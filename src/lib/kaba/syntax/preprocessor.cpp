@@ -125,11 +125,11 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 	bool is_address = false;
 	bool is_local = false;
 	for (int i=0;i<c->num_params;i++)
-		if (c->params[i]->kind == KIND_ADDRESS)
+		if (c->params[i]->kind == NodeKind::ADDRESS)
 			is_address = true;
-		else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
+		else if (c->params[i]->kind == NodeKind::LOCAL_ADDRESS)
 			is_address = is_local = true;
-		else if (c->params[i]->kind != KIND_CONSTANT)
+		else if (c->params[i]->kind != NodeKind::CONSTANT)
 			all_const = false;
 	if (!all_const)
 		return;
@@ -155,7 +155,7 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 							d2 = ps->constants[c->params[1]->link_no].value;
 						f(ps->constants[nc].value, d1, d2);
 						c->script = ps->script;
-						c->kind = KIND_CONSTANT;
+						c->kind = NodeKind::CONSTANT;
 						c->link_no = nc;
 						c->num_params = 0;
 					}
@@ -165,7 +165,7 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 
 Node *SyntaxTree::pre_process_node(Node *c)
 {
-	if (c->kind == KIND_OPERATOR){
+	if (c->kind == NodeKind::OPERATOR){
 		Operator *o = c->as_op();
 		/*if (c->link_nr == OperatorIntAdd){
 			if (c->param[1]->kind == KindConstant){
@@ -180,11 +180,11 @@ Node *SyntaxTree::pre_process_node(Node *c)
 			bool is_address = false;
 			bool is_local = false;
 			for (int i=0;i<c->params.num;i++)
-				if (c->params[i]->kind == KIND_ADDRESS)
+				if (c->params[i]->kind == NodeKind::ADDRESS)
 					is_address = true;
-				else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
+				else if (c->params[i]->kind == NodeKind::LOCAL_ADDRESS)
 					is_address = is_local = true;
-				else if (c->params[i]->kind != KIND_CONSTANT)
+				else if (c->params[i]->kind != NodeKind::CONSTANT)
 					all_const = false;
 			if (all_const){
 				op_func *f = (op_func*)o->f->address_preprocess;
@@ -214,7 +214,7 @@ Node *SyntaxTree::pre_process_node(Node *c)
 			}
 		}
 #if 1
-	}else if (c->kind == KIND_FUNCTION_CALL){
+	}else if (c->kind == NodeKind::FUNCTION_CALL){
 		Function *f = c->as_func();
 		if (!f->is_pure)
 			return c;
@@ -227,17 +227,17 @@ Node *SyntaxTree::pre_process_node(Node *c)
 		bool is_address = false;
 		bool is_local = false;
 		for (int i=0;i<c->params.num;i++){
-			if (c->params[i]->kind == KIND_ADDRESS)
+			if (c->params[i]->kind == NodeKind::ADDRESS)
 				is_address = true;
-			else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
+			else if (c->params[i]->kind == NodeKind::LOCAL_ADDRESS)
 				is_address = is_local = true;
-			else if (c->params[i]->kind != KIND_CONSTANT)
+			else if (c->params[i]->kind != NodeKind::CONSTANT)
 				all_const = false;
 		}
 		void *inst = nullptr;
 		if (c->instance){
 			return c;
-			if (c->instance->kind != KIND_CONSTANT)
+			if (c->instance->kind != NodeKind::CONSTANT)
 				all_const = false;
 			inst = c->instance->as_const()->p();
 		}
@@ -257,10 +257,10 @@ Node *SyntaxTree::pre_process_node(Node *c)
 		//DoError("...pure function evaluation?!?....TODO");
 		return r;
 #endif
-	}else if (c->kind == KIND_ARRAY_BUILDER){
+	}else if (c->kind == NodeKind::ARRAY_BUILDER){
 		bool all_consts = true;
 		for (int i=0; i<c->params.num; i++)
-			if (c->params[i]->kind != KIND_CONSTANT)
+			if (c->params[i]->kind != NodeKind::CONSTANT)
 				all_consts = false;
 		if (all_consts){
 			Node *c_array = add_node_const(add_constant(c->type));
@@ -313,18 +313,18 @@ Node *SyntaxTree::pre_process_node(Node *c)
 // may not use AddConstant()!!!
 Node *SyntaxTree::pre_process_node_addresses(Node *c)
 {
-	if (c->kind == KIND_OPERATOR){
+	if (c->kind == NodeKind::OPERATOR){
 		Operator *o = c->as_op();
 		if (o->f->address){
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
 			for (int i=0;i<c->params.num;i++)
-				if (c->params[i]->kind == KIND_ADDRESS)
+				if (c->params[i]->kind == NodeKind::ADDRESS)
 					is_address = true;
-				else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
+				else if (c->params[i]->kind == NodeKind::LOCAL_ADDRESS)
 					is_address = is_local = true;
-				else if (c->params[i]->kind != KIND_CONSTANT)
+				else if (c->params[i]->kind != NodeKind::CONSTANT)
 					all_const = false;
 			if (all_const){
 				op_func *f = (op_func*)o->f->address;
@@ -335,32 +335,32 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c)
 					d2.init(c->params[1]->type);
 					*(void**)d1.p() = (void*)c->params[0]->link_no;
 					*(void**)d2.p() = (void*)c->params[1]->link_no;
-					if (c->params[0]->kind == KIND_CONSTANT)
+					if (c->params[0]->kind == NodeKind::CONSTANT)
 					    d1.set(*c->params[0]->as_const());
-					if (c->params[1]->kind == KIND_CONSTANT)
+					if (c->params[1]->kind == NodeKind::CONSTANT)
 					    d2.set(*c->params[1]->as_const());
 					Value r;
 					r.init(c->type);
 					f(r, d1, d2);
-					return new Node(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(int_p*)r.p(), c->type);
+					return new Node(is_local ? NodeKind::LOCAL_ADDRESS : NodeKind::ADDRESS, *(int_p*)r.p(), c->type);
 				}
 			}
 		}
-	}else if (c->kind == KIND_REFERENCE){
+	}else if (c->kind == NodeKind::REFERENCE){
 		Node *p0 = c->params[0];
-		if (p0->kind == KIND_VAR_GLOBAL){
-			return new Node(KIND_ADDRESS, (int_p)p0->as_global_p(), c->type);
-		}else if (p0->kind == KIND_VAR_LOCAL){
-			return new Node(KIND_LOCAL_ADDRESS, (int_p)p0->as_local()->_offset, c->type);
-		}else if (p0->kind == KIND_CONSTANT){
-			return new Node(KIND_ADDRESS, (int_p)p0->as_const_p(), c->type);
+		if (p0->kind == NodeKind::VAR_GLOBAL){
+			return new Node(NodeKind::ADDRESS, (int_p)p0->as_global_p(), c->type);
+		}else if (p0->kind == NodeKind::VAR_LOCAL){
+			return new Node(NodeKind::LOCAL_ADDRESS, (int_p)p0->as_local()->_offset, c->type);
+		}else if (p0->kind == NodeKind::CONSTANT){
+			return new Node(NodeKind::ADDRESS, (int_p)p0->as_const_p(), c->type);
 		}
-	}else if (c->kind == KIND_DEREFERENCE){
+	}else if (c->kind == NodeKind::DEREFERENCE){
 		Node *p0 = c->params[0];
-		if (p0->kind == KIND_ADDRESS){
-			return new Node(KIND_MEMORY, p0->link_no, c->type);
-		}else if (p0->kind == KIND_LOCAL_ADDRESS){
-			return new Node(KIND_LOCAL_MEMORY, p0->link_no, c->type);
+		if (p0->kind == NodeKind::ADDRESS){
+			return new Node(NodeKind::MEMORY, p0->link_no, c->type);
+		}else if (p0->kind == NodeKind::LOCAL_ADDRESS){
+			return new Node(NodeKind::LOCAL_MEMORY, p0->link_no, c->type);
 		}
 	}
 	return c;

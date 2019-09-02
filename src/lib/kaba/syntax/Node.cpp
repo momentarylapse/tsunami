@@ -11,80 +11,84 @@
 
 namespace Kaba{
 
-string kind2str(int kind) {
-	if (kind == KIND_VAR_LOCAL)
+string kind2str(NodeKind kind) {
+	if (kind == NodeKind::VAR_LOCAL)
 		return "local";
-	if (kind == KIND_VAR_GLOBAL)
+	if (kind == NodeKind::VAR_GLOBAL)
 		return "global";
-	if (kind == KIND_FUNCTION_NAME)
+	if (kind == NodeKind::FUNCTION_NAME)
 		return "function name";
-	if (kind == KIND_FUNCTION_POINTER)
+	if (kind == NodeKind::FUNCTION_POINTER)
 		return "function pointer";
-	if (kind == KIND_CONSTANT)
+	if (kind == NodeKind::CONSTANT)
 		return "constant";
-	if (kind == KIND_CONSTANT_BY_ADDRESS)
+	if (kind == NodeKind::CONSTANT_BY_ADDRESS)
 		return "constant by addr";
-	if (kind == KIND_FUNCTION_CALL)
+	if (kind == NodeKind::FUNCTION_CALL)
 		return "call";
-	if (kind == KIND_POINTER_CALL)
+	if (kind == NodeKind::POINTER_CALL)
 		return "pointer call";
-	if (kind == KIND_INLINE_CALL)
+	if (kind == NodeKind::INLINE_CALL)
 		return "inline";
-	if (kind == KIND_VIRTUAL_CALL)
+	if (kind == NodeKind::VIRTUAL_CALL)
 		return "virtual call";
-	if (kind == KIND_STATEMENT)
+	if (kind == NodeKind::STATEMENT)
 		return "statement";
-	if (kind == KIND_OPERATOR)
+	if (kind == NodeKind::OPERATOR)
 		return "operator";
-	if (kind == KIND_PRIMITIVE_OPERATOR)
+	if (kind == NodeKind::PRIMITIVE_OPERATOR)
 		return "PRIMITIVE operator";
-	if (kind == KIND_BLOCK)
+	if (kind == NodeKind::BLOCK)
 		return "block";
-	if (kind == KIND_ADDRESS_SHIFT)
+	if (kind == NodeKind::ADDRESS_SHIFT)
 		return "address shift";
-	if (kind == KIND_ARRAY)
+	if (kind == NodeKind::ARRAY)
 		return "array element";
-	if (kind == KIND_POINTER_AS_ARRAY)
+	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return "pointer as array element";
-	if (kind == KIND_REFERENCE)
+	if (kind == NodeKind::REFERENCE)
 		return "address operator";
-	if (kind == KIND_DEREFERENCE)
+	if (kind == NodeKind::DEREFERENCE)
 		return "dereferencing";
-	if (kind == KIND_DEREF_ADDRESS_SHIFT)
+	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
 		return "deref address shift";
-	if (kind == KIND_CLASS)
+	if (kind == NodeKind::CLASS)
 		return "class";
-	if (kind == KIND_ARRAY_BUILDER)
+	if (kind == NodeKind::ARRAY_BUILDER)
 		return "array builder";
-	if (kind == KIND_CONSTRUCTOR_AS_FUNCTION)
+	if (kind == NodeKind::ARRAY_BUILDER_FOR)
+		return "array builder for";
+	if (kind == NodeKind::ARRAY_BUILDER_FOR_IF)
+		return "array builder for if";
+	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return "constructor function";
-	if (kind == KIND_VAR_TEMP)
+	if (kind == NodeKind::VAR_TEMP)
 		return "temp";
-	if (kind == KIND_DEREF_VAR_TEMP)
+	if (kind == NodeKind::DEREF_VAR_TEMP)
 		return "deref temp";
-	if (kind == KIND_REGISTER)
+	if (kind == NodeKind::REGISTER)
 		return "register";
-	if (kind == KIND_ADDRESS)
+	if (kind == NodeKind::ADDRESS)
 		return "address";
-	if (kind == KIND_MEMORY)
+	if (kind == NodeKind::MEMORY)
 		return "memory";
-	if (kind == KIND_LOCAL_ADDRESS)
+	if (kind == NodeKind::LOCAL_ADDRESS)
 		return "local address";
-	if (kind == KIND_LOCAL_MEMORY)
+	if (kind == NodeKind::LOCAL_MEMORY)
 		return "local memory";
-	if (kind == KIND_DEREF_REGISTER)
+	if (kind == NodeKind::DEREF_REGISTER)
 		return "deref register";
-	if (kind == KIND_MARKER)
+	if (kind == NodeKind::MARKER)
 		return "marker";
-	if (kind == KIND_DEREF_MARKER)
+	if (kind == NodeKind::DEREF_MARKER)
 		return "deref marker";
-	if (kind == KIND_GLOBAL_LOOKUP)
+	if (kind == NodeKind::GLOBAL_LOOKUP)
 		return "global lookup";
-	if (kind == KIND_DEREF_GLOBAL_LOOKUP)
+	if (kind == NodeKind::DEREF_GLOBAL_LOOKUP)
 		return "deref global lookup";
-	if (kind == KIND_IMMEDIATE)
+	if (kind == NodeKind::IMMEDIATE)
 		return "immediate";
-	if (kind == KIND_DEREF_LOCAL_MEMORY)
+	if (kind == NodeKind::DEREF_LOCAL_MEMORY)
 		return "deref local";
 	return format("UNKNOWN KIND: %d", kind);
 }
@@ -92,57 +96,57 @@ string kind2str(int kind) {
 
 string Node::sig() const {
 	string t = type->name + " ";
-	if (kind == KIND_VAR_LOCAL)
+	if (kind == NodeKind::VAR_LOCAL)
 		return t + as_local()->name;
-	if (kind == KIND_VAR_GLOBAL)
+	if (kind == NodeKind::VAR_GLOBAL)
 		return t + as_global()->name;
-	if (kind == KIND_FUNCTION_POINTER)
+	if (kind == NodeKind::FUNCTION_POINTER)
 		return t + as_func()->long_name();
-	if (kind == KIND_FUNCTION_NAME)
+	if (kind == NodeKind::FUNCTION_NAME)
 		return t + as_func()->long_name();
-	if (kind == KIND_CONSTANT)
+	if (kind == NodeKind::CONSTANT)
 		return t + as_const()->str();
-	if (kind == KIND_FUNCTION_CALL)
+	if (kind == NodeKind::FUNCTION_CALL)
 		return as_func()->signature();
-	if (kind == KIND_POINTER_CALL)
+	if (kind == NodeKind::POINTER_CALL)
 		return "";
-	if (kind == KIND_INLINE_CALL)
+	if (kind == NodeKind::INLINE_CALL)
 		return as_func()->signature();
-	if (kind == KIND_VIRTUAL_CALL)
+	if (kind == NodeKind::VIRTUAL_CALL)
 		return t + i2s(link_no);//s->Functions[nr]->name;
-	if (kind == KIND_CONSTRUCTOR_AS_FUNCTION)
+	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return as_func()->signature();
-	if (kind == KIND_STATEMENT)
+	if (kind == NodeKind::STATEMENT)
 		return t + as_statement()->name;
-	if (kind == KIND_OPERATOR)
+	if (kind == NodeKind::OPERATOR)
 		return as_op()->sig();
-	if (kind == KIND_PRIMITIVE_OPERATOR)
+	if (kind == NodeKind::PRIMITIVE_OPERATOR)
 		return as_prim_op()->name;
-	if (kind == KIND_BLOCK)
+	if (kind == NodeKind::BLOCK)
 		return "";//p2s(as_block());
-	if (kind == KIND_ADDRESS_SHIFT)
+	if (kind == NodeKind::ADDRESS_SHIFT)
 		return t + i2s(link_no);
-	if (kind == KIND_ARRAY)
+	if (kind == NodeKind::ARRAY)
 		return t;
-	if (kind == KIND_POINTER_AS_ARRAY)
+	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return t;
-	if (kind == KIND_REFERENCE)
+	if (kind == NodeKind::REFERENCE)
 		return t;
-	if (kind == KIND_DEREFERENCE)
+	if (kind == NodeKind::DEREFERENCE)
 		return t;
-	if (kind == KIND_DEREF_ADDRESS_SHIFT)
+	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
 		return t + i2s(link_no);
-	if (kind == KIND_CLASS)
+	if (kind == NodeKind::CLASS)
 		return as_class()->name;
-	if (kind == KIND_REGISTER)
+	if (kind == NodeKind::REGISTER)
 		return t + Asm::GetRegName(link_no);
-	if (kind == KIND_ADDRESS)
+	if (kind == NodeKind::ADDRESS)
 		return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_MEMORY)
+	if (kind == NodeKind::MEMORY)
 		return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_LOCAL_ADDRESS)
+	if (kind == NodeKind::LOCAL_ADDRESS)
 		return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_LOCAL_MEMORY)
+	if (kind == NodeKind::LOCAL_MEMORY)
 		return t + d2h(&link_no, config.pointer_size);
 	return t + i2s(link_no);
 }
@@ -170,7 +174,7 @@ void Node::show() const {
 
 
 Block::Block(Function *f, Block *_parent) :
-	Node(KIND_BLOCK, (int_p)this, TypeVoid)
+	Node(NodeKind::BLOCK, (int_p)this, TypeVoid)
 {
 	level = 0;
 	function = f;
@@ -221,17 +225,17 @@ const Class *Block::name_space() const {
 }
 
 
-Node::Node(int _kind, int64 _link_no, const Class *_type) {
+Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
 	instance = nullptr;
 }
 
-Node::Node(const Class *c) : Node(KIND_CLASS, (int_p)c, TypeClass) {}
-Node::Node(const Block *b) : Node(KIND_BLOCK, (int_p)b, TypeVoid) {}
-Node::Node(const Function *f) : Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunction) {}
-Node::Node(const Constant *c) : Node(KIND_CONSTANT, (int_p)c, c->type) {}
+Node::Node(const Class *c) : Node(NodeKind::CLASS, (int_p)c, TypeClass) {}
+Node::Node(const Block *b) : Node(NodeKind::BLOCK, (int_p)b, TypeVoid) {}
+Node::Node(const Function *f) : Node(NodeKind::FUNCTION_NAME, (int_p)f, TypeFunction) {}
+Node::Node(const Constant *c) : Node(NodeKind::CONSTANT, (int_p)c, c->type) {}
 
 Node::~Node() {
 	if (instance)
@@ -282,11 +286,11 @@ Variable *Node::as_local() const {
 }
 
 Statement *Node::as_statement() const {
-	return &Statements[link_no];
+	return (Statement*)link_no;
 }
 
 PrimitiveOperator *Node::as_prim_op() const {
-	return &PrimitiveOperators[link_no];
+	return (PrimitiveOperator*)link_no;
 }
 
 void Node::set_instance(Node *p) {

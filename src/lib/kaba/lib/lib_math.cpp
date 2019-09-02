@@ -454,7 +454,7 @@ void SIAddPackageMath() {
 		class_add_func("str", TypeString, mf(&complex::str), FLAG_PURE);
 		class_add_const("I", TypeComplex, &complex::I);
 		class_add_func("create", TypeComplex, (void*)__complex_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-			func_set_inline(INLINE_COMPLEX_SET);
+			func_set_inline(InlineID::COMPLEX_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)__complex_set);
@@ -487,7 +487,7 @@ void SIAddPackageMath() {
 			func_add_param("v1", TypeVector);
 			func_add_param("v2", TypeVector);
 		class_add_func("create", TypeVector, (void*)&__vector_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-			func_set_inline(INLINE_VECTOR_SET);
+			func_set_inline(InlineID::VECTOR_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
@@ -542,7 +542,7 @@ void SIAddPackageMath() {
 		class_add_func("str", TypeString, mf(&rect::str), FLAG_PURE);
 		class_add_const("ID", TypeRect, (void*)&rect::ID);
 		class_add_func("create", TypeRect, (void*)__rect_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-			func_set_inline(INLINE_RECT_SET);
+			func_set_inline(InlineID::RECT_SET);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
 			func_add_param("y1", TypeFloat32);
@@ -581,7 +581,7 @@ void SIAddPackageMath() {
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
 		class_add_func("create", TypeColor, (void*)&__color_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-			func_set_inline(INLINE_COLOR_SET);
+			func_set_inline(InlineID::COLOR_SET);
 			func_add_param("a", TypeFloat32);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);

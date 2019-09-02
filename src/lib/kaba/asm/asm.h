@@ -6,22 +6,22 @@ namespace Asm
 {
 
 // instruction sets
-enum{
-	INSTRUCTION_SET_X86,
-	INSTRUCTION_SET_AMD64,
-	INSTRUCTION_SET_ARM
+enum class InstructionSet {
+	NATIVE = -1,
+	X86,
+	AMD64,
+	ARM
 };
 
-struct InstructionSetData
-{
-	int set;
+struct InstructionSetData {
+	InstructionSet set;
 	int pointer_size;
 };
 
-extern InstructionSetData InstructionSet;
+extern InstructionSetData instruction_set;
 
 // single registers
-enum{
+enum {
 	REG_EAX, REG_ECX, REG_EDX, REG_EBX, REG_ESP, REG_ESI, REG_EDI, REG_EBP, // 4 byte
 	REG_AX, REG_CX, REG_DX, REG_BX, REG_BP, REG_SP, REG_SI, REG_DI, // 2 byte
 	REG_AL, REG_CL, REG_DL, REG_BL, REG_AH, REG_CH, REG_DH, REG_BH, // 1 byte
@@ -49,7 +49,7 @@ string GetRegName(int reg);
 
 
 
-enum{
+enum {
 	// data instructions
 	INST_DB,
 	INST_DW,
@@ -328,22 +328,19 @@ enum
 
 const string GetInstructionName(int inst);
 
-struct GlobalVar
-{
+struct GlobalVar {
 	string name;
 	void *pos; // points into the memory of a script
 	int size;
 };
 
-struct Label
-{
+struct Label {
 	string name;
 	int inst_no;
 	int64 value;
 };
 
-struct WantedLabel
-{
+struct WantedLabel {
 	string name;
 	int pos; // position to fill into     relative to CodeOrigin (Opcode[0])
 	int size; // number of bytes to fill
@@ -354,23 +351,20 @@ struct WantedLabel
 	bool abs;
 };
 
-struct AsmData
-{
+struct AsmData {
 	int size; // number of bytes
 	int cmd_pos;
 	int offset; // relative to code_origin (Opcode[0])
 	//void *data;
 };
 
-struct BitChange
-{
+struct BitChange {
 	int cmd_pos;
 	int offset; // relative to code_origin (Opcode[0])
 	int bits;
 };
 
-struct MetaInfo
-{
+struct MetaInfo {
 	int64 code_origin; // how to interpret opcode buffer[0]
 	bool mode16;
 	int line_offset; // number of script lines preceding asm block (to give correct error messages)
@@ -389,8 +383,7 @@ struct MetaInfo
 struct Register;
 
 // a real parameter (usable)
-struct InstructionParam
-{
+struct InstructionParam {
 	InstructionParam();
 	int type;
 	int disp;
@@ -403,8 +396,7 @@ struct InstructionParam
 	string str(bool hide_size = false);
 };
 
-struct InstructionWithParams
-{
+struct InstructionWithParams {
 	int inst;
 	int condition; // ARM
 	InstructionParam p[3];
@@ -416,8 +408,7 @@ struct InstructionWithParams
 };
 
 
-enum
-{
+enum {
 	SIZE_8 = 1,
 	SIZE_16 = 2,
 	SIZE_24 = 3,
@@ -444,8 +435,7 @@ InstructionParam param_deref_imm(int64 value, int size);
 InstructionParam param_label(int64 value, int size);
 InstructionParam param_deref_label(int64 value, int size);
 
-struct InstructionWithParamsList : public Array<InstructionWithParams>
-{
+struct InstructionWithParamsList : public Array<InstructionWithParams> {
 	InstructionWithParamsList(int line_offset);
 	~InstructionWithParamsList();
 
@@ -487,13 +477,12 @@ struct InstructionWithParamsList : public Array<InstructionWithParams>
 	int current_inst;
 };
 
-void Init(int instruction_set = -1);
-int QueryLocalInstructionSet();
+void Init(InstructionSet instruction_set = InstructionSet::NATIVE);
+InstructionSet QueryLocalInstructionSet();
 bool Assemble(const char *code, char *oc, int &ocs);
 string Disassemble(void *code, int length = -1, bool allow_comments = true);
 
-class Exception : public ::Exception
-{
+class Exception : public ::Exception {
 public:
 	Exception(const string &message, const string &expression, int line, int column);
 	~Exception() override;

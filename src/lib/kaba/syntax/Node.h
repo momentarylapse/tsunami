@@ -11,7 +11,7 @@
 
 #include "../../base/base.h"
 
-namespace Kaba{
+namespace Kaba {
 
 class Class;
 class Block;
@@ -25,60 +25,61 @@ class PrimitiveOperator;
 class Statement;
 
 
-enum
-{
-	KIND_UNKNOWN,
+enum class NodeKind {
+	NONE = -1,
+	UNKNOWN,
 	// data
-	KIND_VAR_LOCAL,
-	KIND_VAR_GLOBAL,
-	KIND_FUNCTION_NAME,
-	KIND_FUNCTION_POINTER,
-	KIND_CONSTANT,
+	VAR_LOCAL,
+	VAR_GLOBAL,
+	FUNCTION_NAME,
+	FUNCTION_POINTER,
+	CONSTANT,
 	// execution
-	KIND_FUNCTION_CALL,      // = real function call
-	KIND_VIRTUAL_CALL,       // = virtual function call
-	KIND_INLINE_CALL,        // = function defined inside the compiler...
-	KIND_POINTER_CALL,       // = function call via pointer
-	KIND_STATEMENT,          // = if/while/break/...
-	KIND_BLOCK,              // = block of commands {...}
-	KIND_OPERATOR,
-	KIND_PRIMITIVE_OPERATOR, // tentative...
+	FUNCTION_CALL,      // = real function call
+	VIRTUAL_CALL,       // = virtual function call
+	INLINE_CALL,        // = function defined inside the compiler...
+	POINTER_CALL,       // = function call via pointer
+	STATEMENT,          // = if/while/break/...
+	BLOCK,              // = block of commands {...}
+	OPERATOR,
+	PRIMITIVE_OPERATOR, // tentative...
 	// data altering
-	KIND_ADDRESS_SHIFT,      // = . "struct"
-	KIND_ARRAY,              // = []
-	KIND_POINTER_AS_ARRAY,   // = []
-	KIND_REFERENCE,          // = &
-	KIND_DEREFERENCE,        // = *
-	KIND_DEREF_ADDRESS_SHIFT,// = ->
-	KIND_CONSTANT_BY_ADDRESS,
-	KIND_ADDRESS,            // &global (for pre processing address shifts)
-	KIND_MEMORY,             // global (but LinkNr = address)
-	KIND_LOCAL_ADDRESS,      // &local (for pre processing address shifts)
-	KIND_LOCAL_MEMORY,       // local (but LinkNr = address)
+	ADDRESS_SHIFT,      // = . "struct"
+	ARRAY,              // = []
+	POINTER_AS_ARRAY,   // = []
+	REFERENCE,          // = &
+	DEREFERENCE,        // = *
+	DEREF_ADDRESS_SHIFT,// = ->
+	CONSTANT_BY_ADDRESS,
+	ADDRESS,            // &global (for pre processing address shifts)
+	MEMORY,             // global (but LinkNr = address)
+	LOCAL_ADDRESS,      // &local (for pre processing address shifts)
+	LOCAL_MEMORY,       // local (but LinkNr = address)
 	// special
-	KIND_CLASS,
-	KIND_ARRAY_BUILDER,
-	KIND_CONSTRUCTOR_AS_FUNCTION,
+	CLASS,
+	ARRAY_BUILDER,
+	ARRAY_BUILDER_FOR,
+	ARRAY_BUILDER_FOR_IF,
+	CONSTRUCTOR_AS_FUNCTION,
 	// compilation
-	KIND_VAR_TEMP,
-	KIND_DEREF_VAR_TEMP,
-	KIND_DEREF_LOCAL_MEMORY,
-	KIND_REGISTER,
-	KIND_DEREF_REGISTER,
-	KIND_MARKER,
-	KIND_DEREF_MARKER,
-	KIND_IMMEDIATE,
-	KIND_GLOBAL_LOOKUP,       // ARM
-	KIND_DEREF_GLOBAL_LOOKUP, // ARM
+	VAR_TEMP,
+	DEREF_VAR_TEMP,
+	DEREF_LOCAL_MEMORY,
+	REGISTER,
+	DEREF_REGISTER,
+	MARKER,
+	DEREF_MARKER,
+	IMMEDIATE,
+	GLOBAL_LOOKUP,       // ARM
+	DEREF_GLOBAL_LOOKUP, // ARM
 };
 
 class Node;
 
 // single operand/command
-class Node
-{
+class Node {
 public:
-	int kind;
+	NodeKind kind;
 	int64 link_no;
 	// parameters
 	Array<Node*> params;
@@ -86,7 +87,7 @@ public:
 	Node *instance;
 	// return value
 	const Class *type;
-	Node(int kind, int64 link_no, const Class *type);
+	Node(NodeKind kind, int64 link_no, const Class *type);
 	Node(const Class *c);
 	Node(const Block *b);
 	Node(const Function *f);
@@ -115,12 +116,11 @@ public:
 void clear_nodes(Array<Node*> &nodes);
 void clear_nodes(Array<Node*> &nodes, Node *keep);
 
-string kind2str(int kind);
+string kind2str(NodeKind kind);
 string node2str(SyntaxTree *s, Node *n);
 
 // {...}-block
-class Block : public Node
-{
+class Block : public Node {
 public:
 	Block(Function *f, Block *parent);
 	virtual ~Block();

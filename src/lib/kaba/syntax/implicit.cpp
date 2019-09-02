@@ -8,10 +8,9 @@ namespace Kaba{
 void SyntaxTree::auto_implement_add_virtual_table(Node *self, Function *f, const Class *t) {
 	if (t->vtable.num > 0) {
 		Node *p = shift_node(self, true, 0, TypePointer);
-		auto *c = add_constant(TypePointer);
-		(*(void**)c->value.data) = t->_vtable_location_target_;
+		auto *c = add_constant_pointer(TypePointer, t->_vtable_location_target_);
 		Node *n_0 = add_node_const(c);
-		Node *n_assign = add_node_operator_by_inline(p, n_0, INLINE_POINTER_ASSIGN);
+		Node *n_assign = add_node_operator_by_inline(p, n_0, InlineID::POINTER_ASSIGN);
 		f->block->add(n_assign);
 	}
 }
@@ -38,14 +37,12 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 	Node *n_self = add_node_local_var(f->__get_var(IDENTIFIER_SELF));
 
 	if (t->is_super_array()) {
-		Node *n_el_size = add_node_const(add_constant(TypeInt));
-		n_el_size->as_const()->as_int() = t->parent->size;
+		Node *n_el_size = add_node_const(add_constant_int(t->parent->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
 		n_mem_init->set_param(0, n_el_size);
 		f->block->add(n_mem_init);
 	}else if (t->is_dict()) {
-		Node *n_el_size = add_node_const(add_constant(TypeInt));
-		n_el_size->as_const()->as_int() = t->parent->size + TypeString->size;
+		Node *n_el_size = add_node_const(add_constant_int(t->parent->size + TypeString->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
 		n_mem_init->set_param(0, n_el_size);
 		f->block->add(n_mem_init);
@@ -148,104 +145,50 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 	Node *n_other = add_node_local_var(f->__get_var("other"));
 	Node *n_self = add_node_local_var(f->__get_var(IDENTIFIER_SELF));
 
-	if (t->is_super_array()){
+	if (t->is_super_array() or t->is_array()){
 
-		Function *f_resize = t->get_func("resize", TypeVoid, {TypeInt});
-		if (!f_resize)
-			do_error_implicit(f, format("no %s.resize(int) found", t->name.c_str()));
+		if (t->is_super_array()) {
+			Function *f_resize = t->get_func("resize", TypeVoid, {TypeInt});
+			if (!f_resize)
+				do_error_implicit(f, format("no %s.resize(int) found", t->name.c_str()));
 
-		// self.resize(other.num)
-		Node *n_other_num = shift_node(n_other, false, config.pointer_size, TypeInt);
+			// self.resize(other.num)
+			Node *n_other_num = shift_node(n_other, false, config.pointer_size, TypeInt);
 
-		Node *n_resize = add_node_member_call(f_resize, n_self);
-		n_resize->set_num_params(1);
-		n_resize->set_param(0, n_other_num);
-		f->block->add(n_resize);
+			Node *n_resize = add_node_member_call(f_resize, n_self);
+			n_resize->set_num_params(1);
+			n_resize->set_param(0, n_other_num);
+			f->block->add(n_resize);
+		}
 
-		// for int i, 0, other.num
-		//    self[i].__assign__(other[i])
+		// for el,i in *self
+		//    el = other[i]
 
+		auto *v_el = f->block->add_var("el", t->get_array_element()->get_pointer());
 		auto *v_i = f->block->add_var("i", TypeInt);
-		Node *n_i = add_node_local_var(v_i);
-
-		Node *n_for = add_node_statement(STATEMENT_FOR);
-		f->block->add(n_for);
-
-		// for_var = 0
-		Node *n_0 = add_node_const(add_constant(TypeInt));
-		n_0->as_const()->as_int() = 0;
-		Node *n_assign0 = add_node_operator_by_inline(n_i, n_0, INLINE_INT_ASSIGN);
-		n_for->set_param(0, n_assign0);
-
-		// while(for_var < self.num)
-		Node *n_cmp = add_node_operator_by_inline(cp_node(n_i), cp_node(n_other_num), INLINE_INT_SMALLER);
-		n_for->set_param(1, n_cmp);
 
 		Block *b = new Block(f, f->block);
-		n_for->set_param(2, b);
 
-		// el := self.data[for_var]
-		Node *n_deref_self = deref_node(cp_node(n_self));
-		Node *n_self_data = shift_node(n_deref_self, false, 0, t->parent->get_pointer());
-		Node *n_self_el = add_node_parray(n_self_data, cp_node(n_i), t->parent);
+		// other[i]
+		Node *n_other_el;
+		if (t->is_array())
+			n_other_el = add_node_array(cp_node(n_other), add_node_local_var(v_i));
+		else
+			n_other_el = add_node_dyn_array(cp_node(n_other), add_node_local_var(v_i));
 
-		// el2 := other.data[for_var]
-		Node *n_other_data = shift_node(cp_node(n_other), false, 0, t->parent->get_pointer());
-		Node *n_other_el = add_node_parray(n_other_data, cp_node(n_i), t->parent);
-
-
-		Node *n_assign = link_operator(OPERATOR_ASSIGN, n_self_el, n_other_el);
+		Node *n_assign = link_operator_id(OperatorID::ASSIGN, deref_node(add_node_local_var(v_el)), n_other_el);
 		if (!n_assign)
 			do_error_implicit(f, format("no %s.__assign__() found", t->parent->name.c_str()));
 		b->add(n_assign);
 
-		// ...for_var += 1
-		Node *n_inc = add_node_operator_by_inline(cp_node(n_i), n_0 /*dummy*/, INLINE_INT_INCREASE);
-		n_for->set_param(3, n_inc);
-	} else if (t->is_array()) {
-
-		// for int i, 0, other.num
-		//    self[i].__assign__(other[i])
-
-		auto *v_i = f->block->add_var("i", TypeInt);
-		Node *n_num = add_node_const(add_constant(TypeInt));
-		n_num->as_const()->as_int() = t->array_length;
-
-		Node *n_i = add_node_local_var(v_i);
-
-
-		Node *n_for = add_node_statement(STATEMENT_FOR);
+		Node *n_for = add_node_statement(StatementID::FOR_ARRAY);
+		// [VAR, INDEX, ARRAY, BLOCK]
+		n_for->set_param(0, add_node_local_var(v_el));
+		n_for->set_param(1, add_node_local_var(v_i));
+		n_for->set_param(2, deref_node(cp_node(n_self)));
+		n_for->set_param(3, b);
 		f->block->add(n_for);
 
-
-		// for_var = 0
-		Node *n_0 = add_node_const(add_constant(TypeInt));
-		n_0->as_const()->as_int() = 0;
-		Node *n_assign0 = add_node_operator_by_inline(n_i, n_0, INLINE_INT_ASSIGN);
-		n_for->set_param(0, n_assign0);
-
-		// while(for_var < self.num)
-		Node *n_cmp = add_node_operator_by_inline(cp_node(n_i), n_num, INLINE_INT_SMALLER);
-		n_for->set_param(1, n_cmp);
-
-		Block *b = new Block(f, f->block);
-		n_for->set_param(2, b);
-
-		// el := self.data[for_var]
-		Node *n_self_el = add_node_parray(n_self, cp_node(n_i), t->parent);
-
-		// el2 := other.data[for_var]
-		Node *n_other_el = add_node_parray(ref_node(n_other), cp_node(n_i), t->parent);
-
-
-		Node *n_assign = link_operator(OPERATOR_ASSIGN, n_self_el, n_other_el);
-		if (!n_assign)
-			do_error_implicit(f, format("no %s.__assign__() found", t->parent->name.c_str()));
-		b->add(n_assign);
-
-		// ...for_var += 1
-		Node *n_inc = add_node_operator_by_inline(cp_node(n_i), n_0 /*dummy*/, INLINE_INT_INCREASE);
-		n_for->set_param(3, n_inc);
 	} else {
 
 		// parent assignment
@@ -254,7 +197,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 			Node *o = cp_node(n_other);
 			p->type = o->type = t->parent;
 
-			Node *cmd_assign = link_operator(OPERATOR_ASSIGN, p, o);
+			Node *cmd_assign = link_operator_id(OperatorID::ASSIGN, p, o);
 			if (!cmd_assign)
 				do_error_implicit(f, "missing parent default constructor");
 			f->block->add(cmd_assign);
@@ -268,7 +211,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 			Node *p = shift_node(cp_node(n_self), true, e.offset, e.type);
 			Node *o = shift_node(cp_node(n_other), false, e.offset, e.type); // needed for call-by-ref conversion!
 
-			Node *n_assign = link_operator(OPERATOR_ASSIGN, p, o);
+			Node *n_assign = link_operator_id(OperatorID::ASSIGN, p, o);
 			if (!n_assign)
 				do_error_implicit(f, format("no %s.__assign__ for element \"%s\"", e.type->name.c_str(), e.name.c_str()));
 			f->block->add(n_assign);
@@ -282,45 +225,29 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 void SyntaxTree::auto_implement_array_clear(Function *f, const Class *t) {
 	if (!f)
 		return;
-	auto *var_i = f->block->add_var("for_var", TypeInt);
 
 	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF));
-
-	Node *self_num = shift_node(cp_node(self), true, config.pointer_size, TypeInt);
-
-	Node *for_var = add_node_local_var(var_i);
 
 // delete...
 	Function *f_del = t->parent->get_destructor();
 	if (f_del) {
-		Node *cmd_for = add_node_statement(STATEMENT_FOR);
-		f->block->add(cmd_for);
 
-		// for_var = 0
-		Node *cmd_0 = add_node_const(add_constant(TypeInt));
-		cmd_0->as_const()->as_int() = 0;
-		Node *cmd_assign = add_node_operator_by_inline(for_var, cmd_0, INLINE_INT_ASSIGN);
-		cmd_for->set_param(0, cmd_assign);
-
-		// while(for_var < self.num)
-		Node *cmd_cmp = add_node_operator_by_inline(cp_node(for_var), self_num, INLINE_INT_SMALLER);
-		cmd_for->set_param(1, cmd_cmp);
+		auto *var_i = f->block->add_var("i", TypeInt);
+		auto *var_el = f->block->add_var("el", t->get_array_element()->get_pointer());
 
 		Block *b = new Block(f, f->block);
-		cmd_for->set_param(2, b);
-
-		// el := self.data[for_var]
-		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
-		Node *cmd_el = add_node_parray(self_data, cp_node(for_var), t->parent);
 
 		// __delete__
-		Node *cmd_delete = add_node_member_call(f_del, ref_node(cmd_el));
+		Node *cmd_delete = add_node_member_call(f_del, add_node_local_var(var_el));
 		b->add(cmd_delete);
 
-		// for_var ++
-		Node *cmd_inc = add_node_operator_by_inline(cp_node(for_var), cmd_0 /*dummy*/, INLINE_INT_INCREASE);
-		cmd_for->set_param(3, cmd_inc);
+		Node *cmd_for = add_node_statement(StatementID::FOR_ARRAY);
+		cmd_for->set_param(0, add_node_local_var(var_el));
+		cmd_for->set_param(1, add_node_local_var(var_i));
+		cmd_for->set_param(2, deref_node(cp_node(self)));
+		cmd_for->set_param(3, b);
+
+		f->block->add(cmd_for);
 	} else if (t->parent->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
@@ -334,7 +261,7 @@ void SyntaxTree::auto_implement_array_clear(Function *f, const Class *t) {
 void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 	if (!f)
 		return;
-	auto *var = f->block->add_var("for_var", TypeInt);
+	auto *var = f->block->add_var("i", TypeInt);
 	f->block->add_var("num_old", TypeInt);
 
 	Node *num = add_node_local_var(f->__get_var("num"));
@@ -346,39 +273,30 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 	Node *num_old = add_node_local_var(f->__get_var("num_old"));
 
 	// num_old = self.num
-	f->block->add(add_node_operator_by_inline(num_old, self_num, INLINE_INT_ASSIGN));
+	f->block->add(add_node_operator_by_inline(num_old, self_num, InlineID::INT_ASSIGN));
 
 // delete...
 	Function *f_del = t->parent->get_destructor();
 	if (f_del) {
 
-		Node *cmd_for = add_node_statement(STATEMENT_FOR);
-		f->block->add(cmd_for);
-
-		// for_var = num
-		Node *for_var = add_node_local_var(var);
-		Node *cmd_assign = add_node_operator_by_inline(for_var, cp_node(num), INLINE_INT_ASSIGN);
-		cmd_for->set_param(0, cmd_assign);
-
-		// while(for_var < self.num)
-		Node *cmd_cmp = add_node_operator_by_inline(cp_node(for_var), cp_node(self_num), INLINE_INT_SMALLER);
-		cmd_for->set_param(1, cmd_cmp);
-
 		Block *b = new Block(f, f->block);
-		cmd_for->set_param(2, b);
 
-		// el := self.data[for_var]
-		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
-		Node *cmd_el = add_node_parray(self_data, cp_node(for_var), t->parent);
+		// el := self[i]
+		Node *el = add_node_dyn_array(deref_node(cp_node(self)), add_node_local_var(var));
 
 		// __delete__
-		Node *cmd_delete = add_node_member_call(f_del, ref_node(cmd_el));
+		Node *cmd_delete = add_node_member_call(f_del, ref_node(el));
 		b->add(cmd_delete);
 
-		// ...for_var += 1
-		Node *cmd_inc = add_node_operator_by_inline(cp_node(for_var), num /*dummy*/, INLINE_INT_INCREASE);
-		cmd_for->set_param(3, cmd_inc);
+		//  [VAR, START, STOP, STEP, BLOCK]
+		Node *cmd_for = add_node_statement(StatementID::FOR_RANGE);
+		cmd_for->set_param(0, add_node_local_var(var));
+		cmd_for->set_param(1, cp_node(num));
+		cmd_for->set_param(2, cp_node(self_num));
+		cmd_for->set_param(3, add_node_const(add_constant_int(1)));
+		cmd_for->set_param(4, b);
+		f->block->add(cmd_for);
+
 	} else if (t->parent->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
@@ -391,33 +309,25 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 	// new...
 	Function *f_init = t->parent->get_default_constructor();
 	if (f_init) {
-		Node *cmd_for = add_node_statement(STATEMENT_FOR);
-		f->block->add(cmd_for);
-
-		// for_var = num_old
-		Node *for_var = add_node_local_var(var);
-		Node *cmd_assign = add_node_operator_by_inline(for_var, cp_node(num_old), INLINE_INT_ASSIGN);
-		cmd_for->set_param(0, cmd_assign);
-
-		// while(for_var < self.num)
-		Node *cmd_cmp = add_node_operator_by_inline(cp_node(for_var), cp_node(self_num), INLINE_INT_SMALLER);
-		cmd_for->set_param(1, cmd_cmp);
 
 		Block *b = new Block(f, f->block);
-		cmd_for->set_param(2, b);
 
-		// el := self.data[for_var]
-		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
-		Node *cmd_el = add_node_parray(self_data, cp_node(for_var), t->parent);
+		// el := self[i]
+		Node *el = add_node_dyn_array(deref_node(cp_node(self)), add_node_local_var(var));
 
 		// __init__
-		Node *cmd_init = add_node_member_call(f_init, ref_node(cmd_el));
+		Node *cmd_init = add_node_member_call(f_init, ref_node(el));
 		b->add(cmd_init);
 
-		// ...for_var += 1
-		Node *cmd_inc = add_node_operator_by_inline(cp_node(for_var), num /*dummy*/, INLINE_INT_INCREASE);
-		cmd_for->set_param(3, cmd_inc);
+		//  [VAR, START, STOP, STEP, BLOCK]
+		Node *cmd_for = add_node_statement(StatementID::FOR_RANGE);
+		cmd_for->set_param(0, add_node_local_var(var));
+		cmd_for->set_param(1, cp_node(num_old));
+		cmd_for->set_param(2, cp_node(self_num));
+		cmd_for->set_param(3, add_node_const(add_constant_int(1)));
+		cmd_for->set_param(4, b);
+		f->block->add(cmd_for);
+
 	} else if (t->parent->needs_constructor()) {
 		do_error_implicit(f, "element default constructor missing");
 	}
@@ -435,10 +345,8 @@ void SyntaxTree::auto_implement_array_remove(Function *f, const Class *t) {
 	Function *f_del = t->parent->get_destructor();
 	if (f_del) {
 
-		// el := self.data[index]
-		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
-		Node *cmd_el = add_node_parray(self_data, cp_node(index), t->parent);
+		// el := self[index]
+		Node *cmd_el = add_node_dyn_array(deref_node(cp_node(self)), cp_node(index));
 
 		// __delete__
 		Node *cmd_delete = add_node_member_call(f_del, ref_node(cmd_el));
@@ -465,21 +373,18 @@ void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
 
 
 	// resize(self.num + 1)
-	Node *cmd_1 = add_node_const(add_constant(TypeInt));
-	cmd_1->as_const()->as_int() = 1;
-	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, INLINE_INT_ADD);
+	Node *cmd_1 = add_node_const(add_constant_int(1));
+	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, InlineID::INT_ADD);
 	Node *cmd_resize = add_node_member_call(t->get_func("resize", TypeVoid, {TypeInt}), self);
 	cmd_resize->set_param(0, cmd_add);
 	b->add(cmd_resize);
 
 
 	// el := self.data[self.num - 1]
-	Node *cmd_sub = add_node_operator_by_inline(cp_node(self_num), cp_node(cmd_1), INLINE_INT_SUBTRACT);
-	Node *deref_self = deref_node(cp_node(self));
-	Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
-	Node *cmd_el = add_node_parray(self_data, cmd_sub, t->parent);
+	Node *cmd_sub = add_node_operator_by_inline(cp_node(self_num), cp_node(cmd_1), InlineID::INT_SUBTRACT);
+	Node *cmd_el = add_node_dyn_array(deref_node(cp_node(self)), cmd_sub);
 
-	Node *cmd_assign = link_operator(OPERATOR_ASSIGN, cmd_el, item);
+	Node *cmd_assign = link_operator_id(OperatorID::ASSIGN, cmd_el, item);
 	if (!cmd_assign)
 		do_error_implicit(f, format("no %s.%s for elements", t->parent->name.c_str(), IDENTIFIER_FUNC_ASSIGN.c_str()));
 	b->add(cmd_assign);

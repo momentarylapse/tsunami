@@ -1,5 +1,7 @@
 namespace Kaba{
 
+enum class InlineID;
+
 enum ScriptFlag {
 	FLAG_NONE = 0,
 	FLAG_CALL_BY_VALUE = 1,
@@ -23,7 +25,7 @@ template<class T>
 Function *add_funcx(const string &name, const Class *return_type, T func, ScriptFlag flag = FLAG_NONE) {
 	return add_func(name, return_type, (void*)func, flag);
 }
-void func_set_inline(int index);
+void func_set_inline(InlineID index);
 void func_add_param(const string &name, const Class *type);
 Class *add_class(const Class *root_type);
 void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag = FLAG_NONE);

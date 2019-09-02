@@ -11,7 +11,7 @@ int OCParam;
 
 
 
-InstructionSetData InstructionSet;
+InstructionSetData instruction_set;
 
 struct ParserState
 {
@@ -29,7 +29,7 @@ struct ParserState
 	void init()
 	{
 		default_size = SIZE_32;
-		full_register_size = InstructionSet.pointer_size;
+		full_register_size = instruction_set.pointer_size;
 
 		if (CurrentMetaInfo)
 			if (CurrentMetaInfo->mode16)
@@ -723,11 +723,11 @@ void InstructionWithParamsList::add_wanted_label(int pos, int label_no, int inst
 
 void InstructionWithParamsList::add_func_intro(int stack_alloc_size)
 {
-	if (InstructionSet.set == INSTRUCTION_SET_ARM)
+	if (instruction_set.set == InstructionSet::ARM)
 		return;
-	int_p reg_bp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RBP : REG_EBP;
-	int_p reg_sp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RSP : REG_ESP;
-	int s = InstructionSet.pointer_size;
+	int_p reg_bp = (instruction_set.set == InstructionSet::AMD64) ? REG_RBP : REG_EBP;
+	int_p reg_sp = (instruction_set.set == InstructionSet::AMD64) ? REG_RSP : REG_ESP;
+	int s = instruction_set.pointer_size;
 	add2(INST_PUSH, param_reg(reg_bp));
 	add2(INST_MOV, param_reg(reg_bp), param_reg(reg_sp));
 	if (stack_alloc_size > 127){
@@ -1057,7 +1057,7 @@ void add_inst(int inst, int code, int code_size, int cap, int param1, int param2
 	i.has_big_param = (opt == OPT_BIG_PARAM);
 	i.has_big_addr = (opt == OPT_BIG_ADDR);
 	i.has_fixed_param = (opt != OPT_SMALL_PARAM) and (opt != OPT_MEDIUM_PARAM) and (opt != OPT_BIG_PARAM);
-	if ((i.has_big_param) and (InstructionSet.set != INSTRUCTION_SET_AMD64))
+	if ((i.has_big_param) and (instruction_set.set != InstructionSet::AMD64))
 		return;
 
 	if (inst == INST_LEA)
@@ -1131,24 +1131,22 @@ bool GetInstructionAllowGenReg(int inst)
 
 
 
-int QueryLocalInstructionSet()
-{
+InstructionSet QueryLocalInstructionSet() {
 #ifdef CPU_AMD64
-	return INSTRUCTION_SET_AMD64;
+	return InstructionSet::AMD64;
 #endif
 #ifdef CPU_X86
-	return INSTRUCTION_SET_X86;
+	return InstructionSet::X86;
 #endif
 #ifdef CPU_ARM
-	return INSTRUCTION_SET_ARM;
+	return InstructionSet::ARM;
 #endif
 	msg_error("Asm: unknown instruction set");
-	return INSTRUCTION_SET_X86;
+	return InstructionSet::X86;
 }
 
 
-void InitARM()
-{
+void InitARM() {
 	Registers.clear();
 	for (int i=0; i<16; i++)
 		add_reg(format("r%d", i), REG_R0 + i, REG_GROUP_GENERAL, SIZE_32, i);
@@ -1170,7 +1168,7 @@ void InitARM()
 
 void InitX86()
 {
-	int set = InstructionSet.set;
+	auto set = instruction_set.set;
 
 	Registers.clear();
 	add_reg("rax",	REG_RAX,	REG_GROUP_GENERAL,	SIZE_64,	0);
@@ -1439,7 +1437,7 @@ void InitX86()
 	add_inst(INST_CMP,	0x3d	,1	,-1	,REG_AX	,Iw, OPT_SMALL_PARAM);
 	add_inst(INST_CMP,	0x3d	,1	,-1	,REG_EAX	,Id, OPT_MEDIUM_PARAM);
 	add_inst(INST_CMP,	0x3d	,1	,-1	,REG_RAX	,Id, OPT_BIG_PARAM);
-	if (set == INSTRUCTION_SET_X86){
+	if (set == InstructionSet::X86){
 		add_inst(INST_INC		,0x40	,1	,-1	,REG_EAX	,-1);
 		add_inst(INST_INC		,0x41	,1	,-1	,REG_ECX	,-1);
 		add_inst(INST_INC		,0x42	,1	,-1	,REG_EDX	,-1);
@@ -1457,7 +1455,7 @@ void InitX86()
 		add_inst(INST_DEC		,0x4e	,1	,-1	,REG_ESI	,-1);
 		add_inst(INST_DEC		,0x4f	,1	,-1	,REG_EDI	,-1);
 	}
-	if (set == INSTRUCTION_SET_X86){
+	if (set == InstructionSet::X86){
 		add_inst(INST_PUSH		,0x50	,1	,-1	,REG_EAX	,-1);
 		add_inst(INST_PUSH		,0x51	,1	,-1	,REG_ECX	,-1);
 		add_inst(INST_PUSH		,0x52	,1	,-1	,REG_EDX	,-1);
@@ -1474,7 +1472,7 @@ void InitX86()
 		add_inst(INST_POP		,0x5d	,1	,-1	,REG_EBP	,-1);
 		add_inst(INST_POP		,0x5e	,1	,-1	,REG_ESI	,-1);
 		add_inst(INST_POP		,0x5f	,1	,-1	,REG_EDI	,-1);
-	}else if (set == INSTRUCTION_SET_AMD64){
+	}else if (set == InstructionSet::AMD64){
 		add_inst(INST_PUSH		,0x50	,1	,-1	,REG_RAX	,-1);
 		add_inst(INST_PUSH		,0x51	,1	,-1	,REG_RCX	,-1);
 		add_inst(INST_PUSH		,0x52	,1	,-1	,REG_RDX	,-1);
@@ -1888,7 +1886,7 @@ void InitX86()
 	add_inst(INST_UCOMISS,   0x2e0f,   2, -1, Xx, XMd);
 	add_inst(INST_UCOMISD,   0x2e0f66, 3, -1, Xx, XMq);
 
-	if (set == INSTRUCTION_SET_AMD64){
+	if (set == InstructionSet::AMD64){
 		add_inst(INST_SYSCALL,	0x050f, 2, -1, -1, -1);
 		add_inst(INST_SYSRET,	0x070f, 2, -1, -1, -1);
 		add_inst(INST_SYSENTER,	0x340f, 2, -1, -1, -1);
@@ -1898,26 +1896,25 @@ void InitX86()
 
 
 
-void Init(int set)
-{
-	if (set < 0)
+void Init(InstructionSet set) {
+	if (set == InstructionSet::NATIVE)
 		set = QueryLocalInstructionSet();
 
-	InstructionSet.set = set;
-	InstructionSet.pointer_size = 4;
-	if (set == INSTRUCTION_SET_AMD64)
-		InstructionSet.pointer_size = 8;
+	instruction_set.set = set;
+	instruction_set.pointer_size = 4;
+	if (set == InstructionSet::AMD64)
+		instruction_set.pointer_size = 8;
 
 	for (int i=0;i<NUM_REG_ROOTS;i++)
 		for (int j=0;j<=MAX_REG_SIZE;j++)
 			RegResize[i][j] = -1;
 
 
-	for (int i=0;i<Asm::NUM_INSTRUCTION_NAMES;i++)
+	for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
 		if (InstructionNames[i].inst != i)
 			msg_error(string(InstructionNames[i].name) + "  " + i2s(InstructionNames[i].inst) + "  !=   " + i2s(i));
 
-	if (set == INSTRUCTION_SET_ARM)
+	if (set == InstructionSet::ARM)
 		InitARM();
 	else
 		InitX86();
@@ -2674,7 +2671,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 			}
 
 			// REX
-			if (InstructionSet.set == INSTRUCTION_SET_AMD64){
+			if (instruction_set.set == InstructionSet::AMD64){
 				if ((cur[0] & 0xf0) == 0x40){
 					if ((cur[0] & 0x08) > 0)
 						state.param_size = SIZE_64;
@@ -2821,7 +2818,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 // convert some opcode into (human readable) assembler language
 string Disassemble(void *code, int length, bool allow_comments)
 {
-	if (InstructionSet.set == INSTRUCTION_SET_ARM)
+	if (instruction_set.set == InstructionSet::ARM)
 		return DisassembleARM(code, length, allow_comments);
 	return DisassembleX86(code, length, allow_comments);
 }
@@ -3133,7 +3130,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 		if (p.deref){
 			//---msg_write("deref....");
 			size = state.addr_size; // inst.has_big_addr
-			if (InstructionSet.set == INSTRUCTION_SET_AMD64){
+			if (instruction_set.set == InstructionSet::AMD64){
 				if (inst.has_modrm){
 					value -= (int_p)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
 					if ((value >= 0x80000000) or (-value >= 0x80000000))
@@ -3156,7 +3153,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 	if (inst.inst == INST_JMP_FAR)
 		rel = false;
 	if (p.is_label){
-		if ((InstructionSet.set == INSTRUCTION_SET_AMD64) and (p.deref))
+		if ((instruction_set.set == InstructionSet::AMD64) and (p.deref))
 			rel = true;
 		list.add_wanted_label(ocs, p.value, list.current_inst, rel, false, size);
 	}else if (rel){
@@ -3184,7 +3181,7 @@ void InstructionWithParamsList::LinkWantedLabels(void *oc)
 				size = 1;
 
 			// TODO first byte after command
-			if (InstructionSet.set == INSTRUCTION_SET_ARM){
+			if (instruction_set.set == InstructionSet::ARM){
 				value -= CurrentMetaInfo->code_origin + w.pos + size + 4;
 				int inst = (*this)[w.inst_no].inst;
 				if ((inst == INST_BL) or (inst == INST_B) or (inst == INST_CALL) or (inst == INST_JMP)){
@@ -3642,7 +3639,7 @@ void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 
 /*	// try again with REX prefix?
  // now done automatically...!
-	if ((ninst < 0) and (InstructionSet.set == InstructionSetAMD64)){
+	if ((ninst < 0) and (instruction_set.set == InstructionSetAMD64)){
 		state.ParamSize = Size64;
 
 		for (int i=0;i<CPUInstructions.num;i++)
@@ -4002,7 +3999,7 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 
 void InstructionWithParamsList::Optimize(void *oc, int ocs)
 {
-	if (InstructionSet.set != INSTRUCTION_SET_ARM)
+	if (instruction_set.set != InstructionSet::ARM)
 		ShrinkJumps(oc, ocs);
 }
 
@@ -4041,7 +4038,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 			break;
 
 		// opcode
-		if (InstructionSet.set == INSTRUCTION_SET_ARM)
+		if (instruction_set.set == InstructionSet::ARM)
 			AddInstructionARM((char*)oc, ocs, i);
 		else
 			AddInstruction((char*)oc, ocs, i);

@@ -12,29 +12,26 @@ class Serializer;
 
 // represents a register
 // (or rather the data inside, since many VirtualRegisters might be mapped to the same physical register)
-struct VirtualRegister
-{
+struct VirtualRegister {
 	int reg;
 	int reg_root;
 	int first, last;
 };
 
 // high level instructions
-enum{
+enum {
 	INST_MARKER = 10000,
 	INST_ASM,
 };
 
-struct LoopData
-{
+struct LoopData {
 	int marker_continue, marker_break;
 	int level, index;
 };
 
 
-struct SerialNodeParam
-{
-	int kind;
+struct SerialNodeParam {
+	NodeKind kind;
 	int64 p;
 	int virt; // virtual register (if p represents a physical register)
 	const Class *type;
@@ -49,8 +46,7 @@ struct SerialNodeParam
 
 #define SERIAL_NODE_NUM_PARAMS	3
 
-struct SerialNode
-{
+struct SerialNode {
 	int inst;
 	int cond;
 	SerialNodeParam p[SERIAL_NODE_NUM_PARAMS];
@@ -58,8 +54,7 @@ struct SerialNode
 	string str(Serializer *ser) const;
 };
 
-struct TempVar
-{
+struct TempVar {
 	const Class *type;
 	int first, last, usage_count;
 	bool mapped;
@@ -71,8 +66,7 @@ struct TempVar
 };
 
 
-class Serializer
-{
+class Serializer {
 public:
 	Serializer(Script *script, Asm::InstructionWithParamsList *list);
 	virtual ~Serializer();
@@ -95,8 +89,7 @@ public:
 	int stack_offset, stack_max_size, max_push_size;
 	Array<TempVar> temp_var;
 
-	struct GlobalRef
-	{
+	struct GlobalRef {
 		int label;
 		void *p;
 	};
@@ -149,7 +142,7 @@ public:
 
 
 	Array<SerialNodeParam> inserted_temp;
-	void add_cmd_constructor(const SerialNodeParam &param, int modus);
+	void add_cmd_constructor(const SerialNodeParam &param, NodeKind modus);
 	void add_cmd_destructor(const SerialNodeParam &param, bool needs_ref = true);
 
 	virtual void DoMapping() = 0;

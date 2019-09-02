@@ -26,6 +26,9 @@ class Variable;
 class Node;
 class Constant;
 class Block;
+enum class StatementID;
+enum class InlineID;
+enum class OperatorID;
 
 
 // macros
@@ -37,7 +40,7 @@ struct Define {
 
 class Operator {
 public:
-	int primitive_id;
+	PrimitiveOperator *primitive;
 	const Class *return_type, *param_type_1, *param_type_2;
 
 	SyntaxTree *owner;
@@ -84,8 +87,8 @@ public:
 	const Class *parse_type(const Class *ns);
 	void parse_variable_def(bool single, Block *block);
 	void parse_global_const(const string &name, const Class *type);
-	int which_primitive_operator(const string &name);
-	int which_statement(const string &name);
+	PrimitiveOperator *which_primitive_operator(const string &name);
+	Statement *which_statement(const string &name);
 	const Class *which_owned_class(const string &name);
 
 	// pre compiler
@@ -117,7 +120,8 @@ public:
 	Array<Node*> get_existence(const string &name, Block *block, const Class *ns, bool prefer_class);
 	Array<Node*> get_existence_global(const string &name, const Class *ns, bool prefer_class);
 	void link_most_important_operator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);
-	Node *link_operator(int op_no, Node *param1, Node *param2);
+	Node *link_operator(PrimitiveOperator *primop, Node *param1, Node *param2);
+	Node *link_operator_id(OperatorID op_no, Node *param1, Node *param2);
 	Node *parse_operand_extension(Array<Node*> operands, Block *block);
 	Array<Node*> parse_operand_extension_element(Node *operand);
 	Node *parse_operand_extension_array(Node *operand, Block *block);
@@ -133,15 +137,17 @@ public:
 	void parse_local_definition(Block *block, const Class *type);
 	Node *parse_block(Block *parent, Block *block = nullptr);
 	Node *parse_operand(Block *block, bool prefer_class = false);
-	Node *link_unary_operator(int op_no, Node *operand, Block *block);
+	Node *parse_set_builder(Block *block);
+	Node *link_unary_operator(PrimitiveOperator *op, Node *operand, Block *block);
 	Node *parse_primitive_operator(Block *block);
 	Array<Node*> parse_call_parameters(Block *block);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Node *cmd);
 	Array<const Class*> get_wanted_param_types(Node *link);
 	Node *check_param_link(Node *link, const Class *type, const string &f_name = "", int param_no = -1);
 	Node *parse_statement(Block *block);
+	Node *parse_for_header(Block *block);
+	void post_process_for(Node *n);
 	Node *parse_statement_for(Block *block);
-	Node *parse_statement_for_array(Block *block);
 	Node *parse_statement_while(Block *block);
 	Node *parse_statement_break(Block *block);
 	Node *parse_statement_continue(Block *block);
@@ -167,6 +173,7 @@ public:
 	// neccessary conversions
 	void convert_call_by_reference();
 	void break_down_complicated_commands();
+	Node *break_down_for_loops(Node *c);
 	Node *break_down_complicated_command(Node *c);
 	void make_functions_inline();
 	void map_local_variables_to_stack();
@@ -177,18 +184,22 @@ public:
 
 	// data creation
 	Constant *add_constant(const Class *type, Class *name_space = nullptr);
+	Constant *add_constant_int(int value);
+	Constant *add_constant_pointer(const Class *type, const void *value);
 	Function *add_function(const string &name, const Class *type, const Class *name_space, bool is_static);
 
 	// nodes
-	Node *add_node_statement(int index);
+	Node *add_node_statement(StatementID id);
 	Node *add_node_member_call(Function *f, Node *inst, bool force_non_virtual = false);
 	Node *add_node_func_name(Function *f);
 	Node *add_node_call(Function *f);
 	Node *add_node_const(Constant *c);
 	Node *add_node_operator(Node *p1, Node *p2, Operator *op);
-	Node *add_node_operator_by_inline(Node *p1, Node *p2, int inline_index);
+	Node *add_node_operator_by_inline(Node *p1, Node *p2, InlineID inline_index);
 	Node *add_node_local_var(Variable *var);
 	Node *add_node_parray(Node *p, Node *index, const Class *type);
+	Node *add_node_dyn_array(Node *array, Node *index);
+	Node *add_node_array(Node *array, Node *index);
 	//Node *add_node_block(Block *b);
 	Node *cp_node(Node *c);
 	Node *ref_node(Node *sub, const Class *override_type = nullptr);

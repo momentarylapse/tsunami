@@ -301,15 +301,15 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
 {
 	// push 8 bit -> push 32 bit
 	if (c.inst == Asm::INST_PUSH)
-		if (c.p[0].kind == KIND_REGISTER)
+		if (c.p[0].kind == NodeKind::REGISTER)
 			c.p[0].p = reg_resize(c.p[0].p, config.pointer_size);
 
 
 	// FIXME
 	// evil hack to allow inconsistent param types (in address shifts)
-	if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
+	if (config.instruction_set == Asm::InstructionSet::AMD64){
 		if ((c.inst == Asm::INST_ADD) or (c.inst == Asm::INST_MOV)){
-			if ((c.p[0].kind == KIND_REGISTER) and (c.p[1].kind == KIND_CONSTANT_BY_ADDRESS)){
+			if ((c.p[0].kind == NodeKind::REGISTER) and (c.p[1].kind == NodeKind::CONSTANT_BY_ADDRESS)){
 				// TODO: should become an optimization if value fits into 32 bit...
 				/*if (c.p[0].type->is_pointer){
 #ifdef debug_evil_corrections
@@ -334,7 +334,7 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
 #ifdef debug_evil_corrections
 					msg_write(c.str());
 #endif
-				}else*/ if (c.p[1].kind == KIND_REGISTER){
+				}else*/ if (c.p[1].kind == NodeKind::REGISTER){
 #ifdef debug_evil_corrections
 					msg_write("----evil resize c");
 					msg_write(c.str());
@@ -347,7 +347,7 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
 				}
 			}
 			if ((c.p[0].type->size < 8) and (c.p[1].type->size == 8)){
-				if ((c.p[0].kind == KIND_REGISTER) and ((c.p[1].kind == KIND_REGISTER) or (c.p[1].kind == KIND_DEREF_REGISTER))){
+				if ((c.p[0].kind == NodeKind::REGISTER) and ((c.p[1].kind == NodeKind::REGISTER) or (c.p[1].kind == NodeKind::DEREF_REGISTER))){
 #ifdef debug_evil_corrections
 					msg_write("----evil resize d");
 					msg_write(c.str());

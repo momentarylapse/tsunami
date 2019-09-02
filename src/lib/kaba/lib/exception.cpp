@@ -147,7 +147,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex
 
 		// are we in a try block?
 		for (Node *n: b->parent->params){
-			if (n->kind == KIND_STATEMENT and n->link_no == STATEMENT_TRY){
+			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)){
 				if (n->params[0]->as_block() == b){
 					if (_verbose_exception_)
 						msg_write("found try block");

@@ -251,7 +251,7 @@ void Script::CompileOsEntryPoint() {
 }
 
 Node *check_const_used(Node *n, Script *me) {
-	if (n->kind == KIND_CONSTANT) {
+	if (n->kind == NodeKind::CONSTANT) {
 		n->as_const()->used = true;
 		/*if (n->as_const()->owner != me->syntax)
 			msg_error("evil const " + n->as_const()->name);*/

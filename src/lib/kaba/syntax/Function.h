@@ -15,6 +15,7 @@ namespace Kaba{
 class Class;
 class Block;
 class SyntaxTree;
+enum class InlineID;
 
 
 class Variable {
@@ -51,7 +52,7 @@ public:
 	bool is_extern, auto_declared;
 	bool is_pure, is_static;
 	bool throws_exceptions; // for external
-	int inline_no;
+	InlineID inline_no;
 	int virtual_index;
 	bool needs_overriding;
 	int num_slightly_hidden_vars;

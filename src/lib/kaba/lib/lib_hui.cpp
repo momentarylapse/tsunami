@@ -97,7 +97,6 @@ void SIAddPackageHui()
 	const Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
 	const Class *TypeHuiEventP = add_type_p("Event*", TypeHuiEvent);
 	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
-	const Class *TypeHuiPainterP = add_type_p("Painter*", TypeHuiPainter);
 	const Class *TypeHuiTimer = add_type("Timer", sizeof(hui::Timer));
 	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
@@ -350,8 +349,6 @@ void SIAddPackageHui()
 				func_add_param("func", TypeFunctionP);
 			class_add_func("remove_event_handler", TypeVoid, mf(&hui::Panel::remove_event_handler));
 				func_add_param("uid", TypeInt);
-			//class_add_func("beginDraw", TypeHuiPainterP, mf(&hui::HuiPanel::beginDraw));
-			//	func_add_param("id", TypeString);
 			class_set_vtable(hui::Panel);
 
 
@@ -413,7 +410,7 @@ void SIAddPackageHui()
 		class_add_func_virtual("on_key_down", TypeVoid, mf(&hui::Window::on_key_down));
 		class_add_func_virtual("on_key_up", TypeVoid, mf(&hui::Window::on_key_up));
 		class_add_func_virtual("on_draw", TypeVoid, mf(&hui::Window::on_draw));
-			func_add_param("p", TypeHuiPainterP);
+			func_add_param("p", TypeHuiPainter);
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiNixWindow);
@@ -523,17 +520,17 @@ void SIAddPackageHui()
 			func_add_param("default", TypeString);
 	
 	// user interface
-	add_func("HuiSetIdleFunction", TypeVoid, (void*)&HuiSetIdleFunctionKaba, FLAG_STATIC);
+	add_func("SetIdleFunction", TypeVoid, (void*)&HuiSetIdleFunctionKaba, FLAG_STATIC);
 		func_add_param("idle_func", TypeFunctionP);
-	add_func("HuiRunLater", TypeInt, (void*)&HuiRunLaterKaba, FLAG_STATIC);
+	add_func("RunLater", TypeInt, (void*)&HuiRunLaterKaba, FLAG_STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypePointer);
 		func_add_param("f", TypeFunctionP);
-	add_func("HuiRunRepeated", TypeInt, (void*)&HuiRunRepeatedKaba, FLAG_STATIC);
+	add_func("RunRepeated", TypeInt, (void*)&HuiRunRepeatedKaba, FLAG_STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypePointer);
 		func_add_param("f", TypeFunctionP);
-	add_func("HuiCancelRunner", TypeVoid, (void*)&hui::CancelRunner, FLAG_STATIC);
+	add_func("CancelRunner", TypeVoid, (void*)&hui::CancelRunner, FLAG_STATIC);
 		func_add_param("id", TypeInt);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, FLAG_STATIC);
 		func_add_param("id", TypeString);
@@ -543,51 +540,51 @@ void SIAddPackageHui()
 		func_add_param("image", TypeString);
 		func_add_param("key_code", TypeInt);
 		func_add_param("func", TypeFunctionP);*/
-	add_func("HuiGetEvent", TypeHuiEventP, (void*)&hui::GetEvent, FLAG_STATIC);
+	add_func("GetEvent", TypeHuiEventP, (void*)&hui::GetEvent, FLAG_STATIC);
 	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
 	add_func("HuiEnd", TypeVoid, (void*)&hui::End, FLAG_STATIC);*/
-	add_func("HuiDoSingleMainLoop", TypeVoid, (void*)&hui::Application::do_single_main_loop, FLAG_STATIC);
-	add_func("HuiSleep", TypeVoid, (void*)&hui::Sleep, FLAG_STATIC);
+	add_func("DoSingleMainLoop", TypeVoid, (void*)&hui::Application::do_single_main_loop, FLAG_STATIC);
+	add_func("Sleep", TypeVoid, (void*)&hui::Sleep, FLAG_STATIC);
 		func_add_param("duration", TypeFloat32);
-	add_func("HuiFileDialogOpen", TypeBool, (void*)&hui::FileDialogOpen, FLAG_STATIC);
+	add_func("FileDialogOpen", TypeBool, (void*)&hui::FileDialogOpen, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypeString);
 		func_add_param("show_filter", TypeString);
 		func_add_param("filter", TypeString);
-	add_func("HuiFileDialogSave", TypeBool, (void*)&hui::FileDialogSave, FLAG_STATIC);
+	add_func("FileDialogSave", TypeBool, (void*)&hui::FileDialogSave, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypeString);
 		func_add_param("show_filter", TypeString);
 		func_add_param("filter", TypeString);
-	add_func("HuiFileDialogDir", TypeBool, (void*)&hui::FileDialogDir, FLAG_STATIC);
+	add_func("FileDialogDir", TypeBool, (void*)&hui::FileDialogDir, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypeString);
-	add_func("HuiQuestionBox", TypeString, (void*)&hui::QuestionBox, FLAG_STATIC);
+	add_func("QuestionBox", TypeString, (void*)&hui::QuestionBox, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
 		func_add_param("allow_cancel", TypeBool);
-	add_func("HuiInfoBox", TypeVoid, (void*)&hui::InfoBox, FLAG_STATIC);
+	add_func("InfoBox", TypeVoid, (void*)&hui::InfoBox, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
-	add_func("HuiErrorBox", TypeVoid, (void*)&hui::ErrorBox, FLAG_STATIC);
+	add_func("ErrorBox", TypeVoid, (void*)&hui::ErrorBox, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
-	add_func("HuiCreateMenuFromSource", TypeHuiMenuP, (void*)&hui::CreateMenuFromSource, FLAG_STATIC);
+	add_func("CreateMenuFromSource", TypeHuiMenuP, (void*)&hui::CreateMenuFromSource, FLAG_STATIC);
 		func_add_param("source", TypeString);
 
 	// clipboard
-	add_func("HuiCopyToClipboard", TypeVoid, (void*)&hui::Clipboard::Copy, FLAG_STATIC);
+	add_func("CopyToClipboard", TypeVoid, (void*)&hui::Clipboard::Copy, FLAG_STATIC);
 		func_add_param("buffer", TypeString);
-	add_func("HuiPasteFromClipboard", TypeString, (void*)&hui::Clipboard::Paste, FLAG_STATIC);
-	add_func("HuiOpenDocument", TypeVoid, (void*)&hui::OpenDocument, FLAG_STATIC);
+	add_func("PasteFromClipboard", TypeString, (void*)&hui::Clipboard::Paste, FLAG_STATIC);
+	add_func("OpenDocument", TypeVoid, (void*)&hui::OpenDocument, FLAG_STATIC);
 		func_add_param("filename", TypeString);
-	add_func("HuiSetImage", TypeString, (void*)&hui::SetImage, FLAG_STATIC);
+	add_func("MakeGuiImage", TypeString, (void*)&hui::SetImage, FLAG_STATIC);
 		func_add_param("image", TypeImage);
 
 	add_class(TypeHuiEvent);

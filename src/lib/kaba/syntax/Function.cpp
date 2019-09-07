@@ -156,7 +156,7 @@ void Function::update_parameters_after_parsing() {
 	// class function
 	if (!is_static) {
 		if (!__get_var(IDENTIFIER_SELF))
-			block->add_var(IDENTIFIER_SELF, name_space->get_pointer());
+			block->add_var(IDENTIFIER_SELF, name_space);
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "common.h"
+#include "exception.h"
 
 #ifdef _X_USE_ALGEBRA_
 	#include "../../algebra/algebra.h"
@@ -35,6 +36,7 @@ namespace Kaba{
 // we're always using math types
 #define type_p(p)			(void*)p
 
+extern const Class *TypeStringList;
 extern const Class *TypeComplexList;
 extern const Class *TypeFloatList;
 extern const Class *TypeVectorList;
@@ -44,6 +46,9 @@ extern const Class *TypePlaneList;
 extern const Class *TypeMatrix3;
 extern const Class *TypeIntList;
 extern const Class *TypeFloatPs;
+extern const Class *TypeAny;
+extern const Class *TypeAnyList;
+extern const Class *TypeAnyDict;
 
 
 float _cdecl f_sqr(float f){	return f*f;	}
@@ -307,6 +312,95 @@ void __vector_set(vector &r, float x, float y, float z)
 void __rect_set(rect &r, float x1, float x2, float y1, float y2)
 {	r = rect(x1, x2, y1, y2);	}
 
+
+
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
+
+
+void kaba_array_clear(void *p, const Class *type);
+void kaba_array_resize(void *p, const Class *type, int num);
+void kaba_array_add(DynamicArray &array, void *p, const Class *type);
+
+
+class KabaAny : public Any {
+public:
+	Any _cdecl _map_get(const string &key)
+	{ KABA_EXCEPTION_WRAPPER(return map_get(key)); return Any(); }
+	void _cdecl _map_set(const string &key, Any &a)
+	{ KABA_EXCEPTION_WRAPPER(map_set(key, a)); }
+	Any _cdecl _array_get(int i)
+	{ KABA_EXCEPTION_WRAPPER(return array_get(i)); return Any(); }
+	void _cdecl _array_set(int i, Any &a)
+	{ KABA_EXCEPTION_WRAPPER(array_set(i, a)); }
+	void _cdecl _array_add(Any &a)
+	{ KABA_EXCEPTION_WRAPPER(add(a)); }
+	
+	static void unwrap(Any &aa, void *var, const Class *type) {
+		if (type == TypeInt) {
+			*(int*)var = aa._int();
+		} else if (type == TypeFloat32) {
+			*(float*)var = aa._float();
+		} else if (type == TypeBool) {
+			*(bool*)var = aa._bool();
+		} else if (type == TypeString) {
+			*(string*)var = aa.str();
+		} else if (type->is_pointer()) {
+			*(const void**)var = *aa.as_pointer();
+		} else if (type->is_super_array() and (aa.type == TYPE_ARRAY)) {
+			auto *t_el = type->get_array_element();
+			auto *a = (DynamicArray*)var;
+			auto *b = aa.as_array();
+			int n = b->num;
+			kaba_array_resize(var, type, n);
+			for (int i=0; i<n; i++)
+				unwrap(aa[i], (char*)a->data + i * t_el->size, t_el);
+		} else if (type->is_array() and (aa.type == TYPE_ARRAY)) {
+			auto *t_el = type->get_array_element();
+			auto *b = aa.as_array();
+			int n = min(type->array_length, b->num);
+			for (int i=0; i<n; i++)
+				unwrap((*b)[i], (char*)var + i*t_el->size, t_el);
+		} else if (aa.type == TYPE_HASH) {
+			auto *map = aa.as_map();
+			auto keys = aa.keys();
+			for (auto &e: type->elements)
+				for (string &k: keys)
+					if (e.name == k)
+						unwrap(aa[k], (char*)var + e.offset, e.type);
+		} else {
+			msg_error("unwrap... "  + aa.str() + " -> " + type->long_name());
+		}
+	}
+};
+
+class AnyList : public Array<Any> {
+public:
+	void __assign__(AnyList &o) { *this = o; }
+};
+
+Any kaba_int2any(int i) {
+	return Any(i);
+}
+Any kaba_float2any(float f) {
+	return Any(f);
+}
+Any kaba_bool2any(bool b) {
+	return Any(b);
+}
+Any kaba_str2any(const string &str) {
+	return Any(str);
+}
+Any kaba_pointer2any(const void *p) {
+	return Any(p);
+}
+
+#pragma GCC pop_options
+
+
+
 void SIAddPackageMath() {
 	add_package("math", true);
 
@@ -330,7 +424,8 @@ void SIAddPackageMath() {
 	const Class *TypeFloatArray9 = add_type_a("float[9]", TypeFloat32, 9);
 	const Class *TypeVli = add_type("vli", sizeof(vli));
 	const Class *TypeCrypto = add_type("Crypto", sizeof(Crypto));
-	const Class *TypeAny = add_type("any", sizeof(Any));
+	TypeAny = add_type("any", sizeof(Any));
+	TypeAnyList = add_type_a("any[]", TypeAny, -1);
 	const Class *TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
 	const Class *TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
 	const Class *TypeRandom = add_type("Random", sizeof(Random));
@@ -757,33 +852,51 @@ void SIAddPackageMath() {
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, any_p(mf(&Any::clear)));
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set)));
 			func_add_param("a", TypeAny);
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set_str)));
-			func_add_param("s", TypeString);
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set_int)));
-			func_add_param("i", TypeInt);
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set_float)));
-			func_add_param("f", TypeFloat32);
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set_bool)));
-			func_add_param("b", TypeBool);
 		class_add_func("__iadd__", TypeVoid, any_p(mf(&Any::_add)));
 			func_add_param("a", TypeAny);
 		class_add_func("__isub__", TypeVoid, any_p(mf(&Any::_sub)));
 			func_add_param("a", TypeAny);
 		class_add_func("clear", TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func("__get__", TypeAny, any_p(mf(&Any::get)));
+		class_add_func("length", TypeInt, any_p(mf(&Any::length)));
+		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_map_get)), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func("hset", TypeVoid, any_p(mf(&Any::hset)));
+		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_map_set)), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func("__get__", TypeAny, any_p(mf(&Any::at)));
+		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_array_get)), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
-		class_add_func("aset", TypeVoid, any_p(mf(&Any::aset)));
+		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_array_set)), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 			func_add_param("value", TypeAny);
+		class_add_func("add", TypeVoid, any_p(mf(&KabaAny::_array_add)), FLAG_RAISES_EXCEPTIONS);
+			func_add_param("a", TypeAny);
+		class_add_func("keys", TypeStringList, any_p(mf(&Any::keys)));//, FLAG_RAISES_EXCEPTIONS);
 		class_add_func("bool", TypeBool, any_p(mf(&Any::_bool)));
 		class_add_func("int", TypeInt, any_p(mf(&Any::_int)));
 		class_add_func("float", TypeFloat32, any_p(mf(&Any::_float)));
 		class_add_func("str", TypeString, any_p(mf(&Any::str)));
+		class_add_func("unwrap", TypeVoid, (void*)&KabaAny::unwrap, FLAG_RAISES_EXCEPTIONS);
+			func_add_param("var", TypePointer);
+			func_add_param("type", TypeClassP);
+
+
+	add_class(TypeAnyList);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<Any>::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &AnyList::__assign__);
+			func_add_param("o", TypeAnyList);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<Any>::clear);
+
+	
+	add_funcx("@int2any", TypeAny, &kaba_int2any, FLAG_STATIC);
+		func_add_param("i", TypeInt);
+	add_funcx("@float2any", TypeAny, &kaba_float2any, FLAG_STATIC);
+		func_add_param("i", TypeFloat32);
+	add_funcx("@bool2any", TypeAny, &kaba_bool2any, FLAG_STATIC);
+		func_add_param("i", TypeBool);
+	add_funcx("@str2any", TypeAny, &kaba_str2any, FLAG_STATIC);
+		func_add_param("s", TypeString);
+	add_funcx("@pointer2any", TypeAny, &kaba_pointer2any, FLAG_STATIC);
+		func_add_param("p", TypePointer);
 
 
 	add_class(TypeCrypto);
@@ -815,7 +928,7 @@ void SIAddPackageMath() {
 		class_add_func("normal", TypeFloat32, mf(&Random::normal));
 			func_add_param("mean", TypeFloat32);
 			func_add_param("stddev", TypeFloat32);
-		class_add_func("inBall", TypeVector, mf(&Random::in_ball));
+		class_add_func("in_ball", TypeVector, mf(&Random::in_ball));
 			func_add_param("r", TypeFloat32);
 		class_add_func("dir", TypeVector, mf(&Random::dir));
 	

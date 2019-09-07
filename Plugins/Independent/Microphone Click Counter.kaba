@@ -11,7 +11,7 @@ const float RECOVER_TIME = 0.40
 
 class ClickCounterDialog extends ConfigPanel
 	override MicrophoneClickCounter* c
-	override void __init__(Module *_c)
+	override void __init__(Module* _c)
 		#super.__init__("Click Counter", 300, 175, _counter.session.win, false)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
@@ -25,17 +25,17 @@ class ClickCounterDialog extends ConfigPanel
 		event("inc", &on_increase)
 		event("dec", &on_decrease)
 		
-		id = HuiRunRepeated(0.05, self, &poll)
+		id = RunRepeated(0.05, self, &poll)
 	
 	override void __delete__()
-		HuiCancelRunner(id)
+		CancelRunner(id)
 	void poll()
 		redraw("drawing")
 	int id
 	
 
 
-	void draw_volume(Painter *p)
+	void draw_volume(Painter p)
 		p.set_color(colors.text_soft3)
 		float y0 = 30
 		float y1 = p.height - 5
@@ -44,7 +44,7 @@ class ClickCounterDialog extends ConfigPanel
 		p.set_color(colors.text_soft2)
 		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	void on_draw(Painter *p)
+	void on_draw(Painter p)
 		p.set_color(colors.background)
 		p.set_font_size(12)
 		p.draw_rect(0, 0, p.width, p.height)

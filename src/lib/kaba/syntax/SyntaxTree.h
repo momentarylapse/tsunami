@@ -119,6 +119,7 @@ public:
 	const Class *make_class_func(Function *f);
 	Array<Node*> get_existence(const string &name, Block *block, const Class *ns, bool prefer_class);
 	Array<Node*> get_existence_global(const string &name, const Class *ns, bool prefer_class);
+	Node* get_existence_block(const string &name, Block *block);
 	void link_most_important_operator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);
 	Node *link_operator(PrimitiveOperator *primop, Node *param1, Node *param2);
 	Node *link_operator_id(OperatorID op_no, Node *param1, Node *param2);
@@ -166,7 +167,7 @@ public:
 	Node *parse_statement_map(Block *block);
 	Node *parse_statement_lambda(Block *block);
 	Node *parse_statement_sorted(Block *block);
-	Node *parse_statement_filter(Block *block);
+	Node *parse_statement_dyn(Block *block);
 
 	void create_asm_meta_info();
 
@@ -182,6 +183,10 @@ public:
 	static void transform_block(Block *block, std::function<Node*(Node*)> F);
 	static Node* transform_node(Node *n, std::function<Node*(Node*)> F);
 
+	void transformb(std::function<Node*(Node*, Block*)> F);
+	static void transformb_block(Block *block, std::function<Node*(Node*, Block*)> F);
+	static Node* transformb_node(Node *n, Block *b, std::function<Node*(Node*, Block*)> F);
+
 	// data creation
 	Constant *add_constant(const Class *type, Class *name_space = nullptr);
 	Constant *add_constant_int(int value);
@@ -195,9 +200,14 @@ public:
 	Node *add_node_class(const Class *c);
 	Node *add_node_call(Function *f);
 	Node *add_node_const(Constant *c);
+	Node *add_node_block(Block *b);
 	Node *add_node_operator(Node *p1, Node *p2, Operator *op);
 	Node *add_node_operator_by_inline(Node *p1, Node *p2, InlineID inline_index);
-	Node *add_node_local_var(Variable *var);
+	Node *add_node_global(Variable *var);
+	Node *add_node_local(Variable *var);
+	Node *add_node_local(Variable *var, const Class *type);
+	Node *exlink_add_element(Function *f, ClassElement &e);
+	Node *exlink_add_class_func(Function *f, Function *cf);
 	Node *add_node_parray(Node *p, Node *index, const Class *type);
 	Node *add_node_dyn_array(Node *array, Node *index);
 	Node *add_node_array(Node *array, Node *index);

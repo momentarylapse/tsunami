@@ -70,7 +70,7 @@ class MultiEcho extends AudioEffect
 
 
 	override ConfigPanel *create_panel()
-		return new MultiEchoPanel(self)
+		return new MultiEchoPanel(&self)
 
 class MultiEchoGrid extends Grid
 	Config *config
@@ -92,10 +92,10 @@ class MultiEchoGrid extends Grid
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")
 	void add_events()
-		cp.event_o("reflection-add", self, on_add_reflection)
-		cp.event_o("reflection-delete", self, on_delete_reflection)
+		cp.event_o("reflection-add", &self, on_add_reflection)
+		cp.event_o("reflection-delete", &self, on_delete_reflection)
 
-	void draw_hull_curve(Painter *c, Reflector r)
+	void draw_hull_curve(Painter c, Reflector r)
 		float v = r.volume
 		float t = r.delay
 		c.set_line_width(2)
@@ -112,7 +112,7 @@ class MultiEchoGrid extends Grid
 		c.draw_lines(cc)
 		c.set_line_dash([5.0, 0.0])
 	
-	void draw_peaks(Painter *c, Reflector r)
+	void draw_peaks(Painter c, Reflector r)
 		float v = r.volume
 		float t = r.delay
 		int n = min(100, x_axis.val_max/r.delay)
@@ -129,7 +129,7 @@ class MultiEchoGrid extends Grid
 			t += r.delay
 		c.set_line_width(1)
 
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 	
 		c.set_line_width(1)
 		for r in config.refl
@@ -146,7 +146,7 @@ class MultiEchoGrid extends Grid
 		if hover >= 0
 			draw_details(c, config.refl[hover])
 			
-	void draw_details(Painter* p, Reflector r)
+	void draw_details(Painter p, Reflector r)
 		p.set_font_size(8)
 		p.set_color(colors.text_soft2)
 		float x = x_axis.project(r.delay)
@@ -163,7 +163,7 @@ class MultiEchoGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if HuiGetEvent().key_code == KEY_DELETE
+		if GetEvent().key_code == KEY_DELETE
 			on_delete_reflection()
 
 	void on_delete_reflection()
@@ -203,7 +203,7 @@ class MultiEchoGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l and (selected >= 0)
+		if GetEvent().button_l and (selected >= 0)
 			config.refl[selected].delay = max(get_mouse2().x, 0.001)
 			config.refl[selected].volume = max(get_mouse2().y, 0)
 			cp.changed()
@@ -213,20 +213,20 @@ class MultiEchoGrid extends Grid
 	
 	override void on_mouse_wheel()
 		if hover >= 0
-			config.refl[hover].feedback *= exp(HuiGetEvent().scroll_y * 0.02)
+			config.refl[hover].feedback *= exp(GetEvent().scroll_y * 0.02)
 			redraw()
 			cp.changed()
 
 class MultiEchoPanel extends ConfigPanel
 	override MultiEcho* c
 	MultiEchoGrid grid
-	override void __init__(Module *_h)
+	override void __init__(Module* _h)
 		from_source("
 Grid ? ''
 	DrawingArea drawing '' grabfocus height=250")
 	
 		grid.config = &c.config
-		grid.cp = self
+		grid.cp = &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "s")
 		grid.y_axis.set(0, 1, false, "%")

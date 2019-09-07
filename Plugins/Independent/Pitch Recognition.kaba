@@ -22,7 +22,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		#loopf(fl, 0, 1)
 		#note = i2s(n)
 
-	void draw_volume(Painter *p)
+	void draw_volume(Painter p)
 		p.set_color(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = p.height - 5
@@ -31,7 +31,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		p.set_color(color(1, 0.6, 0.6, 0.6))
 		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	void on_draw(Painter *p)
+	void on_draw(Painter p)
 		p.set_color(colors.background)
 		p.set_font_size(12)
 		p.draw_rect(0, 0, p.width, p.height)
@@ -76,10 +76,10 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		runner = HuiRunRepeated(0.05, self, on_update)
+		runner = RunRepeated(0.05, &self, on_update)
 		
 	override void on_stop()
-		HuiCancelRunner(runner)
+		CancelRunner(runner)
 		delete chain
 	
 	void on_update()
@@ -87,6 +87,6 @@ class PitchRecognition extends TsunamiPlugin
 			panel.redraw("drawing")
 	
 	override ConfigPanel* create_panel()
-		panel = new PitchRecognitionPanel(self)
+		panel = new PitchRecognitionPanel(&self)
 		return panel
 	

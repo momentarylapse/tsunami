@@ -55,7 +55,7 @@ class Biquad extends AudioEffect
 		filter.apply(buf)
 
 	override ConfigPanel *create_panel()
-		return new BiquadPanel(self)
+		return new BiquadPanel(&self)
 
 
 class BiquadGrid extends Grid
@@ -68,7 +68,7 @@ class BiquadGrid extends Grid
 	override void __init__()
 	override void __delete__()
 
-	override void on_draw(Painter *p)
+	override void on_draw(Painter p)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -89,7 +89,7 @@ class BiquadGrid extends Grid
 class BiquadPanel extends ConfigPanel
 	BiquadGrid grid
 	override Biquad *c
-	override void __init__(Module *_biquad)
+	override void __init__(Module* _biquad)
 		super.__init__(_biquad)
 		from_source("
 Grid ? '' vertical
@@ -109,7 +109,7 @@ Grid ? '' vertical
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
-		grid.cp = self
+		grid.cp = &self
 		grid.c = &c.config
 		grid.sample_rate = c.session.sample_rate()
 		

@@ -91,13 +91,13 @@ inline const Class *get_subtype(const Class *t)
 	return TypeUnknown;
 }
 
-inline SerialNodeParam deref_temp(const SerialNodeParam &param)
+inline SerialNodeParam deref_temp(const SerialNodeParam &param, const Class *type)
 {
 	SerialNodeParam deref;
 	//deref = param;
 	deref.kind = NodeKind::DEREF_VAR_TEMP;
 	deref.p = param.p;
-	deref.type = get_subtype(param.type);
+	deref.type = type;
 	deref.shift = 0;
 	return deref;
 }
@@ -261,6 +261,12 @@ string guess_constant(int64 c, Serializer *ser)
 	return "C:"+p2s((void*)c);
 }
 
+string type_name_safe(const Class *t) {
+	if (!t)
+		return "(NO TYPE)";
+	return t->long_name();
+}
+
 string SerialNodeParam::str(Serializer *ser) const
 {
 	string str;
@@ -278,7 +284,7 @@ string SerialNodeParam::str(Serializer *ser) const
 			n = d2h(&p, config.pointer_size);
 		else if (kind == NodeKind::IMMEDIATE)
 			n = guess_constant(p, ser);
-		str = "  (" + type->name + ") " + kind2str(kind) + " " + n;
+		str = "  (" + type_name_safe(type) + ") " + kind2str(kind) + " " + n;
 		if (shift > 0)
 			str += format(" + shift %d", shift);
 	}
@@ -572,8 +578,7 @@ SerialNodeParam Serializer::AddReference(const SerialNodeParam &param, const Cla
 	return ret;
 }
 
-SerialNodeParam Serializer::AddDereference(const SerialNodeParam &param, const Class *force_type)
-{
+SerialNodeParam Serializer::AddDereference(const SerialNodeParam &param, const Class *type) {
 	SerialNodeParam ret;
 	/*add_temp(TypePointer, ret);
 	SerialCommandParam temp;
@@ -582,27 +587,27 @@ SerialNodeParam Serializer::AddDereference(const SerialNodeParam &param, const C
 	temp.kind = KindDerefVarTemp;
 	add_cmd(Asm::inst_mov, ret, temp);*/
 
-	if (param.kind == NodeKind::VAR_TEMP){
-		return deref_temp(param);
-	}else if (param.kind == NodeKind::REGISTER){
+	if (param.kind == NodeKind::VAR_TEMP) {
+		return deref_temp(param, type);
+	} else if (param.kind == NodeKind::REGISTER) {
 		msg_write("???  register???");
 		ret = param;
 		ret.kind = NodeKind::DEREF_REGISTER;
-		ret.type = force_type ? force_type : get_subtype(param.type);
+		ret.type = type;// ? type : get_subtype(param.type);
 		ret.shift = 0;
-	}else{
-		if (config.instruction_set == Asm::InstructionSet::ARM){
-			if (param.kind == NodeKind::LOCAL_ADDRESS){
+	} else {
+		if (config.instruction_set == Asm::InstructionSet::ARM) {
+			if (param.kind == NodeKind::LOCAL_ADDRESS) {
 				ret = param;
 				ret.kind = NodeKind::DEREF_LOCAL_MEMORY;
-			}else{
+			} else {
 				do_error("arm deref...");
 			}
-		}else{
+		} else {
 			//msg_error(string("unhandled deref ", Kind2Str(param.kind)));
 			SerialNodeParam temp = add_temp(param.type);
 			add_cmd(Asm::INST_MOV, temp, param);
-			return deref_temp(temp);
+			return deref_temp(temp, type);
 		}
 	}
 	return ret;
@@ -621,13 +626,12 @@ int Serializer::add_global_ref(void *p)
 	return global_refs.num - 1;
 }
 
-bool node_is_assign_mem(Node *n)
-{
-	if (n->kind == NodeKind::INLINE_CALL){
+bool node_is_assign_mem(Node *n) {
+	if (n->kind == NodeKind::INLINE_CALL) {
 		return (n->as_func()->inline_no == InlineID::CHUNK_ASSIGN);
 	}
 	// nope...
-	/*if (n->kind == NodeKind::FUNCTION_CALL){
+	/*if (n->kind == NodeKind::FUNCTION_CALL) {
 		msg_error("test 2");
 		msg_write(n->as_func()->name);
 		msg_write(n->as_func()->long_name());
@@ -702,7 +706,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 
 	}else if (com->kind == NodeKind::VIRTUAL_CALL){
 
-		AddClassFunctionCall(instance.type->parent->get_virtual_function(com->link_no), instance, params, ret);
+		AddClassFunctionCall(com->as_func(), instance, params, ret);
 
 	}else if (com->kind == NodeKind::INLINE_CALL){
 

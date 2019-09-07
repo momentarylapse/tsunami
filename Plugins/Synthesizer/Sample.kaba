@@ -26,14 +26,14 @@ class SampleRenderer extends PitchRenderer
 	override bool render(AudioBuffer buf)
 		if !sample or (len(events)) == 0
 			return false
-		int[] del
+		int[] to_del
 		for e,i in events
 			buf.add(*sample.origin.buf, e.pos, e.volume)
 			e.pos -= buf.length
 			if e.pos + (len(*sample.origin.buf)) < 0
-				del.add(i)
-		for i in 0:del.num
-			events.remove(del[del.num-1-i])
+				to_del.add(i)
+		for i in 0:to_del.num
+			events.remove(to_del[to_del.num-1-i])
 		return events.num > 0
 	
 
@@ -44,12 +44,12 @@ class SampleSynthesizer extends Synthesizer
 		return new SampleRenderer(self, pitch)
 	
 	override ConfigPanel *create_panel()
-		return new SamplePanel(self)
+		return new SamplePanel(&self)
 
 class SamplePanel extends ConfigPanel
 	SampleConfig *sc
 	override SampleSynthesizer *c
-	override void __init__(Module *_s)
+	override void __init__(Module* _s)
 		sc = &c.config
 		add_list_view("!width=300\\Note\\Sample", 0, 0, "list")
 		event("list", on_select)
@@ -72,7 +72,7 @@ class SamplePanel extends ConfigPanel
 		Sample *old = nil
 		if sc.samples[n]
 			old = sc.samples[n].origin
-		Sample *s = SelectSample(c.session, self, old)
+		Sample *s = SelectSample(c.session, &self, old)
 		if s != old
 			if sc.samples[n]
 				delete sc.samples[n]

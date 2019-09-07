@@ -21,7 +21,7 @@ class HarmonicGrid extends Grid
 	HarmonicPanel *p
 	int Selected, Hover
 
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 	
 		# points
 		for i,n in hc.intensity
@@ -38,7 +38,7 @@ class HarmonicGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l and (Selected >= 0)
+		if GetEvent().button_l and (Selected >= 0)
 			hc.intensity[Selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
@@ -54,8 +54,7 @@ class HarmonicPanel extends ConfigPanel
 	override HarmonicSynthesizer *c
 	HarmonicConfig *hc
 	HarmonicGrid grid
-	override void __init__(Module *_s)
-		super.__init__(_s)
+	override void __init__(Module* _s)
 		add_grid("", 0, 0, "main_table")
 		set_target("main_table")
 		add_grid("", 0, 0, "table1")
@@ -68,7 +67,7 @@ class HarmonicPanel extends ConfigPanel
 		hc = &c.config
 		
 		grid.hc = hc
-		grid.p = self
+		grid.p = &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
@@ -87,7 +86,7 @@ class HarmonicRenderer extends PitchRenderer
 	float phi
 	EnvelopeADSR env
 	override HarmonicSynthesizer *synth
-	override void __init__(Synthesizer *s, int pitch)
+	override void __init__(Synthesizer s, int pitch)
 		volume = 0
 		phi = 0
 		env.reset()
@@ -123,7 +122,7 @@ class HarmonicSynthesizer extends Synthesizer
 
 
 	override ConfigPanel *create_panel()
-		return new HarmonicPanel(self)
+		return new HarmonicPanel(&self)
 	
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new HarmonicRenderer(self, pitch)

@@ -193,15 +193,6 @@ void SIAddPackageFile()
 
 	add_class(TypeDate);
 		class_add_elementx("time", TypeInt, &Date::time);
-		class_add_elementx("year", TypeInt, &Date::year);
-		class_add_elementx("month", TypeInt, &Date::month);
-		class_add_elementx("day", TypeInt, &Date::day);
-		class_add_elementx("hour", TypeInt, &Date::hour);
-		class_add_elementx("minute", TypeInt, &Date::minute);
-		class_add_elementx("second", TypeInt, &Date::second);
-		class_add_elementx("milli_second", TypeInt, &Date::milli_second);
-		class_add_elementx("day_of_week", TypeInt, &Date::day_of_week);
-		class_add_elementx("day_of_year", TypeInt, &Date::day_of_year);
 		class_add_funcx("format", TypeString, &Date::format);
 			func_add_param("f", TypeString);
 		class_add_funcx("str", TypeString, &Date::str);

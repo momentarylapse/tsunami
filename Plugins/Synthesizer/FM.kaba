@@ -81,7 +81,7 @@ class FMPanel extends ConfigPanel
 		event("top-" + id, on_topology)
 	
 	override FMSynthesizer *c
-	override void __init__(Module *_s)
+	override void __init__(Module* _s)
 		fc = &c.config
 		
 		from_source("
@@ -174,7 +174,7 @@ Grid ? ''
 			return p_out
 		return p_osci[index]
 
-	void draw_type(Painter* p, complex z, int type, float dx, float amp)
+	void draw_type(Painter p, complex z, int type, float dx, float amp)
 		dx /= pi
 		float v0 = 0
 		float t0 = -pi
@@ -192,7 +192,7 @@ Grid ? ''
 			t0 = t
 			v0 = v
 	
-	void draw_osci(Painter* p, int index)
+	void draw_osci(Painter p, int index)
 		let z = osci_pos(index)
 		let bg = colors.blob_bg
 		let col = colors.text_soft1
@@ -212,7 +212,7 @@ Grid ? ''
 		#p.set_color(colors.text_soft1)
 		p.draw_str(z.x-4, z.y+6, "x" + f)
 	
-	void draw_link(Painter* p, int a, int b)
+	void draw_link(Painter p, int a, int b)
 		p.set_color(colors.text_soft1)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
@@ -226,7 +226,7 @@ Grid ? ''
 		return sqr(max(x,0) / width / 0.7)
 	float y2v(float y)
 		return max((height - y), 0) / 100
-	void draw_curve_exp(Painter *p, float t0, float v0, float t1, float v1, color col)
+	void draw_curve_exp(Painter p, float t0, float v0, float t1, float v1, color col)
 		float e = log(v1/v0)
 		complex[] cc
 		for a in 0:1.01:0.05
@@ -243,7 +243,7 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
-	void draw_curve_lin(Painter *p, float t0, float v0, float t1, float v1, color col)
+	void draw_curve_lin(Painter p, float t0, float v0, float t1, float v1, color col)
 		complex[] cc
 		cc.add(complex(t2x(t0), v2y(v0)))
 		cc.add(complex(t2x(t1), v2y(v1)))
@@ -258,7 +258,7 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	
-	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
+	void draw_grabber(Painter p, float t0, float v0, float t1, float v1, color col, bool hover)
 		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		if hover
 			col2 = colors.hoverify(col2)
@@ -267,7 +267,7 @@ Grid ? ''
 		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
 		p.set_line_width(1)
 	
-	void draw_envelope(Painter* p, OscillatorConfig o)
+	void draw_envelope(Painter p, OscillatorConfig o)
 		float t0 = 0
 		float t1 = t0 + o.attack
 		float t2 = t1 + o.decay
@@ -292,7 +292,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str(width - 100, height - 20, "sustain " + (o.sustain * 100).str2(0) + " %")
 		
-	void on_draw(Painter* p)
+	void on_draw(Painter p)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -317,7 +317,7 @@ Grid ? ''
 		draw_envelope(p, fc.osc[chosen])
 	
 	int get_hover()
-		let e = HuiGetEvent()
+		let e = GetEvent()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		for i in 0:NUM_OSCILLATORS
@@ -346,7 +346,7 @@ Grid ? ''
 	void on_left_button_up()
 		moving = -1
 	void on_mouse_move()
-		let e = HuiGetEvent()
+		let e = GetEvent()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if moving < -5 and chosen >= 0
@@ -370,9 +370,9 @@ Grid ? ''
 		hover = get_hover()
 		if hover >= 0
 			set_chosen(hover)
-			menu_osci.popup(self)
+			menu_osci.popup(&self)
 		else
-			menu_top.popup(self)
+			menu_top.popup(&self)
 	
 	void set_chosen(int i)
 		chosen = i
@@ -380,7 +380,7 @@ Grid ? ''
 		update()
 	
 	void on_topology()
-		let code = HuiGetEvent().id[4:]
+		let code = GetEvent().id[4:]
 		fc.clear_links()
 		for i in 0:len(code)
 			if code[i] == 'x'
@@ -442,7 +442,7 @@ class FMRenderer extends PitchRenderer
 	int num_osc_active
 	override FMSynthesizer *synth
 	
-	override void __init__(Synthesizer *s, int _pitch)
+	override void __init__(Synthesizer s, int _pitch)
 		#super.__init__(s, _pitch)
 		num_osc_active = 0
 
@@ -504,7 +504,7 @@ class FMSynthesizer extends Synthesizer
 	FMConfig config
 
 	override ConfigPanel *create_panel()
-		return new FMPanel(self)
+		return new FMPanel(&self)
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new FMRenderer(self, pitch)

@@ -31,8 +31,7 @@ enum class NodeKind {
 	// data
 	VAR_LOCAL,
 	VAR_GLOBAL,
-	FUNCTION_NAME,
-	FUNCTION_POINTER,
+	FUNCTION,           // = just the name
 	CONSTANT,
 	// execution
 	FUNCTION_CALL,      // = real function call
@@ -88,9 +87,9 @@ public:
 	// return value
 	const Class *type;
 	Node(NodeKind kind, int64 link_no, const Class *type);
-	Node(const Class *c);
+	/*Node(const Class *c);
 	Node(const Block *b);
-	Node(const Constant *c);
+	Node(const Constant *c);*/
 	virtual ~Node();
 	Block *as_block() const;
 	Function *as_func() const;

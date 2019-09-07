@@ -48,14 +48,14 @@ class HullCurve extends AudioEffect
 			hull(buf.r)
 
 	override ConfigPanel *create_panel()
-		return new HullCurvePanel(self)
+		return new HullCurvePanel(&self)
 
 class HullGrid extends Grid
 	Config *config
 	ConfigPanel *cp
 	int hover, selected
 
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 	
 		# curve + area below
 		FloatInterpolator fi
@@ -73,7 +73,7 @@ class HullGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if HuiGetEvent().key_code == KEY_DELETE
+		if GetEvent().key_code == KEY_DELETE
 			if selected > 0 and selected < config.curve.num-1
 				config.curve.remove(selected)
 				cp.changed()
@@ -95,7 +95,7 @@ class HullGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l and (selected >= 0)
+		if GetEvent().button_l and (selected >= 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = 0
 			float xmax = 1
@@ -122,7 +122,7 @@ class HullGrid extends Grid
 class HullCurvePanel extends ConfigPanel
 	HullGrid grid
 	override HullCurve* c
-	override void __init__(Module *_h)
+	override void __init__(Module* _h)
 		from_source("
 Grid ? '' vertical
 	DrawingArea drawing '' grabfocus height=250
@@ -133,7 +133,7 @@ Grid ? '' vertical
 		#EventMX("drawing", "hui:draw", self, &OnDraw)
 	
 		grid.config = &c.config
-		grid.cp = self
+		grid.cp = &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")

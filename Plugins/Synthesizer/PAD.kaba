@@ -37,7 +37,7 @@ class PADRenderer extends PitchRenderer
 	float[] prebuf
 	EnvelopeADSR env
 	override PADSynthesizer *synth
-	override void __init__(Synthesizer *s, int pitch)
+	override void __init__(Synthesizer s, int pitch)
 		pos = 0
 		
 	void create()
@@ -98,7 +98,7 @@ class PADSynthesizer extends Synthesizer
 	PADConfig config
 	
 	override ConfigPanel *create_panel()
-		return new PADPanel(self)
+		return new PADPanel(&self)
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new PADRenderer(self, pitch)
@@ -112,7 +112,7 @@ class PADGrid extends Grid
 		selected = -1
 		hover = -1
 
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 		pc.A.resize(8)
 	
 		# curve + area below
@@ -132,7 +132,7 @@ class PADGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l and (selected >= 0)
+		if GetEvent().button_l and (selected >= 0)
 			pc.A[selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
@@ -168,7 +168,7 @@ Grid ? ''
 		event("detune", on_change)
 		
 		grid.pc = pc
-		grid.p = self
+		grid.p = &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, 8.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")

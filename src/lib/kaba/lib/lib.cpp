@@ -17,6 +17,7 @@
 #include "exception.h"
 #include "../../config.h"
 #include "../../math/complex.h"
+#include "../../any/any.h"
 
 
 
@@ -28,7 +29,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.6.2";
+string LibVersion = "0.17.7.6";
 
 
 bool call_function(Function *f, void *ff, void *ret, void *inst, const Array<void*> &param);
@@ -44,7 +45,7 @@ const string IDENTIFIER_SELF = "self";
 const string IDENTIFIER_EXTENDS = "extends";
 const string IDENTIFIER_STATIC = "static";
 const string IDENTIFIER_NEW = "new";
-const string IDENTIFIER_DELETE = "delete";
+const string IDENTIFIER_DELETE = "del";
 const string IDENTIFIER_SIZEOF = "sizeof";
 const string IDENTIFIER_TYPE = "type";
 const string IDENTIFIER_STR = "str";
@@ -80,7 +81,7 @@ const string IDENTIFIER_ASM = "asm";
 const string IDENTIFIER_MAP = "map";
 const string IDENTIFIER_LAMBDA = "lambda";
 const string IDENTIFIER_SORTED = "sorted";
-const string IDENTIFIER_FILTER = "filter";
+const string IDENTIFIER_DYN = "dyn";
 
 CompilerConfiguration config;
 
@@ -131,6 +132,9 @@ const Class *TypeVector;
 const Class *TypeRect;
 const Class *TypeColor;
 const Class *TypeQuaternion;
+const Class *TypeAny;
+const Class *TypeAnyList;
+const Class *TypeAnyDict;
  // internal:
 const Class *TypeDynamicArray;
 const Class *TypeDictBase;
@@ -244,33 +248,34 @@ const Class *add_type_d(const string &name, const Class *sub_type) {
 //   without type information ("primitive")
 
 PrimitiveOperator PrimitiveOperators[(int)OperatorID::_COUNT_] = {
-	{"=",  OperatorID::ASSIGN,        true,  1, IDENTIFIER_FUNC_ASSIGN},
-	{"+",  OperatorID::ADD,           false, 11, "__add__"},
-	{"-",  OperatorID::SUBTRACT,      false, 11, "__sub__"},
-	{"*",  OperatorID::MULTIPLY,      false, 12, "__mul__"},
-	{"/",  OperatorID::DIVIDE,        false, 12, "__div__"},
-	{"+=", OperatorID::ADDS,          true,  1,  "__iadd__"},
-	{"-=", OperatorID::SUBTRACTS,     true,  1,  "__isub__"},
-	{"*=", OperatorID::MULTIPLYS,     true,  1,  "__imul__"},
-	{"/=", OperatorID::DIVIDES,       true,  1,  "__idiv__"},
-	{"==", OperatorID::EQUAL,         false, 8,  "__eq__"},
-	{"!=", OperatorID::NOTEQUAL,      false, 8,  "__ne__"},
-	{"!",  OperatorID::NEGATE,        false, 2,  "__not__"},
-	{"<",  OperatorID::SMALLER,       false, 9,  "__lt__"},
-	{">",  OperatorID::GREATER,       false, 9,  "__gt__"},
-	{"<=", OperatorID::SMALLER_EQUAL, false, 9,  "__le__"},
-	{">=", OperatorID::GREATER_EQUAL, false, 9,  "__ge__"},
-	{IDENTIFIER_AND, OperatorID::AND, false, 4,  "__and__"},
-	{IDENTIFIER_OR,  OperatorID::OR,  false, 3,  "__or__"},
-	{"%",  OperatorID::MODULO,        false, 12, "__mod__"},
-	{"&",  OperatorID::BIT_AND,       false, 7, "__bitand__"},
-	{"|",  OperatorID::BIT_OR,        false, 5, "__bitor__"},
-	{"<<", OperatorID::SHIFT_LEFT,    false, 10, "__lshift__"},
-	{">>", OperatorID::SHIFT_RIGHT,   false, 10, "__rshift__"},
-	{"++", OperatorID::INCREASE,      true,  2, "__inc__"},
-	{"--", OperatorID::DECREASE,      true,  2, "__dec__"},
-	{IDENTIFIER_IS, OperatorID::IS,   false, 2,  "-none-"},
-	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-"}
+	{"=",  OperatorID::ASSIGN,        true,  1, IDENTIFIER_FUNC_ASSIGN, false},
+	{"+",  OperatorID::ADD,           false, 11, "__add__", false},
+	{"-",  OperatorID::SUBTRACT,      false, 11, "__sub__", false},
+	{"*",  OperatorID::MULTIPLY,      false, 12, "__mul__", false},
+	{"/",  OperatorID::DIVIDE,        false, 12, "__div__", false},
+	{"+=", OperatorID::ADDS,          true,  1,  "__iadd__", false},
+	{"-=", OperatorID::SUBTRACTS,     true,  1,  "__isub__", false},
+	{"*=", OperatorID::MULTIPLYS,     true,  1,  "__imul__", false},
+	{"/=", OperatorID::DIVIDES,       true,  1,  "__idiv__", false},
+	{"==", OperatorID::EQUAL,         false, 8,  "__eq__", false},
+	{"!=", OperatorID::NOTEQUAL,      false, 8,  "__ne__", false},
+	{"!",  OperatorID::NEGATE,        false, 2,  "__not__", false},
+	{"<",  OperatorID::SMALLER,       false, 9,  "__lt__", false},
+	{">",  OperatorID::GREATER,       false, 9,  "__gt__", false},
+	{"<=", OperatorID::SMALLER_EQUAL, false, 9,  "__le__", false},
+	{">=", OperatorID::GREATER_EQUAL, false, 9,  "__ge__", false},
+	{IDENTIFIER_AND, OperatorID::AND, false, 4,  "__and__", false},
+	{IDENTIFIER_OR,  OperatorID::OR,  false, 3,  "__or__", false},
+	{"%",  OperatorID::MODULO,        false, 12, "__mod__", false},
+	{"&",  OperatorID::BIT_AND,       false, 7, "__bitand__", false},
+	{"|",  OperatorID::BIT_OR,        false, 5, "__bitor__", false},
+	{"<<", OperatorID::SHIFT_LEFT,    false, 10, "__lshift__", false},
+	{">>", OperatorID::SHIFT_RIGHT,   false, 10, "__rshift__", false},
+	{"++", OperatorID::INCREASE,      true,  2, "__inc__", false},
+	{"--", OperatorID::DECREASE,      true,  2, "__dec__", false},
+	{IDENTIFIER_IS, OperatorID::IS,   false, 2,  "-none-", false},
+	{IDENTIFIER_IN, OperatorID::IN,   false, 12, "__contains__", true}, // INVERTED
+	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", false}
 // Level = 15 - (official C-operator priority)
 // priority from "C als erste Programmiersprache", page 552
 };
@@ -561,6 +566,24 @@ void kaba_var_init(void *p, const Class *type) {
 	ff(p);
 }
 
+void kaba_array_clear(void *p, const Class *type) {
+	auto *f = type->get_func("clear", TypeVoid, {});
+	if (!f)
+		kaba_raise_exception(new KabaException("can not clear an array of type " + type->long_name()));
+	typedef void func_t(void*);
+	auto *ff = (func_t*)f->address;
+	ff(p);
+}
+
+void kaba_array_resize(void *p, const Class *type, int num) {
+	auto *f = type->get_func("resize", TypeVoid, {TypeInt});
+	if (!f)
+		kaba_raise_exception(new KabaException("can not resize an array of type " + type->long_name()));
+	typedef void func_t(void*, int);
+	auto *ff = (func_t*)f->address;
+	ff(p, num);
+}
+
 void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 	//msg_write("array add " + type->long_name());
 	if ((type == TypeIntList) or (type == TypeFloatList)) {
@@ -635,24 +658,44 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 	return rr;
 }
 
-DynamicArray _cdecl kaba_array_filter(Function *f, DynamicArray &array, const Class *type) {
-	DynamicArray rr;
-	kaba_var_init(&rr, type);
-
-	for (int i=0; i<array.num; i++) {
-		bool filter_pass = false;
-		void *pa = (char*)array.data + i * array.element_size;
-		bool ok = call_function(f, f->address, &filter_pass, nullptr, {pa});
-		if (!ok)
-			kaba_raise_exception(new KabaException("can not call filter function " + f->signature()));
-		if (filter_pass)
-			kaba_array_add(rr, pa, type);
-	}
-	return rr;
-}
-
 string _cdecl var2str(const void *var, const Class *type) {
 	return type->var2str(var);
+}
+
+Any _cdecl kaba_dyn(const void *var, const Class *type) {
+	if (type == TypeInt)
+		return Any(*(int*)var);
+	if (type == TypeFloat)
+		return Any(*(float*)var);
+	if (type == TypeBool)
+		return Any(*(bool*)var);
+	if (type == TypeString)
+		return Any(*(string*)var);
+	if (type->is_pointer())
+		return Any(*(void**)var);
+	if (type->is_array()) {
+		Any a;
+		auto *t_el = type->get_array_element();
+		for (int i=0; i<type->array_length; i++)
+			a.add(kaba_dyn((char*)var + t_el->size * i, t_el));
+		return a;
+	}
+	if (type->is_super_array()) {
+		Any a;
+		auto *ar = (DynamicArray*)var;
+		auto *t_el = type->get_array_element();
+		for (int i=0; i<ar->num; i++)
+			a.add(kaba_dyn((char*)ar->data + ar->element_size * i, t_el));
+		return a;
+	}
+	
+	// class
+	Any a;
+	for (auto &e: type->elements) {
+		if (!e.hidden)
+			a.map_set(e.name, kaba_dyn((char*)var + e.offset, e.type));
+	}
+	return a;
 }
 
 DynamicArray kaba_map(Function *func, DynamicArray *a) {
@@ -1020,61 +1063,28 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 class StringList : public Array<string>
 {
 public:
-	void _cdecl assign(StringList &s){	*this = s;	}
-	string _cdecl join(const string &glue)
-	{ return implode(*this, glue); }
+	void _cdecl assign(StringList &s) {
+		*this = s;
+	}
+	string _cdecl join(const string &glue) {
+		return implode(*this, glue);
+	}
+	bool __contains__(const string &s) {
+		return this->find(s) >= 0;
+	}
 };
 
-class IntClass
-{
-	int i;
-public:
-	string _cdecl str(){	return i2s(i);	}
-};
+string kaba_float2str(float f) {
+	return f2s(f, 6);
+}
 
-class Int64Class
-{
-	int64 i;
-public:
-	string _cdecl str(){	return i642s(i);	}
-};
+string kaba_float642str(float f) {
+	return f642s(f, 6);
+}
 
-class FloatClass
-{
-	float f;
-public:
-	string _cdecl str(){	return f2s(f, 6);	}
-	string _cdecl str2(int decimals){	return f2s(f, decimals);	}
-};
-
-class Float64Class
-{
-	double f;
-public:
-	string _cdecl str(){	return f642s(f, 6);	}
-	string _cdecl str2(int decimals){	return f642s(f, decimals);	}
-};
-
-class BoolClass
-{
-	bool b;
-public:
-	string _cdecl str(){	return b2s(b);	}
-};
-
-class CharClass
-{
-	char c;
-public:
-	string _cdecl str(){	string r;	r.add(c);	return r;	}
-};
-
-class PointerClass {
-	void *p;
-public:
-	string _cdecl str(){	return p2s(p);	}
-};
-
+string kaba_char2str(char c) {
+	return string(&c, 1);
+}
 
 
 int xop_int_add(int a, int b) {
@@ -1199,38 +1209,38 @@ void SIAddPackageBase() {
 
 
 	add_class(TypePointer);
-		class_add_funcx("str", TypeString, &PointerClass::str, FLAG_PURE);
+		class_add_funcx("str", TypeString, &p2s, FLAG_PURE);
 
 
 	add_class(TypeInt);
-		class_add_funcx("str", TypeString, &IntClass::str, FLAG_PURE);
+		class_add_funcx("str", TypeString, &i2s, FLAG_PURE);
 		class_add_funcx("add", TypeInt, &xop_int_add, FLAG_PURE);
 			func_set_inline(InlineID::INT_ADD);
 			func_add_param("b", TypeInt);
 
 
 	add_class(TypeInt64);
-		class_add_funcx("str", TypeString, &Int64Class::str, FLAG_PURE);
+		class_add_funcx("str", TypeString, &i642s, FLAG_PURE);
 
 
 	add_class(TypeFloat32);
-		class_add_funcx("str", TypeString, &FloatClass::str, FLAG_PURE);
-		class_add_funcx("str2", TypeString, &FloatClass::str2, FLAG_PURE);
+		class_add_funcx("str", TypeString, &kaba_float2str, FLAG_PURE);
+		class_add_funcx("str2", TypeString, &f2s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
 
 
 	add_class(TypeFloat64);
-		class_add_funcx("str", TypeString, &Float64Class::str, FLAG_PURE);
-		class_add_funcx("str2", TypeString, &Float64Class::str2, FLAG_PURE);
+		class_add_funcx("str", TypeString, &kaba_float642str, FLAG_PURE);
+		class_add_funcx("str2", TypeString, &f642s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
 
 
 	add_class(TypeBool);
-		class_add_funcx("str", TypeString, &BoolClass::str, FLAG_PURE);
+		class_add_funcx("str", TypeString, &b2s, FLAG_PURE);
 
 
 	add_class(TypeChar);
-		class_add_funcx("str", TypeString, &CharClass::str, FLAG_PURE);
+		class_add_funcx("str", TypeString, &kaba_char2str, FLAG_PURE);
 
 
 	add_class(TypeString);
@@ -1250,9 +1260,6 @@ void SIAddPackageBase() {
 			func_add_param("x", TypeString);
 		class_add_funcx("__ge__", TypeBool, &string::operator>=, FLAG_PURE);
 			func_add_param("x", TypeString);
-		class_add_funcx("substr", TypeString, &string::substr, FLAG_PURE);
-			func_add_param("start", TypeInt);
-			func_add_param("length", TypeInt);
 		class_add_funcx("head", TypeString, &string::head, FLAG_PURE);
 			func_add_param("size", TypeInt);
 		class_add_funcx("tail", TypeString, &string::tail, FLAG_PURE);
@@ -1306,6 +1313,8 @@ void SIAddPackageBase() {
 			func_add_param("other", TypeStringList);
 		class_add_funcx("join", TypeString, &StringList::join, FLAG_PURE);
 			func_add_param("glue", TypeString);
+		class_add_funcx("__contains__", TypeBool, &StringList::__contains__, FLAG_PURE);
+			func_add_param("s", TypeString);
 
 
 	// constants
@@ -1466,6 +1475,8 @@ void SIAddPackageKaba() {
 
 	add_ext_var("packages", TypeScriptPList, (void*)&Packages);
 	add_ext_var("statements", TypeStatementPList, (void*)&Statements);
+	add_ext_var("lib_version", TypeString, (void*)&LibVersion);
+	add_ext_var("kaba_version", TypeString, (void*)&Version);
 }
 
 
@@ -1495,7 +1506,7 @@ void SIAddBasicCommands() {
 	add_statement(IDENTIFIER_MAP, StatementID::MAP);
 	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
 	add_statement(IDENTIFIER_SORTED, StatementID::SORTED);
-	add_statement(IDENTIFIER_FILTER, StatementID::FILTER);
+	add_statement(IDENTIFIER_DYN, StatementID::DYN);
 }
 
 
@@ -1693,17 +1704,10 @@ void SIAddOperators() {
 
 void SIAddCommands() {
 	// type casting
-	add_func("@s2i", TypeInt, (void*)&s2i, FLAG_STATIC);
-		func_add_param("s", TypeString);
-	add_func("@s2f", TypeFloat32, (void*)&s2f, FLAG_STATIC);
-		func_add_param("s", TypeString);
 	add_func("@i2s", TypeString, (void*)&i2s, FLAG_STATIC);
 		func_add_param("i", TypeInt);
 	add_func("@i642s", TypeString, (void*)&i642s, FLAG_STATIC);
 		func_add_param("i", TypeInt64);
-	add_func("@f2s", TypeString, (void*)&f2s, FLAG_STATIC);
-		func_add_param("f", TypeFloat32);
-		func_add_param("decimals", TypeInt);
 	add_func("@f2sf", TypeString, (void*)&f2sf, FLAG_STATIC);
 		func_add_param("f", TypeFloat32);
 	add_func("@f642sf", TypeString, (void*)&f642sf, FLAG_STATIC);
@@ -1735,20 +1739,19 @@ void SIAddCommands() {
 		func_add_param("cmd", TypeString);
 
 
-	add_func("-sorted-", TypeDynamicArray, (void*)&kaba_array_sort, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+	add_func("@sorted", TypeDynamicArray, (void*)&kaba_array_sort, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("list", TypePointer);
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
-	add_func("-filter-", TypeDynamicArray, (void*)&kaba_array_filter, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
-		func_add_param("func", TypeFunctionP);
-		func_add_param("list", TypePointer);
-		func_add_param("class", TypeClassP);
-	add_func("-var2str-", TypeString, (void*)var2str, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+	add_func("@var2str", TypeString, (void*)var2str, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("-map-", TypeDynamicArray, (void*)kaba_map, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+	add_func("@map", TypeDynamicArray, (void*)kaba_map, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("func", TypeFunctionP);
 		func_add_param("array", TypePointer);
+	add_func("@dyn", TypeAny, (void*)kaba_dyn, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		func_add_param("var", TypePointer);
+		func_add_param("class", TypeClassP);
 
 
 // add_func("ExecuteScript", TypeVoid);
@@ -1855,6 +1858,12 @@ void Init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	add_type_cast(50, TypeFloatList, TypeString, "@fa2s", nullptr);
 	add_type_cast(50, TypeBoolList, TypeString, "@ba2s", nullptr);
 	add_type_cast(50, TypeStringList, TypeString, "@sa2s", nullptr);
+	cur_package = Packages[2];
+	add_type_cast(50, TypeInt, TypeAny, "@int2any", nullptr);
+	add_type_cast(50, TypeFloat32, TypeAny, "@float2any", nullptr);
+	add_type_cast(50, TypeBool, TypeAny, "@bool2any", nullptr);
+	add_type_cast(50, TypeString, TypeAny, "@str2any", nullptr);
+	add_type_cast(50, TypePointer, TypeAny, "@pointer2any", nullptr);
 
 
 	// consistency checks

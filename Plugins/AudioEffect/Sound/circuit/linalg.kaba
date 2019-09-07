@@ -44,7 +44,7 @@ class Matrix
 	float[] solve(float[] b)
 		if n != m or b.num != n
 			raise(new Exception("size mismatch"))
-		Matrix mm = *self
+		Matrix mm = self
 		float[] x
 		x.resize(m)
 		float[] bb = b

@@ -19,23 +19,19 @@ namespace Kaba{
 bool _verbose_exception_ = false;
 
 
-KabaException::KabaException(const string &message)
-{
+KabaException::KabaException(const string &message) {
 	text = message;
 }
 
-void KabaException::__init__(const string &message)
-{
+void KabaException::__init__(const string &message) {
 	new(this) KabaException(message);
 }
 
-void KabaException::__delete__()
-{
+void KabaException::__delete__() {
 	this->~KabaException();
 }
 
-string KabaException::message()
-{
+string KabaException::message() {
 	return text;
 }
 
@@ -43,8 +39,7 @@ string KabaException::message()
 
 
 
-struct StackFrameInfo
-{
+struct StackFrameInfo {
 	void *rip;
 	void *rsp;
 	void *rbp;
@@ -171,6 +166,8 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex
 
 void* rbp2 = nullptr;
 
+#ifdef CPU_AMD64
+
 void relink_return(void *rip, void *rbp, void *rsp)
 {
 #ifdef OS_LINUX
@@ -184,13 +181,14 @@ void relink_return(void *rip, void *rbp, void *rsp)
 			"ret"
 		: "=r" (rbp2)
 		: "r" (rsp), "r" (rip)
-		: "%rsp");
+		: );
 
 //	printf("rbp=%p\n", rbp2);
 #endif
 
 	exit(0);
 }
+#endif
 
 const Class* _get_type(void *p, void *vtable, const Class *ns) {
 	for (auto *c: ns->classes) {
@@ -221,6 +219,7 @@ const Class* get_type(void *p)
 	return TypeUnknown;
 }
 
+#ifdef CPU_AMD64
 
 Array<StackFrameInfo> get_stack_trace(void **rbp)
 {
@@ -345,6 +344,16 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 	exit(1);
 }
 #pragma GCC pop_options
+
+#else
+
+void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
+	msg_error("exception handling not working on this architecture...");
+	msg_write(kaba_exception->message());
+	exit(1);
+}
+
+#endif
 
 }
 

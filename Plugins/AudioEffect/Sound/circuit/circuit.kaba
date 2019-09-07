@@ -1,5 +1,4 @@
-use file
-use "linalg.kaba"
+use linalg
 
 
 class Node
@@ -8,19 +7,21 @@ class Node
 	void __init__(complex p)
 		phi = 0
 		pos = p
-	string tell()
-		return "phi=" + phi
 
 enum
 	TYPE_CABLE
+	TYPE_SOURCE
 	TYPE_RESISTOR
 	TYPE_CAPACITOR
 	TYPE_INDUCTOR
 	TYPE_DIODE
+	NUM_TYPES
 
 string edge_name(int t)
 	if t == TYPE_CABLE
 		return "Cable"
+	if t == TYPE_SOURCE
+		return "Source"
 	if t == TYPE_RESISTOR
 		return "Resistor"
 	if t == TYPE_CAPACITOR
@@ -31,103 +32,127 @@ string edge_name(int t)
 		return "Diode"
 	return "???"
 
+int edge_type(string s)
+	for i in 0:NUM_TYPES
+		if s == edge_name(i)
+			return i
+	return -1
+	
+
+# ARGH
+float[] empty()
+	float[] r
+	return r
+
 class Edge
 	int type
 	int a, b
 	float I, U
-	void __init__(int _type, int[] n)
+	float[4] param
+	void __init__(int _type, int[] n, float[] p)
 		type = _type
 		a = n[0]
 		b = n[1]
+		for pp,i in p
+			param[i] = pp
+	void __assign__(Edge o)
+		pass
 	virtual float g(float dt)
 		return 0.0
 	virtual float I_off(float dt)
 		return 0.0
 	virtual void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 	virtual void iterate(float dt)
 		pass
-	virtual string tell()
-		return "???"
 	virtual void reset_state()
+	virtual string[] param_names()
+		string[] r
+		return r
 
 class Cable extends Edge
-	float R
 	void __init__(int[] n)
-		super.__init__(TYPE_CABLE, n)
+		super.__init__(TYPE_CABLE, n, empty())
 	override float g(float dt)
 		return 1000
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	override string tell()
-		return "| U=" + U + " I=" + I
+
+class Source extends Edge
+	void __init__(int[] n, float i)
+		super.__init__(TYPE_SOURCE, n, [i, 10000.0])
+	override float g(float dt)
+		return 1 / param[1]
+	override float I_off(float dt)
+		return -param[0]
+	override void update(Node[] nodes, float dt)
+		U = nodes[a].phi - nodes[b].phi
+		I = U * g(dt) + param[0]
+	override string[] param_names()
+		return ["I", "R"]
 
 class Resistor extends Edge
-	float R
-	void __init__(int[] n, float _r)
-		super.__init__(TYPE_RESISTOR, n)
-		R = _r
+	void __init__(int[] n, float R)
+		super.__init__(TYPE_RESISTOR, n, [R])
 	override float g(float dt)
-		return 1/R
+		return 1 / param[0]
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	override string tell()
-		return "R=" + R + " U=" + U + " I=" + I
+	override string[] param_names()
+		return ["R"]
 
 class Capacitor extends Edge
-	float C, U_prev
-	void __init__(int[] n, float _c)
-		super.__init__(TYPE_CAPACITOR, n)
-		C = _c
+	float U_prev
+	void __init__(int[] n, float C)
+		super.__init__(TYPE_CAPACITOR, n, [C])
 		U_prev = 0
 	override float g(float dt)
-		return C/dt
+		return param[0] / dt
 	override float I_off(float dt)
-		return -U_prev * C / dt
+		return U_prev * param[0] / dt
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = (U - U_prev) * g(dt)
 	override void iterate(float dt)
 		U_prev = U
-	override string tell()
-		return "C=" + C + " U=" + U + " I=" + I + " U_prev=" + U_prev + " Q=" + C*U
+	override string[] param_names()
+		return ["C"]
 	override void reset_state()
 		U_prev = 0
 
 class Inductor extends Edge
-	float L, I_prev
-	void __init__(int[] n, float _l)
-		super.__init__(TYPE_INDUCTOR, n)
-		L = _l
+	float I_prev
+	void __init__(int[] n, float L)
+		super.__init__(TYPE_INDUCTOR, n, [L])
 		I_prev = 0
 	override float g(float dt)
-		return dt/L
+		return dt / param[0]
 	override float I_off(float dt)
-		return I_prev
+		return -I_prev
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = I_prev + U * g(dt)
 	override void iterate(float dt)
 		I_prev = I
-	override string tell()
-		return "L=" + L + " U=" + U + " I=" + I + " I_prev=" + I_prev
+	override string[] param_names()
+		return ["L"]
 	override void reset_state()
 		I_prev = 0
 
+#const float DIODE_DEFAULT_VT = 0.02585
+#const float DIODE_DEFAULT_IS = 0.0000000001
+const float[] DIODE_DEFAULT_PARAMS = [0.02585, 0.0-23.0258, 1.5]
+
 class Diode extends Edge
-	float VT, IS, q
 	float u_low, u_high
 	float i_low, i_high
 	float g_low, g_high
 	void __init__(int[] n)
-		super.__init__(TYPE_DIODE, n)
-		VT = 0.02585
-		IS = 0.0000000001
-		q = 1.5
-		U = VT
+		super.__init__(TYPE_DIODE, n, DIODE_DEFAULT_PARAMS)
+		U = param[0]
 		u_low = -0.5
 		u_high = 1
 		g_high = (I_sch(u_high+0.01) - I_sch(u_high)) / 0.01
@@ -135,33 +160,31 @@ class Diode extends Edge
 		#0.000001
 		i_high = I_sch(u_high) - u_high*g_high
 		i_low = I_sch(u_low) - u_low*g_low
+	override string[] param_names()
+		return ["V_t", "ln(I_s)", "q"]
 	float I_sch(float u)
-		return IS * (exp(u / q / VT) - 1)
+		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
 	float I_id(float u)
 		if u > u_high
 			return u*g_high + i_high
 		if u < u_low
 			return u*g_low + i_low
-		return IS * (exp(u / q / VT) - 1)
+		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
 	override float g(float dt)
 		if U > u_high
 			return g_high
 		if U < u_low
 			return g_low
-		return IS * exp(U / q / VT) / (q*VT)
+		return exp(param[1] + U / param[2] / param[0]) / (param[2]*param[0])
 	override float I_off(float dt)
 		if U > u_high
-			return i_high
+			return -i_high
 		if U < u_low
-			return i_low
-		#print("Ioff=" + (I_id(U) - g(dt) * U))
-		return (I_id(U) - g(dt) * U)
+			return -i_low
+		return g(dt) * U - I_id(U)
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = I_id(U)
-		#print("=> I=" + I + "   U=" + U)
-	override string tell()
-		return "D U=" + U + " I=" + I
 
 class SimResult
 	float[][] U, I
@@ -177,40 +200,23 @@ class Circuit
 	int out
 	
 	void __init__()
-		reset()
-	
-	void reset()
+		reset_default()
+		
+	void clear()
 		nodes.clear()
-		nodes.add(Node(complex(0.2, 0.3)))
-		nodes.add(Node(complex(0.2, 0.7)))
 		out = 1
 		for e in edges
 			delete e
 		edges.clear()
 	
-	void reset1()
-		nodes.clear()
-		nodes.add(Node(complex(0.1, 0.1)))
-		nodes.add(Node(complex(0.1, 0.4)))
-		nodes.add(Node(complex(0.9, 0.4)))
-		out = 2
-		
-		edges.add(new Resistor([0, 1], 100))
-		edges.add(new Resistor([0, 2], 100))
-		edges.add(new Resistor([0, 2], 100))
-		edges.add(new Resistor([1, 2], 100))
+	void reset_default()
+		clear()
+		nodes.add(Node(complex(0.2, 0.3)))
+		nodes.add(Node(complex(0.2, 0.7)))
 	
 	void reset_state()
 		for e in edges
 			e.reset_state()
-	
-	void tell()
-		print("---------------------------")
-		for n in nodes
-			print(n.tell())
-		for e,i in edges
-			print(e.tell())
-		print("---------------------------")
 	
 	void quick_out()
 		string s
@@ -314,17 +320,55 @@ class Circuit
 			res.I.add(I)
 			res.phi.add(phi)
 	
-	void save(string filename)
-		File* f = Filesystem.create_text(filename)
+	string export()
+		string s
 		for n in nodes
-			f << "Node"
-			f << n.pos.x
-			f << n.pos.y
+			s += "Node:" + n.pos.x + ":" + n.pos.y + "\n"
 		for e in edges
-			f << edge_name(e.type)
-			f << e.a
-			f << e.b
-		delete f
+			s += edge_name(e.type) + ":" + e.a + ":" + e.b
+			int n = len(e.param_names())
+			for i in 0:n
+				s += ":" + e.param[i]
+			s += "\n"
+		s += "Out:" + out + "\n"
+		return s
+	
+	void import(string s)
+		clear()
+		string[] lines = s.explode("\n")
+		for l in lines
+			string[] x = l.explode(":")
+			if len(x) == 0
+				continue
+			if x[0] == "Node"
+				nodes.add(Node(complex(x[1].float(), x[2].float())))
+			else if x[0] == "Out"
+				out = x[1].int()
+			else
+				int t = edge_type(x[0])
+				int[] n = [x[1].int(), x[2].int()]
+				Edge* e = add_default(n, t)
+				for i in 3:len(x)
+					e.param[i] = x[i].float()
+	
+	Edge* add_default(int[]n, int t)
+		Edge* e = nil
+		if t == TYPE_CABLE
+			e = new Cable(n)
+		else if t == TYPE_SOURCE
+			e = new Source(n, 1)
+		else if t == TYPE_RESISTOR
+			e = new Resistor(n, 10)
+		else if t == TYPE_CAPACITOR
+			e = new Capacitor(n, 1)
+		else if t == TYPE_INDUCTOR
+			e = new Inductor(n, 1)
+		else if t == TYPE_DIODE
+			e = new Diode(n)
+		else
+			raise(new Exception("unknown type: " + t))
+		edges.add(e)
+		return e
 
 void _main()
 	Circuit c

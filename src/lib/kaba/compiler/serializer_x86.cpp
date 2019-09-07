@@ -128,10 +128,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 	p.p = 0;
 	p.shift = 0;
 
-	if (link->kind == NodeKind::FUNCTION_POINTER){
-		p.kind = NodeKind::MARKER;
-		p.p = link->as_func()->_label;
-	}else if (link->kind == NodeKind::MEMORY){
+	if (link->kind == NodeKind::MEMORY){
 		p.p = link->link_no;
 	}else if (link->kind == NodeKind::ADDRESS){
 		p.p = (int_p)&link->link_no;
@@ -169,7 +166,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 			if (param.kind == KindVarGlobal)	p.kind = KindRefToGlobal;
 			p.p = param.p;
 		}*/
-		return AddDereference(param);
+		return AddDereference(param, link->type);
 	}else if (link->kind == NodeKind::VAR_TEMP){
 		// only used by <new> operator
 		p.p = link->link_no;

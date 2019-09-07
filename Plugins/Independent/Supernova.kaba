@@ -169,7 +169,7 @@ class SuperNovaWindow extends Window
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	override void on_draw(Painter *p)
+	override void on_draw(Painter p)
 		c = p
 		c.setColor(White)
 		c.setFontSize(12)

@@ -29,7 +29,7 @@ class SpecGrid extends Grid
 		return s / x_scale
 	int create_pitch
 	float create_x
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 		rect r = plot_rect
 		int w = r.width()
 		int h = r.height()
@@ -153,7 +153,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 	MidiNoteBuffer midi
 
 	void show_spec(Song *song)
-		dlg = new SpectrumDialog(self, song)
+		dlg = new SpectrumDialog(&self, song)
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)

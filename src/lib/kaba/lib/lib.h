@@ -81,7 +81,7 @@ extern const string IDENTIFIER_ASM;
 extern const string IDENTIFIER_MAP;
 extern const string IDENTIFIER_LAMBDA;
 extern const string IDENTIFIER_SORTED;
-extern const string IDENTIFIER_FILTER;
+extern const string IDENTIFIER_DYN;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -114,6 +114,7 @@ enum class OperatorID {
 	INCREASE,      // ++
 	DECREASE,      // --
 	IS,            // is
+	IN,            // in
 	EXTENDS,       // extends
 	_COUNT_
 };
@@ -125,6 +126,7 @@ public:
 	bool left_modifiable;
 	unsigned char level; // order of operators ("Punkt vor Strich")
 	string function_name;
+	bool order_inverted; // (param, instance) instead of (instance, param)
 };
 extern PrimitiveOperator PrimitiveOperators[];
 
@@ -162,7 +164,7 @@ enum class StatementID {
 	MAP,
 	LAMBDA,
 	SORTED,
-	FILTER
+	DYN
 };
 
 class Statement {

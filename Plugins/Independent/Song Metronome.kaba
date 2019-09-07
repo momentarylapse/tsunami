@@ -29,7 +29,7 @@ class BlurredDot
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	void draw(Painter *p, color c, float r)
+	void draw(Painter p, color c, float r)
 		if has_prev
 			float dt = 1.0 / MOTION_BLUR_COUNT
 			color cc = c
@@ -55,7 +55,7 @@ class MetronomePanel extends ConfigPanel
 	BlurredDot dot
 	int sr_id
 	
-	void __init__(Session *session, Metronome *_metro)
+	void __init__(Metronome *_metro)
 		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
@@ -88,16 +88,16 @@ Grid ? '' vertical
 		event("mode-bounce-walk", on_mode_bounce_walk)
 		#event("fullscreen", on_fullscreen)
 		
-		sr_id = HuiRunRepeated(UPDATE_DT, self, on_update)
+		sr_id = RunRepeated(UPDATE_DT, &self, on_update)
 	
 	override void __delete__()
-		HuiCancelRunner(sr_id)
-		delete popup_menu
+		CancelRunner(sr_id)
+		del popup_menu
 	
 	void on_update()
 		redraw("area")
 	
-	void on_draw(Painter *p)
+	void on_draw(Painter p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -179,7 +179,7 @@ Grid ? '' vertical
 		
 		fraction_prev = beat_fraction
 	
-	void draw_part_info(Painter* p, int cur_bar_index)
+	void draw_part_info(Painter p, int cur_bar_index)
 		float w = p.width
 		float h = p.height
 		
@@ -225,7 +225,7 @@ Grid ? '' vertical
 		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
 		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
-		popup_menu.popup(self)
+		popup_menu.popup(&self)
 	
 	void on_blink_background()
 		allow_blink_background = !allow_blink_background
@@ -274,7 +274,7 @@ class Metronome extends TsunamiPlugin
 		session.view.signal_chain.set_buffer_size(1024)
 			
 	override ConfigPanel* create_panel()
-		return new MetronomePanel(session, self)
+		return new MetronomePanel(&self)
 		
 	override void on_stop()
 		pass

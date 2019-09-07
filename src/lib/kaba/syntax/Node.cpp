@@ -16,10 +16,8 @@ string kind2str(NodeKind kind) {
 		return "local";
 	if (kind == NodeKind::VAR_GLOBAL)
 		return "global";
-	if (kind == NodeKind::FUNCTION_NAME)
+	if (kind == NodeKind::FUNCTION)
 		return "function name";
-	if (kind == NodeKind::FUNCTION_POINTER)
-		return "function pointer";
 	if (kind == NodeKind::CONSTANT)
 		return "constant";
 	if (kind == NodeKind::CONSTANT_BY_ADDRESS)
@@ -100,9 +98,7 @@ string Node::sig() const {
 		return t + as_local()->name;
 	if (kind == NodeKind::VAR_GLOBAL)
 		return t + as_global()->name;
-	if (kind == NodeKind::FUNCTION_POINTER)
-		return t + as_func()->long_name();
-	if (kind == NodeKind::FUNCTION_NAME)
+	if (kind == NodeKind::FUNCTION)
 		return t + as_func()->long_name();
 	if (kind == NodeKind::CONSTANT)
 		return t + as_const()->str();
@@ -113,7 +109,7 @@ string Node::sig() const {
 	if (kind == NodeKind::INLINE_CALL)
 		return as_func()->signature();
 	if (kind == NodeKind::VIRTUAL_CALL)
-		return t + i2s(link_no);//s->Functions[nr]->name;
+		return as_func()->signature();
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return as_func()->signature();
 	if (kind == NodeKind::STATEMENT)
@@ -231,10 +227,6 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
 	link_no = _link_no;
 	instance = nullptr;
 }
-
-Node::Node(const Class *c) : Node(NodeKind::CLASS, (int_p)c, TypeClassP) {}
-Node::Node(const Block *b) : Node(NodeKind::BLOCK, (int_p)b, TypeVoid) {}
-Node::Node(const Constant *c) : Node(NodeKind::CONSTANT, (int_p)c, c->type) {}
 
 Node::~Node() {
 	if (instance)

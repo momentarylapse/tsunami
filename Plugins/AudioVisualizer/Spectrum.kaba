@@ -59,7 +59,7 @@ class SpecGrid extends Grid
 			y_axis.set(db_min, db_max, false, "db")
 		create_lines()
 
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 		draw_curve_b(c, pr, true, Red)
 		draw_curve_b(c, pl, true, Blue)
 
@@ -67,18 +67,18 @@ class SpectrumPanel extends ConfigPanel
 	override Spectrum* c
 	SpecGrid grid
 	
-	override void __init__(Module *_sp)
+	override void __init__(Module* _sp)
 		from_source("
 DrawingArea area '' height=200 expandy")
 		
-		c.panels.add(self)
+		c.panels.add(&self)
 		
 		grid.init(self, "area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
 	override void __delete__()
 		for p,i in c.panels
-			if p == self
+			if p == &self
 				c.panels.remove(i)
 
 class Spectrum extends AudioVisualizer
@@ -131,6 +131,6 @@ class Spectrum extends AudioVisualizer
 			p.redraw("area")
 		
 	override ConfigPanel* create_panel()
-		return new SpectrumPanel(self)
+		return new SpectrumPanel(&self)
 
 

@@ -94,7 +94,7 @@ class PluginData
 	extern virtual string auto_conf(string name)
 
 class ConfigPanel extends Panel
-	extern void __init__(Module *c)
+	extern void __init__(Module* c)
 	extern override void __delete__()
 	extern virtual void update()
 	extern virtual void set_large(bool large)
@@ -240,7 +240,7 @@ class PitchDetector extends MidiSource
 	bool loud_enough
 
 class PitchRenderer
-	extern void __init__(Synthesizer *synth, int pitch)
+	extern void __init__(Synthesizer synth, int pitch)
 	extern virtual void __delete__()
 	extern virtual bool render(AudioBuffer buf) # return: keep alive
 	#extern virtual void on_event(MidiEvent e)
@@ -265,7 +265,7 @@ class Synthesizer extends Module
 	extern virtual void render(AudioBuffer buf)
 	extern override void on_config()
 	extern override void reset_state()
-	extern virtual PitchRenderer *create_pitch_renderer(int pitch)
+	extern virtual PitchRenderer* create_pitch_renderer(int pitch)
 	extern void set_sample_rate(int sample_rate)
 
 class DummySynthesizer extends Synthesizer
@@ -639,4 +639,4 @@ extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
 
 extern string ChooseModule(Panel* parent, Session* session, int type, string old_name)
 
-extern void draw_boxed_str(Painter *c, float x, float y, string str, color col_text, color col_bg)
+extern void draw_boxed_str(Painter c, float x, float y, string str, color col_text, color col_bg)

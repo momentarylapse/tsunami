@@ -16,7 +16,7 @@ class Volume extends AudioEffect
 	Config config
 
 	override ConfigPanel *create_panel()
-		return new VolumePanel(self)
+		return new VolumePanel(&self)
 
 	override void process(AudioBuffer buf)
 		float factor = config.volume
@@ -39,7 +39,7 @@ class Volume extends AudioEffect
 class VolumePanel extends ConfigPanel
 	override Volume *c
 	Slider *slider
-	override void __init__(Module *_v)
+	override void __init__(Module* _v)
 		add_grid("!width=400", 0, 0, "table1")
 		set_target("table1")
 		add_check_box("Maximieren", 0, 1, "max")
@@ -49,7 +49,7 @@ class VolumePanel extends ConfigPanel
 		add_spin_button("\\0\\1000\\0.1", 1, 0, "volume")
 		add_label("%", 2, 0, "")
 		
-		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, on_volume, c.config.volume)
+		slider = new Slider(&self, "volume_slider", "volume", 0, 2, 100, on_volume, c.config.volume)
 	
 		event("max", on_max)
 	

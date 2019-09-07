@@ -175,7 +175,7 @@ public:
 	virtual int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
 	virtual void fc_end(int push_size, const SerialNodeParam &ret) = 0;
 	SerialNodeParam AddReference(const SerialNodeParam &param, const Class *force_type = nullptr);
-	SerialNodeParam AddDereference(const SerialNodeParam &param, const Class *force_type = nullptr);
+	SerialNodeParam AddDereference(const SerialNodeParam &param, const Class *type);
 
 	void MapTempVarToReg(int vi, int reg);
 	void add_stack_var(TempVar &v, SerialNodeParam &p);

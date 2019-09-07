@@ -105,7 +105,7 @@ class Equalizer extends AudioEffect
 			grid.set_buffer(buf)
 
 	override ConfigPanel *create_panel()
-		return new EqualizerPanel(self)
+		return new EqualizerPanel(&self)
 
 
 const int HOVER_NONE = 0-1
@@ -129,15 +129,15 @@ class EqualizerGrid extends Grid
 		if menu
 			delete menu
 	void init2()
-		panel.event_o("add-peak", self, on_add_peak)
-		panel.event_o("add-low-pass", self, on_add_peak)
-		panel.event_o("add-high-pass", self, on_add_peak)
-		panel.event_o("add-low-shelf", self, on_add_peak)
-		panel.event_o("add-high-shelf", self, on_add_peak)
-		panel.event_o("peak-toggle-enabled", self, on_peak_toggle_enabled)
-		panel.event_o("peak-delete", self, on_peak_delete)
+		panel.event_o("add-peak", &self, on_add_peak)
+		panel.event_o("add-low-pass", &self, on_add_peak)
+		panel.event_o("add-high-pass", &self, on_add_peak)
+		panel.event_o("add-low-shelf", &self, on_add_peak)
+		panel.event_o("add-high-shelf", &self, on_add_peak)
+		panel.event_o("peak-toggle-enabled", &self, on_peak_toggle_enabled)
+		panel.event_o("peak-delete", &self, on_peak_delete)
 
-	override void on_draw(Painter *p)
+	override void on_draw(Painter p)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -187,7 +187,7 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	override void on_mouse_wheel()
-		float dy = HuiGetEvent().scroll_y
+		float dy = GetEvent().scroll_y
 		if hover >= 0
 			if dy > 0
 				c.peaks[hover].q *= 1.04
@@ -223,7 +223,7 @@ class EqualizerGrid extends Grid
 	
 	# hui events
 	void on_add_peak()
-		string id = HuiGetEvent().id
+		string id = GetEvent().id
 		int t = FILTER_PEAK
 		if id == "add-low-pass"
 			t = FILTER_LOW_PASS
@@ -255,7 +255,7 @@ class EqualizerGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l
+		if GetEvent().button_l
 			if selected >= 0
 				c.peaks[selected].pitch = freq_to_pitch(get_mouse2().x)
 				c.peaks[selected].gain = get_mouse2().y - c.gain
@@ -275,7 +275,7 @@ class EqualizerGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if HuiGetEvent().key_code == KEY_DELETE
+		if GetEvent().key_code == KEY_DELETE
 			on_peak_delete()
 
 	void set_buffer(AudioBuffer buf)
@@ -286,7 +286,7 @@ class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	int num_peaks
 	override Equalizer *c
-	override void __init__(Module *_eq)
+	override void __init__(Module* _eq)
 		super.__init__(_eq)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
@@ -297,7 +297,7 @@ class EqualizerPanel extends ConfigPanel
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
-		grid.cp = self
+		grid.cp = &self
 		grid.c = &c.config
 		grid.sample_rate = c.session.sample_rate()
 		num_peaks = 0

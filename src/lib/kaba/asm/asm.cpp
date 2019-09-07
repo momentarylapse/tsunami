@@ -3771,6 +3771,9 @@ void InstructionWithParamsList::AddInstructionARM(char *oc, int &ocs, int n)
 	current_inst = n;
 	state.reset(this);
 
+	if (iwp.inst == INST_ALIGN_OPCODE)
+		return;
+
 	int code = 0;
 
 	code = iwp.condition << 28;

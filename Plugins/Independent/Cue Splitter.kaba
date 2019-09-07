@@ -15,7 +15,7 @@ string sanitize(string s)
 class CueSplitter extends TsunamiPlugin
 	
 	override void on_start()
-		if HuiFileDialogOpen(session.win, "", "", "*.cue", "*.cue")
+		if FileDialogOpen(session.win, "", "", "*.cue", "*.cue")
 			load_cue(HuiFilename)
 	
 	void load_cue(string filename)
@@ -32,22 +32,22 @@ class CueSplitter extends TsunamiPlugin
 				#print(s)
 				
 				if s.head(6) == "FILE \""
-					fn = s.substr(6, s.num - 12)
+					fn = s[6:-6]
 				if s.head(11) == "PERFORMER \""
-					artist = s.substr(11, s.num - 12)
+					artist = s[11:-1]
 				if s.head(7) == "TITLE \""
-					album = s.substr(7, s.num - 8)
+					album = s[7:-1]
 				if s.head(6) == "YEAR \""
-					year = s.substr(6, s.num - 7)
+					year = s[6:-1]
 				if s.head(8) == "  TRACK "
 					cur = new Part
 					cur.foffset = 0
 					parts.add(cur)
 				if s.head(11) == "    TITLE \""
-					cur.title = s.substr(11, s.num - 12)
+					cur.title = s[11:-1]
 					print(cur.title)
 				if s.head(10) == "    INDEX "
-					string soff = s.substr(13, -1)
+					string soff = s[13:]
 					print(soff)
 					string[] xx = soff.explode(":")
 					cur.foffset = 60 * xx[0].float() + xx[1].float() + xx[2].float() * 0.01

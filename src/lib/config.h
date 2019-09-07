@@ -9,6 +9,7 @@
 #define _X_USE_IMAGE_
 #define _X_USE_THREADS_
 #define _X_USE_KABA_
+#define _X_USE_ANY_
 
 //#####################################################################
 // Hui-API

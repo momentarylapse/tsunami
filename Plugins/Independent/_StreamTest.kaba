@@ -14,12 +14,12 @@ class _StreamTest extends TsunamiPlugin
 		out = chain.add(MODULE_STREAM, "AudioOutput")
 		chain.connect(source, 0, out, 0)
 		
-		runner = HuiRunRepeated(0.1, self, on_tick)
+		runner = RunRepeated(0.1, &self, on_tick)
 		
 		chain.start()
 
 	override void on_stop()
-		HuiCancelRunner(runner)
+		CancelRunner(runner)
 		delete chain
 	
 	void on_tick()

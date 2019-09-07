@@ -7,7 +7,7 @@ use "../api.kaba"
 class ImportNKI extends TsunamiPlugin
 	
 	override void on_start()
-		if HuiFileDialogOpen(session.win, "", "", "*.nki", "*.nki")
+		if FileDialogOpen(session.win, "", "", "*.nki", "*.nki")
 			load_nki(HuiFilename)
 		stop()
 	void load_nki(string filename)

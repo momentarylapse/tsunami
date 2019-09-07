@@ -27,7 +27,7 @@ class BlurredDot
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	void draw(Painter *p, color c, float r)
+	void draw(Painter p, color c, float r)
 		if has_prev
 			float dt = 1.0 / MOTION_BLUR_COUNT
 			color cc = c
@@ -98,18 +98,18 @@ Grid ? '' vertical
 		
 		#reveal("config", true)
 		lr_id = -1
-		sr_id = HuiRunRepeated(UPDATE_DT, self, on_update)
+		sr_id = RunRepeated(UPDATE_DT, &self, on_update)
 	
 	void on_update()
 		redraw("area")
 	
 	override void __delete__()
-		HuiCancelRunner(sr_id)
+		CancelRunner(sr_id)
 		if lr_id >= 0
-			HuiCancelRunner(lr_id)
+			CancelRunner(lr_id)
 		delete popup_menu
 	
-	void on_draw(Painter *p)
+	void on_draw(Painter p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -206,20 +206,20 @@ Grid ? '' vertical
 		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
 		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
-		popup_menu.popup(self)
+		popup_menu.popup(&self)
 	
 	int lr_id
 	int sr_id
 	void on_area_mouse_enter()
 		if lr_id >= 0
-			HuiCancelRunner(lr_id)
+			CancelRunner(lr_id)
 			lr_id = -1
 		reveal("config", true)
 	
 	void on_area_mouse_leave()
 		if lr_id >= 0
-			HuiCancelRunner(lr_id)
-		lr_id = HuiRunLater(5, self, _later_unreveal)
+			CancelRunner(lr_id)
+		lr_id = RunLater(5, &self, _later_unreveal)
 	
 	void _later_unreveal()
 		lr_id = -1
@@ -271,7 +271,7 @@ class Metronome extends TsunamiPlugin
 		chain.start()
 
 	override ConfigPanel* create_panel()
-		return new MetronomePanel(session, source, chain, self)
+		return new MetronomePanel(session, source, chain, &self)
 		
 	override void on_stop()
 		delete chain

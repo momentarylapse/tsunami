@@ -154,19 +154,19 @@ Array<Node*> SyntaxTree::parse_operand_extension_element(Node *operand) {
 	for (auto *c: type->constants)
 		if (Exp.cur == c->name) {
 			Exp.next();
-			return {new Node(NodeKind::CONSTANT, (int_p)c, c->type)};
+			return {add_node_const(c)};
 		}
 		
 	// sub-class
 	for (auto *c: type->classes)
 		if (Exp.cur == c->name) {
 			Exp.next();
-			return {new Node(NodeKind::CLASS, (int_p)c, TypeClassP)};
+			return {add_node_class(c)};
 		}
 
 
-	if (!deref and !only_static)
-		operand = ref_node(operand);
+	if (deref and !only_static)
+		operand = deref_node(operand);
 
 	string f_name = Exp.cur;
 
@@ -217,7 +217,7 @@ Node *SyntaxTree::parse_operand_extension_array(Node *operand, Block *block) {
 	if (index2) {
 		auto *cf = operand->type->get_func(IDENTIFIER_FUNC_SUBARRAY, operand->type, {index->type, index->type});
 		if (cf) {
-			Node *f = add_node_member_call(cf, ref_node(operand));
+			Node *f = add_node_member_call(cf, operand);
 			f->set_param(0, index);
 			f->set_param(1, index2);
 			return f;
@@ -227,7 +227,7 @@ Node *SyntaxTree::parse_operand_extension_array(Node *operand, Block *block) {
 	// __get__() ?
 	auto *cf = operand->type->get_get(index->type);
 	if (cf) {
-		Node *f = add_node_member_call(cf, ref_node(operand));
+		Node *f = add_node_member_call(cf, operand);
 		f->set_param(0, index);
 		return f;
 	}
@@ -284,13 +284,8 @@ void SyntaxTree::make_func_node_callable(Node *l, bool check) {
 	}
 
 	// virtual?
-	if (l->instance) {
-		if (f->virtual_index >= 0) {
-			//do_error("virtual call...");
-			l->kind = NodeKind::VIRTUAL_CALL;
-			l->link_no = f->virtual_index;
-		}
-	}
+	if (l->instance and f->virtual_index >= 0)
+		l->kind = NodeKind::VIRTUAL_CALL;
 }
 
 Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block) {
@@ -304,7 +299,7 @@ Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block) 
 	// constructor
 	//auto *vv = block->add_var(block->function->create_slightly_hidden_name(), t);
 	//vv->explicitly_constructed = true;
-	//Node *dummy = add_node_local_var(vv);
+	//Node *dummy = add_node_local(vv);
 	Array<Node*> links;
 	for (auto *cf: t->get_constructors()) {
 		Node *n = add_node_member_call(cf, nullptr /*ref_node(dummy)*/); // temp var added later...
@@ -321,7 +316,7 @@ Node *SyntaxTree::parse_operand_extension_call(Array<Node*> links, Block *block,
 
 	// make links callable
 	for (Node *l: links) {
-		if (l->kind == NodeKind::FUNCTION_NAME) {
+		if (l->kind == NodeKind::FUNCTION) {
 			make_func_node_callable(l, check);
 		} else if (l->kind == NodeKind::CLASS) {
 			auto *t = links[0]->as_class();
@@ -437,7 +432,7 @@ const Class *SyntaxTree::parse_type_extension_pointer(const Class *c) {
 }
 
 
-// find any ".", "->", or "[...]"'s    or operators?
+// find any ".", or "[...]"'s    or operators?
 Node *SyntaxTree::parse_operand_extension(Array<Node*> operands, Block *block) {
 
 	// special
@@ -454,16 +449,13 @@ Node *SyntaxTree::parse_operand_extension(Array<Node*> operands, Block *block) {
 			t = parse_type_extension_dict(t);
 		}
 
-		return parse_operand_extension({new Node(t)}, block);
+		return parse_operand_extension({add_node_class(t)}, block);
 	}
 
 	// nothing?
 	auto primop = which_primitive_operator(Exp.cur);
-	if ((Exp.cur != ".") and (Exp.cur != "[") and (Exp.cur != "(") and (Exp.cur != "->") and (!primop))
+	if ((Exp.cur != ".") and (Exp.cur != "[") and (Exp.cur != "(") and (!primop))
 		return operands[0];
-
-	if (Exp.cur == "->")
-		do_error("\"->\" deprecated,  use \".\" instead");
 
 	if (Exp.cur == ".") {
 		if (operands.num > 1)
@@ -521,13 +513,8 @@ void clear_nodes(Array<Node*> &nodes, Node *keep) {
 
 // when calling ...(...)
 Array<const Class*> SyntaxTree::get_wanted_param_types(Node *link) {
-	if ((link->kind == NodeKind::FUNCTION_CALL) or (link->kind == NodeKind::FUNCTION_NAME) or (link->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
+	if ((link->kind == NodeKind::FUNCTION_CALL) or (link->kind == NodeKind::FUNCTION) or (link->kind == NodeKind::VIRTUAL_CALL) or (link->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
 		return link->as_func()->literal_param_type;
-	} else if (link->kind == NodeKind::VIRTUAL_CALL) {
-		Function *cf = link->instance->type->parent->get_virtual_function(link->link_no);
-		if (!cf)
-			do_error("FindFunctionSingleParameter: can't find virtual function...?!?");
-		return cf->literal_param_type;
 	} else if (link->kind == NodeKind::CLASS) {
 		// should be caught earlier and turned to func...
 		const Class *t = link->as_class();
@@ -730,7 +717,7 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 	auto *f_add = type->get_func("add", TypeVoid, {el_type});
 	if (!f_add)
 		do_error("...add() ???");
-	auto *n_add = add_node_member_call(f_add, ref_node(add_node_local_var(var)));
+	auto *n_add = add_node_member_call(f_add, add_node_local(var));
 	n_add->set_param(0, n_exp);
 
 	Block *b;
@@ -757,7 +744,7 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 	Node *n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, type);
 	n->set_num_params(2);
 	n->set_param(0, n_for);
-	n->set_param(1, add_node_local_var(var));
+	n->set_param(1, add_node_local(var));
 	return n;
 
 }
@@ -815,11 +802,6 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
 				clear_nodes(operands);
 				Node *sub_command = parse_operand(block);
 				return link_unary_operator(po, sub_command, block);
-			} else if (operands[0]->kind == NodeKind::CLASS) {
-				Exp.next();
-				//clear_nodes(operands);
-				//const Class *t = parse_type(block->name_space());
-				//operands = {new Node(NodeKind::CLASS, (int_p)operands[0]->as_class(), TypeClass)};
 			} else {
 				Exp.next();
 				// direct operand!
@@ -897,11 +879,11 @@ Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param) {
 	if (tc == TYPE_CAST_OWN_STRING) {
 		Function *cf = param->type->get_func("str", TypeString, {});
 		if (cf)
-			return ps->add_node_member_call(cf, ps->ref_node(param));
+			return ps->add_node_member_call(cf, param);
 		ps->do_error("automatic .str() not implemented yet");
 		return param;
 	}
-	if (param->kind == NodeKind::CONSTANT) {
+	if (param->kind == NodeKind::CONSTANT and TypeCasts[tc].func) {
 		Node *c_new = ps->add_node_const(ps->add_constant(TypeCasts[tc].dest));
 		TypeCasts[tc].func(*c_new->as_const(), *param->as_const());
 
@@ -940,17 +922,32 @@ Node *link_special_operator_is(SyntaxTree *tree, Node *param1, Node *param2) {
 	return tree->add_node_operator_by_inline(param1, vtable2, InlineID::POINTER_EQUAL);
 }
 
+Node *link_special_operator_in(SyntaxTree *tree, Node *param1, Node *param2) {
+
+	for (Function *f: param2->type->member_functions)
+		if ((f->name == "__contains__") and (f->literal_param_type[0] == param1->type)) {
+			Node *n = tree->add_node_member_call(f, param2);
+			n->set_param(0, param1);
+			return n;
+		}
+	tree->do_error("no __contains__() for " + param2->type->long_name());
+	return nullptr;
+}
+
 Node *SyntaxTree::link_operator_id(OperatorID op_no, Node *param1, Node *param2) {
 	return link_operator(&PrimitiveOperators[(int)op_no], param1, param2);
 }
 
 Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *param2) {
 	bool left_modifiable = primop->left_modifiable;
+	bool order_inverted = primop->order_inverted;
 	string op_func_name = primop->function_name;
 	Node *op = nullptr;
 
 	if (primop->id == OperatorID::IS)
 		return link_special_operator_is(this, param1, param2);
+	if (primop->id == OperatorID::IN)
+		return link_special_operator_in(this, param1, param2);
 
 	auto *p1 = param1->type;
 	auto *p2 = param2->type;
@@ -971,7 +968,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 			auto type1 = f->literal_param_type[0];
 			if (type1->is_pointer_silent()) {
 				if (type_match(p2, type1->parent)) {
-					Node *inst = ref_node(param1);
+					Node *inst = param1;
 					if (p1 == pp1)
 						op = add_node_member_call(f, inst);
 					else
@@ -1029,8 +1026,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 		param1 = apply_type_cast(this, c1_best, param1);
 		param2 = apply_type_cast(this, c2_best, param2);
 		if (op_cf_found) {
-			Node *inst = ref_node(param1);
-			op = add_node_member_call(op_cf_found, inst);
+			op = add_node_member_call(op_cf_found, param1);
 			op->set_num_params(1);
 			op->set_param(0, param2);
 		} else {
@@ -1166,7 +1162,7 @@ Node *SyntaxTree::parse_for_header(Block *block) {
 		auto *var_no = block->add_var(var_name, t);
 
 		Node *cmd_for = add_node_statement(StatementID::FOR_RANGE);
-		cmd_for->set_param(0, add_node_local_var(var_no));
+		cmd_for->set_param(0, add_node_local(var_no));
 		cmd_for->set_param(1, val0);
 		cmd_for->set_param(2, val1);
 		cmd_for->set_param(3, val_step);
@@ -1194,8 +1190,8 @@ Node *SyntaxTree::parse_for_header(Block *block) {
 		Node *cmd_for = add_node_statement(StatementID::FOR_ARRAY);
 		// [VAR, INDEX, ARRAY, BLOCK]
 
-		cmd_for->set_param(0, add_node_local_var(var));
-		cmd_for->set_param(1, add_node_local_var(index));
+		cmd_for->set_param(0, add_node_local(var));
+		cmd_for->set_param(1, add_node_local(index));
 		cmd_for->set_param(2, for_array);
 		//cmd_for->set_param(3, loop_block);
 
@@ -1362,7 +1358,7 @@ Node *SyntaxTree::parse_statement_try(Block *block) {
 			Exp.next();
 			string ex_name = Exp.cur;
 			auto *v = except_block->add_var(ex_name, ex_type);
-			cmd_ex->params.add(add_node_local_var(v));
+			cmd_ex->params.add(add_node_local(v));
 			Exp.next();
 		}
 	}
@@ -1482,7 +1478,7 @@ Node *SyntaxTree::parse_statement_new(Block *block) {
 // Node structure
 //  p[0]: operand
 Node *SyntaxTree::parse_statement_delete(Block *block) {
-	Exp.next(); // delete
+	Exp.next(); // del
 	Node *cmd = add_node_statement(StatementID::DELETE);
 	cmd->set_param(0, parse_operand(block));
 	if (!cmd->params[0]->type->is_pointer())
@@ -1546,6 +1542,12 @@ Node *SyntaxTree::parse_statement_len(Block *block) {
 		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
 			return shift_node(sub, false, e.offset, e.type);
 		}
+		
+	// length() function?
+	auto *f = sub->type->get_func("length", TypeInt, {});
+	if (f) {
+		return add_node_member_call(f, sub);
+	}
 
 
 	do_error("don't know how to get the length of class " + sub->type->name);
@@ -1567,7 +1569,7 @@ Node *SyntaxTree::parse_statement_str(Block *block) {
 	// "universal" var2str
 	auto *c = add_constant_pointer(TypeClassP, sub->type);
 
-	Array<Node*> links = get_existence("-var2str-", nullptr, nullptr, false);
+	Array<Node*> links = get_existence("@var2str", nullptr, nullptr, false);
 	Function *f = links[0]->as_func();
 
 	Node *cmd = add_node_call(f);
@@ -1588,7 +1590,7 @@ Node *SyntaxTree::parse_statement_let(Block *block) {
 
 	auto* rhs = parse_command(block);
 	auto *var = block->add_var(name, rhs->type);
-	auto cmd = link_operator_id(OperatorID::ASSIGN, add_node_local_var(var), rhs);
+	auto cmd = link_operator_id(OperatorID::ASSIGN, add_node_local(var), rhs);
 	if (!cmd)
 		do_error("let: no assignment operator for type " + rhs->type->long_name());
 	return cmd;
@@ -1601,7 +1603,7 @@ Node *SyntaxTree::parse_statement_map(Block *block) {
 	auto params = parse_call_parameters(block);
 	if (params.num != 2)
 		do_error("map() expects 2 parameters");
-	if (params[0]->kind != NodeKind::FUNCTION_NAME)
+	if (params[0]->kind != NodeKind::FUNCTION)
 		do_error("map(): first parameter must be a function name");
 	if (!params[1]->type->is_super_array())
 		do_error("map(): second parameter must be a list[]");
@@ -1611,7 +1613,7 @@ Node *SyntaxTree::parse_statement_map(Block *block) {
 	if (params[0]->as_func()->literal_param_type[0] != params[1]->type->parent)
 		do_error("map(): function parameter does not match list type");
 
-	auto links = get_existence("-map-", nullptr, nullptr, false);
+	auto links = get_existence("@map", nullptr, nullptr, false);
 	Function *f = links[0]->as_func();
 
 	auto *c = add_constant_pointer(TypeFunctionP, params[0]->as_func());
@@ -1665,10 +1667,14 @@ Node *SyntaxTree::parse_statement_lambda(Block *block) {
 
 	f->update_parameters_after_parsing();
 
-	auto *ret = add_node_statement(StatementID::RETURN);
-	ret->set_num_params(1);
-	ret->params[0] = cmd;
-	f->block->add(ret);
+	if (cmd->type == TypeVoid) {
+		f->block->add(cmd);
+	} else {
+		auto *ret = add_node_statement(StatementID::RETURN);
+		ret->set_num_params(1);
+		ret->params[0] = cmd;
+		f->block->add(ret);
+	}
 
 	base_class->add_function(this, f, false, false);
 
@@ -1687,7 +1693,7 @@ Node *SyntaxTree::parse_statement_sorted(Block *block) {
 	if (params[1]->type != TypeString)
 		do_error("sorted(): second parameter must be a string");
 
-	auto links = get_existence("-sorted-", nullptr, nullptr, false);
+	auto links = get_existence("@sorted", nullptr, nullptr, false);
 	Function *f = links[0]->as_func();
 
 	Node *cmd = add_node_call(f);
@@ -1698,35 +1704,18 @@ Node *SyntaxTree::parse_statement_sorted(Block *block) {
 	return cmd;
 }
 
-Node *SyntaxTree::parse_statement_filter(Block *block) {
-	Exp.next(); // "filter"
-	string name = Exp.cur;
+Node *SyntaxTree::parse_statement_dyn(Block *block) {
+	Exp.next(); // dyn
+	Node *sub = parse_single_func_param(block);
 
-	auto params = parse_call_parameters(block);
-	if (params.num != 2)
-		do_error("filter() expects 2 parameters");
-	if (params[0]->kind != NodeKind::FUNCTION_NAME)
-		do_error("filter(): first parameter must be a function name");
-	if (!params[1]->type->is_super_array())
-		do_error("filter(): second parameter must be a list[]");
+	auto *c = add_constant_pointer(TypeClassP, sub->type);
 
-	if (params[0]->as_func()->num_params != 1)
-		do_error("filter(): function must have exactly one parameter");
-	if (params[0]->as_func()->literal_param_type[0] != params[1]->type->parent)
-		do_error("filter(): function parameter does not match list type");
-	if (params[0]->as_func()->literal_return_type != TypeBool)
-		do_error("filter(): function must return bool");
-
-	auto links = get_existence("-filter-", nullptr, nullptr, false);
+	Array<Node*> links = get_existence("@dyn", nullptr, nullptr, false);
 	Function *f = links[0]->as_func();
 
-	auto *c = add_constant_pointer(TypeFunctionP, params[0]->as_func());
-
 	Node *cmd = add_node_call(f);
-	cmd->set_param(0, add_node_const(c));
-	cmd->set_param(1, params[1]);
-	cmd->set_param(2, add_node_class(params[1]->type));
-	cmd->type = params[1]->type;
+	cmd->set_param(0, ref_node(sub));
+	cmd->set_param(1, add_node_const(c));
 	return cmd;
 }
 
@@ -1751,7 +1740,7 @@ Node *SyntaxTree::parse_statement(Block *block) {
 		return parse_statement_pass(block);
 	} else if (Exp.cur == IDENTIFIER_NEW) {
 		return parse_statement_new(block);
-	} else if (Exp.cur == IDENTIFIER_DELETE) {
+	} else if (Exp.cur == IDENTIFIER_DELETE or Exp.cur == "delete") {
 		return parse_statement_delete(block);
 	} else if (Exp.cur == IDENTIFIER_SIZEOF) {
 		return parse_statement_sizeof(block);
@@ -1769,9 +1758,10 @@ Node *SyntaxTree::parse_statement(Block *block) {
 		return parse_statement_lambda(block);
 	} else if (Exp.cur == IDENTIFIER_SORTED) {
 		return parse_statement_sorted(block);
-	} else if (Exp.cur == IDENTIFIER_FILTER) {
-		return parse_statement_filter(block);
+	} else if (Exp.cur == IDENTIFIER_DYN) {
+		return parse_statement_dyn(block);
 	}
+	do_error("unhandled statement..." + Exp.cur);
 	return nullptr;
 }
 

@@ -81,7 +81,7 @@ class Compressor extends AudioEffect
 			b[i] *= pow(10, *gain / 20)
 
 	override ConfigPanel *create_panel()
-		return new CompressorPanel(self)
+		return new CompressorPanel(&self)
 
 	override void process(AudioBuffer buf)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
@@ -96,7 +96,7 @@ class CompressorGrid extends Grid
 	CompressorConfig *config
 	ConfigPanel *cp
 
-	override void on_draw(Painter *p)
+	override void on_draw(Painter p)
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
@@ -125,7 +125,7 @@ class CompressorGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if HuiGetEvent().button_l and (selected > 0)
+		if GetEvent().button_l and (selected > 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = config.curve[selected - 1].x
 			float xmax = 0
@@ -144,7 +144,7 @@ class CompressorGrid extends Grid
 		redraw()
 
 	override void on_key_down()
-		int k = HuiGetEvent().key
+		int k = GetEvent().key
 
 		# [Delete] -> remove point
 		if (k == KEY_DELETE) and (selected > 0) and (selected < config.curve.num - 1)
@@ -156,7 +156,7 @@ class CompressorGrid extends Grid
 class CompressorPanel extends ConfigPanel
 	override Compressor *c
 	CompressorGrid grid
-	override void __init__(Module *_fx)
+	override void __init__(Module* _fx)
 		add_grid("", 0, 0, "table1")
 		set_target("table1")
 		add_drawing_area("!grabfocus,height=200,expandy\\", 0, 0, "drawing_area")
@@ -170,7 +170,7 @@ class CompressorPanel extends ConfigPanel
 		add_label("ms", 5, 0, "")
 		
 		grid.config = &c.config
-		grid.cp = self
+		grid.cp = &self
 		
 		event("attack", on_edit)
 		event("release", on_edit)

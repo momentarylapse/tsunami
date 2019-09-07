@@ -20,7 +20,7 @@ float[NF][NT] sg
 Image im0
 
 class SpecGrid extends Grid
-	override void on_draw(Painter *c)
+	override void on_draw(Painter c)
 		rect r = plot_rect
 		int w = r.width()
 		int h = r.height()
@@ -79,7 +79,7 @@ class ShowSpectrogram extends SongPlugin
 	SpectrumDialog *dlg
 
 	void show_spec(Song *song)
-		dlg = new SpectrumDialog(self, song)
+		dlg = new SpectrumDialog(&self, song)
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)

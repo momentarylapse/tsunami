@@ -20,8 +20,7 @@ class Block;
 class SyntaxTree;
 
 
-class Value
-{
+class Value {
 public:
 	string value;
 	const Class *type;
@@ -29,6 +28,7 @@ public:
 	Value();
 	~Value();
 
+	static bool can_init(const Class *type);
 	void init(const Class *type);
 	void clear();
 	void set(const Value &v);
@@ -48,8 +48,7 @@ public:
 };
 
 // for any type of constant used in the script
-class Constant : public Value
-{
+class Constant : public Value {
 public:
 	Constant(const Class *type, SyntaxTree *owner);
 	string name;
@@ -57,6 +56,9 @@ public:
 	void *address; // either p() or overriden for OS
 	bool used;
 	SyntaxTree *owner;
+	
+	void init(const Class *type);
+	void set(const Value &v);
 };
 
 

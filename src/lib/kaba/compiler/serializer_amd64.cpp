@@ -15,7 +15,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 	SerialNodeParam ret_ref;
 	if (type->uses_return_by_memory()){
 		//add_temp(type, ret_temp);
-		ret_ref = AddReference(/*ret_temp*/ ret);
+		ret_ref = add_reference(/*ret_temp*/ ret);
 		//add_ref();
 		//add_cmd(Asm::inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
 	}
@@ -155,6 +155,7 @@ bool dist_fits_32bit(void *a, void *b) {
 }
 
 void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+	call_used = true;
 	int push_size = fc_begin(instance, params, ret);
 
 	if (f->address) {
@@ -183,8 +184,8 @@ void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &inst
 	fc_end(push_size, instance, params, ret);
 }
 
-void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
-{
+void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+	call_used = true;
 	int push_size = fc_begin(instance, params, ret);
 
 	add_cmd(Asm::INST_MOV, p_rax, instance); // self
@@ -196,8 +197,8 @@ void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialN
 	fc_end(push_size, instance, params, ret);
 }
 
-void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
-{
+void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+	call_used = true;
 	int push_size = fc_begin(p_none, params, ret);
 
 	add_cmd(Asm::INST_MOV, p_rax, pointer);
@@ -207,7 +208,7 @@ void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Arr
 }
 
 
-void SerializerAMD64::AddFunctionIntro(Function *f)
+void SerializerAMD64::add_function_intro_params(Function *f)
 {
 	// return, instance, params
 	Array<Variable*> param;
@@ -289,7 +290,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	}
 }
 
-void SerializerAMD64::AddFunctionOutro(Function *f)
+void SerializerAMD64::add_function_outro(Function *f)
 {
 	add_cmd(Asm::INST_LEAVE);
 	add_cmd(Asm::INST_RET);
@@ -297,7 +298,7 @@ void SerializerAMD64::AddFunctionOutro(Function *f)
 
 //#define debug_evil_corrections
 
-void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
+void SerializerAMD64::correct_unallowed_param_combis2(SerialNode &c)
 {
 	// push 8 bit -> push 32 bit
 	if (c.inst == Asm::INST_PUSH)

@@ -18,9 +18,9 @@ public:
 	void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 	int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
 	void fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) /*override*/;
-	void AddFunctionIntro(Function *f) override;
-	void AddFunctionOutro(Function *f) override;
-	void CorrectUnallowedParamCombis2(SerialNode &c) override;
+	void add_function_intro_params(Function *f) override;
+	void add_function_outro(Function *f) override;
+	void correct_unallowed_param_combis2(SerialNode &c) override;
 };
 
 };

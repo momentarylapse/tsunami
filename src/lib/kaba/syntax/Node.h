@@ -46,6 +46,7 @@ enum class NodeKind {
 	ADDRESS_SHIFT,      // = . "struct"
 	ARRAY,              // = []
 	POINTER_AS_ARRAY,   // = []
+	DYNAMIC_ARRAY,      // = []
 	REFERENCE,          // = &
 	DEREFERENCE,        // = *
 	DEREF_ADDRESS_SHIFT,// = ->

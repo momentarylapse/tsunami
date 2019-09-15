@@ -17,11 +17,15 @@ bool next_const = false;
 
 
 static Array<Node*> _transform_insert_before_;
+Node *conv_break_down_med_level(SyntaxTree *tree, Node *c);
 
-Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var);
 
 string Operator::sig() const {
-	return "(" + param_type_1->name + ") " + primitive->name + " (" + param_type_2->name + ")";
+	if (param_type_1 and param_type_2)
+		return "(" + param_type_1->name + ") " + primitive->name + " (" + param_type_2->name + ")";
+	if (param_type_1)
+		return "(" + param_type_1->name + ") " + primitive->name;
+	return primitive->name + " (" + param_type_2->name + ")";
 }
 
 
@@ -120,11 +124,14 @@ Node *SyntaxTree::add_node_class(const Class *c) {
 
 Node *SyntaxTree::add_node_operator(Node *p1, Node *p2, Operator *op) {
 	Node *cmd = new Node(NodeKind::OPERATOR, (int_p)op, op->return_type);
-	bool unitary = ((op->param_type_1 == TypeVoid) or (op->param_type_2 == TypeVoid));
-	cmd->set_num_params( unitary ? 1 : 2); // unary / binary
-	cmd->set_param(0, p1);
-	if (!unitary)
+	if (op->primitive->param_flags == 3) {
+		cmd->set_num_params(2); // binary
+		cmd->set_param(0, p1);
 		cmd->set_param(1, p2);
+	} else {
+		cmd->set_num_params(1); // unary
+		cmd->set_param(0, p1);
+	}
 	return cmd;
 }
 
@@ -159,8 +166,13 @@ Node *SyntaxTree::add_node_parray(Node *p, Node *index, const Class *type) {
 }
 
 Node *SyntaxTree::add_node_dyn_array(Node *array, Node *index) {
-	auto *t = array->type;
-	return add_node_parray(shift_node(array, false, 0, t->get_pointer()), index, t->get_array_element());
+	Node *cmd_el = new Node(NodeKind::DYNAMIC_ARRAY, 0, array->type->get_array_element());
+	cmd_el->set_num_params(2);
+	cmd_el->set_param(0, array);
+	cmd_el->set_param(1, index);
+	return cmd_el;
+	//auto *t = array->type;
+	//return add_node_parray(shift_node(array, false, 0, t->get_pointer()), index, t->get_array_element());
 }
 
 Node *SyntaxTree::add_node_array(Node *array, Node *index) {
@@ -206,20 +218,55 @@ void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse) {
 	Exp.clear();
 
 	if (config.verbose)
-		show("par:a");
+		show("parse:a");
 
-	convert_call_by_reference();
+}
 
-	/*if (FlagShow)
-		Show();*/
+void SyntaxTree::digest() {
+
+	eval_const_expressions();
+
+	transformb([&](Node* n, Block* b){ return conv_break_down_high_level(n, b); });
+	if (config.verbose)
+		show("digest:break-high");
+
+
+	transform([&](Node* n){ return conv_break_down_med_level(this, n); });
+	transform([&](Node* n){ return conv_break_down_low_level(n); });
+	if (config.verbose)
+		show("digest:break-low");
 
 	simplify_shift_deref();
 	simplify_ref_deref();
-	
-	pre_processor();
+
+	eval_const_expressions();
 
 	if (config.verbose)
-		show("par:b");
+		show("digest:pre-proc");
+
+	transform([&](Node* n){ return conv_func_inline(n); });
+	if (config.verbose)
+		show("digest:inline");
+
+	convert_call_by_reference();
+	if (config.verbose)
+		show("digest:call-by-ref");
+
+	map_local_variables_to_stack();
+	if (config.verbose)
+		show("digest:map");
+
+	simplify_ref_deref();
+	simplify_shift_deref();
+	if (config.verbose)
+		show("digest:deref");
+
+	eval_const_expressions();
+	if (config.verbose)
+		show("digest:map");
+
+
+	//pre_processor_addresses();
 }
 
 
@@ -309,13 +356,13 @@ Node *SyntaxTree::add_node_const(Constant *c) {
 	return new Node(NodeKind::CONSTANT, (int_p)c, c->type);
 }
 
-Node *SyntaxTree::add_node_block(Block *b) {
+/*Node *SyntaxTree::add_node_block(Block *b) {
 	return new Node(NodeKind::BLOCK, (int_p)b, TypeVoid);
-}
+}*/
 
-PrimitiveOperator *SyntaxTree::which_primitive_operator(const string &name) {
-	for (int i=0;i<(int)OperatorID::_COUNT_;i++)
-		if (name == PrimitiveOperators[i].name)
+PrimitiveOperator *SyntaxTree::which_primitive_operator(const string &name, int param_flags) {
+	for (int i=0; i<(int)OperatorID::_COUNT_; i++)
+		if (name == PrimitiveOperators[i].name and param_flags == PrimitiveOperators[i].param_flags)
 			return &PrimitiveOperators[i];
 	return nullptr;
 }
@@ -446,7 +493,7 @@ Array<Node*> SyntaxTree::get_existence(const string &name, Block *block, const C
 		}
 
 		// operators
-		auto w = which_primitive_operator(name);
+		auto w = which_primitive_operator(name, 2); // negate/not...
 		if (w)
 			return {new Node(NodeKind::PRIMITIVE_OPERATOR, (int_p)w, TypeUnknown)};
 	}
@@ -534,11 +581,11 @@ const Class *SyntaxTree::make_class_dict(const Class *element_type) {
 	return make_class(name, Class::Type::DICT, config.super_array_size, 0, element_type);
 }
 
-Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var) {
+Node *SyntaxTree::conv_cbr(Node *c, Variable *var) {
 	// convert
 	if ((c->kind == NodeKind::VAR_LOCAL) and (c->as_local() == var)) {
 		c->type = c->type->get_pointer();
-		return ps->deref_node(c);
+		return deref_node(c);
 	}
 	return c;
 }
@@ -557,33 +604,33 @@ void conv_return(SyntaxTree *ps, nodes *c) {
 #endif
 
 
-Node *conv_calls(SyntaxTree *ps, Node *c) {
+Node *SyntaxTree::conv_calls(Node *c) {
 	if ((c->kind == NodeKind::STATEMENT) and (c->as_statement()->id == StatementID::RETURN))
 		if (c->params.num > 0) {
 			if ((c->params[0]->type->is_array()) /*or (c->Param[j]->Type->IsSuperArray)*/) {
-				c->set_param(0, ps->ref_node(c->params[0]));
+				c->set_param(0, ref_node(c->params[0]));
 			}
 			return c;
 		}
 
-	if ((c->kind == NodeKind::FUNCTION_CALL) or (c->kind == NodeKind::VIRTUAL_CALL) or (c->kind == NodeKind::ARRAY_BUILDER) or (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
+	if ((c->kind == NodeKind::FUNCTION_CALL) or (c->kind == NodeKind::VIRTUAL_CALL) or (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
 
 		// parameters: array/class as reference
 		for (int j=0;j<c->params.num;j++)
 			if (c->params[j]->type->uses_call_by_reference()) {
-				c->set_param(j, ps->ref_node(c->params[j]));
+				c->set_param(j, ref_node(c->params[j]));
 			}
 		// instance...
 		if (c->instance){
 			if (c->instance->type->uses_call_by_reference()) {
-				c->set_instance(ps->ref_node(c->instance));
+				c->set_instance(ref_node(c->instance));
 			}
 		}
 
 		// return: array reference (-> dereference)
 		if ((c->type->is_array()) /*or (c->Type->IsSuperArray)*/) {
 			c->type = c->type->get_pointer();
-			return ps->deref_node(c);
+			return deref_node(c);
 			//deref_command_old(this, c);
 		}
 	}
@@ -593,7 +640,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c) {
 		// parameters: super array as reference
 		for (int j=0;j<c->params.num;j++)
 			if ((c->params[j]->type->is_array()) or (c->params[j]->type->is_super_array())) {
-				c->set_param(j, ps->ref_node(c->params[j]));
+				c->set_param(j, ref_node(c->params[j]));
 			}
   	}
 	return c;
@@ -601,7 +648,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c) {
 
 
 // remove &*x
-Node *easyfy_ref_deref(SyntaxTree *ps, Node *c, int l) {
+Node *SyntaxTree::conv_easyfy_ref_deref(Node *c, int l) {
 	if (c->kind == NodeKind::REFERENCE) {
 		if (c->params[0]->kind == NodeKind::DEREFERENCE) {
 			// remove 2 knots...
@@ -612,7 +659,7 @@ Node *easyfy_ref_deref(SyntaxTree *ps, Node *c, int l) {
 }
 
 // remove (*x)[] and (*x).y
-Node *easyfy_shift_deref(SyntaxTree *ps, Node *c, int l) {
+Node *SyntaxTree::conv_easyfy_shift_deref(Node *c, int l) {
 	if ((c->kind == NodeKind::ADDRESS_SHIFT) or (c->kind == NodeKind::ARRAY)) {
 		if (c->params[0]->kind == NodeKind::DEREFERENCE) {
 			// unify 2 knots (remove 1)
@@ -627,8 +674,8 @@ Node *easyfy_shift_deref(SyntaxTree *ps, Node *c, int l) {
 }
 
 
-Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f) {
-	ps->script->cur_func = f;
+Node *SyntaxTree::conv_return_by_memory(Node *n, Function *f) {
+	script->cur_func = f;
 
 	if ((n->kind != NodeKind::STATEMENT) or (n->as_statement()->id != StatementID::RETURN))
 		return n;
@@ -637,14 +684,14 @@ Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f) {
 	Node *p_ret = nullptr;
 	for (Variable *v: f->var)
 		if (v->name == IDENTIFIER_RETURN_VAR) {
-			p_ret = ps->add_node_local(v);
+			p_ret = add_node_local(v);
 		}
 	if (!p_ret)
-		ps->do_error("-return- not found...");
-	Node *ret = ps->deref_node(p_ret);
-	Node *cmd_assign = ps->link_operator_id(OperatorID::ASSIGN, ret, n->params[0]);
+		do_error("-return- not found...");
+	Node *ret = deref_node(p_ret);
+	Node *cmd_assign = link_operator_id(OperatorID::ASSIGN, ret, n->params[0]);
 	if (!cmd_assign)
-		ps->do_error("no = operator for return from function found: " + f->long_name());
+		do_error("no = operator for return from function found: " + f->long_name());
 	_transform_insert_before_.add(cmd_assign);
 
 	n->set_num_params(0);
@@ -669,7 +716,7 @@ void SyntaxTree::convert_call_by_reference() {
 					v->type = v->type->get_pointer();
 
 					// internal usage...
-					transform_block(f->block, [&](Node *n){ return conv_cbr(this, n, v); });
+					transform_block(f->block, [&](Node *n){ return conv_cbr(n, v); });
 				}
 		}
 
@@ -679,7 +726,7 @@ void SyntaxTree::convert_call_by_reference() {
 				f->var[j]->type = f->var[j]->type->get_pointer();
 
 				// internal usage...
-				transform_block(f->block, [&](Node *n){ return conv_cbr(this, n, f->var[j]); });
+				transform_block(f->block, [&](Node *n){ return conv_cbr(n, f->var[j]); });
 			}
 
 		// return: array as reference
@@ -697,21 +744,21 @@ void SyntaxTree::convert_call_by_reference() {
 	for (Function *f: functions)
 		if (f->return_type->uses_return_by_memory())
 			//convert_return_by_memory(this, f->block, f);
-			transform_block(f->block, [&](Node *n){ return convert_return_by_memory(this, n, f); });
+			transform_block(f->block, [&](Node *n){ return conv_return_by_memory(n, f); });
 
 	// convert function calls
-	transform([&](Node *n){ return conv_calls(this, n); });
+	transform([&](Node *n){ return conv_calls(n); });
 }
 
 
 void SyntaxTree::simplify_ref_deref() {
 	// remove &*
-	transform([&](Node *n){ return easyfy_ref_deref(this, n, 0); });
+	transform([&](Node *n){ return conv_easyfy_ref_deref(n, 0); });
 }
 
 void SyntaxTree::simplify_shift_deref() {
 	// remove &*
-	transform([&](Node *n){ return easyfy_shift_deref(this, n, 0); });
+	transform([&](Node *n){ return conv_easyfy_shift_deref(n, 0); });
 }
 
 InlineID __get_pointer_add_int() {
@@ -720,7 +767,16 @@ InlineID __get_pointer_add_int() {
 	return InlineID::INT_ADD;
 }
 
-Node *SyntaxTree::break_down_complicated_command(Node *c) {
+
+Node *conv_break_down_med_level(SyntaxTree *tree, Node *c) {
+	if (c->kind == NodeKind::DYNAMIC_ARRAY) {
+		return tree->conv_break_down_low_level(tree->add_node_parray(tree->shift_node(c->params[0], false, 0, c->type->get_pointer()), c->params[1], c->type));
+	}
+	return c;
+}
+
+Node *SyntaxTree::conv_break_down_low_level(Node *c) {
+
 	if (c->kind == NodeKind::ARRAY) {
 
 		auto *el_type = c->type;
@@ -805,113 +861,10 @@ Node *SyntaxTree::break_down_complicated_command(Node *c) {
 		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
-	} else if (c->kind == NodeKind::FUNCTION) {
-		return add_node_const(add_constant_pointer(TypeFunctionP, c->as_func()));
-	} else if (c->kind == NodeKind::CLASS) {
-		return add_node_const(add_constant_pointer(TypeClassP, c->as_class()));
-	} else if (c->kind == NodeKind::ARRAY_BUILDER_FOR) {
-
-		_transform_insert_before_.add(c->params[0]);
-		return c->params[1];
 	}
 	return c;
 }
 
-
-Node *SyntaxTree::break_down_for_loops(Node *c) {
-	if ((c->kind == NodeKind::STATEMENT) and (c->as_statement()->id == StatementID::FOR_RANGE)) {
-
-		// [VAR, START, STOP, STEP, BLOCK]
-		auto var = c->params[0];
-		auto val0 = c->params[1];
-		auto val1 = c->params[2];
-		auto step = c->params[3];
-		auto block = c->params[4];
-
-		c->link_no = (int_p)statement_from_id(StatementID::FOR_DIGEST);
-		c->set_num_params(4);
-		// [INIT, CMP, BLOCK, INC]
-
-		Node *cmd_assign = add_node_operator_by_inline(var, val0, InlineID::INT_ASSIGN);
-		c->set_param(0, cmd_assign);
-
-		// while(for_var < val1)
-		Node *cmd_cmp = add_node_operator_by_inline(cp_node(var), val1, InlineID::INT_SMALLER);
-		c->set_param(1, cmd_cmp);
-
-		c->set_param(2, block);
-
-
-		// ...for_var += 1
-		Node *cmd_inc;
-		if (var->type == TypeInt) {
-			if (step->as_const()->as_int() == 1)
-				cmd_inc = add_node_operator_by_inline(cp_node(var), step /*dummy*/, InlineID::INT_INCREASE);
-			else
-				cmd_inc = add_node_operator_by_inline(cp_node(var), step, InlineID::INT_ADD_ASSIGN);
-		} else {
-			cmd_inc = add_node_operator_by_inline(cp_node(var), step, InlineID::FLOAT_ADD_ASSIGN);
-		}
-		c->set_param(3, cmd_inc); // add to loop-block
-
-	} else if ((c->kind == NodeKind::STATEMENT) and (c->as_statement()->id == StatementID::FOR_ARRAY)) {
-
-		// [VAR, INDEX, ARRAY, BLOCK]
-		auto var = c->params[0];
-		auto index = c->params[1];
-		auto array = c->params[2];
-		auto block = c->params[3];
-
-		c->link_no = (int_p)statement_from_id(StatementID::FOR_DIGEST);
-		c->set_num_params(4);
-		// [INIT, CMP, BLOCK, INC]
-
-
-		// 0
-		Node *val0 = add_node_const(add_constant_int(0));
-
-		// implement
-		// for_index = 0
-		Node *cmd_assign = add_node_operator_by_inline(index, val0, InlineID::INT_ASSIGN);
-		c->set_param(0, cmd_assign);
-
-		Node *val1;
-		if (array->type->usable_as_super_array()) {
-			// array.num
-			val1 = new Node(NodeKind::ADDRESS_SHIFT, config.pointer_size, TypeInt);
-			val1->set_num_params(1);
-			val1->set_param(0, cp_node(array));
-		} else {
-			// array.size
-			val1 = add_node_const(add_constant_int(array->type->array_length));
-		}
-
-		// while(for_index < val1)
-		Node *cmd_cmp = add_node_operator_by_inline(cp_node(index), val1, InlineID::INT_SMALLER);
-		c->set_param(1, cmd_cmp);
-
-		// ...block
-		c->set_param(2, block);
-
-		// ...for_index += 1
-		Node *cmd_inc = add_node_operator_by_inline(cp_node(index), val1 /*dummy*/, InlineID::INT_INCREASE);
-		c->set_param(3, cmd_inc);
-
-		// array[index]
-		Node *el;
-		if (array->type->usable_as_super_array()) {
-			el = add_node_dyn_array(array, cp_node(index));
-		} else {
-			el = add_node_array(array, cp_node(index));
-		}
-
-		// &for_var = &array[index]
-		Node *cmd_var_assign = add_node_operator_by_inline(var, ref_node(el), InlineID::POINTER_ASSIGN);
-		block->params.insert(cmd_var_assign, 0);
-
-	}
-	return c;
-}
 
 Node* SyntaxTree::transform_node(Node *n, std::function<Node*(Node*)> F) {
 	if (n->kind == NodeKind::BLOCK) {
@@ -983,48 +936,151 @@ void SyntaxTree::transformb(std::function<Node*(Node*, Block*)> F) {
 	}
 }
 
-Node *conv_constr_func(SyntaxTree *ps, Node *n, Block *b) {
+Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 	if (n->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
 		if (config.verbose) {
 			msg_error("constr func....");
 			n->show();
 		}
-		auto *f = ps->cur_func;
 		
 		// temp var
+		auto *f = cur_func;
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
 		vv->explicitly_constructed = true;
-		Node *dummy = ps->add_node_local(vv);
+		Node *dummy = add_node_local(vv);
 		
-		auto *ib = ps->cp_node(n);
+		auto *ib = cp_node(n);
 		ib->kind = NodeKind::FUNCTION_CALL;
 		ib->type = TypeVoid;
-		ib->set_instance(ps->ref_node(dummy));
+		ib->set_instance(dummy);
 		if (config.verbose)
 			ib->show();
 
 		_transform_insert_before_.add(ib);
 
-		// n->instance should be a reference to local... FIXME
-		return ps->cp_node(dummy);//n->instance->params[0]);
+		return cp_node(dummy);
+	} else if (n->kind == NodeKind::ARRAY_BUILDER) {
+		auto *t_el = n->type->get_array_element();
+		Function *cf = n->type->get_func("add", TypeVoid, {t_el});
+		if (!cf)
+			do_error(format("[..]: can not find %s.add(%s) function???", n->type->long_name().c_str(), t_el->long_name().c_str()));
+
+		// temp var
+		auto *f = cur_func;
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
+		Node *array = add_node_local(vv);
+
+		Block *bb = new Block(f, b);
+		for (int i=0; i<n->params.num; i++){
+			auto *cc = add_node_member_call(cf, cp_node(array));
+			cc->set_param(0, n->params[i]);
+			bb->add(cc);
+		}
+		_transform_insert_before_.add(bb);
+		return array;
+	} else if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::FOR_RANGE)) {
+
+		// [VAR, START, STOP, STEP, BLOCK]
+		auto var = n->params[0];
+		auto val0 = n->params[1];
+		auto val1 = n->params[2];
+		auto step = n->params[3];
+		auto block = n->params[4];
+
+		n->link_no = (int_p)statement_from_id(StatementID::FOR_DIGEST);
+		n->set_num_params(4);
+		// [INIT, CMP, BLOCK, INC]
+
+		Node *cmd_assign = add_node_operator_by_inline(var, val0, InlineID::INT_ASSIGN);
+		n->set_param(0, cmd_assign);
+
+		// while(for_var < val1)
+		Node *cmd_cmp = add_node_operator_by_inline(cp_node(var), val1, InlineID::INT_SMALLER);
+		n->set_param(1, cmd_cmp);
+
+		n->set_param(2, block);
+
+
+		// ...for_var += 1
+		Node *cmd_inc;
+		if (var->type == TypeInt) {
+			if (step->as_const()->as_int() == 1)
+				cmd_inc = add_node_operator_by_inline(cp_node(var), nullptr, InlineID::INT_INCREASE);
+			else
+				cmd_inc = add_node_operator_by_inline(cp_node(var), step, InlineID::INT_ADD_ASSIGN);
+		} else {
+			cmd_inc = add_node_operator_by_inline(cp_node(var), step, InlineID::FLOAT_ADD_ASSIGN);
+		}
+		n->set_param(3, cmd_inc); // add to loop-block
+
+	} else if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::FOR_ARRAY)) {
+
+		// [VAR, INDEX, ARRAY, BLOCK]
+		auto var = n->params[0];
+		auto index = n->params[1];
+		auto array = n->params[2];
+		auto block = n->params[3];
+
+		n->link_no = (int_p)statement_from_id(StatementID::FOR_DIGEST);
+		n->set_num_params(4);
+		// [INIT, CMP, BLOCK, INC]
+
+
+		// 0
+		Node *val0 = add_node_const(add_constant_int(0));
+
+		// implement
+		// for_index = 0
+		Node *cmd_assign = add_node_operator_by_inline(index, val0, InlineID::INT_ASSIGN);
+		n->set_param(0, cmd_assign);
+
+		Node *val1;
+		if (array->type->usable_as_super_array()) {
+			// array.num
+			val1 = new Node(NodeKind::ADDRESS_SHIFT, config.pointer_size, TypeInt);
+			val1->set_num_params(1);
+			val1->set_param(0, cp_node(array));
+		} else {
+			// array.size
+			val1 = add_node_const(add_constant_int(array->type->array_length));
+		}
+
+		// while(for_index < val1)
+		Node *cmd_cmp = add_node_operator_by_inline(cp_node(index), val1, InlineID::INT_SMALLER);
+		n->set_param(1, cmd_cmp);
+
+		// ...block
+		n->set_param(2, block);
+
+		// ...for_index += 1
+		Node *cmd_inc = add_node_operator_by_inline(cp_node(index), nullptr, InlineID::INT_INCREASE);
+		n->set_param(3, cmd_inc);
+
+		// array[index]
+		Node *el;
+		if (array->type->usable_as_super_array()) {
+			el = add_node_dyn_array(array, cp_node(index));
+		} else {
+			el = add_node_array(array, cp_node(index));
+		}
+
+		// &for_var = &array[index]
+		Node *cmd_var_assign = add_node_operator_by_inline(var, ref_node(el), InlineID::POINTER_ASSIGN);
+		block->params.insert(cmd_var_assign, 0);
+
+	} else if (n->kind == NodeKind::FUNCTION) {
+		return add_node_const(add_constant_pointer(TypeFunctionP, n->as_func()));
+	} else if (n->kind == NodeKind::CLASS) {
+		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
+	} else if (n->kind == NodeKind::ARRAY_BUILDER_FOR) {
+
+		_transform_insert_before_.add(n->params[0]);
+		return n->params[1];
 	}
 	return n;
 }
 
-// split arrays and address shifts into simpler commands...
-void SyntaxTree::break_down_complicated_commands() {
-	if (config.verbose) {
-		show("break:a");
-		msg_write("BreakDownComplicatedCommands");
-	}
-	transform([&](Node* n){ return break_down_for_loops(n); });
-	transform([&](Node* n){ return break_down_complicated_command(n); });
-	transformb([&](Node* n, Block* b){ return conv_constr_func(this, n, b); });
-	if (config.verbose)
-		show("break:b");
-}
-
-Node* conv_func_inline(SyntaxTree *ps, Node *n) {
+Node* SyntaxTree::conv_func_inline(Node *n) {
 	if (n->kind == NodeKind::FUNCTION_CALL) {
 		if (n->as_func()->inline_no != InlineID::NONE) {
 			n->kind = NodeKind::INLINE_CALL;
@@ -1039,13 +1095,6 @@ Node* conv_func_inline(SyntaxTree *ps, Node *n) {
 	}
 	return n;
 }
-
-void SyntaxTree::make_functions_inline() {
-	transform([&](Node* n){ return conv_func_inline(this, n); });
-	if (config.verbose)
-		show("break:c");
-}
-
 
 
 void MapLVSX86Return(Function *f) {

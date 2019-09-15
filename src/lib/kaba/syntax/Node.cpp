@@ -42,6 +42,8 @@ string kind2str(NodeKind kind) {
 		return "address shift";
 	if (kind == NodeKind::ARRAY)
 		return "array element";
+	if (kind == NodeKind::DYNAMIC_ARRAY)
+		return "dynamic array element";
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return "pointer as array element";
 	if (kind == NodeKind::REFERENCE)
@@ -124,6 +126,8 @@ string Node::sig() const {
 		return t + i2s(link_no);
 	if (kind == NodeKind::ARRAY)
 		return t;
+	if (kind == NodeKind::DYNAMIC_ARRAY)
+		return t;
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return t;
 	if (kind == NodeKind::REFERENCE)
@@ -135,7 +139,7 @@ string Node::sig() const {
 	if (kind == NodeKind::CLASS)
 		return as_class()->name;
 	if (kind == NodeKind::REGISTER)
-		return t + Asm::GetRegName(link_no);
+		return t + Asm::get_reg_name(link_no);
 	if (kind == NodeKind::ADDRESS)
 		return t + d2h(&link_no, config.pointer_size);
 	if (kind == NodeKind::MEMORY)

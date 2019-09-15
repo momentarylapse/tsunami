@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.7.5";
+string Version = "0.17.7.6";
 
 //#define ScriptDebug
 
@@ -181,7 +181,7 @@ void Script::load(const string &_filename, bool _just_analyse)
 		if ((!just_analyse) and (config.verbose)){
 			msg_write(format("Opcode: %d bytes", opcode_size));
 			if (config.allow_output_stage("dasm"))
-				msg_write(Asm::Disassemble(opcode, opcode_size));
+				msg_write(Asm::disassemble(opcode, opcode_size));
 		}
 
 	}catch(FileError &e){

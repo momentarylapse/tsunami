@@ -18,25 +18,27 @@ public:
 	void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
 	int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
 	void fc_end(int push_size, const SerialNodeParam &ret) override;
-	void AddFunctionIntro(Function *f) override;
-	void AddFunctionOutro(Function *f) override;
-	SerialNodeParam SerializeParameter(Node *link, Block *block, int index) override;
-	void SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index) override;
-	void SerializeInlineFunction(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
+	void add_function_intro_params(Function *f) override;
+	void add_function_intro_frame(int stack_alloc_size) override;
+	void add_function_outro(Function *f) override;
+	SerialNodeParam serialize_parameter(Node *link, Block *block, int index) override;
+	void serialize_statement(Node *com, const SerialNodeParam &ret, Block *block, int index) override;
+	void serialize_inline_function(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
 
-	void DoMapping() override;
-	void ConvertGlobalLookups();
-	void CorrectUnallowedParamCombis();
-	void ConvertMemMovsToLdrStr(SerialNode &c);
-	void ConvertGlobalRefs();
-	void ProcessReferences();
-	void ProcessDereferences();
-	void CorrectReturn() override;
+	void do_mapping() override;
+	void convert_global_lookups();
+	void correct_unallowed_param_combis();
+	void convert_mem_movs_to_ldr_str(SerialNode &c);
+	void convert_global_refs();
+	void process_references();
+	void process_dereferences();
+	void correct_return() override;
 
 	void transfer_by_reg_in(SerialNode &c, int &i, int pno);
 	void transfer_by_reg_out(SerialNode &c, int &i, int pno);
 	void gr_transfer_by_reg_in(SerialNode &c, int &i, int pno);
 	void gr_transfer_by_reg_out(SerialNode &c, int &i, int pno);
+	void split_mov_reg_immediate(SerialNode &c, int &i);
 };
 
 };

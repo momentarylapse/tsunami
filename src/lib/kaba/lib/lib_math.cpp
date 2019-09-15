@@ -279,22 +279,6 @@ float _cdecl maxf(float a, float b)
 float _cdecl minf(float a, float b)
 {	return (a < b) ? a : b;	}
 
-string _cdecl ff2s(complex &x){	return x.str();	}
-string _cdecl fff2s(vector &x){	return x.str();	}
-string _cdecl ffff2s(quaternion &x){	return x.str();	}
-
-
-
-string CastVector2StringP(string &s) {
-	return ((vector*)s.data)->str();
-}
-string CastFFFF2StringP(string &s) {
-	return ((quaternion*)s.data)->str();
-}
-string CastComplex2StringP(string &s) {
-	return ((complex*)s.data)->str();
-}
-
 vector _quat_vec_mul(quaternion &a, vector &b)
 {	return a * b;	}
 color _col_mul_c(color &a, color &b)
@@ -1098,28 +1082,6 @@ void SIAddPackageMath() {
 	add_const("Blue",   TypeColor, (void*)&Blue);
 	add_const("Yellow", TypeColor, (void*)&Yellow);
 	add_const("Orange", TypeColor, (void*)&Orange);
-
-
-
-	// internal type casts
-	add_func("-v2s-", TypeString, (void*)&fff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("v", TypeVector);
-	add_func("-complex2s-", TypeString, (void*)&ff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("z", TypeComplex);
-	add_func("-quaternion2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("q", TypeQuaternion);
-	add_func("-plane2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("p", TypePlane);
-	add_func("-color2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("c", TypeColor);
-	add_func("-rect2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_add_param("r", TypeRect);
-	add_type_cast(50, TypeVector, TypeString, "-v2s-", (void*)&CastVector2StringP);
-	add_type_cast(50, TypeComplex, TypeString, "-complex2s-", (void*)&CastComplex2StringP);
-	add_type_cast(50, TypeColor, TypeString, "-color2s-", (void*)&CastFFFF2StringP);
-	add_type_cast(50, TypeQuaternion, TypeString, "-quaternion2s-", (void*)&CastFFFF2StringP);
-	add_type_cast(50, TypePlane, TypeString, "-plane2s-", (void*)&CastFFFF2StringP);
-	add_type_cast(50, TypeRect, TypeString, "-rect2s-", (void*)&CastFFFF2StringP);
 }
 
 };

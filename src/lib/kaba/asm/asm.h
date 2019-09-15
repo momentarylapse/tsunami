@@ -45,7 +45,7 @@ const int MAX_REG_SIZE = 16;
 
 extern int RegRoot[];
 extern int RegResize[NUM_REG_ROOTS][MAX_REG_SIZE + 1];
-string GetRegName(int reg);
+string get_reg_name(int reg);
 
 
 
@@ -250,6 +250,20 @@ enum {
 	INST_BL,
 	INST_BLX,
 
+	INST_MULS,
+	INST_ADDS,
+	INST_SUBS,
+	INST_RSBS,
+	INST_ADCS,
+	INST_SBCS,
+	INST_RSCS,
+	INST_ANDS,
+	INST_BICS,
+	INST_XORS,
+	INST_ORS,
+	INST_MOVS,
+	INST_MVNS,
+
 	INST_LDR,
 	INST_LDRB,
 //	INST_STR,
@@ -306,8 +320,7 @@ enum {
 	NUM_INSTRUCTION_NAMES
 };
 
-enum
-{
+enum {
 	ARM_COND_EQUAL,
 	ARM_COND_NOT_EQUAL,
 	ARM_COND_CARRY_SET,
@@ -378,7 +391,6 @@ struct MetaInfo {
 
 	MetaInfo();
 };
-
 
 struct Register;
 
@@ -457,16 +469,13 @@ struct InstructionWithParamsList : public Array<InstructionWithParams> {
 
 	void add_wanted_label(int pos, int label_no, int inst_no, bool rel, bool abs, int size);
 
-	void add_func_intro(int stack_alloc_size);
-	void add_func_return(int return_size);
-
-	void AppendFromSource(const string &code);
-	void ShrinkJumps(void *oc, int ocs);
-	void Optimize(void *oc, int ocs);
-	void Compile(void *oc, int &ocs);
-	void LinkWantedLabels(void *oc);
-	void AddInstruction(char *oc, int &ocs, int n);
-	void AddInstructionARM(char *oc, int &ocs, int n);
+	void append_from_source(const string &code);
+	void shrink_jumps(void *oc, int ocs);
+	void optimize(void *oc, int ocs);
+	void compile(void *oc, int &ocs);
+	void link_wanted_labels(void *oc);
+	void add_instruction(char *oc, int &ocs, int n);
+	void add_instruction_arm(char *oc, int &ocs, int n);
 
 	void show();
 
@@ -477,10 +486,10 @@ struct InstructionWithParamsList : public Array<InstructionWithParams> {
 	int current_inst;
 };
 
-void Init(InstructionSet instruction_set = InstructionSet::NATIVE);
+void init(InstructionSet instruction_set = InstructionSet::NATIVE);
 InstructionSet QueryLocalInstructionSet();
-bool Assemble(const char *code, char *oc, int &ocs);
-string Disassemble(void *code, int length = -1, bool allow_comments = true);
+bool assemble(const char *code, char *oc, int &ocs);
+string disassemble(void *code, int length = -1, bool allow_comments = true);
 
 class Exception : public ::Exception {
 public:
@@ -490,15 +499,15 @@ public:
 	int line, column;
 };
 
-void AddInstruction(char *oc, int &ocs, int inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
-void SetInstructionSet(int set);
-bool ImmediateAllowed(int inst);
+void add_instruction(char *oc, int &ocs, int inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
+void set_instructionSet(int set);
+bool immediate_allowed(int inst);
 extern int OCParam;
 extern MetaInfo *CurrentMetaInfo;
 
-void GetInstructionParamFlags(int inst, bool &p1_read, bool &p1_write, bool &p2_read, bool &p2_write);
-bool GetInstructionAllowConst(int inst);
-bool GetInstructionAllowGenReg(int inst);
+void get_instruction_param_flags(int inst, bool &p1_read, bool &p1_write, bool &p2_read, bool &p2_write);
+bool get_instruction_allow_const(int inst);
+bool get_instruction_allow_gen_reg(int inst);
 
 };
 

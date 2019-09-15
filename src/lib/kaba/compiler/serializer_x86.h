@@ -17,16 +17,18 @@ public:
 	int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 	void fc_end(int push_size, const SerialNodeParam &ret) override;
 	void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
-	void AddFunctionIntro(Function *f) override;
-	void AddFunctionOutro(Function *f) override;
-	SerialNodeParam SerializeParameter(Node *link, Block *block, int index) override;
-	void SerializeStatement(Node *com, const Array<SerialNodeParam> &params, const SerialNodeParam &ret, Block *block, int index) override;
-	void SerializeInlineFunction(Node *com, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
+	void add_function_intro_params(Function *f) override;
+	void add_function_intro_frame(int stack_alloc_size) override;
+	void add_function_outro(Function *f) override;
+	SerialNodeParam serialize_parameter(Node *link, Block *block, int index) override;
+	void serialize_statement(Node *com, const SerialNodeParam &ret, Block *block, int index) override;
+	void serialize_inline_function(Node *com, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 
-	void DoMapping() override;
-	void ProcessReferences();
-	virtual void CorrectUnallowedParamCombis();
-	virtual void CorrectUnallowedParamCombis2(SerialNode &c);
+
+	void do_mapping() override;
+	void process_references();
+	virtual void correct_unallowed_param_combis();
+	virtual void correct_unallowed_param_combis2(SerialNode &c);
 };
 
 };

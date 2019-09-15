@@ -21,6 +21,14 @@ Value::~Value() {
 	clear();
 }
 
+bool Value::can_init(const Class *t) {
+	if (!t->needs_constructor())
+		return true;
+	if (t->is_super_array())
+		return true;
+	return false;
+}
+
 void Value::init(const Class *_type) {
 	clear();
 	type = _type;
@@ -85,37 +93,72 @@ DynamicArray& Value::as_array() const {
 	return *(DynamicArray*)p();
 }
 
-int Value::mapping_size() const {
-	if (type->is_super_array()) {
-		if (type->parent->is_super_array())
-			throw Exception("mapping const[][]... TODO", "", 0, 0, nullptr);
-		return config.super_array_size + (as_array().num * type->parent->size);
-	}
+int map_size_complex(void *p, const Class *type) {
 	if (type == TypeCString)
-		return strlen((char*)p()) + 1;
+		return strlen((char*)p) + 1;
+	if (type->is_super_array()) {
+		int size = config.super_array_size;
+		DynamicArray *ar = (DynamicArray*)p;
+		if (type->parent->is_super_array()) {
+			for (int i=0; i<ar->num; i++)
+				size += map_size_complex((char*)ar->data + i * ar->element_size, type->parent);
+			return size;
+		}
 
-	// plain old data
+		return config.super_array_size + (ar->num * type->parent->size);
+	}
 	return type->size;
 }
 
-void Value::map_into(char *memory, char *addr) const {
-	if (type->is_super_array()) {
-		if (type->parent->is_super_array())
-			throw Exception("mapping const[][]... TODO", "", 0, 0, nullptr);
-		// const string -> variable length
-		int size = as_array().element_size * as_array().num;
-		int data_offset = config.super_array_size;
+int Value::mapping_size() const {
+	return map_size_complex(p(), type);
+}
 
-		*(void**)&memory[0] = addr + data_offset; // .data
-		*(int*)&memory[config.pointer_size    ] = as_array().num;
+// map directly into <memory>
+// additional data (array ...) into free parts after <locked>
+char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const Class *type) {
+	if (type->is_super_array()) {
+		DynamicArray *ar = (DynamicArray*)p;
+
+		int direct_size = config.super_array_size;
+		int indirect_size = ar->element_size * ar->num;
+		if (locked == memory)
+			locked = memory + direct_size;
+		char *ar_target = locked;
+		locked += indirect_size;
+
+		*(void**)&memory[0] = ar_target + addr_off; // .data
+		*(int*)&memory[config.pointer_size    ] = ar->num;
 		*(int*)&memory[config.pointer_size + 4] = 0; // .reserved
-		*(int*)&memory[config.pointer_size + 8] = as_array().element_size;
-		memcpy(&memory[data_offset], as_array().data, size);
+		*(int*)&memory[config.pointer_size + 8] = ar->element_size;
+
+		if (type->parent->is_super_array()) {
+			for (int i=0; i<ar->num; i++) {
+				int el_offset = i * ar->element_size;
+				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset, type->parent);
+			}
+
+		} else {
+			memcpy(ar_target, ar->data, indirect_size);
+		}
+		return locked;
 	} else if (type == TypeCString) {
-		strcpy(memory, (char*)p());
+		strcpy(memory, (char*)p);
+		return memory + strlen((char*)p) + 1; // NO RECURSION!!!
+	} else if (type->is_simple_class()) {
+		memcpy(memory, p, type->size);
 	} else {
-		memcpy(memory, p(), type->size);
+		// TEST ME....
+		for (auto &el: type->elements) {
+			if (!el.hidden)
+				locked = map_into_complex(memory + el.offset, locked, addr_off, p + el.offset, el.type);
+		}
 	}
+	return locked;
+}
+
+void Value::map_into(char *memory, char *addr) const {
+	map_into_complex(memory, memory, addr - memory, (char*)p(), type);
 }
 
 string Value::str() const {
@@ -123,11 +166,21 @@ string Value::str() const {
 }
 
 Constant::Constant(const Class *_type, SyntaxTree *_owner) {
-	init(_type);
+	Value::init(_type);
 	name = "-none-";
 	owner = _owner;
 	used = false;
-	address = nullptr;
+	address = p();
+}
+
+void Constant::init(const Class *_type) {
+	Value::init(_type);
+	address = p();
+}
+
+void Constant::set(const Value &v) {
+	Value::set(v);
+	address = p();
 }
 
 string Constant::str() const {

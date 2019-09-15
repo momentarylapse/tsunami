@@ -48,7 +48,7 @@ void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable
 void add_const(const string &name, const Class *type, const void *value);
 void class_add_const(const string &name, const Class *type, const void *value);
 void add_ext_var(const string &name, const Class *type, void *var);
-void add_type_cast(int penalty, const Class *source, const Class *dest, const string &cmd, void *func);
+void add_type_cast(int penalty, const Class *source, const Class *dest, const string &cmd);
 
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \

@@ -205,6 +205,8 @@ OBJ = Action/Bar/Action__ScaleData.o \
  lib/image/image_tga.o \
  lib/image/ImagePainter.o \
  lib/kaba/asm/asm.o \
+ lib/kaba/asm/asm_arm.o \
+ lib/kaba/asm/asm_x86.o \
  lib/kaba/compiler/compiler.o \
  lib/kaba/compiler/mapper.o \
  lib/kaba/compiler/serializer.o \
@@ -998,8 +1000,14 @@ lib/image/image_tga.o : lib/image/image_tga.cpp lib/image/image.h lib/config.h l
 lib/image/ImagePainter.o : lib/image/ImagePainter.cpp lib/image/ImagePainter.h lib/image/Painter.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/image/color.h lib/math/rect.h lib/image/image.h lib/config.h lib/math/complex.h
 	$(CPP) -c lib/image/ImagePainter.cpp -o $@ $(CXXFLAGS)
 
-lib/kaba/asm/asm.o : lib/kaba/asm/asm.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/kaba/asm/asm.h
+lib/kaba/asm/asm.o : lib/kaba/asm/asm.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/kaba/asm/asm.h lib/kaba/asm/internal.h
 	$(CPP) -c lib/kaba/asm/asm.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/asm/asm_arm.o : lib/kaba/asm/asm_arm.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/kaba/asm/asm.h lib/kaba/asm/internal.h
+	$(CPP) -c lib/kaba/asm/asm_arm.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/asm/asm_x86.o : lib/kaba/asm/asm_x86.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/kaba/asm/asm.h lib/kaba/asm/internal.h
+	$(CPP) -c lib/kaba/asm/asm_x86.cpp -o $@ $(CXXFLAGS)
 
 lib/kaba/compiler/compiler.o : lib/kaba/compiler/compiler.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/base/set.h
 	$(CPP) -c lib/kaba/compiler/compiler.cpp -o $@ $(CXXFLAGS)

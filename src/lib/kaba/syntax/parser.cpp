@@ -399,7 +399,7 @@ const Class *SyntaxTree::parse_type_extension_array(const Class *t) {
 
 		// find array index
 		Node *c = parse_command(root_of_all_evil->block);
-		c = transform_node(c, [&](Node *n) { return pre_process_node(n); });
+		c = transform_node(c, [&](Node *n) { return conv_eval_const_func(n); });
 
 		if ((c->kind != NodeKind::CONSTANT) or (c->type != TypeInt))
 			do_error("only constants of type \"int\" allowed for size of arrays");
@@ -453,7 +453,7 @@ Node *SyntaxTree::parse_operand_extension(Array<Node*> operands, Block *block) {
 	}
 
 	// nothing?
-	auto primop = which_primitive_operator(Exp.cur);
+	auto primop = which_primitive_operator(Exp.cur, 1); // ++,--
 	if ((Exp.cur != ".") and (Exp.cur != "[") and (Exp.cur != "(") and (!primop))
 		return operands[0];
 
@@ -483,7 +483,7 @@ Node *SyntaxTree::parse_operand_extension(Array<Node*> operands, Block *block) {
 
 		for (auto *op: operators)
 			if (op->primitive == primop)
-				if ((op->param_type_1 == operands[0]->type) and (op->param_type_2 == TypeVoid)) {
+				if ((op->param_type_1 == operands[0]->type) and (!op->param_type_2)) {
 					Exp.next();
 					return add_node_operator(operands[0], nullptr, op);
 				}
@@ -657,7 +657,7 @@ Node *SyntaxTree::link_unary_operator(PrimitiveOperator *po, Node *operand, Bloc
 	bool ok=false;
 	for (auto *_op: operators)
 		if (po == _op->primitive)
-			if ((_op->param_type_1 == TypeVoid) and (type_match(p2, _op->param_type_2))) {
+			if ((!_op->param_type_1) and (type_match(p2, _op->param_type_2))) {
 				op = _op;
 				ok = true;
 				break;
@@ -671,7 +671,7 @@ Node *SyntaxTree::link_unary_operator(PrimitiveOperator *po, Node *operand, Bloc
 		int pen_min = 100;
 		for (auto *_op: operators)
 			if (po == _op->primitive)
-				if ((_op->param_type_1 == TypeVoid) and (type_match_with_cast(p2, false, false, _op->param_type_2, pen2, c2))) {
+				if ((!_op->param_type_1) and (type_match_with_cast(p2, false, false, _op->param_type_2, pen2, c2))) {
 					ok = true;
 					if (pen2 < pen_min) {
 						op = _op;
@@ -812,10 +812,12 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
 			if (t == TypeUnknown)
 				do_error("unknown operand");
 
-			operands = {add_node_const(add_constant(t))};
-			// constant for parameter (via variable)
-			get_constant_value(Exp.cur, *operands[0]->as_const());
+			Value v;
+			get_constant_value(Exp.cur, v);
+			auto *c = add_constant(t);
+			c->set(v);
 			Exp.next();
+			operands = {add_node_const(c)};
 		}
 
 	}
@@ -828,7 +830,7 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
 
 // only "primitive" operator -> no type information
 Node *SyntaxTree::parse_primitive_operator(Block *block) {
-	auto op = which_primitive_operator(Exp.cur);
+	auto op = which_primitive_operator(Exp.cur, 3);
 	if (!op)
 		return nullptr;
 
@@ -883,19 +885,11 @@ Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param) {
 		ps->do_error("automatic .str() not implemented yet");
 		return param;
 	}
-	if (param->kind == NodeKind::CONSTANT and TypeCasts[tc].func) {
-		Node *c_new = ps->add_node_const(ps->add_constant(TypeCasts[tc].dest));
-		TypeCasts[tc].func(*c_new->as_const(), *param->as_const());
-
-		// relink node
-		return c_new;
-	} else {
-		Node *c = ps->add_node_call(TypeCasts[tc].f);
-		c->type = TypeCasts[tc].dest;
-		c->set_param(0, param);
-		return c;
-	}
-	return param;
+	
+	Node *c = ps->add_node_call(TypeCasts[tc].f);
+	c->type = TypeCasts[tc].dest;
+	c->set_param(0, param);
+	return c;
 }
 
 Node *link_special_operator_is(SyntaxTree *tree, Node *param1, Node *param2) {
@@ -978,7 +972,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 					return op;
 				}
 			} else if (_type_match(p2, equal_classes, type1)) {
-				Node *inst = ref_node(param1);
+				Node *inst = param1;
 				if (p1 == pp1)
 					op = add_node_member_call(f, inst);
 				else
@@ -1209,7 +1203,7 @@ void SyntaxTree::post_process_for(Node *cmd_for) {
 	// ref.
 		var->type = var->type->get_pointer();
 		n_var->type = var->type;
-		transform_node(loop_block, [&](Node *n) { return conv_cbr(this, n, var); });
+		transform_node(loop_block, [&](Node *n) { return conv_cbr(n, var); });
 	}
 
 	// force for_var out of scope...
@@ -2141,7 +2135,7 @@ void SyntaxTree::parse_global_const(const string &name, const Class *type) {
 
 	// find const value
 	Node *cv = parse_command(root_of_all_evil->block);
-	cv = transform_node(cv, [&](Node *n) { return pre_process_node(n); });
+	cv = transform_node(cv, [&](Node *n) { return conv_eval_const_func(n); });
 
 	if ((cv->kind != NodeKind::CONSTANT) or (cv->type != type))
 		do_error(format("only constants of type \"%s\" allowed as value for this constant", type->name.c_str()));
@@ -2239,7 +2233,7 @@ const Class *SyntaxTree::parse_type(const Class *ns) {
 			} else {
 
 				// find array index
-				Node *c = transform_node(parse_command(root_of_all_evil->block), [&](Node *n) { return pre_process_node(n); });
+				Node *c = transform_node(parse_command(root_of_all_evil->block), [&](Node *n) { return conv_eval_const_func(n); });
 
 				if ((c->kind != NodeKind::CONSTANT) or (c->type != TypeInt))
 					do_error("only constants of type \"int\" allowed for size of arrays");

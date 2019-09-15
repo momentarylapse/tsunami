@@ -93,6 +93,7 @@ enum class OperatorID {
 	SUBTRACT,      //  -
 	MULTIPLY,      //  *
 	DIVIDE,        //  /
+	NEGATIVE,      //  -
 	ADDS,          // +=
 	SUBTRACTS,     // -=
 	MULTIPLYS,     // *=
@@ -126,6 +127,7 @@ public:
 	bool left_modifiable;
 	unsigned char level; // order of operators ("Punkt vor Strich")
 	string function_name;
+	int param_flags; // 1 = only left, 2 = only right, 3 = both
 	bool order_inverted; // (param, instance) instead of (instance, param)
 };
 extern PrimitiveOperator PrimitiveOperators[];
@@ -345,13 +347,11 @@ enum class InlineID {
 //--------------------------------------------------------------------------------------------------
 // type casting
 
-typedef void t_cast_func(Value&, Value&);
 class TypeCast {
 public:
 	int penalty;
 	const Class *source, *dest;
 	Function *f;
-	t_cast_func *func;
 };
 extern Array<TypeCast> TypeCasts;
 

@@ -244,7 +244,7 @@ void Script::CompileOsEntryPoint() {
 			nf = index;
 	// call
 	if (nf>=0)
-		Asm::AddInstruction(opcode, opcode_size, Asm::INST_CALL, Asm::param_imm(0, 4));
+		Asm::add_instruction(opcode, opcode_size, Asm::INST_CALL, Asm::param_imm(0, 4));
 	TaskReturnOffset=opcode_size;
 	OCORA = Asm::OCParam;
 	align_opcode();
@@ -509,32 +509,20 @@ void parse_magic_linker_string(SyntaxTree *s)
 }
 
 // generate opcode
-void Script::compile()
-{
+void Script::compile() {
 	Asm::CurrentMetaInfo = syntax->asm_meta_info;
 
 	if (config.compile_os)
 		import_includes(this);
 
 	parse_magic_linker_string(syntax);
-
-	syntax->break_down_complicated_commands();
-
-	syntax->map_local_variables_to_stack();
 	
-	syntax->simplify_ref_deref();
-	syntax->simplify_shift_deref();
-
-	syntax->pre_processor();
-	syntax->make_functions_inline();
-
-	if (config.verbose)
-		syntax->show("comp:a");
+	syntax->digest();
 
 	allocate_memory();
 	map_global_variables_to_memory();
-	if (!config.compile_os)
-		map_constants_to_memory(memory, memory_size, memory);
+//	if (!config.compile_os)
+//		map_constants_to_memory(memory, memory_size, memory);
 
 	allocate_opcode();
 
@@ -550,10 +538,13 @@ void Script::compile()
 
 
 
+	if (config.verbose)
+		syntax->show("compile:b");
+
 	syntax->pre_processor_addresses();
 
 	if (config.verbose)
-		syntax->show("comp:b");
+		syntax->show("compile:eval-addr");
 
 
 // compile functions into Opcode

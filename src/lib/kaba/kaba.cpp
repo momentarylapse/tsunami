@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.7.6";
+string Version = "0.17.7.7";
 
 //#define ScriptDebug
 
@@ -275,7 +275,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 {
 	if (cmd.num < 1)
 		return;
-	msg_write("script command: " + cmd);
+	//msg_write("script command: " + cmd);
 
 	// empty script
 	Script *s = new Script();
@@ -284,12 +284,16 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	try{
 
 // find expressions
-	ps->Exp.analyse(ps, cmd + string("\0", 1));
+	ps->Exp.analyse(ps, cmd);
 	if (ps->Exp.line[0].exp.num < 1){
 		//clear_exp_buffer(&ps->Exp);
 		delete(s);
 		return;
 	}
+	
+	for (auto *p: Packages)
+		if (p->filename == "file")
+			ps->add_include_data(p);
 
 // analyse syntax
 
@@ -300,9 +304,18 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	// parse
 	ps->Exp.reset_parser();
 	ps->parse_complete_command(func->block);
-	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
+	
+	// implicit print(...)?
+	if (func->block->params[0]->type != TypeVoid) {
+		auto *n = ps->add_converter_str(func->block->params[0]);
+		
+		Array<Node*> links = ps->get_existence("print", nullptr, nullptr, false);
+		Function *f = links[0]->as_func();
 
-	ps->convert_call_by_reference();
+		Node *cmd = ps->add_node_call(f);
+		cmd->set_param(0, n);
+		func->block->params[0] = cmd;
+	}
 
 // compile
 	s->compile();
@@ -314,7 +327,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	}*/
 // execute
 	typedef void void_func();
-	void_func *f = (void_func*)s->match_function("--command-func--", "void", {});
+	void_func *f = (void_func*)func->address;
 	if (f)
 		f();
 

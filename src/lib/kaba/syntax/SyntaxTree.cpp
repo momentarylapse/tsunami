@@ -209,7 +209,7 @@ SyntaxTree::SyntaxTree(Script *_script) {
 
 
 void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse) {
-	Exp.analyse(this, buffer + string("\0", 1)); // compatibility... expected by lexical
+	Exp.analyse(this, buffer);
 	
 	pre_compiler(just_analyse);
 
@@ -936,6 +936,14 @@ void SyntaxTree::transformb(std::function<Node*(Node*, Block*)> F) {
 	}
 }
 
+bool node_is_executable(Node *n) {
+	if ((n->kind == NodeKind::CONSTANT) or (n->kind == NodeKind::VAR_LOCAL) or (n->kind == NodeKind::VAR_GLOBAL))
+		return false;
+	if ((n->kind == NodeKind::ADDRESS_SHIFT) or (n->kind == NodeKind::ARRAY) or (n->kind == NodeKind::DYNAMIC_ARRAY) or (n->kind == NodeKind::REFERENCE) or (n->kind == NodeKind::DEREFERENCE) or (n->kind == NodeKind::DEREF_ADDRESS_SHIFT))
+		return node_is_executable(n->params[0]);
+	return true;
+}
+
 Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 	if (n->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
 		if (config.verbose) {
@@ -1020,6 +1028,18 @@ Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 		auto index = n->params[1];
 		auto array = n->params[2];
 		auto block = n->params[3];
+		
+		
+		// array needs execution?
+		if (node_is_executable(array)) {
+			// -> assign into variable before the loop
+			auto *v = b->add_var(b->function->create_slightly_hidden_name(), array->type);
+
+			auto *assign = link_operator_id(OperatorID::ASSIGN, add_node_local(v), array);
+			_transform_insert_before_.add(assign);
+
+			array = add_node_local(v);
+		}
 
 		n->link_no = (int_p)statement_from_id(StatementID::FOR_DIGEST);
 		n->set_num_params(4);

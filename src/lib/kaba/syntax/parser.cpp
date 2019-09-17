@@ -711,8 +711,8 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 
 	const Class *el_type = n_exp->type;
 	const Class *type = make_class_super_array(el_type);
-	auto *var = block->add_var("set-builder", type);
-	
+	auto *var = block->add_var(block->function->create_slightly_hidden_name(), type);
+
 	// array.add(exp)
 	auto *f_add = type->get_func("add", TypeVoid, {el_type});
 	if (!f_add)
@@ -747,6 +747,71 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 	n->set_param(1, add_node_local(var));
 	return n;
 
+}
+
+Node *try_parse_format_string(SyntaxTree *tree, Block *block, Value &v) {
+	string s = v.as_string();
+	
+	Array<Node*> parts;
+	int pos = 0;
+	
+	while (pos < s.num) {
+	
+		int p0 = s.find("{{", pos);
+		
+		// constant part before the next {{insert}}
+		int pe = (p0 < 0) ? s.num : p0;
+		if (pe > pos) {
+			auto *c = tree->add_constant(TypeString);
+			c->as_string() = s.substr(pos, pe-pos);
+			parts.add(tree->add_node_const(c));
+		}
+		if (p0 < 0)
+			break;
+			
+		int p1 = s.find("}}", p0);
+		if (p1 < 0)
+			tree->do_error("string interpolation {{ not ending with }}");
+			
+		string xx = s.substr(p0+2, p1 - p0 - 2);
+		//msg_write("format:  " + xx);
+		ExpressionBuffer ee;
+		ee.analyse(tree, xx);
+		ee.cur_line->physical_line = tree->Exp.cur_line->physical_line;
+		//ee.show();
+		
+		int cl = tree->Exp.get_line_no();
+		int ce = tree->Exp.cur_exp;
+		tree->Exp.line.add(ee.line[0]);
+		tree->Exp.set(0, tree->Exp.line.num-1);
+		
+		Node *n = tree->parse_command(block);
+		n = tree->check_param_link(n, TypeString, "", 0);
+		//n->show();
+		parts.add(n);
+		
+		tree->Exp.line.pop();
+		tree->Exp.set(ce, cl);
+		
+		pos = p1 + 2;
+	
+	}
+	
+	// empty???
+	if (parts.num == 0) {
+		auto *c = tree->add_constant(TypeString);
+		return tree->add_node_const(c);
+	}
+	
+	// glue
+	while (parts.num > 1) {
+		auto *b = parts.pop();
+		auto *a = parts.pop();
+		auto *n = tree->link_operator_id(OperatorID::ADD, a, b);
+		parts.add(n);
+	}
+	//parts[0]->show();
+	return parts[0];
 }
 
 Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
@@ -814,10 +879,15 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
 
 			Value v;
 			get_constant_value(Exp.cur, v);
-			auto *c = add_constant(t);
-			c->set(v);
 			Exp.next();
-			operands = {add_node_const(c)};
+			
+			if (t == TypeString) {
+				operands = {try_parse_format_string(this, block, v)};
+			} else {
+				auto *c = add_constant(t);
+				c->set(v);
+				operands = {add_node_const(c)};
+			}
 		}
 
 	}
@@ -1548,10 +1618,8 @@ Node *SyntaxTree::parse_statement_len(Block *block) {
 	return nullptr;
 }
 
-Node *SyntaxTree::parse_statement_str(Block *block) {
-	Exp.next(); // str
-	Node *sub = parse_single_func_param(block);
-
+Node *SyntaxTree::add_converter_str(Node *sub) {
+	
 	// direct/type cast?
 	int ie = Exp.cur_exp;
 	try {
@@ -1570,6 +1638,13 @@ Node *SyntaxTree::parse_statement_str(Block *block) {
 	cmd->set_param(0, ref_node(sub));
 	cmd->set_param(1, add_node_const(c));
 	return cmd;
+}
+
+Node *SyntaxTree::parse_statement_str(Block *block) {
+	Exp.next(); // str
+	Node *sub = parse_single_func_param(block);
+	
+	return add_converter_str(sub);
 }
 
 // local (variable) definitions...

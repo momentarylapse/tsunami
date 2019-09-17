@@ -529,14 +529,14 @@ string Class::var2str(const void *p) const {
 		return "(" + s + ")";
 
 	} else if (is_array()) {
-			string s;
-			for (int i=0; i<array_length; i++) {
-				if (i > 0)
-					s += ", ";
-				s += parent->var2str(((char*)p) + i * parent->size);
-			}
-			return "[" + s + "]";
+		string s;
+		for (int i=0; i<array_length; i++) {
+			if (i > 0)
+				s += ", ";
+			s += parent->var2str(((char*)p) + i * parent->size);
 		}
+		return "[" + s + "]";
+	}
 	return d2h(p, size, false);
 }
 

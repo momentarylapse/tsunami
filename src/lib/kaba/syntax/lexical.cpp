@@ -140,8 +140,9 @@ ExpKind GetKind(char c) {
 	return ExpKind::LETTER;
 }
 
-void ExpressionBuffer::analyse(SyntaxTree *ps, const string &source) {
+void ExpressionBuffer::analyse(SyntaxTree *ps, const string &_source) {
 	syntax = ps;
+	string source = _source + string("\0", 1); // :P
 	clear();
 
 	// scan all lines

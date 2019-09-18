@@ -1559,8 +1559,11 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 			if (instruction_set.set == InstructionSet::AMD64){
 				if (inst.has_modrm){
 					value -= (int_p)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
-					if ((value >= 0x80000000) or (-value >= 0x80000000))
-						raise_error(format("RIP relative more than 32 bit   %p  %lx", &oc[ocs], value));
+					if ((value >= 0x80000000) or (-value >= 0x80000000)) {
+						msg_write("-----");
+						inst.print();
+						raise_error(format("RIP relative more than 32 bit   %p  %lx", &oc[ocs], p.value));
+					}
 				}else{
 					size = SIZE_64; // Ov/Mv...
 				}

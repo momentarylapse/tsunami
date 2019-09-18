@@ -17,7 +17,6 @@ const float MAX_FREQ = 3000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
-float[NF][NT] sg
 Image im0
 
 class SpecGrid extends Grid
@@ -151,6 +150,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 
 	SpectrumDialog *dlg
 	MidiNoteBuffer midi
+	float[NF][NT] sg
 
 	void show_spec(Song *song)
 		dlg = new SpectrumDialog(&self, song)

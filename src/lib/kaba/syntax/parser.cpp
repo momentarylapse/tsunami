@@ -1957,6 +1957,7 @@ void SyntaxTree::parse_import() {
 		include = Load(filename, script->just_analyse or config.compile_os);
 		// os-includes will be appended to syntax_tree... so don't compile yet
 	}catch(Exception &e) {
+		msg_left();
 
 		int logical_line = Exp.get_line_no();
 		int exp_no = Exp.cur_exp;

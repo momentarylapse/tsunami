@@ -630,10 +630,12 @@ void PluginManager::link_app_script_data() {
 	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "on_stop", Kaba::mf(&TsunamiPlugin::on_stop), &tsunami_plugin);
 	Kaba::LinkExternal("TsunamiPlugin.stop", Kaba::mf(&TsunamiPlugin::stop_request));
 
+	Progress *prog = new Progress("", nullptr);
 	Kaba::DeclareClassSize("Progress", sizeof(Progress));
 	Kaba::LinkExternalClassFunc("Progress.__init__", &Progress::__init__);
-	Kaba::LinkExternalClassFunc("Progress.__delete__", &Progress::__delete__);
+	Kaba::DeclareClassVirtualIndex("Progress", "__delete__", Kaba::mf(&Progress::__delete__), prog);
 	Kaba::LinkExternalClassFunc("Progress.set", &Progress::set_kaba);
+	delete prog;
 
 	ProgressCancelable prog_can;
 	Kaba::DeclareClassSize("ProgressX", sizeof(ProgressCancelable));

@@ -721,26 +721,6 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 				add_cmd(Asm::INST_DIVSD, p_xmm0, param[1]);
 			add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
 			break;
-		case InlineID::FLOAT_MULTIPLY_FI:
-			add_cmd(Asm::INST_CVTSI2SS, p_xmm0, param[1]);
-			add_cmd(Asm::INST_MULSS, p_xmm0, param[0]);
-			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
-			break;
-		case InlineID::FLOAT_MULTIPLY_IF:
-			add_cmd(Asm::INST_CVTSI2SS, p_xmm0, param[0]);
-			add_cmd(Asm::INST_MULSS, p_xmm0, param[1]);
-			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
-			break;
-		case InlineID::FLOAT64_MULTIPLY_FI:
-			add_cmd(Asm::INST_CVTSI2SD, p_xmm0, param[1]);
-			add_cmd(Asm::INST_MULSD, p_xmm0, param[0]);
-			add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
-			break;
-		case InlineID::FLOAT64_MULTIPLY_IF:
-			add_cmd(Asm::INST_CVTSI2SD, p_xmm0, param[0]);
-			add_cmd(Asm::INST_MULSD, p_xmm0, param[1]);
-			add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
-			break;
 		case InlineID::FLOAT_EQUAL:
 		case InlineID::FLOAT_NOT_EQUAL:
 		case InlineID::FLOAT_GREATER:

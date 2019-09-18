@@ -95,7 +95,7 @@ void* get_nice_random_addr()
 
 }
 
-void* get_nice_memory(long size, bool executable)
+void* get_nice_memory(long size, bool executable, Script *script)
 {
 	if (size == 0)
 		return nullptr;
@@ -109,28 +109,32 @@ void* get_nice_memory(long size, bool executable)
 #else
 
 	int prot = PROT_READ | PROT_WRITE;
-	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+	int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE;
 	if (executable){
 		prot |= PROT_EXEC;
 		flags |= MAP_EXECUTABLE;
 	}
 
 	// try in 32bit distance from current opcode
-	for (int i=0; i<100; i++){
+	for (int i=0; i<100000; i++){
 		void *addr0 = get_nice_random_addr();
 		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
 		mem = (char*)mmap(addr0, size, prot, flags, -1, 0);
-		if (config.verbose)
-			printf("%d  %p  ->  %p\n", i, addr0, mem);
 		if ((int_p)mem != -1){
+			if (config.verbose)
+				printf("%d  %p  ->  %p\n", i, addr0, mem);
 			if (labs((int_p)mem - (int_p)addr0) < 1000000000)
 				return mem;
-			else
-				munmap(mem, size);
+			munmap(mem, size);
 			if (config.verbose)
 				msg_write("...try again");
 		}
+		if (i > 5) {
+			prot |= PROT_EXEC;
+			flags |= MAP_EXECUTABLE;
+		}
 	}
+	script->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
 
 	// no?...ok, try anywhere
 	mem = (char*)mmap(nullptr, size, prot, flags, -1, 0);
@@ -154,7 +158,7 @@ void Script::allocate_opcode()
 	if (config.compile_os)
 		max_opcode *= 10;
 
-	opcode = (char*)get_nice_memory(max_opcode, true);
+	opcode = (char*)get_nice_memory(max_opcode, true, this);
 	if (config.verbose)
 		msg_write("opcode:  " + p2s(opcode));
 
@@ -186,7 +190,7 @@ void Script::allocate_memory()
 	for (auto *v: syntax->base_class->static_variables)
 		memory_size += mem_align(v->type->size, 4);
 
-	memory = (char*)get_nice_memory(memory_size, false);
+	memory = (char*)get_nice_memory(memory_size, false, this);
 	if (config.verbose)
 		msg_write("memory:  " + p2s(memory));
 	memory_size = 0;
@@ -521,8 +525,10 @@ void Script::compile() {
 
 	allocate_memory();
 	map_global_variables_to_memory();
-//	if (!config.compile_os)
-//		map_constants_to_memory(memory, memory_size, memory);
+
+	// useful because some constants might have ended up outside of RIP-relative addressing!
+	if (!config.compile_os)
+		map_constants_to_memory(memory, memory_size, memory);
 
 	allocate_opcode();
 

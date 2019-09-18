@@ -298,12 +298,20 @@ void SerializerAMD64::add_function_outro(Function *f)
 
 //#define debug_evil_corrections
 
+void _test_param_mem(SerialNodeParam &p) {
+	//if (p.kind == NodeKind::ADDRESS)
+}
+
 void SerializerAMD64::correct_unallowed_param_combis2(SerialNode &c)
 {
 	// push 8 bit -> push 32 bit
 	if (c.inst == Asm::INST_PUSH)
 		if (c.p[0].kind == NodeKind::REGISTER)
 			c.p[0].p = reg_resize(c.p[0].p, config.pointer_size);
+
+	_test_param_mem(c.p[0]);
+	_test_param_mem(c.p[1]);
+
 
 
 	// FIXME

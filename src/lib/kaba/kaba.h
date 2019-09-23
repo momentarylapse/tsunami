@@ -110,6 +110,7 @@ void DeleteAllScripts(bool even_immortal = false, bool force = false);
 void ExecuteSingleScriptCommand(const string &cmd);
 
 const Class *GetDynamicType(const VirtualBase *p);
+string var2str(const void *p, const Class *type);
 
 };
 

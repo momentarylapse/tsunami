@@ -224,6 +224,8 @@ void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse) {
 
 void SyntaxTree::digest() {
 
+	transform([&](Node* n){ return conv_class_and_func_to_const(n); });
+
 	eval_const_expressions();
 
 	transformb([&](Node* n, Block* b){ return conv_break_down_high_level(n, b); });
@@ -944,6 +946,16 @@ bool node_is_executable(Node *n) {
 	return true;
 }
 
+Node *SyntaxTree::conv_class_and_func_to_const(Node *n) {
+	if (n->kind == NodeKind::FUNCTION) {
+		return add_node_const(add_constant_pointer(TypeFunctionP, n->as_func()));
+	} else if (n->kind == NodeKind::CLASS) {
+		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
+	}
+	return n;
+}
+
+
 Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 	if (n->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
 		if (config.verbose) {
@@ -1088,10 +1100,6 @@ Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 		Node *cmd_var_assign = add_node_operator_by_inline(var, ref_node(el), InlineID::POINTER_ASSIGN);
 		block->params.insert(cmd_var_assign, 0);
 
-	} else if (n->kind == NodeKind::FUNCTION) {
-		return add_node_const(add_constant_pointer(TypeFunctionP, n->as_func()));
-	} else if (n->kind == NodeKind::CLASS) {
-		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
 	} else if (n->kind == NodeKind::ARRAY_BUILDER_FOR) {
 
 		_transform_insert_before_.add(n->params[0]);

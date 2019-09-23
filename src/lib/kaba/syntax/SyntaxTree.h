@@ -162,6 +162,7 @@ public:
 	Node *parse_statement_sizeof(Block *block);
 	Node *parse_statement_type(Block *block);
 	Node *parse_statement_str(Block *block);
+	Node *parse_statement_repr(Block *block);
 	Node *parse_statement_len(Block *block);
 	Node *parse_statement_let(Block *block);
 	Node *parse_statement_map(Block *block);
@@ -175,6 +176,7 @@ public:
 	void digest();
 	void convert_call_by_reference();
 	void map_local_variables_to_stack();
+	Node *conv_class_and_func_to_const(Node *n);
 	Node *conv_break_down_high_level(Node *n, Block *b);
 	Node *conv_break_down_low_level(Node *c);
 	Node *conv_cbr(Node *c, Variable *var);
@@ -221,7 +223,7 @@ public:
 	Node *ref_node(Node *sub, const Class *override_type = nullptr);
 	Node *deref_node(Node *sub, const Class *override_type = nullptr);
 	Node *shift_node(Node *sub, bool deref, int shift, const Class *type);
-	Node *add_converter_str(Node *sub);
+	Node *add_converter_str(Node *sub, bool repr);
 
 	// pre processor
 	Node *conv_eval_const_func(Node *c);

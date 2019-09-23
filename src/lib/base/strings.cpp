@@ -921,6 +921,18 @@ string string::trim() const
 	return substr(i0, i1 - i0 + 1);
 }
 
+string string::escape() const {
+	return str_escape(*this);
+}
+
+string string::unescape() const {
+	return str_unescape(*this);
+}
+
+string string::repr() const {
+	return "\"" + escape() + "\"";
+}
+
 string implode(const Array<string> &a, const string &glue)
 {
 	string r;
@@ -1095,6 +1107,7 @@ string str_unescape(const string &str)
 
 string str_escape(const string &str)
 {
+	//return str.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\"", "\\\"");
 	string r;
 	for (int i=0;i<str.num;i++){
 		if (str[i] == '\t')

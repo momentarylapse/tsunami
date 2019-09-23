@@ -1618,20 +1618,22 @@ Node *SyntaxTree::parse_statement_len(Block *block) {
 	return nullptr;
 }
 
-Node *SyntaxTree::add_converter_str(Node *sub) {
+Node *SyntaxTree::add_converter_str(Node *sub, bool repr) {
 	
-	// direct/type cast?
-	int ie = Exp.cur_exp;
-	try {
-		return check_param_link(sub, TypeString, "", 0);
-	} catch(...) {
-	}
-	Exp.set(ie);
+	auto *t = sub->type;
 
-	// "universal" var2str
+	Function *cf = nullptr;
+	if (repr)
+		cf = t->get_func("repr", TypeString, {});
+	if (!cf)
+		cf = t->get_func("str", TypeString, {});
+	if (cf)
+		return add_node_member_call(cf, sub);
+
+	// "universal" var2str() or var_repr()
 	auto *c = add_constant_pointer(TypeClassP, sub->type);
 
-	Array<Node*> links = get_existence("@var2str", nullptr, nullptr, false);
+	Array<Node*> links = get_existence(repr ? "@var_repr" : "@var2str", nullptr, nullptr, false);
 	Function *f = links[0]->as_func();
 
 	Node *cmd = add_node_call(f);
@@ -1644,7 +1646,14 @@ Node *SyntaxTree::parse_statement_str(Block *block) {
 	Exp.next(); // str
 	Node *sub = parse_single_func_param(block);
 	
-	return add_converter_str(sub);
+	return add_converter_str(sub, false);
+}
+
+Node *SyntaxTree::parse_statement_repr(Block *block) {
+	Exp.next(); // str
+	Node *sub = parse_single_func_param(block);
+
+	return add_converter_str(sub, true);
 }
 
 // local (variable) definitions...
@@ -1817,6 +1826,8 @@ Node *SyntaxTree::parse_statement(Block *block) {
 		return parse_statement_type(block);
 	} else if (Exp.cur == IDENTIFIER_STR) {
 		return parse_statement_str(block);
+	} else if (Exp.cur == IDENTIFIER_REPR) {
+		return parse_statement_repr(block);
 	} else if (Exp.cur == IDENTIFIER_LEN) {
 		return parse_statement_len(block);
 	} else if (Exp.cur == IDENTIFIER_LET) {
@@ -1906,7 +1917,7 @@ void SyntaxTree::parse_complete_command(Block *block) {
 
 		Node *first = parse_operand(block, true);
 
-		if (first->kind == NodeKind::CLASS) {
+		if ((first->kind == NodeKind::CLASS) and !Exp.end_of_line()) {
 			parse_local_definition(block, first->as_class());
 
 		} else {

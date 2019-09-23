@@ -18,6 +18,7 @@
 #include "../../config.h"
 #include "../../math/complex.h"
 #include "../../any/any.h"
+#include <math.h>
 
 
 
@@ -29,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.7.6";
+string LibVersion = "0.17.8.2";
 
 
 bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param);
@@ -49,6 +50,7 @@ const string IDENTIFIER_DELETE = "del";
 const string IDENTIFIER_SIZEOF = "sizeof";
 const string IDENTIFIER_TYPE = "type";
 const string IDENTIFIER_STR = "str";
+const string IDENTIFIER_REPR = "repr";
 const string IDENTIFIER_LEN = "len";
 const string IDENTIFIER_LET = "let";
 const string IDENTIFIER_NAMESPACE = "namespace";
@@ -276,7 +278,8 @@ PrimitiveOperator PrimitiveOperators[(int)OperatorID::_COUNT_] = {
 	{"--", OperatorID::DECREASE,      true,  2, "__dec__", 1, false},
 	{IDENTIFIER_IS, OperatorID::IS,   false, 2,  "-none-", 3, false},
 	{IDENTIFIER_IN, OperatorID::IN,   false, 12, "__contains__", 3, true}, // INVERTED
-	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", 3, false}
+	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", 3, false},
+	{"^",  OperatorID::EXPONENT,      false, 14,  "__exp__", 3, false}
 // Level = 15 - (official C-operator priority)
 // priority from "C als erste Programmiersprache", page 552
 };
@@ -479,10 +482,10 @@ void add_ext_var(const string &name, const Class *type, void *var) {
 	#include <stdlib.h>
 #endif
 
+void _cdecl _print(const string &str)
+{	printf("%s\n", str.c_str());	}
 void _cdecl _cstringout(char *str)
-{	msg_write(str);	}
-void _cdecl _print(string &str)
-{	msg_write(str);	}
+{	_print(str);	}
 int _cdecl _Float2Int(float f)
 {	return (int)f;	}
 double _cdecl _Float2Float64(float f)
@@ -661,8 +664,83 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 	return rr;
 }
 
-string _cdecl var2str(const void *var, const Class *type) {
-	return type->var2str(var);
+string class_repr(const Class *c) {
+	if (c)
+		return "<class " + c->long_name() + ">";
+	return "<class -nil->";
+}
+
+string func_repr(const Function *f) {
+	if (f)
+		return "<func " + f->long_name() + ">";
+	return "<func -nil->";
+}
+
+string _cdecl var_repr(const void *p, const Class *type) {
+	if (type == TypeInt) {
+		return i2s(*(int*)p);
+	} else if (type == TypeFloat32) {
+		return f2s(*(float*)p, 3);
+	} else if (type == TypeFloat64) {
+		return f2s((float)*(double*)p, 3);
+	} else if (type == TypeBool) {
+		return b2s(*(bool*)p);
+	} else if (type == TypeClass) {
+		return ((Class*)p)->name;
+	} else if (type == TypeClassP) {
+		return class_repr(*(Class**)p);
+	} else if (type == TypeFunctionP) {
+		return func_repr(*(Function**)p);
+	} else if (type == TypeAny) {
+		return ((Any*)p)->repr();
+	} else if (type->is_pointer()) {
+		return p2s(*(void**)p);
+	} else if (type == TypeString) {
+		return ((string*)p)->repr();
+	} else if (type == TypeCString) {
+		return string((char*)p).repr();
+	} else if (type->is_super_array()) {
+		string s;
+		DynamicArray *da = (DynamicArray*)p;
+		for (int i=0; i<da->num; i++) {
+			if (i > 0)
+				s += ", ";
+			s += var_repr(((char*)da->data) + i * da->element_size, type->parent);
+		}
+		return "[" + s + "]";
+	} else if (type->is_dict()) {
+		return "{...}";
+	} else if (type->elements.num > 0) {
+		string s;
+		for (auto &e: type->elements) {
+			if (e.hidden)
+				continue;
+			if (s.num > 0)
+				s += ", ";
+			s += var_repr(((char*)p) + e.offset, e.type);
+		}
+		return "(" + s + ")";
+
+	} else if (type->is_array()) {
+		string s;
+		for (int i=0; i<type->array_length; i++) {
+			if (i > 0)
+				s += ", ";
+			s += var_repr(((char*)p) + i * type->parent->size, type->parent);
+		}
+		return "[" + s + "]";
+	}
+	return d2h(p, type->size, false);
+}
+
+string _cdecl var2str(const void *p, const Class *type) {
+	if (type == TypeString)
+		return *(string*)p;
+	if (type == TypeCString)
+		return string((char*)p);
+	if (type == TypeAny)
+		return ((Any*)p)->str();
+	return var_repr(p, type);
 }
 
 Any _cdecl kaba_dyn(const void *var, const Class *type) {
@@ -676,6 +754,8 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		return Any(*(string*)var);
 	if (type->is_pointer())
 		return Any(*(void**)var);
+	if (type == TypeAny)
+		return *(Any*)var;
 	if (type->is_array()) {
 		Any a;
 		auto *t_el = type->get_array_element();
@@ -989,9 +1069,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	TypeCasts.add(c);
 }
 
-
-class StringList : public Array<string>
-{
+class StringList : public Array<string> {
 public:
 	void _cdecl assign(StringList &s) {
 		*this = s;
@@ -1019,6 +1097,14 @@ string kaba_char2str(char c) {
 
 int xop_int_add(int a, int b) {
 	return a + b;
+}
+
+
+int xop_int_exp(int a, int b) {
+	return (int)pow((double)a, (double)b);
+}
+float xop_float_exp(float a, float b) {
+	return pow(a, b);
 }
 
 
@@ -1147,7 +1233,12 @@ void SIAddPackageBase() {
 		class_add_funcx("add", TypeInt, &xop_int_add, FLAG_PURE);
 			func_set_inline(InlineID::INT_ADD);
 			func_add_param("b", TypeInt);
+		class_add_funcx("__exp__", TypeInt, &xop_int_exp, FLAG_PURE);
+			func_add_param("b", TypeInt);
 
+	add_class(TypeIntList);
+		class_add_funcx("str", TypeString, &ia2s, FLAG_PURE);
+		// more in lib_math.cpp ...
 
 	add_class(TypeInt64);
 		class_add_funcx("str", TypeString, &i642s, FLAG_PURE);
@@ -1157,6 +1248,12 @@ void SIAddPackageBase() {
 		class_add_funcx("str", TypeString, &kaba_float2str, FLAG_PURE);
 		class_add_funcx("str2", TypeString, &f2s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
+		class_add_funcx("__exp__", TypeFloat32, &xop_float_exp, FLAG_PURE);
+			func_add_param("b", TypeFloat32);
+
+	add_class(TypeFloatList);
+		class_add_funcx("str", TypeString, &fa2s, FLAG_PURE);
+		// more in lib_math.cpp ...
 
 
 	add_class(TypeFloat64);
@@ -1168,6 +1265,9 @@ void SIAddPackageBase() {
 	add_class(TypeBool);
 		class_add_funcx("str", TypeString, &b2s, FLAG_PURE);
 
+	add_class(TypeBoolList);
+		class_add_funcx("str", TypeString, &ba2s, FLAG_PURE);
+		// more in lib_math.cpp ...
 
 	add_class(TypeChar);
 		class_add_funcx("str", TypeString, &kaba_char2str, FLAG_PURE);
@@ -1224,9 +1324,9 @@ void SIAddPackageBase() {
 		class_add_funcx("dirname", TypeString, &string::dirname, FLAG_PURE);
 		class_add_funcx("basename", TypeString, &string::basename, FLAG_PURE);
 		class_add_funcx("extension", TypeString, &string::extension, FLAG_PURE);
-
 		class_add_funcx("escape", TypeString, &str_escape, FLAG_PURE);
 		class_add_funcx("unescape", TypeString, &str_unescape, FLAG_PURE);
+		class_add_funcx("repr", TypeString, &string::repr, FLAG_PURE);
 
 
 	add_class(TypeStringList);
@@ -1245,6 +1345,7 @@ void SIAddPackageBase() {
 			func_add_param("glue", TypeString);
 		class_add_funcx("__contains__", TypeBool, &StringList::__contains__, FLAG_PURE);
 			func_add_param("s", TypeString);
+		class_add_funcx("str", TypeString, &sa2s, FLAG_PURE);
 
 
 	// constants
@@ -1292,6 +1393,7 @@ void __execute_single_command__(const string &cmd) {
 }
 
 #pragma GCC pop_options
+
 
 void SIAddPackageKaba() {
 	add_package("kaba", false);
@@ -1347,6 +1449,9 @@ void SIAddPackageKaba() {
 			func_add_param("c", TypeClassP);
 		class_add_funcx("long_name", TypeString, &Class::long_name);
 
+	add_class(TypeClassP);
+		class_add_funcx("str", TypeString, &class_repr);
+
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
 		class_add_funcx("long_name", TypeString, &Function::long_name);
@@ -1364,6 +1469,8 @@ void SIAddPackageKaba() {
 		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
 		class_add_elementx("code", TypeFunctionCodeP, &Function::address);
 
+		add_class(TypeFunctionP);
+			class_add_funcx("str", TypeString, &func_repr);
 
 	add_class(TypeVariable);
 		class_add_elementx("name", TypeString, &Variable::name);
@@ -1430,6 +1537,7 @@ void SIAddBasicCommands() {
 	add_statement(IDENTIFIER_SIZEOF, StatementID::SIZEOF, 1);
 	add_statement(IDENTIFIER_TYPE, StatementID::TYPE, 1);
 	add_statement(IDENTIFIER_STR, StatementID::STR, 1);
+	add_statement(IDENTIFIER_REPR, StatementID::REPR, 1);
 	add_statement(IDENTIFIER_LEN, StatementID::LEN, 1);
 	add_statement(IDENTIFIER_LET, StatementID::LET);
 	add_statement(IDENTIFIER_ASM, StatementID::ASM);
@@ -1610,7 +1718,7 @@ void SIAddOperators() {
 
 void SIAddCommands() {
 	// type casting
-	add_func("@i2s", TypeString, (void*)&i2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
+	/*add_func("@i2s", TypeString, (void*)&i2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("i", TypeInt);
 	add_func("@i642s", TypeString, (void*)&i642s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("i", TypeInt64);
@@ -1619,17 +1727,17 @@ void SIAddCommands() {
 	add_func("@f642sf", TypeString, (void*)&f642sf, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("f", TypeFloat64);
 	add_func("@b2s", TypeString, (void*)&b2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
-		func_add_param("b", TypeBool);
+		func_add_param("b", TypeBool);*/
 	add_func("p2s", TypeString, (void*)&p2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("p", TypePointer);
-	add_func("@ia2s", TypeString, (void*)&ia2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
+	/*add_func("@ia2s", TypeString, (void*)&ia2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("a", TypeIntList);
 	add_func("@fa2s", TypeString, (void*)&fa2s, ScriptFlag(FLAG_STATIC | FLAG_PURE)); // TODO...
 		func_add_param("a", TypeFloatList);
 	add_func("@ba2s", TypeString, (void*)&ba2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
 		func_add_param("a", TypeBoolList);
 	add_func("@sa2s", TypeString, (void*)&sa2s, ScriptFlag(FLAG_STATIC | FLAG_PURE));
-		func_add_param("a", TypeStringList);
+		func_add_param("a", TypeStringList);*/
 	// debug output
 	/*add_func("cprint", TypeVoid, (void*)&_cstringout, FLAG_STATIC);
 		func_add_param("str", TypeCString);*/
@@ -1650,6 +1758,9 @@ void SIAddCommands() {
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
 	add_func("@var2str", TypeString, (void*)var2str, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		func_add_param("var", TypePointer);
+		func_add_param("class", TypeClassP);
+	add_func("@var_repr", TypeString, (void*)var_repr, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
 	add_func("@map", TypeDynamicArray, (void*)kaba_map, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
@@ -1754,16 +1865,16 @@ void Init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	add_type_cast(10, TypeInt, TypeChar, "i2c");
 	add_type_cast(20, TypeChar, TypeInt, "c2i");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
-	add_type_cast(50, TypeInt, TypeString, "@i2s");
-	add_type_cast(50, TypeInt64, TypeString, "@i642s");
-	add_type_cast(50, TypeFloat32, TypeString, "@f2sf");
-	add_type_cast(50, TypeFloat64, TypeString, "@f642sf");
-	add_type_cast(50, TypeBool, TypeString, "@b2s");
+	//add_type_cast(50, TypeInt, TypeString, "@i2s");
+	//add_type_cast(50, TypeInt64, TypeString, "@i642s");
+	//add_type_cast(50, TypeFloat32, TypeString, "@f2sf");
+	//add_type_cast(50, TypeFloat64, TypeString, "@f642sf");
+	//add_type_cast(50, TypeBool, TypeString, "@b2s");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
-	add_type_cast(50, TypeIntList, TypeString, "@ia2s");
-	add_type_cast(50, TypeFloatList, TypeString, "@fa2s");
-	add_type_cast(50, TypeBoolList, TypeString, "@ba2s");
-	add_type_cast(50, TypeStringList, TypeString, "@sa2s");
+	//add_type_cast(50, TypeIntList, TypeString, "@ia2s");
+	//add_type_cast(50, TypeFloatList, TypeString, "@fa2s");
+	//add_type_cast(50, TypeBoolList, TypeString, "@ba2s");
+	//add_type_cast(50, TypeStringList, TypeString, "@sa2s");
 	cur_package = Packages[2];
 	add_type_cast(50, TypeInt, TypeAny, "@int2any");
 	add_type_cast(50, TypeFloat32, TypeAny, "@float2any");

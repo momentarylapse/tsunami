@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.7.8";
+string Version = "0.17.8.2";
 
 //#define ScriptDebug
 
@@ -292,7 +292,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	}
 	
 	for (auto *p: Packages)
-		if (p->filename == "file")
+		if ((p->filename == "file") or (p->filename == "image") or (p->filename == "kaba"))
 			ps->add_include_data(p);
 
 // analyse syntax
@@ -307,7 +307,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	
 	// implicit print(...)?
 	if (func->block->params[0]->type != TypeVoid) {
-		auto *n = ps->add_converter_str(func->block->params[0]);
+		auto *n = ps->add_converter_str(func->block->params[0], true);
 		
 		Array<Node*> links = ps->get_existence("print", nullptr, nullptr, false);
 		Function *f = links[0]->as_func();
@@ -316,6 +316,8 @@ void ExecuteSingleScriptCommand(const string &cmd)
 		cmd->set_param(0, n);
 		func->block->params[0] = cmd;
 	}
+	ps->auto_implement_functions(ps->base_class);
+	//ps->show("aaaa");
 
 // compile
 	s->compile();
@@ -391,13 +393,11 @@ void *Script::match_class_function(const string &_class, bool allow_derived, con
 	return nullptr;
 }
 
-void print_var(void *p, const string &name, const Class *t)
-{
-	msg_write(t->name + " " + name + " = " + t->var2str(p));
+void print_var(void *p, const string &name, const Class *t) {
+	msg_write(t->name + " " + name + " = " + var2str(p, t));
 }
 
-void Script::show_vars(bool include_consts)
-{
+void Script::show_vars(bool include_consts) {
 	for (auto *v: syntax->base_class->static_variables)
 		print_var(v->memory, v->name, v->type);
 	/*if (include_consts)

@@ -162,7 +162,7 @@ void Value::map_into(char *memory, char *addr) const {
 }
 
 string Value::str() const {
-	return type->var2str(value.data);
+	return var2str(value.data, type);
 }
 
 Constant::Constant(const Class *_type, SyntaxTree *_owner) {

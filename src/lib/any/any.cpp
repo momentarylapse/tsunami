@@ -130,11 +130,7 @@ void Any::clear() {
 	data = NULL;
 }
 
-static string encode_string(const string &s) {
-	return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\"", "\\\"");
-}
-
-string Any::_str_rec() const {
+string Any::repr() const {
 	if (type == TYPE_INT) {
 		return i2s(*as_int());
 	} else if (type == TYPE_FLOAT) {
@@ -142,7 +138,7 @@ string Any::_str_rec() const {
 	} else if (type == TYPE_BOOL) {
 		return b2s(*as_bool());
 	} else if (type == TYPE_STRING) {
-		return "\"" + encode_string(*as_string()) + "\"";
+		return as_string()->repr();
 	} else if (type == TYPE_POINTER) {
 		return p2s(*as_pointer());
 	} else if (type == TYPE_ARRAY) {
@@ -150,7 +146,7 @@ string Any::_str_rec() const {
 		for (Any &p: *as_array()) {
 			if (s.num > 1)
 				s += ", ";
-			s += p._str_rec();
+			s += p.repr();
 		}
 		return s + "]";
 	} else if (type == TYPE_HASH) {
@@ -158,7 +154,7 @@ string Any::_str_rec() const {
 		for (AnyMap::Entry &p: *as_map()) {
 			if (s.num > 1)
 				s += ", ";
-			s += "\"" + p.key + "\": " + p.value._str_rec();
+			s += p.key.repr() + ": " + p.value.repr();
 		}
 		return s + "}";
 	} else if (type == TYPE_NONE) {
@@ -171,7 +167,7 @@ string Any::_str_rec() const {
 string Any::str() const {
 	if (type == TYPE_STRING)
 		return *as_string();
-	return _str_rec();
+	return repr();
 }
 
 bool Any::_bool() const {

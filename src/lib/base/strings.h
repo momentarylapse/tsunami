@@ -45,6 +45,9 @@ class string : public Array<char> {
 	string _cdecl hex(bool inverted = false) const;
 	string _cdecl unhex() const;
 	bool _cdecl match(const string &glob) const;
+	string repr() const;
+	string escape() const;
+	string unescape() const;
 	int _cdecl utf8len() const;
 	string utf16_to_utf8() const;
 	string latin_to_utf8() const;

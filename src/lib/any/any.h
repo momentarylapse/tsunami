@@ -31,7 +31,7 @@ public:
 	void _cdecl clear();
 	void create_type(int type);
 	string _cdecl str() const;
-	string _cdecl _str_rec() const;
+	string _cdecl repr() const;
 	int _cdecl _int() const;
 	float _cdecl _float() const;
 	bool _cdecl _bool() const;

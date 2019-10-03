@@ -127,7 +127,7 @@ public:
 
 TimeScale::TimeScale(AudioView *_view) : ViewNodeRel(0, 0, 100, AudioView::TIME_SCALE_HEIGHT) {
 	align.horizontal = AlignData::Mode::FILL;
-	align.dz = 20;
+	align.dz = 120;
 	view = _view;
 
 	add_child(new PlaybackRange(this));

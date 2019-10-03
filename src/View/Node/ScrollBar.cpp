@@ -14,7 +14,7 @@ ScrollBar::ScrollBar(AudioView *_view) {
 	align.vertical = AlignData::Mode::FILL;
 	align.horizontal = AlignData::Mode::LEFT;
 	align.w = AudioView::SCROLLBAR_WIDTH;
-	align.dz = 20;
+	align.dz = 120;
 	view = _view;
 }
 ScrollBarHorizontal::ScrollBarHorizontal(AudioView *_view) : ScrollBar(_view) {

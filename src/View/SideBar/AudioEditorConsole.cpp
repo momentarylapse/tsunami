@@ -39,6 +39,8 @@ void AudioEditorConsole::on_edit_mode() {
 		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::SMOOTHEN);
 	if (n == 2)
 		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::CLONE);
+	if (n == 3)
+		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::RUBBER);
 }
 
 void AudioEditorConsole::on_edit_track() {

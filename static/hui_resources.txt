@@ -1,7 +1,7 @@
 t7
-// Number Of Resources
+# Number Of Resources
 62
-// Resource
+# Resource
 Menu
 menu_fake
 disabled
@@ -20,7 +20,7 @@ stop
 1
 0
 0
-// Resource
+# Resource
 Dialog
 audio-editor
 width=300,height=516
@@ -99,7 +99,7 @@ link
 1
 0
 0
-// Resource
+# Resource
 Dialog
 bar_add_dialog
 width=250,height=80
@@ -202,7 +202,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 bar_delete_dialog
 width=150,height=80
@@ -245,7 +245,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 bar_edit_dialog
 width=350,height=80
@@ -402,7 +402,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 configurable_dialog
 width=200,height=100
@@ -463,7 +463,7 @@ image=hui:ok
 3
 0
 0
-// Resource
+# Resource
 Dialog
 configurable-selection-dialog
 width=400,height=500
@@ -500,7 +500,7 @@ ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 curve_console
 width=380,height=516
@@ -573,7 +573,7 @@ link
 2
 0
 0
-// Resource
+# Resource
 Dialog
 curve-target-dialog
 width=300,height=400
@@ -610,7 +610,7 @@ ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 trackdest_dialog
 width=400,height=300
@@ -623,7 +623,7 @@ track_list
 0
 0
 0
-// Resource
+# Resource
 Dialog
 detune_synthesizer_dialog
 width=800,height=500
@@ -666,7 +666,7 @@ image=hui:close
 2
 0
 0
-// Resource
+# Resource
 Dialog
 device-manager
 width=400,height=200
@@ -715,7 +715,7 @@ flat,image=hui:delete
 0
 0
 0
-// Resource
+# Resource
 Dialog
 fx_editor
 width=380,height=516
@@ -776,7 +776,7 @@ link
 0
 0
 0
-// Resource
+# Resource
 Dialog
 fx_panel
 width=300,height=200
@@ -819,7 +819,7 @@ content
 1
 0
 0
-// Resource
+# Resource
 Dialog
 help-dialog
 width=400,height=300
@@ -1078,7 +1078,7 @@ close
 1
 0
 0
-// Resource
+# Resource
 Dialog
 layer_dialog
 width=430,height=375
@@ -1139,7 +1139,7 @@ link
 0
 0
 0
-// Resource
+# Resource
 Dialog
 log_console
 width=200,height=100
@@ -1158,7 +1158,7 @@ format=it,nobar
 0
 0
 0
-// Resource
+# Resource
 Toolbar
 log_toolbar
 
@@ -1177,7 +1177,7 @@ log_close
 1
 0
 0
-// Resource
+# Resource
 Dialog
 marker_dialog
 width=250,height=80
@@ -1238,7 +1238,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Menu
 menu
 
@@ -1905,7 +1905,7 @@ image=hui:about
 3
 0
 0
-// Resource
+# Resource
 Dialog
 midi_editor
 width=300,height=516
@@ -2296,7 +2296,7 @@ link
 2
 0
 0
-// Resource
+# Resource
 Dialog
 mini_bar
 width=400,height=40
@@ -2363,7 +2363,7 @@ width=100,noexpandx,noexpandy
 6
 0
 0
-// Resource
+# Resource
 Dialog
 mixing-console
 width=300,height=200
@@ -2448,7 +2448,7 @@ inner-grid
 0
 0
 0
-// Resource
+# Resource
 Dialog
 module_console
 width=300,height=200
@@ -2527,7 +2527,7 @@ link
 0
 0
 0
-// Resource
+# Resource
 Dialog
 new_dialog
 width=250,height=80
@@ -2702,7 +2702,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 pause_add_dialog
 width=250,height=80
@@ -2763,7 +2763,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 pause_edit_dialog
 width=250,height=80
@@ -2824,7 +2824,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Menu
 popup_all_menu
 
@@ -3065,7 +3065,7 @@ song_properties
 2
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-bar
 
@@ -3228,7 +3228,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-bar-gap
 
@@ -3379,7 +3379,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-buffer
 
@@ -3626,7 +3626,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-device
 
@@ -3657,7 +3657,7 @@ checkable
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup_fx_menu
 
@@ -3706,7 +3706,7 @@ image=hui:delete
 6
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-fx-list
 
@@ -3755,7 +3755,7 @@ fx-copy-from-track
 6
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-layer
 
@@ -3978,7 +3978,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-marker
 
@@ -4219,7 +4219,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-playback-range
 
@@ -4322,7 +4322,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-sample
 
@@ -4569,7 +4569,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-sample-manager
 
@@ -4642,7 +4642,7 @@ create-from-selection
 1
 0
 0
-// Resource
+# Resource
 Menu
 popup_signal_chain_menu
 
@@ -4763,7 +4763,7 @@ signal_chain_delete
 8
 0
 0
-// Resource
+# Resource
 Menu
 popup_signal_module_menu
 
@@ -4788,7 +4788,7 @@ signal_module_delete
 2
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-song
 
@@ -4855,7 +4855,7 @@ song-properties
 5
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-tag
 
@@ -4886,7 +4886,7 @@ tag-add
 3
 0
 0
-// Resource
+# Resource
 Menu
 popup-menu-track
 
@@ -5109,7 +5109,7 @@ song-properties
 3
 0
 0
-// Resource
+# Resource
 Dialog
 progress_dialog
 width=210,height=30
@@ -5122,7 +5122,7 @@ progress_bar
 0
 0
 0
-// Resource
+# Resource
 Dialog
 progress_cancelable_dialog
 width=210,height=30
@@ -5147,7 +5147,7 @@ image=hui:cancel
 1
 0
 0
-// Resource
+# Resource
 Dialog
 raw_config_dialog
 width=300,height=100
@@ -5232,7 +5232,7 @@ ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 record_dialog
 width=300,height=200
@@ -5371,7 +5371,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 sample-manager-dialog
 width=400,height=400,allow-parent
@@ -5456,7 +5456,7 @@ link
 0
 0
 0
-// Resource
+# Resource
 Dialog
 sample_ref_dialog
 width=375,height=230
@@ -5559,7 +5559,7 @@ link
 2
 0
 0
-// Resource
+# Resource
 Dialog
 sample_scale_dialog
 width=250,height=80
@@ -5692,7 +5692,7 @@ image=hui:ok
 1
 0
 0
-// Resource
+# Resource
 Dialog
 sample_selection_dialog
 width=500,height=400
@@ -5735,7 +5735,7 @@ ok
 2
 0
 0
-// Resource
+# Resource
 Dialog
 settings_dialog
 width=580,height=350
@@ -5958,7 +5958,7 @@ image=hui:close
 0
 0
 0
-// Resource
+# Resource
 Dialog
 song_dialog
 width=430,height=375
@@ -6079,7 +6079,7 @@ link
 0
 0
 0
-// Resource
+# Resource
 Dialog
 synth_console
 width=300,height=200
@@ -6140,7 +6140,7 @@ link
 1
 0
 0
-// Resource
+# Resource
 Dialog
 synth_panel
 width=200,height=200
@@ -6177,7 +6177,7 @@ bold,center,expandx
 2
 0
 0
-// Resource
+# Resource
 Toolbar
 toolbar
 
@@ -6274,7 +6274,7 @@ image=hui:media-record
 14
 0
 0
-// Resource
+# Resource
 Dialog
 track_dialog
 width=380,height=516
@@ -6455,7 +6455,7 @@ link
 4
 0
 0
-// Resource
+# Resource
 Dialog
 track-mixer
 
@@ -6504,7 +6504,7 @@ flat,height=20,expandx,padding=1
 1
 0
 0
-// Resource
+# Resource
 Dialog
 track-mixer2
 
@@ -6661,7 +6661,7 @@ width=400
 0
 0
 0
-// Resource
+# Resource
 Dialog
 track-routing-dialog
 width=100,height=50
@@ -6716,7 +6716,7 @@ close
 1
 0
 0
-// Resource
+# Resource
 Dialog
 tuning_dialog
 width=120,height=50
@@ -6753,13 +6753,13 @@ image=hui:ok
 1
 0
 0
-// Number Of Languages
+# Number Of Languages
 2
-// Language
+# Language
 English
-// Number Of IDs
+# Number Of IDs
 547
-// Text
+# Text
 /bars-add
 Add bars...
 
@@ -7046,7 +7046,7 @@ audio-editor/audio-editor
 Audio
 
 audio-editor/edit-mode
-Select\\Smoothen\\Clone
+Select\\Smoothen\\Clone\\Rubber Band
 
 audio-editor/group-edit
 Edit
@@ -8401,14 +8401,14 @@ Ziel-Spur für die Ebenen
 tuning_dialog/tuning_dialog
 Stimmung
 
-// Num Language Strings
+# Num Language Strings
 0
-// Text
-// Language
+# Text
+# Language
 Deutsch
-// Number Of IDs
+# Number Of IDs
 962
-// Text
+# Text
 /add-track-audio-mono
 Audio (mono)
 
@@ -11295,9 +11295,9 @@ Ziel-Spur für die Ebenen
 tuning_dialog/tuning_dialog
 Stimmung
 
-// Num Language Strings
+# Num Language Strings
 246
-// Text
+# Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
                   Close dialog box to exit program.

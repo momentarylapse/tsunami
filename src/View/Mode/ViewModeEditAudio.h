@@ -33,6 +33,7 @@ public:
 		REMOVE_CLICKS,
 		SMOOTHEN,
 		CLONE,
+		RUBBER,
 	};
 	void set_edit_mode(EditMode mode);
 	EditMode edit_mode;
@@ -48,6 +49,7 @@ public:
 	TrackLayer *cur_layer();
 	bool editing(AudioViewLayer *l);
 
+	void apply_rubber(bool pitch_correct);
 
 
 	void left_click_handle_void(AudioViewLayer *vlayer) override;

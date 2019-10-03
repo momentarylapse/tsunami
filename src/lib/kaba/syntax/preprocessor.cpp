@@ -15,6 +15,10 @@ void db_out(const string &s) {
 // call-by-reference dummy
 class CBR {};
 
+class vec2 { float a; float b; };
+class vec3 { float a; float b; float c; };
+class vec4 { float a; float b; float c; float d; };
+
 template<class R>
 void call0(void *ff, void *ret, const Array<void*> &param) {
 	if (std::is_same<CBR,R>::value) {
@@ -163,6 +167,11 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				call2<int64,int64,int>(ff, ret, param);
 				return true;
 			}
+		} else if (f->return_type == TypeComplex) {
+			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
+				call2<vec2,float,float>(ff, ret, param);
+				return true;
+			}
 		} else if (f->return_type->uses_return_by_memory()) {
 			if ((ptype[0] == TypeInt) and(ptype[1] == TypeInt)) {
 				call2<CBR,int,int>(ff, ret, param);
@@ -176,19 +185,31 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			}
 		}
 	} else if (ptype.num == 3) {
-		if (f->return_type->uses_return_by_memory()) {
+		if (f->return_type == TypeVector) {
+			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32)) {
+				call3<vec3,float,float,float>(ff, ret, param);
+				return true;
+			}
+		}
+		/*if (f->return_type->uses_return_by_memory()) {
 			if ((ptype[0] == TypeFloat32) and(ptype[1] == TypeFloat32) and(ptype[2] == TypeFloat32)) {
 				((void(*)(void*, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2]);
 				return true;
 			}
-		}
+		}*/
 	} else if (ptype.num == 4) {
-		if (f->return_type->uses_return_by_memory()) {
+		if (f->return_type->_amd64_allow_pass_in_xmm and (f->return_type->size == 16)) { // rect, color, plane, quaternion
+			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+				call4<vec4,float,float,float,float>(ff, ret, param);
+				return true;
+			}
+		}
+		/*if (f->return_type->uses_return_by_memory()) {
 			if ((ptype[0] == TypeFloat32) and(ptype[1] == TypeFloat32) and(ptype[2] == TypeFloat32) and(ptype[3] == TypeFloat32)) {
 				((void(*)(void*, float, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;
 			}
-		}
+		}*/
 	}
 	db_out(".... NOPE");
 	return false;
@@ -213,17 +234,11 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 
 	// parameters
 	Array<void*> p;
-	if (c->instance) {
-		if (c->instance->kind != NodeKind::CONSTANT)
+	for (int i=0;i<c->uparams.num;i++) {
+		if (c->uparams[i]->kind != NodeKind::CONSTANT)
 			return c;
-		db_out("i: " + c->instance->str());
-		p.add(c->instance->as_const()->p());
-	}
-	for (int i=0;i<c->params.num;i++) {
-		if (c->params[i]->kind != NodeKind::CONSTANT)
-			return c;
-		db_out("p: " + c->params[i]->str());
-		p.add(c->params[i]->as_const()->p());
+		db_out("p: " + c->uparams[i]->str());
+		p.add(c->uparams[i]->as_const()->p());
 	}
 	db_out("-param const");
 
@@ -238,11 +253,8 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 }
 
 bool all_params_are_const(Node *n) {
-	if (n->instance)
-		if (n->instance->kind != NodeKind::CONSTANT)
-			return false;
-	for (int i=0; i<n->params.num; i++)
-		if (n->params[i]->kind != NodeKind::CONSTANT)
+	for (int i=0; i<n->uparams.num; i++)
+		if (n->uparams[i]->kind != NodeKind::CONSTANT)
 			return false;
 	return true;
 }
@@ -312,8 +324,8 @@ Node *SyntaxTree::conv_eval_const_func(Node *c) {
 	} else if (c->kind == NodeKind::DYNAMIC_ARRAY) {
 		if (all_params_are_const(c)) {
 			Node *cr = add_node_const(add_constant(c->type));
-			DynamicArray *da = &c->params[0]->as_const()->as_array();
-			int index = c->params[1]->as_const()->as_int();
+			DynamicArray *da = &c->uparams[0]->as_const()->as_array();
+			int index = c->uparams[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)da->data + index * da->element_size, c->type);
 			return cr;
 		}
@@ -321,8 +333,8 @@ Node *SyntaxTree::conv_eval_const_func(Node *c) {
 		// hmmm, not existing, I guess....
 		if (all_params_are_const(c)) {
 			Node *cr = add_node_const(add_constant(c->type));
-			int index = c->params[1]->as_const()->as_int();
-			rec_assign(cr->as_const()->p(), (char*)c->params[0]->as_const()->p() + index * c->type->size, c->type);
+			int index = c->uparams[1]->as_const()->as_int();
+			rec_assign(cr->as_const()->p(), (char*)c->uparams[0]->as_const()->p() + index * c->type->size, c->type);
 			return cr;
 		}
 	} else if (c->kind == NodeKind::ARRAY_BUILDER) {
@@ -331,9 +343,9 @@ Node *SyntaxTree::conv_eval_const_func(Node *c) {
 			int el_size = c->type->parent->size;
 			DynamicArray *da = &c_array->as_const()->as_array();
 			da->init(el_size);
-			rec_resize(da, c->params.num, c->type);
-			for (int i=0; i<c->params.num; i++)
-				rec_assign(ar_el(da, i), c->params[i]->as_const()->p(), c->type->parent);
+			rec_resize(da, c->uparams.num, c->type);
+			for (int i=0; i<c->uparams.num; i++)
+				rec_assign(ar_el(da, i), c->uparams[i]->as_const()->p(), c->type->parent);
 			return c_array;
 		}
 	}
@@ -352,25 +364,25 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 		//	return c;
 		if ((f->inline_no != InlineID::INT64_ADD_INT) and (f->inline_no != InlineID::INT_ADD))
 			return c;
-		if (c->params[1]->kind != NodeKind::CONSTANT)
+		if (c->uparams[1]->kind != NodeKind::CONSTANT)
 			return c;
 		Array<void*> p;
-		if ((c->params[0]->kind == NodeKind::ADDRESS) or (c->params[0]->kind == NodeKind::LOCAL_ADDRESS)) {
-			p.add((void*)&c->params[0]->link_no);
+		if ((c->uparams[0]->kind == NodeKind::ADDRESS) or (c->uparams[0]->kind == NodeKind::LOCAL_ADDRESS)) {
+			p.add((void*)&c->uparams[0]->link_no);
 		} else {
 			return c;
 		}
-		p.add(c->params[1]->as_const()->p());
+		p.add(c->uparams[1]->as_const()->p());
 
 		int64 new_addr;
 		if (!call_function(f, f->address_preprocess, &new_addr, p))
 			return c;
 
-		c->params[0]->link_no = new_addr;
-		return c->params[0];
+		c->uparams[0]->link_no = new_addr;
+		return c->uparams[0];
 
 	} else if (c->kind == NodeKind::REFERENCE) {
-		Node *p0 = c->params[0];
+		Node *p0 = c->uparams[0];
 		if (p0->kind == NodeKind::VAR_GLOBAL) {
 			return new Node(NodeKind::ADDRESS, (int_p)p0->as_global_p(), c->type);
 		} else if (p0->kind == NodeKind::VAR_LOCAL) {
@@ -379,7 +391,7 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 			return new Node(NodeKind::ADDRESS, (int_p)p0->as_const_p(), c->type);
 		}
 	} else if (c->kind == NodeKind::DEREFERENCE) {
-		Node *p0 = c->params[0];
+		Node *p0 = c->uparams[0];
 		if (p0->kind == NodeKind::ADDRESS) {
 			return new Node(NodeKind::MEMORY, p0->link_no, c->type);
 		} else if (p0->kind == NodeKind::LOCAL_ADDRESS) {

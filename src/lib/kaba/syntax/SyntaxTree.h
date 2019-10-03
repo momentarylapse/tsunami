@@ -126,9 +126,9 @@ public:
 	Node *parse_operand_extension(Array<Node*> operands, Block *block);
 	Array<Node*> parse_operand_extension_element(Node *operand);
 	Node *parse_operand_extension_array(Node *operand, Block *block);
-	Node *parse_operand_extension_call(Array<Node*> operands, Block *block, bool check = true);
+	Node *parse_operand_extension_call(Array<Node*> operands, Block *block);
 	Array<Node*> make_class_node_callable(const Class *t, Block *block);
-	void make_func_node_callable(Node *l, bool check);
+	void make_func_node_callable(Node *l);
 	const Class *parse_type_extension_array(const Class *c);
 	const Class *parse_type_extension_dict(const Class *c);
 	const Class *parse_type_extension_pointer(const Class *c);

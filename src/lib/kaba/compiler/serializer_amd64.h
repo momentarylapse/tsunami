@@ -8,16 +8,15 @@ namespace Kaba
 {
 
 
-class SerializerAMD64 : public SerializerX86
-{
+class SerializerAMD64 : public SerializerX86 {
 public:
 	SerializerAMD64(Script *script, Asm::InstructionWithParamsList *list) : SerializerX86(script, list){};
 	virtual ~SerializerAMD64(){}
-	void add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
-	void add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
+	void add_function_call(Function *f, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
+	void add_virtual_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 	void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
-	int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
-	void fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) /*override*/;
+	int fc_begin(Function *f, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
+	void fc_end(int push_size, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) /*override*/;
 	void add_function_intro_params(Function *f) override;
 	void add_function_outro(Function *f) override;
 	void correct_unallowed_param_combis2(SerialNode &c) override;

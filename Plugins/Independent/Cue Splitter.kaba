@@ -6,6 +6,7 @@ use "../api.kaba"
 class Part
 	string title
 	float foffset
+	void __init__()
 
 string sanitize(string s)
 	string t = s.replace("/", " - ")
@@ -40,7 +41,7 @@ class CueSplitter extends TsunamiPlugin
 				if s.head(6) == "YEAR \""
 					year = s[6:-1]
 				if s.head(8) == "  TRACK "
-					cur = new Part
+					cur = new Part()
 					cur.foffset = 0
 					parts.add(cur)
 				if s.head(11) == "    TITLE \""

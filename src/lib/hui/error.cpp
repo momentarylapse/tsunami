@@ -20,6 +20,7 @@ namespace hui
 {
 
 extern Callback _idle_function_, _error_function_;
+extern bool _screen_opened_;
 
 void _HuiSignalHandler(int)
 {
@@ -179,8 +180,10 @@ void hui_default_error_handler()
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 
 	// dialog
-	ErrorDialog *dlg = new ErrorDialog;
-	dlg->run();
+	if (_screen_opened_) {
+		ErrorDialog *dlg = new ErrorDialog;
+		dlg->run();
+	}
 
 	//HuiEnd();
 	exit(0);

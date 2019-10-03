@@ -12,6 +12,8 @@
 namespace Kaba{
 
 string kind2str(NodeKind kind) {
+	if (kind == NodeKind::PLACEHOLDER)
+		return "placeholder";
 	if (kind == NodeKind::VAR_LOCAL)
 		return "local";
 	if (kind == NodeKind::VAR_GLOBAL)
@@ -96,6 +98,8 @@ string kind2str(NodeKind kind) {
 
 string Node::sig() const {
 	string t = type->name + " ";
+	if (kind == NodeKind::PLACEHOLDER)
+		return "";
 	if (kind == NodeKind::VAR_LOCAL)
 		return t + as_local()->name;
 	if (kind == NodeKind::VAR_GLOBAL)
@@ -107,7 +111,7 @@ string Node::sig() const {
 	if (kind == NodeKind::FUNCTION_CALL)
 		return as_func()->signature();
 	if (kind == NodeKind::POINTER_CALL)
-		return "";
+		return t + "(...)";
 	if (kind == NodeKind::INLINE_CALL)
 		return as_func()->signature();
 	if (kind == NodeKind::VIRTUAL_CALL)
@@ -160,13 +164,11 @@ void Node::show() const {
 	string orig;
 	msg_write(str() + orig);
 	msg_right();
-	if (instance)
-		instance->show();
-	for (Node *p: params)
+	for (Node *p: uparams)
 		if (p)
 			p->show();
 		else
-			msg_write("<param nil>");
+			msg_write("<-NULL->");
 	msg_left();
 }
 
@@ -195,11 +197,11 @@ inline void set_command(Node *&a, Node *b) {
 
 void Block::add(Node *c) {
 	if (c)
-		params.add(c);
+		uparams.add(c);
 }
 
 void Block::set(int index, Node *c) {
-	params[index] = c;
+	uparams[index] = c;
 }
 
 Variable *Block::add_var(const string &name, const Class *type) {
@@ -229,13 +231,10 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
-	instance = nullptr;
 }
 
 Node::~Node() {
-	if (instance)
-		delete instance;
-	for (auto &p: params)
+	for (auto &p: uparams)
 		if (p)
 			delete p;
 }
@@ -289,20 +288,23 @@ PrimitiveOperator *Node::as_prim_op() const {
 }
 
 void Node::set_instance(Node *p) {
-	set_command(instance, p);
+	if (uparams.num == 0)
+		msg_write("no inst...dfljgkldfjg");
+	set_command(uparams[0], p);
 }
 
-void Node::set_num_params(int n) {
-	params.resize(n);
+void Node::set_num_uparams(int n) {
+	uparams.resize(n);
 }
 
-void Node::set_param(int index, Node *p) {
-	/*if ((index < 0) or (index >= params.num)){
+void Node::set_uparam(int index, Node *p) {
+	/*if ((index < 0) or (index >= uparams.num)){
 		show();
 		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);
 	}*/
-	set_command(params[index], p);
+	set_command(uparams[index], p);
 }
+
 
 }
 

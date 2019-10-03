@@ -515,11 +515,11 @@ int Serializer::reg_resize(int reg, int size)
 	return get_reg(Asm::RegRoot[reg], size);
 }
 
-void Serializer::add_member_function_call(Function *cf, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+void Serializer::add_member_function_call(Function *cf, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	if (cf->virtual_index < 0) {
-		add_function_call(cf, instance, params, ret);
+		add_function_call(cf, params, ret);
 	} else {
-		add_virtual_function_call(cf->virtual_index, instance, params, ret);
+		add_virtual_function_call(cf, params, ret);
 	}
 }
 
@@ -647,14 +647,8 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 #if 1
 	if (node_is_assign_mem(com)){
 		Node *dst, *src;
-		if (com->instance){
-			// nope---
-			dst = com->instance;
-			src = com->params[0];
-		}else{
-			dst = com->params[0];
-			src = com->params[1];
-		}
+			dst = com->uparams[0];
+			src = com->uparams[1];
 		if (src->kind == NodeKind::FUNCTION_CALL or src->kind == NodeKind::INLINE_CALL){
 			if (dst->kind == NodeKind::VAR_LOCAL or dst->kind == NodeKind::VAR_GLOBAL or dst->kind == NodeKind::LOCAL_ADDRESS){
 				override_ret = dst;
@@ -677,30 +671,27 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 
 
 	Array<SerialNodeParam> params;
-	params.resize(com->params.num);
+	params.resize(com->uparams.num);
 
 	if (!ignore_params){
 
 		// compile parameters
-		for (int p=0;p<com->params.num;p++)
-			params[p] = serialize_parameter(com->params[p], block, index);
-	}
+		for (int p=0;p<com->uparams.num;p++)
+			params[p] = serialize_parameter(com->uparams[p], block, index);
 
-	// class function -> compile instance
-	SerialNodeParam instance = p_none;
-	if (com->instance){
-		instance = serialize_parameter(com->instance, block, index);
-		// super_array automatically referenced...
+		// class function -> compile instance
+		//if (com->instance)
+		//	params.insert(serialize_parameter(com->instance, block, index), 0);
 	}
 
 
 	if (com->kind == NodeKind::FUNCTION_CALL){
 
-		add_function_call(com->as_func(), instance, params, ret);
+		add_function_call(com->as_func(), params, ret);
 
 	}else if (com->kind == NodeKind::VIRTUAL_CALL){
 
-		add_member_function_call(com->as_func(), instance, params, ret);
+		add_member_function_call(com->as_func(), params, ret);
 
 	}else if (com->kind == NodeKind::INLINE_CALL){
 
@@ -731,11 +722,11 @@ void Serializer::serialize_block(Block *block)
 
 	insert_constructors_block(block);
 
-	for (int i=0;i<block->params.num;i++){
+	for (int i=0;i<block->uparams.num;i++){
 		stack_offset = cur_func->_var_size;
 
 		// serialize
-		serialize_node(block->params[i], block, i);
+		serialize_node(block->uparams[i], block, i);
 		
 		// destruct new temp vars
 		insert_destructors_temp();
@@ -772,54 +763,47 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, NodeKind modu
 		instance = add_reference(param);
 	}
 
-	add_member_function_call(f, instance, {}, p_none);
+	add_member_function_call(f, {instance}, p_none);
 }
 
-void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref)
-{
-	Array<SerialNodeParam> params;
-
-	if (needs_ref){
+void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref) {
+	if (needs_ref) {
 		Function *f = param.type->get_destructor();
 		if (!f)
 			return;
 		SerialNodeParam inst = add_reference(param);
-		add_member_function_call(f, inst, params, p_none);
-	}else{
+		add_member_function_call(f, {inst}, p_none);
+	} else {
 		Function *f = param.type->parent->get_destructor();
 		if (!f)
 			return;
-		add_member_function_call(f, param, params, p_none);
+		add_member_function_call(f, {param}, p_none);
 	}
 }
 
-void Serializer::insert_constructors_block(Block *b)
-{
-	for (auto *v: b->vars){
-		if (!v->explicitly_constructed){
+void Serializer::insert_constructors_block(Block *b) {
+	for (auto *v: b->vars) {
+		if (!v->explicitly_constructed) {
 			SerialNodeParam param = param_local(v->type, v->_offset);
 			add_cmd_constructor(param, (v->name == IDENTIFIER_RETURN_VAR) ? NodeKind::NONE : NodeKind::VAR_LOCAL);
 		}
 	}
 }
 
-void Serializer::insert_destructors_block(Block *b, bool recursive)
-{
-	for (auto *v: b->vars){
+void Serializer::insert_destructors_block(Block *b, bool recursive) {
+	for (auto *v: b->vars) {
 		SerialNodeParam p = param_local(v->type, v->_offset);
 		add_cmd_destructor(p);
 	}
 }
 
-void Serializer::insert_destructors_temp()
-{
+void Serializer::insert_destructors_temp() {
 	for (SerialNodeParam &p: inserted_temp)
 		add_cmd_destructor(p);
 	inserted_temp.clear();
 }
 
-int Serializer::temp_in_cmd(int c, int v)
-{
+int Serializer::temp_in_cmd(int c, int v) {
 	if (cmd[c].inst >= INST_MARKER)
 		return 0;
 	int r = 0;
@@ -849,8 +833,7 @@ void Serializer::scan_temp_var_usage()
 	temp_var_ranges_defined = true;*/
 }
 
-inline bool param_is_simple(SerialNodeParam &p)
-{
+inline bool param_is_simple(SerialNodeParam &p) {
 	return ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::NONE));
 }
 
@@ -909,8 +892,7 @@ int Serializer::find_unused_reg(int first, int last, int size, int exclude)
 
 // inst ... [local] ...
 // ->      mov reg, local     inst ...[reg]...
-void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
-{
+void Serializer::solve_deref_temp_local(int c, int np, bool is_local) {
 	SerialNodeParam p = cmd[c].p[np];
 	int shift = p.shift;
 
@@ -931,13 +913,14 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 
 	next_cmd_target(c);
 	add_cmd(Asm::INST_MOV, p_reg, p);
-	if (shift > 0){
+	if (shift > 0) {
 		// solve_deref_temp_local
 		next_cmd_target(c + 1);
 		add_cmd(Asm::INST_ADD, p_reg, param_imm(TypeInt, shift));
 		set_virtual_reg(reg, c, c+2);
-	}else
+	} else {
 		set_virtual_reg(reg, c, c+1);
+	}
 }
 
 #if 0
@@ -1743,8 +1726,8 @@ void Serializer::serialize_function(Function *f)
 
 	// outro (if last command != return)
 	bool need_outro = true;
-	if (f->block->params.num > 0)
-		if ((f->block->params.back()->kind == NodeKind::STATEMENT) and (f->block->params.back()->as_statement()->id == StatementID::RETURN))
+	if (f->block->uparams.num > 0)
+		if ((f->block->uparams.back()->kind == NodeKind::STATEMENT) and (f->block->uparams.back()->as_statement()->id == StatementID::RETURN))
 			need_outro = false;
 	if (need_outro)
 		add_function_outro(f);

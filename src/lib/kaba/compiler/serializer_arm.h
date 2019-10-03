@@ -8,15 +8,14 @@ namespace Kaba
 {
 
 
-class SerializerARM : public Serializer
-{
+class SerializerARM : public Serializer {
 public:
 	SerializerARM(Script *script, Asm::InstructionWithParamsList *list) : Serializer(script, list){};
 	virtual ~SerializerARM(){}
-	void add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
-	void add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
+	void add_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
+	void add_virtual_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 	void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
-	int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
+	int fc_begin(Function *f, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) override;
 	void fc_end(int push_size, const SerialNodeParam &ret) override;
 	void add_function_intro_params(Function *f) override;
 	void add_function_intro_frame(int stack_alloc_size) override;

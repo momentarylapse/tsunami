@@ -5,6 +5,7 @@
  *      Author: michi
  */
 #include "../kaba.h"
+#include "../lib/dynamic.h"
 #include "../asm/asm.h"
 #include "../../file/file.h"
 #include <stdio.h>
@@ -162,7 +163,7 @@ void Value::map_into(char *memory, char *addr) const {
 }
 
 string Value::str() const {
-	return var2str(value.data, type);
+	return var_repr(value.data, type);
 }
 
 Constant::Constant(const Class *_type, SyntaxTree *_owner) {

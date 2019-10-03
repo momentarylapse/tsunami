@@ -84,10 +84,10 @@ class MultiEchoGrid extends Grid
 		hover = -1
 		selected = -1
 		
-		menu_bg = new Menu
+		menu_bg = new Menu()
 		menu_bg.add("add reflection", "reflection-add")
 		
-		menu_point = new Menu
+		menu_point = new Menu()
 		menu_point.add("Reflection", "label")
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")

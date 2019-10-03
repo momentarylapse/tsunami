@@ -168,11 +168,11 @@ public:
 	void simplify_movs();
 	void remove_unused_temp_vars();
 
-	void add_member_function_call(Function *cf, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret);
-	virtual void add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
-	virtual void add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
+	void add_member_function_call(Function *cf, const Array<SerialNodeParam> &params, const SerialNodeParam &ret);
+	virtual void add_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
+	virtual void add_virtual_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
 	virtual void add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
-	virtual int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
+	virtual int fc_begin(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) = 0;
 	virtual void fc_end(int push_size, const SerialNodeParam &ret) = 0;
 	SerialNodeParam add_reference(const SerialNodeParam &param, const Class *force_type = nullptr);
 	SerialNodeParam add_dereference(const SerialNodeParam &param, const Class *type);

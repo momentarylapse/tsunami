@@ -8,18 +8,18 @@ const string AUTO_CONFIG_INVERT = ""
 
 const float SPEED_OF_SOUND = 320.0 # m/s
 
-class Config extends Module.Config
-	float panning
-	bool invert
-	float distance
-	
-	override void reset()
-		panning = 0 # INVERTED.... for historic reasons...
-		distance = 0
-		invert = false
-	
 
 class Monofier extends AudioEffect
+	class Config extends Module.Config
+		float panning
+		bool invert
+		float distance
+		override void reset()
+			panning = 0 # INVERTED.... for historic reasons...
+			distance = 0
+			invert = false
+	
+
 	Config config
 	float[] temp
 	int offset

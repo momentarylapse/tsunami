@@ -5,32 +5,34 @@ use "../../api.kaba"
 use "../../helper/grid.kaba"
 
 
-class Reflector
-	float delay
-	float volume
-	float feedback
 
-class MEConfig extends Module.Config
-	Reflector[] refl
-
-	override void reset()
-		refl.clear()
-		Reflector r
-		r.volume = 0.2
-		r.feedback = 0.5
-		r.delay = 0.15
-		refl.add(r)
-
-class ReflectorState
-	float[] buf_r, buf_l
-	int offset
 
 class MultiEcho extends AudioEffect
-	MEConfig config
+	class Config extends Module.Config
+		class Reflector
+			float delay
+			float volume
+			float feedback
+
+		Reflector[] refl
+
+		override void reset()
+			refl.clear()
+			Reflector r
+			r.volume = 0.2
+			r.feedback = 0.5
+			r.delay = 0.15
+			refl.add(r)
+
+	Config config
+	
+	class ReflectorState
+		float[] buf_r, buf_l
+		int offset
 	ReflectorState[] refl
 
 
-	void do_delay(float[] b, float[] d, ReflectorState rs, Reflector r)
+	void do_delay(float[] b, float[] d, ReflectorState rs, Config.Reflector r)
 		int p = rs.offset % len(d)
 		for bb in b
 	
@@ -73,8 +75,8 @@ class MultiEcho extends AudioEffect
 		return new MultiEchoPanel(&self)
 
 class MultiEchoGrid extends Grid
-	MEConfig *config
-	ConfigPanel *cp
+	MultiEcho.Config* config
+	ConfigPanel* cp
 	int hover, selected
 	Menu* menu_bg
 	Menu* menu_point
@@ -95,7 +97,7 @@ class MultiEchoGrid extends Grid
 		cp.event_o("reflection-add", &self, on_add_reflection)
 		cp.event_o("reflection-delete", &self, on_delete_reflection)
 
-	void draw_hull_curve(Painter c, Reflector r)
+	void draw_hull_curve(Painter c, MultiEcho.Config.Reflector r)
 		float v = r.volume
 		float t = r.delay
 		c.set_line_width(2)
@@ -112,7 +114,7 @@ class MultiEchoGrid extends Grid
 		c.draw_lines(cc)
 		c.set_line_dash([5.0, 0.0])
 	
-	void draw_peaks(Painter c, Reflector r)
+	void draw_peaks(Painter c, MultiEcho.Config.Reflector r)
 		float v = r.volume
 		float t = r.delay
 		int n = min(100, x_axis.val_max/r.delay)
@@ -146,7 +148,7 @@ class MultiEchoGrid extends Grid
 		if hover >= 0
 			draw_details(c, config.refl[hover])
 			
-	void draw_details(Painter p, Reflector r)
+	void draw_details(Painter p, MultiEcho.Config.Reflector r)
 		p.set_font_size(8)
 		p.set_color(colors.text_soft2)
 		float x = x_axis.project(r.delay)
@@ -182,7 +184,7 @@ class MultiEchoGrid extends Grid
 			menu_bg.popup(panel)
 	
 	void on_add_reflection()
-		Reflector r
+		MultiEcho.Config.Reflector r
 		r.delay = max(get_mouse2().x, 0.001)
 		r.volume = get_mouse2().y
 		r.feedback = 0.5

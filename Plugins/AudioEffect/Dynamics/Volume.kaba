@@ -4,19 +4,20 @@
 use "../../api.kaba"
 
 
-class Config extends Module.Config
-	float volume
-	bool maximize
-	
-	override void reset()
-		volume = 1
-		maximize = false
 
 class Volume extends AudioEffect
+	class Config extends Module.Config
+		float volume
+		bool maximize
+	
+		override void reset()
+			volume = 1
+			maximize = false
+
 	Config config
 
 	override ConfigPanel *create_panel()
-		return new VolumePanel(&self)
+		return new Volume.Panel(&self)
 
 	override void process(AudioBuffer buf)
 		float factor = config.volume
@@ -36,39 +37,39 @@ class Volume extends AudioEffect
 			for i in 0:len(buf)
 				buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
 	
-class VolumePanel extends ConfigPanel
-	override Volume *c
-	Slider *slider
-	override void __init__(Module* _v)
-		add_grid("!width=400", 0, 0, "table1")
-		set_target("table1")
-		add_check_box("Maximieren", 0, 1, "max")
-		add_grid("", 0, 0, "table2")
-		set_target("table2")
-		add_slider("!expandx", 0, 0, "volume_slider")
-		add_spin_button("\\0\\1000\\0.1", 1, 0, "volume")
-		add_label("%", 2, 0, "")
+	class Panel extends ConfigPanel
+		override Volume *c
+		Slider *slider
+		override void __init__(Module* _v)
+			add_grid("!width=400", 0, 0, "table1")
+			set_target("table1")
+			add_check_box("Maximieren", 0, 1, "max")
+			add_grid("", 0, 0, "table2")
+			set_target("table2")
+			add_slider("!expandx", 0, 0, "volume_slider")
+			add_spin_button("\\0\\1000\\0.1", 1, 0, "volume")
+			add_label("%", 2, 0, "")
 		
-		slider = new Slider(&self, "volume_slider", "volume", 0, 2, 100, on_volume, c.config.volume)
+			slider = new Slider(&self, "volume_slider", "volume", 0, 2, 100, on_volume, c.config.volume)
 	
-		event("max", on_max)
+			event("max", on_max)
 	
-	override void __delete__()
-		delete(slider)
+		override void __delete__()
+			delete(slider)
 
-	override void update()
-		slider.set(c.config.volume)
-		check("max", c.config.maximize)
-		enable("volume", !c.config.maximize)
-		enable("volume_slider", !c.config.maximize)
+		override void update()
+			slider.set(c.config.volume)
+			check("max", c.config.maximize)
+			enable("volume", !c.config.maximize)
+			enable("volume_slider", !c.config.maximize)
 
-	void on_max()
-		c.config.maximize = is_checked("max")
-		enable("volume", !c.config.maximize)
-		enable("volume_slider", !c.config.maximize)
-		changed()
+		void on_max()
+			c.config.maximize = is_checked("max")
+			enable("volume", !c.config.maximize)
+			enable("volume_slider", !c.config.maximize)
+			changed()
 
-	void on_volume()
-		c.config.volume = slider.get()
-		changed()
+		void on_volume()
+			c.config.volume = slider.get()
+			changed()
 

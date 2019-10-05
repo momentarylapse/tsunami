@@ -605,7 +605,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	AudioBuffer buf;
 	auto *a = l->edit_buffers(buf, r);
 
-	int chunk_size = 2048;
+	int chunk_size = 2048*16*4;
 	int done = 0;
 	while (done < r.length) {
 		p->set((float) done / (float) r.length);

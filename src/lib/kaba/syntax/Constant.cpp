@@ -36,7 +36,7 @@ void Value::init(const Class *_type) {
 
 	if (type->is_super_array()) {
 		value.resize(sizeof(DynamicArray));
-		as_array().init(type->parent->size);
+		as_array().init(type->param->size);
 	} else {
 		value.resize(max(type->size, (long long)16));
 	}
@@ -54,7 +54,7 @@ void Value::set(const Value &v) {
 	init(v.type);
 	if (type->is_super_array()) {
 		as_array().simple_resize(v.as_array().num);
-		memcpy(as_array().data, v.as_array().data, as_array().num * type->parent->size);
+		memcpy(as_array().data, v.as_array().data, as_array().num * type->param->size);
 
 	} else {
 		// plain old data
@@ -100,13 +100,13 @@ int map_size_complex(void *p, const Class *type) {
 	if (type->is_super_array()) {
 		int size = config.super_array_size;
 		DynamicArray *ar = (DynamicArray*)p;
-		if (type->parent->is_super_array()) {
+		if (type->param->is_super_array()) {
 			for (int i=0; i<ar->num; i++)
-				size += map_size_complex((char*)ar->data + i * ar->element_size, type->parent);
+				size += map_size_complex((char*)ar->data + i * ar->element_size, type->param);
 			return size;
 		}
 
-		return config.super_array_size + (ar->num * type->parent->size);
+		return config.super_array_size + (ar->num * type->param->size);
 	}
 	return type->size;
 }
@@ -133,10 +133,10 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 		*(int*)&memory[config.pointer_size + 4] = 0; // .reserved
 		*(int*)&memory[config.pointer_size + 8] = ar->element_size;
 
-		if (type->parent->is_super_array()) {
+		if (type->param->is_super_array()) {
 			for (int i=0; i<ar->num; i++) {
 				int el_offset = i * ar->element_size;
-				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset, type->parent);
+				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset, type->param);
 			}
 
 		} else {

@@ -5,19 +5,19 @@ use "../../api.kaba"
 const string AUTO_CONFIG_SPEED = "0:20:0.1:1:Hz"
 const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
 
-class Config extends Module.Config
-	float speed
-	float depth
-
-	override void reset()
-		depth = 0.5
-		speed = 6
 
 class Tremolo extends AudioEffect
+	class Config extends Module.Config
+		float speed
+		float depth
+
+		override void reset()
+			depth = 0.5
+			speed = 6
 
 	Config config
 
-	void doTremolo(float[] b)
+	void apply(float[] b)
 		float sample_rate = session.sample_rate()
 	
 		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
@@ -29,6 +29,6 @@ class Tremolo extends AudioEffect
 			bb *= f
 	
 	override void process(AudioBuffer buf)
-		doTremolo(buf.l)
+		apply(buf.l)
 		if buf.channels > 1
-			doTremolo(buf.r)
+			apply(buf.r)

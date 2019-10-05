@@ -61,7 +61,7 @@ namespace Kaba{
 	extern Array<Script*> _public_scripts_;
 };
 
-#define offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
+#define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager() {
 	favorites = new FavoriteManager;
@@ -74,8 +74,8 @@ PluginManager::PluginManager() {
 	Kaba::Packages.add(package);
 	Kaba::_public_scripts_.add(package);
 
-	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr);
-	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, type_dev);
+	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);
+	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, type_dev, package->syntax->base_class);
 }
 
 PluginManager::~PluginManager() {
@@ -241,8 +241,8 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("AudioBuffer.length", &AudioBuffer::length);
 	Kaba::declare_class_element("AudioBuffer.channels", &AudioBuffer::channels);
 	Kaba::declare_class_element("AudioBuffer.c", &AudioBuffer::c);
-	Kaba::_declare_class_element("AudioBuffer.l", offsetof(AudioBuffer, c[0]));
-	Kaba::_declare_class_element("AudioBuffer.r", offsetof(AudioBuffer, c[1]));
+	Kaba::_declare_class_element("AudioBuffer.l", _offsetof(AudioBuffer, c[0]));
+	Kaba::_declare_class_element("AudioBuffer.r", _offsetof(AudioBuffer, c[1]));
 	Kaba::declare_class_element("AudioBuffer.peaks", &AudioBuffer::peaks);
 	Kaba::link_external_class_func("AudioBuffer.__init__", &AudioBuffer::__init__);
 	Kaba::link_external_class_func("AudioBuffer.__delete__", &AudioBuffer::__delete__);
@@ -332,7 +332,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Synthesizer.events", &Synthesizer::events);
 	Kaba::declare_class_element("Synthesizer.keep_notes", &Synthesizer::keep_notes);
 	Kaba::declare_class_element("Synthesizer.active_pitch", &Synthesizer::active_pitch);
-	Kaba::_declare_class_element("Synthesizer.freq", offsetof(Synthesizer, tuning.freq));
+	Kaba::_declare_class_element("Synthesizer.freq", _offsetof(Synthesizer, tuning.freq));
 	Kaba::declare_class_element("Synthesizer.delta_phi", &Synthesizer::delta_phi);
 	Kaba::declare_class_element("Synthesizer.out", &Synthesizer::out);
 	Kaba::declare_class_element("Synthesizer.auto_generate_stereo", &Synthesizer::auto_generate_stereo);
@@ -647,7 +647,7 @@ void PluginManager::link_app_script_data() {
 }
 
 Kaba::Class* PluginManager::get_class(const string &name) {
-	return (Kaba::Class*)package->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr);
+	return (Kaba::Class*)package->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

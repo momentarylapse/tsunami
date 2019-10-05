@@ -277,7 +277,7 @@ void rec_init(void *p, const Class *type) {
 void rec_delete(void *p, const Class *type) {
 	if (type->is_super_array()) {
 		auto ar = (DynamicArray*)p;
-		rec_resize(ar, 0, type->parent);
+		rec_resize(ar, 0, type->param);
 		ar->simple_clear();
 	} else {
 		for (auto &el: type->elements)
@@ -286,7 +286,7 @@ void rec_delete(void *p, const Class *type) {
 }
 
 void rec_resize(DynamicArray *ar, int num, const Class *type) {
-	auto *t_el = type->parent;
+	auto *t_el = type->param;
 	int num_old = ar->num;
 
 	for (int i=num; i<num_old; i++)
@@ -304,7 +304,7 @@ void rec_assign(void *a, void *b, const Class *type) {
 		auto bb = (DynamicArray*)b;
 		rec_resize(aa, bb->num, type);
 		for (int i=0; i<bb->num; i++)
-			rec_assign(ar_el(aa, i), ar_el(bb, i), type->parent);
+			rec_assign(ar_el(aa, i), ar_el(bb, i), type->param);
 
 	} else if (type->is_simple_class()){
 		memcpy(a, b, type->size);
@@ -340,12 +340,12 @@ Node *SyntaxTree::conv_eval_const_func(Node *c) {
 	} else if (c->kind == NodeKind::ARRAY_BUILDER) {
 		if (all_params_are_const(c)) {
 			Node *c_array = add_node_const(add_constant(c->type));
-			int el_size = c->type->parent->size;
+			int el_size = c->type->param->size;
 			DynamicArray *da = &c_array->as_const()->as_array();
 			da->init(el_size);
 			rec_resize(da, c->uparams.num, c->type);
 			for (int i=0; i<c->uparams.num; i++)
-				rec_assign(ar_el(da, i), c->uparams[i]->as_const()->p(), c->type->parent);
+				rec_assign(ar_el(da, i), c->uparams[i]->as_const()->p(), c->type->param);
 			return c_array;
 		}
 	}

@@ -11,7 +11,7 @@ use "../../helper/curves.kaba"
 
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
-const int MIN_VOL = 0-55
+const int MIN_VOL = -55
 const int MAX_VOL = 35
 
 
@@ -46,7 +46,7 @@ class EqCurve extends Curve
 	float gain
 	Peak[] peaks
 	float sample_rate
-	void set(EqConfig c, float _sample_rate)
+	void set(Equalizer.Config c, float _sample_rate)
 		gain = c.gain
 		peaks = c.peaks
 		sample_rate = _sample_rate
@@ -61,21 +61,21 @@ class EqCurve extends Curve
 		return r
 
 
-class EqConfig extends Module.Config
-	float gain
-	Peak[] peaks
-
-	override void reset()
-		gain = 0
-		peaks.clear()
-		peaks.add(Peak(FILTER_HIGH_PASS, 30, -10, 2))
-		peaks.add(Peak(FILTER_LOW_PASS, 100, -10, 2))
 
 class Equalizer extends AudioEffect
+	class Config extends Module.Config
+		float gain
+		Peak[] peaks
+
+		override void reset()
+			gain = 0
+			peaks.clear()
+			peaks.add(Peak(FILTER_HIGH_PASS, 30, -10, 2))
+			peaks.add(Peak(FILTER_LOW_PASS, 100, -10, 2))
 
 	EqualizerGrid *grid
 
-	EqConfig config
+	Config config
 
 	Filter[] filter # state
 	
@@ -108,12 +108,12 @@ class Equalizer extends AudioEffect
 		return new EqualizerPanel(&self)
 
 
-const int HOVER_NONE = 0-1
-const int HOVER_GAIN = 0-2
+const int HOVER_NONE = -1
+const int HOVER_GAIN = -2
 
 class EqualizerGrid extends Grid
-	EqConfig *c
-	EqualizerPanel *cp
+	Equalizer.Config* c
+	EqualizerPanel* cp
 	float sample_rate
 	int hover, selected
 	SpectrumCurve spectrum
@@ -285,7 +285,7 @@ class EqualizerGrid extends Grid
 class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	int num_peaks
-	override Equalizer *c
+	override Equalizer* c
 	override void __init__(Module* _eq)
 		super.__init__(_eq)
 		add_grid("", 0, 0, "grid")

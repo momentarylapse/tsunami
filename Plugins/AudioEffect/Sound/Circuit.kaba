@@ -3,14 +3,11 @@
 use "../../api.kaba"
 use "circuit/circuit.kaba"
 
-class Config extends Module.Config
-	complex[] nodes
-	
-
-#class State : PluginData
-#	overwrite void reset()
 
 class CircuitEffect extends AudioEffect
+	class Config extends Module.Config
+		complex[] nodes
+
 	Config config
 	Circuit c
 	

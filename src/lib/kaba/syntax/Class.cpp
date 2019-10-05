@@ -40,7 +40,7 @@ bool type_match(const Class *given, const Class *wanted) {
 
 	// compatible pointers (of same or derived class)
 	if (given->is_pointer() and wanted->is_pointer())
-		return given->parent->is_derived_from(wanted->parent);
+		return given->param->is_derived_from(wanted->param);
 
 	return given->is_derived_from(wanted);
 }
@@ -54,13 +54,14 @@ bool _type_match(const Class *given, bool same_chunk, const Class *wanted) {
 	return type_match(given, wanted);
 }
 
-Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent) {
+Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent, const Class *_param) {
 	name = _name;
 	owner = _owner;
 	size = _size;
 	type = Type::OTHER;
 	array_length = 0;
 	parent = _parent;
+	param = _param;
 	name_space = nullptr;
 	force_call_by_value = false;
 	fully_parsed = true;
@@ -165,7 +166,7 @@ bool Class::usable_as_super_array() const {
 
 const Class *Class::get_array_element() const {
 	if (is_array() or is_super_array() or is_dict())
-		return parent;
+		return param;
 	if (is_pointer())
 		return nullptr;
 	if (parent)
@@ -179,7 +180,7 @@ bool Class::needs_constructor() const {
 	if (is_super_array() or is_dict())
 		return true;
 	if (is_array())
-		return parent->needs_constructor();
+		return param->needs_constructor();
 	if (vtable.num > 0)
 		return true;
 	if (parent)
@@ -208,7 +209,7 @@ bool Class::needs_destructor() const {
 	if (is_super_array() or is_dict())
 		return true;
 	if (is_array())
-		return parent->get_destructor();
+		return param->get_destructor();
 	if (parent) {
 		if (parent->get_destructor())
 			return true;
@@ -227,8 +228,8 @@ bool Class::needs_destructor() const {
 bool Class::is_derived_from(const Class *root) const {
 	if (this == root)
 		return true;
-	if (is_super_array() or is_array() or is_dict() or is_pointer())
-		return false;
+	/*if (is_super_array() or is_array() or is_dict() or is_pointer())
+		return false;*/  // since parent/param split
 	if (!parent)
 		return false;
 	return parent->is_derived_from(root);
@@ -237,8 +238,8 @@ bool Class::is_derived_from(const Class *root) const {
 bool Class::is_derived_from_s(const string &root) const {
 	if (name == root)
 		return true;
-	if (is_super_array() or is_array() or is_dict() or is_pointer())
-		return false;
+	/*if (is_super_array() or is_array() or is_dict() or is_pointer())
+		return false;*/
 	if (!parent)
 		return false;
 	return parent->is_derived_from_s(root);
@@ -376,7 +377,7 @@ bool class_func_match(Function *a, Function *b) {
 
 
 const Class *Class::get_pointer() const {
-	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, this);
+	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, this, name_space);
 }
 
 const Class *Class::get_root() const {
@@ -442,7 +443,10 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 }
 
 void Class::derive_from(const Class* root, bool increase_size) {
+	if (config.verbose)
+		msg_write("DERIVE  " + long_name() + " from " + root->long_name());
 	parent = const_cast<Class*>(root);
+	param = root->param;
 
 	// inheritance of elements
 	elements = parent->elements;

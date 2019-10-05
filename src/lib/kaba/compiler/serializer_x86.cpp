@@ -342,7 +342,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			Array<Node*> links = syntax_tree->get_existence("@malloc", nullptr, syntax_tree->base_class, false);
 			if (links.num == 0)
 				do_error("@malloc not found????");
-			add_function_call(links[0]->as_func(), {param_imm(TypeInt, ret.type->parent->size)}, ret);
+			add_function_call(links[0]->as_func(), {param_imm(TypeInt, ret.type->param->size)}, ret);
 			clear_nodes(links);
 
 			// __init__()

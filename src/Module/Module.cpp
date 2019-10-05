@@ -88,7 +88,7 @@ ModuleConfiguration *Module::get_config() const {
 	if (!_class)
 		return nullptr;
 	for (auto &e: _class->elements)
-		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
+		if ((e.name == "config") and (e.type->get_root()->long_name() == "Module.Config")) {
 			auto *config = (ModuleConfiguration*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;

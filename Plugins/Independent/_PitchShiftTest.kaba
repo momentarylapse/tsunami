@@ -1,0 +1,159 @@
+# Image = hui:properties
+# Title[Deutsch] = Pitch Shift
+
+use "../api.kaba"
+
+class PitchShift extends TsunamiPlugin
+
+	complex[] buf1
+	complex[] buf2
+	
+	
+	void shift_buf_bad(float[] b, float[] out, float factor)
+		fft_r2c(b, buf1)
+		float f = 1.0 / b.num
+		int N = b.num
+		int NN = buf1.num
+		buf2.resize(NN)
+		for i in 0:NN
+			buf2[i] = complex(0, 0)
+			
+		for i in 0:NN
+			float i_s = i2f(i) / factor
+			int ii_s = f2i(i_s)
+			float di_s = i_s - i2f(ii_s)
+			if ii_s < N
+				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
+
+		out.resize(N)
+		fft_c2r_inv(buf2, out)
+
+	void shift_buf(float[] b, float[] out, float factor)
+		fft_r2c(b, buf1)
+		int N = b.num
+		int NN = buf1.num
+		buf2.resize(NN)
+		for i in 0:NN
+			buf2[i] = complex(0, 0)
+
+		#print("-----")
+		for i in 0:NN
+			float kk = factor * i
+			#float x0 = pi * (N * kk)
+			int j0 = 0#max(kk - 100, 0)
+			int j1 = NN#min(kk + 100, NN)
+			#complex M0 = complex(cos(x0), sin(x0)) * sin(x0)
+			for j in j0:j1
+				float dk = kk - j
+				float x = pi * dk
+				if x == 0
+					buf2[j] += buf1[i]
+				else
+					complex M = complex(cos(x), sin(x)) * (sin(x) / x)
+					buf2[j] += M * buf1[i]
+
+
+		out.resize(N)
+		fft_c2r_inv(buf2, out)
+		out /= N
+		
+	void shift_buf_fast(float[] b, float[] out, float factor)
+		fft_r2c(b, buf1)
+		int N = b.num
+		int NN = buf1.num
+		buf2.resize(NN)
+		for i in 0:NN
+			buf2[i] = complex(0, 0)
+
+		int D = max(100, sqrt(N)*2)
+		for i in 0:NN
+			float kk = factor * i
+			float x0 = pi * kk
+			int j0 = max(kk - D, 0)
+			int j1 = min(kk + D, NN)
+			complex M0 = complex(cos(x0), sin(x0)) * sin(x0)
+			for j in j0:j1
+				float dk = kk - j
+				float x = pi * dk
+				if x == 0
+					buf2[j] += buf1[i]
+				else
+					complex M = M0 * (1/x)
+					buf2[j] += M * buf1[i]
+
+		out.resize(N)
+		fft_c2r_inv(buf2, out)
+		out /= N
+
+	override void on_start()
+		bool show_val = false
+		bool show_fft = false
+		
+		int N = 256*32
+		float k = 100
+		print("----------- orig ------------")
+		print("k={{k}}")
+		let buf = [for i in 0:N sin(2*pi*k*i / i2f(N))]
+#		print(buf)
+#		print("fft:")
+		
+		complex[] z, z2
+		fft_r2c(buf, z)
+#		print(str(map(complex.abs, z)))
+		
+		
+		print("----------- off-grid ------------")
+		float k2 = k + 0.42341
+		print("k={{k2}}")
+		let buf_off = [for i in 0:N sin(2*pi*k2*i / i2f(N))]
+		if show_val
+			print(buf_off)
+		
+		fft_r2c(buf_off, z2)
+		#print(str(map(complex.abs, z2)))
+		if show_fft
+			print(str(z2))
+		
+	#	let c = [for i in 0:N/2+1 sin(pi*(k2-i2f(i))) / (pi*(k2-i))]
+	#	#let c = [for i in 0:N/2 200 / (pi*(k-i))]
+	#	print("guess....")
+	#	print(c)
+	#	print(str([for zz,i in z2 zz.abs() * (1/c[i])]))
+		
+		float factor = k2 / k
+		print("factor {{factor}}")
+		float[] out
+		
+		
+		print("----------- shift bad ------------")
+		shift_buf_bad(buf, out, factor)
+		print("diff:  {{(out-buf_off).sum2()}}")
+		print("diff spec:  {{(z2-buf2).sum2()}}")
+		if show_val
+			print(str(out))
+		if show_fft
+			print(str(buf2))
+		#print(str(map(complex.abs, buf2)))
+		
+		print("----------- shift good ------------")
+		shift_buf(buf, out, factor)
+		print("diff:  {{(out-buf_off).sum2()}}")
+		print("diff spec:  {{(z2-buf2).sum2()}}")
+		if show_val
+			print(str(out))
+		if show_fft
+			print(str(buf2))
+		#print(str(map(complex.abs, buf2)))
+		
+		print("----------- shift fast ------------")
+		shift_buf_fast(buf, out, factor)
+		print("diff:  {{(out-buf_off).sum2()}}")
+		print("diff spec:  {{(z2-buf2).sum2()}}")
+		if show_val
+			print(str(out))
+		if show_fft
+			print(str(buf2))
+		#print(str(map(complex.abs, buf2)))
+		
+		#stop()
+

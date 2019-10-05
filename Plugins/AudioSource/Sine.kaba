@@ -4,14 +4,15 @@ use "../helper/tone.kaba"
 const string AUTO_CONFIG_PITCH = "" #"0:10000:0.1:1:Hz"
 const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
-class Config extends Module.Config
-	float pitch
-	float volume
-	override void reset()
-		pitch = 64
-		volume = 0.8
 
 class SineSource extends AudioSource
+	class Config extends Module.Config
+		float pitch
+		float volume
+		override void reset()
+			pitch = 64
+			volume = 0.8
+
 	Config config
 	int offset
 	override void reset_state()

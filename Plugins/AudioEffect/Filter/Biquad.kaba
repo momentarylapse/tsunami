@@ -9,36 +9,35 @@ use "../../helper/curves.kaba"
 
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
-const int MIN_VOL = 0-55
+const int MIN_VOL = -55
 const int MAX_VOL = 35
 
 
 
-class BiConfig extends Module.Config
-	float a1, a2
-	float b0, b1, b2
-
-	override void reset()
-		a1 = 0
-		a2 = 0
-		b0 = 1
-		b1 = 0
-		b2 = 0
-	
-	void create_filter(Filter f, float sample_rate)
-		f.l.f.sample_rate = sample_rate
-		f.l.f.a[1] = a1
-		f.l.f.a[2] = a2
-		f.l.f.b[0] = b0
-		f.l.f.b[1] = b1
-		f.l.f.b[2] = b2
-		#f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
-
 class Biquad extends AudioEffect
+	class Config extends Module.Config
+		float a1, a2
+		float b0, b1, b2
+
+		override void reset()
+			a1 = 0
+			a2 = 0
+			b0 = 1
+			b1 = 0
+			b2 = 0
+
+		void create_filter(Filter f, float sample_rate)
+			f.l.f.sample_rate = sample_rate
+			f.l.f.a[1] = a1
+			f.l.f.a[2] = a2
+			f.l.f.b[0] = b0
+			f.l.f.b[1] = b1
+			f.l.f.b[2] = b2
+			#f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
+
+	Config config
 
 	BiquadGrid *grid
-
-	BiConfig config
 
 	Filter filter # state
 	
@@ -59,8 +58,8 @@ class Biquad extends AudioEffect
 
 
 class BiquadGrid extends Grid
-	BiConfig *c
-	BiquadPanel *cp
+	Biquad.Config* c
+	BiquadPanel* cp
 	float sample_rate
 	SpectrumCurve spectrum
 	
@@ -88,7 +87,7 @@ class BiquadGrid extends Grid
 
 class BiquadPanel extends ConfigPanel
 	BiquadGrid grid
-	override Biquad *c
+	override Biquad* c
 	override void __init__(Module* _biquad)
 		super.__init__(_biquad)
 		from_source("

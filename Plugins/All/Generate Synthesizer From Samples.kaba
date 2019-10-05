@@ -39,7 +39,7 @@ class XXX extends SongPlugin
 		Sample* t = song.add_sample("new", *source.origin.buf)
 		
 		PitchShift* ps = CreateAudioEffect(session, "Pitch Shift")
-		ps.config.pitch = pow(2, (to - from)/12.0)
+		ps.config.factor = pow(2, (to - from)/12.0)
 		ps.process(*t.buf)
 		
 		synth.config.samples[to] = t.create_ref()

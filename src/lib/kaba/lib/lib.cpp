@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.9.0";
+string LibVersion = "0.17.10.0";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -207,16 +207,15 @@ const Class *add_type(const string &name, int size, ScriptFlag flag) {
 }
 
 const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag) {
-	Class *t = new Class(name, config.pointer_size, cur_package->syntax);
+	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, sub_type);
 	t->type = Class::Type::POINTER;
 	if ((flag & FLAG_SILENT) > 0)
 		t->type = Class::Type::POINTER_SILENT;
-	t->parent = sub_type;
 	__add_class__(t);
 	return t;
 }
 const Class *add_type_a(const string &name, const Class *sub_type, int array_length) {
-	Class *t = new Class(name, 0, cur_package->syntax, sub_type);
+	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
 	if (array_length < 0) {
 		// super array
 		t->size = config.super_array_size;
@@ -233,7 +232,7 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 }
 
 const Class *add_type_d(const string &name, const Class *sub_type) {
-	Class *t = new Class(name, config.super_array_size, cur_package->syntax, sub_type);
+	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, sub_type);
 	t->type = Class::Type::DICT;
 	script_make_dict(t);
 	__add_class__(t);
@@ -535,9 +534,9 @@ void func_add_param(const string &name, const Class *type) {
 
 void script_make_super_array(Class *t, SyntaxTree *ps)
 {
-	const Class *parent = t->parent;
+	const Class *p = t->param;
 	t->derive_from(TypeDynamicArray, false);
-	t->parent = parent;
+	t->param = p;
 	add_class(t);
 
 	Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
@@ -545,42 +544,42 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	sub->return_type = t;
 
 	// FIXME  wrong for complicated classes
-	if (t->parent->is_simple_class()){
-		if (!t->parent->uses_call_by_reference()){
-			if (t->parent->is_pointer()){
+	if (p->is_simple_class()){
+		if (!p->uses_call_by_reference()){
+			if (p->is_pointer()){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<void*>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_p_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_p_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 					func_add_param("index", TypeInt);
-			}else if (t->parent == TypeFloat32){
+			}else if (p == TypeFloat32){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<float>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_f_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_f_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 					func_add_param("index", TypeInt);
-			}else if (t->parent == TypeFloat64){
+			}else if (p == TypeFloat64){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<double>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_d_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_d_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 					func_add_param("index", TypeInt);
-			}else if (t->parent->size == 4){
+			}else if (p->size == 4){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<int>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_4_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_4_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 					func_add_param("index", TypeInt);
-			}else if (t->parent->size == 1){
+			}else if (p->size == 1){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<char>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_1_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_1_single);
-					func_add_param("x", t->parent);
+					func_add_param("x", p);
 					func_add_param("index", TypeInt);
 			}else{
 				msg_error("evil class:  " + t->name);
@@ -588,9 +587,9 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 		}else{
 			// __init__ must be defined manually...!
 			class_add_funcx("add", TypeVoid, &DynamicArray::append_single);
-				func_add_param("x", t->parent);
+				func_add_param("x", p);
 			class_add_funcx("insert", TypeVoid, &DynamicArray::insert_single);
-				func_add_param("x", t->parent);
+				func_add_param("x", p);
 				func_add_param("index", TypeInt);
 		}
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &DynamicArray::simple_clear);
@@ -601,7 +600,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 			func_add_param("index", TypeInt);
 		class_add_funcx("resize", TypeVoid, &DynamicArray::simple_resize);
 			func_add_param("num", TypeInt);
-	}else if (t->parent == TypeString){
+	}else if (p == TypeString){
 		// handled manually later...
 	}else{
 		msg_error("evil class:  " + t->name);

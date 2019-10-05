@@ -29,7 +29,7 @@ typedef void *VirtualTable;
 class Class {
 public:
 	//Class();
-	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr);
+	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr, const Class *param = nullptr);
 	~Class();
 	string name;
 	string long_name() const;
@@ -58,7 +58,8 @@ public:
 	Array<Variable*> static_variables;
 	Array<Constant*> constants;
 	Array<const Class*> classes;
-	const Class *parent;
+	const Class *parent; // derived from
+	const Class *param; // for pointers/arrays etc
 	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...
 	int _logical_line_no;

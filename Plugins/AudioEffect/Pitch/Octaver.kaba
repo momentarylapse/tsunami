@@ -4,13 +4,12 @@ use "../../api.kaba"
 
 const string AUTO_CONFIG_LEVEL = "0:1:0.1:100:%"
 
-class Config extends Module.Config
-	float level
-
-	override void reset()
-		level = 0.5
 
 class Octaver extends AudioEffect
+	class Config extends Module.Config
+		float level
+		override void reset()
+			level = 0.5
 	Config config
 
 	void do_octaver(float[] b)

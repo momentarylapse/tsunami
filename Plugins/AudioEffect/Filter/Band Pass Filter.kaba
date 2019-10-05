@@ -4,12 +4,13 @@ use "../../api.kaba"
 
 const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
 
-class Config extends Module.Config
-	float frequency
-	override void reset()
-		frequency = 1000
 
 class LowPassFilter extends AudioEffect
+	class Config extends Module.Config
+		float frequency
+		override void reset()
+			frequency = 1000
+
 	Config config
 	
 	

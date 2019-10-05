@@ -82,10 +82,11 @@ SerialNodeParam Serializer::add_temp(const Class *t, bool add_constructor)
 	return param;
 }
 
+// unpointer...?
 inline const Class *get_subtype(const Class *t)
 {
-	if (t->parent)
-		return t->parent;
+	if (t->param)
+		return t->param;
 	msg_error("subtype wanted of... " + t->name);
 	//msg_write(cur_func->Name);
 	return TypeUnknown;
@@ -749,7 +750,7 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, NodeKind modu
 {
 	const Class *class_type = param.type;
 	if (modus == NodeKind::NONE)
-		class_type = class_type->parent;
+		class_type = class_type->param;
 	Function *f = class_type->get_default_constructor();
 	if (!f) {
 		if (class_type->needs_constructor())
@@ -774,7 +775,7 @@ void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref
 		SerialNodeParam inst = add_reference(param);
 		add_member_function_call(f, {inst}, p_none);
 	} else {
-		Function *f = param.type->parent->get_destructor();
+		Function *f = param.type->param->get_destructor();
 		if (!f)
 			return;
 		add_member_function_call(f, {param}, p_none);

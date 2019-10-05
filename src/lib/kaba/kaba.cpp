@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.9.0";
+string Version = "0.17.10.0";
 
 //#define ScriptDebug
 
@@ -316,7 +316,8 @@ void ExecuteSingleScriptCommand(const string &cmd)
 		cmd->set_uparam(0, n);
 		func->block->uparams[0] = cmd;
 	}
-	ps->auto_implement_functions(ps->base_class);
+	for (auto *c: ps->owned_classes)
+		ps->auto_implement_functions(c);
 	//ps->show("aaaa");
 
 // compile

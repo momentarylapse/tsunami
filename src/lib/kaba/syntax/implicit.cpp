@@ -37,22 +37,22 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 	Node *n_self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
 	if (t->is_super_array()) {
-		Node *n_el_size = add_node_const(add_constant_int(t->parent->size));
+		Node *n_el_size = add_node_const(add_constant_int(t->param->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
 		n_mem_init->set_uparam(1, n_el_size);
 		f->block->add(n_mem_init);
 	}else if (t->is_dict()) {
-		Node *n_el_size = add_node_const(add_constant_int(t->parent->size + TypeString->size));
+		Node *n_el_size = add_node_const(add_constant_int(t->param->size + TypeString->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
 		n_mem_init->set_uparam(1, n_el_size);
 		f->block->add(n_mem_init);
 	}else if (t->is_array()) {
-		auto *pc_el_init = t->parent->get_default_constructor();
-		if (t->parent->needs_constructor() and !pc_el_init)
-			do_error_implicit(f, format("missing default constructor for %s", t->parent->long_name().c_str()));
+		auto *pc_el_init = t->param->get_default_constructor();
+		if (t->param->needs_constructor() and !pc_el_init)
+			do_error_implicit(f, format("missing default constructor for %s", t->param->long_name().c_str()));
 		if (pc_el_init) {
 			for (int i=0; i<t->array_length; i++) {
-				Node *n_el = shift_node(cp_node(n_self), false, t->parent->size * i, t->parent);
+				Node *n_el = shift_node(cp_node(n_self), false, t->param->size * i, t->param);
 				Node *n_init_el = add_node_member_call(pc_el_init, n_el);
 				f->block->add(n_init_el);
 			}
@@ -100,15 +100,15 @@ void SyntaxTree::auto_implement_destructor(Function *f, const Class *t) {
 			do_error_implicit(f, "clear() missing");
 		f->block->add(add_node_member_call(f_clear, n_self));
 	} else if (t->is_array()) {
-		auto *pc_el_init = t->parent->get_destructor();
+		auto *pc_el_init = t->param->get_destructor();
 		if (pc_el_init) {
 			for (int i=0; i<t->array_length; i++){
-				Node *p = shift_node(cp_node(n_self), false, t->parent->size * i, t->parent);
+				Node *p = shift_node(cp_node(n_self), false, t->param->size * i, t->param);
 				Node *c = add_node_member_call(pc_el_init, p);
 				f->block->add(c);
 			}
-		} else if (t->parent->needs_destructor()) {
-			do_error_implicit(f, "parent desctructor missing");
+		} else if (t->param->needs_destructor()) {
+			do_error_implicit(f, "element desctructor missing");
 		}
 		delete n_self;
 	} else {
@@ -150,7 +150,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 		if (t->is_super_array()) {
 			Function *f_resize = t->get_func("resize", TypeVoid, {TypeInt});
 			if (!f_resize)
-				do_error_implicit(f, format("no %s.resize(int) found", t->name.c_str()));
+				do_error_implicit(f, format("no %s.resize(int) found", t->long_name().c_str()));
 
 			// self.resize(other.num)
 			Node *n_other_num = shift_node(n_other, false, config.pointer_size, TypeInt);
@@ -178,7 +178,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 
 		Node *n_assign = link_operator_id(OperatorID::ASSIGN, deref_node(add_node_local(v_el)), n_other_el);
 		if (!n_assign)
-			do_error_implicit(f, format("no %s.__assign__() found", t->parent->name.c_str()));
+			do_error_implicit(f, format("no %s.__assign__() found", t->param->long_name().c_str()));
 		b->add(n_assign);
 
 		Node *n_for = add_node_statement(StatementID::FOR_ARRAY);
@@ -213,7 +213,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 
 			Node *n_assign = link_operator_id(OperatorID::ASSIGN, p, o);
 			if (!n_assign)
-				do_error_implicit(f, format("no %s.__assign__ for element \"%s\"", e.type->name.c_str(), e.name.c_str()));
+				do_error_implicit(f, format("no %s.__assign__ for element \"%s\"", e.type->long_name().c_str(), e.name.c_str()));
 			f->block->add(n_assign);
 		}
 
@@ -229,7 +229,7 @@ void SyntaxTree::auto_implement_array_clear(Function *f, const Class *t) {
 	Node *self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
 // delete...
-	Function *f_del = t->parent->get_destructor();
+	Function *f_del = t->param->get_destructor();
 	if (f_del) {
 
 		auto *var_i = f->block->add_var("i", TypeInt);
@@ -248,7 +248,7 @@ void SyntaxTree::auto_implement_array_clear(Function *f, const Class *t) {
 		cmd_for->set_uparam(3, b);
 
 		f->block->add(cmd_for);
-	} else if (t->parent->needs_destructor()) {
+	} else if (t->param->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
 
@@ -276,7 +276,7 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 	f->block->add(add_node_operator_by_inline(num_old, self_num, InlineID::INT_ASSIGN));
 
 // delete...
-	Function *f_del = t->parent->get_destructor();
+	Function *f_del = t->param->get_destructor();
 	if (f_del) {
 
 		Block *b = new Block(f, f->block);
@@ -297,7 +297,7 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 		cmd_for->set_uparam(4, b);
 		f->block->add(cmd_for);
 
-	} else if (t->parent->needs_destructor()) {
+	} else if (t->param->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
 
@@ -307,7 +307,7 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 	f->block->add(c_resize);
 
 	// new...
-	Function *f_init = t->parent->get_default_constructor();
+	Function *f_init = t->param->get_default_constructor();
 	if (f_init) {
 
 		Block *b = new Block(f, f->block);
@@ -328,7 +328,7 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 		cmd_for->set_uparam(4, b);
 		f->block->add(cmd_for);
 
-	} else if (t->parent->needs_constructor()) {
+	} else if (t->param->needs_constructor()) {
 		do_error_implicit(f, "element default constructor missing");
 	}
 }
@@ -342,7 +342,7 @@ void SyntaxTree::auto_implement_array_remove(Function *f, const Class *t) {
 	Node *self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
 	// delete...
-	Function *f_del = t->parent->get_destructor();
+	Function *f_del = t->param->get_destructor();
 	if (f_del) {
 
 		// el := self[index]
@@ -351,7 +351,7 @@ void SyntaxTree::auto_implement_array_remove(Function *f, const Class *t) {
 		// __delete__
 		Node *cmd_delete = add_node_member_call(f_del, cmd_el);
 		f->block->uparams.add(cmd_delete);
-	} else if (t->parent->needs_destructor()) {
+	} else if (t->param->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
 
@@ -386,7 +386,7 @@ void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
 
 	Node *cmd_assign = link_operator_id(OperatorID::ASSIGN, cmd_el, item);
 	if (!cmd_assign)
-		do_error_implicit(f, format("no %s.%s for elements", t->parent->name.c_str(), IDENTIFIER_FUNC_ASSIGN.c_str()));
+		do_error_implicit(f, format("no %s.%s for elements", t->param->long_name().c_str(), IDENTIFIER_FUNC_ASSIGN.c_str()));
 	b->add(cmd_assign);
 }
 
@@ -428,7 +428,7 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
 		add_func_header(this, t, "clear", TypeVoid, {}, {});
 		add_func_header(this, t, "resize", TypeVoid, {TypeInt}, {"num"});
-		add_func_header(this, t, "add", TypeVoid, {t->parent}, {"x"});
+		add_func_header(this, t, "add", TypeVoid, {t->param}, {"x"});
 		add_func_header(this, t, "remove", TypeVoid, {TypeInt}, {"index"});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	} else if (t->is_array()) {
@@ -441,8 +441,8 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
 		add_func_header(this, t, "clear", TypeVoid, {}, {});
-		add_func_header(this, t, "add", TypeVoid, {TypeString, t->parent}, {"key", "x"});
-		add_func_header(this, t, "__get__", t->parent, {TypeString}, {"key"});
+		add_func_header(this, t, "add", TypeVoid, {TypeString, t->param}, {"key", "x"});
+		add_func_header(this, t, "__get__", t->param, {TypeString}, {"key"});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	} else if (!t->is_simple_class()) {
 		if (t->parent) {
@@ -543,8 +543,8 @@ void SyntaxTree::auto_implement_functions(const Class *t) {
 	}
 
 	// recursion
-	for (auto *c: sub_classes)
-		auto_implement_functions(c);
+	//for (auto *c: sub_classes)
+	//	auto_implement_functions(c);
 }
 
 

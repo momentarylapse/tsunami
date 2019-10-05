@@ -107,7 +107,7 @@ void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 	} else if (type == TypeBoolList) {
 		array.append_1_single(*(char*)p);
 	} else {
-		auto *f = type->get_func("add", TypeVoid, {type->parent});
+		auto *f = type->get_func("add", TypeVoid, {type->param});
 		if (!f)
 			kaba_raise_exception(new KabaException("can not add to array type " + type->long_name()));
 		typedef void func_t(void*, const void*);
@@ -119,7 +119,7 @@ void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, const string &by) {
 	if (!type->is_super_array())
 		kaba_raise_exception(new KabaException("type '" + type->name + "' is not an array"));
-	const Class *el = type->parent;
+	const Class *el = type->param;
 	if (array.element_size != el->size)
 		kaba_raise_exception(new KabaException("element type size mismatch..."));
 
@@ -130,7 +130,7 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 	const Class *rel = el;
 
 	if (el->is_pointer())
-		rel = el->parent;
+		rel = el->param;
 
 	int offset = -1;
 	const Class *by_type = nullptr;
@@ -215,7 +215,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		for (int i=0; i<da->num; i++) {
 			if (i > 0)
 				s += ", ";
-			s += var_repr(((char*)da->data) + i * da->element_size, type->parent);
+			s += var_repr(((char*)da->data) + i * da->element_size, type->param);
 		}
 		return "[" + s + "]";
 	} else if (type->is_dict()) {
@@ -226,7 +226,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 				s += ", ";
 			s += var_repr(((char*)da->data) + i * da->element_size, TypeString);
 			s += ": ";
-			s += var_repr(((char*)da->data) + i * da->element_size + sizeof(string), type->parent);
+			s += var_repr(((char*)da->data) + i * da->element_size + sizeof(string), type->param);
 		}
 		return "{" + s + "}";
 	} else if (type->elements.num > 0) {
@@ -245,7 +245,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		for (int i=0; i<type->array_length; i++) {
 			if (i > 0)
 				s += ", ";
-			s += var_repr(((char*)p) + i * type->parent->size, type->parent);
+			s += var_repr(((char*)p) + i * type->param->size, type->param);
 		}
 		return "[" + s + "]";
 	}

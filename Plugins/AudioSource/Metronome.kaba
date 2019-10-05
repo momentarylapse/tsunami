@@ -4,19 +4,20 @@
 use "../api.kaba"
 use "../MidiSource/Metronome.kaba"
 
-class MetroConfig extends Module.Config
-	float beats_per_minute
-	float volume
-	int beats_per_measure
-	override void reset()
-		volume = 0.3
-		beats_per_minute = 90
-		beats_per_measure = 4
 
 
 
 class Metronome extends AudioSource
-	MetroConfig config
+	class Config extends Module.Config
+		float beats_per_minute
+		float volume
+		int beats_per_measure
+		override void reset()
+			volume = 0.3
+			beats_per_minute = 90
+			beats_per_measure = 4
+
+	Config config
 	Synthesizer *synth
 	MetronomeSource *source
 	

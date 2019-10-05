@@ -4,31 +4,28 @@ use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
 
-const float MIN_DB = 0.0 - 60.0
-
-class CompressorConfig extends Module.Config
-	complex[] curve
-	float attack, release
-
-	void fill_inter(FloatInterpolator fi)
-		fi.set_type("lerp")
-		fi.add(curve[0].y, 0)
-		for i in 1:curve.num
-			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
-		fi.normalize()
-
-	override void reset()
-		curve.clear()
-		curve.add(complex(MIN_DB, MIN_DB))
-		curve.add(complex(0, 0))
-		attack = 0.01
-		release = 0.1
-		#MouseOver = -1
-		#Selected = -1
+const float MIN_DB = -60.0
 
 
 class Compressor extends AudioEffect
-	CompressorConfig config
+	class Config extends Module.Config
+		complex[] curve
+		float attack, release
+
+		void fill_inter(FloatInterpolator fi)
+			fi.set_type("lerp")
+			fi.add(curve[0].y, 0)
+			for i in 1:curve.num
+				fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
+			fi.normalize()
+
+		override void reset()
+			curve.clear()
+			curve.add(complex(MIN_DB, MIN_DB))
+			curve.add(complex(0, 0))
+			attack = 0.01
+			release = 0.1
+	Config config
 	
 	
 	float gain_r, gain_l
@@ -93,8 +90,8 @@ class Compressor extends AudioEffect
 
 class CompressorGrid extends Grid
 	int hover, selected
-	CompressorConfig *config
-	ConfigPanel *cp
+	Compressor.Config* config
+	ConfigPanel* cp
 
 	override void on_draw(Painter p)
 		FloatInterpolator fi

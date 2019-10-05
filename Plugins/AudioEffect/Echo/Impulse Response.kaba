@@ -35,17 +35,17 @@ void test()
 	fold(x, h, HH, result)
 	print(result)
 
-class Config extends Module.Config
-	SampleRef* sample
-	override void __init__()
-		sample = nil
-	override void reset()
-		if sample
-			delete sample
-		sample = nil
-
 
 class Folding extends AudioEffect
+	class Config extends Module.Config
+		SampleRef* sample
+		override void __init__()
+			sample = nil
+		override void reset()
+			if sample
+				delete sample
+			sample = nil
+
 	Config config
 
 	float[] h

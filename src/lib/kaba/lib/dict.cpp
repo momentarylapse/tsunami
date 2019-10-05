@@ -51,12 +51,12 @@ public:
 #pragma GCC pop_options
 
 void script_make_dict(Class *t, SyntaxTree *ps) {
-	const Class *parent = t->parent;
+	const Class *p = t->param;
 	t->derive_from(TypeDictBase, false);
-	t->parent = parent;
+	t->param = p;
 	add_class(t);
 
-	if (t->parent->is_simple_class()) {
+	if (p->is_simple_class()) {
 		// elements don't need a destructor
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,int>::clear);
 		class_add_funcx("clear", TypeVoid, &Map<string,int>::clear);
@@ -64,28 +64,28 @@ void script_make_dict(Class *t, SyntaxTree *ps) {
 			func_add_param("other", t);
 	}
 
-	if (t->parent == TypeInt) {
+	if (p == TypeInt) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,int>::__init__);
 		class_add_funcx("set", TypeVoid, &IntDict::set_int);
 			func_add_param("key", TypeString);
-			func_add_param("x", t->parent);
-		class_add_funcx("__get__", t->parent, &IntDict::get_int, FLAG_RAISES_EXCEPTIONS);
+			func_add_param("x", p);
+		class_add_funcx("__get__", p, &IntDict::get_int, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx("str", TypeString, &IntDict::str);
-	} else if (t->parent == TypeFloat32) {
+	} else if (p == TypeFloat32) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,float>::__init__);
 		class_add_funcx("set", TypeVoid, &FloatDict::set_float);
 			func_add_param("key", TypeString);
-			func_add_param("x", t->parent);
-		class_add_funcx("__get__", t->parent, &FloatDict::get_float, FLAG_RAISES_EXCEPTIONS);
+			func_add_param("x", p);
+		class_add_funcx("__get__", p, &FloatDict::get_float, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx("str", TypeString, &FloatDict::str);
-	} else if (t->parent == TypeString) {
+	} else if (p == TypeString) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,string>::__init__);
 		class_add_funcx("set", TypeVoid, &Map<string,string>::set);
 			func_add_param("key", TypeString);
-			func_add_param("x", t->parent);
-		class_add_funcx("__get__", t->parent, &StringDict::get_string, FLAG_RAISES_EXCEPTIONS);
+			func_add_param("x", p);
+		class_add_funcx("__get__", p, &StringDict::get_string, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,string>::clear);
 		class_add_funcx("clear", TypeVoid, &Map<string,string>::clear);

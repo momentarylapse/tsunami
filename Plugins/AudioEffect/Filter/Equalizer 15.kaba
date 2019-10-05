@@ -10,7 +10,7 @@ const int NUM_BANDS = 15
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
 
-class Config extends PluginData
+class Config extends Module.Config
 	float[NUM_BANDS] factor
 
 	override void reset()

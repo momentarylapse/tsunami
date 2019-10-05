@@ -683,7 +683,7 @@ void SIAddPackageImage();
 void SIAddPackageSound();
 void SIAddPackageX();
 
-void Init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
+void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	Asm::init(instruction_set);
 	config.instruction_set = Asm::instruction_set.set;
 	if (abi == Abi::NATIVE){
@@ -784,16 +784,14 @@ void Init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 #endif
 }
 
-void ResetExternalLinkData()
-{
+void reset_external_data() {
 	ExternalLinks.clear();
 	ClassOffsets.clear();
 	ClassSizes.clear();
 }
 
 // program variables - specific to the surrounding program, can't always be there...
-void LinkExternal(const string &name, void *pointer)
-{
+void link_external(const string &name, void *pointer) {
 	ExternalLinkData l;
 	l.name = name;
 	l.pointer = pointer;
@@ -803,7 +801,7 @@ void LinkExternal(const string &name, void *pointer)
 	string sname = names[0].replace("@list", "[]").replace("@@", ".");
 	for (auto *p: Packages)
 		foreachi(Function *f, p->syntax->functions, i)
-			if (f->long_name() == sname){
+			if (f->long_name() == sname) {
 				if (names.num > 0)
 					if (f->num_params != names[1]._int())
 						continue;
@@ -811,84 +809,81 @@ void LinkExternal(const string &name, void *pointer)
 			}
 }
 
-void *GetExternalLink(const string &name)
-{
+void *get_external_link(const string &name) {
 	for (ExternalLinkData &l: ExternalLinks)
 		if (l.name == name)
 			return l.pointer;
 	return nullptr;
 }
 
-void DeclareClassSize(const string &class_name, int size)
-{
+void declare_class_size(const string &class_name, int size) {
 	ClassSizeData d;
 	d.class_name = class_name;
 	d.size = size;
 	ClassSizes.add(d);
 }
 
-void DeclareClassOffset(const string &class_name, const string &element, int offset)
-{
+void split_namespace(const string &name, string &class_name, string &element) {
+	int p = name.rfind(".");
+	class_name = name.substr(0, p);
+	element = name.tail(name.num - p - 1);
+}
+
+void _declare_class_element(const string &name, int offset) {
 	ClassOffsetData d;
-	d.class_name = class_name;
-	d.element = element;
+	split_namespace(name, d.class_name, d.element);
 	d.offset = offset;
 	d.is_virtual = false;
 	ClassOffsets.add(d);
 }
 
-void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance)
-{
+void _link_external_virtual(const string &name, void *p, void *instance) {
 #ifdef OS_WINDOWS
 	return;
 #endif
 	VirtualTable *v = *(VirtualTable**)instance;
 
+
 	ClassOffsetData d;
-	d.class_name = class_name;
-	d.element = func;
-	d.offset = get_virtual_index(p, class_name, func);
+	split_namespace(name, d.class_name, d.element);
+	d.offset = get_virtual_index(p, d.class_name, d.element);
 	d.is_virtual = true;
 	ClassOffsets.add(d);
 
-	LinkExternal(class_name + "." + func, v[d.offset]);
+	link_external(name, v[d.offset]);
 }
 
-int process_class_offset(const string &class_name, const string &element, int offset)
-{
+int process_class_offset(const string &class_name, const string &element, int offset) {
 	for (ClassOffsetData &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.element == element))
 			return d.offset;
 	return offset;
 }
-int ProcessClassSize(const string &class_name, int size)
-{
+
+int process_class_size(const string &class_name, int size) {
 	for (ClassSizeData &d: ClassSizes)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
 }
 
-int ProcessClassNumVirtuals(const string &class_name, int num_virtual)
-{
+int process_class_num_virtuals(const string &class_name, int num_virtual) {
 	for (ClassOffsetData &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.is_virtual))
 			num_virtual = max(num_virtual, d.offset + 1);
 	return num_virtual;
 }
 
-void End()
-{
+void clean_up() {
 	DeleteAllScripts(true, true);
 
 	Packages.clear();
 
-	ResetExternalLinkData();
+	reset_external_data();
 }
 
 
-bool CompilerConfiguration::allow_output_func(const Function *f)
-{
+bool CompilerConfiguration::allow_output_func(const Function *f) {
 	if (!verbose)
 		return false;
 	if (!f)
@@ -900,8 +895,7 @@ bool CompilerConfiguration::allow_output_func(const Function *f)
 	return false;
 }
 
-bool CompilerConfiguration::allow_output_stage(const string &stage)
-{
+bool CompilerConfiguration::allow_output_stage(const string &stage) {
 	if (!verbose)
 		return false;
 	Array<string> filters = verbose_stage_filter.explode(",");
@@ -911,8 +905,7 @@ bool CompilerConfiguration::allow_output_stage(const string &stage)
 	return false;
 }
 
-bool CompilerConfiguration::allow_output(const Function *f, const string &stage)
-{
+bool CompilerConfiguration::allow_output(const Function *f, const string &stage) {
 	if (!verbose)
 		return false;
 	if (!allow_output_func(f))

@@ -2,7 +2,7 @@ use "../api.kaba"
 
 const string AUTO_CONFIG_DELAY = "-2:2:1:1000:ms"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float delay
 	
 	override void reset()

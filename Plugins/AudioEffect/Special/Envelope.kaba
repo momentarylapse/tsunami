@@ -4,7 +4,7 @@ const string AUTO_CONFIG_A = "0:1:0.0001:1:"
 const string AUTO_CONFIG_B = "0:1:0.0001:1:"
 const string AUTO_CONFIG_C = "0:1:0.0001:1:"
 
-class EnvConfig extends PluginData
+class EnvConfig extends Module.Config
 	float a, b, c
 	override void reset()
 		a = 0.1

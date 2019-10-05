@@ -4,7 +4,7 @@ const string AUTO_CONFIG_BPM = "1:360:1:1:/min"
 const string AUTO_CONFIG_BEATS = "1:20"
 const string AUTO_CONFIG_SUB_BEATS = "1:20"
 
-class Config extends PluginData
+class Config extends Module.Config
 	
 	# rhythm
 	float bpm

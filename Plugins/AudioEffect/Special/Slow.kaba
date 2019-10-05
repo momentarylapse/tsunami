@@ -2,7 +2,7 @@ use "../../api.kaba"
 
 const string AutoConfigSpeed = "0.01:1:0.1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float speed
 	override void reset()
 		speed = 0.5

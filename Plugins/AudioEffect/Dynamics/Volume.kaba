@@ -4,7 +4,7 @@
 use "../../api.kaba"
 
 
-class Config extends PluginData
+class Config extends Module.Config
 	float volume
 	bool maximize
 	

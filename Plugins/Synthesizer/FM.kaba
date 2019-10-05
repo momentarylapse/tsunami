@@ -48,7 +48,7 @@ class OscillatorConfig
 class OscillatorLink
 	int source, dest
 
-class FMConfig extends PluginData
+class FMConfig extends Module.Config
 	OscillatorConfig[NUM_OSCILLATORS] osc
 	#OscillatorLink[] link
 	override void reset()

@@ -5,7 +5,7 @@ const string AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
 const string AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"
 const string AUTO_CONFIG_MIX = "0:1:1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float attack
 	float sustain
 	float mix

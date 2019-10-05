@@ -5,7 +5,7 @@ use "../../api.kaba"
 
 const string AutoConfigPitch = "0:2:0.1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float pitch
 
 	override void reset()

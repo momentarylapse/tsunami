@@ -2,7 +2,7 @@ use "../api.kaba"
 use "../helper/tone.kaba"
 
 
-class SampleConfig extends PluginData
+class SampleConfig extends Module.Config
 	SampleRef*[] samples
 	override void __delete__()
 		reset()

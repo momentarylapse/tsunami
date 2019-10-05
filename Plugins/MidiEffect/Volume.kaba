@@ -2,7 +2,7 @@ use "../api.kaba"
 
 const string AUTO_CONFIG_VOLUME = "0:1:1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float volume
 	
 	override void reset()

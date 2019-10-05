@@ -4,7 +4,7 @@
 use "../api.kaba"
 use "../MidiSource/Metronome.kaba"
 
-class MetroConfig extends PluginData
+class MetroConfig extends Module.Config
 	float beats_per_minute
 	float volume
 	int beats_per_measure

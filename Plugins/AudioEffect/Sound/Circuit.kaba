@@ -3,7 +3,7 @@
 use "../../api.kaba"
 use "circuit/circuit.kaba"
 
-class Config extends PluginData
+class Config extends Module.Config
 	complex[] nodes
 	
 

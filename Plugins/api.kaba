@@ -85,13 +85,6 @@ class MidiNoteBuffer extends MidiNote*[]
 	extern MidiEvent[] get_events(Range r)
 	extern Range get_range()
 
-class PluginData
-	extern void __init__()
-	extern virtual void __delete__()
-	extern virtual void reset()
-	extern virtual string to_string()
-	extern virtual void from_string(string s, Session* session)
-	extern virtual string auto_conf(string name)
 
 class ConfigPanel extends Panel
 	extern void __init__(Module* c)
@@ -101,29 +94,6 @@ class ConfigPanel extends Panel
 	extern void changed()
 	Module *c
 
-enum
-	COMMAND_START
-	COMMAND_STOP
-	COMMAND_PREPARE_START
-	COMMAND_ACCUMULATION_START
-	COMMAND_ACCUMULATION_STOP
-	COMMAND_ACCUMULATION_CLEAR
-	COMMAND_ACCUMULATION_GET_SIZE
-	COMMAND_SUCK
-
-enum
-	MODULE_AUDIO_SOURCE
-	MODULE_AUDIO_EFFECT
-	MODULE_MIDI_SOURCE
-	MODULE_MIDI_EFFECT
-	MODULE_SYNTHESIZER
-	MODULE_BEAT_SOURCE
-	MODULE_AUDIO_VISUALIZER
-	MODULE_STREAM
-	MODULE_PITCH_DETECTOR
-	MODULE_PLUMBING
-	MODULE_SIGNAL_CHAIN
-
 class Module
 	string name
 	Session* session
@@ -131,35 +101,75 @@ class Module
 	extern virtual void __delete__()
 	extern void reset_config()
 	extern virtual void reset_state()
-	extern virtual ConfigPanel *create_panel()
 	extern void changed()
-	extern virtual void on_config()
-	extern virtual PluginData* get_config()
-	extern string config_to_string()
-	extern void config_from_string(string s)
 	extern virtual int command(int cmd, int param)
 	extern void plug_in(int in_port, Module* source, int out_port)
 	extern void unplug_in(int in_port)
 	extern void subscribe(void* handler, Function* f, string message)
 	extern void unsubscribe(void* handler)
 	extern Module* copy()
+	
+	class Port
+		extern void __init__()
+		extern virtual void __delete__()
+		extern virtual int read_audio(AudioBuffer buf)
+		extern virtual int read_midi(MidiEventBuffer midi)
+		extern virtual int read_beats(Beat[] beats, int samples)
+		
+	class Config
+		extern void __init__()
+		extern virtual void __delete__()
+		extern virtual void reset()
+		extern virtual string to_string()
+		extern virtual void from_string(string s, Session* session)
+		extern virtual string auto_conf(string name)
+
+	extern virtual ConfigPanel *create_panel()
+	extern virtual void on_config()
+	extern virtual Module.Config* get_config()
+	extern string config_to_string()
+	extern void config_from_string(string s)
+
+
+	enum
+		COMMAND_START
+		COMMAND_STOP
+		COMMAND_PREPARE_START
+		COMMAND_ACCUMULATION_START
+		COMMAND_ACCUMULATION_STOP
+		COMMAND_ACCUMULATION_CLEAR
+		COMMAND_ACCUMULATION_GET_SIZE
+		COMMAND_SUCK
+
+	enum
+		AUDIO_SOURCE
+		AUDIO_EFFECT
+		MIDI_SOURCE
+		MIDI_EFFECT
+		SYNTHESIZER
+		BEAT_SOURCE
+		AUDIO_VISUALIZER
+		STREAM
+		PITCH_DETECTOR
+		PLUMBING
+		SIGNAL_CHAIN
 
 class AudioEffect extends Module
-	Port *out
-	Port *source
+	Module.Port *out
+	Module.Port *source
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
 	extern virtual int read(AudioBuffer buf)
 
 class MidiEffect extends Module
-	Port *out
+	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)
 
 class AudioVisualizer extends Module
-	Port *out
+	Module.Port *out
 	int chunk_size
 	extern void __init__()
 	extern override void __delete__()
@@ -210,18 +220,12 @@ class RingBuffer
 
 
 # general "interface"
-class Port
-	extern void __init__()
-	extern virtual void __delete__()
-	extern virtual int read_audio(AudioBuffer buf)
-	extern virtual int read_midi(MidiEventBuffer midi)
-	extern virtual int read_beats(Beat[] beats, int samples)
 
 class AudioSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
-	Port *out
+	Module.Port *out
 
 class MidiSource extends Module
 	extern void __init__()
@@ -259,7 +263,7 @@ class Synthesizer extends Module
 	int[] active_pitch
 	bool auto_generate_stereo
 	MidiEventBuffer events
-	Port *out
+	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
@@ -525,7 +529,7 @@ class AudioInput extends Module
 class Storage
 	extern bool load(Song *s, string filename)
 	extern bool save(Song *s, string filename)
-	extern bool save_via_renderer(Port *source, string filename, int num_samples, Tag[] tags)
+	extern bool save_via_renderer(Module.Port *source, string filename, int num_samples, Tag[] tags)
 	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 

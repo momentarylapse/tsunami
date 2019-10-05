@@ -4,7 +4,7 @@ const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 const string AUTO_CONFIG_TYPE = "uniform|gauss"
 
 
-class NoiseConfig extends PluginData
+class NoiseConfig extends Module.Config
 	float volume
 	string type
 	override void reset()

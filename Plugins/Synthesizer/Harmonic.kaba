@@ -6,7 +6,7 @@ use "../helper/grid.kaba"
 const int NUM_HARMONICS = 10
 
 
-class HarmonicConfig extends PluginData
+class HarmonicConfig extends Module.Config
 	float[NUM_HARMONICS] intensity
 	float release
 	override void reset()

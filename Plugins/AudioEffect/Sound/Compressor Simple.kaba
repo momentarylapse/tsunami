@@ -12,7 +12,7 @@ const string AUTO_CONFIG_RELEASE = "0:1:1:1000:ms"
 const string AUTO_CONFIG_SOFTNESS = "0:1:0.1:100:%"
 const string AUTO_CONFIG_UPWARD = ""
 
-class CompressorConfig extends PluginData
+class CompressorConfig extends Module.Config
 	float threshold
 	float ratio
 	float attack, release

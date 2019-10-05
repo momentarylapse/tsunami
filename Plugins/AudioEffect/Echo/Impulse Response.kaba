@@ -35,7 +35,7 @@ void test()
 	fold(x, h, HH, result)
 	print(result)
 
-class Config extends PluginData
+class Config extends Module.Config
 	SampleRef* sample
 	override void __init__()
 		sample = nil

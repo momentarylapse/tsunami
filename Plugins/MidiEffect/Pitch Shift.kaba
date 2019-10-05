@@ -2,7 +2,7 @@ use "../api.kaba"
 
 const string AUTO_CONFIG_SHIFT = "-50:50:1:1:"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float shift
 	
 	override void reset()

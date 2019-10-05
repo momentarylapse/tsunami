@@ -14,7 +14,7 @@ const int MAX_VOL = 35
 
 
 
-class Config extends PluginData
+class BiConfig extends Module.Config
 	float a1, a2
 	float b0, b1, b2
 
@@ -38,7 +38,7 @@ class Biquad extends AudioEffect
 
 	BiquadGrid *grid
 
-	Config config
+	BiConfig config
 
 	Filter filter # state
 	
@@ -59,7 +59,7 @@ class Biquad extends AudioEffect
 
 
 class BiquadGrid extends Grid
-	Config *c
+	BiConfig *c
 	BiquadPanel *cp
 	float sample_rate
 	SpectrumCurve spectrum

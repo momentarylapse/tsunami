@@ -10,7 +10,7 @@ class Reflector
 	float volume
 	float feedback
 
-class Config extends PluginData
+class MEConfig extends Module.Config
 	Reflector[] refl
 
 	override void reset()
@@ -26,7 +26,7 @@ class ReflectorState
 	int offset
 
 class MultiEcho extends AudioEffect
-	Config config
+	MEConfig config
 	ReflectorState[] refl
 
 
@@ -73,7 +73,7 @@ class MultiEcho extends AudioEffect
 		return new MultiEchoPanel(&self)
 
 class MultiEchoGrid extends Grid
-	Config *config
+	MEConfig *config
 	ConfigPanel *cp
 	int hover, selected
 	Menu* menu_bg

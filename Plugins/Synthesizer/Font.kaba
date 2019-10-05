@@ -61,7 +61,7 @@ class FontList
 
 FontList font_list
 
-class FontConfig extends PluginData
+class FontConfig extends Module.Config
 	string name
 	override void reset()
 		name = ""

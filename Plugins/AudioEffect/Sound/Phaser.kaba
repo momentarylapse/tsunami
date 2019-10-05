@@ -7,7 +7,7 @@ const string AUTO_CONFIG_LFO = "0:5:0.1:1:Hz"
 const string AUTO_CONFIG_Q = "0:20:0.1:1:"
 const string AUTO_CONFIG_MIX = "0:1:1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float f_min
 	float f_max
 	float lfo

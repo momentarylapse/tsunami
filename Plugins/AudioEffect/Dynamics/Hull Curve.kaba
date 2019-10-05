@@ -9,7 +9,7 @@ use "../../helper/grid.kaba"
 const int MIN_VOL = 0-55
 const int MAX_VOL = 35
 
-class Config extends PluginData
+class HullConfig extends Module.Config
 	complex[] curve
 
 	void fill_inter(FloatInterpolator fi)
@@ -29,7 +29,7 @@ class Config extends PluginData
 
 class HullCurve extends AudioEffect
 
-	Config config
+	HullConfig config
 
 	void hull(float[] b)
 	
@@ -51,7 +51,7 @@ class HullCurve extends AudioEffect
 		return new HullCurvePanel(&self)
 
 class HullGrid extends Grid
-	Config *config
+	HullConfig *config
 	ConfigPanel *cp
 	int hover, selected
 

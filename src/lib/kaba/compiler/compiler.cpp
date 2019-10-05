@@ -88,7 +88,7 @@ static int64 _opcode_rand_state_ = 10000;
 
 void* get_nice_random_addr()
 {
-	int64 p = ((int_p)&Init) & 0xfffffffffffff000;
+	int64 p = ((int_p)&init) & 0xfffffffffffff000;
 	_opcode_rand_state_ = (_opcode_rand_state_ * 1664525 + 1013904223);
 	p += (int64)(_opcode_rand_state_ & 0x3fff) * 4096;
 	return (void*)p;
@@ -212,7 +212,7 @@ void Script::update_constant_locations() {
 void Script::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	for (Variable *v: name_space->static_variables) {
 		if (v->is_extern) {
-			v->memory = GetExternalLink(v->name);
+			v->memory = get_external_link(v->name);
 			if (!v->memory)
 				do_error_link("external variable " + v->name + " was not linked");
 		} else {
@@ -502,7 +502,7 @@ void parse_magic_linker_string(SyntaxTree *s)
 				if (x[0] == '\t'){
 					if (d and x.find(":")){
 						auto y = x.substr(1, -1).explode(":");
-						LinkExternal(y[0], d->get_symbol(y[1], s->script));
+						link_external(y[0], d->get_symbol(y[1], s->script));
 					}
 				}else{
 					d = get_dynamic_lib(x, s->script);

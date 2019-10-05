@@ -2234,7 +2234,7 @@ void SyntaxTree::parse_class(Class *_namespace) {
 	for (auto &e: _class->elements)
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
-	_class->size = ProcessClassSize(_class->name, _offset);
+	_class->size = process_class_size(_class->name, _offset);
 
 
 	add_missing_function_headers_for_class(_class);

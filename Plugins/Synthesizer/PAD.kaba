@@ -6,7 +6,7 @@ use "../helper/grid.kaba"
 const int N = 4096*16
 
 
-class PADConfig extends PluginData
+class PADConfig extends Module.Config
 	float[] A
 	float bw
 	float bwscale

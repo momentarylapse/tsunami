@@ -4,7 +4,7 @@ use "../../api.kaba"
 
 const string AUTO_CONFIG_GAIN = "0:1:0.1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float gain
 	override void reset()
 		gain = 0.1

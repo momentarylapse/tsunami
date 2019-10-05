@@ -46,7 +46,7 @@ class EqCurve extends Curve
 	float gain
 	Peak[] peaks
 	float sample_rate
-	void set(Config c, float _sample_rate)
+	void set(EqConfig c, float _sample_rate)
 		gain = c.gain
 		peaks = c.peaks
 		sample_rate = _sample_rate
@@ -61,7 +61,7 @@ class EqCurve extends Curve
 		return r
 
 
-class Config extends PluginData
+class EqConfig extends Module.Config
 	float gain
 	Peak[] peaks
 
@@ -75,7 +75,7 @@ class Equalizer extends AudioEffect
 
 	EqualizerGrid *grid
 
-	Config config
+	EqConfig config
 
 	Filter[] filter # state
 	
@@ -112,7 +112,7 @@ const int HOVER_NONE = 0-1
 const int HOVER_GAIN = 0-2
 
 class EqualizerGrid extends Grid
-	Config *c
+	EqConfig *c
 	EqualizerPanel *cp
 	float sample_rate
 	int hover, selected

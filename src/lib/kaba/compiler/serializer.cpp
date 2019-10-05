@@ -2069,9 +2069,9 @@ void Script::compile_functions(char *oc, int &ocs)
 	int func_no = 0;
 	for (Function *f: syntax->functions)
 		if (f->is_extern){
-			f->address = GetExternalLink(f->long_name() + ":" + i2s(f->num_params));
+			f->address = get_external_link(f->long_name() + ":" + i2s(f->num_params));
 			if (!f->address)
-				f->address = GetExternalLink(f->long_name());
+				f->address = get_external_link(f->long_name());
 			if (!f->address)
 				do_error_link("external function " + f->long_name() + " not linkable");
 		}else{

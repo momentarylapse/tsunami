@@ -6,7 +6,7 @@ use "../../helper/filter.kaba"
 const string AUTO_CONFIG_Z = "0:100:0.1:1:"
 const string AUTO_CONFIG_PHI = "0:6.3:0.1:1:"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float z, phi
 	override void reset()
 		z = 1

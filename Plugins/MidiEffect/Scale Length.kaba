@@ -2,7 +2,7 @@ use "../api.kaba"
 
 const string AUTO_CONFIG_SCALE = "0:2:1:100:%"
 
-class Config extends PluginData
+class Config extends Module.Config
 	float scale
 	
 	override void reset()

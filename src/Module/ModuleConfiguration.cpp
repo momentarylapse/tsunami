@@ -47,24 +47,26 @@ string var_to_string(const Kaba::Class *c, char *v) {
 	} else if (c == Kaba::TypeString) {
 		r += "\"" + str_escape(*(string*)v) + "\"";
 	} else if (c->is_array()) {
+		auto tel = c->get_array_element();
 		r += "[";
 		for (int i=0; i<c->array_length; i++){
 			if (i > 0)
 				r += " ";
-			r += var_to_string(c->parent, &v[i * c->parent->size]);
+			r += var_to_string(tel, &v[i * tel->size]);
 		}
 		r += "]";
 	} else if (c->is_super_array()) {
-		DynamicArray *a = (DynamicArray*)v;
+		auto a = (DynamicArray*)v;
+		auto tel = c->get_array_element();
 		r += "[";
 		for (int i=0; i<a->num; i++){
 			if (i > 0)
 				r += " ";
-			r += var_to_string(c->parent, &(((char*)a->data)[i * c->parent->size]));
+			r += var_to_string(tel, &(((char*)a->data)[i * tel->size]));
 		}
 		r += "]";
 	} else if (c->name == "SampleRef*") {
-		SampleRef *sr = *(SampleRef**)v;
+		auto sr = *(SampleRef**)v;
 		if (sr)
 			r += i2s(sr->origin->get_index());
 		else
@@ -117,16 +119,18 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 	} else if (type == Kaba::TypeString) {
 		*(string*)v = get_next(s, pos);
 	} else if (type->is_array()) {
+		auto tel = type->get_array_element();
 		pos ++; // '['
 		for (int i=0;i<type->array_length;i++) {
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(type->parent, &v[i * type->parent->size], s, pos, session);
+			var_from_string(tel, &v[i * tel->size], s, pos, session);
 		}
 		pos ++; // ']'
 	} else if (type->is_super_array()) {
 		pos ++; // '['
 		DynamicArray *a = (DynamicArray*)v;
+		auto tel = type->get_array_element();
 		a->simple_clear(); // todo...
 		while (true) {
 			if ((s[pos] == ']') or (pos >= s.num))
@@ -134,7 +138,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 			if (a->num > 0)
 				pos ++; // ' '
 			a->simple_resize(a->num + 1);
-			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos, session);
+			var_from_string(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
 		}
 		pos ++; // ']'
 	} else if (type->name == "SampleRef*") {

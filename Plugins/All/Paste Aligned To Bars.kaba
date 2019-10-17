@@ -41,7 +41,7 @@ class XXX extends SongPlugin
 				paste_bar(source, dest, b.range(), song.bars[b0+i].range())
 	
 	int remap(Range rs, Range rd, int x)
-		return rd.offset + i2f(x - rs.offset) * i2f(rd.length) / i2f(rs.length)
+		return rd.offset + float(x - rs.offset) * float(rd.length) / float(rs.length)
 	
 	void paste_bar(TrackLayer* source, TrackLayer* dest, Range rs, Range rd)
 		print("paste bar..." + str(rs) + " -> " + str(rd))

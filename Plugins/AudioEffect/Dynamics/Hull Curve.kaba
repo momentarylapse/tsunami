@@ -37,7 +37,7 @@ class HullCurve extends AudioEffect
 	
 		# hull curve
 		for i in 1:b.num
-			float param = i2f(i) / b.num
+			float param = float(i) / b.num
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 

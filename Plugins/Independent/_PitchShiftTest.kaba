@@ -19,9 +19,9 @@ class PitchShift extends TsunamiPlugin
 			buf2[i] = complex(0, 0)
 			
 		for i in 0:NN
-			float i_s = i2f(i) / factor
-			int ii_s = f2i(i_s)
-			float di_s = i_s - i2f(ii_s)
+			float i_s = float(i) / factor
+			int ii_s = int(i_s)
+			float di_s = i_s - float(ii_s)
 			if ii_s < N
 				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
 
@@ -93,7 +93,7 @@ class PitchShift extends TsunamiPlugin
 		float k = 100
 		print("----------- orig ------------")
 		print("k={{k}}")
-		let buf = [for i in 0:N sin(2*pi*k*i / i2f(N))]
+		let buf = [for i in 0:N sin(2*pi*k*i / float(N))]
 #		print(buf)
 #		print("fft:")
 		
@@ -105,7 +105,7 @@ class PitchShift extends TsunamiPlugin
 		print("----------- off-grid ------------")
 		float k2 = k + 0.42341
 		print("k={{k2}}")
-		let buf_off = [for i in 0:N sin(2*pi*k2*i / i2f(N))]
+		let buf_off = [for i in 0:N sin(2*pi*k2*i / float(N))]
 		if show_val
 			print(buf_off)
 		

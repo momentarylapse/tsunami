@@ -56,7 +56,7 @@ Grid ? ''
 		AudioView* view = plugin.session.view
 		
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(view.sel.range().offset / i2f(song.sample_rate), view.sel.range().end() / i2f(song.sample_rate), false, "s")
+		grid.x_axis.set(view.sel.range().offset / float(song.sample_rate), view.sel.range().end() / float(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		#grid.allow_bg = false
 	
@@ -101,7 +101,7 @@ class ShowSpectrogram extends SongPlugin
 			for j in 0:N
 				sub[j] = buf.r[offset + j]
 			fft_r2c(sub, f)
-			float ww = i2f(N) / song.sample_rate
+			float ww = float(N) / song.sample_rate
 			for i in 0:NF
 				# frequency slice
 				float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)

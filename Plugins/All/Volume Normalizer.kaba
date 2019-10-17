@@ -26,7 +26,7 @@ class VolumeChecker extends SongPlugin
 			float _min = min(buf.r.min(), buf.l.min())
 			vol_max = max(vol_max, max(abs(_max), abs(_min)))
 			done += n
-			p.set("checking", i2f(done) / i2f(range.length))
+			p.set("checking", float(done) / float(range.length))
 
 		bool cancelled = p.is_cancelled()
 

@@ -196,22 +196,24 @@ string _cdecl var_repr(const void *p, const Class *type) {
 	} else if (type == TypeBool) {
 		return b2s(*(bool*)p);
 	} else if (type == TypeClass) {
-		return ((Class*)p)->name;
-	} else if (type == TypeClassP) {
-		return class_repr(*(Class**)p);
-	} else if (type == TypeFunctionP) {
-		return func_repr(*(Function**)p);
+		return class_repr((Class*)p);
+	} else if (type == TypeFunction) {
+		return func_repr((Function*)p);
 	} else if (type == TypeAny) {
 		return ((Any*)p)->repr();
 	} else if (type->is_pointer()) {
-		return p2s(*(void**)p);
+		auto *pp = *(void**)p;
+		// auto deref?
+		if (pp and (type->param != TypeVoid))
+			return var_repr(pp, type->param);
+		return p2s(pp);
 	} else if (type == TypeString) {
 		return ((string*)p)->repr();
 	} else if (type == TypeCString) {
 		return string((char*)p).repr();
 	} else if (type->is_super_array()) {
 		string s;
-		DynamicArray *da = (DynamicArray*)p;
+		auto *da = reinterpret_cast<const DynamicArray*>(p);
 		for (int i=0; i<da->num; i++) {
 			if (i > 0)
 				s += ", ";
@@ -220,7 +222,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		return "[" + s + "]";
 	} else if (type->is_dict()) {
 		string s;
-		DynamicArray *da = (DynamicArray*)p;
+		auto *da = reinterpret_cast<const DynamicArray*>(p);
 		for (int i=0; i<da->num; i++) {
 			if (i > 0)
 				s += ", ";
@@ -258,7 +260,7 @@ string _cdecl var2str(const void *p, const Class *type) {
 	if (type == TypeCString)
 		return string((char*)p);
 	if (type == TypeAny)
-		return ((Any*)p)->str();
+		return reinterpret_cast<const Any*>(p)->str();
 	return var_repr(p, type);
 }
 
@@ -284,7 +286,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 	}
 	if (type->is_super_array()) {
 		Any a;
-		auto *ar = (DynamicArray*)var;
+		auto *ar = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<ar->num; i++)
 			a.add(kaba_dyn((char*)ar->data + ar->element_size * i, t_el));

@@ -5,6 +5,9 @@ use "../../api.kaba"
 
 const string AutoConfigFactor = "0:2:0.1:100:%"
 
+const int CHUNK_SIZE = 1024
+const int OVERLAP = 512
+
 
 class PitchShift extends AudioEffect
 	class Config extends Module.Config
@@ -14,26 +17,26 @@ class PitchShift extends AudioEffect
 			factor = 1
 
 	Config config
-
-	complex[] buf1
-	complex[] buf2
+	
+	AudioBuffer[2] prev_chunk
+	int prev_no
+	
+	override void reset_state()
+		prev_chunk[0].clear()
+		prev_chunk[1].clear()
+		prev_no = 0
 		
 	void shift_buf(float[] b, float factor)
+		complex[] buf1, buf2
 		fft_r2c(b, buf1)
 		int N = b.num
 		int NN = buf1.num
 		buf2.resize(NN)
 		for i in 0:NN
 			buf2[i] = complex(0, 0)
-			
-		int i0 = 10.0 / (session.sample_rate() / 2) * NN
-		print("{{i0}} / {{NN}}")
-		
-		for i in 0:i0
-			buf2[i] += buf1[i]
 
 		int D = max(100, sqrt(N)*2)
-		for i in i0:NN
+		for i in 0:NN
 			float kk = factor * i
 			float x0 = pi * kk
 			int j0 = max(kk - D, 0)
@@ -51,10 +54,26 @@ class PitchShift extends AudioEffect
 		fft_c2r_inv(buf2, b)
 		b /= N
 
-	override void process(AudioBuffer buf)
+	void process_chunk(AudioBuffer buf)
 		shift_buf(buf.l, config.factor)
 		if buf.channels > 1
 			shift_buf(buf.r, config.factor)
-		buf1.clear()
-		buf2.clear()
+			
+		int other = 1 - prev_no
+			
+		prev_chunk[prev_no] = buf
+		int n = min(OVERLAP, len(prev_chunk[other]))
+		print("{{len(buf)}}  {{n}}")
+		for i in 0:n
+			float t = float(i) / n
+			buf.l[i] = t * buf.l[i] + (1-t) * prev_chunk[other].l[i]
+			buf.r[i] = t * buf.r[i] + (1-t) * prev_chunk[other].r[i]
+		
+		prev_no = other
+		
+
+	override void process(AudioBuffer buf)
+		for offset in 0:len(buf):CHUNK_SIZE
+			int end = min(offset + CHUNK_SIZE, len(buf))
+			process_chunk(buf[offset:end])
 

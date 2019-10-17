@@ -62,8 +62,8 @@ class MetronomeSource extends BeatSource
 
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= samples
-		float fraction_sub_beat = 1 - i2f(offset_sub_beat) / i2f(samples_sub_beat)
-		fraction_beat = (i2f(cur_sub_beat()) + fraction_sub_beat) / i2f(config.sub_beats)
+		float fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
+		fraction_beat = (float(cur_sub_beat()) + fraction_sub_beat) / float(config.sub_beats)
 		
 		return samples
 	

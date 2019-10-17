@@ -145,7 +145,7 @@ void SIAddPackageHui()
 			class_add_func("set_decimals", TypeVoid, mf(&hui::Panel::set_decimals));
 				func_add_param("decimals", TypeInt);
 			class_add_func("activate", TypeVoid, mf(&hui::Panel::activate));
-				func_add_param("id", TypeInt);
+				func_add_param("id", TypeString);
 			class_add_func("is_active", TypeVoid, mf(&hui::Panel::is_active));
 				func_add_param("id", TypeString);
 			class_add_func("from_source", TypeVoid, mf(&hui::Panel::from_source));

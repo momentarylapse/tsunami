@@ -44,7 +44,7 @@ class Equalizer15 extends AudioEffect
 		fft_r2c(b, f)
 
 		# equalize
-		float w = i2f(b.num) / sample_rate
+		float w = float(b.num) / sample_rate
 		for i in 0:NUM_BANDS
 			int j0 = clamp(FreqMin[i] * w, 0, len2)
 			int j1 = clamp(FreqMax[i] * w, 0, len2)

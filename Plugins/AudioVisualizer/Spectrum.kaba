@@ -38,7 +38,7 @@ class SpecGrid extends Grid
 		pr.resize(ffr.num)
 		pl.resize(ffl.num)
 		for i in 0:len(ffr)
-			float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
+			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
 			if type == TYPE_LINEAR
@@ -97,7 +97,7 @@ class Spectrum extends AudioVisualizer
 		ffl.clear()
 		ffr.clear()
 	
-		float ww = i2f(len(buf)) / session.sample_rate()
+		float ww = float(len(buf)) / session.sample_rate()
 		for i in 0:N
 			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))

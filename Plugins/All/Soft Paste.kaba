@@ -14,9 +14,9 @@ class ShowSpectrum extends SongPlugin
 		for i in 0:l
 			float x = 1
 			if i < ll
-				x = step(i2f(i) / ll)
+				x = step(float(i) / ll)
 			if i > l - ll
-				x = step(i2f(l - i) / ll)
+				x = step(float(l - i) / ll)
 			buf.l[i] = x * source.l[i] + (1-x) * buf.l[i]
 			buf.r[i] = x * source.r[i] + (1-x) * buf.r[i]
 		dest.edit_buffers_finish(a)

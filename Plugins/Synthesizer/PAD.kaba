@@ -57,7 +57,7 @@ class PADRenderer extends PitchRenderer
 			float bwi = bwHz / (2.0 * sample_rate)
 			float fi = freq * n / sample_rate
 			for i in 0:amp.num
-				amp[i] += gauss((i2f(i) / N) - fi, bwi) * a
+				amp[i] += gauss((float(i) / N) - fi, bwi) * a
 		
 		for i in 0:c.num
 			float phi = rand(2 * pi)

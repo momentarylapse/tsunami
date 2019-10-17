@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.10.0";
+string LibVersion = "0.17.10.1";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -616,7 +616,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	TypeCast c;
 	c.penalty = penalty;
 	c.f = nullptr;
-	for (auto *f: cur_package->syntax->base_class->static_functions)
+	for (auto *f: cur_package->syntax->functions)
 		if (f->long_name() == cmd){
 			c.f = f;
 			break;
@@ -750,13 +750,13 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 
 
 
-	add_type_cast(10, TypeInt, TypeFloat32, "i2f");
-	add_type_cast(10, TypeInt, TypeInt64, "i2i64");
-	add_type_cast(15, TypeInt64, TypeInt, "i642i");
-	add_type_cast(10, TypeFloat32, TypeFloat64,"f2f64");
-	add_type_cast(20, TypeFloat32, TypeInt, "f2i");
-	add_type_cast(10, TypeInt, TypeChar, "i2c");
-	add_type_cast(20, TypeChar, TypeInt, "c2i");
+	add_type_cast(10, TypeInt, TypeFloat32, "int.float");
+	add_type_cast(10, TypeInt, TypeInt64, "int.int64");
+	add_type_cast(15, TypeInt64, TypeInt, "int64.int");
+	add_type_cast(10, TypeFloat32, TypeFloat64,"float.float64");
+	add_type_cast(20, TypeFloat32, TypeInt, "float.int");
+	add_type_cast(10, TypeInt, TypeChar, "int.char");
+	add_type_cast(20, TypeChar, TypeInt, "char.int");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
 	cur_package = Packages[2];

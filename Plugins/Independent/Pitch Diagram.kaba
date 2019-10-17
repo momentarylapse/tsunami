@@ -27,7 +27,7 @@ bool LoudEnough
 float error
 string get_note(float f)
 	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
-	int rel = f2i(pitch + 0.5) % 12
+	int rel = int(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
 	return rel_pitch_name(rel)
 	#loopf(fl, 0, 1)
@@ -113,7 +113,7 @@ void UpdateInput()
 	if max > threshold
 		LoudEnough = true
 		Frequency = fmax
-		played.add(f2i(freq_to_pitch(Frequency) + 0.5))
+		played.add(int(freq_to_pitch(Frequency) + 0.5))
 		#Frequency = fmax
 		Error = error
 	else

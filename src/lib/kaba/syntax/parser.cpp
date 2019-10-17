@@ -285,13 +285,29 @@ void SyntaxTree::make_func_node_callable(Node *l) {
 		l->kind = NodeKind::VIRTUAL_CALL;
 }
 
-Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block) {
+Node *make_fake_constructor(SyntaxTree *tree, const Class *t, Block *block, const Class *param_type) {
+	//if ((t == TypeInt) and (param_type == TypeFloat32))
+	//	return tree->add_node_call(tree->get_existence("f2i", nullptr, nullptr, false)[0]->as_func());
+		
+	auto *cf = param_type->get_func(t->name, t, {});
+	if (!cf)
+		tree->do_error("illegal fake constructor... requires " + param_type->long_name() + "." + t->long_name() + "()");
+	return tree->add_node_member_call(cf, nullptr); // temp var added later...
+		
+	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, TypeVoid);
+	return tree->add_node_member_call(cf, dummy); // temp var added later...
+}
+
+Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block, Array<Node*> &params) {
 	// shortcut??? (inlineable)
 	if ((t == TypeVector) or (t == TypeColor) or (t == TypeRect) or (t == TypeComplex)) {
 		for (auto *f: t->static_functions)
 			if (f->name == "create")
 				return {add_node_call(f)};
 	}
+	
+	if (((t == TypeInt) or (t == TypeFloat32) or (t == TypeBool)) and (params.num == 1))
+		return {make_fake_constructor(this, t, block, params[0]->type)};
 	
 	// constructor
 	//auto *vv = block->add_var(block->function->create_slightly_hidden_name(), t);
@@ -336,7 +352,7 @@ Node *SyntaxTree::parse_operand_extension_call(Array<Node*> links, Block *block)
 		} else if (l->kind == NodeKind::CLASS) {
 			auto *t = links[0]->as_class();
 			clear_nodes(links);
-			links = make_class_node_callable(t, block);
+			links = make_class_node_callable(t, block, params);
 			break;
 		} else if (l->type == TypeFunctionCodeP) {
 			Node *p = links[0];
@@ -385,6 +401,9 @@ Node *SyntaxTree::parse_operand_extension_call(Array<Node*> links, Block *block)
 
 
 	// error message
+	
+	if (links.num == 0)
+		do_error("can not call ...");
 
 	string found = type_list_to_str(type_list_from_nodes(params));
 	string available;
@@ -818,10 +837,19 @@ Node *try_parse_format_string(SyntaxTree *tree, Block *block, Value &v) {
 		tree->Exp.line.add(ee.line[0]);
 		tree->Exp.set(0, tree->Exp.line.num-1);
 		
-		Node *n = tree->parse_command(block);
-		n = tree->check_param_link(n, TypeString, "", 0);
-		//n->show();
-		parts.add(n);
+		try {
+			Node *n = tree->parse_command(block);
+			n = tree->check_param_link(n, TypeString, "", 0);
+			//n->show();
+			parts.add(n);
+		} catch (Exception &e) {
+			tree->Exp.set(ce, cl);
+			//e.line += cl;
+			//e.column += tree->Exp.
+			
+			// not perfect (e has physical line-no etc and e.text has filenames baked in)
+			tree->do_error(e.text);
+		}
 		
 		tree->Exp.line.pop();
 		tree->Exp.set(ce, cl);
@@ -1650,7 +1678,7 @@ Node *SyntaxTree::parse_statement_len(Block *block) {
 	}
 
 
-	do_error("don't know how to get the length of class " + sub->type->long_name());
+	do_error("don't know how to get the length of an object of class " + sub->type->long_name());
 	return nullptr;
 }
 
@@ -1658,7 +1686,11 @@ Node *SyntaxTree::add_converter_str(Node *sub, bool repr) {
 	
 	auto *t = sub->type;
 
-	Function *cf = nullptr;
+	// evil shortcut for pointers (carefull with nil!!)
+	if (!repr and t->is_pointer())
+		return add_converter_str(deref_node(sub), repr);
+
+	Function *cf = nullptr;	
 	if (repr)
 		cf = t->get_func("repr", TypeString, {});
 	if (!cf)

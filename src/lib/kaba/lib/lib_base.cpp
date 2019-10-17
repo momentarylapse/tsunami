@@ -404,31 +404,6 @@ void SIAddPackageBase() {
 	
 
 
-	//	add_func_special("f2i", TypeInt, (void*)&_Float2Int);
-	add_funcx("f2i", TypeInt, &_Float2Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::FLOAT_TO_INT);    // sometimes causes floating point exceptions...
-		func_add_param("f", TypeFloat32);
-	add_funcx("i2f", TypeFloat32, &_Int2Float, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::INT_TO_FLOAT);
-		func_add_param("i", TypeInt);
-	add_funcx("f2f64", TypeFloat64, &_Float2Float64, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::FLOAT_TO_FLOAT64);
-		func_add_param("f", TypeFloat32);
-	add_funcx("f642f", TypeFloat32, &_Float642Float, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::FLOAT64_TO_FLOAT);
-		func_add_param("f", TypeFloat64);
-	add_funcx("i2i64", TypeInt64, &_Int2Int64, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::INT_TO_INT64);
-		func_add_param("i", TypeInt);
-	add_funcx("i642i", TypeInt, &_Int642Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::INT64_TO_INT);
-		func_add_param("i", TypeInt64);
-	add_funcx("i2c", TypeChar, &_Int2Char, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::INT_TO_CHAR);
-		func_add_param("i", TypeInt);
-	add_funcx("c2i", TypeInt, &_Char2Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-		func_set_inline(InlineID::CHAR_TO_INT);
-		func_add_param("c", TypeChar);
 	add_funcx("p2b", TypeBool, &_Pointer2Bool, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(InlineID::POINTER_TO_BOOL);
 		func_add_param("p", TypePointer);
@@ -450,6 +425,12 @@ void SIAddPackageBase() {
 
 	add_class(TypeInt);
 		class_add_funcx("str", TypeString, &i2s, FLAG_PURE);
+		class_add_funcx("float", TypeFloat32, &_Int2Float, FLAG_PURE);
+			func_set_inline(InlineID::INT_TO_FLOAT);
+		class_add_funcx("char", TypeChar, &_Int2Char, FLAG_PURE);
+			func_set_inline(InlineID::INT_TO_CHAR);
+		class_add_funcx("int64", TypeInt64, &_Int2Int64, FLAG_PURE);
+			func_set_inline(InlineID::INT_TO_INT64);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt, TypeInt, InlineID::INT_ASSIGN);
 		add_operator(OperatorID::ADD, TypeInt, TypeInt, TypeInt, InlineID::INT_ADD, (void*)op_int_add);
 		add_operator(OperatorID::SUBTRACT, TypeInt, TypeInt, TypeInt, InlineID::INT_SUBTRACT, (void*)op_int_sub);
@@ -478,6 +459,8 @@ void SIAddPackageBase() {
 
 	add_class(TypeInt64);
 		class_add_funcx("str", TypeString, &i642s, FLAG_PURE);
+		class_add_funcx("int", TypeString, &_Int642Int, FLAG_PURE);
+			func_set_inline(InlineID::INT64_TO_INT);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt64, TypeInt64, InlineID::INT64_ASSIGN);
 		add_operator(OperatorID::ADD, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_ADD, (void*)op_int64_add);
 		add_operator(OperatorID::ADD, TypeInt64, TypeInt64, TypeInt, InlineID::INT64_ADD_INT, (void*)op_int64_add_int); // needed by internal address calculations!
@@ -508,6 +491,10 @@ void SIAddPackageBase() {
 		class_add_funcx("str", TypeString, &kaba_float2str, FLAG_PURE);
 		class_add_funcx("str2", TypeString, &f2s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
+		class_add_funcx("int", TypeInt, &_Float2Int, FLAG_PURE);
+			func_set_inline(InlineID::FLOAT_TO_INT);    // sometimes causes floating point exceptions...
+		class_add_funcx("float64", TypeFloat64, &_Float2Float64, FLAG_PURE);
+			func_set_inline(InlineID::FLOAT_TO_FLOAT64);
 		class_add_funcx("__exp__", TypeFloat32, &xop_float_exp, FLAG_PURE);
 			func_add_param("b", TypeFloat32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloat32, TypeFloat32, InlineID::FLOAT_ASSIGN);
@@ -532,6 +519,8 @@ void SIAddPackageBase() {
 		class_add_funcx("str", TypeString, &kaba_float642str, FLAG_PURE);
 		class_add_funcx("str2", TypeString, &f642s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
+		class_add_funcx("float", TypeFloat32, &_Float642Float, FLAG_PURE);
+			func_set_inline(InlineID::FLOAT64_TO_FLOAT);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloat64, TypeFloat64, InlineID::FLOAT64_ASSIGN);
 		add_operator(OperatorID::ADD, TypeFloat64, TypeFloat64, TypeFloat64, InlineID::FLOAT64_ADD, (void*)op_double_add);
 		add_operator(OperatorID::SUBTRACT, TypeFloat64, TypeFloat64, TypeFloat64, InlineID::FLOAT64_SUBTRACT, (void*)op_double_sub);
@@ -561,6 +550,8 @@ void SIAddPackageBase() {
 
 	add_class(TypeChar);
 		class_add_funcx("str", TypeString, &kaba_char2str, FLAG_PURE);
+		class_add_funcx("int", TypeInt, &_Char2Int, FLAG_PURE);
+			func_set_inline(InlineID::CHAR_TO_INT);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeChar, TypeChar, InlineID::CHAR_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeChar, TypeChar, InlineID::CHAR_EQUAL);
 		add_operator(OperatorID::NOTEQUAL, TypeBool, TypeChar, TypeChar, InlineID::CHAR_NOT_EQUAL);

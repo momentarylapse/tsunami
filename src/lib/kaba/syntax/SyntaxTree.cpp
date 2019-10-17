@@ -114,7 +114,10 @@ Node *SyntaxTree::add_node_member_call(Function *f, Node *inst, bool force_non_v
 Node *SyntaxTree::add_node_call(Function *f) {
 	// FIXME: literal_return_type???
 	Node *c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->return_type);
-	c->set_num_uparams(f->num_params);
+	if (f->is_static)
+		c->set_num_uparams(f->num_params);
+	else
+		c->set_num_uparams(f->num_params + 1);
 	return c;
 }
 

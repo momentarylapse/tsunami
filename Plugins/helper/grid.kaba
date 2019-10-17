@@ -80,13 +80,13 @@ class GridAxis
 		GridPartition r
 		float step = 1
 		float e = log(abs(abs(d))) / log(10)
-		float e_floor = i2f(f2i(e))
+		float e_floor = float(int(e))
 		if e < 0
 			e_floor -= 1
 		step = pow(10, e_floor)
 		float factor = d / step
-		int decimals = f2i(max(-e_floor, 0))
-		float min = i2f(f2i(val_min / step) * step)
+		int decimals = int(max(-e_floor, 0))
+		float min = float(int(val_min / step)) * step
 		float max = val_max
 		
 		float vv = min

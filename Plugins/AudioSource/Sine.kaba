@@ -19,7 +19,7 @@ class SineSource extends AudioSource
 		offset = 0
 	override int read(AudioBuffer buf)
 		let f = pitch_to_freq(config.pitch)
-		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
+		float w_f = 1.0 / float(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
 		for i in 0:len(buf)
 			buf.l[i] = sin((i + offset) * w_f) * config.volume
 		if buf.channels > 1

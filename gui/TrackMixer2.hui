@@ -1,8 +1,8 @@
 Dialog track-mixer2 ""
 	Grid ? "" vertical noexpandx
-		Text name "" center bold marginbottom=5
 		Grid ? "" expandy
 			Grid grid-volume "" width=100 expandy vertical
+				Text name "" center bold marginbottom=5
 				Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance"
 				Grid ? ""
 					Slider volume "0" range=0:1:0.001 vertical width=80 expandy "tooltip=Volume in dB"
@@ -14,8 +14,8 @@ Dialog track-mixer2 ""
 					ToggleButton show-fx "fx" "tooltip=Effects" flat height=20 expandx padding=1
 					Label ? "" width=5
 			Revealer revealer-fx "" slide=right
-				Grid ? "" expandx
-					TabControl tc "audio\\midi" width=140
+				Grid ? "" expandx margintop=20
+					TabControl tc "audio\\midi" width=140 noframe
 						Grid grid-fx "" expandy vertical
 							ListView fx "enabled\\name" format=Ct reorderable nobar expandy expandx
 							Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx
@@ -23,5 +23,5 @@ Dialog track-mixer2 ""
 							ListView midi-fx "enabled\\name" format=Ct reorderable nobar expandy expandx
 							Button add-midi-fx "" "tooltip=Add new midi effect" image=hui:add flat expandx
 			Revealer config-revealer "" slide=right
-				Grid grid-config "" width=400
+				Grid grid-config "" width=400 margintop=20
 

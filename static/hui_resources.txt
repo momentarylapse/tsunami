@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-62
+61
 # Resource
 Menu
 menu_fake
@@ -6457,55 +6457,6 @@ link
 0
 # Resource
 Dialog
-track-mixer
-
-0
-0
-1
-Grid
-?
-vertical,width=90,noexpandx
-0
-0
-4
-Text
-name
-center,bold
-0
-0
-0
-Slider
-panning
-range=-1:1:0.01,expandx,origin=no
-1
-0
-0
-Slider
-volume
-range=0:1:0.001,vertical,expandy
-2
-0
-0
-Grid
-?
-
-3
-0
-2
-ToggleButton
-mute
-flat,height=20,expandx,padding=1
-0
-0
-0
-ToggleButton
-solo
-flat,height=20,expandx,padding=1
-1
-0
-0
-# Resource
-Dialog
 track-mixer2
 
 0
@@ -6516,17 +6467,11 @@ Grid
 vertical,noexpandx
 0
 0
-2
-Text
-name
-center,bold,marginbottom=5
-0
-0
-0
+1
 Grid
 ?
 expandy
-1
+0
 0
 3
 Grid
@@ -6534,17 +6479,23 @@ grid-volume
 width=100,expandy,vertical
 0
 0
-3
+4
+Text
+name
+center,bold,marginbottom=5
+0
+0
+0
 Slider
 panning
 range=-1:1:0.01,expandx,origin=no
-0
+1
 0
 0
 Grid
 ?
 
-1
+2
 0
 2
 Slider
@@ -6562,7 +6513,7 @@ width=5,noexpandx
 Grid
 ?
 
-2
+3
 0
 5
 Label
@@ -6603,13 +6554,13 @@ slide=right
 1
 Grid
 ?
-expandx
+expandx,margintop=20
 0
 0
 1
 TabControl
 tc
-width=140
+width=140,noframe
 0
 0
 2
@@ -6657,7 +6608,7 @@ slide=right
 1
 Grid
 grid-config
-width=400
+width=400,margintop=20
 0
 0
 0
@@ -6758,7 +6709,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-547
+543
 # Text
 /bars-add
 Add bars...
@@ -8299,18 +8250,6 @@ load parameter
 synth_panel/save_favorite
 
 load parameter
-track-mixer/mute
-M
-Mute
-track-mixer/panning
-0
-Balance
-track-mixer/solo
-S
-Solo
-track-mixer/volume
-0
-Volume in dB
 track-mixer2/add-fx
 
 Add new effect

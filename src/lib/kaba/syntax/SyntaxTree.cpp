@@ -409,11 +409,14 @@ Node *SyntaxTree::exlink_add_element(Function *f, ClassElement &e) {
 	return link;
 }
 
+// functions of our "self" class
 Node *SyntaxTree::exlink_add_class_func(Function *f, Function *cf) {
 	Node *link = add_node_func_name(cf);
 	Node *self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-	link->set_num_uparams(1);
-	link->set_instance(self);
+	if (!f->is_static) {
+		link->set_num_uparams(1);
+		link->set_instance(self);
+	}
 	return link;
 }
 
@@ -439,7 +442,7 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 					return {add_node_const(c)};
 
 			// then the (real) functions
-			for (Function *f: ns->static_functions)
+			for (Function *f: ns->functions)
 				if (f->name == name and f->is_static)
 					links.add(add_node_func_name(f));
 			if (links.num > 0 and !prefer_class)
@@ -476,7 +479,7 @@ Node* SyntaxTree::get_existence_block(const string &name, Block *block) {
 		for (auto &e: f->name_space->elements)
 			if (e.name == name)
 				return exlink_add_element(f, e);
-		for (auto *cf: f->name_space->member_functions)
+		for (auto *cf: f->name_space->functions)
 			if (cf->name == name)
 				return exlink_add_class_func(f, cf);
 	}

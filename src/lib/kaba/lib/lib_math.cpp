@@ -325,7 +325,7 @@ void SIAddPackageMath() {
 		class_add_elementx("x", TypeFloat32, &vector::x);
 		class_add_elementx("y", TypeFloat32, &vector::y);
 		class_add_elementx("z", TypeFloat32, &vector::z);
-		class_add_element("e", TypeFloatArray3, 0, FLAG_HIDDEN);
+		class_add_element("_e", TypeFloatArray3, 0);
 		class_add_func("length", TypeFloat32, type_p(mf(&vector::length)), FLAG_PURE);
 		class_add_func("length_sqr", TypeFloat32, type_p(mf(&vector::length_sqr)), FLAG_PURE);
 		class_add_func("length_fuzzy", TypeFloat32, type_p(mf(&vector::length_fuzzy)), FLAG_PURE);
@@ -523,8 +523,8 @@ void SIAddPackageMath() {
 		class_add_element("_13", TypeFloat32, 52);
 		class_add_element("_23", TypeFloat32, 56);
 		class_add_element("_33", TypeFloat32, 60);
-		class_add_element("e", TypeFloatArray4x4, 0, FLAG_HIDDEN);
-		class_add_element("_e", TypeFloatArray16, 0, FLAG_HIDDEN);
+		class_add_element("e", TypeFloatArray4x4, 0);
+		class_add_element("_e", TypeFloatArray16, 0);
 		class_add_func("__imul__", TypeVoid, mf(&matrix::imul));
 			func_add_param("other", TypeMatrix);
 		class_add_func("__mul__", TypeMatrix, mf(&matrix::mul), FLAG_PURE);
@@ -578,8 +578,8 @@ void SIAddPackageMath() {
 		class_add_element("_13", TypeFloat32, 24);
 		class_add_element("_23", TypeFloat32, 28);
 		class_add_element("_33", TypeFloat32, 32);
-		class_add_element("e", TypeFloatArray3x3, 0, FLAG_HIDDEN);
-		class_add_element("_e", TypeFloatArray9, 0, FLAG_HIDDEN);
+		class_add_element("e", TypeFloatArray3x3, 0);
+		class_add_element("_e", TypeFloatArray9, 0);
 		class_add_func("__mul__", TypeMatrix3, mf(&matrix3::mul), FLAG_PURE);
 			func_add_param("other", TypeMatrix3);
 		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), FLAG_PURE);

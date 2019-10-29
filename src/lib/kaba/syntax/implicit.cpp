@@ -453,9 +453,9 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 
 			if (has_own_constructors) {
 				// don't inherit constructors!
-				for (int i=t->member_functions.num-1; i>=0; i--)
-					if (t->member_functions[i]->name == IDENTIFIER_FUNC_INIT and t->member_functions[i]->needs_overriding)
-						t->member_functions.erase(i);
+				for (int i=t->functions.num-1; i>=0; i--)
+					if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
+						t->functions.erase(i);
 			} else {
 				// only auto-implement matching constructors
 				for (auto *pcc: t->parent->get_constructors()) {

@@ -172,15 +172,12 @@ Array<Node*> SyntaxTree::parse_operand_extension_element(Node *operand) {
 
 	// class function?
 	Array<Node*> links;
-	for (auto *cf: type->member_functions)
+	for (auto *cf: type->functions)
 		if (f_name == cf->name) {
 			links.add(add_node_func_name(cf));
-			if (!only_static)
+			if (!cf->is_static and !only_static)
 				links.back()->uparams.add(cp_node(operand));
 		}
-	for (auto *f: type->static_functions)
-		if (f_name == f->name)
-			links.add(add_node_func_name(f));
 	if (links.num > 0) {
 		Exp.next();
 		return links;
@@ -301,7 +298,7 @@ Node *make_fake_constructor(SyntaxTree *tree, const Class *t, Block *block, cons
 Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block, Array<Node*> &params) {
 	// shortcut??? (inlineable)
 	if ((t == TypeVector) or (t == TypeColor) or (t == TypeRect) or (t == TypeComplex)) {
-		for (auto *f: t->static_functions)
+		for (auto *f: t->functions)
 			if (f->name == "create")
 				return {add_node_call(f)};
 	}
@@ -1048,15 +1045,13 @@ Node *link_special_operator_is(SyntaxTree *tree, Node *param1, Node *param2) {
 }
 
 Node *link_special_operator_in(SyntaxTree *tree, Node *param1, Node *param2) {
+	auto *f = param2->type->get_func("__contains__", TypeBool, {param1->type});
+	if (!f)
+		tree->do_error("no __contains__() for " + param2->type->long_name());
 
-	for (Function *f: param2->type->member_functions)
-		if ((f->name == "__contains__") and (f->literal_param_type[0] == param1->type)) {
-			Node *n = tree->add_node_member_call(f, param2);
-			n->set_uparam(1, param1);
-			return n;
-		}
-	tree->do_error("no __contains__() for " + param2->type->long_name());
-	return nullptr;
+	Node *n = tree->add_node_member_call(f, param2);
+	n->set_uparam(1, param1);
+	return n;
 }
 
 Node *SyntaxTree::link_operator_id(OperatorID op_no, Node *param1, Node *param2) {
@@ -1087,8 +1082,8 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 		pp1 = p1->param;
 
 	// exact match as class function?
-	for (Function *f: pp1->member_functions)
-		if (f->name == op_func_name) {
+	for (Function *f: pp1->functions)
+		if ((f->name == op_func_name) and !f->is_static) {
 			// exact match as class function but missing a "&"?
 			auto type1 = f->literal_param_type[0];
 			if (type1->is_pointer_silent()) {
@@ -1135,7 +1130,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 					c1_best = c1;
 					c2_best = c2;
 				}
-	for (auto *cf: p1->member_functions)
+	for (auto *cf: p1->functions)
 		if (cf->name == op_func_name)
 			if (type_match_with_cast(p2, equal_classes, false, cf->literal_param_type[0], pen2, c2))
 				if (pen2 < pen_min) {
@@ -2257,7 +2252,6 @@ void SyntaxTree::parse_class(Class *_namespace) {
 				e.offset = process_class_offset(_class->long_name(), e.name, e.offset + config.pointer_size);
 
 			auto el = ClassElement(IDENTIFIER_VTABLE_VAR, TypePointer, 0);
-			el.hidden = true;
 			_class->elements.insert(el, 0);
 			_offset += config.pointer_size;
 		}
@@ -2551,10 +2545,7 @@ void SyntaxTree::parse_all_class_names(Class *ns, int indent0) {
 }
 
 void SyntaxTree::parse_all_function_bodies(const Class *name_space) {
-	for (auto *f: name_space->static_functions)
-		if ((!f->is_extern) and (f->_logical_line_no >= 0) and (f->name_space == name_space))
-			parse_function_body(f);
-	for (auto *f: name_space->member_functions)
+	for (auto *f: name_space->functions)
 		if ((!f->is_extern) and (f->_logical_line_no >= 0) and (f->name_space == name_space))
 			parse_function_body(f);
 

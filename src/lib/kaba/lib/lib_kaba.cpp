@@ -65,7 +65,6 @@ void SIAddPackageKaba() {
 	add_class(TypeClassElement);
 		class_add_elementx("name", TypeString, &ClassElement::name);
 		class_add_elementx("type", TypeClassP, &ClassElement::type);
-		class_add_elementx("hidden", TypeBool, &ClassElement::hidden);
 		class_add_elementx("offset", TypeInt, &ClassElement::offset);
 
 
@@ -76,8 +75,7 @@ void SIAddPackageKaba() {
 		class_add_elementx("param", TypeClassP, &Class::param);
 		class_add_elementx("namespace", TypeClassP, &Class::name_space);
 		class_add_elementx("elements", TypeClassElementList, &Class::elements);
-		class_add_elementx("functions", TypeFunctionPList, &Class::member_functions);
-		class_add_elementx("static_functions", TypeFunctionPList, &Class::static_functions);
+		class_add_elementx("functions", TypeFunctionPList, &Class::functions);
 		class_add_elementx("classes", TypeClassPList, &Class::classes);
 		class_add_elementx("constants", TypeConstantPList, &Class::constants);
 		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);

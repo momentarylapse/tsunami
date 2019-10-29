@@ -151,7 +151,7 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 	} else {
 		// TEST ME....
 		for (auto &el: type->elements) {
-			if (!el.hidden)
+			if (!el.hidden())
 				locked = map_into_complex(memory + el.offset, locked, addr_off, p + el.offset, el.type);
 		}
 	}

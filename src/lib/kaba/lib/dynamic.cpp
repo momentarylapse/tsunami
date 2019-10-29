@@ -234,7 +234,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 	} else if (type->elements.num > 0) {
 		string s;
 		for (auto &e: type->elements) {
-			if (e.hidden)
+			if (e.hidden())
 				continue;
 			if (s.num > 0)
 				s += ", ";
@@ -296,7 +296,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 	// class
 	Any a;
 	for (auto &e: type->elements) {
-		if (!e.hidden)
+		if (!e.hidden())
 			a.map_set(e.name, kaba_dyn((char*)var + e.offset, e.type));
 	}
 	return a;

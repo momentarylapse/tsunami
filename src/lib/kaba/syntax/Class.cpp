@@ -8,20 +8,22 @@ namespace Kaba{
 ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;
-	hidden = false;
 }
 
 ClassElement::ClassElement(const string &_name, const Class *_type, int _offset) {
 	name = _name;
 	offset = _offset;
 	type = _type;
-	hidden = false;
 }
 
 string ClassElement::signature(bool include_class) const {
 	if (include_class)
 		return type->name + " " + name;
 	return type->name + " " + name;
+}
+
+bool ClassElement::hidden() const {
+	return (name[0] == '_') or (name[0] == '-');
 }
 
 
@@ -77,10 +79,7 @@ Class::~Class() {
 		delete c;
 	for (auto *v: static_variables)
 		delete v;
-	for (auto *f: member_functions)
-		if (f->name_space == this)
-			delete f;
-	for (auto *f: static_functions)
+	for (auto *f: functions)
 		if (f->name_space == this)
 			delete f;
 	for (auto *c: classes)
@@ -245,8 +244,9 @@ bool Class::is_derived_from_s(const string &root) const {
 	return parent->is_derived_from_s(root);
 }
 
+// don't care if static
 Function *Class::get_func(const string &_name, const Class *return_type, const Array<const Class*> &params) const {
-	for (auto *f: member_functions)
+	for (auto *f: functions)
 		if ((f->name == _name) and (f->literal_return_type == return_type) and (f->num_params == params.num)) {
 			bool match = true;
 			for (int i=0; i<params.num; i++) {
@@ -271,7 +271,7 @@ Function *Class::get_default_constructor() const {
 
 Array<Function*> Class::get_constructors() const {
 	Array<Function*> c;
-	for (auto *f: member_functions)
+	for (auto *f: functions)
 		if ((f->name == IDENTIFIER_FUNC_INIT) and (f->literal_return_type == TypeVoid))
 			c.add(f);
 	return c;
@@ -286,7 +286,7 @@ Function *Class::get_assign() const {
 }
 
 Function *Class::get_get(const Class *index) const {
-	for (Function *cf: member_functions) {
+	for (Function *cf: functions) {
 		if (cf->name != "__get__")
 			continue;
 		if (cf->num_params != 1)
@@ -299,7 +299,7 @@ Function *Class::get_get(const Class *index) const {
 }
 
 Function *Class::get_virtual_function(int virtual_index) const {
-	for (Function *f: member_functions)
+	for (Function *f: functions)
 		if (f->virtual_index == virtual_index)
 			return f;
 	return nullptr;
@@ -320,7 +320,7 @@ void Class::link_virtual_table() {
 		vtable[1] = mf(&VirtualBase::__delete_external__);
 
 	// link virtual functions into vtable
-	for (Function *cf: member_functions) {
+	for (Function *cf: functions) {
 		if (cf->virtual_index >= 0) {
 			//msg_write(i2s(cf->virtual_index) + ": " + cf->signature());
 			if (cf->virtual_index >= vtable.num)
@@ -341,7 +341,7 @@ void Class::link_external_virtual_table(void *p) {
 	VirtualTable *t = (VirtualTable*)p;
 	vtable.clear();
 	int max_vindex = 1;
-	for (Function *cf: member_functions)
+	for (Function *cf: functions)
 		if (cf->virtual_index >= 0) {
 			cf->address = t[cf->virtual_index];
 			if (cf->virtual_index >= vtable.num)
@@ -393,7 +393,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 	if (f->is_static) {
 		if (config.verbose)
 			msg_write("   STATIC");
-		static_functions.add(f);
+		functions.add(f);
 	} else {
 		if (config.verbose)
 			msg_write("   MEMBER");
@@ -406,7 +406,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 		// override?
 		Function *orig = nullptr;
 		int orig_index = -1;
-		foreachi (Function *ocf, member_functions, i)
+		foreachi (Function *ocf, functions, i)
 			if (class_func_match(f, ocf)) {
 				orig = ocf;
 				orig_index = i;
@@ -424,9 +424,9 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			f->virtual_index = orig->virtual_index;
 			if (orig->name_space == this)
 				delete orig;
-			member_functions[orig_index] = f;
+			functions[orig_index] = f;
 		} else {
-			member_functions.add(f);
+			functions.add(f);
 		}
 
 		if (f->virtual_index >= 0) {
@@ -452,7 +452,7 @@ void Class::derive_from(const Class* root, bool increase_size) {
 	elements = parent->elements;
 
 	// inheritance of functions
-	for (Function *f: parent->member_functions) {
+	for (Function *f: parent->functions) {
 		if (f->name == IDENTIFIER_FUNC_ASSIGN)
 			continue;
 		Function *ff = f;
@@ -467,9 +467,8 @@ void Class::derive_from(const Class* root, bool increase_size) {
 		}
 		if (config.verbose)
 			msg_write("INHERIT   " + ff->signature());
-		member_functions.add(ff);
+		functions.add(ff);
 	}
-	static_functions.append(parent->static_functions);
 
 	if (increase_size)
 		size += parent->size;

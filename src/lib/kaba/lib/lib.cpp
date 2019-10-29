@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.10.1";
+string LibVersion = "0.17.10.2";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -334,9 +334,7 @@ Class *add_class(const Class *root_type) {
 }
 
 void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag) {
-	auto e = ClassElement(name, type, offset);
-	e.hidden = ((flag & FLAG_HIDDEN) > 0);
-	cur_class->elements.add(e);
+	cur_class->elements.add(ClassElement(name, type, offset));
 }
 
 void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable) {
@@ -350,11 +348,11 @@ int _class_override_num_params = -1;
 void _class_add_member_func(const Class *ccc, Function *f, ScriptFlag flag) {
 	Class *c = const_cast<Class*>(ccc);
 	if ((flag & FLAG_OVERRIDE) > 0) {
-		foreachi(Function *ff, c->member_functions, i)
+		foreachi(Function *ff, c->functions, i)
 			if (ff->name == f->name) {
 				if (_class_override_num_params < 0 or _class_override_num_params == ff->num_params) {
 					//msg_write("OVERRIDE");
-					c->member_functions[i] = f;
+					c->functions[i] = f;
 					return;
 				}
 			}
@@ -368,7 +366,7 @@ void _class_add_member_func(const Class *ccc, Function *f, ScriptFlag flag) {
 					break;
 				}
 			}*/
-		c->member_functions.add(f);
+		c->functions.add(f);
 	}
 }
 
@@ -386,7 +384,7 @@ Function* class_add_func(const string &name, const Class *return_type, void *fun
 
 
 	if (f->is_static)
-		cur_class->static_functions.add(f);
+		cur_class->functions.add(f);
 	else
 		_class_add_member_func(cur_class, f, flag);
 	return f;
@@ -776,7 +774,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 					msg_error("SUPER ARRAY INCONSISTENT: " + c->name);
 			}
 			// x package failing
-			/*for (auto *f: c->member_functions)
+			/*for (auto *f: c->functions)
 				if (f->needs_overriding and (f->name != IDENTIFIER_FUNC_SUBARRAY))
 					msg_error(f->signature());*/
 		}

@@ -106,7 +106,7 @@ Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *
 		}
 	} else {
 		for (auto &e : t->elements)
-			if (!e.hidden)
+			if (!e.hidden())
 				list.append(enumerate_type(pp + e.offset, e.type, prefix + ":" + e.name, prefix_nice + "." + e.name));
 	}
 	return list;

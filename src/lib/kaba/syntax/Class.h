@@ -18,10 +18,10 @@ public:
 	string name;
 	const Class *type;
 	long long offset;
-	bool hidden;
 	ClassElement();
 	ClassElement(const string &name, const Class *type, int offset);
 	string signature(bool include_class) const;
+	bool hidden() const;
 };
 
 typedef void *VirtualTable;
@@ -53,8 +53,7 @@ public:
 	bool is_pointer_silent() const;
 	bool fully_parsed;
 	Array<ClassElement> elements;
-	Array<Function*> member_functions;
-	Array<Function*> static_functions;
+	Array<Function*> functions;
 	Array<Variable*> static_variables;
 	Array<Constant*> constants;
 	Array<const Class*> classes;

@@ -29,7 +29,7 @@ void ModuleConfiguration::__delete__() {
 Array<Kaba::ClassElement> get_unique_elements(const Kaba::Class *c) {
 	Array<Kaba::ClassElement> r;
 	for (auto &e: c->elements)
-		if (!e.hidden)
+		if (!e.hidden())
 			r.add(e);
 	return r;
 }
@@ -129,7 +129,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 		pos ++; // ']'
 	} else if (type->is_super_array()) {
 		pos ++; // '['
-		DynamicArray *a = (DynamicArray*)v;
+		auto *a = (DynamicArray*)v;
 		auto tel = type->get_array_element();
 		a->simple_clear(); // todo...
 		while (true) {
@@ -151,7 +151,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 			}
 		}
 	} else {
-		Array<Kaba::ClassElement> e = get_unique_elements(type);
+		auto e = get_unique_elements(type);
 		pos ++; // '('
 		for (int i=0; i<e.num; i++) {
 			if (i > 0)

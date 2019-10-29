@@ -19,7 +19,7 @@ class OscillatorConfig
 	float amplitude
 	float initial, peak, sustain
 	float attack, decay, release
-	int _type
+	int type
 	bool[NUM_OSCILLATORS] target
 	bool target_out
 	void __init__()
@@ -33,7 +33,7 @@ class OscillatorConfig
 		attack = 0.01
 		decay = 0.4
 		release = 0.4
-		_type = TYPE_SINE
+		type = TYPE_SINE
 		for t in target
 			t = false
 		target_out = false
@@ -206,7 +206,7 @@ Grid ? ''
 	
 		let o = fc.osc[index]
 		p.set_color(col)
-		draw_type(p, z - complex(0,2), o._type, 9, 5.5)
+		draw_type(p, z - complex(0,2), o.type, 9, 5.5)
 		int f = o.factor + 0.5
 		p.set_font_size(7)
 		#p.set_color(colors.text_soft1)
@@ -393,17 +393,17 @@ Grid ? ''
 		changed()
 	
 	void on_type_sine()
-		fc.osc[chosen]._type = TYPE_SINE
+		fc.osc[chosen].type = TYPE_SINE
 		redraw("area")
 		changed()
 	
 	void on_type_square()
-		fc.osc[chosen]._type = TYPE_SQUARE
+		fc.osc[chosen].type = TYPE_SQUARE
 		redraw("area")
 		changed()
 		
 	void on_type_saw()
-		fc.osc[chosen]._type = TYPE_SAW
+		fc.osc[chosen].type = TYPE_SAW
 		redraw("area")
 		changed()
 
@@ -477,14 +477,14 @@ class FMRenderer extends PitchRenderer
 						return false
 					
 				o.phi += delta_phi * (1 + o.input) * o.conf.factor
-				if o.conf._type == TYPE_SINE
+				if o.conf.type == TYPE_SINE
 					o.output = sin(o.phi) * o.volume
-				else if o.conf._type == TYPE_SQUARE
+				else if o.conf.type == TYPE_SQUARE
 					if sin(o.phi) > 0
 						o.output = o.volume
 					else
 						o.output = -o.volume
-				else if o.conf._type == TYPE_SAW
+				else if o.conf.type == TYPE_SAW
 					o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
 				o.input = 0
 				if o.phi > 16*pi

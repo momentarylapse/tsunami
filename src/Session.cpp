@@ -170,9 +170,6 @@ void Session::set_mode(const string &mode) {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
 		win->bottom_bar->mixing_console->show_fx(view->cur_track());
-	} else if (mode == "default/synth"){
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::SYNTH_CONSOLE);
 	} else if (mode == "default/sample-ref") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);

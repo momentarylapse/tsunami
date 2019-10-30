@@ -19,9 +19,7 @@ Dialog track_dialog "Spur" width=380 height=516
 					Text tuning "" expandx
 					Button edit_tuning "" image=hui:properties flat
 		Group g_synth "Synthesizer"
-			Grid ? ""
-				Button select_synth "" expandx flat "tooltip=Select synthesizer" flat
-				Button _edit_synth "" noexpandx flat image=hui:properties "tooltip=Configure synthesizer" flat
+			Grid synth ""
 		Text ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""

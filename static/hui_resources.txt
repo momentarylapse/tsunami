@@ -779,7 +779,7 @@ link
 # Resource
 Dialog
 fx_panel
-width=300,height=200
+width=200,height=200
 0
 0
 1
@@ -794,7 +794,7 @@ Grid
 
 0
 0
-3
+4
 MenuButton
 menu
 image=hui:preferences,flat,menu=popup_fx_menu
@@ -807,10 +807,16 @@ bold,center,big,expandx
 1
 0
 0
+Button
+swap
+image=hui:open,flat
+2
+0
+0
 CheckBox
 enabled
 
-2
+3
 0
 0
 Grid
@@ -6390,21 +6396,9 @@ g_synth
 0
 1
 Grid
-?
+synth
 
 0
-0
-2
-Button
-select_synth
-expandx,flat,flat
-0
-0
-0
-Button
-_edit_synth
-noexpandx,flat,image=hui:properties,flat
-1
 0
 0
 Text
@@ -6709,7 +6703,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-543
+542
 # Text
 /bars-add
 Add bars...
@@ -7167,6 +7161,9 @@ Effects
 fx_panel/enabled
 
 active?
+fx_panel/swap
+
+swap module
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help
 
@@ -8295,9 +8292,6 @@ Track
 track-routing-dialog/track-routing-dialog
 Track routing
 
-track_dialog/_edit_synth
-
-Configure synthesizer
 track_dialog/g_instrument
 Instrument
 
@@ -8313,9 +8307,6 @@ Volume
 track_dialog/panning
 0
 +100% = right, -100% = left
-track_dialog/select_synth
-
-Select synthesizer
 track_dialog/t_panning
 Balance
 

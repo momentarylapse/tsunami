@@ -19,7 +19,6 @@ class MidiEditorConsole;
 class SampleRefConsole;
 class SampleManagerConsole;
 class CurveConsole;
-class SynthConsole;
 class CaptureConsole;
 class AudioView;
 class SideBarConsole;
@@ -43,7 +42,6 @@ public:
 		AUDIO_EDITOR_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
 		CURVE_CONSOLE,
-		SYNTH_CONSOLE,
 		SAMPLEREF_CONSOLE,
 		CAPTURE_CONSOLE,
 		NUM_CONSOLES
@@ -62,7 +60,6 @@ public:
 	AudioEditorConsole *audio_editor_console;
 	MidiEditorConsole *midi_editor_console;
 	CurveConsole *curve_console;
-	SynthConsole *synth_console;
 	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;

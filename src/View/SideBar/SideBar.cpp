@@ -8,7 +8,6 @@
 #include "SideBar.h"
 #include "TrackConsole.h"
 #include "CurveConsole.h"
-#include "SynthConsole.h"
 #include "../AudioView.h"
 #include "AudioEditorConsole.h"
 #include "MidiEditorConsole.h"
@@ -49,7 +48,6 @@ SideBar::SideBar(Session *_session) {
 	audio_editor_console = new AudioEditorConsole(session);
 	midi_editor_console = new MidiEditorConsole(session);
 	curve_console = new CurveConsole(session);
-	synth_console = new SynthConsole(session);
 	sample_ref_console = new SampleRefConsole(session);
 	capture_console = new CaptureConsole(session);
 
@@ -59,7 +57,6 @@ SideBar::SideBar(Session *_session) {
 	add_console(audio_editor_console);
 	add_console(midi_editor_console);
 	add_console(curve_console);
-	add_console(synth_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);
 

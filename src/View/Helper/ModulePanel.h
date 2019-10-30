@@ -26,7 +26,10 @@ public:
 		ENABLE = 4,
 		DELETE = 8,
 		CLOSE = 16,
-		DEFAULT = HEADER | FAVOURITES | ENABLE
+		FIXED_WIDTH = 256,
+		FIXED_HEIGHT = 512,
+		DEFAULT = HEADER | FAVOURITES | ENABLE | FIXED_WIDTH,
+		DEFAULT_H = HEADER | FAVOURITES | ENABLE | FIXED_HEIGHT
 	};
 	
 	ModulePanel(Module *m, Mode mode = Mode::DEFAULT);
@@ -37,6 +40,7 @@ public:
 	void on_delete();
 	void on_large();
 	void on_external();
+	void on_swap();
 	void on_change();
 	void on_change_by_action();
 	
@@ -49,12 +53,14 @@ public:
 	void set_func_replace(std::function<void(const Module*)> func_replace);
 	void set_func_delete(std::function<void()> func_delete);
 	void set_func_close(std::function<void()> func_close);
+	void set_func_choose(std::function<void()> func_choose);
 	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
 	std::function<void(const Module*)> func_replace;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
+	std::function<void()> func_choose;
 	Session *session;
 	Module *module;
 	string old_param;

@@ -472,7 +472,6 @@ sources = [
 	'src/View/SideBar/SampleRefConsole.cpp',
 	'src/View/SideBar/SideBar.cpp',
 	'src/View/SideBar/SongConsole.cpp',
-	'src/View/SideBar/SynthConsole.cpp',
 	'src/View/SideBar/TrackConsole.cpp',
 	'src/View/AudioView.cpp',
 	'src/View/ColorScheme.cpp',

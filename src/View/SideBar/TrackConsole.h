@@ -12,6 +12,7 @@
 #include "SideBar.h"
 class Track;
 class Slider;
+class ModulePanel;
 
 class TrackConsole: public SideBarConsole
 {
@@ -34,7 +35,6 @@ public:
 	void on_edit_curves();
 	void on_edit_midi();
 	void on_edit_midi_fx();
-	void on_edit_synth();
 
 	void set_track(Track *t);
 
@@ -42,6 +42,7 @@ public:
 	void on_update();
 
 	Track *track;
+	ModulePanel *panel;
 	bool editing;
 };
 

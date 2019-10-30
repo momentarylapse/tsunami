@@ -71,8 +71,6 @@ bool AudioView::editing_track(Track *t) {
 		return true;
 	if (session->in_mode("default/midi-fx"))
 		return true;
-	if (session->in_mode("default/synth"))
-		return true;
 	if (session->in_mode("midi"))
 		return true;
 	if (session->in_mode("capture"))

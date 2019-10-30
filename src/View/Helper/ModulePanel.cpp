@@ -13,6 +13,7 @@
 #include "../../TsunamiWindow.h"
 
 extern const int CONFIG_PANEL_WIDTH = 400;
+extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
 ModulePanel::ModulePanel(Module *_m, Mode mode) {
@@ -20,7 +21,7 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	session = module->session;
 
 	from_resource("fx_panel");
-	set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
+	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
 	set_string("name", module->module_subtype);
 
@@ -34,7 +35,20 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 		hide_control("load_favorite", true);
 		hide_control("save_favorite", true);
 	}
-	set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
+	if (mode & Mode::FIXED_WIDTH) {
+		set_options("grid", "noexpandx");
+		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
+	} else {
+		set_options("grid", "expandx");
+		//set_options("content", format("expandx", CONFIG_PANEL_WIDTH));
+	}
+	if (mode & Mode::FIXED_HEIGHT) {
+		set_options("content", format("height=%d", CONFIG_PANEL_HEIGHT));
+		set_options("grid", "noexpandy");
+	} else {
+		set_options("grid", "expandy");
+		//set_options("grid", format("height=%d,expandy", CONFIG_PANEL_MIN_HEIGHT));
+	}
 
 	event("enabled", [=]{ on_enabled(); });
 	event("delete", [=]{ on_delete(); });
@@ -42,14 +56,17 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	event("save_favorite", [=]{ on_save(); });
 	event("show_large", [=]{ on_large(); });
 	event("show_external", [=]{ on_external(); });
+	event("swap", [=]{ on_swap(); });
 
 	hide_control("enabled", true);
 	check("enabled", module->enabled);
+	hide_control("swap", true);
 
 	old_param = module->config_to_string();
 	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
 	module->subscribe(this, [=]{ on_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
 	module->subscribe(this, [=]{
+		module->unsubscribe(this);
 		module = nullptr;
 		delete p;
 	}, module->MESSAGE_DELETE);
@@ -66,25 +83,30 @@ void ModulePanel::set_width(int width) {
 	set_options("grid", format("width=%d", width));
 }
 
-void ModulePanel::set_func_enable(std::function<void(bool)> _func_enable) {
-	func_enable = _func_enable;
+void ModulePanel::set_func_enable(std::function<void(bool)> f) {
+	func_enable = f;
 	hide_control("enabled", func_enable == nullptr);
 }
 
-void ModulePanel::set_func_delete(std::function<void()> _func_delete) {
-	func_delete = _func_delete;
+void ModulePanel::set_func_delete(std::function<void()> f) {
+	func_delete = f;
 }
 
-void ModulePanel::set_func_edit(std::function<void(const string&)> _func_edit) {
-	func_edit = _func_edit;
+void ModulePanel::set_func_edit(std::function<void(const string&)> f) {
+	func_edit = f;
 }
 
-void ModulePanel::set_func_replace(std::function<void(const Module*)> _func_replace) {
-	func_replace = _func_replace;
+void ModulePanel::set_func_replace(std::function<void(const Module*)> f) {
+	func_replace = f;
 }
 
-void ModulePanel::set_func_close(std::function<void()> _func_close) {
-	func_close = _func_close;
+void ModulePanel::set_func_close(std::function<void()> f) {
+	func_close = f;
+}
+
+void ModulePanel::set_func_choose(std::function<void()> f) {
+	func_choose = f;
+	hide_control("swap", false);
 }
 
 void ModulePanel::on_load() {
@@ -121,6 +143,7 @@ ModulePanel *ModulePanel::copy() {
 	c->set_func_replace(func_replace);
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
+	c->set_func_choose(func_choose);
 	return c;
 }
 
@@ -163,6 +186,10 @@ void ModulePanel::on_change() {
 void ModulePanel::on_change_by_action() {
 	check("enabled", module->enabled);
 	old_param = module->config_to_string();
+}
+
+void ModulePanel::on_swap() {
+	hui::RunLater(0.001f, func_choose);
 }
 
 

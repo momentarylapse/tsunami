@@ -19,6 +19,23 @@
 #include "../AudioView.h"
 #include "TrackConsole.h"
 
+hui::Panel *create_dummy_synth_panel() {
+	auto panel = new hui::Panel();
+	panel->add_label("!expandx,center\\- none -", 0, 0, "");
+	return panel;
+}
+
+hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win) {
+	auto *p = new ModulePanel(track->synth, ModulePanel::Mode::DEFAULT_H);
+	p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
+	p->set_func_choose([=]{
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
+		if (name != "")
+			track->set_synthesizer(CreateSynthesizer(session, name));
+	});
+	return p;
+}
+
 TrackConsole::TrackConsole(Session *session) :
 	SideBarConsole(_("Track properties"), session)
 {
@@ -90,20 +107,13 @@ void TrackConsole::load_data() {
 
 		update_strings();
 
-		set_string("select_synth", track->synth->module_subtype);
-
 
 		if (track->synth and track_wants_synth(track)) {
-			panel = new ModulePanel(track->synth, ModulePanel::Mode::DEFAULT_H);
-			panel->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
-			panel->set_func_choose([=]{
-				string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
-				if (name != "")
-					track->set_synthesizer(CreateSynthesizer(session, name));
-			});
-			embed(panel, "synth", 0, 0);
-			add_separator("!horizontal", 0, 1, "separator_0");
+			panel = create_synth_panel(track, session, win);
+		} else {
+			panel = create_dummy_synth_panel();
 		}
+		embed(panel, "synth", 0, 0);
 	} else {
 		hide_control("td_t_bars", true);
 		set_string("tuning", "");

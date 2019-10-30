@@ -803,7 +803,7 @@ image=hui:preferences,flat,menu=popup_fx_menu
 0
 Text
 name
-bold,center,big,expandx
+bold,center,expandx
 1
 0
 0

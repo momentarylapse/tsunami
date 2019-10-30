@@ -42,7 +42,7 @@ public:
 	void on_update();
 
 	Track *track;
-	ModulePanel *panel;
+	hui::Panel *panel;
 	bool editing;
 };
 

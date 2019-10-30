@@ -34,9 +34,8 @@
 #include "../Session.h"
 
 
-Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type)
-{
-	if (type == ModuleType::PLUMBING){
+Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type) {
+	if (type == ModuleType::PLUMBING) {
 		if (sub_type == "BeatMidifier")
 			return new BeatMidifier;
 		if (sub_type == "AudioJoiner")
@@ -53,29 +52,29 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new MidiRecorder;
 		if (sub_type == "MidiSucker")
 			return new MidiSucker;
-	}else if (type == ModuleType::AUDIO_SOURCE){
+	} else if (type == ModuleType::AUDIO_SOURCE) {
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song, true);
-	}else if (type == ModuleType::AUDIO_EFFECT){
+	} else if (type == ModuleType::AUDIO_EFFECT) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new AudioEffect;
-	}else if (type == ModuleType::MIDI_EFFECT){
+	} else if (type == ModuleType::MIDI_EFFECT) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new MidiEffect;
-	}else if (type == ModuleType::SYNTHESIZER){
+	} else if (type == ModuleType::SYNTHESIZER) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummySynthesizer;
 		//if (sub_type == "Sample")
 		//	return new SampleSynthesizer;
-	}else if (type == ModuleType::PITCH_DETECTOR){
+	} else if (type == ModuleType::PITCH_DETECTOR) {
 		return new PitchDetector;
-	}else if (type == ModuleType::BEAT_SOURCE){
+	} else if (type == ModuleType::BEAT_SOURCE) {
 		if (sub_type == "BarStreamer")
 			{}//return new BarStreamer()
-	}else if (type == ModuleType::AUDIO_VISUALIZER){
+	} else if (type == ModuleType::AUDIO_VISUALIZER) {
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
-	}else if (type == ModuleType::STREAM){
+	} else if (type == ModuleType::STREAM) {
 		if (sub_type == "AudioOutput")
 			return new AudioOutput(session);
 		if (sub_type == "AudioInput")
@@ -86,8 +85,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 	return nullptr;
 }
 
-Module* ModuleFactory::_create_dummy(ModuleType type)
-{
+Module* ModuleFactory::_create_dummy(ModuleType type) {
 	if (type == ModuleType::SYNTHESIZER)
 		return new DummySynthesizer;
 	if (type == ModuleType::AUDIO_SOURCE)
@@ -103,13 +101,15 @@ Module* ModuleFactory::_create_dummy(ModuleType type)
 	return nullptr;
 }
 
-string ModuleFactory::base_class(ModuleType type)
-{
+string ModuleFactory::base_class(ModuleType type) {
 	return Module::type_to_name(type);
 }
 
-Module* ModuleFactory::create(Session* session, ModuleType type, const string& sub_type)
-{
+Module* ModuleFactory::create(Session* session, ModuleType type, const string& _sub_type) {
+	string sub_type = _sub_type;
+	if ((type == ModuleType::SYNTHESIZER) and (sub_type == ""))
+		sub_type = "Dummy";
+
 	Module *m = nullptr;
 	Plugin *p = nullptr;
 
@@ -117,7 +117,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& s
 	m = _create_special(session, type, sub_type);
 
 	// plug-ins
-	if (!m){
+	if (!m) {
 		p = session->plugin_manager->get_plugin(session, type, sub_type);
 		if (p)
 			m = (Module*)p->create_instance(session, base_class(type));

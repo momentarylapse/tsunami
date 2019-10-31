@@ -11,6 +11,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../TsunamiWindow.h"
+#include "../../lib/hui/Controls/ControlMenuButton.h"
 
 extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
@@ -31,7 +32,7 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 		p->update();
 	} else {
 		set_target("content");
-		add_label("!center,expandx\\<i>" + _("not configurable") + "</i>", 0, 1, "");
+		add_label("!center,expandx,disabled\\<i>" + _("not configurable") + "</i>", 0, 1, "");
 		hide_control("load_favorite", true);
 		hide_control("save_favorite", true);
 	}
@@ -56,11 +57,15 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	event("save_favorite", [=]{ on_save(); });
 	event("show_large", [=]{ on_large(); });
 	event("show_external", [=]{ on_external(); });
-	event("swap", [=]{ on_swap(); });
+	event("replace", [=]{ on_replace(); });
 
 	hide_control("enabled", true);
 	check("enabled", module->enabled);
-	hide_control("swap", true);
+	
+	auto *mb = (hui::ControlMenuButton*)_get_control_("menu");
+	menu = mb->menu;
+	menu->enable("delete", false);
+	menu->enable("replace", false);
 
 	old_param = module->config_to_string();
 	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
@@ -85,28 +90,25 @@ void ModulePanel::set_width(int width) {
 
 void ModulePanel::set_func_enable(std::function<void(bool)> f) {
 	func_enable = f;
-	hide_control("enabled", func_enable == nullptr);
+	hide_control("enabled", f == nullptr);
 }
 
 void ModulePanel::set_func_delete(std::function<void()> f) {
 	func_delete = f;
+	menu->enable("delete", f != nullptr);
 }
 
 void ModulePanel::set_func_edit(std::function<void(const string&)> f) {
 	func_edit = f;
 }
 
-void ModulePanel::set_func_replace(std::function<void(const Module*)> f) {
-	func_replace = f;
-}
-
 void ModulePanel::set_func_close(std::function<void()> f) {
 	func_close = f;
 }
 
-void ModulePanel::set_func_choose(std::function<void()> f) {
-	func_choose = f;
-	hide_control("swap", false);
+void ModulePanel::set_func_replace(std::function<void()> f) {
+	func_replace = f;
+	menu->enable("replace", f != nullptr);
 }
 
 void ModulePanel::on_load() {
@@ -140,10 +142,9 @@ ModulePanel *ModulePanel::copy() {
 	auto *c = new ModulePanel(module);
 	c->set_func_delete(func_delete);
 	c->set_func_edit(func_edit);
-	c->set_func_replace(func_replace);
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
-	c->set_func_choose(func_choose);
+	c->set_func_replace(func_replace);
 	return c;
 }
 
@@ -188,8 +189,8 @@ void ModulePanel::on_change_by_action() {
 	old_param = module->config_to_string();
 }
 
-void ModulePanel::on_swap() {
-	hui::RunLater(0.001f, func_choose);
+void ModulePanel::on_replace() {
+	hui::RunLater(0.001f, func_replace);
 }
 
 

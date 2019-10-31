@@ -794,7 +794,7 @@ Grid
 
 0
 0
-4
+3
 MenuButton
 menu
 image=hui:preferences,flat,menu=popup_fx_menu
@@ -807,16 +807,10 @@ bold,center,expandx
 1
 0
 0
-Button
-swap
-image=hui:open,flat
-2
-0
-0
 CheckBox
 enabled
 
-3
+2
 0
 0
 Grid
@@ -3669,47 +3663,59 @@ popup_fx_menu
 
 0
 0
-7
+9
+Item
+replace
+image=hui:open
+0
+0
+0
+Separator
+
+
+1
+0
+0
 Item
 load_favorite
 image=hui:open
-0
+2
 0
 0
 Item
 save_favorite
 image=hui:save
-1
+3
 0
 0
 Separator
 
 
-2
+4
 0
 0
 Item
 show_large
 image=hui:zoom-in
-3
+5
 0
 0
 Item
 show_external
 image=hui:zoom-in
-4
+6
 0
 0
 Separator
 
 
-5
+7
 0
 0
 Item
 delete
 image=hui:delete
-6
+8
 0
 0
 # Resource
@@ -7161,9 +7167,6 @@ Effects
 fx_panel/enabled
 
 active?
-fx_panel/swap
-
-swap module
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help
 
@@ -7895,6 +7898,9 @@ Delete
 
 popup_fx_menu/load_favorite
 Load parameters
+
+popup_fx_menu/replace
+Replace...
 
 popup_fx_menu/save_favorite
 Save parameters

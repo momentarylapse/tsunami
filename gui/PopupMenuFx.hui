@@ -1,4 +1,6 @@
 Menu popup_fx_menu ""
+	Item replace "Replace..." image=hui:open
+	Separator
 	Item load_favorite "Load parameters" image=hui:open
 	Item save_favorite "Save parameters" image=hui:save
 	Separator

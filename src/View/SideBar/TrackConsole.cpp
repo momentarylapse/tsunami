@@ -21,14 +21,14 @@
 
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();
-	panel->add_label("!expandx,center\\- none -", 0, 0, "");
+	panel->add_label("!expandx,center,disabled\\<i>" + _("none") + "</i>", 0, 0, "");
 	return panel;
 }
 
 hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win) {
 	auto *p = new ModulePanel(track->synth, ModulePanel::Mode::DEFAULT_H);
 	p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
-	p->set_func_choose([=]{
+	p->set_func_replace([=]{
 		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 		if (name != "")
 			track->set_synthesizer(CreateSynthesizer(session, name));
@@ -128,7 +128,7 @@ void TrackConsole::update_strings() {
 		tuning += pitch_name(track->instrument.string_pitch[i]);
 	}
 	if (track->instrument.string_pitch.num == 0)
-		tuning = _(" - no strings -");
+		tuning = "<i>" + _(" - no strings -") + "</i>";
 	set_string("tuning", tuning);
 }
 

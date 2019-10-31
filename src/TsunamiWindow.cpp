@@ -1161,7 +1161,7 @@ void TsunamiWindow::set_big_panel(ModulePanel* p) {
 	}
 	big_module_panel = p;
 	if (big_module_panel) {
-		big_module_panel->set_func_close([=]{ msg_write("...close"); remove_control("big-grid"); });
+		big_module_panel->set_func_close([=]{ msg_write("...close"); remove_control("plugin-grid"); });
 		int w, h;
 		get_size(w, h);
 		big_module_panel->set_width(w / 2);

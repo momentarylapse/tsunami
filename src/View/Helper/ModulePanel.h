@@ -40,7 +40,7 @@ public:
 	void on_delete();
 	void on_large();
 	void on_external();
-	void on_swap();
+	void on_replace();
 	void on_change();
 	void on_change_by_action();
 	
@@ -50,21 +50,20 @@ public:
 	
 	void set_func_enable(std::function<void(bool)> func_enable);
 	void set_func_edit(std::function<void(const string&)> func_edit);
-	void set_func_replace(std::function<void(const Module*)> func_replace);
 	void set_func_delete(std::function<void()> func_delete);
 	void set_func_close(std::function<void()> func_close);
-	void set_func_choose(std::function<void()> func_choose);
+	void set_func_replace(std::function<void()> func_replace);
 	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
-	std::function<void(const Module*)> func_replace;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
-	std::function<void()> func_choose;
+	std::function<void()> func_replace;
 	Session *session;
 	Module *module;
 	string old_param;
 	ConfigPanel *p;
+	hui::Menu *menu;
 };
 
 

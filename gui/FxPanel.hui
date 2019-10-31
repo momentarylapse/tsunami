@@ -3,6 +3,5 @@ Dialog fx_panel "" width=200 height=200
 		Grid ? ""
 			MenuButton menu "" image=hui:preferences flat menu=popup_fx_menu
 			Text name "" bold center expandx
-			Button swap "" image=hui:open "tooltip=swap module" flat
 			CheckBox enabled "" "tooltip=active?"
 		Grid content ""

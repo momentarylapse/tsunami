@@ -498,6 +498,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Song.time_track", &Song::time_track);
 	Kaba::link_external_class_func("Song.begin_action_group", &Song::begin_action_group);
 	Kaba::link_external_class_func("Song.end_action_group", &Song::end_action_group);
+	Kaba::link_external_class_func("Song.get_time_str", &Song::get_time_str);
+	Kaba::link_external_class_func("Song.get_time_str_fuzzy", &Song::get_time_str_fuzzy);
+	Kaba::link_external_class_func("Song.get_time_str_long", &Song::get_time_str_long);
 
 	SongRenderer sr(nullptr);
 	Kaba::declare_class_size("SongRenderer", sizeof(SongRenderer));
@@ -571,6 +574,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("AudioView.output_stream", &AudioView::output_stream);
 	Kaba::link_external_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	Kaba::link_external_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
+	Kaba::link_external_class_func("AudioView.play", &AudioView::play);
+	Kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
+	Kaba::link_external_class_func("AudioView.optimize_view", &AudioView::optimize_view);
 
 	Kaba::declare_class_size("ColorScheme", sizeof(ColorScheme));
 	Kaba::declare_class_element("ColorScheme.background", &ColorScheme::background);

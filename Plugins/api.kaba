@@ -458,6 +458,10 @@ class Song
 	
 	extern void begin_action_group()
 	extern void end_action_group()
+	
+	extern string get_time_str(int t)
+	extern string get_time_str_fuzzy(int t, float dt)
+	extern string get_time_str_long(int t)
 
 class SongSelection
 	Range range_raw
@@ -491,6 +495,9 @@ class AudioView
 	AudioOutput* output_stream
 	extern void subscribe(void* handler, Function* f, string message)
 	extern void unsubscribe(void* handler)
+	extern void play()
+	extern void set_playback_loop(bool loop)
+	extern void optimize_view()
 
 class SongRenderer extends AudioSource
 	extern void __init__(Song* s)

@@ -565,8 +565,10 @@ void Window::set_info_text(const string &str, const Array<string> &options)
 // give our window the focus....and try to focus the specified control item
 void Panel::activate(const string &control_id)
 {
-	gtk_widget_grab_focus(win->window);
-	gtk_window_present(GTK_WINDOW(win->window));
+	if (win) {
+		gtk_widget_grab_focus(win->window);
+		gtk_window_present(GTK_WINDOW(win->window));
+	}
 	if (control_id.num > 0)
 		apply_foreach(control_id, [=](Control *c){ c->focus(); });
 }
@@ -578,6 +580,8 @@ bool Panel::is_active(const string &control_id)
 		apply_foreach(control_id, [&](Control *c){ r = c->has_focus(); });
 		return r;
 	}
+	if (!win)
+		return false;
 	return (bool)gtk_widget_has_focus(win->window);
 }
 

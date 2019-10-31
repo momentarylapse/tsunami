@@ -4,12 +4,10 @@ use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
 use "../MidiSource/Click.kaba"
+use "../AudioEffect/Special/Click Counter.kaba"
 
-const float THRESHOLD1 = 0.20
-const float THRESHOLD2 = 0.15
-const float RECOVER_TIME = 0.40
 
-class ClickCounterDialog extends ConfigPanel
+class ClickCounterPanel extends ConfigPanel
 	override MicrophoneClickCounter* c
 	override void __init__(Module* _c)
 		#super.__init__("Click Counter", 300, 175, _counter.session.win, false)
@@ -21,11 +19,11 @@ class ClickCounterDialog extends ConfigPanel
 		add_button("+", 0, 0, "inc")
 		add_button("-", 1, 0, "dec")
 	
-		event_x("drawing", "hui:draw", &on_draw)
-		event("inc", &on_increase)
-		event("dec", &on_decrease)
+		event_x("drawing", "hui:draw", on_draw)
+		event("inc", on_increase)
+		event("dec", on_decrease)
 		
-		id = RunRepeated(0.05, self, &poll)
+		id = RunRepeated(0.05, &self, poll)
 	
 	override void __delete__()
 		CancelRunner(id)
@@ -40,7 +38,7 @@ class ClickCounterDialog extends ConfigPanel
 		float y0 = 30
 		float y1 = p.height - 5
 		float h = y1 - y0
-		p.draw_rect(5, y0 + h * (1 - c.Volume), 5, h)
+		p.draw_rect(5, y0 + h * (1 - c.click_counter.volume), 5, h)
 		p.set_color(colors.text_soft2)
 		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
@@ -52,98 +50,53 @@ class ClickCounterDialog extends ConfigPanel
 		draw_volume(p)
 	
 		p.set_color(colors.text)
-		p.draw_str(100, 100, c.counter.str())
+		p.draw_str(100, 100, str(c.click_counter.counter))
 
 	void on_increase()
-		c.counter ++
+		c.click_counter.counter ++
 		redraw("drawing")
 
 	void on_decrease()
-		c.counter --
+		c.click_counter.counter --
 		redraw("drawing")
 
 class MicrophoneClickCounter extends TsunamiPlugin
-
-	AudioInput *input
-	AudioOutput *stream
-	Synthesizer *synth
-	ClickSource *source
-
-	float Volume
-	int counter
-
-	bool active
-	int active_ttl
 	
-	ARGH.... need AudioRecorder exported
+	SignalChain* chain
+	ClickSource* source
+	ClickCounter* click_counter
+	ClickCounterPanel* panel
+	
+	int runner
 	
 	override void on_start()
-
-		counter = 2265
-		active = false
-		active_ttl = -1
-	
-		source = new ClickSource
-		synth = CreateSynthesizer(session, "")
-		synth.plug(0, source, 0)
-		stream = new OutputStream(session)
-		stream.plug(0, synth, 0)
-		stream.set_buffer_size(2048)
-		stream.play()
+		panel = nil
+		chain = session.add_signal_chain("click-counter")
+		let input = chain.add(Module.STREAM, "AudioInput")
+		click_counter = chain.add(Module.AUDIO_EFFECT, "ClickCounter")
+		let sucker = chain.add(Module.PLUMBING, "AudioSucker")
+		source = chain.add(Module.MIDI_SOURCE, "Click")
+		let synth = chain.add(Module.SYNTHESIZER, "")
+		let out = chain.add(Module.STREAM, "AudioOutput")
+		chain.connect(input, 0, click_counter, 0)
+		chain.connect(click_counter, 0, sucker, 0)
+		chain.connect(source, 0, synth, 0)
+		chain.connect(synth, 0, out, 0)
 		
-		#dlg = new ClickCounterDialog(self)
-		#dlg.show()
-		
-		input = new InputStreamAudio(session)
-		input.start()
-		input.subscribe(self, &on_input, "")
-	
-	override ConfigPanel* create_panel()
-		return new ClickCounterDialog(self)
+		chain.start()
+		runner = RunRepeated(0.05, &self, on_update)
 		
 	override void on_stop()
-		input.unsubscribe(self)
-		input.stop()
-		
-		delete input
+		CancelRunner(runner)
+		delete chain
 	
-		delete stream
-		delete synth
+	void on_update()
+		if click_counter.emit
+			source.click()
+			click_counter.emit = false
+		if panel
+			panel.redraw("drawing")
 
-	void on_input()
-		int available = input.current_buffer.available()
 	
-		AudioBuffer buf
-		input.current_buffer.read_ref(buf, available)
-	
-		float[] temp
-		temp = buf.r + buf.l
-		
-		input.current_buffer.read_ref_done(buf)
-	
-		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
-	
-		Volume = 0
-		for f,i in temp
-			if f > Volume
-				Volume = f
-			if f > THRESHOLD1
-				if !active
-					print("start")
-					active = true
-					source.click()
-					stream.play()
-					counter ++
-					print(counter)
-					active_ttl = recover_samples
-			if active and (active_ttl > 0)
-				if f > THRESHOLD2
-					active_ttl = recover_samples
-				else
-					active_ttl --
-			if active and (active_ttl <= 0)
-				print("end")
-				active = false
-				active_ttl = -1
-	
-		#dlg.redraw("drawing")
+	override ConfigPanel* create_panel()
+		return new ClickCounterPanel(&self)

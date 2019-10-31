@@ -1,0 +1,51 @@
+use "../../api.kaba"
+
+const float THRESHOLD1 = 0.20
+const float THRESHOLD2 = 0.15
+const float RECOVER_TIME = 0.40
+
+class ClickCounter extends AudioEffect
+	int counter
+	float volume
+	bool active
+	int active_ttl
+	
+	bool emit # read/reset by outside world...
+	# TODO make callbacks possible!
+	
+	override void reset_state()
+		counter = 0
+		volume = 0
+		active = false
+		emit = false
+		active_ttl = -1
+	
+	override void process(AudioBuffer buf)
+	
+		float[] temp
+		temp = buf.r + buf.l
+	
+		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
+	
+		volume = 0
+		for f,i in temp
+			if f > volume
+				volume = f
+			if f > THRESHOLD1
+				if !active
+					#print("start")
+					active = true
+					emit = true
+					counter ++
+					active_ttl = recover_samples
+			if active and (active_ttl > 0)
+				if f > THRESHOLD2
+					active_ttl = recover_samples
+				else
+					active_ttl --
+			if active and (active_ttl <= 0)
+				#print("end")
+				active = false
+				active_ttl = -1
+	
+		

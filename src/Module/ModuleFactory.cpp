@@ -105,10 +105,22 @@ string ModuleFactory::base_class(ModuleType type) {
 	return Module::type_to_name(type);
 }
 
+void _extract_subtype_and_config(ModuleType type, const string &s, string &subtype, string &config) {
+	subtype = s;
+	config = "";
+	int pp = s.find(":");
+	if (pp >= 0) {
+		subtype = s.head(pp);
+		config = s.substr(pp + 1, -1);
+	}
+	if ((type == ModuleType::SYNTHESIZER) and (subtype == ""))
+		subtype = "Dummy";
+}
+
+// can be pre-configured with sub_type="ModuleName:config..."
 Module* ModuleFactory::create(Session* session, ModuleType type, const string& _sub_type) {
-	string sub_type = _sub_type;
-	if ((type == ModuleType::SYNTHESIZER) and (sub_type == ""))
-		sub_type = "Dummy";
+	string sub_type, config;
+	_extract_subtype_and_config(type, _sub_type, sub_type, config);
 
 	Module *m = nullptr;
 	Plugin *p = nullptr;
@@ -133,6 +145,9 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 	// type specific initialization
 	if (m and type == ModuleType::SYNTHESIZER)
 		((Synthesizer*)m)->set_sample_rate(session->sample_rate());
+	
+	if (config != "")
+		m->config_from_string(config);
 
 	return m;
 }

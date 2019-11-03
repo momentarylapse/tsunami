@@ -87,10 +87,16 @@ float EnvelopeADSR::get() {
 		value *= factor_release;
 		if (value <= 0.0001f)
 			kill();
-	} else {
-		just_killed = false;
 	}
 	return value;
+}
+
+Array<float> EnvelopeADSR::read(int n) {
+	Array<float> f;
+	f.resize(n);
+	for (int i=0; i<n; i++)
+		f[i] = get();
+	return f;
 }
 
 void EnvelopeADSR::start_attack() {
@@ -99,6 +105,7 @@ void EnvelopeADSR::start_attack() {
 
 	mode = MODE_ATTACK;
 	ttl = ttl_attack;
+	just_killed = false;
 
 	if (ttl <= 0)
 		start_decay();

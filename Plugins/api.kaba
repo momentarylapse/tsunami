@@ -28,7 +28,7 @@ class Range
 	bool inside(int pos)
 		return pos >= offset and pos < offset + length
 	string str()
-		return "(" + offset + ":" + end() + ")"
+		return "({{offset}}:{{end()}})"
 Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
@@ -65,7 +65,7 @@ class MidiEvent
 		stringno = -1
 		clef_position = -1
 	string str()
-		return "(" + pos + ", " + pitch + ", " + volume + ")"
+		return "({{pos}}, {{pitch}}, {{volume}})"
 
 class MidiEventBuffer extends MidiEvent[]
 	int samples
@@ -286,6 +286,7 @@ class EnvelopeADSR
 	extern void start(float volume)
 	extern void end()
 	extern float get()
+	extern float[] read(int n)
 	bool just_killed
 
 

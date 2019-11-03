@@ -372,6 +372,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("EnvelopeADSR.start", &EnvelopeADSR::start);
 	Kaba::link_external_class_func("EnvelopeADSR.end", &EnvelopeADSR::end);
 	Kaba::link_external_class_func("EnvelopeADSR.get", &EnvelopeADSR::get);
+	Kaba::link_external_class_func("EnvelopeADSR.read", &EnvelopeADSR::read);
 	Kaba::declare_class_element("EnvelopeADSR.just_killed", &EnvelopeADSR::just_killed);
 
 	Kaba::declare_class_size("BarPattern", sizeof(BarPattern));

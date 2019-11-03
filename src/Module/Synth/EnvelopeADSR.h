@@ -8,6 +8,8 @@
 #ifndef SRC_MODULE_SYNTH_ENVELOPEADSR_H_
 #define SRC_MODULE_SYNTH_ENVELOPEADSR_H_
 
+#include "../../lib/base/base.h"
+
 class EnvelopeADSR {
 public:
 
@@ -22,6 +24,7 @@ public:
 	void end();
 
 	float get();
+	Array<float> read(int n);
 
 	// config
 	float step_attack;

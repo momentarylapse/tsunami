@@ -22,7 +22,7 @@ class Config extends Module.Config
 
 class LowPassFilter extends AudioEffect
 	Config config
-	DynamicFilter filter1, filter2
+	BiquadMultiFilter filter1, filter2
 	float phase
 
 	override void reset_state()

@@ -13,7 +13,7 @@ class LowPassFilter extends AudioEffect
 			frequency = 1000
 
 	Config config
-	Filter filter
+	BiquadFilter filter
 
 	override void reset_state()
 		filter.reset()

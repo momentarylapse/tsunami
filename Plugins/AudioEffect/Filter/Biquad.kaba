@@ -26,26 +26,32 @@ class Biquad extends AudioEffect
 			b1 = 0
 			b2 = 0
 
-		void create_filter(Filter f, float sample_rate)
-			f.l.f.sample_rate = sample_rate
-			f.l.f.a[1] = a1
-			f.l.f.a[2] = a2
-			f.l.f.b[0] = b0
-			f.l.f.b[1] = b1
-			f.l.f.b[2] = b2
-			#f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
+		void create_filter(BiquadFilter.Parameters p)
+			p.a[1] = a1
+			p.a[2] = a2
+			p.b[0] = b0
+			p.b[1] = b1
+			p.b[2] = b2
+
+		void from_filter(BiquadFilter.Parameters p)
+			a1 = p.a[1]
+			a2 = p.a[2]
+			b0 = p.b[0]
+			b1 = p.b[1]
+			b2 = p.b[2]
+		
 
 	Config config
 
 	BiquadGrid *grid
 
-	Filter filter # state
+	BiquadFilter filter # state
 	
 	override void __init__()
 		grid = nil
 	
 	override void on_config()
-		config.create_filter(filter, session.sample_rate())
+		config.create_filter(filter.params)
 	
 	override void reset_state()
 		filter.reset()
@@ -71,13 +77,15 @@ class BiquadGrid extends Grid
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
-		FilterGainCurve gain
-		c.create_filter(gain.f, sample_rate)
+		BiquadGainCurve gain
+		c.create_filter(gain.filter.params)
+		gain.sample_rate = sample_rate
 		draw_curve_c(p, gain, true)
 	
 		# curve + area below
-		FilterPhaseShiftCurve phase
-		c.create_filter(phase.f, sample_rate)
+		BiquadPhaseShiftCurve phase
+		c.create_filter(phase.filter.params)
+		phase.sample_rate = sample_rate
 		draw_curve_c(p, phase, false)
 
 
@@ -113,20 +121,21 @@ Grid ? '' vertical
 		grid.sample_rate = c.session.sample_rate()
 		
 		c.grid = &grid
-		set_float("a1", c.config.a1)
-		set_float("a2", c.config.a2)
-		set_float("b0", c.config.b0)
-		set_float("b1", c.config.b1)
-		set_float("b2", c.config.b2)
 		
 		let ids = ["a1", "a2", "b0", "b1", "b2"]
 		for id in ids
 			event(id, on_change)
+		event_x("drawing", "hui:right-button-down", on_right_click)
 	
 	override void __delete__()
 		c.grid = nil
 		
 	override void update()
+		set_float("a1", c.config.a1)
+		set_float("a2", c.config.a2)
+		set_float("b0", c.config.b0)
+		set_float("b1", c.config.b1)
+		set_float("b2", c.config.b2)
 		grid.redraw()
 	
 	void on_change()
@@ -137,4 +146,56 @@ Grid ? '' vertical
 		c.config.b2 = get_float("b2")
 		c.changed()
 
+	void on_right_click()
+		let dlg = new PresetDialog(self)
+		dlg.run()
+		del dlg
+
+class PresetDialog extends Dialog
+	BiquadPanel *bp
+	void __init__(BiquadPanel _p)
+		super.__init__("preset", 400, 100, _p.win, false)
+		bp = &_p
+		from_source("
+Grid ? '' vertical
+	Grid ? ''
+		Label ? 'Type'
+		ComboBox type 'Low Pass\\Hight Pass\\Low Shelf\\Hight Shelf\\Peak\\All Pass' expandx
+		---|
+		Label ? 'Frequency'
+		SpinButton frequency '440' range=1:10000:0.1
+		Label ? Hz
+		---|
+		Label ? 'Q'
+		SpinButton q '10' range=0:100:0.01
+		---|
+		Label ? 'Gain'
+		SpinButton gain '1' range=-30:30:0.1
+		Label ? dB
+	Grid ? '' buttonbar
+		Button apply 'Apply'
+")
+		event("apply", on_apply)
+	void on_apply()
+		BiquadFilter.Parameters p
+		float sample_rate = bp.c.session.sample_rate()
+		int t = get_int("type")
+		float freq = get_float("frequency")
+		float q = get_float("q")
+		float gain = get_float("gain")
+		if t == 0
+			p.create_low_pass(freq, q, sample_rate)
+		else if t == 1
+			p.create_high_pass(freq, q, sample_rate)
+		else if t == 2
+			p.create_low_shelf(freq, q, gain, sample_rate)
+		else if t == 3
+			p.create_high_shelf(freq, q, gain, sample_rate)
+		else if t == 4
+			p.create_peak(freq, q, gain, sample_rate)
+		else if t == 5
+			p.create_all_pass(freq, q, sample_rate)
+		bp.c.config.from_filter(p)
+		bp.c.changed()
+		bp.update()
 

@@ -82,16 +82,15 @@ class PADRenderer extends PitchRenderer
 
 	override bool render(AudioBuffer buf)
 		for i in 0:len(buf)
-			float d = prebuf[pos] * env.get()
-			if env.just_killed
-				return false
+			float d = prebuf[pos]
 				
 			buf.l[i] += d
 			pos ++
 			if pos >= N
 				pos = 0
+		buf.l *= env.read(len(buf))
 		buf.auto_generate_channels()
-		return true
+		return !env.just_killed
 	
 
 class PADSynthesizer extends Synthesizer

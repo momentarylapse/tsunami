@@ -32,279 +32,245 @@ string filter_name(int t)
 	return "???"
 
 
-# mostly config parameters
-class BasicFilter
-	float[3] a, b
-	float sample_rate
+class BiquadFilter
+
+	# mostly config parameters
+	class Parameters
+		float[3] a, b
 	
-	# requires &x != &y...
-	void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
-		# overlap
-		y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
-		y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
-		# main chunk
-		for i in 2:x.num
-			y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
-		# save overlap
-		for i in 0:2
-			prev_x[i] = x[x.num - 2 + i]
-			prev_y[i] = y[y.num - 2 + i]
-	void __init__()
-		a[0] = 0
-		a[1] = 0
-		a[2] = 0
-		b[0] = 1
-		b[1] = 0
-		b[2] = 0
-	void __assign__(BasicFilter o)
-		pass
-	float gain(float f)
-		complex z
-		z.x = cos(2*pi*f/sample_rate)
-		z.y = sin(2*pi*f/sample_rate)
-		complex H = complex(b[0], 0) + b[1]*z + b[2]*z*z
-		complex y = complex(1,0) + a[1]*z + a[2]*z*z
+		# requires &x != &y...
+		void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
+			# overlap
+			y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
+			y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
+			# main chunk
+			for i in 2:len(x)
+				y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
+			# save overlap
+			for i in 0:2
+				prev_x[i] = x[len(x) - 2 + i]
+				prev_y[i] = y[len(y) - 2 + i]
+		void __init__()
+			a[0] = 0 # ignored
+			a[1] = 0
+			a[2] = 0
+			b[0] = 1
+			b[1] = 0
+			b[2] = 0
+		float gain(float f, float sample_rate)
+			complex z
+			z.x = cos(2*pi*f/sample_rate)
+			z.y = sin(2*pi*f/sample_rate)
+			let H = complex(b[0], 0) + b[1]*z + b[2]*z*z
+			let y = complex(1,0) + a[1]*z + a[2]*z*z
 		
-		float fac = H.abs() / y.abs()
-		return factor_to_db(fac)
-	float phase_shift(float f)
-		complex z
-		z.x = cos(2*pi*f/sample_rate)
-		z.y = sin(2*pi*f/sample_rate)
-		complex H = complex(b[0], 0) + b[1]*z + b[2]*z*z
-		complex y = complex(1,0) + a[1]*z + a[2]*z*z
-		complex zz = H * y.bar()
-		return atan2(zz.y, zz.x) * 10
+			float fac = H.abs() / y.abs()
+			return factor_to_db(fac)
+		float phase_shift(float f, float sample_rate)
+			complex z
+			z.x = cos(2*pi*f/sample_rate)
+			z.y = sin(2*pi*f/sample_rate)
+			let H = complex(b[0], 0) + b[1]*z + b[2]*z*z
+			let y = complex(1,0) + a[1]*z + a[2]*z*z
+			let zz = H * y.bar()
+			return atan2(zz.y, zz.x) * 10
 	
-	void create(int mode, float freq, float q, float gain, float _sample_rate)
-		sample_rate = _sample_rate
-		if mode == FILTER_LOW_PASS
-			create_low_pass(freq, q)
-		else if mode == FILTER_HIGH_PASS
-			create_high_pass(freq, q)
-		else if mode == FILTER_PEAK
-			create_peak(freq, q, gain)
-		#else if mode == FILTER_NOTCH
-#			create_notch(freq, q, gain)
-		else if mode == FILTER_LOW_SHELF
-			create_low_shelf(freq, q, gain)
-		else if mode == FILTER_HIGH_SHELF
-			create_high_shelf(freq, q, gain)
-		else if mode == FILTER_LOW_PASS_LINEAR
-			create_low_pass_linear(freq)
-		else if mode == FILTER_HIGH_PASS_LINEAR
-			create_high_pass_linear(freq)
-		else if mode == FILTER_ALL_PASS
-			create_all_pass(freq, q)
+		void create(int mode, float freq, float q, float gain, float sample_rate)
+			if mode == FILTER_LOW_PASS
+				create_low_pass(freq, q, sample_rate)
+			else if mode == FILTER_HIGH_PASS
+				create_high_pass(freq, q, sample_rate)
+			else if mode == FILTER_PEAK
+				create_peak(freq, q, gain, sample_rate)
+			#else if mode == FILTER_NOTCH
+#				create_notch(freq, q, gain, sample_rate)
+			else if mode == FILTER_LOW_SHELF
+				create_low_shelf(freq, q, gain, sample_rate)
+			else if mode == FILTER_HIGH_SHELF
+				create_high_shelf(freq, q, gain, sample_rate)
+			else if mode == FILTER_LOW_PASS_LINEAR
+				create_low_pass_linear(freq, sample_rate)
+			else if mode == FILTER_HIGH_PASS_LINEAR
+				create_high_pass_linear(freq, sample_rate)
+			else if mode == FILTER_ALL_PASS
+				create_all_pass(freq, q, sample_rate)
 
-	void create_peak(float f_res, float Q, float gain)
-		float g = db_to_factor(gain)
-		float c = 1 / tan(pi * f_res / sample_rate)
-		float B = 1 / Q
-		float a0 = c*c + B*c + 1
-		b[0] = (c*c + B*c*g + 1) / a0
-		a[1] = (2 - 2*c*c) / a0
-		b[1] = a[1]
-		a[2] = (c*c - B*c + 1) / a0
-		b[2] = (c*c - B*g*c + 1) / a0
+		void create_peak(float f_res, float Q, float gain, float sample_rate)
+			float g = db_to_factor(gain)
+			float c = 1 / tan(pi * f_res / sample_rate)
+			float B = 1 / Q
+			float a0 = c*c + B*c + 1
+			b[0] = (c*c + B*c*g + 1) / a0
+			a[1] = (2 - 2*c*c) / a0
+			b[1] = a[1]
+			a[2] = (c*c - B*c + 1) / a0
+			b[2] = (c*c - B*g*c + 1) / a0
 
-	void create_notch(float f_res, float Q)
-		float c = tan(pi * f_res / sample_rate)
-		float a0 = 1 + c/Q + c*c
-		b[0] = (1 + c*c) / a0
-		b[1] = 2 * (c*c - 1) / a0
-		b[2] = b[0]
-		a[1] = b[1]
-		a[2] = (1 - c/Q + c*c) / a0
+		void create_notch(float f_res, float Q, float sample_rate)
+			float c = tan(pi * f_res / sample_rate)
+			float a0 = 1 + c/Q + c*c
+			b[0] = (1 + c*c) / a0
+			b[1] = 2 * (c*c - 1) / a0
+			b[2] = b[0]
+			a[1] = b[1]
+			a[2] = (1 - c/Q + c*c) / a0
 
-	void create_low_pass(float f_res, float q)
-		#b[0] = 1 / (1 + sample_rate/f_res/2/pi)
-#		b[1] = 0
-#		b[2] = 0
-#		a[1] = b[0]-1
-#		a[2] = 0
-		q = sqrt(2) #20 / q
-		float c = tan(pi * f_res / sample_rate)
-		float a0 = 1 + c*q + c*c
-		b[0] = c*c / a0
-		b[1] = 2 * b[0]
-		b[2] = b[0]
-		a[1] = 2 * (c*c - 1) / a0
-		a[2] = (1 - c*q + c*c) / a0
+		void create_low_pass(float f_res, float q, float sample_rate)
+			#b[0] = 1 / (1 + sample_rate/f_res/2/pi)
+#			b[1] = 0
+#			b[2] = 0
+#			a[1] = b[0]-1
+#			a[2] = 0
+			q = sqrt(2) #20 / q
+			float c = tan(pi * f_res / sample_rate)
+			float a0 = 1 + c*q + c*c
+			b[0] = c*c / a0
+			b[1] = 2 * b[0]
+			b[2] = b[0]
+			a[1] = 2 * (c*c - 1) / a0
+			a[2] = (1 - c*q + c*c) / a0
 
-	void create_high_pass(float f_res, float q)
-		#b[0] = 1 / (1 + f_res*2*pi / sample_rate)
-#		b[1] = -b[0]
-#		b[2] = 0
-#		a[1] = -b[0]
-#		a[2] = 0
-		q = sqrt(2) #20 / q
-		float c = tan(pi * f_res / sample_rate)
-		float a0 = 1 + c*q + c*c
-		b[0] = 1 / a0
-		b[1] = - 2 * b[0]
-		b[2] = b[0]
-		a[1] = 2 * (c*c - 1) / a0
-		a[2] = (1 - c*q + c*c) / a0
+		void create_high_pass(float f_res, float q, float sample_rate)
+			#b[0] = 1 / (1 + f_res*2*pi / sample_rate)
+#			b[1] = -b[0]
+#			b[2] = 0
+#			a[1] = -b[0]
+#			a[2] = 0
+			q = sqrt(2) #20 / q
+			float c = tan(pi * f_res / sample_rate)
+			float a0 = 1 + c*q + c*c
+			b[0] = 1 / a0
+			b[1] = - 2 * b[0]
+			b[2] = b[0]
+			a[1] = 2 * (c*c - 1) / a0
+			a[2] = (1 - c*q + c*c) / a0
 
-	void create_low_shelf(float f_res, float q, float gain)
-		float V = db_to_factor(abs(gain))
-		float c = tan(pi * f_res / sample_rate)
+		void create_low_shelf(float f_res, float q, float gain, float sample_rate)
+			float V = db_to_factor(abs(gain))
+			float c = tan(pi * f_res / sample_rate)
 		
-		if gain > 0
-			float a0 = 1 + sqrt(2)*c + c*c
-			b[0] = (1 + sqrt(2*V)*c + V*c*c) / a0
-			b[1] = 2*(V*c*c - 1) / a0
-			b[2] = (1-sqrt(2*V)*c + V*c*c) / a0
-			a[1] = 2*(c*c - 1) / a0
-			a[2] = (1-sqrt(2)*c + c*c) / a0
-		else
-			float a0 = 1 + sqrt(2*V)*c + V*c*c
-			b[0] = (1 + sqrt(2)*c + c*c) / a0
-			b[1] = 2*(c*c - 1) / a0
-			b[2] = (1 - sqrt(2)*c + c*c) / a0
-			a[1] = 2*(V*c*c - 1) / a0
-			a[2] = (1 - sqrt(2*V)*c + V*c*c) / a0
+			if gain > 0
+				float a0 = 1 + sqrt(2)*c + c*c
+				b[0] = (1 + sqrt(2*V)*c + V*c*c) / a0
+				b[1] = 2*(V*c*c - 1) / a0
+				b[2] = (1-sqrt(2*V)*c + V*c*c) / a0
+				a[1] = 2*(c*c - 1) / a0
+				a[2] = (1-sqrt(2)*c + c*c) / a0
+			else
+				float a0 = 1 + sqrt(2*V)*c + V*c*c
+				b[0] = (1 + sqrt(2)*c + c*c) / a0
+				b[1] = 2*(c*c - 1) / a0
+				b[2] = (1 - sqrt(2)*c + c*c) / a0
+				a[1] = 2*(V*c*c - 1) / a0
+				a[2] = (1 - sqrt(2*V)*c + V*c*c) / a0
 		
-		#float c = 2 * sample_rate#1 / tan(pi * f_res / sample_rate)
-#		float w = 2*pi*f_res
-#		float ww = w * (B+1)
-#		float a0 = w+ww
-#		b[0] = (c+ww) / a0
-#		b[1] = (ww-c) / a0
-#		b[2] = 0
-#		a[1] = (w-c) / a0
-#		a[2] = 0
+			#float c = 2 * sample_rate#1 / tan(pi * f_res / sample_rate)
+#			float w = 2*pi*f_res
+#			float ww = w * (B+1)
+#			float a0 = w+ww
+#			b[0] = (c+ww) / a0
+#			b[1] = (ww-c) / a0
+#			b[2] = 0
+#			a[1] = (w-c) / a0
+#			a[2] = 0
 
-	void create_high_shelf(float f_res, float q, float gain)
-		float V = db_to_factor(abs(gain))
-		float c = tan(pi * f_res / sample_rate)
+		void create_high_shelf(float f_res, float q, float gain, float sample_rate)
+			float V = db_to_factor(abs(gain))
+			float c = tan(pi * f_res / sample_rate)
 		
-		if gain > 0
-			float a0 = 1 + sqrt(2)*c + c*c
-			b[0] = (V + sqrt(2*V)*c + c*c) / a0
-			b[1] = 2*(c*c - V) / a0
-			b[2] = (V - sqrt(2*V)*c + c*c) / a0
-			a[1] = 2*(c*c - 1) / a0
-			a[2] = (1 - sqrt(2)*c + c*c) / a0
-		else
-			float a0 = V + sqrt(2*V)*c + c*c
-			b[0] = (1 + sqrt(2)*c + c*c) / a0
-			b[1] = 2*(c*c - 1) / a0
-			b[2] = (1 - sqrt(2)*c + c*c) / a0
-			a[1] = 2*(c*c - V) / a0
-			a[2] = (V - sqrt(2*V)*c + c*c) / a0
+			if gain > 0
+				float a0 = 1 + sqrt(2)*c + c*c
+				b[0] = (V + sqrt(2*V)*c + c*c) / a0
+				b[1] = 2*(c*c - V) / a0
+				b[2] = (V - sqrt(2*V)*c + c*c) / a0
+				a[1] = 2*(c*c - 1) / a0
+				a[2] = (1 - sqrt(2)*c + c*c) / a0
+			else
+				float a0 = V + sqrt(2*V)*c + c*c
+				b[0] = (1 + sqrt(2)*c + c*c) / a0
+				b[1] = 2*(c*c - 1) / a0
+				b[2] = (1 - sqrt(2)*c + c*c) / a0
+				a[1] = 2*(c*c - V) / a0
+				a[2] = (V - sqrt(2*V)*c + c*c) / a0
 		
 		
-	# y[i] := α * (y[i-1] + x[i] - x[i-1])
-	void create_high_pass_linear(float f_res)
-		float RC = 1 / (2 * pi * f_res)
-		float dt = 1.0 / sample_rate
-		float α = RC / (RC + dt)
-		b[0] = α
-		b[1] = -α
-		b[2] = 0
-		a[1] = -α
-		a[2] = 0
+		# y[i] := α * (y[i-1] + x[i] - x[i-1])
+		void create_high_pass_linear(float f_res, float sample_rate)
+			float RC = 1 / (2 * pi * f_res)
+			float dt = 1.0 / sample_rate
+			float α = RC / (RC + dt)
+			b[0] = α
+			b[1] = -α
+			b[2] = 0
+			a[1] = -α
+			a[2] = 0
 
-	# y[i] := α * x[i] + (1-α) * y[i-1]
-	void create_low_pass_linear(float f_res)
-		float RC = 1 / (2 * pi * f_res)
-		float dt = 1.0 / sample_rate
-		float α = dt / (RC + dt)
-		b[0] = α
-		b[1] = 0
-		b[2] = 0
-		a[1] = α - 1
-		a[2] = 0
+		# y[i] := α * x[i] + (1-α) * y[i-1]
+		void create_low_pass_linear(float f_res, float sample_rate)
+			float RC = 1 / (2 * pi * f_res)
+			float dt = 1.0 / sample_rate
+			float α = dt / (RC + dt)
+			b[0] = α
+			b[1] = 0
+			b[2] = 0
+			a[1] = α - 1
+			a[2] = 0
 	
-	void create_all_pass(float freq, float q)
-		float phi = 2 * pi * freq / sample_rate
-		float l = 1 - phi / q
-		create_all_pass_z(l * complex(cos(phi), sin(phi)))
-		
-	void create_all_pass_z(complex z)
-		float l = z.abs()
-		b[0] = l*l
-		b[1] = - 2 * z.x
-		b[2] = 1
-		a[1] = - 2 * z.x
-		a[2] = l*l
+		void create_all_pass(float freq, float q, float sample_rate)
+			float phi = 2 * pi * freq / sample_rate
+			float l = 1 - phi / q
+			create_all_pass_z(l * complex(cos(phi), sin(phi)))
 
-# filter with a state
-class ChannelFilter#Biquad
-	BasicFilter f
-	float[2] prev_x, prev_y
-	void __init__()
-		reset()
-	void __assign__(ChannelFilter o)
-		pass
-	void reset()
-		for i in 0:2
-			prev_x[i] = 0
-			prev_y[i] = 0
-	void create(int mode, float freq, float q, float gain, float _sample_rate)
-		f.create(mode, freq, q, gain, _sample_rate)
-	void apply(float[] buf)
-		let input = buf
-		f.apply(input, buf, prev_x, prev_y)
+		void create_all_pass_z(complex z)
+			float l = z.abs()
+			b[0] = l*l
+			b[1] = - 2 * z.x
+			b[2] = 1
+			a[1] = - 2 * z.x
+			a[2] = l*l
 
-# filter with a state
-class Filter#Biquad
-	ChannelFilter l, r
+
+	class ChannelState
+		float[2] prev_x, prev_y
+		void __init__()
+			reset()
+		void reset()
+			for i in 0:2
+				prev_x[i] = 0
+				prev_y[i] = 0
+			
+	Parameters params
+	ChannelState l, r
+
 	void __init__()
 		reset()
-	void __assign__(Filter o)
-		pass
 	void reset()
 		l.reset()
 		r.reset()
 	void create(int mode, float freq, float q, float gain, float _sample_rate)
-		l.create(mode, freq, q, gain, _sample_rate)
-		r.create(mode, freq, q, gain, _sample_rate)
+		params.create(mode, freq, q, gain, _sample_rate)
 	void apply(AudioBuffer buf)
-		l.apply(buf.l)
+		let input_l = buf.l
+		params.apply(input_l, buf.l, l.prev_x, l.prev_y)
 		if buf.channels > 1
-			r.apply(buf.r)
+			let input_r = buf.r
+			params.apply(input_r, buf.r, r.prev_x, r.prev_y)
+
 
 
 # filter with a state
-class DynamicChannelFilter#Biquad
-	BasicFilter[] f
-	float[2] prev_x, prev_y
+class BiquadMultiFilter
+	BiquadFilter[] f
+
 	void __init__()
 		reset()
-	void __assign__(DynamicChannelFilter o)
-		pass
 	void reset()
-		for i in 0:2
-			prev_x[i] = 0
-			prev_y[i] = 0
+		for ff in f
+			ff.reset()
 	void create(int mode, float[] freq, float[] q, float[] gain, float _sample_rate)
-		#print("create..." + len(freq) + " " + len(q) + " " + len(gain))
 		f.resize(len(freq))
-		for i in 0:len(freq):2
+		for i in 0:len(freq)
 			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)
-	void apply(float[] buf)
-		#print("apply " + len(buf))
-		let input = buf
-		for i in 0:len(buf)-1:2
-			f[i].apply(input[i:i+2], buf[i:i+2], prev_x, prev_y)
-
-# filter with a state
-class DynamicFilter#Biquad
-	DynamicChannelFilter l, r
-	void __init__()
-		reset()
-	void __assign__(DynamicFilter o)
-		pass
-	void reset()
-		l.reset()
-		r.reset()
-	void create(int mode, float[] freq, float[] q, float[] gain, float _sample_rate)
-		l.create(mode, freq, q, gain, _sample_rate)
-		r.create(mode, freq, q, gain, _sample_rate)
 	void apply(AudioBuffer buf)
-		l.apply(buf.l)
-		if buf.channels > 1
-			r.apply(buf.r)
+		for ff in f
+			ff.apply(buf)

@@ -37,7 +37,7 @@ class Peak
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
 	
-	void create_filter(Filter f, float sample_rate)
+	void create_filter(BiquadFilter f, float sample_rate)
 		float freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
@@ -55,9 +55,9 @@ class EqCurve extends Curve
 		float r = gain
 		for p in peaks
 			if p.enabled
-				Filter f
+				BiquadFilter f
 				p.create_filter(f, sample_rate)
-				r += f.l.f.gain(freq)#p.dgain(pitch)
+				r += f.params.gain(freq, sample_rate)#p.dgain(pitch)
 		return r
 
 
@@ -77,7 +77,7 @@ class Equalizer extends AudioEffect
 
 	Config config
 
-	Filter[] filter # state
+	BiquadFilter[] filter # state
 	
 	override void __init__()
 		grid = nil

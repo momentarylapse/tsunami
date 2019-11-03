@@ -7,7 +7,7 @@ const string AUTO_CONFIG_Z = "0:100:0.1:1:"
 const string AUTO_CONFIG_PHI = "0:6.3:0.1:1:"
 
 
-class LowPassFilter extends AudioEffect
+class AllPassFilter extends AudioEffect
 	class Config extends Module.Config
 		float z, phi
 		override void reset()
@@ -15,13 +15,12 @@ class LowPassFilter extends AudioEffect
 			phi = 0
 
 	Config config
-	Filter filter
+	BiquadFilter filter
 
 	override void reset_state()
 		filter.reset()
 
 	override void on_config()
-		#filter.create(FILTER_HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
 		filter.create(FILTER_ALL_PASS, config.z, config.phi, 0, session.sample_rate())
 		
 	override void process(AudioBuffer buf)

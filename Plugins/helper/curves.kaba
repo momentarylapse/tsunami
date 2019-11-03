@@ -3,15 +3,17 @@ use "grid.kaba"
 use "filter.kaba"
 
 
-class FilterGainCurve extends Curve
-	Filter f
+class BiquadGainCurve extends Curve
+	BiquadFilter filter
+	float sample_rate
 	override float get(float freq)
-		return f.l.f.gain(freq)
+		return filter.params.gain(freq, sample_rate)
 
-class FilterPhaseShiftCurve extends Curve
-	Filter f
+class BiquadPhaseShiftCurve extends Curve
+	BiquadFilter filter
+	float sample_rate
 	override float get(float freq)
-		return f.l.f.phase_shift(freq)
+		return filter.params.phase_shift(freq, sample_rate)
 
 
 class SpectrumCurve extends Curve

@@ -40,16 +40,23 @@ class BiquadFilter
 	
 		# requires &x != &y...
 		void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
-			# overlap
-			y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
-			y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
-			# main chunk
-			for i in 2:len(x)
-				y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
-			# save overlap
-			for i in 0:2
-				prev_x[i] = x[len(x) - 2 + i]
-				prev_y[i] = y[len(y) - 2 + i]
+			if len(x) >= 2
+				# overlap
+				y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
+				y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
+				# main chunk
+				for i in 2:len(x)
+					y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
+				# save overlap
+				for i in 0:2
+					prev_x[i] = x[len(x) - 2 + i]
+					prev_y[i] = y[len(y) - 2 + i]
+			else if len(x) == 1
+				y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
+				prev_x[0] = prev_x[1]
+				prev_x[1] = x[0]
+				prev_y[0] = prev_y[1]
+				prev_y[1] = y[0]
 		void __init__()
 			a[0] = 0 # ignored
 			a[1] = 0

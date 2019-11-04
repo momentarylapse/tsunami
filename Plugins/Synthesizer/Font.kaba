@@ -14,13 +14,13 @@ class MidiFont
 		sub = session.create_child()
 		a = new Song(sub, DEFAULT_SAMPLE_RATE)
 		sub.song = a
-		sub.storage.load(a, AppDirectoryStatic + "Midi Fonts/" + name + ".nami")
+		sub.storage.load(a, AppDirectoryStatic + "Midi Fonts/{{name}}.nami")
 
 class FontList
 	MidiFont[] fonts
 	
 	int find(string name)
-		if name == "" and fonts.num > 0
+		if name == "" and len(fonts) > 0
 			return 0
 		for f,i in fonts
 			if f.name == name
@@ -51,11 +51,11 @@ class FontList
 		if n < 0
 			if len(fonts) > 0
 				n = 0
-				session.w("midi font not found: '" + name + "', using '" + fonts[0].name + "' instead")
+				session.w("midi font not found: '{{name}}', using '{{fonts[0].name}}' instead")
 			else
-				session.e("midi font not found: '" + name + "' (none found)")
+				session.e("midi font not found: '{{name}}' (none found)")
 				return nil
-		MidiFont *f = &fonts[n]
+		let f = &fonts[n]
 		f.load(session)
 		return f.a
 
@@ -112,7 +112,7 @@ class FontPanel extends ConfigPanel
 
 	override void update()
 		reset("sets")
-		string[] sets = font_list.get_names()
+		let sets = font_list.get_names()
 		enable("sets", true)
 		for s,i in sets
 			set_string("sets", s)

@@ -19,22 +19,22 @@ class SampleRenderer extends PitchRenderer
 	override SampleSynthesizer *synth
 	override void on_config()
 		sample = nil
-		if synth.config.samples.num >= pitch
+		if pitch < len(synth.config.samples)
 			sample = synth.config.samples[pitch]
 	override void on_start(float volume)
 		events.add(MidiEvent(0, 0, volume))
 	override bool render(AudioBuffer buf)
-		if !sample or (len(events)) == 0
+		if !sample or (len(events) == 0)
 			return false
 		int[] to_del
 		for e,i in events
 			buf.add(*sample.origin.buf, e.pos, e.volume)
 			e.pos -= buf.length
-			if e.pos + (len(*sample.origin.buf)) < 0
+			if e.pos + len(*sample.origin.buf) < 0
 				to_del.add(i)
-		for i in 0:to_del.num
-			events.remove(to_del[to_del.num-1-i])
-		return events.num > 0
+		for i in 0:len(to_del)
+			events.remove(to_del[len(to_del)-1-i])
+		return len(events) > 0
 	
 
 class SampleSynthesizer extends Synthesizer
@@ -58,7 +58,7 @@ class SamplePanel extends ConfigPanel
 		reset("list")
 		for i in 0:MAX_PITCH
 			string name = ""
-			if i < sc.samples.num
+			if i < len(sc.samples)
 				if sc.samples[i]
 					name = sc.samples[i].origin.name
 			set_string("list", pitch_name(i) + "\\" + name)
@@ -67,12 +67,12 @@ class SamplePanel extends ConfigPanel
 		int n = get_int("")
 		if n < 0
 			return
-		if n >= sc.samples.num
+		if n >= len(sc.samples)
 			sc.samples.resize(n + 1)
 		Sample *old = nil
 		if sc.samples[n]
 			old = sc.samples[n].origin
-		Sample *s = SelectSample(c.session, &self, old)
+		let s = SelectSample(c.session, &self, old)
 		if s != old
 			if sc.samples[n]
 				delete sc.samples[n]

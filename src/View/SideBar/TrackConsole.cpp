@@ -33,6 +33,11 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win)
 		if (name != "")
 			track->set_synthesizer(CreateSynthesizer(session, name));
 	});
+	p->set_func_detune([=]{
+		auto *dlg = new DetuneSynthesizerDialog(track->synth, track, session->view, win);
+		dlg->run();
+		delete dlg;
+	});
 	return p;
 }
 

@@ -41,6 +41,7 @@ public:
 	void on_large();
 	void on_external();
 	void on_replace();
+	void on_detune();
 	void on_change();
 	void on_change_by_action();
 	
@@ -48,17 +49,19 @@ public:
 	
 	ModulePanel *copy();
 	
-	void set_func_enable(std::function<void(bool)> func_enable);
-	void set_func_edit(std::function<void(const string&)> func_edit);
-	void set_func_delete(std::function<void()> func_delete);
-	void set_func_close(std::function<void()> func_close);
-	void set_func_replace(std::function<void()> func_replace);
+	void set_func_enable(std::function<void(bool)> f);
+	void set_func_edit(std::function<void(const string&)> f);
+	void set_func_delete(std::function<void()> f);
+	void set_func_close(std::function<void()> f);
+	void set_func_replace(std::function<void()> f);
+	void set_func_detune(std::function<void()> f);
 	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
 	std::function<void()> func_replace;
+	std::function<void()> func_detune;
 	Session *session;
 	Module *module;
 	string old_param;

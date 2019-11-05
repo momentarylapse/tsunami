@@ -58,6 +58,7 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	event("show_large", [=]{ on_large(); });
 	event("show_external", [=]{ on_external(); });
 	event("replace", [=]{ on_replace(); });
+	event("detune", [=]{ on_detune(); });
 
 	hide_control("enabled", true);
 	check("enabled", module->enabled);
@@ -111,6 +112,14 @@ void ModulePanel::set_func_replace(std::function<void()> f) {
 	menu->enable("replace", f != nullptr);
 }
 
+void ModulePanel::set_func_detune(std::function<void()> f) {
+	func_detune = f;
+	if (f) {
+		menu->add_separator();
+		menu->add(_("detune..."), "detune");
+	}
+}
+
 void ModulePanel::on_load() {
 	string name = session->plugin_manager->select_favorite_name(win, module, false);
 	if (name.num == 0)
@@ -145,6 +154,7 @@ ModulePanel *ModulePanel::copy() {
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
 	c->set_func_replace(func_replace);
+	c->set_func_detune(func_detune);
 	return c;
 }
 
@@ -191,6 +201,10 @@ void ModulePanel::on_change_by_action() {
 
 void ModulePanel::on_replace() {
 	hui::RunLater(0.001f, func_replace);
+}
+
+void ModulePanel::on_detune() {
+	func_detune();
 }
 
 

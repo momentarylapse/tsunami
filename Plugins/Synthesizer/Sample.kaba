@@ -9,7 +9,7 @@ class SampleConfig extends Module.Config
 	override void reset()
 		for s in samples
 			if s
-				delete s
+				del s
 		samples.clear()
 
 
@@ -51,7 +51,7 @@ class SamplePanel extends ConfigPanel
 	override SampleSynthesizer *c
 	override void __init__(Module* _s)
 		sc = &c.config
-		add_list_view("!width=300\\Note\\Sample", 0, 0, "list")
+		add_list_view("!expandx\\Note\\Sample", 0, 0, "list")
 		event("list", on_select)
 
 	override void update()

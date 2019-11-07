@@ -5,23 +5,26 @@ use "../helper/tone.kaba"
 
 class MidiFont
 	string name
-	Song *a
+	Song *song
 	Session* sub
 	
+	void __init__()
+	void __init__(string _name)
+		name = _name
+		song = nil
+	
 	void load(Session* session)
-		if a
+		if song
 			return
 		sub = session.create_child()
-		a = new Song(sub, DEFAULT_SAMPLE_RATE)
-		sub.song = a
-		sub.storage.load(a, AppDirectoryStatic + "Midi Fonts/{{name}}.nami")
+		song = new Song(sub, DEFAULT_SAMPLE_RATE)
+		sub.song = song
+		sub.storage.load(song, AppDirectoryStatic + "Midi Fonts/{{name}}.nami")
 
 class FontList
 	MidiFont[] fonts
 	
 	int find(string name)
-		if name == "" and len(fonts) > 0
-			return 0
 		for f,i in fonts
 			if f.name == name
 				return i
@@ -40,24 +43,18 @@ class FontList
 			string name = e.name[:-5]
 			if find(name) >= 0
 				continue
-			MidiFont f
-			f.name = name
-			f.a = nil
-			fonts.add(f)
+			fonts.add(MidiFont(name))
 	
 	Song *get(Session* session, string name)
 		update()
 		int n = find(name)
 		if n < 0
-			if len(fonts) > 0
-				n = 0
-				session.w("midi font not found: '{{name}}', using '{{fonts[0].name}}' instead")
-			else
-				session.e("midi font not found: '{{name}}' (none found)")
-				return nil
+			if len(name) > 0
+				session.e("midi font not found: '{{name}}'")
+			return nil
 		let f = &fonts[n]
 		f.load(session)
-		return f.a
+		return f.song
 
 FontList font_list
 
@@ -68,31 +65,34 @@ class FontConfig extends Module.Config
 
 class FontSynthesizer extends Synthesizer
 	FontConfig config
-	Song *a
-	Synthesizer *s
+	Song *song
+	Synthesizer *synth
 	override void __init__()
-		a = nil
-		s = nil
+		song = nil
+		synth = nil
+	override void __delete__()
+		if synth
+			del synth
 	override void on_config()
-		if s
-			#delete s
-			s = nil
+		if synth
+			del synth
+			synth = nil
 
-		a = font_list.get(session, config.name)
-		if a
-			s = a.tracks[0].synth.copy()
-		if s
-			s.set_sample_rate(sample_rate)
-			s.on_config()
+		song = font_list.get(session, config.name)
+		if song
+			synth = song.tracks[0].synth.copy()
+		if synth
+			synth.set_sample_rate(sample_rate)
+			synth.on_config()
 	override void render(AudioBuffer buf)
-		if !s
+		if !synth
 			return
-		s.events = events
-		s.render(buf)
+		synth.events = events
+		synth.render(buf)
 	
 	override void reset_state()
-		if s
-			s.reset_state()
+		if synth
+			synth.reset_state()
 
 	
 	override ConfigPanel *create_panel()
@@ -113,18 +113,21 @@ class FontPanel extends ConfigPanel
 	override void update()
 		reset("sets")
 		let sets = font_list.get_names()
-		enable("sets", true)
-		for s,i in sets
-			set_string("sets", s)
-			if s == sc.name
-				set_int("sets", i)
-		if len(sets) == 0
+		if len(sets) > 0
+			enable("sets", true)
+			set_string("sets", "  - none -")
+			set_int("sets", 0)
+			for s,i in sets
+				set_string("sets", s)
+				if s == sc.name
+					set_int("sets", i+1)
+		else
 			enable("sets", false)
 			set_string("sets", "  - no fonts found -")
 			set_int("sets", 0)
 		
 	void on_select()
-		int n = get_int("")
+		int n = get_int("")-1
 		sc.name = ""
 		if n >= 0 and n < len(font_list.fonts)
 			sc.name = font_list.fonts[n].name

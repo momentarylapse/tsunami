@@ -405,16 +405,16 @@ image=hui:ok
 # Resource
 Dialog
 configurable_dialog
-width=200,height=100
+
 0
 0
 1
 Grid
 grid
-
+vertical
 0
 0
-2
+3
 Grid
 ?
 
@@ -434,10 +434,16 @@ flat,image=hui:save
 0
 0
 Grid
+content
+
+1
+0
+0
+Grid
 ?
 buttonbar
-0
 2
+0
 4
 Button
 preview

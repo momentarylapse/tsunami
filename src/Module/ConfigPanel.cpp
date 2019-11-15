@@ -11,6 +11,10 @@
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
 
+extern const int CONFIG_PANEL_WIDTH;
+extern const int CONFIG_PANEL_HEIGHT;
+
+
 ConfigPanel::ConfigPanel(Module *_c) {
 	ignore_change = false;
 	c = _c;
@@ -43,7 +47,6 @@ void ConfigPanel::changed() {
 
 
 
-
 class ConfigurationDialog : public hui::Window {
 public:
 	ConfigurationDialog(Module *c, ModuleConfiguration *pd, ConfigPanel *p, hui::Window *parent) :
@@ -55,7 +58,9 @@ public:
 		ok = false;
 
 		set_title(config->module_subtype);
-		embed(panel, "grid", 0, 1);
+		embed(panel, "content", 0, 0);
+		panel->set_options("content", format("width=%d,height=%d", int(CONFIG_PANEL_WIDTH*1.3f), CONFIG_PANEL_HEIGHT)); // doesn't seem to work
+		set_size(CONFIG_PANEL_WIDTH*1.1f, CONFIG_PANEL_HEIGHT*1.2f);
 
 		if (c->module_type != ModuleType::AUDIO_EFFECT)
 			hide_control("preview", true);

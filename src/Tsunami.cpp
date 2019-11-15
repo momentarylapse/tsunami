@@ -26,6 +26,10 @@
 #include "Device/DeviceManager.h"
 #include "Device/Stream/AudioOutput.h"
 #include "Test/TestRingBuffer.h"
+#ifndef NDEBUG
+#include "Module/Audio/AudioEffect.h"
+#include "Module/ConfigPanel.h"
+#endif
 
 
 const string AppName = "Tsunami";
@@ -134,6 +138,7 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 		session->i("--execute <PLUGIN-NAME> [ARGUMENTS]");
 		session->i("--chain <SIGNAL-CHAIN-FILE>");
 #ifndef NDEBUG
+		session->i("--preview-fx <FX>");
 		session->i("--run-tests <FILTER>");
 #endif
 		return true;
@@ -197,6 +202,17 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 			UnitTest::run_all(args[i+1]);
 		else
 			UnitTest::print_all_names();
+		return true;
+	} else if (args[i] == "--preview-fx") {
+		if (args.num < i + 2) {
+			session->e(_("call: tsunami --preview-fx <FX>"));
+			return true;
+		}
+		if (session == Session::GLOBAL)
+			session = create_session();
+		session->win->hide();
+		auto *fx = CreateAudioEffect(session, args[i+1]);
+		configure_module(session->win, fx);
 		return true;
 #endif
 	} else if (args[i].head(2) == "--") {

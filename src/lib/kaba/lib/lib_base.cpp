@@ -151,6 +151,12 @@ public:
 		}
 		resize(num - ndiff);
 	}
+	bool __contains__(int v) {
+		for (int i=0;i<num;i++)
+			if ((*this)[i] == v)
+				return true;
+		return false;
+	}
 	
 	// a += b
 	void _cdecl iadd(IntList &b)	IMPLEMENT_IOP(+=, int)
@@ -681,6 +687,8 @@ void SIAddPackageBase() {
 			func_add_param("other", TypeInt);
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&IntList::assign_int));
 			func_add_param("other", TypeInt);
+		class_add_funcx("__contains__", TypeBool, &IntList::__contains__, FLAG_PURE);
+			func_add_param("i", TypeInt);
 		class_add_func("__lt__", TypeBoolList, mf(&IntList::lt), FLAG_PURE);
 			func_add_param("other", TypeIntList);
 		class_add_func("__le__", TypeBoolList, mf(&IntList::le), FLAG_PURE);

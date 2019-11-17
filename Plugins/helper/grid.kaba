@@ -28,52 +28,102 @@ class GridTick
 class GridPartition
 	GridTick[] tick
 
-class GridAxis
-	float offset, size
-	rect rect
-	float min_label_dist
+#enum
+#	UNIT_NONE
+#	UNIT_TIME
+#	UNIT_PITCH
+#	UNIT_NOTE
+#	UNIT_DB
+#	UNIT_PERCENT
+
+class AxisData
 	float val_min, val_max
 	float val_min_min, val_max_max
-	bool as_log
-	bool freq_as_pitch
+	bool log_scale
 	string unit
 	
-	void __init__()
+
+class GridAxis extends AxisData
+	float offset, size
+	rect area
+	float min_label_dist
+	bool freq_as_pitch
+	Grid* grid
+	Menu* menu
+	string _id
+	
+	override void __init__()
+		_id = p2s(&self)
 		freq_as_pitch = false
 		set(0, 1, false, "")
+		menu = nil
+	override void __delete__()
+		if menu
+			del menu
+	
+	void set_events()
+		grid.panel.event_o("{{_id}}-mode-freq-hz", &self, on_mode_freq_hz)
+		grid.panel.event_o("{{_id}}-mode-pitch", &self, on_mode_pitch)
 	
 	void set(float _val_min, float _val_max, bool _log, string _unit)
 		val_min = _val_min
 		val_max = _val_max
 		val_min_min = _val_min
 		val_max_max = _val_max
-		as_log = _log
+		log_scale = _log
 		unit = _unit
 	
 	float rel2val(float __v)
-		if as_log
+		if log_scale
 			return log2lin(__v, val_min_min, val_max_max)
 		return __v * (val_max_max - val_min_min) + val_min_min
 		
 	float project(float __v)
-		if as_log
+		if log_scale
 			return lin2log(__v, val_min, val_max) * size + offset
 		return ((__v - val_min) / (val_max - val_min)) * size + offset
 
 	float unproject(float __v)
-		if as_log
+		if log_scale
 			return log2lin((__v - offset) / size, val_min, val_max)
 		return (__v - offset) / size * (val_max - val_min) + val_min
 	
 	void zoom(float p, float dz)
 		float m = unproject(p)
-		if as_log
+		if log_scale
 			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
 			val_max = clamp(exp(log(m) + (log(val_max) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
 		else
 			val_min = clamp(m + (val_min - m) * pow(0.9, dz), val_min_min, val_max_max)
 			val_max = clamp(m + (val_max - m) * pow(0.9, dz), val_min_min, val_max_max)
+		grid.redraw()
 		
+	void on_left_button_down()
+		pass
+		
+	void on_right_button_down()
+		if menu
+			del menu
+		menu = new Menu()
+		if unit == "Hz"
+			menu.add("Frequency (Hz)", "{{_id}}-mode-freq-hz")
+			menu.add("Pitch", "{{_id}}-mode-pitch")
+		else if unit == ""
+			menu.add("no unit", "-dummy-")
+		else
+			menu.add("unit: {{unit}}", "-dummy-")
+		menu.popup(grid.panel)
+	
+	void on_mode_freq_hz()
+		freq_as_pitch = false
+		grid.redraw()
+	void on_mode_pitch()
+		freq_as_pitch = true
+		grid.redraw()
+	
+	void on_mouse_wheel(float mm)
+		if grid.panel.win.get_key(KEY_CONTROL)
+			zoom(mm, GetEvent().scroll_y)
 
 	GridPartition get_lin_partition()
 		float d = (val_max - val_min) / size * 150
@@ -94,9 +144,7 @@ class GridAxis
 			GridTick tt
 			tt.value = vv
 			tt.weight = 0.5
-			tt.label = vv.str2(decimals)
-			tt.label += " "
-			tt.label += unit
+			tt.label = "{{vv.str2(decimals)}} {{unit}}"
 			r.tick.add(tt)
 			if factor < 3
 				tt.value = vv + step / 2
@@ -130,14 +178,13 @@ class GridAxis
 					if ((i == 2) or (i == 5)) and (size_param > 4)
 						show = true
 					if show
-						tt.label = vv.str2(0) + " " + unit
+						tt.label = "{{vv.str2(0)}} {{unit}}"
 					r.tick.add(tt)
 				vv = vv0 * 1.5
 				if (i == 1) and (vv >= val_min) and (vv <= val_max)
 					GridTick tt
 					tt.value = vv
 					tt.weight = 0.2
-					tt.label = ""
 					r.tick.add(tt)
 		return r
 		
@@ -145,36 +192,50 @@ class GridAxis
 		GridPartition r
 		float pitch_min = freq_to_pitch(val_min)
 		float pitch_max = freq_to_pitch(val_max)
-		int oct_min = pitch_get_octave(pitch_min)
-		int oct_max = pitch_get_octave(pitch_max) + 1
-		for o in oct_min:oct_max
-			int pitch = pitch_from_octave_and_rel(0, o)
+		float density = (pitch_max - pitch_min) / area.width()
+		#print(density)
+		
+		for p in int(pitch_min):int(pitch_max+1)
+			int rp = pitch_to_rel(p)
 			GridTick tt
-			tt.value = pitch_to_freq(pitch)
-			if (tt.value >= val_min) and (tt.value <= val_max)
-				tt.weight = 0.7
-				tt.label = pitch_name(pitch)
-				r.tick.add(tt)
-			pitch = pitch_from_octave_and_rel(6, o)
-			tt.value = pitch_to_freq(pitch)
-			if (tt.value >= val_min) and (tt.value <= val_max)
+			tt.value = pitch_to_freq(p)
+			float xxx = 0.03
+			tt.weight = 0.1
+			if rp in [2,5,7,11]
+				xxx = 0.06
+				tt.weight = 0.2
+			if rp in [4,9]
+				xxx = 0.25
 				tt.weight = 0.4
-				tt.label = ""
-				r.tick.add(tt)
+			if rp == 0
+				xxx = 10000
+				tt.weight = 1.0
+			if density < xxx / 1.6
+				tt.label = pitch_name(p)
+			#else
+			#	tt.weight = tt.weight * 0.7
+			
+			tt.weight = tt.weight * clamp(1 - density / xxx, 0, 1)#min(1.0, pow(xxx, 2))
+			#if density < xxx
+			r.tick.add(tt)
 		return r
 		
 	GridPartition get_partition()
-		if as_log
+		if log_scale
 			if freq_as_pitch
 				return get_pitch_partition()
 			return get_log_partition()
 		return get_lin_partition()
 
-class GridData
+class Grid
 	bool allow_bg
 	float x0, y0
 	rect plot_rect
 	float x, y, w, h
+	
+	Panel *panel
+	string id
+	float mx, my
 	
 	GridAxis x_axis, y_axis
 	
@@ -193,6 +254,8 @@ class GridData
 		col_hover = colors.hover
 		col_sel = colors.selection
 		allow_bg = true
+		x_axis.grid = &self
+		y_axis.grid = &self
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
 
@@ -213,7 +276,7 @@ class GridData
 		for t in part.tick
 			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
-			if yy < y_axis.rect.y1 or yy > y_axis.rect.y2
+			if yy < y_axis.area.y1 or yy > y_axis.area.y2
 				continue
 			c.draw_line(x, yy, x + w, yy)
 			if t.label.num > 0
@@ -225,7 +288,7 @@ class GridData
 		for t in part.tick
 			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
-			if xx < x_axis.rect.x1 or xx > x_axis.rect.x2
+			if xx < x_axis.area.x1 or xx > x_axis.area.x2
 				continue
 			c.draw_line(xx, y, xx, y + h)
 			if t.label.num > 0
@@ -250,10 +313,10 @@ class GridData
 		
 		x_axis.offset = x
 		x_axis.size = w
-		x_axis.rect = rect(x, x+w, y+h, _h)
+		x_axis.area = rect(x, x+w, y+h, _h)
 		y_axis.offset = y + h
 		y_axis.size = -h
-		y_axis.rect = rect(_x0, x, _y0, y+h)
+		y_axis.area = rect(_x0, x, _y0, y+h)
 		
 		# background
 		if allow_bg
@@ -382,15 +445,9 @@ class GridData
 		
 	bool mouse_over_point3(vector q)
 		return mouse_over_point2(complex(q.x, q.y))
-		
-	virtual void dummy_virtual()
-		pass
+
 		
 
-class Grid extends GridData
-	Panel *panel
-	string id
-	float mx, my
 	
 	void on_draw_all(Painter c)
 		float w = c.width
@@ -403,54 +460,51 @@ class Grid extends GridData
 	void redraw()
 		panel.redraw(id)
 	
-	void on_left_button_down_all()
+	void update_mouse()
 		mx = GetEvent().mouse_x
 		my = GetEvent().mouse_y
+	
+	void on_left_button_down_all()
+		update_mouse()
 		if plot_rect.inside(mx, my)
 			on_left_button_down()
-		if x_axis.rect.inside(mx, my)
-			x_axis.freq_as_pitch = !x_axis.freq_as_pitch
-			redraw()
-		if y_axis.rect.inside(mx, my)
-			y_axis.freq_as_pitch = !y_axis.freq_as_pitch
-			redraw()
+		if x_axis.area.inside(mx, my)
+			x_axis.on_left_button_down()
+		if y_axis.area.inside(mx, my)
+			y_axis.on_left_button_down()
 	
 	void on_left_button_up_all()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		update_mouse()
 		if plot_rect.inside(mx, my)
 			on_left_button_up()
 	
 	void on_right_button_down_all()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		update_mouse()
 		if plot_rect.inside(mx, my)
 			on_right_button_down()
+		if x_axis.area.inside(mx, my)
+			x_axis.on_right_button_down()
+		if y_axis.area.inside(mx, my)
+			y_axis.on_right_button_down()
 	
 	void on_right_button_up_all()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		update_mouse()
 		if plot_rect.inside(mx, my)
 			on_right_button_up()
 	
 	void on_mouse_move_all()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		update_mouse()
 		#if plot_rect.inside(mx, my)
 		on_mouse_move()
 	
 	void on_mouse_wheel_all()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		update_mouse()
 		if plot_rect.inside(mx, my)
 			on_mouse_wheel()
-		if panel.win.get_key(KEY_CONTROL)
-			if x_axis.rect.inside(mx, my)
-				x_axis.zoom(mx, GetEvent().scroll_y)
-				redraw()
-			if y_axis.rect.inside(mx, my)
-				y_axis.zoom(my, GetEvent().scroll_y)
-				redraw()
+		if x_axis.area.inside(mx, my)
+			x_axis.on_mouse_wheel(mx)
+		if y_axis.area.inside(mx, my)
+			y_axis.on_mouse_wheel(my)
 	
 	void on_key_down_all()
 		on_key_down()
@@ -467,6 +521,8 @@ class Grid extends GridData
 		panel.event_ox(id, "hui:mouse-move", &self, on_mouse_move_all)
 		panel.event_ox(id, "hui:mouse-wheel", &self, on_mouse_wheel_all)
 		panel.event_ox(id, "hui:key-down", &self, on_key_down_all)
+		x_axis.set_events()
+		y_axis.set_events()
 	
 	virtual void on_draw(Painter c)
 	virtual void on_left_button_down()

@@ -93,6 +93,11 @@ class BiquadGrid extends Grid
 		spectrum.set(buf, sample_rate)
 		redraw()
 
+	override void on_right_button_down()
+		let dlg = new PresetDialog(cp)
+		dlg.run()
+		del dlg
+
 class BiquadPanel extends ConfigPanel
 	BiquadGrid grid
 	override Biquad* c
@@ -125,7 +130,6 @@ Grid ? '' vertical
 		let ids = ["a1", "a2", "b0", "b1", "b2"]
 		for id in ids
 			event(id, on_change)
-		event_x("drawing", "hui:right-button-down", on_right_click)
 	
 	override void __delete__()
 		c.grid = nil
@@ -146,16 +150,11 @@ Grid ? '' vertical
 		c.config.b2 = get_float("b2")
 		c.changed()
 
-	void on_right_click()
-		let dlg = new PresetDialog(self)
-		dlg.run()
-		del dlg
-
 class PresetDialog extends Dialog
 	BiquadPanel *bp
-	void __init__(BiquadPanel _p)
+	void __init__(BiquadPanel* _p)
 		super.__init__("preset", 400, 100, _p.win, false)
-		bp = &_p
+		bp = _p
 		from_source("
 Grid ? '' vertical
 	Grid ? ''

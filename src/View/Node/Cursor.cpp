@@ -46,7 +46,7 @@ int Cursor::pos() {
 }
 
 bool Cursor::hover(float mx, float my) {
-	if (my < view->area.y2 - 20)
+	if (my < view->song_area().y2 - 20)
 		return false;
 	float x = view->cam.sample2screen(pos());
 	return (fabs(x - mx) < 10);

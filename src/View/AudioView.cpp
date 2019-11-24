@@ -1164,7 +1164,7 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 			draw_boxed_str(c,  x, song_area().my(), song->get_time_str_long(pos), cc, colors.background);
 		c->set_line_width(1.0f);
 		if (show_circle)
-			c->draw_circle(x, area.y2, 8);
+			c->draw_circle(x, song_area().y2, 8);
 	}
 }
 

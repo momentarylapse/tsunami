@@ -16,6 +16,7 @@
 #include "../Data/Song.h"
 #include "../Data/SongSelection.h"
 #include "../Data/Track.h"
+#include "../Data/Midi/Instrument.h"
 #include "../Data/TrackLayer.h"
 #include "../Data/TrackMarker.h"
 #include "../Data/Sample.h"
@@ -51,6 +52,7 @@
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
+#include "../View/Painter/MidiPainter.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "SongPlugin.h"
@@ -463,6 +465,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Track.muted", &Track::muted);
 	Kaba::declare_class_element("Track.fx", &Track::fx);
 	Kaba::declare_class_element("Track.synth", &Track::synth);
+	Kaba::declare_class_element("Track.instrument", &Track::instrument);
 	Kaba::declare_class_element("Track.root", &Track::song);
 	Kaba::link_external_class_func("Track.nice_name", &Track::nice_name);
 	Kaba::link_external_class_func("Track.set_name", &Track::set_name);
@@ -569,6 +572,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("SignalChain.is_active", &SignalChain::is_playback_active);
 
 	Kaba::declare_class_size("AudioView", sizeof(AudioView));
+	Kaba::declare_class_element("AudioView.cam", &AudioView::cam);
 	Kaba::declare_class_element("AudioView.sel", &AudioView::sel);
 	Kaba::declare_class_element("AudioView.renderer", &AudioView::renderer);
 	Kaba::declare_class_element("AudioView.signal_chain", &AudioView::signal_chain);
@@ -578,6 +582,12 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("AudioView.play", &AudioView::play);
 	Kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
 	Kaba::link_external_class_func("AudioView.optimize_view", &AudioView::optimize_view);
+
+	Kaba::declare_class_size("ViewPort", sizeof(ViewPort));
+	Kaba::declare_class_element("ViewPort.area", &ViewPort::area);
+	Kaba::link_external_class_func("ViewPort.__init__", &ViewPort::__init__);
+	Kaba::link_external_class_func("ViewPort.range", &ViewPort::range);
+	Kaba::link_external_class_func("ViewPort.set_range", &ViewPort::set_range);
 
 	Kaba::declare_class_size("ColorScheme", sizeof(ColorScheme));
 	Kaba::declare_class_element("ColorScheme.background", &ColorScheme::background);
@@ -611,6 +621,13 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("SongSelection.has_note",  (bool (SongSelection::*)(const MidiNote*) const)&SongSelection::has);
 	Kaba::link_external_class_func("SongSelection.has_bar",  (bool (SongSelection::*)(const Bar*) const)&SongSelection::has);
 
+
+	Kaba::declare_class_size("MidiPainter", sizeof(MidiPainter));
+	Kaba::declare_class_element("MidiPainter.cam", &MidiPainter::cam);
+	Kaba::link_external_class_func("MidiPainter.__init__", &MidiPainter::__init__);
+	Kaba::link_external_class_func("MidiPainter.set_context", &MidiPainter::set_context);
+	Kaba::link_external_class_func("MidiPainter.draw", &MidiPainter::draw);
+	Kaba::link_external_class_func("MidiPainter.draw_background", &MidiPainter::draw_background);
 
 	Slider slider;
 	Kaba::declare_class_size("Slider", sizeof(Slider));

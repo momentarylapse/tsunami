@@ -67,7 +67,11 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	song = _song;
 	cam = _cam;
 	sel = _sel;
+	if (!sel)
+		sel = new SongSelection; // TODO... delete later...
 	hover = _hover;
+	if (!hover)
+		hover = new HoverData;
 	instrument = nullptr;
 	clef = nullptr;
 	is_playable = true;
@@ -82,6 +86,11 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	mode = MidiMode::LINEAR;
 	rr = 5;
 	set_quality(1.0f, true);
+}
+
+
+void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) {
+	new(this) MidiPainter(_song, _cam, _sel, _hover, _colors);
 }
 
 

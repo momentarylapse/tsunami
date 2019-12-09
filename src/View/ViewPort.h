@@ -8,15 +8,16 @@
 #ifndef SRC_VIEW_VIEWPORT_H_
 #define SRC_VIEW_VIEWPORT_H_
 
+#include "../lib/math/rect.h"
+
 class AudioView;
 class Range;
-class rect;
 class Song;
 
 class ViewPort {
 public:
 	ViewPort(AudioView *v);
-	ViewPort(rect &area);
+	void __init__(AudioView *v);
 
 	static const float BORDER_FACTOR;
 	static const float BORDER_FACTOR_RIGHT;
@@ -29,7 +30,8 @@ public:
 	double animation_time;
 	double animation_non_linearity;
 	double scale;
-	Range range();
+	Range range() const;
+	void set_range(const Range &r);
 
 	float scale_y;
 
@@ -48,8 +50,7 @@ public:
 	void set_target(float pos, float nonlin);
 	void dirty_jump(float pos);
 
-	rect area();
-	rect *override_area;
+	rect area;
 
 	void make_sample_visible(int sample, int samples_ahead);
 	rect nice_mapping_area();

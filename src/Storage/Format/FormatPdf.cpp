@@ -194,7 +194,7 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	float track_space = 20;
 
 	cam->pos = r.offset;
-	cam->scale = (double)cam->area().width() / (double)r.length;
+	cam->scale = (double)cam->area.width() / (double)r.length;
 
 
 	auto bars = song->bars.get_bars(r + 1000);
@@ -275,8 +275,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 
 	float border = 50;
 
-	rect area = rect(border, page_width - border, 0, page_height);
-	cam = new ViewPort(area);
+	cam = new ViewPort(nullptr);
+	cam->area = rect(border, page_width - border, 0, page_height);
 	SongSelection sel;
 	HoverData hover;
 	ColorScheme _colors = create_pdf_color_scheme();

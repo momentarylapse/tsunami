@@ -2,6 +2,10 @@
 #ifndef _MATH_RECT_INCLUDED_
 #define _MATH_RECT_INCLUDED_
 
+#include "../base/base.h"
+
+class string;
+
 // types
 class rect
 {

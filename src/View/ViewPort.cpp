@@ -13,7 +13,6 @@ const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
 ViewPort::ViewPort(AudioView *v) {
-	override_area = nullptr;
 	view = v;
 	scale = 1.0f;
 	pos = 0;
@@ -22,19 +21,20 @@ ViewPort::ViewPort(AudioView *v) {
 	animation_time = -1;
 	animation_non_linearity = 0;
 	scale_y = 1.0f;
+	area = rect::ID;
 }
 
-ViewPort::ViewPort(rect &_area) : ViewPort(nullptr) {
-	override_area = &_area;
+void ViewPort::__init__(AudioView *v) {
+	new(this) ViewPort(v);
 }
 
 
 double ViewPort::screen2sample(double _x) {
-	return (_x - area().x1) / scale + pos;
+	return (_x - area.x1) / scale + pos;
 }
 
 double ViewPort::sample2screen(double s) {
-	return area().x1 + (s - pos) * scale;
+	return area.x1 + (s - pos) * scale;
 }
 
 double ViewPort::dsample2screen(double ds) {
@@ -45,11 +45,6 @@ double ViewPort::dscreen2sample(double dx) {
 	return dx / scale;
 }
 
-rect ViewPort::area() {
-	if (view)
-		return view->song_area();
-	return *override_area;
-}
 
 void ViewPort::range2screen(const Range &r, float &x1, float &x2) {
 	x1 = sample2screen((double)r.start());
@@ -66,7 +61,7 @@ void ViewPort::zoom(float f, float mx) {
 	// max zoom: 20 pixel per sample
 	double scale_new = clampf(scale * f, 0.000001, 20.0);
 
-	pos += (mx - area().x1) * (1.0/scale - 1.0/scale_new);
+	pos += (mx - area.x1) * (1.0/scale - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;
 	scale = scale_new;
 	if (view)
@@ -114,8 +109,13 @@ bool ViewPort::needs_update() {
 	return (animation_time >= 0);
 }
 
-Range ViewPort::range() {
-	return Range(pos, area().width() / scale);
+Range ViewPort::range() const {
+	return Range(pos, area.width() / scale);
+}
+
+void ViewPort::set_range(const Range &r) {
+	pos = r.offset;
+	scale = (double)area.width() / (double)r.length;
 }
 
 void ViewPort::make_sample_visible(int sample, int samples_ahead) {
@@ -123,32 +123,32 @@ void ViewPort::make_sample_visible(int sample, int samples_ahead) {
 	float border = 0;
 	if (view->is_playback_active())
 		border = dsample2screen(samples_ahead);
-	float dx = area().width() * BORDER_FACTOR;
-	float dxr = min(area().width() * BORDER_FACTOR_RIGHT, dx + border);
+	float dx = area.width() * BORDER_FACTOR;
+	float dxr = min(area.width() * BORDER_FACTOR_RIGHT, dx + border);
 
 	if (samples_ahead > 0) {
 		// playback: always jump until the cursor is on the left border
-		if ((x > area().x2 - dxr) or (x < area().x1 + dx))
+		if ((x > area.x2 - dxr) or (x < area.x1 + dx))
 			set_target(sample - dscreen2sample(dx), 0.7f);
 	} else {
 		// no playback: minimal jump until the cursor is between the borders
-		if (x > area().x2 - dxr)
-			set_target(sample - dscreen2sample(area().width() - dxr), 0.7f);
-		else if (x < area().x1 + dx)
+		if (x > area.x2 - dxr)
+			set_target(sample - dscreen2sample(area.width() - dxr), 0.7f);
+		else if (x < area.x1 + dx)
 			set_target(sample - dscreen2sample(dx), 0.7f);
 	}
 }
 
 rect ViewPort::nice_mapping_area() {
 	// mapping target area
-	float x0 = area().x1;
-	float x1 = area().x2;
+	float x0 = area.x1;
+	float x1 = area.x2;
 	if (x1 - x0 > 800)
 		x0 += AudioView::TRACK_HANDLE_WIDTH;
 	float w = x1 - x0;
 	x0 += w * BORDER_FACTOR;
 	x1 -= w * BORDER_FACTOR;
-	return rect(x0, x1, area().y1, area().y2);
+	return rect(x0, x1, area.y1, area.y2);
 }
 
 void ViewPort::show(Range &r) {
@@ -156,7 +156,7 @@ void ViewPort::show(Range &r) {
 
 	// map r into (x0,x1)
 	scale = mr.width() / (double)r.length;
-	pos = (double)r.start() - (mr.x1 - area().x1) / scale;
+	pos = (double)r.start() - (mr.x1 - area.x1) / scale;
 	pos_pre_animation = pos;
 	pos_target = pos;
 	if (view)

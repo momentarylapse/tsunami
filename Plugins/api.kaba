@@ -1,13 +1,13 @@
-#--------------------------------------------------------------------*\
-#|                                                                      |
-#| header for Tsunami plugin api                                        |
-#|                                                                      |
-#|    (c) by MichiSoft TM 2010                                          |
-#|                                                                      |
-#| Don't even think of changing anything within this file!              |
-#|    (unless you dare dying a cruel death)                             |
-#|                                                                      |
-#\*--------------------------------------------------------------------
+#----------------------------------------------------------------------#
+#                                                                      #
+# header for Tsunami plugin api                                        #
+#                                                                      #
+#    (c) by MichiSoft TM 2010                                          #
+#                                                                      #
+# Don't even think of changing anything within this file!              #
+#    (unless you dare dying a cruel death)                             #
+#                                                                      #
+#----------------------------------------------------------------------#
 
 use hui
 use kaba
@@ -47,6 +47,7 @@ class MidiNote
 		stringno = -1
 		clef_position = -1
 		modifier = 0
+		flags = 0
 	extern void set(int mask)
 	extern bool is(int mask)
 	extern MidiNote* copy()
@@ -392,6 +393,10 @@ enum
 	TYPE_AUDIO_STEREO
 	TYPE_GROUP
 
+class Instrument
+	int type
+	int[] string_pitch
+
 class Track
 	int type
 	string name
@@ -404,6 +409,7 @@ class Track
 	MidiEffect*[] midi_fx
 	
 	Synthesizer *synth
+	Instrument instrument
 
 	# editing
 	Song *song
@@ -489,11 +495,19 @@ class ColorScheme
 	color blob_bg_hidden
 	extern color hoverify(color c)
 
+class ViewPort
+	extern void __init__(AudioView* view)
+	extern Range range()
+	extern void set_range(Range r)
+	rect area
+	
+
 class AudioView
 	SongSelection sel
 	SongRenderer* renderer
 	SignalChain* signal_chain
 	AudioOutput* output_stream
+	ViewPort* cam
 	extern void subscribe(void* handler, Function* f, string message)
 	extern void unsubscribe(void* handler)
 	extern void play()
@@ -624,6 +638,28 @@ class Clipboard
 	Song* temp
 	extern bool has_data()
 	extern bool prepare_layer_map(AudioView *view, TrackLayer*[] sources, TrackLayer*[] targets)
+
+
+class MidiMode
+	enum
+		MIDI_LINEAR
+		TAB
+		CLASSICAL
+		DRUM
+		DONT_CARE
+
+class HoverData
+	
+
+class MidiPainter
+	#extern void __init__(AudioView* view)
+	extern void __init__(Song* song, ViewPort* cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void set_context(rect area, Instrument i, bool playable, int mode)
+	extern void draw(Painter p, MidiNoteBuffer midi)
+	extern void draw_background(Painter c)
+	ViewPort* cam
+
+
 
 #extern PluginContext plugin_context
 extern ColorScheme colors

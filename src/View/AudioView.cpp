@@ -1180,6 +1180,7 @@ void AudioView::draw_song(Painter *c) {
 
 	c->set_antialiasing(false);
 
+	cam.area = song_area();
 	cam.update(0.1f);
 
 	update_buffer_zoom();

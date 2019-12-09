@@ -44,7 +44,6 @@ public:
 class MidiPainter
 {
 public:
-	MidiPainter(AudioView *view);
 	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 

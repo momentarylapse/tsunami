@@ -53,6 +53,7 @@
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
 #include "../View/Painter/MidiPainter.h"
+#include "../View/Painter/GridPainter.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "SongPlugin.h"
@@ -628,6 +629,16 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("MidiPainter.set_context", &MidiPainter::set_context);
 	Kaba::link_external_class_func("MidiPainter.draw", &MidiPainter::draw);
 	Kaba::link_external_class_func("MidiPainter.draw_background", &MidiPainter::draw_background);
+
+
+	Kaba::declare_class_size("GridPainter", sizeof(GridPainter));
+	Kaba::link_external_class_func("GridPainter.__init__", &GridPainter::__init__);
+	Kaba::link_external_class_func("GridPainter.set_context", &GridPainter::set_context);
+	Kaba::link_external_class_func("GridPainter.draw_empty_background", &GridPainter::draw_empty_background);
+	Kaba::link_external_class_func("GridPainter.draw_bars", &GridPainter::draw_bars);
+	Kaba::link_external_class_func("GridPainter.draw_bar_numbers", &GridPainter::draw_bar_numbers);
+	Kaba::link_external_class_func("GridPainter.draw_time", &GridPainter::draw_time);
+	Kaba::link_external_class_func("GridPainter.draw_time_numbers", &GridPainter::draw_time_numbers);
 
 	Slider slider;
 	Kaba::declare_class_size("Slider", sizeof(Slider));

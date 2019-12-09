@@ -57,8 +57,6 @@ MidiKeyChange::MidiKeyChange(double _pos, const Scale &_key) : pos(_pos), key(_k
 
 MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
-MidiPainter::MidiPainter(AudioView *view) : MidiPainter(view->song, &view->cam, &view->sel, &view->hover(), view->colors)
-{}
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),

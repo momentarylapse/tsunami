@@ -15,21 +15,22 @@
 class Painter;
 class rect;
 class color;
-class AudioView;
 class ViewPort;
 class Song;
+class ColorScheme;
+class SongSelection;
+class HoverData;
 
-class GridColors
-{
+class GridColors {
 public:
 	color bg, bg_sel;
 	color fg, fg_sel;
 };
 
-class GridPainter
-{
+class GridPainter {
 public:
-	GridPainter(AudioView *view);
+	GridPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
+	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void draw_empty_background(Painter *c);
 	void draw_time(Painter *c);
 	void draw_time_numbers(Painter *c);
@@ -39,10 +40,12 @@ public:
 
 	void set_context(const rect &area, const GridColors &c);
 
-	AudioView *view;
 	ViewPort *cam;
 	Song *song;
 	rect area;
+	SongSelection *sel;
+	HoverData *hover;
+	ColorScheme &color_scheme;
 	GridColors colors;
 };
 

@@ -659,6 +659,18 @@ class MidiPainter
 	extern void draw_background(Painter c)
 	ViewPort* cam
 
+class GridColors
+	color bg, bg_sel
+	color fg, fg_sel
+
+class GridPainter
+	extern void __init__(Song* song, ViewPort* cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void set_context(rect area, GridColors col)
+	extern void draw_empty_background(Painter p)
+	extern void draw_bars(Painter p, int partition)
+	extern void draw_bar_numbers(Painter p)
+	extern void draw_time(Painter p)
+	extern void draw_time_numbers(Painter p)
 
 
 #extern PluginContext plugin_context

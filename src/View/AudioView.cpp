@@ -191,8 +191,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(metronome_overlay_vlayer);
 
 	buffer_painter = new BufferPainter(this);
-	grid_painter = new GridPainter(this);
-	midi_painter = new MidiPainter(this);
+	grid_painter = new GridPainter(song, &cam, &sel, &hover(), colors);
+	midi_painter = new MidiPainter(song, &cam, &sel, &hover(), colors);
 
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 20;

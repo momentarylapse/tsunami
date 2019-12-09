@@ -146,7 +146,7 @@ void TimeScale::draw(Painter* c) {
 	gp->draw_empty_background(c);
 	gp->draw_time(c);
 
-	view->grid_painter->draw_time_numbers(c);
+	gp->draw_time_numbers(c);
 }
 
 bool TimeScale::on_left_button_down() {

@@ -1,0 +1,60 @@
+use "../api.kaba"
+use hui
+
+class SNRPanel extends ConfigPanel
+	override SupernovaRhythm* c
+	MidiPainter* mp
+	GridPainter* gp
+	ViewPort* cam
+	
+	override void __init__(Module* _c)
+		from_source("
+Grid ? ''
+	DrawingArea area '' expandx
+	---|
+	Button button 'X'")
+		c.panel = &self
+	
+		cam = new ViewPort(nil)
+		mp = new MidiPainter(c.session.song, cam, nil, nil, colors)
+		gp = new GridPainter(c.session.song, cam, nil, nil, colors)
+	
+		activate("button")
+		event("button", on_button)
+		event_x("area", "hui:draw", on_draw)
+	
+	void on_button()
+	
+	void on_draw(Painter p)
+		rect r = rect(0, p.width, 0, p.height)
+		cam.area = r
+		cam.set_range(RangeTo(0, 44100))
+		
+		GridColors gc
+		gc.fg = colors.grid
+		gc.bg = colors.background
+		gp.set_context(r, gc)
+		gp.draw_empty_background(p)
+		gp.draw_time(p)
+		gp.draw_time_numbers(p)
+		
+		
+		Instrument i
+		i.type = 1
+		mp.set_context(r, i, true, MidiMode.CLASSICAL)
+		mp.draw_background(p)
+		mp.draw(p, c.midi)
+
+class SupernovaRhythm extends TsunamiPlugin
+	SNRPanel* panel
+	MidiNoteBuffer midi
+
+	override void on_start()
+		int dt = 4400 # 100 ms
+		midi.add(new MidiNote(RangeTo(dt, dt*3), 60, 1.0))
+		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
+	
+
+	override ConfigPanel* create_panel()
+		return new SNRPanel(&self)
+

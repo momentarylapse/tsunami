@@ -864,7 +864,7 @@ void SIAddPackageMath() {
 
 	
 	// float
-	add_const("pi",  TypeFloat32, *(void**)&pi);
+	add_const("pi",  TypeFloat32, (void*)&pi);
 	// color
 	add_const("White",  TypeColor, (void*)&White);
 	add_const("Black",  TypeColor, (void*)&Black);

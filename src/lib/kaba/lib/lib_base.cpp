@@ -798,9 +798,12 @@ void SIAddPackageBase() {
 
 
 	// constants
-	add_const("nil", TypePointer, nullptr);
-	add_const("false", TypeBool, (void*)false);
-	add_const("true",  TypeBool, (void*)true);
+	void *kaba_nil = nullptr;
+	bool kaba_true = true;
+	bool kaba_false = false;
+	add_const("nil", TypePointer, (void*)&kaba_nil);
+	add_const("false", TypeBool, (void*)&kaba_false);
+	add_const("true",  TypeBool, (void*)&kaba_true);
 
 
 	add_class(TypeException);

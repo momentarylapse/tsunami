@@ -294,6 +294,7 @@ void Window::run()
 	}else{
 		while(!got_destroyed()){
 			Application::do_single_main_loop();
+			Sleep(0.005f);
 		}
 	}
 #endif

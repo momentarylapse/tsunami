@@ -67,7 +67,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		//if (sub_type == "Sample")
 		//	return new SampleSynthesizer;
 	} else if (type == ModuleType::PITCH_DETECTOR) {
-		return new PitchDetector;
+		if (sub_type == "Dummy" or sub_type == "")
+			return new DummyPitchDetector;
 	} else if (type == ModuleType::BEAT_SOURCE) {
 		if (sub_type == "BarStreamer")
 			{}//return new BarStreamer()

@@ -29,6 +29,7 @@ class Range
 		return pos >= offset and pos < offset + length
 	string str()
 		return "({{offset}}:{{end()}})"
+	#const Range ALL = Range(-1000000000, 2000000000)
 Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
@@ -82,6 +83,8 @@ class MidiEventBuffer extends MidiEvent[]
 class MidiNoteBuffer extends MidiNote*[]
 	int samples
 	extern override void __init__()
+	extern override void __delete__()
+	extern void deep_clear()
 	extern MidiNote*[] get_notes(Range r)
 	extern MidiEvent[] get_events(Range r)
 	extern Range get_range()
@@ -242,7 +245,11 @@ class MidiSource extends Module
 
 class PitchDetector extends MidiSource
 	float frequency, volume
+	int pitch
 	bool loud_enough
+	extern override void __init__()
+	extern override int read(MidiEventBuffer midi)
+	extern virtual void process(MidiEventBuffer midi, AudioBuffer buf)
 
 class PitchRenderer
 	extern void __init__(Synthesizer synth, int pitch)
@@ -309,6 +316,9 @@ class BeatMidifier extends MidiSource
 class AudioRecorder extends Module
 	int samples_skipped
 	AudioBuffer buffer
+
+class MidiRecorder extends Module
+	MidiEventBuffer buffer
 
 class TrackRenderBuffer
 	int dummy

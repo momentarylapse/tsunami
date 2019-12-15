@@ -28,7 +28,8 @@ Grid ? ''
 	void on_draw(Painter p)
 		rect r = rect(0, p.width, 0, p.height)
 		cam.area = r
-		cam.set_range(RangeTo(0, 44100))
+		int pos = c.recorder.buffer.samples
+		cam.set_range(Range(pos-44100*3, 44100*5))
 		
 		GridColors gc
 		gc.fg = colors.grid
@@ -38,23 +39,64 @@ Grid ? ''
 		gp.draw_time(p)
 		gp.draw_time_numbers(p)
 		
+		let notes = c.recorder.buffer.get_notes(cam.range())
+		MidiNoteBuffer midi
+		for n in notes
+			let nn = new MidiNote()
+			*nn = n
+			midi.add(nn)
 		
 		Instrument i
-		i.type = 1
+		i.type = 6#1
 		mp.set_context(r, i, true, MidiMode.CLASSICAL)
 		mp.draw_background(p)
-		mp.draw(p, c.midi)
+		#mp.draw(p, c.midi)
+		mp.draw(p, midi)
+		
+		midi.deep_clear()
+		
+		#p.set_color(Red)
+		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 
 class SupernovaRhythm extends TsunamiPlugin
 	SNRPanel* panel
 	MidiNoteBuffer midi
+	SignalChain* chain
+	PitchDetector* pitch_detector
+	MidiRecorder* recorder
+	int runner
 
 	override void on_start()
+		panel = nil
+		
 		int dt = 4400 # 100 ms
 		midi.add(new MidiNote(RangeTo(dt, dt*3), 60, 1.0))
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
+		
+		chain = session.add_signal_chain("supernova.recorder")
+		let i = chain.add(Module.STREAM, "AudioInput")
+		let p = chain.add(Module.PITCH_DETECTOR, "Test")
+		let r = chain.add(Module.PLUMBING, "MidiRecorder")
+		let s = chain.add(Module.PLUMBING, "MidiSucker")
+		chain.connect(i, 0, p, 0)
+		chain.connect(p, 0, r, 0)
+		chain.connect(r, 0, s, 0)
+		recorder = r
+		pitch_detector = p
+		chain.start()
+		chain.command(Module.COMMAND_ACCUMULATION_START, 0)
+		runner = RunRepeated(0.05, &self, on_update)
+		
+	override void on_stop()
+		CancelRunner(runner)
+		del chain
+	
+	void on_update()
+		if panel
+			panel.redraw("area")
 	
 
 	override ConfigPanel* create_panel()
-		return new SNRPanel(&self)
+		panel = new SNRPanel(&self)
+		return panel
 

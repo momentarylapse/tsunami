@@ -13,23 +13,29 @@
 class Port;
 class AudioBuffer;
 
-class PitchDetector : public MidiSource
-{
+class PitchDetector : public MidiSource {
 public:
 	PitchDetector();
-	virtual ~PitchDetector();
 
 	void _cdecl __init__();
-	void _cdecl __delete__() override;
 
 	int _cdecl read(MidiEventBuffer &midi) override;
 
-	void process(MidiEventBuffer &midi, AudioBuffer &buf);
+	virtual void process(MidiEventBuffer &midi, AudioBuffer &buf) {};
 
 	Port *source;
 
 	float frequency, volume;
+	int pitch;
 	bool loud_enough;
+};
+
+class DummyPitchDetector : public PitchDetector {
+public:
+	DummyPitchDetector();
+
+	void _cdecl __init__();
+	void process(MidiEventBuffer &midi, AudioBuffer &buf) override;
 };
 
 #endif /* SRC_MODULE_AUDIO_PITCHDETECTOR_H_ */

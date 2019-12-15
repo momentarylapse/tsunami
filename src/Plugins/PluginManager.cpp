@@ -41,6 +41,7 @@
 #include "../Module/Beats/BeatSource.h"
 #include "../Module/Beats/BeatMidifier.h"
 #include "../Module/Midi/MidiEffect.h"
+#include "../Module/Midi/MidiRecorder.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../Device/DeviceManager.h"
@@ -233,11 +234,15 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
 	Kaba::link_external_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
 
-	//PitchDetector pd;
+	DummyPitchDetector pd;
 	Kaba::declare_class_size("PitchDetector", sizeof(PitchDetector));
 	Kaba::declare_class_element("PitchDetector.frequency", &PitchDetector::frequency);
+	Kaba::declare_class_element("PitchDetector.pitch", &PitchDetector::pitch);
 	Kaba::declare_class_element("PitchDetector.volume", &PitchDetector::volume);
 	Kaba::declare_class_element("PitchDetector.loud_enough", &PitchDetector::loud_enough);
+	Kaba::link_external_class_func("PitchDetector.__init__", &DummyPitchDetector::__init__);
+	Kaba::link_external_virtual("PitchDetector.read", &PitchDetector::read, &pd);
+	Kaba::link_external_virtual("PitchDetector.process", &DummyPitchDetector::process, &pd);
 
 	Kaba::declare_class_size("AudioBuffer", sizeof(AudioBuffer));
 	Kaba::declare_class_element("AudioBuffer.offset", &AudioBuffer::offset);
@@ -416,9 +421,11 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_size("MidiNoteBuffer", sizeof(MidiNoteBuffer));
 	Kaba::declare_class_element("MidiNoteBuffer.samples", &MidiNoteBuffer::samples);
 	Kaba::link_external_class_func("MidiNoteBuffer.__init__", &MidiNoteBuffer::__init__);
+	Kaba::link_external_class_func("MidiNoteBuffer.__delete__", &MidiNoteBuffer::__delete__);
 	Kaba::link_external_class_func("MidiNoteBuffer.get_events", &MidiNoteBuffer::get_events);
 	Kaba::link_external_class_func("MidiNoteBuffer.get_notes", &MidiNoteBuffer::get_notes);
 	Kaba::link_external_class_func("MidiNoteBuffer.get_range", &MidiNoteBuffer::range);
+	Kaba::link_external_class_func("MidiNoteBuffer.deep_clear", &MidiNoteBuffer::deep_clear);
 
 	BeatSource bsource;
 	Kaba::declare_class_size("BeatSource", sizeof(BeatSource));
@@ -553,6 +560,8 @@ void PluginManager::link_app_script_data() {
 	
 	Kaba::declare_class_element("AudioRecorder.samples_skipped", &AudioRecorder::samples_skipped);
 	Kaba::declare_class_element("AudioRecorder.buffer", &AudioRecorder::buf);
+
+	Kaba::declare_class_element("MidiRecorder.buffer", &MidiRecorder::buffer);
 
 	SignalChain chain(Session::GLOBAL, "");
 	Kaba::declare_class_size("SignalChain", sizeof(SignalChain));
@@ -718,7 +727,7 @@ void find_plugins_in_dir(const string &rel, const string &group, ModuleType type
 }
 
 void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)()) {
-	for (PluginManager::PluginFile &f: pm->plugin_files) {
+	for (auto &f: pm->plugin_files) {
 		if (f.filename.find(dir) >= 0) {
 			string id = "execute-" + name_space + "--" + f.name;
 			m->add_with_image(f.name, f.image, id);
@@ -758,6 +767,9 @@ void PluginManager::find_plugins() {
 
 	// "BeatSource"
 	find_plugins_in_dir("BeatSource/", "", ModuleType::BEAT_SOURCE, this);
+
+	// "BeatSource"
+	find_plugins_in_dir("PitchDetector/", "", ModuleType::PITCH_DETECTOR, this);
 
 	// "All"
 	find_plugins_in_dir("All/", "", ModuleType::SONG_PLUGIN, this);
@@ -888,6 +900,8 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 		names.add("MidiJoiner");
 		names.add("MidiRecorder");
 		names.add("MidiSucker");
+	}else if (type == ModuleType::PITCH_DETECTOR){
+		names.add("Dummy");
 	}
 	return names;
 }
@@ -912,10 +926,10 @@ string PluginManager::choose_module(hui::Panel *parent, Session *session, Module
 	if (names.num == 0)
 		return "";
 
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
+	auto *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();
 	string name = dlg->_return;
-	delete(dlg);
+	delete dlg;
 	return name;
 }
 

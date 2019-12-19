@@ -47,7 +47,7 @@ class HullCurve extends AudioEffect
 			hull(buf.r)
 
 	override ConfigPanel *create_panel()
-		return new HullCurvePanel(&self)
+		return new HullCurvePanel(self)
 
 class HullGrid extends Grid
 	HullCurve.Config* config
@@ -121,7 +121,7 @@ class HullGrid extends Grid
 class HullCurvePanel extends ConfigPanel
 	HullGrid grid
 	override HullCurve* c
-	override void __init__(Module* _h)
+	override void __init__(Module _h)
 		from_source("
 Grid ? '' vertical
 	DrawingArea drawing '' grabfocus height=250

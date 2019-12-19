@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.10.3";
+string LibVersion = "0.17.11.0";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -118,6 +118,8 @@ const Class *TypeReg8;
 const Class *TypeVoid;
 const Class *TypePointer;
 const Class *TypeChunk;
+const Class *TypeObject;
+const Class *TypeObjectP;
 const Class *TypeBool;
 const Class *TypeInt;
 const Class *TypeInt64;

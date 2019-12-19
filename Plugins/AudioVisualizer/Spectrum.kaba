@@ -67,7 +67,7 @@ class SpectrumPanel extends ConfigPanel
 	override Spectrum* c
 	SpecGrid grid
 	
-	override void __init__(Module* _sp)
+	override void __init__(Module _sp)
 		from_source("
 DrawingArea area '' height=200 expandy")
 		
@@ -131,6 +131,6 @@ class Spectrum extends AudioVisualizer
 			p.redraw("area")
 		
 	override ConfigPanel* create_panel()
-		return new SpectrumPanel(&self)
+		return new SpectrumPanel(self)
 
 

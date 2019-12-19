@@ -36,7 +36,7 @@ class GridPartition
 #	UNIT_DB
 #	UNIT_PERCENT
 
-class AxisData
+class AxisData extends Object
 	float val_min, val_max
 	float val_min_min, val_max_max
 	bool log_scale
@@ -52,6 +52,7 @@ class GridAxis extends AxisData
 	Menu* menu
 	string _id
 	
+	#override void __init__()
 	override void __init__()
 		_id = p2s(&self)
 		freq_as_pitch = false
@@ -62,8 +63,8 @@ class GridAxis extends AxisData
 			del menu
 	
 	void set_events()
-		grid.panel.event_o("{{_id}}-mode-freq-hz", &self, on_mode_freq_hz)
-		grid.panel.event_o("{{_id}}-mode-pitch", &self, on_mode_pitch)
+		grid.panel.event_o("{{_id}}-mode-freq-hz", self, on_mode_freq_hz)
+		grid.panel.event_o("{{_id}}-mode-pitch", self, on_mode_pitch)
 	
 	void set(float _val_min, float _val_max, bool _log, string _unit)
 		val_min = _val_min
@@ -227,7 +228,7 @@ class GridAxis extends AxisData
 			return get_log_partition()
 		return get_lin_partition()
 
-class Grid
+class Grid extends Object
 	bool allow_bg
 	float x0, y0
 	rect plot_rect
@@ -513,14 +514,14 @@ class Grid
 		data_init()
 		panel = &_panel
 		id = _id
-		panel.event_ox(id, "hui:draw", &self, on_draw_all)
-		panel.event_ox(id, "hui:left-button-down", &self, on_left_button_down_all)
-		panel.event_ox(id, "hui:left-button-up", &self, on_left_button_up_all)
-		panel.event_ox(id, "hui:right-button-down", &self, on_right_button_down_all)
-		panel.event_ox(id, "hui:right-button-up", &self, on_right_button_up_all)
-		panel.event_ox(id, "hui:mouse-move", &self, on_mouse_move_all)
-		panel.event_ox(id, "hui:mouse-wheel", &self, on_mouse_wheel_all)
-		panel.event_ox(id, "hui:key-down", &self, on_key_down_all)
+		panel.event_ox(id, "hui:draw", self, on_draw_all)
+		panel.event_ox(id, "hui:left-button-down", self, on_left_button_down_all)
+		panel.event_ox(id, "hui:left-button-up", self, on_left_button_up_all)
+		panel.event_ox(id, "hui:right-button-down", self, on_right_button_down_all)
+		panel.event_ox(id, "hui:right-button-up", self, on_right_button_up_all)
+		panel.event_ox(id, "hui:mouse-move", self, on_mouse_move_all)
+		panel.event_ox(id, "hui:mouse-wheel", self, on_mouse_wheel_all)
+		panel.event_ox(id, "hui:key-down", self, on_key_down_all)
 		x_axis.set_events()
 		y_axis.set_events()
 	

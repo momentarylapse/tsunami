@@ -54,7 +54,7 @@ class HarmonicPanel extends ConfigPanel
 	override HarmonicSynthesizer *c
 	HarmonicConfig *hc
 	HarmonicGrid grid
-	override void __init__(Module* _s)
+	override void __init__(Module _s)
 		add_grid("", 0, 0, "main_table")
 		set_target("main_table")
 		add_grid("", 0, 0, "table1")
@@ -122,7 +122,7 @@ class HarmonicSynthesizer extends Synthesizer
 
 
 	override ConfigPanel *create_panel()
-		return new HarmonicPanel(&self)
+		return new HarmonicPanel(self)
 	
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new HarmonicRenderer(self, pitch)

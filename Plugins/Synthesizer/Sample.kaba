@@ -44,12 +44,12 @@ class SampleSynthesizer extends Synthesizer
 		return new SampleRenderer(self, pitch)
 	
 	override ConfigPanel *create_panel()
-		return new SamplePanel(&self)
+		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel
 	SampleConfig *sc
 	override SampleSynthesizer *c
-	override void __init__(Module* _s)
+	override void __init__(Module _s)
 		sc = &c.config
 		add_list_view("!expandx\\Note\\Sample", 0, 0, "list")
 		event("list", on_select)
@@ -72,7 +72,7 @@ class SamplePanel extends ConfigPanel
 		Sample *old = nil
 		if sc.samples[n]
 			old = sc.samples[n].origin
-		let s = SelectSample(c.session, &self, old)
+		let s = SelectSample(c.session, self, old)
 		if s != old
 			if sc.samples[n]
 				delete sc.samples[n]

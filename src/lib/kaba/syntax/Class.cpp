@@ -5,6 +5,8 @@
 
 namespace Kaba{
 
+extern const Class* TypeObject;
+
 ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;

@@ -79,7 +79,7 @@ void SIAddPackageKaba() {
 		class_add_elementx("classes", TypeClassPList, &Class::classes);
 		class_add_elementx("constants", TypeConstantPList, &Class::constants);
 		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);
-			func_add_param("c", TypeClassP);
+			func_add_param("c", TypeClass);
 		class_add_funcx("long_name", TypeString, &Class::long_name);
 
 	add_class(TypeClassP);
@@ -128,7 +128,7 @@ void SIAddPackageKaba() {
 			func_add_param("source", TypeString);
 			func_add_param("just_analize", TypeBool);
 		class_add_funcx("delete", TypeVoid, &Remove, FLAG_STATIC);
-			func_add_param("script", TypeScriptP);
+			func_add_param("script", TypeScript);
 		class_add_funcx("execute_single_command", TypeVoid, &__execute_single_command__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 			func_add_param("cmd", TypeString);
 	

@@ -72,7 +72,7 @@ class MultiEcho extends AudioEffect
 
 
 	override ConfigPanel *create_panel()
-		return new MultiEchoPanel(&self)
+		return new MultiEchoPanel(self)
 
 class MultiEchoGrid extends Grid
 	MultiEcho.Config* config
@@ -94,8 +94,8 @@ class MultiEchoGrid extends Grid
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")
 	void add_events()
-		cp.event_o("reflection-add", &self, on_add_reflection)
-		cp.event_o("reflection-delete", &self, on_delete_reflection)
+		cp.event_o("reflection-add", self, on_add_reflection)
+		cp.event_o("reflection-delete", self, on_delete_reflection)
 
 	void draw_hull_curve(Painter c, MultiEcho.Config.Reflector r)
 		float v = r.volume
@@ -222,7 +222,7 @@ class MultiEchoGrid extends Grid
 class MultiEchoPanel extends ConfigPanel
 	override MultiEcho* c
 	MultiEchoGrid grid
-	override void __init__(Module* _h)
+	override void __init__(Module _h)
 		from_source("
 Grid ? ''
 	DrawingArea drawing '' grabfocus height=250")

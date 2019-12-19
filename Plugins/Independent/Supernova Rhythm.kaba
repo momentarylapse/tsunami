@@ -1,4 +1,5 @@
 use "../api.kaba"
+use "../PitchDetector/Test.kaba"
 use hui
 
 class SNRPanel extends ConfigPanel
@@ -7,7 +8,7 @@ class SNRPanel extends ConfigPanel
 	GridPainter* gp
 	ViewPort* cam
 	
-	override void __init__(Module* _c)
+	override void __init__(Module _c)
 		from_source("
 Grid ? ''
 	DrawingArea area '' expandx
@@ -46,23 +47,28 @@ Grid ? ''
 			*nn = n
 			midi.add(nn)
 		
-		Instrument i
-		i.type = 6#1
-		mp.set_context(r, i, true, MidiMode.CLASSICAL)
+		Instrument ii
+		ii.type = 6#1
+		mp.set_context(r, ii, true, MidiMode.CLASSICAL)
 		mp.draw_background(p)
 		#mp.draw(p, c.midi)
 		mp.draw(p, midi)
 		
 		midi.deep_clear()
 		
-		#p.set_color(Red)
+		p.set_color(Red)
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
+		
+		for pp,i in c.pitch_detector.pitch_power2
+			float x = (i-20) * 4
+			p.draw_line(x, 0, x, pp/13)
 
 class SupernovaRhythm extends TsunamiPlugin
 	SNRPanel* panel
 	MidiNoteBuffer midi
 	SignalChain* chain
-	PitchDetector* pitch_detector
+#	PitchDetector
+	TestDetector* pitch_detector
 	MidiRecorder* recorder
 	int runner
 
@@ -76,6 +82,7 @@ class SupernovaRhythm extends TsunamiPlugin
 		chain = session.add_signal_chain("supernova.recorder")
 		let i = chain.add(Module.STREAM, "AudioInput")
 		let p = chain.add(Module.PITCH_DETECTOR, "Test")
+		#let x = chain.add(Module.AUDIO_EFFECT, "Chunksize")
 		let r = chain.add(Module.PLUMBING, "MidiRecorder")
 		let s = chain.add(Module.PLUMBING, "MidiSucker")
 		chain.connect(i, 0, p, 0)
@@ -83,9 +90,10 @@ class SupernovaRhythm extends TsunamiPlugin
 		chain.connect(r, 0, s, 0)
 		recorder = r
 		pitch_detector = p
+		chain.set_buffer_size(4096)
 		chain.start()
 		chain.command(Module.COMMAND_ACCUMULATION_START, 0)
-		runner = RunRepeated(0.05, &self, on_update)
+		runner = RunRepeated(0.05, self, on_update)
 		
 	override void on_stop()
 		CancelRunner(runner)
@@ -97,6 +105,6 @@ class SupernovaRhythm extends TsunamiPlugin
 	
 
 	override ConfigPanel* create_panel()
-		panel = new SNRPanel(&self)
+		panel = new SNRPanel(self)
 		return panel
 

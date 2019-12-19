@@ -105,7 +105,7 @@ class Equalizer extends AudioEffect
 			grid.set_buffer(buf)
 
 	override ConfigPanel *create_panel()
-		return new EqualizerPanel(&self)
+		return new EqualizerPanel(self)
 
 
 const int HOVER_NONE = -1
@@ -129,13 +129,13 @@ class EqualizerGrid extends Grid
 		if menu
 			delete menu
 	void init2()
-		panel.event_o("add-peak", &self, on_add_peak)
-		panel.event_o("add-low-pass", &self, on_add_peak)
-		panel.event_o("add-high-pass", &self, on_add_peak)
-		panel.event_o("add-low-shelf", &self, on_add_peak)
-		panel.event_o("add-high-shelf", &self, on_add_peak)
-		panel.event_o("peak-toggle-enabled", &self, on_peak_toggle_enabled)
-		panel.event_o("peak-delete", &self, on_peak_delete)
+		panel.event_o("add-peak", self, on_add_peak)
+		panel.event_o("add-low-pass", self, on_add_peak)
+		panel.event_o("add-high-pass", self, on_add_peak)
+		panel.event_o("add-low-shelf", self, on_add_peak)
+		panel.event_o("add-high-shelf", self, on_add_peak)
+		panel.event_o("peak-toggle-enabled", self, on_peak_toggle_enabled)
+		panel.event_o("peak-delete", self, on_peak_delete)
 
 	override void on_draw(Painter p)
 		draw_curve_c(p, spectrum, false)
@@ -286,7 +286,7 @@ class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	int num_peaks
 	override Equalizer* c
-	override void __init__(Module* _eq)
+	override void __init__(Module _eq)
 		super.__init__(_eq)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")

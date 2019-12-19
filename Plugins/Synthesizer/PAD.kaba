@@ -97,7 +97,7 @@ class PADSynthesizer extends Synthesizer
 	PADConfig config
 	
 	override ConfigPanel *create_panel()
-		return new PADPanel(&self)
+		return new PADPanel(self)
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new PADRenderer(self, pitch)
@@ -147,7 +147,7 @@ class PADPanel extends ConfigPanel
 	PADConfig *pc
 	PADGrid grid
 	override PADSynthesizer* c
-	override void __init__(Module* _s)
+	override void __init__(Module _s)
 		pc = &c.config
 		from_source("
 Grid ? ''

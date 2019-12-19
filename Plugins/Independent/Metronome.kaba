@@ -55,16 +55,16 @@ class MetronomePanel extends ConfigPanel
 	
 	BlurredDot dot
 	
-	void __init__(Session* session, BeatSource* _source, SignalChain* _chain, Metronome* _metro)
+	void __init__(Session session, BeatSource _source, SignalChain _chain, Metronome _metro)
 		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
 	Revealer config ''")
 
-		#metro = _metro		
-		source = _source
-		chain = _chain
+		#metro = &_metro
+		source = &_source
+		chain = &_chain
 		fraction_prev = 0
 		
 		embed(source.create_panel(), "config", 0, 0)
@@ -98,7 +98,7 @@ Grid ? '' vertical
 		
 		#reveal("config", true)
 		lr_id = -1
-		sr_id = RunRepeated(UPDATE_DT, &self, on_update)
+		sr_id = RunRepeated(UPDATE_DT, self, on_update)
 	
 	void on_update()
 		redraw("area")
@@ -219,7 +219,7 @@ Grid ? '' vertical
 	void on_area_mouse_leave()
 		if lr_id >= 0
 			CancelRunner(lr_id)
-		lr_id = RunLater(5, &self, _later_unreveal)
+		lr_id = RunLater(5, self, _later_unreveal)
 	
 	void _later_unreveal()
 		lr_id = -1
@@ -271,7 +271,7 @@ class Metronome extends TsunamiPlugin
 		chain.start()
 
 	override ConfigPanel* create_panel()
-		return new MetronomePanel(session, source, chain, &self)
+		return new MetronomePanel(session, source, chain, self)
 		
 	override void on_stop()
 		delete chain

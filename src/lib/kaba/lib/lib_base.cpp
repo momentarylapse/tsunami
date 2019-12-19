@@ -13,6 +13,8 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
 extern const Class *TypeFloat;
 extern const Class *TypePointerList;
+extern const Class *TypeObject;
+extern const Class *TypeObjectP;
 extern const Class *TypeBoolPs;
 extern const Class *TypeBoolList;
 extern const Class *TypeIntPs;
@@ -40,6 +42,8 @@ void _cdecl _print(const string &str)
 {	printf("%s\n", str.c_str());	}
 void _cdecl _cstringout(char *str)
 {	_print(str);	}
+string _cdecl _binary(const char *p, int length)
+{	return string(p, length);	}
 int _cdecl _Float2Int(float f)
 {	return (int)f;	}
 double _cdecl _Float2Float64(float f)
@@ -110,6 +114,12 @@ float xop_float_exp(float a, float b) {
 }
 
 
+class _VirtualBase : public VirtualBase {
+public:
+	void __init__() {
+		new(this) _VirtualBase();
+	}
+};
 
 
 class BoolList : public Array<bool> {
@@ -336,6 +346,8 @@ void SIAddPackageBase() {
 	TypeReg16			= add_type  ("-reg16-", 2, FLAG_CALL_BY_VALUE);
 	TypeReg8			= add_type  ("-reg8-", 1, FLAG_CALL_BY_VALUE);
 	TypeChunk			= add_type  ("-chunk-", 0); // substitute for all plane-old-data types
+	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
+	TypeObjectP			= add_type_p("Object*", TypeObject);
 
 	// "real"
 	TypeVoid			= add_type  ("void", 0, FLAG_CALL_BY_VALUE);
@@ -357,6 +369,10 @@ void SIAddPackageBase() {
 	(const_cast<Class*>(TypeFloat))->name = "float";
 
 
+	add_class(TypeObject);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &_VirtualBase::__init__);
+		class_add_func_virtualx(IDENTIFIER_FUNC_DELETE, TypeVoid, &VirtualBase::__delete__);
+		class_set_vtable(VirtualBase);
 
 	add_class(TypeDynamicArray);
 		class_add_element("num", TypeInt, config.pointer_size);
@@ -826,6 +842,9 @@ void SIAddPackageBase() {
 		func_add_param("str", TypeCString);*/
 	add_func("print", TypeVoid, (void*)&_print, FLAG_STATIC);
 		func_add_param("str", TypeString);
+	add_func("binary", TypeString, (void*)&_binary, FLAG_STATIC);
+		func_add_param("p", TypePointer);
+		func_add_param("length", TypeInt);
 	// memory
 	add_func("@malloc", TypePointer, (void*)&malloc, FLAG_STATIC);
 		func_add_param("size", TypeInt);

@@ -42,7 +42,7 @@ class Metronome extends AudioSource
 		#return source.create_panel()
 		# how to deal with configuration/string exports...
 		
-		return new MetronomePanel(&self)
+		return new MetronomePanel(self)
 	
 	override void on_config()
 		if !source
@@ -60,7 +60,7 @@ class Metronome extends AudioSource
 	
 class MetronomePanel extends ConfigPanel
 	override Metronome *c
-	override void __init__(Module* _m)
+	override void __init__(Module _m)
 		add_grid("!width=300", 0, 0, "table2")
 		set_target("table2")
 		add_label("Geschwindigkeit:", 0, 0, "")

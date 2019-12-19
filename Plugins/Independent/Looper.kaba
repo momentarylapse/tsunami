@@ -22,7 +22,7 @@ use "../api.kaba"
 
 class LooperPanel extends ConfigPanel
 	override Looper* c
-	override void __init__(Module* _c)
+	override void __init__(Module _c)
 		from_source("
 Grid ? ''
 	Label rec-time '' expandx
@@ -62,8 +62,8 @@ class Looper extends TsunamiPlugin
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		
-		runner = RunRepeated(0.05, &self, on_update)
-		#chain.subscribe(&self, on_update, "Click")
+		runner = RunRepeated(0.05, self, on_update)
+		#chain.subscribe(self, on_update, "Click")
 		
 		chain.start()
 		
@@ -103,4 +103,4 @@ class Looper extends TsunamiPlugin
 		session.view.optimize_view()
 
 	override ConfigPanel* create_panel()
-		return new LooperPanel(&self)
+		return new LooperPanel(self)

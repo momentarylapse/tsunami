@@ -293,9 +293,9 @@ void SIAddPackageNix()
 	add_func("NixSetColor", TypeVoid, nix_p(&nix::SetColor), FLAG_STATIC);
 		func_add_param("c", TypeColor);
 	add_func("NixSetTexture", TypeVoid, nix_p(&nix::SetTexture), FLAG_STATIC);
-		func_add_param("t", TypeTextureP);
+		func_add_param("t", TypeTexture);
 	add_func("NixSetShader", TypeVoid, nix_p(&nix::SetShader), FLAG_STATIC);
-		func_add_param("s", TypeShaderP);
+		func_add_param("s", TypeShader);
 	add_func("VecProject", TypeVoid, nix_p(&nix::GetVecProject), FLAG_STATIC);
 		func_add_param("v_out", TypeVector);
 		func_add_param("v_in", TypeVector);

@@ -81,7 +81,7 @@ class FMPanel extends ConfigPanel
 		event("top-" + id, on_topology)
 	
 	override FMSynthesizer *c
-	override void __init__(Module* _s)
+	override void __init__(Module _s)
 		fc = &c.config
 		
 		from_source("
@@ -504,7 +504,7 @@ class FMSynthesizer extends Synthesizer
 	FMConfig config
 
 	override ConfigPanel *create_panel()
-		return new FMPanel(&self)
+		return new FMPanel(self)
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new FMRenderer(self, pitch)

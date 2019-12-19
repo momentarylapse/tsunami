@@ -60,7 +60,7 @@ class Biquad extends AudioEffect
 		filter.apply(buf)
 
 	override ConfigPanel *create_panel()
-		return new BiquadPanel(&self)
+		return new BiquadPanel(self)
 
 
 class BiquadGrid extends Grid
@@ -101,7 +101,7 @@ class BiquadGrid extends Grid
 class BiquadPanel extends ConfigPanel
 	BiquadGrid grid
 	override Biquad* c
-	override void __init__(Module* _biquad)
+	override void __init__(Module _biquad)
 		super.__init__(_biquad)
 		from_source("
 Grid ? '' vertical

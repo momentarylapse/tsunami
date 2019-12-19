@@ -78,7 +78,7 @@ class Compressor extends AudioEffect
 			b[i] *= pow(10, *gain / 20)
 
 	override ConfigPanel *create_panel()
-		return new CompressorPanel(&self)
+		return new CompressorPanel(self)
 
 	override void process(AudioBuffer buf)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
@@ -153,7 +153,7 @@ class CompressorGrid extends Grid
 class CompressorPanel extends ConfigPanel
 	override Compressor *c
 	CompressorGrid grid
-	override void __init__(Module* _fx)
+	override void __init__(Module _fx)
 		add_grid("", 0, 0, "table1")
 		set_target("table1")
 		add_drawing_area("!grabfocus,height=200,expandy\\", 0, 0, "drawing_area")

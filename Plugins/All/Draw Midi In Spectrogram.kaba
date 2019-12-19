@@ -92,7 +92,7 @@ class SpectrumDialog extends Dialog
 	Song* song
 	Track*[] tracks
 	DrawMidiInSpectrogram* dmis
-	void __init__(SongPlugin* plugin, Song* song)
+	void __init__(SongPlugin plugin, Song _song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		from_source("
 Grid ? ''
@@ -104,18 +104,18 @@ Grid ? ''
 		DefButton close 'Close' image=hui:close")
 		
 		AudioView* view = plugin.session.view
+		dmis = &plugin
+		song = plugin.session.song
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range().offset / float(song.sample_rate), view.sel.range().end() / float(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		#grid.allow_bg = false
-		grid.plugin = plugin
+		grid.plugin = &plugin
 		grid.create_pitch = -1
 		grid.x_offset = view.sel.range().offset
 		grid.x_scale = song.sample_rate
 		
-		dmis = plugin
-		song = plugin.session.song
 		for t in song.tracks
 			if t.type == TYPE_MIDI
 				tracks.add(t)
@@ -153,7 +153,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 	float[NF][NT] sg
 
 	void show_spec(Song *song)
-		dlg = new SpectrumDialog(&self, song)
+		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)

@@ -1,0 +1,32 @@
+use "../../api.kaba"
+
+
+class Chunksize extends AudioEffect
+	RingBuffer* ring_buffer
+	
+	class Config extends Module.Config
+		int size
+		override void reset()
+			size = 4096
+	Config config
+	
+	override void __init__()
+		ring_buffer = new RingBuffer(1<<20)
+	override void __delete__()
+		del ring_buffer
+	
+	override int read(AudioBuffer buf)
+		if !source
+			return -1
+		
+		while ring_buffer.available() < len(buf)
+			AudioBuffer temp
+			temp.resize(config.size)
+			int r = source.read_audio(temp)
+			if r < 0
+				return 0
+			ring_buffer.write(temp)
+			if r < config.size
+				return 0
+		ring_buffer.read(buf)
+		return len(buf)

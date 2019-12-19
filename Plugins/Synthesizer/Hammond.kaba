@@ -68,7 +68,7 @@ class HammondPanel extends ConfigPanel
 	override HammondSynthesizer *c
 	HammondConfig *hc
 	HammondGrid grid
-	override void __init__(Module* _s)
+	override void __init__(Module _s)
 		from_source("
 Grid ? '' vertical
 	Grid ? ''
@@ -174,7 +174,7 @@ class HammondSynthesizer extends Synthesizer
 
 
 	override ConfigPanel *create_panel()
-		return new HammondPanel(&self)
+		return new HammondPanel(self)
 	
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new HammondRenderer(self, pitch)

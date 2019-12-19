@@ -14,7 +14,10 @@ extern bool next_extern;
 extern bool next_static;
 extern bool next_const;
 
-const int TYPE_CAST_OWN_STRING = 4096;
+const int TYPE_CAST_NONE = -1;
+const int TYPE_CAST_DEREFERENCE = -2;
+const int TYPE_CAST_REFERENCE = -3;
+const int TYPE_CAST_OWN_STRING = -10;
 
 bool type_match(const Class *given, const Class *wanted);
 bool _type_match(const Class *given, bool same_chunk, const Class *wanted);
@@ -675,8 +678,7 @@ Node *apply_params_with_cast(SyntaxTree *ps, Node *operand, Array<Node*> &params
 	if (node_is_member_function_with_instance(operand))
 		offset = 1;
 	for (int p=0; p<params.num; p++) {
-		if (casts[p] >= 0)
-			params[p] = apply_type_cast(ps, casts[p], params[p]);
+		params[p] = apply_type_cast(ps, casts[p], params[p]);
 		operand->set_uparam(p + offset, params[p]);
 	}
 	return operand;
@@ -979,13 +981,31 @@ Node *SyntaxTree::parse_primitive_operator(Block *block) {
 	return 0;
 }*/
 
+
 bool type_match_with_cast(const Class *given, bool same_chunk, bool is_modifiable, const Class *wanted, int &penalty, int &cast) {
 	penalty = 0;
-	cast = -1;
+	cast = TYPE_CAST_NONE;
 	if (_type_match(given, same_chunk, wanted))
 	    return true;
 	if (is_modifiable) // is a variable getting assigned.... better not cast
 		return false;
+	if (given->is_pointer()) {
+		if (_type_match(given->param, false, wanted)) {
+			penalty = 10;
+			cast = TYPE_CAST_DEREFERENCE;
+			return true;
+		}
+	}
+	if (wanted->is_pointer_silent()) {
+		// "silent" pointer (&)?
+		if (type_match(given, wanted->param)) {
+			cast = TYPE_CAST_REFERENCE;
+			return true;
+		} else if ((given->is_pointer()) and (type_match(given->param, wanted->param))) {
+			// silent reference & of *
+			return true;
+		}
+	}
 	if (wanted == TypeString) {
 		Function *cf = given->get_func("str", TypeString, {});
 		if (cf) {
@@ -1004,8 +1024,12 @@ bool type_match_with_cast(const Class *given, bool same_chunk, bool is_modifiabl
 }
 
 Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param) {
-	if (tc < 0)
+	if (tc == TYPE_CAST_NONE)
 		return param;
+	if (tc == TYPE_CAST_DEREFERENCE)
+		return ps->deref_node(param);
+	if (tc == TYPE_CAST_REFERENCE)
+		return ps->ref_node(param);
 	if (tc == TYPE_CAST_OWN_STRING) {
 		Function *cf = param->type->get_func("str", TypeString, {});
 		if (cf)
@@ -1117,7 +1141,8 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 
 	// needs type casting?
 	int pen1 = 0, pen2 = 0;
-	int c1 = -1, c2 = -1, c1_best = -1, c2_best = -1;
+	int c1 = TYPE_CAST_NONE, c2 = TYPE_CAST_NONE;
+	int c1_best = TYPE_CAST_NONE, c2_best = TYPE_CAST_NONE;
 	int pen_min = 2000;
 	Operator *op_found = nullptr;
 	Function *op_cf_found = nullptr;

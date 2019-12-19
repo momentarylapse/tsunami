@@ -8,7 +8,7 @@ const int NUM_SAMPLES = 2048
 class OscilloscopePanel extends ConfigPanel
 	override Oscilloscope* c
 	
-	override void __init__(Module* _osci)
+	override void __init__(Module _osci)
 		from_source("
 DrawingArea area '' height=200 expandy")
 		
@@ -56,5 +56,5 @@ class Oscilloscope extends AudioVisualizer
 			panel.redraw("area")
 		
 	override ConfigPanel* create_panel()
-		return new OscilloscopePanel(&self)
+		return new OscilloscopePanel(self)
 

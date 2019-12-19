@@ -9,7 +9,7 @@ class PitchRecognitionPanel extends ConfigPanel
 	override PitchRecognition* c
 	float note_error
 	
-	override void __init__(Module* _p)
+	override void __init__(Module _p)
 		add_drawing_area("", 5, 5, "drawing")
 	
 		event_x("drawing", "hui:draw", on_draw)
@@ -76,7 +76,7 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		runner = RunRepeated(0.05, &self, on_update)
+		runner = RunRepeated(0.05, self, on_update)
 		
 	override void on_stop()
 		CancelRunner(runner)
@@ -87,6 +87,6 @@ class PitchRecognition extends TsunamiPlugin
 			panel.redraw("drawing")
 	
 	override ConfigPanel* create_panel()
-		panel = new PitchRecognitionPanel(&self)
+		panel = new PitchRecognitionPanel(self)
 		return panel
 	

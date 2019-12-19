@@ -3,36 +3,12 @@
 	<head>
 		<version>1.0</version>
 		<system>false</system>
-		<name>playback</name>
+		<name>microphone-spectrum</name>
 	</head>
 	<modules>
-		<module system="true">
-			<category>AudioSource</category>
-			<class>SongRenderer</class>
-			<position>
-				<x>50</x>
-				<y>50</y>
-			</position>
-		</module>
-		<module system="true">
-			<category>AudioVisualizer</category>
-			<class>PeakMeter</class>
-			<position>
-				<x>280</x>
-				<y>80</y>
-			</position>
-		</module>
-		<module system="true">
-			<category>OutputStream</category>
-			<class />
-			<position>
-				<x>510</x>
-				<y>50</y>
-			</position>
-		</module>
 		<module>
-			<category>InputStreamAudio</category>
-			<class />
+			<category>Stream</category>
+			<class>AudioInput</class>
 			<position>
 				<x>198</x>
 				<y>160</y>
@@ -47,8 +23,8 @@
 			</position>
 		</module>
 		<module>
-			<category>AudioSucker</category>
-			<class />
+			<category>Plumbing</category>
+			<class>AudioSucker</class>
 			<position>
 				<x>640</x>
 				<y>144</y>
@@ -61,12 +37,8 @@
 			<target id="1" port="0" />
 		</cable>
 		<cable>
-			<source id="4" port="0" />
-			<target id="5" port="0" />
-		</cable>
-		<cable>
-			<source id="3" port="0" />
-			<target id="4" port="0" />
+			<source id="1" port="0" />
+			<target id="2" port="0" />
 		</cable>
 	</cables>
 </chain>

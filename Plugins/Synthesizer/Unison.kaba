@@ -1,0 +1,293 @@
+use hui
+use "../api.kaba"
+use "../helper/tone.kaba"
+
+const int MAX_VOICES = 15
+
+const float OSCI_RADIUS = 15.0
+const float LINK_LENGTH = OSCI_RADIUS * 5.0
+
+
+
+enum
+	TYPE_SINE
+	TYPE_SQUARE
+	TYPE_SAW
+
+class UnisonConfig extends Module.Config
+	float amplitude
+	float initial, peak, sustain
+	float attack, decay, release
+	int type
+	int num_voices
+	float detune, blend
+	
+	override void reset()
+		num_voices = 3
+		detune = 0.10
+		blend = 0.5
+		amplitude = 0.1
+		initial = 0.01
+		peak = 1
+		sustain = 0.6
+		attack = 0.01
+		decay = 0.4
+		release = 0.4
+		type = TYPE_SINE
+
+class UnisonPanel extends ConfigPanel
+	UnisonConfig *fc
+	
+	float width, height
+	
+	int moving, hover
+	
+	override UnisonSynthesizer *c
+	override void __init__(Module _s)
+		fc = &c.config
+		
+		from_source("
+Grid ? ''
+	DrawingArea area '' expandx expandy
+	---|
+	Grid ? ''
+		Label ? 'Type'
+		ComboBox type 'Sine\\Square\\Saw' expandx
+		---|
+		Label ? 'Voices'
+		SpinButton voices '' range=1:{{MAX_VOICES}} expandx
+		---|
+		Label ? 'Detune'
+		SpinButton detune '' range=0:10:0.01 expandx
+		---|
+		Label ? 'Blend'
+		SpinButton blend '' range=0:1:0.01 expandx
+		---|
+		Label ? 'Amplitude'
+		SpinButton amplitude '' range=0:100:0.001")
+		
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", on_left_button_down)
+		event_x("area", "hui:left-button-up", on_left_button_up)
+		event_x("area", "hui:mouse-move", on_mouse_move)
+		event("type", on_spin_button)
+		event("voices", on_spin_button)
+		event("detune", on_spin_button)
+		event("blend", on_spin_button)
+		event("amplitude", on_spin_button)
+	
+	float t2x(float t)
+		return width*0.7 * sqrt(t)
+	float v2y(float v)
+		return height - 100*v
+	float x2t(float x)
+		return sqr(max(x,0) / width / 0.7)
+	float y2v(float y)
+		return max((height - y), 0) / 100
+	void draw_curve_exp(Painter p, float t0, float v0, float t1, float v1, color col)
+		float e = log(v1/v0)
+		complex[] cc
+		for a in 0:1.01:0.05
+			float t = t0+a*(t1-t0)
+			float v = v0 * exp(a * e)
+			cc.add(complex(t2x(t), v2y(v)))
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		p.set_color(col2)
+		p.set_line_dash([5.0,2.0])
+		p.draw_lines(cc)
+		p.set_line_dash([2.0,0.0])
+		cc.add(complex(t2x(t1), v2y(0)))
+		cc.add(complex(t2x(t0), v2y(0)))
+		col2.a = 0.2
+		p.set_color(col2)
+		p.draw_polygon(cc)
+	void draw_curve_lin(Painter p, float t0, float v0, float t1, float v1, color col)
+		complex[] cc
+		cc.add(complex(t2x(t0), v2y(v0)))
+		cc.add(complex(t2x(t1), v2y(v1)))
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		p.set_color(col2)
+		p.set_line_dash([5.0,2.0])
+		p.draw_lines(cc)
+		p.set_line_dash([2.0,0.0])
+		cc.add(complex(t2x(t1), v2y(0)))
+		cc.add(complex(t2x(t0), v2y(0)))
+		col2.a = 0.2
+		p.set_color(col2)
+		p.draw_polygon(cc)
+	
+	void draw_grabber(Painter p, float t0, float v0, float t1, float v1, color col, bool hover)
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		if hover
+			col2 = colors.hoverify(col2)
+		p.set_color(col2)
+		p.set_line_width(2.0)
+		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
+		p.set_line_width(1)
+	
+	void draw_envelope(Painter p, UnisonConfig o)
+		float t0 = 0
+		float t1 = t0 + o.attack
+		float t2 = t1 + o.decay
+		float t3 = t2 + o.release
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, Red)
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, Orange)
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Green)
+		
+		
+		draw_grabber(p, t1, 0, t1, 1, Red, hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, Orange, hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, Green, hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, Yellow, hover == -13)
+		p.set_color(colors.text_soft1)
+		p.set_font_size(9)
+		if hover == -10
+			p.draw_str(width - 100, height - 20, "attack " + (o.attack * 1000).str2(1) + " ms")
+		else if hover == -11
+			p.draw_str(width - 100, height - 20, "decay " + (o.decay * 1000).str2(0) + " ms")
+		else if hover == -12
+			p.draw_str(width - 100, height - 20, "release " + (o.release * 1000).str2(0) + " ms")
+		else if hover == -13
+			p.draw_str(width - 100, height - 20, "sustain " + (o.sustain * 100).str2(0) + " %")
+		
+	void on_draw(Painter p)
+		width = p.width
+		height = p.height
+		p.set_color(colors.background)
+		p.draw_rect(0, 0, width, height)
+		
+		draw_envelope(p, fc)
+	
+	int get_hover()
+		let e = GetEvent()
+		float mx = e.mouse_x
+		float my = e.mouse_y
+		if my > v2y(1.1)
+			let o = fc
+			if abs(mx - t2x(o.attack)) < 10
+				return -10
+			if abs(mx - t2x(o.attack + o.decay)) < 10
+				return -11
+			if abs(mx - t2x(o.attack + o.decay + o.release)) < 10
+				return -12
+			if mx > t2x(o.attack) and mx < t2x(o.attack + o.decay + o.release) and abs(my - v2y(o.sustain)) < 10
+				return -13
+		return -1
+	
+	void on_left_button_down()
+		hover = get_hover()
+		moving = -1
+		if hover < -5
+			moving = hover
+	void on_left_button_up()
+		moving = -1
+	void on_mouse_move()
+		let e = GetEvent()
+		float mx = e.mouse_x
+		float my = e.mouse_y
+		if moving < -5
+			let o = fc
+			if moving == -10
+				o.attack = clamp(x2t(mx), 0.0002, 2)
+			if moving == -11
+				o.decay = clamp(x2t(mx) - o.attack, 0.001, 2)
+			if moving == -12
+				o.release = clamp(x2t(mx) - o.attack - o.decay, 0.001, 2)
+			if moving == -13
+				o.sustain = clamp(y2v(my), 0.001, 1.0)
+			update()
+			changed()
+		else
+			hover = get_hover()
+		redraw("area")
+
+	void on_spin_button()
+		let o = fc
+		o.type = get_int("type")
+		o.num_voices = get_int("voices")
+		o.detune = get_float("detune")
+		o.blend = get_float("blend")
+		o.amplitude = get_float("amplitude")
+		changed()
+	
+	override void update()
+		let o = fc
+		set_int("type", o.type)
+		set_int("voices", o.num_voices)
+		set_float("detune", o.detune)
+		set_float("blend", o.blend)
+		set_float("amplitude", o.amplitude)
+		redraw("area")
+
+
+class OscillatorState
+	float volume
+	float[MAX_VOICES] phi
+	EnvelopeADSR env
+	void __init__()
+		volume = 0
+		for p in phi
+			p = 0
+		env.reset()
+
+class UnisonRenderer extends PitchRenderer
+	OscillatorState osc
+	override UnisonSynthesizer *synth
+
+	override void on_end()
+		osc.env.end()
+
+	override void on_start(float _volume)
+		osc.env.start(_volume * synth.config.amplitude)
+		let c = &synth.config
+
+	override void on_config()
+		let c = &synth.config
+		osc.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
+		osc.env.set2(c.initial, c.peak)
+
+	override bool render(AudioBuffer buf)
+	
+		let c = &synth.config
+		float[] vv = [for k in 0:c.num_voices c.blend]
+		vv[c.num_voices/2] = 1.0
+		
+		for i in 0:len(buf)
+
+			osc.volume = osc.env.get()
+			if osc.env.just_killed
+				return false
+			
+			float output = 0
+			for k in 0:c.num_voices
+				float v = osc.volume * vv[k]
+				float phi = osc.phi[k] + delta_phi * (1 + c.detune * k * 0.001)
+				if c.type == TYPE_SINE
+					output += sin(phi) * v
+				else if c.type == TYPE_SQUARE
+					if sin(phi) > 0
+						output += v
+					else
+						output -= v
+				else if c.type == TYPE_SAW
+					output += (loop(phi, 0, 2*pi) / pi - 1) * v
+				if phi > 16*pi
+					phi = loop(phi, 0, 2*pi)
+				osc.phi[k] = phi
+			
+			# transport
+			buf.l[i] += output
+		buf.auto_generate_channels()
+		return true
+
+class UnisonSynthesizer extends Synthesizer
+	UnisonConfig config
+
+	override ConfigPanel *create_panel()
+		return new UnisonPanel(self)
+
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new UnisonRenderer(self, pitch)
+
+			
+	

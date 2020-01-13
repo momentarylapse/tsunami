@@ -34,32 +34,32 @@ void SIAddPackageKaba() {
 
 
 	TypeClass 			= add_type  ("Class", sizeof(Class));
-	TypeClassP			= add_type_p("Class*", TypeClass);
-	auto *TypeClassPList = add_type_a("Class*[]", TypeClassP, -1);
+	TypeClassP			= add_type_p(TypeClass);
+	auto *TypeClassPList = add_type_l(TypeClassP);
 
 	TypeFunction		= add_type  ("Function", sizeof(Function));
-	TypeFunctionP		= add_type_p("Function*", TypeFunction);
-	auto *TypeFunctionPList = add_type_a("Function*[]", TypeFunctionP, -1);
+	TypeFunctionP		= add_type_p(TypeFunction);
+	auto *TypeFunctionPList = add_type_l(TypeFunctionP);
 	TypeFunctionCode	= add_type  ("code", 32); // whatever
-	TypeFunctionCodeP	= add_type_p("code*", TypeFunctionCode);
+	TypeFunctionCodeP	= add_type_p(TypeFunctionCode);
 	auto *TypeStatement = add_type  ("Statement", sizeof(Statement));
-	auto *TypeStatementP= add_type_p("Statement*", TypeStatement);
-	auto *TypeStatementPList = add_type_a("Statement*[]", TypeStatementP, -1);
+	auto *TypeStatementP= add_type_p(TypeStatement);
+	auto *TypeStatementPList = add_type_l(TypeStatementP);
 		
 
 	auto *TypeScript = add_type  ("Script", sizeof(Script));
-	auto *TypeScriptP = add_type_p("Script*", TypeScript);
-	auto *TypeScriptPList = add_type_a("Script*[]", TypeScriptP, -1);
+	auto *TypeScriptP = add_type_p(TypeScript);
+	auto *TypeScriptPList = add_type_l(TypeScriptP);
 
 	
 	auto *TypeClassElement = add_type("ClassElement", sizeof(ClassElement));
-	auto *TypeClassElementList = add_type_a("ClassElement[]", TypeClassElement, -1);
+	auto *TypeClassElementList = add_type_l(TypeClassElement);
 	auto *TypeVariable = add_type("Variable", sizeof(Variable));
-	auto *TypeVariableP = add_type_p("Variable*", TypeVariable);
-	auto *TypeVariablePList = add_type_a("Variable*[]", TypeVariableP, -1);
+	auto *TypeVariableP = add_type_p(TypeVariable);
+	auto *TypeVariablePList = add_type_l(TypeVariableP);
 	auto *TypeConstant = add_type("Constant", sizeof(Constant));
-	auto *TypeConstantP = add_type_p("Constant*", TypeConstant);
-	auto *TypeConstantPList = add_type_a("Constant*[]", TypeConstantP, -1);
+	auto *TypeConstantP = add_type_p(TypeConstant);
+	auto *TypeConstantPList = add_type_l(TypeConstantP);
 	
 	
 	add_class(TypeClassElement);

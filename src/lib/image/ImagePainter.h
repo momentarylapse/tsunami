@@ -13,17 +13,20 @@
 #include "../math/rect.h"
 
 
-class ImagePainter : public Painter
-{
+class ImagePainter : public Painter {
 public:
+	ImagePainter();
 	ImagePainter(Image *image);
 	virtual ~ImagePainter();
 
 	Image *image;
+#if HAS_LIB_GTK3
+	//void *cairo_context;
+#endif
 
 	void _cdecl end();
 	void _cdecl set_color(const color &c) override;
-//	void _cdecl set_font(const string &font, float size, bool bold, bool italic) override;
+	void _cdecl set_font(const string &font, float size, bool bold, bool italic) override;
 	void _cdecl set_font_size(float size) override;
 	void _cdecl set_antialiasing(bool enabled) override;
 	void _cdecl set_line_width(float w) override;
@@ -39,10 +42,13 @@ public:
 	void _cdecl draw_circle(float x, float y, float radius) override;
 	void _cdecl draw_str(float x, float y, const string &str) override;
 	float _cdecl get_str_width(const string &str) override;
-	void _cdecl draw_image(float x, float y, const Image &image) override;
-	void _cdecl draw_mask_image(float x, float y, const Image &image) override;
+	void _cdecl draw_image(float x, float y, const Image *image) override;
+	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
+
+	rect clip() const override;
 
 	color _color;
+	string font_name;
 	rect _clip;
 	Array<float> dash;
 	float dash_offset;

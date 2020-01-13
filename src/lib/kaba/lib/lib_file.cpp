@@ -181,11 +181,11 @@ void SIAddPackageFile()
 	add_package("file", false);
 
 	const Class *TypeFile = add_type("File", 0);
-	const Class *TypeFileP = add_type_p("File*", TypeFile);
+	const Class *TypeFileP = add_type_p(TypeFile);
 	const Class *TypeFilesystem = add_type("Filesystem", 0);
 	const Class *TypeDate = add_type("Date", sizeof(Date));
 	const Class *TypeDirEntry = add_type("DirEntry", sizeof(DirEntry));
-	const Class *TypeDirEntryList = add_type_a("DirEntry[]", TypeDirEntry, -1);
+	const Class *TypeDirEntryList = add_type_l(TypeDirEntry);
 	const Class *TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));

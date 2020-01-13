@@ -18,20 +18,18 @@ class rect;
 class complex;
 class File;
 
-namespace pdf
-{
+namespace pdf {
+
 class Parser;
 
 
-struct Page
-{
+struct Page {
 	int width, height;
 	string content;
 };
 
 
-class PagePainter : public ::Painter
-{
+class PagePainter : public ::Painter {
 public:
 	PagePainter(Parser *parser, Page *page);
 	~PagePainter() override;
@@ -53,10 +51,10 @@ public:
 	void _cdecl draw_circle(float x, float y, float radius) override;
 	void _cdecl draw_str(float x, float y, const string &str) override;
 	float _cdecl get_str_width(const string &str) override;
-	void _cdecl draw_image(float x, float y, const Image &image) override;
-	void _cdecl draw_mask_image(float x, float y, const Image &image) override;
-	rect area() override;
-	rect clip() override;
+	void _cdecl draw_image(float x, float y, const Image *image) override;
+	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
+	rect area() const override;
+	rect clip() const override;
 
 	Parser *parser;
 	Page *page;
@@ -70,8 +68,7 @@ public:
 	float text_x, text_y;
 };
 
-class Parser
-{
+class Parser {
 public:
 	Parser();
 	~Parser();

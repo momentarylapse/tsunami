@@ -5,27 +5,21 @@
 
 #ifdef _X_USE_IMAGE_
 	#include "../../image/image.h"
+	#include "../../image/ImagePainter.h"
+#else
+	#error "we're screwed"
 #endif
 
 namespace Kaba{
 
 extern const Class *TypeImage;
 extern const Class *TypeIntList;
+extern const Class *TypeFloatList;
+extern const Class *TypeComplexList;
+extern const Class *TypeObject;
 
-
-#ifdef _X_USE_IMAGE_
-	static Image *_image;
-	#define	GetDAImage(x)		int_p(&_image->x)-int_p(_image)
-#else
-	typedef int Image;
-	#define	GetDAImage(x)		0
-#endif
-
-#ifdef _X_USE_IMAGE_
-	#define image_p(p)		(void*)(p)
-#else
-	#define image_p(p)		NULL
-#endif
+const Class *TypeBasePainter;
+const Class *TypeBasePainterP;
 
 
 
@@ -33,46 +27,100 @@ void SIAddPackageImage() {
 	add_package("image", false);
 
 	TypeImage = add_type("Image", sizeof(Image));
-	const Class *TypeImageP = add_type_p("Image*", TypeImage);
+	auto TypeImageP = add_type_p(TypeImage);
+	TypeBasePainter = add_type("Painter", sizeof(Painter), (ScriptFlag)0, TypeImage);
+	TypeBasePainterP = add_type_p(TypeBasePainter);
 
 	
 	add_class(TypeImage);
-		class_add_element("width", TypeInt, GetDAImage(width));
-		class_add_element("height", TypeInt, GetDAImage(height));
-		class_add_element("mode", TypeInt, GetDAImage(mode));
-		class_add_element("data", TypeIntList, GetDAImage(data));
-		class_add_element("error", TypeBool, GetDAImage(error));
-		class_add_element("alpha_used", TypeBool, GetDAImage(alpha_used));
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, image_p(mf(&Image::__init_ext__)));
+		class_add_elementx("width", TypeInt, &Image::width);
+		class_add_elementx("height", TypeInt, &Image::height);
+		class_add_elementx("mode", TypeInt, &Image::mode);
+		class_add_elementx("data", TypeIntList, &Image::data);
+		class_add_elementx("error", TypeBool, &Image::error);
+		class_add_elementx("alpha_used", TypeBool, &Image::alpha_used);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Image::__init_ext__);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, image_p(mf(&Image::__init__)));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, image_p(mf(&Image::__delete__)));
-		class_add_func("create", TypeVoid, image_p(mf(&Image::create)));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Image::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Image::__delete__);
+		class_add_funcx("create", TypeVoid, &Image::create);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_func("load", TypeVoid, image_p(mf(&Image::load)));
+		class_add_funcx("load", TypeImageP, &Image::load, FLAG_STATIC);
 			func_add_param("filename", TypeString);
-		class_add_func("save", TypeVoid, image_p(mf(&Image::save)));
+		class_add_funcx("save", TypeVoid, &Image::save);
 			func_add_param("filename", TypeString);
-		class_add_func("scale", TypeImageP, image_p(mf(&Image::scale)));
+		class_add_funcx("scale", TypeImageP, &Image::scale);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
-		class_add_func("set_pixel", TypeVoid, image_p(mf(&Image::set_pixel)));
+		class_add_funcx("set_pixel", TypeVoid, &Image::set_pixel);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_func("get_pixel", TypeColor, mf(&Image::get_pixel));
+		class_add_funcx("get_pixel", TypeColor, &Image::get_pixel);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
-		class_add_func("clear", TypeVoid, image_p(mf(&Image::clear)));
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, image_p(mf(&Image::__assign__)));
+		class_add_funcx("clear", TypeVoid, &Image::clear);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Image::__assign__);
 			func_add_param("other", TypeImage);
+		class_add_funcx("start_draw", TypeBasePainterP, &Image::start_draw);
 
-	add_func("LoadImage", TypeImageP, image_p(&LoadImage), FLAG_STATIC);
-		func_add_param("filename", TypeString);
+
+		add_class(TypeBasePainter);
+			class_derive_from(TypeObject, false, true);
+			class_add_elementx("width", TypeInt, &Painter::width);
+			class_add_elementx("height", TypeInt, &Painter::height);
+			class_add_func_virtualx(IDENTIFIER_FUNC_DELETE, TypeVoid, &ImagePainter::__delete__);
+			//class_add_func_virtualx("end", TypeVoid, &HuiPainter::end));
+			class_add_func_virtualx("set_color", TypeVoid, &Painter::set_color);
+				func_add_param("c", TypeColor);
+			class_add_func_virtualx("set_line_width", TypeVoid, &Painter::set_line_width);
+				func_add_param("w", TypeFloat32);
+			class_add_func_virtualx("set_line_dash", TypeVoid, &Painter::set_line_dash);
+				func_add_param("w", TypeFloatList);
+			class_add_func_virtualx("set_roundness", TypeVoid, &Painter::set_roundness);
+				func_add_param("r", TypeFloat32);
+			class_add_func_virtualx("set_antialiasing", TypeVoid, &Painter::set_antialiasing);
+				func_add_param("enabled", TypeBool);
+			class_add_func_virtualx("set_font_size", TypeVoid, &Painter::set_font_size);
+				func_add_param("size", TypeFloat32);
+			class_add_func_virtualx("set_fill", TypeVoid, &Painter::set_fill);
+				func_add_param("fill", TypeBool);
+			class_add_func_virtualx("clip", TypeVoid, &Painter::set_clip);
+				func_add_param("r", TypeRect);
+			class_add_func_virtualx("draw_point", TypeVoid, &Painter::draw_point);
+				func_add_param("x", TypeFloat32);
+				func_add_param("y", TypeFloat32);
+			class_add_func_virtualx("draw_line", TypeVoid, &Painter::draw_line);
+				func_add_param("x1", TypeFloat32);
+				func_add_param("y1", TypeFloat32);
+				func_add_param("x2", TypeFloat32);
+				func_add_param("y2", TypeFloat32);
+			class_add_func_virtualx("draw_lines", TypeVoid, &Painter::draw_lines);
+				func_add_param("p", TypeComplexList);
+			class_add_func_virtualx("draw_polygon", TypeVoid, &Painter::draw_polygon);
+				func_add_param("p", TypeComplexList);
+			class_add_func_virtualx("draw_rect", TypeVoid, mf((void (Painter::*) (float,float,float,float))&Painter::draw_rect));
+				func_add_param("x", TypeFloat32);
+				func_add_param("y", TypeFloat32);
+				func_add_param("w", TypeFloat32);
+				func_add_param("h", TypeFloat32);
+			class_add_func_virtualx("draw_circle", TypeVoid, &Painter::draw_circle);
+				func_add_param("x", TypeFloat32);
+				func_add_param("y", TypeFloat32);
+				func_add_param("r", TypeFloat32);
+			class_add_func_virtualx("draw_str", TypeVoid, &Painter::draw_str);
+				func_add_param("x", TypeFloat32);
+				func_add_param("y", TypeFloat32);
+				func_add_param("str", TypeString);
+			class_add_func_virtualx("draw_image", TypeVoid, &Painter::draw_image);
+				func_add_param("x", TypeFloat32);
+				func_add_param("y", TypeFloat32);
+				func_add_param("image", TypeImage);
+			class_set_vtable(ImagePainter);
 }
 
 };

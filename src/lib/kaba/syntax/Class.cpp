@@ -6,6 +6,7 @@
 namespace Kaba{
 
 extern const Class* TypeObject;
+extern const Class* TypeEmptyList;
 
 ClassElement::ClassElement() {
 	offset = 0;
@@ -45,6 +46,15 @@ bool type_match(const Class *given, const Class *wanted) {
 	// compatible pointers (of same or derived class)
 	if (given->is_pointer() and wanted->is_pointer())
 		return given->param->is_derived_from(wanted->param);
+
+	if (wanted->is_super_array()) {
+		if (given == TypeEmptyList)
+			return true;
+		if (given->is_super_array()) {
+			if (type_match(given->param, wanted->param) and (given->param->size == wanted->param->size))
+				return true;
+		}
+	}
 
 	return given->is_derived_from(wanted);
 }

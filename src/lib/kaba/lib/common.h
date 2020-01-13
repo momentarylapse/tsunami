@@ -18,10 +18,11 @@ enum ScriptFlag {
 class Function;
 
 void add_package(const string &name, bool used_by_default);
-const Class *add_type(const string &name, int size, ScriptFlag = FLAG_NONE);
-const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag = FLAG_NONE);
-const Class *add_type_a(const string &name, const Class *sub_type, int array_length);
-const Class *add_type_d(const string &name, const Class *sub_type);
+const Class *add_type(const string &name, int size, ScriptFlag = FLAG_NONE, const Class *parent = nullptr);
+const Class *add_type_p(const Class *sub_type, ScriptFlag = FLAG_NONE, const string &name = "");
+const Class *add_type_a(const Class *sub_type, int array_length, const string &name = "");
+const Class *add_type_l(const Class *sub_type, const string &name = "");
+const Class *add_type_d(const Class *sub_type, const string &name = "");
 Function *add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag = FLAG_NONE);
 template<class T>
 Function *add_funcx(const string &name, const Class *return_type, T func, ScriptFlag flag = FLAG_NONE) {

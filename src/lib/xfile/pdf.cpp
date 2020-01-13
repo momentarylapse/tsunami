@@ -164,20 +164,20 @@ float PagePainter::get_str_width(const string& str)
 	return font_size * str.num * 0.5f;
 }
 
-void PagePainter::draw_image(float x, float y, const Image& image)
+void PagePainter::draw_image(float x, float y, const Image *image)
 {
 }
 
-void PagePainter::draw_mask_image(float x, float y, const Image& image)
+void PagePainter::draw_mask_image(float x, float y, const Image *image)
 {
 }
 
-rect PagePainter::area()
+rect PagePainter::area() const
 {
 	return rect(0, width, 0, height);
 }
 
-rect PagePainter::clip()
+rect PagePainter::clip() const
 {
 	return area();
 }

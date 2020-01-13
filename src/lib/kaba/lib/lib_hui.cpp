@@ -79,6 +79,7 @@ extern const Class *TypeIntPs;
 extern const Class *TypeFloatList;
 extern const Class *TypeComplexList;
 extern const Class *TypeImage;
+extern const Class *TypeBasePainter;
 const Class *TypeHuiWindowP;
 
 void SIAddPackageHui()
@@ -86,17 +87,17 @@ void SIAddPackageHui()
 	add_package("hui", false);
 	
 	const Class *TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
-	const Class *TypeHuiMenuP = add_type_p("Menu*", TypeHuiMenu);
+	const Class *TypeHuiMenuP = add_type_p(TypeHuiMenu);
 	const Class *TypeHuiToolbar = add_type("Toolbar",  sizeof(hui::Toolbar));
-	const Class *TypeHuiToolbarP = add_type_p("Toolbar*", TypeHuiToolbar);
+	const Class *TypeHuiToolbarP = add_type_p(TypeHuiToolbar);
 	const Class *TypeHuiPanel = add_type("Panel", sizeof(hui::Panel));
-	//const Class *TypeHuiPanelP = add_type_p("Panel*", TypeHuiPanel);
+	//const Class *TypeHuiPanelP = add_type_p(TypeHuiPanel);
 	const Class *TypeHuiWindow = add_type("Window", sizeof(hui::Window));
-	TypeHuiWindowP = add_type_p("Window*", TypeHuiWindow);
+	TypeHuiWindowP = add_type_p(TypeHuiWindow);
 	const Class *TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
 	const Class *TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
 	const Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
-	const Class *TypeHuiEventP = add_type_p("Event*", TypeHuiEvent);
+	const Class *TypeHuiEventP = add_type_p(TypeHuiEvent);
 	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 	const Class *TypeHuiTimer = add_type("Timer", sizeof(hui::Timer));
 	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
@@ -438,56 +439,7 @@ void SIAddPackageHui()
 
 	
 	add_class(TypeHuiPainter);
-		class_derive_from(TypeObject, false, true);
-		class_add_element("width", TypeInt, GetDAPainter(width));
-		class_add_element("height", TypeInt, GetDAPainter(height));
-		//class_add_func_virtual("end", TypeVoid, mf(&hui::HuiPainter::end));
-		class_add_func_virtual("set_color", TypeVoid, mf(&hui::Painter::set_color));
-			func_add_param("c", TypeColor);
-		class_add_func_virtual("set_line_width", TypeVoid, mf(&hui::Painter::set_line_width));
-			func_add_param("w", TypeFloat32);
-		class_add_func_virtual("set_line_dash", TypeVoid, mf(&hui::Painter::set_line_dash));
-			func_add_param("w", TypeFloatList);
-		class_add_func_virtual("set_roundness", TypeVoid, mf(&hui::Painter::set_roundness));
-			func_add_param("r", TypeFloat32);
-		class_add_func_virtual("set_antialiasing", TypeVoid, mf(&hui::Painter::set_antialiasing));
-			func_add_param("enabled", TypeBool);
-		class_add_func_virtual("set_font_size", TypeVoid, mf(&hui::Painter::set_font_size));
-			func_add_param("size", TypeFloat32);
-		class_add_func_virtual("set_fill", TypeVoid, mf(&hui::Painter::set_fill));
-			func_add_param("fill", TypeBool);
-		class_add_func_virtual("clip", TypeVoid, mf(&hui::Painter::set_clip));
-			func_add_param("r", TypeRect);
-		class_add_func_virtual("draw_point", TypeVoid, mf(&hui::Painter::draw_point));
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
-		class_add_func_virtual("draw_line", TypeVoid, mf(&hui::Painter::draw_line));
-			func_add_param("x1", TypeFloat32);
-			func_add_param("y1", TypeFloat32);
-			func_add_param("x2", TypeFloat32);
-			func_add_param("y2", TypeFloat32);
-		class_add_func_virtual("draw_lines", TypeVoid, mf(&hui::Painter::draw_lines));
-			func_add_param("p", TypeComplexList);
-		class_add_func_virtual("draw_polygon", TypeVoid, mf(&hui::Painter::draw_polygon));
-			func_add_param("p", TypeComplexList);
-		class_add_func_virtual("draw_rect", TypeVoid, mf((void (hui::Painter::*) (float,float,float,float))&hui::Painter::draw_rect));
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
-			func_add_param("w", TypeFloat32);
-			func_add_param("h", TypeFloat32);
-		class_add_func_virtual("draw_circle", TypeVoid, mf(&hui::Painter::draw_circle));
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
-			func_add_param("r", TypeFloat32);
-		class_add_func_virtual("draw_str", TypeVoid, mf(&hui::Painter::draw_str));
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
-			func_add_param("str", TypeString);
-		class_add_func_virtual("draw_image", TypeVoid, mf(&hui::Painter::draw_image));
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
-			func_add_param("image", TypeImage);
-		class_set_vtable(hui::Painter);
+		class_derive_from(TypeBasePainter, true, true);
 
 
 	add_class(TypeHuiTimer);

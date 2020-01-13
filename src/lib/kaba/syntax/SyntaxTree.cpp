@@ -902,36 +902,44 @@ Node* SyntaxTree::transformb_node(Node *n, Block *b, std::function<Node*(Node*, 
 	return F(n, b);
 }
 
-void SyntaxTree::transform_block(Block *block, std::function<Node*(Node*)> F) {
-	//foreachi (Node *n, block->nodes, i){
-	for (int i=0; i<block->uparams.num; i++) {
-		block->uparams[i] = transform_node(block->uparams[i], F);
-		if (_transform_insert_before_.num > 0) {
-			for (auto *ib: _transform_insert_before_) {
-				if (config.verbose)
-					msg_error("INSERT BEFORE...");
-				block->uparams.insert(ib, i);
-				i ++;
-			}
-			_transform_insert_before_.clear();
+// preventing a sub-block to handle insertions of an outer block
+#define PUSH_BLOCK_INSERT \
+	auto XXX = _transform_insert_before_; \
+	_transform_insert_before_.clear();
+#define POP_BLOCK_INSERT \
+	_transform_insert_before_ = XXX;
+
+void handle_insert_before(Block *block, int &i) {
+	if (_transform_insert_before_.num > 0) {
+		for (auto *ib: _transform_insert_before_) {
+			if (config.verbose)
+				msg_error("INSERT BEFORE...2");
+			block->uparams.insert(ib, i);
+			i ++;
 		}
+		_transform_insert_before_.clear();
 	}
 }
 
+
+void SyntaxTree::transform_block(Block *block, std::function<Node*(Node*)> F) {
+	PUSH_BLOCK_INSERT;
+	//foreachi (Node *n, block->nodes, i){
+	for (int i=0; i<block->uparams.num; i++) {
+		block->uparams[i] = transform_node(block->uparams[i], F);
+		handle_insert_before(block, i);
+	}
+	POP_BLOCK_INSERT;
+}
+
 void SyntaxTree::transformb_block(Block *block, std::function<Node*(Node*, Block*)> F) {
+	PUSH_BLOCK_INSERT;
 	//foreachi (Node *n, block->nodes, i){
 	for (int i=0; i<block->uparams.num; i++) {
 		block->uparams[i] = transformb_node(block->uparams[i], block, F);
-		if (_transform_insert_before_.num > 0) {
-			for (auto *ib: _transform_insert_before_) {
-				if (config.verbose)
-					msg_error("INSERT BEFORE...");
-				block->uparams.insert(ib, i);
-				i ++;
-			}
-			_transform_insert_before_.clear();
-		}
+		handle_insert_before(block, i);
 	}
+	POP_BLOCK_INSERT;
 }
 
 // split arrays and address shifts into simpler commands...

@@ -10,50 +10,42 @@
 #include "ImagePainter.h"
 
 
-string ImageVersion = "0.2.5.0";
-
-Image::Image()
-{
+Image::Image() {
 	width = height = 0;
 	error = false;
-	mode = ModeRGBA;
+	mode = Mode::RGBA;
 	alpha_used = false;
 }
 
-Image::Image(int _width, int _height, const color &c)
-{
+Image::Image(int _width, int _height, const color &c) {
 	create(_width, _height, c);
 }
 
-void Image::__init__()
-{
+void Image::__init__() {
 	new(this) Image;
 }
 
-void Image::__init_ext__(int _width, int _height, const color &c)
-{
+void Image::__init_ext__(int _width, int _height, const color &c) {
 	new(this) Image(_width, _height, c);
 }
 
-void Image::__delete__()
-{
+void Image::__delete__() {
 	this->Image::~Image();
 }
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
-void Image::load_flipped(const string &filename)
-{
+void Image::_load_flipped(const string &filename) {
 	// reset image
 	width = 0;
 	height = 0;
-	mode = ModeRGBA;
+	mode = Mode::RGBA;
 	error = false;
 	alpha_used = false;
 	data.clear();
 
 	// file ok?
-	if (!file_test_existence(filename)){
+	if (!file_test_existence(filename)) {
 		msg_error("Image.Load: file does not exist: " + filename);
 		return;
 	}
@@ -72,44 +64,38 @@ void Image::load_flipped(const string &filename)
 		msg_error("ImageLoad: unhandled file extension: " + ext);
 }
 
-void Image::load(const string &filename)
-{
-	load_flipped(filename);
+void Image::_load(const string &filename) {
+	_load_flipped(filename);
 	flip_v();
 }
 
-inline unsigned int image_color_rgba(const color &c)
-{
+inline unsigned int image_color_rgba(const color &c) {
 	return int(c.r * 255.0f) + (int(c.g * 255.0f) << 8) + (int(c.b * 255.0f) << 16) + (int(c.a * 255.0f) << 24);
 }
 
-inline unsigned int image_color_bgra(const color &c)
-{
+inline unsigned int image_color_bgra(const color &c) {
 	return int(c.b * 255.0f) + (int(c.g * 255.0f) << 8) + (int(c.r * 255.0f) << 16) + (int(c.a * 255.0f) << 24);
 }
 
-inline color image_uncolor_rgba(unsigned int i)
-{
+inline color image_uncolor_rgba(unsigned int i) {
 	return color((float)(i >> 24) / 255.0f,
 	              (float)(i & 255) / 255.0f,
 	              (float)((i >> 8) & 255) / 255.0f,
 	              (float)((i >> 16) & 255) / 255.0f);
 }
 
-inline color image_uncolor_bgra(unsigned int i)
-{
+inline color image_uncolor_bgra(unsigned int i) {
 	return color((float)(i >> 24) / 255.0f,
 	              (float)((i >> 16) & 255) / 255.0f,
 	              (float)((i >> 8) & 255) / 255.0f,
 	              (float)(i & 255) / 255.0f);
 }
 
-void Image::create(int _width, int _height, const color &c)
-{
+void Image::create(int _width, int _height, const color &c) {
 	// create
 	width = _width;
 	height = _height;
-	mode = ModeRGBA;
+	mode = Mode::RGBA;
 	error = false;
 	alpha_used = (c.a != 1.0f);
 	
@@ -120,8 +106,7 @@ void Image::create(int _width, int _height, const color &c)
 		data[i] = ic;
 }
 
-void Image::save(const string &filename) const
-{
+void Image::save(const string &filename) const {
 	string ext = filename.extension();
 	if (ext == "tga")
 		image_save_tga(filename, *this);
@@ -138,12 +123,11 @@ void Image::clear()
 	data.clear();
 }
 
-Image* Image::scale(int _width, int _height) const
-{
+Image* Image::scale(int _width, int _height) const {
 	Image *r = new Image(_width, _height, Black);
 
 	for (int x=0;x<_width;x++)
-		for (int y=0;y<_height;y++){
+		for (int y=0;y<_height;y++) {
 			int x0 = (int)( (float)x * (float)width / (float)_width );
 			int y0 = (int)( (float)y * (float)height / (float)_height );
 			r->data[y * _width + x] = data[y0 * width + x0];
@@ -152,55 +136,51 @@ Image* Image::scale(int _width, int _height) const
 	return r;
 }
 
-void Image::flip_v()
-{
+void Image::flip_v() {
 	unsigned int t;
 	unsigned int *d = &data[0];
 	for (int y=0;y<height/2;y++)
-		for (int x=0;x<width;x++){
+		for (int x=0;x<width;x++) {
 			t = d[x + y * width];
 			d[x + y * width] = d[x + (height - y - 1) * width];
 			d[x + (height - y - 1) * width] = t;
 		}
 }
 
-inline void col_conv_rgba_to_bgra(unsigned int &c)
-{
+inline void col_conv_rgba_to_bgra(unsigned int &c) {
 	unsigned int a = (c & 0xff000000) >> 24;
-	if (a < 255){
+	if (a < 255) {
 		// cairo wants pre multiplied alpha
 		float aa = (float)((c & 0xff000000) >> 24) / 255.0f;
 		unsigned int r = (unsigned int)((float)(c & 0xff) * aa);
 		unsigned int g = (unsigned int)((float)((c & 0xff00) >> 8) * aa);
 		unsigned int b = (unsigned int)((float)((c & 0xff0000) >> 16) * aa);
 		c = (c & 0xff000000) + b + (r << 16) + (g << 8);
-	}else{
+	} else {
 		unsigned int r = (c & 0xff);
 		unsigned int b = (c & 0xff0000) >> 16;
 		c = (c & 0xff00ff00) + b + (r << 16);
 	}
 }
 
-inline void col_conv_bgra_to_rgba(unsigned int &c)
-{
+inline void col_conv_bgra_to_rgba(unsigned int &c) {
 	unsigned int r = (c & 0xff0000) >> 16;
 	unsigned int b = (c & 0xff);
 	c = (c & 0xff00ff00) + r + (b << 16);
 }
 
-void Image::set_mode(int _mode) const
-{
+void Image::set_mode(Mode _mode) const {
 	if (_mode == mode)
 		return;
 
 	unsigned int *c = (unsigned int*)data.data;
-	if (mode == ModeRGBA){
-		if (_mode == ModeBGRA){
+	if (mode == Mode::RGBA) {
+		if (_mode == Mode::BGRA) {
 			for (int i=0;i<data.num;i++)
 				col_conv_rgba_to_bgra(*(c ++));
 		}
-	}else if (mode == ModeBGRA){
-		if (_mode == ModeRGBA){
+	} else if (mode == Mode::BGRA) {
+		if (_mode == Mode::RGBA) {
 			for (int i=0;i<data.num;i++)
 				col_conv_bgra_to_rgba(*(c ++));
 		}
@@ -209,33 +189,30 @@ void Image::set_mode(int _mode) const
 }
 
 
-void Image::set_pixel(int x, int y, const color &c)
-{
-	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
-		if (mode == ModeBGRA)
+void Image::set_pixel(int x, int y, const color &c) {
+	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)) {
+		if (mode == Mode::BGRA)
 			data[x + y * width] = image_color_bgra(c);
-		else if (mode == ModeRGBA)
+		else if (mode == Mode::RGBA)
 			data[x + y * width] = image_color_rgba(c);
 	}
 }
 
-void Image::draw_pixel(int x, int y, const color &c)
-{
-	if (c.a >= 1){
+void Image::draw_pixel(int x, int y, const color &c) {
+	if (c.a >= 1) {
 		set_pixel(x, y, c);
-	}else if (c.a <= 0){
-	}else{
+	} else if (c.a <= 0){
+	} else {
 		color c0 = get_pixel(x, y);
 		set_pixel(x, y, ColorInterpolate(c0, c, c.a));
 	}
 }
 
-color Image::get_pixel(int x, int y) const
-{
-	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
-		if (mode == ModeBGRA)
+color Image::get_pixel(int x, int y) const {
+	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)) {
+		if (mode == Mode::BGRA)
 			return image_uncolor_bgra(data[x + y * width]);
-		else if (mode == ModeRGBA)
+		else if (mode == Mode::RGBA)
 			return image_uncolor_rgba(data[x + y * width]);
 	}
 	return Black;
@@ -245,8 +222,7 @@ color Image::get_pixel(int x, int y) const
 //  x repeats in [0..width)
 //  y repeats in [0..height)
 //  each pixel has its maximum at offset (0.5, 0.5)
-color Image::get_pixel_interpolated(float x, float y) const
-{
+color Image::get_pixel_interpolated(float x, float y) const {
 	x = loopf(x, 0, (float)width);
 	y = loopf(y, 0, (float)height);
 	int x0 = (x >= 0.5f) ? (int)(x - 0.5f) : (width - 1);
@@ -263,13 +239,12 @@ color Image::get_pixel_interpolated(float x, float y) const
 	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
 }
 
-Image *LoadImage(const string &filename)
-{
+Image *Image::load(const string &filename) {
 	Image *im = new Image;
-	im->load(filename);
+	im->_load(filename);
 	if (!im->error)
 		return im;
-	delete(im);
+	delete im;
 	return nullptr;
 }
 

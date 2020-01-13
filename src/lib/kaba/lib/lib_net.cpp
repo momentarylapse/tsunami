@@ -42,8 +42,8 @@ void SIAddPackageNet()
 
 	TypeNetAddress  = add_type  ("NetAddress", sizeof(NetAddress));
 	TypeSocket      = add_type  ("Socket", sizeof(Socket));
-	TypeSocketP     = add_type_p("Socket*", TypeSocket);
-	TypeSocketPList = add_type_a("Socket*[]", TypeSocketP, -1);
+	TypeSocketP     = add_type_p(TypeSocket);
+	TypeSocketPList = add_type_l(TypeSocketP);
 
 
 	add_class(TypeNetAddress);

@@ -308,6 +308,7 @@ sources = [
 	'src/lib/kaba/lib/lib_nix.cpp',
 	'src/lib/kaba/lib/lib_sound.cpp',
 	'src/lib/kaba/lib/lib_threads.cpp',
+	'src/lib/kaba/lib/lib_vulkan.cpp',
 	'src/lib/kaba/lib/lib_x.cpp',
 	'src/lib/kaba/syntax/Class.cpp',
 	'src/lib/kaba/syntax/Constant.cpp',

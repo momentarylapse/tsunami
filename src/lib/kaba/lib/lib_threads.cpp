@@ -26,9 +26,9 @@ void SIAddPackageThread()
 {
 	add_package("thread", false);
 
-	const Class *TypeThread       = add_type  ("Thread",       sizeof(Thread));
-	const Class *TypeThreadP      = add_type_p("Thread*",      TypeThread);
-	const Class *TypeMutex        = add_type  ("Mutex",        sizeof(Mutex));
+	const Class *TypeThread       = add_type  ("Thread", sizeof(Thread));
+	const Class *TypeThreadP      = add_type_p(TypeThread);
+	const Class *TypeMutex        = add_type  ("Mutex", sizeof(Mutex));
 	const Class *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
 
 	add_class(TypeThread);

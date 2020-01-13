@@ -19,8 +19,7 @@ namespace hui
 
 class Window;
 
-class Painter : public ::Painter
-{
+class Painter : public ::Painter {
 	public:
 #ifdef HUI_API_GTK
 	cairo_t *cr;
@@ -57,14 +56,13 @@ class Painter : public ::Painter
 	void _cdecl draw_circle(float x, float y, float radius) override;
 	void _cdecl draw_str(float x, float y, const string &str) override;
 	float _cdecl get_str_width(const string &str) override;
-	void _cdecl draw_image(float x, float y, const Image &image) override;
-	void _cdecl draw_mask_image(float x, float y, const Image &image) override;
-	rect _cdecl area() override;
-	rect _cdecl clip() override;
+	void _cdecl draw_image(float x, float y, const Image *image) override;
+	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
+	rect _cdecl clip() const override;
 };
 
-Painter *start_image_paint(Image &im);
-void end_image_paint(Image &im, ::Painter *p);
+Painter *start_image_paint(Image *im);
+void end_image_paint(Image *im, ::Painter *p);
 
 };
 

@@ -14,6 +14,8 @@ extern bool next_extern;
 extern bool next_static;
 extern bool next_const;
 
+extern const Class *TypeEmptyList;
+
 const int TYPE_CAST_NONE = -1;
 const int TYPE_CAST_DEREFERENCE = -2;
 const int TYPE_CAST_REFERENCE = -3;
@@ -684,10 +686,12 @@ Node *apply_params_with_cast(SyntaxTree *ps, Node *operand, Array<Node*> &params
 	return operand;
 }
 
-
 Node *build_list(SyntaxTree *ps, Array<Node*> &el) {
-	if (el.num == 0)
-		ps->do_error("empty arrays not supported yet");
+	if (el.num == 0) {
+		//ps->do_error("empty arrays not supported yet");
+		auto c = ps->add_constant(TypeEmptyList);
+		return ps->add_node_const(c);
+	}
 	const Class *t = ps->make_class_super_array(el[0]->type);
 	Node *c = new Node(NodeKind::ARRAY_BUILDER, 0, t);
 	c->set_num_uparams(el.num);
@@ -902,6 +906,8 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class) {
 		} else {
 			Array<Node*> el;
 			while(true) {
+				if (Exp.cur == "]")
+					break;
 				el.add(parse_command(block));
 				if ((Exp.cur != ",") and (Exp.cur != "]"))
 					do_error("\",\" or \"]\" expected");

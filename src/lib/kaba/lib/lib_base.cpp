@@ -8,8 +8,9 @@
 
 
 namespace Kaba {
-	
+
 extern const Class *TypeDynamicArray;
+const Class *TypeEmptyList;
 extern const Class *TypeDictBase;
 extern const Class *TypeFloat;
 extern const Class *TypePointerList;
@@ -18,6 +19,7 @@ extern const Class *TypeObjectP;
 extern const Class *TypeBoolPs;
 extern const Class *TypeBoolList;
 extern const Class *TypeIntPs;
+extern const Class *TypeIntP;
 extern const Class *TypeIntList;
 extern const Class *TypeIntArray;
 extern const Class *TypeFloatP;
@@ -347,7 +349,7 @@ void SIAddPackageBase() {
 	TypeReg8			= add_type  ("-reg8-", 1, FLAG_CALL_BY_VALUE);
 	TypeChunk			= add_type  ("-chunk-", 0); // substitute for all plane-old-data types
 	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
-	TypeObjectP			= add_type_p("Object*", TypeObject);
+	TypeObjectP			= add_type_p(TypeObject);
 
 	// "real"
 	TypeVoid			= add_type  ("void", 0, FLAG_CALL_BY_VALUE);
@@ -358,10 +360,11 @@ void SIAddPackageBase() {
 	TypeFloat64			= add_type  ("float64", sizeof(double), FLAG_CALL_BY_VALUE);
 	TypeChar			= add_type  ("char", sizeof(char), FLAG_CALL_BY_VALUE);
 	TypeDynamicArray	= add_type  ("@DynamicArray", config.super_array_size);
+	TypeEmptyList		= add_type  ("-empty-list-", config.super_array_size);
 	TypeDictBase		= add_type  ("@DictBase",   config.super_array_size);
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
-	TypeExceptionP		= add_type_p("Exception*", TypeException);
+	TypeExceptionP		= add_type_p(TypeException);
 
 
 	// select default float type
@@ -403,26 +406,27 @@ void SIAddPackageBase() {
 			func_add_param("index", TypeInt);
 
 	// derived   (must be defined after the primitive types and the bases!)
-	TypePointer     = add_type_p("void*",     TypeVoid, FLAG_CALL_BY_VALUE); // substitute for all pointer types
-	TypePointerList = add_type_a("void*[]",   TypePointer, -1);
-	TypeBoolPs      = add_type_p("bool&",     TypeBool, FLAG_SILENT);
-	TypeBoolList    = add_type_a("bool[]",    TypeBool, -1);
-	TypeIntPs       = add_type_p("int&",      TypeInt, FLAG_SILENT);
-	TypeIntList     = add_type_a("int[]",     TypeInt, -1);
-	TypeIntArray    = add_type_a("int[?]",    TypeInt, 1);
-	TypeFloatP      = add_type_p("float*",    TypeFloat);
-	TypeFloatPs     = add_type_p("float&",    TypeFloat, FLAG_SILENT);
-	TypeFloatArray  = add_type_a("float[?]",  TypeFloat, 1);
-	TypeFloatArrayP = add_type_p("float[?]*", TypeFloatArray);
-	TypeFloatList   = add_type_a("float[]",   TypeFloat, -1);
-	TypeCharPs      = add_type_p("char&",     TypeChar, FLAG_SILENT);
-	TypeCString     = add_type_a("cstring",   TypeChar, 256);	// cstring := char[256]
-	TypeString      = add_type_a("string",    TypeChar, -1);	// string := char[]
-	TypeStringList  = add_type_a("string[]",  TypeString, -1);
+	TypePointer     = add_type_p(TypeVoid, FLAG_CALL_BY_VALUE); // substitute for all pointer types
+	TypePointerList = add_type_l(TypePointer);
+	TypeBoolPs      = add_type_p(TypeBool, FLAG_SILENT);
+	TypeBoolList    = add_type_l(TypeBool);
+	TypeIntPs       = add_type_p(TypeInt, FLAG_SILENT);
+	TypeIntP        = add_type_p(TypeInt);
+	TypeIntList     = add_type_l(TypeInt);
+	TypeIntArray    = add_type_a(TypeInt, 1, "int[?]");
+	TypeFloatP      = add_type_p(TypeFloat);
+	TypeFloatPs     = add_type_p(TypeFloat, FLAG_SILENT);
+	TypeFloatArray  = add_type_a(TypeFloat, 1, "float[?]");
+	TypeFloatArrayP = add_type_p(TypeFloatArray);
+	TypeFloatList   = add_type_l(TypeFloat);
+	TypeCharPs      = add_type_p(TypeChar, FLAG_SILENT);
+	TypeCString     = add_type_a(TypeChar, 256, "cstring");	// cstring := char[256]
+	TypeString      = add_type_l(TypeChar, "string");	// string := char[]
+	TypeStringList  = add_type_l(TypeString);
 
-	TypeIntDict     = add_type_d("int{}",     TypeInt);
-	TypeFloatDict   = add_type_d("float{}",   TypeFloat);
-	TypeStringDict  = add_type_d("string{}",  TypeString);
+	TypeIntDict     = add_type_d(TypeInt);
+	TypeFloatDict   = add_type_d(TypeFloat);
+	TypeStringDict  = add_type_d(TypeString);
 	
 
 

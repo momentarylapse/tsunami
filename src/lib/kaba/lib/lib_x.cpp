@@ -4,6 +4,8 @@
 #include "common.h"
 #include "exception.h"
 
+#if 1
+
 
 #ifdef _X_ALLOW_X_
 	#include "../../../world/world.h"
@@ -255,18 +257,18 @@ void SIAddPackageX()
 
 	
 	TypeModel			= add_type  ("Model",		sizeof(Model));
-	TypeModelP			= add_type_p("Model*",		TypeModel);
-	TypeModelPPs		= add_type_p("Model*&",		TypeModelP);
-	TypeModelPList		= add_type_a("Model*[]",	TypeModelP, -1);
-	TypeModelPListPs	= add_type_p("Model*[]&",	TypeModelPList, FLAG_SILENT);
+	TypeModelP			= add_type_p(TypeModel);
+	TypeModelPPs		= add_type_p(TypeModelP);
+	TypeModelPList		= add_type_l(TypeModelP);
+	TypeModelPListPs	= add_type_p(TypeModelPList, FLAG_SILENT);
 	TypeBone			= add_type  ("Bone",		sizeof(Bone));
-	TypeBoneList		= add_type_a("Bone[]",		TypeBone, -1);
+	TypeBoneList		= add_type_l(TypeBone);
 	TypeFont			= add_type  ("Font",		sizeof(Font));
-	TypeFontP			= add_type_p("Font*",		TypeFont);
+	TypeFontP			= add_type_p(TypeFont);
 	TypeLayer			= add_type  ("Layer",		sizeof(Layer));
-	TypeLayerP			= add_type_p("Layer*",		TypeLayer);
+	TypeLayerP			= add_type_p(TypeLayer);
 	TypeText			= add_type  ("Text",		sizeof(Text));
-	TypeTextP			= add_type_p("Text*",		TypeText);
+	TypeTextP			= add_type_p(TypeText);
 	TypePicture			= add_type  ("Picture",		sizeof(Picture));
 	TypePicture3D		= add_type  ("Picture3d",	sizeof(Picture3d));
 	TypeParticle		= add_type  ("Particle",	sizeof(Particle));
@@ -274,23 +276,23 @@ void SIAddPackageX()
 	TypeBeam			= add_type  ("Beam",		sizeof(Particle));
 	TypeEffect			= add_type  ("Effect",		sizeof(Effect));
 	TypeCamera			= add_type  ("Camera",		sizeof(Camera));
-	TypeCameraP			= add_type_p("Camera*",		TypeCamera);
+	TypeCameraP			= add_type_p(TypeCamera);
 	TypeController		= add_type  ("Controller",	sizeof(Controller));
 	TypeSkin			= add_type  ("Skin",		sizeof(Skin));
-	TypeSkinP			= add_type_p("Skin*",		TypeSkin);
-	TypeSkinPArray		= add_type_a("Skin*[?]",	TypeSkinP, 1);
+	TypeSkinP			= add_type_p(TypeSkin);
+	TypeSkinPArray		= add_type_a(TypeSkinP, 1, "Skin*[?]");
 	TypeSubSkin			= add_type  ("SubSkin",		sizeof(SubSkin));
-	TypeSubSkinList		= add_type_a("SubSkin[]",	TypeSubSkin, -1);
+	TypeSubSkinList		= add_type_l(TypeSubSkin);
 	TypeMaterial		= add_type  ("Material",	sizeof(Material));
-	TypeMaterialP		= add_type_p("Material*",	TypeMaterial);
-	TypeMaterialPList	= add_type_a("Material*[]",	TypeMaterialP, -1);
+	TypeMaterialP		= add_type_p(TypeMaterial);
+	TypeMaterialPList	= add_type_l(TypeMaterialP);
 	TypeFog				= add_type  ("Fog",			sizeof(Fog));
 	TypeLight			= add_type  ("Light",		sizeof(Light::Light));
-	TypeLightP			= add_type_p("Light*",		TypeLight);
+	TypeLightP			= add_type_p(TypeLight);
 	TypeTraceData		= add_type  ("TraceData",	sizeof(TraceData));
 	TypeTerrain			= add_type  ("Terrain",		sizeof(Terrain));
-	TypeTerrainP		= add_type_p("Terrain*",	TypeTerrain);
-	TypeTerrainPList	= add_type_a("Terrain*[]",	TypeTerrainP, -1);
+	TypeTerrainP		= add_type_p(TypeTerrain);
+	TypeTerrainPList	= add_type_l(TypeTerrainP);
 	TypeLink			= add_type  ("Link",		sizeof(Link));
 	TypeLinkSpring		= add_type  ("LinkSpring",	sizeof(Link));
 	TypeLinkBall		= add_type  ("LinkBall",	sizeof(Link));
@@ -302,7 +304,7 @@ void SIAddPackageX()
 	TypeEngineData		= add_type  ("EngineData",	0);
 	TypeNetworkData		= add_type  ("NetworkData",	0);
 	TypeHostData		= add_type  ("HostData",    sizeof(HostData));
-	TypeHostDataList	= add_type_a("HostData[]",	TypeHostData, -1);
+	TypeHostDataList	= add_type_l(TypeHostData);
 	
 
 	// bone, subskin, material...
@@ -1013,3 +1015,10 @@ void SIAddPackageX()
 }
 
 };
+#else
+
+namespace Kaba {
+void SIAddPackageX(){}
+};
+
+#endif

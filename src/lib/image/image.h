@@ -13,24 +13,22 @@
 #include "../base/base.h"
 #include "color.h"
 
-extern string ImageVersion;
-
 class ImagePainter;
 
-class Image
-{
-	public:
+class Image {
+public:
+	
+	enum class Mode {
+		// little endian OpenGL convention
+		RGBA, // 0xrr 0xgg 0xbb 0xaa = 0xaabbggrr
+		BGRA, // 0xbb 0xgg 0xrr 0xaa = 0xaarrggbb
+	};
+
 	int width, height;
-	mutable int mode;
+	mutable Mode mode;
 	Array<unsigned int> data;
 	bool alpha_used;
 	bool error;
-	
-	enum{
-		// little endian OpenGL convention
-		ModeRGBA, // 0xrr 0xgg 0xbb 0xaa = 0xaabbggrr
-		ModeBGRA, // 0xbb 0xgg 0xrr 0xaa = 0xaarrggbb
-	};
 	Image();
 	Image(int width, int height, const color &c);
 
@@ -42,26 +40,23 @@ class Image
 
 	bool _cdecl is_empty(){	return (data.num == 0);	}
 
-	void _cdecl load(const string &filename);
-	void _cdecl load_flipped(const string &filename);
+	static Image *load(const string &filename);
+	void _cdecl _load(const string &filename);
+	void _cdecl _load_flipped(const string &filename);
 	void _cdecl create(int width, int height, const color &c);
 	void _cdecl save(const string &filename) const;
 	void _cdecl clear();
 
 	Image* _cdecl scale(int width, int height) const;
 	void _cdecl flip_v();
-	void _cdecl set_mode(int mode) const;
+	void _cdecl set_mode(Mode mode) const;
 	void _cdecl set_pixel(int x, int y, const color &c);
 	void _cdecl draw_pixel(int x, int y, const color &c);
 	color _cdecl get_pixel(int x, int y) const;
 	color _cdecl get_pixel_interpolated(float x, float y) const;
+
+	ImagePainter *start_draw();
 };
 
-// windows.h hack...
-#ifdef LoadImage
-#undef LoadImage
-#endif
-
-Image* _cdecl LoadImage(const string &filename);
 
 #endif

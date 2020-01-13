@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------------------------//
 
 
-const float f_m_id[16] = { 1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1 };
+const float f_m_id[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
 const matrix matrix::ID = matrix(f_m_id);
 
 matrix::matrix(const float f[16]) {
@@ -60,9 +60,9 @@ matrix matrix::operator *= (const matrix &m) {
 }
 
 vector matrix::operator * (const vector &v) const {
-	return vector(	v.x*_00 + v.y*_01 + v.z*_02 + _03,
-					v.x*_10 + v.y*_11 + v.z*_12 + _13,
-					v.x*_20 + v.y*_21 + v.z*_22 + _23);
+	return vector(v.x*_00 + v.y*_01 + v.z*_02 + _03,
+	              v.x*_10 + v.y*_11 + v.z*_12 + _13,
+	              v.x*_20 + v.y*_21 + v.z*_22 + _23);
 }
 
 matrix matrix::operator * (float f) const {
@@ -76,9 +76,9 @@ vector matrix::transform(const vector &v) const {
 	return *this * v;
 }
 vector matrix::transform_normal(const vector &v) const {
-	return vector(	v.x*_00 + v.y*_01 + v.z*_02,
-					v.x*_10 + v.y*_11 + v.z*_12,
-					v.x*_20 + v.y*_21 + v.z*_22);
+	return vector(v.x*_00 + v.y*_01 + v.z*_02,
+	              v.x*_10 + v.y*_11 + v.z*_12,
+	              v.x*_20 + v.y*_21 + v.z*_22);
 }
 vector matrix::untransform(const vector &v) const {
 	return inverse() * v;
@@ -109,20 +109,6 @@ vector matrix::mul_v(const vector &v) const
 
 //#define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
 
-// combining two transformation matrices (first do m1, then m2:   m = m2 * m1 )
-void MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1)
-{
-	// m_ij = (sum k) m2_ik * m1_kj
-	matrix _m;
-	for (int i=0; i<4; i++)
-		for (int j=0; j<4; j++)
-			_m.__e[i][j] = m2.__e[i][0]*m1.__e[0][j] + m2.__e[i][1]*m1.__e[1][j] + m2.__e[i][2]*m1.__e[2][j] + m2.__e[i][3]*m1.__e[3][j];
-	/*_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
-	_m._10=_ps(m2,m1,1,0);	_m._11=_ps(m2,m1,1,1);	_m._12=_ps(m2,m1,1,2);	_m._13=_ps(m2,m1,1,3);
-	_m._20=_ps(m2,m1,2,0);	_m._21=_ps(m2,m1,2,1);	_m._22=_ps(m2,m1,2,2);	_m._23=_ps(m2,m1,2,3);
-	_m._30=_ps(m2,m1,3,0);	_m._31=_ps(m2,m1,3,1);	_m._32=_ps(m2,m1,3,2);	_m._33=_ps(m2,m1,3,3);*/
-	m=_m;
-}
 
 // combining two transformation matrices (first do m1, then m2:   m = m2 * m1 )
 matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
@@ -131,7 +117,7 @@ matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 	matrix m;
 	for (int i=0; i<4; i++)
 		for (int j=0; j<4; j++)
-			m.__e[i][j] = m2.__e[i][0]*m1.__e[0][j] + m2.__e[i][1]*m1.__e[1][j] + m2.__e[i][2]*m1.__e[2][j] + m2.__e[i][3]*m1.__e[3][j];
+			m.__e[j][i] = m2.__e[0][i]*m1.__e[j][0] + m2.__e[1][i]*m1.__e[j][1] + m2.__e[2][i]*m1.__e[j][2] + m2.__e[3][i]*m1.__e[j][3];
 	/*_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
 	_m._10=_ps(m2,m1,1,0);	_m._11=_ps(m2,m1,1,1);	_m._12=_ps(m2,m1,1,2);	_m._13=_ps(m2,m1,1,3);
 	_m._20=_ps(m2,m1,2,0);	_m._21=_ps(m2,m1,2,1);	_m._22=_ps(m2,m1,2,2);	_m._23=_ps(m2,m1,2,3);
@@ -139,81 +125,64 @@ matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 	return m;
 }
 
-// identity (no transformation: m*v=v)
-void MatrixIdentity(matrix &m)
-{
-	m = matrix::ID;
-	/*
-	m._00=1;	m._01=0;	m._02=0;	m._03=0;
-	m._10=0;	m._11=1;	m._12=0;	m._13=0;
-	m._20=0;	m._21=0;	m._22=1;	m._23=0;
-	m._30=0;	m._31=0;	m._32=0;	m._33=1;*/
-}
-
-inline float _Determinant(const float m[16])
-{
+float matrix::determinant() const {
 	return
-		m[12]*m[9]*m[6]*m[3]-
-		m[8]*m[13]*m[6]*m[3]-
-		m[12]*m[5]*m[10]*m[3]+
-		m[4]*m[13]*m[10]*m[3]+
-		m[8]*m[5]*m[14]*m[3]-
-		m[4]*m[9]*m[14]*m[3]-
-		m[12]*m[9]*m[2]*m[7]+
-		m[8]*m[13]*m[2]*m[7]+
-		m[12]*m[1]*m[10]*m[7]-
-		m[0]*m[13]*m[10]*m[7]-
-		m[8]*m[1]*m[14]*m[7]+
-		m[0]*m[9]*m[14]*m[7]+
-		m[12]*m[5]*m[2]*m[11]-
-		m[4]*m[13]*m[2]*m[11]-
-		m[12]*m[1]*m[6]*m[11]+
-		m[0]*m[13]*m[6]*m[11]+
-		m[4]*m[1]*m[14]*m[11]-
-		m[0]*m[5]*m[14]*m[11]-
-		m[8]*m[5]*m[2]*m[15]+
-		m[4]*m[9]*m[2]*m[15]+
-		m[8]*m[1]*m[6]*m[15]-
-		m[0]*m[9]*m[6]*m[15]-
-		m[4]*m[1]*m[10]*m[15]+
-		m[0]*m[5]*m[10]*m[15];
+		_30*_21*_12*_03-
+		_20*_31*_12*_03-
+		_30*_11*_22*_03+
+		_10*_31*_22*_03+
+		_20*_11*_32*_03-
+		_10*_21*_32*_03-
+		_30*_21*_02*_13+
+		_20*_31*_02*_13+
+		_30*_01*_22*_13-
+		_00*_31*_22*_13-
+		_20*_01*_32*_13+
+		_00*_21*_32*_13+
+		_30*_11*_02*_23-
+		_10*_31*_02*_23-
+		_30*_01*_12*_23+
+		_00*_31*_12*_23+
+		_10*_01*_32*_23-
+		_00*_11*_32*_23-
+		_20*_11*_02*_33+
+		_10*_21*_02*_33+
+		_20*_01*_12*_33-
+		_00*_21*_12*_33-
+		_10*_01*_22*_33+
+		_00*_11*_22*_33;
 }
-
-float matrix::determinant() const
-{	return _Determinant(e);		}
 
 // inverting the transformation
 matrix matrix::inverse() const {
 	matrix mo;
-	float *m=(float*)this;
-	float *i=(float*)&mo;
-	float x=_Determinant(m);
+	float x = determinant();
 
 	/*msg_write("Matrix Inverse");
 	mout(mi);
 	msg_write(f2s(x,3));*/
 
-	if (x==0){
-		msg_write("MatrixInverse:  matrix not invertible");
+	if (x == 0){
+		msg_write("matrix.inverse():  not invertible");
 		return ID;
 	}
 
-	i[0]= (-m[13]*m[10]*m[7] +m[9]*m[14]*m[7] +m[13]*m[6]*m[11] -m[5]*m[14]*m[11] -m[9]*m[6]*m[15] +m[5]*m[10]*m[15])/x;
-	i[4]= ( m[12]*m[10]*m[7] -m[8]*m[14]*m[7] -m[12]*m[6]*m[11] +m[4]*m[14]*m[11] +m[8]*m[6]*m[15] -m[4]*m[10]*m[15])/x;
-	i[8]= (-m[12]*m[9]* m[7] +m[8]*m[13]*m[7] +m[12]*m[5]*m[11] -m[4]*m[13]*m[11] -m[8]*m[5]*m[15] +m[4]*m[9]* m[15])/x;
-	i[12]=( m[12]*m[9]* m[6] -m[8]*m[13]*m[6] -m[12]*m[5]*m[10] +m[4]*m[13]*m[10] +m[8]*m[5]*m[14] -m[4]*m[9]* m[14])/x;
-	i[1]= ( m[13]*m[10]*m[3] -m[9]*m[14]*m[3] -m[13]*m[2]*m[11] +m[1]*m[14]*m[11] +m[9]*m[2]*m[15] -m[1]*m[10]*m[15])/x;
-	i[5]= (-m[12]*m[10]*m[3] +m[8]*m[14]*m[3] +m[12]*m[2]*m[11] -m[0]*m[14]*m[11] -m[8]*m[2]*m[15] +m[0]*m[10]*m[15])/x;
-	i[9]= ( m[12]*m[9]* m[3] -m[8]*m[13]*m[3] -m[12]*m[1]*m[11] +m[0]*m[13]*m[11] +m[8]*m[1]*m[15] -m[0]*m[9]* m[15])/x;
-	i[13]=(-m[12]*m[9]* m[2] +m[8]*m[13]*m[2] +m[12]*m[1]*m[10] -m[0]*m[13]*m[10] -m[8]*m[1]*m[14] +m[0]*m[9]* m[14])/x;
-	i[2]= (-m[13]*m[6]* m[3] +m[5]*m[14]*m[3] +m[13]*m[2]*m[7]  -m[1]*m[14]*m[7] -m[5]*m[2]*m[15] +m[1]*m[6]* m[15])/x;
-	i[6]= ( m[12]*m[6]* m[3] -m[4]*m[14]*m[3] -m[12]*m[2]*m[7]  +m[0]*m[14]*m[7] +m[4]*m[2]*m[15] -m[0]*m[6]* m[15])/x;
-	i[10]=(-m[12]*m[5]* m[3] +m[4]*m[13]*m[3] +m[12]*m[1]*m[7]  -m[0]*m[13]*m[7] -m[4]*m[1]*m[15] +m[0]*m[5]* m[15])/x;
-	i[14]=( m[12]*m[5]* m[2] -m[4]*m[13]*m[2] -m[12]*m[1]*m[6]  +m[0]*m[13]*m[6] +m[4]*m[1]*m[14] -m[0]*m[5]* m[14])/x;
-	i[3]= ( m[9]* m[6]* m[3] -m[5]*m[10]*m[3] -m[9]* m[2]*m[7]  +m[1]*m[10]*m[7] +m[5]*m[2]*m[11] -m[1]*m[6]* m[11])/x;
-	i[7]= (-m[8]* m[6]* m[3] +m[4]*m[10]*m[3] +m[8]* m[2]*m[7]  -m[0]*m[10]*m[7] -m[4]*m[2]*m[11] +m[0]*m[6]* m[11])/x;
-	i[11]=( m[8]* m[5]* m[3] -m[4]*m[9]* m[3] -m[8]* m[1]*m[7]  +m[0]*m[9]* m[7] +m[4]*m[1]*m[11] -m[0]*m[5]* m[11])/x;
-	i[15]=(-m[8]* m[5]* m[2] +m[4]*m[9]* m[2] +m[8]* m[1]*m[6]  -m[0]*m[9]* m[6] -m[4]*m[1]*m[10] +m[0]*m[5]* m[10])/x;
+	mo._00= (-_31*_22*_13 +_21*_32*_13 +_31*_12*_23 -_11*_32*_23 -_21*_12*_33 +_11*_22*_33)/x;
+	mo._10= ( _30*_22*_13 -_20*_32*_13 -_30*_12*_23 +_10*_32*_23 +_20*_12*_33 -_10*_22*_33)/x;
+	mo._20= (-_30*_21* _13 +_20*_31*_13 +_30*_11*_23 -_10*_31*_23 -_20*_11*_33 +_10*_21* _33)/x;
+	mo._30=( _30*_21* _12 -_20*_31*_12 -_30*_11*_22 +_10*_31*_22 +_20*_11*_32 -_10*_21* _32)/x;
+	mo._01= ( _31*_22*_03 -_21*_32*_03 -_31*_02*_23 +_01*_32*_23 +_21*_02*_33 -_01*_22*_33)/x;
+	mo._11= (-_30*_22*_03 +_20*_32*_03 +_30*_02*_23 -_00*_32*_23 -_20*_02*_33 +_00*_22*_33)/x;
+	mo._21= ( _30*_21* _03 -_20*_31*_03 -_30*_01*_23 +_00*_31*_23 +_20*_01*_33 -_00*_21* _33)/x;
+	mo._31=(-_30*_21* _02 +_20*_31*_02 +_30*_01*_22 -_00*_31*_22 -_20*_01*_32 +_00*_21* _32)/x;
+	mo._02= (-_31*_12* _03 +_11*_32*_03 +_31*_02*_13  -_01*_32*_13 -_11*_02*_33 +_01*_12* _33)/x;
+	mo._12= ( _30*_12* _03 -_10*_32*_03 -_30*_02*_13  +_00*_32*_13 +_10*_02*_33 -_00*_12* _33)/x;
+	mo._22=(-_30*_11* _03 +_10*_31*_03 +_30*_01*_13  -_00*_31*_13 -_10*_01*_33 +_00*_11* _33)/x;
+	mo._32=( _30*_11* _02 -_10*_31*_02 -_30*_01*_12  +_00*_31*_12 +_10*_01*_32 -_00*_11* _32)/x;
+	mo._03= ( _21* _12* _03 -_11*_22*_03 -_21* _02*_13  +_01*_22*_13 +_11*_02*_23 -_01*_12* _23)/x;
+	mo._13= (-_20* _12* _03 +_10*_22*_03 +_20* _02*_13  -_00*_22*_13 -_10*_02*_23 +_00*_12* _23)/x;
+	mo._23=( _20* _11* _03 -_10*_21* _03 -_20* _01*_13  +_00*_21* _13 +_10*_01*_23 -_00*_11* _23)/x;
+	mo._33=(-_20* _11* _02 +_10*_21* _02 +_20* _01*_12  -_00*_21* _12 -_10*_01*_22 +_00*_11* _22)/x;
 	return mo;
 }
 
@@ -293,54 +262,6 @@ matrix matrix::rotation(const vector &ang) {
 	m._10= cx*sz;				m._11= cx*cz;				m._12=-sx;		m._13=0;
 	m._20= sx*cy*sz - sy*cz;	m._21= sx*cy*cz + sy*sz;	m._22= cx*cy;	m._23=0;
 	m._30= 0;					m._31= 0;					m._32=0;		m._33=1;
-	return m;
-}
-
-// ZXY -> for objects
-matrix MatrixRotation2(const vector &ang) {
-	matrix m;
-	/*matrix x,y,z;
-	MatrixRotationX(x,ang.x);
-	MatrixRotationY(y,ang.y);
-	MatrixRotationZ(z,ang.z);
-	// m=y*x*z
-	MatrixMultiply(m,y,x);
-	MatrixMultiply(m,m,z);*/
-	float sx=sinf(ang.x);
-	float cx=cosf(ang.x);
-	float sy=sinf(ang.y);
-	float cy=cosf(ang.y);
-	float sz=sinf(ang.z);
-	float cz=cosf(ang.z);
-	m._00= sx*sy*sz + cy*cz;	m._01= sx*sy*cz - cy*sz;	m._02= cx*sy;	m._03=0;
-	m._10= cx*sz;				m._11= cx*cz;				m._12=-sx;		m._13=0;
-	m._20= sx*cy*sz - sy*cz;	m._21= sx*cy*cz + sy*sz;	m._22= cx*cy;	m._23=0;
-	m._30= 0;					m._31= 0;					m._32=0;		m._33=1;
-	return m;
-}
-
-// YXZ -> for camera rotation
-//   is inverse to MatrixRotation!!
-matrix matrix::rotation_view(const vector &ang) {
-	matrix m;
-	/*matrix x,y,z;
-	MatrixRotationX(x,-ang.x);
-	MatrixRotationY(y,-ang.y);
-	MatrixRotationZ(z,-ang.z);
-	// z*x*y
-	MatrixMultiply(m,z,x);
-	MatrixMultiply(m,m,y);*/
-	float sx=sinf(ang.x);
-	float cx=cosf(ang.x);
-	float sy=sinf(ang.y);
-	float cy=cosf(ang.y);
-	float sz=sinf(ang.z);
-	float cz=cosf(ang.z);
-	// the transposed (=inverted) of MatrixView
-	m._00= sx*sy*sz + cy*cz;	m._01= cx*sz;	m._02= sx*cy*sz - sy*cz;	m._03=0;
-	m._10= sx*sy*cz - cy*sz;	m._11= cx*cz;	m._12= sx*cy*cz + sy*sz;	m._13=0;
-	m._20= cx*sy;				m._21=-sx;		m._22= cx*cy;				m._23=0;
-	m._30= 0;					m._31= 0;		m._32=0;					m._33=1;
 	return m;
 }
 

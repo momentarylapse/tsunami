@@ -63,19 +63,19 @@ void SIAddPackageNix()
 {
 	add_package("nix", false);
 	
-	TypeVectorArray		= add_type_a("vector[?]", TypeVector, 1);
-	TypeVectorArrayP	= add_type_p("vector[?]*", TypeVectorArray);
+	TypeVectorArray		= add_type_a(TypeVector, 1, "vector[?]");
+	TypeVectorArrayP	= add_type_p(TypeVectorArray);
 	TypeVertexBuffer	= add_type  ("VertexBuffer", sizeof(nix::VertexBuffer));
-	TypeVertexBufferP	= add_type_p("VertexBuffer*", TypeVertexBuffer);
+	TypeVertexBufferP	= add_type_p(TypeVertexBuffer);
 	TypeTexture			= add_type  ("Texture", sizeof(nix::Texture));
-	TypeTextureP		= add_type_p("Texture*", TypeTexture);
-	TypeTexturePList	= add_type_a("Texture*[]", TypeTextureP, -1);
+	TypeTextureP		= add_type_p(TypeTexture);
+	TypeTexturePList	= add_type_l(TypeTextureP);
 	TypeDynamicTexture	= add_type  ("DynamicTexture", sizeof(nix::Texture));
 	TypeImageTexture	= add_type  ("ImageTexture", sizeof(nix::Texture));
 	TypeDepthTexture	= add_type  ("DepthTexture", sizeof(nix::Texture));
 	TypeCubeMap			= add_type  ("CubeMap", sizeof(nix::Texture));
 	TypeShader			= add_type  ("Shader", sizeof(nix::Shader));
-	TypeShaderP			= add_type_p("Shader*", TypeShader);
+	TypeShaderP			= add_type_p(TypeShader);
 	
 	add_class(TypeVertexBuffer);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::VertexBuffer::__init__)));

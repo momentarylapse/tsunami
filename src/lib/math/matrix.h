@@ -7,6 +7,7 @@
 class matrix;
 class vector;
 class quaternion;
+class plane;
 matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
 
 
@@ -14,11 +15,11 @@ class matrix {
 public:
 	union {
 		struct {
-			// "c" row major order
-			float _00,_01,_02,_03;
-			float _10,_11,_12,_13;
-			float _20,_21,_22,_23;
-			float _30,_31,_32,_33;
+			// "OpenGL" column major order
+			float _00,_10,_20,_30;
+			float _01,_11,_21,_31;
+			float _02,_12,_22,_32;
+			float _03,_13,_23,_33;
 		};
 		float __e[4][4];
 		float e[16];
@@ -51,30 +52,22 @@ public:
 	vector _cdecl mul_v(const vector &v) const;
 
 	static const matrix ID;
-	
+
 	// creation
 	static matrix _cdecl translation(const vector &v);
 	static matrix _cdecl rotation_x(float w);
 	static matrix _cdecl rotation_y(float w);
 	static matrix _cdecl rotation_z(float w);
 	static matrix _cdecl rotation(const vector &ang);
-	static matrix _cdecl rotation_view(const vector &ang);
 	static matrix _cdecl rotation_q(const quaternion &q);
 	static matrix _cdecl scale(float fx,float fy,float fz);
 	static matrix _cdecl reflection(const plane &pl);
 	static matrix _cdecl perspective(float fovy, float aspect, float z_near, float z_far);
 };
-// matrices
-void _cdecl MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1);
-void _cdecl MatrixIdentity(matrix &m);
-
-matrix _cdecl MatrixMultiply2(const matrix &m2,const matrix &m1);
-matrix _cdecl MatrixRotation2(const vector &ang);
 
 
-
-inline vector *_matrix_get_translation_(const matrix &m)
-{	return (vector*)&m._03;	} // (_03, _13, _23) happens to be aligned the right way...
+//inline vector *_matrix_get_translation_(const matrix &m)
+//{	return (vector*)&m._03;	} // (_03, _13, _23) happens to be aligned the right way...
 
 
 #endif

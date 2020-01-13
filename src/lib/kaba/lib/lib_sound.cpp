@@ -26,9 +26,9 @@ void SIAddPackageSound()
 	add_package("sound", false);
 
 	const Class *TypeSound = add_type("Sound",		sizeof(Sound));
-	const Class *TypeSoundP = add_type_p("Sound*", TypeSound);
+	const Class *TypeSoundP = add_type_p(TypeSound);
 	const Class *TypeMusic = add_type("Music",		sizeof(Music));
-	const Class *TypeMusicP = add_type_p("Music*", TypeMusic);
+	const Class *TypeMusicP = add_type_p(TypeMusic);
 
 	add_class(TypeSound);
 		class_add_func("set",							TypeVoid,	sound_p(mf(&Sound::SetData)));

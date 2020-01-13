@@ -52,10 +52,10 @@ public:
 
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1-2, "\U0001f50a");
-		c->draw_mask_image(area.x1, area.y1, *view->images.speaker);
+		c->draw_mask_image(area.x1, area.y1, view->images.speaker);
 		if (track->muted) {
 			c->set_color(color(1, 0.7f, 0, 0));
-			c->draw_mask_image(area.x1, area.y1, *view->images.x);
+			c->draw_mask_image(area.x1, area.y1, view->images.x);
 		}
 	}
 	bool on_left_button_down() override {
@@ -73,7 +73,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->draw_mask_image(area.x1, area.y1, *view->images.solo);
+		c->draw_mask_image(area.x1, area.y1, view->images.solo);
 	}
 	bool on_left_button_down() override {
 		vtrack->set_solo(!vtrack->solo);
@@ -90,7 +90,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
-		c->draw_mask_image(area.x1, area.y1, *view->images.config);
+		c->draw_mask_image(area.x1, area.y1, view->images.config);
 	}
 	bool on_left_button_down() override {
 		view->session->set_mode("default/track");
@@ -209,7 +209,7 @@ void TrackHeader::draw(Painter *c) {
 		icon = view->images.track_midi; // "♫"
 	else if (track->type == SignalType::GROUP)
 		icon = view->images.track_group; // "G"
-	c->draw_mask_image(area.x1 + 5, area.y1 + 5, *icon);
+	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
 }
 
 class MouseDelayDndTrack : public MouseDelayAction {

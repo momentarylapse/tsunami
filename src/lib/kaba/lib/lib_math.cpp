@@ -42,6 +42,7 @@ extern const Class *TypeVectorList;
 extern const Class *TypeMatrix;
 extern const Class *TypePlane;
 extern const Class *TypePlaneList;
+extern const Class *TypeColorList;
 extern const Class *TypeMatrix3;
 extern const Class *TypeIntList;
 extern const Class *TypeBoolList;
@@ -214,28 +215,39 @@ Any kaba_pointer2any(const void *p) {
 #pragma GCC pop_options
 
 
+template<int N>
+class FloatN {
+public:
+	float a[N];
+	void __assign__(FloatN<N> &o) {
+		for (int i=0; i<N; i++)
+			a[i] = o.a[i];
+	}
+};
+
 
 void SIAddPackageMath() {
 	add_package("math", true);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));
-	TypeComplexList = add_type_a("complex[]", TypeComplex, -1);
+	TypeComplexList = add_type_l(TypeComplex);
 	TypeVector = add_type("vector", sizeof(vector));
-	TypeVectorList = add_type_a("vector[]", TypeVector, -1);
+	TypeVectorList = add_type_l(TypeVector);
 	TypeRect = add_type("rect", sizeof(rect));
 	TypeMatrix = add_type("matrix", sizeof(matrix));
 	TypeQuaternion = add_type("quaternion", sizeof(quaternion));
 	TypePlane = add_type("plane", sizeof(plane));
-	TypePlaneList = add_type_a("plane[]", TypePlane, -1);
+	TypePlaneList = add_type_l(TypePlane);
 	TypeColor = add_type("color", sizeof(color));
+	TypeColorList = add_type_l(TypeColor);
 	TypeMatrix3 = add_type("matrix3", sizeof(matrix3));
-	const Class *TypeFloatArray3 = add_type_a("float[3]", TypeFloat32, 3);
-	const Class *TypeFloatArray4 = add_type_a("float[4]", TypeFloat32, 4);
-	const Class *TypeFloatArray4x4 = add_type_a("float[4][4]", TypeFloatArray4, 4);
-	const Class *TypeFloatArray16 = add_type_a("float[16]", TypeFloat32, 16);
-	const Class *TypeFloatArray3x3 = add_type_a("float[3][3]", TypeFloatArray3, 3);
-	const Class *TypeFloatArray9 = add_type_a("float[9]", TypeFloat32, 9);
+	const Class *TypeFloatArray3 = add_type_a(TypeFloat32, 3);
+	const Class *TypeFloatArray4 = add_type_a(TypeFloat32, 4);
+	const Class *TypeFloatArray4x4 = add_type_a(TypeFloatArray4, 4);
+	const Class *TypeFloatArray16 = add_type_a(TypeFloat32, 16);
+	const Class *TypeFloatArray3x3 = add_type_a(TypeFloatArray3, 3);
+	const Class *TypeFloatArray9 = add_type_a(TypeFloat32, 9);
 	const Class *TypeVli = add_type("vli", sizeof(vli));
 	const Class *TypeCrypto = add_type("Crypto", sizeof(Crypto));
 	TypeAny = add_type("any", sizeof(Any));
@@ -254,6 +266,26 @@ void SIAddPackageMath() {
 		((Class*)TypePlane)->_amd64_allow_pass_in_xmm = true;
 		((Class*)TypeRect)->_amd64_allow_pass_in_xmm = true;
 	}
+
+
+	add_class(TypeFloatArray3);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<3>::__assign__);
+			func_add_param("o", TypeFloatArray3);
+	add_class(TypeFloatArray4);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<4>::__assign__);
+			func_add_param("o", TypeFloatArray4);
+	add_class(TypeFloatArray9);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<9>::__assign__);
+			func_add_param("o", TypeFloatArray9);
+	add_class(TypeFloatArray3x3);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<9>::__assign__);
+			func_add_param("o", TypeFloatArray3x3);
+	add_class(TypeFloatArray16);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<16>::__assign__);
+			func_add_param("o", TypeFloatArray16);
+	add_class(TypeFloatArray4x4);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<16>::__assign__);
+			func_add_param("o", TypeFloatArray4x4);
 
 
 	add_class(TypeComplex);
@@ -478,7 +510,10 @@ void SIAddPackageMath() {
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
-	
+
+	add_class(TypeColorList);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&Array<color>::__init__));
+
 	add_class(TypePlane);
 		class_add_element("a", TypeFloat32, 0);
 		class_add_element("b", TypeFloat32, 4);
@@ -543,6 +578,7 @@ void SIAddPackageMath() {
 		class_add_func("unproject", TypeVector, mf(&matrix::unproject), FLAG_PURE);
 			func_add_param("v", TypeVector);
 		class_add_func("inverse", TypeMatrix, mf(&matrix::inverse), FLAG_PURE);
+		class_add_func("transpose", TypeMatrix, mf(&matrix::transpose), FLAG_PURE);
 		class_add_func("translation", TypeMatrix, (void*)&matrix::translation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("trans", TypeVector);
 		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
@@ -555,8 +591,6 @@ void SIAddPackageMath() {
 			func_add_param("ang", TypeFloat32);
 		class_add_func("rotation_q", TypeMatrix, (void*)&matrix::rotation_q, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("rotation_view", TypeMatrix, (void*)&matrix::rotation_view, ScriptFlag(FLAG_PURE | FLAG_STATIC));
-			func_add_param("ang", TypeVector);
 		class_add_func("scale", TypeMatrix, (void*)&matrix::scale, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);

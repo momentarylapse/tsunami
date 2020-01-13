@@ -43,7 +43,7 @@ public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
-		c->draw_mask_image(area.x1, area.y1, *vlayer->view->images.speaker);
+		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker);
 	}
 	bool on_left_button_down() override {
 		vlayer->layer->set_muted(!vlayer->layer->muted);
@@ -60,7 +60,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1, "S");
-		c->draw_mask_image(area.x1, area.y1, *vlayer->view->images.solo);
+		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo);
 	}
 	bool on_left_button_down() override {
 		vlayer->set_solo(!vlayer->solo);

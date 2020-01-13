@@ -109,18 +109,13 @@ void Painter::set_clip(const rect &r)
 	cairo_clip(cr);
 }
 
-rect Painter::clip()
+rect Painter::clip() const
 {
 	if (!cr)
 		return rect::EMPTY;
 	double x1, x2, y1, y2;
 	cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
 	return rect((float)x1, (float)x2, (float)y1, (float)y2);
-}
-
-rect Painter::area()
-{
-	return rect(0, (float)width, 0, (float)height);
 }
 
 void Painter::draw_point(float x, float y)
@@ -239,19 +234,18 @@ void Painter::draw_circle(float x, float y, float radius)
 		cairo_stroke(cr);
 }
 
-void Painter::draw_image(float x, float y, const Image &image)
-{
+void Painter::draw_image(float x, float y, const Image *image) {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
-	image.set_mode(Image::ModeBGRA);
+	image->set_mode(Image::Mode::BGRA);
 	cairo_pattern_t *p = cairo_get_source(cr);
 	cairo_pattern_reference(p);
-	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,
+	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image->data.data,
                                                          CAIRO_FORMAT_ARGB32,
-                                                         image.width,
-                                                         image.height,
-	    image.width * 4);
+                                                         image->width,
+                                                         image->height,
+	    image->width * 4);
 
 	cairo_set_source_surface(cr, img, x, y);
 	cairo_paint(cr);
@@ -261,17 +255,17 @@ void Painter::draw_image(float x, float y, const Image &image)
 #endif
 }
 
-void Painter::draw_mask_image(float x, float y, const Image &image)
+void Painter::draw_mask_image(float x, float y, const Image *image)
 {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
-	image.set_mode(Image::ModeBGRA);
-	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,
+	image->set_mode(Image::Mode::BGRA);
+	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image->data.data,
                                                          CAIRO_FORMAT_ARGB32,
-                                                         image.width,
-                                                         image.height,
-	    image.width * 4);
+                                                         image->width,
+                                                         image->height,
+	    image->width * 4);
 
 	cairo_mask_surface(cr, img, x, y);
 	cairo_surface_destroy(img);
@@ -333,22 +327,22 @@ void Painter::set_fill(bool fill)
 
 
 
-Painter *start_image_paint(Image &im)
+Painter *start_image_paint(Image *im)
 {
-	im.set_mode(Image::ModeBGRA);
+	im->set_mode(Image::Mode::BGRA);
 
 	Painter *p = new Painter;
-	p->target_surface = cairo_image_surface_create_for_data((unsigned char*)im.data.data, CAIRO_FORMAT_ARGB32, im.width, im.height, im.width*4);
+	p->target_surface = cairo_image_surface_create_for_data((unsigned char*)im->data.data, CAIRO_FORMAT_ARGB32, im->width, im->height, im->width*4);
 	p->cr = cairo_create(p->target_surface);
 	p->layout = pango_cairo_create_layout(p->cr);
 
-	p->width = im.width;
-	p->height = im.height;
+	p->width = im->width;
+	p->height = im->height;
 	p->set_font("Sans", 16, false, false);
 	return p;
 }
 
-void end_image_paint(Image &im, ::Painter *p)
+void end_image_paint(Image *im, ::Painter *p)
 {
 	delete p;
 }

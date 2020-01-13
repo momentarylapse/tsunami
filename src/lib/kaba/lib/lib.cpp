@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.11.0";
+string LibVersion = "0.17.12.0";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -145,6 +145,7 @@ const Class *TypeCharPs;
 const Class *TypeBoolPs;
 const Class *TypeBoolList;
 const Class *TypeIntPs;
+const Class *TypeIntP;
 const Class *TypeIntList;
 const Class *TypeIntArray;
 const Class *TypeIntDict;
@@ -164,6 +165,7 @@ const Class *TypeVectorList;
 const Class *TypeMatrix;
 const Class *TypePlane;
 const Class *TypePlaneList;
+const Class *TypeColorList;
 const Class *TypeMatrix3;
 const Class *TypeDate;
 const Class *TypeImage;
@@ -195,49 +197,74 @@ void add_package(const string &name, bool used_by_default) {
 	cur_package = s;
 }
 
-void __add_class__(Class *t) {
-	cur_package->syntax->base_class->classes.add(t);
-	t->name_space = cur_package->syntax->base_class;
+void __add_class__(Class *t, const Class *name_space) {
+	if (name_space) {
+		const_cast<Class*>(name_space)->classes.add(t);
+		t->name_space = name_space;
+	} else {
+		cur_package->syntax->base_class->classes.add(t);
+		t->name_space = cur_package->syntax->base_class;
+	}
 }
 
-const Class *add_type(const string &name, int size, ScriptFlag flag) {
+const Class *add_type(const string &name, int size, ScriptFlag flag, const Class *name_space) {
 	Class *t = new Class(name, size, cur_package->syntax);
 	if ((flag & FLAG_CALL_BY_VALUE) > 0)
 		t->force_call_by_value = true;
-	__add_class__(t);
+	__add_class__(t, name_space);
 	return t;
 }
 
-const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag) {
+const Class *add_type_p(const Class *sub_type, ScriptFlag flag, const string &_name) {
+	string name = _name;
+	if (name == "") {
+		if ((flag & FLAG_SILENT) > 0)
+			name = sub_type->name + "&";
+		else
+			name = sub_type->name + "*";
+	}
 	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, sub_type);
 	t->type = Class::Type::POINTER;
 	if ((flag & FLAG_SILENT) > 0)
 		t->type = Class::Type::POINTER_SILENT;
-	__add_class__(t);
-	return t;
-}
-const Class *add_type_a(const string &name, const Class *sub_type, int array_length) {
-	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
-	if (array_length < 0) {
-		// super array
-		t->size = config.super_array_size;
-		t->type = Class::Type::SUPER_ARRAY;
-		script_make_super_array(t);
-	} else {
-		// standard array
-		t->size = sub_type->size * array_length;
-		t->type = Class::Type::ARRAY;
-		t->array_length = array_length;
-	}
-	__add_class__(t);
+	__add_class__(t, sub_type->name_space);
 	return t;
 }
 
-const Class *add_type_d(const string &name, const Class *sub_type) {
+// fixed array
+const Class *add_type_a(const Class *sub_type, int array_length, const string &_name) {
+	string name = _name;
+	if (name == "")
+		name = sub_type->name + "[" + i2s(array_length) + "]";
+	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
+	t->size = sub_type->size * array_length;
+	t->type = Class::Type::ARRAY;
+	t->array_length = array_length;
+	__add_class__(t, sub_type->name_space);
+	return t;
+}
+
+// super array
+const Class *add_type_l(const Class *sub_type, const string &_name) {
+	string name = _name;
+	if (name == "")
+		name = sub_type->name + "[]";
+	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
+	t->size = config.super_array_size;
+	t->type = Class::Type::SUPER_ARRAY;
+	script_make_super_array(t);
+	__add_class__(t, sub_type->name_space);
+	return t;
+}
+
+const Class *add_type_d(const Class *sub_type, const string &_name) {
+	string name = _name;
+	if (name == "")
+		name = sub_type->name + "{}";
 	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, sub_type);
 	t->type = Class::Type::DICT;
 	script_make_dict(t);
-	__add_class__(t);
+	__add_class__(t, sub_type->name_space);
 	return t;
 }
 
@@ -681,6 +708,7 @@ void SIAddPackageNet();
 void SIAddPackageImage();
 void SIAddPackageSound();
 void SIAddPackageX();
+void SIAddPackageVulkan();
 
 void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	Asm::init(instruction_set);
@@ -742,6 +770,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageNet();
 	SIAddPackageSound();
 	SIAddPackageThread();
+	SIAddPackageVulkan();
 	SIAddPackageX();
 
 	cur_package = Packages[0];

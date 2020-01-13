@@ -152,7 +152,7 @@ SerialNodeParam SerializerX86::serialize_parameter(Node *link, Block *block, int
 		SerialNodeParam param = param_local(TypePointer, link->link_no);
 		return add_reference(param, link->type);
 	}else if (link->kind == NodeKind::CONSTANT){
-		p.p = (int_p)link->as_const_p();
+		p.p = (int_p)link->as_const()->p(); // FIXME ....need a cleaner approach for compiling os...
 		if (config.compile_os)
 			p.kind = NodeKind::MEMORY;
 		else
@@ -423,13 +423,10 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 			add_cmd(Asm::INST_SETNZ, ret);
 			break;
 		case InlineID::RECT_SET:
-			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[3]);
-			/* fall through */
 		case InlineID::VECTOR_SET:
-			add_cmd(Asm::INST_MOV, param_shift(ret, 8, TypeFloat32), param[2]);
 		case InlineID::COMPLEX_SET:
-			add_cmd(Asm::INST_MOV, param_shift(ret, 4, TypeFloat32), param[1]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 0, TypeFloat32), param[0]);
+			for (int i=0; i<ret.type->size/4; i++)
+				add_cmd(Asm::INST_MOV, param_shift(ret, i*4, TypeFloat32), param[i]);
 			break;
 		case InlineID::COLOR_SET:
 			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[0]);
@@ -448,12 +445,23 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 		case InlineID::BOOL_ASSIGN:
 			add_cmd(Asm::INST_MOV, param[0], param[1]);
 			break;
+// chunk...
 		case InlineID::CHUNK_ASSIGN:
 			for (int i=0; i<com->uparams[0]->type->size/4; i++)
 				add_cmd(Asm::INST_MOV, param_shift(param[0], i * 4, TypeInt), param_shift(param[1], i * 4, TypeInt));
 			for (int i=4*(com->uparams[0]->type->size/4); i<com->uparams[0]->type->size; i++)
 				add_cmd(Asm::INST_MOV, param_shift(param[0], i, TypeChar), param_shift(param[1], i, TypeChar));
 			break;
+		case InlineID::CHUNK_EQUAL:{
+			int val = add_virtual_reg(Asm::REG_AL);
+			add_cmd(Asm::INST_CMP, param_shift(param[0], 0, TypeInt), param_shift(param[1], 0, TypeInt));
+			add_cmd(Asm::INST_SETZ, ret);
+			for (int i=1; i<com->uparams[0]->type->size/4; i++) {
+				add_cmd(Asm::INST_CMP, param_shift(param[0], i*4, TypeInt), param_shift(param[1], i*4, TypeInt));
+				add_cmd(Asm::INST_SETZ, param_vreg(TypeBool, val));
+				add_cmd(Asm::INST_AND, param_vreg(TypeBool, val));
+			}
+			}break;
 // int
 		case InlineID::INT_ADD_ASSIGN:
 		case InlineID::INT64_ADD_ASSIGN:
@@ -834,14 +842,6 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 			add_cmd(Asm::INST_MULSS, p_xmm0, param[1]);
 			add_cmd(Asm::INST_MOVSS, param_shift(ret, 4, TypeFloat32), p_xmm0);
 			break;
-		case InlineID::COMPLEX_EQUAL:{
-			int val = add_virtual_reg(Asm::REG_AL);
-			add_cmd(Asm::INST_CMP, param_shift(param[0], 0, TypeFloat32), param_shift(param[1], 0, TypeFloat32));
-			add_cmd(Asm::INST_SETZ, ret);
-			add_cmd(Asm::INST_CMP, param_shift(param[0], 4, TypeFloat32), param_shift(param[1], 4, TypeFloat32));
-			add_cmd(Asm::INST_SETZ, param_vreg(TypeBool, val));
-			add_cmd(Asm::INST_AND, param_vreg(TypeBool, val));
-			}break;
 // bool/char
 		case InlineID::CHAR_EQUAL:
 		case InlineID::CHAR_NOT_EQUAL:

@@ -22,8 +22,7 @@ const int TYPE_CAST_REFERENCE = -3;
 const int TYPE_CAST_OWN_STRING = -10;
 
 bool type_match(const Class *given, const Class *wanted);
-bool _type_match(const Class *given, bool same_chunk, const Class *wanted);
-bool type_match_with_cast(const Class *type, bool same_chunk, bool is_modifiable, const Class *wanted, int &penalty, int &cast);
+bool type_match_with_cast(const Class *type, bool is_modifiable, const Class *wanted, int &penalty, int &cast);
 //Node exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf);
 
 Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param);
@@ -621,7 +620,7 @@ Node *SyntaxTree::check_param_link(Node *link, const Class *wanted, const string
 		// normal type cast
 		int pen, tc;
 
-		if (type_match_with_cast(given, false, false, wanted, pen, tc))
+		if (type_match_with_cast(given, false, wanted, pen, tc))
 			return apply_type_cast(this, tc, link);
 
 		Exp.rewind();
@@ -647,7 +646,7 @@ bool param_match_with_cast(SyntaxTree *ps, Node *operand, Array<Node*> &params, 
 	casts.resize(params.num);
 	for (int p=0; p<params.num; p++) {
 		int penalty;
-		if (!type_match_with_cast(params[p]->type, false, false, wanted_types[p], penalty, casts[p]))
+		if (!type_match_with_cast(params[p]->type, false, wanted_types[p], penalty, casts[p]))
 			return false;
 	}
 	return true;
@@ -726,7 +725,7 @@ Node *SyntaxTree::link_unary_operator(PrimitiveOperator *po, Node *operand, Bloc
 		int pen_min = 100;
 		for (auto *_op: operators)
 			if (po == _op->primitive)
-				if ((!_op->param_type_1) and (type_match_with_cast(p2, false, false, _op->param_type_2, pen2, c2))) {
+				if ((!_op->param_type_1) and (type_match_with_cast(p2, false, _op->param_type_2, pen2, c2))) {
 					ok = true;
 					if (pen2 < pen_min) {
 						op = _op;
@@ -988,15 +987,15 @@ Node *SyntaxTree::parse_primitive_operator(Block *block) {
 }*/
 
 
-bool type_match_with_cast(const Class *given, bool same_chunk, bool is_modifiable, const Class *wanted, int &penalty, int &cast) {
+bool type_match_with_cast(const Class *given, bool is_modifiable, const Class *wanted, int &penalty, int &cast) {
 	penalty = 0;
 	cast = TYPE_CAST_NONE;
-	if (_type_match(given, same_chunk, wanted))
-	    return true;
+	if (type_match(given, wanted))
+		return true;
 	if (is_modifiable) // is a variable getting assigned.... better not cast
 		return false;
 	if (given->is_pointer()) {
-		if (_type_match(given->param, false, wanted)) {
+		if (type_match(given->param, wanted)) {
 			penalty = 10;
 			cast = TYPE_CAST_DEREFERENCE;
 			return true;
@@ -1101,11 +1100,6 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 
 	auto *p1 = param1->type;
 	auto *p2 = param2->type;
-	bool equal_classes = false;
-	if (p1 == p2)
-		if (!p1->is_super_array())
-			if (p1->elements.num > 0)
-				equal_classes = true;
 
 	const Class *pp1 = p1;
 	if (pp1->is_pointer())
@@ -1126,7 +1120,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 					op->set_uparam(1, ref_node(param2));
 					return op;
 				}
-			} else if (_type_match(p2, equal_classes, type1)) {
+			} else if (type_match(p2, type1)) {
 				Node *inst = param1;
 				if (p1 == pp1)
 					op = add_node_member_call(f, inst);
@@ -1140,7 +1134,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 	// exact (operator) match?
 	for (auto *op: operators)
 		if (primop == op->primitive)
-			if (_type_match(p1, equal_classes, op->param_type_1) and _type_match(p2, equal_classes, op->param_type_2)) {
+			if (type_match(p1, op->param_type_1) and type_match(p2, op->param_type_2)) {
 				return add_node_operator(param1, param2, op);
 			}
 
@@ -1154,7 +1148,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 	Function *op_cf_found = nullptr;
 	for (auto *op: operators)
 		if (primop == op->primitive)
-			if (type_match_with_cast(p1, equal_classes, left_modifiable, op->param_type_1, pen1, c1) and type_match_with_cast(p2, equal_classes, false, op->param_type_2, pen2, c2))
+			if (type_match_with_cast(p1, left_modifiable, op->param_type_1, pen1, c1) and type_match_with_cast(p2, false, op->param_type_2, pen2, c2))
 				if (pen1 + pen2 < pen_min) {
 					op_found = op;
 					pen_min = pen1 + pen2;
@@ -1163,7 +1157,7 @@ Node *SyntaxTree::link_operator(PrimitiveOperator *primop, Node *param1, Node *p
 				}
 	for (auto *cf: p1->functions)
 		if (cf->name == op_func_name)
-			if (type_match_with_cast(p2, equal_classes, false, cf->literal_param_type[0], pen2, c2))
+			if (type_match_with_cast(p2, false, cf->literal_param_type[0], pen2, c2))
 				if (pen2 < pen_min) {
 					op_cf_found = cf;
 					pen_min = pen2;

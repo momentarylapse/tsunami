@@ -60,14 +60,6 @@ bool type_match(const Class *given, const Class *wanted) {
 }
 
 
-// allow same classes... TODO deprecate...
-bool _type_match(const Class *given, bool same_chunk, const Class *wanted) {
-	if ((same_chunk) and (wanted == TypeChunk))
-		return true;
-
-	return type_match(given, wanted);
-}
-
 Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent, const Class *_param) {
 	name = _name;
 	owner = _owner;
@@ -138,12 +130,13 @@ bool Class::uses_return_by_memory() const {
 }
 
 
-
+// is just a bag of plain-old-data?
+//   -> can be assigned as a chunk
 bool Class::is_simple_class() const {
 	if (!uses_call_by_reference())
 		return true;
-	/*if (is_array)
-		return false;*/
+	if (is_array())
+		return param->is_simple_class();
 	if (is_super_array())
 		return false;
 	if (is_dict())
@@ -157,8 +150,8 @@ bool Class::is_simple_class() const {
 		return false;
 	if (get_destructor())
 		return false;
-	if (get_assign())
-		return false;
+	//if (get_assign())
+	//	return false;
 	for (ClassElement &e: elements)
 		if (!e.type->is_simple_class())
 			return false;

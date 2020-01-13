@@ -444,33 +444,35 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		add_func_header(this, t, "add", TypeVoid, {TypeString, t->param}, {"key", "x"});
 		add_func_header(this, t, "__get__", t->param, {TypeString}, {"key"});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
-	} else if (!t->is_simple_class()) {
-		if (t->parent) {
-			bool has_own_constructors = false;
-			for (auto *cc: t->get_constructors())
-				if (!cc->needs_overriding)
-					has_own_constructors = true;
+	} else { // regular classes
+		if (!t->is_simple_class()) {
+			if (t->parent) {
+				bool has_own_constructors = false;
+				for (auto *cc: t->get_constructors())
+					if (!cc->needs_overriding)
+						has_own_constructors = true;
 
-			if (has_own_constructors) {
-				// don't inherit constructors!
-				for (int i=t->functions.num-1; i>=0; i--)
-					if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
-						t->functions.erase(i);
-			} else {
-				// only auto-implement matching constructors
-				for (auto *pcc: t->parent->get_constructors()) {
-					auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc);
-					if (needs_new(c))
-						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c);
+				if (has_own_constructors) {
+					// don't inherit constructors!
+					for (int i=t->functions.num-1; i>=0; i--)
+						if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
+							t->functions.erase(i);
+				} else {
+					// only auto-implement matching constructors
+					for (auto *pcc: t->parent->get_constructors()) {
+						auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc);
+						if (needs_new(c))
+							add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c);
+					}
 				}
+			} else {
+				if (t->needs_constructor() and needs_new(t->get_default_constructor()))
+					if (t->get_constructors().num == 0)
+						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
 			}
-		} else {
-			if (t->needs_constructor() and needs_new(t->get_default_constructor()))
-				if (t->get_constructors().num == 0)
-					add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
+			if (needs_new(t->get_destructor()))
+				add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		}
-		if (needs_new(t->get_destructor()))
-			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		if (needs_new(t->get_assign())) {
 			//add_func_header(this, t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
 			// implement only if parent has also done so
@@ -480,6 +482,9 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 			} else {
 				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}
+		}
+		if (t->get_assign() and t->is_simple_class()) {
+			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
 		}
 	}
 }
@@ -519,8 +524,6 @@ void SyntaxTree::auto_implement_functions(const Class *t) {
 
 	auto sub_classes = t->classes; // might change
 
-	// TODO: really check here?
-	// ...or just implement any function that's declared but not implemented?
 	if (t->is_super_array()) {
 		auto_implement_constructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 		auto_implement_destructor(prepare_auto_impl(t, t->get_destructor()), t);
@@ -535,11 +538,11 @@ void SyntaxTree::auto_implement_functions(const Class *t) {
 		auto_implement_assign(prepare_auto_impl(t, t->get_assign()), t);
 	} else if (t->is_dict()) {
 		auto_implement_constructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
-	} else if (!t->is_simple_class()) {
+	} else {
 		for (auto *cf: t->get_constructors())
 			auto_implement_constructor(prepare_auto_impl(t, cf), t, true);
-		auto_implement_destructor(prepare_auto_impl(t, t->get_destructor()), t);
-		auto_implement_assign(prepare_auto_impl(t, t->get_assign()), t);
+		auto_implement_destructor(prepare_auto_impl(t, t->get_destructor()), t); // if exists...
+		auto_implement_assign(prepare_auto_impl(t, t->get_assign()), t); // if exists...
 	}
 
 	// recursion

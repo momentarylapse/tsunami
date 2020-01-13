@@ -347,7 +347,6 @@ void SIAddPackageBase() {
 	TypeReg32			= add_type  ("-reg32-", 4, FLAG_CALL_BY_VALUE);
 	TypeReg16			= add_type  ("-reg16-", 2, FLAG_CALL_BY_VALUE);
 	TypeReg8			= add_type  ("-reg8-", 1, FLAG_CALL_BY_VALUE);
-	TypeChunk			= add_type  ("-chunk-", 0); // substitute for all plane-old-data types
 	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
 	TypeObjectP			= add_type_p(TypeObject);
 
@@ -433,12 +432,6 @@ void SIAddPackageBase() {
 	add_funcx("p2b", TypeBool, &_Pointer2Bool, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(InlineID::POINTER_TO_BOOL);
 		func_add_param("p", TypePointer);
-
-
-
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeChunk, TypeChunk, InlineID::CHUNK_ASSIGN);
-	add_operator(OperatorID::EQUAL, TypeBool, TypeChunk, TypeChunk, InlineID::CHUNK_EQUAL);
-	add_operator(OperatorID::NOTEQUAL, TypeBool, TypeChunk, TypeChunk, InlineID::CHUNK_NOT_EQUAL);
 	
 
 

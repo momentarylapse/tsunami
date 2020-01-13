@@ -268,24 +268,12 @@ void SIAddPackageMath() {
 	}
 
 
-	add_class(TypeFloatArray3);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<3>::__assign__);
-			func_add_param("o", TypeFloatArray3);
-	add_class(TypeFloatArray4);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<4>::__assign__);
-			func_add_param("o", TypeFloatArray4);
-	add_class(TypeFloatArray9);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<9>::__assign__);
-			func_add_param("o", TypeFloatArray9);
-	add_class(TypeFloatArray3x3);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<9>::__assign__);
-			func_add_param("o", TypeFloatArray3x3);
-	add_class(TypeFloatArray16);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<16>::__assign__);
-			func_add_param("o", TypeFloatArray16);
-	add_class(TypeFloatArray4x4);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &FloatN<16>::__assign__);
-			func_add_param("o", TypeFloatArray4x4);
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray3, TypeFloatArray3, InlineID::CHUNK_ASSIGN, mf(&FloatN<3>::__assign__));
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray4, TypeFloatArray4, InlineID::CHUNK_ASSIGN, mf(&FloatN<4>::__assign__));
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray9, TypeFloatArray9, InlineID::CHUNK_ASSIGN, mf(&FloatN<9>::__assign__));
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray3x3, TypeFloatArray3x3, InlineID::CHUNK_ASSIGN, mf(&FloatN<9>::__assign__));
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray16, TypeFloatArray16, InlineID::CHUNK_ASSIGN, mf(&FloatN<16>::__assign__));
+	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray4x4, TypeFloatArray4x4, InlineID::CHUNK_ASSIGN, mf(&FloatN<16>::__assign__));
 
 
 	add_class(TypeComplex);
@@ -303,7 +291,7 @@ void SIAddPackageMath() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)__complex_set);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);	
-	//	add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_ASSIGN);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplex, TypeComplex, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::ADD, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_ADD, (void*)op_complex_add);
 		add_operator(OperatorID::SUBTRACT, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_SUBTRACT, (void*)op_complex_sub);
 		add_operator(OperatorID::MULTIPLY, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY, (void*)op_complex_mul);
@@ -314,7 +302,7 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_SUBTARCT_ASSIGN);
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY_ASSIGN);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_DIVIDE_ASSIGN);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeComplex, TypeComplex, InlineID::COMPLEX_EQUAL);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeComplex, TypeComplex, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::COMPLEX_NEGATE);
 
 	add_class(TypeComplexList);
@@ -399,6 +387,8 @@ void SIAddPackageMath() {
 		class_add_const("EX", TypeVector, (void*)&vector::EX);
 		class_add_const("EY", TypeVector, (void*)&vector::EY);
 		class_add_const("EZ", TypeVector, (void*)&vector::EZ);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVector, TypeVector, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeVector, TypeVector, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::ADD, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_ADD);
 		add_operator(OperatorID::SUBTRACT, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_SUBTRACT);
 		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVector, TypeVector, InlineID::VECTOR_MULTIPLY_VV);
@@ -446,6 +436,8 @@ void SIAddPackageMath() {
 			func_add_param("dang", TypeVector);
 			func_add_param("reset_z", TypeBool);
 		class_add_const("ID", TypeQuaternion, (void*)&quaternion::ID);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeQuaternion, TypeQuaternion, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeRect);
 		class_add_element("x1", TypeFloat32, 0);
@@ -471,6 +463,8 @@ void SIAddPackageMath() {
 			func_add_param("x2", TypeFloat32);
 			func_add_param("y1", TypeFloat32);
 			func_add_param("y2", TypeFloat32);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeRect, TypeRect, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeRect, TypeRect, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeColor);
 		class_add_element("a", TypeFloat32, 12);
@@ -510,6 +504,8 @@ void SIAddPackageMath() {
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_EQUAL);
 
 	add_class(TypeColorList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&Array<color>::__init__));
@@ -537,6 +533,8 @@ void SIAddPackageMath() {
 		class_add_func("from_point_normal", TypePlane, (void*)&plane::from_point_normal, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("p", TypeVector);
 			func_add_param("n", TypeVector);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypePlane, TypePlane, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypePlane, TypePlane, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypePlaneList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&Array<plane>::__init__));
@@ -601,6 +599,8 @@ void SIAddPackageMath() {
 			func_add_param("z_near", TypeFloat32);
 			func_add_param("z_far", TypeFloat32);
 		class_add_const("ID", TypeMatrix, (void*)&matrix::ID);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix, TypeMatrix, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix, TypeMatrix, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11", TypeFloat32, 0);
@@ -621,6 +621,8 @@ void SIAddPackageMath() {
 		class_add_func("str", TypeString, mf(&matrix3::str), FLAG_PURE);
 		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), FLAG_PURE);
 		class_add_const("ID", TypeMatrix3, (void*)&matrix3::ID);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);

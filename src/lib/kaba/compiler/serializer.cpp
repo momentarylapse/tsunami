@@ -535,9 +535,11 @@ SerialNodeParam Serializer::add_reference(const SerialNodeParam &param, const Cl
 	ret.shift = 0;
 	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS){
 		ret.kind = NodeKind::IMMEDIATE;
-		ret.p = param.p;
+		ret.p = (long)((char*)param.p + param.shift);
 	}else if ((param.kind == NodeKind::IMMEDIATE) or (param.kind == NodeKind::MEMORY)){
 		ret.kind = NodeKind::IMMEDIATE;
+		if (param.shift > 0)
+			msg_error("Serializer: immediade/mem + shift?!?!?");
 		ret.p = param.p;
 	}else if (param.kind == NodeKind::DEREF_VAR_TEMP){
 		ret = param;

@@ -1569,6 +1569,7 @@ void InstructionWithParamsList::compile(void *oc, int &ocs)
 	}
 
 	for (int i=0;i<num+1;i++){
+		state.line_no = i;
 		// bit change
 		for (BitChange &b: CurrentMetaInfo->bit_change)
 			if (b.cmd_pos == i){

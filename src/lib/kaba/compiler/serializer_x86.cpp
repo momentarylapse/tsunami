@@ -152,7 +152,7 @@ SerialNodeParam SerializerX86::serialize_parameter(Node *link, Block *block, int
 		SerialNodeParam param = param_local(TypePointer, link->link_no);
 		return add_reference(param, link->type);
 	}else if (link->kind == NodeKind::CONSTANT){
-		p.p = (int_p)link->as_const()->p(); // FIXME ....need a cleaner approach for compiling os...
+		p.p = (int_p)link->as_const()->address; // FIXME ....need a cleaner approach for compiling os...
 		if (config.compile_os)
 			p.kind = NodeKind::MEMORY;
 		else

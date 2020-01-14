@@ -38,10 +38,10 @@ Exception::Exception(const string &_message, const string &_expression, int _lin
 	text +=  ", " + s->filename;
 }
 
-Exception::Exception(const Asm::Exception &e, Script *s) :
+Exception::Exception(const Asm::Exception &e, Script *s, Function *f) :
 	Asm::Exception(e)
 {
-	text = "assembler: " + message() + ", " + s->filename;
+	text = "assembler: " + message() + ", " + f->long_name() + ": " + s->filename;
 }
 
 

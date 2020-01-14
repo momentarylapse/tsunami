@@ -26,7 +26,7 @@ class Exception : public Asm::Exception
 {
 public:
 	Exception(const string &message, const string &expression, int line, int column, Script *s);
-	Exception(const Asm::Exception &e, Script *s);
+	Exception(const Asm::Exception &e, Script *s, Function *f);
 };
 /*struct SyntaxException : Exception{};
 struct LinkerException : Exception{};

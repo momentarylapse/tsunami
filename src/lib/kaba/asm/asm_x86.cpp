@@ -1562,7 +1562,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 					if ((value >= 0x80000000) or (-value >= 0x80000000)) {
 						msg_write("-----");
 						inst.print();
-						raise_error(format("RIP relative more than 32 bit   %p  %lx", &oc[ocs], p.value));
+						raise_error(format("RIP relative more than 32 bit: %lx from %p", p.value, &oc[ocs]));
 					}
 				}else{
 					size = SIZE_64; // Ov/Mv...

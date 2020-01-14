@@ -288,8 +288,10 @@ PrimitiveOperator *Node::as_prim_op() const {
 }
 
 void Node::set_instance(Node *p) {
+#ifndef NDEBUG
 	if (uparams.num == 0)
 		msg_write("no inst...dfljgkldfjg");
+#endif
 	set_command(uparams[0], p);
 }
 
@@ -298,10 +300,12 @@ void Node::set_num_uparams(int n) {
 }
 
 void Node::set_uparam(int index, Node *p) {
+#ifndef NDEBUG
 	/*if ((index < 0) or (index >= uparams.num)){
 		show();
 		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);
 	}*/
+#endif
 	set_command(uparams[index], p);
 }
 

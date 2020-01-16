@@ -44,7 +44,7 @@ class EventHandler;
 
 // images
 //int LoadImage(const string &filename);
-string SetImage(const Image &image);
+string SetImage(const Image *image, const string &name = "");
 void DeleteImage(const string &name);
 
 // HUI configuration

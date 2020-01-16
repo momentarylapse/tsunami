@@ -178,8 +178,6 @@ void ImagePainter::draw_circle(float cx, float cy, float radius) {
 	}
 }
 
-#define HAS_LIB_GTK3 1
-
 void ImagePainter::draw_str(float x, float y, const string& str) {
 #if HAS_LIB_GTK3
 

@@ -142,11 +142,12 @@ gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 	if (event->window != gtk_tree_view_get_bin_window(GTK_TREE_VIEW(c->widget)))
 		return false;
 	c->panel->win->input.column = -1;
+	c->panel->win->input.row = -1;
 	GtkTreePath *path = nullptr;
 	int cell_x = 0, cell_y = 0;
 	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(c->widget), event->x, event->y, &path, nullptr, &cell_x, &cell_y)) {
 		gint *indices = gtk_tree_path_get_indices(path);
-		c->panel->win->input.column = indices[0];
+		c->panel->win->input.row = indices[0];
 		gtk_tree_path_free(path);
 	}
 

@@ -84,11 +84,10 @@ void OnGtkGLAreaRealize(GtkGLArea *area)
 {	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:resize", false);	}*/
 
 template<class T>
-void win_set_input(Window *win, T *event)
-{
-	if (event->type == GDK_ENTER_NOTIFY){
+void win_set_input(Window *win, T *event) {
+	if (event->type == GDK_ENTER_NOTIFY) {
 		win->input.inside = true;
-	}else if (event->type == GDK_LEAVE_NOTIFY){
+	} else if (event->type == GDK_LEAVE_NOTIFY) {
 		win->input.inside = false;
 	}
 	win->input.dx = (float)event->x - win->input.x;
@@ -98,16 +97,29 @@ void win_set_input(Window *win, T *event)
 	win->input.scroll_y = 0;
 	win->input.x = (float)event->x;
 	win->input.y = (float)event->y;
+	win->input.pressure = 1;
 	int mod = event->state;
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
 	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
 	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
-	if (win->input.lb || win->input.mb || win->input.rb){
+	if (win->input.lb || win->input.mb || win->input.rb) {
 		win->input.inside_smart = true;
-	}else{
+	} else {
 		win->input.inside_smart = win->input.inside;
 	}
 	win->input.just_focused = false;
+}
+
+template<class T>
+void win_set_input_more(Window *win, T *event) {
+	auto dev = gdk_event_get_source_device((GdkEvent*)event);
+	int n = gdk_device_get_n_axes(dev);
+
+	for (int i=0; i<n; i++) {
+		auto u = gdk_device_get_axis_use(dev, i);
+		if (u == GDK_AXIS_PRESSURE)
+			win->input.pressure = event->axes[i];
+	}
 }
 
 gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
@@ -125,6 +137,7 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
+	win_set_input_more(c->panel->win, event);
 
 	// gtk hinting system doesn't work?
 	// always use the real (current) cursor
@@ -163,6 +176,7 @@ gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
+	win_set_input_more(c->panel->win, event);
 
 	// build message
 	string msg = "hui:";

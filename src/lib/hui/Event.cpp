@@ -54,6 +54,7 @@ Event::Event(const string &_id, const string &_message)
 	dy = 0;
 	scroll_x = 0;
 	scroll_y = 0;
+	pressure = 0;
 	id = _id;
 	message = _message;
 	is_default = true;

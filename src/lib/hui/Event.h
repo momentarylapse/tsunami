@@ -34,6 +34,7 @@ class Event
 	float mx, my;
 	float dx, dy;
 	float scroll_x, scroll_y;
+	float pressure;
 	int key, key_code;
 	string text;
 	int width, height;

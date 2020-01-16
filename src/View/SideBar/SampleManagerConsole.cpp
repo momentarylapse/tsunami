@@ -66,7 +66,8 @@ string render_sample(Sample *s, AudioView *view) {
 		render_bufbox(im, *s->buf, view);
 	else if (s->type == SignalType::MIDI)
 		render_midi(im, s->midi);
-	return hui::SetImage(im);
+	string id = "image:sample-" + i2s(s->uid);
+	return hui::SetImage(&im, id);
 }
 
 class SampleManagerItem : public VirtualBase {
@@ -186,7 +187,7 @@ void SampleManagerConsole::on_list_edit() {
 }
 
 void SampleManagerConsole::on_list_right_click() {
-	int n = hui::GetEvent()->column;
+	int n = hui::GetEvent()->row;
 	menu_samples->enable("sample-preview", n >= 0);
 	menu_samples->enable("sample-export", n >= 0);
 	menu_samples->enable("sample-paste", n >= 0);

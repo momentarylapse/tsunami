@@ -212,7 +212,7 @@ public:
 		track->move_effect(s, t);
 	}
 	void on_fx_right_click() {
-		int n = hui::GetEvent()->column;
+		int n = hui::GetEvent()->row;
 		console->menu_fx->enable("fx-delete", n >= 0);
 		console->menu_fx->enable("fx-enabled", n >= 0);
 		if (n >= 0)

@@ -184,18 +184,32 @@ void _MakeUsable_()
 
 static int _current_image_no_ = 0;
 
-string SetImage(const Image &image)
-{
-	HuiImage img;
-	img.type = 1;
-	img.image = image;
-	img.filename = format("image:%d", _current_image_no_ ++);
-	_all_images_.add(img);
-	return img.filename;
+string SetImage(const Image *image, const string &user_name) {
+	HuiImage *img = nullptr;
+	if (user_name != "") {
+		if (user_name.head(6) != "image:") {
+			msg_error("hui.SetImage: name must begin with 'image:'");
+			return "";
+		}
+		for (int i=0;i<_all_images_.num;i++)
+			if (_all_images_[i].filename == user_name) {
+				img = &_all_images_[i];
+			}
+	}
+	if (!img) {
+		HuiImage _img;
+		_img.type = 1;
+		_img.filename = format("image:%d", _current_image_no_ ++);
+		if (user_name != "")
+			_img.filename = user_name;
+		_all_images_.add(_img);
+		img = &_all_images_.back();
+	}
+	img->image = *image;
+	return img->filename;
 }
 
-void DeleteImage(const string &name)
-{
+void DeleteImage(const string &name) {
 	for (int i=0;i<_all_images_.num;i++)
 		if (_all_images_[i].filename == name)
 			_all_images_.erase(i);

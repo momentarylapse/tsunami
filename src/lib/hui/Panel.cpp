@@ -137,6 +137,7 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 	e->dy = win->input.dy;
 	e->scroll_x = win->input.scroll_x;
 	e->scroll_y = win->input.scroll_y;
+	e->pressure = win->input.pressure;
 	e->lbut = win->input.lb;
 	e->mbut = win->input.mb;
 	e->rbut = win->input.rb;

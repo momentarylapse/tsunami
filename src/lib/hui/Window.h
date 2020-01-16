@@ -37,6 +37,7 @@ struct CompleteWindowMessage {
 struct InputData {
 	// mouse
 	float x, y, dx, dy, scroll_x, scroll_y;	// position, change
+	float pressure;
 	bool inside, inside_smart;
 	bool lb, mb, rb; // buttons
 	int row, column, row_target;

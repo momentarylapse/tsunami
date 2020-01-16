@@ -34,7 +34,7 @@
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
-const int EDIT_PITCH_SHOW_COUNT = 30;
+const float EDIT_PITCH_SHOW_COUNT = 30.0f;
 
 
 MidiPainter* midi_context(AudioViewLayer *l);
@@ -251,7 +251,7 @@ void ViewModeMidi::on_start() {
 	auto *sb = cur_vlayer()->scroll_bar;
 	sb->hidden = false;
 	sb->set_callback([=] {
-		int _pitch_max = 127 - sb->offset;
+		float _pitch_max = 128 - sb->offset;
 			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 	});
 	sb->update(EDIT_PITCH_SHOW_COUNT, 128);
@@ -571,7 +571,7 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l)) {
 		auto mode = l->midi_mode();
 		if (mode == MidiMode::LINEAR)
-			return 5000;
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 8;
 		else if (mode == MidiMode::CLASSICAL)
 			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 		else // TAB

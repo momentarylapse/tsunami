@@ -404,9 +404,9 @@ void AudioViewLayer::draw_fades(Painter *c) {
 }
 
 
-void AudioViewLayer::set_edit_pitch_min_max(int _min, int _max) {
-	int diff = _max - _min;
-	edit_pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
+void AudioViewLayer::set_edit_pitch_min_max(float _min, float _max) {
+	float diff = _max - _min;
+	edit_pitch_min = clampf(_min, 0, MAX_PITCH - diff);
 	edit_pitch_max = edit_pitch_min + diff;
 	view->force_redraw();
 }

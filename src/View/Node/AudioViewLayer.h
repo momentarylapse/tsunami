@@ -87,8 +87,8 @@ public:
 
 	static color marker_color(const TrackMarker *m);
 
-	void set_edit_pitch_min_max(int pitch_min, int pitch_max);
-	int edit_pitch_min, edit_pitch_max;
+	void set_edit_pitch_min_max(float pitch_min, float pitch_max);
+	float edit_pitch_min, edit_pitch_max;
 
 	virtual bool is_playable();
 

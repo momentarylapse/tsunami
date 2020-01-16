@@ -96,13 +96,13 @@ public:
 
 	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
 	void set_shift(int shift);
-	void set_linear_range(int pitch_min, int pitch_max);
+	void set_linear_range(float pitch_min, float pitch_max);
 	void set_quality(float quality, bool antialiasing);
 	rect area;
 	const Instrument *instrument;
 	const Clef *clef;
 	bool is_playable;
-	int pitch_min, pitch_max;
+	float pitch_min, pitch_max;
 	int shift;
 	bool as_reference;
 	Array<MidiKeyChange> key_changes;

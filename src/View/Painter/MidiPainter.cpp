@@ -143,6 +143,8 @@ int MidiPainter::screen_to_string(float y) {
 	return (int)floor((string_y0 - y) / string_dy + 0.5f);
 }
 
+// this is the "center" of the note!
+// it reaches below and above this y
 float MidiPainter::pitch2y_linear(float pitch) {
 	return area.y2 - area.height() * (pitch - (float)pitch_min) / (pitch_max - pitch_min);
 }
@@ -154,7 +156,7 @@ float MidiPainter::pitch2y_classical(int pitch) {
 }
 
 int MidiPainter::y2pitch_linear(float y) {
-	return pitch_min + ((area.y2 - y) * (pitch_max - pitch_min) / area.height());
+	return pitch_min + ((area.y2 - y) * (pitch_max - pitch_min) / area.height()) + 0.5f;
 }
 
 int MidiPainter::y2pitch_classical(float y, NoteModifier modifier) {
@@ -490,8 +492,8 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 	// pitch grid
 	c->set_color(color(0.25f, 0, 0, 0));
 	for (int i=pitch_min; i<pitch_max; i++) {
-		float y0 = pitch2y_linear(i + 1);
-		float y1 = pitch2y_linear(i);
+		float y0 = pitch2y_linear(i + 0.5f);
+		float y1 = pitch2y_linear(i - 0.5f);
 		if (!midi_scale.contains(i)) {
 			c->set_color(color(0.2f, 0, 0, 0));
 			c->draw_rect(area.x1, y0, area.width(), y1 - y0);
@@ -522,7 +524,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->draw_str(20, pitch2y_linear(i+1)+dy, name);
+		c->draw_str(20, pitch2y_linear(i+0.5f)+dy, name);
 	}
 }
 
@@ -806,6 +808,8 @@ void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
 }
 
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
+	auto xxx = c->clip();
+	c->set_clip(area);
 	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
@@ -815,6 +819,7 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	} else {
 		_draw_notes(c, notes);
 	}
+	c->set_clip(xxx);
 }
 
 void MidiPainter::draw_background(Painter *c) {
@@ -850,7 +855,7 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	if (mode == MidiMode::CLASSICAL)
 		rr = min(clef_dy/2, 10.0f);
 	if (mode == MidiMode::LINEAR)
-		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 2.3f, 2.0f);
+		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 1.3f, 2.0f);
 	if (mode == MidiMode::TAB)
 		rr = min(string_dy/2, 13.0f);
 }
@@ -859,9 +864,9 @@ void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {
 	key_changes = changes;
 }
 
-void MidiPainter::set_linear_range(int _pitch_min, int _pitch_max) {
-	pitch_min = _pitch_min;
-	pitch_max = _pitch_max;
+void MidiPainter::set_linear_range(float _pitch_min, float _pitch_max) {
+	pitch_min = _pitch_min - 0.5f;
+	pitch_max = _pitch_max - 0.5f;
 }
 
 void MidiPainter::set_shift(int _shift) {

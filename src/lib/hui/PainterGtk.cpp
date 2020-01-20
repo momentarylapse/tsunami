@@ -105,7 +105,7 @@ void Painter::set_roundness(float radius)
 void Painter::set_clip(const rect &r)
 {
 	cairo_reset_clip(cr);
-	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
+	cairo_rectangle(cr, max(r.x1, 0.0f), max(r.y1, 0.0f), min(r.width(), (float)width), min(r.height(), (float)height));
 	cairo_clip(cr);
 }
 

@@ -572,136 +572,136 @@ void AudioView::on_left_double_click() {
 }
 
 
-AudioViewLayer *next_layer(AudioView *view, AudioViewLayer *vlayer) {
+AudioViewLayer *AudioView::next_layer(AudioViewLayer *ll) {
 	bool found = false;
-	for (auto *l: view->vlayer) {
+	for (auto *l: vlayer) {
 		if (found and !l->hidden)
 			return l;
-		if (l == vlayer)
+		if (l == ll)
 			found = true;
 	}
-	return vlayer;
+	return ll;
 }
-AudioViewLayer *prev_layer(AudioView *view, AudioViewLayer *vlayer) {
+AudioViewLayer *AudioView::prev_layer(AudioViewLayer *ll) {
 	AudioViewLayer *prev = nullptr;
-	for (auto *l: view->vlayer) {
-		if (l == vlayer and prev)
+	for (auto *l: vlayer) {
+		if (l == ll and prev)
 			return prev;
 		if (!l->hidden)
 			prev = l;
 	}
-	return vlayer;
+	return ll;
 }
 
-void move_to_layer(AudioView *view, int delta) {
-	auto *vlayer = view->cur_vlayer();
+void AudioView::move_to_layer(int delta) {
+	auto *vlayer = cur_vlayer();
 	if (delta > 0)
-		vlayer = next_layer(view, vlayer);
+		vlayer = next_layer(vlayer);
 	else
-		vlayer = prev_layer(view, vlayer);
+		vlayer = prev_layer(vlayer);
 
-	view->set_current(vlayer->get_hover_data(0,0));
-	view->exclusively_select_layer(vlayer);
-	view->select_under_cursor();
+	set_current(vlayer->get_hover_data(0,0));
+	exclusively_select_layer(vlayer);
+	select_under_cursor();
 }
 
 
-void zoom_y(AudioView *view, float zoom) {
-	view->cam.scale_y = clampf(zoom, 0.5f, 2.0f);
-	view->thm.dirty = true;
-	view->set_message(format(_("vertical zoom %.0f%%"), view->cam.scale_y * 100.0f));
-	view->force_redraw();
+void AudioView::zoom_y(float zoom) {
+	cam.scale_y = clampf(zoom, 0.5f, 2.0f);
+	thm.dirty = true;
+	set_message(format(_("vertical zoom %.0f%%"), cam.scale_y * 100.0f));
+	force_redraw();
 }
 
-void toggle_track_mute(AudioView *v) {
+void AudioView::toggle_track_mute() {
 	bool any_unmuted = false;
-	for (auto *t: v->song->tracks)
-		if (v->sel.has(t) and !t->muted)
+	for (auto *t: song->tracks)
+		if (sel.has(t) and !t->muted)
 			any_unmuted = true;
 
-	v->song->begin_action_group();
-	for (auto *t: v->song->tracks)
-		if (v->sel.has(t))
+	song->begin_action_group();
+	for (auto *t: song->tracks)
+		if (sel.has(t))
 			t->set_muted(any_unmuted);
-	v->song->end_action_group();
+	song->end_action_group();
 }
 
-void toggle_track_solo(AudioView *v) {
-	if (v->cur_vtrack()->solo) {
-		for (auto *vt: v->vtrack)
+void AudioView::toggle_track_solo() {
+	if (cur_vtrack()->solo) {
+		for (auto *vt: vtrack)
 			vt->set_solo(false);
 	} else {
-		for (auto *vt: v->vtrack)
-			vt->set_solo(v->sel.has(vt->track));
+		for (auto *vt: vtrack)
+			vt->set_solo(sel.has(vt->track));
 	}
 }
 
-void toggle_layer_mute(AudioView *v) {
+void AudioView::toggle_layer_mute() {
 	bool any_unmuted = false;
-	for (auto *l: v->vlayer)
-		if (v->sel.has(l->layer) and !l->layer->muted)
+	for (auto *l: vlayer)
+		if (sel.has(l->layer) and !l->layer->muted)
 			any_unmuted = true;
 
-	v->song->begin_action_group();
-	for (auto *l: v->vlayer)
-		if (v->sel.has(l->layer))
+	song->begin_action_group();
+	for (auto *l: vlayer)
+		if (sel.has(l->layer))
 			l->layer->set_muted(any_unmuted);
-	v->song->end_action_group();
+	song->end_action_group();
 }
 
-void toggle_layer_solo(AudioView *v) {
+void AudioView::toggle_layer_solo() {
 	bool any_solo = false;
-	for (auto *l: v->vlayer)
-		if (v->sel.has(l->layer) and l->solo)
+	for (auto *l: vlayer)
+		if (sel.has(l->layer) and l->solo)
 			any_solo = true;
-	for (auto *t: v->vtrack)
-		if (v->sel.has(t->track)){
+	for (auto *t: vtrack)
+		if (sel.has(t->track)){
 			if (any_solo) {
-				for (auto *l: v->vlayer)
+				for (auto *l: vlayer)
 					if (l->track() == t->track)
 						l->set_solo(false);
 			} else {
-				for (auto *l: v->vlayer)
+				for (auto *l: vlayer)
 					if (l->track() == t->track)
-						l->set_solo(v->sel.has(l->layer));
+						l->set_solo(sel.has(l->layer));
 			}
 		}
 }
 
-void toggle_track_exploded(AudioView *v) {
+void AudioView::toggle_track_exploded() {
 	bool any_imploded = false;
-	for (auto *t: v->vtrack)
-		if (v->sel.has(t->track) and t->imploded and t->track->layers.num > 0)
+	for (auto *t: vtrack)
+		if (sel.has(t->track) and t->imploded and t->track->layers.num > 0)
 			any_imploded = true;
 
-	for (auto *t: v->vtrack)
-		if (v->sel.has(t->track) and t->track->layers.num > 0) {
+	for (auto *t: vtrack)
+		if (sel.has(t->track) and t->track->layers.num > 0) {
 			if (any_imploded)
-				v->explode_track(t->track);
+				explode_track(t->track);
 			else
-				v->implode_track(t->track);
+				implode_track(t->track);
 		}
 }
 
 void AudioView::on_command(const string &id) {
 	if (id == "track-muted")
-		toggle_track_mute(this);
+		toggle_track_mute();
 	if (id == "track-solo")
-		toggle_track_solo(this);
+		toggle_track_solo();
 	if (id == "layer-muted")
-		toggle_layer_mute(this);
+		toggle_layer_mute();
 	if (id == "layer-solo")
-		toggle_layer_solo(this);
+		toggle_layer_solo();
 
 	
 	if (id == "track-explode")
-		toggle_track_exploded(this);
+		toggle_track_exploded();
 
 	if (mode == mode_default) {
 		if (id == "layer-up")
-			move_to_layer(this, -1);
+			move_to_layer(-1);
 		if (id == "layer-down")
-			move_to_layer(this, 1);
+			move_to_layer(1);
 	}
 
 	float dt = 0.05f;
@@ -722,11 +722,11 @@ void AudioView::on_command(const string &id) {
 
 	// vertical zoom
 	if (id == "vertical-zoom-in")
-		zoom_y(this, cam.scale_y * 1.2f);
+		zoom_y(cam.scale_y * 1.2f);
 	if (id == "vertical-zoom-out")
-		zoom_y(this, cam.scale_y / 1.2f);
+		zoom_y(cam.scale_y / 1.2f);
 	if (id == "vertical-zoom-default")
-		zoom_y(this, 1.0f);
+		zoom_y(1.0f);
 
 	mode->on_command(id);
 }

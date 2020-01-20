@@ -357,6 +357,17 @@ public:
 	void toggle_select_layer(AudioViewLayer *l);
 	void toggle_select_layer_with_content_in_cursor(AudioViewLayer *l);
 	void toggle_select_track_with_content_in_cursor(AudioViewTrack *t);
+
+
+	AudioViewLayer *next_layer(AudioViewLayer *vlayer);
+	AudioViewLayer *prev_layer(AudioViewLayer *vlayer);
+	void move_to_layer(int delta);
+	void zoom_y(float zoom);
+	void toggle_track_mute();
+	void toggle_track_solo();
+	void toggle_layer_mute();
+	void toggle_layer_solo();
+	void toggle_track_exploded();
 };
 
 #endif /* AUDIOVIEW_H_ */

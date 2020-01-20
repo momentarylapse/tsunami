@@ -547,6 +547,11 @@ void ViewModeMidi::on_key_down(int k) {
 	//if (k == hui::KEY_ESCAPE)
 	//	session->set_mode("default");
 
+	if (k == hui::KEY_UP + hui::KEY_ALT)
+		view->move_to_layer(-1);
+	if (k == hui::KEY_DOWN + hui::KEY_ALT)
+		view->move_to_layer(1);
+
 	ViewModeDefault::on_key_down(k);
 }
 
@@ -774,7 +779,9 @@ void ViewModeMidi::draw_post(Painter *c) {
 	}
 
 
-	// layer border
+	// editing rect
+	auto xxx = c->clip();
+	c->set_clip(l->area);
 	c->set_color(view->colors.text_soft1);
 	c->set_fill(false);
 	if (mode == MidiMode::TAB) {
@@ -795,10 +802,11 @@ void ViewModeMidi::draw_post(Painter *c) {
 		int y2 = mp->pitch2y_linear(p1);
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
-
+	c->set_clip(xxx);
 	c->set_fill(true);
 
 
+	// layer border
 	color col = view->colors.text;
 	col.a = 0.1f;
 	float d = 12;
@@ -817,16 +825,20 @@ string ViewModeMidi::get_tip() {
 		return _("enter note length (1-9, A-F)    cancel (Esc)");
 	if (input_mode == InputMode::BEAT_PARTITION)
 		return _("enter beat partition (1-9, A-F)    cancel (Esc)");
-	string message = _("cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)");
+	string message = _("cursor (←,→)");
+	string message2 = _("    track ALT+(↑,↓)    delete (⟵)    note length,partition (L,P)");
+	message2 += u8"    \U0001d15f  ,\U0001d160  ,\U0001d161  ,\U0001d160/₃    (Q,W,S,T)";
 	if (!cur_vlayer())
-		return message;
+		return message + message2;
 	auto mode = cur_vlayer()->midi_mode();
-	if (mode == MidiMode::TAB)
-		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
-	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
-		message += "    " + _("octave (↑,↓)    modifiers (#,3,0)    add note (A-G)");
-	message += u8"    \U0001d15f  ,\U0001d160  ,\U0001d161  ,\U0001d160/₃    (Q,W,S,T)";
-	return message;
+	if (mode == MidiMode::TAB) {
+		message += _("    string (↑,↓)");
+		message2 += _("    add note (0-9, A-F)");
+	} else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
+		message += _("    octave (↑,↓)");
+		message2 += _("    modifiers (#,3,0)    add note (A-G)");
+	}
+	return message + message2;
 }
 
 int ViewModeMidi::suggest_move_cursor(int pos, bool forward) {

@@ -22,40 +22,38 @@ LogConsole::LogConsole(Session *session) :
 	hui::RunLater(0.01f, [=]{ reload(); });
 }
 
-LogConsole::~LogConsole()
-{
+LogConsole::~LogConsole() {
 	log->unsubscribe(this);
 }
 
-void console_add_message(LogConsole *lc, Log::Message &m)
-{
+void console_add_message(LogConsole *lc, Log::Message &m) {
 	hui::ComboBoxSeparator = "§§";
 	string text = m.text;
 	if (m.session == Session::GLOBAL)
 		text = "[global] " + text;
 	if (m.type == Log::Type::DEBUG)
 		text = "[debug] " + text;
-	if (m.type == Log::Type::ERROR){
+
+	if (m.type == Log::Type::ERROR) {
 		lc->add_string("log_list", "hui:error§§" + text);
 		//lc->blink();
-		lc->win->set_info_text(m.text, {"error", "allow-close"});
-	}else if (m.type == Log::Type::WARNING){
+		lc->win->set_info_text(m.text, {"error", "allow-close", "id=error"});
+	} else if (m.type == Log::Type::WARNING) {
 		lc->add_string("log_list", "hui:warning§§" + text);
-		lc->win->set_info_text(m.text, {"warning", "allow-close"});
-	}else if (m.type == Log::Type::QUESTION){
+		lc->win->set_info_text(m.text, {"warning", "allow-close", "id=warning"});
+	} else if (m.type == Log::Type::QUESTION) {
 		lc->add_string("log_list", "hui:question§§" + text);
-		Array<string> options = {"warning", "allow-close"};
+		Array<string> options = {"warning", "allow-close", "id=question-" + i2s(rand())};
 		for (auto &o: m.responses)
 			options.add("button:" + o);
 		lc->win->set_info_text(m.text, options);
-	}else{
+	} else {
 		lc->add_string("log_list", "§§" + text);
 	}
 	hui::ComboBoxSeparator = "\\";
 }
 
-void LogConsole::reload()
-{
+void LogConsole::reload() {
 	log->unsubscribe(this);
 
 	reset("log_list");
@@ -64,11 +62,10 @@ void LogConsole::reload()
 		console_add_message(this, m);
 	messages_loaded = messages.num;
 
-	log->subscribe3(this, std::bind(&LogConsole::on_log_add, this), Log::MESSAGE_ADD);
+	log->subscribe(this, [=]{ on_log_add(); }, Log::MESSAGE_ADD);
 }
 
-void LogConsole::on_log_add()
-{
+void LogConsole::on_log_add() {
 	auto messages = log->all(session);
 	for (auto &m: messages.sub(messages_loaded, -1))
 		console_add_message(this, m);

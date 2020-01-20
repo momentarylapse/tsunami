@@ -179,8 +179,6 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 #endif
 	gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_TOP]->widget, FALSE, FALSE, 0);
 
-	infobar = nullptr;
-
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
@@ -518,27 +516,48 @@ void __GtkOnInfoBarResponse(GtkWidget *widget, int response, gpointer data)
 	//win->
 }
 
-void Window::set_info_text(const string &str, const Array<string> &options)
-{
-	/*if (infobar)
-		return;*/
+Window::InfoBar *Window::_get_info_bar(const string &id) {
+	for (auto &i: info_bars)
+		if (i.id == id) {
+			gtk_widget_destroy(i.widget);
+			return &i;
+		}
 
 
-	infobar = gtk_info_bar_new();
-	gtk_box_pack_start(GTK_BOX(vbox), infobar, FALSE, FALSE, 0);
-	gtk_box_reorder_child(GTK_BOX(vbox), infobar, 2);
+	InfoBar i;
+	i.id = id;
+	info_bars.add(i);
+	return &info_bars.back();
+}
+
+void Window::set_info_text(const string &str, const Array<string> &options) {
+	string id = "default";
+	for (string &o: options)
+		if (o.head(3) == "id=")
+			id = o.substr(3, -1);
+
+	auto infobar = _get_info_bar(id);
+
+	infobar->widget = gtk_info_bar_new();
+	gtk_box_pack_start(GTK_BOX(vbox), infobar->widget, FALSE, FALSE, 0);
+	gtk_box_reorder_child(GTK_BOX(vbox), infobar->widget, 2);
 	//gtk_widget_set_no_show_all(infobar, TRUE);
 
-	auto *content_area = gtk_info_bar_get_content_area(GTK_INFO_BAR(infobar));
-	auto *message_label = gtk_label_new("");
-	gtk_label_set_text(GTK_LABEL (message_label), sys_str(str));
-	gtk_container_add(GTK_CONTAINER(content_area), message_label);
-	gtk_widget_show(message_label);
+	auto *content_area = gtk_info_bar_get_content_area(GTK_INFO_BAR(infobar->widget));
+	infobar->label = gtk_label_new("");
+	//gtk_label_set_text(GTK_LABEL (message_label), sys_str(str));
+	gtk_container_add(GTK_CONTAINER(content_area), infobar->label);
+
+	g_signal_connect(infobar->widget, "response", G_CALLBACK(&__GtkOnInfoBarResponse), this);
+
+	gtk_label_set_text(GTK_LABEL (infobar->label), sys_str(str));
+
+
 
 	GtkMessageType type = GTK_MESSAGE_INFO;
 	bool allow_close = false;
 	int num_buttons = 0;
-	for (auto &o: options){
+	for (auto &o: options) {
 		if (o == "error")
 			type = GTK_MESSAGE_ERROR;
 		if (o == "warning")
@@ -550,16 +569,14 @@ void Window::set_info_text(const string &str, const Array<string> &options)
 		if (o.head(7) == "button:"){
 			auto x = o.explode(":");
 			if (x.num >= 3)
-				gtk_info_bar_add_button(GTK_INFO_BAR(infobar), sys_str(x[2]), make_info_bar_response(x[1]));
+				gtk_info_bar_add_button(GTK_INFO_BAR(infobar->widget), sys_str(x[2]), make_info_bar_response(x[1]));
 		}
 	}
-	gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar), type);
-	gtk_info_bar_set_show_close_button(GTK_INFO_BAR(infobar), allow_close);
+	gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar->widget), type);
+	gtk_info_bar_set_show_close_button(GTK_INFO_BAR(infobar->widget), allow_close);
 
-
-	g_signal_connect(infobar, "response", G_CALLBACK(&__GtkOnInfoBarResponse), this);
-
-	gtk_widget_show(infobar);
+	gtk_widget_show(infobar->widget);
+	gtk_widget_show(infobar->label);
 }
 
 

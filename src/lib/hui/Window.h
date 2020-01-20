@@ -168,9 +168,16 @@ private:
 public:
 	GtkWidget *window;
 private:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar, *infobar;
+	GtkWidget *vbox, *hbox, *menubar, *statusbar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
+	struct InfoBar {
+		GtkWidget *widget;
+		GtkWidget *label;
+		string id;
+	};
+	Array<InfoBar> info_bars;
+	InfoBar *_get_info_bar(const string &id);
 #endif
 	
 protected:

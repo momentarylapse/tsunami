@@ -12,75 +12,67 @@
 
 const string Data::MESSAGE_FINISHED_LOADING = "FinishedLoading";
 
-Data::Data(Session *_session)
-{
+Data::Data(Session *_session) {
 	action_manager = new ActionManager(this);
 	session = _session;
 	binary_file_format = true;
 	file_time = 0;
 }
 
-Data::~Data()
-{
-	delete(action_manager);
+Data::~Data() {
+	delete action_manager;
 }
 
 
 
-void Data::redo()
-{
+void Data::redo() {
 	action_manager->redo();
 }
 
 
 
-void Data::undo()
-{
+void Data::undo() {
 	action_manager->undo();
 }
 
 
 
-void *Data::execute(Action *a)
-{
+void *Data::execute(Action *a) {
 	return action_manager->execute(a);
 }
 
-void Data::begin_action_group()
-{
+void Data::begin_action_group() {
 	action_manager->group_begin();
 }
 
-void Data::end_action_group()
-{
+void Data::end_action_group() {
 	action_manager->group_end();
 }
 
 
-void Data::reset_history()
-{
+void Data::reset_history() {
 	action_manager->reset();
 }
 
-bool Data::history_enabled()
-{
+bool Data::history_enabled() {
 	return action_manager->is_enabled();
 }
 
+std::shared_timed_mutex &Data::mtx() {
+	return action_manager->mtx;
+}
+
 // "low level" -> don't use ActionManager.lock()!
-void Data::lock()
-{
-	action_manager->mtx.lock();
+void Data::lock() {
+	action_manager->lock();
 }
 
-bool Data::try_lock()
-{
-	return action_manager->mtx.try_lock();
+bool Data::try_lock() {
+	return action_manager->try_lock();
 }
 
-void Data::unlock()
-{
-	action_manager->mtx.unlock();
+void Data::unlock() {
+	action_manager->unlock();
 }
 
 

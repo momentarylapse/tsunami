@@ -18,12 +18,11 @@ class Data;
 class Action;
 class ActionGroup;
 //class Mutex;
-namespace hui{
+namespace hui {
 	class Timer;
 }
 
-class ActionManager : public Observable<VirtualBase>
-{
+class ActionManager : public Observable<VirtualBase> {
 	friend class Data;
 public:
 	ActionManager(Data *_data);
@@ -59,6 +58,7 @@ private:
 	// mutex
 	void lock();
 	void unlock();
+	bool try_lock();
 	int lock_level;
 
 	// group

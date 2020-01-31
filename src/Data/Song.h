@@ -143,8 +143,6 @@ public:
 	BarCollection bars;
 
 	Array<TrackLayer*> layers() const;
-
-	std::shared_timed_mutex mtx;
 };
 
 

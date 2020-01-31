@@ -83,12 +83,12 @@ class CueSplitter extends TsunamiPlugin
 				print(fend)
 				end = fend
 				print(end)
-			print("  " + offset + " : " + end)
-			r.prepare(RangeTo(offset, end), false)
+			print("  {{offset}} : {{end}}")
+			r.set_range(RangeTo(offset, end), false)
 			string _fn = i+1
 			if _fn.num < 2
 				_fn = "0" + _fn
-			_fn += " - " + sanitize(p.title) + ".flac"
+			_fn += " - {{sanitize(p.title)}}.flac"
 			session.storage.save_via_renderer(r.out, dir + _fn, end - offset, tags)
 		print("-----------------done")
 		stop()

@@ -189,7 +189,7 @@ void ModulePanel::on_external() {
 
 void ModulePanel::on_change() {
 	{
-		std::unique_lock<std::shared_timed_mutex> lock(module->session->song->mtx);
+		//std::unique_lock<std::shared_timed_mutex> lock(module->session->song->mtx());
 		if (func_edit)
 			func_edit(old_param);
 	}

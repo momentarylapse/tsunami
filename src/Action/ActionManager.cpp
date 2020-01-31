@@ -83,9 +83,11 @@ void *ActionManager::execute(Action *a) {
 	if (cur_group)
 		return cur_group->add_sub_action(a, data);
 
-	lock();
-	void *r = a->execute(data);
-	unlock();
+	void *r = nullptr;
+	{
+		std::unique_lock<std::shared_timed_mutex> lock(mtx);
+		r = a->execute(data);
+	}
 
 	if (enabled and !a->is_trivial())
 		add(a);
@@ -100,9 +102,10 @@ void ActionManager::undo() {
 	if (!undoable())
 		return;
 
-	lock();
-	action[-- cur_pos]->undo(data);
-	unlock();
+	{
+		std::unique_lock<std::shared_timed_mutex> lock(mtx);
+		action[-- cur_pos]->undo(data);
+	}
 
 	data->notify();
 	notify();
@@ -114,9 +117,10 @@ void ActionManager::redo() {
 	if (!redoable())
 		return;
 
-	lock();
-	action[cur_pos ++]->redo(data);
-	unlock();
+	{
+		std::unique_lock<std::shared_timed_mutex> lock(mtx);
+		action[cur_pos ++]->redo(data);
+	}
 
 	data->notify();
 	notify();
@@ -189,5 +193,18 @@ void ActionManager::unlock() {
 	lock_level --;
 	if (lock_level == 0)
 		mtx.unlock();
+}
+
+bool ActionManager::try_lock() {
+	if (lock_level == 0) {
+		if (mtx.try_lock()) {
+			lock_level ++;
+			return true;
+		}
+		return false;
+	} else {
+		lock_level ++;
+		return true;
+	}
 }
 

@@ -532,7 +532,7 @@ class SongRenderer extends AudioSource
 	extern void __init__(Song s)
 	extern override void __delete__()
 	extern void render(Range r, AudioBuffer buf)
-	extern void prepare(Range r, bool allow_loop)
+	extern void set_range(Range r, bool allow_loop)
 	extern override int read(AudioBuffer b)
 	#extern override void reset_state()
 	extern Range range()

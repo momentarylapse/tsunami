@@ -56,7 +56,7 @@ Song* make_example_song(int num_tracks, int channels) {
 void TestMixer::test_mix_stereo_1track_simple() {
 	Song *s = make_example_song(1, 2);
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -70,7 +70,7 @@ void TestMixer::test_mix_stereo_1track_volume() {
 	s->tracks[0]->set_volume(0.5);
 
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -84,7 +84,7 @@ void TestMixer::test_mix_stereo_1track_balance_right() {
 	s->tracks[0]->set_panning(1.0f);
 
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -99,7 +99,7 @@ void TestMixer::test_mix_stereo_1track_balance_left() {
 	s->tracks[0]->set_panning(-1.0f);
 
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -112,7 +112,7 @@ void TestMixer::test_mix_stereo_1track_balance_left() {
 void TestMixer::test_mix_stereo_2track_simple() {
 	/*Song *s = make_stereo_song();
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -125,7 +125,7 @@ void TestMixer::test_mix_stereo_2track_simple() {
 void TestMixer::test_mix_mono_1track_simple() {
 	Song *s = make_example_song(1, 1);
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -141,7 +141,7 @@ void TestMixer::test_mix_mono_1track_panning_right() {
 	s->tracks[0]->set_panning(1.0f);
 
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
@@ -157,7 +157,7 @@ void TestMixer::test_mix_mono_1track_panning_left() {
 	s->tracks[0]->set_panning(-1.0f);
 
 	auto* sr = new SongRenderer(s);
-	sr->prepare(Range(0,4), false);
+	sr->set_range(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);

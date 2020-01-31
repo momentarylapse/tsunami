@@ -14,6 +14,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Curve.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
@@ -34,9 +35,10 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
+	needs_rebuild = true;
 	if (song) {
 		build_data();
-		prepare(song->range(), false);
+		set_range(song->range(), false);
 		song->subscribe(this, [=]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
 		song->subscribe(this, [=]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
 		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
@@ -128,7 +130,10 @@ int SongRenderer::read(AudioBuffer &buf) {
 	if (!song)
 		return 0;
 
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
+	std::lock_guard<std::shared_timed_mutex> lck(song->mtx());
+
+	if (needs_rebuild)
+		_rebuild();
 
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
@@ -161,29 +166,47 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 void SongRenderer::render(const Range &range, AudioBuffer &buf) {
 	channels = buf.channels;
-	prepare(range, false);
+	set_range(range, false);
 	buf.resize(range.length);
 	read(buf);
 }
 
-void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks) {
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
+void SongRenderer::set_range(const Range &r, bool loop) {
+	if (r == _range and loop == allow_loop)
+		return;
+	_range = r;
+	allow_loop = loop;
+	needs_rebuild = true;
+}
+
+void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers) {
+	allowed_layers_requested = _allowed_layers;
+	needs_rebuild = true;
+}
+
+void SongRenderer::_rebuild() {
+
 	// reset previously unused tracks
 	for (auto *tr: tracks)
 		if (!allowed_tracks.contains(tr->track)) {
 			tr->reset_state();
 			tr->set_pos(pos);
 		}
-	allowed_tracks = _allowed_tracks;
-	//_seek(pos);
-}
 
-void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers) {
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
-	allowed_layers = _allowed_layers;
+	allowed_layers = allowed_layers_requested;
+
+	// which tracks are allowed?
+	allowed_tracks.clear();
+	for (auto *l: allowed_layers)
+		allowed_tracks.add(l->track);
+
 	_set_pos(pos);
+	//reset_state();
+
+	needs_rebuild = false;
 }
 
+// REQUIRES LOCK
 void SongRenderer::clear_data() {
 	for (auto *tr: tracks)
 		delete tr;
@@ -203,20 +226,6 @@ void SongRenderer::clear_data() {
 	allowed_layers.clear();
 }
 
-void SongRenderer::prepare(const Range &__range, bool _allow_loop) {
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
-	//clear_data();
-	_range = __range;
-	allow_loop = _allow_loop;
-
-	for (Track* t: song->tracks)
-		allowed_tracks.add(t);
-	for (TrackLayer* l: song->layers())
-		allowed_layers.add(l);
-
-	reset_state();
-	_set_pos(_range.offset);
-}
 
 void SongRenderer::reset_state() {
 	if (!song)
@@ -238,7 +247,7 @@ void SongRenderer::build_data() {
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));
 
-	set_pos(0);
+	_set_pos(0);
 }
 
 int SongRenderer::get_num_samples() {
@@ -248,9 +257,8 @@ int SongRenderer::get_num_samples() {
 }
 
 void SongRenderer::set_pos(int _pos) {
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
-	reset_state();
-	_set_pos(_pos);
+	pos = _pos;
+	needs_rebuild = true;
 }
 
 void SongRenderer::_set_pos(int _pos) {

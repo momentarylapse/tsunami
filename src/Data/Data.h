@@ -10,6 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../Stuff/Observable.h"
+#include <shared_mutex>
 
 class ActionManager;
 class Action;
@@ -39,6 +40,8 @@ public:
 	ActionManager *action_manager;
 	bool history_enabled();
 
+
+	std::shared_timed_mutex &mtx();
 	void lock();
 	bool try_lock();
 	void unlock();

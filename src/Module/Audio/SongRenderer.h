@@ -23,8 +23,7 @@ class Synthesizer;
 class Range;
 class TrackRenderer;
 
-class SongRenderer : public AudioSource
-{
+class SongRenderer : public AudioSource {
 	friend TrackRenderer;
 public:
 	SongRenderer(Song *s, bool direct_mode = false);
@@ -43,11 +42,9 @@ public:
 	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
-	void _cdecl prepare(const Range &range, bool alllow_loop);
-	void _cdecl allow_tracks(const Set<const Track*> &allowed_tracks);
 	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
 
-	void _cdecl set_range(const Range &r){ _range = r; }
+	void _cdecl set_range(const Range &r, bool alllow_loop);
 	Range _cdecl range(){ return _range; }
 
 	int _cdecl get_num_samples();
@@ -63,6 +60,7 @@ private:
 	void on_song_delete_track();
 	void on_song_finished_loading();
 	void update_tracks();
+	void _rebuild();
 
 	Song *song;
 	Range _range;
@@ -70,7 +68,9 @@ private:
 	int pos;
 	Set<const Track*> allowed_tracks;
 	Set<const TrackLayer*> allowed_layers;
+	Set<const TrackLayer*> allowed_layers_requested;
 	bool direct_mode;
+	bool needs_rebuild;
 
 	Array<TrackRenderer*> tracks;
 

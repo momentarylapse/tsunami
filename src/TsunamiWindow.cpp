@@ -407,8 +407,7 @@ void TsunamiWindow::on_track_render() {
 	song->begin_action_group();
 
 	SongRenderer renderer(song);
-	renderer.prepare(range, false);
-	renderer.allow_tracks(view->sel.tracks());
+	renderer.set_range(range, false);
 	renderer.allow_layers(view->get_playable_layers());
 
 	Track *t = song->add_track(SignalType::AUDIO);

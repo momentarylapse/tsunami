@@ -33,7 +33,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.95.2";
+const string AppVersion = "0.7.96.0";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;

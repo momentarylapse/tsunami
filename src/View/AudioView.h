@@ -235,7 +235,6 @@ public:
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
 	AudioOutput *output_stream;
-	bool playback_loop;
 	void set_playback_loop(bool loop);
 	void play();
 	void stop();
@@ -245,6 +244,7 @@ public:
 	void playback_click();
 	bool is_paused();
 	int playback_pos();
+	bool looping();
 	void _sync_playback_pos();
 	int _playback_sync_counter = 0;
 	int64 _playback_stream_offset = 0;

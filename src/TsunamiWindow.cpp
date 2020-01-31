@@ -407,7 +407,7 @@ void TsunamiWindow::on_track_render() {
 	song->begin_action_group();
 
 	SongRenderer renderer(song);
-	renderer.set_range(range, false);
+	renderer.set_range(range);
 	renderer.allow_layers(view->get_playable_layers());
 
 	Track *t = song->add_track(SignalType::AUDIO);
@@ -803,7 +803,7 @@ void TsunamiWindow::on_remove_sample() {
 }
 
 void TsunamiWindow::on_play_loop() {
-	view->set_playback_loop(!view->playback_loop);
+	view->set_playback_loop(!view->looping());
 }
 
 void TsunamiWindow::on_play() {
@@ -940,7 +940,7 @@ void TsunamiWindow::update_menu() {
 	enable("play", !session->in_mode("capture"));
 	enable("stop", view->is_playback_active() or session->in_mode("capture"));
 	enable("pause", view->is_playback_active() and !view->is_paused());
-	check("play-loop", view->playback_loop);
+	check("play-loop", view->looping());
 	enable("record", !session->in_mode("capture"));
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));

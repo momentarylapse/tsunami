@@ -134,7 +134,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	midi_view_mode = (MidiMode)hui::Config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	playback_range_locked = false;
-	playback_loop = false;
 
 	selection_mode = SelectionMode::NONE;
 	selection_snap_mode = SelectionSnapMode::NONE;
@@ -397,12 +396,12 @@ void AudioView::update_selection() {
 	}
 
 
-	renderer->set_range(get_playback_selection(false), renderer->allow_loop);
+	renderer->set_range(get_playback_selection(false));
 
 	// TODO ...check....
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(playback_pos()))
-			renderer->set_range(get_playback_selection(false), renderer->allow_loop);
+			renderer->set_range(get_playback_selection(false));
 		else{
 			stop();
 		}
@@ -1477,7 +1476,8 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop) {
 	if (signal_chain->is_playback_active())
 		stop();
 
-	renderer->set_range(range, allow_loop);
+	renderer->allow_loop = allow_loop;
+	renderer->set_range(range);
 	renderer->set_pos(range.start());
 	renderer->allow_layers(get_playable_layers());
 	_playback_stream_offset = range.offset - output_stream->samples_played();
@@ -1486,8 +1486,7 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop) {
 }
 
 void AudioView::set_playback_loop(bool loop) {
-	playback_loop = loop;
-	renderer->loop_if_allowed = playback_loop;
+	renderer->set_loop(loop);
 	force_redraw();
 	notify(MESSAGE_SELECTION_CHANGE);
 }
@@ -1515,6 +1514,10 @@ int loop_in_range(int pos, const Range &r) {
 	return loopi(pos, r.start(), r.end());
 }
 
+bool AudioView::looping() {
+	return renderer->loop;
+}
+
 int AudioView::playback_pos() {
 	// crappy syncing....
 	_playback_sync_counter ++;
@@ -1522,7 +1525,7 @@ int AudioView::playback_pos() {
 		_sync_playback_pos();
 	
 	int pos = output_stream->samples_played() + _playback_stream_offset;
-	if (playback_loop and renderer->allow_loop)
+	if (looping() and renderer->allow_loop)
 		return loop_in_range(pos, renderer->range());
 	return pos;
 }
@@ -1803,7 +1806,7 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 		//menu->enable("layer-delete", !l->is_main());
 	}
 
-	menu->check("play-loop", playback_loop);
+	menu->check("play-loop", looping());
 	menu->check("playback-range-lock", playback_range_locked);
 }
 

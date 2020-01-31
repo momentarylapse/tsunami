@@ -32,13 +32,13 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	direct_mode = _direct_mode;
 
 	preview_effect = nullptr;
-	allow_loop = false;
-	loop_if_allowed = false;
+	allow_loop = false; // are we allowed to loop (recording...)
+	loop = false; // do we want to loop (GUI)
 	pos = 0;
 	needs_rebuild = true;
 	if (song) {
 		build_data();
-		set_range(song->range(), false);
+		set_range(song->range());
 		song->subscribe(this, [=]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
 		song->subscribe(this, [=]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
 		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
@@ -157,7 +157,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 		read_basic(buf);
 	}
 
-	if ((pos >= _range.end()) and allow_loop and loop_if_allowed) {
+	if ((pos >= _range.end()) and allow_loop and loop) {
 		reset_state();
 		_set_pos(_range.offset);
 	}
@@ -166,16 +166,23 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 void SongRenderer::render(const Range &range, AudioBuffer &buf) {
 	channels = buf.channels;
-	set_range(range, false);
+	allow_loop = false;
+	set_range(range);
 	buf.resize(range.length);
 	read(buf);
 }
 
-void SongRenderer::set_range(const Range &r, bool loop) {
-	if (r == _range and loop == allow_loop)
+void SongRenderer::set_range(const Range &r) {
+	if (r == _range)
 		return;
 	_range = r;
-	allow_loop = loop;
+	needs_rebuild = true;
+}
+
+void SongRenderer::set_loop(bool l) {
+	if (l == loop)
+		return;
+	loop = l;
 	needs_rebuild = true;
 }
 
@@ -251,7 +258,7 @@ void SongRenderer::build_data() {
 }
 
 int SongRenderer::get_num_samples() {
-	if (allow_loop and loop_if_allowed)
+	if (allow_loop and loop)
 		return -1;
 	return _range.length;
 }

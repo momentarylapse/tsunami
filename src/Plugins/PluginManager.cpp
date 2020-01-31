@@ -517,6 +517,7 @@ void PluginManager::link_app_script_data() {
 	SongRenderer sr(nullptr);
 	Kaba::declare_class_size("SongRenderer", sizeof(SongRenderer));
 	Kaba::link_external_class_func("SongRenderer.set_range", &SongRenderer::set_range);
+	Kaba::link_external_class_func("SongRenderer.set_loop", &SongRenderer::set_loop);
 	Kaba::link_external_class_func("SongRenderer.render", &SongRenderer::render);
 	Kaba::link_external_class_func("SongRenderer.__init__", &SongRenderer::__init__);
 	Kaba::link_external_virtual("SongRenderer.__delete__", &SongRenderer::__delete__, &sr);

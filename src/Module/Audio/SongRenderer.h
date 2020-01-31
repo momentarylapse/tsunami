@@ -37,14 +37,15 @@ public:
 
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
-	
+
 	int get_pos();
 	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
 
-	void _cdecl set_range(const Range &r, bool alllow_loop);
+	void _cdecl set_range(const Range &r);
+	void _cdecl set_loop(bool loop);
 	Range _cdecl range(){ return _range; }
 
 	int _cdecl get_num_samples();
@@ -89,7 +90,7 @@ private:
 public:
 	AudioEffect *preview_effect;
 	bool allow_loop;
-	bool loop_if_allowed;
+	bool loop;
 
 	float get_peak(Track *track);
 	void clear_peaks();

@@ -1,0 +1,77 @@
+use hui
+use "../api.kaba"
+
+enum
+	MODE_FORWARD
+	MODE_LOOP
+
+TrackMarker* get_part(Song* s, int offset)
+	let t = s.time_track()
+	if !t
+		return nil
+	for m in t.layers[0].markers
+		if m.range.inside(offset)
+			return m
+	return nil
+
+
+
+class PPPanel extends ConfigPanel
+	Looper* looper
+	
+	void __init__(Looper *_l)
+		super.__init__(_l)
+		from_source("
+Button forward 'Forward' expandx expandy")
+		looper = _l
+
+		event("forward", on_forward)
+	
+	void on_forward()
+		looper.go_forward()
+		
+
+class Looper extends TsunamiPlugin
+	int runner
+	int mode
+	SignalChain* chain
+	SongRenderer* renderer
+	Song* song
+	TrackMarker* cur_part
+	
+	override void on_start()
+		cur_part = nil
+		song = session.song
+		chain = session.view.signal_chain
+		renderer = session.view.renderer
+		runner = RunRepeated(0.05, self, on_update)
+		mode = MODE_FORWARD
+		
+	override void on_stop()
+		CancelRunner(runner)
+			
+	override ConfigPanel* create_panel()
+		return new PPPanel(&self)
+	
+	void on_leave_part()
+		print("leaving " + cur_part.text)
+		#go_forward
+	void on_enter_part()
+		print("entering " + cur_part.text)
+		renderer.set_range(cur_part.range)
+		renderer.set_loop(true)
+		mode = MODE_LOOP
+	void go_forward()
+		renderer.set_range(song.range())
+		renderer.set_loop(false)
+		mode = MODE_FORWARD
+	
+	void on_update()
+		int pos = renderer.get_pos()
+		let p = get_part(song, pos)
+		if p != cur_part
+			if cur_part
+				on_leave_part()
+			cur_part = p
+			if cur_part
+				on_enter_part()

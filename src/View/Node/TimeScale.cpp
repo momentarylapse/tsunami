@@ -101,7 +101,7 @@ public:
 		if (view->playback_range_locked)
 			x += 20;
 		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
-		hidden = !view->playback_loop;
+		hidden = !view->looping();
 	}
 	void draw(Painter *p) override {
 		p->set_color(view->colors.text);

@@ -123,7 +123,11 @@ class HammondRenderer extends PitchRenderer
 			x = 0
 		for a,i in A
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
-		
+			
+		#print(str(A))
+		env.reset()
+		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
+	void create_stutter()
 		stutter.resize(440) # 10ms
 		stutter = 1
 		for i in 0:10
@@ -134,11 +138,8 @@ class HammondRenderer extends PitchRenderer
 			int offset = 240 + randi(200)
 			for j in 0:3
 				stutter[offset + j] = (1 - synth.config.key_stutter)
-			
-		#print(str(A))
-		env.reset()
-		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
 	override void on_config()
+		create_stutter()
 		env.set(synth.config.attack, DECAY, SUSTAIN, synth.config.release, synth.sample_rate)
 
 	override void on_end()

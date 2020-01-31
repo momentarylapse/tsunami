@@ -127,6 +127,7 @@ void SongRenderer::read_basic(AudioBuffer &buf) {
 int SongRenderer::read(AudioBuffer &buf) {
 	if (!song)
 		return 0;
+
 	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
 
 	int size = min(buf.length, _range.end() - pos);

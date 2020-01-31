@@ -11,6 +11,7 @@
 
 EnvelopeADSR::EnvelopeADSR() {
 	set(0, 0, 0, 0, 0);
+	reset();
 }
 
 void EnvelopeADSR::__init__() {
@@ -24,7 +25,7 @@ void EnvelopeADSR::set(float t_attack, float t_decay, float _sustain, float t_re
 	sustain = _sustain;
 	initial = 0;
 	peak = 1;
-	reset();
+	//reset();
 	//msg_write(format("%f  %d  %f  %d  %f  %d", initial, ttl_attack, peak, ttl_decay, sustain, ttl_release));
 }
 

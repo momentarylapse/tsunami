@@ -1,8 +1,8 @@
-// Language
+# Language
 Deutsch
-// Num IDs
+# Num IDs
 963
-// Data (ID,Text,Tooltip)
+# Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
 
@@ -2892,9 +2892,9 @@ Hinzufügen
 song_dialog/tag-delete
 Löschen
 
-// Num Language Strings
+# Num Language Strings
 246
-// Data (ID,Text)
+# Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
                   Close dialog box to exit program.

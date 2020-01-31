@@ -457,14 +457,18 @@ class FMRenderer extends PitchRenderer
 			o.env.start(_volume * o.conf.amplitude)
 
 	override void on_config()
-		osc.clear()
+		int n = 0
 		for c in synth.config.osc
-			OscillatorState o
-			o.conf = c
-			o.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
-			o.env.set2(c.initial, c.peak)
-			if c.active()
+			if !c.active()
+				continue
+			if len(osc) <= n
+				OscillatorState o
 				osc.add(o)
+			osc[n].conf = c
+			osc[n].env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
+			osc[n].env.set2(c.initial, c.peak)
+			n ++
+		osc.resize(n)
 
 	override bool render(AudioBuffer buf)
 		for i in 0:len(buf)

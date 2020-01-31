@@ -9,6 +9,7 @@
 #include "../../Module/Module.h"
 #include "../../Module/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Data/Song.h"
 #include "../../Session.h"
 #include "../../TsunamiWindow.h"
 #include "../../lib/hui/Controls/ControlMenuButton.h"
@@ -187,8 +188,11 @@ void ModulePanel::on_external() {
 }
 
 void ModulePanel::on_change() {
-	if (func_edit)
-		func_edit(old_param);
+	{
+		std::unique_lock<std::shared_timed_mutex> lock(module->session->song->mtx);
+		if (func_edit)
+			func_edit(old_param);
+	}
 	check("enabled", module->enabled);
 	old_param = module->config_to_string();
 

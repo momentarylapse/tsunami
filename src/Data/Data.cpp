@@ -58,21 +58,17 @@ bool Data::history_enabled() {
 	return action_manager->is_enabled();
 }
 
-std::shared_timed_mutex &Data::mtx() {
-	return action_manager->mtx;
-}
-
 // "low level" -> don't use ActionManager.lock()!
 void Data::lock() {
-	action_manager->lock();
+	mtx.lock();
 }
 
 bool Data::try_lock() {
-	return action_manager->try_lock();
+	return mtx.try_lock();
 }
 
 void Data::unlock() {
-	action_manager->unlock();
+	mtx.unlock();
 }
 
 

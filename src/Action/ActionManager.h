@@ -12,7 +12,6 @@
 #include "Action.h"
 #include "../Data/Data.h"
 #include "../Stuff/Observable.h"
-#include <shared_mutex>
 
 class Data;
 class Action;
@@ -67,9 +66,6 @@ private:
 
 	// for merging
 	hui::Timer *timer;
-
-	//Mutex *mutex;
-	std::shared_timed_mutex mtx;
 };
 
 #endif /* ACTIONMANAGER_H_ */

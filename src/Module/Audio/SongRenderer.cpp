@@ -130,7 +130,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 	if (!song)
 		return 0;
 
-	std::lock_guard<std::shared_timed_mutex> lck(song->mtx());
+	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
 
 	if (needs_rebuild)
 		_rebuild();

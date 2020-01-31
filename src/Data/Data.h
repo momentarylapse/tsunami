@@ -41,7 +41,7 @@ public:
 	bool history_enabled();
 
 
-	std::shared_timed_mutex &mtx();
+	std::shared_timed_mutex mtx;
 	void lock();
 	bool try_lock();
 	void unlock();

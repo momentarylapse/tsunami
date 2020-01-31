@@ -115,21 +115,21 @@ string Function::signature() const {
 
 void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 	blocks.add(block);
-	for (Node* n: block->uparams) {
+	for (Node* n: block->params) {
 		if (n->kind == NodeKind::BLOCK)
 			blocks_add_recursive(blocks, n->as_block());
 		if (n->kind == NodeKind::STATEMENT) {
 			auto id = n->as_statement()->id;
 			if (id == StatementID::FOR_DIGEST) {
-				blocks_add_recursive(blocks, n->uparams[2]->as_block());
+				blocks_add_recursive(blocks, n->params[2]->as_block());
 			} else if (id == StatementID::TRY) {
-				blocks_add_recursive(blocks, n->uparams[0]->as_block());
-				blocks_add_recursive(blocks, n->uparams[2]->as_block());
+				blocks_add_recursive(blocks, n->params[0]->as_block());
+				blocks_add_recursive(blocks, n->params[2]->as_block());
 			} else if (id == StatementID::IF) {
-				blocks_add_recursive(blocks, n->uparams[1]->as_block());
+				blocks_add_recursive(blocks, n->params[1]->as_block());
 			} else if (id == StatementID::IF_ELSE) {
-				blocks_add_recursive(blocks, n->uparams[1]->as_block());
-				blocks_add_recursive(blocks, n->uparams[2]->as_block());
+				blocks_add_recursive(blocks, n->params[1]->as_block());
+				blocks_add_recursive(blocks, n->params[2]->as_block());
 			}
 		}
 	}

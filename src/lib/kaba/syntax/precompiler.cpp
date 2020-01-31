@@ -100,11 +100,13 @@ void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool 
 			}
 
 			// special defines?
-			if ((d.source.num > 4) && (d.source.head(2) == "__") && (d.source.tail(2) == "__")){
+			if ((d.source.num > 4) and (d.source.head(2) == "__") and (d.source.tail(2) == "__")){
 				if (d.source == "__OS__"){
 					do_error("#define __OS__ deprecated");
 				}else if (d.source == "__STRING_CONST_AS_CSTRING__"){
 					flag_string_const_as_cstring = true;
+				}else if (d.source == "__FUNCTION_POINTER_AS_CODE__"){
+					flag_function_pointer_as_code = true;
 				}else if (d.source == "__NO_FUNCTION_FRAME__"){
 					do_error("#define __NO_FUNCTION_FRAME__ deprecated");
 				}else if (d.source == "__ADD_ENTRY_POINT__"){

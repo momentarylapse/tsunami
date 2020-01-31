@@ -7,9 +7,6 @@
 
 namespace Kaba{
 
-void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s);
-
-
 
 int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	const Class *type = ret.get_type_save();
@@ -27,8 +24,9 @@ int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, c
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
 	int64 push_size = 0;
 	
+	// skip the class instance for now...
 	int p0 = 0;
-	if (f->is_static)
+	if (!f->is_static)
 		p0 = 1;
 
 	// push parameters onto stack
@@ -157,14 +155,19 @@ SerialNodeParam SerializerX86::serialize_parameter(Node *link, Block *block, int
 			p.kind = NodeKind::MEMORY;
 		else
 			p.kind = NodeKind::CONSTANT_BY_ADDRESS;
+		if (syntax_tree->flag_function_pointer_as_code and (link->type == TypeFunctionP)) {
+			auto *fp = (Function*)(int_p)link->as_const()->as_int64();
+			p.kind = NodeKind::MARKER;
+			p.p = fp->_label;
+		}
 	}else if ((link->kind == NodeKind::OPERATOR) or (link->kind == NodeKind::FUNCTION_CALL) or (link->kind == NodeKind::INLINE_CALL) or (link->kind == NodeKind::VIRTUAL_CALL) or (link->kind == NodeKind::STATEMENT)){
 		p = serialize_node(link, block, index);
 	}else if (link->kind == NodeKind::REFERENCE){
-		SerialNodeParam param = serialize_parameter(link->uparams[0], block, index);
+		SerialNodeParam param = serialize_parameter(link->params[0], block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
 		return add_reference(param, link->type);
 	}else if (link->kind == NodeKind::DEREFERENCE){
-		SerialNodeParam param = serialize_parameter(link->uparams[0], block, index);
+		SerialNodeParam param = serialize_parameter(link->params[0], block, index);
 		/*if ((param.kind == KindVarLocal) or (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
@@ -187,31 +190,31 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 	switch(statement->id){
 		case StatementID::IF:{
 			int m_after_true = list->create_label("_IF_AFTER_" + i2s(num_markers ++));
-			auto cond = serialize_parameter(com->uparams[0], block, index);
+			auto cond = serialize_parameter(com->params[0], block, index);
 			// cmp;  jz m;  -block-  m;
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
 			add_cmd(Asm::INST_JZ, param_marker32(m_after_true));
-			serialize_block(com->uparams[1]->as_block());
+			serialize_block(com->params[1]->as_block());
 			add_marker(m_after_true);
 			}break;
 		case StatementID::IF_ELSE:{
 			int m_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_markers ++));
 			int m_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_markers ++));
-			auto cond = serialize_parameter(com->uparams[0], block, index);
+			auto cond = serialize_parameter(com->params[0], block, index);
 			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
 			add_cmd(Asm::INST_JZ, param_marker32(m_after_true)); // jz ...
-			serialize_block(com->uparams[1]->as_block());
+			serialize_block(com->params[1]->as_block());
 			add_cmd(Asm::INST_JMP, param_marker32(m_after_false));
 			add_marker(m_after_true);
-			serialize_block(com->uparams[2]->as_block());
+			serialize_block(com->params[2]->as_block());
 			add_marker(m_after_false);
 			}break;
 		case StatementID::WHILE:{
 			int marker_before_while = list->create_label("_WHILE_BEFORE_" + i2s(num_markers ++));
 			int marker_after_while = list->create_label("_WHILE_AFTER_" + i2s(num_markers ++));
 			add_marker(marker_before_while);
-			auto cond = serialize_parameter(com->uparams[0], block, index);
+			auto cond = serialize_parameter(com->params[0], block, index);
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
@@ -220,7 +223,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			// body of loop
 			LoopData l = {marker_before_while, marker_after_while, block->level, index};
 			loop.add(l);
-			serialize_block(com->uparams[1]->as_block());
+			serialize_block(com->params[1]->as_block());
 			loop.pop();
 
 			add_cmd(Asm::INST_JMP, param_marker32(marker_before_while));
@@ -230,9 +233,9 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			int marker_before_for = list->create_label("_FOR_BEFORE_" + i2s(num_markers ++));
 			int marker_after_for = list->create_label("_FOR_AFTER_" + i2s(num_markers ++));
 			int marker_continue = list->create_label("_FOR_CONTINUE_" + i2s(num_markers ++));
-			serialize_node(com->uparams[0], block, index); // i=0
+			serialize_node(com->params[0], block, index); // i=0
 			add_marker(marker_before_for);
-			auto cond = serialize_parameter(com->uparams[1], block, index);
+			auto cond = serialize_parameter(com->params[1], block, index);
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
@@ -241,12 +244,12 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			// body of loop
 			LoopData l = {marker_continue, marker_after_for, block->level, index};
 			loop.add(l);
-			serialize_block(com->uparams[2]->as_block());
+			serialize_block(com->params[2]->as_block());
 			loop.pop();
 
 			// "i++"
 			add_marker(marker_continue);
-			serialize_node(com->uparams[3], block, index);
+			serialize_node(com->params[3], block, index);
 
 			add_cmd(Asm::INST_JMP, param_marker32(marker_before_for));
 			add_marker(marker_after_for);
@@ -258,8 +261,8 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			add_cmd(Asm::INST_JMP, param_marker32(loop.back().marker_continue));
 			break;
 		case StatementID::RETURN:
-			if (com->uparams.num > 0){
-				auto operand = serialize_parameter(com->uparams[0], block, index);
+			if (com->params.num > 0){
+				auto operand = serialize_parameter(com->params[0], block, index);
 					
 				if (cur_func->return_type->_amd64_allow_pass_in_xmm) {
 					insert_destructors_block(block, true);
@@ -346,7 +349,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			clear_nodes(links);
 
 			// __init__()
-			Node *sub = com->uparams[0];
+			Node *sub = com->params[0];
 			Node *c_ret = new Node(NodeKind::VAR_TEMP, ret.p, ret.type);
 			sub->set_instance(c_ret);
 			serialize_node(sub, block, index);
@@ -354,7 +357,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			break;}
 		case StatementID::DELETE:{
 			// __delete__()
-			auto operand = serialize_parameter(com->uparams[0], block, index);
+			auto operand = serialize_parameter(com->params[0], block, index);
 			add_cmd_destructor(operand, false);
 
 			// free()
@@ -369,9 +372,9 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			break;*/
 		case StatementID::TRY:{
 			int marker_finish = list->create_label("_TRY_AFTER_" + i2s(num_markers ++));
-			serialize_block(com->uparams[0]->as_block());
+			serialize_block(com->params[0]->as_block());
 			add_cmd(Asm::INST_JMP, param_marker32(marker_finish));
-			serialize_block(com->uparams[2]->as_block());
+			serialize_block(com->params[2]->as_block());
 			add_marker(marker_finish);
 			}break;
 		case StatementID::ASM:
@@ -447,16 +450,16 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 			break;
 // chunk...
 		case InlineID::CHUNK_ASSIGN:
-			for (int i=0; i<com->uparams[0]->type->size/4; i++)
+			for (int i=0; i<com->params[0]->type->size/4; i++)
 				add_cmd(Asm::INST_MOV, param_shift(param[0], i * 4, TypeInt), param_shift(param[1], i * 4, TypeInt));
-			for (int i=4*(com->uparams[0]->type->size/4); i<com->uparams[0]->type->size; i++)
+			for (int i=4*(com->params[0]->type->size/4); i<com->params[0]->type->size; i++)
 				add_cmd(Asm::INST_MOV, param_shift(param[0], i, TypeChar), param_shift(param[1], i, TypeChar));
 			break;
 		case InlineID::CHUNK_EQUAL:{
 			int val = add_virtual_reg(Asm::REG_AL);
 			add_cmd(Asm::INST_CMP, param_shift(param[0], 0, TypeInt), param_shift(param[1], 0, TypeInt));
 			add_cmd(Asm::INST_SETZ, ret);
-			for (int i=1; i<com->uparams[0]->type->size/4; i++) {
+			for (int i=1; i<com->params[0]->type->size/4; i++) {
 				add_cmd(Asm::INST_CMP, param_shift(param[0], i*4, TypeInt), param_shift(param[1], i*4, TypeInt));
 				add_cmd(Asm::INST_SETZ, param_vreg(TypeBool, val));
 				add_cmd(Asm::INST_AND, param_vreg(TypeBool, val));

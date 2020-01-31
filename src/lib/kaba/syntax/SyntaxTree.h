@@ -242,6 +242,7 @@ public:
 	// compiler options
 	bool flag_immortal;
 	bool flag_string_const_as_cstring;
+	bool flag_function_pointer_as_code;
 
 	Class *base_class;
 	Array<const Class*> owned_classes;

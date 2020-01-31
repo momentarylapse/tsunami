@@ -164,7 +164,7 @@ void Node::show() const {
 	string orig;
 	msg_write(str() + orig);
 	msg_right();
-	for (Node *p: uparams)
+	for (Node *p: params)
 		if (p)
 			p->show();
 		else
@@ -197,11 +197,11 @@ inline void set_command(Node *&a, Node *b) {
 
 void Block::add(Node *c) {
 	if (c)
-		uparams.add(c);
+		params.add(c);
 }
 
 void Block::set(int index, Node *c) {
-	uparams[index] = c;
+	params[index] = c;
 }
 
 Variable *Block::add_var(const string &name, const Class *type) {
@@ -234,7 +234,7 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
 }
 
 Node::~Node() {
-	for (auto &p: uparams)
+	for (auto &p: params)
 		if (p)
 			delete p;
 }
@@ -289,24 +289,24 @@ PrimitiveOperator *Node::as_prim_op() const {
 
 void Node::set_instance(Node *p) {
 #ifndef NDEBUG
-	if (uparams.num == 0)
+	if (params.num == 0)
 		msg_write("no inst...dfljgkldfjg");
 #endif
-	set_command(uparams[0], p);
+	set_command(params[0], p);
 }
 
-void Node::set_num_uparams(int n) {
-	uparams.resize(n);
+void Node::set_num_params(int n) {
+	params.resize(n);
 }
 
-void Node::set_uparam(int index, Node *p) {
+void Node::set_param(int index, Node *p) {
 #ifndef NDEBUG
 	/*if ((index < 0) or (index >= uparams.num)){
 		show();
 		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);
 	}*/
 #endif
-	set_command(uparams[index], p);
+	set_command(params[index], p);
 }
 
 

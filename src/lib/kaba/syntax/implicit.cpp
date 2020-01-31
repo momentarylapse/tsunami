@@ -39,12 +39,12 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 	if (t->is_super_array()) {
 		Node *n_el_size = add_node_const(add_constant_int(t->param->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
-		n_mem_init->set_uparam(1, n_el_size);
+		n_mem_init->set_param(1, n_el_size);
 		f->block->add(n_mem_init);
 	}else if (t->is_dict()) {
 		Node *n_el_size = add_node_const(add_constant_int(t->param->size + TypeString->size));
 		Node *n_mem_init = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), n_self);
-		n_mem_init->set_uparam(1, n_el_size);
+		n_mem_init->set_param(1, n_el_size);
 		f->block->add(n_mem_init);
 	}else if (t->is_array()) {
 		auto *pc_el_init = t->param->get_default_constructor();
@@ -68,7 +68,7 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 				// first, try same signature
 				Node *n_init_parent = add_node_member_call(pc_same, cp_node(n_self));
 				for (int i=0; i<pc_same->num_params; i++)
-					n_init_parent->set_uparam(i+1, add_node_local(f->var[i]));
+					n_init_parent->set_param(i+1, add_node_local(f->var[i]));
 				f->block->add(n_init_parent);
 			} else if (pc_def) {
 				// then, try default constructor
@@ -156,8 +156,8 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 			Node *n_other_num = shift_node(n_other, false, config.pointer_size, TypeInt);
 
 			Node *n_resize = add_node_member_call(f_resize, n_self);
-			n_resize->set_num_uparams(2);
-			n_resize->set_uparam(1, n_other_num);
+			n_resize->set_num_params(2);
+			n_resize->set_param(1, n_other_num);
 			f->block->add(n_resize);
 		}
 
@@ -183,10 +183,10 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 
 		Node *n_for = add_node_statement(StatementID::FOR_ARRAY);
 		// [VAR, INDEX, ARRAY, BLOCK]
-		n_for->set_uparam(0, add_node_local(v_el));
-		n_for->set_uparam(1, add_node_local(v_i));
-		n_for->set_uparam(2, cp_node(n_self));
-		n_for->set_uparam(3, b);
+		n_for->set_param(0, add_node_local(v_el));
+		n_for->set_param(1, add_node_local(v_i));
+		n_for->set_param(2, cp_node(n_self));
+		n_for->set_param(3, b);
 		f->block->add(n_for);
 
 	} else {
@@ -242,10 +242,10 @@ void SyntaxTree::auto_implement_array_clear(Function *f, const Class *t) {
 		b->add(cmd_delete);
 
 		Node *cmd_for = add_node_statement(StatementID::FOR_ARRAY);
-		cmd_for->set_uparam(0, add_node_local(var_el));
-		cmd_for->set_uparam(1, add_node_local(var_i));
-		cmd_for->set_uparam(2, cp_node(self));
-		cmd_for->set_uparam(3, b);
+		cmd_for->set_param(0, add_node_local(var_el));
+		cmd_for->set_param(1, add_node_local(var_i));
+		cmd_for->set_param(2, cp_node(self));
+		cmd_for->set_param(3, b);
 
 		f->block->add(cmd_for);
 	} else if (t->param->needs_destructor()) {
@@ -290,11 +290,11 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 
 		//  [VAR, START, STOP, STEP, BLOCK]
 		Node *cmd_for = add_node_statement(StatementID::FOR_RANGE);
-		cmd_for->set_uparam(0, add_node_local(var));
-		cmd_for->set_uparam(1, cp_node(num));
-		cmd_for->set_uparam(2, cp_node(self_num));
-		cmd_for->set_uparam(3, add_node_const(add_constant_int(1)));
-		cmd_for->set_uparam(4, b);
+		cmd_for->set_param(0, add_node_local(var));
+		cmd_for->set_param(1, cp_node(num));
+		cmd_for->set_param(2, cp_node(self_num));
+		cmd_for->set_param(3, add_node_const(add_constant_int(1)));
+		cmd_for->set_param(4, b);
 		f->block->add(cmd_for);
 
 	} else if (t->param->needs_destructor()) {
@@ -303,7 +303,7 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 
 	// resize
 	Node *c_resize = add_node_member_call(t->get_func("__mem_resize__", TypeVoid, {TypeInt}), cp_node(self));
-	c_resize->set_uparam(1, num);
+	c_resize->set_param(1, num);
 	f->block->add(c_resize);
 
 	// new...
@@ -321,11 +321,11 @@ void SyntaxTree::auto_implement_array_resize(Function *f, const Class *t) {
 
 		//  [VAR, START, STOP, STEP, BLOCK]
 		Node *cmd_for = add_node_statement(StatementID::FOR_RANGE);
-		cmd_for->set_uparam(0, add_node_local(var));
-		cmd_for->set_uparam(1, cp_node(num_old));
-		cmd_for->set_uparam(2, cp_node(self_num));
-		cmd_for->set_uparam(3, add_node_const(add_constant_int(1)));
-		cmd_for->set_uparam(4, b);
+		cmd_for->set_param(0, add_node_local(var));
+		cmd_for->set_param(1, cp_node(num_old));
+		cmd_for->set_param(2, cp_node(self_num));
+		cmd_for->set_param(3, add_node_const(add_constant_int(1)));
+		cmd_for->set_param(4, b);
 		f->block->add(cmd_for);
 
 	} else if (t->param->needs_constructor()) {
@@ -350,15 +350,15 @@ void SyntaxTree::auto_implement_array_remove(Function *f, const Class *t) {
 
 		// __delete__
 		Node *cmd_delete = add_node_member_call(f_del, cmd_el);
-		f->block->uparams.add(cmd_delete);
+		f->block->params.add(cmd_delete);
 	} else if (t->param->needs_destructor()) {
 		do_error_implicit(f, "element destructor missing");
 	}
 
 	// resize
 	Node *c_remove = add_node_member_call(t->get_func("__mem_remove__", TypeVoid, {TypeInt}), self);
-	c_remove->set_uparam(1, index);
-	f->block->uparams.add(c_remove);
+	c_remove->set_param(1, index);
+	f->block->params.add(c_remove);
 }
 
 void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
@@ -376,7 +376,7 @@ void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
 	Node *cmd_1 = add_node_const(add_constant_int(1));
 	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, InlineID::INT_ADD);
 	Node *cmd_resize = add_node_member_call(t->get_func("resize", TypeVoid, {TypeInt}), self);
-	cmd_resize->set_uparam(1, cmd_add);
+	cmd_resize->set_param(1, cmd_add);
 	b->add(cmd_resize);
 
 

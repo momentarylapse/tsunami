@@ -13,6 +13,8 @@
 namespace Kaba{
 
 
+void rec_assign(void *a, void *b, const Class *type);
+
 
 Value::Value() {
 	type = TypeVoid;
@@ -30,13 +32,19 @@ bool Value::can_init(const Class *t) {
 	return false;
 }
 
+int host_size(const Class *_type) {
+	if (_type->is_super_array())
+		return sizeof(DynamicArray);
+	return _type->size;
+}
+
 void Value::init(const Class *_type) {
 	clear();
 	type = _type;
 
 	if (type->is_super_array()) {
 		value.resize(sizeof(DynamicArray));
-		as_array().init(type->param->size);
+		as_array().init(host_size(type->get_array_element()));
 	} else {
 		value.resize(max(type->size, (long long)16));
 	}
@@ -52,14 +60,7 @@ void Value::clear() {
 
 void Value::set(const Value &v) {
 	init(v.type);
-	if (type->is_super_array()) {
-		as_array().simple_resize(v.as_array().num);
-		memcpy(as_array().data, v.as_array().data, as_array().num * type->param->size);
-
-	} else {
-		// plain old data
-		memcpy(p(), v.p(), type->size);
-	}
+	rec_assign(p(), v.p(), type);
 }
 
 void* Value::p() const {
@@ -99,14 +100,10 @@ int map_size_complex(void *p, const Class *type) {
 		return strlen((char*)p) + 1;
 	if (type->is_super_array()) {
 		int size = config.super_array_size;
-		DynamicArray *ar = (DynamicArray*)p;
-		if (type->param->is_super_array()) {
-			for (int i=0; i<ar->num; i++)
-				size += map_size_complex((char*)ar->data + i * ar->element_size, type->param);
-			return size;
-		}
-
-		return config.super_array_size + (ar->num * type->param->size);
+		auto *ar = (DynamicArray*)p;
+		for (int i=0; i<ar->num; i++)
+			size += map_size_complex((char*)ar->data + i * ar->element_size, type->get_array_element());
+		return size;
 	}
 	return type->size;
 }
@@ -117,26 +114,28 @@ int Value::mapping_size() const {
 
 // map directly into <memory>
 // additional data (array ...) into free parts after <locked>
+// direct memory always pre-locked!
 char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const Class *type) {
 	if (type->is_super_array()) {
 		DynamicArray *ar = (DynamicArray*)p;
 
+		auto *el = type->get_array_element();
+
 		int direct_size = config.super_array_size;
-		int indirect_size = ar->element_size * ar->num;
-		if (locked == memory)
-			locked = memory + direct_size;
+		int indirect_size = el->size * ar->num; // target!
 		char *ar_target = locked;
 		locked += indirect_size;
 
 		*(void**)&memory[0] = ar_target + addr_off; // .data
 		*(int*)&memory[config.pointer_size    ] = ar->num;
 		*(int*)&memory[config.pointer_size + 4] = 0; // .reserved
-		*(int*)&memory[config.pointer_size + 8] = ar->element_size;
+		*(int*)&memory[config.pointer_size + 8] = el->size; // target size!
 
 		if (type->param->is_super_array()) {
 			for (int i=0; i<ar->num; i++) {
-				int el_offset = i * ar->element_size;
-				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset, type->param);
+				int el_offset = i * el->size;
+				int el_offset_host = i * ar->element_size;
+				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset_host, type->param);
 			}
 
 		} else {
@@ -159,7 +158,7 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 }
 
 void Value::map_into(char *memory, char *addr) const {
-	map_into_complex(memory, memory, addr - memory, (char*)p(), type);
+	map_into_complex(memory, memory + type->size, addr - memory, (char*)p(), type);
 }
 
 string Value::str() const {

@@ -141,12 +141,12 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex
 			continue;
 
 		// are we in a try block?
-		for (Node *n: b->parent->uparams){
+		for (Node *n: b->parent->params){
 			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)){
-				if (n->uparams[0]->as_block() == b){
+				if (n->params[0]->as_block() == b){
 					if (_verbose_exception_)
 						msg_write("found try block");
-					auto ee = n->uparams[1];
+					auto ee = n->params[1];
 					if (_verbose_exception_)
 						msg_write(ee->type->name);
 					if (!ex_type_match(ex_type, ee->type))
@@ -154,7 +154,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex
 					if (_verbose_exception_)
 						msg_write("match");
 					ebd.except = ee;
-					ebd.except_block = n->uparams[2]->as_block();
+					ebd.except_block = n->params[2]->as_block();
 					return ebd;
 				}
 			}
@@ -318,7 +318,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 			if (_verbose_exception_)
 				msg_write("except_block block: " + p2s(ebd.except_block));
 
-			if (ebd.except->uparams.num > 0){
+			if (ebd.except->params.num > 0){
 				auto v = ebd.except_block->vars[0];
 				void **p = (void**)((int_p)r.rbp + v->_offset);
 				*p = kaba_exception;

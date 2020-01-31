@@ -444,8 +444,9 @@ void Script::link_virtual_functions_into_vtable(const Class *c) {
 	t->link_virtual_table();
 
 	/*if (config.compile_os)*/{
-		for (int i=0; i<t->vtable.num; i++)
+		for (int i=0; i<t->vtable.num; i++) {
 			memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
+		}
 	}
 
 	for (const Class *cc: c->classes)

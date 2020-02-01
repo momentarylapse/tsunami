@@ -47,12 +47,10 @@ void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 void render_midi(Image &im, MidiNoteBuffer &m) {
 	int w = im.width;
 	int h = im.height;
-	Range r = Range(0, m.samples);
-	MidiNoteBufferRef notes = m.get_notes(r);
-	for (MidiNote *n: notes) {
+	for (MidiNote *n: m) {
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
-		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);
-		float x1 = w * clampf((float)n->range.end() / (float)r.length, 0, 1);
+		float x0 = w * clampf((float)n->range.offset / (float)m.samples, 0, 1);
+		float x1 = w * clampf((float)n->range.end() / (float)m.samples, 0, 1);
 		color c = MidiPainter::pitch_color(n->pitch);
 		for (int x=x0; x<=x1; x++)
 			im.set_pixel(x, y, c);
@@ -237,7 +235,10 @@ void SampleManagerConsole::on_create_from_selection() {
 				l->read_buffers_fixed(buf, view->sel.range());
 				song->create_sample_audio("-new-", buf);
 			} else if (l->type == SignalType::MIDI) {
-				song->create_sample_midi("-new-", l->midi.get_notes(view->sel.range()));
+				MidiNoteBuffer buf = l->midi.get_notes(view->sel.range());
+				for (auto *n: buf)
+					n->range.offset -= view->sel.range().offset;
+				song->create_sample_midi("-new-", buf);
 			}
 		}
 }

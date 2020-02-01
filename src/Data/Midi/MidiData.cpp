@@ -352,6 +352,7 @@ MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const {
 
 MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const {
 	MidiNoteBufferRef b;
+	b.samples = r.length;
 	for (MidiNote *n: *this)
 		if (r.overlaps(n->range))
 			b.add(n);

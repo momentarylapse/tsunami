@@ -49,7 +49,7 @@ public:
 		return true;
 	}
 	bool on_left_double_click() override {
-		view->sel = SongSelection::from_range(view->song, view->playback_wish_range).filter(view->sel.layers);
+		view->sel = SongSelection::from_range(view->song, view->playback_wish_range).filter(view->sel.layers());
 		view->update_selection();
 		return true;
 	}

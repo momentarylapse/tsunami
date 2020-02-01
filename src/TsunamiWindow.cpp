@@ -868,7 +868,7 @@ void TsunamiWindow::on_layer_merge() {
 }
 
 void TsunamiWindow::on_layer_mark_selection_dominant() {
-	view->cur_track()->mark_dominant(view->sel.layers, view->sel.range());
+	view->cur_track()->mark_dominant(view->sel.layers(), view->sel.range());
 }
 
 void TsunamiWindow::on_layer_add_selection_dominant() {
@@ -928,9 +928,9 @@ void TsunamiWindow::update_menu() {
 	//Enable("export_selection", true);
 	// bars
 	enable("delete_time", !view->sel.range().empty());
-	enable("bars-delete", view->sel.bars.num > 0);
-	enable("bars-edit", view->sel.bars.num > 0);
-	enable("bars-scale", view->sel.bars.num > 0);
+	enable("bars-delete", view->sel._bars.num > 0);
+	enable("bars-edit", view->sel._bars.num > 0);
+	enable("bars-scale", view->sel._bars.num > 0);
 	// sample
 	enable("sample_from_selection", !view->sel.range().empty());
 	enable("sample-insert", view->sel.num_samples() > 0);
@@ -1126,7 +1126,7 @@ void TsunamiWindow::on_insert_time_interval() {
 }
 
 void TsunamiWindow::on_edit_bars() {
-	if (view->sel.bars.num == 0) {
+	if (view->sel._bars.num == 0) {
 		return;
 	}
 	int num_bars = 0;

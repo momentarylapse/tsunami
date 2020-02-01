@@ -40,15 +40,19 @@ public:
 	SongSelection filter(int mask) const;
 	SongSelection filter(const Array<const TrackLayer*> &layers) const;
 
+	Song *song;
 	Range range_raw;
 	Range range() const;
 
-	Set<const TrackLayer*> layers;
-	Set<const SampleRef*> samples;
-	Set<const TrackMarker*> markers;
-	Set<const MidiNote*> notes;
-	Set<const Bar*> bars;
+	// data, might contain illegal pointers!
+	Set<const TrackLayer*> _layers;
+	Set<const SampleRef*> _samples;
+	Set<const TrackMarker*> _markers;
+	Set<const MidiNote*> _notes;
+	Set<const Bar*> _bars;
+
 	Set<const Track*> tracks() const;
+	Set<const TrackLayer*> layers() const;
 
 	bool has(const Track *t) const;
 

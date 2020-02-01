@@ -759,7 +759,7 @@ void AudioView::force_redraw_part(const rect &r) {
 }
 
 void AudioView::unselect_all_samples() {
-	sel.samples.clear();
+	sel._samples.clear();
 }
 
 void AudioView::update_buffer_zoom() {
@@ -792,10 +792,10 @@ void _try_set_good_cur_layer(AudioView *v) {
 	}
 }
 
-void AudioView::check_consistency()
-{
+void AudioView::check_consistency() {
+
 	// cur_vlayer = null
-	if (!cur_vlayer() and (vlayer.num > 0)){
+	if (!cur_vlayer() and (vlayer.num > 0)) {
 		//msg_error("cur_vlayer = nil");
 		//msg_write(msg_get_trace());
 		//msg_write("  -> setting first");
@@ -803,7 +803,7 @@ void AudioView::check_consistency()
 	}
 
 	// cur_vlayer illegal?
-	if (cur_vlayer() and (vlayer.find(cur_vlayer()) < 0)){
+	if (cur_vlayer() and (vlayer.find(cur_vlayer()) < 0)) {
 		//msg_error("cur_vlayer illegal...");
 		//msg_write(msg_get_trace());
 		_try_set_good_cur_layer(this);
@@ -1681,14 +1681,14 @@ void AudioView::toggle_object() {
 
 bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
 	bool had_sel = sel.has(l->layer);
-	sel.layers.clear();
+	sel._layers.clear();
 	sel.add(l->layer);
 	return had_sel;
 }
 
 bool AudioView::exclusively_select_track(AudioViewTrack *t) {
 	bool had_sel = sel.has(t->track);
-	sel.layers.clear();
+	sel._layers.clear();
 	for (auto *l: t->track->layers)
 		sel.add(l);
 	return had_sel;

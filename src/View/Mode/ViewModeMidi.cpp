@@ -883,7 +883,7 @@ SongSelection ViewModeMidi::get_select_in_edit_cursor() {
 	Range r = get_edit_range();
 	auto s = SongSelection::from_range(view->song, r).filter({view->cur_layer()}).filter(SongSelection::Mask::MIDI_NOTES);
 	auto mode = cur_vlayer()->midi_mode();
-	auto notes = s.notes;
+	auto notes = s._notes;
 	if (mode == MidiMode::TAB) {
 		for (auto *n: notes)
 			if (n->stringno != string_no)
@@ -898,7 +898,7 @@ SongSelection ViewModeMidi::get_select_in_edit_cursor() {
 }
 
 void ViewModeMidi::select_in_edit_cursor() {
-	view->sel.notes = get_select_in_edit_cursor().notes;
+	view->sel._notes = get_select_in_edit_cursor()._notes;
 	view->update_selection();
 }
 

@@ -79,8 +79,8 @@ public:
 			string s = view->song->get_time_str_long(l);
 			if (l < 1000)
 				s += format(_(" (%d samples)"), l);
-			if (view->sel.bars.num > 0)
-				s = format(_("%d bars"), view->sel.bars.num) + ", " + s;
+			if (view->sel._bars.num > 0)
+				s = format(_("%d bars"), view->sel._bars.num) + ", " + s;
 			view->draw_cursor_hover(c, s);
 		}
 	}
@@ -387,7 +387,7 @@ HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer, float mx, floa
 }
 
 SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
-	return SongSelection::from_range(song, r).filter(view->sel.layers);
+	return SongSelection::from_range(song, r).filter(view->sel.layers());
 }
 
 SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, int y1) {

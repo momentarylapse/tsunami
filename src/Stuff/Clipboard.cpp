@@ -231,9 +231,9 @@ bool Clipboard::has_data() {
 bool Clipboard::can_copy(AudioView *view) {
 	if (!view->sel.range().empty())
 		return true;
-	if (view->sel.notes.num > 0)
+	if (view->sel._notes.num > 0)
 		return true;
-	//if (view->sel.samples.num > 0)
+	//if (view->sel._samples.num > 0)
 	//	return true;
 	return false;
 }

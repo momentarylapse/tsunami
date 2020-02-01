@@ -255,6 +255,9 @@ void ViewModeMidi::on_start() {
 			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 	});
 	sb->update(EDIT_PITCH_SHOW_COUNT, 128);
+
+	if (!song->time_track())
+		session->q(_("Midi editing is far easier with a metronome track. Do you want to add one?"), {"track-add-beats:" + _("yes")});
 }
 
 void ViewModeMidi::on_end() {

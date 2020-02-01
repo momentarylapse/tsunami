@@ -19,11 +19,11 @@ TrackMarker* get_part(Song* s, int offset)
 class PPPanel extends ConfigPanel
 	Looper* looper
 	
-	void __init__(Looper *_l)
-		super.__init__(_l)
+	void __init__(Looper l)
+		super.__init__(l)
 		from_source("
 Button forward 'Forward' expandx expandy")
-		looper = _l
+		looper = &l
 
 		event("forward", on_forward)
 	
@@ -51,7 +51,7 @@ class Looper extends TsunamiPlugin
 		CancelRunner(runner)
 			
 	override ConfigPanel* create_panel()
-		return new PPPanel(&self)
+		return new PPPanel(self)
 	
 	void on_leave_part()
 		print("leaving " + cur_part.text)

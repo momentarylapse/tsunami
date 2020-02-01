@@ -809,7 +809,7 @@ void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
 
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	auto xxx = c->clip();
-	c->set_clip(area);
+	c->set_clip(area and c->area());
 	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);

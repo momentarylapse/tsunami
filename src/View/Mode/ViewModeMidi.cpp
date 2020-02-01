@@ -781,7 +781,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 
 	// editing rect
 	auto xxx = c->clip();
-	c->set_clip(l->area);
+	c->set_clip(l->area and view->song_area());
 	c->set_color(view->colors.text_soft1);
 	c->set_fill(false);
 	if (mode == MidiMode::TAB) {

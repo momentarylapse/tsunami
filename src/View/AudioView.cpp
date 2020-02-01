@@ -713,12 +713,6 @@ void AudioView::on_command(const string &id) {
 	if (id == "cursor-jump-end")
 		set_cursor_pos(song->range_with_time().end());
 
-	// zoom
-	if (id == "zoom-in")
-		cam.zoom(exp(  ZoomSpeed), mx);
-	if (id == "zoom-out")
-		cam.zoom(exp(- ZoomSpeed), mx);
-
 	// vertical zoom
 	if (id == "vertical-zoom-in")
 		zoom_y(cam.scale_y * 1.2f);
@@ -1294,11 +1288,11 @@ void AudioView::set_midi_view_mode(MidiMode mode) {
 }
 
 void AudioView::zoom_in() {
-	cam.zoom(2.0f, mx);
+	cam.zoom(exp( ZoomSpeed), mx);
 }
 
 void AudioView::zoom_out() {
-	cam.zoom(0.5f, mx);
+	cam.zoom(exp(-ZoomSpeed), mx);
 }
 
 void AudioView::select_all() {

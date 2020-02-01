@@ -198,12 +198,13 @@ void SampleManagerConsole::on_auto_delete() {
 }
 
 void SampleManagerConsole::on_import() {
-	if (session->storage->ask_open_import(win)) {
-		AudioBuffer buf;
-		session->storage->load_buffer(&buf, hui::Filename);
-		song->create_sample_audio(hui::Filename.basename(), buf);
-		//setInt("sample_list", items.num - 1);
-	}
+	if (!session->storage->ask_open_import(win))
+		return;
+	AudioBuffer buf;
+	if (!session->storage->load_buffer(&buf, hui::Filename))
+		return;
+	song->create_sample_audio(hui::Filename.basename(), buf);
+	//setInt("sample_list", items.num - 1);
 }
 
 void SampleManagerConsole::on_export() {

@@ -50,11 +50,11 @@ FormatDescriptorOgg::FormatDescriptorOgg() :
 
 
 int oe_write_page(ogg_page *page, FILE *fp) {
-    int written;
-    written = fwrite(page->header,1,page->header_len, fp);
-    written += fwrite(page->body,1,page->body_len, fp);
+	int written;
+	written = fwrite(page->header,1,page->header_len, fp);
+	written += fwrite(page->body,1,page->body_len, fp);
 
-    return written;
+	return written;
 }
 
 
@@ -157,32 +157,32 @@ void FormatOgg::save_via_renderer(StorageOperationData *od) {
 			nn = 0;
 		}
 
-        while (vorbis_analysis_blockout(&vd, &vb) == 1) {
+		while (vorbis_analysis_blockout(&vd, &vb) == 1) {
 
-            vorbis_analysis(&vb, nullptr);
-            vorbis_bitrate_addblock(&vb);
+			vorbis_analysis(&vb, nullptr);
+			vorbis_bitrate_addblock(&vb);
 
-            while (vorbis_bitrate_flushpacket(&vd, &op)) {
-                ogg_stream_packetin(&os, &op);
+			while (vorbis_bitrate_flushpacket(&vd, &op)) {
+				ogg_stream_packetin(&os, &op);
 
 				//eos = 0;
-                while (!eos) {
-                    int result = ogg_stream_pageout(&os, &og);
-                    if (!result)
+				while (!eos) {
+					int result = ogg_stream_pageout(&os, &og);
+					if (!result)
 						break;
 
-                    int ret = oe_write_page(&og, f);
-                    if (ret != og.header_len + og.body_len) {
-                        od->error("failed writing data to output stream");
-                        ret = 1;
-                        return;
-                    }
+					int ret = oe_write_page(&og, f);
+					if (ret != og.header_len + og.body_len) {
+						od->error("failed writing data to output stream");
+						ret = 1;
+						return;
+					}
 
-                    if (ogg_page_eos(&og))
-                        eos = 1;
-                }
-            }
-        }
+					if (ogg_page_eos(&og))
+						eos = 1;
+				}
+			}
+		}
 	}
 
 	ogg_stream_flush(&os, &og);
@@ -221,7 +221,7 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		if (offset > 0)
 			t->song->tags.add(Tag(tag_from_vorbis(s.head(offset)), s.substr(offset + 1, -1)));
 		++ptr;
-    }
+	}
 
 	int samples = (int)ov_pcm_total(&vf, -1);
 	if (od->only_load_metadata) {
@@ -238,7 +238,6 @@ void FormatOgg::load_track(StorageOperationData *od) {
 	while (true) {
 
 		int chunk_read = 0;
-		bool error = false;
 		while (true) {
 			int toread = CHUNK_SIZE - chunk_read;
 			int r = ov_read(&vf, &data[chunk_read], toread, 0, 2, 1, &current_section); // 0,2,1 = little endian, 16bit, signed
@@ -248,7 +247,6 @@ void FormatOgg::load_track(StorageOperationData *od) {
 				break;
 			} else if (r < 0) {
 				od->error("ov_read failed");
-				error = true;
 				break;
 			}
 			chunk_read += r;
@@ -256,7 +254,7 @@ void FormatOgg::load_track(StorageOperationData *od) {
 				break;
 		}
 
-		if ((error) or (chunk_read == 0))
+		if ((od->errors_encountered) or (chunk_read == 0))
 			break;
 
 		int bytes_per_sample = 2 * channels;

@@ -34,6 +34,7 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	renderer = nullptr;
 	num_samples = 0;
 	only_load_metadata = false;
+	errors_encountered = false;
 }
 
 StorageOperationData::~StorageOperationData() {
@@ -57,6 +58,7 @@ void StorageOperationData::warn(const string& message) {
 
 void StorageOperationData::error(const string& message) {
 	session->e(filename + ": " + message);
+	errors_encountered = true;
 }
 
 void StorageOperationData::set(float t) {

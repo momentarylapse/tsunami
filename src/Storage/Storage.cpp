@@ -102,7 +102,7 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	delete f;
-	return true;
+	return !od.errors_encountered;
 }
 
 bool Storage::load(Song *song, const string &filename) {
@@ -133,7 +133,7 @@ bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) 
 	od.song->end_action_group();
 
 	delete f;
-	return true;
+	return !od.errors_encountered;
 }
 
 bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
@@ -180,7 +180,7 @@ bool Storage::save(Song *song, const string &filename) {
 		session->win->update_menu();
 
 	delete f;
-	return true;
+	return !od.errors_encountered;
 }
 
 bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags) {
@@ -201,7 +201,7 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
 	delete f;
-	return true;
+	return !od.errors_encountered;
 }
 
 bool Storage::render_export_selection(Song *song, SongSelection *sel, const string &filename) {

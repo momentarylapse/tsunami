@@ -66,6 +66,7 @@ public:
 	Array<Tag> tags;
 	int num_samples;
 	int offset;
+	bool errors_encountered;
 	
 	Map<string, string> parameters;
 

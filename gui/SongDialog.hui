@@ -14,12 +14,7 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 					.
 					CheckBox compress "Compression" "tooltip=when saving"
 		Group ad_t_tags "Tags"
-			Grid ? ""
-				ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
-				---|
-				Grid ? ""
-					Button tag-add "Add" flat image=hui:add
-					Button tag-delete "Delete" flat image=hui:delete
+			ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_samples "Samples" link

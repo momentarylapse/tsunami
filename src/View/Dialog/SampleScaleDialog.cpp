@@ -32,12 +32,7 @@ SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
 	event("hui:close", [=]{ on_close(); });
 }
 
-SampleScaleDialog::~SampleScaleDialog()
-{
-}
-
-void SampleScaleDialog::update(int mode)
-{
+void SampleScaleDialog::update(int mode) {
 	float factor = (float)new_size / (float)sample->buf->length;
 	float new_rate = (float)sample->owner->sample_rate * factor;
 	float orig_rate_inv = (float)sample->owner->sample_rate / factor;
@@ -51,32 +46,27 @@ void SampleScaleDialog::update(int mode)
 		set_float("factor", factor * 100.0f);
 }
 
-void SampleScaleDialog::on_samples()
-{
+void SampleScaleDialog::on_samples() {
 	new_size = get_int("");
 	update(0);
 }
 
-void SampleScaleDialog::on_sample_rate()
-{
+void SampleScaleDialog::on_sample_rate() {
 	new_size = (double)sample->buf->length * (double)get_int("") / (double)sample->owner->sample_rate;
 	update(1);
 }
 
-void SampleScaleDialog::on_sample_rate_inv()
-{
+void SampleScaleDialog::on_sample_rate_inv() {
 	new_size = (double)sample->buf->length / (double)get_int("") * (double)sample->owner->sample_rate;
 	update(2);
 }
 
-void SampleScaleDialog::on_factor()
-{
+void SampleScaleDialog::on_factor() {
 	new_size = sample->buf->length * get_float("") / 100.0f;
 	update(3);
 }
 
-void SampleScaleDialog::on_ok()
-{
+void SampleScaleDialog::on_ok() {
 	auto method = BufferInterpolator::Method::LINEAR;
 	if (get_int("method") == 1)
 		method = BufferInterpolator::Method::CUBIC;
@@ -93,8 +83,7 @@ void SampleScaleDialog::on_ok()
 	destroy();
 }
 
-void SampleScaleDialog::on_close()
-{
+void SampleScaleDialog::on_close() {
 	destroy();
 }
 

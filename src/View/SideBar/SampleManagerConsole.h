@@ -27,7 +27,6 @@ public:
 
 	void update_list();
 
-	void on_list_select();
 	void on_list_edit();
 	void on_list_right_click();
 	void on_import();

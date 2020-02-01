@@ -72,23 +72,25 @@ string render_sample(Sample *s, AudioView *view) {
 
 class SampleManagerItem : public VirtualBase {
 public:
-	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *view) {
+	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *_view) {
 		manager = _manager;
 		s = _s;
+		view = _view;
 		icon = render_sample(s, view);
-		s->subscribe(this, [=]{ on_update(); });
+		s->subscribe(this, [=]{ on_delete(); }, s->MESSAGE_DELETE);
+		s->subscribe(this, [=]{ on_update(); }, s->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SampleManagerItem() {
 		zombify();
 	}
+	void on_delete() {
+		manager->remove(this);
+	}
 	void on_update() {
-		//msg_write("item:  " + message);
-		if (s->cur_message() == s->MESSAGE_DELETE) {
-			manager->remove(this);
-		} else {
-			int n = manager->get_index(s);
-			if (n >= 0)
-				manager->change_string(manager->id_list, n, str());
+		int n = manager->get_index(s);
+		if (n >= 0) {
+			icon = render_sample(s, view);
+			manager->change_string(manager->id_list, n, str());
 		}
 	}
 
@@ -109,6 +111,7 @@ public:
 	string icon;
 	Sample *s;
 	SampleManagerConsole *manager;
+	AudioView *view;
 };
 
 SampleManagerConsole::SampleManagerConsole(Session *session) :
@@ -128,7 +131,6 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 	event("sample-preview", [=]{ on_preview(); });
 	event("sample-paste", [=]{ on_insert(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
-	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
 	event("sample-list", [=]{ on_preview(); });
 
@@ -163,18 +165,6 @@ void SampleManagerConsole::update_list() {
 	for (Sample *s: song->samples)
 		if (get_index(s) < 0)
 			add(new SampleManagerItem(this, s, view));
-
-	on_list_select();
-}
-
-void SampleManagerConsole::on_list_select() {
-	auto sel = get_selected();
-
-	enable("sample-export", sel.num == 1);
-	enable("sample-preview", sel.num == 1);
-	enable("sample-delete", sel.num > 0);
-	enable("sample-paste", sel.num == 1);
-	enable("sample-scale", sel.num == 1);
 }
 
 void SampleManagerConsole::on_list_edit() {
@@ -213,7 +203,6 @@ void SampleManagerConsole::on_import() {
 		session->storage->load_buffer(&buf, hui::Filename);
 		song->create_sample_audio(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
-		on_list_select();
 	}
 }
 
@@ -277,7 +266,7 @@ void SampleManagerConsole::on_scale() {
 			continue;
 		auto *dlg = new SampleScaleDialog(parent->win, s);
 		dlg->run();
-		delete(dlg);
+		delete dlg;
 	}
 }
 

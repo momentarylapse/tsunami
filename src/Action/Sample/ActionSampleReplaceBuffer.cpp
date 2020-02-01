@@ -20,6 +20,7 @@ ActionSampleReplaceBuffer::~ActionSampleReplaceBuffer() {
 
 void* ActionSampleReplaceBuffer::execute(Data* d) {
 	std::swap(sample->buf, buf);
+	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 	return sample;
 }
 

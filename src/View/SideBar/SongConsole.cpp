@@ -45,11 +45,10 @@ SongConsole::SongConsole(Session *session) :
 	event("samplerate", [=]{ on_samplerate(); });
 	event("format", [=]{ on_format(); });
 	event("compress", [=]{ on_compression(); });
-	event_x("tags", "hui:select", [=]{ on_tags_select(); });
 	event_x("tags", "hui:change", [=]{ on_tags_edit(); });
 	event_x("tags", "hui:right-button-down", [=]{ on_tags_right_click(); });
-	event("tag-add", [=]{ on_add_tag(); });
-	event("tag-delete", [=]{ on_delete_tag(); });
+	event("tag-add", [=]{ on_tag_add(); });
+	event("tag-delete", [=]{ on_tag_delete(); });
 
 	event("edit_samples", [=]{ on_edit_samples(); });
 
@@ -98,11 +97,6 @@ void SongConsole::on_compression() {
 	song->set_compression(is_checked("") ? 1 : 0);
 }
 
-void SongConsole::on_tags_select() {
-	int s = get_int("tags");
-	enable("delete_tag", s >= 0);
-}
-
 void SongConsole::on_tags_edit() {
 	int r = hui::GetEvent()->row;
 	if (r < 0)
@@ -116,16 +110,16 @@ void SongConsole::on_tags_edit() {
 }
 
 void SongConsole::on_tags_right_click() {
-	int n = hui::GetEvent()->column;
+	int n = hui::GetEvent()->row;
 	menu_tags->enable("tag-delete", n >= 0);
 	menu_tags->open_popup(this);
 }
 
-void SongConsole::on_add_tag() {
+void SongConsole::on_tag_add() {
 	song->add_tag("key", "value");
 }
 
-void SongConsole::on_delete_tag() {
+void SongConsole::on_tag_delete() {
 	int s = get_int("tags");
 	if (s >= 0)
 		song->delete_tag(s);

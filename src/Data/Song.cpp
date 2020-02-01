@@ -54,8 +54,7 @@ int get_track_index(Track *t) {
 	return -1;
 }
 
-Song::Exception::Exception(const string &_message) {
-	message = _message;
+Song::Error::Error(const string &_message) : Exception(_message) {
 }
 
 Song::Song(Session *session, int _sample_rate) :
@@ -261,7 +260,7 @@ Track *Song::add_track(SignalType type, int index) {
 	if (type == SignalType::BEATS) {
 		// force single time track
 		if (time_track())
-			throw Exception(_("There already is one rhythm track."));
+			throw Error(_("There already is one rhythm track."));
 	}
 	if (index < 0)
 		index = tracks.num;
@@ -297,15 +296,15 @@ void Song::delete_selected_samples(const SongSelection &sel) {
 
 void Song::deleteLayer(int index) {
 	if (layers.num < 2)
-		throw Exception(_("At least one layer has to exist."));
+		throw Error(_("At least one layer has to exist."));
 	execute(new ActionLayerDelete(index));
 }
 
 void Song::mergeLayers(int source, int target) {
 	if (layers.num < 2)
-		throw Exception(_("At least one layer has to exist."));
+		throw Error(_("At least one layer has to exist."));
 	if (source == target)
-		throw Exception(_("Can't merge a layer with itself."));
+		throw Error(_("Can't merge a layer with itself."));
 	execute(new ActionLayerMerge(source, target));
 }
 
@@ -319,7 +318,7 @@ void Song::renameLayer(int index, const string &name) {
 
 void Song::delete_track(Track *track) {
 	if (tracks.num < 2)
-		throw Exception(_("At least one layer has to exist."));
+		throw Error(_("At least one layer has to exist."));
 	execute(new ActionTrackDelete(track));
 }
 
@@ -341,7 +340,7 @@ void Song::add_sample(Sample *sample) {
 
 void Song::delete_sample(Sample *s) {
 	if (s->ref_count > 0)
-		throw Exception(_("Can only delete samples which are unused."));
+		throw Error(_("Can not delete a sample that is in use."));
 	execute(new ActionSampleDelete(s));
 }
 

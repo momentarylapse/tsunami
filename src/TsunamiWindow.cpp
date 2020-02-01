@@ -357,8 +357,8 @@ void TsunamiWindow::on_add_time_track() {
 		b.set_bpm(90, song->sample_rate);
 		for (int i=0; i<10; i++)
 			song->add_bar(-1, b, false);
-	} catch (Song::Exception &e) {
-		session->e(e.message);
+	} catch (Exception &e) {
+		session->e(e.message());
 	}
 	song->end_action_group();
 }
@@ -438,8 +438,8 @@ void TsunamiWindow::on_delete_track() {
 	if (view->cur_track()) {
 		try {
 			song->delete_track(view->cur_track());
-		} catch (Song::Exception &e) {
-			session->e(e.message);
+		} catch (Exception &e) {
+			session->e(e.message());
 		}
 	} else {
 		session->e(_("No track selected"));

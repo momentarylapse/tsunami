@@ -256,8 +256,13 @@ void SampleManagerConsole::on_delete() {
 	auto sel = get_selected();
 
 	song->action_manager->group_begin();
-	for (Sample* s: sel)
-		song->delete_sample(s);
+	for (Sample* s: sel) {
+		try {
+			song->delete_sample(s);
+		} catch (Exception &e) {
+			session->e(e.message());
+		}
+	}
 	song->action_manager->group_end();
 
 	// hui bug

@@ -70,10 +70,9 @@ public:
 
 
 
-	class Exception {
+	class Error : public Exception {
 	public:
-		explicit Exception(const string &message);
-		string message;
+		explicit Error(const string &message);
 	};
 
 

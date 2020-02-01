@@ -181,13 +181,13 @@ const char *get_gtk_icon_name(const string image)
 	return "";
 }
 
-HuiImage *get_image(const string &filename)
-{
+HuiImage *get_image(const string &filename) {
 	for (HuiImage &m: _all_images_)
 		if (m.filename == filename)
 			return &m;
-	HuiImage img = {0, filename};
-	_all_images_.add(img);
+	if (filename != "")
+		msg_error("hui.get_image(): missing image: " + filename);
+	_all_images_.add({0, filename, new Image(16, 16, Red), nullptr});
 	return &_all_images_.back();
 }
 
@@ -227,8 +227,13 @@ void *get_gtk_image_pixbuf(const string &image)
 		if (img->type == 0){
 		}else if (img->type == 1){
 #ifdef _X_USE_IMAGE_
-			return gdk_pixbuf_new_from_data((guchar*)img->image.data.data, GDK_COLORSPACE_RGB, true, 8, img->image.width, img->image.height, img->image.width * 4, nullptr, nullptr);
+			if (!img->pix_buf) {
+				img->pix_buf = gdk_pixbuf_new_from_data((guchar*)img->image->data.data, GDK_COLORSPACE_RGB, true, 8, img->image->width, img->image->height, img->image->width * 4, nullptr, nullptr);
+				for (int i=0; i<1000; i++)
+					g_object_ref(GDK_PIXBUF(img->pix_buf));
+			}
 #endif
+			return img->pix_buf;
 		}
 	}
 	return nullptr;

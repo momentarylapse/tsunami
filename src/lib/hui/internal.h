@@ -22,11 +22,11 @@ extern int allow_signal_level;
 
 
 // images
-struct HuiImage
-{
+struct HuiImage {
 	int type;
 	string filename;
-	Image image;
+	Image *image;
+	void *pix_buf;
 };
 extern Array<HuiImage> _all_images_;
 

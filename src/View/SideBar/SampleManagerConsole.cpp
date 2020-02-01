@@ -39,7 +39,7 @@ void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 		int i1 = (b.length * (x + 1)) / w;
 		for (int i=i0; i<i1; i++)
 			m = max(m, (float)fabs(b.c[0][i]));
-		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
+		for (int y=h*(1-m)/2; y<=h*(1+m)/2; y++)
 			im.set_pixel(x, y, view->colors.text);
 	}
 }
@@ -61,7 +61,7 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 
 string render_sample(Sample *s, AudioView *view) {
 	Image im;
-	im.create(120, 32, color(0, 0, 0, 0));
+	im.create(120, 36, color(0, 0, 0, 0));
 	if (s->type == SignalType::AUDIO)
 		render_bufbox(im, *s->buf, view);
 	else if (s->type == SignalType::MIDI)
@@ -436,12 +436,13 @@ public:
 	}
 
 	void on_import() {
-		if (session->storage->ask_open_import(win)) {
-			AudioBuffer buf;
-			session->storage->load_buffer(&buf, hui::Filename);
-			song->create_sample_audio(hui::Filename.basename(), buf);
-			fill_list();
-		}
+		if (!session->storage->ask_open_import(win))
+			return;
+		AudioBuffer buf;
+		if (!session->storage->load_buffer(&buf, hui::Filename))
+			return;
+		song->create_sample_audio(hui::Filename.basename(), buf);
+		fill_list();
 
 	}
 

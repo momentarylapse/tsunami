@@ -188,31 +188,39 @@ string SetImage(const Image *image, const string &user_name) {
 	HuiImage *img = nullptr;
 	if (user_name != "") {
 		if (user_name.head(6) != "image:") {
-			msg_error("hui.SetImage: name must begin with 'image:'");
+			msg_error("hui.SetImage(): name must begin with 'image:'");
 			return "";
 		}
 		for (int i=0;i<_all_images_.num;i++)
 			if (_all_images_[i].filename == user_name) {
 				img = &_all_images_[i];
+				g_object_unref(GDK_PIXBUF(img->pix_buf));
+				img->pix_buf = nullptr;
 			}
 	}
 	if (!img) {
 		HuiImage _img;
 		_img.type = 1;
 		_img.filename = format("image:%d", _current_image_no_ ++);
+		_img.pix_buf = nullptr;
 		if (user_name != "")
 			_img.filename = user_name;
 		_all_images_.add(_img);
 		img = &_all_images_.back();
 	}
-	img->image = *image;
+	img->image = new Image();
+	*img->image = *image;
 	return img->filename;
 }
 
 void DeleteImage(const string &name) {
 	for (int i=0;i<_all_images_.num;i++)
-		if (_all_images_[i].filename == name)
+		if (_all_images_[i].filename == name) {
+			if (_all_images_[i].pix_buf)
+				g_object_unref(GDK_PIXBUF(_all_images_[i].pix_buf));
+			delete _all_images_[i].image;
 			_all_images_.erase(i);
+		}
 }
 
 

@@ -395,6 +395,7 @@ sources = [
 	'src/Storage/Storage.cpp',
 	'src/Storage/StorageOperationData.cpp',
 	'src/Stuff/BackupManager.cpp',
+	'src/Stuff/CLIParser.cpp',
 	'src/Stuff/Clipboard.cpp',
 	'src/Stuff/Log.cpp',
 	'src/Stuff/Observable.cpp',

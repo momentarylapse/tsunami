@@ -19,6 +19,7 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
+#include "Stuff/CLIParser.h"
 #include "Stuff/PerformanceMonitor.h"
 #include "Stuff/BackupManager.h"
 #include "Plugins/PluginManager.h"
@@ -84,12 +85,8 @@ bool Tsunami::on_startup(const Array<string> &_arg) {
 
 	clipboard = new Clipboard;
 
-	Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
-	Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
-
 	device_manager = new DeviceManager(Session::GLOBAL);
 	Session::GLOBAL->device_manager = device_manager;
-	device_manager->init();
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
@@ -97,135 +94,117 @@ bool Tsunami::on_startup(const Array<string> &_arg) {
 
 	plugin_manager->link_app_script_data();
 
-	if (handle_arguments(arg))
+	if (!handle_arguments(arg))
 		return false;
-
-	// ok, full window mode
-
-	BackupManager::check_old_files(Session::GLOBAL);
-
-
-	// create a window and load file
-	if (sessions.num == 0) {
-		Session *session = create_session();
-		session->song->add_track(SignalType::AUDIO_MONO);
-
-		// default tags
-		session->song->add_tag("title", _("New Audio File"));
-		session->song->add_tag("album", AppName);
-		session->song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
-		session->song->reset_history();
-
-		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
-		session->win->show();
-	}
 
 	return true;
 }
 
 bool Tsunami::handle_arguments(Array<string> &args) {
-	if (args.num < 2)
-		return false;
 	Session *session = Session::GLOBAL;
 
-	for (int i=1; i<args.num; i++) {
+	string chain_file;
+	string plugin_file;
+	bool allow_window = false;
 
-	if (args[i] == "--help") {
-		session->i(AppName + " " + AppVersion);
-		session->i("--help");
-		session->i("--info <FILE>");
-		session->i("--export <FILE-IN> <FILE-OUT>");
-		session->i("--execute <PLUGIN-NAME> [ARGUMENTS]");
-		session->i("--chain <SIGNAL-CHAIN-FILE>");
-#ifndef NDEBUG
-		session->i("--preview-fx <FX>");
-		session->i("--run-tests <FILTER>");
-#endif
-		return true;
-	} else if (args[i] == "--info") {
+	CLIParser p;
+	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
+	p.option("--slow", [&]{ ugly_hack_slow = true; });
+	p.option("--plugin", "FILE", [&](const string &a){ plugin_file = a; });
+
+
+	p.mode("", {"[FILE]"}, [&](const Array<string> &a){
+		session = create_session();
+
+		Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
+		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
+		device_manager->init();
+
+		session->win->show();
+		if (a.num > 0) {
+			session->storage->load(session->song, a[0]);
+		} else {
+			// new file
+			session->song->add_track(SignalType::AUDIO_MONO);
+
+			// default tags
+			session->song->add_tag("title", _("New Audio File"));
+			session->song->add_tag("album", AppName);
+			session->song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
+			session->song->reset_history();
+
+			session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
+		}
+		BackupManager::check_old_files(Session::GLOBAL);
+		allow_window = true;
+	});
+	p.mode("--help", {}, [&](const Array<string> &){
+		p.show();
+	});
+	p.mode("--info", {"FILE1", "..."}, [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (args.num < i+2){
-			session->e(_("call: tsunami --info <FILE>"));
-		} else if (session->storage->load_ex(song, args[i+1], true)) {
-			msg_write(format("sample-rate: %d", song->sample_rate));
-			msg_write(format("samples: %d", song->range().length));
-			msg_write("length: " + song->get_time_str(song->range().length));
-			msg_write(format("tracks: %d", song->tracks.num));
-			int n = 0;
-			for (Track *t: song->tracks)
-				for (TrackLayer *l: t->layers)
-					n += l->samples.num;
-			msg_write(format("refs: %d / %d", n, song->samples.num));
-			for (Tag &t: song->tags)
-				msg_write("tag: " + t.key + " = " + t.value);
+		for (string &filename: a) {
+			if (session->storage->load_ex(song, filename, true)) {
+				msg_write(format("sample-rate: %d", song->sample_rate));
+				msg_write(format("samples: %d", song->range().length));
+				msg_write("length: " + song->get_time_str(song->range().length));
+				msg_write(format("tracks: %d", song->tracks.num));
+				int n = 0;
+				for (Track *t: song->tracks)
+					for (TrackLayer *l: t->layers)
+						n += l->samples.num;
+				msg_write(format("refs: %d / %d", n, song->samples.num));
+				for (Tag &t: song->tags)
+					msg_write("tag: " + t.key + " = " + t.value);
+			}
 		}
 		delete song;
-		return true;
-	} else if (args[i] == "--export") {
+	});
+	p.mode("--export", {"FILE_IN", "FILE_OUT"}, [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (args.num < i + 3) {
-			session->e(_("call: tsunami --export <FILE-IN> <FILE-OUT>"));
-		} else if (session->storage->load(song, args[i+1])) {
-			session->storage->save(song, args[i+2]);
+		if (session->storage->load(song, a[0])) {
+			session->storage->save(song, a[1]);
 		}
 		delete song;
-		return true;
-	} else if (args[1] == "--execute") {
-		if (args.num < i + 2) {
-			session->e(_("call: tsunami --execute <PLUGIN-NAME> [ARGUMENTS]"));
-			return true;
-		}
+	});
+	p.mode("--execute", {"PLUGIN"}, [&](const Array<string> &a){
 		if (session == Session::GLOBAL)
 			session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
-		session->execute_tsunami_plugin(args[i+1]);
-		i ++;
-		//return false;
-	} else if (args[i] == "--chain") {
-		if (args.num < i + 2) {
-			session->e(_("call: tsunami --chain <SIGNAL-CHAIN>"));
-			return true;
-		}
-		if (session == Session::GLOBAL)
-			session = create_session();
-		//session->add_signal_chain(args[i+1]);
-		session->win->show();
-		i ++;
-	} else if (args[i] == "--slow") {
-		ugly_hack_slow = true;
+		session->execute_tsunami_plugin(a[0]);
+	});
 #ifndef NDEBUG
-	} else if (args[i] == "--run-tests") {
-		if (args.num > i + 1)
-			UnitTest::run_all(args[i+1]);
-		else
-			UnitTest::print_all_names();
-		return true;
-	} else if (args[i] == "--preview-fx") {
-		if (args.num < i + 2) {
-			session->e(_("call: tsunami --preview-fx <FX>"));
-			return true;
-		}
+	p.mode("--list-tests", {}, [&](const Array<string> &){
+		UnitTest::print_all_names();
+	});
+	p.mode("--run-tests", {"FILTER"}, [&](const Array<string> &a){
+		UnitTest::run_all(a[0]);
+	});
+	p.mode("--preview-fx", {"FX"}, [&](const Array<string> &a){
 		if (session == Session::GLOBAL)
 			session = create_session();
 		session->win->hide();
-		auto *fx = CreateAudioEffect(session, args[i+1]);
+		auto *fx = CreateAudioEffect(session, a[0]);
 		configure_module(session->win, fx);
-		return true;
+		allow_window = true;
+	});
 #endif
-	} else if (args[i].head(2) == "--") {
-		session->e(_("unknown command: ") + args[i]);
-		return true;
-	} else {
-		if (session == Session::GLOBAL)
-			session = create_session();
-		session->win->show();
-		session->storage->load(session->song, args[i]);
-	}
-	}
-	return false;
+	p.parse(args);
+
+
+
+	if (plugin_file != "")
+		session->execute_tsunami_plugin(plugin_file);
+
+
+	if (chain_file != "")
+		SignalChain::load(session, chain_file);
+
+
+	return allow_window;
 }
 
 Session* Tsunami::create_session() {

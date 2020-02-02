@@ -11,7 +11,7 @@ class VolumeChecker extends SongPlugin
 		
 		Range range = song.range()
 		AudioBuffer buf
-		renderer.set_range(range, false)
+		renderer.set_range(range)
 		
 		buf.resize(1024*16)
 		

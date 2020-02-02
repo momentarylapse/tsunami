@@ -84,7 +84,7 @@ class CueSplitter extends TsunamiPlugin
 				end = fend
 				print(end)
 			print("  {{offset}} : {{end}}")
-			r.set_range(RangeTo(offset, end), false)
+			r.set_range(RangeTo(offset, end))
 			string _fn = i+1
 			if _fn.num < 2
 				_fn = "0" + _fn

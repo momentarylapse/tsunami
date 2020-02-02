@@ -171,6 +171,8 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Session.w", &Session::w);
 	Kaba::link_external_class_func("Session.e", &Session::e);
 	Kaba::link_external_class_func("Session.add_signal_chain", &Session::add_signal_chain);
+	Kaba::link_external_class_func("Session.create_signal_chain", &Session::create_signal_chain);
+	Kaba::link_external_class_func("Session.load_signal_chain", &Session::load_signal_chain);
 	Kaba::link_external_class_func("Session.create_child", &Session::create_child);
 
 

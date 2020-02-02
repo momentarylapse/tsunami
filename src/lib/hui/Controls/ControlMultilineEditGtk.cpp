@@ -12,8 +12,8 @@
 namespace hui
 {
 
-gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
-gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
 void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:change");	}
@@ -86,8 +86,8 @@ void ControlMultilineEdit::__set_option(const string &op, const string &value)
 		g_object_get(G_OBJECT(widget), "events", &mask, nullptr);
 		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
 		g_object_set(G_OBJECT(widget), "events", mask, nullptr);
-		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
-		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
+		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
+		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 	}
 	if (op == "monospace"){
 #if GTK_CHECK_VERSION(3,16,0)

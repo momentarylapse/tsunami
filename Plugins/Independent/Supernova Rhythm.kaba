@@ -79,7 +79,7 @@ class SupernovaRhythm extends TsunamiPlugin
 		midi.add(new MidiNote(RangeTo(dt, dt*3), 60, 1.0))
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
 		
-		chain = session.add_signal_chain("supernova.recorder")
+		chain = session.create_signal_chain("supernova.recorder")
 		let i = chain.add(Module.STREAM, "AudioInput")
 		let p = chain.add(Module.PITCH_DETECTOR, "Test")
 		#let x = chain.add(Module.AUDIO_EFFECT, "Chunksize")

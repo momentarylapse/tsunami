@@ -185,19 +185,30 @@ bool Session::in_mode(const string &m) {
 	return mode == m;
 }
 
-SignalChain* Session::add_signal_chain(const string& name) {
-	auto *chain = new SignalChain(this, name);
+void Session::add_signal_chain(SignalChain *chain) {
 	all_signal_chains.add(chain);
 	notify(MESSAGE_ADD_SIGNAL_CHAIN);
 	chain->subscribe(this, [=]{
 		_remove_signal_chain(chain);
 	}, chain->MESSAGE_DELETE);
+}
+
+SignalChain* Session::create_signal_chain(const string& name) {
+	auto *chain = new SignalChain(this, name);
+	add_signal_chain(chain);
 	return chain;
 }
 
-SignalChain* Session::add_signal_chain_system(const string& name) {
-	auto *chain = add_signal_chain(name);
+SignalChain* Session::create_signal_chain_system(const string& name) {
+	auto *chain = new SignalChain(this, name);
 	chain->belongs_to_system = true;
+	add_signal_chain(chain);
+	return chain;
+}
+
+SignalChain* Session::load_signal_chain(const string& filename) {
+	auto *chain = SignalChain::load(this, filename);
+	add_signal_chain(chain);
 	return chain;
 }
 

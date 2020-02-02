@@ -131,7 +131,7 @@ private:
 MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	session = s;
 	source = new MidiPreviewSource;
-	chain = session->add_signal_chain_system("midi-preview");
+	chain = session->create_signal_chain_system("midi-preview");
 	chain->_add(source);
 	joiner = chain->add(ModuleType::PLUMBING, "MidiJoiner");
 	recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");

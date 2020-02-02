@@ -51,8 +51,10 @@ public:
 	string storage_options;
 
 	Array<SignalChain*> all_signal_chains;
-	SignalChain* add_signal_chain(const string &name);
-	SignalChain* add_signal_chain_system(const string &name);
+	void add_signal_chain(SignalChain *chain);
+	SignalChain* create_signal_chain(const string &name);
+	SignalChain* create_signal_chain_system(const string &name);
+	SignalChain* load_signal_chain(const string &filename);
 	void _remove_signal_chain(SignalChain *chain);
 
 	Array<TsunamiPlugin*> plugins;

@@ -64,7 +64,7 @@ void CaptureConsoleModeAudio::enter() {
 		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
 			set_target(t);
 
-	chain = session->add_signal_chain_system("capture");
+	chain = session->create_signal_chain_system("capture");
 
 	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->subscribe(this, [=]{ update_device_list(); });

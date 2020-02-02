@@ -25,6 +25,8 @@ public:
 	~ControlDrawingArea();
 	void make_current();
 
+	void __set_option(const string &op, const string &value) override;
+
 	void *cur_cairo;
 	bool is_opengl;
 

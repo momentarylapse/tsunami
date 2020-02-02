@@ -545,15 +545,13 @@ void SignalEditor::add_chain(SignalChain *c) {
 }
 
 void SignalEditor::on_new() {
-	session->add_signal_chain("new");
-	//add_chain();
+	session->create_signal_chain("new");
 }
 
 void SignalEditor::on_load() {
 	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
 		session->storage->current_chain_directory = hui::Filename.dirname();
-		auto *c = SignalChain::load(session, hui::Filename);
-		add_chain(c);
+		session->load_signal_chain(hui::Filename);
 	}
 }
 

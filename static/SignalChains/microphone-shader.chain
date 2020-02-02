@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>new</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>Shader</class>
+			<position>
+				<x>95</x>
+				<y>75</y>
+			</position>
+		</module>
+		<module>
+			<category>Stream</category>
+			<class>AudioInput</class>
+			<position>
+				<x>55</x>
+				<y>11</y>
+			</position>
+			<config>(())</config>
+		</module>
+		<module>
+			<category>Plumbing</category>
+			<class>AudioSucker</class>
+			<position>
+				<x>163</x>
+				<y>187</y>
+			</position>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="1" port="0" />
+			<target id="0" port="0" />
+		</cable>
+		<cable>
+			<source id="0" port="0" />
+			<target id="2" port="0" />
+		</cable>
+	</cables>
+</chain>

@@ -136,8 +136,8 @@ void mout(matrix &m)
 
 void Init(const string &api, int width, int height)
 {
-	if (Usable)
-		return;
+	//if (Usable)
+	//	return;
 
 	msg_write("Nix");
 	msg_right();
@@ -192,8 +192,10 @@ void Init(const string &api, int width, int height)
 
 void Kill()
 {
+	msg_write("nix.kill");
 	KillDeviceObjects();
 	glDeleteVertexArrays(1, &VertexArrayID);
+	Usable = false;
 }
 
 // erlaubt dem Device einen Neustart

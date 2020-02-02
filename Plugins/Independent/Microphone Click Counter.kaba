@@ -71,7 +71,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	
 	override void on_start()
 		panel = nil
-		chain = session.add_signal_chain("click-counter")
+		chain = session.create_signal_chain("click-counter")
 		let input = chain.add(Module.STREAM, "AudioInput")
 		click_counter = chain.add(Module.AUDIO_EFFECT, "ClickCounter")
 		let sucker = chain.add(Module.PLUMBING, "AudioSucker")

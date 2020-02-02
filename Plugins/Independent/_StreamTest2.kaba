@@ -10,7 +10,7 @@ class _StreamTest extends TsunamiPlugin
 	bool acc
 	override void on_start()
 	
-		chain = session.add_signal_chain("test")
+		chain = session.create_signal_chain("test")
 		input = chain.add(Module.STREAM, "AudioInput")
 		recorder = chain.add(Module.PLUMBING, "AudioRecorder")
 		Module* sucker = chain.add(Module.PLUMBING, "AudioSucker")
@@ -19,7 +19,7 @@ class _StreamTest extends TsunamiPlugin
 		
 		nn = 0
 		acc = false
-		runner = RunRepeated(0.1, &self, on_tick)
+		runner = RunRepeated(0.1, self, on_tick)
 		
 		chain.start()
 

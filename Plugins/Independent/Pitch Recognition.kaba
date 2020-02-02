@@ -68,7 +68,7 @@ class PitchRecognition extends TsunamiPlugin
 	
 	override void on_start()
 		panel = nil
-		chain = session.add_signal_chain("pitch-recognition")
+		chain = session.create_signal_chain("pitch-recognition")
 		let input = chain.add(Module.STREAM, "AudioInput")
 		pitch_detector = chain.add(Module.PITCH_DETECTOR, "")
 		let out = chain.add(Module.PLUMBING, "MidiSucker")

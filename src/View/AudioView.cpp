@@ -215,7 +215,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	draw_runner_id = -1;
 
 
-	signal_chain = session->add_signal_chain_system("playback");
+	signal_chain = session->create_signal_chain_system("playback");
 	renderer = (SongRenderer*)signal_chain->add(ModuleType::AUDIO_SOURCE, "SongRenderer");
 	peak_meter = (PeakMeter*)signal_chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	output_stream = (AudioOutput*)signal_chain->add(ModuleType::STREAM, "AudioOutput");

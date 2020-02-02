@@ -55,7 +55,7 @@ class Looper extends TsunamiPlugin
 		length = 0
 		mode = 0
 		song = session.song
-		chain = session.add_signal_chain("click-counter")
+		chain = session.create_signal_chain("click-counter")
 		let input = chain.add(Module.STREAM, "AudioInput")
 		recorder = chain.add(Module.PLUMBING, "AudioRecorder")
 		let sucker = chain.add(Module.PLUMBING, "AudioSucker")

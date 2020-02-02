@@ -183,6 +183,7 @@ void SIAddPackageNix()
 	add_func("NixStart", TypeBool, nix_p(&nix::Start), FLAG_STATIC);
 	add_func("NixEnd", TypeVoid, nix_p(&nix::End), FLAG_STATIC);
 	//add_func("NixKillWindows", TypeVoid, nix_p(&nix::KillWindows), FLAG_STATIC);
+	add_func("NixKill", TypeVoid, nix_p(&nix::Kill), FLAG_STATIC);
 	add_func("NixResetToColor", TypeVoid, nix_p(&nix::ResetToColor), FLAG_STATIC);
 		func_add_param("c", TypeColor);
 	add_func("NixSetWorldMatrix", TypeVoid, nix_p(&nix::SetWorldMatrix), FLAG_STATIC);

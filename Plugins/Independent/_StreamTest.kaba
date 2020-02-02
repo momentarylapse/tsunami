@@ -9,7 +9,7 @@ class _StreamTest extends TsunamiPlugin
 	int runner
 	override void on_start()
 	
-		chain = session.add_signal_chain("test")
+		chain = session.create_signal_chain("test")
 		source = chain.add(Module.AUDIO_SOURCE, "Silence")
 		out = chain.add(Module.STREAM, "AudioOutput")
 		chain.connect(source, 0, out, 0)

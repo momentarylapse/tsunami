@@ -33,8 +33,7 @@ static Set<ControlDrawingArea*> _recently_deleted_areas;
 
 
 
-gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
+gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	//std::lock_guard<std::mutex> lock(da->mutex);
@@ -49,35 +48,41 @@ gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	return false;
 }
 
-gboolean OnGtkGLAreaRender(GtkGLArea *area, GdkGLContext *context)
-{
-	//glClearColor(0, 0, 1, 0);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//printf("render...\n");
+gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data) {
+	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	GtkAllocation a;
 	gtk_widget_get_allocation(GTK_WIDGET(area), &a);
-	NixGlArea->panel->win->input.row = a.height;
-	NixGlArea->panel->win->input.column = a.width;
+	da->panel->win->input.row = a.height;
+	da->panel->win->input.column = a.width;
 
 
 	gtk_gl_context = context;
-	NixGlArea->notify("hui:draw-gl");
+	da->notify("hui:draw-gl");
 	return false;
 }
 
-void OnGtkGLAreaRealize(GtkGLArea *area)
-{
-	//printf("realize...\n");
+void on_gtk_gl_area_realize(GtkGLArea *area, gpointer user_data) {
+	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
+
 	gtk_gl_area_make_current(area);
 	if (gtk_gl_area_get_error(area) != nullptr){
 		printf("realize: gl area make current error...\n");
 		return;
 	}
-	//glClearColor(0, 0, 1, 0);
-	//glClear(GL_COLOR_BUFFER_BIT);
 
-	NixGlArea->notify("hui:realize-gl");
+	da->notify("hui:realize");
+}
+
+void on_gtk_gl_area_unrealize(GtkGLArea *area, gpointer user_data) {
+	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
+
+	gtk_gl_area_make_current(area);
+	if (gtk_gl_area_get_error(area) != nullptr){
+		printf("unrealize: gl area make current error...\n");
+		return;
+	}
+	da->notify("hui:unrealize");
 }
 
 /*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
@@ -102,7 +107,7 @@ void win_set_input(Window *win, T *event) {
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
 	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
 	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
-	if (win->input.lb || win->input.mb || win->input.rb) {
+	if (win->input.lb or win->input.mb or win->input.rb) {
 		win->input.inside_smart = true;
 	} else {
 		win->input.inside_smart = win->input.inside;
@@ -122,11 +127,10 @@ void win_set_input_more(Window *win, T *event) {
 	}
 }
 
-gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
-{
+gboolean on_gtk_area_mouse_move(GtkWidget *widget, GdkEventMotion *event, gpointer user_data) {
 	// ignore if SetCursorPosition() was used...
-	if (GtkAreaMouseSet >= 0){
-		if ((fabs(event->x - GtkAreaMouseSetX) > 2.0f) || (fabs(event->y - GtkAreaMouseSetY) > 2.0f)){
+	if (GtkAreaMouseSet >= 0) {
+		if ((fabs(event->x - GtkAreaMouseSetX) > 2.0f) or (fabs(event->y - GtkAreaMouseSetY) > 2.0f)) {
 			GtkAreaMouseSet --;
 			//msg_write(format("ignore fail %.0f\t%0.f", event->x, event->y));
 			return false;
@@ -155,8 +159,7 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 	return false;
 }
 
-gboolean OnGtkAreaMouseEnter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
-{
+gboolean on_gtk_area_mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 
@@ -164,16 +167,14 @@ gboolean OnGtkAreaMouseEnter(GtkWidget *widget, GdkEventCrossing *event, gpointe
 	return false;
 }
 
-gboolean OnGtkAreaMouseLeave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
-{
+gboolean on_gtk_area_mouse_leave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	c->notify("hui:mouse-leave", false);
 	return false;
 }
 
-gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
-{
+gboolean on_gtk_area_button(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	win_set_input_more(c->panel->win, event);
@@ -193,7 +194,7 @@ gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 	else
 		msg += "-button-up";
 
-	if (!gtk_widget_has_focus(widget)){
+	if (!gtk_widget_has_focus(widget)) {
 		gtk_widget_grab_focus(widget);
 		c->panel->win->input.just_focused = true;
 	}
@@ -201,27 +202,25 @@ gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 	return false;
 }
 
-gboolean OnGtkAreaFocusIn(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
-{
+gboolean on_gtk_area_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	c->notify("hui:focus-in", false);
 	return false;
 }
 
-gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
-{
+gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data) {
 	Control *c = reinterpret_cast<Control*>(user_data);
-	if (c->panel->win){
-		if (event->direction == GDK_SCROLL_UP)
+	if (c->panel->win) {
+		if (event->direction == GDK_SCROLL_UP) {
 			c->panel->win->input.scroll_y = 1;
-		else if (event->direction == GDK_SCROLL_DOWN)
+		} else if (event->direction == GDK_SCROLL_DOWN) {
 			c->panel->win->input.scroll_y = -1;
-		else if (event->direction == GDK_SCROLL_LEFT)
+		} else if (event->direction == GDK_SCROLL_LEFT) {
 			c->panel->win->input.scroll_x = -1;
-		else if (event->direction == GDK_SCROLL_RIGHT)
+		} else if (event->direction == GDK_SCROLL_RIGHT) {
 			c->panel->win->input.scroll_x = -1;
-		else if (event->direction == GDK_SCROLL_SMOOTH){
+		} else if (event->direction == GDK_SCROLL_SMOOTH) {
 			c->panel->win->input.scroll_x = (float)event->delta_x;
 			c->panel->win->input.scroll_y = (float)event->delta_y;
 		}
@@ -230,8 +229,7 @@ gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer 
 	return false;
 }
 
-void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
-{
+void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code) {
 	// convert hardware keycode into GDK keyvalue
 	GdkKeymapKey kmk;
 	kmk.keycode = event->hardware_keycode;
@@ -246,7 +244,7 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
 	// convert GDK keyvalue into HUI key id
 	key = -1;
 	for (int i=0;i<NUM_KEYS;i++)
-		//if ((HuiKeyID[i] == keyvalue)||(HuiKeyID2[i] == keyvalue))
+		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
 		if (HuiKeyID[i] == keyvalue)
 			key = i;
 	key_code = key;
@@ -259,12 +257,11 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
 		key_code += KEY_CONTROL;
 	if ((event->state & GDK_SHIFT_MASK) > 0)
 		key_code += KEY_SHIFT;
-	if (((event->state & GDK_MOD1_MASK) > 0) /*|| ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)*/)
+	if (((event->state & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)
 		key_code += KEY_ALT;
 }
 
-bool area_process_key(GdkEventKey *event, Control *c, bool down)
-{
+bool area_process_key(GdkEventKey *event, Control *c, bool down) {
 	int key, key_code;
 	_get_hui_key_id_(event, key, key_code);
 	if (key < 0)
@@ -273,7 +270,7 @@ bool area_process_key(GdkEventKey *event, Control *c, bool down)
 	//c->win->input.key_code = key;
 	c->panel->win->input.key[key] = down;
 
-	if (down){
+	if (down) {
 		c->panel->win->input.key_code = key_code;
 	}
 
@@ -285,13 +282,11 @@ bool area_process_key(GdkEventKey *event, Control *c, bool down)
 
 
 
-gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
-{
+gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
 	return area_process_key(event, (Control*)user_data, true);
 }
 
-gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
-{
+gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
 	return area_process_key(event, (Control*)user_data, false);
 }
 
@@ -305,28 +300,29 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	// FIXME: this needs to be supplied as title... fromSource() won't work...
 	is_opengl = (OptionString.find("opengl") >= 0);
 	GtkWidget *da;
-	if (is_opengl){
+	if (is_opengl) {
 		NixGlArea = this;
 		da = gtk_gl_area_new();
 		gtk_gl_area_set_has_stencil_buffer(GTK_GL_AREA(da), true);
 		gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(da), true);
 		gtk_gl_area_attach_buffers(GTK_GL_AREA(da));
-		g_signal_connect(G_OBJECT(da), "realize", G_CALLBACK(OnGtkGLAreaRealize), this);
-		g_signal_connect(G_OBJECT(da), "render", G_CALLBACK(OnGtkGLAreaRender), this);
-	}else{
+		g_signal_connect(G_OBJECT(da), "realize", G_CALLBACK(on_gtk_gl_area_realize), this);
+		g_signal_connect(G_OBJECT(da), "unrealize", G_CALLBACK(on_gtk_gl_area_unrealize), this);
+		g_signal_connect(G_OBJECT(da), "render", G_CALLBACK(on_gtk_gl_area_render), this);
+	} else {
 		da = gtk_drawing_area_new();
-		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
+		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(on_gtk_area_draw), this);
 	}
-	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
-	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
+	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
+	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
-	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&OnGtkAreaMouseMove), this);
-	g_signal_connect(G_OBJECT(da), "enter-notify-event", G_CALLBACK(&OnGtkAreaMouseEnter), this);
-	g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(&OnGtkAreaMouseLeave), this);
-	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButton), this);
-	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButton), this);
-	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&OnGtkAreaMouseWheel), this);
-//	g_signal_connect(G_OBJECT(da), "focus-in-event", G_CALLBACK(&OnGtkAreaFocusIn), this);
+	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&on_gtk_area_mouse_move), this);
+	g_signal_connect(G_OBJECT(da), "enter-notify-event", G_CALLBACK(&on_gtk_area_mouse_enter), this);
+	g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(&on_gtk_area_mouse_leave), this);
+	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&on_gtk_area_button), this);
+	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&on_gtk_area_button), this);
+	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&on_gtk_area_mouse_wheel), this);
+//	g_signal_connect(G_OBJECT(da), "focus-in-event", G_CALLBACK(&on_gtk_area_focus_in), this);
 	//int mask;
 	//g_object_get(G_OBJECT(da), "events", &mask, NULL);
 	gtk_widget_add_events(da, GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
@@ -346,8 +342,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	cur_cairo = nullptr;
 }
 
-ControlDrawingArea::~ControlDrawingArea()
-{
+ControlDrawingArea::~ControlDrawingArea() {
 	_recently_deleted_areas.add(this);
 
 #if STUPID_HACK
@@ -358,14 +353,18 @@ ControlDrawingArea::~ControlDrawingArea()
 	hui::RunLater(10, [=]{ _recently_deleted_areas.erase(this); });
 }
 
-void ControlDrawingArea::make_current()
-{
+void ControlDrawingArea::make_current() {
 	if (is_opengl)
 		gtk_gl_area_make_current(GTK_GL_AREA(widget));
 }
 
-static bool __drawing_area_queue_redraw(void *p)
-{
+void ControlDrawingArea::__set_option(const string &op, const string &value) {
+	if (op == "makecurrentgl") {
+		make_current();
+	}
+}
+
+static bool __drawing_area_queue_redraw(void *p) {
 	gtk_widget_queue_draw(GTK_WIDGET(p));
 	return false;
 }

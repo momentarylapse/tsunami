@@ -615,7 +615,8 @@ class Session extends Object
 	#PluginManager* plugin_manager
 	
 	extern Session* create_child()
-	extern SignalChain* add_signal_chain(string name)
+	extern SignalChain* create_signal_chain(string name)
+	extern SignalChain* load_signal_chain(string filename)
 
 	# logging
 	extern void i(string msg)

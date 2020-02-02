@@ -34,7 +34,7 @@ void CaptureConsoleModeMulti::enter() {
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
-	chain = session->add_signal_chain_system("capture-multi");
+	chain = session->create_signal_chain_system("capture-multi");
 
 	Array<CaptureTrackData> data;
 

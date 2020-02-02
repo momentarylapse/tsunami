@@ -32,7 +32,7 @@ class MidiLivePlayback extends TsunamiPlugin
 	Synthesizer* synth
 	SignalChain* chain
 	override void on_start()
-		chain = session.add_signal_chain("midi-live")
+		chain = session.create_signal_chain("midi-live")
 		m_in = chain.add(Module.STREAM, "MidiInput")
 		m_out = chain.add(Module.STREAM, "AudioOutput")
 		synth = chain.add(Module.SYNTHESIZER, "")

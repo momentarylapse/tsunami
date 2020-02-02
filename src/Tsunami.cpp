@@ -111,6 +111,7 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
 	p.option("--slow", [&]{ ugly_hack_slow = true; });
 	p.option("--plugin", "FILE", [&](const string &a){ plugin_file = a; });
+	p.option("--chain", "FILE", [&](const string &a){ chain_file = a; });
 
 
 	p.mode("", {"[FILE]"}, [&](const Array<string> &a){
@@ -209,7 +210,7 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 
 
 	if (chain_file != "")
-		SignalChain::load(session, chain_file);
+		session->add_signal_chain(SignalChain::load(session, chain_file));
 
 
 	return allow_window;

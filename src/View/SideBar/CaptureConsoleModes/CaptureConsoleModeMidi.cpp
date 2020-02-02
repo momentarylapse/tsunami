@@ -56,7 +56,7 @@ void CaptureConsoleModeMidi::set_target(const Track *t) {
 void CaptureConsoleModeMidi::enter() {
 	cc->hide_control("single_grid", false);
 
-	chain = session->add_signal_chain_system("capture");
+	chain = session->create_signal_chain_system("capture");
 
 
 	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");

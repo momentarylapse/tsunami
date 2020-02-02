@@ -337,7 +337,7 @@ void SampleManagerConsole::on_preview() {
 		end_preview();
 	int sel = get_int(id_list);
 	preview.sample = items[sel]->s;
-	preview.chain = session->add_signal_chain_system("sample-preview");
+	preview.chain = session->create_signal_chain_system("sample-preview");
 	if (preview.sample->type == SignalType::AUDIO) {
 		preview.renderer = new BufferStreamer(preview.sample->buf);
 		preview.chain->_add(preview.renderer);

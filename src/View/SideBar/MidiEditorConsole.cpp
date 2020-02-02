@@ -76,16 +76,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
 	event("edit_song", [=]{ on_edit_song(); });
 
-	view->subscribe(this, [=]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [=]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
-	view->mode_midi->subscribe(this, [=]{ on_settings_change(); });
-	update();
 }
 
 MidiEditorConsole::~MidiEditorConsole() {
 	clear();
-	view->mode_midi->unsubscribe(this);
-	view->unsubscribe(this);
 }
 
 void MidiEditorConsole::update() {
@@ -265,10 +259,17 @@ void MidiEditorConsole::clear() {
 
 void MidiEditorConsole::on_enter() {
 	session->device_manager->subscribe(this, [=]{ update_input_device_list(); });
+	view->subscribe(this, [=]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [=]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
+	view->mode_midi->subscribe(this, [=]{ on_settings_change(); });
+	set_layer(view->cur_layer());
 }
 
 void MidiEditorConsole::on_leave() {
+	clear();
 	session->device_manager->unsubscribe(this);
+	view->mode_midi->unsubscribe(this);
+	view->unsubscribe(this);
 }
 
 void MidiEditorConsole::set_layer(TrackLayer *l) {
@@ -276,6 +277,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 
 	layer = l;
 	if (layer) {
+
 		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
 
 		/*auto v = view->get_layer(layer);
@@ -283,6 +285,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 			setSelection("reference_tracks", v->reference_tracks);*/
 
 		int strings = layer->track->instrument.string_pitch.num;
+
 		enable("apply_string", strings > 0);
 		enable("string_no", strings > 0);
 		set_options("string_no", format("range=1:%d", strings));

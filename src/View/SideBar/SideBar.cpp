@@ -70,6 +70,8 @@ SideBar::SideBar(Session *_session) {
 }
 
 SideBar::~SideBar() {
+	if ((visible) and (active_console >= 0))
+		consoles[active_console]->on_leave();
 }
 
 void SideBar::add_console(SideBarConsole *c) {

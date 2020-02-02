@@ -14,8 +14,7 @@ class TrackLayer;
 class Device;
 enum class MidiMode;
 
-class MidiEditorConsole : public SideBarConsole
-{
+class MidiEditorConsole : public SideBarConsole {
 public:
 	MidiEditorConsole(Session *session);
 	virtual ~MidiEditorConsole();

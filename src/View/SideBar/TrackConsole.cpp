@@ -55,9 +55,6 @@ TrackConsole::TrackConsole(Session *session) :
 	for (auto &i: instruments)
 		set_string("instrument", i.name());
 
-	load_data();
-	view->subscribe(this, [=]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
-
 	event("name", [=]{ on_name(); });
 	event("volume", [=]{ on_volume(); });
 	event("panning", [=]{ on_panning(); });
@@ -73,11 +70,17 @@ TrackConsole::TrackConsole(Session *session) :
 }
 
 TrackConsole::~TrackConsole() {
+}
+
+
+void TrackConsole::on_enter() {
+	set_track(view->cur_track());
+	view->subscribe(this, [=]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+
+}
+void TrackConsole::on_leave() {
 	view->unsubscribe(this);
-	if (track)
-		track->unsubscribe(this);
-	if (panel)
-		delete panel;
+	set_track(nullptr);
 }
 
 bool track_wants_synth(const Track *t) {

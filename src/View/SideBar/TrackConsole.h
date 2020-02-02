@@ -14,11 +14,13 @@ class Track;
 class Slider;
 class ModulePanel;
 
-class TrackConsole: public SideBarConsole
-{
+class TrackConsole: public SideBarConsole {
 public:
 	TrackConsole(Session *session);
 	virtual ~TrackConsole();
+
+	void on_enter() override;
+	void on_leave() override;
 
 	void load_data();
 	void update_strings();

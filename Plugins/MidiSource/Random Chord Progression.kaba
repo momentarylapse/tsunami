@@ -1,0 +1,57 @@
+use "../api.kaba"
+
+#const string AUTO_CONFIG_PITCH = "0:127:1:1:"
+
+
+#class Config extends Module.Config
+#	override void reset()
+
+const int[] AAA = [60, 62, 64, 65, 67, 69, 71]
+
+class Morse extends MidiSource
+	#Config config
+	int[] chord
+	
+	override void reset_state()
+		chord = [0, 2, 4]
+	
+	override bool on_produce(MidiProduceData data)
+		for c in chord
+			note(AAA[c], 1.0, 4)
+		skip(4)
+		step_chord()
+		return true
+	
+	bool is_valid_chord(int[] cc)
+		if cc[1] - cc[0] < 2
+			return false
+		if cc[2] - cc[1] < 2
+			return false
+		if cc[1] - cc[0] > 3
+			return false
+		if cc[2] - cc[1] > 3
+			return false
+		return true
+	
+	int overlap(int[] a, int[] b)
+		int n = 0
+		for i in 0:7
+			if i in a and i in b
+				n ++
+		return n
+		
+		
+	int[] random_chord()
+		return sorted([randi(7), randi(7), randi(7)], "")
+	
+	void step_chord()
+		while true
+			let cc = random_chord()
+			if !is_valid_chord(cc)
+				continue
+			if overlap(cc, chord) < 1
+				continue
+			if overlap(cc, chord) == 3
+				continue
+			chord = cc
+			return

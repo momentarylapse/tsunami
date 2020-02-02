@@ -233,11 +233,16 @@ class AudioSource extends Module
 	extern virtual int read(AudioBuffer buf)
 	Module.Port *out
 
+class MidiProduceData
+	Bar* bar
+	int beat_no
+
 class MidiSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	# crappy experimental note api:
+	extern virtual bool on_produce(MidiProduceData data)
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)

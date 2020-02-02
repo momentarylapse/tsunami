@@ -78,17 +78,18 @@ class Config extends Module.Config
 
 class Morse extends MidiSource
 	Config config
-	bool first
+	int pos
 	
 	override void reset_state()
-		first = true
+		pos = 0
 	
-	override int read(MidiEventBuffer midi)
-		if first
-			bh_midi = &midi
-			int[] l = morse(config.text)
-			for ll in l
-				note_x(config.pitch, 1, 0, ll, config.beat_partition)
-				skip_x(0, 1, config.beat_partition)
-			first = false
-		return midi.samples
+	override bool on_produce(MidiProduceData data)
+		if pos >= len(config.text)
+			return false
+		let c = config.text[pos:pos+1]
+		let l = morse(c)
+		for ll in l
+			note_x(config.pitch, 1.0, 0, ll, config.beat_partition)
+			skip_x(0, ll+1, config.beat_partition)
+		pos ++
+		return true

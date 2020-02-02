@@ -13,6 +13,8 @@
 
 class Song;
 
+class MidiProduceData;
+
 class MidiSource : public Module {
 public:
 	MidiSource();
@@ -27,11 +29,14 @@ public:
 		MidiSource *source;
 	};
 
-	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
-	virtual void _cdecl reset(){}
+	virtual int _cdecl read(MidiEventBuffer &midi);
+	virtual void _cdecl reset() {}
+
+	int produce_pos;
+	int read_pos;
+	virtual bool _cdecl on_produce(MidiProduceData &data) { return false; }
 
 
-	int bh_offset;
 	void note(float pitch, float volume, int beats);
 	void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition);
 	void skip(int beats);

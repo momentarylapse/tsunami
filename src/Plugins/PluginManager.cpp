@@ -320,6 +320,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_virtual("MidiSource.__delete__", &MidiSource::__delete__, &msource);
 	Kaba::link_external_virtual("MidiSource.read", &MidiSource::read, &msource);
 	Kaba::link_external_virtual("MidiSource.reset", &MidiSource::reset, &msource);
+	Kaba::link_external_virtual("MidiSource.on_produce", &MidiSource::on_produce, &msource);
 	Kaba::link_external_class_func("MidiSource.note", &MidiSource::note);
 	Kaba::link_external_class_func("MidiSource.skip", &MidiSource::skip);
 	Kaba::link_external_class_func("MidiSource.note_x", &MidiSource::note_x);

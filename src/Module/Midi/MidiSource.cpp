@@ -27,7 +27,8 @@ MidiSource::MidiSource() :
 {
 	port_out.add(new Output(this));
 
-	bh_offset = 0;
+	produce_pos = 0;
+	read_pos = 0;
 	bh_midi = nullptr;
 
 
@@ -50,9 +51,36 @@ void MidiSource::__delete__() {
 	this->MidiSource::~MidiSource();
 }
 
+class MidiProduceData {
+public:
+	Bar *bar;
+	int beat_no;
+};
+
+MidiProduceData create_produce_data(Song *song, int offset) {
+	MidiProduceData data;
+	data.bar = nullptr;
+	data.beat_no = 0;
+	auto bb = song->bars.get_bars(Range(offset, 0));
+	if (bb.num > 0)
+		data.bar = bb[0];
+	return data;
+}
+
+// default: produce()...
+int MidiSource::read(MidiEventBuffer &midi) {
+	bh_midi = &midi;
+	read_pos += midi.samples;
+	while (produce_pos < read_pos) {
+		auto data = create_produce_data(session->song, produce_pos);
+		if (!on_produce(data))
+			return midi.samples;
+	}
+	return midi.samples;
+}
+
 void MidiSource::note(float pitch, float volume, int beats) {
 	note_x(pitch, volume, beats, 0, 1);
-
 }
 
 void MidiSource::skip(int beats) {
@@ -76,14 +104,12 @@ int skip_beats(int pos, Song *song, int beats, int sub_beats, int beat_partition
 void MidiSource::note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition) {
 	if (!bh_midi)
 		return;
-	int pos = skip_beats(bh_offset, session->song, beats, sub_beats, beat_partition);
-	bh_midi->add_note(RangeTo(bh_offset, pos), pitch, volume);
-	bh_offset = pos;
-
+	int end_pos = skip_beats(produce_pos, session->song, beats, sub_beats, beat_partition);
+	bh_midi->add_note(RangeTo(produce_pos, end_pos), pitch, volume);
 }
 
 void MidiSource::skip_x(int beats, int sub_beats, int beat_partition) {
-	bh_offset = skip_beats(bh_offset, session->song, beats, sub_beats, beat_partition);
+	produce_pos = skip_beats(produce_pos, session->song, beats, sub_beats, beat_partition);
 }
 
 

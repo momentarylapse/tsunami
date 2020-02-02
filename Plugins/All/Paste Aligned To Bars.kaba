@@ -44,10 +44,10 @@ class XXX extends SongPlugin
 		return rd.offset + float(x - rs.offset) * float(rd.length) / float(rs.length)
 	
 	void paste_bar(TrackLayer* source, TrackLayer* dest, Range rs, Range rd)
-		print("paste bar..." + str(rs) + " -> " + str(rd))
-		MidiNote*[] midi = source.midi.get_notes(rs)
+		print("paste bar... {{rs}} -> {{rd}}")
+		let midi = source.midi.get_notes(rs)
 		for n in midi
-			MidiNote* c = n.copy()
+			let c = n.copy()
 			c.range = RangeTo(remap(rs, rd, n.range.offset), remap(rs, rd, n.range.end()))
 			dest.add_midi_note(c)
 		

@@ -136,6 +136,13 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_size("Range", sizeof(Range));
 	Kaba::declare_class_element("Range.offset", &Range::offset);
 	Kaba::declare_class_element("Range.length", &Range::length);
+	Kaba::link_external_class_func("Range.__and__", &Range::intersect);
+	Kaba::link_external_class_func("Range.str", &Range::str);
+	Kaba::link_external_class_func("Range.start", &Range::start);
+	Kaba::link_external_class_func("Range.end", &Range::end);
+	Kaba::link_external_class_func("Range.covers", &Range::covers);
+	Kaba::link_external_class_func("Range.overlaps", &Range::overlaps);
+	Kaba::link_external_class_func("Range.is_inside", &Range::is_inside);
 
 	Kaba::declare_class_size("Bar", sizeof(Bar));
 	Kaba::declare_class_element("Bar.beats", &Bar::beats);
@@ -146,6 +153,12 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Bar.offset", &Bar::offset);
 	Kaba::link_external_class_func("Bar.range", &Bar::range);
 	Kaba::link_external_class_func("Bar.bpm", &Bar::bpm);
+
+	Kaba::declare_class_size("BarCollection", sizeof(BarCollection));
+	Kaba::link_external_class_func("BarCollection.get_bars", &BarCollection::get_bars);
+	Kaba::link_external_class_func("BarCollection.get_beats", &BarCollection::get_beats);
+	Kaba::link_external_class_func("BarCollection.get_next_beat", &BarCollection::get_next_beat);
+	Kaba::link_external_class_func("BarCollection.get_prev_beat", &BarCollection::get_prev_beat);
 
 	Kaba::declare_class_size("Session", sizeof(Session));
 	Kaba::declare_class_element("Session.id", &Session::id);
@@ -445,6 +458,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("TrackMarker.fx", &TrackMarker::fx);
 
 	Kaba::declare_class_size("TrackLayer", sizeof(TrackLayer));
+	Kaba::declare_class_element("TrackLayer.type", &TrackLayer::type);
 	Kaba::declare_class_element("TrackLayer.buffers", &TrackLayer::buffers);
 	Kaba::declare_class_element("TrackLayer.midi", &TrackLayer::midi);
 	Kaba::declare_class_element("TrackLayer.samples", &TrackLayer::samples);

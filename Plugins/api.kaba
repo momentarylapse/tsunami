@@ -23,12 +23,15 @@ class Range
 	void __init__(int _offset, int _length)
 		offset = _offset
 		length = _length
-	int end()
-		return offset + length
+	extern int start()
+	extern int end()
 	bool inside(int pos)
 		return pos >= offset and pos < offset + length
-	string str()
-		return "({{offset}}:{{end()}})"
+	extern bool overlaps(Range o)
+	extern bool covers(Range o)
+	extern Range __and__(Range o)
+	extern string str()
+	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
 Range RangeTo(int start, int end)
 	return Range(start, end - start)
@@ -362,6 +365,11 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
+class BarCollection extends Bar*[]
+	extern Bar*[] get_bars(Range r)
+	extern Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
+	extern int get_next_beat(int pos)
+	extern int get_prev_beat(int pos)
 
 class TrackLayer
 	int type
@@ -464,7 +472,7 @@ class Song
 	Track*[] tracks
 	Sample*[] samples
 	
-	Bar*[] bars
+	BarCollection bars
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()

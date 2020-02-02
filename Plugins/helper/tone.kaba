@@ -70,10 +70,30 @@ string pitch_name(int pitch)
 enum
 	CHORD_MAJOR
 	CHORD_MINOR
+	CHORD_DIMINISHED
+
+string chord_type_name(int t)
+	if t == CHORD_MAJOR
+		return "maj"
+	if t == CHORD_MINOR
+		return "min"
+	if t == CHORD_DIMINISHED
+		return "dim"
+	return "???"
 
 class Chord
 	int base_tone
 	int type
+	int[] pitch()
+		if type == CHORD_MAJOR
+			return [base_tone, base_tone + 4, base_tone + 7]
+		if type == CHORD_MINOR
+			return [base_tone, base_tone + 3, base_tone + 7]
+		if type == CHORD_DIMINISHED
+			return [base_tone, base_tone + 3, base_tone + 6]
+		return []
+	string name()
+		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + chord_type_name(type)
 
 Chord[]  ParseChords(string str)
 	Chord[] chords

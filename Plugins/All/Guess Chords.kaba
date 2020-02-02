@@ -1,0 +1,54 @@
+use "../api.kaba"
+use "../helper/tone.kaba"
+
+
+class XXX extends SongPlugin
+	override void apply()
+		if len(song.bars) == 0
+			session.e("song doesn't contain any bars")
+			return
+
+		int n = 0
+		song.begin_action_group()
+		for l in song.layers()
+			if session.view.sel.has_layer(l) and l.type == TYPE_MIDI
+				guess_chords(l, session.view.sel.range())
+				n ++
+		song.end_action_group()
+		if n == 0
+			session.e("no midi track selected")
+
+	void guess_chords(TrackLayer* l, Range r)
+		for b in song.bars.get_bars(r)
+			Range rr = b.range()
+			string chord = guess_chord(l.midi.get_notes(rr), rr)
+			l.add_marker(b.range(), chord)
+	
+	int score_overlap(MidiNote*[] midi, int[] pitch, Range r)
+		int score = 0
+		for n in midi
+			for p in pitch
+				if (int(n.pitch + 0.1) - p + 120) % 12 == 0
+					score += (n.range and r).length
+		return score
+	
+	string guess_chord(MidiNote*[] midi, Range r)
+		Chord best
+		int best_score = 0
+		for p in 0:12
+			for t in 0:3
+				Chord c
+				c.base_tone = 60 + p
+				c.type = t
+				int score = score_overlap(midi, c.pitch(), r)
+				if score > best_score
+					best_score = score
+					best = c
+		return best.name()
+		
+		
+	int first_bar(int offset)
+		for b,i in song.bars
+			if b.offset >= offset -100
+				return i
+		return -1

@@ -7,6 +7,8 @@
 | last update: 2008.11.02 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_TEXTURES_EXISTS_
 #define _NIX_TEXTURES_EXISTS_
 
@@ -98,3 +100,6 @@ extern int tex_cube_level;
 };
 
 #endif
+
+#endif
+

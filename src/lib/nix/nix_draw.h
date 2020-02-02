@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_DRAW_EXISTS_
 #define _NIX_DRAW_EXISTS_
 
@@ -36,5 +38,7 @@ extern float line_width;
 extern bool smooth_lines;
 
 };
+
+#endif
 
 #endif

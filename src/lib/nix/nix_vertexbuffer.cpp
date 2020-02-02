@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #include "nix.h"
 #include "nix_common.h"
 
@@ -168,3 +170,5 @@ void init_vertex_buffers()
 }
 
 };
+
+#endif

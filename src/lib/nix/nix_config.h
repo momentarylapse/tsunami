@@ -6,6 +6,7 @@
 |                                                                              |
 | last update: 2007.11.19 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
+#if HAS_LIB_GL
 
 #ifndef _NIX_CONFIG_EXISTS_
 #define _NIX_CONFIG_EXISTS_
@@ -146,5 +147,7 @@ extern int TextureMaxFramesToLive, MaxVideoTextureSize;
 class VertexBuffer;
 extern VertexBuffer *vb_temp; // vertex buffer for 1-frame geometries
 };
+
+#endif
 
 #endif

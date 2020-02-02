@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_LIGHT_EXISTS_
 #define _NIX_LIGHT_EXISTS_
 
@@ -41,5 +43,7 @@ struct Light
 extern Light lights[8];
 
 };
+
+#endif
 
 #endif

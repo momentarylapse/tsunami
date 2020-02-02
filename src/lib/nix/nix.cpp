@@ -10,6 +10,9 @@
 |                                                                              |
 | last update: 2009.10.03 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
+
+#if HAS_LIB_GL
+
 #include "nix.h"
 
 #include "nix_common.h"
@@ -19,7 +22,7 @@ extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.1.0";
+string version = "0.13.2.0";
 
 
 // libraries (in case Visual C++ is used)
@@ -435,3 +438,5 @@ void EnableFog(bool Enabled)
 
 
 };
+
+#endif

@@ -6,6 +6,7 @@
 |                                                                              |
 | last update: 2008.11.09 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
+#if HAS_LIB_GL
 
 #include "nix.h"
 #include "nix_common.h"
@@ -754,3 +755,4 @@ void Texture::render_to_cube_map(vector &pos,callback_function *render_func,int 
 #endif
 
 };
+#endif

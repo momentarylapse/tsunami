@@ -10,9 +10,11 @@
 |                                                                              |
 | last update: 2008.10.27 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
+
+#if HAS_LIB_GL
+
 #ifndef _NIX_EXISTS_
 #define _NIX_EXISTS_
-
 
 
 #include "../config.h"
@@ -60,5 +62,7 @@ void _cdecl SetOffset(float offset);
 extern rect target_rect;
 
 };
+
+#endif
 
 #endif

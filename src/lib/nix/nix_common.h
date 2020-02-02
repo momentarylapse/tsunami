@@ -4,7 +4,7 @@
 |                                                                              |
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
-
+#if HAS_LIB_GL
 
 #include <stdio.h>
 
@@ -75,3 +75,4 @@ extern Fog fog;
 };
 
 
+#endif

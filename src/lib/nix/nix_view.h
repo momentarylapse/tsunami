@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_VIEW_EXISTS_
 #define _NIX_VIEW_EXISTS_
 
@@ -44,5 +46,7 @@ void _cdecl ScreenShotToImage(Image &image);
 extern float view_jitter_x, view_jitter_y;
 
 };
+
+#endif
 
 #endif

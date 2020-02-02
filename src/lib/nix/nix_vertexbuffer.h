@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_VERTEXBUFFER_EXISTS_
 #define _NIX_VERTEXBUFFER_EXISTS_
 
@@ -45,5 +47,7 @@ void init_vertex_buffers();
 
 };
 
+
+#endif
 
 #endif

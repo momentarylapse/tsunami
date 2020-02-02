@@ -10,7 +10,9 @@
 #define _X_USE_THREADS_
 #define _X_USE_KABA_
 #define _X_USE_ANY_
+#if HAS_LIB_GL
 #define _X_USE_NIX_
+#endif
 
 //#####################################################################
 // Hui-API

@@ -5,6 +5,8 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
+#if HAS_LIB_GL
+
 #ifndef _NIX_SHADER_EXISTS_
 #define _NIX_SHADER_EXISTS_
 
@@ -75,5 +77,7 @@ extern Shader *default_shader_3d;
 extern string shader_dir;
 
 };
+
+#endif
 
 #endif

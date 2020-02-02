@@ -84,6 +84,15 @@ else
 	add_project_arguments('-DHAS_LIB_DL=0', language : ['cpp'])
 endif
 
+# optional dependency: gl
+d = cc.find_library('GL', required : false)
+if d.found()
+	add_project_arguments('-DHAS_LIB_GL=1', language : ['cpp'])
+	deps += [d]
+else
+	add_project_arguments('-DHAS_LIB_GL=0', language : ['cpp'])
+endif
+
 
 sources = [
 	'src/Action/Bar/Action__ScaleData.cpp',
@@ -333,6 +342,13 @@ sources = [
 	'src/lib/math/rect.cpp',
 	'src/lib/math/vector.cpp',
 	'src/lib/net/net.cpp',
+	'src/lib/nix/nix.cpp',
+	'src/lib/nix/nix_draw.cpp',
+	'src/lib/nix/nix_light.cpp',
+	'src/lib/nix/nix_shader.cpp',
+	'src/lib/nix/nix_textures.cpp',
+	'src/lib/nix/nix_vertexbuffer.cpp',
+	'src/lib/nix/nix_view.cpp',
 	'src/lib/threads/Mutex.cpp',
 	'src/lib/threads/Thread.cpp',
 	'src/lib/threads/ThreadedWork.cpp',

@@ -1,0 +1,167 @@
+use hui
+use nix
+use "../api.kaba"
+
+const int NUM_SAMPLES = 2048
+
+class ShaderPanel extends ConfigPanel
+	override ShaderVis* c
+	Shader* s
+	float time
+	Timer timer
+	
+	override void __init__(Module _m)
+		from_source("
+DrawingArea area '' height=200 expandy opengl")
+		
+		c.panel = &self
+		
+		time = 0
+	
+		event_x("area", "hui:draw-gl", on_draw)
+		event_x("area", "hui:realize-gl", on_realize)
+	
+	override void __delete__()
+		c.panel = nil
+		del s
+		
+	void on_realize()
+		NixInit("OpenGL", 800, 600)
+
+
+		string frag = "
+#version 330 core
+uniform float zoom;
+uniform float x0, y0;
+in vec2 fragmentTexCoord;
+out vec4 color;
+void main(){
+	vec2 c = (fragmentTexCoord - vec2(0.5, 0.5)) * zoom + vec2(x0, y0);
+	vec2 z = vec2(0,0);
+	for (int i=0; i<50; i++) {
+		z = vec2(z.x*z.x - z.y*z.y, 2*z.x*z.y) + c; // z = z^2 + c
+	}
+	float l = length(z);
+	float f = 0.0;
+	if (l < 10)
+		f = 1.0;
+	color = vec4(sin(l),cos(l),f,0);
+}"
+
+		frag = "
+#version 330 core
+/*	2D Chladni patterns, see for instance:
+	http://paulbourke.net/geometry/chladni/
+	www.386dx25.de 
+*/
+const float pi = 3.1415926535897932384;
+
+// Edge lengths of the rectunglar plate. Note that in reality only 
+// for the case a=b degenerate eigenmodes appear, leading to the 
+// superimposition as implemented here.
+float a;
+float b = 1.0;
+
+// Chladni eigenmodes
+float chladni( float m, float n, vec2 uv )
+{	
+	// cos()*cos() for modes of a plate fixed at its center
+	// sin()*sin() for modes of a plate fixed at its border (boring)
+	return cos(n*pi*uv.x/a)*cos(m*pi*uv.y/b);
+}
+
+// Eigenfrequencies (not used)
+float omega( float m, float n )
+{
+	const float rho = 1.0;
+	const float eta = 1.0;	
+	return pi * sqrt( (rho/eta) * (m/a)*(m/a) + (n/b)*(n/b) );
+}
+in vec2 fragmentTexCoord;
+out vec4 color;
+
+uniform float iTime;
+
+void main()
+{
+	// Domain [0,1]x[0,1]
+	vec2 uv = fragmentTexCoord.xy; // / iResolution.y;
+	a = 1.; //iResolution.x / iResolution.y;
+	
+	// Knot numbers
+	//vec2 mn = 21.0 * iMouse.xy / iResolution.xy; //vec2(4.0,2.0);
+	vec2 mn = vec2(4.0,2.0);
+	
+	// Superposition coefficients
+	float alpha = iTime;
+	mat2 R = mat2( cos(alpha), sin(alpha), -sin(alpha), cos(alpha) );
+	vec2 c = R * vec2(1.0,-1.0);	
+	//c = vec2(1.0,-1.0); // Default coefficients
+	
+	// Superposition of eigenmodes
+	float u = c.x*chladni(mn.x,mn.y,uv) + c.y*chladni(mn.y,mn.x,uv);
+	
+	// Shift-scale from [-1,+1] to [0,1]		
+	u = (0.5+u/2.0);
+	
+	// Visualize knot lines (i.e. zero-crossings)
+	u = step( abs(u-0.5), 0.05 );
+	
+	color = vec4(u*vec3(1.0),1.0);
+}
+
+"
+
+
+		
+		s = NixCreateShader("
+<VertexShader>
+#version 330 core
+layout(location = 0) in vec3 inPosition;
+layout(location = 2) in vec2 inTexCoord;
+out vec2 fragmentTexCoord;
+void main() {
+	gl_Position = vec4(inPosition,1);
+	fragmentTexCoord = inTexCoord;
+}
+</VertexShader>
+<FragmentShader>
+{{frag}}
+</FragmentShader>
+")
+	
+	void on_draw()
+		time += timer.get()
+		print("draw  {{time}}")
+		NixStart()
+		NixResetToColor(Red)
+		NixSetCull(0)
+		NixSetZ(false, false)
+		NixSetShader(s)
+		s.set_float(s.location("zoom"), 2.0)
+		s.set_float(s.location("x0"), 0.0)
+		s.set_float(s.location("y0"), 0.0)
+		s.set_float(s.location("iTime"), time)
+		NixDraw2D(rect.ID, rect(-1,1, -1,1), 0)
+		NixEnd()
+
+class ShaderVis extends AudioVisualizer
+	int n
+	AudioBuffer buffer
+	ShaderPanel *panel
+	
+	override void __init__()
+		panel = nil
+	
+	override void reset_state()
+		n = 0
+	
+	override void process(AudioBuffer buf)
+		print("proc...")
+		buffer = buf
+		if panel
+			panel.redraw("area")
+		
+	override ConfigPanel* create_panel()
+		return new ShaderPanel(self)
+

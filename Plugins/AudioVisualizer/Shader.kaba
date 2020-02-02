@@ -11,68 +11,9 @@ use "../api.kaba"
 
 const int NUM_SAMPLES = 2048
 
-class ShaderPanel extends ConfigPanel
-	override ShaderVis* c
-	Shader* s
-	float time
-	Timer timer
-	int id_runner
-	
-	override void __init__(Module _m)
-		from_source("
-DrawingArea area '' height=200 expandy opengl")
-		
-		time = 0
-	
-		event_x("area", "hui:draw-gl", on_draw)
-		event_x("area", "hui:realize", on_realize)
-		event_x("area", "hui:unrealize", on_unrealize)
-	
-	override void __delete__()
-		#print("delete")
-		CancelRunner(id_runner)
-		#set_options("area", "make-current-gl")
-		#del s
-		#NixKill()
-	
-	void on_step()
-		redraw("area")
-		
-	void on_unrealize()
-		print("unreal...")
-		#set_options("area", "make-current-gl")
-		#del s
-		#NixKill()
-	
-	void on_realize()
-		NixInit("OpenGL", 800, 600)
 
 
-		string frag = "
-#version 330 core
-uniform float zoom;
-uniform float x0, y0;
-in vec2 fragmentTexCoord;
-out vec4 color;
-void main(){
-	vec2 c = (fragmentTexCoord - vec2(0.5, 0.5)) * zoom + vec2(x0, y0);
-	vec2 z = vec2(0,0);
-	for (int i=0; i<50; i++) {
-		z = vec2(z.x*z.x - z.y*z.y, 2*z.x*z.y) + c; // z = z^2 + c
-	}
-	float l = length(z);
-	float f = 0.0;
-	if (l < 10)
-		f = 1.0;
-	color = vec4(sin(l),cos(l),f,0);
-}"
-
-
-
-
-
-		frag = "
-#version 330 core
+const string[] SOURCE = ["
 /*	2D Chladni patterns, see for instance:
 	http://paulbourke.net/geometry/chladni/
 	www.386dx25.de 
@@ -100,11 +41,6 @@ float omega( float m, float n )
 	const float eta = 1.0;	
 	return pi * sqrt( (rho/eta) * (m/a)*(m/a) + (n/b)*(n/b) );
 }
-in vec2 fragmentTexCoord;
-out vec4 color;
-
-uniform float iTime;
-uniform float iVolume;
 
 void main()
 {
@@ -137,12 +73,324 @@ void main()
 	vec3 base_col = vec3(cos(xx),sin(xx),0.5);
 	color = vec4(u*base_col,1.0);
 }
+", "
 
-"
+// http://www.pouet.net/prod.php?which=57245
+// If you intend to reuse this shader, please add credits to 'Danilo Guanabara'
 
 
+void main() {
+	vec3 c;
+	float t = iTime + iVolume*sin(iTime*36)*0.3;
+	float l,z=t;
+	for(int i=0;i<3;i++) {
+		vec2 uv,p=fragmentTexCoord.xy;
+		uv=p;
+		p-=.5;
+		//p.x*=r.x/r.y;
+		z+=.07;
+		l=length(p);
+		uv+=p/l*(sin(z)+1.)*abs(sin(l*9.-z*2.));
+		c[i]=.01/length(abs(mod(uv,1.)-.5));
+	}
+	color=vec4(c/l,t);
+}", "//afl_ext 2017-2019
+
+#define DRAG_MULT 0.048
+#define ITERATIONS_RAYMARCH 13
+#define ITERATIONS_NORMAL 48
+
+
+vec2 wavedx(vec2 position, vec2 direction, float speed, float frequency, float timeshift) {
+    float x = dot(direction, position) * frequency + timeshift * speed;
+    float wave = exp(sin(x) - 1.0);
+    float dx = wave * cos(x);
+    return vec2(wave, -dx);
+}
+
+float getwaves(vec2 position, int iterations){
+	float iter = 0.0;
+    float phase = 6.0;
+    float speed = 2.0;
+    float weight = 1.0;
+    float w = 0.0;
+    float ws = 0.0;
+    for(int i=0;i<iterations;i++){
+        vec2 p = vec2(sin(iter), cos(iter));
+        vec2 res = wavedx(position, p, speed, phase, iTime);
+        position += normalize(p) * res.y * weight * DRAG_MULT;
+        w += res.x * weight;
+        iter += 12.0;
+        ws += weight;
+        weight = mix(weight, 0.0, 0.2);
+        phase *= 1.18;
+        speed *= 1.07;
+    }
+    return (w / ws)*(0.5 + pow(iVolume,2)*5);
+}
+
+float raymarchwater(vec3 camera, vec3 start, vec3 end, float depth){
+    vec3 pos = start;
+    float h = 0.0;
+    float hupper = depth;
+    float hlower = 0.0;
+    vec2 zer = vec2(0.0);
+    vec3 dir = normalize(end - start);
+    for(int i=0;i<318;i++){
+        h = getwaves(pos.xz * 0.1, ITERATIONS_RAYMARCH) * depth - depth;
+        if(h + 0.01 > pos.y) {
+            return distance(pos, camera);
+        }
+        pos += dir * (pos.y - h);
+    }
+    return -1.0;
+}
+
+float H = 0.0;
+vec3 normal(vec2 pos, float e, float depth){
+    vec2 ex = vec2(e, 0);
+    H = getwaves(pos.xy * 0.1, ITERATIONS_NORMAL) * depth;
+    vec3 a = vec3(pos.x, H, pos.y);
+    return normalize(cross(normalize(a-vec3(pos.x - e, getwaves(pos.xy * 0.1 - ex.xy * 0.1, ITERATIONS_NORMAL) * depth, pos.y)), 
+                           normalize(a-vec3(pos.x, getwaves(pos.xy * 0.1 + ex.yx * 0.1, ITERATIONS_NORMAL) * depth, pos.y + e))));
+}
+mat3 rotmat(vec3 axis, float angle)
+{
+	axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1.0 - c;
+	return mat3(oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s, 
+	oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s, 
+	oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);
+}
+
+vec3 getRay(vec2 uv){
+    uv = (uv * 2.0 - 1.0) * vec2(1.3, 1.0); // Resolution...
+	vec3 proj = normalize(vec3(uv.x, uv.y, 1.0) + vec3(uv.x, uv.y, -1.0) * pow(length(uv), 2.0) * 0.05);	
+	return proj;
+    //if(Resolution.x < 400.0) return proj;
+//	vec3 ray = rotmat(vec3(0.0, -1.0, 0.0), 3.0 * (Mouse.x * 2.0 - 1.0)) * rotmat(vec3(1.0, 0.0, 0.0), 1.5 * (Mouse.y * 2.0 - 1.0)) * proj;
+//    return ray;
+}
+
+float intersectPlane(vec3 origin, vec3 direction, vec3 point, vec3 normal)
+{ 
+    return clamp(dot(point - origin, normal) / dot(direction, normal), -1.0, 9991999.0); 
+}
+
+vec3 extra_cheap_atmosphere(vec3 raydir, vec3 sundir){
+	sundir.y = max(sundir.y, -0.07);
+	float special_trick = 1.0 / (raydir.y * 1.0 + 0.1);
+	float special_trick2 = 1.0 / (sundir.y * 11.0 + 1.0);
+	float raysundt = pow(abs(dot(sundir, raydir)), 2.0);
+	float sundt = pow(max(0.0, dot(sundir, raydir)), 8.0);
+	float mymie = sundt * special_trick * 0.2;
+	vec3 suncolor = mix(vec3(1.0), max(vec3(0.0), vec3(1.0) - vec3(5.5, 13.0, 22.4) / 22.4), special_trick2);
+	vec3 bluesky= vec3(5.5, 13.0, 22.4) / 22.4 * suncolor;
+	vec3 bluesky2 = max(vec3(0.0), bluesky - vec3(5.5, 13.0, 22.4) * 0.002 * (special_trick + -6.0 * sundir.y * sundir.y));
+	bluesky2 *= special_trick * (0.24 + raysundt * 0.24);
+	return bluesky2 * (1.0 + 1.0 * pow(1.0 - raydir.y, 3.0)) + mymie * suncolor;
+} 
+vec3 getatm(vec3 ray){
+ 	return extra_cheap_atmosphere(ray, normalize(vec3(1.0))) * 0.5;
+    
+}
+
+float sun(vec3 ray){
+ 	vec3 sd = normalize(vec3(1.0));   
+    return pow(max(0.0, dot(ray, sd)), 528.0) * 110.0;
+}
+vec3 aces_tonemap(vec3 color){	
+	mat3 m1 = mat3(
+        0.59719, 0.07600, 0.02840,
+        0.35458, 0.90834, 0.13383,
+        0.04823, 0.01566, 0.83777
+	);
+	mat3 m2 = mat3(
+        1.60475, -0.10208, -0.00327,
+        -0.53108,  1.10813, -0.07276,
+        -0.07367, -0.00605,  1.07602
+	);
+	vec3 v = m1 * color;    
+	vec3 a = v * (v + 0.0245786) - 0.000090537;
+	vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081;
+	return pow(clamp(m2 * (a / b), 0.0, 1.0), vec3(1.0 / 2.2));	
+}
+void main() {
+	vec2 uv = fragmentTexCoord.xy;
+ 	
+	float waterdepth = 2.1;
+	vec3 wfloor = vec3(0.0, -waterdepth, 0.0);
+	vec3 wceil = vec3(0.0, 0.0, 0.0);
+	vec3 orig = vec3(0.0, 2.0, 0.0);
+	vec3 ray = getRay(uv);
+	float hihit = intersectPlane(orig, ray, wceil, vec3(0.0, 1.0, 0.0));
+    if(ray.y >= -0.01){
+        vec3 C = getatm(ray) * 2.0 + sun(ray);
+        //tonemapping
+    	C = aces_tonemap(C);
+     	color = vec4( C,1.0);   
+        return;
+    }
+	float lohit = intersectPlane(orig, ray, wfloor, vec3(0.0, 1.0, 0.0));
+    vec3 hipos = orig + ray * hihit;
+    vec3 lopos = orig + ray * lohit;
+	float dist = raymarchwater(orig, hipos, lopos, waterdepth);
+    vec3 pos = orig + ray * dist;
+
+	vec3 N = normal(pos.xz, 0.001, waterdepth);
+    vec2 velocity = N.xz * (1.0 - N.y);
+    N = mix(vec3(0.0, 1.0, 0.0), N, 1.0 / (dist * dist * 0.01 + 1.0));
+    vec3 R = reflect(ray, N);
+    float fresnel = (0.04 + (1.0-0.04)*(pow(1.0 - max(0.0, dot(-N, ray)), 5.0)));
+	
+    vec3 C = fresnel * getatm(R) * 2.0 + fresnel * sun(R);
+    //tonemapping
+    C = aces_tonemap(C);
+    
+	color = vec4(C,1.0);
+}", "precision highp float;
+
+
+mat2 rot(float a) {
+    float c = cos(a), s = sin(a);
+    return mat2(c,s,-s,c);
+}
+
+const float pi = acos(-1.0);
+const float pi2 = pi*2.0;
+
+vec2 pmod(vec2 p, float r) {
+    float a = atan(p.x, p.y) + pi/r;
+    float n = pi2 / r;
+    a = floor(a/n)*n;
+    return p*rot(-a);
+}
+
+float box( vec3 p, vec3 b ) {
+    vec3 d = abs(p) - b;
+    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
+float ifsBox(vec3 p) {
+    for (int i=0; i<5; i++) {
+        p = abs(p) - 1.0;
+        p.xy *= rot(iTime*0.3);
+        p.xz *= rot(iTime*0.1);
+    }
+    p.xz *= rot(iTime);
+    return box(p, vec3(0.4,0.8,0.3));
+}
+
+float map(vec3 p, vec3 cPos) {
+    vec3 p1 = p;
+    p1.x = mod(p1.x-5., 10.) - 5.;
+    p1.y = mod(p1.y-5., 10.) - 5.;
+    p1.z = mod(p1.z, 16.)-8.;
+    p1.xy = pmod(p1.xy, 5.0);
+    return ifsBox(p1);
+}
+
+void main() {
+    vec2 p = (fragmentTexCoord.xy * 2.0 - 1);
+
+    vec3 cPos = vec3(0.0,0.0, -3.0 * iTime);
+    // vec3 cPos = vec3(0.3*sin(iTime*0.8), 0.4*cos(iTime*0.3), -6.0 * iTime);
+    vec3 cDir = normalize(vec3(0.0, 0.0, -1.0));
+    vec3 cUp  = vec3(sin(iTime), 1.0, 0.0);
+    vec3 cSide = cross(cDir, cUp);
+
+    vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir);
+
+    // Phantom Mode https://www.shadertoy.com/view/MtScWW by aiekick
+    float acc = 0.0;
+    float acc2 = 0.0;
+    float t = 0.0;
+    for (int i = 0; i < 99; i++) {
+        vec3 pos = cPos + ray * t;
+        float dist = map(pos, cPos);
+        dist = max(abs(dist), 0.02);
+        float a = exp(-dist*3.0);
+        if (mod(length(pos)+24.0*iTime, 30.0) < 3.0) {
+            a *= 2.0;
+            acc2 += a;
+        }
+        acc += a;
+        t += dist * 0.5;
+    }
+
+    vec3 col = vec3(acc * 0.01, acc * 0.011 + acc2*0.002, acc * 0.012+ acc2*0.005);
+    color = vec4(col, 1.0 - t * 0.03);
+}", "void main(){
+    vec2 uv =  (2.0 * fragmentTexCoord - 1);
+
+    for(float i = 1.0; i < 10.0; i++){
+        uv.x += 0.6 / i * cos(i * 2.5* uv.y + iTime);
+        uv.y += 0.6 / i * cos(i * 1.5 * uv.x + iTime);
+    }
+    
+    color = vec4(vec3(0.1)/abs(sin(iTime-uv.y-uv.x)),1.0);
+}"]
+
+
+
+
+
+
+
+
+
+
+
+
+class ShaderPanel extends ConfigPanel
+	override ShaderVis* c
+	Shader* shader
+	float time
+	Timer timer
+	int id_runner
+	int type
+	
+	override void __init__(Module _m)
+		from_source("
+Grid ? '' vertical
+	ComboBox type 'Chladni by 386dx25\\Creation... by Danguafer\\Very fast procedural ocean by afl_ext\\Phantom Star by kasari39\\glowingMarblingBlack by nasana'
+	DrawingArea area '' height=200 expandy opengl")
 		
-		s = NixCreateShader("
+		shader = nil
+		time = 0
+		type = 0
+	
+		event_x("area", "hui:draw-gl", on_draw)
+		event_x("area", "hui:realize", on_realize)
+		event_x("area", "hui:unrealize", on_unrealize)
+		event("type", on_type)
+	
+	override void __delete__()
+		#print("delete")
+		CancelRunner(id_runner)
+		#set_options("area", "make-current-gl")
+		#del s
+		#NixKill()
+	
+	void on_step()
+		redraw("area")
+	
+	void on_type()
+		type = get_int("")
+		update_shader()
+		
+	void on_unrealize()
+		print("unreal...")
+		#set_options("area", "make-current-gl")
+		#del s
+		#NixKill()
+		
+	void update_shader()
+		string frag = SOURCE[type]
+		
+		shader = NixCreateShader("
 <VertexShader>
 #version 330 core
 layout(location = 0) in vec3 inPosition;
@@ -154,10 +402,21 @@ void main() {
 }
 </VertexShader>
 <FragmentShader>
+#version 330 core
+in vec2 fragmentTexCoord;
+out vec4 color;
+
+uniform float iTime;
+uniform float iVolume;
 {{frag}}
 </FragmentShader>
 ")
-		id_runner = RunRepeated(0.05, self, on_step)
+	
+	void on_realize()
+		NixInit("OpenGL", 800, 600)
+		update_shader()
+		
+		id_runner = RunRepeated(0.03, self, on_step)
 	
 	void on_draw()
 		time += timer.get()
@@ -167,12 +426,12 @@ void main() {
 		NixResetToColor(Red)
 		NixSetCull(0)
 		NixSetZ(false, false)
-		NixSetShader(s)
-		s.set_float(s.location("zoom"), 2.0)
-		s.set_float(s.location("x0"), 0.0)
-		s.set_float(s.location("y0"), 0.0)
-		s.set_float(s.location("iTime"), time)
-		s.set_float(s.location("iVolume"), volume)
+		NixSetShader(shader)
+		shader.set_float(shader.location("zoom"), 2.0)
+		shader.set_float(shader.location("x0"), 0.0)
+		shader.set_float(shader.location("y0"), 0.0)
+		shader.set_float(shader.location("iTime"), time)
+		shader.set_float(shader.location("iVolume"), volume)
 		NixDraw2D(rect.ID, rect(-1,1, -1,1), 0)
 		NixEnd()
 

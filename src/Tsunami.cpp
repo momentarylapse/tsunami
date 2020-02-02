@@ -114,11 +114,11 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 
 
 	p.mode("", {"[FILE]"}, [&](const Array<string> &a){
-		session = create_session();
-
 		Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
+
 		device_manager->init();
+		session = create_session();
 
 		session->win->show();
 		if (a.num > 0) {
@@ -170,8 +170,8 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 		delete song;
 	});
 	p.mode("--execute", {"PLUGIN"}, [&](const Array<string> &a){
-		if (session == Session::GLOBAL)
-			session = create_session();
+		device_manager->init();
+		session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0]);
@@ -183,13 +183,21 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 	p.mode("--run-tests", {"FILTER"}, [&](const Array<string> &a){
 		UnitTest::run_all(a[0]);
 	});
-	p.mode("--preview-fx", {"FX"}, [&](const Array<string> &a){
-		if (session == Session::GLOBAL)
-			session = create_session();
+	p.mode("--preview-gui", {"TYPE", "NAME"}, [&](const Array<string> &a){
+		session = create_session();
 		session->win->hide();
-		auto *fx = CreateAudioEffect(session, a[0]);
-		configure_module(session->win, fx);
-		allow_window = true;
+		Module *m = nullptr;
+		if (a[0] == "fx") {
+			m = CreateAudioEffect(session, a[1]);
+			configure_module(session->win, m);
+		} else if (a[0] == "vis") {
+			m = CreateAudioVisualizer(session, a[1]);
+			auto *p = m->create_panel();
+			auto *dlg = new hui::Window("", 800, 600);
+			dlg->add_grid("", 0, 0, "root");
+			dlg->embed(p, "root", 0,0);
+			dlg->run();
+		}
 	});
 #endif
 	p.parse(args);

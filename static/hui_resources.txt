@@ -870,7 +870,7 @@ Grid
 12
 Label
 mouse-move
-
+hgroup=a
 0
 0
 0
@@ -882,7 +882,7 @@ l-move
 0
 Label
 key-move
-
+hgroup=a
 0
 1
 0
@@ -894,7 +894,7 @@ l-move
 0
 Label
 key-move-fast
-
+hgroup=a
 0
 2
 0
@@ -906,7 +906,7 @@ l-move-fast
 0
 Label
 mouse-zoom
-
+hgroup=a
 0
 3
 0
@@ -918,7 +918,7 @@ l-zoom
 0
 Label
 key-zoom
-
+hgroup=a
 0
 4
 0
@@ -930,7 +930,7 @@ l-zoom
 0
 Label
 key-start
-
+hgroup=a
 0
 5
 0
@@ -954,7 +954,7 @@ Grid
 6
 Label
 key-play
-
+hgroup=a
 0
 0
 0
@@ -966,7 +966,7 @@ l-play
 0
 Label
 key-loop
-
+hgroup=a
 0
 1
 0
@@ -978,7 +978,7 @@ l-loop
 0
 Label
 key-record
-
+hgroup=a
 0
 2
 0
@@ -1008,7 +1008,7 @@ Grid
 10
 Label
 key-open
-
+hgroup=a
 0
 0
 0
@@ -2181,10 +2181,10 @@ Grid
 
 1
 0
-2
-Button
-apply_string
-expandx
+3
+Text
+t_string
+hgroup=a
 0
 0
 0
@@ -2194,15 +2194,21 @@ range=0:99
 1
 0
 0
+Button
+apply_string
+expandx
+2
+0
+0
 Grid
 ?
 
 2
 0
-2
-Button
-apply_hand_position
-expandx
+3
+Text
+t_hand
+hgroup=a
 0
 0
 0
@@ -2210,6 +2216,12 @@ SpinButton
 fret_no
 range=0:99
 1
+0
+0
+Button
+apply_hand_position
+expandx
+2
 0
 0
 Grid
@@ -2220,7 +2232,7 @@ Grid
 5
 Text
 t_flags
-
+hgroup=a
 0
 0
 0
@@ -2256,7 +2268,7 @@ Grid
 2
 Text
 t_op_add
-
+hgroup=a
 0
 0
 0
@@ -6643,7 +6655,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-533
+535
 # Text
 /bars-add
 Add bars...
@@ -7399,10 +7411,10 @@ midi_editor/add_key_change
 key change...
 Add a key change at the cursor position
 midi_editor/apply_hand_position
-Apply hand
+apply
 (TAB mode) Find positions on the fretboard for the selected notes
 midi_editor/apply_string
-Apply string
+apply
 (TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch
 midi_editor/beat_partition
 4
@@ -7494,6 +7506,9 @@ midi_editor/t_div
 midi_editor/t_flags
 Flags
 
+midi_editor/t_hand
+Hand
+
 midi_editor/t_input
 Source
 
@@ -7505,6 +7520,9 @@ Length
 
 midi_editor/t_op_add
 Add
+
+midi_editor/t_string
+String
 
 mini_bar/peaks
 

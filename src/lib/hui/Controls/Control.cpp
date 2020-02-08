@@ -169,6 +169,23 @@ bool Control::has_focus()
 	return gtk_widget_has_focus(widget);
 }
 
+Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
+	for (auto &g: panel->size_groups)
+		if (g.name == name)
+			return &g;
+	Panel::SizeGroup gg;
+	gg.name = name;
+	gg.mode = mode;
+	auto mm = GTK_SIZE_GROUP_HORIZONTAL;
+	if (mode == 2)
+		mm = GTK_SIZE_GROUP_VERTICAL;
+	if (mode == 3)
+		mm = GTK_SIZE_GROUP_BOTH;
+	gg.group = gtk_size_group_new(mm);
+	panel->size_groups.add(gg);
+	return &panel->size_groups.back();
+}
+
 void Control::set_options(const string &options)
 {
 	allow_signal_level ++;
@@ -256,6 +273,11 @@ void Control::set_options(const string &options)
 				                               (gdk_screen_get_default(),
 				                                GTK_STYLE_PROVIDER(css_provider),
 												GTK_STYLE_PROVIDER_PRIORITY_USER);*/
+			}else if ((op == "hgroup") or (op == "vgroup")){
+				if (panel) {
+					auto g = get_size_group(panel, a1, (op == "vgroup") ? 2 : 1);
+					gtk_size_group_add_widget(g->group, get_frame());
+				}
 			}else{
 				__set_option(op, a1);
 			}

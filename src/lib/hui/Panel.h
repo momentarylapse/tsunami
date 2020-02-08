@@ -162,6 +162,12 @@ protected:
 #ifdef HUI_API_GTK
 public:
 	GtkWidget *plugable;
+	struct SizeGroup {
+		GtkSizeGroup *group;
+		int mode;
+		string name;
+	};
+	Array<SizeGroup> size_groups;
 protected:
 	void _insert_control_(Control *c, int x, int y);
 	int desired_width, desired_height;

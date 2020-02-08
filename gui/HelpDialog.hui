@@ -5,37 +5,37 @@ Dialog help-dialog "Help" width=400 height=300
 				Grid ? "" vertical
 					Group g_navigation "Navigation"
 						Grid ? ""
-							Label mouse-move "scroll"
+							Label mouse-move "scroll" hgroup=a
 							Label l-move "Move"
 							---|
-							Label key-move "← / →"
+							Label key-move "← / →" hgroup=a
 							Label l-move "Move"
 							---|
-							Label key-move-fast "Pg-up / down"
+							Label key-move-fast "Pg-up / down" hgroup=a
 							Label l-move-fast "Move fast"
 							---|
-							Label mouse-zoom "Ctrl+scroll"
+							Label mouse-zoom "Ctrl+scroll" hgroup=a
 							Label l-zoom "Zoom"
 							---|
-							Label key-zoom "+ / -"
+							Label key-zoom "+ / -" hgroup=a
 							Label l-zoom "Zoom"
 							---|
-							Label key-start "Home / End"
+							Label key-start "Home / End" hgroup=a
 							Label l-start "Jump to start / end"
 					Group g_sound "Sound"
 						Grid ? ""
-							Label key-play "Space"
+							Label key-play "Space" hgroup=a
 							Label l-play "Play / Pause"
 							---|
-							Label key-loop "Ctrl+L"
+							Label key-loop "Ctrl+L" hgroup=a
 							Label l-loop "Loop"
 							---|
-							Label key-record "Ctrl+R"
+							Label key-record "Ctrl+R" hgroup=a
 							Label l-record "Record"
 				Grid ? "" vertical
 					Group g_editing "Editing"
 						Grid ? ""
-							Label key-open "Ctrl+O / S"
+							Label key-open "Ctrl+O / S" hgroup=a
 							Label l-open "Open / Save"
 							---|
 							Label key-copy "Ctrl+C / V"

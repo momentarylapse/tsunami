@@ -11,6 +11,7 @@
 #include "AudioSource.h"
 
 class Track;
+class TrackLayer;
 class AudioEffect;
 class Synthesizer;
 class MidiEventStreamer;
@@ -24,6 +25,7 @@ public:
 	virtual ~TrackRenderer();
 
 	Track *track;
+	Array<TrackLayer*> layers;
 	Array<AudioEffect*> fx;
 	Synthesizer *synth;
 	MidiEventStreamer* midi_streamer;
@@ -51,11 +53,12 @@ public:
 
 	void reset_state();
 
+	void update_layers();
+
 	void on_track_replace_synth();
 	void on_track_add_or_delete_fx();
 	void on_track_change_data();
-	void on_track_delete_layer();
-	void on_track_add_layer();
+	//void on_layer_change_data();
 };
 
 #endif /* SRC_MODULE_AUDIO_TRACKRENDERER_H_ */

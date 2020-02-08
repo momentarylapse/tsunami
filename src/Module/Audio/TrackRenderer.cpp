@@ -124,17 +124,20 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
 	track->subscribe(this, [=]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
 	track->subscribe(this, [=]{ track = nullptr; }, track->MESSAGE_DELETE);
+	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_ADD_LAYER);
+	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
 
-	/*for (TrackLayer *l: track->layers) {
-		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
-		l->subscribe(this, [=]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
-	}*/
+	update_layers();
 }
 
 TrackRenderer::~TrackRenderer() {
 	synth->perf_set_parent(nullptr);
-	if (track)
+	for (auto *l: layers)
+		l->unsubscribe(this);
+	if (track) {
+		track->song->unsubscribe(this);
 		track->unsubscribe(this);
+	}
 	if (midi_streamer)
 		delete midi_streamer;
 	if (!direct_mode) {
@@ -147,12 +150,14 @@ TrackRenderer::~TrackRenderer() {
 void TrackRenderer::fill_midi_streamer() {
 	if (!track)
 		return;
-	MidiNoteBuffer _midi = track->layers[0]->midi;
-	for (TrackLayer *l: track->layers)
+	MidiNoteBuffer _midi;
+	if (layers.num > 0)
+		_midi = layers[0]->midi;
+	for (auto *l: layers)
 		for (auto c: l->samples)
 			if (c->type() == SignalType::MIDI)
 			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
-	for (MidiEffect *fx: track->midi_fx) {
+	for (auto *fx: track->midi_fx) {
 		fx->reset_state();
 		fx->process(&_midi);
 	}
@@ -160,6 +165,7 @@ void TrackRenderer::fill_midi_streamer() {
 	MidiEventBuffer raw = midi_notes_to_events(_midi);
 	midi_streamer->set_data(raw);
 	midi_streamer->ignore_end = true;
+	synth->reset_state();
 
 }
 
@@ -201,10 +207,16 @@ void TrackRenderer::on_track_change_data() {
 	}
 }
 
-void TrackRenderer::on_track_delete_layer() {
-}
+void TrackRenderer::update_layers() {
+	for (auto *l: layers)
+		l->unsubscribe(this);
 
-void TrackRenderer::on_track_add_layer() {
+	layers = track->layers;
+
+	for (auto *l: layers) {
+		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
+		//l->subscribe(this, [=]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
+	}
 }
 
 void TrackRenderer::set_pos(int pos) {

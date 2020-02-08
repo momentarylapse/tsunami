@@ -49,6 +49,7 @@ public:
 	void on_apply_hand_position();
 	void on_apply_flags(int mask);
 	void on_add_key_change();
+	void on_apply_pitch_shift();
 
 	void on_edit_track();
 	void on_edit_midi_fx();

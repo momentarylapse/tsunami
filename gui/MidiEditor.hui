@@ -20,10 +20,10 @@ Dialog midi_editor "Midi" width=300 height=516
 					Grid ? ""
 						Text me_t_modifier "Modifier"
 						Grid ? ""
-							RadioButton modifier:none "none" expandx
-							RadioButton modifier:sharp "♯" "tooltip=sharp" expandx
-							RadioButton modifier:flat "♭" "tooltip=flat" expandx
-							RadioButton modifier:natural "♮" "tooltip=natural" expandx
+							RadioButton modifier:none "none" "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
+							RadioButton modifier:sharp "♯" "tooltip=Sharp - new note is 1 semitone above the key" expandx
+							RadioButton modifier:flat "♭" "tooltip=Flat - new note is 1 semitone below the key" expandx
+							RadioButton modifier:natural "♮" "tooltip=Natural - new note ignores any modifiers in the key" expandx
 						---|
 						Text t_note_length "Length"
 						Grid ? ""
@@ -51,18 +51,22 @@ Dialog midi_editor "Midi" width=300 height=516
 					Button quantize "Quantize" "tooltip=Align selected notes to grid of sub beats" expandx
 					Grid ? ""
 						Text t_string "String" hgroup=a
-						SpinButton string_no "" range=0:99
+						SpinButton string_no "" range=0:99 "tooltip=1=lowest string"
 						Button apply_string "apply" "tooltip=(TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch" expandx
 					Grid ? ""
 						Text t_hand "Hand" hgroup=a
 						SpinButton fret_no "" range=0:99
 						Button apply_hand_position "apply" "tooltip=(TAB mode) Find positions on the fretboard for the selected notes" expandx
 					Grid ? ""
+						Text t_pitch "Pitch" hgroup=a
+						SpinButton pitch_delta "" range=-24:24 "tooltip=Semitones - positive=up, negative=down"
+						Button apply_pitch_shift "shift" "tooltip=Shift the pitch up or down" expandx
+					Grid ? ""
 						Text t_flags "Flags" hgroup=a
-						Button flag_none "x" "tooltip=clear flags"
-						Button flag_trill "tr" "tooltip=set trill flag"
-						Button flag_staccato "." "tooltip=set staccato flag"
-						Button flag_tenuto "_" "tooltip=set tenuto flag"
+						Button flag_none "x" "tooltip=Clear flags"
+						Button flag_trill "tr" "tooltip=Set trill flag"
+						Button flag_staccato "." "tooltip=Set staccato flag"
+						Button flag_tenuto "_" "tooltip=Set tenuto flag"
 					Grid ? ""
 						Text t_op_add "Add" hgroup=a
 						Button add_key_change "key change..." "tooltip=Add a key change at the cursor position"

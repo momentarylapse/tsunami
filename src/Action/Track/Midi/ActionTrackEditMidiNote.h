@@ -13,9 +13,9 @@
 class Track;
 class MidiNote;
 class Range;
+enum class NoteModifier;
 
-class ActionTrackEditMidiNote : public Action
-{
+class ActionTrackEditMidiNote : public Action {
 public:
 	ActionTrackEditMidiNote(MidiNote *n, const Range &range, float pitch, float volume, int stringno, int flags);
 
@@ -26,6 +26,8 @@ private:
 	MidiNote *note;
 	int offset, length;
 	float pitch, volume;
+	int clef_pos;
+	NoteModifier mod;
 	int stringno;
 	int flags;
 };

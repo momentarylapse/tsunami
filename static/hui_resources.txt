@@ -2169,7 +2169,7 @@ Grid
 vertical
 0
 0
-5
+6
 Button
 quantize
 expandx
@@ -2229,6 +2229,30 @@ Grid
 
 3
 0
+3
+Text
+t_pitch
+hgroup=a
+0
+0
+0
+SpinButton
+pitch_delta
+range=-24:24
+1
+0
+0
+Button
+apply_pitch_shift
+expandx
+2
+0
+0
+Grid
+?
+
+4
+0
 5
 Text
 t_flags
@@ -2263,7 +2287,7 @@ flag_tenuto
 Grid
 ?
 
-4
+5
 0
 2
 Text
@@ -6655,7 +6679,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-535
+539
 # Text
 /bars-add
 Add bars...
@@ -7413,6 +7437,9 @@ Add a key change at the cursor position
 midi_editor/apply_hand_position
 apply
 (TAB mode) Find positions on the fretboard for the selected notes
+midi_editor/apply_pitch_shift
+shift
+Shift the pitch up or down
 midi_editor/apply_string
 apply
 (TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch
@@ -7421,16 +7448,16 @@ midi_editor/beat_partition
 Beat partition, `sub beats`
 midi_editor/flag_none
 x
-clear flags
+Clear flags
 midi_editor/flag_staccato
 .
-set staccato flag
+Set staccato flag
 midi_editor/flag_tenuto
 _
-set tenuto flag
+Set tenuto flag
 midi_editor/flag_trill
 tr
-set trill flag
+Set trill flag
 midi_editor/grp_input
 Keyboard input
 
@@ -7484,22 +7511,28 @@ Midi
 
 midi_editor/modifier:flat
 ♭
-flat
+Flat - new note is 1 semitone below the key
 midi_editor/modifier:natural
 ♮
-natural
+Natural - new note ignores any modifiers in the key
 midi_editor/modifier:none
 none
-
+None - new note is only affected by the current key (defined via the \"key change\" operation below)
 midi_editor/modifier:sharp
 ♯
-sharp
+Sharp - new note is 1 semitone above the key
 midi_editor/note_length
 1
 
+midi_editor/pitch_delta
+
+Semitones - positive=up, negative=down
 midi_editor/quantize
 Quantize
 Align selected notes to grid of sub beats
+midi_editor/string_no
+
+1=lowest string
 midi_editor/t_div
 /
 
@@ -7520,6 +7553,9 @@ Length
 
 midi_editor/t_op_add
 Add
+
+midi_editor/t_pitch
+Pitch
 
 midi_editor/t_string
 String

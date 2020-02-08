@@ -67,6 +67,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("quantize", [=]{ on_quantize(); });
 	event("apply_string", [=]{ on_apply_string(); });
 	event("apply_hand_position", [=]{ on_apply_hand_position(); });
+	event("apply_pitch_shift", [=]{ on_apply_pitch_shift(); });
 	event("flag_none", [=]{ on_apply_flags(0); });
 	event("flag_trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
 	event("flag_staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
@@ -351,6 +352,16 @@ void MidiEditorConsole::on_apply_hand_position() {
  			}
 		layer->midi_note_set_string(n, stringno);
 	}
+	song->end_action_group();
+}
+
+void MidiEditorConsole::on_apply_pitch_shift() {
+	int delta = get_int("pitch_delta");
+
+	song->begin_action_group();
+	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: ref)
+		layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
 	song->end_action_group();
 }
 

@@ -213,8 +213,7 @@ void Shader::find_locations()
 	location[LOCATION_MATERIAL_EMISSION] = get_location("material.emission");
 
 	location[LOCATION_LIGHT_COLOR] = get_location("light.color");
-	location[LOCATION_LIGHT_AMBIENT] = get_location("light.ambient");
-	location[LOCATION_LIGHT_SPECULAR] = get_location("light.specular");
+	location[LOCATION_LIGHT_HARSHNESS] = get_location("light.harshness");
 	location[LOCATION_LIGHT_POS] = get_location("light.pos");
 	location[LOCATION_LIGHT_RADIUS] = get_location("light.radius");
 
@@ -389,9 +388,8 @@ void Shader::set_default_data()
 	set_data(location[LOCATION_MATERIAL_SHININESS], &material.shininess, 4);
 	set_color(location[LOCATION_MATERIAL_EMISSION], material.emission);
 
-	set_data(location[LOCATION_LIGHT_AMBIENT], &lights[0].ambient, 4);
-	set_color(location[LOCATION_LIGHT_COLOR], lights[0].diffusive);
-	set_data(location[LOCATION_LIGHT_SPECULAR], &lights[0].specular, 4);
+	set_color(location[LOCATION_LIGHT_COLOR], lights[0].col);
+	set_data(location[LOCATION_LIGHT_HARSHNESS], &lights[0].harshness, 4);
 	vector dir = view_matrix.transform_normal(lights[0].pos);
 	set_data(location[LOCATION_LIGHT_POS], &dir.x, 3*4);
 	set_data(location[LOCATION_LIGHT_RADIUS], &lights[0].radius, 4);
@@ -434,7 +432,7 @@ void init_shaders()
 		"#version 330 core\n"
 		"struct Fog{ vec4 color; float density; };\n"
 		"struct Material{ vec4 ambient, diffusive, specular, emission; float shininess; };\n"
-		"struct Light{ vec4 color; vec3 pos; float radius, ambient, specular; };\n"
+		"struct Light{ vec4 color; vec3 pos; float radius, harshness; };\n"
 		"uniform Material material;\n"
 		"uniform Light light;\n"
 		"uniform Fog fog;\n"
@@ -448,15 +446,15 @@ void init_shaders()
 		"	vec3 l = light.pos;\n"
 		"	float d = max(-dot(n, l), 0);\n"
 		"	color = material.emission;\n"
-		"	color += material.ambient * light.color * light.ambient;\n"
-		"	color += material.diffusive * light.color * d;\n"
+		"	color += material.ambient * light.color * (1 - light.harshness) / 2;\n"
+		"	color += material.diffusive * light.color * light.harshness * d;\n"
 		"	vec4 tex_col = texture(tex0, fragmentTexCoord);\n"
 		"	color *= tex_col;\n"
 		"	if ((d > 0)&&(material.shininess > 1)){\n"
 		"		vec3 e = normalize(fragmentPos); // eye dir\n"
 		"		vec3 rl = reflect(l, n);\n"
 		"		float ee = max(-dot(e, rl), 0);\n"
-		"		color += material.specular * light.color * light.specular * pow(ee, material.shininess);\n"
+		"		color += material.specular * light.color * light.harshness * pow(ee, material.shininess);\n"
 		"	}\n"
 		"	float t = exp(-fragmentPos.z * fog.density);\n"
 		"	color = (1 - t) * fog.color + t * color;\n"

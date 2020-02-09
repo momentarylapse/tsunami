@@ -39,55 +39,42 @@ void TestGLError(const char*);
 
 
 // general ability of using lights
-void EnableLighting(bool enabled)
-{
+void EnableLighting(bool enabled) {
 	LightingEnabled = enabled;
 }
 
 // Punkt-Quelle
-void SetLightRadial(int index, const vector &pos, float radius, const color &diffuse, float ambient, float specular)
-{
+void SetLightRadial(int index, const vector &pos, float radius, const color &col, float harshness) {
 	if ((index < 0) or (index >= 8))
 		return;
 	index = 0;
 
-	lights[index].diffusive = diffuse;
-	lights[index].ambient = ambient;
-	lights[index].specular = specular;
+	lights[index].col = col;
+	lights[index].harshness = harshness;
 	lights[index].pos = pos;
 	lights[index].radius = radius;
 }
 
 // parallele Quelle
 // dir =Richtung, in die das Licht scheinen soll
-void SetLightDirectional(int index, const vector &dir, const color &diffuse, float ambient, float specular)
-{
+void SetLightDirectional(int index, const vector &dir, const color &col, float harshness) {
 	if ((index < 0) or (index >= 8))
 		return;
 	index = 0;
 
-	lights[index].diffusive = diffuse;
-	lights[index].ambient = ambient;
-	lights[index].specular = specular;
+	lights[index].col = col;
+	lights[index].harshness = harshness;
 	lights[index].pos = dir;
 	lights[index].radius = -1;
 }
 
-void EnableLight(int index,bool enabled)
-{
+void EnableLight(int index,bool enabled) {
 	if ((index < 0) or (index >= 8))
 		return;
 	lights[index].enabled = true;
 }
 
-void SetAmbientLight(const color &c)
-{
-	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT,(float*)&c);
-	TestGLError("SetAmbient");
-}
-
-void SetMaterial(const color &ambient,const color &diffuse,const color &specular,float shininess,const color &emission)
-{
+void SetMaterial(const color &ambient,const color &diffuse,const color &specular,float shininess,const color &emission) {
 	material.ambient = ambient;
 	material.diffusive = diffuse;
 	material.specular = specular;

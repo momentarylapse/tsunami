@@ -22,7 +22,7 @@ extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.2.0";
+string version = "0.13.2.1";
 
 
 // libraries (in case Visual C++ is used)
@@ -180,7 +180,6 @@ void Init(const string &api, int width, int height)
 	SetAlpha(ALPHA_NONE);
 	nix::EnableLighting(false);
 	nix::SetMaterial(White, White, White, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
-	nix::SetAmbientLight(Black);
 	CullingInverted = false;
 	SetProjectionPerspective();
 	SetZ(true, true);

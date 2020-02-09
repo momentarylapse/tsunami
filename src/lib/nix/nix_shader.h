@@ -13,8 +13,7 @@
 
 namespace nix{
 
-class Shader
-{
+class Shader {
 public:
 	string filename;
 	int program;
@@ -35,7 +34,7 @@ public:
 	void find_locations();
 	void set_default_data();
 
-	enum{
+	enum {
 		LOCATION_MATRIX_MVP,
 		LOCATION_MATRIX_M,
 		LOCATION_MATRIX_V,
@@ -51,8 +50,7 @@ public:
 		LOCATION_MATERIAL_SHININESS,
 		LOCATION_MATERIAL_EMISSION,
 		LOCATION_LIGHT_COLOR,
-		LOCATION_LIGHT_AMBIENT,
-		LOCATION_LIGHT_SPECULAR,
+		LOCATION_LIGHT_HARSHNESS,
 		LOCATION_LIGHT_POS,
 		LOCATION_LIGHT_RADIUS,
 		LOCATION_FOG_COLOR,

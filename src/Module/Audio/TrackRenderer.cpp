@@ -123,7 +123,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
 	track->subscribe(this, [=]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
-	track->subscribe(this, [=]{ track = nullptr; }, track->MESSAGE_DELETE);
+	track->subscribe(this, [=]{ track = nullptr; update_layers(); }, track->MESSAGE_DELETE);
 	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_ADD_LAYER);
 	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
 
@@ -211,7 +211,9 @@ void TrackRenderer::update_layers() {
 	for (auto *l: layers)
 		l->unsubscribe(this);
 
-	layers = track->layers;
+	layers = {};
+	if (track)
+		layers = track->layers;
 
 	for (auto *l: layers) {
 		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);

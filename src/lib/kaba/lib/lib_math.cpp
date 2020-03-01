@@ -420,12 +420,12 @@ void SIAddPackageMath() {
 		class_add_func("normalize", TypeVoid, mf(&quaternion::normalize));
 		class_add_func("angles", TypeVector, mf(&quaternion::get_angles), FLAG_PURE);
 		class_add_func("str", TypeString, mf(&quaternion::str), FLAG_PURE);
-		class_add_func("rotation_v", TypeQuaternion, (void*)&quaternion::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeQuaternion, (void*)&quaternion::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeVector);
-		class_add_func("rotation_a", TypeQuaternion, (void*)&quaternion::rotation_a, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeQuaternion, (void*)&quaternion::rotation_a, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("axis", TypeVector);
 			func_add_param("angle", TypeFloat32);
-		class_add_func("rotation_m", TypeQuaternion, (void*)&quaternion::rotation_m, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeQuaternion, (void*)&quaternion::rotation_m, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("m_in", TypeMatrix);
 		class_add_func("interpolate", TypeQuaternion, (void*)(quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("q_0", TypeQuaternion);
@@ -579,7 +579,7 @@ void SIAddPackageMath() {
 		class_add_func("transpose", TypeMatrix, mf(&matrix::transpose), FLAG_PURE);
 		class_add_func("translation", TypeMatrix, (void*)&matrix::translation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("trans", TypeVector);
-		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeVector);
 		class_add_func("rotation_x", TypeMatrix, (void*)&matrix::rotation_x, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeFloat32);
@@ -587,7 +587,7 @@ void SIAddPackageMath() {
 			func_add_param("ang", TypeFloat32);
 		class_add_func("rotation_z", TypeMatrix, (void*)&matrix::rotation_z, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_q", TypeMatrix, (void*)&matrix::rotation_q, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_q, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("ang", TypeQuaternion);
 		class_add_func("scale", TypeMatrix, (void*)&matrix::scale, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 			func_add_param("s_x", TypeFloat32);

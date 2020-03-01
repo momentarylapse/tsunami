@@ -13,16 +13,11 @@
 
 namespace nix{
 
-void _cdecl EnableLighting(bool enabled);
-void _cdecl SetLightRadial(int index, const vector &pos, float radius, const color &col, float harshness);
-void _cdecl SetLightDirectional(int index, const vector &dir, const color &col, float harshness);
-void _cdecl EnableLight(int index, bool enabled);
 void _cdecl SetMaterial(const color &ambient, const color &diffuse, const color &specular, float shininess, const color &emission);
 
 
 
-struct Material
-{
+struct Material {
 	color ambient;
 	color diffusive;
 	color specular;
@@ -31,15 +26,13 @@ struct Material
 };
 extern Material material;
 
-struct Light
-{
-	bool enabled;
-	color col;
+// compatible with default_shader_3d (binding=0)
+struct SimpleDirectionalLight {
+	alignas(16) color col;
+	alignas(16) vector dir;
+	alignas(16) float radius;
 	float harshness;
-	vector pos;
-	float radius;
 };
-extern Light lights[8];
 
 };
 

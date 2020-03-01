@@ -113,13 +113,6 @@ bool FileDialogSave(Window *win,const string &title,const string &dir,const stri
 	return (r==GTK_RESPONSE_ACCEPT);
 }
 
-bool SelectColor(Window *win,int r,int g,int b)
-{
-	msg_todo("HuiSelectColor (GTK)");
-	return false;
-}
-
-
 bool SelectFont(Window *win, const string &title)
 {
 #if GTK_CHECK_VERSION(3,0,0)
@@ -137,6 +130,30 @@ bool SelectFont(Window *win, const string &title)
 	return (r == GTK_RESPONSE_OK);
 #endif
 	return false;
+}
+
+bool SelectColor(Window *win, const color &col) {
+	GtkWindow *w = get_window_save(win);
+	auto dlg = gtk_color_chooser_dialog_new("Color", w);
+
+	GdkRGBA gcol;
+	gcol.red = col.r;
+	gcol.green = col.g;
+	gcol.blue = col.b;
+	gcol.alpha = col.a;
+	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
+
+	gtk_widget_show_all(dlg);
+	int r = gtk_dialog_run(GTK_DIALOG(dlg));
+	if (r == GTK_RESPONSE_OK){
+		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
+		Color.r = (float)gcol.red;
+		Color.g = (float)gcol.green;
+		Color.b = (float)gcol.blue;
+		Color.a = (float)gcol.alpha;
+	}
+	gtk_widget_destroy(dlg);
+	return (r == GTK_RESPONSE_OK);
 }
 
 string QuestionBox(Window *win,const string &title,const string &text,bool allow_cancel)

@@ -98,6 +98,12 @@ string kaba_float2str(float f) {
 	return f2s(f, 6);
 }
 
+string kaba_float_format(float f, const string &fmt) {
+	if (fmt.head(1) == "." and fmt.num >= 2)
+		return f2s(f, fmt[1] - 48);
+	return f2s(f, 6);
+}
+
 string kaba_float642str(float f) {
 	return f642s(f, 6);
 }
@@ -510,6 +516,8 @@ void SIAddPackageBase() {
 		class_add_funcx("str", TypeString, &kaba_float2str, FLAG_PURE);
 		class_add_funcx("str2", TypeString, &f2s, FLAG_PURE);
 			func_add_param("decimals", TypeInt);
+		class_add_funcx("format", TypeString, &kaba_float_format, FLAG_PURE);
+			func_add_param("fmt", TypeString);
 		class_add_funcx("int", TypeInt, &_Float2Int, FLAG_PURE);
 			func_set_inline(InlineID::FLOAT_TO_INT);    // sometimes causes floating point exceptions...
 		class_add_funcx("float64", TypeFloat64, &_Float2Float64, FLAG_PURE);

@@ -209,14 +209,14 @@ Grid ? '' vertical
 			change = next_part.text
 		if next_bar
 			if next_bar.beats.num != cur_bar.beats.num
-				change += "  " + next_bar.beats.num + "/₄"
+				change += "  {{next_bar.beats.num}}/₄"
 			float cur_bpm = cur_bar.bpm(song.sample_rate)
 			float next_bpm = next_bar.bpm(song.sample_rate)
 			if abs(cur_bpm - next_bpm) > 2
-				change += "  " + next_bpm.str2(0) + " bpm"
+				change += "  {{next_bpm:.0}} bpm"
 		if change.num > 0
 			p.set_color(colors.text)
-			p.draw_str(20, 5 + fs*1.2 + 5, "> " + change)
+			p.draw_str(20, 5 + fs*1.2 + 5, "> {{change}}")
 				
 	
 	void on_area_right_button_down()

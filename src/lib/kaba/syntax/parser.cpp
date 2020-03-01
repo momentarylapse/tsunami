@@ -803,6 +803,19 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 
 }
 
+
+Node *apply_format(SyntaxTree *tree, Node *n, const string &fmt) {
+	auto f = n->type->get_func("format", TypeString, {TypeString});
+	if (!f)
+		tree->do_error("format string: no .format() function for type " + n->type->long_name());
+	auto *c = tree->add_constant(TypeString);
+	c->as_string() = fmt;
+	auto nf = tree->add_node_call(f);
+	nf->set_instance(n);
+	nf->set_param(1, tree->add_node_const(c));
+	return nf;
+}
+
 Node *try_parse_format_string(SyntaxTree *tree, Block *block, Value &v) {
 	string s = v.as_string();
 	
@@ -828,6 +841,15 @@ Node *try_parse_format_string(SyntaxTree *tree, Block *block, Value &v) {
 			tree->do_error("string interpolation {{ not ending with }}");
 			
 		string xx = s.substr(p0+2, p1 - p0 - 2);
+
+		// "...:format" ?
+		string fmt;
+		int pp = xx.find(":");
+		if (pp >= 0) {
+			fmt = xx.substr(pp + 1, -1);
+			xx = xx.head(pp);
+		}
+
 		//msg_write("format:  " + xx);
 		ExpressionBuffer ee;
 		ee.analyse(tree, xx);
@@ -841,7 +863,12 @@ Node *try_parse_format_string(SyntaxTree *tree, Block *block, Value &v) {
 		
 		try {
 			Node *n = tree->parse_command(block);
-			n = tree->check_param_link(n, TypeString, "", 0);
+
+			if (fmt != "") {
+				n = apply_format(tree, n, fmt);
+			} else {
+				n = tree->check_param_link(n, TypeString, "", 0);
+			}
 			//n->show();
 			parts.add(n);
 		} catch (Exception &e) {
@@ -2653,8 +2680,9 @@ void SyntaxTree::parse() {
 	for (auto *f: functions)
 		test_node_recursion(f->block, "a " + f->long_name());
 
-	for (auto *c: owned_classes)
-		auto_implement_functions(c);
+	for (int i=0; i<owned_classes.num; i++) // array might change...
+		auto_implement_functions(owned_classes[i]);
+
 	for (auto *f: functions)
 		test_node_recursion(f->block, "b " + f->long_name());
 }

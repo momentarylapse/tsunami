@@ -38,8 +38,7 @@ extern string version;
 //--------------------------------------------------------------------//
 void avi_close(int texture);
 
-void _cdecl Init(const string &api, int width, int height);
-void TellUsWhatsWrong();
+void _cdecl Init();
 void KillDeviceObjects();
 void ReincarnateDeviceObjects();
 void Kill();

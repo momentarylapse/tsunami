@@ -36,6 +36,7 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	loop = false; // do we want to loop (GUI)
 	pos = 0;
 	needs_rebuild = true;
+	_previous_pos_delta = 0;
 	if (song) {
 		build_data();
 		set_range(song->range());
@@ -159,6 +160,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 	if ((pos >= _range.end()) and allow_loop and loop) {
 		reset_state();
+		_previous_pos_delta = _range.length;
 		_set_pos(_range.offset);
 	}
 	return size;
@@ -274,10 +276,12 @@ void SongRenderer::_set_pos(int _pos) {
 		tr->set_pos(pos);
 }
 
-int SongRenderer::get_pos() {
-	int delta = 0;
+int SongRenderer::get_pos(int delta) {
 	Range r = range();
-	return loopi(pos + delta, r.start(), r.end());
+	int p = pos + delta;
+	if (p < r.offset)
+		p += _previous_pos_delta;
+	return p;//loopi(pos + delta, r.start(), r.end());
 }
 
 void SongRenderer::on_song_add_track() {

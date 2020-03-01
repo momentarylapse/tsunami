@@ -22,20 +22,18 @@ extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.2.1";
+string version = "0.13.4.0";
 
 
 // libraries (in case Visual C++ is used)
-#pragma comment(lib,"opengl32.lib")
-#pragma comment(lib,"glu32.lib")
+//#pragma comment(lib,"opengl32.lib")
+//#pragma comment(lib,"glu32.lib")
 //#pragma comment(lib,"glut32.lib")
 //#pragma comment(lib,"glaux.lib ")
-#ifdef NIX_ALLOW_VIDEO_TEXTURE
-	#pragma comment(lib,"strmiids.lib")
-	#pragma comment(lib,"vfw32.lib")
-#endif
-
-void TestGLError(const string &);
+//#ifdef NIX_ALLOW_VIDEO_TEXTURE
+//	#pragma comment(lib,"strmiids.lib")
+//	#pragma comment(lib,"vfw32.lib")
+//#endif
 
 
 
@@ -66,8 +64,7 @@ libraries to link:
 */
 
 
-void TestGLError(const char *pos)
-{
+void TestGLError(const char *pos) {
 #if 1
 	int err = glGetError();
 	if (err == GL_NO_ERROR)
@@ -85,27 +82,17 @@ void TestGLError(const char *pos)
 #endif
 }
 
-
-// environment
-bool Usable = false, DoingEvilThingsToTheDevice;
-
 // things'n'stuff
-static bool WireFrame;
-static int ClipPlaneMask;
 int FontGlyphWidth[256];
 
 
-int Api;
-string ApiName;
-int device_width, device_height;
+//int device_width, device_height;
 int target_width, target_height;						// render target size (window/texture)
 rect target_rect;
 bool Fullscreen;
 callback_function *RefillAllVertexBuffers = NULL;
 
-int FatalError;
-int NumTrias;
-int TextureMaxFramesToLive,MaxVideoTextureSize=256;
+int MaxVideoTextureSize=256;
 
 bool CullingInverted;
 
@@ -120,8 +107,7 @@ Fog fog;
 int glShaderCurrent = 0;
 
 
-void MatrixOut(matrix &m)
-{
+void MatrixOut(matrix &m) {
 	msg_write("MatrixOut");
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._00,m._01,m._02,m._03));
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._10,m._11,m._12,m._13));
@@ -129,42 +115,35 @@ void MatrixOut(matrix &m)
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._30,m._31,m._32,m._33));
 }
 
-void mout(matrix &m)
-{
+void mout(matrix &m) {
 	msg_write(format("		%f	%f	%f	%f",m._00,m._01,m._02,m._03));
 	msg_write(format("		%f	%f	%f	%f",m._10,m._11,m._12,m._13));
 	msg_write(format("		%f	%f	%f	%f",m._20,m._21,m._22,m._23));
 	msg_write(format("		%f	%f	%f	%f",m._30,m._31,m._32,m._33));
 }
 
-void Init(const string &api, int width, int height)
-{
+void Init() {
 	//if (Usable)
 	//	return;
 
 	msg_write("Nix");
 	msg_right();
 	msg_write("[" + version + "]");
+
+	msg_write(string("OpenGL: ") + (char*)glGetString(GL_VERSION));
+	msg_write(string("Renderer: ") + (char*)glGetString(GL_RENDERER));
+	msg_write(string("GLSL: ") + (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 	
 
 	Fullscreen = false; // before nix is started, we're hopefully not in fullscreen mode
 
-
-	device_width = width;
-	device_height = height;
-
 	// reset data
-	Api = -1;
-	ApiName = "";
-	FatalError = FatalErrorNone;
 	RefillAllVertexBuffers = NULL;
 
 
 	// default values of the engine
 	view_matrix = matrix::ID;
 	projection_matrix = matrix::ID;
-	TextureMaxFramesToLive = 4096 * 8;
-	ClipPlaneMask = 0;
 	CullingInverted = false;
 
 
@@ -173,31 +152,29 @@ void Init(const string &api, int width, int height)
 	init_shaders();
 	init_vertex_buffers();
 
-	Resize(width, height);
-
 	SetCull(CULL_DEFAULT);
 	SetWire(false);
 	SetAlpha(ALPHA_NONE);
-	nix::EnableLighting(false);
-	nix::SetMaterial(White, White, White, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
+	SetMaterial(White, White, White, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
 	CullingInverted = false;
 	SetProjectionPerspective();
 	SetZ(true, true);
 	SetShader(default_shader_3d);
 
-	Usable = true;
+	int vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	FrameBuffer::DEFAULT->width = vp[2];
+	FrameBuffer::DEFAULT->height = vp[3];
 
 
 	msg_ok();
 	msg_left();
 }
 
-void Kill()
-{
+void Kill() {
 	msg_write("nix.kill");
 	KillDeviceObjects();
 	glDeleteVertexArrays(1, &VertexArrayID);
-	Usable = false;
 }
 
 // erlaubt dem Device einen Neustart
@@ -216,18 +193,7 @@ void ReincarnateDeviceObjects()
 }
 
 
-bool nixDevNeedsUpdate = true;
 
-
-
-
-void TellUsWhatsWrong()
-{
-	/*if (NixFatalError == FatalErrorNoDirectX9)
-		hui::ErrorBox(NixWindow, "DirectX 9 nicht gefunden!","Es tut mir au&serordentlich leid, aber ich hatte Probleme, auf Ihrem\nSystem DirectX 9 zu starten und mich damit zu verbinden!");
-	if (NixFatalError == FatalErrorNoDevice)
-		hui::ErrorBox(NixWindow,"DirectX 9: weder Hardware- noch Softwaremodus!!","Es tut mir au&serordentlich leid, aber ich hatte Probleme, auf Ihrem\nSystem DirectX 9 weder einen Hardware- noch einen Softwaremodus abzuringen!\n...Unerlaubte Afl&osung?");*/
-}
 
 // shoot down windows
 void KillWindows()
@@ -247,21 +213,18 @@ void KillWindows()
 
 
 
-void SetWire(bool enabled)
-{
-	WireFrame = enabled;
-	if (WireFrame){
+void SetWire(bool wire) {
+	if (wire) {
 		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		glDisable(GL_CULL_FACE);
-	}else{
+	} else {
 		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 		glEnable(GL_CULL_FACE);
 	}
 	TestGLError("SetWire");
 }
 
-void SetCull(int mode)
-{
+void SetCull(int mode) {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	if (mode == CULL_NONE)
@@ -273,33 +236,31 @@ void SetCull(int mode)
 	TestGLError("SetCull");
 }
 
-void SetZ(bool write, bool test)
-{
-	if (test){
+void SetZ(bool write, bool test) {
+	if (test) {
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		if (write)
 			glDepthMask(1);
 		else
 			glDepthMask(0);
-	}else{
-		if (write){
+	} else {
+		if (write) {
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_ALWAYS);
 			glDepthMask(1);
-		}else{
+		} else {
 			glDisable(GL_DEPTH_TEST);
 		}
 	}
 	TestGLError("SetZ");
 }
 
-void SetOffset(float offset)
-{
-	if (fabs(offset) > 0.01f){
+void SetOffset(float offset) {
+	if (fabs(offset) > 0.01f) {
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(offset, offset);
-	}else{
+	} else {
 		glDisable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(0, 0);
 	}
@@ -334,8 +295,7 @@ void SetAlpha(int mode)
 void SetAlphaM(int mode)
 {	SetAlpha(mode);	}
 
-unsigned int OGLGetAlphaMode(int mode)
-{
+unsigned int OGLGetAlphaMode(int mode) {
 	if (mode == ALPHA_ZERO)
 		return GL_ZERO;
 	if (mode == ALPHA_ONE)
@@ -360,8 +320,7 @@ unsigned int OGLGetAlphaMode(int mode)
 	return GL_ZERO;
 }
 
-void SetAlpha(int src,int dst)
-{
+void SetAlpha(int src,int dst) {
 	glEnable(GL_BLEND);
 	//glDisable(GL_ALPHA_TEST);
 	glBlendFunc(OGLGetAlphaMode(src),OGLGetAlphaMode(dst));
@@ -371,8 +330,7 @@ void SetAlpha(int src,int dst)
 void SetAlphaSD(int src,int dst)
 {	SetAlpha(src,dst);	}
 
-void SetAlpha(float factor)
-{
+void SetAlpha(float factor) {
 	msg_error("deprecated... SetAlpha(factor)");
 	/*glDisable(GL_ALPHA_TEST);
 	float di[4];

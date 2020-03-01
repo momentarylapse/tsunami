@@ -154,9 +154,9 @@ class MultiEchoGrid extends Grid
 		float x = x_axis.project(r.delay)
 		float y = y_axis.project(r.volume)
 		
-		p.draw_str(x - 20, y - 50, "delay: " + (r.delay * 1000).str2(0) + " ms")
-		p.draw_str(x - 20, y - 35, "volume: " + (r.volume * 100.0).str2(0) + " %")
-		p.draw_str(x - 20, y - 20, "feedback " + (r.feedback * 100).str2(0) + "%")
+		p.draw_str(x - 20, y - 50, "delay: {{r.delay * 1000:.0}} ms")
+		p.draw_str(x - 20, y - 35, "volume: {{r.volume * 100.0:.0}} %")
+		p.draw_str(x - 20, y - 20, "feedback: {{r.feedback * 100:.1}} %")
 
 	# left button down -> select
 	override void on_left_button_down()

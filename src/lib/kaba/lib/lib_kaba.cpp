@@ -71,6 +71,7 @@ void SIAddPackageKaba() {
 	add_class(TypeClass);
 		class_add_elementx("name", TypeString, &Class::name);
 		class_add_elementx("size", TypeInt, &Class::size);
+		class_add_elementx("type", TypeInt, &Class::type);
 		class_add_elementx("parent", TypeClassP, &Class::parent);
 		class_add_elementx("param", TypeClassP, &Class::param);
 		class_add_elementx("namespace", TypeClassP, &Class::name_space);
@@ -80,6 +81,14 @@ void SIAddPackageKaba() {
 		class_add_elementx("constants", TypeConstantPList, &Class::constants);
 		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);
 			func_add_param("c", TypeClass);
+		class_add_funcx("is_pointer", TypeBool, &Class::is_pointer);
+		class_add_funcx("is_super_array", TypeBool, &Class::is_super_array);
+		class_add_funcx("is_array", TypeBool, &Class::is_array);
+		class_add_funcx("is_dict", TypeBool, &Class::is_dict);
+		class_add_funcx("get_func", TypeFunctionP, &Class::get_func);
+			func_add_param("name", TypeString);
+			func_add_param("return_type", TypeClass);
+			func_add_param("params", TypeClassPList);
 		class_add_funcx("long_name", TypeString, &Class::long_name);
 
 	add_class(TypeClassP);

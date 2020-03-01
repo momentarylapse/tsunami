@@ -550,7 +550,7 @@ class SongRenderer extends AudioSource
 	extern override int read(AudioBuffer b)
 	#extern override void reset_state()
 	extern Range range()
-	extern int get_pos()
+	extern int get_pos(int delta)
 	extern void set_pos(int pos)
 	extern BeatSource* get_beat_source()
 

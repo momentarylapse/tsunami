@@ -33,8 +33,6 @@
 	#include <fcntl.h>
 	#include <unistd.h>
 	#include <sys/stat.h>
-	#define _open	open
-	#define _close	close
 #endif
 
 #ifdef OS_WINDOWS
@@ -50,7 +48,7 @@
 #endif
 
 
-namespace nix{
+namespace nix {
 
 extern int current_program;
 
@@ -58,14 +56,11 @@ extern int current_program;
 extern matrix view_matrix, projection_matrix;
 extern matrix world_matrix, world_view_projection_matrix;
 
-extern bool Usable, DoingEvilThingsToTheDevice;
 
-//extern int FontGlyphWidth[256];
 
 void TestGLError(const char *);
 
-struct Fog
-{
+struct Fog {
 	color _color;
 	float density;
 };

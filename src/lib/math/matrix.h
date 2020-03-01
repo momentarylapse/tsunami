@@ -58,8 +58,10 @@ public:
 	static matrix _cdecl rotation_x(float w);
 	static matrix _cdecl rotation_y(float w);
 	static matrix _cdecl rotation_z(float w);
-	static matrix _cdecl rotation(const vector &ang);
+	static matrix _cdecl rotation_v(const vector &ang);
 	static matrix _cdecl rotation_q(const quaternion &q);
+	static matrix _cdecl rotation(const vector &ang) { return rotation_v(ang); }
+	static matrix _cdecl rotation(const quaternion &q) { return rotation_q(q); }
 	static matrix _cdecl scale(float fx,float fy,float fz);
 	static matrix _cdecl reflection(const plane &pl);
 	static matrix _cdecl perspective(float fovy, float aspect, float z_near, float z_far);

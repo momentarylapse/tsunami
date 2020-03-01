@@ -1515,7 +1515,7 @@ bool AudioView::looping() {
 int AudioView::playback_pos() {
 	// crappy syncing....
 	_playback_sync_counter ++;
-	if (_playback_sync_counter > 200)
+	if (_playback_sync_counter > 100)
 		_sync_playback_pos();
 	
 	int pos = output_stream->samples_played() + _playback_stream_offset;
@@ -1527,7 +1527,7 @@ int AudioView::playback_pos() {
 // crappy syncing....
 void AudioView::_sync_playback_pos() {
 	int spos = output_stream->samples_played();
-	int xpos = renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
+	int xpos = renderer->get_pos( - output_stream->get_available() - output_stream->get_latency());
 	_playback_stream_offset = xpos - spos;
 	_playback_sync_counter = 0;
 }

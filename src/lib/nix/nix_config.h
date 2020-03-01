@@ -52,29 +52,13 @@
 
 
 typedef void callback_function();
-typedef void render_str_function(const string &text, Image &image);
-
 
 
 #define NIX_MAX_TEXTURELEVELS	8
 
-enum{
-	FatalErrorNone,
-	FatalErrorNoDirectX8,
-	FatalErrorNoDirectX9,
-	FatalErrorNoDevice,
-	FatalErrorUnknownApi
-};
-
-//#define ResX	NixScreenWidth
-//#define ResY	NixScreenHeight
-//#define MaxX	target_width
-//#define MaxY	target_height
-
-
 
 // alpha modes
-enum{
+enum {
 	ALPHA_NONE,
 	ALPHA_COLOR_KEY = 10,
 	ALPHA_COLOR_KEY_SMOOTH,
@@ -84,7 +68,7 @@ enum{
 };
 
 // alpha parameters ("functions")
-enum{
+enum {
 	ALPHA_ZERO,
 	ALPHA_ONE,
 	ALPHA_SOURCE_COLOR,
@@ -97,14 +81,14 @@ enum{
 	ALPHA_DEST_INV_ALPHA,
 };
 
-enum{
+enum {
 	CULL_NONE,
 	CULL_CCW,
 	CULL_CW,
 	CULL_DEFAULT = CULL_CCW
 };
 
-enum{
+enum {
 	STENCIL_NONE,
 	STENCIL_INCREASE,
 	STENCIL_DECREASE,
@@ -119,30 +103,23 @@ enum{
 	STENCIL_RESET
 };
 
-enum{
+enum {
 	FOG_LINEAR,
 	FOG_EXP,
 	FOG_EXP2
 };
 
 
-namespace nix{
+namespace nix {
 
-extern int Api;
-extern string ApiName;
-extern int device_width, device_height;						// render target size (window, won't change)
+//extern int device_width, device_height;						// render target size (window, won't change)
 extern int target_width, target_height;						// current render target size (window/texture)
 extern bool Fullscreen;
-extern callback_function *RefillAllVertexBuffers;			// animate the application to refill lost VertexBuffers
-extern render_str_function *render_str;
 extern bool LightingEnabled;
 extern bool CullingInverted;
 
-extern int FatalError;
-extern int NumTrias;
-
 extern string texture_dir;
-extern int TextureMaxFramesToLive, MaxVideoTextureSize;
+extern int MaxVideoTextureSize;
 
 class VertexBuffer;
 extern VertexBuffer *vb_temp; // vertex buffer for 1-frame geometries

@@ -248,15 +248,15 @@ vector vector::dir2ang2(const vector &up) const {
 
 // adds two angles (juxtaposition of rotations)
 vector VecAngAdd(const vector &ang1,const vector &ang2) {
-	auto q1 = quaternion::rotation_v(ang1);
-	auto q2 = quaternion::rotation_v(ang2);
+	auto q1 = quaternion::rotation(ang1);
+	auto q2 = quaternion::rotation(ang2);
 	auto q = q2 * q1;
 	return q.get_angles();
 }
 
 vector VecAngInterpolate(const vector &ang1,const vector &ang2,float t) {
-	auto q1 = quaternion::rotation_v(ang1);
-	auto q2 = quaternion::rotation_v(ang2);
+	auto q1 = quaternion::rotation(ang1);
+	auto q2 = quaternion::rotation(ang2);
 	auto r = quaternion::interpolate(q1,q2,t);
 	return r.get_angles();
 }
@@ -271,22 +271,22 @@ vector vector::rotate(const vector &ang) const {
 // which one is the largest coordinate of this vector
 int vector::important_plane() const {
 	vector w;
-	w.x=fabs(x);
-	w.y=fabs(y);
-	w.z=fabs(z);
+	w.x = fabs(x);
+	w.y = fabs(y);
+	w.z = fabs(z);
 	if ((w.x<=w.y) and (w.x<=w.z))
-		return 1;	// Y-Z-Ebene
+		return 0;	// Y-Z-Ebene
 	if (w.y<=w.z)
-		return 2;	// X-Z-Ebene
-	return 3;		// X-Y-Ebene
+		return 1;	// X-Z-Ebene
+	return 2;		// X-Y-Ebene
 }
 
 // finds an orthogonal vector to v
 vector vector::ortho() const {
 	int p = important_plane();
-	if (p == 3)
+	if (p == 2)
 		return vector(y, - x, 0);
-	else if (p == 2)
+	else if (p == 1)
 		return vector(z, 0, - x);
 	return vector(0, z, - y);
 }

@@ -72,7 +72,7 @@ public:
 		typedef int Pipeline;
 		typedef int Vertex1;
 		typedef int RenderPass;
-		typedef int UBOWrapper;
+		typedef int UniformBuffer;
 		typedef int DescriptorSet;
 		typedef int CommandBuffer;
 		typedef int SwapChain;
@@ -116,7 +116,7 @@ void SIAddPackageVulkan() {
 	auto TypePipeline		= add_type  ("Pipeline", sizeof(vulkan::Pipeline));
 	auto TypeRenderPass		= add_type  ("RenderPass", sizeof(vulkan::RenderPass));
 	auto TypeRenderPassP	= add_type_p(TypeRenderPass);
-	auto TypeUBOWrapper		= add_type  ("UBOWrapper", sizeof(vulkan::UBOWrapper));
+	auto TypeUBOWrapper		= add_type  ("UBOWrapper", sizeof(vulkan::UniformBuffer));
 	auto TypeUBOWrapperP	= add_type_p(TypeUBOWrapper);
 	auto TypeUBOWrapperPList= add_type_l(TypeUBOWrapperP);
 	auto TypeDescriptorSet	= add_type  ("DescriptorSet", sizeof(vulkan::DescriptorSet));
@@ -209,10 +209,10 @@ void SIAddPackageVulkan() {
 
 
 	add_class(TypeUBOWrapper);
-		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::UBOWrapper::__init__));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::UniformBuffer::__init__));
 			func_add_param("size", TypeInt);
-		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::UBOWrapper::__delete__));
-		class_add_funcx("update", TypeVoid, vul_p(&vulkan::UBOWrapper::update));
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::UniformBuffer::__delete__));
+		class_add_funcx("update", TypeVoid, vul_p(&vulkan::UniformBuffer::update));
 			func_add_param("source", TypePointer);
 
 

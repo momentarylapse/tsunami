@@ -13,6 +13,20 @@
 
 namespace nix{
 
+class UniformBuffer {
+public:
+	unsigned int buffer;
+	UniformBuffer();
+	~UniformBuffer();
+
+	void __init__();
+	void __delete__();
+	void update(void *data, int size);
+	void update_array(const DynamicArray &a);
+};
+
+void BindUniform(UniformBuffer *ub, int binding);
+
 class Shader {
 public:
 	string filename;
@@ -26,8 +40,9 @@ public:
 	void _cdecl set_data(int location, const float *data, int size);
 	void _cdecl set_matrix(int location, const matrix &m);
 	void _cdecl set_color(int location, const color &c);
-	void _cdecl get_data(const string &var_name, void *data, int size);
-	int _cdecl get_location(const string &var_name);
+	void _cdecl get_data(int location, void *data, int size);
+	int _cdecl get_location(const string &name);
+	void _cdecl link_uniform_block(const string &name, int binding);
 	
 	void _cdecl dispatch(int nx, int ny, int nz);
 
@@ -42,30 +57,24 @@ public:
 		LOCATION_MATRIX_P2D,
 		LOCATION_TEX,
 		LOCATION_TEX_CUBE = LOCATION_TEX + NIX_MAX_TEXTURELEVELS,
-		LOCATION_CAM_POS,
-		LOCATION_CAM_DIR,
 		LOCATION_MATERIAL_AMBIENT,
 		LOCATION_MATERIAL_DIFFUSIVE,
 		LOCATION_MATERIAL_SPECULAR,
 		LOCATION_MATERIAL_SHININESS,
 		LOCATION_MATERIAL_EMISSION,
-		LOCATION_LIGHT_COLOR,
-		LOCATION_LIGHT_HARSHNESS,
-		LOCATION_LIGHT_POS,
-		LOCATION_LIGHT_RADIUS,
-		LOCATION_FOG_COLOR,
-		LOCATION_FOG_DENSITY,
 		NUM_LOCATIONS
 	};
 
 	int location[NUM_LOCATIONS];
+
+
+	static Shader* _cdecl load(const string &filename);
+	static Shader* _cdecl create(const string &source);
 };
 
 
 void init_shaders();
 void _cdecl DeleteAllShaders();
-Shader* _cdecl LoadShader(const string &filename);
-Shader* _cdecl CreateShader(const string &source);
 void _cdecl SetShader(Shader *s);
 void _cdecl SetOverrideShader(Shader *s);
 
@@ -73,6 +82,7 @@ extern Shader *default_shader_2d;
 extern Shader *default_shader_3d;
 
 extern string shader_dir;
+
 
 };
 

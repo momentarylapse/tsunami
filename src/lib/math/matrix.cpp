@@ -243,7 +243,7 @@ matrix matrix::rotation_z(float w) {
 }
 
 // ZXY -> for objects
-matrix matrix::rotation(const vector &ang) {
+matrix matrix::rotation_v(const vector &ang) {
 	matrix m;
 	/*matrix x,y,z;
 	MatrixRotationX(x,ang.x);

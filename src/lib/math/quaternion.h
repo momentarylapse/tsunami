@@ -43,6 +43,9 @@ public:
 	static quaternion _cdecl rotation_a(const vector &axis, float w);
 	static quaternion _cdecl rotation_v(const vector &ang);
 	static quaternion _cdecl rotation_m(const matrix &m);
+	static quaternion _cdecl rotation(const vector &axis, float w) { return rotation_a(axis, w); }
+	static quaternion _cdecl rotation(const vector &ang) { return rotation_v(ang); }
+	static quaternion _cdecl rotation(const matrix &m) { return rotation_m(m); }
 	static quaternion _cdecl interpolate(const quaternion &q1, const quaternion &q2, float t);
 	static quaternion _cdecl interpolate(const quaternion &q1, const quaternion &q2, const quaternion &q3, const quaternion &q4, float t);
 	static quaternion _cdecl drag(const vector &up, const vector &dang, bool reset_z);

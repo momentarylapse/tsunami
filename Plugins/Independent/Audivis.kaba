@@ -1,5 +1,6 @@
 use hui
 use "../api.kaba"
+use "../AudioVisualizer/Shader.kaba"
 
 enum
 	MODE_FORWARD
@@ -28,7 +29,6 @@ Button forward 'Forward' expandx expandy")
 		event("forward", on_forward)
 	
 	void on_forward()
-		print("forward")
 		looper.go_forward()
 		
 
@@ -39,6 +39,9 @@ class Looper extends TsunamiPlugin
 	SongRenderer* renderer
 	Song* song
 	TrackMarker* cur_part
+	ShaderVis* shader_vis
+	ShaderPanel* shader_panel
+	Dialog* shader_win
 	
 	override void on_start()
 		cur_part = nil
@@ -48,7 +51,23 @@ class Looper extends TsunamiPlugin
 		runner = RunRepeated(0.05, self, on_update)
 		mode = MODE_FORWARD
 		
+		shader_vis = chain.add(Module.AUDIO_VISUALIZER, "Shader")
+		chain.connect(renderer, 0, shader_vis, 0)
+		chain.connect(shader_vis, 0, session.view.output_stream, 0) # almost ...
+		
+		shader_win = new Dialog("Shader", 800, 800, session.win, true)
+		shader_panel = shader_vis.create_panel()
+		shader_win.embed(shader_panel, "", 0,0)
+		shader_win.show()
+		
+		
 	override void on_stop()
+		print("stop 1")
+		del shader_panel
+		print("stop 2")
+		del shader_win
+		print("stop 3")
+		del shader_vis
 		CancelRunner(runner)
 			
 	override ConfigPanel* create_panel()

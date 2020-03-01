@@ -689,7 +689,7 @@ void SIAddPackageX()
 		class_add_element("height",			TypeFloatList,	GetDATerrain(height));
 		class_add_element("pattern",		TypeVector,		GetDATerrain(pattern));
 		class_add_element("material",		TypeMaterialP,	GetDATerrain(material));
-		class_add_element("texture_scale",	TypeVectorArray,GetDATerrain(texture_scale));
+		class_add_element("texture_scale",	TypeVectorList,GetDATerrain(texture_scale));
 		class_add_func("update",			TypeVoid,		x_p(mf(&Terrain::Update)));
 			func_add_param("x1",		TypeInt);
 			func_add_param("x2",		TypeInt);

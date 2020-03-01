@@ -38,7 +38,7 @@ public:
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
 
-	int get_pos();
+	int get_pos(int delta);
 	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
@@ -67,6 +67,7 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
+	int _previous_pos_delta;
 	Set<const Track*> allowed_tracks;
 	Set<const TrackLayer*> allowed_layers;
 	Set<const TrackLayer*> allowed_layers_requested;

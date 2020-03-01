@@ -123,7 +123,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
 	track->subscribe(this, [=]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
-	track->subscribe(this, [=]{ track = nullptr; update_layers(); }, track->MESSAGE_DELETE);
+	track->subscribe(this, [=]{ on_track_delete(); }, track->MESSAGE_DELETE);
 	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_ADD_LAYER);
 	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
 
@@ -131,7 +131,10 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 }
 
 TrackRenderer::~TrackRenderer() {
-	synth->perf_set_parent(nullptr);
+	unlink_from_track();
+
+	if (synth)
+		synth->perf_set_parent(nullptr);
 	for (auto *l: layers)
 		l->unsubscribe(this);
 	if (track) {
@@ -143,8 +146,36 @@ TrackRenderer::~TrackRenderer() {
 	if (!direct_mode) {
 		for (auto *f: fx)
 			delete f;
-		delete synth;
+		if (synth)
+			delete synth;
 	}
+}
+
+void TrackRenderer::unlink_from_track() {
+	if (synth) {
+		synth->perf_set_parent(nullptr);
+		if (!direct_mode)
+			delete synth;
+		synth = nullptr;
+	}
+
+	if (track) {
+		track->song->unsubscribe(this);
+		track->unsubscribe(this);
+		track = nullptr;
+	}
+
+	if (!direct_mode) {
+		for (auto *f: fx)
+			delete f;
+		fx = {};
+	}
+
+	update_layers();
+}
+
+void TrackRenderer::on_track_delete() {
+	unlink_from_track();
 }
 
 void TrackRenderer::fill_midi_streamer() {

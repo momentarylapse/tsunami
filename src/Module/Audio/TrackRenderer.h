@@ -53,8 +53,10 @@ public:
 
 	void reset_state();
 
+	void unlink_from_track();
 	void update_layers();
 
+	void on_track_delete();
 	void on_track_replace_synth();
 	void on_track_add_or_delete_fx();
 	void on_track_change_data();

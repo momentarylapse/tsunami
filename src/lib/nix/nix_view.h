@@ -47,12 +47,20 @@ public:
 	DepthBuffer *depth_buffer;
 	unsigned int frame_buffer;
 	int width, height;
+	rect area() const;
 
 	static FrameBuffer *DEFAULT;
 };
 
 void BindFrameBuffer(FrameBuffer *fb);
 
+
+void StartFrameHui();
+void EndFrameHui();
+#if HAS_LIB_GLFW
+void StartFrameGLFW(void *win);
+void EndFrameGLFW(void *win);
+#endif
 
 };
 

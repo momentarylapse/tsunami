@@ -37,6 +37,7 @@ VertexBuffer::VertexBuffer(const string &f) {
 		a.buffer = b.buffer;
 		a.normalized = false;
 		a.stride = 0;
+		a.divisor = 0;
 		if (x == "1f") {
 			a.type = GL_FLOAT;
 			a.num_components = 1;
@@ -73,8 +74,14 @@ void VertexBuffer::__delete__() {
 	this->~VertexBuffer();
 }
 
+void VertexBuffer::set_per_instance(int index) {
+	if (index < 0 or index >= num_attributes)
+		throw Exception("VertexBuffer: invalid attribute index " + i2s(index));
+	attr[index].divisor = 1;
+}
+
 void VertexBuffer::update(int index, const DynamicArray &a) {
-	if (index < 0 or index >= MAX_VB_BUFFERS)
+	if (index < 0 or index >= num_buffers)
 		throw Exception("VertexBuffer: invalid index " + i2s(index));
 	buf[index].count = a.num;
 	glBindBuffer(GL_ARRAY_BUFFER, buf[index].buffer);
@@ -83,6 +90,14 @@ void VertexBuffer::update(int index, const DynamicArray &a) {
 
 int VertexBuffer::count() const {
 	return buf[0].count;
+}
+
+void VertexBuffer::create_rect(const rect &s) {
+	Array<vector> p = {vector(s.x1,s.y1,0), vector(s.x1,s.y2,0), vector(s.x2,s.y2,0),  vector(s.x1,s.y1,0), vector(s.x2,s.y2,0), vector(s.x2,s.y1,0)};
+	Array<float> uv = {0,0, 0,1, 1,1,  0,0, 1,1, 1,0};
+	update(0, p);
+	update(1, p);
+	update(2, uv);
 }
 
 int _current_vb_attr_ = 0;
@@ -96,6 +111,7 @@ void SetVertexBuffer(VertexBuffer *vb) {
 		TestGLError("set vb 2");
 		glVertexAttribPointer(i, a.num_components, a.type, a.normalized, 0, (void*)0);//a.stride, (void*)a.offset);
 		TestGLError("set vb 3");
+		glVertexAttribDivisor(i, a.divisor);
 	}
 
 	for (int i=vb->num_attributes; i<_current_vb_attr_; i++)

@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.13.0";
+string LibVersion = "0.17.14.0";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -698,7 +698,8 @@ void SIAddStatements() {
 void SIAddXCommands();
 void SIAddPackageBase();
 void SIAddPackageKaba();
-void SIAddPackageFile();
+void SIAddPackageTime();
+void SIAddPackageOS();
 void SIAddPackageMath();
 void SIAddPackageThread();
 void SIAddPackageHui();
@@ -762,7 +763,8 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageBase();
 	SIAddPackageKaba();
 	SIAddPackageMath();
-	SIAddPackageFile();
+	SIAddPackageTime();
+	SIAddPackageOS();
 	SIAddPackageImage();
 	SIAddPackageHui();
 	SIAddPackageNix();

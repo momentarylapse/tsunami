@@ -13,6 +13,7 @@ namespace Kaba{
 extern const Class *TypeIntPs;
 extern const Class *TypeFloatPs;
 extern const Class *TypeBoolPs;
+extern const Class *TypeDate;
 
 
 
@@ -22,13 +23,11 @@ extern const Class *TypeBoolPs;
 #pragma GCC optimize("0")
 
 
-class DirEntryList : public Array<DirEntry>
-{
+class DirEntryList : public Array<DirEntry> {
 public:
 	void _cdecl __assign__(const DirEntryList &o)
 	{	*this = o;	}
-	string _cdecl str()
-	{
+	string _cdecl str() {
 		string s = "[";
 		for (int i=0;i<num;i++){
 			if (i > 0)
@@ -49,8 +48,7 @@ public:
 	}
 };
 
-class KabaFile : public File
-{
+class KabaFile : public File {
 public:
 	void _cdecl __delete__()
 	{ this->~KabaFile(); }
@@ -91,84 +89,70 @@ class KabaFileNotWritableError : public KabaFileError
 
 
 
-File* kaba_file_open(const string &filename)
-{
+File* kaba_file_open(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileOpen(filename), KabaFileError);
 	return nullptr;
 }
 
-File* kaba_file_open_text(const string &filename)
-{
+File* kaba_file_open_text(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileOpenText(filename), KabaFileError);
 	return nullptr;
 }
 
-File* kaba_file_create(const string &filename)
-{
+File* kaba_file_create(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileCreate(filename), KabaFileError);
 	return nullptr;
 }
 
-File* kaba_file_create_text(const string &filename)
-{
+File* kaba_file_create_text(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileCreateText(filename), KabaFileError);
 	return nullptr;
 }
 
-string kaba_file_read(const string &filename)
-{
+string kaba_file_read(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileRead(filename), KabaFileError);
 	return "";
 }
 
-string kaba_file_read_text(const string &filename)
-{
+string kaba_file_read_text(const string &filename) {
 	KABA_EXCEPTION_WRAPPER2(return FileReadText(filename), KabaFileError);
 	return "";
 }
 
-void kaba_file_write(const string &filename, const string &buffer)
-{
+void kaba_file_write(const string &filename, const string &buffer) {
 	KABA_EXCEPTION_WRAPPER2(FileWrite(filename, buffer), KabaFileError);
 }
 
-void kaba_file_write_text(const string &filename, const string &buffer)
-{
+void kaba_file_write_text(const string &filename, const string &buffer) {
 	KABA_EXCEPTION_WRAPPER2(FileWriteText(filename, buffer), KabaFileError);
 }
 
-string kaba_file_hash(const string &filename, const string &type)
-{
+string kaba_file_hash(const string &filename, const string &type) {
 	KABA_EXCEPTION_WRAPPER2(return file_hash(filename, type), KabaFileError);
 	return "";
 }
 
-void kaba_file_rename(const string &a, const string &b)
-{
+void kaba_file_rename(const string &a, const string &b) {
 	if (!file_rename(a, b))
 		kaba_raise_exception(new KabaFileError("can not rename file '" + a + "' -> '" + b + "'"));
 }
 
-void kaba_file_copy(const string &a, const string &b)
-{
+void kaba_file_copy(const string &a, const string &b) {
 	if (!file_copy(a, b))
 		kaba_raise_exception(new KabaFileError("can not copy file '" + a + "' -> '" + b + "'"));
 }
 
-void kaba_file_delete(const string &f)
-{
+void kaba_file_delete(const string &f) {
 	if (!file_delete(f))
 		kaba_raise_exception(new KabaFileError("can not delete file '" + f + "'"));
 }
 
-void kaba_dir_create(const string &f)
-{
+void kaba_dir_create(const string &f) {
 	if (!dir_create(f))
 		kaba_raise_exception(new KabaFileError("can not create directory '" + f + "'"));
 }
 
-void kaba_dir_delete(const string &f)
-{
+void kaba_dir_delete(const string &f) {
 	if (!dir_delete(f))
 		kaba_raise_exception(new KabaFileError("can not delete directory '" + f + "'"));
 }
@@ -176,28 +160,18 @@ void kaba_dir_delete(const string &f)
 
 #pragma GCC pop_options
 
-void SIAddPackageFile()
-{
-	add_package("file", false);
+void SIAddPackageOS() {
+	add_package("os", false);
 
 	const Class *TypeFile = add_type("File", 0);
 	const Class *TypeFileP = add_type_p(TypeFile);
 	const Class *TypeFilesystem = add_type("Filesystem", 0);
-	const Class *TypeDate = add_type("Date", sizeof(Date));
 	const Class *TypeDirEntry = add_type("DirEntry", sizeof(DirEntry));
 	const Class *TypeDirEntryList = add_type_l(TypeDirEntry);
 	const Class *TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
 
-
-	add_class(TypeDate);
-		class_add_elementx("time", TypeInt, &Date::time);
-		class_add_funcx("format", TypeString, &Date::format);
-			func_add_param("f", TypeString);
-		class_add_funcx("str", TypeString, &Date::str);
-		class_add_funcx("now", TypeDate, &get_current_date, FLAG_STATIC);
-	
 	add_class(TypeFile);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFile::__delete__);
 		//class_add_funcx("getCDate", TypeDate, &File::GetDateCreation);

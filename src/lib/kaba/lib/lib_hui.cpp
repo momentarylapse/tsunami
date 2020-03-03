@@ -80,6 +80,7 @@ extern const Class *TypeFloatList;
 extern const Class *TypeComplexList;
 extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
+//extern const Class *TypeTimer;
 const Class *TypeHuiWindowP;
 
 void SIAddPackageHui()
@@ -99,7 +100,6 @@ void SIAddPackageHui()
 	const Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
 	const Class *TypeHuiEventP = add_type_p(TypeHuiEvent);
 	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
-	const Class *TypeHuiTimer = add_type("Timer", sizeof(hui::Timer));
 	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
 	
@@ -442,13 +442,6 @@ void SIAddPackageHui()
 		class_derive_from(TypeBasePainter, true, true);
 
 
-	add_class(TypeHuiTimer);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::Timer::reset));
-		class_add_func("get", TypeFloat32, mf(&hui::Timer::get));
-		class_add_func("reset", TypeVoid, mf(&hui::Timer::reset));
-		class_add_func("peek", TypeFloat32, mf(&hui::Timer::peek));
-
-
 	add_class(TypeHuiConfiguration);
 		class_add_func("set_int", TypeVoid, mf(&hui::Configuration::set_int));
 			func_add_param("name", TypeString);
@@ -500,8 +493,6 @@ void SIAddPackageHui()
 	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
 	add_func("HuiEnd", TypeVoid, (void*)&hui::End, FLAG_STATIC);*/
 	add_func("DoSingleMainLoop", TypeVoid, (void*)&hui::Application::do_single_main_loop, FLAG_STATIC);
-	add_func("Sleep", TypeVoid, (void*)&hui::Sleep, FLAG_STATIC);
-		func_add_param("duration", TypeFloat32);
 	add_func("FileDialogOpen", TypeBool, (void*)&hui::FileDialogOpen, FLAG_STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);

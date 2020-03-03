@@ -1,5 +1,5 @@
 # Image = hui:cut
-use file
+use os
 use hui
 use "../api.kaba"
 
@@ -22,7 +22,7 @@ class ImportNKI extends TsunamiPlugin
 			session.storage.load_buffer(buf, dir + "/" + e.name)
 			Sample* s = session.song.add_sample(e.name, buf)
 			if e.name[-5:] != "r.wav"
-				print(e.name[:2].int())
-				s.set_value("pitch", e.name[:2].int() + 10 + 12)
+				print(int(e.name[:2]))
+				s.set_value("pitch", int(e.name[:2]) + 10 + 12)
 		
 	

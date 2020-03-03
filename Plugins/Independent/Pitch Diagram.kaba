@@ -65,7 +65,7 @@ void Draw(Painter *c)
 	if LoudEnough
 		c.draw_str(120, 20, rel_pitch_name(played[played.num - 1] % 12))
 	else
-		c.draw_str(w / 2 - 30, h / 2 - 20, "zu leise")
+		c.draw_str(w / 2 - 30, h / 2 - 20, "too quiet")
 
 void OnClose()
 	delete win
@@ -131,7 +131,7 @@ void main()
 	win.addDrawingArea("", 0, 0, "drawing")
 	
 	win.eventSX("drawing", "hui:draw", &Draw)
-	win.eventS("hui:close", &OnClose)
+	win.eventS("hui:close", OnClose)
 	
 
 

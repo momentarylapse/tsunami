@@ -1,5 +1,6 @@
 use hui
 use nix
+use time
 use "../api.kaba"
 
 #extern void NixKill()
@@ -390,7 +391,7 @@ Grid ? '' vertical
 	void update_shader()
 		string frag = SOURCE[type]
 		
-		shader = NixCreateShader("
+		shader = Shader.create("
 <VertexShader>
 #version 330 core
 layout(location = 0) in vec3 inPosition;
@@ -413,7 +414,7 @@ uniform float iVolume;
 ")
 	
 	void on_realize()
-		NixInit("OpenGL", 800, 600)
+		NixInit()
 		update_shader()
 		
 		id_runner = RunRepeated(0.03, self, on_step)
@@ -422,15 +423,16 @@ uniform float iVolume;
 		time += timer.get()
 		float volume = c.buffer.r.max()
 		
-		NixStart()
-		NixResetToColor(Red)
-		NixSetCull(0)
-		NixSetZ(false, false)
-		NixSetShader(shader)
+		#NixStart()
+		ResetToColor(Red)
+		SetCull(0)
+		SetZ(false, false)
+		SetShader(shader)
 		shader.set_float(shader.location("iTime"), time)
 		shader.set_float(shader.location("iVolume"), volume)
-		NixDraw2D(rect.ID, rect(-1,1, -1,1), 0)
-		NixEnd()
+		vb_temp.create_rect(rect(-1,1, -1,1))
+		DrawTriangles(vb_temp)
+		#NixEnd()
 
 class ShaderVis extends AudioVisualizer
 	AudioBuffer buffer

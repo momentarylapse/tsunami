@@ -19,6 +19,7 @@ void _cdecl ResetToColor(const color &c);
 void _cdecl ResetZ();
 
 void _cdecl DrawTriangles(VertexBuffer *vb);
+void _cdecl DrawInstancedTriangles(VertexBuffer *vb, int count);
 void _cdecl DrawLines(VertexBuffer *vb, bool contiguous);
 
 };

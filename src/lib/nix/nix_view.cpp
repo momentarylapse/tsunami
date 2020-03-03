@@ -7,13 +7,12 @@
 
 #if HAS_LIB_GL
 
+
 #include "nix.h"
 #include "nix_common.h"
 #ifdef _X_USE_IMAGE_
 #include "../image/image.h"
 #endif
-#include "../hui/Controls/Control.h"
-#include "../hui/Controls/ControlDrawingArea.h"
 
 namespace nix{
 
@@ -99,11 +98,15 @@ void FrameBuffer::__delete__() {
 	this->~FrameBuffer();
 }
 
+rect FrameBuffer::area() const {
+	return rect(0, width, 0, height);
+}
+
 void BindFrameBuffer(FrameBuffer *fb) {
 	glBindFramebuffer(GL_FRAMEBUFFER, fb->frame_buffer);
 	TestGLError("BindFrameBuffer: glBindFramebuffer()");
 
-	SetViewport(rect(0, fb->width, 0, fb->height));
+	SetViewport(fb->area());
 }
 
 
@@ -360,7 +363,40 @@ void ScreenShotToImage(Image &image) {
 					GL_RGBA, GL_UNSIGNED_BYTE, &image.data[0]);
 }
 
+void StartFrameHui() {
+	int fb;
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
+	FrameBuffer::DEFAULT->frame_buffer = fb;
+	FrameBuffer::DEFAULT->width = hui::GetEvent()->column;
+	FrameBuffer::DEFAULT->height = hui::GetEvent()->row;
+	SetViewport(FrameBuffer::DEFAULT->area());
+}
+void EndFrameHui() {
+	FrameBuffer::DEFAULT->frame_buffer = 0;
+}
 
+
+#if HAS_LIB_GLFW
+#include <GLFW/glfw3.h>
+#endif
+
+#if HAS_LIB_GLFW
+void StartFrameGLFW(void *win) {
+	GLFWwindow* window = (GLFWwindow*)win;
+	glfwMakeContextCurrent(window);
+	int w, h;
+	glfwGetFramebufferSize(window, &w, &h);
+	FrameBuffer::DEFAULT->width = w;
+	FrameBuffer::DEFAULT->height = h;
+
+	SetViewport(FrameBuffer::DEFAULT->area());
+}
+
+void EndFrameGLFW(void *win) {
+	GLFWwindow* window = (GLFWwindow*)win;
+	glfwSwapBuffers(window);
+}
+#endif
 
 };
 

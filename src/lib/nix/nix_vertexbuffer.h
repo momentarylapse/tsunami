@@ -30,6 +30,7 @@ public:
 		unsigned int type;
 		bool normalized;
 		int stride;
+		int divisor;
 	} attr[MAX_VB_ATTRIBUTES];
 	int num_attributes;
 	int num_buffers;
@@ -41,7 +42,10 @@ public:
 	void _cdecl __delete__();
 
 	void _cdecl update(int index, const DynamicArray &a);
+	void _cdecl set_per_instance(int index);
 	int count() const;
+
+	void create_rect(const rect &dest);
 };
 
 void init_vertex_buffers();

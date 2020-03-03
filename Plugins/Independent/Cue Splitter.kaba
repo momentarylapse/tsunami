@@ -1,5 +1,5 @@
 # Image = hui:cut
-use file
+use os
 use hui
 use "../api.kaba"
 
@@ -50,8 +50,8 @@ class CueSplitter extends TsunamiPlugin
 				if s.head(10) == "    INDEX "
 					string soff = s[13:]
 					print(soff)
-					string[] xx = soff.explode(":")
-					cur.foffset = 60 * xx[0].float() + xx[1].float() + xx[2].float() * 0.01
+					let xx = soff.explode(":")
+					cur.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
 					print(cur.foffset)
 		except
 			pass

@@ -31,6 +31,18 @@ void DrawTriangles(VertexBuffer *vb) {
 	TestGLError("DrawTriangles");
 }
 
+void DrawInstancedTriangles(VertexBuffer *vb, int count) {
+	if (vb->count() == 0)
+		return;
+	current_shader->set_default_data();
+
+	SetVertexBuffer(vb);
+
+	glDrawArraysInstanced(GL_TRIANGLES, 0, vb->count(), count); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+	TestGLError("DrawTriangles");
+}
+
 
 void DrawLines(VertexBuffer *vb, bool contiguous) {
 	if (vb->count() == 0)

@@ -284,13 +284,13 @@ Grid ? ''
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
-			p.draw_str(width - 100, height - 20, "attack {{o.attack * 1000:1}} ms")
+			p.draw_str(width - 100, height - 20, "attack {{o.attack * 1000|.1}} ms")
 		else if hover == -11
-			p.draw_str(width - 100, height - 20, "decay {{o.decay * 1000:.0}} ms")
+			p.draw_str(width - 100, height - 20, "decay {{o.decay * 1000|.0}} ms")
 		else if hover == -12
-			p.draw_str(width - 100, height - 20, "release {{o.release * 1000:.0}} ms")
+			p.draw_str(width - 100, height - 20, "release {{o.release * 1000|.0}} ms")
 		else if hover == -13
-			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100:.0}} %")
+			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100|.0}} %")
 		
 	void on_draw(Painter p)
 		width = p.width
@@ -370,9 +370,9 @@ Grid ? ''
 		hover = get_hover()
 		if hover >= 0
 			set_chosen(hover)
-			menu_osci.popup(&self)
+			menu_osci.popup(self)
 		else
-			menu_top.popup(&self)
+			menu_top.popup(self)
 	
 	void set_chosen(int i)
 		chosen = i

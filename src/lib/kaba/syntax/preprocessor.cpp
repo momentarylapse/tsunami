@@ -56,14 +56,22 @@ void call2(void *ff, void *ret, const Array<void*> &param) {
 		if (std::is_same<CBR,A>::value and std::is_same<CBR,B>::value) {
 			db_out("CBR CBR -> CBR");
 			((void(*)(void*, void*, void*))ff)(ret, param[0], param[1]);
+		} else if (std::is_same<CBR,A>::value) {
+			db_out("CBR x -> CBR");
+			((void(*)(void*, void*, B))ff)(ret, param[0], *(B*)param[1]);
 		} else {
 			db_out("x x -> CBR");
 			((void(*)(void*, A, B))ff)(ret, *(A*)param[0], *(B*)param[1]);
 		}
 
 	} else {
-		db_out("x x -> x");
-		*(R*)ret = ((R(*)(A, B))ff)(*(A*)param[0], *(B*)param[1]);
+		if (std::is_same<CBR,A>::value) {
+			db_out("CBR x -> x");
+			*(R*)ret = ((R(*)(void*, B))ff)(param[0], *(B*)param[1]);
+		} else {
+			db_out("x x -> x");
+			*(R*)ret = ((R(*)(A, B))ff)(*(A*)param[0], *(B*)param[1]);
+		}
 	}
 }
 
@@ -136,6 +144,11 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				call1<float,CBR>(ff, ret, param);
 				return true;
 			}
+		} else if (f->return_type == TypeQuaternion) {
+			if (ptype[0]->uses_call_by_reference()) {
+				call1<vec4,CBR>(ff, ret, param);
+				return true;
+			}
 		} else if (f->return_type->uses_return_by_memory()) {
 			if (ptype[0] == TypeInt) {
 				call1<CBR,int>(ff, ret, param);
@@ -170,6 +183,11 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 		} else if (f->return_type == TypeComplex) {
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
 				call2<vec2,float,float>(ff, ret, param);
+				return true;
+			}
+		} else if (f->return_type == TypeQuaternion) {
+			if ((ptype[0]->uses_call_by_reference()) and(ptype[1] == TypeFloat32)) {
+				call2<vec4,CBR,float>(ff, ret, param);
 				return true;
 			}
 		} else if (f->return_type->uses_return_by_memory()) {

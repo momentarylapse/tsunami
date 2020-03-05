@@ -10,6 +10,7 @@ namespace Kaba{
 
 extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
+extern const Class *TypeMatrix;
 
 
 bool next_extern = false;
@@ -231,9 +232,37 @@ void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse) {
 
 }
 
+Node *make_constructor_static(SyntaxTree *tree, Node *n, const string &name) {
+	for (auto *f: n->type->functions)
+		if (f->name == name) {
+			auto nn = tree->add_node_call(f);
+			nn->params = n->params.sub(1,-1);
+			return nn;
+		}
+	return n;
+}
+
 void SyntaxTree::digest() {
 	if (config.verbose)
 		show("digest:pre");
+
+	// turn vector(x,y,z) into vector._create(x,y,z)
+	transform([&](Node* n){
+		if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
+			return n;
+		if ((n->type == TypeVector) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
+			return make_constructor_static(this, n, "_create");
+		}
+		if (n->type == TypeQuaternion) {
+			if (n->params.num == 2 and n->params[1]->type == TypeVector)
+				return make_constructor_static(this, n, "_rotation_v");
+			if (n->params.num == 3 and n->params[1]->type == TypeVector)
+				return make_constructor_static(this, n, "_rotation_a");
+			if (n->params.num == 2 and n->params[1]->type == TypeMatrix)
+				return make_constructor_static(this, n, "_rotation_m");
+		}
+		return n;
+	});
 
 	transform([&](Node* n){ return conv_class_and_func_to_const(n); });
 

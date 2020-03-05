@@ -16,6 +16,8 @@ extern const Class *TypeBoolPs;
 extern const Class *TypeDate;
 
 
+static File *_kaba_stdin = nullptr;
+
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
@@ -275,6 +277,10 @@ void SIAddPackageOS() {
 		class_add_funcx("delete_directory", TypeVoid, &kaba_dir_delete, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 			func_add_param("dir", TypeString);
 		class_add_funcx("current_directory", TypeString, &get_current_dir, FLAG_STATIC);
+		
+		_kaba_stdin = new File();
+		_kaba_stdin->handle = 0;
+		add_ext_var("stdin", TypeFileP, &_kaba_stdin);
 }
 
 };

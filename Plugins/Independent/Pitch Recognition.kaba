@@ -54,7 +54,7 @@ class PitchRecognitionPanel extends ConfigPanel
 			p.draw_str(x - 8, y - r2 - 22, get_note(c.pitch_detector.frequency))
 			p.draw_str(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
 			p.draw_str(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-			p.draw_str(5, 5, "{{c.pitch_detector.frequency:.1}} Hz")
+			p.draw_str(5, 5, "{{c.pitch_detector.frequency|.1}} Hz")
 			p.draw_line(x, y, x + r * sin(note_error * pi), y - r * cos(note_error * pi))
 		else
 			p.draw_str(x - 30, y - 20, "too quiet")

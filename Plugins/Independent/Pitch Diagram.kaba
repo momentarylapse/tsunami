@@ -52,8 +52,8 @@ void Draw(Painter *c)
 	DrawVolume(c)
 	
 	c.set_color(Black)
-	c.draw_str(20, 20, "{{Frequency:.1}} Hz")
-	c.draw_str(20, 40, "{{Volume:.3}}")
+	c.draw_str(20, 20, "{{Frequency|.1}} Hz")
+	c.draw_str(20, 40, "{{Volume|.3}}")
 	for p,i in played
 		if p < 0
 			continue

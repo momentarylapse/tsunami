@@ -172,13 +172,13 @@ class EqualizerGrid extends Grid
 				p.set_font_size(8)
 				p.set_color(col_hover)
 				p.draw_str(pp.x - 20, pp.y - 65, filter_name(pk.mode))
-				p.draw_str(pp.x - 20, pp.y - 50, "{{pitch_to_freq(pk.pitch):.1}} Hz")
-				p.draw_str(pp.x - 20, pp.y - 35, "{{pk.gain:.1}} dB")
-				p.draw_str(pp.x - 20, pp.y - 20, "Q {{pk.q:.1}}")
+				p.draw_str(pp.x - 20, pp.y - 50, "{{pitch_to_freq(pk.pitch)|.1}} Hz")
+				p.draw_str(pp.x - 20, pp.y - 35, "{{pk.gain|.1}} dB")
+				p.draw_str(pp.x - 20, pp.y - 20, "Q {{pk.q|.1}}")
 		if hover == HOVER_GAIN
 			p.set_font_size(8)
 			p.set_color(col_hover)
-			p.draw_str(mx - 20, y_axis.project(c.gain) - 20, "Gain {{c.gain:.1}} dB")
+			p.draw_str(mx - 20, y_axis.project(c.gain) - 20, "Gain {{c.gain|.1}} dB")
 			
 
 	# left button down -> select

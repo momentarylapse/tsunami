@@ -22,8 +22,6 @@ void TestGLError(const char*);
 matrix view_matrix, projection_matrix;
 matrix world_matrix, world_view_projection_matrix;
 
-float view_jitter_x = 0, view_jitter_y = 0;
-
 Texture *RenderingToTexture = NULL;
 
 #ifdef OS_WINDOWS
@@ -147,8 +145,8 @@ void SetProjectionPerspective() {
 void SetProjectionPerspectiveExt(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max) {
 	// perspective projection
 	auto t = matrix::translation(
-		vector((center_x + view_jitter_x) / float(target_width) * 2.0f - 1,
-			1 - (center_y + view_jitter_y) / float(target_height) * 2.0f,
+		vector(center_x / float(target_width) * 2.0f - 1,
+			1 - center_y / float(target_height) * 2.0f,
 			0));
 	auto p = matrix::perspective(pi / 2, 1, z_min, z_max);
 	auto s = matrix::scale(2 * width_1 / target_width,

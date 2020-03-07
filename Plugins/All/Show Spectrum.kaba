@@ -96,7 +96,7 @@ class ShowSpectrum extends SongPlugin
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
-		delete renderer
+		del renderer
 	
 		complex[] fr, fl
 	
@@ -138,7 +138,7 @@ class ShowSpectrum extends SongPlugin
 		dlg.on_type()
 
 		dlg.run()
-		delete dlg
+		del dlg
 	
 		ffr.clear()
 		ffl.clear()

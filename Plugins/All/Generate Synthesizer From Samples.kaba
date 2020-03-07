@@ -44,5 +44,5 @@ class XXX extends SongPlugin
 		
 		synth.config.samples[to] = t.create_ref()
 		
-		delete ps
+		del ps
 		

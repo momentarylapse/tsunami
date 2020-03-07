@@ -32,8 +32,8 @@ class Metronome extends AudioSource
 	
 	override void __delete__()
 		if source
-			delete source
-			delete synth
+			del source
+			del synth
 
 	override int read(AudioBuffer buf)
 		return synth.out.read_audio(buf)
@@ -52,7 +52,7 @@ class Metronome extends AudioSource
 		source.set_bpm(config.beats_per_minute)
 	
 	override void reset_state()
-		if !source
+		if not source
 			create_stuff()
 		synth.reset_state()
 		source.reset_state()

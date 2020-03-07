@@ -101,7 +101,7 @@ enum class OperatorID {
 	DIVIDES,       // /=
 	EQUAL,         // ==
 	NOTEQUAL,      // !=
-	NEGATE,        //  !
+	NEGATE,        //  not
 	SMALLER,       //  <
 	GREATER,       //  >
 	SMALLER_EQUAL, // <=
@@ -119,6 +119,10 @@ enum class OperatorID {
 	IN,            // in
 	EXTENDS,       // extends
 	EXPONENT,      // ^
+	COMMA,         // ,
+	DEREFERENCE,   // *
+	REFERENCE,     // &
+	ARRAY,         // [...]
 	_COUNT_
 };
 

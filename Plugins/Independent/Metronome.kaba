@@ -107,7 +107,7 @@ Grid ? '' vertical
 		CancelRunner(sr_id)
 		if lr_id >= 0
 			CancelRunner(lr_id)
-		delete popup_menu
+		del popup_menu
 	
 	void on_draw(Painter p)
 		float w = p.width
@@ -274,4 +274,4 @@ class Metronome extends TsunamiPlugin
 		return new MetronomePanel(session, source, chain, self)
 		
 	override void on_stop()
-		delete chain
+		del chain

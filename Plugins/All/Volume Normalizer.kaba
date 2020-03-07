@@ -17,7 +17,7 @@ class VolumeChecker extends SongPlugin
 		
 		vol_max = 0
 		int done = 0
-		while !p.is_cancelled()
+		while not p.is_cancelled()
 			int n = renderer.read(buf)
 			if n < 0
 				break
@@ -30,8 +30,8 @@ class VolumeChecker extends SongPlugin
 
 		bool cancelled = p.is_cancelled()
 
-		delete p
-		delete renderer
+		del p
+		del renderer
 		return !cancelled
 		
 	void ask()

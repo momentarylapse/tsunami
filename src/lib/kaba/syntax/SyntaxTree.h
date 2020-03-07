@@ -83,7 +83,7 @@ public:
 	Function *parse_function_header(Class *name_space, bool as_extern, bool as_static, bool as_virtual, bool override);
 	void skip_parsing_function_body();
 	void parse_function_body(Function *f);
-	bool parse_function_command(Function *f, ExpressionBuffer::Line *this_line);
+	bool parse_function_command(Function *f, int indent0);
 	const Class *parse_type(const Class *ns);
 	void parse_variable_def(bool single, Block *block);
 	void parse_global_const(const string &name, const Class *type);
@@ -132,12 +132,13 @@ public:
 	const Class *parse_type_extension_array(const Class *c);
 	const Class *parse_type_extension_dict(const Class *c);
 	const Class *parse_type_extension_pointer(const Class *c);
-	Node *parse_command(Block *block, Node *first_operand = nullptr);
 	Node *parse_single_func_param(Block *block);
 	void parse_complete_command(Block *block);
 	void parse_local_definition(Block *block, const Class *type);
 	Node *parse_block(Block *parent, Block *block = nullptr);
 	Node *parse_operand(Block *block, bool prefer_class = false);
+	Node *parse_operand_greedy(Block *block, bool allow_tuples = false, Node *first_operand = nullptr);
+	Node *parse_operand_super_greedy(Block *block);
 	Node *parse_set_builder(Block *block);
 	Node *link_unary_operator(PrimitiveOperator *op, Node *operand, Block *block);
 	Node *parse_primitive_operator(Block *block);
@@ -145,6 +146,8 @@ public:
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Node *cmd);
 	Array<const Class*> get_wanted_param_types(Node *link);
 	Node *check_param_link(Node *link, const Class *type, const string &f_name = "", int param_no = -1);
+	Node *try_parse_format_string(Block *block, Value &v);
+	Node *apply_format(Node *n, const string &fmt);
 	Node *parse_statement(Block *block);
 	Node *parse_for_header(Block *block);
 	void post_process_for(Node *n);
@@ -169,6 +172,22 @@ public:
 	Node *parse_statement_lambda(Block *block);
 	Node *parse_statement_sorted(Block *block);
 	Node *parse_statement_dyn(Block *block);
+
+	Node *apply_type_cast(int tc, Node *param, const Class *wanted);
+	Node *apply_params_with_cast(Node *operand, const Array<Node*> &params, const Array<int> &casts, const Array<const Class*> &wanted);
+	bool direct_param_match(Node *operand, Array<Node*> &params);
+	bool param_match_with_cast(Node *operand, Array<Node*> &params, Array<int> &casts, Array<const Class*> &wanted);
+	Node *apply_params_direct(Node *operand, Array<Node*> &params);
+	Node *force_concrete_type(Node *node);
+	void force_concrete_types(Array<Node*> &nodes);
+
+	Node *link_special_operator_is(Node *param1, Node *param2);
+	Node *link_special_operator_in(Node *param1, Node *param2);
+	Node *make_dynamical(Node *node);
+	Array<const Class*> type_list_from_nodes(const Array<Node*> &nn);
+
+	Node *build_abstract_list(const Array<Node*> &el);
+	Node *parse_list(Block *block);
 
 	void create_asm_meta_info();
 
@@ -218,6 +237,8 @@ public:
 	Node *add_node_parray(Node *p, Node *index, const Class *type);
 	Node *add_node_dyn_array(Node *array, Node *index);
 	Node *add_node_array(Node *array, Node *index);
+	Node *add_node_constructor(Function *f);
+	Node *make_fake_constructor(const Class *t, Block *block, const Class *param_type);
 	//Node *add_node_block(Block *b);
 	Node *cp_node(Node *c);
 	Node *ref_node(Node *sub, const Class *override_type = nullptr);

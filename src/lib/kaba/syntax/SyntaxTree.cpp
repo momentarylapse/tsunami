@@ -406,6 +406,11 @@ PrimitiveOperator *SyntaxTree::which_primitive_operator(const string &name, int 
 	for (int i=0; i<(int)OperatorID::_COUNT_; i++)
 		if (name == PrimitiveOperators[i].name and param_flags == PrimitiveOperators[i].param_flags)
 			return &PrimitiveOperators[i];
+
+	// old hack
+	if (name == "!")
+		return &PrimitiveOperators[(int)OperatorID::NEGATE];
+
 	return nullptr;
 }
 
@@ -420,10 +425,6 @@ Statement *SyntaxTree::which_statement(const string &name) {
 	for (auto *s: Statements)
 		if (name == s->name)
 			return s;
-
-	// transitional hack
-	if (name == "delete")
-		return which_statement(IDENTIFIER_DELETE);
 
 	return nullptr;
 }

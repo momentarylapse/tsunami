@@ -14,26 +14,22 @@ class File;
 
 namespace xml{
 
-class SyntaxError : public Exception
-{
+class SyntaxError : public Exception {
 public:
 	SyntaxError();
 };
 
-struct Attribute
-{
+struct Attribute {
 	string key, value;
 };
 
-struct Tag
-{
+struct Tag {
 	string tag;
 	Array<Attribute> attributes;
 	bool single, closing;
 };
 
-struct Element : Tag
-{
+struct Element : Tag {
 	string text;
 	Array<Element> elements;
 
@@ -44,11 +40,10 @@ struct Element : Tag
 	Element with(const string &tag, const string &text = "");
 	Element witha(const string &key, const string &value);
 	Element* find(const string &tag);
-	string value(const string &key);
+	string value(const string &key, const string &def = "");
 };
 
-class Parser
-{
+class Parser {
 public:
 	void _cdecl load(const string &filename);
 

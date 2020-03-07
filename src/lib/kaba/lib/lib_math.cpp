@@ -48,6 +48,7 @@ extern const Class *TypeIntList;
 extern const Class *TypeBoolList;
 extern const Class *TypeFloatPs;
 extern const Class *TypeAny;
+extern const Class *TypeAnyList;
 
 
 float _cdecl f_sqr(float f){	return f*f;	}
@@ -87,6 +88,16 @@ public:
 	void _cdecl imul2f(float x)	IMPLEMENT_IOP2(*=, complex)
 	void _cdecl idiv2f(float x)	IMPLEMENT_IOP2(/=, complex)
 	void _cdecl assign_complex(complex x)	IMPLEMENT_IOP2(=, complex)
+};
+
+class AnyList : public Array<Any> {
+public:
+	void __delete__() {
+		this->~AnyList();
+	}
+	void assign(AnyList &o) {
+		*this = o;
+	}
 };
 
 Array<int> _cdecl int_range(int start, int end) {
@@ -719,7 +730,6 @@ void SIAddPackageMath() {
 			func_add_param("var", TypePointer);
 			func_add_param("type", TypeClassP);
 
-
 	add_funcx("@int2any", TypeAny, &kaba_int2any, FLAG_STATIC);
 		func_add_param("i", TypeInt);
 	add_funcx("@float2any", TypeAny, &kaba_float2any, FLAG_STATIC);
@@ -918,6 +928,17 @@ void SIAddPackageMath() {
 	add_const("Blue",   TypeColor, (void*)&Blue);
 	add_const("Yellow", TypeColor, (void*)&Yellow);
 	add_const("Orange", TypeColor, (void*)&Orange);
+
+
+	// needs to be defined after any
+	TypeAnyList = add_type_l(TypeAny);
+	add_class(TypeAnyList);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&AnyList::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&AnyList::__delete__));
+		class_add_func("add", TypeVoid, mf(&AnyList::add));
+			func_add_param("a", TypeAny);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &AnyList::assign);
+			func_add_param("other", TypeAnyList);
 }
 
 };

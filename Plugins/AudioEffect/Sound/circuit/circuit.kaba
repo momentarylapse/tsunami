@@ -206,7 +206,7 @@ class Circuit
 		nodes.clear()
 		out = 1
 		for e in edges
-			delete e
+			del e
 		edges.clear()
 	
 	void reset_default()
@@ -221,7 +221,7 @@ class Circuit
 	void quick_out()
 		string s
 		for e in edges
-			s += "" + e.U + "\t" + e.I + "\t"
+			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
 	void create_G(Matrix G, float dt)
@@ -323,14 +323,14 @@ class Circuit
 	string export()
 		string s
 		for n in nodes
-			s += "Node:" + n.pos.x + ":" + n.pos.y + "\n"
+			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
 		for e in edges
-			s += edge_name(e.type) + ":" + e.a + ":" + e.b
+			s += edge_name(e.type) + ":{{e.a}}:{{e.b}}"
 			int n = len(e.param_names())
 			for i in 0:n
-				s += ":" + e.param[i]
+				s += ":{{e.param[i]}}"
 			s += "\n"
-		s += "Out:" + out + "\n"
+		s += "Out:{{out}}\n"
 		return s
 	
 	void import(string s)
@@ -366,7 +366,7 @@ class Circuit
 		else if t == TYPE_DIODE
 			e = new Diode(n)
 		else
-			raise(new Exception("unknown type: " + t))
+			raise(new Exception("unknown type: {{t}}"))
 		edges.add(e)
 		return e
 

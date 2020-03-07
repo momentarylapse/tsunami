@@ -94,7 +94,6 @@ callback_function *RefillAllVertexBuffers = NULL;
 
 int MaxVideoTextureSize=256;
 
-bool CullingInverted;
 
 Fog fog;
 
@@ -142,9 +141,9 @@ void Init() {
 
 
 	// default values of the engine
+	world_matrix = matrix::ID;
 	view_matrix = matrix::ID;
 	projection_matrix = matrix::ID;
-	CullingInverted = false;
 
 
 
@@ -156,7 +155,6 @@ void Init() {
 	SetWire(false);
 	SetAlpha(ALPHA_NONE);
 	SetMaterial(White, White, White, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
-	CullingInverted = false;
 	SetProjectionPerspective();
 	SetZ(true, true);
 	SetShader(default_shader_3d);

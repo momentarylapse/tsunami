@@ -25,7 +25,7 @@ class _StreamTest extends TsunamiPlugin
 
 	override void on_stop()
 		CancelRunner(runner)
-		delete chain
+		del chain
 	
 	void on_tick()
 		print("" + input.samples_recorded() + "\t" + recorder.samples_skipped)

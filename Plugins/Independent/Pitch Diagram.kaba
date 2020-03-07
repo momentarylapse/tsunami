@@ -68,7 +68,7 @@ void Draw(Painter *c)
 		c.draw_str(w / 2 - 30, h / 2 - 20, "too quiet")
 
 void OnClose()
-	delete win
+	del win
 	win = nil
 
 void UpdateInput()

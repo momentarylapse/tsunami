@@ -16,7 +16,7 @@ class MLPPanel extends ConfigPanel
 	
 	void on_select_synth()
 		if synth_panel
-			delete synth_panel
+			del synth_panel
 		string name = ChooseModule(self, session, Module.SYNTHESIZER, c.synth.name)
 		c.set_synth(name)
 		set_string("select-synth", name)
@@ -52,7 +52,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.start()
 		
 	override void on_stop()
-		delete chain
+		del chain
 	
 	override ConfigPanel* create_panel()
 		return new MLPPanel(session, self)

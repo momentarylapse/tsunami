@@ -24,7 +24,7 @@ class SampleRenderer extends PitchRenderer
 	override void on_start(float volume)
 		events.add(MidiEvent(0, 0, volume))
 	override bool render(AudioBuffer buf)
-		if !sample or (len(events) == 0)
+		if not sample or (len(events) == 0)
 			return false
 		int[] to_del
 		for e,i in events
@@ -75,7 +75,7 @@ class SamplePanel extends ConfigPanel
 		let s = SelectSample(c.session, self, old)
 		if s != old
 			if sc.samples[n]
-				delete sc.samples[n]
+				del sc.samples[n]
 				sc.samples[n] = nil
 			if s
 				sc.samples[n] = s.create_ref()

@@ -34,8 +34,6 @@ void _cdecl SetScissor(const rect &r);
 
 void _cdecl ScreenShotToImage(Image &image);
 
-extern float view_jitter_x, view_jitter_y;
-
 class FrameBuffer {
 public:
 	FrameBuffer();

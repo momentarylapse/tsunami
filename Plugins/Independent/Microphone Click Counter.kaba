@@ -88,7 +88,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		
 	override void on_stop()
 		CancelRunner(runner)
-		delete chain
+		del chain
 	
 	void on_update()
 		if click_counter.emit

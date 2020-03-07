@@ -27,7 +27,7 @@ class SpectrumCurve extends Curve
 		sample_rate = DEFAULT_SAMPLE_RATE
 		col = colors.text_soft2
 	override void __delete__()
-		delete ring
+		del ring
 	void set(AudioBuffer buf, float _sample_rate)
 		sample_rate = _sample_rate
 		ring.write(buf)

@@ -115,8 +115,6 @@ namespace nix {
 //extern int device_width, device_height;						// render target size (window, won't change)
 extern int target_width, target_height;						// current render target size (window/texture)
 extern bool Fullscreen;
-extern bool LightingEnabled;
-extern bool CullingInverted;
 
 extern string texture_dir;
 extern int MaxVideoTextureSize;

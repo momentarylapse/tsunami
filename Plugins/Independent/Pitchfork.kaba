@@ -18,4 +18,4 @@ class PitchFork extends TsunamiPlugin
 		return source.create_panel()
 
 	override void on_stop()
-		delete chain
+		del chain

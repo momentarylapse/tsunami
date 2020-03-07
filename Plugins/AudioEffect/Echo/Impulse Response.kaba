@@ -43,7 +43,7 @@ class Folding extends AudioEffect
 			sample = nil
 		override void reset()
 			if sample
-				delete sample
+				del sample
 			sample = nil
 
 	Config config
@@ -62,7 +62,7 @@ class Folding extends AudioEffect
 		reset_state()
 	
 	override void process(AudioBuffer buf)
-		if !config.sample
+		if not config.sample
 			return
 		
 		# apply

@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.14.1";
+string Version = "0.18.1.0";
 
 //#define ScriptDebug
 
@@ -306,7 +306,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	ps->parse_complete_command(func->block);
 	
 	// implicit print(...)?
-	if (func->block->params[0]->type != TypeVoid) {
+	if (func->block->params.num > 0 and func->block->params[0]->type != TypeVoid) {
 		auto *n = ps->add_converter_str(func->block->params[0], true);
 		
 		Array<Node*> links = ps->get_existence("print", nullptr, nullptr, false);

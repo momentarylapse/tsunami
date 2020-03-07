@@ -158,7 +158,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
-		delete renderer
+		del renderer
 	
 		complex[] f
 		float[] sub
@@ -204,7 +204,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 		dlg.redraw("drawing_area")
 
 		dlg.run()
-		delete dlg
+		del dlg
 
 	override void apply()
 	

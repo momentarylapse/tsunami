@@ -5,9 +5,6 @@
 
 namespace Kaba{
 
-extern const Class* TypeObject;
-extern const Class* TypeEmptyList;
-
 ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;
@@ -48,8 +45,6 @@ bool type_match(const Class *given, const Class *wanted) {
 		return given->param->is_derived_from(wanted->param);
 
 	if (wanted->is_super_array()) {
-		if (given == TypeEmptyList)
-			return true;
 		if (given->is_super_array()) {
 			if (type_match(given->param, wanted->param) and (given->param->size == wanted->param->size))
 				return true;

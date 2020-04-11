@@ -28,7 +28,7 @@ void SIAddPackageImage() {
 
 	TypeImage = add_type("Image", sizeof(Image));
 	auto TypeImageP = add_type_p(TypeImage);
-	TypeBasePainter = add_type("Painter", sizeof(Painter), (ScriptFlag)0, TypeImage);
+	TypeBasePainter = add_type("Painter", sizeof(Painter), Flags::NONE, TypeImage);
 	TypeBasePainterP = add_type_p(TypeBasePainter);
 
 	
@@ -49,20 +49,23 @@ void SIAddPackageImage() {
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_funcx("load", TypeImageP, &Image::load, FLAG_STATIC);
+		class_add_funcx("load", TypeImageP, &Image::load, Flags::STATIC);
 			func_add_param("filename", TypeString);
 		class_add_funcx("save", TypeVoid, &Image::save);
 			func_add_param("filename", TypeString);
-		class_add_funcx("scale", TypeImageP, &Image::scale);
+		class_add_funcx("scale", TypeImageP, &Image::scale, Flags::CONST);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 		class_add_funcx("set_pixel", TypeVoid, &Image::set_pixel);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_funcx("get_pixel", TypeColor, &Image::get_pixel);
+		class_add_funcx("get_pixel", TypeColor, &Image::get_pixel, Flags::PURE);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
+		class_add_funcx("get_pixel_smooth", TypeColor, &Image::get_pixel_interpolated, Flags::PURE);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
 		class_add_funcx("clear", TypeVoid, &Image::clear);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Image::__assign__);
 			func_add_param("other", TypeImage);

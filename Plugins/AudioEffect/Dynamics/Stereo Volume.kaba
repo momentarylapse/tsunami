@@ -18,7 +18,7 @@ class Volume extends AudioEffect
 
 	Config config
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		buf.l *= config.volume_right
 		if buf.channels > 1
 			buf.r *= config.volume_left

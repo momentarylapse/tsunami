@@ -9,7 +9,7 @@ class PitchShift extends TsunamiPlugin
 	complex[] buf2
 	
 	
-	void shift_buf_bad(float[] b, float[] out, float factor)
+	void shift_buf_bad(float[] b, out float[] out, float factor)
 		fft_r2c(b, buf1)
 		float f = 1.0 / b.num
 		int N = b.num
@@ -28,7 +28,7 @@ class PitchShift extends TsunamiPlugin
 		out.resize(N)
 		fft_c2r_inv(buf2, out)
 
-	void shift_buf(float[] b, float[] out, float factor)
+	void shift_buf(float[] b, out float[] out, float factor)
 		fft_r2c(b, buf1)
 		int N = b.num
 		int NN = buf1.num
@@ -57,7 +57,7 @@ class PitchShift extends TsunamiPlugin
 		fft_c2r_inv(buf2, out)
 		out /= N
 		
-	void shift_buf_fast(float[] b, float[] out, float factor)
+	void shift_buf_fast(float[] b, out float[] out, float factor)
 		fft_r2c(b, buf1)
 		int N = b.num
 		int NN = buf1.num

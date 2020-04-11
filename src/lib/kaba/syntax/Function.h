@@ -16,6 +16,7 @@ class Class;
 class Block;
 class SyntaxTree;
 enum class InlineID;
+enum class Flags;
 
 
 class Variable {
@@ -28,6 +29,7 @@ public:
 	void *memory;
 	bool memory_owner;
 	bool is_extern;
+	bool is_const;
 	bool explicitly_constructed;
 	int _label;
 };
@@ -49,9 +51,14 @@ public:
 	const Class *name_space;
 	const Class *return_type;
 	const Class *literal_return_type;
-	bool is_extern, auto_declared;
-	bool is_pure, is_static;
-	bool throws_exceptions; // for external
+	Flags flags;
+	bool auto_declared;
+	bool is_extern() const;
+	bool is_pure() const;
+	bool is_static() const;
+	bool is_const() const;
+	bool is_selfref() const;
+	bool throws_exceptions() const; // for external
 	InlineID inline_no;
 	int virtual_index;
 	bool needs_overriding;
@@ -63,7 +70,7 @@ public:
 	void *address;
 	void *address_preprocess;
 	int _label;
-	Function(const string &name, const Class *return_type, const Class *name_space);
+	Function(const string &name, const Class *return_type, const Class *name_space, Flags flags = Flags(0));
 	~Function();
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();

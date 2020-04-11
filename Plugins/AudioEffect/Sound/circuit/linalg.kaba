@@ -19,14 +19,14 @@ class Matrix
 		e.resize(n*m)
 	void add(int i, int j, float f)
 		e[i * m + j] += f
-	float get(int i, int j)
+	const float get(int i, int j)
 		return e[i * m + j]
-	string str()
+	const string str()
 		string[] s
 		for i in 0:n
 			s.add(e[i*m:(i+1)*m])
 		return s.join("\n")
-	void diagonalize(float[] b)
+	void diagonalize(out float[] b)
 		for i in 0:n
 			float f = get(i,i)
 			if f == 0
@@ -41,7 +41,7 @@ class Matrix
 				for j in i:m
 					e[ii * m + j] -= e[i * m + j] * g
 				b[ii] -= b[i] * g
-	float[] solve(float[] b)
+	const float[] solve(float[] b)
 		if n != m or b.num != n
 			raise(new Exception("size mismatch"))
 		Matrix mm = self

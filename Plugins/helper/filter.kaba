@@ -39,7 +39,7 @@ class BiquadFilter
 		float[3] a, b
 	
 		# requires &x != &y...
-		void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
+		void apply(float[] x, out float[] y, out float[2] prev_x, out float[2] prev_y)
 			if len(x) >= 2
 				# overlap
 				y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
@@ -122,13 +122,13 @@ class BiquadFilter
 			a[1] = b[1]
 			a[2] = (1 - c/Q + c*c) / a0
 
-		void create_low_pass(float f_res, float q, float sample_rate)
+		void create_low_pass(float f_res, float _q, float sample_rate)
 			#b[0] = 1 / (1 + sample_rate/f_res/2/pi)
 #			b[1] = 0
 #			b[2] = 0
 #			a[1] = b[0]-1
 #			a[2] = 0
-			q = sqrt(2) #20 / q
+			let q = sqrt(2) #20 / _q
 			float c = tan(pi * f_res / sample_rate)
 			float a0 = 1 + c*q + c*c
 			b[0] = c*c / a0
@@ -137,13 +137,13 @@ class BiquadFilter
 			a[1] = 2 * (c*c - 1) / a0
 			a[2] = (1 - c*q + c*c) / a0
 
-		void create_high_pass(float f_res, float q, float sample_rate)
+		void create_high_pass(float f_res, float _q, float sample_rate)
 			#b[0] = 1 / (1 + f_res*2*pi / sample_rate)
 #			b[1] = -b[0]
 #			b[2] = 0
 #			a[1] = -b[0]
 #			a[2] = 0
-			q = sqrt(2) #20 / q
+			let q = sqrt(2) #20 / _q
 			float c = tan(pi * f_res / sample_rate)
 			float a0 = 1 + c*q + c*c
 			b[0] = 1 / a0
@@ -256,7 +256,7 @@ class BiquadFilter
 		r.reset()
 	void create(int mode, float freq, float q, float gain, float _sample_rate)
 		params.create(mode, freq, q, gain, _sample_rate)
-	void apply(AudioBuffer buf)
+	void apply(out AudioBuffer buf)
 		let input_l = buf.l
 		params.apply(input_l, buf.l, l.prev_x, l.prev_y)
 		if buf.channels > 1
@@ -278,6 +278,6 @@ class BiquadMultiFilter
 		f.resize(len(freq))
 		for i in 0:len(freq)
 			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)
-	void apply(AudioBuffer buf)
+	void apply(out AudioBuffer buf)
 		for ff in f
 			ff.apply(buf)

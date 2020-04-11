@@ -37,7 +37,7 @@ class Peak
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
 	
-	void create_filter(BiquadFilter f, float sample_rate)
+	void create_filter(out BiquadFilter f, float sample_rate)
 		float freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
@@ -92,7 +92,7 @@ class Equalizer extends AudioEffect
 		for f in filter
 			f.reset()
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		# global gain
 		buf.scale(db_to_factor(config.gain))
 		

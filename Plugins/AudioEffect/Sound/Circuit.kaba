@@ -19,7 +19,7 @@ class CircuitEffect extends AudioEffect
 		c.edges.add(new Diode([0,1]))
 		c.edges.add(new Diode([1,0]))
 	
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		float dt = 1.0 / session.sample_rate()
 		for f in buf.l
 			float I_in = f / 40

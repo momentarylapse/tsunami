@@ -17,7 +17,7 @@ class Tremolo extends AudioEffect
 
 	Config config
 
-	void apply(float[] b)
+	void apply(out float[] b)
 		float sample_rate = session.sample_rate()
 	
 		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
@@ -28,7 +28,7 @@ class Tremolo extends AudioEffect
 			# old value
 			bb *= f
 	
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		apply(buf.l)
 		if buf.channels > 1
 			apply(buf.r)

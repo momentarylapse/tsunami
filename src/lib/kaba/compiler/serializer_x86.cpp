@@ -26,7 +26,7 @@ int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, c
 	
 	// skip the class instance for now...
 	int p0 = 0;
-	if (!f->is_static)
+	if (!f->is_static())
 		p0 = 1;
 
 	// push parameters onto stack
@@ -46,7 +46,7 @@ int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, c
 	}
 
 	// _cdecl: push class instance as first parameter
-	if (!f->is_static){
+	if (!f->is_static()){
 		add_cmd(Asm::INST_PUSH, params[0]);
 		push_size += config.pointer_size;
 	}

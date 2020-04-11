@@ -18,7 +18,7 @@ class XXX extends SongPlugin
 		if n == 0
 			session.e("no midi track selected")
 
-	void guess_chords(TrackLayer* l, Range r)
+	void guess_chords(out TrackLayer l, Range r)
 		for b in song.bars.get_bars(r)
 			Range rr = b.range()
 			string chord = guess_chord(l.midi.get_notes(rr), rr)

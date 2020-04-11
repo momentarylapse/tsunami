@@ -5,6 +5,7 @@
  *      Author: michi
  */
 #include "../kaba.h"
+#include "../lib/common.h"
 #include "../asm/asm.h"
 #include "../../file/file.h"
 #include <stdio.h>
@@ -17,6 +18,7 @@ Variable::Variable(const string &_name, const Class *_type) {
 	type = _type;
 	_offset = 0;
 	is_extern = false;
+	is_const = false;
 	explicitly_constructed = false;
 	memory = nullptr;
 	memory_owner = false;
@@ -29,24 +31,21 @@ Variable::~Variable() {
 }
 
 
-Function::Function(const string &_name, const Class *_return_type, const Class *_name_space) {
+Function::Function(const string &_name, const Class *_return_type, const Class *_name_space, Flags _flags) {
 	name = _name;
 	block = new Block(this, nullptr);
 	num_params = 0;
 	return_type = _return_type;
 	literal_return_type = _return_type;
 	name_space = _name_space;
-	is_extern = false;
-	is_static = true;
-	auto_declared = false;
-	is_pure = false;
+	flags = _flags;
+	auto_declared = false;;
 	_param_size = 0;
 	_var_size = 0;
 	_logical_line_no = -1;
 	_exp_no = -1;
 	inline_no = InlineID::NONE;
 	virtual_index = -1;
-	throws_exceptions = false;
 	num_slightly_hidden_vars = 0;
 	address = address_preprocess = nullptr;
 	_label = -1;
@@ -154,7 +153,7 @@ void Function::update_parameters_after_parsing() {
 		block->add_var(IDENTIFIER_RETURN_VAR, return_type->get_pointer());
 
 	// class function
-	if (!is_static) {
+	if (!is_static()) {
 		if (!__get_var(IDENTIFIER_SELF))
 			block->add_var(IDENTIFIER_SELF, name_space);
 	}
@@ -162,15 +161,16 @@ void Function::update_parameters_after_parsing() {
 
 
 Function *Function::create_dummy_clone(const Class *_name_space) const {
-	Function *f = new Function(name, return_type, _name_space);
+	Function *f = new Function(name, return_type, _name_space, flags);
 	f->needs_overriding = true;
 
 	f->num_params = num_params;
 	f->literal_param_type = literal_param_type;
-	for (int i=0; i<num_params; i++)
+	for (int i=0; i<num_params; i++) {
 		f->block->add_var(var[i]->name, var[i]->type);
+		f->var[i]->is_const = var[i]->is_const;
+	}
 
-	f->is_static = is_static;
 	f->virtual_index = virtual_index;
 
 	f->update_parameters_after_parsing();
@@ -179,6 +179,29 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 	return f;
 }
 
+bool Function::is_extern() const {
+	return flags_has(flags, Flags::EXTERN);
+}
+
+bool Function::is_pure() const {
+	return flags_has(flags, Flags::PURE);
+}
+
+bool Function::is_static() const {
+	return flags_has(flags, Flags::STATIC);
+}
+
+bool Function::is_const() const {
+	return flags_has(flags, Flags::CONST);
+}
+
+bool Function::is_selfref() const {
+	return flags_has(flags, Flags::SELFREF);
+}
+
+bool Function::throws_exceptions() const {
+	return flags_has(flags, Flags::RAISES_EXCEPTIONS);
+}
 
 }
 

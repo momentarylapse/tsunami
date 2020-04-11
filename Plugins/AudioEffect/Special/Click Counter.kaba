@@ -20,7 +20,7 @@ class ClickCounter extends AudioEffect
 		emit = false
 		active_ttl = -1
 	
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 	
 		float[] temp
 		temp = buf.r + buf.l

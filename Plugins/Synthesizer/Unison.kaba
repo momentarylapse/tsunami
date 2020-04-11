@@ -246,7 +246,7 @@ class UnisonRenderer extends PitchRenderer
 		osc.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
 		osc.env.set2(c.initial, c.peak)
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 	
 		let c = &synth.config
 		float[] vv = [for k in 0:c.num_voices c.blend]

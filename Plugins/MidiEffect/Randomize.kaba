@@ -17,7 +17,7 @@ class Config extends Module.Config
 class Randomize extends MidiEffect
 	Config config
 	
-	override void process(MidiNoteBuffer midi)
+	override void process(out MidiNoteBuffer midi)
 		float delay = session.sample_rate() * config.TimeDelay
 		float var = session.sample_rate() * config.TimeVariation
 		for n in midi

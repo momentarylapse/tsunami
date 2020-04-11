@@ -65,8 +65,8 @@ Grid ? ''
 	void on_close()
 		destroy()
 
-color f2col(float f)
-	f = sqrt(f)
+color f2col(float _f)
+	let f = sqrt(_f)
 	if f < 0.333
 		return color(f * 3, 0, 0, f * 3)
 	else if f < 0.6666

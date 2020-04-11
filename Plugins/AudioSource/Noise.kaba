@@ -16,7 +16,7 @@ class Noise extends AudioSource
 	Config config
 	Random r
 	
-	void do(float[] buf)
+	void do(out float[] buf)
 		if config.type == "uniform"
 			for b in buf
 				b = r.uniform(-1,1) * config.volume
@@ -24,7 +24,7 @@ class Noise extends AudioSource
 			for b in buf
 				b = r.normal(0, 0.2) * config.volume
 	
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		do(buf.l)
 		if buf.channels > 1
 			do(buf.r)

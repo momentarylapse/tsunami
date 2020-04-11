@@ -25,7 +25,7 @@ class LowPassFilter extends AudioEffect
 	# y[i] := α * (y[i-1] + x[i] - x[i-1])
 	# z[i] := α * x[i] + (1-α) * z[i-1]
 	
-	void do(float[] buf, int c)
+	void do(out float[] buf, int c)
 		float RC = 1 / (2 * pi * config.frequency)
 		float dt = 1.0 / session.sample_rate()
 		float aa = dt / (RC + dt)
@@ -50,7 +50,7 @@ class LowPassFilter extends AudioEffect
 		_in[c] = prev_in
 		_out[c] = buf[buf.num - 1]
 		
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		do(buf.r, 0)
 		if buf.channels > 1
 			do(buf.l, 1)

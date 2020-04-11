@@ -38,7 +38,7 @@ class MetronomeSource extends BeatSource
 		
 		on_config()
 		
-	override int read(Beat[] beats, int samples)
+	override int read(out Beat[] beats, int samples)
 	
 		# render clicks
 		while offset_sub_beat < samples

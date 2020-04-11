@@ -15,7 +15,7 @@ class ZeroRenderer extends PitchRenderer
 		fade_out = false
 	
 	# use += ... otherwise would overwrite previous notes...!!!!
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		#print(buf.length)
 		
 #		float freq = pitch_to_freq(pitch)

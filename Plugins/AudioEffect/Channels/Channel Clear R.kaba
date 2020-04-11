@@ -4,5 +4,5 @@ use "../../api.kaba"
 
 
 class ClearR extends AudioEffect
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		buf.r = 0

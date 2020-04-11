@@ -79,40 +79,41 @@ void SIAddPackageKaba() {
 		class_add_elementx("functions", TypeFunctionPList, &Class::functions);
 		class_add_elementx("classes", TypeClassPList, &Class::classes);
 		class_add_elementx("constants", TypeConstantPList, &Class::constants);
-		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);
+		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
 			func_add_param("c", TypeClass);
-		class_add_funcx("is_pointer", TypeBool, &Class::is_pointer);
-		class_add_funcx("is_super_array", TypeBool, &Class::is_super_array);
-		class_add_funcx("is_array", TypeBool, &Class::is_array);
-		class_add_funcx("is_dict", TypeBool, &Class::is_dict);
-		class_add_funcx("get_func", TypeFunctionP, &Class::get_func);
+		class_add_funcx("is_pointer", TypeBool, &Class::is_pointer, Flags::PURE);
+		class_add_funcx("is_super_array", TypeBool, &Class::is_super_array, Flags::PURE);
+		class_add_funcx("is_array", TypeBool, &Class::is_array, Flags::PURE);
+		class_add_funcx("is_dict", TypeBool, &Class::is_dict, Flags::PURE);
+		class_add_funcx("get_func", TypeFunctionP, &Class::get_func, Flags::PURE); // selfref
 			func_add_param("name", TypeString);
 			func_add_param("return_type", TypeClass);
 			func_add_param("params", TypeClassPList);
-		class_add_funcx("long_name", TypeString, &Class::long_name);
+		class_add_funcx("long_name", TypeString, &Class::long_name, Flags::PURE);
 
 	add_class(TypeClassP);
-		class_add_funcx("str", TypeString, &class_repr);
+		class_add_funcx("str", TypeString, &class_repr, Flags::PURE);
 
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
-		class_add_funcx("long_name", TypeString, &Function::long_name);
-		class_add_funcx("signature", TypeString, &Function::signature);
+		class_add_funcx("long_name", TypeString, &Function::long_name, Flags::PURE);
+		class_add_funcx("signature", TypeString, &Function::signature, Flags::PURE);
 		class_add_elementx("namespace", TypeClassP, &Function::name_space);
 		class_add_elementx("num_params", TypeInt, &Function::num_params);
 		class_add_elementx("var", TypeVariablePList, &Function::var);
 		class_add_elementx("param_type", TypeClassPList, &Function::literal_param_type);
 		class_add_elementx("return_type", TypeClassP, &Function::literal_return_type);
-		class_add_elementx("is_static", TypeBool, &Function::is_static);
-		class_add_elementx("is_pure", TypeBool, &Function::is_pure);
-		class_add_elementx("is_extern", TypeBool, &Function::is_extern);
+		class_add_funcx("is_static", TypeBool, &Function::is_static, Flags::PURE);
+		class_add_funcx("is_pure", TypeBool, &Function::is_pure, Flags::PURE);
+		class_add_funcx("is_const", TypeBool, &Function::is_const, Flags::PURE);
+		class_add_funcx("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
 		class_add_elementx("needs_overriding", TypeBool, &Function::needs_overriding);
 		class_add_elementx("virtual_index", TypeInt, &Function::virtual_index);
 		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
 		class_add_elementx("code", TypeFunctionCodeP, &Function::address);
 
-		add_class(TypeFunctionP);
-			class_add_funcx("str", TypeString, &func_repr);
+	add_class(TypeFunctionP);
+		class_add_funcx("str", TypeString, &func_repr, Flags::PURE);
 
 	add_class(TypeVariable);
 		class_add_elementx("name", TypeString, &Variable::name);
@@ -125,20 +126,20 @@ void SIAddPackageKaba() {
 	add_class(TypeScript);
 		class_add_elementx("name", TypeString, &Script::filename);
 		class_add_elementx("used_by_default", TypeBool, &Script::used_by_default);
-		class_add_funcx("classes", TypeClassPList, &Script::classes);
-		class_add_funcx("functions", TypeFunctionPList, &Script::functions);
-		class_add_funcx("variables", TypeVariablePList, &Script::variables);
-		class_add_funcx("constants", TypeConstantPList, &Script::constants);
-		class_add_funcx("base_class", TypeClassP, &Script::base_class);
-		class_add_funcx("load", TypeScriptP, &__load_script__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		class_add_funcx("classes", TypeClassPList, &Script::classes, Flags::PURE);
+		class_add_funcx("functions", TypeFunctionPList, &Script::functions, Flags::PURE);
+		class_add_funcx("variables", TypeVariablePList, &Script::variables, Flags::PURE);
+		class_add_funcx("constants", TypeConstantPList, &Script::constants, Flags::PURE);
+		class_add_funcx("base_class", TypeClassP, &Script::base_class, Flags::PURE);
+		class_add_funcx("load", TypeScriptP, &__load_script__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypeString);
 			func_add_param("just_analize", TypeBool);
-		class_add_funcx("create", TypeScriptP, &__create_from_source__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		class_add_funcx("create", TypeScriptP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
 			func_add_param("just_analize", TypeBool);
-		class_add_funcx("delete", TypeVoid, &Remove, FLAG_STATIC);
+		class_add_funcx("delete", TypeVoid, &Remove, Flags::STATIC);
 			func_add_param("script", TypeScript);
-		class_add_funcx("execute_single_command", TypeVoid, &__execute_single_command__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		class_add_funcx("execute_single_command", TypeVoid, &__execute_single_command__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("cmd", TypeString);
 	
 	add_class(TypeStatement);
@@ -149,9 +150,9 @@ void SIAddPackageKaba() {
 	add_class(TypeClassElementList);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
 
-	add_funcx("get_dynamic_type", TypeClassP, &GetDynamicType, FLAG_STATIC);
+	add_funcx("get_dynamic_type", TypeClassP, &GetDynamicType, Flags::_STATIC__PURE);
 		func_add_param("p", TypePointer);
-	add_funcx("disassemble", TypeString, &Asm::disassemble, FLAG_STATIC);
+	add_funcx("disassemble", TypeString, &Asm::disassemble, Flags::_STATIC__PURE);
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);

@@ -15,7 +15,7 @@ class Chunksize extends AudioEffect
 	override void __delete__()
 		del ring_buffer
 	
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		if !source
 			return -1
 		

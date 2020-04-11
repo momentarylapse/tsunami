@@ -13,10 +13,6 @@ extern const Class *TypeDictBase;
 extern const Class *TypeMatrix;
 
 
-bool next_extern = false;
-bool next_static = false;
-bool next_const = false;
-
 
 static Array<Node*> _transform_insert_before_;
 Node *conv_break_down_med_level(SyntaxTree *tree, Node *c);
@@ -37,6 +33,7 @@ Node *SyntaxTree::cp_node(Node *c) {
 		cmd = new Block(c->as_block()->function, c->as_block()->parent);
 	else
 		cmd = new Node(c->kind, c->link_no, c->type);
+	cmd->is_const = c->is_const;
 	cmd->set_num_params(c->params.num);
 	for (int i=0;i<c->params.num;i++)
 		if (c->params[i])
@@ -73,7 +70,7 @@ Node *SyntaxTree::ref_node(Node *sub, const Class *override_type) {
 }
 
 Node *SyntaxTree::deref_node(Node *sub, const Class *override_type) {
-	Node *c = new Node(NodeKind::UNKNOWN, 0, TypeVoid);
+	Node *c = new Node(NodeKind::UNKNOWN, 0, TypeVoid, sub->is_const);
 	c->kind = NodeKind::DEREFERENCE;
 	c->set_num_params(1);
 	c->set_param(0, sub);
@@ -85,7 +82,7 @@ Node *SyntaxTree::deref_node(Node *sub, const Class *override_type) {
 }
 
 Node *SyntaxTree::shift_node(Node *sub, bool deref, int shift, const Class *type) {
-	Node *c = new Node(deref ? NodeKind::DEREF_ADDRESS_SHIFT : NodeKind::ADDRESS_SHIFT, shift, type);
+	Node *c = new Node(deref ? NodeKind::DEREF_ADDRESS_SHIFT : NodeKind::ADDRESS_SHIFT, shift, type, sub->is_const);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
@@ -102,9 +99,9 @@ Node *SyntaxTree::add_node_statement(StatementID id) {
 Node *SyntaxTree::add_node_member_call(Function *f, Node *inst, bool force_non_virtual) {
 	Node *c;
 	if ((f->virtual_index >= 0) and (!force_non_virtual)) {
-		c = new Node(NodeKind::VIRTUAL_CALL, (int_p)f, f->literal_return_type);
+		c = new Node(NodeKind::VIRTUAL_CALL, (int_p)f, f->literal_return_type, true);
 	} else {
-		c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type);
+		c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type, true);
 	}
 	c->set_num_params(f->num_params + 1);
 	c->set_instance(inst);
@@ -114,8 +111,8 @@ Node *SyntaxTree::add_node_member_call(Function *f, Node *inst, bool force_non_v
 // non-member!
 Node *SyntaxTree::add_node_call(Function *f) {
 	// FIXME: literal_return_type???
-	Node *c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->return_type);
-	if (f->is_static)
+	Node *c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->return_type, true);
+	if (f->is_static())
 		c->set_num_params(f->num_params);
 	else
 		c->set_num_params(f->num_params + 1);
@@ -123,16 +120,16 @@ Node *SyntaxTree::add_node_call(Function *f) {
 }
 
 Node *SyntaxTree::add_node_func_name(Function *f) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, TypeFunctionP);
+	return new Node(NodeKind::FUNCTION, (int_p)f, TypeFunctionP, true);
 }
 
 Node *SyntaxTree::add_node_class(const Class *c) {
-	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP);
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP, true);
 }
 
 
 Node *SyntaxTree::add_node_operator(Node *p1, Node *p2, Operator *op) {
-	Node *cmd = new Node(NodeKind::OPERATOR, (int_p)op, op->return_type);
+	Node *cmd = new Node(NodeKind::OPERATOR, (int_p)op, op->return_type, true);
 	if (op->primitive->param_flags == 3) {
 		cmd->set_num_params(2); // binary
 		cmd->set_param(0, p1);
@@ -155,15 +152,15 @@ Node *SyntaxTree::add_node_operator_by_inline(Node *p1, Node *p2, InlineID inlin
 
 
 Node *SyntaxTree::add_node_local(Variable *v, const Class *type) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->is_const);
 }
 
 Node *SyntaxTree::add_node_local(Variable *v) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->is_const);
 }
 
 Node *SyntaxTree::add_node_global(Variable *v) {
-	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type);
+	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->is_const);
 }
 
 Node *SyntaxTree::add_node_parray(Node *p, Node *index, const Class *type) {
@@ -232,10 +229,10 @@ void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse) {
 
 }
 
-Node *make_constructor_static(SyntaxTree *tree, Node *n, const string &name) {
+Node *SyntaxTree::make_constructor_static(Node *n, const string &name) {
 	for (auto *f: n->type->functions)
 		if (f->name == name) {
-			auto nn = tree->add_node_call(f);
+			auto nn = add_node_call(f);
 			nn->params = n->params.sub(1,-1);
 			return nn;
 		}
@@ -251,15 +248,15 @@ void SyntaxTree::digest() {
 		if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
 			return n;
 		if ((n->type == TypeVector) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
-			return make_constructor_static(this, n, "_create");
+			return make_constructor_static(n, "_create");
 		}
 		if (n->type == TypeQuaternion) {
 			if (n->params.num == 2 and n->params[1]->type == TypeVector)
-				return make_constructor_static(this, n, "_rotation_v");
+				return make_constructor_static(n, "_rotation_v");
 			if (n->params.num == 3 and n->params[1]->type == TypeVector)
-				return make_constructor_static(this, n, "_rotation_a");
+				return make_constructor_static(n, "_rotation_a");
 			if (n->params.num == 2 and n->params[1]->type == TypeMatrix)
-				return make_constructor_static(this, n, "_rotation_m");
+				return make_constructor_static(n, "_rotation_m");
 		}
 		return n;
 	});
@@ -383,11 +380,10 @@ Constant *SyntaxTree::add_constant_pointer(const Class *type, const void *value)
 
 
 
-Function *SyntaxTree::add_function(const string &name, const Class *return_type, const Class *name_space, bool is_static) {
+Function *SyntaxTree::add_function(const string &name, const Class *return_type, const Class *name_space, Flags flags) {
 	if (!name_space)
 		name_space = base_class;
-	Function *f = new Function(name, return_type, name_space);
-	f->is_static = is_static;
+	Function *f = new Function(name, return_type, name_space, flags);
 	functions.add(f);
 	return f;
 }
@@ -395,7 +391,7 @@ Function *SyntaxTree::add_function(const string &name, const Class *return_type,
 
 
 Node *SyntaxTree::add_node_const(Constant *c) {
-	return new Node(NodeKind::CONSTANT, (int_p)c, c->type);
+	return new Node(NodeKind::CONSTANT, (int_p)c, c->type, true);
 }
 
 /*Node *SyntaxTree::add_node_block(Block *b) {
@@ -444,7 +440,7 @@ Node *SyntaxTree::exlink_add_element(Function *f, ClassElement &e) {
 Node *SyntaxTree::exlink_add_class_func(Function *f, Function *cf) {
 	Node *link = add_node_func_name(cf);
 	Node *self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-	if (!f->is_static) {
+	if (!f->is_static()) {
 		link->set_num_params(1);
 		link->set_instance(self);
 	}
@@ -456,7 +452,7 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 
 	if (!prefer_class) {
 		// global variables (=local variables in "RootOfAllEvil")
-		for (Variable *v: base_class->static_variables)
+		for (auto *v: base_class->static_variables)
 			if (v->name == name)
 				return {add_node_global(v)};
 		// TODO.... namespace...
@@ -468,13 +464,13 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 
 		if (!prefer_class) {
 			// named constants
-			for (Constant *c: ns->constants)
+			for (auto *c: ns->constants)
 				if (name == c->name)
 					return {add_node_const(c)};
 
 			// then the (real) functions
-			for (Function *f: ns->functions)
-				if (f->name == name and f->is_static)
+			for (auto *f: ns->functions)
+				if (f->name == name and f->is_static())
 					links.add(add_node_func_name(f));
 			if (links.num > 0 and !prefer_class)
 				return links;
@@ -503,7 +499,7 @@ Node* SyntaxTree::get_existence_block(const string &name, Block *block) {
 	auto *v = block->get_var(name);
 	if (v)
 		return add_node_local(v);
-	if (!f->is_static){
+	if (!f->is_static()){
 		if ((name == IDENTIFIER_SUPER) and (f->name_space->parent))
 			return add_node_local(f->__get_var(IDENTIFIER_SELF), f->name_space->parent);
 		// class elements (within a class function)
@@ -756,7 +752,7 @@ void SyntaxTree::convert_call_by_reference() {
 	for (Function *f: functions) {
 		
 		// TODO: convert self...
-		if (!f->is_static and f->name_space->uses_call_by_reference()) {
+		if (!f->is_static() and f->name_space->uses_call_by_reference()) {
 			for (auto *v: f->var)
 				if (v->name == IDENTIFIER_SELF) {
 					//msg_write("CONV SELF....");
@@ -1047,6 +1043,26 @@ Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 		}
 		_transform_insert_before_.add(bb);
 		return array;
+	} else if (n->kind == NodeKind::DICT_BUILDER) {
+		auto *t_el = n->type->get_array_element();
+		Function *cf = n->type->get_func("set", TypeVoid, {TypeString, t_el});
+		if (!cf)
+			do_error(format("[..]: can not find %s.set(string,%s) function???", n->type->long_name().c_str(), t_el->long_name().c_str()));
+
+		// temp var
+		auto *f = cur_func;
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
+		Node *array = add_node_local(vv);
+
+		Block *bb = new Block(f, b);
+		for (int i=0; i<n->params.num/2; i++){
+			auto *cc = add_node_member_call(cf, cp_node(array));
+			cc->set_param(1, n->params[i*2]);
+			cc->set_param(2, n->params[i*2+1]);
+			bb->add(cc);
+		}
+		_transform_insert_before_.add(bb);
+		return array;
 	} else if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::FOR_RANGE)) {
 
 		// [VAR, START, STOP, STEP, BLOCK]
@@ -1185,7 +1201,7 @@ void MapLVSX86Return(Function *f) {
 }
 
 void MapLVSX86Self(Function *f) {
-	if (!f->is_static){
+	if (!f->is_static()){
 		foreachi(Variable *v, f->var, i)
 			if (v->name == IDENTIFIER_SELF) {
 				v->_offset = f->_param_size;
@@ -1215,7 +1231,7 @@ void SyntaxTree::map_local_variables_to_stack() {
 			}
 
 			foreachi(Variable *v, f->var, i) {
-				if (!f->is_static and (v->name == IDENTIFIER_SELF))
+				if (!f->is_static() and (v->name == IDENTIFIER_SELF))
 					continue;
 				if (v->name == IDENTIFIER_RETURN_VAR)
 					continue;
@@ -1268,7 +1284,7 @@ void SyntaxTree::show(const string &stage) {
 	msg_write("--------- Syntax of " + script->filename + "  " + stage + " ---------");
 	msg_right();
 	for (auto *f: functions)
-		if (!f->is_extern)
+		if (!f->is_extern())
 			f->show(stage);
 	msg_left();
 	msg_write("\n\n");

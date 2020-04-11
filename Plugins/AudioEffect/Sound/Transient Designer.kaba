@@ -33,7 +33,7 @@ class TransientDesigner extends AudioEffect
 		env_att.reset_state()
 		env_sus.reset_state()
 
-	void do(float[] buf, int c, float[] h_fast, float[] h_att, float[] h_sus)
+	void do(out float[] buf, int c, float[] h_fast, float[] h_att, float[] h_sus)
 		
 		for i in 0:len(buf)
 			# gain?
@@ -53,7 +53,7 @@ class TransientDesigner extends AudioEffect
 			#buf[i] = gain*2
 			#buf[i] = hs
 			
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		buf_fast = buf
 		env_fast.process(buf_fast)
 		buf_att = buf

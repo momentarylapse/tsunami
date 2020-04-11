@@ -55,7 +55,7 @@ void SIAddPackageSound()
 			func_add_param("rate",		TypeFloat32);
 	
 	// sound
-	add_func("EmitSound",									TypeSoundP,	sound_p(&SoundEmit), FLAG_STATIC);
+	add_func("EmitSound",									TypeSoundP,	sound_p(&SoundEmit), Flags::STATIC);
 		func_add_param("filename",	TypeString);
 		func_add_param("pos",		TypeVector);
 		func_add_param("r_min",		TypeFloat32);
@@ -63,13 +63,13 @@ void SIAddPackageSound()
 		func_add_param("speed",		TypeFloat32);
 		func_add_param("volume",	TypeFloat32);
 		func_add_param("loop",		TypeBool);
-	add_func("LoadSound",									TypeSoundP,	sound_p(&SoundLoad), FLAG_STATIC);
+	add_func("LoadSound",									TypeSoundP,	sound_p(&SoundLoad), Flags::STATIC);
 		func_add_param("filename",	TypeString);
 	// music
-	add_func("LoadMusic",									TypeMusicP,	sound_p(&MusicLoad), FLAG_STATIC);
+	add_func("LoadMusic",									TypeMusicP,	sound_p(&MusicLoad), Flags::STATIC);
 		func_add_param("filename",		TypeString);
 	// sound creation
-	add_func("SaveSound",		TypeVoid, 		sound_p(&SoundSaveFile), FLAG_STATIC);
+	add_func("SaveSound",		TypeVoid, 		sound_p(&SoundSaveFile), Flags::STATIC);
 		func_add_param("filename",		TypeString);
 		func_add_param("buf_r",			TypeFloatList);
 		func_add_param("buf_l",			TypeFloatList);

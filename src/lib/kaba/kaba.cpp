@@ -8,6 +8,7 @@
 \*----------------------------------------------------------------------------*/
 #include "../file/file.h"
 #include "kaba.h"
+#include "lib/common.h"
 #include <cassert>
 
 #include "../config.h"
@@ -24,7 +25,7 @@
 
 namespace Kaba{
 
-string Version = "0.18.1.0";
+string Version = "0.18.4.0";
 
 //#define ScriptDebug
 
@@ -298,7 +299,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 // analyse syntax
 
 	// create a main() function
-	Function *func = ps->add_function("--command-func--", TypeVoid, ps->base_class, true);
+	Function *func = ps->add_function("--command-func--", TypeVoid, ps->base_class, Flags::STATIC);
 	func->_var_size = 0; // set to -1...
 
 	// parse

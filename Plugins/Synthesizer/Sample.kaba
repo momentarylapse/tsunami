@@ -23,7 +23,7 @@ class SampleRenderer extends PitchRenderer
 			sample = synth.config.samples[pitch]
 	override void on_start(float volume)
 		events.add(MidiEvent(0, 0, volume))
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		if not sample or (len(events) == 0)
 			return false
 		int[] to_del

@@ -33,7 +33,7 @@ int[] find_clicks(float[] b)
 	return clicks
 
 class RemoveClicks extends AudioEffect
-	void unclick(float[] b, int start, int end)
+	void unclick(out float[] b, int start, int end)
 		int i0 = start - 1
 		int i1 = end + 1
 		float v0 = b[i0]
@@ -43,11 +43,11 @@ class RemoveClicks extends AudioEffect
 			b[i] = v0 + m * (i - i0)
 		
 	
-	void repair(float[] b)
+	void repair(out float[] b)
 		int[] clicks = find_clicks(b)
 		for i in 0:clicks.num:2
 			unclick(b, clicks[i], clicks[i+1])
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		repair(buf.l)
 		repair(buf.r)

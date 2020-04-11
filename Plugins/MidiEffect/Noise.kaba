@@ -2,7 +2,7 @@ use "../api.kaba"
 
 class Delay extends MidiEffect
 	
-	override void process(MidiNoteBuffer midi)
+	override void process(out MidiNoteBuffer midi)
 		int length = 1000000#midi.getRange().length
 		int num = length / 20
 		for i in 0:num

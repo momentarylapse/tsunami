@@ -3,7 +3,7 @@
 use "../../api.kaba"
 
 class Swap extends AudioEffect
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		if buf.channels > 1
 			float[] temp
 			temp = buf.l

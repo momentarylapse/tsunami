@@ -292,6 +292,16 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 			a.add(kaba_dyn((char*)ar->data + ar->element_size * i, t_el));
 		return a;
 	}
+	if (type->is_dict()) {
+		Any a = EmptyHash;
+		auto *da = reinterpret_cast<const DynamicArray*>(var);
+		auto *t_el = type->get_array_element();
+		for (int i=0; i<da->num; i++) {
+			string key = *(string*)(((char*)da->data) + i * da->element_size);
+			a.map_set(key, kaba_dyn(((char*)da->data) + i * da->element_size + sizeof(string), type->param));
+		}
+		return a;
+	}
 	
 	// class
 	Any a;

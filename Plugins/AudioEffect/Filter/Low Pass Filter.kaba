@@ -22,5 +22,5 @@ class LowPassFilter extends AudioEffect
 		#filter.create(FILTER_LOW_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
 		filter.create(FILTER_LOW_PASS, config.frequency, 1, 0, session.sample_rate())
 		
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		filter.apply(buf)

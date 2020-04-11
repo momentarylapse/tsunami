@@ -17,7 +17,7 @@ class PADConfig extends Module.Config
 		bwscale = 0.7
 		detune = 0.03
 	
-	void fill_curve(complex[] c, int n0)
+	void fill_curve(out complex[] c, int n0)
 		c.clear()
 		float n = n0 + 1
 		float nn = n + 0.03 * n * n
@@ -80,7 +80,7 @@ class PADRenderer extends PitchRenderer
 	override void on_end()
 		env.end()
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		for i in 0:len(buf)
 			float d = prebuf[pos]
 				

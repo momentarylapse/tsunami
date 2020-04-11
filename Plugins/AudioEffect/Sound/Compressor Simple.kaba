@@ -46,7 +46,7 @@ class Compressor extends AudioEffect
 
 	float dgain_attack, dgain_release
 
-	void compress(float[] b, float[] squares, float *gain)
+	void compress(out float[] b, out float[] squares, out float *gain)
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:b.num
 		
@@ -86,7 +86,7 @@ class Compressor extends AudioEffect
 			# apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		

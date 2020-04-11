@@ -1,5 +1,6 @@
 #include "../../file/file.h"
 #include "../../math/math.h"
+#include "../../base/map.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "common.h"
@@ -49,6 +50,7 @@ extern const Class *TypeBoolList;
 extern const Class *TypeFloatPs;
 extern const Class *TypeAny;
 extern const Class *TypeAnyList;
+extern const Class *TypeAnyDict;
 
 
 float _cdecl f_sqr(float f){	return f*f;	}
@@ -98,6 +100,20 @@ public:
 	void assign(AnyList &o) {
 		*this = o;
 	}
+};
+
+class AnyDict : public Map<string,Any> {
+public:
+	void __delete__() {
+		this->~AnyDict();
+	}
+	void assign(AnyDict &o) {
+		*this = o;
+	}
+	Any get_item(const string &k)
+	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return Any(); }
+	string str()
+	{ return var2str(this, TypeAnyDict); }
 };
 
 Array<int> _cdecl int_range(int start, int end) {
@@ -290,12 +306,12 @@ void SIAddPackageMath() {
 	add_class(TypeComplex);
 		class_add_elementx("x", TypeFloat32, &complex::x);
 		class_add_elementx("y", TypeFloat32, &complex::y);
-		class_add_func("abs", TypeFloat32, mf(&complex::abs), FLAG_PURE);
-		class_add_func("abs_sqr", TypeFloat32, mf(&complex::abs_sqr), FLAG_PURE);
-		class_add_func("bar", TypeComplex, 		mf(&complex::bar), FLAG_PURE);
-		class_add_func("str", TypeString, mf(&complex::str), FLAG_PURE);
+		class_add_func("abs", TypeFloat32, mf(&complex::abs), Flags::PURE);
+		class_add_func("abs_sqr", TypeFloat32, mf(&complex::abs_sqr), Flags::PURE);
+		class_add_func("bar", TypeComplex, 		mf(&complex::bar), Flags::PURE);
+		class_add_func("str", TypeString, mf(&complex::str), Flags::PURE);
 		class_add_const("I", TypeComplex, &complex::I);
-		class_add_func("_create", TypeComplex, (void*)__complex_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_create", TypeComplex, (void*)__complex_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::COMPLEX_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -318,8 +334,8 @@ void SIAddPackageMath() {
 
 	add_class(TypeComplexList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&ComplexList::__init__));
-		class_add_func("sum", TypeComplex, mf(&ComplexList::sum), FLAG_PURE);
-		class_add_func("sum2", TypeFloat32, mf(&ComplexList::sum2), FLAG_PURE);
+		class_add_func("sum", TypeComplex, mf(&ComplexList::sum), Flags::PURE);
+		class_add_func("sum2", TypeFloat32, mf(&ComplexList::sum2), Flags::PURE);
 		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd));
 			func_add_param("other", TypeComplexList);
 		class_add_func("__isub__", TypeVoid, mf(&ComplexList::isub));
@@ -328,13 +344,13 @@ void SIAddPackageMath() {
 			func_add_param("other", TypeComplexList);
 		class_add_func("__idiv__", TypeVoid, mf(&ComplexList::idiv));
 			func_add_param("other", TypeComplexList);
-		class_add_func("__add__", TypeComplexList, mf(&ComplexList::add), FLAG_PURE);
+		class_add_func("__add__", TypeComplexList, mf(&ComplexList::add), Flags::PURE);
 			func_add_param("other", TypeComplexList);
-		class_add_func("__sub__", TypeComplexList, mf(&ComplexList::sub), FLAG_PURE);
+		class_add_func("__sub__", TypeComplexList, mf(&ComplexList::sub), Flags::PURE);
 			func_add_param("other", TypeComplexList);
-		class_add_func("__mul__", TypeComplexList, mf(&ComplexList::mul), FLAG_PURE);
+		class_add_func("__mul__", TypeComplexList, mf(&ComplexList::mul), Flags::PURE);
 			func_add_param("other", TypeComplexList);
-		class_add_func("__div__", TypeComplexList, mf(&ComplexList::div), FLAG_PURE);
+		class_add_func("__div__", TypeComplexList, mf(&ComplexList::div), Flags::PURE);
 			func_add_param("other", TypeComplexList);
 		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd2));
 			func_add_param("other", TypeComplex);
@@ -357,27 +373,27 @@ void SIAddPackageMath() {
 		class_add_elementx("y", TypeFloat32, &vector::y);
 		class_add_elementx("z", TypeFloat32, &vector::z);
 		class_add_element("_e", TypeFloatArray3, 0);
-		class_add_func("length", TypeFloat32, type_p(mf(&vector::length)), FLAG_PURE);
-		class_add_func("length_sqr", TypeFloat32, type_p(mf(&vector::length_sqr)), FLAG_PURE);
-		class_add_func("length_fuzzy", TypeFloat32, type_p(mf(&vector::length_fuzzy)), FLAG_PURE);
-		class_add_func("normalized", TypeVector, mf(&vector::normalized), FLAG_PURE);
-		class_add_func("dir2ang", TypeVector, mf(&vector::dir2ang), FLAG_PURE);
-		class_add_func("dir2ang2", TypeVector, mf(&vector::dir2ang2), FLAG_PURE);
+		class_add_func("length", TypeFloat32, type_p(mf(&vector::length)), Flags::PURE);
+		class_add_func("length_sqr", TypeFloat32, type_p(mf(&vector::length_sqr)), Flags::PURE);
+		class_add_func("length_fuzzy", TypeFloat32, type_p(mf(&vector::length_fuzzy)), Flags::PURE);
+		class_add_func("normalized", TypeVector, mf(&vector::normalized), Flags::PURE);
+		class_add_func("dir2ang", TypeVector, mf(&vector::dir2ang), Flags::PURE);
+		class_add_func("dir2ang2", TypeVector, mf(&vector::dir2ang2), Flags::PURE);
 			func_add_param("up", TypeVector);
-		class_add_func("ang2dir", TypeVector, mf(&vector::ang2dir), FLAG_PURE);
-		class_add_func("rotate", TypeVector, mf(&vector::rotate), FLAG_PURE);
+		class_add_func("ang2dir", TypeVector, mf(&vector::ang2dir), Flags::PURE);
+		class_add_func("rotate", TypeVector, mf(&vector::rotate), Flags::PURE);
 			func_add_param("ang", TypeVector);
-//		class_add_func("__div__", TypeVector, mf(&vector::untransform), FLAG_PURE);
+//		class_add_func("__div__", TypeVector, mf(&vector::untransform), Flags::PURE);
 //			func_add_param("m", TypeMatrix);
-		class_add_func("ortho", TypeVector, mf(&vector::ortho), FLAG_PURE);
-		class_add_func("str", TypeString, mf(&vector::str), FLAG_PURE);
-		class_add_func("dot", TypeFloat32, (void*)&vector::dot, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("ortho", TypeVector, mf(&vector::ortho), Flags::PURE);
+		class_add_func("str", TypeString, mf(&vector::str), Flags::PURE);
+		class_add_func("dot", TypeFloat32, (void*)&vector::dot, Flags::_STATIC__PURE);
 			func_add_param("v1", TypeVector);
 			func_add_param("v2", TypeVector);
-		class_add_funcx("cross", TypeVector, &vector::cross, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_funcx("cross", TypeVector, &vector::cross, Flags::_STATIC__PURE);
 			func_add_param("v1", TypeVector);
 			func_add_param("v2", TypeVector);
-		class_add_func("_create", TypeVector, (void*)&__vector_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_create", TypeVector, (void*)&__vector_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::VECTOR_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -387,10 +403,10 @@ void SIAddPackageMath() {
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
-		class_add_func("ang_add", TypeVector, mf(&VecAngAdd), ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("ang_add", TypeVector, mf(&VecAngAdd), Flags::_STATIC__PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
-		class_add_func("ang_interpolate", TypeVector, mf(&VecAngInterpolate), ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("ang_interpolate", TypeVector, mf(&VecAngInterpolate), Flags::_STATIC__PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
 			func_add_param("t", TypeFloat32);
@@ -422,16 +438,16 @@ void SIAddPackageMath() {
 		class_add_elementx("y", TypeFloat32, &quaternion::y);
 		class_add_elementx("z", TypeFloat32, &quaternion::z);
 		class_add_elementx("w", TypeFloat32, &quaternion::w);
-		class_add_func("__mul__", TypeQuaternion, mf(&quaternion::mul), FLAG_PURE);
+		class_add_func("__mul__", TypeQuaternion, mf(&quaternion::mul), Flags::PURE);
 			func_add_param("other", TypeQuaternion);
-		class_add_func("__mul__", TypeVector, (void*)&_quat_vec_mul, FLAG_PURE);
+		class_add_func("__mul__", TypeVector, (void*)&_quat_vec_mul, Flags::PURE);
 			func_add_param("other", TypeVector);
 		class_add_func("__imul__", TypeVoid, mf(&quaternion::imul));
 			func_add_param("other", TypeQuaternion);
-		class_add_func("bar", TypeQuaternion, mf(&quaternion::bar), FLAG_PURE);
+		class_add_func("bar", TypeQuaternion, mf(&quaternion::bar), Flags::PURE);
 		class_add_func("normalize", TypeVoid, mf(&quaternion::normalize));
-		class_add_func("angles", TypeVector, mf(&quaternion::get_angles), FLAG_PURE);
-		class_add_func("str", TypeString, mf(&quaternion::str), FLAG_PURE);
+		class_add_func("angles", TypeVector, mf(&quaternion::get_angles), Flags::PURE);
+		class_add_func("str", TypeString, mf(&quaternion::str), Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
 			func_add_param("ang", TypeVector);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
@@ -439,18 +455,18 @@ void SIAddPackageMath() {
 			func_add_param("angle", TypeFloat32);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
 			func_add_param("m", TypeMatrix);
-		class_add_func("_rotation_v", TypeQuaternion, (void*)&quaternion::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_rotation_v", TypeQuaternion, (void*)&quaternion::rotation_v, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeVector);
-		class_add_func("_rotation_a", TypeQuaternion, (void*)&quaternion::rotation_a, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_rotation_a", TypeQuaternion, (void*)&quaternion::rotation_a, Flags::_STATIC__PURE);
 			func_add_param("axis", TypeVector);
 			func_add_param("angle", TypeFloat32);
-		class_add_func("_rotation_m", TypeQuaternion, (void*)&quaternion::rotation_m, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_rotation_m", TypeQuaternion, (void*)&quaternion::rotation_m, Flags::_STATIC__PURE);
 			func_add_param("m", TypeMatrix);
-		class_add_func("interpolate", TypeQuaternion, (void*)(quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("interpolate", TypeQuaternion, (void*)(quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, Flags::_STATIC__PURE);
 			func_add_param("q0", TypeQuaternion);
 			func_add_param("q1", TypeQuaternion);
 			func_add_param("t", TypeFloat32);
-		class_add_func("drag", TypeQuaternion, (void*)&quaternion::drag, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("drag", TypeQuaternion, (void*)&quaternion::drag, Flags::_STATIC__PURE);
 			func_add_param("up", TypeVector);
 			func_add_param("dang", TypeVector);
 			func_add_param("reset_z", TypeBool);
@@ -463,15 +479,15 @@ void SIAddPackageMath() {
 		class_add_element("x2", TypeFloat32, 4);
 		class_add_element("y1", TypeFloat32, 8);
 		class_add_element("y2", TypeFloat32, 12);
-		class_add_func("width", TypeFloat32, mf(&rect::width), FLAG_PURE);
-		class_add_func("height", TypeFloat32, mf(&rect::height), FLAG_PURE);
-		class_add_func("area", TypeFloat32, mf(&rect::area), FLAG_PURE);
-		class_add_func("inside", TypeBool, mf(&rect::inside), FLAG_PURE);
+		class_add_func("width", TypeFloat32, mf(&rect::width), Flags::PURE);
+		class_add_func("height", TypeFloat32, mf(&rect::height), Flags::PURE);
+		class_add_func("area", TypeFloat32, mf(&rect::area), Flags::PURE);
+		class_add_func("inside", TypeBool, mf(&rect::inside), Flags::PURE);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
-		class_add_func("str", TypeString, mf(&rect::str), FLAG_PURE);
+		class_add_func("str", TypeString, mf(&rect::str), Flags::PURE);
 		class_add_const("ID", TypeRect, (void*)&rect::ID);
-		class_add_func("_create", TypeRect, (void*)__rect_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_create", TypeRect, (void*)__rect_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::RECT_SET);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
@@ -490,29 +506,29 @@ void SIAddPackageMath() {
 		class_add_element("r", TypeFloat32, 0);
 		class_add_element("g", TypeFloat32, 4);
 		class_add_element("b", TypeFloat32, 8);
-		class_add_func("str", TypeString, mf(&color::str), FLAG_PURE);
-		class_add_func("__add__", TypeColor, mf(&color::operator+), FLAG_PURE);
+		class_add_func("str", TypeString, mf(&color::str), Flags::PURE);
+		class_add_func("__add__", TypeColor, mf(&color::operator+), Flags::PURE);
 			func_add_param("o", TypeColor);
 		class_add_func("__adds__", TypeVoid, mf(&color::operator+=));
 			func_add_param("o", TypeColor);
-		class_add_func("__sub__", TypeColor, mf(&color::operator-), FLAG_PURE);
+		class_add_func("__sub__", TypeColor, mf(&color::operator-), Flags::PURE);
 			func_add_param("o", TypeColor);
 		class_add_func("__subs__", TypeVoid, mf(&color::operator-=));
 			func_add_param("o", TypeColor);
-		class_add_func("__mul__", TypeColor, (void*)&_col_mul_f, FLAG_PURE);
+		class_add_func("__mul__", TypeColor, (void*)&_col_mul_f, Flags::PURE);
 			func_add_param("f", TypeFloat32);
-		class_add_func("__mul__", TypeColor, (void*)&_col_mul_c, FLAG_PURE);
+		class_add_func("__mul__", TypeColor, (void*)&_col_mul_c, Flags::PURE);
 			func_add_param("c", TypeColor);
-		class_add_funcx("hsb", TypeColor, &SetColorHSB, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_funcx("hsb", TypeColor, &SetColorHSB, Flags::_STATIC__PURE);
 			func_add_param("a", TypeFloat32);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
 			func_add_param("b", TypeFloat32);
-		class_add_funcx("interpolate", TypeColor, &ColorInterpolate, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_funcx("interpolate", TypeColor, &ColorInterpolate, Flags::_STATIC__PURE);
 			func_add_param("c1", TypeColor);
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
-		class_add_func("_create", TypeColor, (void*)&__color_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("_create", TypeColor, (void*)&__color_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::COLOR_SET);
 			func_add_param("a", TypeFloat32);
 			func_add_param("r", TypeFloat32);
@@ -535,21 +551,21 @@ void SIAddPackageMath() {
 		class_add_element("c", TypeFloat32, 8);
 		class_add_element("d", TypeFloat32, 12);
 		class_add_element("n", TypeVector, 0);
-		class_add_func("intersect_line", TypeBool, mf(&plane::intersect_line), FLAG_PURE);
+		class_add_func("intersect_line", TypeBool, mf(&plane::intersect_line), Flags::PURE);
 			func_add_param("l1", TypeVector);
 			func_add_param("l2", TypeVector);
 			func_add_param("inter", TypeVector);
-		class_add_func("inverse", TypeVoid, mf(&plane::inverse), FLAG_PURE);
-		class_add_func("distance", TypeFloat32, mf(&plane::distance), FLAG_PURE);
+		class_add_func("inverse", TypeVoid, mf(&plane::inverse), Flags::PURE);
+		class_add_func("distance", TypeFloat32, mf(&plane::distance), Flags::PURE);
 			func_add_param("p", TypeVector);
-		class_add_func("str", TypeString, mf(&plane::str), FLAG_PURE);
-		class_add_func("transform", TypePlane, mf(&plane::transform), FLAG_PURE);
+		class_add_func("str", TypeString, mf(&plane::str), Flags::PURE);
+		class_add_func("transform", TypePlane, mf(&plane::transform), Flags::PURE);
 			func_add_param("m", TypeMatrix);
-		class_add_func("from_points", TypePlane, (void*)&plane::from_points, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("from_points", TypePlane, (void*)&plane::from_points, Flags::_STATIC__PURE);
 			func_add_param("a", TypeVector);
 			func_add_param("b", TypeVector);
 			func_add_param("c", TypeVector);
-		class_add_func("from_point_normal", TypePlane, (void*)&plane::from_point_normal, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("from_point_normal", TypePlane, (void*)&plane::from_point_normal, Flags::_STATIC__PURE);
 			func_add_param("p", TypeVector);
 			func_add_param("n", TypeVector);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypePlane, TypePlane, InlineID::CHUNK_ASSIGN);
@@ -579,40 +595,40 @@ void SIAddPackageMath() {
 		class_add_element("_e", TypeFloatArray16, 0);
 		class_add_func("__imul__", TypeVoid, mf(&matrix::imul));
 			func_add_param("other", TypeMatrix);
-		class_add_func("__mul__", TypeMatrix, mf(&matrix::mul), FLAG_PURE);
+		class_add_func("__mul__", TypeMatrix, mf(&matrix::mul), Flags::PURE);
 			func_add_param("other", TypeMatrix);
-		class_add_func("__mul__", TypeVector, mf(&matrix::mul_v), FLAG_PURE);
+		class_add_func("__mul__", TypeVector, mf(&matrix::mul_v), Flags::PURE);
 			func_add_param("other", TypeVector);
-		class_add_func("str", TypeString, mf(&matrix::str), FLAG_PURE);
-		class_add_func("transform", TypeVector, mf(&matrix::transform), FLAG_PURE);
+		class_add_func("str", TypeString, mf(&matrix::str), Flags::PURE);
+		class_add_func("transform", TypeVector, mf(&matrix::transform), Flags::PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("transform_normal", TypeVector, mf(&matrix::transform_normal), FLAG_PURE);
+		class_add_func("transform_normal", TypeVector, mf(&matrix::transform_normal), Flags::PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("untransform", TypeVector, mf(&matrix::untransform), FLAG_PURE);
+		class_add_func("untransform", TypeVector, mf(&matrix::untransform), Flags::PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("project", TypeVector, mf(&matrix::project), FLAG_PURE);
+		class_add_func("project", TypeVector, mf(&matrix::project), Flags::PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("unproject", TypeVector, mf(&matrix::unproject), FLAG_PURE);
+		class_add_func("unproject", TypeVector, mf(&matrix::unproject), Flags::PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("inverse", TypeMatrix, mf(&matrix::inverse), FLAG_PURE);
-		class_add_func("transpose", TypeMatrix, mf(&matrix::transpose), FLAG_PURE);
-		class_add_func("translation", TypeMatrix, (void*)&matrix::translation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("inverse", TypeMatrix, mf(&matrix::inverse), Flags::PURE);
+		class_add_func("transpose", TypeMatrix, mf(&matrix::transpose), Flags::PURE);
+		class_add_func("translation", TypeMatrix, (void*)&matrix::translation, Flags::_STATIC__PURE);
 			func_add_param("trans", TypeVector);
-		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_v, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeVector);
-		class_add_func("rotation_x", TypeMatrix, (void*)&matrix::rotation_x, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation_x", TypeMatrix, (void*)&matrix::rotation_x, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_y", TypeMatrix, (void*)&matrix::rotation_y, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation_y", TypeMatrix, (void*)&matrix::rotation_y, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_z", TypeMatrix, (void*)&matrix::rotation_z, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation_z", TypeMatrix, (void*)&matrix::rotation_z, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_q, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation_q, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMatrix, (void*)&matrix::scale, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("scale", TypeMatrix, (void*)&matrix::scale, Flags::_STATIC__PURE);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
-		class_add_func("perspective", TypeMatrix, (void*)&matrix::perspective, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+		class_add_func("perspective", TypeMatrix, (void*)&matrix::perspective, Flags::_STATIC__PURE);
 			func_add_param("fovy", TypeFloat32);
 			func_add_param("aspect", TypeFloat32);
 			func_add_param("z_near", TypeFloat32);
@@ -633,12 +649,12 @@ void SIAddPackageMath() {
 		class_add_element("_33", TypeFloat32, 32);
 		class_add_element("e", TypeFloatArray3x3, 0);
 		class_add_element("_e", TypeFloatArray9, 0);
-		class_add_func("__mul__", TypeMatrix3, mf(&matrix3::mul), FLAG_PURE);
+		class_add_func("__mul__", TypeMatrix3, mf(&matrix3::mul), Flags::PURE);
 			func_add_param("other", TypeMatrix3);
-		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), FLAG_PURE);
+		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), Flags::PURE);
 			func_add_param("other", TypeVector);
-		class_add_func("str", TypeString, mf(&matrix3::str), FLAG_PURE);
-		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), FLAG_PURE);
+		class_add_func("str", TypeString, mf(&matrix3::str), Flags::PURE);
+		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), Flags::PURE);
 		class_add_const("ID", TypeMatrix3, (void*)&matrix3::ID);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_EQUAL);
@@ -654,20 +670,20 @@ void SIAddPackageMath() {
 			func_add_param("s", TypeString);
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, algebra_p(mf(&vli::set_int)));
 			func_add_param("i", TypeInt);
-		class_add_func("str", TypeString, algebra_p(mf(&vli::to_string)), FLAG_PURE);
-		class_add_func("compare", TypeInt, algebra_p(mf(&vli::compare)), FLAG_PURE);
+		class_add_func("str", TypeString, algebra_p(mf(&vli::to_string)), Flags::PURE);
+		class_add_func("compare", TypeInt, algebra_p(mf(&vli::compare)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__eq__", TypeBool, algebra_p(mf(&vli::operator==)), FLAG_PURE);
+		class_add_func("__eq__", TypeBool, algebra_p(mf(&vli::operator==)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__ne__", TypeBool, algebra_p(mf(&vli::operator!=)), FLAG_PURE);
+		class_add_func("__ne__", TypeBool, algebra_p(mf(&vli::operator!=)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__lt__", TypeBool, algebra_p(mf(&vli::operator<)), FLAG_PURE);
+		class_add_func("__lt__", TypeBool, algebra_p(mf(&vli::operator<)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__gt__", TypeBool, algebra_p(mf(&vli::operator>)), FLAG_PURE);
+		class_add_func("__gt__", TypeBool, algebra_p(mf(&vli::operator>)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__le__", TypeBool, algebra_p(mf(&vli::operator<=)), FLAG_PURE);
+		class_add_func("__le__", TypeBool, algebra_p(mf(&vli::operator<=)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__ge__", TypeBool, algebra_p(mf(&vli::operator>=)), FLAG_PURE);
+		class_add_func("__ge__", TypeBool, algebra_p(mf(&vli::operator>=)), Flags::PURE);
 			func_add_param("v", TypeVli);
 		class_add_func("__iadd__", TypeVoid, algebra_p(mf(&vli::operator+=)));
 			func_add_param("v", TypeVli);
@@ -675,24 +691,24 @@ void SIAddPackageMath() {
 			func_add_param("v", TypeVli);
 		class_add_func("__imul__", TypeVoid, algebra_p(mf(&vli::operator*=)));
 			func_add_param("v", TypeVli);
-		class_add_func("__add__", TypeVli, algebra_p(mf(&vli::operator+)), FLAG_PURE);
+		class_add_func("__add__", TypeVli, algebra_p(mf(&vli::operator+)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__sub__", TypeVli, algebra_p(mf(&vli::operator-)), FLAG_PURE);
+		class_add_func("__sub__", TypeVli, algebra_p(mf(&vli::operator-)), Flags::PURE);
 			func_add_param("v", TypeVli);
-		class_add_func("__mul__", TypeVli, algebra_p(mf(&vli::operator*)), FLAG_PURE);
+		class_add_func("__mul__", TypeVli, algebra_p(mf(&vli::operator*)), Flags::PURE);
 			func_add_param("v", TypeVli);
 		class_add_func("idiv", TypeVoid, algebra_p(mf(&vli::idiv)));
 			func_add_param("div", TypeVli);
 			func_add_param("rem", TypeVli);
-		class_add_func("div", TypeVli, algebra_p(mf(&vli::_div)), FLAG_PURE);
+		class_add_func("div", TypeVli, algebra_p(mf(&vli::_div)), Flags::PURE);
 			func_add_param("div", TypeVli);
 			func_add_param("rem", TypeVli);
-		class_add_func("pow", TypeVli, algebra_p(mf(&vli::pow)), FLAG_PURE);
+		class_add_func("pow", TypeVli, algebra_p(mf(&vli::pow)), Flags::PURE);
 			func_add_param("exp", TypeVli);
-		class_add_func("pow_mod", TypeVli, algebra_p(mf(&vli::pow_mod)), FLAG_PURE);
+		class_add_func("pow_mod", TypeVli, algebra_p(mf(&vli::pow_mod)), Flags::PURE);
 			func_add_param("exp", TypeVli);
 			func_add_param("mod", TypeVli);
-		class_add_func("gcd", TypeVli, algebra_p(mf(&vli::gcd)), FLAG_PURE);
+		class_add_func("gcd", TypeVli, algebra_p(mf(&vli::gcd)), Flags::PURE);
 			func_add_param("v", TypeVli);
 	
 	add_class(TypeAny);
@@ -707,38 +723,38 @@ void SIAddPackageMath() {
 		class_add_func("__isub__", TypeVoid, any_p(mf(&Any::_sub)));
 			func_add_param("a", TypeAny);
 		class_add_func("clear", TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func("length", TypeInt, any_p(mf(&Any::length)));
-		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_map_get)), FLAG_RAISES_EXCEPTIONS);
+		class_add_func("length", TypeInt, any_p(mf(&Any::length)), Flags::PURE);
+		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_map_get)), Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_map_set)), FLAG_RAISES_EXCEPTIONS);
+		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_map_set)), Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_array_get)), FLAG_RAISES_EXCEPTIONS);
+		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_array_get)), Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
-		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_array_set)), FLAG_RAISES_EXCEPTIONS);
+		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_array_set)), Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 			func_add_param("value", TypeAny);
-		class_add_func("add", TypeVoid, any_p(mf(&KabaAny::_array_add)), FLAG_RAISES_EXCEPTIONS);
+		class_add_func("add", TypeVoid, any_p(mf(&KabaAny::_array_add)), Flags::RAISES_EXCEPTIONS);
 			func_add_param("a", TypeAny);
-		class_add_func("keys", TypeStringList, any_p(mf(&Any::keys)));//, FLAG_RAISES_EXCEPTIONS);
-		class_add_func("bool", TypeBool, any_p(mf(&Any::_bool)));
-		class_add_func("int", TypeInt, any_p(mf(&Any::_int)));
-		class_add_func("float", TypeFloat32, any_p(mf(&Any::_float)));
-		class_add_func("str", TypeString, any_p(mf(&Any::str)));
-		class_add_func("repr", TypeString, any_p(mf(&Any::repr)));
-		class_add_func("unwrap", TypeVoid, (void*)&KabaAny::unwrap, FLAG_RAISES_EXCEPTIONS);
+		class_add_func("keys", TypeStringList, any_p(mf(&Any::keys)), Flags::PURE);//, Flags::RAISES_EXCEPTIONS);
+		class_add_func("bool", TypeBool, any_p(mf(&Any::_bool)), Flags::PURE);
+		class_add_func("int", TypeInt, any_p(mf(&Any::_int)), Flags::PURE);
+		class_add_func("float", TypeFloat32, any_p(mf(&Any::_float)), Flags::PURE);
+		class_add_func("str", TypeString, any_p(mf(&Any::str)), Flags::PURE);
+		class_add_func("repr", TypeString, any_p(mf(&Any::repr)), Flags::PURE);
+		class_add_func("unwrap", TypeVoid, (void*)&KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
 			func_add_param("var", TypePointer);
 			func_add_param("type", TypeClassP);
 
-	add_funcx("@int2any", TypeAny, &kaba_int2any, FLAG_STATIC);
+	add_funcx("@int2any", TypeAny, &kaba_int2any, Flags::STATIC);
 		func_add_param("i", TypeInt);
-	add_funcx("@float2any", TypeAny, &kaba_float2any, FLAG_STATIC);
+	add_funcx("@float2any", TypeAny, &kaba_float2any, Flags::STATIC);
 		func_add_param("i", TypeFloat32);
-	add_funcx("@bool2any", TypeAny, &kaba_bool2any, FLAG_STATIC);
+	add_funcx("@bool2any", TypeAny, &kaba_bool2any, Flags::STATIC);
 		func_add_param("i", TypeBool);
-	add_funcx("@str2any", TypeAny, &kaba_str2any, FLAG_STATIC);
+	add_funcx("@str2any", TypeAny, &kaba_str2any, Flags::STATIC);
 		func_add_param("s", TypeString);
-	add_funcx("@pointer2any", TypeAny, &kaba_pointer2any, FLAG_STATIC);
+	add_funcx("@pointer2any", TypeAny, &kaba_pointer2any, Flags::STATIC);
 		func_add_param("p", TypePointer);
 
 
@@ -746,15 +762,15 @@ void SIAddPackageMath() {
 		class_add_element("n", TypeVli, 0);
 		class_add_element("k", TypeVli, sizeof(vli));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, algebra_p(mf(&Crypto::__init__)));
-		class_add_func("str", TypeString, algebra_p(mf(&Crypto::str)));
+		class_add_func("str", TypeString, algebra_p(mf(&Crypto::str)), Flags::PURE);
 		class_add_func("from_str", TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str", TypeString);
-		class_add_func("encrypt", TypeString, algebra_p(mf(&Crypto::Encrypt)));
+		class_add_func("encrypt", TypeString, algebra_p(mf(&Crypto::Encrypt)), Flags::PURE);
 			func_add_param("str", TypeString);
-		class_add_func("decrypt", TypeString, algebra_p(mf(&Crypto::Decrypt)));
+		class_add_func("decrypt", TypeString, algebra_p(mf(&Crypto::Decrypt)), Flags::PURE);
 			func_add_param("str", TypeString);
 			func_add_param("cut", TypeBool);
-		class_add_func("create_keys", TypeVoid, algebra_p(&CryptoCreateKeys), FLAG_STATIC);
+		class_add_func("create_keys", TypeVoid, algebra_p(&CryptoCreateKeys), Flags::STATIC);
 			func_add_param("c1", TypeCrypto);
 			func_add_param("c2", TypeCrypto);
 			func_add_param("type", TypeString);
@@ -803,11 +819,11 @@ void SIAddPackageMath() {
 			func_add_param("p", TypeFloat32);
 			func_add_param("v", TypeFloat32);
 		class_add_func("normalize", TypeVoid, mf(&Interpolator<float>::normalize));
-		class_add_func("get", TypeFloat32, mf(&Interpolator<float>::get));
+		class_add_func("get", TypeFloat32, mf(&Interpolator<float>::get), Flags::PURE);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeFloat32, mf(&Interpolator<float>::getTang));
+		class_add_func("get_tang", TypeFloat32, mf(&Interpolator<float>::getTang), Flags::PURE);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeFloatList, mf(&Interpolator<float>::getList));
+		class_add_func("get_list", TypeFloatList, mf(&Interpolator<float>::getList), Flags::PURE);
 			func_add_param("t", TypeFloatList);
 
 	
@@ -833,75 +849,75 @@ void SIAddPackageMath() {
 			func_add_param("p", TypeVector);
 			func_add_param("v", TypeVector);
 		class_add_func("normalize", TypeVoid, mf(&Interpolator<vector>::normalize));
-		class_add_func("get", TypeVector, mf(&Interpolator<vector>::get));
+		class_add_func("get", TypeVector, mf(&Interpolator<vector>::get), Flags::PURE);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeVector, mf(&Interpolator<vector>::getTang));
+		class_add_func("get_tang", TypeVector, mf(&Interpolator<vector>::getTang), Flags::PURE);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeVectorList, mf(&Interpolator<vector>::getList));
+		class_add_func("get_list", TypeVectorList, mf(&Interpolator<vector>::getList), Flags::PURE);
 			func_add_param("t", TypeFloatList);
 
 	// mathematical
-	add_func("sin", TypeFloat32, (void*)&sinf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("sin", TypeFloat32, (void*)&sinf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("cos", TypeFloat32, (void*)&cosf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("cos", TypeFloat32, (void*)&cosf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("tan", TypeFloat32, (void*)&tanf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("tan", TypeFloat32, (void*)&tanf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("asin", TypeFloat32, (void*)&asinf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("asin", TypeFloat32, (void*)&asinf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("acos", TypeFloat32, (void*)&acosf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("acos", TypeFloat32, (void*)&acosf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan", TypeFloat32, (void*)&atanf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("atan", TypeFloat32, (void*)&atanf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan2", TypeFloat32, (void*)&atan2f, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("atan2", TypeFloat32, (void*)&atan2f, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("y", TypeFloat32);
-	add_func("sqrt", TypeFloat32, (void*)&sqrtf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("sqrt", TypeFloat32, (void*)&sqrtf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, (void*)&f_sqr, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("sqr", TypeFloat32, (void*)&f_sqr, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("exp", TypeFloat32, (void*)&expf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("exp", TypeFloat32, (void*)&expf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("log", TypeFloat32, (void*)&logf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("log", TypeFloat32, (void*)&logf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("pow", TypeFloat32, (void*)&powf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("pow", TypeFloat32, (void*)&powf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
-	add_func("clamp", TypeFloat32, (void*)&clampf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("clamp", TypeFloat32, (void*)&clampf, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("loop", TypeFloat32, (void*)&loopf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("loop", TypeFloat32, (void*)&loopf, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("abs", TypeFloat32, (void*)&fabsf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("abs", TypeFloat32, (void*)&fabsf, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, (void*)&minf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("min", TypeFloat32, (void*)&minf, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, (void*)&maxf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("max", TypeFloat32, (void*)&maxf, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
 	// int
-	add_func("clampi", TypeInt, (void*)&clampi, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("clampi", TypeInt, (void*)&clampi, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("loopi", TypeInt, (void*)&loopi, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("loopi", TypeInt, (void*)&loopi, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
 	// lists
-	add_func("range", TypeIntList, (void*)&int_range, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("range", TypeIntList, (void*)&int_range, Flags::_STATIC__PURE);
 		func_add_param("start", TypeInt);
 		func_add_param("end", TypeInt);
-	add_func("rangef", TypeFloatList, (void*)&float_range, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("rangef", TypeFloatList, (void*)&float_range, Flags::_STATIC__PURE);
 		func_add_param("start", TypeFloat32);
 		func_add_param("end", TypeFloat32);
 		func_add_param("step", TypeFloat32);
 	// other types
-	add_func("bary_centric", TypeVoid, (void*)&GetBaryCentric, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+	add_func("bary_centric", TypeVoid, (void*)&GetBaryCentric, Flags::_STATIC__PURE);
 		func_add_param("p", TypeVector);
 		func_add_param("a", TypeVector);
 		func_add_param("b", TypeVector);
@@ -909,11 +925,11 @@ void SIAddPackageMath() {
 		func_add_param("f", TypeFloatPs);
 		func_add_param("g", TypeFloatPs);
 	// random numbers
-	add_func("randi", TypeInt, (void*)&randi, FLAG_STATIC);
+	add_func("randi", TypeInt, (void*)&randi, Flags::STATIC);
 		func_add_param("max", TypeInt);
-	add_func("rand", TypeFloat32, (void*)&randf, FLAG_STATIC);
+	add_func("rand", TypeFloat32, (void*)&randf, Flags::STATIC);
 		func_add_param("max", TypeFloat32);
-	add_func("rand_seed", TypeVoid, (void*)&srand, FLAG_STATIC);
+	add_func("rand_seed", TypeVoid, (void*)&srand, Flags::STATIC);
 		func_add_param("seed", TypeInt);
 
 	
@@ -939,6 +955,20 @@ void SIAddPackageMath() {
 			func_add_param("a", TypeAny);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &AnyList::assign);
 			func_add_param("other", TypeAnyList);
+
+	TypeAnyDict = add_type_d(TypeAny);
+	add_class(TypeAnyDict);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&AnyDict::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&AnyDict::__delete__));
+		class_add_funcx("set", TypeVoid, &AnyDict::set);
+			func_add_param("key", TypeString);
+			func_add_param("x", TypeAny);
+		class_add_funcx("__get__", TypeAny, &AnyDict::get_item, Flags::RAISES_EXCEPTIONS);
+			func_add_param("key", TypeString);
+		class_add_funcx("clear", TypeVoid, &AnyDict::clear);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &AnyDict::assign);
+			func_add_param("other", TypeAny);
+		class_add_funcx("str", TypeString, &AnyDict::str);
 }
 
 };

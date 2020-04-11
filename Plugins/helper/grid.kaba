@@ -300,7 +300,8 @@ class Grid extends Object
 	rect get_plot_region(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
 
-	void draw_background(Painter c, float _x0, float _y0, float _w, float _h)
+	void draw_background(Painter c, float _x0, float __y0, float _w, float _h)
+		float _y0 = __y0
 	
 		x0 = _x0
 		y0 = _y0 + 3

@@ -1,4 +1,5 @@
 #include "../kaba.h"
+#include "../lib/common.h"
 #include "../asm/asm.h"
 #include <stdio.h>
 #include "../../file/file.h"
@@ -391,11 +392,12 @@ void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
 }
 
 void add_func_header(SyntaxTree *s, Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr) {
-	Function *f = s->add_function(name, return_type, t, false); // always member-function!
+	Function *f = s->add_function(name, return_type, t, Flags::NONE); // always member-function!
 	f->auto_declared = true;
 	foreachi (auto &p, param_types, i) {
 		f->literal_param_type.add(p);
-		f->block->add_var(param_names[i], p);
+		auto v = f->block->add_var(param_names[i], p);
+		v->is_const = true;
 		f->num_params ++;
 	}
 	f->update_parameters_after_parsing();

@@ -77,15 +77,16 @@ public:
 	void parse_top_level();
 	void parse_all_class_names(Class *ns, int indent0);
 	void parse_all_function_bodies(const Class *name_space);
+	Flags parse_flags(Flags initial);
 	void parse_import();
 	void parse_enum(Class *_namespace);
 	void parse_class(Class *_namespace);
-	Function *parse_function_header(Class *name_space, bool as_extern, bool as_static, bool as_virtual, bool override);
+	Function *parse_function_header(Class *name_space, Flags flags);
 	void skip_parsing_function_body();
 	void parse_function_body(Function *f);
 	bool parse_function_command(Function *f, int indent0);
 	const Class *parse_type(const Class *ns);
-	void parse_variable_def(bool single, Block *block);
+	void parse_variable_def(bool single, Block *block, Flags flags);
 	void parse_global_const(const string &name, const Class *type);
 	PrimitiveOperator *which_primitive_operator(const string &name, int param_flags = 3);
 	Statement *which_statement(const string &name);
@@ -188,6 +189,8 @@ public:
 
 	Node *build_abstract_list(const Array<Node*> &el);
 	Node *parse_list(Block *block);
+	Node *build_abstract_dict(const Array<Node*> &el);
+	Node *parse_dict(Block *block);
 
 	void create_asm_meta_info();
 
@@ -217,7 +220,7 @@ public:
 	Constant *add_constant(const Class *type, Class *name_space = nullptr);
 	Constant *add_constant_int(int value);
 	Constant *add_constant_pointer(const Class *type, const void *value);
-	Function *add_function(const string &name, const Class *type, const Class *name_space, bool is_static);
+	Function *add_function(const string &name, const Class *type, const Class *name_space, Flags flags);
 
 	// nodes
 	Node *add_node_statement(StatementID id);
@@ -232,6 +235,7 @@ public:
 	Node *add_node_global(Variable *var);
 	Node *add_node_local(Variable *var);
 	Node *add_node_local(Variable *var, const Class *type);
+	Node *make_constructor_static(Node *n, const string &name);
 	Node *exlink_add_element(Function *f, ClassElement &e);
 	Node *exlink_add_class_func(Function *f, Function *cf);
 	Node *add_node_parray(Node *p, Node *index, const Class *type);

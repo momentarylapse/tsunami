@@ -25,10 +25,10 @@ void SIAddPackageTime() {
 
 	add_class(TypeDate);
 		class_add_elementx("time", TypeInt, &Date::time);
-		class_add_funcx("format", TypeString, &Date::format);
+		class_add_funcx("format", TypeString, &Date::format, Flags::PURE);
 			func_add_param("f", TypeString);
-		class_add_funcx("str", TypeString, &Date::str);
-		class_add_funcx("now", TypeDate, &get_current_date, FLAG_STATIC);
+		class_add_funcx("str", TypeString, &Date::str, Flags::PURE);
+		class_add_funcx("now", TypeDate, &get_current_date, Flags::STATIC);
 
 
 	add_class(TypeTimer);
@@ -39,7 +39,7 @@ void SIAddPackageTime() {
 
 
 
-	add_func("sleep", TypeVoid, (void*)&hui::Sleep, FLAG_STATIC);
+	add_func("sleep", TypeVoid, (void*)&hui::Sleep, Flags::STATIC);
 		func_add_param("duration", TypeFloat32);
 }
 

@@ -3,7 +3,7 @@ use "../../api.kaba"
 
 class SingleSamples extends AudioEffect
 	
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		if !source
 			return -1
 		for i in 0:len(buf)

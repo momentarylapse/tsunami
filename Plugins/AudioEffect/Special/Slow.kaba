@@ -14,7 +14,7 @@ class Slow extends AudioEffect
 	#override void __init__()
 		#rb = new RingBuffer(1<<20)
 	
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		int n_out = len(buf)
 		int n_in = n_out * config.speed
 

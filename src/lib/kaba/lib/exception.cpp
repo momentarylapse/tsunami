@@ -54,7 +54,7 @@ extern Array<Script*> _public_scripts_;
 inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, bool from_package)
 {
 	foreachi (Function *f, s->syntax->functions, i){
-		if (from_package and !f->throws_exceptions)
+		if (from_package and !f->throws_exceptions())
 			continue;
 		void *frip = f->address;
 		if (frip >= rip)

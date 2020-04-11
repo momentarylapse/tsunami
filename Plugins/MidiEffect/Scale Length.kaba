@@ -11,6 +11,6 @@ class Config extends Module.Config
 class ScaleLength extends MidiEffect
 	Config config
 	
-	override void process(MidiNoteBuffer midi)
+	override void process(out MidiNoteBuffer midi)
 		for n in midi
 			n.range.length = n.range.length * config.scale

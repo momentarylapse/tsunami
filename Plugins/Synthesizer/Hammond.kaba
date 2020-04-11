@@ -149,7 +149,7 @@ class HammondRenderer extends PitchRenderer
 		stutter_offset = 0
 		#filter.reset()
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		for i in 0:len(buf)
 			volume = env.get()
 

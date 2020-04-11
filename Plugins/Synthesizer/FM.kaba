@@ -174,8 +174,8 @@ Grid ? ''
 			return p_out
 		return p_osci[index]
 
-	void draw_type(Painter p, complex z, int type, float dx, float amp)
-		dx /= pi
+	void draw_type(Painter p, complex z, int type, float _dx, float amp)
+		let dx = _dx / pi
 		float v0 = 0
 		float t0 = -pi
 		for t in -pi:pi+0.1:0.1
@@ -470,7 +470,7 @@ class FMRenderer extends PitchRenderer
 			n ++
 		osc.resize(n)
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		for i in 0:len(buf)
 
 			for o in osc

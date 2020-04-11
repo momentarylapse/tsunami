@@ -26,7 +26,7 @@ class PitchShift extends AudioEffect
 		prev_chunk[1].clear()
 		prev_no = 0
 		
-	void shift_buf(float[] b, float factor)
+	void shift_buf(out float[] b, float factor)
 		complex[] buf1, buf2
 		fft_r2c(b, buf1)
 		int N = b.num
@@ -54,7 +54,7 @@ class PitchShift extends AudioEffect
 		fft_c2r_inv(buf2, b)
 		b /= N
 
-	void process_chunk(AudioBuffer buf)
+	void process_chunk(out AudioBuffer buf)
 		shift_buf(buf.l, config.factor)
 		if buf.channels > 1
 			shift_buf(buf.r, config.factor)
@@ -72,7 +72,7 @@ class PitchShift extends AudioEffect
 		prev_no = other
 		
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		for offset in 0:len(buf):CHUNK_SIZE
 			int end = min(offset + CHUNK_SIZE, len(buf))
 			process_chunk(buf[offset:end])

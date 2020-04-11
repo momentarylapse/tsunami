@@ -1990,7 +1990,7 @@ void Script::compile_functions(char *oc, int &ocs) {
 	// link external functions
 	int func_no = 0;
 	for (Function *f: syntax->functions) {
-		if (f->is_extern) {
+		if (f->is_extern()) {
 			f->address = get_external_link(f->long_name() + ":" + i2s(f->num_params));
 			if (!f->address)
 				f->address = get_external_link(f->long_name());
@@ -2004,7 +2004,7 @@ void Script::compile_functions(char *oc, int &ocs) {
 	// create assembler
 	foreachi(Function *f, syntax->functions, i) {
 		func_offset.add(list->num);
-		if (!f->is_extern) {
+		if (!f->is_extern()) {
 			assemble_function(i, f, list);
 		}
 	}
@@ -2030,8 +2030,8 @@ void Script::compile_functions(char *oc, int &ocs) {
 
 
 	// get function addresses
-	for (Function *f: syntax->functions)
-		if (!f->is_extern) {
+	for (auto *f: syntax->functions)
+		if (!f->is_extern()) {
 			f->address = (void*)list->_label_value(f->_label);
 			for (Block *b: f->all_blocks()) {
 				b->_start = (void*)list->_label_value(b->_label_start);

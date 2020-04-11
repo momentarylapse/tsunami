@@ -17,7 +17,7 @@ class SineSource extends AudioSource
 	int offset
 	override void reset_state()
 		offset = 0
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		let f = pitch_to_freq(config.pitch)
 		float w_f = 1.0 / float(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
 		for i in 0:len(buf)

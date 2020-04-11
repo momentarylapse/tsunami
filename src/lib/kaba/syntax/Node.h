@@ -61,6 +61,7 @@ enum class NodeKind {
 	ARRAY_BUILDER,
 	ARRAY_BUILDER_FOR,
 	ARRAY_BUILDER_FOR_IF,
+	DICT_BUILDER,
 	CONSTRUCTOR_AS_FUNCTION,
 	// compilation
 	VAR_TEMP,
@@ -87,11 +88,15 @@ public:
 	// linking of class function instances
 	// return value
 	const Class *type;
-	Node(NodeKind kind, int64 link_no, const Class *type);
+	bool is_const;
+
+	Node(NodeKind kind, int64 link_no, const Class *type, bool is_const = false);
 	/*Node(const Class *c);
 	Node(const Block *b);
 	Node(const Constant *c);*/
 	virtual ~Node();
+	Node *modifiable();
+	Node *make_const();
 	Block *as_block() const;
 	Function *as_func() const;
 	const Class *as_class() const;

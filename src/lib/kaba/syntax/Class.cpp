@@ -390,7 +390,7 @@ const Class *Class::get_root() const {
 void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
 	if (config.verbose)
 		msg_write("CLASS ADD   " + long_name() + "    " + f->signature());
-	if (f->is_static) {
+	if (f->is_static()) {
 		if (config.verbose)
 			msg_write("   STATIC");
 		functions.add(f);

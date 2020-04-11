@@ -32,7 +32,7 @@ class LowPassFilter extends AudioEffect
 	override void on_config()
 		pass
 		
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		float[] f1, f2, q, gain
 		f1.resize(len(buf))
 		f2.resize(len(buf))

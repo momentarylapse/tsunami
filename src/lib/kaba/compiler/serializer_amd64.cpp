@@ -219,7 +219,7 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 				break;
 			}
 	}
-	if (!f->is_static){
+	if (!f->is_static()){
 		for (Variable *v: f->var)
 			if (v->name == IDENTIFIER_SELF){
 				param.add(v);

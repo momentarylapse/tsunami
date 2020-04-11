@@ -69,29 +69,29 @@ void script_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_funcx("set", TypeVoid, &IntDict::set_int);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &IntDict::get_int, FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__get__", p, &IntDict::get_int, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_funcx("str", TypeString, &IntDict::str);
+		class_add_funcx("str", TypeString, &IntDict::str, Flags::PURE);
 	} else if (p == TypeFloat32) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,float>::__init__);
 		class_add_funcx("set", TypeVoid, &FloatDict::set_float);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &FloatDict::get_float, FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__get__", p, &FloatDict::get_float, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_funcx("str", TypeString, &FloatDict::str);
+		class_add_funcx("str", TypeString, &FloatDict::str, Flags::PURE);
 	} else if (p == TypeString) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,string>::__init__);
 		class_add_funcx("set", TypeVoid, &Map<string,string>::set);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &StringDict::get_string, FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__get__", p, &StringDict::get_string, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,string>::clear);
 		class_add_funcx("clear", TypeVoid, &Map<string,string>::clear);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &StringDict::assign);
 			func_add_param("other", t);
-		class_add_funcx("str", TypeString, &StringDict::str);
+		class_add_funcx("str", TypeString, &StringDict::str, Flags::PURE);
 	}
 }
 

@@ -62,6 +62,8 @@ string kind2str(NodeKind kind) {
 		return "array builder for";
 	if (kind == NodeKind::ARRAY_BUILDER_FOR_IF)
 		return "array builder for if";
+	if (kind == NodeKind::DICT_BUILDER)
+		return "dict builder";
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return "constructor function";
 	if (kind == NodeKind::VAR_TEMP)
@@ -227,16 +229,27 @@ const Class *Block::name_space() const {
 }
 
 
-Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
+Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
+	is_const = _const;
 }
 
 Node::~Node() {
 	for (auto &p: params)
 		if (p)
 			delete p;
+}
+
+Node *Node::modifiable() {
+	is_const = false;
+	return this;
+}
+
+Node *Node::make_const() {
+	is_const = true;
+	return this;
 }
 
 Block *Node::as_block() const {

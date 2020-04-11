@@ -121,7 +121,7 @@ void SerializerARM::add_function_call(Function *f, const Array<SerialNodeParam> 
 	call_used = true;
 	int push_size = fc_begin(f, params, ret);
 
-	if ((f->owner() == syntax_tree) and (!f->is_extern)) {
+	if ((f->owner() == syntax_tree) and (!f->is_extern())) {
 		add_cmd(Asm::INST_CALL, param_marker(TypePointer, f->_label));
 	} else {
 		if (!f->address)
@@ -897,7 +897,7 @@ void SerializerARM::add_function_intro_params(Function *f)
 				break;
 			}
 	}
-	if (!f->is_static){
+	if (!f->is_static()){
 		for (Variable *v: f->var)
 			if (v->name == IDENTIFIER_SELF){
 				param.add(v);

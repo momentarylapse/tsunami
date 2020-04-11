@@ -2,7 +2,7 @@ use "../../api.kaba"
 
 const string AUTO_CONFIG_SAMPLE = ""
 
-void fold(float[] x, float[] h, complex[] HH, float[] result)
+void fold(float[] x, float[] h, out complex[] HH, out float[] result)
 	int N = x.num
 	int K = h.num
 	
@@ -61,7 +61,7 @@ class Folding extends AudioEffect
 			h = [1.0]
 		reset_state()
 	
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		if not config.sample
 			return
 		
@@ -75,7 +75,7 @@ class Folding extends AudioEffect
 		overlapl.clear()
 		HH.clear()
 	
-	void do(float[] buf, float[] overlap)
+	void do(out float[] buf, out float[] overlap)
 		float[] y
 		int N = len(buf)
 		int K = len(h)

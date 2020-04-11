@@ -27,7 +27,7 @@ class Monofier extends AudioEffect
 	override void reset_state()
 		offset = 0
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		if buf.channels == 1
 			return
 

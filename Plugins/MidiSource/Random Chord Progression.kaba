@@ -18,7 +18,7 @@ class Morse extends MidiSource
 		degree = 0
 		chord = make_chord(degree)
 	
-	override bool on_produce(MidiProduceData data)
+	override bool on_produce(out MidiProduceData data)
 		for c in chord
 			note(c, 1.0, 4)
 		skip(4)

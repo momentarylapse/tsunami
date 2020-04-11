@@ -6,7 +6,7 @@ float step(float t)
 	return 1 - 1/(exp((t-0.5)*12) + 1)
 
 class ShowSpectrum extends SongPlugin
-	void soft_paste(AudioBuffer source, TrackLayer *dest, Range r)
+	void soft_paste(AudioBuffer source, out TrackLayer dest, Range r)
 		int l = min(len(source), len(r))
 		AudioBuffer buf
 		let a = dest.edit_buffers(buf, Range(r.offset, l))

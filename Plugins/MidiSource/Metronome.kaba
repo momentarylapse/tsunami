@@ -48,7 +48,7 @@ class MetronomeSource extends MidiSource
 		
 		on_config()
 		
-	override int read(MidiEventBuffer midi)
+	override int read(out MidiEventBuffer midi)
 		if pause
 			return midi.samples
 	

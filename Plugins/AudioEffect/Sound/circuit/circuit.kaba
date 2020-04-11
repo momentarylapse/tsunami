@@ -224,7 +224,7 @@ class Circuit
 			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
-	void create_G(Matrix G, float dt)
+	void create_G(out Matrix G, float dt)
 		int n = len(nodes)-1
 		G.clear(n,n)
 		for e in edges
@@ -239,7 +239,7 @@ class Circuit
 			if b >= 0
 				G.add(b, b, g)
 	
-	void create_I(float[] I, float I_in, float dt)
+	void create_I(out float[] I, float I_in, float dt)
 		int n = nodes.num-1
 		I = [I_in]
 		I.resize(n)
@@ -293,7 +293,7 @@ class Circuit
 		#print(factor)
 		return factor
 	
-	void simulate(float t_max, float dt, float amp, float omega, int type, SimResult res)
+	void simulate(float t_max, float dt, float amp, float omega, int type, out SimResult res)
 		for t in 0:t_max:dt
 		
 			# input

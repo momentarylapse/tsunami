@@ -3,47 +3,57 @@ namespace Kaba{
 enum class InlineID;
 enum class OperatorID;
 
-enum ScriptFlag {
-	FLAG_NONE = 0,
-	FLAG_CALL_BY_VALUE = 1,
-	FLAG_SILENT = 2,
-	//FLAG_CLASS = 4,
-	FLAG_PURE = 8,
-	//FLAG_HIDDEN = 16,
-	FLAG_OVERRIDE = 32,
-	FLAG_RAISES_EXCEPTIONS = 64,
-	FLAG_STATIC = 128
+enum class Flags {
+	NONE = 0,
+	CALL_BY_VALUE = 1,
+	SILENT = 2,
+	//CLASS = 4,
+	CONST = 8,
+	PURE_XXX = 16,
+	PURE = CONST | PURE_XXX,
+	OVERRIDE = 32,
+	RAISES_EXCEPTIONS = 64,
+	STATIC = 128,
+	EXTERN = 256,
+	OUT = 512,
+	VIRTUAL = 1024,
+	SELFREF = 2048,
+
+	_STATIC__RAISES_EXCEPTIONS = STATIC | RAISES_EXCEPTIONS,
+	_STATIC__PURE = STATIC | PURE
 };
+bool flags_has(Flags flags, Flags t);
+Flags flags_mix(const Array<Flags> &f);
 
 class Function;
 
 void add_package(const string &name, bool used_by_default);
-const Class *add_type(const string &name, int size, ScriptFlag = FLAG_NONE, const Class *parent = nullptr);
-const Class *add_type_p(const Class *sub_type, ScriptFlag = FLAG_NONE, const string &name = "");
+const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *parent = nullptr);
+const Class *add_type_p(const Class *sub_type, Flags = Flags::NONE, const string &name = "");
 const Class *add_type_a(const Class *sub_type, int array_length, const string &name = "");
 const Class *add_type_l(const Class *sub_type, const string &name = "");
 const Class *add_type_d(const Class *sub_type, const string &name = "");
-Function *add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag = FLAG_NONE);
+Function *add_func(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
 template<class T>
-Function *add_funcx(const string &name, const Class *return_type, T func, ScriptFlag flag = FLAG_NONE) {
+Function *add_funcx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
 	return add_func(name, return_type, (void*)func, flag);
 }
 void func_set_inline(InlineID index);
 void func_add_param(const string &name, const Class *type);
 Class *add_class(const Class *root_type);
-void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag = FLAG_NONE);
+void class_add_element(const string &name, const Class *type, int offset, Flags flag = Flags::NONE);
 template<class T>
-void class_add_elementx(const string &name, const Class *type, T p, ScriptFlag flag = FLAG_NONE) {
+void class_add_elementx(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
 	class_add_element(name, type, *(int*)(void*)&p, flag);
 }
-Function* class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag = FLAG_NONE);
+Function* class_add_func(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
 template<class T>
-Function* class_add_funcx(const string &name, const Class *return_type, T func, ScriptFlag flag = FLAG_NONE) {
+Function* class_add_funcx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
 	return class_add_func(name, return_type, mf(func), flag);
 }
-Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, ScriptFlag = FLAG_NONE);
+Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
 template<class T>
-Function* class_add_func_virtualx(const string &name, const Class *return_type, T func, ScriptFlag flag = FLAG_NONE) {
+Function* class_add_func_virtualx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
 	return class_add_func_virtual(name, return_type, mf(func), flag);
 }
 void class_link_vtable(void *p);

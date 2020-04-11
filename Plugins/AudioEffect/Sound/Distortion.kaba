@@ -13,7 +13,7 @@ class Distortion extends AudioEffect
 	Config config
 
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		float a = max(10000 * pow(config.gain, 2), 0.01)
 		float b = 1 / atan(a)
 	

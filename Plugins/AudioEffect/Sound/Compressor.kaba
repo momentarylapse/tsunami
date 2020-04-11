@@ -12,7 +12,7 @@ class Compressor extends AudioEffect
 		complex[] curve
 		float attack, release
 
-		void fill_inter(FloatInterpolator fi)
+		const void fill_inter(out FloatInterpolator fi)
 			fi.set_type("lerp")
 			fi.add(curve[0].y, 0)
 			for i in 1:curve.num
@@ -41,7 +41,7 @@ class Compressor extends AudioEffect
 
 	float dgain_attack, dgain_release
 
-	void compress(float[] b, float[] squares, float *gain)
+	void compress(out float[] b, out float[] squares, out float *gain)
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:b.num
 		
@@ -80,7 +80,7 @@ class Compressor extends AudioEffect
 	override ConfigPanel *create_panel()
 		return new CompressorPanel(self)
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		

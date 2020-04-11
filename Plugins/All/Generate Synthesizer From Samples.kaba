@@ -33,7 +33,7 @@ class XXX extends SongPlugin
 						break
 		print("aaaa")
 	
-	void shift(Song* song, SampleSynthesizer* synth, int from, int to)
+	void shift(out Song song, out SampleSynthesizer synth, int from, int to)
 		print("shift " + from + " -> " + to)
 		SampleRef* source = synth.config.samples[from]
 		Sample* t = song.add_sample("new", *source.origin.buf)

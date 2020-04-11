@@ -13,7 +13,7 @@ class MidiFont
 		name = _name
 		song = nil
 	
-	void load(Session* session)
+	void load(Session session)
 		if song
 			return
 		sub = session.create_child()
@@ -45,7 +45,7 @@ class FontList
 				continue
 			fonts.add(MidiFont(name))
 	
-	Song *get(Session* session, string name)
+	Song *get(Session session, string name)
 		update()
 		int n = find(name)
 		if n < 0
@@ -84,7 +84,7 @@ class FontSynthesizer extends Synthesizer
 		if synth
 			synth.set_sample_rate(sample_rate)
 			synth.on_config()
-	override void render(AudioBuffer buf)
+	override void render(out AudioBuffer buf)
 		if !synth
 			return
 		synth.events = events

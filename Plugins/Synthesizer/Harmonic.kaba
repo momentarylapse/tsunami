@@ -98,7 +98,7 @@ class HarmonicRenderer extends PitchRenderer
 	override void on_start(float volume)
 		env.start(volume)
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		for i in 0:len(buf)
 			volume = env.get()
 

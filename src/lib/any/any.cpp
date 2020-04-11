@@ -9,6 +9,7 @@ DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
 Any EmptyVar;
 //Any EmptyMap = _empty_dummy_map_;
 Any EmptyArray = *(Array<Any>*)&_empty_dummy_array_;
+Any EmptyHash = Any(_empty_dummy_map_);
 
 
 static string type_name(int t) {
@@ -72,6 +73,11 @@ Any::Any(const void *p) : Any() {
 Any::Any(const Array<Any> &a) : Any() {
 	create_type(TYPE_ARRAY);
 	*as_array() = a;
+}
+
+Any::Any(const AnyMap &m) : Any() {
+	create_type(TYPE_HASH);
+	*as_map() = m;
 }
 
 

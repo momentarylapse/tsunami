@@ -15,7 +15,7 @@ class RectangleRenderer extends PitchRenderer
 	override void on_end()
 		volume = 0
 
-	override bool render(AudioBuffer buf)
+	override bool render(out AudioBuffer buf)
 		for i in 0:len(buf)
 			float d = sin(phase)
 			if d > 0

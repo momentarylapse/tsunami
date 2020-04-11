@@ -98,7 +98,7 @@ void call4(void *ff, void *ret, const Array<void*> &param) {
 bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) {
 	db_out("eval: " + f->signature());
 	Array<const Class*> ptype = f->literal_param_type;
-	if (!f->is_static)
+	if (!f->is_static())
 		ptype.insert(f->name_space, 0);
 
 
@@ -237,7 +237,7 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 	db_out("??? " + f->signature());
 
-	if (!f->is_pure)
+	if (!f->is_pure())
 		return c;
 	db_out("-pure");
 

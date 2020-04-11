@@ -23,17 +23,17 @@ class Range
 	void __init__(int _offset, int _length)
 		offset = _offset
 		length = _length
-	extern int start()
-	extern int end()
-	bool inside(int pos)
+	extern const int start()
+	extern const int end()
+	const bool inside(int pos)
 		return pos >= offset and pos < offset + length
-	extern bool overlaps(Range o)
-	extern bool covers(Range o)
-	extern Range __and__(Range o)
-	extern string str()
+	extern const bool overlaps(Range o)
+	extern const bool covers(Range o)
+	extern const Range __and__(Range o)
+	extern const string str()
 	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
-Range RangeTo(int start, int end)
+const Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
 
@@ -53,7 +53,7 @@ class MidiNote
 		modifier = 0
 		flags = 0
 	extern void set(int mask)
-	extern bool is(int mask)
+	extern const bool is(int mask)
 	extern MidiNote* copy()
 
 class MidiEvent
@@ -69,15 +69,15 @@ class MidiEvent
 		flags = 0
 		stringno = -1
 		clef_position = -1
-	string str()
+	const string str()
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
 class MidiEventBuffer extends MidiEvent[]
 	int samples
 	extern override void __init__()
-	extern MidiNote[] get_notes(Range r)
-	extern MidiEvent[] get_events(Range r)
-	extern Range get_range()
+	extern const MidiNote[] get_notes(Range r)
+	extern const MidiEvent[] get_events(Range r)
+	extern const Range get_range()
 	void add_note(MidiNote n)
 		add(MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(MidiEvent(n.range.end(), n.pitch, 0))
@@ -88,9 +88,9 @@ class MidiNoteBuffer extends MidiNote*[]
 	extern override void __init__()
 	extern override void __delete__()
 	extern void deep_clear()
-	extern MidiNote*[] get_notes(Range r)
-	extern MidiEvent[] get_events(Range r)
-	extern Range get_range()
+	extern selfref MidiNote*[] get_notes(Range r)
+	extern selfref MidiEvent[] get_events(Range r)
+	extern const Range get_range()
 
 
 class ConfigPanel extends Panel
@@ -121,22 +121,22 @@ class Module extends Object
 	class Port
 		extern void __init__()
 		extern virtual void __delete__()
-		extern virtual int read_audio(AudioBuffer buf)
-		extern virtual int read_midi(MidiEventBuffer midi)
-		extern virtual int read_beats(Beat[] beats, int samples)
+		extern virtual int read_audio(out AudioBuffer buf)
+		extern virtual int read_midi(out MidiEventBuffer midi)
+		extern virtual int read_beats(out Beat[] beats, int samples)
 		
 	class Config
 		extern void __init__()
 		extern virtual void __delete__()
 		extern virtual void reset()
-		extern virtual string to_string()
+		extern virtual const string to_string()
 		extern virtual void from_string(string s, Session session)
 		extern virtual string auto_conf(string name)
 
 	extern virtual ConfigPanel *create_panel()
 	extern virtual void on_config()
 	extern virtual Module.Config* get_config()
-	extern string config_to_string()
+	extern const string config_to_string()
 	extern void config_from_string(string s)
 
 
@@ -168,21 +168,21 @@ class AudioEffect extends Module
 	Module.Port *source
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual void process(AudioBuffer buf)
-	extern virtual int read(AudioBuffer buf)
+	extern virtual void process(out AudioBuffer buf)
+	extern virtual int read(out AudioBuffer buf)
 
 class MidiEffect extends Module
 	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual void process(MidiNoteBuffer midi)
+	extern virtual void process(out MidiNoteBuffer midi)
 
 class AudioVisualizer extends Module
 	Module.Port *out
 	int chunk_size
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual void process(AudioBuffer buf)
+	extern virtual void process(out AudioBuffer buf)
 	extern void set_chunk_size(int chunk_size)
 
 class AudioBuffer
@@ -194,14 +194,14 @@ class AudioBuffer
 	extern void __delete__()
 	extern void __assign__(AudioBuffer other)
 	extern void clear()
-	extern Range range()
+	extern const Range range()
 	extern void resize(int length)
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume)
 	#extern void mix_stereo(float volume, float panning)
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
 	extern AudioBuffer __subarray__(int start, int end)
-	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
+	extern const void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 	void scale(float factor)
 		l *= factor
 		if channels > 1
@@ -210,11 +210,11 @@ class AudioBuffer
 		if channels > 1
 			r = l
 
-extern void interpolate_buffer(AudioBuffer in, AudioBuffer out, int method)
+extern void interpolate_buffer(AudioBuffer in, out AudioBuffer out, int method)
 
 class RingBuffer
 	extern void __init__(int size)
-	extern int available()
+	extern const int available()
 	extern void read(AudioBuffer b)
 	extern void write(AudioBuffer b)
 	extern void read_ref(AudioBuffer b, int size)
@@ -233,7 +233,7 @@ class RingBuffer
 class AudioSource extends Module
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual int read(AudioBuffer buf)
+	extern virtual int read(out AudioBuffer buf)
 	Module.Port *out
 
 class MidiProduceData
@@ -258,15 +258,15 @@ class PitchDetector extends MidiSource
 	int pitch
 	bool loud_enough
 	extern override void __init__()
-	extern override int read(MidiEventBuffer midi)
-	extern virtual void process(MidiEventBuffer midi, AudioBuffer buf)
+	extern override int read(out MidiEventBuffer midi)
+	extern virtual void process(out MidiEventBuffer midi, AudioBuffer buf)
 
 class PitchRenderer
 	extern void __init__(Synthesizer synth, int pitch)
 	extern virtual void __delete__()
 	void __assign__(PitchRenderer o)
 		pass
-	extern virtual bool render(AudioBuffer buf) # return: keep alive
+	extern virtual bool render(out AudioBuffer buf) # return: keep alive
 	#extern virtual void on_event(MidiEvent e)
 	extern virtual void on_start(float volume)
 	extern virtual void on_end()
@@ -286,7 +286,7 @@ class Synthesizer extends Module
 	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual void render(AudioBuffer buf)
+	extern virtual void render(out AudioBuffer buf)
 	extern override void on_config()
 	extern override void reset_state()
 	extern virtual PitchRenderer* create_pitch_renderer(int pitch)
@@ -295,7 +295,7 @@ class Synthesizer extends Module
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	#extern overwrite void __delete__()
-	extern override void render(AudioBuffer buf)
+	extern override void render(out AudioBuffer buf)
 	extern override PitchRenderer *create_pitch_renderer(int pitch)
 
 class EnvelopeADSR
@@ -322,7 +322,7 @@ class BeatSource extends Module
 class BeatMidifier extends MidiSource
 	extern override void __init__()
 	#extern override void __delete__()
-	extern override int read(MidiEventBuffer midi)
+	extern override int read(out MidiEventBuffer midi)
 	float volume
 
 class AudioRecorder extends Module
@@ -347,8 +347,8 @@ class Bar
 	int index_text
 	int length
 	int offset
-	extern float bpm(float sample_rate)
-	extern Range range()
+	extern const float bpm(float sample_rate)
+	extern const Range range()
 
 
 class Beat
@@ -366,10 +366,10 @@ class Beat
 		beat_no = 0
 
 class BarCollection extends Bar*[]
-	extern Bar*[] get_bars(Range r)
-	extern Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
-	extern int get_next_beat(int pos)
-	extern int get_prev_beat(int pos)
+	extern selfref Bar*[] get_bars(Range r)
+	extern selfref Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
+	extern const int get_next_beat(int pos)
+	extern const int get_prev_beat(int pos)
 
 class TrackLayer
 	int type
@@ -403,7 +403,7 @@ class Sample # TODO
 	int uid
 	Tag[] tags
 	extern SampleRef* create_ref()
-	extern string get_value(string key)
+	extern const string get_value(string key)
 	extern void set_value(string key, string value)
 
 class SampleRef # TODO
@@ -477,9 +477,9 @@ class Song
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()
 	
-	extern Range range()
-	extern Track* time_track()
-	extern TrackLayer*[] layers()
+	extern const Range range()
+	extern selfref Track* time_track()
+	extern selfref TrackLayer*[] layers()
 	
 	extern Track* add_track(int type, int index)
 	extern void delete_track(int index)
@@ -493,18 +493,18 @@ class Song
 	extern void begin_action_group()
 	extern void end_action_group()
 	
-	extern string get_time_str(int t)
-	extern string get_time_str_fuzzy(int t, float dt)
-	extern string get_time_str_long(int t)
+	extern const string get_time_str(int t)
+	extern const string get_time_str_fuzzy(int t, float dt)
+	extern const string get_time_str_long(int t)
 
 class SongSelection
 	Range range_raw
-	extern Range range()
-	extern bool has_track(Track t)
-	extern bool has_layer(TrackLayer t)
-	extern bool has_marker(TrackMarker m)
-	extern bool has_note(MidiNote n)
-	extern bool has_bar(Bar b)
+	extern const Range range()
+	extern const bool has_track(Track t)
+	extern const bool has_layer(TrackLayer t)
+	extern const bool has_marker(TrackMarker m)
+	extern const bool has_note(MidiNote n)
+	extern const bool has_bar(Bar b)
 
 class ColorScheme
 	color background
@@ -520,11 +520,11 @@ class ColorScheme
 	color blob_bg
 	color blob_bg_selected
 	color blob_bg_hidden
-	extern color hoverify(color c)
+	extern const color hoverify(color c)
 
 class ViewPort
 	extern void __init__(AudioView* view)
-	extern Range range()
+	extern const Range range()
 	extern void set_range(Range r)
 	rect area
 	
@@ -549,10 +549,10 @@ class SongRenderer extends AudioSource
 	extern void set_loop(bool l)
 	extern override int read(AudioBuffer b)
 	#extern override void reset_state()
-	extern Range range()
-	extern int get_pos(int delta)
+	extern const Range range()
+	extern const int get_pos(int delta)
 	extern void set_pos(int pos)
-	extern BeatSource* get_beat_source()
+	extern selfref BeatSource* get_beat_source()
 
 
 class AudioOutput extends Module
@@ -560,10 +560,10 @@ class AudioOutput extends Module
 	extern override void __delete__()
 	extern void stop()
 	extern void start()
-	extern bool is_playing()
-	extern float get_volume()
+	extern const bool is_playing()
+	extern const float get_volume()
 	extern void set_volume(float volume)
-	extern int samples_played()
+	extern const int samples_played()
 
 class AudioInput extends Module
 	RingBuffer current_buffer
@@ -572,15 +572,15 @@ class AudioInput extends Module
 	extern override void __delete__()
 	extern bool start()
 	extern void stop()
-	extern bool is_capturing()
-	extern int sample_rate()
-	extern int samples_recorded()
+	extern const bool is_capturing()
+	extern const int sample_rate()
+	extern const int samples_recorded()
 
 class Storage
 	extern bool load(Song s, string filename)
 	extern bool save(Song s, string filename)
 	extern bool save_via_renderer(Module.Port source, string filename, int num_samples, Tag[] tags)
-	extern bool load_buffer(AudioBuffer buf, string filename)
+	extern bool load_buffer(out AudioBuffer buf, string filename)
 	string current_directory
 
 # create via Session.add_signal_chain()
@@ -596,8 +596,8 @@ class SignalChain extends Module
 	extern void disconnect(Module source, int source_port, Module target, int target_port)
 	extern void start()
 	extern void stop()
-	extern bool is_paused()
-	extern bool is_active()
+	extern const bool is_paused()
+	extern const bool is_active()
 	extern void set_update_dt(float dt)
 	extern void set_buffer_size(int size)
 
@@ -609,19 +609,19 @@ class Session extends Object
 	AudioView* view
 	Storage* storage
 	
-	extern int sample_rate()
+	extern const int sample_rate()
 	
 	#DeviceManager* device_manager
 	#PluginManager* plugin_manager
 	
-	extern Session* create_child()
+	extern const Session* create_child()
 	extern SignalChain* create_signal_chain(string name)
 	extern SignalChain* load_signal_chain(string filename)
 
 	# logging
-	extern void i(string msg)
-	extern void w(string msg)
-	extern void e(string msg)
+	extern const void i(string msg)
+	extern const void w(string msg)
+	extern const void e(string msg)
 
 
 #class PluginContext
@@ -661,12 +661,12 @@ class ProgressX
 	extern virtual void __delete__()
 	extern void set(string msg, float progress)
 	extern void cancel()
-	extern bool is_cancelled()
+	extern const bool is_cancelled()
 
 class Clipboard
 	Song* temp
-	extern bool has_data()
-	extern bool prepare_layer_map(AudioView view, TrackLayer*[] sources, TrackLayer*[] targets)
+	extern const bool has_data()
+	extern bool prepare_layer_map(AudioView view, out TrackLayer*[] sources, out TrackLayer*[] targets)
 
 
 class MidiMode
@@ -711,9 +711,9 @@ extern float db2amp(float db)
 extern float amp2db(float amp)
 
 
-extern void fft_c2c(complex[] in, complex[] out, bool inverse)
-extern void fft_r2c(float[] in, complex[] out)
-extern void fft_c2r_inv(complex[] in, float[] out)
+extern void fft_c2c(complex[] in, out complex[] out, bool inverse)
+extern void fft_r2c(float[] in, out complex[] out)
+extern void fft_c2r_inv(complex[] in, out float[] out)
 
 extern Module* CreateModule(Session session, int type, string name)
 extern Synthesizer* CreateSynthesizer(Session session, string name)

@@ -167,7 +167,7 @@ void SIAddPackageVulkan() {
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_funcx("load", TypeTextureP, vul_p(&__VulkanLoadTexture), FLAG_STATIC);
+		class_add_funcx("load", TypeTextureP, vul_p(&__VulkanLoadTexture), Flags::STATIC);
 			func_add_param("filename", TypeString);
 
 
@@ -187,7 +187,7 @@ void SIAddPackageVulkan() {
 			func_add_param("h", TypeInt);
 			func_add_param("format", TypeString);
 			func_add_param("with_sampler", TypeBool);
-		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::DepthBuffer::__delete__), FLAG_OVERRIDE);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::DepthBuffer::__delete__), Flags::OVERRIDE);
 
 
 	add_class(TypeFrameBuffer);
@@ -204,7 +204,7 @@ void SIAddPackageVulkan() {
 		//class_add_elementx("descr_layout", TypePointerList, vul_p(&vulkan::Shader::descr_layouts));
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::Shader::__init__));
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::Shader::__delete__));
-		class_add_funcx("load", TypeShaderP, vul_p(&__VulkanLoadShader), FLAG_STATIC);
+		class_add_funcx("load", TypeShaderP, vul_p(&__VulkanLoadShader), Flags::STATIC);
 			func_add_param("filename", TypeString);
 
 
@@ -341,24 +341,24 @@ void SIAddPackageVulkan() {
 			func_add_param("t", TypeTexturePList);
 			func_add_param("mode", TypeInt);
 
-	add_funcx("create_window", TypePointer, vul_p(&vulkan::create_window), FLAG_STATIC);
+	add_funcx("create_window", TypePointer, vul_p(&vulkan::create_window), Flags::STATIC);
 		func_add_param("title", TypeString);
 		func_add_param("w", TypeInt);
 		func_add_param("h", TypeInt);
-	add_funcx("window_handle", TypeBool, vul_p(&vulkan::window_handle), FLAG_STATIC);
+	add_funcx("window_handle", TypeBool, vul_p(&vulkan::window_handle), Flags::STATIC);
 		func_add_param("w", TypePointer);
-	add_funcx("window_close", TypeVoid, vul_p(&vulkan::window_close), FLAG_STATIC);
+	add_funcx("window_close", TypeVoid, vul_p(&vulkan::window_close), Flags::STATIC);
 		func_add_param("w", TypePointer);
 
-	add_funcx("vulkan_init", TypeVoid, vul_p(&vulkan::init), FLAG_STATIC);
+	add_funcx("vulkan_init", TypeVoid, vul_p(&vulkan::init), Flags::STATIC);
 		func_add_param("win", TypePointer);
-	add_funcx("vulkan_destroy", TypeVoid, vul_p(&vulkan::destroy), FLAG_STATIC);
-	add_funcx("queue_submit_command_buffer", TypeVoid, vul_p(&vulkan::queue_submit_command_buffer), FLAG_STATIC);
+	add_funcx("vulkan_destroy", TypeVoid, vul_p(&vulkan::destroy), Flags::STATIC);
+	add_funcx("queue_submit_command_buffer", TypeVoid, vul_p(&vulkan::queue_submit_command_buffer), Flags::STATIC);
 		func_add_param("cb", TypeCommandBuffer);
 		func_add_param("wait_sem", TypeSemaphorePList);
 		func_add_param("signal_sem", TypeSemaphorePList);
 		func_add_param("fence", TypeFence);
-	add_funcx("wait_device_idle", TypeVoid, vul_p(&vulkan::wait_device_idle), FLAG_STATIC);
+	add_funcx("wait_device_idle", TypeVoid, vul_p(&vulkan::wait_device_idle), Flags::STATIC);
 
 }
 

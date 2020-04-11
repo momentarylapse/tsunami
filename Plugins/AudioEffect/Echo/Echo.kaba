@@ -25,7 +25,7 @@ class Echo extends AudioEffect
 	int offset
 
 
-	void do_delay(float[] b, float[] d)
+	void do_delay(out float[] b, out float[] d)
 		int p = offset % d.num
 		for bb in b
 	
@@ -44,7 +44,7 @@ class Echo extends AudioEffect
 				p = 0
 
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 
 		int delay_samples = session.sample_rate() * config.delay
 		buf_r.resize(delay_samples)

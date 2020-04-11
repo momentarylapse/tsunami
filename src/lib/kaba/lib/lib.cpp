@@ -56,9 +56,12 @@ const string IDENTIFIER_RETURN_VAR = "-return-";
 const string IDENTIFIER_VTABLE_VAR = "-vtable-";
 const string IDENTIFIER_ENUM = "enum";
 const string IDENTIFIER_CONST = "const";
+const string IDENTIFIER_OUT = "out";
 const string IDENTIFIER_OVERRIDE = "override";
 const string IDENTIFIER_VIRTUAL = "virtual";
 const string IDENTIFIER_EXTERN = "extern";
+//const string IDENTIFIER_ACCESSOR = "accessor";
+const string IDENTIFIER_SELFREF = "selfref";
 const string IDENTIFIER_USE = "use";
 const string IDENTIFIER_RETURN = "return";
 const string IDENTIFIER_RAISE = "raise";
@@ -187,6 +190,16 @@ Script *cur_package = nullptr;
 static Function *cur_func = nullptr;
 static Class *cur_class;
 
+bool flags_has(Flags flags, Flags t) {
+	return ((int(flags) & int(t)) == int(t));
+}
+
+Flags flags_mix(const Array<Flags> &f) {
+	Flags r = Flags::NONE;
+	for (Flags ff: f)
+		r = Flags(int(r) | int(ff));
+	return r;
+}
 
 void add_package(const string &name, bool used_by_default) {
 	Script* s = new Script;
@@ -206,25 +219,25 @@ void __add_class__(Class *t, const Class *name_space) {
 	}
 }
 
-const Class *add_type(const string &name, int size, ScriptFlag flag, const Class *name_space) {
+const Class *add_type(const string &name, int size, Flags flag, const Class *name_space) {
 	Class *t = new Class(name, size, cur_package->syntax);
-	if ((flag & FLAG_CALL_BY_VALUE) > 0)
+	if (flags_has(flag, Flags::CALL_BY_VALUE))
 		t->force_call_by_value = true;
 	__add_class__(t, name_space);
 	return t;
 }
 
-const Class *add_type_p(const Class *sub_type, ScriptFlag flag, const string &_name) {
+const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) {
 	string name = _name;
 	if (name == "") {
-		if ((flag & FLAG_SILENT) > 0)
+		if (flags_has(flag, Flags::SILENT))
 			name = sub_type->name + "&";
 		else
 			name = sub_type->name + "*";
 	}
 	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, sub_type);
 	t->type = Class::Type::POINTER;
-	if ((flag & FLAG_SILENT) > 0)
+	if (flags_has(flag, Flags::SILENT))
 		t->type = Class::Type::POINTER_SILENT;
 	__add_class__(t, sub_type->name_space);
 	return t;
@@ -327,29 +340,27 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 		c = p;
 		p = nullptr;
 	}
-	
-	enum class Mode {
-		MEMBER,
-		STATIC,
-	};
-	
-	Mode mode = Mode::MEMBER;
+
+	Flags flags = Flags::NONE;
+	if (!o->primitive->left_modifiable)
+		flags = Flags::PURE;
+
 	//if (!c->uses_call_by_reference())
 	if (o->primitive->left_modifiable and !c->uses_call_by_reference())
-		mode = Mode::STATIC;
-	if (mode == Mode::MEMBER) {
+		flags = flags_mix({flags, Flags::STATIC});
+
+	if (!flags_has(flags, Flags::STATIC)) {
 		add_class(c);
-		o->f = class_add_func(o->primitive->function_name, return_type, func);
+		o->f = class_add_func(o->primitive->function_name, return_type, func, flags);
 		if (p)
 			func_add_param("b", p);
-	} else if (mode == Mode::STATIC) {
+	} else {
 		add_class(c);
-		o->f = class_add_func(o->primitive->function_name, return_type, func, FLAG_STATIC);
+		o->f = class_add_func(o->primitive->function_name, return_type, func, flags);
 		func_add_param("a", c);
 		if (p)
 			func_add_param("b", p);
 	}
-	o->f->is_pure = !o->primitive->left_modifiable;
 	func_set_inline(inline_index);
 	cur_package->syntax->operators.add(o);
 }
@@ -365,7 +376,7 @@ Class *add_class(const Class *root_type) {
 	return cur_class;
 }
 
-void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag) {
+void class_add_element(const string &name, const Class *type, int offset, Flags flag) {
 	cur_class->elements.add(ClassElement(name, type, offset));
 }
 
@@ -377,9 +388,9 @@ void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable
 
 int _class_override_num_params = -1;
 
-void _class_add_member_func(const Class *ccc, Function *f, ScriptFlag flag) {
+void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 	Class *c = const_cast<Class*>(ccc);
-	if ((flag & FLAG_OVERRIDE) > 0) {
+	if (flags_has(flag, Flags::OVERRIDE)) {
 		foreachi(Function *ff, c->functions, i)
 			if (ff->name == f->name) {
 				if (_class_override_num_params < 0 or _class_override_num_params == ff->num_params) {
@@ -403,11 +414,8 @@ void _class_add_member_func(const Class *ccc, Function *f, ScriptFlag flag) {
 }
 
 
-Function* class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
-	Function *f = new Function(name, return_type, cur_class);
-	f->is_pure = ((flag & FLAG_PURE) > 0);
-	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
-	f->is_static = ((flag & FLAG_STATIC) > 0);
+Function* class_add_func(const string &name, const Class *return_type, void *func, Flags flags) {
+	Function *f = new Function(name, return_type, cur_class, flags);
 	cur_package->syntax->functions.add(f);
 	f->address_preprocess = func;
 	if (config.allow_std_lib)
@@ -415,10 +423,10 @@ Function* class_add_func(const string &name, const Class *return_type, void *fun
 	cur_func = f;
 
 
-	if (f->is_static)
+	if (f->is_static())
 		cur_class->functions.add(f);
 	else
-		_class_add_member_func(cur_class, f, flag);
+		_class_add_member_func(cur_class, f, flags);
 	return f;
 }
 
@@ -468,7 +476,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 	return -1;
 }
 
-Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
+Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, Flags flag) {
 	string tname = cur_class->name;
 	int index = get_virtual_index(func, tname, name);
 	//msg_write("virtual: " + tname + "." + name);
@@ -527,7 +535,7 @@ void add_ext_var(const string &name, const Class *type, void *var) {
 
 Array<Statement*> Statements;
 
-Function *add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
+Function *add_func(const string &name, const Class *return_type, void *func, Flags flag) {
 	add_class(cur_package->base_class());
 	return class_add_func(name, return_type, func, flag);
 }
@@ -556,6 +564,7 @@ void func_set_inline(InlineID index) {
 void func_add_param(const string &name, const Class *type) {
 	if (cur_func) {
 		Variable *v = new Variable(name, type);
+		v->is_const = true;
 		cur_func->var.add(v);
 		cur_func->literal_param_type.add(type);
 		cur_func->num_params ++;
@@ -824,7 +833,7 @@ void link_external(const string &name, void *pointer) {
 		foreachi(Function *f, p->syntax->functions, i)
 			if (f->long_name() == sname) {
 				int n = f->num_params;
-				if (!f->is_static)
+				if (!f->is_static())
 					n ++;
 				if (names.num > 0)
 					if (n != names[1]._int())

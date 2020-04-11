@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-void update_bars(Bar*[] bars)
+void update_bars(out Bar*[] bars)
 	int offset = 0
 	for b in bars
 		b.offset = offset
@@ -34,7 +34,7 @@ class XXX extends SongPlugin
 			paste(session.view.sel.range().offset, ls, target_layers[i])
 		song.end_action_group()
 	
-	void paste(int offset, TrackLayer* source, TrackLayer* dest)
+	void paste(int offset, TrackLayer source, out TrackLayer dest)
 		int b0 = first_bar(offset)
 		for b,i in clipboard.temp.bars
 			if b0+i < len(song.bars)
@@ -43,7 +43,7 @@ class XXX extends SongPlugin
 	int remap(Range rs, Range rd, int x)
 		return rd.offset + float(x - rs.offset) * float(rd.length) / float(rs.length)
 	
-	void paste_bar(TrackLayer* source, TrackLayer* dest, Range rs, Range rd)
+	void paste_bar(TrackLayer source, out TrackLayer dest, Range rs, Range rd)
 		print("paste bar... {{rs}} -> {{rd}}")
 		let midi = source.midi.get_notes(rs)
 		for n in midi

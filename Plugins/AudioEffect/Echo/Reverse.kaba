@@ -3,7 +3,7 @@
 use "../../api.kaba"
 
 class Reverse extends AudioEffect
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		int n = buf.length / 2
 		for i in 0:n
 			int j = buf.length - i - 1

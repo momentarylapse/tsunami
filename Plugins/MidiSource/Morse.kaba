@@ -4,7 +4,7 @@ const string AUTO_CONFIG_PITCH = "0:127:1:1:"
 const string AUTO_CONFIG_TEXT = ""
 const string AUTO_CONFIG_BEAT_PARTITION = "1:8"
 
-void append(int[] a, int[] b)
+void append(out int[] a, int[] b)
 	for x in b
 		a.add(x)
 
@@ -83,7 +83,7 @@ class Morse extends MidiSource
 	override void reset_state()
 		pos = 0
 	
-	override bool on_produce(MidiProduceData data)
+	override bool on_produce(out MidiProduceData data)
 		if pos >= len(config.text)
 			return false
 		let c = config.text[pos:pos+1]

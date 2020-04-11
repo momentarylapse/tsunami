@@ -15,7 +15,7 @@ class HullCurve extends AudioEffect
 	class Config extends Module.Config
 		complex[] curve
 
-		void fill_inter(FloatInterpolator fi)
+		const void fill_inter(out FloatInterpolator fi)
 			fi.set_type("cubic-spline-notang")
 			fi.add(curve[0].y, 0)
 			for i in 1:curve.num
@@ -30,7 +30,7 @@ class HullCurve extends AudioEffect
 
 	Config config
 
-	void hull(float[] b)
+	void hull(out float[] b)
 	
 		FloatInterpolator fi
 		config.fill_inter(fi)
@@ -41,7 +41,7 @@ class HullCurve extends AudioEffect
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		hull(buf.l)
 		if buf.channels > 1
 			hull(buf.r)

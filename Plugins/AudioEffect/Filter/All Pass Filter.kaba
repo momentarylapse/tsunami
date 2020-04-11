@@ -23,5 +23,5 @@ class AllPassFilter extends AudioEffect
 	override void on_config()
 		filter.create(FILTER_ALL_PASS, config.z, config.phi, 0, session.sample_rate())
 		
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		filter.apply(buf)

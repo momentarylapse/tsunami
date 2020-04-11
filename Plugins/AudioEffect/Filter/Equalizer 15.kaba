@@ -34,7 +34,7 @@ class Equalizer15 extends AudioEffect
 		FreqMin[0] = 0
 		FreqMax[NUM_BANDS - 1] = 1000000
 
-	void equalize(float[] b)
+	void equalize(out float[] b)
 		int _STACK_ALIGNMENT_
 		float sample_rate = session.sample_rate()
 	
@@ -55,7 +55,7 @@ class Equalizer15 extends AudioEffect
 		# transform back
 		fft_c2r_inv(f, b)
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 		equalize(buf.l)
 		if buf.channels > 1
 			equalize(buf.r)

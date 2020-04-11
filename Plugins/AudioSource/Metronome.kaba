@@ -35,7 +35,7 @@ class Metronome extends AudioSource
 			del source
 			del synth
 
-	override int read(AudioBuffer buf)
+	override int read(out AudioBuffer buf)
 		return synth.out.read_audio(buf)
 		
 	override ConfigPanel *create_panel()

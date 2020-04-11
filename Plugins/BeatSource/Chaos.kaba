@@ -6,7 +6,7 @@ class ChaosSource extends BeatSource
 	override void reset_state()
 		offset = 0
 		
-	override int read(Beat[] beats, int samples)
+	override int read(out Beat[] beats, int samples)
 		int sample_rate = session.sample_rate()
 	
 		while offset < samples

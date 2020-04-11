@@ -32,7 +32,7 @@ class MultiEcho extends AudioEffect
 	ReflectorState[] refl
 
 
-	void do_delay(float[] b, float[] d, ReflectorState rs, Config.Reflector r)
+	void do_delay(out float[] b, out float[] d, ReflectorState rs, Config.Reflector r)
 		int p = rs.offset % len(d)
 		for bb in b
 	
@@ -50,7 +50,7 @@ class MultiEcho extends AudioEffect
 				p = 0
 
 
-	override void process(AudioBuffer buf)
+	override void process(out AudioBuffer buf)
 
 		int n = len(config.refl)
 		refl.resize(n)

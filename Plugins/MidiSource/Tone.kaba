@@ -19,7 +19,7 @@ class ToneSource extends MidiSource
 	override void reset_state()
 		started = false
 		
-	override int read(MidiEventBuffer midi)
+	override int read(out MidiEventBuffer midi)
 		if !started
 			midi.add(MidiEvent(0, config.pitch, config.volume))
 			started = true

@@ -1,0 +1,18 @@
+use hui
+use "../api.kaba"
+use os
+
+
+class MAE extends SongPlugin
+	
+	override void apply()
+		if len(song.tracks) < 3
+			return
+		if song.tracks[2].type != TYPE_MIDI
+			return
+		float fps = 25
+		float samples_per_frame = song.sample_rate / fps
+		let f = Filesystem.create_text("notes")
+		for n in song.tracks[2].layers[0].midi
+			f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
+		del f

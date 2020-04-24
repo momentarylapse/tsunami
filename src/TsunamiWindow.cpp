@@ -1053,12 +1053,12 @@ void TsunamiWindow::on_save_as() {
 
 void TsunamiWindow::on_render_export_selection() {
 	if (session->storage->ask_save_render_export(this)) {
-		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
+		if (session->storage->render_export_selection(song, view->sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}
 }
 
-Song *copy_song_from_selection(Song *song, SongSelection &sel);
+Song *copy_song_from_selection(Song *song, const SongSelection &sel);
 
 void TsunamiWindow::on_export_selection() {
 	if (session->storage->ask_save(this)) {

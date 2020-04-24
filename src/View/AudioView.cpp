@@ -396,12 +396,12 @@ void AudioView::update_selection() {
 	}
 
 
-	renderer->set_range(get_playback_selection(false));
+	renderer->change_range(get_playback_selection(false));
 
 	// TODO ...check....
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(playback_pos()))
-			renderer->set_range(get_playback_selection(false));
+			renderer->change_range(get_playback_selection(false));
 		else{
 			stop();
 		}
@@ -1472,7 +1472,6 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop) {
 
 	renderer->allow_loop = allow_loop;
 	renderer->set_range(range);
-	renderer->set_pos(range.start());
 	renderer->allow_layers(get_playable_layers());
 	_playback_stream_offset = range.offset - output_stream->samples_played();
 

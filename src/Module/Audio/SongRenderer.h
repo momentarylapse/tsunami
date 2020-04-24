@@ -45,6 +45,7 @@ public:
 	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
 
 	void _cdecl set_range(const Range &r);
+	void _cdecl change_range(const Range &r);
 	void _cdecl set_loop(bool loop);
 	Range _cdecl range(){ return _range; }
 

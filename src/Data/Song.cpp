@@ -466,7 +466,7 @@ Array<TrackLayer*> Song::layers() const {
 
 
 
-Song *copy_song_from_selection(Song *song, SongSelection &sel) {
+Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 	Song *ss = new Song(song->session, song->sample_rate);
 	ss->tags = song->tags;
 	for (Bar *b: song->bars)

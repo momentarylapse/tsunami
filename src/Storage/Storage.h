@@ -34,7 +34,7 @@ public:
 	bool _cdecl load_track(TrackLayer *t, const string &filename, int offset = 0);
 	bool _cdecl load_buffer(AudioBuffer *buf, const string &filename);
 	bool _cdecl save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags);
-	bool _cdecl render_export_selection(Song *song, SongSelection *sel, const string &filename);
+	bool _cdecl render_export_selection(Song *song, const SongSelection &sel, const string &filename);
 	bool _cdecl save(Song *song, const string &filename);
 
 	bool _cdecl ask_by_flags(hui::Window *win, const string &title, int flags);

@@ -175,11 +175,16 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf) {
 	read(buf);
 }
 
-void SongRenderer::set_range(const Range &r) {
+void SongRenderer::change_range(const Range &r) {
 	if (r == _range)
 		return;
 	_range = r;
 	needs_rebuild = true;
+}
+
+void SongRenderer::set_range(const Range &r) {
+	change_range(r);
+	set_pos(r.start());
 }
 
 void SongRenderer::set_loop(bool l) {

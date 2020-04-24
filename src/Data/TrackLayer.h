@@ -89,4 +89,7 @@ public:
 };
 
 
+Set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers);
+
+
 #endif /* SRC_DATA_TRACKLAYER_H_ */

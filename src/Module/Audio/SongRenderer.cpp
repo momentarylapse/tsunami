@@ -40,6 +40,7 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	if (song) {
 		build_data();
 		set_range(song->range());
+		allow_layers(layer_set(song->layers()));
 		song->subscribe(this, [=]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
 		song->subscribe(this, [=]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
 		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);

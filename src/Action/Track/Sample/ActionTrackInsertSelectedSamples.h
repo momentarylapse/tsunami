@@ -12,8 +12,7 @@
 class TrackLayer;
 class SongSelection;
 
-class ActionTrackInsertSelectedSamples : public ActionGroup
-{
+class ActionTrackInsertSelectedSamples : public ActionGroup {
 public:
 	ActionTrackInsertSelectedSamples(const SongSelection &sel);
 

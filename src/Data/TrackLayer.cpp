@@ -265,3 +265,11 @@ bool TrackLayer::is_main() const {
 void TrackLayer::insert_midi_data(int offset, const MidiNoteBuffer& midi) {
 	track->song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }
+
+
+Set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers) {
+	Set<const TrackLayer*> lset;
+	for (auto l: layers)
+		lset.add(l);
+	return lset;
+}

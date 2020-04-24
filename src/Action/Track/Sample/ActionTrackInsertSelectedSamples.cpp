@@ -18,8 +18,7 @@ ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(const SongSel
 {
 }
 
-void ActionTrackInsertSelectedSamples::build(Data *d)
-{
+void ActionTrackInsertSelectedSamples::build(Data *d) {
 	auto *s = dynamic_cast<Song*>(d);
 
 	for (TrackLayer *l: s->layers())

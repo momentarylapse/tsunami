@@ -462,7 +462,6 @@ Array<TrackLayer*> Song::layers() const {
 	for (Track *t: tracks)
 		layers.append(t->layers);
 	return layers;
-
 }
 
 

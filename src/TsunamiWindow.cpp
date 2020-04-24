@@ -396,6 +396,28 @@ void TsunamiWindow::on_add_midi_track() {
 	song->add_track(SignalType::MIDI);
 }
 
+void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nullptr) {
+	const int chunk_size = 1 << 12;
+	int offset = 0;
+
+	while (offset < len) {
+		if (prog)
+			prog->set((float) offset / len);
+
+		Range r = RangeTo(offset, min(offset + chunk_size, len));
+
+		AudioBuffer tbuf;
+		tbuf.set_as_ref(buf, offset, r.length);
+
+		out->read_audio(tbuf);
+
+		offset += chunk_size;
+		if (prog)
+			if (prog->is_cancelled())
+				break;
+	}
+}
+
 void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range();
 	if (range.empty()) {
@@ -404,31 +426,24 @@ void TsunamiWindow::on_track_render() {
 	}
 
 	auto *p = new ProgressCancelable(_(""), this);
-	song->begin_action_group();
 
 	SongRenderer renderer(song);
 	renderer.set_range(range);
 	renderer.allow_layers(view->get_playable_layers());
 
-	Track *t = song->add_track(SignalType::AUDIO);
 
-	int chunk_size = 1 << 12;
-	int offset = range.offset;
+	AudioBuffer buf;
+	buf.resize(range.length);
 
-	while (offset < range.end()) {
-		p->set((float) (offset - range.offset) / range.length);
+	write_into_buffer(renderer.out, buf, range.length, p);
 
-		AudioBuffer buf;
-		Range r = Range(offset, min(chunk_size, range.end() - offset));
-		auto *a = t->layers[0]->edit_buffers(buf, r);
+	song->begin_action_group();
+	Track *t = song->add_track(SignalType::AUDIO_STEREO);
+	AudioBuffer buf_track;
+	auto *a = t->layers[0]->edit_buffers(buf_track, range);
+	buf_track.set(buf, 0, 1);
 
-		renderer.read(buf);
-		t->layers[0]->edit_buffers_finish(a);
-
-		offset += chunk_size;
-		if (p->is_cancelled())
-			break;
-	}
+	t->layers[0]->edit_buffers_finish(a);
 	song->end_action_group();
 	delete p;
 

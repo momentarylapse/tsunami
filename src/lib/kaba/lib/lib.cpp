@@ -30,7 +30,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.18.1.0";
+string LibVersion = "0.18.5.0";
 
 
 const string IDENTIFIER_CLASS = "class";
@@ -85,6 +85,7 @@ const string IDENTIFIER_MAP = "map";
 const string IDENTIFIER_LAMBDA = "lambda";
 const string IDENTIFIER_SORTED = "sorted";
 const string IDENTIFIER_DYN = "dyn";
+const string IDENTIFIER_CALL = "call";
 
 CompilerConfiguration config;
 
@@ -703,6 +704,7 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
 	add_statement(IDENTIFIER_SORTED, StatementID::SORTED);
 	add_statement(IDENTIFIER_DYN, StatementID::DYN);
+	add_statement(IDENTIFIER_CALL, StatementID::CALL);
 }
 
 

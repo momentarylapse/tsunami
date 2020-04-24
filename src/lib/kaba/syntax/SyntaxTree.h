@@ -173,6 +173,7 @@ public:
 	Node *parse_statement_lambda(Block *block);
 	Node *parse_statement_sorted(Block *block);
 	Node *parse_statement_dyn(Block *block);
+	Node *parse_statement_call(Block *block);
 
 	Node *apply_type_cast(int tc, Node *param, const Class *wanted);
 	Node *apply_params_with_cast(Node *operand, const Array<Node*> &params, const Array<int> &casts, const Array<const Class*> &wanted);

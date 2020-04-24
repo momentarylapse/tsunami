@@ -18,6 +18,10 @@ string var_repr(const void *p, const Class *type);
 string var2str(const void *p, const Class *type);
 Any kaba_dyn(const void *var, const Class *type);
 DynamicArray kaba_map(Function *func, DynamicArray *a);
+void kaba_call0(Function *func);
+void kaba_call1(Function *func, void *p1);
+void kaba_call2(Function *func, void *p1, void *p2);
+void kaba_call3(Function *func, void *p1, void *p2, void *p3);
 
 string class_repr(const Class *c);
 string func_repr(const Function *f);

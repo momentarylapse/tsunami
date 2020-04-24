@@ -2184,6 +2184,30 @@ Node *SyntaxTree::parse_statement_dyn(Block *block) {
 	return make_dynamical(sub);
 }
 
+Node *SyntaxTree::parse_statement_call(Block *block) {
+	Exp.next(); // "call"
+	string name = Exp.cur;
+
+	auto params = parse_call_parameters(block);
+	if (params.num == 0)
+		do_error("call() expects at least 1 parameter");
+	if (params[0]->type != TypeFunctionP)
+		do_error("call(): first parameter must be a function pointer ..." + params[0]->type->long_name());
+
+	int np = params.num-1;
+	for (int i=0; i<np; i++)
+		params[i+1] = force_concrete_type(params[i+1]);
+
+	auto links = get_existence("@call" + i2s(np), nullptr, nullptr, false);
+	Function *f = links[0]->as_func();
+
+	Node *cmd = add_node_call(f);
+	cmd->set_param(0, params[0]);
+	for (int i=0; i<np; i++)
+		cmd->set_param(i+1, ref_node(params[i+1]));
+	return cmd;
+}
+
 Node *SyntaxTree::parse_statement(Block *block) {
 	if (Exp.cur == IDENTIFIER_FOR) {
 		return parse_statement_for(block);
@@ -2227,6 +2251,8 @@ Node *SyntaxTree::parse_statement(Block *block) {
 		return parse_statement_sorted(block);
 	} else if (Exp.cur == IDENTIFIER_DYN) {
 		return parse_statement_dyn(block);
+	} else if (Exp.cur == IDENTIFIER_CALL) {
+		return parse_statement_call(block);
 	}
 	do_error("unhandled statement..." + Exp.cur);
 	return nullptr;
@@ -2847,9 +2873,12 @@ void SyntaxTree::parse_all_class_names(Class *ns, int indent0) {
 }
 
 void SyntaxTree::parse_all_function_bodies(const Class *name_space) {
-	for (auto *f: name_space->functions)
+	//for (auto *f: name_space->functions)   might add lambda functions...
+	for (int i=0; i<name_space->functions.num; i++) {
+		auto f = name_space->functions[i];
 		if ((!f->is_extern()) and (f->_logical_line_no >= 0) and (f->name_space == name_space))
 			parse_function_body(f);
+	}
 
 	// recursion
 	//for (auto *c: name_space->classes)   NO... might encounter new classes creating new functions!

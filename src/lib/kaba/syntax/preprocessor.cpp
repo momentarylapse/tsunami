@@ -12,12 +12,18 @@ void db_out(const string &s) {
 	//msg_write(s);
 }
 
+#define CALL_DEBUG_X		0
+
 // call-by-reference dummy
 class CBR {};
 
 class vec2 { float a; float b; };
 class vec3 { float a; float b; float c; };
 class vec4 { float a; float b; float c; float d; };
+
+void call0_void(void *ff, void *ret, const Array<void*> &param) {
+	((void(*)())ff)();
+}
 
 template<class R>
 void call0(void *ff, void *ret, const Array<void*> &param) {
@@ -26,6 +32,17 @@ void call0(void *ff, void *ret, const Array<void*> &param) {
 		((void(*)(void*))ff)(ret);
 	} else {
 		*(R*)ret = ((R(*)())ff)();
+	}
+}
+
+template<class A>
+void call1_void_x(void *ff, void *ret, const Array<void*> &param) {
+	if (std::is_same<CBR,A>::value) {
+		db_out("CBR -> void");
+		((void(*)(void*))ff)(param[0]);
+	} else {
+		db_out("x -> void");
+		((void(*)(A))ff)(*(A*)param[0]);
 	}
 }
 
@@ -103,7 +120,10 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 
 
 	if (ptype.num == 0) {
-		if (f->return_type == TypeInt) {
+		if (f->return_type == TypeVoid) {
+			call0_void(ff, ret, param);
+			return true;
+		} else if (f->return_type == TypeInt) {
 			call0<int>(ff, ret, param);
 			return true;
 		} else if (f->return_type == TypeFloat32) {
@@ -114,7 +134,35 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			return true;
 		}
 	} else if (ptype.num == 1) {
-		if (f->return_type == TypeInt) {
+		if (f->return_type == TypeVoid) {
+			if (ptype[0] == TypeInt) {
+				call1_void_x<int>(ff, ret, param);
+				return true;
+			} else if (ptype[0] == TypeFloat32) {
+				call1_void_x<float>(ff, ret, param);
+				return true;
+			} else if (ptype[0]->uses_call_by_reference()) {
+#if CALL_DEBUG_X
+				void *ppp, *qqq;
+				asm volatile ("movq %%rsp, %%rax;"
+				              "movq %%rax, %0;"
+							"movq %%rbp, %%rax;"
+		  "movq %%rax, %1;"
+				                  :  "=r" (ppp), "=r"(qqq) : : );
+				printf("stack before  sp=%p  bp=%p\n", ppp, qqq);
+#endif
+				call1_void_x<CBR>(ff, ret, param);
+#if CALL_DEBUG_X
+				asm volatile ("movq %%rsp, %%rax;"
+				              "movq %%rax, %0;"
+							"movq %%rbp, %%rax;"
+		  "movq %%rax, %1;"
+				                  :  "=r" (ppp), "=r"(qqq) : : );
+				printf("stack after  sp=%p  bp=%p\n", ppp, qqq);
+#endif
+				return true;
+			}
+		} else if (f->return_type == TypeInt) {
 			if (ptype[0] == TypeInt) {
 				call1<int,int>(ff, ret, param);
 				return true;

@@ -341,6 +341,45 @@ DynamicArray kaba_map(Function *func, DynamicArray *a) {
 	return r;
 }
 
+void assert_num_params(Function *f, int n) {
+	auto p = func_effective_params(f);
+	if (p.num != n)
+		kaba_raise_exception(new KabaException("call(): " + i2s(p.num) + " parameters expected, " + i2s(n) + " given"));
+}
+
+void assert_return_type(Function *f, const Class *ret) {
+	if (f->return_type != ret)
+		kaba_raise_exception(new KabaException("call(): function returns " + f->return_type->long_name() + ", " + ret->long_name() + " required"));
+}
+
+void kaba_call0(Function *func) {
+	assert_num_params(func, 0);
+	assert_return_type(func, TypeVoid);
+	if (!call_function(func, func->address, nullptr, {}))
+		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
+}
+
+void kaba_call1(Function *func, void *p1) {
+	assert_num_params(func, 1);
+	assert_return_type(func, TypeVoid);
+	if (!call_function(func, func->address, nullptr, {p1}))
+		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
+}
+
+void kaba_call2(Function *func, void *p1, void *p2) {
+	assert_num_params(func, 2);
+	assert_return_type(func, TypeVoid);
+	if (!call_function(func, func->address, nullptr, {p1, p2}))
+		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
+}
+
+void kaba_call3(Function *func, void *p1, void *p2, void *p3) {
+	assert_num_params(func, 3);
+	assert_return_type(func, TypeVoid);
+	if (!call_function(func, func->address, nullptr, {p1, p2, p3}))
+		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
+}
+
 #pragma GCC pop_options
 
 	

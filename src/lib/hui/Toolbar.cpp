@@ -100,6 +100,8 @@ void Toolbar::from_resource(Resource *res)
 				item.back()->set_tooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 			}
 		}
+		for (auto &o: cmd.options)
+			item.back()->set_options(o);
 	}
 	enable(true);
 }

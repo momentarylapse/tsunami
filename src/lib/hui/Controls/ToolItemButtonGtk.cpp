@@ -24,8 +24,6 @@ ToolItemButton::ToolItemButton(const string &title, const string &image, const s
 	gtk_widget_show(im);
 	widget = GTK_WIDGET(gtk_tool_button_new(im, sys_str(title)));
 	gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
-	if ((image != "hui:redo") and (image != "hui:open") and (image != "hui:paste") and (image != "hui:media-stop"))
-		gtk_tool_item_set_is_important(GTK_TOOL_ITEM(widget), true);
 	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	gtk_widget_show(widget);
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
@@ -33,6 +31,11 @@ ToolItemButton::ToolItemButton(const string &title, const string &image, const s
 	/*gtk_toolbar_insert(GTK_TOOLBAR(cur_toolbar->widget),it,-1);
 	AddToolbarItem(cur_toolbar,id,HuiToolButton,NULL);
 	cur_toolbar->item.back().widget = it;*/
+}
+
+void ToolItemButton::__set_option(const string &op, const string &value) {
+	if (op == "important")
+		gtk_tool_item_set_is_important(GTK_TOOL_ITEM(widget), true);
 }
 
 }

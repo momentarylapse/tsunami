@@ -29,14 +29,17 @@ ToolItemToggleButton::ToolItemToggleButton(const string &title, const string &im
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
 }
 
-void ToolItemToggleButton::__check(bool checked)
-{
+void ToolItemToggleButton::__check(bool checked) {
 	gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(widget), checked);
 }
 
-bool ToolItemToggleButton::is_checked()
-{
+bool ToolItemToggleButton::is_checked() {
 	return gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
+}
+
+void ToolItemToggleButton::__set_option(const string &op, const string &value) {
+	if (op == "important")
+		gtk_tool_item_set_is_important(GTK_TOOL_ITEM(widget), true);
 }
 
 }

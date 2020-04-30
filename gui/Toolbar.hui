@@ -1,16 +1,16 @@
 Toolbar toolbar ""
-	Item /new "New..." image=hui:new "tooltip=New audiofile"
+	Item /new "New..." image=hui:new "tooltip=New audiofile" important
 	Item /open "Open..." image=hui:open "tooltip=Open audiofile"
-	Item /save "Save" image=hui:save "tooltip=Save audiofile"
+	Item /save "Save" image=hui:save "tooltip=Save audiofile" important
 	Separator
-	Item /undo "Undo" image=hui:undo
+	Item /undo "Undo" image=hui:undo important
 	Item /redo "Redo" image=hui:redo
 	Separator
-	Item /copy "Copy" image=hui:copy "tooltip=Copy selection"
+	Item /copy "Copy" image=hui:copy "tooltip=Copy selection" important
 	Item /paste "Paste" image=hui:paste "tooltip=Paste"
-	Item /delete "Delete" image=hui:delete "tooltip=Delete selection"
+	Item /delete "Delete" image=hui:delete "tooltip=Delete selection" important
 	Separator
-	Item /play "Play" image=hui:media-play
+	Item /play "Play" image=hui:media-play important
 	Item /pause "Pause" image=hui:media-pause
 	Item /stop "Stop" image=hui:media-stop
-	Item /record "Record" image=hui:media-record
+	Item /record "Record" image=hui:media-record important

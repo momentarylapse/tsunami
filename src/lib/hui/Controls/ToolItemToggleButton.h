@@ -13,13 +13,13 @@
 namespace hui
 {
 
-class ToolItemToggleButton : public Control
-{
+class ToolItemToggleButton : public Control {
 public:
 	ToolItemToggleButton(const string &title, const string &image, const string &id);
 
 	void __check(bool checked) override;
 	bool is_checked() override;
+	void __set_option(const string &op, const string &value) override;
 };
 
 }

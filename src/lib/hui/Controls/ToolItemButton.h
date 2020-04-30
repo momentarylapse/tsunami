@@ -13,10 +13,10 @@
 namespace hui
 {
 
-class ToolItemButton : public Control
-{
+class ToolItemButton : public Control {
 public:
 	ToolItemButton(const string &title, const string &image, const string &id);
+	void __set_option(const string &op, const string &value) override;
 };
 
 }

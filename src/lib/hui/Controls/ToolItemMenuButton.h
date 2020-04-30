@@ -15,10 +15,10 @@ namespace hui
 
 class Menu;
 
-class ToolItemMenuButton : public Control
-{
+class ToolItemMenuButton : public Control {
 public:
 	ToolItemMenuButton(const string &title, Menu *menu, const string &image, const string &id);
+	void __set_option(const string &op, const string &value) override;
 };
 
 }

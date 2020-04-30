@@ -6168,7 +6168,7 @@ toolbar
 15
 Item
 new
-image=hui:new
+image=hui:new,important
 0
 0
 0
@@ -6180,7 +6180,7 @@ image=hui:open
 0
 Item
 save
-image=hui:save
+image=hui:save,important
 2
 0
 0
@@ -6192,7 +6192,7 @@ Separator
 0
 Item
 undo
-image=hui:undo
+image=hui:undo,important
 4
 0
 0
@@ -6210,7 +6210,7 @@ Separator
 0
 Item
 copy
-image=hui:copy
+image=hui:copy,important
 7
 0
 0
@@ -6222,7 +6222,7 @@ image=hui:paste
 0
 Item
 delete
-image=hui:delete
+image=hui:delete,important
 9
 0
 0
@@ -6234,7 +6234,7 @@ Separator
 0
 Item
 play
-image=hui:media-play
+image=hui:media-play,important
 11
 0
 0
@@ -6252,7 +6252,7 @@ image=hui:media-stop
 0
 Item
 record
-image=hui:media-record
+image=hui:media-record,important
 14
 0
 0

@@ -51,8 +51,7 @@ public:
 	void select_in_edit_cursor();
 
 	MidiNoteBuffer get_creation_notes(HoverData *sel, int pos0);
-	void set_sub_beat_partition(int partition);
-	void set_note_length(int length);
+	void set_note_length_and_partition(int length, int partition);
 
 	Array<int> get_creation_pitch(int base_pitch);
 	int suggest_move_cursor(int pos, bool forward) override;

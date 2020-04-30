@@ -13,6 +13,7 @@
 class TrackLayer;
 class Device;
 enum class MidiMode;
+enum class NoteBaseLength;
 
 class MidiEditorConsole : public SideBarConsole {
 public:
@@ -29,8 +30,11 @@ public:
 	void update();
 	void update_input_device_list();
 
-	void on_beat_partition();
-	void on_note_length();
+	void on_base_length(NoteBaseLength l);
+	void on_length_dotted();
+	void on_length_triplet();
+	void on_length_custom();
+	NoteBaseLength get_base_length();
 	void on_creation_mode();
 	void on_interval();
 	void on_chord_type();

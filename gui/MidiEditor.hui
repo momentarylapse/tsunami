@@ -3,33 +3,47 @@ Dialog midi_editor "Midi" width=300 height=516
 		Grid me_grid_no ""
 			Text ld_t_no_midi "No midi track selected" expandx center italic
 		Grid me_grid_yes "" vertical
-			Group me_group_creation "Creation"
+			Group me_group_creation "Edit mode"
 				Grid ? "" vertical
-					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord" left
-						.
-						.
-						Grid me_group_interval ""
-							Text ld_t_interval "Interval"
-							SpinButton interval "0" range=-99:99
-						Grid ? ""
-							Text ld_t_chord "Type"
-							ComboBox chord_type "" expandx
-							---|
-							Text ld_t_inversion "Inversion"
-							ComboBox chord_inversion ""
 					Grid ? ""
-						Text me_t_modifier "Modifier"
-						Grid ? ""
-							RadioButton modifier:none "none" "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
-							RadioButton modifier:sharp "♯" "tooltip=Sharp - new note is 1 semitone above the key" expandx
-							RadioButton modifier:flat "♭" "tooltip=Flat - new note is 1 semitone below the key" expandx
-							RadioButton modifier:natural "♮" "tooltip=Natural - new note ignores any modifiers in the key" expandx
+						ToggleButton mode-select "I" flat expandx "tooltip=Select"
+						ToggleButton mode-note "𝅘𝅥" flat expandx "tooltip=Create single notes"
+						ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat expandx "tooltip=Create intervals"
+						ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat expandx "tooltip=Create chords"
+					Grid grid-interval ""
+						Text ld_t_interval "Interval"
+						SpinButton interval "0" range=-99:99
+					Grid grid-chord ""
+						Text ld_t_chord "Type"
+						ComboBox chord_type "" expandx
 						---|
-						Text t_note_length "Length"
-						Grid ? ""
-							SpinButton note_length "1" range=1:16 expandx
-							Text t_div "/"
-							SpinButton beat_partition "4" range=1:256 "tooltip=Beat partition, `sub beats`" expandx
+						Text ld_t_inversion "Inversion"
+						ComboBox chord_inversion ""
+			Group grp-modifier "Modifier"
+				Grid ? ""
+					ToggleButton modifier-none "none" flat "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
+					ToggleButton modifier-sharp "♯" flat "tooltip=Sharp - new note is 1 semitone above the key" expandx
+					ToggleButton modifier-flat "♭" flat "tooltip=Flat - new note is 1 semitone below the key" expandx
+					ToggleButton modifier-natural "♮" flat "tooltip=Natural - new note ignores any modifiers in the key" expandx
+			Group grp-length "Note length"
+				Grid ? ""
+					ToggleButton length-whole "𝅝" flat "tooltip=Whole note"
+					ToggleButton length-half "𝅗𝅥" flat "tooltip=Half note"
+					ToggleButton length-quarter "𝅘𝅥" flat "tooltip=Quarter note"
+					ToggleButton length-eighth "𝅘𝅥𝅮" flat "tooltip=Eighth note"
+					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat "tooltip=Sixteenth note"
+					---|
+					ToggleButton length-dotted "." flat "tooltip=Dotted note (+50% length)"
+					ToggleButton length-triplet "𝅘𝅥𝅮/3" flat "tooltip=Triplet eighth note"
+					Button length-custom "..." flat "tooltip=Custom note length"
+					.
+					Text length-result "" "tooltip=Resulting note length / beat partition"
+			Group grp-flags "Flags"
+				Grid ? ""
+					Button flag-none "none" flat "tooltip=Clear all flags"
+					ToggleButton flag-trill "𝆖" flat "tooltip=Set trill flag"
+					ToggleButton flag-staccato "." flat "tooltip=Set staccato flag"
+					ToggleButton flag-tenuto "_" flat "tooltip=Set tenuto flag"
 			Expander grp_input "Keyboard input"
 				Grid ? ""
 					.
@@ -62,14 +76,8 @@ Dialog midi_editor "Midi" width=300 height=516
 						SpinButton pitch_delta "" range=-24:24 "tooltip=Semitones - positive=up, negative=down"
 						Button apply_pitch_shift "shift" "tooltip=Shift the pitch up or down" expandx
 					Grid ? ""
-						Text t_flags "Flags" hgroup=a
-						Button flag_none "x" "tooltip=Clear flags"
-						Button flag_trill "tr" "tooltip=Set trill flag"
-						Button flag_staccato "." "tooltip=Set staccato flag"
-						Button flag_tenuto "_" "tooltip=Set tenuto flag"
-					Grid ? ""
 						Text t_op_add "Add" hgroup=a
-						Button add_key_change "key change..." "tooltip=Add a key change at the cursor position"
+						Button add_key_change "𝄞" "tooltip=Add a key change at the cursor position"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

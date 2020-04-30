@@ -439,10 +439,9 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 	//l *= div;
 
 	if ((m->sub_beat_partition % p) == 0) {
-		m->set_note_length(m->sub_beat_partition / p * n);
+		m->set_note_length_and_partition(m->sub_beat_partition / p * n, m->sub_beat_partition);
 	} else {
-		m->set_note_length(l * n);
-		m->set_sub_beat_partition(p);
+		m->set_note_length_and_partition(l * n, p);
 	}
 	m->view->set_cursor_pos(m->view->cursor_pos());
 
@@ -513,7 +512,7 @@ void ViewModeMidi::on_key_down(int k) {
 			int number = (k - hui::KEY_0);
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
-			set_note_length(number);
+			set_note_length_and_partition(number, sub_beat_partition);
 			set_input_mode(InputMode::DEFAULT);
 		}
 	} else if (input_mode == InputMode::BEAT_PARTITION) {
@@ -521,7 +520,7 @@ void ViewModeMidi::on_key_down(int k) {
 			int number = (k - hui::KEY_0);
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
-			set_sub_beat_partition(number);
+			set_note_length_and_partition(note_length, number);
 			set_input_mode(InputMode::DEFAULT);
 		}
 	}
@@ -635,15 +634,9 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 	return notes;
 }
 
-void ViewModeMidi::set_sub_beat_partition(int partition) {
-	sub_beat_partition = partition;
-	select_in_edit_cursor();
-	view->force_redraw();
-	notify();
-}
-
-void ViewModeMidi::set_note_length(int length) {
+void ViewModeMidi::set_note_length_and_partition(int length, int partition) {
 	note_length = length;
+	sub_beat_partition = partition;
 	select_in_edit_cursor();
 	view->force_redraw();
 	notify();

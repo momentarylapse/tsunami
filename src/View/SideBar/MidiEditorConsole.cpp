@@ -26,6 +26,22 @@
 //int get_track_index_save(Song *song, Track *t);
 
 
+
+enum class NoteBaseLength {
+	WHOLE,
+	HALF,
+	QUARTER,
+	EIGTH,
+	SIXTEENTH
+};
+
+enum class NoteLengthModifier {
+	NONE,
+	DOTTED,
+	TRIPLET
+};
+
+
 MidiEditorConsole::MidiEditorConsole(Session *session) :
 	SideBarConsole(_("Midi"), session)
 {
@@ -48,17 +64,32 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("beat_partition", [=]{ on_beat_partition(); });
-	event("note_length", [=]{ on_note_length(); });
-	event("midi_edit_mode", [=]{ on_creation_mode(); });
+	//event("beat_partition", [=]{ on_beat_partition(); });
+	//event("note_length", [=]{ on_note_length(); });
+	//event("midi_edit_mode", [=]{ on_creation_mode(); });
+	event("length-whole", [=]{ on_base_length(NoteBaseLength::WHOLE); });
+	event("length-half", [=]{ on_base_length(NoteBaseLength::HALF); });
+	event("length-quarter", [=]{ on_base_length(NoteBaseLength::QUARTER); });
+	event("length-eighth", [=]{ on_base_length(NoteBaseLength::EIGTH); });
+	event("length-sixteenth", [=]{ on_base_length(NoteBaseLength::SIXTEENTH); });
+	event("length-dotted", [=]{ on_length_dotted(); });
+	event("length-triplet", [=]{ on_length_triplet(); });
+	event("length-custom", [=]{ on_length_custom(); });
+
+	event("mode-select", [=]{ view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::SELECT); });
+	event("mode-note", [=]{ view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::NOTE); });
+	event("mode-interval", [=]{ view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL); });
+	event("mode-chord", [=]{ view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::CHORD); });
+
+
 	event("interval", [=]{ on_interval(); });
 	event("chord_type", [=]{ on_chord_type(); });
 	event("chord_inversion", [=]{ on_chord_inversion(); });
 	event_x("reference_tracks", "hui:select", [=]{ on_reference_tracks(); });
-	event("modifier:none", [=]{ on_modifier(NoteModifier::NONE); });
-	event("modifier:sharp", [=]{ on_modifier(NoteModifier::SHARP); });
-	event("modifier:flat", [=]{ on_modifier(NoteModifier::FLAT); });
-	event("modifier:natural", [=]{ on_modifier(NoteModifier::NATURAL); });
+	event("modifier-none", [=]{ on_modifier(NoteModifier::NONE); });
+	event("modifier-sharp", [=]{ on_modifier(NoteModifier::SHARP); });
+	event("modifier-flat", [=]{ on_modifier(NoteModifier::FLAT); });
+	event("modifier-natural", [=]{ on_modifier(NoteModifier::NATURAL); });
 	event("input_active", [=]{ on_input_active(); });
 	event("input_capture", [=]{ on_input_capture(); });
 	event("input", [=]{ on_input_source(); });
@@ -68,19 +99,87 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("apply_string", [=]{ on_apply_string(); });
 	event("apply_hand_position", [=]{ on_apply_hand_position(); });
 	event("apply_pitch_shift", [=]{ on_apply_pitch_shift(); });
-	event("flag_none", [=]{ on_apply_flags(0); });
-	event("flag_trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
-	event("flag_staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
-	event("flag_tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
+	event("flag-none", [=]{ on_apply_flags(0); });
+	event("flag-trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
+	event("flag-staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
+	event("flag-tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("add_key_change", [=]{ on_add_key_change(); });
 	event("edit_track", [=]{ on_edit_track(); });
 	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
 	event("edit_song", [=]{ on_edit_song(); });
-
 }
 
 MidiEditorConsole::~MidiEditorConsole() {
 	clear();
+}
+
+//NoteBaseLength analyse_note_length(MidiEditorConsole *c, NoteLengthModifier &mod) {
+//}
+
+bool is_dotted(MidiEditorConsole *c) {
+	if (c->view->mode_midi->sub_beat_partition*6 == c->view->mode_midi->note_length) // whole
+		return true;
+	if (c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length) // half
+		return true;
+	if (c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*2) // quarter
+		return true;
+	if (c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*4) // eighth
+		return true;
+	if (c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*8) // sixteenth
+		return true;
+	return false;
+}
+
+bool is_triplet(MidiEditorConsole *c) {
+	if (c->view->mode_midi->sub_beat_partition*4 == c->view->mode_midi->note_length*3) // half
+		return true;
+	if (c->view->mode_midi->sub_beat_partition*2 == c->view->mode_midi->note_length*3) // quarter
+		return true;
+	if (c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*3) // eighth
+		return true;
+	if (c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*6) // sixteenth
+		return true;
+	return false;
+}
+
+bool base_is_whole(MidiEditorConsole *c) {
+	if (is_dotted(c))
+		return c->view->mode_midi->sub_beat_partition*6 == c->view->mode_midi->note_length;
+	if (is_triplet(c))
+		return c->view->mode_midi->sub_beat_partition*8 == c->view->mode_midi->note_length*3;
+	return c->view->mode_midi->sub_beat_partition*4 == c->view->mode_midi->note_length;
+}
+
+bool base_is_half(MidiEditorConsole *c) {
+	if (is_dotted(c))
+		return c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length;
+	if (is_triplet(c))
+		return c->view->mode_midi->sub_beat_partition*4 == c->view->mode_midi->note_length*3;
+	return c->view->mode_midi->sub_beat_partition*2 == c->view->mode_midi->note_length;
+}
+
+bool base_is_quarter(MidiEditorConsole *c) {
+	if (is_dotted(c))
+		return c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*2;
+	if (is_triplet(c))
+		return c->view->mode_midi->sub_beat_partition*2 == c->view->mode_midi->note_length*3;
+	return c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length;
+}
+
+bool base_is_eighth(MidiEditorConsole *c) {
+	if (is_dotted(c))
+		return c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*4;
+	if (is_triplet(c))
+		return c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*3;
+	return c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*2;
+}
+
+bool base_is_sixteenth(MidiEditorConsole *c) {
+	if (is_dotted(c))
+		return c->view->mode_midi->sub_beat_partition*3 == c->view->mode_midi->note_length*8;
+	if (is_triplet(c))
+		return c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*6;
+	return c->view->mode_midi->sub_beat_partition == c->view->mode_midi->note_length*4;
 }
 
 void MidiEditorConsole::update() {
@@ -95,22 +194,40 @@ void MidiEditorConsole::update() {
 	if (!layer)
 		return;
 
-	check("modifier:none", view->mode_midi->modifier == NoteModifier::NONE);
-	check("modifier:sharp", view->mode_midi->modifier == NoteModifier::SHARP);
-	check("modifier:flat", view->mode_midi->modifier == NoteModifier::FLAT);
-	check("modifier:natural", view->mode_midi->modifier == NoteModifier::NATURAL);
+	check("mode-select", view->mode_midi->creation_mode == view->mode_midi->CreationMode::SELECT);
+	check("mode-note", view->mode_midi->creation_mode == view->mode_midi->CreationMode::NOTE);
+	check("mode-interval", view->mode_midi->creation_mode == view->mode_midi->CreationMode::INTERVAL);
+	check("mode-chord", view->mode_midi->creation_mode == view->mode_midi->CreationMode::CHORD);
+
+	hide_control("grid-interval", view->mode_midi->creation_mode != view->mode_midi->CreationMode::INTERVAL);
+	hide_control("grid-chord", view->mode_midi->creation_mode != view->mode_midi->CreationMode::CHORD);
+
+	check("modifier-none", view->mode_midi->modifier == NoteModifier::NONE);
+	check("modifier-sharp", view->mode_midi->modifier == NoteModifier::SHARP);
+	check("modifier-flat", view->mode_midi->modifier == NoteModifier::FLAT);
+	check("modifier-natural", view->mode_midi->modifier == NoteModifier::NATURAL);
 
 	MidiMode mode = view->get_layer(layer)->midi_mode();
 
-	enable("modifier:none", mode == MidiMode::CLASSICAL);
-	enable("modifier:sharp", mode == MidiMode::CLASSICAL);
-	enable("modifier:flat", mode == MidiMode::CLASSICAL);
-	enable("modifier:natural", mode == MidiMode::CLASSICAL);
+	enable("modifier-none", mode == MidiMode::CLASSICAL);
+	enable("modifier-sharp", mode == MidiMode::CLASSICAL);
+	enable("modifier-flat", mode == MidiMode::CLASSICAL);
+	enable("modifier-natural", mode == MidiMode::CLASSICAL);
 
 	set_int("midi_edit_mode", (int)view->mode_midi->creation_mode);
 
 	set_int("beat_partition", view->mode_midi->sub_beat_partition);
 	set_int("note_length", view->mode_midi->note_length);
+	string length = format(u8"(%d 𝅘𝅥 / %d)", view->mode_midi->note_length, view->mode_midi->sub_beat_partition);
+	set_string("length-result", length);
+
+	check("length-whole", base_is_whole(this));
+	check("length-half", base_is_half(this));
+	check("length-quarter", base_is_quarter(this));
+	check("length-eighth", base_is_eighth(this));
+	check("length-sixteenth", base_is_sixteenth(this));
+	check("length-dotted", is_dotted(this));
+	check("length-triplet", is_triplet(this));
 
 	check("input_active", view->mode_midi->is_input_active());
 	enable("input_capture", view->mode_midi->is_input_active());
@@ -146,6 +263,66 @@ void MidiEditorConsole::update_input_device_list() {
 			set_int("input", i);
 }
 
+void simplify_fraction(int &a, int &b) {
+	for (int i=2; i<20; i++)
+		if ((a % i) == 0 and (b % i) == 0) {
+			a /= i;
+			b /= i;
+		}
+}
+
+void MidiEditorConsole::on_base_length(NoteBaseLength l) {
+	int partition = 1, length = 1;
+	if (l == NoteBaseLength::WHOLE)
+		length = 4;
+	if (l == NoteBaseLength::HALF)
+		length = 2;
+	if (l == NoteBaseLength::QUARTER)
+		length = 1;
+	if (l == NoteBaseLength::EIGTH)
+		partition = 2;
+	if (l == NoteBaseLength::SIXTEENTH)
+		partition = 4;
+
+	if (is_checked("length-dotted")) {
+		partition *= 2;
+		length *= 3;
+	}
+	if (is_checked("length-triplet")) {
+		partition *= 3;
+		length *= 2;
+	}
+
+	simplify_fraction(length, partition);
+	view->mode_midi->set_note_length_and_partition(length, partition);
+}
+
+NoteBaseLength MidiEditorConsole::get_base_length() {
+	if (is_checked("length-whole"))
+		return NoteBaseLength::WHOLE;
+	if (is_checked("length-half"))
+		return NoteBaseLength::HALF;
+	if (is_checked("length-quarter"))
+		return NoteBaseLength::QUARTER;
+	if (is_checked("length-eighth"))
+		return NoteBaseLength::EIGTH;
+	if (is_checked("length-sixteenth"))
+		return NoteBaseLength::SIXTEENTH;
+	return NoteBaseLength::QUARTER; // ...
+}
+
+void MidiEditorConsole::on_length_dotted() {
+	auto l = get_base_length();
+	on_base_length(l);
+}
+
+void MidiEditorConsole::on_length_triplet() {
+	auto l = get_base_length();
+	on_base_length(l);
+}
+
+void MidiEditorConsole::on_length_custom() {}
+
 void MidiEditorConsole::on_layer_delete() {
 	set_layer(nullptr);
 }
@@ -170,14 +347,6 @@ void MidiEditorConsole::on_view_vtrack_change() {
 
 void MidiEditorConsole::on_settings_change() {
 	update();
-}
-
-void MidiEditorConsole::on_beat_partition() {
-	view->mode_midi->set_sub_beat_partition(get_int(""));
-}
-
-void MidiEditorConsole::on_note_length() {
-	view->mode_midi->set_note_length(get_int(""));
 }
 
 void MidiEditorConsole::on_creation_mode() {
@@ -224,7 +393,7 @@ void MidiEditorConsole::on_edit_song() {
 }
 
 void MidiEditorConsole::on_modifier(NoteModifier m) {
-	view->mode_midi->modifier = m;
+	view->mode_midi->set_modifier(m);
 }
 
 void MidiEditorConsole::on_input_active() {

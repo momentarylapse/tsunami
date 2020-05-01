@@ -231,6 +231,9 @@ void Control::set_options(const string &options) {
 			grab_focus = true;
 			gtk_widget_set_can_focus(widget, true);
 			gtk_widget_grab_focus(widget);
+		} else if (op == "ignorefocus") {
+			grab_focus = false;
+			gtk_widget_set_can_focus(widget, false);
 		} else if (op == "big") {
 			string css = "#" + id + "{font-size: 150%}";
 			set_style_for_widget(widget, css);

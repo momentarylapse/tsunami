@@ -10,5 +10,5 @@ Dialog question-dialog-intint "Question" width=100 height=20
 				Label label2 ""
 				SpinButton value2 ""
 		Grid buttons "" buttonbar
-			Button cancel "Cancel" image=hui:cancel
-			Button ok "Ok" image=hui:ok
+			Button /cancel "Cancel" image=hui:cancel
+			DefButton /ok "Ok" image=hui:ok

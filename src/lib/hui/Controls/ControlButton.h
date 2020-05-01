@@ -13,11 +13,12 @@
 namespace hui
 {
 
+class Panel;
 
-class ControlButton : public Control
-{
+
+class ControlButton : public Control {
 public:
-	ControlButton(const string &text, const string &id);
+	ControlButton(const string &text, const string &id, Panel *panel);
 	string get_string() override;
 	void __set_string(const string &str) override;
 	void set_image(const string &str) override;

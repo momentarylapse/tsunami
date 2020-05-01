@@ -6,9 +6,9 @@ Dialog new_dialog "New file" width=250 height=80
 				Text /per_second "/s"
 		Group nd_g_track "First track"
 			Grid ? ""
-				ToggleButton type-audio-mono "∿" flat huge expandx "tooltip=Audio (mono)"
-				ToggleButton type-audio-stereo "∿∿" flat huge expandx "tooltip=Audio (stereo)"
-				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi"
+				ToggleButton type-audio-mono "∿" flat huge expandx "tooltip=Audio (mono)" ignorefocus
+				ToggleButton type-audio-stereo "∿₂" flat huge expandx "tooltip=Audio (stereo)" ignorefocus
+				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
 		Group nd_g_metronome "Metronome"
 			Grid ? "" vertical
 				CheckBox metronome "add"

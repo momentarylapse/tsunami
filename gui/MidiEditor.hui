@@ -6,59 +6,59 @@ Dialog midi_editor "Midi" width=300 height=516
 			Group me_group_creation "Edit mode"
 				Grid ? "" vertical
 					Grid ? ""
-						ToggleButton mode-select "I" flat huge expandx "tooltip=Select"
-						ToggleButton mode-note "𝅘𝅥" flat huge expandx "tooltip=Create single notes"
-						ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create intervals"
-						ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create chords"
+						ToggleButton mode-select "I" flat huge expandx "tooltip=Select" ignorefocus
+						ToggleButton mode-note "𝅘𝅥" flat huge expandx "tooltip=Create single notes" ignorefocus
+						ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create intervals" ignorefocus
+						ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create chords" ignorefocus
 					Grid grid-interval ""
 						SpinButton interval "0" range=-99:99 expandx "tooltip=Number of semitones above the base note"
 					Grid grid-chord "" vertical
 						Separator ? ""
 						Grid ? ""
-							ToggleButton chord-major "Maj" flat big expandx "tooltip=Major"
-							ToggleButton chord-minor "Min" flat big expandx "tooltip=Minor"
-							ToggleButton chord-diminished "Dim" flat big expandx "tooltip=Diminished"
-							ToggleButton chord-augmented "Aug" flat big expandx "tooltip=Augmented"
+							ToggleButton chord-major "Maj" flat big expandx "tooltip=Major" ignorefocus
+							ToggleButton chord-minor "Min" flat big expandx "tooltip=Minor" ignorefocus
+							ToggleButton chord-diminished "Dim" flat big expandx "tooltip=Diminished" ignorefocus
+							ToggleButton chord-augmented "Aug" flat big expandx "tooltip=Augmented" ignorefocus
 							---|
-							ToggleButton chord-major7 "Maj7" flat big "tooltip=Major 7th" hidden
-							ToggleButton chord-minor7 "Min7" flat big "tooltip=Minor 7th" hidden
+							ToggleButton chord-major7 "Maj7" flat big "tooltip=Major 7th" hidden ignorefocus
+							ToggleButton chord-minor7 "Min7" flat big "tooltip=Minor 7th" hidden ignorefocus
 						Grid ? ""
-							ToggleButton chord-inversion-none "" flat big expandx "tooltip=Regular"
-							ToggleButton chord-inversion-1 "Inv 1" flat big expandx "tooltip=1st inversion"
-							ToggleButton chord-inversion-2 "Inv 2" flat big expandx "tooltip=2nd inversion"
+							ToggleButton chord-inversion-none "" flat big expandx "tooltip=Regular" ignorefocus
+							ToggleButton chord-inversion-1 "Inv 1" flat big expandx "tooltip=1st inversion" ignorefocus
+							ToggleButton chord-inversion-2 "Inv 2" flat big expandx "tooltip=2nd inversion" ignorefocus
 			Group grp-length "Note length"
 				Grid ? ""
-					ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note"
-					ToggleButton length-half "𝅗𝅥" flat big expandx "tooltip=Half note"
-					ToggleButton length-quarter "𝅘𝅥" flat big expandx "tooltip=Quarter note (Q)"
-					ToggleButton length-eighth "𝅘𝅥𝅮" flat big expandx "tooltip=Eighth note (E)"
-					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat big expandx "tooltip=Sixteenth note (S)"
+					ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note" ignorefocus
+					ToggleButton length-half "𝅗𝅥" flat big expandx "tooltip=Half note" ignorefocus
+					ToggleButton length-quarter "𝅘𝅥" flat big expandx "tooltip=Quarter note (Q)" ignorefocus
+					ToggleButton length-eighth "𝅘𝅥𝅮" flat big expandx "tooltip=Eighth note (E)" ignorefocus
+					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat big expandx "tooltip=Sixteenth note (S)" ignorefocus
 					---|
-					ToggleButton length-dotted "𝅘𝅥." flat big "tooltip=Dotted note (+50% length, combines with any basic note length)"
-					ToggleButton length-triplet "𝅘𝅥𝅮/₃" flat big "tooltip=Triplet note (combines with any basic note length)"
+					ToggleButton length-dotted "𝅘𝅥." flat big "tooltip=Dotted note (+50% length, combines with any basic note length)" ignorefocus
+					ToggleButton length-triplet "𝅘𝅥𝅮/₃" flat big "tooltip=Triplet note (combines with any basic note length)" ignorefocus
 					.
-					Button length-custom "..." flat big "tooltip=Custom note length (L,P)"
+					Button length-custom "..." flat big "tooltip=Custom note length (L,P)" ignorefocus
 					Text length-result "" "tooltip=Resulting note length / beat partition"
 			Group grp-modifier "Modifier"
 				Grid ? ""
-					ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
-					ToggleButton modifier-sharp "♯" flat big "tooltip=Sharp - new note is 1 semitone above the key" expandx
-					ToggleButton modifier-flat "♭" flat big "tooltip=Flat - new note is 1 semitone below the key" expandx
-					ToggleButton modifier-natural "♮" flat big "tooltip=Natural - new note ignores any modifiers in the key" expandx
+					ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx ignorefocus
+					ToggleButton modifier-sharp "♯" flat big "tooltip=Sharp - new note is 1 semitone above the key" expandx ignorefocus
+					ToggleButton modifier-flat "♭" flat big "tooltip=Flat - new note is 1 semitone below the key" expandx ignorefocus
+					ToggleButton modifier-natural "♮" flat big "tooltip=Natural - new note ignores any modifiers in the key" expandx ignorefocus
 			Group grp-flags "Flags"
 				Grid ? ""
-					Button flag-none "✂" big expandx "tooltip=Clear all flags"
-					Button flag-trill "𝆖" big expandx "tooltip=Set trill flag"
-					Button flag-staccato "." big expandx "tooltip=Set staccato flag"
-					Button flag-tenuto "_" big expandx "tooltip=Set tenuto flag"
+					Button flag-none "✂" big expandx "tooltip=Clear all flags" ignorefocus
+					Button flag-trill "𝆖" big expandx "tooltip=Set trill flag" ignorefocus
+					Button flag-staccato "." big expandx "tooltip=Set staccato flag" ignorefocus
+					Button flag-tenuto "_" big expandx "tooltip=Set tenuto flag" ignorefocus
 			Group grp_operations "Operations"
 				Grid ? ""
-					Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx
-					Button apply_string "𝄛" big "tooltip=Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)" expandx
-					Button apply_hand_position "✋" big "tooltip=Set hand position: find positions on the fretboard for the selected notes (TAB mode)" expandx
-					Button apply_pitch_shift "↕" big "tooltip=Shift the pitch up or down" expandx
+					Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus
+					Button apply_string "𝄛" big "tooltip=Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)" expandx ignorefocus
+					Button apply_hand_position "✋" big "tooltip=Set hand position: find positions on the fretboard for the selected notes (TAB mode)" expandx ignorefocus
+					Button apply_pitch_shift "↕" big "tooltip=Shift the pitch up or down" expandx ignorefocus
 					---|
-					Button add_key_change "𝄞♯" big "tooltip=Add a key change at the cursor position"
+					Button add_key_change "𝄞♯" big "tooltip=Add a key change at the cursor position" ignorefocus
 			Expander grp_input "Keyboard input"
 				Grid ? ""
 					.

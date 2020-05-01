@@ -2648,23 +2648,23 @@ Grid
 0
 0
 3
-RadioButton
-new_track_type:audio-mono
-
+ToggleButton
+type-audio-mono
+flat,huge,expandx
 0
 0
 0
-RadioButton
-new_track_type:midi
-
+ToggleButton
+type-audio-stereo
+flat,huge,expandx
 1
 0
 0
-RadioButton
-new_track_type:audio-stereo
-
+ToggleButton
+type-midi
+flat,huge,expandx
+2
 0
-1
 0
 Group
 nd_g_metronome
@@ -6646,19 +6646,19 @@ width=5
 0
 ToggleButton
 mute
-flat,height=20,expandx,padding=1
+flat,small,height=20,expandx,padding=1
 1
 0
 0
 ToggleButton
 solo
-flat,height=20,expandx,padding=1
+flat,small,height=20,expandx,padding=1
 2
 0
 0
 ToggleButton
 show-fx
-flat,height=20,expandx,padding=1
+flat,small,height=20,expandx,padding=1
 3
 0
 0
@@ -7820,21 +7820,21 @@ Speed
 new_dialog/new_dialog
 New file
 
-new_dialog/new_track_type:audio-mono
-Audio (mono)
-
-new_dialog/new_track_type:audio-stereo
-Audio (stereo)
-
-new_dialog/new_track_type:midi
-Midi
-
 new_dialog/num_bars
 10
 
 new_dialog/pattern
 
 example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
+new_dialog/type-audio-mono
+∿
+Audio (mono)
+new_dialog/type-audio-stereo
+∿∿
+Audio (stereo)
+new_dialog/type-midi
+♫
+Midi
 pause_add_dialog/duration
 1.0
 

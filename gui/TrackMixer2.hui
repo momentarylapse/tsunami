@@ -9,9 +9,9 @@ Dialog track-mixer2 ""
 					DrawingArea peaks "" width=5 noexpandx
 				Grid ? ""
 					Label ? "" width=5
-					ToggleButton mute "M" "tooltip=Mute" flat height=20 expandx padding=1
-					ToggleButton solo "S" "tooltip=Solo" flat height=20 expandx padding=1
-					ToggleButton show-fx "fx" "tooltip=Effects" flat height=20 expandx padding=1
+					ToggleButton mute "M" "tooltip=Mute" flat small height=20 expandx padding=1
+					ToggleButton solo "S" "tooltip=Solo" flat small height=20 expandx padding=1
+					ToggleButton show-fx "fx" "tooltip=Effects" flat small height=20 expandx padding=1
 					Label ? "" width=5
 			Revealer revealer-fx "" slide=right
 				Grid ? "" expandx margintop=20

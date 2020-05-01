@@ -17,8 +17,7 @@
 void set_bar_pattern(BarPattern &b, const string &pat);
 
 NewDialog::NewDialog(hui::Window *_parent):
-	hui::Window("new_dialog", _parent)
-{
+	hui::Window("new_dialog", _parent) {
 	add_string("sample_rate", "22050");
 	add_string("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
 	add_string("sample_rate", "48000");
@@ -26,7 +25,8 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_int("sample_rate", 1);
 	hide_control("nd_g_metronome_params", true);
 
-	check("new_track_type:audio-mono", true);
+	type = SignalType::AUDIO_MONO;
+	check("type-audio-mono", true);
 
 	new_bar = new Bar(1000, 4, 1);
 	set_int("num_bars", 32);
@@ -38,21 +38,17 @@ NewDialog::NewDialog(hui::Window *_parent):
 	event("hui:close", [=]{ destroy(); });
 	event("ok", [=]{ on_ok(); });
 	event("metronome", [=]{ on_metronome(); });
-	event("new_track_type:midi", [=]{ on_type_midi(); });
+	event("type-audio-mono", [=]{ on_type(SignalType::AUDIO_MONO); });
+	event("type-audio-stereo", [=]{ on_type(SignalType::AUDIO_STEREO); });
+	event("type-midi", [=]{ on_type(SignalType::MIDI); });
 	event("beats", [=]{ on_beats(); });
 	event("divisor", [=]{ on_divisor(); });
 	event("pattern", [=]{ on_pattern(); });
 	event("complex", [=]{ on_complex(); });
 }
 
-void NewDialog::on_ok()
-{
+void NewDialog::on_ok() {
 	int sample_rate = get_string("sample_rate")._int();
-	auto type = SignalType::AUDIO_MONO;
-	if (is_checked("new_track_type:midi"))
-		type = SignalType::MIDI;
-	else if (is_checked("new_track_type:audio-stereo"))
-		type = SignalType::AUDIO_STEREO;
 	Session *session = tsunami->create_session();
 	Song *song = session->song;
 	song->sample_rate = sample_rate;
@@ -79,38 +75,39 @@ void NewDialog::on_ok()
 	session->win->activate("");
 }
 
-void NewDialog::on_beats()
-{
+void NewDialog::on_beats() {
 	*new_bar = Bar(100, get_int(""), new_bar->divisor);
 	set_string("pattern", new_bar->pat_str());
 }
 
-void NewDialog::on_divisor()
-{
+void NewDialog::on_divisor() {
 	new_bar->divisor = 1 << get_int("");
 }
 
-void NewDialog::on_pattern()
-{
+void NewDialog::on_pattern() {
 	set_bar_pattern(*new_bar, get_string("pattern"));
 	set_int("beats", new_bar->beats.num);
 }
 
-void NewDialog::on_complex()
-{
+void NewDialog::on_complex() {
 	bool complex = is_checked("complex");
 	hide_control("beats", complex);
 	hide_control("pattern", !complex);
 }
 
-void NewDialog::on_metronome()
-{
-	hide_control("nd_g_metronome_params", !is_checked(""));
+void NewDialog::on_type(SignalType t) {
+	type = t;
+	check("type-audio-mono", t == SignalType::AUDIO_MONO);
+	check("type-audio-stereo", t == SignalType::AUDIO_STEREO);
+	check("type-midi", t == SignalType::MIDI);
+
+	if (t == SignalType::MIDI) {
+		check("metronome", true);
+		hide_control("nd_g_metronome_params", false);
+	}
 }
 
-void NewDialog::on_type_midi()
-{
-	check("metronome", true);
-	hide_control("nd_g_metronome_params", false);
+void NewDialog::on_metronome() {
+	hide_control("nd_g_metronome_params", !is_checked(""));
 }
 

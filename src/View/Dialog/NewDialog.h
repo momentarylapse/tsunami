@@ -13,24 +13,25 @@
 
 class Song;
 class Bar;
+enum class SignalType;
 
-class NewDialog: public hui::Window
-{
+class NewDialog: public hui::Window {
 public:
 	NewDialog(hui::Window *_parent);
 
 	Bar *new_bar;
+	SignalType type;
 
 	void load_data();
 	void apply_data();
 
+	void on_type(SignalType t);
 	void on_beats();
 	void on_complex();
 	void on_pattern();
 	void on_divisor();
 	void on_ok();
 	void on_metronome();
-	void on_type_midi();
 };
 
 #endif /* NEWDIALOG_H_ */

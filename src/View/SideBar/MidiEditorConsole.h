@@ -14,6 +14,7 @@ class TrackLayer;
 class Device;
 enum class MidiMode;
 enum class NoteBaseLength;
+enum class ChordType;
 
 class MidiEditorConsole : public SideBarConsole {
 public:
@@ -37,8 +38,8 @@ public:
 	NoteBaseLength get_base_length();
 	void on_creation_mode();
 	void on_interval();
-	void on_chord_type();
-	void on_chord_inversion();
+	void on_chord_type(ChordType t);
+	void on_chord_inversion(int i);
 	void on_reference_tracks();
 	void on_modifier(NoteModifier m);
 

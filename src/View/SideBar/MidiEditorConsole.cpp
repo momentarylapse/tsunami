@@ -52,12 +52,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	set_int("interval", view->mode_midi->midi_interval);
 
-	for (int i=0; i<(int)ChordType::NUM; i++)
-		add_string("chord_type", chord_type_name((ChordType)i));
-	set_int("chord_type", 0);
-	add_string("chord_inversion", _("Basic form"));
-	add_string("chord_inversion", _("1st inversion"));
-	add_string("chord_inversion", _("2nd inversion"));
 	set_int("chord_inversion", 0);
 
 
@@ -84,8 +78,13 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 
 	event("interval", [=]{ on_interval(); });
-	event("chord_type", [=]{ on_chord_type(); });
-	event("chord_inversion", [=]{ on_chord_inversion(); });
+	event("chord-major", [=]{ on_chord_type(ChordType::MAJOR); });
+	event("chord-minor", [=]{ on_chord_type(ChordType::MINOR); });
+	event("chord-diminished", [=]{ on_chord_type(ChordType::DIMINISHED); });
+	event("chord-augmented", [=]{ on_chord_type(ChordType::AUGMENTED); });
+	event("chord-inversion-none", [=]{ on_chord_inversion(0); });
+	event("chord-inversion-1", [=]{ on_chord_inversion(1); });
+	event("chord-inversion-2", [=]{ on_chord_inversion(2); });
 	event_x("reference_tracks", "hui:select", [=]{ on_reference_tracks(); });
 	event("modifier-none", [=]{ on_modifier(NoteModifier::NONE); });
 	event("modifier-sharp", [=]{ on_modifier(NoteModifier::SHARP); });
@@ -202,6 +201,14 @@ void MidiEditorConsole::update() {
 
 	hide_control("grid-interval", view->mode_midi->creation_mode != view->mode_midi->CreationMode::INTERVAL);
 	hide_control("grid-chord", view->mode_midi->creation_mode != view->mode_midi->CreationMode::CHORD);
+
+	check("chord-major", view->mode_midi->chord_type == ChordType::MAJOR);
+	check("chord-minor", view->mode_midi->chord_type == ChordType::MINOR);
+	check("chord-diminished", view->mode_midi->chord_type == ChordType::DIMINISHED);
+	check("chord-augmented", view->mode_midi->chord_type == ChordType::AUGMENTED);
+	check("chord-inversion-none", view->mode_midi->chord_inversion == 0);
+	check("chord-inversion-1", view->mode_midi->chord_inversion == 1);
+	check("chord-inversion-2", view->mode_midi->chord_inversion == 2);
 
 	check("modifier-none", view->mode_midi->modifier == NoteModifier::NONE);
 	check("modifier-sharp", view->mode_midi->modifier == NoteModifier::SHARP);
@@ -368,14 +375,17 @@ void MidiEditorConsole::on_creation_mode() {
 
 void MidiEditorConsole::on_interval() {
 	view->mode_midi->midi_interval = get_int("");
+	view->mode_midi->notify();
 }
 
-void MidiEditorConsole::on_chord_type() {
-	view->mode_midi->chord_type = (ChordType)get_int("");
+void MidiEditorConsole::on_chord_type(ChordType t) {
+	view->mode_midi->chord_type = t;
+	view->mode_midi->notify();
 }
 
-void MidiEditorConsole::on_chord_inversion() {
-	view->mode_midi->chord_inversion = get_int("");
+void MidiEditorConsole::on_chord_inversion(int i) {
+	view->mode_midi->chord_inversion = i;
+	view->mode_midi->notify();
 }
 
 void MidiEditorConsole::on_reference_tracks() {

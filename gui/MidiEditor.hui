@@ -6,44 +6,59 @@ Dialog midi_editor "Midi" width=300 height=516
 			Group me_group_creation "Edit mode"
 				Grid ? "" vertical
 					Grid ? ""
-						ToggleButton mode-select "I" flat expandx "tooltip=Select"
-						ToggleButton mode-note "𝅘𝅥" flat expandx "tooltip=Create single notes"
-						ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat expandx "tooltip=Create intervals"
-						ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat expandx "tooltip=Create chords"
+						ToggleButton mode-select "I" flat huge expandx "tooltip=Select"
+						ToggleButton mode-note "𝅘𝅥" flat huge expandx "tooltip=Create single notes"
+						ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create intervals"
+						ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create chords"
 					Grid grid-interval ""
-						Text ld_t_interval "Interval"
-						SpinButton interval "0" range=-99:99
-					Grid grid-chord ""
-						Text ld_t_chord "Type"
-						ComboBox chord_type "" expandx
-						---|
-						Text ld_t_inversion "Inversion"
-						ComboBox chord_inversion ""
-			Group grp-modifier "Modifier"
-				Grid ? ""
-					ToggleButton modifier-none "none" flat "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
-					ToggleButton modifier-sharp "♯" flat "tooltip=Sharp - new note is 1 semitone above the key" expandx
-					ToggleButton modifier-flat "♭" flat "tooltip=Flat - new note is 1 semitone below the key" expandx
-					ToggleButton modifier-natural "♮" flat "tooltip=Natural - new note ignores any modifiers in the key" expandx
+						SpinButton interval "0" range=-99:99 expandx "tooltip=Number of semitones above the base note"
+					Grid grid-chord "" vertical
+						Separator ? ""
+						Grid ? ""
+							ToggleButton chord-major "Maj" flat big expandx "tooltip=Major"
+							ToggleButton chord-minor "Min" flat big expandx "tooltip=Minor"
+							ToggleButton chord-diminished "Dim" flat big expandx "tooltip=Diminished"
+							ToggleButton chord-augmented "Aug" flat big expandx "tooltip=Augmented"
+							---|
+							ToggleButton chord-major7 "Maj7" flat big "tooltip=Major 7th" hidden
+							ToggleButton chord-minor7 "Min7" flat big "tooltip=Minor 7th" hidden
+						Grid ? ""
+							ToggleButton chord-inversion-none "" flat big expandx "tooltip=Regular"
+							ToggleButton chord-inversion-1 "Inv 1" flat big expandx "tooltip=1st inversion"
+							ToggleButton chord-inversion-2 "Inv 2" flat big expandx "tooltip=2nd inversion"
 			Group grp-length "Note length"
 				Grid ? ""
-					ToggleButton length-whole "𝅝" flat expandx "tooltip=Whole note"
-					ToggleButton length-half "𝅗𝅥" flat expandx "tooltip=Half note"
-					ToggleButton length-quarter "𝅘𝅥" flat expandx "tooltip=Quarter note"
-					ToggleButton length-eighth "𝅘𝅥𝅮" flat expandx "tooltip=Eighth note"
-					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat expandx "tooltip=Sixteenth note"
+					ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note"
+					ToggleButton length-half "𝅗𝅥" flat big expandx "tooltip=Half note"
+					ToggleButton length-quarter "𝅘𝅥" flat big expandx "tooltip=Quarter note (Q)"
+					ToggleButton length-eighth "𝅘𝅥𝅮" flat big expandx "tooltip=Eighth note (E)"
+					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat big expandx "tooltip=Sixteenth note (S)"
 					---|
-					ToggleButton length-dotted "." flat "tooltip=Dotted note (+50% length)"
-					ToggleButton length-triplet "𝅘𝅥𝅮/3" flat "tooltip=Triplet eighth note"
-					Button length-custom "..." flat "tooltip=Custom note length"
+					ToggleButton length-dotted "𝅘𝅥." flat big "tooltip=Dotted note (+50% length, combines with any basic note length)"
+					ToggleButton length-triplet "𝅘𝅥𝅮/₃" flat big "tooltip=Triplet note (combines with any basic note length)"
 					.
+					Button length-custom "..." flat big "tooltip=Custom note length (L,P)"
 					Text length-result "" "tooltip=Resulting note length / beat partition"
+			Group grp-modifier "Modifier"
+				Grid ? ""
+					ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx
+					ToggleButton modifier-sharp "♯" flat big "tooltip=Sharp - new note is 1 semitone above the key" expandx
+					ToggleButton modifier-flat "♭" flat big "tooltip=Flat - new note is 1 semitone below the key" expandx
+					ToggleButton modifier-natural "♮" flat big "tooltip=Natural - new note ignores any modifiers in the key" expandx
 			Group grp-flags "Flags"
 				Grid ? ""
-					Button flag-none "none" flat "tooltip=Clear all flags"
-					ToggleButton flag-trill "𝆖" flat "tooltip=Set trill flag"
-					ToggleButton flag-staccato "." flat "tooltip=Set staccato flag"
-					ToggleButton flag-tenuto "_" flat "tooltip=Set tenuto flag"
+					Button flag-none "✂" big expandx "tooltip=Clear all flags"
+					Button flag-trill "𝆖" big expandx "tooltip=Set trill flag"
+					Button flag-staccato "." big expandx "tooltip=Set staccato flag"
+					Button flag-tenuto "_" big expandx "tooltip=Set tenuto flag"
+			Group grp_operations "Operations"
+				Grid ? ""
+					Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx
+					Button apply_string "𝄛" big "tooltip=Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)" expandx
+					Button apply_hand_position "✋" big "tooltip=Set hand position: find positions on the fretboard for the selected notes (TAB mode)" expandx
+					Button apply_pitch_shift "↕" big "tooltip=Shift the pitch up or down" expandx
+					---|
+					Button add_key_change "𝄞♯" big "tooltip=Add a key change at the cursor position"
 			Expander grp_input "Keyboard input"
 				Grid ? ""
 					.
@@ -58,26 +73,8 @@ Dialog midi_editor "Midi" width=300 height=516
 					Grid ? ""
 						RadioButton input_volume:key "key speed" "tooltip=Use the key pressure of the input device"
 						RadioButton input_volume:max "maximum" "tooltip=Ignore key pressure and always use 100% volume"
-			Expander me_group_reference "Reference tracks"
+			Expander me_group_reference "Reference tracks" hidden
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
-			Expander grp_operations "Operations"
-				Grid ? "" vertical
-					Button quantize "Quantize" "tooltip=Align selected notes to grid of sub beats" expandx
-					Grid ? ""
-						Text t_string "String" hgroup=a
-						SpinButton string_no "" range=0:99 "tooltip=1=lowest string"
-						Button apply_string "apply" "tooltip=(TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch" expandx
-					Grid ? ""
-						Text t_hand "Hand" hgroup=a
-						SpinButton fret_no "" range=0:99
-						Button apply_hand_position "apply" "tooltip=(TAB mode) Find positions on the fretboard for the selected notes" expandx
-					Grid ? ""
-						Text t_pitch "Pitch" hgroup=a
-						SpinButton pitch_delta "" range=-24:24 "tooltip=Semitones - positive=up, negative=down"
-						Button apply_pitch_shift "shift" "tooltip=Shift the pitch up or down" expandx
-					Grid ? ""
-						Text t_op_add "Add" hgroup=a
-						Button add_key_change "𝄞♯" "tooltip=Add a key change at the cursor position"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

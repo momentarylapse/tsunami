@@ -1,0 +1,14 @@
+Dialog question-dialog-intint "Question" width=100 height=20
+	Grid ? "" vertical
+		Grid ? ""
+			Label question "" margin-top=8 margin-bottom=8
+			---|
+			Grid ? "" center
+				Label label1 ""
+				SpinButton value1 ""
+				---|
+				Label label2 ""
+				SpinButton value2 ""
+		Grid buttons "" buttonbar
+			Button cancel "Cancel" image=hui:cancel
+			Button ok "Ok" image=hui:ok

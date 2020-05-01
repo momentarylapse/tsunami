@@ -635,8 +635,8 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 }
 
 void ViewModeMidi::set_note_length_and_partition(int length, int partition) {
-	note_length = length;
-	sub_beat_partition = partition;
+	note_length = max(length, 1);
+	sub_beat_partition = max(partition, 1);
 	select_in_edit_cursor();
 	view->force_redraw();
 	notify();

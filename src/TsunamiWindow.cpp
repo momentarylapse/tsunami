@@ -20,6 +20,7 @@
 #include "View/Dialog/PauseAddDialog.h"
 #include "View/Dialog/PauseEditDialog.h"
 #include "View/Dialog/TrackRoutingDialog.h"
+#include "View/Dialog/QuestionDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 //#include "View/BottomBar/DeviceConsole.h"
@@ -418,24 +419,6 @@ void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nu
 	}
 }
 
-int multiple_choice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
-	int r = -1;
-	auto *dlg = new hui::Dialog(title, 200, 40, parent, false);
-	dlg->add_grid("", 0, 0, "grid");
-	dlg->set_target("grid");
-	dlg->add_label("!margin-top=8,margin-bottom=8,center\\" + text, 0, 0, "text");
-	dlg->add_grid("", 0, 1, "buttons");
-	dlg->set_target("buttons");
-	for (int i=0; i<options.num; i++) {
-		string id = format("button-%d", i);
-		dlg->add_button("!expandx,height=36\\" + options[i], i, 0, id);
-		if (tips.num > i)
-			dlg->set_tooltip(id, tips[i]);
-		dlg->event(id, [i,&r,dlg] { r = i; dlg->destroy(); });
-	}
-	dlg->run();
-	return r;
-}
 
 void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range();
@@ -449,7 +432,7 @@ void TsunamiWindow::on_track_render() {
 
 	renderer.allow_layers(view->get_playable_layers());
 	if (view->get_playable_layers() != view->sel.layers()) {
-		int answer = multiple_choice(this, _("Question"), _("Which tracks and layers should be rendered?"),
+		int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
 				{_("respecting solo and mute, ignoring selection"), _("respecting selection and mute, but ignoring solo")}, true);
 		msg_write(answer);

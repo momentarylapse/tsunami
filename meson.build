@@ -445,6 +445,7 @@ sources = [
 	'src/View/Dialog/NewDialog.cpp',
 	'src/View/Dialog/PauseAddDialog.cpp',
 	'src/View/Dialog/PauseEditDialog.cpp',
+	'src/View/Dialog/QuestionDialog.cpp',
 	'src/View/Dialog/SampleScaleDialog.cpp',
 	'src/View/Dialog/SettingsDialog.cpp',
 	'src/View/Dialog/TrackRoutingDialog.cpp',

@@ -27,11 +27,11 @@ Dialog midi_editor "Midi" width=300 height=516
 					ToggleButton modifier-natural "♮" flat "tooltip=Natural - new note ignores any modifiers in the key" expandx
 			Group grp-length "Note length"
 				Grid ? ""
-					ToggleButton length-whole "𝅝" flat "tooltip=Whole note"
-					ToggleButton length-half "𝅗𝅥" flat "tooltip=Half note"
-					ToggleButton length-quarter "𝅘𝅥" flat "tooltip=Quarter note"
-					ToggleButton length-eighth "𝅘𝅥𝅮" flat "tooltip=Eighth note"
-					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat "tooltip=Sixteenth note"
+					ToggleButton length-whole "𝅝" flat expandx "tooltip=Whole note"
+					ToggleButton length-half "𝅗𝅥" flat expandx "tooltip=Half note"
+					ToggleButton length-quarter "𝅘𝅥" flat expandx "tooltip=Quarter note"
+					ToggleButton length-eighth "𝅘𝅥𝅮" flat expandx "tooltip=Eighth note"
+					ToggleButton length-sixteenth "𝅘𝅥𝅯" flat expandx "tooltip=Sixteenth note"
 					---|
 					ToggleButton length-dotted "." flat "tooltip=Dotted note (+50% length)"
 					ToggleButton length-triplet "𝅘𝅥𝅮/3" flat "tooltip=Triplet eighth note"
@@ -77,7 +77,7 @@ Dialog midi_editor "Midi" width=300 height=516
 						Button apply_pitch_shift "shift" "tooltip=Shift the pitch up or down" expandx
 					Grid ? ""
 						Text t_op_add "Add" hgroup=a
-						Button add_key_change "𝄞" "tooltip=Add a key change at the cursor position"
+						Button add_key_change "𝄞♯" "tooltip=Add a key change at the cursor position"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

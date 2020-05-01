@@ -22,6 +22,7 @@
 #include "../../Device/Device.h"
 #include "MidiEditorConsole.h"
 #include "../Dialog/MarkerDialog.h"
+#include "../Dialog/QuestionDialog.h"
 
 //int get_track_index_save(Song *song, Track *t);
 
@@ -321,7 +322,10 @@ void MidiEditorConsole::on_length_triplet() {
 	on_base_length(l);
 }
 
-void MidiEditorConsole::on_length_custom() {}
+void MidiEditorConsole::on_length_custom() {
+	auto r = QuestionDialogIntInt::ask(win, _("Custom note length and beat sub-partitions (of quarter notes):"), {_("Length"), _("Partition")}, {"range=1:20", "range=1:20"});
+	view->mode_midi->set_note_length_and_partition(r.first, r.second);
+}
 
 void MidiEditorConsole::on_layer_delete() {
 	set_layer(nullptr);

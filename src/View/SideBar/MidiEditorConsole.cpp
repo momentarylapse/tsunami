@@ -331,6 +331,8 @@ void MidiEditorConsole::on_length_triplet() {
 
 void MidiEditorConsole::on_length_custom() {
 	auto r = QuestionDialogIntInt::ask(win, _("Custom note length and beat sub-partitions (of quarter notes):"), {_("Length"), _("Partition")}, {"range=1:20", "range=1:20"});
+	if (QuestionDialogIntInt::aborted)
+		return;
 	view->mode_midi->set_note_length_and_partition(r.first, r.second);
 }
 
@@ -512,7 +514,9 @@ void MidiEditorConsole::on_quantize() {
 }
 
 void MidiEditorConsole::on_apply_string() {
-	int string_no = get_int("string_no") - 1;
+	int string_no = QuestionDialogInt::ask(win, _("Move selected notes to which string?"), "range=1:20") - 1;
+	if (QuestionDialogInt::aborted)
+		return;
 
 	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
@@ -522,7 +526,9 @@ void MidiEditorConsole::on_apply_string() {
 }
 
 void MidiEditorConsole::on_apply_hand_position() {
-	int hand_position = get_int("fret_no");
+	int hand_position = QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), "range=0:99");
+	if (QuestionDialogInt::aborted)
+		return;
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
 	song->begin_action_group();
@@ -539,7 +545,9 @@ void MidiEditorConsole::on_apply_hand_position() {
 }
 
 void MidiEditorConsole::on_apply_pitch_shift() {
-	int delta = get_int("pitch_delta");
+	int delta = QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), "range=-99:99");
+	if (QuestionDialogInt::aborted)
+		return;
 
 	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);

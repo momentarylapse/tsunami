@@ -14,6 +14,7 @@ class QuestionDialogInt : hui::Dialog {
 public:
 	QuestionDialogInt(hui::Window *_parent, const string &question, const string &options = "");
 	int result;
+	static bool aborted;
 	static int ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
@@ -22,6 +23,7 @@ class QuestionDialogIntInt : hui::Dialog {
 public:
 	QuestionDialogIntInt(hui::Window *_parent, const string &question, const Array<string> &labels, const Array<string> &options);
 	int result1, result2;
+	static bool aborted;
 	static std::pair<int,int> ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options);
 };
 

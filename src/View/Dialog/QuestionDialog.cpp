@@ -7,15 +7,20 @@
 
 #include "QuestionDialog.h"
 
+
+bool QuestionDialogInt::aborted;
+bool QuestionDialogIntInt::aborted;
+
 QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options) : hui::Dialog(_("Question"), 100, 20, _parent, false){
 	result = 0;
+	aborted = true;
 	from_resource("question-dialog-int");
 	set_string("question", question);
 	set_options("value", options);
 
 	event("value", [=]{ result = get_int("value"); });
 	event("cancel", [=]{ destroy(); });
-	event("ok", [=]{ destroy(); });
+	event("ok", [=]{ aborted = false; destroy(); });
 }
 
 int QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
@@ -37,6 +42,7 @@ int QuestionDialogInt::ask(hui::Window *parent, const string &question, const st
 QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &question, const Array<string> &labels, const Array<string> &options) : hui::Dialog(_("Question"), 100, 20, _parent, false){
 	result1 = 0;
 	result2 = 0;
+	aborted = true;
 	from_resource("question-dialog-intint");
 	set_string("question", question);
 	set_string("label1", labels[0]);
@@ -47,7 +53,7 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 	event("value1", [=]{ result1 = get_int("value1"); });
 	event("value2", [=]{ result2 = get_int("value2"); });
 	event("cancel", [=]{ destroy(); });
-	event("ok", [=]{ destroy(); });
+	event("ok", [=]{ aborted = false; destroy(); });
 }
 
 std::pair<int,int> QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options) {

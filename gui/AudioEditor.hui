@@ -1,10 +1,13 @@
 Dialog audio-editor "Audio" width=300 height=516
 	Grid ? "" vertical
-		Group me_group_creation "Creation"
-			Grid ? "" vertical
-				TabControl edit-mode "Select\\Smoothen\\Clone\\Rubber Band" left
+		Group group-mode "Edit mode"
+			Grid ? ""
+				ToggleButton mode-select "I" flat huge expandx "tooltip=Select" ignorefocus
+				ToggleButton mode-smoothen "Sm" flat huge expandx "tooltip=Smoothen out... TODO" ignorefocus
+				ToggleButton mode-clone "" image=hui:copy flat huge expandx "tooltip=Copy/paste chunks of audio" ignorefocus
+				ToggleButton mode-rubber "↔" flat huge expandx "tooltip=Rubber band stretching" ignorefocus
 		Text ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
-				Button /edit_track "Track" link
+				Button /edit_song "File" link ignorefocus
+				Button /edit_track "Track" link ignorefocus

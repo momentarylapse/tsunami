@@ -34,21 +34,39 @@ vertical
 0
 3
 Group
-me_group_creation
+group-mode
 
 0
 0
 1
 Grid
 ?
-vertical
+
 0
 0
+4
+ToggleButton
+mode-select
+flat,huge,expandx,ignorefocus
+0
+0
+0
+ToggleButton
+mode-smoothen
+flat,huge,expandx,ignorefocus
 1
-TabControl
-edit-mode
-left
 0
+0
+ToggleButton
+mode-clone
+image=hui:copy,flat,huge,expandx,ignorefocus
+2
+0
+0
+ToggleButton
+mode-rubber
+flat,huge,expandx,ignorefocus
+3
 0
 0
 Text
@@ -71,13 +89,13 @@ Grid
 2
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
 Button
 edit_track
-link
+link,ignorefocus
 1
 0
 0
@@ -545,19 +563,19 @@ Grid
 3
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
 Button
 edit_track
-link
+link,ignorefocus
 1
 0
 0
 Button
 edit_fx
-link
+link,ignorefocus
 2
 0
 0
@@ -6862,7 +6880,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-552
+555
 # Text
 /bars-add
 Add bars...
@@ -7146,15 +7164,24 @@ Undo
 audio-editor/audio-editor
 Audio
 
-audio-editor/edit-mode
-Select\\Smoothen\\Clone\\Rubber Band
-
 audio-editor/group-edit
 Edit
 
-audio-editor/me_group_creation
-Creation
+audio-editor/group-mode
+Edit mode
 
+audio-editor/mode-clone
+
+Copy/paste chunks of audio
+audio-editor/mode-rubber
+↔
+Rubber band stretching
+audio-editor/mode-select
+I
+Select
+audio-editor/mode-smoothen
+Sm
+Smoothen out... TODO
 bar_add_dialog/bad_t_beats
 Beats
 

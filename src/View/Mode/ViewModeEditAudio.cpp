@@ -180,6 +180,8 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 
 void ViewModeEditAudio::set_edit_mode(EditMode mode) {
 	edit_mode = mode;
+	view->force_redraw();
+	notify();
 }
 
 
@@ -353,6 +355,6 @@ void ViewModeEditAudio::apply_rubber(bool pitch_correct) {
 string ViewModeEditAudio::get_tip() {
 	if (edit_mode == EditMode::RUBBER)
 		return "...click -> drag/add point ....    X -> delete point   SHIFT+X -> clear   RETURN -> apply on selected range  RETURN+SHIFT -> apply with pitch...";
-	return "AAAAAAAAAAA  audio editing!!!!!!    W,S -> radius";
+	return "AAAAAAAAAAA  audio editing!!!!!!    W,S -> radius    track ALT+(↑,↓)";
 }
 

@@ -1202,7 +1202,7 @@ void AudioView::draw_song(Painter *c) {
 
 	tip = mode->get_tip();
 	if (tip.num > 0)
-		draw_boxed_str(c, song_area().mx(), area.y2 - 30, tip, colors.text_soft1, colors.background_track_selected, 0);
+		draw_boxed_str(c, song_area().mx(), area.y2 - 50, tip, colors.text_soft1, colors.background_track_selected, 0);
 
 
 	if (message.ttl > 0) {

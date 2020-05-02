@@ -15,14 +15,17 @@ class TrackLayer;
 class AudioEditorConsole : public SideBarConsole {
 public:
 	AudioEditorConsole(Session *session);
+	virtual ~AudioEditorConsole();
 
 	void on_layer_delete();
 	void on_view_cur_layer_change();
 
-	void on_edit_mode();
+	void on_edit_mode(int mode);
 
 	void clear();
 	void set_layer(TrackLayer *t);
+
+	void update();
 
 
 	string id_inner;

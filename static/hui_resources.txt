@@ -2511,7 +2511,7 @@ Grid
 2
 Slider
 output-volume
-vertical,width=50,expandy
+vertical,width=50,expandy,ignorefocus
 0
 0
 0
@@ -2535,7 +2535,7 @@ expandy
 0
 ToggleButton
 link-volumes
-flat
+flat,ignorefocus
 1
 0
 0
@@ -6659,7 +6659,7 @@ center,bold,marginbottom=5
 0
 Slider
 panning
-range=-1:1:0.01,expandx,origin=no
+range=-1:1:0.01,expandx,origin=no,ignorefocus
 1
 0
 0
@@ -6671,7 +6671,7 @@ Grid
 2
 Slider
 volume
-range=0:1:0.001,vertical,width=80,expandy
+range=0:1:0.001,vertical,width=80,expandy,ignorefocus
 0
 0
 0

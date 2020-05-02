@@ -14,6 +14,7 @@
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../Mode/ViewModeCurve.h"
+#include "../Mode/ViewModeEdit.h"
 #include "../Painter/BufferPainter.h"
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"
@@ -504,10 +505,11 @@ bool AudioViewLayer::on_left_button_down() {
 
 // TODO put somewhere more reasonable
 bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
-	if (view->mode == view->mode_midi)
-		if (view->hover().type == HoverData::Type::MIDI_PITCH)
-			if (view->mode_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
-				return true;
+	if (view->mode == view->mode_edit)
+		if (view->mode_edit->mode == view->mode_midi)
+			if (view->hover().type == HoverData::Type::MIDI_PITCH)
+				if (view->mode_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
+					return true;
 	if (view->mode == view->mode_curve)
 		if (view->hover().type == HoverData::Type::CURVE_POINT)
 			return true;

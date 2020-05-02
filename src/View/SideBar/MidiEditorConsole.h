@@ -15,6 +15,7 @@ class Device;
 enum class MidiMode;
 enum class NoteBaseLength;
 enum class ChordType;
+class ViewModeMidi;
 
 class MidiEditorConsole : public SideBarConsole {
 public:
@@ -63,10 +64,8 @@ public:
 	void clear();
 	void set_layer(TrackLayer *t);
 
-
-	string id_inner;
-
 	TrackLayer *layer;
+	ViewModeMidi *mode;
 };
 
 #endif /* MIDIEDITORCONSOLE_H_ */

@@ -28,6 +28,7 @@
 #include "View/SideBar/CaptureConsole.h"
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeMidi.h"
+#include "View/Mode/ViewModeEdit.h"
 #include "View/Mode/ViewModeCapture.h"
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
@@ -113,8 +114,17 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-add-beats", [=]{ on_add_time_track(); });
 	event("track-add-midi", [=]{ on_add_midi_track(); });
 	event("track-delete", [=]{ on_delete_track(); });
-	event("layer-edit-midi", [=]{ on_track_edit_midi(); });
-	set_key_code("layer-edit-midi", hui::KEY_ALT + hui::KEY_E);
+	//event("layer-edit-midi", [=]{ on_track_edit_midi(); });
+	//set_key_code("layer-edit-midi", hui::KEY_ALT + hui::KEY_E);
+	event("mode-edit-check", [=]{
+		if (view->mode == view->mode_edit)
+			session->set_mode("default");
+		else
+			session->set_mode("edit-track");
+	});
+	event("layer-edit", [=]{ on_track_edit_midi(); });
+	event("mode-edit", [=]{ on_track_edit_midi(); });
+	set_key_code("mode-edit", hui::KEY_ALT + hui::KEY_E);
 	event("track-edit-fx", [=]{ on_track_edit_fx(); });
 	event("track-add-marker", [=]{ on_track_add_marker(); });
 	event("track-convert-mono", [=]{ on_track_convert_mono(); });
@@ -474,7 +484,7 @@ void TsunamiWindow::on_delete_track() {
 }
 
 void TsunamiWindow::on_track_edit_midi() {
-	session->set_mode("midi");
+	session->set_mode("edit-track");
 }
 
 void TsunamiWindow::on_track_edit_fx() {
@@ -951,6 +961,9 @@ void TsunamiWindow::update_menu() {
 	enable("copy", app->clipboard->can_copy(view));
 	enable("paste", app->clipboard->has_data());
 	enable("delete", !view->sel.is_empty());
+
+	check("mode-edit-check", view->mode == view->mode_edit);
+
 	// file
 	//Enable("export_selection", true);
 	// bars

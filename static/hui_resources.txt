@@ -32,25 +32,7 @@ Grid
 vertical
 0
 0
-4
-Grid
-grid-no
-
-0
-0
-1
-Text
-t-no-audio
-expandx,center,italic
-0
-0
-0
-Grid
-grid-yes
-vertical
-1
-0
-1
+3
 Group
 me_group_creation
 
@@ -72,13 +54,13 @@ left
 Text
 ?
 expandy
-2
+1
 0
 0
 Group
 group-edit
 
-3
+2
 0
 1
 Grid
@@ -1923,25 +1905,7 @@ Grid
 vertical
 0
 0
-4
-Grid
-me_grid_no
-
-0
-0
-1
-Text
-ld_t_no_midi
-expandx,center,italic
-0
-0
-0
-Grid
-me_grid_yes
-vertical
-1
-0
-7
+9
 Group
 me_group_creation
 
@@ -2335,13 +2299,13 @@ height=200,noexpandy,nobar,select-multi
 Text
 ?
 expandy
-2
+7
 0
 0
 Group
 me_group_edit
 
-3
+8
 0
 1
 Grid
@@ -3477,7 +3441,7 @@ buffer-make-movable
 0
 0
 Item
-buffer-edit
+layer-edit
 
 3
 0
@@ -3871,7 +3835,7 @@ layer-add
 0
 0
 Item
-layer-edit-midi
+layer-edit
 
 4
 0
@@ -5044,7 +5008,7 @@ track-edit-fx
 0
 0
 Item
-layer-edit-midi
+layer-edit
 
 6
 0
@@ -6317,7 +6281,7 @@ toolbar
 
 0
 0
-15
+17
 Item
 new
 image=hui:new,important
@@ -6406,6 +6370,18 @@ Item
 record
 image=hui:media-record,important
 14
+0
+0
+Separator
+
+
+15
+0
+0
+Item
+mode-edit-check
+image=hui:edit,important,checkable
+16
 0
 0
 # Resource
@@ -6831,7 +6807,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-550
+548
 # Text
 /bars-add
 Add bars...
@@ -6850,9 +6826,6 @@ Scale
 scale selected bars (by moving the selection on the left)
 /buffer-delete
 Delete
-
-/buffer-edit
-Edit
 
 /buffer-make-movable
 Make movable
@@ -6923,8 +6896,8 @@ Delete
 /layer-down
 Go down one track
 
-/layer-edit-midi
-Edit midi
+/layer-edit
+Edit contents
 
 /layer-make-track
 Turn into track
@@ -7126,9 +7099,6 @@ Edit
 
 audio-editor/me_group_creation
 Creation
-
-audio-editor/t-no-audio
-No audio track selected
 
 bar_add_dialog/bad_t_beats
 Beats
@@ -7664,9 +7634,6 @@ Ignore key pressure and always use 100% volume
 midi_editor/interval
 0
 Number of semitones above the base note
-midi_editor/ld_t_no_midi
-No midi track selected
-
 midi_editor/length-custom
 ...
 Custom note length (L,P)
@@ -8399,6 +8366,9 @@ load parameter
 synth_panel/save_favorite
 
 load parameter
+toolbar/mode-edit-check
+Edit
+
 track-mixer2/add-fx
 
 Add new effect

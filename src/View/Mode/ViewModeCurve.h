@@ -17,6 +17,8 @@ class ViewModeCurve : public ViewModeDefault
 public:
 	ViewModeCurve(AudioView *view);
 
+	void on_start() override;
+
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
 	void on_key_down(int k) override;
 

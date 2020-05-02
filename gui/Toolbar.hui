@@ -14,3 +14,5 @@ Toolbar toolbar ""
 	Item /pause "Pause" image=hui:media-pause
 	Item /stop "Stop" image=hui:media-stop
 	Item /record "Record" image=hui:media-record important
+	Separator
+	Item mode-edit-check "Edit" image=hui:edit important checkable

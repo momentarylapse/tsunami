@@ -462,6 +462,7 @@ sources = [
 	'src/View/Mode/ViewModeCapture.cpp',
 	'src/View/Mode/ViewModeCurve.cpp',
 	'src/View/Mode/ViewModeDefault.cpp',
+	'src/View/Mode/ViewModeEdit.cpp',
 	'src/View/Mode/ViewModeEditAudio.cpp',
 	'src/View/Mode/ViewModeMidi.cpp',
 	'src/View/Mode/ViewModeScaleBars.cpp',

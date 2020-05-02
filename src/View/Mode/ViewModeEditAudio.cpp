@@ -69,7 +69,6 @@ ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 	ViewModeDefault(view)
 {
 	edit_mode = EditMode::SELECT;
-	side_bar_console = SideBar::AUDIO_EDITOR_CONSOLE;
 	
 	edit_radius = 50;
 }
@@ -79,6 +78,7 @@ ViewModeEditAudio::~ViewModeEditAudio() {
 
 
 void ViewModeEditAudio::on_start() {
+	set_side_bar(SideBar::AUDIO_EDITOR_CONSOLE);
 }
 void ViewModeEditAudio::on_end() {
 }

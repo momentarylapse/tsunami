@@ -23,11 +23,11 @@ class MidiInput;
 class Device;
 class SignalChain;
 class Scale;
+class ViewModeEdit;
 enum class NoteModifier;
 enum class ChordType;
 
-class ViewModeMidi : public ViewModeDefault
-{
+class ViewModeMidi : public ViewModeDefault {
 public:
 	ViewModeMidi(AudioView *view);
 	virtual ~ViewModeMidi();

@@ -203,7 +203,7 @@ void TrackConsole::on_edit_curves() {
 }
 
 void TrackConsole::on_edit_midi() {
-	session->set_mode("midi");
+	session->set_mode("edit-track");
 }
 
 void TrackConsole::on_edit_midi_fx() {

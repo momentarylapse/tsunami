@@ -141,7 +141,6 @@ int CaptureTrackData::get_sync_delay() {
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
-	side_bar_console = SideBar::CAPTURE_CONSOLE;
 	chain = nullptr;
 }
 
@@ -150,6 +149,7 @@ ViewModeCapture::~ViewModeCapture() {
 }
 
 void ViewModeCapture::on_start() {
+	set_side_bar(SideBar::CAPTURE_CONSOLE);
 }
 
 void ViewModeCapture::on_end() {

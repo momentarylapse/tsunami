@@ -1,0 +1,129 @@
+/*
+ * ViewModeEdit.cpp
+ *
+ *  Created on: May 1, 2020
+ *      Author: michi
+ */
+
+#include "ViewModeEdit.h"
+#include "ViewModeMidi.h"
+#include "ViewModeEditAudio.h"
+#include "../AudioView.h"
+#include "../Node/AudioViewLayer.h"
+#include "../../Data/base.h"
+#include "../../Data/Track.h"
+
+ViewModeEdit::ViewModeEdit(AudioView *view) : ViewModeDefault(view) {
+	mode = view->mode_midi;
+}
+
+ViewModeEdit::~ViewModeEdit() {
+}
+
+void ViewModeEdit::on_start() {
+	set_mode(suggest_mode());
+	mode->on_start();
+}
+
+void ViewModeEdit::on_end() {
+	mode->on_end();
+}
+
+void ViewModeEdit::on_key_down(int k) {
+
+	if (k == hui::KEY_UP + hui::KEY_ALT)
+		view->move_to_layer(-1);
+	if (k == hui::KEY_DOWN + hui::KEY_ALT)
+		view->move_to_layer(1);
+
+	mode->on_key_down(k);
+}
+
+void ViewModeEdit::on_command(const string &id) {
+	mode->on_command(id);
+}
+
+float ViewModeEdit::layer_suggested_height(AudioViewLayer *l) {
+	return mode->layer_suggested_height(l);
+}
+
+void ViewModeEdit::set_mode(ViewMode *m) {
+	if (mode == m)
+		return;
+	if (view->mode == this)
+		mode->on_end();
+	mode = m;
+	if (view->mode == this)
+		mode->on_start();
+	//win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
+	notify();
+}
+
+void ViewModeEdit::on_cur_layer_change() {
+	view->thm.dirty = true;
+	set_mode(suggest_mode());
+	mode->on_cur_layer_change();
+}
+
+ViewMode *ViewModeEdit::suggest_mode() {
+	if (view->cur_track()->type == SignalType::MIDI)
+		return view->mode_midi;
+	if (view->cur_track()->type == SignalType::AUDIO)
+		return view->mode_edit_audio;
+	return view->mode_midi; // TODO dummy mode...
+}
+
+
+bool ViewModeEdit::editing(AudioViewLayer *l) {
+	if (view->mode != this)
+		return false;
+	if (l != view->cur_vlayer())
+		return false;
+	if (l->track()->type != SignalType::MIDI)
+		return false;
+	return true;
+}
+
+void ViewModeEdit::draw_layer_background(Painter *c, AudioViewLayer *l) {
+	mode->draw_layer_background(c, l);
+}
+
+void ViewModeEdit::draw_post(Painter *c) {
+	mode->draw_post(c);
+
+	auto *l = view->cur_vlayer();
+
+
+	// layer border
+	color col = view->colors.text;
+	col.a = 0.1f;
+	float d = 12;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
+	d = 2;
+	col.a = 0.7f;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
+}
+
+HoverData ViewModeEdit::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
+	return mode->get_hover_data(vlayer, mx, my);
+}
+
+SongSelection ViewModeEdit::get_selection_for_rect(const Range &r, int y0, int y1) {
+	return mode->get_selection_for_rect(r, y0, y1);
+}
+
+SongSelection ViewModeEdit::get_selection_for_range(const Range &r) {
+	return mode->get_selection_for_range(r);
+}
+
+void ViewModeEdit::left_click_handle_void(AudioViewLayer *vlayer) {
+	mode->left_click_handle_void(vlayer);
+}
+
+string ViewModeEdit::get_tip() {
+	return mode->get_tip();
+}

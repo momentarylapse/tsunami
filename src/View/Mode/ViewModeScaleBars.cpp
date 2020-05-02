@@ -18,6 +18,7 @@ ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 {}
 
 void ViewModeScaleBars::on_start() {
+	set_side_bar(-1);
 	start_scaling(view->sel.bar_indices(view->song));
 }
 

@@ -10,7 +10,7 @@ Menu popup-menu-track ""
 		Item /track-midi-mode-tab "Tabulature" checkable
 		Item /track-midi-mode-classical "Classical" checkable
 	Item /track-edit-fx "Edit effects"
-	Item /layer-edit-midi "Edit midi"
+	Item /layer-edit "Edit contents"
 	Item /track-muted "Muted" checkable
 	Item /track-solo "Solo" checkable
 	Item /track-explode "Explode" checkable

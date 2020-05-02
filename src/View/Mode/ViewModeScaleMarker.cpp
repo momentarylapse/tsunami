@@ -23,6 +23,7 @@ ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 }
 
 void ViewModeScaleMarker::on_start() {
+	set_side_bar(-1);
 	scaling = false;
 	layer = view->hover_before_leave.layer();
 	marker = view->hover_before_leave.marker;

@@ -6,7 +6,7 @@
  */
 
 #include "ViewModeMidi.h"
-
+#include "ViewModeEdit.h"
 #include "../../Module/SignalChain.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiRecorder.h"
@@ -101,8 +101,6 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	maximize_input_volume = true;
 
 	mouse_pre_moving_pos = -1;
-
-	side_bar_console = SideBar::MIDI_EDITOR_CONSOLE;
 }
 
 ViewModeMidi::~ViewModeMidi() {
@@ -137,13 +135,7 @@ void ViewModeMidi::set_input_mode(InputMode _mode) {
 }
 
 bool ViewModeMidi::editing(AudioViewLayer *l) {
-	if (view->mode != this)
-		return false;
-	if (l != view->cur_vlayer())
-		return false;
-	if (l->layer->type != SignalType::MIDI)
-		return false;
-	return true;
+	return view->mode_edit->editing(l);
 }
 
 TrackLayer* ViewModeMidi::cur_layer() {
@@ -244,6 +236,7 @@ Device *ViewModeMidi::input_device() {
 }
 
 void ViewModeMidi::on_start() {
+	set_side_bar(SideBar::MIDI_EDITOR_CONSOLE);
 	preview = new MidiPreview(view->session, (Synthesizer*)cur_vlayer()->layer->track->synth->copy());
 	preview->set_input_device(input_wanted_device);
 	if (input_wanted_active)
@@ -549,11 +542,6 @@ void ViewModeMidi::on_key_down(int k) {
 	//if (k == hui::KEY_ESCAPE)
 	//	session->set_mode("default");
 
-	if (k == hui::KEY_UP + hui::KEY_ALT)
-		view->move_to_layer(-1);
-	if (k == hui::KEY_DOWN + hui::KEY_ALT)
-		view->move_to_layer(1);
-
 	ViewModeDefault::on_key_down(k);
 }
 
@@ -800,20 +788,6 @@ void ViewModeMidi::draw_post(Painter *c) {
 	}
 	c->set_clip(xxx);
 	c->set_fill(true);
-
-
-	// layer border
-	color col = view->colors.text;
-	col.a = 0.1f;
-	float d = 12;
-	c->set_color(col);
-	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
-	d = 2;
-	col.a = 0.7f;
-	c->set_color(col);
-	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
 }
 
 string ViewModeMidi::get_tip() {

@@ -32,7 +32,6 @@ void AudioEditorConsole::on_view_cur_layer_change() {
 
 void AudioEditorConsole::on_edit_mode() {
 	int n = get_int("");
-	msg_write(n);
 	if (n == 0)
 		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::SELECT);
 	if (n == 1)

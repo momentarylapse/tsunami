@@ -7,6 +7,8 @@
 
 #include "ViewMode.h"
 #include "../AudioView.h"
+#include "../SideBar/SideBar.h"
+#include "../../TsunamiWindow.h"
 
 ViewMode::ViewMode(AudioView *_view) {
 	view = _view;
@@ -14,7 +16,6 @@ ViewMode::ViewMode(AudioView *_view) {
 	session = view->session;
 	win = view->win;
 	song = view->song;
-	side_bar_console = -1;
 }
 
 HoverData &ViewMode::hover() {
@@ -49,4 +50,11 @@ SongSelection ViewMode::get_selection_for_rect(const Range &r, int y0, int y1) {
 
 SongSelection ViewMode::get_selection_for_track_rect(const Range &r, int y0, int y1) {
 	return SongSelection();
+}
+
+void ViewMode::set_side_bar(int console) {
+	if (console >= 0)
+		win->side_bar->open(console);
+	else
+		win->side_bar->_hide();
 }

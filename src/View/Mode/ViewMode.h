@@ -81,7 +81,7 @@ public:
 	TsunamiWindow *win;
 	Song *song;
 
-	int side_bar_console;
+	void set_side_bar(int console);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODE_H_ */

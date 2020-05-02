@@ -18,6 +18,7 @@
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeCapture.h"
 #include "View/Mode/ViewModeCurve.h"
+#include "View/Mode/ViewModeEdit.h"
 #include "View/Mode/ViewModeEditAudio.h"
 #include "View/Mode/ViewModeMidi.h"
 #include "View/Mode/ViewModeScaleBars.h"
@@ -134,22 +135,14 @@ void Session::set_mode(const string &mode) {
 		win->side_bar->_hide();
 	} else if (mode == "capture") {
 		view->set_mode(view->mode_capture);
-		win->side_bar->open(SideBar::CAPTURE_CONSOLE);
-	} else if (mode == "audio") {
-		view->set_mode(view->mode_edit_audio);
-		win->side_bar->open(SideBar::AUDIO_EDITOR_CONSOLE);
-	} else if (mode == "midi") {
-		view->set_mode(view->mode_midi);
-		win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
+	} else if (mode == "edit-track") {
+		view->set_mode(view->mode_edit);
 	} else if (mode == "scale-bars") {
 		view->set_mode(view->mode_scale_bars);
-		win->side_bar->_hide();
 	} else if (mode == "scale-marker") {
 		view->set_mode(view->mode_scale_marker);
-		win->side_bar->_hide();
 	} else if (mode == "curves") {
 		view->set_mode(view->mode_curve);
-		win->side_bar->open(SideBar::CURVE_CONSOLE);
 	} else if (mode == "default/track") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::TRACK_CONSOLE);

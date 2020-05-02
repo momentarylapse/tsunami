@@ -40,6 +40,7 @@ class ViewMode;
 class ViewModeDefault;
 class ViewModeEditAudio;
 class ViewModeMidi;
+class ViewModeEdit;
 class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
@@ -221,6 +222,7 @@ public:
 	ViewModeDefault *mode_default;
 	ViewModeEditAudio *mode_edit_audio;
 	ViewModeMidi *mode_midi;
+	ViewModeEdit *mode_edit;
 	ViewModeScaleBars *mode_scale_bars;
 	ViewModeCurve *mode_curve;
 	ViewModeCapture *mode_capture;

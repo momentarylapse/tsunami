@@ -60,21 +60,21 @@ Dialog midi_editor "Midi" width=300 height=516
 			Grid ? ""
 				.
 				Grid ? ""
-					CheckBox input_active "Active"
-					CheckBox input_capture "Capture"
+					CheckBox input_active "Active" ignorefocus
+					CheckBox input_capture "Capture" ignorefocus
 				---|
 				Text t_input "Source"
-				ComboBox input "" expandx
+				ComboBox input "" expandx ignorefocus
 				---|
 				Text t_input_volume "Volume"
 				Grid ? ""
-					RadioButton input_volume:key "key speed" "tooltip=Use the key pressure of the input device"
-					RadioButton input_volume:max "maximum" "tooltip=Ignore key pressure and always use 100% volume"
+					RadioButton input_volume:key "key speed" "tooltip=Use the key pressure of the input device" ignorefocus
+					RadioButton input_volume:max "maximum" "tooltip=Ignore key pressure and always use 100% volume" ignorefocus
 		Expander me_group_reference "Reference tracks" hidden
 			ListView reference_tracks "" height=200 noexpandy nobar select-multi
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
-				Button /edit_track "Track" link
-				Button /edit_midi_fx "Midi-Fx" link
+				Button /edit_song "File" link ignorefocus
+				Button /edit_track "Track" link ignorefocus
+				Button /edit_midi_fx "Midi-Fx" link ignorefocus

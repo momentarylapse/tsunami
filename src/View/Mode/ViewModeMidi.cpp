@@ -274,20 +274,20 @@ public:
 		pos0 = vlayer->view->hover().pos;
 	}
 	void on_start() override {
-		view->mode_midi->start_midi_preview(pitch, 1.0f);
+		view->mode_edit_midi->start_midi_preview(pitch, 1.0f);
 	}
 	void on_finish() override {
 		auto notes = get_creation_notes();
 
 		if (notes.num > 0) {
 			view->set_cursor_pos(notes[0]->range.end());
-			view->mode_midi->select_in_edit_cursor();
+			view->mode_edit_midi->select_in_edit_cursor();
 			vlayer->layer->add_midi_notes(notes);
 			notes.clear(); // all notes owned by track now
 		}
 	}
 	void on_clean_up() override {
-		view->mode_midi->preview->end();
+		view->mode_edit_midi->preview->end();
 	}
 	void on_draw_post(Painter *c) override {
 		auto *mp = midi_context(vlayer);
@@ -302,7 +302,7 @@ public:
 
 		// align to beats
 		if (view->song->bars.num > 0)
-			align_to_beats(view->song, r, view->mode_midi->sub_beat_partition);
+			align_to_beats(view->song, r, view->mode_edit_midi->sub_beat_partition);
 
 		// collision?
 		Range allowed = get_allowed_midi_range(vlayer->layer, pitch, pos0);

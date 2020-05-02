@@ -32,12 +32,6 @@ public:
 	void on_edit_tuning();
 	void on_select_synth();
 
-	void on_edit_song();
-	void on_edit_fx();
-	void on_edit_curves();
-	void on_edit_midi();
-	void on_edit_midi_fx();
-
 	void set_track(Track *t);
 
 	void on_view_cur_track_change();

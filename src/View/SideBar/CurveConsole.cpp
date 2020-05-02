@@ -66,9 +66,9 @@ CurveConsole::CurveConsole(Session *session) :
 	event("target", [=]{ on_target(); });
 	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
-	event("edit_song", [=]{ on_edit_song(); });
-	event("edit_track", [=]{ on_edit_track(); });
-	event("edit_fx", [=]{ on_edit_fx(); });
+	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_track", [=]{ session->set_mode("default/track"); });
+	event("edit_fx", [=]{ session->set_mode("default/fx"); });
 
 }
 
@@ -172,18 +172,6 @@ void CurveConsole::on_list_edit() {
 		song->edit_curve(curves[n], name, min, max);
 	}
 	view->force_redraw();
-}
-
-void CurveConsole::on_edit_song() {
-	session->set_mode("default/song");
-}
-
-void CurveConsole::on_edit_track() {
-	session->set_mode("default/track");
-}
-
-void CurveConsole::on_edit_fx() {
-	session->set_mode("default/fx");
 }
 
 Curve* CurveConsole::curve() {

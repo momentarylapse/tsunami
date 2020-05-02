@@ -14,6 +14,7 @@
 class Song;
 class SongConsole;
 class TrackConsole;
+class DummyEditorConsole;
 class AudioEditorConsole;
 class MidiEditorConsole;
 class SampleRefConsole;
@@ -39,6 +40,7 @@ public:
 		SONG_CONSOLE,
 		SAMPLE_CONSOLE,
 		TRACK_CONSOLE,
+		DUMMY_EDITOR_CONSOLE,
 		AUDIO_EDITOR_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
 		CURVE_CONSOLE,
@@ -57,6 +59,7 @@ public:
 
 	SongConsole *song_console;
 	TrackConsole *track_console;
+	DummyEditorConsole *dummy_editor_console;
 	AudioEditorConsole *audio_editor_console;
 	MidiEditorConsole *midi_editor_console;
 	CurveConsole *curve_console;

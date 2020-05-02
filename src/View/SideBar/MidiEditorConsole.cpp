@@ -48,7 +48,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 {
 	from_resource("midi_editor");
 
-	mode = view->mode_midi;
+	mode = view->mode_edit_midi;
 	set_int("interval", mode->midi_interval);
 
 	set_int("chord_inversion", 0);
@@ -99,9 +99,9 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("flag-staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
 	event("flag-tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("add_key_change", [=]{ on_add_key_change(); });
-	event("edit_track", [=]{ on_edit_track(); });
-	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
-	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_track", [=]{ session->set_mode("default/track"); });
+	event("edit_midi_fx", [=]{ session->set_mode("default/midi-fx"); });
+	event("edit_song", [=]{ session->set_mode("default/song"); });
 }
 
 MidiEditorConsole::~MidiEditorConsole() {
@@ -386,18 +386,6 @@ void MidiEditorConsole::on_reference_tracks() {
 	/*int tn = track->get_index();
 	view->vtrack[tn]->reference_tracks = getSelection("");
 	view->forceRedraw();*/
-}
-
-void MidiEditorConsole::on_edit_track() {
-	session->set_mode("default/track");
-}
-
-void MidiEditorConsole::on_edit_midi_fx() {
-	session->set_mode("default/midi-fx");
-}
-
-void MidiEditorConsole::on_edit_song() {
-	session->set_mode("default/song");
 }
 
 void MidiEditorConsole::on_modifier(NoteModifier m) {

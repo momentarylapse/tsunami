@@ -15,9 +15,10 @@
 #include "Node/Cursor.h"
 #include "Node/Background.h"
 #include "Mode/ViewModeDefault.h"
+#include "Mode/ViewModeEdit.h"
+#include "Mode/ViewModeEditDummy.h"
 #include "Mode/ViewModeEditAudio.h"
 #include "Mode/ViewModeMidi.h"
-#include "Mode/ViewModeEdit.h"
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
 #include "Mode/ViewModeScaleBars.h"
@@ -144,7 +145,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
 	mode_edit_audio = new ViewModeEditAudio(this);
-	mode_midi = new ViewModeMidi(this);
+	mode_edit_midi = new ViewModeMidi(this);
+	mode_edit_dummy = new ViewModeEditDummy(this);
 	mode_edit = new ViewModeEdit(this);
 	mode_scale_bars = new ViewModeScaleBars(this);
 	mode_scale_marker = new ViewModeScaleMarker(this);
@@ -285,8 +287,9 @@ AudioView::~AudioView() {
 	delete mode_scale_bars;
 	delete mode_scale_marker;
 	delete mode_edit;
+	delete mode_edit_dummy;
 	delete mode_edit_audio;
-	delete mode_midi;
+	delete mode_edit_midi;
 	delete mode_capture;
 	delete mode_default;
 
@@ -347,7 +350,7 @@ string mode_name(ViewMode *m, AudioView *v) {
 		return "default";
 	if (m == v->mode_curve)
 		return "curves";
-	if (m == v->mode_midi)
+	if (m == v->mode_edit_midi)
 		return "midi";
 	if (m == v->mode_capture)
 		return "capture";
@@ -465,8 +468,8 @@ void AudioView::snap_to_grid(int &pos) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST);
 
 		int sub_beats = 0;
-		if (mode == mode_edit and mode_edit->mode == mode_midi)
-			sub_beats = mode_midi->sub_beat_partition;
+		if (mode == mode_edit and mode_edit->mode == mode_edit_midi)
+			sub_beats = mode_edit_midi->sub_beat_partition;
 
 		// time bar...
 		auto beats = song->bars.get_beats(cam.range(), true, sub_beats>0, sub_beats);

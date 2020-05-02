@@ -1,6 +1,7 @@
 #include "AudioEditorConsole.h"
 #include "../Mode/ViewModeEditAudio.h"
 #include "../AudioView.h"
+#include "../../Session.h"
 
 
 
@@ -10,19 +11,8 @@ AudioEditorConsole::AudioEditorConsole(Session *session) :
 	from_resource("audio-editor");
 	
 	event("edit-mode", [=]{ on_edit_mode(); });
-	event("edit_track", [=]{ on_edit_track(); });
-	event("edit_song", [=]{ on_edit_song(); });
-}
-
-AudioEditorConsole::~AudioEditorConsole()
-{
-}
-
-
-void AudioEditorConsole::on_enter() {
-	
-}
-void AudioEditorConsole::on_leave() {
+	event("edit_track", [=]{ session->set_mode("default/track"); });
+	event("edit_song", [=]{ session->set_mode("default/song"); });
 }
 
 void AudioEditorConsole::on_layer_delete() {
@@ -40,11 +30,6 @@ void AudioEditorConsole::on_edit_mode() {
 		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::CLONE);
 	if (n == 3)
 		view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode::RUBBER);
-}
-
-void AudioEditorConsole::on_edit_track() {
-}
-void AudioEditorConsole::on_edit_song() {
 }
 
 void AudioEditorConsole::clear() {

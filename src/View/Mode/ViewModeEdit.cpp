@@ -6,6 +6,7 @@
  */
 
 #include "ViewModeEdit.h"
+#include "ViewModeEditDummy.h"
 #include "ViewModeMidi.h"
 #include "ViewModeEditAudio.h"
 #include "../AudioView.h"
@@ -14,7 +15,7 @@
 #include "../../Data/Track.h"
 
 ViewModeEdit::ViewModeEdit(AudioView *view) : ViewModeDefault(view) {
-	mode = view->mode_midi;
+	mode = view->mode_edit_midi;
 }
 
 ViewModeEdit::~ViewModeEdit() {
@@ -67,10 +68,10 @@ void ViewModeEdit::on_cur_layer_change() {
 
 ViewMode *ViewModeEdit::suggest_mode() {
 	if (view->cur_track()->type == SignalType::MIDI)
-		return view->mode_midi;
+		return view->mode_edit_midi;
 	if (view->cur_track()->type == SignalType::AUDIO)
 		return view->mode_edit_audio;
-	return view->mode_midi; // TODO dummy mode...
+	return view->mode_edit_dummy;
 }
 
 

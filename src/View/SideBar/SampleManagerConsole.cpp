@@ -132,7 +132,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
 	event("sample-list", [=]{ on_preview(); });
 
-	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_song", [=]{ session->set_mode("default/song"); });
 
 	progress = nullptr;
 
@@ -302,10 +302,6 @@ void SampleManagerConsole::set_selection(const Array<Sample*> &samples) {
 	for (Sample *s: samples)
 		indices.add(get_index(s));
 	hui::Panel::set_selection(id_list, indices);
-}
-
-void SampleManagerConsole::on_edit_song() {
-	session->set_mode("default/song");
 }
 
 void SampleManagerConsole::on_progress_cancel() {

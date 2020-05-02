@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-63
+64
 # Resource
 Menu
 menu_fake
@@ -701,6 +701,61 @@ Button
 erase
 flat,image=hui:delete
 0
+0
+0
+# Resource
+Dialog
+dummy-editor
+width=300,height=516
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+4
+Text
+warning
+center,italic,bold,expandx
+0
+0
+0
+Text
+more-warning
+
+1
+0
+0
+Text
+?
+expandy
+2
+0
+0
+Group
+group-edit
+
+3
+0
+1
+Grid
+?
+
+0
+0
+2
+Button
+edit_song
+link,ignorefocus
+0
+0
+0
+Button
+edit_track
+link,ignorefocus
+1
 0
 0
 # Resource
@@ -2238,13 +2293,13 @@ Grid
 2
 CheckBox
 input_active
-
+ignorefocus
 0
 0
 0
 CheckBox
 input_capture
-
+ignorefocus
 1
 0
 0
@@ -2256,7 +2311,7 @@ t_input
 0
 ComboBox
 input
-expandx
+expandx,ignorefocus
 1
 1
 0
@@ -2274,13 +2329,13 @@ Grid
 2
 RadioButton
 input_volume:key
-
+ignorefocus
 0
 0
 0
 RadioButton
 input_volume:max
-
+ignorefocus
 1
 0
 0
@@ -2316,19 +2371,19 @@ Grid
 3
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
 Button
 edit_track
-link
+link,ignorefocus
 1
 0
 0
 Button
 edit_midi_fx
-link
+link,ignorefocus
 2
 0
 0
@@ -5574,7 +5629,7 @@ Grid
 1
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
@@ -5611,7 +5666,7 @@ ld_t_track
 1
 ComboBox
 track
-
+ignorefocus
 0
 0
 0
@@ -5641,7 +5696,7 @@ db
 0
 CheckBox
 mute
-
+ignorefocus
 2
 0
 0
@@ -5665,19 +5720,19 @@ Grid
 3
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
 Button
 edit_track
-link
+link,ignorefocus
 1
 0
 0
 Button
 edit_sample
-link
+link,ignorefocus
 2
 0
 0
@@ -6173,7 +6228,7 @@ Grid
 1
 Button
 edit_samples
-link
+link,ignorefocus
 0
 0
 0
@@ -6471,7 +6526,7 @@ Grid
 2
 ComboBox
 instrument
-expandx
+expandx,ignorefocus
 0
 0
 0
@@ -6489,7 +6544,7 @@ expandx
 0
 Button
 edit_tuning
-image=hui:properties,flat
+image=hui:properties,flat,ignorefocus
 1
 0
 0
@@ -6525,31 +6580,31 @@ Grid
 5
 Button
 edit_song
-link
+link,ignorefocus
 0
 0
 0
 Button
 edit_fx
-link
+link,ignorefocus
 1
 0
 0
 Button
 edit_midi
-link
+link,ignorefocus
 2
 0
 0
 Button
 edit_midi_fx
-link
+link,ignorefocus
 3
 0
 0
 Button
 edit_curves
-link
+link,ignorefocus
 4
 0
 0
@@ -6807,7 +6862,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-548
+552
 # Text
 /bars-add
 Add bars...
@@ -7243,6 +7298,18 @@ device-manager/midi-input-list
 
 device-manager/output-list
 #\\name\\internal name\\channels\\show\\present
+
+dummy-editor/dummy-editor
+Editing
+
+dummy-editor/group-edit
+Edit
+
+dummy-editor/more-warning
+Only audio and midi tracks can be edited here
+
+dummy-editor/warning
+Can not edit this track type
 
 fx_editor/add
 

@@ -57,10 +57,6 @@ public:
 	void on_add_key_change();
 	void on_apply_pitch_shift();
 
-	void on_edit_track();
-	void on_edit_midi_fx();
-	void on_edit_song();
-
 	void clear();
 	void set_layer(TrackLayer *t);
 

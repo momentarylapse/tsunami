@@ -38,8 +38,6 @@ public:
 	void on_delete();
 	void on_scale();
 
-	void on_edit_song();
-
 	void on_progress_cancel();
 	void on_song_update();
 	void on_preview_tick();

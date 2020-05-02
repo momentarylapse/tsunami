@@ -62,11 +62,11 @@ TrackConsole::TrackConsole(Session *session) :
 	event("edit_tuning", [=]{ on_edit_tuning(); });
 	event("select_synth", [=]{ on_select_synth(); });
 
-	event("edit_song", [=]{ on_edit_song(); });
-	event("edit_fx", [=]{ on_edit_fx(); });
-	event("edit_curves", [=]{ on_edit_curves(); });
-	event("edit_midi", [=]{ on_edit_midi(); });
-	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
+	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_fx", [=]{ session->set_mode("default/fx"); });
+	event("edit_curves", [=]{ session->set_mode("curves"); });
+	event("edit_midi", [=]{ session->set_mode("edit-track"); });
+	event("edit_midi_fx", [=]{ session->set_mode("default/midi-fx"); });
 }
 
 TrackConsole::~TrackConsole() {
@@ -188,26 +188,6 @@ void TrackConsole::on_select_synth() {
 	string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
 		track->set_synthesizer(CreateSynthesizer(session, name));
-}
-
-void TrackConsole::on_edit_song() {
-	session->set_mode("default/song");
-}
-
-void TrackConsole::on_edit_fx() {
-	session->set_mode("default/fx");
-}
-
-void TrackConsole::on_edit_curves() {
-	session->set_mode("curves");
-}
-
-void TrackConsole::on_edit_midi() {
-	session->set_mode("edit-track");
-}
-
-void TrackConsole::on_edit_midi_fx() {
-	session->set_mode("default/midi-fx");
 }
 
 void TrackConsole::on_view_cur_track_change() {

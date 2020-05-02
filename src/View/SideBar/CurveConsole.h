@@ -29,9 +29,6 @@ public:
 	void on_target();
 	void on_list_edit();
 	void on_list_select();
-	void on_edit_song();
-	void on_edit_track();
-	void on_edit_fx();
 
 	void on_enter() override;
 	void on_leave() override;

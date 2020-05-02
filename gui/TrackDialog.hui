@@ -13,18 +13,18 @@ Dialog track_dialog "Spur" width=380 height=516
 				Text /percent "%"
 		Group g_instrument "Instrument"
 			Grid ? ""
-				ComboBox instrument "" expandx
+				ComboBox instrument "" expandx ignorefocus
 				---|
 				Grid ? ""
 					Text tuning "" expandx
-					Button edit_tuning "" image=hui:properties flat
+					Button edit_tuning "" image=hui:properties flat ignorefocus
 		Group g_synth "Synthesizer"
 			Grid synth ""
 		Text ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
-				Button /edit_fx "Fx" link
-				Button /edit_midi "Midi" link
-				Button /edit_midi_fx "Midi-Fx" link
-				Button /edit_curves "Curves" link
+				Button /edit_song "File" link ignorefocus
+				Button /edit_fx "Fx" link ignorefocus
+				Button /edit_midi "Midi" link ignorefocus
+				Button /edit_midi_fx "Midi-Fx" link ignorefocus
+				Button /edit_curves "Curves" link ignorefocus

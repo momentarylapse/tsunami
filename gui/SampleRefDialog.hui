@@ -3,16 +3,16 @@ Dialog sample_ref_dialog "Sample" width=375 height=230
 		Group ld_t_name "Name"
 			Edit name "" expandx
 		Group ld_t_track "Track"
-			ComboBox track ""
+			ComboBox track "" ignorefocus
 		Group ld_t_volume "Volume"
 			Grid ? ""
 				SpinButton volume "0" range=-10000:10:0.1 expandx
 				Text /db "dB"
-				CheckBox mute "Muted"
+				CheckBox mute "Muted" ignorefocus
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
-				Button /edit_track "Track" link
-				Button edit_sample "Sample" link
+				Button /edit_song "File" link ignorefocus
+				Button /edit_track "Track" link ignorefocus
+				Button edit_sample "Sample" link ignorefocus
 

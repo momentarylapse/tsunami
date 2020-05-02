@@ -3,4 +3,4 @@ Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 		ListView sample-list "Preview\\Duration\\Name\\Usage" format=itTt select-multi
 		Group group-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
+				Button /edit_song "File" link ignorefocus

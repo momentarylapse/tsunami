@@ -80,8 +80,6 @@ bool ViewModeEdit::editing(AudioViewLayer *l) {
 		return false;
 	if (l != view->cur_vlayer())
 		return false;
-	if (l->track()->type != SignalType::MIDI)
-		return false;
 	return true;
 }
 
@@ -122,7 +120,12 @@ SongSelection ViewModeEdit::get_selection_for_range(const Range &r) {
 }
 
 void ViewModeEdit::left_click_handle_void(AudioViewLayer *vlayer) {
-	mode->left_click_handle_void(vlayer);
+	if (vlayer == view->cur_vlayer()) {
+		mode->left_click_handle_void(vlayer);
+	} else {
+		ViewModeDefault::left_click_handle_void(vlayer);
+	}
+	view->exclusively_select_layer(vlayer);
 }
 
 string ViewModeEdit::get_tip() {

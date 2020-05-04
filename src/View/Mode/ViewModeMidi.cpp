@@ -143,8 +143,6 @@ TrackLayer* ViewModeMidi::cur_layer() {
 }
 
 AudioViewLayer* ViewModeMidi::cur_vlayer() {
-	//if (!view->cur_vlayer())
-	//	return view->dummy_vlayer;
 	return view->cur_vlayer();
 }
 
@@ -324,6 +322,11 @@ public:
 // note clicking already handled by ViewModeDefault!
 void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
+	if (!view->sel.has(vlayer->layer)) {
+		view->exclusively_select_layer(vlayer);
+		return;
+	}
+
 	auto mode = cur_vlayer()->midi_mode();
 
 	if (hover().type == HoverData::Type::CLEF_POSITION) {
@@ -343,7 +346,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 			if (hover().type == HoverData::Type::MIDI_PITCH) {
 
-				Array<int> pitch = get_creation_pitch(hover().pitch);
+				auto pitch = get_creation_pitch(hover().pitch);
 				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch));
 			}
 		} else /* TAB */ {
@@ -351,6 +354,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 		}
 	}
+	view->exclusively_select_layer(vlayer);
 }
 
 void ViewModeMidi::edit_add_pause() {

@@ -16,14 +16,12 @@ class TrackLayer;
 class ViewModeEditAudio : public ViewModeDefault {
 public:
 	ViewModeEditAudio(AudioView *view);
-	virtual ~ViewModeEditAudio();
 
 	void on_start() override;
 	void on_end() override;
 
 	void on_key_down(int k) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
-	void on_cur_layer_change() override;
 
 	void draw_post(Painter *c) override;
 

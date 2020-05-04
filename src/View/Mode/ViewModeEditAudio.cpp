@@ -73,9 +73,6 @@ ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 	edit_radius = 50;
 }
 
-ViewModeEditAudio::~ViewModeEditAudio() {
-}
-
 
 void ViewModeEditAudio::on_start() {
 	set_side_bar(SideBar::AUDIO_EDITOR_CONSOLE);
@@ -111,9 +108,6 @@ float ViewModeEditAudio::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l))
 		return 200;
 	return ViewModeDefault::layer_suggested_height(l);
-}
-
-void ViewModeEditAudio::on_cur_layer_change() {
 }
 
 Range ViewModeEditAudio::range_source() {
@@ -202,8 +196,13 @@ float step(float t) {
 }
 
 void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
-	if (!editing(vlayer))
+	if (!editing(vlayer)) {
+		ViewModeDefault::left_click_handle_void(vlayer);
 		return;
+	} else if (!view->sel.has(vlayer->layer)) {
+		ViewModeDefault::left_click_handle_void(vlayer);
+		return;
+	}
 	
 	if (edit_mode == EditMode::CLONE) {
 		AudioBuffer source;
@@ -224,9 +223,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 				out.c[c][i] = a * source.c[c][i] + (1-a) * out.c[c][i];
 			}
 		vlayer->layer->edit_buffers_finish(a);
-	}
-
-	if (edit_mode == EditMode::RUBBER) {
+	} else if (edit_mode == EditMode::RUBBER) {
 		float mx = view->mx;
 
 		rubber.hover = -1;
@@ -246,6 +243,8 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 		}
 
 		rubber.selected = rubber.hover;
+	} else { // SELECT
+		ViewModeDefault::left_click_handle_void(vlayer);
 	}
 }
 

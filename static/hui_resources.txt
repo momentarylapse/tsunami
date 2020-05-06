@@ -41,7 +41,7 @@ group-mode
 1
 Grid
 ?
-
+homogenousx
 0
 0
 4
@@ -1990,10 +1990,10 @@ Grid
 vertical
 0
 0
-3
+4
 Grid
 ?
-
+homogenousx
 0
 0
 4
@@ -2023,7 +2023,7 @@ flat,huge,expandx,ignorefocus
 0
 Grid
 grid-interval
-
+hidden
 1
 0
 1
@@ -2035,7 +2035,7 @@ range=-99:99,expandx
 0
 Grid
 grid-chord
-vertical
+vertical,hidden
 2
 0
 3
@@ -2047,7 +2047,7 @@ Separator
 0
 Grid
 ?
-
+homogenousx
 1
 0
 6
@@ -2089,7 +2089,7 @@ flat,big,hidden,ignorefocus
 0
 Grid
 ?
-
+homogenousx
 2
 0
 3
@@ -2111,6 +2111,36 @@ flat,big,expandx,ignorefocus
 2
 0
 0
+Grid
+?
+homogenousx
+3
+0
+4
+ToggleButton
+mode-classical
+flat,huge,expandx,ignorefocus
+0
+0
+0
+ToggleButton
+mode-tab
+flat,huge,ignorefocus
+1
+0
+0
+ToggleButton
+mode-linear
+flat,huge,ignorefocus
+2
+0
+0
+Label
+dummy1
+
+3
+0
+0
 Group
 grp-length
 
@@ -2119,7 +2149,7 @@ grp-length
 1
 Grid
 ?
-
+homogenousx
 0
 0
 9
@@ -2185,7 +2215,7 @@ grp-modifier
 1
 Grid
 ?
-
+homogenousx
 0
 0
 4
@@ -2221,7 +2251,7 @@ grp-flags
 1
 Grid
 ?
-
+homogenousx
 0
 0
 4
@@ -2257,7 +2287,7 @@ grp_operations
 1
 Grid
 ?
-
+homogenousx
 0
 0
 5
@@ -2681,7 +2711,7 @@ nd_g_track
 1
 Grid
 ?
-
+homogenousx
 0
 0
 3
@@ -6880,7 +6910,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-555
+558
 # Text
 /bars-add
 Add bars...
@@ -7770,15 +7800,24 @@ Midi
 midi_editor/mode-chord
 𝅘𝅥𝅘𝅥𝅘𝅥
 Create chords
+midi_editor/mode-classical
+𝄞
+Classical sheet view style
 midi_editor/mode-interval
 𝅘𝅥𝅘𝅥
 Create intervals
+midi_editor/mode-linear
+𝆱
+Linear view style
 midi_editor/mode-note
 𝅘𝅥
 Create single notes
 midi_editor/mode-select
 I
 Select
+midi_editor/mode-tab
+TAB
+Guitar tab view style (only string instruments)
 midi_editor/modifier-flat
 ♭
 Flat - new note is 1 semitone below the key

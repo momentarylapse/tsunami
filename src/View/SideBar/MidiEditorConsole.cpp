@@ -16,6 +16,7 @@
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
 #include "../Node/AudioViewLayer.h"
+#include "../Node/AudioViewTrack.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
 #include "../../Device/DeviceManager.h"
@@ -70,6 +71,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("mode-note", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::NOTE); });
 	event("mode-interval", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL); });
 	event("mode-chord", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::CHORD); });
+
+	event("mode-classical", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::CLASSICAL); });
+	event("mode-tab", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::TAB); });
+	event("mode-linear", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::LINEAR); });
 
 
 	event("interval", [=]{ on_interval(); });
@@ -190,6 +195,10 @@ void MidiEditorConsole::update() {
 	check("mode-note", mode->creation_mode == mode->CreationMode::NOTE);
 	check("mode-interval", mode->creation_mode == mode->CreationMode::INTERVAL);
 	check("mode-chord", mode->creation_mode == mode->CreationMode::CHORD);
+
+	check("mode-classical", view->cur_vlayer()->midi_mode() == MidiMode::CLASSICAL);
+	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::TAB);
+	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::LINEAR);
 
 	hide_control("grid-interval", mode->creation_mode != mode->CreationMode::INTERVAL);
 	hide_control("grid-chord", mode->creation_mode != mode->CreationMode::CHORD);
@@ -419,6 +428,7 @@ void MidiEditorConsole::on_input_volume(int _mode) {
 void MidiEditorConsole::clear() {
 	if (layer)
 		layer->unsubscribe(this);
+	view->cur_vtrack()->unsubscribe(this);
 	layer = nullptr;
 	set_selection("reference_tracks", {});
 }
@@ -445,6 +455,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 	if (layer) {
 
 		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
+		view->cur_vtrack()->subscribe(this, [=]{ update(); });
 
 		/*auto v = view->get_layer(layer);
 		if (v)

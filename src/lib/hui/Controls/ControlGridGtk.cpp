@@ -59,6 +59,10 @@ void ControlGrid::__set_option(const string &op, const string &value) {
 		action_bar = true;
 	} else if (op == "vertical") {
 		vertical = true;
+	} else if (op == "homogenousx") {
+		gtk_grid_set_column_homogeneous(GTK_GRID(widget), true);
+	} else if (op == "homogenousy") {
+		gtk_grid_set_row_homogeneous(GTK_GRID(widget), true);
 	}
 }
 

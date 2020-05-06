@@ -5,7 +5,7 @@ Dialog new_dialog "New file" width=250 height=80
 				ComboBox sample_rate "" expandx editable
 				Text /per_second "/s"
 		Group nd_g_track "First track"
-			Grid ? ""
+			Grid ? "" homogenousx
 				ToggleButton type-audio-mono "∿" flat huge expandx "tooltip=Audio (mono)" ignorefocus
 				ToggleButton type-audio-stereo "∿₂" flat huge expandx "tooltip=Audio (stereo)" ignorefocus
 				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus

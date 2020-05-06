@@ -1,7 +1,7 @@
 Dialog audio-editor "Audio" width=300 height=516
 	Grid ? "" vertical
 		Group group-mode "Edit mode"
-			Grid ? ""
+			Grid ? "" homogenousx
 				ToggleButton mode-select "I" flat huge expandx "tooltip=Select" ignorefocus
 				ToggleButton mode-smoothen "Sm" flat huge expandx "tooltip=Smoothen out... TODO" ignorefocus
 				ToggleButton mode-clone "" image=hui:copy flat huge expandx "tooltip=Copy/paste chunks of audio" ignorefocus

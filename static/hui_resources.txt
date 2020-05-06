@@ -5577,7 +5577,7 @@ Grid
 vertical
 0
 0
-3
+2
 Grid
 ?
 noexpandy
@@ -5598,32 +5598,32 @@ height=25
 0
 Grid
 ?
-
+homogenousx
 1
 0
-3
+4
 Button
 start
-flat,image=hui:media-record
+flat,huge,expandx,image=hui:media-record
 0
 0
 0
 Button
 pause
-flat,image=hui:media-pause
+flat,huge,image=hui:media-pause
 1
 0
 0
 Button
 dump
-flat,image=hui:delete
+flat,huge,image=hui:delete
 2
 0
 0
 Button
 new_version
-
-2
+flat,huge,image=hui:new
+3
 0
 0
 Grid
@@ -6910,7 +6910,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-558
+566
 # Text
 /bars-add
 Add bars...
@@ -7071,9 +7071,6 @@ Paste
 /paste_as_samples
 Paste as samples
 
-/pause
-Pause
-
 /per_minute
 /min
 
@@ -7088,9 +7085,6 @@ Play
 
 /play-loop
 Loop
-
-/play-toggle
-Play
 
 /playback-range-lock
 Lock
@@ -7130,9 +7124,6 @@ Manage samples
 
 /song-properties
 Properties
-
-/stop
-Stop
 
 /track-add-audio-mono
 Audio (mono)
@@ -7599,6 +7590,15 @@ Midi
 menu/paste_time
 Paste
 
+menu/pause
+Pause
+
+menu/play-loop
+Loop
+
+menu/play-toggle
+Play
+
 menu/plugin_on_file
 On audio buffer
 
@@ -7607,6 +7607,9 @@ On midi
 
 menu/quick_export
 Quick export
+
+menu/record
+Record
 
 menu/render_export_selection
 Render selection...
@@ -7637,6 +7640,9 @@ Messages
 
 menu/show-signal-chain
 Signal chain
+
+menu/stop
+Stop
 
 menu/track_import
 Import from file...
@@ -8269,14 +8275,17 @@ raw_config_dialog/t_samplerate
 Samplerate
 
 record_dialog/dump
-Dump
 
+Dump current recording
 record_dialog/grp_source
 Source
 
 record_dialog/new_version
-Start new version
 
+Start new version
+record_dialog/pause
+
+Pause/continue recording
 record_dialog/rdt_capture
 Recording
 
@@ -8292,6 +8301,9 @@ Type
 record_dialog/record_dialog
 Aufnahme
 
+record_dialog/start
+
+Start recording
 record_dialog/time
 0:00
 
@@ -8501,6 +8513,18 @@ synth_panel/save_favorite
 load parameter
 toolbar/mode-edit-check
 Edit
+
+toolbar/pause
+Pause
+
+toolbar/play
+Play
+
+toolbar/record
+Record
+
+toolbar/stop
+Stop
 
 track-mixer2/add-fx
 

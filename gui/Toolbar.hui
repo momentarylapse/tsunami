@@ -10,9 +10,9 @@ Toolbar toolbar ""
 	Item /paste "Paste" image=hui:paste "tooltip=Paste"
 	Item /delete "Delete" image=hui:delete "tooltip=Delete selection" important
 	Separator
-	Item /play "Play" image=hui:media-play important
-	Item /pause "Pause" image=hui:media-pause
-	Item /stop "Stop" image=hui:media-stop
-	Item /record "Record" image=hui:media-record important
+	Item play "Play" image=hui:media-play important
+	Item pause "Pause" image=hui:media-pause
+	Item stop "Stop" image=hui:media-stop
+	Item record "Record" image=hui:media-record important
 	Separator
 	Item mode-edit-check "Edit" image=hui:edit important checkable

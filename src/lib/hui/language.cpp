@@ -134,7 +134,7 @@ bool Language::Command::match(const string &_ns, const string &_id)
 {
 	if (this->id != _id)
 		return false;
-	return ((this->_namespace.num == 0) or (this->_namespace == _ns));
+	return ((this->_namespace == "") or (this->_namespace == _ns));
 }
 
 

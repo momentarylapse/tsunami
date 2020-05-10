@@ -56,7 +56,6 @@ void ViewModeEdit::set_mode(ViewMode *m) {
 	mode = m;
 	if (view->mode == this)
 		mode->on_start();
-	//win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	notify();
 }
 

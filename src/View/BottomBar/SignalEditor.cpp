@@ -94,8 +94,13 @@ public:
 		event("signal_chain_load", [=]{ editor->on_load(); });
 
 		chain = _chain;
+		chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_STATE_CHANGE);
+		//chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
+		chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_DELETE_CABLE);
+		chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_DELETE_MODULE);
+		chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_CABLE);
+		chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_MODULE);
 		chain->subscribe(this, [=]{ on_chain_delete(); }, chain->MESSAGE_DELETE);
-		chain->subscribe(this, [=]{ on_chain_update(); });
 	}
 	virtual ~SignalEditorTab() {
 		chain->unsubscribe(this);
@@ -328,7 +333,7 @@ public:
 		p->set_color(view->colors.text);
 		if (hover.type == hover.TYPE_BUTTON_PLAY)
 			p->set_color(view->colors.hover);
-		p->draw_str(area_play.x1, area_play.y1, chain->is_playback_active() ? "⏹" : "▶️");
+		p->draw_str(area_play.x1, area_play.y1, chain->is_playback_active() ? u8"\u23F9" : u8"\u25B6");
 	}
 
 	void on_chain_update() {

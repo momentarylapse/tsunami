@@ -581,6 +581,7 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 }
 
 void ViewModeMidi::on_cur_layer_change() {
+	msg_write("midi.cur layer change");
 	view->thm.dirty = true;
 }
 

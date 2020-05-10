@@ -236,7 +236,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
-	win->event_xp(id, "hui:draw", [=](Painter *p){ on_draw(p); });
+	win->event_xp(id, "hui:draw", [=](Painter *p) { on_draw(p); });
 	win->event_x(id, "hui:mouse-move", [=]{ on_mouse_move(); });
 	win->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
 	win->event_x(id, "hui:left-double-click", [=]{ on_left_double_click(); });
@@ -406,9 +406,9 @@ void AudioView::update_selection() {
 
 	// TODO ...check....
 	if (is_playback_active()) {
-		if (renderer->range().is_inside(playback_pos()))
+		if (renderer->range().is_inside(playback_pos())) {
 			renderer->change_range(get_playback_selection(false));
-		else{
+		} else {
 			stop();
 		}
 	}
@@ -476,14 +476,14 @@ void AudioView::snap_to_grid(int &pos) {
 		for (Beat &b: beats)
 			_update_find_min(new_pos, found, dmin, pos, b.range.offset);
 
-	}else if (selection_snap_mode == SelectionSnapMode::BAR) {
+	} else if (selection_snap_mode == SelectionSnapMode::BAR) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
 		auto bars = song->bars.get_bars(cam.range());
 		for (Bar *b: bars) {
 			_update_find_min(new_pos, found, dmin, pos, b->range().start());
 			_update_find_min(new_pos, found, dmin, pos, b->range().end());
 		}
-	}else if (selection_snap_mode == SelectionSnapMode::PART) {
+	} else if (selection_snap_mode == SelectionSnapMode::PART) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
 		auto parts = song->get_parts();
 		for (auto *p: parts) {
@@ -660,7 +660,7 @@ void AudioView::toggle_layer_solo() {
 		if (sel.has(l->layer) and l->solo)
 			any_solo = true;
 	for (auto *t: vtrack)
-		if (sel.has(t->track)){
+		if (sel.has(t->track)) {
 			if (any_solo) {
 				for (auto *l: vlayer)
 					if (l->track() == t->track)
@@ -785,7 +785,7 @@ void AudioView::update_buffer_zoom() {
 
 void _try_set_good_cur_layer(AudioView *v) {
 	for (auto *l: v->vlayer)
-		if (l->layer->track == v->_prev_selection.track()){
+		if (l->layer->track == v->_prev_selection.track()) {
 			//msg_write("  -> set by track");
 			v->__set_cur_layer(l);
 			return;
@@ -918,20 +918,19 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
 	return dummy_vlayer;
 }
 
-void AudioView::update_tracks()
-{
+void AudioView::update_tracks() {
 	Array<AudioViewTrack*> vtrack2;
 	Array<AudioViewLayer*> vlayer2;
 	vtrack2.resize(song->tracks.num);
 	vlayer2.resize(song->layers().num);
 
-	foreachi(Track *t, song->tracks, ti){
+	foreachi(Track *t, song->tracks, ti) {
 		bool found = false;
 
 		// find existing
 		foreachi(auto *v, vtrack, vi)
-			if (v){
-				if (v->track == t){
+			if (v) {
+				if (v->track == t) {
 					vtrack2[ti] = v;
 					vtrack[vi] = nullptr;
 					found = true;
@@ -940,21 +939,21 @@ void AudioView::update_tracks()
 			}
 
 		// new track
-		if (!found){
+		if (!found) {
 			vtrack2[ti] = new AudioViewTrack(this, t);
 			background->add_child(vtrack2[ti]);
 		}
 	}
 
 	int li = 0;
-	for (TrackLayer *l: song->layers()){
+	for (TrackLayer *l: song->layers()) {
 
 		bool found = false;
 
 		// find existing
 		foreachi(auto *v, vlayer, vi)
-			if (v){
-				if (v->layer == l){
+			if (v) {
+				if (v->layer == l) {
 					vlayer2[li] = v;
 					vlayer[vi] = nullptr;
 					found = true;
@@ -963,7 +962,7 @@ void AudioView::update_tracks()
 			}
 
 		// new layer
-		if (!found){
+		if (!found) {
 			vlayer2[li] = new AudioViewLayer(this, l);
 			background->add_child(vlayer2[li]);
 			sel.add(l);
@@ -973,23 +972,19 @@ void AudioView::update_tracks()
 	}
 
 	// delete deleted
-	for (auto *v: vtrack)
-		if (v)
-			background->delete_child(v);
-	for (auto *v: vlayer)
-		if (v)
-			background->delete_child(v);
+	auto vtrack_del = vtrack;
+	auto vlayer_del = vlayer;
 	vtrack = vtrack2;
 	vlayer = vlayer2;
 	thm.dirty = true;
 
 	// guess where to create new tracks
-	foreachi(auto *v, vtrack, i){
-		if (v->area.height() == 0){
-			if (i > 0){
+	foreachi(auto *v, vtrack, i) {
+		if (v->area.height() == 0) {
+			if (i > 0) {
 				v->area = vtrack[i-1]->area;
 				v->area.y1 = v->area.y2;
-			}else if (vtrack.num > 1){
+			} else if (vtrack.num > 1) {
 				v->area = vtrack[i+1]->area;
 				v->area.y2 = v->area.y1;
 			}
@@ -997,12 +992,12 @@ void AudioView::update_tracks()
 	}
 
 	// guess where to create new tracks
-	foreachi(auto *v, vlayer, i){
-		if (v->area.height() == 0){
-			if (i > 0){
+	foreachi(auto *v, vlayer, i) {
+		if (v->area.height() == 0) {
+			if (i > 0) {
 				v->area = vlayer[i-1]->area;
 				v->area.y1 = v->area.y2;
-			}else if (vtrack.num > 1){
+			} else if (vtrack.num > 1) {
 				v->area = vlayer[i+1]->area;
 				v->area.y2 = v->area.y1;
 			}
@@ -1015,6 +1010,14 @@ void AudioView::update_tracks()
 	// TODO: detect order change
 	check_consistency();
 	notify(MESSAGE_VTRACK_CHANGE);
+
+
+	for (auto *v: vtrack_del)
+		if (v)
+			background->delete_child(v);
+	for (auto *v: vlayer_del)
+		if (v)
+			background->delete_child(v);
 }
 
 void AudioView::rebuild_scene_graph() {

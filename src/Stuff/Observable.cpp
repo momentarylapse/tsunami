@@ -148,14 +148,20 @@ void ObservableData::notify_send() {
 
 	// send
 	for (auto &n: notifications) {
-		if (MESSAGE_DEBUG_LEVEL >= 1)
+		if (MESSAGE_DEBUG_LEVEL >= 1) {
 			msg_write("send " + get_obs_name(me) + "  ---" + *n.message + "--->>  " + get_obs_name(n.observer));
-		//n.callback();
+			msg_right();
+		}
+
 		cur_message = n.message;
 		if (n.callback)
 			n.callback();
 		else if (n.callback_p)
 			n.callback_p(me);
+
+		if (MESSAGE_DEBUG_LEVEL >= 1) {
+			msg_left();
+		}
 	}
 }
 

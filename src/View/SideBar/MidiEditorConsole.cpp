@@ -183,13 +183,13 @@ bool base_is_sixteenth(MidiEditorConsole *c) {
 }
 
 void MidiEditorConsole::update() {
-	bool allow = false;
-	if (layer)
-		//if (get_track_index_save(view->song, view->cur_track) >= 0)
-			allow = (layer->type == SignalType::MIDI);
-
+	layer = view->cur_layer();
 	if (!layer)
 		return;
+
+	bool allow = false;
+	//if (get_track_index_save(view->song, view->cur_track) >= 0)
+		allow = (layer->type == SignalType::MIDI);
 
 	check("mode-select", mode->creation_mode == mode->CreationMode::SELECT);
 	check("mode-note", mode->creation_mode == mode->CreationMode::NOTE);
@@ -227,7 +227,7 @@ void MidiEditorConsole::update() {
 
 	set_int("beat_partition", mode->sub_beat_partition);
 	set_int("note_length", mode->note_length);
-	string length = format(u8"(%d 𝅘𝅥 / %d)", mode->note_length, mode->sub_beat_partition);
+	string length = format(u8"(%d \U0001D15F / %d)", mode->note_length, mode->sub_beat_partition);
 	set_string("length-result", length);
 
 	check("length-whole", base_is_whole(this));
@@ -250,6 +250,11 @@ void MidiEditorConsole::update() {
 		check("input_volume:key", true);
 	enable("input_volume:key", mode->is_input_active());
 	enable("input_volume:max", mode->is_input_active());
+
+
+	int strings = layer->track->instrument.string_pitch.num;
+	enable("apply_string", strings > 0);
+	enable("apply_hand_position", strings > 0);
 
 
 
@@ -460,14 +465,6 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 		/*auto v = view->get_layer(layer);
 		if (v)
 			setSelection("reference_tracks", v->reference_tracks);*/
-
-		int strings = layer->track->instrument.string_pitch.num;
-
-		enable("apply_string", strings > 0);
-		enable("string_no", strings > 0);
-		set_options("string_no", format("range=1:%d", strings));
-		enable("apply_hand_position", strings > 0);
-		enable("fret_no", strings > 0);
 
 		update();
 	}

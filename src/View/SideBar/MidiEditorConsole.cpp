@@ -253,6 +253,7 @@ void MidiEditorConsole::update() {
 
 
 	int strings = layer->track->instrument.string_pitch.num;
+	enable("mode-tab", strings > 0);
 	enable("apply_string", strings > 0);
 	enable("apply_hand_position", strings > 0);
 

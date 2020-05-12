@@ -73,7 +73,7 @@ MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, f
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
-	sub_beat_partition = 4;
+	sub_beat_partition = 1;
 	note_length = 1;
 	win->set_int("beat_partition", sub_beat_partition);
 	win->set_int("note_length", note_length);
@@ -87,7 +87,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	moving = false;
 	string_no = 0;
-	octave = 3;
+	octave = 4;
 
 	input_wanted_active = false;
 	input_capture = true;

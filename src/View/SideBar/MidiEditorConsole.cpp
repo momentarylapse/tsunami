@@ -52,8 +52,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	mode = view->mode_edit_midi;
 	set_int("interval", mode->midi_interval);
 
-	set_int("chord_inversion", 0);
-
 
 	layer = nullptr;
 	enable("track_name", false);
@@ -82,6 +80,15 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("chord-minor", [=]{ on_chord_type(ChordType::MINOR); });
 	event("chord-diminished", [=]{ on_chord_type(ChordType::DIMINISHED); });
 	event("chord-augmented", [=]{ on_chord_type(ChordType::AUGMENTED); });
+	event("chord-major7", [=]{ on_chord_type(ChordType::MAJOR_SEVENTH); });
+	event("chord-minor7", [=]{ on_chord_type(ChordType::MINOR_SEVENTH); });
+	event("chord-minor-major7", [=]{ on_chord_type(ChordType::MINOR_MAJOR_SEVENTH); });
+	event("chord-diminished7", [=]{ on_chord_type(ChordType::DIMINISHED_SEVENTH); });
+	event("chord-dominant7", [=]{ on_chord_type(ChordType::DOMINANT_SEVENTH); });
+	event("chord-diminished7", [=]{ on_chord_type(ChordType::DIMINISHED_SEVENTH); });
+	event("chord-half-diminished7", [=]{ on_chord_type(ChordType::HALF_DIMINISHED_SEVENTH); });
+	event("chord-augmented7", [=]{ on_chord_type(ChordType::AUGMENTED_SEVENTH); });
+	event("chord-augmented-major7", [=]{ on_chord_type(ChordType::AUGMENTED_MAJOR_SEVENTH); });
 	event("chord-inversion-none", [=]{ on_chord_inversion(0); });
 	event("chord-inversion-1", [=]{ on_chord_inversion(1); });
 	event("chord-inversion-2", [=]{ on_chord_inversion(2); });
@@ -200,13 +207,21 @@ void MidiEditorConsole::update() {
 	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::TAB);
 	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::LINEAR);
 
-	hide_control("grid-interval", mode->creation_mode != mode->CreationMode::INTERVAL);
-	hide_control("grid-chord", mode->creation_mode != mode->CreationMode::CHORD);
+	reveal("revealer-interval", mode->creation_mode == mode->CreationMode::INTERVAL);
+	reveal("revealer-chord", mode->creation_mode == mode->CreationMode::CHORD);
 
 	check("chord-major", mode->chord_type == ChordType::MAJOR);
 	check("chord-minor", mode->chord_type == ChordType::MINOR);
 	check("chord-diminished", mode->chord_type == ChordType::DIMINISHED);
 	check("chord-augmented", mode->chord_type == ChordType::AUGMENTED);
+	check("chord-major7", mode->chord_type == ChordType::MAJOR_SEVENTH);
+	check("chord-minor7", mode->chord_type == ChordType::MINOR_SEVENTH);
+	check("chord-minor-major7", mode->chord_type == ChordType::MINOR_MAJOR_SEVENTH);
+	check("chord-dominant7", mode->chord_type == ChordType::DOMINANT_SEVENTH);
+	check("chord-diminished7", mode->chord_type == ChordType::DIMINISHED_SEVENTH);
+	check("chord-half-diminished7", mode->chord_type == ChordType::HALF_DIMINISHED_SEVENTH);
+	check("chord-augmented7", mode->chord_type == ChordType::AUGMENTED_SEVENTH);
+	check("chord-augmented-major7", mode->chord_type == ChordType::AUGMENTED_MAJOR_SEVENTH);
 	check("chord-inversion-none", mode->chord_inversion == 0);
 	check("chord-inversion-1", mode->chord_inversion == 1);
 	check("chord-inversion-2", mode->chord_inversion == 2);
@@ -404,7 +419,10 @@ void MidiEditorConsole::on_reference_tracks() {
 }
 
 void MidiEditorConsole::on_modifier(NoteModifier m) {
-	mode->set_modifier(m);
+	if (m == mode->modifier)
+		mode->set_modifier(NoteModifier::NONE);
+	else
+		mode->set_modifier(m);
 }
 
 void MidiEditorConsole::on_input_active() {

@@ -1,5 +1,11 @@
 Dialog midi_editor "Midi" width=300 height=516
 	Grid ? "" vertical
+		Group grp-view "View"
+			Grid ? "" homogenousx
+				ToggleButton mode-classical "𝄞" flat huge expandx "tooltip=Classical sheet view style" ignorefocus
+				ToggleButton mode-tab "TAB" flat huge "tooltip=Guitar tab view style (only string instruments)" ignorefocus
+				ToggleButton mode-linear "𝆱" flat huge "tooltip=Linear view style" ignorefocus
+				Label dummy1 ""
 		Group me_group_creation "Edit mode"
 			Grid ? "" vertical
 				Grid ? "" homogenousx
@@ -7,27 +13,29 @@ Dialog midi_editor "Midi" width=300 height=516
 					ToggleButton mode-note "𝅘𝅥" flat huge expandx "tooltip=Create single notes" ignorefocus
 					ToggleButton mode-interval "𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create intervals" ignorefocus
 					ToggleButton mode-chord "𝅘𝅥𝅘𝅥𝅘𝅥" flat huge expandx "tooltip=Create chords" ignorefocus
-				Grid grid-interval "" hidden
-					SpinButton interval "0" range=-99:99 expandx "tooltip=Number of semitones above the base note"
-				Grid grid-chord "" vertical hidden
-					Separator ? ""
-					Grid ? "" homogenousx
-						ToggleButton chord-major "Maj" flat big expandx "tooltip=Major" ignorefocus
-						ToggleButton chord-minor "Min" flat big expandx "tooltip=Minor" ignorefocus
-						ToggleButton chord-diminished "Dim" flat big expandx "tooltip=Diminished" ignorefocus
-						ToggleButton chord-augmented "Aug" flat big expandx "tooltip=Augmented" ignorefocus
+				Revealer revealer-interval ""
+					Grid grid-interval ""
+						SpinButton interval "0" range=-99:99 expandx "tooltip=Number of semitones above the base note"
+				Revealer revealer-chord "" margin-left=20
+					Grid grid-chord "" homogenousx
+						ToggleButton chord-major "C" flat big expandx "tooltip=Major chord" ignorefocus
+						ToggleButton chord-minor "Cm" flat big expandx "tooltip=Minor chord" ignorefocus
+						ToggleButton chord-diminished "Cdim" flat big expandx "tooltip=Diminished chord" ignorefocus
+						ToggleButton chord-augmented "Caug" flat big expandx "tooltip=Augmented chord" ignorefocus
 						---|
-						ToggleButton chord-major7 "Maj7" flat big "tooltip=Major 7th" hidden ignorefocus
-						ToggleButton chord-minor7 "Min7" flat big "tooltip=Minor 7th" hidden ignorefocus
-					Grid ? "" homogenousx
-						ToggleButton chord-inversion-none "" flat big expandx "tooltip=Regular" ignorefocus
-						ToggleButton chord-inversion-1 "Inv 1" flat big expandx "tooltip=1st inversion" ignorefocus
-						ToggleButton chord-inversion-2 "Inv 2" flat big expandx "tooltip=2nd inversion" ignorefocus
-				Grid ? "" homogenousx
-					ToggleButton mode-classical "𝄞" flat huge expandx "tooltip=Classical sheet view style" ignorefocus
-					ToggleButton mode-tab "TAB" flat huge "tooltip=Guitar tab view style (only string instruments)" ignorefocus
-					ToggleButton mode-linear "𝆱" flat huge "tooltip=Linear view style" ignorefocus
-					Label dummy1 ""
+						ToggleButton chord-dominant7 "C⁷" flat big "tooltip=Dominant 7th chord" ignorefocus
+						ToggleButton chord-major7 "CM⁷" flat big "tooltip=Major 7th chord" ignorefocus
+						ToggleButton chord-minor7 "Cm⁷" flat big "tooltip=Minor 7th chord" ignorefocus
+						ToggleButton chord-minor-major7 "CmM⁷" flat big "tooltip=Minor major 7th chord" ignorefocus
+						---|
+						ToggleButton chord-half-diminished7 "Cø⁷" flat big "tooltip=Half diminished 7th chord" ignorefocus
+						ToggleButton chord-diminished7 "Cdim⁷" flat big "tooltip=Diminished 7th chord" ignorefocus
+						ToggleButton chord-augmented7 "C+⁷" flat big "tooltip=Augmented 7th chord" ignorefocus
+						ToggleButton chord-augmented-major7 "C+M⁷" flat big "tooltip=Augmented major 7th chord" ignorefocus
+						---|
+						ToggleButton chord-inversion-none "0" flat big expandx "tooltip=Root position" ignorefocus
+						ToggleButton chord-inversion-1 "-1" flat big expandx "tooltip=1st inversion (root note on top)" ignorefocus
+						ToggleButton chord-inversion-2 "-2" flat big expandx "tooltip=2nd inversion (root and third on top)" ignorefocus
 		Group grp-length "Note length"
 			Grid ? "" homogenousx
 				ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note" ignorefocus

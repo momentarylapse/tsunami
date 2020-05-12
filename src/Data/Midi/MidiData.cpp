@@ -491,6 +491,22 @@ string chord_type_name(ChordType type) {
 		return _("Diminished");
 	if (type == ChordType::AUGMENTED)
 		return _("Augmented");
+	if (type == ChordType::MINOR_SEVENTH)
+		return _("Minor seventh");
+	if (type == ChordType::MAJOR_SEVENTH)
+		return _("Major seventh");
+	if (type == ChordType::MINOR_MAJOR_SEVENTH)
+		return _("Minor major seventh");
+	if (type == ChordType::DIMINISHED_SEVENTH)
+		return _("Diminished seventh");
+	if (type == ChordType::HALF_DIMINISHED_SEVENTH)
+		return _("Half diminished seventh");
+	if (type == ChordType::DOMINANT_SEVENTH)
+		return _("Dominant seventh");
+	if (type == ChordType::AUGMENTED_SEVENTH)
+		return _("Augmented seventh");
+	if (type == ChordType::AUGMENTED_MAJOR_SEVENTH)
+		return _("Augmented major seventh");
 	return "???";
 }
 
@@ -504,6 +520,22 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch) {
 		r = {pitch, pitch+3, pitch+6};
 	} else if (type == ChordType::AUGMENTED) {
 		r = {pitch, pitch+4, pitch+8};
+	} else if (type == ChordType::DIMINISHED_SEVENTH) {
+		r = {pitch, pitch+3, pitch+6, pitch+9};
+	} else if (type == ChordType::HALF_DIMINISHED_SEVENTH) {
+		r = {pitch, pitch+3, pitch+6, pitch+10};
+	} else if (type == ChordType::MINOR_SEVENTH) {
+		r = {pitch, pitch+3, pitch+7, pitch+10};
+	} else if (type == ChordType::MINOR_MAJOR_SEVENTH) {
+		r = {pitch, pitch+3, pitch+7, pitch+11};
+	} else if (type == ChordType::DOMINANT_SEVENTH) {
+		r = {pitch, pitch+4, pitch+7, pitch+10};
+	} else if (type == ChordType::MAJOR_SEVENTH) {
+		r = {pitch, pitch+4, pitch+7, pitch+11};
+	} else if (type == ChordType::AUGMENTED_SEVENTH) {
+		r = {pitch, pitch+4, pitch+8, pitch+10};
+	} else if (type == ChordType::AUGMENTED_MAJOR_SEVENTH) {
+		r = {pitch, pitch+4, pitch+8, pitch+11};
 	} else {
 		return r;
 	}

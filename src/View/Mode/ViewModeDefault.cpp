@@ -271,6 +271,13 @@ void ViewModeDefault::on_key_down(int k) {
 
 void ViewModeDefault::on_command(const string &id) {
 
+	if (view->mode == view->mode_default) {
+		if (id == "layer-up")
+			view->move_to_layer(-1);
+		if (id == "layer-down")
+			view->move_to_layer(1);
+	}
+
 	// playback
 	if (view->is_playback_active()) {
 		if (id == "cursor-move-right")

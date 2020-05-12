@@ -1,7 +1,7 @@
 # Language
 Deutsch
 # Num IDs
-963
+1031
 # Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -599,7 +599,7 @@ midi_editor/beat_partition
 Schlagunterteilung, `Teilschläge`
 midi_editor/interval
 0
-
+Wieviele Halbtöne über dem Grundton
 midi_editor/ld_t_chord
 Typ
 
@@ -1418,10 +1418,10 @@ record_dialog/time
 
 record_dialog/dump
 Verwerfen
-
+Aktuelle Aufnahme löschen
 record_dialog/new_version
 Neue Version starten
-
+Neue Version starten
 popup_layer_menu/delete_layer
 Löschen
 
@@ -2892,8 +2892,212 @@ Hinzufügen
 song_dialog/tag-delete
 Löschen
 
+/layer-edit
+Inhalt bearbeiten
+
+audio-editor/group-mode
+Modus
+
+audio-editor/mode-clone
+
+Audioabschnitte kopieren/einfügen
+audio-editor/mode-rubber
+↔
+Gummiband-Dehnung
+audio-editor/mode-select
+I
+Markieren
+audio-editor/mode-smoothen
+Sm
+Glätten... TODO
+dummy-editor/dummy-editor
+Bearbeiten
+
+dummy-editor/group-edit
+Bearbeiten
+
+dummy-editor/more-warning
+Nur Audio- und Midispuren können hier bearbeitet werden
+
+dummy-editor/warning
+Kann diese Spur nicht bearbeiten
+
+menu/play-loop
+Schleife
+
+menu/play-toggle
+Abspielen
+
+midi_editor/apply_pitch_shift
+↕
+Tonhöhe nach oben oder unten verschieben
+midi_editor/chord-augmented
+Caug
+Erweiterter Akkord
+midi_editor/chord-diminished
+Cdim
+Verminderter Akkord
+midi_editor/chord-inversion-1
+-1
+1. Umkehrung
+midi_editor/chord-inversion-2
+-2
+2. Umkehrung
+midi_editor/chord-inversion-none
+0
+Normal
+midi_editor/chord-major
+C
+Dur Akkord
+midi_editor/chord-major7
+CM⁷
+Großer Septakkord
+midi_editor/chord-minor
+Moll
+Moll Akkord
+midi_editor/chord-minor7
+Cm⁷
+Mollseptakkord
+midi_editor/flag-none
+✂
+Alle Flags entfernen
+midi_editor/flag-staccato
+.
+Staccato Flag setzen
+midi_editor/flag-tenuto
+_
+Tenuto Flag setzen
+midi_editor/flag-trill
+𝆖
+Triller Flag setzen
+midi_editor/grp-flags
+Flags
+
+midi_editor/grp-length
+Noten Länge
+
+midi_editor/grp-modifier
+Versetzung
+
+midi_editor/length-custom
+...
+Benutzerdefinierte Länge (L,P)
+midi_editor/length-dotted
+𝅘𝅥.
+Punktierte Note (+50% Länge, kann mit allen Basis-Längen kombiniert werden)
+midi_editor/length-eighth
+𝅘𝅥𝅮
+Achtel Note (E)
+midi_editor/length-half
+𝅗𝅥
+Halbe Note
+midi_editor/length-quarter
+𝅘𝅥
+Viertelnote (Q)
+midi_editor/length-result
+
+Resultierende Notenlänge / Schlagteiler
+midi_editor/length-sixteenth
+𝅘𝅥𝅯
+Sechzehntelnote (S)
+midi_editor/length-triplet
+𝅘𝅥𝅮/₃
+Trippelnote (kann mit jeder Basislänge kombiniert werden)
+midi_editor/length-whole
+𝅝
+Ganze Note
+midi_editor/mode-chord
+𝅘𝅥𝅘𝅥𝅘𝅥
+Akkorde erzeugen
+midi_editor/mode-classical
+𝄞
+Klassische Notendarstellung
+midi_editor/mode-interval
+𝅘𝅥𝅘𝅥
+Intervalle erzeugen
+midi_editor/mode-linear
+𝆱
+Lineare Notendarstellung
+midi_editor/mode-note
+𝅘𝅥
+Einzelnoten erzeugen
+midi_editor/mode-select
+I
+Markieren
+midi_editor/mode-tab
+TAB
+Darstellung als Gitarren-Tabulatur (nur für Saiteninstrumente)
+midi_editor/modifier-flat
+♭
+B - neue Note ist einen Halbton unter der Tonleiter
+midi_editor/modifier-natural
+♮
+Auflösungszeichen - neue Note ignoriert die Vorzeichen der Tonleiter
+midi_editor/modifier-none
+
+Keines - neue Note wird nur von der aktuellen Tonleiter beeinflusst (durch \"Tonleiterwechsel\" Operation unten definiert)
+midi_editor/modifier-sharp
+♯
+Kreuz - neue Note ist einen Halbton über der Tonleiter
+new_dialog/type-audio-mono
+∿
+Audio (mono)
+new_dialog/type-audio-stereo
+∿₂
+Audio (stereo)
+new_dialog/type-midi
+♫
+Midi
+popup_fx_menu/replace
+Ersetzen...
+
+question-dialog-int/question-dialog-int
+Frage
+
+question-dialog-intint/question-dialog-intint
+Frage
+
+record_dialog/pause
+
+Pause/Aufnahme fortsetzen
+record_dialog/start
+
+Aufnahme starten
+toolbar/mode-edit-check
+Bearbeiten
+
+toolbar/pause
+Pause
+
+toolbar/play
+Abspielen
+
+toolbar/record
+Aufnehmen
+
+toolbar/stop
+Stopp
+
+midi_editor/chord-augmented-major7
+C+M⁷
+Erweiterter Dur Septakkord
+midi_editor/chord-augmented7
+C+⁷
+Erweiterter Dur Septakkord
+midi_editor/chord-diminished7
+Cdim⁷
+Verminderter Septakkord
+midi_editor/chord-dominant7
+C⁷
+Dominant Septakkord
+midi_editor/chord-half-diminished7
+Cø⁷
+Halbverminderter Septakkord
+midi_editor/chord-minor-major7
+CmM⁷
+Moll-Dur Septakkord
 # Num Language Strings
-246
+248
 # Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3387,3 +3591,7 @@ no midi tracks selected
 keine Midispur ausgewählt
 vertical zoom %.0f%%
 vertikaler Zoom %.0f%%
+yes
+Ja
+Major seventh
+Dur Sept

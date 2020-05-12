@@ -702,13 +702,6 @@ void AudioView::on_command(const string &id) {
 	if (id == "track-explode")
 		toggle_track_exploded();
 
-	if (mode == mode_default) {
-		if (id == "layer-up")
-			move_to_layer(-1);
-		if (id == "layer-down")
-			move_to_layer(1);
-	}
-
 	float dt = 0.05f;
 	if (id == "cam-move-right")
 		cam.move(ScrollSpeedFast * dt / cam.scale);

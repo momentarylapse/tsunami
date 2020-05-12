@@ -1978,11 +1978,47 @@ Grid
 vertical
 0
 0
-9
+10
+Group
+grp-view
+
+0
+0
+1
+Grid
+?
+homogenousx
+0
+0
+4
+ToggleButton
+mode-classical
+flat,huge,expandx,ignorefocus
+0
+0
+0
+ToggleButton
+mode-tab
+flat,huge,ignorefocus
+1
+0
+0
+ToggleButton
+mode-linear
+flat,huge,ignorefocus
+2
+0
+0
+Label
+dummy1
+
+3
+0
+0
 Group
 me_group_creation
 
-0
+1
 0
 1
 Grid
@@ -1990,7 +2026,7 @@ Grid
 vertical
 0
 0
-4
+3
 Grid
 ?
 homogenousx
@@ -2021,10 +2057,16 @@ flat,huge,expandx,ignorefocus
 3
 0
 0
+Revealer
+revealer-interval
+
+1
+0
+1
 Grid
 grid-interval
-hidden
-1
+
+0
 0
 1
 SpinButton
@@ -2033,24 +2075,18 @@ range=-99:99,expandx
 0
 0
 0
-Grid
-grid-chord
-vertical,hidden
+Revealer
+revealer-chord
+margin-left=20
 2
 0
-3
-Separator
-
-
-0
-0
-0
-Grid
-?
-homogenousx
 1
+Grid
+grid-chord
+homogenousx
 0
-6
+0
+15
 ToggleButton
 chord-major
 flat,big,expandx,ignorefocus
@@ -2076,75 +2112,75 @@ flat,big,expandx,ignorefocus
 0
 0
 ToggleButton
-chord-major7
-flat,big,hidden,ignorefocus
+chord-dominant7
+flat,big,ignorefocus
 0
+1
+0
+ToggleButton
+chord-major7
+flat,big,ignorefocus
+1
 1
 0
 ToggleButton
 chord-minor7
-flat,big,hidden,ignorefocus
-1
+flat,big,ignorefocus
+2
 1
 0
-Grid
-?
-homogenousx
+ToggleButton
+chord-minor-major7
+flat,big,ignorefocus
+3
+1
+0
+ToggleButton
+chord-half-diminished7
+flat,big,ignorefocus
+0
 2
 0
+ToggleButton
+chord-diminished7
+flat,big,ignorefocus
+1
+2
+0
+ToggleButton
+chord-augmented7
+flat,big,ignorefocus
+2
+2
+0
+ToggleButton
+chord-augmented-major7
+flat,big,ignorefocus
 3
+2
+0
 ToggleButton
 chord-inversion-none
 flat,big,expandx,ignorefocus
 0
-0
+3
 0
 ToggleButton
 chord-inversion-1
 flat,big,expandx,ignorefocus
 1
-0
+3
 0
 ToggleButton
 chord-inversion-2
 flat,big,expandx,ignorefocus
 2
-0
-0
-Grid
-?
-homogenousx
 3
-0
-4
-ToggleButton
-mode-classical
-flat,huge,expandx,ignorefocus
-0
-0
-0
-ToggleButton
-mode-tab
-flat,huge,ignorefocus
-1
-0
-0
-ToggleButton
-mode-linear
-flat,huge,ignorefocus
-2
-0
-0
-Label
-dummy1
-
-3
-0
 0
 Group
 grp-length
 
-1
+2
 0
 1
 Grid
@@ -2210,7 +2246,7 @@ length-result
 Group
 grp-modifier
 
-2
+3
 0
 1
 Grid
@@ -2246,7 +2282,7 @@ flat,big,expandx,ignorefocus
 Group
 grp-flags
 
-3
+4
 0
 1
 Grid
@@ -2282,7 +2318,7 @@ big,expandx,ignorefocus
 Group
 grp_operations
 
-4
+5
 0
 1
 Grid
@@ -2324,7 +2360,7 @@ big,ignorefocus
 Expander
 grp_input
 
-5
+6
 0
 1
 Grid
@@ -2390,7 +2426,7 @@ ignorefocus
 Expander
 me_group_reference
 hidden
-6
+7
 0
 1
 ListView
@@ -2402,13 +2438,13 @@ height=200,noexpandy,nobar,select-multi
 Text
 ?
 expandy
-7
+8
 0
 0
 Group
 me_group_edit
 
-8
+9
 0
 1
 Grid
@@ -6910,7 +6946,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-566
+573
 # Text
 /bars-add
 Add bars...
@@ -7696,32 +7732,50 @@ midi_editor/apply_string
 𝄛
 Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)
 midi_editor/chord-augmented
-Aug
-Augmented
+Caug
+Augmented chord
+midi_editor/chord-augmented-major7
+C+M⁷
+Augmented major 7th chord
+midi_editor/chord-augmented7
+C+⁷
+Augmented 7th chord
 midi_editor/chord-diminished
-Dim
-Diminished
+Cdim
+Diminished chord
+midi_editor/chord-diminished7
+Cdim⁷
+Diminished 7th chord
+midi_editor/chord-dominant7
+C⁷
+Dominant 7th chord
+midi_editor/chord-half-diminished7
+Cø⁷
+Half diminished 7th chord
 midi_editor/chord-inversion-1
-Inv 1
-1st inversion
+-1
+1st inversion (root note on top)
 midi_editor/chord-inversion-2
-Inv 2
-2nd inversion
+-2
+2nd inversion (root and third on top)
 midi_editor/chord-inversion-none
-
-Regular
+0
+Root position
 midi_editor/chord-major
-Maj
-Major
+C
+Major chord
 midi_editor/chord-major7
-Maj7
-Major 7th
+CM⁷
+Major 7th chord
 midi_editor/chord-minor
-Min
-Minor
+Cm
+Minor chord
+midi_editor/chord-minor-major7
+CmM⁷
+Minor major 7th chord
 midi_editor/chord-minor7
-Min7
-Minor 7th
+Cm⁷
+Minor 7th chord
 midi_editor/flag-none
 ✂
 Clear all flags
@@ -7742,6 +7796,9 @@ Note length
 
 midi_editor/grp-modifier
 Modifier
+
+midi_editor/grp-view
+View
 
 midi_editor/grp_input
 Keyboard input
@@ -8616,7 +8673,7 @@ Stimmung
 # Language
 Deutsch
 # Number Of IDs
-962
+1030
 # Text
 /add-track-audio-mono
 Audio (mono)
@@ -8749,6 +8806,9 @@ Löschen
 
 /layer-down
 Gehe runter
+
+/layer-edit
+Inhalt bearbeiten
 
 /layer-edit-midi
 Midi bearbeiten
@@ -8975,6 +9035,21 @@ Auswahl\\Glätten\\Clonen
 audio-editor/group-edit
 Bearbeiten
 
+audio-editor/group-mode
+Modus
+
+audio-editor/mode-clone
+
+Audioabschnitte kopieren/einfügen
+audio-editor/mode-rubber
+↔
+Gummiband-Dehnung
+audio-editor/mode-select
+I
+Markieren
+audio-editor/mode-smoothen
+Sm
+Glätten... TODO
 audio-editor/t-no-audio
 Keine Audio-Spur ausgewählt
 
@@ -9203,6 +9278,18 @@ device-manager/output-list
 device-manager/top-priority
 
 höchste Priorität
+dummy-editor/dummy-editor
+Bearbeiten
+
+dummy-editor/group-edit
+Bearbeiten
+
+dummy-editor/more-warning
+Nur Audio- und Midispuren können hier bearbeitet werden
+
+dummy-editor/warning
+Kann diese Spur nicht bearbeiten
+
 dummy_favorite_dialog/cancel
 Abbrechen
 
@@ -9587,6 +9674,12 @@ Pause
 menu/play
 Abspielen
 
+menu/play-loop
+Schleife
+
+menu/play-toggle
+Abspielen
+
 menu/play_loop
 Schleife
 
@@ -9749,12 +9842,72 @@ Einen Tonartwechsel am Cursor einfügen
 midi_editor/apply_hand_position
 Hand setzen
 (TAB Modus) Positionen auf dem Griffbrett für die markierten Noten finden
+midi_editor/apply_pitch_shift
+↕
+Tonhöhe nach oben oder unten verschieben
 midi_editor/apply_string
 Saite setzen
 (TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern
 midi_editor/beat_partition
 4
 Schlagunterteilung, `Teilschläge`
+midi_editor/chord-augmented
+Caug
+Erweiterter Akkord
+midi_editor/chord-augmented-major7
+C+M⁷
+Erweiterter Dur Septakkord
+midi_editor/chord-augmented7
+C+⁷
+Erweiterter Dur Septakkord
+midi_editor/chord-diminished
+Cdim
+Verminderter Akkord
+midi_editor/chord-diminished7
+Cdim⁷
+Verminderter Septakkord
+midi_editor/chord-dominant7
+C⁷
+Dominant Septakkord
+midi_editor/chord-half-diminished7
+Cø⁷
+Halbverminderter Septakkord
+midi_editor/chord-inversion-1
+-1
+1. Umkehrung
+midi_editor/chord-inversion-2
+-2
+2. Umkehrung
+midi_editor/chord-inversion-none
+0
+Normal
+midi_editor/chord-major
+C
+Dur Akkord
+midi_editor/chord-major7
+CM⁷
+Großer Septakkord
+midi_editor/chord-minor
+Moll
+Moll Akkord
+midi_editor/chord-minor-major7
+CmM⁷
+Moll-Dur Septakkord
+midi_editor/chord-minor7
+Cm⁷
+Mollseptakkord
+midi_editor/flag-none
+✂
+Alle Flags entfernen
+midi_editor/flag-staccato
+.
+Staccato Flag setzen
+midi_editor/flag-tenuto
+_
+Tenuto Flag setzen
+midi_editor/flag-trill
+𝆖
+Triller Flag setzen
 midi_editor/flag_none
 x
 alle Flags entfernen
@@ -9767,6 +9920,15 @@ Tenuto Flag setzen
 midi_editor/flag_trill
 tr
 Triller Flag setzen
+midi_editor/grp-flags
+Flags
+
+midi_editor/grp-length
+Noten Länge
+
+midi_editor/grp-modifier
+Versetzung
+
 midi_editor/grp_input
 Keyboard Eingabe
 
@@ -9787,7 +9949,7 @@ maximal
 Stärke des Tastendrucks ignorieren und Lautstärke immer auf 100% setzen
 midi_editor/interval
 0
-
+Wieviele Halbtöne über dem Grundton
 midi_editor/ld_t_chord
 Typ
 
@@ -9806,6 +9968,33 @@ Unterteilung
 midi_editor/ld_t_scale
 Tonleiter
 
+midi_editor/length-custom
+...
+Benutzerdefinierte Länge (L,P)
+midi_editor/length-dotted
+𝅘𝅥.
+Punktierte Note (+50% Länge, kann mit allen Basis-Längen kombiniert werden)
+midi_editor/length-eighth
+𝅘𝅥𝅮
+Achtel Note (E)
+midi_editor/length-half
+𝅗𝅥
+Halbe Note
+midi_editor/length-quarter
+𝅘𝅥
+Viertelnote (Q)
+midi_editor/length-result
+
+Resultierende Notenlänge / Schlagteiler
+midi_editor/length-sixteenth
+𝅘𝅥𝅯
+Sechzehntelnote (S)
+midi_editor/length-triplet
+𝅘𝅥𝅮/₃
+Trippelnote (kann mit jeder Basislänge kombiniert werden)
+midi_editor/length-whole
+𝅝
+Ganze Note
 midi_editor/me_group_creation
 Erstellen
 
@@ -9839,6 +10028,27 @@ Markieren\\Einzelton\\Intervall\\Akkord
 midi_editor/midi_editor
 Midi
 
+midi_editor/mode-chord
+𝅘𝅥𝅘𝅥𝅘𝅥
+Akkorde erzeugen
+midi_editor/mode-classical
+𝄞
+Klassische Notendarstellung
+midi_editor/mode-interval
+𝅘𝅥𝅘𝅥
+Intervalle erzeugen
+midi_editor/mode-linear
+𝆱
+Lineare Notendarstellung
+midi_editor/mode-note
+𝅘𝅥
+Einzelnoten erzeugen
+midi_editor/mode-select
+I
+Markieren
+midi_editor/mode-tab
+TAB
+Darstellung als Gitarren-Tabulatur (nur für Saiteninstrumente)
 midi_editor/mode:classical
 Klassisch
 
@@ -9851,6 +10061,18 @@ Midi
 midi_editor/mode:tab
 Tab
 
+midi_editor/modifier-flat
+♭
+B - neue Note ist einen Halbton unter der Tonleiter
+midi_editor/modifier-natural
+♮
+Auflösungszeichen - neue Note ignoriert die Vorzeichen der Tonleiter
+midi_editor/modifier-none
+
+Keines - neue Note wird nur von der aktuellen Tonleiter beeinflusst (durch \"Tonleiterwechsel\" Operation unten definiert)
+midi_editor/modifier-sharp
+♯
+Kreuz - neue Note ist einen Halbton über der Tonleiter
 midi_editor/modifier:flat
 ♭
 Be
@@ -10022,6 +10244,15 @@ new_dialog/sub_beats
 new_dialog/t_sub_beats
 Teil-Schläge pro Schlag
 
+new_dialog/type-audio-mono
+∿
+Audio (mono)
+new_dialog/type-audio-stereo
+∿₂
+Audio (stereo)
+new_dialog/type-midi
+♫
+Midi
 pause_add_dialog/duration
 1.0
 
@@ -10453,6 +10684,9 @@ Löschen
 
 popup_fx_menu/load_favorite
 Parameter laden
+
+popup_fx_menu/replace
+Ersetzen...
 
 popup_fx_menu/save_favorite
 Parameter speichern
@@ -10991,6 +11225,12 @@ in Arbeit
 progress_dialog/progress_dialog
 in Arbeit
 
+question-dialog-int/question-dialog-int
+Frage
+
+question-dialog-intint/question-dialog-intint
+Frage
+
 raw_config_dialog/channels
 Mono\\Stereo
 
@@ -11041,7 +11281,7 @@ Verwerfen
 
 record_dialog/dump
 Verwerfen
-
+Aktuelle Aufnahme löschen
 record_dialog/grp_single_source
 Quelle
 
@@ -11050,7 +11290,10 @@ Quelle
 
 record_dialog/new_version
 Neue Version starten
+Neue Version starten
+record_dialog/pause
 
+Pause/Aufnahme fortsetzen
 record_dialog/rdt_audio_source
 Quelle
 
@@ -11084,6 +11327,9 @@ Ziel
 record_dialog/record_dialog
 Aufnahme
 
+record_dialog/start
+
+Aufnahme starten
 record_dialog/time
 0:00
 
@@ -11372,6 +11618,21 @@ Parameter laden
 synth_panel/save_favorite
 
 Parameter speichern
+toolbar/mode-edit-check
+Bearbeiten
+
+toolbar/pause
+Pause
+
+toolbar/play
+Abspielen
+
+toolbar/record
+Aufnehmen
+
+toolbar/stop
+Stopp
+
 track-mixer/mute
 M
 Stumm
@@ -11505,7 +11766,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 # Num Language Strings
-246
+248
 # Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -11691,6 +11952,8 @@ Lydian
 Lydisch
 Major
 Dur
+Major seventh
+Dur Sept
 Master
 Master
 Mastering
@@ -11997,5 +12260,7 @@ unknown synthesizer:
 unbekannter Synthesizer: 
 vertical zoom %.0f%%
 vertikaler Zoom %.0f%%
+yes
+Ja
 𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)
 𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)

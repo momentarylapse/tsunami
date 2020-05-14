@@ -1,4 +1,4 @@
-Dialog marker_dialog "Marker" width=250 height=80
+Dialog marker_dialog "" width=250 height=80 headerbar
 	Grid ? "" vertical
 		Grid grid_text ""
 			Edit text "" expandx
@@ -7,4 +7,4 @@ Dialog marker_dialog "Marker" width=250 height=80
 			ComboBox key_type "" expandx
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button ok "Add marker" default image=hui:ok

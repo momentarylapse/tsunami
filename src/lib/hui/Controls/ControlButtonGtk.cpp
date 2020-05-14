@@ -39,7 +39,6 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 	}
 
 //	SetImageById(this, id);
-	set_options(OptionString);
 }
 
 string ControlButton::get_string() {

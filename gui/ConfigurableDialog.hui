@@ -1,14 +1,10 @@
-Dialog configurable_dialog ""
+Dialog configurable_dialog "" resizable width=400 height=100 headerbar
 	Grid grid "" vertical
 		Grid ? ""
 			Button load_favorite "" flat image=hui:open "tooltip=load parameter"
 			Button save_favorite "" flat image=hui:save "tooltip=save parameter"
-			.
-			.
-			.
 		Grid content "" 
 		Grid ? "" buttonbar
-			Button preview "Preview" image=hui:media-play
-			Text ? "" width=30
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button preview "" image=hui:media-play "tooltip=Preview"
+			Button ok "Apply" default image=hui:ok

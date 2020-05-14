@@ -95,6 +95,9 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 {
 	window = nullptr;
 	win = this;
+	headerbar = nullptr;
+	statusbar = nullptr;
+
 	if ((mode & WIN_MODE_DUMMY) > 0)
 		return;
 
@@ -117,7 +120,7 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 
 		// dialog -> center on screen or root (if given)    ->  done by gtk....later
 		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent->window));
-		gtk_window_set_resizable(GTK_WINDOW(window), true);
+		gtk_window_set_resizable(GTK_WINDOW(window), false);
 	}else{
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 		gtk_window_set_resizable(GTK_WINDOW(window), true);
@@ -562,6 +565,44 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 
 	gtk_widget_show(infobar->widget);
 	gtk_widget_show(infobar->label);
+}
+
+Array<std::pair<string, string>> parse_options(const string &options); // -> Control
+
+void Window::__set_options(const string &options) {
+	auto r = parse_options(options);
+	for (auto x: r) {
+		auto op = x.first;
+		auto val = x.second;
+
+		if (op == "resizable") {
+			if (val == "no" or val == "false")
+				gtk_window_set_resizable(GTK_WINDOW(window), false);
+			else
+				gtk_window_set_resizable(GTK_WINDOW(window), true);
+		} else if (op == "closable") {
+			if (val == "no" or val == "false")
+				gtk_window_set_resizable(GTK_WINDOW(window), false);
+			else
+				gtk_window_set_resizable(GTK_WINDOW(window), true);
+		} else if (op == "headerbar") {
+			_add_headerbar();
+		}
+	}
+}
+
+void Window::_add_headerbar() {
+	headerbar = gtk_header_bar_new();
+	//gtk_header_bar_set_title(GTK_HEADER_BAR(hb), "Dialog"); // sys_str(PartString[0])
+	//gtk_header_bar_set_subtitle(GTK_HEADER_BAR(hb), "test");
+	auto b1 = gtk_button_new_with_label("test");
+	auto b2 = gtk_button_new_with_label("test2");
+	gtk_widget_show(b1);
+	gtk_widget_show(b2);
+
+	gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerbar), true);
+	gtk_widget_show(headerbar);
+	gtk_window_set_titlebar(GTK_WINDOW(window), headerbar);
 }
 
 

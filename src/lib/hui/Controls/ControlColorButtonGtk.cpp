@@ -25,7 +25,6 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	widget = gtk_color_button_new();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
-	set_options(OptionString);
 }
 
 int col_f_to_i16(float f)

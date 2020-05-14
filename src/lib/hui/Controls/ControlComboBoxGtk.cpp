@@ -31,7 +31,6 @@ ControlComboBox::ControlComboBox(const string &title, const string &id) :
 		for (int i=0;i<PartString.num;i++)
 			__add_string(PartString[i]);
 	set_int(0);
-	set_options(OptionString);
 }
 
 string ControlComboBox::get_string()

@@ -1,4 +1,4 @@
-Dialog pause_add_dialog "New pause" width=250 height=80
+Dialog pause_add_dialog "" width=250 height=80 headerbar
 	Grid ? "" vertical
 		Grid ? ""
 			Text t_duration "Duration" right disabled
@@ -7,4 +7,4 @@ Dialog pause_add_dialog "New pause" width=250 height=80
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button ok "Add pause" default image=hui:ok

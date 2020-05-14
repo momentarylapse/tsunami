@@ -1,4 +1,4 @@
-Dialog bar_edit_dialog "Edit bars" width=350 height=80
+Dialog bar_edit_dialog "" width=350 height=80 headerbar
 	Grid ? "" vertical
 		TabControl mode "Speed\\Replace"
 			Grid ? "" vertical
@@ -25,4 +25,4 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 					Label result_bpm "" bold
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button ok "Edit bars" default image=hui:ok

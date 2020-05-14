@@ -21,7 +21,6 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 	GetPartStrings(title);
 	widget = gtk_check_button_new_with_label(sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkCheckboxChange), this);
-	set_options(OptionString);
 }
 
 string ControlCheckBox::get_string()

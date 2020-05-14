@@ -102,7 +102,7 @@ link,ignorefocus
 # Resource
 Dialog
 bar_add_dialog
-width=250,height=80
+width=250,height=80,headerbar
 0
 0
 1
@@ -196,16 +196,16 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
 # Resource
 Dialog
 bar_delete_dialog
-width=150,height=80
+width=150,height=80,headerbar
 0
 0
 1
@@ -239,16 +239,16 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
 # Resource
 Dialog
 bar_edit_dialog
-width=350,height=80
+width=350,height=80,headerbar
 0
 0
 1
@@ -396,16 +396,16 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
 # Resource
 Dialog
 configurable_dialog
-
+resizable,width=400,height=100,headerbar
 0
 0
 1
@@ -444,29 +444,23 @@ Grid
 buttonbar
 2
 0
-4
+3
+Button
+cancel
+image=hui:cancel
+0
+0
+0
 Button
 preview
 image=hui:media-play
-0
-0
-0
-Text
-?
-width=30
 1
 0
 0
 Button
-cancel
-image=hui:cancel
-2
-0
-0
-DefButton
 ok
-image=hui:ok
-3
+default,image=hui:ok
+2
 0
 0
 # Resource
@@ -632,7 +626,7 @@ track_list
 # Resource
 Dialog
 detune_synthesizer_dialog
-width=800,height=500
+width=800,height=500,resizable,headerbar
 0
 0
 1
@@ -668,7 +662,7 @@ all_octaves
 0
 Button
 close
-image=hui:close
+default,image=hui:close
 2
 0
 0
@@ -1241,7 +1235,7 @@ log_close
 # Resource
 Dialog
 marker_dialog
-width=250,height=80
+width=250,height=80,headerbar
 0
 0
 1
@@ -1293,9 +1287,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
@@ -2705,7 +2699,7 @@ link
 # Resource
 Dialog
 new_dialog
-width=250,height=80
+width=250,height=80,headerbar
 0
 0
 1
@@ -2871,16 +2865,16 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
 # Resource
 Dialog
 pause_add_dialog
-width=250,height=80
+width=250,height=80,headerbar
 0
 0
 1
@@ -2932,16 +2926,16 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
 # Resource
 Dialog
 pause_edit_dialog
-width=250,height=80
+width=250,height=80,headerbar
 0
 0
 1
@@ -2993,9 +2987,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
@@ -5999,7 +5993,7 @@ ok
 # Resource
 Dialog
 settings_dialog
-width=580,height=350
+width=580,height=350,headerbar,resizable
 0
 0
 1
@@ -6213,9 +6207,9 @@ buttonbar
 1
 0
 1
-DefButton
+Button
 close
-image=hui:close
+default,image=hui:close
 0
 0
 0
@@ -6906,7 +6900,7 @@ width=400,margintop=20
 # Resource
 Dialog
 track-routing-dialog
-width=100,height=50
+width=100,height=50,headerbar
 0
 0
 1
@@ -6918,7 +6912,7 @@ vertical
 3
 Label
 t-disclaimer
-height=40
+height=40,italic
 0
 0
 0
@@ -6936,7 +6930,7 @@ bold
 0
 Label
 t-target
-bold
+bold,expandx
 1
 0
 0
@@ -6948,20 +6942,20 @@ buttonbar
 2
 Button
 add-group
-
+image=hui:add
 0
 0
 0
 Button
 close
-
+default
 1
 0
 0
 # Resource
 Dialog
 tuning_dialog
-width=120,height=50
+width=120,height=50,headerbar
 0
 0
 1
@@ -6989,9 +6983,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
@@ -7000,7 +6994,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-582
+583
 # Text
 /bars-add
 Add bars...
@@ -7302,9 +7296,6 @@ Bpm
 bar_add_dialog/bad_t_count
 Number
 
-bar_add_dialog/bar_add_dialog
-New bars
-
 bar_add_dialog/beats
 1
 beats per bar
@@ -7320,13 +7311,16 @@ bar_add_dialog/count
 bar_add_dialog/divisor
 𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+bar_add_dialog/ok
+Add bars
+
 bar_add_dialog/pattern
 
 example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
 bar_add_dialog/shift-data
 Move data accordingly
 
-bar_delete_dialog/bar_delete_dialog
+bar_delete_dialog/ok
 Delete bars
 
 bar_delete_dialog/replace-by-pause
@@ -7334,9 +7328,6 @@ Replace by pause
 
 bar_delete_dialog/shift-data
 Move data accordingly
-
-bar_edit_dialog/bar_edit_dialog
-Edit bars
 
 bar_edit_dialog/beats
 1
@@ -7355,6 +7346,9 @@ Speed\\Replace
 
 bar_edit_dialog/number
 1
+
+bar_edit_dialog/ok
+Edit bars
 
 bar_edit_dialog/pattern
 
@@ -7389,9 +7383,12 @@ Name
 configurable_dialog/load_favorite
 
 load parameter
-configurable_dialog/preview
-Preview
+configurable_dialog/ok
+Apply
 
+configurable_dialog/preview
+
+Preview
 configurable_dialog/save_favorite
 
 save parameter
@@ -7414,14 +7411,14 @@ curve_console/target
 Parameter
 
 detune_synthesizer_dialog/all_octaves
-all octaves
+All octaves
 
 detune_synthesizer_dialog/detune_synthesizer_dialog
 Verstimmung
 
 detune_synthesizer_dialog/relative
-relative
-
+Relative
+Only show detuning relative to the original pitch
 device-manager/dev-tab
 Output\\Input\\Midi Input
 
@@ -7590,8 +7587,8 @@ Clear
 log_toolbar/log_close
 Close
 
-marker_dialog/marker_dialog
-Marker
+marker_dialog/ok
+Add marker
 
 menu/about
 About
@@ -8034,11 +8031,11 @@ Beats
 new_dialog/nd_t_bpm
 Speed
 
-new_dialog/new_dialog
-New file
-
 new_dialog/num_bars
 10
+
+new_dialog/ok
+New file
 
 new_dialog/pattern
 
@@ -8055,8 +8052,8 @@ Midi
 pause_add_dialog/duration
 1.0
 
-pause_add_dialog/pause_add_dialog
-New pause
+pause_add_dialog/ok
+Add pause
 
 pause_add_dialog/shift-data
 Move data accordingly
@@ -8070,7 +8067,7 @@ s
 pause_edit_dialog/duration
 1.0
 
-pause_edit_dialog/pause_edit_dialog
+pause_edit_dialog/ok
 Edit pause
 
 pause_edit_dialog/shift-data
@@ -8545,7 +8542,7 @@ settings_dialog/prebuffer_size
 
 will try to keep so many samples in the ringbuffer for an output stream
 settings_dialog/settings_dialog
-Einstellungen
+Settings
 
 settings_dialog/suck_size
 
@@ -8695,8 +8692,8 @@ track-mixer2/volume
 0
 Volume in dB
 track-routing-dialog/add-group
-Add group
 
+Add group
 track-routing-dialog/t-disclaimer
 ...this is highly experimental...don`t complain!
 
@@ -8745,8 +8742,8 @@ Track
 trackdest_dialog/trackdest_dialog
 Ziel-Spur für die Ebenen
 
-tuning_dialog/tuning_dialog
-Stimmung
+tuning_dialog/ok
+Apply tuning
 
 # Num Language Strings
 0

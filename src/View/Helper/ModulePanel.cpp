@@ -167,6 +167,7 @@ class ModuleExternalDialog : public hui::Dialog {
 public:
 	Module *module;
 	ModuleExternalDialog(ModulePanel *m, hui::Window *parent) : hui::Dialog(m->module->module_subtype, CONFIG_PANEL_WIDTH, 300, parent, true) {
+		set_options("", "resizable");
 		module = m->module;
 		m->set_options("grid", "expandx");
 		add_grid("", 0, 0, "grid");

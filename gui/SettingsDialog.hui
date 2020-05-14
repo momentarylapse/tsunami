@@ -1,4 +1,4 @@
-Dialog settings_dialog "Einstellungen" width=580 height=350
+Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable
 	Grid ? "" vertical
 		TabControl tab "General\\User Interface\\Devices\\Other" expandy
 			Grid ? ""
@@ -42,5 +42,5 @@ Dialog settings_dialog "Einstellungen" width=580 height=350
 				Text pdt_oggrate "OGG bitrate" right disabled
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx
 		Grid ? "" buttonbar
-			DefButton /close "Close" image=hui:close
+			Button /close "Close" default image=hui:close
 

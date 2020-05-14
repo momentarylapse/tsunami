@@ -1,7 +1,7 @@
-Dialog detune_synthesizer_dialog "Verstimmung" width=800 height=500
+Dialog detune_synthesizer_dialog "Verstimmung" width=800 height=500 resizable headerbar
 	Grid ? "" vertical
 		DrawingArea detune_area "" expandx expandy
 		Grid ? "" buttonbar
-			CheckBox relative "relative"
-			CheckBox all_octaves "all octaves"
-			Button /close "Close" image=hui:close
+			CheckBox relative "Relative" "tooltip=Only show detuning relative to the original pitch"
+			CheckBox all_octaves "All octaves"
+			Button /close "Close" default image=hui:close

@@ -153,11 +153,20 @@ void SetLanguage(const string &language)
 	UpdateAll();
 }
 
+// first try the specific namespace, then the global one
+#define FOR_LANG_RET(NS, ID, CMD) \
+for (auto &c: cur_lang->cmd) \
+	if (c.match(NS, ID) and c._namespace != "") \
+		return CMD; \
+for (auto &c: cur_lang->cmd) \
+	if (c.match(NS, ID)) \
+		return CMD;
+
 string GetLanguage(const string &ns, const string &id)
 {
 	if ((!_using_language_) or (id.num == 0))
 		return "";
-	for (Language::Command &c: cur_lang->cmd)
+	for (auto &c: cur_lang->cmd)
 		if (c.match(ns, id))
 			return c.text;
 	/*if (cur_lang->cmd[id].num == 0)
@@ -165,23 +174,23 @@ string GetLanguage(const string &ns, const string &id)
 	return "";
 }
 
-string GetLanguageR(const string &ns, Resource &cmd)
-{
+string GetLanguageR(const string &ns, Resource &cmd) {
+	string pre;
+	if (cmd.options.num > 0)
+		pre = "!" + implode(cmd.options, ",") + "\\";
+
 	if ((!_using_language_) or (cmd.id.num == 0))
-		return "!" + implode(cmd.options, ",") + "\\" + cmd.title;
-	for (Language::Command &c: cur_lang->cmd)
-		if (c.match(ns, cmd.id)){
-			if (cmd.options.num > 0)
-				return "!" + implode(cmd.options, ",") + "\\" + c.text;
-			return c.text;
-		}
-	if (cmd.options.num > 0){
+		return pre + cmd.title;
+
+	FOR_LANG_RET(ns, cmd.id, pre + c.text);
+
+	if (cmd.options.num > 0) {
 		if (cmd.title.head(1) == "!")
 			return "!" + implode(cmd.options, ",") + "," + cmd.title.substr(1, -1);
 		else
-			return "!" + implode(cmd.options, ",") + "\\" + cmd.title;
+			return pre + cmd.title;
 	}
-	return "!" + implode(cmd.options, ",") + "\\" + cmd.title;
+	return pre + cmd.title;
 }
 
 // tooltip
@@ -191,9 +200,7 @@ string GetLanguageT(const string &ns, const string &id, const string &tooltip)
 		return tooltip;
 	if ((!_using_language_) or (id.num == 0))
 		return "";
-	for (Language::Command &c: cur_lang->cmd)
-		if (c.match(ns, id))
-			return c.tooltip;
+	FOR_LANG_RET(ns, id, c.tooltip);
 	return "";
 }
 
@@ -216,19 +223,8 @@ string get_lang(const string &ns, const string &id, const string &text, bool all
 		return text;
 	if ((!_using_language_) or (id.num == 0))
 		return text;
-	string r = "";
-	for (Language::Command &c: cur_lang->cmd)
-		if (c.match(ns, id))
-			r = c.text;
-	if (r.num == 0)
-		return text;
-#ifdef HUI_API_WIN
-	if (allow_keys)
-		for (int i=0;i<_HuiCommand_.num;i++)
-			if (id == _HuiCommand_[i].id)
-				return r + "\t", HuiGetKeyCodeName(_HuiCommand_[i].key_code);
-#endif
-	return r;
+	FOR_LANG_RET(ns, id, c.text);
+	return text;
 }
 
 #ifdef HUI_API_WIN

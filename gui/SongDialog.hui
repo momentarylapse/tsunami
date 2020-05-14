@@ -1,18 +1,27 @@
 Dialog song_dialog "Sound-Datei" width=430 height=375
 	Grid ? "" expandy vertical
-		Group ad_t_data "Data"
+		Group grp-info "Info"
 			Grid ? ""
-				ListView data_list "key\\value" nobar height=110 noexpandy
+				Label t-start "Start" hgroup=a right disabled
+				Label start "" bold expandx "tooltip=Position of the first audio chunk/midi note"
 				---|
+				Label t-end "End" right disabled
+				Label end "" bold "tooltip=Position of the last audio chunk/midi note"
+				---|
+				Label t-length "Length" right disabled
+				Label length "" bold "tooltip=Overall time between the first and last audio chunk/midi note"
+				---|
+				Label t-samples "Samples" right disabled
+				Label samples "" bold "tooltip=Total number of samples (the smallest possible time interval in the file)"
+		Group grp-format "Format"
+			Grid ? ""
+				Text ad_t_samplerate "Samplerate" right disabled hgroup=a
+				ComboBox samplerate "" expandx editable "tooltip=How many samples to play per second. This only affects playback, audio data will not be altered to correct the resulting pitch change!"
+				---|
+				Text ad_t_format "Format" right disabled
 				Grid ? ""
-					Text ad_t_samplerate "Samplerate"
-					ComboBox samplerate "" expandx editable
-					---|
-					Text ad_t_format "Format"
-					ComboBox format "" expandx "tooltip=when saving"
-					---|
-					.
-					CheckBox compress "Compression" "tooltip=when saving"
+					ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
+					CheckBox compress "Compression" "tooltip=When saving. EXPERIMENTAL! (don\'t use!)"
 		Group ad_t_tags "Tags"
 			ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
 		Group ad_t_edit "Edit"

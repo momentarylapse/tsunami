@@ -89,10 +89,10 @@ Grid ? ''
 	DrawingArea area '' expandx expandy
 	---|
 	Grid ? ''
-		Label ? 'Freq Multiplier'
+		Label ? 'Freq Multiplier' right disabled
 		SpinButton factor '' range=0:32:0.001 expandx
 		---|
-		Label ? 'Amplitude'
+		Label ? 'Amplitude' right disabled
 		SpinButton amplitude '' range=0:100:0.001")
 		
 		event_x("area", "hui:draw", on_draw)

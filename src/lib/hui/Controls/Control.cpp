@@ -20,18 +20,20 @@ void DBDEL_DONE();
 void WinTrySendByKeyCode(Window *win, int key_code);
 
 // safety feature... in case we delete the control while it notifies us
-struct _HuiNotifyStackElement
-{
+struct _HuiNotifyStackElement {
 	Control *c;
 	bool deleted;
 };
+
 static Array<_HuiNotifyStackElement> _notify_stack_;
+
 inline void notify_push(Control *c) {
 	_HuiNotifyStackElement e;
 	e.c = c;
 	e.deleted = false;
 	_notify_stack_.add(e);
 }
+
 inline void notify_pop() {
 	_notify_stack_.pop();
 }
@@ -169,14 +171,15 @@ Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
 	return &panel->size_groups.back();
 }
 
-void set_style_for_widget(GtkWidget *widget, const string &css) {
+void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css) {
+	string css = "#" + id.replace(":", "") + _css;
 	//msg_write(css);
 	GError *error = nullptr;
 
 	auto *css_provider = gtk_css_provider_new();
 	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num, &error);
 	if (error) {
-		msg_error(string("css: ") + error->message);
+		msg_error(string("css: ") + error->message + " (" + css + ")");
 		return;
 	}
 
@@ -205,15 +208,15 @@ void Control::set_options(const string &options) {
 		else
 			op = aa.head(eq).replace("-", "");
 
-		if (op == "expandx")
+		if (op == "expandx") {
 			gtk_widget_set_hexpand(widget, true);
-		else if (op == "noexpandx")
+		} else if (op == "noexpandx") {
 			gtk_widget_set_hexpand(widget, false);
-		else if (op == "expandy")
+		} else if (op == "expandy") {
 			gtk_widget_set_vexpand(widget, true);
-		else if (op == "noexpandy")
+		} else if (op == "noexpandy") {
 			gtk_widget_set_vexpand(widget, false);
-		else if (op == "indent") {
+		} else if (op == "indent") {
 			indent = 25;
 #if GTK_CHECK_VERSION(3,12,0)
 			gtk_widget_set_margin_start(get_frame(), indent);
@@ -235,14 +238,15 @@ void Control::set_options(const string &options) {
 			grab_focus = false;
 			gtk_widget_set_can_focus(widget, false);
 		} else if (op == "big") {
-			string css = "#" + id + "{font-size: 150%}";
-			set_style_for_widget(widget, css);
+			set_style_for_widget(widget, id, "{font-size: 150%}");
 		} else if (op == "huge") {
-			string css = "#" + id + "{font-size: 180%}";
-			set_style_for_widget(widget, css);
+			set_style_for_widget(widget, id, "{font-size: 180%}");
 		} else if (op == "small") {
-			string css = "#" + id + "{font-size: 75%}";
-			set_style_for_widget(widget, css);
+			set_style_for_widget(widget, id, "{font-size: 75%}");
+		} else if (op == "disabled") {
+			enable(false);
+		} else if (op == "enabled") {
+			enable(true);
 		} else if (eq >= 0) {
 
 			string a1 = aa.tail(aa.num-eq-1);
@@ -271,8 +275,7 @@ void Control::set_options(const string &options) {
 			} else if (op == "marginbottom") {
 				gtk_widget_set_margin_bottom(get_frame(), a1._int());
 			} else if (op == "padding") {
-				string css = "#" + id + format("{padding: %dpx}", a1._int());
-				set_style_for_widget(widget, css);
+				set_style_for_widget(widget, id, format("{padding: %dpx}", a1._int()));
 			} else if ((op == "hgroup") or (op == "vgroup")) {
 				if (panel) {
 					auto g = get_size_group(panel, a1, (op == "vgroup") ? 2 : 1);

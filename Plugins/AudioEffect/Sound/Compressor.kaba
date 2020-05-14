@@ -159,10 +159,10 @@ class CompressorPanel extends ConfigPanel
 		add_drawing_area("!grabfocus,height=200,expandy\\", 0, 0, "drawing_area")
 		add_grid("!noexpandy", 0, 1, "table2")
 		set_target("table2")
-		add_label("Attack", 0, 0, "")
+		add_label("!right,disabled\\Attack", 0, 0, "")
 		add_spin_button("!range=0:100:0.1\\", 1, 0, "attack")
 		add_label("ms", 2, 0, "")
-		add_label("Release", 3, 0, "")
+		add_label("!right,disabled\\Release", 3, 0, "")
 		add_spin_button("!range=0:1000:0.1\\", 4, 0, "release")
 		add_label("ms", 5, 0, "")
 		

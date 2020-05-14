@@ -21,7 +21,7 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 };
 
 SongConsole::SongConsole(Session *session) :
-	SideBarConsole(_("File properties"), session)
+	SideBarConsole(_("File"), session)
 {
 	// dialog
 	set_border_width(5);
@@ -68,13 +68,11 @@ void SongConsole::load_data() {
 	enable("delete_tag", false);
 
 	// data
-	reset("data_list");
 	int samples = song->range().length;
-	add_string("data_list", _("Start") + "\\" + song->get_time_str_long(song->range().start()));
-	add_string("data_list", _("End") + "\\" + song->get_time_str_long(song->range().end()));
-	add_string("data_list", _("Length") + "\\" + song->get_time_str_long(samples));
-	add_string("data_list", _("Samples") + "\\" + i2s(samples));
-	//addString("data_list", _("Samplerate") + "\\ + i2s(audio->sample_rate) + " Hz");
+	set_string("start", song->get_time_str_long(song->range().start()));
+	set_string("end", song->get_time_str_long(song->range().end()));
+	set_string("length", song->get_time_str_long(samples));
+	set_string("samples", i2s(samples));
 
 	set_string("samplerate", i2s(song->sample_rate));
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)

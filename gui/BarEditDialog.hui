@@ -11,10 +11,10 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 			Grid ? "" vertical
 				Label t_info "Keeping the overall duration"
 				Grid ? ""
-					Label t_number "Number"
+					Label t_number "Number" right disabled
 					SpinButton number "1" range=1:1000:1 expandx
 					---|
-					Label t_beats "Beats"
+					Label t_beats "Beats" right disabled
 					Grid ? ""
 						SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
 						Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
@@ -22,7 +22,7 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 					---|
 					Label t_result_bpm "=> Bpm"
-					Label result_bpm "" disabled
+					Label result_bpm "" bold disabled
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

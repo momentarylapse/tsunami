@@ -45,7 +45,7 @@ enum class NoteLengthModifier {
 
 
 MidiEditorConsole::MidiEditorConsole(Session *session) :
-	SideBarConsole(_("Midi"), session)
+	SideBarConsole(_("Midi editor"), session)
 {
 	from_resource("midi_editor");
 

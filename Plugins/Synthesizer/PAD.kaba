@@ -152,13 +152,13 @@ class PADPanel extends ConfigPanel
 		from_source("
 Grid ? ''
 	Grid ? ''
-		Text ? 'bw'
+		Text ? 'BW' right disabled
 		SpinButton bw '0' range=0:10:0.01
 		---|
-		Text ? 'bwscale'
+		Text ? 'BW Scale' right disabled
 		SpinButton bwscale '0' range=0:10:0.01
 		---|
-		Text ? 'detune'
+		Text ? 'Detune' right disabled
 		SpinButton detune '0' range=-10:10:0.01
 	---|
 	DrawingArea drawing '' grabfocus expandy")

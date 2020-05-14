@@ -61,14 +61,14 @@ class Metronome extends AudioSource
 class MetronomePanel extends ConfigPanel
 	override Metronome *c
 	override void __init__(Module _m)
-		add_grid("!width=300", 0, 0, "table2")
+		add_grid("", 0, 0, "table2")
 		set_target("table2")
-		add_label("Geschwindigkeit:", 0, 0, "")
+		add_label("!right,disabled\\Speed", 0, 0, "")
 		add_spin_button("!expandx,range=0:1000:0.1\\", 1, 0, "beats_per_minute")
 		add_label("/min", 2, 0, "")
-		add_label("Schläge pro Takt:", 0, 1, "")
+		add_label("!right,disabled\\Beats per bar", 0, 1, "")
 		add_spin_button("!range=1:32:1\\", 1, 1, "beats_per_measure")
-		add_label("Lautstärke:", 0, 2, "")
+		add_label("!right,disabled\\Volume", 0, 2, "")
 		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
 		add_label("%", 2, 2, "")
 	

@@ -51,19 +51,19 @@ Grid ? ''
 	DrawingArea area '' expandx expandy
 	---|
 	Grid ? ''
-		Label ? 'Type'
+		Label ? 'Type' right disabled
 		ComboBox type 'Sine\\Square\\Saw' expandx
 		---|
-		Label ? 'Voices'
+		Label ? 'Voices' right disabled
 		SpinButton voices '' range=1:{{MAX_VOICES}} expandx
 		---|
-		Label ? 'Detune'
+		Label ? 'Detune' right disabled
 		SpinButton detune '' range=0:10:0.01 expandx
 		---|
-		Label ? 'Blend'
+		Label ? 'Blend' right disabled
 		SpinButton blend '' range=0:1:0.01 expandx
 		---|
-		Label ? 'Amplitude'
+		Label ? 'Amplitude' right disabled
 		SpinButton amplitude '' range=0:100:0.001")
 		
 		event_x("area", "hui:draw", on_draw)

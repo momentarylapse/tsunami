@@ -1,7 +1,7 @@
 Dialog pause_add_dialog "New pause" width=250 height=80
 	Grid ? "" vertical
 		Grid ? ""
-			Text t_duration "Duration"
+			Text t_duration "Duration" right disabled
 			SpinButton duration "1.0" range=0:10000:0.001 expandx
 			Text t_s "s"
 		CheckBox shift-data "Move data accordingly"

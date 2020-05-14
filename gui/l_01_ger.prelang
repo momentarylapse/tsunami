@@ -1,7 +1,7 @@
 # Language
 Deutsch
 # Num IDs
-1031
+1038
 # Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2932,10 +2932,10 @@ midi_editor/apply_pitch_shift
 ↕
 Tonhöhe nach oben oder unten verschieben
 midi_editor/chord-augmented
-Caug
++
 Erweiterter Akkord
 midi_editor/chord-diminished
-Cdim
+-
 Verminderter Akkord
 midi_editor/chord-inversion-1
 -1
@@ -2947,16 +2947,16 @@ midi_editor/chord-inversion-none
 0
 Normal
 midi_editor/chord-major
-C
+M
 Dur Akkord
 midi_editor/chord-major7
-CM⁷
+M⁷
 Großer Septakkord
 midi_editor/chord-minor
-Moll
+m
 Moll Akkord
 midi_editor/chord-minor7
-Cm⁷
+m⁷
 Mollseptakkord
 midi_editor/flag-none
 ✂
@@ -3096,8 +3096,29 @@ Halbverminderter Septakkord
 midi_editor/chord-minor-major7
 CmM⁷
 Moll-Dur Septakkord
+midi_editor/grp-view
+Ansicht
+
+song_dialog/grp-format
+Format
+
+song_dialog/grp-info
+Info
+
+song_dialog/t-end
+Ende:
+
+song_dialog/t-length
+Länge:
+
+song_dialog/t-samples
+Samples:
+
+song_dialog/t-start
+Anfang:
+
 # Num Language Strings
-248
+255
 # Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3595,3 +3616,17 @@ yes
 Ja
 Major seventh
 Dur Sept
+Audio editor
+Audioeditor
+Dominant seventh
+Dominant-Septakkord
+Editor
+Editor
+File
+Datei
+Midi editor
+Midieditor
+Minor major seventh
+Moll-Dur-Septakkord
+Minor seventh
+Moll-Septakkord

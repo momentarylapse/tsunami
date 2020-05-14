@@ -2,44 +2,44 @@ Dialog settings_dialog "Einstellungen" width=580 height=350
 	Grid ? "" vertical
 		TabControl tab "General\\User Interface\\Devices\\Other" expandy
 			Grid ? ""
-				Text pdp_language "Language"
+				Text pdp_language "Language" right disabled
 				ComboBox language "" expandx
 				---|
-				Text pdt_defaultartist "Default artist"
+				Text pdt_defaultartist "Default artist" right disabled
 				Edit default_artist "" "tooltip=will create an artist=... tag in new files"
 				---|
-				Text t_quick_export_dir "Quick export"
+				Text t_quick_export_dir "Quick export" right disabled
 				Grid ? ""
 					Edit quick_export_dir "" expandx disabled
 					Button quick_export_dir_find "" image=hui:find
 			Grid ? ""
-				Text pdp_colorscheme "Color scheme"
+				Text pdp_colorscheme "Color scheme" right disabled
 				ComboBox color_scheme "" expandx
 				---|
-				Text t_scroll_speed "Scroll speed"
+				Text t_scroll_speed "Scroll speed" right disabled
 				SpinButton scroll_speed "" --range=0.1:20:0.1
 				---|
-				Text t_quality "Quality"
+				Text t_quality "Quality" right disabled
 				Grid ? ""
-					CheckBox antialiasing "antialiasing"
-					CheckBox high_details "high details"
+					CheckBox antialiasing "Antialiasing"
+					CheckBox high_details "High details"
 				---|
-				Text t_debug "Debug"
+				Text t_debug "Debug" right disabled
 				CheckBox cpu_meter "CPU meter"
 			Grid ? ""
-				Text t_audio_api "Audio library"
+				Text t_audio_api "Audio library" right disabled
 				ComboBox audio_api "" expandx "tooltip=a program restart is required to apply"
 				---|
-				Text t_midi_api "Midi library"
+				Text t_midi_api "Midi library" right disabled
 				ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
 				---|
-				Text t_prebuffer_size "Prebuffer"
+				Text t_prebuffer_size "Prebuffer" right disabled
 				SpinButton prebuffer_size "" --range=0:1000000:1 "tooltip=will try to keep so many samples in the ringbuffer for an output stream"
 				---|
-				Text t_suck_size "Suck buffer"
+				Text t_suck_size "Suck buffer" right disabled
 				SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
 			Grid ? ""
-				Text pdt_oggrate "OGG bitrate"
+				Text pdt_oggrate "OGG bitrate" right disabled
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx
 		Grid ? "" buttonbar
 			DefButton /close "Close" image=hui:close

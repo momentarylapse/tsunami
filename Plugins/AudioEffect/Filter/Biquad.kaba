@@ -107,12 +107,12 @@ class BiquadPanel extends ConfigPanel
 Grid ? '' vertical
 	DrawingArea drawing '' grabfocus expandy
 	Grid ? ''
-		Label ? 'a'
+		Label ? 'a' right disabled
 		.
 		SpinButton a1 '' range=-100:100:0.01
 		SpinButton a2 '' range=-100:100:0.01
 		---|
-		Label ? 'b'
+		Label ? 'b' right disabled
 		SpinButton b0 '' range=-100:100:0.01
 		SpinButton b1 '' range=-100:100:0.01
 		SpinButton b2 '' range=-100:100:0.01")

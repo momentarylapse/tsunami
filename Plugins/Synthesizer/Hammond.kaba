@@ -72,15 +72,15 @@ class HammondPanel extends ConfigPanel
 		from_source("
 Grid ? '' vertical
 	Grid ? ''
-		Label ? 'Attack'
+		Label ? 'Attack' right disabled
 		SpinButton attack '0' range=0:500:0.1 expandx
 		Label ? 'ms'
 		---|
-		Label ? 'Release'
+		Label ? 'Release' right disabled
 		SpinButton release '0' range=0:500:0.1 expandx
 		Label ? 'ms'
 		---|
-		Label ? 'Key stutter'
+		Label ? 'Key stutter' right disabled
 		SpinButton stutter '0' range=0:100:1 expandx
 		Label ? '%'
 	DrawingArea drawing '' grabfocus")

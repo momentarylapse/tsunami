@@ -42,7 +42,7 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win)
 }
 
 TrackConsole::TrackConsole(Session *session) :
-	SideBarConsole(_("Track properties"), session)
+	SideBarConsole(_("Track"), session)
 {
 	track = nullptr;
 	panel = nullptr;
@@ -129,12 +129,13 @@ void TrackConsole::load_data() {
 }
 
 void TrackConsole::update_strings() {
-	string tuning = format(_("%d strings: "), track->instrument.string_pitch.num);
+	string tuning = format(_("%d strings: <b>"), track->instrument.string_pitch.num);
 	for (int i=0; i<track->instrument.string_pitch.num; i++) {
 		if (i > 0)
 			tuning += ", ";
 		tuning += pitch_name(track->instrument.string_pitch[i]);
 	}
+	tuning += "</b>";
 	if (track->instrument.string_pitch.num == 0)
 		tuning = "<i>" + _(" - no strings -") + "</i>";
 	set_string("tuning", tuning);

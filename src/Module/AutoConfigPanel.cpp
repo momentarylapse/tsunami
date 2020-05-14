@@ -424,7 +424,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	set_target("grid");
 	foreachi(auto *a, aa, i) {
 		set_target("grid");
-		add_label(a->label, 0, i, "");
+		add_label("!right,disabled\\" + a->label, 0, i, format("label-%d", i));
 		add_label(a->unit, 2, i, "");
 		a->add_gui(this, i, [a,this]{
 			a->value_from_gui();

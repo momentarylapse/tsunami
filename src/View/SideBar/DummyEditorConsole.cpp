@@ -10,7 +10,7 @@
 
 
 DummyEditorConsole::DummyEditorConsole(Session *session) :
-	SideBarConsole(_("Edit"), session)
+	SideBarConsole(_("Editor"), session)
 {
 	from_resource("dummy-editor");
 

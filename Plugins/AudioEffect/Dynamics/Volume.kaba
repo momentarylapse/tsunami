@@ -43,7 +43,7 @@ class Volume extends AudioEffect
 		override void __init__(Module _v)
 			add_grid("!width=400", 0, 0, "table1")
 			set_target("table1")
-			add_check_box("Maximieren", 0, 1, "max")
+			add_check_box("Maximize", 0, 1, "max")
 			add_grid("", 0, 0, "table2")
 			set_target("table2")
 			add_slider("!expandx", 0, 0, "volume_slider")

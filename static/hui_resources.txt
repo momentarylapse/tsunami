@@ -118,9 +118,9 @@ Grid
 0
 0
 8
-Text
+Label
 bad_t_count
-
+right,disabled
 0
 0
 0
@@ -130,9 +130,9 @@ range=1:10000:1,expandx
 1
 0
 0
-Text
+Label
 bad_t_beats
-
+right,disabled
 0
 1
 0
@@ -166,9 +166,9 @@ divisor
 3
 1
 0
-Text
+Label
 bad_t_bpm
-
+right,disabled
 0
 2
 0
@@ -326,7 +326,7 @@ Grid
 8
 Label
 t_number
-
+right,disabled
 0
 0
 0
@@ -338,7 +338,7 @@ range=1:1000:1,expandx
 0
 Label
 t_beats
-
+right,disabled
 0
 1
 0
@@ -380,7 +380,7 @@ t_result_bpm
 0
 Label
 result_bpm
-disabled
+bold,disabled
 1
 2
 0
@@ -2077,7 +2077,7 @@ range=-99:99,expandx
 0
 Revealer
 revealer-chord
-margin-left=20
+
 2
 0
 1
@@ -2113,49 +2113,49 @@ flat,big,expandx,ignorefocus
 0
 ToggleButton
 chord-dominant7
-flat,big,ignorefocus
+flat,ignorefocus
 0
 1
 0
 ToggleButton
 chord-major7
-flat,big,ignorefocus
+flat,ignorefocus
 1
 1
 0
 ToggleButton
 chord-minor7
-flat,big,ignorefocus
+flat,ignorefocus
 2
 1
 0
 ToggleButton
 chord-minor-major7
-flat,big,ignorefocus
+flat,ignorefocus
 3
 1
 0
 ToggleButton
 chord-half-diminished7
-flat,big,ignorefocus
+flat,ignorefocus
 0
 2
 0
 ToggleButton
 chord-diminished7
-flat,big,ignorefocus
+flat,ignorefocus
 1
 2
 0
 ToggleButton
 chord-augmented7
-flat,big,ignorefocus
+flat,ignorefocus
 2
 2
 0
 ToggleButton
 chord-augmented-major7
-flat,big,ignorefocus
+flat,ignorefocus
 3
 2
 0
@@ -2389,7 +2389,7 @@ ignorefocus
 0
 Text
 t_input
-
+right,disabled
 0
 1
 0
@@ -2401,7 +2401,7 @@ expandx,ignorefocus
 0
 Text
 t_input_volume
-
+right,disabled
 0
 2
 0
@@ -2795,7 +2795,7 @@ nd_g_metronome_params
 9
 Text
 nd_t_bpm
-
+right,disabled
 0
 0
 0
@@ -2813,7 +2813,7 @@ per_minute
 0
 Text
 nd_t_bars
-
+right,disabled
 0
 1
 0
@@ -2825,7 +2825,7 @@ range=0:999
 0
 Text
 nd_t_beats
-
+right,disabled
 0
 2
 0
@@ -2898,7 +2898,7 @@ Grid
 3
 Text
 t_duration
-
+right,disabled
 0
 0
 0
@@ -2959,7 +2959,7 @@ Grid
 3
 Text
 t_duration
-
+right,disabled
 0
 0
 0
@@ -6023,7 +6023,7 @@ Grid
 6
 Text
 pdp_language
-
+right,disabled
 0
 0
 0
@@ -6035,7 +6035,7 @@ expandx
 0
 Text
 pdt_defaultartist
-
+right,disabled
 0
 1
 0
@@ -6047,7 +6047,7 @@ default_artist
 0
 Text
 t_quick_export_dir
-
+right,disabled
 0
 2
 0
@@ -6077,7 +6077,7 @@ Grid
 8
 Text
 pdp_colorscheme
-
+right,disabled
 0
 0
 0
@@ -6089,7 +6089,7 @@ expandx
 0
 Text
 t_scroll_speed
-
+right,disabled
 0
 1
 0
@@ -6101,7 +6101,7 @@ scroll_speed
 0
 Text
 t_quality
-
+right,disabled
 0
 2
 0
@@ -6125,7 +6125,7 @@ high_details
 0
 Text
 t_debug
-
+right,disabled
 0
 3
 0
@@ -6143,7 +6143,7 @@ Grid
 8
 Text
 t_audio_api
-
+right,disabled
 0
 0
 0
@@ -6155,7 +6155,7 @@ expandx
 0
 Text
 t_midi_api
-
+right,disabled
 0
 1
 0
@@ -6167,7 +6167,7 @@ expandx
 0
 Text
 t_prebuffer_size
-
+right,disabled
 0
 2
 0
@@ -6179,7 +6179,7 @@ prebuffer_size
 0
 Text
 t_suck_size
-
+right,disabled
 0
 3
 0
@@ -6197,7 +6197,7 @@ Grid
 2
 Text
 pdt_oggrate
-
+right,disabled
 0
 0
 0
@@ -6231,9 +6231,9 @@ Grid
 expandy,vertical
 0
 0
-3
+4
 Group
-ad_t_data
+grp-info
 
 0
 0
@@ -6242,23 +6242,71 @@ Grid
 ?
 
 0
+0
+8
+Label
+t-start
+hgroup=a,right,disabled
+0
+0
+0
+Label
+start
+bold,expandx
+1
+0
+0
+Label
+t-end
+right,disabled
+0
+1
+0
+Label
+end
+bold
+1
+1
+0
+Label
+t-length
+right,disabled
 0
 2
-ListView
-data_list
-nobar,height=110,noexpandy
 0
+Label
+length
+bold
+1
+2
 0
+Label
+t-samples
+right,disabled
 0
+3
+0
+Label
+samples
+bold
+1
+3
+0
+Group
+grp-format
+
+1
+0
+1
 Grid
 ?
 
 0
-1
-5
+0
+4
 Text
 ad_t_samplerate
-
+right,disabled,hgroup=a
 0
 0
 0
@@ -6270,26 +6318,32 @@ expandx,editable
 0
 Text
 ad_t_format
-
+right,disabled
 0
 1
 0
+Grid
+?
+
+1
+1
+2
 ComboBox
 format
-expandx
-1
-1
+expandx,expandx
+0
+0
 0
 CheckBox
 compress
 
 1
-2
+0
 0
 Group
 ad_t_tags
 
-1
+2
 0
 1
 ListView
@@ -6301,7 +6355,7 @@ format=TT
 Group
 ad_t_edit
 
-2
+3
 0
 1
 Grid
@@ -6562,7 +6616,7 @@ noexpandx
 6
 Text
 t_volume
-
+right,disabled
 0
 0
 0
@@ -6580,7 +6634,7 @@ db
 0
 Text
 t_panning
-
+right,disabled
 0
 1
 0
@@ -6946,7 +7000,7 @@ image=hui:ok
 # Language
 English
 # Number Of IDs
-573
+582
 # Text
 /bars-add
 Add bars...
@@ -7732,25 +7786,25 @@ midi_editor/apply_string
 𝄛
 Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)
 midi_editor/chord-augmented
-Caug
++
 Augmented chord
 midi_editor/chord-augmented-major7
-C+M⁷
++M⁷
 Augmented major 7th chord
 midi_editor/chord-augmented7
-C+⁷
++⁷
 Augmented 7th chord
 midi_editor/chord-diminished
-Cdim
+-
 Diminished chord
 midi_editor/chord-diminished7
-Cdim⁷
+-⁷
 Diminished 7th chord
 midi_editor/chord-dominant7
-C⁷
+D⁷
 Dominant 7th chord
 midi_editor/chord-half-diminished7
-Cø⁷
+ø⁷
 Half diminished 7th chord
 midi_editor/chord-inversion-1
 -1
@@ -7762,19 +7816,19 @@ midi_editor/chord-inversion-none
 0
 Root position
 midi_editor/chord-major
-C
+M
 Major chord
 midi_editor/chord-major7
-CM⁷
+M⁷
 Major 7th chord
 midi_editor/chord-minor
-Cm
+m
 Minor chord
 midi_editor/chord-minor-major7
-CmM⁷
+mM⁷
 Minor major 7th chord
 midi_editor/chord-minor7
-Cm⁷
+m⁷
 Minor 7th chord
 midi_editor/flag-none
 ✂
@@ -7813,10 +7867,10 @@ midi_editor/input_capture
 Capture
 
 midi_editor/input_volume:key
-key speed
+Key speed
 Use the key pressure of the input device
 midi_editor/input_volume:max
-maximum
+Maximum
 Ignore key pressure and always use 100% volume
 midi_editor/interval
 0
@@ -7960,7 +8014,7 @@ new_dialog/divisor
 𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 new_dialog/metronome
-add
+Add
 
 new_dialog/nd_g_frequency
 Samplerate
@@ -8455,7 +8509,7 @@ sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
 
 settings_dialog/antialiasing
-antialiasing
+Antialiasing
 
 settings_dialog/audio_api
 
@@ -8467,7 +8521,7 @@ settings_dialog/default_artist
 
 will create an artist=... tag in new files
 settings_dialog/high_details
-high details
+High details
 
 settings_dialog/midi_api
 
@@ -8523,9 +8577,6 @@ Suck buffer
 settings_dialog/tab
 General\\User Interface\\Devices\\Other
 
-song_dialog/ad_t_data
-Data
-
 song_dialog/ad_t_edit
 Edit
 
@@ -8540,15 +8591,45 @@ Tags
 
 song_dialog/compress
 Compression
-when saving
-song_dialog/data_list
-key\\value
+When saving. EXPERIMENTAL! (don\\'t use!)
+song_dialog/end
 
+Position of the last audio chunk/midi note
 song_dialog/format
 
-when saving
+When saving. EXPERIMENTAL! (probably don\\'t change!)
+song_dialog/grp-format
+Format
+
+song_dialog/grp-info
+Info
+
+song_dialog/length
+
+Overall time between the first and last audio chunk/midi note
+song_dialog/samplerate
+
+How many samples to play per second. This only affects playback, audio data will not be altered to correct the resulting pitch change!
+song_dialog/samples
+
+Total number of samples (the smallest possible time interval in the file)
 song_dialog/song_dialog
 Sound-Datei
+
+song_dialog/start
+
+Position of the first audio chunk/midi note
+song_dialog/t-end
+End
+
+song_dialog/t-length
+Length
+
+song_dialog/t-samples
+Samples
+
+song_dialog/t-start
+Start
 
 song_dialog/tags
 Tag\\Value
@@ -8673,7 +8754,7 @@ Stimmung
 # Language
 Deutsch
 # Number Of IDs
-1030
+1037
 # Text
 /add-track-audio-mono
 Audio (mono)
@@ -9852,7 +9933,7 @@ midi_editor/beat_partition
 4
 Schlagunterteilung, `Teilschläge`
 midi_editor/chord-augmented
-Caug
++
 Erweiterter Akkord
 midi_editor/chord-augmented-major7
 C+M⁷
@@ -9861,7 +9942,7 @@ midi_editor/chord-augmented7
 C+⁷
 Erweiterter Dur Septakkord
 midi_editor/chord-diminished
-Cdim
+-
 Verminderter Akkord
 midi_editor/chord-diminished7
 Cdim⁷
@@ -9882,19 +9963,19 @@ midi_editor/chord-inversion-none
 0
 Normal
 midi_editor/chord-major
-C
+M
 Dur Akkord
 midi_editor/chord-major7
-CM⁷
+M⁷
 Großer Septakkord
 midi_editor/chord-minor
-Moll
+m
 Moll Akkord
 midi_editor/chord-minor-major7
 CmM⁷
 Moll-Dur Septakkord
 midi_editor/chord-minor7
-Cm⁷
+m⁷
 Mollseptakkord
 midi_editor/flag-none
 ✂
@@ -9928,6 +10009,9 @@ Noten Länge
 
 midi_editor/grp-modifier
 Versetzung
+
+midi_editor/grp-view
+Ansicht
 
 midi_editor/grp_input
 Keyboard Eingabe
@@ -11591,8 +11675,26 @@ key\\value
 song_dialog/format
 
 beim Speichern
+song_dialog/grp-format
+Format
+
+song_dialog/grp-info
+Info
+
 song_dialog/song_dialog
 Sound-Datei
+
+song_dialog/t-end
+Ende:
+
+song_dialog/t-length
+Länge:
+
+song_dialog/t-samples
+Samples:
+
+song_dialog/t-start
+Anfang:
 
 song_dialog/tag-add
 Hinzufügen
@@ -11766,7 +11868,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 # Num Language Strings
-248
+255
 # Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -11828,6 +11930,8 @@ Audio (mono)
 Audio (mono)
 Audio (stereo)
 Audio (stereo)
+Audio editor
+Audioeditor
 Augmented
 Übermäßig
 Bars
@@ -11892,12 +11996,16 @@ Devices
 Geräte
 Diminished
 Vermindert
+Dominant seventh
+Dominant-Septakkord
 Dorian
 Dorisch
 Double Bass
 Kontra-Bass
 Drums
 Schlagzeug
+Editor
+Editor
 Editor for audio files
 Editor für Audio Dateien
 Effects
@@ -11918,6 +12026,8 @@ Export file
 Datei exportieren
 Failed writing header to output stream\n
 Konnte Header nicht in Ausgabe Stream schreiben\n
+File
+Datei
 File properties
 Datei Eigenschaften
 Flute
@@ -11966,8 +12076,14 @@ Midi
 Midi
 Midi Fx
 Midi Fx
+Midi editor
+Midieditor
 Minor
 Moll
+Minor major seventh
+Moll-Dur-Septakkord
+Minor seventh
+Moll-Septakkord
 Mixer
 Mischpult
 Mixing console

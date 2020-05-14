@@ -6,10 +6,10 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 					SpinButton bpm "0" range=0:1000:0.1 expandx
 					Label t_bpm "Bpm"
 				Grid ? "" vertical
-					CheckBox shift-data "Move data accordingly"
+					CheckBox shift-data "Move data accordingly" expandx
 					CheckBox scale-audio "Scale audio" margin-left=30
 			Grid ? "" vertical
-				Label t_info "Keeping the overall duration"
+				Label t_info "Keeping the overall duration" expandx center italic
 				Grid ? ""
 					Label t_number "Number" right disabled
 					SpinButton number "1" range=1:1000:1 expandx
@@ -21,8 +21,8 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
 					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 					---|
-					Label t_result_bpm "=> Bpm"
-					Label result_bpm "" bold disabled
+					Label t_result_bpm "=> Bpm" right disabled
+					Label result_bpm "" bold
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

@@ -102,15 +102,11 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 
 	// creation
 	if (parent){
-		//window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		//gtk_window_set_modal(GTK_WINDOW(window), !allow_parent);
-		
 		window = gtk_dialog_new();
+
+
 		if (!allow_parent)
 			gtk_window_set_modal(GTK_WINDOW(window), true);//false);
-		// TODO GTK3
-		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
-		//gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #ifndef OS_WINDOWS
 #if !GTK_CHECK_VERSION(3,0,0)
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
@@ -118,30 +114,18 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
 #endif
 #endif
-	}else
+
+		// dialog -> center on screen or root (if given)    ->  done by gtk....later
+		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent->window));
+		gtk_window_set_resizable(GTK_WINDOW(window), true);
+	}else{
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		gtk_window_set_resizable(GTK_WINDOW(window), true);
+	}
 
 	GetPartStrings(title);
 
 	gtk_window_set_title(GTK_WINDOW(window), sys_str(PartString[0]));
-	gtk_window_set_resizable(GTK_WINDOW(window), true);
-	if (parent){
-		// dialog -> center on screen or root (if given)    ->  done by gtk....later
-		/*if (parent){
-			irect r=parent->GetOuterior();
-			x = r.x1 + (r.x2-r.x1-width)/2;
-			y = r.y1 + (r.y2-r.y1-height)/2;
-		}else{
-			GdkScreen *screen=gtk_window_get_screen(GTK_WINDOW(window));
-			x=(gdk_screen_get_width(screen)-width)/2;
-			y=(gdk_screen_get_height(screen)-height)/2;
-		}
-		//gtk_window_move(GTK_WINDOW(window),x,y);*/
-		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent->window));
-	}else{
-		/*if ((x >= 0) && (y >= 0))
-			gtk_window_move(GTK_WINDOW(window), x, y);*/
-	}
 
 	// size
 	gtk_window_resize(GTK_WINDOW(window), width, height);
@@ -160,48 +144,50 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 
 	// fill in some stuff
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);
-	if (parent){
+	if (parent) {
 		vbox = gtk_dialog_get_content_area(GTK_DIALOG(window));
-	}else{
+		plugable = vbox;
+		cur_control = nullptr;
+	} else {
 		vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 		//gtk_box_pack_start(GTK_BOX(window), vbox, TRUE, TRUE, 0);
 		gtk_container_add(GTK_CONTAINER(window), vbox);
 		gtk_widget_show(vbox);
+
+		// menu bar
+		menubar = gtk_menu_bar_new();
+		gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+
+		// tool bars
+	#if GTK_CHECK_VERSION(3,0,0)
+		gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[TOOLBAR_TOP]->widget), "primary-toolbar");
+	#endif
+		gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_TOP]->widget, FALSE, FALSE, 0);
+
+
+		hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+		//gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+		gtk_widget_show(hbox);
+
+		gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_LEFT]->widget, FALSE, FALSE, 0);
+
+		plugable = nullptr;
+		cur_control = nullptr;
+		// free to use...
+		//cur_control = hbox;
+		plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+		gtk_widget_show(plugable);
+		//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
+		gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_BOTTOM]->widget, FALSE, FALSE, 0);
+
+		// status bar
+		statusbar = gtk_statusbar_new();
+		gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 	}
-
-	// menu bar
-	menubar = gtk_menu_bar_new();
-	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
-
-	// tool bars
-#if GTK_CHECK_VERSION(3,0,0)
-	gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[TOOLBAR_TOP]->widget), "primary-toolbar");
-#endif
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_TOP]->widget, FALSE, FALSE, 0);
-
-
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-	//gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
-	gtk_widget_show(hbox);
-
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_LEFT]->widget, FALSE, FALSE, 0);
-
-	plugable = nullptr;
-	cur_control = nullptr;
-	// free to use...
-	//cur_control = hbox;
-	plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	gtk_widget_show(plugable);
-	//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
-	gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_BOTTOM]->widget, FALSE, FALSE, 0);
-
-	// status bar
-	statusbar = gtk_statusbar_new();
-	gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 	
 #ifdef OS_WINDOWS
 	hWnd = nullptr;
@@ -344,8 +330,7 @@ void Window::hide()
 }
 
 // set the string in the title bar
-void Window::set_title(const string &title)
-{
+void Window::set_title(const string &title) {
 	gtk_window_set_title(GTK_WINDOW(window),sys_str(title));
 }
 

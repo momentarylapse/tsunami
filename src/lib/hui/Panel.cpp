@@ -315,7 +315,7 @@ void Panel::set_from_resource(Resource *res) {
 	// directly change window?
 	if (panel_is_window and res_is_window) {
 		// title
-		win->set_title(GetLanguage(id, res->id));
+		win->set_title(GetLanguage(res->id, res->id));
 
 		// size
 		int width = res->value("width", "0")._int();

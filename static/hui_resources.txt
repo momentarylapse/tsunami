@@ -296,7 +296,7 @@ vertical
 2
 CheckBox
 shift-data
-
+expandx
 0
 0
 0
@@ -314,7 +314,7 @@ vertical
 2
 Label
 t_info
-
+expandx,center,italic
 0
 0
 0
@@ -374,13 +374,13 @@ divisor
 0
 Label
 t_result_bpm
-
+right,disabled
 0
 2
 0
 Label
 result_bpm
-bold,disabled
+bold
 1
 2
 0

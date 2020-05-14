@@ -239,7 +239,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// main table
 	set_target("main-grid");
-	add_drawing_area("!grabfocus", 0, 0, "area");
+	add_drawing_area("!grabfocus,gesture=zoom", 0, 0, "area");
 
 	toolbar[0]->set_by_id("toolbar");
 	//ToolbarConfigure(false, true);

@@ -249,6 +249,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	win->event_x(id, "hui:key-down", [=]{ on_key_down(); });
 	win->event_x(id, "hui:key-up", [=]{ on_key_up(); });
 	win->event_x(id, "hui:mouse-wheel", [=]{ on_mouse_wheel(); });
+	win->event_x(id, "hui:gesture-zoom", [=]{ mode->on_command("hui:gesture-zoom"); });
+	win->event_x(id, "hui:gesture-zoom-begin", [=]{ mode->on_command("hui:gesture-zoom-begin"); });
+	win->event_x(id, "hui:gesture-zoom-end", [=]{ mode->on_command("hui:gesture-zoom-end"); });
 
 	win->activate(id);
 

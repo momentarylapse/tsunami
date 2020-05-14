@@ -269,6 +269,8 @@ void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
 void ViewModeDefault::on_key_down(int k) {
 }
 
+static float _zoom_0_ = 1;
+
 void ViewModeDefault::on_command(const string &id) {
 
 	if (view->mode == view->mode_default) {
@@ -293,6 +295,16 @@ void ViewModeDefault::on_command(const string &id) {
 			expand_sel_range(view, this, true);
 		if (id == "cursor-expand-left")
 			expand_sel_range(view, this, false);
+	}
+
+	if (id == "hui:gesture-zoom-begin") {
+		_zoom_0_ = 1;//view->cam.scale;
+	}
+	if (id == "hui:gesture-zoom-end") {
+	}
+	if (id == "hui:gesture-zoom") {
+		view->cam.zoom(hui::GetEvent()->scroll_x/_zoom_0_, view->mx);
+		_zoom_0_ = hui::GetEvent()->scroll_x;
 	}
 }
 

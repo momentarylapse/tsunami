@@ -44,7 +44,6 @@ void ControlGrid::add(Control *child, int x, int y) {
 			gtk_header_bar_pack_end(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
 		else
 			gtk_header_bar_pack_start(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
-		gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(panel->win->headerbar), false);
 		hide(true);
 	} else {
 		gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);

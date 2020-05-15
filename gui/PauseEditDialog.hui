@@ -1,4 +1,4 @@
-Dialog pause_edit_dialog "" width=250 height=80 headerbar
+Dialog pause_edit_dialog "Edit pause" width=250 height=80 headerbar closebutton=no
 	Grid ? "" vertical
 		Grid ? ""
 			Text t_duration "Duration" right disabled
@@ -7,4 +7,4 @@ Dialog pause_edit_dialog "" width=250 height=80 headerbar
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			Button ok "Edit pause" default image=hui:ok
+			Button ok "Edit" default image=hui:ok

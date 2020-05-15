@@ -1,4 +1,4 @@
-Dialog configurable_dialog "" resizable width=400 height=100 headerbar
+Dialog configurable_dialog "" resizable width=400 height=100 headerbar closebutton=no
 	Grid grid "" vertical
 		Grid ? ""
 			Button load_favorite "" flat image=hui:open "tooltip=load parameter"

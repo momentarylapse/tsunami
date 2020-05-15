@@ -1,4 +1,4 @@
-Dialog new_dialog "" width=250 height=80 headerbar
+Dialog new_dialog "New file" width=250 height=80 headerbar closebutton=no
 	Grid ? "" vertical
 		Group nd_g_frequency "Samplerate"
 			Grid ? ""
@@ -28,4 +28,4 @@ Dialog new_dialog "" width=250 height=80 headerbar
 					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			Button ok "New file" default image=hui:ok
+			Button ok "New" default image=hui:ok

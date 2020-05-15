@@ -568,6 +568,7 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 }
 
 Array<std::pair<string, string>> parse_options(const string &options); // -> Control
+bool val_is_positive(const string &val, bool def = false);
 
 void Window::__set_options(const string &options) {
 	auto r = parse_options(options);
@@ -576,17 +577,14 @@ void Window::__set_options(const string &options) {
 		auto val = x.second;
 
 		if (op == "resizable") {
-			if (val == "no" or val == "false")
-				gtk_window_set_resizable(GTK_WINDOW(window), false);
-			else
-				gtk_window_set_resizable(GTK_WINDOW(window), true);
+			gtk_window_set_resizable(GTK_WINDOW(window), val_is_positive(val, true));
 		} else if (op == "closable") {
-			if (val == "no" or val == "false")
-				gtk_window_set_resizable(GTK_WINDOW(window), false);
-			else
-				gtk_window_set_resizable(GTK_WINDOW(window), true);
+			//gtk_window_set_resizable(GTK_WINDOW(window), val_is_positive(val, true));
 		} else if (op == "headerbar") {
 			_add_headerbar();
+		} else if (op == "closebutton") {
+			if (headerbar)
+				gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerbar), val_is_positive(val, true));
 		}
 	}
 }

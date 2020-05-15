@@ -213,6 +213,14 @@ Array<std::pair<string, string>> parse_options(const string &options) {
 	return r;
 }
 
+bool val_is_positive(const string &val, bool def = false) {
+	if (val == "no" or val == "false")
+		return false;
+	if (val == "yes" or val == "true")
+		return true;
+	return def;
+}
+
 void Control::set_options(const string &options) {
 	allow_signal_level ++;
 
@@ -225,11 +233,11 @@ void Control::set_options(const string &options) {
 		auto val = x.second;
 
 		if (op == "expandx") {
-			gtk_widget_set_hexpand(widget, true);
+			gtk_widget_set_hexpand(widget, val_is_positive(val, true));
 		} else if (op == "noexpandx") {
 			gtk_widget_set_hexpand(widget, false);
 		} else if (op == "expandy") {
-			gtk_widget_set_vexpand(widget, true);
+			gtk_widget_set_vexpand(widget, val_is_positive(val, true));
 		} else if (op == "noexpandy") {
 			gtk_widget_set_vexpand(widget, false);
 		} else if (op == "indent") {
@@ -247,9 +255,10 @@ void Control::set_options(const string &options) {
 			gtk_widget_set_margin_left(get_frame(), 0);
 		#endif
 		} else if (op == "grabfocus") {
-			grab_focus = true;
-			gtk_widget_set_can_focus(widget, true);
-			gtk_widget_grab_focus(widget);
+			grab_focus = val_is_positive(val, true);
+			gtk_widget_set_can_focus(widget, grab_focus);
+			if (grab_focus)
+				gtk_widget_grab_focus(widget);
 		} else if (op == "ignorefocus") {
 			grab_focus = false;
 			gtk_widget_set_can_focus(widget, false);

@@ -102,7 +102,7 @@ link,ignorefocus
 # Resource
 Dialog
 bar_add_dialog
-width=250,height=80,headerbar
+width=250,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -205,7 +205,7 @@ default,image=hui:ok
 # Resource
 Dialog
 bar_delete_dialog
-width=150,height=80,headerbar
+width=180,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -248,7 +248,7 @@ default,danger,image=hui:ok
 # Resource
 Dialog
 bar_edit_dialog
-width=350,height=80,headerbar
+width=350,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -405,7 +405,7 @@ default,image=hui:ok
 # Resource
 Dialog
 configurable_dialog
-resizable,width=400,height=100,headerbar
+resizable,width=400,height=100,headerbar,closebutton=no
 0
 0
 1
@@ -466,7 +466,7 @@ default,image=hui:ok
 # Resource
 Dialog
 configurable-selection-dialog
-width=400,height=500,headerbar,resizable
+width=400,height=500,headerbar,resizable,closebutton=no
 0
 0
 1
@@ -1235,7 +1235,7 @@ log_close
 # Resource
 Dialog
 marker_dialog
-width=250,height=80,headerbar
+width=250,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -2699,7 +2699,7 @@ link
 # Resource
 Dialog
 new_dialog
-width=250,height=80,headerbar
+width=250,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -2874,7 +2874,7 @@ default,image=hui:ok
 # Resource
 Dialog
 pause_add_dialog
-width=250,height=80,headerbar
+width=250,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -2935,7 +2935,7 @@ default,image=hui:ok
 # Resource
 Dialog
 pause_edit_dialog
-width=250,height=80,headerbar
+width=250,height=80,headerbar,closebutton=no
 0
 0
 1
@@ -6002,7 +6002,7 @@ Grid
 vertical
 0
 0
-2
+1
 TabControl
 tab
 expandy
@@ -6199,18 +6199,6 @@ ComboBox
 ogg_bitrate
 expandx
 1
-0
-0
-Grid
-?
-buttonbar
-1
-0
-1
-Button
-close
-image=hui:close
-0
 0
 0
 # Resource
@@ -6939,23 +6927,17 @@ Grid
 buttonbar
 2
 0
-2
+1
 Button
 add-group
 image=hui:add
 0
 0
 0
-Button
-close
-
-1
-0
-0
 # Resource
 Dialog
 track-selector
-width=300,height=500,headerbar,resizable
+width=300,height=500,headerbar,closebutton=no,resizable
 0
 0
 1
@@ -6992,7 +6974,7 @@ default
 # Resource
 Dialog
 tuning_dialog
-width=120,height=50,headerbar
+width=120,height=50,headerbar,closebutton=no
 0
 0
 1
@@ -7031,7 +7013,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-585
+594
 # Text
 /bars-add
 Add bars...
@@ -7333,6 +7315,9 @@ Bpm
 bar_add_dialog/bad_t_count
 Number
 
+bar_add_dialog/bar_add_dialog
+Add bars
+
 bar_add_dialog/beats
 1
 beats per bar
@@ -7349,7 +7334,7 @@ bar_add_dialog/divisor
 𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 bar_add_dialog/ok
-Add bars
+Add
 
 bar_add_dialog/pattern
 
@@ -7357,14 +7342,20 @@ example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc.
 bar_add_dialog/shift-data
 Move data accordingly
 
-bar_delete_dialog/ok
+bar_delete_dialog/bar_delete_dialog
 Delete bars
+
+bar_delete_dialog/ok
+Delete
 
 bar_delete_dialog/replace-by-pause
 Replace by pause
 
 bar_delete_dialog/shift-data
 Move data accordingly
+
+bar_edit_dialog/bar_edit_dialog
+Edit bars
 
 bar_edit_dialog/beats
 1
@@ -7385,7 +7376,7 @@ bar_edit_dialog/number
 1
 
 bar_edit_dialog/ok
-Edit bars
+Edit
 
 bar_edit_dialog/pattern
 
@@ -7624,8 +7615,11 @@ Clear
 log_toolbar/log_close
 Close
 
+marker_dialog/marker_dialog
+Marker
+
 marker_dialog/ok
-Add marker
+Set
 
 menu/about
 About
@@ -8068,11 +8062,14 @@ Beats
 new_dialog/nd_t_bpm
 Speed
 
+new_dialog/new_dialog
+New file
+
 new_dialog/num_bars
 10
 
 new_dialog/ok
-New file
+New
 
 new_dialog/pattern
 
@@ -8090,6 +8087,9 @@ pause_add_dialog/duration
 1.0
 
 pause_add_dialog/ok
+Add
+
+pause_add_dialog/pause_add_dialog
 Add pause
 
 pause_add_dialog/shift-data
@@ -8105,6 +8105,9 @@ pause_edit_dialog/duration
 1.0
 
 pause_edit_dialog/ok
+Edit
+
+pause_edit_dialog/pause_edit_dialog
 Edit pause
 
 pause_edit_dialog/shift-data
@@ -8744,6 +8747,9 @@ track-routing-dialog/track-routing-dialog
 Track routing
 
 track-selector/ok
+Select
+
+track-selector/track-selector
 Select track
 
 track-selector/tracks
@@ -8786,7 +8792,10 @@ trackdest_dialog/trackdest_dialog
 Ziel-Spur für die Ebenen
 
 tuning_dialog/ok
-Apply tuning
+Apply
+
+tuning_dialog/tuning_dialog
+Tuning
 
 # Num Language Strings
 0

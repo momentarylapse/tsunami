@@ -1,4 +1,4 @@
-Dialog configurable-selection-dialog "" width=400 height=500 headerbar resizable
+Dialog configurable-selection-dialog "" width=400 height=500 headerbar resizable closebutton=no
 	Grid ? ""
 		TreeView list "Name" nobar
 		---|

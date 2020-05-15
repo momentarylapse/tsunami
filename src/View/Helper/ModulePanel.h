@@ -29,10 +29,11 @@ public:
 		FIXED_WIDTH = 256,
 		FIXED_HEIGHT = 512,
 		DEFAULT = HEADER | FAVOURITES | ENABLE | FIXED_WIDTH,
-		DEFAULT_H = HEADER | FAVOURITES | ENABLE | FIXED_HEIGHT
+		DEFAULT_H = HEADER | FAVOURITES | ENABLE | FIXED_HEIGHT,
+		DEFAULT_S = HEADER | FAVOURITES | ENABLE
 	};
-	
-	ModulePanel(Module *m, Mode mode = Mode::DEFAULT);
+
+	ModulePanel(Module *m, hui::Panel *outer = nullptr, Mode mode = Mode::DEFAULT);
 	virtual ~ModulePanel();
 	void on_load();
 	void on_save();
@@ -46,7 +47,7 @@ public:
 	
 	void set_width(int width);
 	
-	ModulePanel *copy();
+	void copy_into(ModulePanel *source);
 	
 	void set_func_enable(std::function<void(bool)> f);
 	void set_func_delete(std::function<void()> f);
@@ -63,6 +64,7 @@ public:
 	Module *module;
 	string old_param;
 	ConfigPanel *p;
+	hui::Panel *outer;
 	hui::Menu *menu;
 };
 

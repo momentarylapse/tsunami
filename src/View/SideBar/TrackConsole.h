@@ -30,7 +30,6 @@ public:
 	void on_panning();
 	void on_instrument();
 	void on_edit_tuning();
-	void on_select_synth();
 
 	void set_track(Track *t);
 

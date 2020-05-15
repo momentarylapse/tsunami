@@ -18,14 +18,21 @@ extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
-ModulePanel::ModulePanel(Module *_m, Mode mode) {
+ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	module = _m;
 	session = module->session;
+
+	outer = _outer;
 
 	from_resource("fx_panel");
 	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
-	set_string("name", module->module_subtype);
+	if (outer) {
+		remove_control("header");
+	} else {
+		outer = this;
+		set_string("name", module->module_subtype);
+	}
 
 	p = module->create_panel();
 	if (p) {
@@ -34,8 +41,8 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	} else {
 		set_target("content");
 		add_label("!center,expandx,disabled\\<i>" + _("not configurable") + "</i>", 0, 1, "");
-		hide_control("load_favorite", true);
-		hide_control("save_favorite", true);
+		outer->hide_control("load_favorite", true);
+		outer->hide_control("save_favorite", true);
 	}
 	if (mode & Mode::FIXED_WIDTH) {
 		set_options("grid", "noexpandx");
@@ -52,19 +59,19 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 		//set_options("grid", format("height=%d,expandy", CONFIG_PANEL_MIN_HEIGHT));
 	}
 
-	event("enabled", [=]{ on_enabled(); });
-	event("delete", [=]{ on_delete(); });
-	event("load_favorite", [=]{ on_load(); });
-	event("save_favorite", [=]{ on_save(); });
-	event("show_large", [=]{ on_large(); });
-	event("show_external", [=]{ on_external(); });
-	event("replace", [=]{ on_replace(); });
-	event("detune", [=]{ on_detune(); });
+	outer->event("enabled", [=]{ on_enabled(); });
+	outer->event("delete", [=]{ on_delete(); });
+	outer->event("load_favorite", [=]{ on_load(); });
+	outer->event("save_favorite", [=]{ on_save(); });
+	outer->event("show_large", [=]{ on_large(); });
+	outer->event("show_external", [=]{ on_external(); });
+	outer->event("replace", [=]{ on_replace(); });
+	outer->event("detune", [=]{ on_detune(); });
 
-	hide_control("enabled", true);
-	check("enabled", module->enabled);
+	outer->hide_control("enabled", true);
+	outer->check("enabled", module->enabled);
 	
-	auto *mb = (hui::ControlMenuButton*)_get_control_("menu");
+	auto *mb = (hui::ControlMenuButton*)outer->_get_control_("menu");
 	menu = mb->menu;
 	menu->enable("delete", false);
 	menu->enable("replace", false);
@@ -91,7 +98,7 @@ void ModulePanel::set_width(int width) {
 
 void ModulePanel::set_func_enable(std::function<void(bool)> f) {
 	func_enable = f;
-	hide_control("enabled", f == nullptr);
+	outer->hide_control("enabled", f == nullptr);
 }
 
 void ModulePanel::set_func_delete(std::function<void()> f) {
@@ -112,7 +119,7 @@ void ModulePanel::set_func_detune(std::function<void()> f) {
 	func_detune = f;
 	if (f) {
 		menu->add_separator();
-		menu->add(_("detune..."), "detune");
+		menu->add(_("Detune..."), "detune");
 	}
 }
 
@@ -144,29 +151,31 @@ void ModulePanel::on_delete() {
 		hui::RunLater(0, func_delete);
 }
 
-ModulePanel *ModulePanel::copy() {
-	auto *c = new ModulePanel(module);
+void ModulePanel::copy_into(ModulePanel *c) {
 	c->set_func_delete(func_delete);
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
 	c->set_func_replace(func_replace);
 	c->set_func_detune(func_detune);
-	return c;
 }
 
 void ModulePanel::on_large() {
-	session->win->set_big_panel(copy());
+	auto *c = new ModulePanel(module, nullptr);
+	copy_into(c);
+	session->win->set_big_panel(c);
 }
 
 class ModuleExternalDialog : public hui::Dialog {
 public:
 	Module *module;
-	ModuleExternalDialog(ModulePanel *m, hui::Window *parent) : hui::Dialog(m->module->module_subtype, CONFIG_PANEL_WIDTH, 300, parent, true) {
-		set_options("", "resizable");
+	ModuleExternalDialog(ModulePanel *m_orig, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
+		auto m = new ModulePanel(m_orig->module, this, ModulePanel::Mode::DEFAULT_S);
+		m_orig->copy_into(m);
+		set_title(m->module->module_subtype);
+		set_size(CONFIG_PANEL_WIDTH, 300);
 		module = m->module;
-		m->set_options("grid", "expandx");
-		add_grid("", 0, 0, "grid");
-		embed(m, "grid", 0, 0);
+		//m->set_options("grid", "expandx");
+		embed(m, "content", 0, 0);
 		module->subscribe(this, [=]{
 			module = nullptr;
 			destroy();
@@ -179,13 +188,12 @@ public:
 };
 
 void ModulePanel::on_external() {
-	auto *dlg = new ModuleExternalDialog(copy(), session->win);
+	auto *dlg = new ModuleExternalDialog(this, session->win);
 	dlg->show();
 }
 
 void ModulePanel::on_change() {
-	check("enabled", module->enabled);
-
+	outer->check("enabled", module->enabled);
 }
 
 void ModulePanel::on_replace() {

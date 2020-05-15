@@ -40,7 +40,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 	}
 
 	if (hb) {
-		if (child->id == "ok" or child->id == "apply" or child->id == "close")
+		if (child->id == "ok" or child->id == "apply" or child->id == "close" or child->id == "preview")
 			gtk_header_bar_pack_end(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
 		else
 			gtk_header_bar_pack_start(GTK_HEADER_BAR(panel->win->headerbar), child_widget);

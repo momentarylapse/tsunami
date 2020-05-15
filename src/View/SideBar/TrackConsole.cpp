@@ -26,7 +26,7 @@ hui::Panel *create_dummy_synth_panel() {
 }
 
 hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win) {
-	auto *p = new ModulePanel(track->synth, ModulePanel::Mode::DEFAULT_H);
+	auto *p = new ModulePanel(track->synth, nullptr, ModulePanel::Mode::DEFAULT_H);
 	//p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([=]{
 		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
@@ -60,7 +60,6 @@ TrackConsole::TrackConsole(Session *session) :
 	event("panning", [=]{ on_panning(); });
 	event("instrument", [=]{ on_instrument(); });
 	event("edit_tuning", [=]{ on_edit_tuning(); });
-	event("select_synth", [=]{ on_select_synth(); });
 
 	event("edit_song", [=]{ session->set_mode("default/song"); });
 	event("edit_fx", [=]{ session->set_mode("default/fx"); });
@@ -181,14 +180,6 @@ void TrackConsole::on_edit_tuning() {
 	auto *dlg = new TuningDialog(win, track);
 	dlg->run();
 	delete(dlg);
-}
-
-void TrackConsole::on_select_synth() {
-	if (!track)
-		return;
-	string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
-	if (name != "")
-		track->set_synthesizer(CreateSynthesizer(session, name));
 }
 
 void TrackConsole::on_view_cur_track_change() {

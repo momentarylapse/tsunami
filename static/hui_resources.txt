@@ -6018,7 +6018,7 @@ image=hui:ok
 # Resource
 Dialog
 sample_selection_dialog
-width=500,height=400
+width=500,height=400,headerbar,resizable,closebutton=no
 0
 0
 1
@@ -6041,20 +6041,20 @@ buttonbar
 0
 3
 Button
-import
-image=hui:open
+cancel
+
 0
 0
 0
 Button
-cancel
-
+import
+image=hui:open
 1
 0
 0
 Button
 ok
-
+default
 2
 0
 0
@@ -7081,7 +7081,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-600
+601
 # Text
 /bars-add
 Add bars...
@@ -8624,9 +8624,12 @@ Samples
 
 sample_selection_dialog/import
 
-import from file
+Import from file
+sample_selection_dialog/ok
+Select
+
 sample_selection_dialog/sample_selection_dialog
-Sample wählen
+Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name

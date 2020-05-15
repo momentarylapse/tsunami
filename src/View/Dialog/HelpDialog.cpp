@@ -8,7 +8,7 @@
 #include "HelpDialog.h"
 
 HelpDialog::HelpDialog(hui::Window *_parent) :
-	hui::Window("help-dialog", _parent)
+	hui::Dialog("help-dialog", _parent)
 {
 	if (hui::Config.get_bool("FirstStart", true))
 		hide_control("first-time-message", false);

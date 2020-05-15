@@ -647,7 +647,7 @@ Grid
 buttonbar
 1
 0
-3
+2
 CheckBox
 relative
 
@@ -658,12 +658,6 @@ CheckBox
 all_octaves
 
 1
-0
-0
-Button
-close
-default,image=hui:close
-2
 0
 0
 # Resource

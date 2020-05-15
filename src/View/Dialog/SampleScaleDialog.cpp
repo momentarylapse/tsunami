@@ -10,10 +10,9 @@
 #include "../../Data/Sample.h"
 #include "../../Data/Audio/BufferInterpolator.h"
 
-SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
-	hui::Dialog("", 100, 100, root, false)
+SampleScaleDialog::SampleScaleDialog(hui::Window *parent, Sample *s):
+	hui::Dialog("sample_scale_dialog", parent)
 {
-	from_resource("sample_scale_dialog");
 	sample = s;
 
 	set_int("samples_orig", sample->buf->length);

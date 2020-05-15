@@ -15,11 +15,11 @@
 class TrackLayer;
 class TrackMarker;
 
-class MarkerDialog: public hui::Window {
+class MarkerDialog: public hui::Dialog {
 public:
-	MarkerDialog(hui::Window *_parent, TrackLayer *t, const Range &range, const string &text, const TrackMarker *marker);
-	MarkerDialog(hui::Window *_parent, TrackLayer *t, const Range &range, const string &text);
-	MarkerDialog(hui::Window *_parent, TrackLayer *t, const TrackMarker *marker);
+	MarkerDialog(hui::Window *parent, TrackLayer *t, const Range &range, const string &text, const TrackMarker *marker);
+	MarkerDialog(hui::Window *parent, TrackLayer *t, const Range &range, const string &text);
+	MarkerDialog(hui::Window *parent, TrackLayer *t, const TrackMarker *marker);
 
 	void on_edit();
 	void on_ok();

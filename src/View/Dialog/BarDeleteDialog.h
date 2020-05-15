@@ -13,15 +13,13 @@
 class Song;
 class Range;
 
-class BarDeleteDialog : public hui::Dialog
-{
+class BarDeleteDialog : public hui::Dialog {
 public:
 	Song *song;
 	Array<int> sel;
 
-	BarDeleteDialog(hui::Window *root, Song *s, const Array<int> &bars);
+	BarDeleteDialog(hui::Window *parent, Song *s, const Array<int> &bars);
 	void on_ok();
-	void on_close();
 	void on_replace_by_pause();
 };
 

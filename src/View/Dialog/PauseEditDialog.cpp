@@ -12,10 +12,9 @@
 
 extern bool bar_dialog_move_data;
 
-PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index):
-	hui::Dialog("", 100, 100, root, false)
+PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
+	hui::Dialog("pause_edit_dialog", parent)
 {
-	from_resource("pause_edit_dialog");
 	song = _song;
 	index = _index;
 
@@ -28,8 +27,7 @@ PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index):
 	event("hui:close", [=]{ destroy(); });
 }
 
-void PauseEditDialog::on_ok()
-{
+void PauseEditDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	float duration = get_float("duration");
 	BarPattern b = *song->bars[index];

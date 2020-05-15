@@ -17,7 +17,8 @@
 void set_bar_pattern(BarPattern &b, const string &pat);
 
 NewDialog::NewDialog(hui::Window *_parent):
-	hui::Window("new_dialog", _parent) {
+	hui::Dialog("new_dialog", _parent)
+{
 	add_string("sample_rate", "22050");
 	add_string("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
 	add_string("sample_rate", "48000");

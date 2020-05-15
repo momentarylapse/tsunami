@@ -372,7 +372,7 @@ void SampleManagerConsole::end_preview() {
 class SampleSelector : public hui::Dialog {
 public:
 	SampleSelector(Session *_session, hui::Panel *parent, Sample *old) :
-		hui::Dialog("", 300, 400, parent->win, false)
+		hui::Dialog("sample_selection_dialog", parent->win)
 	{
 		session = _session;
 		song = session->song;
@@ -381,9 +381,6 @@ public:
 		for (Sample *s: song->samples)
 			if (s == old)
 				selected = s;
-
-
-		from_resource("sample_selection_dialog");
 
 		list_id = "sample_selection_list";
 

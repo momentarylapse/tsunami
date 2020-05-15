@@ -10,11 +10,9 @@
 
 #include "../../lib/hui/hui.h"
 
-class HelpDialog: public hui::Window
-{
+class HelpDialog: public hui::Dialog {
 public:
 	HelpDialog(hui::Window *parent);
-
 };
 
 

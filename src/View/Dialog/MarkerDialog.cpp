@@ -15,7 +15,7 @@ string encode_key(const Scale &key) {
 }
 
 MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const Range &_range, const string &_text, const TrackMarker *_marker):
-	hui::Window("marker_dialog", _parent)
+	hui::Dialog("marker_dialog", _parent)
 {
 	layer = _l;
 	range = _range;

@@ -116,12 +116,11 @@ void FavoriteManager::set(const Favorite &ff) {
 
 class FavoriteSelectionDialog : public hui::Dialog {
 public:
-	FavoriteSelectionDialog(hui::Window *win, const Array<string> &_names, bool _save) :
-		hui::Dialog(_(""), 300, 200, win, false)
+	FavoriteSelectionDialog(hui::Window *parent, const Array<string> &_names, bool _save) :
+		hui::Dialog("favorite-dialog", parent)
 	{
 		save = _save;
 		names = _names;
-		from_resource("favorite-dialog");
 		set_options("name", "placeholder=" + _("enter new name"));
 		if (!save)
 			add_string("list", _("-Default  Parameters-"));

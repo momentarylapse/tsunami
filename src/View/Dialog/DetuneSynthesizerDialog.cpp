@@ -15,10 +15,8 @@
 const int RELATIVE_NUM_PITCHES = 6;
 
 DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, hui::Window *parent) :
-	hui::Dialog("", 800, 550, parent, false)
+	hui::Dialog("detune_synthesizer_dialog", parent)
 {
-	from_resource("detune_synthesizer_dialog");
-
 	track = t;
 	synth = s;
 	view = v;

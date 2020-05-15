@@ -21,7 +21,7 @@ ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 }
 
 ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleType _type, Session *_session, const string &old_name) :
-	hui::Window("configurable-selection-dialog", _parent)
+	hui::Dialog("configurable-selection-dialog", _parent)
 {
 	type = _type;
 	session = _session;

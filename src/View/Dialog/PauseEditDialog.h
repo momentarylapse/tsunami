@@ -13,13 +13,12 @@
 class Song;
 class Range;
 
-class PauseEditDialog : public hui::Dialog
-{
+class PauseEditDialog : public hui::Dialog {
 public:
 	Song *song;
 	int index;
 
-	PauseEditDialog(hui::Window *root, Song *song, int index);
+	PauseEditDialog(hui::Window *parent, Song *song, int index);
 	void on_ok();
 };
 

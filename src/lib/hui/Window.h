@@ -199,6 +199,7 @@ public:
 class Dialog : public Window {
 public:
 	Dialog(const string &title, int width, int height, Window *parent, bool allow_parent);
+	Dialog(const string &id, Window *parent);
 	void _cdecl __init_ext__(const string &title, int width, int height, Window *parent, bool allow_parent);
 };
 

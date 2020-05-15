@@ -11,10 +11,9 @@
 bool QuestionDialogInt::aborted;
 bool QuestionDialogIntInt::aborted;
 
-QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options) : hui::Dialog(_("Question"), 100, 20, _parent, false){
+QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options) : hui::Dialog("question-dialog-int", _parent){
 	result = 0;
 	aborted = true;
-	from_resource("question-dialog-int");
 	set_string("question", question);
 	set_options("value", options);
 

@@ -14,10 +14,9 @@
 
 bool bar_dialog_move_data = true;
 
-BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
-	hui::Dialog("", 100, 100, root, false)
+BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
+	hui::Dialog("bar_add_dialog", parent)
 {
-	from_resource("bar_add_dialog");
 	song = s;
 	index = max(_index, 0);
 

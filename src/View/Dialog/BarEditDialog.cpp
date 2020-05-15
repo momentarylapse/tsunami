@@ -15,10 +15,9 @@ static bool bar_dialog_scale_audio = false;
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
-BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Array<int> &_bars):
-	hui::Dialog("", 100, 100, root, false)
+BarEditDialog::BarEditDialog(hui::Window *parent, Song *_song, const Array<int> &_bars):
+	hui::Dialog("bar_edit_dialog", parent)
 {
-	from_resource("bar_edit_dialog");
 	song = _song;
 	duration = 0;
 	sel = _bars;

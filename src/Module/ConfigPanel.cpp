@@ -47,10 +47,10 @@ void ConfigPanel::changed() {
 
 
 
-class ConfigurationDialog : public hui::Window {
+class ConfigurationDialog : public hui::Dialog {
 public:
 	ConfigurationDialog(Module *c, ModuleConfiguration *pd, ConfigPanel *p, hui::Window *parent) :
-		hui::Window("configurable_dialog", parent)
+		hui::Dialog("configurable_dialog", parent)
 	{
 		config = c;
 		panel = p;

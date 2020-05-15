@@ -14,8 +14,7 @@
 class Song;
 class Bar;
 
-class BarAddDialog : public hui::Dialog
-{
+class BarAddDialog : public hui::Dialog {
 public:
 	Song *song;
 	int index;

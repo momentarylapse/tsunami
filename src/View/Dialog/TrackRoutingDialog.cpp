@@ -11,9 +11,8 @@
 #include "../../Data/Track.h"
 
 TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
-	hui::Dialog("", 300, 50, parent, false)
+	hui::Dialog("track-routing-dialog", parent)
 {
-	from_resource("track-routing-dialog");
 	song = _song;
 	num_tracks = 0;
 

@@ -14,10 +14,9 @@
 
 extern bool bar_dialog_move_data;
 
-PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
-	hui::Dialog("", 100, 100, root, false)
+PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
+	hui::Dialog("pause_add_dialog", parent)
 {
-	from_resource("pause_add_dialog");
 	song = s;
 	index = _index;
 

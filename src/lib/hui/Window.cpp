@@ -178,6 +178,8 @@ void Dialog::__init_ext__(const string& title, int width, int height, Window* pa
 }
 
 
+Dialog::Dialog(const string &id, Window *parent) : Window(id, parent) {}
+
 
 SourceWindow::SourceWindow(const string &buffer, Window *parent) {
 	_init_("", 300, 200, parent, buffer.find("allow-parent"), 0);

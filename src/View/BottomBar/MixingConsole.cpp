@@ -29,8 +29,7 @@ class TrackSelectionDialog : public hui::Dialog {
 public:
 	Song *song;
 	Track *selected = nullptr;
-	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog("", 300, 500, parent, false) {
-		from_resource("track-selector");
+	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog("track-selector", parent) {
 		song = _song;
 		for (Track *t: song->tracks)
 			add_string("tracks", t->nice_name());

@@ -59,12 +59,18 @@ void ControlButton::set_image(const string& str) {
 }
 
 void ControlButton::__set_option(const string &op, const string &value) {
-	if (op == "flat")
+	if (op == "flat") {
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
-	if (op == "default") {
+	} else if (op == "default") {
 		gtk_widget_set_can_default(widget, true);
 		if (panel->win) // otherwise gtk will complain
 			gtk_widget_grab_default(widget);
+		auto sc = gtk_widget_get_style_context(widget);
+		gtk_style_context_add_class(sc, GTK_STYLE_CLASS_SUGGESTED_ACTION);
+	} else if (op == "danger") {
+		auto sc = gtk_widget_get_style_context(widget);
+		gtk_style_context_remove_class(sc, GTK_STYLE_CLASS_SUGGESTED_ACTION);
+		gtk_style_context_add_class(sc, GTK_STYLE_CLASS_DESTRUCTIVE_ACTION);
 	}
 }
 

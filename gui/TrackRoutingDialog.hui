@@ -6,4 +6,4 @@ Dialog track-routing-dialog 'Track routing' width=100 height=50 headerbar
 			Label t-target 'Target' bold expandx
 		Grid ? '' buttonbar
 			Button add-group '' 'tooltip=Add group' image=hui:add
-			Button /close 'Close' default
+			Button /close 'Close'

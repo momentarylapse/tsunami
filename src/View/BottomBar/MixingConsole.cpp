@@ -29,12 +29,13 @@ class TrackSelectionDialog : public hui::Dialog {
 public:
 	Song *song;
 	Track *selected = nullptr;
-	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog(_("Track Selector"), 300, 500, parent, false) {
-		add_list_view("!nobar\\tracks", 0, 0, "tracks");
+	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog("", 300, 500, parent, false) {
+		from_resource("track-selector");
 		song = _song;
 		for (Track *t: song->tracks)
 			add_string("tracks", t->nice_name());
 		event("tracks", [=]{ on_select(); });
+		event("ok", [=]{ on_select(); });
 	}
 	void on_select() {
 		int n = get_int("");

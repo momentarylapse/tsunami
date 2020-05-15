@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-64
+65
 # Resource
 Menu
 menu_fake
@@ -217,7 +217,7 @@ vertical
 3
 CheckBox
 replace-by-pause
-
+expandx
 0
 0
 0
@@ -241,7 +241,7 @@ image=hui:cancel
 0
 Button
 ok
-default,image=hui:ok
+default,danger,image=hui:ok
 1
 0
 0
@@ -466,7 +466,7 @@ default,image=hui:ok
 # Resource
 Dialog
 configurable-selection-dialog
-width=400,height=500
+width=400,height=500,headerbar,resizable
 0
 0
 1
@@ -478,7 +478,7 @@ Grid
 2
 TreeView
 list
-
+nobar
 0
 0
 0
@@ -496,7 +496,7 @@ cancel
 0
 Button
 ok
-
+default
 1
 0
 0
@@ -6209,7 +6209,7 @@ buttonbar
 1
 Button
 close
-default,image=hui:close
+image=hui:close
 0
 0
 0
@@ -6948,6 +6948,43 @@ image=hui:add
 0
 Button
 close
+
+1
+0
+0
+# Resource
+Dialog
+track-selector
+width=300,height=500,headerbar,resizable
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+ListView
+tracks
+nobar
+0
+0
+0
+Grid
+?
+buttonbar
+1
+0
+2
+Button
+cancel
+
+0
+0
+0
+Button
+ok
 default
 1
 0
@@ -6994,7 +7031,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-583
+585
 # Text
 /bars-add
 Add bars...
@@ -7374,11 +7411,11 @@ Number
 bar_edit_dialog/t_result_bpm
 => Bpm
 
-configurable-selection-dialog/configurable-selection-dialog
-Auswahl
-
 configurable-selection-dialog/list
 Name
+
+configurable-selection-dialog/ok
+Select
 
 configurable_dialog/load_favorite
 
@@ -8705,6 +8742,12 @@ Track
 
 track-routing-dialog/track-routing-dialog
 Track routing
+
+track-selector/ok
+Select track
+
+track-selector/tracks
+tracks
 
 track_dialog/g_instrument
 Instrument

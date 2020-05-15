@@ -42,5 +42,5 @@ Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable
 				Text pdt_oggrate "OGG bitrate" right disabled
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx
 		Grid ? "" buttonbar
-			Button /close "Close" default image=hui:close
+			Button /close "Close" image=hui:close
 

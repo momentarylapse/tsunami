@@ -1,7 +1,7 @@
-Dialog configurable-selection-dialog "Auswahl" width=400 height=500
+Dialog configurable-selection-dialog "" width=400 height=500 headerbar resizable
 	Grid ? ""
-		TreeView list "Name"
+		TreeView list "Name" nobar
 		---|
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
-			Button /ok "OK"
+			Button ok "Select" default

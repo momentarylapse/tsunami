@@ -65,13 +65,14 @@ class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(SongPlugin plugin)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
+		set_options("", "headerbar,resizable")
 		from_source("
 Grid ? ''
 	DrawingArea drawing_area ''
 	---|
-	Grid ? '' noexpandy
+	Grid ? '' buttonbar
 		ComboBox type 'Linear\\Logarithm'
-		Button close 'Close' width=120 image=hui:close")
+		Button close 'Close' image=hui:close")
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")

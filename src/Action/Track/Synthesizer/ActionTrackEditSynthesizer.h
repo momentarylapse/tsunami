@@ -11,13 +11,13 @@
 #include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditSynthesizer: public ActionMergable<string>
-{
+class ActionTrackEditSynthesizer: public ActionMergable<string> {
 public:
-	ActionTrackEditSynthesizer(Track *t, const string &params_old);
+	ActionTrackEditSynthesizer(Track *t);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
+	void redo(Data *d) override;
 
 	bool mergable(Action *a) override;
 

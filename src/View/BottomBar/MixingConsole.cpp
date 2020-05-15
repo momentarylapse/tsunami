@@ -178,12 +178,14 @@ public:
 				AudioEffect *fx = (AudioEffect*)m;
 				config_panel->set_func_enable([=](bool enabled){ track->enable_effect(fx, enabled); });
 				config_panel->set_func_delete([=]{ track->delete_effect(fx); });
-				config_panel->set_func_edit([=](const string &old_param){ track->edit_effect(fx, old_param); });
+				//config_panel->set_func_edit([=](const string &old_param){ track->edit_effect(fx, old_param); });
+				msg_todo("aaa1");
 			} else { // MIDI_EFFECT
 				MidiEffect *fx = (MidiEffect*)m;
 				config_panel->set_func_enable([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
 				config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
-				config_panel->set_func_edit([=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
+				//config_panel->set_func_edit([=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
+				msg_todo("aaa2");
 			}
 			embed(config_panel, config_grid_id, 0, 0);
 

@@ -135,6 +135,7 @@ public:
 		f->read_int();
 		string params = f->read_str();
 		me->config_from_string(params);
+		me->_config_latest_history = params;
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -622,8 +623,7 @@ public:
 	}
 };
 
-class FileChunkMidiEffect : public FileChunk<MidiNoteBuffer,MidiEffect>
-{
+class FileChunkMidiEffect : public FileChunk<MidiNoteBuffer,MidiEffect> {
 public:
 	FileChunkMidiEffect() : FileChunk<MidiNoteBuffer,MidiEffect>("effect") {}
 	virtual void create() {}
@@ -634,6 +634,7 @@ public:
 		me->range.length = f->read_int();
 		string params = f->read_str();
 		me->config_from_string(params);
+		me->_config_latest_history = params;
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -924,8 +925,7 @@ public:
 	}
 };
 
-class FileChunkSynthesizer : public FileChunk<Track,Synthesizer>
-{
+class FileChunkSynthesizer : public FileChunk<Track,Synthesizer> {
 public:
 	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth") {
 		add_child(new FileChunkSynthesizerTuning);
@@ -934,7 +934,9 @@ public:
 	virtual void read(File *f) {
 		Session *session = cur_op(this)->session;
 		me = CreateSynthesizer(session, f->read_str());
-		me->config_from_string(f->read_str());
+		string param = f->read_str();
+		me->config_from_string(param);
+		me->_config_latest_history = param;
 		f->read_str();
 		f->read_int();
 
@@ -952,8 +954,7 @@ public:
 	}
 };
 
-class FileChunkBar : public FileChunk<Song,Bar>
-{
+class FileChunkBar : public FileChunk<Song,Bar> {
 public:
 	FileChunkBar() : FileChunk<Song,Bar>("bar") {}
 	virtual void create() { me = nullptr; }

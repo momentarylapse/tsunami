@@ -19,7 +19,6 @@
 #include "../Plugins/Plugin.h"
 #include "../Stuff/PerformanceMonitor.h"
 
-const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Module::MESSAGE_STATE_CHANGE = "StateChange";
 const string Module::MESSAGE_TICK = "Tick";
 const string Module::MESSAGE_READ_END_OF_STREAM = "ReadEndOfStream";
@@ -37,6 +36,7 @@ Module::Module(ModuleType type, const string &sub_type) {
 	allow_config_in_chain = false;
 	_class = nullptr;
 	belongs_to_system = false;
+	func_edit = [=] { notify(); };
 	perf_channel = PerformanceMonitor::create_channel("module", this);
 }
 
@@ -106,6 +106,8 @@ string Module::config_to_string() const {
 }
 
 
+// not signaling actions/gui!
+//   but consistent state
 void Module::config_from_string(const string &param) {
 	auto *config = get_config();
 	if (!config)
@@ -116,8 +118,11 @@ void Module::config_from_string(const string &param) {
 }
 
 
+
 // default version
 //   try to execute   Module.config.reset()
+// not signaling actions/gui!
+//   but consistent state
 void Module::reset_config() {
 	auto *config = get_config();
 	if (config)
@@ -138,16 +143,21 @@ ConfigPanel *Module::create_panel() {
 	return new AutoConfigPanel(aa, this);
 }
 
-// called by the ConfigPanel to signal a config change
+// call after editing (by ConfigPanel etc) to signal a config change
+//   -> signaling ui, actions
 void Module::changed() {
 	on_config();
-	notify();
+	//notify();
+	func_edit();
 }
 
 
+// don't copy the func_edit
 Module *Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_type, module_subtype);
-	clone->config_from_string(config_to_string());
+	string param = config_to_string();
+	clone->config_from_string(param);
+	clone->_config_latest_history = param;
 	return clone;
 }
 
@@ -219,6 +229,11 @@ void Module::_plug_in(int in_port, Module *source, int source_port) {
 void Module::_unplug_in(int in_port) {
 	auto tp = port_in[in_port];
 	*tp.port = nullptr;
+}
+
+
+void Module::set_func_edit(std::function<void()> f) {
+	func_edit = f;
 }
 
 void Module::perf_start() {

@@ -43,21 +43,18 @@ public:
 	void on_replace();
 	void on_detune();
 	void on_change();
-	void on_change_by_action();
 	
 	void set_width(int width);
 	
 	ModulePanel *copy();
 	
 	void set_func_enable(std::function<void(bool)> f);
-	void set_func_edit(std::function<void(const string&)> f);
 	void set_func_delete(std::function<void()> f);
 	void set_func_close(std::function<void()> f);
 	void set_func_replace(std::function<void()> f);
 	void set_func_detune(std::function<void()> f);
 	
 	std::function<void(bool)> func_enable;
-	std::function<void(const string&)> func_edit;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
 	std::function<void()> func_replace;

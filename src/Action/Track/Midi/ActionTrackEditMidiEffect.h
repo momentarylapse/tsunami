@@ -12,12 +12,12 @@
 class Track;
 class MidiEffect;
 
-class ActionTrackEditMidiEffect: public ActionMergable<string>
-{
+class ActionTrackEditMidiEffect: public ActionMergable<string> {
 public:
-	ActionTrackEditMidiEffect(MidiEffect *fx, const string &old_params);
+	ActionTrackEditMidiEffect(MidiEffect *fx);
 
 	void *execute(Data *d) override;
+	void redo(Data *d) override;
 	void undo(Data *d) override;
 
 	bool mergable(Action *a) override;

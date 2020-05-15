@@ -1,7 +1,7 @@
 Dialog fx_panel "" width=200 height=200
 	Grid grid "" expandx noexpandy vertical
 		Grid ? ""
-			MenuButton menu "" image=hui:preferences flat menu=popup_fx_menu
+			MenuButton menu "" image=hui:properties flat menu=popup_fx_menu
 			Text name "" bold center expandx
 			CheckBox enabled "" "tooltip=active?"
 		Grid content ""

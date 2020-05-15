@@ -21,7 +21,7 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d) {
 		std::swap(track->synth->tuning.freq[i], tuning[i]);
 	track->synth->update_delta_phi();
 
-	track->synth->Observable::notify(track->synth->MESSAGE_CHANGE_BY_ACTION);
+	track->synth->notify();
 
 	return nullptr;
 }

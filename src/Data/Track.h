@@ -59,16 +59,16 @@ public:
 	void _cdecl set_channels(int channels);
 	void _cdecl add_effect(AudioEffect *effect);
 	void _cdecl delete_effect(AudioEffect *effect);
-	void _cdecl edit_effect(AudioEffect *effect, const string &param_old);
+	void _cdecl edit_effect(AudioEffect *effect);
 	void _cdecl enable_effect(AudioEffect *effect, bool enabled);
 	void _cdecl move_effect(int source, int target);
 	void _cdecl add_midi_effect(MidiEffect *effect);
 	void _cdecl delete_midi_effect(MidiEffect *effect);
-	void _cdecl edit_midi_effect(MidiEffect *effect, const string &param_old);
+	void _cdecl edit_midi_effect(MidiEffect *effect);
 	void _cdecl enable_midi_effect(MidiEffect *effect, bool enabled);
 	void _cdecl move_midi_effect(int source, int target);
 	void _cdecl set_synthesizer(Synthesizer *synth);
-	void _cdecl edit_synthesizer(const string &param_old);
+	void _cdecl edit_synthesizer();
 	void _cdecl detune_synthesizer(const float tuning[MAX_PITCH]);
 	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
 
@@ -89,8 +89,11 @@ public:
 
 	Array<AudioEffect*> fx;
 	Array<MidiEffect*> midi_fx;
+	void _register_fx(AudioEffect *fx);
+	void _register_midi_fx(MidiEffect *fx);
 
 	Synthesizer *synth;
+	void _register_synth(Synthesizer *s);
 
 	Array<TrackMarker*> _markers_old;
 

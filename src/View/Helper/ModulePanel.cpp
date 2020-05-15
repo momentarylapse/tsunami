@@ -71,7 +71,6 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 
 	old_param = module->config_to_string();
 	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
-	module->subscribe(this, [=]{ on_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
 	module->subscribe(this, [=]{
 		module->unsubscribe(this);
 		module = nullptr;
@@ -100,10 +99,6 @@ void ModulePanel::set_func_delete(std::function<void()> f) {
 	menu->enable("delete", f != nullptr);
 }
 
-void ModulePanel::set_func_edit(std::function<void(const string&)> f) {
-	func_edit = f;
-}
-
 void ModulePanel::set_func_close(std::function<void()> f) {
 	func_close = f;
 }
@@ -126,9 +121,10 @@ void ModulePanel::on_load() {
 	if (name.num == 0)
 		return;
 	session->plugin_manager->apply_favorite(module, name);
-	if (func_edit)
-		func_edit(old_param);
-	old_param = module->config_to_string();
+	module->changed();
+	//if (func_edit)
+	//	func_edit(old_param);
+	//old_param = module->config_to_string();
 }
 
 void ModulePanel::on_save() {
@@ -151,7 +147,6 @@ void ModulePanel::on_delete() {
 ModulePanel *ModulePanel::copy() {
 	auto *c = new ModulePanel(module);
 	c->set_func_delete(func_delete);
-	c->set_func_edit(func_edit);
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
 	c->set_func_replace(func_replace);
@@ -189,19 +184,8 @@ void ModulePanel::on_external() {
 }
 
 void ModulePanel::on_change() {
-	{
-		//std::unique_lock<std::shared_timed_mutex> lock(module->session->song->mtx());
-		if (func_edit)
-			func_edit(old_param);
-	}
 	check("enabled", module->enabled);
-	old_param = module->config_to_string();
 
-}
-
-void ModulePanel::on_change_by_action() {
-	check("enabled", module->enabled);
-	old_param = module->config_to_string();
 }
 
 void ModulePanel::on_replace() {

@@ -9,8 +9,7 @@
 
 
 // default behavior for redo...
-void Action::redo(Data *d)
-{
+void Action::redo(Data *d) {
 	execute(d);
 }
 

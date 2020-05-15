@@ -18,10 +18,8 @@ extern const int CONFIG_PANEL_HEIGHT;
 ConfigPanel::ConfigPanel(Module *_c) {
 	ignore_change = false;
 	c = _c;
-	if (c) {
+	if (c)
 		c->subscribe(this, [=]{ if (!ignore_change) update(); }, c->MESSAGE_CHANGE);
-		c->subscribe(this, [=]{ if (!ignore_change) update(); }, c->MESSAGE_CHANGE_BY_ACTION);
-	}
 }
 
 ConfigPanel::~ConfigPanel() {

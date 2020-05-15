@@ -451,7 +451,7 @@ class Track
 	extern void set_panning(float panning)
 	extern void add_effect(AudioEffect effect)
 	extern void delete_effect(int index)
-	extern void edit_effect(int index, string param_old)
+	extern void edit_effect(int index)
 	extern void enable_effect(int index, bool enabled)
 	extern void set_synthesizer(Synthesizer synth)
 

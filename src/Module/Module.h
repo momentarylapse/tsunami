@@ -72,7 +72,6 @@ public:
 
 	void set_session_etc(Session *session, const string &sub_type);
 
-	static const string MESSAGE_CHANGE_BY_ACTION;
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_READ_END_OF_STREAM;
 	static const string MESSAGE_PLAY_END_OF_STREAM;
@@ -109,6 +108,11 @@ public:
 
 	string config_to_string() const;
 	void config_from_string(const string &options);
+
+
+	string _config_latest_history;
+	void set_func_edit(std::function<void()> f);
+	std::function<void()> func_edit;
 
 
 

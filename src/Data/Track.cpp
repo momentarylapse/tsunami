@@ -72,6 +72,7 @@ Track::Track(SignalType _type, Synthesizer *_synth) {
 	volume = 1;
 	muted = false;
 
+	_register_synth(_synth);
 	synth = _synth;
 }
 
@@ -195,11 +196,25 @@ void Track::set_channels(int _channels) {
 
 void Track::add_effect(AudioEffect *effect) {
 	song->execute(new ActionTrackAddEffect(this, effect));
+	_register_fx(effect);
+}
+
+
+void Track::_register_fx(AudioEffect *fx) {
+	fx->set_func_edit([=]{ edit_effect(fx); });
+}
+
+void Track::_register_midi_fx(MidiEffect *fx) {
+	fx->set_func_edit([=]{ edit_midi_effect(fx); });
+}
+
+void Track::_register_synth(Synthesizer *s) {
+	s->set_func_edit([=]{ edit_synthesizer(); });
 }
 
 // execute after editing...
-void Track::edit_effect(AudioEffect *effect, const string &param_old) {
-	song->execute(new ActionTrackEditEffect(effect, param_old));
+void Track::edit_effect(AudioEffect *effect) {
+	song->execute(new ActionTrackEditEffect(effect));
 }
 
 void Track::enable_effect(AudioEffect *effect, bool enabled) {
@@ -221,11 +236,12 @@ void Track::move_effect(int source, int target) {
 
 void Track::add_midi_effect(MidiEffect *effect) {
 	song->execute(new ActionTrackAddMidiEffect(this, effect));
+	_register_midi_fx(effect);
 }
 
 // execute after editing...
-void Track::edit_midi_effect(MidiEffect *effect, const string &param_old) {
-	song->execute(new ActionTrackEditMidiEffect(effect, param_old));
+void Track::edit_midi_effect(MidiEffect *effect) {
+	song->execute(new ActionTrackEditMidiEffect(effect));
 }
 
 void Track::enable_midi_effect(MidiEffect *effect, bool enabled) {
@@ -246,11 +262,12 @@ void Track::move_midi_effect(int source, int target) {
 
 void Track::set_synthesizer(Synthesizer *_synth) {
 	song->execute(new ActionTrackSetSynthesizer(this, _synth));
+	_register_synth(_synth);
 }
 
 // execute after editing...
-void Track::edit_synthesizer(const string &param_old) {
-	song->execute(new ActionTrackEditSynthesizer(this, param_old));
+void Track::edit_synthesizer() {
+	song->execute(new ActionTrackEditSynthesizer(this));
 }
 
 void Track::detune_synthesizer(const float tuning[MAX_PITCH]) {

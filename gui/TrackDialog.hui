@@ -17,7 +17,7 @@ Dialog track_dialog "Spur" width=380 height=516
 				---|
 				Grid ? ""
 					Text tuning "" expandx
-					Button edit_tuning "" image=hui:properties flat ignorefocus
+					Button edit_tuning "" image=hui:edit flat ignorefocus
 		Group g_synth "Synthesizer"
 			Grid synth ""
 		Text ? "" expandy

@@ -11,29 +11,31 @@
 
 #include "../../../Module/Audio/AudioEffect.h"
 
-ActionTrackEditEffect::ActionTrackEditEffect(AudioEffect *_fx, const string &_old_params)
-{
+ActionTrackEditEffect::ActionTrackEditEffect(AudioEffect *_fx) {
 	fx = _fx;
-	old_value = _old_params;
+	old_value = fx->_config_latest_history;
 	new_value = fx->config_to_string();
 }
 
-void *ActionTrackEditEffect::execute(Data *d)
-{
-	fx->config_from_string(new_value);
-	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
-
+void *ActionTrackEditEffect::execute(Data *d) {
+	fx->_config_latest_history = new_value;
+	fx->notify();
 	return nullptr;
 }
 
-void ActionTrackEditEffect::undo(Data *d)
-{
-	fx->config_from_string(old_value);
-	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
+void ActionTrackEditEffect::redo(Data *d) {
+	fx->_config_latest_history = new_value;
+	fx->config_from_string(new_value);
+	fx->notify();
 }
 
-bool ActionTrackEditEffect::mergable(Action *a)
-{
+void ActionTrackEditEffect::undo(Data *d) {
+	fx->_config_latest_history = old_value;
+	fx->config_from_string(old_value);
+	fx->notify();
+}
+
+bool ActionTrackEditEffect::mergable(Action *a) {
 	auto *aa = dynamic_cast<ActionTrackEditEffect*>(a);
 	if (!aa)
 		return false;

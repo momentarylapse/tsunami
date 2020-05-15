@@ -13,10 +13,11 @@ class AudioEffect;
 
 class ActionTrackEditEffect: public ActionMergable<string> {
 public:
-	ActionTrackEditEffect(AudioEffect *fx, const string &old_params);
+	ActionTrackEditEffect(AudioEffect *fx);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
+	void redo(Data *d) override;
 
 	bool mergable(Action *a) override;
 

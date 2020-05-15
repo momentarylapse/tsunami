@@ -10,22 +10,28 @@
 #include "../../../Module/Synth/Synthesizer.h"
 #include <assert.h>
 
-ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t, const string &params_old) {
+ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t) {
 	track = t;
-	old_value = params_old;
+	old_value = t->synth->_config_latest_history;
 	new_value = t->synth->config_to_string();
 }
 
 void *ActionTrackEditSynthesizer::execute(Data *d) {
-	track->synth->config_from_string(new_value);
-	track->synth->Observable::notify(track->synth->MESSAGE_CHANGE_BY_ACTION);
-
+	track->synth->_config_latest_history = new_value;
+	track->synth->notify();
 	return nullptr;
 }
 
+void ActionTrackEditSynthesizer::redo(Data *d) {
+	track->synth->_config_latest_history = new_value;
+	track->synth->config_from_string(new_value);
+	track->synth->notify();
+}
+
 void ActionTrackEditSynthesizer::undo(Data *d) {
+	track->synth->_config_latest_history = old_value;
 	track->synth->config_from_string(old_value);
-	track->synth->Observable::notify(track->synth->MESSAGE_CHANGE_BY_ACTION);
+	track->synth->notify();
 }
 
 bool ActionTrackEditSynthesizer::mergable(Action *a) {

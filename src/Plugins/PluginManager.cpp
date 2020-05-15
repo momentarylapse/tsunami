@@ -825,8 +825,8 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	add_plugins_in_dir("Independent/", this, m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
 }
 
-void PluginManager::apply_favorite(Module *c, const string &name) {
-	favorites->apply(c, name);
+void PluginManager::apply_favorite(Module *c, const string &name, bool notify) {
+	favorites->apply(c, name, notify);
 }
 
 void PluginManager::save_favorite(Module *c, const string &name) {

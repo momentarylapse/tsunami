@@ -77,16 +77,21 @@ Array<string> FavoriteManager::get_list(Module *c) {
 	return r;
 }
 
-void FavoriteManager::apply(Module *c, const string &name) {
+void FavoriteManager::apply(Module *c, const string &name, bool notify) {
 	c->reset_config();
-	if (name == DEFAULT_NAME)
+	if (name == DEFAULT_NAME) {
+		if (notify)
+			c->notify();
 		return;
+	}
 	if (!loaded)
 		load(c->session);
 	for (Favorite &f: favorites) {
 		if ((f.type == c->module_type) and (f.config_name == c->module_subtype) and (f.name == name))
 			c->config_from_string(f.options);
 	}
+	if (notify)
+		c->notify();
 }
 
 void FavoriteManager::save(Module *c, const string &name) {

@@ -44,7 +44,7 @@ public:
 	void set(const Favorite &f);
 
 	Array<string> get_list(Module *c);
-	void apply(Module *c, const string &name);
+	void apply(Module *c, const string &name, bool notify);
 	void save(Module *c, const string &name);
 
 	string select_name(hui::Window *win, Module *c, bool save);

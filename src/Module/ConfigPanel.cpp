@@ -84,7 +84,7 @@ public:
 		string name = config->session->plugin_manager->select_favorite_name(this, config, false);
 		if (name.num == 0)
 			return;
-		config->session->plugin_manager->apply_favorite(config, name);
+		config->session->plugin_manager->apply_favorite(config, name, true);
 	}
 	void on_save() {
 		string name = config->session->plugin_manager->select_favorite_name(this, config, true);

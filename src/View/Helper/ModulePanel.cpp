@@ -127,7 +127,7 @@ void ModulePanel::on_load() {
 	string name = session->plugin_manager->select_favorite_name(win, module, false);
 	if (name.num == 0)
 		return;
-	session->plugin_manager->apply_favorite(module, name);
+	session->plugin_manager->apply_favorite(module, name, false);
 	module->changed();
 	//if (func_edit)
 	//	func_edit(old_param);

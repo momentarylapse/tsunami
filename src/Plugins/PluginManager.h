@@ -43,7 +43,7 @@ public:
 	Plugin *load_and_compile_plugin(ModuleType type, const string &filename);
 	Plugin *get_plugin(Session *session, ModuleType type, const string &name);
 
-	void apply_favorite(Module *c, const string &name);
+	void apply_favorite(Module *c, const string &name, bool notify);
 	void save_favorite(Module *c, const string &name);
 	string select_favorite_name(hui::Window *win, Module *c, bool save);
 

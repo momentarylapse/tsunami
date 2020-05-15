@@ -50,7 +50,7 @@
 #include "../Device/Stream/MidiInput.h"
 #include "../Stuff/Clipboard.h"
 #include "../View/AudioView.h"
-#include "../View/Dialog/ConfigurableSelectorDialog.h"
+#include "../View/Dialog/ModuleSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
 #include "../View/Painter/MidiPainter.h"
@@ -829,21 +829,18 @@ void PluginManager::apply_favorite(Module *c, const string &name) {
 	favorites->apply(c, name);
 }
 
-void PluginManager::save_favorite(Module *c, const string &name)
-{
+void PluginManager::save_favorite(Module *c, const string &name) {
 	favorites->save(c, name);
 }
 
 
-string PluginManager::select_favorite_name(hui::Window *win, Module *c, bool save)
-{
+string PluginManager::select_favorite_name(hui::Window *win, Module *c, bool save) {
 	return favorites->select_name(win, c, save);
 }
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const string &filename)
-{
+Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const string &filename) {
 	for (Plugin *p: plugins)
 		if (filename == p->filename)
 			return p;
@@ -859,10 +856,9 @@ Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const string &fi
 }
 
 
-Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const string &name)
-{
-	for (PluginFile &pf: plugin_files){
-		if ((pf.name.replace(" ", "") == name.replace(" ", "")) and (pf.type == type)){
+Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const string &name) {
+	for (PluginFile &pf: plugin_files) {
+		if ((pf.name.replace(" ", "") == name.replace(" ", "")) and (pf.type == type)) {
 			Plugin *p = load_and_compile_plugin(type, pf.filename);
 			return p;
 		}
@@ -871,45 +867,42 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const strin
 	return nullptr;
 }
 
-string PluginManager::plugin_dir_static()
-{
+string PluginManager::plugin_dir_static() {
 	if (tsunami->installed)
 		return tsunami->directory_static + "Plugins/";
 	return "Plugins/";
 }
 
-string PluginManager::plugin_dir_local()
-{
+string PluginManager::plugin_dir_local() {
 	if (tsunami->installed)
 		return tsunami->directory + "Plugins/";
 	return "Plugins/";
 }
 
 
-Array<string> PluginManager::find_module_sub_types(ModuleType type)
-{
+Array<string> PluginManager::find_module_sub_types(ModuleType type) {
 	Array<string> names;
 	for (auto &pf: plugin_files)
 		if (pf.type == type)
 			names.add(pf.name);
 
-	if (type == ModuleType::AUDIO_SOURCE){
+	if (type == ModuleType::AUDIO_SOURCE) {
 		names.add("SongRenderer");
 		//names.add("BufferStreamer");
-	}else if (type == ModuleType::MIDI_EFFECT){
+	} else if (type == ModuleType::MIDI_EFFECT) {
 		names.add("Dummy");
-	}else if (type == ModuleType::BEAT_SOURCE){
+	} else if (type == ModuleType::BEAT_SOURCE) {
 		//names.add("BarStreamer");
-	}else if (type == ModuleType::AUDIO_VISUALIZER){
+	} else if (type == ModuleType::AUDIO_VISUALIZER) {
 		names.add("PeakMeter");
-	}else if (type == ModuleType::SYNTHESIZER){
+	} else if (type == ModuleType::SYNTHESIZER) {
 		names.add("Dummy");
 		//names.add("Sample");
-	}else if (type == ModuleType::STREAM){
+	} else if (type == ModuleType::STREAM) {
 		names.add("AudioInput");
 		names.add("AudioOutput");
 		names.add("MidiInput");
-	}else if (type == ModuleType::PLUMBING){
+	} else if (type == ModuleType::PLUMBING) {
 		names.add("AudioBackup");
 		names.add("AudioJoiner");
 		names.add("AudioRecorder");
@@ -918,15 +911,14 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 		names.add("MidiJoiner");
 		names.add("MidiRecorder");
 		names.add("MidiSucker");
-	}else if (type == ModuleType::PITCH_DETECTOR){
+	} else if (type == ModuleType::PITCH_DETECTOR) {
 		names.add("Dummy");
 	}
 	return names;
 }
 
-Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type)
-{
-	if (type == ModuleType::AUDIO_EFFECT){
+Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type) {
+	if (type == ModuleType::AUDIO_EFFECT) {
 		Array<string> names;
 		for (auto &pf: plugin_files)
 			if (pf.type == type)
@@ -936,15 +928,14 @@ Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type)
 	return find_module_sub_types(type);
 }
 
-string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
-{
-	Array<string> names = session->plugin_manager->find_module_sub_types(type);
+string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name) {
+	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num == 1)
 		return names[0];
 	if (names.num == 0)
 		return "";
 
-	auto *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
+	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();
 	string name = dlg->_return;
 	delete dlg;

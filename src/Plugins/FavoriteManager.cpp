@@ -14,23 +14,21 @@
 
 const string FavoriteManager::DEFAULT_NAME = ":def:";
 
-FavoriteManager::FavoriteManager()
-{
+FavoriteManager::FavoriteManager() {
 	loaded = false;
 }
 
-FavoriteManager::~FavoriteManager()
-{
+FavoriteManager::~FavoriteManager() {
 }
 
 void FavoriteManager::load_from_file(const string &filename, bool read_only, Session *session)
 {
 	if (!file_test_existence(filename))
 		return;
-	try{
+	try {
 		File *f = FileOpenText(filename);
 		int n = f->read_int();
-		for (int i=0; i<n; i++){
+		for (int i=0; i<n; i++) {
 			Favorite ff;
 			string type = f->read_str();
 			ff.type = Module::type_from_name(type);
@@ -41,62 +39,57 @@ void FavoriteManager::load_from_file(const string &filename, bool read_only, Ses
 			set(ff);
 		}
 		delete(f);
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		session->e(e.message());
 	}
 }
 
-void FavoriteManager::load(Session *session)
-{
+void FavoriteManager::load(Session *session) {
 	load_from_file(tsunami->directory_static + "favorites_demo.txt", true, session);
 	load_from_file(tsunami->directory + "favorites.txt", false, session);
 	loaded = true;
 }
 
-void FavoriteManager::save(Session *session)
-{
-	try{
+void FavoriteManager::save(Session *session) {
+	try {
 		File *f = FileCreateText(tsunami->directory + "favorites.txt");
 		f->write_int(favorites.num);
-		for (Favorite &ff: favorites){
+		for (Favorite &ff: favorites) {
 			f->write_str(Module::type_to_name(ff.type));
 			f->write_str(ff.config_name);
 			f->write_str(ff.name);
 			f->write_str(ff.options);
 		}
 		delete(f);
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		session->e(e.message());
 	}
 }
 
-Array<string> FavoriteManager::get_list(Module *c)
-{
+Array<string> FavoriteManager::get_list(Module *c) {
 	if (!loaded)
 		load(c->session);
 	Array<string> r;
-	for (Favorite &f: favorites){
+	for (Favorite &f: favorites) {
 		if ((f.type == c->module_type) and (f.config_name == c->module_subtype))
 			r.add(f.name);
 	}
 	return r;
 }
 
-void FavoriteManager::apply(Module *c, const string &name)
-{
+void FavoriteManager::apply(Module *c, const string &name) {
 	c->reset_config();
 	if (name == DEFAULT_NAME)
 		return;
 	if (!loaded)
 		load(c->session);
-	for (Favorite &f: favorites){
+	for (Favorite &f: favorites) {
 		if ((f.type == c->module_type) and (f.config_name == c->module_subtype) and (f.name == name))
 			c->config_from_string(f.options);
 	}
 }
 
-void FavoriteManager::save(Module *c, const string &name)
-{
+void FavoriteManager::save(Module *c, const string &name) {
 	if (!loaded)
 		load(c->session);
 	Favorite f;
@@ -109,10 +102,9 @@ void FavoriteManager::save(Module *c, const string &name)
 	save(c->session);
 }
 
-void FavoriteManager::set(const Favorite &ff)
-{
-	for (Favorite &f: favorites){
-		if ((f.type == ff.type) and (f.config_name == ff.config_name) and (f.name == ff.name)){
+void FavoriteManager::set(const Favorite &ff) {
+	for (Favorite &f: favorites) {
+		if ((f.type == ff.type) and (f.config_name == ff.config_name) and (f.name == ff.name)) {
 			f.options = ff.options;
 			return;
 		}
@@ -122,56 +114,46 @@ void FavoriteManager::set(const Favorite &ff)
 }
 
 
-class FavoriteSelectionDialog : public hui::Dialog
-{
+class FavoriteSelectionDialog : public hui::Dialog {
 public:
 	FavoriteSelectionDialog(hui::Window *win, const Array<string> &_names, bool _save) :
 		hui::Dialog(_(""), 300, 200, win, false)
 	{
 		save = _save;
 		names = _names;
-		add_grid("", 0, 0, "grid");
-		set_target("grid");
-		add_list_view("Name", 0, 0, "list");
-		add_grid("", 0, 1, "grid2");
-		set_target("grid2");
-		add_edit("!expandx,placeholder=" + _("enter new name"), 0, 0, "name");
-		add_def_button("Ok", 1, 0, "ok");
+		from_resource("favorite-dialog");
+		set_options("name", "placeholder=" + _("enter new name"));
 		if (!save)
 			add_string("list", _("-Default  Parameters-"));
 		for (string &n: names)
 			add_string("list", n);
 		if (!save)
 			names.insert(":def:", 0);
-		hide_control("grid2", !save);
-		event("list", std::bind(&FavoriteSelectionDialog::on_list, this));
-		event_x("list", "hui:select", std::bind(&FavoriteSelectionDialog::on_list_select, this));
-		event("name", std::bind(&FavoriteSelectionDialog::on_name, this));
-		event("ok", std::bind(&FavoriteSelectionDialog::on_ok, this));
-		set_int("list", -1);
+		hide_control("name", !save);
+		event("list", [=]{ on_list(); });
+		event_x("list", "hui:select", [=]{ on_list_select(); });
+		event("name", [=]{ on_name(); });
+		event("ok", [=]{ on_ok(); });
+		event("cancel", [=]{ destroy(); });
 	}
-	void on_list()
-	{
+	void on_list() {
 		int n = get_int("list");
 		selection = "";
-		if (n >= 0){
+		if (n >= 0) {
 			selection = names[n];
 			set_string("name", names[n]);
 		}
 		destroy();
 	}
-	void on_list_select()
-	{
+	void on_list_select() {
 		int n = get_int("list");
 		if (n >= 0)
 			set_string("name", names[n]);
 	}
-	void on_name()
-	{
+	void on_name() {
 		set_int("list", -1);
 	}
-	void on_ok()
-	{
+	void on_ok() {
 		selection = get_string("name");
 		destroy();
 	}
@@ -181,11 +163,10 @@ public:
 	string selection;
 };
 
-string FavoriteManager::select_name(hui::Window *win, Module *c, bool save)
-{
-	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, get_list(c), save);
+string FavoriteManager::select_name(hui::Window *win, Module *c, bool save) {
+	auto dlg = new FavoriteSelectionDialog(win, get_list(c), save);
 	dlg->run();
 	string sel = dlg->selection;
-	delete(dlg);
+	delete dlg;
 	return sel;
 }

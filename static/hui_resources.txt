@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-65
+66
 # Resource
 Menu
 menu_fake
@@ -767,6 +767,49 @@ link,ignorefocus
 Button
 edit_track
 link,ignorefocus
+1
+0
+0
+# Resource
+Dialog
+favorite-dialog
+width=300,height=200,headerbar,closebutton=no,resizable
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
+ListView
+list
+nobar
+0
+0
+0
+Edit
+name
+
+1
+0
+0
+Grid
+?
+buttonbar
+2
+0
+2
+Button
+cancel
+
+0
+0
+0
+Button
+ok
+default
 1
 0
 0
@@ -7013,7 +7056,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-594
+598
 # Text
 /bars-add
 Add bars...
@@ -7402,6 +7445,9 @@ Number
 bar_edit_dialog/t_result_bpm
 => Bpm
 
+configurable-selection-dialog/configurable-selection-dialog
+Module
+
 configurable-selection-dialog/list
 Name
 
@@ -7473,6 +7519,15 @@ Only audio and midi tracks can be edited here
 
 dummy-editor/warning
 Can not edit this track type
+
+favorite-dialog/favorite-dialog
+Parameter
+
+favorite-dialog/list
+Name
+
+favorite-dialog/ok
+Select
 
 fx_editor/add
 

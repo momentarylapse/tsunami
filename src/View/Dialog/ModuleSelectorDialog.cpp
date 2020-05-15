@@ -1,16 +1,17 @@
 /*
- * SynthesizerDialog.cpp
+ * ModuleSelectorDialog.cpp
  *
  *  Created on: 16.08.2013
  *      Author: michi
  */
 
-#include "ConfigurableSelectorDialog.h"
+#include "ModuleSelectorDialog.h"
+
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Module/Module.h"
 
-ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const string &s)
-{
+ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 	Label l;
 	l.full = s;
 	auto ss = s.explode("/");
@@ -19,14 +20,15 @@ ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const 
 	return l;
 }
 
-ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, ModuleType _type, Session *_session, const string &old_name) :
+ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleType _type, Session *_session, const string &old_name) :
 	hui::Window("configurable-selection-dialog", _parent)
 {
 	type = _type;
 	session = _session;
-	Array<string> tnames = session->plugin_manager->find_module_sub_types_grouped(type);
+	set_title(Module::type_to_name(type));
+	auto tnames = session->plugin_manager->find_module_sub_types_grouped(type);
 
-	for (string &s: tnames){
+	for (string &s: tnames) {
 		Label l = split_label(s);
 		labels.add(l);
 		if (l.group.num > 0)
@@ -38,53 +40,36 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, Mod
 
 	foreachi (Label &l, labels, i){
 		int n = i;
-		if (ugroups.num > 0){
+		if (ugroups.num > 0) {
 			int r = ugroups.find(l.group);
 			add_child_string("list", r, l.name);
-		}else
+		} else {
 			set_string("list", l.name);
+		}
 		if (l.name == old_name)
 			set_int("list", n);
 	}
 
-	event("hui:close", [=]{ on_close(); });
+	event("hui:close", [=]{ destroy(); });
 	event_x("list", "hui:select", [=]{ on_list_select(); });
 	event("list", [=]{ on_select(); });
-	event("cancel", [=]{ on_cancel(); });
-	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ destroy(); });
+	event("ok", [=]{ on_select(); });
 	enable("ok", false);
 }
 
-ConfigurableSelectorDialog::~ConfigurableSelectorDialog()
-{
+ModuleSelectorDialog::~ModuleSelectorDialog() {
 }
 
-void ConfigurableSelectorDialog::on_list_select()
-{
+void ModuleSelectorDialog::on_list_select() {
 	int n = get_int("list") - ugroups.num;
 	enable("ok", n >= 0);
 }
 
-void ConfigurableSelectorDialog::on_select()
-{
+void ModuleSelectorDialog::on_select() {
 	int n = get_int("list") - ugroups.num;
 	if (n < 0)
 		return;
 	_return = labels[n].name;
 	destroy();
-}
-
-void ConfigurableSelectorDialog::on_close()
-{
-	destroy();
-}
-
-void ConfigurableSelectorDialog::on_cancel()
-{
-	destroy();
-}
-
-void ConfigurableSelectorDialog::on_ok()
-{
-	on_select();
 }

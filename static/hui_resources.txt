@@ -2849,10 +2849,16 @@ metronome
 0
 0
 0
+Revealer
+metro-revealer
+
+1
+0
+1
 Grid
 nd_g_metronome_params
 
-1
+0
 0
 9
 Text
@@ -2936,8 +2942,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog

@@ -24,7 +24,7 @@ NewDialog::NewDialog(hui::Window *_parent):
 	add_string("sample_rate", "48000");
 	add_string("sample_rate", "96000");
 	set_int("sample_rate", 1);
-	hide_control("nd_g_metronome_params", true);
+	reveal("metro-revealer", false);
 
 	type = SignalType::AUDIO_MONO;
 	check("type-audio-mono", true);
@@ -104,11 +104,11 @@ void NewDialog::on_type(SignalType t) {
 
 	if (t == SignalType::MIDI) {
 		check("metronome", true);
-		hide_control("nd_g_metronome_params", false);
+		reveal("metro-revealer", true);
 	}
 }
 
 void NewDialog::on_metronome() {
-	hide_control("nd_g_metronome_params", !is_checked(""));
+	reveal("metro-revealer", is_checked(""));
 }
 

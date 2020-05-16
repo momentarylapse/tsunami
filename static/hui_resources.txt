@@ -472,7 +472,7 @@ vertical
 3
 ListView
 curves
-expandx,format=TTTt
+expandx,format=tTT
 0
 0
 0
@@ -7510,7 +7510,7 @@ curve_console/curve_console
 Kurven
 
 curve_console/curves
-Name\\min\\max\\Parameter
+Target\\min\\max
 
 curve_console/target
 Parameter

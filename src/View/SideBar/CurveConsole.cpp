@@ -106,7 +106,7 @@ void CurveConsole::update_list() {
 			curves.add(c);
 
 	foreachi(Curve *c, curves, i) {
-		add_string(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->get_targets(song));
+		add_string(id_list, c->get_targets(song) + format("\\%.3f\\%.3f", c->min, c->max));
 		if (c == curve())
 			set_int(id_list, i);
 	}
@@ -141,7 +141,7 @@ void CurveConsole::on_target() {
 	//if (dlg->id == "ok")
 		song->curve_set_targets(curve(), targets);
 
-	delete(dlg);
+	delete dlg;
 	update_list();
 }
 
@@ -163,9 +163,7 @@ void CurveConsole::on_list_edit() {
 		string name = curves[n]->name;
 		float min = curves[n]->min;
 		float max = curves[n]->max;
-		if (col == 0)
-			name = get_cell(id_list, n, col);
-		else if (col == 1)
+		if (col == 1)
 			min = get_cell(id_list, n, col)._float();
 		else if (col == 2)
 			max = get_cell(id_list, n, col)._float();

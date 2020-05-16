@@ -15,6 +15,11 @@
 #include "../Module/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
 
+string i2s_small(int); // MidiData.cpp ?
+
+const string NICE_SEP = u8" \u203a ";
+
+
 Curve::Target::Target() {
 	p = nullptr;
 }
@@ -68,19 +73,20 @@ Track* Curve::Target::track(Song *s) const {
 Array<Curve::Target> Curve::Target::enumerate(Song *s) {
 	Array<Target> list;
 	foreachi(Track *t, s->tracks, i)
-		list.append(enumerate_track(t, format("t:%d", i), format("track[%d]", i)));
+		list.append(enumerate_track(t, format("t:%d", i), "track" + i2s_small(i)));
 	return list;
 }
 
 Array<Curve::Target> Curve::Target::enumerate_track(Track *t, const string &prefix, const string &prefix_nice) {
 	Array<Target> list;
-	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
-	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
+	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + NICE_SEP + "volume"));
+	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + NICE_SEP + "panning"));
+
 	foreachi(auto *fx, t->fx, i)
-		list.append(enumerate_module(fx, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i)));
+		list.append(enumerate_module(fx, prefix + format(":fx:%d", i), prefix_nice + NICE_SEP + "fx" + i2s_small(i)));
 	foreachi(auto *fx, t->midi_fx, i)
-		list.append(enumerate_module(fx, prefix + format(":mfx:%d", i), prefix_nice + format(".mfx[%d]", i)));
-	list.append(enumerate_module(t->synth, prefix + ":s", prefix_nice + ".synth"));
+		list.append(enumerate_module(fx, prefix + format(":mfx:%d", i), prefix_nice + NICE_SEP + "mfx" + i2s_small(i)));
+	list.append(enumerate_module(t->synth, prefix + ":s", prefix_nice + NICE_SEP + "synth"));
 	return list;
 }
 Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &prefix, const string &prefix_nice) {
@@ -98,17 +104,17 @@ Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *
 		list.add(Target((float*)pp, prefix, prefix_nice));
 	} else if (t->is_array()) {
 		for (int i=0; i<t->array_length; i++) {
-			list.append(enumerate_type(pp + t->param->size * i, t->param, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
+			list.append(enumerate_type(pp + t->param->size * i, t->param, prefix + format(":%d", i), prefix_nice + i2s_small(i)));
 		}
 	} else if (t->is_super_array()) {
 		auto *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++) {
-			list.append(enumerate_type(pp + da->element_size * i, t->param, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
+			list.append(enumerate_type(pp + da->element_size * i, t->param, prefix + format(":%d", i), prefix_nice + i2s_small(i)));
 		}
 	} else {
 		for (auto &e : t->elements)
 			if (!e.hidden())
-				list.append(enumerate_type(pp + e.offset, e.type, prefix + ":" + e.name, prefix_nice + "." + e.name));
+				list.append(enumerate_type(pp + e.offset, e.type, prefix + ":" + e.name, prefix_nice + NICE_SEP + e.name));
 	}
 	return list;
 }

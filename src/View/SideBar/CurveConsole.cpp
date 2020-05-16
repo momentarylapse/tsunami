@@ -14,10 +14,10 @@
 #include "../../Data/Curve.h"
 #include "../../Session.h"
 
-class CurveTargetDialog : public hui::Window {
+class CurveTargetDialog : public hui::Dialog {
 public:
 	CurveTargetDialog(hui::Panel *parent, Track *track, Array<Curve::Target> &t) :
-		hui::Window(("curve-target-dialog"), parent->win),
+		hui::Dialog(("curve-target-dialog"), parent->win),
 		targets(t)
 	{
 		all_targets = Curve::Target::enumerate_track(track, "", "");

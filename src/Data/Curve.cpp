@@ -86,8 +86,9 @@ Array<Curve::Target> Curve::Target::enumerate_track(Track *t, const string &pref
 Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &prefix, const string &prefix_nice) {
 	Array<Target> list;
 	auto *pd = c->get_config();
-	if (pd)
+	if (pd) {
 		list.append(enumerate_type((char*)pd, pd->_class, prefix, prefix_nice));
+	}
 	return list;
 }
 
@@ -97,12 +98,12 @@ Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *
 		list.add(Target((float*)pp, prefix, prefix_nice));
 	} else if (t->is_array()) {
 		for (int i=0; i<t->array_length; i++) {
-			list.append(enumerate_type(pp + t->parent->size * i, t->parent, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
+			list.append(enumerate_type(pp + t->param->size * i, t->param, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
 		}
 	} else if (t->is_super_array()) {
 		auto *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++) {
-			list.append(enumerate_type(pp + da->element_size * i, t->parent, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
+			list.append(enumerate_type(pp + da->element_size * i, t->param, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
 		}
 	} else {
 		for (auto &e : t->elements)

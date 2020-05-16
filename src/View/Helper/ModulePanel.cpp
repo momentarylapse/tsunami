@@ -143,7 +143,7 @@ void ModulePanel::on_save() {
 
 void ModulePanel::on_enabled() {
 	if (func_enable)
-		func_enable(is_checked(""));
+		func_enable(outer->is_checked("enabled"));
 }
 
 void ModulePanel::on_delete() {

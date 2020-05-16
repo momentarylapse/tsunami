@@ -582,14 +582,22 @@ void Window::__set_options(const string &options) {
 			//gtk_window_set_resizable(GTK_WINDOW(window), val_is_positive(val, true));
 		} else if (op == "headerbar") {
 			_add_headerbar();
+		} else if (op == "statusbar") {
+			enable_statusbar(val_is_positive(val, true));
 		} else if (op == "closebutton") {
 			if (headerbar)
 				gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerbar), val_is_positive(val, true));
+		} else if (op == "cursor") {
+			show_cursor(val_is_positive(val, true));
+		} else if (op == "borderwidth") {
+			set_border_width(val._int());
 		}
 	}
 }
 
 void Window::_add_headerbar() {
+	if (headerbar)
+		return;
 	headerbar = gtk_header_bar_new();
 	//gtk_header_bar_set_title(GTK_HEADER_BAR(hb), "Dialog"); // sys_str(PartString[0])
 	//gtk_header_bar_set_subtitle(GTK_HEADER_BAR(hb), "test");

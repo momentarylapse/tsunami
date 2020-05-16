@@ -1,6 +1,7 @@
-Dialog curve-target-dialog "Ziel" width=300 height=400
+Dialog curve-target-dialog "Target" width=300 height=400 headerbar closebutton=no resizable borderwidth=0
 	Grid ? "" vertical
 		ListView list "Name" multiselection nobar
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
-			Button /ok "OK"
+			---|
+			Button /ok "Select" default

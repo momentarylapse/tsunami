@@ -12,6 +12,11 @@
 #include "../math/vector.h"
 
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
+//#if defined(OS_WINDOWS)
+#define USE_WINSOCK
+#endif
+
+#ifdef USE_WINSOCK
 	#include <winsock.h>
 	#pragma comment(lib,"wsock32.lib")
 
@@ -64,7 +69,7 @@ void NetInit()
 {
 	if (!msg_inited)
 		msg_init();
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 	if (WSAStartup(MAKEWORD(1,1),&wsaData)!=0){
 		msg_error("WSAStartup  (Network....)");
 	}
@@ -115,10 +120,9 @@ void Socket::close()
 	if (s < 0)
 		return;
 	//so("close");
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 	closesocket(s);
-#endif
-#ifdef OS_LINUX
+#else
 	::close(s);
 #endif
 	s = -1;
@@ -126,11 +130,10 @@ void Socket::close()
 
 void Socket::setBlocking(bool blocking)
 {
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 	unsigned long l = blocking ? 0 : 1;
 	ioctlsocket(s, FIONBIO, &l);
-#endif
-#ifdef OS_LINUX
+#else
 	fcntl(s, F_SETFL, blocking ? 0 : O_NONBLOCK);
 #endif
 }
@@ -208,10 +211,9 @@ Socket *Socket::accept()
 //	so(1,"accept...");
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 	con->s = ::accept(s, (struct sockaddr *)&remote_addr, &size);
-#endif
-#ifdef OS_LINUX
+#else
 	socklen_t len = (socklen_t)size;
 	con->s = ::accept(s, (struct sockaddr *)&remote_addr, &len);
 #endif
@@ -226,9 +228,9 @@ Socket *Socket::accept()
 	}
 
 	so(1,"  -client found");
-	#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 		so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
-	#endif
+#endif
 	con->setBlocking(true);
 
 	return con;
@@ -282,11 +284,11 @@ bool Socket::_connect(const string &addr,int port)
 			so(2,"test");
 			so(2,status);
 			struct sockaddr address;
-			#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 				int address_len=sizeof(address);
-			#else
+#else
 				socklen_t address_len=sizeof(address);
-			#endif
+#endif
 			if (getpeername(s,&address,&address_len)<0){
 				so(1,"peer name :(");
 				ttt=NetConnectTimeout;
@@ -304,16 +306,16 @@ bool Socket::_connect(const string &addr,int port)
 	}
 	if (ttt>0){
 		so(1,"  -ERROR (connect)");
-		#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 			so(0,WSAGetLastError());
-		#endif
+#endif
 		close();
 		return false;
 	}
 
 	/*if (connect(s, (struct sockaddr *)&host_addr, sizeof(host_addr))==-1){
 		so(0,"  -ERROR (connect)");
-		#if defined(OS_WINDOWS) || defined(OS_MINGW)
+		#ifdef USE_WINSOCK
 			so(0,WSAGetLastError());
 		#endif
 		NetClose(s);
@@ -357,7 +359,7 @@ string Socket::read()
 
 	int r;
 	sockaddr_in addr;
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 	int addr_len = sizeof(addr);
 #else
 	socklen_t addr_len = sizeof(addr);
@@ -394,7 +396,7 @@ bool Socket::write(const string &buf)
 		memset((char *)&addr, 0, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(target.port);
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#ifdef USE_WINSOCK
 			msg_error("inet_aton() on windows...\n");
 #else
 		if (inet_aton(target.host.c_str(), &addr.sin_addr)==0)

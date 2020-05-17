@@ -497,7 +497,7 @@ SerialNodeParam Serializer::add_reference(const SerialNodeParam &param, const Cl
 	ret.shift = 0;
 	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		ret.kind = NodeKind::IMMEDIATE;
-		ret.p = (long)((char*)param.p + param.shift);
+		ret.p = (int_p)((char*)param.p + param.shift);
 	} else if ((param.kind == NodeKind::IMMEDIATE) or (param.kind == NodeKind::MEMORY)) {
 		ret.kind = NodeKind::IMMEDIATE;
 		if (param.shift > 0)

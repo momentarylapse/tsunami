@@ -42,7 +42,7 @@ nix::Shader* __CreateShader(const string &source) {
 #else
 struct FakeTexture {
 	int width, height;
-}
+	int color_attachments, depth_buffer;
 };
 	namespace nix{
 		typedef int VertexBuffer;

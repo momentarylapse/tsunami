@@ -339,7 +339,7 @@ void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
 }
 
 void Script::map_constants_to_opcode() {
-	map_constants_to_memory(opcode, opcode_size, (char*)(long)syntax->asm_meta_info->code_origin);
+	map_constants_to_memory(opcode, opcode_size, (char*)(int_p)syntax->asm_meta_info->code_origin);
 	align_opcode();
 }
 

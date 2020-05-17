@@ -428,7 +428,7 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list) {
 float get_max_volume(AudioBuffer &buf) {
 	float peak = 0;
 	for (int i=0; i<buf.length; i++)
-		peak = max(peak, fabs(buf.c[0][i]));
+		peak = max(peak, (float)fabs(buf.c[0][i]));
 	return peak;
 }
 

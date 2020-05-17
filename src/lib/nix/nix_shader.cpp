@@ -5,7 +5,6 @@
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
 
-#define HAS_LIB_GL 1
 #if HAS_LIB_GL
 
 #include "nix.h"

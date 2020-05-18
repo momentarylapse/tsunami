@@ -22,11 +22,13 @@
 //#define StructuredShifts
 //#define FILE_COMMENTS_DEBUG
 
+#include <chrono>
+#include <ctime>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <time.h>
 
 #ifdef OS_WINDOWS
 	#include <stdio.h>
@@ -41,7 +43,6 @@
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <stdarg.h>
-	#include <sys/timeb.h>
 	#include <sys/stat.h>
 
 	#define _open	::open
@@ -61,71 +62,40 @@
 #endif
 
 
-#ifdef OS_WINDOWS
-Date systime2date(_SYSTEMTIME t)
-{
+Date time2date(time_t t) {
 	Date d;
-	d.time=-1;//(int)t.time;   :---(
-	d.year=t.wYear;
-	d.month=t.wMonth;
-	d.day=t.wDay;
-	d.hour=t.wHour;
-	d.minute=t.wMinute;
-	d.second=t.wSecond;
-	d.milli_second=t.wMilliseconds;
-	d.day_of_week=t.wDayOfWeek;
-	d.day_of_year=-1;//t.wDayofyear;   :---(
-	return d;
-}
-#endif
-Date time2date(time_t t)
-{
-	Date d;
-	d.time=(int)t;
-	tm *tm=localtime(&t);
-	d.year=tm->tm_year+1900;
-	d.month=tm->tm_mon;
-	d.day=tm->tm_mday;
-	d.hour=tm->tm_hour;
-	d.minute=tm->tm_min;
-	d.second=tm->tm_sec;
-	d.milli_second=0;
-	d.day_of_week=tm->tm_wday;
-	d.day_of_year=tm->tm_yday;
+	d.time = (int64)t;
+	tm *tm = localtime(&t);
+	d.milli_second = 0;
 	return d;
 }
 
-Date get_current_date()
-{
-#ifdef OS_WINDOWS
-	_SYSTEMTIME t;
-	GetLocalTime(&t);
-	return systime2date(t);
-#endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
-	time_t t;
-	t = time(nullptr);
-	Date d;
-	d = time2date(t);
-	timeb tb;
-	ftime(&tb);
-	d.milli_second = tb.millitm;
+Date Date::now() {
+	auto now = std::chrono::system_clock::now();
+	auto t = std::chrono::system_clock::to_time_t(now);
+	auto d = time2date(t);
+
+	auto dtn = now.time_since_epoch();
+	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dtn);
+	d.milli_second = ms.count() % 1000;
 	return d;
-#endif
 }
 
-string Date::format(const string &f) const
-{
+string Date::format(const string &f) const {
 	char buffer [80];
-	time_t rawtime = this->time;
+	time_t rawtime = (time_t)this->time;
 	tm * timeinfo = localtime (&rawtime);
 	strftime(buffer, sizeof(buffer), f.c_str(), timeinfo);
 	return buffer;
 }
 
-string Date::str() const
-{	return this->format("%c");	}
+string Date::str() const {
+	return this->format("%c");
+}
 
+void Date::__assign__(const Date &d) {
+	*this = d;
+}
 
 t_file_try_again_func *FileTryAgainFunc;
 

@@ -1062,7 +1062,7 @@ bool song_is_simple_midi(Song *s) {
 string _suggest_filename(Song *s, const string &dir) {
 	if (s->filename != "")
 		return s->filename.basename();
-	string base = get_current_date().format("%Y-%m-%d");
+	string base = Date::now().format("%Y-%m-%d");
 
 	string ext = "nami";
 	if (song_is_simple_audio(s))

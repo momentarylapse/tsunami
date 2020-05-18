@@ -9,14 +9,11 @@
 #define HUITIMER_H_
 
 #include "hui.h"
+#include <chrono>
 
-namespace hui
-{
+namespace hui {
 
-void InitTimers();
-
-class Timer
-{
+class Timer {
 public:
 	Timer();
 	float peek();
@@ -24,13 +21,8 @@ public:
 	void reset();
 
 private:
-#ifdef OS_WINDOWS
-	LONGLONG cur_time;
-	LONGLONG last_time;
-#else
-	struct timeval cur_time;
-	struct timeval last_time;
-#endif
+	std::chrono::high_resolution_clock::time_point prev_time;
+	std::chrono::high_resolution_clock::time_point cur_time;
 };
 
 

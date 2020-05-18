@@ -43,14 +43,15 @@
 // time/date
 
 struct Date {
-	int time;
-	int year, month, day, hour, minute, second, milli_second;
-	int day_of_week, day_of_year;
+	int64 time;
+	int milli_second;
+	int dummy[7];
 	string _cdecl format(const string &f) const;
 	string _cdecl str() const;
-};
+	void __assign__(const Date &d);
 
-Date _cdecl get_current_date();
+	static Date _cdecl now();
+};
 
 
 

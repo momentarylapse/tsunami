@@ -84,9 +84,6 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 
 
-
-	InitTimers();
-
 	_InitInput_();
 
 	ComboBoxSeparator = "\\";

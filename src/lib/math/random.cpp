@@ -4,7 +4,7 @@
 #define PHI 0x9e3779b9
 
 Random::Random() {
-	auto d = get_current_date();
+	auto d = Date::now();
 	seed(d.format("%c") + i2s(d.milli_second));
 }
 

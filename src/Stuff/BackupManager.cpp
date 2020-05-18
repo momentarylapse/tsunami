@@ -15,7 +15,7 @@ int BackupManager::next_uuid;
 
 string BackupManager::get_filename(const string &extension)
 {
-	Date d = get_current_date();
+	Date d = Date::now();
 	string base = tsunami->directory + d.format("backup-%Y-%m-%d");
 	for (int i=0; i<26; i++){
 		string fn = base + "a." + extension;

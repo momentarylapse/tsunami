@@ -7011,7 +7011,7 @@ image=hui:add
 # Resource
 Dialog
 track-selector
-width=300,height=500,headerbar,closebutton=no,resizable
+width=360,height=450,headerbar,closebutton=no,resizable,borderwidth=0
 0
 0
 1
@@ -7042,8 +7042,8 @@ cancel
 Button
 ok
 default
-1
 0
+1
 0
 # Resource
 Dialog

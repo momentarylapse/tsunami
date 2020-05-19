@@ -35,6 +35,7 @@ public:
 			add_string("tracks", t->nice_name());
 		event("tracks", [=]{ on_select(); });
 		event("ok", [=]{ on_select(); });
+		event("cancel", [=]{ destroy(); });
 	}
 	void on_select() {
 		int n = get_int("");

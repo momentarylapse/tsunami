@@ -1,6 +1,7 @@
-Dialog track-selector "Select track" width=300 height=500 headerbar closebutton=no resizable
+Dialog track-selector "Select track" width=360 height=450 headerbar closebutton=no resizable borderwidth=0
 	Grid ? "" vertical
 		ListView tracks "tracks" nobar
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
+			---|
 			Button ok "Select" default

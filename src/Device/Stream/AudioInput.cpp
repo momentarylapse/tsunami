@@ -48,6 +48,11 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 	const void *data;
 	pa_stream_peek(p, &data, &nbytes);
 	input->_pulse_test_error("pa_stream_peek");
+
+	// empty buffer
+	if (nbytes == 0)
+		return;
+
 	int frames = nbytes / sizeof(float) / input->num_channels;
 
 	if (data) {
@@ -70,14 +75,24 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 
 		pa_stream_drop(p);
 		input->_pulse_test_error("pa_stream_drop");
+	} else if (nbytes > 0) {
+		// holes
+		pa_stream_drop(p);
+		input->_pulse_test_error("pa_stream_drop");
 	}
 	//msg_write(">");
-	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
+	//pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
 }
 
 void AudioInput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
 	auto *stream = (AudioInput*)userdata;
 	//msg_write("--success");
+	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
+}
+
+void AudioInput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
+	auto *stream = (AudioInput*)userdata;
+	//printf("--state\n");
 	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
 }
 
@@ -258,13 +273,13 @@ void AudioInput::_kill_dev() {
 		pa_stream_disconnect(pulse_stream);
 		_pulse_test_error("pa_stream_disconnect");
 
-		// FIXME really necessary?!?!?!?
+/*		// FIXME really necessary?!?!?!?
 		for (int i=0; i<1000; i++) {
 			if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED) {
 				break;
 			}
 			hui::Sleep(0.001f);
-		}
+		}*/
 
 		pa_stream_unref(pulse_stream);
 		_pulse_test_error("pa_stream_unref");
@@ -335,7 +350,7 @@ void AudioInput::_create_dev() {
 
 
 		pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
-		//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, this);
+		pa_stream_set_state_callback(pulse_stream, &pulse_stream_state_callback, this);
 
 		pa_buffer_attr attr_in;
 	//	attr_in.fragsize = -1;
@@ -353,6 +368,7 @@ void AudioInput::_create_dev() {
 		_pulse_test_error("pa_stream_connect_record");
 
 		if (!pulse_wait_stream_ready(pulse_stream, dev_man)) {
+			dev_man->unlock();
 			session->e("pulse_wait_stream_ready");
 			return;
 		}

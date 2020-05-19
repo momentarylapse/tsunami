@@ -24,6 +24,8 @@ class Session;
 #if HAS_LIB_PULSEAUDIO
 struct pa_context;
 struct pa_threaded_mainloop;
+struct pa_sink_info;
+struct pa_source_info;
 #endif
 
 #if HAS_LIB_PORTAUDIO
@@ -95,6 +97,10 @@ public:
 	pa_context *pulse_context;
 	pa_threaded_mainloop *pulse_mainloop;
 	bool _pulse_test_error(Session *session, const string &msg);
+	bool pulse_wait_context_ready();
+	static void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata);
+	static void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata);
+	static void pulse_state_callback(pa_context* context, void* userdata);
 #endif
 #if HAS_LIB_PORTAUDIO
 	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);

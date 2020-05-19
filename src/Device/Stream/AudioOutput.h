@@ -128,6 +128,7 @@ private:
 	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 	static void pulse_stream_underflow_callback(pa_stream *s, void *userdata);
 	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
+	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
 #endif
 
 #if HAS_LIB_PORTAUDIO

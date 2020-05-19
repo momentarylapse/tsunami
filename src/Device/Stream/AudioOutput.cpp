@@ -63,6 +63,9 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 	//printf("output request %d\n", (int)nbytes);
 	AudioOutput *stream = (AudioOutput*)userdata;
 
+	if (nbytes == 0)
+		return;
+
 	void *data;
 	/*int r =*/ pa_stream_begin_write(p, &data, &nbytes);
 	stream->_pulse_test_error("pa_stream_begin_write");
@@ -81,12 +84,18 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 	}
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
 void AudioOutput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
 	auto *stream = (AudioOutput*)userdata;
 	//msg_write("--success");
+	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+}
+
+void AudioOutput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
+	auto *stream = (AudioOutput*)userdata;
+	//printf("--state\n");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
@@ -276,6 +285,7 @@ void AudioOutput::_create_dev() {
 		pulse_stream = pa_stream_new(device_manager->pulse_context, "stream", &ss, nullptr);
 		_pulse_test_error("pa_stream_new");
 
+		pa_stream_set_state_callback(pulse_stream, &pulse_stream_state_callback, this);
 		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
 		pa_stream_set_underflow_callback(pulse_stream, &pulse_stream_underflow_callback, this);
 
@@ -496,8 +506,10 @@ void AudioOutput::_fill_prebuffer() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		if (!pulse_stream)
+		if (!pulse_stream) {
+			device_manager->unlock();
 			return;
+		}
 
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
 		_pulse_test_error("pa_stream_prebuf");
@@ -511,8 +523,10 @@ void AudioOutput::_fill_prebuffer() {
 
 #if HAS_LIB_PORTAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		if (!portaudio_stream)
+		if (!portaudio_stream) {
+			device_manager->unlock();
 			return;
+		}
 		//PaError err = Pa_StartStream(portaudio_stream);
 		//_portaudio_test_error(err, "Pa_StartStream");
 	}

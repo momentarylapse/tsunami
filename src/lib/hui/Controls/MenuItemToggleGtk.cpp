@@ -12,13 +12,13 @@
 namespace hui
 {
 
-gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data);
+gboolean on_get_menu_click(GtkWidget *widget, gpointer data);
 
 MenuItemToggle::MenuItemToggle(const string &title, const string &id) :
 	Control(MENU_ITEM_TOGGLE, id)
 {
 	widget = gtk_check_menu_item_new_with_label(get_lang_sys(id, title, false));
-	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
+	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(on_get_menu_click), this);
 }
 
 void MenuItemToggle::__check(bool checked)

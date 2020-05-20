@@ -12,7 +12,7 @@
 namespace hui
 {
 
-void OnGtkButtonPress(GtkWidget *widget, gpointer data);
+void on_gtk_button_press(GtkWidget *widget, gpointer data);
 
 
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)

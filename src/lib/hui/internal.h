@@ -15,7 +15,7 @@ namespace hui
 #else
 	extern int HuiKeyID[256];
 	extern void *invisible_cursor;
-	extern void *get_gtk_image(const string &image, bool large);
+	extern void *get_gtk_image(const string &image, GtkIconSize size);
 	extern void *get_gtk_image_pixbuf(const string &image);
 #endif
 extern int allow_signal_level;

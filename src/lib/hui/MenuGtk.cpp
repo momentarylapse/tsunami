@@ -191,14 +191,13 @@ HuiImage *get_image(const string &filename) {
 	return &_all_images_.back();
 }
 
-void *get_gtk_image(const string &image, bool large)
-{
+void *get_gtk_image(const string &image, GtkIconSize size) {
 	if (image == "")
 		return nullptr;
-	if (image.head(4) == "hui:"){
+	if (image.head(4) == "hui:") {
 		// internal
-		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), large ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_MENU);
-	}else{
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), size);
+	} else {
 		// file
 		//HuiImage *img = get_image(image);
 		//if (!img)

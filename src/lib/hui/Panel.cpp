@@ -628,7 +628,9 @@ void Panel::delete_control(const string &_id) {
 }
 
 void Panel::set_options(const string &_id, const string &options) {
-	if (_id != "") {
+	if (id == "toolbar[0]" and win == this) {
+		win->toolbar[0]->set_options(options);
+	} else if (_id != "") {
 		apply_foreach(_id, [=](Control *c) { c->set_options(options); });
 	} else if (win == this) {
 		win->__set_options(options);

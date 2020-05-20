@@ -15,8 +15,7 @@ namespace hui
 
 class Window;
 
-class Toolbar
-{
+class Toolbar {
 public:
 	Toolbar(Window *win, bool vertical = false);
 	virtual ~Toolbar();
@@ -44,6 +43,7 @@ public:
 	void _cdecl set_by_id(const string &id);
 	void _cdecl from_source(const string &source);
 	void _cdecl from_resource(Resource *r);
+	void _cdecl set_options(const string &options);
 
 	void _add(Control *c);
 

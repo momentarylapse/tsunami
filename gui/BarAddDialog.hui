@@ -16,4 +16,5 @@ Dialog bar_add_dialog "Add bars" width=250 height=80 headerbar closebutton=no
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
+			---|
 			Button ok "Add" default image=hui:ok

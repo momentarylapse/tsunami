@@ -25,4 +25,5 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80 headerbar closebutton=no
 					Label result_bpm "" bold
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
+			---|
 			Button ok "Edit" default image=hui:ok

@@ -213,7 +213,7 @@ Array<std::pair<string, string>> parse_options(const string &options) {
 	return r;
 }
 
-bool val_is_positive(const string &val, bool def = false) {
+bool val_is_positive(const string &val, bool def) {
 	if (val == "no" or val == "false")
 		return false;
 	if (val == "yes" or val == "true")

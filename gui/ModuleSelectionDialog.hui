@@ -4,4 +4,5 @@ Dialog configurable-selection-dialog "Module" width=400 height=500 headerbar res
 		---|
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
+			---|
 			Button ok "Select" default

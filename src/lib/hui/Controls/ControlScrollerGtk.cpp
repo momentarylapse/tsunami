@@ -24,11 +24,10 @@ ControlScroller::ControlScroller(const string &title, const string &id) :
 	gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(widget), true);
 	gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(widget), true);
 #endif
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
-void ControlScroller::add(Control *child, int x, int y)
-{
+void ControlScroller::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_container_add(GTK_CONTAINER(viewport), child_widget);
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
@@ -37,16 +36,15 @@ void ControlScroller::add(Control *child, int x, int y)
 }
 
 
-void ControlScroller::__set_option(const string& op, const string& value)
-{
+void ControlScroller::__set_option(const string& op, const string& value) {
 	GtkPolicyType h_policy, v_policy;
 	gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(widget), &h_policy, &v_policy);
-	if (op == "scrollx"){
+	if (op == "scrollx") {
 		if (value == "no")
 			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget), GTK_POLICY_NEVER, v_policy);
 		if (value == "yes")
 			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget), GTK_POLICY_AUTOMATIC, v_policy);
-	}else if (op == "scrolly"){
+	} else if (op == "scrolly") {
 		if (value == "no")
 			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget), h_policy, GTK_POLICY_NEVER);
 		if (value == "yes")

@@ -296,9 +296,8 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 #if STUPID_HACK
 	delay_timer = new Timer;
 #endif
-	GetPartStrings(title);
 	// FIXME: this needs to be supplied as title... fromSource() won't work...
-	is_opengl = (OptionString.find("opengl") >= 0);
+	is_opengl = option_has(get_option_from_title(title), "opengl");
 	GtkWidget *da;
 	if (is_opengl) {
 		NixGlArea = this;
@@ -337,7 +336,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 
 	cur_cairo = nullptr;
 }

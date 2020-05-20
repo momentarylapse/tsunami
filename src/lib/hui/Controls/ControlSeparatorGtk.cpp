@@ -10,15 +10,14 @@
 namespace hui
 {
 
-ControlSeparator::ControlSeparator(const string &text, const string &_id) :
+ControlSeparator::ControlSeparator(const string &title, const string &_id) :
 	Control(CONTROL_SEPARATOR, _id)
 {
-	GetPartStrings(text);
-	if (OptionString.find("vertical") >= 0)
+	if (option_has(get_option_from_title(title), "vertical"))
 		widget = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	else
 		widget = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 };

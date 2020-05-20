@@ -199,8 +199,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog
@@ -242,8 +242,8 @@ image=hui:cancel
 Button
 ok
 default,danger,image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog
@@ -399,8 +399,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog
@@ -448,14 +448,14 @@ flat,image=hui:save
 Button
 ok
 default,image=hui:ok
-3
 0
+1
 0
 Button
 preview
 image=hui:media-play
-4
-0
+1
+1
 0
 # Resource
 Dialog
@@ -761,8 +761,8 @@ cancel
 Button
 ok
 default
-1
 0
+1
 0
 # Resource
 Dialog
@@ -2761,8 +2761,8 @@ cancel
 Button
 ok
 default
-1
 0
+1
 0
 # Resource
 Dialog
@@ -3003,8 +3003,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog
@@ -3064,8 +3064,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Resource
 Menu
@@ -6055,13 +6055,13 @@ cancel
 Button
 import
 image=hui:open
-0
 1
+0
 0
 Button
 ok
 default
-1
+0
 1
 0
 # Resource
@@ -7079,8 +7079,8 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
-1
 0
+1
 0
 # Number Of Languages
 2

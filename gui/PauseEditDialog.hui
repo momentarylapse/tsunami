@@ -7,4 +7,5 @@ Dialog pause_edit_dialog "Edit pause" width=250 height=80 headerbar closebutton=
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
+			---|
 			Button ok "Edit" default image=hui:ok

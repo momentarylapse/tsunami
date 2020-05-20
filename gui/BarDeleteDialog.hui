@@ -4,4 +4,5 @@ Dialog bar_delete_dialog "Delete bars" width=180 height=80 headerbar closebutton
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
+			---|
 			Button ok "Delete" default danger image=hui:ok

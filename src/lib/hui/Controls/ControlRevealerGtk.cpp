@@ -12,37 +12,35 @@
 namespace hui
 {
 
-void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointer user_data);
+void on_gtk_expander_expand(GObject* object, GParamSpec *param_spec, gpointer user_data);
 
 ControlRevealer::ControlRevealer(const string &title, const string &id) :
 	Control(CONTROL_REVEALER, id)
 {
-	GetPartStrings(title);
+	auto parts = split_title(title);
 
 #if GTK_CHECK_VERSION(3,10,0)
 	widget = gtk_revealer_new();
 #else
 	widget = gtk_expander_new(sys_str("<b>Revealer...</b>"));
 	gtk_expander_set_use_markup(GTK_EXPANDER(widget), true);
-	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), nullptr);
+	g_signal_connect(widget, "notify::expanded", G_CALLBACK(on_gtk_expander_expand), nullptr);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
 #endif
 
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 
-void ControlRevealer::add(Control *child, int x, int y)
-{
+void ControlRevealer::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 	children.add(child);
 	child->parent = this;
 }
 
-void ControlRevealer::reveal(bool reveal)
-{
+void ControlRevealer::reveal(bool reveal) {
 #if GTK_CHECK_VERSION(3,10,0)
 	gtk_revealer_set_reveal_child(GTK_REVEALER(widget), reveal);
 #else
@@ -50,8 +48,7 @@ void ControlRevealer::reveal(bool reveal)
 #endif
 }
 
-bool ControlRevealer::is_revealed()
-{
+bool ControlRevealer::is_revealed() {
 #if GTK_CHECK_VERSION(3,10,0)
 	return gtk_revealer_get_reveal_child(GTK_REVEALER(widget));
 #else
@@ -60,8 +57,7 @@ bool ControlRevealer::is_revealed()
 }
 
 
-void ControlRevealer::__set_option(const string& op, const string& value)
-{
+void ControlRevealer::__set_option(const string& op, const string& value) {
 #if GTK_CHECK_VERSION(3,10,0)
 	if (op == "slide"){
 		if (value == "up")
@@ -72,7 +68,7 @@ void ControlRevealer::__set_option(const string& op, const string& value)
 			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_LEFT);
 		else if (value == "right")
 			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_RIGHT);
-	}else if (op == "cross-fade")
+	}else if (op == "crossfade")
 		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_CROSSFADE);
 #endif
 }

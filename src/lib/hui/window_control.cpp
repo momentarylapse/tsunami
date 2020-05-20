@@ -19,10 +19,6 @@ bool Panel::is_enabled(const string &id)
 // creating control items
 
 
-
-Array<string> PartString;
-string OptionString, HuiFormatString;
-
 /*string ScanOptions(int id, const string &title)
 {
 	string title2 = get_lang(id, title);
@@ -53,18 +49,13 @@ string OptionString, HuiFormatString;
 	return title2;
 }*/
 
-void GetPartStrings(const string &title)
-{
-	PartString.clear();
-	OptionString = "";
-	HuiFormatString = "";
-
-	PartString = title.explode(ComboBoxSeparator);
+Array<string> split_title(const string &title) {
+	auto r = title.explode(ComboBoxSeparator);
 //	msg_write(sa2s(PartString));
-	if (PartString.num > 0)
-		if (PartString[0].num > 0)
-			if (PartString[0][0] == '!'){
-				OptionString = PartString[0].substr(1, -1);
+	if (r.num > 0)
+		if (r[0].head(1) == "!") {
+			r.erase(0);
+				/*OptionString = PartString[0].substr(1, -1);
 				PartString.erase(0);
 
 				int a = OptionString.find("format=");
@@ -73,12 +64,35 @@ void GetPartStrings(const string &title)
 					int b = HuiFormatString.find(",");
 					if (b >= 0)
 						HuiFormatString = HuiFormatString.substr(0, b);
-				}
+				}*/
 			}
-	if (PartString.num == 0)
-		PartString.add("");
-//	msg_write(OptionString);
-//	msg_write(HuiFormatString);
+	if (r.num == 0)
+		return {""};
+	return r;
+}
+
+
+string get_option_from_title(const string &title) {
+	auto r = title.explode(ComboBoxSeparator);
+	if (r.num > 0)
+		if (r[0].head(1) == "!")
+			return r[0].substr(1, -1);
+	return "";
+
+}
+
+bool option_has(const string &options, const string &key) {
+	return sa_contains(options.explode(","), key);
+}
+string option_value(const string &options, const string &key) {
+	auto r = options.explode(",");
+	for (auto &x: r) {
+		int p = x.find("=", 0);
+		if (p >= 0)
+			if (x.head(p) == key)
+				return x.substr(p + 1, -1);
+	}
+	return "";
 }
 
 };

@@ -20,10 +20,10 @@ void on_gtk_toggle_button_toggle(GtkWidget *widget, gpointer data)
 ControlToggleButton::ControlToggleButton(const string &title, const string &id) :
 	Control(CONTROL_TOGGLEBUTTON, id)
 {
-	GetPartStrings(title);
-	widget = gtk_toggle_button_new_with_label(sys_str(PartString[0]));
+	auto parts = split_title(title);
+	widget = gtk_toggle_button_new_with_label(sys_str(parts[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&on_gtk_toggle_button_toggle), this);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 string ControlToggleButton::get_string() {

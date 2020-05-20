@@ -19,11 +19,10 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	vertical = false;
 	button_bar = false;
 	action_bar = false;
-	GetPartStrings(title);
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 void ControlGrid::add(Control *child, int x, int y) {
@@ -40,7 +39,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 	}
 
 	if (hb) {
-		if (child->id == "ok" or child->id == "apply" or child->id == "close" or child->id == "preview")
+		if (y == 1)
 			gtk_header_bar_pack_end(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
 		else
 			gtk_header_bar_pack_start(GTK_HEADER_BAR(panel->win->headerbar), child_widget);

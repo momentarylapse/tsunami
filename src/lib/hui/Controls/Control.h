@@ -22,13 +22,14 @@ class Panel;
 extern int allow_signal_level; // -> hui_window_control.cpp
 
 
-void GetPartStrings(const string &title);
-//string ScanOptions(int id, const string &title);
-extern Array<string> PartString;
-extern string OptionString, HuiFormatString;
+Array<string> split_title(const string &title);
+string get_option_from_title(const string &title);
+bool option_has(const string &options, const string &key);
+string option_value(const string &options, const string &key);
+bool val_is_positive(const string &val, bool def = false);
+Array<std::pair<string, string>> parse_options(const string &options);
 
-class Control
-{
+class Control {
 public:
 	Control(int _type, const string &_id);
 	virtual ~Control();

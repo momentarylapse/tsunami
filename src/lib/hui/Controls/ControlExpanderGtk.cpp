@@ -13,11 +13,10 @@
 namespace hui
 {
 
-void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointer user_data)
-{
-	if (gtk_expander_get_expanded(GTK_EXPANDER(object))){
+void on_gtk_expander_expand(GObject* object, GParamSpec *param_spec, gpointer user_data) {
+	if (gtk_expander_get_expanded(GTK_EXPANDER(object))) {
 		gtk_widget_set_vexpand_set(GTK_WIDGET(object), false);
-	}else{
+	} else {
 		gtk_widget_set_vexpand(GTK_WIDGET(object), false);
 	}
 }
@@ -25,31 +24,27 @@ void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointer user_
 ControlExpander::ControlExpander(const string &title, const string &id) :
 	Control(CONTROL_EXPANDER, id)
 {
-	GetPartStrings(title);
-	widget = gtk_expander_new(sys_str("<b>" + PartString[0] + "</b>"));
+	auto parts = split_title(title);
+	widget = gtk_expander_new(sys_str("<b>" + parts[0] + "</b>"));
 	gtk_expander_set_use_markup(GTK_EXPANDER(widget), true);
-	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), nullptr);
+	g_signal_connect(widget, "notify::expanded", G_CALLBACK(on_gtk_expander_expand), nullptr);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
 }
 
-void ControlExpander::expand(int row, bool expand)
-{
+void ControlExpander::expand(int row, bool expand) {
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-void ControlExpander::expand_all(bool expand)
-{
+void ControlExpander::expand_all(bool expand) {
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-bool ControlExpander::is_expanded(int row)
-{
+bool ControlExpander::is_expanded(int row) {
 	return (bool)gtk_expander_get_expanded(GTK_EXPANDER(widget));
 }
 
-void ControlExpander::add(Control *child, int x, int y)
-{
+void ControlExpander::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_widget_set_vexpand(child_widget, true);
 	//gtk_widget_set_hexpand(child_widget, true);

@@ -15,13 +15,11 @@ namespace hui
 ControlPaned::ControlPaned(const string &title, const string &id) :
 	Control(CONTROL_PANED, id)
 {
-	GetPartStrings(title);
-
-	if (OptionString.find("vertical") >= 0)
+	if (option_has(get_option_from_title(title), "vertical"))
 		widget = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 	else
 		widget = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 void ControlPaned::add(Control *child, int x, int y) {

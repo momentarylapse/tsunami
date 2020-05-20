@@ -26,15 +26,15 @@ Menu *_create_res_menu_(const string &ns, Resource *res); // -> Resource.cpp
 ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
 	Control(CONTROL_MENU_BUTTON, id)
 {
-	GetPartStrings(title);
+	auto parts = split_title(title);
 	widget = gtk_menu_button_new();
-	gtk_button_set_label(GTK_BUTTON(widget), sys_str(PartString[0]));
+	gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkMenuButtonPress), this);
 
 	menu = NULL;
 
 //	SetImageById(this, id);
-	set_options(OptionString);
+	set_options(get_option_from_title(title));
 }
 
 string ControlMenuButton::get_string() {

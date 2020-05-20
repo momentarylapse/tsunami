@@ -60,8 +60,6 @@ void Toolbar::_add(Control *c) {
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), GTK_TOOL_ITEM(c->widget), -1);
 }
 
-Array<std::pair<string, string>> parse_options(const string &options); // -> Control
-
 void Toolbar::set_options(const string &options) {
 	auto r = parse_options(options);
 	for (auto x: r) {

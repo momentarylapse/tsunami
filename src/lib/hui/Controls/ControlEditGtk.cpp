@@ -14,37 +14,33 @@ namespace hui
 
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 
-void OnGtkEditChange(GtkWidget *widget, gpointer data)
+void on_gtk_edit_changed(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:change");	}
 
 ControlEdit::ControlEdit(const string &title, const string &id) :
 	Control(CONTROL_EDIT, id)
 {
-	GetPartStrings(title);
+	auto parts = split_title(title);
 	widget = gtk_entry_new();
 	gtk_entry_set_width_chars(GTK_ENTRY(widget), 3);
-	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(PartString[0]));
+	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(parts[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
-	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkEditChange), this);
+	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&on_gtk_edit_changed), this);
 }
 
-void ControlEdit::__set_string(const string &str)
-{
+void ControlEdit::__set_string(const string &str) {
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
 }
 
-string ControlEdit::get_string()
-{
+string ControlEdit::get_string() {
 	return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
-void ControlEdit::__reset()
-{
+void ControlEdit::__reset() {
 	__set_string("");
 }
 
-void ControlEdit::completion_add(const string &text)
-{
+void ControlEdit::completion_add(const string &text) {
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));
 	if (!comp){
 		comp = gtk_entry_completion_new();
@@ -62,16 +58,14 @@ void ControlEdit::completion_add(const string &text)
 	set_list_cell(GTK_LIST_STORE(m), iter, 0, text);
 }
 
-void ControlEdit::completion_clear()
-{
+void ControlEdit::completion_clear() {
 	gtk_entry_set_completion(GTK_ENTRY(widget), nullptr);
 }
 
-void ControlEdit::__set_option(const string &op, const string &value)
-{
-	if (op == "clear-placeholder")
+void ControlEdit::__set_option(const string &op, const string &value) {
+	if (op == "clearplaceholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), "");
-	else if (op == "clear-completion")
+	else if (op == "clearcompletion")
 		gtk_entry_set_completion(GTK_ENTRY(widget), nullptr);
 	else if (op == "placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), value.c_str());

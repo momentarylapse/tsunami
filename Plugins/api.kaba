@@ -54,7 +54,7 @@ class MidiNote
 		flags = 0
 	extern void set(int mask)
 	extern const bool is(int mask)
-	extern MidiNote* copy()
+	extern const MidiNote* copy()
 
 class MidiEvent
 	int pos
@@ -116,7 +116,7 @@ class Module extends Object
 	extern void unplug_in(int in_port)
 	extern void subscribe(Object handler, Function f, string message)
 	extern void unsubscribe(Object handler)
-	extern Module* copy()
+	extern const Module* copy()
 	
 	class Port
 		extern void __init__()
@@ -200,8 +200,8 @@ class AudioBuffer
 	extern void add(AudioBuffer b, int offset, float volume)
 	#extern void mix_stereo(float volume, float panning)
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
-	extern AudioBuffer __subarray__(int start, int end)
-	extern const void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
+	extern selfref AudioBuffer __subarray__(int start, int end)
+	extern const void get_spectrum(out complex[] spec_r, out complex[] spec_l, int samples)
 	void scale(float factor)
 		l *= factor
 		if channels > 1
@@ -215,11 +215,11 @@ extern void interpolate_buffer(AudioBuffer in, out AudioBuffer out, int method)
 class RingBuffer
 	extern void __init__(int size)
 	extern const int available()
-	extern void read(AudioBuffer b)
+	extern void read(out AudioBuffer b)
 	extern void write(AudioBuffer b)
-	extern void read_ref(AudioBuffer b, int size)
+	extern void read_ref(out AudioBuffer b, int size)
 	extern void read_ref_done(AudioBuffer b)
-	extern void peek_ref(AudioBuffer b, int size)
+	extern void peek_ref(out AudioBuffer b, int size)
 	extern void write_ref(AudioBuffer b, int size)
 	extern void write_ref_done(AudioBuffer b)
 	#extern void move_read_pos(int delta)
@@ -243,7 +243,7 @@ class MidiProduceData
 class MidiSource extends Module
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual int read(MidiEventBuffer midi)
+	extern virtual int read(out MidiEventBuffer midi)
 	# crappy experimental note api:
 	extern virtual bool on_produce(MidiProduceData data)
 	extern void note(float pitch, float volume, int beats)
@@ -313,11 +313,11 @@ class EnvelopeADSR
 class BeatSource extends Module
 	extern void __init__()
 	extern override void __delete__()
-	extern virtual int read(Beat[] beats, int samples)
-	extern virtual int beats_per_bar()
-	extern virtual int cur_beat()
-	extern virtual int cur_bar()
-	extern virtual float beat_fraction()
+	extern virtual int read(out Beat[] beats, int samples)
+	extern virtual const int beats_per_bar()
+	extern virtual const int cur_beat()
+	extern virtual const int cur_bar()
+	extern virtual const float beat_fraction()
 
 class BeatMidifier extends MidiSource
 	extern override void __init__()
@@ -379,9 +379,9 @@ class TrackLayer
 	SampleRef*[] samples
 	TrackMarker*[] markers
 	
-	extern void get_buffers(AudioBuffer buf, Range r)
-	extern void read_buffers(AudioBuffer buf, Range r, bool allow_ref)
-	extern void *edit_buffers(AudioBuffer buf, Range r)
+	extern void get_buffers(out AudioBuffer buf, Range r)
+	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
+	extern void *edit_buffers(out AudioBuffer buf, Range r)
 	extern void edit_buffers_finish(void *a)
 	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
 	extern void add_midi_note(MidiNote *n)
@@ -441,7 +441,7 @@ class Track
 	# editing
 	Song *song
 	
-	extern string nice_name()
+	extern const string nice_name()
 
 	#TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
@@ -544,10 +544,10 @@ class AudioView extends Object
 class SongRenderer extends AudioSource
 	extern void __init__(Song s)
 	extern override void __delete__()
-	extern void render(Range r, AudioBuffer buf)
+	extern void render(Range r, out AudioBuffer buf)
 	extern void set_range(Range r)
 	extern void set_loop(bool l)
-	extern override int read(AudioBuffer b)
+	extern override int read(out AudioBuffer b)
 	#extern override void reset_state()
 	extern const Range range()
 	extern const int get_pos(int delta)
@@ -577,7 +577,7 @@ class AudioInput extends Module
 	extern const int samples_recorded()
 
 class Storage
-	extern bool load(Song s, string filename)
+	extern bool load(out Song s, string filename)
 	extern bool save(Song s, string filename)
 	extern bool save_via_renderer(Module.Port source, string filename, int num_samples, Tag[] tags)
 	extern bool load_buffer(out AudioBuffer buf, string filename)

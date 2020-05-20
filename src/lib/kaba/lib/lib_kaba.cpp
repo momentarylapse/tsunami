@@ -107,6 +107,8 @@ void SIAddPackageKaba() {
 		class_add_funcx("is_pure", TypeBool, &Function::is_pure, Flags::PURE);
 		class_add_funcx("is_const", TypeBool, &Function::is_const, Flags::PURE);
 		class_add_funcx("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
+		class_add_funcx("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
+		class_add_funcx("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
 		class_add_elementx("needs_overriding", TypeBool, &Function::needs_overriding);
 		class_add_elementx("virtual_index", TypeInt, &Function::virtual_index);
 		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
@@ -118,6 +120,7 @@ void SIAddPackageKaba() {
 	add_class(TypeVariable);
 		class_add_elementx("name", TypeString, &Variable::name);
 		class_add_elementx("type", TypeClassP, &Variable::type);
+		class_add_elementx("is_const", TypeBool, &Variable::is_const);
 		
 	add_class(TypeConstant);
 		class_add_elementx("name", TypeString, &Constant::name);

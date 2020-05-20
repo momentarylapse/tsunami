@@ -53,6 +53,29 @@ void _kaba_array_sort_p(DynamicArray &array, int offset_by) {
 	}
 }
 
+template<class T>
+void _kaba_array_sort_pf(DynamicArray &array, Function *f) {
+	char **p = (char**)array.data;
+	T r1, r2;
+	for (int i=0; i<array.num; i++) {
+		if (!call_function(f, f->address, &r1, {*p}))
+			kaba_raise_exception(new KabaException("call failed " + f->long_name()));
+
+		//T *pp = (T*)(*p + offset_by);
+		char **q = p + 1;
+		for (int j=i+1; j<array.num; j++) {
+			if (!call_function(f, f->address, &r2, {*q}))
+				kaba_raise_exception(new KabaException("call failed"));
+			if (r1 > r2){
+				array.simple_swap(i, j);
+				std::swap(r1, r2);
+			}
+			q ++;
+		}
+		p ++;
+	}
+}
+
 void kaba_var_assign(void *pa, const void *pb, const Class *type) {
 	if ((type == TypeInt) or (type == TypeFloat32)) {
 		*(int*)pa = *(int*)pb;
@@ -134,6 +157,7 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 
 	int offset = -1;
 	const Class *by_type = nullptr;
+	Function *sfunc = nullptr;
 	if (by == "") {
 		offset = 0;
 		by_type = rel;
@@ -143,12 +167,34 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 				by_type = e.type;
 				offset = e.offset;
 			}
-		if (!by_type)
-			kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
+		if (!by_type) {
+			for (auto *f: rel->functions)
+				if (f->name == by) {
+					if (f->num_params > 0)
+						kaba_raise_exception(new KabaException("can only sort by a function without parameters"));
+					by_type = f->literal_return_type;
+					sfunc = f;
+				}
+			if (!sfunc)
+				kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
+		}
 	}
 
+	if (sfunc) {
+		if (!el->is_pointer())
+			kaba_raise_exception(new KabaException("function sorting only for pointers"));
+		if (by_type == TypeString)
+			_kaba_array_sort_pf<string>(rr, sfunc);
+		else if (by_type == TypeInt)
+			_kaba_array_sort_pf<int>(rr, sfunc);
+		else if (by_type == TypeFloat32)
+			_kaba_array_sort_pf<float>(rr, sfunc);
+		else if (by_type == TypeBool)
+			_kaba_array_sort_pf<bool>(rr, sfunc);
+		else
+			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
 
-	if (el->is_pointer()) {
+	} else if (el->is_pointer()) {
 		if (by_type == TypeString)
 			_kaba_array_sort_p<string>(rr, offset);
 		else if (by_type == TypeInt)

@@ -180,6 +180,9 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			} else if (ptype[0] == TypeFloat32) {
 				call1<bool,float>(ff, ret, param);
 				return true;
+			} else if (ptype[0]->uses_call_by_reference()) {
+				call1<bool,CBR>(ff, ret, param);
+				return true;
 			}
 		} else if (f->return_type == TypeFloat32) {
 			if (ptype[0] == TypeInt) {

@@ -111,6 +111,8 @@ void SIAddPackageImage() {
 				func_add_param("y", TypeFloat32);
 				func_add_param("w", TypeFloat32);
 				func_add_param("h", TypeFloat32);
+			class_add_func_virtualx("draw_rect", TypeVoid, mf((void (Painter::*) (const rect&))&Painter::draw_rect));
+				func_add_param("r", TypeRect);
 			class_add_func_virtualx("draw_circle", TypeVoid, &Painter::draw_circle);
 				func_add_param("x", TypeFloat32);
 				func_add_param("y", TypeFloat32);

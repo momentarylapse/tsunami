@@ -69,6 +69,7 @@ public:
 			hide_control("preview", true);
 
 		event("ok", [=]{ on_ok(); });
+		event("cancel", [=]{ destroy(); });
 		event("preview", [=]{ on_preview(); });
 	}
 	~ConfigurationDialog() {

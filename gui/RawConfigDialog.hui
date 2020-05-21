@@ -1,16 +1,17 @@
-Dialog raw_config_dialog "Raw Datei" width=300 height=100
+Dialog raw_config_dialog "Raw file" width=300 height=100 headerbar closebutton=no
 	Grid ? "" vertical
 		Grid ? ""
-			Text t_format "Format"
+			Text t_format "Format" right disabled
 			ComboBox format "" expandx
 			---|
-			Text t_channels "Channels"
+			Text t_channels "Channels" right disabled
 			Grid ? ""
 				RadioButton channels:mono "Mono"
 				RadioButton channels:stereo "Stereo"
 			---|
-			Text t_samplerate "Samplerate"
+			Text t_samplerate "Samplerate" right disabled
 			SpinButton sample_rate "44100" range=1:
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
-			Button /ok "OK"
+			---|
+			Button /ok "OK" default

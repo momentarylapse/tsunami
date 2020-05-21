@@ -5527,7 +5527,7 @@ image=hui:ok
 # Resource
 Dialog
 raw_config_dialog
-width=300,height=100
+width=300,height=100,headerbar,closebutton=no
 0
 0
 1
@@ -5545,7 +5545,7 @@ Grid
 6
 Text
 t_format
-
+right,disabled
 0
 0
 0
@@ -5557,7 +5557,7 @@ expandx
 0
 Text
 t_channels
-
+right,disabled
 0
 1
 0
@@ -5581,7 +5581,7 @@ channels:stereo
 0
 Text
 t_samplerate
-
+right,disabled
 0
 2
 0
@@ -5605,9 +5605,9 @@ cancel
 0
 Button
 ok
-
-1
+default
 0
+1
 0
 # Resource
 Dialog
@@ -7087,7 +7087,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-601
+602
 # Text
 /bars-add
 Add bars...
@@ -7237,7 +7237,7 @@ Zoom
 New...
 
 /ok
-Select
+Ok
 
 /open
 Open...
@@ -7502,6 +7502,9 @@ Target
 
 curve-target-dialog/list
 Name
+
+curve-target-dialog/ok
+Select
 
 curve_console/cc_group_edit
 Edit
@@ -8500,7 +8503,7 @@ raw_config_dialog/channels:stereo
 Stereo
 
 raw_config_dialog/raw_config_dialog
-Raw Datei
+Raw file
 
 raw_config_dialog/sample_rate
 44100

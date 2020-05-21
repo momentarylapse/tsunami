@@ -4,4 +4,4 @@ Dialog curve-target-dialog "Target" width=300 height=400 headerbar closebutton=n
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
 			---|
-			Button /ok "Select" default
+			Button ok "Select" default

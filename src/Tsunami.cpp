@@ -28,7 +28,7 @@
 #include "Device/Stream/AudioOutput.h"
 #include "Test/TestRingBuffer.h"
 #ifndef NDEBUG
-#include "Module/Audio/AudioEffect.h"
+#include "Module/ModuleFactory.h"
 #include "Module/ConfigPanel.h"
 #endif
 
@@ -189,7 +189,13 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 		session->win->hide();
 		Module *m = nullptr;
 		if (a[0] == "fx") {
-			m = CreateAudioEffect(session, a[1]);
+			m = ModuleFactory::create(session, ModuleType::AUDIO_EFFECT, a[1]);
+			configure_module(session->win, m);
+		} else if (a[0] == "mfx") {
+			m = ModuleFactory::create(session, ModuleType::MIDI_EFFECT, a[1]);
+			configure_module(session->win, m);
+		} else if (a[0] == "synth") {
+			m = ModuleFactory::create(session, ModuleType::SYNTHESIZER, a[1]);
 			configure_module(session->win, m);
 		} else if (a[0] == "vis") {
 			m = CreateAudioVisualizer(session, a[1]);
@@ -198,6 +204,8 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 			dlg->add_grid("", 0, 0, "root");
 			dlg->embed(p, "root", 0,0);
 			dlg->run();
+		} else {
+			msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
 		}
 	});
 #endif

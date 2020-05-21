@@ -72,9 +72,11 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	outer->check("enabled", module->enabled);
 	
 	auto *mb = (hui::ControlMenuButton*)outer->_get_control_("menu");
-	menu = mb->menu;
-	menu->enable("delete", false);
-	menu->enable("replace", false);
+	if (mb) {
+		menu = mb->menu;
+		menu->enable("delete", false);
+		menu->enable("replace", false);
+	}
 
 	old_param = module->config_to_string();
 	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
@@ -165,30 +167,9 @@ void ModulePanel::on_large() {
 	session->win->set_big_panel(c);
 }
 
-class ModuleExternalDialog : public hui::Dialog {
-public:
-	Module *module;
-	ModuleExternalDialog(ModulePanel *m_orig, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
-		auto m = new ModulePanel(m_orig->module, this, ModulePanel::Mode::DEFAULT_S);
-		m_orig->copy_into(m);
-		set_title(m->module->module_subtype);
-		set_size(CONFIG_PANEL_WIDTH, 300);
-		module = m->module;
-		//m->set_options("grid", "expandx");
-		embed(m, "content", 0, 0);
-		module->subscribe(this, [=]{
-			module = nullptr;
-			destroy();
-		}, module->MESSAGE_DELETE);
-	}
-	void on_destroy() override {
-		if (module)
-			module->unsubscribe(this);
-	}
-};
-
 void ModulePanel::on_external() {
-	auto *dlg = new ModuleExternalDialog(this, session->win);
+	auto *dlg = new ModuleExternalDialog(module, session->win);
+	copy_into(dlg->module_panel);
 	dlg->show();
 }
 
@@ -205,3 +186,22 @@ void ModulePanel::on_detune() {
 }
 
 
+
+
+ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
+	module = _module;
+	module_panel = new ModulePanel(module, this, ModulePanel::Mode::DEFAULT_S);
+	set_title(module->module_subtype);
+	set_size(CONFIG_PANEL_WIDTH, 300);
+	//m->set_options("grid", "expandx");
+	embed(module_panel, "content", 0, 0);
+	module->subscribe(this, [=]{
+		module = nullptr;
+		destroy();
+	}, module->MESSAGE_DELETE);
+}
+
+void ModuleExternalDialog::on_destroy() {
+	if (module)
+		module->unsubscribe(this);
+}

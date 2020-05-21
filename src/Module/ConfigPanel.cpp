@@ -8,6 +8,7 @@
 #include "ConfigPanel.h"
 #include "Module.h"
 #include "../View/Helper/Progress.h"
+#include "../View/Helper/ModulePanel.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
 
@@ -47,54 +48,39 @@ void ConfigPanel::changed() {
 
 class ConfigurationDialog : public hui::Dialog {
 public:
-	ConfigurationDialog(Module *c, ModuleConfiguration *pd, ConfigPanel *p, hui::Window *parent) :
+	ConfigurationDialog(Module *m, hui::Window *parent) :
 		hui::Dialog("configurable_dialog", parent)
 	{
-		config = c;
-		panel = p;
+		module = m;
+		module_panel = new ModulePanel(module, this, ModulePanel::Mode::DEFAULT_S);
+		set_title(module->module_subtype);
+		set_size(CONFIG_PANEL_WIDTH, 300);
+		embed(module_panel, "content", 0, 0);
+		module->subscribe(this, [=]{
+			module = nullptr;
+			destroy();
+		}, module->MESSAGE_DELETE);
+
 		progress = nullptr;
 		ok = false;
 
-		set_title(config->module_subtype);
-		embed(panel, "content", 0, 0);
-		panel->set_options("content", format("width=%d,height=%d", int(CONFIG_PANEL_WIDTH*1.3f), CONFIG_PANEL_HEIGHT)); // doesn't seem to work
-		set_size(CONFIG_PANEL_WIDTH*1.1f, CONFIG_PANEL_HEIGHT*1.2f);
 
-		if (c->module_type != ModuleType::AUDIO_EFFECT)
+		if (module->module_type != ModuleType::AUDIO_EFFECT)
 			hide_control("preview", true);
 
-		event("load_favorite", [=]{ on_load(); });
-		event("save_favorite", [=]{ on_save(); });
 		event("ok", [=]{ on_ok(); });
 		event("preview", [=]{ on_preview(); });
-		event("cancel", [=]{ on_close(); });
-		event("hui:close", [=]{ on_close(); });
+	}
+	~ConfigurationDialog() {
+		if (module)
+			module->unsubscribe(this);
 	}
 	void on_ok() {
 		ok = true;
 		destroy();
 	}
-	void on_close() {
-		destroy();
-	}
 	void on_preview() {
 		preview_start();
-	}
-	void on_load() {
-		string name = config->session->plugin_manager->select_favorite_name(this, config, false);
-		if (name.num == 0)
-			return;
-		config->session->plugin_manager->apply_favorite(config, name, true);
-	}
-	void on_save() {
-		string name = config->session->plugin_manager->select_favorite_name(this, config, true);
-		if (name.num == 0)
-			return;
-		config->session->plugin_manager->save_favorite(config, name);
-	}
-
-	void on_config_change() {
-		panel->update();
 	}
 
 	void preview_start() {
@@ -139,8 +125,8 @@ public:
 		tsunami->win->view->renderer->preview_effect = NULL;*/
 	}
 
-	Module *config;
-	ConfigPanel *panel;
+	Module *module;
+	ModulePanel *module_panel;
 	Progress *progress;
 	bool ok;
 };
@@ -152,13 +138,7 @@ bool configure_module(hui::Window *win, Module *m) {
 	if (!config)
 		return true;
 
-	//_auto_panel_ = NULL;
-	auto *panel = m->create_panel();
-	if (!panel)
-		return true;
-	panel->set_large(true);
-	panel->update();
-	auto *dlg = new ConfigurationDialog(m, config, panel, win);
+	auto *dlg = new ConfigurationDialog(m, win);
 	dlg->run();
 	bool ok = dlg->ok;
 	delete dlg;

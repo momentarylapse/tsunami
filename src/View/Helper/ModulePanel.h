@@ -47,7 +47,7 @@ public:
 	
 	void set_width(int width);
 	
-	void copy_into(ModulePanel *source);
+	void copy_into(ModulePanel *dest);
 	
 	void set_func_enable(std::function<void(bool)> f);
 	void set_func_delete(std::function<void()> f);
@@ -68,6 +68,14 @@ public:
 	hui::Menu *menu;
 };
 
+
+class ModuleExternalDialog : public hui::Dialog {
+public:
+	Module *module;
+	ModulePanel *module_panel;
+	ModuleExternalDialog(Module *_module, hui::Window *parent);
+	void on_destroy() override;
+};
 
 
 #endif /* SRC_VIEW_HELPER_MODULEPANEL_H_ */

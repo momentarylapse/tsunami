@@ -2,7 +2,6 @@ Menu popup-menu-buffer ""
 	Item header "Audio buffer" disabled
 	Separator
 	Item /buffer-make-movable "Make movable"
-	Item /layer-edit "Edit contents"
 	Item /buffer-delete "Delete"
 	Separator
 	Item /track-add-marker "Add marker"
@@ -23,8 +22,10 @@ Menu popup-menu-buffer ""
 			Item /track-midi-mode-linear "Linear" checkable
 			Item /track-midi-mode-tab "Tabulature" checkable
 			Item /track-midi-mode-classical "Classical" checkable
-		Item /track-edit-fx "Edit effects"
-		Item /track-edit-midi "Edit midi"
+		Menu /menu-edit "Edit"
+			Item /layer-edit "Contents"
+			Item /track-edit-fx "Effects"
+			Item /track-edit-curves "Curves"
 		Item /track-muted "Muted" checkable
 		Item /track-solo "Solo" checkable
 		Item /track-explode "Explode" checkable

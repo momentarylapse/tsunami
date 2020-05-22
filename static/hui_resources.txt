@@ -3374,7 +3374,7 @@ menu-track
 
 9
 0
-5
+4
 Item
 track-delete
 
@@ -3399,22 +3399,34 @@ track-convert-stereo
 1
 0
 0
+Menu
+menu-edit
+
+2
+0
+3
+Item
+layer-edit
+
+0
+0
+0
 Item
 track-edit-fx
+
+1
+0
+0
+Item
+track-edit-curves
 
 2
 0
 0
 Item
-track-edit-midi
-
-3
-0
-0
-Item
 track-properties
 
-4
+3
 0
 0
 Menu
@@ -3519,7 +3531,7 @@ menu-track
 
 6
 0
-5
+4
 Item
 track-delete
 
@@ -3544,22 +3556,34 @@ track-convert-stereo
 1
 0
 0
+Menu
+menu-edit
+
+2
+0
+3
+Item
+layer-edit
+
+0
+0
+0
 Item
 track-edit-fx
+
+1
+0
+0
+Item
+track-edit-curves
 
 2
 0
 0
 Item
-track-edit-midi
-
-3
-0
-0
-Item
 track-properties
 
-4
+3
 0
 0
 Menu
@@ -3628,7 +3652,7 @@ popup-menu-buffer
 
 0
 0
-10
+9
 Item
 header
 disabled
@@ -3648,33 +3672,27 @@ buffer-make-movable
 0
 0
 Item
-layer-edit
-
-3
-0
-0
-Item
 buffer-delete
 
-4
+3
 0
 0
 Separator
 
 
-5
+4
 0
 0
 Item
 track-add-marker
 
-6
+5
 0
 0
 Menu
 menu-version
 
-7
+6
 0
 7
 Item
@@ -3722,9 +3740,9 @@ checkable
 Menu
 menu-track
 
-8
+7
 0
-9
+8
 Item
 track-delete
 
@@ -3773,46 +3791,58 @@ checkable
 2
 0
 0
-Item
-track-edit-fx
+Menu
+menu-edit
 
 3
 0
+3
+Item
+layer-edit
+
+0
+0
 0
 Item
-track-edit-midi
+track-edit-fx
 
-4
+1
+0
+0
+Item
+track-edit-curves
+
+2
 0
 0
 Item
 track-muted
 checkable
-5
+4
 0
 0
 Item
 track-solo
 checkable
-6
+5
 0
 0
 Item
 track-explode
 checkable
-7
+6
 0
 0
 Item
 track-properties
 
-8
+7
 0
 0
 Menu
 menu-song
 
-9
+8
 0
 4
 Menu
@@ -3980,10 +4010,28 @@ layer-add
 3
 0
 0
+Menu
+menu-edit
+
+4
+0
+3
 Item
 layer-edit
 
-4
+0
+0
+0
+Item
+track-edit-fx
+
+1
+0
+0
+Item
+track-edit-curves
+
+2
 0
 0
 Item
@@ -4051,7 +4099,7 @@ menu-track
 
 12
 0
-8
+6
 Item
 track-delete
 
@@ -4077,39 +4125,27 @@ track-convert-stereo
 0
 0
 Item
-track-edit-fx
-
-2
-0
-0
-Item
-track-edit-midi
-
-3
-0
-0
-Item
 track-muted
 checkable
-4
+2
 0
 0
 Item
 track-solo
 checkable
-5
+3
 0
 0
 Item
 track-explode
 checkable
-6
+4
 0
 0
 Item
 track-properties
 
-7
+5
 0
 0
 Menu
@@ -4268,7 +4304,7 @@ menu-track
 
 7
 0
-9
+8
 Item
 track-delete
 
@@ -4317,40 +4353,52 @@ checkable
 2
 0
 0
-Item
-track-edit-fx
+Menu
+menu-edit
 
 3
 0
+3
+Item
+layer-edit
+
+0
+0
 0
 Item
-track-edit-midi
+track-edit-fx
 
-4
+1
+0
+0
+Item
+track-edit-curves
+
+2
 0
 0
 Item
 track-muted
 checkable
-5
+4
 0
 0
 Item
 track-solo
 checkable
-6
+5
 0
 0
 Item
 track-explode
 checkable
-7
+6
 0
 0
 Item
 track-properties
 
-8
+7
 0
 0
 Menu
@@ -4679,7 +4727,7 @@ menu-track
 
 8
 0
-9
+8
 Item
 track-delete
 
@@ -4728,40 +4776,52 @@ checkable
 2
 0
 0
-Item
-track-edit-fx
+Menu
+menu-edit
 
 3
 0
+3
+Item
+layer-edit
+
+0
+0
 0
 Item
-track-edit-midi
+track-edit-fx
 
-4
+1
+0
+0
+Item
+track-edit-curves
+
+2
 0
 0
 Item
 track-muted
 checkable
-5
+4
 0
 0
 Item
 track-solo
 checkable
-6
+5
 0
 0
 Item
 track-explode
 checkable
-7
+6
 0
 0
 Item
 track-properties
 
-8
+7
 0
 0
 Menu
@@ -5147,7 +5207,7 @@ popup-menu-track
 
 0
 0
-15
+14
 Item
 header
 disabled
@@ -5208,58 +5268,70 @@ checkable
 2
 0
 0
-Item
-track-edit-fx
+Menu
+menu-edit
 
 5
 0
-0
+3
 Item
 layer-edit
 
-6
+0
+0
+0
+Item
+track-edit-fx
+
+1
+0
+0
+Item
+track-edit-curves
+
+2
 0
 0
 Item
 track-muted
 checkable
-7
+6
 0
 0
 Item
 track-solo
 checkable
-8
+7
 0
 0
 Item
 track-explode
 checkable
-9
+8
 0
 0
 Item
 track-properties
 
-10
+9
 0
 0
 Separator
 
 
-11
+10
 0
 0
 Item
 track-add-marker
 
-12
+11
 0
 0
 Menu
 menu-version
 
-13
+12
 0
 7
 Item
@@ -5307,7 +5379,7 @@ checkable
 Menu
 menu-song
 
-14
+13
 0
 4
 Menu
@@ -7087,7 +7159,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-602
+603
 # Text
 /bars-add
 Add bars...
@@ -7177,7 +7249,7 @@ Delete
 Go down one track
 
 /layer-edit
-Edit contents
+Contents
 
 /layer-make-track
 Turn into track
@@ -7208,6 +7280,9 @@ Resize
 
 /menu-convert
 Convert
+
+/menu-edit
+Edit
 
 /menu-file
 File
@@ -7329,11 +7404,11 @@ Stereo
 /track-delete
 Delete
 
-/track-edit-fx
-Edit effects
+/track-edit-curves
+Curves
 
-/track-edit-midi
-Edit midi
+/track-edit-fx
+Effects
 
 /track-explode
 Explode

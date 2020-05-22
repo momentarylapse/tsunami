@@ -3,7 +3,10 @@ Menu popup-menu-layer ""
 	Separator
 	Item /layer-delete "Delete"
 	Item /layer-add "Add version"
-	Item /layer-edit "Edit contents"
+	Menu /menu-edit "Edit"
+		Item /layer-edit "Contents"
+		Item /track-edit-fx "Effects"
+		Item /track-edit-curves "Curves"
 	Item /layer-mark-dominant "Mark selection as dominant"
 	Item /layer-make-track "Turn into track"
 	Item /layer-merge "Merge..."
@@ -19,8 +22,6 @@ Menu popup-menu-layer ""
 		Menu /menu-convert "Convert"
 			Item /track-convert-mono "Mono"
 			Item /track-convert-stereo "Stereo"
-		Item /track-edit-fx "Edit effects"
-		Item /track-edit-midi "Edit midi"
 		Item /track-muted "Muted" checkable
 		Item /track-solo "Solo" checkable
 		Item /track-explode "Explode" checkable

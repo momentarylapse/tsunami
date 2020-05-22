@@ -23,8 +23,10 @@ Menu popup-menu-sample ""
 			Item /track-midi-mode-linear "Linear" checkable
 			Item /track-midi-mode-tab "Tabulature" checkable
 			Item /track-midi-mode-classical "Classical" checkable
-		Item /track-edit-fx "Edit effects"
-		Item /track-edit-midi "Edit midi"
+		Menu /menu-edit "Edit"
+			Item /layer-edit "Contents"
+			Item /track-edit-fx "Effects"
+			Item /track-edit-curves "Curves"
 		Item /track-muted "Muted" checkable
 		Item /track-solo "Solo" checkable
 		Item /track-explode "Explode" checkable

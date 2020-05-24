@@ -4,6 +4,7 @@
 #include "dynamic.h"
 #include "../../file/file.h"
 #include <algorithm>
+#include <cstdio>
 #include <math.h>
 
 

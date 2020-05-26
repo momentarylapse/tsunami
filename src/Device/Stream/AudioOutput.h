@@ -92,6 +92,7 @@ private:
 #endif
 
 	int dev_sample_rate;
+	int64 samples_requested = 0;
 	int64 fake_samples_played = 0;
 
 	DeviceManager *device_manager;

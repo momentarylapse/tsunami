@@ -121,6 +121,7 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 
 	int available = ring_buf.available();
 	int frames = min(frames_request, available);
+	samples_requested += frames_request;
 
 
 //	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
@@ -674,10 +675,17 @@ int64 AudioOutput::samples_played() {
 		return (double)t * usec2samples - fake_samples_played;
 	}
 #endif
+#if HAS_LIB_PORTAUDIO
+	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
+	//	always returning 0???
+	//	PaTime t = Pa_GetStreamTime(portaudio_stream);
+	//	return (double)t / session->sample_rate() - fake_samples_played;
+		return samples_requested;
+	}
+#endif
 	return 0;
 }
 
-ModuleConfiguration *AudioOutput::get_config() const
-{
+ModuleConfiguration *AudioOutput::get_config() const {
 	return (ModuleConfiguration*)&config;
 }

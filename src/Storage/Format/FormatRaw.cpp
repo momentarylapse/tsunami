@@ -100,7 +100,7 @@ void FormatRaw::load_track(StorageOperationData *od) {
 
 		long long read = 0;
 		int nn = 0;
-		int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
+		int nice_buffer_size = 10000;//CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size) {
 			int toread = (int)min((long long)nice_buffer_size, size - read);
 			int r = f->read_buffer(data, toread);

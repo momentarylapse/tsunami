@@ -31,7 +31,6 @@
 #include <stdio.h>
 
 #ifdef OS_WINDOWS
-	#include <stdio.h>
 	#include <io.h>
 	#include <direct.h>
 	#include <stdarg.h>
@@ -261,7 +260,7 @@ void FileWriteText(const string &filename, const string &str)
 
 void set_mode(File *f)
 {
-#ifdef OS_WINDOWS
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
 	if (dynamic_cast<TextFile*>(f))
 		_setmode(f->handle,_O_TEXT);
 	else

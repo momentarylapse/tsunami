@@ -23,7 +23,7 @@ FavoriteManager::~FavoriteManager() {
 
 void FavoriteManager::load_from_file(const string &filename, bool read_only, Session *session)
 {
-	if (!file_test_existence(filename))
+	if (!file_exists(filename))
 		return;
 	try {
 		File *f = FileOpenText(filename);

@@ -418,32 +418,39 @@ void init_shaders() {
 		"#version 330 core\n"
 		"uniform mat4 mat_v;\n"
 		"struct Material { vec4 ambient, diffusive, specular, emission; float shininess; };\n"
-		"struct Light { vec4 color; vec4 dir; float radius, harshness; };\n"
+		"struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };\n"
+		"uniform int num_lights = 0;\n"
+		"/*layout(binding = 1)*/ uniform LightData { Light light[32]; };\n"
 		"uniform Material material;\n"
-		"uniform LightBlock { Light light; };\n"
 		"in vec3 fragmentNormal;\n"
 		"in vec2 fragmentTexCoord;\n"
 		"in vec3 fragmentPos;\n"
 		"uniform sampler2D tex0;\n"
-		"out vec4 color;\n"
-		"void main() {\n"
-		"	vec3 n = normalize(fragmentNormal);\n"
-		"	vec3 l = (mat_v * vec4(light.dir.xyz, 0)).xyz;\n"
-		"	float d = max(-dot(n, l), 0);\n"
-		"	color = material.emission;\n"
-		"	color += material.ambient * light.color * (1 - light.harshness) / 2;\n"
-		"	color += material.diffusive * light.color * light.harshness * d;\n"
-		"	vec4 tex_col = texture(tex0, fragmentTexCoord);\n"
+		"out vec4 out_color;\n"
+		"vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {\n"
+		"	vec3 L = (mat_v * vec4(l.dir.xyz, 0)).xyz;\n"
+		"	float d = max(-dot(n, L), 0);\n"
+		"	vec4 color = material.ambient * l.color * (1 - l.harshness) / 2;\n"
+		"	color += material.diffusive * l.color * l.harshness * d;\n"
 		"	color *= tex_col;\n"
 		"	if ((d > 0) && (material.shininess > 1)) {\n"
 		"		vec3 e = normalize(fragmentPos); // eye dir\n"
-		"		vec3 rl = reflect(l, n);\n"
+		"		vec3 rl = reflect(L, n);\n"
 		"		float ee = max(-dot(e, rl), 0);\n"
-		"		color += material.specular * light.color * light.harshness * pow(ee, material.shininess);\n"
+		"		color += material.specular * l.color * l.harshness * pow(ee, material.shininess);\n"
 		"	}\n"
-		"	color.a = material.diffusive.a * tex_col.a;\n"
+		"	return color;\n"
+		"}\n"
+		"void main() {\n"
+		"	vec3 n = normalize(fragmentNormal);\n"
+		"	out_color = material.emission;\n"
+		"	vec4 tex_col = texture(tex0, fragmentTexCoord);\n"
+		"	for (int i=0; i<num_lights; i++)\n"
+		"		out_color += basic_lighting(light[i], n, tex_col);\n"
+		"	out_color.a = material.diffusive.a * tex_col.a;\n"
 		"}\n"
 		"</FragmentShader>");
+	default_shader_3d->link_uniform_block("LightData", 1);
 
 
 
@@ -485,8 +492,6 @@ void init_shaders() {
 		msg_error(e.message());
 		throw e;
 	}
-
-	default_shader_3d->link_uniform_block("LightBlock", 0);
 }
 
 };

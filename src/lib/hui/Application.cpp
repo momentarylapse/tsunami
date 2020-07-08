@@ -111,11 +111,11 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 
-	if (file_test_existence(directory_static + "icon.svg"))
+	if (file_exists(directory_static + "icon.svg"))
 		set_property("logo", directory_static + "icon.svg");
-	else if (file_test_existence(directory_static + "icon.png"))
+	else if (file_exists(directory_static + "icon.png"))
 		set_property("logo", directory_static + "icon.png");
-	else if (file_test_existence(directory_static + "icon.ico"))
+	else if (file_exists(directory_static + "icon.ico"))
 		set_property("logo", directory_static + "icon.ico");
 }
 

@@ -51,10 +51,12 @@ gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
+	int scale = gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(GTK_WIDGET(area))));
 	GtkAllocation a;
 	gtk_widget_get_allocation(GTK_WIDGET(area), &a);
-	da->panel->win->input.row = a.height;
-	da->panel->win->input.column = a.width;
+	da->panel->win->input.row = a.height * scale;
+	da->panel->win->input.column = a.width * scale;
+	da->panel->win->input.row_target = scale;
 
 
 	gtk_gl_context = context;

@@ -4,8 +4,8 @@
 #include "dynamic.h"
 #include "../../file/file.h"
 #include <algorithm>
-#include <cstdio>
 #include <math.h>
+#include <cstdio>
 
 
 namespace Kaba {
@@ -36,11 +36,6 @@ extern const Class *TypeFloatDict;
 extern const Class *TypeStringDict;
 extern const Class *TypeAny;
 
-
-#ifndef OS_WINDOWS
-	//#define _cdecl
-	#include <stdlib.h>
-#endif
 
 void _cdecl _print(const string &str)
 {	printf("%s\n", str.c_str());	}

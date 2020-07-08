@@ -44,26 +44,38 @@
 	}
 #endif
 
+Date time2date(time_t t);
+
 
 // just test the existence of a file
-bool file_test_existence(const string &filename)
-{
+bool file_exists(const string &filename) {
 	struct stat s;
-	if (stat(filename.sys_filename().c_str(), &s) == 0){
+	if (stat(filename.sys_filename().c_str(), &s) == 0) {
 		//if (s.st_mode & S_IFREG)
 			return true;
 	}
 	return false;
 }
 
-bool file_is_directory(const string &path)
-{
+int64 file_size(const string &path) {
 	struct stat s;
-	if (stat(path.sys_filename().c_str(), &s) == 0){
-		if (s.st_mode & S_IFDIR)
-			return true;
-	}
-	return false;
+	if (stat(path.sys_filename().c_str(), &s) != 0)
+		return -1;
+	return s.st_size;
+}
+
+Date file_mtime(const string &path) {
+	struct stat s;
+	if (stat(path.sys_filename().c_str(), &s) != 0)
+		return time2date(0);
+	return time2date(s.st_mtime);
+}
+
+bool file_is_directory(const string &path) {
+	struct stat s;
+	if (stat(path.sys_filename().c_str(), &s) != 0)
+		return false;
+	return (s.st_mode & S_IFDIR);
 }
 
 
@@ -185,13 +197,16 @@ string shell_execute(const string &cmd)
 }
 
 
+void sa_sort_i(Array<string> a) {
+	for (int i=0; i<a.num-1; i++)
+		for (int j=i+1; j<a.num; j++)
+			if (a[i].icompare(a[j]) < 0)
+				a.swap(i, j);
+}
 
 // search a directory for files matching a filter
-Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_directories)
-{
-	Array<DirEntry> entry_list;
-	DirEntry entry;
-
+Array<string> dir_search(const string &dir, const string &filter, bool show_directories) {
+	Array<string> dir_list, file_list;
 
 	string filter2 = filter.substr(1, filter.num - 1);
 	string dir2 = dir;
@@ -200,68 +215,54 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;
-	auto handle=_findfirst((dir2 + "*").c_str(), &t);
-	auto e=handle;
-	while(e>=0){
+	auto handle = _findfirst((dir2 + "*").c_str(), &t);
+	auto e = handle;
+	while (e >= 0) {
 		string name = t.name;
 		//if ((strcmp(t.name,".")!=0)and(strcmp(t.name,"..")!=0)and(strstr(t.name,"~")==NULL)){
-		if ((name != ".") and (name != "..") and (name.back() != '~')){
-			if (name.match(filter) or ((show_directories) and (t.attrib==_A_SUBDIR)) ){
-				entry.name = name;
-				entry.is_dir = (t.attrib == _A_SUBDIR);
-				entry.size = t.size;
-				entry_list.add(entry);
+		if ((name != ".") and (name != "..") and (name.back() != '~')) {
+			if (name.match(filter) or (show_directories and (t.attrib == _A_SUBDIR))) {
+				if (t.attrib == _A_SUBDIR)
+					dir_list.add(name);
+				else
+					file_list.add(name);
 			}
 		}
-		e=_findnext(handle,&t);
+		e = _findnext(handle,&t);
 	}
 #else // defined(OS_LINUX) || defined(OS_MINGW)
 	DIR *_dir;
-	_dir=opendir(dir2.c_str());
-	if (!_dir){
-		return entry_list;
-	}
+	_dir = opendir(dir2.c_str());
+	if (!_dir)
+		return {};
 	struct dirent *dn;
-	dn=readdir(_dir);
+	dn = readdir(_dir);
 	struct stat s;
-	while(dn){
+	while (dn) {
 		//if ((strcmp(dn->d_name,".")!=0)and(strcmp(dn->d_name,"..")!=0)and(!strstr(dn->d_name,"~"))){
 		string name = dn->d_name;
-		if ((name != ".") and (name != "..") and (name.back() != '~')){
+		if ((name != ".") and (name != "..") and (name.back() != '~')) {
 			string ffn = dir2 + name;
 			stat(ffn.c_str(), &s);
-			bool is_reg=(s.st_mode & S_IFREG)>0;
-			bool is_dir=(s.st_mode & S_IFDIR)>0;
-			int sss=strlen(dn->d_name) - filter2.num;
-			if (sss<0)	sss=0;
-			if (((is_reg) and (name.match(filter))) or ((show_directories) and (is_dir))){
-				entry.name = name;
-				entry.is_dir = is_dir;
-				entry.size = s.st_size;
-				entry_list.add(entry);
+			bool is_reg = (s.st_mode & S_IFREG)>0;
+			bool is_dir = (s.st_mode & S_IFDIR)>0;
+			if ((is_reg and name.match(filter)) or (show_directories and is_dir)) {
+				if (is_dir)
+					dir_list.add(name);
+				else
+					file_list.add(name);
 			}
 		}
-		dn=readdir(_dir);
+		dn = readdir(_dir);
 	}
 	closedir(_dir);
 #endif
 
 	
 	// sorting...
-	for (int i=0;i<entry_list.num-1;i++)
-		for (int j=i+1;j<entry_list.num;j++){
-			bool ok = true;
-			if (entry_list[i].is_dir == entry_list[j].is_dir){
-				if (entry_list[i].name.icompare(entry_list[j].name) > 0)
-					ok = false;
-			}else
-				if ((!entry_list[i].is_dir) and (entry_list[j].is_dir))
-					ok = false;
-			if (!ok)
-				entry_list.swap(i, j);
-		}
-
-	return entry_list;
+	sa_sort_i(dir_list);
+	sa_sort_i(file_list);
+	return dir_list + file_list;
 }
 
 

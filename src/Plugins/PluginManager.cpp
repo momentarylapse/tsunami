@@ -727,11 +727,11 @@ void find_plugins_in_dir_absolute(const string &_dir, const string &group, Modul
 	if (group.num > 0)
 		dir += group + "/";
 	auto list = dir_search(dir, "*.kaba", false);
-	for (DirEntry &e: list) {
+	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;
-		pf.name = e.name.replace(".kaba", "");
-		pf.filename = dir + e.name;
+		pf.name = e.replace(".kaba", "");
+		pf.filename = dir + e;
 		pf.group = group;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);

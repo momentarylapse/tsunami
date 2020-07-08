@@ -21,7 +21,7 @@ string BackupManager::get_filename(const string &extension)
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
 		msg_write(fn);
-		if (!file_test_existence(fn))
+		if (!file_exists(fn))
 			return fn;
 	}
 	return "";
@@ -51,7 +51,7 @@ void BackupManager::check_old_files(Session *session)
 		bf.uuid = next_uuid ++;
 		bf.session = nullptr;
 		bf.f = nullptr;
-		bf.filename = tsunami->directory + f.name;
+		bf.filename = tsunami->directory + f;
 		files.add(bf);
 	}
 

@@ -279,7 +279,7 @@ Texture *LoadTexture(const string &_filename) {
 			return t->valid ? t : NULL;
 
 	// test existence
-	if (!file_test_existence(texture_dir + filename)) {
+	if (!file_exists(texture_dir + filename)) {
 		msg_error("texture file does not exist: " + filename);
 		return NULL;
 	}
@@ -296,7 +296,7 @@ void Texture::reload() {
 	string _filename = texture_dir + filename;
 
 	// test the file's existence
-	if (!file_test_existence(_filename)) {
+	if (!file_exists(_filename)) {
 		msg_error("texture file does not exist!");
 		return;
 	}

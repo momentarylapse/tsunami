@@ -40,7 +40,7 @@ class FontList
 	void update()
 		let list = Filesystem.search(AppDirectoryStatic + "Midi Fonts", "*.nami", false)
 		for e in list
-			string name = e.name[:-5]
+			string name = e[:-5]
 			if find(name) >= 0
 				continue
 			fonts.add(MidiFont(name))

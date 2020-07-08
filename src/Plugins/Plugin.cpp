@@ -27,8 +27,7 @@ string Plugin::get_error() {
 bool Plugin::file_changed() {
 	int new_date = -1;
 	try {
-		File *f = FileOpen(filename);
-		new_date = f->GetDateModification().time;
+		new_date = file_mtime(filename).time;
 		if (new_date != file_date) {
 			file_date = new_date;
 			return true;

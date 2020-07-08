@@ -25,7 +25,7 @@ public:
 	virtual void _cdecl set_font_size(float size) = 0;
 	virtual void _cdecl set_antialiasing(bool enabled) = 0;
 	virtual void _cdecl set_line_width(float w) = 0;
-	virtual void _cdecl set_roundness(float radius){}
+	virtual void _cdecl set_roundness(float radius) {}
 	virtual void _cdecl set_line_dash(const Array<float> &dash, float offset) = 0;
 	virtual void _cdecl set_fill(bool fill) = 0;
 	virtual void _cdecl set_clip(const rect &r) = 0;
@@ -40,6 +40,7 @@ public:
 	virtual float _cdecl get_str_width(const string &str) = 0;
 	virtual void _cdecl draw_image(float x, float y, const Image *image) = 0;
 	virtual void _cdecl draw_mask_image(float x, float y, const Image *image) = 0;
+	virtual void _cdecl set_transform(float rot[], const complex &offset) {}
 	int width = 0;
 	int height = 0;
 	float font_size = 12;

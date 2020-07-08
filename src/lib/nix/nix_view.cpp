@@ -115,6 +115,7 @@ matrix create_pixel_projection_matrix() {
 	return s * t;
 }
 
+
 void SetViewport(const rect &area) {
 	target_rect = area;
 	target_width = max((int)area.width(), 1);

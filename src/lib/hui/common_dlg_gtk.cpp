@@ -187,8 +187,7 @@ void InfoBox(Window *win,const string &title,const string &text)
 	gtk_widget_destroy(dlg);
 }
 
-void ErrorBox(Window *win,const string &title,const string &text)
-{
+void ErrorBox(Window *win,const string &title,const string &text) {
 	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg=gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text));
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
@@ -199,22 +198,27 @@ void ErrorBox(Window *win,const string &title,const string &text)
 	gtk_widget_destroy(dlg);
 }
 
+Array<char*> sa2ca_nt(const Array<string> &a) {
+	Array<char*> _a_;
+	for (string &s: a){
+		char *p = new char[s.num + 1];
+		strcpy(p, s.c_str());
+		_a_.add(p);
+	}
+	_a_.add(nullptr);
+	return _a_;
+}
+
 void AboutBox(Window *win)
 {
 	// load license
 	if (Application::get_property("license") == "")
-		if (file_test_existence(Application::directory_static + "license_small.txt"))
+		if (file_exists(Application::directory_static + "license_small.txt"))
 			Application::set_property("license", FileRead(Application::directory_static + "license_small.txt"));
 
 	// author list
-	Array<char*> _a_;
-	Array<string> authors = Application::get_property("author").explode(";");
-	for (string &author : authors){
-		char *p = new char[author.num + 1];
-		strcpy(p, author.c_str());
-		_a_.add(p);
-	}
-	_a_.add(nullptr);
+	auto authors = Application::get_property("author").explode(";");
+	auto _a_ = sa2ca_nt(authors);
 
 	GError *error = nullptr;
 	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(Application::get_property("logo").c_str(), &error);

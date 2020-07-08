@@ -84,12 +84,12 @@ public:
 	// meta
 	void _cdecl set_pos(int pos);
 	void _cdecl seek(int delta);
-	int _cdecl get_size();
-	long long _cdecl get_size64();
+	int _cdecl get_size32();
+	int64 _cdecl get_size();
 	int _cdecl get_pos();
-	Date _cdecl GetDateCreation();
-	Date _cdecl GetDateModification();
-	Date _cdecl GetDateAccess();
+	Date _cdecl ctime();
+	Date _cdecl mtime();
+	Date _cdecl atime();
 
 	// file format version
 	int ReadFileFormatVersion();

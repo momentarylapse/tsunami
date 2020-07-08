@@ -45,7 +45,7 @@ void Image::_load_flipped(const string &filename) {
 	data.clear();
 
 	// file ok?
-	if (!file_test_existence(filename)) {
+	if (!file_exists(filename)) {
 		msg_error("Image.Load: file does not exist: " + filename);
 		return;
 	}

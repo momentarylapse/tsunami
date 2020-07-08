@@ -58,6 +58,7 @@ class Painter : public ::Painter {
 	float _cdecl get_str_width(const string &str) override;
 	void _cdecl draw_image(float x, float y, const Image *image) override;
 	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
+	void _cdecl set_transform(float rot[], const complex &offset) override;
 	rect _cdecl clip() const override;
 };
 

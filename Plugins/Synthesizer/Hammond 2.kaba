@@ -1,0 +1,210 @@
+use hui
+use "../api.kaba"
+use "../helper/tone.kaba"
+use "../helper/grid.kaba"
+use "../helper/filter.kaba"
+
+const int NUM_HARMONICS = 9
+const float[] HARMONIC_FREQS = [0.5, 1.0, 1.498823530, 2.0, 2.997647060, 4.0, 5.040941178, 5.995294120, 8.0]
+
+const float DECAY = 0.01
+const float SUSTAIN = 0.7
+
+
+float RA(float f)
+	return 12194.0^2 * f^4 / ((f^2 + 20.6^2) * sqrt((f^2 + 107.7^2) * (f^2 + 737.9^2)) * (f^2 + 12194.0^2))
+
+class HammondConfig extends Module.Config
+	float[NUM_HARMONICS] intensity
+	float attack
+	float release
+	float key_stutter
+	override void reset()
+		for i in intensity
+			i = 0
+		intensity[0] = 0.2
+		intensity[1] = 0.3
+		intensity[2] = 0.1
+		intensity[3] = 0.1
+		attack = 0.005
+		release = 0.1
+		key_stutter = 0.5
+
+class HammondGrid extends Grid
+	HammondConfig *hc
+	HammondPanel *p
+	int selected, hover
+
+	override void on_draw(Painter c)
+	
+		# points
+		for i,n in hc.intensity
+			let z0 = complex(n+1, 0)
+			let z1 = complex(n+1, i)
+			c.set_line_width(2)
+			draw_line2(c, z0, z1, n == selected, n == hover)
+			draw_point2(c, z1, n == selected, n == hover)
+			
+	# left button down -> select
+	override void on_left_button_down()
+		selected = hover
+		redraw()
+
+	override void on_mouse_move()
+		# move
+		if GetEvent().button_l and (selected >= 0)
+			hc.intensity[selected] = clamp(get_mouse2().y, 0, 1)
+			p.changed()
+		else
+		# hover?
+			hover = -1
+			for i,n in hc.intensity
+				let p = project2(complex(n+1, i))
+				if (mx > p.x - 10) and (mx < p.x + 10)
+					hover = n
+		redraw()
+
+class HammondPanel extends ConfigPanel
+	override HammondSynthesizer *c
+	HammondConfig *hc
+	HammondGrid grid
+	override void __init__(Module _s)
+		from_source("
+Grid ? '' vertical
+	Grid ? ''
+		Label ? 'Attack'
+		SpinButton attack '0' range=0:500:0.1 expandx
+		Label ? 'ms'
+		---|
+		Label ? 'Release'
+		SpinButton release '0' range=0:500:0.1 expandx
+		Label ? 'ms'
+		---|
+		Label ? 'Key stutter'
+		SpinButton stutter '0' range=0:100:1 expandx
+		Label ? '%'
+	DrawingArea drawing '' grabfocus")
+		event("attack", on_change)
+		event("release", on_change)
+		event("stutter", on_change)
+		hc = &c.config
+		
+		grid.hc = hc
+		grid.p = &self
+		grid.init(self, "drawing")
+		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
+		grid.y_axis.set(0, 1.05, false, "")
+		
+	void on_change()
+		hc.key_stutter = get_float("stutter") / 100
+		hc.attack = get_float("attack") / 1000
+		hc.release = get_float("release") / 1000
+		changed()
+	
+	override void update()
+		redraw("drawing")
+		set_float("stutter", hc.key_stutter * 100)
+		set_float("attack", hc.attack * 1000)
+		set_float("release", hc.release * 1000)
+
+float[] create_stutter(float intensity)
+	float[] stutter
+	stutter.resize(440) # 10ms
+	stutter = 1
+	for i in 0:10
+		int offset = 40 + randi(200)
+		for j in 0:3
+			stutter[offset + j] = (1 - intensity)
+	for i in 0:10
+		int offset = 240 + randi(200)
+		for j in 0:3
+			stutter[offset + j] = (1 - intensity)
+	return stutter
+
+class SineGenerator
+	float phi
+	float delta_phi
+	void __init__()
+		phi = 0
+	void set_omega(float omega)
+		delta_phi = omega
+	float[] read(int n)
+		float[] f
+		f.resize(n)
+		for i in 0:n
+			f[i] = sin(phi)
+			phi += delta_phi
+		phi = loop(phi, 0, 2*pi)
+		return f
+
+class HammondRenderer extends PitchRenderer
+	float volume
+	float[NUM_HARMONICS] phi
+	float[NUM_HARMONICS] A
+	SineGenerator[NUM_HARMONICS] osci
+	float[] stutter
+	int stutter_offset
+	EnvelopeADSR env
+	BiquadFilter filter
+	override HammondSynthesizer *synth
+	override void __init__(Synthesizer s, int pitch)
+		volume = 0
+		for o,i in osci
+			o.set_omega(delta_phi * HARMONIC_FREQS[i])
+		for x in phi
+			x = 0
+		for a,i in A
+			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
+			
+		#print(str(A))
+		env.reset()
+		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
+	override void on_config()
+		stutter = create_stutter(synth.config.key_stutter)
+		env.set(synth.config.attack, DECAY, SUSTAIN, synth.config.release, synth.sample_rate)
+
+	override void on_end()
+		env.end()
+	override void on_start(float volume)
+		env.start(volume)
+		stutter_offset = 0
+		#filter.reset()
+
+	override bool render(out AudioBuffer buf)
+		int n = len(buf)
+		
+		float[] b = osci[0].read(n) * (synth.config.intensity[0] * A[0])
+		for i in 1:NUM_HARMONICS
+			b += osci[i].read(n) * (synth.config.intensity[i] * A[i])
+
+		buf.l += b * env.read(n)
+		#for i in 0:len(buf)
+#
+#			float d = 0
+#			for x,j in phi
+#				d += sin(x) * synth.config.intensity[j] * A[j]
+#				
+#				x += delta_phi * HARMONIC_FREQS[j]
+#				if x > 8*pi
+#					x = loop(x, 0, 2*pi)
+#			buf.l[i] += d * env.get()
+		#buf.l *= env.read(len(buf))
+		#env.read(len(buf))
+
+		if stutter_offset < len(stutter)
+			buf.l *= stutter[stutter_offset:]
+			stutter_offset += len(buf)
+		buf.auto_generate_channels()
+		filter.apply(buf)
+
+		return !env.just_killed
+
+class HammondSynthesizer extends Synthesizer
+	HammondConfig config
+
+
+	override ConfigPanel *create_panel()
+		return new HammondPanel(&self)
+	
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new HammondRenderer(self, pitch)

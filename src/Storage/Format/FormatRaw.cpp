@@ -92,7 +92,7 @@ void FormatRaw::load_track(StorageOperationData *od) {
 		f = FileOpen(od->filename);
 
 		int byte_per_sample = (format_get_bits(format) / 8) * channels;
-		long long size = f->get_size64() - offset;
+		int64 size = f->get_size() - offset;
 		//int samples = size / byte_per_sample;
 
 		if (offset > 0)
@@ -102,7 +102,7 @@ void FormatRaw::load_track(StorageOperationData *od) {
 		int nn = 0;
 		int nice_buffer_size = 10000;//CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size) {
-			int toread = (int)min((long long)nice_buffer_size, size - read);
+			int toread = (int)min((int64)nice_buffer_size, size - read);
 			int r = f->read_buffer(data, toread);
 			nn ++;
 			if (nn > 16) {

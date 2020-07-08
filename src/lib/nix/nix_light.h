@@ -26,12 +26,14 @@ struct Material {
 };
 extern Material material;
 
-// compatible with default_shader_3d (binding=0)
-struct SimpleDirectionalLight {
-	alignas(16) color col;
+// compatible with default_shader_3d (binding=1)
+struct BasicLight {
+	alignas(16) matrix proj;
+	alignas(16) vector pos;
 	alignas(16) vector dir;
+	alignas(16) color col;
 	alignas(16) float radius;
-	float harshness;
+	float theta, harshness;
 };
 
 };

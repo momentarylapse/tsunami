@@ -3,22 +3,28 @@
 
 
 class Date;
+#include <functional>
 
 
 //--------------------------------------------------------------
 // file/directory operations
 
-bool _cdecl dir_create(const string &dir);
-bool _cdecl dir_delete(const string &dir);
+void _cdecl dir_create(const string &dir);
+void _cdecl dir_delete(const string &dir);
 string _cdecl get_current_dir();
-bool _cdecl file_rename(const string &source,const string &target);
-bool _cdecl file_copy(const string &source,const string &target);
-bool _cdecl file_delete(const string &filename);
+void _cdecl file_rename(const string &source,const string &target);
+void _cdecl file_copy(const string &source,const string &target);
+void _cdecl file_delete(const string &filename);
 bool _cdecl file_exists(const string &filename);
 bool _cdecl file_is_directory(const string &path);
 int64 _cdecl file_size(const string &path);
 Date _cdecl file_mtime(const string &path);
 string _cdecl file_hash(const string &filename, const string &type);
+
+bool func_did_not_throw(std::function<void()> f);
+#define FILE_OP_OK(OP) \
+	func_did_not_throw([=]{ OP; })
+
 
 
 string _cdecl shell_execute(const string &cmd);

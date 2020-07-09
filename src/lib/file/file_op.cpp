@@ -22,29 +22,37 @@
 	#define _close	close
 	#define _rmdir	rmdir
 	#define _unlink	unlink
-	inline unsigned char to_low(unsigned char c)
-	{
-		if ((c>='A')and(c<='Z'))
-			return c-'A'+'a';
+	inline unsigned char to_low(unsigned char c) {
+		if ((c >= 'A') and (c <= 'Z'))
+			return c - 'A' + 'a';
 		return c;
 	}
 #endif
 #ifdef OS_LINUX
-	int _stricmp(const char*a,const char*b)
-	{
-		unsigned char a_low=to_low(*a);
-		unsigned char b_low=to_low(*b);
-		while((*a!=0)and(*b!=0)){
-			if (a_low!=b_low)	break;
+	int _stricmp(const char*a,const char*b) {
+		unsigned char a_low = to_low(*a);
+		unsigned char b_low = to_low(*b);
+		while ((*a != 0) and (*b != 0)) {
+			if (a_low != b_low)
+				break;
 			a++,++b;
-			a_low=to_low(*a);
-			b_low=to_low(*b);
+			a_low = to_low(*a);
+			b_low = to_low(*b);
 		}
-		return a_low-b_low;
+		return a_low - b_low;
 	}
 #endif
 
 Date time2date(time_t t);
+
+bool func_did_not_throw(std::function<void()> f) {
+	try {
+		f();
+		return true;
+	} catch (...) {
+		return false;
+	}
+}
 
 
 // just test the existence of a file
@@ -60,126 +68,124 @@ bool file_exists(const string &filename) {
 int64 file_size(const string &path) {
 	struct stat s;
 	if (stat(path.sys_filename().c_str(), &s) != 0)
-		return -1;
+		throw FileError("unable to stat '" + path + "'");
 	return s.st_size;
 }
 
 Date file_mtime(const string &path) {
 	struct stat s;
 	if (stat(path.sys_filename().c_str(), &s) != 0)
-		return time2date(0);
+		throw FileError("unable to stat '" + path + "'");
 	return time2date(s.st_mtime);
 }
 
 bool file_is_directory(const string &path) {
 	struct stat s;
 	if (stat(path.sys_filename().c_str(), &s) != 0)
-		return false;
+		return false; //throw FileError("unable to stat '" + path + "'");
 	return (s.st_mode & S_IFDIR);
 }
 
 
-bool dir_create(const string &dir)
-{
+void dir_create(const string &dir) {
+	if (file_is_directory(dir))
+		return;
 #if defined(OS_WINDOWS)
-	return (_mkdir(dir.sys_filename().c_str()) == 0);
+	if (_mkdir(dir.sys_filename().c_str()) != 0)
 #elif defined(OS_MINGW)
-	return (mkdir(dir.sys_filename().c_str()) == 0);
+	if (mkdir(dir.sys_filename().c_str()) != 0)
 #else // defined(OS_LINUX)
-	return (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) == 0);
+	if (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 #endif
-	return false;
+		throw FileError("can not create directory '" + dir + "'");
 }
 
-bool dir_delete(const string &dir)
-{
-	return (_rmdir(dir.sys_filename().c_str())==0);
+void dir_delete(const string &dir) {
+	if (_rmdir(dir.sys_filename().c_str()) != 0)
+		throw FileError("can not delete directory '" + dir + "'");
 }
 
-string get_current_dir()
-{
+string get_current_dir() {
 	string str;
 	char tmp[256];
 #ifdef OS_WINDOWS
-	char *r=_getcwd(tmp, sizeof(tmp));
+	char *r = _getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "\\";
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	char *r=getcwd(tmp, sizeof(tmp));
+	char *r = getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "/";
 #endif
 	return str;
 }
 
-bool file_rename(const string &source,const string &target)
-{
+void file_rename(const string &source, const string &target) {
 	char dir[512];
-	for (int i=0;i<target.num;i++){
-		dir[i]=target[i];
-		dir[i+1]=0;
-		if (i>3)
-			if ((target[i]=='/')or(target[i]=='\\'))
+	for (int i=0; i<target.num; i++){
+		dir[i] = target[i];
+		dir[i+1] = 0;
+		if (i > 3)
+			if ((target[i] == '/') or (target[i] == '\\'))
 				dir_create(string(dir));
 	}
-	return (rename(source.sys_filename().c_str(), target.sys_filename().c_str())==0);
+	if (rename(source.sys_filename().c_str(), target.sys_filename().c_str()) != 0)
+		throw FileError("can not rename file '" + source + "' -> '" + target + "'");
 }
 
-bool file_copy(const string &source,const string &target)
-{
+void file_copy(const string &source, const string &target) {
 	char dir[512];
-	for (int i=0;i<target.num;i++){
-		dir[i]=target[i];
-		dir[i+1]=0;
-		if (i>3)
-			if ((target[i]=='/')or(target[i]=='\\'))
+	for (int i=0; i<target.num; i++){
+		dir[i] = target[i];
+		dir[i+1] = 0;
+		if (i > 3)
+			if ((target[i] == '/') or (target[i] == '\\'))
 				dir_create(string(dir));
 	}
 	int hs=_open(source.sys_filename().c_str(),O_RDONLY);
 	if (hs<0)
-		return false;
+		throw FileError("copy: can not open source file '" + source + "'");
 #ifdef OS_WINDOWS
 	int ht=_creat(target.sys_filename().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	int ht=creat(target.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int ht = creat(target.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
-	if (ht<0){
+	if (ht < 0){
 		_close(hs);
-		return false;
+		throw FileError("copy: can not create target file '" + target + "'");
 	}
 	char buf[10240];
-	int r=10;
-	while(r>0){
-		r=_read(hs,buf,sizeof(buf));
-		int rr=_write(ht,buf,r);
+	int r = 10;
+	while(r > 0){
+		r = _read(hs,buf,sizeof(buf));
+		int rr = _write(ht,buf,r);
+		if (rr < r)
+			throw FileError("can not copy file '" + source + "' -> '" + target + "' (write failed)");
 	}
 	_close(hs);
 	_close(ht);
-	return true;
 }
 
-bool file_delete(const string &filename)
-{
-	return (_unlink(filename.sys_filename().c_str())==0);
+void file_delete(const string &filename) {
+	if (_unlink(filename.sys_filename().c_str()) != 0)
+		throw FileError("can not delete file '" + filename + "'");
 }
 
-string file_hash(const string &filename, const string &type)
-{
-	if (type == "md5"){
+string file_hash(const string &filename, const string &type) {
+	if (type == "md5") {
 		return FileRead(filename).md5();
 	}
 	return "";
 }
 
-string shell_execute(const string &cmd)
-{
+string shell_execute(const string &cmd) {
 #ifdef OS_LINUX
 	FILE *f = popen(cmd.c_str(), "r");
 	string buffer;
 
-	while(true){
+	while (true) {
 		int c = fgetc(f);
 		if (c == EOF)
 			break;
@@ -197,10 +203,10 @@ string shell_execute(const string &cmd)
 }
 
 
-void sa_sort_i(Array<string> a) {
+void sa_sort_i(Array<string> &a) {
 	for (int i=0; i<a.num-1; i++)
 		for (int j=i+1; j<a.num; j++)
-			if (a[i].icompare(a[j]) < 0)
+			if (a[i].icompare(a[j]) > 0)
 				a.swap(i, j);
 }
 

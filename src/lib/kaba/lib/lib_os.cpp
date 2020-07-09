@@ -121,28 +121,23 @@ string kaba_file_hash(const string &filename, const string &type) {
 }
 
 void kaba_file_rename(const string &a, const string &b) {
-	if (!file_rename(a, b))
-		kaba_raise_exception(new KabaFileError("can not rename file '" + a + "' -> '" + b + "'"));
+	KABA_EXCEPTION_WRAPPER2(file_rename(a, b), KabaFileError);
 }
 
 void kaba_file_copy(const string &a, const string &b) {
-	if (!file_copy(a, b))
-		kaba_raise_exception(new KabaFileError("can not copy file '" + a + "' -> '" + b + "'"));
+	KABA_EXCEPTION_WRAPPER2(file_copy(a, b), KabaFileError);
 }
 
 void kaba_file_delete(const string &f) {
-	if (!file_delete(f))
-		kaba_raise_exception(new KabaFileError("can not delete file '" + f + "'"));
+	KABA_EXCEPTION_WRAPPER2(file_delete(f), KabaFileError);
 }
 
 void kaba_dir_create(const string &f) {
-	if (!dir_create(f))
-		kaba_raise_exception(new KabaFileError("can not create directory '" + f + "'"));
+	KABA_EXCEPTION_WRAPPER2(dir_create(f), KabaFileError);
 }
 
 void kaba_dir_delete(const string &f) {
-	if (!dir_delete(f))
-		kaba_raise_exception(new KabaFileError("can not delete directory '" + f + "'"));
+	KABA_EXCEPTION_WRAPPER2(dir_delete(f), KabaFileError);
 }
 
 

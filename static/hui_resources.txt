@@ -2680,7 +2680,7 @@ image=hui:properties,flat,menu=popup_fx_menu
 0
 CheckBox
 enabled
-
+switch
 1
 0
 0
@@ -2717,7 +2717,7 @@ bold,center,expandx
 0
 CheckBox
 enabled
-
+switch
 2
 0
 0

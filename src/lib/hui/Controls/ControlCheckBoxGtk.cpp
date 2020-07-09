@@ -9,8 +9,7 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
 
 void on_gtk_checkbox_clicked(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:change");	}

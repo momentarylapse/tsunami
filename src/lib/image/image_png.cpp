@@ -116,7 +116,7 @@ void image_load_png(const string &filename, Image &image)
 	}
 
 	string dest;
-	dest.resize(image.height * (image.width * bytes_per_pixel + 1) + 1024);
+	dest.resize(image.height * (image.width * bytes_per_pixel + 2) + 1024);
 	unsigned long len = dest.num;
 	int r = uncompress((unsigned char*)&dest[0], &len, (unsigned char*)&data[0], data.num);
 	if (r != 0)

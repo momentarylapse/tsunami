@@ -412,11 +412,11 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 				orig_index = i;
 			}
 		if (override and !orig)
-			s->do_error(format("can not override function %s, no previous definition", f->signature().c_str()), f->_exp_no, f->_logical_line_no);
+			s->do_error(format("can not override function %s, no previous definition", f->signature()), f->_exp_no, f->_logical_line_no);
 		if (!override and orig) {
 			msg_write(f->signature());
 			msg_write(orig->signature());
-			s->do_error(format("function %s is already defined, use '%s'", f->signature().c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
+			s->do_error(format("function %s is already defined, use '%s'", f->signature(), IDENTIFIER_OVERRIDE), f->_exp_no, f->_logical_line_no);
 		}
 		if (override) {
 			if (config.verbose)

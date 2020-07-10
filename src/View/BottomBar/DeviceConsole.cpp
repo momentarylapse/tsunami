@@ -42,11 +42,11 @@ DeviceConsole::~DeviceConsole()
 string DeviceConsole::to_format(int i, const Device *d)
 {
 	if (d->type == DeviceType::AUDIO_OUTPUT)
-		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
+		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name(), d->internal_name, d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
 	if (d->type == DeviceType::AUDIO_INPUT)
-		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
+		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name(), d->internal_name, d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
 	if (d->type == DeviceType::MIDI_INPUT)
-		return format("%d\\%s\\%s\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->visible ? "true" : "false", d->present ? "true" : "false");
+		return format("%d\\%s\\%s\\%s\\%s", i + 1, d->get_name(), d->internal_name, d->visible ? "true" : "false", d->present ? "true" : "false");
 	return "";
 }
 

@@ -41,6 +41,7 @@ Tsunami *tsunami = nullptr;
 
 bool ugly_hack_slow = false;
 
+
 Tsunami::Tsunami() :
 	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
 {

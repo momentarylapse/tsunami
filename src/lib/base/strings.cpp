@@ -349,98 +349,7 @@ string string::extension() const
 	return "";
 }
 
-static bool format_locale_set = false;
 
-// connecting strings
-string format(const string &str,...)
-{
-	string tmp;
-	va_list args;
-
-    // retrieve the variable arguments
-    va_start(args, str);
-
-	//if (!format_locale_set){
-		setlocale(LC_NUMERIC, "C");
-		//format_locale_set = true;
-	//}
-
-#ifdef OS_WINDOWS
-	int len = _vscprintf(str.c_str(), args);
-#else
-	int len = vsnprintf(nullptr, 0, str.c_str(), args);
-#endif
-	tmp.resize(len + 1);
-    va_start(args, str);
-    vsprintf((char*)tmp.data, str.c_str(), args); // C4996
-    // Note: vsprintf is deprecated; consider using vsprintf_s instead
-	tmp.resize(len);
-	va_end(args);
-	
-	return tmp;
-#if 0
-	char *tmp=_file_get_str_();
-	tmp[0]=0;
-
-	va_list marker;
-	va_start(marker,str);
-
-	int l=0,s=strlen(str);
-	for (int i=0;i<s;i++){
-		if ((str[i]=='%')and(str[i+1]=='s')){
-			strcat(tmp,va_arg(marker,char*));
-			i++;
-			l=strlen(tmp);
-		}else if ((str[i]=='%')and(str[i+1]=='d')){
-			strcat(tmp,i2s(va_arg(marker,int)));
-			i++;
-			l=strlen(tmp);
-		}else if ((str[i]=='%')and(str[i+1]=='f')){
-			int fl=3;
-			if (str[i+2]==':'){
-				fl=str[i+3]-'0';
-				i+=3;
-			}else
-				i++;
-			strcat(tmp,f2s((float)va_arg(marker,double),fl));
-			l=strlen(tmp);
-		}else if ((str[i]=='%')and(str[i+1]=='v')){
-			int fl=3;
-			if (str[i+2]==':'){
-				fl=str[i+3]-'0';
-				i+=3;
-			}else
-				i++;
-			/*float *v=(float*)&va_arg(marker,double);
-			va_arg(marker,float);
-			va_arg(marker,float);
-			strcat(tmp,"( ");
-			strcat(tmp,f2s(v[0],fl));
-			strcat(tmp," , ");
-			strcat(tmp,f2s(v[1],fl));
-			strcat(tmp," , ");
-			strcat(tmp,f2s(v[2],fl));
-			strcat(tmp," )");
-			l=strlen(tmp);*/
-msg_write>Error("Todo:  %v");
-		}else{
-			tmp[l]=str[i];
-			tmp[l+1]=0;
-			l++;
-		}
-	}
-	va_end(marker);
-
-	return tmp;
-#endif
-}
-
-// cut the string at the position of a substring
-/*void strcut(char *str,const char *dstr)
-{
-	if (strstr(str,dstr))
-		strstr(str,dstr)[0]=0;
-}*/
 
 // convert an integer to a string (with a given number of decimals)
 string i2s2(int i,int l)
@@ -716,6 +625,107 @@ string sa2s(const Array<string> &a)
 	s += "]";
 	return s;
 }
+
+
+string str_rep(const string &s, int n) {
+	string r;
+	for (int i=0; i<n; i++)
+		r += s;
+	return r;
+}
+
+template<> string _xf_str_(const string &f, int64 value) {
+	string s = i642s(value);
+	if (f.num == 2) {
+		if (f == "+d") {
+			if (value > 0)
+				return "+" + s;
+			return s;
+		}
+	}
+	if (f.num == 3) {
+		if (f[0] == '0' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'd'))
+			return str_rep("0", f[1] - '0' - i2s(value).num) + s;
+		if (f[0] == '.' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'd'))
+			return str_rep("0", f[1] - '0' - i2s(value).num) + s;
+		if (f[0] == '0' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'x'))
+			return string(&value, 4).hex(true).tail(f[1] - '0');
+	}
+	if (f == "d")
+		return s;
+	if (f == "x")
+		return string(&value, 4).hex(true);
+	throw Exception("format evil (int): " + f);
+}
+
+template<> string _xf_str_<double>(const string &f, double value) {
+	if (f.num == 3) {
+		if (f[0] == '.' and (f[1] >= '0' and f[1] <= '9') and (f[2] == 'f'))
+			return f642s(value, f[1] - '0');
+	}
+	if (f != "f")
+		throw Exception("format evil (float): " + f);
+	return f642s(value, 6);
+}
+
+template<> string _xf_str_(const string &f, const string &value) {
+	if (f != "s")
+		throw Exception("format evil (string): " + f);
+	return value;
+}
+
+template<> string _xf_str_(const string &f, const char *value) {
+	if (f != "s")
+		throw Exception("format evil (string): " + f);
+	return value;
+}
+
+template<> string _xf_str_(const string &f, bool value) { return _xf_str_(f, (int64)value); }
+template<> string _xf_str_(const string &f, int value) { return _xf_str_(f, (int64)value); }
+//template<> string _xf_str_(const string &f, long value) { return _xf_str_(f, (int64)value); }
+template<> string _xf_str_(const string &f, unsigned int value) { return _xf_str_(f, (int64)value); }
+template<> string _xf_str_(const string &f, unsigned long long value) { return _xf_str_(f, (int64)value); }
+//template<> string _xf_str_(const string &f, unsigned long value) { return _xf_str_(f, (int64)value); }
+template<> string _xf_str_(const string &f, float value) { return _xf_str_(f, (double)value); }
+template<> string _xf_str_(const string &f, string value) { return _xf_str_<const string&>(f, value); }
+template<> string _xf_str_(const string &f, char *value) { return _xf_str_<const char*>(f, value); }
+
+// %lx
+
+string format(const string &s) {
+	return s.replace("%%", "%");
+}
+
+
+bool _xf_split_first_(const string &s, string &pre, string &f, string &post) {
+	for (int i=0; i<s.num-1; i++) {
+		if (s[i] == '%') {
+			if (s[i+1] == '%') {
+				i ++;
+				continue;
+			}
+			for (int j=i+1; j<s.num; j++) {
+				if ((s[j] == '.') or (s[j] == '+') or (s[j] == '-') or (s[j] >= '0' and s[j] <= '9')) {
+					f.add(s[j]);
+				} else if ((s[j] == 's') or (s[j] == 'f') or (s[j] == 'd') or (s[j] == 'x') or (s[j] == 'p')) {
+					f.add(s[j]);
+					break;
+				} else if (s[j] == 'l') {
+				} else {
+					throw Exception("xformat: evil format");
+				}
+			}
+			pre = s.head(i).replace("%%", "%");
+			post = s.substr(i+f.num+1, -1);
+			return true;
+		}
+	}
+	pre = s.replace("%%", "%");
+	return false;
+}
+
+
+
 
 // convert a string to an integer
 int string::_int() const

@@ -236,17 +236,17 @@ Node *SyntaxTree::parse_operand_extension_array(Node *operand, Block *block) {
 	if (!allowed)
 		if (operand->type->is_pointer()) {
 			if ((!operand->type->param->is_array()) and (!operand->type->param->usable_as_super_array()))
-				do_error(format("using pointer type \"%s\" as an array (like in C) is not allowed any more", operand->type->long_name().c_str()));
+				do_error(format("using pointer type \"%s\" as an array (like in C) is not allowed any more", operand->type->long_name()));
 			allowed = true;
 			pparray = (operand->type->param->usable_as_super_array());
 		}
 	if (!allowed)
-		do_error(format("type \"%s\" is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->long_name().c_str(), index->type->long_name().c_str()));
+		do_error(format("type \"%s\" is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()));
 
 
 	if (index->type != TypeInt) {
 		Exp.rewind();
-		do_error(format("type of index for an array needs to be int, not %s", index->type->long_name().c_str()));
+		do_error(format("type of index for an array needs to be int, not %s", index->type->long_name()));
 	}
 
 	Node *array = nullptr;
@@ -629,7 +629,7 @@ Node *SyntaxTree::check_param_link(Node *link, const Class *wanted, const string
 			return link;
 		} else {
 			Exp.rewind();
-			do_error(format("(c) parameter %d in command \"%s\" has type %s, %s expected", param_no + 1, f_name.c_str(), given->long_name().c_str(), wanted->long_name().c_str()));
+			do_error(format("(c) parameter %d in command \"%s\" has type %s, %s expected", param_no + 1, f_name, given->long_name(), wanted->long_name()));
 		}
 
 	} else {
@@ -640,7 +640,7 @@ Node *SyntaxTree::check_param_link(Node *link, const Class *wanted, const string
 			return apply_type_cast(tc, link, wanted);
 
 		Exp.rewind();
-		do_error(format("parameter %d in command \"%s\" has type %s, %s expected", param_no + 1, f_name.c_str(), given->long_name().c_str(), wanted->long_name().c_str()));
+		do_error(format("parameter %d in command \"%s\" has type %s, %s expected", param_no + 1, f_name, given->long_name(), wanted->long_name()));
 	}
 	return link;
 }
@@ -1371,7 +1371,7 @@ void SyntaxTree::link_most_important_operator(Array<Node*> &operands, Array<Node
 
 	_operators[mio] = link_operator(op_no, param1, param2);
 	if (!_operators[mio])
-		do_error(format("no operator found: %s %s %s", param1->type->long_name().c_str(), op_no->name.c_str(), param2->type->long_name().c_str()), op_exp[mio]);
+		do_error(format("no operator found: %s %s %s", param1->type->long_name(), op_no->name, param2->type->long_name()), op_exp[mio]);
 
 // remove from list
 	operands[mio] = _operators[mio];
@@ -1801,7 +1801,7 @@ Node *SyntaxTree::parse_statement_new(Block *block) {
 	Array<Function*> cfs = t->get_constructors();
 	Array<Node*> funcs;
 	if (cfs.num == 0)
-		do_error(format("class \"%s\" does not have a constructor", t->long_name().c_str()));
+		do_error(format("class \"%s\" does not have a constructor", t->long_name()));
 	for (auto *cf: cfs) {
 		funcs.add(add_node_func_name(cf));
 		funcs.back()->params.add(new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));
@@ -2290,7 +2290,7 @@ void SyntaxTree::parse_local_definition(Block *block, const Class *type) {
 		type = parse_type(block->name_space());
 
 	if (type->needs_constructor() and !type->get_default_constructor())
-		do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->long_name().c_str()));
+		do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->long_name()));
 
 	for (int l=0;!Exp.end_of_line();l++) {
 		// name
@@ -2526,9 +2526,9 @@ void SyntaxTree::parse_class(Class *_namespace) {
 					orig = &e;
 			bool override = flags_has(flags, Flags::OVERRIDE);
 			if (override and ! orig)
-				do_error(format("can not override element '%s', no previous definition", el.name.c_str()));
+				do_error(format("can not override element '%s', no previous definition", el.name));
 			if (!override and orig)
-				do_error(format("element '%s' is already defined, use '%s' to override", el.name.c_str(), IDENTIFIER_OVERRIDE.c_str()));
+				do_error(format("element '%s' is already defined, use '%s' to override", el.name, IDENTIFIER_OVERRIDE));
 			if (override) {
 				if (orig->type->is_pointer() and el.type->is_pointer())
 					orig->type = el.type;
@@ -2617,7 +2617,7 @@ void SyntaxTree::parse_global_const(const string &name, const Class *type) {
 	cv = transform_node(cv, [&](Node *n) { return conv_eval_const_func(n); });
 
 	if ((cv->kind != NodeKind::CONSTANT) or (cv->type != type))
-		do_error(format("only constants of type \"%s\" allowed as value for this constant", type->long_name().c_str()));
+		do_error(format("only constants of type \"%s\" allowed as value for this constant", type->long_name()));
 	Constant *c_orig = cv->as_const();
 
 	auto *c = add_constant(type);
@@ -2741,7 +2741,7 @@ const Class *SyntaxTree::parse_type(const Class *ns) {
 				if (c->name == Exp.cur)
 					sub = c;
 			if (!sub)
-				do_error(format("class %s does not have a sub-class %s", t->long_name().c_str(), Exp.cur.c_str()));
+				do_error(format("class %s does not have a sub-class %s", t->long_name(), Exp.cur));
 			t = sub;
 			Exp.next();
 		} else {

@@ -277,7 +277,7 @@ string msg_get_trace()
 		if (unw_is_signal_frame(&cursor) > 0)
 			trace.clear();
 
-		string t = format("0x%lx:", pc);
+		string t = format("0x%lx:", (int64)pc);
 
 		char sym[256];
 		if (unw_get_proc_name(&cursor, sym, sizeof(sym), &offset) == 0) {
@@ -286,7 +286,7 @@ string msg_get_trace()
 			char* demangled = abi::__cxa_demangle(sym, nullptr, nullptr, &status);
 			if (status == 0)
 				nameptr = demangled;
-			t += format(" (%s + 0x%lx)", nameptr, offset);
+			t += format(" (%s + 0x%lx)", nameptr, (int64)offset);
 			free(demangled);
 		} else {
 			t += " (\?\?\?)";

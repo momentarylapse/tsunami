@@ -21,7 +21,7 @@ Plugin::Plugin(const string &_filename, ModuleType _type) {
 }
 
 string Plugin::get_error() {
-	return format(_("Error in script file: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
+	return format(_("Error in script file: \"%s\"\n%s"), filename, error_message);
 }
 
 bool Plugin::file_changed() {
@@ -70,6 +70,6 @@ void *Plugin::create_instance(Session *session, const string &root_type) {
 			return t->create_instance();
 		}
 	}
-	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));
+	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename, root_type));
 	return nullptr;
 }

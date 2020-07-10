@@ -23,7 +23,7 @@ void SyntaxTree::auto_implement_add_child_constructors(Node *n_self, Function *f
 			continue;
 		Function *ff = e.type->get_default_constructor();
 		if (e.type->needs_constructor() and !ff)
-			do_error_implicit(f, format("missing default constructor for element %s", e.name.c_str()));
+			do_error_implicit(f, format("missing default constructor for element %s", e.name));
 		if (!ff)
 			continue;
 		Node *p = shift_node(cp_node(n_self), false, e.offset, e.type);
@@ -50,7 +50,7 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 	}else if (t->is_array()) {
 		auto *pc_el_init = t->param->get_default_constructor();
 		if (t->param->needs_constructor() and !pc_el_init)
-			do_error_implicit(f, format("missing default constructor for %s", t->param->long_name().c_str()));
+			do_error_implicit(f, format("missing default constructor for %s", t->param->long_name()));
 		if (pc_el_init) {
 			for (int i=0; i<t->array_length; i++) {
 				Node *n_el = shift_node(cp_node(n_self), false, t->param->size * i, t->param);
@@ -121,7 +121,7 @@ void SyntaxTree::auto_implement_destructor(Function *f, const Class *t) {
 				continue;
 			Function *ff = e.type->get_destructor();
 			if (!ff and e.type->needs_destructor())
-				do_error_implicit(f, format("missing destructor for element %s", e.name.c_str()));
+				do_error_implicit(f, format("missing destructor for element %s", e.name));
 			if (!ff)
 				continue;
 			Node *p = shift_node(cp_node(n_self), false, e.offset, e.type);
@@ -151,7 +151,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 		if (t->is_super_array()) {
 			Function *f_resize = t->get_func("resize", TypeVoid, {TypeInt});
 			if (!f_resize)
-				do_error_implicit(f, format("no %s.resize(int) found", t->long_name().c_str()));
+				do_error_implicit(f, format("no %s.resize(int) found", t->long_name()));
 
 			// self.resize(other.num)
 			Node *n_other_num = shift_node(n_other, false, config.pointer_size, TypeInt);
@@ -179,7 +179,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 
 		Node *n_assign = link_operator_id(OperatorID::ASSIGN, deref_node(add_node_local(v_el)), n_other_el);
 		if (!n_assign)
-			do_error_implicit(f, format("no %s.__assign__() found", t->param->long_name().c_str()));
+			do_error_implicit(f, format("no %s.__assign__() found", t->param->long_name()));
 		b->add(n_assign);
 
 		Node *n_for = add_node_statement(StatementID::FOR_ARRAY);
@@ -214,7 +214,7 @@ void SyntaxTree::auto_implement_assign(Function *f, const Class *t) {
 
 			Node *n_assign = link_operator_id(OperatorID::ASSIGN, p, o);
 			if (!n_assign)
-				do_error_implicit(f, format("no %s.__assign__ for element \"%s\"", e.type->long_name().c_str(), e.name.c_str()));
+				do_error_implicit(f, format("no %s.__assign__ for element \"%s\"", e.type->long_name(), e.name));
 			f->block->add(n_assign);
 		}
 
@@ -387,7 +387,7 @@ void SyntaxTree::auto_implement_array_add(Function *f, const Class *t) {
 
 	Node *cmd_assign = link_operator_id(OperatorID::ASSIGN, cmd_el, item);
 	if (!cmd_assign)
-		do_error_implicit(f, format("no %s.%s for elements", t->param->long_name().c_str(), IDENTIFIER_FUNC_ASSIGN.c_str()));
+		do_error_implicit(f, format("no %s.%s for elements", t->param->long_name(), IDENTIFIER_FUNC_ASSIGN));
 	b->add(cmd_assign);
 }
 

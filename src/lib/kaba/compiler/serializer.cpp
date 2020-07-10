@@ -301,7 +301,7 @@ void Serializer::cmd_list_out(const string &stage) {
 	if (true) {
 		msg_write("-----------");
 		foreachi(TempVar &v, temp_var, i)
-			msg_write(format("  %d   %d -> %d    %s   %s", i, v.first, v.last, v.type->name.c_str(), v.referenced ? "-referenced-" : ""));
+			msg_write(format("  %d   %d -> %d    %s   %s", i, v.first, v.last, v.type->name, v.referenced ? "-referenced-" : ""));
 		msg_write("--------------------------------");
 	}
 }

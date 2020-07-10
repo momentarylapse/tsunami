@@ -1457,7 +1457,7 @@ string x86_disassemble(void *_code_,int length,bool allow_comments)
 
 		}else{
 			//msg_write(string2("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false)));
-			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false).c_str());
+			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false));
 			cur ++;
 		}
 
@@ -1529,7 +1529,7 @@ inline int CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &p
 		}
 	}
 	if (pf.mrm_mode != MRM_NONE)
-		raise_error(format("unhandled modrm %d %d %s %d %s", pf.mrm_mode, p.type, (p.reg?p.reg->name.c_str():""), p.deref, SizeOut(pf.size).c_str()));
+		raise_error(format("unhandled modrm %d %d %s %d %s", pf.mrm_mode, p.type, (p.reg?p.reg->name:""), p.deref, SizeOut(pf.size)));
 	return 0x00;
 }
 

@@ -604,7 +604,7 @@ bool TsunamiWindow::allow_termination() {
 
 	if (song->action_manager->is_save())
 		return true;
-	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
+	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true);
 	if (answer == "hui:yes") {
 		/*if (!OnSave())
 		 return false;*/

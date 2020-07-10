@@ -95,7 +95,7 @@ void* get_nice_random_addr()
 
 }
 
-void* get_nice_memory(long size, bool executable, Script *script)
+void* get_nice_memory(int64 size, bool executable, Script *script)
 {
 	if (size == 0)
 		return nullptr;

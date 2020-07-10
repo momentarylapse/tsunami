@@ -157,7 +157,7 @@ bool Clipboard::prepare_layer_map(AudioView *view, Array<TrackLayer*> &source_li
 	string t1 = "[" + implode(temp_type, ", ") + "]";
 	string t2 = "[" + implode(dest_type, ", ") + "]";
 	if (t1 != t2){
-		view->session->e(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1.c_str(), t2.c_str()));
+		view->session->e(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1, t2));
 		return false;
 	}
 	return true;

@@ -590,12 +590,12 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	if (t->is_super_array() or t->is_dict()) {
 		t->derive_from(TypeDynamicArray, false); // we already set its size!
 		if (param->needs_constructor() and !param->get_default_constructor())
-			do_error(format("can not create a dynamic array from type %s, missing default constructor", param->long_name().c_str()));
+			do_error(format("can not create a dynamic array from type %s, missing default constructor", param->long_name()));
 		t->param = param;
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_array()) {
 		if (param->needs_constructor() and !param->get_default_constructor())
-			do_error(format("can not create an array from type %s, missing default constructor", param->long_name().c_str()));
+			do_error(format("can not create an array from type %s, missing default constructor", param->long_name()));
 		add_missing_function_headers_for_class(t);
 	}
 	return t;
@@ -1028,7 +1028,7 @@ Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 		auto *t_el = n->type->get_array_element();
 		Function *cf = n->type->get_func("add", TypeVoid, {t_el});
 		if (!cf)
-			do_error(format("[..]: can not find %s.add(%s) function???", n->type->long_name().c_str(), t_el->long_name().c_str()));
+			do_error(format("[..]: can not find %s.add(%s) function???", n->type->long_name(), t_el->long_name()));
 
 		// temp var
 		auto *f = cur_func;
@@ -1047,7 +1047,7 @@ Node *SyntaxTree::conv_break_down_high_level(Node *n, Block *b) {
 		auto *t_el = n->type->get_array_element();
 		Function *cf = n->type->get_func("set", TypeVoid, {TypeString, t_el});
 		if (!cf)
-			do_error(format("[..]: can not find %s.set(string,%s) function???", n->type->long_name().c_str(), t_el->long_name().c_str()));
+			do_error(format("[..]: can not find %s.set(string,%s) function???", n->type->long_name(), t_el->long_name()));
 
 		// temp var
 		auto *f = cur_func;

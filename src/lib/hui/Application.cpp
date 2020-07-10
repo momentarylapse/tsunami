@@ -53,12 +53,12 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 			if ((filename.head(11) == "/usr/local/") or (filename.find("/") < 0)) {
 				installed = true;
 				// installed version?
-				directory = format("%s/.%s/", getenv("HOME"), app_name.c_str());
+				directory = format("%s/.%s/", getenv("HOME"), app_name);
 				directory_static = "/usr/local/share/" + app_name + "/";
 			} else if ((filename.head(5) == "/usr/") or (filename.find("/") < 0)) {
 				installed = true;
 				// installed version?
-				directory = format("%s/.%s/", getenv("HOME"), app_name.c_str());
+				directory = format("%s/.%s/", getenv("HOME"), app_name);
 				directory_static = "/usr/share/" + app_name + "/";
 			}
 		}

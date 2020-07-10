@@ -863,7 +863,7 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const strin
 			return p;
 		}
 	}
-	session->e(format(_("Can't find %s plugin: %s ..."), Module::type_to_name(type).c_str(), name.c_str()));
+	session->e(format(_("Can't find %s plugin: %s ..."), Module::type_to_name(type), name));
 	return nullptr;
 }
 

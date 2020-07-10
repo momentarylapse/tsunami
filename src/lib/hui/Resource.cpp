@@ -144,7 +144,7 @@ Window *CreateResourceDialog(const string &id, Window *root) {
 	//return HuiCreateDialog("-dialog not found in resource-",200,100,root,true,mf);
 	Resource *res = GetResource(id);
 	if (!res) {
-		msg_error(format("CreateResourceDialog  (id=%s)  m(-_-)m",id.c_str()));
+		msg_error(format("CreateResourceDialog  (id=%s)  m(-_-)m", id));
 		return nullptr;
 	}
 	
@@ -208,7 +208,7 @@ Menu *_create_res_menu_(const string &ns, Resource *res) {
 Menu *CreateResourceMenu(const string &id) {
 	Resource *res = GetResource(id);
 	if (!res) {
-		msg_error(format("CreateResourceMenu  (id=%d)  m(-_-)m", id.c_str()).c_str());
+		msg_error(format("CreateResourceMenu  (id=%d)  m(-_-)m", id));
 		return nullptr;
 	}
 

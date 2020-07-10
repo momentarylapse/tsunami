@@ -153,7 +153,7 @@ void PagePainter::draw_str(float x, float y, const string& str)
 	float dx = x - text_x;
 	float dy = y - text_y;
 	int fid = parser->font_id(font_name);
-	page->content += format("     /F%d %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", fid+1, font_size, dx, dy, _pdf_str_filter(str).c_str());
+	page->content += format("     /F%d %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", fid+1, font_size, dx, dy, _pdf_str_filter(str));
 
 	text_x = x;
 	text_y = y;

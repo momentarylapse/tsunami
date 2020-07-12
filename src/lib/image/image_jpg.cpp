@@ -124,13 +124,13 @@ inline void jpg_update_bits(unsigned char *&b,int &bit_off)
 	b2=a[2];
 	// join...but in "wrong" order!  m(T_T)m
 	jpg_temp_bits=( ( ( (b0<<16) + (b1<<8) + b2) << bit_off ) >> 8 ) & 0x0000ffff;
-	//msg_write(d2h(&jpg_temp_bits,3,true));
+	//msg_write(i2h(jpg_temp_bits,3));
 }
 
 inline unsigned char jpg_get_huffman(s_jpg_huffman_table *h,unsigned char *&b,int &bit_off)
 {
 	jpg_update_bits(b,bit_off);
-	//msg_write(d2h(&jpg_temp_bits,3,true));
+	//msg_write(i2h(jpg_temp_bits,3));
 	for (int i=0;i<16;i++){
 		int c=jpg_get_bits(i+1,false);
 		if ((c>=h->min[i]) and (c<=h->max[i])){

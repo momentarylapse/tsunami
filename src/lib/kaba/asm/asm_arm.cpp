@@ -319,7 +319,7 @@ string arm_disassemble(void *_code_,int length,bool allow_comments)
 
 		int x = (cur >> 25) & 0x7;
 
-		buf += string((char*)&cur, 4).hex(true).substr(2, -1);
+		buf += i2h(cur, 4);
 		buf += "    ";
 
 		InstructionWithParams iwp;

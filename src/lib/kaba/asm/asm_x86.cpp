@@ -1449,15 +1449,15 @@ string x86_disassemble(void *_code_,int length,bool allow_comments)
 				for (int ii=0;ii<48-l;ii++)
 					str += " ";
 				str += "// ";
-				str += d2h(code, (int_p)cur - (int_p)code, false);
+				str += d2h(code, (int_p)cur - (int_p)code);
 			}
 			//msg_write(str);
 			bufstr += str;
 			bufstr += "\n";
 
 		}else{
-			//msg_write(string2("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false)));
-			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false));
+			//msg_write(string2("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code))));
+			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code)));
 			cur ++;
 		}
 

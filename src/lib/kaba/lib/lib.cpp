@@ -459,7 +459,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 			}
 		} catch (...) {
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
-			msg_write(string((char*)pp, 4).hex());
+			msg_write(p2s(pp));
 			msg_write(Asm::disassemble(func, 16));
 		}
 	} else {

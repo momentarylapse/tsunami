@@ -297,7 +297,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		}
 		return "[" + s + "]";
 	}
-	return d2h(p, type->size, false);
+	return d2h(p, type->size);
 }
 
 string _cdecl var2str(const void *p, const Class *type) {

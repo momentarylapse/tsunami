@@ -224,10 +224,10 @@ string signed_hex(int64 i) {
 		i = -i;
 	}
 	if (i < 256)
-		return s + d2h(&i, 1);
+		return s + "0x" + i2h(i, 1);
 	if (i < 65536)
-		return s + d2h(&i, 2);
-	return s + d2h(&i, 4);
+		return s + "0x" + i2h(i, 2);
+	return s + "0x" + i2h(i, 4);
 }
 
 
@@ -262,7 +262,7 @@ string SerialNodeParam::str(Serializer *ser) const
 		else if (kind == NodeKind::LOCAL_MEMORY)
 			n = signed_hex(p);
 		else if (kind == NodeKind::MEMORY)
-			n = d2h(&p, config.pointer_size);
+			n = "0x" + i2h(p, config.pointer_size);
 		else if (kind == NodeKind::IMMEDIATE)
 			n = guess_constant(p, ser);
 		str = "  (" + type_name_safe(type) + ") " + kind2str(kind) + " " + n;

@@ -846,7 +846,7 @@ string InstructionParam::str(bool hide_size)
 				s.add(RegisterByID[REG_R0 + i]->name);
 		return "{" + implode(s, ",") + "}";
 	}else if (type == PARAMT_IMMEDIATE){
-		string s = d2h(&value, deref ? state.addr_size : size);
+		string s = "0x" + i2h(value, deref ? state.addr_size : size);
 		if (is_label)
 			s = state.get_label(value);
 		if (deref)
@@ -1131,14 +1131,14 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				p.size = SIZE_64;
 		}
 		if (DebugAsm){
-			printf("hex const:  %s\n",d2h((char*)&p.value,p.size).c_str());
+			printf("hex const:  0x%s\n",i2h(p.value,p.size).c_str());
 		}
 
 	// char const
 	}else if ((param[0] == '\'') and (param[param.num - 1] == '\'')){
 		p = param_imm((int_p)param[1], SIZE_8);
 		if (DebugAsm)
-			printf("hex const:  %s\n",d2h((char*)&p.value,1).c_str());
+			printf("hex const:  0x%s\n",i2h(p.value,1).c_str());
 
 	// label substitude
 	}else if (param == "$"){

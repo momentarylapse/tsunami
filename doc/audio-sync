@@ -1,0 +1,12 @@
+pulse...
+
+== Playback ==
+
+pulse internal underrun doesn't seem to affect much
+self-correcting?
+
+tsunami:
+
+buffer underrun => feed silence to pulse
+=> fake-read counter
+=> renderer seek

@@ -353,7 +353,7 @@ void Script::LinkOsEntryPoint()
 		int lll = (int_p)f->address - syntax->asm_meta_info->code_origin - TaskReturnOffset;
 		//printf("insert   %d  an %d\n", lll, OCORA);
 		//msg_write(lll);
-		//msg_write(d2h(&lll,4,false));
+		//msg_write(i2h(lll,4));
 		*(int*)&opcode[OCORA] = lll;
 	}
 }

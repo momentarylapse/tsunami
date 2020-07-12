@@ -97,17 +97,14 @@ public:
 	}
 };
 
-string i2s_zero_padded(int i, int n) {
-	string s = i2s(i);
-	while (s.num < n)
-		s = "0" + s;
-	return s;
-}
-
 string kaba_int_format(int i, const string &fmt) {
-	if (fmt.head(1) == "0" and fmt.num >= 2)
-		return i2s_zero_padded(i, fmt[1] - 48);
-	return i2s(i);
+	try {
+		if (fmt.tail(1) == "x")
+			return _xf_str_<int>(fmt, i);
+		return _xf_str_<int>(fmt + "d", i);
+	} catch(::Exception &e) {
+		return "{ERROR: " + e.message() + "}";
+	}
 }
 
 string kaba_float2str(float f) {
@@ -115,9 +112,11 @@ string kaba_float2str(float f) {
 }
 
 string kaba_float_format(float f, const string &fmt) {
-	if (fmt.head(1) == "." and fmt.num >= 2)
-		return f2s(f, fmt[1] - 48);
-	return f2s(f, 6);
+	try {
+		return _xf_str_<float>(fmt + "f", f);
+	} catch(::Exception &e) {
+		return "{ERROR: " + e.message() + "}";
+	}
 }
 
 string kaba_float642str(float f) {
@@ -126,6 +125,15 @@ string kaba_float642str(float f) {
 
 string kaba_char2str(char c) {
 	return string(&c, 1);
+}
+
+
+string kaba_string_format(const string &s, const string &fmt) {
+	try {
+		return _xf_str_<const string&>(fmt + "s", s);
+	} catch(::Exception &e) {
+		return "{ERROR: " + e.message() + "}";
+	}
 }
 
 
@@ -668,7 +676,6 @@ void SIAddPackageBase() {
 		class_add_funcx("hash", TypeInt, &string::hash, Flags::PURE);
 		class_add_funcx("md5", TypeString, &string::md5, Flags::PURE);
 		class_add_funcx("hex", TypeString, &string::hex, Flags::PURE);
-			func_add_param("inverted", TypeBool);
 		class_add_funcx("unhex", TypeString, &string::unhex, Flags::PURE);
 		class_add_funcx("match", TypeBool, &string::match, Flags::PURE);
 			func_add_param("glob", TypeString);
@@ -683,6 +690,8 @@ void SIAddPackageBase() {
 		class_add_funcx("escape", TypeString, &str_escape, Flags::PURE);
 		class_add_funcx("unescape", TypeString, &str_unescape, Flags::PURE);
 		class_add_funcx("repr", TypeString, &string::repr, Flags::PURE);
+		class_add_funcx("format", TypeString, &kaba_string_format, Flags::PURE);
+			func_add_param("fmt", TypeString);
 
 
 

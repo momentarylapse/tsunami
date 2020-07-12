@@ -515,40 +515,42 @@ string p2s(const void *p)
 	return string(tmp);
 }
 
+char hex_nibble(int v) {
+	if (v < 10)
+		return '0' + v;
+	return 'a' + v - 10;
+}
+
 // convert binary data to a hex-code-string
 // inverted:
 //    false:   12.34.56.78
-//    true:    0x78.56.34.12
-string string::hex(bool inverted) const
-{
+//    true:    78563412
+string _str_hex_(const string &s, bool inverted) {
 	string str;
-	if (inverted)
-		str = "0x";
-	unsigned char *c_data = (unsigned char *)data;
-	for (int i=0;i<num;i++){
+	//if (inverted)
+	//	str = "0x";
+	unsigned char *c_data = (unsigned char *)s.data;
+	for (int i=0;i<s.num;i++){
 		int dd;
 		if (inverted)
-			dd = c_data[num - i - 1];
+			dd = c_data[s.num - i - 1];
 		else
 			dd = c_data[i];
 		int c1 = (dd & 15);
 		int c2 = (dd >> 4);
-		if (c2 < 10)
-			str.add('0' + c2);
-		else
-			str.add('a' + c2 - 10);
-		if (c1 < 10)
-			str.add('0' + c1);
-		else
-			str.add('a' + c1 - 10);
-		if ((!inverted)and(i < num - 1))
+		str.add(hex_nibble(c2));
+		str.add(hex_nibble(c1));
+		if ((!inverted) and (i < s.num - 1))
 			str.add('.');
 	}
 	return str;
 }
 
-inline int hex_nibble_to_value(char c)
-{
+string string::hex() const {
+	return _str_hex_(*this, false);
+}
+
+inline int hex_nibble_to_value(char c) {
 	if ((c >= '0') and (c <= '9'))
 		return c - '0';
 	if ((c >= 'a') and (c <= 'f'))
@@ -558,12 +560,9 @@ inline int hex_nibble_to_value(char c)
 	return 0;
 }
 
-string string::unhex() const
-{
+string string::unhex() const {
 	string r;
-	bool rev = ((*this)[1] == 'x');
-	int i0 = rev ? 2 : 0;
-	for (int i=i0; i<num;i++){
+	for (int i=0; i<num;i++){
 		if ((*this)[i] == '.')
 			continue;
 		int v1 = hex_nibble_to_value((*this)[i]);
@@ -571,56 +570,50 @@ string string::unhex() const
 		int v2 = hex_nibble_to_value((*this)[i]);
 		r.add(v1 * 16 + v2);
 	}
-	if (rev)
-		return r.reverse();
 	return r;
 }
 
-string d2h(const void *data, int bytes, bool inverted)
-{	return string((const char*)data, bytes).hex(inverted);	}
+string d2h(const void *data, int bytes)
+{	return string((const char*)data, bytes).hex();	}
 
-string ia2s(const Array<int> &a)
-{
-	string s = "[";
-	for (int i=0;i<a.num;i++){
-		if (i > 0)
-			s += ", ";
-		s += i2s(a[i]);
-	}
-	s += "]";
-	return s;
+string i2h(int64 data, int bytes)
+{	return _str_hex_(string((const char*)&data, bytes), true);	}
+
+string i2h_min(int64 data) {
+	string r;
+	do {
+		r.add(hex_nibble(data & 0xf));
+		data >>= 4;
+	} while (data != 0);
+	return r.reverse();
 }
 
-string fa2s(const Array<float> &a)
+#define MAKE_ARRAY_STR(NAME, T, F) \
+string NAME(const Array<T> &a) { \
+	string s = "["; \
+	for (int i=0; i<a.num; i++) { \
+		if (i > 0) \
+			s += ", "; \
+		s += F(a[i]); \
+	} \
+	s += "]"; \
+	return s; \
+}
+
+string str_quote(const string &s) { return "\"" + s + "\""; }
+
+MAKE_ARRAY_STR(ia2s, int, i2s);
+MAKE_ARRAY_STR(fa2s, float, f2sf);
+MAKE_ARRAY_STR(ba2s, bool, b2s);
+MAKE_ARRAY_STR(sa2s, string, str_quote);
+
+string _fa2s(const Array<float> &a)
 {
 	string s = "[";
 	for (int i=0;i<a.num;i++){
 		if (i > 0)
 			s += ", ";
 		s += f2s(a[i], 6);
-	}
-	s += "]";
-	return s;
-}
-string ba2s(const Array<bool> &a)
-{
-	string s = "[";
-	for (int i=0;i<a.num;i++){
-		if (i > 0)
-			s += ", ";
-		s += b2s(a[i]);
-	}
-	s += "]";
-	return s;
-}
-
-string sa2s(const Array<string> &a)
-{
-	string s = "[";
-	for (int i=0;i<a.num;i++){
-		if (i > 0)
-			s += ", ";
-		s += "\"" + a[i] + "\"";
 	}
 	s += "]";
 	return s;
@@ -634,44 +627,130 @@ string str_rep(const string &s, int n) {
 	return r;
 }
 
-template<> string _xf_str_(const string &f, int64 value) {
-	string s = i642s(value);
-	if (f.num == 2) {
-		if (f == "+d") {
-			if (value > 0)
-				return "+" + s;
+struct xf_format_data {
+	bool sign, left_justify, fill_zeros, sharp;
+	int width;
+	int decimals;
+	char type;
+	xf_format_data() {
+		sign = false;
+		left_justify = false;
+		fill_zeros = false;
+		sharp = false;
+		type = 0;
+		width = 0;
+		decimals = -1;
+	}
+	string apply_justify(const string &s) {
+		if (width <= 0 or fill_zeros)
 			return s;
+		if (left_justify)
+			return s + str_rep(" ", width - s.num);
+		else
+			return str_rep(" ", width - s.num) + s;
+	}
+};
+
+xf_format_data xf_parse(const string &f) {
+	xf_format_data r;
+	r.type = f.back();
+	int i0 = 0;
+	// flags
+	for (int i=0; i<f.num; i++) {
+		i0 = i;
+		if (f[i] == '+')
+			r.sign = true;
+		else if (f[i] == '-')
+			r.left_justify = true;
+		else if (f[i] == '0')
+			r.fill_zeros = true;
+		else if (f[i] == '#')
+			r.sharp = true;
+		else
+			break;
+	}
+	if (f[i0] >= '0' and f[i0] <= '9') {
+		r.width = f[i0] - '0';
+		i0 ++;
+		if (f[i0] >= '0' and f[i0] <= '9') {
+			r.width = r.width * 10 + (f[i0] - '0');
+			i0 ++;
 		}
 	}
-	if (f.num == 3) {
-		if (f[0] == '0' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'd'))
-			return str_rep("0", f[1] - '0' - i2s(value).num) + s;
-		if (f[0] == '.' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'd'))
-			return str_rep("0", f[1] - '0' - i2s(value).num) + s;
-		if (f[0] == '0' and (f[1] >= '1' and f[1] <= '9') and (f[2] == 'x'))
-			return string(&value, 4).hex(true).tail(f[1] - '0');
+	if (f[i0] == '.') {
+		i0 ++;
+		if (f[i0] >= '0' and f[i0] <= '9') {
+			r.decimals = f[i0] - '0';
+			i0 ++;
+		}
 	}
-	if (f == "d")
-		return s;
-	if (f == "x")
-		return string(&value, 4).hex(true);
-	throw Exception("format evil (int): " + f);
+	if (i0 < f.num-1)
+		throw Exception("format evil: " + f);
+	return r;
+}
+
+template<> string _xf_str_(const string &f, int64 value) {
+	auto ff = xf_parse(f);
+	bool negative = false;
+	if (value < 0) {
+		negative = true;
+		value = - value;
+	}
+	string s;
+	if (ff.type == 'd') {
+		s = i642s(value);
+	} else if (ff.type == 'x') {
+		s = i2h_min(value);
+	} else {
+		throw Exception("format evil (int): " + f);
+	}
+		
+	int size = s.num;
+	if (negative or ff.sign)
+		size ++;
+	if (ff.type == 'x' and ff.sharp)
+		size += 2;
+	
+	int n_zeros = 0;
+	if (ff.fill_zeros)
+		n_zeros = ff.width;
+	if (ff.decimals >= 0)
+		n_zeros = ff.decimals;
+	s = str_rep("0", n_zeros - size) + s;
+	if (ff.type == 'x' and ff.sharp)
+		s = "0x" + s;
+
+	// sign
+	if (negative)
+		s = "-" + s;
+	else if (ff.sign)
+		s = "+" + s;
+
+	return ff.apply_justify(s);
 }
 
 template<> string _xf_str_<double>(const string &f, double value) {
-	if (f.num == 3) {
-		if (f[0] == '.' and (f[1] >= '0' and f[1] <= '9') and (f[2] == 'f'))
-			return f642s(value, f[1] - '0');
-	}
-	if (f != "f")
+	auto ff = xf_parse(f);
+	string s;
+	int decimals = 6;
+	if (ff.decimals >= 0)
+		decimals = ff.decimals;
+		
+	if (ff.type == 'f') {
+		s = f642s(value, decimals);
+	} else {
 		throw Exception("format evil (float): " + f);
-	return f642s(value, 6);
+	}
+	return ff.apply_justify(s);
 }
 
 template<> string _xf_str_(const string &f, const string &value) {
-	if (f != "s")
+	auto ff = xf_parse(f);
+	if (ff.type == 's') {
+	} else {
 		throw Exception("format evil (string): " + f);
-	return value;
+	}
+	return ff.apply_justify(value);
 }
 
 template<> string _xf_str_(const string &f, const char *value) {

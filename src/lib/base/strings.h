@@ -44,7 +44,7 @@ class string : public Array<char> {
 	Array<string> _cdecl explode(const string &s) const;
 	string _cdecl lower() const;
 	string _cdecl upper() const;
-	string _cdecl hex(bool inverted = false) const;
+	string _cdecl hex() const;
 	string _cdecl unhex() const;
 	bool _cdecl match(const string &glob) const;
 	string repr() const;
@@ -159,7 +159,8 @@ bool _cdecl s2b(const string &s);
 float _cdecl s2f(const string &s);
 double _cdecl s2f64(const string &s);
 
-string _cdecl d2h(const void *data, int bytes, bool inverted = true);
+string _cdecl d2h(const void *data, int bytes);
+string _cdecl i2h(int64, int bytes);
 string _cdecl h2d(const string &hex_str, int bytes);
 
 string _cdecl implode(const Array<string> &a, const string &glue);

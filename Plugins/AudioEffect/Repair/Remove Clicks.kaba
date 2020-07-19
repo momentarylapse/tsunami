@@ -14,17 +14,17 @@ bool click_end(float last, float cur)
 
 int[] find_clicks(float[] b)
 	int[] clicks
-	for i in 1:b.num-1
+	for i in 1:len(b)-1
 		if click_start(b[i-1], b[i])
 			clicks.add(i)
-			int j1 = min(b.num, i + MAX_CLICK_SAMPLES)
+			int j1 = min(len(b), i + MAX_CLICK_SAMPLES)
 			for j in i:j1
 				if click_end(b[j-1], b[j])
 					i = j
 					clicks.add(i)
 					break
 	
-	for i in 0:clicks.num-2:2
+	for i in 0:len(clicks)-2:2
 		if clicks[i+2] - clicks[i+1] < 8
 			clicks.remove(i+2)
 			clicks.remove(i+1)
@@ -45,7 +45,7 @@ class RemoveClicks extends AudioEffect
 	
 	void repair(out float[] b)
 		int[] clicks = find_clicks(b)
-		for i in 0:clicks.num:2
+		for i in 0:len(clicks):2
 			unclick(b, clicks[i], clicks[i+1])
 
 	override void process(out AudioBuffer buf)

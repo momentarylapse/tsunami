@@ -244,6 +244,17 @@ void DynamicArray::delete_single(int index)
 	num --;
 }
 
+
+void DynamicArray::forget() {
+	data = nullptr;
+	allocated = 0;
+	num = 0;
+}
+
+bool DynamicArray::is_ref() const {
+	return (num > 0) and (allocated == 0);
+}
+
 int DynamicArray::index(const void *p)
 {	return ((int_p)p - (int_p)data) / element_size;	}
 

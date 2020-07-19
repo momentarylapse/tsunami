@@ -56,10 +56,10 @@ class PADRenderer extends PitchRenderer
 			float bwHz = (pow(2, synth.config.bw / 12.0) - 1.0) * freq * pow(nn, synth.config.bwscale)
 			float bwi = bwHz / (2.0 * sample_rate)
 			float fi = freq * n / sample_rate
-			for i in 0:amp.num
+			for i in 0:len(amp)
 				amp[i] += gauss((float(i) / N) - fi, bwi) * a
 		
-		for i in 0:c.num
+		for i in 0:len(c)
 			float phi = rand(2 * pi)
 			c[i] = complex(cos(phi), sin(phi)) * amp[i]
 		

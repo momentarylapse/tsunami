@@ -75,7 +75,7 @@ class CueSplitter extends TsunamiPlugin
 			tags.add(Tag("tracknumber", i+1))
 			int offset = p.foffset * session.song.sample_rate
 			int end = session.song.range().length
-			if i < parts.num-1
+			if i < len(parts)-1
 				print(parts[i+1].foffset)
 				float fsr = session.song.sample_rate
 				print(fsr)
@@ -86,7 +86,7 @@ class CueSplitter extends TsunamiPlugin
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
 			string _fn = i+1
-			if _fn.num < 2
+			if len(_fn) < 2
 				_fn = "0" + _fn
 			_fn += " - {{sanitize(p.title)}}.flac"
 			session.storage.save_via_renderer(r.out, dir + _fn, end - offset, tags)

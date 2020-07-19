@@ -63,7 +63,7 @@ void Draw(Painter *c)
 	
 	c.set_color(Black)
 	if LoudEnough
-		c.draw_str(120, 20, rel_pitch_name(played[played.num - 1] % 12))
+		c.draw_str(120, 20, rel_pitch_name(played[len(played) - 1] % 12))
 	else
 		c.draw_str(w / 2 - 30, h / 2 - 20, "too quiet")
 
@@ -74,7 +74,7 @@ void OnClose()
 void UpdateInput()
 	int[1] stack_corrector # needed for stack alignment (T_T)
 	
-	int num = clampi(input.cur_buf.num, 0, buf_size)
+	int num = clampi(len(input.cur_buf), 0, buf_size)
 	buf.resize(buf_size)
 	
 	# alten Pufferinhalt verschieben
@@ -91,7 +91,7 @@ void UpdateInput()
 #		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
 	complex[] bufc
-	bufc.resize(buf.num / 2 + 1)
+	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(buf, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
@@ -108,7 +108,7 @@ void UpdateInput()
 				max = amp
 				fmax = f
 	max *= fmax
-	max /= sqrt(buf.num) * 2 * pi
+	max /= sqrt(len(buf)) * 2 * pi
 	Volume = clamp(max / threshold / 2, 0, 1)
 	if max > threshold
 		LoudEnough = true
@@ -119,7 +119,7 @@ void UpdateInput()
 	else
 		LoudEnough = false
 		played.add(-1)
-	if played.num > 500
+	if len(played) > 500
 		played.remove(0)
 	win.redraw("drawing")
 

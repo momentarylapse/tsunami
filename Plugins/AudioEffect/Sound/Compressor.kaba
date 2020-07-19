@@ -15,7 +15,7 @@ class Compressor extends AudioEffect
 		const void fill_inter(out FloatInterpolator fi)
 			fi.set_type("lerp")
 			fi.add(curve[0].y, 0)
-			for i in 1:curve.num
+			for i in 1:len(curve)
 				fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 			fi.normalize()
 
@@ -43,11 +43,11 @@ class Compressor extends AudioEffect
 
 	void compress(out float[] b, out float[] squares, out float *gain)
 		float bmin = pow(10, MIN_DB/20)
-		for i in 0:b.num
+		for i in 0:len(b)
 		
 			# in level (filtered)
-			squares[i%squares.num] = b[i]*b[i]
-			float rms = sqrt(squares.sum() / squares.num * 2)
+			squares[i % len(squares)] = b[i]*b[i]
+			float rms = sqrt(squares.sum() / len(squares) * 2)
 			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
 			float in_level = MIN_DB
@@ -56,7 +56,7 @@ class Compressor extends AudioEffect
 		
 			# out level
 			float out_level = in_level
-			for j in 1:config.curve.num
+			for j in 1:len(config.curve)
 				if (in_level >= config.curve[j - 1].x) and (in_level <= config.curve[j].x)
 					out_level = config.curve[j - 1].y + (config.curve[j].y - config.curve[j - 1].y) * (in_level - config.curve[j - 1].x) / (config.curve[j].x - config.curve[j - 1].x)
 					break
@@ -99,7 +99,7 @@ class CompressorGrid extends Grid
 	
 		# curve
 		draw_curve(p, fi, true)
-		for i in 1:config.curve.num
+		for i in 1:len(config.curve)
 			draw_point2(p, config.curve[i], i == selected, i == hover)
 
 	# left button down -> select
@@ -110,7 +110,7 @@ class CompressorGrid extends Grid
 	# right button down -> new point
 	override void on_right_button_down()
 		complex m = get_mouse2()
-		for i in 1:config.curve.num
+		for i in 1:len(config.curve)
 			complex q = config.curve[i - 1]
 			complex p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
@@ -126,16 +126,16 @@ class CompressorGrid extends Grid
 			config.curve[selected] = get_mouse2()
 			float xmin = config.curve[selected - 1].x
 			float xmax = 0
-			if selected < config.curve.num - 1
+			if selected < len(config.curve) - 1
 				xmax = config.curve[selected + 1].x
 			config.curve[selected].x = clamp(config.curve[selected].x, xmin, xmax)
-			if selected == config.curve.num - 1
+			if selected == len(config.curve) - 1
 				config.curve[selected].x = 0
 			cp.changed()
 		else
 		# mouse over?
 			hover = -1
-			for i in 1:config.curve.num
+			for i in 1:len(config.curve)
 				if mouse_over_point2(config.curve[i])
 					hover = i
 		redraw()
@@ -144,7 +144,7 @@ class CompressorGrid extends Grid
 		int k = GetEvent().key
 
 		# [Delete] -> remove point
-		if (k == KEY_DELETE) and (selected > 0) and (selected < config.curve.num - 1)
+		if (k == KEY_DELETE) and (selected > 0) and (selected < len(config.curve) - 1)
 			config.curve.remove(selected)
 			cp.changed()
 			selected = -1

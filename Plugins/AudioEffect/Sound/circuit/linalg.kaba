@@ -19,9 +19,9 @@ class Matrix
 		e.resize(n*m)
 	void add(int i, int j, float f)
 		e[i * m + j] += f
-	const float get(int i, int j)
+	float get(int i, int j)
 		return e[i * m + j]
-	const string str()
+	string __str__()
 		string[] s
 		for i in 0:n
 			s.add(e[i*m:(i+1)*m])
@@ -41,8 +41,8 @@ class Matrix
 				for j in i:m
 					e[ii * m + j] -= e[i * m + j] * g
 				b[ii] -= b[i] * g
-	const float[] solve(float[] b)
-		if n != m or b.num != n
+	float[] solve(float[] b)
+		if n != m or len(b) != n
 			raise(new Exception("size mismatch"))
 		Matrix mm = self
 		float[] x

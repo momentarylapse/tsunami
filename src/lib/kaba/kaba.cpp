@@ -25,7 +25,7 @@
 
 namespace Kaba{
 
-string Version = "0.18.5.2";
+string Version = "0.18.6.4";
 
 //#define ScriptDebug
 
@@ -292,6 +292,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 
 	// empty script
 	Script *s = new Script();
+	s->filename = "command line";
 	SyntaxTree *ps = s->syntax;
 
 	try{

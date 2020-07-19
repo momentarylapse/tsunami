@@ -77,11 +77,12 @@ void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
 		ff(g_var);
 }
 
-void init_all_global_objects(SyntaxTree *ps)
-{
-	for (Variable *v: ps->base_class->static_variables)
+void init_all_global_objects(SyntaxTree *ps, const Class *c) {
+	for (Variable *v: c->static_variables)
 		if (!v->is_extern)
 			try_init_global_var(v->type, (char*)v->memory, ps);
+	for (auto *cc: c->classes)
+		init_all_global_objects(ps, cc);
 }
 
 static int64 _opcode_rand_state_ = 10000;
@@ -184,11 +185,18 @@ int mem_size_needed(const Class *c) {
 	return memory_size;
 }
 
+int mem_size_needed_total(const Class *c) {
+	int size = mem_size_needed(c);
+	for (auto *v: c->static_variables)
+		size += mem_align(v->type->size, 4);
+	for (auto *cc: c->classes)
+		size += mem_size_needed_total(cc);
+	return size;
+}
+
 void Script::allocate_memory()
 {
-	memory_size = mem_size_needed(syntax->base_class);
-	for (auto *v: syntax->base_class->static_variables)
-		memory_size += mem_align(v->type->size, 4);
+	memory_size = mem_size_needed_total(syntax->base_class);
 
 	memory = (char*)get_nice_memory(memory_size, false, this);
 	if (config.verbose)
@@ -222,6 +230,8 @@ void Script::_map_global_variables_to_memory(char *mem, int &offset, char *addre
 			//memset(v->memory, 0, v->type->size); // reset all global variables to 0
 		}
 	}
+	for (auto *cc: name_space->classes)
+		_map_global_variables_to_memory(mem, offset, address, cc);
 }
 
 void Script::map_global_variables_to_memory() {
@@ -571,7 +581,7 @@ void Script::compile() {
 
 	// initialize global objects
 	if (!config.compile_os)
-		init_all_global_objects(syntax);
+		init_all_global_objects(syntax, syntax->base_class);
 
 	//_expand(Opcode,OpcodeSize);
 

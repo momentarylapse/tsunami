@@ -55,6 +55,7 @@ class Edge
 		b = n[1]
 		for pp,i in p
 			param[i] = pp
+		#print(str(self))
 	void __assign__(Edge o)
 		pass
 	virtual float g(float dt)
@@ -240,7 +241,7 @@ class Circuit
 				G.add(b, b, g)
 	
 	void create_I(out float[] I, float I_in, float dt)
-		int n = nodes.num-1
+		int n = len(nodes)-1
 		I = [I_in]
 		I.resize(n)
 		for e in edges
@@ -253,7 +254,7 @@ class Circuit
 				I[b] -= I_off
 
 	void optimizer_step(float I_in, float dt)
-		int n = nodes.num-1
+		int n = len(nodes)-1
 		Matrix G
 		create_G(G, dt)
 		#print("G")
@@ -325,7 +326,7 @@ class Circuit
 		for n in nodes
 			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
 		for e in edges
-			s += edge_name(e.type) + ":{{e.a}}:{{e.b}}"
+			s += edge_name(e.type) + ":{{e.a}:{{e.b}}"
 			int n = len(e.param_names())
 			for i in 0:n
 				s += ":{{e.param[i]}}"
@@ -341,15 +342,15 @@ class Circuit
 			if len(x) == 0
 				continue
 			if x[0] == "Node"
-				nodes.add(Node(complex(x[1].float(), x[2].float())))
+				nodes.add(Node(complex(float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
-				out = x[1].int()
+				out = int(x[1])
 			else
 				int t = edge_type(x[0])
-				int[] n = [x[1].int(), x[2].int()]
+				int[] n = [int(x[1]), int(x[2])]
 				Edge* e = add_default(n, t)
 				for i in 3:len(x)
-					e.param[i] = x[i].float()
+					e.param[i] = float(x[i])
 	
 	Edge* add_default(int[]n, int t)
 		Edge* e = nil
@@ -366,18 +367,21 @@ class Circuit
 		else if t == TYPE_DIODE
 			e = new Diode(n)
 		else
-			raise(new Exception("unknown type: {{t}}"))
+			raise(new Exception("unknown type: " + t))
 		edges.add(e)
 		return e
 
 void _main()
 	Circuit c
+	#c.edges.add(new Resistor([0,1], 1))
 	#c.nodes.add(Node(complex(0,0)))
 	#c.edges.add(new Diode([0, 2]))
 	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
+	print(str(c))
 	SimResult res
 	c.simulate(1, 1, 0.1, 1, 0, res)
+	print(str(c))
 
 void __main()
 	Diode* d = new Diode([0,0])

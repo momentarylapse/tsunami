@@ -20,7 +20,7 @@ void fill(AudioBuffer buf)
 
 void sync()
 	bool found = false
-	for int i, 0, input.cur_buf.num
+	for i in 0:len(input.cur_buf)
 		if abs(input.cur_buf.r[i]) > 0.1
 			offset_in += i
 			print offset_in
@@ -29,7 +29,7 @@ void sync()
 	if found
 		delete dlg
 	else
-		offset_in += input.cur_buf.num
+		offset_in += len(input.cur_buf)
 
 void main()
 	synth.sample_rate = SAMPLE_RATE

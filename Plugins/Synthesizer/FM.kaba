@@ -386,7 +386,7 @@ Grid ? ''
 			if code[i] == 'x'
 				fc.osc[i].target_out = true
 			else
-				int t = code[i:i+1].int()
+				int t = int(code[i:i+1])
 				fc.osc[i].target[t] = true
 		update_osci_pos()
 		redraw("area")

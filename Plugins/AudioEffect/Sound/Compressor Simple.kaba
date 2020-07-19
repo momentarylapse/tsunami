@@ -48,11 +48,11 @@ class Compressor extends AudioEffect
 
 	void compress(out float[] b, out float[] squares, out float *gain)
 		float bmin = pow(10, MIN_DB/20)
-		for i in 0:b.num
+		for i in 0:len(b)
 		
 			# in level (filtered)
-			squares[i%squares.num] = b[i]*b[i]
-			float rms = sqrt(squares.sum() / squares.num * 2)
+			squares[i % len(squares)] = b[i]*b[i]
+			float rms = sqrt(squares.sum() / len(squares) * 2)
 			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
 			float in_level = MIN_DB

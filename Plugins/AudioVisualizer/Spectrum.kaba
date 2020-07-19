@@ -35,8 +35,8 @@ class SpecGrid extends Grid
 		
 
 	void create_lines()
-		pr.resize(ffr.num)
-		pl.resize(ffl.num)
+		pr.resize(len(ffr))
+		pl.resize(len(ffl))
 		for i in 0:len(ffr)
 			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
@@ -103,8 +103,8 @@ class Spectrum extends AudioVisualizer
 			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
 			int j0 = fmin * ww
 			int j1 = fmax * ww + 1
-			j0 = clamp(j0, 0, fr.num)
-			j1 = clamp(j1, 0, fr.num)
+			j0 = clamp(j0, 0, len(fr))
+			j1 = clamp(j1, 0, len(fr))
 			float bmaxr = 0
 			float bmaxl = 0
 			for j in j0:j1

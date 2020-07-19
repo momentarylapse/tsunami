@@ -38,12 +38,12 @@ class SpectrumCurve extends Curve
 			complex[] zr, zl
 			N = buf.length
 			b.get_spectrum(zr, zl, N)
-			spec.resize(zr.num)
+			spec.resize(len(zr))
 			for z,i in zr
 				spec[i] = log(z.abs())
 			ring.read_ref_done(b)
 	override float get(float freq)
 		int i = freq * N / sample_rate
-		if i >= spec.num-2
+		if i >= len(spec)-2
 			return 0
 		return spec[i]*10

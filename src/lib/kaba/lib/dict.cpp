@@ -66,32 +66,32 @@ void script_make_dict(Class *t, SyntaxTree *ps) {
 
 	if (p == TypeInt) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,int>::__init__);
-		class_add_funcx("set", TypeVoid, &IntDict::set_int);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &IntDict::set_int);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &IntDict::get_int, Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_GET, p, &IntDict::get_int, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_funcx("str", TypeString, &IntDict::str, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &IntDict::str, Flags::PURE);
 	} else if (p == TypeFloat32) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,float>::__init__);
-		class_add_funcx("set", TypeVoid, &FloatDict::set_float);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &FloatDict::set_float);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &FloatDict::get_float, Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_GET, p, &FloatDict::get_float, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_funcx("str", TypeString, &FloatDict::str, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &FloatDict::str, Flags::PURE);
 	} else if (p == TypeString) {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,string>::__init__);
-		class_add_funcx("set", TypeVoid, &Map<string,string>::set);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &Map<string,string>::set);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
-		class_add_funcx("__get__", p, &StringDict::get_string, Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_GET, p, &StringDict::get_string, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,string>::clear);
 		class_add_funcx("clear", TypeVoid, &Map<string,string>::clear);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &StringDict::assign);
 			func_add_param("other", t);
-		class_add_funcx("str", TypeString, &StringDict::str, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &StringDict::str, Flags::PURE);
 	}
 }
 

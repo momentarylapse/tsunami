@@ -324,14 +324,14 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 	if (type == TypeAny)
 		return *(Any*)var;
 	if (type->is_array()) {
-		Any a = EmptyArray;
+		Any a = Any::EmptyArray;
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<type->array_length; i++)
 			a.add(kaba_dyn((char*)var + t_el->size * i, t_el));
 		return a;
 	}
 	if (type->is_super_array()) {
-		Any a = EmptyArray;
+		Any a = Any::EmptyArray;
 		auto *ar = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<ar->num; i++)
@@ -339,7 +339,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		return a;
 	}
 	if (type->is_dict()) {
-		Any a = EmptyHash;
+		Any a = Any::EmptyMap;
 		auto *da = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<da->num; i++) {

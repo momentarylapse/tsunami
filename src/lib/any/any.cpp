@@ -1,33 +1,64 @@
 #include "any.h"
 #include "../base/map.h"
+#include "../config.h"
+
+#ifdef _X_USE_KABA_
+#include "../kaba/kaba.h"
+namespace Kaba {
+	extern const Class *TypeAnyList;
+	extern const Class *TypeAnyDict;
+}
+const void *_get_class(int t) {
+	if (t == Any::TYPE_INT)
+		return Kaba::TypeInt;
+	if (t == Any::TYPE_FLOAT)
+		return Kaba::TypeFloat32;
+	if (t == Any::TYPE_BOOL)
+		return Kaba::TypeBool;
+	if (t == Any::TYPE_STRING)
+		return Kaba::TypeString;
+	if (t == Any::TYPE_ARRAY)
+		return Kaba::TypeAnyList;
+	if (t == Any::TYPE_MAP)
+		return Kaba::TypeAnyDict;
+	return Kaba::TypeVoid;
+}
+#else
+	const void *_get_class(int t) {
+		return nullptr;
+	}
+#endif
 
 class AnyMap : public Map<string, Any> {};
 
 AnyMap _empty_dummy_map_;
-DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
+static DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
 
 Any EmptyVar;
 //Any EmptyMap = _empty_dummy_map_;
-Any EmptyArray = *(Array<Any>*)&_empty_dummy_array_;
-Any EmptyHash = Any(_empty_dummy_map_);
+Any Any::EmptyArray = *(Array<Any>*)&_empty_dummy_array_;
+Any Any::EmptyMap = Any(_empty_dummy_map_);
+
+//#define any_db(m)	msg_write(m)
+#define any_db(m)
 
 
 static string type_name(int t) {
-	if (t == TYPE_NONE)
+	if (t == Any::TYPE_NONE)
 		return "-none-";
-	if (t == TYPE_INT)
+	if (t == Any::TYPE_INT)
 		return "int";
-	if (t == TYPE_FLOAT)
+	if (t == Any::TYPE_FLOAT)
 		return "float";
-	if (t == TYPE_BOOL)
+	if (t == Any::TYPE_BOOL)
 		return "bool";
-	if (t == TYPE_STRING)
+	if (t == Any::TYPE_STRING)
 		return "string";
-	if (t == TYPE_ARRAY)
+	if (t == Any::TYPE_ARRAY)
 		return "array";
-	if (t == TYPE_HASH)
-		return "hash map";
-	if (t == TYPE_POINTER)
+	if (t == Any::TYPE_MAP)
+		return "map";
+	if (t == Any::TYPE_POINTER)
 		return "pointer";
 	return "-unknown type-";
 }
@@ -35,10 +66,20 @@ static string type_name(int t) {
 Any::Any() {
 	type = TYPE_NONE;
 	data = NULL;
+	parent = nullptr;
+#ifdef _X_USE_KABA_
+	_class = Kaba::TypeVoid;
+#else
+	_class = nullptr;
+#endif
 }
 
 void Any::__init__() {
 	new(this) Any;
+}
+
+void Any::__delete__() {
+	this->~Any();
 }
 
 Any::Any(const Any &a) : Any() {
@@ -76,14 +117,30 @@ Any::Any(const Array<Any> &a) : Any() {
 }
 
 Any::Any(const AnyMap &m) : Any() {
-	create_type(TYPE_HASH);
+	create_type(TYPE_MAP);
 	*as_map() = m;
 }
 
+Any Any::ref() {
+	Any r;
+	r.parent = this;
+	r.type = type;
+	r.data = data;
+	r._class = _class;
+	any_db(format("ref  %s -> %s:   %s", p2s(this), p2s(parent), str()));
+	return r;
+}
 
 void Any::create_type(int _type) {
+	if (parent) {
+		any_db(format("parent create  %s -> %s:   %s", p2s(this), p2s(parent), str()));
+		parent->create_type(_type);
+		sync_from_parent();
+		return;
+	}
 	clear();
 	type = _type;
+	_class = _get_class(type);
 	if (type == TYPE_INT) {
 		data = new int;
 	} else if (type == TYPE_FLOAT) {
@@ -96,7 +153,7 @@ void Any::create_type(int _type) {
 		data = new string;
 	} else if (type == TYPE_ARRAY) {
 		data = new Array<Any>;
-	} else if (type == TYPE_HASH) {
+	} else if (type == TYPE_MAP) {
 		data = new AnyMap;
 	} else if (type == TYPE_NONE) {
 	} else {
@@ -104,36 +161,65 @@ void Any::create_type(int _type) {
 	}
 }
 
+void Any::sync_to_parent() {
+	if (parent) {
+		any_db(format("sync  %s -> %s:   %s", p2s(this), p2s(parent), str()));
+		parent->data = data;
+		parent->type = type;
+		parent->_class = _class;
+		parent->sync_to_parent();
+	}
+}
+
+void Any::sync_from_parent() {
+	if (parent) {
+		any_db(format("sync  %s << %s:   %s", p2s(this), p2s(parent), parent->str()));
+		parent->sync_from_parent();
+		data = parent->data;
+		type = parent->type;
+		_class = parent->_class;
+	}
+}
+
 /*Any::Any(const AnyHashMap &a)
 {
-	type = TYPE_HASH;
+	type = TYPE_DICT;
 	data = new AnyHashMap;
 	*((AnyHashMap*)data) = a;
 }*/
 
-Any::~Any()
-{	clear();	}
+Any::~Any() {
+	if (!parent)
+		clear();
+}
 
 void Any::clear() {
-	//msg_write(format("clear %s  %p", type->Name, this));
-	if (type == TYPE_INT)
-		delete as_int();
-	else if (type == TYPE_FLOAT)
-		delete as_float();
-	else if (type == TYPE_BOOL)
-		delete as_bool();
-	else if (type == TYPE_STRING)
-		delete as_string();
-	else if (type == TYPE_ARRAY)
-		delete as_array();
-	else if (type == TYPE_HASH)
-		delete as_map();
-	else if (type == TYPE_POINTER)
-		delete as_pointer();
-	else if (type != TYPE_NONE)
-		msg_error("Any.clear(): " + type_name(type));
-	type = TYPE_NONE;
-	data = NULL;
+	//any_db(format("clear  %s", p2s(this)));
+	if (parent) {
+		any_db(format("parent clear  %s -> %s:   %s", p2s(this), p2s(parent), str()));
+		parent->clear();
+		sync_from_parent();
+	} else {
+		if (type == TYPE_INT)
+			delete as_int();
+		else if (type == TYPE_FLOAT)
+			delete as_float();
+		else if (type == TYPE_BOOL)
+			delete as_bool();
+		else if (type == TYPE_STRING)
+			delete as_string();
+		else if (type == TYPE_ARRAY)
+			delete as_array();
+		else if (type == TYPE_MAP)
+			delete as_map();
+		else if (type == TYPE_POINTER)
+			delete as_pointer();
+		else if (type != TYPE_NONE)
+			msg_error("any.clear(): " + type_name(type));
+		type = TYPE_NONE;
+		_class = _get_class(type);
+		data = NULL;
+	}
 }
 
 string Any::repr() const {
@@ -155,7 +241,7 @@ string Any::repr() const {
 			s += p.repr();
 		}
 		return s + "]";
-	} else if (type == TYPE_HASH) {
+	} else if (type == TYPE_MAP) {
 		string s = "{";
 		for (AnyMap::Entry &p: *as_map()) {
 			if (s.num > 1)
@@ -181,7 +267,7 @@ bool Any::_bool() const {
 		return *as_bool();
 	if (type == TYPE_INT)
 		return *as_int() != 0;
-	throw Exception("not bool: " + type_name(type));
+	throw Exception("can not interpret as bool: " + type_name(type));
 }
 
 int Any::_int() const {
@@ -193,7 +279,7 @@ int Any::_int() const {
 		return (int)*as_float();
 	if (type == TYPE_STRING)
 		return as_string()->_int();
-	throw Exception("not int: " + type_name(type));
+	throw Exception("can not interpret as int: " + type_name(type));
 }
 
 float Any::_float() const {
@@ -203,11 +289,14 @@ float Any::_float() const {
 		return *as_float();
 	if (type == TYPE_STRING)
 		return as_string()->_float();
-	throw Exception("not float: " + type_name(type));
+	throw Exception("can not interpret as float: " + type_name(type));
 }
 
-Any &Any::operator = (const Any &a) {
+void Any::operator = (const Any &a) {
 	if (&a != this) {
+		bool b = parent;
+		if (parent)
+			any_db("=   IS REF " + str());
 		create_type(a.type);
 		if (a.type == TYPE_INT) {
 			*as_int() = *a.as_int();
@@ -221,88 +310,84 @@ Any &Any::operator = (const Any &a) {
 			*as_string() = *a.as_string();
 		} else if (a.type == TYPE_ARRAY) {
 			*as_array() = *a.as_array();
-		} else if (a.type == TYPE_HASH) {
+		} else if (a.type == TYPE_MAP) {
 			*as_map() = *a.as_map();
 		} else if (a.type != TYPE_NONE) {
 			clear();
-			msg_error("Any = Any: " + type_name(a.type));
+			msg_error("any = any: " + type_name(a.type));
 		}
+		if (b)
+			any_db(str());
 	}
-	return *this;
 }
 
-Any Any::operator + (const Any &a) const
-{
-	if ((type == TYPE_INT) && (a.type == TYPE_INT))
-		return *(int*)data + *(int*)a.data;
-	if ((type == TYPE_FLOAT) && (a.type == TYPE_FLOAT))
-		return *(float*)data + *(float*)a.data;
-	if ((type == TYPE_INT) && (a.type == TYPE_FLOAT))
-		return (float)*(int*)data + *(float*)a.data;
-	if ((type == TYPE_FLOAT) && (a.type == TYPE_INT))
-		return *(float*)data + (float)*(int*)a.data;
-	if ((type == TYPE_STRING) && (a.type == TYPE_STRING))
-		return *(string*)data + *(string*)a.data;
-	msg_error("Any + Any: " + type_name(type) + " + " + type_name(a.type));
-	return EmptyVar;
+Any Any::operator + (const Any &a) const {
+	if ((type == TYPE_INT) and (a.type == TYPE_INT))
+		return _int() + a._int();
+	if ((type == TYPE_FLOAT or type == TYPE_INT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+		return _float() + a._float();
+	if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
+		return str() + a.str();
+	throw Exception(format("%s + %s not allowed", type_name(type), type_name(a.type)));
+	return Any();
 }
 
-Any Any::operator - (const Any &a) const
-{
-	if ((type == TYPE_INT) && (a.type == TYPE_INT))
-		return *(int*)data - *(int*)a.data;
-	if ((type == TYPE_FLOAT) && (a.type == TYPE_FLOAT))
-		return *(float*)data - *(float*)a.data;
-	if ((type == TYPE_INT) && (a.type == TYPE_FLOAT))
-		return (float)*(int*)data - *(float*)a.data;
-	if ((type == TYPE_FLOAT) && (a.type == TYPE_INT))
-		return *(float*)data - (float)*(int*)a.data;
-	msg_error("Any - Any: " + type_name(type) + " - " + type_name(a.type));
-	return EmptyVar;
+Any Any::operator - (const Any &a) const {
+	if ((type == TYPE_INT) and (a.type == TYPE_INT))
+		return _int() - a._int();
+	if ((type == TYPE_FLOAT or type == TYPE_INT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+		return _float() - a._float();
+	throw Exception(format("%s - %s not allowed", type_name(type), type_name(a.type)));
+	return Any();
 }
 
-void Any::operator += (const Any &a)
-{
-	if ((type == TYPE_INT) && (a.type == TYPE_INT))
-		*(int*)data += *(int*)a.data;
-	else if ((type == TYPE_FLOAT) && (a.type == TYPE_FLOAT))
-		*(float*)data += *(float*)a.data;
-	else if ((type == TYPE_INT) && (a.type == TYPE_FLOAT))
-		*(int*)data += (int)*(float*)a.data;
-	else if ((type == TYPE_FLOAT) && (a.type == TYPE_INT))
-		*(float*)data += (float)*(int*)a.data;
-	else if ((type == TYPE_STRING) && (a.type == TYPE_STRING))
-		*(string*)data += *(string*)a.data;
-	else if ((type == TYPE_ARRAY) && (a.type == TYPE_ARRAY))
+void Any::operator += (const Any &a) {
+	if ((type == TYPE_INT) and (a.type == TYPE_INT or a.type == TYPE_FLOAT))
+		*as_int() += a._int();
+	else if ((type == TYPE_FLOAT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+		*as_float() += a._float();
+	else if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
+		*as_string() += a.str();
+	else if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY))
 		append(a);
 	else if (type == TYPE_ARRAY)
 		add(a);
 	else
-		msg_error("Any += Any: " + type_name(type) + " += " + type_name(a.type));
+		throw Exception(format("%s += %s not allowed", type_name(type), type_name(a.type)));
 }
 
 void Any::add(const Any &a) {
-	if (type == TYPE_NONE) {
-		type = TYPE_ARRAY;
-		data = new Array<Any>;
+	if (parent) {
+		parent->add(a);
+		sync_from_parent();
+		any_db(format("parent add  %s -> %s:   %s", p2s(this), p2s(parent), str()));
+		return;
 	}
+	if (type == TYPE_NONE)
+		create_type(TYPE_ARRAY);
 	if (type == TYPE_ARRAY) {
 		if (&a == this) {
 			Any b = a;
-			((Array<Any>*)data)->add(b);
+			as_array()->add(b);
 		} else {
-			((Array<Any>*)data)->add(a);
+			as_array()->add(a);
 		}
 	} else {
-		throw Exception("not an array: " + type_name(type));
+		throw Exception("only allowed for arrays: " + type_name(type));
 	}
 }
 
+// TODO: map.append(map)
 void Any::append(const Any &a) {
-	if (type == TYPE_NONE) {
-		type = TYPE_ARRAY;
-		data = new Array<Any>;
+	if (parent) {
+		parent->append(a);
+		sync_from_parent();
+		return;
 	}
+	if (a.type != TYPE_ARRAY)
+		throw Exception("parameter not an array: " + type_name(a.type));
+	if (type == TYPE_NONE)
+		create_type(TYPE_ARRAY);
 	if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY)) {
 		if (&a == this) {
 			Any b = a;
@@ -311,69 +396,55 @@ void Any::append(const Any &a) {
 			as_array()->append(*a.as_array());
 		}
 	} else {
-		throw Exception("not an array: " + type_name(type) + " " + type_name(a.type));
+		throw Exception("not an array: " + type_name(type));
 	}
 }
 
 int Any::length() {
 	if (type == TYPE_ARRAY)
 		return as_array()->num;
-	if (type == TYPE_HASH)
+	if (type == TYPE_MAP)
 		return as_map()->num;
 	if (type == TYPE_STRING)
 		return as_string()->num;
 	return 0;
 }
 
-Any &Any::operator[] (int index)
-{
-	if (type == TYPE_ARRAY)
-		return (*(Array<Any>*)data)[index];
-	msg_error("Any[]: not an array: " + type_name(type));
-	return EmptyVar;
+Any &Any::operator[] (int index) {
+	if (type != TYPE_ARRAY)
+		msg_error("only allowed for arrays: " + type_name(type));
+	return (*as_array())[index];
 }
 
-const Any &Any::operator[] (int index) const
-{
-	if (type == TYPE_ARRAY)
-		return (*(Array<Any>*)data)[index];
-	msg_error("Any[]: not an array: " + type_name(type));
-	return EmptyVar;
+const Any &Any::operator[] (int index) const {
+	if (type != TYPE_ARRAY)
+		msg_error("only allowed for arrays: " + type_name(type));
+	return (*as_array())[index];
 }
 
-Any &Any::back()
-{
-	if (type == TYPE_ARRAY)
-		return ((Array<Any>*)data)->back();
-	msg_error("Any.back: not an array: " + type_name(type));
-	return EmptyVar;
+Any &Any::back() {
+	if (type != TYPE_ARRAY)
+		msg_error("only allowed for arrays: " + type_name(type));
+	return as_array()->back();
 }
 
-const Any &Any::operator[] (const string &key) const
-{
-	if (type == TYPE_HASH)
-		return (*(AnyMap*)data)[key];
-	msg_error("Any[]: not a hash map: " + type_name(type));
-	return EmptyVar;
+const Any &Any::operator[] (const string &key) const {
+	if (type != TYPE_MAP)
+		msg_error("only allowed for maps: " + type_name(type));
+	return (*as_map())[key];
 }
 
-Any &Any::operator[] (const string &key)
-{
-	if (type == TYPE_NONE){
-		type = TYPE_HASH;
-		data = new AnyMap;
-	}
-	if (type == TYPE_HASH){
-		//msg_write(p2s(&(*(HashMap*)data)[key]));
-		return (*(AnyMap*)data)[key];
-	}
-	msg_error("Any[]: not a hash map: " + type_name(type));
-	return EmptyVar;
+Any &Any::operator[] (const string &key) {
+	if (type == TYPE_NONE)
+		create_type(TYPE_MAP);
+	if (type != TYPE_MAP)
+		msg_error("only allowed for maps: " + type_name(type));
+	return (*as_map())[key];
 }
 
 Array<string> Any::keys() const {
-	if (type != TYPE_HASH)
-		return {}; //throw Exception("not a hash map: " + type_name(type));
+	if (type != TYPE_MAP)
+		return {};
 	return as_map()->keys();
 }
 
@@ -405,36 +476,53 @@ Array<Any>* Any::as_array() const {
 	return (Array<Any>*)data;
 }
 
-Any Any::array_get(int i) const {
+Any Any::array_get(int i) {
 	if (type != TYPE_ARRAY)
 		throw Exception("not an array: " + type_name(type));
-	return (*this)[i];
+	return (*this)[i].ref();
 }
 
 void Any::array_set(int i, const Any &value) {
-	if (type == TYPE_NONE) {
-		type = TYPE_ARRAY;
-		data = new Array<Any>;
+	if (parent) {
+		parent->array_set(i, value);
+		sync_from_parent();
+		return;
 	}
+	if (type == TYPE_NONE)
+		create_type(TYPE_ARRAY);
 	if (type != TYPE_ARRAY)
 		throw Exception("not an array: " + type_name(type));
 	(*this)[i] = value;
 }
 
-Any Any::map_get(const string &key) const {
-	if (type != TYPE_HASH)
-		throw Exception("not a hash map: " + type_name(type));
+Any Any::map_get(const string &key) {
+	if (type != TYPE_MAP)
+		throw Exception("not a map: " + type_name(type));
 	if (!as_map()->contains(key))
 		throw Exception("key not found: " + key);
-	return (*as_map())[key];
+	return (*as_map())[key].ref();
 }
 
 void Any::map_set(const string &key, const Any &value) {
-	if (type == TYPE_NONE) {
-		type = TYPE_HASH;
-		data = new AnyMap;
+	if (parent) {
+		parent->map_set(key, value);
+		sync_from_parent();
+		return;
 	}
-	if (type != TYPE_HASH)
-		throw Exception("not a hash map: " + type_name(type));
+	if (type == TYPE_NONE)
+		create_type(TYPE_MAP);
+	if (type != TYPE_MAP)
+		throw Exception("not a map: " + type_name(type));
 	as_map()->set(key, value);
+}
+
+void Any::map_drop(const string &key) {
+	if (parent) {
+		parent->map_drop(key);
+		sync_from_parent();
+		return;
+	}
+	if (type != TYPE_MAP)
+		throw Exception("not a map: " + type_name(type));
+	as_map()->drop(key);
 }

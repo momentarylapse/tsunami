@@ -1175,6 +1175,12 @@ string str_unescape(const string &str)
 		if ((str[i]=='\\')and(str[i+1]=='n')){
 			r += "\n";
 			i ++;
+		}else if ((str[i]=='\\')and(str[i+1]=='r')){
+			r += "\r";
+			i++;
+		}else if ((str[i]=='\\')and(str[i+1]=='0')){
+			r += "\0";
+			i++;
 		}else if ((str[i]=='\\')and(str[i+1]=='\\')){
 			r += "\\";
 			i++;
@@ -1187,8 +1193,12 @@ string str_unescape(const string &str)
 		}else if ((str[i]=='\\')and(str[i+1]=='"')){
 			r += "\"";
 			i++;
-		}else
+		}else if ((str[i]=='\\')and(str[i+1]=='\'')){
+			r += "'";
+			i++;
+		}else{
 			r.add(str[i]);
+		}
 	}
 	return r;
 }
@@ -1203,10 +1213,14 @@ string str_escape(const string &str)
 			r += "\\t";
 		else if (str[i] == '\n')
 			r += "\\n";
+		else if (str[i] == '\r')
+			r += "\\r";
 		else if (str[i] == '\\')
 			r += "\\\\";
 		else if (str[i] == '\"')
 			r += "\\\"";
+		else if (str[i] == '\0')
+			r += "\\0";
 		else
 			r.add(str[i]);
 	}

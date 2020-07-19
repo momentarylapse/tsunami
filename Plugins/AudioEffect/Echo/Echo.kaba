@@ -26,7 +26,7 @@ class Echo extends AudioEffect
 
 
 	void do_delay(out float[] b, out float[] d)
-		int p = offset % d.num
+		int p = offset % len(d)
 		for bb in b
 	
 			# old value
@@ -40,7 +40,7 @@ class Echo extends AudioEffect
 			d[p] = b0 + d[p] * config.feedback
 		
 			p ++
-			if p >= d.num
+			if p >= len(d)
 				p = 0
 
 

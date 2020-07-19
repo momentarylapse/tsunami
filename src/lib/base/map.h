@@ -6,8 +6,7 @@
 
 
 template<class T1, class T2>
-struct MapEntry
-{
+struct MapEntry {
 	T1 key;
 	T2 value;
 	bool operator == (const MapEntry<T1, T2> &e) const
@@ -16,58 +15,53 @@ struct MapEntry
 	{	return key > e.key;	}
 };
 
-class MapKeyError : public Exception
-{
+class MapKeyError : public Exception {
 public:
 	MapKeyError(): Exception("key not found"){}
 };
 
 template<class T1, class T2>
-class Map : public Set<MapEntry<T1, T2> >
-{
+class Map : public Set<MapEntry<T1, T2> > {
 public:
 	typedef MapEntry<T1, T2> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	void _cdecl set(const T1 &key, const T2 &value)
-	{
+	void _cdecl set(const T1 &key, const T2 &value) {
 		int n = find(key);
-		if (n >= 0){
+		if (n >= 0) {
 			((Entry*)data)[n].value = value;
-		}else{
+		} else {
 			MapEntry<T1, T2> e = {key, value};
 			Set<MapEntry<T1, T2> >::add(e);
 		}
 	}
-	int _cdecl find(const T1 &key) const
-	{
+	int _cdecl find(const T1 &key) const {
 		Entry e = {key, T2()};
 		return Set<Entry>::find(e);
 	}
-	bool _cdecl contains(const T1 &key) const
-	{
+	bool _cdecl contains(const T1 &key) const {
 		return find(key) >= 0;
 	}
-	const T2 &operator[] (const T1 &key) const
-	{
+	const T2 &operator[] (const T1 &key) const {
 		//msg_write("const[]");
 		int n = find(key);
-		if (n >= 0)
-			return ((Entry*)data)[n].value;
-		throw MapKeyError();
-		//return T2();
+		if (n < 0)
+			throw MapKeyError();
+		return ((Entry*)data)[n].value;
 	}
-	T2 &operator[] (const T1 &key)
-	{
+	T2 &operator[] (const T1 &key) {
 		int n = find(key);
-		if (n >= 0)
-			return ((Entry*)data)[n].value;
-
-		throw MapKeyError();
-		//return T2();
+		if (n < 0)
+			throw MapKeyError();
+		return ((Entry*)data)[n].value;
 	}
-	Array<T1> keys() const
-	{
+	void drop(const T1 &key) {
+		int n = find(key);
+		if (n < 0)
+			throw MapKeyError();
+		Array<MapEntry<T1, T2> >::erase(n);
+	}
+	Array<T1> keys() const {
 		Array<T1> keys;
 		for (int i=0; i<this->num; i++)
 			keys.add(((Entry*)data)[i].key);

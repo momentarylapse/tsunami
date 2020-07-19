@@ -27,7 +27,7 @@ void SIAddPackageTime() {
 		class_add_elementx("time", TypeInt64, &Date::time);
 		class_add_funcx("format", TypeString, &Date::format, Flags::PURE);
 			func_add_param("f", TypeString);
-		class_add_funcx("str", TypeString, &Date::str, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &Date::str, Flags::PURE);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&Date::__assign__));
 			func_add_param("o", TypeDate);
 		class_add_funcx("now", TypeDate, &Date::now, Flags::STATIC);

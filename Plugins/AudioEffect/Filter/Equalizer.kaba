@@ -235,7 +235,7 @@ class EqualizerGrid extends Grid
 			t = FILTER_HIGH_SHELF
 		vector m = right_click_mouse_pos
 		c.peaks.add(Peak(t, freq_to_pitch(m.x), m.y - c.gain, 2))
-		selected = c.peaks.num - 1
+		selected = len(c.peaks) - 1
 		hover = selected
 		cp.changed()
 		redraw()
@@ -268,7 +268,7 @@ class EqualizerGrid extends Grid
 			hover = -1
 			if abs(my - y_axis.project(c.gain)) < 10
 				hover = HOVER_GAIN
-			for i in 0:c.peaks.num
+			for i in 0:len(c.peaks)
 				if mouse_over_point2(c.peaks[i].z(c.gain))
 					hover = i
 		redraw()

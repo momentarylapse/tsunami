@@ -109,8 +109,8 @@ class ShowSpectrogram extends SongPlugin
 				float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
 				int j0 = fmin * ww
 				int j1 = fmax * ww + 1
-				j0 = clamp(j0, 0, f.num)
-				j1 = clamp(j1, 0, f.num)
+				j0 = clamp(j0, 0, len(f))
+				j1 = clamp(j1, 0, len(f))
 				
 				# find maximum amplitude in that frequency interval
 				float bmaxr = 0

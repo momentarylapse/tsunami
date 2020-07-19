@@ -18,7 +18,7 @@ class HullCurve extends AudioEffect
 		const void fill_inter(out FloatInterpolator fi)
 			fi.set_type("cubic-spline-notang")
 			fi.add(curve[0].y, 0)
-			for i in 1:curve.num
+			for i in 1:len(curve)
 				fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 			fi.normalize()
 
@@ -36,8 +36,8 @@ class HullCurve extends AudioEffect
 		config.fill_inter(fi)
 	
 		# hull curve
-		for i in 1:b.num
-			float param = float(i) / b.num
+		for i in 1:len(b)
+			float param = float(i) / len(b)
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
@@ -62,7 +62,7 @@ class HullGrid extends Grid
 		draw_curve(c, fi, true)
 	
 		# points
-		for i in 0:config.curve.num
+		for i in 0:len(config.curve)
 			draw_point2(c, config.curve[i], i == selected, i == hover)
 
 	# left button down -> select
@@ -73,7 +73,7 @@ class HullGrid extends Grid
 	# [Delete] -> remove point
 	override void on_key_down()
 		if GetEvent().key_code == KEY_DELETE
-			if selected > 0 and selected < config.curve.num-1
+			if selected > 0 and selected < len(config.curve)-1
 				config.curve.remove(selected)
 				cp.changed()
 				selected = -1
@@ -81,7 +81,7 @@ class HullGrid extends Grid
 
 	# right button down -> new point
 	override void on_right_button_down()
-		for i in 1:config.curve.num
+		for i in 1:len(config.curve)
 			complex q = project2(config.curve[i - 1])
 			complex p = project2(config.curve[i])
 			if (mx > q.x) and (mx < p.x)
@@ -89,7 +89,7 @@ class HullGrid extends Grid
 				cp.changed()
 				selected = i
 				redraw()
-				i = config.curve.num
+				i = len(config.curve)
 				break
 
 	override void on_mouse_move()
@@ -100,11 +100,11 @@ class HullGrid extends Grid
 			float xmax = 1
 			if selected > 0
 				xmin = config.curve[selected - 1].x
-			if selected < config.curve.num - 1
+			if selected < len(config.curve) - 1
 				xmax = config.curve[selected + 1].x
 			config.curve[selected].x = clamp(config.curve[selected].x, xmin, xmax)
 			config.curve[selected].y = clamp(config.curve[selected].y, MIN_VOL, MAX_VOL)
-			if selected == config.curve.num - 1
+			if selected == len(config.curve) - 1
 				config.curve[selected].x = 1
 			if selected == 0
 				config.curve[selected].x = 0

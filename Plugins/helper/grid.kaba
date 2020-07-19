@@ -10,7 +10,7 @@ class Curve
 	virtual float get(float x)
 	virtual float[] get_list(float[] xx)
 		float[] r
-		r.resize(xx.num)
+		r.resize(len(xx))
 		for x,i in xx
 			r[i] = get(x)
 		return r
@@ -280,7 +280,7 @@ class Grid extends Object
 			if yy < y_axis.area.y1 or yy > y_axis.area.y2
 				continue
 			c.draw_line(x, yy, x + w, yy)
-			if t.label.num > 0
+			if len(t.label) > 0
 				c.set_color(col_line)
 				c.draw_line(x, yy, x + 6, yy)
 				c.draw_str(x0 + 2, yy - 3, t.label)
@@ -292,7 +292,7 @@ class Grid extends Object
 			if xx < x_axis.area.x1 or xx > x_axis.area.x2
 				continue
 			c.draw_line(xx, y, xx, y + h)
-			if t.label.num > 0
+			if len(t.label) > 0
 				c.set_color(col_line)
 				c.draw_line(xx, y + h - 6, xx, y + h)
 				c.draw_str(xx - 8, y + h + 8, t.label)
@@ -345,7 +345,7 @@ class Grid extends Object
 			pp.add(complex(x, y + h))
 			c.set_color(color(0.3, 0.3, 0.3, 1))
 			c.draw_polygon(pp)
-			pp.resize(pp.num - 2)
+			pp.resize(len(pp) - 2)
 		c.set_line_width(2)
 		c.set_color(col_line)
 		c.draw_lines(pp)
@@ -365,7 +365,7 @@ class Grid extends Object
 			pp.add(complex(x, y + h))
 			c.set_color(curve.col_below)
 			c.draw_polygon(pp)
-			pp.resize(pp.num - 2)
+			pp.resize(len(pp) - 2)
 		c.set_line_width(2)
 		c.set_color(curve.col)
 		c.draw_lines(pp)
@@ -381,7 +381,7 @@ class Grid extends Object
 			col2.a = 0.3
 			c.set_color(col2)
 			c.draw_polygon(pp)
-			pp.resize(pp.num - 2)
+			pp.resize(len(pp) - 2)
 		c.set_line_width(0.9)
 		c.set_color(col)
 		c.draw_lines(pp)

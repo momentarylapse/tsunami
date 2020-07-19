@@ -15,17 +15,17 @@ bool click_end(float last, float cur)
 
 int[] find_clicks(float[] b)
 	int[] clicks
-	for i in 1:b.num-1
+	for i in 1:len(b)-1
 		if click_start(b[i-1], b[i])
 			clicks.add(i)
-			int j1 = min(b.num, i + MAX_CLICK_SAMPLES)
+			int j1 = min(len(b), i + MAX_CLICK_SAMPLES)
 			for j in i:j1
 				if click_end(b[j-1], b[j])
 					i = j
 					clicks.add(i)
 					break
 	
-	for i in 0:clicks.num-2:2
+	for i in 0:len(clicks)-2:2
 		if clicks[i+2] - clicks[i+1] < MIN_CLICK_SAMPLES
 			clicks.remove(i+2)
 			clicks.remove(i+1)
@@ -35,7 +35,7 @@ int[] find_clicks(float[] b)
 
 void unclick(out float[] b, out TrackLayer l, int offset)
 	int[] clicks = find_clicks(b)
-	for i in 0:clicks.num:2
+	for i in 0:len(clicks):2
 		l.add_marker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click")
 		#l.addMarker(clicks[i+1] + offset, "]")
 

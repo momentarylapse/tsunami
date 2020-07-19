@@ -16,9 +16,9 @@ class XXX extends SongPlugin
 			print(s.get_value("pitch"))
 			if s.get_value("pitch") == ""
 				continue
-			int pitch = s.get_value("pitch").int()
+			int pitch = int(s.get_value("pitch"))
 			print(pitch)
-			if pitch >= synth.config.samples.num
+			if pitch >= len(synth.config.samples)
 				synth.config.samples.resize(pitch+1)
 			if synth.config.samples[pitch] == nil
 				synth.config.samples[pitch] = s.create_ref()

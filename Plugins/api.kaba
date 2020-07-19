@@ -30,7 +30,7 @@ class Range
 	extern const bool overlaps(Range o)
 	extern const bool covers(Range o)
 	extern const Range __and__(Range o)
-	extern const string str()
+	extern const string __str__()
 	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
 const Range RangeTo(int start, int end)
@@ -69,7 +69,7 @@ class MidiEvent
 		flags = 0
 		stringno = -1
 		clef_position = -1
-	const string str()
+	const string __str__()
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
 class MidiEventBuffer extends MidiEvent[]

@@ -30,14 +30,16 @@
 
 namespace Kaba{
 
-string LibVersion = "0.18.5.2";
-
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
 const string IDENTIFIER_FUNC_DELETE = "__delete__";
 const string IDENTIFIER_FUNC_ASSIGN = "__assign__";
 const string IDENTIFIER_FUNC_GET = "__get__";
+const string IDENTIFIER_FUNC_SET = "__set__";
+const string IDENTIFIER_FUNC_LENGTH = "__length__";
+const string IDENTIFIER_FUNC_STR = "__str__";
+const string IDENTIFIER_FUNC_REPR = "__repr__";
 const string IDENTIFIER_FUNC_SUBARRAY = "__subarray__";
 const string IDENTIFIER_SUPER = "super";
 const string IDENTIFIER_SELF = "self";
@@ -572,6 +574,13 @@ void func_add_param(const string &name, const Class *type) {
 	}
 }
 
+class PointerList : public Array<void*> {
+public:
+	bool __contains__(void *x) {
+		return find(x) >= 0;
+	}
+};
+
 void script_make_super_array(Class *t, SyntaxTree *ps)
 {
 	const Class *p = t->param;
@@ -593,6 +602,8 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_p_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
+				class_add_funcx("__contains__", TypeBool, &PointerList::__contains__);
+					func_add_param("x", p);
 			}else if (p == TypeFloat32){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<float>::__init__);
 				class_add_funcx("add", TypeVoid, &DynamicArray::append_f_single);
@@ -663,8 +674,8 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 		}
 	if (!c.f){
 #ifdef _X_USE_HUI_
-		hui::ErrorBox(nullptr, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
-		hui::RaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");
+		hui::ErrorBox(nullptr, "", "add_type_cast (ScriptInit): " + cmd + " not found");
+		hui::RaiseError("add_type_cast (ScriptInit): " + cmd + " not found");
 #else
 		msg_error("add_type_cast (ScriptInit): " + string(cmd) + " not found"));
 		exit(1);
@@ -795,13 +806,13 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 
 
 
-	add_type_cast(10, TypeInt, TypeFloat32, "int.float");
-	add_type_cast(10, TypeInt, TypeInt64, "int.int64");
-	add_type_cast(15, TypeInt64, TypeInt, "int64.int");
-	add_type_cast(10, TypeFloat32, TypeFloat64,"float.float64");
-	add_type_cast(20, TypeFloat32, TypeInt, "float.int");
-	add_type_cast(10, TypeInt, TypeChar, "int.char");
-	add_type_cast(20, TypeChar, TypeInt, "char.int");
+	add_type_cast(10, TypeInt, TypeFloat32, "int.__float__");
+	add_type_cast(10, TypeInt, TypeInt64, "int.__int64__");
+	add_type_cast(15, TypeInt64, TypeInt, "int64.__int__");
+	add_type_cast(10, TypeFloat32, TypeFloat64,"float.__float64__");
+	add_type_cast(20, TypeFloat32, TypeInt, "float.__int__");
+	add_type_cast(10, TypeInt, TypeChar, "int.__char__");
+	add_type_cast(20, TypeChar, TypeInt, "char.__int__");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
 	cur_package = Packages[2];

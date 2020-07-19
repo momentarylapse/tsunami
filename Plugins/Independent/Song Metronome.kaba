@@ -190,7 +190,7 @@ Grid ? '' vertical
 		
 		Bar* cur_bar = song.bars[cur_bar_index]
 		Bar* next_bar = nil
-		if cur_bar_index + 1 < song.bars.num
+		if cur_bar_index + 1 < len(song.bars)
 			next_bar = song.bars[cur_bar_index + 1]
 		
 		int offset = cur_bar.offset
@@ -208,13 +208,13 @@ Grid ? '' vertical
 		if next_part and next_part != cur_part
 			change = next_part.text
 		if next_bar
-			if next_bar.beats.num != cur_bar.beats.num
+			if len(next_bar.beats) != len(cur_bar.beats)
 				change += "  {{len(next_bar.beats)}}/₄"
 			float cur_bpm = cur_bar.bpm(song.sample_rate)
 			float next_bpm = next_bar.bpm(song.sample_rate)
 			if abs(cur_bpm - next_bpm) > 2
 				change += "  {{next_bpm|.0}} bpm"
-		if change.num > 0
+		if len(change) > 0
 			p.set_color(colors.text)
 			p.draw_str(20, 5 + fs*1.2 + 5, "> {{change}}")
 				

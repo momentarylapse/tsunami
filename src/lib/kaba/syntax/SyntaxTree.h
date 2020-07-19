@@ -182,6 +182,7 @@ public:
 	Node *apply_params_direct(Node *operand, Array<Node*> &params);
 	Node *force_concrete_type(Node *node);
 	void force_concrete_types(Array<Node*> &nodes);
+	Node *deref_if_pointer(Node *node);
 
 	Node *link_special_operator_is(Node *param1, Node *param2);
 	Node *link_special_operator_in(Node *param1, Node *param2);
@@ -253,7 +254,8 @@ public:
 
 	// pre processor
 	Node *conv_eval_const_func(Node *c);
-	void eval_const_expressions();
+	Node *conv_eval_const_func_nofunc(Node *c);
+	void eval_const_expressions(bool allow_func_eval);
 	Node *pre_process_node_addresses(Node *c);
 	void pre_processor_addresses();
 	void simplify_shift_deref();

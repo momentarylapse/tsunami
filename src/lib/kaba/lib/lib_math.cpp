@@ -175,6 +175,7 @@ void kaba_array_resize(void *p, const Class *type, int num);
 class KabaAny : public Any {
 public:
 	Any _cdecl _map_get(const string &key)
+	//{ return map_get(key); }
 	{ KABA_EXCEPTION_WRAPPER(return map_get(key)); return Any(); }
 	void _cdecl _map_set(const string &key, Any &a)
 	{ KABA_EXCEPTION_WRAPPER(map_set(key, a)); }
@@ -184,6 +185,20 @@ public:
 	{ KABA_EXCEPTION_WRAPPER(array_set(i, a)); }
 	void _cdecl _array_add(Any &a)
 	{ KABA_EXCEPTION_WRAPPER(add(a)); }
+	Array<Any> _as_array() {
+		if (type != TYPE_ARRAY)
+			kaba_raise_exception(new KabaException("not an array"));
+		Array<Any> r;
+		r.set_ref(*as_array());
+		return r;
+	}
+	Array<int> _as_map() { // FAKE TYPE!!!
+		if (type != TYPE_MAP)
+			kaba_raise_exception(new KabaException("not a map"));
+		Array<int> r;
+		r.set_ref(*(Array<int>*)as_map());
+		return r;
+	}
 	
 	static void unwrap(Any &aa, void *var, const Class *type) {
 		if (type == TypeInt) {
@@ -210,7 +225,7 @@ public:
 			int n = min(type->array_length, b->num);
 			for (int i=0; i<n; i++)
 				unwrap((*b)[i], (char*)var + i*t_el->size, t_el);
-		} else if (aa.type == TYPE_HASH) {
+		} else if (aa.type == TYPE_MAP) {
 			auto *map = aa.as_map();
 			auto keys = aa.keys();
 			for (auto &e: type->elements)
@@ -269,18 +284,18 @@ void SIAddPackageMath() {
 	TypeColor = add_type("color", sizeof(color));
 	TypeColorList = add_type_l(TypeColor);
 	TypeMatrix3 = add_type("matrix3", sizeof(matrix3));
-	const Class *TypeFloatArray3 = add_type_a(TypeFloat32, 3);
-	const Class *TypeFloatArray4 = add_type_a(TypeFloat32, 4);
-	const Class *TypeFloatArray4x4 = add_type_a(TypeFloatArray4, 4);
-	const Class *TypeFloatArray16 = add_type_a(TypeFloat32, 16);
-	const Class *TypeFloatArray3x3 = add_type_a(TypeFloatArray3, 3);
-	const Class *TypeFloatArray9 = add_type_a(TypeFloat32, 9);
-	const Class *TypeVli = add_type("vli", sizeof(vli));
-	const Class *TypeCrypto = add_type("Crypto", sizeof(Crypto));
+	auto TypeFloatArray3 = add_type_a(TypeFloat32, 3);
+	auto TypeFloatArray4 = add_type_a(TypeFloat32, 4);
+	auto TypeFloatArray4x4 = add_type_a(TypeFloatArray4, 4);
+	auto TypeFloatArray16 = add_type_a(TypeFloat32, 16);
+	auto TypeFloatArray3x3 = add_type_a(TypeFloatArray3, 3);
+	auto TypeFloatArray9 = add_type_a(TypeFloat32, 9);
+	auto TypeVli = add_type("vli", sizeof(vli));
+	auto TypeCrypto = add_type("Crypto", sizeof(Crypto));
 	TypeAny = add_type("any", sizeof(Any));
-	const Class *TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
-	const Class *TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
-	const Class *TypeRandom = add_type("Random", sizeof(Random));
+	auto TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
+	auto TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
+	auto TypeRandom = add_type("Random", sizeof(Random));
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
@@ -309,7 +324,7 @@ void SIAddPackageMath() {
 		class_add_func("abs", TypeFloat32, mf(&complex::abs), Flags::PURE);
 		class_add_func("abs_sqr", TypeFloat32, mf(&complex::abs_sqr), Flags::PURE);
 		class_add_func("bar", TypeComplex, 		mf(&complex::bar), Flags::PURE);
-		class_add_func("str", TypeString, mf(&complex::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&complex::str), Flags::PURE);
 		class_add_const("I", TypeComplex, &complex::I);
 		class_add_func("_create", TypeComplex, (void*)__complex_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::COMPLEX_SET);
@@ -373,6 +388,7 @@ void SIAddPackageMath() {
 		class_add_elementx("y", TypeFloat32, &vector::y);
 		class_add_elementx("z", TypeFloat32, &vector::z);
 		class_add_element("_e", TypeFloatArray3, 0);
+		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeFloat32, type_p(mf(&vector::length)), Flags::PURE);
 		class_add_func("length", TypeFloat32, type_p(mf(&vector::length)), Flags::PURE);
 		class_add_func("length_sqr", TypeFloat32, type_p(mf(&vector::length_sqr)), Flags::PURE);
 		class_add_func("length_fuzzy", TypeFloat32, type_p(mf(&vector::length_fuzzy)), Flags::PURE);
@@ -386,7 +402,7 @@ void SIAddPackageMath() {
 //		class_add_func("__div__", TypeVector, mf(&vector::untransform), Flags::PURE);
 //			func_add_param("m", TypeMatrix);
 		class_add_func("ortho", TypeVector, mf(&vector::ortho), Flags::PURE);
-		class_add_func("str", TypeString, mf(&vector::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&vector::str), Flags::PURE);
 		class_add_func("dot", TypeFloat32, (void*)&vector::dot, Flags::_STATIC__PURE);
 			func_add_param("v1", TypeVector);
 			func_add_param("v2", TypeVector);
@@ -447,7 +463,7 @@ void SIAddPackageMath() {
 		class_add_func("bar", TypeQuaternion, mf(&quaternion::bar), Flags::PURE);
 		class_add_func("normalize", TypeVoid, mf(&quaternion::normalize));
 		class_add_func("angles", TypeVector, mf(&quaternion::get_angles), Flags::PURE);
-		class_add_func("str", TypeString, mf(&quaternion::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&quaternion::str), Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
 			func_add_param("ang", TypeVector);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
@@ -485,7 +501,7 @@ void SIAddPackageMath() {
 		class_add_func("inside", TypeBool, mf(&rect::inside), Flags::PURE);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
-		class_add_func("str", TypeString, mf(&rect::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&rect::str), Flags::PURE);
 		class_add_const("ID", TypeRect, (void*)&rect::ID);
 		class_add_func("_create", TypeRect, (void*)__rect_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::RECT_SET);
@@ -506,7 +522,7 @@ void SIAddPackageMath() {
 		class_add_element("r", TypeFloat32, 0);
 		class_add_element("g", TypeFloat32, 4);
 		class_add_element("b", TypeFloat32, 8);
-		class_add_func("str", TypeString, mf(&color::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&color::str), Flags::PURE);
 		class_add_func("__add__", TypeColor, mf(&color::operator+), Flags::PURE);
 			func_add_param("o", TypeColor);
 		class_add_func("__adds__", TypeVoid, mf(&color::operator+=));
@@ -558,7 +574,7 @@ void SIAddPackageMath() {
 		class_add_func("inverse", TypeVoid, mf(&plane::inverse), Flags::PURE);
 		class_add_func("distance", TypeFloat32, mf(&plane::distance), Flags::PURE);
 			func_add_param("p", TypeVector);
-		class_add_func("str", TypeString, mf(&plane::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&plane::str), Flags::PURE);
 		class_add_func("transform", TypePlane, mf(&plane::transform), Flags::PURE);
 			func_add_param("m", TypeMatrix);
 		class_add_func("from_points", TypePlane, (void*)&plane::from_points, Flags::_STATIC__PURE);
@@ -599,7 +615,7 @@ void SIAddPackageMath() {
 			func_add_param("other", TypeMatrix);
 		class_add_func("__mul__", TypeVector, mf(&matrix::mul_v), Flags::PURE);
 			func_add_param("other", TypeVector);
-		class_add_func("str", TypeString, mf(&matrix::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&matrix::str), Flags::PURE);
 		class_add_func("transform", TypeVector, mf(&matrix::transform), Flags::PURE);
 			func_add_param("v", TypeVector);
 		class_add_func("transform_normal", TypeVector, mf(&matrix::transform_normal), Flags::PURE);
@@ -653,7 +669,7 @@ void SIAddPackageMath() {
 			func_add_param("other", TypeMatrix3);
 		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), Flags::PURE);
 			func_add_param("other", TypeVector);
-		class_add_func("str", TypeString, mf(&matrix3::str), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&matrix3::str), Flags::PURE);
 		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), Flags::PURE);
 		class_add_const("ID", TypeMatrix3, (void*)&matrix3::ID);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_ASSIGN);
@@ -670,7 +686,7 @@ void SIAddPackageMath() {
 			func_add_param("s", TypeString);
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, algebra_p(mf(&vli::set_int)));
 			func_add_param("i", TypeInt);
-		class_add_func("str", TypeString, algebra_p(mf(&vli::to_string)), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, algebra_p(mf(&vli::to_string)), Flags::PURE);
 		class_add_func("compare", TypeInt, algebra_p(mf(&vli::compare)), Flags::PURE);
 			func_add_param("v", TypeVli);
 		class_add_func("__eq__", TypeBool, algebra_p(mf(&vli::operator==)), Flags::PURE);
@@ -712,36 +728,38 @@ void SIAddPackageMath() {
 			func_add_param("v", TypeVli);
 	
 	add_class(TypeAny);
-		class_add_element("type", TypeInt, 0);
-		class_add_element("data", TypePointer, 4);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, any_p(mf(&Any::__init__)));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, any_p(mf(&Any::set)));
+		class_add_elementx("type", TypeClassP, &Any::_class);
+		class_add_elementx("data", TypePointer, &Any::data);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Any::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Any::__delete__);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Any::set);
 			func_add_param("a", TypeAny);
-		class_add_func("__iadd__", TypeVoid, any_p(mf(&Any::_add)));
+		class_add_funcx("__iadd__", TypeVoid, &Any::_add);
 			func_add_param("a", TypeAny);
-		class_add_func("__isub__", TypeVoid, any_p(mf(&Any::_sub)));
+		class_add_funcx("__isub__", TypeVoid, &Any::_sub);
 			func_add_param("a", TypeAny);
-		class_add_func("clear", TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func("length", TypeInt, any_p(mf(&Any::length)), Flags::PURE);
-		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_map_get)), Flags::RAISES_EXCEPTIONS);
+		class_add_funcx("clear", TypeVoid, &Any::clear);
+		class_add_funcx(IDENTIFIER_FUNC_LENGTH, TypeInt, &Any::length, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_map_get, Flags::_SELFREF__RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_map_set)), Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_map_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func("__get__", TypeAny, any_p(mf(&KabaAny::_array_get)), Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_array_get, Flags::_SELFREF__RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
-		class_add_func("set", TypeVoid, any_p(mf(&KabaAny::_array_set)), Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_array_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 			func_add_param("value", TypeAny);
-		class_add_func("add", TypeVoid, any_p(mf(&KabaAny::_array_add)), Flags::RAISES_EXCEPTIONS);
+		class_add_funcx("add", TypeVoid, &KabaAny::_array_add, Flags::RAISES_EXCEPTIONS);
 			func_add_param("a", TypeAny);
-		class_add_func("keys", TypeStringList, any_p(mf(&Any::keys)), Flags::PURE);//, Flags::RAISES_EXCEPTIONS);
-		class_add_func("bool", TypeBool, any_p(mf(&Any::_bool)), Flags::PURE);
-		class_add_func("int", TypeInt, any_p(mf(&Any::_int)), Flags::PURE);
-		class_add_func("float", TypeFloat32, any_p(mf(&Any::_float)), Flags::PURE);
-		class_add_func("str", TypeString, any_p(mf(&Any::str)), Flags::PURE);
-		class_add_func("repr", TypeString, any_p(mf(&Any::repr)), Flags::PURE);
+		class_add_funcx("drop", TypeVoid, &Any::map_drop, Flags::RAISES_EXCEPTIONS);
+			func_add_param("key", TypeString);
+		class_add_funcx("keys", TypeStringList, &Any::keys, Flags::PURE);//, Flags::RAISES_EXCEPTIONS);
+		class_add_funcx("__bool__", TypeBool, &Any::_bool, Flags::PURE);
+		class_add_funcx("__int__", TypeInt, &Any::_int, Flags::PURE);
+		class_add_funcx("__float__", TypeFloat32, &Any::_float, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &Any::str, Flags::PURE);
+		class_add_funcx(IDENTIFIER_FUNC_REPR, TypeString, &Any::repr, Flags::PURE);
 		class_add_func("unwrap", TypeVoid, (void*)&KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
 			func_add_param("var", TypePointer);
 			func_add_param("type", TypeClassP);
@@ -762,7 +780,7 @@ void SIAddPackageMath() {
 		class_add_element("n", TypeVli, 0);
 		class_add_element("k", TypeVli, sizeof(vli));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, algebra_p(mf(&Crypto::__init__)));
-		class_add_func("str", TypeString, algebra_p(mf(&Crypto::str)), Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, algebra_p(mf(&Crypto::str)), Flags::PURE);
 		class_add_func("from_str", TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str", TypeString);
 		class_add_func("encrypt", TypeString, algebra_p(mf(&Crypto::Encrypt)), Flags::PURE);
@@ -960,15 +978,20 @@ void SIAddPackageMath() {
 	add_class(TypeAnyDict);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&AnyDict::__init__));
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&AnyDict::__delete__));
-		class_add_funcx("set", TypeVoid, &AnyDict::set);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &AnyDict::set);
 			func_add_param("key", TypeString);
 			func_add_param("x", TypeAny);
-		class_add_funcx("__get__", TypeAny, &AnyDict::get_item, Flags::RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_GET, TypeAny, &AnyDict::get_item, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_funcx("clear", TypeVoid, &AnyDict::clear);
 		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &AnyDict::assign);
 			func_add_param("other", TypeAny);
-		class_add_funcx("str", TypeString, &AnyDict::str);
+		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &AnyDict::str);
+
+
+	add_class(TypeAny);
+		class_add_funcx("as_array", TypeAnyList, &KabaAny::_as_array, Flags::_SELFREF__RAISES_EXCEPTIONS);
+		class_add_funcx("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::_SELFREF__RAISES_EXCEPTIONS);
 }
 
 };

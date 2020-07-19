@@ -22,7 +22,7 @@ class ShowSpectrum extends SongPlugin
 		dest.edit_buffers_finish(a)
 	
 	bool check_clipboard()
-		if clipboard.temp.tracks.num == 0
+		if len(clipboard.temp.tracks) == 0
 			return false
 		if clipboard.temp.tracks[0].type != TYPE_AUDIO
 			return false

@@ -137,7 +137,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Range.offset", &Range::offset);
 	Kaba::declare_class_element("Range.length", &Range::length);
 	Kaba::link_external_class_func("Range.__and__", &Range::intersect);
-	Kaba::link_external_class_func("Range.str", &Range::str);
+	Kaba::link_external_class_func("Range.__str__", &Range::str);
 	Kaba::link_external_class_func("Range.start", &Range::start);
 	Kaba::link_external_class_func("Range.end", &Range::end);
 	Kaba::link_external_class_func("Range.covers", &Range::covers);

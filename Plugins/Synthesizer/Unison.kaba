@@ -249,7 +249,7 @@ class UnisonRenderer extends PitchRenderer
 	override bool render(out AudioBuffer buf)
 	
 		let c = &synth.config
-		float[] vv = [for k in 0:c.num_voices c.blend]
+		let vv = [for k in 0:c.num_voices c.blend]
 		vv[c.num_voices/2] = 1.0
 		
 		for i in 0:len(buf)

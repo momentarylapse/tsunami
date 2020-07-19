@@ -30,7 +30,7 @@ class Flanger extends AudioEffect
 		offset = 0
 
 	void do_flanger(out float[] b, out float[] temp)
-		int p = offset % temp.num
+		int p = offset % len(temp)
 		float sample_rate = session.sample_rate()
 	
 		float f_a = (1 - 0.5 * config.depth) * config.delay
@@ -47,13 +47,13 @@ class Flanger extends AudioEffect
 			int dp = dt * sample_rate
 			int p2 = p - dp
 			if p2 < 0
-				p2 += temp.num
+				p2 += len(temp)
 		
 			# add echo
 			bb += temp[p2]
 		
 			p ++
-			if p >= temp.num
+			if p >= len(temp)
 				p = 0
 
 	

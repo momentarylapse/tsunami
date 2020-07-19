@@ -107,7 +107,7 @@ Chord[]  ParseChords(string str)
 			c.base_tone = char_to_rel_pitch(a + 32) + 48
 		else
 			continue
-		if i < str.num - 1
+		if i < len(str) - 1
 			if str[i + 1] == '#'
 				c.base_tone ++
 				i ++
@@ -117,7 +117,7 @@ Chord[]  ParseChords(string str)
 #void AddSimpleTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
 #	float f_w = 1.0 / sample_rate * f * 2.0 * pi
 #	int i0 = max(pos0, 0)
-#	int i1 = min(pos1, buf.num)
+#	int i1 = min(pos1, len(buf))
 #	for int i, i0, i1
 #		float tt = (i - pos0) * f_w
 #		float d = sin(tt) * vol

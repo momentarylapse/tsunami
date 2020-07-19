@@ -20,7 +20,8 @@ enum class Flags {
 	SELFREF = 2048,
 
 	_STATIC__RAISES_EXCEPTIONS = STATIC | RAISES_EXCEPTIONS,
-	_STATIC__PURE = STATIC | PURE
+	_STATIC__PURE = STATIC | PURE,
+	_SELFREF__RAISES_EXCEPTIONS = SELFREF | RAISES_EXCEPTIONS
 };
 bool flags_has(Flags flags, Flags t);
 Flags flags_mix(const Array<Flags> &f);

@@ -9,7 +9,7 @@ typedef void op_func(Value&, Value&, Value&);
 
 
 void db_out(const string &s) {
-	//msg_write(s);
+//	msg_write(s);
 }
 
 #define CALL_DEBUG_X		0
@@ -112,6 +112,7 @@ void call4(void *ff, void *ret, const Array<void*> &param) {
 
 // void*,int,int64,float,float64,char,bool,string,vector,complex
 
+// BEFORE call-by-ref transformation!!!
 bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) {
 	db_out("eval: " + f->signature());
 	Array<const Class*> ptype = f->literal_param_type;
@@ -206,6 +207,9 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
 				call1<CBR,float>(ff, ret, param);
+				return true;
+			} else if (ptype[0]->is_pointer()) {
+				call1<CBR,void*>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
 				call1<CBR,CBR>(ff, ret, param);
@@ -304,10 +308,15 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 	// parameters
 	Array<void*> p;
 	for (int i=0;i<c->params.num;i++) {
-		if (c->params[i]->kind != NodeKind::CONSTANT)
+		if (c->params[i]->kind == NodeKind::DEREFERENCE and c->params[i]->params[0]->kind == NodeKind::CONSTANT) {
+			db_out("pp: " + c->params[i]->params[0]->str());
+			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
+		} else if (c->params[i]->kind == NodeKind::CONSTANT) {
+			db_out("p: " + c->params[i]->str());
+			p.add(c->params[i]->as_const()->p());
+		} else {
 			return c;
-		db_out("p: " + c->params[i]->str());
-		p.add(c->params[i]->as_const()->p());
+		}
 	}
 	db_out("-param const");
 
@@ -385,14 +394,18 @@ void rec_assign(void *a, void *b, const Class *type) {
 	}
 }
 
-
 // BEFORE transforming to call-by-reference!
 Node *SyntaxTree::conv_eval_const_func(Node *c) {
 	if (c->kind == NodeKind::OPERATOR) {
 		return eval_function_call(this, c, c->as_op()->f);
 	} else if (c->kind == NodeKind::FUNCTION_CALL) {
 		return eval_function_call(this, c, c->as_func());
-	} else if (c->kind == NodeKind::DYNAMIC_ARRAY) {
+	}
+	return conv_eval_const_func_nofunc(c);
+}
+
+Node *SyntaxTree::conv_eval_const_func_nofunc(Node *c) {
+	if (c->kind == NodeKind::DYNAMIC_ARRAY) {
 		if (all_params_are_const(c)) {
 			Node *cr = add_node_const(add_constant(c->type));
 			DynamicArray *da = &c->params[0]->as_const()->as_array();
@@ -470,8 +483,12 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 	return c;
 }
 
-void SyntaxTree::eval_const_expressions() {
-	transform([&](Node *n){ return conv_eval_const_func(n); });
+void SyntaxTree::eval_const_expressions(bool allow_func_eval) {
+	if (allow_func_eval) {
+		transform([&](Node *n){ return conv_eval_const_func(n); });
+	} else {
+		transform([&](Node *n){ return conv_eval_const_func_nofunc(n); });
+	}
 }
 
 void SyntaxTree::pre_processor_addresses() {

@@ -20,8 +20,6 @@ namespace Kaba{
 //#define mem_align(x)	((x) + (4 - (x) % 4) % 4)
 #define mem_align(x, n)		((((x) + (n) - 1) / (n) ) * (n))
 
-extern string LibVersion;
-
 class SyntaxTree;
 class Class;
 class Value;
@@ -39,6 +37,10 @@ extern const string IDENTIFIER_FUNC_INIT;
 extern const string IDENTIFIER_FUNC_DELETE;
 extern const string IDENTIFIER_FUNC_ASSIGN;
 extern const string IDENTIFIER_FUNC_GET;
+extern const string IDENTIFIER_FUNC_SET;
+extern const string IDENTIFIER_FUNC_LENGTH;
+extern const string IDENTIFIER_FUNC_STR;
+extern const string IDENTIFIER_FUNC_REPR;
 extern const string IDENTIFIER_FUNC_SUBARRAY;
 extern const string IDENTIFIER_SUPER;
 extern const string IDENTIFIER_SELF;

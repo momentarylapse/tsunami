@@ -153,7 +153,7 @@ class SuperNovaWindow extends Window
 	
 		c.setColor(Black)
 		if LoudEnough
-			c.drawStr(120, 20, rel_pitch_name(played[played.num - 1].note % 12))
+			c.drawStr(120, 20, rel_pitch_name(played[len(played) - 1].note % 12))
 		else
 			c.drawStr(w / 2 - 30, h / 2 - 20, "zu leise")
 	
@@ -203,7 +203,7 @@ void UpdateInput()
 	
 	if available > BUFFER_SIZE
 		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
-		Offset += available - BUFFER_SIZE#input.cur_buf.num
+		Offset += available - BUFFER_SIZE#len(input.cur_buf)
 	
 	int num = clampi(available, 0, BUFFER_SIZE)
 	input.current_buffer.peekRef(buf, num)
@@ -216,7 +216,7 @@ void UpdateInput()
 	float[] temp = buf.r + buf.l
 	
 	complex[] bufc
-	bufc.resize(buf.num / 2 + 1)
+	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(temp, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
@@ -233,12 +233,12 @@ void UpdateInput()
 				max = amp
 				fmax = f
 	max *= fmax
-	max /= sqrt(buf.num) * 2 * pi
+	max /= sqrt(len(buf)) * 2 * pi
 	Volume = clamp(max / threshold / 2, 0, 1)
 	if max > threshold
 		PlayedData p
 		p.offset = Offset
-		p.length = buf.num
+		p.length = len(buf)
 		p.correct = false
 		LoudEnough = true
 		Frequency = fmax
@@ -255,7 +255,7 @@ void UpdateInput()
 		played.add(p)
 	else
 		LoudEnough = false
-	if played.num > 500
+	if len(played) > 500
 		played.remove(0)
 		
 	if Offset > LessonLength

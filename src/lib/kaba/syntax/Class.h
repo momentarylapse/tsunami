@@ -17,9 +17,9 @@ class ClassElement {
 public:
 	string name;
 	const Class *type;
-	long long offset;
+	int64 offset;
 	ClassElement();
-	ClassElement(const string &name, const Class *type, int offset);
+	ClassElement(const string &name, const Class *type, int64 offset);
 	string signature(bool include_class) const;
 	bool hidden() const;
 };
@@ -29,11 +29,11 @@ typedef void *VirtualTable;
 class Class {
 public:
 	//Class();
-	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr, const Class *param = nullptr);
+	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Class *param = nullptr);
 	~Class();
 	string name;
 	string long_name() const;
-	long long size; // complete size of type
+	int64 size; // complete size of type
 	int array_length;
 
 	enum class Type {

@@ -10,7 +10,7 @@ ClassElement::ClassElement() {
 	type = nullptr;
 }
 
-ClassElement::ClassElement(const string &_name, const Class *_type, int _offset) {
+ClassElement::ClassElement(const string &_name, const Class *_type, int64 _offset) {
 	name = _name;
 	offset = _offset;
 	type = _type;
@@ -55,7 +55,7 @@ bool type_match(const Class *given, const Class *wanted) {
 }
 
 
-Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent, const Class *_param) {
+Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Class *_param) {
 	name = _name;
 	owner = _owner;
 	size = _size;

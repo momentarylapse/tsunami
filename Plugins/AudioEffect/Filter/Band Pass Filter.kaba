@@ -40,7 +40,7 @@ class LowPassFilter extends AudioEffect
 		# y[i] := b * (y[i-1] + x[i] - x[i-1])
 		# z[i] := α * y[i] + b * z[i-1]
 	
-		for i in 1:buf.num
+		for i in 1:len(buf)
 			float t = buf[i]
 			buf[i] = bb * (buf[i] + buf[i-1] - prev_in)
 			prev_in = t
@@ -48,7 +48,7 @@ class LowPassFilter extends AudioEffect
 		
 		used[c] = true
 		_in[c] = prev_in
-		_out[c] = buf[buf.num - 1]
+		_out[c] = buf[len(buf) - 1]
 		
 	override void process(out AudioBuffer buf)
 		do(buf.r, 0)

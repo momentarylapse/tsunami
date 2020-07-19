@@ -3,8 +3,8 @@ use "../../api.kaba"
 const string AUTO_CONFIG_SAMPLE = ""
 
 void fold(float[] x, float[] h, out complex[] HH, out float[] result)
-	int N = x.num
-	int K = h.num
+	int N = len(x)
+	int K = len(h)
 	
 	# fft of input
 	float[] xx = x
@@ -13,7 +13,7 @@ void fold(float[] x, float[] h, out complex[] HH, out float[] result)
 	fft_r2c(xx, XX)
 	
 	# fft of kernel
-	if HH.num != (N+K)/2+1
+	if len(HH) != (N+K)/2+1
 		#print("recalc HH")
 		float[] hh = h
 		hh.resize(N + K)
@@ -83,7 +83,7 @@ class Folding extends AudioEffect
 		float[] ttt
 		fold(buf, h, HH, ttt)
 		
-		if overlap.num < N
+		if len(overlap) < N
 			overlap.resize(N)
 		
 		buf = ttt[:N]

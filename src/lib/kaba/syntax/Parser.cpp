@@ -100,7 +100,7 @@ void SyntaxTree::get_constant_value(const string &str, Value &value) {
 	} else if (value.type == TypeString) {
 		value.as_string() = str.substr(1, -2).unescape();
 	} else if (value.type == TypeCString) {
-		strcpy((char*)value.p(), str.substr(1, -2).c_str());
+		strcpy((char*)value.p(), str.substr(1, -2).unescape().c_str());
 	} else if (value.type == TypeInt) {
 		value.as_int() = (int)s2i2(str);
 	} else if (value.type == TypeInt64) {

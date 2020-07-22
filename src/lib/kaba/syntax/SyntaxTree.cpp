@@ -345,15 +345,23 @@ void SyntaxTree::do_error_implicit(Function *f, const string &str) {
 	do_error(format("[auto generating %s] : %s", f->signature(), str), ex, line);
 }
 
-void SyntaxTree::create_asm_meta_info() {
-	asm_meta_info->global_var.clear();
-	for (auto *v: base_class->static_variables){
+void _asm_add_static_vars(Asm::MetaInfo *meta, const Class *c) {
+	for (auto *v: c->static_variables) {
 		Asm::GlobalVar vv;
 		vv.name = v->name;
+		if (c->name.head(1) != "-")
+			vv.name = c->long_name() + "." + v->name;
 		vv.size = v->type->size;
 		vv.pos = v->memory;
-		asm_meta_info->global_var.add(vv);
+		meta->global_var.add(vv);
 	}
+	for (auto *cc: c->classes)
+		_asm_add_static_vars(meta, cc);
+}
+
+void SyntaxTree::create_asm_meta_info() {
+	asm_meta_info->global_var.clear();
+	_asm_add_static_vars(asm_meta_info, base_class);
 }
 
 

@@ -60,7 +60,9 @@ void msg_init(const string &force_filename, bool verbose)
 		msg_file_name = force_filename;
 	if (!verbose)
 		return;
-	file = FileCreateText(msg_file_name);
+	try {
+		file = FileCreateText(msg_file_name);
+	} catch(...) {}
 	Verbose = verbose;
 #ifdef MSG_LOG_TIMIGS
 	file->write_str("[hh:mm:ss, ms]");
@@ -77,7 +79,9 @@ void msg_set_verbose(bool verbose)
 	if (Verbose == verbose)
 		return;
 	if (verbose){
-		file = FileCreateText(msg_file_name);
+		try {
+			file = FileCreateText(msg_file_name);
+		} catch(...) {}
 		Shift = 0;
 	}else{
 		msg_end(false);

@@ -52,7 +52,7 @@ class HammondGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if GetEvent().button_l and (selected >= 0)
+		if hui.get_event().button_l and (selected >= 0)
 			hc.intensity[selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else

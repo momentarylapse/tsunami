@@ -87,7 +87,7 @@ class Equalizer15Panel extends ConfigPanel
 		update()
 
 	void on_event()
-		Event *e = GetEvent()
+		Event *e = hui.get_event()
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_{{i}}")
 				c.config.factor[i] = get_float("") * 2

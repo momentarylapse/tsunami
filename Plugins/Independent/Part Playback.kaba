@@ -45,11 +45,11 @@ class Looper extends TsunamiPlugin
 		song = session.song
 		chain = session.view.signal_chain
 		renderer = session.view.renderer
-		runner = RunRepeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, self, on_update)
 		mode = MODE_FORWARD
 		
 	override void on_stop()
-		CancelRunner(runner)
+		hui.cancel_runner(runner)
 			
 	override ConfigPanel* create_panel()
 		return new PPPanel(self)

@@ -122,7 +122,7 @@ class CompressorGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if GetEvent().button_l and (selected > 0)
+		if hui.get_event().button_l and (selected > 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = config.curve[selected - 1].x
 			float xmax = 0
@@ -141,7 +141,7 @@ class CompressorGrid extends Grid
 		redraw()
 
 	override void on_key_down()
-		int k = GetEvent().key
+		int k = hui.get_event().key
 
 		# [Delete] -> remove point
 		if (k == KEY_DELETE) and (selected > 0) and (selected < len(config.curve) - 1)

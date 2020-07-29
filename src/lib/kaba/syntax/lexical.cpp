@@ -28,6 +28,7 @@ static ExpKind exp_kind;
 
 ExpressionBuffer::ExpressionBuffer() : cur(dummy) {
 	clear();
+	reset_indent();
 }
 
 string ExpressionBuffer::get_name(int n) {

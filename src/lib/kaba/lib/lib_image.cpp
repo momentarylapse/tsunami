@@ -24,7 +24,7 @@ const Class *TypeBasePainterP;
 
 
 void SIAddPackageImage() {
-	add_package("image", false);
+	add_package("image");
 
 	TypeImage = add_type("Image", sizeof(Image));
 	auto TypeImageP = add_type_p(TypeImage);

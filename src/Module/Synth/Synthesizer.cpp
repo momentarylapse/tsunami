@@ -79,7 +79,7 @@ Synthesizer::Synthesizer() :
 {
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::MIDI, &source, "in"));
+	port_in.add({SignalType::MIDI, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);
@@ -139,9 +139,8 @@ PitchRenderer *Synthesizer::create_pitch_renderer(int pitch) {
 
 PitchRenderer *Synthesizer::get_pitch_renderer(int pitch) {
 	for (auto *p: pitch_renderer)
-		if (p->pitch == pitch) {
+		if (p->pitch == pitch)
 			return p;
-		}
 	auto *p = create_pitch_renderer(pitch);
 	if (p) {
 		p->on_config();

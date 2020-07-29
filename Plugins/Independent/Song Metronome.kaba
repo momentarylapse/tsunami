@@ -65,9 +65,9 @@ Grid ? '' vertical
 		fraction_prev = 0
 		
 		fullscreen = false
-		mode = HuiConfig.get_int("Plugins/Metronome/Mode", MODE_BOUNCE_WALK)
-		allow_blink_background = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
-		allow_blink_number = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
+		mode = hui.config.get_int("Plugins/Metronome/Mode", MODE_BOUNCE_WALK)
+		allow_blink_background = hui.config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
+		allow_blink_number = hui.config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
 		popup_menu = new Menu()
 		popup_menu.add_checkable("Blink background", "blink-background")
@@ -88,10 +88,10 @@ Grid ? '' vertical
 		event("mode-bounce-walk", on_mode_bounce_walk)
 		#event("fullscreen", on_fullscreen)
 		
-		sr_id = RunRepeated(UPDATE_DT, &self, on_update)
+		sr_id = hui.run_repeated(UPDATE_DT, &self, on_update)
 	
 	override void __delete__()
-		CancelRunner(sr_id)
+		hui.cancel_runner(sr_id)
 		del popup_menu
 	
 	void on_update()
@@ -229,23 +229,23 @@ Grid ? '' vertical
 	
 	void on_blink_background()
 		allow_blink_background = !allow_blink_background
-		HuiConfig.set_bool("Plugins/Metronome/AllowBlinkBackground", allow_blink_background)
+		hui.config.set_bool("Plugins/Metronome/AllowBlinkBackground", allow_blink_background)
 	
 	void on_blink_number()
 		allow_blink_number = !allow_blink_number
-		HuiConfig.set_bool("Plugins/Metronome/AllowBlinkNumber", allow_blink_number)
+		hui.config.set_bool("Plugins/Metronome/AllowBlinkNumber", allow_blink_number)
 	
 	void on_mode_circle()
 		mode = MODE_CIRCLE
-		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+		hui.config.set_int("Plugins/Metronome/Mode", mode)
 	
 	void on_mode_bounce()
 		mode = MODE_BOUNCE
-		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+		hui.config.set_int("Plugins/Metronome/Mode", mode)
 	
 	void on_mode_bounce_walk()
 		mode = MODE_BOUNCE_WALK
-		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+		hui.config.set_int("Plugins/Metronome/Mode", mode)
 	
 	#void on_fullscreen()
 #		fullscreen = !fullscreen

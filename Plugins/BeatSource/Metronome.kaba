@@ -28,6 +28,9 @@ class MetronomeSource extends BeatSource
 	int samples_beat
 	int samples_sub_beat
 	
+	override void __init__()
+		print("MetronomeSource.init...")
+	
 
 	override void reset_state()
 

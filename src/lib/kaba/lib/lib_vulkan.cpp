@@ -95,7 +95,7 @@ extern const Class *TypeColorList;
 
 
 void SIAddPackageVulkan() {
-	add_package("vulkan", false);
+	add_package("vulkan");
 	
 	auto TypeVertexBuffer	= add_type  ("VertexBuffer", sizeof(vulkan::VertexBuffer));
 	//auto TypeVertexBufferP	= add_type_p(TypeVertexBuffer);
@@ -350,9 +350,9 @@ void SIAddPackageVulkan() {
 	add_funcx("window_close", TypeVoid, vul_p(&vulkan::window_close), Flags::STATIC);
 		func_add_param("w", TypePointer);
 
-	add_funcx("vulkan_init", TypeVoid, vul_p(&vulkan::init), Flags::STATIC);
+	add_funcx("init", TypeVoid, vul_p(&vulkan::init), Flags::STATIC);
 		func_add_param("win", TypePointer);
-	add_funcx("vulkan_destroy", TypeVoid, vul_p(&vulkan::destroy), Flags::STATIC);
+	add_funcx("destroy", TypeVoid, vul_p(&vulkan::destroy), Flags::STATIC);
 	add_funcx("queue_submit_command_buffer", TypeVoid, vul_p(&vulkan::queue_submit_command_buffer), Flags::STATIC);
 		func_add_param("cb", TypeCommandBuffer);
 		func_add_param("wait_sem", TypeSemaphorePList);

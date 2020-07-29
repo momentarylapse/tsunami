@@ -98,7 +98,7 @@ string kind2str(NodeKind kind) {
 }
 
 
-string Node::sig() const {
+string Node::sig(const Class *ns) const {
 	string t = type->name + " ";
 	if (kind == NodeKind::PLACEHOLDER)
 		return "";
@@ -107,23 +107,23 @@ string Node::sig() const {
 	if (kind == NodeKind::VAR_GLOBAL)
 		return t + as_global()->name;
 	if (kind == NodeKind::FUNCTION)
-		return t + as_func()->long_name();
+		return t + as_func()->cname(ns);
 	if (kind == NodeKind::CONSTANT)
 		return t + as_const()->str();
 	if (kind == NodeKind::FUNCTION_CALL)
-		return as_func()->signature();
+		return as_func()->signature(ns);
 	if (kind == NodeKind::POINTER_CALL)
 		return t + "(...)";
 	if (kind == NodeKind::INLINE_CALL)
-		return as_func()->signature();
+		return as_func()->signature(ns);
 	if (kind == NodeKind::VIRTUAL_CALL)
-		return as_func()->signature();
+		return as_func()->signature(ns);
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
-		return as_func()->signature();
+		return as_func()->signature(ns);
 	if (kind == NodeKind::STATEMENT)
 		return t + as_statement()->name;
 	if (kind == NodeKind::OPERATOR)
-		return as_op()->sig();
+		return as_op()->sig(ns);
 	if (kind == NodeKind::PRIMITIVE_OPERATOR)
 		return as_prim_op()->name;
 	if (kind == NodeKind::BLOCK)
@@ -157,18 +157,18 @@ string Node::sig() const {
 	return t + i2s(link_no);
 }
 
-string Node::str() const {
-	return "<" + kind2str(kind) + ">  " + sig();
+string Node::str(const Class *ns) const {
+	return "<" + kind2str(kind) + ">  " + sig(ns);
 }
 
 
-void Node::show() const {
+void Node::show(const Class *ns) const {
 	string orig;
-	msg_write(str() + orig);
+	msg_write(str(ns) + orig);
 	msg_right();
 	for (Node *p: params)
 		if (p)
-			p->show();
+			p->show(ns);
 		else
 			msg_write("<-NULL->");
 	msg_left();

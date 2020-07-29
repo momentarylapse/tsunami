@@ -65,6 +65,7 @@ extern const string IDENTIFIER_VIRTUAL;
 extern const string IDENTIFIER_EXTERN;
 extern const string IDENTIFIER_SELFREF;
 extern const string IDENTIFIER_USE;
+extern const string IDENTIFIER_IMPORT;
 extern const string IDENTIFIER_RETURN;
 extern const string IDENTIFIER_RAISE;
 extern const string IDENTIFIER_TRY;
@@ -470,7 +471,7 @@ int process_class_num_virtuals(const string &class_name, int num_virtual);
 //--------------------------------------------------------------------------------------------------
 // packages
 
-extern Array<Script*> Packages;
+extern Array<Script*> packages;
 
 
 };

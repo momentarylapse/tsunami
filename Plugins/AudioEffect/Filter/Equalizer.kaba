@@ -187,7 +187,7 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	override void on_mouse_wheel()
-		float dy = GetEvent().scroll_y
+		float dy = hui.get_event().scroll_y
 		if hover >= 0
 			if dy > 0
 				c.peaks[hover].q *= 1.04
@@ -223,7 +223,7 @@ class EqualizerGrid extends Grid
 	
 	# hui events
 	void on_add_peak()
-		string id = GetEvent().id
+		string id = hui.get_event().id
 		int t = FILTER_PEAK
 		if id == "add-low-pass"
 			t = FILTER_LOW_PASS
@@ -255,7 +255,7 @@ class EqualizerGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if GetEvent().button_l
+		if hui.get_event().button_l
 			if selected >= 0
 				c.peaks[selected].pitch = freq_to_pitch(get_mouse2().x)
 				c.peaks[selected].gain = get_mouse2().y - c.gain
@@ -275,7 +275,7 @@ class EqualizerGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if GetEvent().key_code == KEY_DELETE
+		if hui.get_event().key_code == KEY_DELETE
 			on_peak_delete()
 
 	void set_buffer(AudioBuffer buf)

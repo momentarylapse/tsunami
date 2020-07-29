@@ -55,13 +55,13 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 #include "../../base/set.h"
 #include "SyntaxTree.h"
 
-void test_node_recursion(Node *root, const string &message) {
+void test_node_recursion(Node *root, const Class *ns, const string &message) {
 	Set<Node*> nodes;
 	SyntaxTree::transform_node(root, [&](Node *n){
 		if (nodes.contains(n)){
 			msg_error("node double..." + message);
 			//msg_write(f->long_name);
-			msg_write(n->str());
+			msg_write(n->str(ns));
 		}else
 			nodes.add(n);
 		return n; });
@@ -79,18 +79,24 @@ SyntaxTree *Function::owner() const {
 	return name_space->owner;
 }
 
-string namespacify(const string &name, const Class *name_space);
+string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 
 string Function::long_name() const {
 	string p = (needs_overriding ? " [NEEDS OVERRIDE]" : "");
-	return namespacify(name, name_space) + p;
+	return namespacify_rel(name, name_space, nullptr) + p;
+}
+
+string Function::cname(const Class *ns) const {
+	string p = (needs_overriding ? " [NEEDS OVERRIDE]" : "");
+	return namespacify_rel(name, name_space, ns) + p;
 }
 
 void Function::show(const string &stage) const {
 	if (!config.allow_output(this, stage))
 		return;
-	msg_write("[function] " + return_type->long_name() + " " + long_name());
-	block->show();
+	auto ns = owner()->base_class;
+	msg_write("[function] " + return_type->cname(ns) + " " + cname(ns));
+	block->show(ns);
 }
 
 string Function::create_slightly_hidden_name() {
@@ -101,13 +107,15 @@ Variable *Function::__get_var(const string &name) const {
 	return block->get_var(name);
 }
 
-string Function::signature() const {
-	string r = literal_return_type->long_name() + " ";
-	r += long_name() + "(";
+string Function::signature(const Class *ns) const {
+	if (!ns)
+		ns = owner()->base_class;
+	string r = literal_return_type->cname(ns) + " ";
+	r += cname(ns) + "(";
 	for (int i=0; i<num_params; i++) {
 		if (i > 0)
 			r += ", ";
-		r += literal_param_type[i]->long_name();
+		r += literal_param_type[i]->cname(ns);
 	}
 	return r + ")";
 }
@@ -175,7 +183,7 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 
 	f->update_parameters_after_parsing();
 	if (config.verbose)
-		msg_write("DUMMY CLONE   " + f->signature());
+		msg_write("DUMMY CLONE   " + f->signature(_name_space));
 	return f;
 }
 

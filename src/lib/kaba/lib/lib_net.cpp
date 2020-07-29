@@ -38,7 +38,7 @@ const Class *TypeSocketPList;
 
 void SIAddPackageNet()
 {
-	add_package("net", false);
+	add_package("net");
 
 	TypeNetAddress  = add_type  ("NetAddress", sizeof(NetAddress));
 	TypeSocket      = add_type  ("Socket", sizeof(Socket));

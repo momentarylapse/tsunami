@@ -62,13 +62,13 @@ class Looper extends TsunamiPlugin
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		
-		runner = RunRepeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, self, on_update)
 		#chain.subscribe(self, on_update, "Click")
 		
 		chain.start()
 		
 	override void on_stop()
-		CancelRunner(runner)
+		hui.cancel_runner(runner)
 		#chain.unsubscribe(&self)
 		del chain
 	

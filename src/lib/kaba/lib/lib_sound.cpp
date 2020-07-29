@@ -23,7 +23,7 @@ extern const Class *TypeFloatList;
 
 void SIAddPackageSound()
 {
-	add_package("sound", false);
+	add_package("sound");
 
 	const Class *TypeSound = add_type("Sound",		sizeof(Sound));
 	const Class *TypeSoundP = add_type_p(TypeSound);

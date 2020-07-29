@@ -309,10 +309,10 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 	Array<void*> p;
 	for (int i=0;i<c->params.num;i++) {
 		if (c->params[i]->kind == NodeKind::DEREFERENCE and c->params[i]->params[0]->kind == NodeKind::CONSTANT) {
-			db_out("pp: " + c->params[i]->params[0]->str());
+			db_out("pp: " + c->params[i]->params[0]->str(tree->base_class));
 			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
 		} else if (c->params[i]->kind == NodeKind::CONSTANT) {
-			db_out("p: " + c->params[i]->str());
+			db_out("p: " + c->params[i]->str(tree->base_class));
 			p.add(c->params[i]->as_const()->p());
 		} else {
 			return c;
@@ -326,7 +326,7 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 		return c;
 	Node *r = tree->add_node_const(tree->add_constant(f->return_type));
 	r->as_const()->set(temp);
-	db_out(">>>  " + r->str());
+	db_out(">>>  " + r->str(tree->base_class));
 	return r;
 }
 

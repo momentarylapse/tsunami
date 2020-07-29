@@ -141,10 +141,20 @@ void kaba_dir_delete(const string &f) {
 }
 
 
+string _cdecl kaba_shell_execute(const string &cmd) {
+	try {
+		return shell_execute(cmd);
+	} catch(::Exception &e) {
+		kaba_raise_exception(new KabaException(e.message()));
+	}
+	return "";
+}
+
+
 #pragma GCC pop_options
 
 void SIAddPackageOS() {
-	add_package("os", false);
+	add_package("os");
 
 	const Class *TypeFile = add_type("File", 0);
 	const Class *TypeFileP = add_type_p(TypeFile);
@@ -248,6 +258,10 @@ void SIAddPackageOS() {
 		_kaba_stdin = new File();
 		_kaba_stdin->handle = 0;
 		add_ext_var("stdin", TypeFileP, &_kaba_stdin);
+
+	// system
+	add_func("shell_execute", TypeString, (void*)&kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);
+		func_add_param("cmd", TypeString);
 }
 
 };

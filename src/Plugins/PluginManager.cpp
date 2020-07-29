@@ -75,7 +75,7 @@ PluginManager::PluginManager() {
 	package = new Kaba::Script;
 	package->filename = "-tsunami-internal-";
 	package->used_by_default = false;
-	Kaba::Packages.add(package);
+	Kaba::packages.add(package);
 	Kaba::_public_scripts_.add(package);
 
 	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);

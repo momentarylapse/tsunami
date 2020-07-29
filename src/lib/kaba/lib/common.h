@@ -19,6 +19,8 @@ enum class Flags {
 	VIRTUAL = 1024,
 	SELFREF = 2048,
 
+	AUTO_IMPORT = 1<<24,
+
 	_STATIC__RAISES_EXCEPTIONS = STATIC | RAISES_EXCEPTIONS,
 	_STATIC__PURE = STATIC | PURE,
 	_SELFREF__RAISES_EXCEPTIONS = SELFREF | RAISES_EXCEPTIONS
@@ -28,7 +30,7 @@ Flags flags_mix(const Array<Flags> &f);
 
 class Function;
 
-void add_package(const string &name, bool used_by_default);
+void add_package(const string &name, Flags = Flags::NONE);
 const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *parent = nullptr);
 const Class *add_type_p(const Class *sub_type, Flags = Flags::NONE, const string &name = "");
 const Class *add_type_a(const Class *sub_type, int array_length, const string &name = "");

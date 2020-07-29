@@ -37,13 +37,13 @@ class VolumeChecker extends SongPlugin
 	void ask()
 		string q = "Song reaches a peak volume of {{vol_max * 100.0|.1}}% ({{amp2db(vol_max)|.1}}dB)\n"
 		if vol_max > 0.95 and vol_max < 1.0
-			InfoBox(session.win, "Info", "{{q}} seems fine...")
+			hui.info_box(session.win, "Info", "{{q}} seems fine...")
 			return
 		if vol_max < 1
 			q += "increase each track's volume by {{amp2db(1/vol_max)|.1}} dB to reach 100%?"
 		else
 			q += "decrease each track's volume by {{-amp2db(1/vol_max)|.1}} dB to stay below 100%?"
-		string a = QuestionBox(session.win, "Question", q, true)
+		string a = hui.question_box(session.win, "Question", q, true)
 		if a == "hui:yes"
 			session.song.begin_action_group()
 			for t in session.song.tracks

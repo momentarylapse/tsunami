@@ -76,10 +76,10 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		runner = RunRepeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, self, on_update)
 		
 	override void on_stop()
-		CancelRunner(runner)
+		hui.cancel_runner(runner)
 		del chain
 	
 	void on_update()

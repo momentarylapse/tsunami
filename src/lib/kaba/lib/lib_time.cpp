@@ -17,7 +17,7 @@ extern const Class *TypeDate;
 const Class *TypeTimer;
 
 void SIAddPackageTime() {
-	add_package("time", false);
+	add_package("time");
 
 	TypeDate = add_type("Date", sizeof(Date));
 	TypeTimer = add_type("Timer", sizeof(hui::Timer));
@@ -28,13 +28,13 @@ void SIAddPackageTime() {
 		class_add_funcx("format", TypeString, &Date::format, Flags::PURE);
 			func_add_param("f", TypeString);
 		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &Date::str, Flags::PURE);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&Date::__assign__));
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Date::__assign__);
 			func_add_param("o", TypeDate);
 		class_add_funcx("now", TypeDate, &Date::now, Flags::STATIC);
 
 
 	add_class(TypeTimer);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::Timer::reset));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Timer::reset);
 		class_add_funcx("get", TypeFloat32, &hui::Timer::get);
 		class_add_funcx("reset", TypeVoid, &hui::Timer::reset);
 		class_add_funcx("peek", TypeFloat32, &hui::Timer::peek);

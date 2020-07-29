@@ -348,7 +348,7 @@ void main() {
 class ShaderPanel extends ConfigPanel
 	override ShaderVis* c
 	Shader* shader
-	float time
+	float _time
 	Timer timer
 	int id_runner
 	int type
@@ -360,7 +360,7 @@ Grid ? '' vertical
 	DrawingArea area '' height=200 expandy opengl")
 		
 		shader = nil
-		time = 0
+		_time = 0
 		type = 0
 	
 		event_x("area", "hui:draw-gl", on_draw)
@@ -370,7 +370,7 @@ Grid ? '' vertical
 	
 	override void __delete__()
 		#print("delete")
-		CancelRunner(id_runner)
+		hui.cancel_runner(id_runner)
 		#set_options("area", "make-current-gl")
 		#del s
 		#NixKill()
@@ -414,24 +414,24 @@ uniform float iVolume;
 ")
 	
 	void on_realize()
-		NixInit()
+		nix.init()
 		update_shader()
 		
-		id_runner = RunRepeated(0.03, self, on_step)
+		id_runner = hui.run_repeated(0.03, self, on_step)
 	
 	void on_draw()
-		time += timer.get()
+		_time += timer.get()
 		float volume = c.buffer.r.max()
 		
-		#NixStart()
-		ResetToColor(Red)
-		SetCull(0)
-		SetZ(false, false)
-		SetShader(shader)
-		shader.set_float(shader.location("iTime"), time)
+		#nix.start()
+		nix.reset_to_color(Red)
+		nix.set_cull(0)
+		nix.set_z(false, false)
+		nix.set_shader(shader)
+		shader.set_float(shader.location("iTime"), _time)
 		shader.set_float(shader.location("iVolume"), volume)
-		vb_temp.create_rect(rect(-1,1, -1,1))
-		DrawTriangles(vb_temp)
+		nix.vb_temp.create_rect(rect(-1,1, -1,1))
+		nix.draw_triangles(vb_temp)
 		#NixEnd()
 
 class ShaderVis extends AudioVisualizer

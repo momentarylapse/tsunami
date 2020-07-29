@@ -65,6 +65,7 @@ const string IDENTIFIER_EXTERN = "extern";
 //const string IDENTIFIER_ACCESSOR = "accessor";
 const string IDENTIFIER_SELFREF = "selfref";
 const string IDENTIFIER_USE = "use";
+const string IDENTIFIER_IMPORT = "import";
 const string IDENTIFIER_RETURN = "return";
 const string IDENTIFIER_RAISE = "raise";
 const string IDENTIFIER_TRY = "try";
@@ -186,7 +187,7 @@ const Class *TypeFunctionCode;
 const Class *TypeFunctionCodeP;
 
 
-Array<Script*> Packages;
+Array<Script*> packages;
 Script *cur_package = nullptr;
 
 
@@ -204,11 +205,12 @@ Flags flags_mix(const Array<Flags> &f) {
 	return r;
 }
 
-void add_package(const string &name, bool used_by_default) {
+void add_package(const string &name, Flags flags) {
 	Script* s = new Script;
-	s->used_by_default = used_by_default;
+	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
+	s->syntax->base_class->name = name;
 	s->filename = name;
-	Packages.add(s);
+	packages.add(s);
 	cur_package = s;
 }
 
@@ -800,7 +802,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageVulkan();
 	SIAddPackageX();
 
-	cur_package = Packages[0];
+	cur_package = packages[0];
 	SIAddXCommands();
 
 
@@ -815,7 +817,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	add_type_cast(20, TypeChar, TypeInt, "char.__int__");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
-	cur_package = Packages[2];
+	cur_package = packages[2];
 	add_type_cast(50, TypeInt, TypeAny, "@int2any");
 	add_type_cast(50, TypeFloat32, TypeAny, "@float2any");
 	add_type_cast(50, TypeBool, TypeAny, "@bool2any");
@@ -842,9 +844,9 @@ void link_external(const string &name, void *pointer) {
 
 	Array<string> names = name.explode(":");
 	string sname = names[0].replace("@list", "[]").replace("@@", ".");
-	for (auto *p: Packages)
+	for (auto *p: packages)
 		foreachi(Function *f, p->syntax->functions, i)
-			if (f->long_name() == sname) {
+			if (f->cname(p->base_class()) == sname) {
 				int n = f->num_params;
 				if (!f->is_static())
 					n ++;
@@ -900,21 +902,21 @@ void _link_external_virtual(const string &name, void *p, void *instance) {
 }
 
 int process_class_offset(const string &class_name, const string &element, int offset) {
-	for (ClassOffsetData &d: ClassOffsets)
+	for (auto &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.element == element))
 			return d.offset;
 	return offset;
 }
 
 int process_class_size(const string &class_name, int size) {
-	for (ClassSizeData &d: ClassSizes)
+	for (auto &d: ClassSizes)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
 }
 
 int process_class_num_virtuals(const string &class_name, int num_virtual) {
-	for (ClassOffsetData &d: ClassOffsets)
+	for (auto &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.is_virtual))
 			num_virtual = max(num_virtual, d.offset + 1);
 	return num_virtual;
@@ -923,7 +925,7 @@ int process_class_num_virtuals(const string &class_name, int num_virtual) {
 void clean_up() {
 	DeleteAllScripts(true, true);
 
-	Packages.clear();
+	packages.clear();
 
 	reset_external_data();
 }

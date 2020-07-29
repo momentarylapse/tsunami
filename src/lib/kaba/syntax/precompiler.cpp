@@ -1,4 +1,5 @@
 #include "../kaba.h"
+#include "Parser.h"
 #include "../../file/file.h"
 
 namespace Kaba{
@@ -16,9 +17,21 @@ void SetImmortal(SyntaxTree *ps)
 		SetImmortal(i->syntax);
 }
 
+static bool _class_contains(const Class *c, const string &name) {
+	for (auto *cc: c->classes)
+		if (cc->name == name)
+			return true;
+	for (auto *f: c->functions)
+		if (f->name == name)
+			return true;
+	for (auto *cc: c->constants)
+		if (cc->name == name)
+			return true;
+	return false;
+}
+
 // import data from an included script file
-void SyntaxTree::add_include_data(Script *s)
-{
+void SyntaxTree::add_include_data(Script *s, bool indirect) {
 	for (Script *i: includes)
 		if (i == s)
 			return;
@@ -36,27 +49,24 @@ void SyntaxTree::add_include_data(Script *s)
 	/*if (FlagCompileOS){
 		import_deep(this, ps);
 	}else{*/
-		includes.add(s);
-		s->reference_counter ++;
+	if (indirect) {
+		imported_symbols->classes.add(ps->base_class);
+	} else {
+		for (auto *c: ps->base_class->classes)
+			imported_symbols->classes.add(c);
+		for (auto *f: ps->base_class->functions)
+			imported_symbols->functions.add(f);
+		for (auto *v: ps->base_class->static_variables)
+			imported_symbols->static_variables.add(v);
+		for (auto *c: ps->base_class->constants)
+			imported_symbols->constants.add(c);
+		if (s->filename.find(".kaba") < 0)
+			if (!_class_contains(imported_symbols, ps->base_class->name))
+				imported_symbols->classes.add(ps->base_class);
+	}
+	includes.add(s);
+	s->reference_counter ++;
 	//}
-
-	/*ExpressionBuffer::Line *cur_line = Exp.cur_line;
-	PreCompiler(script->JustAnalyse);
-	Exp.cur_line = cur_line;
-	Exp.cur_exp = 0;*/
-
-
-	// types
-//	Type.insert(Type.begin(), ps->Type.begin(), ps->Type.end()); // make sure foreign types precede the "own" types!
-/*	for (int i=0;i<ps->Types.num;i++)
-		Types.insert(ps->Types[i], i);
-		//Type.insert(ps->Type[i + PreType.num], i);
-
-	// constants
-	foreach(Constant &c, ps->Constants)
-		if (c.name[0] != '-')
-			Constants.add(c);*/
-	// TODO... ownership of "big" constants
 
 	for (Operator *op: ps->operators)
 		if (op->owner == ps)
@@ -75,18 +85,17 @@ string MacroName[NumMacroNames] =
 	"#immortal",
 };
 
-void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
-{
+void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse) {
 	string filename;
 	Define d;
 
 
-	int macro_no=-1;
-	for (int i=0;i<NumMacroNames;i++)
+	int macro_no = -1;
+	for (int i=0; i<NumMacroNames; i++)
 		if (Exp.cur == MacroName[i])
 			macro_no = i;
 	
-	switch(macro_no){
+	switch(macro_no) {
 		case MacroDefine:
 			// source
 			Exp.next();
@@ -100,13 +109,13 @@ void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool 
 			}
 
 			// special defines?
-			if ((d.source.num > 4) and (d.source.head(2) == "__") and (d.source.tail(2) == "__")){
+			if ((d.source.num > 4) and (d.source.head(2) == "__") and (d.source.tail(2) == "__")) {
 				if (d.source == "__OS__"){
 					do_error("#define __OS__ deprecated");
 				}else if (d.source == "__STRING_CONST_AS_CSTRING__"){
-					flag_string_const_as_cstring = true;
+					tree->flag_string_const_as_cstring = true;
 				}else if (d.source == "__FUNCTION_POINTER_AS_CODE__"){
-					flag_function_pointer_as_code = true;
+					tree->flag_function_pointer_as_code = true;
 				}else if (d.source == "__NO_FUNCTION_FRAME__"){
 					do_error("#define __NO_FUNCTION_FRAME__ deprecated");
 				}else if (d.source == "__ADD_ENTRY_POINT__"){
@@ -117,12 +126,13 @@ void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool 
 					do_error("#define __CODE_ORIGING__ deprecated");
 				}else
 					do_error("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
-			}else
+			} else {
 				// normal define
-				defines.add(d);
+				tree->defines.add(d);
+			}
 			break;
 		case MacroImmortal:
-			SetImmortal(this);
+			SetImmortal(tree);
 			//FlagImmortal=true;
 			break;
 		default:
@@ -137,7 +147,7 @@ void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool 
 }
 
 // ... maybe some time later
-void SyntaxTree::pre_compiler(bool just_analyse)
+void Parser::pre_compiler(bool just_analyse)
 {
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
@@ -146,7 +156,7 @@ void SyntaxTree::pre_compiler(bool just_analyse)
 		Exp.set(0, i);
 		if (Exp.cur[0] == '#'){
 			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
-		}else if (Exp.line[i].exp[0].name == IDENTIFIER_USE){
+		}else if ((Exp.line[i].exp[0].name == IDENTIFIER_USE) or (Exp.line[i].exp[0].name == IDENTIFIER_IMPORT)) {
 			parse_import();
 			Exp.line.erase(i);
 			i --;
@@ -156,7 +166,7 @@ void SyntaxTree::pre_compiler(bool just_analyse)
 			// replace by definition?
 			int num_defs_inserted = 0;
 			while(!Exp.end_of_line()){
-				foreachi(Define &d, defines, j){
+				foreachi(Define &d, tree->defines, j){
 					if (Exp.cur == d.source){
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						Exp.remove(Exp.cur_exp);

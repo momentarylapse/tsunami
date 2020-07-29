@@ -16,8 +16,8 @@ string sanitize(string s)
 class CueSplitter extends TsunamiPlugin
 	
 	override void on_start()
-		if FileDialogOpen(session.win, "", "", "*.cue", "*.cue")
-			load_cue(HuiFilename)
+		if hui.file_dialog_open(session.win, "", "", "*.cue", "*.cue")
+			load_cue(hui.filename)
 	
 	void load_cue(string filename)
 		string dir = filename.dirname()

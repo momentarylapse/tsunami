@@ -165,7 +165,7 @@ class MultiEchoGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if GetEvent().key_code == KEY_DELETE
+		if hui.get_event().key_code == KEY_DELETE
 			on_delete_reflection()
 
 	void on_delete_reflection()
@@ -205,7 +205,7 @@ class MultiEchoGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if GetEvent().button_l and (selected >= 0)
+		if hui.get_event().button_l and (selected >= 0)
 			config.refl[selected].delay = max(get_mouse2().x, 0.001)
 			config.refl[selected].volume = max(get_mouse2().y, 0)
 			cp.changed()
@@ -215,7 +215,7 @@ class MultiEchoGrid extends Grid
 	
 	override void on_mouse_wheel()
 		if hover >= 0
-			config.refl[hover].feedback *= exp(GetEvent().scroll_y * 0.02)
+			config.refl[hover].feedback *= exp(hui.get_event().scroll_y * 0.02)
 			redraw()
 			cp.changed()
 

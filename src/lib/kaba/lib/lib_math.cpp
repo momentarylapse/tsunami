@@ -269,7 +269,7 @@ public:
 
 
 void SIAddPackageMath() {
-	add_package("math", true);
+	add_package("math", Flags::AUTO_IMPORT);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));

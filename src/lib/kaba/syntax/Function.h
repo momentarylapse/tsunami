@@ -41,6 +41,7 @@ public:
 	
 	string name;
 	string long_name() const; // "Class.Function"
+	string cname(const Class *ns) const;
 	// parameters (linked to intern variables)
 	int num_params;
 	// block of code
@@ -75,7 +76,7 @@ public:
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();
 	void update_parameters_after_parsing();
-	string signature() const;
+	string signature(const Class *ns = nullptr) const;
 	Array<Block*> all_blocks();
 	void show(const string &stage = "") const;
 

@@ -22,9 +22,8 @@ namespace Kaba{
 #endif
 
 
-void SIAddPackageThread()
-{
-	add_package("thread", false);
+void SIAddPackageThread() {
+	add_package("thread");
 
 	const Class *TypeThread       = add_type  ("Thread", sizeof(Thread));
 	const Class *TypeThreadP      = add_type_p(TypeThread);

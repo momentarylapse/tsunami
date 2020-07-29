@@ -329,26 +329,6 @@ public:
 };
 
 
-
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
-
-
-string _cdecl kaba_shell_execute(const string &cmd) {
-	try {
-		return shell_execute(cmd);
-	} catch(::Exception &e) {
-		kaba_raise_exception(new KabaException(e.message()));
-	}
-	return "";
-}
-
-
-#pragma GCC pop_options
-
-
 void SIAddXCommands() {
 
 
@@ -387,7 +367,7 @@ void SIAddXCommands() {
 
 
 void SIAddPackageBase() {
-	add_package("base", true);
+	add_package("base", Flags::AUTO_IMPORT);
 
 	// internal
 	TypeUnknown			= add_type  ("-unknown-", 0); // should not appear anywhere....or else we're screwed up!
@@ -905,9 +885,6 @@ void SIAddPackageBase() {
 		func_add_param("size", TypeInt);
 	add_func("@free", TypeVoid, (void*)&free, Flags::STATIC);
 		func_add_param("p", TypePointer);
-	// system
-	add_func("shell_execute", TypeString, (void*)&kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("cmd", TypeString);
 }
 
 

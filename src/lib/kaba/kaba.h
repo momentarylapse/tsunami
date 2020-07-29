@@ -90,7 +90,6 @@ public:
 	Array<int> function_vars_to_link;
 
 	bool just_analyse, show_compiler_stats;
-	Function *cur_func;
 
 
 	// package

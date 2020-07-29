@@ -250,7 +250,7 @@ extern const Class *TypeShaderP;
 
 void SIAddPackageX()
 {
-	add_package("x", false);
+	add_package("x");
 #if _X_ALLOW_X_
 	AllowXContainer = false;
 #endif

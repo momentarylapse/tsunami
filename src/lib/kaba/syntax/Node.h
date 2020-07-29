@@ -112,9 +112,9 @@ public:
 	void set_num_params(int n);
 	void set_param(int index, Node *p);
 	void set_instance(Node *p);
-	string sig() const;
-	string str() const;
-	void show() const;
+	string sig(const Class *ns) const;
+	string str(const Class *ns) const;
+	void show(const Class *ns) const;
 };
 
 void clear_nodes(Array<Node*> &nodes);

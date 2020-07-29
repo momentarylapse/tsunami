@@ -159,7 +159,7 @@ Grid ? ''
 		draw_envelope(p, fc)
 	
 	int get_hover()
-		let e = GetEvent()
+		let e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if my > v2y(1.1)
@@ -182,7 +182,7 @@ Grid ? ''
 	void on_left_button_up()
 		moving = -1
 	void on_mouse_move()
-		let e = GetEvent()
+		let e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if moving < -5

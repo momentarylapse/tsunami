@@ -48,7 +48,7 @@ class Looper extends TsunamiPlugin
 		song = session.song
 		chain = session.view.signal_chain
 		renderer = session.view.renderer
-		runner = RunRepeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, self, on_update)
 		mode = MODE_FORWARD
 		
 		shader_vis = chain.add(Module.AUDIO_VISUALIZER, "Shader")
@@ -68,7 +68,7 @@ class Looper extends TsunamiPlugin
 		del shader_win
 		print("stop 3")
 		del shader_vis
-		CancelRunner(runner)
+		hui.cancel_runner(runner)
 			
 	override ConfigPanel* create_panel()
 		return new PPPanel(self)

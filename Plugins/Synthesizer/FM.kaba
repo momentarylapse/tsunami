@@ -317,7 +317,7 @@ Grid ? ''
 		draw_envelope(p, fc.osc[chosen])
 	
 	int get_hover()
-		let e = GetEvent()
+		let e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		for i in 0:NUM_OSCILLATORS
@@ -346,7 +346,7 @@ Grid ? ''
 	void on_left_button_up()
 		moving = -1
 	void on_mouse_move()
-		let e = GetEvent()
+		let e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if moving < -5 and chosen >= 0
@@ -380,7 +380,7 @@ Grid ? ''
 		update()
 	
 	void on_topology()
-		let code = GetEvent().id[4:]
+		let code = hui.get_event().id[4:]
 		fc.clear_links()
 		for i in 0:len(code)
 			if code[i] == 'x'

@@ -186,8 +186,8 @@ class SuperNovaWindow extends Window
 		if Mode != ModeConfig
 			return
 		hover = -1
-		float mx = HuiGetEvent().mouse_x
-		float my = HuiGetEvent().mouse_y
+		float mx = Huihui.get_event().mouse_x
+		float my = Huihui.get_event().mouse_y
 		for l,i in LessonName
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
@@ -268,7 +268,7 @@ void StartLesson(string name)
 	Score = 0
 	played.clear()
 
-	storage.load(audio, AppDirectoryStatic + "Lessons/" + name + ".nami")
+	storage.load(audio, hui.app_directory_static + "Lessons/" + name + ".nami")
 	for t in audio.tracks
 		if t.type == TRACK_TYPE_MIDI
 			MidiTrack = t
@@ -310,7 +310,7 @@ void StopLesson()
 	input.removeObserver(nil)
 	input.stop()
 	TotalScore += Score
-	HuiConfig.setFloat("Supernova.Score", TotalScore)
+	hui.config.setFloat("Supernova.Score", TotalScore)
 	Mode = ModeConfig
 	win.enable("speed", true)
 	win.enable("cancel", false)
@@ -332,13 +332,13 @@ void main()
 	HandPosition = 5
 	
 	LessonName.clear()
-	DirEntry[] list = DirSearch(AppDirectoryStatic + "Lessons/", "*.nami", false)
+	DirEntry[] list = DirSearch(hui.app_directory_static + "Lessons/", "*.nami", false)
 	for e in list
 		if e.name[0] != '0'
 			LessonName.add(e.name.substr(0, -6))
 		
 		
-	TotalScore = HuiConfig.getFloat("Supernova.Score", 0)
+	TotalScore = hui.config.getFloat("Supernova.Score", 0)
 	
 	MainWin.hide()
 	win.run()

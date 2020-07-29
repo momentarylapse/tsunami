@@ -72,7 +72,7 @@ class HullGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if GetEvent().key_code == KEY_DELETE
+		if hui.get_event().key_code == KEY_DELETE
 			if selected > 0 and selected < len(config.curve)-1
 				config.curve.remove(selected)
 				cp.changed()
@@ -94,7 +94,7 @@ class HullGrid extends Grid
 
 	override void on_mouse_move()
 		# move
-		if GetEvent().button_l and (selected >= 0)
+		if hui.get_event().button_l and (selected >= 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = 0
 			float xmax = 1

@@ -124,7 +124,7 @@ class GridAxis extends AxisData
 	
 	void on_mouse_wheel(float mm)
 		if grid.panel.win.get_key(KEY_CONTROL)
-			zoom(mm, GetEvent().scroll_y)
+			zoom(mm, hui.get_event().scroll_y)
 
 	GridPartition get_lin_partition()
 		float d = (val_max - val_min) / size * 150
@@ -430,18 +430,18 @@ class Grid extends Object
 		c.draw_line(pp0.x, pp0.y, pp1.x, pp1.y)
 	
 	complex get_mouse2()
-		float mx = GetEvent().mouse_x
-		float my = GetEvent().mouse_y
+		float mx = hui.get_event().mouse_x
+		float my = hui.get_event().mouse_y
 		return unproject2(complex(mx, my))
 	
 	vector get_mouse3(float z)
-		float mx = GetEvent().mouse_x
-		float my = GetEvent().mouse_y
+		float mx = hui.get_event().mouse_x
+		float my = hui.get_event().mouse_y
 		return unproject3(vector(mx, my, z))
 		
 	bool mouse_over_point2(complex q)
-		float mx = GetEvent().mouse_x
-		float my = GetEvent().mouse_y
+		float mx = hui.get_event().mouse_x
+		float my = hui.get_event().mouse_y
 		complex p = project2(q)
 		return (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 		
@@ -463,8 +463,8 @@ class Grid extends Object
 		panel.redraw(id)
 	
 	void update_mouse()
-		mx = GetEvent().mouse_x
-		my = GetEvent().mouse_y
+		mx = hui.get_event().mouse_x
+		my = hui.get_event().mouse_y
 	
 	void on_left_button_down_all()
 		update_mouse()

@@ -29,7 +29,7 @@ void __execute_single_command__(const string &cmd) {
 
 
 void SIAddPackageKaba() {
-	add_package("kaba", false);
+	add_package("kaba");
 
 
 	TypeClass 			= add_type  ("Class", sizeof(Class));
@@ -90,6 +90,8 @@ void SIAddPackageKaba() {
 			func_add_param("return_type", TypeClass);
 			func_add_param("params", TypeClassPList);
 		class_add_funcx("long_name", TypeString, &Class::long_name, Flags::PURE);
+		class_add_funcx("cname", TypeString, &Class::cname, Flags::PURE);
+			func_add_param("ns", TypeClassP);
 		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &class_repr, Flags::PURE);
 
 	add_class(TypeClassP);
@@ -98,7 +100,10 @@ void SIAddPackageKaba() {
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
 		class_add_funcx("long_name", TypeString, &Function::long_name, Flags::PURE);
+		class_add_funcx("cname", TypeString, &Function::cname, Flags::PURE);
+			func_add_param("ns", TypeClassP);
 		class_add_funcx("signature", TypeString, &Function::signature, Flags::PURE);
+			func_add_param("ns", TypeClassP);
 		class_add_elementx("namespace", TypeClassP, &Function::name_space);
 		class_add_elementx("num_params", TypeInt, &Function::num_params);
 		class_add_elementx("var", TypeVariablePList, &Function::var);
@@ -161,7 +166,7 @@ void SIAddPackageKaba() {
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);
 
-	add_ext_var("packages", TypeScriptPList, (void*)&Packages);
+	add_ext_var("packages", TypeScriptPList, (void*)&packages);
 	add_ext_var("statements", TypeStatementPList, (void*)&Statements);
 	add_ext_var("kaba_version", TypeString, (void*)&Version);
 }

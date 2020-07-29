@@ -19,12 +19,12 @@ class _StreamTest extends TsunamiPlugin
 		
 		nn = 0
 		acc = false
-		runner = RunRepeated(0.1, self, on_tick)
+		runner = hui.run_repeated(0.1, self, on_tick)
 		
 		chain.start()
 
 	override void on_stop()
-		CancelRunner(runner)
+		hui.cancel_runner(runner)
 		del chain
 	
 	void on_tick()

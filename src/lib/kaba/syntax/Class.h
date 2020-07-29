@@ -33,6 +33,7 @@ public:
 	~Class();
 	string name;
 	string long_name() const;
+	string cname(const Class *ns) const;
 	int64 size; // complete size of type
 	int array_length;
 

@@ -1,7 +1,7 @@
 # Image = hui:zoom-out
 # Title[Deutsch] = Ausblenden
 
-use "../../api.kaba"
+use tsunami
 
 class FadeOut extends AudioEffect
 	override void process(out AudioBuffer buf)

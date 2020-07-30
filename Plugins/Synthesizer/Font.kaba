@@ -1,7 +1,7 @@
 use os
 use hui
-use "../api.kaba"
-use "../helper/tone.kaba"
+use tsunami
+use helper.tone
 
 class MidiFont
 	string name

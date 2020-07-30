@@ -6,6 +6,7 @@
 #include "Parser.h"
 #include <stdio.h>
 
+
 namespace Kaba{
 
 void test_node_recursion(Node *root, const Class *ns, const string &message);
@@ -2440,44 +2441,95 @@ void Parser::parse_complete_command(Block *block) {
 
 extern Array<Script*> loading_script_stack;
 
+string canonical_import_name(const string &s) {
+	return s.lower().replace(" ", "").replace("_", "");
+}
+
+string dir_has(const string &dir, const string &name) {
+	auto list = dir_search(dir, "*", true);
+	for (auto &e: list)
+		if (canonical_import_name(e) == name)
+			return e;
+	return "";
+}
+
+string import_dir_match(const string &dir0, const string &name) {
+	auto xx = name.explode("/");
+	string filename = dir0;
+
+	for (int i=0; i<xx.num; i++) {
+		filename = dir_canonical(filename);
+		string e = dir_has(filename, canonical_import_name(xx[i]));
+		if (e == "")
+			return "";
+		filename += e;
+	}
+	return filename;
+
+	if (file_exists(dir0 + name))
+		return dir0 + name;
+	return "";
+}
+
+string find_import(Script *s, const string &_name) {
+	string name = _name.replace(".kaba", "");
+	name = name.replace(".", "/") + ".kaba";
+
+	if (name.head(2) == "@/")
+		return path_canonical(hui::Application::directory_static + "lib/" + name.substr(2, -1)); // TODO...
+
+	for (int i=0; i<5; i++) {
+		string filename = import_dir_match(path_canonical(path_dirname(s->filename) + str_repeat("../", i)), name);
+		if (filename != "")
+			return filename;
+	}
+
+	return "";
+}
+
 void Parser::parse_import() {
 	string command = Exp.cur; // 'use' / 'import'
 	bool indirect = (command == IDENTIFIER_IMPORT);
 	Exp.next();
 
+	// parse import name
 	string name = Exp.cur;
+	Exp.next();
+	while (!Exp.end_of_line()) {
+		if (Exp.cur != ".")
+			do_error("'.' expected in import name");
+		name += ".";
+		expect_no_new_line();
+		Exp.next();
+		name += Exp.cur;
+		Exp.next();
+	}
 	
 	if (name.match("\"*\""))
 		name = name.substr(1, name.num - 2); // remove ""
 		
 	
-	// internal packages?	
+	// internal packages?
 	for (Script *p: packages)
 		if (p->filename == name) {
 			tree->add_include_data(p, indirect);
 			return;
 		}
-	
-	if (name.tail(5) != ".kaba")
-		name += ".kaba";
 
-	string filename = tree->script->filename.dirname() + name;
-	if (name.head(2) == "@/")
-		filename = hui::Application::directory_static + "lib/" + name.substr(2, -1); // TODO...
-	filename = filename.no_recursion();
-
-
+	string filename = find_import(tree->script, name);
+	if (filename == "")
+		do_error(format("can not find import '%s'", name));
 
 	for (Script *ss: loading_script_stack)
-		if (ss->filename == filename.sys_filename())
+		if (ss->filename == sys_filename(filename))
 			do_error("recursive include");
 
 	msg_right();
 	Script *include;
-	try{
+	try {
 		include = Load(filename, tree->script->just_analyse or config.compile_os);
 		// os-includes will be appended to syntax_tree... so don't compile yet
-	}catch(Exception &e) {
+	} catch(Exception &e) {
 		msg_left();
 
 		int logical_line = Exp.get_line_no();

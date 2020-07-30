@@ -1,6 +1,6 @@
 # Title[Deutsch] = Tremolo
 
-use "../../api.kaba"
+use tsunami
 
 const string AUTO_CONFIG_SPEED = "0:20:0.1:1:Hz"
 const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"

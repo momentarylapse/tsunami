@@ -64,14 +64,6 @@ class string : public Array<char> {
 	bool _cdecl _bool() const;
 	const char *c_str() const;
 
-	// for paths
-	string _cdecl sys_filename() const;
-	string _cdecl dirname() const;
-	string _cdecl basename() const;
-	void _cdecl dir_ensure_ending();
-	string _cdecl no_recursion() const;
-	string _cdecl extension() const;
-
 	// operators
 	void _cdecl operator = (const string &s)
 	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
@@ -170,6 +162,7 @@ string _cdecl utf32_to_utf8(const Array<int> &s);
 
 string _cdecl str_unescape(const string &str);
 string _cdecl str_escape(const string &str);
+string _cdecl str_repeat(const string &s, int n);
 
 string _cdecl str_m_to_utf8(const string &str);
 string _cdecl str_utf8_to_m(const string &str);

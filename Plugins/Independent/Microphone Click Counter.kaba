@@ -1,10 +1,10 @@
 # Image = hui:find
 # Title[Deutsch] = Tonerkennung
 use hui
-use "../api.kaba"
-use "../helper/tone.kaba"
-use "../MidiSource/Click.kaba"
-use "../AudioEffect/Special/Click Counter.kaba"
+use tsunami
+use helper.tone
+use MidiSource.Click
+use AudioEffect.Special.ClickCounter
 
 
 class ClickCounterPanel extends ConfigPanel

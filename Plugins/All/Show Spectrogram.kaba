@@ -2,8 +2,8 @@
 # Title[Deutsch] = Spektrum zeigen
 use hui
 use image
-use "../api.kaba"
-use "../helper/grid.kaba"
+use tsunami
+use helper.grid
 
 ##show
 ##disasm

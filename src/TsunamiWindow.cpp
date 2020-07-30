@@ -594,7 +594,7 @@ void TsunamiWindow::on_send_bug_report() {
 
 string title_filename(const string &filename) {
 	if (filename.num > 0)
-		return filename.basename(); // + " (" + filename.dirname() + ")";
+		return path_basename(filename); // + " (" + filename.dirname() + ")";
 	return _("No name");
 }
 
@@ -1060,7 +1060,7 @@ bool song_is_simple_midi(Song *s) {
 
 string _suggest_filename(Song *s, const string &dir) {
 	if (s->filename != "")
-		return s->filename.basename();
+		return path_basename(s->filename);
 	string base = Date::now().format("%Y-%m-%d");
 
 	string ext = "nami";

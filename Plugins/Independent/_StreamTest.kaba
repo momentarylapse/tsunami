@@ -1,5 +1,5 @@
-use "../api.kaba"
-use "../AudioSource/Silence.kaba"
+use tsunami
+use AudioSource.Silence
 use hui
 
 class _StreamTest extends TsunamiPlugin

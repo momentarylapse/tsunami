@@ -1,6 +1,6 @@
 use hui
-use "../api.kaba"
-use "../helper/tone.kaba"
+use tsunami
+use helper.tone
 
 const int NUM_OSCILLATORS = 6
 

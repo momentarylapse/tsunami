@@ -1,7 +1,7 @@
 # Image = hui:zoom-in
 # Title[Deutsch] = Lautstärke
 
-use "../../api.kaba"
+use tsunami
 
 
 

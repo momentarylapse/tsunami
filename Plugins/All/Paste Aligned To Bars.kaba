@@ -1,4 +1,4 @@
-use "../api.kaba"
+use tsunami
 
 void update_bars(out Bar*[] bars)
 	int offset = 0

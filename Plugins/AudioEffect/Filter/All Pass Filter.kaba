@@ -1,7 +1,7 @@
 # Image = hui:properties
 # Title[Deutsch] = Hochpass Filter
-use "../../api.kaba"
-use "../../helper/filter.kaba"
+use tsunami
+use helper.filter
 
 const string AUTO_CONFIG_Z = "0:100:0.1:1:"
 const string AUTO_CONFIG_PHI = "0:6.3:0.1:1:"

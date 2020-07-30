@@ -1,6 +1,6 @@
 # Image = hui:properties
 # Title[Deutsch] = Schaltkreis
-use "../../api.kaba"
+use tsunami
 use "circuit/circuit.kaba"
 
 

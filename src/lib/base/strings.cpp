@@ -287,68 +287,6 @@ const char *string::c_str() const
 }
 
 
-// transposes path-strings to the current operating system
-// accepts windows and linux paths ("/" and "\\")
-string string::sys_filename() const
-{
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
-	return replace("/", "\\");
-#else
-	return replace("\\", "/");
-#endif
-}
-
-// ends with '/' or '\'
-string string::dirname() const
-{
-	int i = max(rfind("/"), rfind("\\"));
-	if (i >= 0)
-		return head(i + 1);
-	return "";
-}
-
-string string::basename() const
-{
-	int i = max(rfind("/"), rfind("\\"));
-	if (i >= 0)
-		return tail(num - i - 1);
-	return *this;
-}
-
-// make sure the name ends with a shlash
-void string::dir_ensure_ending()
-{
-	if (num > 0){
-		char lc = (*this)[num - 1];
-		if ((lc != '/') and (lc != '\\'))
-			add('/');
-	}
-}
-
-// remove "/../"
-string string::no_recursion() const
-{
-	string str = replace("\\", "/");
-	Array<string> p = str.explode("/");
-
-	for (int i=1;i<p.num;i++)
-		if ((p[i] == "..") and (p[i-1] != "..")){
-			p.erase(i);
-			p.erase(i - 1);
-			i -= 2;
-		}
-
-	return implode(p, "/");
-}
-
-string string::extension() const
-{
-	int pos = rfind(".");
-	if (pos >= 0)
-		return tail(num - pos - 1).lower();
-	return "";
-}
-
 
 
 // convert an integer to a string (with a given number of decimals)
@@ -620,13 +558,6 @@ string _fa2s(const Array<float> &a)
 }
 
 
-string str_rep(const string &s, int n) {
-	string r;
-	for (int i=0; i<n; i++)
-		r += s;
-	return r;
-}
-
 struct xf_format_data {
 	bool sign, left_justify, fill_zeros, sharp;
 	int width;
@@ -645,9 +576,9 @@ struct xf_format_data {
 		if (width <= 0 or fill_zeros)
 			return s;
 		if (left_justify)
-			return s + str_rep(" ", width - s.num);
+			return s + str_repeat(" ", width - s.num);
 		else
-			return str_rep(" ", width - s.num) + s;
+			return str_repeat(" ", width - s.num) + s;
 	}
 };
 
@@ -716,7 +647,7 @@ template<> string _xf_str_(const string &f, int64 value) {
 		n_zeros = ff.width;
 	if (ff.decimals >= 0)
 		n_zeros = ff.decimals;
-	s = str_rep("0", n_zeros - size) + s;
+	s = str_repeat("0", n_zeros - size) + s;
 	if (ff.type == 'x' and ff.sharp)
 		s = "0x" + s;
 
@@ -1055,6 +986,13 @@ bool string::match(const string &glob) const
 	if (tail(g.back().num) != g.back())
 		return false;
 	return true;
+}
+
+string str_repeat(const string &s, int n) {
+	string r;
+	for (int i=0; i<n; i++)
+		r += s;
+	return r;
 }
 
 int string::utf8len() const

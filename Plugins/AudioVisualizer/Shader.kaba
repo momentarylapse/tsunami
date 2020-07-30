@@ -1,7 +1,7 @@
 use hui
 use nix
 use time
-use "../api.kaba"
+use tsunami
 
 #extern void NixKill()
 

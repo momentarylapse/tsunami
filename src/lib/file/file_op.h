@@ -21,6 +21,15 @@ int64 _cdecl file_size(const string &path);
 Date _cdecl file_mtime(const string &path);
 string _cdecl file_hash(const string &filename, const string &type);
 
+string _cdecl path_absolute(const string &path);
+string _cdecl path_canonical(const string &path);
+string _cdecl dir_canonical(const string &path);
+
+string _cdecl sys_filename(const string &path);
+string _cdecl path_dirname(const string &path);
+string _cdecl path_basename(const string &path);
+string _cdecl path_extension(const string &path);
+
 bool func_did_not_throw(std::function<void()> f);
 #define FILE_OP_OK(OP) \
 	func_did_not_throw([=]{ OP; })

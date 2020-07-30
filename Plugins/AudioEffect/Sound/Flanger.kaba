@@ -1,7 +1,7 @@
 # Image = hui:copy
 # Title[Deutsch] = Flanger
 
-use "../../api.kaba"
+use tsunami
 
 const string AUTO_CONFIG_DELAY = "0:0.02:0.1:1000:ms"
 const string AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"

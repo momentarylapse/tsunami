@@ -67,8 +67,8 @@ Storage::~Storage() {
 }
 
 bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
-	current_directory = filename.dirname();
-	FormatDescriptor *d = get_format(filename.extension(), 0);
+	current_directory = path_dirname(filename);
+	FormatDescriptor *d = get_format(path_extension(filename), 0);
 	if (!d)
 		return false;
 
@@ -110,8 +110,8 @@ bool Storage::load(Song *song, const string &filename) {
 }
 
 bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) {
-	current_directory = filename.dirname();
-	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	current_directory = path_dirname(filename);
+	auto *d = get_format(path_extension(filename), FormatDescriptor::Flag::AUDIO);
 	if (!d)
 		return false;
 
@@ -152,9 +152,9 @@ bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
 }
 
 bool Storage::save(Song *song, const string &filename) {
-	current_directory = filename.dirname();
+	current_directory = path_dirname(filename);
 
-	FormatDescriptor *d = get_format(filename.extension(), 0);
+	FormatDescriptor *d = get_format(path_extension(filename), 0);
 	if (!d)
 		return false;
 
@@ -184,7 +184,7 @@ bool Storage::save(Song *song, const string &filename) {
 }
 
 bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags) {
-	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
+	FormatDescriptor *d = get_format(path_extension(filename), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return false;
 

@@ -166,13 +166,13 @@ void FormatMp3::load_track(StorageOperationData *od)
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("yes | avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
 			od->storage->load_track(od->layer, tmp, od->offset);
-			od->storage->current_directory = od->filename.dirname();
+			od->storage->current_directory = path_dirname(od->filename);
 			file_delete(tmp);
 		}else if (system("which ffmpeg") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("yes | ffmpeg -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
 			od->storage->load_track(od->layer, tmp, od->offset);
-			od->storage->current_directory = od->filename.dirname();
+			od->storage->current_directory = path_dirname(od->filename);
 			file_delete(tmp);
 		}else
 			od->error("need external program 'avconv' to decode");

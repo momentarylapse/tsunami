@@ -1,4 +1,4 @@
-use "../api.kaba"
+use tsunami
 
 const string AUTO_CONFIG_BPM = "1:360:1:1:/min"
 const string AUTO_CONFIG_BEATS = "1:20"

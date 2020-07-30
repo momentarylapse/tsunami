@@ -1,6 +1,6 @@
 # Image = hui:properties
 # Title[Deutsch] = Verzerrer
-use "../../api.kaba"
+use tsunami
 
 const string AUTO_CONFIG_GAIN = "0:1:0.1:100:%"
 

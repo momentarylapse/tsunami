@@ -1,7 +1,8 @@
 # Image = hui:copy
 # Title[Deutsch] = Echo
 
-use "../../api.kaba"
+use tsunami
+use helper.grid
 
 const string AUTO_CONFIG_DELAY = "0:1:1:1000:ms"
 const string AUTO_CONFIG_VOLUME = "0:2:0.1:100:%"

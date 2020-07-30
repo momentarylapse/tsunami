@@ -1,6 +1,6 @@
 # Title[Deutsch] = nichts tun
 
-use "../../api.kaba"
+use tsunami
 
 class Identity extends AudioEffect
 	override void process(out AudioBuffer buf)

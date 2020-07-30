@@ -1,6 +1,6 @@
 # Image = hui:forward
 # Title[Deutsch] = Kanäle L -> R
-use "../../api.kaba"
+use tsunami
 
 class LToR extends AudioEffect
 	override void process(out AudioBuffer buf)

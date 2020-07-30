@@ -50,7 +50,7 @@ void Image::_load_flipped(const string &filename) {
 		return;
 	}
 	
-	string ext = filename.extension();
+	string ext = path_extension(filename);
 	
 	if (ext == "bmp")
 		image_load_bmp(filename, *this);
@@ -107,7 +107,7 @@ void Image::create(int _width, int _height, const color &c) {
 }
 
 void Image::save(const string &filename) const {
-	string ext = filename.extension();
+	string ext = path_extension(filename);
 	if (ext == "tga")
 		image_save_tga(filename, *this);
 	else if (ext == "bmp")

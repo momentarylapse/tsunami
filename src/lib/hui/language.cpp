@@ -60,7 +60,7 @@
 	{	return str.c_str();	}
 
 	const char *sys_str_f(const string &str)
-	{	return str.sys_filename().c_str();	}
+	{	return sys_filename(str).c_str();	}
 
 	string de_sys_str(const char *str)
 	{	return string(str);	}

@@ -475,7 +475,7 @@ public:
 
 	void on_save() {
 		if (hui::FileDialogSave(win, _("Save the signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
-			session->storage->current_chain_directory = hui::Filename.dirname();
+			session->storage->current_chain_directory = path_dirname(hui::Filename);
 			chain->save(hui::Filename);
 		}
 	}
@@ -555,7 +555,7 @@ void SignalEditor::on_new() {
 
 void SignalEditor::on_load() {
 	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
-		session->storage->current_chain_directory = hui::Filename.dirname();
+		session->storage->current_chain_directory = path_dirname(hui::Filename);
 		session->load_signal_chain(hui::Filename);
 	}
 }

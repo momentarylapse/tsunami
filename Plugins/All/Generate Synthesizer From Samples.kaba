@@ -1,6 +1,6 @@
-use "../api.kaba"
-use "../Synthesizer/Sample.kaba"
-use "../AudioEffect/Pitch/Pitch Shift.kaba"
+use tsunami
+use Synthesizer.Sample
+use AudioEffect.Pitch.PitchShift
 
 class XXX extends SongPlugin
 	override void apply()

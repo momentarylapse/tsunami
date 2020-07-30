@@ -1,6 +1,6 @@
 # Image = hui:back
 # Title[Deutsch] = Rückwärts
-use "../../api.kaba"
+use tsunami
 
 class Reverse extends AudioEffect
 	override void process(out AudioBuffer buf)

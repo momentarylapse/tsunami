@@ -1,5 +1,5 @@
-use "../../api.kaba"
-use "../../helper/filter.kaba"
+use tsunami
+use helper.filter
 
 const string AUTO_CONFIG_FMIN = "0:10000:1:1:Hz"
 const string AUTO_CONFIG_FMAX = "0:10000:1:1:Hz"

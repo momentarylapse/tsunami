@@ -1,7 +1,7 @@
 # Image = hui:zoom-in
 # Title[Deutsch] = Lautstärke
 
-use "../../api.kaba"
+use tsunami
 
 const string AUTO_CONFIG_VOLUME_RIGHT = "0:2:0.1:100:%"
 const string AUTO_CONFIG_VOLUME_LEFT = "0:2:0.1:100:%"

@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Spektrum zeigen
 use hui
-use "../api.kaba"
-use "../helper/grid.kaba"
+use tsunami
+use helper.grid
 
 const int N = 512
 const float MIN_FREQ = 20.0

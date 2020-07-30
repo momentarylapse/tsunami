@@ -1,5 +1,5 @@
 use hui
-use "../api.kaba"
+use tsunami
 
 enum
 	MODE_FORWARD

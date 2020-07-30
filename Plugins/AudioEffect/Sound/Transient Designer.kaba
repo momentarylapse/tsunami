@@ -1,5 +1,5 @@
-use "../../api.kaba"
-use "../Special/Envelope.kaba"
+use tsunami
+use Special.Envelope
 
 const string AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
 const string AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"

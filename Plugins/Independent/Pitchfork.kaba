@@ -1,6 +1,6 @@
 # Image = hui:media-play
 # Title[Deutsch] = Stimmgabel
-use "../api.kaba"
+use tsunami
 
 class PitchFork extends TsunamiPlugin
 	SignalChain* chain

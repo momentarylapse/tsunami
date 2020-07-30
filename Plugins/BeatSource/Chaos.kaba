@@ -1,4 +1,4 @@
-use "../api.kaba"
+use tsunami
 
 class ChaosSource extends BeatSource
 	int offset

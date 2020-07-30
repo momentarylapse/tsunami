@@ -89,7 +89,7 @@ void image_load_tga(const string &filename, Image &image)
 	unsigned char Header[18];
 	int x;
 	unsigned char *data=nullptr,*pal=nullptr;
-	FILE* f=fopen(filename.sys_filename().c_str(),"rb");
+	FILE* f=fopen(sys_filename(filename).c_str(),"rb");
 	int r=fread(&Header, 18, 1, f);
 	int offset=get_int_from_buffer(Header,0,1)+18;
 	int tga_type=get_int_from_buffer(Header,2,1);
@@ -197,7 +197,7 @@ static unsigned char Header[18];
 
 void image_save_tga(const string &filename, const Image &image)
 {
-	FILE* f=fopen(filename.sys_filename().c_str(),"wb");
+	FILE* f=fopen(sys_filename(filename).c_str(),"wb");
 	if (!f){
 		msg_error("couldn't save tga file: " + filename);
 		return;

@@ -1,8 +1,8 @@
 # Image = hui:add
 # Title[Deutsch] = Metronom
 
-use "../api.kaba"
-use "../MidiSource/Metronome.kaba"
+use tsunami
+use MidiSource.Metronome
 
 
 

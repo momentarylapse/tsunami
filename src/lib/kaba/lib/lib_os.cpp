@@ -254,6 +254,18 @@ void SIAddPackageOS() {
 		class_add_funcx("delete_directory", TypeVoid, &kaba_dir_delete, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("dir", TypeString);
 		class_add_funcx("current_directory", TypeString, &get_current_dir, Flags::STATIC);
+		class_add_funcx("absolute", TypeString, &path_absolute, Flags::STATIC);
+			func_add_param("path", TypeString);
+		class_add_funcx("dirname", TypeString, &path_dirname, Flags::_STATIC__PURE);
+			func_add_param("path", TypeString);
+		class_add_funcx("basename", TypeString, &path_basename, Flags::_STATIC__PURE);
+			func_add_param("path", TypeString);
+		class_add_funcx("extension", TypeString, &path_extension, Flags::_STATIC__PURE);
+			func_add_param("path", TypeString);
+		class_add_funcx("canonical", TypeString, &path_canonical, Flags::_STATIC__PURE);
+			func_add_param("path", TypeString);
+		class_add_funcx("dir_canonical", TypeString, &dir_canonical, Flags::_STATIC__PURE);
+			func_add_param("path", TypeString);
 		
 		_kaba_stdin = new File();
 		_kaba_stdin->handle = 0;

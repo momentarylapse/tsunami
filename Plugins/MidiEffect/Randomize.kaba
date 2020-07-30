@@ -1,4 +1,4 @@
-use "../api.kaba"
+use tsunami
 
 const string AutoConfigTimeDelay = "-2:2:1:1000:ms"
 const string AutoConfigTimeVariation = "0:1:1:1000:ms"

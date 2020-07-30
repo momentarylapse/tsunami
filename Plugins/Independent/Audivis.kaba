@@ -1,6 +1,6 @@
 use hui
-use "../api.kaba"
-use "../AudioVisualizer/Shader.kaba"
+use tsunami
+use AudioVisualizer.Shader
 
 enum
 	MODE_FORWARD

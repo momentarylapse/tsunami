@@ -1,6 +1,6 @@
 # Image = hui:back
 # Title[Deutsch] = Kanäle L <- R
-use "../../api.kaba"
+use tsunami
 
 class Swap extends AudioEffect
 	override void process(out AudioBuffer buf)

@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Supernova
 use hui
-use "../api.kaba"
-use "../helper/tone.kaba"
+use tsunami
+use helper.tone
 
 #const int freq = 44100
 const int f_min = 50

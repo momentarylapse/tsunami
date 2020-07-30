@@ -1,7 +1,7 @@
 # Image = hui:media-play
 # Title[Deutsch] = Song Metronom
 use hui
-use "../api.kaba"
+use tsunami
 
 enum
 	MODE_CIRCLE

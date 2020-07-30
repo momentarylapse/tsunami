@@ -201,7 +201,7 @@ void SampleManagerConsole::on_import() {
 	AudioBuffer buf;
 	if (!session->storage->load_buffer(&buf, hui::Filename))
 		return;
-	song->create_sample_audio(hui::Filename.basename(), buf);
+	song->create_sample_audio(path_basename(hui::Filename), buf);
 	//setInt("sample_list", items.num - 1);
 }
 
@@ -436,7 +436,7 @@ public:
 		AudioBuffer buf;
 		if (!session->storage->load_buffer(&buf, hui::Filename))
 			return;
-		song->create_sample_audio(hui::Filename.basename(), buf);
+		song->create_sample_audio(path_basename(hui::Filename), buf);
 		fill_list();
 
 	}

@@ -273,7 +273,7 @@ void Texture::__delete__() {
 Texture *LoadTexture(const string &_filename) {
 	if (_filename.num < 1)
 		return NULL;
-	string filename = _filename.sys_filename();
+	string filename = sys_filename(_filename);
 	for (Texture *t: textures)
 		if (filename == t->filename)
 			return t->valid ? t : NULL;
@@ -305,7 +305,7 @@ void Texture::reload() {
 		avi_info[texture]=NULL;
 	#endif
 
-	string extension = filename.extension();
+	string extension = path_extension(filename);
 
 // AVI
 	if (extension == "avi"){

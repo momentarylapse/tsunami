@@ -1,6 +1,6 @@
 # Image = hui:clear
 # Title[Deutsch] = Kanal Löschen R
-use "../../api.kaba"
+use tsunami
 
 
 class ClearR extends AudioEffect

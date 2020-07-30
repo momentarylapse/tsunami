@@ -1,7 +1,7 @@
 use hui
-use "../api.kaba"
-use "../helper/tone.kaba"
-use "../helper/grid.kaba"
+use tsunami
+use helper.tone
+use helper.grid
 
 const int N = 4096*16
 

@@ -1,5 +1,5 @@
-use "../api.kaba"
-use "../helper/tone.kaba"
+use tsunami
+use helper.tone
 
 
 class SampleConfig extends Module.Config

@@ -1,6 +1,6 @@
-use "../api.kaba"
-use "grid.kaba"
-use "filter.kaba"
+use tsunami
+use grid
+use filter
 
 
 class BiquadGainCurve extends Curve

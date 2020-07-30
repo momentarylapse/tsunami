@@ -1,5 +1,5 @@
 use hui
-use "../api"
+use tsunami
 use tone
 
 class Curve

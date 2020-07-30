@@ -94,7 +94,7 @@ void image_load_bmp(const string &filename, Image &image)
 	//msg_write("bmp");
 	unsigned char Header[56];
 	unsigned char *pal = nullptr, temp_buffer[8];
-	FILE* f = fopen(filename.sys_filename().c_str(), "rb");
+	FILE* f = fopen(sys_filename(filename).c_str(), "rb");
 	int r = fread(&Header, 56, 1, f);
 
 	image.width = get_int_from_buffer(Header, 18, 4);

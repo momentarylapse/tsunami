@@ -58,7 +58,7 @@ bool func_did_not_throw(std::function<void()> f) {
 // just test the existence of a file
 bool file_exists(const string &filename) {
 	struct stat s;
-	if (stat(filename.sys_filename().c_str(), &s) == 0) {
+	if (stat(sys_filename(filename).c_str(), &s) == 0) {
 		//if (s.st_mode & S_IFREG)
 			return true;
 	}
@@ -67,21 +67,21 @@ bool file_exists(const string &filename) {
 
 int64 file_size(const string &path) {
 	struct stat s;
-	if (stat(path.sys_filename().c_str(), &s) != 0)
+	if (stat(sys_filename(path).c_str(), &s) != 0)
 		throw FileError("unable to stat '" + path + "'");
 	return s.st_size;
 }
 
 Date file_mtime(const string &path) {
 	struct stat s;
-	if (stat(path.sys_filename().c_str(), &s) != 0)
+	if (stat(sys_filename(path).c_str(), &s) != 0)
 		throw FileError("unable to stat '" + path + "'");
 	return time2date(s.st_mtime);
 }
 
 bool file_is_directory(const string &path) {
 	struct stat s;
-	if (stat(path.sys_filename().c_str(), &s) != 0)
+	if (stat(sys_filename(path).c_str(), &s) != 0)
 		return false; //throw FileError("unable to stat '" + path + "'");
 	return (s.st_mode & S_IFDIR);
 }
@@ -91,17 +91,17 @@ void dir_create(const string &dir) {
 	if (file_is_directory(dir))
 		return;
 #if defined(OS_WINDOWS)
-	if (_mkdir(dir.sys_filename().c_str()) != 0)
+	if (_mkdir(sys_filename(dir).c_str()) != 0)
 #elif defined(OS_MINGW)
-	if (mkdir(dir.sys_filename().c_str()) != 0)
+	if (mkdir(sys_filename(dir).c_str()) != 0)
 #else // defined(OS_LINUX)
-	if (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
+	if (mkdir(sys_filename(dir).c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 #endif
 		throw FileError("can not create directory '" + dir + "'");
 }
 
 void dir_delete(const string &dir) {
-	if (_rmdir(dir.sys_filename().c_str()) != 0)
+	if (_rmdir(sys_filename(dir).c_str()) != 0)
 		throw FileError("can not delete directory '" + dir + "'");
 }
 
@@ -129,7 +129,7 @@ void file_rename(const string &source, const string &target) {
 			if ((target[i] == '/') or (target[i] == '\\'))
 				dir_create(string(dir));
 	}
-	if (rename(source.sys_filename().c_str(), target.sys_filename().c_str()) != 0)
+	if (rename(sys_filename(source).c_str(), sys_filename(target).c_str()) != 0)
 		throw FileError("can not rename file '" + source + "' -> '" + target + "'");
 }
 
@@ -142,15 +142,15 @@ void file_copy(const string &source, const string &target) {
 			if ((target[i] == '/') or (target[i] == '\\'))
 				dir_create(string(dir));
 	}
-	int hs=_open(source.sys_filename().c_str(),O_RDONLY);
+	int hs=_open(sys_filename(source).c_str(),O_RDONLY);
 	if (hs<0)
 		throw FileError("copy: can not open source file '" + source + "'");
 #ifdef OS_WINDOWS
-	int ht=_creat(target.sys_filename().c_str(),_S_IREAD | _S_IWRITE);
+	int ht=_creat(sys_filename(target).c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	int ht = creat(target.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int ht = creat(sys_filename(target).c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht < 0){
 		_close(hs);
@@ -169,7 +169,7 @@ void file_copy(const string &source, const string &target) {
 }
 
 void file_delete(const string &filename) {
-	if (_unlink(filename.sys_filename().c_str()) != 0)
+	if (_unlink(sys_filename(filename).c_str()) != 0)
 		throw FileError("can not delete file '" + filename + "'");
 }
 
@@ -179,6 +179,69 @@ string file_hash(const string &filename, const string &type) {
 	}
 	return "";
 }
+
+
+// transposes path-strings to the current operating system
+// accepts windows and linux paths ("/" and "\\")
+string sys_filename(const string &path) {
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+	return path.replace("/", "\\");
+#else
+	return path.replace("\\", "/");
+#endif
+}
+
+// ends with '/' or '\'
+string path_dirname(const string &path) {
+	int i = max(path.rfind("/"), path.rfind("\\"));
+	if (i >= 0)
+		return path.head(i + 1);
+	return "";
+}
+
+string path_basename(const string &path) {
+	int i = max(path.rfind("/"), path.rfind("\\"));
+	if (i >= 0)
+		return path.tail(path.num - i - 1);
+	return path;
+}
+
+// make sure the name ends with a slash
+string dir_canonical(const string &path) {
+	string p = path_canonical(path);
+	if (p.tail(1) != "/")
+		return p + "/";
+	return p;
+}
+
+// remove "/../"
+string path_canonical(const string &path) {
+	auto p = path.replace("\\", "/").explode("/");
+
+	for (int i=1; i<p.num; i++)
+		if ((p[i] == "..") and (p[i-1] != "..")){
+			p.erase(i);
+			p.erase(i - 1);
+			i -= 2;
+		}
+
+	return implode(p, "/");
+}
+
+string path_extension(const string &path) {
+	int pos = path.rfind(".");
+	if (pos >= 0)
+		return path.tail(path.num - pos - 1).lower();
+	return "";
+}
+
+
+string path_absolute(const string &path) {
+	if (path.head(1) == "/" or path.substr(1,1) == ":")
+		return path;
+	return path_canonical(get_current_dir() + path);
+}
+
 
 string shell_execute(const string &cmd) {
 #ifdef OS_LINUX
@@ -215,9 +278,7 @@ Array<string> dir_search(const string &dir, const string &filter, bool show_dire
 	Array<string> dir_list, file_list;
 
 	string filter2 = filter.substr(1, filter.num - 1);
-	string dir2 = dir;
-	dir2.dir_ensure_ending();
-	dir2 = dir2.sys_filename();
+	string dir2 = sys_filename(dir_canonical(dir));
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;

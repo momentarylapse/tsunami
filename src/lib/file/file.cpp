@@ -259,7 +259,7 @@ void set_mode(File *f) {
 
 // open a file
 void File::open(const string &_filename) {
-	handle = _open(_filename.sys_filename().c_str(), O_RDONLY);
+	handle = _open(sys_filename(_filename).c_str(), O_RDONLY);
 	if (handle <= 0)
 		throw FileError("failed opening file '" + _filename + "'");
 
@@ -277,10 +277,10 @@ void File::open(const string &_filename) {
 // create a new file or reset an existing one
 void File::create(const string &_filename) {
 #ifdef OS_WINDOWS
-	handle = _creat(_filename.sys_filename().c_str(), _S_IREAD | _S_IWRITE);
+	handle = _creat(sys_filename(_filename).c_str(), _S_IREAD | _S_IWRITE);
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::creat(_filename.sys_filename().c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle = ::creat(sys_filename(_filename).c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
 		throw FileError("failed creating file '" + _filename + "'");
@@ -292,10 +292,10 @@ void File::create(const string &_filename) {
 // create a new file or append data to an existing one
 void File::append(const string &_filename) {
 #ifdef OS_WINDOWS
-	handle = _open(_filename.sys_filename().c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
+	handle = _open(sys_filename(_filename).c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::open(_filename.sys_filename().c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle = ::open(sys_filename(_filename).c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
 		throw FileError("failed appending file '" + _filename + "'");

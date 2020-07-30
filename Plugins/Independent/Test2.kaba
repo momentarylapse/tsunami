@@ -1,5 +1,5 @@
 use hui
-use "../api.kaba"
+use tsunami
 
 const int CHUNK_SIZE = 1024
 const int NUM_CHUNKS = 4

@@ -1,7 +1,7 @@
 # Image = hui:properties
 # Title[Deutsch] = Hochpass Filter
-use "../../api.kaba"
-use "../../helper/filter.kaba"
+use tsunami
+use helper.filter
 
 const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
 

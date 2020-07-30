@@ -1,5 +1,5 @@
-use "../api.kaba"
-use "../helper/tone.kaba"
+use tsunami
+use helper.tone
 
 const int MIN_DETECT_PITCH = 40
 const int MAX_DETECT_PITCH = 100

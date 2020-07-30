@@ -24,9 +24,9 @@
 	#include <windows.h>
 #endif
 
-namespace Kaba{
+namespace Kaba {
 
-string Version = "0.19.-2.0";
+string Version = "0.19.-2.2";
 
 //#define ScriptDebug
 
@@ -60,12 +60,12 @@ Script *Load(const string &filename, bool just_analyse) {
 
 	// already loaded?
 	for (Script *ps: _public_scripts_)
-		if (ps->filename == filename.sys_filename())
+		if (ps->filename == sys_filename(filename))
 			return ps;
 	
 	// load
 	s = new Script();
-	s->syntax->base_class->name = filename.basename().replace(".kaba", "");
+	s->syntax->base_class->name = path_basename(filename).replace(".kaba", "");
 	try {
 		s->load(filename, just_analyse);
 	} catch(const Exception &e) {
@@ -175,16 +175,17 @@ struct LoadingScript {
 };
 Array<LoadingScript> loading_script_stack;
 
+
 void Script::load(const string &_filename, bool _just_analyse) {
 	loading_script_stack.add(this);
 	just_analyse = _just_analyse;
-	filename = _filename.sys_filename();
+	filename = sys_filename(path_absolute(config.directory + _filename));
 	auto parser = syntax->parser = new Parser(syntax);
 
 	try {
 
 	// read file
-		string buffer = FileReadText(config.directory + filename);
+		string buffer = FileReadText(filename);
 		parser->parse_buffer(buffer, just_analyse);
 
 

@@ -1,5 +1,5 @@
-use "../api.kaba"
-use "../PitchDetector/Test.kaba"
+use tsunami
+use PitchDetector.Test
 use hui
 
 class SNRPanel extends ConfigPanel

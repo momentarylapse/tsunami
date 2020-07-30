@@ -653,6 +653,8 @@ void SIAddPackageBase() {
 			func_add_param("by", TypeString);
 		class_add_funcx("explode", TypeStringList, &string::explode, Flags::PURE);
 			func_add_param("str", TypeString);
+		class_add_funcx("repeat", TypeString, &str_repeat, Flags::PURE);
+			func_add_param("n", TypeInt);
 		class_add_funcx("lower", TypeString, &string::lower, Flags::PURE);
 		class_add_funcx("upper", TypeString, &string::upper, Flags::PURE);
 		class_add_funcx("reverse", TypeString, &string::reverse, Flags::PURE);
@@ -667,9 +669,6 @@ void SIAddPackageBase() {
 		class_add_funcx("__float__", TypeFloat32, &string::_float, Flags::PURE);
 		class_add_funcx("__float64__", TypeFloat64, &string::f64, Flags::PURE);
 		class_add_funcx("trim", TypeString, &string::trim, Flags::PURE);
-		class_add_funcx("dirname", TypeString, &string::dirname, Flags::PURE);
-		class_add_funcx("basename", TypeString, &string::basename, Flags::PURE);
-		class_add_funcx("extension", TypeString, &string::extension, Flags::PURE);
 		class_add_funcx("escape", TypeString, &str_escape, Flags::PURE);
 		class_add_funcx("unescape", TypeString, &str_unescape, Flags::PURE);
 		class_add_funcx(IDENTIFIER_FUNC_REPR, TypeString, &string::repr, Flags::PURE);

@@ -122,14 +122,13 @@ void Configuration::load()
 	}
 }
 
-void Configuration::save()
-{
-	dir_create(filename.dirname());
-	try{
+void Configuration::save() {
+	dir_create(path_dirname(filename));
+	try {
 		File *f = FileCreateText(filename);
 		f->write_str("// NumConfigs");
 		f->write_int(map.num);
-		for (auto &e: map){
+		for (auto &e: map) {
 			f->write_str("// " + e.key);
 			f->write_str(e.value);
 		}
@@ -137,7 +136,8 @@ void Configuration::save()
 		FileClose(f);
 		loaded = true;
 		changed = false;
-	}catch(...){}
+	} catch(...) {
+	}
 }
 
 

@@ -27,8 +27,7 @@ bool FileDialogDir(Window *win, const string &title, const string &dir/*, const 
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT){
-		Filename = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER (dlg));
-		Filename.dir_ensure_ending();
+		Filename = dir_canonical(gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dlg)));
 	}
 	gtk_widget_destroy(dlg);
 	return (r == GTK_RESPONSE_ACCEPT);
@@ -79,9 +78,9 @@ static void try_to_ensure_extension(string &filename, const string &filter)
 	// multiple choices -> ignore
 	if (filter.find(";") >= 0)
 		return;
-	string filter_ext = filter.extension(); // "*.ext"
+	string filter_ext = path_extension(filter); // "*.ext"
 	// not the wanted extension -> add
-	if (filename.extension() != filter_ext)
+	if (path_extension(filename) != filter_ext)
 		filename += "." + filter_ext;
 }
 

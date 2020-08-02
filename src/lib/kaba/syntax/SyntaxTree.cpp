@@ -1245,7 +1245,7 @@ SyntaxTree::~SyntaxTree() {
 void SyntaxTree::show(const string &stage) {
 	if (!config.allow_output_stage(stage))
 		return;
-	msg_write("--------- Syntax of " + script->filename + "  " + stage + " ---------");
+	msg_write(format("--------- Syntax of %s  %s ---------", script->filename, stage));
 	msg_right();
 	for (auto *f: functions)
 		if (!f->is_extern())

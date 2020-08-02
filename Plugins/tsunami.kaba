@@ -11,6 +11,7 @@
 
 use hui
 use kaba
+use os
 
 const int NUM_PEAK_LEVELS = 24
 
@@ -463,7 +464,7 @@ class Tag
 		value = _value
 
 class Song
-	string filename
+	Path filename
 	Tag[] tags
 	int sample_rate
 
@@ -577,11 +578,11 @@ class AudioInput extends Module
 	extern const int samples_recorded()
 
 class Storage
-	extern bool load(out Song s, string filename)
-	extern bool save(Song s, string filename)
-	extern bool save_via_renderer(Module.Port source, string filename, int num_samples, Tag[] tags)
-	extern bool load_buffer(out AudioBuffer buf, string filename)
-	string current_directory
+	extern bool load(out Song s, Path filename)
+	extern bool save(Song s, Path filename)
+	extern bool save_via_renderer(Module.Port source, Path filename, int num_samples, Tag[] tags)
+	extern bool load_buffer(out AudioBuffer buf, Path filename)
+	Path current_directory
 
 # create via Session.add_signal_chain()
 class SignalChain extends Module
@@ -616,7 +617,7 @@ class Session extends Object
 	
 	extern const Session* create_child()
 	extern SignalChain* create_signal_chain(string name)
-	extern SignalChain* load_signal_chain(string filename)
+	extern SignalChain* load_signal_chain(Path filename)
 
 	# logging
 	extern const void i(string msg)
@@ -724,7 +725,7 @@ extern MidiEffect* CreateMidiEffect(Session session, string name)
 extern BeatMidifier* CreateBeatMidifier(Session session)
 extern BeatSource* CreateBeatSource(Session session, string name)
 extern Sample* SelectSample(Session session, Panel panel, Sample* old)
-#extern void SetTempBackupFilename(string filename)
+#extern void SetTempBackupFilename(Path filename)
 
 extern string ChooseModule(Panel parent, Session session, int type, string old_name)
 

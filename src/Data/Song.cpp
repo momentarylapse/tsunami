@@ -156,7 +156,7 @@ Song::~Song() {
 }
 
 bool Song::is_empty() {
-	if (filename.num > 0)
+	if (!filename.is_empty())
 		return false;
 	return action_manager->is_save();
 }

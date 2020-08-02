@@ -9,6 +9,7 @@
 #define SRC_DATA_DATA_H_
 
 #include "../lib/base/base.h"
+#include "../lib/file/path.h"
 #include "../Stuff/Observable.h"
 #include <shared_mutex>
 
@@ -33,7 +34,7 @@ public:
 	void _cdecl end_action_group();
 
 	Session *session;
-	string filename;
+	Path filename;
 	int file_time;
 	bool binary_file_format;
 

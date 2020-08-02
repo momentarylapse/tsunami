@@ -36,6 +36,7 @@
 #include "../base/base.h"
 #include "msg.h"
 #include "file_op.h"
+#include "path.h"
 
 
 
@@ -74,12 +75,12 @@ public:
 	virtual ~File();
 
 	// opening
-	virtual void open(const string &filename);
-	virtual void create(const string &filename);
-	virtual void append(const string &filename);
+	virtual void open(const Path &filename);
+	virtual void create(const Path &filename);
+	virtual void append(const Path &filename);
 	void close();
 
-	bool _cdecl eof();
+	bool _cdecl end();
 
 	// meta
 	void _cdecl set_pos(int pos);
@@ -130,20 +131,20 @@ public:
 	int float_decimals;
 
 //private:
-	string filename;
+	Path filename;
 	int handle;
 };
 
-extern File *FileOpen(const string &filename);
-extern File *FileOpenText(const string &filename);
-extern File *FileCreate(const string &filename);
-extern File *FileCreateText(const string &filename);
-extern File *FileAppend(const string &filename);
+extern File *FileOpen(const Path &filename);
+extern File *FileOpenText(const Path &filename);
+extern File *FileCreate(const Path &filename);
+extern File *FileCreateText(const Path &filename);
+extern File *FileAppend(const Path &filename);
 extern void FileClose(File *f);
-extern string FileRead(const string &filename);
-extern string FileReadText(const string &filename);
-extern void FileWrite(const string &filename, const string &str);
-extern void FileWriteText(const string &filename, const string &str);
+extern string FileRead(const Path &filename);
+extern string FileReadText(const Path &filename);
+extern void FileWrite(const Path &filename, const string &str);
+extern void FileWriteText(const Path &filename, const string &str);
 
 
 

@@ -95,7 +95,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	char data[16];
 
 	f = FileCreate(od->filename);
-	string ext = path_extension(od->filename);
+	string ext = od->filename.extension();
 	if (ext == "gp3")
 		version = 300;
 	else if (ext == "gp4")

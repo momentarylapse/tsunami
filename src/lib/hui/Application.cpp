@@ -23,10 +23,10 @@ extern Callback _idle_function_;
 
 Map<string, string> Application::_properties_;
 
-string Application::filename;
-string Application::directory;
-string Application::directory_static;
-string Application::initial_working_directory;
+Path Application::filename;
+Path Application::directory;
+Path Application::directory_static;
+Path Application::initial_working_directory;
 bool Application::installed;
 bool Application::running;
 
@@ -44,7 +44,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 		directory = initial_working_directory;
-		directory_static = directory + "static/";
+		directory_static = directory << "static";
 		if (_args.num > 0) {
 			// assume a local/non-installed version
 			filename = _args[0].replace("\\", "/");
@@ -52,15 +52,15 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 			// installed version?
-			if ((filename.head(11) == "/usr/local/") or (filename.find("/") < 0)) {
+			if (filename.is_in("/usr/local/") or (filename.str().find("/") < 0)) {
 				installed = true;
-				directory_static = "/usr/local/share/" + app_name + "/";
-			} else if (filename.head(5) == "/usr/") {
+				directory_static = Path("/usr/local/share/") << app_name;
+			} else if (filename.is_in("/usr/")) {
 				installed = true;
-				directory_static = "/usr/share/" + app_name + "/";
-			} else if (filename.head(5) == "/opt/") {
+				directory_static = Path("/usr/share/") << app_name;
+			} else if (filename.is_in("/opt/")) {
 				installed = true;
-				directory_static = "/opt/" + app_name + "/";
+				directory_static = Path("/opt/") << app_name;
 			}
 
 			if (installed) {
@@ -78,12 +78,16 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		directory = directory.replace("\\Unoptimized\\", "\\");
 		directory = directory.replace("\\x64\\", "\\");
 		hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
-		directory_static = directory + "static\\";
+		directory_static = directory << "static";
 	#endif
+
+		// just in case...
+		directory = directory.as_dir();
+		directory_static = directory_static.as_dir();
 
 	if (!msg_inited) {
 		dir_create(directory);
-		msg_init(directory + "message.txt", !(flags & FLAG_SILENT));
+		msg_init(directory << "message.txt", !(flags & FLAG_SILENT));
 	}
 
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
@@ -96,14 +100,14 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	SetDefaultErrorHandler(nullptr);
 	//msg_write("");
 
-	Config.filename = directory + "config.txt";
+	Config.filename = directory << "config.txt";
 
 
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 	//msg_write("HuiInitialWorkingDirectory " + HuiInitialWorkingDirectory);
 
 	if (flags & FLAG_LOAD_RESOURCE)
-		LoadResource(directory_static + "hui_resources.txt");
+		LoadResource(directory_static << "hui_resources.txt");
 
 	if (def_lang.num > 0)
 		SetLanguage(Config.get_str("Language", def_lang));
@@ -116,16 +120,15 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 
-	if (file_exists(directory_static + "icon.svg"))
-		set_property("logo", directory_static + "icon.svg");
-	else if (file_exists(directory_static + "icon.png"))
-		set_property("logo", directory_static + "icon.png");
-	else if (file_exists(directory_static + "icon.ico"))
-		set_property("logo", directory_static + "icon.ico");
+	if (file_exists(directory_static << "icon.svg"))
+		set_property("logo", (directory_static << "icon.svg").str());
+	else if (file_exists(directory_static << "icon.png"))
+		set_property("logo", (directory_static << "icon.png").str());
+	else if (file_exists(directory_static << "icon.ico"))
+		set_property("logo", (directory_static << "icon.ico").str());
 }
 
-Application::~Application()
-{
+Application::~Application() {
 	if (Config.changed)
 		Config.save();
 	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
@@ -134,12 +137,10 @@ Application::~Application()
 
 
 // deprecated...
-void Application::_init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang)
-{
+void Application::_init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang) {
 }
 
-int Application::run()
-{
+int Application::run() {
 	running = true;
 #ifdef HUI_API_WIN
 	MSG messages;
@@ -173,8 +174,7 @@ int Application::run()
 }
 
 // FIXME: when closing the last window, hard_end() gets called... ignoring onEnd()!!!
-void Application::end()
-{
+void Application::end() {
 	SetIdleFunction(nullptr);
 
 	on_end();
@@ -183,8 +183,7 @@ void Application::end()
 }
 
 // ends the system loop of the run() command
-void Application::hard_end()
-{
+void Application::hard_end() {
 	SetIdleFunction(nullptr);
 
 	foreachb(Window *w, _all_windows_)
@@ -216,8 +215,7 @@ void Application::hard_end()
 	if (msg_inited)
 		msg_end();
 }
-void Application::do_single_main_loop()
-{
+void Application::do_single_main_loop() {
 #ifdef HUI_API_WIN
 	MSG messages;
 	messages.message=0;
@@ -249,13 +247,13 @@ void Application::do_single_main_loop()
 
 	//SetIdleFunction(NULL);
 	int counter = 0;
-	do{
+	do {
 		g_main_context_iteration(nullptr, false);
 		gtk_main_iteration_do(false);
 		counter ++;
 		if (counter > 5)
 			break;
-	}while (gtk_events_pending());
+	} while (gtk_events_pending());
 
 	// pop idle function
 	//SetIdleFunction(_if_);
@@ -263,22 +261,19 @@ void Application::do_single_main_loop()
 }
 
 
-void Application::set_property(const string &name, const string &value)
-{
+void Application::set_property(const string &name, const string &value) {
 	_properties_.set(name, value);
 }
 
-string Application::get_property(const string &name)
-{
-	try{
+string Application::get_property(const string &name) {
+	try {
 		return _properties_[name];
-	}catch(...){
+	} catch(...) {
 		return "";
 	}
 }
 
-void Application::about_box(Window *win)
-{
+void Application::about_box(Window *win) {
 	AboutBox(win);
 }
 

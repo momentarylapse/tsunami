@@ -6,6 +6,8 @@
 
 namespace Kaba {
 
+extern const Class *TypePath;
+
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
@@ -141,7 +143,7 @@ void SIAddPackageKaba() {
 		class_add_funcx("constants", TypeConstantPList, &Script::constants, Flags::PURE);
 		class_add_funcx("base_class", TypeClassP, &Script::base_class, Flags::PURE);
 		class_add_funcx("load", TypeScriptP, &__load_script__, Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypeString);
+			func_add_param("filename", TypePath);
 			func_add_param("just_analize", TypeBool);
 		class_add_funcx("create", TypeScriptP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);

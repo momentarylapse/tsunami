@@ -11,6 +11,8 @@
 #ifndef _NIX_TEXTURES_EXISTS_
 #define _NIX_TEXTURES_EXISTS_
 
+#include "../file/path.h"
+
 namespace nix{
 
 // textures
@@ -30,7 +32,7 @@ public:
 		IMAGE
 	};
 	Type type;
-	string filename;
+	Path filename;
 	int width, height;
 	bool valid;
 	
@@ -74,7 +76,7 @@ public:
 };
 
 
-Texture* _cdecl LoadTexture(const string &filename);
+Texture* _cdecl LoadTexture(const Path &filename);
 void _cdecl SetTexture(Texture *texture);
 void _cdecl SetTextures(const Array<Texture*> &textures);
 

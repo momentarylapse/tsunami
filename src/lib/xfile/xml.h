@@ -11,6 +11,7 @@
 #include "../base/base.h"
 
 class File;
+class Path;
 
 namespace xml{
 
@@ -45,12 +46,12 @@ struct Element : Tag {
 
 class Parser {
 public:
-	void _cdecl load(const string &filename);
+	void _cdecl load(const Path &filename);
 
 	Element read_element(File *f);
 	Element read_tag(File *f);
 
-	void _cdecl save(const string &filename);
+	void _cdecl save(const Path &filename);
 	void write_element(File *f, Element &e, int indent);
 
 	Array<Element> elements;

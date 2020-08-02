@@ -321,8 +321,7 @@ void Parser::end()
 	f = nullptr;
 }
 
-Parser* save(const string& filename)
-{
+Parser* save(const Path &filename) {
 	auto p = new Parser;
 	p->f = FileCreate(filename);
 	return p;

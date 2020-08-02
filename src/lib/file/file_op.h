@@ -3,32 +3,24 @@
 
 
 class Date;
+class Path;
 #include <functional>
 
 
 //--------------------------------------------------------------
 // file/directory operations
 
-void _cdecl dir_create(const string &dir);
-void _cdecl dir_delete(const string &dir);
-string _cdecl get_current_dir();
-void _cdecl file_rename(const string &source,const string &target);
-void _cdecl file_copy(const string &source,const string &target);
-void _cdecl file_delete(const string &filename);
-bool _cdecl file_exists(const string &filename);
-bool _cdecl file_is_directory(const string &path);
-int64 _cdecl file_size(const string &path);
-Date _cdecl file_mtime(const string &path);
-string _cdecl file_hash(const string &filename, const string &type);
-
-string _cdecl path_absolute(const string &path);
-string _cdecl path_canonical(const string &path);
-string _cdecl dir_canonical(const string &path);
-
-string _cdecl sys_filename(const string &path);
-string _cdecl path_dirname(const string &path);
-string _cdecl path_basename(const string &path);
-string _cdecl path_extension(const string &path);
+void _cdecl dir_create(const Path &dir);
+void _cdecl dir_delete(const Path &dir);
+Path _cdecl get_current_dir();
+void _cdecl file_rename(const Path &source, const Path &target);
+void _cdecl file_copy(const Path &source, const Path &target);
+void _cdecl file_delete(const Path &filename);
+bool _cdecl file_exists(const Path &filename);
+bool _cdecl file_is_directory(const Path &path);
+int64 _cdecl file_size(const Path &path);
+Date _cdecl file_mtime(const Path &path);
+string _cdecl file_hash(const Path &filename, const string &type);
 
 bool func_did_not_throw(std::function<void()> f);
 #define FILE_OP_OK(OP) \
@@ -39,6 +31,6 @@ bool func_did_not_throw(std::function<void()> f);
 string _cdecl shell_execute(const string &cmd);
 
 
-Array<string> _cdecl dir_search(const string &dir,const string &filter,bool show_directories);
+Array<string> _cdecl dir_search(const Path &dir, const string &filter, bool show_directories);
 
 #endif

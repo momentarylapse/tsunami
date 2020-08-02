@@ -19,8 +19,8 @@ class CueSplitter extends TsunamiPlugin
 		if hui.file_dialog_open(session.win, "", "", "*.cue", "*.cue")
 			load_cue(hui.filename)
 	
-	void load_cue(string filename)
-		string dir = Filesystem.dirname(filename)
+	void load_cue(Path filename)
+		Path dir = filename.parent()
 		string fn
 		string year, album, artist
 		Part*[] parts
@@ -59,7 +59,7 @@ class CueSplitter extends TsunamiPlugin
 		if fn == ""
 			return
 		
-		session.storage.load(session.song, dir + fn)
+		session.storage.load(session.song, dir << fn)
 		SongRenderer* r = new SongRenderer(session.song)
 		
 		for p,i in parts
@@ -89,7 +89,7 @@ class CueSplitter extends TsunamiPlugin
 			if len(_fn) < 2
 				_fn = "0" + _fn
 			_fn += " - {{sanitize(p.title)}}.flac"
-			session.storage.save_via_renderer(r.out, dir + _fn, end - offset, tags)
+			session.storage.save_via_renderer(r.out, dir << _fn, end - offset, tags)
 		print("-----------------done")
 		stop()
 		

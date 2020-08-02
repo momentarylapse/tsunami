@@ -453,7 +453,7 @@ void Serializer::move_param(SerialNodeParam &p, int from, int to) {
 			}
 		if (!found) {
 			msg_error(format("move_param: no RegChannel...  reg_root=%d  from=%d", r, from));
-			msg_write(script->filename + " : " + cur_func->long_name());
+			msg_write(script->filename.str() + " : " + cur_func->long_name());
 		}
 	}
 }

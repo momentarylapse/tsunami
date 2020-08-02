@@ -17,18 +17,16 @@ namespace hui
 
 
 // set the default directory
-void SetDirectory(const string &dir)
-{
+void SetDirectory(const Path &dir) {
 #ifdef OS_WINDOWS
-	_chdir(dir.sys_filename().c_str());
+	_chdir(dir.str().c_str());
 #endif
 #ifdef OS_LINUX
-	int r=chdir(sys_str_f(dir));
+	int r = chdir(dir.str().c_str());
 #endif
 }
 
-int GetCpuCount()
-{
+int GetCpuCount() {
 #ifdef OS_WINDOWS
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
@@ -41,13 +39,12 @@ int GetCpuCount()
 
 
 
-void OpenDocument(const string &filename)
-{
+void OpenDocument(const Path &filename) {
 #ifdef OS_WINDOWS
-	ShellExecute(NULL,_T(""),hui_tchar_str(filename),_T(""),_T(""),SW_SHOW);
+	ShellExecute(NULL, _T(""), hui_tchar_str(filename.str()), _T(""), _T(""), SW_SHOW);
 #endif
 #ifdef OS_LINUX
-	int r=system(format("gnome-open '%s'", filename).c_str());
+	int r = system(format("gnome-open '%s'", filename).c_str());
 #endif
 }
 

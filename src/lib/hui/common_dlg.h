@@ -12,16 +12,15 @@
 
 class color;
 
-namespace hui
-{
+namespace hui {
 
 class Window;
 
 // file dialogs
-bool _cdecl FileDialogOpen(Window *win, const string &title, const string &dir, const string &show_filter, const string &filter);
-bool _cdecl FileDialogSave(Window *win, const string &title, const string &dir, const string &show_filter, const string &filter);
-bool _cdecl FileDialogDir(Window *win, const string &title, const string &dir/*, string &root_dir*/);
-extern string Filename;
+bool _cdecl FileDialogOpen(Window *win, const string &title, const Path &dir, const string &show_filter, const string &filter);
+bool _cdecl FileDialogSave(Window *win, const string &title, const Path &dir, const string &show_filter, const string &filter);
+bool _cdecl FileDialogDir(Window *win, const string &title, const Path &dir/*, string &root_dir*/);
+extern Path Filename;
 bool _cdecl SelectColor(Window *win, const color &c);
 extern color Color;
 bool _cdecl SelectFont(Window *win, const string &title);

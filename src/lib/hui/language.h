@@ -32,9 +32,9 @@
 	#define de_sys_str_f	hui_de_tchar_str_f
 #else
 	extern const char *sys_str(const string &str);
-	extern const char *sys_str_f(const string &str);
+	extern const char *sys_str_f(const Path &str);
 	extern string de_sys_str(const char *str);
-	extern string de_sys_str_f(const char *str);
+	extern Path de_sys_str_f(const char *str);
 #endif
 	/*extern const char *str_ascii2m(const char *str);
 	extern const char *str_m2ascii(const char *str);*/

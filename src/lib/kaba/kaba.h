@@ -9,11 +9,12 @@
 #if !defined(KABA_H__INCLUDED_)
 #define KABA_H__INCLUDED_
 
-namespace Kaba{
-class Script;
+namespace Kaba {
+	class Script;
 }
 
 #include "../base/base.h"
+#include "../file/path.h"
 #include "asm/asm.h"
 #include "lib/lib.h"
 #include "syntax/SyntaxTree.h"
@@ -22,8 +23,7 @@ namespace Kaba{
 
 extern string Version;
 
-class Exception : public Asm::Exception
-{
+class Exception : public Asm::Exception {
 public:
 	Exception(const string &message, const string &expression, int line, int column, Script *s);
 	Exception(const Asm::Exception &e, Script *s, Function *f);
@@ -34,14 +34,13 @@ struct LinkerException : Exception{};*/
 
 
 // executable (compiled) data
-class Script
-{
+class Script {
 public:
 	// don't call yourself.... better use LoadScript(...)
 	Script();
 	~Script();
 
-	void load(const string &filename, bool just_analyse = false);
+	void load(const Path &filename, bool just_analyse = false);
 
 	// building operational code
 	void compile();
@@ -75,7 +74,7 @@ public:
 
 // data
 
-	string filename;
+	Path filename;
 	SyntaxTree *syntax;
 
 	int reference_counter;
@@ -101,7 +100,7 @@ public:
 	const Class* base_class();
 };
 
-Script *Load(const string &filename, bool just_analyse = false);
+Script *Load(const Path &filename, bool just_analyse = false);
 Script *CreateForSource(const string &source, bool just_analyse = false);
 void Remove(Script *s);
 void ExecutePublicScripts();

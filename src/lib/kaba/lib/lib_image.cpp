@@ -17,6 +17,7 @@ extern const Class *TypeIntList;
 extern const Class *TypeFloatList;
 extern const Class *TypeComplexList;
 extern const Class *TypeObject;
+extern const Class *TypePath;
 
 const Class *TypeBasePainter;
 const Class *TypeBasePainterP;
@@ -50,9 +51,9 @@ void SIAddPackageImage() {
 			func_add_param("height", TypeInt);
 			func_add_param("c", TypeColor);
 		class_add_funcx("load", TypeImageP, &Image::load, Flags::STATIC);
-			func_add_param("filename", TypeString);
+			func_add_param("filename", TypePath);
 		class_add_funcx("save", TypeVoid, &Image::save);
-			func_add_param("filename", TypeString);
+			func_add_param("filename", TypePath);
 		class_add_funcx("scale", TypeImageP, &Image::scale, Flags::CONST);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);

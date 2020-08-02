@@ -14,7 +14,7 @@
 
 namespace nix{
 
-string texture_dir = "";
+Path texture_dir;
 
 Array<Texture*> textures;
 Texture *default_texture = NULL;
@@ -270,18 +270,17 @@ void Texture::__delete__() {
 	this->~Texture();
 }
 
-Texture *LoadTexture(const string &_filename) {
-	if (_filename.num < 1)
-		return NULL;
-	string filename = sys_filename(_filename);
+Texture *LoadTexture(const Path &filename) {
+	if (filename.is_empty())
+		return nullptr;
 	for (Texture *t: textures)
 		if (filename == t->filename)
-			return t->valid ? t : NULL;
+			return t->valid ? t : nullptr;
 
 	// test existence
-	if (!file_exists(texture_dir + filename)) {
-		msg_error("texture file does not exist: " + filename);
-		return NULL;
+	if (!file_exists(texture_dir << filename)) {
+		msg_error("texture file does not exist: " + filename.str());
+		return nullptr;
 	}
 
 	Texture *t = new Texture;
@@ -291,9 +290,9 @@ Texture *LoadTexture(const string &_filename) {
 }
 
 void Texture::reload() {
-	msg_write("loading texture: " + filename);
+	msg_write("loading texture: " + filename.str());
 
-	string _filename = texture_dir + filename;
+	Path _filename = texture_dir << filename;
 
 	// test the file's existence
 	if (!file_exists(_filename)) {
@@ -305,7 +304,7 @@ void Texture::reload() {
 		avi_info[texture]=NULL;
 	#endif
 
-	string extension = path_extension(filename);
+	string extension = filename.extension();
 
 // AVI
 	if (extension == "avi"){
@@ -433,7 +432,7 @@ void Texture::write_float(Array<float> &data, int nx, int ny, int nz) {
 }
 
 void Texture::unload() {
-	msg_write("unloading Texture: " + filename);
+	msg_write("unloading Texture: " + filename.str());
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDeleteTextures(1, (unsigned int*)&texture);
 }
@@ -581,33 +580,29 @@ static int NixCubeMapTarget[] = {
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 };
 
-CubeMap::CubeMap(int size)
-{
-	msg_write(format("creating cube map [ %d x %d x 6 ]", size, size));
+CubeMap::CubeMap(int size) {
+	msg_write(format("creating cube map [%d x %d x 6]", size, size));
 	width = size;
 	height = size;
 	type = Type::CUBE;
 	filename = "-cubemap-";
 }
 
-void CubeMap::__init__(int size)
-{
+void CubeMap::__init__(int size) {
 	new(this) CubeMap(size);
 }
 
-void CubeMap::fill_side(int side, Texture *source)
-{
+void CubeMap::fill_side(int side, Texture *source) {
 	if (!source)
 		return;
 	if (source->type == Type::CUBE)
 		return;
 	Image image;
-	image.load(texture_dir + source->filename);
+	image.load(texture_dir << source->filename);
 	overwrite_side(side, image);
 }
 
-void CubeMap::overwrite_side(int side, const Image &image)
-{
+void CubeMap::overwrite_side(int side, const Image &image) {
 	OverwriteTexture__(this, GL_TEXTURE_CUBE_MAP, NixCubeMapTarget[side], image);
 }
 

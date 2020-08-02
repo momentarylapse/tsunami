@@ -20,12 +20,12 @@ namespace Kaba{
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
-nix::Texture* __LoadTexture(const string &filename) {
+nix::Texture* __LoadTexture(const Path &filename) {
 	KABA_EXCEPTION_WRAPPER(return nix::LoadTexture(filename));
 	return nullptr;
 }
 
-nix::Shader* __LoadShader(const string &filename) {
+nix::Shader* __LoadShader(const Path &filename) {
 	KABA_EXCEPTION_WRAPPER(return nix::Shader::load(filename));
 	return nullptr;
 }
@@ -60,6 +60,7 @@ extern const Class *TypeMatrix;
 extern const Class *TypeImage;
 extern const Class *TypeFloatList;
 extern const Class *TypeDynamicArray;
+extern const Class *TypePath;
 const Class *TypeVertexBuffer;
 const Class *TypeVertexBufferP;
 const Class *TypeTexture;
@@ -120,7 +121,7 @@ void SIAddPackageNix() {
 		class_add_func("write_float", TypeVoid, nix_p(mf(&nix::Texture::write_float)));
 			func_add_param("data", TypeFloatList);
 		class_add_func("load", TypeTextureP, nix_p(&__LoadTexture), Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypeString);
+			func_add_param("filename", TypePath);
 		class_add_elementx("width", TypeInt, &nix::Texture::width);
 		class_add_elementx("height", TypeInt, &nix::Texture::height);
 
@@ -180,7 +181,7 @@ void SIAddPackageNix() {
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 		class_add_func("load", TypeShaderP, nix_p(&__LoadShader), Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypeString);
+			func_add_param("filename", TypePath);
 		class_add_func("create", TypeShaderP, nix_p(&__CreateShader), Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
 		class_add_const("DEFAULT_3D", TypeShaderP, nix_p(&nix::default_shader_3d));

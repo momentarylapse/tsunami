@@ -9,14 +9,15 @@
 #ifndef _UTIL_EXISTS_
 #define _UTIL_EXISTS_
 
+class Path;
 
 namespace hui
 {
 
-void _cdecl SetDirectory(const string &dir);
+void _cdecl SetDirectory(const Path &dir);
 int _cdecl GetCpuCount();
 
-void _cdecl OpenDocument(const string &filename);
+void _cdecl OpenDocument(const Path &filename);
 
 };
 

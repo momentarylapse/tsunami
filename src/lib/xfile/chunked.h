@@ -9,16 +9,17 @@
 #define SRC_LIB_XFILE_CHUNKED_H_
 
 
+class Path;
+
 class FileChunkBasic;
 
-class ChunkedFileParser
-{
+class ChunkedFileParser {
 public:
 	ChunkedFileParser(int _header_name_size);
 	virtual ~ChunkedFileParser();
 
-	bool read(const string &filename, void *p);
-	bool write(const string &filename, void *p);
+	bool read(const Path &filename, void *p);
+	bool write(const Path &filename, void *p);
 	void set_base(FileChunkBasic *base);
 
 	virtual void on_notify(){};
@@ -30,15 +31,12 @@ public:
 	FileChunkBasic *base;
 	int header_name_size;
 
-	struct Context
-	{
-		struct Layer
-		{
+	struct Context {
+		struct Layer {
 			string name;
 			int pos0, size;
 			Layer(){}
-			Layer(const string &_name, int _pos, int _size)
-			{
+			Layer(const string &_name, int _pos, int _size) {
 				name = _name;
 				pos0 = _pos;
 				size = _size;
@@ -57,8 +55,7 @@ public:
 
 };
 
-class FileChunkBasic
-{
+class FileChunkBasic {
 public:
 	FileChunkBasic(const string &_name);
 	virtual ~FileChunkBasic();
@@ -100,20 +97,16 @@ public:
 
 
 template<class PT, class T>
-class FileChunk : public FileChunkBasic
-{
+class FileChunk : public FileChunkBasic {
 public:
 	FileChunk(const string &name) : FileChunkBasic(name){ me = nullptr; parent = nullptr; }
-	void *get() override
-	{
+	void *get() override {
 		return me;
 	}
-	void set(void *_me) override
-	{
+	void set(void *_me) override {
 		me = (T*)_me;
 	}
-	void set_parent(void *_parent) override
-	{
+	void set_parent(void *_parent) override {
 		parent = (PT*)_parent;
 	}
 	T *me;

@@ -103,7 +103,7 @@ public:
 
 
 void PluginManager::link_app_script_data() {
-	Kaba::config.directory = "";
+	Kaba::config.directory = Path::EMPTY;
 
 	// api definition
 	Kaba::link_external("device_manager", &tsunami->device_manager);
@@ -722,31 +722,32 @@ void get_plugin_file_data(PluginManager::PluginFile &pf) {
 	} catch(...) {}
 }
 
-void find_plugins_in_dir_absolute(const string &_dir, const string &group, ModuleType type, PluginManager *pm) {
-	string dir = _dir;
+void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleType type) {
+	Path dir = _dir;
 	if (group.num > 0)
-		dir += group + "/";
+		dir <<= group;
+	msg_write(dir.str());
 	auto list = dir_search(dir, "*.kaba", false);
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.replace(".kaba", "");
-		pf.filename = dir + e;
+		pf.filename = dir << e;
 		pf.group = group;
 		get_plugin_file_data(pf);
-		pm->plugin_files.add(pf);
+		plugin_files.add(pf);
 	}
 }
 
-void find_plugins_in_dir(const string &rel, const string &group, ModuleType type, PluginManager *pm) {
-	find_plugins_in_dir_absolute(pm->plugin_dir_static() + rel, group, type, pm);
-	if (pm->plugin_dir_local() != pm->plugin_dir_static())
-		find_plugins_in_dir_absolute(pm->plugin_dir_local() + rel, group, type, pm);
+void PluginManager::find_plugins_in_dir(const Path &rel, const string &group, ModuleType type) {
+	find_plugins_in_dir_absolute(plugin_dir_static() << rel, group, type);
+	if (plugin_dir_local() != plugin_dir_static())
+		find_plugins_in_dir_absolute(plugin_dir_local() << rel, group, type);
 }
 
-void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)()) {
-	for (auto &f: pm->plugin_files) {
-		if (f.filename.find(dir) >= 0) {
+void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)()) {
+	for (auto &f: plugin_files) {
+		if (f.filename.is_in(plugin_dir_static() << dir) or f.filename.is_in(plugin_dir_local() << dir)) {
 			string id = "execute-" + name_space + "--" + f.name;
 			m->add_with_image(f.name, f.image, id);
 			win->event(id, std::bind(function, win));
@@ -761,42 +762,42 @@ void PluginManager::find_plugins() {
 
 	// "AudioSource"
 #ifndef OS_WINDOWS
-	find_plugins_in_dir("AudioSource/", "", ModuleType::AUDIO_SOURCE, this);
+	find_plugins_in_dir("AudioSource", "", ModuleType::AUDIO_SOURCE);
 
 	// "AudioEffect"
-	find_plugins_in_dir("AudioEffect/", "Channels", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Dynamics", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Echo", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Filter", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Pitch", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Repair", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Sound", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect", "Channels", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Dynamics", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Echo", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Filter", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Pitch", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Repair", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Sound", ModuleType::AUDIO_EFFECT);
 	// hidden...
-	find_plugins_in_dir("AudioEffect/", "Special", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect", "Special", ModuleType::AUDIO_EFFECT);
 
 	// "AudioVisualizer"
-	find_plugins_in_dir("AudioVisualizer/", "", ModuleType::AUDIO_VISUALIZER, this);
+	find_plugins_in_dir("AudioVisualizer", "", ModuleType::AUDIO_VISUALIZER);
 
 	// "MidiSource"
-	find_plugins_in_dir("MidiSource/", "", ModuleType::MIDI_SOURCE, this);
+	find_plugins_in_dir("MidiSource", "", ModuleType::MIDI_SOURCE);
 
 	// "MidiEffect"
-	find_plugins_in_dir("MidiEffect/", "", ModuleType::MIDI_EFFECT, this);
+	find_plugins_in_dir("MidiEffect", "", ModuleType::MIDI_EFFECT);
 
 	// "BeatSource"
-	find_plugins_in_dir("BeatSource/", "", ModuleType::BEAT_SOURCE, this);
+	find_plugins_in_dir("BeatSource", "", ModuleType::BEAT_SOURCE);
 
 	// "BeatSource"
-	find_plugins_in_dir("PitchDetector/", "", ModuleType::PITCH_DETECTOR, this);
+	find_plugins_in_dir("PitchDetector", "", ModuleType::PITCH_DETECTOR);
 
 	// "All"
-	find_plugins_in_dir("All/", "", ModuleType::SONG_PLUGIN, this);
+	find_plugins_in_dir("All", "", ModuleType::SONG_PLUGIN);
 
 	// rest
-	find_plugins_in_dir("Independent/", "", ModuleType::TSUNAMI_PLUGIN, this);
+	find_plugins_in_dir("Independent", "", ModuleType::TSUNAMI_PLUGIN);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer/", "", ModuleType::SYNTHESIZER, this);
+	find_plugins_in_dir("Synthesizer", "", ModuleType::SYNTHESIZER);
 #endif
 }
 
@@ -804,25 +805,25 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	hui::Menu *m = win->get_menu();
 
 	// "Buffer"
-	add_plugins_in_dir("AudioEffect/Channels/", this, m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Echo/", this, m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Filter/", this, m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Pitch/", this, m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Repair/", this, m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Sound/", this, m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Channels", m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Dynamics", m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Echo", m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Filter", m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Pitch", m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Repair", m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Sound", m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 
-	add_plugins_in_dir("AudioSource/", this, m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::on_menu_execute_audio_source);
+	add_plugins_in_dir("AudioSource", m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::on_menu_execute_audio_source);
 
 	// "Midi"
-	add_plugins_in_dir("MidiEffect/", this, m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::on_menu_execute_midi_effect);
-	add_plugins_in_dir("MidiSource/", this, m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::on_menu_execute_midi_source);
+	add_plugins_in_dir("MidiEffect", m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::on_menu_execute_midi_effect);
+	add_plugins_in_dir("MidiSource", m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::on_menu_execute_midi_source);
 
 	// "All"
-	add_plugins_in_dir("All/", this, m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, &TsunamiWindow::on_menu_execute_song_plugin);
+	add_plugins_in_dir("All", m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, &TsunamiWindow::on_menu_execute_song_plugin);
 
 	// rest
-	add_plugins_in_dir("Independent/", this, m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
+	add_plugins_in_dir("Independent", m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
 }
 
 void PluginManager::apply_favorite(Module *c, const string &name, bool notify) {
@@ -840,7 +841,7 @@ string PluginManager::select_favorite_name(hui::Window *win, Module *c, bool sav
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const string &filename) {
+Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const Path &filename) {
 	for (Plugin *p: plugins)
 		if (filename == p->filename)
 			return p;
@@ -867,16 +868,16 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const strin
 	return nullptr;
 }
 
-string PluginManager::plugin_dir_static() {
+Path PluginManager::plugin_dir_static() {
 	if (tsunami->installed)
-		return tsunami->directory_static + "Plugins/";
-	return "Plugins/";
+		return tsunami->directory_static << "Plugins";
+	return "Plugins";
 }
 
-string PluginManager::plugin_dir_local() {
+Path PluginManager::plugin_dir_local() {
 	if (tsunami->installed)
-		return tsunami->directory + "Plugins/";
-	return "Plugins/";
+		return tsunami->directory << "Plugins";
+	return "Plugins";
 }
 
 

@@ -16,7 +16,7 @@
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Song.h"
 
-StorageOperationData::StorageOperationData(Session *_session, Format *_format, const string &_filename, const string &message) {
+StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename, const string &message) {
 	session = _session;
 	win = session->win;
 	storage = session->storage;
@@ -49,15 +49,15 @@ void StorageOperationData::set_layer(TrackLayer *l) {
 }
 
 void StorageOperationData::info(const string& message) {
-	session->i(filename + ": " + message);
+	session->i(filename.str() + ": " + message);
 }
 
 void StorageOperationData::warn(const string& message) {
-	session->w(filename + ": " + message);
+	session->w(filename.str() + ": " + message);
 }
 
 void StorageOperationData::error(const string& message) {
-	session->e(filename + ": " + message);
+	session->e(filename.str() + ": " + message);
 	errors_encountered = true;
 }
 

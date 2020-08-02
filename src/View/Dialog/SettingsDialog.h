@@ -12,8 +12,7 @@
 
 class AudioView;
 
-class SettingsDialog: public hui::Window
-{
+class SettingsDialog: public hui::Window {
 public:
 	SettingsDialog(AudioView *view, hui::Window *parent);
 
@@ -36,8 +35,7 @@ public:
 
 
 private:
-	struct OggQuality
-	{
+	struct OggQuality {
 		OggQuality(){}
 		OggQuality(float q, int b) : quality(q), bitrate(b){};
 		float quality;

@@ -42,7 +42,7 @@ static Array<string> TodoStr;
 bool msg_inited = false;
 
 static File *file = nullptr;
-static string msg_file_name = "message.txt";
+static Path msg_file_name = "message.txt";
 static int Shift;
 
 static bool Verbose=false;
@@ -50,13 +50,12 @@ static bool ErrorOccured;
 static string ErrorMsg;
 
 // call only once!
-void msg_init(const string &force_filename, bool verbose)
-{
+void msg_init(const Path &force_filename, bool verbose) {
 	Verbose = false;
 	Shift = 0;
 	ErrorOccured = false;
 	msg_inited = true;
-	if (force_filename != "")
+	if (!force_filename.is_empty())
 		msg_file_name = force_filename;
 	if (!verbose)
 		return;
@@ -69,13 +68,11 @@ void msg_init(const string &force_filename, bool verbose)
 #endif
 }
 
-void msg_init(bool verbose)
-{
+void msg_init(bool verbose) {
 	msg_init("", verbose);
 }
 
-void msg_set_verbose(bool verbose)
-{
+void msg_set_verbose(bool verbose) {
 	if (Verbose == verbose)
 		return;
 	if (verbose){
@@ -89,8 +86,7 @@ void msg_set_verbose(bool verbose)
 	Verbose = verbose;
 }
 
-void msg_add_str(const string &str)
-{
+void msg_add_str(const string &str) {
 	if (!Verbose)	return;
 	int l = str.num;
 	log_pos.add(log_buffer.num);

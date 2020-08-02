@@ -21,8 +21,7 @@ FavoriteManager::FavoriteManager() {
 FavoriteManager::~FavoriteManager() {
 }
 
-void FavoriteManager::load_from_file(const string &filename, bool read_only, Session *session)
-{
+void FavoriteManager::load_from_file(const Path &filename, bool read_only, Session *session) {
 	if (!file_exists(filename))
 		return;
 	try {
@@ -45,14 +44,14 @@ void FavoriteManager::load_from_file(const string &filename, bool read_only, Ses
 }
 
 void FavoriteManager::load(Session *session) {
-	load_from_file(tsunami->directory_static + "favorites_demo.txt", true, session);
-	load_from_file(tsunami->directory + "favorites.txt", false, session);
+	load_from_file(tsunami->directory_static << "favorites_demo.txt", true, session);
+	load_from_file(tsunami->directory << "favorites.txt", false, session);
 	loaded = true;
 }
 
 void FavoriteManager::save(Session *session) {
 	try {
-		File *f = FileCreateText(tsunami->directory + "favorites.txt");
+		File *f = FileCreateText(tsunami->directory << "favorites.txt");
 		f->write_int(favorites.num);
 		for (Favorite &ff: favorites) {
 			f->write_str(Module::type_to_name(ff.type));

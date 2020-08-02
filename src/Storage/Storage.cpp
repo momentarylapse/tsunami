@@ -55,24 +55,24 @@ Storage::Storage(Session *_session) {
 	formats.add(new FormatDescriptorPdf());
 
 	current_directory = hui::Config.get_str("CurrentDirectory", "");
-	current_chain_directory = hui::Application::directory_static + "SignalChains/";
+	current_chain_directory = hui::Application::directory_static << "SignalChains";
 }
 
 Storage::~Storage() {
-	hui::Config.set_str("CurrentDirectory", current_directory);
+	hui::Config.set_str("CurrentDirectory", current_directory.str());
 
 	for (auto *d: formats)
 		delete(d);
 	formats.clear();
 }
 
-bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
-	current_directory = path_dirname(filename);
-	FormatDescriptor *d = get_format(path_extension(filename), 0);
+bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
+	current_directory = filename.parent();
+	FormatDescriptor *d = get_format(filename.extension(), 0);
 	if (!d)
 		return false;
 
-	session->i(_("loading ") + filename);
+	session->i(_("loading ") + filename.str());
 
 	Format *f = d->create();
 	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
@@ -105,17 +105,17 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
 	return !od.errors_encountered;
 }
 
-bool Storage::load(Song *song, const string &filename) {
+bool Storage::load(Song *song, const Path &filename) {
 	return load_ex(song, filename, false);
 }
 
-bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) {
-	current_directory = path_dirname(filename);
-	auto *d = get_format(path_extension(filename), FormatDescriptor::Flag::AUDIO);
+bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
+	current_directory = filename.parent();
+	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
 	if (!d)
 		return false;
 
-	session->i(_("loading track ") + filename);
+	session->i(_("loading track ") + filename.str());
 
 	Format *f = d->create();
 	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
@@ -136,8 +136,8 @@ bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) 
 	return !od.errors_encountered;
 }
 
-bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
-	session->i(_("loading buffer ") + filename);
+bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
+	session->i(_("loading buffer ") + filename.str());
 
 	Song *aa = new Song(session, session->sample_rate());
 	Track *t = aa->add_track(SignalType::AUDIO);
@@ -151,14 +151,14 @@ bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
 	return ok;
 }
 
-bool Storage::save(Song *song, const string &filename) {
-	current_directory = path_dirname(filename);
+bool Storage::save(Song *song, const Path &filename) {
+	current_directory = filename.parent();
 
-	FormatDescriptor *d = get_format(path_extension(filename), 0);
+	FormatDescriptor *d = get_format(filename.extension(), 0);
 	if (!d)
 		return false;
 
-	session->i(_("saving ") + filename);
+	session->i(_("saving ") + filename.str());
 
 	if (!d->test_compatibility(song))
 		session->w(_("data loss when saving in this format!"));
@@ -183,12 +183,12 @@ bool Storage::save(Song *song, const string &filename) {
 	return !od.errors_encountered;
 }
 
-bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags) {
-	FormatDescriptor *d = get_format(path_extension(filename), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
+bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {
+	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return false;
 
-	session->i(_("exporting ") + filename);
+	session->i(_("exporting ") + filename.str());
 
 	Format *f = d->create();
 	auto od = StorageOperationData(session, f, filename, _("exporting"));
@@ -204,7 +204,7 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 	return !od.errors_encountered;
 }
 
-bool Storage::render_export_selection(Song *song, const SongSelection &sel, const string &filename) {
+bool Storage::render_export_selection(Song *song, const SongSelection &sel, const Path &filename) {
 	SongRenderer renderer(song);
 	renderer.set_range(sel.range());
 	renderer.allow_layers(sel.layers());

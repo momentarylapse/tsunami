@@ -5,7 +5,7 @@ namespace hui
 {
 
 // file dialogs
-string Filename;
+Path Filename;
 color Color;
 
 string Fontname;

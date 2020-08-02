@@ -83,13 +83,13 @@ inline unsigned int get_int_from_buffer(unsigned char *buffer, int pos, int byte
 	return r;
 }
 
-void image_load_tga(const string &filename, Image &image)
+void image_load_tga(const Path &filename, Image &image)
 {
 	//msg_write("tga");
 	unsigned char Header[18];
 	int x;
 	unsigned char *data=nullptr,*pal=nullptr;
-	FILE* f=fopen(sys_filename(filename).c_str(),"rb");
+	FILE* f=fopen(filename.str().c_str(),"rb");
 	int r=fread(&Header, 18, 1, f);
 	int offset=get_int_from_buffer(Header,0,1)+18;
 	int tga_type=get_int_from_buffer(Header,2,1);
@@ -195,11 +195,11 @@ void image_load_tga(const string &filename, Image &image)
 static unsigned char Header[18];
 //void NixSaveTGA(const string &filename,int width,int height,int bits,int alpha_bits,void *data)
 
-void image_save_tga(const string &filename, const Image &image)
+void image_save_tga(const Path &filename, const Image &image)
 {
-	FILE* f=fopen(sys_filename(filename).c_str(),"wb");
+	FILE* f=fopen(filename.str().c_str(),"wb");
 	if (!f){
-		msg_error("couldn't save tga file: " + filename);
+		msg_error("couldn't save tga file: " + filename.str());
 		return;
 	}
 	image.set_mode(Image::Mode::RGBA);

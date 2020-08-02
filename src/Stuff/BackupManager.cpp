@@ -13,26 +13,23 @@
 Array<BackupManager::BackupFile> BackupManager::files;
 int BackupManager::next_uuid;
 
-string BackupManager::get_filename(const string &extension)
-{
+Path BackupManager::get_filename(const string &extension) {
 	Date d = Date::now();
-	string base = tsunami->directory + d.format("backup-%Y-%m-%d");
-	for (int i=0; i<26; i++){
+	string base = d.format("backup-%Y-%m-%d");
+	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
-		msg_write(fn);
-		if (!file_exists(fn))
-			return fn;
+		if (!file_exists(tsunami->directory << fn))
+			return tsunami->directory << fn;
 	}
 	return "";
 }
 
 
-void BackupManager::set_save_state(Session *session)
-{
-	for (auto &bf: files){
-		if (bf.session == session){
-			session->i(_("deleting backup: ") + bf.filename);
+void BackupManager::set_save_state(Session *session) {
+	for (auto &bf: files) {
+		if (bf.session == session) {
+			session->i(_("deleting backup: ") + bf.filename.str());
 			file_delete(bf.filename);
 			bf.session = nullptr; // auto remove
 		}
@@ -40,63 +37,58 @@ void BackupManager::set_save_state(Session *session)
 	_clear_old();
 }
 
-void BackupManager::check_old_files(Session *session)
-{
+void BackupManager::check_old_files(Session *session) {
 	_clear_old();
 
 	// update list
 	auto _files = dir_search(tsunami->directory, "backup-*", false);
-	for (auto &f: _files){
+	for (auto &f: _files) {
 		BackupFile bf;
 		bf.uuid = next_uuid ++;
 		bf.session = nullptr;
 		bf.f = nullptr;
-		bf.filename = tsunami->directory + f;
+		bf.filename = tsunami->directory << f;
 		files.add(bf);
 	}
 
 	// check
-	for (auto &bf: files){
+	for (auto &bf: files) {
 		if (!bf.session)
-			session->q(_("recording backup found: ") + bf.filename, {format("import-backup-%d:", bf.uuid) + _("import"), format("delete-backup-%d:", bf.uuid) + _("delete")});
+			session->q(_("recording backup found: ") + bf.filename.str(), {format("import-backup-%d:", bf.uuid) + _("import"), format("delete-backup-%d:", bf.uuid) + _("delete")});
 	}
 }
 
-File *BackupManager::create_file(const string &extension, Session *session)
-{
+File *BackupManager::create_file(const string &extension, Session *session) {
 	BackupFile bf;
 	bf.uuid = -1;//next_uuid ++;
 	bf.session = session;
 	bf.filename = get_filename(extension);
-	session->i(_("creating backup: ") + bf.filename);
-	try{
+	session->i(_("creating backup: ") + bf.filename.str());
+	try {
 		bf.f = FileCreate(bf.filename);
 		files.add(bf);
 		return bf.f;
-	}catch(FileError &e){
+	} catch(FileError &e) {
 		session->e(e.message());
 	}
 	return nullptr;
 }
 
-void BackupManager::abort(File *f)
-{
+void BackupManager::abort(File *f) {
 	//delete f;
 	done(f);
 }
 
-void BackupManager::done(File *f)
-{
+void BackupManager::done(File *f) {
 	delete f;
 	auto bf = _find_by_file(f);
-	if (bf){
-		bf->session->i(_("backup done: ") + bf->filename);
+	if (bf) {
+		bf->session->i(_("backup done: ") + bf->filename.str());
 		bf->f = nullptr;
 	}
 }
 
-BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
-{
+BackupManager::BackupFile* BackupManager::_find_by_file(File *f) {
 	if (!f)
 		return nullptr;
 	for (auto &bf: files)
@@ -105,36 +97,32 @@ BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
 	return nullptr;
 }
 
-BackupManager::BackupFile* BackupManager::_find_by_uuid(int uuid)
-{
+BackupManager::BackupFile* BackupManager::_find_by_uuid(int uuid) {
 	for (auto &bf: files)
 		if (bf.uuid == uuid)
 			return &bf;
 	return nullptr;
 }
 
-string BackupManager::get_filename_for_uuid(int uuid)
-{
+Path BackupManager::get_filename_for_uuid(int uuid) {
 	auto *bf = _find_by_uuid(uuid);
 	if (bf)
 		return bf->filename;
 	return "";
 }
 
-void BackupManager::delete_old(int uuid)
-{
+void BackupManager::delete_old(int uuid) {
 	auto *bf = _find_by_uuid(uuid);
-	if (bf){
-		Session::GLOBAL->i(_("deleting backup: ") + bf->filename);
+	if (bf) {
+		Session::GLOBAL->i(_("deleting backup: ") + bf->filename.str());
 		file_delete(bf->filename);
 		bf->session = nullptr;
 	}
 }
 
-void BackupManager::_clear_old()
-{
+void BackupManager::_clear_old() {
 	for (int i=0; i<files.num; i++)
-		if (!files[i].session){
+		if (!files[i].session) {
 			files.erase(i);
 			i --;
 		}

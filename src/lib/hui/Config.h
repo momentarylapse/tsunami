@@ -10,17 +10,17 @@
 
 #include "../base/base.h"
 #include "../base/map.h"
+#include "../file/path.h"
 
-namespace hui
-{
+namespace hui {
 
 class Configuration {
 public:
 	Configuration();
-	explicit Configuration(const string &filename);
+	explicit Configuration(const Path &filename);
 	~Configuration();
 	void _cdecl __init__();
-	void _cdecl __init_ext__(const string &filename);
+	void _cdecl __init_ext__(const Path &filename);
 	void _cdecl __del__();
 
 	void _cdecl set_int(const string &name, int val);
@@ -35,7 +35,7 @@ public:
 	void _cdecl save();
 
 	bool loaded, changed;
-	string filename;
+	Path filename;
 	Map<string, string> map;
 };
 

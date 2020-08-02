@@ -35,7 +35,7 @@ void Image::__delete__() {
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
-void Image::_load_flipped(const string &filename) {
+void Image::_load_flipped(const Path &filename) {
 	// reset image
 	width = 0;
 	height = 0;
@@ -46,11 +46,11 @@ void Image::_load_flipped(const string &filename) {
 
 	// file ok?
 	if (!file_exists(filename)) {
-		msg_error("Image.Load: file does not exist: " + filename);
+		msg_error("Image.load: file does not exist: " + filename.str());
 		return;
 	}
 	
-	string ext = path_extension(filename);
+	string ext = filename.extension();
 	
 	if (ext == "bmp")
 		image_load_bmp(filename, *this);
@@ -61,10 +61,10 @@ void Image::_load_flipped(const string &filename) {
 	else if (ext == "png")
 		image_load_png(filename, *this);
 	else
-		msg_error("ImageLoad: unhandled file extension: " + ext);
+		msg_error("Image.load: unhandled file extension: " + ext);
 }
 
-void Image::_load(const string &filename) {
+void Image::_load(const Path &filename) {
 	_load_flipped(filename);
 	flip_v();
 }
@@ -106,14 +106,14 @@ void Image::create(int _width, int _height, const color &c) {
 		data[i] = ic;
 }
 
-void Image::save(const string &filename) const {
-	string ext = path_extension(filename);
+void Image::save(const Path &filename) const {
+	string ext = filename.extension();
 	if (ext == "tga")
 		image_save_tga(filename, *this);
 	else if (ext == "bmp")
 		image_save_bmp(filename, *this);
 	else
-		msg_error("ImageSave: unhandled file extension: " + ext);
+		msg_error("Image.save: unhandled file extension: " + ext);
 }
 
 void Image::clear()
@@ -239,7 +239,7 @@ color Image::get_pixel_interpolated(float x, float y) const {
 	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
 }
 
-Image *Image::load(const string &filename) {
+Image *Image::load(const Path &filename) {
 	Image *im = new Image;
 	im->_load(filename);
 	if (!im->error)

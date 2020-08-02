@@ -60,7 +60,7 @@ void SyntaxTree::add_include_data(Script *s, bool indirect) {
 			imported_symbols->static_variables.add(v);
 		for (auto *c: ps->base_class->constants)
 			imported_symbols->constants.add(c);
-		if (s->filename.find(".kaba") < 0)
+		if (s->filename.basename().find(".kaba") < 0)
 			if (!_class_contains(imported_symbols, ps->base_class->name))
 				imported_symbols->classes.add(ps->base_class);
 	}

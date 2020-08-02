@@ -9,6 +9,7 @@
 #define PLUGIN_H_
 
 #include "../lib/base/base.h"
+#include "../lib/file/path.h"
 
 namespace Kaba{
 	class Script;
@@ -22,9 +23,9 @@ enum class ModuleType;
 class Plugin
 {
 public:
-	Plugin(const string &_filename, ModuleType type);
+	Plugin(const Path &filename, ModuleType type);
 
-	string filename;
+	Path filename;
 	int file_date;
 	int index;
 	Kaba::Script *s;

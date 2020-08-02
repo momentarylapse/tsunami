@@ -1,2 +1,2 @@
 
-void image_load_jpg(const string &filename, Image &image);
+void image_load_jpg(const Path &filename, Image &image);

@@ -20,7 +20,7 @@ public:
 
 	Array<Test> tests() override;
 
-	static void test_compile(ModuleType type, const string &filename);
+	static void test_compile(ModuleType type, const Path &filename);
 	static void test_audio_effect(const string &name);
 	static void test_audio_source(const string &name);
 	static void test_midi_effect(const string &name);

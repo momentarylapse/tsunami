@@ -10,23 +10,22 @@
 
 #include "../lib/base/base.h"
 
+class Path;
 class Module;
 enum class ModuleType;
-namespace hui{
+namespace hui {
 	class Window;
 }
 class Session;
 
-class FavoriteManager
-{
+class FavoriteManager {
 public:
 	FavoriteManager();
 	virtual ~FavoriteManager();
 
 	static const string DEFAULT_NAME;
 
-	struct Favorite
-	{
+	struct Favorite {
 		string name;
 		string config_name;
 		string options;
@@ -38,7 +37,7 @@ public:
 	Array<Favorite> favorites;
 
 	void load(Session *session);
-	void load_from_file(const string &filename, bool read_only, Session *session);
+	void load_from_file(const Path &filename, bool read_only, Session *session);
 	void save(Session *session);
 
 	void set(const Favorite &f);

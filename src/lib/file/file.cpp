@@ -101,20 +101,17 @@ t_file_try_again_func *FileTryAgainFunc;
 
 
 
-File::File()
-{
+File::File() {
 	handle = -1;
 	float_decimals = 6;
 }
 
-File::~File()
-{
+File::~File() {
 	if (handle>=0)
 		close();
 }
 
-bool File::eof()
-{
+bool File::end() {
 #ifdef OS_WINDOWS
 	return _eof(handle);
 #endif
@@ -126,8 +123,7 @@ bool File::eof()
 #endif
 }
 
-class TextFile : public File
-{
+class TextFile : public File {
 public:
 	TextFile();
 	virtual ~TextFile();
@@ -152,15 +148,14 @@ public:
 	virtual void write_comment(const string &str);
 };
 
-TextFile::TextFile()
-{
+TextFile::TextFile() {
 	float_decimals = 6;
 }
 
 TextFile::~TextFile() {
 }
 
-File *FileOpen(const string &filename) {
+File *FileOpen(const Path &filename) {
 	File *f = new File();
 	try {
 		f->open(filename);
@@ -171,7 +166,7 @@ File *FileOpen(const string &filename) {
 	return f;
 }
 
-File *FileOpenText(const string &filename) {
+File *FileOpenText(const Path &filename) {
 	File *f = new TextFile();
 	try {
 		f->open(filename);
@@ -182,7 +177,7 @@ File *FileOpenText(const string &filename) {
 	return f;
 }
 
-File *FileCreate(const string &filename) {
+File *FileCreate(const Path &filename) {
 	File *f = new File();
 	try {
 		f->create(filename);
@@ -193,7 +188,7 @@ File *FileCreate(const string &filename) {
 	return f;
 }
 
-File *FileCreateText(const string &filename) {
+File *FileCreateText(const Path &filename) {
 	File *f = new TextFile();
 	try {
 		f->create(filename);
@@ -204,7 +199,7 @@ File *FileCreateText(const string &filename) {
 	return f;
 }
 
-File *FileAppend(const string &filename) {
+File *FileAppend(const Path &filename) {
 	File *f = new File();
 	try {
 		f->append(filename);
@@ -222,27 +217,27 @@ void FileClose(File *f) {
 	}
 }
 
-string FileRead(const string &filename) {
+string FileRead(const Path &filename) {
 	File *f = FileOpen(filename);
 	string r = f->read_complete();
 	FileClose(f);
 	return r;
 }
 
-string FileReadText(const string &filename) {
+string FileReadText(const Path &filename) {
 	File *f = FileOpenText(filename);
 	string r = f->read_complete();
 	FileClose(f);
 	return r;
 }
 
-void FileWrite(const string &filename, const string &str) {
+void FileWrite(const Path &filename, const string &str) {
 	File *f = FileCreate(filename);
 	f->write_buffer(str);
 	FileClose(f);
 }
 
-void FileWriteText(const string &filename, const string &str) {
+void FileWriteText(const Path &filename, const string &str) {
 	File *f = FileCreateText(filename);
 	f->write_buffer(str);
 	FileClose(f);
@@ -258,10 +253,11 @@ void set_mode(File *f) {
 }
 
 // open a file
-void File::open(const string &_filename) {
-	handle = _open(sys_filename(_filename).c_str(), O_RDONLY);
+void File::open(const Path &_filename) {
+	filename = _filename;
+	handle = _open(filename.str().c_str(), O_RDONLY);
 	if (handle <= 0)
-		throw FileError("failed opening file '" + _filename + "'");
+		throw FileError(format("failed opening file '%s'", filename));
 
 	/*if (FileTryAgainFunc){
 		if (FileTryAgainFunc(filename)){
@@ -269,38 +265,36 @@ void File::open(const string &_filename) {
 			return;
 		}
 	}*/
-
-	filename = _filename;
 	set_mode(this);
 }
 
 // create a new file or reset an existing one
-void File::create(const string &_filename) {
+void File::create(const Path &_filename) {
+	filename = _filename;
 #ifdef OS_WINDOWS
-	handle = _creat(sys_filename(_filename).c_str(), _S_IREAD | _S_IWRITE);
+	handle = _creat(filename.str().c_str(), _S_IREAD | _S_IWRITE);
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::creat(sys_filename(_filename).c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle = ::creat(filename.str().c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
-		throw FileError("failed creating file '" + _filename + "'");
+		throw FileError(format("failed creating file '%s'", filename));
 
-	filename = _filename;
 	set_mode(this);
 }
 
 // create a new file or append data to an existing one
-void File::append(const string &_filename) {
+void File::append(const Path &_filename) {
+	filename = _filename;
 #ifdef OS_WINDOWS
-	handle = _open(sys_filename(_filename).c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
+	handle = _open(filename.str().c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::open(sys_filename(_filename).c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle = ::open(filename.str().c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
-		throw FileError("failed appending file '" + _filename + "'");
+		throw FileError(format("failed appending file '%s'", filename));
 
-	filename = _filename;
 	set_mode(this);
 }
 
@@ -404,7 +398,7 @@ string File::read_complete() {
 int File::read_buffer(void *buffer, int size) {
 	int r = _read(handle, buffer, size);
 	if (r < 0)
-		throw FileError("failed reading file '" + filename + "'");
+		throw FileError(format("failed reading file '%s'", filename));
 	return r;
 }
 
@@ -412,7 +406,7 @@ int File::read_buffer(void *buffer, int size) {
 int File::write_buffer(const void *buffer, int size) {
 	int r = _write(handle,buffer,size);
 	if (r < 0)
-		throw FileError("failed writing file '" + filename + "'");
+		throw FileError(format("failed writing file '%s'", filename));
 	return r;
 }
 
@@ -427,7 +421,7 @@ int File::write_buffer(const string &str) {
 static void read_buffer_asserted(File *f, void *buf, int size) {
 	int r = f->read_buffer(buf, size);
 	if (r < size)
-		throw FileError("end of file '" + f->filename + "'");
+		throw FileError(format("end of file '%s'", f->filename));
 }
 
 // read a single character (1 byte)
@@ -533,7 +527,7 @@ string File::read_str() {
 string TextFile::read_str() {
 	// read one byte at a time until we reach a \n character
 	string str;
-	while(true){
+	while(true) {
 		char c = read_char();
 
 		#ifdef OS_LINUX

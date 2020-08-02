@@ -14,6 +14,7 @@
 #include "color.h"
 
 class ImagePainter;
+class Path;
 
 class Image {
 public:
@@ -40,11 +41,11 @@ public:
 
 	bool _cdecl is_empty(){	return (data.num == 0);	}
 
-	static Image *load(const string &filename);
-	void _cdecl _load(const string &filename);
-	void _cdecl _load_flipped(const string &filename);
+	static Image *load(const Path &filename);
+	void _cdecl _load(const Path &filename);
+	void _cdecl _load_flipped(const Path &filename);
 	void _cdecl create(int width, int height, const color &c);
-	void _cdecl save(const string &filename) const;
+	void _cdecl save(const Path &filename) const;
 	void _cdecl clear();
 
 	Image* _cdecl scale(int width, int height) const;

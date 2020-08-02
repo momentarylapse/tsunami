@@ -376,8 +376,8 @@ void TsunamiWindow::on_add_time_track() {
 void TsunamiWindow::on_import_backup() {
 	string id = hui::GetEvent()->id;
 	int uuid = id.explode(":").back()._int();
-	string filename = BackupManager::get_filename_for_uuid(uuid);
-	if (filename == "")
+	auto filename = BackupManager::get_filename_for_uuid(uuid);
+	if (filename.is_empty())
 		return;
 
 	if (song->is_empty()) {
@@ -592,9 +592,9 @@ void TsunamiWindow::on_redo() {
 void TsunamiWindow::on_send_bug_report() {
 }
 
-string title_filename(const string &filename) {
-	if (filename.num > 0)
-		return path_basename(filename); // + " (" + filename.dirname() + ")";
+string title_filename(const Path &filename) {
+	if (!filename.is_empty())
+		return filename.basename();
 	return _("No name");
 }
 
@@ -1058,9 +1058,9 @@ bool song_is_simple_midi(Song *s) {
 	return true;
 }
 
-string _suggest_filename(Song *s, const string &dir) {
-	if (s->filename != "")
-		return path_basename(s->filename);
+string _suggest_filename(Song *s, const Path &dir) {
+	if (!s->filename.is_empty())
+		return s->filename.basename();
 	string base = Date::now().format("%Y-%m-%d");
 
 	string ext = "nami";
@@ -1072,7 +1072,7 @@ string _suggest_filename(Song *s, const string &dir) {
 	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
-		if (!file_exists(dir + name))
+		if (!file_exists(dir << name))
 			return name;
 	}
 	return "";
@@ -1109,7 +1109,7 @@ void TsunamiWindow::on_export_selection() {
 }
 
 void TsunamiWindow::on_quick_export() {
-	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory);
+	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory.str());
 	if (session->storage->save(song, dir + _suggest_filename(song, dir)))
 		view->set_message(_("file saved"));
 }

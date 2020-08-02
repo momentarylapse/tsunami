@@ -11,11 +11,12 @@
 #if !defined(MSG_H)
 #define MSG_H
 
+class Path;
 
 
 // administration
 void msg_init(bool verbose = true);
-void msg_init(const string &force_filename, bool verbose = true);
+void msg_init(const Path &force_filename, bool verbose = true);
 void msg_set_verbose(bool verbose);
 void msg_end(bool del_file = true);
 

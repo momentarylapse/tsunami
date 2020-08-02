@@ -9,8 +9,7 @@
 #ifndef _HUI_RESOURCE_EXISTS_
 #define _HUI_RESOURCE_EXISTS_
 
-namespace hui
-{
+namespace hui {
 
 //----------------------------------------------------------------------------------
 // resource handling
@@ -20,8 +19,7 @@ Menu *_cdecl CreateResourceMenu(const string &id);
 
 
 
-class Resource
-{
+class Resource {
 public:
 	string type;
 	string id;
@@ -44,7 +42,7 @@ Resource ParseResource(const string &buffer, bool literal = false);
 
 
 // resources
-void _cdecl LoadResource(const string &filename);
+void _cdecl LoadResource(const Path &filename);
 Resource *GetResource(const string &id);
 
 };

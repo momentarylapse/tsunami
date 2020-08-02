@@ -56,56 +56,56 @@ bool func_did_not_throw(std::function<void()> f) {
 
 
 // just test the existence of a file
-bool file_exists(const string &filename) {
+bool file_exists(const Path &filename) {
 	struct stat s;
-	if (stat(sys_filename(filename).c_str(), &s) == 0) {
+	if (stat(filename.str().c_str(), &s) == 0) {
 		//if (s.st_mode & S_IFREG)
 			return true;
 	}
 	return false;
 }
 
-int64 file_size(const string &path) {
+int64 file_size(const Path &path) {
 	struct stat s;
-	if (stat(sys_filename(path).c_str(), &s) != 0)
-		throw FileError("unable to stat '" + path + "'");
+	if (stat(path.str().c_str(), &s) != 0)
+		throw FileError(format("unable to stat '%s'", path));
 	return s.st_size;
 }
 
-Date file_mtime(const string &path) {
+Date file_mtime(const Path &path) {
 	struct stat s;
-	if (stat(sys_filename(path).c_str(), &s) != 0)
-		throw FileError("unable to stat '" + path + "'");
+	if (stat(path.str().c_str(), &s) != 0)
+		throw FileError(format("unable to stat '%s'", path));
 	return time2date(s.st_mtime);
 }
 
-bool file_is_directory(const string &path) {
+bool file_is_directory(const Path &path) {
 	struct stat s;
-	if (stat(sys_filename(path).c_str(), &s) != 0)
+	if (stat(path.str().c_str(), &s) != 0)
 		return false; //throw FileError("unable to stat '" + path + "'");
 	return (s.st_mode & S_IFDIR);
 }
 
 
-void dir_create(const string &dir) {
+void dir_create(const Path &dir) {
 	if (file_is_directory(dir))
 		return;
 #if defined(OS_WINDOWS)
-	if (_mkdir(sys_filename(dir).c_str()) != 0)
+	if (_mkdir(dir.str().c_str()) != 0)
 #elif defined(OS_MINGW)
-	if (mkdir(sys_filename(dir).c_str()) != 0)
+	if (mkdir(dir.str().c_str()) != 0)
 #else // defined(OS_LINUX)
-	if (mkdir(sys_filename(dir).c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
+	if (mkdir(dir.str().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 #endif
-		throw FileError("can not create directory '" + dir + "'");
+		throw FileError(format("can not create directory '%s'", dir));
 }
 
-void dir_delete(const string &dir) {
-	if (_rmdir(sys_filename(dir).c_str()) != 0)
-		throw FileError("can not delete directory '" + dir + "'");
+void dir_delete(const Path &dir) {
+	if (_rmdir(dir.str().c_str()) != 0)
+		throw FileError(format("can not delete directory '%s'", dir));
 }
 
-string get_current_dir() {
+Path get_current_dir() {
 	string str;
 	char tmp[256];
 #ifdef OS_WINDOWS
@@ -117,44 +117,34 @@ string get_current_dir() {
 	str = tmp;
 	str += "/";
 #endif
-	return str;
+	return Path(str);
 }
 
-void file_rename(const string &source, const string &target) {
-	char dir[512];
-	for (int i=0; i<target.num; i++){
-		dir[i] = target[i];
-		dir[i+1] = 0;
-		if (i > 3)
-			if ((target[i] == '/') or (target[i] == '\\'))
-				dir_create(string(dir));
-	}
-	if (rename(sys_filename(source).c_str(), sys_filename(target).c_str()) != 0)
-		throw FileError("can not rename file '" + source + "' -> '" + target + "'");
+void file_rename(const Path &source, const Path &target) {
+	for (auto &p: target.all_parents())
+		dir_create(p);
+
+	if (rename(source.str().c_str(), target.str().c_str()) != 0)
+		throw FileError(format("can not rename file '%s' -> '%s'", source, target));
 }
 
-void file_copy(const string &source, const string &target) {
-	char dir[512];
-	for (int i=0; i<target.num; i++){
-		dir[i] = target[i];
-		dir[i+1] = 0;
-		if (i > 3)
-			if ((target[i] == '/') or (target[i] == '\\'))
-				dir_create(string(dir));
-	}
-	int hs=_open(sys_filename(source).c_str(),O_RDONLY);
+void file_copy(const Path &source, const Path &target) {
+	for (auto &p: target.all_parents())
+		dir_create(p);
+
+	int hs=_open(source.str().c_str(),O_RDONLY);
 	if (hs<0)
-		throw FileError("copy: can not open source file '" + source + "'");
+		throw FileError(format("copy: can not open source file '%s'", source));
 #ifdef OS_WINDOWS
-	int ht=_creat(sys_filename(target).c_str(),_S_IREAD | _S_IWRITE);
+	int ht=_creat(target.str().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	int ht = creat(sys_filename(target).c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int ht = creat(target.str().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht < 0){
 		_close(hs);
-		throw FileError("copy: can not create target file '" + target + "'");
+		throw FileError(format("copy: can not create target file '%s'", target));
 	}
 	char buf[10240];
 	int r = 10;
@@ -162,85 +152,24 @@ void file_copy(const string &source, const string &target) {
 		r = _read(hs,buf,sizeof(buf));
 		int rr = _write(ht,buf,r);
 		if (rr < r)
-			throw FileError("can not copy file '" + source + "' -> '" + target + "' (write failed)");
+			throw FileError(format("can not copy file '%s' -> '%s' (write failed)", source, target));
 	}
 	_close(hs);
 	_close(ht);
 }
 
-void file_delete(const string &filename) {
-	if (_unlink(sys_filename(filename).c_str()) != 0)
-		throw FileError("can not delete file '" + filename + "'");
+void file_delete(const Path &filename) {
+	if (_unlink(filename.str().c_str()) != 0)
+		throw FileError(format("can not delete file '%s'", filename));
 }
 
-string file_hash(const string &filename, const string &type) {
+string file_hash(const Path &filename, const string &type) {
 	if (type == "md5") {
 		return FileRead(filename).md5();
 	}
 	return "";
 }
 
-
-// transposes path-strings to the current operating system
-// accepts windows and linux paths ("/" and "\\")
-string sys_filename(const string &path) {
-#if defined(OS_WINDOWS) || defined(OS_MINGW)
-	return path.replace("/", "\\");
-#else
-	return path.replace("\\", "/");
-#endif
-}
-
-// ends with '/' or '\'
-string path_dirname(const string &path) {
-	int i = max(path.rfind("/"), path.rfind("\\"));
-	if (i >= 0)
-		return path.head(i + 1);
-	return "";
-}
-
-string path_basename(const string &path) {
-	int i = max(path.rfind("/"), path.rfind("\\"));
-	if (i >= 0)
-		return path.tail(path.num - i - 1);
-	return path;
-}
-
-// make sure the name ends with a slash
-string dir_canonical(const string &path) {
-	string p = path_canonical(path);
-	if (p.tail(1) != "/")
-		return p + "/";
-	return p;
-}
-
-// remove "/../"
-string path_canonical(const string &path) {
-	auto p = path.replace("\\", "/").explode("/");
-
-	for (int i=1; i<p.num; i++)
-		if ((p[i] == "..") and (p[i-1] != "..")){
-			p.erase(i);
-			p.erase(i - 1);
-			i -= 2;
-		}
-
-	return implode(p, "/");
-}
-
-string path_extension(const string &path) {
-	int pos = path.rfind(".");
-	if (pos >= 0)
-		return path.tail(path.num - pos - 1).lower();
-	return "";
-}
-
-
-string path_absolute(const string &path) {
-	if (path.head(1) == "/" or path.substr(1,1) == ":")
-		return path;
-	return path_canonical(get_current_dir() + path);
-}
 
 
 string shell_execute(const string &cmd) {
@@ -274,15 +203,14 @@ void sa_sort_i(Array<string> &a) {
 }
 
 // search a directory for files matching a filter
-Array<string> dir_search(const string &dir, const string &filter, bool show_directories) {
+Array<string> dir_search(const Path &dir, const string &filter, bool show_directories) {
 	Array<string> dir_list, file_list;
 
 	string filter2 = filter.substr(1, filter.num - 1);
-	string dir2 = sys_filename(dir_canonical(dir));
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;
-	auto handle = _findfirst((dir2 + "*").c_str(), &t);
+	auto handle = _findfirst((dir.as_dir().str() + "*").c_str(), &t);
 	auto e = handle;
 	while (e >= 0) {
 		string name = t.name;
@@ -299,7 +227,7 @@ Array<string> dir_search(const string &dir, const string &filter, bool show_dire
 	}
 #else // defined(OS_LINUX) || defined(OS_MINGW)
 	DIR *_dir;
-	_dir = opendir(dir2.c_str());
+	_dir = opendir(dir.str().c_str());
 	if (!_dir)
 		return {};
 	struct dirent *dn;
@@ -309,10 +237,10 @@ Array<string> dir_search(const string &dir, const string &filter, bool show_dire
 		//if ((strcmp(dn->d_name,".")!=0)and(strcmp(dn->d_name,"..")!=0)and(!strstr(dn->d_name,"~"))){
 		string name = dn->d_name;
 		if ((name != ".") and (name != "..") and (name.back() != '~')) {
-			string ffn = dir2 + name;
-			stat(ffn.c_str(), &s);
-			bool is_reg = (s.st_mode & S_IFREG)>0;
-			bool is_dir = (s.st_mode & S_IFDIR)>0;
+			Path ffn = dir << name;
+			stat(ffn.str().c_str(), &s);
+			bool is_reg = (s.st_mode & S_IFREG) > 0;
+			bool is_dir = (s.st_mode & S_IFDIR) > 0;
 			if ((is_reg and name.match(filter)) or (show_directories and is_dir)) {
 				if (is_dir)
 					dir_list.add(name);

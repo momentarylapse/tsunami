@@ -63,7 +63,7 @@ void LoadResourceCommand7(File *f, Resource *c) {
 	}
 }
 
-void LoadResource(const string &filename) {
+void LoadResource(const Path &filename) {
 	// dirty...
 	_resources_.clear();
 	_languages_.clear();

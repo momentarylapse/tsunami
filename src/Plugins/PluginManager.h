@@ -18,29 +18,29 @@ class TsunamiWindow;
 class SongPlugin;
 class TsunamiPlugin;
 class Session;
-namespace hui{
+namespace hui {
 	class Window;
 	class Panel;
+	class Menu;
 }
-namespace Kaba{
+namespace Kaba {
 	class Script;
 	class Class;
 }
 
-class PluginManager
-{
+class PluginManager {
 public:
 	PluginManager();
 	virtual ~PluginManager();
 
-	string plugin_dir_static();
-	string plugin_dir_local();
+	Path plugin_dir_static();
+	Path plugin_dir_local();
 
 	void link_app_script_data();
 	void find_plugins();
 	void add_plugins_to_menu(TsunamiWindow *win);
 
-	Plugin *load_and_compile_plugin(ModuleType type, const string &filename);
+	Plugin *load_and_compile_plugin(ModuleType type, const Path &filename);
 	Plugin *get_plugin(Session *session, ModuleType type, const string &name);
 
 	void apply_favorite(Module *c, const string &name, bool notify);
@@ -54,11 +54,10 @@ public:
 
 
 	// not compiled yet
-	struct PluginFile
-	{
+	struct PluginFile {
 		string name;
 		string group;
-		string filename;
+		Path filename;
 		string image;
 		ModuleType type;
 		Array<string> title;
@@ -75,6 +74,11 @@ public:
 
 	Kaba::Script *package;
 	Kaba::Class *get_class(const string &name);
+
+private:
+	void find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleType type);
+	void find_plugins_in_dir(const Path &rel, const string &group, ModuleType type);
+	void add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)());
 };
 
 #endif /* PLUGINMANAGER_H_ */

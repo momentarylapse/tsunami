@@ -390,7 +390,7 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 	source->base_class->constants.clear();
 
 	// don't fully include internal libraries
-	if (source->script->filename.find(".kaba") < 0)
+	if (source->script->filename.basename().find(".kaba") < 0)
 		return;
 
 	dest->base_class->static_variables.append(source->base_class->static_variables);

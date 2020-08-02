@@ -11,6 +11,7 @@
 #include "../base/base.h"
 #include "../image/Painter.h"
 
+class Path;
 class Painter;
 class Image;
 class color;
@@ -82,7 +83,7 @@ public:
 	int font_id(const string &name);
 };
 
-Parser *save(const string &filename);
+Parser *save(const Path &filename);
 
 }
 

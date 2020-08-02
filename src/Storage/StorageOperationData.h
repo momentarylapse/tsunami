@@ -10,6 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/base/map.h"
+#include "../lib/file/path.h"
 
 class Song;
 class Progress;
@@ -29,7 +30,7 @@ enum class SampleFormat;
 
 class StorageOperationData {
 public:
-	StorageOperationData(Session *session, Format *format, const string &filename, const string &message);
+	StorageOperationData(Session *session, Format *format, const Path &filename, const string &message);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -56,7 +57,7 @@ public:
 	Session *session;
 	Song *song;
 	Progress *progress;
-	string filename;
+	Path filename;
 	AudioBuffer *buf;
 	int channels_suggested;
 	bool allow_channels_change;

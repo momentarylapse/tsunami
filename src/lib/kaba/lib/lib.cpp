@@ -186,6 +186,8 @@ const Class *TypeFunctionP;
 const Class *TypeFunctionCode;
 const Class *TypeFunctionCodeP;
 
+extern const Class *TypePath;
+
 
 Array<Script*> packages;
 Script *cur_package = nullptr;
@@ -206,6 +208,11 @@ Flags flags_mix(const Array<Flags> &f) {
 }
 
 void add_package(const string &name, Flags flags) {
+	for (auto &p: packages)
+		if (p->filename.str() == name) {
+			cur_package = p;
+			return;
+		}
 	Script* s = new Script;
 	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
 	s->syntax->base_class->name = name;
@@ -653,7 +660,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 			func_add_param("index", TypeInt);
 		class_add_funcx("resize", TypeVoid, &DynamicArray::simple_resize);
 			func_add_param("num", TypeInt);
-	}else if (p == TypeString or p == TypeAny){
+	}else if (p == TypeString or p == TypeAny or p == TypePath){
 		// handled manually later...
 	}else{
 		msg_error("evil class:  " + t->name);
@@ -664,8 +671,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 
 
 Array<TypeCast> TypeCasts;
-void add_type_cast(int penalty, const Class *source, const Class *dest, const string &cmd)
-{
+void add_type_cast(int penalty, const Class *source, const Class *dest, const string &cmd) {
 	TypeCast c;
 	c.penalty = penalty;
 	c.f = nullptr;
@@ -728,6 +734,7 @@ void SIAddPackageBase();
 void SIAddPackageKaba();
 void SIAddPackageTime();
 void SIAddPackageOS();
+void SIAddPackageOSPath();
 void SIAddPackageMath();
 void SIAddPackageThread();
 void SIAddPackageHui();
@@ -789,6 +796,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddStatements();
 
 	SIAddPackageBase();
+	SIAddPackageOSPath();
 	SIAddPackageKaba();
 	SIAddPackageMath();
 	SIAddPackageTime();
@@ -802,7 +810,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageVulkan();
 	SIAddPackageX();
 
-	cur_package = packages[0];
+	add_package("base");
 	SIAddXCommands();
 
 
@@ -817,12 +825,14 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	add_type_cast(20, TypeChar, TypeInt, "char.__int__");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
-	cur_package = packages[2];
+	add_package("math");
 	add_type_cast(50, TypeInt, TypeAny, "@int2any");
 	add_type_cast(50, TypeFloat32, TypeAny, "@float2any");
 	add_type_cast(50, TypeBool, TypeAny, "@bool2any");
 	add_type_cast(50, TypeString, TypeAny, "@str2any");
 	add_type_cast(50, TypePointer, TypeAny, "@pointer2any");
+	add_package("os");
+	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
 
 
 	// consistency checks

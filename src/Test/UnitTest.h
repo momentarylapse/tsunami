@@ -15,6 +15,7 @@
 
 class AudioBuffer;
 class Range;
+class Path;
 
 class UnitTest {
 public:

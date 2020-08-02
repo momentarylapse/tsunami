@@ -47,7 +47,7 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 
 	set_options("default_artist", "placeholder=" + AppName);
 
-	set_options("quick_export_dir", "placeholder=" + hui::Application::directory);
+	set_options("quick_export_dir", "placeholder=" + hui::Application::directory.str());
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -205,7 +205,7 @@ void SettingsDialog::on_high_details() {
 
 void SettingsDialog::on_qed_find() {
 	if (hui::FileDialogDir(this, _("Quick export directory"), "")) {
-		hui::Config.set_str("QuickExportDir", hui::Filename);
-		set_string("quick_export_dir", hui::Filename);
+		hui::Config.set_str("QuickExportDir", hui::Filename.str());
+		set_string("quick_export_dir", hui::Filename.str());
 	}
 }

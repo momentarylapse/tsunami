@@ -12,7 +12,7 @@
 
 namespace nix{
 
-string shader_dir;
+Path shader_dir;
 
 
 Shader *default_shader_2d = NULL;
@@ -221,20 +221,20 @@ void Shader::find_locations() {
 	location[LOCATION_MATERIAL_EMISSION] = get_location("material.emission");
 }
 
-Shader *Shader::load(const string &filename) {
-	if (filename.num == 0){
+Shader *Shader::load(const Path &filename) {
+	if (filename.is_empty()){
 		default_shader_3d->reference_count ++;
 		return default_shader_3d;
 	}
 
-	string fn = shader_dir + filename;
+	Path fn = shader_dir << filename;
 	for (Shader *s: shaders)
 		if ((s->filename == fn) and (s->program >= 0)) {
 			s->reference_count ++;
 			return s;
 		}
 
-	msg_write("loading shader: " + fn);
+	msg_write("loading shader: " + fn.str());
 	msg_right();
 
 	try {
@@ -245,7 +245,7 @@ Shader *Shader::load(const string &filename) {
 
 		msg_left();
 		return shader;
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		msg_error(e.message());
 		default_shader_3d->reference_count ++;
 		return default_shader_3d;
@@ -262,11 +262,10 @@ Shader::Shader() {
 }
 
 Shader::~Shader() {
-	msg_write("delete shader: " + filename);
+	msg_write("delete shader: " + filename.str());
 	glDeleteProgram(program);
 	TestGLError("NixUnrefShader");
 	program = -1;
-	filename = "";
 }
 
 void Shader::unref() {
@@ -277,7 +276,7 @@ void Shader::unref() {
 		glDeleteProgram(program);
 		TestGLError("NixUnrefShader");
 		program = -1;
-		filename = "";
+		filename = Path();
 	}
 }
 

@@ -10,8 +10,7 @@
 
 #include "../Module/Module.h"
 
-class TsunamiPlugin : public Module
-{
+class TsunamiPlugin : public Module {
 public:
 	TsunamiPlugin();
 	virtual ~TsunamiPlugin();

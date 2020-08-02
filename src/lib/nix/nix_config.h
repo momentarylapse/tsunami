@@ -116,7 +116,7 @@ namespace nix {
 extern int target_width, target_height;						// current render target size (window/texture)
 extern bool Fullscreen;
 
-extern string texture_dir;
+extern Path texture_dir;
 extern int MaxVideoTextureSize;
 
 class VertexBuffer;

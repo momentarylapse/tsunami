@@ -33,8 +33,8 @@ public:
 	static const string MESSAGE_DELETE_CABLE;
 
 	void reset();
-	void save(const string &filename);
-	static SignalChain *load(Session *session, const string &filename);
+	void save(const Path &filename);
+	static SignalChain *load(Session *session, const Path &filename);
 
 	string name;
 

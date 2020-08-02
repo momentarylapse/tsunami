@@ -10,22 +10,20 @@
 
 #include "../base/base.h"
 #include "../base/map.h"
+#include "../file/path.h"
 #include "common.h"
 
-namespace hui
-{
+namespace hui {
 
 class Window;
 
-enum
-{
+enum {
 	FLAG_LOAD_RESOURCE = 1,
 	FLAG_SILENT = 2,
 	FLAG_UNIQUE = 16,
 };
 
-class Application : public VirtualBase
-{
+class Application : public VirtualBase {
 public:
 	Application(const string &app_name, const string &def_lang, int flags);
 	virtual ~Application();
@@ -50,10 +48,10 @@ public:
 
 	static Map<string, string> _properties_;
 
-	static string filename;
-	static string directory;			// dir of changeable files (ie. ~/.app/)
-	static string directory_static;	// dir of static files (ie. /usr/shar/app)
-	static string initial_working_directory;
+	static Path filename;
+	static Path directory;			// dir of changeable files (ie. ~/.app/)
+	static Path directory_static;	// dir of static files (ie. /usr/shar/app)
+	static Path initial_working_directory;
 	static bool installed; // installed into system folders?
 	static bool running;
 
@@ -63,8 +61,7 @@ public:
 }
 
 #define HUI_EXECUTE(APP_CLASS) \
-int hui_main(const Array<string> &arg) \
-{ \
+int hui_main(const Array<string> &arg) { \
 	APP_CLASS::_args = arg; \
 	APP_CLASS *app = new APP_CLASS; \
 	int r = 0; \

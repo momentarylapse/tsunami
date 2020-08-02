@@ -26,24 +26,21 @@
 
 namespace Kaba {
 
-string Version = "0.19.-2.2";
+string Version = "0.19.-2.4";
 
 //#define ScriptDebug
-
-int GlobalWaitingMode;
-float GlobalTimeToWait;
 
 
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Script *s) :
 	Asm::Exception(_message, _expression, _line, _column)
 {
-	text +=  ", " + s->filename;
+	text +=  ", " + s->filename.str();
 }
 
 Exception::Exception(const Asm::Exception &e, Script *s, Function *f) :
 	Asm::Exception(e)
 {
-	text = "assembler: " + message() + ", " + f->long_name() + ": " + s->filename;
+	text = format("assembler: %s, %s: %s", message(), f->long_name(), s->filename);
 }
 
 
@@ -54,18 +51,18 @@ Array<Script*> _dead_scripts_;
 
 
 
-Script *Load(const string &filename, bool just_analyse) {
+Script *Load(const Path &filename, bool just_analyse) {
 	//msg_write(string("Lade ",filename));
 	Script *s = nullptr;
 
 	// already loaded?
 	for (Script *ps: _public_scripts_)
-		if (ps->filename == sys_filename(filename))
+		if (ps->filename == filename)
 			return ps;
 	
 	// load
 	s = new Script();
-	s->syntax->base_class->name = path_basename(filename).replace(".kaba", "");
+	s->syntax->base_class->name = filename.basename().replace(".kaba", "");
 	try {
 		s->load(filename, just_analyse);
 	} catch(const Exception &e) {
@@ -176,10 +173,12 @@ struct LoadingScript {
 Array<LoadingScript> loading_script_stack;
 
 
-void Script::load(const string &_filename, bool _just_analyse) {
+void Script::load(const Path &_filename, bool _just_analyse) {
 	loading_script_stack.add(this);
 	just_analyse = _just_analyse;
-	filename = sys_filename(path_absolute(config.directory + _filename));
+
+
+	filename = (config.directory << _filename).absolute().canonical();
 	auto parser = syntax->parser = new Parser(syntax);
 
 	try {
@@ -201,7 +200,7 @@ void Script::load(const string &_filename, bool _just_analyse) {
 
 	} catch(FileError &e) {
 		loading_script_stack.pop();
-		do_error("script file not loadable: " + filename);
+		do_error("script file not loadable: " + filename.str());
 	} catch(Exception &e) {
 		loading_script_stack.pop();
 		throw e;
@@ -217,21 +216,18 @@ void Script::do_error(const string &str, int override_line)
 	syntax->do_error(str, 0, override_line);
 }
 
-void Script::do_error_internal(const string &str)
-{
+void Script::do_error_internal(const string &str) {
 	do_error("internal compiler error: " + str, 0);
 }
 
-void Script::do_error_link(const string &str)
-{
+void Script::do_error_link(const string &str) {
 	do_error(str, 0);
 }
 
-void Script::set_variable(const string &name, void *data)
-{
+void Script::set_variable(const string &name, void *data) {
 	//msg_write(name);
 	for (auto *v: syntax->base_class->static_variables)
-		if (v->name == name){
+		if (v->name == name) {
 			memcpy(v->memory, data, v->type->size);
 			return;
 		}
@@ -292,7 +288,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 
 	// empty script
 	Script *s = new Script();
-	s->filename = "command line";
+	s->filename = "-command line-";
 	SyntaxTree *ps = s->syntax;
 	auto parser = ps->parser = new Parser(ps);
 

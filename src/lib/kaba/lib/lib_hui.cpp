@@ -80,6 +80,7 @@ extern const Class *TypeFloatList;
 extern const Class *TypeComplexList;
 extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
+extern const Class *TypePath;
 //extern const Class *TypeTimer;
 const Class *TypeHuiWindowP;
 
@@ -101,9 +102,6 @@ void SIAddPackageHui() {
 	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
-	
-	add_func("GetKeyName", TypeString, hui_p(&hui::GetKeyName), Flags::_STATIC__PURE);
-		func_add_param("id", TypeInt);
 
 	add_class(TypeHuiMenu);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::Menu::__init__));
@@ -495,19 +493,19 @@ void SIAddPackageHui() {
 	add_func("file_dialog_open", TypeBool, (void*)&hui::FileDialogOpen, Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
-		func_add_param("dir", TypeString);
+		func_add_param("dir", TypePath);
 		func_add_param("show_filter", TypeString);
 		func_add_param("filter", TypeString);
 	add_func("file_dialog_save", TypeBool, (void*)&hui::FileDialogSave, Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
-		func_add_param("dir", TypeString);
+		func_add_param("dir", TypePath);
 		func_add_param("show_filter", TypeString);
 		func_add_param("filter", TypeString);
 	add_func("file_dialog_dir", TypeBool, (void*)&hui::FileDialogDir, Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
-		func_add_param("dir", TypeString);
+		func_add_param("dir", TypePath);
 	add_func("question_box", TypeString, (void*)&hui::QuestionBox, Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
@@ -523,13 +521,15 @@ void SIAddPackageHui() {
 		func_add_param("text", TypeString);
 	add_func("create_menu_from_source", TypeHuiMenuP, (void*)&hui::CreateMenuFromSource, Flags::STATIC);
 		func_add_param("source", TypeString);
+	add_func("get_key_name", TypeString, hui_p(&hui::GetKeyName), Flags::_STATIC__PURE);
+		func_add_param("id", TypeInt);
 
 	// clipboard
 	add_func("copy_to_clipboard", TypeVoid, (void*)&hui::Clipboard::Copy, Flags::STATIC);
 		func_add_param("buffer", TypeString);
 	add_func("paste_from_clipboard", TypeString, (void*)&hui::Clipboard::Paste, Flags::STATIC);
 	add_func("open_document", TypeVoid, (void*)&hui::OpenDocument, Flags::STATIC);
-		func_add_param("filename", TypeString);
+		func_add_param("filename", TypePath);
 	add_func("make_gui_image", TypeString, (void*)&hui::SetImage, Flags::STATIC);
 		func_add_param("image", TypeImage);
 
@@ -653,11 +653,11 @@ void SIAddPackageHui() {
 	add_const("NUM_KEYS",TypeInt,(void*)hui::NUM_KEYS);
 	add_const("KEY_ANY",TypeInt,(void*)hui::KEY_ANY);
 
-	add_ext_var("app_filename", TypeString, hui_p(&hui::Application::filename));
-	add_ext_var("app_directory", TypeString, hui_p(&hui::Application::directory));
-	add_ext_var("app_directory_static",TypeString, hui_p(&hui::Application::directory_static));
-	add_ext_var("filename", TypeString, hui_p(&hui::Filename));
-	add_ext_var("config", TypeHuiConfiguration, hui_p(&hui::Config));
+	add_ext_var("app_filename", TypePath, hui_p(&hui::Application::filename));
+	add_ext_var("app_directory", TypePath, hui_p(&hui::Application::directory));
+	add_ext_var("app_directory_static", TypePath, hui_p(&hui::Application::directory_static));
+	add_ext_var("filename", TypePath, hui_p(&hui::Filename));
+	add_ext_var("app_config", TypeHuiConfiguration, hui_p(&hui::Config));
 }
 
 };

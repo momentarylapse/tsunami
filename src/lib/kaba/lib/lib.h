@@ -390,7 +390,7 @@ public:
 	bool allow_simplification;
 	bool allow_registers;
 
-	string directory;
+	Path directory;
 	bool verbose;
 	string verbose_func_filter;
 	string verbose_stage_filter;

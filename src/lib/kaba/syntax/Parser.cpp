@@ -2445,7 +2445,7 @@ string canonical_import_name(const string &s) {
 	return s.lower().replace(" ", "").replace("_", "");
 }
 
-string dir_has(const string &dir, const string &name) {
+string dir_has(const Path &dir, const string &name) {
 	auto list = dir_search(dir, "*", true);
 	for (auto &e: list)
 		if (canonical_import_name(e) == name)
@@ -2453,38 +2453,38 @@ string dir_has(const string &dir, const string &name) {
 	return "";
 }
 
-string import_dir_match(const string &dir0, const string &name) {
+Path import_dir_match(const Path &dir0, const string &name) {
 	auto xx = name.explode("/");
-	string filename = dir0;
+	Path filename = dir0;
 
 	for (int i=0; i<xx.num; i++) {
-		filename = dir_canonical(filename);
 		string e = dir_has(filename, canonical_import_name(xx[i]));
 		if (e == "")
-			return "";
-		filename += e;
+			return Path::EMPTY;
+		filename <<= e;
 	}
 	return filename;
 
-	if (file_exists(dir0 + name))
-		return dir0 + name;
-	return "";
+	if (file_exists(dir0 << name))
+		return dir0 << name;
+	return Path::EMPTY;
 }
 
-string find_import(Script *s, const string &_name) {
+
+Path find_import(Script *s, const string &_name) {
 	string name = _name.replace(".kaba", "");
 	name = name.replace(".", "/") + ".kaba";
 
 	if (name.head(2) == "@/")
-		return path_canonical(hui::Application::directory_static + "lib/" + name.substr(2, -1)); // TODO...
+		return (hui::Application::directory_static << "lib" << name.substr(2, -1)).canonical(); // TODO...
 
 	for (int i=0; i<5; i++) {
-		string filename = import_dir_match(path_canonical(path_dirname(s->filename) + str_repeat("../", i)), name);
-		if (filename != "")
+		Path filename = import_dir_match((s->filename.parent() << str_repeat("../", i)).canonical(), name);
+		if (!filename.is_empty())
 			return filename;
 	}
 
-	return "";
+	return Path::EMPTY;
 }
 
 void Parser::parse_import() {
@@ -2511,17 +2511,17 @@ void Parser::parse_import() {
 	
 	// internal packages?
 	for (Script *p: packages)
-		if (p->filename == name) {
+		if (p->filename.str() == name) {
 			tree->add_include_data(p, indirect);
 			return;
 		}
 
-	string filename = find_import(tree->script, name);
-	if (filename == "")
+	Path filename = find_import(tree->script, name);
+	if (filename.is_empty())
 		do_error(format("can not find import '%s'", name));
 
 	for (Script *ss: loading_script_stack)
-		if (ss->filename == sys_filename(filename))
+		if (ss->filename == filename)
 			do_error("recursive include");
 
 	msg_right();

@@ -59,8 +59,8 @@
 	const char *sys_str(const string &str)
 	{	return str.c_str();	}
 
-	const char *sys_str_f(const string &str)
-	{	return sys_filename(str).c_str();	}
+	const char *sys_str_f(const Path &str)
+	{	return str.str().c_str();	}
 
 	string de_sys_str(const char *str)
 	{	return string(str);	}

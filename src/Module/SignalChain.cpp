@@ -223,7 +223,7 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 	notify(MESSAGE_DELETE_CABLE);
 }
 
-void SignalChain::save(const string& filename) {
+void SignalChain::save(const Path& filename) {
 	xml::Parser p;
 	xml::Element root("chain");
 	xml::Element hh("head");
@@ -258,7 +258,7 @@ void SignalChain::save(const string& filename) {
 	p.save(filename);
 }
 
-SignalChain *SignalChain::load(Session *session, const string& filename) {
+SignalChain *SignalChain::load(Session *session, const Path &filename) {
 	auto *chain = new SignalChain(session, "new");
 
 	try {

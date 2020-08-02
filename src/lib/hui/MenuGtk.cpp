@@ -206,7 +206,7 @@ void *get_gtk_image(const string &image, GtkIconSize size) {
 	//	if ((img->filename[0] == '/') or (img->filename[1] == ':'))
 	//		return gtk_image_new_from_file(sys_str_f(img->filename));
 		// relative
-		return gtk_image_new_from_file(sys_str_f(Application::directory_static + image));
+		return gtk_image_new_from_file(sys_str_f(Application::directory_static << image));
 	}
 }
 

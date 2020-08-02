@@ -410,7 +410,7 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 	delete[](col[2]);
 }
 
-void image_load_jpg(const string &filename, Image &image)
+void image_load_jpg(const Path &filename, Image &image)
 {
 	string tt = FileRead(filename);
 	unsigned char *buf = (unsigned char*)tt.data;

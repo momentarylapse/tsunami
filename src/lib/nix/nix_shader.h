@@ -29,7 +29,7 @@ void BindUniform(UniformBuffer *ub, int binding);
 
 class Shader {
 public:
-	string filename;
+	Path filename;
 	int program;
 	int reference_count;
 	Shader();
@@ -68,7 +68,7 @@ public:
 	int location[NUM_LOCATIONS];
 
 
-	static Shader* _cdecl load(const string &filename);
+	static Shader* _cdecl load(const Path &filename);
 	static Shader* _cdecl create(const string &source);
 };
 
@@ -81,7 +81,7 @@ void _cdecl SetOverrideShader(Shader *s);
 extern Shader *default_shader_2d;
 extern Shader *default_shader_3d;
 
-extern string shader_dir;
+extern Path shader_dir;
 
 
 };

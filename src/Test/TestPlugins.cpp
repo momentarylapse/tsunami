@@ -28,7 +28,7 @@ Array<UnitTest::Test> TestPlugins::tests() {
 	Array<Test> list;
 	auto *pm = Session::GLOBAL->plugin_manager;
 	for (auto &pf: pm->plugin_files)
-		list.add({"compile:" + pf.filename, [pf]{ test_compile(pf.type, pf.filename); }});
+		list.add({"compile:" + pf.filename.str(), [pf]{ test_compile(pf.type, pf.filename); }});
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")
@@ -54,7 +54,7 @@ Array<UnitTest::Test> TestPlugins::tests() {
 }
 
 
-void TestPlugins::test_compile(ModuleType type, const string &filename) {
+void TestPlugins::test_compile(ModuleType type, const Path &filename) {
 
 	try {
 		auto *s = Kaba::Load(filename);

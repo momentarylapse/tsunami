@@ -11,7 +11,7 @@
 #include "../lib/hui/hui.h"
 
 
-Plugin::Plugin(const string &_filename, ModuleType _type) {
+Plugin::Plugin(const Path &_filename, ModuleType _type) {
 	s = nullptr;
 	type = _type;
 	filename = _filename;
@@ -38,7 +38,7 @@ bool Plugin::file_changed() {
 }
 
 void Plugin::recompile(Session *session) {
-	session->i(_("compiling script: ") + filename);
+	session->i(_("compiling script: ") + filename.str());
 
 	if (s) {
 		Kaba::Remove(s);

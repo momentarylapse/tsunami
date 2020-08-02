@@ -206,14 +206,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	set_high_details(hui::Config.get_bool("View.HighDetails", true));
 	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
 
-	images.speaker = Image::load(tsunami->directory_static + "icons/volume.png");
-	images.solo = Image::load(tsunami->directory_static + "icons/solo.png");
-	images.config = Image::load(tsunami->directory_static + "icons/wrench.png");
-	images.x = Image::load(tsunami->directory_static + "icons/x.png");
-	images.track_audio = Image::load(tsunami->directory_static + "icons/track-audio.png");
-	images.track_time = Image::load(tsunami->directory_static + "icons/track-time.png");
-	images.track_midi = Image::load(tsunami->directory_static + "icons/track-midi.png");
-	images.track_group = Image::load(tsunami->directory_static + "icons/track-group.png");
+	images.speaker = Image::load(tsunami->directory_static << "icons/volume.png");
+	images.solo = Image::load(tsunami->directory_static << "icons/solo.png");
+	images.config = Image::load(tsunami->directory_static << "icons/wrench.png");
+	images.x = Image::load(tsunami->directory_static << "icons/x.png");
+	images.track_audio = Image::load(tsunami->directory_static << "icons/track-audio.png");
+	images.track_time = Image::load(tsunami->directory_static << "icons/track-time.png");
+	images.track_midi = Image::load(tsunami->directory_static << "icons/track-midi.png");
+	images.track_group = Image::load(tsunami->directory_static << "icons/track-group.png");
 
 	peak_thread = nullptr;
 	draw_runner_id = -1;

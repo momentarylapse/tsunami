@@ -89,12 +89,12 @@ inline unsigned int get_int_from_buffer(unsigned char *buffer, int pos, int byte
 	return r;
 }
 
-void image_load_bmp(const string &filename, Image &image)
+void image_load_bmp(const Path &filename, Image &image)
 {
 	//msg_write("bmp");
 	unsigned char Header[56];
 	unsigned char *pal = nullptr, temp_buffer[8];
-	FILE* f = fopen(sys_filename(filename).c_str(), "rb");
+	FILE* f = fopen(filename.str().c_str(), "rb");
 	int r = fread(&Header, 56, 1, f);
 
 	image.width = get_int_from_buffer(Header, 18, 4);
@@ -158,44 +158,43 @@ void image_load_bmp(const string &filename, Image &image)
 	fclose(f);
 }
 
-void image_save_bmp(const string &filename, const Image &image)
-{
-	try{
-	File *f = FileCreate(filename);
-	image.set_mode(image.Mode::RGBA);
+void image_save_bmp(const Path &filename, const Image &image) {
+	try {
+		File *f = FileCreate(filename);
+		image.set_mode(image.Mode::RGBA);
 
-	int row_size = 4 * (int)((image.width * 3 + 3) / 4);
-	int data_size = row_size * image.height;
+		int row_size = 4 * (int)((image.width * 3 + 3) / 4);
+		int data_size = row_size * image.height;
 
-	unsigned char Header[56];
-	memset(Header, 0, 56);
-	Header[0] = 'B';
-	Header[1] = 'M';
-	*(int*)(&Header[2]) = 56 + data_size; // size
-	*(int*)(&Header[10]) = 56; // data offset
-	*(int*)(&Header[14]) = 40;
-	*(int*)(&Header[18]) = image.width;
-	*(int*)(&Header[22]) = image.height;
-	*(short*)(&Header[26]) = 1; // # planes
-	*(short*)(&Header[28]) = 24; // bits
-	*(int*)(&Header[30]) = 0; // compression
-	*(int*)(&Header[34]) = data_size;
-	f->write_buffer(Header, 56);
-	unsigned char *row = new unsigned char[row_size + 16];
-	for (int y=image.height-1;y>=0;y--){
-		unsigned int *d = ((unsigned int*)image.data.data) + (y * image.width);
-		unsigned char *p = row;
-		for (int x=0;x<image.width;x++){
-			*(p ++) = (*d) >> 16;
-			*(p ++) = (*d) >> 8;
-			*(p ++) = (*d);
-			d ++;
+		unsigned char Header[56];
+		memset(Header, 0, 56);
+		Header[0] = 'B';
+		Header[1] = 'M';
+		*(int*)(&Header[2]) = 56 + data_size; // size
+		*(int*)(&Header[10]) = 56; // data offset
+		*(int*)(&Header[14]) = 40;
+		*(int*)(&Header[18]) = image.width;
+		*(int*)(&Header[22]) = image.height;
+		*(short*)(&Header[26]) = 1; // # planes
+		*(short*)(&Header[28]) = 24; // bits
+		*(int*)(&Header[30]) = 0; // compression
+		*(int*)(&Header[34]) = data_size;
+		f->write_buffer(Header, 56);
+		unsigned char *row = new unsigned char[row_size + 16];
+		for (int y=image.height-1;y>=0;y--) {
+			unsigned int *d = ((unsigned int*)image.data.data) + (y * image.width);
+			unsigned char *p = row;
+			for (int x=0;x<image.width;x++) {
+				*(p ++) = (*d) >> 16;
+				*(p ++) = (*d) >> 8;
+				*(p ++) = (*d);
+				d ++;
+			}
+			f->write_buffer(row, row_size);
 		}
-		f->write_buffer(row, row_size);
-	}
-	delete[](row);
+		delete[](row);
 
-	FileClose(f);
-	}catch(...){
+		FileClose(f);
+	} catch(...) {
 	}
 }

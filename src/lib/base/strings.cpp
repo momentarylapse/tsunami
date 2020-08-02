@@ -137,46 +137,27 @@ int string::rfind(const string &s, int start) const
 	return -1;
 }
 
-int string::compare(const string &s) const
-{
-	unsigned char *a = (unsigned char*)data;
-	int n = num;
-	if (num > s.num)
-		n = s.num;
-	for (int i=0;i<n;i++){
-		if (s[i] != a[i])
-			return (int)a[i] - (int)s[i];
+int string::compare(const string &s) const {
+	auto a = (unsigned char*)data;
+	auto b = (unsigned char*)s.data;
+	int n = min(num, s.num);
+	for (int i=0; i<n; i++) {
+		if (a[i] != b[i])
+			return (int)a[i] - (int)b[i];
 	}
 	return num - s.num;
 }
 
-inline int ichar(unsigned char a)
-{
-	if ((a >= 'A') and (a <= 'Z'))
-		return (int)a - (int)'A' + (int)'a';
-	return (int)a;
+int string::icompare(const string &s) const {
+	return lower().compare(s.lower());
 }
 
-int string::icompare(const string &s) const
-{
-	unsigned char *a = (unsigned char*)data;
-	int n = num;
-	if (num > s.num)
-		n = s.num;
-	for (int i=0;i<n;i++){
-		if (ichar(s[i]) != ichar(a[i]))
-			return ichar(a[i]) - ichar(s[i]);
-	}
-	return num - s.num;
-}
-
-string string::reverse() const
-{
+string string::reverse() const {
 	string r;
 	r.resize(num);
-	unsigned char *a = (unsigned char*)data;
-	unsigned char *b = (unsigned char*)r.data;
-	for (int i=0;i<num;i++)
+	auto a = (unsigned char*)data;
+	auto b = (unsigned char*)r.data;
+	for (int i=0; i<num; i++)
 		b[num - i - 1] = a[i];
 	return r;
 }

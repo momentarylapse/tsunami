@@ -86,6 +86,7 @@ void SaveKeyCodes(const string &filename);
 string _cdecl GetKeyName(int key_code);
 string _cdecl GetKeyCodeName(int key_code);
 string _cdecl GetKeyChar(int key_code);
+int _cdecl ParseKeyCode(const string &code);
 
 
 

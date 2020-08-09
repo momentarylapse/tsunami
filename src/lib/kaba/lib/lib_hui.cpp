@@ -440,28 +440,34 @@ void SIAddPackageHui() {
 
 
 	add_class(TypeHuiConfiguration);
-		class_add_func("set_int", TypeVoid, mf(&hui::Configuration::set_int));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Configuration::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &hui::Configuration::__del__);
+		class_add_funcx("load", TypeVoid, &hui::Configuration::load);
+			func_add_param("path", TypePath);
+		class_add_funcx("save", TypeVoid, &hui::Configuration::save);
+			func_add_param("path", TypePath);
+		class_add_funcx("set_int", TypeVoid, &hui::Configuration::set_int);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeInt);
-		class_add_func("set_float", TypeVoid, mf(&hui::Configuration::set_float));
+		class_add_funcx("set_float", TypeVoid, &hui::Configuration::set_float);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeFloat32);
-		class_add_func("set_bool", TypeVoid, mf(&hui::Configuration::set_bool));
+		class_add_funcx("set_bool", TypeVoid, &hui::Configuration::set_bool);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeBool);
-		class_add_func("set_str", TypeVoid, mf(&hui::Configuration::set_str));
+		class_add_funcx("set_str", TypeVoid, &hui::Configuration::set_str);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeString);
-		class_add_func("get_int", TypeInt, mf(&hui::Configuration::get_int));
+		class_add_funcx("get_int", TypeInt, &hui::Configuration::get_int);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeInt);
-		class_add_func("get_float", TypeFloat32, mf(&hui::Configuration::get_float));
+		class_add_funcx("get_float", TypeFloat32, &hui::Configuration::get_float);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeFloat32);
-		class_add_func("get_bool", TypeBool, mf(&hui::Configuration::get_bool));
+		class_add_funcx("get_bool", TypeBool, &hui::Configuration::get_bool);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeBool);
-		class_add_func("get_str", TypeString, mf(&hui::Configuration::get_str));
+		class_add_funcx("get_str", TypeString, &hui::Configuration::get_str);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeString);
 	

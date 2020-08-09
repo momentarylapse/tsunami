@@ -26,7 +26,7 @@
 
 namespace Kaba {
 
-string Version = "0.19.-2.4";
+string Version = "0.19.-1.0";
 
 //#define ScriptDebug
 
@@ -178,7 +178,10 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 	just_analyse = _just_analyse;
 
 
-	filename = (config.directory << _filename).absolute().canonical();
+	if (_filename.is_relative())
+		filename = (config.directory << _filename).absolute().canonical();
+	else
+		filename = _filename.absolute().canonical();
 	auto parser = syntax->parser = new Parser(syntax);
 
 	try {

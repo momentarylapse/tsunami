@@ -82,7 +82,8 @@ public:
 	Flags parse_flags(Flags initial);
 	void parse_import();
 	void parse_enum(Class *_namespace);
-	void parse_class(Class *_namespace);
+	bool parse_class(Class *_namespace);
+	void skip_parse_class();
 	Function *parse_function_header(Class *name_space, Flags flags);
 	void skip_parsing_function_body();
 	void parse_function_body(Function *f);

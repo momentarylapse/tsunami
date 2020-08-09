@@ -67,8 +67,6 @@ void so(int dbg,int i)
 
 void NetInit()
 {
-	if (!msg_inited)
-		msg_init();
 #ifdef USE_WINSOCK
 	if (WSAStartup(MAKEWORD(1,1),&wsaData)!=0){
 		msg_error("WSAStartup  (Network....)");

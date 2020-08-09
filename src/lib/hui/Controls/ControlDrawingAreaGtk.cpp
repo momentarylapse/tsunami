@@ -48,10 +48,14 @@ gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 	return false;
 }
 
+int get_screen_scale(GtkWidget *w) {
+	return gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(w)));
+}
+
 gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
-	int scale = gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(GTK_WIDGET(area))));
+	int scale = get_screen_scale(GTK_WIDGET(area));
 	GtkAllocation a;
 	gtk_widget_get_allocation(GTK_WIDGET(area), &a);
 	da->panel->win->input.row = a.height * scale;

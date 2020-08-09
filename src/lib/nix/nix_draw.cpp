@@ -58,6 +58,17 @@ void DrawLines(VertexBuffer *vb, bool contiguous) {
 	TestGLError("DrawLines");
 }
 
+void DrawPoints(VertexBuffer *vb) {
+	if (vb->count() == 0)
+		return;
+	current_shader->set_default_data();
+
+	SetVertexBuffer(vb);
+
+	glDrawArrays(GL_POINTS, 0, vb->count());
+	TestGLError("DrawPoints");
+}
+
 
 void ResetToColor(const color &c) {
 	glClearColor(c.r, c.g, c.b, c.a);

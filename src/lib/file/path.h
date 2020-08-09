@@ -40,7 +40,9 @@ public:
 	bool has_dir_ending() const;
 	string basename() const;
 	string basename_no_ext() const;
+	Path no_ext() const;
 	string extension() const;
+	Path with(const string &s) const;
 	string dirname() const;
 	Path parent() const;
 	Path canonical() const;

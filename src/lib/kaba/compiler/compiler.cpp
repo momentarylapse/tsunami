@@ -220,9 +220,9 @@ void Script::update_constant_locations() {
 void Script::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	for (Variable *v: name_space->static_variables) {
 		if (v->is_extern) {
-			v->memory = get_external_link(v->name);
+			v->memory = get_external_link(v->cname(name_space, name_space->owner->base_class));
 			if (!v->memory)
-				do_error_link(format("external variable '%s' was not linked", v->name));
+				do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));
 		} else {
 			int size_aligned = mem_align(v->type->size, 4);
 			v->memory = &address[offset];

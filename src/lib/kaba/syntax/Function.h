@@ -25,6 +25,8 @@ public:
 	~Variable();
 	const Class *type; // for creating instances
 	string name;
+	string long_name(const Class *ns) const;
+	string cname(const Class *ns, const Class *ns_obs) const;
 	int64 _offset; // for compilation
 	void *memory;
 	bool memory_owner;

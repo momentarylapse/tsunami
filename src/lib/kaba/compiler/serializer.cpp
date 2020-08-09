@@ -1961,10 +1961,35 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list) {
 	return nullptr;
 }
 
+bool is_func(Node *n) {
+	return (n->kind == NodeKind::FUNCTION_CALL or n->kind == NodeKind::VIRTUAL_CALL or n->kind == NodeKind::FUNCTION);
+}
+
+int check_needed(SyntaxTree *tree, Function *f) {
+	int ref_count = 0;
+	tree->transform([&](Node* n){ if (is_func(n) and n->as_func() == f) ref_count ++; return n; });
+
+	if (f->is_static() and f->name == "main")
+		ref_count ++;
+	if (f->virtual_index >= 0)
+		ref_count ++;
+	// well, for now, only allow these functions:
+	if (f->name != "__assign__" and f->name != "__delete__" and f->name != "__init__")
+		ref_count ++;
+
+	return ref_count;
+}
+
 void Script::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
 	if (config.verbose and config.allow_output(f, "asm"))
 		msg_write("serializing " + f->long_name() + " -------------------");
 	f->show("asm");
+
+
+	// skip unused functions?
+	if (config.remove_unused)
+		if (check_needed(syntax, f) == 0)
+			return;
 
 	Serializer *d = CreateSerializer(this, list);
 

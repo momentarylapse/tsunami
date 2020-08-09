@@ -21,6 +21,7 @@ void _cdecl ResetZ();
 void _cdecl DrawTriangles(VertexBuffer *vb);
 void _cdecl DrawInstancedTriangles(VertexBuffer *vb, int count);
 void _cdecl DrawLines(VertexBuffer *vb, bool contiguous);
+void _cdecl DrawPoints(VertexBuffer *vb);
 
 };
 

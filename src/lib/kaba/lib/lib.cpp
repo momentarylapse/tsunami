@@ -741,9 +741,37 @@ void SIAddPackageHui();
 void SIAddPackageNix();
 void SIAddPackageNet();
 void SIAddPackageImage();
-void SIAddPackageSound();
-void SIAddPackageX();
 void SIAddPackageVulkan();
+
+CompilerConfiguration::CompilerConfiguration() {
+	abi = Abi::NATIVE;
+	instruction_set = Asm::InstructionSet::NATIVE;
+	allow_std_lib = true;
+	pointer_size = sizeof(void*);
+	super_array_size = sizeof(DynamicArray);
+	stack_size = DEFAULT_STACK_SIZE;
+
+	allow_simplification = true;
+	allow_registers = true;
+	stack_mem_align = 8;
+	function_align = 2 * pointer_size;
+	stack_frame_align = 2 * pointer_size;
+
+	compile_silently = false;
+	verbose = false;
+	verbose_func_filter = "*";
+	verbose_stage_filter = "*";
+	show_compiler_stats = true;
+
+	compile_os = false;
+	remove_unused = false;
+	override_variables_offset = false;
+	variables_offset = 0;
+	override_code_origin = false;
+	code_origin = 0;
+	add_entry_point = false;
+	no_function_frame = false;
+}
 
 void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	Asm::init(instruction_set);
@@ -770,27 +798,9 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 		config.super_array_size = mem_align(config.pointer_size + 3 * sizeof(int), config.pointer_size);
 	else
 		config.super_array_size = sizeof(DynamicArray);
-	config.stack_size = DEFAULT_STACK_SIZE;
 
-	config.allow_simplification = true;
-	config.allow_registers = true;
-	config.stack_mem_align = 8;
 	config.function_align = 2 * config.pointer_size;
 	config.stack_frame_align = 2 * config.pointer_size;
-
-	config.compile_silently = false;
-	config.verbose = false;
-	config.verbose_func_filter = "*";
-	config.verbose_stage_filter = "*";
-	config.show_compiler_stats = true;
-
-	config.compile_os = false;
-	config.override_variables_offset = false;
-	config.variables_offset = 0;
-	config.override_code_origin = false;
-	config.code_origin = 0;
-	config.add_entry_point = false;
-	config.no_function_frame = false;
 
 
 	SIAddStatements();
@@ -805,10 +815,8 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageHui();
 	SIAddPackageNix();
 	SIAddPackageNet();
-	SIAddPackageSound();
 	SIAddPackageThread();
 	SIAddPackageVulkan();
-	SIAddPackageX();
 
 	add_package("base");
 	SIAddXCommands();
@@ -826,11 +834,11 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
 	add_package("math");
-	add_type_cast(50, TypeInt, TypeAny, "@int2any");
-	add_type_cast(50, TypeFloat32, TypeAny, "@float2any");
-	add_type_cast(50, TypeBool, TypeAny, "@bool2any");
-	add_type_cast(50, TypeString, TypeAny, "@str2any");
-	add_type_cast(50, TypePointer, TypeAny, "@pointer2any");
+	add_type_cast(50, TypeInt, TypeAny, "math.@int2any");
+	add_type_cast(50, TypeFloat32, TypeAny, "math.@float2any");
+	add_type_cast(50, TypeBool, TypeAny, "math.@bool2any");
+	add_type_cast(50, TypeString, TypeAny, "math.@str2any");
+	add_type_cast(50, TypePointer, TypeAny, "math.@pointer2any");
 	add_package("os");
 	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
 

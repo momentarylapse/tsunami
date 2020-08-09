@@ -220,6 +220,8 @@ void SIAddPackageNix() {
 	add_func("draw_lines", TypeVoid, nix_p(&nix::DrawLines), Flags::STATIC);
 		func_add_param("vb", TypeVertexBuffer);
 		func_add_param("contiguous", TypeBool);
+	add_func("draw_points", TypeVoid, nix_p(&nix::DrawPoints), Flags::STATIC);
+		func_add_param("vb", TypeVertexBuffer);
 	add_func("set_alpha", TypeVoid, nix_p(&nix::SetAlphaM), Flags::STATIC);
 		func_add_param("mode", TypeInt);
 	add_func("set_alpha", TypeVoid, nix_p(&nix::SetAlphaSD), Flags::STATIC);

@@ -12,6 +12,7 @@
 
 namespace Kaba{
 
+string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 
 Variable::Variable(const string &_name, const Class *_type) {
 	name = _name;
@@ -28,6 +29,14 @@ Variable::Variable(const string &_name, const Class *_type) {
 Variable::~Variable() {
 	if (memory_owner)
 		free(memory);
+}
+
+string Variable::long_name(const Class *ns) const {
+	return namespacify_rel(name, ns, nullptr);
+}
+
+string Variable::cname(const Class *ns, const Class *ns_obs) const {
+	return namespacify_rel(name, ns, ns_obs);
 }
 
 
@@ -79,7 +88,6 @@ SyntaxTree *Function::owner() const {
 	return name_space->owner;
 }
 
-string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 
 string Function::long_name() const {
 	string p = (needs_overriding ? " [NEEDS OVERRIDE]" : "");

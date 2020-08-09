@@ -35,6 +35,7 @@ public:
 	Shader();
 	~Shader();
 	void _cdecl unref();
+	Shader _cdecl *ref();
 	void _cdecl set_float(int location, float f);
 	void _cdecl set_int(int location, int i);
 	void _cdecl set_data(int location, const float *data, int size);

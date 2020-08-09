@@ -415,12 +415,32 @@ string GetKeyCodeName(int key_code)
 		return "";
 	string n;
 	if ((key_code & KEY_CONTROL) == KEY_CONTROL)
-		n += "Ctrl+";
+		n += "Ctrl + ";
 	if ((key_code & KEY_SHIFT) == KEY_SHIFT)
-		n += "Shift+";
+		n += "Shift + ";
+	if ((key_code & KEY_ALT) == KEY_ALT)
+		n += "Alt + ";
 	n += GetKeyName(key_code % 256);
 	return n;
 }
+
+int ParseKeyCode(const string &s) {
+	int key = 0;
+	auto xx = s.explode(" + ");
+	for (auto x: xx) {
+		for (int k=0; k<NUM_KEYS; k++)
+			if (x == GetKeyName(k))
+				key |= k;
+		if (x == "Ctrl")
+			key |= KEY_CONTROL;
+		if (x == "Shift")
+			key |= KEY_SHIFT;
+		if (x == "Alt")
+			key |= KEY_ALT;
+	}
+	return key;
+}
+
 
 string GetKeyChar(int key_code)
 {

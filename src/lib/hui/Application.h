@@ -39,6 +39,7 @@ public:
 	static void hard_end();
 	static void do_single_main_loop();
 
+	static void guess_directories(const Array<string> &arg, const string &app_name);
 
 
 

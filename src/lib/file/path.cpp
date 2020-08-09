@@ -131,9 +131,9 @@ bool Path::has_dir_ending() const {
 }
 
 string Path::basename() const {
-	int i = s.rfind(SEPARATOR);
+	int i = s.substr(0, s.num-1).rfind(SEPARATOR);
 	if (i >= 0)
-		return s.tail(s.num - i - 1);
+		return s.tail(s.num - i - 1).replace(SEPARATOR, "");
 	return s;
 }
 
@@ -145,12 +145,23 @@ string Path::basename_no_ext() const {
 	return "";
 }
 
+Path Path::no_ext() const {
+	int pos = s.rfind(".");
+	if (pos >= 0)
+		return s.head(pos);
+	return *this;
+}
+
 string Path::extension() const {
 	string b = basename();
 	int pos = b.rfind(".");
 	if (pos >= 0)
 		return b.tail(b.num - pos - 1).lower();
 	return "";
+}
+
+Path Path::with(const string &_s) const {
+	return s + _s;
 }
 
 // ends with '/' or '\'
@@ -216,11 +227,11 @@ Path Path::_canonical_remove(int n_remove, bool keep_going, bool make_dir) const
 			n_remove --;
 		}
 	}
-	if (n_remove != 0)
+	if (n_remove > 0 and is_absolute())
 		return EMPTY; // ERROR
 	if (xx.num == 0 and is_relative())
 		return EMPTY; // ERROR
-	auto pp = Path(implode(xx, SEPARATOR));
+	auto pp = Path(str_repeat("../", n_remove) + implode(xx, SEPARATOR));
 	if (make_dir)
 		return pp.as_dir();
 	return pp;

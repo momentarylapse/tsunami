@@ -133,7 +133,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 	if (!m) {
 		p = session->plugin_manager->get_plugin(session, type, sub_type);
 		if (p)
-			m = (Module*)p->create_instance(session, base_class(type));
+			m = (Module*)p->create_instance(session, "*." + base_class(type));
 	}
 
 	// plug-in failed? -> default

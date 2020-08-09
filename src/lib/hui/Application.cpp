@@ -35,62 +35,12 @@ Array<string> Application::_args;
 
 
 Application::Application(const string &app_name, const string &def_lang, int flags) {
-	initial_working_directory = get_current_dir();
-	installed = false;
 
-	#ifdef HUI_API_GTK
-		g_set_prgname(app_name.c_str());
-	#endif
+#ifdef HUI_API_GTK
+	g_set_prgname(app_name.c_str());
+#endif
 
-	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
-		directory = initial_working_directory;
-		directory_static = directory << "static";
-		if (_args.num > 0) {
-			// assume a local/non-installed version
-			filename = _args[0].replace("\\", "/");
-			directory = "./";
-
-
-			// installed version?
-			if (filename.is_in("/usr/local/") or (filename.str().find("/") < 0)) {
-				installed = true;
-				directory_static = Path("/usr/local/share/") << app_name;
-			} else if (filename.is_in("/usr/")) {
-				installed = true;
-				directory_static = Path("/usr/share/") << app_name;
-			} else if (filename.is_in("/opt/")) {
-				installed = true;
-				directory_static = Path("/opt/") << app_name;
-			}
-
-			if (installed) {
-				directory = format("%s/.%s/", getenv("HOME"), app_name);
-			}
-		}
-		dir_create(directory);
-	#else // OS_WINDOWS
-		char *ttt = nullptr;
-		int r = _get_pgmptr(&ttt);
-		filename = ttt;
-		directory = filename.dirname();
-		directory = directory.replace("\\Release\\", "\\");
-		directory = directory.replace("\\Debug\\", "\\");
-		directory = directory.replace("\\Unoptimized\\", "\\");
-		directory = directory.replace("\\x64\\", "\\");
-		hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
-		directory_static = directory << "static";
-	#endif
-
-		// just in case...
-		directory = directory.as_dir();
-		directory_static = directory_static.as_dir();
-
-	if (!msg_inited) {
-		dir_create(directory);
-		msg_init(directory << "message.txt", !(flags & FLAG_SILENT));
-	}
-
-	//msg_write("HuiAppDirectory " + HuiAppDirectory);
+	guess_directories(_args, app_name);
 
 
 	_InitInput_();
@@ -98,26 +48,15 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	ComboBoxSeparator = "\\";
 	_using_language_ = false;
 	SetDefaultErrorHandler(nullptr);
-	//msg_write("");
 
-	Config.filename = directory << "config.txt";
+	Config.load(directory << "config.txt");
 
-
-	//msg_write("HuiAppDirectory " + HuiAppDirectory);
-	//msg_write("HuiInitialWorkingDirectory " + HuiInitialWorkingDirectory);
 
 	if (flags & FLAG_LOAD_RESOURCE)
 		LoadResource(directory_static << "hui_resources.txt");
 
 	if (def_lang.num > 0)
 		SetLanguage(Config.get_str("Language", def_lang));
-
-	// at this point:
-	//   HuiAppDirectory -> dir to run binary in (binary dir or ~/.my_app/)
-	//   HuiAppFilename -> binary file (no dir)
-	//   HuiInitialWorkingDirectory -> working dir before running this program
-	//   working dir -> ?
-
 
 
 	if (file_exists(directory_static << "icon.svg"))
@@ -130,11 +69,76 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 Application::~Application() {
 	if (Config.changed)
-		Config.save();
+		Config.save(directory << "config.txt");
 	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
 		msg_end();
 }
 
+Path strip_dev_dirs(const Path &p) {
+	if (p.basename() == "build")
+		return p.parent();
+	if (p.basename() == "Debug")
+		return p.parent();
+	if (p.basename() == "Release")
+		return p.parent();
+	if (p.basename() == "x64")
+		return p.parent();
+	if (p.basename() == "Unoptimized")
+		return p.parent();
+	return p;
+}
+
+//   filename -> executable file
+//   directory ->
+//      NONINSTALLED:  binary dir
+//      INSTALLED:     ~/.MY_APP/
+//   directory_static ->
+//      NONINSTALLED:  binary dir/static/
+//      INSTALLED:     /usr/local/share/MY_APP/
+//   initial_working_directory -> working dir before running this program
+void Application::guess_directories(const Array<string> &arg, const string &app_name) {
+
+	initial_working_directory = get_current_dir();
+	installed = false;
+
+
+	// executable file
+#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
+	if (arg.num > 0)
+		filename = arg[0];
+#else // OS_WINDOWS
+	char *ttt = nullptr;
+	int r = _get_pgmptr(&ttt);
+	filename = ttt;
+	hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
+#endif
+
+
+	// first, assume a local/non-installed version
+	directory = strip_dev_dirs(filename.parent());
+	directory_static = directory << "static";
+
+
+	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
+		// installed version?
+		if (filename.is_in("/usr/local") or (filename.str().find("/") < 0)) {
+			installed = true;
+			directory_static = Path("/usr/local/share") << app_name;
+		} else if (filename.is_in("/usr")) {
+			installed = true;
+			directory_static = Path("/usr/share") << app_name;
+		} else if (filename.is_in("/opt")) {
+			installed = true;
+			directory_static = Path("/opt") << app_name;
+		//} else if (f) {
+		}
+
+		if (installed) {
+			directory = format("%s/.%s/", getenv("HOME"), app_name);
+			dir_create(directory);
+		}
+	#endif
+}
 
 // deprecated...
 void Application::_init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang) {
@@ -211,7 +215,7 @@ void Application::hard_end() {
 #endif
 #endif
 	if (Config.changed)
-		Config.save();
+		Config.save(directory << "config.txt");
 	if (msg_inited)
 		msg_end();
 }

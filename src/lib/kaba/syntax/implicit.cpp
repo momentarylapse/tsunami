@@ -429,6 +429,27 @@ Array<string> class_func_param_names(Function *cf) {
 	return names;
 }
 
+bool has_user_constructors(const Class *t) {
+	for (auto *cc: t->get_constructors())
+		if (!cc->needs_overriding)
+			return true;
+	return false;
+}
+
+void remove_inherited_constructors(Class *t) {
+	for (int i=t->functions.num-1; i>=0; i--)
+		if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
+			t->functions.erase(i);
+}
+
+void redefine_inherited_constructors(Class *t, SyntaxTree *tree) {
+	for (auto *pcc: t->parent->get_constructors()) {
+		auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc);
+		if (needs_new(c))
+			add_func_header(tree, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c);
+	}
+}
+
 void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 	if (t->owner != this)
 		return;
@@ -459,29 +480,16 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 	} else { // regular classes
 		if (!t->is_simple_class()) {
 			if (t->parent) {
-				bool has_own_constructors = false;
-				for (auto *cc: t->get_constructors())
-					if (!cc->needs_overriding)
-						has_own_constructors = true;
-
-				if (has_own_constructors) {
+				if (has_user_constructors(t)) {
 					// don't inherit constructors!
-					for (int i=t->functions.num-1; i>=0; i--)
-						if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
-							t->functions.erase(i);
+					remove_inherited_constructors(t);
 				} else {
 					// only auto-implement matching constructors
-					for (auto *pcc: t->parent->get_constructors()) {
-						auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc);
-						if (needs_new(c))
-							add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c);
-					}
+					redefine_inherited_constructors(t, this);
 				}
-			} else {
-				if (t->needs_constructor() and needs_new(t->get_default_constructor()))
-					if (t->get_constructors().num == 0)
-						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
 			}
+			if (t->needs_constructor() and t->get_constructors().num == 0)
+				add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
 			if (needs_new(t->get_destructor()))
 				add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		}

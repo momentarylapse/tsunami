@@ -379,6 +379,7 @@ enum class Abi {
 
 class CompilerConfiguration {
 public:
+	CompilerConfiguration();
 	Asm::InstructionSet instruction_set;
 	Abi abi;
 	bool allow_std_lib;
@@ -401,6 +402,7 @@ public:
 	bool show_compiler_stats;
 
 	bool compile_os;
+	bool remove_unused;
 	bool no_function_frame;
 	bool add_entry_point;
 	bool override_variables_offset;

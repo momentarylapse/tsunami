@@ -222,20 +222,17 @@ void Shader::find_locations() {
 }
 
 Shader *Shader::load(const Path &filename) {
-	if (filename.is_empty()){
-		default_shader_3d->reference_count ++;
-		return default_shader_3d;
-	}
+	if (filename.is_empty())
+		return default_shader_3d->ref();
 
 	Path fn = shader_dir << filename;
+	if (filename.is_absolute())
+		fn = filename;
 	for (Shader *s: shaders)
-		if ((s->filename == fn) and (s->program >= 0)) {
-			s->reference_count ++;
-			return s;
-		}
+		if ((s->filename == fn) and (s->program >= 0))
+			return s->ref();
 
 	msg_write("loading shader: " + fn.str());
-	msg_right();
 
 	try {
 		string source = FileRead(fn);
@@ -243,12 +240,10 @@ Shader *Shader::load(const Path &filename) {
 		if (shader)
 			shader->filename = fn;
 
-		msg_left();
 		return shader;
 	} catch (Exception &e) {
 		msg_error(e.message());
-		default_shader_3d->reference_count ++;
-		return default_shader_3d;
+		return default_shader_3d->ref();
 	}
 }
 
@@ -268,6 +263,11 @@ Shader::~Shader() {
 	program = -1;
 }
 
+Shader *Shader::ref() {
+	reference_count ++;
+	return this;
+}
+
 void Shader::unref() {
 	reference_count --;
 	if ((reference_count <= 0) and (program >= 0)) {
@@ -276,14 +276,14 @@ void Shader::unref() {
 		glDeleteProgram(program);
 		TestGLError("NixUnrefShader");
 		program = -1;
-		filename = Path();
+		filename = Path::EMPTY;
 	}
 }
 
 void DeleteAllShaders() {
 	return;
 	for (Shader *s: shaders)
-		delete(s);
+		delete s;
 	shaders.clear();
 	init_shaders();
 }
@@ -392,7 +392,7 @@ void Shader::dispatch(int nx, int ny, int nz) {
 
 
 void init_shaders() {
-	try{
+	try {
 
 	default_shader_3d = nix::Shader::create(
 		"<VertexShader>\n"
@@ -485,8 +485,8 @@ void init_shaders() {
 		"}\n"
 		"</FragmentShader>");
 
-	default_shader_3d->reference_count ++;
-	default_shader_2d->reference_count ++;
+		default_shader_3d->ref();
+		default_shader_2d->ref();
 	} catch(Exception &e) {
 		msg_error(e.message());
 		throw e;

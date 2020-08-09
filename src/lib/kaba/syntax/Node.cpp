@@ -99,7 +99,7 @@ string kind2str(NodeKind kind) {
 
 
 string Node::sig(const Class *ns) const {
-	string t = type->name + " ";
+	string t = type->cname(ns) + " ";
 	if (kind == NodeKind::PLACEHOLDER)
 		return "";
 	if (kind == NodeKind::VAR_LOCAL)

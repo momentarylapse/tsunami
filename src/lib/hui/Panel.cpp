@@ -120,6 +120,13 @@ void Panel::remove_event_handler(int event_handler_id) {
 }
 
 void Panel::set_key_code(const string &id, int key_code, const string &image) {
+	// make sure, neither id nor key_code are already used
+	for (auto &e: event_key_codes)
+		if (e.id == id or e.key_code == key_code) {
+			e.id = id;
+			e.key_code = key_code;
+			return;
+		}
 	event_key_codes.add(EventKeyCode(id, "", key_code));
 }
 

@@ -49,7 +49,8 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	_using_language_ = false;
 	SetDefaultErrorHandler(nullptr);
 
-	Config.load(directory << "config.txt");
+	if (file_exists(directory << "config.txt"))
+		Config.load(directory << "config.txt");
 
 
 	if (flags & FLAG_LOAD_RESOURCE)

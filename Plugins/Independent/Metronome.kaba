@@ -228,23 +228,23 @@ Grid ? '' vertical
 	
 	void on_blink_background()
 		allow_blink_background = !allow_blink_background
-		hui.app_config.set_bool("Plugins/Metronome/AllowBlinkBackground", allow_blink_background)
+		hui.app_config["Plugins/Metronome/AllowBlinkBackground"] = allow_blink_background
 	
 	void on_blink_number()
 		allow_blink_number = !allow_blink_number
-		hui.app_config.set_bool("Plugins/Metronome/AllowBlinkNumber", allow_blink_number)
+		hui.app_config["Plugins/Metronome/AllowBlinkNumber"] = allow_blink_number
 	
 	void on_mode_circle()
 		mode = MODE_CIRCLE
-		hui.app_config.set_int("Plugins/Metronome/Mode", mode)
+		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
 	void on_mode_bounce()
 		mode = MODE_BOUNCE
-		hui.app_config.set_int("Plugins/Metronome/Mode", mode)
+		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
 	void on_mode_bounce_walk()
 		mode = MODE_BOUNCE_WALK
-		hui.app_config.set_int("Plugins/Metronome/Mode", mode)
+		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
 	#void on_fullscreen()
 #		fullscreen = !fullscreen

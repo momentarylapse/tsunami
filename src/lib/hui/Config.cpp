@@ -95,7 +95,7 @@ static string _parse_value(const string &s) {
 	return strip(s);
 }
 
-void Configuration::load(const Path &filename) {
+bool Configuration::load(const Path &filename) {
 	try {
 		File *f = FileOpenText(filename);
 		map.clear();
@@ -143,8 +143,9 @@ void Configuration::load(const Path &filename) {
 		FileClose(f);
 		loaded = true;
 		changed = false;
+		return true;
 	} catch(Exception &e) {
-		msg_error(e.message());
+		return false;
 	}
 }
 

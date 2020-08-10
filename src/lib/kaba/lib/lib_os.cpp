@@ -203,12 +203,10 @@ void SIAddPackageOSPath() {
 		class_add_funcx("basename_no_ext", TypeString, &Path::basename_no_ext, Flags::_CONST__PURE);
 		class_add_funcx("extension", TypeString, &Path::extension, Flags::_CONST__PURE);
 		class_add_funcx("canonical", TypePath, &Path::canonical, Flags::_CONST__PURE);
-		class_add_funcx("as_dir", TypePath, &Path::as_dir, Flags::_CONST__PURE);
 		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &Path::str, Flags::_CONST__PURE);
 		class_add_funcx("is_empty", TypeBool, &Path::is_empty, Flags::_CONST__PURE);
 		class_add_funcx("is_relative", TypeBool, &Path::is_relative, Flags::_CONST__PURE);
 		class_add_funcx("is_absolute", TypeBool, &Path::is_absolute, Flags::_CONST__PURE);
-		class_add_funcx("has_dir_ending", TypeBool, &Path::has_dir_ending, Flags::_CONST__PURE);
 		class_add_funcx("parent", TypePath, &Path::parent, Flags::_CONST__PURE);
 		class_add_funcx("compare", TypeInt, &Path::compare, Flags::_CONST__PURE);
 			func_add_param("p", TypePath);

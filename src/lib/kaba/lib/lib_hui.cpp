@@ -76,6 +76,7 @@ namespace Kaba{
 extern const Class *TypeObject;
 extern const Class *TypeIntList;
 extern const Class *TypeIntPs;
+extern const Class *TypeStringList;
 extern const Class *TypeFloatList;
 extern const Class *TypeComplexList;
 extern const Class *TypeImage;
@@ -83,6 +84,10 @@ extern const Class *TypeBasePainter;
 extern const Class *TypePath;
 //extern const Class *TypeTimer;
 const Class *TypeHuiWindowP;
+
+string _hui_config_get(hui::Configuration &c, const string &key) {
+	return c.get_str(key, "");
+}
 
 void SIAddPackageHui() {
 	add_package("hui");
@@ -442,34 +447,37 @@ void SIAddPackageHui() {
 	add_class(TypeHuiConfiguration);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Configuration::__init__);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &hui::Configuration::__del__);
-		class_add_funcx("load", TypeVoid, &hui::Configuration::load);
+		class_add_funcx("load", TypeBool, &hui::Configuration::load);
 			func_add_param("path", TypePath);
 		class_add_funcx("save", TypeVoid, &hui::Configuration::save);
 			func_add_param("path", TypePath);
-		class_add_funcx("set_int", TypeVoid, &hui::Configuration::set_int);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &hui::Configuration::set_int);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeInt);
-		class_add_funcx("set_float", TypeVoid, &hui::Configuration::set_float);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &hui::Configuration::set_float);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeFloat32);
-		class_add_funcx("set_bool", TypeVoid, &hui::Configuration::set_bool);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &hui::Configuration::set_bool);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeBool);
-		class_add_funcx("set_str", TypeVoid, &hui::Configuration::set_str);
+		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &hui::Configuration::set_str);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeString);
-		class_add_funcx("get_int", TypeInt, &hui::Configuration::get_int);
+		class_add_funcx("get_int", TypeInt, &hui::Configuration::get_int, Flags::CONST);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeInt);
-		class_add_funcx("get_float", TypeFloat32, &hui::Configuration::get_float);
+		class_add_funcx("get_float", TypeFloat32, &hui::Configuration::get_float, Flags::CONST);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeFloat32);
-		class_add_funcx("get_bool", TypeBool, &hui::Configuration::get_bool);
+		class_add_funcx("get_bool", TypeBool, &hui::Configuration::get_bool, Flags::CONST);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeBool);
-		class_add_funcx("get_str", TypeString, &hui::Configuration::get_str);
+		class_add_funcx("get_str", TypeString, &hui::Configuration::get_str, Flags::CONST);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeString);
+		class_add_funcx(IDENTIFIER_FUNC_GET, TypeString, &_hui_config_get, Flags::CONST);
+			func_add_param("name", TypeString);
+		class_add_funcx("keys", TypeStringList, &hui::Configuration::keys, Flags::CONST);
 	
 	// user interface
 	add_func("set_idle_function", TypeVoid, (void*)&HuiSetIdleFunctionKaba, Flags::STATIC);

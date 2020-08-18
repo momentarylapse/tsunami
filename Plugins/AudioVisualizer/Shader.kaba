@@ -424,13 +424,13 @@ uniform float iVolume;
 		float volume = c.buffer.r.max()
 		
 		#nix.start()
-		nix.reset_to_color(Red)
+		nix.reset_to_color(color.RED)
 		nix.set_cull(0)
 		nix.set_z(false, false)
 		nix.set_shader(shader)
 		shader.set_float(shader.location("iTime"), _time)
 		shader.set_float(shader.location("iVolume"), volume)
-		nix.vb_temp.create_rect(rect(-1,1, -1,1))
+		nix.vb_temp.create_rect(rect(-1,1, -1,1), rect.ID)
 		nix.draw_triangles(vb_temp)
 		#NixEnd()
 

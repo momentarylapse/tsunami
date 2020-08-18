@@ -200,8 +200,8 @@ public:
 
 	color signal_color(SignalType type, bool hover) {
 		color c = signal_color_base(type);
-		c = ColorInterpolate(c, view->colors.text, 0.2f);
-		//c = ColorInterpolate(c, view->colors.background, 0.2f);
+		c = color::interpolate(c, view->colors.text, 0.2f);
+		//c = color::interpolate(c, view->colors.background, 0.2f);
 		if (hover)
 			c = view->colors.hoverify(c);
 		return c;
@@ -231,7 +231,7 @@ public:
 
 		// curve
 		p->set_color(base_color);
-		//p->set_color(ColorInterpolate(base_color, view->colors.background, 0.1f));
+		//p->set_color(color::interpolate(base_color, view->colors.background, 0.1f));
 		p->set_line_width(2.0f);
 		p->set_line_dash({5, 2}, 0);
 		Array<complex> cc;
@@ -241,7 +241,7 @@ public:
 		p->set_line_dash({}, 0);
 		p->set_line_width(1);
 
-		p->set_color(ColorInterpolate(base_color, view->colors.text, 0.1f));
+		p->set_color(color::interpolate(base_color, view->colors.text, 0.1f));
 		//p->set_color(base_color);
 		draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 	}

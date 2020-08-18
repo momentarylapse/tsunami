@@ -56,7 +56,7 @@ Grid ? ''
 		
 		midi.deep_clear()
 		
-		p.set_color(Red)
+		p.set_color(color.RED)
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 		
 		for pp,i in c.pitch_detector.pitch_power2

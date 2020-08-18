@@ -6,7 +6,7 @@ class Curve
 	color col, col_below
 	void __init__()
 		col = colors.text_soft1
-		col_below = color(0.3, 0.3, 0.3, 1)
+		col_below = color(0.3, 0.3, 1, 0.3)
 	virtual float get(float x)
 	virtual float[] get_list(float[] xx)
 		float[] r
@@ -343,7 +343,7 @@ class Grid extends Object
 		if fill_below
 			pp.add(complex(x + w, y + h))
 			pp.add(complex(x, y + h))
-			c.set_color(color(0.3, 0.3, 0.3, 1))
+			c.set_color(color(0.3, 0.3, 1, 0.3))
 			c.draw_polygon(pp)
 			pp.resize(len(pp) - 2)
 		c.set_line_width(2)
@@ -391,7 +391,7 @@ class Grid extends Object
 		if hover
 			return color.interpolate(col_hover, col_line, 0.0)
 		if selected
-			return color.interpolate(col_sel, col_line, 0.5)#color(1, 0.7, 0, 0)
+			return color.interpolate(col_sel, col_line, 0.5)#color(0.7, 0, 0, 1)
 		return col_line
 	
 	void draw_point_xy(Painter c, float x, float y, bool selected, bool hover)
@@ -423,10 +423,10 @@ class Grid extends Object
 		c.set_color(col_line)
 		float radius = 3
 		if hover
-			c.set_color(Red)
+			c.set_color(color.RED)
 			radius = 4
 		else if selected
-			c.set_color(color(1, 0.7, 0, 0))
+			c.set_color(color(0.7, 0, 0, 1))
 		c.draw_line(pp0.x, pp0.y, pp1.x, pp1.y)
 	
 	complex get_mouse2()

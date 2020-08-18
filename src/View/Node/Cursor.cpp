@@ -21,7 +21,7 @@ Cursor::Cursor(AudioView *_view, bool end) : ViewNodeFree() {
 }
 
 void Cursor::draw(Painter* c) {
-	color col = ColorInterpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
+	color col = color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
 	if (!is_end) {
 		float x = view->cam.sample2screen(pos());
 		float r = 4;

@@ -58,8 +58,8 @@ class SpecGrid extends Grid
 		create_lines()
 
 	override void on_draw(Painter c)
-		draw_curve_b(c, pr, true, Red)
-		draw_curve_b(c, pl, true, Blue)
+		draw_curve_b(c, pr, true, color.RED)
+		draw_curve_b(c, pl, true, color.BLUE)
 
 class SpectrumDialog extends Dialog
 	SpecGrid grid

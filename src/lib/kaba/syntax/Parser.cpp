@@ -1907,21 +1907,32 @@ Node *Parser::parse_statement_new(Block *block) {
 //  p[0]: operand
 Node *Parser::parse_statement_delete(Block *block) {
 	Exp.next(); // del
+	auto p = parse_operand(block);
+	if (!p->type->is_pointer())
+		do_error("pointer expected after 'del'");
+
+	// override del operator?
+	auto f = p->type->param->get_func("__del_override__", TypeVoid, {});
+	if (f) {
+		auto cmd = tree->add_node_call(f);
+		cmd->set_instance(tree->deref_node(p));
+		return cmd;
+	}
+
+	// default delete
 	Node *cmd = tree->add_node_statement(StatementID::DELETE);
-	cmd->set_param(0, parse_operand(block));
-	if (!cmd->params[0]->type->is_pointer())
-		do_error("pointer expected after delete");
+	cmd->set_param(0, p);
 	return cmd;
 }
 
 Node *Parser::parse_single_func_param(Block *block) {
 	string func_name = Exp.cur_line->exp[Exp.cur_exp-1].name;
 	if (Exp.cur != "(")
-		do_error("'(' expected after '" + func_name + "'");
+		do_error(format("'(' expected after '%s'", func_name));
 	Exp.next(); // "("
 	Node *n = parse_operand_greedy(block);
 	if (Exp.cur != ")")
-		do_error("')' expected after parameter of '" + func_name + "'");
+		do_error(format("')' expected after parameter of '%s'", func_name));
 	Exp.next(); // ")"
 	return n;
 }

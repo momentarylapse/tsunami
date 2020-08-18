@@ -23,12 +23,12 @@ class PitchRecognitionPanel extends ConfigPanel
 		#note = i2s(n)
 
 	void draw_volume(Painter p)
-		p.set_color(color(1, 0.8, 0.8, 0.8))
+		p.set_color(color(0.8, 0.8, 0.8, 1))
 		float y0 = 30
 		float y1 = p.height - 5
 		float h = y1 - y0
 		p.draw_rect(5, y0 + h * (1 - c.pitch_detector.volume), 5, h)
-		p.set_color(color(1, 0.6, 0.6, 0.6))
+		p.set_color(color(0.6, 0.6, 0.6, 1))
 		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 	void on_draw(Painter p)

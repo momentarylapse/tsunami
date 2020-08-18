@@ -428,14 +428,9 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 		case InlineID::RECT_SET:
 		case InlineID::VECTOR_SET:
 		case InlineID::COMPLEX_SET:
+		case InlineID::COLOR_SET:
 			for (int i=0; i<ret.type->size/4; i++)
 				add_cmd(Asm::INST_MOV, param_shift(ret, i*4, TypeFloat32), param[i]);
-			break;
-		case InlineID::COLOR_SET:
-			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[0]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 0, TypeFloat32), param[1]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 4, TypeFloat32), param[2]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 8, TypeFloat32), param[3]);
 			break;
 		case InlineID::INT_ASSIGN:
 		case InlineID::INT64_ASSIGN:

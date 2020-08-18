@@ -311,14 +311,14 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	w = max(w, x1 - x0);
 
 	color col = view->colors.text;
-	color col_bg = ColorInterpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.6f);
+	color col_bg = color::interpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.6f);
 	color col_frame = marker_color(marker);
 	if (sel) {
 		col = view->colors.text;
-		//col_bg = view->colors.blob_bg_selected;//ColorInterpolate(col_bg, view->colors.selection, 0.6f);
-		//col_frame = view->colors.blob_bg_selected;//ColorInterpolate(col_frame, view->colors.selection, 0.6f);
-		col_bg = ColorInterpolate(col_bg, view->colors.blob_bg_selected, 0.8f);
-		col_frame = ColorInterpolate(col_frame, view->colors.blob_bg_selected, 0.8f);
+		//col_bg = view->colors.blob_bg_selected;//color::interpolate(col_bg, view->colors.selection, 0.6f);
+		//col_frame = view->colors.blob_bg_selected;//color::interpolate(col_frame, view->colors.selection, 0.6f);
+		col_bg = color::interpolate(col_bg, view->colors.blob_bg_selected, 0.8f);
+		col_frame = color::interpolate(col_frame, view->colors.blob_bg_selected, 0.8f);
 		//col_frame = view->colors.selection;
 	}
 	if (hover) {

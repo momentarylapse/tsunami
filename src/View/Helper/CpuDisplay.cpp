@@ -94,10 +94,10 @@ void CpuDisplay::on_draw(Painter* p) {
 		Array<int> indent;
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
-				color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
+				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
 				if (c.stats.back().counter == 0)
-					p->set_color(ColorInterpolate(col, view->colors.background, 0.7f));
+					p->set_color(color::interpolate(col, view->colors.background, 0.7f));
 				int dx = 0;
 				if (c.parent >= 0) {
 					for (int i=0; i<channels.num; i++)
@@ -125,7 +125,7 @@ void CpuDisplay::on_draw(Painter* p) {
 		int t = 0;
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
-				color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
+				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
 				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
 				t ++;

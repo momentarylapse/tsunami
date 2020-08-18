@@ -485,6 +485,7 @@ void SerializerARM::serialize_inline_function(Node *com, const Array<SerialNodeP
 			add_cmd(Asm::INST_FSTS, ret, reg_s0);
 			break;
 		case InlineID::RECT_SET:
+		case InlineID::COLOR_SET:
 			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[3]);
 			/* fall through */
 		case InlineID::VECTOR_SET:
@@ -492,12 +493,6 @@ void SerializerARM::serialize_inline_function(Node *com, const Array<SerialNodeP
 		case InlineID::COMPLEX_SET:
 			add_cmd(Asm::INST_MOV, param_shift(ret, 4, TypeFloat32), param[1]);
 			add_cmd(Asm::INST_MOV, param_shift(ret, 0, TypeFloat32), param[0]);
-			break;
-		case InlineID::COLOR_SET:
-			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[0]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 0, TypeFloat32), param[1]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 4, TypeFloat32), param[2]);
-			add_cmd(Asm::INST_MOV, param_shift(ret, 8, TypeFloat32), param[3]);
 			break;
 		default:
 			do_error("unimplemented inline function: #" + i2s((int)index));

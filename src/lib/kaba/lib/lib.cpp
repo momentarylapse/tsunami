@@ -858,6 +858,8 @@ void link_external(const string &name, void *pointer) {
 	ExternalLinkData l;
 	l.name = name;
 	l.pointer = pointer;
+	if (abs((int_p)pointer) < 1000)
+		msg_error("probably a virtual function: " + name);
 	ExternalLinks.add(l);
 
 	Array<string> names = name.explode(":");

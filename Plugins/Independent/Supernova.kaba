@@ -107,7 +107,7 @@ class SuperNovaWindow extends Window
 		for i in 0:6
 			float ly = h - (i + 1) * 30
 			c.drawLine(0, ly, w, ly)
-		c.setColor(Black)
+		c.setColor(color.BLACK)
 		c.setFontSize(18)
 		MidiNote[] notes = MidiTrack.midi.getNotes(song.getRange())
 		for n in notes
@@ -119,11 +119,11 @@ class SuperNovaWindow extends Window
 			float ly = h - (s + 1) * 30
 			c.setColor(ColorSetHSB(0.3, (n.pitch % 12) / 12.0, 1, 1))
 			c.drawRect(sample2x(n.range.offset), ly - 12, n.range.length / 700.0, 24)
-			c.setColor(Black)
+			c.setColor(color.BLACK)
 			c.drawStr(sample2x(n.range.offset), ly-12, f)
 			
 	void drawScore()
-		c.setColor(Black)
+		c.setColor(color.BLACK)
 		c.setFontSize(24)
 		c.drawStr(w - 220, 50, Score.str2(0) + " Punkte")
 		
@@ -139,9 +139,9 @@ class SuperNovaWindow extends Window
 		c.drawStr(20, 40, Volume.str())
 		for p in played
 			if p.correct
-				c.setColor(Blue)
+				c.setColor(color.BLUE)
 			else
-				c.setColor(Red)
+				c.setColor(color.RED)
 			float x = sample2x(p.offset)
 			float y = h - h * (p.note - 40.0) / 60.0
 			c.drawLine(x, y, x + 2, y)
@@ -151,7 +151,7 @@ class SuperNovaWindow extends Window
 		
 		drawScore()
 	
-		c.setColor(Black)
+		c.setColor(color.BLACK)
 		if LoudEnough
 			c.drawStr(120, 20, rel_pitch_name(played[len(played) - 1].note % 12))
 		else
@@ -163,15 +163,15 @@ class SuperNovaWindow extends Window
 			if i == hover
 				c.setColor(color(1, 0.8, 0.8, 1))
 				c.drawRect(100, 35 + i * 40, 300, 35)
-			c.setColor(Black)
+			c.setColor(color.BLACK)
 			c.drawStr(100, 38 + i * 40, l)
-		c.setColor(Black)
+		c.setColor(color.BLACK)
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
 	override void on_draw(Painter p)
 		c = p
-		c.setColor(White)
+		c.setColor(color.WHITE)
 		c.setFontSize(12)
 		w = c.width
 		h = c.height

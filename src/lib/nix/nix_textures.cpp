@@ -260,6 +260,11 @@ Texture::Texture(int w, int h, const string &_format) : Texture() {
 
 Texture::~Texture() {
 	unload();
+	foreachi(auto t, textures, i)
+		if (t == this) {
+			textures.erase(i);
+			break;
+		}
 }
 
 void Texture::__init__(int w, int h, const string &f) {

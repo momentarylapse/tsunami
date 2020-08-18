@@ -32,7 +32,7 @@ class SpecGrid extends Grid
 		float xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
 		
 		Image im
-		im.create(w, h, Black)
+		im.create(w, h, color.BLACK)
 		for x in 0:w
 			for y in 0:h
 				im.set_pixel(x, y, im0.get_pixel(x * xa + xb, y * ya + yb))
@@ -69,10 +69,10 @@ Grid ? ''
 color f2col(float _f)
 	let f = sqrt(_f)
 	if f < 0.333
-		return color(f * 3, 0, 0, f * 3)
+		return color(0, 0, f*3, f*3)
 	else if f < 0.6666
-		return color(1, f * 3 - 1, 0, 2 - f * 3)
-	return color(1, 1, f * 3 - 2, 0)
+		return color(f*3 - 1, 0, 2 - f*3, 1)
+	return color(1, f*3 - 2, 0, 1)
 
 class ShowSpectrogram extends SongPlugin
 
@@ -121,7 +121,7 @@ class ShowSpectrogram extends SongPlugin
 				_max = max(_max, bmaxr)
 				sg[t][i] = bmaxr
 	
-		im0.create(NT, NF, Black)
+		im0.create(NT, NF, color.BLACK)
 		for t in 0:NT
 			for i in 0:NF
 				float ff = sg[t][i] / _max

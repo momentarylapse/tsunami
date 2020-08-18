@@ -129,7 +129,7 @@ Grid ? '' vertical
 		# background
 		color bg = colors.background
 		if allow_blink_background
-			bg = color.interpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+			bg = color.interpolate(color.RED, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
 		p.draw_rect(0, 0, w, h)
 		

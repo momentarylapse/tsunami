@@ -130,15 +130,15 @@ Grid ? ''
 		float t1 = t0 + o.attack
 		float t2 = t1 + o.decay
 		float t3 = t2 + o.release
-		draw_curve_lin(p, t0, o.initial, t1, o.peak, Red)
-		draw_curve_lin(p, t1, o.peak, t2, o.sustain, Orange)
-		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Green)
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, color.RED)
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, color.ORANGE)
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, color.GREEN)
 		
 		
-		draw_grabber(p, t1, 0, t1, 1, Red, hover == -10)
-		draw_grabber(p, t2, 0, t2, 1, Orange, hover == -11)
-		draw_grabber(p, t3, 0, t3, 1, Green, hover == -12)
-		draw_grabber(p, t1, o.sustain, t3, o.sustain, Yellow, hover == -13)
+		draw_grabber(p, t1, 0, t1, 1, color.RED, hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, color.ORANGE, hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, color.GREEN, hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, color.YELLOW, hover == -13)
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
 		if hover == -10

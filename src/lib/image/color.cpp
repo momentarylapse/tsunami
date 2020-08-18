@@ -11,6 +11,7 @@ const color Green  = color(1, 0, 1, 0);
 const color Blue   = color(1, 0, 0, 1);
 const color Yellow = color(1, 1, 1, 0);
 const color Orange = color(1, 1, 0.5f, 0);
+const color Purple = color(1, 1, 0.5f, 0);
 
 
 //------------------------------------------------------------------------------------------------//
@@ -18,8 +19,7 @@ const color Orange = color(1, 1, 0.5f, 0);
 //------------------------------------------------------------------------------------------------//
 
 
-void color::clamp()
-{
+void color::clamp() {
 	a = clampf(a, 0, 1);
 	r = clampf(r, 0, 1);
 	g = clampf(g, 0, 1);
@@ -28,8 +28,7 @@ void color::clamp()
 
 // create a color from (alpha, red, green blue)
 // (values of set [0..1])
-color SetColorSave(float a,float r,float g, float b)
-{
+color color::create_save(float r,float g, float b, float a) {
 	if (a < 0)
 		a = 0;
 	else if (a > 1)
@@ -49,8 +48,7 @@ color SetColorSave(float a,float r,float g, float b)
 	return color(a, r, g, b);
 }
 
-color SetColorHSB(float a,float hue,float saturation,float brightness)
-{
+color color::hsb(float hue, float saturation, float brightness, float a) {
 	int h=int(hue*6)%6;
 	float f=hue*6.0f-int(hue*6);
 	float p=brightness*(1-saturation);
@@ -67,36 +65,31 @@ color SetColorHSB(float a,float hue,float saturation,float brightness)
 }
 
 // create a mixed color = a * (1-t)  +  b * t
-color ColorInterpolate(const color &a,const color &b,float t)
-{
+color color::interpolate(const color &a,const color &b,float t) {
 	return (1-t)*a + t*b;
 }
 
-color ColorFromIntRGB(int *i)
-{
+color color::from_int_rgb(int *i) {
 	return color(	1,
 					(float)i[0]/255.0f,
 					(float)i[1]/255.0f,
 					(float)i[2]/255.0f);
 }
 
-color ColorFromIntARGB(int *i)
-{
+color color::from_int_argb(int *i) {
 	return color(	(float)i[0]/255.0f,
 					(float)i[1]/255.0f,
 					(float)i[2]/255.0f,
 					(float)i[3]/255.0f);
 }
 
-void color::get_int_rgb(int *i) const
-{
+void color::get_int_rgb(int *i) const {
 	i[0] = int(r * 255.0f);
 	i[1] = int(g * 255.0f);
 	i[2] = int(b * 255.0f);
 }
 
-void color::get_int_argb(int *i) const
-{
+void color::get_int_argb(int *i) const {
 	i[0] = int(a * 255.0f);
 	i[1] = int(r * 255.0f);
 	i[2] = int(g * 255.0f);

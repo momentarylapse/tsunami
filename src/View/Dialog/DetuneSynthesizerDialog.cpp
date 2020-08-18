@@ -47,12 +47,12 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 
 	if (hover >= 0) {
 		if (is_checked("all_octaves")) {
-			color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.1f);
+			color c = color::interpolate(view->colors.background, view->colors.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
 				p->draw_rect(pitch2x(i), 0, pitch2x(1), h);
 		}
-		color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.2f);
+		color c = color::interpolate(view->colors.background, view->colors.capture_marker, 0.2f);
 		p->set_color(c);
 		p->draw_rect(pitch2x(hover), 0, pitch2x(1), h);
 	}

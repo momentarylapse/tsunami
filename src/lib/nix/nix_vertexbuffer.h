@@ -45,7 +45,7 @@ public:
 	void _cdecl set_per_instance(int index);
 	int count() const;
 
-	void create_rect(const rect &dest);
+	void create_rect(const rect &dest, const rect &source = rect::ID);
 };
 
 void init_vertex_buffers();

@@ -147,7 +147,7 @@ color _col_mul_f(color &a, float b)
 
 complex __complex_set(float x, float y)
 { return complex(x, y); }
-color __color_set(float a, float r, float g, float b)
+color __color_set(float r, float g, float b, float a)
 { return color(a, r, g, b); }
 vector __vector_set(float x, float y, float z)
 { return vector(x, y, z); }
@@ -518,10 +518,10 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::EQUAL, TypeBool, TypeRect, TypeRect, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeColor);
-		class_add_element("a", TypeFloat32, 12);
 		class_add_element("r", TypeFloat32, 0);
 		class_add_element("g", TypeFloat32, 4);
 		class_add_element("b", TypeFloat32, 8);
+		class_add_element("a", TypeFloat32, 12);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&color::str), Flags::PURE);
 		class_add_func("__add__", TypeColor, mf(&color::operator+), Flags::PURE);
 			func_add_param("o", TypeColor);
@@ -535,28 +535,38 @@ void SIAddPackageMath() {
 			func_add_param("f", TypeFloat32);
 		class_add_func("__mul__", TypeColor, (void*)&_col_mul_c, Flags::PURE);
 			func_add_param("c", TypeColor);
-		class_add_funcx("hsb", TypeColor, &SetColorHSB, Flags::_STATIC__PURE);
-			func_add_param("a", TypeFloat32);
+		class_add_funcx("hsb", TypeColor, &color::hsb, Flags::_STATIC__PURE);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
 			func_add_param("b", TypeFloat32);
-		class_add_funcx("interpolate", TypeColor, &ColorInterpolate, Flags::_STATIC__PURE);
+			func_add_param("a", TypeFloat32);
+		class_add_funcx("interpolate", TypeColor, &color::interpolate, Flags::_STATIC__PURE);
 			func_add_param("c1", TypeColor);
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
 		class_add_func("_create", TypeColor, (void*)&__color_set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::COLOR_SET);
-			func_add_param("a", TypeFloat32);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
+			func_add_param("a", TypeFloat32);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)&__color_set);
-			func_add_param("a", TypeFloat32);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
+			func_add_param("a", TypeFloat32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_EQUAL);
+		// color
+		class_add_const("WHITE",  TypeColor, (void*)&White);
+		class_add_const("BLACK",  TypeColor, (void*)&Black);
+		class_add_const("GRAY",   TypeColor, (void*)&Gray);
+		class_add_const("RED",    TypeColor, (void*)&Red);
+		class_add_const("GREEN",  TypeColor, (void*)&Green);
+		class_add_const("BLUE",   TypeColor, (void*)&Blue);
+		class_add_const("YELLOW", TypeColor, (void*)&Yellow);
+		class_add_const("ORANGE", TypeColor, (void*)&Orange);
+		class_add_const("PURPLE", TypeColor, (void*)&Purple);
 
 	add_class(TypeColorList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&Array<color>::__init__));
@@ -953,15 +963,6 @@ void SIAddPackageMath() {
 	
 	// float
 	add_const("pi",  TypeFloat32, (void*)&pi);
-	// color
-	add_const("White",  TypeColor, (void*)&White);
-	add_const("Black",  TypeColor, (void*)&Black);
-	add_const("Gray",   TypeColor, (void*)&Gray);
-	add_const("Red",    TypeColor, (void*)&Red);
-	add_const("Green",  TypeColor, (void*)&Green);
-	add_const("Blue",   TypeColor, (void*)&Blue);
-	add_const("Yellow", TypeColor, (void*)&Yellow);
-	add_const("Orange", TypeColor, (void*)&Orange);
 
 
 	// needs to be defined after any

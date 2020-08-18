@@ -92,9 +92,9 @@ int VertexBuffer::count() const {
 	return buf[0].count;
 }
 
-void VertexBuffer::create_rect(const rect &s) {
-	Array<vector> p = {vector(s.x1,s.y1,0), vector(s.x1,s.y2,0), vector(s.x2,s.y2,0),  vector(s.x1,s.y1,0), vector(s.x2,s.y2,0), vector(s.x2,s.y1,0)};
-	Array<float> uv = {0,0, 0,1, 1,1,  0,0, 1,1, 1,0};
+void VertexBuffer::create_rect(const rect &d, const rect &s) {
+	Array<vector> p = {vector(d.x1,d.y1,0), vector(d.x1,d.y2,0), vector(d.x2,d.y2,0),  vector(d.x1,d.y1,0), vector(d.x2,d.y2,0), vector(d.x2,d.y1,0)};
+	Array<float> uv = {s.x1,s.y1, s.x1,s.y2, s.x2,s.y2,  s.x1,s.y1, s.x2,s.y2, s.x2,s.y1};
 	update(0, p);
 	update(1, p);
 	update(2, uv);

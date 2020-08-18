@@ -34,16 +34,16 @@ string get_note(float f)
 	#note = i2s(n)
 
 void DrawVolume(Painter *c)
-	c.set_color(color(1, 0.8, 0.8, 0.8))
+	c.set_color(color(0.8, 0.8, 0.8, 1))
 	float y0 = 30
 	float y1 = c.height - 5
 	float h = y1 - y0
 	c.draw_rect(5, y0 + h * (1 - Volume), 5, h)
-	c.set_color(color(1, 0.6, 0.6, 0.6))
+	c.set_color(color(0.6, 0.6, 0.6, 1))
 	c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw(Painter *c)
-	c.set_color(White)
+	c.set_color(color.WHITE)
 	c.set_font_size(12)
 	int w = c.width
 	int h = c.height
@@ -51,7 +51,7 @@ void Draw(Painter *c)
 	
 	DrawVolume(c)
 	
-	c.set_color(Black)
+	c.set_color(color.BLACK)
 	c.draw_str(20, 20, "{{Frequency|.1}} Hz")
 	c.draw_str(20, 40, "{{Volume|.3}}")
 	for p,i in played
@@ -61,7 +61,7 @@ void Draw(Painter *c)
 		float y = h - h * (p - 40.0) / 60.0
 		c.draw_line(x, y, x + 2, y)
 	
-	c.set_color(Black)
+	c.set_color(color.BLACK)
 	if LoudEnough
 		c.draw_str(120, 20, rel_pitch_name(played[len(played) - 1] % 12))
 	else

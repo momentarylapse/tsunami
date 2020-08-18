@@ -109,7 +109,7 @@ class MultiEchoGrid extends Grid
 			cc.add(project2(complex(t, v)))
 			v *= dv
 			t += dt
-		c.set_color(color.interpolate(Red, colors.text_soft2, 0.3))
+		c.set_color(color.interpolate(color.RED, colors.text_soft2, 0.3))
 		c.set_line_dash([5.0, 2.0])
 		c.draw_lines(cc)
 		c.set_line_dash([5.0, 0.0])

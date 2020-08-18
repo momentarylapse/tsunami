@@ -118,7 +118,7 @@ class PADGrid extends Grid
 		complex[] curve
 		for a,i in pc.A
 			pc.fill_curve(curve, i)
-			draw_curve_b(c, curve, false, Red)
+			draw_curve_b(c, curve, false, color.RED)
 	
 		# points
 		for a,i in pc.A

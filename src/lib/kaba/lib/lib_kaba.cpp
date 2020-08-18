@@ -30,6 +30,12 @@ void __execute_single_command__(const string &cmd) {
 #pragma GCC pop_options
 
 
+void show_func(Function *f) {
+	config.verbose = true;
+	f->show("");
+	config.verbose = false;
+}
+
 void SIAddPackageKaba() {
 	add_package("kaba");
 
@@ -167,6 +173,8 @@ void SIAddPackageKaba() {
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);
+	add_funcx("show_func", TypeVoid, &show_func, Flags::STATIC);
+		func_add_param("f", TypeFunction);
 
 	add_ext_var("packages", TypeScriptPList, (void*)&packages);
 	add_ext_var("statements", TypeStatementPList, (void*)&Statements);

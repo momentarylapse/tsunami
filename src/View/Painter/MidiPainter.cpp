@@ -94,24 +94,24 @@ void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, Hov
 
 color MidiPainter::pitch_color(int pitch) {
 	return PITCH_COLORS[pitch % 12];
-	//return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
+	//return color::hsb((float)(pitch % 12) / 12.0f, 0.6f, 1, 1);
 }
 
 
 void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, bool playable, ColorScheme &colors) {
 	if (playable)
-		col = ColorInterpolate(MidiPainter::pitch_color(n->pitch), colors.text, 0.2f);
+		col = color::interpolate(MidiPainter::pitch_color(n->pitch), colors.text, 0.2f);
 	else
 		col = colors.text_soft3;
 
 	if (state & MidiPainter::STATE_HOVER) {
-		col = ColorInterpolate(col, colors.hover, 0.5f);
+		col = color::interpolate(col, colors.hover, 0.5f);
 	} else if (state & MidiPainter::STATE_SELECTED) {
-		col = ColorInterpolate(col, colors.selection, 0.5f);
+		col = color::interpolate(col, colors.selection, 0.5f);
 	} else if (state & MidiPainter::STATE_REFERENCE) {
-		col = ColorInterpolate(col, colors.background_track, 0.65f);
+		col = color::interpolate(col, colors.background_track, 0.65f);
 	}
-	col_shadow = ColorInterpolate(col, colors.background_track, 0.5f);
+	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
 }
 
 
@@ -777,7 +777,7 @@ void MidiPainter::draw_low_detail_dummy_part(Painter *c, const Range &r, const M
 			continue;
 		color col = pitch_color(i);
 		if (!is_playable)
-			col = ColorInterpolate(col, colors.text_soft3, 0.8f);
+			col = color::interpolate(col, colors.text_soft3, 0.8f);
 		col.a = (float)count[i] / (float)notes.num;
 		c->set_color(col);
 		float y0 = area.y2 - i*area.height()/12;

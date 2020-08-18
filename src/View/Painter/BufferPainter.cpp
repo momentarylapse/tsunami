@@ -159,7 +159,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
-			c->set_color(ColorInterpolate(col, Red, 0.3f));
+			c->set_color(color::interpolate(col, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			c->set_antialiasing(false);
 			return;
@@ -186,7 +186,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 			int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
 			for (int i=0; i<nn; i++){
 				if (b._peaks_chunk_needs_update(i)){
-					c->set_color(ColorInterpolate(col, Red, 0.3f));
+					c->set_color(color::interpolate(col, Red, 0.3f));
 					float xx0 = max((float)view->cam.sample2screen(offset + i*b.PEAK_CHUNK_SIZE), x0);
 					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
 					c->draw_rect(xx0, area.y1, xx1 - xx0, h);
@@ -229,7 +229,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
-			c->set_color(ColorInterpolate(col, Red, 0.3f));
+			c->set_color(color::interpolate(col, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			c->set_antialiasing(false);
 			return;

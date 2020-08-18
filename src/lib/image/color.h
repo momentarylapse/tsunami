@@ -5,11 +5,10 @@
 
 #include "../base/base.h"
 
-class color
-{
+class color {
 public:
 	float r,g,b,a;
-	color(){};
+	color() {};
 	color(float a,float r,float g,float b)
 	{	this->a=a;	this->r=r;	this->g=g;	this->b=b;	}
 	/*color& operator = (const color& c)
@@ -38,13 +37,14 @@ public:
 
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
+
+
+	static color _cdecl create_save(float r, float g, float b, float a);
+	static color _cdecl hsb(float a, float hue, float saturation, float brightness);
+	static color _cdecl interpolate(const color &a, const color &b, float t);
+	static color _cdecl from_int_rgb(int *i);
+	static color _cdecl from_int_argb(int *i);
 };
-// colors
-color _cdecl SetColorSave(float a, float r, float g, float b);
-color _cdecl SetColorHSB(float a, float hue, float saturation, float brightness);
-color _cdecl ColorInterpolate(const color &a, const color &b, float t);
-color _cdecl ColorFromIntRGB(int *i);
-color _cdecl ColorFromIntARGB(int *i);
 
 extern const color White;
 extern const color Black;
@@ -55,5 +55,6 @@ extern const color Green;
 extern const color Blue;
 extern const color Yellow;
 extern const color Orange;
+extern const color Purple;
 
 #endif

@@ -27,13 +27,13 @@ DrawingArea area '' height=200 expandy")
 		p.draw_rect(0, 0, w, h)
 		
 		AudioBuffer *buf = &c.buffer
-		p.set_color(color(0.2,0,1,0))
+		p.set_color(color(0,1,0, 0.2))
 		#p.set_line_width(0.5)
 		float x0, y0, x1, y1
 		for i in 0:buf.length
 			x1 = w * (buf.l[i] / 2 + 0.5)
 			y1 = h * (buf.r[i] / 2 + 0.5)
-			p.set_color(color(float(i) / NUM_SAMPLES, 0,1,0))
+			p.set_color(color(0,1,0, float(i) / NUM_SAMPLES))
 			if i > 0
 				p.draw_line(x0, y0, x1, y1)
 			x0 = x1

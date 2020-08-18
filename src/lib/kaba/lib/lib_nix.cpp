@@ -103,6 +103,7 @@ void SIAddPackageNix() {
 			func_add_param("data", TypeDynamicArray);
 		class_add_func("create_rect", TypeVoid, nix_p(mf(&nix::VertexBuffer::create_rect)));
 			func_add_param("dest", TypeRect);
+			func_add_param("source", TypeRect);
 		class_add_func("count", TypeInt, nix_p(mf(&nix::VertexBuffer::count)));
 
 

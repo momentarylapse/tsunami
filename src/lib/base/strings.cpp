@@ -337,8 +337,7 @@ string i642s(long long i)
 }
 
 // convert a float to a string
-string f2s(float f,int dez)
-{
+string f2s(float f, int dez) {
 	/*strcpy(str,"");
 	if (f<0){
 		strcat(str,"-");
@@ -363,6 +362,14 @@ string f2s(float f,int dez)
 		if (t[i] == ',')
 			t[i] = '.';
 	return t;
+}
+
+string f2s_clean(float f, int dez) {
+	auto s = f2s(f, dez);
+	for (int i=s.num-1; i>=0; i--)
+		if (s.back() == '0')
+			s.pop();
+	return s;
 }
 
 // convert a float to a string

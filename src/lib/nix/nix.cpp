@@ -22,7 +22,7 @@ extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.4.0";
+string version = "0.13.5.0";
 
 
 // libraries (in case Visual C++ is used)
@@ -154,7 +154,7 @@ void Init() {
 	SetCull(CULL_DEFAULT);
 	SetWire(false);
 	SetAlpha(ALPHA_NONE);
-	SetMaterial(White, White, White, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
+	SetMaterial(White, 0.5f, 0, 10, color(0.1f, 0.1f, 0.1f, 0.1f));
 	SetProjectionPerspective();
 	SetZ(true, true);
 	SetShader(default_shader_3d);

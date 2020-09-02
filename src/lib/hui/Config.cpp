@@ -8,9 +8,8 @@
 #include "Config.h"
 #include "hui.h"
 
-#ifdef OS_WINDOWS
-#include <tchar.h>
-#endif
+
+string f2s_clean(float f, int dez);
 
 namespace hui
 {
@@ -43,7 +42,7 @@ void Configuration::set_int(const string& name, int val) {
 }
 
 void Configuration::set_float(const string& name, float val) {
-	set_str(name, f2s(val, 6));
+	set_str(name, f2s_clean(val, 6));
 }
 
 void Configuration::set_bool(const string& name, bool val) {
@@ -75,12 +74,17 @@ string Configuration::get_str(const string& name, const string& default_str) con
 	}
 }
 
+bool Configuration::has(const string& name) const {
+	return map.find(name) >= 0;
+}
+
 static string strip(const string &s) {
 	int first = 0;
 	int last = s.num;
 	for (int i=0; i<s.num; i++)
-		if (s[i] != ' ') {
-			first = i;
+		if (s[i] == ' ') {
+			first = i+1;
+		} else {
 			break;
 		}
 	for (int i=s.num-1; i>=first; i--)
@@ -154,7 +158,7 @@ void Configuration::save(const Path &filename) {
 	try {
 		File *f = FileCreateText(filename);
 		for (auto &e: map)
-			f->write_str(format("%s = %s ", e.key, e.value));
+			f->write_str(format("%s = %s", e.key, e.value));
 
 		if (comments.num > 0)
 			f->write_str("");

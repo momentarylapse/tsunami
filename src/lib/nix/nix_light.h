@@ -13,16 +13,14 @@
 
 namespace nix{
 
-void _cdecl SetMaterial(const color &ambient, const color &diffuse, const color &specular, float shininess, const color &emission);
+void _cdecl SetMaterial(const color &diffuse, float ambient, float specular, float shininess, const color &emission);
 
 
 
 struct Material {
-	color ambient;
 	color diffusive;
-	color specular;
 	color emission;
-	float shininess;
+	float ambient, specular, shininess;
 };
 extern Material material;
 

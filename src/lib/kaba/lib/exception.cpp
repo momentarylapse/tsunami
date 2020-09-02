@@ -47,6 +47,8 @@ struct StackFrameInfo {
 	Function *f;
 	int64 offset;
 	string str() const {
+		if (!s or !f)
+			return "-not in kaba-";
 		return format(">>  %s : %s()  +0x%x", s->filename.str(), f->long_name(), offset);
 	}
 };

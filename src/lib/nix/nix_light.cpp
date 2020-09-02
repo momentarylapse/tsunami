@@ -17,7 +17,8 @@ namespace nix{
 Material material;
 
 
-void SetMaterial(const color &ambient,const color &diffuse,const color &specular,float shininess,const color &emission) {
+// TODO: better names
+void SetMaterial(const color &diffuse, float ambient, float specular, float shininess, const color &emission) {
 	material.ambient = ambient;
 	material.diffusive = diffuse;
 	material.specular = specular;

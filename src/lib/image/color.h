@@ -31,9 +31,11 @@ public:
 	{	return color(a*c.a , r*c.r , g*c.g , b*c.b);	}
 	void _cdecl operator *= (const color &c)
 	{	a*=c.a;	r*=c.r;	g*=c.g;	b*=c.b;	}
+	bool operator==(const color &c) const;
+	bool operator!=(const color &c) const;
 	void _cdecl clamp();
-	string _cdecl str() const
-	{	return format("(%f, %f, %f, %f)", r, g, b, a);	}
+	string _cdecl str() const;
+	string _cdecl hex() const;
 
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
@@ -44,6 +46,7 @@ public:
 	static color _cdecl interpolate(const color &a, const color &b, float t);
 	static color _cdecl from_int_rgb(int *i);
 	static color _cdecl from_int_argb(int *i);
+	static color _cdecl parse(const string &s);
 };
 
 extern const color White;

@@ -29,11 +29,12 @@ public:
 		DYNAMIC,
 		CUBE,
 		DEPTH,
-		IMAGE
+		IMAGE,
+		VOLUME
 	};
 	Type type;
 	Path filename;
-	int width, height;
+	int width, height, nz;
 	bool valid;
 	
 	unsigned int texture;
@@ -41,8 +42,10 @@ public:
 
 	Texture();
 	Texture(int width, int height, const string &format);
+	Texture(int nx, int ny, int nz, const string &format);
 	~Texture();
 	void _cdecl __init__(int width, int height, const string &format);
+	void _cdecl __init3__(int nx, int ny, int nz, const string &format);
 	void _cdecl __delete__();
 
 	void _cdecl overwrite(const Image &image);

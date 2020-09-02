@@ -205,11 +205,18 @@ Shader *Shader::create(const string &source) {
 }
 
 void Shader::find_locations() {
-	location[LOCATION_MATRIX_MVP] = get_location("mat_mvp");
-	location[LOCATION_MATRIX_M] = get_location("mat_m");
-	location[LOCATION_MATRIX_V] = get_location("mat_v");
-	location[LOCATION_MATRIX_P] = get_location("mat_p");
-	location[LOCATION_MATRIX_P2D] = get_location("mat_p2d");
+	location[LOCATION_MATRIX_M] = get_location("matrix.model");
+	location[LOCATION_MATRIX_V] = get_location("matrix.view");
+	location[LOCATION_MATRIX_P] = get_location("matrix.project");
+
+	if (location[LOCATION_MATRIX_M] < 0 and location[LOCATION_MATRIX_V] < 0 and location[LOCATION_MATRIX_P] < 0) {
+		location[LOCATION_MATRIX_MVP] = get_location("mat_mvp");
+		location[LOCATION_MATRIX_M] = get_location("mat_m");
+		location[LOCATION_MATRIX_V] = get_location("mat_v");
+		location[LOCATION_MATRIX_P] = get_location("mat_p");
+		if (location[LOCATION_MATRIX_M] >= 0 or location[LOCATION_MATRIX_V] >= 0 or location[LOCATION_MATRIX_P] >= 0)
+			msg_error("deprecated matrix linking: " + filename.str());
+	}
 	for (int i=0; i<NIX_MAX_TEXTURELEVELS; i++)
 		location[LOCATION_TEX + i] = get_location("tex" + i2s(i));
 	location[LOCATION_TEX_CUBE] = get_location("tex_cube");
@@ -219,6 +226,11 @@ void Shader::find_locations() {
 	location[LOCATION_MATERIAL_SPECULAR] = get_location("material.specular");
 	location[LOCATION_MATERIAL_SHININESS] = get_location("material.shininess");
 	location[LOCATION_MATERIAL_EMISSION] = get_location("material.emission");
+
+	link_uniform_block("Matrix", 0);
+	link_uniform_block("LightData", 1);
+	link_uniform_block("Material", 2);
+	link_uniform_block("Fog", 3);
 }
 
 Shader *Shader::load(const Path &filename) {
@@ -309,12 +321,12 @@ int Shader::get_location(const string &name) {
 	return glGetUniformLocation(program, name.c_str());
 }
 
-void Shader::link_uniform_block(const string &name, int binding) {
+bool Shader::link_uniform_block(const string &name, int binding) {
 	int index = glGetUniformBlockIndex(program, name.c_str());
-	if (index >= 0)
-		glUniformBlockBinding(program, index, binding);
-	else
-		msg_error("shader block not found: " + name);
+	if (index < 0)
+		return false;
+	glUniformBlockBinding(program, index, binding);
+	return true;
 }
 
 void Shader::set_data(int location, const float *data, int size) {
@@ -363,10 +375,6 @@ void Shader::set_matrix(int location, const matrix &m) {
 	TestGLError("SetShaderData");
 }
 
-void Shader::get_data(int location, void *data, int size) {
-	msg_todo("NixGetShaderData for OpenGL");
-}
-
 void Shader::set_default_data() {
 	set_matrix(location[LOCATION_MATRIX_MVP], world_view_projection_matrix);
 	set_matrix(location[LOCATION_MATRIX_M], world_matrix);
@@ -376,9 +384,9 @@ void Shader::set_default_data() {
 		set_int(location[LOCATION_TEX + i], i);
 	if (tex_cube_level >= 0)
 		set_int(location[LOCATION_TEX_CUBE], tex_cube_level);
-	set_color(location[LOCATION_MATERIAL_AMBIENT], material.ambient);
+	set_float(location[LOCATION_MATERIAL_AMBIENT], material.ambient);
 	set_color(location[LOCATION_MATERIAL_DIFFUSIVE], material.diffusive);
-	set_color(location[LOCATION_MATERIAL_SPECULAR], material.specular);
+	set_float(location[LOCATION_MATERIAL_SPECULAR], material.specular);
 	set_data(location[LOCATION_MATERIAL_SHININESS], &material.shininess, 4);
 	set_color(location[LOCATION_MATERIAL_EMISSION], material.emission);
 }
@@ -397,93 +405,109 @@ void init_shaders() {
 	default_shader_3d = nix::Shader::create(
 		"<VertexShader>\n"
 		"#version 330 core\n"
-		"uniform mat4 mat_mvp;\n"
-		"uniform mat4 mat_m;\n"
-		"uniform mat4 mat_v;\n"
-		"layout(location = 0) in vec3 inPosition;\n"
-		"layout(location = 1) in vec3 inNormal;\n"
-		"layout(location = 2) in vec2 inTexCoord;\n"
-		"out vec3 fragmentNormal;\n"
-		"out vec2 fragmentTexCoord;\n"
-		"out vec3 fragmentPos; // camera space\n"
+		"#extension GL_ARB_separate_shader_objects : enable"
+		"\n"
+		"struct Matrix { mat4 model, view, project; };\n"
+		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
+		"\n"
+		"layout(location = 0) in vec3 in_position;\n"
+		"layout(location = 1) in vec3 in_normal;\n"
+		"layout(location = 2) in vec2 in_uv;\n"
+		"\n"
+		"layout(location = 0) out vec3 out_pos; // camera space\n"
+		"layout(location = 1) out vec3 out_normal;\n"
+		"layout(location = 2) out vec2 out_uv;\n"
+		"\n"
 		"void main() {\n"
-		"	gl_Position = mat_mvp * vec4(inPosition,1);\n"
-		"	fragmentNormal = (mat_v * mat_m * vec4(inNormal,0)).xyz;\n"
-		"	fragmentTexCoord = inTexCoord;\n"
-		"	fragmentPos = (mat_v * mat_m * vec4(inPosition,1)).xyz;\n"
+		"	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);\n"
+		"	out_normal = (matrix.view * matrix.model * vec4(in_normal, 0)).xyz;\n"
+		"	out_uv = in_uv;\n"
+		"	out_pos = (matrix.view * matrix.model * vec4(in_position, 1)).xyz;\n"
 		"}\n"
 		"</VertexShader>\n"
 		"<FragmentShader>\n"
 		"#version 330 core\n"
-		"uniform mat4 mat_v;\n"
-		"struct Material { vec4 ambient, diffusive, specular, emission; float shininess; };\n"
+		"#extension GL_ARB_separate_shader_objects : enable"
+		"\n"
+		"struct Matrix { mat4 model, view, project; };\n"
+		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
+		"struct Material { vec4 diffusive, emission; float ambient, specular, shininess; };\n"
+		"/*layout(binding = 2)*/ uniform Material material;\n"
 		"struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };\n"
 		"uniform int num_lights = 0;\n"
 		"/*layout(binding = 1)*/ uniform LightData { Light light[32]; };\n"
-		"uniform Material material;\n"
-		"in vec3 fragmentNormal;\n"
-		"in vec2 fragmentTexCoord;\n"
-		"in vec3 fragmentPos;\n"
+		"\n"
+		"layout(location = 0) in vec3 in_pos;\n"
+		"layout(location = 1) in vec3 in_normal;\n"
+		"layout(location = 2) in vec2 in_uv;\n"
 		"uniform sampler2D tex0;\n"
 		"out vec4 out_color;\n"
+		"\n"
 		"vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {\n"
-		"	vec3 L = (mat_v * vec4(l.dir.xyz, 0)).xyz;\n"
+		"	vec3 L = (matrix.model * vec4(l.dir.xyz, 0)).xyz;\n"
 		"	float d = max(-dot(n, L), 0);\n"
-		"	vec4 color = material.ambient * l.color * (1 - l.harshness) / 2;\n"
+		"	vec4 color = material.diffusive * material.ambient * l.color * (1 - l.harshness) / 2;\n"
 		"	color += material.diffusive * l.color * l.harshness * d;\n"
 		"	color *= tex_col;\n"
 		"	if ((d > 0) && (material.shininess > 1)) {\n"
-		"		vec3 e = normalize(fragmentPos); // eye dir\n"
+		"		vec3 e = normalize(in_pos); // eye dir\n"
 		"		vec3 rl = reflect(L, n);\n"
 		"		float ee = max(-dot(e, rl), 0);\n"
 		"		color += material.specular * l.color * l.harshness * pow(ee, material.shininess);\n"
 		"	}\n"
 		"	return color;\n"
 		"}\n"
+		"\n"
 		"void main() {\n"
-		"	vec3 n = normalize(fragmentNormal);\n"
+		"	vec3 n = normalize(in_normal);\n"
 		"	out_color = material.emission;\n"
-		"	vec4 tex_col = texture(tex0, fragmentTexCoord);\n"
+		"	vec4 tex_col = texture(tex0, in_uv);\n"
 		"	for (int i=0; i<num_lights; i++)\n"
 		"		out_color += basic_lighting(light[i], n, tex_col);\n"
 		"	out_color.a = material.diffusive.a * tex_col.a;\n"
 		"}\n"
 		"</FragmentShader>");
-	default_shader_3d->link_uniform_block("LightData", 1);
+	default_shader_3d->filename = "-default 3d-";
 
 
 
 	default_shader_2d = nix::Shader::create(
 		"<VertexShader>\n"
 		"#version 330 core\n"
+		"#extension GL_ARB_separate_shader_objects : enable"
 		"\n"
-		"uniform mat4 mat_mvp;\n"
+		"struct Matrix { mat4 model, view, project; };\n"
+		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
 		"\n"
-		"layout(location = 0) in vec3 inPosition;\n"
-		"layout(location = 1) in vec4 inColor;\n"
-		"layout(location = 2) in vec2 inTexCoord;\n"
+		"layout(location = 0) in vec3 in_position;\n"
+		"layout(location = 1) in vec4 in_color;\n"
+		"layout(location = 2) in vec2 in_uv;\n"
 		"\n"
-		"out vec2 fragmentTexCoord;\n"
-		"out vec4 fragmentColor;\n"
+		"layout(location = 0) out vec2 out_uv;\n"
+		"layout(location = 1) out vec4 out_color;\n"
 		"\n"
 		"void main() {\n"
-		"	gl_Position = mat_mvp * vec4(inPosition,1);\n"
-		"	fragmentTexCoord = inTexCoord;\n"
-		"	fragmentColor = inColor;\n"
+		"	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);\n"
+		"	out_uv = in_uv;\n"
+		"	out_color = in_color;\n"
 		"}\n"
 		"\n"
 		"</VertexShader>\n"
 		"<FragmentShader>\n"
 		"#version 330 core\n"
-		"in vec2 fragmentTexCoord;\n"
-		"in vec4 fragmentColor;\n"
+		"#extension GL_ARB_separate_shader_objects : enable"
+		"\n"
+		"layout(location = 0) in vec2 in_uv;\n"
+		"layout(location = 1) in vec4 in_color;\n"
 		"uniform sampler2D tex0;\n"
 		"out vec4 color;\n"
+		"\n"
 		"void main() {\n"
-		"	color = texture(tex0, fragmentTexCoord);\n"
-		"	color *= fragmentColor;\n"
+		"	color = texture(tex0, in_uv);\n"
+		"	color *= in_color;\n"
 		"}\n"
 		"</FragmentShader>");
+		default_shader_2d->filename = "-default 2d-";
 
 		default_shader_3d->ref();
 		default_shader_2d->ref();

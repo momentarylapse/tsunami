@@ -112,6 +112,11 @@ void SIAddPackageNix() {
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::Texture::__init3__)));
+			func_add_param("nx", TypeInt);
+			func_add_param("ny", TypeInt);
+			func_add_param("nz", TypeInt);
+			func_add_param("format", TypeString);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::Texture::__delete__)));
 		class_add_func("overwrite", TypeVoid, nix_p(mf(&nix::Texture::overwrite)));
 			func_add_param("image", TypeImage);
@@ -121,6 +126,9 @@ void SIAddPackageNix() {
 			func_add_param("data", TypeFloatList);
 		class_add_func("write_float", TypeVoid, nix_p(mf(&nix::Texture::write_float)));
 			func_add_param("data", TypeFloatList);
+			func_add_param("nx", TypeInt);
+			func_add_param("ny", TypeInt);
+			func_add_param("nz", TypeInt);
 		class_add_func("load", TypeTextureP, nix_p(&__LoadTexture), Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 		class_add_elementx("width", TypeInt, &nix::Texture::width);

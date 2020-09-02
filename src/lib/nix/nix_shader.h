@@ -41,9 +41,8 @@ public:
 	void _cdecl set_data(int location, const float *data, int size);
 	void _cdecl set_matrix(int location, const matrix &m);
 	void _cdecl set_color(int location, const color &c);
-	void _cdecl get_data(int location, void *data, int size);
 	int _cdecl get_location(const string &name);
-	void _cdecl link_uniform_block(const string &name, int binding);
+	bool _cdecl link_uniform_block(const string &name, int binding);
 	
 	void _cdecl dispatch(int nx, int ny, int nz);
 
@@ -55,7 +54,6 @@ public:
 		LOCATION_MATRIX_M,
 		LOCATION_MATRIX_V,
 		LOCATION_MATRIX_P,
-		LOCATION_MATRIX_P2D,
 		LOCATION_TEX,
 		LOCATION_TEX_CUBE = LOCATION_TEX + NIX_MAX_TEXTURELEVELS,
 		LOCATION_MATERIAL_AMBIENT,

@@ -19,6 +19,34 @@ const color Purple = color(1, 1, 0.5f, 0);
 //------------------------------------------------------------------------------------------------//
 
 
+string color::str() const {
+	return format("(%.3f, %.3f, %.3f, %.3f)", r, g, b, a);
+}
+
+string color::hex() const {
+	return format("#02x02x02x02x", (int)(r*255), (int)(g*255), (int)(b*255), (int)(a*255));
+}
+
+// "(1.0, 1.0, 1.0, 1.0)"
+// "1.0 1.0 1.0"
+// "#rrggbbaa"
+color color::parse(const string &s) {
+	color c = Black;
+	if (s.head(1) == "#") {
+	} else {
+		auto xx = s.replace("(", "").replace(")", "").replace(",", "").explode(" ");
+		if (xx.num > 0)
+			c.r = xx[0]._float();
+		if (xx.num > 1)
+			c.g = xx[1]._float();
+		if (xx.num > 2)
+			c.b = xx[2]._float();
+		if (xx.num > 3)
+			c.a = xx[3]._float();
+	}
+	return c;
+}
+
 void color::clamp() {
 	a = clampf(a, 0, 1);
 	r = clampf(r, 0, 1);
@@ -94,4 +122,12 @@ void color::get_int_argb(int *i) const {
 	i[1] = int(r * 255.0f);
 	i[2] = int(g * 255.0f);
 	i[3] = int(b * 255.0f);
+}
+
+bool color::operator ==(const color &c) const {
+	return (r == c.r) and (g == c.g) and (b == c.b) and (a == c.a);
+}
+
+bool color::operator !=(const color &c) const {
+	return !(*this == c);
 }

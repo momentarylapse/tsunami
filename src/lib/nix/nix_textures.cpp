@@ -237,7 +237,7 @@ Texture::Texture() {
 	avi_info = NULL;
 #endif
 	glGenTextures(1, &texture);
-	width = height = 0;
+	width = height = nz = 0;
 
 	textures.add(this);
 }
@@ -258,6 +258,23 @@ Texture::Texture(int w, int h, const string &_format) : Texture() {
 	TestGLError("Texture: parameter");
 }
 
+Texture::Texture(int w, int h, int _nz, const string &_format) : Texture() {
+	msg_write(format("creating texture [%d x %d x %d] ", w, h, _nz) + _format);
+	width = w;
+	height = h;
+	nz = _nz;
+	type = Type::VOLUME;
+
+	glBindTexture(GL_TEXTURE_3D, texture);
+	auto d = parse_format(_format);
+	internal_format = d.internal_format;
+	glTexImage3D(GL_TEXTURE_3D, 0, internal_format, width, height, nz, 0, d.components, d.x, 0);
+	TestGLError("Texture: glTexImage3D");
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	TestGLError("Texture: parameter");
+}
+
 Texture::~Texture() {
 	unload();
 	foreachi(auto t, textures, i)
@@ -269,6 +286,10 @@ Texture::~Texture() {
 
 void Texture::__init__(int w, int h, const string &f) {
 	new(this) Texture(w, h, f);
+}
+
+void Texture::__init3__(int nx, int ny, int nz, const string &f) {
+	new(this) Texture(nx, ny, nz, f);
 }
 
 void Texture::__delete__() {
@@ -425,14 +446,21 @@ void Texture::read_float(Array<float> &data) {
 }
 
 void Texture::write_float(Array<float> &data, int nx, int ny, int nz) {
-	msg_todo("Texture.write_float");
 	SetTexture(this);
-	if ((internal_format == GL_R8) or (internal_format == GL_R32F)) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nx, ny, nz, GL_RGBA, GL_FLOAT, &data[0]);
-		//glSetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, data.data); // 1 channel
+	if (type == Type::VOLUME) {
+		if ((internal_format == GL_R8) or (internal_format == GL_R32F)) {
+			glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, nx, ny, nz, 0, GL_RED, GL_FLOAT, &data[0]);
+		} else {
+			glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, nx, ny, nz, 0, GL_RGBA, GL_FLOAT, &data[0]);
+		}
 	} else {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nx, ny, nz, GL_RGBA, GL_FLOAT, &data[0]);
-		//glSetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, data.data); // 4 channels
+		if ((internal_format == GL_R8) or (internal_format == GL_R32F)) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, nx, ny, 0, GL_RED, GL_FLOAT, &data[0]);
+			//glSetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, data.data); // 1 channel
+		} else {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nx, ny, 0, GL_RGBA, GL_FLOAT, &data[0]);
+			//glSetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, data.data); // 4 channels
+		}
 	}
 }
 
@@ -442,8 +470,7 @@ void Texture::unload() {
 	glDeleteTextures(1, (unsigned int*)&texture);
 }
 
-void SetTexture(Texture *t)
-{
+void SetTexture(Texture *t) {
 	//refresh_texture(t);
 	if (!t)
 		t = default_texture;
@@ -460,28 +487,32 @@ void SetTexture(Texture *t)
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 		glBindImageTexture(0, t->texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, t->internal_format);
 		TestGLError("SetTex b");
+	} else if (t->type == Texture::Type::VOLUME){
+		glBindTexture(GL_TEXTURE_3D, t->texture);
+		TestGLError("SetTex b");
 	} else {
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 		TestGLError("SetTex b");
 	}
 }
 
-void SetTextures(const Array<Texture*> &textures)
-{
+void SetTextures(const Array<Texture*> &textures) {
 	/*for (int i=0;i<num_textures;i++)
 		if (texture[i] >= 0)
 			refresh_texture(texture[i]);*/
 
 	tex_cube_level = -1;
-	for (int i=0; i<textures.num; i++){
-		Texture *t = textures[i];
+	for (int i=0; i<textures.num; i++) {
+		auto t = textures[i];
 		if (!t)
 			t = default_texture;
 		glActiveTexture(GL_TEXTURE0+i);
-		if (t->type == t->Type::CUBE){
+		if (t->type == t->Type::CUBE) {
 			glBindTexture(GL_TEXTURE_CUBE_MAP, t->texture);
 			tex_cube_level = i;
-		}else{
+		} else if (t->type == t->Type::VOLUME) {
+			glBindTexture(GL_TEXTURE_3D, t->texture);
+		} else {
 			glBindTexture(GL_TEXTURE_2D, t->texture);
 		}
 		//TestGLError("SetTex"+i2s(i));
@@ -611,88 +642,6 @@ void CubeMap::overwrite_side(int side, const Image &image) {
 	OverwriteTexture__(this, GL_TEXTURE_CUBE_MAP, NixCubeMapTarget[side], image);
 }
 
-#ifdef NIX_API_DIRECTX9
-void SetCubeMatrix(vector pos,vector ang)
-{
-	// TODO
-	if (NixApi==NIX_API_DIRECTX9){
-		matrix t,r;
-		MatrixTranslation(t,-pos);
-		MatrixRotationView(r,ang);
-		MatrixMultiply(NixViewMatrix,r,t);
-		lpDevice->SetTransform(D3DTS_VIEW,(D3DXMATRIX*)&NixViewMatrix);
-		lpDevice->Clear(0,NULL,D3DCLEAR_ZBUFFER,0,1.0f,0);
-	}
-}
-void Texture::render_to_cube_map(vector &pos,callback_function *render_func,int mask)
-{
-	if (mask<1)	return;
-	// TODO
-	if (NixApi==NIX_API_DIRECTX9){
-		HRESULT hr;
-		matrix vm=NixViewMatrix;
-
-		hr=DXRenderToEnvMap[cube_map]->BeginCube(DXCubeMap[cube_map]);
-		if (hr!=D3D_OK){
-			msg_error(string("DXRenderToEnvMap: ",DXErrorMsg(hr)));
-			return;
-		}
-		D3DXMatrixPerspectiveFovLH((D3DXMATRIX*)&NixProjectionMatrix,pi/2,1,NixMinDepth,NixMaxDepth);
-		lpDevice->SetTransform(D3DTS_PROJECTION,(D3DXMATRIX*)&NixProjectionMatrix);
-		MatrixInverse(NixInvProjectionMatrix,NixProjectionMatrix);
-		NixTargetWidth=NixTargetHeight=CubeMapSize[cube_map];
-		DXViewPort.X=DXViewPort.Y=0;
-		DXViewPort.Width=DXViewPort.Height=CubeMapSize[cube_map];
-		lpDevice->SetViewport(&DXViewPort);
-
-		if (mask&1){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_POSITIVE_X,0);
-			SetCubeMatrix(pos,vector(0,pi/2,0));
-			render_func();
-		}
-		if (mask&2){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_NEGATIVE_X,0);
-			SetCubeMatrix(pos,vector(0,-pi/2,0));
-			render_func();
-		}
-		if (mask&4){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_POSITIVE_Y,0);
-			SetCubeMatrix(pos,vector(-pi/2,0,0));
-			render_func();
-		}
-		if (mask&8){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_NEGATIVE_Y,0);
-			SetCubeMatrix(pos,vector(pi/2,0,0));
-			render_func();
-		}
-		if (mask&16){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_POSITIVE_Z,0);
-			SetCubeMatrix(pos,v0);
-			render_func();
-		}
-		if (mask&32){
-			DXRenderToEnvMap[cube_map]->Face(D3DCUBEMAP_FACE_NEGATIVE_Z,0);
-			SetCubeMatrix(pos,vector(0,pi,0));
-			render_func();
-		}
-		DXRenderToEnvMap[cube_map]->End(0);
-
-		/*lpDevice->BeginScene();
-		SetCubeMatrix(pos,vector(0,pi,0));
-		render_func();
-		//lpDevice->EndScene();
-		End();*/
-
-		NixViewMatrix=vm;
-		NixSetView(true,NixViewMatrix);
-	}
-#ifdef NIX_API_OPENGL
-	if (Api==NIX_API_OPENGL){
-		msg_todo("RenderToCubeMap for OpenGL");
-	}
-#endif
-}
-#endif
 
 };
 #endif

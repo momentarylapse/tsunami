@@ -29,6 +29,7 @@ public:
 	float _cdecl get_float(const string &name, float default_val = 0) const;
 	bool _cdecl get_bool(const string &name, bool default_val = false) const;
 	string _cdecl get_str(const string &name, const string &default_str) const;
+	bool _cdecl has(const string &name) const;
 	bool _cdecl load(const Path &filename);
 	void _cdecl save(const Path &filename);
 

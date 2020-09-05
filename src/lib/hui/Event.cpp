@@ -1,6 +1,8 @@
 #include "hui.h"
 #include "common.h"
 
+// TODO: international key names
+
 namespace hui
 {
 
@@ -399,10 +401,10 @@ string GetKeyName(int k)
 	if (k==KEY_COMMA)		return "Comma";
 	if (k==KEY_DOT)			return "Dot";
 	if (k==KEY_SMALLER)		return "<";
-	if (k==KEY_SZ)			return str_m_to_utf8("&s");
-	if (k==KEY_AE)			return str_m_to_utf8("&A");
-	if (k==KEY_OE)			return str_m_to_utf8("&O");
-	if (k==KEY_UE)			return str_m_to_utf8("&U");
+	if (k==KEY_SZ)			return "ß";
+	if (k==KEY_AE)			return "Ä";
+	if (k==KEY_OE)			return "Ö";
+	if (k==KEY_UE)			return "Ü";
 	if (k==KEY_RWINDOWS)	return "WindowsR";
 	if (k==KEY_LWINDOWS)	return "WindowsL";
 	return "";
@@ -473,9 +475,9 @@ string GetKeyChar(int key_code)
 		if (key==KEY_SUBTRACT)	return "_";
 		if (key==KEY_SMALLER)	return ">";
 		if (key==KEY_SZ)			return "?";
-		if (key==KEY_AE)			return str_m_to_utf8("&A");
-		if (key==KEY_OE)			return str_m_to_utf8("&O");
-		if (key==KEY_UE)			return str_m_to_utf8("&U");
+		if (key==KEY_AE)			return u8"Ä";
+		if (key==KEY_OE)			return u8"Ö";
+		if (key==KEY_UE)			return u8"Ü";
 		if (key==KEY_FENCE)		return "\'";
 		if (key==KEY_GRAVE)		return "°";
 		if (key==KEY_SPACE)		return " ";
@@ -521,10 +523,10 @@ string GetKeyChar(int key_code)
 	if (key==KEY_NUM_MULTIPLY)	return "*";
 	if (key==KEY_NUM_DIVIDE)		return "/";
 	if (key==KEY_SMALLER)		return "<";
-	if (key==KEY_SZ)				return str_m_to_utf8("&s");
-	if (key==KEY_AE)				return str_m_to_utf8("&a");
-	if (key==KEY_OE)				return str_m_to_utf8("&o");
-	if (key==KEY_UE)				return str_m_to_utf8("&u");
+	if (key==KEY_SZ)				return u8"ß";
+	if (key==KEY_AE)				return u8"ä";
+	if (key==KEY_OE)				return u8"ö";
+	if (key==KEY_UE)				return u8"ü";
 	if (key==KEY_SPACE)			return " ";
 	if (key==KEY_TAB)			return "\t";
 	if (key==KEY_RETURN)			return "\n";

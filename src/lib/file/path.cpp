@@ -231,7 +231,7 @@ Path Path::_canonical_remove(int n_remove, bool keep_going, bool make_dir) const
 		return EMPTY; // ERROR
 	if (xx.num == 0 and is_relative())
 		return EMPTY; // ERROR
-	auto pp = Path(str_repeat("../", n_remove) + implode(xx, SEPARATOR));
+	auto pp = Path(string("../").repeat(n_remove) + implode(xx, SEPARATOR));
 	if (make_dir)
 		return pp.as_dir();
 	return pp;

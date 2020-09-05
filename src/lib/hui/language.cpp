@@ -1,10 +1,6 @@
 #include "hui.h"
 #include "internal.h"
 
-#ifdef OS_WINDOWS
-#include <tchar.h>
-#endif
-
 // character set....
 #ifdef OS_WINDOWS
 
@@ -74,53 +70,6 @@
 
 
 
-/*	// Umlaute zu Vokalen mit & davor zerlegen
-	const char *str_ascii2m(const char *str)
-	{
-		unsigned char *us=(unsigned char *)str;
-		char *ss=_file_get_str_();
-
-		int l=0;
-		for (unsigned int i=0;i<strlen(str)+1;i++){
-			ss[l]=str[i];
-			if (us[i]==0xe4){	ss[l]='&';	ss[l+1]='a';	l++;	}
-			if (us[i]==0xf6){	ss[l]='&';	ss[l+1]='o';	l++;	}
-			if (us[i]==0xfc){	ss[l]='&';	ss[l+1]='u';	l++;	}
-			if (us[i]==0xdf){	ss[l]='&';	ss[l+1]='s';	l++;	}
-			if (us[i]==0xc4){	ss[l]='&';	ss[l+1]='A';	l++;	}
-			if (us[i]==0xd6){	ss[l]='&';	ss[l+1]='O';	l++;	}
-			if (us[i]==0xdc){	ss[l]='&';	ss[l+1]='U';	l++;	}
-			if (us[i]=='&'){	ss[l]='&';	ss[l+1]='&';	l++;	}
-			if (us[i]=='\r')	continue;
-			l++;
-		}
-		return ss;
-	}
-
-	const char *str_m2ascii(const char *str)
-	{
-		char *ss=_file_get_str_();
-		unsigned char *us=(unsigned char *)ss;
-
-		int l=0;
-		for (unsigned int i=0;i<strlen(str)+1;i++){
-			ss[l]=str[i];
-			if (str[i]=='&'){
-				if      (str[i+1]=='a'){	us[l]=0xe4;	i++;	}
-				else if (str[i+1]=='o'){	us[l]=0xf6;	i++;	}
-				else if (str[i+1]=='u'){	us[l]=0xfc;	i++;	}
-				else if (str[i+1]=='s'){	us[l]=0xdf;	i++;	}
-				else if (str[i+1]=='A'){	us[l]=0xc4;	i++;	}
-				else if (str[i+1]=='O'){	us[l]=0xd6;	i++;	}
-				else if (str[i+1]=='U'){	us[l]=0xdc;	i++;	}
-				else if (str[i+1]=='&'){	us[l]='&';	i++;	}
-			}
-			l++;
-		}
-		return ss;
-	}*/
-
-
 namespace hui
 {
 
@@ -130,20 +79,18 @@ Array<Language> _languages_;
 Language *cur_lang = nullptr;
 
 
-bool Language::Command::match(const string &_ns, const string &_id)
-{
+bool Language::Command::match(const string &_ns, const string &_id) {
 	if (this->id != _id)
 		return false;
 	return ((this->_namespace == "") or (this->_namespace == _ns));
 }
 
 
-void SetLanguage(const string &language)
-{
+void SetLanguage(const string &language) {
 	cur_lang = nullptr;
 	_using_language_ = false;
 	for (Language &l: _languages_)
-		if (l.name == language){
+		if (l.name == language) {
 			cur_lang = &l;
 			_using_language_ = true;
 		}
@@ -162,8 +109,7 @@ for (auto &c: cur_lang->cmd) \
 	if (c.match(NS, ID)) \
 		return CMD;
 
-string GetLanguage(const string &ns, const string &id)
-{
+string GetLanguage(const string &ns, const string &id) {
 	if ((!_using_language_) or (id.num == 0))
 		return "";
 	for (auto &c: cur_lang->cmd)
@@ -194,8 +140,7 @@ string GetLanguageR(const string &ns, Resource &cmd) {
 }
 
 // tooltip
-string GetLanguageT(const string &ns, const string &id, const string &tooltip)
-{
+string GetLanguageT(const string &ns, const string &id, const string &tooltip) {
 	if (tooltip.num > 0)
 		return tooltip;
 	if ((!_using_language_) or (id.num == 0))
@@ -205,8 +150,7 @@ string GetLanguageT(const string &ns, const string &id, const string &tooltip)
 }
 
 // pre-translated...translations
-string GetLanguageS(const string &str)
-{
+string GetLanguageS(const string &str) {
 	if (!_using_language_)
 		return str;
 	for (Language::Translation &t: cur_lang->trans){
@@ -217,8 +161,7 @@ string GetLanguageS(const string &str)
 }
 
 
-string get_lang(const string &ns, const string &id, const string &text, bool allow_keys)
-{
+string get_lang(const string &ns, const string &id, const string &text, bool allow_keys) {
 	if (text.num > 0)
 		return text;
 	if ((!_using_language_) or (id.num == 0))
@@ -227,18 +170,12 @@ string get_lang(const string &ns, const string &id, const string &text, bool all
 	return text;
 }
 
-#ifdef HUI_API_WIN
-	const TCHAR *get_lang_sys(const string &id, const string &text, bool allow_keys)
-#else
-	const char *get_lang_sys(const string &id, const string &text, bool allow_keys)
-#endif
-{
+const char *get_lang_sys(const string &id, const string &text, bool allow_keys) {
 	return sys_str(get_lang("", id, text, allow_keys));
 }
 
 
-void UpdateAll()
-{
+void UpdateAll() {
 /*	// update windows
 	for (int i=0;i<HuiWindow.num;i++){
 		for (int j=0;j<HuiWindow[i]->Control.num;j++){
@@ -253,16 +190,14 @@ void UpdateAll()
 	}*/
 }
 
-Array<string> GetLanguages()
-{
+Array<string> GetLanguages() {
 	Array<string> n;
 	for (Language &l: _languages_)
 		n.add(l.name);
 	return n;
 }
 
-string GetCurLanguage()
-{
+string GetCurLanguage() {
 	if (cur_lang)
 		return cur_lang->name;
 	return "";

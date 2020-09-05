@@ -41,6 +41,7 @@ class string : public Array<char> {
 	string _cdecl replace(const string &sub, const string &by) const;
 	string _cdecl reverse() const;
 	string _cdecl trim() const;
+	string _cdecl repeat(int n) const;
 	Array<string> _cdecl explode(const string &s) const;
 	string _cdecl lower() const;
 	string _cdecl upper() const;
@@ -66,7 +67,6 @@ class string : public Array<char> {
 
 	// operators
 	void _cdecl operator = (const string &s)
-	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
 	{	simple_assign(&s);	}
 	void _cdecl operator = (string &&s)
 	{	exchange(s);	}
@@ -76,20 +76,7 @@ class string : public Array<char> {
 	{	string r = *this;	r += s;	return r;	}
 	friend string _cdecl operator + (const char *s1, const string &s2)
 	{	return string(s1) + s2;	}
-	bool _cdecl operator == (const string &s) const
-	{
-		if (num != s.num)
-			return false;
-		unsigned char *a = (unsigned char*)data;
-		unsigned char *b = (unsigned char*)s.data;
-		for (int i=0;i<num;i++){
-			if (*a != *b)
-				return false;
-			a ++;
-			b ++;
-		}
-		return true;
-	}
+	bool _cdecl operator == (const string &s) const;
 	bool _cdecl operator != (const string &s) const
 	{	return !(*this == s);	}
 	bool _cdecl operator < (const string &s) const
@@ -158,14 +145,6 @@ string _cdecl h2d(const string &hex_str, int bytes);
 string _cdecl implode(const Array<string> &a, const string &glue);
 string _cdecl utf32_to_utf8(const Array<int> &s);
 
-
-
-string _cdecl str_unescape(const string &str);
-string _cdecl str_escape(const string &str);
-string _cdecl str_repeat(const string &s, int n);
-
-string _cdecl str_m_to_utf8(const string &str);
-string _cdecl str_utf8_to_m(const string &str);
 
 bool _cdecl sa_contains(const Array<string> &a, const string &s);
 

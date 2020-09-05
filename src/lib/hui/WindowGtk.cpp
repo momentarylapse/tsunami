@@ -532,8 +532,12 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 	gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar->widget), type);
 	gtk_info_bar_set_show_close_button(GTK_INFO_BAR(infobar->widget), allow_close);
 
-	gtk_widget_show(infobar->widget);
-	gtk_widget_show(infobar->label);
+	if (sa_contains(options, "clear")) {
+		gtk_widget_hide(infobar->widget);
+	} else {
+		gtk_widget_show(infobar->widget);
+		gtk_widget_show(infobar->label);
+	}
 }
 
 void Window::__set_options(const string &options) {

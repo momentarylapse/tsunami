@@ -2490,7 +2490,7 @@ Path find_import(Script *s, const string &_name) {
 		return (hui::Application::directory_static << "lib" << name.substr(2, -1)).canonical(); // TODO...
 
 	for (int i=0; i<5; i++) {
-		Path filename = import_dir_match((s->filename.parent() << str_repeat("../", i)).canonical(), name);
+		Path filename = import_dir_match((s->filename.parent() << string("../").repeat(i)).canonical(), name);
 		if (!filename.is_empty())
 			return filename;
 	}

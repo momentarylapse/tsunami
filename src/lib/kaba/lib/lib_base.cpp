@@ -37,8 +37,9 @@ extern const Class *TypeStringDict;
 extern const Class *TypeAny;
 
 
+static string kaba_print_postfix = "\n";
 void _cdecl kaba_print(const string &str)
-{	printf("%s\n", str.c_str());	}
+{	printf("%s%s", str.c_str(), kaba_print_postfix.c_str()); fflush(stdout);	}
 void _cdecl kaba_cstringout(char *str)
 {	kaba_print(str);	}
 string _cdecl kaba_binary(const char *p, int length)
@@ -653,7 +654,7 @@ void SIAddPackageBase() {
 			func_add_param("by", TypeString);
 		class_add_funcx("explode", TypeStringList, &string::explode, Flags::PURE);
 			func_add_param("str", TypeString);
-		class_add_funcx("repeat", TypeString, &str_repeat, Flags::PURE);
+		class_add_funcx("repeat", TypeString, &string::repeat, Flags::PURE);
 			func_add_param("n", TypeInt);
 		class_add_funcx("lower", TypeString, &string::lower, Flags::PURE);
 		class_add_funcx("upper", TypeString, &string::upper, Flags::PURE);
@@ -669,8 +670,10 @@ void SIAddPackageBase() {
 		class_add_funcx("__float__", TypeFloat32, &string::_float, Flags::PURE);
 		class_add_funcx("__float64__", TypeFloat64, &string::f64, Flags::PURE);
 		class_add_funcx("trim", TypeString, &string::trim, Flags::PURE);
-		class_add_funcx("escape", TypeString, &str_escape, Flags::PURE);
-		class_add_funcx("unescape", TypeString, &str_unescape, Flags::PURE);
+		class_add_funcx("escape", TypeString, &string::escape, Flags::PURE);
+		class_add_funcx("unescape", TypeString, &string::unescape, Flags::PURE);
+		class_add_funcx("utf8_to_utf32", TypeIntList, &string::utf8_to_utf32, Flags::PURE);
+		class_add_funcx("utf8_length", TypeInt, &string::utf8len, Flags::PURE);
 		class_add_funcx(IDENTIFIER_FUNC_REPR, TypeString, &string::repr, Flags::PURE);
 		class_add_funcx("format", TypeString, &kaba_string_format, Flags::PURE);
 			func_add_param("fmt", TypeString);
@@ -876,6 +879,7 @@ void SIAddPackageBase() {
 		func_add_param("str", TypeCString);*/
 	add_func("print", TypeVoid, (void*)&kaba_print, Flags::STATIC);
 		func_add_param("str", TypeString);
+	add_ext_var("_print_postfix", TypeString, &kaba_print_postfix);
 	add_func("binary", TypeString, (void*)&kaba_binary, Flags::STATIC);
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);

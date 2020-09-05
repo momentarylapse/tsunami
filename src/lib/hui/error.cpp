@@ -22,16 +22,14 @@ namespace hui
 extern Callback _idle_function_, _error_function_;
 extern bool _screen_opened_;
 
-void _HuiSignalHandler(int)
-{
+void _HuiSignalHandler(int) {
 	_error_function_();
 }
 
 // apply a function to be executed when a critical error occures
-void SetErrorFunction(const Callback &function)
-{
+void SetErrorFunction(const Callback &function) {
 	_error_function_ = function;
-	if (function){
+	if (function) {
 		signal(SIGSEGV, &_HuiSignalHandler);
 		/*signal(SIGINT, &_HuiSignalHandler);
 		signal(SIGILL, &_HuiSignalHandler);
@@ -48,8 +46,7 @@ static Callback _eh_cleanup_function_;
 
 #ifdef _X_USE_NET_
 
-class ReportDialog : public Dialog
-{
+class ReportDialog : public Dialog {
 public:
 	ReportDialog(Window *parent) :
 		Dialog(_("Bug Report"), 450, 400, parent, false)
@@ -74,13 +71,12 @@ public:
 		add_def_button(_("Ok"), 1, 0 ,"ok");
 		set_image("ok", "hui:ok");
 
-		event("ok", std::bind(&ReportDialog::onOk, this));
-		event("cancel", std::bind(&ReportDialog::destroy, this));
-		event("hui:close", std::bind(&ReportDialog::destroy, this));
+		event("ok", [=]{ on_ok(); });
+		event("cancel", [=]{ destroy(); });
+		event("hui:close", [=]{ destroy(); });
 	}
 
-	void onOk()
-	{
+	void on_ok() {
 		string sender = get_string("sender");
 		string comment = get_string("comment");
 		string return_msg;
@@ -92,8 +88,7 @@ public:
 	}
 };
 
-void SendBugReport(Window *parent)
-{
+void SendBugReport(Window *parent) {
 	ReportDialog *dlg = new ReportDialog(parent);
 	dlg->run();
 	delete(dlg);
@@ -101,8 +96,7 @@ void SendBugReport(Window *parent)
 
 #endif
 
-class ErrorDialog : public Dialog
-{
+class ErrorDialog : public Dialog {
 public:
 	ErrorDialog() :
 		Dialog(_("Error"), 600, 500, nullptr, false)
@@ -119,7 +113,7 @@ public:
 		set_image("ok", "hui:ok");
 
 	#ifdef _X_USE_NET_
-		event("send_report", std::bind(&ErrorDialog::onSendBugReport, this));
+		event("send_report", std::bind(&ErrorDialog::on_send_bug_report, this));
 	#else
 		enable("send_report", false);
 		set_tooltip("send_report", _("Program was compiled without network support..."));
@@ -129,31 +123,27 @@ public:
 			if (temp.num > 0)
 				add_string("message_list", temp);
 		}
-		event("show_log", std::bind(&ErrorDialog::onShowLog, this));
+		event("show_log", [=]{ on_show_log(); });
 		//event("cancel", std::bind(&ErrorDialog::onClose, this));
-		event("hui:win_close", std::bind(&ErrorDialog::onClose, this));
-		event("ok", std::bind(&ErrorDialog::onClose, this));
+		event("hui:win_close", [=]{ on_close(); });
+		event("ok", [=]{ on_close(); });
 	}
 
-	void onShowLog()
-	{
+	void on_show_log() {
 		OpenDocument("message.txt");
 	}
 
-	void onSendBugReport()
-	{
+	void on_send_bug_report() {
 		SendBugReport(this);
 	}
 
-	void onClose()
-	{
+	void on_close() {
 		msg_write("real close");
 		exit(0);
 	}
 };
 
-void hui_default_error_handler()
-{
+void hui_default_error_handler() {
 	_idle_function_ = nullptr;
 
 	msg_reset_shift();
@@ -171,7 +161,7 @@ void hui_default_error_handler()
 	}
 
 	foreachb(Window *w, _all_windows_)
-		delete(w);
+		delete w;
 	msg_write(_("                  Close dialog box to exit program."));
 
 	//HuiMultiline=true;
@@ -189,14 +179,12 @@ void hui_default_error_handler()
 	exit(0);
 }
 
-void SetDefaultErrorHandler(const Callback &error_cleanup_function)
-{
+void SetDefaultErrorHandler(const Callback &error_cleanup_function) {
 	_eh_cleanup_function_ = error_cleanup_function;
 	SetErrorFunction(&hui_default_error_handler);
 }
 
-void RaiseError(const string &message)
-{
+void RaiseError(const string &message) {
 	msg_error(message + " (HuiRaiseError)");
 	/*int *p_i=NULL;
 	*p_i=4;*/

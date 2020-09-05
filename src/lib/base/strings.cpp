@@ -26,15 +26,17 @@
 	#include <sys/stat.h>
 #endif
 
+string str_unescape(const string &str);
+string str_repeat(const string &s, int n);
+string str_escape(const string &str);
 
 
-string::string()
-{
+
+string::string() {
 	init(sizeof(unsigned char));
 }
 
-string::string(const char *str)
-{
+string::string(const char *str) {
 	init(sizeof(unsigned char));
 	int l = strlen(str);
 	resize(l);
@@ -42,73 +44,76 @@ string::string(const char *str)
 		memcpy(data, str, l);
 }
 
-string::string(const void *str, int l)
-{
+string::string(const void *str, int l) {
 	init(sizeof(unsigned char));
 	resize(l);
 	if (l > 0)
 		memcpy(data, str, l);
 }
 
-string::string(const string &s)
-{
+string::string(const string &s) {
 	init(sizeof(unsigned char));
 	simple_assign(&s);
 }
 
-string::string(string &&s)
-{
+string::string(string &&s) {
 	init(sizeof(unsigned char));
 	exchange(s);
 }
 
-void string::__init__()
-{
+void string::__init__() {
 	new(this) string;
 }
 
-string::~string()
-{
+string::~string() {
 	clear();
 }
 
-string string::substr(int start, int length) const
-{
+bool string::operator == (const string &s) const {
+	if (num != s.num)
+		return false;
+	return compare(s) == 0;
+}
+
+string string::substr(int start, int length) const {
 	string r;
 	if (start >= num)
 		return r;
-	if (start < 0){
+	if (start < 0) {
 		// start from the end
 		start = num + start;
 		if (start < 0)
 			return r;
 	}
-	if (length < 0){
+	if (length < 0) {
 		length = num - start + length + 1;
 	}
 	if (start + length > num)
 		length = num - start;
-	if (length > 0){
+	if (length > 0) {
 		r.resize(length);
 		memcpy(r.data, &((unsigned char*)data)[start], length);
 	}
 	return r;
 }
 
-string string::head(int size) const
-{ size = min(size, num); return substr(0, size); }
+string string::head(int size) const {
+	size = min(size, num);
+	return substr(0, size);
+}
 
-string string::tail(int size) const
-{ size = min(size, num); return substr(num - size, size); }
+string string::tail(int size) const {
+	size = min(size, num);
+	return substr(num - size, size);
+}
 
-int string::find(const string &s, int start) const
-{
+int string::find(const string &s, int start) const {
 	unsigned char *b = (unsigned char*)data;
 	unsigned char *aa = (unsigned char*)s.data;
-	for (int i=start;i<num - s.num + 1;i++){
+	for (int i=start;i<num - s.num + 1;i++) {
 		bool ok = true;
 		for (int j=0;j<s.num;j++)
-			if (b[i + j] != aa[j]){
+			if (b[i + j] != aa[j]) {
 				ok = false;
 				break;
 			}
@@ -118,16 +123,15 @@ int string::find(const string &s, int start) const
 	return -1;
 }
 
-int string::rfind(const string &s, int start) const
-{
+int string::rfind(const string &s, int start) const {
 	unsigned char *b = (unsigned char*)data;
 	unsigned char *aa = (unsigned char*)s.data;
 	if (start < 0)
 		start = num - 1;
-	for (int i=start;i>=0;i--){
+	for (int i=start;i>=0;i--) {
 		bool ok = true;
 		for (int j=0;j<s.num;j++)
-			if (b[i + j] != aa[j]){
+			if (b[i + j] != aa[j]) {
 				ok = false;
 				break;
 			}
@@ -142,8 +146,10 @@ int string::compare(const string &s) const {
 	auto b = (unsigned char*)s.data;
 	int n = min(num, s.num);
 	for (int i=0; i<n; i++) {
-		if (a[i] != b[i])
-			return (int)a[i] - (int)b[i];
+		if (*a != *b)
+			return (int)*a - (int)*b;
+		a ++;
+		b ++;
 	}
 	return num - s.num;
 }
@@ -162,12 +168,11 @@ string string::reverse() const {
 	return r;
 }
 
-Array<string> string::explode(const string &s) const
-{
+Array<string> string::explode(const string &s) const {
 	Array<string> r;
 
 	int pos = 0;
-	while(true){
+	while (true) {
 		int pos2 = find(s, pos);
 		if (pos2 < 0)
 			break;
@@ -182,39 +187,36 @@ Array<string> string::explode(const string &s) const
 }
 
 
-void string::replace0(int start, int length, const string &str)
-{
+void string::replace0(int start, int length, const string &str) {
 	if (start + length > num)
 		return;
 	unsigned char *s = (unsigned char*)data;
 	int d = str.num - length;
-	if (d > 0){
+	if (d > 0) {
 		resize(num + d);
 		s = (unsigned char*)data;
 		for (int i=num-1;i>=start+length;i--)
 			s[i] = s[i - d];
 	}
 	memcpy(&s[start], str.data, str.num);
-	if (d < 0){
+	if (d < 0) {
 		for (int i=start+str.num;i<num+d;i++)
 			s[i] = s[i - d];
 		resize(num + d);
 	}
 }
 
-string string::replace(const string &sub, const string &by) const
-{
+string string::replace(const string &sub, const string &by) const {
 	string r = *this;
 	int i = r.find(sub, 0);
-	while (i >= 0){
+	while (i >= 0) {
 		r.replace0(i, sub.num, by);
 		i = r.find(sub, i + by.num);
 	}
 	return r;
 }
 
-string string::lower() const
-{
+string string::lower() const {
 	string r = *this;
 	for (int i=0;i<r.num;i++)
 		if ((r[i] >= 'A') and (r[i] <= 'Z'))
@@ -222,10 +224,9 @@ string string::lower() const
 	return r;
 }
 
-string string::upper() const
-{
+string string::upper() const {
 	string r = *this;
-	for (int i=0;i<r.num;i++)
+	for (int i=0; i<r.num; i++)
 		if ((r[i] >= 'a') and (r[i] <= 'z'))
 			r[i] += 'A' - 'a';
 	return r;
@@ -239,12 +240,11 @@ static int _current_stack_small_pos_ = 0;
 static char _stack_small_str_[STR_SMALL_STACK_DEPTH][STR_SMALL_SIZE];
 static int _current_stack_large_pos_ = 0;
 static char *_stack_large_str_[STR_LARGE_STACK_DEPTH];
-inline char *get_str(int size)
-{
-	if (size < STR_SMALL_SIZE){
+inline char *get_str(int size) {
+	if (size < STR_SMALL_SIZE) {
 		_current_stack_small_pos_ = (_current_stack_small_pos_ + 1) % STR_SMALL_STACK_DEPTH;
 		return _stack_small_str_[_current_stack_small_pos_];
-	}else{
+	} else {
 		_current_stack_large_pos_ = (_current_stack_large_pos_ + 1) % STR_LARGE_STACK_DEPTH;
 		if (_stack_large_str_[_current_stack_large_pos_])
 			delete[]_stack_large_str_[_current_stack_large_pos_];
@@ -254,9 +254,8 @@ inline char *get_str(int size)
 }
 
 
-const char *string::c_str() const
-{
-	if (allocated > num){
+const char *string::c_str() const {
+	if (allocated > num) {
 		((char*)data)[num] = 0;
 		return (const char*)data;
 	}
@@ -271,10 +270,9 @@ const char *string::c_str() const
 
 
 // convert an integer to a string (with a given number of decimals)
-string i2s2(int i,int l)
-{
+string i2s2(int i, int l) {
 	string r;
-	for (int n=l-1;n>=0;n--){
+	for (int n=l-1; n>=0; n--) {
 		r.add(i%10+48);
 		i /= 10;
 	}
@@ -426,16 +424,14 @@ string f642sf(double f)
 }
 
 // convert a bool to a string
-string b2s(bool b)
-{
+string b2s(bool b) {
 	if (b)
-		return string("true");
-	return string("false");
+		return "true";
+	return "false";
 }
 
 // convert a pointer to a string
-string p2s(const void *p)
-{
+string p2s(const void *p) {
 	char tmp[64];
 	sprintf(tmp, "%p", p);
 	return string(tmp);
@@ -533,10 +529,9 @@ MAKE_ARRAY_STR(fa2s, float, f2sf);
 MAKE_ARRAY_STR(ba2s, bool, b2s);
 MAKE_ARRAY_STR(sa2s, string, str_quote);
 
-string _fa2s(const Array<float> &a)
-{
+string _fa2s(const Array<float> &a) {
 	string s = "[";
-	for (int i=0;i<a.num;i++){
+	for (int i=0; i<a.num; i++) {
 		if (i > 0)
 			s += ", ";
 		s += f2s(a[i], 6);
@@ -858,8 +853,7 @@ static const unsigned int md5_K[64] = {
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-string string::md5() const
-{
+string string::md5() const {
 	unsigned int a0 = 0x67452301;
 	unsigned int b0 = 0xEFCDAB89;
 	unsigned int c0 = 0x98BADCFE;
@@ -867,7 +861,7 @@ string string::md5() const
 	unsigned long long message_length = num * 8;
 	string message = *this;
 	message.add(0x80);
-	while((message.num % 64) != 56)
+	while ((message.num % 64) != 56)
 		message.add(0x00);
 	message += string(&message_length, 8);
 
@@ -875,7 +869,7 @@ string string::md5() const
 	int n = message.num / 64;
 	unsigned int *M = (unsigned int*)&message[0];
 
-	for (int j=0; j<n; j++){
+	for (int j=0; j<n; j++) {
 
 		unsigned int A = a0;
 		unsigned int B = b0;
@@ -883,17 +877,17 @@ string string::md5() const
 		unsigned int D = d0;
 
 		unsigned int F, g;
-		for (int i=0; i<64; i++){
+		for (int i=0; i<64; i++) {
 			if (i < 16){
 	            F = (B & C) | ((~B) & D);
 	            g = i;
-			}else if (i < 32){
+			} else if (i < 32) {
 	            F = (B & D) | (C & (~ D));
 	            g = (5*i + 1) % 16;
-			}else if (i < 48){
+			} else if (i < 48) {
 	            F = B ^ C ^ D;
 	            g = (3*i + 5) % 16;
-			}else{
+			} else {
 	            F = C ^ (B | (~ D));
 	            g = (7*i) % 16;
 			}
@@ -917,8 +911,7 @@ string string::md5() const
 	return out.hex().replace(".", "");
 }
 
-string string::trim() const
-{
+string string::trim() const {
 	int i0 = 0, i1 = num-1;
 	for (i0=0;i0<num;i0++)
 		if (((*this)[i0] != ' ') and ((*this)[i0] != '\t') and ((*this)[i0] != '\n') and ((*this)[i0] != '\r'))
@@ -937,14 +930,17 @@ string string::unescape() const {
 	return str_unescape(*this);
 }
 
+string string::repeat(int n) const {
+	return str_repeat(*this, n);
+}
+
 string string::repr() const {
 	return "\"" + escape() + "\"";
 }
 
-string implode(const Array<string> &a, const string &glue)
-{
+string implode(const Array<string> &a, const string &glue) {
 	string r;
-	for (int i=0;i<a.num;i++){
+	for (int i=0;i<a.num;i++) {
 		if (i > 0)
 			r += glue;
 		r += a[i];
@@ -952,9 +948,8 @@ string implode(const Array<string> &a, const string &glue)
 	return r;
 }
 
-bool string::match(const string &glob) const
-{
-	Array<string> g = glob.explode("*");
+bool string::match(const string &glob) const {
+	auto g = glob.explode("*");
 
 	// no *'s -> direct match
 	if (g.num < 2)
@@ -963,7 +958,7 @@ bool string::match(const string &glob) const
 	if (head(g[0].num) != g[0])
 		return false;
 	int pos = g[0].num;
-	for (int i=1; i<g.num-1; i++){
+	for (int i=1; i<g.num-1; i++) {
 		pos = find(g[i], pos);
 		if (pos < 0)
 			return false;
@@ -983,18 +978,19 @@ string str_repeat(const string &s, int n) {
 	return r;
 }
 
-int string::utf8len() const
-{
+int string::utf8len() const {
 	int l = 0;
-	for (int i=0; i<num; i++)
-		if (((*this)[i] & 0x80) == 0)
+	for (int i=0; i<num; i++) {
+		if (((*this)[i] & 0x80) == 0) // ASCII
 			l ++;
+		else if (((*this)[i] & 0xc0) == 0xc0) // begin multi-byte
+			l ++;
+	}
 	return l;
 }
 
 
-string utf8_char(unsigned int code)
-{
+string utf8_char(unsigned int code) {
 	char r[6] = "";
 	if ((code & 0xffffff80) == 0){ // 7bit
 		return string((char*)&code, 1);
@@ -1031,16 +1027,15 @@ string utf8_char(unsigned int code)
 	}
 }
 
-Array<int> string::utf16_to_utf32() const
-{
+Array<int> string::utf16_to_utf32() const {
 	Array<int> r;
 	bool big_endian = false;
 	unsigned int last = 0;
-	for (int i=0; i<num-1; i+=2){
-		if (((*this)[i] == 0xff) and ((*this)[i+1] == 0xfe)){
+	for (int i=0; i<num-1; i+=2) {
+		if (((*this)[i] == 0xff) and ((*this)[i+1] == 0xfe)) {
 			big_endian = false;
 			continue;
-		}else if (((*this)[i] == 0xfe) and ((*this)[i+1] == 0xff)){
+		}else if (((*this)[i] == 0xfe) and ((*this)[i+1] == 0xff)) {
 			big_endian = true;
 			continue;
 		}
@@ -1058,21 +1053,18 @@ Array<int> string::utf16_to_utf32() const
 	return r;
 }
 
-string string::utf16_to_utf8() const
-{
+string string::utf16_to_utf8() const {
 	return utf32_to_utf8(utf16_to_utf32());
 }
 
-string string::latin_to_utf8() const
-{
+string string::latin_to_utf8() const {
 	string r;
 	for (int i=0; i<num; i++)
 		r += utf8_char((*this)[i]);
 	return r;
 }
 
-string utf32_to_utf8(const Array<int> &s)
-{
+string utf32_to_utf8(const Array<int> &s) {
 	string r;
 	for (int i=0; i<s.num; i++)
 		r += utf8_char(s[i]);
@@ -1080,22 +1072,24 @@ string utf32_to_utf8(const Array<int> &s)
 }
 
 // LAZY... can only convert small code points (13bit)!!!!!
-Array<int> string::utf8_to_utf32() const
-{
+Array<int> string::utf8_to_utf32() const {
 	Array<int> r;
 	for (int i=0; i<num; i++)
-		if ((((unsigned int)(*this)[i] & 0x80) > 0) and (i < (*this).num - 1)){
+		if ((((unsigned int)(*this)[i] & 0xf0) == 0xe0) and (i < (*this).num - 2)) {
+			r.add((((*this)[i] & 0x0f) << 12) + (((*this)[i + 1] & 0x3f) << 6) + ((*this)[i + 2] & 0x3f));
+			i += 2;
+		} else if ((((unsigned int)(*this)[i] & 0xe0) == 0xc0) and (i < (*this).num - 1)) {
 			r.add((((*this)[i] & 0x1f) << 6) + ((*this)[i + 1] & 0x3f));
 			i ++;
-		}else
+		} else {
 			r.add((*this)[i]);
+		}
 	return r;
 }
 
 
 
-string str_unescape(const string &str)
-{
+string str_unescape(const string &str) {
 	string r;
 	for (int i=0;i<str.num;i++){
 		if ((str[i]=='\\')and(str[i+1]=='n')){
@@ -1130,11 +1124,10 @@ string str_unescape(const string &str)
 }
 
 
-string str_escape(const string &str)
-{
+string str_escape(const string &str) {
 	//return str.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\"", "\\\"");
 	string r;
-	for (int i=0;i<str.num;i++){
+	for (int i=0; i<str.num; i++){
 		if (str[i] == '\t')
 			r += "\\t";
 		else if (str[i] == '\n')
@@ -1153,83 +1146,7 @@ string str_escape(const string &str)
 	return r;
 }
 
-string str_m_to_utf8(const string &str)
-{
-	string r;
-	for (int i=0;i<str.num;i++){
-		if ((str[i] == '&') and (i < str.num - 1)){
-			if (str[i+1]=='a'){
-				r.add(0xc3);
-				r.add(0xa4);
-			}else if (str[i+1]=='o'){
-				r.add(0xc3);
-				r.add(0xb6);
-			}else if (str[i+1]=='u'){
-				r.add(0xc3);
-				r.add(0xbc);
-			}else if (str[i+1]=='s'){
-				r.add(0xc3);
-				r.add(0x9f);
-			}else if (str[i+1]=='A'){
-				r.add(0xc3);
-				r.add(0x84);
-			}else if (str[i+1]=='O'){
-				r.add(0xc3);
-				r.add(0x96);
-			}else if (str[i+1]=='U'){
-				r.add(0xc3);
-				r.add(0x9c);
-			}else if (str[i+1]=='&'){
-				r.add('&');
-			}else{
-				r.add(str[i]);
-				i --;
-			}
-			i ++;
-		}else
-			r.add(str[i]);
-	}
-	return r;
-}
-
-// Umlaute zu Vokalen mit & davor zerlegen
-string str_utf8_to_m(const string &str)
-{
-	string r;
-	const unsigned char *us = (const unsigned char*)str.c_str();
-
-	for (int i=0;i<str.num;i++){
-		if ((us[i]==0xc3) and (us[i+1]==0xa4)){
-			r += "&a";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0xb6)){
-			r += "&o";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0xbc)){
-			r += "&u";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0x9f)){
-			r += "&s";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0x84)){
-			r += "&A";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0x96)){
-			r += "&O";
-			i ++;
-		}else if ((us[i]==0xc3) and (us[i+1]==0x9c)){
-			r += "&U";
-			i ++;
-		}else if (us[i]=='&'){
-			r += "&&";
-		}else
-			r.add(str[i]);
-	}
-	return r;
-}
-
-bool sa_contains(const Array<string> &a, const string &s)
-{
+bool sa_contains(const Array<string> &a, const string &s) {
 	for (string &aa: a)
 		if (aa == s)
 			return true;

@@ -45,7 +45,7 @@ string var_to_string(const Kaba::Class *c, char *v) {
 	} else if (c == Kaba::TypeBool) {
 		r += (*(bool*)v) ? "true" : "false";
 	} else if (c == Kaba::TypeString) {
-		r += "\"" + str_escape(*(string*)v) + "\"";
+		r += "\"" + ((string*)v)->escape() + "\"";
 	} else if (c->is_array()) {
 		auto tel = c->get_array_element();
 		r += "[";
@@ -95,7 +95,7 @@ string get_next(const string &var_temp, int &pos) {
 				i ++;
 			} else if (var_temp[i] == '"') {
 				pos = i + 1;
-				return str_unescape(var_temp.substr(start + 1, i - start - 1));
+				return var_temp.substr(start + 1, i - start - 1).unescape();
 			}
 		} else if ((var_temp[i] == ' ') or (var_temp[i] == ']') or (var_temp[i] == ')') or (var_temp[i] == '[') or (var_temp[i] == '(')) {
 			pos = i;

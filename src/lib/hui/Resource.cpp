@@ -108,8 +108,8 @@ void LoadResource(const Path &filename) {
 					c._namespace = ids[0];
 				if (ids.num >= 1)
 					c.id = ids.back();
-				c.text = str_unescape(f->read_str());
-				c.tooltip = str_unescape(f->read_str());
+				c.text = f->read_str().unescape();
+				c.tooltip = f->read_str().unescape();
 				hl.cmd.add(c);
 			}
 			// Num Language Strings
@@ -119,8 +119,8 @@ void LoadResource(const Path &filename) {
 			f->read_comment();
 			for (int i=0;i<n;i++) {
 				Language::Translation s;
-				s.orig = str_unescape(f->read_str());
-				s.trans = str_unescape(f->read_str());
+				s.orig = f->read_str().unescape();
+				s.trans = f->read_str().unescape();
 				hl.trans.add(s);
 			}
 			_languages_.add(hl);
@@ -313,7 +313,7 @@ void res_parse_new(const string &line, Array<string> &tokens) {
 					ss.add(line[j]);
 				} else if ((line[j] == '\"') or (line[j] == '\'')) {
 					i = j;
-					tokens.add(str_unescape(ss));
+					tokens.add(ss.unescape());
 					//temp += str_unescape(ss);
 					break;
 				} else
@@ -444,11 +444,11 @@ string Resource::to_string(int indent) {
 		ind += "\t";
 	string nn = ind + type;
 	if (type != "Separator")
-		nn += " " + id + " \"" + str_escape(title) + "\"";
+		nn += " " + id + " \"" + title.escape() + "\"";
 	for (string &o: options)
 		nn += " " + o;
 	if (tooltip.num > 0)
-		nn += " \"tooltip=" + str_escape(tooltip) + "\"";
+		nn += " \"tooltip=" + tooltip.escape() + "\"";
 	if (type == "Grid") {
 		int ymax = 0;
 		for (auto &c: children)

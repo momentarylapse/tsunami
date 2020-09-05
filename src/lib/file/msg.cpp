@@ -103,7 +103,7 @@ void msg_write(int i) {
 void msg_write(const string &str) {
 	if (!Verbose)
 		return;
-	string s = str_repeat("\t", Shift) + str;
+	string s = string("\t").repeat(Shift) + str;
 	msg_add_str(s.replace("\t", "    "));
 	if (file)
 		file->write_str(s);

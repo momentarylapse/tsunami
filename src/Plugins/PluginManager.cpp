@@ -726,7 +726,6 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 	Path dir = _dir;
 	if (group.num > 0)
 		dir <<= group;
-	msg_write(dir.str());
 	auto list = dir_search(dir, "*.kaba", false);
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;

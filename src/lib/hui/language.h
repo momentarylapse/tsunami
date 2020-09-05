@@ -36,21 +36,14 @@
 	extern string de_sys_str(const char *str);
 	extern Path de_sys_str_f(const char *str);
 #endif
-	/*extern const char *str_ascii2m(const char *str);
-	extern const char *str_m2ascii(const char *str);*/
 
 
 
-namespace hui
-{
+namespace hui {
 
 
-extern string get_lang(const string &ns,const string &id,const string &text,bool allow_keys=false);
-#ifdef HUI_API_WIN
-	extern const TCHAR *get_lang_sys(const string &id,const string &text,bool allow_keys=false);
-#else
-	extern const char *get_lang_sys(const string &id,const string &text,bool allow_keys=false);
-#endif
+extern string get_lang(const string &ns, const string &id, const string &text, bool allow_keys=false);
+extern const char *get_lang_sys(const string &id, const string &text, bool allow_keys=false);
 
 class Resource;
 
@@ -66,21 +59,18 @@ string _cdecl GetLanguageR(const string &ns, Resource &cmd);
 string _cdecl GetLanguageT(const string &ns, const string &id, const string &tooltip);
 string _cdecl GetLanguageS(const string &str);
 #define L(ns, id)	hui::GetLanguage(ns, id)
-#define _(str)	hui::GetLanguageS(str_m_to_utf8(str))
+#define _(str)	hui::GetLanguageS(str)
 void _cdecl UpdateAll();
 
 // internal
 
-struct Language
-{
-	struct Translation
-	{
+struct Language {
+	struct Translation {
 		string orig;
 		string trans; // pre defined translation of orig
 	};
 
-	struct Command
-	{
+	struct Command {
 		string _namespace, id, text, tooltip;
 		bool match(const string &_ns, const string &id);
 	};

@@ -285,19 +285,19 @@ string i2s(int i)
 	string r;	
 	int l=0;
 	bool m=false;
-	if (i<0){
+	if (i<0) {
 		i=-i;
 		m=true;
 	}
 	char a[128];
-	while (1){
+	while (1) {
 		a[l]=(i%10)+48;
 		l++;
 		i=(int)(i/10);
 		if (i==0)
 			break;
 	}
-	if (m){
+	if (m) {
 		a[l]='-';
 		l++;
 	}
@@ -312,19 +312,19 @@ string i642s(long long i)
 	string r;
 	int l=0;
 	bool m=false;
-	if (i<0){
+	if (i<0) {
 		i=-i;
 		m=true;
 	}
 	char a[128];
-	while (1){
+	while (1) {
 		a[l]=(i%10)+48;
 		l++;
 		i=(long long)(i/10);
 		if (i==0)
 			break;
 	}
-	if (m){
+	if (m) {
 		a[l]='-';
 		l++;
 	}
@@ -337,12 +337,12 @@ string i642s(long long i)
 // convert a float to a string
 string f2s(float f, int dez) {
 	/*strcpy(str,"");
-	if (f<0){
+	if (f<0) {
 		strcat(str,"-");
 		f=-f;
 	}
 	strcat(str,i2s(int(f)));
-	if (dez>0){
+	if (dez>0) {
 		strcat(str,",");
 		int e=1;
 		for (int i=0;i<dez;i++)
@@ -374,12 +374,12 @@ string f2s_clean(float f, int dez) {
 string f642s(double f,int dez)
 {
 	/*strcpy(str,"");
-	if (f<0){
+	if (f<0) {
 		strcat(str,"-");
 		f=-f;
 	}
 	strcat(str,i2s(int(f)));
-	if (dez>0){
+	if (dez>0) {
 		strcat(str,",");
 		int e=1;
 		for (int i=0;i<dez;i++)
@@ -452,7 +452,7 @@ string _str_hex_(const string &s, bool inverted) {
 	//if (inverted)
 	//	str = "0x";
 	unsigned char *c_data = (unsigned char *)s.data;
-	for (int i=0;i<s.num;i++){
+	for (int i=0;i<s.num;i++) {
 		int dd;
 		if (inverted)
 			dd = c_data[s.num - i - 1];
@@ -484,7 +484,7 @@ inline int hex_nibble_to_value(char c) {
 
 string string::unhex() const {
 	string r;
-	for (int i=0; i<num;i++){
+	for (int i=0; i<num;i++) {
 		if ((*this)[i] == '.')
 			continue;
 		int v1 = hex_nibble_to_value((*this)[i]);
@@ -725,7 +725,7 @@ int string::_int() const
 {
 	bool minus = false;
 	int res = 0;
-	for (int i=0; i<num; i++){
+	for (int i=0; i<num; i++) {
 		char c = (*this)[i];
 		if ((c == '-') and (i == 0))
 			minus = true;
@@ -741,7 +741,7 @@ long long string::i64() const
 {
 	bool minus = false;
 	long long res = 0;
-	for (int i=0; i<num; i++){
+	for (int i=0; i<num; i++) {
 		char c = (*this)[i];
 		if ((c == '-') and (i == 0))
 			minus = true;
@@ -768,20 +768,20 @@ double string::f64() const
 	bool minus = false;
 	int e = -1;
 	double res = 0;
-	for (int i=0; i<num; i++){
+	for (int i=0; i<num; i++) {
 		if (e > 0)
 			e *= 10;
 		char c = (*this)[i];
-		if ((c =='-') and (i == 0)){
+		if ((c =='-') and (i == 0)) {
 			minus = true;
-		}else if ((c == ',') or (c == '.')){
+		} else if ((c == ',') or (c == '.')) {
 			e = 1;
-		}else if ((c >= '0') and (c <= '9')){
+		} else if ((c >= '0') and (c <= '9')) {
 			if (e < 0)
 				res = res * 10 + (c-48);
 			else
 				res += float(c-48) / (float)e;
-		}else if ((c == 'e') or (c == 'E')){
+		} else if ((c == 'e') or (c == 'E')) {
 			int ex = substr(i+1, -1)._int();
 			res *= pow(10.0, ex);
 			break;
@@ -812,7 +812,7 @@ int string::hash() const
 	int id = 0;
 	int n = num / 4;
 	int *str_i = (int*)data;
-	for (int i=0;i<n;i++){
+	for (int i=0;i<n;i++) {
 		int t = str_i[i];
 		id = id ^ t;
 	}
@@ -878,7 +878,7 @@ string string::md5() const {
 
 		unsigned int F, g;
 		for (int i=0; i<64; i++) {
-			if (i < 16){
+			if (i < 16) {
 	            F = (B & C) | ((~B) & D);
 	            g = i;
 			} else if (i < 32) {
@@ -992,31 +992,31 @@ int string::utf8len() const {
 
 string utf8_char(unsigned int code) {
 	char r[6] = "";
-	if ((code & 0xffffff80) == 0){ // 7bit
+	if ((code & 0xffffff80) == 0) { // 7bit
 		return string((char*)&code, 1);
-	}else if ((code & 0xfffff800) == 0){ // 11bit
+	} else if ((code & 0xfffff800) == 0) { // 11bit
 		r[1] = (code & 0x003f) | 0x80;        // 00-05
 		r[0] = ((code & 0x07c0) >> 6) | 0xc0; // 06-10
 		return string(r, 2);
-	}else if ((code & 0xffff0000) == 0){ // 16bit
+	} else if ((code & 0xffff0000) == 0) { // 16bit
 		r[2] = (code & 0x003f) | 0x80;         // 00-05
 		r[1] = ((code & 0x0fc0) >> 6) | 0x80;  // 06-11
 		r[0] = ((code & 0xf000) >> 12) | 0xe0; // 12-15
 		return string(r, 3);
-	}else if ((code & 0xffe00000) == 0){ // 21bit
+	} else if ((code & 0xffe00000) == 0) { // 21bit
 		r[3] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[2] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
 		r[1] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
 		r[0] = ((code & 0x001c0000) >> 18) | 0xf0; // 18-20
 		return string(r, 4);
-	}else if ((code & 0xffe00000) == 0){ // 26bit
+	} else if ((code & 0xffe00000) == 0) { // 26bit
 		r[4] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[3] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
 		r[2] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
 		r[1] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
 		r[1] = ((code & 0x03000000) >> 24) | 0xf4; // 24-25
 		return string(r, 5);
-	}else{ // 31bit
+	} else { // 31bit
 		r[5] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[4] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
 		r[3] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
@@ -1035,7 +1035,7 @@ Array<int> string::utf16_to_utf32() const {
 		if (((*this)[i] == 0xff) and ((*this)[i+1] == 0xfe)) {
 			big_endian = false;
 			continue;
-		}else if (((*this)[i] == 0xfe) and ((*this)[i+1] == 0xff)) {
+		} else if (((*this)[i] == 0xfe) and ((*this)[i+1] == 0xff)) {
 			big_endian = true;
 			continue;
 		}
@@ -1091,32 +1091,40 @@ Array<int> string::utf8_to_utf32() const {
 
 string str_unescape(const string &str) {
 	string r;
-	for (int i=0;i<str.num;i++){
-		if ((str[i]=='\\')and(str[i+1]=='n')){
-			r += "\n";
-			i ++;
-		}else if ((str[i]=='\\')and(str[i+1]=='r')){
-			r += "\r";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='0')){
-			r += "\0";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='\\')){
-			r += "\\";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='?')){
-			r += "?";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='t')){
-			r += "\t";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='"')){
-			r += "\"";
-			i++;
-		}else if ((str[i]=='\\')and(str[i+1]=='\'')){
-			r += "'";
-			i++;
-		}else{
+	for (int i=0;i<str.num;i++) {
+		if ((str[i] == '\\') and (i < str.num-1)) {
+			if (str[i+1] == 'n') {
+				r.add('\n');
+				i ++;
+			} else if (str[i+1] == 'r') {
+				r.add('\r');
+				i ++;
+			} else if (str[i+1] == '0') {
+				r.add(0);
+				i ++;
+			} else if (str[i+1] == '\\') {
+				r.add('\\');
+				i ++;
+			} else if (str[i+1] == '?') {
+				r.add('?');
+				i ++;
+			} else if (str[i+1] == 't') {
+				r.add('\t');
+				i ++;
+			} else if (str[i+1] == '"') {
+				r.add('"');
+				i ++;
+			} else if (str[i+1] == '\'') {
+				r.add('\'');
+				i ++;
+			} else if ((str[i+1] == 'x') and (i < str.num-3)) {
+				r.add(hex_nibble_to_value(str[i+2]) * 16 + hex_nibble_to_value(str[i+3]));
+				i += 3;
+			} else {
+				// error
+				r.add(str[i]);
+			}
+		} else {
 			r.add(str[i]);
 		}
 	}
@@ -1127,7 +1135,7 @@ string str_unescape(const string &str) {
 string str_escape(const string &str) {
 	//return str.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\"", "\\\"");
 	string r;
-	for (int i=0; i<str.num; i++){
+	for (int i=0; i<str.num; i++) {
 		if (str[i] == '\t')
 			r += "\\t";
 		else if (str[i] == '\n')
@@ -1167,15 +1175,15 @@ int regex_match(char *rex,char *str,int max_matches)
 
 	int n_matches=0;
 
-	for (int i=0;i<ss;i++){
+	for (int i=0;i<ss;i++) {
 		bool match=true;
-		for (int j=0;j<rs;j++){
+		for (int j=0;j<rs;j++) {
 			if (i+j>=ss)
 				match=false;
 			else if (str[i+j]!=rex[j])
 				match=false;
 		}
-		if (match){
+		if (match) {
 			regex_out_pos[n_matches]=i;
 			regex_out_length[n_matches]=rs;
 			regex_out_match[n_matches]=&str[i];

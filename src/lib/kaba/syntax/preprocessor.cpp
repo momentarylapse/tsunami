@@ -167,6 +167,9 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			if (ptype[0] == TypeInt) {
 				call1<int,int>(ff, ret, param);
 				return true;
+			} else if (ptype[0] == TypeChar) {
+				call1<int,char>(ff, ret, param);
+				return true;
 			} else if (ptype[0] == TypeFloat32) {
 				call1<int,float>(ff, ret, param);
 				return true;
@@ -174,15 +177,15 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				call1<int,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (f->return_type == TypeBool) {
+		} else if (f->return_type == TypeBool or f->return_type == TypeChar) {
 			if (ptype[0] == TypeInt) {
-				call1<bool,int>(ff, ret, param);
+				call1<char,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
-				call1<bool,float>(ff, ret, param);
+				call1<char,float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
-				call1<bool,CBR>(ff, ret, param);
+				call1<char,CBR>(ff, ret, param);
 				return true;
 			}
 		} else if (f->return_type == TypeFloat32) {

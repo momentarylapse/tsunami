@@ -2820,11 +2820,18 @@ void Parser::parse_named_const(const string &name, const Class *type, Class *nam
 
 	// find const value
 	Node *cv = parse_operand_super_greedy(block);
+
+	int pen, tc;
+	if (type_match_with_cast(cv, false, type, pen, tc))
+		cv = apply_type_cast(tc, cv, type);
 	cv = force_concrete_type(cv);
+
 	cv = tree->transform_node(cv, [&](Node *n) { return tree->conv_eval_const_func(n); });
 
-	if ((cv->kind != NodeKind::CONSTANT) or (cv->type != type))
-		do_error(format("only constants of type '%s' allowed as value for this constant", type->long_name()));
+	if (cv->kind != NodeKind::CONSTANT)
+		do_error("constant value expected");
+	if (cv->type != type)
+		do_error(format("constant value of type '%s' expected", type->long_name()));
 	Constant *c_value = cv->as_const();
 
 	auto *c = tree->add_constant(type, name_space);

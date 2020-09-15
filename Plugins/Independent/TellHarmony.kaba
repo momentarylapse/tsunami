@@ -1,0 +1,77 @@
+use tsunami
+use helper.tone
+use hui
+
+int next_ending(MidiNote*[] notes)
+	int e = notes[0].range.end()
+	let next = 0
+	for n,i in notes
+		if n.range.end() < e
+			next = i
+			e = n.range.end()
+	return next
+
+class Harmony
+	MidiNote*[] notes
+	Range range
+	Chord chord
+	int[] pp
+	void calc()
+		pp = [for n in notes int(n.pitch) % 12]
+		chord = Chord.guess(pp)
+
+		
+
+void track_harmony_step(int pos0, int pos1, out Harmony[] r, out MidiNote*[] active)
+	if pos1 < pos0 + 200
+		return
+	int p = pos0
+	while len(active) > 0
+		let ni = next_ending(active)
+		let n = active[ni]
+		let end = min(n.range.end(), pos1)
+		Harmony h
+		h.notes = active
+		h.range = RangeTo(p, end)
+		if p + 200 < end
+			r.add(h)
+		active.remove(ni)
+		p = end
+		if p + 200 > pos1
+			break
+		
+
+Harmony[] track_harmony(MidiNote*[] midi)
+	Harmony[] r
+	if len(midi) == 0
+		return r
+	
+	MidiNote*[] active
+	int pos = midi[0].range.offset
+	for n in midi
+		track_harmony_step(pos, n.range.offset, r, active)
+		active.add(n)
+		pos = n.range.offset
+	track_harmony_step(pos, midi[len(midi)-1].range.end(), r, active)
+	return r
+
+class TellHarmony extends TsunamiPlugin
+	override void on_draw_post(Painter p)
+		let v = session.view.cur_vlayer()
+		
+	#	let midi = v.layer.midi.get_notes(session.view.cam.range())
+	#	int n = len(v.layer.midi.get_notes(session.view.cam.range()))
+		
+#		p.set_color(color.RED)
+		let harm = track_harmony(v.layer.midi)#midi)
+		for h,i in harm
+			h.calc()
+			let c = MidiPainter.pitch_color(h.chord.base_tone)
+			c.a = 0.15
+			p.set_color(c)
+			float x1 = session.view.cam.sample2screen(h.range.offset)
+			float x2 = session.view.cam.sample2screen(h.range.end())
+			p.draw_rect(rect(x1, x2, v.area.y1, v.area.y2))
+			p.set_color(colors.text)
+			p.draw_str(x1, v.area.y1, "{{h.chord.name()}}")
+			p.draw_str(x1, v.area.y1+30, [for _p in h.pp rel_pitch_name(_p)].join(" "))

@@ -6,7 +6,7 @@ class SNRPanel extends ConfigPanel
 	override SupernovaRhythm* c
 	MidiPainter* mp
 	GridPainter* gp
-	ViewPort* cam
+	AudioView.ViewPort* cam
 	
 	override void __init__(Module _c)
 		from_source("
@@ -16,7 +16,7 @@ Grid ? ''
 	Button button 'X'")
 		c.panel = &self
 	
-		cam = new ViewPort(nil)
+		cam = new AudioView.ViewPort(nil)
 		mp = new MidiPainter(c.session.song, cam, nil, nil, colors)
 		gp = new GridPainter(c.session.song, cam, nil, nil, colors)
 	

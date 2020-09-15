@@ -523,24 +523,36 @@ class ColorScheme
 	color blob_bg_hidden
 	extern const color hoverify(color c)
 
-class ViewPort
-	extern void __init__(AudioView* view)
-	extern const Range range()
-	extern void set_range(Range r)
-	rect area
-	
+class SceneGraph
+	class Node
+		rect area
 
 class AudioView extends Object
+	class ViewPort
+		extern void __init__(AudioView* view)
+		extern const Range range()
+		extern void set_range(Range r)
+		extern float64 sample2screen64(float64 s)
+		extern float sample2screen(float s)
+		extern float64 screen2sample64(float64 s)
+		extern float screen2sample(float s)
+		rect area
+	
+	class Layer extends SceneGraph.Node
+		TrackLayer* layer
+		
 	SongSelection sel
 	SongRenderer* renderer
 	SignalChain* signal_chain
 	AudioOutput* output_stream
-	ViewPort* cam
+	ViewPort cam
 	extern void subscribe(Object handler, Function f, string message)
 	extern void unsubscribe(Object handler)
 	extern void play()
 	extern void set_playback_loop(bool loop)
 	extern void optimize_view()
+	extern Layer* cur_vlayer()
+	extern void* cur_vtrack()
 
 class SongRenderer extends AudioSource
 	extern void __init__(Song s)
@@ -643,6 +655,7 @@ class TsunamiPlugin extends Module
 	extern override void __delete__()
 	extern virtual void on_start()
 	extern virtual void on_stop()
+	extern virtual void on_draw_post(Painter p)
 	extern void stop()
 	string[] args
 
@@ -683,18 +696,19 @@ class HoverData
 
 class MidiPainter
 	#extern void __init__(AudioView* view)
-	extern void __init__(Song song, ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
 	extern void set_context(rect area, Instrument i, bool playable, int mode)
 	extern void draw(Painter p, MidiNoteBuffer midi)
 	extern void draw_background(Painter c)
-	ViewPort* cam
+	extern static color pitch_color(int p)
+	AudioView.ViewPort* cam
 
 class GridColors
 	color bg, bg_sel
 	color fg, fg_sel
 
 class GridPainter
-	extern void __init__(Song song, ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
 	extern void set_context(rect area, GridColors col)
 	extern void draw_empty_background(Painter p)
 	extern void draw_bars(Painter p, int partition)

@@ -10,6 +10,8 @@
 
 #include "../Module/Module.h"
 
+class Painter;
+
 class TsunamiPlugin : public Module {
 public:
 	TsunamiPlugin();
@@ -20,8 +22,9 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	virtual void _cdecl on_start(){};
-	virtual void _cdecl on_stop(){};
+	virtual void _cdecl on_start() {};
+	virtual void _cdecl on_stop() {};
+	virtual void _cdecl on_draw_post(Painter *p) {};
 
 	void _cdecl stop_request();
 

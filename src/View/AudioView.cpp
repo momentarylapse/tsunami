@@ -41,6 +41,7 @@
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Audio/PeakMeter.h"
 #include "../Module/SignalChain.h"
+#include "../Plugins/TsunamiPlugin.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
@@ -1191,6 +1192,8 @@ void AudioView::draw_song(Painter *c) {
 		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
 
 	mode->draw_post(c);
+	for (auto *plugin: session->plugins)
+		plugin->on_draw_post(c);
 
 	// tool tip?
 	string tip;

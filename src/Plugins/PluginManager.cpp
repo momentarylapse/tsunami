@@ -53,6 +53,8 @@
 #include "../View/Dialog/ModuleSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
+#include "../View/Node/ViewNode.h"
+#include "../View/Node/AudioViewLayer.h"
 #include "../View/Painter/MidiPainter.h"
 #include "../View/Painter/GridPainter.h"
 #include "Plugin.h"
@@ -610,12 +612,24 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("AudioView.play", &AudioView::play);
 	Kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
 	Kaba::link_external_class_func("AudioView.optimize_view", &AudioView::optimize_view);
+	Kaba::link_external_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
+	Kaba::link_external_class_func("AudioView.cur_vtrack", &AudioView::cur_vtrack);
 
-	Kaba::declare_class_size("ViewPort", sizeof(ViewPort));
-	Kaba::declare_class_element("ViewPort.area", &ViewPort::area);
-	Kaba::link_external_class_func("ViewPort.__init__", &ViewPort::__init__);
-	Kaba::link_external_class_func("ViewPort.range", &ViewPort::range);
-	Kaba::link_external_class_func("ViewPort.set_range", &ViewPort::set_range);
+	Kaba::declare_class_size("SceneGraph.Node", sizeof(ViewNode));
+	Kaba::declare_class_element("SceneGraph.Node.area", &ViewNode::area);
+
+	Kaba::declare_class_size("AudioView.Layer", sizeof(AudioViewLayer));
+	Kaba::declare_class_element("AudioView.Layer.layer", &AudioViewLayer::layer);
+
+	Kaba::declare_class_size("AudioView.ViewPort", sizeof(ViewPort));
+	Kaba::declare_class_element("AudioView.ViewPort.area", &ViewPort::area);
+	Kaba::link_external_class_func("AudioView.ViewPort.__init__", &ViewPort::__init__);
+	Kaba::link_external_class_func("AudioView.ViewPort.range", &ViewPort::range);
+	Kaba::link_external_class_func("AudioView.ViewPort.set_range", &ViewPort::set_range);
+	Kaba::link_external_class_func("AudioView.ViewPort.sample2screen64", &ViewPort::sample2screen);
+	Kaba::link_external_class_func("AudioView.ViewPort.screen2sample64", &ViewPort::screen2sample);
+	Kaba::link_external_class_func("AudioView.ViewPort.sample2screen", &ViewPort::sample2screen_f);
+	Kaba::link_external_class_func("AudioView.ViewPort.screen2sample", &ViewPort::screen2sample_f);
 
 	Kaba::declare_class_size("ColorScheme", sizeof(ColorScheme));
 	Kaba::declare_class_element("ColorScheme.background", &ColorScheme::background);
@@ -656,6 +670,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("MidiPainter.set_context", &MidiPainter::set_context);
 	Kaba::link_external_class_func("MidiPainter.draw", &MidiPainter::draw);
 	Kaba::link_external_class_func("MidiPainter.draw_background", &MidiPainter::draw_background);
+	Kaba::link_external_class_func("MidiPainter.pitch_color", &MidiPainter::pitch_color);
 
 
 	Kaba::declare_class_size("GridPainter", sizeof(GridPainter));
@@ -690,6 +705,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_virtual("TsunamiPlugin.__delete__", &TsunamiPlugin::__delete__, &tsunami_plugin);
 	Kaba::link_external_virtual("TsunamiPlugin.on_start", &TsunamiPlugin::on_start, &tsunami_plugin);
 	Kaba::link_external_virtual("TsunamiPlugin.on_stop", &TsunamiPlugin::on_stop, &tsunami_plugin);
+	Kaba::link_external_virtual("TsunamiPlugin.on_draw_post", &TsunamiPlugin::on_draw_post, &tsunami_plugin);
 	Kaba::link_external_class_func("TsunamiPlugin.stop", &TsunamiPlugin::stop_request);
 
 	Progress *prog = new Progress("", nullptr);

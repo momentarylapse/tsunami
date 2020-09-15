@@ -45,6 +45,14 @@ double ViewPort::dscreen2sample(double dx) {
 	return dx / scale;
 }
 
+float ViewPort::screen2sample_f(float _x) {
+	return screen2sample(_x);
+}
+
+float ViewPort::sample2screen_f(float _x) {
+	return sample2screen(_x);
+}
+
 
 void ViewPort::range2screen(const Range &r, float &x1, float &x2) {
 	x1 = sample2screen((double)r.start());

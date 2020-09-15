@@ -67,52 +67,102 @@ string pitch_name(int pitch)
 	string name_oct = pitch_get_octave(pitch)
 	return name_rel + name_oct
 
-enum
-	CHORD_MAJOR
-	CHORD_MINOR
-	CHORD_DIMINISHED
 
 string chord_type_name(int t)
-	if t == CHORD_MAJOR
+	if t == Chord.MAJOR
 		return "maj"
-	if t == CHORD_MINOR
+	if t == Chord.MINOR
 		return "min"
-	if t == CHORD_DIMINISHED
+	if t == Chord.DIMINISHED
 		return "dim"
+	if t == Chord.AUGMENTED
+		return "aug"
+	if t == Chord.SINGLE_TONE
+		return ""
+	if t > Chord.SINGLE_TONE and t < Chord.SINGLE_TONE + 7
+		return " +{{t - Chord.SINGLE_TONE}}"
 	return "???"
 
 class Chord
+	enum
+		MAJOR
+		MINOR
+		DIMINISHED
+		AUGMENTED
+		
+		SINGLE_TONE
+		NUM_TYPES = 11
 	int base_tone
 	int type
 	int[] pitch()
-		if type == CHORD_MAJOR
+		if type == MAJOR
 			return [base_tone, base_tone + 4, base_tone + 7]
-		if type == CHORD_MINOR
+		if type == MINOR
 			return [base_tone, base_tone + 3, base_tone + 7]
-		if type == CHORD_DIMINISHED
+		if type == DIMINISHED
 			return [base_tone, base_tone + 3, base_tone + 6]
+		if type == AUGMENTED
+			return [base_tone, base_tone + 4, base_tone + 8]
+		if type == SINGLE_TONE
+			return [base_tone]
+		if type > SINGLE_TONE
+			return [base_tone, base_tone + (type - SINGLE_TONE)]
 		return []
 	string name()
+		if type < 0
+			return "???"
 		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + chord_type_name(type)
 
-Chord[]  ParseChords(string str)
-	Chord[] chords
-	for a,i in str
+	static Chord[] parse(string str)
+		Chord[] chords
+		for a,i in str
+			Chord c
+			if a >= 'a' and a <= 'h'
+				c.type = MINOR
+				c.base_tone = char_to_rel_pitch(a) + 48
+			else if a >= 'A' and a <= 'H'
+				c.type = MAJOR
+				c.base_tone = char_to_rel_pitch(a + 32) + 48
+			else
+				continue
+			if i < len(str) - 1
+				if str[i + 1] == '#'
+					c.base_tone ++
+					i ++
+			chords.add(c)
+		return chords
+	
+	const bool match_pitch(int[] _pitches)
+		let pp = pitch()
+		for _p in _pitches
+			bool found = false
+			for p in pp
+				if (p - _p) % 12 == 0
+					found = true
+			if not found
+				return false
+		return true
+		
+
+
+	static Chord guess(int[] pitches)
+		int sig = pitch_signature(pitches)
 		Chord c
-		if a >= 'a' and a <= 'h'
-			c.type = CHORD_MINOR
-			c.base_tone = char_to_rel_pitch(a) + 48
-		else if a >= 'A' and a <= 'H'
-			c.type = CHORD_MAJOR
-			c.base_tone = char_to_rel_pitch(a + 32) + 48
-		else
-			continue
-		if i < len(str) - 1
-			if str[i + 1] == '#'
-				c.base_tone ++
-				i ++
-		chords.add(c)
-	return chords
+		for b in 0:12
+			for t in 0:NUM_TYPES
+				c.base_tone = b
+				c.type = t
+				int s = pitch_signature(c.pitch())
+				if s == sig #c.match_pitch(pitches)
+					return c
+		c.type = -1
+		return c
+
+int pitch_signature(int[] pitches)
+	int s = 0
+	for p in pitches
+		s = s | (1 << (p % 12))
+	return s
 
 #void AddSimpleTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
 #	float f_w = 1.0 / sample_rate * f * 2.0 * pi

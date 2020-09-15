@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-67
+68
 # Resource
 Menu
 menu_fake
@@ -3066,6 +3066,43 @@ ok
 default,image=hui:ok
 0
 1
+0
+# Resource
+Dialog
+plugin-console
+width=300,height=200
+0
+0
+1
+Grid
+main-grid
+expany
+0
+0
+3
+Scroller
+scroller
+
+0
+0
+1
+Grid
+panel-grid
+
+0
+0
+0
+Label
+no-plugins-label
+angle=90,bold,width=60,expandy
+1
+0
+0
+Button
+add
+expandy,noexpandx,image=hui:add
+2
+0
 0
 # Resource
 Menu
@@ -7159,7 +7196,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-603
+606
 # Text
 /bars-add
 Add bars...
@@ -8286,6 +8323,15 @@ Move data accordingly
 pause_edit_dialog/t_duration
 Duration
 
+plugin-console/add
+
+add plugin
+plugin-console/no-plugins-label
+no plugins yet
+
+plugin-console/plugin-console
+Plugins
+
 popup-menu-bar-gap/header
 Bar gap
 
@@ -8801,13 +8847,13 @@ Tags
 
 song_dialog/compress
 Compression
-When saving. EXPERIMENTAL! (don\\'t use!)
+When saving. EXPERIMENTAL! (don't use!)
 song_dialog/end
 
 Position of the last audio chunk/midi note
 song_dialog/format
 
-When saving. EXPERIMENTAL! (probably don\\'t change!)
+When saving. EXPERIMENTAL! (probably don't change!)
 song_dialog/grp-format
 Format
 

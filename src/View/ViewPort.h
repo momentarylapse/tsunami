@@ -42,6 +42,8 @@ public:
 	double sample2screen(double s);
 	double dsample2screen(double ds);
 	double dscreen2sample(double dx);
+	float screen2sample_f(float x);
+	float sample2screen_f(float s);
 	void range2screen(const Range &r, float &x1, float &x2);
 	void range2screen_clip(const Range &r, const rect &area, float &x1, float &x2);
 

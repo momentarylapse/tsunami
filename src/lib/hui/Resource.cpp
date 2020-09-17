@@ -223,69 +223,6 @@ Menu *CreateMenuFromSource(const string &source) {
 
 
 
-inline bool res_is_letter(char c) {
-	return ((c >= 'a') and (c <= 'z')) or ((c >= 'A') and (c <= 'z'));
-}
-
-inline bool res_is_number(char c) {
-	return (c >= '0') and (c <= '9');
-}
-
-inline bool res_is_alphanum(char c) {
-	return res_is_letter(c) or res_is_number(c);
-}
-
-Array<string> res_tokenize(const string &s) {
-	Array<string> a;
-	for (int i=0;i<s.num;i++) {
-		// ignore whitespace
-		if ((s[i] == ' ') or (s[i] == '\t'))
-			continue;
-
-		// read token
-		string token;
-		if ((s[i] == '\"') or (s[i] == '\'')) {
-			// string
-			i ++;
-			for (;i<s.num;i++) {
-				if ((s[i] == '\"') or (s[i] == '\''))
-					break;
-				token.add(s[i]);
-			}
-		} else if (res_is_letter(s[i])) {
-			// word
-			for (;i<s.num;i++) {
-				token.add(s[i]);
-				if (i < s.num - 1)
-					if (!res_is_alphanum(s[i + 1]))
-						break;
-			}
-		} else if ((res_is_number(s[i])) or ((s[i] == '-') and (res_is_number(s[i + 1])))) {
-			// number
-			for (;i<s.num;i++) {
-				token.add(s[i]);
-				if (i < s.num - 1)
-					if ((!res_is_number(s[i + 1])) and (s[i + 1] != '.'))
-						break;
-			}
-		} else {
-			// operator etc
-			token.add(s[i]);
-			if ((s[i] == '-') and (s[i + 1] == '>'))
-				token.add(s[++ i]);
-		}
-		a.add(token);
-	}
-	return a;
-}
-
-bool res_sa_contains(Array<string> &a, const string &s) {
-	for (string &aa: a)
-		if (aa == s)
-			return true;
-	return false;
-}
-
 int res_get_indent(const string &line) {
 	int indent = 0;
 	for (int i=0;i<line.num;i++)
@@ -296,7 +233,8 @@ int res_get_indent(const string &line) {
 	return indent;
 }
 
-void res_parse_new(const string &line, Array<string> &tokens) {
+Array<string> parse_tokens(const string &line) {
+	Array<string> tokens;
 	int indent = res_get_indent(line);
 	string temp;
 	for (int i=indent;i<line.num;i++) {
@@ -307,23 +245,25 @@ void res_parse_new(const string &line, Array<string> &tokens) {
 		} else if ((temp.num == 0) and ((line[i] == '\"') or (line[i] == '\''))) {
 			// string
 			string ss;
-			for (int j=i+1;j<line.num;j++) {
+			for (int j=i+1; j<line.num; j++) {
 				if (line[j] == '\\') {
 					ss.add(line[j ++]);
 					ss.add(line[j]);
 				} else if ((line[j] == '\"') or (line[j] == '\'')) {
 					i = j;
 					tokens.add(ss.unescape());
-					//temp += str_unescape(ss);
 					break;
-				} else
+				} else {
 					ss.add(line[j]);
+				}
 			}
-		} else
+		} else {
 			temp.add(line[i]);
+		}
 	}
 	if (temp.num > 0)
 		tokens.add(temp);
+	return tokens;
 }
 
 void res_add_option(Resource &c, const string &option) {
@@ -334,10 +274,9 @@ void res_add_option(Resource &c, const string &option) {
 	c.options.add(option);
 }
 
-bool res_load_line(string &l, Resource &c, bool literally) {
+bool res_load_line(const string &l, Resource &c, bool literally) {
 	// parse line
-	Array<string> tokens;
-	res_parse_new(l, tokens);
+	auto tokens = parse_tokens(l);
 	if (tokens.num == 0)
 		return false;
 

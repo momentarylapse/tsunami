@@ -187,7 +187,7 @@ Array<string> string::explode(const string &s) const {
 }
 
 
-void string::replace0(int start, int length, const string &str) {
+void string::_replace0(int start, int length, const string &str) {
 	if (start + length > num)
 		return;
 	unsigned char *s = (unsigned char*)data;
@@ -210,7 +210,7 @@ string string::replace(const string &sub, const string &by) const {
 	string r = *this;
 	int i = r.find(sub, 0);
 	while (i >= 0) {
-		r.replace0(i, sub.num, by);
+		r._replace0(i, sub.num, by);
 		i = r.find(sub, i + by.num);
 	}
 	return r;
@@ -522,23 +522,12 @@ string NAME(const Array<T> &a) { \
 	return s; \
 }
 
-string str_quote(const string &s) { return "\"" + s + "\""; }
+string str_quote(const string &s) { return s.repr(); }
 
 MAKE_ARRAY_STR(ia2s, int, i2s);
 MAKE_ARRAY_STR(fa2s, float, f2sf);
 MAKE_ARRAY_STR(ba2s, bool, b2s);
 MAKE_ARRAY_STR(sa2s, string, str_quote);
-
-string _fa2s(const Array<float> &a) {
-	string s = "[";
-	for (int i=0; i<a.num; i++) {
-		if (i > 0)
-			s += ", ";
-		s += f2s(a[i], 6);
-	}
-	s += "]";
-	return s;
-}
 
 
 struct xf_format_data {
@@ -1152,6 +1141,80 @@ string str_escape(const string &str) {
 			r.add(str[i]);
 	}
 	return r;
+}
+
+bool string::has_char(char c) const {
+	for (int j=0; j<num; j++)
+		if (c == (*this)[j])
+			return true;
+	return false;
+}
+
+Array<string> str_split_any(const string &s, const string &splitters) {
+	Array<string> r;
+	int prev = 0;
+	for (int i=0; i<s.num; i++) {
+		if (splitters.has_char(s[i])) {
+			r.add(s.substr(prev, i-prev));
+			prev = i + 1;
+			break;
+		}
+	}
+	r.add(s.substr(prev, -1));
+	return r;
+}
+
+Array<string> string::split_any(const string &splitters) const {
+	return str_split_any(*this, splitters);
+}
+
+Array<string> str_parse_tokens(const string &line, const string &splitters) {
+	Array<string> tokens;
+	string temp;
+	bool keep_quotes = splitters.has_char('\"');
+
+	auto end_token = [&tokens, &temp] {
+		if (temp.num > 0)
+			tokens.add(temp);
+		temp = "";
+	};
+
+	for (int i=0; i<line.num; i++) {
+		if (line[i] == ' ' or line[i] == '\t' or line[i] == '\n') {
+			// whitespace
+			end_token();
+		} else if ((line[i] == '\"') or (line[i] == '\'')) {
+			// string
+			end_token();
+
+			int start = i;
+			for (int j=i+1; j<line.num; j++) {
+				if (line[j] == '\\') {
+					j ++;
+				} else if ((line[j] == '\"') or (line[j] == '\'')) {
+					i = j;
+					if (keep_quotes)
+						tokens.add(line.substr(start, i-start+1));
+					else
+						tokens.add(line.substr(start+1, i-start-1));
+					break;
+				}
+			}
+		} else 	if (splitters.has_char(line[i])) {
+			// splitter character
+			end_token();
+			tokens.add(line.substr(i, 1));
+		} else {
+			// regular token
+			temp.add(line[i]);
+		}
+	}
+	end_token();
+	return tokens;
+}
+
+Array<string> string::parse_tokens(const string &splitters) const {
+	return str_parse_tokens(*this, splitters);
 }
 
 bool sa_contains(const Array<string> &a, const string &s) {

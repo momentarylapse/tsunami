@@ -35,8 +35,13 @@ public:
 	void sync_to_parent();
 	void sync_from_parent();
 	void create_type(int type);
+
 	string _cdecl str() const;
 	string _cdecl repr() const;
+
+	static Any parse(const string &s);
+
+
 	int _cdecl _int() const;
 	float _cdecl _float() const;
 	bool _cdecl _bool() const;
@@ -53,13 +58,13 @@ public:
 	Any &_cdecl back();
 	int length();
 	
-	int* as_int() const;
-	float* as_float() const;
-	bool* as_bool() const;
-	string* as_string() const;
-	Array<Any>* as_array() const;
-	AnyMap* as_map() const;
-	const void** as_pointer() const;
+	int& as_int() const;
+	float& as_float() const;
+	bool& as_bool() const;
+	string& as_string() const;
+	Array<Any>& as_array() const;
+	AnyMap& as_map() const;
+	const void*& as_pointer() const;
 
 	// map/dict
 	const Any &operator[] (const string &key) const;

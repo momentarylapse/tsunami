@@ -189,44 +189,44 @@ public:
 		if (type != TYPE_ARRAY)
 			kaba_raise_exception(new KabaException("not an array"));
 		Array<Any> r;
-		r.set_ref(*as_array());
+		r.set_ref(as_array());
 		return r;
 	}
 	Array<int> _as_map() { // FAKE TYPE!!!
 		if (type != TYPE_MAP)
 			kaba_raise_exception(new KabaException("not a map"));
 		Array<int> r;
-		r.set_ref(*(Array<int>*)as_map());
+		r.set_ref((Array<int>&)as_map());
 		return r;
 	}
 	
 	static void unwrap(Any &aa, void *var, const Class *type) {
 		if (type == TypeInt) {
-			*(int*)var = aa._int();
+			*(int*)var = aa.as_int();
 		} else if (type == TypeFloat32) {
-			*(float*)var = aa._float();
+			*(float*)var = aa.as_float();
 		} else if (type == TypeBool) {
-			*(bool*)var = aa._bool();
+			*(bool*)var = aa.as_bool();
 		} else if (type == TypeString) {
-			*(string*)var = aa.str();
+			*(string*)var = aa.as_string();
 		} else if (type->is_pointer()) {
-			*(const void**)var = *aa.as_pointer();
+			*(const void**)var = aa.as_pointer();
 		} else if (type->is_super_array() and (aa.type == TYPE_ARRAY)) {
 			auto *t_el = type->get_array_element();
 			auto *a = (DynamicArray*)var;
-			auto *b = aa.as_array();
-			int n = b->num;
+			auto &b = aa.as_array();
+			int n = b.num;
 			kaba_array_resize(var, type, n);
 			for (int i=0; i<n; i++)
 				unwrap(aa[i], (char*)a->data + i * t_el->size, t_el);
 		} else if (type->is_array() and (aa.type == TYPE_ARRAY)) {
 			auto *t_el = type->get_array_element();
-			auto *b = aa.as_array();
-			int n = min(type->array_length, b->num);
+			auto &b = aa.as_array();
+			int n = min(type->array_length, b.num);
 			for (int i=0; i<n; i++)
-				unwrap((*b)[i], (char*)var + i*t_el->size, t_el);
+				unwrap(b[i], (char*)var + i*t_el->size, t_el);
 		} else if (aa.type == TYPE_MAP) {
-			auto *map = aa.as_map();
+			auto &map = aa.as_map();
 			auto keys = aa.keys();
 			for (auto &e: type->elements)
 				for (string &k: keys)
@@ -236,6 +236,8 @@ public:
 			msg_error("unwrap... "  + aa.str() + " -> " + type->long_name());
 		}
 	}
+	static Any _cdecl parse(const string &s)
+	{ KABA_EXCEPTION_WRAPPER(return Any::parse(s)); return Any(); }
 };
 
 Any kaba_int2any(int i) {
@@ -773,6 +775,8 @@ void SIAddPackageMath() {
 		class_add_func("unwrap", TypeVoid, (void*)&KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
 			func_add_param("var", TypePointer);
 			func_add_param("type", TypeClassP);
+		class_add_func("parse", TypeAny, (void*)&KabaAny::parse, Flags::_STATIC__RAISES_EXCEPTIONS);
+			func_add_param("s", TypeString);
 
 	add_funcx("@int2any", TypeAny, &kaba_int2any, Flags::STATIC);
 		func_add_param("i", TypeInt);

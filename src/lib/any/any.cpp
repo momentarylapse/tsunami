@@ -88,37 +88,37 @@ Any::Any(const Any &a) : Any() {
 
 Any::Any(int i) : Any() {
 	create_type(TYPE_INT);
-	*as_int() = i;
+	as_int() = i;
 }
 
 Any::Any(float f) : Any() {
 	create_type(TYPE_FLOAT);
-	*as_float() = f;
+	as_float() = f;
 }
 
 Any::Any(bool b) : Any() {
 	create_type(TYPE_BOOL);
-	*as_bool() = b;
+	as_bool() = b;
 }
 
 Any::Any(const string &s) : Any() {
 	create_type(TYPE_STRING);
-	*as_string() = s;
+	as_string() = s;
 }
 
 Any::Any(const void *p) : Any() {
 	create_type(TYPE_POINTER);
-	*as_pointer() = p;
+	as_pointer() = p;
 }
 
 Any::Any(const Array<Any> &a) : Any() {
 	create_type(TYPE_ARRAY);
-	*as_array() = a;
+	as_array() = a;
 }
 
 Any::Any(const AnyMap &m) : Any() {
 	create_type(TYPE_MAP);
-	*as_map() = m;
+	as_map() = m;
 }
 
 Any Any::ref() {
@@ -201,19 +201,19 @@ void Any::clear() {
 		sync_from_parent();
 	} else {
 		if (type == TYPE_INT)
-			delete as_int();
+			delete &as_int();
 		else if (type == TYPE_FLOAT)
-			delete as_float();
+			delete &as_float();
 		else if (type == TYPE_BOOL)
-			delete as_bool();
+			delete &as_bool();
 		else if (type == TYPE_STRING)
-			delete as_string();
+			delete &as_string();
 		else if (type == TYPE_ARRAY)
-			delete as_array();
+			delete &as_array();
 		else if (type == TYPE_MAP)
-			delete as_map();
+			delete &as_map();
 		else if (type == TYPE_POINTER)
-			delete as_pointer();
+			delete &as_pointer();
 		else if (type != TYPE_NONE)
 			msg_error("any.clear(): " + type_name(type));
 		type = TYPE_NONE;
@@ -224,18 +224,18 @@ void Any::clear() {
 
 string Any::repr() const {
 	if (type == TYPE_INT) {
-		return i2s(*as_int());
+		return i2s(as_int());
 	} else if (type == TYPE_FLOAT) {
-		return f2s(*as_float(), 6);
+		return f2s(as_float(), 6);
 	} else if (type == TYPE_BOOL) {
-		return b2s(*as_bool());
+		return b2s(as_bool());
 	} else if (type == TYPE_STRING) {
-		return as_string()->repr();
+		return as_string().repr();
 	} else if (type == TYPE_POINTER) {
-		return p2s(*as_pointer());
+		return p2s(as_pointer());
 	} else if (type == TYPE_ARRAY) {
 		string s = "[";
-		for (Any &p: *as_array()) {
+		for (Any &p: as_array()) {
 			if (s.num > 1)
 				s += ", ";
 			s += p.repr();
@@ -243,7 +243,7 @@ string Any::repr() const {
 		return s + "]";
 	} else if (type == TYPE_MAP) {
 		string s = "{";
-		for (AnyMap::Entry &p: *as_map()) {
+		for (AnyMap::Entry &p: as_map()) {
 			if (s.num > 1)
 				s += ", ";
 			s += p.key.repr() + ": " + p.value.repr();
@@ -258,37 +258,122 @@ string Any::repr() const {
 
 string Any::str() const {
 	if (type == TYPE_STRING)
-		return *as_string();
+		return as_string();
 	return repr();
+}
+
+bool str_is_number(const string &s) {
+	for (int i=0; i<s.num; i++) {
+		if (s[i] >= '0' and s[i] <= '9')
+			continue;
+		if (s[i] == '-')
+			continue;
+		if (s[i] == '.')
+			continue;
+		return false;
+	}
+	return true;
+}
+
+
+void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
+	auto expect_no_end = [&tokens, &pos] {
+		if (pos >= tokens.num)
+			throw Exception("string ended unexpectedly");
+	};
+	auto expect_token = [&tokens, &pos, expect_no_end] (const string &t) {
+		expect_no_end();
+		if (tokens[pos] != t)
+			throw Exception(format("'%s' expected", t));
+		pos ++;
+	};
+	expect_no_end();
+	auto &cur = tokens[pos];
+	if (cur == "[") {
+		a.create_type(Any::TYPE_ARRAY);
+		pos ++;
+		while (tokens[pos] != "]") {
+			a.as_array().resize(a.as_array().num + 1);
+			any_parse_part(a.as_array().back(), tokens, pos);
+			if (tokens[pos] == "]")
+				break;
+			expect_token(",");
+		}
+		pos ++;
+	} else if (cur == "{") {
+		a.create_type(Any::TYPE_MAP);
+		pos ++;
+		while (tokens[pos] != "}") {
+			Any key;
+			any_parse_part(key, tokens, pos);
+			if (key.type != Any::TYPE_STRING)
+				throw Exception("only strings allowed as dict keys");
+			expect_token(":");
+			a.as_map().set(key.as_string(), Any());
+			any_parse_part(a.as_map()[key.as_string()], tokens, pos);
+			if (tokens[pos] == "}")
+				break;
+			expect_token(",");
+		}
+		pos ++;
+	} else if (str_is_number(cur)) {
+		if (cur.has_char('.')) {
+			a.create_type(Any::TYPE_FLOAT);
+			a.as_float() = cur._float();
+		} else {
+			a.create_type(Any::TYPE_INT);
+			a.as_int() = cur._int();
+		}
+		pos ++;
+	} else if (cur == "true" or cur == "false") {
+		a.create_type(Any::TYPE_BOOL);
+		a.as_bool() = cur._bool();
+		pos ++;
+	} else if (cur[0] == '\"' or cur[0] == '\'') {
+		a.create_type(Any::TYPE_STRING);
+		a.as_string() = cur.substr(1, -2).unescape();
+		pos ++;
+	} else {
+		throw Exception(format("what is '%s'?", cur));
+	}
+};
+
+Any Any::parse(const string &s) {
+	auto tokens = s.parse_tokens(",:[](){}\"");
+	int pos = 0;
+
+	Any r;
+	any_parse_part(r, tokens, pos);
+	return r;
 }
 
 bool Any::_bool() const {
 	if (type == TYPE_BOOL)
-		return *as_bool();
+		return as_bool();
 	if (type == TYPE_INT)
-		return *as_int() != 0;
+		return as_int() != 0;
 	throw Exception("can not interpret as bool: " + type_name(type));
 }
 
 int Any::_int() const {
 	if (type == TYPE_INT)
-		return *as_int();
+		return as_int();
 	if (type == TYPE_BOOL)
-		return (int)*as_bool();
+		return (int)as_bool();
 	if (type == TYPE_FLOAT)
-		return (int)*as_float();
+		return (int)as_float();
 	if (type == TYPE_STRING)
-		return as_string()->_int();
+		return as_string()._int();
 	throw Exception("can not interpret as int: " + type_name(type));
 }
 
 float Any::_float() const {
 	if (type == TYPE_INT)
-		return (float)*as_int();
+		return (float)as_int();
 	if (type == TYPE_FLOAT)
-		return *as_float();
+		return as_float();
 	if (type == TYPE_STRING)
-		return as_string()->_float();
+		return as_string()._float();
 	throw Exception("can not interpret as float: " + type_name(type));
 }
 
@@ -299,19 +384,19 @@ void Any::operator = (const Any &a) {
 			any_db("=   IS REF " + str());
 		create_type(a.type);
 		if (a.type == TYPE_INT) {
-			*as_int() = *a.as_int();
+			as_int() = a.as_int();
 		} else if (a.type == TYPE_FLOAT) {
-			*as_float() = *a.as_float();
+			as_float() = a.as_float();
 		} else if (a.type == TYPE_BOOL) {
-			*as_bool() = *a.as_bool();
+			as_bool() = a.as_bool();
 		} else if (a.type == TYPE_POINTER) {
-			*as_pointer() = *a.as_pointer();
+			as_pointer() = a.as_pointer();
 		} else if (a.type == TYPE_STRING) {
-			*as_string() = *a.as_string();
+			as_string() = a.as_string();
 		} else if (a.type == TYPE_ARRAY) {
-			*as_array() = *a.as_array();
+			as_array() = a.as_array();
 		} else if (a.type == TYPE_MAP) {
-			*as_map() = *a.as_map();
+			as_map() = a.as_map();
 		} else if (a.type != TYPE_NONE) {
 			clear();
 			msg_error("any = any: " + type_name(a.type));
@@ -343,11 +428,11 @@ Any Any::operator - (const Any &a) const {
 
 void Any::operator += (const Any &a) {
 	if ((type == TYPE_INT) and (a.type == TYPE_INT or a.type == TYPE_FLOAT))
-		*as_int() += a._int();
+		as_int() += a._int();
 	else if ((type == TYPE_FLOAT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
-		*as_float() += a._float();
+		as_float() += a._float();
 	else if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
-		*as_string() += a.str();
+		as_string() += a.str();
 	else if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY))
 		append(a);
 	else if (type == TYPE_ARRAY)
@@ -368,9 +453,9 @@ void Any::add(const Any &a) {
 	if (type == TYPE_ARRAY) {
 		if (&a == this) {
 			Any b = a;
-			as_array()->add(b);
+			as_array().add(b);
 		} else {
-			as_array()->add(a);
+			as_array().add(a);
 		}
 	} else {
 		throw Exception("only allowed for arrays: " + type_name(type));
@@ -391,9 +476,9 @@ void Any::append(const Any &a) {
 	if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY)) {
 		if (&a == this) {
 			Any b = a;
-			as_array()->append(*b.as_array());
+			as_array().append(b.as_array());
 		} else {
-			as_array()->append(*a.as_array());
+			as_array().append(a.as_array());
 		}
 	} else {
 		throw Exception("not an array: " + type_name(type));
@@ -402,36 +487,36 @@ void Any::append(const Any &a) {
 
 int Any::length() {
 	if (type == TYPE_ARRAY)
-		return as_array()->num;
+		return as_array().num;
 	if (type == TYPE_MAP)
-		return as_map()->num;
+		return as_map().num;
 	if (type == TYPE_STRING)
-		return as_string()->num;
+		return as_string().num;
 	return 0;
 }
 
 Any &Any::operator[] (int index) {
 	if (type != TYPE_ARRAY)
 		msg_error("only allowed for arrays: " + type_name(type));
-	return (*as_array())[index];
+	return as_array()[index];
 }
 
 const Any &Any::operator[] (int index) const {
 	if (type != TYPE_ARRAY)
 		msg_error("only allowed for arrays: " + type_name(type));
-	return (*as_array())[index];
+	return as_array()[index];
 }
 
 Any &Any::back() {
 	if (type != TYPE_ARRAY)
 		msg_error("only allowed for arrays: " + type_name(type));
-	return as_array()->back();
+	return as_array().back();
 }
 
 const Any &Any::operator[] (const string &key) const {
 	if (type != TYPE_MAP)
 		msg_error("only allowed for maps: " + type_name(type));
-	return (*as_map())[key];
+	return as_map()[key];
 }
 
 Any &Any::operator[] (const string &key) {
@@ -439,41 +524,41 @@ Any &Any::operator[] (const string &key) {
 		create_type(TYPE_MAP);
 	if (type != TYPE_MAP)
 		msg_error("only allowed for maps: " + type_name(type));
-	return (*as_map())[key];
+	return as_map()[key];
 }
 
 Array<string> Any::keys() const {
 	if (type != TYPE_MAP)
 		return {};
-	return as_map()->keys();
+	return as_map().keys();
 }
 
-int* Any::as_int() const {
-	return (int*)data;
+int& Any::as_int() const {
+	return *(int*)data;
 }
 
-float* Any::as_float() const {
-	return (float*)data;
+float& Any::as_float() const {
+	return *(float*)data;
 }
 
-bool* Any::as_bool() const {
-	return (bool*)data;
+bool& Any::as_bool() const {
+	return *(bool*)data;
 }
 
-const void** Any::as_pointer() const {
-	return (const void**)data;
+const void*& Any::as_pointer() const {
+	return *(const void**)data;
 }
 
-string* Any::as_string() const {
-	return (string*)data;
+string& Any::as_string() const {
+	return *(string*)data;
 }
 
-AnyMap* Any::as_map() const {
-	return (AnyMap*)data;
+AnyMap& Any::as_map() const {
+	return *(AnyMap*)data;
 }
 
-Array<Any>* Any::as_array() const {
-	return (Array<Any>*)data;
+Array<Any>& Any::as_array() const {
+	return *(Array<Any>*)data;
 }
 
 Any Any::array_get(int i) {
@@ -498,9 +583,9 @@ void Any::array_set(int i, const Any &value) {
 Any Any::map_get(const string &key) {
 	if (type != TYPE_MAP)
 		throw Exception("not a map: " + type_name(type));
-	if (!as_map()->contains(key))
+	if (!as_map().contains(key))
 		throw Exception("key not found: " + key);
-	return (*as_map())[key].ref();
+	return as_map()[key].ref();
 }
 
 void Any::map_set(const string &key, const Any &value) {
@@ -513,7 +598,7 @@ void Any::map_set(const string &key, const Any &value) {
 		create_type(TYPE_MAP);
 	if (type != TYPE_MAP)
 		throw Exception("not a map: " + type_name(type));
-	as_map()->set(key, value);
+	as_map().set(key, value);
 }
 
 void Any::map_drop(const string &key) {
@@ -524,5 +609,5 @@ void Any::map_drop(const string &key) {
 	}
 	if (type != TYPE_MAP)
 		throw Exception("not a map: " + type_name(type));
-	as_map()->drop(key);
+	as_map().drop(key);
 }

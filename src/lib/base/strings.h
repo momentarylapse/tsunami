@@ -32,17 +32,20 @@ class string : public Array<char> {
 	{	delete_single(index);	}
 	int _cdecl find(const string &s, int start = 0) const;
 	int _cdecl rfind(const string &s, int start = -1) const;
+	bool has_char(char c) const;
 	string _cdecl substr(int start, int length) const;
 	string _cdecl head(int size) const;
 	string _cdecl tail(int size) const;
 	int _cdecl compare(const string &s) const;
 	int _cdecl icompare(const string &s) const;
-	void _cdecl replace0(int start, int length, const string &s);
+	void _cdecl _replace0(int start, int length, const string &s);
 	string _cdecl replace(const string &sub, const string &by) const;
 	string _cdecl reverse() const;
 	string _cdecl trim() const;
 	string _cdecl repeat(int n) const;
 	Array<string> _cdecl explode(const string &s) const;
+	Array<string> _cdecl split_any(const string &splitters) const;
+	Array<string> _cdecl parse_tokens(const string &splitters = "") const;
 	string _cdecl lower() const;
 	string _cdecl upper() const;
 	string _cdecl hex() const;

@@ -233,38 +233,6 @@ int res_get_indent(const string &line) {
 	return indent;
 }
 
-Array<string> parse_tokens(const string &line) {
-	Array<string> tokens;
-	int indent = res_get_indent(line);
-	string temp;
-	for (int i=indent;i<line.num;i++) {
-		if (line[i] == ' ') {
-			if (temp.num > 0)
-				tokens.add(temp);
-			temp = "";
-		} else if ((temp.num == 0) and ((line[i] == '\"') or (line[i] == '\''))) {
-			// string
-			string ss;
-			for (int j=i+1; j<line.num; j++) {
-				if (line[j] == '\\') {
-					ss.add(line[j ++]);
-					ss.add(line[j]);
-				} else if ((line[j] == '\"') or (line[j] == '\'')) {
-					i = j;
-					tokens.add(ss.unescape());
-					break;
-				} else {
-					ss.add(line[j]);
-				}
-			}
-		} else {
-			temp.add(line[i]);
-		}
-	}
-	if (temp.num > 0)
-		tokens.add(temp);
-	return tokens;
-}
 
 void res_add_option(Resource &c, const string &option) {
 	if (option.head(8) == "tooltip=") {
@@ -276,7 +244,7 @@ void res_add_option(Resource &c, const string &option) {
 
 bool res_load_line(const string &l, Resource &c, bool literally) {
 	// parse line
-	auto tokens = parse_tokens(l);
+	auto tokens = l.parse_tokens();
 	if (tokens.num == 0)
 		return false;
 

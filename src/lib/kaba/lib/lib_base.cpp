@@ -654,6 +654,8 @@ void SIAddPackageBase() {
 			func_add_param("by", TypeString);
 		class_add_funcx("explode", TypeStringList, &string::explode, Flags::PURE);
 			func_add_param("str", TypeString);
+		class_add_funcx("parse_tokens", TypeStringList, &string::parse_tokens, Flags::PURE);
+			func_add_param("splitters", TypeString);
 		class_add_funcx("repeat", TypeString, &string::repeat, Flags::PURE);
 			func_add_param("n", TypeInt);
 		class_add_funcx("lower", TypeString, &string::lower, Flags::PURE);

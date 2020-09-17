@@ -101,7 +101,7 @@ bool Tsunami::on_startup(const Array<string> &_arg) {
 	return true;
 }
 
-bool Tsunami::handle_arguments(Array<string> &args) {
+bool Tsunami::handle_arguments(const Array<string> &args) {
 	Session *session = Session::GLOBAL;
 
 	string chain_file;

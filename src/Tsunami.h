@@ -36,7 +36,7 @@ public:
 	bool on_startup(const Array<string> &arg) override;
 	void on_end() override;
 
-	bool handle_arguments(Array<string> &arg);
+	bool handle_arguments(const Array<string> &arg);
 	void load_key_codes();
 
 	Session* create_session();

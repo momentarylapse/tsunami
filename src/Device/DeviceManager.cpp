@@ -84,9 +84,8 @@ void pulse_ignore_op(Session *session, pa_operation *op) {
 }
 
 void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
+	auto *dm = static_cast<DeviceManager*>(userdata);
 	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
-
-	DeviceManager *dm = (DeviceManager*)userdata;
 
 	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)) {
 		//printf("----change   %d\n", idx);
@@ -116,7 +115,7 @@ bool DeviceManager::pulse_wait_context_ready() {
 
 
 void DeviceManager::pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata) {
-	DeviceManager *dm = (DeviceManager*)userdata;
+	auto *dm = static_cast<DeviceManager*>(userdata);
 	if (eol > 0 or !i or !userdata) {
 		pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
 		return;
@@ -133,7 +132,7 @@ void DeviceManager::pulse_sink_info_callback(pa_context *c, const pa_sink_info *
 }
 
 void DeviceManager::pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata) {
-	DeviceManager *dm = (DeviceManager*)userdata;
+	auto *dm = static_cast<DeviceManager*>(userdata);
 	if (eol > 0 or !i or !userdata) {
 		pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
 		return;
@@ -150,7 +149,7 @@ void DeviceManager::pulse_source_info_callback(pa_context *c, const pa_source_in
 }
 
 void DeviceManager::pulse_state_callback(pa_context* context, void* userdata) {
-	DeviceManager *dm = (DeviceManager*)userdata;
+	auto *dm = static_cast<DeviceManager*>(userdata);
     pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
 }
 
@@ -159,7 +158,7 @@ void DeviceManager::pulse_state_callback(pa_context* context, void* userdata) {
 
 Array<Device*> str2devs(const string &s, DeviceType type) {
 	Array<Device*> devices;
-	Array<string> a = s.explode("|");
+	auto a = s.explode("|");
 	for (string &b: a)
 		devices.add(new Device(type, b));
 	return devices;
@@ -204,7 +203,6 @@ DeviceManager::DeviceManager(Session *_session) {
 DeviceManager::~DeviceManager() {
 	hui::CancelRunner(hui_rep_id);
 
-	write_config();
 	kill();
 
 	for (Device *d: output_devices)
@@ -243,7 +241,7 @@ void DeviceManager::remove_device(DeviceType type, int index) {
 		return;
 	if (devices[index]->present)
 		return;
-	delete(devices[index]);
+	delete devices[index];
 	devices.erase(index);
 
 	write_config();
@@ -276,8 +274,8 @@ void DeviceManager::update_devices(bool serious) {
 	if (midi_api == ApiType::ALSA)
 		_update_devices_midi_alsa();
 
-	notify(MESSAGE_CHANGE);
 	write_config();
+	notify(MESSAGE_CHANGE);
 }
 
 
@@ -581,11 +579,12 @@ float DeviceManager::get_output_volume() {
 
 void DeviceManager::set_output_volume(float _volume) {
 	output_volume = _volume;
+	write_config();
 	notify(MESSAGE_CHANGE);
 }
 
 Device* DeviceManager::get_device(DeviceType type, const string &internal_name) {
-	Array<Device*> &devices = device_list(type);
+	auto &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
 			return d;
@@ -593,7 +592,7 @@ Device* DeviceManager::get_device(DeviceType type, const string &internal_name) 
 }
 
 Device* DeviceManager::get_device_create(DeviceType type, const string &internal_name) {
-	Array<Device*> &devices = device_list(type);
+	auto &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
 			return d;
@@ -616,7 +615,7 @@ Array<Device*> &DeviceManager::device_list(DeviceType type) {
 }
 
 Array<Device*> DeviceManager::good_device_list(DeviceType type) {
-	Array<Device*> &all = device_list(type);
+	auto &all = device_list(type);
 	Array<Device*> list;
 	for (Device *d: all)
 		if (d->visible and d->present)
@@ -625,7 +624,7 @@ Array<Device*> DeviceManager::good_device_list(DeviceType type) {
 }
 
 Device *DeviceManager::choose_device(DeviceType type) {
-	Array<Device*> &devices = device_list(type);
+	auto &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->present and d->visible)
 			return d;

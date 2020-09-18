@@ -56,9 +56,8 @@ struct StackFrameInfo {
 
 extern Array<Script*> _public_scripts_;
 
-inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, bool from_package)
-{
-	foreachi (Function *f, s->syntax->functions, i){
+inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, bool from_package) {
+	foreachi (Function *f, s->syntax->functions, i) {
 		if (from_package and !f->throws_exceptions())
 			continue;
 		void *frip = f->address;
@@ -75,15 +74,14 @@ inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, b
 	}
 }
 
-StackFrameInfo get_func_from_rip(void *rip)
-{
+StackFrameInfo get_func_from_rip(void *rip) {
 	StackFrameInfo r;
 	r.rip = rip;
 	r.f = nullptr;
 	r.offset = 1000000;
 
 	// compiled functions
-	for (Script* s: _public_scripts_){
+	for (Script* s: _public_scripts_) {
 		if ((rip < s->opcode) or (rip > &s->opcode[s->opcode_size]))
 			continue;
 		func_from_rip_test_script(r, s, rip, false);
@@ -92,14 +90,13 @@ StackFrameInfo get_func_from_rip(void *rip)
 		return r;
 
 	// externally linked...
-	for (auto p: packages){
+	for (auto p: packages) {
 		func_from_rip_test_script(r, p, rip, true);
 	}
 	return r;
 }
 
-struct ExceptionBlockData
-{
+struct ExceptionBlockData {
 	// needs_killing might be a reference to blocks... std::move()...
 	// better keep blocks alive for a while
 	Array<Block*> blocks;
@@ -108,8 +105,7 @@ struct ExceptionBlockData
 	Node *except;
 };
 
-inline bool ex_type_match(const Class *ex_type, const Class *catch_type)
-{
+inline bool ex_type_match(const Class *ex_type, const Class *catch_type) {
 	if (ex_type == TypeUnknown)
 		return true;
 	if (catch_type == TypeVoid)
@@ -117,19 +113,18 @@ inline bool ex_type_match(const Class *ex_type, const Class *catch_type)
 	return ex_type->is_derived_from(catch_type);
 }
 
-ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex_type)
-{
+ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex_type) {
 	ExceptionBlockData ebd;
 	ebd.except_block = nullptr;
 	ebd.except = nullptr;
 
-	if (f){
+	if (f) {
 		// which blocks are we in?
 		auto blocks = f->all_blocks();
 		//printf("%d blocks\n", blocks.num);
-		foreachb (Block *b, blocks){
+		foreachb (Block *b, blocks) {
 			//printf("-block  %p    %p-%p\n", b, b->_start, b->_end);
-			if ((b->_start <= rip) and (b->_end >= rip)){
+			if ((b->_start <= rip) and (b->_end >= rip)) {
 //				printf("   inside\n");
 				ebd.blocks.add(b);
 			}
@@ -139,16 +134,16 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex
 
 	// walk through the blocks from inside to outside
 	Array<int> node_index;
-	foreachi (Block *b, ebd.blocks, bi){
+	foreachi (Block *b, ebd.blocks, bi) {
 		ebd.needs_killing.add(b);
 
 		if (!b->parent)
 			continue;
 
 		// are we in a try block?
-		for (Node *n: b->parent->params){
-			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)){
-				if (n->params[0]->as_block() == b){
+		for (Node *n: b->parent->params) {
+			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)) {
+				if (n->params[0]->as_block() == b) {
 					if (_verbose_exception_)
 						msg_write("found try block");
 					auto ee = n->params[1];
@@ -173,8 +168,7 @@ void* rbp2 = nullptr;
 
 #ifdef CPU_AMD64
 
-void relink_return(void *rip, void *rbp, void *rsp)
-{
+void relink_return(void *rip, void *rbp, void *rsp) {
 #ifdef OS_LINUX
 	if (_verbose_exception_)
 		printf("relink to rip=%p, rbp=%p  rsp=%p\n", rip, rbp, rsp);
@@ -208,8 +202,7 @@ const Class* _get_type(void *p, void *vtable, const Class *ns) {
 	return nullptr;
 }
 
-const Class* get_type(void *p)
-{
+const Class* get_type(void *p) {
 	if (!p)
 		return TypeUnknown;
 	void *vtable = *(void**)p;
@@ -226,15 +219,14 @@ const Class* get_type(void *p)
 
 #ifdef CPU_AMD64
 
-Array<StackFrameInfo> get_stack_trace(void **rbp)
-{
+Array<StackFrameInfo> get_stack_trace(void **rbp) {
 	Array<StackFrameInfo> trace;
 
 	void **rsp = nullptr;
 //	msg_write("stack trace");
 //	printf("rbp=%p     ...%p\n", rbp, &rsp);
 
-	while (true){
+	while (true) {
 		rsp = rbp;
 		rbp = (void**)*rsp;
 		rsp ++;
@@ -245,14 +237,14 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 		rsp ++;
 //		printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
 		auto r = get_func_from_rip(rip);
-		if (r.f){
+		if (r.f) {
 			r.rsp = rsp;
 			r.rbp = rbp;
 			trace.add(r);
 			if (_verbose_exception_)
 				msg_write(r.str());
 
-		}else{
+		} else {
 			//if (_verbose_exception_)
 			//	msg_write("unknown function...: " + p2s(rip));
 			break;
@@ -268,8 +260,7 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
-void _cdecl kaba_raise_exception(KabaException *kaba_exception)
-{
+void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 #ifdef OS_LINUX
 	// get stack frame base pointer rbp
 	void **rbp = nullptr;
@@ -296,34 +287,34 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 
 	const Class *ex_type = get_type(kaba_exception);
 
-	for (auto r: trace){
+	for (auto r: trace) {
 
 		if (_verbose_exception_)
 			msg_write(r.str());
 		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
 
-		for (Block *b: ebd.needs_killing){
+		for (Block *b: ebd.needs_killing) {
 			if (_verbose_exception_)
 				msg_write("  block " + p2s(b));
-			for (Variable *v: b->vars){
+			for (Variable *v: b->vars) {
 				char *p = (char*)r.rbp + v->_offset;
 				if (_verbose_exception_)
 					msg_write("   " + v->type->name + " " + v->name + "  " + p2s(p));
 				auto cf = v->type->get_destructor();
-				if (cf){
+				if (cf) {
 					typedef void con_func(void *);
 					con_func * f = (con_func*)cf->address;
-					if (f){
+					if (f) {
 						f(p);
 					}
 				}
 			}
 		}
-		if (ebd.except_block){
+		if (ebd.except_block) {
 			if (_verbose_exception_)
 				msg_write("except_block block: " + p2s(ebd.except_block));
 
-			if (ebd.except->params.num > 0){
+			if (ebd.except->params.num > 0) {
 				auto v = ebd.except_block->vars[0];
 				void **p = (void**)((int_p)r.rbp + v->_offset);
 				*p = kaba_exception;

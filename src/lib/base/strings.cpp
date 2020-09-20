@@ -900,13 +900,17 @@ string string::md5() const {
 	return out.hex().replace(".", "");
 }
 
+bool is_whitespace_x(char c) {
+	return ((c == ' ') or (c == '\t') or (c == '\n') or (c == '\r') or (c == '\0'));
+}
+
 string string::trim() const {
 	int i0 = 0, i1 = num-1;
-	for (i0=0;i0<num;i0++)
-		if (((*this)[i0] != ' ') and ((*this)[i0] != '\t') and ((*this)[i0] != '\n') and ((*this)[i0] != '\r'))
+	for (i0=0; i0<num; i0++)
+		if (!is_whitespace_x((*this)[i0]))
 			break;
-	for (i1=num-1;i1>=0;i1--)
-		if (((*this)[i1] != ' ') and ((*this)[i1] != '\t') and ((*this)[i1] != '\n') and ((*this)[i1] != '\r'))
+	for (i1=num-1; i1>=0; i1--)
+		if (!is_whitespace_x((*this)[i1]))
 			break;
 	return substr(i0, i1 - i0 + 1);
 }

@@ -17,14 +17,14 @@ FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
 {
 }
 
-FormatSoundFont2::FormatSoundFont2()
-{
+FormatSoundFont2::FormatSoundFont2() {
 	sample_offset = 0;
 	sample_count = 0;
+	od = nullptr;
+	song = nullptr;
 }
 
-void FormatSoundFont2::load_song(StorageOperationData *_od)
-{
+void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	od = _od;
 	song = od->song;
 
@@ -32,12 +32,12 @@ void FormatSoundFont2::load_song(StorageOperationData *_od)
 
 	sample_offset = -1;
 
-	try{
+	try {
 		f = FileOpen(od->filename);
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		od->error(e.message());
 	}
 
@@ -45,8 +45,7 @@ void FormatSoundFont2::load_song(StorageOperationData *_od)
 	delete(f);
 }
 
-void FormatSoundFont2::sfSample::print()
-{
+void FormatSoundFont2::sfSample::print() {
 	msg_write("----sample");
 	msg_write(name);
 	msg_write(start);
@@ -57,44 +56,100 @@ void FormatSoundFont2::sfSample::print()
 	msg_write(sample_type);
 }
 
-void FormatSoundFont2::read_chunk(File *f)
-{
-	char temp[4];
-	f->read_buffer(temp, 4);
-	string name = string(temp, 4);
+string read_str(File *f, int l) {
+	string s;
+	s.resize(l);
+	f->read_buffer(s);
+	int p0 = s.find(string("\0", 1), 0);
+	if (p0 >= 0)
+		return s.head(p0);
+	return s;
+}
+
+void FormatSoundFont2::read_chunk(File *f) {
+	string name = read_str(f, 4).upper();
 	int l = f->read_int();
 	int after_pos = f->get_pos() + l;
 
-	msg_write("chunk: " + name + " (" + i2s(l) + ")");
+	msg_write(format("chunk: %s (%d)", name, l));
 	msg_right();
 
 
-	if (name == "RIFF"){
-		f->read_buffer(temp, 4);
-		string aaa = string(temp, 4);
+	if (name == "RIFF") {
+		string aaa = read_str(f, 4);
 		if (aaa != "sfbk")
-			throw Exception("'sfbk' expected in RIFF chunk");
+			throw Exception("'sfbk' expected in 'RIFF' chunk");
 
 		read_chunk(f);
 		read_chunk(f);
 		read_chunk(f);
-	}else if (name == "LIST"){
-		f->read_buffer(temp, 4);
-		string aaa = string(temp, 4);
-		msg_write("LIST: " + aaa);
-		while (f->get_pos() < after_pos - 3){
+	} else if (name == "LIST") {
+		string aaa = read_str(f, 4);
+		msg_write(format("list type: %s", aaa));
+		while (f->get_pos() < after_pos - 3) {
 			read_chunk(f);
 		}
-	}else if (name == "smpl"){
+	} else if (name == "SMPL") {
 		sample_offset = f->get_pos();
 		sample_count = l / 2;
-	}else if (name == "shdr"){
-		while (f->get_pos() < after_pos - 3){
+	} else if (name == "SHDR") {
+		while (f->get_pos() < after_pos - 3) {
 			sfSample s;
 			read_sample_header(f, s);
-			if (s.name != "EOS")
-				samples.add(s);
+			if (s.name == "EOS")
+				break;
+			samples.add(s);
 		}
+	} else if (sa_contains({"INAM", "IENG", "IPRD", "ICOP", "ICRD", "ICMT", "ISFT", "ISNG"}, name)) {
+		string t = read_str(f, l);
+		if (name == "INAM")
+			song->add_tag("title", t);
+		else if (name == "IENG")
+			song->add_tag("engineer", t);
+		else if (name == "IPRD")
+			song->add_tag("product", t);
+		else if (name == "ICOP")
+			song->add_tag("copyright", t);
+		else if (name == "ICRD")
+			song->add_tag("date", t);
+		else if (name == "ICMT")
+			song->add_tag("comment", t);
+		else if (name == "ISNG")
+			song->add_tag("engine", t);
+		else if (name == "ISFT")
+			song->add_tag("software", t);
+	} else if (sa_contains({"IFIL"}, name)) {
+		// ignore
+	} else if (name == "PHDR") {
+		while (f->get_pos() < after_pos - 3) {
+			sfPresetHeader p;
+			p.name = read_str(f, 20);
+			p.preset = f->read_word();
+			p.bank = f->read_word();
+			p.bag_index = f->read_word();
+			p.library = f->read_int();
+			p.genre = f->read_int();
+			p.morphology = f->read_int();
+			if (p.name == "EOP")
+				break;
+			presets.add(p);
+			od->info(format("preset: %s  %d %d bag=%d", p.name, p.preset, p.bank, p.bag_index));
+		}
+	} else if (name == "INST") {
+		while (f->get_pos() < after_pos - 3) {
+			sfInstrument i;
+			i.name = read_str(f, 20);
+			i.bag_index = f->read_word();
+			if (i.name == "EOI")
+				break;
+			instruments.add(i);
+			od->info(format("instrument: %s   bag=%d", i.name, i.bag_index));
+		}
+	} else {
+		string t;
+		t.resize(l);
+		f->read_buffer(t);
+		msg_write(t.hex());
 	}
 
 	f->set_pos(after_pos);
@@ -103,8 +158,7 @@ void FormatSoundFont2::read_chunk(File *f)
 	msg_left();
 }
 
-void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s)
-{
+void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s) {
 	char temp[21];
 	f->read_buffer(temp, 20);
 	s.name = temp;
@@ -119,15 +173,14 @@ void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s
 	s.sample_type = f->read_word();
 }
 
-void FormatSoundFont2::read_samples(File *f)
-{
+void FormatSoundFont2::read_samples(File *f) {
 	int samples_all = 0;
 	int samples_read = 0;
-	for (sfSample &s : samples)
+	for (auto &s : samples)
 		samples_all += s.end - s.start;
-	for (sfSample &s : samples){
+	for (auto &s : samples) {
 		//s.print();
-		if ((s.sample_type & 0x8000) != 0){
+		if ((s.sample_type & 0x8000) != 0) {
 			msg_write("rom");
 			continue;
 		}

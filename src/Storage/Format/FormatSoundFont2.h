@@ -43,6 +43,21 @@ public:
 		void print();
 	};
 	Array<sfSample> samples;
+	struct sfPresetHeader {
+		string name;
+		int preset;
+		int bank;
+		int bag_index;
+		int library;
+		int genre;
+		int morphology;
+	};
+	Array<sfPresetHeader> presets;
+	struct sfInstrument {
+		string name;
+		int bag_index;
+	};
+	Array<sfInstrument> instruments;
 
 	void read_sample_header(File *f, sfSample &s);
 };

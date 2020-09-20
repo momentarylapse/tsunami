@@ -49,15 +49,15 @@ void StorageOperationData::set_layer(TrackLayer *l) {
 }
 
 void StorageOperationData::info(const string& message) {
-	session->i(filename.str() + ": " + message);
+	session->i(message);
 }
 
 void StorageOperationData::warn(const string& message) {
-	session->w(filename.str() + ": " + message);
+	session->w(message);
 }
 
 void StorageOperationData::error(const string& message) {
-	session->e(filename.str() + ": " + message);
+	session->e(message);
 	errors_encountered = true;
 }
 

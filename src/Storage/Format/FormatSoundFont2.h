@@ -47,17 +47,28 @@ public:
 		string name;
 		int preset;
 		int bank;
-		int bag_index;
+		int bag_start;
+		int bag_end;
 		int library;
 		int genre;
 		int morphology;
 	};
 	Array<sfPresetHeader> presets;
+	struct sfBag {
+		int gen_start, gen_end, mod_index;
+	};
+	Array<sfBag> preset_bags, instrument_bags;
 	struct sfInstrument {
 		string name;
-		int bag_index;
+		int bag_start;
+		int bag_end;
 	};
 	Array<sfInstrument> instruments;
+	struct sfGenerator {
+		int op, amount;
+		string str() const;
+	};
+	Array<sfGenerator> preset_generators, instrument_generators;
 
 	void read_sample_header(File *f, sfSample &s);
 };

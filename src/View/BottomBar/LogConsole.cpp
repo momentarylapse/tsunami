@@ -8,6 +8,7 @@
 #include "BottomBar.h"
 #include "../../Session.h"
 #include "../../Stuff/Log.h"
+#include "../../Data/Song.h"
 #include "LogConsole.h"
 
 LogConsole::LogConsole(Session *session) :
@@ -31,6 +32,8 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 	string text = m.text;
 	if (m.session == Session::GLOBAL)
 		text = "[global] " + text;
+	else
+		text = "[" + m.session->song->filename.basename() + "]: " + text;
 	if (m.type == Log::Type::DEBUG)
 		text = "[debug] " + text;
 

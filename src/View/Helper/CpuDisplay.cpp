@@ -139,7 +139,7 @@ void CpuDisplay::on_left_button_down() {
 		dlg->show();
 	} else {
 		dlg = new hui::Dialog("cpu", 380, 260, panel->win, true);
-		dlg->set_border_width(0);
+		dlg->set_options("", "resizable,borderwidth=0");
 		dlg->add_drawing_area("", 0, 0, "area");
 		dlg->event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
 		dlg->event("hui:close", [=]{ on_dialog_close(); });

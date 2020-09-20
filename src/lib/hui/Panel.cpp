@@ -149,8 +149,6 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 	e->mbut = win->input.mb;
 	e->rbut = win->input.rb;
 	e->key_code = win->input.key_code;
-	e->key = (e->key_code % 256);
-	e->text = GetKeyChar(e->key_code);
 	e->row = win->input.row;
 	e->row_target = win->input.row_target;
 	e->column = win->input.column;

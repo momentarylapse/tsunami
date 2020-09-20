@@ -3,8 +3,7 @@
 
 // TODO: international key names
 
-namespace hui
-{
+namespace hui {
 
 
 #ifdef HUI_API_WIN
@@ -16,8 +15,7 @@ namespace hui
 
 
 
-EventListener::EventListener(int _uid, const string &_id, const string &_message, const Callback &_function)
-{
+EventListener::EventListener(int _uid, const string &_id, const string &_message, const Callback &_function) {
 	uid = _uid;
 	id = _id;
 	message = _message;
@@ -26,8 +24,7 @@ EventListener::EventListener(int _uid, const string &_id, const string &_message
 	type = 0;
 }
 
-EventListener::EventListener(int _uid, const string &_id, const string &_message, int __, const CallbackP &_function)
-{
+EventListener::EventListener(int _uid, const string &_id, const string &_message, int __, const CallbackP &_function) {
 	uid = _uid;
 	id = _id;
 	message = _message;
@@ -36,8 +33,7 @@ EventListener::EventListener(int _uid, const string &_id, const string &_message
 	type = 0;
 }
 
-EventKeyCode::EventKeyCode(const string &_id, const string &_message, int _key_code)
-{
+EventKeyCode::EventKeyCode(const string &_id, const string &_message, int _key_code) {
 	id = _id;
 	message = _message;
 	key_code = _key_code;
@@ -45,13 +41,13 @@ EventKeyCode::EventKeyCode(const string &_id, const string &_message, int _key_c
 }
 
 Event _hui_event_;
-Event *GetEvent()
-{
+Event *GetEvent() {
 	return &_hui_event_;
 }
 
-Event::Event(const string &_id, const string &_message)
-{
+string Event::_text;
+
+Event::Event(const string &_id, const string &_message) {
 	dx = 0;
 	dy = 0;
 	scroll_x = 0;
@@ -61,7 +57,6 @@ Event::Event(const string &_id, const string &_message)
 	message = _message;
 	is_default = true;
 	height = width = 0;
-	key = -1;
 	key_code = -1;
 	mx = my = 0;
 	win = nullptr;
@@ -71,8 +66,11 @@ Event::Event(const string &_id, const string &_message)
 	just_focused = false;
 }
 
-bool Event::match(const string &_id, const string &_message) const
-{
+string Event::text() const {
+	return _text;
+}
+
+bool Event::match(const string &_id, const string &_message) const {
 	// all events
 	if (_id == "*")
 		return true;
@@ -97,8 +95,7 @@ bool Event::match(const string &_id, const string &_message) const
 	return false;
 }
 
-void _InitInput_()
-{
+void _InitInput_() {
 	#ifdef HUI_API_WIN
 
 		for (int k=0;k<256;k++)
@@ -203,129 +200,128 @@ void _InitInput_()
 	#endif
 	#ifdef HUI_API_GTK
 
-		for (int k=0;k<NUM_KEYS;k++)
-			HuiKeyID[k]=HuiKeyID2[k]=0;
+		for (int k=0; k<NUM_KEYS; k++)
+			HuiKeyID[k] = HuiKeyID2[k] = 0;
 
-		HuiKeyID[KEY_LCONTROL]=GDK_KEY_Control_L;
-		HuiKeyID[KEY_RCONTROL]=GDK_KEY_Control_R;
-		HuiKeyID[KEY_LSHIFT]=GDK_KEY_Shift_L;
-		HuiKeyID[KEY_RSHIFT]=GDK_KEY_Shift_R;
-		HuiKeyID[KEY_LALT]=GDK_KEY_Alt_L;
-		HuiKeyID[KEY_RALT]=GDK_KEY_Alt_R;
-		HuiKeyID[KEY_ADD]=GDK_KEY_plus;
-		HuiKeyID[KEY_SUBTRACT]=GDK_KEY_minus;
-		HuiKeyID[KEY_FENCE]=GDK_KEY_numbersign;
-		HuiKeyID[KEY_GRAVE]=GDK_KEY_asciicircum;
-		HuiKeyID[KEY_HOME]=GDK_KEY_Home;
-		HuiKeyID[KEY_END]=GDK_KEY_End;
-		HuiKeyID[KEY_NEXT]=GDK_KEY_Page_Up;
-		HuiKeyID[KEY_PRIOR]=GDK_KEY_Page_Down;
-		HuiKeyID[KEY_UP]=GDK_KEY_Up;
-		HuiKeyID[KEY_DOWN]=GDK_KEY_Down;
-		HuiKeyID[KEY_LEFT]=GDK_KEY_Left;
-		HuiKeyID[KEY_RIGHT]=GDK_KEY_Right;
-		HuiKeyID[KEY_RETURN]=GDK_KEY_Return;
-		HuiKeyID[KEY_ESCAPE]=GDK_KEY_Escape;
-		HuiKeyID[KEY_INSERT]=GDK_KEY_Insert;
-		HuiKeyID[KEY_DELETE]=GDK_KEY_Delete;
-		HuiKeyID[KEY_SPACE]=GDK_KEY_space;
-		HuiKeyID[KEY_F1]=GDK_KEY_F1;
-		HuiKeyID[KEY_F2]=GDK_KEY_F2;
-		HuiKeyID[KEY_F3]=GDK_KEY_F3;
-		HuiKeyID[KEY_F4]=GDK_KEY_F4;
-		HuiKeyID[KEY_F5]=GDK_KEY_F5;
-		HuiKeyID[KEY_F6]=GDK_KEY_F6;
-		HuiKeyID[KEY_F7]=GDK_KEY_F7;
-		HuiKeyID[KEY_F8]=GDK_KEY_F8;
-		HuiKeyID[KEY_F9]=GDK_KEY_F9;
-		HuiKeyID[KEY_F10]=GDK_KEY_F10;
-		HuiKeyID[KEY_F11]=GDK_KEY_F11;
-		HuiKeyID[KEY_F12]=GDK_KEY_F12;
-		HuiKeyID[KEY_1]=GDK_KEY_1;
-		HuiKeyID[KEY_2]=GDK_KEY_2;
-		HuiKeyID[KEY_3]=GDK_KEY_3;
-		HuiKeyID[KEY_4]=GDK_KEY_4;
-		HuiKeyID[KEY_5]=GDK_KEY_5;
-		HuiKeyID[KEY_6]=GDK_KEY_6;
-		HuiKeyID[KEY_7]=GDK_KEY_7;
-		HuiKeyID[KEY_8]=GDK_KEY_8;
-		HuiKeyID[KEY_9]=GDK_KEY_9;
-		HuiKeyID[KEY_0]=GDK_KEY_0;
-		HuiKeyID[KEY_A]=GDK_KEY_a;		HuiKeyID2[KEY_A]=GDK_KEY_A;
-		HuiKeyID[KEY_B]=GDK_KEY_b;		HuiKeyID2[KEY_B]=GDK_KEY_B;
-		HuiKeyID[KEY_C]=GDK_KEY_c;		HuiKeyID2[KEY_C]=GDK_KEY_C;
-		HuiKeyID[KEY_D]=GDK_KEY_d;		HuiKeyID2[KEY_D]=GDK_KEY_D;
-		HuiKeyID[KEY_E]=GDK_KEY_e;		HuiKeyID2[KEY_E]=GDK_KEY_E;
-		HuiKeyID[KEY_F]=GDK_KEY_f;		HuiKeyID2[KEY_F]=GDK_KEY_F;
-		HuiKeyID[KEY_G]=GDK_KEY_g;		HuiKeyID2[KEY_G]=GDK_KEY_G;
-		HuiKeyID[KEY_H]=GDK_KEY_h;		HuiKeyID2[KEY_H]=GDK_KEY_H;
-		HuiKeyID[KEY_I]=GDK_KEY_i;		HuiKeyID2[KEY_I]=GDK_KEY_I;
-		HuiKeyID[KEY_J]=GDK_KEY_j;		HuiKeyID2[KEY_J]=GDK_KEY_J;
-		HuiKeyID[KEY_K]=GDK_KEY_k;		HuiKeyID2[KEY_K]=GDK_KEY_K;
-		HuiKeyID[KEY_L]=GDK_KEY_l;		HuiKeyID2[KEY_L]=GDK_KEY_L;
-		HuiKeyID[KEY_M]=GDK_KEY_m;		HuiKeyID2[KEY_M]=GDK_KEY_M;
-		HuiKeyID[KEY_N]=GDK_KEY_n;		HuiKeyID2[KEY_N]=GDK_KEY_N;
-		HuiKeyID[KEY_O]=GDK_KEY_o;		HuiKeyID2[KEY_O]=GDK_KEY_O;
-		HuiKeyID[KEY_P]=GDK_KEY_p;		HuiKeyID2[KEY_P]=GDK_KEY_P;
-		HuiKeyID[KEY_Q]=GDK_KEY_q;		HuiKeyID2[KEY_Q]=GDK_KEY_Q;
-		HuiKeyID[KEY_R]=GDK_KEY_r;		HuiKeyID2[KEY_R]=GDK_KEY_R;
-		HuiKeyID[KEY_S]=GDK_KEY_s;		HuiKeyID2[KEY_S]=GDK_KEY_S;
-		HuiKeyID[KEY_T]=GDK_KEY_t;		HuiKeyID2[KEY_T]=GDK_KEY_T;
-		HuiKeyID[KEY_U]=GDK_KEY_u;		HuiKeyID2[KEY_U]=GDK_KEY_U;
-		HuiKeyID[KEY_V]=GDK_KEY_v;		HuiKeyID2[KEY_V]=GDK_KEY_V;
-		HuiKeyID[KEY_W]=GDK_KEY_w;		HuiKeyID2[KEY_W]=GDK_KEY_W;
-		HuiKeyID[KEY_X]=GDK_KEY_x;		HuiKeyID2[KEY_X]=GDK_KEY_X;
-		HuiKeyID[KEY_Y]=GDK_KEY_y;		HuiKeyID2[KEY_Y]=GDK_KEY_Y;
-		HuiKeyID[KEY_Z]=GDK_KEY_z;		HuiKeyID2[KEY_Z]=GDK_KEY_Z;
-		HuiKeyID[KEY_BACKSPACE]=GDK_KEY_BackSpace;
-		HuiKeyID[KEY_TAB]=GDK_KEY_Tab;
-		HuiKeyID[KEY_NUM_0]=GDK_KEY_KP_0;
-		HuiKeyID[KEY_NUM_1]=GDK_KEY_KP_1;
-		HuiKeyID[KEY_NUM_2]=GDK_KEY_KP_2;
-		HuiKeyID[KEY_NUM_3]=GDK_KEY_KP_3;
-		HuiKeyID[KEY_NUM_4]=GDK_KEY_KP_4;
-		HuiKeyID[KEY_NUM_5]=GDK_KEY_KP_5;
-		HuiKeyID[KEY_NUM_6]=GDK_KEY_KP_6;
-		HuiKeyID[KEY_NUM_7]=GDK_KEY_KP_7;
-		HuiKeyID[KEY_NUM_8]=GDK_KEY_KP_8;
-		HuiKeyID[KEY_NUM_9]=GDK_KEY_KP_9;
-		HuiKeyID[KEY_NUM_ADD]=GDK_KEY_KP_Add;
-		HuiKeyID[KEY_NUM_SUBTRACT]=GDK_KEY_KP_Subtract;
-		HuiKeyID[KEY_NUM_MULTIPLY]=GDK_KEY_KP_Multiply;
-		HuiKeyID[KEY_NUM_DIVIDE]=GDK_KEY_KP_Divide;
-		HuiKeyID[KEY_NUM_COMMA]=GDK_KEY_KP_Decimal;
-		HuiKeyID[KEY_NUM_ENTER]=GDK_KEY_KP_Enter;
-		HuiKeyID[KEY_COMMA]=GDK_KEY_comma;				HuiKeyID2[KEY_COMMA]=GDK_KEY_semicolon;
-		HuiKeyID[KEY_DOT]=GDK_KEY_period;
-		HuiKeyID[KEY_SMALLER]=GDK_KEY_less;			HuiKeyID2[KEY_AE]=GDK_KEY_greater;
-		HuiKeyID[KEY_SZ]=GDK_KEY_ssharp;
-		HuiKeyID[KEY_AE]=GDK_KEY_adiaeresis;			HuiKeyID2[KEY_AE]=GDK_KEY_ae;
-		HuiKeyID[KEY_OE]=GDK_KEY_odiaeresis;					HuiKeyID2[KEY_AE]=GDK_KEY_oe;
-		HuiKeyID[KEY_UE]=GDK_KEY_udiaeresis;
-		HuiKeyID[KEY_LWINDOWS]=GDK_KEY_Super_L;
-		HuiKeyID[KEY_RWINDOWS]=GDK_KEY_Super_R;
+		HuiKeyID[KEY_LCONTROL] = GDK_KEY_Control_L;
+		HuiKeyID[KEY_RCONTROL] = GDK_KEY_Control_R;
+		HuiKeyID[KEY_LSHIFT] = GDK_KEY_Shift_L;
+		HuiKeyID[KEY_RSHIFT] = GDK_KEY_Shift_R;
+		HuiKeyID[KEY_LALT] = GDK_KEY_Alt_L;
+		HuiKeyID[KEY_RALT] = GDK_KEY_Alt_R;
+		HuiKeyID[KEY_PLUS] = GDK_KEY_plus;
+		HuiKeyID[KEY_MINUS] = GDK_KEY_minus;
+		HuiKeyID[KEY_FENCE] = GDK_KEY_numbersign;
+		HuiKeyID[KEY_GRAVE] = GDK_KEY_asciicircum;
+		HuiKeyID[KEY_HOME] = GDK_KEY_Home;
+		HuiKeyID[KEY_END] = GDK_KEY_End;
+		HuiKeyID[KEY_PAGE_UP] = GDK_KEY_Page_Up;
+		HuiKeyID[KEY_PAGE_DOWN] = GDK_KEY_Page_Down;
+		HuiKeyID[KEY_UP] = GDK_KEY_Up;
+		HuiKeyID[KEY_DOWN] = GDK_KEY_Down;
+		HuiKeyID[KEY_LEFT] = GDK_KEY_Left;
+		HuiKeyID[KEY_RIGHT] = GDK_KEY_Right;
+		HuiKeyID[KEY_RETURN] = GDK_KEY_Return;
+		HuiKeyID[KEY_ESCAPE] = GDK_KEY_Escape;
+		HuiKeyID[KEY_INSERT] = GDK_KEY_Insert;
+		HuiKeyID[KEY_DELETE] = GDK_KEY_Delete;
+		HuiKeyID[KEY_SPACE] = GDK_KEY_space;
+		HuiKeyID[KEY_F1] = GDK_KEY_F1;
+		HuiKeyID[KEY_F2] = GDK_KEY_F2;
+		HuiKeyID[KEY_F3] = GDK_KEY_F3;
+		HuiKeyID[KEY_F4] = GDK_KEY_F4;
+		HuiKeyID[KEY_F5] = GDK_KEY_F5;
+		HuiKeyID[KEY_F6] = GDK_KEY_F6;
+		HuiKeyID[KEY_F7] = GDK_KEY_F7;
+		HuiKeyID[KEY_F8] = GDK_KEY_F8;
+		HuiKeyID[KEY_F9] = GDK_KEY_F9;
+		HuiKeyID[KEY_F10] = GDK_KEY_F10;
+		HuiKeyID[KEY_F11] = GDK_KEY_F11;
+		HuiKeyID[KEY_F12] = GDK_KEY_F12;
+		HuiKeyID[KEY_1] = GDK_KEY_1;
+		HuiKeyID[KEY_2] = GDK_KEY_2;
+		HuiKeyID[KEY_3] = GDK_KEY_3;
+		HuiKeyID[KEY_4] = GDK_KEY_4;
+		HuiKeyID[KEY_5] = GDK_KEY_5;
+		HuiKeyID[KEY_6] = GDK_KEY_6;
+		HuiKeyID[KEY_7] = GDK_KEY_7;
+		HuiKeyID[KEY_8] = GDK_KEY_8;
+		HuiKeyID[KEY_9] = GDK_KEY_9;
+		HuiKeyID[KEY_0] = GDK_KEY_0;
+		HuiKeyID[KEY_A] = GDK_KEY_a;		HuiKeyID2[KEY_A] = GDK_KEY_A;
+		HuiKeyID[KEY_B] = GDK_KEY_b;		HuiKeyID2[KEY_B] = GDK_KEY_B;
+		HuiKeyID[KEY_C] = GDK_KEY_c;		HuiKeyID2[KEY_C] = GDK_KEY_C;
+		HuiKeyID[KEY_D] = GDK_KEY_d;		HuiKeyID2[KEY_D] = GDK_KEY_D;
+		HuiKeyID[KEY_E] = GDK_KEY_e;		HuiKeyID2[KEY_E] = GDK_KEY_E;
+		HuiKeyID[KEY_F] = GDK_KEY_f;		HuiKeyID2[KEY_F] = GDK_KEY_F;
+		HuiKeyID[KEY_G] = GDK_KEY_g;		HuiKeyID2[KEY_G] = GDK_KEY_G;
+		HuiKeyID[KEY_H] = GDK_KEY_h;		HuiKeyID2[KEY_H] = GDK_KEY_H;
+		HuiKeyID[KEY_I] = GDK_KEY_i;		HuiKeyID2[KEY_I] = GDK_KEY_I;
+		HuiKeyID[KEY_J] = GDK_KEY_j;		HuiKeyID2[KEY_J] = GDK_KEY_J;
+		HuiKeyID[KEY_K] = GDK_KEY_k;		HuiKeyID2[KEY_K] = GDK_KEY_K;
+		HuiKeyID[KEY_L] = GDK_KEY_l;		HuiKeyID2[KEY_L] = GDK_KEY_L;
+		HuiKeyID[KEY_M] = GDK_KEY_m;		HuiKeyID2[KEY_M] = GDK_KEY_M;
+		HuiKeyID[KEY_N] = GDK_KEY_n;		HuiKeyID2[KEY_N] = GDK_KEY_N;
+		HuiKeyID[KEY_O] = GDK_KEY_o;		HuiKeyID2[KEY_O] = GDK_KEY_O;
+		HuiKeyID[KEY_P] = GDK_KEY_p;		HuiKeyID2[KEY_P] = GDK_KEY_P;
+		HuiKeyID[KEY_Q] = GDK_KEY_q;		HuiKeyID2[KEY_Q] = GDK_KEY_Q;
+		HuiKeyID[KEY_R] = GDK_KEY_r;		HuiKeyID2[KEY_R] = GDK_KEY_R;
+		HuiKeyID[KEY_S] = GDK_KEY_s;		HuiKeyID2[KEY_S] = GDK_KEY_S;
+		HuiKeyID[KEY_T] = GDK_KEY_t;		HuiKeyID2[KEY_T] = GDK_KEY_T;
+		HuiKeyID[KEY_U] = GDK_KEY_u;		HuiKeyID2[KEY_U] = GDK_KEY_U;
+		HuiKeyID[KEY_V] = GDK_KEY_v;		HuiKeyID2[KEY_V] = GDK_KEY_V;
+		HuiKeyID[KEY_W] = GDK_KEY_w;		HuiKeyID2[KEY_W] = GDK_KEY_W;
+		HuiKeyID[KEY_X] = GDK_KEY_x;		HuiKeyID2[KEY_X] = GDK_KEY_X;
+		HuiKeyID[KEY_Y] = GDK_KEY_y;		HuiKeyID2[KEY_Y] = GDK_KEY_Y;
+		HuiKeyID[KEY_Z] = GDK_KEY_z;		HuiKeyID2[KEY_Z] = GDK_KEY_Z;
+		HuiKeyID[KEY_BACKSPACE] = GDK_KEY_BackSpace;
+		HuiKeyID[KEY_TAB] = GDK_KEY_Tab;
+		HuiKeyID[KEY_NUM_0] = GDK_KEY_KP_0;
+		HuiKeyID[KEY_NUM_1] = GDK_KEY_KP_1;
+		HuiKeyID[KEY_NUM_2] = GDK_KEY_KP_2;
+		HuiKeyID[KEY_NUM_3] = GDK_KEY_KP_3;
+		HuiKeyID[KEY_NUM_4] = GDK_KEY_KP_4;
+		HuiKeyID[KEY_NUM_5] = GDK_KEY_KP_5;
+		HuiKeyID[KEY_NUM_6] = GDK_KEY_KP_6;
+		HuiKeyID[KEY_NUM_7] = GDK_KEY_KP_7;
+		HuiKeyID[KEY_NUM_8] = GDK_KEY_KP_8;
+		HuiKeyID[KEY_NUM_9] = GDK_KEY_KP_9;
+		HuiKeyID[KEY_NUM_ADD] = GDK_KEY_KP_Add;
+		HuiKeyID[KEY_NUM_SUBTRACT] = GDK_KEY_KP_Subtract;
+		HuiKeyID[KEY_NUM_MULTIPLY] = GDK_KEY_KP_Multiply;
+		HuiKeyID[KEY_NUM_DIVIDE] = GDK_KEY_KP_Divide;
+		HuiKeyID[KEY_NUM_COMMA] = GDK_KEY_KP_Decimal;
+		HuiKeyID[KEY_NUM_ENTER] = GDK_KEY_KP_Enter;
+		HuiKeyID[KEY_COMMA] = GDK_KEY_comma;				HuiKeyID2[KEY_COMMA] = GDK_KEY_semicolon;
+		HuiKeyID[KEY_DOT] = GDK_KEY_period;
+		HuiKeyID[KEY_LESS] = GDK_KEY_less;			HuiKeyID2[KEY_LESS] = GDK_KEY_greater;
+		HuiKeyID[KEY_SZ] = GDK_KEY_ssharp;
+		HuiKeyID[KEY_AE] = GDK_KEY_adiaeresis;			HuiKeyID2[KEY_AE] = GDK_KEY_ae;
+		HuiKeyID[KEY_OE] = GDK_KEY_odiaeresis;					HuiKeyID2[KEY_AE] = GDK_KEY_oe;
+		HuiKeyID[KEY_UE] = GDK_KEY_udiaeresis;
+		HuiKeyID[KEY_LWINDOWS] = GDK_KEY_Super_L;
+		HuiKeyID[KEY_RWINDOWS] = GDK_KEY_Super_R;
 	#endif
 }
 
-string GetKeyName(int k)
-{
+string GetKeyName(int k) {
 	if (k==KEY_LCONTROL)	return "ControlL";
 	if (k==KEY_RCONTROL)	return "ControlR";
 	if (k==KEY_LSHIFT)		return "ShiftL";
 	if (k==KEY_RSHIFT)		return "ShiftR";
 	if (k==KEY_LALT)		return "AltL";
 	if (k==KEY_RALT)		return "AltR";
-	if (k==KEY_ADD)			return "Add";
-	if (k==KEY_SUBTRACT)	return "Subtract";
-	if (k==KEY_FENCE)		return "Fence";
+	if (k==KEY_PLUS)			return "+";
+	if (k==KEY_MINUS)	return "-";
+	if (k==KEY_FENCE)		return "#";
 	if (k==KEY_GRAVE)		return "Grave";
 	if (k==KEY_END)			return "End";
-	if (k==KEY_NEXT)		return "Next";
-	if (k==KEY_PRIOR)		return "Prior";
-	if (k==KEY_UP)			return "ArrowUp";
-	if (k==KEY_DOWN)		return "ArrowDown";
-	if (k==KEY_LEFT)		return "ArrowLeft";
-	if (k==KEY_RIGHT)		return "ArrowRight";
+	if (k==KEY_PAGE_UP)		return "Next";
+	if (k==KEY_PAGE_DOWN)		return "Prior";
+	if (k==KEY_UP)			return "Up";
+	if (k==KEY_DOWN)		return "Down";
+	if (k==KEY_LEFT)		return "Left";
+	if (k==KEY_RIGHT)		return "Right";
 	if (k==KEY_RETURN)		return "Return";
 	if (k==KEY_ESCAPE)		return "Escape";
 	if (k==KEY_INSERT)		return "Insert";
@@ -398,30 +394,29 @@ string GetKeyName(int k)
 	if (k==KEY_NUM_DIVIDE)	return "Num Divide";
 	if (k==KEY_NUM_ENTER)	return "Num Enter";
 	if (k==KEY_NUM_COMMA)	return "Num Comma";
-	if (k==KEY_COMMA)		return "Comma";
-	if (k==KEY_DOT)			return "Dot";
-	if (k==KEY_SMALLER)		return "<";
-	if (k==KEY_SZ)			return "ß";
-	if (k==KEY_AE)			return "Ä";
-	if (k==KEY_OE)			return "Ö";
-	if (k==KEY_UE)			return "Ü";
+	if (k==KEY_COMMA)		return ",";
+	if (k==KEY_DOT)			return ".";
+	if (k==KEY_LESS)		return "<";
+	if (k==KEY_SZ)			return u8"ß";
+	if (k==KEY_AE)			return u8"Ä";
+	if (k==KEY_OE)			return u8"Ö";
+	if (k==KEY_UE)			return u8"Ü";
 	if (k==KEY_RWINDOWS)	return "WindowsR";
 	if (k==KEY_LWINDOWS)	return "WindowsL";
 	return "";
 }
 
 
-string GetKeyCodeName(int key_code)
-{
+string GetKeyCodeName(int key_code) {
 	if (key_code < 0)
 		return "";
 	string n;
 	if ((key_code & KEY_CONTROL) == KEY_CONTROL)
-		n += "Ctrl + ";
+		n += "Ctrl+";
 	if ((key_code & KEY_SHIFT) == KEY_SHIFT)
-		n += "Shift + ";
+		n += "Shift+";
 	if ((key_code & KEY_ALT) == KEY_ALT)
-		n += "Alt + ";
+		n += "Alt+";
 	n += GetKeyName(key_code % 256);
 	return n;
 }
@@ -443,13 +438,23 @@ int ParseKeyCode(const string &s) {
 	return key;
 }
 
-
-string GetKeyChar(int key_code)
-{
-	// TODO ... using German key table
-	
+// deprecated... for now
+string GetKeyChar(int key_code) {
 	if (key_code < 0)
 		return "";
+
+	int gdk_keyvalue = HuiKeyID[key_code & 0xff];
+	if ((key_code & KEY_SHIFT) > 0)
+		gdk_keyvalue = gdk_keyval_to_upper(gdk_keyvalue);
+	int code = gdk_keyval_to_unicode(gdk_keyvalue);
+	if (code > 0)
+		return utf32_to_utf8({code});
+	// ARGH...FIXME
+
+	// TODO ... using German key table
+	//auto *map = gdk_keymap_get_for_display(gdk_display_get_default());
+	
+
 	int key = (key_code % 256);
 	// shift
 	if ((key_code & KEY_SHIFT) > 0){
@@ -471,9 +476,9 @@ string GetKeyChar(int key_code)
 		if (key==KEY_0)			return "=";
 		if (key==KEY_COMMA)		return ";";
 		if (key==KEY_DOT)		return ":";
-		if (key==KEY_ADD)		return "*";
-		if (key==KEY_SUBTRACT)	return "_";
-		if (key==KEY_SMALLER)	return ">";
+		if (key==KEY_PLUS)		return "*";
+		if (key==KEY_MINUS)	return "_";
+		if (key==KEY_LESS)	return ">";
 		if (key==KEY_SZ)			return "?";
 		if (key==KEY_AE)			return u8"Ä";
 		if (key==KEY_OE)			return u8"Ö";
@@ -494,8 +499,8 @@ string GetKeyChar(int key_code)
 		if (key==KEY_8)			return "[";
 		if (key==KEY_9)			return "]";
 		if (key==KEY_0)			return "}";
-		if (key==KEY_ADD)		return "~";
-		if (key==KEY_SMALLER)	return "|";
+		if (key==KEY_PLUS)		return "~";
+		if (key==KEY_MINUS)	return "|";
 		if (key==KEY_SZ)		return "\\";
 		return "";
 	}
@@ -514,15 +519,15 @@ string GetKeyChar(int key_code)
 		}
 	if (key==KEY_COMMA)			return ",";
 	if (key==KEY_DOT)			return ".";
-	if (key==KEY_ADD)			return "+";
-	if (key==KEY_SUBTRACT)		return "-";
+	if (key==KEY_PLUS)			return "+";
+	if (key==KEY_MINUS)		return "-";
 	if (key==KEY_FENCE)			return "#";
 	if (key==KEY_GRAVE)			return "^";
 	if (key==KEY_NUM_ADD)			return "+";
 	if (key==KEY_NUM_SUBTRACT)	return "-";
 	if (key==KEY_NUM_MULTIPLY)	return "*";
 	if (key==KEY_NUM_DIVIDE)		return "/";
-	if (key==KEY_SMALLER)		return "<";
+	if (key==KEY_LESS)		return "<";
 	if (key==KEY_SZ)				return u8"ß";
 	if (key==KEY_AE)				return u8"ä";
 	if (key==KEY_OE)				return u8"ö";

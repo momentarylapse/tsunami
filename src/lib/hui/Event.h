@@ -12,21 +12,16 @@
 #include "../base/base.h"
 #include "Callback.h"
 
-namespace hui
-{
+namespace hui {
 
 class Window;
 
 
-class EventHandler : public VirtualBase
-{
-public:
-};
+class EventHandler : public VirtualBase {};
 
 
 
-class Event
-{
+class Event {
 	public:
 	Window *win;
 	string message, id;
@@ -35,23 +30,23 @@ class Event
 	float dx, dy;
 	float scroll_x, scroll_y;
 	float pressure;
-	int key, key_code;
-	string text;
+	int key_code;
 	int width, height;
 	bool lbut, mbut, rbut;
 	int row, column, row_target;
 	bool just_focused;
+	static string _text;
 	Event(){}
 	Event(const string &id, const string &message);
 
 	bool match(const string &id, const string &message) const;
+	string text() const;
 };
 
 extern Event _hui_event_;
 Event *GetEvent();
 
-class EventKeyCode
-{
+class EventKeyCode {
 public:
 	string id, message;
 	int key_code;
@@ -59,8 +54,7 @@ public:
 	EventKeyCode(const string &id, const string &messgae, int key_code);
 };
 
-class EventListener
-{
+class EventListener {
 public:
 	int uid;
 	int type;
@@ -85,25 +79,25 @@ void SaveKeyCodes(const string &filename);
 // input
 string _cdecl GetKeyName(int key_code);
 string _cdecl GetKeyCodeName(int key_code);
-string _cdecl GetKeyChar(int key_code);
+//string _cdecl GetKeyChar(int key_code);
 int _cdecl ParseKeyCode(const string &code);
 
 
 
-// key codes
-enum{
+// key codes (physical keys)
+enum {
 	KEY_LCONTROL,
 	KEY_RCONTROL,
 	KEY_LSHIFT,
 	KEY_RSHIFT,
 	KEY_LALT,
 	KEY_RALT,
-	KEY_ADD,
-	KEY_SUBTRACT,
+	KEY_PLUS,
+	KEY_MINUS,
 	KEY_FENCE,		// "Raute"???
 	KEY_END,
-	KEY_NEXT,
-	KEY_PRIOR,
+	KEY_PAGE_UP,
+	KEY_PAGE_DOWN,
 	KEY_UP,
 	KEY_DOWN,
 	KEY_LEFT,
@@ -182,7 +176,7 @@ enum{
 	KEY_NUM_ENTER,
 	KEY_COMMA,
 	KEY_DOT,
-	KEY_SMALLER,
+	KEY_LESS,
 	KEY_SZ,
 	KEY_AE,
 	KEY_OE,

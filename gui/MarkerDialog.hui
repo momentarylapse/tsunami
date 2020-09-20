@@ -7,4 +7,5 @@ Dialog marker_dialog "Marker" width=250 height=80 headerbar closebutton=no
 			ComboBox key_type "" expandx
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
+			---|
 			Button ok "Set" default image=hui:ok

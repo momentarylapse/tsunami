@@ -9,7 +9,7 @@
 #include "../lib/file/msg.h"
 
 
-string CLIParser::Mode::str(const string &cmd) {
+string CLIParser::Mode::str(const string &cmd) const {
 	string s = cmd;
 	if (name != "")
 		s += " " + name;
@@ -18,11 +18,15 @@ string CLIParser::Mode::str(const string &cmd) {
 	return s;
 }
 
-bool CLIParser::Mode::match(const string &arg) {
+string CLIParser::Mode::stri(const string &cmd) const {
+	return format("%-36s # %s", str(cmd), info);
+}
+
+bool CLIParser::Mode::match(const string &arg) const {
 	return sa_contains(name.explode("/"), arg);
 }
 
-int CLIParser::Mode::grab_parameters(const Array<string> &arg) {
+int CLIParser::Mode::grab_parameters(const Array<string> &arg) const {
 	int min_params = 0;
 	int max_params = 0;
 	for (auto &p: parameter) {
@@ -42,21 +46,24 @@ int CLIParser::Mode::grab_parameters(const Array<string> &arg) {
 	return min(arg.num, max_params);
 }
 
-string CLIParser::Option::str() {
+string CLIParser::Option::str() const {
 	if (parameter.num > 0)
 		return name + " " + parameter;
 	else
 		return name;
 }
+string CLIParser::Option::stri() const {
+	return format("%-36s # %s", str(), info);
+}
 
-void CLIParser::option(const string &name, const std::function<void()> &cb) {
-	options.add({name, "", cb, nullptr});
+void CLIParser::flag(const string &name, const string &info, const std::function<void()> &cb) {
+	options.add({name, "", info, cb, nullptr});
 }
-void CLIParser::option(const string &name, const string &p, const std::function<void(const string&)> &cb) {
-	options.add({name, p, nullptr, cb});
+void CLIParser::option(const string &name, const string &p, const string &info, const std::function<void(const string&)> &cb) {
+	options.add({name, p, info, nullptr, cb});
 }
-void CLIParser::mode(const string &name, const Array<string> &p, const std::function<void(const Array<string>&)> &cb) {
-	modes.add({name, p, cb});
+void CLIParser::mode(const string &name, const Array<string> &p, const string &info, const std::function<void(const Array<string>&)> &cb) {
+	modes.add({name, p, info, cb});
 }
 
 void CLIParser::info(const string &cmd, const string &i) {
@@ -64,100 +71,111 @@ void CLIParser::info(const string &cmd, const string &i) {
 	_info = i;
 }
 
-void CLIParser::show() {
+void CLIParser::show_info() {
 	msg_write(_info);
 	msg_write("");
 	msg_write("run:");
 	for (auto &m: modes)
-		msg_write("  " + m.str(command));
+		msg_write("  " + m.stri(command));
 	if (options.num > 0) {
 		msg_write("");
 		msg_write("options:");
 		for (auto &o: options)
-			msg_write("  " + o.str());
+			msg_write("  " + o.stri());
 	}
 }
 
-void CLIParser::parse(const Array<string> &_arg) {
-	bool had_mode = false;
-	for (int i=1; i<_arg.num; i++) {
-		if (_arg[i].head(1) == "-") {
-			bool found = false;
-			for (auto &o: options) {
-				if (sa_contains(o.name.explode("/"), _arg[i])) {
-					if (o.parameter.num > 0) {
-						if (_arg.num <= i + 1) {
-							msg_error("parameter '" + o.parameter + "' expected after " + o.name);
-							exit(1);
-						}
-						o.callback_param(_arg[i+1]);
-						i ++;
-					} else {
-						o.callback();
-					}
-					found = true;
-				}
-			}
-			for (auto &m: modes) {
-				if (m.name == "")
-					continue;
-				if (m.match(_arg[i])) {
-					int n = m.grab_parameters(_arg.sub(i+1, -1));
-					if (n < 0) {
-						msg_error("missing parameter after " + m.name);
-						msg_write(m.str(command));
-						exit(1);
-					}
-					m.callback(_arg.sub(i+1, n));
-					i += n;
-					found = true;
-					had_mode = true;
-				}
-			}
-			if (!found) {
-				msg_error("unknown option " + _arg[i]);
-				exit(1);
-			}
-		} else {
-			// rest
-			arg.add(_arg[i]);
-		}
+void CLIParser::die(const string &msg) {
+	msg_error(msg);
+	exit(1);
+}
+
+bool CLIParser::try_run_mode(const Mode &m, const Array<string> &arg) {
+	int i0 = 0;
+
+	if (m.name == "") {
+		// always match
+	} else {
+		if (arg.num == 0)
+			return false;
+		if (!m.match(arg[0]))
+			return false;
+		i0 = 1;
 	}
 
-	if (had_mode) {
-		if (arg.num > 0) {
-			msg_error("unexpected parameter: " + arg[0]);
-			exit(1);
+	int n = m.grab_parameters(arg.sub(i0, -1));
+	if (n < 0)
+		die("missing parameter for command: " + m.str());
+	if (n < arg.num-i0)
+		die("too many parameters for command: " + m.str());
+	m.callback(arg.sub(i0, n));
+	return true;
+}
+
+Array<string> CLIParser::eval_all_options(const Array<string> &arg) {
+
+	Array<string> rest;
+
+	// pick out all options
+	for (int i=1; i<arg.num; i++) {
+		if (arg[i].head(1) != "-") {
+			rest.add(arg[i]);
+			continue;
 		}
 
-	} else {
-	// default mode
+		bool found = false;
+
+		// is a mode?
+		for (auto &m: modes) {
+			if (m.name == "")
+				continue;
+			if (m.match(arg[i])) {
+				rest.add(arg[i]);
+				found = true;
+			}
+		}
+		if (found)
+			continue;
+
+		// is an option?
+		for (auto &o: options) {
+			if (sa_contains(o.name.explode("/"), arg[i])) {
+				if (o.parameter.num > 0) {
+					if (arg.num <= i + 1)
+						die("parameter '" + o.parameter + "' expected after " + o.name);
+					o.callback_param(arg[i+1]);
+					i ++;
+				} else {
+					o.callback();
+				}
+				found = true;
+			}
+		}
+
+
+		if (!found)
+			die("unknown option: " + arg[i]);
+	}
+	return rest;
+}
+
+void CLIParser::parse(const Array<string> &arg) {
+
+	auto rest = eval_all_options(arg);
+
+	// first try named modes
 	for (auto &m: modes) {
 		if (m.name != "")
-			continue;
-		int n = m.grab_parameters(arg);
-		if (n < 0) {
-			msg_error("missing parameter");
-			msg_write(m.str(command));
-			exit(1);
-		}
-		if (n < arg.num) {
-			msg_error("unexpected parameter: " + arg[n]);
-			exit(1);
-		}
-		m.callback(arg);
-		had_mode = true;
+			if (try_run_mode(m, rest))
+				return;
 	}
+	// then the default mode
+	for (auto &m: modes) {
+		if (m.name == "")
+			if (try_run_mode(m, rest))
+				return;
 	}
 
-	if (!had_mode) {
-		msg_error("no default mode?!?");
-		exit(1);
-	}
 
-	/*if (!found) {
-		msg_error("unexpected parameter: " + _arg[i]);
-		exit(1);
-	}*/
-
+	die("no matching default mode?!?");
 }

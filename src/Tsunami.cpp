@@ -110,13 +110,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 
 	CLIParser p;
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
-	p.option("--slow", [&]{ ugly_hack_slow = true; });
-	p.option("--plugin", "FILE", [&](const string &a){ plugin_file = a; });
-	p.option("--chain", "FILE", [&](const string &a){ chain_file = a; });
-	p.option("--params", "PARAMS", [&](const string &a){ Storage::options_in = a; });
+	p.flag("--slow", "", [&]{ ugly_hack_slow = true; });
+	p.option("--plugin", "FILE", "add a plugin to run", [&](const string &a){ plugin_file = a; });
+	p.option("--chain", "FILE", "add a signal chain", [&](const string &a){ chain_file = a; });
+	p.option("--params", "PARAMS", "set loading parameters", [&](const string &a){ Storage::options_in = a; });
 
 
-	p.mode("", {"[FILE]"}, [&](const Array<string> &a){
+	p.mode("", {"[FILE]"}, "open a window and (optionally) load a file", [&](const Array<string> &a){
 		Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
@@ -141,10 +141,10 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		BackupManager::check_old_files(Session::GLOBAL);
 		allow_window = true;
 	});
-	p.mode("--help", {}, [&](const Array<string> &){
-		p.show();
+	p.mode("--help", {}, "show this info", [&](const Array<string> &){
+		p.show_info();
 	});
-	p.mode("--info", {"FILE1", "..."}, [&](const Array<string> &a){
+	p.mode("--info", {"FILE1", "..."}, "show information about the file", [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		for (string &filename: a) {
@@ -164,7 +164,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		}
 		delete song;
 	});
-	p.mode("--export", {"FILE_IN", "FILE_OUT"}, [&](const Array<string> &a){
+	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (session->storage->load(song, a[0])) {
@@ -172,7 +172,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		}
 		delete song;
 	});
-	p.mode("--execute", {"PLUGIN"}, [&](const Array<string> &a){
+	p.mode("--execute", {"PLUGIN"}, "just run a plugin", [&](const Array<string> &a){
 		device_manager->init();
 		session = create_session();
 		session->win->hide();
@@ -180,13 +180,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->execute_tsunami_plugin(a[0]);
 	});
 #ifndef NDEBUG
-	p.mode("--list-tests", {}, [&](const Array<string> &){
+	p.mode("--list-tests", {}, "debug: list internal unit tests", [&](const Array<string> &){
 		UnitTest::print_all_names();
 	});
-	p.mode("--run-tests", {"FILTER"}, [&](const Array<string> &a){
+	p.mode("--run-tests", {"FILTER"}, "debug: run internal unit tests", [&](const Array<string> &a){
 		UnitTest::run_all(a[0]);
 	});
-	p.mode("--preview-gui", {"TYPE", "NAME"}, [&](const Array<string> &a){
+	p.mode("--preview-gui", {"TYPE", "NAME"}, "debug: show the config gui of a plugin", [&](const Array<string> &a){
 		session = create_session();
 		session->win->hide();
 		Module *m = nullptr;

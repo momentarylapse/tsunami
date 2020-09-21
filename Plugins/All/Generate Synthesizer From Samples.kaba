@@ -91,13 +91,15 @@ class XXX extends SongPlugin
 					int k0 = int(zz["keys"][0])
 					int k1 = int(zz["keys"][1]) + 1
 					let s = song.samples[int(zz["sample"])]
-					int root = -1
 					if zz.has("root-key")
-						root = int(zz["root-key"])
-					else if s.get_value("pitch") != ""
-						root = int(s.get_value("pitch"))
-					else
+						s.set_value("pitch", zz["root-key"])
+					if zz.has("start-loop")
+						s.set_value("start-loop", zz["start-loop"])
+					if zz.has("end-loop")
+						s.set_value("end-loop", zz["end-loop"])
+					if s.get_value("pitch") == ""
 						continue
+					int root = int(s.get_value("pitch"))
 					for pitch in k0:k1
 						if pitch >= len(synth.config.samples)
 							synth.config.samples.resize(pitch+1)
@@ -108,6 +110,7 @@ class XXX extends SongPlugin
 							else
 								shift(song, synth, s, root, pitch)
 	#							prog.set("pitch shift", 0.2)
+
 	#	prog.set("remove samples", 0.7)
 		let to_del = [for s in session.song.samples s if s.ref_count == 0]
 		for s in to_del

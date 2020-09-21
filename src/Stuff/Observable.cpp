@@ -115,16 +115,24 @@ void ObservableData::subscribe(VirtualBase *_me, VirtualBase *observer, const Ob
 	subscriptions.add(ObservableData::Subscription(observer, &message, callback, callback_p));
 	me = _me;
 	if (MESSAGE_DEBUG_LEVEL >= 2)
-		msg_write("subscribe:  " + get_obs_name(me) + "  <<  (" + message + ")  <<  " + get_obs_name(observer));
+		msg_write(format("subscribe:  %s  <<  (%s)  <<  %s", get_obs_name(me), message, get_obs_name(observer)));
 }
 
 void ObservableData::unsubscribe(VirtualBase *observer) {
 	if (MESSAGE_DEBUG_LEVEL >= 2)
-		msg_write("unsubscribe:  " + get_obs_name(me) + "  <<  " + get_obs_name(observer));
+		msg_write(format("unsubscribe:  %s  <<  %s", get_obs_name(me), get_obs_name(observer)));
 	for (int i=subscriptions.num-1; i>=0; i--)
 		if (subscriptions[i].observer == observer) {
 			subscriptions.erase(i);
 		}
+}
+
+static bool om_match(const string &m, const ObservableData::Subscription &r) {
+	if (*r.message == m)
+		return true;
+	if ((*r.message == Observable<VirtualBase>::MESSAGE_ANY) and (m != Observable<VirtualBase>::MESSAGE_DELETE))
+		return true;
+	return false;
 }
 
 void ObservableData::notify_send() {
@@ -139,7 +147,7 @@ void ObservableData::notify_send() {
 	for (const string *m: message_queue) {
 		//msg_write("send " + observable_name + ": " + queue[i]);
 		for (auto &r: subscriptions) {
-			if ((*r.message == *m) or (*r.message == Observable<VirtualBase>::MESSAGE_ANY))
+			if (om_match(*m, r))
 				notifications.add(Notification(r.observer, m, r.callback, r.callback_p));
 		}
 	}
@@ -149,7 +157,7 @@ void ObservableData::notify_send() {
 	// send
 	for (auto &n: notifications) {
 		if (MESSAGE_DEBUG_LEVEL >= 1) {
-			msg_write("send " + get_obs_name(me) + "  ---" + *n.message + "--->>  " + get_obs_name(n.observer));
+			msg_write(format("send %s  ---%s--->> %s", get_obs_name(me), *n.message, get_obs_name(n.observer)));
 			msg_right();
 		}
 

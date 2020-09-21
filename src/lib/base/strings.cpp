@@ -1200,7 +1200,7 @@ Array<string> str_parse_tokens(const string &line, const string &splitters) {
 					if (keep_quotes)
 						tokens.add(line.substr(start, i-start+1));
 					else
-						tokens.add(line.substr(start+1, i-start-1));
+						tokens.add(line.substr(start+1, i-start-1).unescape());
 					break;
 				}
 			}

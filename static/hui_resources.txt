@@ -7517,7 +7517,7 @@ bar_add_dialog/count
 1
 
 bar_add_dialog/divisor
-𝅘𝅥   \\\\𝅘𝅥𝅮   \\\\𝅘𝅥𝅯   
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 bar_add_dialog/ok
 Add
@@ -7553,10 +7553,10 @@ bar_edit_dialog/complex
 
 complex beat pattern
 bar_edit_dialog/divisor
-𝅘𝅥   \\\\𝅘𝅥𝅮   \\\\𝅘𝅥𝅯   
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 bar_edit_dialog/mode
-Speed\\\\Replace
+Speed\\Replace
 
 bar_edit_dialog/number
 1
@@ -7625,7 +7625,7 @@ curve_console/curve_console
 Kurven
 
 curve_console/curves
-Target\\\\min\\\\max
+Target\\min\\max
 
 curve_console/target
 Parameter
@@ -7640,19 +7640,19 @@ detune_synthesizer_dialog/relative
 Relative
 Only show detuning relative to the original pitch
 device-manager/dev-tab
-Output\\\\Input\\\\Midi Input
+Output\\Input\\Midi Input
 
 device-manager/erase
 
 Remove from list
 device-manager/input-list
-#\\\\name\\\\internal name\\\\channels\\\\show\\\\present
+#\\name\\internal name\\channels\\show\\present
 
 device-manager/midi-input-list
-#\\\\name\\\\internal name\\\\show\\\\present
+#\\name\\internal name\\show\\present
 
 device-manager/output-list
-#\\\\name\\\\internal name\\\\channels\\\\show\\\\present
+#\\name\\internal name\\channels\\show\\present
 
 dummy-editor/dummy-editor
 Editing
@@ -7784,7 +7784,7 @@ help-dialog/mouse-zoom
 Ctrl+scroll
 
 help-dialog/tab
-Basics\\\\Recording
+Basics\\Recording
 
 layer_dialog/add_layer
 
@@ -7796,7 +7796,7 @@ layer_dialog/layer_dialog
 Layers
 
 layer_dialog/layers
-#\\\\Name\\\\Active
+#\\Name\\Active
 Each layer can contain its own audio buffers
 layer_dialog/lvld_t_edit
 Edit
@@ -7808,7 +7808,7 @@ log_console/log_console
 Nachrichten
 
 log_console/log_list
-type\\\\msg
+type\\msg
 
 log_toolbar/log_clear
 Clear
@@ -8172,7 +8172,7 @@ midi_editor/modifier-natural
 Natural - new note ignores any modifiers in the key
 midi_editor/modifier-none
 
-None - new note is only affected by the current key (defined via the \\\"key change\\\" operation below)
+None - new note is only affected by the current key (defined via the \"key change\" operation below)
 midi_editor/modifier-sharp
 ♯
 Sharp - new note is 1 semitone above the key
@@ -8201,7 +8201,7 @@ mini_bar/show_bottom_bar
 
 Expand
 mini_bar/volume
-0\\\\-10000\\\\10\\\\0.1
+0\\-10000\\10\\0.1
 Output volume
 mixing-console/link-volumes
 🔗
@@ -8246,7 +8246,7 @@ new_dialog/complex
 
 complex beat pattern
 new_dialog/divisor
-𝅘𝅥   \\\\𝅘𝅥𝅮   \\\\𝅘𝅥𝅯   
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 new_dialog/metronome
 Add
@@ -8675,7 +8675,7 @@ sample-manager-dialog/group-edit
 Edit
 
 sample-manager-dialog/sample-list
-Preview\\\\Duration\\\\Name\\\\Usage
+Preview\\Duration\\Name\\Usage
 
 sample-manager-dialog/sample-manager-dialog
 Sample Manager
@@ -8708,7 +8708,7 @@ sample_scale_dialog/factor
 0
 
 sample_scale_dialog/method
-Linear\\\\Cubic\\\\Sinc\\\\Fourier
+Linear\\Cubic\\Sinc\\Fourier
 
 sample_scale_dialog/rate_inv_new
 1
@@ -8762,7 +8762,7 @@ sample_selection_dialog/sample_selection_dialog
 Sample
 
 sample_selection_dialog/sample_selection_list
-Preview\\\\Duration\\\\Name
+Preview\\Duration\\Name
 
 settings_dialog/antialiasing
 Antialiasing
@@ -8783,7 +8783,7 @@ settings_dialog/midi_api
 
 a program restart is required to apply
 settings_dialog/ogg_bitrate
-64\\\\80\\\\96\\\\112\\\\128\\\\160\\\\196\\\\224\\\\256\\\\320\\\\500
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
 
 settings_dialog/pdp_colorscheme
 Color scheme
@@ -8831,7 +8831,7 @@ settings_dialog/t_suck_size
 Suck buffer
 
 settings_dialog/tab
-General\\\\User Interface\\\\Devices\\\\Other
+General\\User Interface\\Devices\\Other
 
 song_dialog/ad_t_edit
 Edit
@@ -8847,13 +8847,13 @@ Tags
 
 song_dialog/compress
 Compression
-When saving. EXPERIMENTAL! (don\\'t use!)
+When saving. EXPERIMENTAL! (don't use!)
 song_dialog/end
 
 Position of the last audio chunk/midi note
 song_dialog/format
 
-When saving. EXPERIMENTAL! (probably don\\'t change!)
+When saving. EXPERIMENTAL! (probably don't change!)
 song_dialog/grp-format
 Format
 
@@ -8888,8 +8888,8 @@ song_dialog/t-start
 Start
 
 song_dialog/tags
-Tag\\\\Value
-Suggestion:\\n* title\\n* artist\\n* album\\n* tracknumber\\n* year/date\\n* genre
+Tag\\Value
+Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
 synth_console/detune
 
 detune
@@ -8927,10 +8927,10 @@ track-mixer2/add-midi-fx
 
 Add new midi effect
 track-mixer2/fx
-enabled\\\\name
+enabled\\name
 
 track-mixer2/midi-fx
-enabled\\\\name
+enabled\\name
 
 track-mixer2/mute
 M
@@ -8945,7 +8945,7 @@ track-mixer2/solo
 S
 Solo
 track-mixer2/tc
-audio\\\\midi
+audio\\midi
 
 track-mixer2/volume
 0

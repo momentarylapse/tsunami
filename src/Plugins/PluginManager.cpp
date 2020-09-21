@@ -304,7 +304,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Sample.midi", &Sample::midi);
 	Kaba::declare_class_element("Sample.volume", &Sample::volume);
 	Kaba::declare_class_element("Sample.uid", &Sample::uid);
+	Kaba::declare_class_element("Sample.ref_count", &Sample::ref_count);
 	Kaba::declare_class_element("Sample.tags", &Sample::tags);
+	Kaba::link_external_class_func("Sample.__init__", &Sample::__init__);
 	Kaba::link_external_class_func("Sample.create_ref", &Sample::create_ref);
 	Kaba::link_external_class_func("Sample.get_value", &Sample::get_value);
 	Kaba::link_external_class_func("Sample.set_value", &Sample::set_value);

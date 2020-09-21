@@ -16,7 +16,7 @@ Dialog sample_scale_dialog "Scale sample" width=250 height=80
 			SpinButton samples_new "1" range=1: expandx
 			SpinButton rate_new "1" range=1: expandx
 			SpinButton rate_inv_new "1" range=1: expandx disabled
-			SpinButton factor "0" range=0:1000:0.01" expandx
+			SpinButton factor "0" range=0:1000:0.01 expandx
 		Grid ? ""
 			Text ssd_t_method "Method"
 			ComboBox method "Linear\\Cubic\\Sinc\\Fourier" expandx

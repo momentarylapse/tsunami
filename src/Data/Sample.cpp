@@ -53,6 +53,10 @@ Sample::~Sample() {
 		delete buf;
 }
 
+void Sample::__init__(const string &_name, const AudioBuffer &_buf) {
+	new(this) Sample(_name, _buf);
+}
+
 
 int Sample::get_index() const {
 	if (!owner)

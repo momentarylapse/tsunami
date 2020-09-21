@@ -77,6 +77,8 @@ public:
 		icon = render_sample(s, view);
 		s->subscribe(this, [=]{ on_delete(); }, s->MESSAGE_DELETE);
 		s->subscribe(this, [=]{ on_update(); }, s->MESSAGE_CHANGE_BY_ACTION);
+		s->subscribe(this, [=]{ on_update(); }, s->MESSAGE_REFERENCE);
+		s->subscribe(this, [=]{ on_update(); }, s->MESSAGE_UNREFERENCE);
 	}
 	virtual ~SampleManagerItem() {
 		zombify();
@@ -104,7 +106,7 @@ public:
 		string e;
 		if (s->auto_delete)
 			e = " *";
-		return icon + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + s->name + e + "\\" + format(_("%d times"), s->ref_count);
+		return format("%s\\%s\\%s%s\\%d times", icon, s->owner->get_time_str_long(s->range().length), s->name, e, s->ref_count);
 	}
 	string icon;
 	Sample *s;

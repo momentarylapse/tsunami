@@ -402,7 +402,9 @@ class Sample # TODO
 	MidiNoteBuffer midi
 	float volume
 	int uid
+	int ref_count
 	Tag[] tags
+	extern void __init__(string name, AudioBuffer buf)
 	extern SampleRef* create_ref()
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
@@ -490,7 +492,7 @@ class Song
 	extern void add_pause(int index, float time, bool affect_midi)
 	#extern void edit_bar(int index, BarPattern p, bool affect_midi)
 	extern void delete_bar(int index, bool affect_midi)
-	extern Sample* add_sample(string name, AudioBuffer buf)
+	extern void add_sample(Sample s)
 	extern void delete_sample(Sample sample)
 	
 	extern void begin_action_group()

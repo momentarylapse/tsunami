@@ -1,0 +1,12 @@
+use tsunami
+use hui
+use time
+
+class XXX extends SongPlugin
+	override void apply()
+		let prog = new ProgressX("generating sound font", session.win)
+		for i in 0:100
+			prog.set("remove samples", i*0.01)
+			sleep(0.2)
+		del prog
+		

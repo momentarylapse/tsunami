@@ -316,9 +316,7 @@ void FormatSoundFont2::read_chunk(File *f) {
 }
 
 void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s) {
-	char temp[21];
-	f->read_buffer(temp, 20);
-	s.name = temp;
+	s.name = read_str(f, 20);
 	s.start = f->read_int();
 	s.end = f->read_int();
 	s.start_loop = f->read_int();

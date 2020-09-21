@@ -79,6 +79,7 @@ Control::~Control() {
 	DBDEL("control", id, this);
 
 #ifdef HUI_API_GTK
+	g_signal_handlers_disconnect_by_data(widget, this);
 	//if (widget)
 	//	gtk_widget_destroy(widget);
 	//unset_widgets_rec(this);
@@ -91,7 +92,7 @@ Control::~Control() {
 	}
 	while (children.num > 0) {
 		Control *c = children.pop();
-		delete(c);
+		delete c;
 	}
 
 

@@ -165,7 +165,7 @@ class MultiEchoGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if hui.get_event().key_code == KEY_DELETE
+		if hui.get_event().key == KEY_DELETE
 			on_delete_reflection()
 
 	void on_delete_reflection()

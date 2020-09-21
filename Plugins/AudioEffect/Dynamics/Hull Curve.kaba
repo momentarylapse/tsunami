@@ -72,7 +72,7 @@ class HullGrid extends Grid
 
 	# [Delete] -> remove point
 	override void on_key_down()
-		if hui.get_event().key_code == KEY_DELETE
+		if hui.get_event().key == KEY_DELETE
 			if selected > 0 and selected < len(config.curve)-1
 				config.curve.remove(selected)
 				cp.changed()

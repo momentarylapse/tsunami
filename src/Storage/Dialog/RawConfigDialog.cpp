@@ -19,11 +19,13 @@ RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent)
 
 	for (int i=1; i<(int)SampleFormat::NUM_SAMPLE_FORMATS; i++)
 		add_string("format", format_name((SampleFormat)i));
-	set_int("format", od->parameters["format"]._int() - 1);
-	if (od->parameters["channels"] == "2")
+	set_int("format", (int)format_from_code(od->parameters["format"].str()) - 1);
+
+	if (od->parameters["channels"]._int() == 2)
 		check("channels:stereo", true);
 	else
 		check("channels:mono", true);
+
 	set_int("sample_rate", od->parameters["samplerate"]._int());
 	set_int("offset", od->parameters["offset"]._int());
 
@@ -38,13 +40,13 @@ void RawConfigDialog::on_close() {
 }
 
 void RawConfigDialog::on_ok() {
-	od->parameters.set("format", i2s(get_int("format") + 1));
+	od->parameters.map_set("format", format_code(SampleFormat(get_int("format") + 1)));
 	if (is_checked("channels:stereo"))
-		od->parameters.set("channels", "2");
+		od->parameters.map_set("channels", 2);
 	else
-		od->parameters.set("channels", "1");
-	od->parameters.set("samplerate", get_string("sample_rate"));
-	od->parameters.set("offset", get_string("offset"));
+		od->parameters.map_set("channels", 1);
+	od->parameters.map_set("samplerate", get_int("sample_rate"));
+	od->parameters.map_set("offset", get_int("offset"));
 	ok = true;
 	destroy();
 }

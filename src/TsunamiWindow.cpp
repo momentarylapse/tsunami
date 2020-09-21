@@ -381,18 +381,16 @@ void TsunamiWindow::on_import_backup() {
 	if (filename.is_empty())
 		return;
 
+	Storage::options_in = "format:f32,channels:2,samplerate:44100";
 	if (song->is_empty()) {
-		session->storage_options = "f32:2:44100";
 		session->storage->load(song, filename);
 		//BackupManager::set_save_state(session);
-		session->storage_options = "";
 	} else {
 		Session *s = tsunami->create_session();
-		s->storage_options = "f32:2:44100";
 		s->win->show();
 		s->storage->load(s->song, filename);
-		s->storage_options = "";
 	}
+	Storage::options_in = "";
 
 	//BackupManager::del
 }

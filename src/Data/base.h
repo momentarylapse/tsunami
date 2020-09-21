@@ -34,6 +34,8 @@ enum class SampleFormat {
 SampleFormat format_for_bits(int bits);
 int format_get_bits(SampleFormat);
 string format_name(SampleFormat format);
+string format_code(SampleFormat format);
+SampleFormat format_from_code(const string &code);
 
 
 enum class SignalType {

@@ -40,8 +40,9 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 		check(format("classical-%d", i), true);
 		check(format("tab-%d", i), t->instrument.string_pitch.allocated > 0);
 		enable(format("tab-%d", i), t->instrument.string_pitch.allocated > 0);
+		// TODO read from parameters
 	}
-	set_float("scale", 100.0f);
+	set_float("scale", od->parameters["horizontal-scale"]._float() * 100);
 
 	event("hui:close", [=]{ on_close(); });
 	event("cancel", [=]{ on_close(); });
@@ -54,17 +55,20 @@ void PdfConfigDialog::on_close() {
 
 void PdfConfigDialog::on_ok() {
 	ok = true;
+	Any ats;
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		Array<string> p;
+		Any at;
+		at.map_set("index", i);
 		if (is_checked(format("classical-%d", i)))
-			p.add("classical");
+			at.map_set("classical", true);
 		if (is_checked(format("tab-%d", i)))
-			p.add("tab");
-		od->parameters.set(format("track-%d", i), implode(p, ","));
+			at.map_set("tab", true);
+		ats.add(at);
 	}
-	od->parameters.set("horizontal-scale", f2s(get_float("scale") / 100, 3));
+	od->parameters.map_set("tracks", ats);
+	od->parameters.map_set("horizontal-scale", get_float("scale") / 100);
 
 	destroy();
 }

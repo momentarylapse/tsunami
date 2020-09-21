@@ -20,24 +20,22 @@ FormatDescriptorRaw::FormatDescriptorRaw() :
 
 
 bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
-	od->parameters.set("format", i2s((int)SampleFormat::SAMPLE_FORMAT_32_FLOAT));
-	od->parameters.set("channels", "2");
-	od->parameters.set("samplerate", i2s(od->session->sample_rate()));
-	od->parameters.set("offset", "0");
+	// optional defaults
+	if (!od->parameters.has("offset"))
+		od->parameters.map_set("offset", 0);
+	if (!od->parameters.has("samplerate"))
+		od->parameters.map_set("samplerate", od->session->sample_rate());
 	
-	if (od->session->storage_options != "") {
-		auto x = od->session->storage_options.explode(":");
-		if (x.num >= 3) {
-			od->parameters.set("offset", "0");
-			od->parameters.set("format", i2s((int)SampleFormat::SAMPLE_FORMAT_16));
-			if (x[0] == "f32")
-				od->parameters.set("format", i2s((int)SampleFormat::SAMPLE_FORMAT_32_FLOAT));
-				
-			od->parameters.set("channels", x[1]);
-			od->parameters.set("sample_rate", x[2]);
-			return true;
-		}
-	}
+	if (od->parameters.has("format") and od->parameters.has("channels"))
+		return true;
+
+	// mandatory defaults
+	if (!od->parameters.has("format"))
+		od->parameters.map_set("format", "f32");
+	if (!od->parameters.has("channels"))
+		od->parameters.map_set("channels", 2);
+
+
 	auto *dlg = new RawConfigDialog(od, od->session->win);
 	dlg->run();
 	bool ok = dlg->ok;
@@ -52,7 +50,7 @@ void FormatRaw::save_via_renderer(StorageOperationData *od) {
 	
 	int offset = od->parameters["offset"]._int();
 	int channels = od->parameters["channels"]._int();
-	auto format = (SampleFormat)od->parameters["format"]._int();
+	auto format = format_from_code(od->parameters["format"].str());
 	
 
 	for (int i=0; i<offset; i++)
@@ -80,7 +78,7 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	int offset = od->parameters["offset"]._int();
 	int channels = od->parameters["channels"]._int();
 	int sample_rate = od->parameters["samplerate"]._int();
-	auto format = (SampleFormat)od->parameters["format"]._int();
+	auto format = format_from_code(od->parameters["format"].str());
 
 	char *data = new char[CHUNK_SIZE];
 	File *f = nullptr;

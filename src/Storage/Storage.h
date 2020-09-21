@@ -51,6 +51,9 @@ public:
 	Path current_directory;
 	Path current_chain_directory;
 
+	static string options_in;
+	static string options_out;
+
 	Session *session;
 };
 

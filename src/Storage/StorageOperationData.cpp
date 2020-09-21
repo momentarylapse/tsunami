@@ -35,6 +35,16 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	num_samples = 0;
 	only_load_metadata = false;
 	errors_encountered = false;
+
+
+	try {
+		auto x = Any::parse("{" + Storage::options_in + "}");
+		for (string &k: x.keys())
+			parameters.map_set(k, x[k]);
+	} catch (Exception &e) {
+		session->e(::format("options '%s':  %s", Storage::options_in, e.message()));
+	}
+	Storage::options_in = "";
 }
 
 StorageOperationData::~StorageOperationData() {

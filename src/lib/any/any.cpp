@@ -302,7 +302,7 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 	auto expect_token = [&tokens, &pos, expect_no_end] (const string &t) {
 		expect_no_end();
 		if (tokens[pos] != t)
-			throw Exception(format("'%s' expected", t));
+			throw Exception(format("'%s' expected, got '%s'", t, tokens[pos]));
 		pos ++;
 	};
 	expect_no_end();
@@ -352,7 +352,11 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 		a.as_string() = cur.substr(1, -2).unescape();
 		pos ++;
 	} else {
-		throw Exception(format("what is '%s'?", cur));
+		// token (string without quotes)
+		a.create_type(Any::TYPE_STRING);
+		a.as_string() = cur;
+		pos ++;
+		//throw Exception(format("what is '%s'?", cur));
 	}
 };
 

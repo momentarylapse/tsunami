@@ -34,7 +34,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.97.12";
+const string AppVersion = "0.7.98.0";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -113,10 +113,11 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	p.option("--slow", [&]{ ugly_hack_slow = true; });
 	p.option("--plugin", "FILE", [&](const string &a){ plugin_file = a; });
 	p.option("--chain", "FILE", [&](const string &a){ chain_file = a; });
+	p.option("--params", "PARAMS", [&](const string &a){ Storage::options_in = a; });
 
 
 	p.mode("", {"[FILE]"}, [&](const Array<string> &a){
-		Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
+		Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 		device_manager->init();
@@ -158,7 +159,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 						n += l->samples.num;
 				msg_write(format("refs: %d / %d", n, song->samples.num));
 				for (Tag &t: song->tags)
-					msg_write("tag: " + t.key + " = " + t.value);
+					msg_write(format("tag: %s = %s", t.key, t.value));
 			}
 		}
 		delete song;
@@ -211,6 +212,9 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 #endif
 	p.parse(args);
+
+	Storage::options_in = "";
+	Storage::options_out = "";
 
 
 

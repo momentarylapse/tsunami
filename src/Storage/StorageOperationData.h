@@ -9,7 +9,7 @@
 #define SRC_STORAGE_STORAGEOPERATIONDATA_H_
 
 #include "../lib/base/base.h"
-#include "../lib/base/map.h"
+#include "../lib/any/any.h"
 #include "../lib/file/path.h"
 
 class Song;
@@ -69,7 +69,7 @@ public:
 	int offset;
 	bool errors_encountered;
 	
-	Map<string, string> parameters;
+	Any parameters;
 
 	bool only_load_metadata;
 };

@@ -48,8 +48,6 @@ public:
 	AudioView *view;
 	Storage *storage;
 
-	string storage_options;
-
 	Array<SignalChain*> all_signal_chains;
 	void add_signal_chain(SignalChain *chain);
 	SignalChain* create_signal_chain(const string &name);

@@ -36,7 +36,16 @@ FormatDescriptorPdf::FormatDescriptorPdf() :
 
 
 bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
-	od->parameters.set("horizontal-scale", "1.0");
+	// optional defaults
+	if (!od->parameters.has("horizontal-scale"))
+		od->parameters.map_set("horizontal-scale", 1.0f);
+
+	if (od->parameters.has("tracks"))
+		return true;
+
+	// mandatory defaults
+	if (!od->parameters.has("tracks"))
+		od->parameters.map_set("tracks", {});
 	
 	auto *dlg = new PdfConfigDialog(od, od->win);
 	dlg->run();
@@ -212,9 +221,12 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 		if (t->type != SignalType::MIDI)
 			continue;
 
-		string ff = od->parameters[format("track-%d", ti)];
-		bool allow_classical = (ff.find("classical") >= 0);
-		bool allow_tab = (ff.find("tab") >= 0) and (t->instrument.string_pitch.num > 0);
+		Any at;
+		for (Any &a: od->parameters["tracks"].as_array())
+			if (a["index"]._int() == ti)
+				at = a;
+		bool allow_classical = at.has("classical");
+		bool allow_tab = at.has("tab") and (t->instrument.string_pitch.num > 0);
 		if (!allow_classical and !allow_tab)
 			continue;
 

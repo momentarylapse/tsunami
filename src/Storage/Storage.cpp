@@ -34,6 +34,9 @@
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/SongSelection.h"
 
+string Storage::options_in;
+string Storage::options_out;
+
 Storage::Storage(Session *_session) {
 	session = _session;
 	formats.add(new FormatDescriptorNami());
@@ -62,13 +65,13 @@ Storage::~Storage() {
 	hui::Config.set_str("CurrentDirectory", current_directory.str());
 
 	for (auto *d: formats)
-		delete(d);
+		delete d;
 	formats.clear();
 }
 
 bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 	current_directory = filename.parent();
-	FormatDescriptor *d = get_format(filename.extension(), 0);
+	auto *d = get_format(filename.extension(), 0);
 	if (!d)
 		return false;
 
@@ -79,7 +82,7 @@ bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 	od.song = song;
 	od.only_load_metadata = only_metadata;
 	if (!f->get_parameters(&od, true)) {
-		delete(f);
+		delete f;
 		return false;
 	}
 

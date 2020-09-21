@@ -133,6 +133,8 @@ void Song::reset() {
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
+	secret_data.clear();
+
 	for (Track *t: tracks)
 		delete(t);
 	tracks.clear();

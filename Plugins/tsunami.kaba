@@ -474,6 +474,8 @@ class Song
 	Sample*[] samples
 	
 	BarCollection bars
+
+	any secret_data
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()

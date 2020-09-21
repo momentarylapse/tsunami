@@ -10,8 +10,9 @@
 
 #include "Data.h"
 #include "Curve.h"
-#include "../lib/base/base.h"
 #include "Rhythm/BarCollection.h"
+#include "../lib/base/base.h"
+#include "../lib/any/any.h"
 #include <shared_mutex>
 
 class Data;
@@ -140,6 +141,8 @@ public:
 	Array<Sample*> samples;
 	Array<Curve*> curves;
 	BarCollection bars;
+
+	Any secret_data;
 
 	Array<TrackLayer*> layers() const;
 };

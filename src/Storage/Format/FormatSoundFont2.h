@@ -47,21 +47,21 @@ public:
 		string name;
 		int preset;
 		int bank;
-		int bag_start;
-		int bag_end;
+		int zone_start;
+		int zone_end;
 		int library;
 		int genre;
 		int morphology;
 	};
 	Array<sfPresetHeader> presets;
-	struct sfBag {
+	struct sfZone {
 		int gen_start, gen_end, mod_index;
 	};
-	Array<sfBag> preset_bags, instrument_bags;
+	Array<sfZone> preset_zones, instrument_zones;
 	struct sfInstrument {
 		string name;
-		int bag_start;
-		int bag_end;
+		int zone_start;
+		int zone_end;
 	};
 	Array<sfInstrument> instruments;
 	struct sfGenerator {

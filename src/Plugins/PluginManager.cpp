@@ -514,6 +514,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Song.samples", &Song::samples);
 //	Kaba::declare_class_element("Song.layers", &Song::layers);
 	Kaba::declare_class_element("Song.bars", &Song::bars);
+	Kaba::declare_class_element("Song.secret_data", &Song::secret_data);
 	Kaba::link_external_class_func("Song.__init__", &Song::__init__);
 	Kaba::link_external_virtual("Song.__delete__", &Song::__delete__, &af);
 	Kaba::link_external_class_func("Song.add_track", &Song::add_track);

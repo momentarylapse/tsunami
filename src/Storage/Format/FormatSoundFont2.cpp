@@ -24,6 +24,73 @@ FormatSoundFont2::FormatSoundFont2() {
 	song = nullptr;
 }
 
+Any ia2any(const Array<int> &ia) {
+	Any a;
+	for (int i: ia)
+		a.add(i);
+	return a;
+}
+
+void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zone_start, int zone_end, const Array<FormatSoundFont2::sfGenerator> &generators) {
+	Any azs;
+	foreachi (auto &z, zones, ii) {
+		if (ii >= zone_start and ii < zone_end) {
+			int start = 0;
+			int end = 0;
+			int startloop = 0;
+			int endloop = 0;
+			Any az;
+			//msg_write(format("  zone %d", ii));
+			for (int jj=z.gen_start; jj<z.gen_end; jj++) {
+				auto &g = generators[jj];
+				//msg_write("    gen " + g.str());
+				if (g.op == 43) {
+					az.map_set("keys", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
+				} else if (g.op == 44) {
+					az.map_set("vel", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
+				} else if (g.op == 46) {
+					az.map_set("keys", ia2any({g.amount, g.amount}));
+				} else if (g.op == 47) {
+					az.map_set("vel", ia2any({g.amount, g.amount}));
+				} else if (g.op == 53) {
+					az.map_set("sample", g.amount);
+				} else if (g.op == 58) {
+					az.map_set("root-key", g.amount);
+				} else if (g.op == 41) {
+					az.map_set("instrument", g.amount);
+				} else if (g.op == 2) {
+					startloop += g.amount;
+				} else if (g.op == 3) {
+					endloop += g.amount;
+				} else if (g.op == 45) {
+					startloop += g.amount << 15;
+				} else if (g.op == 50) {
+					endloop += g.amount << 15;
+				} else if (g.op == 0) {
+					start += g.amount;
+				} else if (g.op == 1) {
+					end += g.amount;
+				} else if (g.op == 4) {
+					start += g.amount << 15;
+				} else if (g.op == 12) {
+					end += g.amount << 15;
+				}
+			}
+			if (start > 0)
+				az.map_set("start", start);
+			if (end > 0)
+				az.map_set("end", end);
+			if (startloop > 0)
+				az.map_set("start-loop", startloop);
+			if (endloop > 0)
+				az.map_set("end-loop", endloop);
+			if (az.type != az.TYPE_NONE)
+				azs.add(az);
+		}
+	}
+	ai.map_set("zones", azs);
+}
+
 void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	od = _od;
 	song = od->song;
@@ -42,33 +109,33 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	}
 
 
-	presets.back().bag_end = preset_bags.num;
-	preset_bags.back().gen_end = preset_generators.num;
+	presets.back().zone_end = preset_zones.num;
+	preset_zones.back().gen_end = preset_generators.num;
+	Any aps;
 	for (auto &p: presets) {
-		msg_write(format("preset: %s  #%d bank=%d", p.name, p.preset, p.bank));
-		foreachi (auto &b, preset_bags, ii) {
-			if (ii >= p.bag_start and ii < p.bag_end) {
-				msg_write(format("  bag %d", ii));
-				for (int jj=b.gen_start; jj<b.gen_end; jj++)
-					msg_write("    gen " + preset_generators[jj].str());
-			}
-		}
+		Any ap;
+		ap.map_set("name", p.name);
+		import_zones(ap, preset_zones, p.zone_start, p.zone_end, preset_generators);
+		aps.add(ap);
 	}
-	instruments.back().bag_end = instrument_bags.num;
-	instrument_bags.back().gen_end = instrument_generators.num;
+	song->secret_data.map_set("presets", aps);
+
+	instruments.back().zone_end = instrument_zones.num;
+	instrument_zones.back().gen_end = instrument_generators.num;
+	Any ais;
 	for (auto &i: instruments) {
-		msg_write(format("instrument: %s", i.name));
-		foreachi (auto &b, instrument_bags, ii) {
-			if (ii >= i.bag_start and ii < i.bag_end) {
-				msg_write(format("  bag %d", ii));
-				for (int jj=b.gen_start; jj<b.gen_end; jj++)
-					msg_write("    gen " + instrument_generators[jj].str());
-			}
-		}
+		//msg_write(format("instrument: %s", i.name));
+		Any ai;
+		ai.map_set("name", i.name);
+		import_zones(ai, instrument_zones, i.zone_start, i.zone_end, instrument_generators);
+		ais.add(ai);
 	}
 
+	song->secret_data.map_set("instruments", ais);
+	msg_write(song->secret_data.str());
 
-	delete(f);
+
+	delete f;
 }
 
 void FormatSoundFont2::sfSample::print() {
@@ -104,7 +171,7 @@ string FormatSoundFont2::sfGenerator::str() const {
 	if (op == 16)	s = "reverb send";
 	if (op == 17)	s = "pan";
 	if (op == 41)	s = "instrument";
-	if (op == 43)	return format("key range  %d:%d", (int)(amount & 0xff), (int)((amount >> 8) & 0xff));
+	if (op == 43)	s = "key range";
 	if (op == 44)	s = "vel range";
 	if (op == 45)	s = "start loop addrs coarse offset+";
 	if (op == 46)	s = "key";
@@ -169,7 +236,7 @@ void FormatSoundFont2::read_chunk(File *f) {
 			song->add_tag("engine", t);
 		else if (name == "ISFT")
 			song->add_tag("software", t);
-	} else if (sa_contains({"IFIL"}, name)) {
+	} else if (sa_contains({"IFIL", "PMOD", "IMOD"}, name)) {
 		// ignore
 	} else if (name == "PHDR") {
 		while (f->get_pos() < after_pos - 3) {
@@ -177,48 +244,48 @@ void FormatSoundFont2::read_chunk(File *f) {
 			p.name = read_str(f, 20);
 			p.preset = f->read_word();
 			p.bank = f->read_word();
-			p.bag_start = f->read_word();
-			p.bag_end = -1;
+			p.zone_start = f->read_word();
+			p.zone_end = -1;
 			p.library = f->read_int();
 			p.genre = f->read_int();
 			p.morphology = f->read_int();
 			if (p.name == "EOP")
 				break;
 			if (presets.num > 0)
-				presets.back().bag_end = p.bag_start;
+				presets.back().zone_end = p.zone_start;
 			presets.add(p);
 		}
 	} else if (name == "INST") {
 		while (f->get_pos() < after_pos - 3) {
 			sfInstrument i;
 			i.name = read_str(f, 20);
-			i.bag_start = f->read_word();
-			i.bag_end = -1;
+			i.zone_start = f->read_word();
+			i.zone_end = -1;
 			if (i.name == "EOI")
 				break;
 			if (instruments.num > 0)
-				instruments.back().bag_end = i.bag_start;
+				instruments.back().zone_end = i.zone_start;
 			instruments.add(i);
 		}
 	} else if (name == "PBAG") {
 		while (f->get_pos() < after_pos - 3) {
-			sfBag p;
+			sfZone p;
 			p.gen_start = f->read_word();
 			p.gen_end = -1;
 			p.mod_index = f->read_word();
-			if (preset_bags.num > 0)
-				preset_bags.back().gen_end = p.gen_start;
-			preset_bags.add(p);
+			if (preset_zones.num > 0)
+				preset_zones.back().gen_end = p.gen_start;
+			preset_zones.add(p);
 		}
 	} else if (name == "IBAG") {
 		while (f->get_pos() < after_pos - 3) {
-			sfBag p;
+			sfZone p;
 			p.gen_start = f->read_word();
 			p.gen_end = -1;
 			p.mod_index = f->read_word();
-			if (instrument_bags.num > 0)
-				instrument_bags.back().gen_end = p.gen_start;
-			instrument_bags.add(p);
+			if (instrument_zones.num > 0)
+				instrument_zones.back().gen_end = p.gen_start;
+			instrument_zones.add(p);
 		}
 	} else if (name == "PGEN") {
 		while (f->get_pos() < after_pos - 3) {

@@ -762,6 +762,9 @@ void SIAddPackageMath() {
 		class_add_funcx(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_array_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 			func_add_param("value", TypeAny);
+		class_add_funcx("is_empty", TypeBool, &Any::is_empty, Flags::PURE);
+		class_add_funcx("has", TypeBool, &Any::has, Flags::PURE);
+			func_add_param("key", TypeString);
 		class_add_funcx("add", TypeVoid, &KabaAny::_array_add, Flags::RAISES_EXCEPTIONS);
 			func_add_param("a", TypeAny);
 		class_add_funcx("drop", TypeVoid, &Any::map_drop, Flags::RAISES_EXCEPTIONS);

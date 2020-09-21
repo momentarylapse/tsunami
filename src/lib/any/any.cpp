@@ -116,6 +116,12 @@ Any::Any(const Array<Any> &a) : Any() {
 	as_array() = a;
 }
 
+Any::Any(const Array<int> &a) : Any() {
+	create_type(TYPE_ARRAY);
+	for (int i: a)
+		as_array().add(i);
+}
+
 Any::Any(const AnyMap &m) : Any() {
 	create_type(TYPE_MAP);
 	as_map() = m;
@@ -151,11 +157,11 @@ void Any::create_type(int _type) {
 		data = new (void*);
 	} else if (type == TYPE_STRING) {
 		data = new string;
-	} else if (type == TYPE_ARRAY) {
+	} else if (is_array()) {
 		data = new Array<Any>;
-	} else if (type == TYPE_MAP) {
+	} else if (is_map()) {
 		data = new AnyMap;
-	} else if (type == TYPE_NONE) {
+	} else if (is_empty()) {
 	} else {
 		msg_error("can not create " + type_name(type));
 	}
@@ -208,18 +214,30 @@ void Any::clear() {
 			delete &as_bool();
 		else if (type == TYPE_STRING)
 			delete &as_string();
-		else if (type == TYPE_ARRAY)
+		else if (is_array())
 			delete &as_array();
-		else if (type == TYPE_MAP)
+		else if (is_map())
 			delete &as_map();
 		else if (type == TYPE_POINTER)
 			delete &as_pointer();
-		else if (type != TYPE_NONE)
+		else if (!is_empty())
 			msg_error("any.clear(): " + type_name(type));
 		type = TYPE_NONE;
 		_class = _get_class(type);
 		data = NULL;
 	}
+}
+
+bool Any::is_empty() const {
+	return type == TYPE_NONE;
+}
+
+bool Any::is_array() const {
+	return type == TYPE_ARRAY;
+}
+
+bool Any::is_map() const {
+	return type == TYPE_MAP;
 }
 
 string Any::repr() const {
@@ -233,7 +251,7 @@ string Any::repr() const {
 		return as_string().repr();
 	} else if (type == TYPE_POINTER) {
 		return p2s(as_pointer());
-	} else if (type == TYPE_ARRAY) {
+	} else if (is_array()) {
 		string s = "[";
 		for (Any &p: as_array()) {
 			if (s.num > 1)
@@ -241,7 +259,7 @@ string Any::repr() const {
 			s += p.repr();
 		}
 		return s + "]";
-	} else if (type == TYPE_MAP) {
+	} else if (is_map()) {
 		string s = "{";
 		for (AnyMap::Entry &p: as_map()) {
 			if (s.num > 1)
@@ -249,7 +267,7 @@ string Any::repr() const {
 			s += p.key.repr() + ": " + p.value.repr();
 		}
 		return s + "}";
-	} else if (type == TYPE_NONE) {
+	} else if (is_empty()) {
 		return "<empty>";
 	} else {
 		return "unhandled Any.str(): " + type_name(type);
@@ -393,11 +411,13 @@ void Any::operator = (const Any &a) {
 			as_pointer() = a.as_pointer();
 		} else if (a.type == TYPE_STRING) {
 			as_string() = a.as_string();
-		} else if (a.type == TYPE_ARRAY) {
+		} else if (a.is_array()) {
 			as_array() = a.as_array();
-		} else if (a.type == TYPE_MAP) {
+		} else if (a.is_map()) {
 			as_map() = a.as_map();
-		} else if (a.type != TYPE_NONE) {
+		} else if (a.is_empty()) {
+			clear();
+		} else {
 			clear();
 			msg_error("any = any: " + type_name(a.type));
 		}
@@ -433,9 +453,9 @@ void Any::operator += (const Any &a) {
 		as_float() += a._float();
 	else if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
 		as_string() += a.str();
-	else if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY))
+	else if (is_array() and a.is_array())
 		append(a);
-	else if (type == TYPE_ARRAY)
+	else if (is_array())
 		add(a);
 	else
 		throw Exception(format("%s += %s not allowed", type_name(type), type_name(a.type)));
@@ -448,9 +468,9 @@ void Any::add(const Any &a) {
 		any_db(format("parent add  %s -> %s:   %s", p2s(this), p2s(parent), str()));
 		return;
 	}
-	if (type == TYPE_NONE)
+	if (is_empty())
 		create_type(TYPE_ARRAY);
-	if (type == TYPE_ARRAY) {
+	if (is_array()) {
 		if (&a == this) {
 			Any b = a;
 			as_array().add(b);
@@ -469,11 +489,11 @@ void Any::append(const Any &a) {
 		sync_from_parent();
 		return;
 	}
-	if (a.type != TYPE_ARRAY)
+	if (!a.is_array())
 		throw Exception("parameter not an array: " + type_name(a.type));
-	if (type == TYPE_NONE)
+	if (is_empty())
 		create_type(TYPE_ARRAY);
-	if ((type == TYPE_ARRAY) and (a.type == TYPE_ARRAY)) {
+	if (is_array() and a.is_array()) {
 		if (&a == this) {
 			Any b = a;
 			as_array().append(b.as_array());
@@ -486,9 +506,9 @@ void Any::append(const Any &a) {
 }
 
 int Any::length() {
-	if (type == TYPE_ARRAY)
+	if (is_array())
 		return as_array().num;
-	if (type == TYPE_MAP)
+	if (is_map())
 		return as_map().num;
 	if (type == TYPE_STRING)
 		return as_string().num;
@@ -496,41 +516,47 @@ int Any::length() {
 }
 
 Any &Any::operator[] (int index) {
-	if (type != TYPE_ARRAY)
+	if (!is_array())
 		msg_error("only allowed for arrays: " + type_name(type));
 	return as_array()[index];
 }
 
 const Any &Any::operator[] (int index) const {
-	if (type != TYPE_ARRAY)
+	if (!is_array())
 		msg_error("only allowed for arrays: " + type_name(type));
 	return as_array()[index];
 }
 
 Any &Any::back() {
-	if (type != TYPE_ARRAY)
+	if (!is_array())
 		msg_error("only allowed for arrays: " + type_name(type));
 	return as_array().back();
 }
 
 const Any &Any::operator[] (const string &key) const {
-	if (type != TYPE_MAP)
+	if (!is_map())
 		msg_error("only allowed for maps: " + type_name(type));
 	return as_map()[key];
 }
 
 Any &Any::operator[] (const string &key) {
-	if (type == TYPE_NONE)
+	if (is_empty())
 		create_type(TYPE_MAP);
-	if (type != TYPE_MAP)
+	if (!is_map())
 		msg_error("only allowed for maps: " + type_name(type));
 	return as_map()[key];
 }
 
 Array<string> Any::keys() const {
-	if (type != TYPE_MAP)
+	if (!is_map())
 		return {};
 	return as_map().keys();
+}
+
+bool Any::has(const string &key) const {
+	if (!is_map())
+		return false;
+	return sa_contains(as_map().keys(), key);
 }
 
 int& Any::as_int() const {
@@ -562,7 +588,7 @@ Array<Any>& Any::as_array() const {
 }
 
 Any Any::array_get(int i) {
-	if (type != TYPE_ARRAY)
+	if (!is_array())
 		throw Exception("not an array: " + type_name(type));
 	return (*this)[i].ref();
 }
@@ -573,15 +599,15 @@ void Any::array_set(int i, const Any &value) {
 		sync_from_parent();
 		return;
 	}
-	if (type == TYPE_NONE)
+	if (is_empty())
 		create_type(TYPE_ARRAY);
-	if (type != TYPE_ARRAY)
+	if (!is_array())
 		throw Exception("not an array: " + type_name(type));
 	(*this)[i] = value;
 }
 
 Any Any::map_get(const string &key) {
-	if (type != TYPE_MAP)
+	if (!is_map())
 		throw Exception("not a map: " + type_name(type));
 	if (!as_map().contains(key))
 		throw Exception("key not found: " + key);
@@ -594,9 +620,9 @@ void Any::map_set(const string &key, const Any &value) {
 		sync_from_parent();
 		return;
 	}
-	if (type == TYPE_NONE)
+	if (is_empty())
 		create_type(TYPE_MAP);
-	if (type != TYPE_MAP)
+	if (!is_map())
 		throw Exception("not a map: " + type_name(type));
 	as_map().set(key, value);
 }
@@ -607,7 +633,7 @@ void Any::map_drop(const string &key) {
 		sync_from_parent();
 		return;
 	}
-	if (type != TYPE_MAP)
+	if (!is_map())
 		throw Exception("not a map: " + type_name(type));
 	as_map().drop(key);
 }

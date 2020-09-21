@@ -84,7 +84,7 @@ void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zon
 				az.map_set("start-loop", startloop);
 			if (endloop > 0)
 				az.map_set("end-loop", endloop);
-			if (az.type != az.TYPE_NONE)
+			if (!az.is_empty())
 				azs.add(az);
 		}
 	}

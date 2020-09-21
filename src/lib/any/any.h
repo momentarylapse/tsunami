@@ -27,6 +27,7 @@ public:
 	Any(bool b);
 	Any(const string &s);
 	Any(const Array<Any> &a);
+	Any(const Array<int> &a);
 	Any(const AnyMap&m);
 	Any(const void *p);
 	~Any();
@@ -35,6 +36,10 @@ public:
 	void sync_to_parent();
 	void sync_from_parent();
 	void create_type(int type);
+
+	bool is_empty() const;
+	bool is_array() const;
+	bool is_map() const;
 
 	string _cdecl str() const;
 	string _cdecl repr() const;
@@ -70,6 +75,7 @@ public:
 	const Any &operator[] (const string &key) const;
 	Any &operator[] (const string &key);
 	Array<string> keys() const;
+	bool has(const string &key) const;
 
 	// data
 	int type;

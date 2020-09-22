@@ -216,7 +216,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = Image::load(tsunami->directory_static << "icons/track-midi.png");
 	images.track_group = Image::load(tsunami->directory_static << "icons/track-group.png");
 
-	peak_thread = nullptr;
+	peak_thread = new PeakThread(this);
+	peak_thread->run();
 	draw_runner_id = -1;
 
 
@@ -297,8 +298,8 @@ AudioView::~AudioView() {
 	delete mode_capture;
 	delete mode_default;
 
-	if (peak_thread)
-		delete peak_thread;
+	peak_thread->hard_stop();
+	delete peak_thread;
 
 	delete dummy_vtrack;
 	delete dummy_vlayer;
@@ -1218,8 +1219,8 @@ void AudioView::draw_song(Painter *c) {
 		animating = true;
 	}
 
-	if (peak_thread and !peak_thread->is_done())
-		slow_repeat = true;
+	//if (peak_thread and !peak_thread->is_done())
+	//	slow_repeat = true;
 
 	if (cam.needs_update())
 		animating = true;
@@ -1279,14 +1280,7 @@ void AudioView::update_menu() {
 
 void AudioView::update_peaks() {
 	msg_write("-------------------- view update peaks");
-	if (peak_thread) {
-		msg_error("   already updating peaks...");
-		peak_thread->reset();
-		delete peak_thread;
-	}
-
-	peak_thread = new PeakThread(this);
-	peak_thread->run();
+	peak_thread->start_update();
 }
 
 void AudioView::set_midi_view_mode(MidiMode mode) {
@@ -1459,13 +1453,7 @@ void AudioView::enable(bool _enabled) {
 		song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
 		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
 		song->subscribe(this, [=]{
-			msg_write("song.before change");
-			if (peak_thread) {
-				msg_error("   kill peaks...");
-				peak_thread->reset();
-				delete peak_thread;
-				peak_thread = nullptr;
-			}
+			peak_thread->stop_update();
 		}, song->MESSAGE_BEFORE_CHANGE);
 		song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
 		song->subscribe(this, [=]{

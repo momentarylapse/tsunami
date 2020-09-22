@@ -25,11 +25,20 @@ public:
 	PeakThread(AudioView *view);
 	~PeakThread();
 	void on_run() override;
+
+	// interface from outside
+	void start_update();
+	void stop_update();
+	void hard_stop();
+
+private:
+	std::atomic<bool> updating;
+
 	void update_buffer(AudioBuffer &buf);
 	void update_track(Track *t);
 	void update_song();
 
-	void reset();
+	void notify();
 };
 
 

@@ -181,7 +181,7 @@ void ActionManager::group_end() {
 
 void ActionManager::_lock() {
 	if (lock_level == 0)
-		data->mtx.lock();
+		data->lock();
 	else
 		msg_error("LOCK LEVEL > 1");
 	lock_level ++;
@@ -190,6 +190,6 @@ void ActionManager::_lock() {
 void ActionManager::_unlock() {
 	lock_level --;
 	if (lock_level == 0)
-		data->mtx.unlock();
+		data->unlock();
 }
 

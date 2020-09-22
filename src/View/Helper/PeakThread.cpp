@@ -19,6 +19,7 @@ PeakThread::PeakThread(AudioView *_view) {
 	view = _view;
 	song = view->song;
 	allow_running = true;
+	updating = false;
 	perf_channel = PerformanceMonitor::create_channel("peak", this);
 }
 
@@ -27,42 +28,70 @@ PeakThread::~PeakThread() {
 }
 
 void PeakThread::on_run() {
-	try {
-		update_song();
-	} catch(...) {
+	while (allow_running) {
+		if (updating) {
+			try {
+				update_song();
+				updating = false;
+				notify();
+				msg_write(":D");
+			} catch(Exception &e) {
+				msg_write(":(    " + e.message());
+			}
+		}
+		hui::Sleep(0.05f);
 	}
+}
+
+void PeakThread::start_update() {
+	if (updating)
+		stop_update();
+	msg_write("PT START");
+	updating = true;
+}
+
+void PeakThread::stop_update() {
+	msg_write("PT STOP");
+	updating = false;
+}
+
+void PeakThread::hard_stop() {
+	msg_write("PT HARD STOP");
+	updating = false;
+	allow_running = false;
+	kill();
 }
 
 void PeakThread::update_buffer(AudioBuffer &buf) {
 	song->lock();
-	if (!allow_running) {
+	if (!updating) {
 		song->unlock();
-		throw "";
+		throw Exception("aaa4");
 	}
 	int n = buf._update_peaks_prepare();
 	song->unlock();
 
 	Thread::cancelation_point();
-
-	if (!allow_running)
-		throw "";
+	if (!updating)
+		throw Exception("aaa3");
 
 	for (int i=0; i<n; i++) {
 		if (buf._peaks_chunk_needs_update(i)) {
 			while (!song->try_lock()) {
 				Thread::cancelation_point();
 				hui::Sleep(0.01f);
-				if (!allow_running)
-					throw "";
+				if (!updating)
+					throw Exception("aaa");
 			}
 			PerformanceMonitor::start_busy(perf_channel);
 			buf._update_peaks_chunk(i);
 			PerformanceMonitor::end_busy(perf_channel);
 			song->unlock();
+			notify();
 			Thread::cancelation_point();
 		}
-		if (!allow_running)
-			throw "";
+		if (!updating)
+			throw Exception("aaa2");
 	}
 }
 
@@ -73,6 +102,7 @@ void PeakThread::update_track(Track *t) {
 }
 
 void PeakThread::update_song() {
+	msg_write(".");
 	for (Track *t: song->tracks)
 		update_track(t);
 	for (Sample *s: song->samples)
@@ -80,8 +110,7 @@ void PeakThread::update_song() {
 			update_buffer(*s->buf);
 }
 
-void PeakThread::reset() {
-	allow_running = false;
-	join();
+void PeakThread::notify() {
+	hui::RunLater(0.01f, [=]{ view->force_redraw(); });
 }
 

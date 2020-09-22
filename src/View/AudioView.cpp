@@ -853,11 +853,13 @@ void AudioView::on_song_new() {
 }
 
 void AudioView::on_song_finished_loading() {
+	msg_write("------finish loading");
 	if ((vlayer.num >= 12) and (vtrack.num >= 2)) {
 		for (auto *t: vtrack)
 			if (t->track->layers.num > 1)
 				implode_track(t->track);
 	}
+	update_peaks();
 	optimize_view();
 	hui::RunLater(0.5f, [=]{ optimize_view(); });
 }
@@ -869,8 +871,11 @@ void AudioView::on_song_tracks_change() {
 }
 
 void AudioView::on_song_change() {
-	if (song->history_enabled())
+	msg_write("song.after-change");
+	if (song->history_enabled()) {
+		msg_write("+++");
 		hui::RunLater(0.01f, [=]{ update_peaks(); });
+	}
 }
 
 void AudioView::on_stream_tick() {
@@ -1273,11 +1278,10 @@ void AudioView::update_menu() {
 }
 
 void AudioView::update_peaks() {
-	//msg_write("-------------------- view update peaks");
+	msg_write("-------------------- view update peaks");
 	if (peak_thread) {
-		//msg_error("   already updating peaks...");
-		peak_thread->allow_running = false;
-		peak_thread->join();
+		msg_error("   already updating peaks...");
+		peak_thread->reset();
 		delete peak_thread;
 	}
 
@@ -1454,7 +1458,16 @@ void AudioView::enable(bool _enabled) {
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
 		song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
 		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
-		song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_CHANGE);
+		song->subscribe(this, [=]{
+			msg_write("song.before change");
+			if (peak_thread) {
+				msg_error("   kill peaks...");
+				peak_thread->reset();
+				delete peak_thread;
+				peak_thread = nullptr;
+			}
+		}, song->MESSAGE_BEFORE_CHANGE);
+		song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
 		song->subscribe(this, [=]{
 			force_redraw();
 			update_menu();

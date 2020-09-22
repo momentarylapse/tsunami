@@ -11,6 +11,8 @@
 
 
 const string Data::MESSAGE_FINISHED_LOADING = "FinishedLoading";
+const string Data::MESSAGE_BEFORE_CHANGE = "BeforeChange";
+const string Data::MESSAGE_AFTER_CHANGE = "AfterChange";
 
 Data::Data(Session *_session) {
 	action_manager = new ActionManager(this);

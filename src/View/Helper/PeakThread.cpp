@@ -18,6 +18,7 @@
 PeakThread::PeakThread(AudioView *_view) {
 	view = _view;
 	song = view->song;
+	allow_running = true;
 	perf_channel = PerformanceMonitor::create_channel("peak", this);
 }
 
@@ -77,5 +78,10 @@ void PeakThread::update_song() {
 	for (Sample *s: song->samples)
 		if (s->buf)
 			update_buffer(*s->buf);
+}
+
+void PeakThread::reset() {
+	allow_running = false;
+	join();
 }
 

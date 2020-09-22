@@ -23,6 +23,8 @@ public:
 	virtual ~Data();
 
 	static const string MESSAGE_FINISHED_LOADING;
+	static const string MESSAGE_BEFORE_CHANGE;
+	static const string MESSAGE_AFTER_CHANGE;
 
 	virtual void _cdecl reset() = 0;
 

@@ -22,7 +22,7 @@ namespace hui {
 }
 
 class ActionManager : public Observable<VirtualBase> {
-	friend class Data;
+	//friend class Data;
 public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
@@ -43,9 +43,9 @@ public:
 	void mark_current_as_save();
 
 private:
-	void truncate();
-	bool merge(Action *a);
-	void add(Action *a);
+	void _truncate_future_history();
+	bool _try_merge_into_head(Action *a);
+	void _add_to_history(Action *a);
 	Data *data;
 	Array<Action*> action;
 	int cur_pos;
@@ -54,10 +54,12 @@ private:
 	int cur_level;
 	bool enabled;
 
+	void _edit_start();
+	void _edit_end();
+
 	// mutex
-	void lock();
-	void unlock();
-	bool try_lock();
+	void _lock();
+	void _unlock();
 	int lock_level;
 
 	// group

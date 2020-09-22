@@ -16,19 +16,20 @@ class Song;
 class Track;
 class AudioBuffer;
 
-class PeakThread : public Thread
-{
+class PeakThread : public Thread {
 public:
 	AudioView *view;
 	Song *song;
 	int perf_channel;
-	bool allow_running = true;
+	std::atomic<bool> allow_running;
 	PeakThread(AudioView *view);
 	~PeakThread();
 	void on_run() override;
 	void update_buffer(AudioBuffer &buf);
 	void update_track(Track *t);
 	void update_song();
+
+	void reset();
 };
 
 

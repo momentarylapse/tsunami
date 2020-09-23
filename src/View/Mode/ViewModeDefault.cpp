@@ -259,7 +259,7 @@ void playback_seek_relative(AudioView *view, float dt) {
 
 void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
 	int pos = view->sel.range_raw.start();
-	pos = m->suggest_move_cursor(pos, forward);
+	pos = m->suggest_move_cursor(Range(pos, 0), forward);
 	view->sel.range_raw.set_start(pos);
 
 	view->select_under_cursor();
@@ -288,9 +288,9 @@ void ViewModeDefault::on_command(const string &id) {
 			playback_seek_relative(view, -5);
 	} else {
 		if (id == "cursor-move-right")
-			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().end(), true));
+			view->set_cursor_pos(suggest_move_cursor(view->cursor_range(), true));
 		if (id == "cursor-move-left")
-			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().offset, false));
+			view->set_cursor_pos(suggest_move_cursor(view->cursor_range(), false));
 		if (id == "cursor-expand-right")
 			expand_sel_range(view, this, true);
 		if (id == "cursor-expand-left")
@@ -323,8 +323,15 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 
 Bar *song_bar_at(Song *s, int pos);
 
-int ViewModeDefault::suggest_move_cursor(int pos, bool forward) {
-	int PIXELS = 100;
+int ViewModeDefault::suggest_move_cursor(const Range &cursor, bool forward) {
+	int PIXELS = 30;
+
+	int pos = cursor.start();
+	if (forward)
+		pos = cursor.end();
+
+	if (cursor.length > 0)
+		return pos;
 
 	Bar *b = song_bar_at(view->song, pos);
 	if (!forward)

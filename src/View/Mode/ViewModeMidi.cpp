@@ -816,7 +816,14 @@ string ViewModeMidi::get_tip() {
 	return message + message2;
 }
 
-int ViewModeMidi::suggest_move_cursor(int pos, bool forward) {
+int ViewModeMidi::suggest_move_cursor(const Range &cursor, bool forward) {
+	int pos = cursor.start();
+	if (forward)
+		pos = cursor.end();
+
+	if (cursor.length > 0)
+		return pos;
+
 	if (forward) {
 		Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, note_length);
 		if (rr.length > 0)
@@ -838,7 +845,7 @@ Range ViewModeMidi::get_edit_range() {
 		return view->sel.range();
 
 	int pos = view->cursor_pos();
-	return RangeTo(pos, suggest_move_cursor(pos, true));
+	return RangeTo(pos, suggest_move_cursor(Range(pos, 0), true));
 }
 
 
@@ -848,7 +855,7 @@ Range ViewModeMidi::get_backwards_range() {
 		return view->sel.range();
 
 	int pos = view->cursor_pos();
-	return RangeTo(suggest_move_cursor(pos, false), pos);
+	return RangeTo(suggest_move_cursor(view->sel.range(), false), pos);
 }
 
 SongSelection ViewModeMidi::get_select_in_edit_cursor() {

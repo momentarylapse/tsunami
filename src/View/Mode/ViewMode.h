@@ -63,7 +63,7 @@ public:
 
 	virtual Set<Track*> prevent_playback(){ return {}; }
 
-	virtual int suggest_move_cursor(int pos, bool forward) = 0;
+	virtual int suggest_move_cursor(const Range &cursor, bool forward) = 0;
 
 	virtual void left_click_handle(AudioViewLayer *vlayer) {}
 	virtual void left_click_handle_object(AudioViewLayer *vlayer) {}

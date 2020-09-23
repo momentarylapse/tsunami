@@ -23,7 +23,7 @@ public:
 	void on_key_down(int k) override;
 	void on_command(const string &id) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
-	int suggest_move_cursor(int pos, bool forward) override;
+	int suggest_move_cursor(const Range &cursor, bool forward) override;
 
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 

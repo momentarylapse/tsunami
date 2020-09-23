@@ -269,6 +269,29 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_bar_gap = hui::CreateResourceMenu("popup-menu-bar-gap");
 	menu_buffer = hui::CreateResourceMenu("popup-menu-buffer");
 
+	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
+	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
+	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
+	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
+	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
+	song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
+	//song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+	song->subscribe(this, [=]{
+		on_song_new();
+		on_song_finished_loading();
+		enable(true);
+	}, song->MESSAGE_FINISHED_LOADING);
+	song->subscribe(this, [=]{
+		enable(false);
+	}, song->MESSAGE_START_LOADING);
+	song->subscribe(this, [=]{
+		peak_thread->stop_update();
+	}, song->MESSAGE_BEFORE_CHANGE);
+	song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
+	song->subscribe(this, [=]{
+		force_redraw();
+		update_menu();
+	}, song->MESSAGE_ANY);
 	enable(true);
 
 	//ForceRedraw();
@@ -1180,7 +1203,6 @@ void AudioView::draw_selection(Painter *c) {
 }
 
 void AudioView::draw_song(Painter *c) {
-	bool slow_repeat = false;
 	bool animating = update_scene_graph();
 
 	c->set_antialiasing(false);
@@ -1221,13 +1243,10 @@ void AudioView::draw_song(Painter *c) {
 		animating = true;
 	}
 
-	//if (peak_thread and !peak_thread->is_done())
-	//	slow_repeat = true;
-
 	if (cam.needs_update())
 		animating = true;
 
-	if (animating or slow_repeat)
+	if (animating)
 		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [=]{ force_redraw(); });
 }
 
@@ -1452,32 +1471,8 @@ void AudioView::__set_cur_sample(SampleRef *s) {
 void AudioView::enable(bool _enabled) {
 	if (enabled and !_enabled) {
 		msg_write("===== DISABLE");
-		song->unsubscribe(this);
 	} else if (!enabled and _enabled) {
 		msg_write("===== ENABLE");
-		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
-		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
-		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
-		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
-		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
-		song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
-		//song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
-		song->subscribe(this, [=]{
-			enable(false);
-			song->subscribe(this, [=]{
-				on_song_new();
-				on_song_finished_loading();
-				enable(true);
-			}, song->MESSAGE_FINISHED_LOADING);
-		}, song->MESSAGE_START_LOADING);
-		song->subscribe(this, [=]{
-			peak_thread->stop_update();
-		}, song->MESSAGE_BEFORE_CHANGE);
-		song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
-		song->subscribe(this, [=]{
-			force_redraw();
-			update_menu();
-		}, song->MESSAGE_ANY);
 	}
 	enabled = _enabled;
 	force_redraw();

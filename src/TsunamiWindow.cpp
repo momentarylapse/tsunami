@@ -149,6 +149,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("track-explode", hui::KEY_ALT + hui::KEY_X);
 	set_key_code("layer-up", hui::KEY_UP);
 	set_key_code("layer-down", hui::KEY_DOWN);
+	set_key_code("layer-expand-up", hui::KEY_SHIFT + hui::KEY_UP);
+	set_key_code("layer-expand-down", hui::KEY_SHIFT + hui::KEY_DOWN);
 
 	event("layer-add", [=]{ on_add_layer(); });
 	event("layer-delete", [=]{ on_delete_layer(); });
@@ -201,11 +203,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("show-log", [=]{ on_show_log(); });
 	event("about", [=]{ on_about(); });
 	event("help", [=]{ on_help(); });
-	set_key_code("run_plugin", hui::KEY_RETURN + hui::KEY_SHIFT);
+	set_key_code("run_plugin", hui::KEY_SHIFT + hui::KEY_RETURN);
 	event("exit", [=]{ on_exit(); });
-	set_key_code("exit", hui::KEY_Q + hui::KEY_CONTROL);
+	set_key_code("exit", hui::KEY_CONTROL + hui::KEY_Q);
 	event("select_all", [=]{ on_select_all(); });
-	set_key_code("select_all", hui::KEY_A + hui::KEY_CONTROL);
+	set_key_code("select_all", hui::KEY_CONTROL + hui::KEY_A);
 	event("select_nothing", [=]{ on_select_none(); });
 	event("select_expand", [=]{ on_select_expand(); });
 	set_key_code("select_expand", hui::KEY_TAB + hui::KEY_SHIFT);

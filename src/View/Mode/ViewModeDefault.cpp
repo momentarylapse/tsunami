@@ -271,6 +271,47 @@ void ViewModeDefault::on_key_down(int k) {
 
 static float _zoom_0_ = 1;
 
+AudioViewLayer *first_selected_layer_in_block(AudioView *view, bool up) {
+	auto *first_layer = view->cur_vlayer();
+	while (true) {
+		AudioViewLayer *v = nullptr;
+		if (!up)
+			v = view->next_layer(first_layer);
+		else
+			v = view->prev_layer(first_layer);
+		if (v == first_layer or !view->sel.has(v->layer))
+			return first_layer;
+		first_layer = v;
+	}
+}
+
+void expand_layer_selection(AudioView *view, bool up) {
+	auto *vlayer = view->cur_vlayer();
+
+	// block
+	auto *first_layer = first_selected_layer_in_block(view, !up);
+	auto *last_layer = first_selected_layer_in_block(view, up);
+
+	if (vlayer == first_layer)
+		first_layer = last_layer;
+
+	if (!up)
+		vlayer = view->next_layer(vlayer);
+	else
+		vlayer = view->prev_layer(vlayer);
+
+	// select only between
+	float y0 = min(vlayer->area.y1, first_layer->area.y1);
+	float y1 = max(vlayer->area.y2, first_layer->area.y2);
+	for (auto *l: view->vlayer)
+		view->sel.set(l->layer, l->area.my() > y0 and l->area.my() < y1);
+
+	view->set_current(vlayer->get_hover_data(0,0));
+	//exclusively_select_layer(vlayer);
+	view->select_under_cursor();
+
+}
+
 void ViewModeDefault::on_command(const string &id) {
 
 	if (view->mode == view->mode_default) {
@@ -278,6 +319,10 @@ void ViewModeDefault::on_command(const string &id) {
 			view->move_to_layer(-1);
 		if (id == "layer-down")
 			view->move_to_layer(1);
+		if (id == "layer-expand-up")
+			expand_layer_selection(view, true);
+		if (id == "layer-expand-down")
+			expand_layer_selection(view, false);
 	}
 
 	// playback

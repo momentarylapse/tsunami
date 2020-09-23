@@ -39,8 +39,7 @@ FormatDescriptorNami::FormatDescriptorNami() :
 	FormatDescriptor("Tsunami", "nami", Flag::AUDIO | Flag::MIDI | Flag::FX | Flag::MULTITRACK | Flag::TAGS | Flag::SAMPLES | Flag::READ | Flag::WRITE) {}
 
 
-class FileChunkTag : public FileChunk<Song,Tag>
-{
+class FileChunkTag : public FileChunk<Song,Tag> {
 public:
 	FileChunkTag() : FileChunk<Song,Tag>("tag") {}
 	virtual void create() {
@@ -57,8 +56,7 @@ public:
 	}
 };
 
-class FileChunkLayerName : public FileChunk<Song,Song>
-{
+class FileChunkLayerName : public FileChunk<Song,Song> {
 public:
 	FileChunkLayerName() : FileChunk<Song,Song>("lvlname") {}
 	virtual void create() { me = parent; }
@@ -77,8 +75,7 @@ public:
 	}
 };
 
-class FileChunkFormat : public FileChunk<Song,Song>
-{
+class FileChunkFormat : public FileChunk<Song,Song> {
 public:
 	FileChunkFormat() : FileChunk<Song,Song>("format") {}
 	virtual void create() { me = parent; }
@@ -104,8 +101,7 @@ public:
 	}
 };
 
-class FileChunkSend : public FileChunk<Song,Song>
-{
+class FileChunkSend : public FileChunk<Song,Song> {
 public:
 	FileChunkSend() : FileChunk<Song,Song>("send") {}
 	virtual void create() { me = parent; }
@@ -152,8 +148,7 @@ public:
 };
 
 // DEPRECATED
-class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect>
-{
+class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect> {
 public:
 	FileChunkGlobalEffect() : FileChunk<Song,AudioEffect>("effect") {}
 	virtual void create() {}
@@ -179,8 +174,7 @@ public:
 	}
 };
 
-class FileChunkCurve : public FileChunk<Song,Curve>
-{
+class FileChunkCurve : public FileChunk<Song,Curve> {
 public:
 	FileChunkCurve() : FileChunk<Song,Curve>("curve") {}
 	virtual void create() {
@@ -313,8 +307,7 @@ string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p) {
 	return data;
 }
 
-struct UncompressData
-{
+struct UncompressData {
 	AudioBuffer *buf;
 	string *data;
 	int sample_offset;
@@ -405,8 +398,7 @@ void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p) {
 }
 #endif
 
-class FileChunkBufferBox : public FileChunk<TrackLayer,AudioBuffer>
-{
+class FileChunkBufferBox : public FileChunk<TrackLayer,AudioBuffer> {
 public:
 	FileChunkBufferBox() : FileChunk<TrackLayer,AudioBuffer>("bufbox") {}
 	virtual void create() {
@@ -468,8 +460,7 @@ public:
 	}
 };
 
-class FileChunkSampleBufferBox : public FileChunk<Sample,AudioBuffer>
-{
+class FileChunkSampleBufferBox : public FileChunk<Sample,AudioBuffer> {
 public:
 	FileChunkSampleBufferBox() : FileChunk<Sample,AudioBuffer>("bufbox") {}
 	virtual void create() {
@@ -532,8 +523,7 @@ public:
 	}
 };
 
-class FileChunkSampleRef : public FileChunk<TrackLayer,SampleRef>
-{
+class FileChunkSampleRef : public FileChunk<TrackLayer,SampleRef> {
 public:
 	FileChunkSampleRef() : FileChunk<TrackLayer,SampleRef>("samref") {}
 	virtual void create() {}
@@ -563,8 +553,7 @@ public:
 };
 
 // deprecated
-class _FileChunkTrackSampleRef : public FileChunk<Track,SampleRef>
-{
+class _FileChunkTrackSampleRef : public FileChunk<Track,SampleRef> {
 public:
 	_FileChunkTrackSampleRef() : FileChunk<Track,SampleRef>("samref") {}
 	virtual void create() {}
@@ -585,8 +574,7 @@ public:
 };
 
 
-class FileChunkMidiEvent : public FileChunk<MidiNoteBuffer,MidiEvent>
-{
+class FileChunkMidiEvent : public FileChunk<MidiNoteBuffer,MidiEvent> {
 public:
 	FileChunkMidiEvent() : FileChunk<MidiNoteBuffer,MidiEvent>("event") {}
 	virtual void create() {
@@ -652,8 +640,7 @@ public:
 };
 
 
-class FileChunkMidiNote : public FileChunk<MidiNoteBuffer,MidiNote>
-{
+class FileChunkMidiNote : public FileChunk<MidiNoteBuffer,MidiNote> {
 public:
 	FileChunkMidiNote() : FileChunk<MidiNoteBuffer,MidiNote>("note") {}
 	virtual void create() {}
@@ -675,8 +662,7 @@ public:
 	}
 };
 
-class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteBuffer>
-{
+class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteBuffer> {
 public:
 	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteBuffer>("midi") {
 		add_child(new FileChunkMidiEvent);
@@ -736,8 +722,7 @@ static bool note_buffer_has_flags(MidiNoteBuffer &buf) {
 	return false;
 }
 
-class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteBuffer>
-{
+class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteBuffer> {
 public:
 	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteBuffer>("midi") {
 		add_child(new FileChunkMidiEvent);
@@ -796,8 +781,7 @@ public:
 	}
 };
 
-class FileChunkSample : public FileChunk<Song,Sample>
-{
+class FileChunkSample : public FileChunk<Song,Sample> {
 public:
 	FileChunkSample() : FileChunk<Song,Sample>("sample") {
 		add_child(new FileChunkSampleBufferBox);
@@ -909,8 +893,7 @@ public:
 	}
 };
 
-class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Synthesizer::Tuning>
-{
+class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Synthesizer::Tuning> {
 public:
 	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Synthesizer::Tuning>("tuning") {}
 	virtual void create() { me = &parent->tuning; }
@@ -998,8 +981,7 @@ public:
 	}
 };
 
-/*class FileChunkTrackBar : public FileChunk<Track,Bar>
-{
+/*class FileChunkTrackBar : public FileChunk<Track,Bar> {
 public:
 	FileChunkTrackBar() : FileChunk<Track,Bar>("bar") {}
 	virtual void create() { me = NULL; }
@@ -1029,8 +1011,7 @@ public:
 	}
 };*/
 
-class FileChunkMarkerOld : public FileChunk<Track,TrackMarker>
-{
+class FileChunkMarkerOld : public FileChunk<Track,TrackMarker> {
 public:
 	FileChunkMarkerOld() : FileChunk<Track,TrackMarker>("marker") {}
 	virtual void create() {
@@ -1055,8 +1036,7 @@ public:
 	}
 };
 
-class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld>
-{
+class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld> {
 public:
 	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade") {}
 	virtual void create() {
@@ -1079,8 +1059,7 @@ public:
 	}
 };
 
-class FileChunkTuning : public FileChunk<Track,Instrument>
-{
+class FileChunkTuning : public FileChunk<Track,Instrument> {
 public:
 	FileChunkTuning() : FileChunk<Track,Instrument>("tuning") {}
 	virtual void create() {
@@ -1154,8 +1133,18 @@ public:
 	}
 };
 
-class FileChunkNami : public FileChunk<Song,Song>
-{
+class FileChunkSecret : public FileChunk<Song,Any> {
+public:
+	FileChunkSecret() : FileChunk<Song,Any>("secret") {}
+	void read(File *f) override {
+		parent->secret_data = Any::parse(f->read_str());
+	}
+	void write(File *f) override {
+		f->write_str(parent->secret_data.str());
+	}
+};
+
+class FileChunkNami : public FileChunk<Song,Song> {
 public:
 	FileChunkNami() :
 		FileChunk<Song,Song>("nami") {
@@ -1168,6 +1157,7 @@ public:
 		add_child(new FileChunkGlobalEffect);
 		add_child(new FileChunkCurve);
 		add_child(new FileChunkSend);
+		add_child(new FileChunkSecret);
 	}
 	virtual void create() { me = parent; }
 	virtual void read(File *f) {
@@ -1190,11 +1180,12 @@ public:
 				needs_send = true;
 		if (needs_send)
 			write_sub("send", me);
+		if (!me->secret_data.is_empty())
+			write_sub("secret", &me->secret_data);
 	}
 };
 
-class ChunkedFileFormatNami : public ChunkedFileParser
-{
+class ChunkedFileFormatNami : public ChunkedFileParser {
 public:
 	ChunkedFileFormatNami() :
 		ChunkedFileParser(8) {

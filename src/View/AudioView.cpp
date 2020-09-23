@@ -126,6 +126,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	session = _session;
 	win = session->win;
 	song = session->song;
+	_optimize_view_requested = false;
 
 	perf_channel = PerformanceMonitor::create_channel("view", this);
 
@@ -709,9 +710,9 @@ void AudioView::on_command(const string &id) {
 
 	float dt = 0.05f;
 	if (id == "cam-move-right")
-		cam.move(ScrollSpeedFast * dt / cam.scale);
+		cam.move(ScrollSpeedFast * dt / cam.pixels_per_sample);
 	if (id == "cam-move-left")
-		cam.move(- ScrollSpeedFast * dt / cam.scale);
+		cam.move(- ScrollSpeedFast * dt / cam.pixels_per_sample);
 	if (id == "cursor-jump-start")
 		set_cursor_pos(song->range_with_time().start());
 	if (id == "cursor-jump-end")
@@ -771,10 +772,10 @@ void AudioView::update_buffer_zoom() {
 	buffer_zoom_factor = 1.0;
 
 	// which level of detail?
-	if (cam.scale < 0.2f)
+	if (cam.pixels_per_sample < 0.2f)
 		for (int i=24-1;i>=0;i--) {
 			double _f = (double)(1 << (i + AudioBuffer::PEAK_OFFSET_EXP));
-			if (_f > 2.0 / cam.scale) {
+			if (_f > 2.0 / cam.pixels_per_sample) {
 				prefered_buffer_layer = i;
 				buffer_zoom_factor = _f;
 			}
@@ -850,7 +851,7 @@ void AudioView::on_song_new() {
 		for (TrackLayer *l: t->layers)
 			sel.add(l);
 	check_consistency();
-	optimize_view();
+	request_optimize_view();
 }
 
 void AudioView::on_song_finished_loading() {
@@ -861,8 +862,7 @@ void AudioView::on_song_finished_loading() {
 				implode_track(t->track);
 	}
 	update_peaks();
-	optimize_view();
-	hui::RunLater(0.5f, [=]{ optimize_view(); });
+	request_optimize_view();
 }
 
 void AudioView::on_song_tracks_change() {
@@ -1185,12 +1185,14 @@ void AudioView::draw_song(Painter *c) {
 
 	c->set_antialiasing(false);
 
+	scene_graph->update_geometry_recursive(area);
+
 	cam.area = song_area();
+	if (_optimize_view_requested)
+		perform_optimize_view();
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-
-	scene_graph->update_geometry_recursive(area);
 	scene_graph->draw(c);
 
 	// playing/capturing position
@@ -1254,7 +1256,7 @@ void AudioView::on_draw(Painter *c) {
 	PerformanceMonitor::end_busy(perf_channel);
 }
 
-void AudioView::optimize_view() {
+void AudioView::perform_optimize_view() {
 	if (area.x2 <= 0)
 		area.x2 = 1024;
 
@@ -1263,7 +1265,13 @@ void AudioView::optimize_view() {
 	if (r.length == 0)
 		r.length = 10 * song->sample_rate;
 
+	_optimize_view_requested = false;
 	cam.show(r);
+}
+
+void AudioView::request_optimize_view() {
+	_optimize_view_requested = true;
+	force_redraw();
 }
 
 void AudioView::update_menu() {
@@ -1443,15 +1451,25 @@ void AudioView::__set_cur_sample(SampleRef *s) {
 // unused?!?
 void AudioView::enable(bool _enabled) {
 	if (enabled and !_enabled) {
+		msg_write("===== DISABLE");
 		song->unsubscribe(this);
 	} else if (!enabled and _enabled) {
+		msg_write("===== ENABLE");
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
 		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
 		song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
-		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+		//song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+		song->subscribe(this, [=]{
+			enable(false);
+			song->subscribe(this, [=]{
+				on_song_new();
+				on_song_finished_loading();
+				enable(true);
+			}, song->MESSAGE_FINISHED_LOADING);
+		}, song->MESSAGE_START_LOADING);
 		song->subscribe(this, [=]{
 			peak_thread->stop_update();
 		}, song->MESSAGE_BEFORE_CHANGE);
@@ -1462,6 +1480,7 @@ void AudioView::enable(bool _enabled) {
 		}, song->MESSAGE_ANY);
 	}
 	enabled = _enabled;
+	force_redraw();
 }
 
 

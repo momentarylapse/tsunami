@@ -86,6 +86,7 @@ bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 		return false;
 	}
 
+	song->notify(song->MESSAGE_START_LOADING);
 	song->reset();
 	song->action_manager->enable(false);
 	song->filename = filename;

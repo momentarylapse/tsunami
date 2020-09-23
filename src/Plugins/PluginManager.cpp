@@ -614,7 +614,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
 	Kaba::link_external_class_func("AudioView.play", &AudioView::play);
 	Kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
-	Kaba::link_external_class_func("AudioView.optimize_view", &AudioView::optimize_view);
+	Kaba::link_external_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);
 	Kaba::link_external_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
 	Kaba::link_external_class_func("AudioView.cur_vtrack", &AudioView::cur_vtrack);
 

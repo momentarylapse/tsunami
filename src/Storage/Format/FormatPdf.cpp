@@ -203,7 +203,7 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	float track_space = 20;
 
 	cam->pos = r.offset;
-	cam->scale = (double)cam->area.width() / (double)r.length;
+	cam->pixels_per_sample = (double)cam->area.width() / (double)r.length;
 
 
 	auto bars = song->bars.get_bars(r + 1000);

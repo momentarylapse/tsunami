@@ -62,9 +62,9 @@ public:
 	void on_update() override {
 		// cheap auto scrolling
 		if (view->mx < 50)
-			view->cam.move(-10 / view->cam.scale);
+			view->cam.move(-10 / view->cam.pixels_per_sample);
 		if (view->mx > view->area.width() - 50)
-			view->cam.move(10 / view->cam.scale);
+			view->cam.move(10 / view->cam.pixels_per_sample);
 
 		range.set_start(view->get_mouse_pos_snap());
 		view->hover().y1 = view->my;
@@ -239,7 +239,7 @@ void ViewModeDefault::on_mouse_wheel() {
 		if (win->get_key(hui::KEY_CONTROL)) {
 			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);
 		} else if (win->get_key(hui::KEY_SHIFT)) {
-			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed);
+			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 		} else {
 			scroll_y(view, e->scroll_y * view->mouse_wheel_speed * view->ScrollSpeed);
 		}
@@ -247,7 +247,7 @@ void ViewModeDefault::on_mouse_wheel() {
 
 	// horizontal scroll
 	if (fabs(e->scroll_x) > 0.1f)
-		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed);
+		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 }
 
 void playback_seek_relative(AudioView *view, float dt) {

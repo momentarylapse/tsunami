@@ -160,7 +160,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
 			c->set_color(color::interpolate(col, Red, 0.3f));
-			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
 			c->set_antialiasing(false);
 			return;
 		}
@@ -172,13 +172,13 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 		cc.a *= 0.3f;
 		c->set_color(cc);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
 
 
 		// mean square
 		c->set_color(col);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], offset);
 
 
 		// invalid peaks...
@@ -197,7 +197,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
+			draw_line_buffer(c, view_pos_rel, view->cam.pixels_per_sample, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
 	c->set_antialiasing(false);
 }
@@ -230,7 +230,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
 			c->set_color(color::interpolate(col, Red, 0.3f));
-			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
 			c->set_antialiasing(false);
 			return;
 		}
@@ -245,12 +245,12 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 			_bzf *= 2;
 		}*/
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
+			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
 	}else{
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer_sel(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
+			draw_line_buffer_sel(c, view_pos_rel, view->cam.pixels_per_sample, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
 	c->set_antialiasing(false);
 }

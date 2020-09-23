@@ -444,7 +444,7 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
-	if (cam->scale < quality.rhythm_zoom_min)
+	if (cam->pixels_per_sample < quality.rhythm_zoom_min)
 		return;
 
 	c->set_antialiasing(quality.antialiasing);
@@ -814,7 +814,7 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 
-	if (cam->scale < quality.notes_zoom_min) {
+	if (cam->pixels_per_sample < quality.notes_zoom_min) {
 		draw_low_detail_dummy(c, midi);
 	} else {
 		_draw_notes(c, notes);

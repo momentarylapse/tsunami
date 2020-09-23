@@ -14,7 +14,7 @@ const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
 ViewPort::ViewPort(AudioView *v) {
 	view = v;
-	scale = 1.0f;
+	pixels_per_sample = 1.0f;
 	pos = 0;
 	pos_target = 0;
 	pos_pre_animation = 0;
@@ -30,19 +30,19 @@ void ViewPort::__init__(AudioView *v) {
 
 
 double ViewPort::screen2sample(double _x) {
-	return (_x - area.x1) / scale + pos;
+	return (_x - area.x1) / pixels_per_sample + pos;
 }
 
 double ViewPort::sample2screen(double s) {
-	return area.x1 + (s - pos) * scale;
+	return area.x1 + (s - pos) * pixels_per_sample;
 }
 
 double ViewPort::dsample2screen(double ds) {
-	return ds * scale;
+	return ds * pixels_per_sample;
 }
 
 double ViewPort::dscreen2sample(double dx) {
-	return dx / scale;
+	return dx / pixels_per_sample;
 }
 
 float ViewPort::screen2sample_f(float _x) {
@@ -67,11 +67,11 @@ void ViewPort::range2screen_clip(const Range &r, const rect &area, float &x1, fl
 
 void ViewPort::zoom(float f, float mx) {
 	// max zoom: 20 pixel per sample
-	double scale_new = clampf(scale * f, 0.000001, 20.0);
+	double scale_new = clampf(pixels_per_sample * f, 0.000001, 20.0);
 
-	pos += (mx - area.x1) * (1.0/scale - 1.0/scale_new);
+	pos += (mx - area.x1) * (1.0/pixels_per_sample - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;
-	scale = scale_new;
+	pixels_per_sample = scale_new;
 	if (view)
 		view->cam_changed();
 }
@@ -118,12 +118,12 @@ bool ViewPort::needs_update() {
 }
 
 Range ViewPort::range() const {
-	return Range(pos, area.width() / scale);
+	return Range(pos, area.width() / pixels_per_sample);
 }
 
 void ViewPort::set_range(const Range &r) {
 	pos = r.offset;
-	scale = (double)area.width() / (double)r.length;
+	pixels_per_sample = (double)area.width() / (double)r.length;
 }
 
 void ViewPort::make_sample_visible(int sample, int samples_ahead) {
@@ -159,12 +159,12 @@ rect ViewPort::nice_mapping_area() {
 	return rect(x0, x1, area.y1, area.y2);
 }
 
-void ViewPort::show(Range &r) {
+void ViewPort::show(const Range &r) {
 	rect mr = nice_mapping_area();
 
 	// map r into (x0,x1)
-	scale = mr.width() / (double)r.length;
-	pos = (double)r.start() - (mr.x1 - area.x1) / scale;
+	pixels_per_sample = mr.width() / (double)r.length;
+	pos = (double)r.start() - (mr.x1 - area.x1) / pixels_per_sample;
 	pos_pre_animation = pos;
 	pos_target = pos;
 	if (view)

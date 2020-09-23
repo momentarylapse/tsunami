@@ -29,7 +29,7 @@ public:
 	double pos_target;
 	double animation_time;
 	double animation_non_linearity;
-	double scale;
+	double pixels_per_sample;
 	Range range() const;
 	void set_range(const Range &r);
 
@@ -56,7 +56,7 @@ public:
 
 	void make_sample_visible(int sample, int samples_ahead);
 	rect nice_mapping_area();
-	void show(Range &r);
+	void show(const Range &r);
 };
 
 #endif /* SRC_VIEW_VIEWPORT_H_ */

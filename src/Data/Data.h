@@ -22,6 +22,7 @@ public:
 	explicit Data(Session *session);
 	virtual ~Data();
 
+	static const string MESSAGE_START_LOADING;
 	static const string MESSAGE_FINISHED_LOADING;
 	static const string MESSAGE_BEFORE_CHANGE;
 	static const string MESSAGE_AFTER_CHANGE;

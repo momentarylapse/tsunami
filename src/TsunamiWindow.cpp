@@ -914,7 +914,7 @@ void TsunamiWindow::on_sample_from_selection() {
 }
 
 void TsunamiWindow::on_view_optimal() {
-	view->optimize_view();
+	view->request_optimize_view();
 }
 
 void TsunamiWindow::on_select_none() {

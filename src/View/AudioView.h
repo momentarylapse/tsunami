@@ -133,7 +133,9 @@ public:
 	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area);
 	void draw_cursor_hover(Painter *c, const string &msg);
 
-	void optimize_view();
+	void request_optimize_view();
+	void perform_optimize_view();
+	bool _optimize_view_requested;
 	void update_menu();
 
 	string id;

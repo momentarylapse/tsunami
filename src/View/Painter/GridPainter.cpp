@@ -54,7 +54,7 @@ void GridPainter::draw_empty_background(Painter *c) {
 }
 
 void GridPainter::draw_time(Painter *c) {
-	double dl = AudioViewTrack::MIN_GRID_DIST / cam->scale; // >= 10 pixel
+	double dl = AudioViewTrack::MIN_GRID_DIST / cam->pixels_per_sample; // >= 10 pixel
 	double dt = dl / song->sample_rate;
 	double ldt = log10(dt);
 	double factor = 1;
@@ -88,7 +88,7 @@ void GridPainter::draw_time(Painter *c) {
 
 void GridPainter::draw_time_numbers(Painter *c) {
 	c->set_font("", AudioView::FONT_SIZE, false, false);
-	double dl = AudioViewTrack::MIN_GRID_DIST / cam->scale; // >= 10 pixel
+	double dl = AudioViewTrack::MIN_GRID_DIST / cam->pixels_per_sample; // >= 10 pixel
 	double dt = dl / song->sample_rate;
 	double ldt = log10(dt);
 	double factor = 1;

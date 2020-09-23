@@ -120,8 +120,6 @@ public:
 	void zoom_out();
 
 	void draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time = false, bool show_circle = false);
-	void draw_selection(Painter *c);
-	void draw_background(Painter *c);
 	void draw_song(Painter *c);
 	int draw_runner_id;
 

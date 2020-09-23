@@ -61,18 +61,20 @@ int xxx_total_read = 0;
 
 void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
 	//printf("output request %d\n", (int)nbytes);
-	AudioOutput *stream = (AudioOutput*)userdata;
+	auto stream = static_cast<AudioOutput*>(userdata);
 
 	if (nbytes == 0)
 		return;
 
 	void *data;
-	/*int r =*/ pa_stream_begin_write(p, &data, &nbytes);
+	int r = pa_stream_begin_write(p, &data, &nbytes);
 	stream->_pulse_test_error("pa_stream_begin_write");
+	if (r != 0)
+		return;
 	//printf("%d  %p  %d\n", r, data, (int)nbytes);
 
 	int frames = nbytes / 8;
-	float *out = (float*)data;
+	float *out = static_cast<float*>(data);
 
 	bool out_of_data = stream->feed_stream_output(frames, out);
 
@@ -88,19 +90,19 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 }
 
 void AudioOutput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto *stream = (AudioOutput*)userdata;
+	auto stream = static_cast<AudioOutput*>(userdata);
 	//msg_write("--success");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
 void AudioOutput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto *stream = (AudioOutput*)userdata;
+	auto stream = static_cast<AudioOutput*>(userdata);
 	//printf("--state\n");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
 void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) {
-	auto *stream = (AudioOutput*)userdata;
+	auto stream = static_cast<AudioOutput*>(userdata);
 	//stream->session->w("pulse: underflow\n");
 	printf("pulse: underflow\n");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
@@ -184,9 +186,9 @@ int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void
                                                     PaStreamCallbackFlags statusFlags,
                                                     void *userData) {
 //	printf("request %d\n", (int)frames);
-	AudioOutput *stream = (AudioOutput*)userData;
+	auto stream = static_cast<AudioOutput*>(userData);
 
-	float *out = (float*)outputBuffer;
+	auto out = static_cast<float*>(outputBuffer);
 	(void) inputBuffer; /* Prevent unused variable warning. */
 
 	bool out_of_data = stream->feed_stream_output((int)frames, out);
@@ -580,7 +582,7 @@ void AudioOutput::on_config() {
 bool AudioOutput::_pulse_test_error(const string &msg) {
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0) {
-		session->e("AudioOutput: " + msg + ": " + pa_strerror(e));
+		session->e(format("AudioOutput: %s: %s", msg, pa_strerror(e)));
 		return true;
 	}
 	return false;
@@ -590,7 +592,7 @@ bool AudioOutput::_pulse_test_error(const string &msg) {
 #if HAS_LIB_PORTAUDIO
 bool AudioOutput::_portaudio_test_error(PaError err, const string &msg) {
 	if (err != paNoError) {
-		session->e("AudioOutput: " + msg + ": " + Pa_GetErrorText(err));
+		session->e(format("AudioOutput: %s: %s", msg, Pa_GetErrorText(err)));
 		return true;
 	}
 	return false;

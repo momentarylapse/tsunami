@@ -43,7 +43,7 @@ extern bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm); // -> Outp
 
 void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
 	//printf("input request %d\n", (int)nbytes);
-	AudioInput *input = (AudioInput*)userdata;
+	auto input = static_cast<AudioInput*>(userdata);
 
 	const void *data;
 	pa_stream_peek(p, &data, &nbytes);
@@ -85,19 +85,19 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 }
 
 void AudioInput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto *stream = (AudioInput*)userdata;
+	auto stream = static_cast<AudioInput*>(userdata);
 	//msg_write("--success");
 	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
 }
 
 void AudioInput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto *stream = (AudioInput*)userdata;
+	auto stream = static_cast<AudioInput*>(userdata);
 	//printf("--state\n");
 	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
 }
 
 void AudioInput::pulse_input_notify_callback(pa_stream *p, void *userdata) {
-	AudioInput *input = (AudioInput*)userdata;
+	auto stream = static_cast<AudioInput*>(userdata);
 	printf("sstate... %p:  ", p);
 	int s = pa_stream_get_state(p);
 	if (s == PA_STREAM_UNCONNECTED)
@@ -107,7 +107,7 @@ void AudioInput::pulse_input_notify_callback(pa_stream *p, void *userdata) {
 	if (s == PA_STREAM_TERMINATED)
 		printf("terminated");
 	printf("\n");
-	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
+	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
 }
 
 #endif
@@ -121,10 +121,10 @@ int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void 
                                                     PaStreamCallbackFlags statusFlags,
                                                     void *userData) {
 	//printf("request %d\n", (int)frames);
-	AudioInput *input = (AudioInput*)userData;
+	auto input = static_cast<AudioInput*>(userData);
 
 	(void)outputBuffer; /* Prevent unused variable warning. */
-	float *in = (float*) inputBuffer;
+	auto in = static_cast<const float*>(inputBuffer);
 
 
 	if (in) {
@@ -443,7 +443,7 @@ bool AudioInput::_pulse_test_error(const string &msg) {
 #if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(session->device_manager->pulse_context);
 	if (e != 0)
-		session->e(msg + " (input): " + pa_strerror(e));
+		session->e(format("%s (input): %s", msg, pa_strerror(e)));
 	return (e != 0);
 #endif
 	return false;
@@ -452,7 +452,7 @@ bool AudioInput::_pulse_test_error(const string &msg) {
 #if HAS_LIB_PORTAUDIO
 bool AudioInput::_portaudio_test_error(PaError err, const string &msg) {
 	if (err != paNoError) {
-		session->e(msg + ": (input): " + Pa_GetErrorText(err));
+		session->e(format("%s: (input): %s", msg, Pa_GetErrorText(err)));
 		return true;
 	}
 	return false;

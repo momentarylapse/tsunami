@@ -65,7 +65,7 @@ public:
 	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;
 	bool _cdecl exports(string &data, int channels, SampleFormat format) const;
 	void _cdecl interleave(float *p, float volume) const;
-	void _cdecl deinterleave(float *p, int num_channels);
+	void _cdecl deinterleave(const float *p, int num_channels);
 
 
 	static const int PEAK_CHUNK_EXP;

@@ -533,7 +533,7 @@ void AudioBuffer::interleave(float *p, float volume) const {
 	}
 }
 
-void AudioBuffer::deinterleave(float *p, int num_channels) {
+void AudioBuffer::deinterleave(const float *p, int num_channels) {
 	float *pl = &c[0][0];
 	float *pr = &c[1][0];
 	if (num_channels == 1) {

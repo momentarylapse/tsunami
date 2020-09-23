@@ -1196,12 +1196,6 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 	}
 }
 
-void AudioView::draw_background(Painter *c) {
-}
-
-void AudioView::draw_selection(Painter *c) {
-}
-
 void AudioView::draw_song(Painter *c) {
 	bool animating = update_scene_graph();
 

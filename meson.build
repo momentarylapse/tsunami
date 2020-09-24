@@ -130,6 +130,7 @@ sources = [
 	'src/Action/Track/Buffer/ActionTrack__SplitBuffer.cpp',
 	'src/Action/Track/Buffer/ActionTrackCreateBuffers.cpp',
 	'src/Action/Track/Buffer/ActionTrackEditBuffer.cpp',
+	'src/Action/Track/Buffer/ActionTrackMoveBuffer.cpp',
 	'src/Action/Track/Buffer/ActionTrackSetChannels.cpp',
 	'src/Action/Track/Data/ActionTrackEditMuted.cpp',
 	'src/Action/Track/Data/ActionTrackEditName.cpp',

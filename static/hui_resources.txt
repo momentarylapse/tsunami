@@ -1340,7 +1340,7 @@ menu_edit
 
 1
 0
-13
+14
 Item
 undo
 image=hui:undo
@@ -1407,16 +1407,22 @@ image=hui:delete
 10
 0
 0
+Item
+delete-shift
+image=hui:delete
+11
+0
+0
 Separator
 
 
-11
+12
 0
 0
 Item
 settings
 image=hui:preferences
-12
+13
 0
 0
 Menu
@@ -7196,7 +7202,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-606
+607
 # Text
 /bars-add
 Add bars...
@@ -7245,7 +7251,10 @@ dB
 
 /delete
 Delete
-
+does not move anything - leaves a gap instead
+/delete-shift
+Delete and shift
+no gap - moves everyting afterwards
 /device-delete
 Delete
 

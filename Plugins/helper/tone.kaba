@@ -77,6 +77,22 @@ string chord_type_name(int t)
 		return "dim"
 	if t == Chord.AUGMENTED
 		return "aug"
+	if t == Chord.DOMINANT_SEVENTH
+		return "dom7"
+	if t == Chord.MINOR_SEVENTH
+		return "min7"
+	if t == Chord.MAJOR_SEVENTH
+		return "maj7"
+	if t == Chord.MINOR_MAJOR_SEVENTH
+		return "minmaj7"
+	if t == Chord.DIMINISHED_SEVENTH
+		return "dim7"
+	if t == Chord.HALF_DIMINISHED_SEVENTH
+		return "halfdim7"
+	if t == Chord.AUGMENTED_SEVENTH
+		return "aug7"
+	if t == Chord.AUGMENTED_MAJOR_SEVENTH
+		return "augmaj7"
 	if t == Chord.SINGLE_TONE
 		return ""
 	if t > Chord.SINGLE_TONE and t < Chord.SINGLE_TONE + 7
@@ -85,13 +101,24 @@ string chord_type_name(int t)
 
 class Chord
 	enum
+		# 3 tones
 		MAJOR
 		MINOR
 		DIMINISHED
 		AUGMENTED
-		
+		# 4 tones
+		MINOR_SEVENTH
+		MAJOR_SEVENTH
+		MINOR_MAJOR_SEVENTH
+		DIMINISHED_SEVENTH
+		HALF_DIMINISHED_SEVENTH
+		DOMINANT_SEVENTH
+		AUGMENTED_SEVENTH
+		AUGMENTED_MAJOR_SEVENTH
+		# 1 tone
 		SINGLE_TONE
-		NUM_TYPES = 11
+		# 2 tones (intervals > prime)
+		NUM_TYPES = 19 # SINGLE_TONE + 12
 	int base_tone
 	int type
 	int[] pitch()
@@ -103,6 +130,24 @@ class Chord
 			return [base_tone, base_tone + 3, base_tone + 6]
 		if type == AUGMENTED
 			return [base_tone, base_tone + 4, base_tone + 8]
+			
+		if type == DOMINANT_SEVENTH
+			return [base_tone, base_tone + 4, base_tone + 7, base_tone + 10]
+		if type == MAJOR_SEVENTH
+			return [base_tone, base_tone + 4, base_tone + 7, base_tone + 11]
+		if type == MINOR_SEVENTH
+			return [base_tone, base_tone + 3, base_tone + 7, base_tone + 10]
+		if type == MINOR_MAJOR_SEVENTH
+			return [base_tone, base_tone + 3, base_tone + 7, base_tone + 11]
+		if type == DIMINISHED_SEVENTH
+			return [base_tone, base_tone + 3, base_tone + 6, base_tone + 9]
+		if type == HALF_DIMINISHED_SEVENTH
+			return [base_tone, base_tone + 3, base_tone + 6, base_tone + 10]
+		if type == AUGMENTED_SEVENTH
+			return [base_tone, base_tone + 4, base_tone + 8, base_tone + 10]
+		if type == AUGMENTED_MAJOR_SEVENTH
+			return [base_tone, base_tone + 4, base_tone + 8, base_tone + 11]
+			
 		if type == SINGLE_TONE
 			return [base_tone]
 		if type > SINGLE_TONE

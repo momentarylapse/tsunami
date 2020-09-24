@@ -52,6 +52,7 @@
 #include "Data/Rhythm/Bar.h"
 #include "Action/ActionManager.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "Action/Song/ActionSongMoveSelection.h"
 #include "Module/Audio/AudioEffect.h"
 #include "Module/Audio/AudioSource.h"
 #include "Module/Midi/MidiEffect.h"
@@ -98,6 +99,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("paste_time", [=]{ on_paste_time(); });
 	event("delete", [=]{ on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
+	event("delete-shift", [=]{ on_delete_shift(); });
+	set_key_code("delete-shift", hui::KEY_SHIFT + hui::KEY_DELETE);
 	event("render_export_selection", [=]{ on_render_export_selection(); });
 	set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL);
 	event("export_selection", [=]{ on_export_selection(); });
@@ -795,8 +798,24 @@ void TsunamiWindow::on_menu_execute_tsunami_plugin() {
 }
 
 void TsunamiWindow::on_delete() {
-	if (!view->sel.is_empty())
-		song->delete_selection(view->sel);
+	if (view->sel.is_empty())
+		return;
+	song->delete_selection(view->sel);
+	//view->set_cursor_pos(view->cursor_range().start());
+}
+
+void TsunamiWindow::on_delete_shift() {
+	if (view->sel.is_empty())
+		return;
+	song->begin_action_group();
+	song->delete_selection(view->sel);
+	auto sel = SongSelection::from_range(song, RangeTo(view->cursor_range().end(), 2000000000)).filter(view->sel.layers());
+	auto a = new ActionSongMoveSelection(song, sel, true);
+	a->set_param_and_notify(song, -view->sel.range().length);
+	song->execute(a);
+	song->end_action_group();
+
+	view->set_cursor_pos(view->cursor_range().start());
 }
 
 void TsunamiWindow::on_sample_manager() {
@@ -960,6 +979,7 @@ void TsunamiWindow::update_menu() {
 	enable("copy", app->clipboard->can_copy(view));
 	enable("paste", app->clipboard->has_data());
 	enable("delete", !view->sel.is_empty());
+	enable("delete-shift", !view->sel.is_empty());
 
 	check("mode-edit-check", view->mode == view->mode_edit);
 

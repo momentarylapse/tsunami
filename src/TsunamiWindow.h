@@ -45,6 +45,7 @@ public:
 	void on_paste_as_samples();
 	void on_paste_time();
 	void on_delete();
+	void on_delete_shift();
 	void on_render_export_selection();
 	void on_export_selection();
 	void on_quick_export();

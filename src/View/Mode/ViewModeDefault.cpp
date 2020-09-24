@@ -107,7 +107,7 @@ public:
 		ref_pos = hover_reference_pos(view->hover());
 	}
 	void on_start() override {
-		action = new ActionSongMoveSelection(view->song, sel);
+		action = new ActionSongMoveSelection(view->song, sel, false);
 	}
 	void on_update() override {
 		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);

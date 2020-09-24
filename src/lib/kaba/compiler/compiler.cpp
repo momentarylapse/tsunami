@@ -24,12 +24,10 @@ namespace Kaba{
 
 int LocalOffset,LocalOffsetMax;
 
-/*int get_func_temp_size(Function *f)
-{
+/*int get_func_temp_size(Function *f) {
 }*/
 
-inline int add_temp_var(int size)
-{
+inline int add_temp_var(int size) {
 	LocalOffset += size;
 	if (LocalOffset > LocalOffsetMax)
 		LocalOffsetMax = LocalOffset;
@@ -43,14 +41,13 @@ int TaskReturnOffset;
 #define CallRel32OCSize			5
 #define AfterWaitOCSize			10
 
-void add_esp_add(Asm::InstructionWithParamsList *list,int d)
-{
-	if (d > 0){
+void add_esp_add(Asm::InstructionWithParamsList *list,int d) {
+	if (d > 0) {
 		if (d > 120)
 			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 4));
 		else
 			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 1));
-	}else if (d < 0){
+	} else if (d < 0) {
 		if (d < -120)
 			list->add2(Asm::INST_SUB, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(-d, 4));
 		else
@@ -87,17 +84,20 @@ void init_all_global_objects(SyntaxTree *ps, const Class *c) {
 
 static int64 _opcode_rand_state_ = 10000;
 
-void* get_nice_random_addr()
-{
+// randomly pick a page address +/- 1gb around &Kaba::init
+void* get_nice_random_addr() {
 	int64 p = ((int_p)&init) & 0xfffffffffffff000;
 	_opcode_rand_state_ = (_opcode_rand_state_ * 1664525 + 1013904223);
-	p += (int64)(_opcode_rand_state_ & 0x3fff) * 4096;
+	//printf("%p      %04x\n", p, (int)_opcode_rand_state_ & 0x3ffff);
+	if (_opcode_rand_state_ & 0x40000)
+		p += (int64)(_opcode_rand_state_ & 0x3ffff) * 4096;
+	else
+		p -= (int64)(_opcode_rand_state_ & 0x3ffff) * 4096;
 	return (void*)p;
 
 }
 
-void* get_nice_memory(int64 size, bool executable, Script *script)
-{
+void* get_nice_memory(int64 size, bool executable, Script *script) {
 	if (size == 0)
 		return nullptr;
 	void *mem = nullptr;
@@ -111,31 +111,31 @@ void* get_nice_memory(int64 size, bool executable, Script *script)
 
 	int prot = PROT_READ | PROT_WRITE;
 	int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE;
-	if (executable){
+	if (executable) {
 		prot |= PROT_EXEC;
 		flags |= MAP_EXECUTABLE;
 	}
 
 	// try in 32bit distance from current opcode
-	for (int i=0; i<100000; i++){
+	for (int i=0; i<10000; i++) {
 		void *addr0 = get_nice_random_addr();
 		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
 		mem = (char*)mmap(addr0, size, prot, flags, -1, 0);
-		if ((int_p)mem != -1){
+		if ((int_p)mem != -1) {
 			if (config.verbose)
 				printf("%d  %p  ->  %p\n", i, addr0, mem);
-			if (labs((int_p)mem - (int_p)addr0) < 1000000000)
+			if (labs((int_p)mem - (int_p)addr0) < 2000000000)
 				return mem;
-			munmap(mem, size);
+			//munmap(mem, size);
 			if (config.verbose)
 				msg_write("...try again");
 		}
-		if (i > 5) {
+		if (i > 5000) {
 			prot |= PROT_EXEC;
-			flags |= MAP_EXECUTABLE;
+			flags |= MAP_EXECUTABLE | MAP_FIXED;
 		}
 	}
-	script->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
+	//script->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
 
 	// no?...ok, try anywhere
 	mem = (char*)mmap(nullptr, size, prot, flags, -1, 0);
@@ -144,8 +144,8 @@ void* get_nice_memory(int64 size, bool executable, Script *script)
 #endif
 
 	// failed...
-	if (!mem){
-		msg_error(string("Script:  could not allocate executable memory: ") + strerror(errno));
+	if (!mem) {
+		script->do_error(format("could not allocate executable memory: %s", strerror(errno)));
 		mem = new char[size];
 	}
 
@@ -153,8 +153,7 @@ void* get_nice_memory(int64 size, bool executable, Script *script)
 }
 
 
-void Script::allocate_opcode()
-{
+void Script::allocate_opcode() {
 	int max_opcode = MAX_OPCODE;
 	if (config.compile_os)
 		max_opcode *= 10;
@@ -194,8 +193,7 @@ int mem_size_needed_total(const Class *c) {
 	return size;
 }
 
-void Script::allocate_memory()
-{
+void Script::allocate_memory() {
 	memory_size = mem_size_needed_total(syntax->base_class);
 
 	memory = (char*)get_nice_memory(memory_size, false, this);
@@ -272,16 +270,15 @@ Node *check_const_used(Node *n, Script *me) {
 	return n;
 }
 
-void remap_virtual_tables(Script *s, char *mem, int &offset, char *address, const Class *ct)
-{
+void remap_virtual_tables(Script *s, char *mem, int &offset, char *address, const Class *ct) {
 	// vtables -> no data yet...
-	if (ct->vtable.num > 0){
+	if (ct->vtable.num > 0) {
 		Class *t = const_cast<Class*>(ct);
 		t->_vtable_location_compiler_ = &mem[offset];
 		t->_vtable_location_target_ = &address[offset];
 		offset += config.pointer_size * t->vtable.num;
 		for (Constant *c: s->syntax->base_class->constants)
-			if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data)){
+			if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data)) {
 				c->as_int64() = (int_p)t->_vtable_location_target_;
 			}
 	}
@@ -295,7 +292,7 @@ void _map_constants_to_memory(char *mem, int &offset, char *address, const Class
 
 	// also allow named constants... might be imported by other scripts!
 	for (Constant *c: ns->constants)
-		if (c->used or ((c->name[0] != '-') and !config.compile_os)){
+		if (c->used or ((c->name[0] != '-') and !config.compile_os)) {
 			c->address = (void*)(address + offset);//ns->owner->asm_meta_info->code_origin + offset);
 		//	c->address = &mem[offset];
 			c->map_into(&mem[offset], (char*)c->address);
@@ -303,13 +300,13 @@ void _map_constants_to_memory(char *mem, int &offset, char *address, const Class
 		}
 
 	/*foreachi(Constant *c, syntax->constants, i)
-		if ((c->mapping_size() > 1) and used[i]){
+		if ((c->mapping_size() > 1) and used[i]) {
 			cnst[i] = (char*)(syntax->asm_meta_info->code_origin + opcode_size);
 			c->map_into(&opcode[opcode_size], cnst[i]);
 			opcode_size += mem_align(c->mapping_size(), 4);
 		}
 	foreachi(Constant *c, syntax->constants, i)
-		if ((c->mapping_size() == 1) and used[i]){
+		if ((c->mapping_size() == 1) and used[i]) {
 			cnst[i] = (char*)(syntax->asm_meta_info->code_origin + opcode_size);
 			c->map_into(&opcode[opcode_size], cnst[i]);
 			opcode_size += 1;
@@ -324,7 +321,7 @@ void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
 	remap_virtual_tables(this, mem, offset, address, syntax->base_class);
 
 
-	syntax->transform([&](Node* n){ return check_const_used(n, this); });
+	syntax->transform([&](Node* n) { return check_const_used(n, this); });
 
 	/*int n = 0;
 	for (bool b: used)
@@ -333,7 +330,7 @@ void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
 	msg_write(format("     USED:    %d / %d", n, used.num));
 	int size0 = opcode_size;
 
-	foreachi(Constant *c, syntax->constants, i){
+	foreachi(Constant *c, syntax->constants, i) {
 		cnst[i] = (char*)(syntax->asm_meta_info->code_origin + opcode_size);
 		c->map_into(&opcode[opcode_size], cnst[i]);
 		opcode_size += mem_align(c->mapping_size(), 4);
@@ -366,16 +363,15 @@ void Script::LinkOsEntryPoint() {
 	*(int*)&opcode[OCORA] = lll;
 }
 
-bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert)
-{
-	for (int i=0;i<opcode_size - size;i++){
+bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert) {
+	for (int i=0;i<opcode_size - size;i++) {
 		bool match = true;
 		for (int j=0;j<size;j++)
-			if (pattern[j] != opcode[i + j]){
+			if (pattern[j] != opcode[i + j]) {
 				match = false;
 				break;
 			}
-		if (match){
+		if (match) {
 			for (int j=0;j<size;j++)
 				opcode[i + j] = insert[j];
 			return true;
@@ -461,12 +457,10 @@ void Script::link_virtual_functions_into_vtable(const Class *c) {
 		link_virtual_functions_into_vtable(cc);
 }
 
-struct DynamicLibraryImport
-{
+struct DynamicLibraryImport {
 	string filename;
 	void *handle;
-	void *get_symbol(const string &name, Script *s)
-	{
+	void *get_symbol(const string &name, Script *s) {
 #if HAS_LIB_DL
 		if (!handle)
 			return nullptr;
@@ -480,8 +474,7 @@ struct DynamicLibraryImport
 	}
 };
 static Array<DynamicLibraryImport*> dynamic_libs;
-DynamicLibraryImport *get_dynamic_lib(const string &filename, Script *s)
-{
+DynamicLibraryImport *get_dynamic_lib(const string &filename, Script *s) {
 #if HAS_LIB_DL
 	for (auto &d: dynamic_libs)
 		if (d->filename == filename)
@@ -499,21 +492,20 @@ DynamicLibraryImport *get_dynamic_lib(const string &filename, Script *s)
 	return nullptr;
 }
 
-void parse_magic_linker_string(SyntaxTree *s)
-{
+void parse_magic_linker_string(SyntaxTree *s) {
 	for (auto *c: s->base_class->constants)
-		if (c->name == "KABA_LINK" and c->type == TypeString){
+		if (c->name == "KABA_LINK" and c->type == TypeString) {
 			DynamicLibraryImport *d = nullptr;
 			auto xx = c->as_string().explode("\n");
-			for (string &x: xx){
+			for (string &x: xx) {
 				if (x.num == 0)
 					continue;
-				if (x[0] == '\t'){
-					if (d and x.find(":")){
+				if (x[0] == '\t') {
+					if (d and x.find(":")) {
 						auto y = x.substr(1, -1).explode(":");
 						link_external(y[0], d->get_symbol(y[1], s->script));
 					}
-				}else{
+				} else {
 					d = get_dynamic_lib(x, s->script);
 				}
 			}
@@ -585,7 +577,7 @@ void Script::compile() {
 
 	//_expand(Opcode,OpcodeSize);
 
-	if (show_compiler_stats){
+	if (show_compiler_stats) {
 		msg_write("--------------------------------");
 		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size));
 	}

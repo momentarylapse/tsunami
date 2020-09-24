@@ -276,6 +276,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	embed(mini_bar, "main-grid", 0, 2);
 
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
+	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SELECTION_CHANGE);
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 	view->signal_chain->subscribe(this, [=]{ on_update(); });

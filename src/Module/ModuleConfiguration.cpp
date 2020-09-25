@@ -163,14 +163,20 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 }
 
 string ModuleConfiguration::to_string() const {
-	return var_to_string(_class, (char*)this);
+	return to_any().str();
+	//return var_to_string(_class, (char*)this);
 }
 
 Any ModuleConfiguration::to_any() const {
+	throw Exception("TODO");
 	return Any();
 }
 
 void ModuleConfiguration::from_string(const string &s, Session *session) {
+	from_any(Any::parse(s), session);
+}
+
+void ModuleConfiguration::from_string_legacy(const string &s, Session *session) {
 	reset();
 	int pos = 0;
 	var_from_string(_class, (char*)this, s, pos, session);
@@ -178,6 +184,7 @@ void ModuleConfiguration::from_string(const string &s, Session *session) {
 
 void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	reset();
+	throw Exception("TODO");
 }
 
 bool ac_name_match(const string &const_name, const string &var_name) {

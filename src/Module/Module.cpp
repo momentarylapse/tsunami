@@ -131,11 +131,16 @@ void Module::config_from_string(int _version, const string &param) {
 	if (!config)
 		return;
 
-	if (_version != VERSION_LATEST and _version != version()) {
-		// ... TODO
-	}
+	if (_version == VERSION_LEGACY) {
+		config->from_string_legacy(param, session);
+	} else {
+		if (_version != VERSION_LATEST and _version != version()) {
+			// ... TODO
+			session->e(format("%s: version request:%d current:%d", module_subtype, _version, version()));
+		}
 
-	config->from_string(param, session);
+		config->from_string(param, session);
+	}
 	on_config();
 }
 
@@ -148,6 +153,7 @@ void Module::config_from_any(int _version, const Any &param) {
 
 	if (_version != VERSION_LATEST and _version != version()) {
 		// ... TODO
+		session->e(format("%s: version request:%d current:%d", module_subtype, _version, version()));
 	}
 
 	config->from_any(param, session);

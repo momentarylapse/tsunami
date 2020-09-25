@@ -28,6 +28,7 @@ public:
 	virtual void _cdecl reset(){}
 	virtual string to_string() const;
 	virtual void from_string(const string &s, Session *session);
+	virtual void from_string_legacy(const string &s, Session *session);
 	virtual Any to_any() const;
 	virtual void from_any(const Any &a, Session *session);
 	virtual string auto_conf(const string &name) const;

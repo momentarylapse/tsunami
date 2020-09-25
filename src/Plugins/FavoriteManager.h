@@ -29,6 +29,7 @@ public:
 		string name;
 		string config_name;
 		string options;
+		int version;
 		ModuleType type;
 		bool read_only;
 	};

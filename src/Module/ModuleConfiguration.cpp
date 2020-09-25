@@ -166,10 +166,18 @@ string ModuleConfiguration::to_string() const {
 	return var_to_string(_class, (char*)this);
 }
 
+Any ModuleConfiguration::to_any() const {
+	return Any();
+}
+
 void ModuleConfiguration::from_string(const string &s, Session *session) {
 	reset();
 	int pos = 0;
 	var_from_string(_class, (char*)this, s, pos, session);
+}
+
+void ModuleConfiguration::from_any(const Any &a, Session *session) {
+	reset();
 }
 
 bool ac_name_match(const string &const_name, const string &var_name) {

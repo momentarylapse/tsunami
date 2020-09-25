@@ -35,6 +35,7 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 			ff.name = f->read_str();
 			ff.options = f->read_str();
 			ff.read_only = read_only;
+			ff.version = Module::VERSION_LEGACY;
 			set(ff);
 		}
 		delete(f);
@@ -87,7 +88,7 @@ void FavoriteManager::apply(Module *c, const string &name, bool notify) {
 		load(c->session);
 	for (Favorite &f: favorites) {
 		if ((f.type == c->module_type) and (f.config_name == c->module_subtype) and (f.name == name))
-			c->config_from_string(f.options);
+			c->config_from_string(f.version, f.options);
 	}
 	if (notify)
 		c->notify();

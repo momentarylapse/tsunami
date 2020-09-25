@@ -13,6 +13,7 @@
 #include "ModuleFactory.h"
 #include "Port/Port.h"
 #include "../Session.h"
+#include "../lib/any/any.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/kaba/syntax/Class.h"
 #include "../Plugins/PluginManager.h"
@@ -89,11 +90,20 @@ ModuleConfiguration *Module::get_config() const {
 		return nullptr;
 	for (auto &e: _class->elements)
 		if ((e.name == "config") and (e.type->get_root()->long_name() == "tsunami.Module.Config")) {
-			auto *config = (ModuleConfiguration*)((char*)this + e.offset);
+			auto *config = reinterpret_cast<ModuleConfiguration*>((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
 		}
 	return nullptr;
+}
+
+int Module::version() const {
+	if (!_class)
+		return 0;
+	for (auto *c: _class->constants)
+		if ((c->name == "VERSION") and (c->type->name == "int"))
+			return c->as_int();
+	return 0;
 }
 
 
@@ -105,15 +115,42 @@ string Module::config_to_string() const {
 	return config->to_string();
 }
 
+Any Module::config_to_any() const {
+	auto *config = get_config();
+	if (!config)
+		return Any();
+
+	return config->to_any();
+}
+
 
 // not signaling actions/gui!
 //   but consistent state
-void Module::config_from_string(const string &param) {
+void Module::config_from_string(int _version, const string &param) {
 	auto *config = get_config();
 	if (!config)
 		return;
 
+	if (_version != VERSION_LATEST and _version != version()) {
+		// ... TODO
+	}
+
 	config->from_string(param, session);
+	on_config();
+}
+
+// not signaling actions/gui!
+//   but consistent state
+void Module::config_from_any(int _version, const Any &param) {
+	auto *config = get_config();
+	if (!config)
+		return;
+
+	if (_version != VERSION_LATEST and _version != version()) {
+		// ... TODO
+	}
+
+	config->from_any(param, session);
 	on_config();
 }
 
@@ -156,7 +193,7 @@ void Module::changed() {
 Module *Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_type, module_subtype);
 	string param = config_to_string();
-	clone->config_from_string(param);
+	clone->config_from_string(Module::VERSION_LATEST, param);
 	clone->_config_latest_history = param;
 	return clone;
 }

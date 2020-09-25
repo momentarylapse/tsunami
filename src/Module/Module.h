@@ -28,6 +28,7 @@ class Session;
 class Plugin;
 class Port;
 class InPortDescription;
+class Any;
 
 enum class ModuleType {
 	// plug-ins
@@ -105,9 +106,14 @@ public:
 	virtual void _cdecl on_config(){}
 
 	virtual ModuleConfiguration *get_config() const;
+	int version() const;
+	static const int VERSION_LATEST = -1;
+	static const int VERSION_LEGACY = -2;
 
 	string config_to_string() const;
-	void config_from_string(const string &options);
+	Any config_to_any() const;
+	void config_from_string(int version, const string &options);
+	void config_from_any(int version, const Any &options);
 
 
 	string _config_latest_history;

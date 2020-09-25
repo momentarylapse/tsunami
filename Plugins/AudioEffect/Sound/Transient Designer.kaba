@@ -22,11 +22,11 @@ class TransientDesigner extends AudioEffect
 	
 	override void on_config()
 		env_fast.session = session
-		env_fast.config_from_string("0.2, 0, 0.0001")
+		env_fast.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.0001)")
 		env_att.session = session
-		env_att.config_from_string("0.02, 0, 0.0001")
+		env_att.config_from_string(Module.VERSION_LEGACY, "(0.02 0 0.0001)")
 		env_sus.session = session
-		env_sus.config_from_string("0.2, 0, 0.00000002") # ~100ms release
+		env_sus.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.00000002)") # ~100ms release
 	
 	override void reset_state()
 		env_fast.reset_state()

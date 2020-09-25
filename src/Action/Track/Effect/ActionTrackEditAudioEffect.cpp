@@ -25,13 +25,13 @@ void *ActionTrackEditEffect::execute(Data *d) {
 
 void ActionTrackEditEffect::redo(Data *d) {
 	fx->_config_latest_history = new_value;
-	fx->config_from_string(new_value);
+	fx->config_from_string(Module::VERSION_LATEST, new_value);
 	fx->notify();
 }
 
 void ActionTrackEditEffect::undo(Data *d) {
 	fx->_config_latest_history = old_value;
-	fx->config_from_string(old_value);
+	fx->config_from_string(Module::VERSION_LATEST, old_value);
 	fx->notify();
 }
 

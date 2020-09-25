@@ -130,7 +130,7 @@ public:
 		f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->config_from_string(params);
+		me->config_from_string(Module::VERSION_LEGACY, params);
 		me->_config_latest_history = params;
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
@@ -158,7 +158,7 @@ public:
 		f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->config_from_string(params);
+		me->config_from_string(Module::VERSION_LEGACY, params);
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -621,7 +621,7 @@ public:
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
 		string params = f->read_str();
-		me->config_from_string(params);
+		me->config_from_string(Module::VERSION_LEGACY, params);
 		me->_config_latest_history = params;
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
@@ -918,7 +918,7 @@ public:
 		Session *session = cur_op(this)->session;
 		me = CreateSynthesizer(session, f->read_str());
 		string param = f->read_str();
-		me->config_from_string(param);
+		me->config_from_string(Module::VERSION_LEGACY, param);
 		me->_config_latest_history = param;
 		f->read_str();
 		f->read_int();

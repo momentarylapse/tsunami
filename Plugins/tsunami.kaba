@@ -138,8 +138,12 @@ class Module extends Object
 	extern virtual void on_config()
 	extern virtual Module.Config* get_config()
 	extern const string config_to_string()
-	extern void config_from_string(string s)
+	extern const any config_to_any()
+	extern void config_from_string(int version, string s)
+	extern void config_from_any(int version, any a)
 
+	const int VERSION_LATEST = -1
+	const int VERSION_LEGACY = -2
 
 	enum
 		COMMAND_START

@@ -19,20 +19,20 @@ ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(MidiEffect *_fx) {
 
 void *ActionTrackEditMidiEffect::execute(Data *d) {
 	fx->_config_latest_history = new_value;
-	fx->config_from_string(new_value);
+	fx->config_from_string(Module::VERSION_LATEST, new_value);
 	fx->notify();
 	return nullptr;
 }
 
 void ActionTrackEditMidiEffect::redo(Data *d) {
 	fx->_config_latest_history = new_value;
-	fx->config_from_string(old_value);
+	fx->config_from_string(Module::VERSION_LATEST, old_value);
 	fx->notify();
 }
 
 void ActionTrackEditMidiEffect::undo(Data *d) {
 	fx->_config_latest_history = old_value;
-	fx->config_from_string(old_value);
+	fx->config_from_string(Module::VERSION_LATEST, old_value);
 	fx->notify();
 }
 

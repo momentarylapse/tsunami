@@ -236,6 +236,7 @@ void SignalChain::save(const Path& filename) {
 		xml::Element e("module");
 		e.add(xml::Element("category", m->type_to_name(m->module_type)));
 		e.add(xml::Element("class", m->module_subtype));
+		e.add(xml::Element("version", i2s(m->version())));
 		e.add(xml::Element("position").with("x", f2s(m->module_x, 0)).with("y", f2s(m->module_y, 0)));
 		if (m->allow_config_in_chain)
 			e.add_attribute("configurable", "true");
@@ -279,6 +280,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			string sub_type = e.value("class");
 			string name = e.value("name");
 			string sys = e.value("system");
+			int version = e.value("version", i2s(Module::VERSION_LEGACY))._int();
 			Module *m = nullptr;
 			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
@@ -288,7 +290,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 					throw Exception("unhandled module type: " + type);
 				m = chain->_add(ModuleFactory::create(session, itype, sub_type));
 			}
-			m->config_from_string(e.value("config"));
+			m->config_from_string(version, e.value("config"));
 			m->module_x = e.find("position")->value("x")._float();
 			m->module_y = e.find("position")->value("y")._float();
 		}

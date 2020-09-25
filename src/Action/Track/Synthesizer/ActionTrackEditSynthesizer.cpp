@@ -24,13 +24,13 @@ void *ActionTrackEditSynthesizer::execute(Data *d) {
 
 void ActionTrackEditSynthesizer::redo(Data *d) {
 	track->synth->_config_latest_history = new_value;
-	track->synth->config_from_string(new_value);
+	track->synth->config_from_string(Module::VERSION_LATEST, new_value);
 	track->synth->notify();
 }
 
 void ActionTrackEditSynthesizer::undo(Data *d) {
 	track->synth->_config_latest_history = old_value;
-	track->synth->config_from_string(old_value);
+	track->synth->config_from_string(Module::VERSION_LATEST, old_value);
 	track->synth->notify();
 }
 

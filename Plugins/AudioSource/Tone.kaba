@@ -34,7 +34,8 @@ class SineSource extends AudioSource
 			del source
 		source = CreateMidiSource(session, "Tone")
 		synth = CreateSynthesizer(session, "")
-		synth.config_from_string("{{config.pitch}},{{config.volume}}")
+		#dyn({"pitch":config.pitch, "volume":config.volume})
+		source.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
 		synth.plug_in(0, source, 0)
 	override int read(out AudioBuffer buf)
 		return synth.out.read_audio(buf)

@@ -148,7 +148,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 		((Synthesizer*)m)->set_sample_rate(session->sample_rate());
 	
 	if (config != "")
-		m->config_from_string(config);
+		m->config_from_string(Module::VERSION_LATEST, config);
 
 	return m;
 }

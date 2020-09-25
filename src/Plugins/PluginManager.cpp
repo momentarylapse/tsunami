@@ -191,6 +191,8 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_virtual("Module.get_config", &Module::get_config, &module);
 	Kaba::link_external_class_func("Module.config_to_string", &Module::config_to_string);
 	Kaba::link_external_class_func("Module.config_from_string", &Module::config_from_string);
+	Kaba::link_external_class_func("Module.config_to_any", &Module::config_to_any);
+	Kaba::link_external_class_func("Module.config_from_any", &Module::config_from_any);
 	Kaba::link_external_virtual("Module.on_config", &Module::on_config, &module);
 	Kaba::link_external_virtual("Module.command", &Module::command, &module);
 	Kaba::link_external_class_func("Module.subscribe", &ObservableKabaWrapper<Module>::subscribe_kaba);

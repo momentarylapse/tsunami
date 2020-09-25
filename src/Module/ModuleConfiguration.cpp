@@ -34,6 +34,7 @@ Array<Kaba::ClassElement> get_unique_elements(const Kaba::Class *c) {
 	return r;
 }
 
+#if 0
 string var_to_string(const Kaba::Class *c, char *v) {
 	string r;
 	if (c == Kaba::TypeInt) {
@@ -83,6 +84,47 @@ string var_to_string(const Kaba::Class *c, char *v) {
 	}
 	return r;
 }
+#endif
+
+Any var_to_any(const Kaba::Class *c, char *v) {
+	if (c == Kaba::TypeInt) {
+		return Any(*(int*)v);
+	} else if (c == Kaba::TypeChar) {
+		return Any((int)*(char*)v);
+	} else if (c == Kaba::TypeFloat32) {
+		return Any(*(float*)v);
+	} else if (c == Kaba::TypeBool) {
+		return Any(*(bool*)v);
+	} else if (c == Kaba::TypeString) {
+		return Any(*(string*)v);
+	} else if (c->is_array()) {
+		Any r;
+		auto tel = c->get_array_element();
+		for (int i=0; i<c->array_length; i++)
+			r.add(var_to_any(tel, &v[i * tel->size]));
+		return r;
+	} else if (c->is_super_array()) {
+		Any r;
+		auto a = (DynamicArray*)v;
+		auto tel = c->get_array_element();
+		for (int i=0; i<a->num; i++)
+			r.add(var_to_any(tel, &(((char*)a->data)[i * tel->size])));
+		return r;
+	} else if (c->name == "SampleRef*") {
+		auto sr = *(SampleRef**)v;
+		if (sr)
+			return Any("sample:" + i2s(sr->origin->uid));
+		else
+			return Any("sample:none");
+	} else {
+		auto e = get_unique_elements(c);
+		Any r;
+		for (int i=0; i<e.num; i++)
+			r.map_set(e[i].name, var_to_any(e[i].type, &v[e[i].offset]));
+		return r;
+	}
+	return Any();
+}
 
 string get_next(const string &var_temp, int &pos) {
 	int start = pos;
@@ -105,7 +147,7 @@ string get_next(const string &var_temp, int &pos) {
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
+void var_from_string_legacy(const Kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
 	if (pos >= s.num)
 		return;
 	if (type == Kaba::TypeInt) {
@@ -124,7 +166,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 		for (int i=0;i<type->array_length;i++) {
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(tel, &v[i * tel->size], s, pos, session);
+			var_from_string_legacy(tel, &v[i * tel->size], s, pos, session);
 		}
 		pos ++; // ']'
 	} else if (type->is_super_array()) {
@@ -138,7 +180,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 			if (a->num > 0)
 				pos ++; // ' '
 			a->simple_resize(a->num + 1);
-			var_from_string(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
+			var_from_string_legacy(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
 		}
 		pos ++; // ']'
 	} else if (type->name == "SampleRef*") {
@@ -156,7 +198,62 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 		for (int i=0; i<e.num; i++) {
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(e[i].type, &v[e[i].offset], s, pos, session);
+			var_from_string_legacy(e[i].type, &v[e[i].offset], s, pos, session);
+		}
+		pos ++; // ')'
+	}
+}
+
+void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *session) {
+	if (type == Kaba::TypeInt) {
+		*(int*)v = a._int();
+	} else if (type == Kaba::TypeChar) {
+		*(char*)v = a._int();
+	} else if (type == Kaba::TypeFloat32) {
+		*(float*)v = a._float();
+	} else if (type == Kaba::TypeBool) {
+		*(bool*)v = a._bool();
+	} else if (type == Kaba::TypeString) {
+		*(string*)v = a.str();
+	} else if (type->is_array()) {
+		auto tel = type->get_array_element();
+		pos ++; // '['
+		for (int i=0;i<type->array_length;i++) {
+			if (i > 0)
+				pos ++; // ' '
+			var_from_string_legacy(tel, &v[i * tel->size], s, pos, session);
+		}
+		pos ++; // ']'
+	} else if (type->is_super_array()) {
+		pos ++; // '['
+		auto *a = (DynamicArray*)v;
+		auto tel = type->get_array_element();
+		a->simple_clear(); // todo...
+		while (true) {
+			if ((s[pos] == ']') or (pos >= s.num))
+				break;
+			if (a->num > 0)
+				pos ++; // ' '
+			a->simple_resize(a->num + 1);
+			var_from_string_legacy(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
+		}
+		pos ++; // ']'
+	} else if (type->name == "SampleRef*") {
+		string ss = get_next(s, pos);
+		*(SampleRef**)v = nullptr;
+		if ((ss != "nil") and session->song) {
+			int n = ss._int();
+			if ((n >= 0) and (n < session->song->samples.num)) {
+				*(SampleRef**)v = new SampleRef(session->song->samples[n]);
+			}
+		}
+	} else {
+		auto e = get_unique_elements(type);
+		pos ++; // '('
+		for (int i=0; i<e.num; i++) {
+			if (i > 0)
+				pos ++; // ' '
+			var_from_string_legacy(e[i].type, &v[e[i].offset], s, pos, session);
 		}
 		pos ++; // ')'
 	}
@@ -168,8 +265,7 @@ string ModuleConfiguration::to_string() const {
 }
 
 Any ModuleConfiguration::to_any() const {
-	throw Exception("TODO");
-	return Any();
+	return var_to_any(_class, (char*)this);
 }
 
 void ModuleConfiguration::from_string(const string &s, Session *session) {
@@ -179,11 +275,12 @@ void ModuleConfiguration::from_string(const string &s, Session *session) {
 void ModuleConfiguration::from_string_legacy(const string &s, Session *session) {
 	reset();
 	int pos = 0;
-	var_from_string(_class, (char*)this, s, pos, session);
+	var_from_string_legacy(_class, (char*)this, s, pos, session);
 }
 
 void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	reset();
+	var_from_any(_class, (char*)this, a, session);
 	throw Exception("TODO");
 }
 

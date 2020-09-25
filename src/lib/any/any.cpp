@@ -240,6 +240,29 @@ bool Any::is_map() const {
 	return type == TYPE_MAP;
 }
 
+bool key_needs_quotes(const string &k) {
+	if (k == "")
+		return true;
+	for (char c: k) {
+		if (c >= 'a' and c <= 'z')
+			continue;
+		if (c >= 'A' and c <= 'Z')
+			continue;
+		if (c >= '0' and c <= '9')
+			continue;
+		if (c == '_' or c == '-') // ya, we allow '-'...
+			continue;
+		return true;
+	}
+	return false;
+}
+
+string minimal_key_repr(const string &k) {
+	if (key_needs_quotes(k))
+		return k.repr();
+	return k;
+}
+
 string Any::repr() const {
 	if (type == TYPE_INT) {
 		return i2s(as_int());
@@ -264,11 +287,11 @@ string Any::repr() const {
 		for (AnyMap::Entry &p: as_map()) {
 			if (s.num > 1)
 				s += ", ";
-			s += p.key.repr() + ": " + p.value.repr();
+			s += minimal_key_repr(p.key) + ": " + p.value.repr();
 		}
 		return s + "}";
 	} else if (is_empty()) {
-		return "<empty>";
+		return "nil";
 	} else {
 		return "unhandled Any.str(): " + type_name(type);
 	}
@@ -334,6 +357,8 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 			expect_token(",");
 		}
 		pos ++;
+	} else if (cur == "nil") {
+		a.clear();
 	} else if (str_is_number(cur)) {
 		if (cur.has_char('.')) {
 			a.create_type(Any::TYPE_FLOAT);

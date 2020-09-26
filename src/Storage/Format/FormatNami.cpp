@@ -127,23 +127,29 @@ public:
 	virtual void read(File *f) {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
-		f->read_int();
+		int _chunk_version = f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->config_from_string(Module::VERSION_LEGACY, params);
-		me->_config_latest_history = params;
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
+		int version = Module::VERSION_LEGACY;
+		if (_chunk_version >= 1) {
+			version = f->read_int();
+		}
+
+		me->config_from_string(Module::VERSION_LEGACY, params);
+		me->_config_latest_history = params;
 		parent->add_effect(me);
 	}
 	virtual void write(File *f) {
 		f->write_str(me->module_subtype);
 		f->write_bool(false);
-		f->write_int(0);
+		f->write_int(1); // chunk version
 		f->write_int(0);
 		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
+		f->write_int(me->version());
 	}
 };
 
@@ -633,6 +639,7 @@ public:
 			me->enabled = false;
 		//parent->fx.add(me);
 		msg_write("todo: nami midi fx");
+		msg_error("midi fx " + me->module_subtype + " " + me->range.str());
 	}
 	virtual void write(File *f) {
 		f->write_str(me->module_subtype);

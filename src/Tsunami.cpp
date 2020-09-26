@@ -14,6 +14,9 @@
 #include "Module/SignalChain.h"
 #include "Module/Audio/SongRenderer.h"
 #include "Module/Audio/PeakMeter.h"
+#include "Module/Audio/AudioEffect.h"
+#include "Module/Midi/MidiEffect.h"
+#include "Module/Synth/Synthesizer.h"
 #include "TsunamiWindow.h"
 #include "Session.h"
 #include "Storage/Storage.h"
@@ -101,6 +104,37 @@ bool Tsunami::on_startup(const Array<string> &_arg) {
 	return true;
 }
 
+void show_song(Song *song) {
+	msg_write(format("  sample-rate: %d", song->sample_rate));
+	msg_write(format("  samples: %d", song->range().length));
+	msg_write("  length: " + song->get_time_str(song->range().length));
+	msg_write(format("  tracks: %d", song->tracks.num));
+	int n = 0;
+	for (Track *t: song->tracks) {
+		msg_write(format("  track '%s'", t->nice_name()));
+		msg_write("    type: " + signal_type_name(t->type));
+		if (t->type == SignalType::MIDI) {
+			msg_write("    synth: " + t->synth->module_subtype);
+			msg_write(format("      version: %d", t->synth->version()));
+		}
+		for (TrackLayer *l: t->layers) {
+			msg_write("    layer");
+			if (l->samples.num > 0)
+				msg_write(format("      refs: %d", l->samples.num));
+			if (l->markers.num > 0)
+				msg_write(format("      markers: %d", l->markers.num));
+			n += l->samples.num;
+		}
+		for (auto *fx: t->fx)
+			msg_write(format("    fx: %s", fx->module_subtype));
+		for (auto *fx: t->midi_fx)
+			msg_write(format("    midifx: %s", fx->module_subtype));
+	}
+	msg_write(format("  refs: %d / %d", n, song->samples.num));
+	for (Tag &t: song->tags)
+		msg_write(format("  tag: %s = %s", t.key, t.value));
+}
+
 bool Tsunami::handle_arguments(const Array<string> &args) {
 	Session *session = Session::GLOBAL;
 
@@ -147,21 +181,9 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	p.mode("--info", {"FILE1", "..."}, "show information about the file", [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		for (string &filename: a) {
-			if (session->storage->load_ex(song, filename, true)) {
-				msg_write(format("sample-rate: %d", song->sample_rate));
-				msg_write(format("samples: %d", song->range().length));
-				msg_write("length: " + song->get_time_str(song->range().length));
-				msg_write(format("tracks: %d", song->tracks.num));
-				int n = 0;
-				for (Track *t: song->tracks)
-					for (TrackLayer *l: t->layers)
-						n += l->samples.num;
-				msg_write(format("refs: %d / %d", n, song->samples.num));
-				for (Tag &t: song->tags)
-					msg_write(format("tag: %s = %s", t.key, t.value));
-			}
-		}
+		for (string &filename: a)
+			if (session->storage->load_ex(song, filename, true))
+				show_song(song);
 		delete song;
 	});
 	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a){

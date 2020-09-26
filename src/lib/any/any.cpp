@@ -147,15 +147,15 @@ void Any::create_type(int _type) {
 	clear();
 	type = _type;
 	_class = _get_class(type);
-	if (type == TYPE_INT) {
+	if (is_int()) {
 		data = new int;
-	} else if (type == TYPE_FLOAT) {
+	} else if (is_float()) {
 		data = new float;
-	} else if (type == TYPE_BOOL) {
+	} else if (is_bool()) {
 		data = new bool;
-	} else if (type == TYPE_POINTER) {
+	} else if (is_pointer()) {
 		data = new (void*);
-	} else if (type == TYPE_STRING) {
+	} else if (is_string()) {
 		data = new string;
 	} else if (is_array()) {
 		data = new Array<Any>;
@@ -206,19 +206,19 @@ void Any::clear() {
 		parent->clear();
 		sync_from_parent();
 	} else {
-		if (type == TYPE_INT)
+		if (is_int())
 			delete &as_int();
-		else if (type == TYPE_FLOAT)
+		else if (is_float())
 			delete &as_float();
-		else if (type == TYPE_BOOL)
+		else if (is_bool())
 			delete &as_bool();
-		else if (type == TYPE_STRING)
+		else if (is_string())
 			delete &as_string();
 		else if (is_array())
 			delete &as_array();
 		else if (is_map())
 			delete &as_map();
-		else if (type == TYPE_POINTER)
+		else if (is_pointer())
 			delete &as_pointer();
 		else if (!is_empty())
 			msg_error("any.clear(): " + type_name(type));
@@ -230,6 +230,26 @@ void Any::clear() {
 
 bool Any::is_empty() const {
 	return type == TYPE_NONE;
+}
+
+bool Any::is_int() const {
+	return type == TYPE_INT;
+}
+
+bool Any::is_float() const {
+	return type == TYPE_FLOAT;
+}
+
+bool Any::is_bool() const {
+	return type == TYPE_BOOL;
+}
+
+bool Any::is_string() const {
+	return type == TYPE_STRING;
+}
+
+bool Any::is_pointer() const {
+	return type == TYPE_POINTER;
 }
 
 bool Any::is_array() const {
@@ -264,15 +284,15 @@ string minimal_key_repr(const string &k) {
 }
 
 string Any::repr() const {
-	if (type == TYPE_INT) {
+	if (is_int()) {
 		return i2s(as_int());
-	} else if (type == TYPE_FLOAT) {
+	} else if (is_float()) {
 		return f2s(as_float(), 6);
-	} else if (type == TYPE_BOOL) {
+	} else if (is_bool()) {
 		return b2s(as_bool());
-	} else if (type == TYPE_STRING) {
+	} else if (is_string()) {
 		return as_string().repr();
-	} else if (type == TYPE_POINTER) {
+	} else if (is_pointer()) {
 		return p2s(as_pointer());
 	} else if (is_array()) {
 		string s = "[";
@@ -298,7 +318,7 @@ string Any::repr() const {
 }
 
 string Any::str() const {
-	if (type == TYPE_STRING)
+	if (is_string())
 		return as_string();
 	return repr();
 }
@@ -359,6 +379,7 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 		pos ++;
 	} else if (cur == "nil") {
 		a.clear();
+		pos ++;
 	} else if (str_is_number(cur)) {
 		if (cur.has_char('.')) {
 			a.create_type(Any::TYPE_FLOAT);
@@ -395,31 +416,31 @@ Any Any::parse(const string &s) {
 }
 
 bool Any::_bool() const {
-	if (type == TYPE_BOOL)
+	if (is_bool())
 		return as_bool();
-	if (type == TYPE_INT)
+	if (is_int())
 		return as_int() != 0;
 	throw Exception("can not interpret as bool: " + type_name(type));
 }
 
 int Any::_int() const {
-	if (type == TYPE_INT)
+	if (is_int())
 		return as_int();
-	if (type == TYPE_BOOL)
+	if (is_bool())
 		return (int)as_bool();
-	if (type == TYPE_FLOAT)
+	if (is_float())
 		return (int)as_float();
-	if (type == TYPE_STRING)
+	if (is_string())
 		return as_string()._int();
 	throw Exception("can not interpret as int: " + type_name(type));
 }
 
 float Any::_float() const {
-	if (type == TYPE_INT)
+	if (is_int())
 		return (float)as_int();
-	if (type == TYPE_FLOAT)
+	if (is_float())
 		return as_float();
-	if (type == TYPE_STRING)
+	if (is_string())
 		return as_string()._float();
 	throw Exception("can not interpret as float: " + type_name(type));
 }
@@ -430,15 +451,15 @@ void Any::operator = (const Any &a) {
 		if (parent)
 			any_db("=   IS REF " + str());
 		create_type(a.type);
-		if (a.type == TYPE_INT) {
+		if (a.is_int()) {
 			as_int() = a.as_int();
-		} else if (a.type == TYPE_FLOAT) {
+		} else if (a.is_float()) {
 			as_float() = a.as_float();
-		} else if (a.type == TYPE_BOOL) {
+		} else if (a.is_bool()) {
 			as_bool() = a.as_bool();
-		} else if (a.type == TYPE_POINTER) {
+		} else if (a.is_pointer()) {
 			as_pointer() = a.as_pointer();
-		} else if (a.type == TYPE_STRING) {
+		} else if (a.is_string()) {
 			as_string() = a.as_string();
 		} else if (a.is_array()) {
 			as_array() = a.as_array();
@@ -456,31 +477,31 @@ void Any::operator = (const Any &a) {
 }
 
 Any Any::operator + (const Any &a) const {
-	if ((type == TYPE_INT) and (a.type == TYPE_INT))
+	if (is_int() and a.is_int())
 		return _int() + a._int();
-	if ((type == TYPE_FLOAT or type == TYPE_INT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+	if ((is_float() or is_int()) and (a.is_float() or a.is_int()))
 		return _float() + a._float();
-	if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
+	if (is_string() and a.is_string())
 		return str() + a.str();
 	throw Exception(format("%s + %s not allowed", type_name(type), type_name(a.type)));
 	return Any();
 }
 
 Any Any::operator - (const Any &a) const {
-	if ((type == TYPE_INT) and (a.type == TYPE_INT))
+	if (is_int() and a.is_int())
 		return _int() - a._int();
-	if ((type == TYPE_FLOAT or type == TYPE_INT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+	if ((is_float() or is_int()) and (a.is_float() or a.is_int()))
 		return _float() - a._float();
 	throw Exception(format("%s - %s not allowed", type_name(type), type_name(a.type)));
 	return Any();
 }
 
 void Any::operator += (const Any &a) {
-	if ((type == TYPE_INT) and (a.type == TYPE_INT or a.type == TYPE_FLOAT))
+	if (is_int() and (a.is_int() or a.is_float()))
 		as_int() += a._int();
-	else if ((type == TYPE_FLOAT) and (a.type == TYPE_FLOAT or a.type == TYPE_INT))
+	else if (is_float() and (a.is_float() or a.is_int()))
 		as_float() += a._float();
-	else if ((type == TYPE_STRING) and (a.type == TYPE_STRING))
+	else if (is_string() and a.is_string())
 		as_string() += a.str();
 	else if (is_array() and a.is_array())
 		append(a);
@@ -539,7 +560,7 @@ int Any::length() {
 		return as_array().num;
 	if (is_map())
 		return as_map().num;
-	if (type == TYPE_STRING)
+	if (is_string())
 		return as_string().num;
 	return 0;
 }

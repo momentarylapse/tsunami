@@ -130,8 +130,8 @@ class Module extends Object
 		extern void __init__()
 		extern virtual void __delete__()
 		extern virtual void reset()
-		extern virtual const string to_string()
-		extern virtual void from_string(string s, Session session)
+		extern const string to_string()
+		extern void from_string(string s, Session session)
 		extern virtual string auto_conf(string name)
 
 	extern virtual ConfigPanel *create_panel()

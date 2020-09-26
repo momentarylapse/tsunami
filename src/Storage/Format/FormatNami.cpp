@@ -531,10 +531,15 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
-		me->volume = f->read_float();
-		me->muted = f->read_bool();
-		f->read_int();
+		float volume = f->read_float();
+		bool muted = f->read_bool();
+		int uid = f->read_int();
+		if (uid != 0)
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
+		else
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
+		me->volume = volume;
+		me->muted = muted;
 		f->read_int();
 		f->read_int(); // reserved
 		f->read_int();
@@ -545,7 +550,7 @@ public:
 		f->write_int(me->origin->get_index());
 		f->write_float(me->volume);
 		f->write_bool(me->muted);
-		f->write_int(0);
+		f->write_int(me->origin->uid);
 		f->write_int(0);
 		f->write_int(0); // reserved
 		f->write_int(0);
@@ -797,14 +802,16 @@ public:
 		me->volume = f->read_float();
 		me->offset = f->read_int();
 		me->type = (SignalType)f->read_int();
-		f->read_int(); // reserved
+		int uid = f->read_int();
+		if (uid != 0)
+			me->uid = uid;
 	}
 	virtual void write(File *f) {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_int(me->offset);
 		f->write_int((int)me->type);
-		f->write_int(0); // reserved
+		f->write_int(me->uid);
 	}
 	virtual void write_subs() {
 		if (me->type == SignalType::AUDIO)
@@ -918,10 +925,15 @@ public:
 		Session *session = cur_op(this)->session;
 		me = CreateSynthesizer(session, f->read_str());
 		string param = f->read_str();
-		me->config_from_string(Module::VERSION_LEGACY, param);
-		me->_config_latest_history = param;
+		int version = Module::VERSION_LEGACY;
 		f->read_str();
-		f->read_int();
+		int _v = f->read_int();
+		if (_v > 0) {
+			version = f->read_int();
+			f->read_int(); // reserved
+		}
+		me->config_from_string(version, param);
+		me->_config_latest_history = param;
 
 		parent->set_synthesizer(me);
 	}
@@ -929,7 +941,9 @@ public:
 		f->write_str(me->module_subtype);
 		f->write_str(me->config_to_string());
 		f->write_str("");
-		f->write_int(0); // reserved
+		f->write_int(1);
+		f->write_int(me->version());
+		f->write_int(0);// reserved
 	}
 	virtual void write_subs() {
 		if (!me->tuning.is_default())

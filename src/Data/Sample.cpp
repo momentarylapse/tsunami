@@ -26,7 +26,7 @@ Sample::Sample(SignalType _type) {
 	ref_count = 0;
 	auto_delete = false;
 
-	uid = randi(0x7fffffff);
+	uid = create_uid();
 
 	buf = nullptr;
 	if (_type == SignalType::AUDIO)
@@ -129,5 +129,9 @@ void Sample::unset_owner() {
 	if (owner)
 		_pointer_unref();
 	owner = nullptr;
+}
+
+int Sample::create_uid() {
+	return randi(0x7fffffff);
 }
 

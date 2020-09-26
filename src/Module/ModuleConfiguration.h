@@ -26,11 +26,11 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 	virtual void _cdecl reset(){}
-	virtual string to_string() const;
-	virtual void from_string(const string &s, Session *session);
-	virtual void from_string_legacy(const string &s, Session *session);
-	virtual Any to_any() const;
-	virtual void from_any(const Any &a, Session *session);
+	string to_string() const;
+	void from_string(const string &s, Session *session);
+	void from_string_legacy(const string &s, Session *session);
+	Any to_any() const;
+	void from_any(const Any &a, Session *session);
 	virtual string auto_conf(const string &name) const;
 	void changed();
 	Module *_module;

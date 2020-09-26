@@ -113,9 +113,8 @@ Any var_to_any(const Kaba::Class *c, char *v) {
 	} else if (c->name == "SampleRef*") {
 		auto sr = *(SampleRef**)v;
 		if (sr)
-			return Any("sample:" + i2s(sr->origin->uid));
-		else
-			return Any("sample:none");
+			return Any("sample:" + i2h(sr->origin->uid, 4));
+		return Any();
 	} else {
 		auto e = get_unique_elements(c);
 		Any r;
@@ -204,6 +203,11 @@ void var_from_string_legacy(const Kaba::Class *type, char *v, const string &s, i
 	}
 }
 
+int h2i(const string &h) {
+	string s = string("\0\0\0\0", 4) + h.unhex().reverse();
+	return *(int*)&s[s.num - 4];
+}
+
 void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *session) {
 	if (type == Kaba::TypeInt) {
 		*(int*)v = a._int();
@@ -216,46 +220,47 @@ void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *sessi
 	} else if (type == Kaba::TypeString) {
 		*(string*)v = a.str();
 	} else if (type->is_array()) {
+		if (!a.is_array())
+			throw Exception("array expected");
+		auto &array = a.as_array();
 		auto tel = type->get_array_element();
-		pos ++; // '['
-		for (int i=0;i<type->array_length;i++) {
-			if (i > 0)
-				pos ++; // ' '
-			var_from_string_legacy(tel, &v[i * tel->size], s, pos, session);
-		}
-		pos ++; // ']'
+		for (int i=0; i<min(type->array_length, array.num); i++)
+			var_from_any(tel, &v[i * tel->size], array[i], session);
 	} else if (type->is_super_array()) {
-		pos ++; // '['
-		auto *a = (DynamicArray*)v;
+		if (!a.is_array())
+			throw Exception("array expected");
+		auto &array = a.as_array();
+		auto *aa = (DynamicArray*)v;
 		auto tel = type->get_array_element();
-		a->simple_clear(); // todo...
-		while (true) {
-			if ((s[pos] == ']') or (pos >= s.num))
-				break;
-			if (a->num > 0)
-				pos ++; // ' '
-			a->simple_resize(a->num + 1);
-			var_from_string_legacy(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
-		}
-		pos ++; // ']'
+		aa->simple_resize(array.num); // todo...
+		for (int i=0; i<array.num; i++)
+			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
 	} else if (type->name == "SampleRef*") {
-		string ss = get_next(s, pos);
 		*(SampleRef**)v = nullptr;
-		if ((ss != "nil") and session->song) {
-			int n = ss._int();
-			if ((n >= 0) and (n < session->song->samples.num)) {
-				*(SampleRef**)v = new SampleRef(session->song->samples[n]);
+		if (a.is_string()) {
+			string ss = a.str();
+			if ((ss.head(7) == "sample:") and session->song) {
+				int uid = h2i(ss.substr(7,-1));
+				auto s = session->song->get_sample_by_uid(uid);
+				if (s)
+					*(SampleRef**)v = s->create_ref();
+				else
+					session->e(format("sample invalid: %s  %d  %8x", ss, uid, uid));
 			}
 		}
 	} else {
 		auto e = get_unique_elements(type);
-		pos ++; // '('
-		for (int i=0; i<e.num; i++) {
-			if (i > 0)
-				pos ++; // ' '
-			var_from_string_legacy(e[i].type, &v[e[i].offset], s, pos, session);
+		if (a.is_array()) {
+			auto &aa = a.as_array();
+			for (int i=0; i<min(e.num, aa.num); i++)
+				var_from_any(e[i].type, &v[e[i].offset], aa[i], session);
+		} else if (a.is_map()) {
+			for (auto &el: e)
+				if (a.has(el.name))
+					var_from_any(el.type, &v[el.offset], a[el.name], session);
+		} else {
+			throw Exception("array or map expected");
 		}
-		pos ++; // ')'
 	}
 }
 
@@ -265,23 +270,40 @@ string ModuleConfiguration::to_string() const {
 }
 
 Any ModuleConfiguration::to_any() const {
-	return var_to_any(_class, (char*)this);
+	auto a = var_to_any(_class, (char*)this);
+	msg_write("to_any: " + a.str());
+	return a;
 }
 
 void ModuleConfiguration::from_string(const string &s, Session *session) {
-	from_any(Any::parse(s), session);
+	//msg_write("from_string: " + s);
+	try {
+		from_any(Any::parse(s), session);
+	} catch (Exception &e) {
+		session->e(e.message());
+	}
 }
 
 void ModuleConfiguration::from_string_legacy(const string &s, Session *session) {
+	msg_write("legacy: " + s);
 	reset();
 	int pos = 0;
-	var_from_string_legacy(_class, (char*)this, s, pos, session);
+	try  {
+		var_from_string_legacy(_class, (char*)this, s, pos, session);
+	} catch (Exception &e) {
+		session->e(e.message());
+	}
+	msg_write("-> " + to_string());
 }
 
 void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	reset();
-	var_from_any(_class, (char*)this, a, session);
-	throw Exception("TODO");
+	try {
+		var_from_any(_class, (char*)this, a, session);
+	} catch (Exception &e) {
+		session->e(e.message());
+	}
+	msg_write("from_any: " + a.str());
 }
 
 bool ac_name_match(const string &const_name, const string &var_name) {

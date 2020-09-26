@@ -38,6 +38,11 @@ public:
 	void create_type(int type);
 
 	bool is_empty() const;
+	bool is_string() const;
+	bool is_int() const;
+	bool is_float() const;
+	bool is_bool() const;
+	bool is_pointer() const;
 	bool is_array() const;
 	bool is_map() const;
 

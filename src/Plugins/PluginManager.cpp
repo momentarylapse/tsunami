@@ -207,8 +207,8 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Module.Config.__init__", &ModuleConfiguration::__init__);
 	Kaba::link_external_virtual("Module.Config.__delete__", &ModuleConfiguration::__delete__, &plugin_data);
 	Kaba::link_external_virtual("Module.Config.reset", &ModuleConfiguration::reset, &plugin_data);
-	Kaba::link_external_virtual("Module.Config.from_string", &ModuleConfiguration::from_string, &plugin_data);
-	Kaba::link_external_virtual("Module.Config.to_string", &ModuleConfiguration::to_string, &plugin_data);
+	Kaba::link_external_class_func("Module.Config.from_string", &ModuleConfiguration::from_string);
+	Kaba::link_external_class_func("Module.Config.to_string", &ModuleConfiguration::to_string);
 	Kaba::link_external_virtual("Module.Config.auto_conf", &ModuleConfiguration::auto_conf, &plugin_data);
 
 

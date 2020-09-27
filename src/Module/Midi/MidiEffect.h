@@ -21,25 +21,20 @@ class AudioBuffer;
 class MidiNoteBuffer;
 class SongSelection;
 
-class MidiEffect : public Module
-{
+class MidiEffect : public Module {
 public:
 	MidiEffect();
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	bool only_on_selection;
-	Range range;
-
 	Port *source;
 
-	virtual void _cdecl process(MidiNoteBuffer *midi){};
+	virtual void _cdecl process(MidiNoteBuffer *midi) {};
 
 	void process_layer(TrackLayer *l, SongSelection &sel);
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(MidiEffect *fx);
 		int read_midi(MidiEventBuffer &midi) override;

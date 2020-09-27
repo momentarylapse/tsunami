@@ -31,7 +31,6 @@ MidiEffect::MidiEffect() :
 	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &source, "in"});
 	source = nullptr;
-	only_on_selection = false;
 }
 
 void MidiEffect::__init__() {

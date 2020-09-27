@@ -30,6 +30,7 @@
 #include "../../lib/xfile/chunked.h"
 
 
+class ChunkedFileFormatNami;
 
 StorageOperationData *cur_op(FileChunkBasic *c);
 
@@ -627,25 +628,30 @@ public:
 	FileChunkMidiEffect() : FileChunk<MidiNoteBuffer,MidiEffect>("effect") {}
 	void create() override {}
 	void read(File *f) override {
-		me = CreateMidiEffect(cur_op(this)->session, f->read_str());
-		me->only_on_selection = f->read_bool();
-		me->range.offset = f->read_int();
-		me->range.length = f->read_int();
+		string name = f->read_str();
+		f->read_bool();
+		f->read_int(); // reserved
+		int version = f->read_int();
 		string params = f->read_str();
-		me->config_from_string(Module::VERSION_LEGACY, params);
-		me->_config_latest_history = params;
 		string temp = f->read_str();
+
+		if (version == 0)
+			version = Module::VERSION_LEGACY;
+
+		me = CreateMidiEffect(cur_op(this)->session, name);
+		me->config_from_string(version, params);
+		me->_config_latest_history = params;
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
-		//parent->fx.add(me);
-		msg_write("todo: nami midi fx");
-		msg_error("midi fx " + me->module_subtype + " " + me->range.str());
+
+		Song *song = (Song*)root->base->get();
+		song->tracks.back()->midi_fx.add(me);
 	}
 	void write(File *f) override {
 		f->write_str(me->module_subtype);
-		f->write_bool(me->only_on_selection);
-		f->write_int(me->range.offset);
-		f->write_int(me->range.length);
+		f->write_bool(false);
+		f->write_int(0); // reserved
+		f->write_int(me->version());
 		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
 	}

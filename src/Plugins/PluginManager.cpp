@@ -239,8 +239,6 @@ void PluginManager::link_app_script_data() {
 
 	MidiEffect meffect;
 	Kaba::declare_class_size("MidiEffect", sizeof(MidiEffect));
-	Kaba::declare_class_element("MidiEffect.only_on_selection", &MidiEffect::only_on_selection);
-	Kaba::declare_class_element("MidiEffect.range", &MidiEffect::range);
 	Kaba::link_external_class_func("MidiEffect.__init__", &MidiEffect::__init__);
 	Kaba::link_external_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
 	Kaba::link_external_virtual("MidiEffect.process", &MidiEffect::process, &meffect);

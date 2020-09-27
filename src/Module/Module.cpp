@@ -99,11 +99,11 @@ ModuleConfiguration *Module::get_config() const {
 
 int Module::version() const {
 	if (!_class)
-		return 0;
+		return 1;
 	for (auto *c: _class->constants)
 		if ((c->name == "VERSION") and (c->type->name == "int"))
 			return c->as_int();
-	return 0;
+	return 1;
 }
 
 

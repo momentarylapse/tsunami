@@ -16,6 +16,8 @@
 #include "../Data/Song.h"
 #include "../Session.h"
 
+bool module_config_debug = false;
+
 
 void ModuleConfiguration::__init__() {
 	new(this) ModuleConfiguration;
@@ -271,7 +273,8 @@ string ModuleConfiguration::to_string() const {
 
 Any ModuleConfiguration::to_any() const {
 	auto a = var_to_any(_class, (char*)this);
-	msg_write("to_any: " + a.str());
+	if (module_config_debug)
+		msg_write("to_any: " + a.str());
 	return a;
 }
 
@@ -303,7 +306,9 @@ void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	} catch (Exception &e) {
 		session->e(e.message());
 	}
-	msg_write("from_any: " + a.str());
+
+	if (module_config_debug)
+		msg_write("from_any: " + a.str());
 }
 
 bool ac_name_match(const string &const_name, const string &var_name) {

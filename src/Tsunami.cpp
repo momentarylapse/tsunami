@@ -114,26 +114,31 @@ void show_song(Song *song) {
 		msg_write(format("  track '%s'", t->nice_name()));
 		msg_write("    type: " + signal_type_name(t->type));
 		if (t->type == SignalType::MIDI) {
-			msg_write("    synth: " + t->synth->module_subtype);
-			msg_write(format("      version: %d", t->synth->version()));
+			msg_write(format("    synth: %s v%d", t->synth->module_subtype, t->synth->version()));
 		}
 		for (TrackLayer *l: t->layers) {
 			msg_write("    layer");
+			if (l->buffers.num > 0)
+				msg_write(format("      buffers: %d", l->buffers.num));
+			if (l->midi.num > 0)
+				msg_write(format("      notes: %d", l->midi.num));
 			if (l->samples.num > 0)
-				msg_write(format("      refs: %d", l->samples.num));
+				msg_write(format("      sample-refs: %d", l->samples.num));
 			if (l->markers.num > 0)
 				msg_write(format("      markers: %d", l->markers.num));
 			n += l->samples.num;
 		}
 		for (auto *fx: t->fx)
-			msg_write(format("    fx: %s", fx->module_subtype));
+			msg_write(format("    fx: %s v%d", fx->module_subtype, fx->version()));
 		for (auto *fx: t->midi_fx)
-			msg_write(format("    midifx: %s", fx->module_subtype));
+			msg_write(format("    midifx: %s v%d", fx->module_subtype, fx->version()));
 	}
 	msg_write(format("  refs: %d / %d", n, song->samples.num));
 	for (Tag &t: song->tags)
 		msg_write(format("  tag: %s = %s", t.key, t.value));
 }
+
+extern bool module_config_debug;
 
 bool Tsunami::handle_arguments(const Array<string> &args) {
 	Session *session = Session::GLOBAL;
@@ -145,6 +150,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	CLIParser p;
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
 	p.flag("--slow", "", [&]{ ugly_hack_slow = true; });
+	p.flag("--mcd", "", [&]{ module_config_debug = true; });
 	p.option("--plugin", "FILE", "add a plugin to run", [&](const string &a){ plugin_file = a; });
 	p.option("--chain", "FILE", "add a signal chain", [&](const string &a){ chain_file = a; });
 	p.option("--params", "PARAMS", "set loading parameters", [&](const string &a){ Storage::options_in = a; });

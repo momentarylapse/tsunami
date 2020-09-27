@@ -36,69 +36,17 @@ Array<Kaba::ClassElement> get_unique_elements(const Kaba::Class *c) {
 	return r;
 }
 
-#if 0
-string var_to_string(const Kaba::Class *c, char *v) {
-	string r;
+Any var_to_any(const Kaba::Class *c, const char *v) {
 	if (c == Kaba::TypeInt) {
-		r += i2s(*(int*)v);
+		return Any(*(const int*)v);
 	} else if (c == Kaba::TypeChar) {
-		r += i2s(*(char*)v);
+		return Any((int)*(const char*)v);
 	} else if (c == Kaba::TypeFloat32) {
-		r += f2s(*(float*)v, 6);
+		return Any(*(const float*)v);
 	} else if (c == Kaba::TypeBool) {
-		r += (*(bool*)v) ? "true" : "false";
+		return Any(*(const bool*)v);
 	} else if (c == Kaba::TypeString) {
-		r += "\"" + ((string*)v)->escape() + "\"";
-	} else if (c->is_array()) {
-		auto tel = c->get_array_element();
-		r += "[";
-		for (int i=0; i<c->array_length; i++){
-			if (i > 0)
-				r += " ";
-			r += var_to_string(tel, &v[i * tel->size]);
-		}
-		r += "]";
-	} else if (c->is_super_array()) {
-		auto a = (DynamicArray*)v;
-		auto tel = c->get_array_element();
-		r += "[";
-		for (int i=0; i<a->num; i++){
-			if (i > 0)
-				r += " ";
-			r += var_to_string(tel, &(((char*)a->data)[i * tel->size]));
-		}
-		r += "]";
-	} else if (c->name == "SampleRef*") {
-		auto sr = *(SampleRef**)v;
-		if (sr)
-			r += i2s(sr->origin->get_index());
-		else
-			r += "nil";
-	} else {
-		auto e = get_unique_elements(c);
-		r += "(";
-		for (int i=0; i<e.num; i++) {
-			if (i > 0)
-				r += " ";
-			r += var_to_string(e[i].type, &v[e[i].offset]);
-		}
-		r += ")";
-	}
-	return r;
-}
-#endif
-
-Any var_to_any(const Kaba::Class *c, char *v) {
-	if (c == Kaba::TypeInt) {
-		return Any(*(int*)v);
-	} else if (c == Kaba::TypeChar) {
-		return Any((int)*(char*)v);
-	} else if (c == Kaba::TypeFloat32) {
-		return Any(*(float*)v);
-	} else if (c == Kaba::TypeBool) {
-		return Any(*(bool*)v);
-	} else if (c == Kaba::TypeString) {
-		return Any(*(string*)v);
+		return Any(*(const string*)v);
 	} else if (c->is_array()) {
 		Any r;
 		auto tel = c->get_array_element();
@@ -110,18 +58,24 @@ Any var_to_any(const Kaba::Class *c, char *v) {
 		auto a = (DynamicArray*)v;
 		auto tel = c->get_array_element();
 		for (int i=0; i<a->num; i++)
-			r.add(var_to_any(tel, &(((char*)a->data)[i * tel->size])));
+			r.add(var_to_any(tel, (char*)a->simple_element(i)));
 		return r;
 	} else if (c->name == "SampleRef*") {
 		auto sr = *(SampleRef**)v;
 		if (sr)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
-	} else {
-		auto e = get_unique_elements(c);
+	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector) {
 		Any r;
-		for (int i=0; i<e.num; i++)
-			r.map_set(e[i].name, var_to_any(e[i].type, &v[e[i].offset]));
+		for (auto &e: c->elements)
+			if (e.hidden())
+				r.add(var_to_any(e.type, &v[e.offset]));
+		return r;
+	} else {
+		Any r;
+		for (auto &e: c->elements)
+			if (!e.hidden())
+				r.map_set(e.name, var_to_any(e.type, &v[e.offset]));
 		return r;
 	}
 	return Any();
@@ -272,7 +226,7 @@ string ModuleConfiguration::to_string() const {
 }
 
 Any ModuleConfiguration::to_any() const {
-	auto a = var_to_any(_class, (char*)this);
+	auto a = var_to_any(_class, (const char*)this);
 	if (module_config_debug)
 		msg_write("to_any: " + a.str());
 	return a;

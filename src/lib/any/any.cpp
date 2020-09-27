@@ -29,6 +29,9 @@ const void *_get_class(int t) {
 	}
 #endif
 
+
+string f2s_clean(float f, int dez);
+
 class AnyMap : public Map<string, Any> {};
 
 AnyMap _empty_dummy_map_;
@@ -287,7 +290,7 @@ string Any::repr() const {
 	if (is_int()) {
 		return i2s(as_int());
 	} else if (is_float()) {
-		return f2s(as_float(), 6);
+		return f2s_clean(as_float(), 6);
 	} else if (is_bool()) {
 		return b2s(as_bool());
 	} else if (is_string()) {

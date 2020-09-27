@@ -5,6 +5,7 @@
 #include <string.h>
 #include <initializer_list>
 #include <stdlib.h>
+#include <functional>
 #include <ciso646>
 
 // dynamic arrays
@@ -37,7 +38,8 @@ public:
 	void _cdecl simple_move(int source, int target);
 	void _cdecl reverse();
 	DynamicArray _cdecl ref_subarray(int start, int end);
-	int _cdecl index(const void *p);
+	int _cdecl simple_index(const void *p) const;
+	void* simple_element(int index);
 	void _cdecl simple_clear();
 
 	// reference arrays
@@ -240,6 +242,14 @@ public:
 	}
 	const T &_cdecl back() const {
 		return ((T*)data)[num - 1];
+	}
+
+	Array<T> filter(std::function<bool(const T&)> f) const {
+		Array<T> r;
+		for (T &e: *this)
+			if (f(e))
+				r.add(e);
+		return r;
 	}
 
 	// reference arrays

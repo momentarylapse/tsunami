@@ -42,15 +42,15 @@ FormatDescriptorNami::FormatDescriptorNami() :
 class FileChunkTag : public FileChunk<Song,Tag> {
 public:
 	FileChunkTag() : FileChunk<Song,Tag>("tag") {}
-	virtual void create() {
+	void create() override {
 		parent->tags.add(Tag());
 		me = &parent->tags.back();
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->key = f->read_str();
 		me->value = f->read_str();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->key);
 		f->write_str(me->value);
 	}
@@ -59,8 +59,8 @@ public:
 class FileChunkLayerName : public FileChunk<Song,Song> {
 public:
 	FileChunkLayerName() : FileChunk<Song,Song>("lvlname") {}
-	virtual void create() { me = parent; }
-	virtual void read(File *f) {
+	void create() override { me = parent; }
+	void read(File *f) override {
 		int num = f->read_int();
 		for (int i=0;i<num;i++)
 			f->read_str();
@@ -68,7 +68,7 @@ public:
 		for (int i=0;i<num;i++)
 			me->layers.add(new Song::Layer(f->read_str()));*/
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		/*f->write_int(me->layers.num);
 		for (auto l: me->layers)
 			f->write_str(l->name);*/
@@ -78,8 +78,8 @@ public:
 class FileChunkFormat : public FileChunk<Song,Song> {
 public:
 	FileChunkFormat() : FileChunk<Song,Song>("format") {}
-	virtual void create() { me = parent; }
-	virtual void read(File *f) {
+	void create() override { me = parent; }
+	void read(File *f) override {
 		me->sample_rate = f->read_int();
 		me->default_format = (SampleFormat)f->read_int();
 		f->read_int(); // channels
@@ -89,7 +89,7 @@ public:
 		f->read_int();
 		f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->sample_rate);
 		f->write_int((int)me->default_format);
 		f->write_int(2); // channels
@@ -104,8 +104,8 @@ public:
 class FileChunkSend : public FileChunk<Song,Song> {
 public:
 	FileChunkSend() : FileChunk<Song,Song>("send") {}
-	virtual void create() { me = parent; }
-	virtual void read(File *f) {
+	void create() override { me = parent; }
+	void read(File *f) override {
 		f->read_int();
 		for (Track *t: me->tracks) {
 			int i = f->read_int();
@@ -113,7 +113,7 @@ public:
 				t->send_target = me->tracks[i];
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(0);
 		for (Track *t: me->tracks)
 			f->write_int(get_track_index(t->send_target));
@@ -123,8 +123,8 @@ public:
 class FileChunkEffect : public FileChunk<Track,AudioEffect> {
 public:
 	FileChunkEffect() : FileChunk<Track,AudioEffect>("effect") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		int _chunk_version = f->read_int();
@@ -142,7 +142,7 @@ public:
 		me->_config_latest_history = params;
 		parent->add_effect(me);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->module_subtype);
 		f->write_bool(false);
 		f->write_int(1); // chunk version
@@ -157,8 +157,8 @@ public:
 class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect> {
 public:
 	FileChunkGlobalEffect() : FileChunk<Song,AudioEffect>("effect") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
@@ -170,7 +170,7 @@ public:
 			me->enabled = false;
 		parent->__fx.add(me);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->module_subtype);
 		f->write_bool(false);
 		f->write_int(0);
@@ -183,11 +183,11 @@ public:
 class FileChunkCurve : public FileChunk<Song,Curve> {
 public:
 	FileChunkCurve() : FileChunk<Song,Curve>("curve") {}
-	virtual void create() {
+	void create() override {
 		me = new Curve;
 		parent->curves.add(me);
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		f->read_int();
 		me->name = f->read_str();
 		int n = f->read_int();
@@ -207,7 +207,7 @@ public:
 		}
 		parent->notify(parent->MESSAGE_ADD_CURVE);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(0); // version
 		f->write_str(me->name);
 		f->write_int(me->targets.num);
@@ -407,12 +407,12 @@ void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p) {
 class FileChunkBufferBox : public FileChunk<TrackLayer,AudioBuffer> {
 public:
 	FileChunkBufferBox() : FileChunk<TrackLayer,AudioBuffer>("bufbox") {}
-	virtual void create() {
+	void create() override {
 		AudioBuffer dummy;
 		parent->buffers.add(dummy);
 		me = &parent->buffers.back();
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->offset = f->read_int();
 		int num = f->read_int();
 		me->resize(num);
@@ -444,7 +444,7 @@ public:
 			me->import(data.data, me->channels, format_for_bits(bits), num);
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		Song *song = (Song*)root->base->get();
 
 		f->write_int(me->offset);
@@ -469,10 +469,10 @@ public:
 class FileChunkSampleBufferBox : public FileChunk<Sample,AudioBuffer> {
 public:
 	FileChunkSampleBufferBox() : FileChunk<Sample,AudioBuffer>("bufbox") {}
-	virtual void create() {
+	void create() override {
 		me = parent->buf;
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->offset = f->read_int();
 		int num = f->read_int();
 		int channels = f->read_int(); // channels (2)
@@ -507,7 +507,7 @@ public:
 				me->import(data.data, channels, format_for_bits(bits), num);
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		Song *song = (Song*)root->base->get();
 
 		f->write_int(me->offset);
@@ -532,8 +532,8 @@ public:
 class FileChunkSampleRef : public FileChunk<TrackLayer,SampleRef> {
 public:
 	FileChunkSampleRef() : FileChunk<TrackLayer,SampleRef>("samref") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
@@ -550,7 +550,7 @@ public:
 		f->read_int(); // reserved
 		f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->origin->name);
 		f->write_int(me->pos);
 		f->write_int(me->origin->get_index());
@@ -567,8 +567,8 @@ public:
 class _FileChunkTrackSampleRef : public FileChunk<Track,SampleRef> {
 public:
 	_FileChunkTrackSampleRef() : FileChunk<Track,SampleRef>("samref") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
@@ -580,7 +580,7 @@ public:
 		f->read_int(); // reserved
 		f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 	}
 };
 
@@ -588,11 +588,11 @@ public:
 class FileChunkMidiEvent : public FileChunk<MidiNoteBuffer,MidiEvent> {
 public:
 	FileChunkMidiEvent() : FileChunk<MidiNoteBuffer,MidiEvent>("event") {}
-	virtual void create() {
+	void create() override {
 		//parent->add(MidiEvent());
 		//me = &parent->back();
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		MidiEvent e;
 		e.pos = f->read_int();
 		e.pitch = f->read_int();
@@ -614,7 +614,7 @@ public:
 			error("nami/midi: no note to end");
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->pos);
 		f->write_int(me->pitch);
 		f->write_float(me->volume);
@@ -625,8 +625,8 @@ public:
 class FileChunkMidiEffect : public FileChunk<MidiNoteBuffer,MidiEffect> {
 public:
 	FileChunkMidiEffect() : FileChunk<MidiNoteBuffer,MidiEffect>("effect") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		me = CreateMidiEffect(cur_op(this)->session, f->read_str());
 		me->only_on_selection = f->read_bool();
 		me->range.offset = f->read_int();
@@ -641,7 +641,7 @@ public:
 		msg_write("todo: nami midi fx");
 		msg_error("midi fx " + me->module_subtype + " " + me->range.str());
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->module_subtype);
 		f->write_bool(me->only_on_selection);
 		f->write_int(me->range.offset);
@@ -654,9 +654,9 @@ public:
 
 class FileChunkMidiNote : public FileChunk<MidiNoteBuffer,MidiNote> {
 public:
-	FileChunkMidiNote() : FileChunk<MidiNoteBuffer,MidiNote>("note") {}
-	virtual void create() {}
-	virtual void read(File *f) {
+	FileChunkMidiNote(const string &name) : FileChunk<MidiNoteBuffer,MidiNote>(name) {}
+	void create() override {}
+	void read(File *f) override {
 		MidiNote *n = new MidiNote;
 		n->range.offset = f->read_int();
 		n->range.length = f->read_int();
@@ -665,7 +665,7 @@ public:
 		f->read_int(); // reserved
 		parent->add(n);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
 		f->write_int(me->pitch);
@@ -676,13 +676,14 @@ public:
 
 class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteBuffer> {
 public:
-	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteBuffer>("midi") {
+	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteBuffer>("midi") {}
+	void define_children() override {
 		add_child(new FileChunkMidiEvent);
-		add_child(new FileChunkMidiNote);
+		add_child(new FileChunkMidiNote("note"));
 		//add_child(new FileChunkMidiEffect);
 	}
-	virtual void create() { me = &parent->midi; }
-	virtual void read(File *f) {
+	void create() override { me = &parent->midi; }
+	void read(File *f) override {
 		f->read_str();
 		f->read_str();
 		f->read_str();
@@ -704,7 +705,7 @@ public:
 			me->add(n);
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str("");
 		f->write_str("");
 		f->write_str("");
@@ -722,7 +723,7 @@ public:
 		}
 		f->write_int(0); // reserved
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		//write_sub_parray("effect", me->fx);
 	}
 };
@@ -736,13 +737,15 @@ static bool note_buffer_has_flags(MidiNoteBuffer &buf) {
 
 class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteBuffer> {
 public:
-	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteBuffer>("midi") {
+	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteBuffer>("midi") {}
+	void define_children() override {
 		add_child(new FileChunkMidiEvent);
-		add_child(new FileChunkMidiNote);
+		add_child(new FileChunkMidiNote("note"));
+		add_child(new FileChunkMidiNote("midinote")); // deprecated
 		add_child(new FileChunkMidiEffect);
 	}
-	virtual void create() { me = &parent->layers[0]->midi; }
-	virtual void read(File *f) {
+	void create() override { me = &parent->layers[0]->midi; }
+	void read(File *f) override {
 		f->read_str();
 		f->read_str();
 		f->read_str();
@@ -767,7 +770,7 @@ public:
 		}
 		f->read_int(); // reserved
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		bool has_flags = note_buffer_has_flags(*me);
 		f->write_str("");
 		f->write_str("");
@@ -788,23 +791,24 @@ public:
 		}
 		f->write_int(0); // reserved
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		write_sub_parray("effect", parent->midi_fx);
 	}
 };
 
 class FileChunkSample : public FileChunk<Song,Sample> {
 public:
-	FileChunkSample() : FileChunk<Song,Sample>("sample") {
+	FileChunkSample() : FileChunk<Song,Sample>("sample") {}
+	void define_children() override {
 		add_child(new FileChunkSampleBufferBox);
 		add_child(new FileChunkSampleMidiData);
 	}
-	virtual void create() {
+	void create() override {
 		me = new Sample(SignalType::AUDIO);
 		me->set_owner(parent);
 		parent->samples.add(me);
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->name = f->read_str();
 		me->volume = f->read_float();
 		me->offset = f->read_int();
@@ -813,14 +817,14 @@ public:
 		if (uid != 0)
 			me->uid = uid;
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_int(me->offset);
 		f->write_int((int)me->type);
 		f->write_int(me->uid);
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		if (me->type == SignalType::AUDIO)
 			write_sub("bufbox", me->buf);
 		else if (me->type == SignalType::MIDI)
@@ -854,18 +858,18 @@ public:
 class FileChunkMarker : public FileChunk<TrackLayer,TrackMarker> {
 public:
 	FileChunkMarker() : FileChunk<TrackLayer,TrackMarker>("marker") {}
-	virtual void create() {
+	void create() override {
 		me = new TrackMarker();
 		parent->markers.add(me);
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
 		me->text = f->read_str();
 		int nfx = f->read_int();
 		int version = f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
 		f->write_str(me->text);
@@ -876,9 +880,8 @@ public:
 
 class FileChunkTrackLayer : public FileChunk<Track,TrackLayer> {
 public:
-	int n;
-	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level") {
-		n = 0;
+	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level") {}
+	void define_children() override {
 		add_child(new FileChunkBufferBox);
 		add_child(new FileChunkSampleRef);
 		add_child(new FileChunkFade);
@@ -886,7 +889,7 @@ public:
 	}
 	void create() override {}
 	void read(File *f) override {
-		n = f->read_int();
+		int n = f->read_int();
 		if (n > 0) {
 			parent->layers.add(new TrackLayer(parent));
 		}
@@ -910,13 +913,13 @@ public:
 class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Synthesizer::Tuning> {
 public:
 	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Synthesizer::Tuning>("tuning") {}
-	virtual void create() { me = &parent->tuning; }
-	virtual void read(File *f) {
+	void create() override { me = &parent->tuning; }
+	void read(File *f) override {
 		for (int i=0; i<MAX_PITCH; i++)
 			me->freq[i] = f->read_float();
 		parent->update_delta_phi();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		for (int i=0; i<MAX_PITCH; i++)
 			f->write_float(me->freq[i]);
 	}
@@ -924,11 +927,12 @@ public:
 
 class FileChunkSynthesizer : public FileChunk<Track,Synthesizer> {
 public:
-	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth") {
+	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth") {}
+	void define_children() override {
 		add_child(new FileChunkSynthesizerTuning);
 	}
-	virtual void create() {}
-	virtual void read(File *f) {
+	void create() override {}
+	void read(File *f) override {
 		Session *session = cur_op(this)->session;
 		me = CreateSynthesizer(session, f->read_str());
 		string param = f->read_str();
@@ -944,7 +948,7 @@ public:
 
 		parent->set_synthesizer(me);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->module_subtype);
 		f->write_str(me->config_to_string());
 		f->write_str("");
@@ -952,7 +956,7 @@ public:
 		f->write_int(me->version());
 		f->write_int(0);// reserved
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		if (!me->tuning.is_default())
 			write_sub("tuning", &me->tuning);
 	}
@@ -961,8 +965,8 @@ public:
 class FileChunkBar : public FileChunk<Song,Bar> {
 public:
 	FileChunkBar() : FileChunk<Song,Bar>("bar") {}
-	virtual void create() { me = nullptr; }
-	virtual void read(File *f) {
+	void create() override { me = nullptr; }
+	void read(File *f) override {
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
@@ -985,7 +989,7 @@ public:
 			parent->bars.add(new Bar(b));
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		if (me->is_pause())
 			f->write_int(BarPattern::Type::PAUSE);
 		else if (me->is_uniform())
@@ -1002,11 +1006,12 @@ public:
 	}
 };
 
-/*class FileChunkTrackBar : public FileChunk<Track,Bar> {
+// deprecated
+class FileChunkTrackBar : public FileChunk<Track,Bar> {
 public:
 	FileChunkTrackBar() : FileChunk<Track,Bar>("bar") {}
-	virtual void create() { me = NULL; }
-	virtual void read(File *f) {
+	void create() override { me = NULL; }
+	void read(File *f) override {
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
@@ -1019,27 +1024,19 @@ public:
 		for (int i=0; i<count; i++)
 			parent->song->bars.add(new Bar(length, num_beats, sub_beats));
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		root->on_error("deprecated... TrackBar.write");
-		if (me->is_pause())
-			f->write_int(BarPattern::Type::PAUSE);
-		else
-			f->write_int(BarPattern::Type::BAR);
-		f->write_int(me->length);
-		f->write_int(me->num_beats);
-		f->write_int(1);
-		f->write_int(0); // reserved
 	}
-};*/
+};
 
 class FileChunkMarkerOld : public FileChunk<Track,TrackMarker> {
 public:
 	FileChunkMarkerOld() : FileChunk<Track,TrackMarker>("marker") {}
-	virtual void create() {
+	void create() override {
 		me = new TrackMarker();
 		parent->_markers_old.add(me);
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->range.offset = f->read_int();
 		me->text = f->read_str();
 		int version = f->read_int();
@@ -1048,7 +1045,7 @@ public:
 			int nfx = f->read_int();
 		}
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->range.offset);
 		f->write_str(me->text);
 		f->write_int(1);
@@ -1060,9 +1057,9 @@ public:
 class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld> {
 public:
 	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade") {}
-	virtual void create() {
+	void create() override {
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		CrossFadeOld ff;
 		ff.position = f->read_int();
 		ff.target = f->read_int();
@@ -1071,7 +1068,7 @@ public:
 		f->read_int();
 		parent->_fades_old.add(ff);
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->position);
 		f->write_int(me->target);
 		f->write_int(me->samples);
@@ -1083,15 +1080,15 @@ public:
 class FileChunkTuning : public FileChunk<Track,Instrument> {
 public:
 	FileChunkTuning() : FileChunk<Track,Instrument>("tuning") {}
-	virtual void create() {
+	void create() override {
 		me = &parent->instrument;
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		me->string_pitch.resize(f->read_int());
 		for (int i=0; i<me->string_pitch.num; i++)
 			me->string_pitch[i] = f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->string_pitch.num);
 		for (int i=0; i<me->string_pitch.num; i++)
 			f->write_int(me->string_pitch[i]);
@@ -1100,22 +1097,23 @@ public:
 
 class FileChunkTrack : public FileChunk<Song,Track> {
 public:
-	FileChunkTrack() : FileChunk<Song,Track>("track") {
+	FileChunkTrack() : FileChunk<Song,Track>("track") {}
+	void define_children() override {
 		add_child(new FileChunkTuning);
 		add_child(new FileChunkTrackLayer);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
-		//add_child(new FileChunkTrackBar);
-		add_child(new FileChunkMarkerOld);
+		add_child(new FileChunkTrackBar); // deprecated
+		add_child(new FileChunkMarkerOld); // deprecated
 		add_child(new _FileChunkTrackSampleRef); // deprecated
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
-		add_child(new FileChunkFadeOld);
+		add_child(new FileChunkFadeOld); // deprecated
 	}
-	virtual void create() {
+	void create() override {
 		//me = parent->addTrack(SignalType::AUDIO);
 	}
-	virtual void read(File *f) {
+	void read(File *f) override {
 		string name = f->read_str();
 		float volume = f->read_float();
 		float muted = f->read_bool();
@@ -1130,7 +1128,7 @@ public:
 
 		notify();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_bool(me->muted);
@@ -1141,7 +1139,7 @@ public:
 
 		notify();
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		if (!me->instrument.has_default_tuning())
 			write_sub("tuning", &me->instrument);
 		write_sub_parray("level", me->layers);
@@ -1167,8 +1165,8 @@ public:
 
 class FileChunkNami : public FileChunk<Song,Song> {
 public:
-	FileChunkNami() :
-		FileChunk<Song,Song>("nami") {
+	FileChunkNami() : FileChunk<Song,Song>("nami") {}
+	void define_children() override {
 		add_child(new FileChunkFormat);
 		add_child(new FileChunkTag);
 		add_child(new FileChunkLayerName);
@@ -1180,14 +1178,14 @@ public:
 		add_child(new FileChunkSend);
 		add_child(new FileChunkSecret);
 	}
-	virtual void create() { me = parent; }
-	virtual void read(File *f) {
+	void create() override { me = parent; }
+	void read(File *f) override {
 		me->sample_rate = f->read_int();
 	}
-	virtual void write(File *f) {
+	void write(File *f) override {
 		f->write_int(me->sample_rate);
 	}
-	virtual void write_subs() {
+	void write_subs() override {
 		write_sub("format", me);
 		write_sub_array("tag", me->tags);
 	//	write_sub("lvlname", me);
@@ -1211,7 +1209,7 @@ public:
 	ChunkedFileFormatNami() :
 		ChunkedFileParser(8) {
 		od = nullptr;
-		base = new FileChunkNami;
+		set_base(new FileChunkNami);
 	}
 	StorageOperationData *od;
 
@@ -1223,16 +1221,16 @@ public:
 		od = _od;
 		return this->write(od->filename, od->song);
 	}
-	virtual void on_notify() {
+	void on_notify() override {
 		od->set((float)context.f->get_pos() / (float)context.f->get_size());
 	}
-	virtual void on_unhandled() {
+	void on_unhandled() override {
 		od->error("unhandled nami chunk: " + context.str());
 	}
-	virtual void on_error(const string &message) {
+	void on_error(const string &message) override {
 		od->error(message);
 	}
-	virtual void on_warn(const string &message) {
+	void on_warn(const string &message) override {
 		od->warn(message);
 	}
 };

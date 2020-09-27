@@ -78,40 +78,41 @@ void FileChunkBasic::error(const string &message) {
 
 void FileChunkBasic::add_child(FileChunkBasic *c) {
 	children.add(c);
+	c->define_children();
 }
 void FileChunkBasic::set_root(ChunkedFileParser *r) {
 	root = r;
 	context = &r->context;
-	for (FileChunkBasic *c : children)
+	for (auto *c: children)
 		c->set_root(r);
 }
 
 FileChunkBasic *FileChunkBasic::get_sub(const string &name) {
-	for (FileChunkBasic *c : children)
+	for (auto *c: children)
 		if (c->name == name) {
 			c->context = context;
 			c->set_parent(get());
 			return c;
 		}
-	throw Exception("no sub... " + name + " in " + context->str());
+	throw Exception(format("no sub... '%s' in '%s'", name, context->str()));
 }
 
 void FileChunkBasic::write_sub(const string &name, void *p) {
-	FileChunkBasic *c = get_sub(name);
+	auto *c = get_sub(name);
 	c->set(p);
 	c->write_complete();
 }
 
 void FileChunkBasic::write_sub_parray(const string &name, DynamicArray &a) {
-	FileChunkBasic *c = get_sub(name);
-	Array<void*> *pa = (Array<void*>*)&a;
+	auto c = get_sub(name);
+	auto pa = (Array<void*>*)&a;
 	for (int i=0; i<pa->num; i++) {
 		c->set((*pa)[i]);
 		c->write_complete();
 	}
 }
 void FileChunkBasic::write_sub_array(const string &name, DynamicArray &a) {
-	FileChunkBasic *c = get_sub(name);
+	auto c = get_sub(name);
 	for (int i=0; i<a.num; i++) {
 		c->set((char*)a.data + a.element_size * i);
 		c->write_complete();
@@ -186,6 +187,13 @@ void FileChunkBasic::read_contents() {
 				break;
 			}
 		if (!ok) {
+			string tt;
+			tt.resize(context->end() - f->get_pos());
+			f->read_buffer(tt);
+			if (tt.num > 100)
+				tt.resize(100);
+			msg_write(tt.hex());
+
 			if (root)
 				root->on_unhandled();
 			//throw Exception("no sub handler: " + context->str());
@@ -201,6 +209,11 @@ ChunkedFileParser::~ChunkedFileParser() {
 	delete base;
 }
 
+void ChunkedFileParser::set_base(FileChunkBasic *b) {
+	base = b;
+	base->define_children();
+}
+
 bool ChunkedFileParser::read(const Path &filename, void *p) {
 	File *f = FileOpen(filename);
 	context.f = f;
@@ -210,7 +223,7 @@ bool ChunkedFileParser::read(const Path &filename, void *p) {
 	base->set(p);
 	string cname = base->read_header();
 	if (cname != base->name)
-		throw Exception("wrong base chunk: " + cname + " (" + base->name + " expected)");
+		throw Exception(format("wrong base chunk: %s (%s expected)", cname, base->name));
 	base->read_contents();
 
 	delete f;

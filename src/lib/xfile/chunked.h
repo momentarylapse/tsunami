@@ -59,8 +59,10 @@ class FileChunkBasic {
 public:
 	FileChunkBasic(const string &_name);
 	virtual ~FileChunkBasic();
-	virtual void write(File *f) = 0;
+	virtual void define_children() {};
 	virtual void read(File *f) = 0;
+	virtual void write(File *f) = 0;
+	virtual void write_subs() {}
 	virtual void create();
 	string name;
 
@@ -71,15 +73,13 @@ public:
 	void add_child(FileChunkBasic *c);
 	void set_root(ChunkedFileParser *r);
 
-	virtual void set(void *t){};
-	virtual void set_parent(void *t){};
-	virtual void *get(){ return 0; }
+	virtual void set(void *t) {};
+	virtual void set_parent(void *t) {};
+	virtual void *get() { return 0; }
 
 	ChunkedFileParser::Context *context;
 	Array<FileChunkBasic*> children;
 	ChunkedFileParser *root;
-
-	virtual void write_subs(){}
 
 	FileChunkBasic *get_sub(const string &name);
 

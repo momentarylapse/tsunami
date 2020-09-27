@@ -11,6 +11,7 @@
 #include "Data/Song.h"
 #include "Data/Track.h"
 #include "Data/TrackLayer.h"
+#include "Data/Rhythm/Bar.h"
 #include "Module/SignalChain.h"
 #include "Module/Audio/SongRenderer.h"
 #include "Module/Audio/PeakMeter.h"
@@ -138,6 +139,53 @@ void show_song(Song *song) {
 		msg_write(format("  tag: %s = %s", t.key, t.value));
 }
 
+bool mod_comp(Module *a, Module *b) {
+	if (a->module_subtype != b->module_subtype)
+		return false;
+	if (a->config_to_string() != b->config_to_string())
+		return false;
+	return true;
+}
+
+Array<string> diff(Song *a, Song *b) {
+	Array<string> r;
+	if (a->bars.num != b->bars.num)
+		r.add("#bars");
+	for (int i=0; i<min(a->bars.num, b->bars.num); i++)
+		if (*(BarPattern*)a->bars[i] != *(BarPattern*)b->bars[i])
+			r.add(format("bar %d", i));
+	if (a->samples.num != b->samples.num)
+		r.add("#samples");
+	if (a->curves.num != b->curves.num)
+		r.add("#curves");
+	if (a->tracks.num != b->tracks.num)
+		r.add("#tracks");
+	for (int i=0; i<min(a->tracks.num, b->tracks.num); i++) {
+		auto ta = a->tracks[i];
+		auto tb = b->tracks[i];
+		if (!mod_comp(ta->synth, tb->synth))
+			r.add(format("t%d.synth", i));
+		if (ta->fx.num != tb->fx.num)
+			r.add(format("t%d.#fx", i));
+		for (int j=0; j<min(ta->fx.num, tb->fx.num); j++)
+			if (!mod_comp(ta->fx[j], tb->fx[j]))
+				r.add(format("t%d.fx%d", i, j));
+		if (ta->layers.num != tb->layers.num)
+			r.add(format("t%d.#layers", i));
+		for (int j=0; j<min(ta->layers.num, tb->layers.num); j++) {
+			auto la = ta->layers[j];
+			auto lb = tb->layers[j];
+			if (la->markers.num != lb->markers.num)
+				r.add(format("t%d.l%d.#markers", i, j));
+			if (la->buffers.num != lb->buffers.num)
+				r.add(format("t%d.l%d.#buffers", i, j));
+			if (la->midi.num != lb->midi.num)
+				r.add(format("t%d.l%d.#midi", i, j));
+		}
+	}
+	return r;
+}
+
 extern bool module_config_debug;
 
 bool Tsunami::handle_arguments(const Array<string> &args) {
@@ -191,6 +239,20 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			if (session->storage->load_ex(song, filename, true))
 				show_song(song);
 		delete song;
+	});
+	p.mode("--diff", {"FILE1", "FILE2"}, "compare 2 files", [&](const Array<string> &a){
+		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
+		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
+		session->song = song1;
+		if (session->storage->load_ex(song1, a[0], true))
+			if (session->storage->load_ex(song2, a[1], true)) {
+				auto r = diff(song1, song2);
+				if (r.num > 0)
+					msg_error("diffs: " + sa2s(r));
+			}
+
+		delete song1;
+		delete song2;
 	});
 	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);

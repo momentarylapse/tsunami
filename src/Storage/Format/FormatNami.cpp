@@ -940,7 +940,7 @@ public:
 	void create() override {}
 	void read(File *f) override {
 		Session *session = cur_op(this)->session;
-		me = CreateSynthesizer(session, f->read_str());
+		string name = f->read_str();
 		string param = f->read_str();
 		int version = Module::VERSION_LEGACY;
 		f->read_str();
@@ -949,6 +949,12 @@ public:
 			version = f->read_int();
 			f->read_int(); // reserved
 		}
+		if (name == "Drumset") {
+			msg_error("converting drumset...");
+			name = "Font";
+			param = "(\"drumset-1\")";
+		}
+		me = CreateSynthesizer(session, name);
 		me->config_from_string(version, param);
 		me->_config_latest_history = param;
 

@@ -139,7 +139,7 @@ public:
 			version = f->read_int();
 		}
 
-		me->config_from_string(Module::VERSION_LEGACY, params);
+		me->config_from_string(version, params);
 		me->_config_latest_history = params;
 		parent->add_effect(me);
 	}

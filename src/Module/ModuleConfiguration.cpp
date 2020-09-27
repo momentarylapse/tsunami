@@ -68,7 +68,7 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector) {
 		Any r;
 		for (auto &e: c->elements)
-			if (e.hidden())
+			if (!e.hidden())
 				r.add(var_to_any(e.type, &v[e.offset]));
 		return r;
 	} else {
@@ -215,7 +215,7 @@ void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *sessi
 				if (a.has(el.name))
 					var_from_any(el.type, &v[el.offset], a[el.name], session);
 		} else {
-			throw Exception("array or map expected");
+			throw Exception("array or map expected for " + type->long_name());
 		}
 	}
 }
@@ -258,7 +258,8 @@ void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	try {
 		var_from_any(_class, (char*)this, a, session);
 	} catch (Exception &e) {
-		session->e(e.message());
+		msg_write(a.str());
+		session->e(/*this->_module->module_subtype + ": " +*/ e.message());
 	}
 
 	if (module_config_debug)

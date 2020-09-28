@@ -34,11 +34,9 @@ enum class SignalType;
 class Tag {
 public:
 	string key, value;
-	Tag(){}
-	Tag(const string &_key, const string &_value) {
-		key = _key;
-		value = _value;
-	}
+	bool operator==(const Tag &o) const;
+	bool operator!=(const Tag &o) const;
+	bool valid() const;
 };
 
 class Song : public Data {

@@ -356,10 +356,10 @@ void FormatSoundFont2::read_samples(File *f) {
 		Sample *sample = song->create_sample_audio(s.name, buf);
 		delete[] data;
 
-		sample->tags.add(Tag("pitch", i2s(s.original_key)));
-		sample->tags.add(Tag("start-loop", i2s(s.start_loop)));
-		sample->tags.add(Tag("end-loop", i2s(s.end_loop)));
-		sample->tags.add(Tag("correction", i2s(s.correction)));
+		sample->tags.add({"pitch", i2s(s.original_key)});
+		sample->tags.add({"start-loop", i2s(s.start_loop)});
+		sample->tags.add({"end-loop", i2s(s.end_loop)});
+		sample->tags.add({"correction", i2s(s.correction)});
 
 		samples_read += num_samples;
 		od->set(float(samples_read) / (float)samples_all);

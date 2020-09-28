@@ -100,7 +100,7 @@ void Sample::set_value(const string &key, const string &value) {
 			t.value = value;
 			return;
 		}
-	tags.add(Tag(key, value));
+	tags.add({key, value});
 }
 
 

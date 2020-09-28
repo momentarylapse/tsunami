@@ -186,6 +186,10 @@ bool Instrument::operator==(const Instrument &i) const {
 	return type == i.type;
 }
 
+bool Instrument::operator!=(const Instrument &i) const {
+	return !(*this == i);
+}
+
 int Instrument::highest_usable_string(int pitch) const {
 	if (!has_strings())
 		return -1;

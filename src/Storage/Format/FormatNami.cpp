@@ -950,7 +950,7 @@ public:
 			f->read_int(); // reserved
 		}
 		if (name == "Drumset") {
-			msg_error("converting drumset...");
+			session->w("converting drumset...");
 			name = "Font";
 			param = "(\"drumset-1\")";
 		}

@@ -219,7 +219,7 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		string s = *ptr;
 		int offset = s.find("=");
 		if (offset > 0)
-			t->song->tags.add(Tag(tag_from_vorbis(s.head(offset)), s.substr(offset + 1, -1)));
+			t->song->tags.add({tag_from_vorbis(s.head(offset)), s.substr(offset + 1, -1)});
 		++ptr;
 	}
 

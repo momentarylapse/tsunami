@@ -11,11 +11,10 @@
 #include "Data/Song.h"
 #include "Data/Track.h"
 #include "Data/TrackLayer.h"
-#include "Data/Rhythm/Bar.h"
 #include "Module/SignalChain.h"
+#include "Module/Audio/AudioEffect.h"
 #include "Module/Audio/SongRenderer.h"
 #include "Module/Audio/PeakMeter.h"
-#include "Module/Audio/AudioEffect.h"
 #include "Module/Midi/MidiEffect.h"
 #include "Module/Synth/Synthesizer.h"
 #include "TsunamiWindow.h"
@@ -26,6 +25,7 @@
 #include "Stuff/CLIParser.h"
 #include "Stuff/PerformanceMonitor.h"
 #include "Stuff/BackupManager.h"
+#include "Stuff/Diff.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Device/DeviceManager.h"
@@ -139,53 +139,6 @@ void show_song(Song *song) {
 		msg_write(format("  tag: %s = %s", t.key, t.value));
 }
 
-bool mod_comp(Module *a, Module *b) {
-	if (a->module_subtype != b->module_subtype)
-		return false;
-	if (a->config_to_string() != b->config_to_string())
-		return false;
-	return true;
-}
-
-Array<string> diff(Song *a, Song *b) {
-	Array<string> r;
-	if (a->bars.num != b->bars.num)
-		r.add("#bars");
-	for (int i=0; i<min(a->bars.num, b->bars.num); i++)
-		if (*(BarPattern*)a->bars[i] != *(BarPattern*)b->bars[i])
-			r.add(format("bar %d", i));
-	if (a->samples.num != b->samples.num)
-		r.add("#samples");
-	if (a->curves.num != b->curves.num)
-		r.add("#curves");
-	if (a->tracks.num != b->tracks.num)
-		r.add("#tracks");
-	for (int i=0; i<min(a->tracks.num, b->tracks.num); i++) {
-		auto ta = a->tracks[i];
-		auto tb = b->tracks[i];
-		if (!mod_comp(ta->synth, tb->synth))
-			r.add(format("t%d.synth", i));
-		if (ta->fx.num != tb->fx.num)
-			r.add(format("t%d.#fx", i));
-		for (int j=0; j<min(ta->fx.num, tb->fx.num); j++)
-			if (!mod_comp(ta->fx[j], tb->fx[j]))
-				r.add(format("t%d.fx%d", i, j));
-		if (ta->layers.num != tb->layers.num)
-			r.add(format("t%d.#layers", i));
-		for (int j=0; j<min(ta->layers.num, tb->layers.num); j++) {
-			auto la = ta->layers[j];
-			auto lb = tb->layers[j];
-			if (la->markers.num != lb->markers.num)
-				r.add(format("t%d.l%d.#markers", i, j));
-			if (la->buffers.num != lb->buffers.num)
-				r.add(format("t%d.l%d.#buffers", i, j));
-			if (la->midi.num != lb->midi.num)
-				r.add(format("t%d.l%d.#midi", i, j));
-		}
-	}
-	return r;
-}
-
 extern bool module_config_debug;
 
 bool Tsunami::handle_arguments(const Array<string> &args) {
@@ -229,10 +182,11 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		BackupManager::check_old_files(Session::GLOBAL);
 		allow_window = true;
 	});
-	p.mode("--help", {}, "show this info", [&](const Array<string> &){
+	p.mode("--help", {}, "show this info", [&](const Array<string> &) {
 		p.show_info();
 	});
-	p.mode("--info", {"FILE1", "..."}, "show information about the file", [&](const Array<string> &a){
+	p.mode("--info", {"FILE1", "..."}, "show information about the file", [&](const Array<string> &a) {
+		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		for (string &filename: a)
@@ -240,13 +194,14 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 				show_song(song);
 		delete song;
 	});
-	p.mode("--diff", {"FILE1", "FILE2"}, "compare 2 files", [&](const Array<string> &a){
+	p.mode("--diff", {"FILE1", "FILE2"}, "compare 2 files", [&](const Array<string> &a) {
+		session->log->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;
 		if (session->storage->load_ex(song1, a[0], true))
 			if (session->storage->load_ex(song2, a[1], true)) {
-				auto r = diff(song1, song2);
+				auto r = diff_song(song1, song2);
 				if (r.num > 0)
 					msg_error("diffs: " + sa2s(r));
 			}
@@ -254,7 +209,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		delete song1;
 		delete song2;
 	});
-	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a){
+	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (session->storage->load(song, a[0])) {
@@ -262,7 +217,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		}
 		delete song;
 	});
-	p.mode("--execute", {"PLUGIN"}, "just run a plugin", [&](const Array<string> &a){
+	p.mode("--execute", {"PLUGIN"}, "just run a plugin", [&](const Array<string> &a) {
 		device_manager->init();
 		session = create_session();
 		session->win->hide();
@@ -270,13 +225,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->execute_tsunami_plugin(a[0]);
 	});
 #ifndef NDEBUG
-	p.mode("--list-tests", {}, "debug: list internal unit tests", [&](const Array<string> &){
+	p.mode("--list-tests", {}, "debug: list internal unit tests", [&](const Array<string> &) {
 		UnitTest::print_all_names();
 	});
-	p.mode("--run-tests", {"FILTER"}, "debug: run internal unit tests", [&](const Array<string> &a){
+	p.mode("--run-tests", {"FILTER"}, "debug: run internal unit tests", [&](const Array<string> &a) {
 		UnitTest::run_all(a[0]);
 	});
-	p.mode("--preview-gui", {"TYPE", "NAME"}, "debug: show the config gui of a plugin", [&](const Array<string> &a){
+	p.mode("--preview-gui", {"TYPE", "NAME"}, "debug: show the config gui of a plugin", [&](const Array<string> &a) {
 		session = create_session();
 		session->win->hide();
 		Module *m = nullptr;

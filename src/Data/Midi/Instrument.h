@@ -12,8 +12,7 @@
 
 class Clef;
 
-class Instrument
-{
+class Instrument {
 public:
 	enum class Type{
 		NONE,
@@ -51,6 +50,7 @@ public:
 	bool has_default_tuning() const;
 
 	bool operator==(const Instrument &i) const;
+	bool operator!=(const Instrument &i) const;
 
 	void set_midi_no(int no);
 

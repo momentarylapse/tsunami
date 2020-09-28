@@ -8,8 +8,14 @@
 #include "CrossFade.h"
 
 
-Range CrossFade::range()
-{
+Range CrossFade::range() const {
 	return Range(position, samples);
 }
 
+bool CrossFade::operator ==(const CrossFade &o) const {
+	return (position == o.position) and (mode == o.mode) and (samples == o.samples);
+}
+
+bool CrossFade::operator !=(const CrossFade &o) const {
+	return !(*this == o);
+}

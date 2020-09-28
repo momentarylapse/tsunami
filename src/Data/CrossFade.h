@@ -21,7 +21,10 @@ public:
 	int position;
 	Mode mode;
 	int samples;
-	Range range();
+
+	Range range() const;
+	bool operator==(const CrossFade &o) const;
+	bool operator!=(const CrossFade &o) const;
 };
 
 class CrossFadeOld {

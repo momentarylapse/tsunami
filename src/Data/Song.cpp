@@ -91,14 +91,26 @@ const string Song::MESSAGE_CHANGE_CHANNELS = "ChangeChannels";
 const string Song::MESSAGE_EDIT_BARS = "EditBars";
 const string Song::MESSAGE_ENABLE_FX = "EnableFx";
 
+bool Tag::operator ==(const Tag &o) const {
+	return key == o.key and value == o.value;
+}
+
+bool Tag::operator !=(const Tag &o) const {
+	return !(*this == o);
+}
+
+bool Tag::valid() const {
+	return (key != "") and (value != "");
+}
+
 
 void Song::add_tag(const string &key, const string &value) {
 	if ((key != "") and (value != ""))
-		execute(new ActionTagAdd(Tag(key, value)));
+		execute(new ActionTagAdd({key, value}));
 }
 
 void Song::edit_tag(int index, const string &key, const string &value) {
-	execute(new ActionTagEdit(index, Tag(key, value)));
+	execute(new ActionTagEdit(index, {key, value}));
 }
 
 void Song::delete_tag(int index) {

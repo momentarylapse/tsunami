@@ -13,6 +13,7 @@ const string Log::MESSAGE_ADD = "Add";
 
 Log::Log() {
 	allow_debug = hui::Config.get_bool("Log.Debug", false);
+	allow_console_output = true;
 }
 
 
@@ -52,23 +53,20 @@ Array<Log::Message> Log::all(Session *session) {
 
 
 void Log::add_message(Session *session, Type type, const string &message, const Array<string> &responses) {
-	Message m;
-	m.session = session;
-	m.type = type;
-	m.text = message;
-	m.responses = responses;
-	messages.add(m);
+	messages.add({session, type, message, responses});
 
-	if (type == Type::ERROR) {
-		msg_error(message);
-	} else if (type == Type::WARNING) {
-		msg_write(message);
-	} else if (type == Type::QUESTION) {
-		msg_write(message);
-	} else if (type == Type::DEBUG) {
-		msg_write(message);
-	} else {
-		msg_write(message);
+	if (allow_console_output) {
+		if (type == Type::ERROR) {
+			msg_error(message);
+		} else if (type == Type::WARNING) {
+			msg_write(message);
+		} else if (type == Type::QUESTION) {
+			msg_write(message);
+		} else if (type == Type::DEBUG) {
+			msg_write(message);
+		} else {
+			msg_write(message);
+		}
 	}
 
 	// make sure messages are handled in the gui thread...

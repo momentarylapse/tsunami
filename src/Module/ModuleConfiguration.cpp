@@ -242,7 +242,7 @@ void ModuleConfiguration::from_string(const string &s, Session *session) {
 }
 
 void ModuleConfiguration::from_string_legacy(const string &s, Session *session) {
-	msg_write("legacy: " + s);
+	Session::GLOBAL->w("legacy: " + s);
 	reset();
 	int pos = 0;
 	try  {
@@ -250,7 +250,7 @@ void ModuleConfiguration::from_string_legacy(const string &s, Session *session) 
 	} catch (Exception &e) {
 		session->e(e.message());
 	}
-	msg_write("-> " + to_string());
+	Session::GLOBAL->i("-> " + to_string());
 }
 
 void ModuleConfiguration::from_any(const Any &a, Session *session) {

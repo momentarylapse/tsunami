@@ -86,6 +86,7 @@ Synthesizer::Synthesizer() :
 	source = nullptr;
 	source_run_out = false;
 	auto_generate_stereo = false;
+	render_by_ref = true;
 
 	tuning.set_default();
 
@@ -153,13 +154,23 @@ void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
 	if (offset == end)
 		return;
 
-	AudioBuffer part;
-	part.set_as_ref(buf, offset, end - offset);
 	auto *pr = get_pitch_renderer(pitch);
 	if (!pr)
 		return;
-	if (!pr->render(part))
-		active_pitch.erase(pitch);
+
+	if (render_by_ref) {
+		AudioBuffer part;
+		part.set_as_ref(buf, offset, end - offset);
+		if (!pr->render(part))
+			active_pitch.erase(pitch);
+	} else {
+		AudioBuffer part;
+		part.resize(end - offset);
+		if (!pr->render(part))
+			active_pitch.erase(pitch);
+		buf.add(part, offset, 1.0f);
+
+	}
 }
 
 void Synthesizer::_handle_event(const MidiEvent &e) {

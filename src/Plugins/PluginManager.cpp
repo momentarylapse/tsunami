@@ -364,6 +364,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Synthesizer.delta_phi", &Synthesizer::delta_phi);
 	Kaba::declare_class_element("Synthesizer.out", &Synthesizer::out);
 	Kaba::declare_class_element("Synthesizer.auto_generate_stereo", &Synthesizer::auto_generate_stereo);
+	Kaba::declare_class_element("Synthesizer.render_by_ref", &Synthesizer::render_by_ref);
 	Kaba::link_external_class_func("Synthesizer.__init__", &Synthesizer::__init__);
 	Kaba::link_external_virtual("Synthesizer.__delete__", &Synthesizer::__delete__, &synth);
 	Kaba::link_external_virtual("Synthesizer.render", &Synthesizer::render, &synth);

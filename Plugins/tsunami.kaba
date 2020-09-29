@@ -291,6 +291,7 @@ class Synthesizer extends Module
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	bool auto_generate_stereo
+	bool render_by_ref
 	MidiEventBuffer events
 	Module.Port *out
 	extern void __init__()

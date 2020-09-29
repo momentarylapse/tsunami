@@ -22,7 +22,6 @@ class SampleConfig extends Module.Config
 
 class SampleRenderer extends PitchRenderer
 	SampleConfig.Zone* zone
-	MidiEventBuffer events
 	AudioBuffer data
 	EnvelopeADSR env
 	int offset
@@ -31,6 +30,7 @@ class SampleRenderer extends PitchRenderer
 	
 	override SampleSynthesizer *synth
 	override void on_config()
+		synth.render_by_ref = false
 		zone = nil
 		offset = 0
 		for z in synth.config.zones
@@ -45,20 +45,20 @@ class SampleRenderer extends PitchRenderer
 					allow_loop = true
 					interpolate_buffer(z.sample.origin.buf, data, 0)
 					env.set(z.attack, 1, z.sustain, z.release, synth.session.sample_rate())
-					print("++++++   {{start_loop}}:{{end_loop}}  ({{len(data)}})   {{pitch}}")
+#					print("++++++   {{start_loop}}:{{end_loop}}  ({{len(data)}})   {{pitch}}")
 					if end_loop < start_loop + 8 or end_loop < 8
 						allow_loop = false
 						end_loop = len(data)
 					else
 						start_loop = clampi(start_loop, 0, len(data))
 						end_loop = clampi(end_loop, start_loop + 1, len(data))
-					print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
-					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
+#					print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
+#					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
 					break
 				
 	override void on_start(float volume)
 		env.start(volume)
-		#events.add(MidiEvent(0, 0, volume))
+		offset = 0
 	override void on_end()
 		env.end()
 	override bool render(out AudioBuffer buf)

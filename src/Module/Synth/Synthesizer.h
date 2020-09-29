@@ -70,6 +70,7 @@ public:
 
 	int keep_notes;
 	bool auto_generate_stereo;
+	bool render_by_ref;
 
 
 	void _cdecl reset_default();

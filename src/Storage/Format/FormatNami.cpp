@@ -461,7 +461,7 @@ public:
 
 			int uncompressed_size = me->length * me->channels * format_get_bits(song->default_format) / 8;
 			data = compress_buffer(*me, song, this);
-			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+			cur_op(this)->session->i(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
 		f->write_buffer(data);
 	}
@@ -524,7 +524,7 @@ public:
 
 			int uncompressed_size = me->length * me->channels * format_get_bits(song->default_format) / 8;
 			data = compress_buffer(*me, song, this);
-			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+			cur_op(this)->session->i(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
 		f->write_buffer(data);
 	}

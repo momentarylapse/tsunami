@@ -11,6 +11,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Sample.h"
 #include "../../Data/Audio/AudioBuffer.h"
+#include "../../Session.h"
 
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
 	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
@@ -190,8 +191,7 @@ void FormatSoundFont2::read_chunk(File *f) {
 	int l = f->read_int();
 	int after_pos = f->get_pos() + l;
 
-	msg_write(format("chunk: %s (%d)", name, l));
-	msg_right();
+	od->session->debug("sf2", format("chunk: %s (%d)", name, l));
 
 
 	if (name == "RIFF") {
@@ -204,7 +204,7 @@ void FormatSoundFont2::read_chunk(File *f) {
 		read_chunk(f);
 	} else if (name == "LIST") {
 		string aaa = read_str(f, 4);
-		msg_write(format("list type: %s", aaa));
+		od->session->debug("sf2", format("list type: %s", aaa));
 		while (f->get_pos() < after_pos - 3) {
 			read_chunk(f);
 		}
@@ -306,13 +306,10 @@ void FormatSoundFont2::read_chunk(File *f) {
 		string t;
 		t.resize(l);
 		f->read_buffer(t);
-		msg_write(t.hex());
+		od->session->debug("sf2", t.hex());
 	}
 
 	f->set_pos(after_pos);
-
-
-	msg_left();
 }
 
 void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s) {
@@ -336,7 +333,7 @@ void FormatSoundFont2::read_samples(File *f) {
 	for (auto &s : samples) {
 		//s.print();
 		if ((s.sample_type & 0x8000) != 0) {
-			msg_write("rom");
+			od->session->debug("sf2", "rom");
 			continue;
 		}
 		if ((s.start < 0) or (s.start >= sample_count))

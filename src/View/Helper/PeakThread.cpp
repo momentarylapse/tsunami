@@ -34,9 +34,9 @@ void PeakThread::on_run() {
 				update_song();
 				updating = false;
 				notify();
-				msg_write(":D");
+				//msg_write(":D");
 			} catch(Exception &e) {
-				msg_write(":(    " + e.message());
+				//msg_write(":(    " + e.message());
 			}
 		}
 		hui::Sleep(0.05f);
@@ -46,17 +46,17 @@ void PeakThread::on_run() {
 void PeakThread::start_update() {
 	if (updating)
 		stop_update();
-	msg_write("PT START");
+	//msg_write("PT START");
 	updating = true;
 }
 
 void PeakThread::stop_update() {
-	msg_write("PT STOP");
+	//msg_write("PT STOP");
 	updating = false;
 }
 
 void PeakThread::hard_stop() {
-	msg_write("PT HARD STOP");
+	//msg_write("PT HARD STOP");
 	updating = false;
 	allow_running = false;
 	kill();
@@ -102,7 +102,7 @@ void PeakThread::update_track(Track *t) {
 }
 
 void PeakThread::update_song() {
-	msg_write(".");
+	//msg_write(".");
 	for (Track *t: song->tracks)
 		update_track(t);
 	for (Sample *s: song->samples)

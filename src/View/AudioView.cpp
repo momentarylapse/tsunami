@@ -390,12 +390,12 @@ void AudioView::set_mode(ViewMode *m) {
 	if (m == mode)
 		return;
 	if (mode) {
-		//msg_write("end mode " + mode_name(mode, this));
+		session->debug("view", "end mode " + mode_name(mode, this));
 		mode->on_end();
 	}
 	mode = m;
 	if (mode) {
-		//msg_write("start mode " + mode_name(mode, this));
+		session->debug("view", "start mode " + mode_name(mode, this));
 		mode->on_start();
 	}
 	thm.dirty = true;
@@ -808,15 +808,15 @@ void AudioView::update_buffer_zoom() {
 void _try_set_good_cur_layer(AudioView *v) {
 	for (auto *l: v->vlayer)
 		if (l->layer->track == v->_prev_selection.track()) {
-			//msg_write("  -> set by track");
+			v->session->debug("view", "  -> set by track");
 			v->__set_cur_layer(l);
 			return;
 		}
 	if (v->vlayer.num > 0) {
-		//msg_write("  -> set first layer");
+		v->session->debug("view", "  -> set first layer");
 		v->__set_cur_layer(v->vlayer[0]);
 	} else {
-		//msg_error("....no vlayers");
+		v->session->debug("view", "....no vlayers");
 	}
 }
 
@@ -824,15 +824,15 @@ void AudioView::check_consistency() {
 
 	// cur_vlayer = null
 	if (!cur_vlayer() and (vlayer.num > 0)) {
-		//msg_error("cur_vlayer = nil");
+		session->debug("view", "cur_vlayer = nil");
 		//msg_write(msg_get_trace());
-		//msg_write("  -> setting first");
+		session->debug("view", "  -> setting first");
 		__set_cur_layer(vlayer[0]);
 	}
 
 	// cur_vlayer illegal?
 	if (cur_vlayer() and (vlayer.find(cur_vlayer()) < 0)) {
-		//msg_error("cur_vlayer illegal...");
+		session->debug("view", "cur_vlayer illegal...");
 		//msg_write(msg_get_trace());
 		_try_set_good_cur_layer(this);
 	}
@@ -878,7 +878,7 @@ void AudioView::on_song_new() {
 }
 
 void AudioView::on_song_finished_loading() {
-	msg_write("------finish loading");
+	session->debug("view", "------finish loading");
 	if ((vlayer.num >= 12) and (vtrack.num >= 2)) {
 		for (auto *t: vtrack)
 			if (t->track->layers.num > 1)
@@ -895,9 +895,9 @@ void AudioView::on_song_tracks_change() {
 }
 
 void AudioView::on_song_change() {
-	msg_write("song.after-change");
+	session->debug("view", "song.after-change");
 	if (song->history_enabled()) {
-		msg_write("+++");
+		session->debug("view", "+++");
 		hui::RunLater(0.01f, [=]{ update_peaks(); });
 	}
 }
@@ -938,8 +938,8 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
 			return l;
 	}
 
-	msg_write("get_layer() failed for " + p2s(layer));
-	msg_write(msg_get_trace());
+	session->e("get_layer() failed for " + p2s(layer));
+	session->i(msg_get_trace());
 
 	return dummy_vlayer;
 }
@@ -1300,7 +1300,7 @@ void AudioView::update_menu() {
 }
 
 void AudioView::update_peaks() {
-	msg_write("-------------------- view update peaks");
+	session->debug("view", "-------------------- view update peaks");
 	peak_thread->start_update();
 }
 
@@ -1398,7 +1398,7 @@ void AudioView::set_current(const HoverData &h) {
 	cur_selection = h;
 
 	if (!cur_vlayer()) {
-		//msg_write("   ...setting cur_vlayer = nil");
+		session->debug("view", "   ...setting cur_vlayer = nil");
 		//msg_write(msg_get_trace());
 		cur_selection.vlayer = _prev_selection.vlayer;
 	}
@@ -1464,9 +1464,9 @@ void AudioView::__set_cur_sample(SampleRef *s) {
 // unused?!?
 void AudioView::enable(bool _enabled) {
 	if (enabled and !_enabled) {
-		msg_write("===== DISABLE");
+		session->debug("view", "DISABLE");
 	} else if (!enabled and _enabled) {
-		msg_write("===== ENABLE");
+		session->debug("view", "ENABLE");
 	}
 	enabled = _enabled;
 	force_redraw();

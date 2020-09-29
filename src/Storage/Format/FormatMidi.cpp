@@ -325,6 +325,13 @@ void FormatMidi::save_song(StorageOperationData* od)
 					f->write_byte(0);
 				}
 			}
+
+			// end of track
+			write_var(f, 0);
+			f->write_byte(0xff);
+			f->write_byte(0x2f);
+			f->write_byte(0x00);
+
 			int pos = f->get_pos();
 			f->set_pos(pos0);
 			write_int(f, pos - pos0 - 4);

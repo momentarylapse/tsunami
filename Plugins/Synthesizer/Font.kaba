@@ -3,6 +3,7 @@ use hui
 use tsunami
 use helper.tone
 
+# a single file
 class MidiFont
 	string name
 	Song *song
@@ -20,9 +21,35 @@ class MidiFont
 		song = new Song(sub, DEFAULT_SAMPLE_RATE)
 		sub.song = song
 		sub.storage.load(song, hui.app_directory_static << "Midi Fonts/{{name}}.nami")
+	
+	string[] instruments(Session session)
+		load(session)
+		string[] ii
+		for t in song.tracks
+			if t.type == TYPE_MIDI
+				ii.add(t.name)
+		return ii
+	
+	Synthesizer* get_synth(Session session, string name)
+		load(session)
+		if not song
+			return nil
+		# match by name
+		for t in song.tracks
+			if t.type == TYPE_MIDI and t.name == name
+				let m = t.synth.copy()
+				Synthesizer* s = m
+				return s
+		# fist midi track...
+		for t in song.tracks
+			if t.type == TYPE_MIDI
+				let m = t.synth.copy()
+				Synthesizer* s = m
+				return s
+		return nil
 
 class FontList
-	MidiFont[] fonts
+	MidiFont*[] fonts
 	
 	int find(string name)
 		for f,i in fonts
@@ -35,6 +62,12 @@ class FontList
 		for s in fonts
 			list.add(s.name)
 		return list
+		
+	string[] instruments(Session session, string name)
+		for f in fonts
+			if f.name == name
+				return f.instruments(session)
+		return []
 
 	#string[] find_drumsets()
 	void update()
@@ -43,32 +76,39 @@ class FontList
 			string name = e[:-5]
 			if find(name) >= 0
 				continue
-			fonts.add(MidiFont(name))
+			fonts.add(new MidiFont(name))
 	
-	Song *get(Session session, string name)
+	MidiFont* get(Session session, string name)
 		update()
 		int n = find(name)
 		if n < 0
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
 			return nil
-		let f = &fonts[n]
-		f.load(session)
-		return f.song
+		let f = fonts[n]
+		return f
+		#f.load(session)
+		#return f.song
+	
+	Synthesizer* get_synth(Session session, string name, string instrument)
+		let font = get(session, name)
+		if not font
+			return nil
+		return font.get_synth(session, instrument)
 
 FontList font_list
 
 class FontConfig extends Module.Config
 	string name
+	string instrument
 	override void reset()
 		name = ""
+		instrument = ""
 
 class FontSynthesizer extends Synthesizer
 	FontConfig config
-	Song *song
 	Synthesizer *synth
 	override void __init__()
-		song = nil
 		synth = nil
 	override void __delete__()
 		if synth
@@ -78,9 +118,7 @@ class FontSynthesizer extends Synthesizer
 			del synth
 			synth = nil
 
-		song = font_list.get(session, config.name)
-		if song
-			synth = song.tracks[0].synth.copy()
+		synth = font_list.get_synth(session, config.name, config.instrument)
 		if synth
 			synth.set_sample_rate(sample_rate)
 			synth.on_config()
@@ -94,7 +132,6 @@ class FontSynthesizer extends Synthesizer
 		if synth
 			synth.reset_state()
 
-	
 	override ConfigPanel *create_panel()
 		return new FontPanel(self)
 
@@ -108,9 +145,13 @@ class FontPanel extends ConfigPanel
 		set_target("grid")
 		add_label("Set", 0 ,0, "")
 		add_combo_box("!expandx", 1, 0, "sets")
+		add_label("Instrument", 0 ,1, "")
+		add_combo_box("!expandx", 1, 1, "instruments")
 		event("sets", on_select)
+		event("instruments", on_instruments)
 
 	override void update()
+		print("update....")
 		reset("sets")
 		let sets = font_list.get_names()
 		if len(sets) > 0
@@ -125,10 +166,31 @@ class FontPanel extends ConfigPanel
 			enable("sets", false)
 			set_string("sets", "  - no fonts found -")
 			set_int("sets", 0)
+
+		reset("instruments")
+		let instruments = font_list.instruments(c.session, sc.name)
+		bool match = false
+		for ins,i in instruments
+			add_string("instruments", ins)
+			if ins == sc.instrument
+				set_int("instruments", i)
+				match = true
+		if not match
+			set_int("instruments", 0)
+		
 		
 	void on_select()
 		int n = get_int("")-1
 		sc.name = ""
 		if n >= 0 and n < len(font_list.fonts)
 			sc.name = font_list.fonts[n].name
+		changed()
+		update()
+	
+	void on_instruments()
+		int n = get_int("")
+		sc.instrument = ""
+		let instruments = font_list.instruments(c.session, sc.name)
+		if n >= 0 and n < len(instruments)
+			sc.instrument = instruments[n]
 		changed()

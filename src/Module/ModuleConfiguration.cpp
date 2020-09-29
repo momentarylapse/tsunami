@@ -65,7 +65,8 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 		if (sr)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
-	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector) {
+	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector or c == Kaba::TypeQuaternion or c == Kaba::TypeColor) {
+		// rect ...nope
 		Any r;
 		for (auto &e: c->elements)
 			if (!e.hidden())

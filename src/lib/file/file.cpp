@@ -404,6 +404,8 @@ int File::read_buffer(void *buffer, int size) {
 
 // insert the buffer into the file
 int File::write_buffer(const void *buffer, int size) {
+	if (size == 0)
+		return 0;
 	int r = _write(handle,buffer,size);
 	if (r < 0)
 		throw FileError(format("failed writing file '%s'", filename));
@@ -517,6 +519,10 @@ bool TextFile::read_bool() {
 string File::read_str() {
 	// binary: read length as a word then read so many bytes
 	int l = read_word();
+	if (l >= 0xc000) {
+		l = (read_word() << 14) + (l & 0x3fff);
+	}
+
 	string str;
 	str.resize(l + 16); // prevents "uninitialized" bytes in syscall parameter... (valgrind)
 	read_buffer_asserted(this, str.data, l);
@@ -629,10 +635,15 @@ void TextFile::write_bool(bool b) {
 //   text mode:   complete rest of this line
 //   binary mode: length word, then string
 void File::write_str(const string &str) {
-	int num = min(str.num, 65535);
-	write_word(num);
-	if (num > 0)
+	int num = min(str.num, 0x1fffffff); // ~ 1gb...
+	if (num >= 0xc000) {
+		write_word((num & 0x3fff) | 0xc000);
+		write_word(num >> 14);
 		write_buffer(str.data, num);
+	} else {
+		write_word(num);
+		write_buffer(str.data, num);
+	}
 }
 void TextFile::write_str(const string &str) {
 	write_buffer(str);

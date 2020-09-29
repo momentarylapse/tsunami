@@ -1,0 +1,108 @@
+use tsunami
+use hui
+
+class XXX extends SongPlugin
+	override void apply()
+		if not song.secret_data.has("instruments")
+			session.e("no sf2 data found")
+			return
+		
+	#	let prog = new ProgressX("generating sound font", session.win)
+		
+
+		print("make")
+		for p in song.secret_data["presets"].as_array()
+			import_preset(p)
+		
+	
+	void import_preset(any p)
+		print("import " + p["name"])
+				
+		let track = song.add_track(TYPE_MIDI, -1)
+		track.set_name(p["name"])
+		print("creating synth")
+		track.synth = CreateSynthesizer(session, "Sample Zones")
+		print("set synth")
+		let synth = track.synth
+		track.set_synthesizer(synth)
+			
+		any a
+		a["zones"] = []
+		
+		track.layers[0].midi.add(new MidiNote(Range(0, 100000), 64, 1.0))
+		track.layers[0].midi.add(new MidiNote(Range(100000, 10000), 65, 1.0))
+		track.layers[0].midi.add(new MidiNote(Range(200000, 10000), 66, 1.0))
+		track.layers[0].midi.add(new MidiNote(Range(210000, 10000), 67, 1.0))
+		track.layers[0].midi.add(new MidiNote(Range(220000, 10000), 68, 1.0))
+		track.layers[0].midi.add(new MidiNote(Range(230000, 10000), 69, 1.0))
+			
+			
+
+		for z in p["zones"].as_array()
+			if not z.has("instrument")
+				continue
+				
+			#if z.has("vel")
+			#print("P {{z}}")
+				
+			let ii = song.secret_data["instruments"][int(z["instrument"])]
+			for zz in ii["zones"].as_array()
+				if not zz.has("sample")
+					continue
+				if not zz.has("keys")
+					continue
+				int index = int(zz["sample"])
+				int offset = 0
+				for k in 0:index
+					offset += len(song.samples[k].buf)
+				let s = song.samples[index]
+				#print("I {{zz}}")
+
+				
+				any az
+				az["sample"] = "sample:{{s.uid|08x}}"
+				az["pitch_min"] = int(zz["keys"][0])
+				az["pitch_max"] = int(zz["keys"][1])
+				
+				az["vel_min"] = 0.0
+				az["vel_max"] = 1.0
+				
+				az["attack"] = 0.0
+				az["sustain"] = 1.0
+				az["release"] = 1.0
+				
+				if s.get_value("pitch") == ""
+					continue
+				az["pitch_original"] = int(s.get_value("pitch"))
+				az["start_loop"] = int(s.get_value("start-loop"))
+				az["end_loop"] = int(s.get_value("end-loop"))
+				print("sample: {{s.get_value("start-loop")}}:{{s.get_value("end-loop")}}  {{len(s.buf)}}")
+				
+				import_from_zone(az, z, offset) # from preset zone
+				import_from_zone(az, zz, offset) # from instrument zone
+				print("    loop  {{az["start_loop"]}}:{{az["end_loop"]}}")
+	
+				a["zones"].add(az)
+		#print(a)
+		synth.config_from_any(1, a)
+
+void import_from_zone(out any o, any i, int offset)
+	if i.has("keys")
+		o["pitch_min"] = int(i["keys"][0])
+		o["pitch_max"] = int(i["keys"][1])
+				
+	if i.has("vel")
+		o["vel_min"] = int(i["vel"][0]) / 127.0
+		o["vel_max"] = int(i["vel"][1]) / 127.0
+			
+	if i.has("root-key")
+		o["pitch_original"] = int(i["root-key"])
+	if i.has("start-loop")
+		o["start_loop"] = int(i["start-loop"]) - offset
+	if i.has("end-loop")
+		o["end_loop"] = int(i["end-loop"]) - offset
+	for k in ["attack", "sustain", "release"]
+		if i.has(k)
+			o[k] = float(i[k])
+
+		

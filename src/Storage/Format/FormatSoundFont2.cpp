@@ -12,6 +12,7 @@
 #include "../../Data/Sample.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Session.h"
+#include <cmath>
 
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
 	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
@@ -32,6 +33,14 @@ Any ia2any(const Array<int> &ia) {
 	return a;
 }
 
+float abs_timecents_to_sec(int ats) {
+	return (float)pow(2.0, ats / 1200.0);
+}
+
+int sec_to_samples(Session *s, float t) {
+	return int(s->sample_rate() * t);
+}
+
 void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zone_start, int zone_end, const Array<FormatSoundFont2::sfGenerator> &generators) {
 	Any azs;
 	foreachi (auto &z, zones, ii) {
@@ -41,10 +50,12 @@ void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zon
 			int startloop = 0;
 			int endloop = 0;
 			Any az;
-			//msg_write(format("  zone %d", ii));
+			msg_write(format("  zone %d", ii));
 			for (int jj=z.gen_start; jj<z.gen_end; jj++) {
 				auto &g = generators[jj];
-				//msg_write("    gen " + g.str());
+				msg_write("    gen " + g.str());
+				if (g.op <= 4)
+					msg_error("WAHHHH");
 				if (g.op == 43) {
 					az.map_set("keys", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
 				} else if (g.op == 44) {
@@ -75,6 +86,10 @@ void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zon
 					start += g.amount << 15;
 				} else if (g.op == 12) {
 					end += g.amount << 15;
+				} else if (g.op == 34) {
+					az.map_set("attack", abs_timecents_to_sec((short)g.amount));
+				} else if (g.op == 38) {
+					az.map_set("release", abs_timecents_to_sec((short)g.amount));
 				}
 			}
 			if (start > 0)
@@ -116,6 +131,7 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	preset_zones.back().gen_end = preset_generators.num;
 	Any aps;
 	for (auto &p: presets) {
+		msg_write(format("preset: %s", p.name));
 		Any ap;
 		ap.map_set("name", p.name);
 		import_zones(ap, preset_zones, p.zone_start, p.zone_end, preset_generators);
@@ -127,7 +143,7 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	instrument_zones.back().gen_end = instrument_generators.num;
 	Any ais;
 	for (auto &i: instruments) {
-		//msg_write(format("instrument: %s", i.name));
+		msg_write(format("instrument: %s", i.name));
 		Any ai;
 		ai.map_set("name", i.name);
 		import_zones(ai, instrument_zones, i.zone_start, i.zone_end, instrument_generators);
@@ -172,6 +188,11 @@ string FormatSoundFont2::sfGenerator::str() const {
 	if (op == 15)	s = "chorus send";
 	if (op == 16)	s = "reverb send";
 	if (op == 17)	s = "pan";
+	if (op == 34)	s = "attack";
+	if (op == 35)	s = "hold";
+	if (op == 36)	s = "decay";
+	if (op == 37)	s = "sustain";
+	if (op == 38)	s = "release";
 	if (op == 41)	s = "instrument";
 	if (op == 43)	s = "key range";
 	if (op == 44)	s = "vel range";
@@ -354,8 +375,8 @@ void FormatSoundFont2::read_samples(File *f) {
 		delete[] data;
 
 		sample->tags.add({"pitch", i2s(s.original_key)});
-		sample->tags.add({"start-loop", i2s(s.start_loop)});
-		sample->tags.add({"end-loop", i2s(s.end_loop)});
+		sample->tags.add({"start-loop", i2s(s.start_loop - s.start)});
+		sample->tags.add({"end-loop", i2s(s.end_loop - s.start)});
 		sample->tags.add({"correction", i2s(s.correction)});
 
 		samples_read += num_samples;

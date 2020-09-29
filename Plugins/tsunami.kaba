@@ -211,6 +211,10 @@ class AudioBuffer
 		l *= factor
 		if channels > 1
 			r *= factor
+	void __imul__(float[] f)
+		l *= f
+		if channels > 1
+			r *= f
 	void auto_generate_channels()
 		if channels > 1
 			r = l

@@ -1167,11 +1167,12 @@ public:
 class FileChunkSecret : public FileChunk<Song,Any> {
 public:
 	FileChunkSecret() : FileChunk<Song,Any>("secret") {}
+	void create() override { me = &parent->secret_data; }
 	void read(File *f) override {
-		parent->secret_data = Any::parse(f->read_str());
+		*me = Any::parse(f->read_str());
 	}
 	void write(File *f) override {
-		f->write_str(parent->secret_data.str());
+		f->write_str(me->str());
 	}
 };
 

@@ -1,0 +1,112 @@
+use tsunami
+use helper.tone
+
+
+class SampleConfig extends Module.Config
+	class Zone
+		SampleRef* sample
+		int pitch_original
+		int pitch_min, pitch_max
+		int start_loop, end_loop
+		float vel_min, vel_max
+		float attack, sustain, release
+		void __delete__()
+			if sample
+				del sample
+	Zone[] zones
+	override void __delete__()
+		reset()
+	override void reset()
+		zones.clear()
+
+
+class SampleRenderer extends PitchRenderer
+	SampleConfig.Zone* zone
+	MidiEventBuffer events
+	AudioBuffer data
+	EnvelopeADSR env
+	int offset
+	int start_loop, end_loop
+	bool allow_loop
+	
+	override SampleSynthesizer *synth
+	override void on_config()
+		zone = nil
+		offset = 0
+		for z in synth.config.zones
+			if pitch >= z.pitch_min and pitch <= z.pitch_max
+				if true#z.vel_max > 0.95 #volume >= z.volume_min and volume <= z.volume_max
+					zone = &z
+				#	print(str(z))
+					float factor = pow(2, float(z.pitch_original - pitch) / 12)
+					data.resize(z.sample.origin.buf.length * factor)
+					start_loop = zone.start_loop * factor
+					end_loop = zone.end_loop * factor
+					allow_loop = true
+					interpolate_buffer(z.sample.origin.buf, data, 0)
+					env.set(z.attack, 1, z.sustain, z.release, synth.session.sample_rate())
+					print("++++++   {{start_loop}}:{{end_loop}}  ({{len(data)}})   {{pitch}}")
+					if end_loop < start_loop + 8 or end_loop < 8
+						allow_loop = false
+						end_loop = len(data)
+					else
+						start_loop = clampi(start_loop, 0, len(data))
+						end_loop = clampi(end_loop, start_loop + 1, len(data))
+					print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
+					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
+					break
+				
+	override void on_start(float volume)
+		env.start(volume)
+		#events.add(MidiEvent(0, 0, volume))
+	override void on_end()
+		env.end()
+	override bool render(out AudioBuffer buf)
+		if not zone
+			return false
+		int done = 0
+		int todo = len(buf)
+		while todo > 0
+			int avail = end_loop - offset
+			int chunk = min(avail, todo)
+			buf[done:].set(data[offset:end_loop], 0, 1)
+			
+			done += chunk
+			todo -= chunk
+			offset += chunk
+			if offset >= end_loop
+				if not allow_loop
+					offset = 0
+					buf *= env.read(len(buf))
+					env.reset()
+					return false
+				offset = start_loop
+		buf *= env.read(len(buf))
+		return not env.just_killed
+			
+	
+	
+class SampleSynthesizer extends Synthesizer
+	SampleConfig config
+	
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new SampleRenderer(self, pitch)
+	
+	override ConfigPanel *create_panel()
+		return new SamplePanel(self)
+
+class SamplePanel extends ConfigPanel
+	SampleConfig *sc
+	override SampleSynthesizer *c
+	override void __init__(Module _s)
+		sc = &c.config
+		add_list_view("!expandx\\Note range\\Sample", 0, 0, "list")
+		#event("list", on_select)
+
+	override void update()
+		reset("list")
+		for z in sc.zones
+			string name = ""
+			if z.sample
+				name = z.sample.origin.name
+			set_string("list", pitch_name(z.pitch_min) + " - " + pitch_name(z.pitch_max) + "\\" + name)

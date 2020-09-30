@@ -6,6 +6,7 @@
  */
 
 #include "ControlCheckBox.h"
+#include "../Config.h"
 
 #ifdef HUI_API_GTK
 
@@ -25,6 +26,8 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 {
 	auto parts = split_title(title);
 	is_switch = option_has(get_option_from_title(title), "switch");
+	if (hui::Config.has("hui.prevent-checkbox-switch"))
+		is_switch = false;
 	if (is_switch) {
 		widget = gtk_switch_new();
 		//g_signal_connect(G_OBJECT(widget), "notify::active", G_CALLBACK(&on_gtk_switch_clicked), this);

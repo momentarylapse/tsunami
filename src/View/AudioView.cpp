@@ -170,9 +170,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	selection_marker = new SelectionMarker(this);
 	scroll_bar_y = new ScrollBar(this);
 	scroll_bar_y->auto_hide = true;
-	scroll_bar_y->set_callback([=]{ thm.update_immediately(this, song, song_area()); });
+	scroll_bar_y->set_callback([=] {
+		thm.update_immediately(this, song, song_area());
+	});
 	scroll_bar_time = new ScrollBarHorizontal(this);
-	scroll_bar_time->set_callback([=]{ cam.dirty_jump(song->range_with_time().start() + scroll_bar_time->offset); });
+	scroll_bar_time->set_callback([=] {
+		cam.dirty_jump(song->range_with_time().start() + scroll_bar_time->offset);
+	});
 	scroll_bar_time->constrained = false;
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
@@ -1392,6 +1396,13 @@ void AudioView::select_sample(SampleRef *s, bool diff) {
 	}
 }
 
+void ensure_layer_on_screen(AudioView *view, AudioViewLayer *l) {
+	if (l->area.y1 < view->song_area().y1)
+		view->scroll_bar_y->set_offset(view->scroll_bar_y->offset - (view->song_area().y1 - l->area.y1));
+	if (l->area.y2 > view->song_area().y2)
+		view->scroll_bar_y->set_offset(view->scroll_bar_y->offset - (view->song_area().y2 - l->area.y2));
+}
+
 void AudioView::set_current(const HoverData &h) {
 	_prev_selection = cur_selection;
 
@@ -1407,6 +1418,7 @@ void AudioView::set_current(const HoverData &h) {
 	}
 	if (cur_vlayer() != _prev_selection.vlayer) {
 		mode->on_cur_layer_change();
+		ensure_layer_on_screen(this, cur_vlayer());
 		force_redraw();
 		notify(MESSAGE_CUR_LAYER_CHANGE);
 	}

@@ -60,7 +60,7 @@ void ViewModeEdit::set_mode(ViewMode *m) {
 }
 
 void ViewModeEdit::on_cur_layer_change() {
-	view->thm.dirty = true;
+	view->thm.set_dirty();
 	set_mode(suggest_mode());
 	mode->on_cur_layer_change();
 }

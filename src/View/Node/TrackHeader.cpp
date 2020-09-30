@@ -15,6 +15,7 @@
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 
 
 
@@ -93,7 +94,7 @@ public:
 		c->draw_mask_image(area.x1, area.y1, view->images.config);
 	}
 	bool on_left_button_down() override {
-		view->session->set_mode("default/track");
+		view->session->set_mode(EditMode::DefaultTrack);
 		return true;
 	}
 	string get_tip() override {
@@ -272,7 +273,7 @@ bool TrackHeader::on_left_button_down() {
 	return true;
 }
 bool TrackHeader::on_left_double_click() {
-	view->session->set_mode("default/track");
+	view->session->set_mode(EditMode::DefaultTrack);
 	return true;
 }
 

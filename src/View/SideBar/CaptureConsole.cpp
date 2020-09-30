@@ -20,6 +20,7 @@
 
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 
 
 
@@ -167,12 +168,12 @@ void CaptureConsole::on_ok() {
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	if (has_data())
 		view->mode_capture->insert();
-	session->set_mode("default");
+	session->set_mode(EditMode::Default);
 }
 
 void CaptureConsole::on_cancel() {
 	//on_dump();
-	session->set_mode("default");
+	session->set_mode(EditMode::Default);
 }
 
 void CaptureConsole::on_new_version() {

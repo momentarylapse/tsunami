@@ -25,6 +25,7 @@ namespace hui {
 	class Window;
 }
 
+
 // representing one instance/window
 class Session : public Observable<VirtualBase> {
 public:

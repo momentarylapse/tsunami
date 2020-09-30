@@ -8,6 +8,7 @@
 #include "ViewModeScaleMarker.h"
 #include "../AudioView.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../Data/TrackMarker.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Range.h"
@@ -56,7 +57,7 @@ void ViewModeScaleMarker::on_left_button_up() {
 }
 
 void ViewModeScaleMarker::on_right_button_down() {
-	session->set_mode("default");
+	session->set_mode(EditMode::Default);
 }
 
 void ViewModeScaleMarker::on_mouse_move() {
@@ -65,7 +66,7 @@ void ViewModeScaleMarker::on_mouse_move() {
 
 void ViewModeScaleMarker::on_key_down(int k) {
 	if (k == hui::KEY_ESCAPE)
-		session->set_mode("default");
+		session->set_mode(EditMode::Default);
 	if (k == hui::KEY_RETURN)
 		perform_scale();
 }
@@ -74,6 +75,6 @@ void ViewModeScaleMarker::perform_scale() {
 	if (marker)
 		layer->edit_marker(marker, view->sel.range(), marker->text);
 
-	session->set_mode("default");
+	session->set_mode(EditMode::Default);
 }
 

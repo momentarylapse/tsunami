@@ -117,7 +117,7 @@ void ViewModeMidi::set_modifier(NoteModifier mod) {
 
 void ViewModeMidi::set_mode(MidiMode _mode) {
 	mode_wanted = _mode;
-	view->thm.dirty = true;
+	view->thm.set_dirty();
 	view->force_redraw();
 	notify();
 }
@@ -544,7 +544,7 @@ void ViewModeMidi::on_key_down(int k) {
 //		set_input_mode(InputMode::DEFAULT);
 
 	//if (k == hui::KEY_ESCAPE)
-	//	session->set_mode("default");
+	//	session->set_mode(EditMode::Default);
 
 	ViewModeDefault::on_key_down(k);
 }
@@ -581,23 +581,19 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 }
 
 void ViewModeMidi::on_cur_layer_change() {
-	msg_write("midi.cur layer change");
-	view->thm.dirty = true;
+	view->thm.set_dirty();
 }
 
 
 Array<int> ViewModeMidi::get_creation_pitch(int base_pitch) {
-	Array<int> pitch;
-	if (creation_mode == CreationMode::NOTE) {
-		pitch.add(base_pitch);
-	} else if (creation_mode == CreationMode::INTERVAL) {
-		pitch.add(base_pitch);
+	if (creation_mode == CreationMode::INTERVAL) {
 		if (midi_interval != 0)
-			pitch.add(base_pitch + midi_interval);
+			return {base_pitch, base_pitch + midi_interval};
 	} else if (creation_mode == CreationMode::CHORD) {
-		pitch = chord_notes(chord_type, chord_inversion, base_pitch);
+		return chord_notes(chord_type, chord_inversion, base_pitch);
 	}
-	return pitch;
+	//if (creation_mode == CreationMode::NOTE)
+	return {base_pitch};
 }
 
 MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {

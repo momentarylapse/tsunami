@@ -16,6 +16,7 @@
 #include "../Dialog/ModuleSelectorDialog.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../AudioView.h"
 #include "TrackConsole.h"
 
@@ -61,11 +62,11 @@ TrackConsole::TrackConsole(Session *session) :
 	event("instrument", [=]{ on_instrument(); });
 	event("edit_tuning", [=]{ on_edit_tuning(); });
 
-	event("edit_song", [=]{ session->set_mode("default/song"); });
-	event("edit_fx", [=]{ session->set_mode("default/fx"); });
-	event("edit_curves", [=]{ session->set_mode("curves"); });
-	event("edit_midi", [=]{ session->set_mode("edit-track"); });
-	event("edit_midi_fx", [=]{ session->set_mode("default/midi-fx"); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
+	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultFx); });
+	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
+	event("edit_midi", [=]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultMidiFx); });
 }
 
 TrackConsole::~TrackConsole() {

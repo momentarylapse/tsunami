@@ -2,6 +2,7 @@
 #include "../Mode/ViewModeEditAudio.h"
 #include "../AudioView.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 
 
 
@@ -14,8 +15,8 @@ AudioEditorConsole::AudioEditorConsole(Session *session) :
 	event("mode-smoothen", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN); });
 	event("mode-clone", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE); });
 	event("mode-rubber", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER); });
-	event("edit_track", [=]{ session->set_mode("default/track"); });
-	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 
 	view->mode_edit_audio->subscribe(this, [=] { update(); });
 	update();

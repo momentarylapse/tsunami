@@ -13,6 +13,7 @@
 #include "../../Data/Track.h"
 #include "../../Data/Curve.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 
 class CurveTargetDialog : public hui::Dialog {
 public:
@@ -66,9 +67,9 @@ CurveConsole::CurveConsole(Session *session) :
 	event("target", [=]{ on_target(); });
 	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
-	event("edit_song", [=]{ session->set_mode("default/song"); });
-	event("edit_track", [=]{ session->set_mode("default/track"); });
-	event("edit_fx", [=]{ session->set_mode("default/fx"); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
+	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultFx); });
 
 }
 

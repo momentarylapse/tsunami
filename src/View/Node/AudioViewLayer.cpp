@@ -20,6 +20,7 @@
 #include "../Painter/MidiPainter.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -429,9 +430,9 @@ color AudioViewLayer::background_selection_color() {
 bool AudioView::editing_layer(AudioViewLayer *l) {
 	if (cur_vlayer() != l)
 		return false;
-	if (session->in_mode("midi"))
+	if (session->in_mode(EditMode::EditTrack))
 		return true;
-	if (session->in_mode("capture"))
+	if (session->in_mode(EditMode::Capture))
 		return true;
 	return false;
 }

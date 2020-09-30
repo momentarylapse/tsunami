@@ -7,6 +7,7 @@
 
 #include "DummyEditorConsole.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 
 
 DummyEditorConsole::DummyEditorConsole(Session *session) :
@@ -14,6 +15,6 @@ DummyEditorConsole::DummyEditorConsole(Session *session) :
 {
 	from_resource("dummy-editor");
 
-	event("edit_track", [=]{ session->set_mode("default/track"); });
-	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 }

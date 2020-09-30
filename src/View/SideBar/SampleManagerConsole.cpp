@@ -12,6 +12,7 @@
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include <math.h>
 
 #include "../../Action/ActionManager.h"
@@ -134,7 +135,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
 	event("sample-list", [=]{ on_preview(); });
 
-	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 
 	progress = nullptr;
 

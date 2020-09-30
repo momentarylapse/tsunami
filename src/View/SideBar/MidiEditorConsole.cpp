@@ -19,6 +19,7 @@
 #include "../Node/AudioViewTrack.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 #include "MidiEditorConsole.h"
@@ -111,9 +112,9 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("flag-staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
 	event("flag-tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("add_key_change", [=]{ on_add_key_change(); });
-	event("edit_track", [=]{ session->set_mode("default/track"); });
-	event("edit_midi_fx", [=]{ session->set_mode("default/midi-fx"); });
-	event("edit_song", [=]{ session->set_mode("default/song"); });
+	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultMidiFx); });
+	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 }
 
 MidiEditorConsole::~MidiEditorConsole() {

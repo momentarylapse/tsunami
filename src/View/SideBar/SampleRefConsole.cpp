@@ -13,6 +13,7 @@
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../Helper/Slider.h"
 #include "SampleRefConsole.h"
 #include "SampleManagerConsole.h"
@@ -35,21 +36,18 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	view->subscribe(this, [=]{ on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
-SampleRefConsole::~SampleRefConsole()
-{
+SampleRefConsole::~SampleRefConsole() {
 	if (sample)
 		sample->unsubscribe(this);
 	view->unsubscribe(this);
 }
 
 
-void SampleRefConsole::on_name()
-{
+void SampleRefConsole::on_name() {
 	//sample->origin->name = GetString("");
 }
 
-void SampleRefConsole::on_mute()
-{
+void SampleRefConsole::on_mute() {
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
@@ -59,13 +57,11 @@ void SampleRefConsole::on_mute()
 	sample->subscribe(this, [=]{ on_update(); });
 }
 
-void SampleRefConsole::on_track()
-{
+void SampleRefConsole::on_track() {
 	//int n = getInt("");
 }
 
-void SampleRefConsole::on_volume()
-{
+void SampleRefConsole::on_volume() {
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
@@ -73,24 +69,20 @@ void SampleRefConsole::on_volume()
 	sample->subscribe(this, [=]{ on_update(); });
 }
 
-void SampleRefConsole::on_edit_song()
-{
-	session->set_mode("default/song");
+void SampleRefConsole::on_edit_song() {
+	session->set_mode(EditMode::DefaultSong);
 }
 
-void SampleRefConsole::on_edit_track()
-{
-	session->set_mode("default/track");
+void SampleRefConsole::on_edit_track() {
+	session->set_mode(EditMode::DefaultTrack);
 }
 
-void SampleRefConsole::on_edit_sample()
-{
+void SampleRefConsole::on_edit_sample() {
 	bar()->sample_manager->set_selection({sample->origin});
-	session->set_mode("default/samples");
+	session->set_mode(EditMode::DefaultSamples);
 }
 
-void SampleRefConsole::load_data()
-{
+void SampleRefConsole::load_data() {
 	enable("name", false);
 	enable("mute", sample);
 	enable("volume", sample);
@@ -112,8 +104,7 @@ void SampleRefConsole::load_data()
 	//setInt("track", sample->track_no);
 }
 
-void SampleRefConsole::on_view_cur_sample_change()
-{
+void SampleRefConsole::on_view_cur_sample_change() {
 	if (sample)
 		sample->unsubscribe(this);
 	layer = view->cur_layer();
@@ -123,8 +114,7 @@ void SampleRefConsole::on_view_cur_sample_change()
 	load_data();
 }
 
-void SampleRefConsole::on_update()
-{
+void SampleRefConsole::on_update() {
 	if (sample->cur_message() == sample->MESSAGE_DELETE){
 		sample->unsubscribe(this);
 		sample = nullptr;

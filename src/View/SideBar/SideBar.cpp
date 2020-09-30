@@ -17,6 +17,7 @@
 #include "SongConsole.h"
 #include "CaptureConsole.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/BottomBar.h"
 
@@ -85,7 +86,7 @@ void SideBar::add_console(SideBarConsole *c) {
 
 void SideBar::on_close() {
 	if (allow_close())
-		session->set_mode("default");
+		session->set_mode(EditMode::Default);
 	//_hide();
 }
 

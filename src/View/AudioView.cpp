@@ -24,6 +24,7 @@
 #include "Mode/ViewModeScaleBars.h"
 #include "Mode/ViewModeScaleMarker.h"
 #include "../Session.h"
+#include "../EditModes.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Data/base.h"
@@ -402,7 +403,7 @@ void AudioView::set_mode(ViewMode *m) {
 		session->debug("view", "start mode " + mode_name(mode, this));
 		mode->on_start();
 	}
-	thm.dirty = true;
+	thm.set_dirty();
 	force_redraw();
 }
 
@@ -646,7 +647,7 @@ void AudioView::move_to_layer(int delta) {
 
 void AudioView::zoom_y(float zoom) {
 	cam.scale_y = clampf(zoom, 0.5f, 2.0f);
-	thm.dirty = true;
+	thm.set_dirty();
 	set_message(format(_("vertical zoom %.0f%%"), cam.scale_y * 100.0f));
 	force_redraw();
 }
@@ -765,7 +766,7 @@ void AudioView::on_key_down() {
 			mdp()->cancel();
 		} else {
 			if (win->side_bar->allow_close())
-				session->set_mode("default");
+				session->set_mode(EditMode::Default);
 		}
 	}
 	mode->on_key_down(k);
@@ -854,7 +855,7 @@ void AudioView::implode_track(Track *t) {
 			l->hidden = !l->layer->is_main();
 		}
 	get_track(t)->imploded = true;
-	thm.dirty = true;
+	thm.set_dirty();
 	force_redraw();
 }
 
@@ -865,7 +866,7 @@ void AudioView::explode_track(Track *t) {
 			l->hidden = false;
 		}
 	get_track(t)->imploded = false;
-	thm.dirty = true;
+	thm.set_dirty();
 	force_redraw();
 }
 
@@ -1006,7 +1007,7 @@ void AudioView::update_tracks() {
 	auto vlayer_del = vlayer;
 	vtrack = vtrack2;
 	vlayer = vlayer2;
-	thm.dirty = true;
+	thm.set_dirty();
 
 	// guess where to create new tracks
 	foreachi(auto *v, vtrack, i) {

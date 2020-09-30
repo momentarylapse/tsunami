@@ -6,6 +6,7 @@
  */
 
 #include "Session.h"
+#include "EditModes.h"
 #include "TsunamiWindow.h"
 #include "Stuff/Log.h"
 #include "Storage/Storage.h"
@@ -33,6 +34,23 @@ Session *Session::GLOBAL = nullptr;
 const string Session::MESSAGE_ADD_PLUGIN = "AddPlugin";
 const string Session::MESSAGE_REMOVE_PLUGIN = "RemovePlugin";
 const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "AddSignalChain";
+
+
+const string EditMode::Default = "default";
+const string EditMode::DefaultSong = "default/song";
+const string EditMode::DefaultTrack = "default/track";
+const string EditMode::DefaultFx = "default/fx";
+const string EditMode::DefaultMidiFx = "default/midi-fx";
+const string EditMode::DefaultSamples = "default/samples";
+const string EditMode::DefaultMixing = "default/mixing";
+const string EditMode::DefaultMastering = "default/mastering";
+const string EditMode::DefaultSampleRef = "default/sample-ref";
+const string EditMode::EditTrack = "edit-track";
+const string EditMode::Capture = "capture";
+const string EditMode::ScaleBars = "scale-bars";
+const string EditMode::ScaleMarker = "scale-marker";
+const string EditMode::Curves = "curves";
+
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon) {
 	win = nullptr;
@@ -130,40 +148,40 @@ void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 
 void Session::set_mode(const string &mode) {
 	debug("mode", ">> " + mode);
-	if (mode == "default") {
+	if (mode == EditMode::Default) {
 		view->set_mode(view->mode_default);
 		win->side_bar->_hide();
-	} else if (mode == "capture") {
+	} else if (mode == EditMode::Capture) {
 		view->set_mode(view->mode_capture);
-	} else if (mode == "edit-track") {
+	} else if (mode == EditMode::EditTrack) {
 		view->set_mode(view->mode_edit);
-	} else if (mode == "scale-bars") {
+	} else if (mode == EditMode::ScaleBars) {
 		view->set_mode(view->mode_scale_bars);
-	} else if (mode == "scale-marker") {
+	} else if (mode == EditMode::ScaleMarker) {
 		view->set_mode(view->mode_scale_marker);
-	} else if (mode == "curves") {
+	} else if (mode == EditMode::Curves) {
 		view->set_mode(view->mode_curve);
-	} else if (mode == "default/track") {
+	} else if (mode == EditMode::DefaultTrack) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::TRACK_CONSOLE);
-	} else if (mode == "default/song") {
+	} else if (mode == EditMode::DefaultSong) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SONG_CONSOLE);
-	} else if (mode == "default/samples") {
+	} else if (mode == EditMode::DefaultSamples) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLE_CONSOLE);
-	} else if (mode == "default/mixing") {
+	} else if (mode == EditMode::DefaultMixing) {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-	} else if (mode == "default/fx") {
-		view->set_mode(view->mode_default);
-		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->show_fx(view->cur_track());
-	} else if (mode == "default/midi-fx") {
+	} else if (mode == EditMode::DefaultFx) {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
 		win->bottom_bar->mixing_console->show_fx(view->cur_track());
-	} else if (mode == "default/sample-ref") {
+	} else if (mode == EditMode::DefaultMidiFx) {
+		view->set_mode(view->mode_default);
+		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+		win->bottom_bar->mixing_console->show_fx(view->cur_track());
+	} else if (mode == EditMode::DefaultSampleRef) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	} else {

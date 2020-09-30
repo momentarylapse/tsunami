@@ -12,6 +12,7 @@
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -64,15 +65,15 @@ void AudioViewTrack::on_track_change() {
 bool AudioView::editing_track(Track *t) {
 	if (cur_track() != t)
 		return false;
-	if (session->in_mode("default/track"))
+	if (session->in_mode(EditMode::DefaultTrack))
 		return true;
-	if (session->in_mode("default/fx"))
+	if (session->in_mode(EditMode::DefaultFx))
 		return true;
-	if (session->in_mode("default/midi-fx"))
+	if (session->in_mode(EditMode::DefaultMidiFx))
 		return true;
-	if (session->in_mode("midi"))
+	if (session->in_mode(EditMode::EditTrack))
 		return true;
-	if (session->in_mode("capture"))
+	if (session->in_mode(EditMode::Capture))
 		return true;
 	return false;
 }
@@ -105,7 +106,7 @@ void AudioViewTrack::set_midi_mode(MidiMode mode) {
 	midi_mode_wanted = mode;
 	notify();
 	view->update_menu(); // FIXME
-	view->thm.dirty = true;
+	view->thm.set_dirty();
 	view->force_redraw();
 }
 

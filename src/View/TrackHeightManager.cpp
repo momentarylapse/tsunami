@@ -18,11 +18,14 @@
 TrackHeightManager::TrackHeightManager() {
 	animating = false;
 	t = 0;
-	dirty = true;
+	_dirty = true;
 	render_area = rect::ID;
 }
 
 
+void TrackHeightManager::set_dirty() {
+	_dirty = true;
+}
 
 bool TrackHeightManager::check(Song *a) {
 	return true;
@@ -62,11 +65,11 @@ void set_track_areas_from_layers(AudioView *view) {
 
 bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r) {
 	// start animation?
-	if (dirty) {
+	if (_dirty) {
 		plan(view, a, r);
 		t = 0;
 		animating = true;
-		dirty = false;
+		_dirty = false;
 
 		for (auto *v: view->vlayer)
 			v->area_last = v->area;
@@ -114,7 +117,7 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r) {
 void TrackHeightManager::update_immediately(AudioView *view, Song *a, const rect &r) {
 	plan(view, a, r);
 	animating = false;
-	dirty = false;
+	_dirty = false;
 
 	for (auto *v : view->vlayer)
 		v->area = v->area_target;

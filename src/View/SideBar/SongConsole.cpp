@@ -6,6 +6,7 @@
  */
 
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../View/AudioView.h"
 #include "../BottomBar/BottomBar.h"
 #include "../../Data/Song.h"
@@ -124,7 +125,7 @@ void SongConsole::on_tag_delete() {
 }
 
 void SongConsole::on_edit_samples() {
-	session->set_mode("default/samples");
+	session->set_mode(EditMode::DefaultSamples);
 }
 
 void SongConsole::on_update() {

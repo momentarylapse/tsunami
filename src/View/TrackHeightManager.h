@@ -20,7 +20,8 @@ public:
 	TrackHeightManager();
 
 	float t;
-	bool dirty;
+	bool _dirty;
+	void set_dirty();
 	bool animating;
 	rect render_area;
 	hui::Timer timer;

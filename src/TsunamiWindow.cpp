@@ -7,6 +7,7 @@
 
 #include "TsunamiWindow.h"
 #include "Session.h"
+#include "EditModes.h"
 
 #include "Module/Audio/SongRenderer.h"
 #include "Tsunami.h"
@@ -121,13 +122,13 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	//set_key_code("layer-edit-midi", hui::KEY_ALT + hui::KEY_E);
 	event("mode-edit-check", [=]{
 		if (view->mode == view->mode_edit)
-			session->set_mode("default");
+			session->set_mode(EditMode::Default);
 		else
-			session->set_mode("edit-track");
+			session->set_mode(EditMode::EditTrack);
 	});
 	event("layer-edit", [=]{ on_track_edit_midi(); });
 	set_key_code("layer-edit", hui::KEY_ALT + hui::KEY_E);
-	event("layer-edit-curves", [=]{ session->set_mode("curves"); });
+	event("layer-edit-curves", [=]{ session->set_mode(EditMode::Curves); });
 	event("track-edit-fx", [=]{ on_track_edit_fx(); });
 	event("track-add-marker", [=]{ on_track_add_marker(); });
 	set_key_code("track-add-marker", hui::KEY_CONTROL + hui::KEY_J);
@@ -488,11 +489,11 @@ void TsunamiWindow::on_delete_track() {
 }
 
 void TsunamiWindow::on_track_edit_midi() {
-	session->set_mode("edit-track");
+	session->set_mode(EditMode::EditTrack);
 }
 
 void TsunamiWindow::on_track_edit_fx() {
-	session->set_mode("default/fx");
+	session->set_mode(EditMode::DefaultFx);
 }
 
 void TsunamiWindow::on_track_add_marker() {
@@ -549,15 +550,15 @@ void TsunamiWindow::on_layer_midi_mode_classical() {
 }
 
 void TsunamiWindow::on_song_properties() {
-	session->set_mode("default/song");
+	session->set_mode(EditMode::DefaultSong);
 }
 
 void TsunamiWindow::on_track_properties() {
-	session->set_mode("default/track");
+	session->set_mode(EditMode::DefaultTrack);
 }
 
 void TsunamiWindow::on_sample_properties() {
-	session->set_mode("default/sample-ref");
+	session->set_mode(EditMode::DefaultSampleRef);
 }
 
 void TsunamiWindow::on_delete_marker() {
@@ -577,7 +578,7 @@ void TsunamiWindow::on_edit_marker() {
 }
 
 void TsunamiWindow::on_marker_resize() {
-	session->set_mode("scale-marker");
+	session->set_mode(EditMode::ScaleMarker);
 }
 
 void TsunamiWindow::on_show_log() {
@@ -819,7 +820,7 @@ void TsunamiWindow::on_delete_shift() {
 }
 
 void TsunamiWindow::on_sample_manager() {
-	session->set_mode("default/samples");
+	session->set_mode(EditMode::DefaultSamples);
 }
 
 void TsunamiWindow::on_mixing_console() {
@@ -827,11 +828,11 @@ void TsunamiWindow::on_mixing_console() {
 }
 
 void TsunamiWindow::on_fx_console() {
-	session->set_mode("default/fx");
+	session->set_mode(EditMode::DefaultFx);
 }
 
 void TsunamiWindow::on_mastering_console() {
-	session->set_mode("default/mastering");
+	session->set_mode(EditMode::DefaultMastering);
 }
 
 void TsunamiWindow::on_sample_import() {
@@ -862,14 +863,14 @@ void TsunamiWindow::on_play_loop() {
 }
 
 void TsunamiWindow::on_play() {
-	if (session->in_mode("capture"))
+	if (session->in_mode(EditMode::Capture))
 		return;
 
 	view->play();
 }
 
 void TsunamiWindow::on_play_toggle() {
-	if (session->in_mode("capture"))
+	if (session->in_mode(EditMode::Capture))
 		return;
 
 	if (view->is_playback_active()) {
@@ -880,16 +881,17 @@ void TsunamiWindow::on_play_toggle() {
 }
 
 void TsunamiWindow::on_pause() {
-	if (session->in_mode("capture"))
+	if (session->in_mode(EditMode::Capture))
 		return;
 	view->pause(true);
 }
 
 void TsunamiWindow::on_stop() {
-	if (session->in_mode("capture")) {
-		session->set_mode("default");
-	} else
+	if (session->in_mode(EditMode::Capture)) {
+		session->set_mode(EditMode::Default);
+	} else {
 		view->stop();
+	}
 }
 
 void TsunamiWindow::on_insert_sample() {
@@ -897,7 +899,7 @@ void TsunamiWindow::on_insert_sample() {
 }
 
 void TsunamiWindow::on_record() {
-	session->set_mode("capture");
+	session->set_mode(EditMode::Capture);
 }
 
 void TsunamiWindow::on_add_layer() {
@@ -996,16 +998,16 @@ void TsunamiWindow::update_menu() {
 	enable("sample-delete", view->sel.num_samples() > 0);
 	enable("sample-properties", view->cur_sample());
 	// sound
-	enable("play", !session->in_mode("capture"));
-	enable("stop", view->is_playback_active() or session->in_mode("capture"));
+	enable("play", !session->in_mode(EditMode::Capture));
+	enable("stop", view->is_playback_active() or session->in_mode(EditMode::Capture));
 	enable("pause", view->is_playback_active() and !view->is_paused());
 	check("play-loop", view->looping());
-	enable("record", !session->in_mode("capture"));
+	enable("record", !session->in_mode(EditMode::Capture));
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
 	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_EDITOR));
 	check("show_devices", bottom_bar->is_active(BottomBar::DEVICE_CONSOLE));
-	check("sample_manager", session->in_mode("default/samples"));
+	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
 
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->is_save())
@@ -1210,7 +1212,7 @@ void TsunamiWindow::on_edit_bars() {
 }
 
 void TsunamiWindow::on_scale_bars() {
-	session->set_mode("scale-bars");
+	session->set_mode(EditMode::ScaleBars);
 }
 
 void TsunamiWindow::set_big_panel(ModulePanel* p) {

@@ -192,8 +192,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	vbox->add_child(hbox);
 	vbox->add_child(scroll_bar_time);
 
-	hbox->add_child(scroll_bar_y);
 	hbox->add_child(background);
+	hbox->add_child(scroll_bar_y);
 
 	scene_graph->add_child(cursor_start);
 	scene_graph->add_child(cursor_end);

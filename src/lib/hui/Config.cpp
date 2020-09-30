@@ -96,7 +96,12 @@ static string strip(const string &s) {
 }
 
 static string _parse_value(const string &s) {
-	return strip(s);
+	string r = strip(s);
+	if (r.head(1) == "\"" and r.tail(1) == "\"")
+		return r.substr(1, r.num-2).unescape();
+	if (r.head(1) == "\'" and r.tail(1) == "\'")
+		return r.substr(1, r.num-2).replace("\\\'", "\'");
+	return r;
 }
 
 bool Configuration::load(const Path &filename) {
@@ -153,12 +158,37 @@ bool Configuration::load(const Path &filename) {
 	}
 }
 
+bool string_needs_quotes(const string &v) {
+	if (v.num == 0)
+		return false;
+
+	if (v.head(1) == " " or v.tail(1) == " ")
+		return true;
+	if (v.has_char('\"') or v.has_char('\t') or v.has_char('\n'))
+		return true;
+	return false;
+}
+
+string str_simple_repr(const string &v) {
+	if (!string_needs_quotes(v))
+		return v;
+	int mode = 2;
+	if (v.has_char('\t') or v.has_char('\n'))
+		mode = 1;
+	if (v.has_char('\''))
+		mode = 1;
+
+	if (mode == 1)
+		return v.repr();
+	return "'" + v.replace("'", "\\'") + "'";
+}
+
 void Configuration::save(const Path &filename) {
 	dir_create(filename.parent());
 	try {
 		File *f = FileCreateText(filename);
 		for (auto &e: map)
-			f->write_str(format("%s = %s", e.key, e.value));
+			f->write_str(format("%s = %s", e.key, str_simple_repr(e.value)));
 
 		if (comments.num > 0)
 			f->write_str("");

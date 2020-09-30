@@ -88,6 +88,8 @@ bool file_is_directory(const Path &path) {
 
 
 void dir_create(const Path &dir) {
+	if (dir.is_empty())
+		return;
 	if (file_is_directory(dir))
 		return;
 #if defined(OS_WINDOWS)

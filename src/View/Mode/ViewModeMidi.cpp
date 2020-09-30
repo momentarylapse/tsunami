@@ -457,9 +457,9 @@ void ViewModeMidi::on_key_down(int k) {
 	auto mode = cur_vlayer()->midi_mode();
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 		if (input_mode == InputMode::DEFAULT) {
-			if (k == hui::KEY_0){
+			if (k == hui::KEY_0 or k == hui::KEY_1){
 				set_modifier(NoteModifier::NONE);
-			} else if (k == hui::KEY_FENCE) {
+			} else if (k == hui::KEY_2) {
 				set_modifier(NoteModifier::SHARP);
 			} else if (k == hui::KEY_3) {
 				set_modifier(NoteModifier::FLAT);
@@ -807,7 +807,7 @@ string ViewModeMidi::get_tip() {
 		message2 += _("    add note (0-9, A-F)");
 	} else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 		message += _("    octave (↑,↓)");
-		message2 += _("    modifiers (#,3,0)    add note (A-G)");
+		message2 += _("    modifiers (1-4)    add note (A-G)");
 	}
 	return message + message2;
 }

@@ -140,7 +140,7 @@ public:
 	const Class *name_space() const;
 
 	Variable *get_var(const string &name);
-	Variable *add_var(const string &name, const Class *type);
+	Variable *add_var(const string &name, const Class *type, bool is_const = false);
 };
 
 }

@@ -121,7 +121,7 @@ class Chord
 		NUM_TYPES = 19 # SINGLE_TONE + 12
 	int base_tone
 	int type
-	int[] pitch()
+	const int[] pitch()
 		if type == MAJOR
 			return [base_tone, base_tone + 4, base_tone + 7]
 		if type == MINOR

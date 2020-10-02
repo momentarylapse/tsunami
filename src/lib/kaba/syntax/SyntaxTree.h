@@ -138,7 +138,7 @@ public:
 	Node *cp_node(Node *c);
 	Node *ref_node(Node *sub, const Class *override_type = nullptr);
 	Node *deref_node(Node *sub, const Class *override_type = nullptr);
-	Node *shift_node(Node *sub, bool deref, int shift, const Class *type);
+	Node *shift_node(Node *sub, bool deref, int64 shift, const Class *type);
 
 	// pre processor
 	Node *conv_eval_const_func(Node *c);

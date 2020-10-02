@@ -206,10 +206,11 @@ void Block::set(int index, Node *c) {
 	params[index] = c;
 }
 
-Variable *Block::add_var(const string &name, const Class *type) {
+Variable *Block::add_var(const string &name, const Class *type, bool is_const) {
 	if (get_var(name))
 		function->owner()->do_error(format("variable '%s' already declared in this context", name));
 	Variable *v = new Variable(name, type);
+	v->is_const = is_const;
 	function->var.add(v);
 	vars.add(v);
 	return v;

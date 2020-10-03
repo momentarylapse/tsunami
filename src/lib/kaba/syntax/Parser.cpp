@@ -2583,13 +2583,9 @@ void Parser::parse_enum(Class *_namespace) {
 			if (Exp.cur == "=") {
 				Exp.next();
 				expect_no_new_line();
-				Value v;
-				get_constant_value(Exp.cur, v);
-				if (v.type == TypeInt)
-					value = v.as_int();
-				else
-					do_error("integer constant expected after '=' for explicit value of enum");
-				Exp.next();
+
+				Node *cv = parse_and_eval_const(tree->root_of_all_evil->block, TypeInt);
+				value = cv->as_const()->as_int();
 			}
 			c->as_int() = (value ++);
 
@@ -2813,10 +2809,7 @@ void Parser::expect_indent() {
 		do_error("additional indent expected");
 }
 
-void Parser::parse_named_const(const string &name, const Class *type, Class *name_space, Block *block) {
-	if (Exp.cur != "=")
-		do_error("'=' expected after const name");
-	Exp.next();
+Node *Parser::parse_and_eval_const(Block *block, const Class *type) {
 
 	// find const value
 	Node *cv = parse_operand_super_greedy(block);
@@ -2832,6 +2825,16 @@ void Parser::parse_named_const(const string &name, const Class *type, Class *nam
 		do_error("constant value expected");
 	if (cv->type != type)
 		do_error(format("constant value of type '%s' expected", type->long_name()));
+	return cv;
+}
+
+void Parser::parse_named_const(const string &name, const Class *type, Class *name_space, Block *block) {
+	if (Exp.cur != "=")
+		do_error("'=' expected after const name");
+	Exp.next();
+
+	// find const value
+	Node *cv = parse_and_eval_const(block, type);
 	Constant *c_value = cv->as_const();
 
 	auto *c = tree->add_constant(type, name_space);

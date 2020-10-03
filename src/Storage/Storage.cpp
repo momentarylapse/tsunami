@@ -155,6 +155,11 @@ bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
 	return ok;
 }
 
+Path Storage::temp_saving_file(const string &ext) {
+	return (tsunami->directory << "-temp-saving-.").with(ext);
+}
+
+// safety: first write to temp file, then (if successful) move
 bool Storage::save(Song *song, const Path &filename) {
 	current_directory = filename.parent();
 
@@ -162,13 +167,13 @@ bool Storage::save(Song *song, const Path &filename) {
 	if (!d)
 		return false;
 
-	session->i(_("saving ") + filename.str());
+	auto temp_file = temp_saving_file(filename.extension());
 
 	if (!d->test_compatibility(song))
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	auto od = StorageOperationData(session, f, filename, _("saving ") + d->description);
+	auto od = StorageOperationData(session, f, temp_file, _("saving ") + d->description);
 	od.song = song;
 	if (!f->get_parameters(&od, true)) {
 		delete f;
@@ -182,6 +187,14 @@ bool Storage::save(Song *song, const Path &filename) {
 	song->action_manager->mark_current_as_save();
 	if (session->win)
 		session->win->update_menu();
+
+	if (!od.errors_encountered) {
+		try {
+			file_rename(temp_file, filename);
+		} catch (Exception &e) {
+			od.error("failed to move temp file to target: " + e.message());
+		}
+	}
 
 	delete f;
 	return !od.errors_encountered;

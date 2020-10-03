@@ -46,6 +46,8 @@ public:
 
 	FormatDescriptor *get_format(const string &ext, int flags);
 
+	static Path temp_saving_file(const string &ext);
+
 //private:
 	Array<FormatDescriptor*> formats;
 	Path current_directory;

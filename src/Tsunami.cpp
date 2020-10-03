@@ -38,7 +38,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.99.0";
+const string AppVersion = "0.7.99.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -148,17 +148,19 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	string chain_file;
 	string plugin_file;
 	bool allow_window = false;
+	bool force = false;
 
 	CLIParser p;
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
 	p.flag("--slow", "", [&]{ ugly_hack_slow = true; });
 	p.flag("--mcd", "", [&]{ module_config_debug = true; });
+	p.flag("--force", "", [&]{ force = true; });
 	p.option("--plugin", "FILE", "add a plugin to run", [&](const string &a){ plugin_file = a; });
 	p.option("--chain", "FILE", "add a signal chain", [&](const string &a){ chain_file = a; });
 	p.option("--params", "PARAMS", "set loading parameters", [&](const string &a){ Storage::options_in = a; });
 
 
-	p.mode("", {"[FILE]"}, "open a window and (optionally) load a file", [&](const Array<string> &a){
+	p.mode("", {"[FILE]"}, "open a window and (optionally) load a file", [&](const Array<string> &a) {
 		Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
@@ -191,7 +193,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		for (string &filename: a)
-			if (session->storage->load_ex(song, filename, true))
+			if (session->storage->load_ex(song, filename, true) or force)
 				show_song(song);
 		delete song;
 	});
@@ -200,8 +202,8 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;
-		if (session->storage->load_ex(song1, a[0], true))
-			if (session->storage->load_ex(song2, a[1], true)) {
+		if (session->storage->load_ex(song1, a[0], true) or force)
+			if (session->storage->load_ex(song2, a[1], true) or force) {
 				auto r = diff_song(song1, song2);
 				if (r.num > 0)
 					msg_error("diffs: " + sa2s(r));
@@ -213,7 +215,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (session->storage->load(song, a[0]))
+		if (session->storage->load(song, a[0]) or force)
 			session->storage->save(song, a[1]);
 		delete song;
 	});

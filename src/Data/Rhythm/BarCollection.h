@@ -16,19 +16,18 @@ class Bar;
 class Range;
 
 
-class BarCollection : public Array<Bar*>
-{
+class BarCollection : public Array<Bar*> {
 public:
-	Array<Beat> get_beats(const Range &r, bool include_hidden = false, bool include_sub_beats = false, int sub_beat_partition = 1);
-	Array<Bar*> get_bars(const Range &r);
-	int get_next_beat(int pos);
-	int get_prev_beat(int pos);
-	int get_next_sub_beat(int pos, int sub_beat_partition);
-	int get_prev_sub_beat(int pos, int sub_beat_partition);
-	Range get_sub_beats(int pos, int sub_beat_partition, int num_sub_beats);
-	Range expand(const Range &r, int sub_beat_partition);
-	Range range();
-	Range sub_range(const Range &indices);
+	Array<Beat> get_beats(const Range &r, bool include_hidden = false, bool include_sub_beats = false, int sub_beat_partition = 1) const;
+	Array<Bar*> get_bars(const Range &r) const;
+	int get_next_beat(int pos) const;
+	int get_prev_beat(int pos) const;
+	int get_next_sub_beat(int pos, int sub_beat_partition) const;
+	int get_prev_sub_beat(int pos, int sub_beat_partition) const;
+	Range get_sub_beats(int pos, int sub_beat_partition, int num_sub_beats) const;
+	Range expand(const Range &r, int sub_beat_partition) const;
+	Range range() const;
+	Range sub_range(const Range &indices) const;
 };
 
 

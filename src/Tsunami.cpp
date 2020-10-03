@@ -109,6 +109,7 @@ void show_song(Song *song) {
 	msg_write(format("  sample-rate: %d", song->sample_rate));
 	msg_write(format("  samples: %d", song->range().length));
 	msg_write("  length: " + song->get_time_str(song->range().length));
+	msg_write(format("  bars: %d", song->bars.num));
 	msg_write(format("  tracks: %d", song->tracks.num));
 	int n = 0;
 	for (Track *t: song->tracks) {
@@ -212,9 +213,8 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (session->storage->load(song, a[0])) {
+		if (session->storage->load(song, a[0]))
 			session->storage->save(song, a[1]);
-		}
 		delete song;
 	});
 	p.mode("--execute", {"PLUGIN"}, "just run a plugin", [&](const Array<string> &a) {

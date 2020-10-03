@@ -39,7 +39,7 @@ int ChunkedFileParser::Context::end() {
 
 string ChunkedFileParser::Context::str() {
 	string s;
-	for (Layer &l : layers) {
+	for (Layer &l: layers) {
 		if (s.num > 0)
 			s += "/";
 		s += l.name;
@@ -53,8 +53,8 @@ FileChunkBasic::FileChunkBasic(const string &_name) {
 	context = nullptr;
 }
 FileChunkBasic::~FileChunkBasic() {
-	for (FileChunkBasic *c : children)
-		delete(c);
+	for (auto *c: children)
+		delete c;
 }
 void FileChunkBasic::create() {
 	throw Exception("no data creation... " + name);
@@ -105,16 +105,15 @@ void FileChunkBasic::write_sub(const string &name, void *p) {
 
 void FileChunkBasic::write_sub_parray(const string &name, DynamicArray &a) {
 	auto c = get_sub(name);
-	auto pa = (Array<void*>*)&a;
-	for (int i=0; i<pa->num; i++) {
-		c->set((*pa)[i]);
+	for (int i=0; i<a.num; i++) {
+		c->set(*(void**)a.simple_element(i));
 		c->write_complete();
 	}
 }
 void FileChunkBasic::write_sub_array(const string &name, DynamicArray &a) {
 	auto c = get_sub(name);
 	for (int i=0; i<a.num; i++) {
-		c->set((char*)a.data + a.element_size * i);
+		c->set(a.simple_element(i));
 		c->write_complete();
 	}
 }
@@ -122,7 +121,7 @@ void FileChunkBasic::write_sub_array(const string &name, DynamicArray &a) {
 void FileChunkBasic::write_begin_chunk(File *f) {
 	string s = name + "        ";
 	f->write_buffer(s.data, root->header_name_size);
-	f->write_int(0); // temporary
+	f->write_int(-1); // temporary
 	context->push(name, context->f->get_pos(), 0);
 }
 
@@ -156,10 +155,17 @@ string FileChunkBasic::read_header() {
 	int size = context->f->read_int();
 	int pos0 = context->f->get_pos();
 
+
+	if (size == -1) {
+		root->on_warn("chunk with undefined size.... trying to recover");
+		size = context->f->get_size() - context->f->get_pos();
+	}
+
 	if (size < 0)
 		throw Exception("chunk with negative size found");
 	if (pos0 + size > context->end())
 		throw Exception("inner chunk is larger than its parent");
+
 
 	context->push(cname, pos0, size);
 	return cname;
@@ -173,11 +179,10 @@ void FileChunkBasic::read_contents() {
 
 	// read nested chunks
 	while (f->get_pos() < context->end() - 8) {
-
 		string cname = read_header();
 
 		bool ok = false;
-		for (FileChunkBasic *c : children)
+		for (FileChunkBasic *c: children)
 			if (c->name == cname) {
 				c->set_parent(get());
 				c->create();
@@ -190,9 +195,7 @@ void FileChunkBasic::read_contents() {
 			string tt;
 			tt.resize(context->end() - f->get_pos());
 			f->read_buffer(tt);
-			if (tt.num > 100)
-				tt.resize(100);
-			msg_write(tt.hex());
+			msg_write(tt.substr(0, 100).hex());
 
 			if (root)
 				root->on_unhandled();

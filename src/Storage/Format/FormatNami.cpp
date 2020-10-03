@@ -997,9 +997,8 @@ public:
 			b.update_total();
 		}
 
-		for (int i=0; i<count; i++) {
+		for (int i=0; i<count; i++)
 			parent->bars.add(new Bar(b));
-		}
 	}
 	void write(File *f) override {
 		if (me->is_pause())
@@ -1257,7 +1256,7 @@ void FormatNami::save_song(StorageOperationData *od) {
 	try {
 		ChunkedFileFormatNami n;
 		n.write_file(od);
-	} catch(Exception &s) {
+	} catch (Exception &s) {
 		od->error("saving nami: " + s.message());
 	}
 }
@@ -1358,9 +1357,10 @@ void FormatNami::load_song(StorageOperationData *od) {
 	try {
 		ChunkedFileFormatNami n;
 		n.read_file(od);
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		od->error("loading nami: " + e.message());
 	}
+
 
 	// some post processing
 	make_consistent(od);

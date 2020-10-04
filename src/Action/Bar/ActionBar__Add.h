@@ -15,14 +15,13 @@ class Bar;
 class ActionBar__Add: public Action {
 public:
 	ActionBar__Add(int index, Bar *bar);
-	~ActionBar__Add();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	int index;
-	Bar *bar;
+	shared<Bar> bar;
 };
 
 #endif /* SRC_ACTION_BAR_ACTIONBAR__ADD_H_ */

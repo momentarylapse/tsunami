@@ -12,17 +12,15 @@
 
 class Bar;
 
-class ActionBar__Delete: public Action
-{
+class ActionBar__Delete: public Action {
 public:
 	ActionBar__Delete(int index);
-	~ActionBar__Delete();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	Bar *bar;
+	shared<Bar> bar;
 	int index;
 };
 

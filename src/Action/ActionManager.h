@@ -47,7 +47,7 @@ private:
 	bool _try_merge_into_head(Action *a);
 	void _add_to_history(Action *a);
 	Data *data;
-	Array<Action*> action;
+	owned_array<Action> action;
 	int cur_pos;
 	int save_pos;
 
@@ -64,10 +64,10 @@ private:
 
 	// group
 	int cur_group_level;
-	ActionGroup *cur_group;
+	owned<ActionGroup> cur_group;
 
 	// for merging
-	hui::Timer *timer;
+	owned<hui::Timer> timer;
 };
 
 #endif /* ACTIONMANAGER_H_ */

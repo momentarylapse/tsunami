@@ -90,8 +90,8 @@ void CaptureConsole::on_enter() {
 	}
 
 	mode->enter();
-	chain = mode->chain;
-	view->mode_capture->chain = mode->chain;
+	chain = mode->chain.get();
+	view->mode_capture->chain = chain;
 
 	view->signal_chain->subscribe(this, [=]{ on_putput_tick(); }, Module::MESSAGE_TICK);
 	view->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);

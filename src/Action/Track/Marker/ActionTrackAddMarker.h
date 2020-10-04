@@ -17,13 +17,12 @@ class Range;
 class ActionTrackAddMarker: public Action {
 public:
 	ActionTrackAddMarker(TrackLayer *l, TrackMarker *marker);
-	~ActionTrackAddMarker() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	TrackMarker *marker;
+	shared<TrackMarker> marker;
 	TrackLayer *layer;
 };
 

@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_RHYTHM_BAR_H_
 #define SRC_DATA_RHYTHM_BAR_H_
 
+#include "../../lib/base/pointer.h"
 #include "../Range.h"
 
 #ifdef IGNORE
@@ -17,7 +18,7 @@
 class BarCollection;
 class Beat;
 
-class BarPattern {
+class BarPattern : public Sharable<Empty> {
 public:
 	BarPattern();
 	BarPattern(int length, int num_beats, int divisor);

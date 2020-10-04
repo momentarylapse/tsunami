@@ -110,7 +110,6 @@ void CaptureConsoleModeMidi::update_device_list() {
 void CaptureConsoleModeMidi::leave() {
 	session->device_manager->unsubscribe(this);
 	cc->peak_meter->set_source(nullptr);
-	delete chain;
 	chain = nullptr;
 }
 

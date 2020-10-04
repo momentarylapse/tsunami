@@ -8,9 +8,15 @@
 #include "TrackMarker.h"
 #include "Midi/Scale.h"
 
-string TrackMarker::nice_text() const
-{
-	if (marker_is_key(text)){
+TrackMarker::TrackMarker() {}
+
+TrackMarker::TrackMarker(const Range &r, const string &t) {
+	range = r;
+	text = t;
+}
+
+string TrackMarker::nice_text() const {
+	if (marker_is_key(text)) {
 		Scale s = parse_marker_key(text);
 		return s.nice_name();
 	}
@@ -18,13 +24,11 @@ string TrackMarker::nice_text() const
 }
 
 
-bool marker_is_key(const string &text)
-{
+bool marker_is_key(const string &text) {
 	return text.match("::key=*::");
 }
 
-Scale parse_marker_key(const string &text)
-{
+Scale parse_marker_key(const string &text) {
 	Scale scale = Scale::C_MAJOR;
 	if (!marker_is_key(text))
 		return scale;

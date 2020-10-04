@@ -22,29 +22,21 @@ ActionManager::ActionManager(Data *_data) {
 
 ActionManager::~ActionManager() {
 	reset();
-	//delete(mutex);
-	delete timer;
 }
 
 void ActionManager::reset() {
-	for (Action *a: action)
-		delete a;
 	action.clear();
 	cur_pos = 0;
 	save_pos = 0;
 	cur_level = 0;
 	enabled = true;
 	cur_group_level = 0;
-	if (cur_group)
-		delete cur_group;
 	cur_group = nullptr;
 	notify();
 }
 
 
 void ActionManager::_truncate_future_history() {
-	for (int i=cur_pos; i<action.num; i++)
-		delete action[i];
 	action.resize(cur_pos);
 }
 
@@ -172,9 +164,7 @@ void ActionManager::group_end() {
 	assert(cur_group_level >= 0);
 
 	if (cur_group_level == 0) {
-		auto *g = cur_group;
-		cur_group = nullptr;
-		_add_to_history(g);
+		_add_to_history(cur_group.check_out());
 		_edit_end();
 	}
 }

@@ -9,6 +9,7 @@
 #define SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODE_H_
 
 #include "../../../lib/base/base.h"
+#include "../../../lib/base/pointer.h"
 
 class CaptureConsole;
 class Song;
@@ -19,7 +20,6 @@ class SignalChain;
 class CaptureConsoleMode : public VirtualBase {
 public:
 	CaptureConsoleMode(CaptureConsole *cc);
-	virtual ~CaptureConsoleMode(){};
 	virtual void enter() = 0;
 	virtual void leave() = 0;
 	
@@ -34,7 +34,7 @@ public:
 	Session *session;
 	Song *song;
 	AudioView *view;
-	SignalChain *chain;
+	owned<SignalChain> chain;
 };
 
 

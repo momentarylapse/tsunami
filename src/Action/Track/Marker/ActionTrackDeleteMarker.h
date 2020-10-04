@@ -15,14 +15,13 @@ class TrackMarker;
 class ActionTrackDeleteMarker: public Action {
 public:
 	ActionTrackDeleteMarker(TrackLayer *l, int index);
-	~ActionTrackDeleteMarker() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	int index;
-	TrackMarker *marker;
+	shared<TrackMarker> marker;
 	TrackLayer *layer;
 };
 

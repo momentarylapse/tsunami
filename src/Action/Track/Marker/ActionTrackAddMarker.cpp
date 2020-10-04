@@ -14,21 +14,14 @@ ActionTrackAddMarker::ActionTrackAddMarker(TrackLayer *l, TrackMarker *m) {
 	marker = m;
 }
 
-ActionTrackAddMarker::~ActionTrackAddMarker() {
-	if (marker)
-		delete marker;
-}
-
 void *ActionTrackAddMarker::execute(Data *d) {
-	layer->markers.add(marker);
+	layer->markers.add(marker.get());
 	layer->notify();
-	auto *m = marker;
-	marker = nullptr;
-	return m;
+	return marker.get();
 }
 
 void ActionTrackAddMarker::undo(Data *d) {
-	marker = layer->markers.pop();
+	layer->markers.pop();
 	//marker->fake_death();
 	layer->notify();
 }

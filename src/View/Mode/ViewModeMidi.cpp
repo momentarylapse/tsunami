@@ -97,15 +97,9 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	rep_key = -1;
 	rep_key_num = 0;
 
-	preview = nullptr;
 	maximize_input_volume = true;
 
 	mouse_pre_moving_pos = -1;
-}
-
-ViewModeMidi::~ViewModeMidi() {
-	if (preview)
-		delete preview;
 }
 
 
@@ -252,7 +246,6 @@ void ViewModeMidi::on_start() {
 }
 
 void ViewModeMidi::on_end() {
-	delete preview;
 	preview = nullptr;
 
 	for (auto *v: view->vlayer)

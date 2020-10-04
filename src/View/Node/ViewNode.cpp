@@ -38,7 +38,6 @@ void ViewNode::add_child(ViewNode* child) {
 }
 
 void ViewNode::delete_child(ViewNode* child) {
-	delete child;
 	for (int i=0; i<children.num; i++)
 		if (children[i] == child)
 			children.erase(i);

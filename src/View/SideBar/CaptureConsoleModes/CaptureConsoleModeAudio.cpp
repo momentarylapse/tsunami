@@ -116,6 +116,5 @@ void CaptureConsoleModeAudio::leave() {
 	session->device_manager->unsubscribe(this);
 	chain->stop();
 	cc->peak_meter->set_source(nullptr);
-	delete chain;
 	chain = nullptr;
 }

@@ -17,7 +17,6 @@ class Track;
 class ViewModeDefault : public ViewMode {
 public:
 	ViewModeDefault(AudioView *view);
-	virtual ~ViewModeDefault();
 
 	void on_mouse_wheel() override;
 	void on_key_down(int k) override;

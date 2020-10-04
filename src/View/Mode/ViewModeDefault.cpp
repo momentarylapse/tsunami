@@ -152,9 +152,6 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 {
 }
 
-ViewModeDefault::~ViewModeDefault() {
-}
-
 void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
 	if (view->select_xor) {

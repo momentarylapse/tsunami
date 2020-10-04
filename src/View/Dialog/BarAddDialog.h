@@ -10,6 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/Range.h"
+#include "../../Data/Rhythm/Bar.h"
 
 class Song;
 class Bar;
@@ -19,7 +20,7 @@ public:
 	Song *song;
 	int index;
 
-	Bar *new_bar;
+	Bar new_bar;
 
 	BarAddDialog(hui::Window *root, Song *s, int index);
 

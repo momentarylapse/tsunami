@@ -28,10 +28,7 @@ public:
 	color fg, fg_sel;
 };
 
-class Empty {
-};
-
-class GridPainter : public Sharable<Empty> {
+class GridPainter {
 public:
 	GridPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);

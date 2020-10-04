@@ -94,15 +94,23 @@ public:
 		clear();
 	}
 	void clear() {
+		pdb("owned[] ");
 		for (T *p: *this)
 			delete p;
 		Array<T*>::clear();
 	}
+	void resize(int size) {
+		for (int i=size; i<this->num; i++)
+			delete (*this)[i];
+		Array<T*>::resize(size);
+	}
 	void erase(int index) {
+		pdb("owned[] erase");
 		delete (*this)[index];
 		Array<T*>::erase(index);
 	}
 	T *extract(int index) {
+		pdb("owned[] extract");
 		auto p = (*this)[index];
 		Array<T*>::erase(index);
 		return p;
@@ -113,6 +121,7 @@ public:
 	}
 };
 
+class Empty {};
 
 template <class T>
 class Sharable : public T {
@@ -244,6 +253,15 @@ public:
 				delete p;
 		}
 		Array<T*>::clear();
+	}
+	void resize(int size) {
+		for (int i=size; i<this->num; i++) {
+			auto p = (*this)[i];
+			p->_pointer_unref();
+			if (!p->_has_pointer_refs())
+				delete p;
+		}
+		Array<T*>::resize(size);
 	}
 	void add(T *p) {
 		pdb("shared[] add");

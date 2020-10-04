@@ -14,29 +14,27 @@
 class Data;
 class ActionManager;
 
-class ActionGroup: public Action
-{
+class ActionGroup: public Action {
 	friend class ActionManager;
 public:
 	ActionGroup();
-	virtual ~ActionGroup();
 
-	virtual string name(){	return "-group-";	}
+	//string name() override { return "-group-"; }
 
 	virtual void build(Data *d) = 0;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
-	virtual void redo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
+	void redo(Data *d) override;
 
-	virtual bool is_trivial();
+	bool is_trivial() override;
 
 protected:
 	void *add_sub_action(Action *a, Data *d);
 	virtual void *execute_return(Data *d);
 
 private:
-	Array<Action*> action;
+	owned_array<Action> action;
 };
 
 #endif /* ACTIONGROUP_H_ */

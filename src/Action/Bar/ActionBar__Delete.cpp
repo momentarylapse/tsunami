@@ -16,11 +16,6 @@ ActionBar__Delete::ActionBar__Delete(int _index) {
 	bar = nullptr;
 }
 
-ActionBar__Delete::~ActionBar__Delete() {
-	if (bar)
-		delete bar;
-}
-
 void *ActionBar__Delete::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
@@ -40,5 +35,4 @@ void ActionBar__Delete::undo(Data *d) {
 
 	s->bars.insert(bar, index);
 	s->notify(s->MESSAGE_EDIT_BARS);
-	bar = nullptr;
 }

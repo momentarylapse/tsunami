@@ -16,11 +16,6 @@ ActionBar__Add::ActionBar__Add(int _index, Bar *_bar) {
 	bar = _bar;
 }
 
-ActionBar__Add::~ActionBar__Add() {
-	if (bar)
-		delete bar;
-}
-
 void *ActionBar__Add::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
@@ -28,7 +23,6 @@ void *ActionBar__Add::execute(Data *d) {
 
 	s->bars.insert(bar, index);
 	s->notify(s->MESSAGE_EDIT_BARS);
-	bar = nullptr;
 
 	return nullptr;
 }
@@ -36,7 +30,6 @@ void *ActionBar__Add::execute(Data *d) {
 void ActionBar__Add::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
-	bar = s->bars[index];
 	s->bars.erase(index);
 	s->notify(s->MESSAGE_EDIT_BARS);
 }

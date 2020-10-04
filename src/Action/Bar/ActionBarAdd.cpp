@@ -27,10 +27,6 @@ ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode) {
 	mode = _mode;
 }
 
-ActionBarAdd::~ActionBarAdd() {
-	delete bar;
-}
-
 void ActionBarAdd::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	add_sub_action(new ActionBar__Add(index, bar), d);

@@ -9,6 +9,7 @@
 #define SRC_VIEW_MODE_VIEWMODEMIDI_H_
 
 #include "ViewModeDefault.h"
+#include "../../lib/base/pointer.h"
 #include "../../lib/math/math.h"
 
 class MidiNoteBuffer;
@@ -30,7 +31,6 @@ enum class ChordType;
 class ViewModeMidi : public ViewModeDefault {
 public:
 	ViewModeMidi(AudioView *view);
-	virtual ~ViewModeMidi();
 
 	void on_start() override;
 	void on_end() override;
@@ -96,7 +96,7 @@ public:
 	void set_input_mode(InputMode mode);
 	InputMode input_mode;
 
-	MidiPreview *preview;
+	owned<MidiPreview> preview;
 	Device *input_wanted_device;
 	Device *input_device();
 	bool input_wanted_active;

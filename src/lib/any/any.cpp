@@ -343,7 +343,7 @@ bool str_is_number(const string &s) {
 void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 	auto expect_no_end = [&tokens, &pos] {
 		if (pos >= tokens.num)
-			throw Exception("string ended unexpectedly");
+			throw Exception("string ended unexpectedly: " + sa2s(tokens));
 	};
 	auto expect_token = [&tokens, &pos, expect_no_end] (const string &t) {
 		expect_no_end();
@@ -412,6 +412,7 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 Any Any::parse(const string &s) {
 	auto tokens = s.parse_tokens(",:[](){}\"");
 	int pos = 0;
+	msg_write("parse: " + s);
 
 	Any r;
 	any_parse_part(r, tokens, pos);

@@ -9,16 +9,19 @@
 #define SRC_DATA_TRACKMARKER_H_
 
 #include "Range.h"
+#include "../Module/Audio/AudioEffect.h"
 
 class AudioEffect;
 class Scale;
 
 
-class TrackMarker {
+class TrackMarker : public Sharable<Empty>{
 public:
+	TrackMarker();
+	TrackMarker(const Range &r, const string &t);
 	Range range;
 	string text;
-	Array<AudioEffect*> fx;
+	shared_array<AudioEffect> fx;
 
 	string nice_text() const;
 };

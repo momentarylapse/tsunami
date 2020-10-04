@@ -10,13 +10,15 @@
 
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/pointer.h"
+#include "Bar.h"
 
 class Beat;
 class Bar;
 class Range;
 
 
-class BarCollection : public Array<Bar*> {
+class BarCollection : public shared_array<Bar> {
 public:
 	Array<Beat> get_beats(const Range &r, bool include_hidden = false, bool include_sub_beats = false, int sub_beat_partition = 1) const;
 	Array<Bar*> get_bars(const Range &r) const;

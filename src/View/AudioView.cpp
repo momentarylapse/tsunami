@@ -125,8 +125,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 {
 	id = _id;
 	session = _session;
-	win = session->win;
-	song = session->song;
+	win = session->win.get();
+	song = session->song.get();
 	_optimize_view_requested = false;
 
 	perf_channel = PerformanceMonitor::create_channel("view", this);

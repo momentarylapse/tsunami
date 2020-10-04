@@ -8,6 +8,7 @@
 #ifndef SIDEBAR_H_
 #define SIDEBAR_H_
 
+#include "../../lib/base/pointer.h"
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observable.h"
 
@@ -28,7 +29,7 @@ class Session;
 class SideBar : public Observable<hui::Panel> {
 public:
 	SideBar(Session *session);
-	virtual ~SideBar();
+	~SideBar() override;
 
 	void on_close();
 	void on_choose();
@@ -67,27 +68,26 @@ public:
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;
 
-	Array<SideBarConsole*> consoles;
+	owned_array<SideBarConsole> consoles;
 	void add_console(SideBarConsole *c);
 
 	Session *session;
 };
 
 
-class SideBarConsole : public hui::Panel
-{
+class SideBarConsole : public hui::Panel {
 public:
 	SideBarConsole(const string &_title, Session *_session);
 	string title;
 	Session *session;
 	Song *song;
 	AudioView *view;
-	SideBar *bar(){ return dynamic_cast<SideBar*>(parent); }
+	SideBar *bar() { return dynamic_cast<SideBar*>(parent); }
 
-	virtual void on_enter(){}
-	virtual void on_leave(){}
-	virtual void on_set_large(bool large){}
-	virtual bool allow_close(){ return true; }
+	virtual void on_enter() {}
+	virtual void on_leave() {}
+	virtual void on_set_large(bool large) {}
+	virtual bool allow_close() { return true; }
 };
 
 #endif /* BOTTOMBAR_H_ */

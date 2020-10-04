@@ -12,6 +12,7 @@ ViewNode::ViewNode() : ViewNode(0, 0) {
 }
 
 ViewNode::ViewNode(float w, float h) {
+	msg_write("new ViewNode " + p2s(this));
 	align.horizontal = AlignData::Mode::NONE;
 	align.vertical = AlignData::Mode::NONE;
 	align.dx = 0;

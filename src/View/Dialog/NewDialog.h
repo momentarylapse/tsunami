@@ -10,6 +10,7 @@
 
 
 #include "../../lib/hui/hui.h"
+#include "../../Data/Rhythm/Bar.h"
 
 class Song;
 class Bar;
@@ -19,7 +20,7 @@ class NewDialog: public hui::Dialog {
 public:
 	NewDialog(hui::Window *_parent);
 
-	Bar *new_bar;
+	Bar new_bar;
 	SignalType type;
 
 	void load_data();

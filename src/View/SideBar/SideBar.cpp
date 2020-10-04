@@ -74,7 +74,7 @@ SideBar::SideBar(Session *_session) {
 }
 
 SideBar::~SideBar() {
-	if ((visible) and (active_console >= 0))
+	if (visible and (active_console >= 0))
 		consoles[active_console]->on_leave();
 }
 
@@ -91,7 +91,7 @@ void SideBar::on_close() {
 }
 
 void SideBar::_show() {
-	if ((!visible) and (active_console >= 0))
+	if (!visible and (active_console >= 0))
 		consoles[active_console]->on_enter();
 
 	reveal("revealer", true);
@@ -101,7 +101,7 @@ void SideBar::_show() {
 
 // FIXME: this is the official closing function...
 void SideBar::_hide() {
-	if ((visible) and (active_console >= 0))
+	if (visible and (active_console >= 0))
 		consoles[active_console]->on_leave();
 
 	reveal("revealer", false);
@@ -148,7 +148,7 @@ bool SideBar::allow_close() {
 SideBarConsole::SideBarConsole(const string &_title, Session *_session) {
 	title = _title;
 	session = _session;
-	song = session->song;
+	song = session->song.get();
 	view = session->view;
 }
 

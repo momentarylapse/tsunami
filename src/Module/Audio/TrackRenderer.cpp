@@ -91,7 +91,6 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		synth = (Synthesizer*)t->synth->copy();
 	synth->set_sample_rate(t->song->sample_rate);
 	synth->set_instrument(t->instrument);
-	midi_streamer = nullptr;
 
 	if (direct_mode) {
 		fx = t->fx;
@@ -108,8 +107,10 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		synth->_plug_in(0, midi_streamer.get(), 0);
 		fill_midi_streamer();
 	} else if (t->type == SignalType::BEATS) {
-
-		synth->_plug_in(0, sr->beat_midifier, 0);
+		beat_midifier = new BeatMidifier;
+		beat_midifier->_plug_in(0, sr->bar_streamer.get(), 0);
+		beat_midifier->perf_set_parent(this);
+		synth->_plug_in(0, beat_midifier.get(), 0);
 	}
 	
 	perf_set_parent(song_renderer);
@@ -212,7 +213,7 @@ void TrackRenderer::on_track_replace_synth() {
 	if (track->type == SignalType::MIDI) {
 		synth->_plug_in(0, midi_streamer.get(), 0);
 	} else if (track->type == SignalType::BEATS) {
-		synth->_plug_in(0, song_renderer->beat_midifier, 0);
+		synth->_plug_in(0, beat_midifier.get(), 0);
 	}
 	synth->perf_set_parent(this);
 }
@@ -427,8 +428,7 @@ int TrackRenderer::read(AudioBuffer &buf) {
 	auto _fx = fx;
 	if (song_renderer and song_renderer->preview_effect)
 		_fx.add(song_renderer->preview_effect);
-	if (_fx.num > 0)
-		apply_fx(buf, _fx);
+	apply_fx(buf, _fx);
 
 	buf.mix_stereo(track->volume, track->panning);
 

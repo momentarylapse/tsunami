@@ -9,6 +9,7 @@
 #define SRC_STORAGE_STORAGEOPERATIONDATA_H_
 
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 #include "../lib/any/any.h"
 #include "../lib/file/path.h"
 
@@ -31,7 +32,6 @@ enum class SampleFormat;
 class StorageOperationData {
 public:
 	StorageOperationData(Session *session, Format *format, const Path &filename, const string &message);
-	virtual ~StorageOperationData();
 
 	void info(const string &message);
 	void warn(const string &message);
@@ -56,7 +56,7 @@ public:
 
 	Session *session;
 	Song *song;
-	Progress *progress;
+	owned<Progress> progress;
 	Path filename;
 	AudioBuffer *buf;
 	int channels_suggested;

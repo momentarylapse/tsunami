@@ -29,10 +29,10 @@ NewDialog::NewDialog(hui::Window *_parent):
 	type = SignalType::AUDIO_MONO;
 	check("type-audio-mono", true);
 
-	new_bar = new Bar(1000, 4, 1);
+	new_bar = Bar(1000, 4, 1);
 	set_int("num_bars", 32);
-	set_int("beats", new_bar->beats.num);
-	set_string("pattern", new_bar->pat_str());
+	set_int("beats", new_bar.beats.num);
+	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
 
 	event("cancel", [=]{ destroy(); });
@@ -51,16 +51,16 @@ NewDialog::NewDialog(hui::Window *_parent):
 void NewDialog::on_ok() {
 	int sample_rate = get_string("sample_rate")._int();
 	Session *session = tsunami->create_session();
-	Song *song = session->song;
+	Song *song = session->song.get();
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
-	if (is_checked("metronome")){
+	if (is_checked("metronome")) {
 		song->add_track(SignalType::BEATS, 0);
 		int count = get_int("num_bars");
 		float bpm = get_float("beats_per_minute");
-		new_bar->set_bpm(bpm, song->sample_rate);
+		new_bar.set_bpm(bpm, song->sample_rate);
 		for (int i=0; i<count; i++)
-			song->add_bar(-1, *new_bar, false);
+			song->add_bar(-1, new_bar, false);
 	}
 	song->add_track(type);
 
@@ -77,17 +77,17 @@ void NewDialog::on_ok() {
 }
 
 void NewDialog::on_beats() {
-	*new_bar = Bar(100, get_int(""), new_bar->divisor);
-	set_string("pattern", new_bar->pat_str());
+	new_bar = Bar(100, get_int(""), new_bar.divisor);
+	set_string("pattern", new_bar.pat_str());
 }
 
 void NewDialog::on_divisor() {
-	new_bar->divisor = 1 << get_int("");
+	new_bar.divisor = 1 << get_int("");
 }
 
 void NewDialog::on_pattern() {
-	set_bar_pattern(*new_bar, get_string("pattern"));
-	set_int("beats", new_bar->beats.num);
+	set_bar_pattern(new_bar, get_string("pattern"));
+	set_int("beats", new_bar.beats.num);
 }
 
 void NewDialog::on_complex() {

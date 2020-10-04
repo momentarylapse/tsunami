@@ -51,7 +51,7 @@ Array<UnitTest::Test> TestPointer::tests() {
 
 void TestPointer::test_owned() {
 	{
-		auto own = owned<X>(new X());
+		auto own = ownify(new X());
 		assert_equal(X::instance_count, 1);
 		auto x = std::move(own);
 		assert_equal(X::instance_count, 1);

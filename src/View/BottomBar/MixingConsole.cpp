@@ -97,7 +97,7 @@ public:
 
 		vtrack = t;
 		track = t->track;
-		auto *song = console->session->song;
+		auto *song = console->session->song.get();
 		song->subscribe(this, [=]{ update(); }, song->MESSAGE_ENABLE_FX);
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
@@ -159,13 +159,12 @@ public:
 	}
 
 	Module *selected_module = nullptr;
-	ModulePanel *config_panel = nullptr;
+	owned<ModulePanel> config_panel;
+
 	void select_module(Module *m) {
 		if (selected_module)
 			selected_module->unsubscribe(this);
 
-		if (config_panel)
-			delete config_panel;
 		config_panel = nullptr;
 
 		selected_module = m;
@@ -184,7 +183,7 @@ public:
 				config_panel->set_func_enable([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
 				config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
 			}
-			embed(config_panel, config_grid_id, 0, 0);
+			embed(config_panel.get(), config_grid_id, 0, 0);
 
 			m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);
 		}
@@ -229,7 +228,7 @@ public:
 			track->enable_effect(track->fx[n], !track->fx[n]->enabled);
 	}
 	void on_fx_copy_from_track() {
-		auto *dlg = new TrackSelectionDialog(win, track->song);
+		auto dlg = ownify(new TrackSelectionDialog(win, track->song));
 		dlg->run();
 		if (dlg->selected and dlg->selected != track) {
 			track->song->begin_action_group();
@@ -239,7 +238,6 @@ public:
 				track->add_effect((AudioEffect*)fx->copy());
 			track->song->end_action_group();
 		}
-		delete dlg;
 	}
 	void on_add_fx() {
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
@@ -400,11 +398,6 @@ MixingConsole::~MixingConsole() {
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
 	device_manager->unsubscribe(this);
-	for (TrackMixer *m: mixer)
-		delete m;
-	delete peak_meter;
-	delete spectrum_meter;
-	delete menu_fx;
 }
 
 void MixingConsole::on_chain_state_change() {
@@ -443,10 +436,8 @@ void MixingConsole::load_data() {
 	}
 
 	// delete non-matching
-	for (int i=n_ok; i<mixer.num; i++) {
-		delete mixer[i];
+	for (int i=n_ok; i<mixer.num; i++)
 		remove_control("separator-" + i2s(i));
-	}
 	mixer.resize(n_ok);
 
 	// add new

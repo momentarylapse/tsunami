@@ -16,6 +16,10 @@ static void pdb(const string &s) {
 	msg_write(s);
 }
 
+static void crash() {
+	int *p = nullptr;
+	*p = 0;
+}
 
 
 template <class T>
@@ -87,6 +91,13 @@ public:
 	}
 };
 
+
+
+template<class T>
+auto ownify(T *p) {
+	return owned<T>(p);
+}
+
 template <class T>
 class owned_array : public Array<T*> {
 public:
@@ -135,6 +146,11 @@ public:
 	void _pointer_unref() {
 		_pointer_ref_counter --;
 		pdb(format("unref %s -> %d", p2s(this), _pointer_ref_counter));
+		if (_pointer_ref_counter < 0) {
+			msg_error("---- OOOOOOO");
+			crash();
+			exit(1);
+		}
 	}
 	bool _has_pointer_refs() {
 		return _pointer_ref_counter > 0;

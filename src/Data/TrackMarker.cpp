@@ -8,9 +8,12 @@
 #include "TrackMarker.h"
 #include "Midi/Scale.h"
 
-TrackMarker::TrackMarker() {}
+TrackMarker::TrackMarker() {
+	msg_write("new TrackMarker " + p2s(this));
+}
 
 TrackMarker::TrackMarker(const Range &r, const string &t) {
+	msg_write("new TrackMarker " + p2s(this));
 	range = r;
 	text = t;
 }

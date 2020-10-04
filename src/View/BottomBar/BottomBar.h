@@ -8,6 +8,7 @@
 #ifndef SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_
 #define SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_
 
+#include "../../lib/base/pointer.h"
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observable.h"
 
@@ -26,7 +27,6 @@ class PluginConsole;
 class BottomBar : public Observable<hui::Panel> {
 public:
 	BottomBar(Session *session);
-	virtual ~BottomBar();
 
 
 	enum {
@@ -74,7 +74,7 @@ public:
 
 	int index(Console *console);
 
-	Array<Console*> consoles;
+	owned_array<Console> consoles;
 	void add_console(Console *c, const string &list_name);
 };
 

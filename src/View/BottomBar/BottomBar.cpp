@@ -57,9 +57,6 @@ BottomBar::BottomBar(Session *session) {
 			open(c);
 }
 
-BottomBar::~BottomBar() {
-}
-
 void BottomBar::on_close() {
 	_hide();
 }
@@ -142,7 +139,7 @@ BottomBar::Console::Console(const string &_title, Session *_session) {
 	title = _title;
 	notify = false;
 	session = _session;
-	song = session->song;
+	song = session->song.get();
 	view = session->view;
 }
 

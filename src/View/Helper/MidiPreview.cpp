@@ -150,10 +150,6 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	chain->mark_all_modules_as_system();
 }
 
-MidiPreview::~MidiPreview() {
-	delete chain;
-}
-
 void MidiPreview::start(const Array<int> &pitch, float volume, float ttl) {
 	//kill_preview();
 

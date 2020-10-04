@@ -8,6 +8,7 @@
 #ifndef TSUNAMI_H_
 #define TSUNAMI_H_
 
+#include "lib/base/pointer.h"
 #include "lib/hui/hui.h"
 
 extern const string AppName;
@@ -27,8 +28,7 @@ class TsunamiWindow;
 class Session;
 class PerformanceMonitor;
 
-class Tsunami : public hui::Application
-{
+class Tsunami : public hui::Application {
 public:
 	Tsunami();
 	virtual ~Tsunami();
@@ -42,14 +42,14 @@ public:
 	Session* create_session();
 	bool allow_termination();
 
-	Array<Session*> sessions;
+	shared_array<Session> sessions;
 
-	Log *log;
+	owned<Log> log;
 
-	DeviceManager *device_manager;
-	PluginManager *plugin_manager;
-	Clipboard *clipboard;
-	PerformanceMonitor *perf_mon;
+	owned<DeviceManager> device_manager;
+	owned<PluginManager> plugin_manager;
+	owned<Clipboard> clipboard;
+	owned<PerformanceMonitor> perf_mon;
 };
 
 

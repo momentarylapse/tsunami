@@ -53,10 +53,8 @@ const string EditMode::Curves = "curves";
 
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon) {
-	win = nullptr;
 	view = nullptr;
 	_kaba_win = nullptr;
-	song = nullptr;
 	storage = new Storage(this);
 
 	log = _log;
@@ -70,12 +68,6 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	die_on_plugin_stop = false;
 }
 
-Session::~Session() {
-	if (song)
-		delete song;
-	delete storage;
-}
-
 int Session::sample_rate() {
 	if (song)
 		return song->sample_rate;
@@ -85,7 +77,7 @@ int Session::sample_rate() {
 void Session::set_win(TsunamiWindow *_win) {
 	win = _win;
 	view = win->view;
-	_kaba_win = dynamic_cast<hui::Window*>(win);
+	_kaba_win = dynamic_cast<hui::Window*>(win.get());
 }
 
 Session *Session::create_child() {
@@ -136,7 +128,6 @@ void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 		foreachi (auto *pp, plugins, i)
 			if (p == pp)
 				plugins.erase(i);
-		delete p;
 	});
 
 	/*tpl->stop();

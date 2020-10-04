@@ -68,41 +68,31 @@ Tsunami::Tsunami() :
 }
 
 Tsunami::~Tsunami() {
-	delete device_manager;
-	delete plugin_manager;
-	delete clipboard;
-	delete log;
-	delete perf_mon;
 }
 
 void Tsunami::on_end() {
-	while (sessions.num > 0) {
-		Session *s = sessions.pop();
-		delete s;
-	}
+	sessions.clear();
 }
 
-bool Tsunami::on_startup(const Array<string> &_arg) {
-	Array<string> arg = _arg;
+bool Tsunami::on_startup(const Array<string> &arg) {
 	tsunami = this;
 
 	perf_mon = new PerformanceMonitor;
 
 	log = new Log;
 
-	Session::GLOBAL = new Session(log, nullptr, nullptr, perf_mon);
+	Session::GLOBAL = new Session(log.get(), nullptr, nullptr, perf_mon.get());
 
 	clipboard = new Clipboard;
 
 	device_manager = new DeviceManager(Session::GLOBAL);
-	Session::GLOBAL->device_manager = device_manager;
+	Session::GLOBAL->device_manager = device_manager.get();
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
-	Session::GLOBAL->plugin_manager = plugin_manager;
+	Session::GLOBAL->plugin_manager = plugin_manager.get();
 
 	plugin_manager->link_app_script_data();
-
 
 
 	if (false)
@@ -188,7 +178,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 
 		session->win->show();
 		if (a.num > 0) {
-			session->storage->load(session->song, a[0]);
+			session->storage->load(session->song.get(), a[0]);
 		} else {
 			// new file
 			session->song->add_track(SignalType::AUDIO_MONO);
@@ -258,13 +248,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Module *m = nullptr;
 		if (a[0] == "fx") {
 			m = ModuleFactory::create(session, ModuleType::AUDIO_EFFECT, a[1]);
-			configure_module(session->win, m);
+			configure_module(session->win.get(), m);
 		} else if (a[0] == "mfx") {
 			m = ModuleFactory::create(session, ModuleType::MIDI_EFFECT, a[1]);
-			configure_module(session->win, m);
+			configure_module(session->win.get(), m);
 		} else if (a[0] == "synth") {
 			m = ModuleFactory::create(session, ModuleType::SYNTHESIZER, a[1]);
-			configure_module(session->win, m);
+			configure_module(session->win.get(), m);
 		} else if (a[0] == "vis") {
 			m = CreateAudioVisualizer(session, a[1]);
 			auto *p = m->create_panel();
@@ -296,7 +286,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 }
 
 Session* Tsunami::create_session() {
-	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
+	Session *session = new Session(log.get(), device_manager.get(), plugin_manager.get(), perf_mon.get());
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 

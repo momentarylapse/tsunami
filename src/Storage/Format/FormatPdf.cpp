@@ -47,11 +47,9 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	if (!od->parameters.has("tracks"))
 		od->parameters.map_set("tracks", {});
 	
-	auto *dlg = new PdfConfigDialog(od, od->win);
+	auto dlg = ownify(new PdfConfigDialog(od, od->win));
 	dlg->run();
-	bool ok = dlg->ok;
-	delete dlg;
-	return ok;
+	return dlg->ok;
 }
 
 ColorScheme create_pdf_color_scheme() {

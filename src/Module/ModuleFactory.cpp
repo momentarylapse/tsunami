@@ -54,7 +54,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new MidiSucker;
 	} else if (type == ModuleType::AUDIO_SOURCE) {
 		if (sub_type == "SongRenderer")
-			return new SongRenderer(session->song, true);
+			return new SongRenderer(session->song.get(), true);
 	} else if (type == ModuleType::AUDIO_EFFECT) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new AudioEffect;
@@ -133,7 +133,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 	if (!m) {
 		p = session->plugin_manager->get_plugin(session, type, sub_type);
 		if (p)
-			m = (Module*)p->create_instance(session, "*." + base_class(type));
+			m = reinterpret_cast<Module*>(p->create_instance(session, "*." + base_class(type)));
 	}
 
 	// plug-in failed? -> default
@@ -145,7 +145,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 
 	// type specific initialization
 	if (m and type == ModuleType::SYNTHESIZER)
-		((Synthesizer*)m)->set_sample_rate(session->sample_rate());
+		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 	
 	if (config != "")
 		m->config_from_string(Module::VERSION_LATEST, config);

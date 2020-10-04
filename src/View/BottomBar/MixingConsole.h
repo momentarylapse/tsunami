@@ -37,15 +37,15 @@ public:
 	void _cdecl on_hide() override;
 
 	DeviceManager *device_manager;
-	PeakMeterDisplay *peak_meter;
-	PeakMeterDisplay *spectrum_meter;
+	owned<PeakMeterDisplay> peak_meter;
+	owned<PeakMeterDisplay> spectrum_meter;
 
 	string id_inner;
-	Array<TrackMixer*> mixer;
+	owned_array<TrackMixer> mixer;
 
 	int peak_runner_id;
 	
-	hui::Menu *menu_fx;
+	owned<hui::Menu> menu_fx;
 	
 	void show_fx(Track *t);
 };

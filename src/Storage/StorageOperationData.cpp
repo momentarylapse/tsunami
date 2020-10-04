@@ -18,10 +18,10 @@
 
 StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename, const string &message) {
 	session = _session;
-	win = session->win;
-	storage = session->storage;
+	win = session->win.get();
+	storage = session->storage.get();
 	format = _format;
-	song = session->song;
+	song = session->song.get();
 	filename = _filename;
 	progress = new Progress(message, win);
 	channels_suggested = 2;
@@ -45,10 +45,6 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 		session->e(::format("options '%s':  %s", Storage::options_in, e.message()));
 	}
 	Storage::options_in = "";
-}
-
-StorageOperationData::~StorageOperationData() {
-	delete progress;
 }
 
 void StorageOperationData::set_layer(TrackLayer *l) {

@@ -72,7 +72,7 @@ int MidiSource::read(MidiEventBuffer &midi) {
 	bh_midi = &midi;
 	read_pos += midi.samples;
 	while (produce_pos < read_pos) {
-		auto data = create_produce_data(session->song, produce_pos);
+		auto data = create_produce_data(session->song.get(), produce_pos);
 		if (!on_produce(data))
 			return midi.samples;
 	}
@@ -104,12 +104,12 @@ int skip_beats(int pos, Song *song, int beats, int sub_beats, int beat_partition
 void MidiSource::note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition) {
 	if (!bh_midi)
 		return;
-	int end_pos = skip_beats(produce_pos, session->song, beats, sub_beats, beat_partition);
+	int end_pos = skip_beats(produce_pos, session->song.get(), beats, sub_beats, beat_partition);
 	bh_midi->add_note(RangeTo(produce_pos, end_pos), pitch, volume);
 }
 
 void MidiSource::skip_x(int beats, int sub_beats, int beat_partition) {
-	produce_pos = skip_beats(produce_pos, session->song, beats, sub_beats, beat_partition);
+	produce_pos = skip_beats(produce_pos, session->song.get(), beats, sub_beats, beat_partition);
 }
 
 

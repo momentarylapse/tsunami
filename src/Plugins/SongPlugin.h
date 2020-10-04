@@ -16,16 +16,15 @@ namespace hui{
 class Session;
 class Song;
 
-class SongPlugin : public VirtualBase
-{
+class SongPlugin : public VirtualBase {
 public:
 	SongPlugin();
-	virtual ~SongPlugin();
+	~SongPlugin() override {};
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
-	virtual void _cdecl apply(){}
+	virtual void _cdecl apply() {}
 
 	Session *session;
 	Song *song;

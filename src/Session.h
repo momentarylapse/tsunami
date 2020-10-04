@@ -9,6 +9,7 @@
 #define SRC_SESSION_H_
 
 #include "lib/base/base.h"
+#include "lib/base/pointer.h"
 #include "Stuff/Observable.h"
 
 class TsunamiWindow;
@@ -27,10 +28,9 @@ namespace hui {
 
 
 // representing one instance/window
-class Session : public Observable<VirtualBase> {
+class Session : public Sharable<Observable<VirtualBase>> {
 public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
-	virtual ~Session();
 
 	static const string MESSAGE_ADD_PLUGIN;
 	static const string MESSAGE_REMOVE_PLUGIN;
@@ -43,20 +43,20 @@ public:
 	Session *create_child();
 
 	int id;
-	TsunamiWindow *win;
+	owned<TsunamiWindow> win;
 	hui::Window *_kaba_win;
-	Song *song;
+	shared<Song> song;
 	AudioView *view;
-	Storage *storage;
+	owned<Storage> storage;
 
-	Array<SignalChain*> all_signal_chains;
+	shared_array<SignalChain> all_signal_chains;
 	void add_signal_chain(SignalChain *chain);
 	SignalChain* create_signal_chain(const string &name);
 	SignalChain* create_signal_chain_system(const string &name);
 	SignalChain* load_signal_chain(const Path &filename);
 	void _remove_signal_chain(SignalChain *chain);
 
-	Array<TsunamiPlugin*> plugins;
+	shared_array<TsunamiPlugin> plugins;
 	TsunamiPlugin *last_plugin;
 	bool die_on_plugin_stop;
 

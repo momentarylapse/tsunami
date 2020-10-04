@@ -36,11 +36,9 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 		od->parameters.map_set("channels", 2);
 
 
-	auto *dlg = new RawConfigDialog(od, od->session->win);
+	auto dlg = ownify(new RawConfigDialog(od, od->win));
 	dlg->run();
-	bool ok = dlg->ok;
-	delete dlg;
-	return ok;
+	return dlg->ok;
 }
 
 void FormatRaw::save_via_renderer(StorageOperationData *od) {

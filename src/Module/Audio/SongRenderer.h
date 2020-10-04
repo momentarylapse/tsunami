@@ -38,7 +38,7 @@ public:
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
 
-	int get_pos(int delta);
+	int get_pos(int delta) const;
 	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
@@ -47,11 +47,11 @@ public:
 	void _cdecl set_range(const Range &r);
 	void _cdecl change_range(const Range &r);
 	void _cdecl set_loop(bool loop);
-	Range _cdecl range(){ return _range; }
+	Range _cdecl range() const { return _range; }
 
-	int _cdecl get_num_samples();
+	int _cdecl get_num_samples() const;
 
-	BeatSource _cdecl *get_beat_source(){ return (BeatSource*)bar_streamer; }
+	BeatSource _cdecl *get_beat_source() { return (BeatSource*)bar_streamer.get(); }
 
 private:
 	void read_basic(AudioBuffer &buf);
@@ -75,13 +75,12 @@ private:
 	bool direct_mode;
 	bool needs_rebuild;
 
-	Array<TrackRenderer*> tracks;
+	owned_array<TrackRenderer> tracks;
 
 
 	int get_first_usable_track(Track *target);
 
-	BarStreamer *bar_streamer;
-	BeatMidifier *beat_midifier;
+	shared<BarStreamer> bar_streamer;
 
 	void clear_data();
 	void build_data();
@@ -90,11 +89,11 @@ private:
 	int channels;
 
 public:
-	AudioEffect *preview_effect;
+	shared<AudioEffect> preview_effect;
 	bool allow_loop;
 	bool loop;
 
-	float get_peak(Track *track);
+	float get_peak(const Track *track);
 	void clear_peaks();
 };
 

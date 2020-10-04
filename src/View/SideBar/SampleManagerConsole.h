@@ -45,7 +45,7 @@ public:
 
 	void end_preview();
 
-	Array<SampleManagerItem*> items;
+	owned_array<SampleManagerItem> items;
 	Array<SampleManagerItem*> old_items;
 	void add(SampleManagerItem *item);
 	void remove(SampleManagerItem *item);
@@ -62,10 +62,10 @@ public:
 		Sample *sample = nullptr;
 	} preview;
 
-	Progress *progress;
+	owned<Progress> progress;
 	
 	string id_list;
-	hui::Menu *menu_samples;
+	owned<hui::Menu> menu_samples;
 
 	static Sample *_cdecl select(Session *session, hui::Panel *parent, Sample *old);
 };

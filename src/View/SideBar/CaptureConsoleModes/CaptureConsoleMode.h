@@ -34,7 +34,7 @@ public:
 	Session *session;
 	Song *song;
 	AudioView *view;
-	owned<SignalChain> chain;
+	shared<SignalChain> chain;
 };
 
 

@@ -238,7 +238,7 @@ public:
 
 	Song *song;
 
-	shared<SignalChain> signal_chain;
+	SignalChain *signal_chain;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
 	AudioOutput *output_stream;
@@ -279,7 +279,7 @@ public:
 	rect song_area();
 	rect clip;
 	TrackHeightManager thm;
-	owned<SceneGraph> scene_graph;
+	shared<SceneGraph> scene_graph;
 	bool update_scene_graph();
 	void rebuild_scene_graph();
 

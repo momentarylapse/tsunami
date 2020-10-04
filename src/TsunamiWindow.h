@@ -8,6 +8,7 @@
 #ifndef TSUNAMIWINDOW_H_
 #define TSUNAMIWINDOW_H_
 
+#include "lib/base/pointer.h"
 #include "lib/hui/hui.h"
 
 class Song;
@@ -140,9 +141,9 @@ public:
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
-	MiniBar *mini_bar;
+	owned<MiniBar> mini_bar;
 	
-	ModulePanel *big_module_panel;
+	owned<ModulePanel> big_module_panel;
 	void set_big_panel(ModulePanel *p);
 
 	bool auto_delete;

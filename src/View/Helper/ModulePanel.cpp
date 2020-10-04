@@ -168,7 +168,7 @@ void ModulePanel::on_large() {
 }
 
 void ModulePanel::on_external() {
-	auto *dlg = new ModuleExternalDialog(module, session->win);
+	auto *dlg = new ModuleExternalDialog(module, session->win.get());
 	copy_into(dlg->module_panel);
 	dlg->show();
 }

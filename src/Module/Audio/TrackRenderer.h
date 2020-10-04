@@ -15,6 +15,7 @@ class TrackLayer;
 class AudioEffect;
 class Synthesizer;
 class MidiEventStreamer;
+class BeatMidifier;
 class SongRenderer;
 class AudioBuffer;
 
@@ -22,13 +23,14 @@ class TrackRenderer : public AudioSource {
 	friend SongRenderer;
 public:
 	TrackRenderer(Track *t, SongRenderer *sr);
-	virtual ~TrackRenderer();
+	~TrackRenderer() override;
 
 	shared<Track> track;
 	shared_array<TrackLayer> layers;
 	shared_array<AudioEffect> fx;
 	shared<Synthesizer> synth;
-	owned<MidiEventStreamer> midi_streamer;
+	shared<MidiEventStreamer> midi_streamer;
+	shared<BeatMidifier> beat_midifier;
 	SongRenderer *song_renderer;
 	bool direct_mode;
 	int offset;

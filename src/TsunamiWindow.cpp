@@ -75,9 +75,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		hui::Window(AppName, 800, 600) {
 	session = _session;
 	session->set_win(this);
-	song = session->song;
+	song = session->song.get();
 	app = tsunami;
-	big_module_panel = nullptr;
 
 	int width = hui::Config.get_int("Window.Width", 800);
 	int height = hui::Config.get_int("Window.Height", 600);
@@ -277,7 +276,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	bottom_bar = new BottomBar(session);
 	embed(bottom_bar, "main-grid", 0, 1);
 	mini_bar = new MiniBar(bottom_bar, session);
-	embed(mini_bar, "main-grid", 0, 2);
+	embed(mini_bar.get(), "main-grid", 0, 2);
 
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SELECTION_CHANGE);
@@ -312,8 +311,7 @@ void TsunamiCleanUp() {
 		again = false;
 		foreachi(Session *s, tsunami->sessions, i)
 			if (s->win->got_destroyed() and s->win->auto_delete) {
-				delete s->win;
-				delete s;
+				msg_write("--------Tsunami erase...");
 				tsunami->sessions.erase(i);
 				again = true;
 				break;
@@ -340,7 +338,7 @@ void TsunamiWindow::on_destroy() {
 	side_bar->unsubscribe(this);
 
 	delete side_bar;
-	delete mini_bar;
+	mini_bar = nullptr;
 	delete bottom_bar;
 	delete view;
 
@@ -352,9 +350,8 @@ void TsunamiWindow::on_about() {
 }
 
 void TsunamiWindow::on_help() {
-	auto *dlg = new HelpDialog(this);
+	auto dlg = ownify(new HelpDialog(this));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_add_audio_track_mono() {
@@ -395,7 +392,7 @@ void TsunamiWindow::on_import_backup() {
 	} else {
 		Session *s = tsunami->create_session();
 		s->win->show();
-		s->storage->load(s->song, filename);
+		s->storage->load(s->song.get(), filename);
 	}
 	Storage::options_in = "";
 
@@ -457,12 +454,12 @@ void TsunamiWindow::on_track_render() {
 			return;
 	}
 
-	auto *p = new ProgressCancelable(_(""), this);
+	auto p = ownify(new ProgressCancelable(_(""), this));
 
 	AudioBuffer buf;
 	buf.resize(range.length);
 
-	write_into_buffer(renderer.out, buf, range.length, p);
+	write_into_buffer(renderer.out, buf, range.length, p.get());
 
 	song->begin_action_group();
 	Track *t = song->add_track(SignalType::AUDIO_STEREO);
@@ -472,7 +469,6 @@ void TsunamiWindow::on_track_render() {
 
 	t->layers[0]->edit_buffers_finish(a);
 	song->end_action_group();
-	delete p;
 
 }
 
@@ -499,9 +495,8 @@ void TsunamiWindow::on_track_edit_fx() {
 void TsunamiWindow::on_track_add_marker() {
 	if (view->cur_track()) {
 		Range range = view->sel.range();
-		auto *dlg = new MarkerDialog(this, view->cur_layer(), range, "");
+		auto dlg = ownify(new MarkerDialog(this, view->cur_layer(), range, ""));
 		dlg->run();
-		delete dlg;
 	} else {
 		session->e(_("No track selected"));
 	}
@@ -569,12 +564,12 @@ void TsunamiWindow::on_delete_marker() {
 }
 
 void TsunamiWindow::on_edit_marker() {
-	if (view->cur_selection.marker){
-		auto *dlg = new MarkerDialog(this, view->cur_layer(), view->cur_selection.marker);
+	if (view->cur_selection.marker) {
+		auto dlg = ownify(new MarkerDialog(this, view->cur_layer(), view->cur_selection.marker));
 		dlg->run();
-		delete dlg;
-	} else
+	} else {
 		session->e(_("No marker selected"));
+	}
 }
 
 void TsunamiWindow::on_marker_resize() {
@@ -614,8 +609,9 @@ bool TsunamiWindow::allow_termination() {
 		 return false;*/
 		on_save();
 		return true;
-	} else if (answer == "hui:no")
+	} else if (answer == "hui:no") {
 		return true;
+	}
 
 	// cancel
 	return false;
@@ -638,7 +634,7 @@ void TsunamiWindow::on_paste_time() {
 }
 
 void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win) {
-	auto *p = new Progress(_("applying effect"), win);
+	auto p = ownify(new Progress(_("applying effect"), win));
 	fx->reset_state();
 
 	AudioBuffer buf;
@@ -655,11 +651,10 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	}
 
 	l->edit_buffers_finish(a);
-	delete p;
 }
 
 void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::Window *win) {
-	auto *p = new Progress(_("applying source"), win);
+	auto p = ownify(new Progress(_("applying source"), win));
 	fx->reset_state();
 	
 	AudioBuffer buf;
@@ -677,28 +672,24 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 	}
 
 	l->edit_buffers_finish(a);
-	delete p;
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 	int n_layers = 0;
 
-	auto *fx = CreateAudioEffect(session, name);
+	auto fx = ownify(CreateAudioEffect(session, name));
 
-	if (!configure_module(this, fx)) {
-		delete fx;
+	if (!configure_module(this, fx.get()))
 		return;
-	}
 	song->begin_action_group();
 	for (Track *t: song->tracks)
 		for (auto *l: t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				fx_process_layer(l, view->sel.range(), fx, this);
+				fx_process_layer(l, view->sel.range(), fx.get(), this);
 				n_layers ++;
 			}
 	song->end_action_group();
-	delete fx;
 	
 	if (n_layers == 0)
 		session->e(_("no audio tracks selected"));
@@ -708,21 +699,18 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 	int n_layers = 0;
 
-	auto *s = CreateAudioSource(session, name);
+	auto s = ownify(CreateAudioSource(session, name));
 
-	if (!configure_module(this, s)) {
-		delete s;
+	if (!configure_module(this, s.get()))
 		return;
-	}
 	song->begin_action_group();
 	for (Track *t: song->tracks)
 		for (auto *l: t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				source_process_layer(l, view->sel.range(), s, this);
+				source_process_layer(l, view->sel.range(), s.get(), this);
 				n_layers ++;
 			}
 	song->end_action_group();
-	delete s;
 	
 	if (n_layers == 0)
 		session->e(_("no audio tracks selected"));
@@ -732,12 +720,10 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 	int n_layers = 0;
 
-	auto *fx = CreateMidiEffect(session, name);
+	auto fx = ownify(CreateMidiEffect(session, name));
 
-	if (!configure_module(this, fx)) {
-		delete fx;
+	if (!configure_module(this, fx.get()))
 		return;
-	}
 	
 	song->action_manager->group_begin();
 	for (Track *t: song->tracks)
@@ -748,7 +734,6 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 				n_layers ++;
 			}
 	song->action_manager->group_end();
-	delete fx;
 	
 	if (n_layers == 0)
 		session->e(_("no midi tracks selected"));
@@ -758,12 +743,10 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 	int n_layers = 0;
 
-	auto *s = CreateMidiSource(session, name);
+	auto s = ownify(CreateMidiSource(session, name));
 
-	if (!configure_module(this, s)) {
-		delete s;
+	if (!configure_module(this, s.get()))
 		return;
-	}
 	
 	song->begin_action_group();
 	for (Track *t: song->tracks)
@@ -777,7 +760,6 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 				n_layers ++;
 			}
 	song->end_action_group();
-	delete s;
 	
 	if (n_layers == 0)
 		session->e(_("no midi tracks selected"));
@@ -786,10 +768,8 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 void TsunamiWindow::on_menu_execute_song_plugin() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	auto *p = CreateSongPlugin(session, name);
-
+	auto p = ownify(CreateSongPlugin(session, name));
 	p->apply();
-	delete p;
 }
 
 void TsunamiWindow::on_menu_execute_tsunami_plugin() {
@@ -842,9 +822,8 @@ void TsunamiWindow::on_command(const string & id) {
 }
 
 void TsunamiWindow::on_settings() {
-	auto *dlg = new SettingsDialog(view, this);
+	auto dlg = ownify(new SettingsDialog(view, this));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_track_import() {
@@ -1040,9 +1019,8 @@ void TsunamiWindow::on_exit() {
 }
 
 void TsunamiWindow::on_new() {
-	auto *dlg = new NewDialog(this);
+	auto dlg = ownify(new NewDialog(this));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_open() {
@@ -1053,7 +1031,7 @@ void TsunamiWindow::on_open() {
 		} else {
 			auto *s = tsunami->create_session();
 			s->win->show();
-			s->storage->load(s->song, hui::Filename);
+			s->storage->load(s->song.get(), hui::Filename);
 		}
 	}
 }
@@ -1123,10 +1101,9 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel);
 
 void TsunamiWindow::on_export_selection() {
 	if (session->storage->ask_save(this)) {
-		Song *s = copy_song_from_selection(song, view->sel);
-		if (session->storage->save(s, hui::Filename))
+		auto s = ownify(copy_song_from_selection(song, view->sel));
+		if (session->storage->save(s.get(), hui::Filename))
 			view->set_message(_("file exported"));
-		delete s;
 	}
 }
 
@@ -1149,21 +1126,18 @@ int pref_bar_index(AudioView *view) {
 }
 
 void TsunamiWindow::on_add_bars() {
-	auto dlg = new BarAddDialog(win, song, pref_bar_index(view));
+	auto dlg = ownify(new BarAddDialog(win, song, pref_bar_index(view)));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_add_pause() {
-	auto *dlg = new PauseAddDialog(win, song, pref_bar_index(view));
+	auto dlg = ownify(new PauseAddDialog(win, song, pref_bar_index(view)));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_delete_bars() {
-	auto *dlg = new BarDeleteDialog(win, song, view->sel.bar_indices(song));
+	auto dlg = ownify(new BarDeleteDialog(win, song, view->sel.bar_indices(song)));
 	dlg->run();
-	delete dlg;
 }
 
 void TsunamiWindow::on_delete_time_interval() {
@@ -1199,13 +1173,11 @@ void TsunamiWindow::on_edit_bars() {
 			num_bars++;
 	}
 	if (num_bars > 0 and num_pauses == 0) {
-		auto *dlg = new BarEditDialog(win, song, view->sel.bar_indices(song));
+		auto dlg = ownify(new BarEditDialog(win, song, view->sel.bar_indices(song)));
 		dlg->run();
-		delete dlg;
 	} else if (num_bars == 0 and num_pauses == 1) {
-		auto *dlg = new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]);
+		auto dlg = ownify(new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]));
 		dlg->run();
-		delete dlg;
 	} else {
 		hui::ErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
 	}
@@ -1216,9 +1188,6 @@ void TsunamiWindow::on_scale_bars() {
 }
 
 void TsunamiWindow::set_big_panel(ModulePanel* p) {
-	if (big_module_panel) {
-		delete big_module_panel;
-	}
 	big_module_panel = p;
 	if (big_module_panel) {
 		big_module_panel->set_func_close([=]{ msg_write("...close"); remove_control("plugin-grid"); });
@@ -1228,6 +1197,6 @@ void TsunamiWindow::set_big_panel(ModulePanel* p) {
 		set_target("root-grid");
 		//add_paned("!expandx", 0, 0, "plugin-grid");
 		add_grid("", 0, 0, "plugin-grid");
-		embed(big_module_panel, "plugin-grid", 0, 0);
+		embed(big_module_panel.get(), "plugin-grid", 0, 0);
 	}
 }

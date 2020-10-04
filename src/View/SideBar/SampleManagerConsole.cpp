@@ -269,9 +269,8 @@ void SampleManagerConsole::on_scale() {
 	for (Sample* s: sel) {
 		if (s->type != SignalType::AUDIO)
 			continue;
-		auto *dlg = new SampleScaleDialog(parent->win, s);
+		auto dlg = ownify(new SampleScaleDialog(parent->win, s));
 		dlg->run();
-		delete dlg;
 	}
 }
 
@@ -283,6 +282,7 @@ void SampleManagerConsole::add(SampleManagerItem *item) {
 void SampleManagerConsole::remove(SampleManagerItem *item) {
 	foreachi(auto *si, items, i)
 		if (si == item) {
+			msg_write("--------SampleManagerConsole erase...");
 			items.erase(i);
 			remove_string(id_list, i);
 
@@ -361,7 +361,6 @@ void SampleManagerConsole::on_preview() {
 void SampleManagerConsole::end_preview() {
 	if (progress) {
 		progress->unsubscribe(this);
-		delete progress;
 		progress = nullptr;
 	}
 	preview.chain->unsubscribe(this);
@@ -378,7 +377,7 @@ public:
 		hui::Dialog("sample_selection_dialog", parent->win)
 	{
 		session = _session;
-		song = session->song;
+		song = session->song.get();
 		selected = nullptr;
 		_old = old;
 		for (Sample *s: song->samples)
@@ -462,9 +461,7 @@ public:
 };
 
 Sample *SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old) {
-	auto *s = new SampleSelector(session, parent, old);
+	auto s = ownify(new SampleSelector(session, parent, old));
 	s->run();
-	Sample *r = s->selected;
-	delete(s);
-	return r;
+	return s->selected;
 }

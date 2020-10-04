@@ -6,6 +6,7 @@
  */
 
 #include "QuestionDialog.h"
+#include "../../lib/base/pointer.h"
 
 
 bool QuestionDialogInt::aborted;
@@ -23,11 +24,9 @@ QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &questio
 }
 
 int QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
-	auto *dlg = new QuestionDialogInt(parent, question, options);
+	auto dlg = ownify(new QuestionDialogInt(parent, question, options));
 	dlg->run();
-	int r = dlg->result;
-	delete dlg;
-	return r;
+	return dlg->result;
 }
 
 

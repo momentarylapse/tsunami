@@ -26,12 +26,9 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	module_subtype = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
-	beat_midifier = nullptr;
-	bar_streamer = nullptr;
 	channels = 2;
 	direct_mode = _direct_mode;
 
-	preview_effect = nullptr;
 	allow_loop = false; // are we allowed to loop (recording...)
 	loop = false; // do we want to loop (GUI)
 	pos = 0;
@@ -223,19 +220,7 @@ void SongRenderer::_rebuild() {
 
 // REQUIRES LOCK
 void SongRenderer::clear_data() {
-	for (auto *tr: tracks)
-		delete tr;
 	tracks.clear();
-
-	if (beat_midifier) {
-		delete beat_midifier;
-		beat_midifier = nullptr;
-	}
-
-	if (bar_streamer) {
-		delete bar_streamer;
-		bar_streamer = nullptr;
-	}
 
 	allowed_tracks.clear();
 	allowed_layers.clear();
@@ -255,9 +240,6 @@ void SongRenderer::reset_state() {
 void SongRenderer::build_data() {
 	bar_streamer = new BarStreamer(song->bars);
 	bar_streamer->perf_set_parent(this);
-	beat_midifier = new BeatMidifier;
-	beat_midifier->_plug_in(0, bar_streamer, 0);
-	beat_midifier->perf_set_parent(this);
 
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));
@@ -265,7 +247,7 @@ void SongRenderer::build_data() {
 	_set_pos(0);
 }
 
-int SongRenderer::get_num_samples() {
+int SongRenderer::get_num_samples() const {
 	if (allow_loop and loop)
 		return -1;
 	return _range.length;
@@ -282,7 +264,7 @@ void SongRenderer::_set_pos(int _pos) {
 		tr->set_pos(pos);
 }
 
-int SongRenderer::get_pos(int delta) {
+int SongRenderer::get_pos(int delta) const {
 	Range r = range();
 	int p = pos + delta;
 	if (p < r.offset)
@@ -317,13 +299,13 @@ void SongRenderer::update_tracks() {
 	foreachi (auto *tr, tracks, ti) {
 		bool found = song->tracks.find(tr->track.get()) >= 0;
 		if (!found) {
-			delete tr;
+			msg_write("--------SongRenderer erase...");
 			tracks.erase(ti);
 		}
 	}
 }
 
-float SongRenderer::get_peak(Track *t) {
+float SongRenderer::get_peak(const Track *t) {
 	for (auto *tr: tracks)
 		if (tr->track.get() == t) {
 			float r = tr->peak;

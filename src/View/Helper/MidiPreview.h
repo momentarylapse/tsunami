@@ -9,6 +9,8 @@
 #define SRC_VIEW_HELPER_MIDIPREVIEW_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/pointer.h"
+#include "../../Module/SignalChain.h"
 
 class AudioOutput;
 class Synthesizer;
@@ -23,9 +25,8 @@ class Session;
 class MidiPreview : public VirtualBase {
 public:
 	MidiPreview(Session *s, Synthesizer *synth);
-	virtual ~MidiPreview();
 
-	SignalChain *chain;
+	shared<SignalChain> chain;
 	Module *synth;
 	Module *joiner;
 	Module *out;

@@ -33,9 +33,8 @@
 #include "../lib/threads/Mutex.h"
 
 
-TrackLayer::TrackLayer(){}
-
 TrackLayer::TrackLayer(Track *t) {
+	msg_write("  new TrackLayer " + p2s(this));
 	track = t;
 	type = t->type;
 	channels = t->channels;
@@ -45,9 +44,7 @@ TrackLayer::TrackLayer(Track *t) {
 TrackLayer::~TrackLayer() {
 	midi.deep_clear();
 
-	for (SampleRef *r: samples)
-		delete(r);
-	samples.clear();
+	msg_write("  del TrackLayer " + p2s(this));
 }
 
 Range TrackLayer::range(int keep_notes) const {

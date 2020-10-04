@@ -126,7 +126,7 @@ Array<string> diff_track(Track *ta, Track *tb, const string &ee) {
 	if (ta->panning != tb->panning)
 		r.add(ee + "panning");
 
-	r += diff_module(ta->synth, tb->synth, ee + "synth.");
+	r += diff_module(ta->synth.get(), tb->synth.get(), ee + "synth.");
 
 	if (ta->fx.num != tb->fx.num)
 		r.add(ee + "#fx");

@@ -86,7 +86,7 @@ Array<Curve::Target> Curve::Target::enumerate_track(Track *t, const string &pref
 		list.append(enumerate_module(fx, prefix + format(":fx:%d", i), prefix_nice + NICE_SEP + "fx" + i2s_small(i)));
 	foreachi(auto *fx, t->midi_fx, i)
 		list.append(enumerate_module(fx, prefix + format(":mfx:%d", i), prefix_nice + NICE_SEP + "mfx" + i2s_small(i)));
-	list.append(enumerate_module(t->synth, prefix + ":s", prefix_nice + NICE_SEP + "synth"));
+	list.append(enumerate_module(t->synth.get(), prefix + ":s", prefix_nice + NICE_SEP + "synth"));
 	return list;
 }
 Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &prefix, const string &prefix_nice) {

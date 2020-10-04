@@ -37,7 +37,7 @@ bool Background::on_left_button_down() {
 }
 
 bool Background::on_right_button_down() {
-	view->open_popup(view->menu_song);
+	view->open_popup(view->menu_song.get());
 	return true;
 }
 

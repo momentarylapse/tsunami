@@ -26,11 +26,6 @@ ViewNode::ViewNode(float w, float h) {
 	z = 0;
 }
 
-ViewNode::~ViewNode() {
-	for (auto c: children)
-		delete c;
-}
-
 bool ViewNode::hover(float mx, float my) {
 	if (hidden)
 		return false;

@@ -15,14 +15,13 @@ class Track;
 class ActionTrack__DeleteEmpty: public Action {
 public:
 	ActionTrack__DeleteEmpty(Track *track);
-	~ActionTrack__DeleteEmpty() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	int index;
-	Track *track;
+	shared<Track> track;
 };
 
 #endif /* SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_ */

@@ -55,7 +55,6 @@ void MouseDelayPlanner::finish() {
 	if (acting()) {
 		action->on_finish();
 		action->on_clean_up();
-		delete action;
 		action = nullptr;
 		_started_acting = false;
 		//view->force_redraw();
@@ -67,7 +66,6 @@ void MouseDelayPlanner::cancel() {
 	if (acting()) {
 		action->on_cancel();
 		action->on_clean_up();
-		delete action;
 		action = nullptr;
 		_started_acting = false;
 		//view->force_redraw();

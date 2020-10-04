@@ -13,8 +13,7 @@ class Track;
 class TrackLayer;
 class SampleRef;
 
-class SampleRefConsole: public SideBarConsole
-{
+class SampleRefConsole: public SideBarConsole {
 public:
 	SampleRefConsole(Session *session);
 	virtual ~SampleRefConsole();

@@ -64,7 +64,7 @@ void SongRenderer::__delete__() {
 
 int SongRenderer::get_first_usable_track(Track *target) {
 	foreachi(auto *tr, tracks, i)
-		if (!tr->track->muted and allowed_tracks.contains(tr->track) and (tr->track->send_target == target))
+		if (!tr->track->muted and allowed_tracks.contains(tr->track.get()) and (tr->track->send_target == target))
 			return i;
 	return -1;
 }
@@ -82,7 +82,7 @@ void SongRenderer::render_send_target(AudioBuffer &buf, Track* target) {
 
 		// other tracks
 		for (int i=i0+1;i<tracks.num;i++){
-			Track *t = tracks[i]->track;
+			Track *t = tracks[i]->track.get();
 			if (!allowed_tracks.contains(t))
 				continue;
 			if (t->muted)
@@ -203,7 +203,7 @@ void SongRenderer::_rebuild() {
 
 	// reset previously unused tracks
 	for (auto *tr: tracks)
-		if (!allowed_tracks.contains(tr->track)) {
+		if (!allowed_tracks.contains(tr->track.get())) {
 			tr->reset_state();
 			tr->set_pos(pos);
 		}
@@ -308,17 +308,14 @@ void SongRenderer::update_tracks() {
 	for (Track *t: song->tracks) {
 		bool found = false;
 		for (auto &tr: tracks)
-			if (tr->track == t)
+			if (tr->track.get() == t)
 				found = true;
 		if (!found)
 			tracks.add(new TrackRenderer(t, this));
 	}
 
 	foreachi (auto *tr, tracks, ti) {
-		bool found = false;
-		for (Track *t: song->tracks)
-			if (t == tr->track)
-				found = true;
+		bool found = song->tracks.find(tr->track.get()) >= 0;
 		if (!found) {
 			delete tr;
 			tracks.erase(ti);
@@ -328,7 +325,7 @@ void SongRenderer::update_tracks() {
 
 float SongRenderer::get_peak(Track *t) {
 	for (auto *tr: tracks)
-		if (tr->track == t) {
+		if (tr->track.get() == t) {
 			float r = tr->peak;
 			tr->peak = 0;
 			return r;

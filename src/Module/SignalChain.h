@@ -38,7 +38,7 @@ public:
 
 	string name;
 
-	Array<Module*> modules;
+	shared_array<Module> modules;
 	Module* _add(Module *m);
 	Module* add(ModuleType type, const string &sub_type = "");
 	void delete_module(Module *m);
@@ -93,7 +93,7 @@ public:
 	bool sucking;
 	int buffer_size;
 	float no_data_wait;
-	SuckerThread *thread;
+	owned<SuckerThread> thread;
 	int do_suck();
 	void _start_sucking();
 	void _stop_sucking();

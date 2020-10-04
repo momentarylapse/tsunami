@@ -13,12 +13,7 @@
 
 ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track) {
 	index = _track->get_index();
-	track = nullptr;
-}
-
-ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty() {
-	if (track)
-		delete track;
+	track = _track;
 }
 
 void *ActionTrack__DeleteEmpty::execute(Data *d) {
@@ -27,7 +22,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d) {
 	Track *t = a->tracks[index];
 	int num_buf = 0;
 	int num_samples = 0;
-	for (TrackLayer *l : t->layers){
+	for (TrackLayer *l: t->layers){
 		num_buf += l->buffers.num;
 		num_samples += l->samples.num;
 	}
@@ -35,9 +30,6 @@ void *ActionTrack__DeleteEmpty::execute(Data *d) {
 	assert(num_samples == 0);
 
 	// TODO: no layers allowed?!?
-
-	// save data
-	track = t;
 
 	// delete
 	a->tracks.erase(index);
@@ -57,7 +49,6 @@ void ActionTrack__DeleteEmpty::undo(Data *d) {
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
 	a->notify(a->MESSAGE_ADD_LAYER);
-	track = nullptr;
 }
 
 

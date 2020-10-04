@@ -16,14 +16,13 @@ class TrackLayer;
 class ActionTrackLayer__Delete : public Action {
 public:
 	ActionTrackLayer__Delete(Track *t, int index);
-	~ActionTrackLayer__Delete();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
 	Track *track;
 	int index;
-	TrackLayer *layer;
+	shared<TrackLayer> layer;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_ */

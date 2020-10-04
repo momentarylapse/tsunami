@@ -9,13 +9,14 @@
 #define ACTION_H_
 
 #include "../Data/Data.h"
+#include "../lib/base/pointer.h"
 
 class Data;
 
 class Action {
 public:
 	Action(){}
-	virtual ~Action(){}
+	virtual ~Action() {}
 
 	virtual void *execute(Data *d) = 0;
 	virtual void undo(Data *d) = 0;

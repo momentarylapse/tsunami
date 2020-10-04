@@ -105,7 +105,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer(raw);
 		midi_streamer->perf_set_parent(this);
-		synth->_plug_in(0, midi_streamer, 0);
+		synth->_plug_in(0, midi_streamer.get(), 0);
 		fill_midi_streamer();
 	} else if (t->type == SignalType::BEATS) {
 
@@ -141,21 +141,11 @@ TrackRenderer::~TrackRenderer() {
 		track->song->unsubscribe(this);
 		track->unsubscribe(this);
 	}
-	if (midi_streamer)
-		delete midi_streamer;
-	if (!direct_mode) {
-		for (auto *f: fx)
-			delete f;
-		if (synth)
-			delete synth;
-	}
 }
 
 void TrackRenderer::unlink_from_track() {
 	if (synth) {
 		synth->perf_set_parent(nullptr);
-		if (!direct_mode)
-			delete synth;
 		synth = nullptr;
 	}
 
@@ -165,11 +155,8 @@ void TrackRenderer::unlink_from_track() {
 		track = nullptr;
 	}
 
-	if (!direct_mode) {
-		for (auto *f: fx)
-			delete f;
-		fx = {};
-	}
+	if (!direct_mode)
+		fx.clear();
 
 	update_layers();
 }
@@ -217,15 +204,13 @@ void TrackRenderer::on_track_replace_synth() {
 	if (direct_mode) {
 		synth = track->synth;
 	} else {
-		delete synth;
-
 		synth = (Synthesizer*)track->synth->copy();
 		synth->set_sample_rate(track->song->sample_rate);
 		synth->set_instrument(track->instrument);
 	}
 
 	if (track->type == SignalType::MIDI) {
-		synth->_plug_in(0, midi_streamer, 0);
+		synth->_plug_in(0, midi_streamer.get(), 0);
 	} else if (track->type == SignalType::BEATS) {
 		synth->_plug_in(0, song_renderer->beat_midifier, 0);
 	}
@@ -242,9 +227,12 @@ void TrackRenderer::update_layers() {
 	for (auto *l: layers)
 		l->unsubscribe(this);
 
-	layers = {};
+	msg_write("-----TR update  clear");
+	layers.clear();
+	msg_write("-----TR update =");
 	if (track)
 		layers = track->layers;
+	msg_write("-----TR update done");
 
 	for (auto *l: layers) {
 		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
@@ -398,7 +386,7 @@ void TrackRenderer::render_midi(AudioBuffer &buf) {
 }
 
 void TrackRenderer::render_group(AudioBuffer &buf) {
-	song_renderer->render_send_target(buf, track);
+	song_renderer->render_send_target(buf, track.get());
 }
 
 void TrackRenderer::render_no_fx(AudioBuffer &buf) {

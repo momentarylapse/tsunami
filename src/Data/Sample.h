@@ -10,6 +10,7 @@
 
 #include "Midi/MidiData.h"
 #include "../lib/math/rect.h"
+#include "../lib/base/pointer.h"
 #include "../Stuff/Observable.h"
 #include "Audio/AudioBuffer.h"
 
@@ -19,7 +20,7 @@ class SampleRef;
 class Tag;
 enum class SignalType;
 
-class Sample : public Observable<VirtualBase> {
+class Sample : public Sharable<Observable<VirtualBase>> {
 public:
 	Sample(SignalType type);
 	Sample(const string &name, const AudioBuffer &buf);
@@ -49,10 +50,6 @@ public:
 	int uid;
 	int ref_count;
 	bool auto_delete;
-
-	int _pointer_ref_count;
-	Sample *_pointer_ref();
-	void _pointer_unref();
 
 	Array<Tag> tags;
 	string _cdecl get_value(const string &key) const;

@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_CURVE_H_
 #define SRC_DATA_CURVE_H_
 
+#include "../lib/base/pointer.h"
 #include "../Stuff/Observable.h"
 
 class Song;
@@ -18,7 +19,7 @@ namespace Kaba {
 	class Class;
 };
 
-class Curve : public Observable<VirtualBase> {
+class Curve : public Sharable<Observable<VirtualBase>> {
 public:
 	Curve();
 	virtual ~Curve();

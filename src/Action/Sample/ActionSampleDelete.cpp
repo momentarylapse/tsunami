@@ -12,21 +12,14 @@
 #include "../../Data/Sample.h"
 
 ActionSampleDelete::ActionSampleDelete(Sample *s) {
-	sample = s->_pointer_ref();
+	sample = s;
 	index = -1;
-}
-
-ActionSampleDelete::~ActionSampleDelete() {
-	sample->_pointer_unref();
 }
 
 void *ActionSampleDelete::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(sample->ref_count == 0);
-	index = -1;
-	for (int i=0; i<a->samples.num; i++)
-		if (a->samples[i] == sample)
-			index = i;
+	index = a->samples.find(sample.get());
 	assert(index >= 0);
 
 	sample->fake_death();

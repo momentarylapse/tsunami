@@ -8,6 +8,7 @@
 #ifndef SRC_VIEW_MOUSEDELAYPLANNER_H_
 #define SRC_VIEW_MOUSEDELAYPLANNER_H_
 
+#include "../lib/base/pointer.h"
 #include <functional>
 
 class AudioView;
@@ -36,7 +37,7 @@ public:
 	bool _started_acting = false;
 	SceneGraph *scene_graph;
 	typedef std::function<void()> Callback;
-	MouseDelayAction *action = nullptr;
+	owned<MouseDelayAction> action;
 	void prepare(MouseDelayAction *action);
 	void start_acting();
 	bool update();

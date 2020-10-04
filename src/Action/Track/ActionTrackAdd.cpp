@@ -16,14 +16,8 @@ ActionTrackAdd::ActionTrackAdd(Track *t, int _index) {
 	index = _index;
 }
 
-ActionTrackAdd::~ActionTrackAdd() {
-	if (track)
-		delete track;
-}
-
 void ActionTrackAdd::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
-	track = s->tracks[index];
 	s->tracks.erase(index);
 
 	// notify outer structures first!
@@ -45,9 +39,8 @@ void *ActionTrackAdd::execute(Data *d) {
 
 	s->notify(s->MESSAGE_ADD_TRACK);
 	s->notify(s->MESSAGE_ADD_LAYER);
-	track = nullptr;
 
-	return s->tracks[index];
+	return track.get();
 }
 
 

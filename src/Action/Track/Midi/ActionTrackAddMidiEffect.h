@@ -15,13 +15,12 @@ class MidiEffect;
 class ActionTrackAddMidiEffect: public Action {
 public:
 	ActionTrackAddMidiEffect(Track *t, MidiEffect *effect);
-	~ActionTrackAddMidiEffect();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	MidiEffect *effect;
+	shared<MidiEffect> effect;
 	Track *track;
 };
 

@@ -45,7 +45,7 @@ public:
 		return parent->on_left_button_down();
 	}
 	bool on_right_button_down() override {
-		view->open_popup(view->menu_playback_range);
+		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
 	bool on_left_double_click() override {
@@ -85,7 +85,7 @@ public:
 		return true;
 	}
 	bool on_right_button_down() override {
-		view->open_popup(view->menu_playback_range);
+		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
 };
@@ -117,7 +117,7 @@ public:
 		return true;
 	}
 	bool on_right_button_down() override {
-		view->open_popup(view->menu_playback_range);
+		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
 };
@@ -141,7 +141,7 @@ void TimeScale::draw(Painter* c) {
 	g.bg_sel = view->colors.background_track_selection;
 	g.fg = g.fg_sel = view->colors.grid;
 
-	auto *gp = view->grid_painter;
+	auto *gp = view->grid_painter.get();
 	gp->set_context(area, g);
 	gp->draw_empty_background(c);
 	gp->draw_time(c);
@@ -162,7 +162,7 @@ bool TimeScale::on_left_button_down() {
 }
 
 bool TimeScale::on_right_button_down() {
-	view->open_popup(view->menu_song);
+	view->open_popup(view->menu_song.get());
 	return true;
 }
 

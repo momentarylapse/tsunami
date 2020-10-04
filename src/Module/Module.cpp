@@ -46,9 +46,6 @@ Module::~Module() {
 	for (auto &pd: port_in)
 		*pd.port = nullptr;
 
-	for (Module* c: children)
-		delete c;
-
 	for (auto *p: port_out)
 		delete p;
 	PerformanceMonitor::delete_channel(perf_channel);

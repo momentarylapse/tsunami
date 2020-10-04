@@ -17,13 +17,12 @@ class Sample;
 class ActionSampleAdd : public Action {
 public:
 	ActionSampleAdd(Sample *s);
-	~ActionSampleAdd() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	Sample *sample;
+	shared<Sample> sample;
 };
 
 #endif /* ACTIONSAMPLEADD_H_ */

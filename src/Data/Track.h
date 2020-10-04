@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_TRACK_H_
 #define SRC_DATA_TRACK_H_
 
+#include "../lib/base/pointer.h"
 #include "Range.h"
 #include "Midi/MidiData.h"
 #include "Midi/Instrument.h"
@@ -26,7 +27,7 @@ enum class SignalType;
 
 
 
-class Track : public Observable<VirtualBase> {
+class Track : public Sharable<Observable<VirtualBase>> {
 public:
 	Track(SignalType type, Synthesizer *synth);
 	virtual ~Track();
@@ -80,19 +81,19 @@ public:
 
 	Instrument instrument;
 
-	Array<TrackLayer*> layers;
+	shared_array<TrackLayer> layers;
 
 	float volume, panning;
 	bool muted;
 
 	Track *send_target;
 
-	Array<AudioEffect*> fx;
-	Array<MidiEffect*> midi_fx;
+	shared_array<AudioEffect> fx;
+	shared_array<MidiEffect> midi_fx;
 	void _register_fx(AudioEffect *fx);
 	void _register_midi_fx(MidiEffect *fx);
 
-	Synthesizer *synth;
+	shared<Synthesizer> synth;
 	void _register_synth(Synthesizer *s);
 
 	Array<TrackMarker*> _markers_old;

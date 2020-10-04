@@ -9,17 +9,17 @@
 #define SRC_VIEW_NODE_VIEWNODE_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/pointer.h"
 #include "../../lib/math/math.h"
 #include "../../Stuff/Observable.h"
 
 class Painter;
 class HoverData;
 
-class ViewNode : public Observable<VirtualBase> {
+class ViewNode : public Sharable<Observable<VirtualBase>> {
 public:
 	ViewNode();
 	ViewNode(float w, float h);
-	virtual ~ViewNode();
 
 	virtual bool allow_handle_click_when_gaining_focus() { return true; }
 
@@ -59,7 +59,7 @@ public:
 		float dx, dy, dz;
 		float w, h;
 	} align;
-	Array<ViewNode*> children;
+	shared_array<ViewNode> children;
 	rect area;
 	int z;
 	bool hidden;

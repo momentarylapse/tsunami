@@ -641,7 +641,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 			auto *mp = midi_context(l);
 			auto mode = l->midi_mode();
 			if (mode == MidiMode::LINEAR)
-				mp->draw_pitch_grid(c, l->layer->track->synth);
+				mp->draw_pitch_grid(c, l->layer->track->synth.get());
 
 			if (mode == MidiMode::CLASSICAL) {
 				mp->draw_clef_classical(c);

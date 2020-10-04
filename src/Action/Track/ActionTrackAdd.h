@@ -15,13 +15,12 @@ class Track;
 class ActionTrackAdd : public Action {
 public:
 	ActionTrackAdd(Track *t, int index);
-	~ActionTrackAdd();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	Track *track;
+	shared<Track> track;
 	int index;
 };
 

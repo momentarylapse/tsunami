@@ -13,17 +13,15 @@
 class Track;
 class TrackLayer;
 
-class ActionTrackLayerAdd : public Action
-{
+class ActionTrackLayerAdd : public Action {
 public:
 	ActionTrackLayerAdd(Track *t, TrackLayer *l);
-	~ActionTrackLayerAdd();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
 	Track *track;
-	TrackLayer *layer;
+	shared<TrackLayer> layer;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERADD_H_ */

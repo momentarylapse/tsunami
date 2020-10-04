@@ -27,7 +27,7 @@ public:
 	~ActionTrack__DeleteSample() {
 		if (ref)
 			if (!ref->owner)
-				delete(ref);
+				delete ref;
 	}
 	void *execute(Data* d) override {
 		ref = layer->samples[index];
@@ -52,7 +52,7 @@ ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref) {
 }
 
 void ActionTrackDeleteSample::build(Data *d) {
-	Sample *sample = ref->origin;
+	Sample *sample = ref->origin.get();
 
 	add_sub_action(new ActionTrack__DeleteSample(ref), d);
 

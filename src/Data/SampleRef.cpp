@@ -15,11 +15,10 @@ const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
 
-SampleRef::SampleRef(Sample *sample)
-{
+SampleRef::SampleRef(Sample *sample) {
+	msg_write("  new SampleRef " + p2s(this));
 	origin = sample;
 	origin->ref();
-	origin->_pointer_ref();
 	layer = nullptr;
 	owner = nullptr;
 	pos = 0;
@@ -27,54 +26,45 @@ SampleRef::SampleRef(Sample *sample)
 	muted = false;
 }
 
-SampleRef::~SampleRef()
-{
+SampleRef::~SampleRef() {
 	notify(MESSAGE_DELETE);
 	origin->unref();
-	origin->_pointer_unref();
+	msg_write("  del SampleRef " + p2s(this));
 }
 
-void SampleRef::__init__(Sample *sam)
-{
+void SampleRef::__init__(Sample *sam) {
 	new(this) SampleRef(sam);
 }
 
-void SampleRef::__delete__()
-{
+void SampleRef::__delete__() {
 	this->SampleRef::~SampleRef();
 }
 
-int SampleRef::get_index() const
-{
-	if (layer){
+int SampleRef::get_index() const {
+	if (layer) {
 		return layer->samples.find((SampleRef*)this);
 	}
 	return -1;
 }
 
-/*Track *SampleRef::track() const
-{
+/*Track *SampleRef::track() const {
 	if (owner)
 		return owner->tracks[track_no];
 	return NULL;
 }*/
 
-Range SampleRef::range() const
-{
-	return origin->range() + pos;
+Range SampleRef::range() const {
+	return origin.get()->range() + pos;
 }
 
-SignalType SampleRef::type() const
-{
-	return origin->type;
+SignalType SampleRef::type() const {
+	return origin.get()->type;
 }
 
-AudioBuffer& SampleRef::buf() const
-{
-	return *origin->buf;
+AudioBuffer& SampleRef::buf() const {
+	return *origin.get()->buf;
 }
 
-MidiNoteBuffer& SampleRef::midi() const
-{
-	return origin->midi;
+MidiNoteBuffer& SampleRef::midi() const {
+	return origin.get()->midi;
 }

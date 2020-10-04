@@ -47,7 +47,7 @@ void CaptureConsoleModeMidi::on_source() {
 
 void CaptureConsoleModeMidi::set_target(const Track *t) {
 	target = t;
-	preview_synth = (Synthesizer*)t->synth->copy();
+	preview_synth = (Synthesizer*)t->synth.get()->copy();
 	chain->_add(preview_synth);
 
 	//cc->enable("start", true);

@@ -302,7 +302,7 @@ public:
 	void on_button() {
 		Sample *old = nullptr;
 		if (*value)
-			old = (*value)->origin;
+			old = (*value)->origin.get();
 		Sample *s = SampleManagerConsole::select(session, panel, old);
 		if (s != old) {
 			if (*value)

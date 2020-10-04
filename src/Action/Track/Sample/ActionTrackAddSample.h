@@ -17,15 +17,14 @@ class TrackLayer;
 class ActionTrackAddSample: public Action {
 public:
 	ActionTrackAddSample(TrackLayer *l, int pos, Sample *sample);
-	~ActionTrackAddSample() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;
-	Sample *sample;
-	SampleRef *ref;
+	shared<Sample> sample;
+	shared<SampleRef> ref;
 	int pos;
 };
 

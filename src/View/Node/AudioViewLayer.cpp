@@ -561,20 +561,20 @@ bool AudioViewLayer::on_right_button_down() {
 	}
 
 	if (h.sample) {
-		view->open_popup(view->menu_sample);
+		view->open_popup(view->menu_sample.get());
 	} else if (h.bar) {
-		view->open_popup(view->menu_bar);
+		view->open_popup(view->menu_bar.get());
 	} else if (h.marker) {
-		view->open_popup(view->menu_marker);
+		view->open_popup(view->menu_marker.get());
 	} else if (h.type == HoverData::Type::BAR_GAP) {
-		view->open_popup(view->menu_bar_gap);
+		view->open_popup(view->menu_bar_gap.get());
 	} else if (hover_buffer(h) >= 0) {
-		view->open_popup(view->menu_buffer);
+		view->open_popup(view->menu_buffer.get());
 	} else { // void
 		if (track()->layers.num == 1)
-			view->open_popup(view->menu_track);
+			view->open_popup(view->menu_track.get());
 		else
-			view->open_popup(view->menu_layer);
+			view->open_popup(view->menu_layer.get());
 	}
 	return true;
 }

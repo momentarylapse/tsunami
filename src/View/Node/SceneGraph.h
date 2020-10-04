@@ -40,7 +40,7 @@ public:
 	void set_current(const HoverData &h);
 	hui::Callback cb_set_current;
 
-	MouseDelayPlanner *mdp;
+	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);
 	void mdp_run(MouseDelayAction *action);
 	void mdp_prepare(hui::Callback update);

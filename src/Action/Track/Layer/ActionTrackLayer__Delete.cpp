@@ -19,17 +19,11 @@ ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index) {
 	layer = t->layers[index];
 }
 
-ActionTrackLayer__Delete::~ActionTrackLayer__Delete() {
-	if (layer)
-		delete layer;
-}
-
 void* ActionTrackLayer__Delete::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < track->layers.num);
 
-	layer = track->layers[index];
 	assert(layer->buffers.num == 0);
 	layer->fake_death();
 	track->layers.erase(index);
@@ -43,7 +37,6 @@ void ActionTrackLayer__Delete::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.insert(layer, index);
-	layer = nullptr;
 
 	a->notify(a->MESSAGE_ADD_LAYER);
 }

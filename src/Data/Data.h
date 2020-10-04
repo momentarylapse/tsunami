@@ -9,6 +9,7 @@
 #define SRC_DATA_DATA_H_
 
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 #include "../lib/file/path.h"
 #include "../Stuff/Observable.h"
 #include <shared_mutex>
@@ -17,7 +18,7 @@ class ActionManager;
 class Action;
 class Session;
 
-class Data : public Observable<VirtualBase> {
+class Data : public Sharable<Observable<VirtualBase>> {
 public:
 	explicit Data(Session *session);
 	virtual ~Data();

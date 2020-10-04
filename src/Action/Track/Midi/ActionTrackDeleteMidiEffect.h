@@ -12,17 +12,15 @@
 #include "../../Action.h"
 class Track;
 
-class ActionTrackDeleteMidiEffect: public Action
-{
+class ActionTrackDeleteMidiEffect: public Action {
 public:
 	ActionTrackDeleteMidiEffect(Track *t, int index);
-	~ActionTrackDeleteMidiEffect();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	MidiEffect *effect;
+	shared<MidiEffect> effect;
 	Track *track;
 	int index;
 };

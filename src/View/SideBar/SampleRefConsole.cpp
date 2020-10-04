@@ -78,7 +78,7 @@ void SampleRefConsole::on_edit_track() {
 }
 
 void SampleRefConsole::on_edit_sample() {
-	bar()->sample_manager->set_selection({sample->origin});
+	bar()->sample_manager->set_selection({sample->origin.get()});
 	session->set_mode(EditMode::DefaultSamples);
 }
 

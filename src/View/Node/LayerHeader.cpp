@@ -43,7 +43,7 @@ public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
-		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker);
+		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker.get());
 	}
 	bool on_left_button_down() override {
 		vlayer->layer->set_muted(!vlayer->layer->muted);
@@ -60,7 +60,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1, "S");
-		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo);
+		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo.get());
 	}
 	bool on_left_button_down() override {
 		vlayer->set_solo(!vlayer->solo);
@@ -226,7 +226,7 @@ bool LayerHeader::on_right_button_down() {
 		view->exclusively_select_layer(vlayer);
 		view->select_under_cursor();
 	}
-	view->open_popup(view->menu_layer);
+	view->open_popup(view->menu_layer.get());
 	return true;
 }
 HoverData LayerHeader::get_hover_data(float mx, float my) {

@@ -15,13 +15,12 @@ class Sample;
 class ActionSampleDelete : public Action {
 public:
 	ActionSampleDelete(Sample *s);
-	~ActionSampleDelete() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	Sample *sample;
+	shared<Sample> sample;
 	int index;
 };
 

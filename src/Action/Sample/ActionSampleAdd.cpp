@@ -14,11 +14,6 @@
 
 ActionSampleAdd::ActionSampleAdd(Sample *s) {
 	sample = s;
-	sample->_pointer_ref();
-}
-
-ActionSampleAdd::~ActionSampleAdd() {
-	sample->_pointer_unref();
 }
 
 void *ActionSampleAdd::execute(Data *d) {
@@ -26,7 +21,7 @@ void *ActionSampleAdd::execute(Data *d) {
 	sample->set_owner(a);
 	a->samples.add(sample);
 	a->notify(a->MESSAGE_ADD_SAMPLE);
-	return sample;
+	return sample.get();
 }
 
 void ActionSampleAdd::undo(Data *d) {

@@ -425,6 +425,7 @@ sources = [
 	'src/Test/TestMidiPreview.cpp',
 	'src/Test/TestMixer.cpp',
 	'src/Test/TestPlugins.cpp',
+	'src/Test/TestPointer.cpp',
 	'src/Test/TestRhythm.cpp',
 	'src/Test/TestRingBuffer.cpp',
 	'src/Test/TestStreams.cpp',

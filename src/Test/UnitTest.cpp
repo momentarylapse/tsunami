@@ -23,6 +23,7 @@
 #include "TestPlugins.h"
 #include "TestMixer.h"
 #include "TestTrackVersion.h"
+#include "TestPointer.h"
 
 UnitTest::UnitTest(const string &_name) {
 	name = _name;
@@ -113,7 +114,7 @@ void UnitTest::assert_equal(const AudioBuffer &a, const AudioBuffer &b, float ep
 	for (int ci=0; ci<a.channels; ci++)
 		for (int i=0; i<a.length; i++)
 			if (fabs(a.c[ci][i] - b.c[ci][i]) > epsilon)
-				throw Failure("a!=b (channel " + i2s(ci) + "\na: " + fa2s(a.c[ci]) + "\nb: " + fa2s(b.c[ci]));
+				throw Failure(format("a!=b (channel %d\na: %s\nb: %s", ci, fa2s(a.c[ci]), fa2s(b.c[ci])));
 }
 
 string UnitTest::ra2s(const Array<Range> &a) {
@@ -136,11 +137,12 @@ void UnitTest::assert_equal(const Array<Range> &a, const Array<Range> &b) {
 		throw Failure(format("a.num (%d) != b.num (%d)", a.num, b.num));
 	for (int i=0; i<a.num; i++)
 		if (a[i] != b[i])
-			throw Failure("a!=b\na: " + ra2s(a) + "\nb: " + ra2s(b));
+			throw Failure(format("a!=b\na: %s\nb: %s", ra2s(a), ra2s(b)));
 }
 
 Array<UnitTest*> UnitTest::all() {
 	Array<UnitTest*> tests;
+	tests.add(new TestPointer);
 	tests.add(new TestAudioBuffer);
 	tests.add(new TestRingBuffer);
 	tests.add(new TestInterpolator);

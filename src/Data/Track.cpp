@@ -52,6 +52,7 @@ const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
 
 Track::Track(SignalType _type, Synthesizer *_synth) {
+	msg_write("  new Track " + p2s(this));
 	type = _type;
 	channels = 1;
 	if (type == SignalType::AUDIO_MONO) {
@@ -79,27 +80,14 @@ Track::Track(SignalType _type, Synthesizer *_synth) {
 
 Track::~Track() {
 	notify(MESSAGE_DELETE);
-	for (TrackLayer *l: layers)
-		delete(l);
-	layers.clear();
-
-	for (AudioEffect *f: fx)
-		delete(f);
-	fx.clear();
-
-	for (MidiEffect *f: midi_fx)
-		delete(f);
-	midi_fx.clear();
-
-	if (synth)
-		delete(synth);
+	msg_write("  del Track " + p2s(this));
 }
 
 Range Track::range() const {
 	Range r = Range::EMPTY;
 
-	for (TrackLayer *l: layers)
-		r = r or l->range(synth->keep_notes);
+	for (auto *l: layers)
+		r = r or l->range(synth.get()->keep_notes);
 
 	return r;
 }

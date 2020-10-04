@@ -88,14 +88,11 @@ SignalChain::~SignalChain() {
 		thread->keep_running = false;
 		thread->join();
 		//thread->kill();
-		delete(thread);
 		thread = nullptr;
 	}
 	stop();
 	for (Module *m: modules)
 		m->unsubscribe(this);
-	for (Module *m: modules)
-		delete m;
 	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
 
@@ -158,7 +155,6 @@ void SignalChain::delete_module(Module *m) {
 		disconnect_out(m, i);
 
 	modules.erase(index);
-	delete m;
 	notify(MESSAGE_DELETE_MODULE);
 }
 
@@ -460,7 +456,6 @@ void SignalChain::_stop_sucking() {
 		session->debug("chain", "stop suck");
 		thread->keep_running = false;
 		thread->join();
-		delete thread;
 		thread = nullptr;
 	}
 	sucking = false;

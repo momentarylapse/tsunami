@@ -53,10 +53,10 @@ public:
 
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1-2, "\U0001f50a");
-		c->draw_mask_image(area.x1, area.y1, view->images.speaker);
+		c->draw_mask_image(area.x1, area.y1, view->images.speaker.get());
 		if (track->muted) {
 			c->set_color(color(1, 0.7f, 0, 0));
-			c->draw_mask_image(area.x1, area.y1, view->images.x);
+			c->draw_mask_image(area.x1, area.y1, view->images.x.get());
 		}
 	}
 	bool on_left_button_down() override {
@@ -74,7 +74,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->draw_mask_image(area.x1, area.y1, view->images.solo);
+		c->draw_mask_image(area.x1, area.y1, view->images.solo.get());
 	}
 	bool on_left_button_down() override {
 		vtrack->set_solo(!vtrack->solo);
@@ -91,7 +91,7 @@ public:
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
-		c->draw_mask_image(area.x1, area.y1, view->images.config);
+		c->draw_mask_image(area.x1, area.y1, view->images.config.get());
 	}
 	bool on_left_button_down() override {
 		view->session->set_mode(EditMode::DefaultTrack);
@@ -203,13 +203,13 @@ void TrackHeader::draw(Painter *c) {
 	c->set_font("", -1, false, false);
 
 	// icons
-	auto *icon = view->images.track_audio;
+	auto *icon = view->images.track_audio.get();
 	if (track->type == SignalType::BEATS)
-		icon = view->images.track_time; // "⏱"
+		icon = view->images.track_time.get(); // "⏱"
 	else if (track->type == SignalType::MIDI)
-		icon = view->images.track_midi; // "♫"
+		icon = view->images.track_midi.get(); // "♫"
 	else if (track->type == SignalType::GROUP)
-		icon = view->images.track_group; // "G"
+		icon = view->images.track_group.get(); // "G"
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
 }
 
@@ -282,7 +282,7 @@ bool TrackHeader::on_right_button_down() {
 		view->exclusively_select_layer(vtrack->first_layer());
 		view->select_under_cursor();
 	}
-	view->open_popup(view->menu_track);
+	view->open_popup(view->menu_track.get());
 	return true;
 }
 

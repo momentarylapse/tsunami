@@ -15,22 +15,16 @@ ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, MidiEffect *_effect
 	effect = _effect;
 }
 
-ActionTrackAddMidiEffect::~ActionTrackAddMidiEffect() {
-	if (effect)
-		delete effect;
-}
-
 void *ActionTrackAddMidiEffect::execute(Data *d) {
 	track->midi_fx.add(effect);
 	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
-	effect = nullptr;
 
 	return nullptr;
 }
 
 void ActionTrackAddMidiEffect::undo(Data *d) {
 	assert(track->midi_fx.num > 0);
-	effect = track->midi_fx.pop();
+	track->midi_fx.pop();
 	effect->fake_death();
 	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
 }

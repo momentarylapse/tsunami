@@ -413,7 +413,7 @@ int ViewModeDefault::suggest_move_cursor(const Range &cursor, bool forward) {
 }
 
 MidiPainter* midi_context(AudioViewLayer *l) {
-	auto *mp = l->view->midi_painter;
+	auto *mp = l->view->midi_painter.get();
 	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode());
 	mp->set_key_changes(l->midi_key_changes);
 	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);

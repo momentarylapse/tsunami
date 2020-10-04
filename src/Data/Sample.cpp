@@ -14,9 +14,10 @@
 
 const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Sample::MESSAGE_REFERENCE = "Reference";
-const string Sample::MESSAGE_UNREFERENCE= "Unreference";
+const string Sample::MESSAGE_UNREFERENCE = "Unreference";
 
 Sample::Sample(SignalType _type) {
+	msg_write("  new Sample " + p2s(this));
 	owner = nullptr;
 	type = _type;
 
@@ -31,8 +32,6 @@ Sample::Sample(SignalType _type) {
 	buf = nullptr;
 	if (_type == SignalType::AUDIO)
 		buf = new AudioBuffer;
-
-	_pointer_ref_count = 0;
 }
 
 Sample::Sample(const string &_name, const AudioBuffer &_buf) : Sample(SignalType::AUDIO) {
@@ -51,6 +50,7 @@ Sample::~Sample() {
 	notify(MESSAGE_DELETE);
 	if (buf)
 		delete buf;
+	msg_write("  del Sample " + p2s(this));
 }
 
 void Sample::__init__(const string &_name, const AudioBuffer &_buf) {
@@ -103,31 +103,12 @@ void Sample::set_value(const string &key, const string &value) {
 	tags.add({key, value});
 }
 
-
-Sample *Sample::_pointer_ref() {
-	_pointer_ref_count ++;
-	return this;
-}
-
-void Sample::_pointer_unref() {
-	_pointer_ref_count --;
-	if (_pointer_ref_count == 0)
-		delete this;
-}
-
 void Sample::set_owner(Song *s) {
 	assert(s);
-	if (owner) {
-		owner = s;
-	} else {
-		_pointer_ref();
-		owner = s;
-	}
+	owner = s;
 }
 
 void Sample::unset_owner() {
-	if (owner)
-		_pointer_unref();
 	owner = nullptr;
 }
 

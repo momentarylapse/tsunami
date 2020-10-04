@@ -27,7 +27,7 @@ hui::Panel *create_dummy_synth_panel() {
 }
 
 hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win) {
-	auto *p = new ModulePanel(track->synth, nullptr, ModulePanel::Mode::DEFAULT_H);
+	auto *p = new ModulePanel(track->synth.get(), nullptr, ModulePanel::Mode::DEFAULT_H);
 	//p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([=]{
 		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
@@ -35,7 +35,7 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win)
 			track->set_synthesizer(CreateSynthesizer(session, name));
 	});
 	p->set_func_detune([=]{
-		auto *dlg = new DetuneSynthesizerDialog(track->synth, track, session->view, win);
+		auto *dlg = new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win);
 		dlg->run();
 		delete dlg;
 	});

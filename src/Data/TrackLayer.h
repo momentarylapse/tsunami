@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_TRACKLAYER_H_
 #define SRC_DATA_TRACKLAYER_H_
 
+#include "../lib/base/pointer.h"
 #include "Range.h"
 #include "Midi/MidiData.h"
 #include "Midi/Instrument.h"
@@ -27,7 +28,7 @@ enum class SignalType;
 
 
 
-class TrackLayer : public Observable<VirtualBase> {
+class TrackLayer : public Sharable<Observable<VirtualBase>> {
 public:
 	TrackLayer();
 	TrackLayer(Track *track);
@@ -75,7 +76,7 @@ public:
 
 	MidiNoteBuffer midi;
 
-	Array<SampleRef*> samples;
+	shared_array<SampleRef> samples;
 	
 	Array<TrackMarker*> markers;
 	Array<TrackMarker*> markers_sorted() const;

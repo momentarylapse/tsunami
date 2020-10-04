@@ -12,6 +12,7 @@
 #include "Curve.h"
 #include "Rhythm/BarCollection.h"
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 #include "../lib/any/any.h"
 #include <shared_mutex>
 
@@ -135,9 +136,9 @@ public:
 	int compression;
 
 	Array<AudioEffect*> __fx;
-	Array<Track*> tracks;
-	Array<Sample*> samples;
-	Array<Curve*> curves;
+	shared_array<Track> tracks;
+	shared_array<Sample> samples;
+	shared_array<Curve> curves;
 	BarCollection bars;
 
 	Any secret_data;

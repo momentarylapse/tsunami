@@ -10,14 +10,15 @@
 
 
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 #include "../Stuff/Observable.h"
 
-namespace Kaba{
+namespace Kaba {
 	class Script;
 	class Class;
 };
 
-namespace hui{
+namespace hui {
 	class Panel;
 }
 
@@ -63,7 +64,7 @@ enum class ModuleCommand {
 	SUCK,
 };
 
-class Module : public Observable<VirtualBase> {
+class Module : public Sharable<Observable<VirtualBase>> {
 public:
 
 	Module(ModuleType type, const string &sub_type);
@@ -122,7 +123,7 @@ public:
 
 
 
-	virtual void _cdecl reset_state(){}
+	virtual void _cdecl reset_state() {}
 
 
 	static const int COMMAND_NOT_HANDLED;
@@ -142,7 +143,7 @@ public:
 	static string type_to_name(ModuleType type);
 	static ModuleType type_from_name(const string &name);
 
-	Array<Module*> children;
+	shared_array<Module> children;
 };
 
 

@@ -8,6 +8,7 @@
 #ifndef AUDIOVIEW_H_
 #define AUDIOVIEW_H_
 
+#include "../lib/base/pointer.h"
 #include "../Data/SongSelection.h"
 #include "../Data/Midi/Scale.h"
 #include "../Stuff/Observable.h"
@@ -220,6 +221,8 @@ public:
 
 	ViewMode *mode;
 	void set_mode(ViewMode *m);
+
+	owned_array<ViewMode> all_modes;
 	ViewModeDefault *mode_default;
 	ViewModeEdit *mode_edit;
 	ViewModeEditDummy *mode_edit_dummy;
@@ -235,7 +238,7 @@ public:
 
 	Song *song;
 
-	SignalChain *signal_chain;
+	shared<SignalChain> signal_chain;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
 	AudioOutput *output_stream;
@@ -276,7 +279,7 @@ public:
 	rect song_area();
 	rect clip;
 	TrackHeightManager thm;
-	SceneGraph *scene_graph;
+	owned<SceneGraph> scene_graph;
 	bool update_scene_graph();
 	void rebuild_scene_graph();
 
@@ -295,15 +298,15 @@ public:
 	SelectionMarker *selection_marker;
 
 
-	MidiPainter *midi_painter;
-	BufferPainter *buffer_painter;
-	GridPainter *grid_painter;
+	owned<MidiPainter> midi_painter;
+	owned<BufferPainter> buffer_painter;
+	owned<GridPainter> grid_painter;
 
 	Array<AudioViewTrack*> vtrack;
 	Array<AudioViewLayer*> vlayer;
 	AudioViewLayer *metronome_overlay_vlayer;
-	AudioViewTrack *dummy_vtrack;
-	AudioViewLayer *dummy_vlayer;
+	shared<AudioViewTrack> dummy_vtrack;
+	shared<AudioViewLayer> dummy_vlayer;
 	AudioViewTrack *get_track(Track *track);
 	AudioViewLayer *get_layer(TrackLayer *layer);
 	void update_tracks();
@@ -325,22 +328,22 @@ public:
 	void set_message(const string &text, float size=1.0f);
 	void draw_message(Painter *c, Message &m);
 
-	PeakThread *peak_thread;
+	owned<PeakThread> peak_thread;
 
 	struct ImageData {
-		Image *speaker, *x, *solo, *config;
-		Image *track_audio, *track_time, *track_midi, *track_group;
+		owned<Image> speaker, x, solo, config;
+		owned<Image> track_audio, track_time, track_midi, track_group;
 	} images;
 
-	hui::Menu *menu_track;
-	hui::Menu *menu_playback_range;
-	hui::Menu *menu_layer;
-	hui::Menu *menu_sample;
-	hui::Menu *menu_marker;
-	hui::Menu *menu_bar;
-	hui::Menu *menu_bar_gap;
-	hui::Menu *menu_buffer;
-	hui::Menu *menu_song;
+	owned<hui::Menu> menu_track;
+	owned<hui::Menu> menu_playback_range;
+	owned<hui::Menu> menu_layer;
+	owned<hui::Menu> menu_sample;
+	owned<hui::Menu> menu_marker;
+	owned<hui::Menu> menu_bar;
+	owned<hui::Menu> menu_bar_gap;
+	owned<hui::Menu> menu_buffer;
+	owned<hui::Menu> menu_song;
 	void prepare_menu(hui::Menu *menu);
 	void open_popup(hui::Menu *menu);
 

@@ -15,10 +15,6 @@ ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_syn
 	synth = _synth;
 }
 
-ActionTrackSetSynthesizer::~ActionTrackSetSynthesizer() {
-	delete synth;
-}
-
 void ActionTrackSetSynthesizer::undo(Data *d) {
 	execute(d);
 }
@@ -29,6 +25,6 @@ void *ActionTrackSetSynthesizer::execute(Data *d) {
 	std::swap(synth, track->synth);
 	track->notify(Track::MESSAGE_REPLACE_SYNTHESIZER);
 
-	return synth;
+	return synth.get();
 }
 

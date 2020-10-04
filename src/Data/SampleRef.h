@@ -9,6 +9,7 @@
 #define SRC_DATA_SAMPLEREF_H_
 
 #include "../Stuff/Observable.h"
+#include "../lib/base/pointer.h"
 #include "../lib/math/rect.h"
 
 class Song;
@@ -19,7 +20,7 @@ class AudioBuffer;
 class Range;
 enum class SignalType;
 
-class SampleRef : public Observable<VirtualBase> {
+class SampleRef : public Sharable<Observable<VirtualBase>> {
 public:
 	SampleRef(Sample *sample);
 	virtual ~SampleRef();
@@ -34,7 +35,7 @@ public:
 	int _cdecl get_index() const;
 
 	int pos;
-	Sample *origin;
+	shared<Sample> origin;
 	AudioBuffer &buf() const;
 	MidiNoteBuffer &midi() const;
 	bool muted;

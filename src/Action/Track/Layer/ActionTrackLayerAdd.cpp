@@ -16,11 +16,6 @@ ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l) {
 	layer = l;
 }
 
-ActionTrackLayerAdd::~ActionTrackLayerAdd() {
-	if (layer)
-		delete layer;
-}
-
 void* ActionTrackLayerAdd::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 

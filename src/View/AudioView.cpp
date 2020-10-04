@@ -155,6 +155,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_scale_marker = new ViewModeScaleMarker(this);
 	mode_curve = new ViewModeCurve(this);
 	mode_capture = new ViewModeCapture(this);
+	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_dummy, mode_edit, mode_scale_bars, mode_scale_marker, mode_curve, mode_capture};
 	set_mode(mode_default);
 
 	scene_graph = new SceneGraph([=]{ set_current(scene_graph->cur_selection); });
@@ -310,39 +311,7 @@ AudioView::~AudioView() {
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
-	delete scroll_bar_y;
-	delete scroll_bar_time;
-
-	delete buffer_painter;
-	delete grid_painter;
-	delete midi_painter;
-
-	delete mode_curve;
-	delete mode_scale_bars;
-	delete mode_scale_marker;
-	delete mode_edit;
-	delete mode_edit_dummy;
-	delete mode_edit_audio;
-	delete mode_edit_midi;
-	delete mode_capture;
-	delete mode_default;
-
 	peak_thread->hard_stop();
-	delete peak_thread;
-
-	delete dummy_vtrack;
-	delete dummy_vlayer;
-	delete metronome_overlay_vlayer;
-
-	delete images.speaker;
-	delete images.x;
-	delete images.solo;
-	delete images.config;
-	delete images.track_audio;
-	delete images.track_midi;
-	delete images.track_time;
-
-	delete signal_chain;
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
@@ -934,7 +903,7 @@ AudioViewTrack *AudioView::get_track(Track *track) {
 		if (t->track == track)
 			return t;
 	}
-	return dummy_vtrack;
+	return dummy_vtrack.get();
 }
 
 AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
@@ -946,7 +915,7 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
 	session->e("get_layer() failed for " + p2s(layer));
 	session->i(msg_get_trace());
 
-	return dummy_vlayer;
+	return dummy_vlayer.get();
 }
 
 void AudioView::update_tracks() {
@@ -1844,7 +1813,7 @@ HoverData &AudioView::hover() {
 }
 
 MouseDelayPlanner *AudioView::mdp() {
-	return scene_graph->mdp;
+	return scene_graph->mdp.get();
 }
 
 void AudioView::mdp_prepare(MouseDelayAction *a) {

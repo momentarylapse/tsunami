@@ -311,16 +311,17 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Sample.get_value", &Sample::get_value);
 	Kaba::link_external_class_func("Sample.set_value", &Sample::set_value);
 
-	Sample sample(SignalType::AUDIO);
-	sample._pointer_ref(); // stack allocated... don't auto-delete!
+	{
+	shared<Sample> sample = new Sample(SignalType::AUDIO);
 	//sample.owner = tsunami->song;
-	SampleRef sampleref(&sample);
+	SampleRef sampleref(sample.get());
 	Kaba::declare_class_size("SampleRef", sizeof(SampleRef));
 	Kaba::link_external_class_func("SampleRef.buf", &SampleRef::buf);
 	Kaba::link_external_class_func("SampleRef.midi", &SampleRef::midi);
 	Kaba::declare_class_element("SampleRef.origin", &SampleRef::origin);
 	Kaba::link_external_class_func("SampleRef.__init__", &SampleRef::__init__);
 	Kaba::link_external_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
+	}
 
 
 

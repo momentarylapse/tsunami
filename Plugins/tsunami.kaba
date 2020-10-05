@@ -613,6 +613,7 @@ class Storage
 class SignalChain extends Module
 	extern void __init__(Session session, string name)
 	extern override void __delete__()
+	extern void __del_override__()
 	extern override int command(int cmd, int param)
 	extern override void reset_state()
 	extern Module* add(int type, string name)

@@ -85,7 +85,7 @@ public:
 		zombify();
 	}
 	void on_delete() {
-		manager->remove(this);
+		hui::RunLater(0.001f, [=]{ manager->remove(this); });
 	}
 	void on_update() {
 		int n = manager->get_index(s);
@@ -147,10 +147,6 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 }
 
 SampleManagerConsole::~SampleManagerConsole() {
-	for (auto *si: items)
-		delete(si);
-	items.clear();
-
 	song->unsubscribe(this);
 }
 
@@ -286,8 +282,8 @@ void SampleManagerConsole::remove(SampleManagerItem *item) {
 			items.erase(i);
 			remove_string(id_list, i);
 
-			// don't delete now... we're still in notify()?
-			item->zombify();
+			// don't delete now... we're still in notify()?  nope!
+			//item->zombify();
 			old_items.add(item);
 		}
 }
@@ -366,7 +362,7 @@ void SampleManagerConsole::end_preview() {
 	preview.chain->unsubscribe(this);
 	preview.stream->unsubscribe(this);
 	preview.chain->stop();
-	delete preview.chain;
+	preview.chain->unregister();
 	preview.sample = nullptr;
 }
 

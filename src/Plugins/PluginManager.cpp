@@ -594,6 +594,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_virtual("SignalChain.__delete__", &SignalChain::__delete__, &chain);
 	Kaba::link_external_virtual("SignalChain.reset_state", &SignalChain::reset_state, &chain);
 	Kaba::link_external_virtual("SignalChain.command", &SignalChain::command, &chain);
+	Kaba::link_external_class_func("SignalChain.__del_override__", &SignalChain::unregister);
 	Kaba::link_external_class_func("SignalChain.start", &SignalChain::start);
 	Kaba::link_external_class_func("SignalChain.stop", &SignalChain::stop);
 	Kaba::link_external_class_func("SignalChain.add", &SignalChain::add);

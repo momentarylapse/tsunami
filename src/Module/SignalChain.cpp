@@ -104,6 +104,10 @@ void SignalChain::__delete__() {
 	this->SignalChain::~SignalChain();
 }
 
+void SignalChain::unregister() {
+	session->remove_signal_chain(this);
+}
+
 void SignalChain::set_tick_dt(float dt) {
 	tick_dt = dt;
 }

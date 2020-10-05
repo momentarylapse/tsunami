@@ -32,6 +32,8 @@ public:
 	static const string MESSAGE_ADD_CABLE;
 	static const string MESSAGE_DELETE_CABLE;
 
+	void unregister();
+
 	void reset();
 	void save(const Path &filename);
 	static SignalChain *load(Session *session, const Path &filename);

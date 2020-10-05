@@ -444,7 +444,7 @@ public:
 			session->e(_("not allowed to delete the main signal chain"));
 			return;
 		}
-		hui::RunLater(0.001f, [=](){ delete chain; });
+		hui::RunLater(0.001f, [=](){ chain->unregister(); });
 	}
 
 

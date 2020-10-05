@@ -190,9 +190,9 @@ bool Session::in_mode(const string &m) {
 void Session::add_signal_chain(SignalChain *chain) {
 	all_signal_chains.add(chain);
 	notify(MESSAGE_ADD_SIGNAL_CHAIN);
-	chain->subscribe(this, [=]{
+	/*chain->subscribe(this, [=]{
 		_remove_signal_chain(chain);
-	}, chain->MESSAGE_DELETE);
+	}, chain->MESSAGE_DELETE);*/
 }
 
 SignalChain* Session::create_signal_chain(const string &name) {
@@ -214,7 +214,7 @@ SignalChain* Session::load_signal_chain(const Path &filename) {
 	return chain;
 }
 
-void Session::_remove_signal_chain(SignalChain* chain) {
+void Session::remove_signal_chain(SignalChain* chain) {
 	for (int i=0; i<all_signal_chains.num; i++)
 		if (chain == all_signal_chains[i])
 			all_signal_chains.erase(i);

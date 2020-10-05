@@ -54,7 +54,7 @@ public:
 	SignalChain* create_signal_chain(const string &name);
 	SignalChain* create_signal_chain_system(const string &name);
 	SignalChain* load_signal_chain(const Path &filename);
-	void _remove_signal_chain(SignalChain *chain);
+	void remove_signal_chain(SignalChain *chain);
 
 	shared_array<TsunamiPlugin> plugins;
 	TsunamiPlugin *last_plugin;

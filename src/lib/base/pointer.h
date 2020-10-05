@@ -52,11 +52,11 @@ public:
 	void release() {
 		if (_p)
 			delete _p;
-		_p = nullptr;
+		forget();
 	}
 	T *check_out() {
 		T *r = _p;
-		_p = nullptr;
+		forget();
 		return r;
 	}
 
@@ -70,6 +70,10 @@ public:
 	}
 	void operator=(T *o) {
 		set(o);
+	}
+	void operator=(owned<T> &&o) {
+		set(o);
+		o.forget();
 	}
 	void operator=(nullptr_t o) {
 		release();
@@ -88,6 +92,10 @@ public:
 	}
 	explicit operator bool() const {
 		return _p;
+	}
+private:
+	void forget() {
+		_p = nullptr;
 	}
 };
 
@@ -161,6 +169,7 @@ public:
 template<class T>
 class shared {
 	T *_p = nullptr;
+	friend class owned<T>;
 public:
 	shared() {
 		_p = nullptr;
@@ -211,6 +220,11 @@ public:
 	void operator=(const shared<T> o) {
 		pdb(format("shared/s = %s", p2s(o._p)));
 		set(o._p);
+	}
+	void operator=(owned<T> &&o) {
+		pdb(format("shared/o = %s", p2s(o._p)));
+		set(o._p);
+		o.forget();
 	}
 	/*bool operator==(const shared<T> o) const {
 		return _p == o._p;

@@ -78,7 +78,7 @@ public:
 
 	shared_array<SampleRef> samples;
 	
-	Array<TrackMarker*> markers;
+	shared_array<TrackMarker> markers;
 	Array<TrackMarker*> markers_sorted() const;
 
 	Array<CrossFade> fades;

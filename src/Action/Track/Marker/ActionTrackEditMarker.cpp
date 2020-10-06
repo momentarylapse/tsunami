@@ -18,13 +18,8 @@ ActionTrackEditMarker::ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m
 }
 
 void *ActionTrackEditMarker::execute(Data *d) {
-	string temp = text;
-	text = marker->text;
-	marker->text = temp;
-
-	Range r = range;
-	range = marker->range;
-	marker->range = r;
+	std::swap(marker->text, text);
+	std::swap(marker->range, range);
 
 	layer->notify();
 	return nullptr;

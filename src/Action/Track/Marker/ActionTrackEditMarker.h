@@ -23,7 +23,7 @@ public:
 
 private:
 	const TrackLayer *layer;
-	TrackMarker *marker;
+	shared<TrackMarker> marker;
 	Range range;
 	string text;
 };

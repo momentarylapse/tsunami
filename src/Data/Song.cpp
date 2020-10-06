@@ -484,8 +484,8 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 		if (sel.range().covers(b->range())) {
 			int before = b->range().offset - sel.range().offset;
 			if (ss->bars.num == 0 and before > 0)
-				ss->bars.add(new Bar(before, 0, 0));
-			ss->bars.add(new Bar(*b));
+				ss->bars.add(new Bar(before, 0, 0)); // pause
+			ss->bars.add(b->copy());
 		}
 	for (Track *t: song->tracks) {
 		if (!sel.has(t))
@@ -525,7 +525,7 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 			}
 			for (auto *m: l->markers)
 				if (sel.has(m))
-					ll->markers.add(new TrackMarker({m->range - sel.range().offset, m->text}));
+					ll->markers.add(new TrackMarker(m->range - sel.range().offset, m->text));
 			ll->fades = l->fades; // TODO...
 		}
 	}

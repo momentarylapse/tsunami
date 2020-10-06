@@ -22,7 +22,7 @@ BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 
 
 	set_int("count", 1);
-	new_bar = Bar(100, 4, 1);
+	new_bar = {100, 4, 1};
 	new_bar.set_bpm(90, song->sample_rate);
 
 	// get default data from "selected" reference bar

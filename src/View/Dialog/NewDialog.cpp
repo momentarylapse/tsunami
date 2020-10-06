@@ -29,7 +29,7 @@ NewDialog::NewDialog(hui::Window *_parent):
 	type = SignalType::AUDIO_MONO;
 	check("type-audio-mono", true);
 
-	new_bar = Bar(1000, 4, 1);
+	new_bar = {1000, 4, 1};
 	set_int("num_bars", 32);
 	set_int("beats", new_bar.beats.num);
 	set_string("pattern", new_bar.pat_str());

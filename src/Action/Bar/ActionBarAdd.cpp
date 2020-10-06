@@ -21,9 +21,9 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode) {
+ActionBarAdd::ActionBarAdd(int _index, const BarPattern &pattern, int _mode) {
 	index = _index;
-	bar = new Bar(_bar);
+	bar = new Bar(pattern);
 	mode = _mode;
 }
 

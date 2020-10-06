@@ -42,8 +42,6 @@ TrackLayer::TrackLayer(Track *t) {
 }
 
 TrackLayer::~TrackLayer() {
-	midi.deep_clear();
-
 	msg_write("  del TrackLayer " + p2s(this));
 }
 

@@ -15,7 +15,7 @@ class Bar;
 
 class ActionBarAdd : public ActionGroup {
 public:
-	ActionBarAdd(int index, const BarPattern &bar, int mode);
+	ActionBarAdd(int index, const BarPattern &pattern, int mode);
 
 	void build(Data *d) override;
 

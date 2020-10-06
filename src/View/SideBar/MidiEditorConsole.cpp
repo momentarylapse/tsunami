@@ -508,7 +508,7 @@ void MidiEditorConsole::on_quantize() {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, mode->sub_beat_partition);
 
 	song->begin_action_group();
-	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	auto ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref) {
 		view->sel.set(n, false);
 		MidiNote *nn = n->copy();
@@ -527,7 +527,7 @@ void MidiEditorConsole::on_apply_string() {
 		return;
 
 	song->begin_action_group();
-	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	auto ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref)
 		layer->midi_note_set_string(n, string_no);
 	song->end_action_group();
@@ -540,7 +540,7 @@ void MidiEditorConsole::on_apply_hand_position() {
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
 	song->begin_action_group();
-	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	auto ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref) {
  		int stringno = 0;
  		for (int i=0; i<string_pitch.num; i++)
@@ -558,7 +558,7 @@ void MidiEditorConsole::on_apply_pitch_shift() {
 		return;
 
 	song->begin_action_group();
-	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	auto ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref)
 		layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
 	song->end_action_group();
@@ -566,7 +566,7 @@ void MidiEditorConsole::on_apply_pitch_shift() {
 
 void MidiEditorConsole::on_apply_flags(int mask) {
 	song->begin_action_group();
-	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	auto ref = layer->midi.get_notes_by_selection(view->sel);
 	if (mask == 0) {
 		for (auto *n: ref)
 			layer->midi_note_set_flags(n, 0);
@@ -579,7 +579,6 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_add_key_change() {
-	auto *dlg = new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::");
+	auto dlg = ownify(new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::"));
 	dlg->run();
-	delete dlg;
 }

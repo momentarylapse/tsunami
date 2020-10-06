@@ -146,6 +146,12 @@ template <class T>
 class Sharable : public T {
 	int _pointer_ref_counter = 0;
 public:
+	Sharable() {}
+
+	// prevent copying
+	Sharable(const Sharable<T> &o) = delete;
+	void operator=(const Sharable<T> &o) = delete;
+
 	auto _pointer_ref() {
 		_pointer_ref_counter ++;
 		pdb(format("ref %s -> %d", p2s(this), _pointer_ref_counter));

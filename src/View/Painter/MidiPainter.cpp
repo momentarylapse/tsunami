@@ -344,7 +344,7 @@ struct QuantizedBar {
 	}
 };
 
-Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBufferRef &bnotes, Bar *b, MidiPainter *mp, float spu, std::function<float(MidiNote*)> y_func) {
+Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, MidiPainter *mp, float spu, std::function<float(MidiNote*)> y_func) {
 	Array<QuantizedNote> ndata;
 	float y_mid = (mp->area.y1 + mp->area.y2) / 2;
 
@@ -465,7 +465,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		float spu = quarter_length / (float)QUARTER_PARTITION;
 //		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
-		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
+		auto bnotes = midi.get_notes(b->range());
 		//c->set_color(colors.text_soft3);
 
 		auto ndata = quantize_all_notes_in_bar(bnotes, b, this, spu, y_func);
@@ -812,7 +812,7 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	c->set_clip(area and c->area());
 	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
-	MidiNoteBufferRef notes = midi.get_notes(cur_range);
+	auto notes = midi.get_notes(cur_range);
 
 	if (cam->pixels_per_sample < quality.notes_zoom_min) {
 		draw_low_detail_dummy(c, midi);

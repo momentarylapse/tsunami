@@ -18,7 +18,7 @@
 class BarCollection;
 class Beat;
 
-class BarPattern : public Sharable<Empty> {
+class BarPattern {
 public:
 	BarPattern();
 	BarPattern(int length, int num_beats, int divisor);
@@ -43,9 +43,8 @@ public:
 	};
 };
 
-class Bar : public BarPattern {
+class Bar : public Sharable<BarPattern> {
 public:
-	Bar(){}
 	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int divisor);
 	bool is_pause();
@@ -54,6 +53,9 @@ public:
 	string format_bpm(float sample_rate) const;
 
 	Array<Beat> get_beats(int offset, bool include_sub_beats = false, int sub_beat_partition = 1) const;
+
+	const BarPattern &pattern() const;
+	Bar *copy() const;
 
 
 	// filled by BarCollection.getBars()

@@ -13,14 +13,13 @@
 #include "../../Data/Rhythm/Bar.h"
 
 class Song;
-class Bar;
 enum class SignalType;
 
 class NewDialog: public hui::Dialog {
 public:
 	NewDialog(hui::Window *_parent);
 
-	Bar new_bar;
+	BarPattern new_bar;
 	SignalType type;
 
 	void load_data();

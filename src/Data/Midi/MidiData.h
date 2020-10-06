@@ -9,13 +9,13 @@
 #define SRC_DATA_MIDI_MIDIDATA_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/pointer.h"
 #include "../Range.h"
 #include "MidiNote.h"
 #include "MidiEvent.h"
 
 #define MAX_PITCH		128
 
-class MidiNoteBufferRef;
 class MidiEffect;
 class Instrument;
 class Clef;
@@ -53,7 +53,7 @@ public:
 	void append(const MidiEventBuffer &data);
 };
 
-class MidiNoteBuffer : public Array<MidiNote*> {
+class MidiNoteBuffer : public shared_array<MidiNote> {
 public:
 	MidiNoteBuffer();
 	MidiNoteBuffer(const MidiNoteBuffer &midi);
@@ -61,10 +61,9 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__();
 	void clear();
-	void deep_clear();
 	MidiEventBuffer get_events(const Range &r) const;
-	MidiNoteBufferRef get_notes(const Range &r) const;
-	MidiNoteBufferRef get_notes_by_selection(const SongSelection &s) const;
+	MidiNoteBuffer get_notes(const Range &r) const;
+	MidiNoteBuffer get_notes_by_selection(const SongSelection &s) const;
 	MidiNoteBuffer duplicate() const;
 	void append(const MidiNoteBuffer &midi, int offset);
 
@@ -75,18 +74,11 @@ public:
 	void sanify(const Range &r);
 
 	void operator=(const MidiNoteBuffer &midi);
-	void operator=(const MidiNoteBufferRef &midi);
 
 	void update_clef_pos(const Instrument &instrument, const Scale &s) const;
 	void reset_clef() const;
 
 	bool has(MidiNote *n) const;
-};
-
-class MidiNoteBufferRef : public MidiNoteBuffer {
-public:
-	MidiNoteBufferRef();
-	~MidiNoteBufferRef();
 };
 
 MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes);

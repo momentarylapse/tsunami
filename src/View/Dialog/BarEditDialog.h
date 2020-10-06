@@ -9,17 +9,16 @@
 #define SRC_VIEW_DIALOG_BAREDITDIALOG_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../Data/Rhythm/Bar.h"
 
 class Song;
 class Range;
-class Bar;
 
-class BarEditDialog : public hui::Dialog
-{
+class BarEditDialog : public hui::Dialog {
 public:
 	Song *song;
 	Array<int> sel;
-	Bar *new_bar;
+	BarPattern new_bar;
 
 	int duration;
 

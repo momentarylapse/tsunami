@@ -447,7 +447,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("MidiNoteBuffer.get_events", &MidiNoteBuffer::get_events);
 	Kaba::link_external_class_func("MidiNoteBuffer.get_notes", &MidiNoteBuffer::get_notes);
 	Kaba::link_external_class_func("MidiNoteBuffer.get_range", &MidiNoteBuffer::range);
-	Kaba::link_external_class_func("MidiNoteBuffer.deep_clear", &MidiNoteBuffer::deep_clear);
 
 	BeatSource bsource;
 	Kaba::declare_class_size("BeatSource", sizeof(BeatSource));

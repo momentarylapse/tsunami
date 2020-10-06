@@ -666,7 +666,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 	// samples per 16th / 3
 	float spu = (float)b->range().length / (float)b->total_sub_beats * (float)b->divisor / (float)BEAT_PARTITION;
 
-	MidiNoteBufferRef notes = t->t->layers[0]->midi.get_notes(b->range());
+	auto notes = t->t->layers[0]->midi.get_notes(b->range());
 	Array<GuitarNote> gnotes;
 
 	for (MidiNote *n : notes){

@@ -323,7 +323,6 @@ MidiNoteBuffer::MidiNoteBuffer(const MidiNoteBuffer &midi) {
 }
 
 MidiNoteBuffer::~MidiNoteBuffer() {
-	deep_clear();
 }
 
 void MidiNoteBuffer::__init__() {
@@ -335,23 +334,16 @@ void MidiNoteBuffer::__delete__() {
 }
 
 void MidiNoteBuffer::clear() {
-	Array<MidiNote*>::clear();
+	shared_array<MidiNote>::clear();
 	samples = 0;
 }
 
-void MidiNoteBuffer::deep_clear() {
-	for (MidiNote *n: *this)
-		delete(n);
-	clear();
-}
-
 MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const {
-	MidiNoteBufferRef b = get_notes(r);
-	return midi_notes_to_events(b);
+	return midi_notes_to_events(get_notes(r));
 }
 
-MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const {
-	MidiNoteBufferRef b;
+MidiNoteBuffer MidiNoteBuffer::get_notes(const Range &r) const {
+	MidiNoteBuffer b;
 	b.samples = r.length;
 	for (MidiNote *n: *this)
 		if (r.overlaps(n->range))
@@ -359,16 +351,11 @@ MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const {
 	return b;
 }
 
-MidiNoteBufferRef MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const {
-	MidiNoteBufferRef b;
+MidiNoteBuffer MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const {
+	MidiNoteBuffer b;
 	for (MidiNote *n: *this)
 		if (s.has(n))
 			b.add(n);
-	return b;
-}
-
-MidiNoteBuffer MidiNoteBuffer::duplicate() const {
-	MidiNoteBuffer b = *this;
 	return b;
 }
 
@@ -382,21 +369,19 @@ void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
 	sort();
 }
 
-void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi) {
-	deep_clear();
-
-	for (MidiNote *n: midi)
-		add(n->copy());
-
-	samples = midi.samples;
+MidiNoteBuffer MidiNoteBuffer::duplicate() const {
+	MidiNoteBuffer r;
+	for (MidiNote *n: *this)
+		r.add(n->copy());
+	r.samples = samples;
+	return r;
 }
 
-// deep copy!
-void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi) {
-	deep_clear();
+void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi) {
+	clear();
 
 	for (MidiNote *n: midi)
-		add(n->copy());
+		add(n);
 
 	samples = midi.samples;
 }
@@ -416,16 +401,8 @@ void MidiNoteBuffer::sort() {
 				swap(i, j);
 }
 
-void MidiNoteBuffer::sanify(const Range &r)
-{
+void MidiNoteBuffer::sanify(const Range &r) {
 	sort();
-}
-
-MidiNoteBufferRef::MidiNoteBufferRef() {
-}
-
-MidiNoteBufferRef::~MidiNoteBufferRef() {
-	clear();
 }
 
 MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {

@@ -73,7 +73,8 @@ bool BarPattern::operator !=(const BarPattern &o) const {
 	return !(*this == o);
 }
 
-Bar::Bar(const BarPattern &b) : BarPattern(b) {
+Bar::Bar(const BarPattern &b) /*: Sharable<BarPattern>(b)*/ {
+	*(BarPattern*)this = b;
 	offset = 0;
 	index = -1;
 	index_text = -1;
@@ -81,6 +82,14 @@ Bar::Bar(const BarPattern &b) : BarPattern(b) {
 
 Bar::Bar(int _length, int _num_beats, int _num_sub_beats) : Bar(BarPattern(_length, _num_beats, _num_sub_beats))
 {}
+
+const BarPattern &Bar::pattern() const {
+	return *(const BarPattern*)this;
+}
+
+Bar *Bar::copy() const {
+	return new Bar(pattern());
+}
 
 string Bar::format_beats(bool fancy) const {
 	string div = fancy ? i2s_small(4*divisor) : i2s(4*divisor);

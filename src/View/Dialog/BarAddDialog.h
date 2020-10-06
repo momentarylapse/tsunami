@@ -13,14 +13,13 @@
 #include "../../Data/Rhythm/Bar.h"
 
 class Song;
-class Bar;
 
 class BarAddDialog : public hui::Dialog {
 public:
 	Song *song;
 	int index;
 
-	Bar new_bar;
+	BarPattern new_bar;
 
 	BarAddDialog(hui::Window *root, Song *s, int index);
 

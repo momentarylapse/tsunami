@@ -61,7 +61,6 @@ public:
 			destroy();
 		}, module->MESSAGE_DELETE);
 
-		progress = nullptr;
 		ok = false;
 
 
@@ -119,7 +118,6 @@ public:
 		tsunami->win->view->stream->unsubscribe(this);
 		progress->unsubscribe(this);
 		tsunami->win->view->stream->stop();
-		delete(progress);
 		progress = NULL;
 
 
@@ -128,7 +126,7 @@ public:
 
 	Module *module;
 	ModulePanel *module_panel;
-	Progress *progress;
+	owned<Progress> progress;
 	bool ok;
 };
 

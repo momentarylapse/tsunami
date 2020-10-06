@@ -22,10 +22,6 @@ Clipboard::Clipboard() {
 	temp = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 }
 
-Clipboard::~Clipboard() {
-	delete(temp);
-}
-
 void Clipboard::clear() {
 	if (temp->tracks.num > 0) {
 		temp->reset();
@@ -60,8 +56,8 @@ static int find_offset(AudioView *view) {
 		return view->sel.range().offset;
 
 	int offset = view->song->range().end();
-	for (Track *t: view->song->tracks)
-		for (TrackLayer *l: t->layers)
+	for (auto *t: view->song->tracks)
+		for (auto *l: t->layers)
 			if (view->sel.has(l))
 				for (MidiNote *n: l->midi)
 					if (view->sel.has(n))

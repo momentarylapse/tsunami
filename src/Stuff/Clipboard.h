@@ -8,6 +8,7 @@
 #ifndef SRC_STUFF_CLIPBOARD_H_
 #define SRC_STUFF_CLIPBOARD_H_
 
+#include "../lib/base/pointer.h"
 #include "Observable.h"
 class Song;
 class Track;
@@ -15,12 +16,10 @@ class TrackLayer;
 class AudioView;
 class PluginManager;
 
-class Clipboard : public Observable<VirtualBase>
-{
+class Clipboard : public Observable<VirtualBase> {
 	friend class PluginManager;
 public:
 	Clipboard();
-	virtual ~Clipboard();
 
 	void copy(AudioView *view);
 	void paste(AudioView *view);
@@ -37,7 +36,7 @@ public:
 	bool can_copy(AudioView *view);
 
 private:
-	Song *temp;
+	shared<Song> temp;
 	Array<int> ref_uid;
 };
 

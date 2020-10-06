@@ -61,17 +61,13 @@ class AutoConfigDataFloat : public AutoConfigData {
 public:
 	float min, max, step, factor;
 	float *value;
-	Slider *slider;
+	owned<Slider> slider;
 	AutoConfigDataFloat(const string &_name) : AutoConfigData(_name) {
 		min = -1000000;
 		max = 1000000;
 		step = 0.001f;
 		factor = 1;
 		value = nullptr;
-		slider = nullptr;
-	}
-	~AutoConfigDataFloat() override {
-		delete(slider);
 	}
 	void parse(const string &s) override {
 		auto p = s.explode(":");

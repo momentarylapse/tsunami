@@ -7,6 +7,7 @@
 
 #include "FavoriteManager.h"
 #include "../Module/Module.h"
+#include "../lib/base/pointer.h"
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
@@ -25,7 +26,7 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 	if (!file_exists(filename))
 		return;
 	try {
-		File *f = FileOpenText(filename);
+		auto f = ownify(FileOpenText(filename));
 		int n = f->read_int();
 		for (int i=0; i<n; i++) {
 			Favorite ff;
@@ -38,8 +39,7 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 			ff.version = Module::VERSION_LEGACY;
 			set(ff);
 		}
-		delete(f);
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		session->e(e.message());
 	}
 }
@@ -52,7 +52,7 @@ void FavoriteManager::load(Session *session) {
 
 void FavoriteManager::save(Session *session) {
 	try {
-		File *f = FileCreateText(tsunami->directory << "favorites.txt");
+		auto f = ownify(FileCreateText(tsunami->directory << "favorites.txt"));
 		f->write_int(favorites.num);
 		for (Favorite &ff: favorites) {
 			f->write_str(Module::type_to_name(ff.type));
@@ -60,8 +60,7 @@ void FavoriteManager::save(Session *session) {
 			f->write_str(ff.name);
 			f->write_str(ff.options);
 		}
-		delete(f);
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		session->e(e.message());
 	}
 }

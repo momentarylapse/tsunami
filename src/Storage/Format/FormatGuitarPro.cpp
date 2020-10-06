@@ -122,7 +122,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 			tt.t = t;
 			tracks.add(tt);
 		}
-	Array<Bar*> bars = song->bars.get_bars(Range::ALL);
+	auto bars = song->bars.get_bars(Range::ALL);
 	tempo = 90;
 	if (bars.num > 0)
 		tempo = (bars[0]->bpm(song->sample_rate) + 0.5f);
@@ -174,7 +174,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 		for (GpTrack &t : tracks)
 			write_measure(&t, b);
 	}
-	delete(f);
+	delete f;
 }
 
 void FormatGuitarPro::load_song(StorageOperationData *_od)

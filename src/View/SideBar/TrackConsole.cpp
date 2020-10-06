@@ -35,9 +35,8 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win)
 			track->set_synthesizer(CreateSynthesizer(session, name));
 	});
 	p->set_func_detune([=]{
-		auto *dlg = new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win);
+		auto dlg = ownify(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win));
 		dlg->run();
-		delete dlg;
 	});
 	return p;
 }
@@ -68,10 +67,6 @@ TrackConsole::TrackConsole(Session *session) :
 	event("edit_midi", [=]{ session->set_mode(EditMode::DefaultTrack); });
 	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultMidiFx); });
 }
-
-TrackConsole::~TrackConsole() {
-}
-
 
 void TrackConsole::on_enter() {
 	set_track(view->cur_track());
@@ -178,9 +173,8 @@ void TrackConsole::on_instrument() {
 }
 
 void TrackConsole::on_edit_tuning() {
-	auto *dlg = new TuningDialog(win, track);
+	auto dlg = ownify(new TuningDialog(win, track));
 	dlg->run();
-	delete(dlg);
 }
 
 void TrackConsole::on_view_cur_track_change() {

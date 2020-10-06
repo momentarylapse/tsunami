@@ -8,17 +8,21 @@
 #ifndef PROGRESS_H_
 #define PROGRESS_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/base/pointer.h"
 #include "../../Stuff/Observable.h"
 
-class Progress : public Observable<VirtualBase>
-{
+namespace hui {
+	class Window;
+	class Timer;
+}
+
+class Progress : public Observable<VirtualBase> {
 public:
 	Progress(const string &str, hui::Window *parent);
-	virtual ~Progress();
+	~Progress() override {};
 
 	void _cdecl __init__(const string &str, hui::Window *parent);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	void set(float progress);
 	void set(const string &str, float progress);
@@ -32,21 +36,20 @@ public:
 
 protected:
 	Progress();
-	hui::Window *dlg;
-	hui::Timer timer;
+	owned<hui::Window> dlg;
+	owned<hui::Timer> timer;
 	float allow_next;
 	bool cancelled;
 };
 
-class ProgressCancelable : public Progress
-{
+class ProgressCancelable : public Progress {
 public:
 	ProgressCancelable(const string &str, hui::Window *parent);
 	ProgressCancelable();
-	virtual ~ProgressCancelable();
+	~ProgressCancelable() override {};
 
 	void _cdecl __init__(const string &str, hui::Window *parent);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 };
 
 #endif /* PROGRESS_H_ */

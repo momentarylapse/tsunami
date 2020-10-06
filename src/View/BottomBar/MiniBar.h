@@ -8,6 +8,7 @@
 #ifndef SRC_VIEW_BOTTOMBAR_MINIBAR_H_
 #define SRC_VIEW_BOTTOMBAR_MINIBAR_H_
 
+#include "../../lib/base/pointer.h"
 #include "../../lib/hui/hui.h"
 
 class PeakMeterDisplay;
@@ -19,8 +20,7 @@ class AudioView;
 class Session;
 enum class SelectionSnapMode;
 
-class MiniBar : public hui::Panel
-{
+class MiniBar : public hui::Panel {
 public:
 	MiniBar(BottomBar *bottom_bar, Session *session);
 	virtual ~MiniBar();
@@ -39,8 +39,8 @@ public:
 	//OutputStream *stream;
 	Session *session;
 	DeviceManager *dev_manager;
-	PeakMeterDisplay *peak_meter;
-	CpuDisplay *cpu_display;
+	owned<PeakMeterDisplay> peak_meter;
+	owned<CpuDisplay> cpu_display;
 	BottomBar *bottom_bar;
 	AudioView *view;
 };

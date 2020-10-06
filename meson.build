@@ -382,7 +382,6 @@ sources = [
 	'src/Module/Port/Port.cpp',
 	'src/Module/Synth/DummySynthesizer.cpp',
 	'src/Module/Synth/EnvelopeADSR.cpp',
-	'src/Module/Synth/SampleSynthesizer.cpp',
 	'src/Module/Synth/Synthesizer.cpp',
 	'src/Module/AutoConfigPanel.cpp',
 	'src/Module/ConfigPanel.cpp',

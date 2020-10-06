@@ -14,8 +14,7 @@ class AutoConfigData;
 class ModuleConfiguration;
 class Session;
 
-class AutoConfigPanel : public ConfigPanel
-{
+class AutoConfigPanel : public ConfigPanel {
 public:
 	Array<AutoConfigData*> aa;
 	AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c);

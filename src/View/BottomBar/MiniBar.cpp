@@ -45,8 +45,6 @@ MiniBar::~MiniBar() {
 	view->unsubscribe(this);
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
-	delete(peak_meter);
-	delete(cpu_display);
 }
 
 void MiniBar::on_show_bottom_bar() {

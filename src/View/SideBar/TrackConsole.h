@@ -17,7 +17,6 @@ class ModulePanel;
 class TrackConsole: public SideBarConsole {
 public:
 	TrackConsole(Session *session);
-	virtual ~TrackConsole();
 
 	void on_enter() override;
 	void on_leave() override;

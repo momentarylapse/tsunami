@@ -11,7 +11,6 @@
 #include "../../Data/Song.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "DummySynthesizer.h"
-#include "SampleSynthesizer.h"
 #include "../../lib/math/math.h"
 #include "../Port/Port.h"
 

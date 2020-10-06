@@ -220,12 +220,12 @@ int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const {
 	return data.samples;
 }
 
-Array<MidiNote> MidiEventBuffer::get_notes(const Range &r) const {
+MidiNoteBuffer MidiEventBuffer::get_notes(const Range &r) const {
 	MidiNoteBuffer a = midi_events_to_notes(*this);
-	Array<MidiNote> b;
+	MidiNoteBuffer b;
 	for (MidiNote *n: a)
 		if (r.overlaps(n->range))
-			b.add(*n);
+			b.add(n->copy());
 	return b;
 }
 

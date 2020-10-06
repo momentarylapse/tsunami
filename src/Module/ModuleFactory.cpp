@@ -28,7 +28,6 @@
 #include "Beats/BeatMidifier.h"
 #include "Synth/Synthesizer.h"
 #include "Synth/DummySynthesizer.h"
-#include "Synth/SampleSynthesizer.h"
 #include "../Plugins/Plugin.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
@@ -64,8 +63,6 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 	} else if (type == ModuleType::SYNTHESIZER) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummySynthesizer;
-		//if (sub_type == "Sample")
-		//	return new SampleSynthesizer;
 	} else if (type == ModuleType::PITCH_DETECTOR) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummyPitchDetector;

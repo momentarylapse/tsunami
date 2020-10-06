@@ -21,6 +21,7 @@ class Instrument;
 class Clef;
 class Scale;
 class SongSelection;
+class MidiNoteBuffer;
 
 enum class MidiMode {
 	LINEAR,
@@ -38,7 +39,7 @@ public:
 	void clear();
 	MidiEventBuffer get_events(const Range &r) const;
 	int read(MidiEventBuffer &data, const Range &r) const;
-	Array<MidiNote> get_notes(const Range &r) const;
+	MidiNoteBuffer get_notes(const Range &r) const;
 	int get_next_event(int pos) const;
 
 	Range range(int elongation) const;

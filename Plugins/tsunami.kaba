@@ -76,7 +76,7 @@ class MidiEvent
 class MidiEventBuffer extends MidiEvent[]
 	int samples
 	extern override void __init__()
-	extern const MidiNote[] get_notes(Range r)
+	extern const MidiNoteBuffer get_notes(Range r)
 	extern const MidiEvent[] get_events(Range r)
 	extern const Range get_range()
 	void add_note(MidiNote n)
@@ -89,7 +89,7 @@ class MidiNoteBuffer extends MidiNote*[]
 	extern override void __init__()
 	extern override void __delete__()
 	extern void deep_clear()
-	extern selfref MidiNote*[] get_notes(Range r)
+	extern selfref MidiNoteBuffer get_notes(Range r)
 	extern selfref MidiEvent[] get_events(Range r)
 	extern const Range get_range()
 

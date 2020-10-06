@@ -40,12 +40,7 @@ Grid ? ''
 		gp.draw_time(p)
 		gp.draw_time_numbers(p)
 		
-		let notes = c.recorder.buffer.get_notes(cam.range())
-		MidiNoteBuffer midi
-		for n in notes
-			let nn = new MidiNote()
-			*nn = n
-			midi.add(nn)
+		let midi = c.recorder.buffer.get_notes(cam.range())
 		
 		Instrument ii
 		ii.type = 6#1

@@ -13,11 +13,9 @@
 
 class TrackLayer;
 
-class ActionTrackInsertMidi : public Action
-{
+class ActionTrackInsertMidi : public Action {
 public:
 	ActionTrackInsertMidi(TrackLayer *l, int offset, const MidiNoteBuffer &midi);
-	virtual ~ActionTrackInsertMidi();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

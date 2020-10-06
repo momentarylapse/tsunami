@@ -11,8 +11,7 @@
 #include "Instrument.h"
 
 
-MidiNote::MidiNote()
-{
+MidiNote::MidiNote() {
 	range = Range::EMPTY;
 	pitch = 0;
 	volume = 0;

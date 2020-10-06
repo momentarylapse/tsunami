@@ -8,30 +8,19 @@
 #include "ActionTrackDeleteMidiNote.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer* l, int _index)
-{
+ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer* l, int _index) {
 	layer = l;
 	index = _index;
-	note = nullptr;
-}
-
-ActionTrackDeleteMidiNote::~ActionTrackDeleteMidiNote()
-{
-	if (note)
-		delete(note);
-}
-
-void* ActionTrackDeleteMidiNote::execute(Data* d)
-{
 	note = layer->midi[index];
+}
+
+void* ActionTrackDeleteMidiNote::execute(Data* d) {
 	layer->midi.erase(index);
 	layer->notify(layer->MESSAGE_CHANGE);
 	return nullptr;
 }
 
-void ActionTrackDeleteMidiNote::undo(Data* d)
-{
+void ActionTrackDeleteMidiNote::undo(Data* d) {
 	layer->midi.insert(note, index);
-	note = nullptr;
 	layer->notify(layer->MESSAGE_CHANGE);
 }

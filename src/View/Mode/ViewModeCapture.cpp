@@ -54,7 +54,7 @@ void CaptureTrackData::insert_midi(int s_start, int delay) {
 	int i0 = s_start + delay;
 
 	// insert data
-	target->layers[0]->insert_midi_data(i0, midi_events_to_notes(midi_recorder()->buffer).duplicate());
+	target->layers[0]->insert_midi_data(i0, midi_events_to_notes(midi_recorder()->buffer));
 }
 
 

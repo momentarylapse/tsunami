@@ -10,8 +10,7 @@
 #include "../../../Data/Track.h"
 
 
-ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n)
-{
+ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n) {
 	layer = l;
 	note = n;
 
@@ -23,24 +22,14 @@ ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n)
 			insert_index = i + 1;
 }
 
-ActionTrackAddMidiNote::~ActionTrackAddMidiNote()
-{
-	if (note)
-		delete(note);
-}
-
-void* ActionTrackAddMidiNote::execute(Data* d)
-{
+void* ActionTrackAddMidiNote::execute(Data* d) {
 	layer->midi.insert(note, insert_index);
-	note = nullptr;
 	layer->notify(layer->MESSAGE_CHANGE);
 
-	return note;
+	return note.get();
 }
 
-void ActionTrackAddMidiNote::undo(Data* d)
-{
-	note = layer->midi[insert_index];
+void ActionTrackAddMidiNote::undo(Data* d) {
 	layer->midi.erase(insert_index);
 	layer->notify(layer->MESSAGE_CHANGE);
 }

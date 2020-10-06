@@ -23,13 +23,8 @@ public:
 	void undo(Data *d) override;
 
 private:
-	MidiNote *note;
-	int offset, length;
-	float pitch, volume;
-	int clef_pos;
-	NoteModifier mod;
-	int stringno;
-	int flags;
+	shared<MidiNote> note;
+	shared<MidiNote> note2;
 };
 
 #endif /* SRC_ACTION_TRACK_MIDI_ACTIONTRACKEDITMIDINOTE_H_ */

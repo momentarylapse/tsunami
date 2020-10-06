@@ -13,18 +13,16 @@
 class TrackLayer;
 class MidiNote;
 
-class ActionTrackDeleteMidiNote: public Action
-{
+class ActionTrackDeleteMidiNote: public Action {
 public:
 	ActionTrackDeleteMidiNote(TrackLayer *l, int index);
-	~ActionTrackDeleteMidiNote();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;
-	MidiNote *note;
+	shared<MidiNote> note;
 	int index;
 };
 

@@ -13,18 +13,16 @@
 class TrackLayer;
 class MidiNote;
 
-class ActionTrackAddMidiNote : public Action
-{
+class ActionTrackAddMidiNote : public Action {
 public:
 	ActionTrackAddMidiNote(TrackLayer *l, MidiNote *n);
-	~ActionTrackAddMidiNote();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;
-	MidiNote *note;
+	shared<MidiNote> note;
 	int insert_index;
 };
 

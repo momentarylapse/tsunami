@@ -8,8 +8,7 @@
 #include "ActionTrackInsertMidi.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const MidiNoteBuffer &_midi)
-{
+ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const MidiNoteBuffer &_midi) {
 	layer = l;;
 	offset = _offset;
 	midi = _midi;
@@ -19,21 +18,14 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const M
 	applied = false;
 }
 
-ActionTrackInsertMidi::~ActionTrackInsertMidi()
-{
-	if (applied)
-		midi.clear();
-}
 
-
-void *ActionTrackInsertMidi::execute(Data *d)
-{
+void *ActionTrackInsertMidi::execute(Data *d) {
 	inserted_at.clear();
 
-	foreachb(MidiNote *n, midi){
+	foreachb(MidiNote *n, midi) {
 		int index = layer->midi.num;
 		for (int i=0;i<layer->midi.num;i++)
-			if (n->range.offset < layer->midi[i]->range.offset){
+			if (n->range.offset < layer->midi[i]->range.offset) {
 				index = i;
 				break;
 			}
@@ -46,8 +38,7 @@ void *ActionTrackInsertMidi::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTrackInsertMidi::undo(Data *d)
-{
+void ActionTrackInsertMidi::undo(Data *d) {
 	foreachb(int i, inserted_at)
 		layer->midi.erase(i);
 

@@ -42,6 +42,10 @@ extern const string IDENTIFIER_FUNC_LENGTH;
 extern const string IDENTIFIER_FUNC_STR;
 extern const string IDENTIFIER_FUNC_REPR;
 extern const string IDENTIFIER_FUNC_SUBARRAY;
+extern const string IDENTIFIER_FUNC_SHARED_REF;
+extern const string IDENTIFIER_FUNC_SHARED_UNREF;
+extern const string IDENTIFIER_FUNC_SHARED_CLEAR;
+extern const string IDENTIFIER_FUNC_SHARED_CREATE;
 extern const string IDENTIFIER_SUPER;
 extern const string IDENTIFIER_SELF;
 extern const string IDENTIFIER_EXTENDS;
@@ -347,6 +351,8 @@ enum class InlineID {
 	VECTOR_DIVIDE_VF,
 	VECTOR_DIVIDE_ASSIGN,
 	VECTOR_NEGATE,
+
+	SHARED_POINTER_INIT,
 };
 
 

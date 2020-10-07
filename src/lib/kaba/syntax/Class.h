@@ -2,6 +2,7 @@
 #ifndef CLASS_H_
 #define CLASS_H_
 
+#include "../../base/pointer.h"
 
 namespace Kaba{
 
@@ -26,7 +27,7 @@ public:
 
 typedef void *VirtualTable;
 
-class Class {
+class Class : public Sharable<Empty> {
 public:
 	//Class();
 	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Class *param = nullptr);
@@ -43,6 +44,8 @@ public:
 		SUPER_ARRAY,
 		POINTER,
 		POINTER_SILENT, // pointer silent (&)
+		POINTER_SHARED,
+		POINTER_UNIQUE,
 		DICT,
 	};
 	Type type;
@@ -51,6 +54,8 @@ public:
 	bool is_super_array() const;
 	bool is_dict() const;
 	bool is_pointer() const;
+	bool is_usable_as_pointer() const;
+	bool is_pointer_shared() const;
 	bool is_pointer_silent() const;
 	bool fully_parsed;
 	Array<ClassElement> elements;

@@ -41,7 +41,7 @@ void track_harmony_step(int pos0, int pos1, out Harmony[] r, out MidiNote*[] act
 			break
 		
 
-Harmony[] track_harmony(MidiNote*[] midi)
+Harmony[] track_harmony(MidiNoteBuffer midi)
 	Harmony[] r
 	if len(midi) == 0
 		return r

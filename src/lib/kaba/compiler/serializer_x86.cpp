@@ -439,6 +439,9 @@ void SerializerX86::serialize_inline_function(Node *com, const Array<SerialNodeP
 		case InlineID::POINTER_ASSIGN:
 			add_cmd(Asm::INST_MOV, param[0], param[1]);
 			break;
+		case InlineID::SHARED_POINTER_INIT:
+			add_cmd(Asm::INST_MOV, param[0], param_imm(TypeInt, 0));
+			break;
 		case InlineID::CHAR_ASSIGN:
 		case InlineID::BOOL_ASSIGN:
 			add_cmd(Asm::INST_MOV, param[0], param[1]);

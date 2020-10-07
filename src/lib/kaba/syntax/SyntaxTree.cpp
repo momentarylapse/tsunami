@@ -11,6 +11,7 @@ namespace Kaba{
 
 extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
+extern const Class *TypeSharedPointer;
 extern const Class *TypeMatrix;
 
 extern ExpressionBuffer *cur_exp_buf;
@@ -553,6 +554,10 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	} else if (t->is_array()) {
 		if (param->needs_constructor() and !param->get_default_constructor())
 			do_error(format("can not create an array from type '%s', missing default constructor", param->long_name()));
+		add_missing_function_headers_for_class(t);
+	} else if (t->is_pointer_shared()) {
+		//t->derive_from(TypeSharedPointer, true);
+		t->param = param;
 		add_missing_function_headers_for_class(t);
 	}
 	return t;

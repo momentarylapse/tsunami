@@ -14,6 +14,7 @@ namespace Kaba {
 }
 
 #include "../base/base.h"
+#include "../base/pointer.h"
 #include "../file/path.h"
 #include "asm/asm.h"
 #include "lib/lib.h"
@@ -34,7 +35,7 @@ struct LinkerException : Exception{};*/
 
 
 // executable (compiled) data
-class Script {
+class Script : public Sharable<Empty> {
 public:
 	// don't call yourself.... better use LoadScript(...)
 	Script();

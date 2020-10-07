@@ -53,6 +53,8 @@ class MidiNote
 		clef_position = -1
 		modifier = 0
 		flags = 0
+	extern void _ref()
+	extern bool _unref()
 	extern void set(int mask)
 	extern const bool is(int mask)
 	extern const MidiNote* copy()
@@ -84,7 +86,7 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	extern void add_metronome_click(int pos, int level, float volume)
 
-class MidiNoteBuffer extends MidiNote*[]
+class MidiNoteBuffer extends shared MidiNote[]
 	int samples
 	extern override void __init__()
 	extern override void __delete__()
@@ -116,6 +118,8 @@ class Module extends Object
 	extern void unplug_in(int in_port)
 	extern void subscribe(Object handler, Function f, string message)
 	extern void unsubscribe(Object handler)
+	extern void _ref()
+	extern bool _unref()
 	extern const Module* copy()
 	
 	class Port
@@ -348,6 +352,8 @@ class TrackMarker
 	Range range
 	string text
 	AudioEffect*[] fx
+	extern void _ref()
+	extern bool _unref()
 	
 class Bar
 	int[] beats
@@ -356,6 +362,8 @@ class Bar
 	int index_text
 	int length
 	int offset
+	extern void _ref()
+	extern bool _unref()
 	extern const float bpm(float sample_rate)
 	extern const Range range()
 
@@ -388,6 +396,9 @@ class TrackLayer
 	SampleRef*[] samples
 	TrackMarker*[] markers
 	
+	extern void _ref()
+	extern bool _unref()
+	
 	extern void get_buffers(out AudioBuffer buf, Range r)
 	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
 	extern void *edit_buffers(out AudioBuffer buf, Range r)
@@ -413,6 +424,8 @@ class Sample # TODO
 	int ref_count
 	Tag[] tags
 	extern void __init__(string name, AudioBuffer buf)
+	extern void _ref()
+	extern bool _unref()
 	extern SampleRef* create_ref()
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
@@ -421,6 +434,8 @@ class SampleRef # TODO
 	Sample* origin
 	extern void __init__(Sample* sam)
 	extern virtual void __delete__()
+	extern void _ref()
+	extern bool _unref()
 
 
 enum
@@ -465,6 +480,9 @@ class Track
 	extern void edit_effect(int index)
 	extern void enable_effect(int index, bool enabled)
 	extern void set_synthesizer(Synthesizer synth)
+	
+	extern void _ref()
+	extern bool _unref()
 
 class Tag
 	string key, value
@@ -489,6 +507,9 @@ class Song
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()
+	
+	extern void _ref()
+	extern bool _unref()
 	
 	extern const Range range()
 	extern selfref Track* time_track()
@@ -538,6 +559,8 @@ class ColorScheme
 class SceneGraph
 	class Node
 		rect area
+		extern void _ref()
+		extern bool _unref()
 
 class AudioView extends Object
 	class ViewPort

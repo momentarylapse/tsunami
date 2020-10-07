@@ -189,9 +189,6 @@ Block::Block(Function *f, Block *_parent) :
 	_label_start = _label_end = -1;
 }
 
-Block::~Block() {
-}
-
 
 inline void set_command(Node *&a, Node *b) {
 	a = b;

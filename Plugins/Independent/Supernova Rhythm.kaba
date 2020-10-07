@@ -49,8 +49,6 @@ Grid ? ''
 		#mp.draw(p, c.midi)
 		mp.draw(p, midi)
 		
-		midi.deep_clear()
-		
 		p.set_color(color.RED)
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 		

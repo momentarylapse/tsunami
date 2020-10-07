@@ -90,7 +90,7 @@ class SpecGrid extends Grid
 class SpectrumDialog extends Dialog
 	SpecGrid grid
 	Song* song
-	Track*[] tracks
+	shared Track[] tracks
 	DrawMidiInSpectrogram* dmis
 	void __init__(SongPlugin plugin, Song _song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
@@ -135,7 +135,7 @@ Grid ? ''
 		int n = get_int("target")
 		if n < 0
 			return
-		Track* t = tracks[n]
+		let t = tracks[n]
 		t.layers[0].insert_midi_data(0, dmis.midi)
 		
 		destroy()

@@ -152,12 +152,15 @@ public:
 	Sharable(const Sharable<T> &o) = delete;
 	void operator=(const Sharable<T> &o) = delete;
 
-	auto _pointer_ref() {
+	void _pointer_ref() {
 		_pointer_ref_counter ++;
 		pdb(format("ref %s -> %d", p2s(this), _pointer_ref_counter));
+	}
+	auto _pointer_xref() {
+		_pointer_ref();
 		return this;
 	}
-	void _pointer_unref() {
+	bool _pointer_unref() {
 		_pointer_ref_counter --;
 		pdb(format("unref %s -> %d", p2s(this), _pointer_ref_counter));
 		if (_pointer_ref_counter < 0) {
@@ -165,6 +168,7 @@ public:
 			crash();
 			exit(1);
 		}
+		return _pointer_ref_counter == 0;
 	}
 	bool _has_pointer_refs() {
 		return _pointer_ref_counter > 0;
@@ -183,12 +187,12 @@ public:
 	shared(T *p) {
 		pdb(format("+shared %s", p2s(p)));
 		if (p)
-			_p = (T*)p->_pointer_ref();
+			_p = (T*)p->_pointer_xref();
 	}
 	shared(const shared<T> &o) {
 		pdb(format("+shared/s %s", p2s(o._p)));
 		if (o)
-			_p = (T*)o._p->_pointer_ref();
+			_p = (T*)o._p->_pointer_xref();
 	}
 	~shared() {
 		pdb(format("-shared %s", p2s(_p)));
@@ -204,12 +208,11 @@ public:
 			return;
 		release();
 		if (p)
-			_p = (T*)p->_pointer_ref();
+			_p = (T*)p->_pointer_xref();
 	}
 	void release() {
 		if (_p) {
-			_p->_pointer_unref();
-			if (!_p->_has_pointer_refs()) {
+			if (_p->_pointer_unref()) {
 				delete _p;
 			}
 		}
@@ -284,8 +287,7 @@ public:
 	void clear() {
 		pdb("shared[] clear");
 		for (T *p: *this) {
-			p->_pointer_unref();
-			if (!p->_has_pointer_refs())
+			if (p->_pointer_unref())
 				delete p;
 		}
 		Array<T*>::clear();
@@ -293,8 +295,7 @@ public:
 	void resize(int size) {
 		for (int i=size; i<this->num; i++) {
 			auto p = (*this)[i];
-			p->_pointer_unref();
-			if (!p->_has_pointer_refs())
+			if (p->_pointer_unref())
 				delete p;
 		}
 		Array<T*>::resize(size);
@@ -332,8 +333,7 @@ public:
 	void erase(int index) {
 		pdb("shared[] erase");
 		auto p = (*this)[index];
-		p->_pointer_unref();
-		if (!p->_has_pointer_refs())
+		if (p->_pointer_unref())
 			delete p;
 		Array<T*>::erase(index);
 	}

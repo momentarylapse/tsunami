@@ -11,6 +11,7 @@
 namespace Kaba {
 
 extern const Class *TypeDynamicArray;
+extern const Class *TypeSharedPointer;
 const Class *TypeAbstractList;
 const Class *TypeAbstractDict;
 extern const Class *TypeDictBase;
@@ -392,6 +393,7 @@ void SIAddPackageBase() {
 	TypeAbstractList	= add_type  ("-abstract-list-", config.super_array_size);
 	TypeAbstractDict	= add_type  ("-abstract-dict-", config.super_array_size);
 	TypeDictBase		= add_type  ("@DictBase",   config.super_array_size);
+	TypeSharedPointer	= add_type  ("@SharedPointer", config.pointer_size);
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
 	TypeExceptionP		= add_type_p(TypeException);
@@ -434,6 +436,10 @@ void SIAddPackageBase() {
 			func_add_param("size", TypeInt);
 		class_add_funcx("__mem_remove__", TypeVoid, &DynamicArray::delete_single);
 			func_add_param("index", TypeInt);
+
+	add_class(TypeSharedPointer);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
+			func_set_inline(InlineID::SHARED_POINTER_INIT);
 
 	// derived   (must be defined after the primitive types and the bases!)
 	TypePointer     = add_type_p(TypeVoid, Flags::CALL_BY_VALUE); // substitute for all pointer types

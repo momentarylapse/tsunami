@@ -9,6 +9,7 @@
 #define SRC_LIB_KABA_SYNTAX_FUNCTION_H_
 
 #include "../../base/base.h"
+#include "../../base/pointer.h"
 
 namespace Kaba{
 
@@ -19,7 +20,7 @@ enum class InlineID;
 enum class Flags;
 
 
-class Variable {
+class Variable : public Sharable<Empty> {
 public:
 	Variable(const string &name, const Class *type);
 	~Variable();
@@ -37,7 +38,7 @@ public:
 };
 
 // user defined functions
-class Function {
+class Function : public Sharable<Empty> {
 public:
 	SyntaxTree *owner() const;
 	

@@ -41,6 +41,10 @@ const string IDENTIFIER_FUNC_LENGTH = "__length__";
 const string IDENTIFIER_FUNC_STR = "__str__";
 const string IDENTIFIER_FUNC_REPR = "__repr__";
 const string IDENTIFIER_FUNC_SUBARRAY = "__subarray__";
+const string IDENTIFIER_FUNC_SHARED_REF = "_ref";
+const string IDENTIFIER_FUNC_SHARED_UNREF = "_unref";
+const string IDENTIFIER_FUNC_SHARED_CLEAR = "_clear";
+const string IDENTIFIER_FUNC_SHARED_CREATE = "_create";
 const string IDENTIFIER_SUPER = "super";
 const string IDENTIFIER_SELF = "self";
 const string IDENTIFIER_EXTENDS = "extends";
@@ -146,6 +150,7 @@ const Class *TypeAnyDict;
  // internal:
 const Class *TypeDynamicArray;
 const Class *TypeDictBase;
+const Class *TypeSharedPointer;
 const Class *TypePointerList;
 const Class *TypeCharPs;
 const Class *TypeBoolPs;

@@ -8,22 +8,19 @@
 #include "ActionTrackMoveAudioEffect.h"
 #include "../../../Data/Track.h"
 
-ActionTrackMoveAudioEffect::ActionTrackMoveAudioEffect(Track* t, int _source, int _target)
-{
+ActionTrackMoveAudioEffect::ActionTrackMoveAudioEffect(Track* t, int _source, int _target) {
 	track = t;
 	source = _source;
 	target = _target;
 }
 
-void* ActionTrackMoveAudioEffect::execute(Data* d)
-{
-	track->fx.move(source, target);
+void* ActionTrackMoveAudioEffect::execute(Data* d) {
+	weak(track->fx).move(source, target);
 	track->notify();
 	return nullptr;
 }
 
-void ActionTrackMoveAudioEffect::undo(Data* d)
-{
-	track->fx.move(target, source);
+void ActionTrackMoveAudioEffect::undo(Data* d) {
+	weak(track->fx).move(target, source);
 	track->notify();
 }

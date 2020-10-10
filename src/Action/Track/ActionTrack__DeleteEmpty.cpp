@@ -11,7 +11,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 
-ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track) {
+ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(shared<Track> _track) {
 	index = _track->get_index();
 	track = _track;
 }
@@ -19,10 +19,10 @@ ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track) {
 void *ActionTrack__DeleteEmpty::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < a->tracks.num);
-	Track *t = a->tracks[index];
+	Track *t = a->tracks[index].get();
 	int num_buf = 0;
 	int num_samples = 0;
-	for (TrackLayer *l: t->layers){
+	for (TrackLayer *l: weak(t->layers)){
 		num_buf += l->buffers.num;
 		num_samples += l->samples.num;
 	}

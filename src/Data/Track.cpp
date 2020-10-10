@@ -7,6 +7,7 @@
 
 #include "Track.h"
 #include "TrackLayer.h"
+#include "TrackMarker.h"
 #include "CrossFade.h"
 #include "base.h"
 #include "Song.h"
@@ -86,7 +87,7 @@ Track::~Track() {
 Range Track::range() const {
 	Range r = Range::EMPTY;
 
-	for (auto *l: layers)
+	for (auto *l: weak(layers))
 		r = r or l->range(synth.get()->keep_notes);
 
 	return r;
@@ -96,7 +97,7 @@ int get_same_type_index(Track *t) {
 	if (!t->song)
 		return -1;
 	int n = 0;
-	foreachi(Track *tt, t->song->tracks, i)
+	foreachi(Track *tt, weak(t->song->tracks), i)
 		if (tt->type == t->type) {
 			if (tt == t)
 				return n;
@@ -131,11 +132,11 @@ string Track::nice_name() {
 
 int Track::get_index() {
 	//assert(song);
-	return song->tracks.find(this);
+	return weak(song->tracks).find(this);
 }
 
 void Track::invalidate_all_peaks() {
-	for (TrackLayer *l: layers)
+	for (TrackLayer *l: weak(layers))
 		for (AudioBuffer &b: l->buffers)
 			b.peaks.clear();
 }
@@ -143,7 +144,7 @@ void Track::invalidate_all_peaks() {
 
 
 bool Track::has_version_selection() {
-	for (auto *l: layers)
+	for (auto *l: weak(layers))
 		if (l->fades.num > 0)
 			return true;
 	return false;
@@ -211,7 +212,7 @@ void Track::enable_effect(AudioEffect *effect, bool enabled) {
 }
 
 void Track::delete_effect(AudioEffect *effect) {
-	foreachi(AudioEffect *f, fx, index) {
+	foreachi(AudioEffect *f, weak(fx), index) {
 		if (f == effect)
 			song->execute(new ActionTrackDeleteEffect(this, index));
 	}
@@ -238,7 +239,7 @@ void Track::enable_midi_effect(MidiEffect *effect, bool enabled) {
 }
 
 void Track::delete_midi_effect(MidiEffect *effect) {
-	foreachi(MidiEffect *f, midi_fx, index)
+	foreachi(MidiEffect *f, weak(midi_fx), index)
 		if (f == effect)
 			song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }

@@ -77,7 +77,7 @@ void CaptureTrackData::insert_audio(int s_start, int delay) {
 	song->begin_action_group();
 
 	TrackLayer *layer = nullptr;
-	for (auto *l: target->layers)
+	for (auto *l: weak(target->layers))
 		if (layer_available(l, r)) {
 			layer = l;
 			break;
@@ -163,7 +163,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 
 	int offset = view->get_playback_selection(true).offset;
 	for (auto &d: data) {
-		auto *l = view->get_layer(d.target->layers[0]);
+		auto *l = view->get_layer(d.target->layers[0].get());
 		if (d.type() == SignalType::AUDIO) {
 			auto *rec = d.audio_recorder();
 

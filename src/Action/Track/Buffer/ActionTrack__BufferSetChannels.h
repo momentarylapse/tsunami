@@ -12,8 +12,7 @@
 
 class TrackLayer;
 
-class ActionTrack__BufferSetChannels : public Action
-{
+class ActionTrack__BufferSetChannels : public Action {
 public:
 	ActionTrack__BufferSetChannels(TrackLayer *layer, int index, int channels);
 

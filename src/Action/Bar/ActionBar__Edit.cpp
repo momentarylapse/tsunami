@@ -14,21 +14,19 @@
 #include "../../Data/Song.h"
 
 
-ActionBar__Edit::ActionBar__Edit(int _index, int _length, Array<int> &_beats, int _divisor)
-{
+ActionBar__Edit::ActionBar__Edit(int _index, int _length, Array<int> &_beats, int _divisor) {
 	index = _index;
 	length = _length;
 	divisor = _divisor;
 	beats = _beats;
 }
 
-void *ActionBar__Edit::execute(Data *d)
-{
+void *ActionBar__Edit::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < s->bars.num);
 
-	Bar *bar = s->bars[index];
+	auto bar = s->bars[index];
 
 	std::swap(length, bar->length);
 	std::swap(beats, bar->beats);
@@ -40,8 +38,7 @@ void *ActionBar__Edit::execute(Data *d)
 	return nullptr;
 }
 
-void ActionBar__Edit::undo(Data *d)
-{
+void ActionBar__Edit::undo(Data *d) {
 	execute(d);
 }
 

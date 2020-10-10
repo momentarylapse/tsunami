@@ -16,15 +16,13 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include <assert.h>
 
-Action__ShiftData::Action__ShiftData(int _offset, int _shift, int _mode)
-{
+Action__ShiftData::Action__ShiftData(int _offset, int _shift, int _mode) {
 	offset = _offset;
 	shift = _shift;
 	mode = _mode;
 }
 
-void *Action__ShiftData::execute(Data *d)
-{
+void *Action__ShiftData::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_shift(s, shift);
@@ -32,8 +30,7 @@ void *Action__ShiftData::execute(Data *d)
 	return nullptr;
 }
 
-void Action__ShiftData::undo(Data *d)
-{
+void Action__ShiftData::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	offset += shift;
@@ -41,18 +38,17 @@ void Action__ShiftData::undo(Data *d)
 	offset -= shift;
 }
 
-void Action__ShiftData::do_shift(Song *s, int delta)
-{
-	for (Track *t: s->tracks){
+void Action__ShiftData::do_shift(Song *s, int delta) {
+	for (auto t: s->tracks) {
 
-		for (TrackLayer *l: t->layers){
+		for (auto l: t->layers) {
 			// buffer
 			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= offset)
 					b.offset += delta;
 
 			// midi
-			for (MidiNote *n: l->midi){
+			for (auto n: l->midi) {
 				if (n->range.start() >= offset)
 					n->range.offset += delta;
 				/*else if (n->range.end() >= offset){
@@ -62,7 +58,7 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 			}
 
 			// marker
-			for (TrackMarker *m: l->markers){
+			for (auto m: l->markers) {
 				if (m->range.offset >= offset)
 					m->range.offset += delta;
 				/*else if (m->range.end() >= offset)
@@ -70,7 +66,7 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 			}
 
 			// samples
-			for (SampleRef *s: l->samples)
+			for (auto s: l->samples)
 				if (s->pos >= offset)
 					s->pos += delta;
 

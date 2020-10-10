@@ -160,7 +160,7 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 		align.w = AudioView::LAYER_HANDLE_WIDTH * 1.6f;
 		
 		
-	for (auto *c: children)
+	for (auto *c: weak(children))
 		c->hidden = !extended or vlayer->represents_imploded;
 	if (!vlayer->represents_imploded) {
 		//children[1]->hidden |= (layer->track->layers.num == 1);

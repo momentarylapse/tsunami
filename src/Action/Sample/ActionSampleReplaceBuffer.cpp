@@ -9,19 +9,15 @@
 #include "../../Data/Sample.h"
 #include <algorithm>
 
-ActionSampleReplaceBuffer::ActionSampleReplaceBuffer(Sample* s, AudioBuffer* _buf) {
+ActionSampleReplaceBuffer::ActionSampleReplaceBuffer(shared<Sample> s, AudioBuffer* _buf) {
 	sample = s;
 	buf = _buf;
-}
-
-ActionSampleReplaceBuffer::~ActionSampleReplaceBuffer() {
-	delete buf;
 }
 
 void* ActionSampleReplaceBuffer::execute(Data* d) {
 	std::swap(sample->buf, buf);
 	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
-	return sample;
+	return sample.get();
 }
 
 void ActionSampleReplaceBuffer::undo(Data* d) {

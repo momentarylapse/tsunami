@@ -17,7 +17,7 @@ ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n) {
 	note->stringno = l->track->instrument.make_string_valid(note->pitch, note->stringno);
 
 	insert_index = 0;
-	foreachi(MidiNote *nn, l->midi, i)
+	foreachi(MidiNote *nn, weak(l->midi), i)
 		if (note->range.offset > nn->range.offset)
 			insert_index = i + 1;
 }

@@ -309,7 +309,7 @@ void TsunamiCleanUp() {
 	bool again = false;
 	do {
 		again = false;
-		foreachi(Session *s, tsunami->sessions, i)
+		foreachi(Session *s, weak(tsunami->sessions), i)
 			if (s->win->got_destroyed() and s->win->auto_delete) {
 				msg_write("--------Tsunami erase...");
 				tsunami->sessions.erase(i);
@@ -683,8 +683,8 @@ void TsunamiWindow::on_menu_execute_audio_effect() {
 	if (!configure_module(this, fx.get()))
 		return;
 	song->begin_action_group();
-	for (Track *t: song->tracks)
-		for (auto *l: t->layers)
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
 				fx_process_layer(l, view->sel.range(), fx.get(), this);
 				n_layers ++;
@@ -704,8 +704,8 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 	if (!configure_module(this, s.get()))
 		return;
 	song->begin_action_group();
-	for (Track *t: song->tracks)
-		for (auto *l: t->layers)
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
 				source_process_layer(l, view->sel.range(), s.get(), this);
 				n_layers ++;
@@ -726,8 +726,8 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 		return;
 	
 	song->action_manager->group_begin();
-	for (Track *t: song->tracks)
-		for (auto *l: t->layers)
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
 				fx->reset_state();
 				fx->process_layer(l, view->sel);
@@ -749,8 +749,8 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 		return;
 	
 	song->begin_action_group();
-	for (Track *t: song->tracks)
-		for (auto *l: t->layers)
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
 				s->reset_state();
 				MidiEventBuffer buf;
@@ -829,7 +829,7 @@ void TsunamiWindow::on_settings() {
 void TsunamiWindow::on_track_import() {
 	if (session->storage->ask_open_import(this)) {
 		Track *t = song->add_track(SignalType::AUDIO_STEREO);
-		session->storage->load_track(t->layers[0], hui::Filename, view->cursor_pos());
+		session->storage->load_track(t->layers[0].get(), hui::Filename, view->cursor_pos());
 	}
 }
 
@@ -1052,7 +1052,7 @@ bool song_is_simple_audio(Song *s) {
 }
 
 bool song_is_simple_midi(Song *s) {
-	for (Track* t: s->tracks)
+	for (Track* t: weak(s->tracks))
 		if ((t->type != SignalType::MIDI) and (t->type != SignalType::BEATS))
 			return false;
 	return true;

@@ -99,7 +99,7 @@ void SampleRefConsole::load_data() {
 	set_float("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
 	reset("track");
-	for (Track *t: song->tracks)
+	for (Track *t: weak(song->tracks))
 		add_string("track", t->nice_name());
 	//setInt("track", sample->track_no);
 }

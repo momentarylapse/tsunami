@@ -42,8 +42,6 @@ extern const string IDENTIFIER_FUNC_LENGTH;
 extern const string IDENTIFIER_FUNC_STR;
 extern const string IDENTIFIER_FUNC_REPR;
 extern const string IDENTIFIER_FUNC_SUBARRAY;
-extern const string IDENTIFIER_FUNC_SHARED_REF;
-extern const string IDENTIFIER_FUNC_SHARED_UNREF;
 extern const string IDENTIFIER_FUNC_SHARED_CLEAR;
 extern const string IDENTIFIER_FUNC_SHARED_CREATE;
 extern const string IDENTIFIER_SUPER;
@@ -61,6 +59,7 @@ extern const string IDENTIFIER_LET;
 extern const string IDENTIFIER_NAMESPACE;
 extern const string IDENTIFIER_RETURN_VAR;
 extern const string IDENTIFIER_VTABLE_VAR;
+extern const string IDENTIFIER_SHARED_COUNT;
 extern const string IDENTIFIER_ENUM;
 extern const string IDENTIFIER_CONST;
 extern const string IDENTIFIER_OUT;
@@ -68,6 +67,10 @@ extern const string IDENTIFIER_OVERRIDE;
 extern const string IDENTIFIER_VIRTUAL;
 extern const string IDENTIFIER_EXTERN;
 extern const string IDENTIFIER_SELFREF;
+extern const string IDENTIFIER_SHARED;
+extern const string IDENTIFIER_OWNED;
+extern const string IDENTIFIER_PURE;
+extern const string IDENTIFIER_THROWS;
 extern const string IDENTIFIER_USE;
 extern const string IDENTIFIER_IMPORT;
 extern const string IDENTIFIER_RETURN;
@@ -479,7 +482,7 @@ int process_class_num_virtuals(const string &class_name, int num_virtual);
 //--------------------------------------------------------------------------------------------------
 // packages
 
-extern Array<Script*> packages;
+extern shared_array<Script> packages;
 
 
 };

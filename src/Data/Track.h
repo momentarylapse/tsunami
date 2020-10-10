@@ -96,7 +96,7 @@ public:
 	shared<Synthesizer> synth;
 	void _register_synth(Synthesizer *s);
 
-	Array<TrackMarker*> _markers_old;
+	shared_array<TrackMarker> _markers_old;
 
 	Array<CrossFadeOld> _fades_old;
 	bool has_version_selection();

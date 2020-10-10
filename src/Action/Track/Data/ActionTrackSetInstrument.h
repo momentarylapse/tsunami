@@ -16,7 +16,6 @@ class MidiNote;
 class ActionTrackSetInstrument: public ActionMergable<Instrument> {
 public:
 	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
-	virtual ~ActionTrackSetInstrument(){}
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

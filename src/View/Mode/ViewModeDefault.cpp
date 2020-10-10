@@ -474,19 +474,19 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, i
 		s.add(l);
 
 		// samples
-		for (SampleRef *sr: l->samples)
+		for (SampleRef *sr: weak(l->samples))
 			s.set(sr, r.overlaps(sr->range()));
 			
 
 		// markers
-		for (TrackMarker *m: l->markers)
+		for (TrackMarker *m: weak(l->markers))
 			s.set(m, r.overlaps(m->range));
 
 		// midi
 
 		auto *mp = midi_context(vl);
 		float d = mp->rr;
-		for (MidiNote *n: l->midi)
+		for (MidiNote *n: weak(l->midi))
 			if ((n->y + d >= y0) and (n->y - d <= y1))
 				//s.set(n, s.range.is_inside(n->range.center()));
 				s.set(n, r.overlaps(n->range));

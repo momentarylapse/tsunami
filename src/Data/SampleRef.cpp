@@ -15,7 +15,7 @@ const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
 
-SampleRef::SampleRef(Sample *sample) {
+SampleRef::SampleRef(shared<Sample> sample) {
 	msg_write("  new SampleRef " + p2s(this));
 	origin = sample;
 	origin->ref();
@@ -32,7 +32,7 @@ SampleRef::~SampleRef() {
 	msg_write("  del SampleRef " + p2s(this));
 }
 
-void SampleRef::__init__(Sample *sam) {
+void SampleRef::__init__(shared<Sample> sam) {
 	new(this) SampleRef(sam);
 }
 
@@ -42,7 +42,7 @@ void SampleRef::__delete__() {
 
 int SampleRef::get_index() const {
 	if (layer) {
-		return layer->samples.find((SampleRef*)this);
+		return weak(layer->samples).find((SampleRef*)this);
 	}
 	return -1;
 }

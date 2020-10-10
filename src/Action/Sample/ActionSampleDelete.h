@@ -14,7 +14,7 @@ class Sample;
 
 class ActionSampleDelete : public Action {
 public:
-	ActionSampleDelete(Sample *s);
+	ActionSampleDelete(shared<Sample> s);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

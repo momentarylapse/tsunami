@@ -8,6 +8,7 @@
 \*----------------------------------------------------------------------------*/
 #include "../file/file.h"
 #include "kaba.h"
+#include "lib/common.h"
 #include "syntax/Parser.h"
 #include "lib/common.h"
 #include <cassert>
@@ -26,7 +27,7 @@
 
 namespace Kaba {
 
-string Version = "0.19.1.-1";
+string Version = "0.19.1.0";
 
 //#define ScriptDebug
 
@@ -44,77 +45,53 @@ Exception::Exception(const Asm::Exception &e, Script *s, Function *f) :
 }
 
 
-Array<Script*> _public_scripts_;
-Array<Script*> _dead_scripts_;
+shared_array<Script> _public_scripts_;
 
 
 
 
 
-Script *Load(const Path &filename, bool just_analyse) {
+shared<Script> load(const Path &filename, bool just_analyse) {
 	//msg_write(string("Lade ",filename));
-	Script *s = nullptr;
 
 	// already loaded?
-	for (Script *ps: _public_scripts_)
+	for (auto ps: _public_scripts_)
 		if (ps->filename == filename)
 			return ps;
 	
 	// load
-	s = new Script();
-	s->syntax->base_class->name = filename.basename().replace(".kaba", "");
-	try {
-		s->load(filename, just_analyse);
-	} catch(const Exception &e) {
-		delete(s);
-		throw e;
-	}
+	shared<Script> s = new Script();
+	s->load(filename, just_analyse);
 
 	// store script in database
 	_public_scripts_.add(s);
 	return s;
 }
 
-Script *CreateForSource(const string &buffer, bool just_analyse) {
-	Script *s = new Script;
+shared<Script> create_for_source(const string &buffer, bool just_analyse) {
+	shared<Script> s = new Script;
 	s->just_analyse = just_analyse;
-	auto parser = s->syntax->parser = new Parser(s->syntax);
-	try {
-		parser->parse_buffer(buffer, just_analyse);
+	s->syntax->parser = new Parser(s->syntax);
+	s->syntax->default_import();
+	s->syntax->parser->parse_buffer(buffer, just_analyse);
 
-		if (!just_analyse)
-			s->compile();
-	} catch(const Exception &e) {
-		delete(s);
-		throw e;
-	}
+	if (!just_analyse)
+		s->compile();
 	return s;
 }
 
-void Remove(Script *s)
-{
-	// remove references
-	for (Script *i: s->syntax->includes)
-		i->reference_counter --;
-
-	// put on to-delete-list
-	_dead_scripts_.add(s);
+void remove_script(Script *s) {
 
 	// remove from normal list
 	for (int i=0;i<_public_scripts_.num;i++)
 		if (_public_scripts_[i] == s)
 			_public_scripts_.erase(i);
-
-	// delete all deletables
-	for (int i=_dead_scripts_.num-1;i>=0;i--)
-		if (_dead_scripts_[i]->reference_counter <= 0){
-			delete(_dead_scripts_[i]);
-			_dead_scripts_.erase(i);
-		}
 }
 
-void DeleteAllScripts(bool even_immortal, bool force)
-{
+void delete_all_scripts(bool even_immortal, bool force) {
+	_public_scripts_.clear();
+
+#if 0
 	// try to erase them...
 	auto to_del = _public_scripts_;
 	foreachb(Script *s, to_del)
@@ -136,6 +113,7 @@ void DeleteAllScripts(bool even_immortal, bool force)
 	for (int i=0;i<num_ps;i++)
 		msg_write(string2("  fehlt:   %s  %p  (%d)",ppn[i],ppp[i],pps[i]));
 	*/
+#endif
 }
 
 VirtualTable* get_vtable(const VirtualBase *p) {
@@ -143,7 +121,7 @@ VirtualTable* get_vtable(const VirtualBase *p) {
 }
 
 const Class *_dyn_type_in_namespace(const VirtualTable *p, const Class *ns) {
-	for (auto *c: ns->classes) {
+	for (auto *c: weak(ns->classes)) {
 		if (c->_vtable_location_target_ == p)
 			return c;
 		auto t = _dyn_type_in_namespace(p, c);
@@ -154,9 +132,9 @@ const Class *_dyn_type_in_namespace(const VirtualTable *p, const Class *ns) {
 }
 
 // TODO...namespace
-const Class *GetDynamicType(const VirtualBase *p) {
+const Class *get_dynamic_type(const VirtualBase *p) {
 	auto *pp = get_vtable(p);
-	for (Script *s: _public_scripts_) {
+	for (auto s: _public_scripts_) {
 		auto t = _dyn_type_in_namespace(pp, s->syntax->base_class);
 		if (t)
 			return t;
@@ -182,9 +160,13 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 		filename = (config.directory << _filename).absolute().canonical();
 	else
 		filename = _filename.absolute().canonical();
-	auto parser = syntax->parser = new Parser(syntax);
+	syntax->base_class->name = filename.basename().replace(".kaba", "");
+
+	auto parser = new Parser(syntax);
+	syntax->parser = parser;
 
 	try {
+		syntax->default_import();
 
 	// read file
 		string buffer = FileReadText(filename);
@@ -195,7 +177,7 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 			compile();
 		/*if (pre_script->FlagShow)
 			pre_script->Show();*/
-		if ((!just_analyse) and (config.verbose)){
+		if (!just_analyse and config.verbose){
 			msg_write(format("Opcode: %d bytes", opcode_size));
 			if (config.allow_output_stage("dasm"))
 				msg_write(Asm::disassemble(opcode, opcode_size));
@@ -211,8 +193,7 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 	loading_script_stack.pop();
 }
 
-void Script::do_error(const string &str, int override_line)
-{
+void Script::do_error(const string &str, int override_line) {
 #ifdef CPU_ARM
 	msg_error(str);
 #endif
@@ -229,7 +210,7 @@ void Script::do_error_link(const string &str) {
 
 void Script::set_variable(const string &name, void *data) {
 	//msg_write(name);
-	for (auto *v: syntax->base_class->static_variables)
+	for (auto *v: weak(syntax->base_class->static_variables))
 		if (v->name == name) {
 			memcpy(v->memory, data, v->type->size);
 			return;
@@ -240,8 +221,6 @@ void Script::set_variable(const string &name, void *data) {
 Script::Script() {
 	filename = "-empty script-";
 	used_by_default = false;
-
-	reference_counter = 0;
 
 	show_compiler_stats = !config.compile_silently;
 
@@ -256,10 +235,9 @@ Script::Script() {
 	syntax = new SyntaxTree(this);
 }
 
-Script::~Script()
-{
+Script::~Script() {
 	int r = 0;
-	if (opcode){
+	if (opcode) {
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(opcode, 0, MEM_RELEASE);
 		#else
@@ -268,7 +246,7 @@ Script::~Script()
 	}
 	if (r != 0)
 		msg_error("munmap...op");
-	if (memory and memory_size > 0){
+	if (memory and memory_size > 0) {
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(memory, 0, MEM_RELEASE);
 		#else
@@ -278,60 +256,59 @@ Script::~Script()
 	if (r != 0)
 		msg_error("munmap...mem");
 	//msg_write(string2("-----------            Memory:         %p",Memory));
-	delete(syntax);
+	delete syntax;
 }
 
 
 // bad:  should clean up in case of errors!
-void ExecuteSingleScriptCommand(const string &cmd)
-{
+void execute_single_script_command(const string &cmd) {
 	if (cmd.num < 1)
 		return;
 	//msg_write("script command: " + cmd);
 
 	// empty script
-	Script *s = new Script();
+	shared<Script> s = new Script();
 	s->filename = "-command line-";
-	SyntaxTree *ps = s->syntax;
-	auto parser = ps->parser = new Parser(ps);
+	auto tree = s->syntax;
+	tree->default_import();
+	auto parser = new Parser(tree);
+	tree->parser = parser;
 
 	try {
 
 // find expressions
-	parser->Exp.analyse(ps, cmd);
-	if (parser->Exp.line[0].exp.num < 1){
+	parser->Exp.analyse(tree, cmd);
+	if (parser->Exp.line[0].exp.num < 1) {
 		//clear_exp_buffer(&ps->Exp);
-		delete(s);
 		return;
 	}
 	
-	for (auto *p: packages)
-		if (!p->used_by_default and (p->filename != "x"))
-			ps->add_include_data(p, true);
+	for (auto p: packages)
+		if (!p->used_by_default)
+			tree->add_include_data(p, true);
 
 // analyse syntax
 
 	// create a main() function
-	Function *func = ps->add_function("--command-func--", TypeVoid, ps->base_class, Flags::STATIC);
+	Function *func = tree->add_function("--command-func--", TypeVoid, tree->base_class, Flags::STATIC);
 	func->_var_size = 0; // set to -1...
 
 	parser->Exp.reset_parser();
 
 	// parse
-	parser->parse_complete_command(func->block);
+	parser->parse_complete_command(func->block.get());
 	
 	// implicit print(...)?
 	if (func->block->params.num > 0 and func->block->params[0]->type != TypeVoid) {
-		auto *n = parser->add_converter_str(func->block->params[0], true);
+		auto n = parser->add_converter_str(func->block->params[0], true);
 		
-		auto links = ps->get_existence("print", nullptr, nullptr, false);
-		Function *f = links[0]->as_func();
+		auto f = tree->required_func_global("print");
 
-		Node *cmd = ps->add_node_call(f);
+		auto cmd = tree->add_node_call(f);
 		cmd->set_param(0, n);
 		func->block->params[0] = cmd;
 	}
-	for (auto *c: ps->owned_classes)
+	for (auto *c: tree->owned_classes)
 		parser->auto_implement_functions(c);
 	//ps->show("aaaa");
 
@@ -344,11 +321,9 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	if (f)
 		f();
 
-	}catch(const Exception &e){
+	} catch(const Exception &e) {
 		e.print();
 	}
-
-	delete(s);
 }
 
 void *Script::match_function(const string &name, const string &return_type, const Array<string> &param_types) {
@@ -380,7 +355,7 @@ void *Script::match_class_function(const string &_class, bool allow_derived, con
 		return nullptr;
 
 	// match
-	for (Function *f: syntax->functions){
+	for (auto *f: syntax->functions){
 		if (!f->name_space)
 			continue;
 		if (!f->name_space->is_derived_from(root_type))
@@ -409,7 +384,7 @@ void print_var(void *p, const string &name, const Class *t) {
 }
 
 void Script::show_vars(bool include_consts) {
-	for (auto *v: syntax->base_class->static_variables)
+	for (auto *v: weak(syntax->base_class->static_variables))
 		print_var(v->memory, v->name, v->type);
 	/*if (include_consts)
 		foreachi(LocalVariable &c, pre_script->Constant, i)
@@ -417,7 +392,7 @@ void Script::show_vars(bool include_consts) {
 }
 
 Array<const Class*> Script::classes() {
-	return syntax->base_class->classes;
+	return weak(syntax->base_class->classes);
 }
 
 Array<Function*> Script::functions() {
@@ -425,11 +400,11 @@ Array<Function*> Script::functions() {
 }
 
 Array<Variable*> Script::variables() {
-	return syntax->base_class->static_variables;
+	return weak(syntax->base_class->static_variables);
 }
 
 Array<Constant*> Script::constants() {
-	return syntax->base_class->constants;
+	return weak(syntax->base_class->constants);
 }
 
 const Class *Script::base_class() {

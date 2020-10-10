@@ -10,10 +10,9 @@
 #include "../../../Data/TrackMarker.h"
 #include <assert.h>
 
-ActionTrackDeleteMarker::ActionTrackDeleteMarker(TrackLayer *l, int _index) {
+ActionTrackDeleteMarker::ActionTrackDeleteMarker(shared<TrackLayer> l, int _index) {
 	layer = l;
 	index = _index;
-	marker = nullptr;
 }
 
 void *ActionTrackDeleteMarker::execute(Data *d) {

@@ -467,7 +467,7 @@ void AudioViewLayer::draw(Painter *c) {
 	draw_track_buffers(c);
 
 	// samples
-	for (auto *s: layer->samples)
+	for (auto *s: weak(layer->samples))
 		draw_sample(c, s);
 
 	draw_markers(c, layer->markers_sorted(), view->hover());
@@ -611,7 +611,7 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 
 	// markers
 	for (int i=0; i<min(layer->markers.num, marker_areas.num); i++) {
-		auto *m = layer->markers[i];
+		auto *m = layer->markers[i].get();
 		if (marker_areas.contains(m) and marker_label_areas.contains(m))
 			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)) {
 				s.marker = m;
@@ -621,7 +621,7 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 	}
 
 	// TODO: prefer selected samples
-	for (auto *ss: layer->samples) {
+	for (auto *ss: weak(layer->samples)) {
 		int offset = view->mouse_over_sample(ss);
 		if (offset >= 0) {
 			s.sample = ss;

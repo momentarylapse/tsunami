@@ -14,12 +14,6 @@
 ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index) {
 	track = t;
 	index = _index;
-	effect = nullptr;
-}
-
-ActionTrackDeleteEffect::~ActionTrackDeleteEffect() {
-	if (effect)
-		delete effect;
 }
 
 void *ActionTrackDeleteEffect::execute(Data *d) {
@@ -35,14 +29,12 @@ void *ActionTrackDeleteEffect::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackDeleteEffect::undo(Data *d)
-{
+void ActionTrackDeleteEffect::undo(Data *d) {
 	assert(index >= 0);
 
 	assert(index <= track->fx.num);
 
 	track->fx.insert(effect, index);
 	track->notify(track->MESSAGE_ADD_EFFECT);
-	effect = nullptr;
 }
 

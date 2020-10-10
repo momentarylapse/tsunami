@@ -14,13 +14,12 @@ class Curve;
 
 class ActionCurveAdd : public Action {
 public:
-	ActionCurveAdd(Curve *curve, int index);
-	~ActionCurveAdd();
+	ActionCurveAdd(shared<Curve> curve, int index);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
-	Curve *curve;
+	shared<Curve> curve;
 	int index;
 };
 

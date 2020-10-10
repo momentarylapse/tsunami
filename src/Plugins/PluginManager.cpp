@@ -64,7 +64,7 @@
 #include "FavoriteManager.h"
 
 namespace Kaba{
-	extern Array<Script*> _public_scripts_;
+	extern shared_array<Script> _public_scripts_;
 };
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
@@ -78,15 +78,15 @@ PluginManager::PluginManager() {
 	package->filename = "-tsunami-internal-";
 	package->used_by_default = false;
 	Kaba::packages.add(package);
-	Kaba::_public_scripts_.add(package);
+	Kaba::_public_scripts_.add(package.get());
 
 	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);
 	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, type_dev, package->syntax->base_class);
 }
 
 PluginManager::~PluginManager() {
-	delete favorites;
-	Kaba::clean_up();
+	//plugins.clear();
+	//Kaba::clean_up();
 }
 
 
@@ -153,10 +153,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Bar.index", &Bar::index);
 	Kaba::declare_class_element("Bar.index_text", &Bar::index_text);
 	Kaba::declare_class_element("Bar.offset", &Bar::offset);
+	Kaba::declare_class_element("Bar." + Kaba::IDENTIFIER_SHARED_COUNT, &Bar::_pointer_ref_counter);
 	Kaba::link_external_class_func("Bar.range", &Bar::range);
 	Kaba::link_external_class_func("Bar.bpm", &Bar::bpm);
-	Kaba::link_external_class_func("Bar._ref", &Bar::_pointer_ref);
-	Kaba::link_external_class_func("Bar._unref", &Bar::_pointer_unref);
 
 	Kaba::declare_class_size("BarCollection", sizeof(BarCollection));
 	Kaba::link_external_class_func("BarCollection.get_bars", &BarCollection::get_bars);
@@ -170,6 +169,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Session.win", &Session::_kaba_win);
 	Kaba::declare_class_element("Session.view", &Session::view);
 	Kaba::declare_class_element("Session.song", &Session::song);
+	Kaba::declare_class_element("Session." + Kaba::IDENTIFIER_SHARED_COUNT, &Session::_pointer_ref_counter);
 	Kaba::link_external_class_func("Session.sample_rate", &Session::sample_rate);
 	Kaba::link_external_class_func("Session.i", &Session::i);
 	Kaba::link_external_class_func("Session.w", &Session::w);
@@ -178,14 +178,13 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Session.create_signal_chain", &Session::create_signal_chain);
 	Kaba::link_external_class_func("Session.load_signal_chain", &Session::load_signal_chain);
 	Kaba::link_external_class_func("Session.create_child", &Session::create_child);
-	Kaba::link_external_class_func("Session._ref", &Session::_pointer_ref);
-	Kaba::link_external_class_func("Session._unref", &Session::_pointer_unref);
 
 
 	Module module(ModuleType::AUDIO_EFFECT, "");
 	Kaba::declare_class_size("Module", sizeof(Module));
 	Kaba::declare_class_element("Module.name", &Module::module_subtype);
 	Kaba::declare_class_element("Module.session", &Module::session);
+	Kaba::declare_class_element("Module." + Kaba::IDENTIFIER_SHARED_COUNT, &Module::_pointer_ref_counter);
 	Kaba::link_external_class_func("Module.__init__", &Module::__init__);
 	Kaba::link_external_virtual("Module.__delete__", &Module::__delete__, &module);
 	Kaba::link_external_virtual("Module.create_panel", &Module::create_panel, &module);
@@ -204,8 +203,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Module.copy", &Module::copy);
 	Kaba::link_external_class_func("Module.plug_in", &Module::_plug_in);
 	Kaba::link_external_class_func("Module.unplug_in", &Module::_unplug_in);
-	Kaba::link_external_class_func("Module._ref", &Module::_pointer_ref);
-	Kaba::link_external_class_func("Module._unref", &Module::_pointer_unref);
 
 
 	ModuleConfiguration plugin_data;
@@ -312,12 +309,11 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Sample.uid", &Sample::uid);
 	Kaba::declare_class_element("Sample.ref_count", &Sample::ref_count);
 	Kaba::declare_class_element("Sample.tags", &Sample::tags);
+	Kaba::declare_class_element("Sample." + Kaba::IDENTIFIER_SHARED_COUNT, &Sample::_pointer_ref_counter);
 	Kaba::link_external_class_func("Sample.__init__", &Sample::__init__);
 	Kaba::link_external_class_func("Sample.create_ref", &Sample::create_ref);
 	Kaba::link_external_class_func("Sample.get_value", &Sample::get_value);
 	Kaba::link_external_class_func("Sample.set_value", &Sample::set_value);
-	Kaba::link_external_class_func("Sample._ref", &Sample::_pointer_ref);
-	Kaba::link_external_class_func("Sample._unref", &Sample::_pointer_unref);
 
 	{
 	shared<Sample> sample = new Sample(SignalType::AUDIO);
@@ -327,10 +323,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("SampleRef.buf", &SampleRef::buf);
 	Kaba::link_external_class_func("SampleRef.midi", &SampleRef::midi);
 	Kaba::declare_class_element("SampleRef.origin", &SampleRef::origin);
+	Kaba::declare_class_element("SampleRef." + Kaba::IDENTIFIER_SHARED_COUNT, &SampleRef::_pointer_ref_counter);
 	Kaba::link_external_class_func("SampleRef.__init__", &SampleRef::__init__);
 	Kaba::link_external_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
-	Kaba::link_external_class_func("SampleRef._ref", &SampleRef::_pointer_ref);
-	Kaba::link_external_class_func("SampleRef._unref", &SampleRef::_pointer_unref);
 	}
 
 
@@ -430,11 +425,10 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("MidiNote.clef_position", &MidiNote::clef_position);
 	Kaba::declare_class_element("MidiNote.modifier", &MidiNote::modifier);
 	Kaba::declare_class_element("MidiNote.flags", &MidiNote::flags);
+	Kaba::declare_class_element("MidiNote." + Kaba::IDENTIFIER_SHARED_COUNT, &MidiNote::_pointer_ref_counter);
 	Kaba::link_external_class_func("MidiNote.copy", &MidiNote::copy);
 	Kaba::link_external_class_func("MidiNote.is", &MidiNote::is);
 	Kaba::link_external_class_func("MidiNote.set", &MidiNote::set);
-	Kaba::link_external_class_func("MidiNote._ref", &MidiNote::_pointer_ref);
-	Kaba::link_external_class_func("MidiNote._unref", &MidiNote::_pointer_unref);
 	
 	Kaba::declare_class_size("MidiEvent", sizeof(MidiEvent));
 	Kaba::declare_class_element("MidiEvent.pos", &MidiEvent::pos);
@@ -475,8 +469,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("TrackMarker.text", &TrackMarker::text);
 	Kaba::declare_class_element("TrackMarker.range", &TrackMarker::range);
 	Kaba::declare_class_element("TrackMarker.fx", &TrackMarker::fx);
-	Kaba::link_external_class_func("TrackMarker._ref", &TrackMarker::_pointer_ref);
-	Kaba::link_external_class_func("TrackMarker._unref", &TrackMarker::_pointer_unref);
+	Kaba::declare_class_element("TrackMarker." + Kaba::IDENTIFIER_SHARED_COUNT, &TrackMarker::_pointer_ref_counter);
 
 	Kaba::declare_class_size("TrackLayer", sizeof(TrackLayer));
 	Kaba::declare_class_element("TrackLayer.type", &TrackLayer::type);
@@ -485,6 +478,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("TrackLayer.samples", &TrackLayer::samples);
 	Kaba::declare_class_element("TrackLayer.markers", &TrackLayer::markers);
 	Kaba::declare_class_element("TrackLayer.track", &TrackLayer::track);
+	Kaba::declare_class_element("TrackLayer." + Kaba::IDENTIFIER_SHARED_COUNT, &TrackLayer::_pointer_ref_counter);
 	Kaba::link_external_class_func("TrackLayer.get_buffers", &TrackLayer::get_buffers);
 	Kaba::link_external_class_func("TrackLayer.read_buffers", &TrackLayer::read_buffers);
 	Kaba::link_external_class_func("TrackLayer.edit_buffers", &TrackLayer::edit_buffers);
@@ -499,8 +493,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("TrackLayer.add_marker", &TrackLayer::add_marker);
 	Kaba::link_external_class_func("TrackLayer.delete_marker", &TrackLayer::delete_marker);
 	Kaba::link_external_class_func("TrackLayer.edit_marker", &TrackLayer::edit_marker);
-	Kaba::link_external_class_func("TrackLayer._ref", &TrackLayer::_pointer_ref);
-	Kaba::link_external_class_func("TrackLayer._unref", &TrackLayer::_pointer_unref);
 
 	Kaba::declare_class_size("Track", sizeof(Track));
 	Kaba::declare_class_element("Track.type", &Track::type);
@@ -513,6 +505,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::declare_class_element("Track.synth", &Track::synth);
 	Kaba::declare_class_element("Track.instrument", &Track::instrument);
 	Kaba::declare_class_element("Track.root", &Track::song);
+	Kaba::declare_class_element("Track." + Kaba::IDENTIFIER_SHARED_COUNT, &Track::_pointer_ref_counter);
 	Kaba::link_external_class_func("Track.nice_name", &Track::nice_name);
 	Kaba::link_external_class_func("Track.set_name", &Track::set_name);
 	Kaba::link_external_class_func("Track.set_muted", &Track::set_muted);
@@ -523,8 +516,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Track.edit_effect", &Track::edit_effect);
 	Kaba::link_external_class_func("Track.enable_effect", &Track::enable_effect);
 	Kaba::link_external_class_func("Track.set_synthesizer", &Track::set_synthesizer);
-	Kaba::link_external_class_func("Track._ref", &Track::_pointer_ref);
-	Kaba::link_external_class_func("Track._unref", &Track::_pointer_unref);
 
 	Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Kaba::declare_class_size("Song", sizeof(Song));
@@ -536,6 +527,7 @@ void PluginManager::link_app_script_data() {
 //	Kaba::declare_class_element("Song.layers", &Song::layers);
 	Kaba::declare_class_element("Song.bars", &Song::bars);
 	Kaba::declare_class_element("Song.secret_data", &Song::secret_data);
+	Kaba::declare_class_element("Song." + Kaba::IDENTIFIER_SHARED_COUNT, &Song::_pointer_ref_counter);
 	Kaba::link_external_class_func("Song.__init__", &Song::__init__);
 	Kaba::link_external_virtual("Song.__delete__", &Song::__delete__, &af);
 	Kaba::link_external_class_func("Song.add_track", &Song::add_track);
@@ -554,8 +546,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("Song.get_time_str", &Song::get_time_str);
 	Kaba::link_external_class_func("Song.get_time_str_fuzzy", &Song::get_time_str_fuzzy);
 	Kaba::link_external_class_func("Song.get_time_str_long", &Song::get_time_str_long);
-	Kaba::link_external_class_func("Song._ref", &Song::_pointer_ref);
-	Kaba::link_external_class_func("Song._unref", &Song::_pointer_unref);
 
 	SongRenderer sr(nullptr);
 	Kaba::declare_class_size("SongRenderer", sizeof(SongRenderer));
@@ -642,8 +632,7 @@ void PluginManager::link_app_script_data() {
 
 	Kaba::declare_class_size("SceneGraph.Node", sizeof(ViewNode));
 	Kaba::declare_class_element("SceneGraph.Node.area", &ViewNode::area);
-	Kaba::link_external_class_func("SceneGraph.Node._ref", &ViewNode::_pointer_ref);
-	Kaba::link_external_class_func("SceneGraph.Node._unref", &ViewNode::_pointer_unref);
+	Kaba::declare_class_element("SceneGraph.Node." + Kaba::IDENTIFIER_SHARED_COUNT, &ViewNode::_pointer_ref_counter);
 
 	Kaba::declare_class_size("AudioView.Layer", sizeof(AudioViewLayer));
 	Kaba::declare_class_element("AudioView.Layer.layer", &AudioViewLayer::layer);

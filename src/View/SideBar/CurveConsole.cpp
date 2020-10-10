@@ -102,7 +102,7 @@ void CurveConsole::on_leave() {
 void CurveConsole::update_list() {
 	reset(id_list);
 	curves.clear();
-	for (auto *c: song->curves)
+	for (auto *c: weak(song->curves))
 		if (c->targets[0].track(song) == view->cur_track())
 			curves.add(c);
 
@@ -115,9 +115,8 @@ void CurveConsole::update_list() {
 
 void CurveConsole::on_add() {
 	Array<Curve::Target> targets;
-	auto *dlg = new CurveTargetDialog(this, view->cur_track(), targets);
+	auto dlg = ownify(new CurveTargetDialog(this, view->cur_track(), targets));
 	dlg->run();
-	delete dlg;
 	if (targets.num > 0) {
 		Curve *c = song->add_curve("new", targets);
 		view->mode_curve->set_curve(c);
@@ -137,12 +136,11 @@ void CurveConsole::on_target() {
 	if (!curve())
 		return;
 	auto targets = curve()->targets;
-	auto *dlg = new CurveTargetDialog(this, view->cur_track(), targets);
+	auto dlg = ownify(new CurveTargetDialog(this, view->cur_track(), targets));
 	dlg->run();
 	//if (dlg->id == "ok")
 		song->curve_set_targets(curve(), targets);
 
-	delete dlg;
 	update_list();
 }
 

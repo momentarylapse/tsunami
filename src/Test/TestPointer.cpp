@@ -143,7 +143,7 @@ void TestPointer::test_shared_array_set_array() {
 
 		{
 			msg_write("a0");
-			Array<X*> b = {new X(), new X()};
+			shared_array<X> b = {new X(), new X()};
 			msg_write("a1");
 			assert_equal(X::instance_count, 6);
 			msg_write("a1b");

@@ -12,8 +12,7 @@
 class AudioEffect;
 class Track;
 
-class ActionTrackMoveAudioEffect: public Action
-{
+class ActionTrackMoveAudioEffect: public Action {
 public:
 	ActionTrackMoveAudioEffect(Track *track, int source, int target);
 

@@ -15,13 +15,12 @@ class AudioEffect;
 class ActionTrackDeleteEffect: public Action {
 public:
 	ActionTrackDeleteEffect(Track *t, int index);
-	~ActionTrackDeleteEffect();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	AudioEffect *effect;
+	shared<AudioEffect> effect;
 	Track *track;
 	int index;
 };

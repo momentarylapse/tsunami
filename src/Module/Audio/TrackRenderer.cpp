@@ -44,7 +44,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos) {
 int TrackRenderer::get_first_usable_layer() {
 	if (!song_renderer)
 		return 0;
-	foreachi(TrackLayer *l, track->layers, i) {
+	foreachi(TrackLayer *l, weak(track->layers), i) {
 		if (song_renderer->allowed_layers.contains(l))
 			return i;
 	}
@@ -53,7 +53,7 @@ int TrackRenderer::get_first_usable_layer() {
 
 static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf) {
 	// subs
-	for (SampleRef *s: l->samples) {
+	for (SampleRef *s: weak(l->samples)) {
 		if (s->muted)
 			continue;
 
@@ -73,7 +73,7 @@ void TrackRenderer::reset_state() {
 	if (midi_streamer)
 		fill_midi_streamer();
 
-	for (AudioEffect *fx: fx)
+	for (AudioEffect *fx: weak(fx))
 		fx->reset_state();
 	synth->reset_state();
 }
@@ -95,7 +95,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	if (direct_mode) {
 		fx = t->fx;
 	} else {
-		for (AudioEffect *f: t->fx)
+		for (AudioEffect *f: weak(t->fx))
 			fx.add((AudioEffect*)f->copy());
 	}
 
@@ -116,7 +116,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	perf_set_parent(song_renderer);
 	synth->perf_set_parent(this);
 	
-	for (auto *f: fx)
+	for (auto *f: weak(fx))
 		f->perf_set_parent(this);
 		
 
@@ -136,7 +136,7 @@ TrackRenderer::~TrackRenderer() {
 
 	if (synth)
 		synth->perf_set_parent(nullptr);
-	for (auto *l: layers)
+	for (auto *l: weak(layers))
 		l->unsubscribe(this);
 	if (track) {
 		track->song->unsubscribe(this);
@@ -172,11 +172,11 @@ void TrackRenderer::fill_midi_streamer() {
 	MidiNoteBuffer _midi;
 	if (layers.num > 0)
 		_midi = layers[0]->midi;
-	for (auto *l: layers)
-		for (auto c: l->samples)
+	for (auto *l: weak(layers))
+		for (auto c: weak(l->samples))
 			if (c->type() == SignalType::MIDI)
 			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
-	for (auto *fx: track->midi_fx) {
+	for (auto *fx: weak(track->midi_fx)) {
 		fx->reset_state();
 		fx->process(&_midi);
 	}
@@ -194,7 +194,7 @@ void TrackRenderer::on_track_add_or_delete_fx() {
 	if (direct_mode) {
 		fx = track->fx;
 	}
-	for (auto *f: fx)
+	for (auto *f: weak(fx))
 		f->perf_set_parent(this);
 }
 
@@ -225,7 +225,7 @@ void TrackRenderer::on_track_change_data() {
 }
 
 void TrackRenderer::update_layers() {
-	for (auto *l: layers)
+	for (auto *l: weak(layers))
 		l->unsubscribe(this);
 
 	msg_write("-----TR update  clear");
@@ -235,7 +235,7 @@ void TrackRenderer::update_layers() {
 		layers = track->layers;
 	msg_write("-----TR update done");
 
-	for (auto *l: layers) {
+	for (auto *l: weak(layers)) {
 		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
 		//l->subscribe(this, [=]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
 	}
@@ -247,7 +247,7 @@ void TrackRenderer::set_pos(int pos) {
 	offset = pos;
 	if (midi_streamer)
 		midi_streamer->set_pos(pos);
-	for (auto *f: fx)
+	for (auto *f: weak(fx))
 		f->reset_state();
 	if (track->type == SignalType::BEATS)
 		song_renderer->bar_streamer->set_pos(pos);
@@ -305,7 +305,7 @@ static void add_fade_in(TrackLayer *l, const Range &r, AudioBuffer &buf, const R
 void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 	Range cur = Range(offset, buf.length);
 	
-	for (TrackLayer *l: track->layers) {
+	for (TrackLayer *l: weak(track->layers)) {
 		if (song_renderer and !song_renderer->allowed_layers.contains(l))
 			continue;
 	
@@ -350,18 +350,18 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf) {
 		// first (un-muted) layer
 		track->layers[i0]->read_buffers_fixed(buf, cur);
 		// TODO: allow_ref if no other layers + no fx
-		add_samples(track->layers[i0], cur, buf);
+		add_samples(track->layers[i0].get(), cur, buf);
 
 		// other layers
 		AudioBuffer tbuf;
 		for (int i=i0+1;i<track->layers.num;i++) {
-			if (song_renderer and !song_renderer->allowed_layers.contains(track->layers[i]))
+			if (song_renderer and !song_renderer->allowed_layers.contains(track->layers[i].get()))
 				continue;
 
 			//if (track->layers[i]->muted)
 			//	continue;
 			track->layers[i]->read_buffers(tbuf, cur, true);
-			add_samples(track->layers[i], cur, tbuf);
+			add_samples(track->layers[i].get(), cur, tbuf);
 			buf.add(tbuf, 0);
 		}
 	}
@@ -428,7 +428,7 @@ int TrackRenderer::read(AudioBuffer &buf) {
 	auto _fx = fx;
 	if (song_renderer and song_renderer->preview_effect)
 		_fx.add(song_renderer->preview_effect);
-	apply_fx(buf, _fx);
+	apply_fx(buf, weak(_fx));
 
 	buf.mix_stereo(track->volume, track->panning);
 

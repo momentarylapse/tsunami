@@ -8,7 +8,7 @@
 #include "ActionTrackEditMidiNote.h"
 #include "../../../Data/Track.h"
 
-ActionTrackEditMidiNote::ActionTrackEditMidiNote(MidiNote *n, const Range &range, float _pitch, float _volume, int _stringno, int _flags) {
+ActionTrackEditMidiNote::ActionTrackEditMidiNote(shared<MidiNote> n, const Range &range, float _pitch, float _volume, int _stringno, int _flags) {
 	note = n;
 	note2 = new MidiNote(range, _pitch, _volume);
 	note2->stringno = _stringno;

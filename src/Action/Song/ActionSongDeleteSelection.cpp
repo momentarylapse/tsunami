@@ -12,6 +12,7 @@
 #include "../../Data/SongSelection.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/SampleRef.h"
 #include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBuffer.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"
@@ -23,26 +24,26 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(const SongSelection &_sel) 
 
 void ActionSongDeleteSelection::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
-	for (Track *t: s->tracks) {
+	for (auto t: weak(s->tracks)) {
 
-		for (TrackLayer *l: t->layers) {
+		for (auto l: weak(t->layers)) {
 			// buffer boxes
 			if (sel.has(l) and !sel.range().empty())
 				DeleteBuffersFromTrackLayer(s, t, l, sel);
 
 			// midi
 			for (int i=l->midi.num-1; i>=0; i--)
-				if (sel.has(l->midi[i]))
+				if (sel.has(l->midi[i].get()))
 					add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);
 
 			// marker
 			for (int i=l->markers.num-1; i>=0; i--)
-				if (sel.has(l->markers[i]))
+				if (sel.has(l->markers[i].get()))
 					add_sub_action(new ActionTrackDeleteMarker(l, i), d);
 
 			// samples
 			for (int i=l->samples.num-1; i>=0; i--)
-				if (sel.has(l->samples[i]))
+				if (sel.has(l->samples[i].get()))
 					add_sub_action(new ActionTrackDeleteSample(l->samples[i]), d);
 		}
 	}

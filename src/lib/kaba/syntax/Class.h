@@ -12,6 +12,7 @@ class Class;
 class Function;
 class Constant;
 class Variable;
+enum class Flags;
 
 
 class ClassElement {
@@ -49,6 +50,7 @@ public:
 		DICT,
 	};
 	Type type;
+	Flags flags;
 
 	bool is_array() const;
 	bool is_super_array() const;
@@ -57,25 +59,25 @@ public:
 	bool is_usable_as_pointer() const;
 	bool is_pointer_shared() const;
 	bool is_pointer_silent() const;
-	bool fully_parsed;
+	bool fully_parsed() const;
 	Array<ClassElement> elements;
-	Array<Function*> functions;
-	Array<Variable*> static_variables;
-	Array<Constant*> constants;
-	Array<const Class*> classes;
+	shared_array<Function> functions;
+	shared_array<Variable> static_variables;
+	shared_array<Constant> constants;
+	shared_array<const Class> classes;
 	const Class *parent; // derived from
 	const Class *param; // for pointers/arrays etc
 	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...
 	int _logical_line_no;
 	int _exp_no;
-	bool _amd64_allow_pass_in_xmm;
+	bool _amd64_allow_pass_in_xmm() const;
 	Array<void*> vtable;
 	void *_vtable_location_compiler_; // may point to const/opcode
 	void *_vtable_location_target_; // (opcode offset adjusted)
 	void *_vtable_location_external_; // from linked classes (just for reference)
 
-	bool force_call_by_value;
+	bool force_call_by_value() const;
 	bool uses_call_by_reference() const;
 	bool uses_return_by_memory() const;
 	bool is_simple_class() const;

@@ -9,7 +9,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveEditPoint::ActionCurveEditPoint(Curve *_curve, int _index, int _pos, float _value) {
+ActionCurveEditPoint::ActionCurveEditPoint(shared<Curve> _curve, int _index, int _pos, float _value) {
 	curve = _curve;
 	index = _index;
 	new_value.pos = _pos;
@@ -31,7 +31,7 @@ bool ActionCurveEditPoint::mergable(Action *a) {
 	auto *e = dynamic_cast<ActionCurveEditPoint*>(a);
 	if (!e)
 		return false;
-	return (curve == e->curve) and (index == e->index);
+	return (curve == e->curve.get()) and (index == e->index);
 
 }
 

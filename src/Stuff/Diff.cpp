@@ -131,17 +131,17 @@ Array<string> diff_track(Track *ta, Track *tb, const string &ee) {
 	if (ta->fx.num != tb->fx.num)
 		r.add(ee + "#fx");
 	for (int i=0; i<min(ta->fx.num, tb->fx.num); i++)
-		r += diff_module(ta->fx[i], tb->fx[i], ee  + format("fx[%d].", i));
+		r += diff_module(ta->fx[i].get(), tb->fx[i].get(), ee  + format("fx[%d].", i));
 
 	if (ta->midi_fx.num != tb->midi_fx.num)
 		r.add(ee + "#midi_fx");
 	for (int i=0; i<min(ta->midi_fx.num, tb->midi_fx.num); i++)
-		r += diff_module(ta->midi_fx[i], tb->midi_fx[i], ee  + format("midi_fx[%d].", i));
+		r += diff_module(ta->midi_fx[i].get(), tb->midi_fx[i].get(), ee  + format("midi_fx[%d].", i));
 
 	if (ta->layers.num != tb->layers.num)
 		r.add(ee + "#layers");
 	for (int i=0; i<min(ta->layers.num, tb->layers.num); i++)
-		r += diff_layer(ta->layers[i], tb->layers[i], ee + format("layer[%d].", i));
+		r += diff_layer(ta->layers[i].get(), tb->layers[i].get(), ee + format("layer[%d].", i));
 	return r;
 }
 
@@ -151,7 +151,7 @@ Array<string> diff_song(Song *a, Song *b) {
 	if (a->bars.num != b->bars.num)
 		r.add("#bars");
 	for (int i=0; i<min(a->bars.num, b->bars.num); i++)
-		if (*(BarPattern*)a->bars[i] != *(BarPattern*)b->bars[i])
+		if (*(BarPattern*)a->bars[i].get() != *(BarPattern*)b->bars[i].get())
 			r.add(format("bar[%d]", i));
 
 	if (a->tags != b->tags)
@@ -164,7 +164,7 @@ Array<string> diff_song(Song *a, Song *b) {
 	if (a->samples.num != b->samples.num)
 		r.add("#samples");
 	for (int i=0; i<min(a->samples.num, b->samples.num); i++)
-		r += diff_sample(a->samples[i], b->samples[i], format("sample[i].", i));
+		r += diff_sample(a->samples[i].get(), b->samples[i].get(), format("sample[i].", i));
 
 	if (a->curves.num != b->curves.num)
 		r.add("#curves");
@@ -172,6 +172,6 @@ Array<string> diff_song(Song *a, Song *b) {
 	if (a->tracks.num != b->tracks.num)
 		r.add("#tracks");
 	for (int i=0; i<min(a->tracks.num, b->tracks.num); i++)
-		r += diff_track(a->tracks[i], b->tracks[i], format("track[%d].", i));
+		r += diff_track(a->tracks[i].get(), b->tracks[i].get(), format("track[%d].", i));
 	return r;
 }

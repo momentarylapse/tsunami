@@ -16,14 +16,12 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include <assert.h>
 
-Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size)
-{
+Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size) {
 	source = _source;
 	new_size = _new_size;
 }
 
-void *Action__ScaleData::execute(Data *d)
-{
+void *Action__ScaleData::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_scale(s, source, new_size);
@@ -31,19 +29,17 @@ void *Action__ScaleData::execute(Data *d)
 	return nullptr;
 }
 
-void Action__ScaleData::undo(Data *d)
-{
+void Action__ScaleData::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_scale(s, Range(source.offset, new_size), source.length);
 }
 
-int __shift_data_shift(const Range &source, int new_length, int pos)
-{
+int __shift_data_shift(const Range &source, int new_length, int pos) {
 	if (pos >= source.end())
 		// after source
 		return pos + new_length - source.length;
-	if (pos >= source.offset){
+	if (pos >= source.offset) {
 		// inside source
 		if (source.length == 0)
 			return pos - new_length;
@@ -52,20 +48,19 @@ int __shift_data_shift(const Range &source, int new_length, int pos)
 	return pos;
 }
 
-void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
-{
+void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 	int pos0 = r.offset;
-	for (Track *t: s->tracks){
+	for (auto t: s->tracks) {
 
 		// buffer
-		for (TrackLayer *l: t->layers){
+		for (auto l: t->layers) {
 			for (AudioBuffer &b: l->buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(r, new_length, b.offset);
 
 
 			// midi
-			foreachi(MidiNote *n, l->midi, j){
+			foreachi(auto n, l->midi, j) {
 				// note start
 				if (n->range.start() >= pos0)
 					n->range.set_start(__shift_data_shift(r, new_length, n->range.start()));
@@ -75,7 +70,7 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 			}
 
 			// marker
-			for (TrackMarker *m: l->markers){
+			for (auto m: l->markers) {
 				if (m->range.start() >= pos0)
 					m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
 				if (m->range.end() >= pos0)
@@ -83,7 +78,7 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 			}
 
 			// samples
-			for (SampleRef *s: l->samples)
+			for (auto s: l->samples)
 				if (s->pos >= pos0)
 					s->pos = __shift_data_shift(r, new_length, s->pos);
 

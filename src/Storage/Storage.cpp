@@ -101,7 +101,7 @@ bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 	song->action_manager->reset();
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_CHANGE);
-	for (Track *t: song->tracks)
+	for (Track *t: weak(song->tracks))
 		t->notify();
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
@@ -145,7 +145,7 @@ bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
 
 	Song *aa = new Song(session, session->sample_rate());
 	Track *t = aa->add_track(SignalType::AUDIO);
-	TrackLayer *l = t->layers[0];
+	TrackLayer *l = t->layers[0].get();
 	bool ok = load_track(l, filename, 0);
 	if (l->buffers.num > 0){
 		buf->resize(l->buffers[0].length);

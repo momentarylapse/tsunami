@@ -24,7 +24,6 @@ class MidiEventBuffer;
 class CaptureConsole : public SideBarConsole {
 public:
 	CaptureConsole(Session *session);
-	virtual ~CaptureConsole();
 
 
 	void on_enter() override;
@@ -52,13 +51,13 @@ public:
 		PAUSED
 	} state;
 
-	PeakMeterDisplay *peak_meter;
+	owned<PeakMeterDisplay> peak_meter;
 	CaptureConsoleMode *mode;
 
-	CaptureConsoleMode *mode_audio;
-	CaptureConsoleMode *mode_midi;
-	CaptureConsoleMode *mode_multi;
-	SignalChain *chain;
+	owned<CaptureConsoleMode> mode_audio;
+	owned<CaptureConsoleMode> mode_midi;
+	owned<CaptureConsoleMode> mode_multi;
+	shared<SignalChain> chain;
 	int n_sync = 0;
 
 

@@ -35,7 +35,7 @@ public:
 };
 
 int get_layer_index(TrackLayer *layer) {
-	return layer->track->layers.find(layer);
+	return weak(layer->track->layers).find(layer);
 }
 
 SignalType effective_type(Track *t) {
@@ -58,7 +58,7 @@ void ActionTrackLayerMakeTrack::build(Data *d) {
 	t->volume = orig->volume;
 	t->panning = orig->panning;
 	add_sub_action(new ActionTrackAdd(t, orig->get_index() + 1), d);
-	add_sub_action(new ActionLayerMoveData(layer, t->layers[0]), d);
+	add_sub_action(new ActionLayerMoveData(layer, t->layers[0].get()), d);
 	add_sub_action(new ActionTrackLayerDelete(layer->track, get_layer_index(layer)), d);
 }
 

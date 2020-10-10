@@ -14,13 +14,13 @@ class TrackLayer;
 
 class ActionTrack__SplitBuffer : public Action {
 public:
-	ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset);
+	ActionTrack__SplitBuffer(shared<TrackLayer> l, int _index, int _offset);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	TrackLayer *layer;
+	shared<TrackLayer> layer;
 	int index;
 	int offset;
 };

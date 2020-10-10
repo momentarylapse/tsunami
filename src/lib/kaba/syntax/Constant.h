@@ -23,7 +23,7 @@ class SyntaxTree;
 class Value {
 public:
 	string value;
-	const Class *type;
+	shared<const Class> type;
 
 	Value();
 	~Value();
@@ -48,7 +48,7 @@ public:
 };
 
 // for any type of constant used in the script
-class Constant : public Value {
+class Constant : public Sharable<Value> {
 public:
 	Constant(const Class *type, SyntaxTree *owner);
 	string name;

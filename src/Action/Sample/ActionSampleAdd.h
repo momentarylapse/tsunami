@@ -16,7 +16,7 @@ class Sample;
 
 class ActionSampleAdd : public Action {
 public:
-	ActionSampleAdd(Sample *s);
+	ActionSampleAdd(shared<Sample> s);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

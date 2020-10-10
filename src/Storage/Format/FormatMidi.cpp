@@ -254,7 +254,7 @@ void FormatMidi::save_song(StorageOperationData* od)
 		f = FileCreate(od->filename);
 
 		int num_tracks = 0;
-		for (Track *t: od->song->tracks)
+		for (Track *t: weak(od->song->tracks))
 			if (t->type == SignalType::MIDI)
 				num_tracks ++;
 		int ticks_per_beat = 16;
@@ -269,7 +269,7 @@ void FormatMidi::save_song(StorageOperationData* od)
 		int numerator = 4;
 		int denominator = 4;
 		int last_bar = 0;
-		for (Track* t : od->song->tracks) {
+		for (Track* t : weak(od->song->tracks)) {
 			if (t->type != SignalType::MIDI)
 				continue;
 			write_chunk_name(f, "MTrk");
@@ -284,7 +284,7 @@ void FormatMidi::save_song(StorageOperationData* od)
 				f->write_buffer(t->name);
 			}
 			if (od->song->bars.num > 0) {
-				auto *b = od->song->bars[0];
+				auto *b = od->song->bars[0].get();
 				float bpm = b->bpm(od->song->sample_rate);
 				mpqn = 60000000.0f / bpm;
 				write_var(f, 0);

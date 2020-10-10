@@ -13,17 +13,15 @@
 class AudioBuffer;
 class Sample;
 
-class ActionSampleReplaceBuffer : public Action
-{
+class ActionSampleReplaceBuffer : public Action {
 public:
-	ActionSampleReplaceBuffer(Sample *s, AudioBuffer *buf);
-	~ActionSampleReplaceBuffer() override;
+	ActionSampleReplaceBuffer(shared<Sample> s, AudioBuffer *buf);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	Sample *sample;
+	shared<Sample> sample;
 	AudioBuffer *buf;
 };
 

@@ -9,16 +9,14 @@
 #include "ActionTrack__DeleteBuffer.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index)
-{
+ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
 }
 
 
 
-void ActionTrack__DeleteBuffer::undo(Data *d)
-{
+void ActionTrack__DeleteBuffer::undo(Data *d) {
 	// restore
 	layer->buffers.insert(buf, index);
 
@@ -28,8 +26,7 @@ void ActionTrack__DeleteBuffer::undo(Data *d)
 
 
 
-void *ActionTrack__DeleteBuffer::execute(Data *d)
-{
+void *ActionTrack__DeleteBuffer::execute(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 
 	assert(index >= 0 and index < layer->buffers.num);

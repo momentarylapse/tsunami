@@ -163,11 +163,11 @@ SerialNodeParam SerializerX86::serialize_parameter(Node *link, Block *block, int
 	}else if ((link->kind == NodeKind::OPERATOR) or (link->kind == NodeKind::FUNCTION_CALL) or (link->kind == NodeKind::INLINE_CALL) or (link->kind == NodeKind::VIRTUAL_CALL) or (link->kind == NodeKind::STATEMENT)){
 		p = serialize_node(link, block, index);
 	}else if (link->kind == NodeKind::REFERENCE){
-		SerialNodeParam param = serialize_parameter(link->params[0], block, index);
+		auto param = serialize_parameter(link->params[0].get(), block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
 		return add_reference(param, link->type);
 	}else if (link->kind == NodeKind::DEREFERENCE){
-		SerialNodeParam param = serialize_parameter(link->params[0], block, index);
+		auto param = serialize_parameter(link->params[0].get(), block, index);
 		/*if ((param.kind == KindVarLocal) or (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
@@ -190,7 +190,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 	switch(statement->id){
 		case StatementID::IF:{
 			int m_after_true = list->create_label("_IF_AFTER_" + i2s(num_markers ++));
-			auto cond = serialize_parameter(com->params[0], block, index);
+			auto cond = serialize_parameter(com->params[0].get(), block, index);
 			// cmp;  jz m;  -block-  m;
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
 			add_cmd(Asm::INST_JZ, param_marker32(m_after_true));
@@ -200,7 +200,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 		case StatementID::IF_ELSE:{
 			int m_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_markers ++));
 			int m_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_markers ++));
-			auto cond = serialize_parameter(com->params[0], block, index);
+			auto cond = serialize_parameter(com->params[0].get(), block, index);
 			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
 			add_cmd(Asm::INST_JZ, param_marker32(m_after_true)); // jz ...
@@ -214,7 +214,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			int marker_before_while = list->create_label("_WHILE_BEFORE_" + i2s(num_markers ++));
 			int marker_after_while = list->create_label("_WHILE_AFTER_" + i2s(num_markers ++));
 			add_marker(marker_before_while);
-			auto cond = serialize_parameter(com->params[0], block, index);
+			auto cond = serialize_parameter(com->params[0].get(), block, index);
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
@@ -233,9 +233,9 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			int marker_before_for = list->create_label("_FOR_BEFORE_" + i2s(num_markers ++));
 			int marker_after_for = list->create_label("_FOR_AFTER_" + i2s(num_markers ++));
 			int marker_continue = list->create_label("_FOR_CONTINUE_" + i2s(num_markers ++));
-			serialize_node(com->params[0], block, index); // i=0
+			serialize_node(com->params[0].get(), block, index); // i=0
 			add_marker(marker_before_for);
-			auto cond = serialize_parameter(com->params[1], block, index);
+			auto cond = serialize_parameter(com->params[1].get(), block, index);
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, cond, param_imm(TypeBool, 0x0));
@@ -249,7 +249,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 
 			// "i++"
 			add_marker(marker_continue);
-			serialize_node(com->params[3], block, index);
+			serialize_node(com->params[3].get(), block, index);
 
 			add_cmd(Asm::INST_JMP, param_marker32(marker_before_for));
 			add_marker(marker_after_for);
@@ -262,9 +262,9 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			break;
 		case StatementID::RETURN:
 			if (com->params.num > 0){
-				auto operand = serialize_parameter(com->params[0], block, index);
+				auto operand = serialize_parameter(com->params[0].get(), block, index);
 					
-				if (cur_func->return_type->_amd64_allow_pass_in_xmm) {
+				if (cur_func->return_type->_amd64_allow_pass_in_xmm()) {
 					insert_destructors_block(block, true);
 					// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
 					//		add_cmd(Asm::INST_FLD, t); 
@@ -342,30 +342,24 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			break;
 		case StatementID::NEW:{
 			// malloc()
-			Array<Node*> links = syntax_tree->get_existence("@malloc", nullptr, syntax_tree->base_class, false);
-			if (links.num == 0)
-				do_error("@malloc not found????");
-			add_function_call(links[0]->as_func(), {param_imm(TypeInt, ret.type->param->size)}, ret);
-			clear_nodes(links);
+			auto f = syntax_tree->required_func_global("@malloc");
+			add_function_call(f, {param_imm(TypeInt, ret.type->param->size)}, ret);
 
 			// __init__()
-			Node *sub = com->params[0];
+			auto sub = com->params[0];
 			Node *c_ret = new Node(NodeKind::VAR_TEMP, ret.p, ret.type);
 			sub->set_instance(c_ret);
-			serialize_node(sub, block, index);
+			serialize_node(sub.get(), block, index);
 			//delete sub;
 			break;}
 		case StatementID::DELETE:{
 			// __delete__()
-			auto operand = serialize_parameter(com->params[0], block, index);
+			auto operand = serialize_parameter(com->params[0].get(), block, index);
 			add_cmd_destructor(operand, false);
 
 			// free()
-			Array<Node*> links = syntax_tree->get_existence("@free", nullptr, syntax_tree->base_class, false);
-			if (links.num == 0)
-				do_error("@free not found????");
-			add_function_call(links[0]->as_func(), {operand}, p_none);
-			clear_nodes(links);
+			auto f = syntax_tree->required_func_global("@free");
+			add_function_call(f, {operand}, p_none);
 			break;}
 		/*case StatementID::RAISE:
 			AddFunctionCall();

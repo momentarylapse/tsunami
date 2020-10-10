@@ -22,7 +22,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index) {
 }
 
 void ActionTrackInsertSample::build(Data *d) {
-	SampleRef *ref = layer->samples[index];
+	SampleRef *ref = layer->samples[index].get();
 
 	if (layer->type == SignalType::AUDIO) {
 
@@ -38,7 +38,7 @@ void ActionTrackInsertSample::build(Data *d) {
 		add_sub_action(action, d);
 	}else if (layer->type == SignalType::MIDI) {
 		auto midi = ref->midi();
-		for (MidiNote *n : midi) {
+		for (auto n: weak(midi)) {
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;
 			add_sub_action(new ActionTrackAddMidiNote(layer, nn), d);

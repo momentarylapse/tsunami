@@ -16,18 +16,18 @@
 
 
 ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &sel, bool move_buffers) {
-	for (Track *t: a->tracks) {
+	for (auto t: weak(a->tracks)) {
 		if (sel.has(t))
 			tracks.add(t);
 
-		for (TrackLayer *l: t->layers) {
-			for (MidiNote *n: l->midi)
+		for (auto l: weak(t->layers)) {
+			for (auto n: weak(l->midi))
 				if (sel.has(n))
 					notes.add({n, n->range.offset});
-			for (TrackMarker *m: l->markers)
+			for (auto m: weak(l->markers))
 				if (sel.has(m))
 					markers.add({m, m->range.offset});
-			for (SampleRef *s: l->samples)
+			for (auto s: weak(l->samples))
 				if (sel.has(s))
 					samples.add({s, s->pos});
 			if (move_buffers and sel.has(l)) {

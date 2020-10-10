@@ -96,16 +96,16 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 }
 
 void PeakThread::update_track(Track *t) {
-	for (TrackLayer *l: t->layers)
+	for (TrackLayer *l: weak(t->layers))
 		for (AudioBuffer &b: l->buffers)
 			update_buffer(b);
 }
 
 void PeakThread::update_song() {
 	//msg_write(".");
-	for (Track *t: song->tracks)
+	for (Track *t: weak(song->tracks))
 		update_track(t);
-	for (Sample *s: song->samples)
+	for (Sample *s: weak(song->samples))
 		if (s->buf)
 			update_buffer(*s->buf);
 }

@@ -173,7 +173,7 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 
 	align.h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
 		
-	for (auto *c: children)
+	for (auto *c: weak(children))
 		c->hidden = !extended;
 	children[1]->hidden |= (view->song->tracks.num == 1);
 	

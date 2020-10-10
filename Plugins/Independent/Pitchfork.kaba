@@ -9,8 +9,8 @@ class PitchFork extends TsunamiPlugin
 	
 		chain = session.create_signal_chain("pitch-fork")
 		source = chain.add(Module.AUDIO_SOURCE, "Sine")
-		Module* out = chain.add(Module.STREAM, "AudioOutput")
-		chain.connect(source, 0, out, 0)
+		let output = chain.add(Module.STREAM, "AudioOutput")
+		chain.connect(source, 0, output, 0)
 		
 		chain.start()
 	

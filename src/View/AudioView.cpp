@@ -623,12 +623,12 @@ void AudioView::zoom_y(float zoom) {
 
 void AudioView::toggle_track_mute() {
 	bool any_unmuted = false;
-	for (auto *t: song->tracks)
+	for (auto *t: weak(song->tracks))
 		if (sel.has(t) and !t->muted)
 			any_unmuted = true;
 
 	song->begin_action_group();
-	for (auto *t: song->tracks)
+	for (auto *t: weak(song->tracks))
 		if (sel.has(t))
 			t->set_muted(any_unmuted);
 	song->end_action_group();
@@ -844,8 +844,8 @@ void AudioView::on_song_new() {
 	update_tracks();
 	sel.range_raw = Range::EMPTY;
 	sel.clear();
-	for (Track *t: song->tracks)
-		for (TrackLayer *l: t->layers)
+	for (Track *t: weak(song->tracks))
+		for (TrackLayer *l: weak(t->layers))
 			sel.add(l);
 	check_consistency();
 	request_optimize_view();
@@ -924,7 +924,7 @@ void AudioView::update_tracks() {
 	vtrack2.resize(song->tracks.num);
 	vlayer2.resize(song->layers().num);
 
-	foreachi(Track *t, song->tracks, ti) {
+	foreachi(Track *t, weak(song->tracks), ti) {
 		bool found = false;
 
 		// find existing
@@ -1042,7 +1042,7 @@ bool need_metro_overlay(Song *song, AudioView *view) {
 	Track *tt = song->time_track();
 	if (!tt)
 		return false;
-	auto *vv = view->get_layer(tt->layers[0]);
+	auto *vv = view->get_layer(tt->layers[0].get());
 	if (!vv)
 		return false;
 	return !vv->on_screen();
@@ -1062,7 +1062,7 @@ bool AudioView::update_scene_graph() {
 
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {
-		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
+		metronome_overlay_vlayer->layer = song->time_track()->layers[0].get();
 		metronome_overlay_vlayer->area = rect(song_area().x1, song_area().x2, song_area().y1, song_area().y1 + this->TIME_SCALE_HEIGHT*2);
 	}
 	return animating;
@@ -1190,7 +1190,7 @@ void AudioView::draw_song(Painter *c) {
 		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
 
 	mode->draw_post(c);
-	for (auto *plugin: session->plugins)
+	for (auto *plugin: weak(session->plugins))
 		plugin->on_draw_post(c);
 
 	// tool tip?
@@ -1321,27 +1321,27 @@ void AudioView::select_expand() {
 	bool update = true;
 	while (update) {
 		update = false;
-		for (Track *t: song->tracks) {
+		for (Track *t: weak(song->tracks)) {
 			if (!sel.has(t))
 				continue;
 
 			if (t->type == SignalType::BEATS)
-				for (Bar* b: song->bars)
+				for (Bar* b: weak(song->bars))
 					test_range(b->range(), r, update);
 
 			// midi
-			for (TrackLayer *l: t->layers)
+			for (TrackLayer *l: weak(t->layers))
 				if (sel.has(l))
-					for (MidiNote *n: l->midi)
+					for (MidiNote *n: weak(l->midi))
 						test_range(n->range, r, update);
 
-			for (TrackLayer *l: t->layers) {
+			for (TrackLayer *l: weak(t->layers)) {
 				// buffers
 				for (AudioBuffer &b: l->buffers)
 					test_range(b.range(), r, update);
 
 				// samples
-				for (SampleRef *s: l->samples)
+				for (SampleRef *s: weak(l->samples))
 					test_range(s->range(), r, update);
 			}
 		}
@@ -1580,7 +1580,7 @@ Set<const TrackLayer*> AudioView::get_playable_layers() {
 	auto tracks = get_playable_tracks();
 
 	Set<const TrackLayer*> layers;
-	for (Track* t: song->tracks) {
+	for (Track* t: weak(song->tracks)) {
 		if (!tracks.contains(t))
 			continue;
 		bool any_solo = has_any_solo_layer(t);
@@ -1687,7 +1687,7 @@ bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
 bool AudioView::exclusively_select_track(AudioViewTrack *t) {
 	bool had_sel = sel.has(t->track);
 	sel._layers.clear();
-	for (auto *l: t->track->layers)
+	for (auto *l: weak(t->track->layers))
 		sel.add(l);
 	return had_sel;
 }
@@ -1740,10 +1740,10 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 // hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
 void AudioView::toggle_select_track_with_content_in_cursor(AudioViewTrack *t) {
 	if (sel.has(t->track)) {
-		for (auto *l: t->track->layers)
+		for (auto *l: weak(t->track->layers))
 			sel = sel.minus(SongSelection::all(song).filter({l}));
 	} else {
-		for (auto *l: t->track->layers)
+		for (auto *l: weak(t->track->layers))
 			sel = sel || SongSelection::from_range(song, sel.range()).filter({l});
 	}
 	//toggle_select_layer();

@@ -13,8 +13,7 @@
 
 class TrackLayer;
 
-class ActionTrackEditBuffer : public Action
-{
+class ActionTrackEditBuffer : public Action {
 public:
 	ActionTrackEditBuffer(TrackLayer *l, const Range &_range);
 

@@ -91,7 +91,7 @@ SignalChain::~SignalChain() {
 		thread = nullptr;
 	}
 	stop();
-	for (Module *m: modules)
+	for (Module *m: weak(modules))
 		m->unsubscribe(this);
 	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
@@ -125,7 +125,7 @@ Module *SignalChain::_add(Module *m) {
 }
 
 int SignalChain::module_index(Module *m) {
-	foreachi(Module *mm, modules, i)
+	foreachi(Module *mm, weak(modules), i)
 		if (mm == m)
 			return i;
 	return -1;
@@ -136,7 +136,7 @@ bool is_system_module(Module *m) {
 }
 
 Module *SignalChain::get_by_type(ModuleType type, const string &sub_type) {
-	for (Module *m: modules)
+	for (Module *m: weak(modules))
 		if (m->module_type == type and m->module_subtype == sub_type)
 			return m;
 	return nullptr;
@@ -164,10 +164,10 @@ void SignalChain::delete_module(Module *m) {
 
 Array<SignalChain::Cable> SignalChain::cables() {
 	Array<Cable> cables;
-	for (Module *target: modules) {
+	for (Module *target: weak(modules)) {
 		foreachi (auto tp, target->port_in, tpi) {
 			if (*tp.port) {
-				for (Module *source: modules) {
+				for (Module *source: weak(modules)) {
 					foreachi (auto sp, source->port_out, spi) {
 						if (*tp.port == sp) {
 							Cable c;
@@ -208,7 +208,7 @@ void SignalChain::disconnect(Module *source, int source_port, Module *target, in
 void SignalChain::disconnect_out(Module *source, int source_port) {
 	Port *sp = source->port_out[source_port];
 
-	for (Module *target: modules)
+	for (Module *target: weak(modules))
 		for (auto &p: target->port_in) {
 			if ((*p.port) == sp) {
 				*p.port = nullptr;
@@ -232,7 +232,7 @@ void SignalChain::save(const Path& filename) {
 	hh.add(xml::Element("name", name));
 	root.add(hh);
 	xml::Element mm("modules");
-	for (Module *m: modules) {
+	for (Module *m: weak(modules)) {
 		xml::Element e("module");
 		e.add(xml::Element("category", m->type_to_name(m->module_type)));
 		e.add(xml::Element("class", m->module_subtype));
@@ -301,7 +301,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			int sp = e.find("source")->value("port")._int();
 			int t = e.find("target")->value("id")._int();
 			int tp = e.find("target")->value("port")._int();
-			chain->connect(chain->modules[s], sp, chain->modules[t], tp);
+			chain->connect(chain->modules[s].get(), sp, chain->modules[t].get(), tp);
 		}
 
 		auto *pp = root.find("ports");
@@ -309,7 +309,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			PortX p;
 			int m = e.value("module")._int();
 			p.port = e.value("port")._int();
-			p.module = chain->modules[m];
+			p.module = chain->modules[m].get();
 			chain->_ports_out.add(p);
 		}
 		chain->update_ports();
@@ -328,10 +328,10 @@ void SignalChain::update_ports() {
 void SignalChain::reset() {
 	msg_write("aaaargh  reset");
 	for (int i=modules.num-1; i>=3; i--)
-		delete_module(modules[i]);
+		delete_module(modules[i].get());
 
-	connect(modules[0], 0, modules[1], 0);
-	connect(modules[1], 0, modules[2], 0);
+	connect(modules[0].get(), 0, modules[1].get(), 0);
+	connect(modules[1].get(), 0, modules[2].get(), 0);
 }
 
 Module* SignalChain::add(ModuleType type, const string &sub_type) {
@@ -342,7 +342,7 @@ void SignalChain::reset_state() {
 	session->debug("chain", "reset");
 
 	std::lock_guard<std::mutex> lock(mutex);
-	for (auto *m: modules)
+	for (auto *m: weak(modules))
 		m->reset_state();
 }
 
@@ -353,7 +353,7 @@ void SignalChain::prepare_start() {
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		for (auto *m: modules)
+		for (auto *m: weak(modules))
 			m->command(ModuleCommand::PREPARE_START, 0);
 	}
 	if (!sucking)
@@ -371,7 +371,7 @@ void SignalChain::start() {
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		for (auto *m: modules)
+		for (auto *m: weak(modules))
 			m->command(ModuleCommand::START, 0);
 	}
 
@@ -389,7 +389,7 @@ void SignalChain::stop() {
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		for (auto *m: modules)
+		for (auto *m: weak(modules))
 			m->command(ModuleCommand::STOP, 0);
 	}
 	state = State::PAUSED;
@@ -422,7 +422,7 @@ int SignalChain::command(ModuleCommand cmd, int param) {
 		return 0;
 	} else {
 		int r = COMMAND_NOT_HANDLED;
-		for (Module *m: modules)
+		for (Module *m: weak(modules))
 			r = max(r, m->command(cmd, param));
 		return r;
 	}
@@ -469,7 +469,7 @@ int SignalChain::do_suck() {
 	std::lock_guard<std::mutex> lock(mutex);
 	PerformanceMonitor::start_busy(perf_channel_suck);
 	int s = Port::END_OF_STREAM;
-	for (auto *m: modules) {
+	for (auto *m: weak(modules)) {
 		int r = m->command(ModuleCommand::SUCK, buffer_size);
 		s = max(s, r);
 	}
@@ -478,6 +478,6 @@ int SignalChain::do_suck() {
 }
 
 void SignalChain::mark_all_modules_as_system() {
-	for (auto *m: modules)
+	for (auto *m: weak(modules))
 		m->belongs_to_system = true;
 }

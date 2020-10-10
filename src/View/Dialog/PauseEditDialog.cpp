@@ -18,7 +18,7 @@ PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 	song = _song;
 	index = _index;
 
-	Bar *b = song->bars[index];
+	Bar *b = song->bars[index].get();
 	set_float("duration", (float)b->length / (float)song->sample_rate);
 	check("shift-data", bar_dialog_move_data);
 
@@ -30,7 +30,7 @@ PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 void PauseEditDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	float duration = get_float("duration");
-	BarPattern b = *song->bars[index];
+	BarPattern b = *song->bars[index].get();
 	b.length = (float)song->sample_rate * duration;
 	song->edit_bar(index, b, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 

@@ -233,7 +233,7 @@ string signed_hex(int64 i) {
 
 string guess_constant(int64 c, Serializer *ser) {
 	if (c != 0) {
-		for (auto *s: ser->syntax_tree->includes)
+		for (auto s: ser->syntax_tree->includes)
 			for (auto *f: s->syntax->functions)
 				if (c == (int_p)f->address)
 					return "FUNC:" + f->long_name();
@@ -609,9 +609,8 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	Node *override_ret = nullptr;
 #if 1
 	if (node_is_assign_mem(com)) {
-		Node *dst, *src;
-			dst = com->params[0];
-			src = com->params[1];
+		auto dst = com->params[0].get();
+		auto src = com->params[1].get();
 		if (src->kind == NodeKind::FUNCTION_CALL or src->kind == NodeKind::INLINE_CALL) {
 			if (dst->kind == NodeKind::VAR_LOCAL or dst->kind == NodeKind::VAR_GLOBAL or dst->kind == NodeKind::LOCAL_ADDRESS) {
 				override_ret = dst;
@@ -640,7 +639,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 		// compile parameters
 		for (int p=0;p<com->params.num;p++)
-			params[p] = serialize_parameter(com->params[p], block, index);
+			params[p] = serialize_parameter(com->params[p].get(), block, index);
 
 		// class function -> compile instance
 		//if (com->instance)
@@ -688,7 +687,7 @@ void Serializer::serialize_block(Block *block) {
 		stack_offset = cur_func->_var_size;
 
 		// serialize
-		serialize_node(block->params[i], block, i);
+		serialize_node(block->params[i].get(), block, i);
 		
 		// destruct new temp vars
 		insert_destructors_temp();
@@ -1624,7 +1623,7 @@ void Serializer::resolve_deref_reg_shift() {
 void Serializer::serialize_function(Function *f) {
 	syntax_tree->create_asm_meta_info();
 	syntax_tree->asm_meta_info->line_offset = 0;
-	Asm::CurrentMetaInfo = syntax_tree->asm_meta_info;
+	Asm::CurrentMetaInfo = syntax_tree->asm_meta_info.get();
 
 	cur_func = f;
 	num_markers = 0;
@@ -1640,14 +1639,14 @@ void Serializer::serialize_function(Function *f) {
 			map_reg_root.add(i);//Asm::REG_R0+i);
 
 	} else {
-	if (config.allow_registers) {
-		map_reg_root.add(0); // eax
-		map_reg_root.add(1); // ecx
-		map_reg_root.add(2); // edx
-	//	MapRegRoot.add(3); // ebx
-	//	MapRegRoot.add(6); // esi
-	//	MapRegRoot.add(7); // edi
-	}
+		if (config.allow_registers) {
+			map_reg_root.add(0); // eax
+			map_reg_root.add(1); // ecx
+			map_reg_root.add(2); // edx
+		//	MapRegRoot.add(3); // ebx
+		//	MapRegRoot.add(6); // esi
+		//	MapRegRoot.add(7); // edi
+		}
 	}
 
 // serialize
@@ -1655,7 +1654,7 @@ void Serializer::serialize_function(Function *f) {
 	add_function_intro_params(f);
 
 	// function
-	serialize_block(f->block);
+	serialize_block(f->block.get());
 	scan_temp_var_usage();
 
 	if (config.verbose)
@@ -1961,20 +1960,20 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list) {
 	return nullptr;
 }
 
-bool is_func(Node *n) {
+bool is_func(shared<Node> n) {
 	return (n->kind == NodeKind::FUNCTION_CALL or n->kind == NodeKind::VIRTUAL_CALL or n->kind == NodeKind::FUNCTION);
 }
 
 int check_needed(SyntaxTree *tree, Function *f) {
 	int ref_count = 0;
-	tree->transform([&](Node* n){ if (is_func(n) and n->as_func() == f) ref_count ++; return n; });
+	tree->transform([&](shared<Node> n){ if (is_func(n) and n->as_func() == f) ref_count ++; return n; });
 
 	if (f->is_static() and f->name == "main")
 		ref_count ++;
 	if (f->virtual_index >= 0)
 		ref_count ++;
 	// well, for now, only allow these functions:
-	if (f->name != "__assign__" and f->name != "__delete__" and f->name != "__init__")
+	if (f->name != IDENTIFIER_FUNC_ASSIGN and f->name != IDENTIFIER_FUNC_DELETE and f->name != IDENTIFIER_FUNC_INIT)
 		ref_count ++;
 
 	return ref_count;

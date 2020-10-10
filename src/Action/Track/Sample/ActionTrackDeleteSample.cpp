@@ -17,17 +17,11 @@ class ActionTrack__DeleteSample : public Action {
 private:
 	TrackLayer *layer;
 	int index;
-	SampleRef *ref;
+	shared<SampleRef> ref;
 public:
-	ActionTrack__DeleteSample(SampleRef *_ref) {
+	ActionTrack__DeleteSample(shared<SampleRef> _ref) {
 		layer = _ref->layer;
 		index = _ref->get_index();
-		ref = nullptr;
-	}
-	~ActionTrack__DeleteSample() {
-		if (ref)
-			if (!ref->owner)
-				delete ref;
 	}
 	void *execute(Data* d) override {
 		ref = layer->samples[index];
@@ -43,16 +37,15 @@ public:
 		layer->samples.insert(ref, index);
 		ref->origin->ref();
 		ref->owner = layer->song();
-		ref = nullptr;
 	}
 };
 
-ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref) {
+ActionTrackDeleteSample::ActionTrackDeleteSample(shared<SampleRef> _ref) {
 	ref = _ref;
 }
 
 void ActionTrackDeleteSample::build(Data *d) {
-	Sample *sample = ref->origin.get();
+	auto sample = ref->origin;
 
 	add_sub_action(new ActionTrack__DeleteSample(ref), d);
 

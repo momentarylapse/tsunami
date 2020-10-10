@@ -61,7 +61,7 @@ void Curve::Target::from_string(const string &str, Song *s) {
 }
 
 Track* Curve::Target::track(Song *s) const {
-	for (Track *track: s->tracks) {
+	for (Track *track: weak(s->tracks)) {
 		auto list = enumerate_track(track, "", "");
 		for (Target &t : list)
 			if (t.p == p)
@@ -72,7 +72,7 @@ Track* Curve::Target::track(Song *s) const {
 
 Array<Curve::Target> Curve::Target::enumerate(Song *s) {
 	Array<Target> list;
-	foreachi(Track *t, s->tracks, i)
+	foreachi(Track *t, weak(s->tracks), i)
 		list.append(enumerate_track(t, format("t:%d", i), "track" + i2s_small(i)));
 	return list;
 }
@@ -82,9 +82,9 @@ Array<Curve::Target> Curve::Target::enumerate_track(Track *t, const string &pref
 	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + NICE_SEP + "volume"));
 	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + NICE_SEP + "panning"));
 
-	foreachi(auto *fx, t->fx, i)
+	foreachi(auto *fx, weak(t->fx), i)
 		list.append(enumerate_module(fx, prefix + format(":fx:%d", i), prefix_nice + NICE_SEP + "fx" + i2s_small(i)));
-	foreachi(auto *fx, t->midi_fx, i)
+	foreachi(auto *fx, weak(t->midi_fx), i)
 		list.append(enumerate_module(fx, prefix + format(":mfx:%d", i), prefix_nice + NICE_SEP + "mfx" + i2s_small(i)));
 	list.append(enumerate_module(t->synth.get(), prefix + ":s", prefix_nice + NICE_SEP + "synth"));
 	return list;

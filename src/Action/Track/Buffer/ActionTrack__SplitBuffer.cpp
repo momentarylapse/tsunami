@@ -10,7 +10,7 @@
 #include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset) {
+ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(shared<TrackLayer> l, int _index, int _offset) {
 	layer = l;
 	index = _index;
 	offset = _offset;

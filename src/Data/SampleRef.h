@@ -22,9 +22,9 @@ enum class SignalType;
 
 class SampleRef : public Sharable<Observable<VirtualBase>> {
 public:
-	SampleRef(Sample *sample);
+	SampleRef(shared<Sample> sample);
 	virtual ~SampleRef();
-	void _cdecl __init__(Sample *sample);
+	void _cdecl __init__(shared<Sample> sample);
 	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CHANGE_BY_ACTION;

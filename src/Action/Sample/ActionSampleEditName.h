@@ -12,10 +12,9 @@
 
 class Sample;
 
-class ActionSampleEditName: public ActionMergable<string>
-{
+class ActionSampleEditName: public ActionMergable<string> {
 public:
-	ActionSampleEditName(Sample *s, const string &name);
+	ActionSampleEditName(shared<Sample> s, const string &name);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -23,7 +22,7 @@ public:
 	bool mergable(Action *a) override;
 
 private:
-	Sample *sample;
+	shared<Sample> sample;
 };
 
 #endif /* ACTIONSAMPLEEDITNAME_H_ */

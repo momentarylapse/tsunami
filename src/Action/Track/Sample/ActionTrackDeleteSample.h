@@ -13,12 +13,12 @@ class SampleRef;
 
 class ActionTrackDeleteSample : public ActionGroup {
 public:
-	ActionTrackDeleteSample(SampleRef *ref);
+	ActionTrackDeleteSample(shared<SampleRef> ref);
 
 	void build(Data *d) override;
 
 private:
-	SampleRef *ref;
+	shared<SampleRef> ref;
 };
 
 #endif /* ACTIONTRACKDELETESAMPLE_H_ */

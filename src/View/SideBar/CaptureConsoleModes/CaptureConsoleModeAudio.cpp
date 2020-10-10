@@ -60,7 +60,7 @@ void CaptureConsoleModeAudio::enter() {
 	cc->hide_control("single_grid", false);
 
 
-	for (Track *t: view->song->tracks)
+	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
 			set_target(t);
 

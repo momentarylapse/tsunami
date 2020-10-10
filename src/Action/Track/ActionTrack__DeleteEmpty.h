@@ -14,7 +14,7 @@ class Track;
 
 class ActionTrack__DeleteEmpty: public Action {
 public:
-	ActionTrack__DeleteEmpty(Track *track);
+	ActionTrack__DeleteEmpty(shared<Track> track);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

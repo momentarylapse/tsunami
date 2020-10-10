@@ -108,15 +108,15 @@ public:
 	void create() override { me = parent; }
 	void read(File *f) override {
 		f->read_int();
-		for (Track *t: me->tracks) {
+		for (Track *t: weak(me->tracks)) {
 			int i = f->read_int();
 			if (i >= 0 and i < me->tracks.num)
-				t->send_target = me->tracks[i];
+				t->send_target = me->tracks[i].get();
 		}
 	}
 	void write(File *f) override {
 		f->write_int(0);
-		for (Track *t: me->tracks)
+		for (Track *t: weak(me->tracks))
 			f->write_int(get_track_index(t->send_target));
 	}
 };
@@ -542,9 +542,9 @@ public:
 		bool muted = f->read_bool();
 		int uid = f->read_int();
 		if (uid != 0)
-			me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get());
 		else
-			me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get());
 		me->volume = volume;
 		me->muted = muted;
 		f->read_int();
@@ -573,7 +573,7 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->layers[0]->add_sample_ref(pos, parent->song->samples[index]);
+		me = parent->layers[0]->add_sample_ref(pos, parent->song->samples[index].get());
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		f->read_int();
@@ -601,7 +601,7 @@ public:
 		f->read_int(); // reserved
 
 		int unended = -1;
-		foreachi(MidiNote *n, *parent, i)
+		foreachi(MidiNote *n, weak(*parent), i)
 			if ((n->pitch == e.pitch) and (n->range.length == -1))
 				unended = i;
 
@@ -719,7 +719,7 @@ public:
 
 		f->write_int(me->num);
 		f->write_int(3); // stringno + clef_position
-		for (MidiNote *n : *me) {
+		for (MidiNote *n: weak(*me)) {
 			f->write_int(n->range.offset);
 			f->write_int(n->range.length);
 			f->write_int(n->pitch);
@@ -735,7 +735,7 @@ public:
 };
 
 static bool note_buffer_has_flags(MidiNoteBuffer &buf) {
-	for (auto *n: buf)
+	for (auto *n: weak(buf))
 		if (n->flags > 0)
 			return true;
 	return false;
@@ -785,7 +785,7 @@ public:
 
 		f->write_int(me->num);
 		f->write_int(has_flags ? 7 : 3); // stringno + clef_position (+ flags)
-		for (MidiNote *n : *me) {
+		for (MidiNote *n : weak(*me)) {
 			f->write_int(n->range.offset);
 			f->write_int(n->range.length);
 			f->write_int(n->pitch);
@@ -899,11 +899,11 @@ public:
 		if (n > 0) {
 			parent->layers.add(new TrackLayer(parent));
 		}
-		me = parent->layers.back();
+		me = parent->layers.back().get();
 	}
 	void write(File *f) override {
 		int n = 0;
-		foreachi(TrackLayer *l, parent->layers, i)
+		foreachi(TrackLayer *l, weak(parent->layers), i)
 			if (l == me)
 				n = i;
 		f->write_int(n);
@@ -1206,7 +1206,7 @@ public:
 		write_sub_parray("track", me->tracks);
 		write_sub_parray("curve", me->curves);
 		bool needs_send = false;
-		for (Track *t: me->tracks)
+		for (Track *t: weak(me->tracks))
 			if (t->send_target)
 				needs_send = true;
 		if (needs_send)
@@ -1273,7 +1273,7 @@ void check_empty_subs(Song *a) {
 
 void FormatNami::make_consistent(StorageOperationData *od) {
 	Song *a = od->song;
-	for (auto *s : a->samples) {
+	for (auto *s: weak(a->samples)) {
 		if (s->type == SignalType::MIDI) {
 			if ((s->midi.samples == 0) and (s->midi.num > 0)) {
 				s->midi.samples = s->midi.back()->range.end();
@@ -1281,9 +1281,9 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 		}
 	}
 
-	for (auto *t: a->tracks) {
+	for (auto *t: weak(a->tracks)) {
 		int n[3] = {0,0,0};
-		for (auto *l: t->layers)
+		for (auto *l: weak(t->layers))
 			for (auto &b: l->buffers)
 				n[b.channels] ++;
 
@@ -1294,7 +1294,7 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 		// having stereo buffers?
 		if (n[2] > 0) {
 			t->channels = 2;
-			for (auto *l: t->layers)
+			for (auto *l: weak(t->layers))
 				l->channels = 2;
 		}
 	}
@@ -1304,14 +1304,14 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 		auto *tm = a->add_track(SignalType::GROUP);
 		tm->name = "Master";
 		tm->fx = a->__fx;
-		for (Track *t: a->tracks)
+		for (Track *t: weak(a->tracks))
 			if (t != tm) {
 				t->set_send_target(tm);
 			}
 		a->__fx.clear();
 	}
 
-	for (Track *t: a->tracks) {
+	for (Track *t: weak(a->tracks)) {
 		t->layers[0]->markers.append(t->_markers_old);
 		
 		if (t->_fades_old.num > 0) {
@@ -1325,7 +1325,7 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 		if (!t->has_version_selection())
 			continue;
 		bool semi_old_version = false;
-		for (auto *l: t->layers) {
+		for (auto *l: weak(t->layers)) {
 			if (l->fades.num > 0) {
 				if (l->fades[0].mode == CrossFade::INWARD) {
 					od->info("adding missing fade-in");
@@ -1340,7 +1340,7 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 			}
 		}
 		if (semi_old_version)
-			for (auto *l: t->layers) {
+			for (auto *l: weak(t->layers)) {
 				if (l != t->layers[0] and l->fades.num == 0) {
 					od->info("disabling non-first version without fades");
 					l->fades.add({a->range().start(), CrossFade::OUTWARD, 2000});

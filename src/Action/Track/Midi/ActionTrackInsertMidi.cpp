@@ -12,7 +12,7 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const M
 	layer = l;;
 	offset = _offset;
 	midi = _midi;
-	for (MidiNote *n: midi)
+	for (MidiNote *n: weak(midi))
 		n->range.offset += offset;
 	midi.sort();
 	applied = false;
@@ -22,7 +22,7 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const M
 void *ActionTrackInsertMidi::execute(Data *d) {
 	inserted_at.clear();
 
-	foreachb(MidiNote *n, midi) {
+	foreachb(MidiNote *n, weak(midi)) {
 		int index = layer->midi.num;
 		for (int i=0;i<layer->midi.num;i++)
 			if (n->range.offset < layer->midi[i]->range.offset) {

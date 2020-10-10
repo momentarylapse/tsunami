@@ -172,7 +172,7 @@ bool Song::is_empty() {
 Range Song::range() {
 	Range r = Range::EMPTY;
 
-	for (Track *t: tracks)
+	for (Track *t: weak(tracks))
 		r = r or t->range();
 
 	return r;
@@ -247,7 +247,7 @@ int Song::bar_offset(int index) {
 }
 
 Bar *song_bar_at(Song *s, int pos) {
-	for (Bar *b: s->bars)
+	for (Bar *b: weak(s->bars))
 		if (b->range().is_inside(pos))
 			return b;
 	return nullptr;
@@ -292,11 +292,11 @@ void Song::insert_selected_samples(const SongSelection &sel) {
 
 void Song::delete_selected_samples(const SongSelection &sel) {
 	action_manager->group_begin();
-	for (Track *t: tracks)
-		for (TrackLayer *l: t->layers) {
+	for (Track *t: weak(tracks))
+		for (TrackLayer *l: weak(t->layers)) {
 			for (int j=l->samples.num-1; j>=0; j--)
-				if (sel.has(l->samples[j]))
-					l->delete_sample_ref(l->samples[j]);
+				if (sel.has(l->samples[j].get()))
+					l->delete_sample_ref(l->samples[j].get());
 		}
 	action_manager->group_end();
 }
@@ -399,7 +399,7 @@ void Song::delete_time_interval(int index, const Range &range) {
 }
 
 Curve *Song::add_curve(const string &name, Array<Curve::Target> &targets) {
-	Curve *c = new Curve;
+	auto c = new Curve;
 	c->name = name;
 	c->targets = targets;
 	execute(new ActionCurveAdd(c, curves.num));
@@ -432,23 +432,23 @@ void Song::curve_edit_point(Curve *curve, int index, int pos, float value) {
 }
 
 void Song::invalidate_all_peaks() {
-	for (Track *t: tracks)
+	for (auto t: tracks)
 		t->invalidate_all_peaks();
-	for (Sample *s: samples)
+	for (auto s: samples)
 		if (s->buf)
 			s->buf->peaks.clear();
 }
 
 
 Sample* Song::get_sample_by_uid(int uid) {
-	for (Sample *s: samples)
+	for (Sample *s: weak(samples))
 		if (s->uid == uid)
 			return s;
 	return nullptr;
 }
 
 Track *Song::time_track() {
-	for (Track *t: tracks)
+	for (Track *t: weak(tracks))
 		if (t->type == SignalType::BEATS)
 			return t;
 	return nullptr;
@@ -470,8 +470,8 @@ string Song::get_tag(const string &key) {
 
 Array<TrackLayer*> Song::layers() const {
 	Array<TrackLayer*> layers;
-	for (Track *t: tracks)
-		layers.append(t->layers);
+	for (Track *t: weak(tracks))
+		layers.append(weak(t->layers));
 	return layers;
 }
 
@@ -480,14 +480,14 @@ Array<TrackLayer*> Song::layers() const {
 Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 	Song *ss = new Song(song->session, song->sample_rate);
 	ss->tags = song->tags;
-	for (Bar *b: song->bars)
+	for (Bar *b: weak(song->bars))
 		if (sel.range().covers(b->range())) {
 			int before = b->range().offset - sel.range().offset;
 			if (ss->bars.num == 0 and before > 0)
 				ss->bars.add(new Bar(before, 0, 0)); // pause
 			ss->bars.add(b->copy());
 		}
-	for (Track *t: song->tracks) {
+	for (Track *t: weak(song->tracks)) {
 		if (!sel.has(t))
 			continue;
 		Track *tt = new Track(t->type, (Synthesizer*)t->synth->copy());
@@ -496,19 +496,19 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 		tt->volume = t->volume;
 		tt->panning = t->panning;
 		tt->muted = t->muted;
-		for (auto *f: t->fx)
+		for (auto *f: weak(t->fx))
 			tt->fx.add((AudioEffect*)f->copy());
-		for (auto *f: t->midi_fx)
+		for (auto *f: weak(t->midi_fx))
 			tt->midi_fx.add((MidiEffect*)f->copy());
 		tt->synth = (Synthesizer*)t->synth->copy();
 		tt->instrument = t->instrument;
 		tt->channels = t->channels;
-		for (TrackLayer *l: t->layers) {
+		for (TrackLayer *l: weak(t->layers)) {
 			if (!sel.has(l))
 				continue;
 			auto *ll = new TrackLayer(tt);
 			tt->layers.add(ll);
-			for (auto *n: l->midi)
+			for (auto *n: weak(l->midi))
 				if (sel.has(n)) {
 					auto *nn = n->copy();
 					nn->range.offset -= sel.range().offset;
@@ -523,7 +523,7 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 					ll->buffers.back().offset = ri.offset - sel.range().offset;
 				}
 			}
-			for (auto *m: l->markers)
+			for (auto *m: weak(l->markers))
 				if (sel.has(m))
 					ll->markers.add(new TrackMarker(m->range - sel.range().offset, m->text));
 			ll->fades = l->fades; // TODO...

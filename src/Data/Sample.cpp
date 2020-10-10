@@ -61,7 +61,7 @@ void Sample::__init__(const string &_name, const AudioBuffer &_buf) {
 int Sample::get_index() const {
 	if (!owner)
 		return -1;
-	foreachi(Sample *s, owner->samples, i)
+	foreachi(auto s, owner->samples, i)
 		if (this == s)
 			return i;
 	return -1;

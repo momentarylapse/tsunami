@@ -12,14 +12,12 @@
 #include "../../../Data/Audio/AudioBuffer.h"
 
 
-class ActionSongSetDefaultFormat : public Action
-{
+class ActionSongSetDefaultFormat : public Action {
 public:
 	ActionSongSetDefaultFormat(SampleFormat format, int compression);
-	virtual ~ActionSongSetDefaultFormat(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 	SampleFormat format;
 	int compression;

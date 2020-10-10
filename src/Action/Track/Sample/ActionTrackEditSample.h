@@ -14,24 +14,22 @@
 class Track;
 class SampleRef;
 
-struct EditSampleRefData
-{
+struct EditSampleRefData {
 	float volume;
 	bool mute;
 };
 
-class ActionTrackEditSample : public ActionMergable<EditSampleRefData>
-{
+class ActionTrackEditSample : public ActionMergable<EditSampleRefData> {
 public:
-	ActionTrackEditSample(SampleRef *ref, float volume, bool mute);
+	ActionTrackEditSample(shared<SampleRef> ref, float volume, bool mute);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	SampleRef *ref;
+	shared<SampleRef> ref;
 };
 
 #endif /* ACTIONTRACKEDITSAMPLE_H_ */

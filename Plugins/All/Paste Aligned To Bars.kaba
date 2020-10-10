@@ -1,6 +1,6 @@
 use tsunami
 
-void update_bars(out Bar*[] bars)
+void update_bars(out BarCollection bars)
 	int offset = 0
 	for b in bars
 		b.offset = offset

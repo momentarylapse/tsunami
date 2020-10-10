@@ -64,7 +64,7 @@ void CaptureConsoleModeMidi::enter() {
 	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
-	for (Track *t: view->song->tracks)
+	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t) and (t->type == SignalType::MIDI))
 			set_target(t);
 			

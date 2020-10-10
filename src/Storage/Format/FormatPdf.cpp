@@ -75,7 +75,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
 	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, true, MidiMode::CLASSICAL);
-	mp->set_key_changes(get_key_changes(t->layers[0]));
+	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(2, true);
 
 	float ya = mp->clef_pos_to_screen(8);
@@ -109,7 +109,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	int n = t->instrument.string_pitch.num;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
-	mp->set_key_changes(get_key_changes(t->layers[0]));
+	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(2, true);
 
 	float sy0 = mp->string_to_screen(n - 1) - string_dy/2;
@@ -136,7 +136,7 @@ TrackMarker* get_bar_part(Song *s, int offset) {
 	auto *t = s->time_track();
 	if (!t)
 		return nullptr;
-	for (TrackMarker *m: t->layers[0]->markers)
+	for (TrackMarker *m: weak(t->layers[0]->markers))
 		if (abs(m->range.offset - offset) < 1000)
 			return m;
 	return nullptr;
@@ -215,7 +215,7 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 
 	draw_bar_markers(p, x0, w, y0, 100, r);
 
-	foreachi (Track* t, song->tracks, ti) {
+	foreachi (Track* t, weak(song->tracks), ti) {
 		if (t->type != SignalType::MIDI)
 			continue;
 

@@ -12,7 +12,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Sample.h"
 
-ActionSampleAdd::ActionSampleAdd(Sample *s) {
+ActionSampleAdd::ActionSampleAdd(shared<Sample> s) {
 	sample = s;
 }
 

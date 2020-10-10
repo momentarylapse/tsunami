@@ -16,7 +16,7 @@ class TrackLayer;
 
 class ActionTrackAddSample: public Action {
 public:
-	ActionTrackAddSample(TrackLayer *l, int pos, Sample *sample);
+	ActionTrackAddSample(TrackLayer *l, int pos, shared<Sample> sample);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

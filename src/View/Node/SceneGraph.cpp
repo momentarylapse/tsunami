@@ -17,7 +17,7 @@
 
 Array<ViewNode*> collect_children(ViewNode *n, bool include_hidden) {
 	Array<ViewNode*> nodes;
-	for (auto *c: n->children)
+	for (auto *c: weak(n->children))
 		if (!c->hidden or include_hidden) {
 			nodes.add(c);
 			nodes.append(collect_children(c, include_hidden));

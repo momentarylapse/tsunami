@@ -1,4 +1,5 @@
 #include "../kaba.h"
+#include "../lib/common.h"
 #include "Parser.h"
 #include "../../file/file.h"
 
@@ -10,29 +11,28 @@ namespace Kaba{
 //#define ScriptDebug
 
 
-void SetImmortal(SyntaxTree *ps)
-{
+void SetImmortal(SyntaxTree *ps) {
 	ps->flag_immortal = true;
-	for (Script *i: ps->includes)
+	for (auto i: ps->includes)
 		SetImmortal(i->syntax);
 }
 
 static bool _class_contains(const Class *c, const string &name) {
-	for (auto *cc: c->classes)
+	for (auto *cc: weak(c->classes))
 		if (cc->name == name)
 			return true;
-	for (auto *f: c->functions)
+	for (auto *f: weak(c->functions))
 		if (f->name == name)
 			return true;
-	for (auto *cc: c->constants)
+	for (auto *cc: weak(c->constants))
 		if (cc->name == name)
 			return true;
 	return false;
 }
 
 // import data from an included script file
-void SyntaxTree::add_include_data(Script *s, bool indirect) {
-	for (Script *i: includes)
+void SyntaxTree::add_include_data(shared<Script> s, bool indirect) {
+	for (auto i: weak(includes))
 		if (i == s)
 			return;
 
@@ -52,20 +52,20 @@ void SyntaxTree::add_include_data(Script *s, bool indirect) {
 	if (indirect) {
 		imported_symbols->classes.add(ps->base_class);
 	} else {
-		for (auto *c: ps->base_class->classes)
+		for (auto *c: weak(ps->base_class->classes))
 			imported_symbols->classes.add(c);
-		for (auto *f: ps->base_class->functions)
+		for (auto *f: weak(ps->base_class->functions))
 			imported_symbols->functions.add(f);
-		for (auto *v: ps->base_class->static_variables)
+		for (auto *v: weak(ps->base_class->static_variables))
 			imported_symbols->static_variables.add(v);
-		for (auto *c: ps->base_class->constants)
+		for (auto *c: weak(ps->base_class->constants))
 			imported_symbols->constants.add(c);
 		if (s->filename.basename().find(".kaba") < 0)
-			if (!_class_contains(imported_symbols, ps->base_class->name))
+			if (!_class_contains(imported_symbols.get(), ps->base_class->name)) {
 				imported_symbols->classes.add(ps->base_class);
+			}
 	}
 	includes.add(s);
-	s->reference_counter ++;
 	//}
 
 	for (Operator *op: ps->operators)

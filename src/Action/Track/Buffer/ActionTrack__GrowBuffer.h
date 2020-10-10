@@ -12,8 +12,7 @@
 
 class TrackLayer;
 
-class ActionTrack__GrowBuffer : public Action
-{
+class ActionTrack__GrowBuffer : public Action {
 public:
 	ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length);
 

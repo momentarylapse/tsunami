@@ -19,8 +19,7 @@
 #include "../Track/Buffer/ActionTrack__ShrinkBuffer.h"
 #include <assert.h>
 
-ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, int _mode)
-{
+ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, int _mode) {
 	index = _index;
 	length = b.length;
 	divisor = b.divisor;
@@ -28,20 +27,19 @@ ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, int _mode)
 	mode = _mode;
 }
 
-void ActionBarEdit::build(Data *d)
-{
+void ActionBarEdit::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	Range r = Range(s->bar_offset(index), s->bars[index]->length);
 
 	float scale_factor = (float)length / (float)r.length;
 
 	add_sub_action(new ActionBar__Edit(index, length, beats, divisor), d);
-	if (mode != Bar::EditMode::IGNORE){
+	if (mode != Bar::EditMode::IGNORE) {
 		bool scale_audio = (mode == Bar::EditMode::STRETCH_AND_SCALE_AUDIO);
 
-		if (scale_audio){
-			for (Track *t: s->tracks)
-				for (TrackLayer *l: t->layers)
+		if (scale_audio) {
+			for (auto t: weak(s->tracks))
+				for (auto l: weak(t->layers))
 					foreachi (AudioBuffer &b, l->buffers, index)
 						if (b.range().overlaps(r)){
 							Range stretch_zone = b.range().intersect(r);

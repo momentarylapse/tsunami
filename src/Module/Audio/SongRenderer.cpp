@@ -101,12 +101,12 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf) {
 }
 
 void apply_curves(Song *audio, int pos) {
-	for (Curve *c: audio->curves)
+	for (Curve *c: weak(audio->curves))
 		c->apply(pos);
 }
 
 void unapply_curves(Song *audio) {
-	for (Curve *c: audio->curves)
+	for (Curve *c: weak(audio->curves))
 		c->unapply();
 }
 
@@ -241,7 +241,7 @@ void SongRenderer::build_data() {
 	bar_streamer = new BarStreamer(song->bars);
 	bar_streamer->perf_set_parent(this);
 
-	for (Track *t: song->tracks)
+	for (Track *t: weak(song->tracks))
 		tracks.add(new TrackRenderer(t, this));
 
 	_set_pos(0);
@@ -287,7 +287,7 @@ void SongRenderer::on_song_finished_loading() {
 
 void SongRenderer::update_tracks() {
 	// new tracks
-	for (Track *t: song->tracks) {
+	for (Track *t: weak(song->tracks)) {
 		bool found = false;
 		for (auto &tr: tracks)
 			if (tr->track.get() == t)
@@ -296,8 +296,8 @@ void SongRenderer::update_tracks() {
 			tracks.add(new TrackRenderer(t, this));
 	}
 
-	foreachi (auto *tr, tracks, ti) {
-		bool found = song->tracks.find(tr->track.get()) >= 0;
+	foreachi (auto &tr, tracks, ti) {
+		bool found = weak(song->tracks).find(tr->track.get()) >= 0;
 		if (!found) {
 			msg_write("--------SongRenderer erase...");
 			tracks.erase(ti);
@@ -306,7 +306,7 @@ void SongRenderer::update_tracks() {
 }
 
 float SongRenderer::get_peak(const Track *t) {
-	for (auto *tr: tracks)
+	for (auto &tr: tracks)
 		if (tr->track.get() == t) {
 			float r = tr->peak;
 			tr->peak = 0;
@@ -316,7 +316,7 @@ float SongRenderer::get_peak(const Track *t) {
 }
 
 void SongRenderer::clear_peaks() {
-	for (auto *tr: tracks)
+	for (auto &tr: tracks)
 		tr->peak = 0;
 }
 

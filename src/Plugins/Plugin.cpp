@@ -12,7 +12,6 @@
 
 
 Plugin::Plugin(const Path &_filename, ModuleType _type) {
-	s = nullptr;
 	type = _type;
 	filename = _filename;
 	index = -1;
@@ -41,13 +40,13 @@ void Plugin::recompile(Session *session) {
 	session->i(_("compiling script: ") + filename.str());
 
 	if (s) {
-		Kaba::Remove(s);
+		Kaba::remove_script(s.get());
 		s = nullptr;
 	}
 
 	// load + compile
 	try {
-		s = Kaba::Load(filename);
+		s = Kaba::load(filename);
 
 	} catch(Kaba::Exception &e) {
 		error_message = e.message();
@@ -58,14 +57,14 @@ void Plugin::recompile(Session *session) {
 bool Plugin::usable(Session *session) {
 	if (file_changed())
 		recompile(session);
-	return s;
+	return s.get();
 }
 
 void *Plugin::create_instance(Session *session, const string &root_type) {
 	if (!usable(session))
 		return nullptr;
 
-	for (auto *t : s->syntax->base_class->classes) {
+	for (auto *t: weak(s->syntax->base_class->classes)) {
 		if (t->is_derived_from_s(root_type)) {
 			return t->create_instance();
 		}

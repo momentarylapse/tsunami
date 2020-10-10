@@ -57,7 +57,7 @@ Array<UnitTest::Test> TestPlugins::tests() {
 void TestPlugins::test_compile(ModuleType type, const Path &filename) {
 
 	try {
-		auto *s = Kaba::Load(filename);
+		auto s = Kaba::load(filename);
 	} catch (Kaba::Exception &e) {
 		throw Failure(e.message());
 	}

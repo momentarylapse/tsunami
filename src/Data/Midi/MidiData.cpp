@@ -223,7 +223,7 @@ int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const {
 MidiNoteBuffer MidiEventBuffer::get_notes(const Range &r) const {
 	MidiNoteBuffer a = midi_events_to_notes(*this);
 	MidiNoteBuffer b;
-	for (MidiNote *n: a)
+	for (MidiNote *n: weak(a))
 		if (r.overlaps(n->range))
 			b.add(n->copy());
 	return b;
@@ -345,7 +345,7 @@ MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const {
 MidiNoteBuffer MidiNoteBuffer::get_notes(const Range &r) const {
 	MidiNoteBuffer b;
 	b.samples = r.length;
-	for (MidiNote *n: *this)
+	for (MidiNote *n: weak(*this))
 		if (r.overlaps(n->range))
 			b.add(n);
 	return b;
@@ -353,14 +353,14 @@ MidiNoteBuffer MidiNoteBuffer::get_notes(const Range &r) const {
 
 MidiNoteBuffer MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const {
 	MidiNoteBuffer b;
-	for (MidiNote *n: *this)
+	for (MidiNote *n: weak(*this))
 		if (s.has(n))
 			b.add(n);
 	return b;
 }
 
 void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
-	for (MidiNote *n: midi) {
+	for (MidiNote *n: weak(midi)) {
 		MidiNote *nn = n->copy();
 		nn->range.offset += offset;
 		add(nn);
@@ -371,7 +371,7 @@ void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
 
 MidiNoteBuffer MidiNoteBuffer::duplicate() const {
 	MidiNoteBuffer r;
-	for (MidiNote *n: *this)
+	for (MidiNote *n: weak(*this))
 		r.add(n->copy());
 	r.samples = samples;
 	return r;
@@ -380,7 +380,7 @@ MidiNoteBuffer MidiNoteBuffer::duplicate() const {
 void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi) {
 	clear();
 
-	for (MidiNote *n: midi)
+	for (MidiNote *n: weak(midi))
 		add(n);
 
 	samples = midi.samples;
@@ -407,7 +407,7 @@ void MidiNoteBuffer::sanify(const Range &r) {
 
 MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {
 	MidiEventBuffer r;
-	for (MidiNote *n: notes) {
+	for (MidiNote *n: weak(notes)) {
 		Range rr = n->range;
 		if (n->is(NOTE_FLAG_STACCATO))
 			rr = Range(rr.offset, rr.length/2);
@@ -528,17 +528,17 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch) {
 
 void MidiNoteBuffer::update_clef_pos(const Instrument &instrument, const Scale& scale) const {
 	const Clef& clef = instrument.get_clef();
-	for (MidiNote *n: *this)
+	for (MidiNote *n: weak(*this))
 		n->update_clef_pos(clef, instrument, scale);
 }
 
 void MidiNoteBuffer::reset_clef() const {
-	for (MidiNote *n: *this)
+	for (MidiNote *n: weak(*this))
 		n->reset_clef();
 }
 
 bool MidiNoteBuffer::has(MidiNote* n) const {
-	for (auto *nn: *this)
+	for (auto *nn: weak(*this))
 		if (nn == n)
 			return true;
 	return false;

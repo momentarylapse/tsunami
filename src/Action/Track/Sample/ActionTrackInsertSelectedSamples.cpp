@@ -22,7 +22,7 @@ void ActionTrackInsertSelectedSamples::build(Data *d) {
 	auto *s = dynamic_cast<Song*>(d);
 
 	for (TrackLayer *l: s->layers())
-		foreachib(SampleRef *ss, l->samples, si)
+		foreachib(SampleRef *ss, weak(l->samples), si)
 			if (sel.has(ss))
 				add_sub_action(new ActionTrackInsertSample(l, si), d);
 }

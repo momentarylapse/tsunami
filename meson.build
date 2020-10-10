@@ -213,6 +213,7 @@ sources = [
 	'src/Device/DeviceManager.cpp',
 	'src/lib/any/any.cpp',
 	'src/lib/base/array.cpp',
+	'src/lib/base/pointer.cpp',
 	'src/lib/base/strings.cpp',
 	'src/lib/file/file.cpp',
 	'src/lib/file/file_op.cpp',

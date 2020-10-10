@@ -64,24 +64,21 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 #include "../../base/set.h"
 #include "SyntaxTree.h"
 
-void test_node_recursion(Node *root, const Class *ns, const string &message) {
+void test_node_recursion(shared<Node> root, const Class *ns, const string &message) {
 	Set<Node*> nodes;
-	SyntaxTree::transform_node(root, [&](Node *n){
-		if (nodes.contains(n)){
+	SyntaxTree::transform_node(root, [&](shared<Node> n) {
+		if (nodes.contains(n.get())) {
 			msg_error("node double..." + message);
 			//msg_write(f->long_name);
 			msg_write(n->str(ns));
-		}else
-			nodes.add(n);
+		} else {
+			nodes.add(n.get());
+		}
 		return n; });
 }
 
 Function::~Function() {
 	//test_node_recursion(block, long_name());
-	if (block)
-		delete block;
-	for (Variable* v: var)
-		delete v;
 }
 
 SyntaxTree *Function::owner() const {
@@ -130,7 +127,7 @@ string Function::signature(const Class *ns) const {
 
 void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 	blocks.add(block);
-	for (Node* n: block->params) {
+	for (auto n: block->params) {
 		if (n->kind == NodeKind::BLOCK)
 			blocks_add_recursive(blocks, n->as_block());
 		if (n->kind == NodeKind::STATEMENT) {
@@ -155,7 +152,7 @@ void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 Array<Block*> Function::all_blocks() {
 	Array<Block*> blocks;
 	if (block)
-		blocks_add_recursive(blocks, block);
+		blocks_add_recursive(blocks, block.get());
 	return blocks;
 }
 

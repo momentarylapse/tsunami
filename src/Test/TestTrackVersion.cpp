@@ -29,10 +29,10 @@ Array<UnitTest::Test> TestTrackVersion::tests() {
 	};
 }
 
-Song *create_layer_example_data(bool with_fades) {
+shared<Song> create_layer_example_data(bool with_fades) {
 	Song *s = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Track *t = s->add_track(SignalType::AUDIO_MONO);
-	auto *l1 = t->layers[0];
+	auto *l1 = t->layers[0].get();
 	auto *l2 = t->add_layer();
 	if (with_fades) {
 		l1->fades = {{5, CrossFade::OUTWARD, 2}, {10, CrossFade::INWARD, 2}, {15, CrossFade::OUTWARD, 2}, {20, CrossFade::INWARD, 2}};
@@ -42,40 +42,35 @@ Song *create_layer_example_data(bool with_fades) {
 }
 
 void TestTrackVersion::test_active_version_ranges_base() {
-	Song *s = create_layer_example_data(true);
+	auto s = create_layer_example_data(true);
 	assert_equal(s->tracks[0]->layers[0]->active_version_ranges(), {RangeTo(Range::BEGIN,7), RangeTo(10,17), RangeTo(20,Range::END)});
-	delete s;
 }
 
 void TestTrackVersion::test_inactive_version_ranges_base() {
-	Song *s = create_layer_example_data(true);
+	auto s = create_layer_example_data(true);
 	assert_equal(s->tracks[0]->layers[0]->inactive_version_ranges(), {RangeTo(7,10), RangeTo(17,20)});
-	delete s;
 }
 
 void TestTrackVersion::test_active_version_ranges_second() {
-	Song *s = create_layer_example_data(true);
+	auto s = create_layer_example_data(true);
 	assert_equal(s->tracks[0]->layers[1]->active_version_ranges(), {RangeTo(Range::BEGIN,2), RangeTo(5,12), RangeTo(15,22), RangeTo(25, Range::END)});
-	delete s;
 }
 
 void TestTrackVersion::test_inactive_version_ranges_second() {
-	Song *s = create_layer_example_data(true);
+	auto s = create_layer_example_data(true);
 	assert_equal(s->tracks[0]->layers[1]->inactive_version_ranges(), {RangeTo(2,5), RangeTo(12,15), RangeTo(22,25)});
-	delete s;
 }
 
 void TestTrackVersion::test_dominant() {
-	Song *s = create_layer_example_data(false);
-	Track *t = s->tracks[0];
+	auto s = create_layer_example_data(false);
+	Track *t = s->tracks[0].get();
 	Range r = RangeTo(0, 100000);
-	t->mark_dominant({t->layers[0]}, r);
+	t->mark_dominant({t->layers[0].get()}, r);
 	assert_equal(t->layers[0]->fades.num, 0);
 	assert_equal(t->layers[1]->fades.num, 2);
-	t->mark_dominant({t->layers[1]}, r);
+	t->mark_dominant({t->layers[1].get()}, r);
 	assert_equal(t->layers[0]->fades.num, 2);
 	assert_equal(t->layers[1]->fades.num, 0);
-	delete s;
 }
 
 #endif

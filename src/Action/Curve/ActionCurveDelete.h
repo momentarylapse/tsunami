@@ -15,12 +15,11 @@ class Curve;
 class ActionCurveDelete : public Action {
 public:
 	ActionCurveDelete(int index);
-	virtual ~ActionCurveDelete();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
-	Curve *curve;
+	shared<Curve> curve;
 	int index;
 };
 

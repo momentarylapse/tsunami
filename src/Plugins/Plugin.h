@@ -9,6 +9,7 @@
 #define PLUGIN_H_
 
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 #include "../lib/file/path.h"
 
 namespace Kaba{
@@ -20,15 +21,14 @@ class Session;
 enum class ModuleType;
 
 // represents a compiled script
-class Plugin
-{
+class Plugin {
 public:
 	Plugin(const Path &filename, ModuleType type);
 
 	Path filename;
 	int file_date;
 	int index;
-	Kaba::Script *s;
+	shared<Kaba::Script> s;
 
 	bool usable(Session *session);
 	ModuleType type;

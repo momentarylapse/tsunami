@@ -48,7 +48,7 @@ void ActionTrackSampleFromSelection::CreateSamplesFromLayerMidi(TrackLayer *l) {
 	for (auto n: midi)
 		n->range.offset -= sel.range().offset;
 	add_sub_action(new ActionTrackPasteAsSample(l, sel.range().offset, midi, auto_delete), l->song());
-	foreachib(MidiNote *n, l->midi, i)
+	foreachib(MidiNote *n, weak(l->midi), i)
 		if (sel.has(n))
 			add_sub_action(new ActionTrackDeleteMidiNote(l, i), l->song());
 }

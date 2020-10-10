@@ -148,7 +148,7 @@ public:
 			s.type = Selection::TYPE_BUTTON_PLAY;
 			return s;
 		}
-		for (auto *m: chain->modules){
+		for (auto *m: weak(chain->modules)){
 			rect r = module_rect(m);
 			if (r.inside(mx, my)) {
 				s.type = Selection::TYPE_MODULE;
@@ -291,13 +291,13 @@ public:
 		p->draw_rect(0, 0, w, h);
 		p->set_font_size(12);
 
-		for (auto *m: chain->modules)
+		for (auto *m: weak(chain->modules))
 			draw_module(p, m);
 
 		for (auto &c: chain->cables())
 			draw_cable(p, c);
 
-		for (auto *m: chain->modules)
+		for (auto *m: weak(chain->modules))
 			draw_ports(p, m);
 
 		for (auto &pp: chain->_ports_out){
@@ -519,11 +519,11 @@ SignalEditor::SignalEditor(Session *session) :
 
 	event("selector", [=]{ on_chain_switch(); });
 
-	for (auto *c: session->all_signal_chains)
+	for (auto *c: weak(session->all_signal_chains))
 		add_chain(c);
 	show_config(nullptr);
 
-	session->subscribe(this, [=] { add_chain(session->all_signal_chains.back()); }, session->MESSAGE_ADD_SIGNAL_CHAIN);
+	session->subscribe(this, [=] { add_chain(session->all_signal_chains.back().get()); }, session->MESSAGE_ADD_SIGNAL_CHAIN);
 }
 
 SignalEditor::~SignalEditor() {
@@ -574,8 +574,8 @@ void SignalEditor::show_config(Module *m) {
 	if (m) {
 		config_panel = new ModulePanel(config_module);
 		config_panel->set_func_delete([=] {
-			for (auto *chain: session->all_signal_chains)
-				for (auto *_m: chain->modules)
+			for (auto *chain: weak(session->all_signal_chains))
+				for (auto *_m: weak(chain->modules))
 					if (m == _m)
 						chain->delete_module(m);
 		});

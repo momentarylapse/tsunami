@@ -38,7 +38,7 @@ const Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
 
-class MidiNote
+shared class MidiNote
 	Range range
 	float pitch
 	float volume
@@ -53,8 +53,6 @@ class MidiNote
 		clef_position = -1
 		modifier = 0
 		flags = 0
-	extern void _ref()
-	extern bool _unref()
 	extern void set(int mask)
 	extern const bool is(int mask)
 	extern const MidiNote* copy()
@@ -90,7 +88,8 @@ class MidiNoteBuffer extends shared MidiNote[]
 	int samples
 	extern override void __init__()
 	extern override void __delete__()
-	extern selfref MidiNoteBuffer get_notes(Range r)
+	#extern selfref MidiNoteBuffer get_notes(Range r)
+	extern selfref MidiNote*[] get_notes(Range r)
 	extern selfref MidiEvent[] get_events(Range r)
 	extern const Range get_range()
 
@@ -103,7 +102,7 @@ class ConfigPanel extends Panel
 	extern void changed()
 	Module *c
 
-class Module extends Object
+shared class Module extends Object
 	string name
 	Session* session
 	extern void __init__(int type, string sub_type)
@@ -118,8 +117,6 @@ class Module extends Object
 	extern void unplug_in(int in_port)
 	extern void subscribe(Object handler, Function f, string message)
 	extern void unsubscribe(Object handler)
-	extern void _ref()
-	extern bool _unref()
 	extern const Module* copy()
 	
 	class Port
@@ -348,22 +345,18 @@ class MidiRecorder extends Module
 class TrackRenderBuffer
 	int dummy
 
-class TrackMarker
+shared class TrackMarker
 	Range range
 	string text
 	AudioEffect*[] fx
-	extern void _ref()
-	extern bool _unref()
 	
-class Bar
+shared class Bar
 	int[] beats
 	int divisor
 	int index
 	int index_text
 	int length
 	int offset
-	extern void _ref()
-	extern bool _unref()
 	extern const float bpm(float sample_rate)
 	extern const Range range()
 
@@ -382,22 +375,19 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
-class BarCollection extends Bar*[]
+class BarCollection extends Bar[] # shared Bar[]
 	extern selfref Bar*[] get_bars(Range r)
 	extern selfref Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
 	extern const int get_next_beat(int pos)
 	extern const int get_prev_beat(int pos)
 
-class TrackLayer
+shared class TrackLayer
 	int type
 	Track *track
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
 	SampleRef*[] samples
 	TrackMarker*[] markers
-	
-	extern void _ref()
-	extern bool _unref()
 	
 	extern void get_buffers(out AudioBuffer buf, Range r)
 	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
@@ -414,7 +404,7 @@ class TrackLayer
 	extern void delete_marker(TrackMarker *marker)
 	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
-class Sample # TODO
+shared class Sample # TODO
 	string name
 	int type
 	AudioBuffer* buf
@@ -424,18 +414,14 @@ class Sample # TODO
 	int ref_count
 	Tag[] tags
 	extern void __init__(string name, AudioBuffer buf)
-	extern void _ref()
-	extern bool _unref()
 	extern SampleRef* create_ref()
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
 
-class SampleRef # TODO
+shared class SampleRef # TODO
 	Sample* origin
 	extern void __init__(Sample* sam)
 	extern virtual void __delete__()
-	extern void _ref()
-	extern bool _unref()
 
 
 enum
@@ -450,7 +436,7 @@ class Instrument
 	int type
 	int[] string_pitch
 
-class Track
+shared class Track
 	int type
 	string name
 	TrackLayer*[] layers
@@ -480,9 +466,6 @@ class Track
 	extern void edit_effect(int index)
 	extern void enable_effect(int index, bool enabled)
 	extern void set_synthesizer(Synthesizer synth)
-	
-	extern void _ref()
-	extern bool _unref()
 
 class Tag
 	string key, value
@@ -491,7 +474,7 @@ class Tag
 		key = _key
 		value = _value
 
-class Song
+shared class Song
 	Path filename
 	Tag[] tags
 	int sample_rate
@@ -507,9 +490,6 @@ class Song
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()
-	
-	extern void _ref()
-	extern bool _unref()
 	
 	extern const Range range()
 	extern selfref Track* time_track()
@@ -557,10 +537,8 @@ class ColorScheme
 	extern const color hoverify(color c)
 
 class SceneGraph
-	class Node
+	shared class Node
 		rect area
-		extern void _ref()
-		extern bool _unref()
 
 class AudioView extends Object
 	class ViewPort
@@ -650,7 +628,7 @@ class SignalChain extends Module
 	extern void set_update_dt(float dt)
 	extern void set_buffer_size(int size)
 
-class Session extends Object
+shared class Session extends Object
 	int id
 	#TsunamiWindow* win
 	Window* win

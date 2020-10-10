@@ -13,8 +13,7 @@
 
 class TrackLayer;
 
-class ActionTrack__DeleteBuffer : public Action
-{
+class ActionTrack__DeleteBuffer : public Action {
 public:
 	ActionTrack__DeleteBuffer(TrackLayer *l, int _index);
 

@@ -52,7 +52,7 @@ ViewNode *ViewNode::root() {
 }
 
 bool ViewNode::is_cur_hover() {
-	for (auto *c: children)
+	for (auto *c: weak(children))
 		if (c->is_cur_hover())
 			return true;
 	return is_cur_hover_non_recursive();
@@ -104,7 +104,7 @@ void ViewNode::update_geometry_recursive(const rect &target_area) {
 	if (parent)
 		z = parent->z + align.dz;
 
-	for (auto *c: children)
+	for (auto *c: weak(children))
 		c->update_geometry_recursive(area);
 }
 
@@ -131,7 +131,7 @@ void NodeHBox::update_geometry_recursive(const rect &target_area) {
 	float w_avail = area.width();
 	float w_min = 0;
 	int n_expand = 0;
-	for (auto *c: children) {
+	for (auto *c: weak(children)) {
 		if (c->hidden)
 			continue;
 		if (c->align.horizontal == AlignData::Mode::FILL)
@@ -140,7 +140,7 @@ void NodeHBox::update_geometry_recursive(const rect &target_area) {
 			w_min += c->align.w;
 	}
 	float offset = 0;
-	for (auto *c: children) {
+	for (auto *c: weak(children)) {
 		float w = c->align.w;
 		if (c->align.horizontal == AlignData::Mode::FILL)
 			w = (w_avail - w_min) / n_expand;
@@ -163,7 +163,7 @@ void NodeVBox::update_geometry_recursive(const rect &target_area) {
 	float h_avail = area.height();
 	float h_min = 0;
 	int n_expand = 0;
-	for (auto *c: children) {
+	for (auto *c: weak(children)) {
 		if (c->hidden)
 			continue;
 		if (c->align.vertical == AlignData::Mode::FILL)
@@ -172,7 +172,7 @@ void NodeVBox::update_geometry_recursive(const rect &target_area) {
 			h_min += c->align.h;
 	}
 	float offset = 0;
-	for (auto *c: children) {
+	for (auto *c: weak(children)) {
 		float h = c->align.h;
 		if (c->align.vertical == AlignData::Mode::FILL)
 			h = (h_avail - h_min) / n_expand;

@@ -117,12 +117,12 @@ MidiMode AudioViewTrack::midi_mode() {
 }
 
 void AudioViewTrack::draw_imploded_data(Painter *c) {
-	auto *l = view->get_layer(track->layers[0]);
+	auto *l = view->get_layer(track->layers[0].get());
 	view->buffer_painter->set_context(l->area);
 
 	view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
 
-	for (auto *layer: track->layers) {
+	for (auto *layer: weak(track->layers)) {
 		auto rr = layer->active_version_ranges();
 
 		for (auto &r: rr) {
@@ -155,7 +155,7 @@ void AudioViewTrack::draw(Painter *c) {
 }
 
 AudioViewLayer* AudioViewTrack::first_layer() {
-	return view->get_layer(track->layers[0]);
+	return view->get_layer(track->layers[0].get());
 }
 
 bool AudioViewTrack::is_playable() {

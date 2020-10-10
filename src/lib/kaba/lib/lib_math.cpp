@@ -301,14 +301,14 @@ void SIAddPackageMath() {
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
-		((Class*)TypeFloat32)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeFloat64)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeComplex)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeQuaternion)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeVector)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeColor)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypePlane)->_amd64_allow_pass_in_xmm = true;
-		((Class*)TypeRect)->_amd64_allow_pass_in_xmm = true;
+		flags_set(((Class*)TypeFloat32)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeFloat64)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeComplex)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeQuaternion)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeVector)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeColor)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypePlane)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+		flags_set(((Class*)TypeRect)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 	}
 
 

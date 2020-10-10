@@ -12,16 +12,14 @@
 
 class Song;
 
-class ActionSongSetSampleRate : public ActionMergable<int>
-{
+class ActionSongSetSampleRate : public ActionMergable<int> {
 public:
 	ActionSongSetSampleRate(Song *s, int sample_rate);
-	virtual ~ActionSongSetSampleRate(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 };
 
 #endif /* SRC_ACTION_SONG_DATA_ACTIONSONGSETSAMPLERATE_H_ */

@@ -17,7 +17,7 @@ enum class NoteModifier;
 
 class ActionTrackEditMidiNote : public Action {
 public:
-	ActionTrackEditMidiNote(MidiNote *n, const Range &range, float pitch, float volume, int stringno, int flags);
+	ActionTrackEditMidiNote(shared<MidiNote> n, const Range &range, float pitch, float volume, int stringno, int flags);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

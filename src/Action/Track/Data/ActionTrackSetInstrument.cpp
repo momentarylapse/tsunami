@@ -14,8 +14,8 @@ ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &i
 	old_value = t->instrument;
 	new_value = instrument;
 
-	for (auto *l: track->layers)
-		for (auto *n: l->midi) {
+	for (auto l: weak(track->layers))
+		for (auto n: weak(l->midi)) {
 			StringChange c;
 			c.note = n;
 			c.from = n->stringno;
@@ -28,7 +28,7 @@ ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &i
 
 void* ActionTrackSetInstrument::execute(Data* d) {
 	track->instrument = new_value;
-	for (auto *l: track->layers)
+	for (auto *l: weak(track->layers))
 		l->midi.reset_clef();
 
 	for (auto &c: string_change)
@@ -41,7 +41,7 @@ void* ActionTrackSetInstrument::execute(Data* d) {
 
 void ActionTrackSetInstrument::undo(Data* d) {
 	track->instrument = old_value;
-	for (auto *l: track->layers)
+	for (auto l: track->layers)
 		l->midi.reset_clef();
 
 	for (auto &c: string_change)

@@ -15,13 +15,13 @@
 
 class ActionCurveEditPoint : public ActionMergable<Curve::Point> {
 public:
-	ActionCurveEditPoint(Curve *curve, int index, int pos, float value);
+	ActionCurveEditPoint(shared<Curve> curve, int index, int pos, float value);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 	bool mergable(Action *a) override;
 private:
-	Curve *curve;
+	shared<Curve> curve;
 	int index;
 };
 

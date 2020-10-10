@@ -70,12 +70,12 @@ void Module::set_session_etc(Session *_session, const string &sub_type) {
 	auto *c = get_config();
 	if (c) {
 		c->_module = this;
-		c->_class = Kaba::GetDynamicType(c);
+		c->_class = Kaba::get_dynamic_type(c);
 		/*msg_write("config class: " + p2s(c->_class) + "  " + sub_type);
 		if (c->_class)
 			msg_write(c->_class->name);*/
 	}
-	_class = Kaba::GetDynamicType(this);
+	_class = Kaba::get_dynamic_type(this);
 
 	reset_config();
 	reset_state();
@@ -99,7 +99,7 @@ ModuleConfiguration *Module::get_config() const {
 int Module::version() const {
 	if (!_class)
 		return 1;
-	for (auto *c: _class->constants)
+	for (auto *c: weak(_class->constants))
 		if ((c->name == "VERSION") and (c->type->name == "int"))
 			return c->as_int();
 	return 1;

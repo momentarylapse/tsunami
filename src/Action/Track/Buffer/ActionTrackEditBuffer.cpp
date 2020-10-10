@@ -12,8 +12,7 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range)
-{
+ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range) {
 	// prepare...
 	range = _range;
 	layer = l;
@@ -34,8 +33,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range)
 
 
 
-void ActionTrackEditBuffer::undo(Data *d)
-{
+void ActionTrackEditBuffer::undo(Data *d) {
 	layer->buffers[index].invalidate_peaks(range);
 
 	AudioBuffer b;
@@ -43,13 +41,11 @@ void ActionTrackEditBuffer::undo(Data *d)
 	box.swap_value(b);
 }
 
-void ActionTrackEditBuffer::redo(Data *d)
-{
+void ActionTrackEditBuffer::redo(Data *d) {
 	undo(d);
 }
 
-void *ActionTrackEditBuffer::execute(Data *d)
-{
+void *ActionTrackEditBuffer::execute(Data *d) {
 	layer->buffers[index].invalidate_peaks(range);
 
 	// nothing to do...

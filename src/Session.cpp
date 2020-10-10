@@ -125,7 +125,7 @@ void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 		last_plugin = p;
 		notify(MESSAGE_REMOVE_PLUGIN);
 		p->on_stop();
-		foreachi (auto *pp, plugins, i)
+		foreachi (auto *pp, weak(plugins), i)
 			if (p == pp)
 				plugins.erase(i);
 	});

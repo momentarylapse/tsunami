@@ -15,8 +15,7 @@
 
 class TrackLayer;
 
-class ActionTrack__AddBuffer : public Action
-{
+class ActionTrack__AddBuffer : public Action {
 public:
 	ActionTrack__AddBuffer(TrackLayer *l, int index, const Range &r);
 

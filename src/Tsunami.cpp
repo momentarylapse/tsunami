@@ -121,13 +121,13 @@ void show_song(Song *song) {
 	msg_write(format("  bars: %d", song->bars.num));
 	msg_write(format("  tracks: %d", song->tracks.num));
 	int n = 0;
-	for (Track *t: song->tracks) {
+	for (Track *t: weak(song->tracks)) {
 		msg_write(format("  track '%s'", t->nice_name()));
 		msg_write("    type: " + signal_type_name(t->type));
 		if (t->type == SignalType::MIDI) {
 			msg_write(format("    synth: %s v%d", t->synth->module_subtype, t->synth->version()));
 		}
-		for (TrackLayer *l: t->layers) {
+		for (TrackLayer *l: weak(t->layers)) {
 			msg_write("    layer");
 			if (l->buffers.num > 0)
 				msg_write(format("      buffers: %d", l->buffers.num));
@@ -139,9 +139,9 @@ void show_song(Song *song) {
 				msg_write(format("      markers: %d", l->markers.num));
 			n += l->samples.num;
 		}
-		for (auto *fx: t->fx)
+		for (auto *fx: weak(t->fx))
 			msg_write(format("    fx: %s v%d", fx->module_subtype, fx->version()));
-		for (auto *fx: t->midi_fx)
+		for (auto *fx: weak(t->midi_fx))
 			msg_write(format("    midifx: %s v%d", fx->module_subtype, fx->version()));
 	}
 	msg_write(format("  refs: %d / %d", n, song->samples.num));
@@ -302,7 +302,7 @@ void Tsunami::load_key_codes() {
 }
 
 bool Tsunami::allow_termination() {
-	for (auto *s: sessions)
+	for (auto *s: weak(sessions))
 		if (!s->win->allow_termination())
 			return false;
 	return true;

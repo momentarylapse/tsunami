@@ -31,7 +31,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	add_spin_button("!expandx", 1, 0, "scale");
 	add_label("%", 2, 0, "");
 	set_target("tracks");
-	foreachi(Track *t, song->tracks, i){
+	foreachi(Track *t, weak(song->tracks), i){
 		if (t->type != SignalType::MIDI)
 			continue;
 		add_label(t->nice_name(), 0, i, "");
@@ -56,7 +56,7 @@ void PdfConfigDialog::on_close() {
 void PdfConfigDialog::on_ok() {
 	ok = true;
 	Any ats;
-	foreachi(Track *t, song->tracks, i){
+	foreachi(Track *t, weak(song->tracks), i){
 		if (t->type != SignalType::MIDI)
 			continue;
 		Any at;

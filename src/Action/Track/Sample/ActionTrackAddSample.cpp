@@ -12,7 +12,7 @@
 #include "../../../Data/Sample.h"
 #include <cassert>
 
-ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample) {
+ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, shared<Sample> _sample) {
 	layer = l;
 	pos = _pos;
 
@@ -42,6 +42,6 @@ void *ActionTrackAddSample::execute(Data *d) {
 	sample->ref();
 
 	layer->samples.add(ref);
-	return layer->samples.back();
+	return ref.get();
 }
 

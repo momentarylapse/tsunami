@@ -95,7 +95,7 @@ ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(Track *_track, const 
 }
 
 void ActionTrackLayerMarkDominant::build(Data *d) {
-	for (TrackLayer *l: track->layers) {
+	for (TrackLayer *l: weak(track->layers)) {
 		bool activate = (layers.find(l) >= 0);
 		add_sub_action(new ActionTrackLayerActivateVersion(l, range, activate), d);
 	}

@@ -118,7 +118,7 @@ public:
 	void _cdecl delete_selected_samples(const SongSelection &sel);
 	void _cdecl delete_selection(const SongSelection &sel);
 	void _cdecl create_samples_from_selection(const SongSelection &sel, bool auto_delete);
-	Curve *_cdecl add_curve(const string &name, Array<Curve::Target> &targets);
+	Curve* _cdecl add_curve(const string &name, Array<Curve::Target> &targets);
 	void _cdecl delete_curve(Curve *curve);
 	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max);
 	void _cdecl curve_set_targets(Curve *curve, Array<Curve::Target> &targets);
@@ -135,7 +135,7 @@ public:
 	SampleFormat default_format;
 	int compression;
 
-	Array<AudioEffect*> __fx;
+	shared_array<AudioEffect> __fx;
 	shared_array<Track> tracks;
 	shared_array<Sample> samples;
 	shared_array<Curve> curves;

@@ -14,12 +14,12 @@ class Curve;
 
 class ActionCurveDeletePoint : public Action {
 public:
-	ActionCurveDeletePoint(Curve *curve, int index);
+	ActionCurveDeletePoint(shared<Curve> curve, int index);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
-	Curve *curve;
+	shared<Curve> curve;
 	int index;
 	int pos;
 	float value;

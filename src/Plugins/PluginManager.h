@@ -69,10 +69,10 @@ public:
 
 	Array<Plugin*> plugins;
 
-	FavoriteManager *favorites;
+	owned<FavoriteManager> favorites;
 
 
-	Kaba::Script *package;
+	shared<Kaba::Script> package;
 	Kaba::Class *get_class(const string &name);
 
 private:

@@ -24,11 +24,11 @@ TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
 void TrackRoutingDialog::load() {
 	groups.clear();
 
-	for (Track *t: song->tracks)
+	for (Track *t: weak(song->tracks))
 		if (t->type == SignalType::GROUP)
 			groups.add(t);
 
-	foreachi (Track *t, song->tracks, i) {
+	foreachi (Track *t, weak(song->tracks), i) {
 		set_target("list");
 		string id = "target-" + i2s(i);
 		if (i >= num_tracks) {
@@ -60,7 +60,7 @@ void TrackRoutingDialog::on_target(int i) {
 }
 
 bool has_track_name(Song *s, const string &name) {
-	for (auto *t: s->tracks)
+	for (auto *t: weak(s->tracks))
 		if (t->name == name)
 			return true;
 	return false;

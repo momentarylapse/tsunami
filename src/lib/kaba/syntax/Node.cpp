@@ -166,14 +166,13 @@ void Node::show(const Class *ns) const {
 	string orig;
 	msg_write(str(ns) + orig);
 	msg_right();
-	for (Node *p: params)
+	for (auto p: params)
 		if (p)
 			p->show(ns);
 		else
 			msg_write("<-NULL->");
 	msg_left();
 }
-
 
 
 
@@ -190,16 +189,12 @@ Block::Block(Function *f, Block *_parent) :
 }
 
 
-inline void set_command(Node *&a, Node *b) {
-	a = b;
-}
-
-void Block::add(Node *c) {
+void Block::add(shared<Node> c) {
 	if (c)
 		params.add(c);
 }
 
-void Block::set(int index, Node *c) {
+void Block::set(int index, shared<Node> c) {
 	params[index] = c;
 }
 
@@ -213,7 +208,7 @@ Variable *Block::add_var(const string &name, const Class *type, bool is_const) {
 	return v;
 }
 
-Variable *Block::get_var(const string &name) {
+Variable *Block::get_var(const string &name) const {
 	for (auto *v: vars)
 		if (v->name == name)
 			return v;
@@ -226,7 +221,6 @@ const Class *Block::name_space() const {
 	return function->name_space;
 }
 
-
 Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const) {
 	type = _type;
 	kind = _kind;
@@ -235,9 +229,6 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const) {
 }
 
 Node::~Node() {
-	for (auto &p: params)
-		if (p)
-			delete p;
 }
 
 Node *Node::modifiable() {
@@ -298,26 +289,26 @@ PrimitiveOperator *Node::as_prim_op() const {
 	return (PrimitiveOperator*)link_no;
 }
 
-void Node::set_instance(Node *p) {
+void Node::set_instance(shared<Node> p) {
 #ifndef NDEBUG
 	if (params.num == 0)
 		msg_write("no inst...dfljgkldfjg");
 #endif
-	set_command(params[0], p);
+	params[0] = p;
 }
 
 void Node::set_num_params(int n) {
 	params.resize(n);
 }
 
-void Node::set_param(int index, Node *p) {
+void Node::set_param(int index, shared<Node> p) {
 #ifndef NDEBUG
 	/*if ((index < 0) or (index >= uparams.num)){
 		show();
 		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);
 	}*/
 #endif
-	set_command(params[index], p);
+	params[index] = p;
 }
 
 

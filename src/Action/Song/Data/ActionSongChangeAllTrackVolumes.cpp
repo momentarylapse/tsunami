@@ -13,7 +13,7 @@ ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track 
 	track_no = t->get_index();
 	new_value = _volume;
 	old_value = t->volume;
-	for (Track *tt: t->song->tracks)
+	for (auto tt: t->song->tracks)
 		old_volumes.add(tt->volume);
 }
 
@@ -22,7 +22,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 
 	float factor = new_value / old_value;
 
-	foreachi(Track *tt, s->tracks, i) {
+	foreachi(auto tt, s->tracks, i) {
 		tt->volume = old_volumes[i] * factor;
 		tt->notify(tt->MESSAGE_CHANGE);
 	}
@@ -33,7 +33,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 void ActionSongChangeAllTrackVolumes::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
-	foreachi(Track *tt, s->tracks, i) {
+	foreachi(auto tt, s->tracks, i) {
 		tt->volume = old_volumes[i];
 		tt->notify(tt->MESSAGE_CHANGE);
 	}

@@ -33,7 +33,7 @@ bool FormatDescriptor::test_compatibility(Song *a) {
 	int num_fx = 0;
 	int num_audio = 0;
 	int num_midi = 0;
-	for (Track *t: a->tracks) {
+	for (Track *t: weak(a->tracks)) {
 		num_fx += t->fx.num;
 		if (t->type == SignalType::AUDIO)
 			num_audio ++;
@@ -71,7 +71,7 @@ void Format::import_data(TrackLayer *layer, void *data, int channels, SampleForm
 
 void Format::load_song(StorageOperationData *od) {
 	od->track = od->song->add_track(SignalType::AUDIO_STEREO, 0);
-	od->layer = od->track->layers[0];
+	od->layer = od->track->layers[0].get();
 	od->allow_channels_change = true;
 	load_track(od);
 }

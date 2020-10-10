@@ -31,7 +31,6 @@ CaptureConsole::CaptureConsole(Session *session):
 {
 	mode = nullptr;
 	state = State::EMPTY;
-	chain = nullptr;
 
 
 	// dialog
@@ -55,13 +54,6 @@ CaptureConsole::CaptureConsole(Session *session):
 	mode_multi = new CaptureConsoleModeMulti(this);
 }
 
-CaptureConsole::~CaptureConsole() {
-	delete mode_audio;
-	delete mode_midi;
-	delete mode_multi;
-	delete peak_meter;
-}
-
 void CaptureConsole::on_enter() {
 	hide_control("single_grid", true);
 	hide_control("multi_grid", true);
@@ -73,7 +65,7 @@ void CaptureConsole::on_enter() {
 	enable("ok", false);
 
 	int num_audio = 0, num_midi = 0;
-	for (Track *t: view->song->tracks)
+	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t)) {
 			if (t->type == SignalType::AUDIO)
 				num_audio ++;
@@ -82,16 +74,16 @@ void CaptureConsole::on_enter() {
 		}
 
 	if ((num_audio == 1) and (num_midi == 0)) {
-		mode = mode_audio;
+		mode = mode_audio.get();
 	} else if ((num_audio == 0) and (num_midi == 1)) {
-		mode = mode_midi;
+		mode = mode_midi.get();
 	} else { // TYPE_TIME
-		mode = mode_multi;
+		mode = mode_multi.get();
 	}
 
 	mode->enter();
 	chain = mode->chain.get();
-	view->mode_capture->chain = chain;
+	view->mode_capture->chain = chain.get();
 
 	view->signal_chain->subscribe(this, [=]{ on_putput_tick(); }, Module::MESSAGE_TICK);
 	view->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);

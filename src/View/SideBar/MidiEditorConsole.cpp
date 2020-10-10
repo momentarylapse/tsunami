@@ -508,8 +508,8 @@ void MidiEditorConsole::on_quantize() {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, mode->sub_beat_partition);
 
 	song->begin_action_group();
-	auto ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref) {
+	auto notes = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: weak(notes)) {
 		view->sel.set(n, false);
 		MidiNote *nn = n->copy();
 		nn->range.set_start(align_to_beats(nn->range.start(), beats));
@@ -527,8 +527,8 @@ void MidiEditorConsole::on_apply_string() {
 		return;
 
 	song->begin_action_group();
-	auto ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref)
+	auto notes = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: weak(notes))
 		layer->midi_note_set_string(n, string_no);
 	song->end_action_group();
 }
@@ -540,8 +540,8 @@ void MidiEditorConsole::on_apply_hand_position() {
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
 	song->begin_action_group();
-	auto ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref) {
+	auto notes = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: weak(notes)) {
  		int stringno = 0;
  		for (int i=0; i<string_pitch.num; i++)
 			if (n->pitch >= string_pitch[i] + hand_position) {
@@ -558,20 +558,20 @@ void MidiEditorConsole::on_apply_pitch_shift() {
 		return;
 
 	song->begin_action_group();
-	auto ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref)
+	auto notes = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: weak(notes))
 		layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
 	song->end_action_group();
 }
 
 void MidiEditorConsole::on_apply_flags(int mask) {
 	song->begin_action_group();
-	auto ref = layer->midi.get_notes_by_selection(view->sel);
+	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	if (mask == 0) {
-		for (auto *n: ref)
+		for (auto *n: weak(notes))
 			layer->midi_note_set_flags(n, 0);
 	} else {
-		for (auto *n: ref)
+		for (auto *n: weak(notes))
 			layer->midi_note_set_flags(n, n->flags | mask);
 
 	}

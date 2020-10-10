@@ -14,14 +14,13 @@ class AudioEffect;
 
 class ActionTrackAddEffect: public Action {
 public:
-	ActionTrackAddEffect(Track *t, AudioEffect *effect);
-	~ActionTrackAddEffect();
+	ActionTrackAddEffect(Track *t, shared<AudioEffect> effect);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	AudioEffect *effect;
+	shared<AudioEffect> effect;
 	Track *track;
 };
 

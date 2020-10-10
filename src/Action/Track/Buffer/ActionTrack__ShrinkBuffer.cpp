@@ -10,8 +10,7 @@
 #include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length)
-{
+ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length) {
 	layer = l;
 	index = _index;
 	new_length = _length;
@@ -19,8 +18,7 @@ ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, 
 	buf = AudioBuffer(0, l->channels);
 }
 
-void ActionTrack__ShrinkBuffer::undo(Data *d)
-{
+void ActionTrack__ShrinkBuffer::undo(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 
 	// restore
@@ -33,8 +31,7 @@ void ActionTrack__ShrinkBuffer::undo(Data *d)
 
 
 
-void *ActionTrack__ShrinkBuffer::execute(Data *d)
-{
+void *ActionTrack__ShrinkBuffer::execute(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));

@@ -48,8 +48,8 @@ void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 	l->song()->begin_action_group();
 
 	for (int i=l->midi.num-1; i>=0; i--)
-		if (sel.has(l->midi[i]))
-			l->delete_midi_note(l->midi[i]);
+		if (sel.has(l->midi[i].get()))
+			l->delete_midi_note(l->midi[i].get());
 
 	auto ref = l->midi.get_notes(Range::ALL);
 
@@ -59,7 +59,7 @@ void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 	l->song()->end_action_group();
 
 	// select new notes
-	for (auto *n: l->midi)
+	for (auto *n: weak(l->midi))
 		if (!ref.has(n))
 			sel.set(n, true);
 }

@@ -13,8 +13,7 @@
 class Song;
 class BarPattern;
 
-class ActionBarEdit: public ActionGroup
-{
+class ActionBarEdit: public ActionGroup {
 public:
 	ActionBarEdit(int index, const BarPattern &bar, int mode);
 

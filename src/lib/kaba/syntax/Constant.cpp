@@ -17,7 +17,6 @@ void rec_assign(void *a, void *b, const Class *type);
 
 
 Value::Value() {
-	type = TypeVoid;
 }
 
 Value::~Value() {
@@ -51,16 +50,17 @@ void Value::init(const Class *_type) {
 }
 
 void Value::clear() {
-	if (type->is_super_array())
-		as_array().simple_clear();
+	if (type)
+		if (type->is_super_array())
+			as_array().simple_clear();
 
 	value.clear();
-	type = TypeVoid;
+	type = nullptr;
 }
 
 void Value::set(const Value &v) {
-	init(v.type);
-	rec_assign(p(), v.p(), type);
+	init(v.type.get());
+	rec_assign(p(), v.p(), type.get());
 }
 
 void* Value::p() const {
@@ -109,7 +109,7 @@ int map_size_complex(void *p, const Class *type) {
 }
 
 int Value::mapping_size() const {
-	return map_size_complex(p(), type);
+	return map_size_complex(p(), type.get());
 }
 
 // map directly into <memory>
@@ -158,11 +158,11 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 }
 
 void Value::map_into(char *memory, char *addr) const {
-	map_into_complex(memory, memory + type->size, addr - memory, (char*)p(), type);
+	map_into_complex(memory, memory + type->size, addr - memory, (char*)p(), type.get());
 }
 
 string Value::str() const {
-	return var_repr(value.data, type);
+	return var_repr(value.data, type.get());
 }
 
 Constant::Constant(const Class *_type, SyntaxTree *_owner) {

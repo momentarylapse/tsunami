@@ -39,7 +39,7 @@ void CaptureConsoleModeMulti::enter() {
 	Array<CaptureTrackData> data;
 
 	// target list multi
-	for (Track *t: song->tracks) {
+	for (Track *t: weak(song->tracks)) {
 		if ((t->type != SignalType::AUDIO) and (t->type != SignalType::MIDI))
 			continue;
 		if (!view->sel.has(t))

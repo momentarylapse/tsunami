@@ -10,13 +10,7 @@
 #include "../../Data/Curve.h"
 
 ActionCurveDelete::ActionCurveDelete(int _index) {
-	curve = nullptr;
 	index = _index;
-}
-
-ActionCurveDelete::~ActionCurveDelete() {
-	if (curve)
-		delete curve;
 }
 
 void* ActionCurveDelete::execute(Data* d) {
@@ -36,6 +30,5 @@ void ActionCurveDelete::undo(Data* d) {
 
 	a->curves.insert(curve, index);
 	a->notify(a->MESSAGE_ADD_CURVE);
-	curve = nullptr;
 }
 

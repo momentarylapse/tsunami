@@ -13,16 +13,14 @@
 class Song;
 class Track;
 
-class ActionSongChangeAllTrackVolumes : public ActionMergable<float>
-{
+class ActionSongChangeAllTrackVolumes : public ActionMergable<float> {
 public:
 	ActionSongChangeAllTrackVolumes(Song *s, Track *t, float volume);
-	virtual ~ActionSongChangeAllTrackVolumes(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 	int track_no;
 	Array<float> old_volumes;

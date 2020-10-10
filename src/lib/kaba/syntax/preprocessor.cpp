@@ -274,7 +274,7 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			}
 		}*/
 	} else if (ptype.num == 4) {
-		if (f->return_type->_amd64_allow_pass_in_xmm and (f->return_type->size == 16)) { // rect, color, plane, quaternion
+		if (f->return_type->_amd64_allow_pass_in_xmm() and (f->return_type->size == 16)) { // rect, color, plane, quaternion
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
 				call4<vec4,float,float,float,float>(ff, ret, param);
 				return true;
@@ -292,7 +292,7 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 }
 
 
-Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
+shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 	db_out("??? " + f->signature());
 
 	if (!f->is_pure())
@@ -327,13 +327,13 @@ Node *eval_function_call(SyntaxTree *tree, Node *c, Function *f) {
 	temp.init(f->return_type);
 	if (!call_function(f, ff, temp.p(), p))
 		return c;
-	Node *r = tree->add_node_const(tree->add_constant(f->return_type));
+	auto r = tree->add_node_const(tree->add_constant(f->return_type));
 	r->as_const()->set(temp);
 	db_out(">>>  " + r->str(tree->base_class));
 	return r;
 }
 
-bool all_params_are_const(Node *n) {
+bool all_params_are_const(shared<Node> n) {
 	for (int i=0; i<n->params.num; i++)
 		if (n->params[i]->kind != NodeKind::CONSTANT)
 			return false;
@@ -398,7 +398,7 @@ void rec_assign(void *a, void *b, const Class *type) {
 }
 
 // BEFORE transforming to call-by-reference!
-Node *SyntaxTree::conv_eval_const_func(Node *c) {
+shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
 	if (c->kind == NodeKind::OPERATOR) {
 		return eval_function_call(this, c, c->as_op()->f);
 	} else if (c->kind == NodeKind::FUNCTION_CALL) {
@@ -407,10 +407,10 @@ Node *SyntaxTree::conv_eval_const_func(Node *c) {
 	return conv_eval_const_func_nofunc(c);
 }
 
-Node *SyntaxTree::conv_eval_const_func_nofunc(Node *c) {
+shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 	if (c->kind == NodeKind::DYNAMIC_ARRAY) {
 		if (all_params_are_const(c)) {
-			Node *cr = add_node_const(add_constant(c->type));
+			auto cr = add_node_const(add_constant(c->type));
 			DynamicArray *da = &c->params[0]->as_const()->as_array();
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)da->data + index * da->element_size, c->type);
@@ -419,14 +419,14 @@ Node *SyntaxTree::conv_eval_const_func_nofunc(Node *c) {
 	} else if (c->kind == NodeKind::ARRAY) {
 		// hmmm, not existing, I guess....
 		if (all_params_are_const(c)) {
-			Node *cr = add_node_const(add_constant(c->type));
+			auto cr = add_node_const(add_constant(c->type));
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)c->params[0]->as_const()->p() + index * c->type->size, c->type);
 			return cr;
 		}
 	} else if (c->kind == NodeKind::ARRAY_BUILDER) {
 		if (all_params_are_const(c)) {
-			Node *c_array = add_node_const(add_constant(c->type));
+			auto c_array = add_node_const(add_constant(c->type));
 			DynamicArray &da = c_array->as_const()->as_array();
 			rec_resize(&da, c->params.num, c->type);
 			for (int i=0; i<c->params.num; i++)
@@ -442,7 +442,7 @@ Node *SyntaxTree::conv_eval_const_func_nofunc(Node *c) {
 
 
 // may not use AddConstant()!!!
-Node *SyntaxTree::pre_process_node_addresses(Node *c) {
+shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 	if (c->kind == NodeKind::INLINE_CALL) {
 		auto *f = c->as_func();
 		//if (!f->is_pure or !f->address_preprocess)
@@ -464,10 +464,10 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 			return c;
 
 		c->params[0]->link_no = new_addr;
-		return c->params[0];
+		return c->params[0].get();
 
 	} else if (c->kind == NodeKind::REFERENCE) {
-		Node *p0 = c->params[0];
+		auto p0 = c->params[0];
 		if (p0->kind == NodeKind::VAR_GLOBAL) {
 			return new Node(NodeKind::ADDRESS, (int_p)p0->as_global_p(), c->type);
 		} else if (p0->kind == NodeKind::VAR_LOCAL) {
@@ -476,7 +476,7 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 			return new Node(NodeKind::ADDRESS, (int_p)p0->as_const_p(), c->type);
 		}
 	} else if (c->kind == NodeKind::DEREFERENCE) {
-		Node *p0 = c->params[0];
+		auto p0 = c->params[0];
 		if (p0->kind == NodeKind::ADDRESS) {
 			return new Node(NodeKind::MEMORY, p0->link_no, c->type);
 		} else if (p0->kind == NodeKind::LOCAL_ADDRESS) {
@@ -488,14 +488,14 @@ Node *SyntaxTree::pre_process_node_addresses(Node *c) {
 
 void SyntaxTree::eval_const_expressions(bool allow_func_eval) {
 	if (allow_func_eval) {
-		transform([&](Node *n){ return conv_eval_const_func(n); });
+		transform([&](shared<Node> n){ return conv_eval_const_func(n); });
 	} else {
-		transform([&](Node *n){ return conv_eval_const_func_nofunc(n); });
+		transform([&](shared<Node> n){ return conv_eval_const_func_nofunc(n); });
 	}
 }
 
 void SyntaxTree::pre_processor_addresses() {
-	transform([&](Node *n){ return pre_process_node_addresses(n); });
+	transform([&](shared<Node> n){ return pre_process_node_addresses(n); });
 }
 
 };

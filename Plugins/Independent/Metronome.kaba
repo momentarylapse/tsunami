@@ -265,11 +265,11 @@ class Metronome extends TsunamiPlugin
 		
 		Module *beat_midifier = chain.add(Module.PLUMBING, "BeatMidifier")
 		Module *synth = chain.add(Module.SYNTHESIZER, "")
-		Module *out = chain.add(Module.STREAM, "AudioOutput")
+		Module *output = chain.add(Module.STREAM, "AudioOutput")
 		
 		chain.connect(source, 0, beat_midifier, 0)
 		chain.connect(beat_midifier, 0, synth, 0)
-		chain.connect(synth, 0, out, 0)
+		chain.connect(synth, 0, output, 0)
 		
 		chain.set_buffer_size(1024)
 		#chain.set_update_dt(UPDATE_DT)

@@ -13,8 +13,7 @@
 
 class TrackLayer;
 
-class ActionTrack__ShrinkBuffer : public Action
-{
+class ActionTrack__ShrinkBuffer : public Action {
 public:
 	ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length);
 

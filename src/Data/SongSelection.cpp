@@ -46,17 +46,17 @@ SongSelection SongSelection::from_range(Song *song, const Range &r) {
 
 	s._update_bars(song);
 
-	for (Track *t: song->tracks) {
-		for (auto *l: t->layers) {
+	for (Track *t: weak(song->tracks)) {
+		for (auto *l: weak(t->layers)) {
 			s.add(l);
 
-			for (auto *n: l->midi)
+			for (auto *n: weak(l->midi))
 				s.set(n, s.range().overlaps(n->range));
 				
-			for (auto *m: l->markers)
+			for (auto *m: weak(l->markers))
 				s.set(m, s.range().overlaps(m->range));
 
-			for (auto *sr: l->samples)
+			for (auto *sr: weak(l->samples))
 				s.set(sr, s.range().overlaps(sr->range()));
 		}
 	}
@@ -81,15 +81,15 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 		if (has(l))
 			s.add(l);
 
-		for (auto m: l->markers)
+		for (auto m: weak(l->markers))
 			if (has(m))
 				s.add(m);
 
-		for (auto *n: l->midi)
+		for (auto *n: weak(l->midi))
 			if (has(n))
 				s.add(n);
 
-		for (auto *sr: l->samples)
+		for (auto *sr: weak(l->samples))
 			if (has(sr))
 				s.add(sr);
 
@@ -123,7 +123,7 @@ void SongSelection::_update_bars(Song* s) {
 		return;
 
 	int pos = 0;
-	foreachi(Bar *b, s->bars, i) {
+	foreachi(Bar *b, weak(s->bars), i) {
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
 		if (r.overlaps(range()))
@@ -133,7 +133,7 @@ void SongSelection::_update_bars(Song* s) {
 }
 
 bool SongSelection::has(const Track *t) const {
-	for (auto *l: t->layers)
+	for (auto *l: weak(t->layers))
 		if (has(l))
 			return true;
 	return false;
@@ -188,7 +188,7 @@ bool SongSelection::is_empty() const {
 
 Array<int> SongSelection::bar_indices(Song *song) const {
 	Array<int> indices;
-	foreachi(Bar *b, song->bars, i)
+	foreachi(Bar *b, weak(song->bars), i)
 		if (has(b))
 			indices.add(i);
 	return indices;
@@ -203,7 +203,7 @@ Array<const T*> constify_array(const Array<T*> &array) {
 }
 
 SongSelection SongSelection::restrict_to_track(Track *t) const {
-	return filter(constify_array(t->layers));
+	return filter(constify_array(weak(t->layers)));
 }
 
 SongSelection SongSelection::restrict_to_layer(TrackLayer *l) const {

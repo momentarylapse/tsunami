@@ -111,7 +111,7 @@ void SerializerAMD64::fc_end(int push_size, const Array<SerialNodeParam> &params
 
 	// return > 4b already got copied to [ret] by the function!
 	if ((type != TypeVoid) and (!type->uses_return_by_memory())) {
-		if (type->_amd64_allow_pass_in_xmm) {
+		if (type->_amd64_allow_pass_in_xmm()) {
 			if (type == TypeFloat32) {
 				add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
 			} else if (type == TypeFloat64) {
@@ -213,21 +213,21 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 	// return, instance, params
 	Array<Variable*> param;
 	if (f->return_type->uses_return_by_memory()){
-		for (Variable *v: f->var)
+		for (Variable *v: weak(f->var))
 			if (v->name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (!f->is_static()){
-		for (Variable *v: f->var)
+		for (Variable *v: weak(f->var))
 			if (v->name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
 			}
 	}
 	for (int i=0;i<f->num_params;i++)
-		param.add(f->var[i]);
+		param.add(f->var[i].get());
 
 	// map params...
 	Array<Variable*> reg_param;

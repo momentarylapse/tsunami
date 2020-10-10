@@ -39,10 +39,10 @@ void ActionBarDelete::build(Data *d) {
 	if (affect_data) {
 		SongSelection sel = SongSelection::from_range(s, r).filter(SongSelection::Mask::SAMPLES);
 
-		for (Track *t: s->tracks) {
+		for (auto t: weak(s->tracks)) {
 			
-			for (TrackLayer *l: t->layers) {
-				foreachib (TrackMarker *m, l->markers, i) {
+			for (auto l: weak(t->layers)) {
+				foreachib (auto m, weak(l->markers), i) {
 					if (r.covers(m->range)) {
 						// cover
 						add_sub_action(new ActionTrackDeleteMarker(l, i), d);
@@ -58,7 +58,7 @@ void ActionBarDelete::build(Data *d) {
 					}
 				}
 
-				foreachib (MidiNote *m, l->midi, i) {
+				foreachib (auto m, weak(l->midi), i) {
 					if (r.covers(m->range)) {
 						// cover
 						add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);

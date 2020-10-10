@@ -84,7 +84,7 @@ public:
 	NodeKind kind;
 	int64 link_no;
 	// parameters
-	Array<Node*> params;
+	shared_array<Node> params;
 	// linking of class function instances
 	// return value
 	const Class *type;
@@ -110,8 +110,8 @@ public:
 	Variable *as_global() const;
 	Variable *as_local() const;
 	void set_num_params(int n);
-	void set_param(int index, Node *p);
-	void set_instance(Node *p);
+	void set_param(int index, shared<Node> p);
+	void set_instance(shared<Node> p);
 	string sig(const Class *ns) const;
 	string str(const Class *ns) const;
 	void show(const Class *ns) const;
@@ -133,12 +133,12 @@ public:
 	void *_start, *_end; // opcode range
 	int _label_start, _label_end;
 	int level;
-	void add(Node *c);
-	void set(int index, Node *c);
+	void add(shared<Node> c);
+	void set(int index, shared<Node> c);
 	
 	const Class *name_space() const;
 
-	Variable *get_var(const string &name);
+	Variable *get_var(const string &name) const;
 	Variable *add_var(const string &name, const Class *type, bool is_const = false);
 };
 

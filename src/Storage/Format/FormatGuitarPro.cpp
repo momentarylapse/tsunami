@@ -111,7 +111,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
 
 	//Array<Track*> tracks;
-	for (Track *t : song->tracks)
+	for (Track *t : weak(song->tracks))
 		if (t->type == SignalType::MIDI){
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
@@ -669,7 +669,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 	auto notes = t->t->layers[0]->midi.get_notes(b->range());
 	Array<GuitarNote> gnotes;
 
-	for (MidiNote *n : notes){
+	for (MidiNote *n : weak(notes)){
 		Range r = n->range and b->range();
 		GuitarNote gn;
 		gn.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);

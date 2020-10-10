@@ -21,7 +21,7 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 	int bar_index = 0;
 	int bar_no = 0;
 
-	for (Bar *b: *this) {
+	for (Bar *b: weak(*this)) {
 		if (!b->is_pause()) {
 			auto _beats = b->get_beats(pos_bar, include_sub_beats, sub_beat_partition);
 			for (Beat &bb: _beats)
@@ -47,7 +47,7 @@ Array<Bar*> BarCollection::get_bars(const Range &r) const {
 	int pos0 = 0;
 	int index = 0;
 	int bar_no_text = 0;
-	for (Bar *b: *this) {
+	for (Bar *b: weak(*this)) {
 		Range rr = Range(pos0, b->length);
 		b->index = index;
 		b->index_text = bar_no_text;
@@ -134,7 +134,7 @@ Range BarCollection::expand(const Range &r, int beat_partition) const {
 
 Range BarCollection::range() const {
 	int pos0 = 0;
-	for (Bar *b: *this)
+	for (Bar *b: weak(*this))
 		pos0 += b->length;
 	return Range(0, pos0);
 }

@@ -15,12 +15,12 @@ ActionTrackMoveMidiEffect::ActionTrackMoveMidiEffect(Track* t, int _source, int 
 }
 
 void* ActionTrackMoveMidiEffect::execute(Data* d) {
-	track->midi_fx.move(source, target);
+	weak(track->midi_fx).move(source, target);
 	track->notify();
 	return nullptr;
 }
 
 void ActionTrackMoveMidiEffect::undo(Data* d) {
-	track->midi_fx.move(target, source);
+	weak(track->midi_fx).move(target, source);
 	track->notify();
 }

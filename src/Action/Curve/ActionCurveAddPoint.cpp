@@ -9,7 +9,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveAddPoint::ActionCurveAddPoint(Curve *_curve, int _pos, float _value) {
+ActionCurveAddPoint::ActionCurveAddPoint(shared<Curve> _curve, int _pos, float _value) {
 	curve = _curve;
 	index = curve->points.num;
 	pos = _pos;

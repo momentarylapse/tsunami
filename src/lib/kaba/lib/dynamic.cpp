@@ -176,7 +176,7 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 				offset = e.offset;
 			}
 		if (!by_type) {
-			for (auto *f: rel->functions)
+			for (auto *f: weak(rel->functions))
 				if (f->name == by) {
 					if (f->num_params > 0)
 						kaba_raise_exception(new KabaException("can only sort by a function without parameters"));

@@ -43,7 +43,7 @@ MidiPainter* midi_context(AudioViewLayer *l);
 
 Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start) {
 	Range allowed = Range::ALL;
-	for (MidiNote *n: l->midi) {
+	for (MidiNote *n: weak(l->midi)) {
 		for (int p: pitch)
 			if (n->pitch == p) {
 				if (n->range.is_inside(start))
@@ -686,7 +686,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.pitch = uniclef_to_pitch(upos, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
 
-			for (auto *n: l->midi)
+			for (auto *n: weak(l->midi))
 				if (hover_note_classical(*n, s, this)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;
@@ -698,7 +698,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.modifier = modifier;
 			s.type = HoverData::Type::CLEF_POSITION;
 
-			for (auto *n: l->midi)
+			for (auto *n: weak(l->midi))
 				if (hover_note_tab(*n, s, this)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;
@@ -709,7 +709,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.clef_position = mp->y2clef_linear(my, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
 
-			for (auto *n: l->midi)
+			for (auto *n: weak(l->midi))
 				if (hover_note_linear(*n, s, this)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;

@@ -348,7 +348,7 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 	Array<QuantizedNote> ndata;
 	float y_mid = (mp->area.y1 + mp->area.y2) / 2;
 
-	for (MidiNote *n: bnotes) {
+	for (MidiNote *n: weak(bnotes)) {
 		Range r = n->range - b->offset;
 		if (r.offset < 0)
 			continue;
@@ -505,7 +505,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 	color cc = colors.text;
 	cc.a = 0.4f;
 	Array<SampleRef*> *p = nullptr;
-	if ((synth) and (synth->module_subtype == "Sample")) {
+	if (synth and (synth->module_subtype == "Sample")) {
 		auto *c = synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
@@ -569,7 +569,7 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 
 	// draw notes
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: notes) {
+	for (MidiNote *n: weak(notes)) {
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		draw_note_linear(c, *n, note_state(n, as_reference, sel, hover));
@@ -643,7 +643,7 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: notes)
+	for (MidiNote *n: weak(notes))
 		draw_note_tab(c,  n,  note_state(n, as_reference, sel, hover));
 	c->set_antialiasing(false);
 
@@ -740,7 +740,7 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: notes)
+	for (MidiNote *n: weak(notes))
 		draw_note_classical(c, n, note_state(n, as_reference, sel, hover));
 	c->set_antialiasing(false);
 
@@ -770,7 +770,7 @@ void MidiPainter::draw_low_detail_dummy_part(Painter *c, const Range &r, const M
 	float x0, x1;
 	cam->range2screen(r, x0, x1);
 	int count[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
-	for (MidiNote *n: notes)
+	for (MidiNote *n: weak(notes))
 		count[pitch_to_rel(n->pitch)] ++;
 	for (int i=0; i<12; i++) {
 		if (count[i] == 0)
@@ -788,7 +788,7 @@ void MidiPainter::draw_low_detail_dummy_part(Painter *c, const Range &r, const M
 
 Range extend_range_to_bars(const Range &r, const BarCollection &bars) {
 	Range rr = r;
-	for (auto &b: bars) {
+	for (auto b: weak(bars)) {
 		if (b->range().is_more_inside(rr.start()))
 			rr.set_start(b->range().start());
 		if (b->range().is_more_inside(rr.end()))

@@ -8,7 +8,7 @@
 #include "ActionTrackDeleteMidiNote.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer* l, int _index) {
+ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
 	note = layer->midi[index];

@@ -31,7 +31,7 @@ public:
 	Track *selected = nullptr;
 	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog("track-selector", parent) {
 		song = _song;
-		for (Track *t: song->tracks)
+		for (Track *t: weak(song->tracks))
 			add_string("tracks", t->nice_name());
 		event("tracks", [=]{ on_select(); });
 		event("ok", [=]{ on_select(); });
@@ -40,7 +40,7 @@ public:
 	void on_select() {
 		int n = get_int("");
 		if (n >= 0)
-			selected = song->tracks[n];
+			selected = song->tracks[n].get();
 		destroy();
 	}
 };
@@ -195,14 +195,14 @@ public:
 	void on_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
-			select_module(track->fx[n]);
+			select_module(track->fx[n].get());
 		else
 			select_module(nullptr);
 	}
 	void on_fx_edit() {
 		int n = hui::GetEvent()->row;
 		if (n >= 0)
-			track->enable_effect(track->fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
+			track->enable_effect(track->fx[n].get(), get_cell("", n, hui::GetEvent()->column)._bool());
 	}
 	void on_fx_move() {
 		int s = hui::GetEvent()->row;
@@ -220,21 +220,21 @@ public:
 	void on_fx_delete() {
 		int n = get_int("fx");
 		if (n >= 0)
-			track->delete_effect(track->fx[n]);
+			track->delete_effect(track->fx[n].get());
 	}
 	void on_fx_enabled() {
 		int n = get_int("fx");
 		if (n >= 0)
-			track->enable_effect(track->fx[n], !track->fx[n]->enabled);
+			track->enable_effect(track->fx[n].get(), !track->fx[n]->enabled);
 	}
 	void on_fx_copy_from_track() {
 		auto dlg = ownify(new TrackSelectionDialog(win, track->song));
 		dlg->run();
 		if (dlg->selected and dlg->selected != track) {
 			track->song->begin_action_group();
-			foreachb (auto *fx, track->fx)
+			foreachb (auto *fx, weak(track->fx))
 				track->delete_effect(fx);
-			for (auto *fx: dlg->selected->fx)
+			for (auto *fx: weak(dlg->selected->fx))
 				track->add_effect((AudioEffect*)fx->copy());
 			track->song->end_action_group();
 		}
@@ -249,14 +249,14 @@ public:
 	void on_midi_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
-			select_module(track->midi_fx[n]);
+			select_module(track->midi_fx[n].get());
 		else
 			select_module(nullptr);
 	}
 	void on_midi_fx_edit() {
 		int n = hui::GetEvent()->row;
 		if (n >= 0)
-			track->enable_midi_effect(track->midi_fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
+			track->enable_midi_effect(track->midi_fx[n].get(), get_cell("", n, hui::GetEvent()->column)._bool());
 	}
 	void on_midi_fx_move() {
 		int s = hui::GetEvent()->row;
@@ -305,20 +305,20 @@ public:
 
 		// fx list
 		reset("fx");
-		for (auto *fx: track->fx)
+		for (auto *fx: weak(track->fx))
 			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
 
 		// midi fx list
 		reset("midi-fx");
-		for (auto *fx: track->midi_fx)
+		for (auto *fx: weak(track->midi_fx))
 			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
 		
 		update_fx_list_selection();
 	}
 	void update_fx_list_selection() {
 		if (track) {
-			set_int("fx", track->fx.find((AudioEffect*)selected_module));
-			set_int("midi-fx", track->midi_fx.find((MidiEffect*)selected_module));
+			set_int("fx", weak(track->fx).find((AudioEffect*)selected_module));
+			set_int("midi-fx", weak(track->midi_fx).find((MidiEffect*)selected_module));
 		}
 	}
 
@@ -406,7 +406,7 @@ void MixingConsole::on_chain_state_change() {
 		peak_runner_id = -1;
 		// clear
 		view->renderer->clear_peaks();
-		for (auto *m: mixer)
+		for (auto &m: mixer)
 			m->redraw("peaks");
 	} else if (peak_runner_id == -1 and view->signal_chain->is_playback_active()) {
 		peak_runner_id = hui::RunRepeated(0.1f, [=]{ for (auto *m: mixer) m->redraw("peaks"); });
@@ -418,14 +418,14 @@ void MixingConsole::on_output_volume() {
 }
 
 void MixingConsole::show_fx(Track *t) {
-	for (auto *m: mixer)
+	for (auto &m: mixer)
 		m->show_fx(m->track == t);
 }
 
 void MixingConsole::load_data() {
 	// how many TrackMixers still match?
 	int n_ok = 0;
-	foreachi (auto *m, mixer, i) {
+	foreachi (auto &m, mixer, i) {
 		if (!m->vtrack)
 			break;
 		if (i >= view->vtrack.num)
@@ -462,7 +462,7 @@ void MixingConsole::on_tracks_change() {
 }
 
 void MixingConsole::update_all() {
-	for (auto *m: mixer)
+	for (auto &m: mixer)
 		m->update();
 }
 

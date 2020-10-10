@@ -10,6 +10,7 @@
 #include "base.h"
 #include "Song.h"
 #include "CrossFade.h"
+#include "Sample.h"
 #include "SampleRef.h"
 #include "TrackMarker.h"
 #include "Audio/AudioBuffer.h"
@@ -54,10 +55,10 @@ Range TrackLayer::range(int keep_notes) const {
 	if ((type == SignalType::MIDI) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
 
-	for (TrackMarker *m: markers)
+	for (TrackMarker *m: weak(markers))
 		r = r or m->range;
 
-	for (SampleRef *s: samples)
+	for (SampleRef *s: weak(samples))
 		r = r or s->range();
 
 	return r;
@@ -72,7 +73,7 @@ Song *TrackLayer::song() const {
 int TrackLayer::version_number() const {
 	if (!track)
 		return 0;
-	foreachi (TrackLayer *l, track->layers, i)
+	foreachi (TrackLayer *l, weak(track->layers), i)
 		if (l == this)
 			return i;
 	return 0;
@@ -113,7 +114,7 @@ Array<Range> TrackLayer::inactive_version_ranges() const {
 }
 
 Array<TrackMarker*> TrackLayer::markers_sorted() const {
-	auto sorted = markers;
+	auto sorted = weak(markers);
 	for (int i=0; i<sorted.num; i++)
 		for (int j=i+1; j<sorted.num; j++)
 			if (sorted[i]->range.offset > sorted[j]->range.offset)
@@ -199,7 +200,7 @@ void TrackLayer::add_midi_note(MidiNote *n) {
 
 void TrackLayer::add_midi_notes(const MidiNoteBuffer &notes) {
 	track->song->begin_action_group();
-	for (MidiNote *n: notes)
+	for (MidiNote *n: weak(notes))
 		add_midi_note(n);
 	track->song->end_action_group();
 }
@@ -217,7 +218,7 @@ void TrackLayer::midi_note_set_flags(MidiNote *note, int flags) {
 }
 
 void TrackLayer::delete_midi_note(const MidiNote *note) {
-	foreachi(MidiNote *n, midi, index)
+	foreachi(MidiNote *n, weak(midi), index)
 		if (n == note)
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
@@ -229,7 +230,7 @@ TrackMarker *TrackLayer::add_marker(const Range &range, const string &text) {
 }
 
 void TrackLayer::delete_marker(const TrackMarker *marker) {
-	foreachi(const TrackMarker *m, markers, index)
+	foreachi(const TrackMarker *m, weak(markers), index)
 		if (m == marker)
 			track->song->execute(new ActionTrackDeleteMarker(this, index));
 }

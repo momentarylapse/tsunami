@@ -12,8 +12,7 @@
 
 class Song;
 
-class ActionBarDelete: public ActionGroup
-{
+class ActionBarDelete: public ActionGroup {
 public:
 	ActionBarDelete(int index, bool affect_data);
 

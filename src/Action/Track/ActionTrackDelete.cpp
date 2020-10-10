@@ -12,6 +12,7 @@
 #include "Buffer/ActionTrack__DeleteBuffer.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/SampleRef.h"
 
 ActionTrackDelete::ActionTrackDelete(Track *_track) {
 	track = _track;
@@ -20,7 +21,7 @@ ActionTrackDelete::ActionTrackDelete(Track *_track) {
 void ActionTrackDelete::build(Data *d) {
 
 	// delete buffers
-	for (auto *l: track->layers) {
+	for (auto *l: weak(track->layers)) {
 		for (int i=l->buffers.num-1; i>=0; i--)
 			add_sub_action(new ActionTrack__DeleteBuffer(l, i), d);
 

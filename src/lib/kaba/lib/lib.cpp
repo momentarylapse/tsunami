@@ -41,8 +41,6 @@ const string IDENTIFIER_FUNC_LENGTH = "__length__";
 const string IDENTIFIER_FUNC_STR = "__str__";
 const string IDENTIFIER_FUNC_REPR = "__repr__";
 const string IDENTIFIER_FUNC_SUBARRAY = "__subarray__";
-const string IDENTIFIER_FUNC_SHARED_REF = "_ref";
-const string IDENTIFIER_FUNC_SHARED_UNREF = "_unref";
 const string IDENTIFIER_FUNC_SHARED_CLEAR = "_clear";
 const string IDENTIFIER_FUNC_SHARED_CREATE = "_create";
 const string IDENTIFIER_SUPER = "super";
@@ -60,6 +58,7 @@ const string IDENTIFIER_LET = "let";
 const string IDENTIFIER_NAMESPACE = "namespace";
 const string IDENTIFIER_RETURN_VAR = "-return-";
 const string IDENTIFIER_VTABLE_VAR = "-vtable-";
+const string IDENTIFIER_SHARED_COUNT = "_shared_ref_count";
 const string IDENTIFIER_ENUM = "enum";
 const string IDENTIFIER_CONST = "const";
 const string IDENTIFIER_OUT = "out";
@@ -68,6 +67,10 @@ const string IDENTIFIER_VIRTUAL = "virtual";
 const string IDENTIFIER_EXTERN = "extern";
 //const string IDENTIFIER_ACCESSOR = "accessor";
 const string IDENTIFIER_SELFREF = "selfref";
+const string IDENTIFIER_SHARED = "shared";
+const string IDENTIFIER_OWNED = "owned";
+const string IDENTIFIER_PURE = "pure";
+const string IDENTIFIER_THROWS = "throws";
 const string IDENTIFIER_USE = "use";
 const string IDENTIFIER_IMPORT = "import";
 const string IDENTIFIER_RETURN = "return";
@@ -194,7 +197,7 @@ const Class *TypeFunctionCodeP;
 extern const Class *TypePath;
 
 
-Array<Script*> packages;
+shared_array<Script> packages;
 Script *cur_package = nullptr;
 
 
@@ -203,6 +206,14 @@ static Class *cur_class;
 
 bool flags_has(Flags flags, Flags t) {
 	return ((int(flags) & int(t)) == int(t));
+}
+
+void flags_set(Flags &flags, Flags t) {
+	flags = Flags(int(flags) | int(t));
+}
+
+void flags_clear(Flags &flags, Flags t) {
+	flags = Flags(int(flags) & (~int(t)));
 }
 
 Flags flags_mix(const Array<Flags> &f) {
@@ -215,15 +226,15 @@ Flags flags_mix(const Array<Flags> &f) {
 void add_package(const string &name, Flags flags) {
 	for (auto &p: packages)
 		if (p->filename.str() == name) {
-			cur_package = p;
+			cur_package = p.get();
 			return;
 		}
-	Script* s = new Script;
+	shared<Script> s = new Script;
 	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
 	s->syntax->base_class->name = name;
 	s->filename = name;
 	packages.add(s);
-	cur_package = s;
+	cur_package = s.get();
 }
 
 void __add_class__(Class *t, const Class *name_space) {
@@ -239,7 +250,7 @@ void __add_class__(Class *t, const Class *name_space) {
 const Class *add_type(const string &name, int size, Flags flag, const Class *name_space) {
 	Class *t = new Class(name, size, cur_package->syntax);
 	if (flags_has(flag, Flags::CALL_BY_VALUE))
-		t->force_call_by_value = true;
+		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, name_space);
 	return t;
 }
@@ -408,7 +419,7 @@ int _class_override_num_params = -1;
 void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 	Class *c = const_cast<Class*>(ccc);
 	if (flags_has(flag, Flags::OVERRIDE)) {
-		foreachi(Function *ff, c->functions, i)
+		foreachi(Function *ff, weak(c->functions), i)
 			if (ff->name == f->name) {
 				if (_class_override_num_params < 0 or _class_override_num_params == ff->num_params) {
 					//msg_write("OVERRIDE");
@@ -869,7 +880,7 @@ void link_external(const string &name, void *pointer) {
 
 	Array<string> names = name.explode(":");
 	string sname = names[0].replace("@list", "[]").replace("@@", ".");
-	for (auto *p: packages)
+	for (auto p: packages)
 		foreachi(Function *f, p->syntax->functions, i)
 			if (f->cname(p->base_class()) == sname) {
 				int n = f->num_params;
@@ -948,7 +959,7 @@ int process_class_num_virtuals(const string &class_name, int num_virtual) {
 }
 
 void clean_up() {
-	DeleteAllScripts(true, true);
+	delete_all_scripts(true, true);
 
 	packages.clear();
 

@@ -9,7 +9,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveEdit::ActionCurveEdit(Curve *_curve, const string &_name, float _min, float _max, Array<Curve::Target> &_targets) {
+ActionCurveEdit::ActionCurveEdit(shared<Curve> _curve, const string &_name, float _min, float _max, Array<Curve::Target> &_targets) {
 	curve = _curve;
 	name = _name;
 	min = _min;

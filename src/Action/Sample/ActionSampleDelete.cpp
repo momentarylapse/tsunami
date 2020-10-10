@@ -11,7 +11,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Sample.h"
 
-ActionSampleDelete::ActionSampleDelete(Sample *s) {
+ActionSampleDelete::ActionSampleDelete(shared<Sample> s) {
 	sample = s;
 	index = -1;
 }
@@ -19,7 +19,7 @@ ActionSampleDelete::ActionSampleDelete(Sample *s) {
 void *ActionSampleDelete::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(sample->ref_count == 0);
-	index = a->samples.find(sample.get());
+	index = weak(a->samples).find(sample.get());
 	assert(index >= 0);
 
 	sample->fake_death();

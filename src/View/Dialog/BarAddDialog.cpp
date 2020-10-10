@@ -27,7 +27,7 @@ BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
-		foreachi(Bar *b, song->bars, i)
+		foreachi(Bar *b, weak(song->bars), i)
 			if ((i <= index) and (!b->is_pause())){
 				new_bar = *b;
 			}

@@ -11,7 +11,7 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l) {
+ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, shared<TrackLayer> l) {
 	track = t;
 	layer = l;
 }
@@ -21,15 +21,13 @@ void* ActionTrackLayerAdd::execute(Data* d) {
 
 	track->layers.add(layer);
 	a->notify(a->MESSAGE_ADD_LAYER);
-	layer = nullptr;
 
-	return track->layers.back();
+	return layer.get();
 }
 
 void ActionTrackLayerAdd::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
-	layer = track->layers.back();
 	layer->fake_death();
 	track->layers.pop();
 

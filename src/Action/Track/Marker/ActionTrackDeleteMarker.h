@@ -14,7 +14,7 @@ class TrackMarker;
 
 class ActionTrackDeleteMarker: public Action {
 public:
-	ActionTrackDeleteMarker(TrackLayer *l, int index);
+	ActionTrackDeleteMarker(shared<TrackLayer> l, int index);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -22,7 +22,7 @@ public:
 private:
 	int index;
 	shared<TrackMarker> marker;
-	TrackLayer *layer;
+	shared<TrackLayer> layer;
 };
 
 #endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_ */

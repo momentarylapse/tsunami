@@ -9,16 +9,14 @@
 #include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length)
-{
+ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length) {
 	layer = l;
 	index = _index;
 	new_length = _new_length;
 	old_length = 0;
 }
 
-void *ActionTrack__GrowBuffer::execute(Data *d)
-{
+void *ActionTrack__GrowBuffer::execute(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	old_length = b.length;
 	b.resize(new_length);
@@ -28,8 +26,7 @@ void *ActionTrack__GrowBuffer::execute(Data *d)
 
 
 
-void ActionTrack__GrowBuffer::undo(Data *d)
-{
+void ActionTrack__GrowBuffer::undo(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	b.resize(old_length);
 }

@@ -10,7 +10,7 @@
 #include "../../Data/Curve.h"
 
 
-ActionCurveDeletePoint::ActionCurveDeletePoint(Curve *_curve, int _index) {
+ActionCurveDeletePoint::ActionCurveDeletePoint(shared<Curve> _curve, int _index) {
 	curve = _curve;
 	index = _index;
 	pos = 0;

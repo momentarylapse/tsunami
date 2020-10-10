@@ -10,8 +10,7 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/SampleRef.h"
 
-ActionTrackEditSample::ActionTrackEditSample(SampleRef *_ref, float volume, bool mute)
-{
+ActionTrackEditSample::ActionTrackEditSample(shared<SampleRef> _ref, float volume, bool mute) {
 	ref = _ref;
 	old_value.volume = ref->volume;
 	old_value.mute = ref->muted;
@@ -19,8 +18,7 @@ ActionTrackEditSample::ActionTrackEditSample(SampleRef *_ref, float volume, bool
 	new_value.mute = mute;
 }
 
-void *ActionTrackEditSample::execute(Data *d)
-{
+void *ActionTrackEditSample::execute(Data *d) {
 	//Song *a = dynamic_cast<Song*>(d);
 
 	ref->volume = new_value.volume;
@@ -30,8 +28,7 @@ void *ActionTrackEditSample::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTrackEditSample::undo(Data *d)
-{
+void ActionTrackEditSample::undo(Data *d) {
 	//Song *a = dynamic_cast<Song*>(d);
 
 	ref->volume = old_value.volume;
@@ -40,11 +37,10 @@ void ActionTrackEditSample::undo(Data *d)
 }
 
 
-bool ActionTrackEditSample::mergable(Action *a)
-{
-	ActionTrackEditSample *aa = dynamic_cast<ActionTrackEditSample*>(a);
+bool ActionTrackEditSample::mergable(Action *a) {
+	auto aa = dynamic_cast<ActionTrackEditSample*>(a);
 	if (!aa)
 		return false;
-	return (aa->ref == ref);
+	return (aa->ref == ref.get());
 }
 

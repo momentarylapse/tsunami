@@ -48,7 +48,7 @@ void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 void render_midi(Image &im, MidiNoteBuffer &m) {
 	int w = im.width;
 	int h = im.height;
-	for (MidiNote *n: m) {
+	for (MidiNote *n: weak(m)) {
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n->range.offset / (float)m.samples, 0, 1);
 		float x1 = w * clampf((float)n->range.end() / (float)m.samples, 0, 1);
@@ -159,7 +159,7 @@ int SampleManagerConsole::get_index(Sample *s) {
 
 void SampleManagerConsole::update_list() {
 	// new samples?
-	for (Sample *s: song->samples)
+	for (Sample *s: weak(song->samples))
 		if (get_index(s) < 0)
 			add(new SampleManagerItem(this, s, view));
 }
@@ -234,8 +234,8 @@ void SampleManagerConsole::on_create_from_selection() {
 				l->read_buffers_fixed(buf, view->sel.range());
 				song->create_sample_audio("-new-", buf);
 			} else if (l->type == SignalType::MIDI) {
-				MidiNoteBuffer buf = l->midi.get_notes(view->sel.range());
-				for (auto *n: buf)
+				auto buf = l->midi.get_notes(view->sel.range());
+				for (auto *n: weak(buf))
 					n->range.offset -= view->sel.range().offset;
 				song->create_sample_midi("-new-", buf);
 			}
@@ -376,7 +376,7 @@ public:
 		song = session->song.get();
 		selected = nullptr;
 		_old = old;
-		for (Sample *s: song->samples)
+		for (Sample *s: weak(song->samples))
 			if (s == old)
 				selected = s;
 
@@ -401,7 +401,7 @@ public:
 
 		set_string(list_id, _("\\- none -\\"));
 		set_int(list_id, 0);
-		foreachi(Sample *s, song->samples, i) {
+		foreachi(Sample *s, weak(song->samples), i) {
 			icon_names.add(render_sample(s, session->view));
 			set_string(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf->length) + "\\" + s->name);
 			if (s == selected)
@@ -413,7 +413,7 @@ public:
 		int n = get_int("");
 		selected = nullptr;
 		if (n >= 1)
-			selected = song->samples[n - 1];
+			selected = song->samples[n - 1].get();
 		enable("ok", n >= 0);
 	}
 
@@ -423,7 +423,7 @@ public:
 			selected = nullptr;
 			destroy();
 		} else if (n >= 1) {
-			selected = song->samples[n - 1];
+			selected = song->samples[n - 1].get();
 			destroy();
 		}
 	}

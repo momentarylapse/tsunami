@@ -15,7 +15,7 @@ class TrackLayer;
 
 class ActionTrackLayerAdd : public Action {
 public:
-	ActionTrackLayerAdd(Track *t, TrackLayer *l);
+	ActionTrackLayerAdd(Track *t, shared<TrackLayer> l);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

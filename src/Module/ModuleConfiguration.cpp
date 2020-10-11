@@ -48,13 +48,13 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 	} else if (c == Kaba::TypeString) {
 		return Any(*(const string*)v);
 	} else if (c->is_array()) {
-		Any r;
+		Any r = Any::EmptyArray;
 		auto tel = c->get_array_element();
 		for (int i=0; i<c->array_length; i++)
 			r.add(var_to_any(tel, &v[i * tel->size]));
 		return r;
 	} else if (c->is_super_array()) {
-		Any r;
+		Any r = Any::EmptyArray;
 		auto a = (DynamicArray*)v;
 		auto tel = c->get_array_element();
 		for (int i=0; i<a->num; i++)
@@ -67,13 +67,13 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 		return Any();
 	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector or c == Kaba::TypeQuaternion or c == Kaba::TypeColor) {
 		// rect ...nope
-		Any r;
+		Any r = Any::EmptyArray;
 		for (auto &e: c->elements)
 			if (!e.hidden())
 				r.add(var_to_any(e.type, &v[e.offset]));
 		return r;
 	} else {
-		Any r;
+		Any r = Any::EmptyMap;
 		for (auto &e: c->elements)
 			if (!e.hidden())
 				r.map_set(e.name, var_to_any(e.type, &v[e.offset]));
@@ -192,15 +192,15 @@ void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *sessi
 		aa->simple_resize(array.num); // todo...
 		for (int i=0; i<array.num; i++)
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
-	} else if (type->name == "SampleRef*") {
-		*(SampleRef**)v = nullptr;
+	} else if (type->name == "shared SampleRef") {
+		*(shared<SampleRef>*)v = nullptr;
 		if (a.is_string()) {
 			string ss = a.str();
 			if ((ss.head(7) == "sample:") and session->song) {
 				int uid = h2i(ss.substr(7,-1));
 				auto s = session->song->get_sample_by_uid(uid);
 				if (s)
-					*(SampleRef**)v = s->create_ref();
+					*(shared<SampleRef>*)v = s->create_ref();
 				else
 					session->e(format("sample invalid: %s  %d  %8x", ss, uid, uid));
 			}
@@ -277,7 +277,7 @@ string ModuleConfiguration::auto_conf(const string &name) const {
 	auto *ps = _class->owner;
 	if (!ps)
 		return "";
-	for (auto c: ps->base_class->constants) {
+	for (auto c: weak(ps->base_class->constants)) {
 		if (c->type == Kaba::TypeString)
 			if (ac_name_match(c->name, name))
 				return c->as_string();

@@ -438,7 +438,21 @@ void Parser::auto_implement_shared_assign(Function *f, const Class *t) {
 	f->block->add(op);
 
 
-	// p.count ++
+	// if p
+	//     p.count ++
+	auto cmd_if = tree->add_node_statement(StatementID::IF);
+	f->block->add(cmd_if);
+
+	// if p
+	auto ff = tree->required_func_global("p2b");
+	auto cmd_cmp = tree->add_node_call(ff);
+	cmd_cmp->set_param(0, tree->cp_node(p));
+	cmd_if->set_param(0, cmd_cmp);
+
+	auto b = new Block(f, f->block.get());
+	cmd_if->set_param(1, b);
+
+
 	auto tt = self->type->param;
 	bool found = false;
 	for (auto &e: tt->elements)
@@ -446,7 +460,7 @@ void Parser::auto_implement_shared_assign(Function *f, const Class *t) {
 			// count ++
 			auto count = tree->shift_node(tree->deref_node(tree->cp_node(self_p)), false, e.offset, e.type);
 			auto inc = tree->add_node_operator_by_inline(count, nullptr, InlineID::INT_INCREASE);
-			f->block->add(inc);
+			b->add(inc);
 			found = true;
 		}
 	if (!found)

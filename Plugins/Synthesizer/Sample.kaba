@@ -75,3 +75,4 @@ class SamplePanel extends ConfigPanel
 			if s
 				sc.samples[n] = s.create_ref()
 			changed()
+			update()

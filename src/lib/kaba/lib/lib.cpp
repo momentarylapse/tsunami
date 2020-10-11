@@ -67,6 +67,7 @@ const string IDENTIFIER_VIRTUAL = "virtual";
 const string IDENTIFIER_EXTERN = "extern";
 //const string IDENTIFIER_ACCESSOR = "accessor";
 const string IDENTIFIER_SELFREF = "selfref";
+const string IDENTIFIER_WEAK = "weak";
 const string IDENTIFIER_SHARED = "shared";
 const string IDENTIFIER_OWNED = "owned";
 const string IDENTIFIER_PURE = "pure";
@@ -740,6 +741,7 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_SORTED, StatementID::SORTED);
 	add_statement(IDENTIFIER_DYN, StatementID::DYN);
 	add_statement(IDENTIFIER_CALL, StatementID::CALL);
+	add_statement(IDENTIFIER_WEAK, StatementID::WEAK, 1);
 }
 
 

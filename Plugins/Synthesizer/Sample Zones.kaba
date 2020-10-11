@@ -4,15 +4,12 @@ use helper.tone
 
 class SampleConfig extends Module.Config
 	class Zone
-		SampleRef* sample
+		shared SampleRef sample
 		int pitch_original
 		int pitch_min, pitch_max
 		int start_loop, end_loop
 		float vel_min, vel_max
 		float attack, sustain, release
-		void __delete__()
-			if sample
-				del sample
 	Zone[] zones
 	override void __delete__()
 		reset()
@@ -107,6 +104,6 @@ class SamplePanel extends ConfigPanel
 		reset("list")
 		for z in sc.zones
 			string name = ""
-			if z.sample
+			if weak(z.sample)
 				name = z.sample.origin.name
 			set_string("list", pitch_name(z.pitch_min) + " - " + pitch_name(z.pitch_max) + "\\" + name)

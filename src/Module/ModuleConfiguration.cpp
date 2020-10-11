@@ -60,7 +60,7 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 		for (int i=0; i<a->num; i++)
 			r.add(var_to_any(tel, (char*)a->simple_element(i)));
 		return r;
-	} else if (c->name == "SampleRef*") {
+	} else if (c->name == "shared SampleRef") {
 		auto sr = *(SampleRef**)v;
 		if (sr)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
@@ -139,13 +139,13 @@ void var_from_string_legacy(const Kaba::Class *type, char *v, const string &s, i
 			var_from_string_legacy(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
 		}
 		pos ++; // ']'
-	} else if (type->name == "SampleRef*") {
+	} else if (type->name == "shared SampleRef") {
 		string ss = get_next(s, pos);
-		*(SampleRef**)v = nullptr;
+		*(shared<SampleRef>*)v = nullptr;
 		if ((ss != "nil") and session->song) {
 			int n = ss._int();
 			if ((n >= 0) and (n < session->song->samples.num)) {
-				*(SampleRef**)v = new SampleRef(session->song->samples[n]);
+				*(shared<SampleRef>*)v = new SampleRef(session->song->samples[n]);
 			}
 		}
 	} else {

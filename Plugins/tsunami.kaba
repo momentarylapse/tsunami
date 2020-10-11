@@ -348,7 +348,7 @@ class TrackRenderBuffer
 shared class TrackMarker
 	Range range
 	string text
-	AudioEffect*[] fx
+	shared AudioEffect[] fx
 	
 shared class Bar
 	int[] beats
@@ -375,7 +375,7 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
-class BarCollection extends Bar[] # shared Bar[]
+class BarCollection extends shared Bar[]
 	extern selfref Bar*[] get_bars(Range r)
 	extern selfref Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
 	extern const int get_next_beat(int pos)
@@ -386,8 +386,8 @@ shared class TrackLayer
 	Track *track
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
-	SampleRef*[] samples
-	TrackMarker*[] markers
+	shared SampleRef[] samples
+	shared TrackMarker[] markers
 	
 	extern void get_buffers(out AudioBuffer buf, Range r)
 	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
@@ -418,9 +418,9 @@ shared class Sample # TODO
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
 
-shared class SampleRef # TODO
-	Sample* origin
-	extern void __init__(Sample* sam)
+shared class SampleRef
+	shared Sample origin
+	extern void __init__(shared Sample sam)
 	extern virtual void __delete__()
 
 
@@ -439,15 +439,15 @@ class Instrument
 shared class Track
 	int type
 	string name
-	TrackLayer*[] layers
+	shared TrackLayer[] layers
 
 	float volume, panning
 	bool muted
 	
-	AudioEffect*[] fx
-	MidiEffect*[] midi_fx
+	shared AudioEffect[] fx
+	shared MidiEffect[] midi_fx
 	
-	Synthesizer *synth
+	shared Synthesizer synth
 	Instrument instrument
 
 	# editing
@@ -481,8 +481,8 @@ shared class Song
 
 	float volume
 	
-	Track*[] tracks
-	Sample*[] samples
+	shared Track[] tracks
+	shared Sample[] samples
 	
 	BarCollection bars
 

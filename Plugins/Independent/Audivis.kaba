@@ -10,7 +10,7 @@ TrackMarker* get_part(Song* s, int offset)
 	let t = s.time_track()
 	if !t
 		return nil
-	for m in t.layers[0].markers
+	for m in weak(t.layers[0].markers)
 		if m.range.inside(offset)
 			return m
 	return nil

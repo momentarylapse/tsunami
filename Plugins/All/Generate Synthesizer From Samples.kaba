@@ -74,7 +74,7 @@ class XXX extends SongPlugin
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample")
 		print("set synth")
-		SampleSynthesizer* synth = track.synth
+		SampleSynthesizer* synth = weak(track.synth)
 		track.set_synthesizer(synth)
 		
 
@@ -104,15 +104,15 @@ class XXX extends SongPlugin
 						if pitch >= len(synth.config.samples)
 							synth.config.samples.resize(pitch+1)
 
-						if synth.config.samples[pitch] == nil
+						if weak(synth.config.samples[pitch]) == nil
 							if pitch == root
 								synth.config.samples[pitch] = s.create_ref()
 							else
-								shift(song, synth, s, root, pitch)
+								shift(song, synth, weak(s), root, pitch)
 	#							prog.set("pitch shift", 0.2)
 
 	#	prog.set("remove samples", 0.7)
-		let to_del = [for s in session.song.samples s if s.ref_count == 0]
+		let to_del = [for s in weak(session.song.samples) s if s.ref_count == 0]
 		for s in to_del
 			session.song.delete_sample(s)
 	#	del prog

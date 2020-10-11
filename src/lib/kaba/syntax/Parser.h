@@ -140,6 +140,7 @@ public:
 	shared<Node> parse_statement_sorted(Block *block);
 	shared<Node> parse_statement_dyn(Block *block);
 	shared<Node> parse_statement_call(Block *block);
+	shared<Node> parse_statement_weak(Block *block);
 
 
 	void auto_implement_add_virtual_table(shared<Node> self, Function *f, const Class *t);

@@ -67,6 +67,7 @@ extern const string IDENTIFIER_OVERRIDE;
 extern const string IDENTIFIER_VIRTUAL;
 extern const string IDENTIFIER_EXTERN;
 extern const string IDENTIFIER_SELFREF;
+extern const string IDENTIFIER_WEAK;
 extern const string IDENTIFIER_SHARED;
 extern const string IDENTIFIER_OWNED;
 extern const string IDENTIFIER_PURE;
@@ -187,7 +188,8 @@ enum class StatementID {
 	LAMBDA,
 	SORTED,
 	DYN,
-	CALL
+	CALL,
+	WEAK
 };
 
 class Statement {

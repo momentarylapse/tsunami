@@ -38,9 +38,9 @@ class ShowSpectrum extends SongPlugin
 			return
 
 		int n = 0
-		for t in song.tracks
+		for t in weak(song.tracks)
 			if t.type == TYPE_AUDIO
-				for l in t.layers
+				for l in weak(t.layers)
 					if session.view.sel.has_layer(l)
 						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
 						n ++

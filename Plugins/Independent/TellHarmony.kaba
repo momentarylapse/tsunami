@@ -48,7 +48,7 @@ Harmony[] track_harmony(MidiNoteBuffer midi)
 	
 	MidiNote*[] active
 	int pos = midi[0].range.offset
-	for n in midi
+	for n in weak(midi)
 		track_harmony_step(pos, n.range.offset, r, active)
 		active.add(n)
 		pos = n.range.offset

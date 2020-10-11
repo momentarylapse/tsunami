@@ -188,10 +188,10 @@ Grid ? '' vertical
 		if !t
 			return
 		
-		Bar* cur_bar = song.bars[cur_bar_index]
+		Bar* cur_bar = weak(song.bars[cur_bar_index])
 		Bar* next_bar = nil
 		if cur_bar_index + 1 < len(song.bars)
-			next_bar = song.bars[cur_bar_index + 1]
+			next_bar = weak(song.bars[cur_bar_index + 1])
 		
 		int offset = cur_bar.offset
 		TrackMarker *cur_part = get_part(t, offset + DELTA)
@@ -260,8 +260,8 @@ int bar_index(Song* song, int offset)
 	return 0
 
 
-TrackMarker* get_part(Track* t, int offset)
-	for m in t.layers[0].markers
+TrackMarker* get_part(Track t, int offset)
+	for m in weak(t.layers[0].markers)
 		if m.range.inside(offset)
 			return m
 	return nil

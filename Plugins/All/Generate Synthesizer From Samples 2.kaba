@@ -24,7 +24,7 @@ class XXX extends SongPlugin
 		track.synth = CreateSynthesizer(session, "Sample Zones")
 		print("set synth")
 		let synth = track.synth
-		track.set_synthesizer(synth)
+		track.set_synthesizer(weak(synth))
 			
 		any a
 		a["zones"] = []

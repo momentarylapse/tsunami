@@ -2311,6 +2311,32 @@ shared<Node> Parser::parse_statement_call(Block *block) {
 	return cmd;
 }
 
+shared<Node> Parser::parse_statement_weak(Block *block) {
+	Exp.next(); // "call"
+	string name = Exp.cur;
+
+	auto params = parse_call_parameters(block);
+	if (params.num != 1)
+		do_error("weak() expects 1 parameter");
+
+	auto t = params[0]->type;
+	while (true) {
+		if (t->is_pointer_shared()) {
+			auto tt = t->param->get_pointer();
+			return tree->shift_node(params[0], false, 0, tt);
+		} else if (t->is_super_array() and t->get_array_element()->is_pointer_shared()) {
+			auto tt = tree->make_class_super_array(t->param->param->get_pointer());
+			return tree->shift_node(params[0], false, 0, tt);
+		}
+		if (t->parent)
+			t = t->parent;
+		else
+			break;
+	}
+	do_error("weak() expects either a shared pointer, or a shared pointer array");
+	return nullptr;
+}
+
 shared<Node> Parser::parse_statement(Block *block) {
 	if (Exp.cur == IDENTIFIER_FOR) {
 		return parse_statement_for(block);
@@ -2356,6 +2382,8 @@ shared<Node> Parser::parse_statement(Block *block) {
 		return parse_statement_dyn(block);
 	} else if (Exp.cur == IDENTIFIER_CALL) {
 		return parse_statement_call(block);
+	} else if (Exp.cur == IDENTIFIER_WEAK) {
+		return parse_statement_weak(block);
 	}
 	do_error("unhandled statement..." + Exp.cur);
 	return nullptr;

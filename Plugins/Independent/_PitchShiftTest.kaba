@@ -122,35 +122,35 @@ class PitchShift extends TsunamiPlugin
 		
 		float factor = k2 / k
 		print("factor {{factor}}")
-		float[] out
+		float[] output
 		
 		
 		print("----------- shift bad ------------")
-		shift_buf_bad(buf, out, factor)
-		print("diff:  {{(out-buf_off).sum2()}}")
+		shift_buf_bad(buf, output, factor)
+		print("diff:  {{(output-buf_off).sum2()}}")
 		print("diff spec:  {{(z2-buf2).sum2()}}")
 		if show_val
-			print(str(out))
+			print(str(output))
 		if show_fft
 			print(str(buf2))
 		#print(str(map(complex.abs, buf2)))
 		
 		print("----------- shift good ------------")
-		shift_buf(buf, out, factor)
-		print("diff:  {{(out-buf_off).sum2()}}")
+		shift_buf(buf, output, factor)
+		print("diff:  {{(output-buf_off).sum2()}}")
 		print("diff spec:  {{(z2-buf2).sum2()}}")
 		if show_val
-			print(str(out))
+			print(str(output))
 		if show_fft
 			print(str(buf2))
 		#print(str(map(complex.abs, buf2)))
 		
 		print("----------- shift fast ------------")
-		shift_buf_fast(buf, out, factor)
-		print("diff:  {{(out-buf_off).sum2()}}")
+		shift_buf_fast(buf, output, factor)
+		print("diff:  {{(output-buf_off).sum2()}}")
 		print("diff spec:  {{(z2-buf2).sum2()}}")
 		if show_val
-			print(str(out))
+			print(str(output))
 		if show_fft
 			print(str(buf2))
 		#print(str(map(complex.abs, buf2)))

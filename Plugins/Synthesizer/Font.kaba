@@ -26,7 +26,7 @@ class MidiFont
 		load(session)
 		string[] ii
 		for t in song.tracks
-			if t.type == TYPE_MIDI
+			if t.type == SignalType.MIDI
 				ii.add(t.name)
 		return ii
 	
@@ -36,13 +36,13 @@ class MidiFont
 			return nil
 		# match by name
 		for t in song.tracks
-			if t.type == TYPE_MIDI and t.name == name
+			if t.type == SignalType.MIDI and t.name == name
 				let m = t.synth.copy()
 				Synthesizer* s = m
 				return s
 		# fist midi track...
 		for t in song.tracks
-			if t.type == TYPE_MIDI
+			if t.type == SignalType.MIDI
 				let m = t.synth.copy()
 				Synthesizer* s = m
 				return s

@@ -52,6 +52,9 @@ bool type_match(const Class *given, const Class *wanted) {
 		}
 	}
 
+	if (wanted == TypeDynamic)
+		return true;
+
 	return given->is_derived_from(wanted);
 }
 

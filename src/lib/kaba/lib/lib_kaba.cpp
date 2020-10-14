@@ -55,7 +55,7 @@ void SIAddPackageKaba() {
 		
 
 	auto *TypeScript = add_type  ("Script", sizeof(Script));
-	auto *TypeScriptP = add_type_p(TypeScript);
+	auto *TypeScriptP = add_type_p(TypeScript, Flags::SHARED);
 	auto *TypeScriptPList = add_type_l(TypeScriptP);
 
 	
@@ -164,8 +164,12 @@ void SIAddPackageKaba() {
 		class_add_elementx("id", TypeInt, &Statement::id);
 		class_add_elementx("num_params", TypeInt, &Statement::num_params);
 		
+	add_class(TypeScriptPList);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &shared_array<Script>::__init__);
+
 	add_class(TypeClassElementList);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<ClassElement>::clear);
 
 	add_funcx("get_dynamic_type", TypeClassP, &get_dynamic_type, Flags::_STATIC__PURE);
 		func_add_param("p", TypePointer);

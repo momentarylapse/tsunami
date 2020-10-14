@@ -11,7 +11,7 @@ class XXX extends SongPlugin
 		int n = 0
 		song.begin_action_group()
 		for l in song.layers()
-			if session.view.sel.has_layer(l) and l.type == TYPE_MIDI
+			if session.view.sel.has_layer(l) and l.type == SignalType.MIDI
 				guess_chords(l, session.view.sel.range())
 				n ++
 		song.end_action_group()

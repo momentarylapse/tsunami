@@ -8,7 +8,7 @@ class MAE extends SongPlugin
 	override void apply()
 		if len(song.tracks) < 3
 			return
-		if song.tracks[2].type != TYPE_MIDI
+		if song.tracks[2].type != SignalType.MIDI
 			return
 		float fps = 25
 		float samples_per_frame = song.sample_rate / fps

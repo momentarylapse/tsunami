@@ -51,7 +51,7 @@ class Looper extends TsunamiPlugin
 		runner = hui.run_repeated(0.05, self, on_update)
 		mode = MODE_FORWARD
 		
-		shader_vis = chain.add(Module.AUDIO_VISUALIZER, "Shader")
+		shader_vis = chain.add(Module.Type.AUDIO_VISUALIZER, "Shader")
 		chain.connect(renderer, 0, shader_vis, 0)
 		chain.connect(shader_vis, 0, session.view.output_stream, 0) # almost ...
 		

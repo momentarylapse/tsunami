@@ -12,7 +12,7 @@ class XXX extends SongPlugin
 			session.e("clipboard is empty")
 			return
 		for t in clipboard.temp.tracks
-			if t.type != TYPE_MIDI
+			if t.type != SignalType.MIDI
 				session.e("can only paste midi")
 				return
 		if len(clipboard.temp.bars) == 0

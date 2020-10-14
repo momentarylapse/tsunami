@@ -119,7 +119,7 @@ Grid ? ''
 		grid.x_scale = song.sample_rate
 		
 		for t in song.tracks
-			if t.type == TYPE_MIDI
+			if t.type == SignalType.MIDI
 				tracks.add(t)
 				set_string("target", t.nice_name())
 		set_int("target", 0)

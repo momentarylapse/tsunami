@@ -17,6 +17,8 @@ extern const Class *TypeMatrix;
 
 extern ExpressionBuffer *cur_exp_buf;
 
+bool is_func(shared<Node> n);
+
 
 
 static shared_array<Node> _transform_insert_before_;
@@ -1147,6 +1149,19 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		_transform_insert_before_.add(n->params[0]);
 		return n->params[1];
+	}
+
+	// TODO experimental dynamic type insertion
+	if (false and is_func(n)) {
+		auto f = n->as_func();
+		for (int i=0; i<f->num_params; i++)
+			if (f->literal_param_type[i] == TypeDynamic) {
+				msg_error("conv dyn!");
+				auto c = add_constant(TypeClassP);
+				c->as_int64() = (int64)(int_p)n->params[i]->type;
+				n->params.insert(add_node_const(c), i+1);
+				n->show(base_class);
+			}
 	}
 	return n;
 }

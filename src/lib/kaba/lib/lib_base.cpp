@@ -350,6 +350,9 @@ void SIAddXCommands() {
 	add_func("@dyn", TypeAny, (void*)kaba_dyn, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
+	add_func("@xmap", TypeDynamicArray, (void*)kaba_xmap, Flags::_STATIC__RAISES_EXCEPTIONS);
+		func_add_param("func", TypeFunctionP);
+		func_add_param("array", TypeDynamic);
 
 	add_func("@call0", TypeVoid, (void*)&kaba_call0, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("f", TypeFunctionP);
@@ -380,6 +383,7 @@ void SIAddPackageBase() {
 	TypeReg8			= add_type  ("-reg8-", 1, Flags::CALL_BY_VALUE);
 	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
 	TypeObjectP			= add_type_p(TypeObject);
+	TypeDynamic			= add_type  ("-dynamic-", 0);
 
 	// "real"
 	TypeVoid			= add_type  ("void", 0, Flags::CALL_BY_VALUE);

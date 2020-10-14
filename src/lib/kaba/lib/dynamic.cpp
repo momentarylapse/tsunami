@@ -378,6 +378,14 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 
 Array<const Class*> func_effective_params(const Function *f);
 
+DynamicArray kaba_xmap(Function *func, DynamicArray *a, const Class *t) {
+	msg_write("xmap " + p2s(a) + " " + p2s(t));
+	msg_write(a->num);
+	msg_write(fa2s(*(Array<float>*)a));
+	msg_write(t->long_name());
+	return kaba_map(func, a);
+}
+
 DynamicArray kaba_map(Function *func, DynamicArray *a) {
 	DynamicArray r;
 	auto p = func_effective_params(func);

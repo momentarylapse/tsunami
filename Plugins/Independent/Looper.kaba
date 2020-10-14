@@ -56,9 +56,9 @@ class Looper extends TsunamiPlugin
 		mode = 0
 		song = session.song
 		chain = session.create_signal_chain("click-counter")
-		let input = chain.add(Module.STREAM, "AudioInput")
-		recorder = chain.add(Module.PLUMBING, "AudioRecorder")
-		let sucker = chain.add(Module.PLUMBING, "AudioSucker")
+		let input = chain.add(Module.Type.STREAM, "AudioInput")
+		recorder = chain.add(Module.Type.PLUMBING, "AudioRecorder")
+		let sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		
@@ -82,19 +82,19 @@ class Looper extends TsunamiPlugin
 			rec_stop()
 	
 	void rec_start()
-		recorder.command(Module.COMMAND_ACCUMULATION_START, 0)
+		recorder.command(Module.Command.ACCUMULATION_START, 0)
 		mode = 1
 	void rec_stop()
-		recorder.command(Module.COMMAND_ACCUMULATION_STOP, 0)
+		recorder.command(Module.Command.ACCUMULATION_STOP, 0)
 		
 		length = len(recorder.buffer)
-		let t = song.add_track(TYPE_AUDIO, 0)
+		let t = song.add_track(SignalType.AUDIO, 0)
 		AudioBuffer tbuf
 		let a = t.layers[0].edit_buffers(tbuf, Range(0, length))
 		tbuf.set(recorder.buffer, 0, 1.0)
 		t.layers[0].edit_buffers_finish(a)
 		
-		recorder.command(Module.COMMAND_ACCUMULATION_CLEAR, 0)
+		recorder.command(Module.Command.ACCUMULATION_CLEAR, 0)
 		mode = 2
 		
 		session.view.sel.range_raw = Range(0, length)

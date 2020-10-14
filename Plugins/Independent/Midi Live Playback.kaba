@@ -17,7 +17,7 @@ class MLPPanel extends ConfigPanel
 	void on_select_synth()
 		if synth_panel
 			del synth_panel
-		string name = ChooseModule(self, session, Module.SYNTHESIZER, c.synth.name)
+		string name = ChooseModule(self, session, Module.Type.SYNTHESIZER, c.synth.name)
 		c.set_synth(name)
 		set_string("select-synth", name)
 		
@@ -33,9 +33,9 @@ class MidiLivePlayback extends TsunamiPlugin
 	SignalChain* chain
 	override void on_start()
 		chain = session.create_signal_chain("midi-live")
-		m_in = chain.add(Module.STREAM, "MidiInput")
-		m_out = chain.add(Module.STREAM, "AudioOutput")
-		synth = chain.add(Module.SYNTHESIZER, "")
+		m_in = chain.add(Module.Type.STREAM, "MidiInput")
+		m_out = chain.add(Module.Type.STREAM, "AudioOutput")
+		synth = chain.add(Module.Type.SYNTHESIZER, "")
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		chain.start()
@@ -45,7 +45,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.reset_state()
 		chain.delete(synth)
 		
-		synth = chain.add(Module.SYNTHESIZER, name)
+		synth = chain.add(Module.Type.SYNTHESIZER, name)
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		

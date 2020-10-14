@@ -110,6 +110,7 @@ extern const Class *TypeReg64; // dummy for compilation
 extern const Class *TypeReg32; // dummy for compilation
 extern const Class *TypeReg16; // dummy for compilation
 extern const Class *TypeReg8; // dummy for compilation
+extern const Class *TypeDynamic;
 extern const Class *TypeVoid;
 extern const Class *TypePointer;
 extern const Class *TypeBool;

@@ -145,17 +145,17 @@ shared class Module extends Object
 	const int VERSION_LATEST = -1
 	const int VERSION_LEGACY = -2
 
-	enum
-		COMMAND_START
-		COMMAND_STOP
-		COMMAND_PREPARE_START
-		COMMAND_ACCUMULATION_START
-		COMMAND_ACCUMULATION_STOP
-		COMMAND_ACCUMULATION_CLEAR
-		COMMAND_ACCUMULATION_GET_SIZE
-		COMMAND_SUCK
+	enum Command
+		START
+		STOP
+		PREPARE_START
+		ACCUMULATION_START
+		ACCUMULATION_STOP
+		ACCUMULATION_CLEAR
+		ACCUMULATION_GET_SIZE
+		SUCK
 
-	enum
+	enum Type
 		AUDIO_SOURCE
 		AUDIO_EFFECT
 		MIDI_SOURCE
@@ -424,13 +424,13 @@ shared class SampleRef
 	extern virtual void __delete__()
 
 
-enum
-	TYPE_AUDIO
-	TYPE_TIME
-	TYPE_MIDI
-	TYPE_AUDIO_MONO
-	TYPE_AUDIO_STEREO
-	TYPE_GROUP
+enum SignalType
+	AUDIO
+	TIME
+	MIDI
+	AUDIO_MONO
+	AUDIO_STEREO
+	GROUP
 
 class Instrument
 	int type
@@ -697,13 +697,12 @@ class Clipboard
 	extern bool prepare_layer_map(AudioView view, out TrackLayer*[] sources, out TrackLayer*[] targets)
 
 
-class MidiMode
-	enum
-		MIDI_LINEAR
-		TAB
-		CLASSICAL
-		DRUM
-		DONT_CARE
+enum MidiMode
+	MIDI_LINEAR
+	TAB
+	CLASSICAL
+	DRUM
+	DONT_CARE
 
 class HoverData
 	

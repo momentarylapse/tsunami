@@ -10,8 +10,8 @@ class _StreamTest extends TsunamiPlugin
 	override void on_start()
 	
 		chain = session.create_signal_chain("test")
-		source = chain.add(Module.AUDIO_SOURCE, "Silence")
-		out = chain.add(Module.STREAM, "AudioOutput")
+		source = chain.add(Module.Type.AUDIO_SOURCE, "Silence")
+		out = chain.add(Module.Type.STREAM, "AudioOutput")
 		chain.connect(source, 0, out, 0)
 		
 		runner = hui.run_repeated(0.1, self, on_tick)

@@ -162,8 +162,8 @@ public:
 	ExpressionBuffer Exp;
 
 	int for_index_count;
-
 	int parser_loop_depth;
+	bool found_dynamic_param;
 };
 
 } /* namespace Kaba */

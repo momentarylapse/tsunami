@@ -70,7 +70,7 @@ class XXX extends SongPlugin
 	#	let prog = new ProgressX("generating sound font", session.win)
 
 		print("creating track")
-		let track = song.add_track(TYPE_MIDI, 0)
+		let track = song.add_track(SignalType.MIDI, 0)
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample")
 		print("set synth")

@@ -11,9 +11,9 @@ class _StreamTest extends TsunamiPlugin
 	override void on_start()
 	
 		chain = session.create_signal_chain("test")
-		input = chain.add(Module.STREAM, "AudioInput")
-		recorder = chain.add(Module.PLUMBING, "AudioRecorder")
-		Module* sucker = chain.add(Module.PLUMBING, "AudioSucker")
+		input = chain.add(Module.Type.STREAM, "AudioInput")
+		recorder = chain.add(Module.Type.PLUMBING, "AudioRecorder")
+		Module* sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		
@@ -34,9 +34,9 @@ class _StreamTest extends TsunamiPlugin
 			acc = !acc
 			if acc
 				print("-------start")
-				chain.command(Module.COMMAND_ACCUMULATION_START, 0)
+				chain.command(Module.Command.ACCUMULATION_START, 0)
 			else
 				print("-------stop")
-				chain.command(Module.COMMAND_ACCUMULATION_STOP, 0)
-				chain.command(Module.COMMAND_ACCUMULATION_CLEAR, 0)
+				chain.command(Module.Command.ACCUMULATION_STOP, 0)
+				chain.command(Module.Command.ACCUMULATION_CLEAR, 0)
 			nn = 0

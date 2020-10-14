@@ -18,7 +18,7 @@ class XXX extends SongPlugin
 	void import_preset(any p)
 		print("import " + p["name"])
 				
-		let track = song.add_track(TYPE_MIDI, -1)
+		let track = song.add_track(SignalType.MIDI, -1)
 		track.set_name(p["name"])
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample Zones")

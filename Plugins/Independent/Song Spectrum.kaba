@@ -5,7 +5,7 @@ class SongSpectrum extends TsunamiPlugin
 	override void on_start()
 		# very crappy topology :P
 		let chain = session.view.signal_chain
-		spec = chain.add(Module.AUDIO_VISUALIZER, "Spectrum")
+		spec = chain.add(Module.Type.AUDIO_VISUALIZER, "Spectrum")
 		chain.connect(session.view.renderer, 0, spec, 0)
 		chain.connect(spec, 0, session.view.output_stream, 0)
 	override void on_stop()

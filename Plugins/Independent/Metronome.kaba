@@ -263,9 +263,9 @@ class Metronome extends TsunamiPlugin
 		chain = session.create_signal_chain("metronome")
 		source = chain._add(CreateBeatSource(session, "Metronome"))
 		
-		Module *beat_midifier = chain.add(Module.PLUMBING, "BeatMidifier")
-		Module *synth = chain.add(Module.SYNTHESIZER, "")
-		Module *output = chain.add(Module.STREAM, "AudioOutput")
+		Module *beat_midifier = chain.add(Module.Type.PLUMBING, "BeatMidifier")
+		Module *synth = chain.add(Module.Type.SYNTHESIZER, "")
+		Module *output = chain.add(Module.Type.STREAM, "AudioOutput")
 		
 		chain.connect(source, 0, beat_midifier, 0)
 		chain.connect(beat_midifier, 0, synth, 0)

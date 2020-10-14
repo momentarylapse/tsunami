@@ -73,11 +73,11 @@ class SupernovaRhythm extends TsunamiPlugin
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
 		
 		chain = session.create_signal_chain("supernova.recorder")
-		let i = chain.add(Module.STREAM, "AudioInput")
-		let p = chain.add(Module.PITCH_DETECTOR, "Test")
-		#let x = chain.add(Module.AUDIO_EFFECT, "Chunksize")
-		let r = chain.add(Module.PLUMBING, "MidiRecorder")
-		let s = chain.add(Module.PLUMBING, "MidiSucker")
+		let i = chain.add(Module.Type.STREAM, "AudioInput")
+		let p = chain.add(Module.Type.PITCH_DETECTOR, "Test")
+		#let x = chain.add(Module.Type.AUDIO_EFFECT, "Chunksize")
+		let r = chain.add(Module.Type.PLUMBING, "MidiRecorder")
+		let s = chain.add(Module.Type.PLUMBING, "MidiSucker")
 		chain.connect(i, 0, p, 0)
 		chain.connect(p, 0, r, 0)
 		chain.connect(r, 0, s, 0)
@@ -85,7 +85,7 @@ class SupernovaRhythm extends TsunamiPlugin
 		pitch_detector = p
 		chain.set_buffer_size(4096)
 		chain.start()
-		chain.command(Module.COMMAND_ACCUMULATION_START, 0)
+		chain.command(Module.Command.ACCUMULATION_START, 0)
 		runner = hui.run_repeated(0.05, self, on_update)
 		
 	override void on_stop()

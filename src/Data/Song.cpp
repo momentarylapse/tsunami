@@ -60,7 +60,7 @@ Song::Error::Error(const string &_message) : Exception(_message) {
 Song::Song(Session *session, int _sample_rate) :
 	Data(session)
 {
-	msg_write("  new Song " + p2s(this));
+	//msg_write("  new Song " + p2s(this));
 	sample_rate = _sample_rate;
 	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
@@ -160,7 +160,7 @@ void Song::reset() {
 
 Song::~Song() {
 	reset();
-	msg_write("  del Song " + p2s(this));
+	//msg_write("  del Song " + p2s(this));
 }
 
 bool Song::is_empty() {
@@ -272,11 +272,11 @@ Track *Song::add_track(SignalType type, int index) {
 	}
 	if (index < 0)
 		index = tracks.num;
-	msg_write("--------new track");
+	//msg_write("--------new track");
 	Track *t = new Track(type, CreateSynthesizer(session, ""));
-	msg_write("--------layer add");
+	//msg_write("--------layer add");
 	t->layers.add(new TrackLayer(t));
-	msg_write("--------execute");
+	//msg_write("--------execute");
 	return (Track*)execute(new ActionTrackAdd(t, index));
 }
 

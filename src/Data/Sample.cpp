@@ -17,7 +17,7 @@ const string Sample::MESSAGE_REFERENCE = "Reference";
 const string Sample::MESSAGE_UNREFERENCE = "Unreference";
 
 Sample::Sample(SignalType _type) {
-	msg_write("  new Sample " + p2s(this));
+	//msg_write("  new Sample " + p2s(this));
 	owner = nullptr;
 	type = _type;
 
@@ -50,7 +50,7 @@ Sample::~Sample() {
 	notify(MESSAGE_DELETE);
 	if (buf)
 		delete buf;
-	msg_write("  del Sample " + p2s(this));
+	//msg_write("  del Sample " + p2s(this));
 }
 
 void Sample::__init__(const string &_name, const AudioBuffer &_buf) {

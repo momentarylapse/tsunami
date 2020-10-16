@@ -228,12 +228,12 @@ void TrackRenderer::update_layers() {
 	for (auto *l: weak(layers))
 		l->unsubscribe(this);
 
-	msg_write("-----TR update  clear");
+	//msg_write("-----TR update  clear");
 	layers.clear();
-	msg_write("-----TR update =");
+	//msg_write("-----TR update =");
 	if (track)
 		layers = track->layers;
-	msg_write("-----TR update done");
+	//msg_write("-----TR update done");
 
 	for (auto *l: weak(layers)) {
 		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);

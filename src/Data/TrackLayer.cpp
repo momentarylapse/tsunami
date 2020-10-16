@@ -35,7 +35,7 @@
 
 
 TrackLayer::TrackLayer(Track *t) {
-	msg_write("  new TrackLayer " + p2s(this));
+	//msg_write("  new TrackLayer " + p2s(this));
 	track = t;
 	type = t->type;
 	channels = t->channels;
@@ -43,7 +43,7 @@ TrackLayer::TrackLayer(Track *t) {
 }
 
 TrackLayer::~TrackLayer() {
-	msg_write("  del TrackLayer " + p2s(this));
+	//msg_write("  del TrackLayer " + p2s(this));
 }
 
 Range TrackLayer::range(int keep_notes) const {
@@ -55,10 +55,10 @@ Range TrackLayer::range(int keep_notes) const {
 	if ((type == SignalType::MIDI) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
 
-	for (TrackMarker *m: weak(markers))
+	for (auto *m: weak(markers))
 		r = r or m->range;
 
-	for (SampleRef *s: weak(samples))
+	for (auto *s: weak(samples))
 		r = r or s->range();
 
 	return r;

@@ -14,7 +14,7 @@ Node::Node() : Node(0, 0) {
 }
 
 Node::Node(float w, float h) {
-	msg_write("new Node " + p2s(this));
+	//msg_write("new Node " + p2s(this));
 	align.horizontal = AlignData::Mode::NONE;
 	align.vertical = AlignData::Mode::NONE;
 	align.dx = 0;

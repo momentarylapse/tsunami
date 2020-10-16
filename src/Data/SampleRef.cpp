@@ -16,7 +16,7 @@ const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
 SampleRef::SampleRef(shared<Sample> sample) {
-	msg_write("  new SampleRef " + p2s(this));
+	//msg_write("  new SampleRef " + p2s(this));
 	origin = sample;
 	origin->ref();
 	layer = nullptr;
@@ -29,7 +29,7 @@ SampleRef::SampleRef(shared<Sample> sample) {
 SampleRef::~SampleRef() {
 	notify(MESSAGE_DELETE);
 	origin->unref();
-	msg_write("  del SampleRef " + p2s(this));
+	//msg_write("  del SampleRef " + p2s(this));
 }
 
 void SampleRef::__init__(shared<Sample> sam) {

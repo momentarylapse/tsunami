@@ -299,7 +299,7 @@ void SongRenderer::update_tracks() {
 	foreachi (auto &tr, tracks, ti) {
 		bool found = weak(song->tracks).find(tr->track.get()) >= 0;
 		if (!found) {
-			msg_write("--------SongRenderer erase...");
+			//msg_write("--------SongRenderer erase...");
 			tracks.erase(ti);
 		}
 	}

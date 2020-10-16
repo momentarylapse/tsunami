@@ -29,8 +29,8 @@ const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 
 Module::Module(ModuleType type, const string &sub_type) {
-	msg_write("new Module " + p2s(this));
-	msg_write(type_to_name(type) + "   " + sub_type);
+	//msg_write("new Module " + p2s(this));
+	//msg_write(type_to_name(type) + "   " + sub_type);
 	module_type = type;
 	module_subtype = sub_type;
 	session = Session::GLOBAL;

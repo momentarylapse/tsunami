@@ -412,7 +412,6 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 Any Any::parse(const string &s) {
 	auto tokens = s.parse_tokens(",:[](){}\"");
 	int pos = 0;
-	msg_write("parse: " + s);
 
 	Any r;
 	any_parse_part(r, tokens, pos);

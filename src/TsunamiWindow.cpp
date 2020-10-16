@@ -311,7 +311,7 @@ void TsunamiCleanUp() {
 		again = false;
 		foreachi(Session *s, weak(tsunami->sessions), i)
 			if (s->win->got_destroyed() and s->win->auto_delete) {
-				msg_write("--------Tsunami erase...");
+				//msg_write("--------Tsunami erase...");
 				tsunami->sessions.erase(i);
 				again = true;
 				break;

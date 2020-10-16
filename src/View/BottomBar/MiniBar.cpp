@@ -6,7 +6,6 @@
  */
 
 #include "BottomBar.h"
-#include "../Helper/CpuDisplay.h"
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
@@ -25,9 +24,6 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 
 	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter);
 	set_float("volume", dev_manager->get_output_volume());
-
-	auto cpu_display = new CpuDisplay(session, [&]{ redraw("cpu"); });
-	cpu_display_adapter = new CpuDisplayAdapter(this, "cpu", cpu_display);
 
 	on_selection_snap_mode(view->selection_snap_mode);
 

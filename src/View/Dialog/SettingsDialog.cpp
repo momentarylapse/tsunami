@@ -192,7 +192,7 @@ void SettingsDialog::on_suck_buffer() {
 void SettingsDialog::on_cpu_meter() {
 	bool show = is_checked("");
 	hui::Config.set_bool("CpuDisplay", show);
-	view->win->mini_bar->cpu_display_adapter->parent->hide_control(view->win->mini_bar->cpu_display_adapter->id, !show);
+	view->cpu_display->enable(show);
 }
 
 void SettingsDialog::on_antialiasing() {

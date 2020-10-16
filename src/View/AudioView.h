@@ -53,14 +53,15 @@ class MidiPainter;
 class BufferPainter;
 class GridPainter;
 namespace scenegraph {
-class SceneGraph;
-class Node;
+	class SceneGraph;
+	class Node;
 }
 class TimeScale;
 class Cursor;
 class SelectionMarker;
 class MouseDelayPlanner;
 class MouseDelayAction;
+class CpuDisplay;
 enum class MidiMode;
 
 
@@ -298,6 +299,7 @@ public:
 	scenegraph::Node *background;
 	Cursor *cursor_start, *cursor_end;
 	SelectionMarker *selection_marker;
+	CpuDisplay *cpu_display;
 
 
 	owned<MidiPainter> midi_painter;

@@ -52,6 +52,7 @@
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
 #include "Helper/PeakThread.h"
+#include "Helper/CpuDisplay.h"
 #include "SideBar/SideBar.h"
 
 
@@ -200,6 +201,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(cursor_end);
 	scene_graph->add_child(selection_marker);
 	scene_graph->add_child(metronome_overlay_vlayer);
+
+
+	cpu_display = new CpuDisplay(session, [&]{ force_redraw(); });
+	scene_graph->add_child(cpu_display);
 
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), colors);

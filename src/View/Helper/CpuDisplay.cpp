@@ -21,11 +21,10 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 	id = _id;
 	cpu_display = _cpu_display;
 
-	if (!hui::Config.get_bool("CpuDisplay", false))
-		parent->hide_control(id, true);
-
 	scene_graph = new scenegraph::SceneGraph([] {});
 	scene_graph->add_child(cpu_display);
+	cpu_display->align.horizontal = scenegraph::Node::AlignData::Mode::FILL;
+	cpu_display->align.vertical = scenegraph::Node::AlignData::Mode::FILL;
 
 	parent->event_xp(id, "hui:draw", [=](Painter* p){
 		scene_graph->update_geometry_recursive(p->area());
@@ -38,8 +37,14 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 
 
 CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scenegraph::NodeFree() {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.w = 120;
+	align.h = 30;
+	align.dx = -20;
+	align.dy = -20;
+	align.horizontal = AlignData::Mode::RIGHT;
+	align.vertical = AlignData::Mode::BOTTOM;
+	align.dz = 100;
+	hidden = true;
 
 	session = _session;
 	perf_mon = session->perf_mon;
@@ -48,13 +53,24 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 
 	dlg = nullptr;
 
-	perf_mon->subscribe(this, [=]{ update(); });
+	if (hui::Config.get_bool("CpuDisplay", false))
+		enable(true);
 }
 
 CpuDisplay::~CpuDisplay() {
-	perf_mon->unsubscribe(this);
+	enable(false);
 	if (dlg)
 		delete dlg;
+}
+
+void CpuDisplay::enable(bool active) {
+	perf_mon->unsubscribe(this);
+
+	hidden = !active;
+	request_redraw();
+
+	if (active)
+		perf_mon->subscribe(this, [=]{ update(); });
 }
 
 color type_color(const string &t) {
@@ -87,8 +103,10 @@ void CpuDisplay::draw(Painter* p) {
 	int h = area.height();
 	bool large = (h > 50);
 
+	auto old_clip = p->clip();
+	p->set_clip(area);
+
 	p->set_color(view->colors.background);
-	//p->draw_rect(2, 2, w-4, h-4);
 	p->draw_rect(area);
 	p->set_line_width(large ? 2.0f : 1.0f);
 
@@ -142,6 +160,11 @@ void CpuDisplay::draw(Painter* p) {
 			t ++;
 		}
 	} else {
+
+		p->set_fill(false);
+		p->set_color(view->colors.text_soft3);
+		p->draw_rect(area);
+		p->set_fill(true);
 	
 		p->set_font_size(7);
 	
@@ -150,11 +173,12 @@ void CpuDisplay::draw(Painter* p) {
 			if (c.stats.num > 0) {
 				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
-				p->draw_str(x00 + 20 + (t/2) * 30, y00 + h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
+				p->draw_str(x00 + 7 + (t/2) * 30, y00 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
 				t ++;
 			}
 		}
 	}
+	p->set_clip(old_clip);
 }
 
 class CpuDisplayDialog : public hui::Dialog {

@@ -32,6 +32,7 @@ public:
 	bool on_left_button_down() override;
 	void draw(Painter *p) override;
 	void update();
+	void enable(bool active);
 
 	Session *session;
 	PerformanceMonitor *perf_mon;

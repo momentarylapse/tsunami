@@ -1,13 +1,13 @@
 #include "ViewModeEditAudio.h"
 #include "../SideBar/AudioEditorConsole.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewLayer.h"
 #include "../../Data/base.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../MouseDelayPlanner.h"
 #include "../../Data/Audio/BufferInterpolator.h"
 #include "../../Plugins/FastFourierTransform.h"
+#include "../Graph/AudioViewLayer.h"
 
 
 struct RubberPoint {

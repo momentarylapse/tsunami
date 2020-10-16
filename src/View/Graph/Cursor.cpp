@@ -5,15 +5,16 @@
  *      Author: michi
  */
 
-#include "Cursor.h"
-#include "AudioViewLayer.h"
+#include "../Graph/Cursor.h"
+
 #include "../AudioView.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
+#include "../Graph/AudioViewLayer.h"
 
 
-Cursor::Cursor(AudioView *_view, bool end) : ViewNodeFree() {
+Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 	view = _view;
 	align.dz = 50;
 	is_end = end;
@@ -74,7 +75,7 @@ bool Cursor::on_left_button_down() {
 }
 
 
-SelectionMarker::SelectionMarker(AudioView *_view) : ViewNodeFree() {
+SelectionMarker::SelectionMarker(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
 	align.dz = 49;
 }

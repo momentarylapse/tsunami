@@ -5,10 +5,8 @@
  *      Author: michi
  */
 
-#include "AudioViewLayer.h"
-#include "AudioViewTrack.h"
-#include "LayerHeader.h"
-#include "ScrollBar.h"
+#include "../Graph/AudioViewLayer.h"
+
 #include "../AudioView.h"
 #include "../MouseDelayPlanner.h"
 #include "../Mode/ViewMode.h"
@@ -37,6 +35,9 @@
 #include "../../Data/Midi/Clef.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../Graph/AudioViewTrack.h"
+#include "../Graph/LayerHeader.h"
+#include "../Graph/ScrollBar.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Painter/MidiPainter.h"
 
@@ -71,7 +72,7 @@ public:
 };
 
 
-AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeFree() {
+AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegraph::NodeFree() {
 	align.horizontal = AlignData::Mode::FILL;
 	view = _view;
 	layer = _layer;
@@ -85,7 +86,7 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeF
 
 	represents_imploded = false;
 
-	if (layer){
+	if (layer) {
 		layer->subscribe(this, [=]{ on_layer_change(); }, layer->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);

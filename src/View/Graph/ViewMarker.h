@@ -5,18 +5,17 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_VIEWMARKER_H_
-#define SRC_VIEW_NODE_VIEWMARKER_H_
+#ifndef SRC_VIEW_GRAPH_VIEWMARKER_H_
+#define SRC_VIEW_GRAPH_VIEWMARKER_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class TrackMarker;
 class AudioViewTrack;
 
-class ViewMarker : public ViewNode {
+class ViewMarker : public scenegraph::Node {
 public:
 	ViewMarker(AudioViewTrack *parent, TrackMarker *marker);
-	~ViewMarker();
 
 	void draw(Painter *c) override;
 	HoverData get_hover_data(float mx, float my) override;
@@ -28,4 +27,4 @@ public:
 	TrackMarker *marker;
 };
 
-#endif // SRC_VIEW_NODE_VIEWMARKER_H_
+#endif // SRC_VIEW_GRAPH_VIEWMARKER_H_

@@ -5,24 +5,25 @@
  *      Author: michi
  */
 
-#include "LayerHeader.h"
-#include "ViewNode.h"
-#include "AudioViewLayer.h"
-#include "AudioViewTrack.h"
+#include "../Graph/LayerHeader.h"
+
+#include "../Helper/Graph/Node.h"
 #include "../AudioView.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../Graph/AudioViewLayer.h"
+#include "../Graph/AudioViewTrack.h"
 
 
 
 
-class LayerHeaderButton : public ViewNodeRel {
+class LayerHeaderButton : public scenegraph::NodeRel {
 public:
 	AudioViewLayer *vlayer;
 	LayerHeader *header;
-	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : ViewNodeRel(dx, dy, 16, 16) {
+	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : scenegraph::NodeRel(dx, dy, 16, 16) {
 		vlayer = lh->vlayer;
 		header = lh;
 	}
@@ -95,7 +96,7 @@ public:
 	}
 };
 
-LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNodeRel(0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel(0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	z = 70;
 	align.horizontal = AlignData::Mode::RIGHT;
 	vlayer = l;
@@ -167,7 +168,7 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 		//children[2]->hidden |= !layer->is_main();
 	}
 	
-	ViewNode::update_geometry_recursive(target_area);
+	Node::update_geometry_recursive(target_area);
 }
 
 void LayerHeader::draw(Painter *c) {
@@ -231,7 +232,7 @@ bool LayerHeader::on_right_button_down() {
 }
 HoverData LayerHeader::get_hover_data(float mx, float my) {
 	auto *view = vlayer->view;
-	auto h = ViewNode::get_hover_data(mx, my);
+	auto h = Node::get_hover_data(mx, my);
 	h.vtrack = view->get_track(vlayer->layer->track);
 	h.vlayer = vlayer;
 	return h;

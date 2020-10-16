@@ -36,8 +36,6 @@
 #include "View/Helper/Progress.h"
 #include "View/Helper/ModulePanel.h"
 #include "View/AudioView.h"
-#include "View/Node/AudioViewTrack.h"
-#include "View/Node/AudioViewLayer.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Plugins/SongPlugin.h"
@@ -64,6 +62,8 @@
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
 #include "Device/DeviceManager.h"
+#include "View/Graph/AudioViewLayer.h"
+#include "View/Graph/AudioViewTrack.h"
 
 extern const string AppName;
 

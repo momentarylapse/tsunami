@@ -11,7 +11,9 @@
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 
-class ViewNode;
+namespace scenegraph {
+	class Node;
+}
 class AudioViewTrack;
 class AudioViewLayer;
 class Track;
@@ -25,7 +27,7 @@ enum class NoteModifier;
 
 class HoverData {
 public:
-	ViewNode *node;
+	scenegraph::Node *node;
 	AudioViewLayer *vlayer;
 	TrackLayer *layer() const;
 	AudioViewTrack *vtrack;

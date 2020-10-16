@@ -5,7 +5,8 @@
  *      Author: michi
  */
 
-#include "TimeScale.h"
+#include "../Graph/TimeScale.h"
+
 #include "../AudioView.h"
 #include "../Painter/GridPainter.h"
 #include "../../Module/Audio/SongRenderer.h"
@@ -17,10 +18,10 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 
 
-class PlaybackRange : public ViewNodeRel {
+class PlaybackRange : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackRange(TimeScale *time_scale) : ViewNodeRel(0, 0, 0, 0) {
+	PlaybackRange(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 0, 0) {
 		view = time_scale->view;
 		align.horizontal = AlignData::Mode::FILL;
 	}
@@ -60,10 +61,10 @@ public:
 	}
 };
 
-class PlaybackLockSymbol : public ViewNodeRel {
+class PlaybackLockSymbol : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackLockSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
+	PlaybackLockSymbol(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_geometry(const rect &target_area) override {
@@ -90,10 +91,10 @@ public:
 	}
 };
 
-class PlaybackLoopSymbol : public ViewNodeRel {
+class PlaybackLoopSymbol : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackLoopSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
+	PlaybackLoopSymbol(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_geometry(const rect &target_area) override {
@@ -125,7 +126,7 @@ public:
 
 
 
-TimeScale::TimeScale(AudioView *_view) : ViewNodeRel(0, 0, 100, AudioView::TIME_SCALE_HEIGHT) {
+TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioView::TIME_SCALE_HEIGHT) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.dz = 120;
 	view = _view;

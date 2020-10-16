@@ -7,7 +7,6 @@
 
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewLayer.h"
 #include "../Painter/BufferPainter.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
@@ -21,6 +20,7 @@
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 #include "../../Device/Stream/AudioOutput.h"
+#include "../Graph/AudioViewLayer.h"
 
 CaptureTrackData::CaptureTrackData() : CaptureTrackData(nullptr, nullptr, nullptr) {}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_recorder) {

@@ -7,10 +7,10 @@
 
 #include "MouseDelayPlanner.h"
 #include "../lib/hui/hui.h"
-#include "Node/SceneGraph.h"
+#include "Helper/Graph/SceneGraph.h"
 #include <cmath>
 
-MouseDelayPlanner::MouseDelayPlanner(SceneGraph *sg) {
+MouseDelayPlanner::MouseDelayPlanner(scenegraph::SceneGraph *sg) {
 	scene_graph = sg;
 	min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
 	hui::Config.set_int("View.MouseMinMoveToSelect", min_move_to_start);

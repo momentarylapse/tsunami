@@ -8,8 +8,8 @@
 #include "HoverData.h"
 
 #include "../Data/Midi/MidiData.h"
-#include "Node/AudioViewLayer.h"
-#include "Node/AudioViewTrack.h"
+#include "Graph/AudioViewLayer.h"
+#include "Graph/AudioViewTrack.h"
 
 
 HoverData::HoverData() {

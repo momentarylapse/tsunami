@@ -5,20 +5,18 @@
  *      Author: michi
  */
  
-#include "ViewMarker.h"
-#include "ViewNode.h"
+#include "../Graph/ViewMarker.h"
+
+#include "../Helper/Graph/Node.h"
 #include "../HoverData.h"
 
 ViewMarker::ViewMarker(AudioViewTrack *parent, TrackMarker *_marker) {
 	marker = _marker;
 }
 
-ViewMarker::~ViewMarker() {
-}
-
 
 HoverData ViewMarker::get_hover_data(float mx, float my) {
-	auto h = ViewNode::get_hover_data(mx, my);
+	auto h = Node::get_hover_data(mx, my);
 	//h.vlayer = this;
 	h.marker = marker;
 	//h.vtrack = view->get_track(layer->track);

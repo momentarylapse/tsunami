@@ -1,18 +1,20 @@
 /*
- * ViewNode.cpp
+ * Node.cpp
  *
  *  Created on: 08.06.2019
  *      Author: michi
  */
 
-#include "ViewNode.h"
+#include "Node.h"
 #include "SceneGraph.h"
 
-ViewNode::ViewNode() : ViewNode(0, 0) {
+namespace scenegraph {
+
+Node::Node() : Node(0, 0) {
 }
 
-ViewNode::ViewNode(float w, float h) {
-	msg_write("new ViewNode " + p2s(this));
+Node::Node(float w, float h) {
+	msg_write("new Node " + p2s(this));
 	align.horizontal = AlignData::Mode::NONE;
 	align.vertical = AlignData::Mode::NONE;
 	align.dx = 0;
@@ -27,55 +29,55 @@ ViewNode::ViewNode(float w, float h) {
 	z = 0;
 }
 
-bool ViewNode::hover(float mx, float my) {
+bool Node::hover(float mx, float my) {
 	if (hidden)
 		return false;
 	return area.inside(mx, my);
 }
 
-void ViewNode::add_child(ViewNode* child) {
+void Node::add_child(Node* child) {
 	children.add(child);
 	child->parent = this;
 }
 
-void ViewNode::delete_child(ViewNode* child) {
+void Node::delete_child(Node* child) {
 	for (int i=0; i<children.num; i++)
 		if (children[i] == child)
 			children.erase(i);
 }
 
-ViewNode *ViewNode::root() {
-	ViewNode *r = this;
+Node *Node::root() {
+	Node *r = this;
 	while (r->parent)
 		r = r->parent;
 	return r;
 }
 
-bool ViewNode::is_cur_hover() {
+bool Node::is_cur_hover() {
 	for (auto *c: weak(children))
 		if (c->is_cur_hover())
 			return true;
 	return is_cur_hover_non_recursive();
 }
 
-bool ViewNode::is_cur_hover_non_recursive() {
+bool Node::is_cur_hover_non_recursive() {
 	if (auto *sg = dynamic_cast<SceneGraph*>(root())) {
 		return sg->hover.node == this;
 	}
 	return false;
 }
 
-HoverData ViewNode::get_hover_data(float mx, float my) {
+HoverData Node::get_hover_data(float mx, float my) {
 	HoverData h;
 	h.node = this;
 	return h;
 }
 
-string ViewNode::get_tip() {
+string Node::get_tip() {
 	return "";
 }
 
-void ViewNode::update_geometry(const rect &target_area) {
+void Node::update_geometry(const rect &target_area) {
 	if (align.horizontal == AlignData::Mode::FILL) {
 		area.x1 = target_area.x1;
 		area.x2 = target_area.x2;
@@ -99,7 +101,7 @@ void ViewNode::update_geometry(const rect &target_area) {
 	}
 }
 
-void ViewNode::update_geometry_recursive(const rect &target_area) {
+void Node::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
 	if (parent)
 		z = parent->z + align.dz;
@@ -108,10 +110,10 @@ void ViewNode::update_geometry_recursive(const rect &target_area) {
 		c->update_geometry_recursive(area);
 }
 
-ViewNodeFree::ViewNodeFree() : ViewNode(0, 0) {
+NodeFree::NodeFree() : Node(0, 0) {
 }
 
-ViewNodeRel::ViewNodeRel(float dx, float dy, float w, float h) : ViewNode(w, h) {
+NodeRel::NodeRel(float dx, float dy, float w, float h) : Node(w, h) {
 	align.horizontal = AlignData::Mode::LEFT;
 	align.dx = dx;
 	align.vertical = AlignData::Mode::TOP;
@@ -120,11 +122,11 @@ ViewNodeRel::ViewNodeRel(float dx, float dy, float w, float h) : ViewNode(w, h) 
 
 
 
-NodeHBox::NodeHBox() {
+HBox::HBox() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 }
-void NodeHBox::update_geometry_recursive(const rect &target_area) {
+void HBox::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
 	if (parent)
 		z = parent->z + align.dz;
@@ -151,12 +153,12 @@ void NodeHBox::update_geometry_recursive(const rect &target_area) {
 	}
 }
 
-NodeVBox::NodeVBox() {
+VBox::VBox() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 }
 
-void NodeVBox::update_geometry_recursive(const rect &target_area) {
+void VBox::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
 	if (parent)
 		z = parent->z + align.dz;
@@ -183,3 +185,4 @@ void NodeVBox::update_geometry_recursive(const rect &target_area) {
 	}
 }
 
+}

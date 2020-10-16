@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_AUDIOVIEWTRACK_H_
-#define SRC_VIEW_NODE_AUDIOVIEWTRACK_H_
+#ifndef SRC_VIEW_GRAPH_AUDIOVIEWTRACK_H_
+#define SRC_VIEW_GRAPH_AUDIOVIEWTRACK_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class Track;
 class Painter;
@@ -18,7 +18,7 @@ class MidiKeyChange;
 enum class MidiMode;
 
 
-class AudioViewTrack : public ViewNodeFree {
+class AudioViewTrack : public scenegraph::NodeFree {
 public:
 	AudioViewTrack(AudioView *view, Track *track);
 	~AudioViewTrack() override;
@@ -49,4 +49,4 @@ public:
 	bool imploded;
 };
 
-#endif /* SRC_VIEW_NODE_AUDIOVIEWTRACK_H_ */
+#endif /* SRC_VIEW_GRAPH_AUDIOVIEWTRACK_H_ */

@@ -5,15 +5,15 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_BACKGROUND_H_
-#define SRC_VIEW_NODE_BACKGROUND_H_
+#ifndef SRC_VIEW_GRAPH_BACKGROUND_H_
+#define SRC_VIEW_GRAPH_BACKGROUND_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class AudioView;
 class AudioViewLayer;
 
-class Background : public ViewNodeFree {
+class Background : public scenegraph::NodeFree {
 public:
 	Background(AudioView *view);
 
@@ -29,4 +29,4 @@ public:
 	HoverData get_hover_data(float mx, float my) override;
 };
 
-#endif /* SRC_VIEW_NODE_BACKGROUND_H_ */
+#endif /* SRC_VIEW_GRAPH_BACKGROUND_H_ */

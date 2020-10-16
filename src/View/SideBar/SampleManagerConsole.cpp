@@ -7,7 +7,6 @@
 
 #include "../../Storage/Storage.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewLayer.h"
 #include "../Painter/MidiPainter.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
@@ -28,6 +27,7 @@
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/Midi/MidiEventStreamer.h"
+#include "../Graph/AudioViewLayer.h"
 
 
 // TODO: use BufferPainter / MidiPainter

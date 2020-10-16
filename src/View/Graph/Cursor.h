@@ -5,16 +5,16 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_CURSOR_H_
-#define SRC_VIEW_NODE_CURSOR_H_
+#ifndef SRC_VIEW_GRAPH_CURSOR_H_
+#define SRC_VIEW_GRAPH_CURSOR_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 #include "../../Data/Range.h"
 
 class AudioView;
 class color;
 
-class Cursor : public ViewNodeFree {
+class Cursor : public scenegraph::NodeFree {
 public:
 	Cursor(AudioView *view, bool end);
 
@@ -31,7 +31,7 @@ public:
 	bool on_left_button_down() override;
 };
 
-class SelectionMarker : public ViewNodeFree {
+class SelectionMarker : public scenegraph::NodeFree {
 public:
 	SelectionMarker(AudioView *view);
 	bool hover(float mx, float my) override { return false; }
@@ -41,4 +41,4 @@ public:
 	void draw_bar_gap_selector(Painter* p, int bar_gap, const color &col);
 };
 
-#endif /* SRC_VIEW_NODE_CURSOR_H_ */
+#endif /* SRC_VIEW_GRAPH_CURSOR_H_ */

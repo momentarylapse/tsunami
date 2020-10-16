@@ -5,7 +5,8 @@
  *      Author: michi
  */
 
-#include "ScrollBar.h"
+#include "../Graph/ScrollBar.h"
+
 #include "../AudioView.h"
 
 const float SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
@@ -97,7 +98,7 @@ bool ScrollBar::on_left_button_down() {
 }
 
 void ScrollBar::update_geometry(const rect& target_area) {
-	ViewNode::update_geometry(target_area);
+	Node::update_geometry(target_area);
 	if (auto_hide)
 		hidden = !(page_size < content_size);
 }

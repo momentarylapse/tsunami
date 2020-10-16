@@ -12,7 +12,9 @@
 #include <functional>
 
 class AudioView;
-class SceneGraph;
+namespace scenegraph {
+	class SceneGraph;
+}
 class Painter;
 
 class MouseDelayAction {
@@ -29,13 +31,13 @@ public:
 
 class MouseDelayPlanner {
 public:
-	MouseDelayPlanner(SceneGraph *scene_graph);
+	MouseDelayPlanner(scenegraph::SceneGraph *scene_graph);
 
 	float dist = -1;
 	float x0 = 0, y0 = 0;
 	int min_move_to_start;
 	bool _started_acting = false;
-	SceneGraph *scene_graph;
+	scenegraph::SceneGraph *scene_graph;
 	typedef std::function<void()> Callback;
 	owned<MouseDelayAction> action;
 	void prepare(MouseDelayAction *action);

@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_AUDIOVIEWLAYER_H_
-#define SRC_VIEW_NODE_AUDIOVIEWLAYER_H_
+#ifndef SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_
+#define SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class Track;
 class TrackLayer;
@@ -33,7 +33,7 @@ class ScrollBar;
 class AudioViewTrack;
 
 
-class AudioViewLayer : public ViewNodeFree {
+class AudioViewLayer : public scenegraph::NodeFree {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;
@@ -107,4 +107,4 @@ public:
 	ScrollBar *scroll_bar;
 };
 
-#endif /* SRC_VIEW_NODE_AUDIOVIEWLAYER_H_ */
+#endif /* SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_ */

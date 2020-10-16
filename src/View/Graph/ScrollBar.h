@@ -5,16 +5,16 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_SCROLLBAR_H_
-#define SRC_VIEW_NODE_SCROLLBAR_H_
+#ifndef SRC_VIEW_GRAPH_SCROLLBAR_H_
+#define SRC_VIEW_GRAPH_SCROLLBAR_H_
 
 #include "../../lib/base/base.h"
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class Painter;
 class AudioView;
 
-class ScrollBar : public ViewNode {
+class ScrollBar : public scenegraph::Node {
 public:
 	ScrollBar(AudioView *view);
 	//ScrollBar(AudioView *view);
@@ -45,4 +45,4 @@ public:
 	ScrollBarHorizontal(AudioView *view);
 };
 
-#endif /* SRC_VIEW_NODE_SCROLLBAR_H_ */
+#endif /* SRC_VIEW_GRAPH_SCROLLBAR_H_ */

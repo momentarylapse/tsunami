@@ -7,13 +7,13 @@
 
 #include "ViewModeCurve.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewTrack.h"
-#include "../Node/AudioViewLayer.h"
 #include "../../Data/Curve.h"
 #include "../../Data/Song.h"
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../Graph/AudioViewLayer.h"
+#include "../Graph/AudioViewTrack.h"
 #include "../SideBar/SideBar.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
@@ -110,7 +110,7 @@ void ViewModeCurve::draw_post(Painter* c) {
 }
 
 HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
-	auto s = vlayer->ViewNode::get_hover_data(mx, my);//ViewModeDefault::get_hover_data(vlayer, mx, my);
+	auto s = vlayer->Node::get_hover_data(mx, my);//ViewModeDefault::get_hover_data(vlayer, mx, my);
 	s.type = HoverData::Type::CURVE_POINT_NONE;
 
 	// curve points

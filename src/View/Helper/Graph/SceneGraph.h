@@ -5,19 +5,21 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_SCENEGRAPH_H_
-#define SRC_VIEW_NODE_SCENEGRAPH_H_
+#ifndef SRC_VIEW_HELPER_GRAPH_SCENEGRAPH_H_
+#define SRC_VIEW_HELPER_GRAPH_SCENEGRAPH_H_
 
-#include "ViewNode.h"
-#include "../HoverData.h"
+#include "Node.h"
+#include "../../HoverData.h"
 
 class AudioView;
 class MouseDelayPlanner;
 class MouseDelayAction;
 
-class SceneGraph : public ViewNode {
+namespace scenegraph {
+
+class SceneGraph : public Node {
 public:
-	SceneGraph(hui::Callback cb_set_current);//AudioView *view);
+	SceneGraph(hui::Callback cb_set_current);
 
 	bool on_left_button_down() override;
 	bool on_left_button_up() override;
@@ -33,8 +35,6 @@ public:
 
 	string get_tip() override;
 
-	//AudioView *view;
-
 	HoverData hover;
 	HoverData cur_selection;
 	void set_current(const HoverData &h);
@@ -48,5 +48,7 @@ public:
 	float mx, my;
 	void set_mouse();
 };
+
+}
 
 #endif /* SRC_VIEW_NODE_SCENEGRAPH_H_ */

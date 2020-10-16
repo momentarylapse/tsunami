@@ -9,7 +9,6 @@
 #include "../AudioView.h"
 #include "../ViewPort.h"
 #include "../ColorScheme.h"
-#include "../Node/AudioViewLayer.h" // argh
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Midi/MidiNote.h"
@@ -21,6 +20,7 @@
 #include "../Helper/SymbolRenderer.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ModuleConfiguration.h"
+#include "../Graph/AudioViewLayer.h" // argh
 
 
 // rhythm quantization

@@ -6,8 +6,6 @@
  */
 
 #include "AudioViewTrack.h"
-#include "AudioViewLayer.h"
-#include "TrackHeader.h"
 #include "../AudioView.h"
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
@@ -21,13 +19,15 @@
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/CrossFade.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "AudioViewLayer.h"
+#include "TrackHeader.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Painter/BufferPainter.h"
 
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
-AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNodeFree() {
+AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::NodeFree() {
 	view = _view;
 	track = _track;
 	solo = false;

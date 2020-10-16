@@ -7,10 +7,7 @@
 
 #include "ViewModeDefault.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewTrack.h"
-#include "../Node/AudioViewLayer.h"
-#include "../Node/SceneGraph.h"
-#include "../Node/ScrollBar.h"
+#include "../Helper/Graph/SceneGraph.h"
 #include "../MouseDelayPlanner.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
@@ -33,6 +30,9 @@
 #include "../../lib/hui/Controls/Control.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "../../Device/Stream/AudioOutput.h"
+#include "../Graph/AudioViewLayer.h"
+#include "../Graph/AudioViewTrack.h"
+#include "../Graph/ScrollBar.h"
 
 float marker_alpha_factor(float w, float w_group, bool border);
 Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);

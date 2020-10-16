@@ -12,8 +12,7 @@
 
 class Curve;
 
-class ViewModeCurve : public ViewModeDefault
-{
+class ViewModeCurve : public ViewModeDefault {
 public:
 	ViewModeCurve(AudioView *view);
 

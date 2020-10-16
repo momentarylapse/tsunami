@@ -7,16 +7,16 @@
 
 #include "SceneGraph.h"
 
-#include "../HoverData.h"
-#include "../AudioView.h"
-#include "../ViewPort.h"
-#include "../MouseDelayPlanner.h"
+#include "../../HoverData.h"
+#include "../../AudioView.h"
+#include "../../ViewPort.h"
+#include "../../MouseDelayPlanner.h"
 
 
+namespace scenegraph {
 
-
-Array<ViewNode*> collect_children(ViewNode *n, bool include_hidden) {
-	Array<ViewNode*> nodes;
+Array<Node*> collect_children(Node *n, bool include_hidden) {
+	Array<Node*> nodes;
 	for (auto *c: weak(n->children))
 		if (!c->hidden or include_hidden) {
 			nodes.add(c);
@@ -25,7 +25,7 @@ Array<ViewNode*> collect_children(ViewNode *n, bool include_hidden) {
 	return nodes;
 }
 
-Array<ViewNode*> collect_children_up(ViewNode *n) {
+Array<Node*> collect_children_up(Node *n) {
 	auto nodes = collect_children(n, false);
 	for (int i=0; i<nodes.num; i++)
 		for (int j=i+1; j<nodes.num; j++)
@@ -34,7 +34,7 @@ Array<ViewNode*> collect_children_up(ViewNode *n) {
 	return nodes;
 }
 
-Array<ViewNode*> collect_children_down(ViewNode *n) {
+Array<Node*> collect_children_down(Node *n) {
 	auto nodes = collect_children(n, false);
 	for (int i=0; i<nodes.num; i++)
 		for (int j=i+1; j<nodes.num; j++)
@@ -198,3 +198,4 @@ void SceneGraph::mdp_prepare(hui::Callback update) {
 	mdp->prepare(new MouseDelayActionWrapper(update));
 }
 
+}

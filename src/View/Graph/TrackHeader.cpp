@@ -5,9 +5,9 @@
  *      Author: michi
  */
 
-#include "TrackHeader.h"
-#include "ViewNode.h"
-#include "AudioViewTrack.h"
+#include "../Graph/TrackHeader.h"
+
+#include "../Helper/Graph/Node.h"
 #include "../AudioView.h"
 #include "../MouseDelayPlanner.h"
 #include "../../Data/base.h"
@@ -16,6 +16,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
+#include "../Graph/AudioViewTrack.h"
 
 
 
@@ -23,12 +24,12 @@
 
 
 
-class TrackHeaderButton : public ViewNodeRel {
+class TrackHeaderButton : public scenegraph::NodeRel {
 public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader *header;
-	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNodeRel(dx, dy, 16, 16) {
+	TrackHeaderButton(TrackHeader *th, float dx, float dy) : scenegraph::NodeRel(dx, dy, 16, 16) {
 		vtrack = th->vtrack;
 		header = th;
 		view = th->view;
@@ -102,7 +103,7 @@ public:
 	}
 };
 
-TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	align.dz = 70;
 	vtrack = t;
 	view = vtrack->view;
@@ -177,7 +178,7 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 		c->hidden = !extended;
 	children[1]->hidden |= (view->song->tracks.num == 1);
 	
-	ViewNode::update_geometry_recursive(target_area);
+	Node::update_geometry_recursive(target_area);
 }
 
 void TrackHeader::draw(Painter *c) {
@@ -287,7 +288,7 @@ bool TrackHeader::on_right_button_down() {
 }
 
 HoverData TrackHeader::get_hover_data(float mx, float my) {
-	auto h = ViewNode::get_hover_data(mx, my);
+	auto h = Node::get_hover_data(mx, my);
 	h.vtrack = vtrack;
 	h.vlayer = vtrack->first_layer();
 	return h;

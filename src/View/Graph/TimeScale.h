@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_TIMESCALE_H_
-#define SRC_VIEW_NODE_TIMESCALE_H_
+#ifndef SRC_VIEW_GRAPH_TIMESCALE_H_
+#define SRC_VIEW_GRAPH_TIMESCALE_H_
 
-#include "ViewNode.h"
+#include "../Helper/Graph/Node.h"
 
 class AudioView;
 
-class TimeScale : public ViewNodeRel {
+class TimeScale : public scenegraph::NodeRel {
 public:
 	TimeScale(AudioView *view);
 	void draw(Painter *p) override;
@@ -27,4 +27,4 @@ public:
 	AudioView *view;
 };
 
-#endif /* SRC_VIEW_NODE_TIMESCALE_H_ */
+#endif /* SRC_VIEW_GRAPH_TIMESCALE_H_ */

@@ -5,19 +5,20 @@
  *      Author: michi
  */
 
-#include "Background.h"
-#include "AudioViewLayer.h"
+#include "../Graph/Background.h"
+
 #include "../AudioView.h"
 #include "../Mode/ViewMode.h"
 #include "../Painter/GridPainter.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../Graph/AudioViewLayer.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
-Background::Background(AudioView *_view) : ViewNodeFree() {
+Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;

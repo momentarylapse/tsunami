@@ -23,7 +23,7 @@
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewTrack.h"
+#include "../Graph/AudioViewTrack.h"
 
 class TrackSelectionDialog : public hui::Dialog {
 public:

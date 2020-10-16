@@ -1,25 +1,27 @@
 /*
- * ViewNode.h
+ * Node.h
  *
  *  Created on: 08.06.2019
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_NODE_VIEWNODE_H_
-#define SRC_VIEW_NODE_VIEWNODE_H_
+#ifndef SRC_VIEW_HELPER_GRAPH_NODE_H_
+#define SRC_VIEW_HELPER_GRAPH_NODE_H_
 
-#include "../../lib/base/base.h"
-#include "../../lib/base/pointer.h"
-#include "../../lib/math/math.h"
-#include "../../Stuff/Observable.h"
+#include "../../../lib/base/base.h"
+#include "../../../lib/base/pointer.h"
+#include "../../../lib/math/math.h"
+#include "../../../Stuff/Observable.h"
 
 class Painter;
 class HoverData;
 
-class ViewNode : public Sharable<Observable<VirtualBase>> {
+namespace scenegraph {
+
+class Node : public Sharable<Observable<VirtualBase>> {
 public:
-	ViewNode();
-	ViewNode(float w, float h);
+	Node();
+	Node(float w, float h);
 
 	virtual bool allow_handle_click_when_gaining_focus() { return true; }
 
@@ -32,8 +34,8 @@ public:
 	virtual bool hover(float mx, float my);
 	virtual void draw(Painter *p) {}
 	virtual HoverData get_hover_data(float mx, float my);
-	void add_child(ViewNode *child);
-	void delete_child(ViewNode *child);
+	void add_child(Node *child);
+	void delete_child(Node *child);
 
 	bool is_cur_hover();
 	bool is_cur_hover_non_recursive();
@@ -43,9 +45,9 @@ public:
 	virtual void update_geometry(const rect &target_area);
 	virtual void update_geometry_recursive(const rect &target_area);
 
-	ViewNode *root();
+	Node *root();
 
-	ViewNode *parent;
+	Node *parent;
 	struct AlignData {
 		enum class Mode{
 			NONE,
@@ -59,33 +61,35 @@ public:
 		float dx, dy, dz;
 		float w, h;
 	} align;
-	shared_array<ViewNode> children;
+	shared_array<Node> children;
 	rect area;
 	int z;
 	bool hidden;
 };
 
-class ViewNodeFree : public ViewNode {
+class NodeFree : public Node {
 public:
-	ViewNodeFree();
+	NodeFree();
 };
 
-class ViewNodeRel : public ViewNode {
+class NodeRel : public Node {
 public:
-	ViewNodeRel(float dx, float dy, float w, float h);
+	NodeRel(float dx, float dy, float w, float h);
 };
 
 
-class NodeHBox : public ViewNode {
+class HBox : public Node {
 public:
-	NodeHBox();
+	HBox();
 	void update_geometry_recursive(const rect &target_area) override;
 };
 
-class NodeVBox : public ViewNode {
+class VBox : public Node {
 public:
-	NodeVBox();
+	VBox();
 	void update_geometry_recursive(const rect &target_area) override;
 };
 
-#endif /* SRC_VIEW_NODE_VIEWNODE_H_ */
+}
+
+#endif /* SRC_VIEW_HELPER_GRAPH_NODE_H_ */

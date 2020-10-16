@@ -7,13 +7,7 @@
 
 #include "AudioView.h"
 #include "MouseDelayPlanner.h"
-#include "Node/AudioViewTrack.h"
-#include "Node/AudioViewLayer.h"
-#include "Node/TimeScale.h"
-#include "Node/SceneGraph.h"
-#include "Node/ScrollBar.h"
-#include "Node/Cursor.h"
-#include "Node/Background.h"
+#include "Helper/Graph/SceneGraph.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeEdit.h"
 #include "Mode/ViewModeEditDummy.h"
@@ -48,6 +42,12 @@
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
+#include "Graph/AudioViewLayer.h"
+#include "Graph/AudioViewTrack.h"
+#include "Graph/Background.h"
+#include "Graph/Cursor.h"
+#include "Graph/ScrollBar.h"
+#include "Graph/TimeScale.h"
 #include "Painter/BufferPainter.h"
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
@@ -158,13 +158,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_dummy, mode_edit, mode_scale_bars, mode_scale_marker, mode_curve, mode_capture};
 	set_mode(mode_default);
 
-	scene_graph = new SceneGraph([=]{ set_current(scene_graph->cur_selection); });
+	scene_graph = new scenegraph::SceneGraph([=]{ set_current(scene_graph->cur_selection); });
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
 	time_scale = new TimeScale(this);
 
-	auto *vbox = new NodeVBox();
-	auto *hbox = new NodeHBox();
+	auto *vbox = new scenegraph::VBox();
+	auto *hbox = new scenegraph::HBox();
 
 	background = new Background(this);
 	cursor_start = new Cursor(this, false);

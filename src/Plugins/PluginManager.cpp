@@ -51,10 +51,10 @@
 #include "../Stuff/Clipboard.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ModuleSelectorDialog.h"
+#include "../View/Graph/AudioViewLayer.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
-#include "../View/Node/ViewNode.h"
-#include "../View/Node/AudioViewLayer.h"
+#include "../View/Helper/Graph/Node.h"
 #include "../View/Painter/MidiPainter.h"
 #include "../View/Painter/GridPainter.h"
 #include "Plugin.h"
@@ -630,9 +630,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::link_external_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
 	Kaba::link_external_class_func("AudioView.cur_vtrack", &AudioView::cur_vtrack);
 
-	Kaba::declare_class_size("SceneGraph.Node", sizeof(ViewNode));
-	Kaba::declare_class_element("SceneGraph.Node.area", &ViewNode::area);
-	Kaba::declare_class_element("SceneGraph.Node." + Kaba::IDENTIFIER_SHARED_COUNT, &ViewNode::_pointer_ref_counter);
+	Kaba::declare_class_size("SceneGraph.Node", sizeof(scenegraph::Node));
+	Kaba::declare_class_element("SceneGraph.Node.area", &scenegraph::Node::area);
+	Kaba::declare_class_element("SceneGraph.Node." + Kaba::IDENTIFIER_SHARED_COUNT, &scenegraph::Node::_pointer_ref_counter);
 
 	Kaba::declare_class_size("AudioView.Layer", sizeof(AudioViewLayer));
 	Kaba::declare_class_element("AudioView.Layer.layer", &AudioViewLayer::layer);

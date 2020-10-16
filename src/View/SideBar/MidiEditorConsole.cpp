@@ -15,8 +15,6 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
-#include "../Node/AudioViewLayer.h"
-#include "../Node/AudioViewTrack.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
@@ -25,6 +23,8 @@
 #include "MidiEditorConsole.h"
 #include "../Dialog/MarkerDialog.h"
 #include "../Dialog/QuestionDialog.h"
+#include "../Graph/AudioViewLayer.h"
+#include "../Graph/AudioViewTrack.h"
 
 //int get_track_index_save(Song *song, Track *t);
 

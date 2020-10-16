@@ -52,8 +52,10 @@ class Session;
 class MidiPainter;
 class BufferPainter;
 class GridPainter;
+namespace scenegraph {
 class SceneGraph;
-class ViewNode;
+class Node;
+}
 class TimeScale;
 class Cursor;
 class SelectionMarker;
@@ -279,7 +281,7 @@ public:
 	rect song_area();
 	rect clip;
 	TrackHeightManager thm;
-	shared<SceneGraph> scene_graph;
+	shared<scenegraph::SceneGraph> scene_graph;
 	bool update_scene_graph();
 	void rebuild_scene_graph();
 
@@ -293,7 +295,7 @@ public:
 	ScrollBar *scroll_bar_y;
 	ScrollBar *scroll_bar_time;
 	TimeScale *time_scale;
-	ViewNode *background;
+	scenegraph::Node *background;
 	Cursor *cursor_start, *cursor_end;
 	SelectionMarker *selection_marker;
 

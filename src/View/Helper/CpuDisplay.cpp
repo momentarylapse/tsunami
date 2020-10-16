@@ -6,27 +6,47 @@
  */
 
 #include "CpuDisplay.h"
+#include "Graph/SceneGraph.h"
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
 #include "../../Module/Module.h"
+#include "../../TsunamiWindow.h"
 #include "../AudioView.h"
 
 static const float UPDATE_DT = 2.0f;
 
-CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session) {
-	panel = _panel;
+CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, CpuDisplay *_cpu_display) {
+	parent = _parent;
 	id = _id;
-	perf_mon = session->perf_mon;
-	view = session->view;
-
-	dlg = nullptr;
+	cpu_display = _cpu_display;
 
 	if (!hui::Config.get_bool("CpuDisplay", false))
-		panel->hide_control(id, true);
+		parent->hide_control(id, true);
 
-	panel->event_xp(id, "hui:draw", [=](Painter* p){ on_draw(p); });
-	panel->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
+	scene_graph = new scenegraph::SceneGraph([] {});
+	scene_graph->add_child(cpu_display);
+
+	parent->event_xp(id, "hui:draw", [=](Painter* p){
+		scene_graph->update_geometry_recursive(p->area());
+		scene_graph->draw(p);
+	});
+	parent->event_x(id, "hui:left-button-down", [=]{ scene_graph->on_left_button_down(); });
+}
+
+
+
+
+CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scenegraph::NodeFree() {
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
+
+	session = _session;
+	perf_mon = session->perf_mon;
+	view = session->view;
+	request_redraw = _request_redraw;
+
+	dlg = nullptr;
 
 	perf_mon->subscribe(this, [=]{ update(); });
 }
@@ -53,30 +73,33 @@ string channel_title(PerfChannelInfo &c) {
 	if (c.name != "module")
 		return c.name;
 
-	auto *m = (Module*)c.p;
+	auto *m = reinterpret_cast<Module*>(c.p);
 	if (m->module_subtype != "")
 		return m->module_subtype;
 
 	return m->type_to_name(m->module_type);
 }
 
-void CpuDisplay::on_draw(Painter* p) {
-	int w = p->width;
-	int h = p->height;
+void CpuDisplay::draw(Painter* p) {
+	float x00 = area.x1;
+	float y00 = area.y1;
+	int w = area.width();
+	int h = area.height();
 	bool large = (h > 50);
 
 	p->set_color(view->colors.background);
-	p->draw_rect(2, 2, w-4, h-4);
+	//p->draw_rect(2, 2, w-4, h-4);
+	p->draw_rect(area);
 	p->set_line_width(large ? 2.0f : 1.0f);
 
 	// graphs
 	for (auto &c: channels) {
 		p->set_color(type_color(c.name));
 		for (int j=1; j<c.stats.num; j++) {
-			float x0 = w - 2 - (c.stats.num - (j-1)) * 2;
-			float x1 = w - 2 - (c.stats.num -  j   ) * 2;
-			float y0 = 2 + (h - 4) * (1 - c.stats[j-1].cpu);
-			float y1 = 2 + (h - 4) * (1 - c.stats[j].cpu);
+			float x0 = area.x2 - (c.stats.num - (j-1)) * 2;
+			float x1 = area.x2 - (c.stats.num -  j   ) * 2;
+			float y0 = area.y1 + h * (1 - c.stats[j-1].cpu);
+			float y1 = area.y1 + h * (1 - c.stats[j].cpu);
 			if (x1 >= 2)
 				p->draw_line(x0, y0, x1, y1);
 		}
@@ -127,30 +150,32 @@ void CpuDisplay::on_draw(Painter* p) {
 			if (c.stats.num > 0) {
 				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
-				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
+				p->draw_str(x00 + 20 + (t/2) * 30, y00 + h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
 				t ++;
 			}
 		}
 	}
 }
 
-void CpuDisplay::on_left_button_down() {
-	if (dlg) {
-		dlg->show();
-	} else {
-		dlg = new hui::Dialog("cpu", 380, 260, panel->win, true);
-		dlg->set_options("", "resizable,borderwidth=0");
-		dlg->add_drawing_area("", 0, 0, "area");
-		dlg->event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
-		dlg->event("hui:close", [=]{ on_dialog_close(); });
-		dlg->show();
-	}
-}
+class CpuDisplayDialog : public hui::Dialog {
+public:
+	CpuDisplayDialog(Session *session) : hui::Dialog("cpu", 380, 260, session->win.get()->win, true) {
+		set_options("", "resizable,borderwidth=0");
+		add_drawing_area("", 0, 0, "area");
 
-void CpuDisplay::on_dialog_close() {
+		auto cpu_display = new CpuDisplay(session, [&]{ redraw("area"); });
+		adapter = new CpuDisplayAdapter(this, "area", cpu_display);
+		event("hui:close", [=]{ hide(); });
+	}
+
+	CpuDisplayAdapter *adapter;
+};
+
+bool CpuDisplay::on_left_button_down() {
 	if (!dlg)
-		return;
-	dlg->hide();
+		dlg = new CpuDisplayDialog(session);
+	dlg->show();
+	return true;
 }
 
 void ch_sort(Array<PerfChannelInfo> &channels) {
@@ -185,8 +210,5 @@ Array<PerfChannelInfo> ch_tree_sort(const Array<PerfChannelInfo> &ch) {
 
 void CpuDisplay::update() {
 	channels = ch_tree_sort(perf_mon->get_info());
-
-	panel->redraw(id);
-	if (dlg)
-		dlg->redraw("area");
+	request_redraw();
 }

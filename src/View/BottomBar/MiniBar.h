@@ -13,6 +13,7 @@
 
 class PeakMeterDisplay;
 class CpuDisplay;
+class CpuDisplayAdapter;
 class AudioOutput;
 class DeviceManager;
 class BottomBar;
@@ -40,7 +41,7 @@ public:
 	Session *session;
 	DeviceManager *dev_manager;
 	owned<PeakMeterDisplay> peak_meter;
-	owned<CpuDisplay> cpu_display;
+	owned<CpuDisplayAdapter> cpu_display_adapter;
 	BottomBar *bottom_bar;
 	AudioView *view;
 };

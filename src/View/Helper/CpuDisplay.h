@@ -9,10 +9,14 @@
 #define SRC_VIEW_HELPER_CPUDISPLAY_H_
 
 #include "../../Stuff/Observable.h"
+#include "Graph/Node.h"
 
-namespace hui{
+namespace hui {
 	class Panel;
 	class Dialog;
+}
+namespace scenegraph {
+	class SceneGraph;
 }
 class Painter;
 class PerformanceMonitor;
@@ -20,26 +24,38 @@ class Session;
 class AudioView;
 class PerfChannelInfo;
 
-class CpuDisplay : public VirtualBase {
+class CpuDisplay : public scenegraph::NodeFree {
 public:
-	CpuDisplay(hui::Panel *panel, const string &id, Session *session);
+	CpuDisplay(Session *session, hui::Callback request_redraw);
 	virtual ~CpuDisplay();
 
-	void on_dialog_close();
-	void on_left_button_down();
-	void on_draw(Painter *p);
+	bool on_left_button_down() override;
+	void draw(Painter *p) override;
 	void update();
 
+	Session *session;
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
 
-	hui::Panel *panel;
-	string id;
+	hui::Callback request_redraw;
 
 	hui::Dialog *dlg;
 
 
 	Array<PerfChannelInfo> channels;
+};
+
+
+
+class CpuDisplayAdapter : public VirtualBase {
+public:
+	CpuDisplayAdapter(hui::Panel *parent, const string &id, CpuDisplay *cpu_display);
+
+	CpuDisplay *cpu_display;
+	scenegraph::SceneGraph *scene_graph;
+
+	hui::Panel *parent;
+	string id;
 };
 
 #endif /* SRC_VIEW_HELPER_CPUDISPLAY_H_ */

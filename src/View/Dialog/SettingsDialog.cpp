@@ -12,6 +12,7 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/MiniBar.h"
+#include "../BottomBar/DeviceConsole.h"
 #include "../Helper/CpuDisplay.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
@@ -60,6 +61,10 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 	ogg_quality.add(OggQuality(0.8f, 256));
 	ogg_quality.add(OggQuality(0.9f, 320));
 	ogg_quality.add(OggQuality(1.0f, 500));
+
+
+	device_console = new DeviceConsole(view->session);
+	embed(device_console, "device-console", 0, 0);
 
 	load_data();
 

@@ -632,7 +632,7 @@ Grid
 2
 TabControl
 dev-tab
-left
+
 0
 0
 3
@@ -6182,7 +6182,7 @@ default
 # Resource
 Dialog
 settings_dialog
-width=580,height=350,headerbar,resizable,borderwidth=0
+width=680,height=450,headerbar,resizable,borderwidth=0
 0
 0
 1
@@ -6281,6 +6281,12 @@ Grid
 
 1
 0
+2
+Grid
+?
+
+0
+0
 8
 Text
 t_audio_api
@@ -6329,6 +6335,18 @@ suck_size
 --range=0:1000000:1
 1
 3
+0
+Group
+g-device-list
+
+0
+1
+1
+Grid
+device-console
+
+0
+0
 0
 Grid
 ?
@@ -7190,7 +7208,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-606
+607
 # Text
 /bars-add
 Add bars...
@@ -8773,6 +8791,9 @@ CPU meter
 settings_dialog/default_artist
 
 will create an artist=... tag in new files
+settings_dialog/g-device-list
+Order of preference
+
 settings_dialog/high_details
 High details
 

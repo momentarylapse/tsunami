@@ -11,6 +11,7 @@
 #include "../../lib/hui/hui.h"
 
 class AudioView;
+class DeviceConsole;
 
 class SettingsDialog: public hui::Window {
 public:
@@ -44,6 +45,7 @@ private:
 
 	Array<OggQuality> ogg_quality;
 	AudioView *view;
+	DeviceConsole *device_console;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

@@ -1,4 +1,4 @@
-Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable borderwidth=0
+Dialog settings_dialog "Settings" width=680 height=450 headerbar resizable borderwidth=0
 	Grid ? "" vertical
 		TabControl tab "User Interface\\Devices\\Storage" expandy
 			Grid ? ""
@@ -19,17 +19,21 @@ Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable borde
 				Text t_debug "Debug" right disabled
 				CheckBox cpu_meter "CPU meter"
 			Grid ? ""
-				Text t_audio_api "Audio library" right disabled
-				ComboBox audio_api "" expandx "tooltip=a program restart is required to apply"
+				Grid ? ""
+					Text t_audio_api "Audio library" right disabled
+					ComboBox audio_api "" expandx "tooltip=a program restart is required to apply"
+					---|
+					Text t_midi_api "Midi library" right disabled
+					ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
+					---|
+					Text t_prebuffer_size "Prebuffer" right disabled
+					SpinButton prebuffer_size "" --range=0:1000000:1 "tooltip=will try to keep so many samples in the ringbuffer for an output stream"
+					---|
+					Text t_suck_size "Suck buffer" right disabled
+					SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
 				---|
-				Text t_midi_api "Midi library" right disabled
-				ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
-				---|
-				Text t_prebuffer_size "Prebuffer" right disabled
-				SpinButton prebuffer_size "" --range=0:1000000:1 "tooltip=will try to keep so many samples in the ringbuffer for an output stream"
-				---|
-				Text t_suck_size "Suck buffer" right disabled
-				SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
+				Group g-device-list "Order of preference"
+					Grid device-console ""
 			Grid ? ""
 				Text pdt_defaultartist "Default artist" right disabled
 				Edit default_artist "" "tooltip=will create an artist=... tag in new files"

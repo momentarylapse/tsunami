@@ -331,7 +331,7 @@ void Panel::add_menu_button(const string &title, int x, int y, const string &id)
 }
 
 void Panel::embed_dialog(const string &id, int x, int y) {
-	border_width = 8;
+	spacing = 5;
 
 	Resource *res = GetResource(id);
 	if (!res)

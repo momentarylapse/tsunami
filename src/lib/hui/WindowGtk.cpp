@@ -561,6 +561,8 @@ void Window::__set_options(const string &options) {
 			show_cursor(val_is_positive(val, true));
 		} else if (op == "borderwidth") {
 			set_border_width(val._int());
+		} else if (op == "spacing") {
+			spacing = val._int();
 		}
 	}
 }

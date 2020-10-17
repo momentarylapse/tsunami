@@ -248,7 +248,7 @@ default,danger,image=hui:ok
 # Resource
 Dialog
 bar_edit_dialog
-width=350,height=80,headerbar,closebutton=no
+width=350,height=80,headerbar,closebutton=no,borderwidth=0
 0
 0
 1
@@ -6182,7 +6182,7 @@ default
 # Resource
 Dialog
 settings_dialog
-width=580,height=350,headerbar,resizable
+width=580,height=350,headerbar,resizable,borderwidth=0
 0
 0
 1
@@ -6197,13 +6197,13 @@ tab
 expandy
 0
 0
-4
+3
 Grid
 ?
 
 0
 0
-6
+10
 Text
 pdp_language
 right,disabled
@@ -6217,82 +6217,40 @@ expandx
 0
 0
 Text
-pdt_defaultartist
-right,disabled
-0
-1
-0
-Edit
-default_artist
-
-1
-1
-0
-Text
-t_quick_export_dir
-right,disabled
-0
-2
-0
-Grid
-?
-
-1
-2
-2
-Edit
-quick_export_dir
-expandx,disabled
-0
-0
-0
-Button
-quick_export_dir_find
-image=hui:find
-1
-0
-0
-Grid
-?
-
-1
-0
-8
-Text
 pdp_colorscheme
 right,disabled
 0
-0
+1
 0
 ComboBox
 color_scheme
 expandx
 1
-0
+1
 0
 Text
 t_scroll_speed
 right,disabled
 0
-1
+2
 0
 SpinButton
 scroll_speed
 --range=0.1:20:0.1
 1
-1
+2
 0
 Text
 t_quality
 right,disabled
 0
-2
+3
 0
 Grid
 ?
 
 1
-2
+3
 2
 CheckBox
 antialiasing
@@ -6310,18 +6268,18 @@ Text
 t_debug
 right,disabled
 0
-3
+4
 0
 CheckBox
 cpu_meter
 
 1
-3
+4
 0
 Grid
 ?
 
-2
+1
 0
 8
 Text
@@ -6375,20 +6333,56 @@ suck_size
 Grid
 ?
 
-3
-0
 2
+0
+6
+Text
+pdt_defaultartist
+right,disabled
+0
+0
+0
+Edit
+default_artist
+
+1
+0
+0
+Text
+t_quick_export_dir
+right,disabled
+0
+1
+0
+Grid
+?
+
+1
+1
+2
+Edit
+quick_export_dir
+expandx,disabled
+0
+0
+0
+Button
+quick_export_dir_find
+image=hui:find
+1
+0
+0
 Text
 pdt_oggrate
 right,disabled
 0
-0
+2
 0
 ComboBox
 ogg_bitrate
 expandx
 1
-0
+2
 0
 # Resource
 Dialog
@@ -7086,17 +7080,11 @@ Grid
 vertical
 0
 0
-3
-Label
-t-disclaimer
-height=40,italic
-0
-0
-0
+2
 Grid
 list
 
-1
+0
 0
 2
 Label
@@ -7114,7 +7102,7 @@ bold,expandx
 Grid
 ?
 buttonbar
-2
+1
 0
 1
 Button
@@ -7202,7 +7190,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-607
+606
 # Text
 /bars-add
 Add bars...
@@ -8840,7 +8828,7 @@ settings_dialog/t_suck_size
 Suck buffer
 
 settings_dialog/tab
-General\\User Interface\\Devices\\Other
+User Interface\\Devices\\Storage
 
 song_dialog/ad_t_edit
 Edit
@@ -8962,9 +8950,6 @@ Volume in dB
 track-routing-dialog/add-group
 
 Add group
-track-routing-dialog/t-disclaimer
-...this is highly experimental...don`t complain!
-
 track-routing-dialog/t-target
 Target
 

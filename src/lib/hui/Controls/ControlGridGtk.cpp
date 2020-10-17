@@ -20,8 +20,8 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	button_bar = false;
 	action_bar = false;
 	widget = gtk_grid_new();
-	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
-	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
+	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->spacing);
+	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->spacing);
 	set_options(get_option_from_title(title));
 }
 

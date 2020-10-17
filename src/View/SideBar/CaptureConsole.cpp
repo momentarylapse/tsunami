@@ -34,7 +34,6 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	set_border_width(5);
 	embed_dialog("record_dialog", 0, 0);
 
 

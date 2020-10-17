@@ -152,6 +152,7 @@ public:
 	string _get_cur_id_();
 	void _set_cur_id_(const string &id);
 	void _cdecl set_border_width(int width);
+	void _cdecl set_spacing(int width);
 
 
 protected:
@@ -189,6 +190,7 @@ public:
 	int _get_unique_id_();
 	int num_float_decimals;
 	int border_width;
+	int spacing;
 	Window *win;
 	Panel *parent;
 	Array<Panel*> children;

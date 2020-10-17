@@ -1,4 +1,4 @@
-Dialog bar_edit_dialog "Edit bars" width=350 height=80 headerbar closebutton=no
+Dialog bar_edit_dialog "Edit bars" width=350 height=80 headerbar closebutton=no borderwidth=0
 	Grid ? "" vertical
 		TabControl mode "Speed\\Replace"
 			Grid ? "" vertical

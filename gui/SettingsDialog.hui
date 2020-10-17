@@ -1,18 +1,10 @@
-Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable
+Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable borderwidth=0
 	Grid ? "" vertical
-		TabControl tab "General\\User Interface\\Devices\\Other" expandy
+		TabControl tab "User Interface\\Devices\\Storage" expandy
 			Grid ? ""
 				Text pdp_language "Language" right disabled
 				ComboBox language "" expandx
 				---|
-				Text pdt_defaultartist "Default artist" right disabled
-				Edit default_artist "" "tooltip=will create an artist=... tag in new files"
-				---|
-				Text t_quick_export_dir "Quick export" right disabled
-				Grid ? ""
-					Edit quick_export_dir "" expandx disabled
-					Button quick_export_dir_find "" image=hui:find
-			Grid ? ""
 				Text pdp_colorscheme "Color scheme" right disabled
 				ComboBox color_scheme "" expandx
 				---|
@@ -39,5 +31,13 @@ Dialog settings_dialog "Settings" width=580 height=350 headerbar resizable
 				Text t_suck_size "Suck buffer" right disabled
 				SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
 			Grid ? ""
+				Text pdt_defaultartist "Default artist" right disabled
+				Edit default_artist "" "tooltip=will create an artist=... tag in new files"
+				---|
+				Text t_quick_export_dir "Quick export" right disabled
+				Grid ? ""
+					Edit quick_export_dir "" expandx disabled
+					Button quick_export_dir_find "" image=hui:find
+				---|
 				Text pdt_oggrate "OGG bitrate" right disabled
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx

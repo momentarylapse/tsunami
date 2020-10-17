@@ -238,6 +238,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// table structure
 	set_size(width, height);
 	set_border_width(0);
+	set_spacing(0);
 	add_grid("", 0, 0, "root-grid");
 	set_target("root-grid");
 	add_grid("", 1, 0, "main-grid");

@@ -47,7 +47,6 @@ TrackConsole::TrackConsole(Session *session) :
 	track = nullptr;
 	panel = nullptr;
 	editing = false;
-	set_border_width(5);
 	from_resource("track_dialog");
 	set_decimals(1);
 

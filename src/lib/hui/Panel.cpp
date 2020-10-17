@@ -19,6 +19,7 @@ Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
 	border_width = 5;
+	spacing = 5;
 	id = "";
 	num_float_decimals = 3;
 	root_control = nullptr;
@@ -80,6 +81,10 @@ void Panel::_ClearPanel_() {
 
 void Panel::set_border_width(int width) {
 	border_width = width;
+}
+
+void Panel::set_spacing(int width) {
+	spacing = width;
 }
 
 void Panel::set_decimals(int decimals) {

@@ -48,7 +48,7 @@ public:
 class TrackMixer: public hui::Panel {
 public:
 	TrackMixer(AudioViewTrack *t, MixingConsole *c) {
-		set_border_width(0);
+		set_spacing(0);
 		from_resource("track-mixer2");
 
 		track = nullptr;
@@ -365,7 +365,7 @@ MixingConsole::MixingConsole(Session *session) :
 	device_manager = session->device_manager;
 	id_inner = "inner-grid";
 
-	set_border_width(2);
+	set_spacing(2);
 	from_resource("mixing-console");
 
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, PeakMeterDisplay::Mode::PEAKS);

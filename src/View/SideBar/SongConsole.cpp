@@ -25,7 +25,6 @@ SongConsole::SongConsole(Session *session) :
 	SideBarConsole(_("File"), session)
 {
 	// dialog
-	set_border_width(5);
 	embed_dialog("song_dialog", 0, 0);
 	set_decimals(1);
 

@@ -100,7 +100,7 @@ void ControlTabControl::add(Control *child, int x, int y) {
 	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
 	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
 	if (panel)
-		gtk_container_set_border_width(GTK_CONTAINER(target_widget), panel->border_width);
+		gtk_container_set_border_width(GTK_CONTAINER(target_widget), panel->spacing);
 	children.add(child);
 	child->parent = this;
 }

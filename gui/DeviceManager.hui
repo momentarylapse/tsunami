@@ -1,8 +1,8 @@
 Dialog device-manager "" width=400 height=200
 	Grid ? ""
 		TabControl dev-tab "Output\\Input\\Midi Input" left
-			ListView output-list "#\\name\\internal name\\channels\\show\\present" format=ttttCc reorderable
-			ListView input-list "#\\name\\internal name\\channels\\show\\present" format=ttttCc reorderable
-			ListView midi-input-list "#\\name\\internal name\\show\\present" format=tttCc reorderable
+			ListView output-list "#\\name\\status\\info\\hide" format=mmmmC reorderable "tooltip=drag and drop to change order of preference"
+			ListView input-list "#\\name\\status\\info\\hide" format=mmmmC reorderable
+			ListView midi-input-list "#\\name\\status\\hide" format=mmmC reorderable
 		Grid ? ""
 			Button erase "" flat image=hui:delete "tooltip=Remove from list"

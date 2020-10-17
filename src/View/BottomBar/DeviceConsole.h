@@ -32,7 +32,9 @@ public:
 	void on_top_priority();
 	void on_erase();
 
-	string to_format(int i, const Device *d);
+	string to_format(const Device *d);
+
+	int fav_index(const Device *d);
 
 	DeviceManager *device_manager;
 	Array<Device*> output_devices;

@@ -638,19 +638,19 @@ left
 3
 ListView
 output-list
-format=ttttCc,reorderable
+format=mmmmC,reorderable
 0
 0
 0
 ListView
 input-list
-format=ttttCc,reorderable
+format=mmmmC,reorderable
 1
 0
 0
 ListView
 midi-input-list
-format=tttCc,reorderable
+format=mmmC,reorderable
 2
 0
 0
@@ -7655,14 +7655,14 @@ device-manager/erase
 
 Remove from list
 device-manager/input-list
-#\\name\\internal name\\channels\\show\\present
+#\\name\\status\\info\\hide
 
 device-manager/midi-input-list
-#\\name\\internal name\\show\\present
+#\\name\\status\\hide
 
 device-manager/output-list
-#\\name\\internal name\\channels\\show\\present
-
+#\\name\\status\\info\\hide
+drag and drop to change order of preference
 dummy-editor/dummy-editor
 Editing
 

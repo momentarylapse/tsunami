@@ -12,6 +12,7 @@
 
 class DeviceManager;
 class Device;
+enum class DeviceType;
 
 class DeviceConsole: public BottomBar::Console {
 public:
@@ -20,11 +21,10 @@ public:
 
 	void update_full();
 	void change_data();
-	void add_device();
+	void on_add_device();
 
-	void on_output_move();
-	void on_input_move();
-	void on_midi_input_move();
+	void on_move_device(DeviceType type);
+	void on_right_click_device(DeviceType type);
 	void on_erase();
 
 	void on_device_hide();
@@ -34,9 +34,6 @@ public:
 	int fav_index(const Device *d);
 
 	DeviceManager *device_manager;
-	Array<Device*> &output_devices();
-	Array<Device*> &input_devices();
-	Array<Device*> &midi_input_devices();
 
 	hui::Menu *popup;
 	Device *popup_device;

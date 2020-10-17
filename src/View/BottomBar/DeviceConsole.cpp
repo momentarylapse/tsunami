@@ -10,6 +10,18 @@
 #include "../../Device/Device.h"
 #include "../../Device/DeviceManager.h"
 
+static string list_id(DeviceType type) {
+	if (type == DeviceType::AUDIO_OUTPUT)
+		return "output-list";
+	if (type == DeviceType::AUDIO_INPUT)
+		return "input-list";
+	if (type == DeviceType::MIDI_INPUT)
+		return "midi-input-list";
+	return "?";
+}
+
+static const Array<DeviceType> LIST_TYPE = {DeviceType::AUDIO_OUTPUT, DeviceType::AUDIO_INPUT, DeviceType::MIDI_INPUT};
+
 DeviceConsole::DeviceConsole(Session *session) :
 	BottomBar::Console(_("Devices"), session)
 {
@@ -19,40 +31,16 @@ DeviceConsole::DeviceConsole(Session *session) :
 
 	from_resource("device-manager");
 
-	event_x("output-list", "hui:move", [=]{ on_output_move(); });
-	event_x("input-list", "hui:move", [=]{ on_input_move(); });
-	event_x("midi-input-list", "hui:move", [=]{ on_midi_input_move(); });
-
-	event_x("output-list", "hui:right-button-down", [=]{
-		int n = hui::GetEvent()->row;
-		if (n >= 0) {
-			popup_device = device_manager->device_list(DeviceType::AUDIO_OUTPUT)[n];
-			popup->check("device-hide", !popup_device->visible);
-			popup->open_popup(this);
-		}
-	});
-	event_x("input-list", "hui:right-button-down", [=]{
-		int n = hui::GetEvent()->row;
-		if (n >= 0) {
-			popup_device = device_manager->device_list(DeviceType::AUDIO_INPUT)[n];
-			popup->check("device-hide", !popup_device->visible);
-			popup->open_popup(this);
-		}
-	});
-	event_x("midi-input-list", "hui:right-button-down", [=]{
-		int n = hui::GetEvent()->row;
-		if (n >= 0) {
-			popup_device = device_manager->device_list(DeviceType::MIDI_INPUT)[n];
-			popup->check("device-hide", !popup_device->visible);
-			popup->open_popup(this);
-		}
-	});
+	for (auto t: LIST_TYPE) {
+		event_x(list_id(t), "hui:move", [=]{ on_move_device(t); });
+		event_x(list_id(t), "hui:right-button-down", [=]{ on_right_click_device(t); });
+	}
 	event("device-delete", [=]{ on_erase(); });
 	event("device-hide", [=]{ on_device_hide(); });
 
 	popup = hui::CreateResourceMenu("popup-menu-device");
 
-	device_manager->subscribe(this, [=]{ add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
+	device_manager->subscribe(this, [=]{ on_add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
 	device_manager->subscribe(this, [=]{ update_full(); }, device_manager->MESSAGE_REMOVE_DEVICE);
 	device_manager->subscribe(this, [=]{ change_data(); }, device_manager->MESSAGE_CHANGE);
 
@@ -69,6 +57,12 @@ void DeviceConsole::on_device_hide() {
 	device_manager->set_device_config(popup_device);
 }
 
+string shorten(const string &s, int max_length) {
+	if (s.num <= max_length)
+		return s;
+	return s.head(max_length/2-1) + "\u2026" + s.tail(max_length/2-1);
+}
+
 string DeviceConsole::to_format(const Device *d) {
 	string pre, post;
 	if (!d->visible or !d->present) {
@@ -81,14 +75,14 @@ string DeviceConsole::to_format(const Device *d) {
 	string status = pre + (d->present ? "<big>✔</big>" : "<big>✘</big> <small>(missing)</small>") + post;
 	string index = i2s(fav_index(d) + 1);
 	if (!d->visible)
-		index = "<small>(hidden)</small>";
+		index = "<small>(ignored)</small>";
 	index = pre + index + post;
-	string name = pre + d->get_name() + post;
+	string name = pre + shorten(d->get_name(), 64) + post;
 	if (d->type == DeviceType::AUDIO_OUTPUT or d->type == DeviceType::AUDIO_INPUT) {
 		string info = pre + format("%d channels", d->channels) + post;
-		return format("%s\\%s\\%s\\%s", index, name, status, info);
+		return format("%s\\%s\\%s\\%s", index, status, name, info);
 	} else if (d->type == DeviceType::MIDI_INPUT) {
-		return format("%s\\%s\\%s", index, name, status);
+		return format("%s\\%s\\%s", index, status, name);
 	}
 	return "";
 }
@@ -103,112 +97,61 @@ int DeviceConsole::fav_index(const Device *d) {
 	}
 	return -1;
 }
-Array<Device*> &DeviceConsole::output_devices() {
-	return device_manager->device_list(DeviceType::AUDIO_OUTPUT);
-}
-Array<Device*> &DeviceConsole::input_devices() {
-	return device_manager->device_list(DeviceType::AUDIO_INPUT);
-}
-Array<Device*> &DeviceConsole::midi_input_devices() {
-	return device_manager->device_list(DeviceType::MIDI_INPUT);
+
+void DeviceConsole::on_right_click_device(DeviceType type) {
+	int n = hui::GetEvent()->row;
+	if (n >= 0) {
+		popup_device = device_manager->device_list(type)[n];
+		popup->enable("device-delete", !popup_device->present);
+		popup->check("device-hide", !popup_device->visible);
+		popup->open_popup(this);
+	}
 }
 
 void DeviceConsole::change_data() {
-	foreachi(Device *d, output_devices(), i)
-		change_string("output-list", i, to_format(d));
-
-	foreachi(Device *d, input_devices(), i)
-		change_string("input-list", i, to_format(d));
-
-	foreachi(Device *d, midi_input_devices(), i)
-		change_string("midi-input-list", i, to_format(d));
+	for (auto t: LIST_TYPE)
+		foreachi(Device *d, device_manager->device_list(t), i)
+			change_string(list_id(t), i, to_format(d));
 }
 
 void DeviceConsole::update_full() {
-	Device *sel_out = nullptr, *sel_in = nullptr, *sel_midi_in = nullptr;
+	for (auto t: LIST_TYPE) {
+		Device *sel = nullptr;
+		auto &devs = device_manager->device_list(t);
+		auto id = list_id(t);
+		int index = get_int(id);
+		if (index >= 0)
+			sel = devs[index];
 
-	if (get_int("output-list") >= 0)
-		sel_out = output_devices()[get_int("output-list")];
-	if (get_int("input-list") >= 0)
-		sel_in = input_devices()[get_int("input-list")];
-	if (get_int("midi-input-list") >= 0)
-		sel_midi_in = midi_input_devices()[get_int("midi-input-list")];
-
-	reset("output-list");
-	foreachi(Device *d, output_devices(), i) {
-		add_string("output-list", to_format(d));
-		if (d == sel_out)
-			set_int("output-list", i);
-	}
-
-	reset("input-list");
-	foreachi(Device *d, input_devices(), i) {
-		add_string("input-list", to_format(d));
-		if (d == sel_in)
-			set_int("input-list", i);
-	}
-
-	reset("midi-input-list");
-	foreachi(Device *d, midi_input_devices(), i) {
-		add_string("midi-input-list", to_format(d));
-		if (d == sel_midi_in)
-			set_int("midi-input-list", i);
-	}
-
-}
-
-void DeviceConsole::add_device() {
-	if (device_manager->msg_type == DeviceType::AUDIO_OUTPUT) {
-		Device *d = output_devices().back();
-		add_string("output-list", to_format(d));
-	} else if (device_manager->msg_type == DeviceType::AUDIO_INPUT) {
-		Device *d = input_devices().back();
-		add_string("input-list", to_format(d));
-	} else if (device_manager->msg_type == DeviceType::MIDI_INPUT) {
-		Device *d = midi_input_devices().back();
-		add_string("midi-input-list", to_format(d));
+		reset(id);
+		foreachi(Device *d, devs, i) {
+			add_string(id, to_format(d));
+			if (d == sel)
+				set_int(id, i);
+		}
 	}
 }
 
+void DeviceConsole::on_add_device() {
+	auto type = device_manager->msg_type;
+	auto d = device_manager->device_list(type).back();
+	add_string(list_id(type), to_format(d));
+}
 
-void DeviceConsole::on_output_move() {
+
+void DeviceConsole::on_move_device(DeviceType type) {
 	auto e = hui::GetEvent();
 	int source = e->row;
 	int target = e->row_target;
 	//msg_write(format("  move  %d  ->  %d", source, target));
-	device_manager->move_device_priority(output_devices()[source], target);
-	set_int("output-list", target);
-}
-
-void DeviceConsole::on_input_move() {
-	auto e = hui::GetEvent();
-	int source = e->row;
-	int target = e->row_target;
-	device_manager->move_device_priority(input_devices()[source], target);
-	set_int("input-list", target);
-}
-
-void DeviceConsole::on_midi_input_move() {
-	auto e = hui::GetEvent();
-	int source = e->row;
-	int target = e->row_target;
-	device_manager->move_device_priority(midi_input_devices()[source], target);
-	set_int("midi-input-list", target);
+	device_manager->move_device_priority(device_manager->device_list(type)[source], target);
+	set_int(list_id(type), target);
 }
 
 void DeviceConsole::on_erase() {
 	int t = get_int("dev-tab");
-	if (t == 0) {
-		int n = get_int("output-list");
-		if (n >= 0)
-			device_manager->remove_device(DeviceType::AUDIO_OUTPUT, n);
-	} else if (t == 1) {
-		int n = get_int("input-list");
-		if (n >= 0)
-			device_manager->remove_device(DeviceType::AUDIO_INPUT, n);
-	} else if (t == 2) {
-		int n = get_int("midi-input-list");
-		if (n >= 0)
-			device_manager->remove_device(DeviceType::MIDI_INPUT, n);
-	}
+	auto type = LIST_TYPE[t];
+	int n = get_int(list_id(type));
+	if (n >= 0)
+		device_manager->remove_device(type, n);
 }

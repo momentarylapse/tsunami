@@ -1,5 +1,5 @@
 Dialog device-manager "" width=400 height=200
 	TabControl dev-tab "Output\\Input\\Midi Input"
-		ListView output-list "#\\name\\status\\info" format=mmmm reorderable "tooltip=drag and drop to change order of preference"
-		ListView input-list "#\\name\\status\\info" format=mmmm reorderable
-		ListView midi-input-list "#\\name\\status" format=mmm reorderable
+		ListView output-list "#\\status\\name\\info" format=mmmm reorderable "tooltip=drag and drop to change order of preference\nright click to ignore or delete"
+		ListView input-list "#\\status\\name\\info" format=mmmm reorderable "tooltip=drag and drop to change order of preference\nright click to ignore or delete"
+		ListView midi-input-list "#\\status\\name" format=mmm reorderable "tooltip=drag and drop to change order of preference\nright click to ignore or delete"

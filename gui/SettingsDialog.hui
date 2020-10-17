@@ -1,4 +1,4 @@
-Dialog settings_dialog "Settings" width=680 height=450 headerbar resizable borderwidth=0
+Dialog settings_dialog "Settings" width=800 height=600 headerbar resizable borderwidth=0
 	Grid ? "" vertical
 		TabControl tab "User Interface\\Devices\\Storage" expandy
 			Grid ? ""

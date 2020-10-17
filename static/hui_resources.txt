@@ -1580,7 +1580,7 @@ menu_view
 
 5
 0
-8
+7
 Menu
 menu_view_midi
 
@@ -1618,27 +1618,21 @@ checkable
 0
 0
 Item
-show-devices
-
-3
-0
-0
-Item
 show-fx-console
 
-4
+3
 0
 0
 Separator
 
 
-5
+4
 0
 0
 Menu
 menu-view-zoom
 
-6
+5
 0
 7
 Item
@@ -1686,7 +1680,7 @@ image=hui:zoom-fit
 Menu
 menu-view-cursor
 
-7
+6
 0
 6
 Item
@@ -6164,7 +6158,7 @@ default
 # Resource
 Dialog
 settings_dialog
-width=680,height=450,headerbar,resizable,borderwidth=0
+width=800,height=600,headerbar,resizable,borderwidth=0
 0
 0
 1
@@ -7190,7 +7184,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-606
+605
 # Text
 /bars-add
 Add bars...
@@ -7244,10 +7238,10 @@ does not move anything - leaves a gap instead
 Delete and shift
 no gap - moves everyting afterwards
 /device-delete
-Delete
+Remove (missing)
 
 /device-hide
-Hide
+Ignore
 
 /edit_curves
 Curves
@@ -7640,14 +7634,14 @@ device-manager/dev-tab
 Output\\Input\\Midi Input
 
 device-manager/input-list
-#\\name\\status\\info
-
+#\\status\\name\\info
+drag and drop to change order of preference\nright click to ignore or delete
 device-manager/midi-input-list
-#\\name\\status
-
+#\\status\\name
+drag and drop to change order of preference\nright click to ignore or delete
 device-manager/output-list
-#\\name\\status\\info
-drag and drop to change order of preference
+#\\status\\name\\info
+drag and drop to change order of preference\nright click to ignore or delete
 dummy-editor/dummy-editor
 Editing
 
@@ -7941,9 +7935,6 @@ Expand selection
 
 menu/select_nothing
 Clear selection
-
-menu/show-devices
-Devices
 
 menu/show-fx-console
 Effects

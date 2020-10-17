@@ -31,7 +31,7 @@ public:
 	//ViewNode *get_hover();
 	HoverData get_hover_data(float mx, float my) override;
 
-	void draw(Painter *p) override;
+	void on_draw(Painter *p) override;
 
 	string get_tip() override;
 

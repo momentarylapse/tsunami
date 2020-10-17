@@ -66,7 +66,7 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 
 }
 
-void Background::draw(Painter* c) {
+void Background::on_draw(Painter* c) {
 	int yy = area.y1;
 	if (view->vlayer.num > 0)
 		yy = view->vlayer.back()->area.y2;

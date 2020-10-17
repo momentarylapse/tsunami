@@ -68,7 +68,7 @@ public:
 
 	void draw_fades(Painter *c);
 
-	void draw(Painter *c) override;
+	void on_draw(Painter *c) override;
 
 	bool on_screen();
 

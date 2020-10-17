@@ -447,7 +447,7 @@ void AudioViewLayer::set_solo(bool _solo) {
 }
 
 
-void AudioViewLayer::draw(Painter *c) {
+void AudioViewLayer::on_draw(Painter *c) {
 	if (represents_imploded)
 		return;
 

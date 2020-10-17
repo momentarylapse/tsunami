@@ -30,7 +30,7 @@ public:
 	virtual ~CpuDisplay();
 
 	bool on_left_button_down() override;
-	void draw(Painter *p) override;
+	void on_draw(Painter *p) override;
 	void update();
 	void enable(bool active);
 

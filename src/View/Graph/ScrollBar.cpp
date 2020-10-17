@@ -44,7 +44,7 @@ void ScrollBar::set_offset(float _offset) {
 		callback();
 }
 
-void ScrollBar::draw(Painter *c) {
+void ScrollBar::on_draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
 	bool _hover = is_cur_hover();

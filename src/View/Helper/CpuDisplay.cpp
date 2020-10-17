@@ -28,7 +28,7 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 
 	parent->event_xp(id, "hui:draw", [=](Painter* p){
 		scene_graph->update_geometry_recursive(p->area());
-		scene_graph->draw(p);
+		scene_graph->on_draw(p);
 	});
 	parent->event_x(id, "hui:left-button-down", [=]{ scene_graph->on_left_button_down(); });
 }
@@ -96,7 +96,7 @@ string channel_title(PerfChannelInfo &c) {
 	return m->type_to_name(m->module_type);
 }
 
-void CpuDisplay::draw(Painter* p) {
+void CpuDisplay::on_draw(Painter* p) {
 	float x00 = area.x1;
 	float y00 = area.y1;
 	int w = area.width();
@@ -106,7 +106,7 @@ void CpuDisplay::draw(Painter* p) {
 	auto old_clip = p->clip();
 	p->set_clip(area);
 
-	p->set_color(view->colors.background);
+	p->set_color(large ? view->colors.background : view->colors.background_overlay);
 	p->draw_rect(area);
 	p->set_line_width(large ? 2.0f : 1.0f);
 
@@ -160,11 +160,6 @@ void CpuDisplay::draw(Painter* p) {
 			t ++;
 		}
 	} else {
-
-		p->set_fill(false);
-		p->set_color(view->colors.text_soft3);
-		p->draw_rect(area);
-		p->set_fill(true);
 	
 		p->set_font_size(7);
 	

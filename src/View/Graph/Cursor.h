@@ -18,7 +18,7 @@ class Cursor : public scenegraph::NodeFree {
 public:
 	Cursor(AudioView *view, bool end);
 
-	void draw(Painter *p) override;
+	void on_draw(Painter *p) override;
 	bool hover(float mx, float my) override;
 	string get_tip() override;
 
@@ -37,7 +37,7 @@ public:
 	bool hover(float mx, float my) override { return false; }
 
 	AudioView *view;
-	void draw(Painter *p) override;
+	void on_draw(Painter *p) override;
 	void draw_bar_gap_selector(Painter* p, int bar_gap, const color &col);
 };
 

@@ -152,14 +152,14 @@ string SceneGraph::get_tip() {
 	return "";
 }
 
-void SceneGraph::draw(Painter *p) {
+void SceneGraph::on_draw(Painter *p) {
 	auto xxx = p->clip();
 	p->set_clip(area);
 
 	auto nodes = collect_children_up(this);
 	for (auto *n: nodes) {
 		//p->set_clip(area and n->area);
-		n->draw(p);
+		n->on_draw(p);
 	}
 	p->set_clip(xxx);
 

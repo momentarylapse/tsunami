@@ -9,15 +9,15 @@
 #define PEAKMETERDISPLAY_H_
 
 #include "../../Stuff/Observable.h"
+#include "Graph/Node.h"
 
 class PeakMeter;
 class PeakMeterData;
-namespace hui{
+namespace hui {
 	class Panel;
 }
 
-class PeakMeterDisplay : public VirtualBase
-{
+class PeakMeterDisplay : public scenegraph::Node {
 public:
 
 	enum class Mode{
@@ -26,13 +26,14 @@ public:
 		BOTH
 	};
 	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
+	PeakMeterDisplay(PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
 	virtual ~PeakMeterDisplay();
 
 	void set_source(PeakMeter *source);
 
-	void on_draw(Painter *p);
-	void on_left_button_down();
-	void on_right_button_down();
+	void on_draw(Painter *p) override;
+	bool on_left_button_down() override;
+	bool on_right_button_down() override;
 	void on_update();
 	void enable(bool enabled);
 

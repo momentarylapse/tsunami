@@ -27,7 +27,7 @@ public:
 	bool auto_hide = false;
 	void drag_update(float mx, float my);
 	void set_offset(float offset);
-	void draw(Painter *c) override;
+	void on_draw(Painter *c) override;
 	void set_area(const rect &r);
 	void update(float page, float content);
 

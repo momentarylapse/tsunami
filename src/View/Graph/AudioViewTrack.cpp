@@ -145,7 +145,7 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 	}*/
 }
 
-void AudioViewTrack::draw(Painter *c) {
+void AudioViewTrack::on_draw(Painter *c) {
 	if (imploded) {
 		draw_imploded_data(c);
 

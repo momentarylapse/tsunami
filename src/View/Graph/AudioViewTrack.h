@@ -24,7 +24,7 @@ public:
 	~AudioViewTrack() override;
 
 	void draw_imploded_data(Painter *c);
-	void draw(Painter *c) override;
+	void on_draw(Painter *c) override;
 
 	void set_solo(bool solo);
 	void set_muted(bool muted);

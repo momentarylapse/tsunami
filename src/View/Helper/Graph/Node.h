@@ -32,7 +32,7 @@ public:
 	virtual bool on_mouse_move() { return false; }
 
 	virtual bool hover(float mx, float my);
-	virtual void draw(Painter *p) {}
+	virtual void on_draw(Painter *p) {}
 	virtual HoverData get_hover_data(float mx, float my);
 	void add_child(Node *child);
 	void delete_child(Node *child);

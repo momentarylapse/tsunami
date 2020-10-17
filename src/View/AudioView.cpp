@@ -8,6 +8,7 @@
 #include "AudioView.h"
 #include "MouseDelayPlanner.h"
 #include "Helper/Graph/SceneGraph.h"
+#include "Helper/PeakMeterDisplay.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeEdit.h"
 #include "Mode/ViewModeEditDummy.h"
@@ -54,6 +55,7 @@
 #include "Helper/PeakThread.h"
 #include "Helper/CpuDisplay.h"
 #include "SideBar/SideBar.h"
+#include "BottomBar/BottomBar.h"
 
 
 const float AudioView::FONT_SIZE = 10.0f;
@@ -119,6 +121,46 @@ void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, co
 	c->draw_str(x, y, str);
 }
 
+class BottomBarExpandButton : public scenegraph::Node {
+public:
+	AudioView *view;
+	BottomBarExpandButton(AudioView *_view) : Node(50, 50) {
+		align.dz = 200;
+		align.horizontal = align.Mode::LEFT;
+		align.vertical = align.Mode::BOTTOM;
+		view = _view;
+	}
+	void on_draw(Painter *p) override {
+		if (view->session->win->bottom_bar->visible)
+			return;
+		color c = view->colors.background_overlay;
+		if (is_cur_hover())
+			c = view->colors.hoverify(c);
+		p->set_color(c);
+		p->draw_circle(area.mx(), area.my(),40);
+		p->set_color(view->colors.text_soft3);
+		p->set_font_size(17);
+		p->draw_str(area.mx()-10, area.my()-10, "▲");
+		p->set_font_size(view->FONT_SIZE);
+	}
+	bool on_left_button_down() override {
+		if (view->session->win->bottom_bar->visible)
+			return false;
+		view->session->win->bottom_bar->_show();
+		return true;
+	}
+	string get_tip() override {
+		return _("show control panel");
+	}
+};
+
+
+bool view_should_show_peaks(AudioView *view) {
+	if (view->session->win->bottom_bar)
+		if (view->session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE))
+			return false;
+	return view->signal_chain->is_playback_active();
+}
 
 
 AudioView::AudioView(Session *_session, const string &_id) :
@@ -243,6 +285,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	signal_chain->subscribe(this, [=]{ on_stream_tick(); }, Module::MESSAGE_TICK);
 	signal_chain->subscribe(this, [=]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+
+
+	peak_meter_display = new PeakMeterDisplay(peak_meter, PeakMeterDisplay::Mode::BOTH);
+	peak_meter_display->hidden = true;
+	scene_graph->add_child(peak_meter_display);
+
+	scene_graph->add_child(new BottomBarExpandButton(this));
 
 	mx = my = 0;
 
@@ -887,6 +936,7 @@ void AudioView::on_stream_tick() {
 }
 
 void AudioView::on_stream_state_change() {
+	peak_meter_display->hidden = !view_should_show_peaks(this);
 	force_redraw();
 }
 
@@ -1188,7 +1238,7 @@ void AudioView::draw_song(Painter *c) {
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-	scene_graph->draw(c);
+	scene_graph->on_draw(c);
 
 	// playing/capturing position
 	if (is_playback_active())

@@ -17,7 +17,7 @@ class ViewMarker : public scenegraph::Node {
 public:
 	ViewMarker(AudioViewTrack *parent, TrackMarker *marker);
 
-	void draw(Painter *c) override;
+	void on_draw(Painter *c) override;
 	HoverData get_hover_data(float mx, float my) override;
 
 	bool on_left_button_down() override;

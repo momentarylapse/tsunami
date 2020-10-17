@@ -49,7 +49,7 @@ public:
 class TrackButtonMute: public TrackHeaderButton {
 public:
 	TrackButtonMute(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		auto *track = vtrack->track;
 
 		c->set_color(get_color());
@@ -72,7 +72,7 @@ public:
 class TrackButtonSolo: public TrackHeaderButton {
 public:
 	TrackButtonSolo(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->draw_mask_image(area.x1, area.y1, view->images.solo.get());
@@ -89,7 +89,7 @@ public:
 class TrackButtonConfig: public TrackHeaderButton {
 public:
 	TrackButtonConfig(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
 		c->draw_mask_image(area.x1, area.y1, view->images.config.get());
@@ -181,7 +181,7 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
 }
 
-void TrackHeader::draw(Painter *c) {
+void TrackHeader::on_draw(Painter *c) {
 	auto *track = vtrack->track;
 
 	c->set_antialiasing(true);

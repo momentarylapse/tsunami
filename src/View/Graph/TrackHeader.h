@@ -19,7 +19,7 @@ public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader(AudioViewTrack *t);
-	void draw(Painter *c) override;
+	void on_draw(Painter *c) override;
 	HoverData get_hover_data(float mx, float my) override;
 	
 	bool playable();

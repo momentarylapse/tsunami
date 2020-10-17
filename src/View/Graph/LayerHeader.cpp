@@ -42,7 +42,7 @@ public:
 class LayerButtonMute: public LayerHeaderButton {
 public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker.get());
 	}
@@ -58,7 +58,7 @@ public:
 class LayerButtonSolo: public LayerHeaderButton {
 public:
 	LayerButtonSolo(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1, "S");
 		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo.get());
@@ -77,7 +77,7 @@ public:
 class LayerButtonExplode: public LayerHeaderButton {
 public:
 	LayerButtonExplode(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
-	void draw(Painter *c) override {
+	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		if (vlayer->represents_imploded)
 			c->draw_str(area.x1, area.y1, u8"\u2b73");
@@ -171,7 +171,7 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
 }
 
-void LayerHeader::draw(Painter *c) {
+void LayerHeader::on_draw(Painter *c) {
 	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
 	bool _hover = is_cur_hover();

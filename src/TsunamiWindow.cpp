@@ -276,8 +276,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// bottom bar
 	bottom_bar = new BottomBar(session);
 	embed(bottom_bar, "main-grid", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, session);
-	embed(mini_bar.get(), "main-grid", 0, 2);
+	//mini_bar = new MiniBar(bottom_bar, session);
+	//embed(mini_bar.get(), "main-grid", 0, 2);
 
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SELECTION_CHANGE);
@@ -1000,9 +1000,12 @@ void TsunamiWindow::on_side_bar_update() {
 	update_menu();
 }
 
+bool view_should_show_peaks(AudioView *view);
+
 void TsunamiWindow::on_bottom_bar_update() {
 	if (!bottom_bar->visible)
 		activate(view->id);
+	view->peak_meter_display->hidden = !view_should_show_peaks(view);
 	update_menu();
 }
 

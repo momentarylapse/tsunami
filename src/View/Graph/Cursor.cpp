@@ -21,7 +21,7 @@ Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 	drag_range = Range::EMPTY;
 }
 
-void Cursor::draw(Painter* c) {
+void Cursor::on_draw(Painter* c) {
 	color col = color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
 	if (!is_end) {
 		float x = view->cam.sample2screen(pos());
@@ -94,7 +94,7 @@ void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color
 	p->set_line_width(1.0f);
 }
 
-void SelectionMarker::draw(Painter* p) {
+void SelectionMarker::on_draw(Painter* p) {
 	float x1, x2;
 	view->cam.range2screen_clip(view->cursor_range(), view->song_area(), x1, x2);
 

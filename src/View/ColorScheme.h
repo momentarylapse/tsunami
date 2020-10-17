@@ -28,6 +28,7 @@ public:
 	color background_track;
 	color background_track_selected;
 	color background_track_selection;
+	color background_overlay;
 	color selection_internal;
 	color selection_boundary;
 	color selection_boundary_hover;

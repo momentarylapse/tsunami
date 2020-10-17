@@ -42,6 +42,7 @@ void ColorScheme::auto_generate() {
 	background_track_selected = col_inter(background, selection*1.2f, 0.10f);
 	background_track_selection = col_inter(background, selection*1.2f, 0.4f);
 	background_track = background;
+
 	selection_bars = selection;
 	selection_bars.a = pow(0.13f, gamma);
 	selection_bars_hover = color::interpolate(selection_bars, hover, 0.5f);
@@ -61,6 +62,9 @@ void ColorScheme::auto_generate() {
 	//grid = text_soft3;
 	sample = text_soft2;
 	sample_selected = selection;
+
+	background_overlay = color::interpolate(background, text_soft3, 0.1f);
+	background_overlay.a = 0.8f;
 	
 
 	blob_bg_hidden = color::interpolate(color::interpolate(selection, text_soft3, 0.6f), background_track_selected, 0.8f);

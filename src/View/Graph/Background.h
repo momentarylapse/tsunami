@@ -23,7 +23,7 @@ public:
 
 	void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2);
 
-	void draw(Painter *p) override;
+	void on_draw(Painter *p) override;
 
 	AudioView *view;
 	HoverData get_hover_data(float mx, float my) override;

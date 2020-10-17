@@ -32,7 +32,7 @@ HoverData ViewMarker::get_hover_data(float mx, float my) {
 	return h;
 }
 
-void ViewMarker::draw(Painter *p) {
+void ViewMarker::on_draw(Painter *p) {
 }
 
 bool ViewMarker::on_left_button_down() {

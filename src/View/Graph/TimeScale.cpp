@@ -33,7 +33,7 @@ public:
 		view->cam.range2screen_clip(r, parent->area, area.x1, area.x2);
 		hidden = (view->playback_wish_range.length == 0) and !view->is_playback_active();
 	}
-	void draw(Painter *p) override {
+	void on_draw(Painter *p) override {
 		p->set_color(AudioView::colors.blob_bg_selected);
 		if (view->is_playback_active())
 			p->set_color(AudioView::colors.preview_marker);
@@ -72,7 +72,7 @@ public:
 		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 		hidden = !view->playback_range_locked;
 	}
-	void draw(Painter *p) override {
+	void on_draw(Painter *p) override {
 		p->set_color(view->colors.text);
 		if (this->is_cur_hover())
 			p->set_color(view->colors.hoverify(view->colors.text));
@@ -104,7 +104,7 @@ public:
 		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 		hidden = !view->looping();
 	}
-	void draw(Painter *p) override {
+	void on_draw(Painter *p) override {
 		p->set_color(view->colors.text);
 		if (this->is_cur_hover())
 			p->set_color(view->colors.hoverify(view->colors.text));
@@ -136,7 +136,7 @@ TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioVie
 	add_child(new PlaybackLoopSymbol(this));
 }
 
-void TimeScale::draw(Painter* c) {
+void TimeScale::on_draw(Painter* c) {
 	GridColors g;
 	g.bg = view->colors.background_track;
 	g.bg_sel = view->colors.background_track_selection;

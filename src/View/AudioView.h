@@ -62,6 +62,7 @@ class SelectionMarker;
 class MouseDelayPlanner;
 class MouseDelayAction;
 class CpuDisplay;
+class PeakMeterDisplay;
 enum class MidiMode;
 
 
@@ -300,6 +301,7 @@ public:
 	Cursor *cursor_start, *cursor_end;
 	SelectionMarker *selection_marker;
 	CpuDisplay *cpu_display;
+	PeakMeterDisplay *peak_meter_display;
 
 
 	owned<MidiPainter> midi_painter;

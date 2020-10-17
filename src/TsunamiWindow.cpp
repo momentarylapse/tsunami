@@ -174,7 +174,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("song-edit-samples", [=]{ on_sample_manager(); });
 	event("show-mixing-console", [=]{ on_mixing_console(); });
 	set_key_code("show-mixing-console", hui::KEY_CONTROL + hui::KEY_M);
-	event("show-devices", [=]{ bottom_bar->toggle(BottomBar::DEVICE_CONSOLE); });
+	event("show-devices", [=]{ on_settings(); });
 	event("show-signal-chain", [=]{ bottom_bar->toggle(BottomBar::SIGNAL_EDITOR); });
 	event("show-mastering-console", [=]{ on_mastering_console(); });
 	event("show-fx-console", [=]{ on_fx_console(); });
@@ -986,7 +986,6 @@ void TsunamiWindow::update_menu() {
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
 	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_EDITOR));
-	check("show_devices", bottom_bar->is_active(BottomBar::DEVICE_CONSOLE));
 	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
 
 	string title = title_filename(song->filename) + " - " + AppName;

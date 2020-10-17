@@ -18,7 +18,6 @@ class DeviceManager;
 class Track;
 class MixingConsole;
 class LogConsole;
-class DeviceConsole;
 class SignalEditor;
 class Session;
 class BottomBarConsole;
@@ -32,7 +31,6 @@ public:
 	enum {
 		MIXING_CONSOLE,
 		SIGNAL_EDITOR,
-		DEVICE_CONSOLE,
 		PLUGIN_CONSOLE,
 		LOG_CONSOLE
 	};
@@ -68,7 +66,6 @@ public:
 
 	MixingConsole *mixing_console;
 	SignalEditor *signal_editor;
-	DeviceConsole *device_console;
 	PluginConsole *plugin_console;
 	LogConsole *log_console;
 

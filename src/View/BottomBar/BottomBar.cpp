@@ -8,7 +8,6 @@
 #include "BottomBar.h"
 #include "MixingConsole.h"
 #include "LogConsole.h"
-#include "DeviceConsole.h"
 #include "SignalEditor.h"
 #include "PluginConsole.h"
 #include "../AudioView.h"
@@ -33,12 +32,10 @@ BottomBar::BottomBar(Session *session) {
 
 	mixing_console = new MixingConsole(session);
 	signal_editor = new SignalEditor(session);
-	device_console = new DeviceConsole(session);
 	plugin_console = new PluginConsole(session);
 	log_console = new LogConsole(session);
 	add_console(mixing_console, "");
 	add_console(signal_editor, "");
-	add_console(device_console, "");
 	add_console(plugin_console, "");
 	add_console(log_console, "");
 

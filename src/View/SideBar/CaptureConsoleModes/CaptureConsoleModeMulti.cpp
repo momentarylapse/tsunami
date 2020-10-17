@@ -141,6 +141,7 @@ void CaptureConsoleModeMulti::leave() {
 		cc->remove_control(c.id_peaks);
 	}
 	items.clear();
+	session->remove_signal_chain(chain.get());
 	chain = nullptr;
 }
 

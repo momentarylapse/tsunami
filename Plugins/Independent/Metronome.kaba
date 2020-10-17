@@ -57,7 +57,6 @@ class MetronomePanel extends ConfigPanel
 	
 	void __init__(Session session, BeatSource _source, SignalChain _chain, Metronome _metro)
 		super.__init__(_metro)
-		print("MetronomePanel.init...")
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
@@ -255,11 +254,7 @@ class Metronome extends TsunamiPlugin
 	SignalChain* chain
 	BeatSource *source
 	
-	override void __init__()
-		print("Metronome.init...")
-	
 	override void on_start()
-		print("Metronome.start...")
 		chain = session.create_signal_chain("metronome")
 		source = chain._add(CreateBeatSource(session, "Metronome"))
 		

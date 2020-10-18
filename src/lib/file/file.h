@@ -43,7 +43,8 @@
 //--------------------------------------------------------------
 // time/date
 
-struct Date {
+class Date {
+public:
 	int64 time;
 	int milli_second;
 	int dummy[7];

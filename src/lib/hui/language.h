@@ -15,7 +15,7 @@
 // string conversion
 
 #ifdef OS_WINDOWS
-	extern const TCHAR *hui_tchar_str(const string &str);
+	/*extern const TCHAR *hui_tchar_str(const string &str);
 	extern const TCHAR *hui_tchar_str_f(const string &str);
 	extern string hui_de_tchar_str(const TCHAR *str);
 	extern string hui_de_tchar_str_f(const TCHAR *str);
@@ -23,7 +23,7 @@
 		#define win_str LPWSTR
 	#else
 		#define win_str LPSTR
-	#endif
+	#endif*/
 #endif
 #ifdef HUI_API_WIN
 	#define sys_str			hui_tchar_str

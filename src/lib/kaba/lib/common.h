@@ -7,6 +7,16 @@ namespace Kaba{
 enum class InlineID;
 enum class OperatorID;
 
+#ifdef CONST
+#undef CONST
+#endif
+#ifdef PURE
+#undef PURE
+#endif
+#ifdef OUT
+#undef OUT
+#endif
+
 enum class Flags {
 	NONE = 0,
 	CALL_BY_VALUE = 0x1,

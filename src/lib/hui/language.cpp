@@ -3,6 +3,7 @@
 
 // character set....
 #ifdef OS_WINDOWS
+	#include <windows.h>
 
 	#define NUM_TCHAR_STRINGS				32
 	#define TCHAR_STRING_LENGTH			1024
@@ -10,8 +11,7 @@
 	static TCHAR _tchar_str_[NUM_TCHAR_STRINGS][TCHAR_STRING_LENGTH];
 	#define _get_tchar_str_()		_tchar_str_[(cur_tchar_str++)%NUM_TCHAR_STRINGS]
 
-	const TCHAR *hui_tchar_str(const string &str)
-	{
+	const TCHAR *hui_tchar_str(const string &str) {
 		#ifdef _UNICODE
 			TCHAR *w=_get_tchar_str_();
 			MultiByteToWideChar(CP_UTF8,0,(LPCSTR)str.c_str(),-1,w,TCHAR_STRING_LENGTH);
@@ -21,13 +21,11 @@
 		#endif
 	}
 
-	const TCHAR *hui_tchar_str_f(const string &str)
-	{
-		return hui_tchar_str(str.sys_filename().c_str());
-	}
+	//const TCHAR *hui_tchar_str_f(const string &str) {
+		//return hui_tchar_str(str.sys_filename().c_str());
+	//}
 
-	string hui_de_tchar_str(const TCHAR *str)
-	{
+	string hui_de_tchar_str(const TCHAR *str) {
 		#ifdef _UNICODE
 			string s;
 			s.resize(4096);
@@ -39,15 +37,14 @@
 		#endif
 	}
 
-	string de_sys_str_f(const TCHAR *str)
-	{
+	/*string de_sys_str_f(const TCHAR *str) {
 		return hui_de_tchar_str(str).replace("/", "\\");
 	}
 
 	int _tchar_str_size_(TCHAR *str)
 	{
 		return _tcslen(str)*sizeof(TCHAR);
-	}
+	}*/
 #endif
 
 #ifdef HUI_API_GTK

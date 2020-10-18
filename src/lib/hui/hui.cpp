@@ -40,7 +40,7 @@ string Version = "0.6.13.0";
 
 
 #ifdef OS_WINDOWS
-	HINSTANCE hui_win_instance;
+	void *hui_win_instance;
 #endif
 #ifdef HUI_API_WIN
 	HFONT hui_win_default_font;
@@ -94,9 +94,8 @@ int hui_main(const Array<string> &);
 
 #ifdef _CONSOLE
 
-int _tmain(int NumArgs, _TCHAR *Args[])
-{
-	return hui_main(MakeArgs(NumArgs, Args));
+int _tmain(int NumArgs, _TCHAR *Args[]) {
+	return hui_main(hui::make_args(NumArgs, Args));
 }
 
 #else

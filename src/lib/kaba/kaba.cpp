@@ -142,13 +142,7 @@ const Class *get_dynamic_type(const VirtualBase *p) {
 	return nullptr;
 }
 
-// wrapper preventing compiler complaints for Array<Script*>.pop()
-struct LoadingScript {
-	Script *s = nullptr;
-	LoadingScript() {}
-	LoadingScript(Script *_s) { s = _s; }
-};
-Array<LoadingScript> loading_script_stack;
+Array<shared<Script>> loading_script_stack;
 
 
 void Script::load(const Path &_filename, bool _just_analyse) {

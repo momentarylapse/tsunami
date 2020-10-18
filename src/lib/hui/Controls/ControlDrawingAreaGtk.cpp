@@ -16,8 +16,6 @@ static std::thread::id main_thread_id = std::this_thread::get_id();
 
 #define STUPID_HACK 0
 
-#include <GL/gl.h>
-
 #ifdef HUI_API_GTK
 
 namespace hui
@@ -245,7 +243,7 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code) {
 	auto *map = gdk_keymap_get_for_display(gdk_display_get_default());
 	int keyvalue = gdk_keymap_lookup_key(map, &kmk);
 
-	Event::_text = utf32_to_utf8({gdk_keyval_to_unicode(event->keyval)});
+	Event::_text = utf32_to_utf8({(int)gdk_keyval_to_unicode(event->keyval)});
 
 	// yes, gtk3 has a direct event->keyval, but we need the "basic" key (without modifiers)
 

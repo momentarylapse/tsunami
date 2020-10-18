@@ -38,7 +38,6 @@
 			#define _WIN32_WINNT 0x0500
 		#endif
 	#endif
-	#include <windows.h>
 #endif
 #ifdef HUI_API_GTK
 	#include <gtk/gtk.h>

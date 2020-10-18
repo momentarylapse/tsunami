@@ -28,7 +28,7 @@ void _kaba_array_sort(DynamicArray &array, int offset_by, bool reverse) {
 	for (int i=0; i<array.num; i++) {
 		T *q = (T*)((char*)p + array.element_size);
 		for (int j=i+1; j<array.num; j++) {
-			if (*p > *q xor reverse)
+			if ((*p > *q) xor reverse)
 				array.simple_swap(i, j);
 			q = (T*)((char*)q + array.element_size);
 		}
@@ -44,7 +44,7 @@ void _kaba_array_sort_p(DynamicArray &array, int offset_by, bool reverse) {
 		char **q = p + 1;
 		for (int j=i+1; j<array.num; j++) {
 			T *qq = (T*)(*q + offset_by);
-			if (*pp > *qq xor reverse) {
+			if ((*pp > *qq) xor reverse) {
 				array.simple_swap(i, j);
 				pp = (T*)(*p + offset_by);
 			}
@@ -67,7 +67,7 @@ void _kaba_array_sort_pf(DynamicArray &array, Function *f, bool reverse) {
 		for (int j=i+1; j<array.num; j++) {
 			if (!call_function(f, f->address, &r2, {*q}))
 				kaba_raise_exception(new KabaException("call failed"));
-			if (r1 > r2 xor reverse) {
+			if ((r1 > r2) xor reverse) {
 				array.simple_swap(i, j);
 				std::swap(r1, r2);
 			}

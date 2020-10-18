@@ -99,6 +99,10 @@ extern const string IDENTIFIER_DYN;
 extern const string IDENTIFIER_CALL;
 
 
+#ifdef IN
+#undef IN
+#endif
+
 //--------------------------------------------------------------------------------------------------
 // operators
 enum class OperatorID {
@@ -159,6 +163,9 @@ extern PrimitiveOperator PrimitiveOperators[];
 //--------------------------------------------------------------------------------------------------
 // commands
 
+#ifdef DELETE
+#undef DELETE
+#endif
 
 // statements
 enum class StatementID {

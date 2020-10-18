@@ -75,7 +75,7 @@ public:
 		set(o);
 		o.forget();
 	}
-	void operator=(nullptr_t o) {
+	void operator=(std::nullptr_t o) {
 		release();
 	}
 	bool operator==(const T *o) const {

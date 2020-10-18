@@ -4,12 +4,17 @@
 	#include <direct.h>
 	#include <tchar.h>
 	#include <signal.h>
+	#include <windows.h>
 #endif
 #ifdef OS_LINUX
 	#include <sys/time.h>
 	#include <unistd.h>
 #endif
 
+
+#ifdef OS_WINDOWS
+const TCHAR* hui_tchar_str(const string& str);
+#endif
 
 namespace hui
 {

@@ -6,7 +6,7 @@ namespace hui
 {
 
 #ifdef OS_WINDOWS
-	extern HINSTANCE hui_win_instance;
+	extern void *hui_win_instance;
 #endif
 #ifdef HUI_API_WIN
 	extern unsigned char HuiKeyID[256];

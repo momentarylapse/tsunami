@@ -12,7 +12,7 @@
 
 // which operating system?
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	#define OS_WINDOWS
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 	#define OS_MINGW

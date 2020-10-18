@@ -10,6 +10,10 @@
 #include "hui.h"
 #include "internal.h"
 
+#ifdef OS_WINDOWS
+#include <windows.h>
+#endif
+
 namespace hui
 {
 
@@ -111,7 +115,7 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 	char *ttt = nullptr;
 	int r = _get_pgmptr(&ttt);
 	filename = ttt;
-	hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
+	hui_win_instance = (void*)GetModuleHandle(nullptr);
 #endif
 
 

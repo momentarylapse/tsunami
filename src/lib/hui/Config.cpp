@@ -16,7 +16,7 @@ namespace hui
 
 
 #ifdef OS_WINDOWS
-	int _tchar_str_size_(TCHAR *str);
+	//int _tchar_str_size_(TCHAR *str);
 #endif
 
 Configuration Config;

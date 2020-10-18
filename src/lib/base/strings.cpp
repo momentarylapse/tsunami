@@ -656,7 +656,7 @@ template<> string _xf_str_(const string &f, const string &value) {
 	return ff.apply_justify(value);
 }
 
-template<> string _xf_str_(const string &f, const char *value) {
+template<> string _xf_str_(const string &f, const char *const value) {
 	if (f != "s")
 		throw Exception("format evil (string): " + f);
 	return value;
@@ -670,7 +670,7 @@ template<> string _xf_str_(const string &f, unsigned long long value) { return _
 //template<> string _xf_str_(const string &f, unsigned long value) { return _xf_str_(f, (int64)value); }
 template<> string _xf_str_(const string &f, float value) { return _xf_str_(f, (double)value); }
 template<> string _xf_str_(const string &f, string value) { return _xf_str_<const string&>(f, value); }
-template<> string _xf_str_(const string &f, char *value) { return _xf_str_<const char*>(f, value); }
+template<> string _xf_str_(const string& f, char* const value) { return _xf_str_<const char*>(f, value); }
 
 // %lx
 

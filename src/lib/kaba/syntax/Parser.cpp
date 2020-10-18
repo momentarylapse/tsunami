@@ -2483,7 +2483,7 @@ void Parser::parse_complete_command(Block *block) {
 	expect_new_line();
 }
 
-extern Array<Script*> loading_script_stack;
+extern Array<shared<Script>> loading_script_stack;
 
 string canonical_import_name(const string &s) {
 	return s.lower().replace(" ", "").replace("_", "");
@@ -2564,7 +2564,7 @@ void Parser::parse_import() {
 	if (filename.is_empty())
 		do_error(format("can not find import '%s'", name));
 
-	for (auto ss: loading_script_stack)
+	for (auto ss: weak(loading_script_stack))
 		if (ss->filename == filename)
 			do_error("recursive include");
 

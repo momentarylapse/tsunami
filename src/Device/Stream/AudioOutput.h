@@ -120,7 +120,7 @@ private:
 	} state;
 
 	int latency;
-	timeval xxx_prev_time;
+	//timeval xxx_prev_time;
 
 
 	bool feed_stream_output(int frames, float *out);

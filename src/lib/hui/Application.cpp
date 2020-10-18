@@ -83,9 +83,9 @@ Path strip_dev_dirs(const Path &p) {
 	if (p.basename() == "build")
 		return p.parent();
 	if (p.basename() == "Debug")
-		return p.parent();
+		return strip_dev_dirs(p.parent());
 	if (p.basename() == "Release")
-		return p.parent();
+		return strip_dev_dirs(p.parent());
 	if (p.basename() == "x64")
 		return p.parent();
 	if (p.basename() == "Unoptimized")

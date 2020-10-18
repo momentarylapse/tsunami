@@ -17,7 +17,8 @@ struct PerfChannelStat {
 	int counter;
 };
 
-struct PerfChannelInfo {
+class PerfChannelInfo {
+public:
 	int id, parent;
 	string name;
 	void *p;

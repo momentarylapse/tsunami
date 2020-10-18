@@ -208,7 +208,8 @@ Menu *_create_res_menu_(const string &ns, Resource *res) {
 Menu *CreateResourceMenu(const string &id) {
 	Resource *res = GetResource(id);
 	if (!res) {
-		msg_error(format("CreateResourceMenu  (id=%d)  m(-_-)m", id));
+		msg_error(format("CreateResourceMenu  (id=%s)  m(-_-)m", id));
+		throw Exception(format("CreateResourceMenu  (id=%s)  m(-_-)m", id));
 		return nullptr;
 	}
 

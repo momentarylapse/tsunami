@@ -162,6 +162,7 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 
 	FLAC__StreamEncoder *encoder = nullptr;
 	FLAC__StreamMetadata *metadata = nullptr;
+	msg_write("FLAC");
 
 	try{
 		FLAC__StreamEncoderInitStatus init_status;
@@ -174,6 +175,7 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 		int bits = format_get_bits(format);
 		if (bits > 24)
 			bits = 24;
+		msg_write(channels);
 
 		// allocate the encoder
 		encoder = FLAC__stream_encoder_new();
@@ -222,7 +224,7 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 			FLAC__int32 *pp = flac_pcm;
 			for (int i=0;i<samples_read;i++){
 				for (int c=0; c<channels; c++)
-					*(pp ++) = (int)(buf.c[0][i] * scale);
+					*(pp ++) = (int)(buf.c[c][i] * scale);
 			}
 			/* feed samples to encoder */
 			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, samples_read))

@@ -212,7 +212,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 					od->suggest_tag(tag_from_wave(key), value);
 				}
 			}
-		} else if (chunk_name == "PEAK" or chunk_name == "fact") {
+		} else if (chunk_name == "PEAK" /*or chunk_name == "fact"*/) {
 			f->seek(chunk_size);
 		} else {
 			od->warn("unhandled wave chunk: " + chunk_name);

@@ -31,7 +31,7 @@ enum class SampleFormat {
 };
 
 
-SampleFormat format_for_bits(int bits);
+SampleFormat format_for_bits(int bits, bool prefer_float, bool big_endian=false);
 int format_get_bits(SampleFormat);
 string format_name(SampleFormat format);
 string format_code(SampleFormat format);

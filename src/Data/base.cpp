@@ -19,15 +19,25 @@ float db2amplitude(float db) {
 }
 
 
-SampleFormat format_for_bits(int bits) {
-	if (bits == 8)
+SampleFormat format_for_bits(int bits, bool prefer_float, bool big_endian) {
+	if (bits == 8) {
 		return SampleFormat::SAMPLE_FORMAT_8;
-	if (bits == 16)
+	} else if (bits == 16) {
+		if (big_endian)
+			return SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN;
 		return SampleFormat::SAMPLE_FORMAT_16;
-	if (bits == 24)
+	} else if (bits == 24) {
+		if (big_endian)
+			return SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN;
 		return SampleFormat::SAMPLE_FORMAT_24;
-	if (bits == 32)
-		return SampleFormat::SAMPLE_FORMAT_32;
+	} else if (bits == 32) {
+		if (prefer_float)
+			return SampleFormat::SAMPLE_FORMAT_32_FLOAT;
+		else if (big_endian)
+			return SampleFormat::SAMPLE_FORMAT_32_BIGENDIAN;
+		else
+			return SampleFormat::SAMPLE_FORMAT_32;
+	}
 	return SampleFormat::SAMPLE_FORMAT_UNKNOWN;
 }
 

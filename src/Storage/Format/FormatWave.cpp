@@ -23,18 +23,14 @@ FormatDescriptorWave::FormatDescriptorWave() :
 }
 
 
-void FormatWave::save_via_renderer(StorageOperationData *od)
-{
+void FormatWave::save_via_renderer(StorageOperationData *od) {
 	Port *r = od->renderer;
 
 	SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
 	if (od->song)
 		format = od->song->default_format;
-	if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT)
-		format = SampleFormat::SAMPLE_FORMAT_32;
 	int bit_depth = format_get_bits(format);
 	int channels = od->channels_suggested;
-	msg_write(channels);
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
@@ -44,11 +40,11 @@ void FormatWave::save_via_renderer(StorageOperationData *od)
 	f->write_int(samples * bytes_per_sample + 44);
 	f->write_buffer("WAVEfmt ",8);
 	f->write_int(16); // chunk size (fmt)
-	f->write_word(1); // version
+	f->write_word((format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) ? 3 : 1); // format PCM/IEEE FLOAT
 	f->write_word(channels); // channels
 	f->write_int(od->session->sample_rate());
 	f->write_int(od->session->sample_rate() * bytes_per_sample); // bytes per sec
-	f->write_word(4); // block align
+	f->write_word(bytes_per_sample); // block align
 	f->write_word(bit_depth);
 	f->write_buffer("data", 4);
 	f->write_int(samples * bytes_per_sample);
@@ -56,10 +52,10 @@ void FormatWave::save_via_renderer(StorageOperationData *od)
 	AudioBuffer buf(CHUNK_SIZE, channels);
 	int done = 0;
 	int samples_read;
-	while ((samples_read = r->read_audio(buf)) > 0){
+	while ((samples_read = r->read_audio(buf)) > 0) {
 		buf.resize(samples_read);
 		string data;
-		if (!buf.exports(data, channels, SampleFormat::SAMPLE_FORMAT_16))
+		if (!buf.exports(data, channels, format))
 			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);
@@ -71,16 +67,14 @@ void FormatWave::save_via_renderer(StorageOperationData *od)
 	FileClose(f);
 }
 
-static string read_chunk_name(File *f)
-{
+static string read_chunk_name(File *f) {
 	string s;
 	s.resize(4);
 	*(int*)s.data = f->read_int();
 	return s;
 }
 
-static string tag_from_wave(const string &key)
-{
+static string tag_from_wave(const string &key) {
 	if (key == "IART")
 		return "artist";
 	if (key == "INAM")
@@ -102,14 +96,13 @@ static string tag_from_wave(const string &key)
 	return key;
 }
 
-void FormatWave::load_track(StorageOperationData *od)
-{
+void FormatWave::load_track(StorageOperationData *od) {
 	Track *t = od->track;
 
 	char *data = new char[CHUNK_SIZE];
 	File *f = nullptr;
 
-	try{
+	try {
 		f = FileOpen(od->filename);
 
 	if (read_chunk_name(f) != "RIFF")
@@ -128,11 +121,11 @@ void FormatWave::load_track(StorageOperationData *od)
 	auto format = SampleFormat::SAMPLE_FORMAT_16;
 
 	// read chunks
-	while (f->get_pos() < real_file_size - 8){
+	while (f->get_pos() < real_file_size - 8) {
 		string chunk_name = read_chunk_name(f);
 		int chunk_size = f->read_int();
 
-		if (chunk_name == "fmt "){
+		if (chunk_name == "fmt ") {
 			if ((chunk_size != 16) and (chunk_size != 18) and (chunk_size != 40))
 				throw Exception(::format("wave file gives header size %d (16, 18 or 40 expected)", chunk_size));
 			char header[16];
@@ -150,14 +143,14 @@ void FormatWave::load_track(StorageOperationData *od)
 			bits = *(short*)&header[14];
 			byte_per_sample = (bits / 8) * channels;
 
-			format = format_for_bits(bits);
+			format = format_for_bits(bits, format_code == 3);
 			od->suggest_samplerate(freq);
 			od->suggest_channels(channels);
 			if (t->get_index() == 0)
 				t->song->set_default_format(format);
 
 			fmt_chunk_read = true;
-		}else if (chunk_name == "data"){
+		} else if (chunk_name == "data") {
 			if (!fmt_chunk_read)
 				throw Exception("\"data\" chunk but no preceeding \"fmt\" chunk");
 
@@ -173,11 +166,11 @@ void FormatWave::load_track(StorageOperationData *od)
 			int read = 0;
 			int nn = 0;
 			int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
-			while (read < chunk_size){
+			while (read < chunk_size) {
 				int toread = clampi(nice_buffer_size, 0, chunk_size - read);
 				int r = f->read_buffer(data, toread);
 				nn ++;
-				if (nn > 16){
+				if (nn > 16) {
 					float perc_read = 0.1f;
 					float dperc_read = 0.9f;
 					od->set(perc_read + dperc_read * (float)read / (float)chunk_size);
@@ -188,12 +181,12 @@ void FormatWave::load_track(StorageOperationData *od)
 					int _offset = read / byte_per_sample + od->offset;
 					import_data(od->layer, data, channels, format, dsamples, _offset);
 					read += r;
-				}else{
+				} else {
 					throw Exception("could not read in wave file...");
 				}
 			}
 			break;
-		}else if (chunk_name == "LIST"){
+		} else if (chunk_name == "LIST") {
 
 			// tags...
 			string buf;
@@ -201,10 +194,10 @@ void FormatWave::load_track(StorageOperationData *od)
 			f->read_buffer(buf.data, buf.num);
 			//msg_write(buf.hex());
 
-			if (buf.head(4) == "INFO"){
+			if (buf.head(4) == "INFO") {
 				int offset = 4;
-				while (offset + 8 < buf.num){
-					if (buf[offset] == 0){
+				while (offset + 8 < buf.num) {
+					if (buf[offset] == 0) {
 						offset ++;
 						continue;
 					}
@@ -219,16 +212,16 @@ void FormatWave::load_track(StorageOperationData *od)
 					od->suggest_tag(tag_from_wave(key), value);
 				}
 			}
-
-		}else{
+		} else if (chunk_name == "PEAK" or chunk_name == "fact") {
+			f->seek(chunk_size);
+		} else {
 			od->warn("unhandled wave chunk: " + chunk_name);
 
-			for (int i=0;i<chunk_size;i++)
-				f->read_byte();
+			f->seek(chunk_size);
 		}
 	}
 
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		od->error(e.message());
 	}
 

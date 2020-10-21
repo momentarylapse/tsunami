@@ -442,7 +442,7 @@ public:
 			uncompress_buffer(*me, data, this);
 
 		}else{
-			me->import(data.data, me->channels, format_for_bits(bits), num);
+			me->import(data.data, me->channels, format_for_bits(bits, true), num);
 		}
 	}
 	void write(File *f) override {
@@ -505,7 +505,7 @@ public:
 
 		}else{
 			if (bytes > 0)
-				me->import(data.data, channels, format_for_bits(bits), num);
+				me->import(data.data, channels, format_for_bits(bits, true), num);
 		}
 	}
 	void write(File *f) override {

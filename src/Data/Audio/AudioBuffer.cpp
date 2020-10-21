@@ -449,6 +449,10 @@ inline void set_data_24(int *data, float value) {
 	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
+inline void set_data_32(int *data, float value) {
+	*data = set_data(value, 2147483648.0f, 0x7fffffff, 0x80000000);
+}
+
 bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool align32) const {
 	wtb_overflow = false;
 	float*source[2];
@@ -471,6 +475,14 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 			for (int ci=0; ci<_channels; ci++) {
 				set_data_24((int*)sc, *(source[ci]++));
 				sc += d;
+			}
+		}
+	} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
+		int *sc = (int*)data;
+		for (int i=0;i<length;i++) {
+			for (int ci=0; ci<_channels; ci++) {
+				set_data_32(sc, *(source[ci]++));
+				sc ++;
 			}
 		}
 	} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {

@@ -20,8 +20,7 @@
 
 bool flac_tells_samples;
 int flac_offset;
-int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
-SampleFormat flac_format;
+int flac_samples, flac_file_size;
 int flac_read_samples;
 
 
@@ -30,25 +29,28 @@ string tag_from_vorbis(const string &key);
 string tag_to_vorbis(const string &key);
 
 
-FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
-{
+FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data) {
 	if (frame->header.number.sample_number == 0)
 		flac_read_samples = 0;
 	StorageOperationData *od = (StorageOperationData*)client_data;
 
+	int channels = frame->header.channels;
+	int bits = frame->header.bits_per_sample;
+	int freq = frame->header.sample_rate;
+
 	if (flac_tells_samples)
-		od->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
+		od->set((float)(flac_read_samples / channels) / (float)(flac_samples));
 	else // estimate... via increasingly compressed size
-		od->set(( 1 - exp(- (float)(flac_read_samples * flac_channels * (flac_bits / 8)) / (float)flac_file_size ) ));
+		od->set(( 1 - exp(- (float)(flac_read_samples * channels * (bits / 8)) / (float)flac_file_size ) ));
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
 	AudioBuffer buf;
 	auto *a = od->layer->edit_buffers(buf, range);
 
-	float scale = pow(2.0f, flac_bits-1);
-	for (int ci=0; ci<buf.channels; ci++){
-		const FLAC__int32 *source = buffer[min(ci, flac_channels)];
+	float scale = pow(2.0f, bits-1);
+	for (int ci=0; ci<buf.channels; ci++) {
+		const FLAC__int32 *source = buffer[min(ci, channels)];
 		for (int i=0;i<(int)frame->header.blocksize;i++)
 			buf.c[ci][i] = source[i] / scale;
 	}
@@ -59,34 +61,29 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
-{
+void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data) {
 	StorageOperationData *od = (StorageOperationData*)client_data;
-	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
-		flac_freq = metadata->data.stream_info.sample_rate;
-		flac_bits = metadata->data.stream_info.bits_per_sample;
-		flac_format = format_for_bits(flac_bits);
+	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
+		int bits = metadata->data.stream_info.bits_per_sample;
 		flac_samples = metadata->data.stream_info.total_samples;
 		flac_tells_samples = (flac_samples != 0);
-		flac_channels = metadata->data.stream_info.channels;
-		od->suggest_channels(flac_channels);
-		od->suggest_samplerate(flac_freq);
-		od->suggest_default_format(format_for_bits(flac_bits));
+		od->suggest_channels(metadata->data.stream_info.channels);
+		od->suggest_samplerate(metadata->data.stream_info.sample_rate);
+		od->suggest_default_format(format_for_bits(bits, true));
 		//printf("%d %d %d %d\n", flac_channels, flac_bits, (int)flac_samples, flac_freq);
-	}else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT){
-		for (int i=0;i<(int)metadata->data.vorbis_comment.num_comments;i++){
+	} else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
+		for (int i=0; i<(int)metadata->data.vorbis_comment.num_comments; i++){
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
 				od->suggest_tag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
 		}
-	}else{
+	} else {
 		od->warn("flac_metadata_callback: unhandled type: " + i2s(metadata->type));
 	}
 }
 
-void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
-{
+void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data) {
 	//msg_write("error");
 	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 }

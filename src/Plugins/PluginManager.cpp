@@ -80,8 +80,8 @@ PluginManager::PluginManager() {
 	Kaba::packages.add(package);
 	Kaba::_public_scripts_.add(package.get());
 
-	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);
-	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, type_dev, package->syntax->base_class);
+	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class);
+	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->syntax->base_class);
 }
 
 PluginManager::~PluginManager() {
@@ -741,7 +741,7 @@ void PluginManager::link_app_script_data() {
 }
 
 Kaba::Class* PluginManager::get_class(const string &name) {
-	return (Kaba::Class*)package->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr, nullptr, package->syntax->base_class);
+	return (Kaba::Class*)package->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

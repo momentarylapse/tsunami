@@ -38,7 +38,7 @@ const Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
 
-shared class MidiNote
+class MidiNote as shared
 	Range range
 	float pitch
 	float volume
@@ -102,7 +102,7 @@ class ConfigPanel extends Panel
 	extern void changed()
 	Module *c
 
-shared class Module extends Object
+class Module as shared extends Object
 	string name
 	Session* session
 	extern void __init__(int type, string sub_type)
@@ -345,12 +345,12 @@ class MidiRecorder extends Module
 class TrackRenderBuffer
 	int dummy
 
-shared class TrackMarker
+class TrackMarker as shared
 	Range range
 	string text
 	shared AudioEffect[] fx
 	
-shared class Bar
+class Bar as shared
 	int[] beats
 	int divisor
 	int index
@@ -381,7 +381,7 @@ class BarCollection extends shared Bar[]
 	extern const int get_next_beat(int pos)
 	extern const int get_prev_beat(int pos)
 
-shared class TrackLayer
+class TrackLayer as shared
 	int type
 	Track *track
 	AudioBuffer[] buffers
@@ -404,7 +404,7 @@ shared class TrackLayer
 	extern void delete_marker(TrackMarker *marker)
 	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
-shared class Sample # TODO
+class Sample as shared # TODO
 	string name
 	int type
 	AudioBuffer* buf
@@ -418,7 +418,7 @@ shared class Sample # TODO
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
 
-shared class SampleRef
+class SampleRef as shared
 	shared Sample origin
 	extern void __init__(shared Sample sam)
 	extern virtual void __delete__()
@@ -436,7 +436,7 @@ class Instrument
 	int type
 	int[] string_pitch
 
-shared class Track
+class Track as shared
 	int type
 	string name
 	shared TrackLayer[] layers
@@ -474,7 +474,7 @@ class Tag
 		key = _key
 		value = _value
 
-shared class Song
+class Song as shared
 	Path filename
 	Tag[] tags
 	int sample_rate
@@ -537,7 +537,7 @@ class ColorScheme
 	extern const color hoverify(color c)
 
 class SceneGraph
-	shared class Node
+	class Node as shared
 		rect area
 
 class AudioView extends Object
@@ -628,7 +628,7 @@ class SignalChain extends Module
 	extern void set_update_dt(float dt)
 	extern void set_buffer_size(int size)
 
-shared class Session extends Object
+class Session as shared extends Object
 	int id
 	#TsunamiWindow* win
 	Window* win

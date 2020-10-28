@@ -127,24 +127,13 @@ string Function::signature(const Class *ns) const {
 
 void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 	blocks.add(block);
-	for (auto n: block->params) {
+	for (auto n: weak(block->params)) {
 		if (n->kind == NodeKind::BLOCK)
 			blocks_add_recursive(blocks, n->as_block());
 		if (n->kind == NodeKind::STATEMENT) {
-			auto id = n->as_statement()->id;
-			if (id == StatementID::FOR_DIGEST) {
-				blocks_add_recursive(blocks, n->params[2]->as_block());
-			} else if (id == StatementID::WHILE) {
-				blocks_add_recursive(blocks, n->params[1]->as_block());
-			} else if (id == StatementID::TRY) {
-				blocks_add_recursive(blocks, n->params[0]->as_block());
-				blocks_add_recursive(blocks, n->params[2]->as_block());
-			} else if (id == StatementID::IF) {
-				blocks_add_recursive(blocks, n->params[1]->as_block());
-			} else if (id == StatementID::IF_ELSE) {
-				blocks_add_recursive(blocks, n->params[1]->as_block());
-				blocks_add_recursive(blocks, n->params[2]->as_block());
-			}
+			for (auto p: weak(n->params))
+				if (p->kind == NodeKind::BLOCK)
+					blocks_add_recursive(blocks, p->as_block());
 		}
 	}
 }

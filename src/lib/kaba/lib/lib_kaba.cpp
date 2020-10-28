@@ -80,7 +80,7 @@ void SIAddPackageKaba() {
 		class_add_elementx("size", TypeInt, &Class::size);
 		class_add_elementx("type", TypeInt, &Class::type);
 		class_add_elementx("parent", TypeClassP, &Class::parent);
-		class_add_elementx("param", TypeClassP, &Class::param);
+		class_add_elementx("param", TypeClassPList, &Class::param);
 		class_add_elementx("namespace", TypeClassP, &Class::name_space);
 		class_add_elementx("elements", TypeClassElementList, &Class::elements);
 		class_add_elementx("functions", TypeFunctionPList, &Class::functions);

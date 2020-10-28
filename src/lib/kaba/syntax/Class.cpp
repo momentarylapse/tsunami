@@ -43,11 +43,11 @@ bool type_match(const Class *given, const Class *wanted) {
 
 	// compatible pointers (of same or derived class)
 	if (given->is_pointer() and wanted->is_pointer())
-		return given->param->is_derived_from(wanted->param);
+		return given->param[0]->is_derived_from(wanted->param[0]);
 
 	if (wanted->is_super_array()) {
 		if (given->is_super_array()) {
-			if (type_match(given->param, wanted->param) and (given->param->size == wanted->param->size))
+			if (type_match(given->param[0], wanted->param[0]) and (given->param[0]->size == wanted->param[0]->size))
 				return true;
 		}
 	}
@@ -59,7 +59,7 @@ bool type_match(const Class *given, const Class *wanted) {
 }
 
 
-Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Class *_param) {
+Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
 	flags = Flags::FULLY_PARSED;
 	name = _name;
 	owner = _owner;
@@ -137,7 +137,7 @@ bool Class::is_super_array() const
 bool Class::is_pointer() const
 { return type == Type::POINTER or type == Type::POINTER_SILENT /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */; }
 
-bool Class::is_usable_as_pointer() const
+bool Class::is_some_pointer() const
 { return type == Type::POINTER or type == Type::POINTER_SILENT  or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE; }
 
 bool Class::is_pointer_shared() const
@@ -166,7 +166,7 @@ bool Class::is_simple_class() const {
 	if (!uses_call_by_reference())
 		return true;
 	if (is_array())
-		return param->is_simple_class();
+		return param[0]->is_simple_class();
 	if (is_super_array())
 		return false;
 	if (is_dict())
@@ -200,7 +200,7 @@ bool Class::usable_as_super_array() const {
 
 const Class *Class::get_array_element() const {
 	if (is_array() or is_super_array() or is_dict())
-		return param;
+		return param[0];
 	if (is_pointer())
 		return nullptr;
 	if (parent)
@@ -215,7 +215,7 @@ bool Class::needs_constructor() const {
 	if (is_super_array() or is_dict())
 		return true;
 	if (is_array())
-		return param->needs_constructor();
+		return param[0]->needs_constructor();
 	if (vtable.num > 0)
 		return true;
 	if (parent)
@@ -230,7 +230,7 @@ bool Class::needs_constructor() const {
 bool Class::is_size_known() const {
 	if (!fully_parsed())
 		return false;
-	if (is_super_array() or is_dict() or is_pointer())
+	if (is_super_array() or is_dict() or is_some_pointer())
 		return true;
 	for (ClassElement &e: elements)
 		if (!e.type->is_size_known())
@@ -244,7 +244,7 @@ bool Class::needs_destructor() const {
 	if (is_super_array() or is_dict())
 		return true;
 	if (is_array())
-		return param->get_destructor();
+		return param[0]->get_destructor();
 	if (parent) {
 		if (parent->get_destructor())
 			return true;
@@ -413,7 +413,7 @@ bool class_func_match(Function *a, Function *b) {
 
 
 const Class *Class::get_pointer() const {
-	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, this, name_space);
+	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, {this}, name_space);
 }
 
 const Class *Class::get_root() const {

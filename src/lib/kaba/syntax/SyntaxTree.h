@@ -75,12 +75,13 @@ public:
 
 	// syntax analysis
 	const Class *add_class(const Class *type);
-	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Class *param, const Class *ns);
-	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Class *param, const Class *ns);
+	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns);
+	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns);
 	const Class *make_class_super_array(const Class *element_type);
 	const Class *make_class_array(const Class *element_type, int num_elements);
 	const Class *make_class_dict(const Class *element_type);
 	const Class *make_class_func(Function *f);
+	const Class *make_class_func(const Array<const Class*> &param, const Class *ret);
 	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns, bool prefer_class);
 	shared_array<Node> get_existence_global(const string &name, const Class *ns, bool prefer_class);
 	shared<Node> get_existence_block(const string &name, Block *block);

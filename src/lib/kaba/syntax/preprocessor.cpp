@@ -360,7 +360,7 @@ void rec_init(void *p, const Class *type) {
 void rec_delete(void *p, const Class *type) {
 	if (type->is_super_array()) {
 		auto ar = (DynamicArray*)p;
-		rec_resize(ar, 0, type->param);
+		rec_resize(ar, 0, type->param[0]);
 		ar->simple_clear();
 	} else {
 		for (auto &el: type->elements)
@@ -369,7 +369,7 @@ void rec_delete(void *p, const Class *type) {
 }
 
 void rec_resize(DynamicArray *ar, int num, const Class *type) {
-	auto *t_el = type->param;
+	auto *t_el = type->param[0];
 	int num_old = ar->num;
 
 	for (int i=num; i<num_old; i++)
@@ -387,7 +387,7 @@ void rec_assign(void *a, void *b, const Class *type) {
 		auto bb = (DynamicArray*)b;
 		rec_resize(aa, bb->num, type);
 		for (int i=0; i<bb->num; i++)
-			rec_assign(ar_el(aa, i), ar_el(bb, i), type->param);
+			rec_assign(ar_el(aa, i), ar_el(bb, i), type->param[0]);
 
 	} else if (type->is_simple_class()){
 		memcpy(a, b, type->size);
@@ -430,7 +430,7 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 			DynamicArray &da = c_array->as_const()->as_array();
 			rec_resize(&da, c->params.num, c->type);
 			for (int i=0; i<c->params.num; i++)
-				rec_assign(ar_el(&da, i), c->params[i]->as_const()->p(), c->type->param);
+				rec_assign(ar_el(&da, i), c->params[i]->as_const()->p(), c->type->param[0]);
 			return c_array;
 		}
 	}

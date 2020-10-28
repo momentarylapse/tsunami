@@ -50,18 +50,34 @@ shared<Node> SyntaxTree::cp_node(shared<Node> c) {
 }
 
 const Class *SyntaxTree::make_class_func(Function *f) {
-	return TypeFunctionCodeP;
+	auto params = f->literal_param_type;
+	if (!f->is_static())
+		params.insert(f->name_space, 0);
+	if (params.num == 0)
+		return make_class_func({TypeVoid}, f->literal_return_type);
+	return make_class_func(params, f->literal_return_type);
+	//return TypeFunctionP;
+}
+
+const Class *SyntaxTree::make_class_func(const Array<const Class*> &param, const Class *ret) {
 
 	// maybe some day...
-	string params;
-	for (int i=0; i<f->num_params; i++) {
+	string params;// = param->name;
+	for (int i=0; i<param.num; i++) {
 		if (i > 0)
 			params += ",";
-		params += f->literal_param_type[i]->name;
+		params += param[i]->name;
 	}
-	return make_class("func(" + params + ")->" + f->return_type->name, Class::Type::POINTER, config.pointer_size, 0, nullptr, TypeVoid, base_class);
-
-	return TypePointer;
+	if (param.num > 1)
+		params = "(" + params + ")";
+	auto params_ret = param;
+	params_ret.add(ret);
+	auto ff = make_class("<func " + params + "->" + ret->name + ">", Class::Type::FUNCTION, 0, 0, nullptr, params_ret, base_class);
+	if (!ff->parent) {
+		const_cast<Class*>(ff)->derive_from(TypeFunction, true);
+	}
+	//auto p = ff->get_pointer();
+	return make_class(params + "->" + ret->name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, base_class);
 }
 
 shared<Node> SyntaxTree::ref_node(shared<Node> sub, const Class *override_type) {
@@ -87,7 +103,7 @@ shared<Node> SyntaxTree::deref_node(shared<Node> sub, const Class *override_type
 	if (override_type)
 		c->type = override_type;
 	else
-		c->type = sub->type->param;
+		c->type = sub->type->param[0];
 	return c;
 }
 
@@ -130,7 +146,7 @@ shared<Node> SyntaxTree::add_node_call(Function *f) {
 }
 
 shared<Node> SyntaxTree::add_node_func_name(Function *f) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, TypeFunctionP, true);
+	return new Node(NodeKind::FUNCTION, (int_p)f, make_class_func(f), true);
 }
 
 shared<Node> SyntaxTree::add_node_class(const Class *c) {
@@ -192,7 +208,7 @@ shared<Node> SyntaxTree::add_node_dyn_array(shared<Node> array, shared<Node> ind
 }
 
 shared<Node> SyntaxTree::add_node_array(shared<Node> array, shared<Node> index) {
-	auto *el = new Node(NodeKind::ARRAY, 0, array->type->param);
+	auto *el = new Node(NodeKind::ARRAY, 0, array->type->param[0]);
 	el->set_num_params(2);
 	el->set_param(0, array);
 	el->set_param(1, index);
@@ -208,7 +224,8 @@ SyntaxTree::SyntaxTree(Script *_script) {
 	base_class = new Class("-base-", 0, this);
 	_base_class = base_class;
 	imported_symbols = new Class("-imported-", 0, this);
-	root_of_all_evil = new Function("RootOfAllEvil", TypeVoid, base_class);
+	root_of_all_evil = new Function("-root-", TypeVoid, base_class);
+
 
 	flag_string_const_as_cstring = false;
 	flag_function_pointer_as_code = false;
@@ -543,11 +560,11 @@ const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class 
 	return nullptr;
 }
 
-Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Class *param, const Class *ns) {
+Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns) {
 	if (find_root_type_by_name(name, ns, false))
 		do_error("class already exists");
 
-	Class *t = new Class(name, size, this, parent, param);
+	Class *t = new Class(name, size, this, parent, params);
 	t->type = type;
 	if (cur_exp_buf) {
 		t->_logical_line_no = cur_exp_buf->get_line_no();
@@ -562,23 +579,26 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	t->array_length = max(array_size, 0);
 	if (t->is_super_array() or t->is_dict()) {
 		t->derive_from(TypeDynamicArray, false); // we already set its size!
-		if (param->needs_constructor() and !param->get_default_constructor())
-			do_error(format("can not create a dynamic array from type '%s', missing default constructor", param->long_name()));
-		t->param = param;
+		if (params[0]->needs_constructor() and !params[0]->get_default_constructor())
+			do_error(format("can not create a dynamic array from type '%s', missing default constructor", params[0]->long_name()));
+		t->param = params;
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_array()) {
-		if (param->needs_constructor() and !param->get_default_constructor())
-			do_error(format("can not create an array from type '%s', missing default constructor", param->long_name()));
+		if (params[0]->needs_constructor() and !params[0]->get_default_constructor())
+			do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()));
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_pointer_shared()) {
 		//t->derive_from(TypeSharedPointer, true);
-		t->param = param;
+		t->param = params;
 		add_missing_function_headers_for_class(t);
+	} else if (t->type == Class::Type::FUNCTION) {
+		t->derive_from(TypeFunction, true);
+		t->param = params;
 	}
 	return t;
 }
 
-const Class *SyntaxTree::make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Class *param, const Class *ns) {
+const Class *SyntaxTree::make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns) {
 	//msg_write("make class " + name + " ns=" + ns->long_name() + " param=" + param->long_name());
 	
 	// check if it already exists
@@ -587,22 +607,22 @@ const Class *SyntaxTree::make_class(const string &name, Class::Type type, int si
 		return tt;
 
 	// add new class
-	return create_new_class(name, type, size, array_size, parent, param, ns);
+	return create_new_class(name, type, size, array_size, parent, params, ns);
 }
 
 const Class *SyntaxTree::make_class_super_array(const Class *element_type) {
 	string name = element_type->name + "[]";
-	return make_class(name, Class::Type::SUPER_ARRAY, config.super_array_size, -1, TypeDynamicArray, element_type, element_type->name_space);
+	return make_class(name, Class::Type::SUPER_ARRAY, config.super_array_size, -1, TypeDynamicArray, {element_type}, element_type->name_space);
 }
 
 const Class *SyntaxTree::make_class_array(const Class *element_type, int num_elements) {
 	string name = element_type->name + format("[%d]", num_elements);
-	return make_class(name, Class::Type::ARRAY, element_type->size * num_elements, num_elements, nullptr, element_type, element_type->name_space);
+	return make_class(name, Class::Type::ARRAY, element_type->size * num_elements, num_elements, nullptr, {element_type}, element_type->name_space);
 }
 
 const Class *SyntaxTree::make_class_dict(const Class *element_type) {
 	string name = element_type->name + "{}";
-	return make_class(name, Class::Type::DICT, config.super_array_size, 0, TypeDictBase, element_type, element_type->name_space);
+	return make_class(name, Class::Type::DICT, config.super_array_size, 0, TypeDictBase, {element_type}, element_type->name_space);
 }
 
 shared<Node> SyntaxTree::conv_cbr(shared<Node> c, Variable *var) {

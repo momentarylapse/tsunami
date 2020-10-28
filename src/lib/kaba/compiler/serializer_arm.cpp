@@ -43,7 +43,7 @@ int SerializerARM::fc_begin(Function *f, const Array<SerialNodeParam> &_params, 
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> float_param;
 	for (SerialNodeParam &p: params){
-		if ((p.type == TypeInt) /*or (p.type == TypeInt64)*/ or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_usable_as_pointer()){
+		if ((p.type == TypeInt) /*or (p.type == TypeInt64)*/ or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_some_pointer()){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{
@@ -899,7 +899,7 @@ void SerializerARM::add_function_intro_params(Function *f)
 	Array<Variable*> stack_param;
 	Array<Variable*> float_param;
 	for (Variable *p: param){
-		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_usable_as_pointer()){
+		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_some_pointer()){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{

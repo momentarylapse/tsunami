@@ -343,7 +343,7 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 		case StatementID::NEW:{
 			// malloc()
 			auto f = syntax_tree->required_func_global("@malloc");
-			add_function_call(f, {param_imm(TypeInt, ret.type->param->size)}, ret);
+			add_function_call(f, {param_imm(TypeInt, ret.type->param[0]->size)}, ret);
 
 			// __init__()
 			auto sub = com->params[0];
@@ -366,9 +366,18 @@ void SerializerX86::serialize_statement(Node *com, const SerialNodeParam &ret, B
 			break;*/
 		case StatementID::TRY:{
 			int marker_finish = list->create_label("_TRY_AFTER_" + i2s(num_markers ++));
+
+			// try
 			serialize_block(com->params[0]->as_block());
 			add_cmd(Asm::INST_JMP, param_marker32(marker_finish));
-			serialize_block(com->params[2]->as_block());
+
+			// except
+			for (int i=2; i<com->params.num; i+=2) {
+				serialize_block(com->params[i]->as_block());
+				if (i < com->params.num-1)
+					add_cmd(Asm::INST_JMP, param_marker32(marker_finish));
+			}
+
 			add_marker(marker_finish);
 			}break;
 		case StatementID::ASM:

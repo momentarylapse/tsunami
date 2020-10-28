@@ -104,12 +104,12 @@ Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *
 		list.add(Target((float*)pp, prefix, prefix_nice));
 	} else if (t->is_array()) {
 		for (int i=0; i<t->array_length; i++) {
-			list.append(enumerate_type(pp + t->param->size * i, t->param, prefix + format(":%d", i), prefix_nice + i2s_small(i)));
+			list.append(enumerate_type(pp + t->param[0]->size * i, t->param[0], prefix + format(":%d", i), prefix_nice + i2s_small(i)));
 		}
 	} else if (t->is_super_array()) {
 		auto *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++) {
-			list.append(enumerate_type(pp + da->element_size * i, t->param, prefix + format(":%d", i), prefix_nice + i2s_small(i)));
+			list.append(enumerate_type(pp + da->element_size * i, t->param[0], prefix + format(":%d", i), prefix_nice + i2s_small(i)));
 		}
 	} else {
 		for (auto &e : t->elements)

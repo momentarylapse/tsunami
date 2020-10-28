@@ -58,7 +58,7 @@ void add_esp_add(Asm::InstructionWithParamsList *list,int d) {
 void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
 	if (type->is_array()) {
 		for (int i=0;i<type->array_length;i++)
-			try_init_global_var(type->param, g_var + i * type->param->size, ps);
+			try_init_global_var(type->param[0], g_var + i * type->param[0]->size, ps);
 		return;
 	}
 	Function *cf = type->get_default_constructor();

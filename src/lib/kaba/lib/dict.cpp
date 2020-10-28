@@ -51,9 +51,9 @@ public:
 #pragma GCC pop_options
 
 void script_make_dict(Class *t, SyntaxTree *ps) {
-	const Class *p = t->param;
+	const Class *p = t->param[0];
 	t->derive_from(TypeDictBase, false);
-	t->param = p;
+	t->param[0] = p;
 	add_class(t);
 
 	if (p->is_simple_class()) {

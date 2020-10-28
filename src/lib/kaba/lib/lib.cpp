@@ -83,6 +83,7 @@ const string IDENTIFIER_ELSE = "else";
 const string IDENTIFIER_WHILE = "while";
 const string IDENTIFIER_FOR = "for";
 const string IDENTIFIER_IN = "in";
+const string IDENTIFIER_AS = "as";
 const string IDENTIFIER_BREAK = "break";
 const string IDENTIFIER_CONTINUE = "continue";
 const string IDENTIFIER_PASS = "pass";
@@ -267,7 +268,7 @@ const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) 
 		else
 			name = sub_type->name + "*";
 	}
-	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, sub_type);
+	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::POINTER;
 	if (flags_has(flag, Flags::SILENT))
 		t->type = Class::Type::POINTER_SILENT;
@@ -282,7 +283,7 @@ const Class *add_type_a(const Class *sub_type, int array_length, const string &_
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[" + i2s(array_length) + "]";
-	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
+	Class *t = new Class(name, 0, cur_package->syntax, nullptr, {sub_type});
 	t->size = sub_type->size * array_length;
 	t->type = Class::Type::ARRAY;
 	t->array_length = array_length;
@@ -295,7 +296,7 @@ const Class *add_type_l(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[]";
-	Class *t = new Class(name, 0, cur_package->syntax, nullptr, sub_type);
+	Class *t = new Class(name, 0, cur_package->syntax, nullptr, {sub_type});
 	t->size = config.super_array_size;
 	t->type = Class::Type::SUPER_ARRAY;
 	script_make_super_array(t);
@@ -307,7 +308,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "{}";
-	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, sub_type);
+	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::DICT;
 	script_make_dict(t);
 	__add_class__(t, sub_type->name_space);
@@ -631,9 +632,9 @@ public:
 
 void script_make_super_array(Class *t, SyntaxTree *ps)
 {
-	const Class *p = t->param;
+	const Class *p = t->param[0];
 	t->derive_from(TypeDynamicArray, false);
-	t->param = p;
+	t->param[0] = p;
 	add_class(t);
 
 	Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
@@ -745,7 +746,7 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_FOR, StatementID::FOR_DIGEST, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
 	add_statement(IDENTIFIER_BREAK, StatementID::BREAK);
 	add_statement(IDENTIFIER_CONTINUE, StatementID::CONTINUE);
-	add_statement(IDENTIFIER_NEW, StatementID::NEW);
+	add_statement(IDENTIFIER_NEW, StatementID::NEW, 1);
 	add_statement(IDENTIFIER_DELETE, StatementID::DELETE, 1);
 	add_statement(IDENTIFIER_SIZEOF, StatementID::SIZEOF, 1);
 	add_statement(IDENTIFIER_TYPE, StatementID::TYPE, 1);

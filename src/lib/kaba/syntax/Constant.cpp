@@ -131,11 +131,11 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 		*(int*)&memory[config.pointer_size + 4] = 0; // .reserved
 		*(int*)&memory[config.pointer_size + 8] = el->size; // target size!
 
-		if (type->param->is_super_array()) {
+		if (type->param[0]->is_super_array()) {
 			for (int i=0; i<ar->num; i++) {
 				int el_offset = i * el->size;
 				int el_offset_host = i * ar->element_size;
-				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset_host, type->param);
+				locked = map_into_complex(ar_target + el_offset, locked, addr_off, (char*)ar->data + el_offset_host, type->param[0]);
 			}
 
 		} else {

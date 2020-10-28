@@ -31,7 +31,7 @@ typedef void *VirtualTable;
 class Class : public Sharable<Empty> {
 public:
 	//Class();
-	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Class *param = nullptr);
+	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
 	~Class();
 	string name;
 	string long_name() const;
@@ -47,6 +47,7 @@ public:
 		POINTER_SILENT, // pointer silent (&)
 		POINTER_SHARED,
 		POINTER_UNIQUE,
+		FUNCTION,
 		DICT,
 	};
 	Type type;
@@ -56,7 +57,7 @@ public:
 	bool is_super_array() const;
 	bool is_dict() const;
 	bool is_pointer() const;
-	bool is_usable_as_pointer() const;
+	bool is_some_pointer() const;
 	bool is_pointer_shared() const;
 	bool is_pointer_silent() const;
 	bool fully_parsed() const;
@@ -66,7 +67,7 @@ public:
 	shared_array<Constant> constants;
 	shared_array<const Class> classes;
 	const Class *parent; // derived from
-	const Class *param; // for pointers/arrays etc
+	Array<const Class*> param; // for pointers/arrays etc
 	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...
 	int _logical_line_no;

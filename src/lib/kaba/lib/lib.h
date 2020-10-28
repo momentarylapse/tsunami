@@ -83,6 +83,7 @@ extern const string IDENTIFIER_ELSE;
 extern const string IDENTIFIER_WHILE;
 extern const string IDENTIFIER_FOR;
 extern const string IDENTIFIER_IN;
+extern const string IDENTIFIER_AS;
 extern const string IDENTIFIER_BREAK;
 extern const string IDENTIFIER_CONTINUE;
 extern const string IDENTIFIER_PASS;

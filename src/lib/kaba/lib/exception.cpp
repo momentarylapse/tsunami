@@ -146,16 +146,18 @@ ExceptionBlockData get_blocks(shared<Script> s, Function *f, void* rip, const Cl
 				if (n->params[0]->as_block() == b) {
 					if (_verbose_exception_)
 						msg_write("found try block");
-					auto ee = n->params[1].get();
-					if (_verbose_exception_)
-						msg_write(ee->type->name);
-					if (!ex_type_match(ex_type, ee->type))
-						continue;
-					if (_verbose_exception_)
-						msg_write("match");
-					ebd.except = ee;
-					ebd.except_block = n->params[2]->as_block();
-					return ebd;
+					for (int i=1; i<n->params.num; i+=2) {
+						auto ee = n->params[i].get();
+						if (_verbose_exception_)
+							msg_write(ee->type->name);
+						if (!ex_type_match(ex_type, ee->type))
+							continue;
+						if (_verbose_exception_)
+							msg_write("match");
+						ebd.except = ee;
+						ebd.except_block = n->params[i+1]->as_block();
+						return ebd;
+					}
 				}
 			}
 		}

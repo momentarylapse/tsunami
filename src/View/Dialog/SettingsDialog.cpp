@@ -43,8 +43,8 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 	event("prebuffer_size", [=]{ on_prebuffer(); });
 	event("suck_size", [=]{ on_suck_buffer(); });
 	event("quick_export_dir_find", [=]{ on_qed_find(); });
-	event("hui:close", [=]{ destroy(); });
-	event("close", [=]{ destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
+	event("close", [=]{ request_destroy(); });
 
 	set_options("default_artist", "placeholder=" + AppName);
 

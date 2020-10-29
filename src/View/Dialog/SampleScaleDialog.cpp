@@ -79,10 +79,10 @@ void SampleScaleDialog::on_ok() {
 	BufferInterpolator::interpolate(*sample->buf, *buf, method);
 
 	sample->owner->sample_replace_buffer(sample, buf);
-	destroy();
+	request_destroy();
 }
 
 void SampleScaleDialog::on_close() {
-	destroy();
+	request_destroy();
 }
 

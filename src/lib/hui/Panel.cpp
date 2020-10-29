@@ -184,10 +184,6 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 				sent = true;
 			}
 		}
-
-		// window closed by callback?
-		if (win->got_destroyed())
-			return sent;
 	}
 
 	// reset

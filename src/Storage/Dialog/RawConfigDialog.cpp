@@ -36,7 +36,7 @@ RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent)
 }
 
 void RawConfigDialog::on_close() {
-	destroy();
+	request_destroy();
 }
 
 void RawConfigDialog::on_ok() {
@@ -48,5 +48,5 @@ void RawConfigDialog::on_ok() {
 	od->parameters.map_set("samplerate", get_int("sample_rate"));
 	od->parameters.map_set("offset", get_int("offset"));
 	ok = true;
-	destroy();
+	request_destroy();
 }

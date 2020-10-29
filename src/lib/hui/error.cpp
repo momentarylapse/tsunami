@@ -72,8 +72,8 @@ public:
 		set_image("ok", "hui:ok");
 
 		event("ok", [=]{ on_ok(); });
-		event("cancel", [=]{ destroy(); });
-		event("hui:close", [=]{ destroy(); });
+		event("cancel", [=]{ request_destroy(); });
+		event("hui:close", [=]{ request_destroy(); });
 	}
 
 	void on_ok() {
@@ -84,7 +84,7 @@ public:
 			InfoBox(nullptr, "ok", return_msg);
 		else
 			ErrorBox(nullptr, "error", return_msg);
-		destroy();
+		request_destroy();
 	}
 };
 

@@ -171,6 +171,7 @@ void ModulePanel::on_external() {
 	auto *dlg = new ModuleExternalDialog(module, session->win.get());
 	copy_into(dlg->module_panel);
 	dlg->show();
+	// "self-deleting"
 }
 
 void ModulePanel::on_change() {
@@ -197,11 +198,18 @@ ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent)
 	embed(module_panel, "content", 0, 0);
 	module->subscribe(this, [=]{
 		module = nullptr;
-		destroy();
+		request_destroy();
 	}, module->MESSAGE_DELETE);
+	event("hui:close",[=] {
+		msg_write("deleting external dialog...soon");
+		hui::RunLater(0.01f, [=] {
+			msg_error("deleting external dialog...");
+			delete this;
+		});
+	});
 }
 
-void ModuleExternalDialog::on_destroy() {
+ModuleExternalDialog::~ModuleExternalDialog() {
 	if (module)
 		module->unsubscribe(this);
 }

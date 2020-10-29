@@ -19,8 +19,8 @@ QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &questio
 	set_options("value", options);
 
 	event("value", [=]{ result = get_int("value"); });
-	event("cancel", [=]{ destroy(); });
-	event("ok", [=]{ aborted = false; destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("ok", [=]{ aborted = false; request_destroy(); });
 }
 
 int QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
@@ -50,8 +50,8 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 
 	event("value1", [=]{ result1 = get_int("value1"); });
 	event("value2", [=]{ result2 = get_int("value2"); });
-	event("cancel", [=]{ destroy(); });
-	event("ok", [=]{ aborted = false; destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("ok", [=]{ aborted = false; request_destroy(); });
 }
 
 std::pair<int,int> QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options) {
@@ -79,7 +79,7 @@ int QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, 
 		dlg->add_button("!expandx,height=36\\" + options[i], i, 0, id);
 		if (tips.num > i)
 			dlg->set_tooltip(id, tips[i]);
-		dlg->event(id, [i,&r,dlg] { r = i; dlg->destroy(); });
+		dlg->event(id, [i,&r,dlg] { r = i; dlg->request_destroy(); });
 	}
 	dlg->run();
 	return r;

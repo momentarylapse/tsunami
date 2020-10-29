@@ -421,10 +421,10 @@ public:
 		int n = get_int("");
 		if (n == 0) {
 			selected = nullptr;
-			destroy();
+			request_destroy();
 		} else if (n >= 1) {
 			selected = song->samples[n - 1].get();
-			destroy();
+			request_destroy();
 		}
 	}
 
@@ -440,12 +440,12 @@ public:
 	}
 
 	void on_ok() {
-		destroy();
+		request_destroy();
 	}
 
 	void on_cancel() {
 		selected = _old;
-		destroy();
+		request_destroy();
 	}
 
 	Sample *selected;

@@ -24,8 +24,7 @@ class ModulePanel;
 class TsunamiWindow : public hui::Window {
 public:
 	TsunamiWindow(Session *session);
-	virtual ~TsunamiWindow();
-	void on_destroy() override;
+	~TsunamiWindow() override;
 
 	void on_help();
 	void on_about();
@@ -141,12 +140,9 @@ public:
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
-	owned<MiniBar> mini_bar;
 	
 	owned<ModulePanel> big_module_panel;
 	void set_big_panel(ModulePanel *p);
-
-	bool auto_delete;
 
 	Tsunami *app;
 };

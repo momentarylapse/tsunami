@@ -17,7 +17,7 @@ TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
 	num_tracks = 0;
 
 	load();
-	event("close", [=]{ destroy(); });
+	event("close", [=]{ request_destroy(); });
 	event("add-group", [=]{ on_add_group(); });
 }
 

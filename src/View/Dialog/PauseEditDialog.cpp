@@ -23,8 +23,8 @@ PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 	check("shift-data", bar_dialog_move_data);
 
 	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ destroy(); });
-	event("hui:close", [=]{ destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
 }
 
 void PauseEditDialog::on_ok() {
@@ -34,5 +34,5 @@ void PauseEditDialog::on_ok() {
 	b.length = (float)song->sample_rate * duration;
 	song->edit_bar(index, b, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 
-	destroy();
+	request_destroy();
 }

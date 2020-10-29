@@ -50,15 +50,12 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleType _typ
 			set_int("list", n);
 	}
 
-	event("hui:close", [=]{ destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
 	event_x("list", "hui:select", [=]{ on_list_select(); });
 	event("list", [=]{ on_select(); });
-	event("cancel", [=]{ destroy(); });
+	event("cancel", [=]{ request_destroy(); });
 	event("ok", [=]{ on_select(); });
 	enable("ok", false);
-}
-
-ModuleSelectorDialog::~ModuleSelectorDialog() {
 }
 
 void ModuleSelectorDialog::on_list_select() {
@@ -71,5 +68,5 @@ void ModuleSelectorDialog::on_select() {
 	if (n < 0)
 		return;
 	_return = labels[n].name;
-	destroy();
+	request_destroy();
 }

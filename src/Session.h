@@ -31,6 +31,7 @@ namespace hui {
 class Session : public Sharable<Observable<VirtualBase>> {
 public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
+	~Session() override;
 
 	static const string MESSAGE_ADD_PLUGIN;
 	static const string MESSAGE_REMOVE_PLUGIN;
@@ -48,6 +49,7 @@ public:
 	shared<Song> song;
 	AudioView *view;
 	owned<Storage> storage;
+	bool auto_delete;
 
 	shared_array<SignalChain> all_signal_chains;
 	void add_signal_chain(SignalChain *chain);

@@ -94,12 +94,7 @@ void Window::_clean_up_() {
 
 // default handler when trying to close the windows
 void Window::on_close_request() {
-	destroy();
-	
-	// no message function (and last window): end program
-	if (_all_windows_.num > 0)
-		return;
-	Application::hard_end();
+	request_destroy();
 }
 
 

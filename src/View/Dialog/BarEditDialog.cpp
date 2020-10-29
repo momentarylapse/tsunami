@@ -101,11 +101,11 @@ void BarEditDialog::on_ok() {
 	}
 	song->end_action_group();
 
-	destroy();
+	request_destroy();
 }
 
 void BarEditDialog::on_close() {
-	destroy();
+	request_destroy();
 }
 
 void BarEditDialog::on_beats() {

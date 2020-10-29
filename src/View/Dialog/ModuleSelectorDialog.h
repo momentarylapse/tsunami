@@ -16,7 +16,6 @@ enum class ModuleType;
 class ModuleSelectorDialog: public hui::Dialog {
 public:
 	ModuleSelectorDialog(hui::Window *_parent, ModuleType type, Session *session, const string &old_name = "");
-	virtual ~ModuleSelectorDialog();
 
 	void on_list_select();
 	void on_select();

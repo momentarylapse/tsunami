@@ -137,7 +137,7 @@ public:
 		event_x("list", "hui:select", [=]{ on_list_select(); });
 		event("name", [=]{ on_name(); });
 		event("ok", [=]{ on_ok(); });
-		event("cancel", [=]{ destroy(); });
+		event("cancel", [=]{ request_destroy(); });
 	}
 	void on_list() {
 		int n = get_int("list");
@@ -146,7 +146,7 @@ public:
 			selection = names[n];
 			set_string("name", names[n]);
 		}
-		destroy();
+		request_destroy();
 	}
 	void on_list_select() {
 		int n = get_int("list");
@@ -158,7 +158,7 @@ public:
 	}
 	void on_ok() {
 		selection = get_string("name");
-		destroy();
+		request_destroy();
 	}
 
 	bool save;

@@ -94,9 +94,9 @@ void BarAddDialog::on_ok() {
 		song->add_bar(index, new_bar, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
-	destroy();
+	request_destroy();
 }
 
 void BarAddDialog::on_close() {
-	destroy();
+	request_destroy();
 }

@@ -32,7 +32,6 @@ Path Application::directory;
 Path Application::directory_static;
 Path Application::initial_working_directory;
 bool Application::installed;
-bool Application::running;
 
 Array<string> Application::_args;
 
@@ -73,6 +72,8 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 }
 
 Application::~Application() {
+	//foreachb(Window *w, _all_windows_)
+	//	delete(w);
 	if (Config.changed)
 		Config.save(directory << "config.txt");
 	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
@@ -145,112 +146,19 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 	#endif
 }
 
-// deprecated...
-void Application::_init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang) {
-}
-
 int Application::run() {
-	running = true;
-#ifdef HUI_API_WIN
-	MSG messages;
-	messages.message = 0;
-	bool HuiHaveToExit = false;
-	bool got_message;
-	while ((!HuiHaveToExit) and (WM_QUIT!=messages.message)){
-		bool allow=true;
-		if (_idle_function_.is_set())
-			got_message=(PeekMessage(&messages,nullptr,0U,0U,PM_REMOVE)!=0);
-		else
-			got_message=(GetMessage(&messages,nullptr,0,0)!=0);
-		if (got_message){
-			allow=false;
-			TranslateMessage(&messages);
-			DispatchMessage(&messages);
-			for (int i=0;i<_hui_windows_.num;i++)
-				if (_hui_windows_[i]->hWnd == messages.hwnd){
-					allow=true;
-					break;
-				}
-		}
-		if (_idle_function_.is_set() and allow)
-			_idle_function_.call();
-	}
-#endif
-#ifdef HUI_API_GTK
 	gtk_main();
-#endif
+
+	on_end();
 	return 0;
 }
 
-// FIXME: when closing the last window, hard_end() gets called... ignoring onEnd()!!!
 void Application::end() {
 	SetIdleFunction(nullptr);
-
-	on_end();
-
-	hard_end();
+	gtk_main_quit();
 }
 
-// ends the system loop of the run() command
-void Application::hard_end() {
-	SetIdleFunction(nullptr);
-
-	foreachb(Window *w, _all_windows_)
-		delete(w);
-
-	// send "quit" message
-#ifdef HUI_API_WIN
-	PostQuitMessage(0);
-#endif
-#ifdef HUI_API_GTK
-	if (gtk_main_level() > 0)
-		gtk_main_quit();
-#endif
-
-	// really end hui?
-#ifdef HUI_API_GTK
-#ifdef OS_LINUX
-	// sometimes freezes...
-	//if (hui_x_display)
-	//	XCloseDisplay(hui_x_display);
-#endif
-
-#if GTK_CHECK_VERSION(3,0,0)
-	g_object_unref(invisible_cursor);
-#endif
-#endif
-	if (Config.changed)
-		Config.save(directory << "config.txt");
-	if (msg_inited)
-		msg_end();
-}
 void Application::do_single_main_loop() {
-#ifdef HUI_API_WIN
-	MSG messages;
-	messages.message=0;
-	HuiHaveToExit=false;
-	bool got_message;
-
-	bool allow=true;
-	if (_idle_function_)
-		got_message=(PeekMessage(&messages,nullptr,0U,0U,PM_REMOVE)!=0);
-	else
-		got_message=(GetMessage(&messages,nullptr,0,0)!=0);
-	if (got_message){
-		allow=false;
-		TranslateMessage(&messages);
-		DispatchMessage(&messages);
-		for (int i=0;i<_hui_windows_.num;i++)
-			if (_hui_windows_[i]->hWnd == messages.hwnd){
-				allow = true;
-				return;
-			}
-	}
-	/*if (HuiIdleFunction and allow)
-		HuiIdleFunction();*/
-#endif
-#ifdef HUI_API_GTK
-
 	// push idle function
 	//Callback _if_ = _idle_function_;
 
@@ -266,7 +174,6 @@ void Application::do_single_main_loop() {
 
 	// pop idle function
 	//SetIdleFunction(_if_);
-#endif
 }
 
 

@@ -26,13 +26,6 @@ class Toolbar;
 class ResourceNew;
 
 
-struct CompleteWindowMessage {
-	#ifdef HUI_API_WIN
-		unsigned int msg,wparam,lparam;
-	#endif
-};
-
-
 // user input
 struct InputData {
 	// mouse
@@ -75,16 +68,14 @@ public:
 	Window(const string &title, int width, int height);
 	Window(const string &id, Window *parent);
 	void _cdecl __init_ext__(const string &title, int width, int height);
-	virtual ~Window();
+	~Window() override;
 	void _cdecl __delete__() override;
 
 	void _init_(const string &title, int width, int height, Window *parent, bool allow_parent, int mode);
 	void _init_generic_(Window *parent, bool allow_parent, int mode);
 	void _clean_up_();
 
-	void _cdecl destroy();
-	bool _cdecl got_destroyed();
-	virtual void _cdecl on_destroy(){}
+	void _cdecl request_destroy();
 
 	// the window
 	void _cdecl run();
@@ -182,6 +173,7 @@ protected:
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
 	Window *parent_window;
+	bool requested_destroy;
 };
 
 

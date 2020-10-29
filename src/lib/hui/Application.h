@@ -26,17 +26,14 @@ enum {
 class Application : public VirtualBase {
 public:
 	Application(const string &app_name, const string &def_lang, int flags);
-	virtual ~Application();
-
-	static void _init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang);
+	~Application() override;
 
 	virtual bool on_startup(const Array<string> &arg) = 0;
-	virtual void on_end(){}
+	virtual void on_end() {}
 
-	void end();
+	static void end();
 
-	static int run();
-	static void hard_end();
+	int run();
 	static void do_single_main_loop();
 
 	static void guess_directories(const Array<string> &arg, const string &app_name);
@@ -54,7 +51,6 @@ public:
 	static Path directory_static;	// dir of static files (ie. /usr/shar/app)
 	static Path initial_working_directory;
 	static bool installed; // installed into system folders?
-	static bool running;
 
 	static Array<string> _args;
 };
@@ -68,7 +64,7 @@ int hui_main(const Array<string> &arg) { \
 	int r = 0; \
 	if (app->on_startup(arg)) \
 		r = app->run(); \
-	delete(app); \
+	delete app; \
 	return r; \
 }
 

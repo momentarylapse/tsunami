@@ -50,7 +50,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 }
 
 void PdfConfigDialog::on_close() {
-	destroy();
+	request_destroy();
 }
 
 void PdfConfigDialog::on_ok() {
@@ -70,6 +70,6 @@ void PdfConfigDialog::on_ok() {
 	od->parameters.map_set("tracks", ats);
 	od->parameters.map_set("horizontal-scale", get_float("scale") / 100);
 
-	destroy();
+	request_destroy();
 }
 

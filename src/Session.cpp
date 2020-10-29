@@ -61,11 +61,16 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
 	perf_mon = _perf_mon;
+	auto_delete = true;
 
 	last_plugin = nullptr;
 
 	id = next_id ++;
 	die_on_plugin_stop = false;
+}
+
+Session::~Session() {
+	msg_write("~Session");
 }
 
 int Session::sample_rate() {

@@ -186,5 +186,5 @@ void DetuneSynthesizerDialog::on_relative() {
 }
 
 void DetuneSynthesizerDialog::on_close() {
-	destroy();
+	request_destroy();
 }

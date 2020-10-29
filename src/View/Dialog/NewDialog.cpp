@@ -35,8 +35,8 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
 
-	event("cancel", [=]{ destroy(); });
-	event("hui:close", [=]{ destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
 	event("ok", [=]{ on_ok(); });
 	event("metronome", [=]{ on_metronome(); });
 	event("type-audio-mono", [=]{ on_type(SignalType::AUDIO_MONO); });
@@ -71,7 +71,7 @@ void NewDialog::on_ok() {
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
-	destroy();
+	request_destroy();
 	session->win->show();
 	session->win->activate("");
 }

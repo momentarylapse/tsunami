@@ -34,7 +34,7 @@ public:
 	};
 
 	ModulePanel(Module *m, hui::Panel *outer = nullptr, Mode mode = Mode::DEFAULT);
-	virtual ~ModulePanel();
+	~ModulePanel() override;
 	void on_load();
 	void on_save();
 	void on_enabled();
@@ -74,7 +74,7 @@ public:
 	Module *module;
 	ModulePanel *module_panel;
 	ModuleExternalDialog(Module *_module, hui::Window *parent);
-	void on_destroy() override;
+	~ModuleExternalDialog() override;
 };
 
 

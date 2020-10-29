@@ -27,8 +27,8 @@ BarDeleteDialog::BarDeleteDialog(hui::Window *parent, Song *s, const Array<int> 
 	//enable("replace-by-pause", !bar_dialog_move_data);
 
 	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ destroy(); });
-	event("hui:close", [=]{ destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
 	event("replace-by-pause", [=]{ on_replace_by_pause(); });
 }
 
@@ -57,5 +57,5 @@ void BarDeleteDialog::on_ok() {
 
 	song->end_action_group();
 
-	destroy();
+	request_destroy();
 }

@@ -35,13 +35,13 @@ public:
 			add_string("tracks", t->nice_name());
 		event("tracks", [=]{ on_select(); });
 		event("ok", [=]{ on_select(); });
-		event("cancel", [=]{ destroy(); });
+		event("cancel", [=]{ request_destroy(); });
 	}
 	void on_select() {
 		int n = get_int("");
 		if (n >= 0)
 			selected = song->tracks[n].get();
-		destroy();
+		request_destroy();
 	}
 };
 

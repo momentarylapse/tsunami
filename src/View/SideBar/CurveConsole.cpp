@@ -36,8 +36,8 @@ public:
 		}
 		set_selection("list", sel);
 
-		event("hui:close", [=]{ destroy(); });
-		event("cancel", [=]{ destroy(); });
+		event("hui:close", [=]{ request_destroy(); });
+		event("cancel", [=]{ request_destroy(); });
 		event("ok", [=]{ on_ok(); });
 		event("list", [=]{ on_ok(); });
 	}
@@ -50,7 +50,7 @@ public:
 		targets.clear();
 		for (int i: sel)
 			targets.add(all_targets[i]);
-		destroy();
+		request_destroy();
 	}
 };
 

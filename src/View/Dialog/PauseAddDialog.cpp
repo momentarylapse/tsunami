@@ -28,8 +28,7 @@ PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
 	event("hui:close", [=]{ on_close(); });
 }
 
-void PauseAddDialog::on_ok()
-{
+void PauseAddDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	float duration = get_float("duration");
 	song->begin_action_group();
@@ -41,10 +40,9 @@ void PauseAddDialog::on_ok()
 	song->add_pause(index, length, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
-	destroy();
+	request_destroy();
 }
 
-void PauseAddDialog::on_close()
-{
-	destroy();
+void PauseAddDialog::on_close() {
+	request_destroy();
 }

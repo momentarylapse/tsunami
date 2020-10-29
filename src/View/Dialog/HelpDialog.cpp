@@ -12,6 +12,6 @@ HelpDialog::HelpDialog(hui::Window *_parent) :
 {
 	if (hui::Config.get_bool("FirstStart", true))
 		hide_control("first-time-message", false);
-	event("close", [=]{ destroy(); });
+	event("close", [=]{ request_destroy(); });
 }
 

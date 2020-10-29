@@ -19,8 +19,8 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 	update();
 
 	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ destroy(); });
-	event("hui:close", [=]{ destroy(); });
+	event("cancel", [=]{ request_destroy(); });
+	event("hui:close", [=]{ request_destroy(); });
 	event("add_first", [=]{ on_add_first(); });
 }
 
@@ -68,7 +68,7 @@ void TuningDialog::on_ok()
 	Instrument i = track->instrument;
 	i.string_pitch = tuning;
 	track->set_instrument(i);
-	destroy();
+	request_destroy();
 }
 
 void TuningDialog::on_edit()

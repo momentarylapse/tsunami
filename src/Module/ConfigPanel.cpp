@@ -58,7 +58,7 @@ public:
 		embed(module_panel, "content", 0, 0);
 		module->subscribe(this, [=]{
 			module = nullptr;
-			destroy();
+			request_destroy();
 		}, module->MESSAGE_DELETE);
 
 		ok = false;
@@ -68,7 +68,7 @@ public:
 			hide_control("preview", true);
 
 		event("ok", [=]{ on_ok(); });
-		event("cancel", [=]{ destroy(); });
+		event("cancel", [=]{ request_destroy(); });
 		event("preview", [=]{ on_preview(); });
 	}
 	~ConfigurationDialog() {
@@ -77,7 +77,7 @@ public:
 	}
 	void on_ok() {
 		ok = true;
-		destroy();
+		request_destroy();
 	}
 	void on_preview() {
 		preview_start();

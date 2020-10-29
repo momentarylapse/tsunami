@@ -264,8 +264,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		event("delete-backup-" + i2s(i), [=]{ on_delete_backup(); });
 	}
 
-	auto_delete = false;
-
 	view = new AudioView(session, "area");
 	session->view = view;
 
@@ -302,28 +300,22 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	update_menu();
 }
 
-TsunamiWindow::~TsunamiWindow() {
-	// all done by onDestroy()
-}
+void TsunamiCleanUp(Session *session) {
+	msg_write("clean-up");
+	msg_write(tsunami->sessions.num);
+	foreachi(Session *s, weak(tsunami->sessions), i)
+		if (s == session and s->auto_delete) {
+			msg_write("--------Tsunami erase...");
+			tsunami->sessions.erase(i);
+		}
 
-void TsunamiCleanUp() {
-	bool again = false;
-	do {
-		again = false;
-		foreachi(Session *s, weak(tsunami->sessions), i)
-			if (s->win->got_destroyed() and s->win->auto_delete) {
-				//msg_write("--------Tsunami erase...");
-				tsunami->sessions.erase(i);
-				again = true;
-				break;
-			}
-	} while (again);
-
+	msg_write(tsunami->sessions.num);
 	if (tsunami->sessions.num == 0)
 		tsunami->end();
 }
 
-void TsunamiWindow::on_destroy() {
+TsunamiWindow::~TsunamiWindow() {
+	msg_write("~TsunamiWindow");
 	int w, h;
 	get_size_desired(w, h);
 	hui::Config.set_int("Window.Width", w);
@@ -339,11 +331,10 @@ void TsunamiWindow::on_destroy() {
 	side_bar->unsubscribe(this);
 
 	delete side_bar;
-	mini_bar = nullptr;
 	delete bottom_bar;
 	delete view;
 
-	hui::RunLater(0.010f, &TsunamiCleanUp);
+	hui::RunLater(0.010f, [=]{ TsunamiCleanUp(session); });
 }
 
 void TsunamiWindow::on_about() {
@@ -1015,9 +1006,14 @@ void TsunamiWindow::on_update() {
 }
 
 void TsunamiWindow::on_exit() {
+	msg_write("on_exit");
 	if (allow_termination()) {
 		BackupManager::set_save_state(session);
-		destroy();
+		//request_destroy();
+		hui::RunLater(0.01f, [=]{ session->win = nullptr; });
+		/*foreachi (auto s, weak(tsunami->sessions), i)
+			if (s == session)
+				tsunami->sessions.erase(i);*/
 	}
 }
 

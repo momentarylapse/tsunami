@@ -68,9 +68,11 @@ Tsunami::Tsunami() :
 }
 
 Tsunami::~Tsunami() {
+	msg_write("~Tsunami");
 }
 
 void Tsunami::on_end() {
+	msg_write("Tsunami on end");
 	sessions.clear();
 }
 
@@ -93,20 +95,6 @@ bool Tsunami::on_startup(const Array<string> &arg) {
 	Session::GLOBAL->plugin_manager = plugin_manager.get();
 
 	plugin_manager->link_app_script_data();
-
-
-	if (false)
-	{
-		msg_write("----sample---");
-		shared<Sample> sample = new Sample(SignalType::AUDIO);
-		msg_write("aaa");
-		//sample.owner = tsunami->song;
-		{
-		SampleRef sampleref(sample.get());
-		msg_write("aaa2");
-		}
-		msg_write("aaa3");
-	}
 
 	if (!handle_arguments(arg))
 		return false;
@@ -291,7 +279,6 @@ Session* Tsunami::create_session() {
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
 	session->set_win(new TsunamiWindow(session));
-	session->win->auto_delete = true;
 	session->win->show();
 
 	sessions.add(session);

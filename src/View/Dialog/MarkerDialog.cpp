@@ -67,9 +67,9 @@ void MarkerDialog::on_ok() {
 	} else {
 		layer->add_marker(range, text);
 	}
-	destroy();
+	request_destroy();
 }
 
 void MarkerDialog::on_close() {
-	destroy();
+	request_destroy();
 }

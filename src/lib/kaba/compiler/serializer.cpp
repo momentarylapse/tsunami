@@ -648,21 +648,13 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 
 	if (com->kind == NodeKind::FUNCTION_CALL) {
-
 		add_function_call(com->as_func(), params, ret);
-
 	} else if (com->kind == NodeKind::VIRTUAL_CALL) {
-
 		add_member_function_call(com->as_func(), params, ret);
-
 	} else if (com->kind == NodeKind::INLINE_CALL) {
-
 		serialize_inline_function(com, params, ret);
-
 	} else if (com->kind == NodeKind::POINTER_CALL) {
-
 		add_pointer_call(params[0], params.sub(1, -1), ret);
-
 	} else if (com->kind == NodeKind::STATEMENT) {
 		serialize_statement(com, ret, block, index);
 	} else if (com->kind == NodeKind::BLOCK) {

@@ -61,13 +61,13 @@ void ViewPort::range2screen(const Range &r, float &x1, float &x2) {
 
 void ViewPort::range2screen_clip(const Range &r, const rect &area, float &x1, float &x2) {
 	range2screen(r, x1, x2);
-	x1 = clampf(x1, area.x1, area.x2);
-	x2 = clampf(x2, area.x1, area.x2);
+	x1 = clamp(x1, area.x1, area.x2);
+	x2 = clamp(x2, area.x1, area.x2);
 }
 
 void ViewPort::zoom(float f, float mx) {
 	// max zoom: 20 pixel per sample
-	double scale_new = clampf(pixels_per_sample * f, 0.000001, 20.0);
+	double scale_new = clamp(pixels_per_sample * f, 0.000001, 20.0);
 
 	pos += (mx - area.x1) * (1.0/pixels_per_sample - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;

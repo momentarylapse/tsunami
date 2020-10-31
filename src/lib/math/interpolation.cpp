@@ -243,13 +243,11 @@ template<>
 inline complex _inter_angular_lerp_(const Interpolator<complex>::Part &p, float t)
 {	return complex(0,0);	}
 
-float clampf(float, float, float);
-
 
 template<class T>
 int Interpolator<T>::canonize(float &t)
 {
-	t = clampf(t, 0, t_sum * 0.99999f);
+	t = clamp(t, 0.0f, t_sum * 0.99999f);
 	foreachi(Part &p, part, i)
 		if ((t >= p.t0) && (t <= p.t0 + p.dt)){
 			t = (t - p.t0) / p.dt;

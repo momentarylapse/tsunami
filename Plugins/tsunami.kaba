@@ -115,7 +115,7 @@ class Module as shared extends Object
 	extern virtual int command(int cmd, int param)
 	extern void plug_in(int in_port, Module source, int out_port)
 	extern void unplug_in(int in_port)
-	extern void subscribe(Object handler, Function f, string message)
+	extern void subscribe(Object handler, Object->void f, string message)
 	extern void unsubscribe(Object handler)
 	extern const Module* copy()
 	
@@ -559,7 +559,7 @@ class AudioView extends Object
 	SignalChain* signal_chain
 	AudioOutput* output_stream
 	ViewPort cam
-	extern void subscribe(Object handler, Function f, string message)
+	extern void subscribe(Object handler, Object->void f, string message)
 	extern void unsubscribe(Object handler)
 	extern void play()
 	extern void set_playback_loop(bool loop)
@@ -659,7 +659,7 @@ class Session as shared extends Object
 #	Range range
 
 class Slider
-	extern void __init__(Panel panel, string id_slider, string id_edit, float v_min, float v_max, float factor, Function func, float value)
+	extern void __init__(Panel panel, string id_slider, string id_edit, float v_min, float v_max, float factor, Object->void func, float value)
 	extern virtual void __delete__()
 	extern float get()
 	extern void set(float f)

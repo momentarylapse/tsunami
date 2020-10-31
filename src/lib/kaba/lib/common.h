@@ -58,6 +58,7 @@ const Class *add_type_p(const Class *sub_type, Flags = Flags::NONE, const string
 const Class *add_type_a(const Class *sub_type, int array_length, const string &name = "");
 const Class *add_type_l(const Class *sub_type, const string &name = "");
 const Class *add_type_d(const Class *sub_type, const string &name = "");
+const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params);
 Function *add_func(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
 template<class T>
 Function *add_funcx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {

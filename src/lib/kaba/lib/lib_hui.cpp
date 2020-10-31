@@ -92,20 +92,23 @@ string _hui_config_get(hui::Configuration &c, const string &key) {
 void SIAddPackageHui() {
 	add_package("hui");
 	
-	const Class *TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
-	const Class *TypeHuiMenuP = add_type_p(TypeHuiMenu);
-	const Class *TypeHuiToolbar = add_type("Toolbar",  sizeof(hui::Toolbar));
-	const Class *TypeHuiToolbarP = add_type_p(TypeHuiToolbar);
-	const Class *TypeHuiPanel = add_type("Panel", sizeof(hui::Panel));
-	//const Class *TypeHuiPanelP = add_type_p(TypeHuiPanel);
-	const Class *TypeHuiWindow = add_type("Window", sizeof(hui::Window));
+	auto TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
+	auto TypeHuiMenuP = add_type_p(TypeHuiMenu);
+	auto TypeHuiToolbar = add_type("Toolbar",  sizeof(hui::Toolbar));
+	auto TypeHuiToolbarP = add_type_p(TypeHuiToolbar);
+	auto TypeHuiPanel = add_type("Panel", sizeof(hui::Panel));
+	//auto TypeHuiPanelP = add_type_p(TypeHuiPanel);
+	auto TypeHuiWindow = add_type("Window", sizeof(hui::Window));
 	TypeHuiWindowP = add_type_p(TypeHuiWindow);
-	const Class *TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
-	const Class *TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
-	const Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
-	const Class *TypeHuiEventP = add_type_p(TypeHuiEvent);
-	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
-	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
+	auto TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
+	auto TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
+	auto TypeHuiEvent = add_type("Event", sizeof(hui::Event));
+	auto TypeHuiEventP = add_type_p(TypeHuiEvent);
+	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
+	auto TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
+
+	auto TypeCallback = add_type_f(TypeVoid, {TypeObject});
+	auto TypeCallbackP = add_type_f(TypeVoid, {TypeObject, TypeHuiPainter});
 
 
 	add_class(TypeHuiMenu);
@@ -339,20 +342,29 @@ void SIAddPackageHui() {
 			func_add_param("id", TypeString);
 		class_add_func("event", TypeInt, mf(&KabaPanelWrapper::_kaba_event));
 			func_add_param("id", TypeString);
-			func_add_param("func", TypeFunction);
+			func_add_param("func", TypeCallback);
 		class_add_func("event_o", TypeInt, mf(&KabaPanelWrapper::_kaba_event_o));
 			func_add_param("id", TypeString);
 			func_add_param("handler", TypeObject);
-			func_add_param("func", TypeFunction);
+			func_add_param("func", TypeCallback);
 		class_add_func("event_x", TypeInt, mf(&KabaPanelWrapper::_kaba_event_x));
 			func_add_param("id", TypeString);
 			func_add_param("msg", TypeString);
-			func_add_param("func", TypeFunction);
+			func_add_param("func", TypeCallback);
+		class_add_func("event_x", TypeInt, mf(&KabaPanelWrapper::_kaba_event_x));
+			func_add_param("id", TypeString);
+			func_add_param("msg", TypeString);
+			func_add_param("func", TypeCallbackP);
 		class_add_func("event_ox", TypeInt, mf(&KabaPanelWrapper::_kaba_event_ox));
 			func_add_param("id", TypeString);
 			func_add_param("msg", TypeString);
 			func_add_param("handler", TypeObject);
-			func_add_param("func", TypeFunction);
+			func_add_param("func", TypeCallback);
+		class_add_func("event_ox", TypeInt, mf(&KabaPanelWrapper::_kaba_event_ox));
+			func_add_param("id", TypeString);
+			func_add_param("msg", TypeString);
+			func_add_param("handler", TypeObject);
+			func_add_param("func", TypeCallbackP);
 		class_add_func("remove_event_handler", TypeVoid, mf(&hui::Panel::remove_event_handler));
 			func_add_param("uid", TypeInt);
 		class_set_vtable(hui::Panel);
@@ -481,15 +493,15 @@ void SIAddPackageHui() {
 	
 	// user interface
 	add_func("set_idle_function", TypeVoid, (void*)&HuiSetIdleFunctionKaba, Flags::STATIC);
-		func_add_param("idle_func", TypeFunction);
+		func_add_param("idle_func", TypeCallback);
 	add_func("run_later", TypeInt, (void*)&HuiRunLaterKaba, Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypeObject);
-		func_add_param("f", TypeFunction);
+		func_add_param("f", TypeCallback);
 	add_func("run_repeated", TypeInt, (void*)&HuiRunRepeatedKaba, Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypeObject);
-		func_add_param("f", TypeFunction);
+		func_add_param("f", TypeCallback);
 	add_func("cancel_runner", TypeVoid, (void*)&hui::CancelRunner, Flags::STATIC);
 		func_add_param("id", TypeInt);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);

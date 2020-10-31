@@ -47,8 +47,8 @@ class SampleRenderer extends PitchRenderer
 						allow_loop = false
 						end_loop = len(data)
 					else
-						start_loop = clampi(start_loop, 0, len(data))
-						end_loop = clampi(end_loop, start_loop + 1, len(data))
+						start_loop = clamp(start_loop, 0, len(data))
+						end_loop = clamp(end_loop, start_loop + 1, len(data))
 #					print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
 #					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
 					break

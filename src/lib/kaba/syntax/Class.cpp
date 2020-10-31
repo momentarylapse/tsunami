@@ -27,6 +27,31 @@ bool ClassElement::hidden() const {
 	return (name[0] == '_') or (name[0] == '-');
 }
 
+bool type_match(const Class *given, const Class *wanted);
+
+bool func_pointer_match(const Class *given, const Class *wanted) {
+	auto g = given->param[0];
+	auto w = wanted->param[0];
+	//msg_write(format("%s   vs   %s", g->name, w->name));
+	if (g->param.num != w->param.num) {
+		//msg_error(format("%s   vs   %s     ###", g->name, w->name));
+		return false;
+	}
+	// hmmm, let's be pedantic for return values
+	if (g->param.back() != w->param.back()) {
+		//msg_error(format("%s   vs   %s     return", g->name, w->name));
+		return false;
+	}
+	// allow down-cast for parameters
+	// ACTUALLY, this is the wrong way!!!!
+	//    but we can't know user types when creating the standard library...
+	for (int i=0; i<g->param.num-1; i++)
+		if (!type_match(g->param[i], w->param[i])) {
+			//msg_error(format("%s   vs   %s     param", g->name, w->name, i));
+			return false;
+		}
+	return true;
+}
 
 bool type_match(const Class *given, const Class *wanted) {
 	// exact match?
@@ -42,8 +67,12 @@ bool type_match(const Class *given, const Class *wanted) {
 		return true;
 
 	// compatible pointers (of same or derived class)
-	if (given->is_pointer() and wanted->is_pointer())
-		return given->param[0]->is_derived_from(wanted->param[0]);
+	if (given->is_pointer() and wanted->is_pointer()) {
+		if (given->param[0]->is_derived_from(wanted->param[0]))
+			return true;
+		if (given->param[0]->type == Class::Type::FUNCTION and wanted->param[0]->type == Class::Type::FUNCTION)
+			return func_pointer_match(given, wanted);
+	}
 
 	if (wanted->is_super_array()) {
 		if (given->is_super_array()) {

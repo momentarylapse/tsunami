@@ -47,7 +47,7 @@ public:
 	shared<Node> apply_type_cast(int tc, shared<Node> param, const Class *wanted);
 	shared<Node> apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<int> &casts, const Array<const Class*> &wanted);
 	bool direct_param_match(shared<Node> operand, shared_array<Node> &params);
-	bool param_match_with_cast(shared<Node> operand, shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted);
+	bool param_match_with_cast(shared<Node> operand, shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty);
 	shared<Node> apply_params_direct(shared<Node> operand, shared_array<Node> &params);
 	shared<Node> force_concrete_type(shared<Node> node);
 	void force_concrete_types(shared_array<Node> &nodes);

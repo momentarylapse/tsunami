@@ -39,16 +39,39 @@ class Ray;
 
 
 
+template<class T>
+T clamp(T x, T min, T max) {
+	if (min >= max)
+		return min;
+	if (x < min)
+		return min;
+	if (x >= max)
+		return max;
+	return x;
+}
+template<class T>
+T loop(T x, T min, T max);
+template<class T>
+T abs(T x) {
+	if (x < 0)
+		return -x;
+	return x;
+}
+template<class T>
+T sqr(T x) {
+	return x * x;
+}
 
-// ints
-int _cdecl clampi(int i, int min, int max);
-int _cdecl loopi(int i, int min, int max);
+
+template<>
+int loop<int>(int x, int min, int max);
+
+template<>
+float loop<float>(float x, float min, float max);
+
+
+
 int _cdecl randi(int m);
-
-// floats
-float _cdecl sqr(float f);
-float _cdecl clampf(float f, float min, float max);
-float _cdecl loopf(float f, float min, float max);
 float _cdecl randf(float m);
 
 const float pi = 3.141592654f;

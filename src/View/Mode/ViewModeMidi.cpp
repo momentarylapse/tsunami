@@ -324,7 +324,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 	if (hover().type == HoverData::Type::CLEF_POSITION) {
 		if (mode == MidiMode::TAB)
-			string_no = clampi(hover().clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
+			string_no = clamp(hover().clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
 	}else if (hover().type == HoverData::Type::MIDI_PITCH){
 		if (mode == MidiMode::CLASSICAL)
 			octave = pitch_get_octave(hover().pitch);

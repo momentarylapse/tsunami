@@ -70,7 +70,7 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 }
 
 Session::~Session() {
-	msg_write("~Session");
+	//msg_write("~Session");
 }
 
 int Session::sample_rate() {

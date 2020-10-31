@@ -176,14 +176,34 @@ public:
 	//Array<bool> _cdecl _not(BoolList &b)	IMPLEMENT_OP(!, bool, bool)
 };
 
+template<class T>
+T list_min(const Array<T> &a) {
+	if (a.num == 0)
+		return 0;
+	T r = a[0];
+	for (int i=1; i<a.num; i++)
+		r = min(r, a[i]);
+	return r;
+}
+template<class T>
+T list_max(const Array<T> &a) {
+	if (a.num == 0)
+		return 0;
+	T r = a[0];
+	for (int i=1; i<a.num; i++)
+		r = max(r, a[i]);
+	return r;
+}
+template<class T>
+T list_sum(const Array<T> &a) {
+	T r = 0;
+	for (int i=0; i<a.num; i++)
+		r += a[i];
+	return r;
+}
+
 class IntList : public Array<int> {
 public:
-	int _cdecl sum() {
-		int r = 0;
-		for (int i=0;i<num;i++)
-			r += (*this)[i];
-		return r;
-	}
 	void _cdecl sort()
 	{	std::sort((int*)data, (int*)data + num);	}
 	void _cdecl unique() {
@@ -252,30 +272,6 @@ public:
 
 class FloatList : public Array<float> {
 public:
-	float _cdecl _max() {
-		float max = 0;
-		if (num > 0)
-			max = (*this)[0];
-		for (int i=1;i<num;i++)
-			if ((*this)[i] > max)
-				max = (*this)[i];
-		return max;
-	}
-	float _cdecl _min() {
-		float min = 0;
-		if (num > 0)
-			min = (*this)[0];
-		for (int i=1;i<num;i++)
-			if ((*this)[i] < min)
-				min = (*this)[i];
-		return min;
-	}
-	float _cdecl sum() {
-		float r = 0;
-		for (int i=0;i<num;i++)
-			r += (*this)[i];
-		return r;
-	}
 	float _cdecl sum2() {
 		float r = 0;
 		for (int i=0;i<num;i++)
@@ -717,7 +713,9 @@ void SIAddPackageBase() {
 		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &ia2s, Flags::PURE);
 		class_add_func("sort", TypeVoid, mf(&IntList::sort));
 		class_add_func("unique", TypeVoid, mf(&IntList::unique));
-		class_add_func("sum", TypeInt, mf(&IntList::sum), Flags::PURE);
+		class_add_funcx("sum", TypeInt, &list_sum<int>, Flags::PURE);
+		class_add_funcx("min", TypeInt, &list_min<int>, Flags::PURE);
+		class_add_funcx("max", TypeInt, &list_max<int>, Flags::PURE);
 		class_add_func("__iadd__", TypeVoid, mf(&IntList::iadd));
 			func_add_param("other", TypeIntList);
 		class_add_func("__isub__", TypeVoid, mf(&IntList::isub));
@@ -778,10 +776,10 @@ void SIAddPackageBase() {
 	add_class(TypeFloatList);
 		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &fa2s, Flags::PURE);
 		class_add_func("sort", TypeVoid, mf(&FloatList::sort));
-		class_add_func("sum", TypeFloat32, mf(&FloatList::sum), Flags::PURE);
+		class_add_funcx("sum", TypeFloat32, &list_sum<float>, Flags::PURE);
 		class_add_func("sum2", TypeFloat32, mf(&FloatList::sum2), Flags::PURE);
-		class_add_func("max", TypeFloat32, mf(&FloatList::_max), Flags::PURE);
-		class_add_func("min", TypeFloat32, mf(&FloatList::_min), Flags::PURE);
+		class_add_funcx("max", TypeFloat32, &list_max<float>, Flags::PURE);
+		class_add_funcx("min", TypeFloat32, &list_min<float>, Flags::PURE);
 		class_add_func("__iadd__", TypeVoid, mf(&FloatList::iadd));
 			func_add_param("other", TypeFloatList);
 		class_add_func("__isub__", TypeVoid, mf(&FloatList::isub));

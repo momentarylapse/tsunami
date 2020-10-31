@@ -49,9 +49,9 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 	int w = im.width;
 	int h = im.height;
 	for (MidiNote *n: weak(m)) {
-		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
-		float x0 = w * clampf((float)n->range.offset / (float)m.samples, 0, 1);
-		float x1 = w * clampf((float)n->range.end() / (float)m.samples, 0, 1);
+		float y = h * clamp((80 - n->pitch) / 50.0f, 0.0f, 1.0f);
+		float x0 = w * clamp((float)n->range.offset / (float)m.samples, 0.0f, 1.0f);
+		float x1 = w * clamp((float)n->range.end() / (float)m.samples, 0.0f, 1.0f);
 		color c = MidiPainter::pitch_color(n->pitch);
 		for (int x=x0; x<=x1; x++)
 			im.set_pixel(x, y, c);

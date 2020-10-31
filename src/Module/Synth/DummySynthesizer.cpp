@@ -31,7 +31,7 @@ public:
 
 			phi += delta_phi;
 			if (phi > 8*pi)
-				phi = loopf(phi, 0, 2*pi);
+				phi = loop(phi, 0.0f, 2*pi);
 		}
 		return true;
 	}

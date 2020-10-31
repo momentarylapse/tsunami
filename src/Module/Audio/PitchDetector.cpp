@@ -92,7 +92,7 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 			}
 		}
 	max /= sqrt(buf.length) * 2 * pi;
-	volume = clampf(max / THRESHOLD / 2, 0, 1);
+	volume = clamp(max / THRESHOLD / 2, 0.0f, 1.0f);
 	loud_enough = (max > THRESHOLD);
 	float fmax = get_freq(imax);
 

@@ -131,10 +131,12 @@ Array<float> _cdecl float_range(float start, float end, float step) {
 	return a;
 }
 
-float _cdecl maxf(float a, float b)
+template<class T>
+T _cdecl x_max(T a, T b)
 {	return (a > b) ? a : b;	}
 
-float _cdecl minf(float a, float b)
+template<class T>
+T _cdecl x_min(T a, T b)
 {	return (a < b) ? a : b;	}
 
 vector _quat_vec_mul(quaternion &a, vector &b)
@@ -891,6 +893,23 @@ void SIAddPackageMath() {
 		class_add_func("get_list", TypeVectorList, mf(&Interpolator<vector>::getList), Flags::PURE);
 			func_add_param("t", TypeFloatList);
 
+	// int
+	add_func("clamp", TypeInt, (void*)&clamp<int>, Flags::_STATIC__PURE);
+		func_add_param("i", TypeInt);
+		func_add_param("min", TypeInt);
+		func_add_param("max", TypeInt);
+	add_func("loop", TypeInt, (void*)&loop<int>, Flags::_STATIC__PURE);
+		func_add_param("i", TypeInt);
+		func_add_param("min", TypeInt);
+		func_add_param("max", TypeInt);
+	add_func("abs", TypeInt, (void*)&abs<int>, Flags::_STATIC__PURE);
+		func_add_param("i", TypeInt);
+	add_funcx("min", TypeInt, &x_min<int>, Flags::_STATIC__PURE);
+		func_add_param("a", TypeInt);
+		func_add_param("b", TypeInt);
+	add_funcx("max", TypeInt, &x_max<int>, Flags::_STATIC__PURE);
+		func_add_param("a", TypeInt);
+		func_add_param("b", TypeInt);
 	// mathematical
 	add_func("sin", TypeFloat32, (void*)&sinf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
@@ -918,31 +937,22 @@ void SIAddPackageMath() {
 	add_func("pow", TypeFloat32, (void*)&powf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
-	add_func("clamp", TypeFloat32, (void*)&clampf, Flags::_STATIC__PURE);
+	add_funcx("clamp", TypeFloat32, &clamp<float>, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("loop", TypeFloat32, (void*)&loopf, Flags::_STATIC__PURE);
+	add_funcx("loop", TypeFloat32, &loop<float>, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("abs", TypeFloat32, (void*)&fabsf, Flags::_STATIC__PURE);
+	add_funcx("abs", TypeFloat32, &abs<float>, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, (void*)&minf, Flags::_STATIC__PURE);
+	add_funcx("min", TypeFloat32, &x_min<float>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, (void*)&maxf, Flags::_STATIC__PURE);
+	add_funcx("max", TypeFloat32, &x_max<float>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	// int
-	add_func("clampi", TypeInt, (void*)&clampi, Flags::_STATIC__PURE);
-		func_add_param("i", TypeInt);
-		func_add_param("min", TypeInt);
-		func_add_param("max", TypeInt);
-	add_func("loopi", TypeInt, (void*)&loopi, Flags::_STATIC__PURE);
-		func_add_param("i", TypeInt);
-		func_add_param("min", TypeInt);
-		func_add_param("max", TypeInt);
 	// lists
 	add_func("range", TypeIntList, (void*)&int_range, Flags::_STATIC__PURE);
 		func_add_param("start", TypeInt);

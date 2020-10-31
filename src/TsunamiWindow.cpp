@@ -301,21 +301,18 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 }
 
 void TsunamiCleanUp(Session *session) {
-	msg_write("clean-up");
-	msg_write(tsunami->sessions.num);
 	foreachi(Session *s, weak(tsunami->sessions), i)
 		if (s == session and s->auto_delete) {
-			msg_write("--------Tsunami erase...");
+			//msg_write("--------Tsunami erase...");
 			tsunami->sessions.erase(i);
 		}
 
-	msg_write(tsunami->sessions.num);
+	//msg_write(tsunami->sessions.num);
 	if (tsunami->sessions.num == 0)
 		tsunami->end();
 }
 
 TsunamiWindow::~TsunamiWindow() {
-	msg_write("~TsunamiWindow");
 	int w, h;
 	get_size_desired(w, h);
 	hui::Config.set_int("Window.Width", w);
@@ -439,7 +436,6 @@ void TsunamiWindow::on_track_render() {
 		int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
 				{_("respecting solo and mute, ignoring selection"), _("respecting selection and mute, but ignoring solo")}, true);
-		msg_write(answer);
 		if (answer == 1)
 			renderer.allow_layers(view->sel.layers());
 		else if (answer < 0)
@@ -1006,14 +1002,10 @@ void TsunamiWindow::on_update() {
 }
 
 void TsunamiWindow::on_exit() {
-	msg_write("on_exit");
 	if (allow_termination()) {
 		BackupManager::set_save_state(session);
 		//request_destroy();
 		hui::RunLater(0.01f, [=]{ session->win = nullptr; });
-		/*foreachi (auto s, weak(tsunami->sessions), i)
-			if (s == session)
-				tsunami->sessions.erase(i);*/
 	}
 }
 

@@ -223,8 +223,8 @@ color Image::get_pixel(int x, int y) const {
 //  y repeats in [0..height)
 //  each pixel has its maximum at offset (0.5, 0.5)
 color Image::get_pixel_interpolated(float x, float y) const {
-	x = loopf(x, 0, (float)width);
-	y = loopf(y, 0, (float)height);
+	x = loop(x, 0.0f, (float)width);
+	y = loop(y, 0.0f, (float)height);
 	int x0 = (x >= 0.5f) ? (int)(x - 0.5f) : (width - 1);
 	int x1 = (x0 < width - 1) ? (x0 + 1) : 0;
 	int y0 = (y >= 0.5f) ? (int)(y - 0.5f) : (height - 1);
@@ -233,8 +233,8 @@ color Image::get_pixel_interpolated(float x, float y) const {
 	color c01 = get_pixel(x0, y1);
 	color c10 = get_pixel(x1, y0);
 	color c11 = get_pixel(x1, y1);
-	float sx = loopf(x + 0.5f, 0, 1);
-	float sy = loopf(y + 0.5f, 0, 1);
+	float sx = loop(x + 0.5f, 0.0f, 1.0f);
+	float sy = loop(y + 0.5f, 0.0f, 1.0f);
 	// bilinear interpolation
 	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
 }

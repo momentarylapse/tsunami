@@ -201,7 +201,14 @@ void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Arr
 	call_used = true;
 	int push_size = fc_begin(nullptr, params, ret);
 
-	add_cmd(Asm::INST_MOV, p_rax, pointer);
+	if (pointer.type == TypeFunctionCodeP) {
+		add_cmd(Asm::INST_MOV, p_rax, pointer);
+	} else {
+		//TypeFunctionP
+		add_cmd(Asm::INST_MOV, p_rax, pointer);
+		add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, offsetof(Function, address)));
+		add_cmd(Asm::INST_MOV, p_rax, p_deref_eax);
+	}
 	add_cmd(Asm::INST_CALL, p_rax); // the actual call
 
 	fc_end(push_size, params, ret);

@@ -669,7 +669,7 @@ void AudioView::move_to_layer(int delta) {
 
 
 void AudioView::zoom_y(float zoom) {
-	cam.scale_y = clampf(zoom, 0.5f, 2.0f);
+	cam.scale_y = clamp(zoom, 0.5f, 2.0f);
 	thm.set_dirty();
 	set_message(format(_("vertical zoom %.0f%%"), cam.scale_y * 100.0f));
 	force_redraw();
@@ -1558,7 +1558,7 @@ bool AudioView::is_paused() {
 }
 
 int loop_in_range(int pos, const Range &r) {
-	return loopi(pos, r.start(), r.end());
+	return loop(pos, r.start(), r.end());
 }
 
 bool AudioView::looping() {

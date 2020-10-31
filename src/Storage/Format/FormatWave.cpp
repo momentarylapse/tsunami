@@ -167,7 +167,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 			int nn = 0;
 			int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 			while (read < chunk_size) {
-				int toread = clampi(nice_buffer_size, 0, chunk_size - read);
+				int toread = clamp(nice_buffer_size, 0, chunk_size - read);
 				int r = f->read_buffer(data, toread);
 				nn ++;
 				if (nn > 16) {

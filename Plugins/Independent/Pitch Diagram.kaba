@@ -74,7 +74,7 @@ void OnClose()
 void UpdateInput()
 	int[1] stack_corrector # needed for stack alignment (T_T)
 	
-	int num = clampi(len(input.cur_buf), 0, buf_size)
+	int num = clamp(len(input.cur_buf), 0, buf_size)
 	buf.resize(buf_size)
 	
 	# alten Pufferinhalt verschieben

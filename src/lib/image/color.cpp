@@ -48,10 +48,10 @@ color color::parse(const string &s) {
 }
 
 void color::clamp() {
-	a = clampf(a, 0, 1);
-	r = clampf(r, 0, 1);
-	g = clampf(g, 0, 1);
-	b = clampf(b, 0, 1);
+	a = ::clamp(a, 0.0f, 1.0f);
+	r = ::clamp(r, 0.0f, 1.0f);
+	g = ::clamp(g, 0.0f, 1.0f);
+	b = ::clamp(b, 0.0f, 1.0f);
 }
 
 // create a color from (alpha, red, green blue)

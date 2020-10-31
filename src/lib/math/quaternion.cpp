@@ -252,7 +252,7 @@ quaternion quaternion::scale_angle(float f) const {
 
 // quaternion correction
 void quaternion::normalize() {
-	float l = sqrtf(x*x + y*y + z*z + w*w);
+	float l = sqrt(x*x + y*y + z*z + w*w);
 	l = 1.0f / l;
 	w *= l;
 	x *= l;
@@ -262,14 +262,12 @@ void quaternion::normalize() {
 
 // the axis of our quaternion rotation
 vector quaternion::get_axis() const {
-	vector ax = vector(x, y, z);
-	ax.normalize();
-	return ax;
+	return vector(x, y, z).normalized();
 }
 
 // angle value of the quaternion
 float quaternion::get_angle() const {
-	return acosf(w)*2;
+	return acos(w)*2;
 }
 
 quaternion quaternion::drag(const vector &up, const vector &dang, bool reset_z) {
@@ -286,7 +284,7 @@ quaternion quaternion::drag(const vector &up, const vector &dang, bool reset_z) 
 	}
 
 	vector ang = q.get_angles();
-	ang.x = clampf(ang.x + dang.x, -pi/2+0.01f, pi/2-0.01f);
+	ang.x = clamp(ang.x + dang.x, -pi/2+0.01f, pi/2-0.01f);
 	ang.y += dang.y;
 	ang.z += dang.z;
 	if (reset_z)

@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 
-#define NEW_TYPE_PARSING 1
 #define NEW_NEW_PARSING 0
 
 namespace Kaba{
@@ -177,6 +176,7 @@ void Parser::do_error(const string &str, int override_exp_no, int override_line)
 
 shared_array<Node> Parser::parse_operand_extension_element(shared<Node> operand) {
 	Exp.next();
+	operand = force_concrete_type(operand);
 	const Class *type = operand->type;
 	bool deref = false;
 	bool only_static = false;
@@ -436,18 +436,6 @@ shared<Node> Parser::parse_operand_extension_call(const shared_array<Node> &link
 	auto xxx = [&](const shared_array<Node> &links) {
 		//force_concrete_types(params);
 
-
-	// find (and provisional link) the parameters in the source
-
-	/*bool needs_brackets = ((Operand->type != TypeVoid) or (Operand->param.num != 1));
-	if (needs_brackets) {
-		FindFunctionParameters(wanted_type, block, Operand);
-
-	} else {
-		wanted_type.add(TypeUnknown);
-		FindFunctionSingleParameter(0, wanted_type, block, Operand);
-	}*/
-
 	// direct match...
 	for (shared<Node> operand: links) {
 		if (!direct_param_match(operand, params))
@@ -458,14 +446,26 @@ shared<Node> Parser::parse_operand_extension_call(const shared_array<Node> &link
 
 
 	// advanced match...
-	for (shared<Node> operand: links) {
-		Array<int> casts;
-		Array<const Class*> wanted;
-		if (!param_match_with_cast(operand, params, casts, wanted))
+	Array<int> casts;
+	Array<const Class*> wanted;
+	int min_penalty = 1000000;
+	shared<Node> chosen;
+	for (auto operand: links) {
+		Array<int> cur_casts;
+		Array<const Class*> cur_wanted;
+		int cur_penalty;
+		if (!param_match_with_cast(operand, params, cur_casts, cur_wanted, &cur_penalty))
 			continue;
-
-		return check_const_params(tree, apply_params_with_cast(operand, params, casts, wanted));
+		if (cur_penalty < min_penalty){
+			casts = cur_casts;
+			wanted = cur_wanted;
+			chosen = operand;
+			min_penalty = cur_penalty;
+			//return check_const_params(tree, apply_params_with_cast(operand, params, casts, wanted));
+		}
 	}
+	if (chosen)
+		return check_const_params(tree, apply_params_with_cast(chosen, params, casts, wanted));
 
 
 	// error message
@@ -763,15 +763,17 @@ bool Parser::direct_param_match(shared<Node> operand, shared_array<Node> &params
 	return true;
 }
 
-bool Parser::param_match_with_cast(shared<Node> operand, shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted) {
+bool Parser::param_match_with_cast(shared<Node> operand, shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty) {
 	wanted = get_wanted_param_types(operand);
 	if (wanted.num != params.num)
 		return false;
 	casts.resize(params.num);
+	*max_penalty = 0;
 	for (int p=0; p<params.num; p++) {
 		int penalty;
 		if (!type_match_with_cast(params[p], false, wanted[p], penalty, casts[p]))
 			return false;
+		*max_penalty = max(*max_penalty, penalty);
 	}
 	return true;
 }
@@ -2413,17 +2415,36 @@ shared<Node> Parser::parse_statement_call(Block *block) {
 	if (!is_function_pointer(params[0]->type))
 		do_error("call(): first parameter must be a function pointer ..." + params[0]->type->long_name());
 
-	int np = params.num-1;
-	for (int i=0; i<np; i++)
-		params[i+1] = force_concrete_type(params[i+1]);
+	auto ft = params[0]->type;
+	if (ft == TypeFunctionP) {
 
-	auto f = tree->required_func_global("@call" + i2s(np));
+		int np = params.num-1;
+		for (int i=0; i<np; i++)
+			params[i+1] = force_concrete_type(params[i+1]);
 
-	auto cmd = tree->add_node_call(f);
-	cmd->set_param(0, params[0]);
-	for (int i=0; i<np; i++)
-		cmd->set_param(i+1, tree->ref_node(params[i+1]));
-	return cmd;
+		auto f = tree->required_func_global("@call" + i2s(np));
+
+		auto cmd = tree->add_node_call(f);
+		cmd->set_param(0, params[0]);
+		for (int i=0; i<np; i++)
+			cmd->set_param(i+1, tree->ref_node(params[i+1]));
+		return cmd;
+	} else {
+		auto pp = ft->param[0]->param;
+
+		auto cmd = new Node(NodeKind::POINTER_CALL, 0, pp.back());
+		cmd->set_num_params(pp.num);
+		cmd->set_param(0, params[0]);
+
+		if (pp.num != params.num)
+			do_error(format("call(p,...): %d additional parameters given, but the function pointer expects %d", params.num-1, pp.num-1));
+
+		int np = params.num-1;
+		for (int i=0; i<np; i++)
+			cmd->set_param(i+1, check_param_link(params[i+1], pp[i], "call", i+1));
+		return cmd;
+
+	}
 }
 
 shared<Node> Parser::parse_statement_weak(Block *block) {

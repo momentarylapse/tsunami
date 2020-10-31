@@ -284,8 +284,8 @@ float marker_alpha_factor(float w, float w_group, bool border) {
 	if (w == 0)
 		return 0.5f;
 	if (border)
-		return clampf((w_group - 30) / 100, 0, 1.0f);
-	return clampf((w - 40) / 80, 0, 1.0f);
+		return clamp((w_group - 30) / 100, 0.0f, 1.0f);
+	return clamp((w - 40) / 80, 0.0f, 1.0f);
 }
 
 
@@ -409,7 +409,7 @@ void AudioViewLayer::draw_fades(Painter *c) {
 
 void AudioViewLayer::set_edit_pitch_min_max(float _min, float _max) {
 	float diff = _max - _min;
-	edit_pitch_min = clampf(_min, 0, MAX_PITCH - diff);
+	edit_pitch_min = clamp(_min, 0.0f, MAX_PITCH - diff);
 	edit_pitch_max = edit_pitch_min + diff;
 	view->force_redraw();
 }

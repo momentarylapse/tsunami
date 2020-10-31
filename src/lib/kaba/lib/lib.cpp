@@ -315,6 +315,10 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	return t;
 }
 
+const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params) {
+	return cur_package->syntax->make_class_func(params, ret_type);
+}
+
 //------------------------------------------------------------------------------------------------//
 //                                           operators                                            //
 //------------------------------------------------------------------------------------------------//

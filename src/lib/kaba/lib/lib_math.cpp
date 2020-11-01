@@ -977,6 +977,7 @@ void SIAddPackageMath() {
 	add_func("rand_seed", TypeVoid, (void*)&srand, Flags::STATIC);
 		func_add_param("seed", TypeInt);
 
+	add_ext_var("_any_allow_simple_output", TypeBool, (void*)&Any::allow_simple_output);
 	
 	// float
 	add_const("pi",  TypeFloat32, (void*)&pi);

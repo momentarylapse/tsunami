@@ -41,6 +41,7 @@ Any EmptyVar;
 //Any EmptyMap = _empty_dummy_map_;
 Any Any::EmptyArray = *(Array<Any>*)&_empty_dummy_array_;
 Any Any::EmptyMap = Any(_empty_dummy_map_);
+bool Any::allow_simple_output = true;
 
 //#define any_db(m)	msg_write(m)
 #define any_db(m)
@@ -281,7 +282,7 @@ bool key_needs_quotes(const string &k) {
 }
 
 string minimal_key_repr(const string &k) {
-	if (key_needs_quotes(k))
+	if (key_needs_quotes(k) or !Any::allow_simple_output)
 		return k.repr();
 	return k;
 }

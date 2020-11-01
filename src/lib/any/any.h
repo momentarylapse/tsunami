@@ -109,6 +109,7 @@ public:
 
 	static Any EmptyMap;
 	static Any EmptyArray;
+	static bool allow_simple_output;
 };
 
 

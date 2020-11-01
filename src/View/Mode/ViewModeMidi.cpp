@@ -78,7 +78,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	win->set_int("beat_partition", sub_beat_partition);
 	win->set_int("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
-	creation_mode = CreationMode::SELECT;
+	creation_mode = CreationMode::NOTE;
 	input_mode = InputMode::DEFAULT;
 	midi_interval = 3;
 	chord_type = ChordType::MINOR;
@@ -584,9 +584,10 @@ Array<int> ViewModeMidi::get_creation_pitch(int base_pitch) {
 			return {base_pitch, base_pitch + midi_interval};
 	} else if (creation_mode == CreationMode::CHORD) {
 		return chord_notes(chord_type, chord_inversion, base_pitch);
+	} else if (creation_mode == CreationMode::NOTE) {
+		return {base_pitch};
 	}
-	//if (creation_mode == CreationMode::NOTE)
-	return {base_pitch};
+	return {};
 }
 
 MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {

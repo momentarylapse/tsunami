@@ -11,7 +11,7 @@
 const int Range::BEGIN = -1000000000; // just less than 0x4000.0000, so that also length < 0x8000.000 (staying positive)
 const int Range::END = 1000000000;
 const Range Range::ALL = RangeTo(BEGIN, END);
-const Range Range::EMPTY = Range(0, 0);
+const Range Range::NONE = Range(0, 0);
 
 
 Range RangeTo(int start, int end) {
@@ -85,9 +85,12 @@ int Range::center() const {
 	return offset + length / 2;
 }
 
-// FIXME   length == 0????
-bool Range::empty() const {
-	return length <= 0;
+bool Range::is_empty() const {
+	return length == 0;
+}
+
+bool Range::is_none() const {
+	return length == 0 and offset == 0;
 }
 
 // do <this> and <r> have at least one sample of overlap?
@@ -109,21 +112,21 @@ bool Range::is_more_inside(int pos) const {
 }
 
 Range Range::intersect(const Range &r) const {
-	if (empty() or r.empty())
-		return EMPTY;
+	if (is_none() or r.is_none())
+		return NONE;
 	int i0 = max(start(), r.start());
 	int i1 = min(end(), r.end());
-	return Range(i0, i1 - i0);
+	return RangeTo(i0, i1);
 }
 
 Range Range::operator||(const Range &r) const {
-	if (empty())
+	if (is_none())
 		return r;
-	if (r.empty())
+	if (r.is_none())
 		return *this;
 	int i0 = min(start(), r.start());
 	int i1 = max(end(), r.end());
-	return Range(i0, i1 - i0);
+	return RangeTo(i0, i1);
 }
 
 Range Range::operator&&(const Range &r) const {

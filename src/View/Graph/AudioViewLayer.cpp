@@ -330,7 +330,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	}
 
 	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
-	if (marker->range.empty())
+	if (marker->range.is_empty())
 		allow_label = (view->cam.dsample2screen(2000) > 1);
 	float lw = c->get_str_width(text);
 	float dx = max(view->CORNER_RADIUS, (x1-x0)/2 - lw/2);

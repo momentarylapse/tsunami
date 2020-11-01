@@ -52,7 +52,7 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset) {
 }
 
 static int find_offset(AudioView *view) {
-	if (!view->sel.range().empty())
+	if (!view->sel.range().is_empty())
 		return view->sel.range().offset;
 
 	int offset = view->song->range().end();
@@ -225,7 +225,7 @@ bool Clipboard::has_data() {
 }
 
 bool Clipboard::can_copy(AudioView *view) {
-	if (!view->sel.range().empty())
+	if (!view->sel.range().is_empty())
 		return true;
 	if (view->sel._notes.num > 0)
 		return true;

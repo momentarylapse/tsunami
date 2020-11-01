@@ -423,7 +423,7 @@ void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nu
 
 void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range();
-	if (range.empty()) {
+	if (range.is_empty()) {
 		session->e(_("Selection range is empty"));
 		return;
 	}
@@ -955,12 +955,12 @@ void TsunamiWindow::update_menu() {
 	// file
 	//Enable("export_selection", true);
 	// bars
-	enable("delete_time", !view->sel.range().empty());
+	enable("delete_time", !view->sel.range().is_empty());
 	enable("bars-delete", view->sel._bars.num > 0);
 	enable("bars-edit", view->sel._bars.num > 0);
 	enable("bars-scale", view->sel._bars.num > 0);
 	// sample
-	enable("sample_from_selection", !view->sel.range().empty());
+	enable("sample_from_selection", !view->sel.range().is_empty());
 	enable("sample-insert", view->sel.num_samples() > 0);
 	enable("sample-delete", view->sel.num_samples() > 0);
 	enable("sample-properties", view->cur_sample());

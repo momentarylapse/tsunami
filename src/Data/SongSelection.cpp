@@ -181,7 +181,7 @@ int SongSelection::num_samples() const {
 }
 
 bool SongSelection::is_empty() const {
-	if (!range().empty())
+	if (!range().is_empty())
 		return false;
 	return (_samples.num == 0) and (_markers.num == 0) and (_notes.num == 0) and (_bars.num == 0);
 }

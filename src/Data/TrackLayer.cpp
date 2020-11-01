@@ -47,7 +47,7 @@ TrackLayer::~TrackLayer() {
 }
 
 Range TrackLayer::range(int keep_notes) const {
-	Range r = Range::EMPTY;
+	Range r = Range::NONE;
 
 	for (AudioBuffer &b: buffers)
 		r = r or b.range();

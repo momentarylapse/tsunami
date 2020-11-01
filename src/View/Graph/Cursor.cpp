@@ -18,7 +18,7 @@ Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 	view = _view;
 	align.dz = 50;
 	is_end = end;
-	drag_range = Range::EMPTY;
+	drag_range = Range::NONE;
 }
 
 void Cursor::on_draw(Painter* c) {

@@ -28,7 +28,7 @@ void ActionSongDeleteSelection::build(Data *d) {
 
 		for (auto l: weak(t->layers)) {
 			// buffer boxes
-			if (sel.has(l) and !sel.range().empty())
+			if (sel.has(l) and !sel.range().is_none())
 				DeleteBuffersFromTrackLayer(s, t, l, sel);
 
 			// midi

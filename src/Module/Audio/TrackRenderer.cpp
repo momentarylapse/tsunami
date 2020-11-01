@@ -37,7 +37,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos) {
 	bpos = i0 - r.start();
 	ir.length = i1 - i0;
 
-	return !ir.empty();
+	return !ir.is_empty();
 }
 
 

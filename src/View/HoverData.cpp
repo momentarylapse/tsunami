@@ -44,7 +44,7 @@ void HoverData::clear() {
 	index = 0;
 	pos = 0;
 	pos_snap = 0;
-	range = Range::EMPTY;
+	range = Range::NONE;
 	y0 = y1 = 0;
 	pitch = -1;
 	clef_position = -1;

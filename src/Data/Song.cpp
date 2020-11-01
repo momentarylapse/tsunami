@@ -170,7 +170,7 @@ bool Song::is_empty() {
 }
 
 Range Song::range() {
-	Range r = Range::EMPTY;
+	Range r = Range::NONE;
 
 	for (Track *t: weak(tracks))
 		r = r or t->range();
@@ -368,7 +368,7 @@ void Song::delete_selection(const SongSelection &sel) {
 }
 
 void Song::create_samples_from_selection(const SongSelection &sel, bool auto_delete) {
-	if (!sel.range().empty())
+	if (!sel.range().is_empty())
 		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 

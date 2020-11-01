@@ -85,7 +85,7 @@ Track::~Track() {
 }
 
 Range Track::range() const {
-	Range r = Range::EMPTY;
+	Range r = Range::NONE;
 
 	for (auto *l: weak(layers))
 		r = r or l->range(synth.get()->keep_notes);

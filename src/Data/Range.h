@@ -19,7 +19,7 @@ public:
 	Range(const Range &r);
 
 	static const Range ALL;
-	static const Range EMPTY;
+	static const Range NONE;
 	
 	static const int BEGIN;
 	static const int END;
@@ -40,7 +40,8 @@ public:
 	int start() const;
 	int end() const;
 	int center() const;
-	bool empty() const;
+	bool is_empty() const;
+	bool is_none() const;
 
 	bool is_inside(int pos) const;
 	bool is_more_inside(int pos) const;

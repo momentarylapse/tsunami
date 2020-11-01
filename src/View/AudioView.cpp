@@ -490,7 +490,7 @@ bool AudioView::mouse_over_time(int pos) {
 Range AudioView::get_playback_selection(bool for_recording) {
 	if (playback_wish_range.length > 0)
 		return playback_wish_range;
-	if (sel.range().empty()) {
+	if (sel.range().is_empty()) {
 		if (for_recording)
 			return Range(sel.range().start(), 0x70000000);
 		int num = song->range_with_time().end() - sel.range().start();
@@ -896,7 +896,7 @@ void AudioView::explode_track(Track *t) {
 void AudioView::on_song_new() {
 	__set_cur_layer(nullptr);
 	update_tracks();
-	sel.range_raw = Range::EMPTY;
+	sel.range_raw = RangeTo(0, 0);
 	sel.clear();
 	for (Track *t: weak(song->tracks))
 		for (TrackLayer *l: weak(t->layers))

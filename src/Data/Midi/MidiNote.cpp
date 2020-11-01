@@ -12,7 +12,7 @@
 
 
 MidiNote::MidiNote() {
-	range = Range::EMPTY;
+	range = Range::NONE;
 	pitch = 0;
 	volume = 0;
 	flags = 0;

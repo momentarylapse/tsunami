@@ -47,7 +47,7 @@ Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start) 
 		for (int p: pitch)
 			if (n->pitch == p) {
 				if (n->range.is_inside(start))
-					return Range::EMPTY;
+					return Range::NONE;
 			}
 	}
 
@@ -300,7 +300,7 @@ public:
 
 		// create notes
 		MidiNoteBuffer notes;
-		if (allowed.empty())
+		if (allowed.is_empty())
 			return notes;
 		for (int p: pitch)
 			notes.add(new MidiNote(r and allowed, p, 1));
@@ -606,7 +606,7 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 
 	// create notes
 	MidiNoteBuffer notes;
-	if (allowed.empty())
+	if (allowed.is_empty())
 		return notes;
 	for (int p: pitch)
 		notes.add(new MidiNote(r and allowed, p, 1));

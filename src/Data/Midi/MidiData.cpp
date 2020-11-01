@@ -235,7 +235,7 @@ int MidiEventBuffer::get_next_event(int pos) const {
 
 Range MidiEventBuffer::range(int elongation) const {
 	if (num == 0)
-		return Range::EMPTY;
+		return Range::NONE;
 	int i0 = (*this)[0].pos;
 	int i1 = back().pos;
 	return Range(i0, i1 - i0 + elongation);
@@ -388,7 +388,7 @@ void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi) {
 
 Range MidiNoteBuffer::range(int elongation) const {
 	if (num == 0)
-		return Range::EMPTY;
+		return Range::NONE;
 	int i0 = (*this)[0]->range.offset;
 	int i1 = back()->range.end(); // FIXME...
 	return RangeTo(i0, i1 + elongation);

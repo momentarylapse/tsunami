@@ -41,7 +41,7 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset) {
 		ll->buffers.add(buf);
 		l->read_buffers(ll->buffers[0], view->sel.range(), false);
 	} else if (l->type == SignalType::MIDI) {
-		ll->midi = l->midi.get_notes_by_selection(view->sel);
+		ll->midi = l->midi.get_notes_by_selection(view->sel).duplicate();
 		ll->midi.samples = view->sel.range().length;
 		ll->midi.sanify(view->sel.range());
 		for (MidiNote *n: weak(ll->midi))

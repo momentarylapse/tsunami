@@ -33,6 +33,7 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	loop = false; // do we want to loop (GUI)
 	pos = 0;
 	needs_rebuild = true;
+	needs_synth_reset = true;
 	_previous_pos_delta = 0;
 	if (song) {
 		build_data();
@@ -133,6 +134,8 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 	if (needs_rebuild)
 		_rebuild();
+	if (needs_synth_reset)
+		_reset_all_synth();
 
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
@@ -196,6 +199,12 @@ void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers) {
 	needs_rebuild = true;
 }
 
+void SongRenderer::_reset_all_synth() {
+	for (auto *tr: tracks)
+		tr->synth->reset_state();
+	needs_synth_reset = false;
+}
+
 void SongRenderer::_rebuild() {
 
 	// reset previously unused tracks
@@ -213,7 +222,6 @@ void SongRenderer::_rebuild() {
 		allowed_tracks.add(l->track);
 
 	_set_pos(pos);
-	//reset_state();
 
 	needs_rebuild = false;
 }
@@ -256,6 +264,7 @@ int SongRenderer::get_num_samples() const {
 void SongRenderer::set_pos(int _pos) {
 	pos = _pos;
 	needs_rebuild = true;
+	needs_synth_reset = true;
 }
 
 void SongRenderer::_set_pos(int _pos) {

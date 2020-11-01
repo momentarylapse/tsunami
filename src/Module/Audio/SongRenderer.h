@@ -63,6 +63,7 @@ private:
 	void on_song_finished_loading();
 	void update_tracks();
 	void _rebuild();
+	void _reset_all_synth();
 
 	Song *song;
 	Range _range;
@@ -74,6 +75,7 @@ private:
 	Set<const TrackLayer*> allowed_layers_requested;
 	bool direct_mode;
 	bool needs_rebuild;
+	bool needs_synth_reset;
 
 	owned_array<TrackRenderer> tracks;
 

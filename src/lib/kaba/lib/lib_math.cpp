@@ -132,12 +132,19 @@ Array<float> _cdecl float_range(float start, float end, float step) {
 }
 
 template<class T>
-T _cdecl x_max(T a, T b)
-{	return (a > b) ? a : b;	}
+T _cdecl x_max(T a, T b) {
+	return max(a,b);
+}
 
 template<class T>
-T _cdecl x_min(T a, T b)
-{	return (a < b) ? a : b;	}
+T _cdecl x_min(T a, T b) {
+	return min(a, b);
+}
+
+template<class T>
+T _cdecl x_abs(T x) {
+	return abs(x);
+}
 
 vector _quat_vec_mul(quaternion &a, vector &b)
 {	return a * b;	}
@@ -894,15 +901,15 @@ void SIAddPackageMath() {
 			func_add_param("t", TypeFloatList);
 
 	// int
-	add_func("clamp", TypeInt, (void*)&clamp<int>, Flags::_STATIC__PURE);
+	add_funcx("clamp", TypeInt, &clamp<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("loop", TypeInt, (void*)&loop<int>, Flags::_STATIC__PURE);
+	add_funcx("loop", TypeInt, &loop<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("abs", TypeInt, (void*)&abs<int>, Flags::_STATIC__PURE);
+	add_funcx("abs", TypeInt, &x_abs<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 	add_funcx("min", TypeInt, &x_min<int>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeInt);
@@ -911,30 +918,30 @@ void SIAddPackageMath() {
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
 	// mathematical
-	add_func("sin", TypeFloat32, (void*)&sinf, Flags::_STATIC__PURE);
+	add_funcx("sin", TypeFloat32, &sinf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("cos", TypeFloat32, (void*)&cosf, Flags::_STATIC__PURE);
+	add_funcx("cos", TypeFloat32, &cosf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("tan", TypeFloat32, (void*)&tanf, Flags::_STATIC__PURE);
+	add_funcx("tan", TypeFloat32, &tanf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("asin", TypeFloat32, (void*)&asinf, Flags::_STATIC__PURE);
+	add_funcx("asin", TypeFloat32, &asinf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("acos", TypeFloat32, (void*)&acosf, Flags::_STATIC__PURE);
+	add_funcx("acos", TypeFloat32, &acosf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan", TypeFloat32, (void*)&atanf, Flags::_STATIC__PURE);
+	add_funcx("atan", TypeFloat32, &atanf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan2", TypeFloat32, (void*)&atan2f, Flags::_STATIC__PURE);
+	add_funcx("atan2", TypeFloat32, &atan2f, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("y", TypeFloat32);
-	add_func("sqrt", TypeFloat32, (void*)&sqrtf, Flags::_STATIC__PURE);
+	add_funcx("sqrt", TypeFloat32, &sqrtf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, (void*)&f_sqr, Flags::_STATIC__PURE);
+	add_funcx("sqr", TypeFloat32, &f_sqr, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("exp", TypeFloat32, (void*)&expf, Flags::_STATIC__PURE);
+	add_funcx("exp", TypeFloat32, &expf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("log", TypeFloat32, (void*)&logf, Flags::_STATIC__PURE);
+	add_funcx("log", TypeFloat32, &logf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("pow", TypeFloat32, (void*)&powf, Flags::_STATIC__PURE);
+	add_funcx("pow", TypeFloat32, &powf, Flags::_STATIC__PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
 	add_funcx("clamp", TypeFloat32, &clamp<float>, Flags::_STATIC__PURE);

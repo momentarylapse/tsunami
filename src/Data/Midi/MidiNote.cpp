@@ -29,8 +29,8 @@ MidiNote::MidiNote(const Range &_range, float _pitch, float _volume) {
 	reset_clef();
 }
 
-MidiNote *MidiNote::copy() const {
-	MidiNote *n = new MidiNote(range, pitch, volume);
+MidiNote *MidiNote::copy(int offset) const {
+	MidiNote *n = new MidiNote(range + offset, pitch, volume);
 	n->flags = flags;
 	n->stringno = stringno;
 

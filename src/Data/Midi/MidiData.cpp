@@ -360,20 +360,19 @@ MidiNoteBuffer MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) co
 }
 
 void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
-	for (MidiNote *n: weak(midi)) {
-		MidiNote *nn = n->copy();
-		nn->range.offset += offset;
-		add(nn);
-	}
+	for (MidiNote *n: weak(midi))
+		add(n->copy(offset));
 	samples = max(samples, midi.samples + offset);
 	sort();
 }
 
-MidiNoteBuffer MidiNoteBuffer::duplicate() const {
+MidiNoteBuffer MidiNoteBuffer::duplicate(int offset) const {
 	MidiNoteBuffer r;
 	for (MidiNote *n: weak(*this))
 		r.add(n->copy());
 	r.samples = samples;
+	for (MidiNote *n: weak(r))
+		n->range.offset -= offset;
 	return r;
 }
 

@@ -16,7 +16,7 @@ class Range;
 
 class ActionTrackAddMarker: public Action {
 public:
-	ActionTrackAddMarker(TrackLayer *l, TrackMarker *marker);
+	ActionTrackAddMarker(TrackLayer *l, const TrackMarker *marker);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

@@ -65,7 +65,7 @@ void MarkerDialog::on_ok() {
 	if (marker) {
 		layer->edit_marker(marker, marker->range, text);
 	} else {
-		layer->add_marker(range, text);
+		layer->add_marker(new TrackMarker(range, text));
 	}
 	request_destroy();
 }

@@ -26,6 +26,13 @@ string TrackMarker::nice_text() const {
 	return text;
 }
 
+// TODO fx
+TrackMarker *TrackMarker::copy(int offset) const {
+	if (fx.num > 0)
+		msg_error("TODO: copy fx");
+	return new TrackMarker(range + offset, text);
+}
+
 
 bool marker_is_key(const string &text) {
 	return text.match("::key=*::");

@@ -56,7 +56,7 @@ public:
 	void _cdecl delete_sample_ref(SampleRef *ref);
 	void _cdecl edit_sample_ref(SampleRef *ref, float volume, bool mute);
 	
-	TrackMarker* _cdecl add_marker(const Range &range, const string &text);
+	const TrackMarker* _cdecl add_marker(const TrackMarker *marker);
 	void _cdecl delete_marker(const TrackMarker *marker);
 	void _cdecl edit_marker(const TrackMarker *marker, const Range &range, const string &text);
 

@@ -223,10 +223,9 @@ void TrackLayer::delete_midi_note(const MidiNote *note) {
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
 
-TrackMarker *TrackLayer::add_marker(const Range &range, const string &text) {
-	auto *m = new TrackMarker(range, text);
-	track->song->execute(new ActionTrackAddMarker(this, m));
-	return m;
+const TrackMarker *TrackLayer::add_marker(const TrackMarker *marker) {
+	track->song->execute(new ActionTrackAddMarker(this, marker));
+	return marker;
 }
 
 void TrackLayer::delete_marker(const TrackMarker *marker) {

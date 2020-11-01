@@ -509,11 +509,8 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 			auto *ll = new TrackLayer(tt);
 			tt->layers.add(ll);
 			for (auto *n: weak(l->midi))
-				if (sel.has(n)) {
-					auto *nn = n->copy();
-					nn->range.offset -= sel.range().offset;
-					ll->midi.add(nn);
-				}
+				if (sel.has(n))
+					ll->midi.add(n->copy(-sel.range().offset));
 			for (auto &b: l->buffers) {
 				if (b.range().overlaps(sel.range())) {
 					Range ri = b.range() and sel.range();
@@ -525,7 +522,7 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 			}
 			for (auto *m: weak(l->markers))
 				if (sel.has(m))
-					ll->markers.add(new TrackMarker(m->range - sel.range().offset, m->text));
+					ll->markers.add(m->copy(- sel.range().offset));
 			ll->fades = l->fades; // TODO...
 		}
 	}

@@ -22,7 +22,7 @@ class XXX extends SongPlugin
 		for b in song.bars.get_bars(r)
 			Range rr = b.range()
 			string chord = guess_chord(l.midi.get_notes(rr), rr)
-			l.add_marker(b.range(), chord)
+			l.add_marker(new TrackMarker(b.range(), chord))
 	
 	int score_overlap(MidiNote*[] midi, int[] pitch, Range r)
 		int score = 0

@@ -24,6 +24,7 @@ public:
 	shared_array<AudioEffect> fx;
 
 	string nice_text() const;
+	TrackMarker *copy(int offset=0) const;
 };
 
 

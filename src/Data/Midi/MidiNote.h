@@ -31,7 +31,7 @@ class MidiNote : public Sharable<Empty> {
 public:
 	MidiNote();
 	MidiNote(const Range &range, float pitch, float volume);
-	MidiNote *copy() const;
+	MidiNote *copy(int offset=0) const;
 	Range range;
 	float pitch;
 	float volume;

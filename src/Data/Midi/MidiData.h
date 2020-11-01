@@ -64,7 +64,7 @@ public:
 	MidiEventBuffer get_events(const Range &r) const;
 	MidiNoteBuffer get_notes(const Range &r) const;
 	MidiNoteBuffer get_notes_by_selection(const SongSelection &s) const;
-	MidiNoteBuffer duplicate() const;
+	MidiNoteBuffer duplicate(int offset=0) const;
 	void append(const MidiNoteBuffer &midi, int offset);
 
 	Range range(int elongation) const;

@@ -47,7 +47,7 @@ class XXX extends SongPlugin
 		print("paste bar... {{rs}} -> {{rd}}")
 		let midi = source.midi.get_notes(rs)
 		for n in midi
-			let c = n.copy()
+			let c = n.copy(0)
 			c.range = RangeTo(remap(rs, rd, n.range.offset), remap(rs, rd, n.range.end()))
 			dest.add_midi_note(c)
 		

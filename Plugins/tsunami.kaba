@@ -55,7 +55,7 @@ class MidiNote as shared
 		flags = 0
 	extern void set(int mask)
 	extern const bool is(int mask)
-	extern const MidiNote* copy()
+	extern const MidiNote* copy(int offset)
 
 class MidiEvent
 	int pos
@@ -346,6 +346,9 @@ class TrackRenderBuffer
 	int dummy
 
 class TrackMarker as shared
+	void __init__(Range r, string t)
+		range = r
+		text = t
 	Range range
 	string text
 	shared AudioEffect[] fx
@@ -400,7 +403,7 @@ class TrackLayer as shared
 	extern SampleRef* add_sample_ref(int pos, Sample* sample)
 	extern void delete_sample_ref(SampleRef *ref)
 	extern void edit_sample_ref(SampleRef *ref, float volume, bool mute)
-	extern TrackMarker* add_marker(Range range, string text)
+	extern TrackMarker* add_marker(TrackMarker m)
 	extern void delete_marker(TrackMarker *marker)
 	extern void edit_marker(TrackMarker *marker, Range range, string text)
 

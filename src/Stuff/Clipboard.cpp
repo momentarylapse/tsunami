@@ -13,6 +13,7 @@
 #include "../Data/Song.h"
 #include "../Data/Track.h"
 #include "../Data/TrackLayer.h"
+#include "../Data/TrackMarker.h"
 #include "../Data/Sample.h"
 #include "../Data/SongSelection.h"
 #include "../Data/Rhythm/Bar.h"
@@ -30,23 +31,26 @@ void Clipboard::clear() {
 	ref_uid.clear();
 }
 
-void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset) {
-	if (l->type == SignalType::BEATS)
+void Clipboard::append_track(TrackLayer *source, AudioView *view, int offset) {
+	if (source->type == SignalType::BEATS)
 		return;
 
-	TrackLayer *ll = temp->add_track(l->type)->layers[0].get();
+	TrackLayer *target = temp->add_track(source->type)->layers[0].get();
 
-	if (l->type == SignalType::AUDIO) {
+	if (source->type == SignalType::AUDIO) {
 		AudioBuffer buf;
-		ll->buffers.add(buf);
-		l->read_buffers(ll->buffers[0], view->sel.range(), false);
-	} else if (l->type == SignalType::MIDI) {
-		ll->midi = l->midi.get_notes_by_selection(view->sel).duplicate();
-		ll->midi.samples = view->sel.range().length;
-		ll->midi.sanify(view->sel.range());
-		for (MidiNote *n: weak(ll->midi))
+		target->buffers.add(buf);
+		source->read_buffers(target->buffers[0], view->sel.range(), false);
+	} else if (source->type == SignalType::MIDI) {
+		target->midi = source->midi.get_notes_by_selection(view->sel).duplicate(-offset);
+		target->midi.samples = view->sel.range().length;
+		target->midi.sanify(view->sel.range());
+		for (MidiNote *n: weak(target->midi))
 			n->range.offset -= offset;
 	}
+	for (auto m: weak(source->markers))
+		if (view->sel.has(m))
+			target->markers.add(m->copy(-offset));
 
 	ref_uid.add(-1);
 }
@@ -55,13 +59,18 @@ static int find_offset(AudioView *view) {
 	if (!view->sel.range().is_empty())
 		return view->sel.range().offset;
 
+	// offset to first selected item
 	int offset = view->song->range().end();
 	for (auto *t: weak(view->song->tracks))
 		for (auto *l: weak(t->layers))
-			if (view->sel.has(l))
+			if (view->sel.has(l)) {
 				for (MidiNote *n: weak(l->midi))
 					if (view->sel.has(n))
 						offset = min(offset, n->range.offset);
+				for (auto m: weak(l->markers))
+					if (view->sel.has(m))
+						offset = min(offset, m->range.offset);
+			}
 
 	return offset;
 }
@@ -101,12 +110,11 @@ void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, int offset) 
 		buf.set(source->buffers[0], 0, 1.0f);
 		target->edit_buffers_finish(a);
 	} else if (target->type == SignalType::MIDI) {
-		for (MidiNote *n: weak(source->midi)) {
-			MidiNote *nn = n->copy();
-			nn->range.offset += offset;
-			target->add_midi_note(nn);
-		}
+		for (MidiNote *n: weak(source->midi))
+			target->add_midi_note(n->copy(offset));
 	}
+	for (auto m: weak(source->markers))
+		target->add_marker(m->copy(offset));
 }
 
 void Clipboard::paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, int offset) {
@@ -228,6 +236,8 @@ bool Clipboard::can_copy(AudioView *view) {
 	if (!view->sel.range().is_empty())
 		return true;
 	if (view->sel._notes.num > 0)
+		return true;
+	if (view->sel._markers.num > 0)
 		return true;
 	//if (view->sel._samples.num > 0)
 	//	return true;

@@ -511,7 +511,7 @@ void MidiEditorConsole::on_quantize() {
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: weak(notes)) {
 		view->sel.set(n, false);
-		MidiNote *nn = n->copy();
+		auto nn = n->copy();
 		nn->range.set_start(align_to_beats(nn->range.start(), beats));
 		nn->range.set_end(align_to_beats(nn->range.end(), beats));
 		layer->delete_midi_note(n);

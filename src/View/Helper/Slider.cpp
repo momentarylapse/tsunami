@@ -37,7 +37,7 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 
 
 
-Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value)
+Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, kaba::Function *_func, float _value)
 {
 	panel = _panel;
 	id_slider = _id_slider;
@@ -63,7 +63,7 @@ Slider::~Slider()
 	}
 }
 
-void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value)
+void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, kaba::Function *_func, float _value)
 {
 	new(this) Slider(_panel, _id_slider, _id_edit, _v_min, _v_max, _factor, _func, _value);
 }

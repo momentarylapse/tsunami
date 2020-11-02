@@ -7,7 +7,7 @@
 class vector;
 
 
-namespace Kaba{
+namespace kaba {
 
 
 extern const Class *TypeIntPs;

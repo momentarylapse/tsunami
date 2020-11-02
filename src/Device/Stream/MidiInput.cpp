@@ -15,7 +15,7 @@
 #include "../../lib/kaba/lib/common.h"
 #include "../../Plugins/PluginManager.h"
 
-namespace Kaba {
+namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
@@ -87,10 +87,10 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleType::STREAM, "MidiInput"
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	auto _class = session->plugin_manager->get_class("MidiInputConfig");
 	if (_class->elements.num == 0) {
-		Kaba::add_class(_class);
-		Kaba::class_add_elementx("device", device_pointer_class, &Config::device);
-		Kaba::class_add_elementx("free_flow", Kaba::TypeBool, &Config::free_flow);
-		_class->_vtable_location_target_ = Kaba::get_vtable(&config);
+		kaba::add_class(_class);
+		kaba::class_add_elementx("device", device_pointer_class, &Config::device);
+		kaba::class_add_elementx("free_flow", kaba::TypeBool, &Config::free_flow);
+		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config._class = _class;
 

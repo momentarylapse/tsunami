@@ -5,7 +5,7 @@
 
 
 
-namespace Kaba{
+namespace kaba {
 
 
 int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {

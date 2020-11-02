@@ -28,24 +28,24 @@ void ModuleConfiguration::__delete__() {
 }
 
 
-Array<Kaba::ClassElement> get_unique_elements(const Kaba::Class *c) {
-	Array<Kaba::ClassElement> r;
+Array<kaba::ClassElement> get_unique_elements(const kaba::Class *c) {
+	Array<kaba::ClassElement> r;
 	for (auto &e: c->elements)
 		if (!e.hidden())
 			r.add(e);
 	return r;
 }
 
-Any var_to_any(const Kaba::Class *c, const char *v) {
-	if (c == Kaba::TypeInt) {
+Any var_to_any(const kaba::Class *c, const char *v) {
+	if (c == kaba::TypeInt) {
 		return Any(*(const int*)v);
-	} else if (c == Kaba::TypeChar) {
+	} else if (c == kaba::TypeChar) {
 		return Any((int)*(const char*)v);
-	} else if (c == Kaba::TypeFloat32) {
+	} else if (c == kaba::TypeFloat32) {
 		return Any(*(const float*)v);
-	} else if (c == Kaba::TypeBool) {
+	} else if (c == kaba::TypeBool) {
 		return Any(*(const bool*)v);
-	} else if (c == Kaba::TypeString) {
+	} else if (c == kaba::TypeString) {
 		return Any(*(const string*)v);
 	} else if (c->is_array()) {
 		Any r = Any::EmptyArray;
@@ -65,7 +65,7 @@ Any var_to_any(const Kaba::Class *c, const char *v) {
 		if (sr)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
-	} else if (c == Kaba::TypeComplex or c == Kaba::TypeVector or c == Kaba::TypeQuaternion or c == Kaba::TypeColor) {
+	} else if (c == kaba::TypeComplex or c == kaba::TypeVector or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
 		// rect ...nope
 		Any r = Any::EmptyArray;
 		for (auto &e: c->elements)
@@ -103,18 +103,18 @@ string get_next(const string &var_temp, int &pos) {
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string_legacy(const Kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
+void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
 	if (pos >= s.num)
 		return;
-	if (type == Kaba::TypeInt) {
+	if (type == kaba::TypeInt) {
 		*(int*)v = get_next(s, pos)._int();
-	} else if (type == Kaba::TypeChar) {
+	} else if (type == kaba::TypeChar) {
 		*(char*)v = get_next(s, pos)._int();
-	} else if (type == Kaba::TypeFloat32) {
+	} else if (type == kaba::TypeFloat32) {
 		*(float*)v = get_next(s, pos)._float();
-	} else if (type == Kaba::TypeBool) {
+	} else if (type == kaba::TypeBool) {
 		*(bool*)v = (get_next(s, pos) == "true");
-	} else if (type == Kaba::TypeString) {
+	} else if (type == kaba::TypeString) {
 		*(string*)v = get_next(s, pos);
 	} else if (type->is_array()) {
 		auto tel = type->get_array_element();
@@ -165,16 +165,16 @@ int h2i(const string &h) {
 	return *(int*)&s[s.num - 4];
 }
 
-void var_from_any(const Kaba::Class *type, char *v, const Any &a, Session *session) {
-	if (type == Kaba::TypeInt) {
+void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *session) {
+	if (type == kaba::TypeInt) {
 		*(int*)v = a._int();
-	} else if (type == Kaba::TypeChar) {
+	} else if (type == kaba::TypeChar) {
 		*(char*)v = a._int();
-	} else if (type == Kaba::TypeFloat32) {
+	} else if (type == kaba::TypeFloat32) {
 		*(float*)v = a._float();
-	} else if (type == Kaba::TypeBool) {
+	} else if (type == kaba::TypeBool) {
 		*(bool*)v = a._bool();
-	} else if (type == Kaba::TypeString) {
+	} else if (type == kaba::TypeString) {
 		*(string*)v = a.str();
 	} else if (type->is_array()) {
 		if (!a.is_array())
@@ -278,7 +278,7 @@ string ModuleConfiguration::auto_conf(const string &name) const {
 	if (!ps)
 		return "";
 	for (auto c: weak(ps->base_class->constants)) {
-		if (c->type == Kaba::TypeString)
+		if (c->type == kaba::TypeString)
 			if (ac_name_match(c->name, name))
 				return c->as_string();
 	}

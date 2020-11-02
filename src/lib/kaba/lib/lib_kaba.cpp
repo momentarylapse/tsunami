@@ -4,7 +4,7 @@
 #include "dynamic.h"
 
 
-namespace Kaba {
+namespace kaba {
 
 extern const Class *TypePath;
 

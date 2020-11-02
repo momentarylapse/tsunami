@@ -9,7 +9,7 @@
 	#include "../../threads/ThreadedWork.h"
 #endif
 
-namespace Kaba{
+namespace kaba {
 
 
 #ifdef _X_USE_THREADS_

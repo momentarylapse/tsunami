@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "../../file/file.h"
 
-namespace Kaba {
+namespace kaba {
 
 
 

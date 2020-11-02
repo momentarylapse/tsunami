@@ -19,7 +19,7 @@
 #endif
 #include <errno.h>
 
-namespace Kaba{
+namespace kaba {
 
 
 int LocalOffset,LocalOffsetMax;
@@ -84,7 +84,7 @@ void init_all_global_objects(SyntaxTree *ps, const Class *c) {
 
 static int64 _opcode_rand_state_ = 10000;
 
-// randomly pick a page address +/- 1gb around &Kaba::init
+// randomly pick a page address +/- 1gb around &kaba::init
 void* get_nice_random_addr() {
 	int64 p = ((int_p)&init) & 0xfffffffffffff000;
 	_opcode_rand_state_ = (_opcode_rand_state_ * 1664525 + 1013904223);

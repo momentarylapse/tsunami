@@ -57,17 +57,17 @@ Array<UnitTest::Test> TestPlugins::tests() {
 void TestPlugins::test_compile(ModuleType type, const Path &filename) {
 
 	try {
-		auto s = Kaba::load(filename);
-	} catch (Kaba::Exception &e) {
+		auto s = kaba::load(filename);
+	} catch (kaba::Exception &e) {
 		throw Failure(e.message());
 	}
-	//Kaba::config.verbose = true;
+	//kaba::config.verbose = true;
 	//Plugin *p = Session::GLOBAL->plugin_manager->load_and_compile_plugin(type, filename);
 	//if (!p->usable(Session::GLOBAL))
 	//	throw Failure(p->error_message);
 
-	// hmmm, right now, some tsunami internals are in Kaba::_public_scripts_
-	//Kaba::DeleteAllScripts(true, true);
+	// hmmm, right now, some tsunami internals are in kaba::_public_scripts_
+	//kaba::DeleteAllScripts(true, true);
 }
 
 void TestPlugins::test_audio_effect(const string &name) {

@@ -3,7 +3,7 @@
 #include "Parser.h"
 #include "../../file/file.h"
 
-namespace Kaba{
+namespace kaba {
 
 
 #define MAX_DEFINE_RECURSIONS	128

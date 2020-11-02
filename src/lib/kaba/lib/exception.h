@@ -10,7 +10,7 @@
 
 #include "../../base/base.h"
 
-namespace Kaba
+namespace kaba
 {
 
 class KabaException

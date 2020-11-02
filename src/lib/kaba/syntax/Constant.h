@@ -13,7 +13,7 @@
 
 class complex;
 
-namespace Kaba{
+namespace kaba {
 
 class Class;
 class Block;

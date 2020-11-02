@@ -40,15 +40,15 @@ void Plugin::recompile(Session *session) {
 	session->i(_("compiling script: ") + filename.str());
 
 	if (s) {
-		Kaba::remove_script(s.get());
+		kaba::remove_script(s.get());
 		s = nullptr;
 	}
 
 	// load + compile
 	try {
-		s = Kaba::load(filename);
+		s = kaba::load(filename);
 
-	} catch(Kaba::Exception &e) {
+	} catch(kaba::Exception &e) {
 		error_message = e.message();
 		session->e(get_error());
 	}

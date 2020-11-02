@@ -4,7 +4,7 @@
 
 #include "../../base/pointer.h"
 
-namespace Kaba{
+namespace kaba {
 
 class Script;
 class SyntaxTree;

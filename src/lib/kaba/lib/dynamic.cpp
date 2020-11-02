@@ -4,7 +4,7 @@
 #include "exception.h"
 #include "../../any/any.h"
 
-namespace Kaba {
+namespace kaba {
 	
 extern const Class *TypeIntList;
 extern const Class *TypeFloatList;

@@ -10,7 +10,7 @@
 #include "../../file/file.h"
 #include <stdio.h>
 
-namespace Kaba{
+namespace kaba {
 
 
 void rec_assign(void *a, void *b, const Class *type);

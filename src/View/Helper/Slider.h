@@ -10,7 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 
-namespace Kaba {
+namespace kaba {
 	class Function;
 }
 
@@ -19,10 +19,10 @@ class Slider : public hui::EventHandler
 public:
 	Slider();
 	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, const hui::Callback &func, float _value);
-	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value);
+	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, kaba::Function *_func, float _value);
 	virtual ~Slider();
 
-	void _cdecl __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value);
+	void _cdecl __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, kaba::Function *_func, float _value);
 	virtual void _cdecl __delete__();
 
 	void _cdecl set(float value);

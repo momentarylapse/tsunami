@@ -10,7 +10,7 @@
 #endif
 
 
-namespace Kaba {
+namespace kaba {
 
 
 extern const Class *TypeDate;

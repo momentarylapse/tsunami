@@ -5,7 +5,7 @@
 #include "dynamic.h"
 #include "../../base/map.h"
 
-namespace Kaba {
+namespace kaba {
 
 extern const Class *TypeDictBase;
 extern const Class *TypeIntDict;

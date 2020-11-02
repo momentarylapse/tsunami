@@ -8,7 +8,7 @@
 	#include "../../nix/nix.h"
 #endif
 
-namespace Kaba{
+namespace kaba {
 
 
 #ifdef _X_USE_NIX_

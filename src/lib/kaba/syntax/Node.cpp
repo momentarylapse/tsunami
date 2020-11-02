@@ -9,7 +9,7 @@
 #include "../../file/file.h"
 #include <stdio.h>
 
-namespace Kaba{
+namespace kaba {
 
 string kind2str(NodeKind kind) {
 	if (kind == NodeKind::PLACEHOLDER)

@@ -10,7 +10,7 @@
 #include "../../file/file.h"
 #include <stdio.h>
 
-namespace Kaba{
+namespace kaba {
 
 string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 

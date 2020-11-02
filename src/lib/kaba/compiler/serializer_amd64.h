@@ -4,7 +4,7 @@
 
 #include "serializer_x86.h"
 
-namespace Kaba
+namespace kaba
 {
 
 

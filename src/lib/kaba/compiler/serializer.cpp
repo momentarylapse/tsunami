@@ -6,7 +6,7 @@
 #include "../../file/file.h"
 
 
-namespace Kaba{
+namespace kaba {
 
 
 //#define debug_evil_corrections	1

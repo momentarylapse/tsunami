@@ -8,7 +8,7 @@
 	#include "../../net/net.h"
 #endif
 
-namespace Kaba{
+namespace kaba {
 
 #ifdef _X_USE_NET_
 	#define net_p(p)		(void*)p

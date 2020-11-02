@@ -4,24 +4,24 @@
 
 #ifdef _X_USE_KABA_
 #include "../kaba/kaba.h"
-namespace Kaba {
+namespace kaba {
 	extern const Class *TypeAnyList;
 	extern const Class *TypeAnyDict;
 }
 const void *_get_class(int t) {
 	if (t == Any::TYPE_INT)
-		return Kaba::TypeInt;
+		return kaba::TypeInt;
 	if (t == Any::TYPE_FLOAT)
-		return Kaba::TypeFloat32;
+		return kaba::TypeFloat32;
 	if (t == Any::TYPE_BOOL)
-		return Kaba::TypeBool;
+		return kaba::TypeBool;
 	if (t == Any::TYPE_STRING)
-		return Kaba::TypeString;
+		return kaba::TypeString;
 	if (t == Any::TYPE_ARRAY)
-		return Kaba::TypeAnyList;
+		return kaba::TypeAnyList;
 	if (t == Any::TYPE_MAP)
-		return Kaba::TypeAnyDict;
-	return Kaba::TypeVoid;
+		return kaba::TypeAnyDict;
+	return kaba::TypeVoid;
 }
 #else
 	const void *_get_class(int t) {
@@ -72,7 +72,7 @@ Any::Any() {
 	data = NULL;
 	parent = nullptr;
 #ifdef _X_USE_KABA_
-	_class = Kaba::TypeVoid;
+	_class = kaba::TypeVoid;
 #else
 	_class = nullptr;
 #endif
@@ -344,7 +344,7 @@ bool str_is_number(const string &s) {
 void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 	auto expect_no_end = [&tokens, &pos] {
 		if (pos >= tokens.num)
-			throw Exception("string ended unexpectedly: " + sa2s(tokens));
+			throw Exception("string ended unexpectedly");
 	};
 	auto expect_token = [&tokens, &pos, expect_no_end] (const string &t) {
 		expect_no_end();

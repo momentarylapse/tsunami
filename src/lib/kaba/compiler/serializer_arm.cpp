@@ -8,7 +8,7 @@ namespace Asm{
 	extern int ARM_DATA_INSTRUCTIONS[16]; // -> asm.cpp
 };
 
-namespace Kaba{
+namespace kaba {
 
 #define reg_s0 param_preg(TypeFloat32, Asm::REG_S0)
 #define reg_s1 param_preg(TypeFloat32, Asm::REG_S1)

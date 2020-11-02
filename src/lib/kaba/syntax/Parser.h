@@ -13,7 +13,7 @@
 
 //#include "lexical.h"
 
-namespace Kaba {
+namespace kaba {
 
 class Class;
 class Function;
@@ -171,6 +171,6 @@ public:
 	bool found_dynamic_param;
 };
 
-} /* namespace Kaba */
+} /* namespace kaba */
 
 #endif /* SRC_LIB_KABA_SYNTAX_PARSER_H_ */

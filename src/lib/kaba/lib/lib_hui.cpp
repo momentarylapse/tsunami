@@ -16,7 +16,7 @@ namespace hui{
 #endif
 }
 
-namespace Kaba{
+namespace kaba {
 
 #ifdef _X_USE_HUI_
 	static hui::Event *_event;

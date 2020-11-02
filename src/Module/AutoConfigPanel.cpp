@@ -370,7 +370,7 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 	auto *ps = config->_class->owner;
 	Array<AutoConfigData*> r;
 	for (auto &e: config->_class->elements) {
-		if (e.type == Kaba::TypeFloat32) {
+		if (e.type == kaba::TypeFloat32) {
 			if (e.name == "pitch") {
 				auto *a = new AutoConfigDataPitch(e.name);
 				a->value = (float*)((char*)config + e.offset);
@@ -380,15 +380,15 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			}
-		} else if (e.type == Kaba::TypeInt) {
+		} else if (e.type == kaba::TypeInt) {
 			auto *a = new AutoConfigDataInt(e.name);
 			a->value = (int*)((char*)config + e.offset);
 			r.add(a);
-		} else if (e.type == Kaba::TypeBool) {
+		} else if (e.type == kaba::TypeBool) {
 			auto *a = new AutoConfigDataBool(e.name);
 			a->value = (bool*)((char*)config + e.offset);
 			r.add(a);
-		} else if (e.type == Kaba::TypeString) {
+		} else if (e.type == kaba::TypeString) {
 			auto *a = new AutoConfigDataString(e.name);
 			a->value = (string*)((char*)config + e.offset);
 			r.add(a);

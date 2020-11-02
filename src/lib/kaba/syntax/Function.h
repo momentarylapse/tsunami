@@ -11,7 +11,7 @@
 #include "../../base/base.h"
 #include "../../base/pointer.h"
 
-namespace Kaba{
+namespace kaba {
 
 class Class;
 class Block;

@@ -1,6 +1,7 @@
 #include "../../file/file.h"
 #include "../kaba.h"
 #include "../../config.h"
+#include "../../math/matrix.h"
 #include "common.h"
 #include "exception.h"
 
@@ -11,7 +12,7 @@
 #endif
 #endif
 
-namespace Kaba{
+namespace kaba {
 
 
 
@@ -158,15 +159,11 @@ void SIAddPackageVulkan() {
 	add_class(TypeVertexBuffer);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::VertexBuffer::__init__));
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::VertexBuffer::__delete__));
-		class_add_funcx("build", TypeVoid, vul_p(&vulkan::VertexBuffer::build1));
-			func_add_param("vertices", TypeVertexList);
-		class_add_funcx("build", TypeVoid, vul_p(&vulkan::VertexBuffer::build1i));
-			func_add_param("vertices", TypeVertexList);
+		class_add_funcx("build", TypeVoid, vul_p(&vulkan::VertexBuffer::build_v3_v3_v2_i));
+			func_add_param("vertices", TypeDynamicArray);
 			func_add_param("indices", TypeIntList);
 		class_add_funcx("build", TypeVoid, vul_p(&vulkan::VertexBuffer::build));
-			func_add_param("vertices", TypePointer);
-			func_add_param("size", TypeInt);
-			func_add_param("count", TypeInt);
+			func_add_param("vertices", TypeDynamicArray);
 
 
 
@@ -297,6 +294,7 @@ void SIAddPackageVulkan() {
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::RayPipeline::__init__));
 			func_add_param("layout", TypeString);
 			func_add_param("shader", TypeShaderPList);
+		class_add_funcx("create_sbt", TypeVoid, vul_p(&vulkan::RayPipeline::create_sbt));
 
 	add_class(TypeRenderPass);
 		class_add_elementx("clear_color", TypeColorList, vul_p(&vulkan::RenderPass::clear_color));
@@ -398,11 +396,11 @@ void SIAddPackageVulkan() {
 			func_add_param("nz", TypeInt);
 
 	add_class(TypeAccelerationStructure);
-		class_add_funcx("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top), Flags::STATIC);
+		//class_add_funcx("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top), Flags::STATIC);
+		class_add_funcx("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top_simple), Flags::STATIC);
 			func_add_param("instances", TypeDynamicArray);
 		class_add_funcx("create_bottom", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_bottom), Flags::STATIC);
 			func_add_param("vb", TypeVertexBuffer);
-			func_add_param("ib", TypeVertexBuffer);
 
 	add_funcx("create_window", TypePointer, vul_p(&vulkan::create_window), Flags::STATIC);
 		func_add_param("title", TypeString);

@@ -322,7 +322,6 @@ sources = [
 	'src/lib/kaba/lib/lib_threads.cpp',
 	'src/lib/kaba/lib/lib_time.cpp',
 	'src/lib/kaba/lib/lib_vulkan.cpp',
-	'src/lib/kaba/lib/lib_x.cpp',
 	'src/lib/kaba/syntax/Class.cpp',
 	'src/lib/kaba/syntax/Constant.cpp',
 	'src/lib/kaba/syntax/Function.cpp',

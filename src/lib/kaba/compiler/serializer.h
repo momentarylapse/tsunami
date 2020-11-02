@@ -2,7 +2,7 @@
 #ifndef SERIALIZER_H_
 #define SERIALIZER_H_
 
-namespace Kaba
+namespace kaba
 {
 
 class Serializer;

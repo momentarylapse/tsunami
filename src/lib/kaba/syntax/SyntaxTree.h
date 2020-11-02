@@ -17,7 +17,7 @@ namespace Asm {
 	struct MetaInfo;
 };
 
-namespace Kaba{
+namespace kaba {
 
 class Script;
 class SyntaxTree;

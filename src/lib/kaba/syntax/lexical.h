@@ -2,7 +2,7 @@
 #ifndef LEXICAL_H_
 #define LEXICAL_H_
 
-namespace Kaba{
+namespace kaba {
 
 class SyntaxTree;
 

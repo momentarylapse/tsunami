@@ -3,7 +3,7 @@ class DynamicArray;
 class string;
 class Any;
 
-namespace Kaba {
+namespace kaba {
 	
 class Class;
 class Function;

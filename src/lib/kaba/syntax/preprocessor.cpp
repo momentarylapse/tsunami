@@ -3,7 +3,7 @@
 #include "../../file/file.h"
 #include <type_traits>
 
-namespace Kaba {
+namespace kaba {
 
 typedef void op_func(Value&, Value&, Value&);
 

@@ -98,7 +98,7 @@ Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &pr
 	return list;
 }
 
-Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *t, const string &prefix, const string &prefix_nice) {
+Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const kaba::Class *t, const string &prefix, const string &prefix_nice) {
 	Array<Curve::Target> list;
 	if (t->name == "float") {
 		list.add(Target((float*)pp, prefix, prefix_nice));

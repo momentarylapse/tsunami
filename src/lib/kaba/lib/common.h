@@ -2,7 +2,7 @@
 #ifndef SRC_LIB_KABA_LIB_COMMON_H_
 #define SRC_LIB_KABA_LIB_COMMON_H_
 
-namespace Kaba{
+namespace kaba {
 
 enum class InlineID;
 enum class OperatorID;

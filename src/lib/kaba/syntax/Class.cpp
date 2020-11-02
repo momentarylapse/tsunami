@@ -4,7 +4,7 @@
 #include "../../file/file.h"
 #include "Class.h"
 
-namespace Kaba{
+namespace kaba {
 
 ClassElement::ClassElement() {
 	offset = 0;

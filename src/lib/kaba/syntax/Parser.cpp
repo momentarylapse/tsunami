@@ -9,7 +9,7 @@
 
 #define NEW_NEW_PARSING 0
 
-namespace Kaba{
+namespace kaba {
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message);
 

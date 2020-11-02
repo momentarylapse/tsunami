@@ -10,7 +10,7 @@
 	#error "we're screwed"
 #endif
 
-namespace Kaba{
+namespace kaba {
 
 extern const Class *TypeImage;
 extern const Class *TypeIntList;

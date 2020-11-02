@@ -8,7 +8,7 @@
 #include <cstdio>
 
 
-namespace Kaba {
+namespace kaba {
 
 extern const Class *TypeDynamicArray;
 extern const Class *TypeSharedPointer;

@@ -13,7 +13,7 @@
 #include "../lib/base/pointer.h"
 #include "../Stuff/Observable.h"
 
-namespace Kaba {
+namespace kaba {
 	class Script;
 	class Class;
 };
@@ -85,7 +85,7 @@ public:
 	string module_subtype;
 	Session *session;
 	float module_x, module_y;
-	const Kaba::Class *_class;
+	const kaba::Class *_class;
 
 	Module *copy() const;
 

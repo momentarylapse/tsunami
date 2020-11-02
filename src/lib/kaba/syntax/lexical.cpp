@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "SyntaxTree.h"
 
-namespace Kaba{
+namespace kaba {
 
 //#define ScriptDebug
 

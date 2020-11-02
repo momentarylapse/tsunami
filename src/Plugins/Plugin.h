@@ -12,7 +12,7 @@
 #include "../lib/base/pointer.h"
 #include "../lib/file/path.h"
 
-namespace Kaba{
+namespace kaba {
 	class Script;
 	class Class;
 };
@@ -28,7 +28,7 @@ public:
 	Path filename;
 	int file_date;
 	int index;
-	shared<Kaba::Script> s;
+	shared<kaba::Script> s;
 
 	bool usable(Session *session);
 	ModuleType type;

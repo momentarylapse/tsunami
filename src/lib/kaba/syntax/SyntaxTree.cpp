@@ -5,7 +5,7 @@
 #include "../../file/file.h"
 #include <stdio.h>
 
-namespace Kaba{
+namespace kaba {
 
 //#define ScriptDebug
 

@@ -9,7 +9,7 @@
 #if !defined(KABA_H__INCLUDED_)
 #define KABA_H__INCLUDED_
 
-namespace Kaba {
+namespace kaba {
 	class Script;
 }
 
@@ -20,7 +20,7 @@ namespace Kaba {
 #include "lib/lib.h"
 #include "syntax/SyntaxTree.h"
 
-namespace Kaba{
+namespace kaba {
 
 extern string Version;
 

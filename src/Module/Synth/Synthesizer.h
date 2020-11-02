@@ -23,7 +23,7 @@ class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
 class Session;
 class Synthesizer;
-namespace Kaba{
+namespace kaba {
 	class Class;
 }
 
@@ -99,7 +99,7 @@ protected:
 
 	MidiEventBuffer events;
 
-	Kaba::Class* pitch_renderer_class;
+	kaba::Class* pitch_renderer_class;
 	Array<PitchRenderer*> pitch_renderer;
 	PitchRenderer *get_pitch_renderer(int pitch);
 	virtual PitchRenderer *create_pitch_renderer(int pitch);

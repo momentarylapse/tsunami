@@ -9,7 +9,7 @@
 #endif
 
 
-namespace Kaba{
+namespace kaba {
 
 #ifdef _X_USE_SOUND_
 	#define sound_p(p)		(void*)p

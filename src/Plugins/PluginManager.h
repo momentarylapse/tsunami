@@ -23,7 +23,7 @@ namespace hui {
 	class Panel;
 	class Menu;
 }
-namespace Kaba {
+namespace kaba {
 	class Script;
 	class Class;
 }
@@ -72,8 +72,8 @@ public:
 	owned<FavoriteManager> favorites;
 
 
-	shared<Kaba::Script> package;
-	Kaba::Class *get_class(const string &name);
+	shared<kaba::Script> package;
+	kaba::Class *get_class(const string &name);
 
 private:
 	void find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleType type);

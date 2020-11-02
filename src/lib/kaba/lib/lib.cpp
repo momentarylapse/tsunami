@@ -28,7 +28,7 @@
 
 
 
-namespace Kaba{
+namespace kaba {
 
 
 const string IDENTIFIER_CLASS = "class";

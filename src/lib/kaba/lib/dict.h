@@ -1,4 +1,4 @@
-namespace Kaba {
+namespace kaba {
 	class Class;
 	class SyntaxTree;
 	

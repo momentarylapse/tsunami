@@ -9,7 +9,7 @@
 #if !defined(LIB_H__INCLUDED_)
 #define LIB_H__INCLUDED_
 
-namespace Kaba{
+namespace kaba {
 
 
 #define MAX_OPCODE				(2*65536)	// max. amount of opcode

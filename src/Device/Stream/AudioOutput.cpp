@@ -15,7 +15,7 @@
 #include "../../lib/kaba/lib/common.h"
 #include "../../Plugins/PluginManager.h"
 
-namespace Kaba {
+namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
@@ -233,12 +233,12 @@ AudioOutput::AudioOutput(Session *_session) :
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	device_manager = session->device_manager;
-	auto _class = session->plugin_manager->get_class("AudioOutputConfig");//new Kaba::Class("Config", sizeof(config), nullptr, nullptr);
+	auto _class = session->plugin_manager->get_class("AudioOutputConfig");//new kaba::Class("Config", sizeof(config), nullptr, nullptr);
 	if (_class->elements.num == 0) {
-		Kaba::add_class(_class);
-		Kaba::class_add_elementx("volume", Kaba::TypeFloat32, &Config::volume);
-		Kaba::class_add_elementx("device", device_pointer_class, &Config::device);
-		_class->_vtable_location_target_ = Kaba::get_vtable(&config);
+		kaba::add_class(_class);
+		kaba::class_add_elementx("volume", kaba::TypeFloat32, &Config::volume);
+		kaba::class_add_elementx("device", device_pointer_class, &Config::device);
+		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config._class = _class;
 

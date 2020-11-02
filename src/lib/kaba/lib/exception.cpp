@@ -13,7 +13,7 @@
 #include <assert.h>
 
 
-namespace Kaba{
+namespace kaba {
 
 
 bool _verbose_exception_ = false;

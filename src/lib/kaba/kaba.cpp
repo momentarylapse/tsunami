@@ -25,7 +25,7 @@
 	#include <windows.h>
 #endif
 
-namespace Kaba {
+namespace kaba {
 
 string Version = "0.19.5.2";
 

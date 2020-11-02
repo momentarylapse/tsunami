@@ -25,6 +25,7 @@ class Session;
 class MidiPreview : public VirtualBase {
 public:
 	MidiPreview(Session *s, Synthesizer *synth);
+	~MidiPreview() override;
 
 	shared<SignalChain> chain;
 	Module *synth;

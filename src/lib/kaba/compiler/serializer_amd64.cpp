@@ -16,11 +16,11 @@ int SerializerAMD64::fc_begin(Function *__f, const Array<SerialNodeParam> &_para
 		//add_temp(type, ret_temp);
 		ret_ref = add_reference(/*ret_temp*/ ret);
 		//add_ref();
-		//add_cmd(Asm::inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
+		//cmd.add_cmd(Asm::inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
 	}
 
 	// grow stack (down) for local variables of the calling function
-//	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
+//	cmd.add_cmd(- cur_func->_VarSize - LocalOffset - 8);
 	int64 push_size = 0;
 
 	Array<SerialNodeParam> params = _params;
@@ -60,12 +60,12 @@ int SerializerAMD64::fc_begin(Function *__f, const Array<SerialNodeParam> &_para
 	// push parameters onto stack
 	push_size = 8 * stack_param.num;
 	if (push_size > 127)
-		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeInt, push_size));
+		cmd.add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeInt, push_size));
 	else if (push_size > 0)
-		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, push_size));
+		cmd.add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, push_size));
 	foreachb(SerialNodeParam &p, stack_param){
-		add_cmd(Asm::INST_MOV, param_preg(p.type, get_reg(0, p.type->size)), p);
-		add_cmd(Asm::INST_PUSH, p_rax);
+		cmd.add_cmd(Asm::INST_MOV, param_preg(p.type, get_reg(0, p.type->size)), p);
+		cmd.add_cmd(Asm::INST_PUSH, p_rax);
 	}
 	max_push_size = max(max_push_size, (int)push_size);
 
@@ -73,9 +73,9 @@ int SerializerAMD64::fc_begin(Function *__f, const Array<SerialNodeParam> &_para
 	foreachib(SerialNodeParam &p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
 		if (p.type == TypeFloat64)
-			add_cmd(Asm::INST_MOVSD, param_preg(TypeReg128, reg), p);
+			cmd.add_cmd(Asm::INST_MOVSD, param_preg(TypeReg128, reg), p);
 		else
-			add_cmd(Asm::INST_MOVSS, param_preg(TypeReg128, reg), p);
+			cmd.add_cmd(Asm::INST_MOVSS, param_preg(TypeReg128, reg), p);
 	}
 	
 	Array<int> virts;
@@ -86,22 +86,22 @@ int SerializerAMD64::fc_begin(Function *__f, const Array<SerialNodeParam> &_para
 		int root = param_regs_root[i];
 		int preg = get_reg(root, p.type->size);
 		if (preg >= 0){
-			int v = add_virtual_reg(preg);
+			int v = cmd.add_virtual_reg(preg);
 			virts.add(v);
-			add_cmd(Asm::INST_MOV, param_vreg(p.type, v), p);
+			cmd.add_cmd(Asm::INST_MOV, param_vreg(p.type, v), p);
 		}else{
 			// some registers are not 8bit'able
-			int v = add_virtual_reg(get_reg(root, 4));
+			int v = cmd.add_virtual_reg(get_reg(root, 4));
 			virts.add(v);
-			int va = add_virtual_reg(Asm::REG_EAX);
-			add_cmd(Asm::INST_MOV, param_vreg(p.type, va, Asm::REG_AL), p);
-			add_cmd(Asm::INST_MOV, param_vreg(TypeReg32, v), param_vreg(p.type, va));
+			int va = cmd.add_virtual_reg(Asm::REG_EAX);
+			cmd.add_cmd(Asm::INST_MOV, param_vreg(p.type, va, Asm::REG_AL), p);
+			cmd.add_cmd(Asm::INST_MOV, param_vreg(TypeReg32, v), param_vreg(p.type, va));
 		}
 	}
 
 	// extend reg channels to call
 	for (int v: virts)
-		use_virtual_reg(v, cmd.num, cmd.num);
+		cmd.use_virtual_reg(v, cmd.cmd.num, cmd.cmd.num);
 
 	return push_size;
 }
@@ -113,35 +113,35 @@ void SerializerAMD64::fc_end(int push_size, const Array<SerialNodeParam> &params
 	if ((type != TypeVoid) and (!type->uses_return_by_memory())) {
 		if (type->_amd64_allow_pass_in_xmm()) {
 			if (type == TypeFloat32) {
-				add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
 			} else if (type == TypeFloat64) {
-				add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
 			} else if (type->size == 8) { // float[2]
-				add_cmd(Asm::INST_MOVLPS, ret, p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVLPS, ret, p_xmm0);
 			} else if (type->size == 12) { // float[3]
-				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
-				add_cmd(Asm::INST_MOVSS, param_shift(ret, 8, TypeFloat32), p_xmm1);
+				cmd.add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVSS, param_shift(ret, 8, TypeFloat32), p_xmm1);
 			} else if (type->size == 16) { // float[4]
 				// hmm, weird
-				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
-				//add_cmd(Asm::INST_MOVHPS, param_shift(ret, 8, TypeReg64), p_xmm0);
-				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 8, TypeReg64), p_xmm1);
-				//add_cmd(Asm::INST_MOVUPS, ret, p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
+				//cmd.add_cmd(Asm::INST_MOVHPS, param_shift(ret, 8, TypeReg64), p_xmm0);
+				cmd.add_cmd(Asm::INST_MOVLPS, param_shift(ret, 8, TypeReg64), p_xmm1);
+				//cmd.add_cmd(Asm::INST_MOVUPS, ret, p_xmm0);
 			} else {
 				do_error("xmm return ..." + type->long_name());
 			}
 		} else if (type->size == 1) {
-			int r = add_virtual_reg(Asm::REG_AL);
-			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
-			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
+			int r = cmd.add_virtual_reg(Asm::REG_AL);
+			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
+			cmd.set_virtual_reg(r, cmd.cmd.num - 2, cmd.cmd.num - 1);
 		} else if (type->size == 4) {
-			int r = add_virtual_reg(Asm::REG_EAX);
-			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
-			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
+			int r = cmd.add_virtual_reg(Asm::REG_EAX);
+			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
+			cmd.set_virtual_reg(r, cmd.cmd.num - 2, cmd.cmd.num - 1);
 		} else {
-			int r = add_virtual_reg(Asm::REG_RAX);
-			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
-			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
+			int r = cmd.add_virtual_reg(Asm::REG_RAX);
+			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
+			cmd.set_virtual_reg(r, cmd.cmd.num - 2, cmd.cmd.num - 1);
 		}
 	}
 }
@@ -160,24 +160,30 @@ void SerializerAMD64::add_function_call(Function *f, const Array<SerialNodeParam
 	if (f->address) {
 		if (dist_fits_32bit(f->address, script->opcode)) {
 			// 32bit call distance
-			add_cmd(Asm::INST_CALL, param_imm(TypeReg32, (int_p)f->address)); // the actual call
+			cmd.add_cmd(Asm::INST_CALL, param_imm(TypeReg32, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
 		} else {
 			// 64bit call distance
-			add_cmd(Asm::INST_MOV, p_rax, param_imm(TypeReg64, (int_p)f->address));
-			add_cmd(Asm::INST_CALL, p_rax);
+			cmd.add_cmd(Asm::INST_MOV, p_rax, param_imm(TypeReg64, (int_p)f->address));
+			cmd.add_cmd(Asm::INST_CALL, p_rax);
 		}
 	} else if (f->_label >= 0) {
 		if (f->owner() == syntax_tree) {
 			// 32bit call distance
-			add_cmd(Asm::INST_CALL, param_marker(TypeInt, f->_label));
+			cmd.add_cmd(Asm::INST_CALL, param_marker(TypeInt, f->_label));
 		} else {
 			// 64bit call distance
-			add_cmd(Asm::INST_MOV, p_rax, param_marker(TypePointer, f->_label));
-			add_cmd(Asm::INST_CALL, p_rax);
+			cmd.add_cmd(Asm::INST_MOV, p_rax, param_marker(TypePointer, f->_label));
+			cmd.add_cmd(Asm::INST_CALL, p_rax);
 		}
 	} else {
 		do_error_link("could not link function " + f->signature());
+	}
+
+	// call violates all used registers...
+	for (int i=0;i<map_reg_root.num;i++) {
+		int v = cmd.add_virtual_reg(get_reg(i, 4));
+		cmd.use_virtual_reg(v, cmd.cmd.num-1, cmd.cmd.num-1);
 	}
 
 	fc_end(push_size, params, ret);
@@ -187,11 +193,11 @@ void SerializerAMD64::add_virtual_function_call(Function *f, const Array<SerialN
 	call_used = true;
 	int push_size = fc_begin(f, params, ret);
 
-	add_cmd(Asm::INST_MOV, p_rax, params[0]); // self
-	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable
-	add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, 8 * f->virtual_index)); // vtable + n
-	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable[n]
-	add_cmd(Asm::INST_CALL, p_rax); // the actual call
+	cmd.add_cmd(Asm::INST_MOV, p_rax, params[0]); // self
+	cmd.add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable
+	cmd.add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, 8 * f->virtual_index)); // vtable + n
+	cmd.add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable[n]
+	cmd.add_cmd(Asm::INST_CALL, p_rax); // the actual call
 
 	fc_end(push_size, params, ret);
 }
@@ -202,14 +208,14 @@ void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Arr
 	int push_size = fc_begin(nullptr, params, ret);
 
 	if (pointer.type == TypeFunctionCodeP) {
-		add_cmd(Asm::INST_MOV, p_rax, pointer);
+		cmd.add_cmd(Asm::INST_MOV, p_rax, pointer);
 	} else {
 		//TypeFunctionP
-		add_cmd(Asm::INST_MOV, p_rax, pointer);
-		add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, offsetof(Function, address)));
-		add_cmd(Asm::INST_MOV, p_rax, p_deref_eax);
+		cmd.add_cmd(Asm::INST_MOV, p_rax, pointer);
+		cmd.add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, offsetof(Function, address)));
+		cmd.add_cmd(Asm::INST_MOV, p_rax, p_deref_eax);
 	}
-	add_cmd(Asm::INST_CALL, p_rax); // the actual call
+	cmd.add_cmd(Asm::INST_CALL, p_rax); // the actual call
 
 	fc_end(push_size, params, ret);
 }
@@ -219,7 +225,7 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 {
 	// return, instance, params
 	Array<Variable*> param;
-	if (f->return_type->uses_return_by_memory()){
+	if (f->effective_return_type->uses_return_by_memory()){
 		for (Variable *v: weak(f->var))
 			if (v->name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
@@ -261,9 +267,9 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 	foreachib(Variable *p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
 		if (p->type == TypeFloat64)
-			add_cmd(Asm::INST_MOVSD, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+			cmd.add_cmd(Asm::INST_MOVSD, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
 		else
-			add_cmd(Asm::INST_MOVSS, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+			cmd.add_cmd(Asm::INST_MOVSS, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
 
 
 	}
@@ -274,17 +280,17 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 		int root = param_regs_root[i];
 		int preg = get_reg(root, p->type->size);
 		if (preg >= 0){
-			int v = add_virtual_reg(preg);
-			add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, v));
-			set_virtual_reg(v, cmd.num - 1, cmd.num - 1);
+			int v = cmd.add_virtual_reg(preg);
+			cmd.add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, v));
+			cmd.set_virtual_reg(v, cmd.cmd.num - 1, cmd.cmd.num - 1);
 		}else{
 			// some registers are not 8bit'able
-			int v = add_virtual_reg(get_reg(root, 4));
-			int va = add_virtual_reg(Asm::REG_EAX);
-			add_cmd(Asm::INST_MOV, param_vreg(TypeReg32, va), param_vreg(TypeReg32, v));
-			add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, va, get_reg(0, p->type->size)));
-			set_virtual_reg(v, cmd.num - 2, cmd.num - 2);
-			set_virtual_reg(va, cmd.num - 2, cmd.num - 1);
+			int v = cmd.add_virtual_reg(get_reg(root, 4));
+			int va = cmd.add_virtual_reg(Asm::REG_EAX);
+			cmd.add_cmd(Asm::INST_MOV, param_vreg(TypeReg32, va), param_vreg(TypeReg32, v));
+			cmd.add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, va, get_reg(0, p->type->size)));
+			cmd.set_virtual_reg(v, cmd.cmd.num - 2, cmd.cmd.num - 2);
+			cmd.set_virtual_reg(va, cmd.cmd.num - 2, cmd.cmd.num - 1);
 		}
 	}
 		
@@ -292,20 +298,20 @@ void SerializerAMD64::add_function_intro_params(Function *f)
 	foreachb(Variable *p, stack_param){
 		do_error("func with stack...");
 		/*int s = 8;
-		add_cmd(Asm::inst_push, p);
+		cmd.add_cmd(Asm::inst_push, p);
 		push_size += s;*/
 	}
 }
 
 void SerializerAMD64::add_function_outro(Function *f)
 {
-	add_cmd(Asm::INST_LEAVE);
-	add_cmd(Asm::INST_RET);
+	cmd.add_cmd(Asm::INST_LEAVE);
+	cmd.add_cmd(Asm::INST_RET);
 }
 
 //#define debug_evil_corrections
 
-void _test_param_mem(SerialNodeParam &p) {
+static void _test_param_mem(SerialNodeParam &p) {
 	//if (p.kind == NodeKind::ADDRESS)
 }
 

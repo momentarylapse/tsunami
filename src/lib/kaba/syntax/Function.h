@@ -56,7 +56,7 @@ public:
 	shared_array<Variable> var;
 	Array<const Class*> literal_param_type;
 	const Class *name_space;
-	const Class *return_type;
+	const Class *effective_return_type;
 	const Class *literal_return_type;
 	Flags flags;
 	bool auto_declared;

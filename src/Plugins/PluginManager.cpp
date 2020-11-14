@@ -790,6 +790,7 @@ void PluginManager::find_plugins() {
 	kaba::init();
 	kaba::config.show_compiler_stats = false;
 	kaba::config.compile_silently = true;
+	kaba::config.use_new_serializer = true;
 
 	// "AudioSource"
 #ifndef OS_WINDOWS

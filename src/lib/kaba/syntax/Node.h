@@ -112,9 +112,16 @@ public:
 	void set_num_params(int n);
 	void set_param(int index, shared<Node> p);
 	void set_instance(shared<Node> p);
+	void set_type(const Class *type);
 	string sig(const Class *ns) const;
 	string str(const Class *ns) const;
 	void show(const Class *ns) const;
+
+	shared<Node> shallow_copy() const;
+	shared<Node> ref(const Class *override_type = nullptr) const;
+	shared<Node> deref(const Class *override_type = nullptr) const;
+	shared<Node> shift(int64 shift, const Class *type) const;
+	shared<Node> deref_shift(int64 shift, const Class *type) const;
 };
 
 void clear_nodes(Array<Node*> &nodes);

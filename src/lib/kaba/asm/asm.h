@@ -317,6 +317,9 @@ enum {
 	INST_FLDS,
 	INST_FSTS,
 
+	// fake
+	INST_MODULO,
+
 	NUM_INSTRUCTION_NAMES
 };
 

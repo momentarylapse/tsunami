@@ -403,6 +403,8 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_FLDS,	"flds"},
 	{INST_FSTS,	"fsts"},
 	
+	{INST_MODULO, "modulo"},
+
 	{-1,			"???"}
 };
 

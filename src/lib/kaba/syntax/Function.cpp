@@ -44,7 +44,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	name = _name;
 	block = new Block(this, nullptr);
 	num_params = 0;
-	return_type = _return_type;
+	effective_return_type = _return_type;
 	literal_return_type = _return_type;
 	name_space = _name_space;
 	flags = _flags;
@@ -65,7 +65,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 #include "SyntaxTree.h"
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message) {
-	Set<Node*> nodes;
+	/*Set<Node*> nodes;
 	SyntaxTree::transform_node(root, [&](shared<Node> n) {
 		if (nodes.contains(n.get())) {
 			msg_error("node double..." + message);
@@ -74,7 +74,7 @@ void test_node_recursion(shared<Node> root, const Class *ns, const string &messa
 		} else {
 			nodes.add(n.get());
 		}
-		return n; });
+		return n; });*/
 }
 
 Function::~Function() {
@@ -100,7 +100,7 @@ void Function::show(const string &stage) const {
 	if (!config.allow_output(this, stage))
 		return;
 	auto ns = owner()->base_class;
-	msg_write("[function] " + return_type->cname(ns) + " " + cname(ns));
+	msg_write("[function] " + literal_return_type->cname(ns) + " " + cname(ns));
 	block->show(ns);
 }
 
@@ -153,8 +153,8 @@ void Function::update_parameters_after_parsing() {
 	// but only, if not existing yet...
 
 	// return by memory
-	if (return_type->uses_return_by_memory())
-		block->add_var(IDENTIFIER_RETURN_VAR, return_type->get_pointer());
+	if (literal_return_type->uses_return_by_memory())
+		block->add_var(IDENTIFIER_RETURN_VAR, literal_return_type->get_pointer());
 
 	// class function
 	if (!is_static()) {
@@ -165,7 +165,7 @@ void Function::update_parameters_after_parsing() {
 
 
 Function *Function::create_dummy_clone(const Class *_name_space) const {
-	Function *f = new Function(name, return_type, _name_space, flags);
+	Function *f = new Function(name, literal_return_type, _name_space, flags);
 	f->needs_overriding = true;
 
 	f->num_params = num_params;

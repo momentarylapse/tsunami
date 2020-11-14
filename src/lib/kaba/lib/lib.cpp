@@ -643,7 +643,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 
 	Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
 	sub->literal_return_type = t;
-	sub->return_type = t;
+	sub->effective_return_type= t;
 
 	// FIXME  wrong for complicated classes
 	if (p->is_simple_class()) {
@@ -798,6 +798,7 @@ CompilerConfiguration::CompilerConfiguration() {
 
 	allow_simplification = true;
 	allow_registers = true;
+	allow_simplify_consts = true;
 	stack_mem_align = 8;
 	function_align = 2 * pointer_size;
 	stack_frame_align = 2 * pointer_size;
@@ -810,6 +811,7 @@ CompilerConfiguration::CompilerConfiguration() {
 
 	compile_os = false;
 	remove_unused = false;
+	use_new_serializer = false;
 	override_variables_offset = false;
 	variables_offset = 0;
 	override_code_origin = false;
@@ -1011,7 +1013,7 @@ bool CompilerConfiguration::allow_output_func(const Function *f) {
 bool CompilerConfiguration::allow_output_stage(const string &stage) {
 	if (!verbose)
 		return false;
-	Array<string> filters = verbose_stage_filter.explode(",");
+	auto filters = verbose_stage_filter.explode(",");
 	for (auto &fil: filters)
 		if (stage.match(fil))
 			return true;

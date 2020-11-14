@@ -18,6 +18,11 @@ namespace kaba {
 
 bool _verbose_exception_ = false;
 
+static void dbo(const string &s) {
+	if (_verbose_exception_)
+		msg_write(s);
+}
+
 
 KabaException::KabaException(const string &message) {
 	text = message;
@@ -144,16 +149,13 @@ ExceptionBlockData get_blocks(shared<Script> s, Function *f, void* rip, const Cl
 		for (auto n: weak(b->parent->params)) {
 			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)) {
 				if (n->params[0]->as_block() == b) {
-					if (_verbose_exception_)
-						msg_write("found try block");
+					dbo("found try block");
 					for (int i=1; i<n->params.num; i+=2) {
 						auto ee = n->params[i].get();
-						if (_verbose_exception_)
-							msg_write(ee->type->name);
+						dbo(ee->type->name);
 						if (!ex_type_match(ex_type, ee->type))
 							continue;
-						if (_verbose_exception_)
-							msg_write("match");
+						dbo("match");
 						ebd.except = ee;
 						ebd.except_block = n->params[i+1]->as_block();
 						return ebd;
@@ -172,8 +174,7 @@ void* rbp2 = nullptr;
 
 void relink_return(void *rip, void *rbp, void *rsp) {
 #ifdef OS_LINUX
-	if (_verbose_exception_)
-		printf("relink to rip=%p, rbp=%p  rsp=%p\n", rip, rbp, rsp);
+	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
 	// ARGH....
 	asm volatile(	"mov %1, %%rsp\n\t"
 			"pop %%rbp\n\t" // pop rbp
@@ -243,12 +244,10 @@ Array<StackFrameInfo> get_stack_trace(void **rbp) {
 			r.rsp = rsp;
 			r.rbp = rbp;
 			trace.add(r);
-			if (_verbose_exception_)
-				msg_write(r.str());
+			dbo(r.str());
 
 		} else {
-			//if (_verbose_exception_)
-			//	msg_write("unknown function...: " + p2s(rip));
+			//dbo("unknown function...: " + p2s(rip));
 			break;
 		}
 	}
@@ -273,8 +272,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 		:
 		: );
 
-	if (_verbose_exception_)
-		msg_error("raise...");
+	dbo("raise...");
 
 //	printf("rbp=%p   rsp=%p    local=%p\n", rbp, rsp, &rsp);
 
@@ -291,19 +289,21 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 
 	for (auto r: trace) {
 
-		if (_verbose_exception_)
-			msg_write(r.str());
+		dbo(r.str());
 		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
 
 		for (Block *b: ebd.needs_killing) {
-			if (_verbose_exception_)
-				msg_write("  block " + p2s(b));
+			dbo("  block " + p2s(b));
 			for (Variable *v: b->vars) {
+				// for now, ignore temporary variables...
+				if (v->name.head(1) == "-")
+					continue;
+
 				char *p = (char*)r.rbp + v->_offset;
-				if (_verbose_exception_)
-					msg_write("   " + v->type->name + " " + v->name + "  " + p2s(p));
+				dbo("   " + v->type->name + " " + v->name + "  " + p2s(p));
 				auto cf = v->type->get_destructor();
 				if (cf) {
+					dbo("call destr: " + cf->long_name());
 					typedef void con_func(void *);
 					con_func * f = (con_func*)cf->address;
 					if (f) {
@@ -313,8 +313,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 			}
 		}
 		if (ebd.except_block) {
-			if (_verbose_exception_)
-				msg_write("except_block block: " + p2s(ebd.except_block));
+			dbo("except_block block: " + p2s(ebd.except_block));
 
 			if (ebd.except->params.num > 0) {
 				auto v = ebd.except_block->vars[0];

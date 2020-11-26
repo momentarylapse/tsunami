@@ -106,6 +106,9 @@ public:
 	void assemble_cmd_arm(SerialNode &c);
 	void add_function_intro_frame(int stack_alloc_size);
 
+	Array<int> func_param_virts;
+	void mark_regs_busy_at_call(int index);
+	void extend_reg_usage_to_call(int index);
 
 	struct GlobalRef {
 		int label;

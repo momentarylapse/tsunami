@@ -1,22 +1,14 @@
 
-#ifndef SERIALIZER_H_
-#define SERIALIZER_H_
+#pragma once
+
+#include "CommandList.h"
+#include "SerialNode.h"
 
 namespace kaba
 {
 
 class Serializer;
 
-
-#define max_reg			8 // >= all RegXXX used...
-
-// represents a register
-// (or rather the data inside, since many VirtualRegisters might be mapped to the same physical register)
-struct VirtualRegister {
-	int reg;
-	int reg_root;
-	int first, last;
-};
 
 // high level instructions
 enum {
@@ -27,68 +19,6 @@ enum {
 struct LoopData {
 	int marker_continue, marker_break;
 	int level, index;
-};
-
-
-struct SerialNodeParam {
-	NodeKind kind;
-	int64 p;
-	int virt; // virtual register (if p represents a physical register)
-	const Class *type;
-	int shift;
-	//int c_id, v_id;
-	bool operator == (const SerialNodeParam &param) const
-	{	return (kind == param.kind) and (p == param.p) and (type == param.type) and (shift == param.shift);	}
-	string str(Serializer *ser) const;
-	const Class* get_type_save() const
-	{	return type ? type : TypeVoid;	}
-};
-extern const SerialNodeParam p_none;
-
-#define SERIAL_NODE_NUM_PARAMS	3
-
-struct SerialNode {
-	int inst;
-	int cond;
-	SerialNodeParam p[SERIAL_NODE_NUM_PARAMS];
-	int index;
-	string str(Serializer *ser) const;
-};
-
-struct TempVar {
-	const Class *type;
-	int first, last, usage_count;
-	bool mapped;
-	bool referenced;
-	bool force_stack;
-	int stack_offset;
-	int entangled;
-	void use(int first, int last);
-};
-
-struct CommandList {
-	Array<SerialNode> cmd;
-	Array<VirtualRegister> virtual_reg;
-	Array<TempVar> temp_var;
-	int next_cmd_index = 0;
-	Serializer *ser = nullptr;
-
-	//void add_reg_channel(int reg, int first, int last);
-	int add_virtual_reg(int reg);
-	void set_virtual_reg(int v, int first, int last);
-	void use_virtual_reg(int v, int first, int last);
-	SerialNodeParam _add_temp(const Class *t);
-	void add_cmd(int cond, int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
-	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
-	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2);
-	void add_cmd(int inst, const SerialNodeParam &p);
-	void add_cmd(int inst);
-	void set_cmd_param(SerialNode &c, int param_index, const SerialNodeParam &p);
-	void next_cmd_target(int index);
-	void remove_cmd(int index);
-	void remove_temp_var(int v);
-	void move_param(SerialNodeParam &p, int from, int to);
-	int add_marker(int m = -1);
 };
 
 
@@ -213,20 +143,6 @@ public:
 	static int get_reg(int root, int size);
 };
 
-SerialNodeParam param_shift(const SerialNodeParam &param, int shift, const Class *t);
-SerialNodeParam param_global(const Class *type, void *v);
-SerialNodeParam param_local(const Class *type, int offset);
-SerialNodeParam param_imm(const Class *type, int64 c);
-SerialNodeParam param_marker(const Class *type, int m);
-SerialNodeParam param_marker32(int m);
-SerialNodeParam param_deref_marker(const Class *type, int m);
-SerialNodeParam param_preg(const Class *type, int reg);
-SerialNodeParam param_deref_preg(const Class *type, int reg);
-SerialNodeParam param_lookup(const Class *type, int ref);
-SerialNodeParam param_deref_lookup(const Class *type, int ref);
-SerialNodeParam deref_temp(const SerialNodeParam &param, const Class *type);
-
 
 };
 
-#endif /* SERIALIZER_H_ */

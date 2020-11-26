@@ -421,8 +421,6 @@ void SIAddPackageVulkan() {
 		func_add_param("signal_sem", TypeSemaphorePList);
 		func_add_param("fence", TypeFence);
 	add_funcx("wait_device_idle", TypeVoid, vul_p(&vulkan::wait_device_idle), Flags::STATIC);
-	add_funcx("_rtx_init", TypeVoid, vul_p(&vulkan::rtx_init), Flags::STATIC);
-	add_funcx("_rtx_step", TypeVoid, vul_p(&vulkan::rtx_step), Flags::STATIC);
 
 }
 

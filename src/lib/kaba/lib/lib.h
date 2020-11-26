@@ -435,6 +435,8 @@ public:
 	int function_align;
 	int stack_frame_align;
 
+	int function_address_offset;
+
 };
 
 extern CompilerConfiguration config;

@@ -74,7 +74,7 @@ void SerializerX::add_pointer_call(const SerialNodeParam &pointer, const Array<S
 	if (config.compile_os)
 		cmd.add_cmd(Asm::INST_MOV, t1, pointer); // function pointer
 	else
-		cmd.add_cmd(Asm::INST_ADD, t1, pointer, param_imm(TypeInt, offsetof(Function, address))); // function pointer
+		cmd.add_cmd(Asm::INST_ADD, t1, pointer, param_imm(TypeInt, config.function_address_offset)); // function pointer
 	cmd.add_cmd(Asm::INST_CALL, ret, deref_temp(t1, TypeFunctionCodeP)); // the actual call
 
 	fc_end(push_size, ret);

@@ -811,13 +811,15 @@ CompilerConfiguration::CompilerConfiguration() {
 
 	compile_os = false;
 	remove_unused = false;
-	use_new_serializer = false;
+	use_new_serializer = true;
 	override_variables_offset = false;
 	variables_offset = 0;
 	override_code_origin = false;
 	code_origin = 0;
 	add_entry_point = false;
 	no_function_frame = false;
+
+	function_address_offset = element_offset(&Function::address); // offsetof(Function, address);
 }
 
 void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {

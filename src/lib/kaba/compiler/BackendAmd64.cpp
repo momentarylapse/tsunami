@@ -7,6 +7,8 @@
 
 #include "BackendAmd64.h"
 #include "serializer.h"
+#include "CommandList.h"
+#include "SerialNode.h"
 #include "../../file/msg.h"
 
 namespace kaba {
@@ -285,6 +287,7 @@ void BackendAmd64::correct_implement_commands() {
 			cmd.remove_cmd(i);
 			i --;
 		} else if (c.inst == Asm::INST_CALL) {
+
 			if (c.p[1].type == TypeFunctionCodeP) {
 				//serializer->do_error("indirect call...");
 				auto fp = c.p[1];
@@ -432,11 +435,8 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 	} else {
 		serializer->do_error_link("could not link function " + f->signature());
 	}
-	// call violates all used registers...
-	for (int i=0;i<map_reg_root.num;i++) {
-		int v = cmd.add_virtual_reg(get_reg(i, 4));
-		cmd.use_virtual_reg(v, cmd.cmd.num-1, cmd.cmd.num-1);
-	}
+	extend_reg_usage_to_call(cmd.next_cmd_index - 1);
+	mark_regs_busy_at_call(cmd.next_cmd_index - 1);
 
 	fc_end(push_size, params, ret);
 }
@@ -447,6 +447,8 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 
 	insert_cmd(Asm::INST_MOV, p_rax, fp);
 	insert_cmd(Asm::INST_CALL, p_rax);
+	extend_reg_usage_to_call(cmd.next_cmd_index - 1);
+	mark_regs_busy_at_call(cmd.next_cmd_index - 1);
 
 	fc_end(push_size, params, ret);
 }
@@ -513,7 +515,7 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 			insert_cmd(Asm::INST_MOVSS, param_preg(TypeReg128, reg), p);
 	}
 
-	Array<int> virts;
+	func_param_virts = {};
 
 	// rdi, rsi, rdx, rcx, r8, r9
 	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
@@ -522,23 +524,32 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 		int preg = get_reg(root, p.type->size);
 		if (preg >= 0) {
 			int v = cmd.add_virtual_reg(preg);
-			virts.add(v);
+			func_param_virts.add(v);
 			insert_cmd(Asm::INST_MOV, param_vreg(p.type, v), p);
 		} else {
 			// some registers are not 8bit'able
 			int v = cmd.add_virtual_reg(get_reg(root, 4));
-			virts.add(v);
+			func_param_virts.add(v);
 			int va = cmd.add_virtual_reg(Asm::REG_EAX);
 			insert_cmd(Asm::INST_MOV, param_vreg(p.type, va, Asm::REG_AL), p);
 			insert_cmd(Asm::INST_MOV, param_vreg(TypeReg32, v), param_vreg(TypeReg32, va));
 		}
 	}
 
-	// extend reg channels to call
-	for (int v: virts)
-		cmd.use_virtual_reg(v, cmd.next_cmd_index-1, cmd.next_cmd_index);
-
 	return push_size;
+}
+
+void BackendAmd64::mark_regs_busy_at_call(int index) {
+	// call violates all used registers...
+	for (int i=0;i<map_reg_root.num;i++) {
+		int v = cmd.add_virtual_reg(get_reg(i, 4));
+		cmd.use_virtual_reg(v, index, index);
+	}
+}
+
+void BackendAmd64::extend_reg_usage_to_call(int index) {
+	for (int v: func_param_virts)
+		cmd.use_virtual_reg(v, index, index);
 }
 
 SerialNodeParam BackendAmd64::param_vreg(const Class *type, int vreg, int preg) {
@@ -596,7 +607,8 @@ int BackendAmd64::find_unused_reg(int first, int last, int size, int exclude) {
 			if (!is_reg_root_used_in_interval(r, first, last)) {
 				return cmd.add_virtual_reg(get_reg(r, size));
 			}
-	serializer->cmd_list_out("fur", "find unused reg");
+	serializer->cmd_list_out("fur", "find unused reg", true);
+	msg_write(serializer->cur_func->long_name());
 	serializer->do_error(format("no free register of size %d   in %d:%d", size, first, last));
 	return -1;
 }

@@ -52,6 +52,11 @@ Flags flags_mix(const Array<Flags> &f);
 
 class Function;
 
+template<class T>
+int element_offset(T p) {
+	return *(int*)(void*)&p;
+}
+
 void add_package(const string &name, Flags = Flags::NONE);
 const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *parent = nullptr);
 const Class *add_type_p(const Class *sub_type, Flags = Flags::NONE, const string &name = "");
@@ -70,7 +75,7 @@ Class *add_class(const Class *root_type);
 void class_add_element(const string &name, const Class *type, int offset, Flags flag = Flags::NONE);
 template<class T>
 void class_add_elementx(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
-	class_add_element(name, type, *(int*)(void*)&p, flag);
+	class_add_element(name, type, element_offset(p), flag);
 }
 Function* class_add_func(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
 template<class T>

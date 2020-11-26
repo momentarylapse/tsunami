@@ -392,8 +392,10 @@ Grid ? '' vertical
 		string frag = SOURCE[type]
 		
 		shader = Shader.create("
+<Layout>
+	version = 330 core
+</Layout>
 <VertexShader>
-#version 330 core
 layout(location = 0) in vec3 inPosition;
 layout(location = 2) in vec2 inTexCoord;
 out vec2 fragmentTexCoord;
@@ -403,7 +405,6 @@ void main() {
 }
 </VertexShader>
 <FragmentShader>
-#version 330 core
 in vec2 fragmentTexCoord;
 out vec4 color;
 

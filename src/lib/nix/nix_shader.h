@@ -69,6 +69,7 @@ public:
 
 	static Shader* _cdecl load(const Path &filename);
 	static Shader* _cdecl create(const string &source);
+	void _cdecl update(const string &source);
 };
 
 

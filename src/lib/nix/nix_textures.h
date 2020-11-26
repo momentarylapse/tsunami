@@ -54,6 +54,8 @@ public:
 	void _cdecl write_float(Array<float> &data, int nx, int ny, int nz);
 	void _cdecl reload();
 	void _cdecl unload();
+
+	void _cdecl set_options(const string &op);
 };
 
 class ImageTexture : public Texture {

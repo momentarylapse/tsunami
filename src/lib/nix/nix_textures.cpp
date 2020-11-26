@@ -424,6 +424,21 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 	}
 }
 
+void Texture::set_options(const string &op) {
+	if (op == "wrap=repeat") {
+		glBindTexture(0, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	} else if (op == "wrap=clamp") {
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	} else {
+		msg_error("unknown option: " + op);
+	}
+	TestGLError("Texture.set_options");
+}
+
 void Texture::overwrite(const Image &image) {
 	OverwriteTexture__(this, GL_TEXTURE_2D, GL_TEXTURE_2D, image);
 }

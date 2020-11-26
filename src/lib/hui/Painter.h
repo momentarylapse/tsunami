@@ -26,6 +26,7 @@ class Painter : public ::Painter {
 	PangoLayout *layout;
 	PangoFontDescription *font_desc;
 	cairo_surface_t *target_surface;
+	float _initial_offset_x, _initial_offset_y;
 #endif
 	Window *win;
 	string id;

@@ -78,25 +78,8 @@ bool Configuration::has(const string& name) const {
 	return map.find(name) >= 0;
 }
 
-static string strip(const string &s) {
-	int first = 0;
-	int last = s.num;
-	for (int i=0; i<s.num; i++)
-		if (s[i] == ' ') {
-			first = i+1;
-		} else {
-			break;
-		}
-	for (int i=s.num-1; i>=first; i--)
-		if (s[i] != ' ') {
-			last = i;
-			break;
-		}
-	return s.substr(first, last + 1 - first);
-}
-
 static string _parse_value(const string &s) {
-	string r = strip(s);
+	string r = s.trim();
 	if (r.head(1) == "\"" and r.tail(1) == "\"")
 		return r.substr(1, r.num-2).unescape();
 	if (r.head(1) == "\'" and r.tail(1) == "\'")

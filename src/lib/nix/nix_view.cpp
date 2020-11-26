@@ -67,14 +67,14 @@ FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
 		TestGLError("DepthTexture: glReadBuffer");
 	}
 
+	Array<GLenum> draw_buffers;
 	foreachi (Texture *t, color_attachments, i) {
-
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, t->texture, 0);
 		TestGLError("FrameBuffer: glFramebufferTexture");
-		GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0 + (unsigned)i};
-		glDrawBuffers(1, draw_buffers);
-		TestGLError("FrameBuffer: glDrawBuffers");
+		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);
 	}
+	glDrawBuffers(draw_buffers.num, &draw_buffers[0]);
+	TestGLError("FrameBuffer: glDrawBuffers");
 
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)

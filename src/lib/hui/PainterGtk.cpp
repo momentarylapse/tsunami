@@ -29,6 +29,8 @@ Painter::Painter() {
 	cur_font = "";
 	font_size = 16;
 	corner_radius = 0;
+	_initial_offset_x = 0;
+	_initial_offset_y = 0;
 }
 
 Painter::Painter(Panel *panel, const string &_id) {
@@ -52,6 +54,12 @@ Painter::Painter(Panel *panel, const string &_id) {
 		width = gdk_window_get_width(gtk_widget_get_window(c->widget));
 		height = gdk_window_get_height(gtk_widget_get_window(c->widget));
 		set_font("Sans", 16, false, false);
+
+		// might be translated already
+		cairo_matrix_t m;
+		cairo_get_matrix(cr, &m);
+		_initial_offset_x = m.x0;
+		_initial_offset_y = m.y0;
 	}
 }
 
@@ -305,8 +313,6 @@ void Painter::set_fill(bool fill) {
 void Painter::set_transform(float *rot, const complex &offset) {
 	cairo_matrix_t m;
 
-	// might be translated already
-	cairo_get_matrix(cr, &m);
 
 	if (rot) {
 		m.xx = rot[0];
@@ -314,8 +320,8 @@ void Painter::set_transform(float *rot, const complex &offset) {
 		m.yx = rot[2];
 		m.yy = rot[3];
 	}
-	m.x0 += offset.x;
-	m.y0 += offset.y;
+	m.x0 = offset.x + _initial_offset_x;
+	m.y0 = offset.y + _initial_offset_y;
 	cairo_set_matrix(cr, &m);
 }
 

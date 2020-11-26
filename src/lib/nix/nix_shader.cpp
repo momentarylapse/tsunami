@@ -14,6 +14,9 @@ namespace nix{
 
 Path shader_dir;
 
+const int TYPE_LAYOUT = -41;
+const int TYPE_MODULE = -42;
+
 
 Shader *default_shader_2d = NULL;
 Shader *default_shader_3d = NULL;
@@ -72,6 +75,16 @@ struct ShaderSourcePart {
 	string source;
 };
 
+struct ShaderMetaData {
+	string version, name;
+};
+
+struct ShaderModule {
+	ShaderMetaData meta;
+	string source;
+};
+static Array<ShaderModule> shader_modules;
+
 Array<ShaderSourcePart> get_shader_parts(const string &source) {
 	Array<ShaderSourcePart> parts;
 	int pos = 0;
@@ -106,8 +119,10 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 			p.type = GL_TESS_EVALUATION_SHADER;
 		} else if (tag == "GeometryShader") {
 			p.type = GL_GEOMETRY_SHADER;
+		} else if (tag == "Module") {
+			p.type = TYPE_MODULE;
 		} else if (tag == "Layout") {
-			continue;
+			p.type = TYPE_LAYOUT;
 		} else {
 			msg_error("unknown shader tag: '" + tag + "'");
 			continue;
@@ -129,7 +144,37 @@ string get_inside_of_tag(const string &source, const string &tag) {
 	return source.substr(pos0, pos1 - pos0);
 }
 
-int create_gl_shader(const string &source, int type) {
+string expand_shader_source(const string &source, ShaderMetaData &meta) {
+	string r = source;
+	while (true) {
+		int p = r.find("#import", 0);
+		if (p < 0)
+			break;
+		int p2 = r.find("\n", p);
+		string imp = r.substr(p + 7, p2 - p - 7).replace(" ", "");
+		//msg_error("import '" + imp + "'");
+
+		bool found = false;
+		for (auto &m: shader_modules)
+			if (m.meta.name == imp) {
+				//msg_error("FOUND");
+				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.substr(p2, -1);
+				found = true;
+			}
+		if (!found)
+			throw Exception(format("shader import '%s' not found", imp));
+	}
+
+	string intro;
+	if (meta.version != "")
+		intro += "#version " + meta.version + "\n";
+	if (r.find("GL_ARB_separate_shader_objects", 0) < 0)
+		intro += "#extension GL_ARB_separate_shader_objects : enable\n";
+	return intro + r;
+}
+
+int create_gl_shader(const string &_source, int type, ShaderMetaData &meta) {
+	string source = expand_shader_source(_source, meta);
 	if (source.num == 0)
 		return -1;
 	int gl_shader = glCreateShader(type);
@@ -160,7 +205,23 @@ int create_gl_shader(const string &source, int type) {
 	return gl_shader;
 }
 
-Shader *Shader::create(const string &source) {
+ShaderMetaData parse_meta(string source) {
+	ShaderMetaData m;
+	for (auto &x: source.explode("\n")) {
+		auto y = x.explode("=");
+		if (y.num == 2) {
+			string k = y[0].trim();
+			string v = y[1].trim();
+			if (k == "name")
+				m.name = v;
+			else if (k == "version")
+				m.version = v;
+		}
+	}
+	return m;
+}
+
+void Shader::update(const string &source) {
 	auto parts = get_shader_parts(source);
 
 	if (parts.num == 0)
@@ -169,12 +230,24 @@ Shader *Shader::create(const string &source) {
 	int prog = create_empty_shader_program();
 
 	Array<int> shaders;
+	ShaderMetaData meta;
 	for (auto p: parts) {
-		int shader = create_gl_shader(p.source, p.type);
-		shaders.add(shader);
-		if (shader >= 0)
-			glAttachShader(prog, shader);
-		TestGLError("AddShader attach");
+		if (p.type == TYPE_MODULE) {
+			ShaderModule m;
+			m.source = p.source;
+			m.meta = meta;
+			shader_modules.add(m);
+			msg_write("new module '" + m.meta.name + "'");
+			return;
+		} else if (p.type == TYPE_LAYOUT) {
+			meta = parse_meta(p.source);
+		} else {
+			int shader = create_gl_shader(p.source, p.type, meta);
+			shaders.add(shader);
+			if (shader >= 0)
+				glAttachShader(prog, shader);
+			TestGLError("AddShader attach");
+		}
 	}
 
 	int status;
@@ -194,13 +267,26 @@ Shader *Shader::create(const string &source) {
 		glDeleteShader(shader);
 	TestGLError("DeleteShader");
 
-	Shader *s = new Shader;
-	s->program = prog;
+	program = prog;
 	shader_error = "";
 
-	s->find_locations();
+	find_locations();
 
 	TestGLError("CreateShader");
+}
+Shader *Shader::create(const string &source) {
+	Shader *s = new Shader;
+	try {
+		s->update(source);
+		/*if (s->program < 0) {
+			// module
+			//delete s;
+			return nullptr;
+		}*/
+	} catch (...) {
+		delete s;
+		throw;
+	}
 	return s;
 }
 
@@ -270,8 +356,9 @@ Shader::Shader() {
 
 Shader::~Shader() {
 	msg_write("delete shader: " + filename.str());
-	glDeleteProgram(program);
-	TestGLError("NixUnrefShader");
+	if (program >= 0)
+		glDeleteProgram(program);
+	TestGLError("glDeleteProgram");
 	program = -1;
 }
 
@@ -285,7 +372,8 @@ void Shader::unref() {
 	if ((reference_count <= 0) and (program >= 0)) {
 		if ((this == default_shader_3d) or (this == default_shader_2d))
 			return;
-		glDeleteProgram(program);
+		if (program >= 0)
+			glDeleteProgram(program);
 		TestGLError("NixUnrefShader");
 		program = -1;
 		filename = Path::EMPTY;
@@ -444,14 +532,20 @@ void init_shaders() {
 		"out vec4 out_color;\n"
 		"\n"
 		"vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {\n"
-		"	vec3 L = (matrix.model * vec4(l.dir.xyz, 0)).xyz;\n"
-		"	float d = max(-dot(n, L), 0);\n"
+		"	float attenuation = 1.0;\n"
+		"	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;\n"
+		"	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;\n"
+		"	if (l.radius > 0) {\n"
+		"		LD = normalize(in_pos - LP);\n"
+		"		attenuation = min(l.radius / length(in_pos - LP), 1);\n"
+		"	}\n"
+		"	float d = max(-dot(n, LD), 0) * attenuation;\n"
 		"	vec4 color = material.diffusive * material.ambient * l.color * (1 - l.harshness) / 2;\n"
 		"	color += material.diffusive * l.color * l.harshness * d;\n"
 		"	color *= tex_col;\n"
 		"	if ((d > 0) && (material.shininess > 1)) {\n"
 		"		vec3 e = normalize(in_pos); // eye dir\n"
-		"		vec3 rl = reflect(L, n);\n"
+		"		vec3 rl = reflect(LD, n);\n"
 		"		float ee = max(-dot(e, rl), 0);\n"
 		"		color += material.specular * l.color * l.harshness * pow(ee, material.shininess);\n"
 		"	}\n"

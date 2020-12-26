@@ -79,6 +79,8 @@ void TestGLError(const char *pos) {
 		msg_error("GL_INVALID_FRAMEBUFFER_OPERATION at " + string(pos));
 	else
 		msg_error(i2s(err) + " at " + string(pos));
+	if (err != GL_NO_ERROR)
+		throw Exception("OpenGL error");
 #endif
 }
 

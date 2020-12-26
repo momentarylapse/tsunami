@@ -47,7 +47,7 @@
 #include <math.h>
 #include "../base/base.h"
 #include "../file/file.h"
-#include "../hui/hui.h"
+//#include "../hui/hui.h"
 #include "../math/math.h"
 
 

@@ -10,6 +10,8 @@
 #ifndef _NIX_VIEW_EXISTS_
 #define _NIX_VIEW_EXISTS_
 
+class Image;
+
 namespace nix{
 
 class Texture;
@@ -41,6 +43,8 @@ public:
 	~FrameBuffer();
 	void __init__(const Array<Texture*> &attachments);
 	void __delete__();
+	void update(const Array<Texture*> &attachments);
+	void update_x(const Array<Texture*> &attachments, int cube_face);
 	Array<Texture*> color_attachments;
 	DepthBuffer *depth_buffer;
 	unsigned int frame_buffer;

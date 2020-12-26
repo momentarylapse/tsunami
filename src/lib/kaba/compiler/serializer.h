@@ -131,7 +131,7 @@ public:
 	SerialNodeParam p_eax, p_eax_int, p_deref_eax;
 	SerialNodeParam p_rax;
 	SerialNodeParam p_ax, p_al, p_al_bool, p_al_char;
-	SerialNodeParam p_st0, p_st1, p_xmm0, p_xmm1;
+	SerialNodeParam p_xmm0, p_xmm1;
 
 
 	SerialNodeParam param_vreg(const Class *type, int vreg, int preg = -1);

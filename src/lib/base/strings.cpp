@@ -195,12 +195,12 @@ void string::_replace0(int start, int length, const string &str) {
 	if (d > 0) {
 		resize(num + d);
 		s = (unsigned char*)data;
-		for (int i=num-1;i>=start+length;i--)
+		for (int i=num-1; i>=start+str.num; i--)
 			s[i] = s[i - d];
 	}
 	memcpy(&s[start], str.data, str.num);
 	if (d < 0) {
-		for (int i=start+str.num;i<num+d;i++)
+		for (int i=start+str.num; i<num+d; i++)
 			s[i] = s[i - d];
 		resize(num + d);
 	}

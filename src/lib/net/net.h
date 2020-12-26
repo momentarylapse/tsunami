@@ -12,20 +12,20 @@
 
 
 #include "../base/base.h"
+#include "../base/pointer.h"
 
 class vector;
 
-class SocketException
-{
+class SocketError : public Exception {
+public:
+	SocketError() : Exception() {}
+	SocketError(const string &msg) : Exception(msg) {}
 };
 
-class SocketConnectionLostException : public SocketException
-{
-};
+class SocketConnectionLostException : public SocketError {};
 
 
-class NetAddress
-{
+class NetAddress {
 public:
 	string host;
 	int port;
@@ -34,46 +34,94 @@ public:
 	void __delete__();
 };
 
-class Socket
-{
+class BinaryBuffer {
 public:
-	Socket(int type);
-	~Socket();
+	BinaryBuffer();
 
-	bool _create(int port, bool block);
-	bool _connect(const string &addr,int port);
+	string data;
+	int pos;
+	void set_pos(int pos);
+	int get_pos();
+	void clear();
 
-	Socket *accept();
-	void close();
-	void setBlocking(bool blocking);
-	bool isConnected();
+	void read(void *p, int size);
 
-	// send / receive directly
-	string read();
-	bool write(const string &buf);
-	bool canWrite();
-	bool canRead();
-
-	// buffered read
+	// read
 	void operator>>(int &i);
 	void operator>>(float &f);
 	void operator>>(bool &b);
 	void operator>>(char &c);
 	void operator>>(string &s);
 	void operator>>(vector &v);
-	void _read_buffered_(void *p, int size);
-	void setBufferPos(int pos);
-	int getBufferPos();
-	void clearBuffer();
 
-	// buffered write
+	// write
 	void operator<<(int i);
 	void operator<<(float f);
 	void operator<<(bool b);
 	void operator<<(char c);
 	void operator<<(const string &s);
 	void operator<<(const vector &v);
-	bool writeBuffer();
+};
+
+class Socket : public Sharable<Empty> {
+public:
+	enum class Type {
+		DUMMY,
+		TCP,
+		UDP
+	};
+
+	Socket(Type type);
+	~Socket();
+
+	void _create();
+	void _bind(int port);
+	void _listen();
+	void _connect(const string &addr, int port);
+
+	Socket *accept();
+	void close();
+	void set_blocking(bool blocking);
+	bool is_connected();
+
+	BinaryBuffer buffer;
+
+	// send / receive directly
+	string read();
+	bool write(const string &buf);
+	bool can_write();
+	bool can_read();
+	bool read_buffer(int size);
+
+	void _read_buffered_(void *p, int size);
+	bool write_buffer();
+
+
+
+	void set_buffer_pos(int pos);
+	int get_buffer_pos();
+	void clear_buffer();
+
+	// argh...
+	int block_pos;
+	void start_block();
+	void end_block();
+
+	// read
+	void operator>>(int &i);
+	void operator>>(float &f);
+	void operator>>(bool &b);
+	void operator>>(char &c);
+	void operator>>(string &s);
+	void operator>>(vector &v);
+
+	// write
+	void operator<<(int i);
+	void operator<<(float f);
+	void operator<<(bool b);
+	void operator<<(char c);
+	void operator<<(const string &s);
+	void operator<<(const vector &v);
 
 	// kaba interface
 	void __init__();
@@ -81,29 +129,25 @@ public:
 
 	int uid;
 	int s;
-	int type;
-	string buffer;
-	int buffer_pos;
+	Type type;
 	bool last_op_reading;
 
 	// udp
-	void setTarget(NetAddress &target);
-	NetAddress getSender();
+	void set_target(NetAddress &target);
+	NetAddress get_sender();
 	NetAddress target;
 	NetAddress sender;
 
-	static const int TYPE_DUMMY;
-	static const int TYPE_TCP;
-	static const int TYPE_UDP;
+
+
+	static Socket *listen(int port, bool block);
+	static Socket *connect(const string &host, int port);
+	static Socket *create_udp(int port);
 };
 
 void NetInit();
 
-Socket *NetListen(int port, bool block);
-Socket *NetConnect(const string &host, int port);
-Socket *NetCreateUDP(int port);
-
 // ...
-bool NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment, string &return_msg);
+void NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment);
 
 #endif

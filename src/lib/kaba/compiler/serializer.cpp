@@ -7,6 +7,7 @@
 
 #include "SerializerX.h"
 #include "BackendAmd64.h"
+#include "BackendX86.h"
 
 
 namespace kaba {
@@ -1809,8 +1810,6 @@ Serializer::Serializer(Script *s, Asm::InstructionWithParamsList *_list) {
 	p_al = param_preg(TypeReg8, Asm::REG_AL);
 	p_al_bool = param_preg(TypeBool, Asm::REG_AL);
 	p_al_char = param_preg(TypeChar, Asm::REG_AL);
-	p_st0 = param_preg(TypeFloat32, Asm::REG_ST0);
-	p_st1 = param_preg(TypeFloat32, Asm::REG_ST1);
 	p_xmm0 = param_preg(TypeReg128, Asm::REG_XMM0);
 	p_xmm1 = param_preg(TypeReg128, Asm::REG_XMM1);
 }
@@ -1847,6 +1846,16 @@ int check_needed(SyntaxTree *tree, Function *f) {
 	return ref_count;
 }
 
+Backend *create_backend(SerializerX *s) {
+	if (config.instruction_set == Asm::InstructionSet::AMD64)
+		return new BackendAmd64(s);
+	if (config.instruction_set == Asm::InstructionSet::X86)
+		return new BackendX86(s);
+//	if (config.instruction_set == Asm::InstructionSet::ARM)
+//		return new BackendARM(s);
+	return nullptr;
+}
+
 void Script::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
 	if (config.verbose and config.allow_output(f, "asm"))
 		msg_write("serializing " + f->long_name() + " -------------------");
@@ -1868,7 +1877,7 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 		x->cur_func_index = index;
 		x->serialize_function(f);
 		x->fix_return_by_ref();
-		auto be = new BackendAmd64(x);
+		auto be = create_backend(x);
 		be->process(f, index);
 
 		try {
@@ -1885,7 +1894,7 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 
 	} else {
 
-		Serializer *d = CreateSerializer(this, list);
+		auto *d = CreateSerializer(this, list);
 
 		try {
 			d->cur_func_index = index;
@@ -1936,16 +1945,18 @@ void Script::compile_functions(char *oc, int &ocs) {
 	//	list->show();
 
 	// assemble into opcode
-	try{
+	try {
 		list->optimize(oc, ocs);
 		list->compile(oc, ocs);
-	}catch(Asm::Exception &e) {
+	} catch(Asm::Exception &e) {
+		list->show();
 		Function *f = nullptr;
 		for (int i=0; i<func_offset.num; i++)
 			if (e.line >= func_offset[i] and e.line < func_offset[i+1]) {
 				f = syntax->functions[i];
 				break;
 			}
+		msg_write(f->long_name());
 		throw Exception(e, this, f);
 	}
 

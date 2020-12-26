@@ -465,6 +465,7 @@ void x86_init()
 	add_inst(INST_MOVSX,	0xbf0f,	2,	-1,	Gw,	Ew, OPT_SMALL_PARAM);
 	add_inst(INST_MOVSX,	0xbf0f,	2,	-1,	Gd,	Ew, OPT_MEDIUM_PARAM);
 	add_inst(INST_MOVSX,	0xbf0f,	2,	-1,	Gq,	Ew, OPT_BIG_PARAM);
+	add_inst(INST_MOVSXD,	0x63,	1,	-1,	Gq,	Ed, OPT_BIG_PARAM);
 	add_inst(INST_ADC,	0x10	,1	,-1	,Eb	,Gb);
 	add_inst(INST_ADC,	0x11,	1,	-1,	Ew,	Gw, OPT_SMALL_PARAM);
 	add_inst(INST_ADC,	0x11,	1,	-1,	Ed,	Gd, OPT_MEDIUM_PARAM);

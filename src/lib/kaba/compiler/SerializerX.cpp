@@ -306,12 +306,13 @@ void SerializerX::serialize_inline_function(Node *com, const Array<SerialNodePar
 		case InlineID::FLOAT_TO_INT:
 			cmd.add_cmd(Asm::INST_CVTTSS2SI, ret, param[0]);
 			break;
-/*		case InlineID::FLOAT_TO_INT:{
-			int veax = add_virtual_reg(Asm::REG_EAX);
-			cmd.add_cmd(Asm::INST_MOVSS, p_xmm0, param[0]);
-			cmd.add_cmd(Asm::INST_CVTTSS2SI, param_vreg(TypeInt, veax), p_xmm0);
-			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(TypeInt, veax));
-			}break;
+		case InlineID::FLOAT_TO_FLOAT64:
+			cmd.add_cmd(Asm::INST_CVTSS2SD, ret, param[0]);
+			break;
+		case InlineID::FLOAT64_TO_FLOAT:
+			cmd.add_cmd(Asm::INST_CVTSD2SS, ret, param[0]);
+			break;
+/*
 		case InlineID::FLOAT_TO_FLOAT64:
 			cmd.add_cmd(Asm::INST_CVTSS2SD, p_xmm0, param[0]);
 			cmd.add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
@@ -637,19 +638,19 @@ void SerializerX::serialize_inline_function(Node *com, const Array<SerialNodePar
 // vector
 		case InlineID::VECTOR_ADD_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::INST_FADD, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::INST_FADD, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
 		case InlineID::VECTOR_MULTIPLY_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::INST_FMUL, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::INST_FMUL, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
 		case InlineID::VECTOR_DIVIDE_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::INST_FDIV, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::INST_FDIV, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
 		case InlineID::VECTOR_SUBTARCT_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::INST_FSUB, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::INST_FSUB, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
 		case InlineID::VECTOR_ADD:
 			for (int i=0;i<3;i++)

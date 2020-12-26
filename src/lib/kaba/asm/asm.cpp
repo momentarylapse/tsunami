@@ -157,6 +157,7 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_MOV,		"mov",		2, 1},
 	{INST_MOVZX,	"movzx",	2, 1},
 	{INST_MOVSX,	"movsx",	2, 1},
+	{INST_MOVSXD,	"movsxd",	2, 1},
 	{INST_AND,		"and",		3, 1},
 	{INST_OR,		"or",		3, 1},
 	{INST_XOR,		"xor",		3, 1},

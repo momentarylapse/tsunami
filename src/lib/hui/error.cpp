@@ -80,10 +80,12 @@ public:
 		string sender = get_string("sender");
 		string comment = get_string("comment");
 		string return_msg;
-		if (NetSendBugReport(sender, Application::get_property("name"), Application::get_property("version"), comment, return_msg))
+		try {
+			NetSendBugReport(sender, Application::get_property("name"), Application::get_property("version"), comment);
 			InfoBox(nullptr, "ok", return_msg);
-		else
-			ErrorBox(nullptr, "error", return_msg);
+		} catch (Exception &e) {
+			ErrorBox(nullptr, "error", e.message());
+		}
 		request_destroy();
 	}
 };

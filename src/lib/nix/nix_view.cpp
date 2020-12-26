@@ -10,6 +10,9 @@
 
 #include "nix.h"
 #include "nix_common.h"
+#ifdef _X_USE_HUI_
+#include "../hui/hui.h"
+#endif
 #ifdef _X_USE_IMAGE_
 #include "../image/image.h"
 #endif
@@ -40,7 +43,30 @@ FrameBuffer::FrameBuffer() {
 }
 
 FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
+	glGenFramebuffers(1, &frame_buffer);
+	TestGLError("FrameBuffer: glGenFramebuffers");
+	update(attachments);
+}
+
+FrameBuffer::~FrameBuffer() {
+	glDeleteFramebuffers(1, &frame_buffer);
+}
+
+void FrameBuffer::__init__(const Array<Texture*> &attachments) {
+	new(this) FrameBuffer(attachments);
+}
+
+void FrameBuffer::__delete__() {
+	this->~FrameBuffer();
+}
+
+void FrameBuffer::update(const Array<Texture*> &attachments) {
+	update_x(attachments, -1);
+}
+
+void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 	depth_buffer = nullptr;
+	color_attachments = {};
 
 	for (auto *a: attachments) {
 		if (a->type == a->Type::DEPTH)
@@ -51,8 +77,6 @@ FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
 		height = a->height;
 	}
 
-	glGenFramebuffers(1, &frame_buffer);
-	TestGLError("FrameBuffer: glGenFramebuffers");
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	TestGLError("FrameBuffer: glBindFramebuffer");
 
@@ -68,8 +92,11 @@ FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
 	}
 
 	Array<GLenum> draw_buffers;
+	int target =  GL_TEXTURE_2D;
+	if (cube_face >= 0)
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cube_face;
 	foreachi (Texture *t, color_attachments, i) {
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, t->texture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, t->texture, 0);
 		TestGLError("FrameBuffer: glFramebufferTexture");
 		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);
 	}
@@ -77,23 +104,21 @@ FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
 	TestGLError("FrameBuffer: glDrawBuffers");
 
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		msg_error("FrameBuffer: framebuffer != complete");
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+			msg_write("incomplete att");
+		//if (r == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
+		//	msg_write("incomplete dim");
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+			msg_write("missing att");
+		if (status == GL_FRAMEBUFFER_UNSUPPORTED)
+			msg_write("unsup");
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	TestGLError("FrameBuffer: glBindFramebuffer(0)");
-}
-
-FrameBuffer::~FrameBuffer() {
-	glDeleteFramebuffers(1, &frame_buffer);
-}
-
-void FrameBuffer::__init__(const Array<Texture*> &attachments) {
-	new(this) FrameBuffer(attachments);
-}
-
-void FrameBuffer::__delete__() {
-	this->~FrameBuffer();
 }
 
 rect FrameBuffer::area() const {
@@ -362,6 +387,8 @@ void ScreenShotToImage(Image &image) {
 					GL_RGBA, GL_UNSIGNED_BYTE, &image.data[0]);
 }
 
+#ifdef _X_USE_HUI_
+
 void StartFrameHui() {
 	int fb;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
@@ -370,9 +397,12 @@ void StartFrameHui() {
 	FrameBuffer::DEFAULT->height = hui::GetEvent()->row;
 	SetViewport(FrameBuffer::DEFAULT->area());
 }
+
 void EndFrameHui() {
 	FrameBuffer::DEFAULT->frame_buffer = 0;
 }
+
+#endif
 
 
 #if HAS_LIB_GLFW

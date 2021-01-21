@@ -18,12 +18,12 @@ const int TYPE_LAYOUT = -41;
 const int TYPE_MODULE = -42;
 
 
-Shader *default_shader_2d = NULL;
-Shader *default_shader_3d = NULL;
-Shader *current_shader = NULL;
-Shader *override_shader = NULL;
+Shader *Shader::default_2d = nullptr;
+Shader *Shader::default_3d = nullptr;
+Shader *Shader::_current_ = nullptr;
+Shader *Shader::default_load = nullptr;
 
-static Array<Shader*> shaders;
+static shared_array<Shader> shaders;
 
 int current_program = 0;
 
@@ -275,19 +275,10 @@ void Shader::update(const string &source) {
 	TestGLError("CreateShader");
 }
 Shader *Shader::create(const string &source) {
-	Shader *s = new Shader;
-	try {
-		s->update(source);
-		/*if (s->program < 0) {
-			// module
-			//delete s;
-			return nullptr;
-		}*/
-	} catch (...) {
-		delete s;
-		throw;
-	}
-	return s;
+	shared<Shader> s = new Shader;
+	s->update(source);
+	shaders.add(s);
+	return s.get();
 }
 
 void Shader::find_locations() {
@@ -307,10 +298,9 @@ void Shader::find_locations() {
 		location[LOCATION_TEX + i] = get_location("tex" + i2s(i));
 	location[LOCATION_TEX_CUBE] = get_location("tex_cube");
 
-	location[LOCATION_MATERIAL_AMBIENT] = get_location("material.ambient");
-	location[LOCATION_MATERIAL_DIFFUSIVE] = get_location("material.diffusive");
-	location[LOCATION_MATERIAL_SPECULAR] = get_location("material.specular");
-	location[LOCATION_MATERIAL_SHININESS] = get_location("material.shininess");
+	location[LOCATION_MATERIAL_ALBEDO] = get_location("material.albedo");
+	location[LOCATION_MATERIAL_ROUGHNESS] = get_location("material.roughness");
+	location[LOCATION_MATERIAL_METAL] = get_location("material.metal");
 	location[LOCATION_MATERIAL_EMISSION] = get_location("material.emission");
 
 	link_uniform_block("Matrix", 0);
@@ -321,14 +311,14 @@ void Shader::find_locations() {
 
 Shader *Shader::load(const Path &filename) {
 	if (filename.is_empty())
-		return default_shader_3d->ref();
+		return default_load;
 
 	Path fn = shader_dir << filename;
 	if (filename.is_absolute())
 		fn = filename;
-	for (Shader *s: shaders)
+	for (Shader *s: weak(shaders))
 		if ((s->filename == fn) and (s->program >= 0))
-			return s->ref();
+			return s;
 
 	msg_write("loading shader: " + fn.str());
 
@@ -341,13 +331,11 @@ Shader *Shader::load(const Path &filename) {
 		return shader;
 	} catch (Exception &e) {
 		msg_error(e.message());
-		return default_shader_3d->ref();
+		return default_load;
 	}
 }
 
 Shader::Shader() {
-	shaders.add(this);
-	reference_count = 1;
 	filename = "-no file-";
 	program = -1;
 	for (int i=0; i<NUM_LOCATIONS; i++)
@@ -362,47 +350,21 @@ Shader::~Shader() {
 	program = -1;
 }
 
-Shader *Shader::ref() {
-	reference_count ++;
-	return this;
-}
-
-void Shader::unref() {
-	reference_count --;
-	if ((reference_count <= 0) and (program >= 0)) {
-		if ((this == default_shader_3d) or (this == default_shader_2d))
-			return;
-		if (program >= 0)
-			glDeleteProgram(program);
-		TestGLError("NixUnrefShader");
-		program = -1;
-		filename = Path::EMPTY;
-	}
-}
-
 void DeleteAllShaders() {
 	return;
-	for (Shader *s: shaders)
-		delete s;
 	shaders.clear();
 	init_shaders();
 }
 
 void SetShader(Shader *s) {
-	if (override_shader)
-		s = override_shader;
-	if (s == NULL)
-		s = default_shader_3d;
-	current_shader = s;
+	if (s == nullptr)
+		s = Shader::default_3d;
+	Shader::_current_ = s;
 	current_program = s->program;
 	glUseProgram(current_program);
 	TestGLError("SetProgram");
 
 	//s->set_default_data();
-}
-
-void SetOverrideShader(Shader *s) {
-	override_shader = s;
 }
 
 int Shader::get_location(const string &name) {
@@ -472,10 +434,9 @@ void Shader::set_default_data() {
 		set_int(location[LOCATION_TEX + i], i);
 	if (tex_cube_level >= 0)
 		set_int(location[LOCATION_TEX_CUBE], tex_cube_level);
-	set_float(location[LOCATION_MATERIAL_AMBIENT], material.ambient);
-	set_color(location[LOCATION_MATERIAL_DIFFUSIVE], material.diffusive);
-	set_float(location[LOCATION_MATERIAL_SPECULAR], material.specular);
-	set_data(location[LOCATION_MATERIAL_SHININESS], &material.shininess, 4);
+	set_color(location[LOCATION_MATERIAL_ALBEDO], material.albedo);
+	set_float(location[LOCATION_MATERIAL_ROUGHNESS], material.roughness);
+	set_float(location[LOCATION_MATERIAL_METAL], material.metal);
 	set_color(location[LOCATION_MATERIAL_EMISSION], material.emission);
 }
 
@@ -490,7 +451,7 @@ void Shader::dispatch(int nx, int ny, int nz) {
 void init_shaders() {
 	try {
 
-	default_shader_3d = nix::Shader::create(
+	Shader::default_3d = nix::Shader::create(
 		"<VertexShader>\n"
 		"#version 330 core\n"
 		"#extension GL_ARB_separate_shader_objects : enable"
@@ -519,7 +480,7 @@ void init_shaders() {
 		"\n"
 		"struct Matrix { mat4 model, view, project; };\n"
 		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
-		"struct Material { vec4 diffusive, emission; float ambient, specular, shininess; };\n"
+		"struct Material { vec4 albedo, emission; float roughness, metal; };\n"
 		"/*layout(binding = 2)*/ uniform Material material;\n"
 		"struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };\n"
 		"uniform int num_lights = 0;\n"
@@ -540,14 +501,15 @@ void init_shaders() {
 		"		attenuation = min(l.radius / length(in_pos - LP), 1);\n"
 		"	}\n"
 		"	float d = max(-dot(n, LD), 0) * attenuation;\n"
-		"	vec4 color = material.diffusive * material.ambient * l.color * (1 - l.harshness) / 2;\n"
-		"	color += material.diffusive * l.color * l.harshness * d;\n"
+		"	vec4 color = material.albedo * material.roughness * l.color * (1 - l.harshness) / 2;\n"
+		"	color += material.albedo * l.color * l.harshness * d;\n"
 		"	color *= tex_col;\n"
-		"	if ((d > 0) && (material.shininess > 1)) {\n"
+		"	if ((d > 0) && (material.roughness < 0.8)) {\n"
 		"		vec3 e = normalize(in_pos); // eye dir\n"
 		"		vec3 rl = reflect(LD, n);\n"
 		"		float ee = max(-dot(e, rl), 0);\n"
-		"		color += material.specular * l.color * l.harshness * pow(ee, material.shininess);\n"
+		"		float shininess = 5 / (1.1 - material.roughness);\n"
+		"		color += (1 - material.roughness) * l.color * l.harshness * pow(ee, shininess);\n"
 		"	}\n"
 		"	return color;\n"
 		"}\n"
@@ -558,14 +520,14 @@ void init_shaders() {
 		"	vec4 tex_col = texture(tex0, in_uv);\n"
 		"	for (int i=0; i<num_lights; i++)\n"
 		"		out_color += basic_lighting(light[i], n, tex_col);\n"
-		"	out_color.a = material.diffusive.a * tex_col.a;\n"
+		"	out_color.a = material.albedo.a * tex_col.a;\n"
 		"}\n"
 		"</FragmentShader>");
-	default_shader_3d->filename = "-default 3d-";
+	Shader::default_3d->filename = "-default 3d-";
 
 
 
-	default_shader_2d = nix::Shader::create(
+	Shader::default_2d = nix::Shader::create(
 		"<VertexShader>\n"
 		"#version 330 core\n"
 		"#extension GL_ARB_separate_shader_objects : enable"
@@ -601,14 +563,12 @@ void init_shaders() {
 		"	color *= in_color;\n"
 		"}\n"
 		"</FragmentShader>");
-		default_shader_2d->filename = "-default 2d-";
-
-		default_shader_3d->ref();
-		default_shader_2d->ref();
+		Shader::default_2d->filename = "-default 2d-";
 	} catch(Exception &e) {
 		msg_error(e.message());
 		throw e;
 	}
+	Shader::default_load = Shader::default_3d;
 }
 
 };

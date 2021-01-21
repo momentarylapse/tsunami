@@ -27,7 +27,7 @@
 
 namespace kaba {
 
-string Version = "0.19.5.2";
+string Version = "0.19.6.1";
 
 //#define ScriptDebug
 
@@ -50,13 +50,22 @@ shared_array<Script> _public_scripts_;
 
 
 
+Path absolute_script_path(const Path &filename) {
+	if (filename.is_relative())
+		return (config.directory << filename).absolute().canonical();
+	else
+		return filename.absolute().canonical();
+}
+
 
 shared<Script> load(const Path &filename, bool just_analyse) {
-	//msg_write(string("Lade ",filename));
+	//msg_write("loading " + filename.str());
+
+	auto _filename = absolute_script_path(filename);
 
 	// already loaded?
 	for (auto ps: _public_scripts_)
-		if (ps->filename == filename)
+		if (ps->filename == _filename)
 			return ps;
 	
 	// load
@@ -149,11 +158,8 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 	loading_script_stack.add(this);
 	just_analyse = _just_analyse;
 
+	filename = absolute_script_path(_filename);
 
-	if (_filename.is_relative())
-		filename = (config.directory << _filename).absolute().canonical();
-	else
-		filename = _filename.absolute().canonical();
 	syntax->base_class->name = filename.basename().replace(".kaba", "");
 
 	auto parser = new Parser(syntax);
@@ -171,16 +177,11 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 			compile();
 		/*if (pre_script->FlagShow)
 			pre_script->Show();*/
-		if (!just_analyse and config.verbose){
-			msg_write(format("Opcode: %d bytes", opcode_size));
-			if (config.allow_output_stage("dasm"))
-				msg_write(Asm::disassemble(opcode, opcode_size));
-		}
 
-	} catch(FileError &e) {
+	} catch (FileError &e) {
 		loading_script_stack.pop();
 		do_error("script file not loadable: " + filename.str());
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		loading_script_stack.pop();
 		throw e;
 	}

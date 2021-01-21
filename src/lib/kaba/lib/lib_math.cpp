@@ -911,6 +911,8 @@ void SIAddPackageMath() {
 		func_add_param("max", TypeInt);
 	add_funcx("abs", TypeInt, &x_abs<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
+	add_funcx("sign", TypeInt, &sign<int>, Flags::_STATIC__PURE);
+		func_add_param("i", TypeInt);
 	add_funcx("min", TypeInt, &x_min<int>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
@@ -953,6 +955,8 @@ void SIAddPackageMath() {
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
 	add_funcx("abs", TypeFloat32, &abs<float>, Flags::_STATIC__PURE);
+		func_add_param("f", TypeFloat32);
+	add_funcx("sign", TypeFloat32, &sign<float>, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
 	add_funcx("min", TypeFloat32, &x_min<float>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);

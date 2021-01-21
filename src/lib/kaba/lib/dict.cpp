@@ -56,7 +56,7 @@ void script_make_dict(Class *t, SyntaxTree *ps) {
 	t->param[0] = p;
 	add_class(t);
 
-	if (p->is_simple_class()) {
+	if (p->can_memcpy()) {
 		// elements don't need a destructor
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,int>::clear);
 		class_add_funcx("clear", TypeVoid, &Map<string,int>::clear);

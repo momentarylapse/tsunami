@@ -53,6 +53,7 @@ public:
 
 	virtual void add_function_outro(Function *f);
 	virtual void add_function_intro_params(Function *f);
+	virtual void add_function_intro_frame(int stack_alloc_size);
 
 	void do_mapping() override;
 
@@ -74,7 +75,6 @@ public:
 	Asm::InstructionParam prepare_param(int inst, SerialNodeParam &p);
 	void assemble_cmd(SerialNode &c);
 	void assemble_cmd_arm(SerialNode &c);
-	void add_function_intro_frame(int stack_alloc_size);
 
 	void mark_regs_busy_at_call(int index);
 	void extend_reg_usage_to_call(int index);

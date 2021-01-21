@@ -58,10 +58,11 @@ enum class NodeKind {
 	LOCAL_MEMORY,       // local (but LinkNr = address)
 	// special
 	CLASS,
-	ARRAY_BUILDER,
+	ARRAY_BUILDER,		// = [X,Y,...]
 	ARRAY_BUILDER_FOR,
 	ARRAY_BUILDER_FOR_IF,
-	DICT_BUILDER,
+	DICT_BUILDER,		// = {"x":y, ...}
+	TUPLE,				// = (X,Y,...)
 	CONSTRUCTOR_AS_FUNCTION,
 	// compilation
 	VAR_TEMP,

@@ -819,7 +819,7 @@ string InstructionParam::str(bool hide_size)
 		if (deref){
 			//msg_write("deref");
 			string ss;
-			if (!hide_size)
+			if (!hide_size or size != state.default_size)
 				ss = get_size_name(size) + " ";
 			string s = reg->name;
 			if (disp == DISP_MODE_8){

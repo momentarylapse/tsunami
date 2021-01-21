@@ -12,13 +12,19 @@
 #include "nix_common.h"
 #include "../image/image.h"
 
+// management:
+//  Texture.load()
+//    -> managed, shared<>, DON'T DELETE
+//  new Texture()
+//    -> unmanaged, needs manual delete
+
 namespace nix{
 
 Path texture_dir;
 
-Array<Texture*> textures;
-Texture *default_texture = NULL;
-Texture *tex_text = NULL;
+shared_array<Texture> textures;
+Texture *default_texture = nullptr;
+Texture *tex_text = nullptr;
 int tex_cube_level = -1;
 
 
@@ -189,14 +195,14 @@ void init_textures() {
 }
 
 void ReleaseTextures() {
-	for (Texture *t: textures) {
+	for (Texture *t: weak(textures)) {
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 		glDeleteTextures(1, &t->texture);
 	}
 }
 
 void ReincarnateTextures() {
-	for (Texture *t: textures) {
+	for (Texture *t: weak(textures)) {
 		glGenTextures(1, &t->texture);
 		t->reload();
 	}
@@ -238,8 +244,6 @@ Texture::Texture() {
 #endif
 	glGenTextures(1, &texture);
 	width = height = nz = 0;
-
-	textures.add(this);
 }
 
 
@@ -277,11 +281,11 @@ Texture::Texture(int w, int h, int _nz, const string &_format) : Texture() {
 
 Texture::~Texture() {
 	unload();
-	foreachi(auto t, textures, i)
+	/*foreachi(auto t, textures, i)
 		if (t == this) {
 			textures.erase(i);
 			break;
-		}
+		}*/
 }
 
 void Texture::__init__(int w, int h, const string &f) {
@@ -296,22 +300,27 @@ void Texture::__delete__() {
 	this->~Texture();
 }
 
-Texture *LoadTexture(const Path &filename) {
+void TextureClear() {
+	msg_error("Texture Clear");
+	for (Texture *t: weak(textures))
+		msg_write(t->filename.str());
+}
+
+Texture *Texture::load(const Path &filename) {
 	if (filename.is_empty())
 		return nullptr;
-	for (Texture *t: textures)
+	for (Texture *t: weak(textures))
 		if (filename == t->filename)
 			return t->valid ? t : nullptr;
 
 	// test existence
-	if (!file_exists(texture_dir << filename)) {
-		msg_error("texture file does not exist: " + filename.str());
-		return nullptr;
-	}
+	if (!file_exists(texture_dir << filename))
+		throw Exception("texture file does not exist: " + filename.str());
 
 	Texture *t = new Texture;
 	t->filename = filename;
 	t->reload();
+	textures.add(t);
 	return t;
 }
 
@@ -321,10 +330,8 @@ void Texture::reload() {
 	Path _filename = texture_dir << filename;
 
 	// test the file's existence
-	if (!file_exists(_filename)) {
-		msg_error("texture file does not exist!");
-		return;
-	}
+	if (!file_exists(_filename))
+		throw Exception("texture file does not exist!");
 
 	#ifdef NIX_ALLOW_VIDEO_TEXTURE
 		avi_info[texture]=NULL;
@@ -333,7 +340,7 @@ void Texture::reload() {
 	string extension = filename.extension();
 
 // AVI
-	if (extension == "avi"){
+	if (extension == "avi") {
 		//msg_write("avi");
 		#ifdef NIX_ALLOW_VIDEO_TEXTURE
 			avi_info[texture]=new s_avi_info;
@@ -353,7 +360,7 @@ void Texture::reload() {
 			msg_write("-> un-comment the NIX_ALLOW_VIDEO_TEXTURE definition in the source file \"00_config.h\" and recompile the program");
 			return;
 		#endif
-	}else{
+	} else {
 		auto image = Image::load(_filename);
 		overwrite(*image);
 		delete image;
@@ -386,10 +393,10 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		}else if (t->type == t->Type::DYNAMIC){
+		} else if (t->type == t->Type::DYNAMIC){
 			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}else{
+		} else {
 			//glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -637,6 +644,12 @@ CubeMap::CubeMap(int size) {
 	height = size;
 	type = Type::CUBE;
 	filename = "-cubemap-";
+
+
+	Image im;
+	im.create(size, size, Blue);
+	for (int i=0; i<6; i++)
+		overwrite_side(i, im);
 }
 
 void CubeMap::__init__(int size) {

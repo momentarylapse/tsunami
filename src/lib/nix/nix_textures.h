@@ -11,6 +11,7 @@
 #ifndef _NIX_TEXTURES_EXISTS_
 #define _NIX_TEXTURES_EXISTS_
 
+#include "../base/pointer.h"
 #include "../file/path.h"
 
 namespace nix{
@@ -22,7 +23,7 @@ void ReincarnateTextures();
 
 
 
-class Texture {
+class Texture : public Sharable<Empty> {
 public:
 	enum class Type {
 		DEFAULT,
@@ -56,6 +57,8 @@ public:
 	void _cdecl unload();
 
 	void _cdecl set_options(const string &op);
+
+	static Texture* _cdecl load(const Path &filename);
 };
 
 class ImageTexture : public Texture {
@@ -81,11 +84,10 @@ public:
 };
 
 
-Texture* _cdecl LoadTexture(const Path &filename);
 void _cdecl SetTexture(Texture *texture);
 void _cdecl SetTextures(const Array<Texture*> &textures);
 
-extern Array<Texture*> textures;
+//extern Array<Texture*> textures;
 extern int tex_cube_level;
 
 

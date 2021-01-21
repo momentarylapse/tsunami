@@ -33,6 +33,7 @@ void script_make_dict(Class *t, SyntaxTree *ps = nullptr);
 
 
 extern const string IDENTIFIER_CLASS;
+extern const string IDENTIFIER_FUNC;
 extern const string IDENTIFIER_FUNC_INIT;
 extern const string IDENTIFIER_FUNC_DELETE;
 extern const string IDENTIFIER_FUNC_ASSIGN;

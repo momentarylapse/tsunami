@@ -167,10 +167,13 @@ bool Class::is_pointer() const
 { return type == Type::POINTER or type == Type::POINTER_SILENT /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */; }
 
 bool Class::is_some_pointer() const
-{ return type == Type::POINTER or type == Type::POINTER_SILENT  or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE; }
+{ return type == Type::POINTER or type == Type::POINTER_SILENT  or type == Type::POINTER_SHARED or type == Type::POINTER_OWNED; }
 
 bool Class::is_pointer_shared() const
 { return type == Type::POINTER_SHARED; }
+
+bool Class::is_pointer_owned() const
+{ return type == Type::POINTER_OWNED; }
 
 bool Class::is_pointer_silent() const
 { return type == Type::POINTER_SILENT; }
@@ -191,11 +194,11 @@ bool Class::uses_return_by_memory() const {
 
 // is just a bag of plain-old-data?
 //   -> can be assigned as a chunk
-bool Class::is_simple_class() const {
+bool Class::can_memcpy() const {
 	if (!uses_call_by_reference())
 		return true;
 	if (is_array())
-		return param[0]->is_simple_class();
+		return param[0]->can_memcpy();
 	if (is_super_array())
 		return false;
 	if (is_dict())
@@ -203,7 +206,7 @@ bool Class::is_simple_class() const {
 	if (vtable.num > 0)
 		return false;
 	if (parent)
-		if (!parent->is_simple_class())
+		if (!parent->can_memcpy())
 			return false;
 	if (get_constructors().num > 0)
 		return false;
@@ -212,7 +215,7 @@ bool Class::is_simple_class() const {
 	//if (get_assign())
 	//	return false;
 	for (ClassElement &e: elements)
-		if (!e.type->is_simple_class())
+		if (!e.type->can_memcpy())
 			return false;
 	return true;
 }

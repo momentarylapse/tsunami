@@ -68,19 +68,21 @@ void TestGLError(const char *pos) {
 #if 1
 	int err = glGetError();
 	if (err == GL_NO_ERROR)
-	{}//msg_write("GL_NO_ERROR");
-	else if (err == GL_INVALID_ENUM)
-		msg_error("GL_INVALID_ENUM at " + string(pos));
+		return;
+
+	string t;
+	if (err == GL_INVALID_ENUM)
+		t = "GL_INVALID_ENUM at " + string(pos);
 	else if (err == GL_INVALID_VALUE)
-		msg_error("GL_INVALID_VALUE at " + string(pos));
+		t = "GL_INVALID_VALUE at " + string(pos);
 	else if (err == GL_INVALID_OPERATION)
-		msg_error("GL_INVALID_OPERATION at " + string(pos));
+		t = "GL_INVALID_OPERATION at " + string(pos);
 	else if (err == GL_INVALID_FRAMEBUFFER_OPERATION)
-		msg_error("GL_INVALID_FRAMEBUFFER_OPERATION at " + string(pos));
+		t = "GL_INVALID_FRAMEBUFFER_OPERATION at " + string(pos);
 	else
-		msg_error(i2s(err) + " at " + string(pos));
-	if (err != GL_NO_ERROR)
-		throw Exception("OpenGL error");
+		t = i2s(err) + " at " + string(pos);
+	msg_error(t);
+	throw Exception("OpenGL error: " + t);
 #endif
 }
 
@@ -156,10 +158,10 @@ void Init() {
 	SetCull(CULL_DEFAULT);
 	SetWire(false);
 	SetAlpha(ALPHA_NONE);
-	SetMaterial(White, 0.5f, 0, 10, color(0.1f, 0.1f, 0.1f, 0.1f));
+	SetMaterial(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
 	SetProjectionPerspective();
 	SetZ(true, true);
-	SetShader(default_shader_3d);
+	SetShader(Shader::default_3d);
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);

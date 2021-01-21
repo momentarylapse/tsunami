@@ -190,26 +190,41 @@ void BackendX86::correct_implement_commands() {
 		auto &c = cmd.cmd[i];
 		if (c.inst == Asm::INST_MOV) {
 			int size = c.p[0].type->size;
-			if (size > config.pointer_size) {
+			// mov can only copy these sizes (ignore 2...)
+			if (size != 1 and size != 4 and size != config.pointer_size) {
 				implement_mov_chunk(c, i, size);
 				i = cmd.next_cmd_index - 1;
 			}
-		} else if (c.inst == Asm::INST_MOVSX) {
+		} else if (c.inst == Asm::INST_MOVSX or c.inst == Asm::INST_MOVZX) {
+			// only  (char <-> int)  or  (int <-> int64)
+			auto inst = c.inst;
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
 //			msg_write("MOVSX " + p1.type->name + " << "+ p2.type->name);
 			cmd.remove_cmd(i);
 			cmd.next_cmd_target(i);
-			int reg = find_unused_reg(i, i, p2.type->size);
-			insert_cmd(Asm::INST_MOV, param_vreg(p2.type, reg), p2);
-			int preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 			if (p1.type == TypeInt64 and p2.type == TypeInt) {
+				// int64 <- int
+				int reg = find_unused_reg(i, i, p2.type->size);
+				insert_cmd(Asm::INST_MOV, param_vreg(p2.type, reg), p2);
+				int preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::INST_MOVSXD, param_vreg(p1.type, reg, preg_x), param_vreg(p2.type, reg));
 				insert_cmd(Asm::INST_MOV, p1, param_vreg(p1.type, reg, preg_x));
+			} else if (p1.type == TypeInt and p2.type == TypeChar) {
+				// int <- char
+				int reg = find_unused_reg(i, i, max(p1.type->size, p2.type->size));
+				int preg = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
+				insert_cmd(inst, param_vreg(p1.type, reg, preg), p2);
+				insert_cmd(Asm::INST_MOV, p1, param_vreg(p1.type, reg, preg));
 			} else {
+				// char <- int
+				// int <- int64
+				int reg = find_unused_reg(i, i, p2.type->size);
+				insert_cmd(Asm::INST_MOV, param_vreg(p2.type, reg), p2);
+				int preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::INST_MOV, p1, param_vreg(p1.type, reg, preg_x));
 			}
-			i ++;
+			i = cmd.next_cmd_index - 1;
 		} else if (c.inst == Asm::INST_MODULO) {
 			auto r = c.p[0];
 			auto p1 = c.p[1];
@@ -1091,8 +1106,8 @@ void BackendX86::assemble_cmd_arm(SerialNode &c) {
 
 
 void BackendX86::add_function_intro_frame(int stack_alloc_size) {
-	int reg_bp = (config.instruction_set == Asm::InstructionSet::AMD64) ? Asm::REG_RBP : Asm::REG_EBP;
-	int reg_sp = (config.instruction_set == Asm::InstructionSet::AMD64) ? Asm::REG_RSP : Asm::REG_ESP;
+	int reg_bp = Asm::REG_EBP;
+	int reg_sp = Asm::REG_ESP;
 	//int s = config.pointer_size;
 	list->add2(Asm::INST_PUSH, Asm::param_reg(reg_bp));
 	list->add2(Asm::INST_MOV, Asm::param_reg(reg_bp), Asm::param_reg(reg_sp));

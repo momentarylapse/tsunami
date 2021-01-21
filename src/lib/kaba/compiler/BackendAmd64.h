@@ -32,10 +32,13 @@ public:
 
 	void add_function_outro(Function *f) override;
 	void add_function_intro_params(Function *f) override;
+	void add_function_intro_frame(int stack_alloc_size) override;
 
 	void correct_return() {}
 
-	void add_function_intro_frame(int stack_alloc_size);
+
+	Array<int> param_regs_root;
+	int max_xmm_params;
 };
 
 }

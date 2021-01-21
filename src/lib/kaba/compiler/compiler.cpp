@@ -581,6 +581,8 @@ void Script::compile() {
 		msg_write("--------------------------------");
 		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size));
 	}
+	if (config.allow_output_stage("dasm"))
+		msg_write(Asm::disassemble(opcode, opcode_size));
 }
 
 };

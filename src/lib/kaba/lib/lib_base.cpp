@@ -14,6 +14,7 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypeSharedPointer;
 const Class *TypeAbstractList;
 const Class *TypeAbstractDict;
+const Class *TypeAbstractTuple;
 extern const Class *TypeDictBase;
 extern const Class *TypeFloat;
 extern const Class *TypePointerList;
@@ -392,6 +393,7 @@ void SIAddPackageBase() {
 	TypeDynamicArray	= add_type  ("@DynamicArray", config.super_array_size);
 	TypeAbstractList	= add_type  ("-abstract-list-", config.super_array_size);
 	TypeAbstractDict	= add_type  ("-abstract-dict-", config.super_array_size);
+	TypeAbstractTuple	= add_type  ("-abstract-tuple-", config.super_array_size);
 	TypeDictBase		= add_type  ("@DictBase",   config.super_array_size);
 	TypeSharedPointer	= add_type  ("@SharedPointer", config.pointer_size);
 

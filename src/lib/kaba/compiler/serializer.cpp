@@ -132,9 +132,12 @@ string SerialNodeParam::str(Serializer *ser) const {
 			n = ((Variable*)p)->name;
 		else if (kind == NodeKind::CONSTANT)
 			n = ((Constant*)p)->str();
-		else if (kind == NodeKind::CONSTANT_BY_ADDRESS)
-			n = var_repr((void*)(int_p)p, type) + " @" + p2s((void*)(int_p)p);
-		else if (kind == NodeKind::FUNCTION)
+		else if (kind == NodeKind::CONSTANT_BY_ADDRESS) {
+			if (config.compile_os)
+				n = "@" + p2s((void*)(int_p)p);
+			else
+				n = var_repr((void*)(int_p)p, type) + " @" + p2s((void*)(int_p)p);
+		} else if (kind == NodeKind::FUNCTION)
 			n = ((Function*)p)->signature(TypeVoid);
 		str = "(" + type_name_safe(type) + ") <" + kind2str(kind) + "> " + n;
 		if (shift > 0)

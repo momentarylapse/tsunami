@@ -17,12 +17,12 @@ namespace nix{
 Material material;
 
 
-// TODO: better names
-void SetMaterial(const color &diffuse, float ambient, float specular, float shininess, const color &emission) {
-	material.ambient = ambient;
-	material.diffusive = diffuse;
-	material.specular = specular;
-	material.shininess = shininess;
+void SetMaterial(const color &albedo, float roughness, float metal, const color &emission) {
+	material.albedo = albedo;
+	material.roughness = roughness;
+	material.metal = metal;
+	//material.specular = (1 - roughness);
+	//material.shininess = 5 / (1.1f - roughness);//shininess;
 	material.emission = emission;
 }
 

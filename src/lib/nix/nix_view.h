@@ -36,7 +36,7 @@ void _cdecl SetScissor(const rect &r);
 
 void _cdecl ScreenShotToImage(Image &image);
 
-class FrameBuffer {
+class FrameBuffer : public Sharable<Empty> {
 public:
 	FrameBuffer();
 	FrameBuffer(const Array<Texture*> &attachments);

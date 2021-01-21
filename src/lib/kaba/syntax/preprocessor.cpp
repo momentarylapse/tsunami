@@ -389,7 +389,7 @@ void rec_assign(void *a, void *b, const Class *type) {
 		for (int i=0; i<bb->num; i++)
 			rec_assign(ar_el(aa, i), ar_el(bb, i), type->param[0]);
 
-	} else if (type->is_simple_class()){
+	} else if (type->can_memcpy()){
 		memcpy(a, b, type->size);
 	} else {
 		for (auto &el: type->elements)

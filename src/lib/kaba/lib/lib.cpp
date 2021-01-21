@@ -32,6 +32,7 @@ namespace kaba {
 
 
 const string IDENTIFIER_CLASS = "class";
+const string IDENTIFIER_FUNC = "func";
 const string IDENTIFIER_FUNC_INIT = "__init__";
 const string IDENTIFIER_FUNC_DELETE = "__delete__";
 const string IDENTIFIER_FUNC_ASSIGN = "__assign__";
@@ -646,7 +647,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	sub->effective_return_type= t;
 
 	// FIXME  wrong for complicated classes
-	if (p->is_simple_class()) {
+	if (p->can_memcpy()) {
 		if (!p->uses_call_by_reference()){
 			if (p->is_pointer()){
 				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<void*>::__init__);

@@ -16,8 +16,18 @@ namespace kaba {
 
 BackendAmd64::BackendAmd64(Serializer *s) : BackendX86(s) {
 
-	// eax, ecx, edx
+	// rax, rcx, rdx
 	map_reg_root = {0,1,2};
+
+	if (config.abi == Abi::WINDOWS_64) {
+		// rcx, rdx, r8, r9
+		param_regs_root = { 1, 2, 8, 9 };
+		max_xmm_params = 4;
+	} else {
+		// rdi, rsi, rdx, rcx, r8, r9
+		param_regs_root = {7, 6, 2, 1, 8, 9 };
+		max_xmm_params = 8;
+	}
 }
 
 BackendAmd64::~BackendAmd64() {
@@ -242,13 +252,13 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 	Array<SerialNodeParam> xmm_param;
 	for (auto &p: params) {
 		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_some_pointer()) {
-			if (reg_param.num < 6) {
+			if (reg_param.num < param_regs_root.num) {
 				reg_param.add(p);
 			} else {
 				stack_param.add(p);
 			}
 		} else if ((p.type == TypeFloat32) or (p.type == TypeFloat64)) {
-			if (xmm_param.num < 8) {
+			if (xmm_param.num < max_xmm_params) {
 				xmm_param.add(p);
 			} else {
 				stack_param.add(p);
@@ -281,8 +291,6 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 
 	func_param_virts = {};
 
-	// rdi, rsi, rdx, rcx, r8, r9
-	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
 	foreachib(auto &p, reg_param, i) {
 		int root = param_regs_root[i];
 		int preg = get_reg(root, p.type->size);
@@ -337,13 +345,13 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	Array<Variable*> xmm_param;
 	for (Variable *p: param) {
 		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_some_pointer()) {
-			if (reg_param.num < 6) {
+			if (reg_param.num < param_regs_root.num) {
 				reg_param.add(p);
 			} else {
 				stack_param.add(p);
 			}
 		} else if ((p->type == TypeFloat32) or (p->type == TypeFloat64)) {
-			if (xmm_param.num < 8) {
+			if (xmm_param.num < max_xmm_params) {
 				xmm_param.add(p);
 			} else {
 				stack_param.add(p);
@@ -364,8 +372,6 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 
 	}
 
-	// rdi, rsi,rdx, rcx, r8, r9
-	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
 	foreachib(Variable *p, reg_param, i) {
 		int root = param_regs_root[i];
 		int preg = get_reg(root, p->type->size);
@@ -420,9 +426,13 @@ void BackendAmd64::process_references() {
 }
 
 
+// so far not used... x86 also implements both...
 void BackendAmd64::add_function_intro_frame(int stack_alloc_size) {
-	int_p reg_bp = (config.instruction_set == Asm::InstructionSet::AMD64) ? Asm::REG_RBP : Asm::REG_EBP;
-	int_p reg_sp = (config.instruction_set == Asm::InstructionSet::AMD64) ? Asm::REG_RSP : Asm::REG_ESP;
+	if (config.abi == Abi::WINDOWS_64)
+		stack_alloc_size += 32; // shadow space
+
+	int_p reg_bp = Asm::REG_RBP;
+	int_p reg_sp = Asm::REG_RSP;
 	//int s = config.pointer_size;
 	list->add2(Asm::INST_PUSH, Asm::param_reg(reg_bp));
 	list->add2(Asm::INST_MOV, Asm::param_reg(reg_bp), Asm::param_reg(reg_sp));

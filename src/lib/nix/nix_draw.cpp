@@ -10,9 +10,7 @@
 #include "nix.h"
 #include "nix_common.h"
 
-namespace nix{
-
-extern Shader *current_shader;
+namespace nix {
 
 
 
@@ -22,7 +20,7 @@ extern Shader *current_shader;
 void DrawTriangles(VertexBuffer *vb) {
 	if (vb->count() == 0)
 		return;
-	current_shader->set_default_data();
+	Shader::_current_->set_default_data();
 
 	SetVertexBuffer(vb);
 
@@ -34,7 +32,7 @@ void DrawTriangles(VertexBuffer *vb) {
 void DrawInstancedTriangles(VertexBuffer *vb, int count) {
 	if (vb->count() == 0)
 		return;
-	current_shader->set_default_data();
+	Shader::_current_->set_default_data();
 
 	SetVertexBuffer(vb);
 
@@ -47,7 +45,7 @@ void DrawInstancedTriangles(VertexBuffer *vb, int count) {
 void DrawLines(VertexBuffer *vb, bool contiguous) {
 	if (vb->count() == 0)
 		return;
-	current_shader->set_default_data();
+	Shader::_current_->set_default_data();
 
 	SetVertexBuffer(vb);
 
@@ -61,7 +59,7 @@ void DrawLines(VertexBuffer *vb, bool contiguous) {
 void DrawPoints(VertexBuffer *vb) {
 	if (vb->count() == 0)
 		return;
-	current_shader->set_default_data();
+	Shader::_current_->set_default_data();
 
 	SetVertexBuffer(vb);
 

@@ -97,7 +97,7 @@ void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cube_face;
 	foreachi (Texture *t, color_attachments, i) {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, t->texture, 0);
-		TestGLError("FrameBuffer: glFramebufferTexture");
+		TestGLError("FrameBuffer: glFramebufferTexture2D");
 		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);
 	}
 	glDrawBuffers(draw_buffers.num, &draw_buffers[0]);

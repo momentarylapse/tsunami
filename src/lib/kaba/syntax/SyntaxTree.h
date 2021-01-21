@@ -152,7 +152,7 @@ public:
 	void simplify_ref_deref();
 
 	void add_missing_function_headers_for_class(Class *t);
-	void add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE);
+	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE);
 	const Class *find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion);
 
 	void show(const string &stage);

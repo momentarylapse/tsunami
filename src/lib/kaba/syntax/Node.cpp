@@ -64,6 +64,8 @@ string kind2str(NodeKind kind) {
 		return "array builder for if";
 	if (kind == NodeKind::DICT_BUILDER)
 		return "dict builder";
+	if (kind == NodeKind::TUPLE)
+		return "tuple";
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return "constructor function";
 	if (kind == NodeKind::VAR_TEMP)

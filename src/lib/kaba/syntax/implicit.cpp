@@ -9,6 +9,8 @@
 namespace kaba {
 
 
+const int FULL_CONSTRUCTOR_MAX_PARAMS = 4;
+
 
 void Parser::do_error_implicit(Function *f, const string &str) {
 	int line = max(f->_logical_line_no, f->name_space->_logical_line_no);
@@ -25,8 +27,10 @@ void Parser::auto_implement_add_virtual_table(shared<Node> self, Function *f, co
 	}
 }
 
-void Parser::auto_implement_add_child_constructors(shared<Node> n_self, Function *f, const Class *t) {
+void Parser::auto_implement_add_child_constructors(shared<Node> n_self, Function *f, const Class *t, bool allow_elements_from_parent) {
 	int i0 = t->parent ? t->parent->elements.num : 0;
+	if (allow_elements_from_parent)
+		i0 = 0;
 	foreachi(ClassElement &e, t->elements, i) {
 		if (i < i0)
 			continue;
@@ -78,12 +82,25 @@ void Parser::auto_implement_constructor(Function *f, const Class *t, bool allow_
 						self->shift(te->size * i, te)));
 			}
 		}
-	} else if (t->is_pointer_shared()) {
+	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
 		auto te = t->param[0];
 		// self.p = nil
 		f->block->add(tree->add_node_operator_by_inline(InlineID::POINTER_ASSIGN,
 				self->shift(0, TypePointer),
 				tree->add_node_const(tree->add_constant_pointer(te->get_pointer(), nullptr))));
+	} else if (flags_has(f->flags, Flags::__INIT_FILL_ALL_PARAMS)) {
+		// init
+		auto_implement_add_child_constructors(self, f, t, true);
+
+		// element[] = param[]
+		foreachi(ClassElement &e, t->elements, i)
+			if (!e.hidden()) {
+				auto param = tree->add_node_local(f->__get_var(e.name));
+				auto n_assign = link_operator_id(OperatorID::ASSIGN, self->shift(e.offset, e.type), param);
+				if (!n_assign)
+					do_error_implicit(f, format("no %s.__assign__() found", e.type->long_name()));
+				f->block->add(n_assign);
+			}
 	} else {
 
 		// parent constructor
@@ -105,7 +122,7 @@ void Parser::auto_implement_constructor(Function *f, const Class *t, bool allow_
 		}
 
 		// call child constructors for elements
-		auto_implement_add_child_constructors(self, f, t);
+		auto_implement_add_child_constructors(self, f, t, false);
 
 		// add vtable reference
 		// after child constructor (otherwise would get overwritten)
@@ -136,7 +153,7 @@ void Parser::auto_implement_destructor(Function *f, const Class *t) {
 		} else if (te->needs_destructor()) {
 			do_error_implicit(f, "element desctructor missing");
 		}
-	} else if (t->is_pointer_shared()) {
+	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
 		// call clear()
 		auto f_clear = t->get_func(IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, {});
 		if (!f_clear)
@@ -564,7 +581,7 @@ void Parser::auto_implement_shared_create(Function *f, const Class *t) {
 }
 
 
-void SyntaxTree::add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf, Flags flags) {
+Function *SyntaxTree::add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf, Flags flags) {
 	Function *f = add_function(name, return_type, t, flags); // always member-function??? no...?
 	f->auto_declared = true;
 	foreachi (auto &p, param_types, i) {
@@ -573,9 +590,11 @@ void SyntaxTree::add_func_header(Class *t, const string &name, const Class *retu
 		v->is_const = true;
 		f->num_params ++;
 	}
+	//msg_write("ADD " + f->signature(TypeVoid));
 	f->update_parameters_after_parsing();
 	bool override = cf;
 	t->add_function(this, f, false, override);
+	return f;
 }
 
 bool needs_new(Function *f) {
@@ -613,6 +632,32 @@ void redefine_inherited_constructors(Class *t, SyntaxTree *tree) {
 	}
 }
 
+void add_full_constructor(Class *t, SyntaxTree *tree) {
+	Array<string> names;
+	Array<const Class*> types;
+	for (auto &e: t->elements) {
+		if (!e.hidden()) {
+			names.add(e.name);
+			types.add(e.type);
+		}
+	}
+	auto f = tree->add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, types, names);
+	flags_set(f->flags, Flags::__INIT_FILL_ALL_PARAMS);
+}
+
+bool can_fully_construct(Class *t) {
+	if (t->vtable.num > 0)
+		return false;
+	if (t->elements.num > FULL_CONSTRUCTOR_MAX_PARAMS)
+		return false;
+	for (auto &e: t->elements)
+		if (!e.type->get_assign() and e.type->uses_call_by_reference()) {
+			msg_write(e.type->name);
+			return false;
+		}
+	return true;
+}
+
 void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 	if (t->owner != this)
 		return;
@@ -647,8 +692,20 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t->param[0]->get_pointer()}, {"p"});
 		add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"p"});
 		add_func_header(t, IDENTIFIER_FUNC_SHARED_CREATE, t, {t->param[0]->get_pointer()}, {"p"}, nullptr, Flags::STATIC);
+	} else if (t->is_pointer_owned()) {
+		add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
+		add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
+		add_func_header(t, IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, {}, {});
+		add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t->param[0]->get_pointer()}, {"p"});
+		//add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"p"});
+		//add_func_header(t, IDENTIFIER_FUNC_SHARED_CREATE, t, {t->param[0]->get_pointer()}, {"p"}, nullptr, Flags::STATIC);
 	} else { // regular classes
-		if (!t->is_simple_class()) {
+		if (t->can_memcpy()) {
+			if (has_user_constructors(t)) {
+			} else if (can_fully_construct(t)){
+				add_full_constructor(t, this);
+			}
+		} else {
 			if (t->parent) {
 				if (has_user_constructors(t)) {
 					// don't inherit constructors!
@@ -658,8 +715,11 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 					redefine_inherited_constructors(t, this);
 				}
 			}
-			if (t->needs_constructor() and t->get_constructors().num == 0)
+			if (t->needs_constructor() and t->get_constructors().num == 0) {
 				add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
+				if (can_fully_construct(t))
+					add_full_constructor(t, this);
+			}
 			if (needs_new(t->get_destructor()))
 				add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		}
@@ -673,7 +733,7 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 				add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}
 		}
-		if (t->get_assign() and t->is_simple_class()) {
+		if (t->get_assign() and t->can_memcpy()) {
 			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
 		}
 	}
@@ -735,6 +795,13 @@ void Parser::auto_implement_functions(const Class *t) {
 		auto_implement_shared_assign(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t->param[0]->get_pointer()})), t);
 		auto_implement_shared_assign(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t})), t);
 		auto_implement_shared_create(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_SHARED_CREATE, t, {t->param[0]->get_pointer()})), t);
+	} else if (t->is_pointer_owned()) {
+		auto_implement_constructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
+		auto_implement_destructor(prepare_auto_impl(t, t->get_destructor()), t);
+		auto_implement_shared_clear(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, {})), t);
+		auto_implement_shared_assign(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t->param[0]->get_pointer()})), t);
+		//auto_implement_shared_assign(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t})), t);
+		//auto_implement_shared_create(prepare_auto_impl(t, t->get_func(IDENTIFIER_FUNC_SHARED_CREATE, t, {t->param[0]->get_pointer()})), t);
 	} else {
 		for (auto *cf: t->get_constructors())
 			auto_implement_constructor(prepare_auto_impl(t, cf), t, true);

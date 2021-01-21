@@ -33,14 +33,14 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception);
 try{ \
 	CODE; \
 }catch(::Exception &e){ \
-	kaba_raise_exception(new KabaException(e.message())); \
+	kaba::kaba_raise_exception(new kaba::KabaException(e.message())); \
 }
 
 #define KABA_EXCEPTION_WRAPPER2(CODE,EXCLASS) \
 try{ \
 	CODE; \
 }catch(::Exception &e){ \
-	kaba_raise_exception(new EXCLASS(e.message())); \
+	kaba::kaba_raise_exception(new EXCLASS(e.message())); \
 }
 
 

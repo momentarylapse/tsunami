@@ -145,7 +145,7 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 	} else if (type == TypeCString) {
 		strcpy(memory, (char*)p);
 		return memory + strlen((char*)p) + 1; // NO RECURSION!!!
-	} else if (type->is_simple_class()) {
+	} else if (type->can_memcpy()) {
 		memcpy(memory, p, type->size);
 	} else {
 		// TEST ME....

@@ -565,13 +565,15 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 		if (params[0]->needs_constructor() and !params[0]->get_default_constructor())
 			do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()));
 		add_missing_function_headers_for_class(t);
-	} else if (t->is_pointer_shared()) {
+	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
 		//t->derive_from(TypeSharedPointer, true);
 		t->param = params;
 		add_missing_function_headers_for_class(t);
 	} else if (t->type == Class::Type::FUNCTION) {
 		t->derive_from(TypeFunction, true);
 		t->param = params;
+	//} else if (t->type == Class::Type::PRODUCT) {
+	//	add_missing_function_headers_for_class(t);
 	}
 	return t;
 }

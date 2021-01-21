@@ -21,7 +21,7 @@ namespace kaba {
 #pragma GCC optimize("0")
 
 nix::Texture* __LoadTexture(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER(return nix::LoadTexture(filename));
+	KABA_EXCEPTION_WRAPPER(return nix::Texture::load(filename));
 	return nullptr;
 }
 
@@ -163,7 +163,6 @@ void SIAddPackageNix() {
 		class_add_elementx("depth_buffer", TypeDepthBufferP, &nix::FrameBuffer::depth_buffer);
 
 	add_class(TypeShader);
-		class_add_func("unref", TypeVoid, nix_p(mf(&nix::Shader::unref)));
 		class_add_func("location", TypeInt, nix_p(mf(&nix::Shader::get_location)));
 			func_add_param("name", TypeString);
 		class_add_func("link_uniform_block", TypeVoid, nix_p(mf(&nix::Shader::link_uniform_block)));
@@ -193,8 +192,8 @@ void SIAddPackageNix() {
 			func_add_param("filename", TypePath);
 		class_add_func("create", TypeShaderP, nix_p(&__CreateShader), Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
-		class_add_const("DEFAULT_3D", TypeShaderP, nix_p(&nix::default_shader_3d));
-		class_add_const("DEFAULT_2D", TypeShaderP, nix_p(&nix::default_shader_2d));
+		class_add_const("DEFAULT_3D", TypeShaderP, nix_p(&nix::Shader::default_3d));
+		class_add_const("DEFAULT_2D", TypeShaderP, nix_p(&nix::Shader::default_2d));
 
 
 		add_class(TypeUniformBuffer);
@@ -270,10 +269,9 @@ void SIAddPackageNix() {
 	add_func("set_wire", TypeVoid, nix_p(&nix::SetWire), Flags::STATIC);
 		func_add_param("enabled", TypeBool);
 	add_func("set_material", TypeVoid, nix_p(&nix::SetMaterial), Flags::STATIC);
-		func_add_param("ambient", TypeColor);
-		func_add_param("diffuse", TypeColor);
-		func_add_param("specular", TypeColor);
-		func_add_param("shininess", TypeFloat32);
+		func_add_param("albedo", TypeColor);
+		func_add_param("roughness", TypeFloat32);
+		func_add_param("metal", TypeFloat32);
 		func_add_param("emission", TypeColor);
 	add_func("set_texture", TypeVoid, nix_p(&nix::SetTexture), Flags::STATIC);
 		func_add_param("t", TypeTexture);

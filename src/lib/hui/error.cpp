@@ -178,7 +178,7 @@ void hui_default_error_handler() {
 	}
 
 	//HuiEnd();
-	exit(0);
+	exit(1);
 }
 
 void SetDefaultErrorHandler(const Callback &error_cleanup_function) {

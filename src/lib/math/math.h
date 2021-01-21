@@ -58,6 +58,14 @@ T abs(T x) {
 	return x;
 }
 template<class T>
+T sign(T x) {
+	if (x < 0)
+		return -1;
+	if (x == 0)
+		return 0;
+	return 1;
+}
+template<class T>
 T sqr(T x) {
 	return x * x;
 }

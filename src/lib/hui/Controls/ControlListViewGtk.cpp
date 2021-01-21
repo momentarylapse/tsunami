@@ -279,16 +279,9 @@ void ControlListView::__set_int(int i) {
 }
 
 int ControlListView::get_int() {
-	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-
-	for (int i=0; ; i++) {
-		GtkTreeIter iter;
-		if (!gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, nullptr, i))
-			return -1;
-		if (gtk_tree_selection_iter_is_selected(sel, &iter))
-			return i;
-
-	}
+	auto sel = get_selection();
+	if (sel.num > 0)
+		return sel[0];
 	return -1;
 }
 

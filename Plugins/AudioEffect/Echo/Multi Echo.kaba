@@ -17,12 +17,7 @@ class MultiEcho extends AudioEffect
 		Reflector[] refl
 
 		override void reset()
-			refl.clear()
-			Reflector r
-			r.volume = 0.2
-			r.feedback = 0.5
-			r.delay = 0.15
-			refl.add(r)
+			refl = [[0.15, 0.2, 0.5]]
 
 	Config config
 	

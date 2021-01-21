@@ -21,9 +21,6 @@ const int MAX_PITCH = 128
 
 class Range
 	int offset, length
-	void __init__(int _offset, int _length)
-		offset = _offset
-		length = _length
 	extern const int start()
 	extern const int end()
 	const bool inside(int pos)
@@ -472,10 +469,6 @@ class Track as shared
 
 class Tag
 	string key, value
-	void __init__()
-	void __init__(string _key, string _value)
-		key = _key
-		value = _value
 
 class Song as shared
 	Path filename

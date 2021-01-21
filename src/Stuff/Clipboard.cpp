@@ -45,8 +45,6 @@ void Clipboard::append_track(TrackLayer *source, AudioView *view, int offset) {
 		target->midi = source->midi.get_notes_by_selection(view->sel).duplicate(-offset);
 		target->midi.samples = view->sel.range().length;
 		target->midi.sanify(view->sel.range());
-		for (MidiNote *n: weak(target->midi))
-			n->range.offset -= offset;
 	}
 	for (auto m: weak(source->markers))
 		if (view->sel.has(m))

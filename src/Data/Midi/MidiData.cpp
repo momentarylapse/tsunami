@@ -369,10 +369,8 @@ void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
 MidiNoteBuffer MidiNoteBuffer::duplicate(int offset) const {
 	MidiNoteBuffer r;
 	for (MidiNote *n: weak(*this))
-		r.add(n->copy());
+		r.add(n->copy(offset));
 	r.samples = samples;
-	for (MidiNote *n: weak(r))
-		n->range.offset -= offset;
 	return r;
 }
 

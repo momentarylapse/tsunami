@@ -42,7 +42,7 @@
 #include "Data/SampleRef.h"
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.101.2";
+const string AppVersion = "0.7.101.3";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -63,7 +63,7 @@ Tsunami::Tsunami() :
 	set_property("version", AppVersion + " \"" + AppNickname + "\"");
 	set_property("comment", _("Editor for audio files"));
 	set_property("website", "http://michi.is-a-geek.org/software");
-	set_property("copyright", "© 2007-2020 by Michael Ankele");
+	set_property("copyright", "© 2007-2021 by Michael Ankele");
 	set_property("author", "Michael Ankele <michi@lupina.de>");
 }
 

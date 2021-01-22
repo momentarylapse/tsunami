@@ -15,9 +15,7 @@ const int MOTION_BLUR_COUNT = 20
 
 class BlurredDot
 	complex pos, pos0
-	bool has_prev
-	void __init__()
-		has_prev = false
+	bool has_prev = false
 	void move(float x, float y)
 		pos0 = pos
 		pos.x = x
@@ -77,7 +75,7 @@ Grid ? '' vertical
 		popup_menu = new Menu()
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		Menu *sub_mode = new Menu()
+		let sub_mode = new Menu()
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
@@ -258,9 +256,9 @@ class Metronome extends TsunamiPlugin
 		chain = session.create_signal_chain("metronome")
 		source = chain._add(CreateBeatSource(session, "Metronome"))
 		
-		Module *beat_midifier = chain.add(Module.Type.PLUMBING, "BeatMidifier")
-		Module *synth = chain.add(Module.Type.SYNTHESIZER, "")
-		Module *output = chain.add(Module.Type.STREAM, "AudioOutput")
+		let beat_midifier = chain.add(Module.Type.PLUMBING, "BeatMidifier")
+		let synth = chain.add(Module.Type.SYNTHESIZER, "")
+		let output = chain.add(Module.Type.STREAM, "AudioOutput")
 		
 		chain.connect(source, 0, beat_midifier, 0)
 		chain.connect(beat_midifier, 0, synth, 0)

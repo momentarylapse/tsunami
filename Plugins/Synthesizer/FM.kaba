@@ -425,26 +425,19 @@ Grid ? ''
 
 
 class OscillatorState
-	float input, output
-	float volume
-	float phi
+	float input = 0
+	float output = 0
+	float volume = 0
+	float phi = 0
 	EnvelopeADSR env
 	OscillatorConfig conf
 	void __init__()
-		volume = 0
-		input = 0
-		output = 0
-		phi = 0
 		env.reset()
 
 class FMRenderer extends PitchRenderer
 	OscillatorState[] osc
-	int num_osc_active
-	override FMSynthesizer *synth
-	
-	override void __init__(Synthesizer s, int _pitch)
-		#super.__init__(s, _pitch)
-		num_osc_active = 0
+	int num_osc_active = 0
+	override FMSynthesizer* synth
 
 	override void on_end()
 		for o,oi in osc

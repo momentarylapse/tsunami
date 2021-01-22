@@ -72,15 +72,13 @@ class MultiEcho extends AudioEffect
 class MultiEchoGrid extends Grid
 	MultiEcho.Config* config
 	ConfigPanel* cp
-	int hover, selected
+	int hover = -1
+	int selected = -1
 	Menu* menu_bg
 	Menu* menu_point
 	
 	
 	override void __init__()
-		hover = -1
-		selected = -1
-		
 		menu_bg = new Menu()
 		menu_bg.add("add reflection", "reflection-add")
 		

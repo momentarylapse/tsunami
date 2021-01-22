@@ -18,11 +18,8 @@ class SineSource extends AudioSource
 
 	Config config
 	int offset
-	Synthesizer* synth
-	MidiSource* source
-	override void __init__()
-		synth = nil
-		source = nil
+	Synthesizer* synth = nil
+	MidiSource* source = nil
 	override void __delete__()
 		if synth
 			del synth

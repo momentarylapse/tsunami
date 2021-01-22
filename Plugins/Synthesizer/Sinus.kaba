@@ -3,12 +3,9 @@ use helper.tone
 
 
 class SinusRenderer extends PitchRenderer
-	float volume
-	float phase
-	override SinusSynthesizer *synth
-	override void __init__(Synthesizer s, int pitch)
-		volume = 0
-		phase = 0
+	float volume = 0
+	float phase = 0
+	override SinusSynthesizer* synth
 
 	override void on_start(float v)
 		volume = v

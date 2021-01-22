@@ -3026,6 +3026,14 @@ bool Parser::parse_class(Class *_namespace) {
 
 			parser_class_add_element(this, _class, name, type, flags, _offset);
 
+			if (Exp.cur == "=") {
+				Exp.next();
+				auto cv = parse_and_eval_const(tree->root_of_all_evil->block.get(), type);
+				Constant *c_value = cv->as_const();
+				ClassInitializers init = {_class->elements.num - 1, c_value};
+				_class->initializers.add(init);
+			}
+
 			if ((Exp.cur != ",") and !Exp.end_of_line())
 				do_error("',' or newline expected after class element");
 			if (Exp.end_of_line())
@@ -3119,16 +3127,17 @@ shared<Node> Parser::parse_and_eval_const(Block *block, const Class *type) {
 	auto cv = parse_operand_super_greedy(block);
 
 	int pen, tc;
-	if (type_match_with_cast(cv, false, type, pen, tc))
+	if (type_match_with_cast(cv, false, type, pen, tc)) {
 		cv = apply_type_cast(tc, cv, type);
-	cv = force_concrete_type(cv);
+	} else {
+		do_error(format("constant value of type '%s' expected", type->long_name()));
+	}
+	//cv = force_concrete_type(cv);
 
 	cv = tree->transform_node(cv, [&](shared<Node> n) { return tree->conv_eval_const_func(n); });
 
 	if (cv->kind != NodeKind::CONSTANT)
 		do_error("constant value expected");
-	if (cv->type != type)
-		do_error(format("constant value of type '%s' expected", type->long_name()));
 	return cv;
 }
 

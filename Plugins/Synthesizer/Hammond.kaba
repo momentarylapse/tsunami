@@ -109,23 +109,21 @@ Grid ? '' vertical
 
 
 class HammondRenderer extends PitchRenderer
-	float volume
+	float volume = 0
 	float[NUM_HARMONICS] phi
 	float[NUM_HARMONICS] A
 	float[] stutter
 	int stutter_offset
 	EnvelopeADSR env
 	BiquadFilter filter
-	override HammondSynthesizer *synth
+	override HammondSynthesizer* synth
 	override void __init__(Synthesizer s, int pitch)
-		volume = 0
 		for x in phi
 			x = 0
 		for a,i in A
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
-		env.reset()
 		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
 	void create_stutter()
 		stutter.resize(440) # 10ms

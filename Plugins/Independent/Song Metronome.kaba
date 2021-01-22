@@ -17,9 +17,7 @@ const int DELTA = 400
 
 class BlurredDot
 	complex pos, pos0
-	bool has_prev
-	void __init__()
-		has_prev = false
+	bool has_prev = false
 	void move(float x, float y)
 		pos0 = pos
 		pos.x = x

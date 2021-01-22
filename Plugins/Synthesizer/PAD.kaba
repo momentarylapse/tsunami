@@ -33,12 +33,10 @@ float gauss(float f, float bw)
 
 
 class PADRenderer extends PitchRenderer
-	int pos
+	int pos = 0
 	float[] prebuf
 	EnvelopeADSR env
-	override PADSynthesizer *synth
-	override void __init__(Synthesizer s, int pitch)
-		pos = 0
+	override PADSynthesizer* synth
 		
 	void create()
 		float freq = pitch_to_freq(pitch)
@@ -105,11 +103,8 @@ class PADSynthesizer extends Synthesizer
 class PADGrid extends Grid
 	PADConfig *pc
 	ConfigPanel *p
-	int selected, hover
-	
-	override void __init__()
-		selected = -1
-		hover = -1
+	int selected = -1
+	int hover = -1
 
 	override void on_draw(Painter c)
 		pc.A.resize(8)

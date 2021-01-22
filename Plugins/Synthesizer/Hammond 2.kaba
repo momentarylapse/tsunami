@@ -122,10 +122,8 @@ float[] create_stutter(float intensity)
 	return stutter
 
 class SineGenerator
-	float phi
-	float delta_phi
-	void __init__()
-		phi = 0
+	float phi = 0
+	float delta_phi = 0
 	void set_omega(float omega)
 		delta_phi = omega
 	float[] read(int n)
@@ -138,7 +136,7 @@ class SineGenerator
 		return f
 
 class HammondRenderer extends PitchRenderer
-	float volume
+	float volume = 0
 	float[NUM_HARMONICS] phi
 	float[NUM_HARMONICS] A
 	SineGenerator[NUM_HARMONICS] osci
@@ -146,9 +144,8 @@ class HammondRenderer extends PitchRenderer
 	int stutter_offset
 	EnvelopeADSR env
 	BiquadFilter filter
-	override HammondSynthesizer *synth
+	override HammondSynthesizer* synth
 	override void __init__(Synthesizer s, int pitch)
-		volume = 0
 		for o,i in osci
 			o.set_omega(delta_phi * HARMONIC_FREQS[i])
 		for x in phi
@@ -157,7 +154,6 @@ class HammondRenderer extends PitchRenderer
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
-		env.reset()
 		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
 	override void on_config()
 		stutter = create_stutter(synth.config.key_stutter)

@@ -246,6 +246,8 @@ bool Class::needs_constructor() const {
 		return false;
 	if (is_super_array() or is_dict())
 		return true;
+	if (initializers.num > 0)
+		return true;
 	if (is_array())
 		return param[0]->needs_constructor();
 	if (vtable.num > 0)

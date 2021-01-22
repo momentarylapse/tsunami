@@ -18,12 +18,8 @@ class Metronome extends AudioSource
 			beats_per_measure = 4
 
 	Config config
-	Synthesizer *synth
-	MetronomeSource *source
-	
-	override void __init__()
-		synth = nil
-		source = nil
+	Synthesizer* synth = nil
+	MetronomeSource* source = nil
 	
 	void create_stuff()
 		synth = CreateSynthesizer(session, "")

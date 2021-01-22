@@ -401,6 +401,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("DummySynthesizer.on_config", &DummySynthesizer::on_config, &dsynth);
 
 	kaba::declare_class_size("EnvelopeADSR", sizeof(EnvelopeADSR));
+	kaba::link_external_class_func("EnvelopeADSR.__init__", &EnvelopeADSR::reset);
 	kaba::link_external_class_func("EnvelopeADSR.set", &EnvelopeADSR::set);
 	kaba::link_external_class_func("EnvelopeADSR.set2", &EnvelopeADSR::set2);
 	kaba::link_external_class_func("EnvelopeADSR.reset", &EnvelopeADSR::reset);

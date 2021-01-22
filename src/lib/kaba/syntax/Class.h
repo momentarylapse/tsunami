@@ -26,6 +26,12 @@ public:
 	bool hidden() const;
 };
 
+class ClassInitializers {
+public:
+	int element;
+	shared<Constant> value;
+};
+
 typedef void *VirtualTable;
 
 class Class : public Sharable<Empty> {
@@ -64,6 +70,7 @@ public:
 	bool is_pointer_silent() const;
 	bool fully_parsed() const;
 	Array<ClassElement> elements;
+	Array<ClassInitializers> initializers;
 	shared_array<Function> functions;
 	shared_array<Variable> static_variables;
 	shared_array<Constant> constants;

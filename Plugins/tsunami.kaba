@@ -39,17 +39,15 @@ class MidiNote as shared
 	Range range
 	float pitch
 	float volume
-	int stringno, clef_position, modifier
-	int flags
+	int stringno = -1
+	int clef_position = -1
+	int modifier = 0
+	int flags = 0
 	void __init__()
 	void __init__(Range r, float _pitch, float _volume)
 		range = r
 		pitch = _pitch
 		volume = _volume
-		stringno = -1
-		clef_position = -1
-		modifier = 0
-		flags = 0
 	extern void set(int mask)
 	extern const bool is(int mask)
 	extern const MidiNote* copy(int offset)
@@ -58,15 +56,14 @@ class MidiEvent
 	int pos
 	float pitch
 	float volume
-	int flags
-	int stringno, clef_position
+	int flags = 0
+	int stringno = -1
+	int clef_position = -1
+	void __init__()
 	void __init__(int _pos, float _pitch, float _volume)
 		pos = _pos
 		pitch = _pitch
 		volume = _volume
-		flags = 0
-		stringno = -1
-		clef_position = -1
 	const string __str__()
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
@@ -306,7 +303,7 @@ class DummySynthesizer extends Synthesizer
 	extern override PitchRenderer *create_pitch_renderer(int pitch)
 
 class EnvelopeADSR
-	#extern void __init__()
+	extern void __init__()
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
 	extern void set2(float initial, float peak)
 	extern void reset()
@@ -364,16 +361,14 @@ class Bar as shared
 class Beat
 	Range range
 	int bar_index
-	int bar_no
-	int beat_no
+	int bar_no = 0
+	int beat_no = 0
 	int level
 
 	void __init__()
 	void __init__(int _offset, int _level)
 		range = Range(_offset, 0)
 		level = _level
-		bar_no = 0
-		beat_no = 0
 
 class BarCollection extends shared Bar[]
 	extern selfref Bar*[] get_bars(Range r)

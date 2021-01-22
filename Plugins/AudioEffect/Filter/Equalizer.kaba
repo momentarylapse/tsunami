@@ -29,10 +29,7 @@ class Peak
 		q = _q
 	
 	complex z(float g0)
-		complex r
-		r.x = pitch_to_freq(pitch)
-		r.y = gain + g0
-		return r
+		return [pitch_to_freq(pitch), gain + g0]
 	#float q()
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
@@ -73,14 +70,11 @@ class Equalizer extends AudioEffect
 			peaks.add(Peak(FILTER_HIGH_PASS, 30, -10, 2))
 			peaks.add(Peak(FILTER_LOW_PASS, 100, -10, 2))
 
-	EqualizerGrid *grid
+	EqualizerGrid* grid = nil
 
 	Config config
 
 	BiquadFilter[] filter # state
-	
-	override void __init__()
-		grid = nil
 	
 	override void on_config()
 		filter.clear()
@@ -115,16 +109,12 @@ class EqualizerGrid extends Grid
 	Equalizer.Config* c
 	EqualizerPanel* cp
 	float sample_rate
-	int hover, selected
+	int hover = HOVER_NONE
+	int selected = HOVER_NONE
 	SpectrumCurve spectrum
 	
-	Menu* menu
+	Menu* menu = nil
 	
-	
-	override void __init__()
-		hover = HOVER_NONE
-		selected = hover
-		menu = nil
 	override void __delete__()
 		if menu
 			del menu

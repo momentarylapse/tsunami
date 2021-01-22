@@ -82,14 +82,10 @@ class HarmonicPanel extends ConfigPanel
 
 
 class HarmonicRenderer extends PitchRenderer
-	float volume
-	float phi
+	float volume = 0
+	float phi = 0
 	EnvelopeADSR env
-	override HarmonicSynthesizer *synth
-	override void __init__(Synthesizer s, int pitch)
-		volume = 0
-		phi = 0
-		env.reset()
+	override HarmonicSynthesizer* synth
 	override void on_config()
 		env.set(0.01, 0.01, 0.7, synth.config.release, synth.sample_rate)
 

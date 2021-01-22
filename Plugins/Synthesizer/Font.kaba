@@ -6,13 +6,11 @@ use helper.tone
 # a single file
 class MidiFont
 	string name
-	Song *song
+	Song* song = nil
 	Session* sub
 	
-	void __init__()
 	void __init__(string _name)
 		name = _name
-		song = nil
 	
 	void load(Session session)
 		if song
@@ -107,9 +105,7 @@ class FontConfig extends Module.Config
 
 class FontSynthesizer extends Synthesizer
 	FontConfig config
-	Synthesizer *synth
-	override void __init__()
-		synth = nil
+	Synthesizer* synth = nil
 	override void __delete__()
 		if synth
 			del synth

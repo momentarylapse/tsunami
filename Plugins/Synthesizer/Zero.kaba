@@ -2,17 +2,9 @@ use tsunami
 use helper.tone
 
 class ZeroRenderer extends PitchRenderer
-	float phase
-	float volume
-	bool fade_out
-	
-	# gets called when creating the renderer
-	override void __init__(Synthesizer s, int pitch)
-		# dark magic...gave up
-		super.__init__(s, pitch)
-		phase = 0
-		volume = 0
-		fade_out = false
+	float phase = 0
+	float volume = 0
+	bool fade_out = false
 	
 	# use += ... otherwise would overwrite previous notes...!!!!
 	override bool render(out AudioBuffer buf)

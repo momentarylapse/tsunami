@@ -43,12 +43,9 @@ class Biquad extends AudioEffect
 
 	Config config
 
-	BiquadGrid *grid
+	BiquadGrid* grid = nil
 
 	BiquadFilter filter # state
-	
-	override void __init__()
-		grid = nil
 	
 	override void on_config()
 		config.create_filter(filter.params)

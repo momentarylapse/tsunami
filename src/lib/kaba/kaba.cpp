@@ -11,6 +11,7 @@
 #include "lib/common.h"
 #include "syntax/Parser.h"
 #include "lib/common.h"
+#include "Interpreter.h"
 #include <cassert>
 
 #include "../config.h"
@@ -309,6 +310,12 @@ void execute_single_script_command(const string &cmd) {
 
 // compile
 	s->compile();
+
+
+	if (kaba::config.interpreted) {
+		s->interpreter->run("--command-func--");
+		return;
+	}
 
 // execute
 	typedef void void_func();

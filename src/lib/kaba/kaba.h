@@ -33,6 +33,8 @@ public:
 struct LinkerException : Exception{};
 struct LinkerException : Exception{};*/
 
+class Interpreter;
+
 
 // executable (compiled) data
 class Script : public Sharable<Empty> {
@@ -88,6 +90,8 @@ public:
 	Array<int> function_vars_to_link;
 
 	bool just_analyse, show_compiler_stats;
+
+	owned<Interpreter> interpreter;
 
 
 	// package

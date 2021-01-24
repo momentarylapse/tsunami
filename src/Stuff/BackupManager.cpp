@@ -41,7 +41,7 @@ void BackupManager::check_old_files(Session *session) {
 	_clear_old();
 
 	// update list
-	auto _files = dir_search(tsunami->directory, "backup-*", false);
+	auto _files = dir_search(tsunami->directory, "backup-*", "f");
 	for (auto &f: _files) {
 		BackupFile bf;
 		bf.uuid = next_uuid ++;

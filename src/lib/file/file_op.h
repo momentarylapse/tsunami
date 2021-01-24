@@ -31,6 +31,6 @@ bool func_did_not_throw(std::function<void()> f);
 string _cdecl shell_execute(const string &cmd);
 
 
-Array<string> _cdecl dir_search(const Path &dir, const string &filter, bool show_directories);
+Array<Path> _cdecl dir_search(const Path &dir, const string &filter, const string &options);
 
 #endif

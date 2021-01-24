@@ -338,6 +338,7 @@ sources = [
 	'src/lib/kaba/syntax/precompiler.cpp',
 	'src/lib/kaba/syntax/preprocessor.cpp',
 	'src/lib/kaba/syntax/SyntaxTree.cpp',
+	'src/lib/kaba/Interpreter.cpp',
 	'src/lib/kaba/kaba.cpp',
 	'src/lib/math/complex.cpp',
 	'src/lib/math/interpolation.cpp',

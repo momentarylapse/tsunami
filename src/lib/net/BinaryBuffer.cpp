@@ -20,7 +20,7 @@ void BinaryBuffer::__init__() {
 }
 
 void BinaryBuffer::__delete__() {
-	BinaryBuffer::~BinaryBuffer();
+	this->BinaryBuffer::~BinaryBuffer();
 }
 
 void BinaryBuffer::read(void *p, int size) {

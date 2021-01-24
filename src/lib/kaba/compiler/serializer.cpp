@@ -8,6 +8,7 @@
 #include "SerializerX.h"
 #include "BackendAmd64.h"
 #include "BackendX86.h"
+#include "../Interpreter.h"
 
 
 namespace kaba {
@@ -1873,6 +1874,16 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 	if (config.verbose and config.allow_output(f, "ser:0"))
 		f->block->show(TypeVoid);
 
+	if (config.interpreted) {
+		auto x = new SerializerX(this, list);
+		x->cur_func_index = index;
+		x->serialize_function(f);
+		x->fix_return_by_ref();
+		if (!syntax->script->interpreter)
+			syntax->script->interpreter = new Interpreter(syntax->script);
+		syntax->script->interpreter->add_function(f, x);
+		return;
+	}
 
 	if (config.use_new_serializer) {
 
@@ -1974,7 +1985,8 @@ void Script::compile_functions(char *oc, int &ocs) {
 			}
 		}
 
-	delete(list);
+	if (!config.interpreted)
+		delete list;
 }
 
 };

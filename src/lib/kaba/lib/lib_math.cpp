@@ -97,7 +97,7 @@ public:
 	void __delete__() {
 		this->~AnyList();
 	}
-	void assign(AnyList &o) {
+	void assign(const AnyList &o) {
 		*this = o;
 	}
 };

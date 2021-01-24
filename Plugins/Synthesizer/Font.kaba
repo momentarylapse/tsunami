@@ -69,9 +69,9 @@ class FontList
 
 	#string[] find_drumsets()
 	void update()
-		let list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", false)
+		let list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
 		for e in list
-			string name = e[:-5]
+			string name = str(e)[:-5]
 			if find(name) >= 0
 				continue
 			fonts.add(new MidiFont(name))

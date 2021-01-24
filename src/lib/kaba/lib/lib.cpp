@@ -792,10 +792,10 @@ void SIAddPackageVulkan();
 CompilerConfiguration::CompilerConfiguration() {
 	abi = Abi::NATIVE;
 	instruction_set = Asm::InstructionSet::NATIVE;
+	interpreted = false;
 	allow_std_lib = true;
 	pointer_size = sizeof(void*);
 	super_array_size = sizeof(DynamicArray);
-	stack_size = DEFAULT_STACK_SIZE;
 
 	allow_simplification = true;
 	allow_registers = true;

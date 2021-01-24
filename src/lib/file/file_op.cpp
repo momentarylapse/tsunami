@@ -204,10 +204,10 @@ void sa_sort_i(Array<string> &a) {
 				a.swap(i, j);
 }
 
-// search a directory for files matching a filter
-Array<string> dir_search(const Path &dir, const string &filter, bool show_directories) {
-	Array<string> dir_list, file_list;
 
+
+// search a directory for files matching a filter
+void dir_search_single(const Path &dir, const string &filter, Array<string> &dir_list, Array<string> &file_list) {
 	string filter2 = filter.substr(1, filter.num - 1);
 
 #ifdef OS_WINDOWS
@@ -218,7 +218,7 @@ Array<string> dir_search(const Path &dir, const string &filter, bool show_direct
 		string name = t.name;
 		//if ((strcmp(t.name,".")!=0)and(strcmp(t.name,"..")!=0)and(strstr(t.name,"~")==NULL)){
 		if ((name != ".") and (name != "..") and (name.back() != '~')) {
-			if (name.match(filter) or (show_directories and (t.attrib == _A_SUBDIR))) {
+			if (name.match(filter) or (t.attrib == _A_SUBDIR)) {
 				if (t.attrib == _A_SUBDIR)
 					dir_list.add(name);
 				else
@@ -231,7 +231,7 @@ Array<string> dir_search(const Path &dir, const string &filter, bool show_direct
 	DIR *_dir;
 	_dir = opendir(dir.str().c_str());
 	if (!_dir)
-		return {};
+		return;
 	struct dirent *dn;
 	dn = readdir(_dir);
 	struct stat s;
@@ -243,7 +243,7 @@ Array<string> dir_search(const Path &dir, const string &filter, bool show_direct
 			stat(ffn.str().c_str(), &s);
 			bool is_reg = (s.st_mode & S_IFREG) > 0;
 			bool is_dir = (s.st_mode & S_IFDIR) > 0;
-			if ((is_reg and name.match(filter)) or (show_directories and is_dir)) {
+			if ((is_reg and name.match(filter)) or is_dir) {
 				if (is_dir)
 					dir_list.add(name);
 				else
@@ -255,11 +255,44 @@ Array<string> dir_search(const Path &dir, const string &filter, bool show_direct
 	closedir(_dir);
 #endif
 
-	
 	// sorting...
 	sa_sort_i(dir_list);
 	sa_sort_i(file_list);
-	return dir_list + file_list;
+}
+
+void dir_search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<string> &dir_list, Array<string> &file_list) {
+	Array<string> sub_dir_list, sub_file_list;
+	dir_search_single(dir0 << subdir, filter, sub_dir_list, sub_file_list);
+	for (auto &x: sub_dir_list) {
+		dir_list.add((subdir << x).str());
+		dir_search_single_rec(dir0, subdir << x, filter, dir_list, file_list);
+	}
+	for (auto &x: sub_file_list)
+		file_list.add((subdir << x).str());
+}
+
+// search a directory for files matching a filter
+Array<Path> dir_search(const Path &dir, const string &filter, const string &options) {
+	Array<string> dir_list, file_list;
+
+	bool show_files = options.find("f") >= 0;
+	bool show_dirs = options.find("d") >= 0;
+	bool show_recursive = options.find("r") >= 0;
+
+	if (show_recursive) {
+		dir_search_single_rec(dir, "", filter, dir_list, file_list);
+	} else {
+		dir_search_single(dir, filter, dir_list, file_list);
+	}
+	
+	Array<Path> r;
+	if (show_dirs)
+		for (auto &x: dir_list)
+			r.add(x);
+	if (show_files)
+		for (auto &x: file_list)
+			r.add(x);
+	return r;
 }
 
 

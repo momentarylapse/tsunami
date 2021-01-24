@@ -17,6 +17,7 @@ class vector;
 class BinaryBuffer {
 public:
 	BinaryBuffer();
+	~BinaryBuffer() {}
 
 	void __init__();
 	void __delete__();

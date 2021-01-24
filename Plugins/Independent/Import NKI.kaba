@@ -15,15 +15,15 @@ class ImportNKI extends TsunamiPlugin
 		Path dir = Path(str(filename)[:-4] + " Samples")
 		print(dir)
 		
-		let list = Filesystem.search(dir, "*.wav", false)
+		let list = Filesystem.search(dir, "*.wav", "f")
 		for e in list
 		
 			AudioBuffer buf
 			session.storage.load_buffer(buf, dir << e)
 			let s = new Sample(e, buf)
 			session.song.add_sample(s)
-			if e[-5:] != "r.wav"
-				print(int(e[:2]))
-				s.set_value("pitch", int(e[:2]) + 10 + 12)
+			if str(e)[-5:] != "r.wav"
+				print(int(str(e)[:2]))
+				s.set_value("pitch", int(str(e)[:2]) + 10 + 12)
 		
 	

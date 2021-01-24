@@ -14,7 +14,6 @@ namespace kaba {
 
 #define MAX_OPCODE				(2*65536)	// max. amount of opcode
 #define MAX_THREAD_OPCODE		1024
-#define DEFAULT_STACK_SIZE		32768	// max. amount of stack memory
 
 
 //#define mem_align(x)	((x) + (4 - (x) % 4) % 4)
@@ -402,9 +401,9 @@ public:
 	CompilerConfiguration();
 	Asm::InstructionSet instruction_set;
 	Abi abi;
+	bool interpreted;
 	bool allow_std_lib;
 
-	int64 stack_size;
 	int64 pointer_size;
 	int super_array_size;
 

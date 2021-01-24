@@ -2721,10 +2721,10 @@ string canonical_import_name(const string &s) {
 }
 
 string dir_has(const Path &dir, const string &name) {
-	auto list = dir_search(dir, "*", true);
+	auto list = dir_search(dir, "*", "fd");
 	for (auto &e: list)
-		if (canonical_import_name(e) == name)
-			return e;
+		if (canonical_import_name(e.str()) == name)
+			return e.str();
 	return "";
 }
 
@@ -3080,6 +3080,9 @@ void Parser::post_process_newly_parsed_class(Class *_class, int size) {
 			auto el = ClassElement(IDENTIFIER_VTABLE_VAR, TypePointer, 0);
 			_class->elements.insert(el, 0);
 			size += config.pointer_size;
+
+			for (auto &i: _class->initializers)
+				i.element ++;
 		}
 	}
 

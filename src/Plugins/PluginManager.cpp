@@ -759,11 +759,11 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 	Path dir = _dir;
 	if (group.num > 0)
 		dir <<= group;
-	auto list = dir_search(dir, "*.kaba", false);
+	auto list = dir_search(dir, "*.kaba", "f");
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;
-		pf.name = e.replace(".kaba", "");
+		pf.name = e.str().replace(".kaba", "");
 		pf.filename = dir << e;
 		pf.group = group;
 		get_plugin_file_data(pf);

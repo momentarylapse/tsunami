@@ -50,7 +50,7 @@ void Parser::auto_implement_add_child_constructors(shared<Node> n_self, Function
 				n_self->shift(e.offset, e.type),
 				tree->add_node_const(init.value.get()));
 		if (!n_assign)
-			do_error_implicit(f, format("no %s.__assign__() found", e.type->long_name()));
+			do_error_implicit(f, format("(auto init) no operator %s = %s found", e.type->long_name(), init.value->type->long_name()));
 		f->block->add(n_assign);
 
 	}
@@ -110,7 +110,7 @@ void Parser::auto_implement_constructor(Function *f, const Class *t, bool allow_
 				auto param = tree->add_node_local(f->__get_var(e.name));
 				auto n_assign = link_operator_id(OperatorID::ASSIGN, self->shift(e.offset, e.type), param);
 				if (!n_assign)
-					do_error_implicit(f, format("no %s.__assign__() found", e.type->long_name()));
+					do_error_implicit(f, format("no operator %s = %s found", param->type->long_name(), e.type->long_name()));
 				f->block->add(n_assign);
 			}
 	} else {

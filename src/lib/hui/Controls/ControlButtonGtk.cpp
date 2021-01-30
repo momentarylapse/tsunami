@@ -37,6 +37,7 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 		widget = gtk_button_new_with_label(sys_str(parts[0]));
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_button_press), this);
 	}
+	set_options(get_option_from_title(title));
 
 //	SetImageById(this, id);
 }

@@ -55,10 +55,9 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 }
 
 std::pair<int,int> QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options) {
-	auto *dlg = new QuestionDialogIntInt(parent, question, labels, options);
+	auto dlg = ownify(new QuestionDialogIntInt(parent, question, labels, options));
 	dlg->run();
 	auto r = std::make_pair(dlg->result1, dlg->result2);
-	delete dlg;
 	return r;
 }
 
@@ -68,18 +67,18 @@ std::pair<int,int> QuestionDialogIntInt::ask(hui::Window *parent, const string &
 
 int QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
 	int r = -1;
-	auto *dlg = new hui::Dialog(title, 200, 40, parent, false);
+	auto dlg = ownify(new hui::Dialog(title, 200, 40, parent, false));
 	dlg->add_grid("", 0, 0, "grid");
 	dlg->set_target("grid");
 	dlg->add_label("!margin-top=8,margin-bottom=8,center\\" + text, 0, 0, "text");
-	dlg->add_grid("", 0, 1, "buttons");
+	dlg->add_grid("!expandx", 0, 1, "buttons");
 	dlg->set_target("buttons");
 	for (int i=0; i<options.num; i++) {
 		string id = format("button-%d", i);
 		dlg->add_button("!expandx,height=36\\" + options[i], i, 0, id);
 		if (tips.num > i)
 			dlg->set_tooltip(id, tips[i]);
-		dlg->event(id, [i,&r,dlg] { r = i; dlg->request_destroy(); });
+		dlg->event(id, [i,&r,&dlg] { r = i; dlg->request_destroy(); });
 	}
 	dlg->run();
 	return r;

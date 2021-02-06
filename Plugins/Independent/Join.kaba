@@ -1,0 +1,24 @@
+use tsunami
+
+class Join extends TsunamiPlugin
+	override void on_start()
+		print(args)
+		if len(args) < 2
+			print("need more args!!!")
+			return
+		int offset = 0
+		let song = new Song(session, 44100)
+		let t = song.add_track(SignalType.AUDIO, 0)
+		let layer = t.layers[0]
+		for f in args[1:]
+			print(f)
+			AudioBuffer part
+			session.storage.load_buffer(part, f)
+			
+			AudioBuffer buf
+			let a = layer.edit_buffers(buf, Range(offset, len(part)))
+			buf.set(part, 0, 1.0)
+			layer.edit_buffers_finish(a)
+			offset += len(part)
+		session.storage.save(song, args[0])
+	override void on_stop()

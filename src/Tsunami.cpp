@@ -42,7 +42,7 @@
 #include "Data/SampleRef.h"
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.101.4";
+const string AppVersion = "0.7.101.5";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -216,12 +216,12 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			session->storage->save(song, a[1]);
 		delete song;
 	});
-	p.mode("--execute", {"PLUGIN"}, "just run a plugin", [&](const Array<string> &a) {
+	p.mode("--execute", {"PLUGIN", "..."}, "just run a plugin", [&](const Array<string> &a) {
 		device_manager->init();
 		session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
-		session->execute_tsunami_plugin(a[0]);
+		session->execute_tsunami_plugin(a[0], a.sub(1, -1));
 	});
 #ifndef NDEBUG
 	p.mode("--list-tests", {}, "debug: list internal unit tests", [&](const Array<string> &) {

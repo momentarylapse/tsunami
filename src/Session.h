@@ -63,7 +63,7 @@ public:
 	bool die_on_plugin_stop;
 
 
-	void execute_tsunami_plugin(const string &name);
+	void execute_tsunami_plugin(const string &name, const Array<string> &args = {});
 	void on_plugin_stop_request(TsunamiPlugin *p);
 
 	int sample_rate();

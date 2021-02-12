@@ -10,19 +10,20 @@
 
 #include "../../Action.h"
 
-class Track;
+class TrackLayer;
 class MidiNote;
 class Range;
 enum class NoteModifier;
 
 class ActionTrackEditMidiNote : public Action {
 public:
-	ActionTrackEditMidiNote(shared<MidiNote> n, const Range &range, float pitch, float volume, int stringno, int flags);
+	ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote> n, const Range &range, float pitch, float volume, int stringno, int flags);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
+	TrackLayer *layer;
 	shared<MidiNote> note;
 	shared<MidiNote> note2;
 };

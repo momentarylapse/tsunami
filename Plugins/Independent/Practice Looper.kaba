@@ -20,6 +20,7 @@ class PLPanel extends ConfigPanel
 		super.__init__(l)
 		from_source("
 Grid ? '' vertical
+	Label ? 'Do not edit the file (even adjusting volumes)!' bold italic
 	Grid ? ''
 		Button play 'Play' expandx expandy
 		Button pause 'Pause' expandx expandy
@@ -83,8 +84,7 @@ class PracticeLooper extends TsunamiPlugin
 	func reset()
 		if not altered_speed
 			return
-		print("UNDO")
-		session.view.sel.range_raw = old_sel
+		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, current_speed)
 		session.view.cam.set_range(scale_range(session.view.cam.range(), current_speed))
 		song.undo()
 		altered_speed = false

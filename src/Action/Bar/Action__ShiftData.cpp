@@ -39,16 +39,16 @@ void Action__ShiftData::undo(Data *d) {
 }
 
 void Action__ShiftData::do_shift(Song *s, int delta) {
-	for (auto t: s->tracks) {
+	for (auto t: weak(s->tracks)) {
 
-		for (auto l: t->layers) {
+		for (auto l: weak(t->layers)) {
 			// buffer
-			for (AudioBuffer &b : l->buffers)
+			for (auto &b : l->buffers)
 				if (b.offset >= offset)
 					b.offset += delta;
 
 			// midi
-			for (auto n: l->midi) {
+			for (auto n: weak(l->midi)) {
 				if (n->range.start() >= offset)
 					n->range.offset += delta;
 				/*else if (n->range.end() >= offset){
@@ -58,7 +58,7 @@ void Action__ShiftData::do_shift(Song *s, int delta) {
 			}
 
 			// marker
-			for (auto m: l->markers) {
+			for (auto m: weak(l->markers)) {
 				if (m->range.offset >= offset)
 					m->range.offset += delta;
 				/*else if (m->range.end() >= offset)
@@ -66,13 +66,15 @@ void Action__ShiftData::do_shift(Song *s, int delta) {
 			}
 
 			// samples
-			for (auto s: l->samples)
+			for (auto s: weak(l->samples))
 				if (s->pos >= offset)
 					s->pos += delta;
 
-			for (CrossFade &f: l->fades)
+			for (auto &f: l->fades)
 				if (f.position >= offset)
 					f.position += delta;
+
+			l->notify();
 		}
 	}
 }

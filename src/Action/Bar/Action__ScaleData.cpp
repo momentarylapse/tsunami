@@ -50,17 +50,17 @@ int __shift_data_shift(const Range &source, int new_length, int pos) {
 
 void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 	int pos0 = r.offset;
-	for (auto t: s->tracks) {
+	for (auto t: weak(s->tracks)) {
 
 		// buffer
-		for (auto l: t->layers) {
-			for (AudioBuffer &b: l->buffers)
+		for (auto l: weak(t->layers)) {
+			for (auto &b: l->buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(r, new_length, b.offset);
 
 
 			// midi
-			foreachi(auto n, l->midi, j) {
+			foreachi(auto n, weak(l->midi), j) {
 				// note start
 				if (n->range.start() >= pos0)
 					n->range.set_start(__shift_data_shift(r, new_length, n->range.start()));
@@ -70,7 +70,7 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 			}
 
 			// marker
-			for (auto m: l->markers) {
+			for (auto m: weak(l->markers)) {
 				if (m->range.start() >= pos0)
 					m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
 				if (m->range.end() >= pos0)
@@ -78,14 +78,16 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 			}
 
 			// samples
-			for (auto s: l->samples)
+			for (auto s: weak(l->samples))
 				if (s->pos >= pos0)
 					s->pos = __shift_data_shift(r, new_length, s->pos);
 
 			// fades
-			for (CrossFade &f: l->fades)
+			for (auto &f: l->fades)
 				if (f.position >= pos0)
 					f.position = __shift_data_shift(r, new_length, f.position);
+
+			l->notify();
 		}
 	}
 }

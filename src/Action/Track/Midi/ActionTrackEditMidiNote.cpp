@@ -6,15 +6,16 @@
  */
 
 #include "ActionTrackEditMidiNote.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
-ActionTrackEditMidiNote::ActionTrackEditMidiNote(shared<MidiNote> n, const Range &range, float _pitch, float _volume, int _stringno, int _flags) {
+ActionTrackEditMidiNote::ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote> n, const Range &range, float _pitch, float _volume, int _stringno, int _flags) {
 	note = n;
 	note2 = new MidiNote(range, _pitch, _volume);
 	note2->stringno = _stringno;
 	note2->flags = _flags;
 	note2->clef_position = -1;
 	note2->modifier = NoteModifier::UNKNOWN;
+	layer = l;
 }
 
 void* ActionTrackEditMidiNote::execute(Data* d) {
@@ -25,6 +26,7 @@ void* ActionTrackEditMidiNote::execute(Data* d) {
 	std::swap(note->flags, note2->flags);
 	std::swap(note->clef_position, note2->clef_position);
 	std::swap(note->modifier, note2->modifier);
+	layer->notify(layer->MESSAGE_CHANGE);
 	return nullptr;
 }
 

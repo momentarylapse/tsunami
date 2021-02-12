@@ -2,10 +2,10 @@ use linalg
 
 
 class Node
-	float phi
+	float phi = 0
 	complex pos
+	void __init__()
 	void __init__(complex p)
-		phi = 0
 		pos = p
 
 enum
@@ -106,10 +106,9 @@ class Resistor extends Edge
 		return ["R"]
 
 class Capacitor extends Edge
-	float U_prev
+	float U_prev = 0
 	void __init__(int[] n, float C)
 		super.__init__(TYPE_CAPACITOR, n, [C])
-		U_prev = 0
 	override float g(float dt)
 		return param[0] / dt
 	override float I_off(float dt)
@@ -125,10 +124,9 @@ class Capacitor extends Edge
 		U_prev = 0
 
 class Inductor extends Edge
-	float I_prev
+	float I_prev = 0
 	void __init__(int[] n, float L)
 		super.__init__(TYPE_INDUCTOR, n, [L])
-		I_prev = 0
 	override float g(float dt)
 		return dt / param[0]
 	override float I_off(float dt)
@@ -367,7 +365,7 @@ class Circuit
 		else if t == TYPE_DIODE
 			e = new Diode(n)
 		else
-			raise(new Exception("unknown type: " + t))
+			raise(new Exception("unknown type: {{t}}"))
 		edges.add(e)
 		return e
 

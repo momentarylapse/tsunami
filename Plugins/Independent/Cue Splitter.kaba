@@ -6,10 +6,10 @@ use tsunami
 class Part
 	string title
 	float foffset
-	void __init__()
+#	void __init__()
 
 string sanitize(string s)
-	string t = s.replace("/", " - ")
+	let t = s.replace("/", " - ")
 	#t = t.replace("", " - ")
 	return t
 
@@ -20,13 +20,13 @@ class CueSplitter extends TsunamiPlugin
 			load_cue(hui.filename)
 	
 	void load_cue(Path filename)
-		Path dir = filename.parent()
+		let dir = filename.parent()
 		string fn
 		string year, album, artist
 		Part*[] parts
 		Part *cur = nil
 		try
-			File *f = Filesystem.open_text(filename)
+			let f = Filesystem.open_text(filename)
 			while true
 				string s
 				f >> s
@@ -48,7 +48,7 @@ class CueSplitter extends TsunamiPlugin
 					cur.title = s[11:-1]
 					print(cur.title)
 				if s.head(10) == "    INDEX "
-					string soff = s[13:]
+					let soff = s[13:]
 					print(soff)
 					let xx = soff.explode(":")
 					cur.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
@@ -72,7 +72,7 @@ class CueSplitter extends TsunamiPlugin
 			if year != ""
 				tags.add(Tag("year", year))
 			tags.add(Tag("title", p.title))
-			tags.add(Tag("tracknumber", i+1))
+			tags.add(Tag("tracknumber", str(i+1)))
 			int offset = p.foffset * session.song.sample_rate
 			int end = session.song.range().length
 			if i < len(parts)-1
@@ -85,10 +85,7 @@ class CueSplitter extends TsunamiPlugin
 				print(end)
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
-			string _fn = i+1
-			if len(_fn) < 2
-				_fn = "0" + _fn
-			_fn += " - {{sanitize(p.title)}}.flac"
+			let _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
 			session.storage.save_via_renderer(r.out, dir << _fn, end - offset, tags)
 		print("-----------------done")
 		stop()

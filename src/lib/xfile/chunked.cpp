@@ -87,7 +87,14 @@ void FileChunkBasic::set_root(ChunkedFileParser *r) {
 		c->set_root(r);
 }
 
-FileChunkBasic *FileChunkBasic::get_sub(const string &name) {
+string str_clamp(const string &s, int l) {
+	if (s.num > l)
+		return s.substr(0, l);
+	return s;
+}
+
+FileChunkBasic *FileChunkBasic::get_sub(const string &_name) {
+	string name = str_clamp(_name, root->header_name_size);
 	for (auto *c: children)
 		if (c->name == name) {
 			c->context = context;
@@ -103,17 +110,17 @@ void FileChunkBasic::write_sub(const string &name, void *p) {
 	c->write_complete();
 }
 
-void FileChunkBasic::write_sub_parray(const string &name, DynamicArray &a) {
+void FileChunkBasic::write_sub_parray(const string &name, const DynamicArray &a) {
 	auto c = get_sub(name);
 	for (int i=0; i<a.num; i++) {
-		c->set(*(void**)a.simple_element(i));
+		c->set(*(void**)const_cast<DynamicArray&>(a).simple_element(i));
 		c->write_complete();
 	}
 }
-void FileChunkBasic::write_sub_array(const string &name, DynamicArray &a) {
+void FileChunkBasic::write_sub_array(const string &name, const DynamicArray &a) {
 	auto c = get_sub(name);
 	for (int i=0; i<a.num; i++) {
-		c->set(a.simple_element(i));
+		c->set(const_cast<DynamicArray&>(a).simple_element(i));
 		c->write_complete();
 	}
 }
@@ -168,6 +175,7 @@ string FileChunkBasic::read_header() {
 
 
 	context->push(cname, pos0, size);
+	//msg_write("CHUNK " + context->str());
 	return cname;
 }
 
@@ -195,7 +203,7 @@ void FileChunkBasic::read_contents() {
 			string tt;
 			tt.resize(context->end() - f->get_pos());
 			f->read_buffer(tt);
-			msg_write(tt.substr(0, 100).hex());
+			//msg_write(tt.substr(0, 100).hex());
 
 			if (root)
 				root->on_unhandled();
@@ -215,6 +223,13 @@ ChunkedFileParser::~ChunkedFileParser() {
 void ChunkedFileParser::set_base(FileChunkBasic *b) {
 	base = b;
 	base->define_children();
+	base->_clamp_name_rec(header_name_size);
+}
+
+void FileChunkBasic::_clamp_name_rec(int length) {
+	name = str_clamp(name, length);
+	for (auto c: children)
+		c->_clamp_name_rec(length);
 }
 
 bool ChunkedFileParser::read(const Path &filename, void *p) {

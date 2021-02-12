@@ -431,19 +431,41 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 	}
 }
 
-void Texture::set_options(const string &op) {
-	if (op == "wrap=repeat") {
-		glBindTexture(0, texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	} else if (op == "wrap=clamp") {
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	} else {
-		msg_error("unknown option: " + op);
+void Texture::set_options(const string &options) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	for (auto &x: options.explode(",")) {
+		auto y = x.explode("=");
+		if (y.num != 2)
+			throw Exception("key=value expected: " + x);
+		string key = y[0];
+		string value = y[1];
+		if (key == "wrap") {
+			if (value == "repeat") {
+				//glBindTexture(0, texture);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			} else if (value == "clamp") {
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			} else {
+				throw Exception("unknown value for key: " + x);
+			}
+		} else if ((key == "magfilter") or (key == "minfilter")) {
+			auto filter = (key == "magfilter") ? GL_TEXTURE_MAG_FILTER : GL_TEXTURE_MIN_FILTER;
+			if (value == "linear") {
+				glTexParameteri(GL_TEXTURE_2D, filter, GL_LINEAR);
+			} else if (value == "nearest") {
+				glTexParameteri(GL_TEXTURE_2D, filter, GL_NEAREST);
+			} else if (value == "trilinear") {
+				glTexParameteri(GL_TEXTURE_2D, filter, GL_LINEAR_MIPMAP_LINEAR);
+			} else {
+				throw Exception("unknown value for key: " + x);
+			}
+		} else {
+			throw Exception("unknown key: " + key);
+		}
+		TestGLError("Texture.set_options");
 	}
-	TestGLError("Texture.set_options");
 }
 
 void Texture::overwrite(const Image &image) {

@@ -644,7 +644,7 @@ void BackendX86::correct_unallowed_param_combis2(SerialNode &c) {
 
 	if (c.inst == Asm::INST_CMP)
 		if ((c.p[1].kind == NodeKind::IMMEDIATE) and (c.p[1].type->size == 8)) {
-			if (c.p[1].p & 0xffffffff00000000 != 0)
+			if ((c.p[1].p & 0xffffffff00000000) != 0)
 				do_error("cmp immediate > 32bit");
 			c.p[1].type = TypeInt;
 		}

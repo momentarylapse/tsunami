@@ -64,7 +64,7 @@ string rel_pitch_name(int pitch_rel)
 
 string pitch_name(int pitch)
 	string name_rel = rel_pitch_name(pitch_to_rel(pitch))
-	string name_oct = pitch_get_octave(pitch)
+	string name_oct = str(pitch_get_octave(pitch))
 	return name_rel + name_oct
 
 

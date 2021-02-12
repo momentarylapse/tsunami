@@ -210,7 +210,7 @@ Grid ? ''
 		int f = o.factor + 0.5
 		p.set_font_size(7)
 		#p.set_color(colors.text_soft1)
-		p.draw_str(z.x-4, z.y+6, "x" + f)
+		p.draw_str(z.x-4, z.y+6, "x{{f}}")
 	
 	void draw_link(Painter p, int a, int b)
 		p.set_color(colors.text_soft1)

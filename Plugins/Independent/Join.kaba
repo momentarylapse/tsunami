@@ -8,7 +8,7 @@ class Join extends TsunamiPlugin
 			return
 		int offset = 0
 		let song = new Song(session, 44100)
-		let t = song.add_track(SignalType.AUDIO, 0)
+		let t = song.add_track(SignalType.AUDIO_STEREO, 0)
 		let layer = t.layers[0]
 		for f in args[1:]
 			print(f)

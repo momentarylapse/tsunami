@@ -337,7 +337,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		return Any(*(bool*)var);
 	if (type == TypeString)
 		return Any(*(string*)var);
-	if (type->is_pointer())
+	if (type->is_some_pointer())
 		return Any(*(void**)var);
 	if (type == TypeAny)
 		return *(Any*)var;

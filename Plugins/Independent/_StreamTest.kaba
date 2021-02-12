@@ -23,4 +23,4 @@ class _StreamTest extends TsunamiPlugin
 		del chain
 	
 	void on_tick()
-		print("" + out.samples_played() + "\t" + source.offset)
+		print("{{out.samples_played()}}\t{{source.offset}}")

@@ -28,7 +28,7 @@ class _StreamTest extends TsunamiPlugin
 		del chain
 	
 	void on_tick()
-		print("" + input.samples_recorded() + "\t" + recorder.samples_skipped)
+		print("{{input.samples_recorded()}}\t{{recorder.samples_skipped}}")
 		nn ++
 		if nn > 100
 			acc = !acc

@@ -278,12 +278,15 @@ Array<Path> dir_search(const Path &dir, const string &filter, const string &opti
 	bool show_files = options.find("f") >= 0;
 	bool show_dirs = options.find("d") >= 0;
 	bool show_recursive = options.find("r") >= 0;
+	bool show_self = options.find("0") >= 0;
 
 	if (show_recursive) {
 		dir_search_single_rec(dir, "", filter, dir_list, file_list);
 	} else {
 		dir_search_single(dir, filter, dir_list, file_list);
 	}
+	if (show_self)
+		dir_list.insert("", 0);
 	
 	Array<Path> r;
 	if (show_dirs)

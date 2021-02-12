@@ -78,7 +78,7 @@ public:
 	void parse();
 	void parse_top_level();
 	void parse_all_class_names(Class *ns, int indent0);
-	void parse_all_function_bodies(const Class *name_space);
+	void parse_all_function_bodies();
 	Flags parse_flags(Flags initial = Flags::NONE);
 	void parse_import();
 	void parse_enum(Class *_namespace);
@@ -88,7 +88,7 @@ public:
 	void skip_parse_class();
 	Function *parse_function_header(Class *name_space, Flags flags0);
 	Function *parse_function_header_new(Class *name_space, Flags flags0);
-	void skip_parsing_function_body();
+	void skip_parsing_function_body(Function *f);
 	void parse_function_body(Function *f);
 	bool parse_function_command(Function *f, int indent0);
 	const Class *parse_type(const Class *ns);
@@ -162,6 +162,8 @@ public:
 	void auto_implement_shared_assign(Function *f, const Class *t);
 	void auto_implement_shared_clear(Function *f, const Class *t);
 	void auto_implement_shared_create(Function *f, const Class *t);
+	void auto_implement_owned_clear(Function *f, const Class *t);
+	void auto_implement_owned_assign(Function *f, const Class *t);
 	void auto_implement_functions(const Class *t);
 	
 	SyntaxTree *tree;
@@ -171,6 +173,8 @@ public:
 	int for_index_count;
 	int parser_loop_depth;
 	bool found_dynamic_param;
+
+	Array<Function*> function_needs_parsing;
 };
 
 } /* namespace kaba */

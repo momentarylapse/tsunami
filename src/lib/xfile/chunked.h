@@ -65,6 +65,7 @@ public:
 	virtual void write_subs() {}
 	virtual void create();
 	string name;
+	void _clamp_name_rec(int length);
 
 	void notify();
 	void info(const string &message);
@@ -84,8 +85,8 @@ public:
 	FileChunkBasic *get_sub(const string &name);
 
 	void write_sub(const string &name, void *p);
-	void write_sub_parray(const string &name, DynamicArray &a);
-	void write_sub_array(const string &name, DynamicArray &a);
+	void write_sub_parray(const string &name, const DynamicArray &a);
+	void write_sub_array(const string &name, const DynamicArray &a);
 	void write_begin_chunk(File *f);
 	void write_end_chunk(File *f);
 	void write_complete();

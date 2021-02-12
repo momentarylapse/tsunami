@@ -12,7 +12,7 @@ class ImportNKI extends TsunamiPlugin
 		stop()
 	void load_nki(Path filename)
 		print(filename)
-		Path dir = Path(str(filename)[:-4] + " Samples")
+		let dir = Path(str(filename)[:-4] + " Samples")
 		print(dir)
 		
 		let list = Filesystem.search(dir, "*.wav", "f")
@@ -24,6 +24,6 @@ class ImportNKI extends TsunamiPlugin
 			session.song.add_sample(s)
 			if str(e)[-5:] != "r.wav"
 				print(int(str(e)[:2]))
-				s.set_value("pitch", int(str(e)[:2]) + 10 + 12)
+				s.set_value("pitch", str(int(str(e)[:2]) + 10 + 12))
 		
 	

@@ -30,7 +30,7 @@ class ZeroRenderer extends PitchRenderer
 		return volume > 0.001
 		
 	override void on_start(float _volume)
-		print("MIDI START " + _volume)
+		print("MIDI START {{_volume}}")
 		volume = _volume * 0.3
 		fade_out = false
 	override void on_end()

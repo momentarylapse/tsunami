@@ -17,7 +17,7 @@ int loop<int>(int i, int min, int max) {
 		int n = (int)((min-i) / d) + 1;
 		return i + d * n;
 	}
-	if (i > max){
+	if (i >= max){
 		int n = (int)((i-max) / d) + 1;
 		return i - d * n;
 	}

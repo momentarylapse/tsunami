@@ -92,11 +92,11 @@ class XXX extends SongPlugin
 					int k1 = int(zz["keys"][1]) + 1
 					let s = song.samples[int(zz["sample"])]
 					if zz.has("root-key")
-						s.set_value("pitch", zz["root-key"])
+						s.set_value("pitch", str(zz["root-key"]))
 					if zz.has("start-loop")
-						s.set_value("start-loop", zz["start-loop"])
+						s.set_value("start-loop", str(zz["start-loop"]))
 					if zz.has("end-loop")
-						s.set_value("end-loop", zz["end-loop"])
+						s.set_value("end-loop", str(zz["end-loop"]))
 					if s.get_value("pitch") == ""
 						continue
 					int root = int(s.get_value("pitch"))

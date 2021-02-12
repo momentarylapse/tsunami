@@ -171,7 +171,7 @@ Grid ? '' vertical
 			fs *= 0.8
 			p.set_color(colors.text_soft2)
 		p.set_font_size(fs)
-		p.draw_str(x0-fs*0.4, y0-fs/2, cur_beat + 1)
+		p.draw_str(x0-fs*0.4, y0-fs/2, str(cur_beat + 1))
 		
 		draw_part_info(p, cur_bar)
 		
@@ -200,7 +200,7 @@ Grid ? '' vertical
 		if cur_part
 			p.draw_str(10, 5, cur_part.text)
 			int first_bar = bar_index(song, cur_part.range.offset + DELTA)
-			p.draw_str(w - 5 - fs*3, 5, (cur_bar.index - first_bar) + 2)
+			p.draw_str(w - 5 - fs*3, 5, str((cur_bar.index - first_bar) + 2))
 	
 		string change
 		if next_part and next_part != cur_part

@@ -542,6 +542,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Song.add_sample", &Song::add_sample);
 	kaba::link_external_class_func("Song.delete_sample", &Song::delete_sample);
 	kaba::link_external_class_func("Song.time_track", &Song::time_track);
+	kaba::link_external_class_func("Song.undo", &Song::undo);
+	kaba::link_external_class_func("Song.redo", &Song::redo);
+	kaba::link_external_class_func("Song.reset_history", &Song::reset_history);
 	kaba::link_external_class_func("Song.begin_action_group", &Song::begin_action_group);
 	kaba::link_external_class_func("Song.end_action_group", &Song::end_action_group);
 	kaba::link_external_class_func("Song.get_time_str", &Song::get_time_str);
@@ -626,10 +629,12 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	kaba::link_external_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
 	kaba::link_external_class_func("AudioView.play", &AudioView::play);
+	kaba::link_external_class_func("AudioView.prepare_playback", &AudioView::prepare_playback);
 	kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
 	kaba::link_external_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);
 	kaba::link_external_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
 	kaba::link_external_class_func("AudioView.cur_vtrack", &AudioView::cur_vtrack);
+	kaba::link_external_class_func("AudioView.update_selection", &AudioView::update_selection);
 
 	kaba::declare_class_size("SceneGraph.Node", sizeof(scenegraph::Node));
 	kaba::declare_class_element("SceneGraph.Node.area", &scenegraph::Node::area);

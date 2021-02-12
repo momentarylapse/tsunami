@@ -346,7 +346,13 @@ class TrackMarker as shared
 	Range range
 	string text
 	shared AudioEffect[] fx
-	
+
+
+#class BarPattern
+#	int length
+#	int divisor
+#	int[] beats
+
 class Bar as shared
 	int[] beats
 	int divisor
@@ -356,6 +362,11 @@ class Bar as shared
 	int offset
 	extern const float bpm(float sample_rate)
 	extern const Range range()
+	enum EditMode
+		IGNORE
+		INSERT_SILENCE
+		STRETCH
+		STRETCH_AND_SCALE_AUDIO
 
 
 class Beat
@@ -488,13 +499,16 @@ class Song as shared
 	
 	extern Track* add_track(int type, int index)
 	extern void delete_track(int index)
-	extern void add_bar(int index, float bpm, int beats, bool affect_midi)
-	extern void add_pause(int index, float time, bool affect_midi)
-	#extern void edit_bar(int index, BarPattern p, bool affect_midi)
+	extern void add_bar(int index, Bar b, int mode)
+	extern void add_pause(int index, int length, int mode)
+	extern void edit_bar(int index, Bar b, int mode)
 	extern void delete_bar(int index, bool affect_midi)
 	extern void add_sample(Sample s)
-	extern void delete_sample(Sample sample)
+	extern void delete_sample(Sample s)
 	
+	extern void undo()
+	extern void redo()
+	extern void reset_history()
 	extern void begin_action_group()
 	extern void end_action_group()
 	
@@ -552,11 +566,13 @@ class AudioView extends Object
 	ViewPort cam
 	extern void subscribe(Object handler, Object->void f, string message)
 	extern void unsubscribe(Object handler)
+	extern void prepare_playback(Range r, bool allow_loop)
 	extern void play()
 	extern void set_playback_loop(bool loop)
 	extern void optimize_view()
 	extern Layer* cur_vlayer()
 	extern void* cur_vtrack()
+	extern void update_selection()
 
 class SongRenderer extends AudioSource
 	extern void __init__(Song s)

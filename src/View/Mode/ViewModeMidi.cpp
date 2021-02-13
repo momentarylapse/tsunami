@@ -335,7 +335,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 		select_in_edit_cursor();
 		start_selection_rect(SelectionMode::RECT);
 
-	} else {
+	} else /* note / chord */ {
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 			if (hover().type == HoverData::Type::MIDI_PITCH) {
 
@@ -343,8 +343,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch));
 			}
 		} else /* TAB */ {
-			// hmmm, abuse selection system again...
-
+			view->set_cursor_pos(hover().pos_snap);
 		}
 	}
 	view->exclusively_select_layer(vlayer);

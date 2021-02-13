@@ -104,13 +104,13 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 	else
 		col = colors.text_soft3;
 
-	if (state & MidiPainter::STATE_HOVER) {
-		col = color::interpolate(col, colors.hover, 0.5f);
-	} else if (state & MidiPainter::STATE_SELECTED) {
-		col = color::interpolate(col, colors.selection, 0.5f);
-	} else if (state & MidiPainter::STATE_REFERENCE) {
+	if (state & MidiPainter::STATE_REFERENCE)
 		col = color::interpolate(col, colors.background_track, 0.65f);
-	}
+	if (state & MidiPainter::STATE_SELECTED)
+		col = color::interpolate(col, colors.selection, 0.5f);
+	if (state & MidiPainter::STATE_HOVER)
+		col = color::interpolate(col, colors.hover, 0.5f);
+
 	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
 }
 

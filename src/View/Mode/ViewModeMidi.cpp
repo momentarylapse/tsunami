@@ -282,6 +282,7 @@ public:
 	}
 	void on_draw_post(Painter *c) override {
 		auto *mp = midi_context(vlayer);
+		mp->set_force_shadows(true);
 
 		// current creation
 		auto notes = get_creation_notes();
@@ -632,6 +633,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 
 		if (l->layer->type == SignalType::MIDI) {
 			auto *mp = midi_context(l);
+			mp->set_force_shadows(true);
 			auto mode = l->midi_mode();
 			if (mode == MidiMode::LINEAR)
 				mp->draw_pitch_grid(c, l->layer->track->synth.get());
@@ -735,6 +737,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	view->cam.range2screen(r, x1, x2);
 
 	auto *mp = midi_context(l);
+	mp->set_force_shadows(true);
 
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 

@@ -32,8 +32,7 @@ class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 
-class MidiKeyChange
-{
+class MidiKeyChange {
 public:
 	MidiKeyChange();
 	MidiKeyChange(double pos, const Scale &key);
@@ -41,8 +40,7 @@ public:
 	Scale key;
 };
 
-class MidiPainter
-{
+class MidiPainter {
 public:
 	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
@@ -51,8 +49,7 @@ public:
 	static const int PITCH_MIN_DEFAULT = 25;
 	static const int PITCH_MAX_DEFAULT = 105;
 
-	enum MidiNoteState
-	{
+	enum MidiNoteState {
 		STATE_DEFAULT = 0,
 		STATE_HOVER = 1,
 		STATE_SELECTED = 2,
@@ -105,10 +102,13 @@ public:
 	float pitch_min, pitch_max;
 	int shift;
 	bool as_reference;
+	bool allow_shadows;
+	bool force_shadows;
+	void set_force_shadows(bool force);
 	Array<MidiKeyChange> key_changes;
 	void set_key_changes(const Array<MidiKeyChange> &changes);
 
-	struct{
+	struct {
 		bool antialiasing;
 		float rhythm_zoom_min;
 		float notes_zoom_min;
@@ -117,7 +117,7 @@ public:
 		float tab_text_threshold;
 		int note_count_threshold;
 		float factor;
-	}quality;
+	} quality;
 
 	float clef_dy;
 	float clef_y0;

@@ -74,6 +74,8 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	clef = nullptr;
 	is_playable = true;
 	as_reference = false;
+	allow_shadows = false;
+	force_shadows = false;
 	pitch_min = PITCH_MIN_DEFAULT;
 	pitch_max = PITCH_MAX_DEFAULT;
 	shift = 0;
@@ -551,13 +553,14 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 
 	if (n->flags > 0) {
+		float x = (x1 + x2) / 2;
 		if (n->is(NOTE_FLAG_TRILL))
-			c->draw_str(x1, y - rr*3, "tr~");
+			c->draw_str(x, y - rr*3, "tr~");
 		if (n->is(NOTE_FLAG_STACCATO))
-			c->draw_circle(x1+rr, y + rr*2, 2);
+			c->draw_circle(x + rr, y + rr*2, 2);
 		if (n->is(NOTE_FLAG_TENUTO)) {
 			c->set_line_width(3);
-			c->draw_line(x1, y + rr*2, x1+20, y + rr*2);
+			c->draw_line(x, y + rr*2, x1+20, y + rr*2);
 			c->set_line_width(1);
 		}
 	}
@@ -580,7 +583,7 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 
 	// draw notes
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: weak(notes)) {
+	for (auto *n: weak(notes)) {
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		draw_note_linear(c, *n, note_state(n, as_reference, sel, hover));
@@ -591,7 +594,7 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle) {
 	//x1 += r;
 	// "shadow" to indicate length
-	if (x2 - x1 > quality.shadow_threshold) {
+	if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
 		c->set_color(col_shadow);
 		c->draw_rect(x1, y - rr*0.7f - rx, x2 - x1 + rx, rr*2*0.7f + rx*2);
 	}
@@ -655,7 +658,7 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: weak(notes))
+	for (auto *n: weak(notes))
 		draw_note_tab(c,  n,  note_state(n, as_reference, sel, hover));
 	c->set_antialiasing(false);
 
@@ -665,6 +668,7 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
 void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state) {
 	float x1, x2;
 	cam->range2screen(n->range + shift, x1, x2);
+	float x = (x1 + x2) / 2;
 
 	// checked before...
 //	if (n.clef_position < 0)
@@ -678,12 +682,12 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	for (int i=10; i<=p; i+=2) {
 		c->set_color(colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
+		c->draw_line(x - clef_dy, y, x + clef_dy, y);
 	}
 	for (int i=-2; i>=p; i-=2) {
 		c->set_color(colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
+		c->draw_line(x - clef_dy, y, x + clef_dy, y);
 	}
 
 	draw_complex_note(c, n, state, x1, x2, y);
@@ -692,7 +696,7 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 		c->set_color(colors.text);
 		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
 		float size = rr*2.8f;
-		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.5f , size, modifier_symbol(n->modifier));
+		SymbolRenderer::draw(c, x - size*1.0f, y - size*0.5f , size, modifier_symbol(n->modifier));
 	}
 }
 
@@ -752,7 +756,7 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: weak(notes))
+	for (auto *n: weak(notes))
 		draw_note_classical(c, n, note_state(n, as_reference, sel, hover));
 	c->set_antialiasing(false);
 
@@ -856,10 +860,12 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	clef_dy = min(area.height() / 13, 30.0f);
 	clef_y0 = area.y2 - area.height() / 2 + 2 * clef_dy;
 
+	mode = _mode;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;
-	mode = _mode;
+	allow_shadows = (mode == MidiMode::LINEAR);
+	force_shadows = false;
 
 	pitch_min = PITCH_MIN_DEFAULT;
 	pitch_max = PITCH_MAX_DEFAULT;
@@ -894,4 +900,8 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 	quality.tab_text_threshold = rr/4 / q;
 	quality.antialiasing = antialiasing;
 	quality.note_count_threshold = area.width() * 0.4f * q;
+}
+void MidiPainter::set_force_shadows(bool force) {
+	force_shadows = force;
+	allow_shadows = force or (mode == MidiMode::LINEAR);
 }

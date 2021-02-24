@@ -228,13 +228,16 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 
 
 void AudioViewLayer::draw_midi(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift) {
-	view->midi_painter->set_context(area, layer->track->instrument, is_playable(), midi_mode());
-	view->midi_painter->set_key_changes(midi_key_changes);
-	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
-	view->midi_painter->set_shift(shift);
-	if (view->editing_layer(this))
-		view->midi_painter->set_linear_range(edit_pitch_min, edit_pitch_max);
-	view->midi_painter->draw(c, midi);
+	auto mp = view->midi_painter.get();
+	mp->set_context(area, layer->track->instrument, is_playable(), midi_mode());
+	mp->set_key_changes(midi_key_changes);
+	mp->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
+	mp->set_shift(shift);
+	if (view->editing_layer(this)) {
+		mp->set_linear_range(edit_pitch_min, edit_pitch_max);
+		mp->set_force_shadows(true);
+	}
+	mp->draw(c, midi);
 }
 
 bool can_merge(TrackMarker *a, TrackMarker *b) {

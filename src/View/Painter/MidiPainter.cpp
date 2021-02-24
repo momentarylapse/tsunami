@@ -352,11 +352,12 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 		Range r = n->range - b->offset;
 		if (r.offset < 0)
 			continue;
-		QuantizedNote d = QuantizedNote(n, r, spu);
+		auto d = QuantizedNote(n, r, spu);
 		if (d.length == 0 or d.offset < 0)
 			continue;
 
-		d.x = mp->cam->sample2screen(n->range.offset + mp->shift);
+		//d.x = mp->cam->sample2screen(n->range.offset + mp->shift);
+		d.x = mp->cam->sample2screen(n->range.center() + mp->shift);
 		d.y = y_func(n);
 		d.up = (d.y >= y_mid);
 
@@ -443,6 +444,8 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 }
 
 
+static hui::Timer mp_timer;
+
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
 	if (cam->pixels_per_sample < quality.rhythm_zoom_min)
 		return;
@@ -453,6 +456,10 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);*/
+
+	float dt = 0;
+	float dt_draw = 0;
+	mp_timer.reset();
 
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars) {
@@ -474,14 +481,18 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		auto groups = digest_note_groups(ndata, qbar);
 
+		dt += mp_timer.get();
+
 		for (auto &g: groups) {
 			if (g.num == 1)
 				draw_single_ndata(c, g[0], rr);
 			else
 				draw_group_ndata(c, g, rr);
 		}
+		dt_draw += mp_timer.get();
 
 	}
+	msg_write(format("mp %.2f / %.2f ms", dt*1000, dt_draw*1000));
 	c->set_line_width(1);
 	c->set_antialiasing(false);
 }
@@ -588,7 +599,7 @@ void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, floa
 	// the note circle
 	c->set_color(col);
 	if ((x2 - x1 > quality.note_circle_threshold) or force_circle)
-		c->draw_circle(x1, y, rr+rx);
+		c->draw_circle((x1+x2)/2, y, rr+rx);
 	else
 		c->draw_rect(x1 - rr*0.8f - rx, y - rr*0.8f - rx, rr*1.6f + rx*2, rr*1.6f + rx*2);
 }
@@ -635,7 +646,8 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	if (x2 - x1 > quality.tab_text_threshold and rr > 5) {
 		float font_size = rr * 1.2f;
 		c->set_color(colors.high_contrast_b);//text);
-		SymbolRenderer::draw(c, x1, y - font_size/2, font_size, i2s(n->pitch - instrument->string_pitch[n->stringno]), 0);
+		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
+		SymbolRenderer::draw(c, (x1+x2)/2 - tt.num * font_size * 0.13f, y - font_size/2, font_size, tt, 0);
 	}
 }
 

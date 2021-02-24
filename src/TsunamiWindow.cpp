@@ -246,6 +246,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// main table
 	set_target("main-grid");
 	add_drawing_area("!grabfocus,gesture=zoom", 0, 0, "area");
+	if (hui::Config.get_bool("View.EventCompression", true) == false)
+		set_options("area", "noeventcompression");
 
 	toolbar[0]->set_by_id("toolbar");
 	//ToolbarConfigure(false, true);

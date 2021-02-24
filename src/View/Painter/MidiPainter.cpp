@@ -454,8 +454,6 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 }
 
 
-static hui::Timer mp_timer;
-
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
 	if (cam->pixels_per_sample < quality.rhythm_zoom_min)
 		return;
@@ -467,9 +465,6 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	else
 		c->set_color(colors.text_soft3);*/
 
-	float dt = 0;
-	float dt_draw = 0;
-	mp_timer.reset();
 
 	bool neck_offset = (mode == MidiMode::TAB);
 
@@ -493,18 +488,14 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		auto groups = digest_note_groups(ndata, qbar);
 
-		dt += mp_timer.get();
-
 		for (auto &g: groups) {
 			if (g.num == 1)
 				draw_single_ndata(c, g[0], rr, neck_offset);
 			else
 				draw_group_ndata(c, g, rr, neck_offset);
 		}
-		dt_draw += mp_timer.get();
 
 	}
-	msg_write(format("mp %.2f / %.2f ms", dt*1000, dt_draw*1000));
 	c->set_line_width(1);
 	c->set_antialiasing(false);
 }
@@ -664,20 +655,25 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	get_col(col, col_shadow, n, state, is_playable, colors);
 	//draw_complex_note(c, n, state, x1, x2, y);
 
+	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.6f;
 	if (x2 - x1 > quality.tab_text_threshold and rr > 5) {
+		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
+
+		// hide the string line to make the number more readable
 		color cc = colors.background_track;
 		cc.a = 0.5f;
 		c->set_color(cc);
-		c->draw_circle((x1+x2)/2, y, rr * 1.3f);
-		//c->set_color(colors.high_contrast_b);//text);
-		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
+		float dx = rr * 0.8f * tt.num;
+		c->draw_rect(rect(x - dx, x + dx, y - 2, y + 2));
+
+		// fret number as symbol
 		c->set_color(col);
-		SymbolRenderer::draw(c, (x1+x2)/2, y - font_size/2, font_size, tt, true, 0);
+		SymbolRenderer::draw(c, x, y - font_size/2, font_size, tt, true, 0);
 
 		draw_note_flags(c, n, state, x1, x2, y);
 	} else {
-		SymbolRenderer::draw(c, (x1+x2)/2, y - font_size/2, font_size, "o", true, 0);
+		SymbolRenderer::draw(c, x, y - font_size/2, font_size, "e", true, 0);
 	}
 }
 

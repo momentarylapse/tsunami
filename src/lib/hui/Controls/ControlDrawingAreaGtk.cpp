@@ -351,6 +351,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 
 void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
+	static int nn = 0;
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
 #if GTK_CHECK_VERSION(4,0,0)
 	auto mod = gtk_event_controller_get_current_event_state(controller);
@@ -512,19 +513,19 @@ void ControlDrawingArea::make_current() {
 }
 
 void on_gtk_gesture_zoom(GtkGestureZoom *controller, gdouble scale, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = scale;
 	c->panel->win->input.scroll_y = scale;
 	c->notify("hui:gesture-zoom", false);
 }
 
 void on_gtk_gesture_zoom_begin(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	c->notify("hui:gesture-zoom-begin", false);
 }
 
 void on_gtk_gesture_zoom_end(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	c->notify("hui:gesture-zoom-end", false);
 }
 
@@ -539,6 +540,10 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 			g_signal_connect(G_OBJECT(gesture_zoom), "begin", G_CALLBACK(&on_gtk_gesture_zoom_begin), this);
 			g_signal_connect(G_OBJECT(gesture_zoom), "end", G_CALLBACK(&on_gtk_gesture_zoom_end), this);
 		}
+	} else if (op == "noeventcompression") {
+		hui::RunLater(0.01f, [=] {
+			gdk_window_set_event_compression(GDK_WINDOW(gtk_widget_get_window(widget)), false);
+		});
 	}
 }
 

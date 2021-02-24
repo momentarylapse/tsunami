@@ -18,8 +18,7 @@ namespace hui
 
 class Timer;
 
-class ControlDrawingArea : public Control
-{
+class ControlDrawingArea : public Control {
 public:
 	ControlDrawingArea(const string &text, const string &id);
 	~ControlDrawingArea();

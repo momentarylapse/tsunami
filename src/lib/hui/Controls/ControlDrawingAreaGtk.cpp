@@ -14,6 +14,11 @@
 #include <thread>
 static std::thread::id main_thread_id = std::this_thread::get_id();
 
+
+#if !GTK_CHECK_VERSION(3,24,0)
+#error gtk >= 3.24 required
+#endif
+
 #define STUPID_HACK 0
 
 #ifdef HUI_API_GTK
@@ -92,6 +97,13 @@ void on_gtk_gl_area_unrealize(GtkGLArea *area, gpointer user_data) {
 /*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
 {	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:resize", false);	}*/
 
+void win_set_mouse_pos(Window *win, float x, float y) {
+	win->input.dx = x - win->input.x;
+	win->input.dy = y - win->input.y;
+	win->input.x = x;
+	win->input.y = y;
+}
+
 template<class T>
 void win_set_input(Window *win, T *event) {
 	if (event->type == GDK_ENTER_NOTIFY) {
@@ -99,13 +111,10 @@ void win_set_input(Window *win, T *event) {
 	} else if (event->type == GDK_LEAVE_NOTIFY) {
 		win->input.inside = false;
 	}
-	win->input.dx = (float)event->x - win->input.x;
-	win->input.dy = (float)event->y - win->input.y;
+	win_set_mouse_pos(win, (float)event->x, (float)event->y);
 	//msg_write(format("%.1f\t%.1f\t->\t%.1f\t%.1f\t(%.1f\t%.1f)", win->input.x, win->input.y, event->x, event->y, win->input.dx, win->input.dy));
 	win->input.scroll_x = 0;
 	win->input.scroll_y = 0;
-	win->input.x = (float)event->x;
-	win->input.y = (float)event->y;
 	win->input.pressure = 1;
 	int mod = event->state;
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
@@ -143,7 +152,7 @@ gboolean on_gtk_area_mouse_move(GtkWidget *widget, GdkEventMotion *event, gpoint
 		GtkAreaMouseSet = -1;
 	}
 
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	win_set_input_more(c->panel->win, event);
 
@@ -158,28 +167,31 @@ gboolean on_gtk_area_mouse_move(GtkWidget *widget, GdkEventMotion *event, gpoint
 	c->win->input.x = x;
 	c->win->input.y = y;*/
 
-	c->notify("hui:mouse-move", false);
-	gdk_event_request_motions(event); // to prevent too many signals for slow message processing
+	if (!c->panel->win->input.lb)
+		c->notify("hui:mouse-move", false);
+//	gdk_event_request_motions(event); // to prevent too many signals for slow message processing
 	return false;
 }
 
-gboolean on_gtk_area_mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
-	win_set_input(c->panel->win, event);
 
+//[[deprecated]]
+gboolean on_gtk_area_mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	win_set_input(c->panel->win, event);
 	c->notify("hui:mouse-enter", false);
 	return false;
 }
 
+//[[deprecated]]
 gboolean on_gtk_area_mouse_leave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	c->notify("hui:mouse-leave", false);
 	return false;
 }
 
 gboolean on_gtk_area_button(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	win_set_input_more(c->panel->win, event);
 
@@ -207,14 +219,14 @@ gboolean on_gtk_area_button(GtkWidget *widget, GdkEventButton *event, gpointer u
 }
 
 gboolean on_gtk_area_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
 	c->notify("hui:focus-in", false);
 	return false;
 }
 
 gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data) {
-	Control *c = reinterpret_cast<Control*>(user_data);
+	auto c = reinterpret_cast<Control*>(user_data);
 	if (c->panel->win) {
 		if (event->direction == GDK_SCROLL_UP) {
 			c->panel->win->input.scroll_y = 1;
@@ -231,6 +243,35 @@ gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpoin
 		c->notify("hui:mouse-wheel", false);
 	}
 	return false;
+}
+
+
+void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
+
+
+	Event::_text = utf32_to_utf8({(int)gdk_keyval_to_unicode(keyval)});
+
+	// yes, gtk3 has a direct event->keyval, but we need the "basic" key (without modifiers)
+
+	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
+	// convert GDK keyvalue into HUI key id
+	key = -1;
+	for (int i=0; i<NUM_KEYS; i++)
+		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
+		if (HuiKeyID[i] == keyval)
+			key = i;
+	key_code = key;
+	if (key < 0)
+		return;
+
+
+	// key code?
+	if ((mod & GDK_CONTROL_MASK) > 0)
+		key_code += KEY_CONTROL;
+	if ((mod & GDK_SHIFT_MASK) > 0)
+		key_code += KEY_SHIFT;
+	if (((mod & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)
+		key_code += KEY_ALT;
 }
 
 void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code) {
@@ -297,6 +338,91 @@ gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user
 	return area_process_key(event, (Control*)user_data, false);
 }
 
+void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	double x0, y0;
+	gtk_gesture_drag_get_start_point(gesture, &x0, &y0);
+	win_set_mouse_pos(c->panel->win, float(x0 + offset_x), float(y0 + offset_y));
+	c->panel->win->input.lb = true;
+	c->panel->win->input.mb = false;
+	c->panel->win->input.rb = false;
+	c->notify("hui:mouse-move", false);
+}
+
+void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+#if GTK_CHECK_VERSION(4,0,0)
+	auto mod = gtk_event_controller_get_current_event_state(controller);
+	c->panel->win->input.lb = (mod & GDK_BUTTON1_MASK);
+	c->panel->win->input.mb = (mod & GDK_BUTTON2_MASK);
+	c->panel->win->input.rb = (mod & GDK_BUTTON3_MASK);
+#endif
+	c->notify("hui:mouse-move", false);
+}
+
+// ignored by gtk???
+void on_gtk_motion_enter(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	msg_write("ENTER NEW");
+	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+	c->notify("hui:mouse-enter", false);
+}
+
+void on_gtk_motion_leave(GtkEventControllerMotion *controller, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	msg_write("LEAVE");
+	c->notify("hui:mouse-leave", false);
+}
+
+// gtk 3.24
+void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, double dy, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.scroll_x = (float)dx;
+	c->panel->win->input.scroll_y = (float)dy;
+	c->notify("hui:mouse-wheel", false);
+}
+
+gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+
+	int key, key_code;
+	_get_hui_key_id_2(keyval, state, key, key_code);
+	if (key < 0)
+		return false;
+
+	c->panel->win->input.key[key] = true;
+	c->panel->win->input.key_code = key_code;
+	c->notify("hui:key-down", false);
+
+	// stop further gtk key handling
+	return c->grab_focus;
+}
+
+void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+
+	int key, key_code;
+	_get_hui_key_id_2(keyval, state, key, key_code);
+	if (key < 0)
+		return;
+
+	c->panel->win->input.key[key] = false;
+	c->panel->win->input.key_code = key_code;
+	c->notify("hui:key-up", false);
+}
+
+#if GTK_CHECK_VERSION(4,0,0)
+void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+	c->panel->win->input.lb = true;
+	c->panel->win->input.mb = false;
+	c->panel->win->input.rb = false;
+	c->notify("hui:left-button-down", false);
+}
+#endif
+
 ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
@@ -319,15 +445,15 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 		da = gtk_drawing_area_new();
 		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(on_gtk_area_draw), this);
 	}
-	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
-	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
+///?	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
+///?	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
-	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&on_gtk_area_mouse_move), this);
+////	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&on_gtk_area_mouse_move), this);
 	g_signal_connect(G_OBJECT(da), "enter-notify-event", G_CALLBACK(&on_gtk_area_mouse_enter), this);
 	g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(&on_gtk_area_mouse_leave), this);
 	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&on_gtk_area_button), this);
 	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&on_gtk_area_button), this);
-	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&on_gtk_area_mouse_wheel), this);
+///	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&on_gtk_area_mouse_wheel), this);
 //	g_signal_connect(G_OBJECT(da), "focus-in-event", G_CALLBACK(&on_gtk_area_focus_in), this);
 	//int mask;
 	//g_object_get(G_OBJECT(da), "events", &mask, NULL);
@@ -339,6 +465,27 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	gtk_widget_add_events(da, GDK_SMOOTH_SCROLL_MASK | GDK_TOUCHPAD_GESTURE_MASK);
 	//mask = GDK_ALL_EVENTS_MASK;
 //	g_object_set(G_OBJECT(da), "events", mask, NULL);
+
+	auto handler_key = gtk_event_controller_key_new(da);
+	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
+	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
+
+#if GTK_CHECK_VERSION(4,0,0)
+	auto gesture_click = gtk_gesture_click_new(da);
+	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
+#endif
+
+	auto handler_motion = gtk_event_controller_motion_new(da);
+	g_signal_connect(G_OBJECT(handler_motion), "motion", G_CALLBACK(&on_gtk_gesture_motion), this);
+	// somehow getting ignored?
+	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
+	g_signal_connect(G_OBJECT(handler_motion), "leave", G_CALLBACK(&on_gtk_motion_leave), this);
+
+	auto handler_scroll = gtk_event_controller_scroll_new(da, GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
+	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
+
+///	auto handler_drag = gtk_gesture_drag_new(da);
+///	g_signal_connect(G_OBJECT(handler_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
 
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);

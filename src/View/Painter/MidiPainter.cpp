@@ -205,25 +205,30 @@ struct QuantizedNote {
 	bool up;
 };
 
-void draw_single_ndata(Painter *c, QuantizedNote &d, float rr) {
-	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
+void draw_single_ndata(Painter *c, QuantizedNote &d, float rr, bool neck_offset) {
+	float neck_length = max(NOTE_NECK_LENGTH, rr*7);
 	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
+
+	float neck_dy0 = 0;
+	if (neck_offset)
+		neck_dy0 = e * rr * 1.5f;
+
 	if (d.base_length == SIXTEENTH) {
 		c->set_line_width(neck_width);
-		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
+		c->draw_line(d.x, d.y + neck_dy0, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
 		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
 		c->draw_line(d.x, d.y + e * (neck_length - NOTE_BAR_DISTANCE), d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_BAR_DISTANCE - NOTE_FLAG_DY));
 	} else if (d.base_length == EIGHTH) {
 		c->set_line_width(neck_width);
-		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
+		c->draw_line(d.x, d.y + neck_dy0, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
 		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
 	} else if (d.base_length == QUARTER) {
 		c->set_line_width(neck_width);
-		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
+		c->draw_line(d.x, d.y + neck_dy0, d.x, d.y + e * neck_length);
 	}
 
 	if (d.punctured)
@@ -232,8 +237,8 @@ void draw_single_ndata(Painter *c, QuantizedNote &d, float rr) {
 		c->draw_str(d.x, d.y + e*neck_length + e * 9 - 4, "3");
 }
 
-void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr) {
-	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
+void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr, bool neck_offset) {
+	float neck_length = max(NOTE_NECK_LENGTH, rr*6);
 	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
 	float e = d[0].up ? -1 : 1;
 	float x0 = d[0].x;
@@ -248,16 +253,19 @@ void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr) {
 	float dy0min = 0;
 	for (auto &dd: d)
 		dy0min = max(dy0min, e * (dd.y - (y0 + m * (dd.x - x0))));
-	y0 += e * max(neck_length, dy0min + neck_length * 0.6f);
+	y0 += e * max(neck_length, dy0min + neck_length * 0.8f);
 
 	// draw necks
+	float neck_dy0 = 0;
+	if (neck_offset)
+		neck_dy0 = e * rr * 1.5f;
+
 	c->set_line_width(neck_width);
 	for (auto &dd: d)
 		if (dd.n) {
 			c->set_color(dd.col);
-			c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
+			c->draw_line(dd.x, dd.y + neck_dy0, dd.x, y0 + m * (dd.x - x0));
 		}
-
 
 	// bar
 	c->set_line_width(NOTE_BAR_WIDTH);
@@ -463,6 +471,8 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	float dt_draw = 0;
 	mp_timer.reset();
 
+	bool neck_offset = (mode == MidiMode::TAB);
+
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars) {
 		if (b->is_pause())
@@ -487,9 +497,9 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		for (auto &g: groups) {
 			if (g.num == 1)
-				draw_single_ndata(c, g[0], rr);
+				draw_single_ndata(c, g[0], rr, neck_offset);
 			else
-				draw_group_ndata(c, g, rr);
+				draw_group_ndata(c, g, rr, neck_offset);
 		}
 		dt_draw += mp_timer.get();
 
@@ -541,6 +551,24 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 	}
 }
 
+void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
+
+	if (n->flags > 0) {
+		float x = (x1 + x2) / 2;
+		if (n->is(NOTE_FLAG_TRILL))
+			SymbolRenderer::draw(c, x, y - rr*3, rr, "tr", true, 0);
+			//c->draw_str(x, y - rr*3, "tr~");
+		if (n->is(NOTE_FLAG_STACCATO))
+			c->draw_circle(x + rr, y + rr*2, 2);
+		if (n->is(NOTE_FLAG_TENUTO)) {
+			c->set_line_width(3);
+			c->draw_line(x, y + rr*2, x1+20, y + rr*2);
+			c->set_line_width(1);
+		}
+	}
+
+}
+
 void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
 	if (state & MidiPainter::STATE_SELECTED) {
 		color col1 = colors.selection;
@@ -552,19 +580,7 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 
 	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 
-	if (n->flags > 0) {
-		float x = (x1 + x2) / 2;
-		if (n->is(NOTE_FLAG_TRILL))
-			c->draw_str(x, y - rr*3, "tr~");
-		if (n->is(NOTE_FLAG_STACCATO))
-			c->draw_circle(x + rr, y + rr*2, 2);
-		if (n->is(NOTE_FLAG_TENUTO)) {
-			c->set_line_width(3);
-			c->draw_line(x, y + rr*2, x1+20, y + rr*2);
-			c->set_line_width(1);
-		}
-	}
-
+	draw_note_flags(c, n, state, x1, x2, y);
 }
 
 
@@ -644,13 +660,24 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	float y = string_to_screen(p);
 	n->y = y;
 
-	draw_complex_note(c, n, state, x1, x2, y);
+	color col, col_shadow;
+	get_col(col, col_shadow, n, state, is_playable, colors);
+	//draw_complex_note(c, n, state, x1, x2, y);
 
+	float font_size = rr * 1.6f;
 	if (x2 - x1 > quality.tab_text_threshold and rr > 5) {
-		float font_size = rr * 1.2f;
-		c->set_color(colors.high_contrast_b);//text);
+		color cc = colors.background_track;
+		cc.a = 0.5f;
+		c->set_color(cc);
+		c->draw_circle((x1+x2)/2, y, rr * 1.3f);
+		//c->set_color(colors.high_contrast_b);//text);
 		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
-		SymbolRenderer::draw(c, (x1+x2)/2 - tt.num * font_size * 0.13f, y - font_size/2, font_size, tt, 0);
+		c->set_color(col);
+		SymbolRenderer::draw(c, (x1+x2)/2, y - font_size/2, font_size, tt, true, 0);
+
+		draw_note_flags(c, n, state, x1, x2, y);
+	} else {
+		SymbolRenderer::draw(c, (x1+x2)/2, y - font_size/2, font_size, "o", true, 0);
 	}
 }
 
@@ -852,7 +879,7 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	clef = &i.get_clef();
 
 	// TAB
-	string_dy = min((area.height() * 0.7f) / instrument->string_pitch.num, 40.0f);
+	string_dy = min((area.height() * 0.7f) / max(6, instrument->string_pitch.num), 40.0f);
 	float h = string_dy * instrument->string_pitch.num;
 	string_y0 = area.y2 - (area.height() - h) / 2 - string_dy/2;
 

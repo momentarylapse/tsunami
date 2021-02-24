@@ -18,40 +18,37 @@ namespace SymbolRenderer
 
 static bool enabled = ENABLED;
 
-struct Symbol
-{
+struct Symbol {
 	float size;
+	bool bold;
 	string text;
 	Image im;
 
-	Symbol(float _size, const string &_text)
-	{
+	Symbol(float _size, bool _bold, const string &_text) {
 		text = _text;
 		size = _size;
+		bold = _bold;
 		im.create(size * text.num, size * 1.5f, color(0,0,0,0));
 	}
 
-	void render()
-	{
+	void render() {
 		// render symbol into image
 		Painter *p = hui::start_image_paint(&im);
 		p->set_color(White);
 		p->set_font_size(size);
+		p->set_font("Sans", size, bold, false);
 		p->draw_str(0, 0, text);
 		hui::end_image_paint(&im, p);
 	}
 
-	void compress()
-	{
+	void compress() {
 		// used area?
 		int xmax = 0, ymax = 0;
 		for (int x=0; x<im.width; x++)
 			for (int y=0; y<im.height; y++)
-				if (im.get_pixel(x, y).r > 0){
-					if (x > xmax)
-						xmax = x;
-					if (y+1 > ymax)
-						ymax = y+1;
+				if (im.get_pixel(x, y).r > 0) {
+					xmax = max(x+1, xmax);
+					ymax = max(y+1, ymax);
 				}
 
 		// how much unused area?
@@ -72,10 +69,9 @@ static Array<Symbol*> symbols;
 
 
 
-Symbol *make_symbol(float size, const string &s)
-{
+Symbol *make_symbol(float size, bool bold, const string &s) {
 	//msg_write("new symbol " + f2s(size, 1) + " " + s);
-	Symbol *sym = new Symbol(size, s);
+	Symbol *sym = new Symbol(size, bold, s);
 	sym->render();
 	sym->compress();
 
@@ -83,29 +79,27 @@ Symbol *make_symbol(float size, const string &s)
 	return sym;
 }
 
-Symbol *get_symbol(float size, const string &s)
-{
+Symbol *get_symbol(float size, bool bold, const string &s) {
 	// already exists?
 	for (Symbol *sym: symbols)
-		if (sym->text == s and fabs(sym->size - size) <= 0.5f)
+		if ((sym->text == s) and (sym->bold == bold) and fabs(sym->size - size) <= 0.5f)
 			return sym;
 
 	// no -> make new
-	return make_symbol(size, s);
+	return make_symbol(size, bold, s);
 }
 
-void draw(Painter *p, float x, float y, float size, const string &s, int align)
-{
-	if (enabled){
-		Symbol *sym = get_symbol(size, s);
+void draw(Painter *p, float x, float y, float size, const string &s, bool bold, int align) {
+	if (enabled) {
+		auto sym = get_symbol(size, bold, s);
 		float dx = 0;
 		if (align == 0)
-			dx = - sym->size / 2;
+			dx = - sym->im.width / 2;
 		if (align == -1)
-			dx = - sym->size;
+			dx = - sym->im.width;
 		//p->drawImage(x + dx, y, sym->im);
 		p->draw_mask_image(x + dx, y, &sym->im);
-	}else{
+	} else {
 		p->set_font_size(size);
 		float dx = 0;
 		if (align == 0)
@@ -116,8 +110,17 @@ void draw(Painter *p, float x, float y, float size, const string &s, int align)
 	}
 }
 
-void enable(bool _enabled)
-{
+float width(Painter *p, float size, const string &s, bool bold) {
+	if (enabled) {
+		auto sym = get_symbol(size, bold, s);
+		return sym->im.width;
+	} else {
+		p->set_font_size(size);
+		return p->get_str_width(s);
+	}
+}
+
+void enable(bool _enabled) {
 	enabled = _enabled;
 }
 

@@ -66,6 +66,8 @@ private:
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
 
+	void draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
+
 	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
 	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
 	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);

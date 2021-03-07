@@ -9,6 +9,7 @@
 #define SRC_DATA_TRACKLAYER_H_
 
 #include "../lib/base/pointer.h"
+#include "../lib/base/set.h"
 #include "Range.h"
 #include "Midi/MidiData.h"
 #include "Midi/Instrument.h"

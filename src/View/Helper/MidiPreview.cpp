@@ -12,6 +12,7 @@
 #include "../../Module/SignalChain.h"
 #include <mutex>
 #include "../../Device/Stream/MidiInput.h"
+#include "../../lib/file/msg.h"
 
 
 class MidiPreviewSource : public MidiSource {

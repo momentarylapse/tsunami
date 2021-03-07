@@ -11,6 +11,8 @@
 #include "../Port/Port.h"
 #include "../Module.h"
 
+class File;
+
 class AudioBackup : public Module {
 public:
 	AudioBackup(Session *session);

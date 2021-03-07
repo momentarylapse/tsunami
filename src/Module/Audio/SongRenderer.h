@@ -10,6 +10,7 @@
 
 #include "../../Data/Range.h"
 #include "AudioSource.h"
+#include "../../lib/base/set.h"
 
 class MidiEventStreamer;
 class BarStreamer;

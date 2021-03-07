@@ -9,6 +9,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Stuff/BackupManager.h"
+#include "../../lib/file/file.h"
 
 AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::PLUMBING, "AudioBackup") {
 	session = _session;

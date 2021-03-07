@@ -45,6 +45,7 @@
 #include "../Module/Midi/MidiEffect.h"
 #include "../Stuff/Log.h"
 #include "../lib/threads/Mutex.h"
+#include "../lib/hui/language.h"
 #include <assert.h>
 
 

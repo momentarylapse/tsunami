@@ -9,7 +9,6 @@
 #define OBSERVABLE_H_
 
 #include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
 #include <functional>
 
 class ObservableData {

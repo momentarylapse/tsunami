@@ -9,6 +9,7 @@
 #include <functional>
 //#include <typeinfo>
 #include "../lib/kaba/kaba.h"
+#include "../lib/file/msg.h"
 
 
 static const int MESSAGE_DEBUG_LEVEL = 0;

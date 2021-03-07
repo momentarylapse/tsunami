@@ -9,6 +9,8 @@
 #include "Action.h"
 #include "ActionMergable.h"
 #include "ActionGroup.h"
+#include "../lib/file/msg.h"
+#include "../lib/hui/Timer.h"
 #include "../Data/Data.h"
 #include <assert.h>
 

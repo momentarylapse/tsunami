@@ -9,6 +9,7 @@
 #define SRC_MODULE_SYNTH_SYNTHESIZER_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/set.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Midi/Instrument.h"
 #include "../Module.h"

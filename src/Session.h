@@ -22,6 +22,7 @@ class DeviceManager;
 class PluginManager;
 class PerformanceMonitor;
 class SignalChain;
+class Path;
 namespace hui {
 	class Window;
 }

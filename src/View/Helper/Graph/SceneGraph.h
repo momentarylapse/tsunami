@@ -19,7 +19,8 @@ namespace scenegraph {
 
 class SceneGraph : public Node {
 public:
-	SceneGraph(hui::Callback cb_set_current);
+	using Callback = std::function<void()>;
+	SceneGraph(Callback cb_set_current);
 
 	bool on_left_button_down() override;
 	bool on_left_button_up() override;
@@ -38,12 +39,12 @@ public:
 	HoverData hover;
 	HoverData cur_selection;
 	void set_current(const HoverData &h);
-	hui::Callback cb_set_current;
+	Callback cb_set_current;
 
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);
 	void mdp_run(MouseDelayAction *action);
-	void mdp_prepare(hui::Callback update);
+	void mdp_prepare(Callback update);
 
 	float mx, my;
 	void set_mouse();

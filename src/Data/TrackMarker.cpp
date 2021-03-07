@@ -7,6 +7,7 @@
 
 #include "TrackMarker.h"
 #include "Midi/Scale.h"
+#include "../lib/file/msg.h"
 
 TrackMarker::TrackMarker() {
 	//msg_write("new TrackMarker " + p2s(this));

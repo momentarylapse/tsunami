@@ -14,6 +14,7 @@
 class ConfigPanel;
 class Module;
 class Session;
+class Path;
 enum class SignalType;
 enum class ModuleType;
 class SuckerThread;

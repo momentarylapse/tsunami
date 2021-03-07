@@ -9,6 +9,7 @@
 #define SRC_VIEW_MODE_VIEWMODE_H_
 
 #include "../../Stuff/Observable.h"
+#include "../../lib/base/set.h"
 
 enum class MidiMode;
 enum class SelectionMode;

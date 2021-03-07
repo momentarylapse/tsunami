@@ -28,6 +28,7 @@
 #endif
 #include <math.h>
 #include "../../lib/xfile/chunked.h"
+#include "../../lib/hui/language.h"
 
 
 class ChunkedFileFormatNami;

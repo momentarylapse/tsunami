@@ -15,6 +15,7 @@
 #include "../../Data/Track.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
+#include "../../lib/hui/language.h"
 
 
 FormatDescriptorWave::FormatDescriptorWave() :

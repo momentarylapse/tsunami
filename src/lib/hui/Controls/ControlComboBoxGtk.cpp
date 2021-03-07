@@ -6,6 +6,7 @@
  */
 
 #include "ControlComboBox.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -13,7 +14,7 @@ namespace hui
 {
 
 void on_gtk_combo_box_change(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlComboBox::ControlComboBox(const string &title, const string &id) :
 	Control(CONTROL_COMBOBOX, id)

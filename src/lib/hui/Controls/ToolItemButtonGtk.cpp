@@ -6,6 +6,7 @@
  */
 
 #include "ToolItemButton.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -15,7 +16,7 @@ namespace hui
 void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
 
 void on_gtk_tool_button_click(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:click");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CLICK);	}
 
 ToolItemButton::ToolItemButton(const string &title, const string &image, const string &id) :
 	Control(TOOL_ITEM_BUTTON, id)

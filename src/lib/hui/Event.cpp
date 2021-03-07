@@ -13,6 +13,55 @@ namespace hui {
 	int HuiKeyID[256], HuiKeyID2[256];
 #endif
 
+namespace EventID {
+const string _MATCH_DEFAULT_ = ":def:";
+const string KEY_DOWN = "hui:key-down";
+const string KEY_UP = "hui:key-up";
+const string LEFT_BUTTON_DOWN = "hui:left-button-down";
+const string LEFT_BUTTON_UP = "hui:left-button-up";
+const string LEFT_DOUBLE_CLICK = "hui:left-double-click";
+const string MIDDLE_BUTTON_DOWN = "hui:middle-button-down";
+const string MIDDLE_BUTTON_UP = "hui:middle-button-up";
+const string MIDDLE_DOUBLE_CLICK = "hui:middle-double-click";
+const string RIGHT_BUTTON_DOWN = "hui:right-button-down";
+const string RIGHT_BUTTON_UP = "hui:right-button-up";
+const string RIGHT_DOUBLE_CLICK = "hui:right-double-click";
+const string MOUSE_MOVE = "hui:mouse-move";
+const string MOUSE_WHEEL = "hui:mouse-wheel";
+const string MOUSE_ENTER = "hui:mouse-enter";
+const string MOUSE_LEAVE = "hui:mouse-leave";
+const string GESTURE_ZOOM = "hui:gesture-zoom";
+const string GESTURE_ZOOM_BEGIN = "hui:gesture-zoom-begin";
+const string GESTURE_ZOOM_END = "hui:gesture-zoom-end";
+const string FOCUS_IN = "hui:focus-in";
+const string RESIZE = "hui:resize";
+const string DRAW = "hui:draw";
+const string DRAW_GL = "hui:draw-gl";
+const string REALIZE = "hui:realize";
+const string UNREALIZE = "hui:unrealize";
+const string CLICK = "hui:click";
+const string CHANGE = "hui:change";
+const string SELECT = "hui:select";
+const string EDIT = "hui:edit";
+const string ACTIVATE = "hui:activate";
+const string MOVE = "hui:move";
+const string CLOSE = "hui:close";
+const string INFO = "hui:info";
+bool is_valid(const string &id) {
+	return sa_contains({
+		_MATCH_DEFAULT_,
+		KEY_DOWN, KEY_UP,
+		LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, LEFT_DOUBLE_CLICK,
+		MIDDLE_BUTTON_DOWN, MIDDLE_BUTTON_UP, MIDDLE_DOUBLE_CLICK,
+		RIGHT_BUTTON_DOWN, RIGHT_BUTTON_UP, RIGHT_DOUBLE_CLICK,
+		MOUSE_MOVE, MOUSE_WHEEL, MOUSE_ENTER, MOUSE_LEAVE,
+		GESTURE_ZOOM, GESTURE_ZOOM_BEGIN, GESTURE_ZOOM_END,
+		FOCUS_IN,
+		DRAW, DRAW_GL, REALIZE, UNREALIZE,
+		CLICK, CHANGE, SELECT, EDIT, ACTIVATE, MOVE, CLOSE, INFO}, id);
+}
+}
+
 
 
 EventListener::EventListener(int _uid, const string &_id, const string &_message, const Callback &_function) {

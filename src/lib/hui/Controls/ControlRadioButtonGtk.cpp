@@ -15,7 +15,7 @@ namespace hui
 {
 
 void on_gtk_radio_button_toggle(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlRadioButton::ControlRadioButton(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_RADIOBUTTON, id)

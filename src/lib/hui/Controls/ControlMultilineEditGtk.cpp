@@ -6,6 +6,7 @@
  */
 
 #include "ControlMultilineEdit.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -16,7 +17,7 @@ gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer us
 gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
 void on_gtk_multiline_edit_change(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id) :
 	Control(CONTROL_MULTILINEEDIT, id)

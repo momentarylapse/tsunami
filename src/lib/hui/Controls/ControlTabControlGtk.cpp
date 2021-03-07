@@ -14,9 +14,9 @@ namespace hui
 {
 
 void on_gtk_tab_control_switch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data) {
-	ControlTabControl *c = reinterpret_cast<ControlTabControl*>(data);
+	auto c = reinterpret_cast<ControlTabControl*>(data);
 	c->cur_page = page_num;
-	c->notify("hui:change");
+	c->notify(EventID::CHANGE);
 }
 
 

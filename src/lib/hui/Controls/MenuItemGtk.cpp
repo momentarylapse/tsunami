@@ -17,7 +17,7 @@ namespace hui
 void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
 
 gboolean on_get_menu_click(GtkWidget *widget, gpointer data) {
-	reinterpret_cast<Control*>(data)->notify("hui:click");
+	reinterpret_cast<Control*>(data)->notify(EventID::CLICK);
 	return FALSE;
 }
 

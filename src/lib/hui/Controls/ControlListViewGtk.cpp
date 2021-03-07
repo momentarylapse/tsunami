@@ -33,7 +33,7 @@ void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpoin
 
 	c->panel->win->input.column = column;
 	c->panel->win->input.row = s2i(path_string);
-	c->notify("hui:change", false);
+	c->notify(EventID::CHANGE, false);
 	gtk_tree_path_free(path);
 }
 
@@ -53,7 +53,7 @@ void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, c
 
 	c->panel->win->input.column = column;
 	c->panel->win->input.row = s2i(path_string);
-	c->notify("hui:change", false);
+	c->notify(EventID::CHANGE, false);
 	gtk_tree_path_free(path);
 }
 
@@ -127,10 +127,10 @@ void configure_tree_view_columns(Control *c, GtkWidget *view, const string &_for
 }
 
 void on_gtk_list_activate(GtkWidget *widget, void* a, void* b, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:activate");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::ACTIVATE);	}
 
 void on_gtk_list_select(GtkTreeSelection *selection, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:select", false);	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::SELECT, false);	}
 
 gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
 	if (event->button != 3) // right
@@ -150,7 +150,7 @@ gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 		gtk_tree_path_free(path);
 	}
 
-	c->notify("hui:right-button-down", false);
+	c->notify(EventID::RIGHT_BUTTON_DOWN, false);
 	return false;
 }
 
@@ -170,7 +170,7 @@ void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer u
 		lv->panel->win->input.row = indices[0];
 		lv->panel->win->input.row_target = lv->row_target - 1;
 	}
-	lv->notify("hui:move", false);
+	lv->notify(EventID::MOVE, false);
 }
 
 void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data) {

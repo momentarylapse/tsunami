@@ -9,6 +9,7 @@
 #include "../hui.h"
 #include <math.h>
 #include "../internal.h"
+#include "../Event.h"
 #include "../../math/rect.h"
 
 #include <thread>
@@ -46,7 +47,7 @@ gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 #if STUPID_HACK
 	da->redraw_area.clear();
 #endif
-	da->notify("hui:draw");
+	da->notify(EventID::DRAW);
 	//msg_write("/draw " + da->id);
 	return false;
 }
@@ -67,7 +68,7 @@ gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer 
 
 
 	gtk_gl_context = context;
-	da->notify("hui:draw-gl");
+	da->notify(EventID::DRAW_GL);
 	return false;
 }
 
@@ -80,7 +81,7 @@ void on_gtk_gl_area_realize(GtkGLArea *area, gpointer user_data) {
 		return;
 	}
 
-	da->notify("hui:realize");
+	da->notify(EventID::REALIZE);
 }
 
 void on_gtk_gl_area_unrealize(GtkGLArea *area, gpointer user_data) {
@@ -91,7 +92,7 @@ void on_gtk_gl_area_unrealize(GtkGLArea *area, gpointer user_data) {
 		printf("unrealize: gl area make current error...\n");
 		return;
 	}
-	da->notify("hui:unrealize");
+	da->notify(EventID::UNREALIZE);
 }
 
 /*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
@@ -117,6 +118,8 @@ void win_set_input(Window *win, T *event) {
 	win->input.scroll_y = 0;
 	win->input.pressure = 1;
 	int mod = event->state;
+	//printf("mod: %x    %x %x %x\n", mod, GDK_BUTTON1_MASK, GDK_BUTTON2_MASK, GDK_BUTTON3_MASK);
+	// hmmm, seems to be off sometimes... better set it by hand, later
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
 	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
 	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
@@ -168,7 +171,7 @@ gboolean on_gtk_area_mouse_move(GtkWidget *widget, GdkEventMotion *event, gpoint
 	c->win->input.y = y;*/
 
 	if (!c->panel->win->input.lb)
-		c->notify("hui:mouse-move", false);
+		c->notify(EventID::MOUSE_MOVE, false);
 //	gdk_event_request_motions(event); // to prevent too many signals for slow message processing
 	return false;
 }
@@ -178,7 +181,7 @@ gboolean on_gtk_area_mouse_move(GtkWidget *widget, GdkEventMotion *event, gpoint
 gboolean on_gtk_area_mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
-	c->notify("hui:mouse-enter", false);
+	c->notify(EventID::MOUSE_ENTER, false);
 	return false;
 }
 
@@ -186,7 +189,7 @@ gboolean on_gtk_area_mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpo
 gboolean on_gtk_area_mouse_leave(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
-	c->notify("hui:mouse-leave", false);
+	c->notify(EventID::MOUSE_LEAVE, false);
 	return false;
 }
 
@@ -195,20 +198,39 @@ gboolean on_gtk_area_button(GtkWidget *widget, GdkEventButton *event, gpointer u
 	win_set_input(c->panel->win, event);
 	win_set_input_more(c->panel->win, event);
 
-	// build message
-	string msg = "hui:";
-	if (event->button == 1)
-		msg += "left";
-	else if (event->button == 2)
-		msg += "middle";
-	else if (event->button == 3)
-		msg += "right";
-	if (event->type == GDK_2BUTTON_PRESS)
-		msg += "-double-click";
-	else if (event->type == GDK_BUTTON_PRESS)
-		msg += "-button-down";
-	else
-		msg += "-button-up";
+	string msg;
+	auto win = c->panel->win;
+	if (event->type == GDK_BUTTON_PRESS) {
+		if (event->button == 1) {
+			msg = EventID::LEFT_BUTTON_DOWN;
+			win->input.lb = true;
+		} else if (event->button == 2) {
+			msg = EventID::MIDDLE_BUTTON_DOWN;
+			win->input.mb = true;
+		} else if (event->button == 3) {
+			msg = EventID::RIGHT_BUTTON_DOWN;
+			win->input.rb = true;
+		}
+	} else if (event->type == GDK_BUTTON_RELEASE) {
+		if (event->button == 1) {
+			msg = EventID::LEFT_BUTTON_UP;
+			win->input.lb = false;
+		} else if (event->button == 2) {
+			msg = EventID::MIDDLE_BUTTON_UP;
+			win->input.mb = false;
+		} else if (event->button == 3) {
+			msg = EventID::RIGHT_BUTTON_UP;
+			win->input.rb = false;
+		}
+	} else if (event->type == GDK_2BUTTON_PRESS) {
+		if (event->button == 1) {
+			msg = EventID::LEFT_DOUBLE_CLICK;
+		} else if (event->button == 2) {
+			msg = EventID::MIDDLE_DOUBLE_CLICK;
+		} else if (event->button == 3) {
+			msg = EventID::RIGHT_DOUBLE_CLICK;
+		}
+	}
 
 	if (!gtk_widget_has_focus(widget)) {
 		gtk_widget_grab_focus(widget);
@@ -221,7 +243,7 @@ gboolean on_gtk_area_button(GtkWidget *widget, GdkEventButton *event, gpointer u
 gboolean on_gtk_area_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
-	c->notify("hui:focus-in", false);
+	c->notify(EventID::FOCUS_IN, false);
 	return false;
 }
 
@@ -240,7 +262,7 @@ gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpoin
 			c->panel->win->input.scroll_x = (float)event->delta_x;
 			c->panel->win->input.scroll_y = (float)event->delta_y;
 		}
-		c->notify("hui:mouse-wheel", false);
+		c->notify(EventID::MOUSE_WHEEL, false);
 	}
 	return false;
 }
@@ -322,7 +344,7 @@ bool area_process_key(GdkEventKey *event, Control *c, bool down) {
 		c->panel->win->input.key_code = key_code;
 	}
 
-	c->notify(down ? "hui:key-down" : "hui:key-up", false);
+	c->notify(down ? EventID::KEY_DOWN : EventID::KEY_UP, false);
 
 	// stop further gtk key handling
 	return c->grab_focus;
@@ -346,7 +368,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 	c->panel->win->input.lb = true;
 	c->panel->win->input.mb = false;
 	c->panel->win->input.rb = false;
-	c->notify("hui:mouse-move", false);
+	c->notify(EventID::MOUSE_MOVE, false);
 }
 
 void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
@@ -359,7 +381,7 @@ void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, doubl
 	c->panel->win->input.mb = (mod & GDK_BUTTON2_MASK);
 	c->panel->win->input.rb = (mod & GDK_BUTTON3_MASK);
 #endif
-	c->notify("hui:mouse-move", false);
+	c->notify(EventID::MOUSE_MOVE, false);
 }
 
 // ignored by gtk???
@@ -367,13 +389,13 @@ void on_gtk_motion_enter(GtkEventControllerMotion *controller, double x, double 
 	auto c = reinterpret_cast<Control*>(user_data);
 	msg_write("ENTER NEW");
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
-	c->notify("hui:mouse-enter", false);
+	c->notify(EventID::MOUSE_ENTER, false);
 }
 
 void on_gtk_motion_leave(GtkEventControllerMotion *controller, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	msg_write("LEAVE");
-	c->notify("hui:mouse-leave", false);
+	c->notify(EventID::MOUSE_LEAVE, false);
 }
 
 // gtk 3.24
@@ -381,7 +403,7 @@ void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, doub
 	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = (float)dx;
 	c->panel->win->input.scroll_y = (float)dy;
-	c->notify("hui:mouse-wheel", false);
+	c->notify(EventID::MOUSE_WHEEL, false);
 }
 
 gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
@@ -394,7 +416,7 @@ gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, gui
 
 	c->panel->win->input.key[key] = true;
 	c->panel->win->input.key_code = key_code;
-	c->notify("hui:key-down", false);
+	c->notify(EventID::KEY_DOWN, false);
 
 	// stop further gtk key handling
 	return c->grab_focus;
@@ -410,7 +432,7 @@ void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint 
 
 	c->panel->win->input.key[key] = false;
 	c->panel->win->input.key_code = key_code;
-	c->notify("hui:key-up", false);
+	c->notify(EventID::KEY_UP, false);
 }
 
 #if GTK_CHECK_VERSION(4,0,0)
@@ -420,7 +442,7 @@ void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double 
 	c->panel->win->input.lb = true;
 	c->panel->win->input.mb = false;
 	c->panel->win->input.rb = false;
-	c->notify("hui:left-button-down", false);
+	c->notify(EventID::LEFT_BUTTON_DOWN, false);
 }
 #endif
 
@@ -470,10 +492,12 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	auto handler_key = gtk_event_controller_key_new(da);
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_key);
 
 #if GTK_CHECK_VERSION(4,0,0)
 	auto gesture_click = gtk_gesture_click_new(da);
 	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, gesture_click);
 #endif
 
 	auto handler_motion = gtk_event_controller_motion_new(da);
@@ -481,9 +505,11 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	// somehow getting ignored?
 	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
 	g_signal_connect(G_OBJECT(handler_motion), "leave", G_CALLBACK(&on_gtk_motion_leave), this);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_motion);
 
 	auto handler_scroll = gtk_event_controller_scroll_new(da, GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
 	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_scroll);
 
 ///	auto handler_drag = gtk_gesture_drag_new(da);
 ///	g_signal_connect(G_OBJECT(handler_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
@@ -516,17 +542,17 @@ void on_gtk_gesture_zoom(GtkGestureZoom *controller, gdouble scale, gpointer use
 	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = scale;
 	c->panel->win->input.scroll_y = scale;
-	c->notify("hui:gesture-zoom", false);
+	c->notify(EventID::GESTURE_ZOOM, false);
 }
 
 void on_gtk_gesture_zoom_begin(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
-	c->notify("hui:gesture-zoom-begin", false);
+	c->notify(EventID::GESTURE_ZOOM_BEGIN, false);
 }
 
 void on_gtk_gesture_zoom_end(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
-	c->notify("hui:gesture-zoom-end", false);
+	c->notify(EventID::GESTURE_ZOOM_END, false);
 }
 
 void ControlDrawingArea::__set_option(const string &op, const string &value) {

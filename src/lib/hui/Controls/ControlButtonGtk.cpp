@@ -16,11 +16,11 @@ namespace hui
 void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
 
 void on_gtk_button_press(GtkWidget *widget, gpointer data) {
-	reinterpret_cast<Control*>(data)->notify("hui:click");
+	reinterpret_cast<Control*>(data)->notify(EventID::CLICK);
 }
 
 gboolean on_gtk_link_button_activate(GtkWidget *widget, gpointer data) {
-	reinterpret_cast<Control*>(data)->notify("hui:click");
+	reinterpret_cast<Control*>(data)->notify(EventID::CLICK);
 	return true;
 }
 

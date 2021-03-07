@@ -52,7 +52,7 @@ void WinTrySendByKeyCode(Window *win, int key_code) {
 
 static gboolean on_gtk_window_close(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 	Window *win = (Window *)user_data;
-	Event e = Event("", "hui:close");
+	Event e = Event("", EventID::CLOSE);
 	if (win->_send_event_(&e))
 		return true;
 	win->on_close_request();
@@ -73,7 +73,7 @@ static gboolean on_gtk_window_focus(GtkWidget *widget, GdkEventFocus *event, gpo
 
 static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data) {
 	Window *win = (Window *)user_data;
-	Event e = Event("", "hui:resize");
+	Event e = Event("", EventID::RESIZE);
 	win->_send_event_(&e);
 }
 
@@ -432,7 +432,7 @@ void __GtkOnInfoBarResponse(GtkWidget *widget, int response, gpointer data) {
 
 	int index = response - 1234;
 	if (index >= 0 and index < __info_bar_responses.num) {
-		Event e = Event(__info_bar_responses[index], "hui:info");
+		Event e = Event(__info_bar_responses[index], EventID::INFO);
 		win->_send_event_(&e);
 	}
 	//win->infobar = nullptr;

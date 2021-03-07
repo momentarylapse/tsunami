@@ -6,6 +6,7 @@
  */
 
 #include "ControlEdit.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -15,7 +16,7 @@ namespace hui
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 
 void on_gtk_edit_changed(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlEdit::ControlEdit(const string &title, const string &id) :
 	Control(CONTROL_EDIT, id)

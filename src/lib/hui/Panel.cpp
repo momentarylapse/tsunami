@@ -102,10 +102,12 @@ void Panel::_set_cur_id_(const string &id) {
 }
 
 int Panel::event(const string &id, const Callback &function) {
-	return event_x(id, ":def:", function);
+	return event_x(id, EventID::_MATCH_DEFAULT_, function);
 }
 
 int Panel::event_x(const string &id, const string &msg, const Callback &function) {
+	if (!EventID::is_valid(msg))
+		msg_error(format("invalid event message: %s/%s", id, msg));
 	int uid = current_event_listener_uid ++;
 	event_listeners.add(EventListener(uid, id, msg, function));
 	return uid;
@@ -113,6 +115,8 @@ int Panel::event_x(const string &id, const string &msg, const Callback &function
 
 // hopefully deprecated soon?
 int Panel::event_xp(const string &id, const string &msg, const CallbackP &function) {
+	if (!EventID::is_valid(msg))
+		msg_error(format("invalid event message: %s/%s", id, msg));
 	int uid = current_event_listener_uid ++;
 	event_listeners.add(EventListener(uid, id, msg, -1, function));
 	return uid;

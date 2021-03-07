@@ -193,6 +193,43 @@ enum {
 	KEY_ALT = 1024
 };
 
+namespace EventID {
+extern const string _MATCH_DEFAULT_;
+extern const string KEY_DOWN;
+extern const string KEY_UP;
+extern const string LEFT_BUTTON_DOWN;
+extern const string LEFT_BUTTON_UP;
+extern const string LEFT_DOUBLE_CLICK;
+extern const string MIDDLE_BUTTON_DOWN;
+extern const string MIDDLE_BUTTON_UP;
+extern const string MIDDLE_DOUBLE_CLICK;
+extern const string RIGHT_BUTTON_DOWN;
+extern const string RIGHT_BUTTON_UP;
+extern const string RIGHT_DOUBLE_CLICK;
+extern const string MOUSE_MOVE;
+extern const string MOUSE_WHEEL;
+extern const string MOUSE_ENTER;
+extern const string MOUSE_LEAVE;
+extern const string GESTURE_ZOOM;
+extern const string GESTURE_ZOOM_BEGIN;
+extern const string GESTURE_ZOOM_END;
+extern const string FOCUS_IN;
+extern const string RESIZE;
+extern const string DRAW;
+extern const string DRAW_GL;
+extern const string REALIZE;
+extern const string UNREALIZE;
+extern const string CLICK;
+extern const string CHANGE;
+extern const string SELECT;
+extern const string EDIT;
+extern const string ACTIVATE;
+extern const string MOVE;
+extern const string CLOSE;
+extern const string INFO;
+bool is_valid(const string &id);
+}
+
 
 };
 

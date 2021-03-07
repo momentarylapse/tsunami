@@ -6,6 +6,7 @@
  */
 
 #include "ControlColorButton.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -16,7 +17,7 @@ void on_gtk_button_press(GtkWidget *widget, gpointer data);
 
 
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	Control(CONTROL_COLORBUTTON, id)

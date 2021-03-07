@@ -6,6 +6,7 @@
  */
 
 #include "ControlSpinButton.h"
+#include "../Event.h"
 #include <math.h>
 
 #ifdef HUI_API_GTK
@@ -16,7 +17,7 @@ namespace hui
 void parse_range(const string &str, float &vmin, float &vmax, float &step); // -> slider
 
 void on_gtk_spin_button_change(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	Control(CONTROL_SPINBUTTON, id)

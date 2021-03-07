@@ -6,6 +6,7 @@
  */
 
 #include "ControlToggleButton.h"
+#include "../Event.h"
 
 #ifdef HUI_API_GTK
 
@@ -15,7 +16,7 @@ namespace hui
 void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
 
 void on_gtk_toggle_button_toggle(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
+{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
 
 ControlToggleButton::ControlToggleButton(const string &title, const string &id) :
 	Control(CONTROL_TOGGLEBUTTON, id)

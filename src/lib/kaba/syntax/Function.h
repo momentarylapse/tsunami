@@ -31,8 +31,9 @@ public:
 	int64 _offset; // for compilation
 	void *memory;
 	bool memory_owner;
-	bool is_extern;
-	bool is_const;
+	Flags flags;
+	bool is_extern() const;
+	bool is_const() const;
 	bool explicitly_constructed;
 	int _label;
 };

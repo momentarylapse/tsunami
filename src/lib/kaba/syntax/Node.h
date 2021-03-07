@@ -10,6 +10,7 @@
 
 
 #include "../../base/base.h"
+#include "../lib/common.h"
 
 namespace kaba {
 
@@ -147,7 +148,7 @@ public:
 	const Class *name_space() const;
 
 	Variable *get_var(const string &name) const;
-	Variable *add_var(const string &name, const Class *type, bool is_const = false);
+	Variable *add_var(const string &name, const Class *type, Flags flags = Flags::NONE);
 };
 
 }

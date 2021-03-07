@@ -257,7 +257,7 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		return b2s(*(bool*)p);
 	} else if (type == TypeClass) {
 		return class_repr((Class*)p);
-	} else if (type->type == Class::Type::FUNCTION) {
+	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
 		return func_repr((Function*)p);
 	} else if (type == TypeAny) {
 		return ((Any*)p)->repr();

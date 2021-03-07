@@ -53,8 +53,8 @@ struct StackFrameInfo {
 	int64 offset;
 	string str() const {
 		if (!s or !f)
-			return "-not in kaba-";
-		return format(">>  %s : %s()  +0x%x", s->filename.str(), f->long_name(), offset);
+			return ">>  NOT IN KABA";
+		return format(">>  %s()  +0x%x  (%s)", f->long_name(), offset, s->filename.str());
 	}
 };
 

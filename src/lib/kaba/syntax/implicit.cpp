@@ -659,7 +659,7 @@ Function *SyntaxTree::add_func_header(Class *t, const string &name, const Class 
 	foreachi (auto &p, param_types, i) {
 		f->literal_param_type.add(p);
 		auto v = f->block->add_var(param_names[i], p);
-		v->is_const = true;
+		flags_set(v->flags, Flags::CONST);
 		f->num_params ++;
 	}
 	//msg_write("ADD " + f->signature(TypeVoid));
@@ -724,7 +724,7 @@ bool can_fully_construct(const Class *t) {
 		return false;
 	for (auto &e: t->elements)
 		if (!e.type->get_assign() and e.type->uses_call_by_reference()) {
-			msg_write(e.type->name);
+			msg_write(format("class %s auto constructor prevented by element %s %s", t->name, e.name, e.type->name));
 			return false;
 		}
 	return true;

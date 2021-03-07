@@ -28,7 +28,7 @@
 
 namespace kaba {
 
-string Version = "0.19.7.0";
+string Version = "0.19.8.0";
 
 //#define ScriptDebug
 
@@ -308,6 +308,10 @@ void execute_single_script_command(const string &cmd) {
 		parser->auto_implement_functions(c);
 	//ps->show("aaaa");
 
+
+	if (config.verbose)
+		tree->show("parse:a");
+
 // compile
 	s->compile();
 
@@ -318,10 +322,12 @@ void execute_single_script_command(const string &cmd) {
 	}
 
 // execute
-	typedef void void_func();
-	void_func *f = (void_func*)func->address;
-	if (f)
-		f();
+	if (kaba::config.instruction_set == Asm::QueryLocalInstructionSet()) {
+		typedef void void_func();
+		void_func *f = (void_func*)func->address;
+		if (f)
+			f();
+	}
 
 	} catch(const Exception &e) {
 		e.print();

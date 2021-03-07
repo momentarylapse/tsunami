@@ -302,6 +302,7 @@ sources = [
 	'src/lib/kaba/asm/asm_x86.cpp',
 	'src/lib/kaba/compiler/Backend.cpp',
 	'src/lib/kaba/compiler/BackendAmd64.cpp',
+	'src/lib/kaba/compiler/BackendARM.cpp',
 	'src/lib/kaba/compiler/BackendX86.cpp',
 	'src/lib/kaba/compiler/CommandList.cpp',
 	'src/lib/kaba/compiler/compiler.cpp',

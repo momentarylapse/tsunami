@@ -7,10 +7,13 @@ namespace kaba {
 
 typedef void op_func(Value&, Value&, Value&);
 
-
+#if 0
 void db_out(const string &s) {
-//	msg_write(s);
+	msg_write(s);
 }
+#else
+#define db_out(x)
+#endif
 
 #define CALL_DEBUG_X		0
 

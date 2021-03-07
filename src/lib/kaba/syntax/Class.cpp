@@ -547,6 +547,7 @@ void Class::derive_from(const Class* root, bool increase_size) {
 
 void *Class::create_instance() const {
 	void *p = malloc(size);
+	memset(p, 0, size);
 	Function *c = get_default_constructor();
 	if (c) {
 		typedef void con_func(void *);

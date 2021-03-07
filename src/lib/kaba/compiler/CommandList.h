@@ -37,8 +37,10 @@ struct TempVar {
 	bool mapped;
 	bool referenced;
 	bool force_stack;
+	bool force_register;
 	int stack_offset;
 	int entangled;
+	TempVar();
 	void use(int first, int last);
 };
 

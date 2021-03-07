@@ -18,8 +18,7 @@ Variable::Variable(const string &_name, const Class *_type) {
 	name = _name;
 	type = _type;
 	_offset = 0;
-	is_extern = false;
-	is_const = false;
+	flags = Flags::NONE;
 	explicitly_constructed = false;
 	memory = nullptr;
 	memory_owner = false;
@@ -37,6 +36,14 @@ string Variable::long_name(const Class *ns) const {
 
 string Variable::cname(const Class *ns, const Class *ns_obs) const {
 	return namespacify_rel(name, ns, ns_obs);
+}
+
+bool Variable::is_const() const {
+	return flags_has(flags, Flags::CONST);
+}
+
+bool Variable::is_extern() const {
+	return flags_has(flags, Flags::EXTERN);
 }
 
 
@@ -159,7 +166,7 @@ void Function::update_parameters_after_parsing() {
 	// class function
 	if (!is_static()) {
 		if (!__get_var(IDENTIFIER_SELF))
-			block->add_var(IDENTIFIER_SELF, name_space, is_const());
+			block->add_var(IDENTIFIER_SELF, name_space, is_const() ? Flags::CONST : Flags::NONE);
 	}
 }
 
@@ -172,7 +179,7 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 	f->literal_param_type = literal_param_type;
 	for (int i=0; i<num_params; i++) {
 		f->block->add_var(var[i]->name, var[i]->type);
-		f->var[i]->is_const = var[i]->is_const;
+		f->var[i]->flags = var[i]->flags;
 	}
 
 	f->virtual_index = virtual_index;

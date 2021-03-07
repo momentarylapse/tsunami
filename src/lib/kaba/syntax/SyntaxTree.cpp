@@ -152,15 +152,15 @@ shared<Node> SyntaxTree::add_node_operator_by_inline(InlineID inline_index, cons
 
 
 shared<Node> SyntaxTree::add_node_local(Variable *v, const Class *type) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->is_const);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->is_const());
 }
 
 shared<Node> SyntaxTree::add_node_local(Variable *v) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->is_const);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->is_const());
 }
 
 shared<Node> SyntaxTree::add_node_global(Variable *v) {
-	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->is_const);
+	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->is_const());
 }
 
 shared<Node> SyntaxTree::add_node_parray(shared<Node> p, shared<Node> index, const Class *type) {

@@ -47,6 +47,8 @@ void BackendX86::process(Function *f, int index) {
 	stack_max_size = f->_var_size;
 
 	correct();
+
+	do_mapping();
 }
 
 static int trafo_inst_float(int inst, const Class *t) {

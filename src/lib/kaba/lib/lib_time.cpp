@@ -5,6 +5,8 @@
 
 #ifdef _X_USE_HUI_
 	#include "../../hui/hui.h"
+#elif defined(_X_USE_HUI_MINIMAL_)
+	#include "../../hui_minimal/hui.h"
 #else
 	we are re screwed.... TODO: test for _X_USE_HUI_
 #endif

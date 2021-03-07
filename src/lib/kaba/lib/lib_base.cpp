@@ -15,6 +15,7 @@ extern const Class *TypeSharedPointer;
 const Class *TypeAbstractList;
 const Class *TypeAbstractDict;
 const Class *TypeAbstractTuple;
+extern const Class *TypeStringAutoCast;
 extern const Class *TypeDictBase;
 extern const Class *TypeFloat;
 extern const Class *TypePointerList;
@@ -486,6 +487,7 @@ void SIAddPackageBase() {
 	TypeCharPs      = add_type_p(TypeChar, Flags::SILENT);
 	TypeCString     = add_type_a(TypeChar, 256, "cstring");	// cstring := char[256]
 	TypeString      = add_type_l(TypeChar, "string");	// string := char[]
+	TypeStringAutoCast = add_type("-string-auto-cast-", config.super_array_size);	// string := char[]
 	TypeStringList  = add_type_l(TypeString);
 
 	TypeIntDict     = add_type_d(TypeInt);
@@ -916,7 +918,7 @@ void SIAddPackageBase() {
 	/*add_func("cprint", TypeVoid, (void*)&_cstringout, Flags::STATIC);
 		func_add_param("str", TypeCString);*/
 	add_func("print", TypeVoid, (void*)&kaba_print, Flags::STATIC);
-		func_add_param("str", TypeString);
+		func_add_param("str", TypeStringAutoCast);//, (Flags)((int)Flags::CONST | (int)Flags::AUTO_CAST));
 	add_ext_var("_print_postfix", TypeString, &kaba_print_postfix);
 	add_func("binary", TypeString, (void*)&kaba_binary, Flags::STATIC);
 		func_add_param("p", TypePointer);

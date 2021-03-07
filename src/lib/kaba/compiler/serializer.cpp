@@ -8,6 +8,7 @@
 #include "SerializerX.h"
 #include "BackendAmd64.h"
 #include "BackendX86.h"
+#include "BackendARM.h"
 #include "../Interpreter.h"
 
 
@@ -17,6 +18,18 @@ namespace kaba {
 //#define debug_evil_corrections	1
 
 //#ifdef ScriptDebug
+
+TempVar::TempVar() {
+	type = TypeUnknown;
+	first = last = -1;
+	usage_count = 0;
+	mapped = false;
+	referenced = false;
+	force_stack = false;
+	force_register = false;
+	stack_offset = -1;
+	entangled = 0;
+}
 
 void TempVar::use(int _first, int _last) {
 	if ((first < 0) or ((first >= 0) and (first > _first)))
@@ -28,7 +41,7 @@ void TempVar::use(int _first, int _last) {
 
 // return of a function might need temp vars without destructor FIXME ?!?
 SerialNodeParam Serializer::add_temp(const Class *t, bool add_constructor) {
-	SerialNodeParam r = cmd._add_temp(t);
+	auto r = cmd._add_temp(t);
 
 	if (t != TypeVoid) {
 		if (r.type->get_destructor())
@@ -147,6 +160,34 @@ string SerialNodeParam::str(Serializer *ser) const {
 	return str;
 }
 
+string _cond_str(int cond) {
+	if (cond == Asm::ARM_COND_EQUAL)
+		return "eq";
+	if (cond == Asm::ARM_COND_NOT_EQUAL)
+		return "ne";
+	if (cond == Asm::ARM_COND_LESS_THAN)
+		return "lt";
+	if (cond == Asm::ARM_COND_LESS_EQUAL)
+		return "le";
+	if (cond == Asm::ARM_COND_GREATER_THAN)
+		return "gt";
+	if (cond == Asm::ARM_COND_GREATER_EQUAL)
+		return "ge";
+	if (cond == Asm::ARM_COND_CARRY_SET)
+		return "carry";
+	if (cond == Asm::ARM_COND_CARRY_CLEAR)
+		return "nocarry";
+	if (cond == Asm::ARM_COND_NEGATIVE)
+		return "neg";
+	if (cond == Asm::ARM_COND_POSITIVE)
+		return "pos";
+	if (cond == Asm::ARM_COND_OVERFLOW)
+		return "over";
+	if (cond == Asm::ARM_COND_NO_OVERFLOW)
+		return "nover";
+	return "?";
+}
+
 string SerialNode::str(Serializer *ser) const {
 	if (inst == INST_MARKER)
 		return "-- " + ser->list->label[p[0].p].name + " --";
@@ -154,7 +195,7 @@ string SerialNode::str(Serializer *ser) const {
 		return format("-- Asm %d --", p[0].p);
 	string t;
 	if (cond != Asm::ARM_COND_ALWAYS)
-		t += "[cond]";
+		t += _cond_str(cond) + ":";
 	t += format("%-6s %s", Asm::GetInstructionName(inst), p[0].str(ser));
 	if (p[1].kind != NodeKind::NONE)
 		t += ",  " + p[1].str(ser);
@@ -1855,8 +1896,9 @@ Backend *create_backend(SerializerX *s) {
 		return new BackendAmd64(s);
 	if (config.instruction_set == Asm::InstructionSet::X86)
 		return new BackendX86(s);
-//	if (config.instruction_set == Asm::InstructionSet::ARM)
-//		return new BackendARM(s);
+	if (config.instruction_set == Asm::InstructionSet::ARM)
+		return new BackendARM(s);
+	s->script->do_error("unable to create a backend for the architecture");
 	return nullptr;
 }
 
@@ -1892,10 +1934,9 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 		x->serialize_function(f);
 		x->fix_return_by_ref();
 		auto be = create_backend(x);
-		be->process(f, index);
 
 		try {
-			be->do_mapping();
+			be->process(f, index);
 			be->assemble();
 		} catch (Exception &e) {
 			throw e;

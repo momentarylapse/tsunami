@@ -76,7 +76,7 @@ void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
 
 void init_all_global_objects(SyntaxTree *ps, const Class *c) {
 	for (auto *v: weak(c->static_variables))
-		if (!v->is_extern)
+		if (!v->is_extern())
 			try_init_global_var(v->type, (char*)v->memory, ps);
 	for (auto *cc: weak(c->classes))
 		init_all_global_objects(ps, cc);
@@ -217,7 +217,7 @@ void Script::update_constant_locations() {
 
 void Script::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	for (auto *v: weak(name_space->static_variables)) {
-		if (v->is_extern) {
+		if (v->is_extern()) {
 			v->memory = get_external_link(v->cname(name_space, name_space->owner->base_class));
 			if (!v->memory)
 				do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));

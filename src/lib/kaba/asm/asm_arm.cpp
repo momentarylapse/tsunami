@@ -66,7 +66,7 @@ void arm_init() {
 
 	// create easy to access array
 	RegisterByID.clear();
-	for (int i=0;i<Registers.num;i++){
+	for (int i=0;i<Registers.num;i++) {
 		if (RegisterByID.num <= Registers[i].id)
 			RegisterByID.resize(Registers[i].id + 1);
 		RegisterByID[Registers[i].id] = &Registers[i];
@@ -74,8 +74,8 @@ void arm_init() {
 
 	cpu_instructions_arm.clear();
 
-	add_inst_arm(INST_MUL,  0x00000090, 0x0ff00ff0, AP_REG_16, AP_REG_0, AP_REG_8);
-	add_inst_arm(INST_MULS, 0x00100090, 0x0ff00ff0, AP_REG_16, AP_REG_0, AP_REG_8);
+	add_inst_arm(INST_MUL,  0x00000090, 0x0ff0f0f0, AP_REG_16, AP_REG_0, AP_REG_8);
+	add_inst_arm(INST_MULS, 0x00100090, 0x0ff0f0f0, AP_REG_16, AP_REG_0, AP_REG_8);
 
 	// data
 	add_inst_arm(INST_AND,  0x00000000, 0x0df00000, AP_REG_12, AP_REG_16, AP_SHIFTER_0X12_I25);
@@ -145,7 +145,7 @@ void arm_init() {
 	add_inst_arm(INST_FNMULS, 0x0e200a40, 0x0fb00f50, AP_FREG_12_22, AP_FREG_16_7, AP_FREG_0_5);
 	add_inst_arm(INST_FADDS,  0x0e300a00, 0x0fb00f50, AP_FREG_12_22, AP_FREG_16_7, AP_FREG_0_5);
 	add_inst_arm(INST_FSUBS,  0x0e300a40, 0x0fb00f50, AP_FREG_12_22, AP_FREG_16_7, AP_FREG_0_5);
-	add_inst_arm(INST_FDIVS,  0x0e400a00, 0x0fb00f50, AP_FREG_12_22, AP_FREG_16_7, AP_FREG_0_5);
+	add_inst_arm(INST_FDIVS,  0x0e800a00, 0x0fb00f50, AP_FREG_12_22, AP_FREG_16_7, AP_FREG_0_5);
 
 	add_inst_arm(INST_FCPYS,  0x0eb00a40, 0x0fbf0fd0, AP_FREG_12_22, AP_FREG_0_5);
 	add_inst_arm(INST_FABSS,  0x0eb00ac0, 0x0fbf0fd0, AP_FREG_12_22, AP_FREG_0_5);
@@ -168,36 +168,50 @@ void arm_init() {
 	add_inst_arm(INST_FTOSIZS, 0x0ebd0ac0, 0x0fbf0fd0, AP_FREG_12_22, AP_FREG_0_5);
 }
 
+const int NUM_ARM_DATA_INSTRUCTIONS = 32;
 
-int ARM_DATA_INSTRUCTIONS[16] =
-{
+int ARM_DATA_INSTRUCTIONS[NUM_ARM_DATA_INSTRUCTIONS] = {
 	INST_AND,
+	INST_ANDS,
 	INST_XOR,
+	INST_XORS,
 	INST_SUB,
+	INST_SUBS,
 	INST_RSB,
+	INST_RSBS,
 	INST_ADD,
+	INST_ADDS,
 	INST_ADC,
+	INST_ADCS,
 	INST_SBC,
+	INST_SBCS,
 	INST_RSC,
+	INST_RSCS,
+	-1,
 	INST_TST,
+	-1,
 	INST_TEQ,
+	-1,
 	INST_CMP,
+	-1,
 	INST_CMN,
 	INST_OR,
+	INST_ORS,
 	INST_MOV,
+	INST_MOVS,
 	INST_BIC,
-	INST_MVN
+	INST_BICS,
+	INST_MVN,
+	INST_MVNS
 };
 
-int arm_decode_imm(int imm)
-{
+int arm_decode_imm(int imm) {
 	int r = ((imm >> 8) & 0xf);
 	int n = (imm & 0xff);
 	return n >> (r*2) | n << (32 - r*2);
 }
 
-InstructionParam disarm_shift_reg(int code)
-{
+InstructionParam disarm_shift_reg(int code) {
 	InstructionParam p = param_reg(REG_R0 + (code & 0xf));
 	bool by_reg = (code >> 4) & 0x1;
 	int r = ((code >> 7) & 0x1f);
@@ -207,9 +221,9 @@ InstructionParam disarm_shift_reg(int code)
 		s += "<<";
 	else
 		s += ">>";
-	if (by_reg){
+	if (by_reg) {
 		s += show_reg((code >> 8) & 0xf);
-	}else{
+	} else {
 		s += format("%d", r);
 	}*/
 	return p;
@@ -224,9 +238,9 @@ InstructionParam param_xxx(int code, bool bb) {
 	bool pre = ((code >> 24) & 1);
 	bool up = ((code >> 23) & 1);
 	bool ww = ((code >> 21) & 1);
-	if (imm){
+	if (imm) {
 		msg_write( " --shifted reg--");
-	}else{
+	} else {
 		if (code & 0xfff)
 			p = param_deref_reg_shift(REG_R0 + Rn, up ? (code & 0xfff) : (-(code & 0xfff)), bb ? SIZE_8 : SIZE_32);
 		else
@@ -310,11 +324,10 @@ InstructionWithParams disarm_general(int code) {
 	return i;
 }
 
-string arm_disassemble(void *_code_,int length,bool allow_comments)
-{
+string arm_disassemble(void *_code_,int length,bool allow_comments) {
 	string buf;
 	int *code = (int*)_code_;
-	for (int ni=0; ni<length/4; ni++){
+	for (int ni=0; ni<length/4; ni++) {
 		int cur = code[ni];
 
 		int x = (cur >> 25) & 0x7;
@@ -332,8 +345,7 @@ string arm_disassemble(void *_code_,int length,bool allow_comments)
 	return buf;
 }
 
-int arm_reg_no(Register *r)
-{
+int arm_reg_no(Register *r) {
 	if (r)
 		if ((r->id >= REG_R0) and (r->id <= REG_R15))
 			return r->id - REG_R0;
@@ -341,8 +353,7 @@ int arm_reg_no(Register *r)
 	return -1;
 }
 
-int arm_freg_no(Register *r)
-{
+int arm_freg_no(Register *r) {
 	if (r)
 		if ((r->id >= REG_S0) and (r->id <= REG_S31))
 			return r->id - REG_S0;
@@ -350,11 +361,10 @@ int arm_freg_no(Register *r)
 	return -1;
 }
 
-int arm_encode_8l4(unsigned int value)
-{
-	for (int ex=0; ex<=30; ex+=2){
+int arm_encode_8l4(unsigned int value) {
+	for (int ex=0; ex<=30; ex+=2) {
 		unsigned int mask = (0xffffff00 >> ex) | (0xffffff00 << (32-ex));
-		if ((value & mask) == 0){
+		if ((value & mask) == 0) {
 			unsigned int mant = (value << ex) | (value >> (32 - ex));
 			return mant | (ex << (8-1));
 		}
@@ -363,24 +373,21 @@ int arm_encode_8l4(unsigned int value)
 	return 0;
 }
 
-bool inline arm_is_load_store_reg(int inst)
-{
+bool inline arm_is_load_store_reg(int inst) {
 	return (inst == INST_LDR) or (inst == INST_LDRB) or (inst == INST_STR) or (inst == INST_STRB);
 }
 
-bool inline arm_is_data(int inst, int &nn)
-{
+bool inline arm_is_data(int inst, int &nn) {
 	nn = -1;
-	for (int i=0; i<16; i++)
-		if (inst == ARM_DATA_INSTRUCTIONS[i]){
+	for (int i=0; i<NUM_ARM_DATA_INSTRUCTIONS; i++)
+		if (inst == ARM_DATA_INSTRUCTIONS[i]) {
 			nn = i;
 			return true;
 		}
 	return false;
 }
 
-bool inline arm_is_load_store_multi(int inst)
-{
+bool inline arm_is_load_store_multi(int inst) {
 	if ((inst == INST_LDMIA) or (inst == INST_LDMIB) or (inst == INST_LDMDA) or (inst == INST_LDMDB))
 		return true;
 	if ((inst == INST_STMIA) or (inst == INST_STMIB) or (inst == INST_STMDA) or (inst == INST_STMDB))
@@ -388,8 +395,7 @@ bool inline arm_is_load_store_multi(int inst)
 	return false;
 }
 
-void arm_expect(InstructionWithParams &c, int type0 = PARAMT_NONE, int type1 = PARAMT_NONE, int type2 = PARAMT_NONE)
-{
+void arm_expect(InstructionWithParams &c, int type0 = PARAMT_NONE, int type1 = PARAMT_NONE, int type2 = PARAMT_NONE) {
 	int t[3] = {type0, type1, type2};
 	for (int i=0; i<3; i++)
 		if (c.p[i].type != t[i])
@@ -447,8 +453,7 @@ inline bool label_after_now(InstructionWithParamsList *list, int label_no, int n
 	return list->label[label_no].inst_no > now;
 }
 
-void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
-{
+void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n) {
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
 	state.reset(this);
@@ -459,45 +464,45 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 	int code = 0;
 
 	code = iwp.condition << 28;
-	int nn = -1;
-	if (arm_is_data(iwp.inst, nn)){
-		if ((iwp.inst == INST_CMP) or (iwp.inst == INST_CMN) or (iwp.inst == INST_TST) or (iwp.inst == INST_TEQ) or (iwp.inst == INST_MOV)){
+	int data_nn = -1;
+	if (arm_is_data(iwp.inst, data_nn)) {
+		if ((iwp.inst == INST_CMP) or (iwp.inst == INST_CMN) or (iwp.inst == INST_TST) or (iwp.inst == INST_TEQ) or (iwp.inst == INST_MOV)) {
 			iwp.p[2] = iwp.p[1];
-			if ((iwp.inst == INST_CMP) or (iwp.inst == INST_CMN)){
+			if ((iwp.inst == INST_CMP) or (iwp.inst == INST_CMN)) {
 				iwp.p[1] = iwp.p[0];
 				iwp.p[0] = param_reg(REG_R0);
-			}else{
+			} else {
 				iwp.p[1] = param_reg(REG_R0);
 			}
 		}
-		bool ss = (iwp.inst == INST_CMP) or (iwp.inst == INST_CMN) or (iwp.inst == INST_TST) or (iwp.inst == INST_TEQ);
+//		bool ss = (iwp.inst == INST_CMP) or (iwp.inst == INST_CMN) or (iwp.inst == INST_TST) or (iwp.inst == INST_TEQ);
 		code |= 0x0 << 26;
-		code |= (nn << 21);
-		if (ss)
-			code |= 1 << 20;
-		if (iwp.p[2].type == PARAMT_REGISTER){
+		code |= (data_nn << 20);
+	//	if (ss)
+	//		code |= 1 << 20;
+		if (iwp.p[2].type == PARAMT_REGISTER) {
 			arm_expect(iwp, PARAMT_REGISTER, PARAMT_REGISTER, PARAMT_REGISTER);
 			code |= arm_reg_no(iwp.p[2].reg) << 0;
 			if (iwp.p[2].disp != DISP_MODE_NONE)
 				raise_error("p3.disp != DISP_MODE_NONE");
-		}else if (iwp.p[2].type == PARAMT_IMMEDIATE){
+		} else if (iwp.p[2].type == PARAMT_IMMEDIATE) {
 			arm_expect(iwp, PARAMT_REGISTER, PARAMT_REGISTER, PARAMT_IMMEDIATE);
-			if (iwp.p[2].is_label){
+			if (iwp.p[2].is_label) {
 				add_wanted_label(ocs + 2, iwp.p[2].value, n, false, false, SIZE_8L4);
-			}else{
+			} else {
 				code |= arm_encode_8l4(iwp.p[2].value) << 0;
 				code |= 1 << 25;
 			}
-		}/*else if (iwp.p[2].type == PARAMT_REGISTER_SHIFT){
+		}/*else if (iwp.p[2].type == PARAMT_REGISTER_SHIFT) {
 			msg_write("TODO reg shift");
 			code |= arm_reg_no(iwp.p[2].reg) << 0;
 			code |= (iwp.p[2].value & 0xff) << 4;
-		}*/ else{
+		}*/ else {
 			raise_error("unhandled param #3 in " + iwp.str());
 		}
 		code |= arm_reg_no(iwp.p[0].reg) << 12;
 		code |= arm_reg_no(iwp.p[1].reg) << 16;
-	}else if (arm_is_load_store_reg(iwp.inst)){
+	} else if (arm_is_load_store_reg(iwp.inst)) {
 		if (iwp.inst == INST_LDR)
 			code |= 0x04100000;
 		else if (iwp.inst == INST_LDRB)
@@ -507,7 +512,7 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 		else if (iwp.inst == INST_STRB)
 			code |= 0x04400000;
 
-		if ((iwp.p[1].type == PARAMT_IMMEDIATE) and (iwp.p[1].deref) and (iwp.p[1].is_label)){
+		if ((iwp.p[1].type == PARAMT_IMMEDIATE) and (iwp.p[1].deref) and (iwp.p[1].is_label)) {
 			add_wanted_label(ocs + 2, iwp.p[1].value, n, true, true, SIZE_12);
 			iwp.p[1] = param_deref_reg_shift(REG_R15, label_after_now(this, iwp.p[1].value, n) ? 1 : -1, SIZE_32);
 		}
@@ -518,21 +523,21 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 		code |= arm_reg_no(iwp.p[0].reg) << 12; // Rd
 		code |= arm_reg_no(iwp.p[1].reg) << 16; // Rn
 
-		if ((iwp.p[1].disp == DISP_MODE_8) or (iwp.p[1].disp == DISP_MODE_32)){
+		if ((iwp.p[1].disp == DISP_MODE_8) or (iwp.p[1].disp == DISP_MODE_32)) {
 			if ((iwp.p[1].value > 0x0fff) or (iwp.p[1].value < - 0x0fff))
 				raise_error("offset larger than 12 bit: " + iwp.str());
 			if (iwp.p[1].value >= 0)
 				code |= 0x01800000 | (iwp.p[1].value & 0x0fff);
 			else
 				code |= 0x01000000 | ((-iwp.p[1].value) & 0x0fff);
-		}else if (iwp.p[1].disp == DISP_MODE_REG2){
+		} else if (iwp.p[1].disp == DISP_MODE_REG2) {
 			if (iwp.p[1].value >= 0)
 				code |= 0x03800000;
 			else
 				code |= 0x03000000;
 			code |= arm_reg_no(iwp.p[1].reg2);
 		}
-	}else if (arm_is_load_store_multi(iwp.inst)){
+	} else if (arm_is_load_store_multi(iwp.inst)) {
 		arm_expect(iwp, PARAMT_REGISTER, PARAMT_IMMEDIATE);
 		bool ll = ((iwp.inst == INST_LDMIA) or (iwp.inst == INST_LDMIB) or (iwp.inst == INST_LDMDA) or (iwp.inst == INST_LDMDB));
 		bool uu = ((iwp.inst == INST_LDMIA) or (iwp.inst == INST_LDMIB) or (iwp.inst == INST_STMIA) or (iwp.inst == INST_STMIB));
@@ -550,32 +555,32 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 			code |= 0x00200000;
 		code |= arm_reg_no(iwp.p[0].reg) << 16;
 		code |= iwp.p[1].value & 0xffff;
-	}else if (iwp.inst == INST_MUL){
+	} else if (iwp.inst == INST_MUL) {
 		code |= 0x00000090;
 		arm_expect(iwp, PARAMT_REGISTER, PARAMT_REGISTER, PARAMT_REGISTER);
 		code |= arm_reg_no(iwp.p[0].reg) << 16;
 		code |= arm_reg_no(iwp.p[1].reg);
 		code |= arm_reg_no(iwp.p[2].reg) << 8;
-	}else if ((iwp.inst == INST_BLX) or ((iwp.inst == INST_CALL) and (iwp.p[0].type == PARAMT_REGISTER))){
+	} else if ((iwp.inst == INST_BLX) or ((iwp.inst == INST_CALL) and (iwp.p[0].type == PARAMT_REGISTER))) {
 		arm_expect(iwp, PARAMT_REGISTER);
 		code |= 0x012fff30;
 		code |= arm_reg_no(iwp.p[0].reg);
-	}else if ((iwp.inst == INST_BL) or (iwp.inst == INST_B) or (iwp.inst == INST_JMP) or (iwp.inst == INST_CALL)){
+	} else if ((iwp.inst == INST_BL) or (iwp.inst == INST_B) or (iwp.inst == INST_JMP) or (iwp.inst == INST_CALL)) {
 		arm_expect(iwp, PARAMT_IMMEDIATE);
 		if ((iwp.inst == INST_BL) or (iwp.inst == INST_CALL))
 			code |= 0x0b000000;
 		else
 			code |= 0x0a000000;
 		int value = iwp.p[0].value;
-		if (iwp.p[0].is_label){
+		if (iwp.p[0].is_label) {
 			add_wanted_label(ocs + 1, value, n, true, false, SIZE_24);
-		}else if (iwp.inst == INST_CALL)
+		} else if (iwp.inst == INST_CALL)
 			value = (iwp.p[0].value - (int_p)&oc[ocs] - 8) >> 2;
 		code |= (value & 0x00ffffff);
-	}else if (iwp.inst == INST_DD){
+	} else if (iwp.inst == INST_DD) {
 		arm_expect(iwp, PARAMT_IMMEDIATE);
 		code = iwp.p[0].value;
-	}else if ((iwp.inst == INST_FLDS) or (iwp.inst == INST_FSTS)){
+	} else if ((iwp.inst == INST_FLDS) or (iwp.inst == INST_FSTS)) {
 		if (iwp.inst == INST_FLDS)
 			code |= 0x0d100a00;
 		else
@@ -583,11 +588,11 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 		if (iwp.inst == INST_FSTS)
 			std::swap(iwp.p[0], iwp.p[1]);
 
-		if ((iwp.p[1].type == PARAMT_IMMEDIATE) and (iwp.p[1].deref)){
-			if (iwp.p[1].is_label){
+		if ((iwp.p[1].type == PARAMT_IMMEDIATE) and (iwp.p[1].deref)) {
+			if (iwp.p[1].is_label) {
 				add_wanted_label(ocs + 3, iwp.p[1].value, n, true, true, SIZE_8S2);
 				iwp.p[1] = param_deref_reg_shift(REG_R15, label_after_now(this, iwp.p[1].value, n) ? 1 : -1, SIZE_32);
-			}else{
+			} else {
 				iwp.p[1] = param_deref_reg_shift(REG_R15, iwp.p[1].value - (int_p)&oc[ocs] - 8, SIZE_32);
 			}
 		}
@@ -599,7 +604,7 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 
 		code |= arm_reg_no(iwp.p[1].reg) << 16; // Rn
 
-		if ((iwp.p[1].disp == DISP_MODE_8) or (iwp.p[1].disp == DISP_MODE_32)){
+		if ((iwp.p[1].disp == DISP_MODE_8) or (iwp.p[1].disp == DISP_MODE_32)) {
 			int v = (iwp.p[1].value >> 2);
 			if ((v > 0x00ff) or (v < - 0x00ff))
 				raise_error("offset larger than 8 bit: " + iwp.str());
@@ -609,7 +614,7 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n)
 				code |= 0x00000000 | ((-v) & 0x00ff);
 		}
 	} else if (arm_ass_gen(iwp, code)) {
-	}else{
+	} else {
 		raise_error("cannot assemble instruction: " + iwp.str());
 	}
 

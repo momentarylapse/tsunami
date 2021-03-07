@@ -46,8 +46,8 @@ public:
 
 	shared<Node> apply_type_cast(int tc, shared<Node> param, const Class *wanted);
 	shared<Node> apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<int> &casts, const Array<const Class*> &wanted);
-	bool direct_param_match(shared<Node> operand, shared_array<Node> &params);
-	bool param_match_with_cast(shared<Node> operand, shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty);
+	bool direct_param_match(const shared<Node> operand, const shared_array<Node> &params);
+	bool param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty);
 	shared<Node> apply_params_direct(shared<Node> operand, shared_array<Node> &params);
 	shared<Node> force_concrete_type(shared<Node> node);
 	void force_concrete_types(shared_array<Node> &nodes);
@@ -55,7 +55,7 @@ public:
 	shared<Node> add_converter_str(shared<Node> sub, bool repr);
 
 	void link_most_important_operator(shared_array<Node> &operand, shared_array<Node> &_operator, Array<int> &op_exp);
-	shared_array<Node> make_class_node_callable(const Class *t, Block *block, shared_array<Node> &params);
+	shared_array<Node> make_class_node_callable(const Class *t, shared_array<Node> &params);
 	shared<Node> make_func_node_callable(const shared<Node> l);
 	shared<Node> link_unary_operator(PrimitiveOperator *op, shared<Node> operand, Block *block);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, shared<Node> cmd);
@@ -103,6 +103,8 @@ public:
 	shared_array<Node> parse_operand_extension_element(shared<Node> operand);
 	shared<Node> parse_operand_extension_array(shared<Node> operand, Block *block);
 	shared<Node> parse_operand_extension_call(const shared_array<Node> &operands, Block *block);
+
+	shared<Node> try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &params);
 
 	const Class *parse_type_extension_array(const Class *c);
 	const Class *parse_type_extension_dict(const Class *c);

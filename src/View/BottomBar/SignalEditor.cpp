@@ -26,6 +26,7 @@
 
 const float MODULE_WIDTH = 140;
 const float MODULE_HEIGHT = 23;
+const float MODULE_GRID = 23;
 
 static rect module_rect(Module *m) {
 	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
@@ -70,6 +71,7 @@ public:
 		event_x("area", "hui:left-button-down", [=]{ on_left_button_down(); });
 		event_x("area", "hui:left-button-up", [=]{ on_left_button_up(); });
 		event_x("area", "hui:right-button-down", [=]{ on_right_button_down(); });
+		event_x("area", "hui:mouse-wheel", [=]{ on_mouse_wheel(); });
 		event_x("area", "hui:key-down", [=]{ on_key_down(); });
 
 
@@ -112,6 +114,9 @@ public:
 	SignalChain *chain;
 	rect area_play;
 
+	complex view_offset = complex(0,0);
+	float view_zoom = 1;
+
 	struct Selection {
 		Selection() {
 			type = -1;
@@ -148,6 +153,8 @@ public:
 			s.type = Selection::TYPE_BUTTON_PLAY;
 			return s;
 		}
+		mx -= view_offset.x;
+		my -= view_offset.y;
 		for (auto *m: weak(chain->modules)){
 			rect r = module_rect(m);
 			if (r.inside(mx, my)) {
@@ -284,11 +291,46 @@ public:
 		}
 	}
 
-	void on_draw(Painter* p) {
+	void draw_background(Painter *p) {
 		int w = p->width;
 		int h = p->height;
 		p->set_color(view->colors.background);
 		p->draw_rect(0, 0, w, h);
+		p->set_line_width(0.7f);
+
+
+		float rot[4] = {1,0,0,1};
+		p->set_transform(rot, view_offset);
+
+		float D = MODULE_GRID;
+		int i0 = -view_offset.x / D;
+		int i1 = (w - view_offset.x) / D;
+		for (int i=i0; i<=i1; i++) {
+			float x = i * D;
+			if ((i % 5) == 0)
+				p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
+			else
+				p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
+			p->draw_line(x, -view_offset.y, x, h - view_offset.y);
+		}
+		int j0 = -view_offset.y / D;
+		int j1 = (h - view_offset.y) / D;
+		for (int j=j0; j<=j1; j++) {
+			float y = j * D;
+			if ((j % 5) == 0)
+				p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
+			else
+				p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
+			p->draw_line(-view_offset.x, y, w - view_offset.x, y);
+		}
+
+		p->set_line_width(1);
+	}
+
+	void on_draw(Painter* p) {
+		int w = p->width;
+		int h = p->height;
+		draw_background(p);
 		p->set_font_size(12);
 
 		for (auto *m: weak(chain->modules))
@@ -329,6 +371,9 @@ public:
 		if (hh.type == hover.TYPE_PORT_OUT)
 			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());
 
+
+		float rot0[] = {1,0,0,1};
+		p->set_transform(rot0, complex::ZERO);
 		area_play = rect(10, 30, p->height - 30, p->height - 10);
 		p->set_color(view->colors.text);
 		if (hover.type == hover.TYPE_BUTTON_PLAY)
@@ -376,6 +421,10 @@ public:
 			}
 			sel = Selection();
 			apply_sel();
+		} else if (sel.type == sel.TYPE_MODULE) {
+			auto *m = sel.module;
+			m->module_x = MODULE_GRID * (int)(m->module_x / MODULE_GRID + 0.5f);
+			m->module_y = MODULE_GRID * (int)(m->module_y / MODULE_GRID + 0.5f);
 		}
 		redraw("area");
 	}
@@ -386,8 +435,8 @@ public:
 		if (hui::GetEvent()->lbut) {
 			if (sel.type == sel.TYPE_MODULE) {
 				auto *m = sel.module;
-				m->module_x = mx + sel.dx;
-				m->module_y = my + sel.dy;
+				m->module_x = mx + sel.dx - view_offset.x;
+				m->module_y = my + sel.dy - view_offset.y;
 			} else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 				hover.target_module = nullptr;
 				auto h = get_hover(mx, my);
@@ -430,6 +479,23 @@ public:
 				hover = sel = Selection();
 			}
 		}
+		if (key == hui::KEY_UP)
+			view_offset.y += 10;
+		if (key == hui::KEY_DOWN)
+			view_offset.y -= 10;
+		if (key == hui::KEY_LEFT)
+			view_offset.x += 10;
+		if (key == hui::KEY_RIGHT)
+			view_offset.x -= 10;
+		redraw("area");
+	}
+
+	void on_mouse_wheel() {
+		float dx = hui::GetEvent()->scroll_x;
+		float dy = hui::GetEvent()->scroll_y;
+		view_offset -= complex(dx, dy) * 10;
+		// TODO restrict...
+		redraw("area");
 	}
 
 	void apply_sel() {

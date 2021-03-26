@@ -20,7 +20,7 @@
 
 
 // peaks:
-// ...
+//   ALWAYS 2 channels... (4*n)
 
 
 const int AudioBuffer::PEAK_CHUNK_EXP = 15;
@@ -29,13 +29,16 @@ const int AudioBuffer::PEAK_OFFSET_EXP = 3;
 const int AudioBuffer::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
 const int AudioBuffer::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 
+const int MIN_CHANNELS = 2;
 const int MAX_CHANNELS = 16;
+
+#define MEM_CHANNELS  max(channels, MIN_CHANNELS)
 
 
 AudioBuffer::AudioBuffer() {
 	offset = 0;
 	length = 0;
-	channels = MAX_CHANNELS;
+	channels = 2;
 }
 
 AudioBuffer::AudioBuffer(int _length, int _channels) {
@@ -50,7 +53,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i] = b.c[i];
 }
 
@@ -59,7 +62,7 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i] = std::move(b.c[i]);
 }
 
@@ -72,19 +75,21 @@ void AudioBuffer::__delete__() {
 }
 
 void AudioBuffer::operator=(const AudioBuffer &b) {
+	clear();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i] = b.c[i];
 	peaks = b.peaks;
 }
 
 void AudioBuffer::operator=(AudioBuffer &&b) {
+	clear();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i] = std::move(b.c[i]);
 	peaks = std::move(b.peaks);
 }
@@ -99,12 +104,22 @@ void AudioBuffer::clear() {
 }
 
 void AudioBuffer::set_zero() {
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<channels; i++)
 		memset(&c[i][0], 0, sizeof(float) * length);
 	peaks.clear();
 }
 
 void AudioBuffer::set_channels(int _channels) {
+	if (_channels < 1 or _channels >= MAX_CHANNELS)
+		return;
+
+	// add new channels
+	for (int i=MEM_CHANNELS; i<max(_channels, MIN_CHANNELS); i++)
+		c[i].resize(length);
+	// remove old channels
+	for (int i=max(_channels, MIN_CHANNELS); i<MEM_CHANNELS; i++)
+		c[i].clear();
+
 	channels = _channels;
 	peaks.clear();
 }
@@ -127,7 +142,7 @@ void AudioBuffer::resize(int _length) {
 
 	if (_length < length)
 		_truncate_peaks(_length);
-	for (int i = 0; i < MAX_CHANNELS; i++)
+	for (int i = 0; i < MEM_CHANNELS; i++)
 		c[i].resize(_length);
 	length = _length;
 }
@@ -135,8 +150,7 @@ void AudioBuffer::resize(int _length) {
 bool AudioBuffer::is_ref() const
 {	return c[0].is_ref();	}
 
-void fa_make_own(Array<float> &a)
-{
+void fa_make_own(Array<float> &a) {
 	void *data = a.data;
 	int num = a.num;
 	a.clear();
@@ -147,33 +161,22 @@ void fa_make_own(Array<float> &a)
 void AudioBuffer::make_own() {
 	if (is_ref()) {
 		//msg_write("bb::make_own!");
-		for (int i=0; i<MAX_CHANNELS; i++)
+		for (int i=0; i<MEM_CHANNELS; i++)
 			fa_make_own(c[i]);
 	}
 }
 
 void AudioBuffer::swap_ref(AudioBuffer &b) {
 	// buffer
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i].exchange(b.c[i]);
 
 	// peaks
 	peaks.exchange(b.peaks);
 
-	// num
-	int t = length;
-	length = b.length;
-	b.length = t;
-
-	// offset
-	t = offset;
-	offset = b.offset;
-	b.offset = t;
-
-	// channels
-	t = channels;
-	channels = b.channels;
-	b.channels = t;
+	std::swap(length, b.length);
+	std::swap(offset, b.offset);
+	std::swap(channels, b.channels);
 }
 
 void AudioBuffer::append(const AudioBuffer &b) {
@@ -193,7 +196,7 @@ void float_array_swap_values(Array<float> &a, Array<float> &b) {
 void AudioBuffer::swap_value(AudioBuffer &b) {
 	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
@@ -203,6 +206,8 @@ void AudioBuffer::swap_value(AudioBuffer &b) {
 // and by (0,sqrt(2)) on left/right (OVERDRIVE)!
 void AudioBuffer::mix_stereo(float volume, float panning) {
 	if ((volume == 1.0f) and (panning == 0) and (channels == 2))
+		return;
+	if (channels > 2)
 		return;
 
 
@@ -214,7 +219,7 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 			fl *= (1 - panning);
 		else
 			fr *= (1 + panning);
-	} else {
+	} else if (channels == 1) {
 		fl = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
 		fr = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
 	}
@@ -226,7 +231,7 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 			c[0][i] *= fl;
 			c[1][i] *= fr;
 		}
-	} else {
+	} else if (channels == 1) {
 		set_channels(2);
 		// mono -> stereo
 		for (int i=0;i<length;i++) {
@@ -317,7 +322,7 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 	length = _length;
 	offset = _offset + source.offset;
 	channels = source.channels;
-	for (int i=0; i<MAX_CHANNELS; i++)
+	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i].set_ref(source.c[i].sub(_offset, _length));
 }
 
@@ -659,7 +664,7 @@ void AudioBuffer::_update_peaks_chunk(int index) {
 
 	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, peaks[0].num, index));
 
-	for (int j=0; j<channels; j++) {
+	for (int j=0; j<min(channels, 2); j++) {
 		for (int i=i0; i<i1; i++)
 			peaks[j][i] = (unsigned char)(fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
 	}

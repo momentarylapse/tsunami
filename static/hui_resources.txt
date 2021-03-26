@@ -6718,10 +6718,16 @@ image=hui:media-stop
 13
 0
 0
-Item
+Menu
 record
 image=hui:media-record,important
 14
+0
+1
+Item
+record-setup
+
+0
 0
 0
 Separator
@@ -7184,7 +7190,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-605
+606
 # Text
 /bars-add
 Add bars...
@@ -8904,6 +8910,9 @@ Play
 
 toolbar/record
 Record
+
+toolbar/record-setup
+Setup...
 
 toolbar/stop
 Stop

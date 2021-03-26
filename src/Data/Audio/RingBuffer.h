@@ -38,6 +38,7 @@ public:
 	void write_ref_cancel(AudioBuffer &b);
 
 	void clear();
+	void set_channels(int channels);
 
 	AudioBuffer buf;
 	std::atomic<int> read_pos;

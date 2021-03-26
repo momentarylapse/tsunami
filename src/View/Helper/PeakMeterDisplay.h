@@ -42,7 +42,7 @@ private:
 	void connect();
 	void unconnect();
 
-	PeakMeterData *r, *l;
+	Array<PeakMeterData> channels;
 
 	hui::Panel *panel;
 	string id;

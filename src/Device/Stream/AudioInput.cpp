@@ -161,6 +161,7 @@ int AudioInput::Output::read_audio(AudioBuffer &buf) {
 	if (stream->buffer.available() < buf.length)
 		return NOT_ENOUGH_DATA;
 
+	buf.set_channels(stream->num_channels);
 	int r = stream->buffer.read(buf);
 
 	return r;
@@ -182,7 +183,7 @@ AudioInput::AudioInput(Session *_session) :
 	session = _session;
 	_sample_rate = session->sample_rate();
 	chunk_size = DEFAULT_CHUNK_SIZE;
-	num_channels = 0;
+	num_channels = 2;
 
 	state = State::NO_DEVICE;
 #if HAS_LIB_PULSEAUDIO
@@ -336,7 +337,8 @@ void AudioInput::_create_dev() {
 
 	session->debug("input", "create device");
 
-	num_channels = min(cur_device->channels, 2);
+	num_channels = cur_device->channels;
+	buffer.set_channels(num_channels);
 	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO

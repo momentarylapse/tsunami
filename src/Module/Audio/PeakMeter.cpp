@@ -18,6 +18,10 @@ const int PeakMeter::SPECTRUM_SIZE = 30;
 const float PeakMeter::FREQ_MIN = 40.0f;
 const float PeakMeter::FREQ_MAX = 4000.0f;
 
+PeakMeterData::PeakMeterData() {
+	reset();
+}
+
 void PeakMeterData::reset() {
 	peak = 0;
 	super_peak = super_peak_t = 0;
@@ -46,11 +50,14 @@ void PeakMeterData::update(Array<float> &buf, float dt) {
 PeakMeter::PeakMeter() {
 	module_subtype = "PeakMeter";
 	spectrum_requests = 0;
-	l.reset();
-	r.reset();
+	_set_channels(2);
 }
 
 PeakMeter::~PeakMeter() {
+}
+
+void PeakMeter::_set_channels(int num_channels) {
+	channels.resize(num_channels);
 }
 
 inline float nice_peak(float p) {
@@ -59,13 +66,13 @@ inline float nice_peak(float p) {
 
 void PeakMeter::find_peaks(AudioBuffer &buf) {
 	float dt = (float)buf.length / (float)session->sample_rate();
-	l.update(buf.c[0], dt);
-	r.update(buf.c[1], dt);
+	for (int i=0; i<buf.channels; i++)
+		channels[i].update(buf.c[i], dt);
 }
 
 void PeakMeter::clear_data() {
-	l.reset();
-	r.reset();
+	for (auto &c: channels)
+		c.reset();
 }
 
 inline float PeakMeter::i_to_freq(int i) {
@@ -81,31 +88,31 @@ void PeakMeter::unrequest_spectrum() {
 }
 
 void PeakMeter::find_spectrum(AudioBuffer &buf) {
-	Array<complex> cr, cl;
-	cr.resize(buf.length / 2 + 1);
-	cl.resize(buf.length / 2 + 1);
-	FastFourierTransform::fft_r2c(buf.c[0], cl);
-	FastFourierTransform::fft_r2c(buf.c[1], cr);
-	r.spec.resize(SPECTRUM_SIZE);
-	l.spec.resize(SPECTRUM_SIZE);
-	float sample_rate = (float)session->sample_rate();
-	for (int i=0;i<SPECTRUM_SIZE;i++) {
-		float f0 = i_to_freq(i);
-		float f1 = i_to_freq(i + 1);
-		int n0 = f0 * buf.length / sample_rate;
-		int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
-		float s = 0;
-		for (int n=n0;n<n1;n++)
-			if (n < cr.num) {
-				s = max(s, cr[n].abs_sqr());
-				s = max(s, cl[n].abs_sqr());
-			}
-		r.spec[i] = l.spec[i] = sqrt(sqrt(s) / (float)SPECTRUM_SIZE / pi / 2);
+	for (int i=0; i<buf.channels; i++) {
+		auto &c = channels[i];
+
+		Array<complex> zz;
+		FastFourierTransform::fft_r2c(buf.c[i], zz);
+		c.spec.resize(SPECTRUM_SIZE);
+		float sample_rate = (float)session->sample_rate();
+		for (int i=0;i<SPECTRUM_SIZE;i++) {
+			float f0 = i_to_freq(i);
+			float f1 = i_to_freq(i + 1);
+			int n0 = f0 * buf.length / sample_rate;
+			int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
+			float s = 0;
+			for (int n=n0; n<n1; n++)
+				if (n < zz.num)
+					s = max(s, zz[n].abs_sqr());
+			c.spec[i] = sqrt(sqrt(s) / (float)SPECTRUM_SIZE / pi / 2);
+		}
 	}
 }
 
 void PeakMeter::process(AudioBuffer& buf) {
 	clear_data();
+	_set_channels(buf.channels);
+
 	find_peaks(buf);
 	if (spectrum_requests > 0)
 		find_spectrum(buf);

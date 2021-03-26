@@ -16,15 +16,19 @@ int AudioRecorder::Output::read_audio(AudioBuffer& buf) {
 
 	int r = rec->source->read_audio(buf);
 
-	if (r > 0) {
-		if (rec->accumulating) {
-			std::lock_guard<std::mutex> lock(rec->mtx_buf);
-			rec->buf.append(buf.ref(0, r));
-		} else {
-			rec->samples_skipped += r;
-		}
-	}
+	if (r <= 0)
+		return r;
 
+	if (rec->accumulating) {
+		// accumulate
+		std::lock_guard<std::mutex> lock(rec->mtx_buf);
+		if (buf.channels > rec->buf.channels)
+			rec->buf.set_channels(buf.channels);
+		rec->buf.append(buf.ref(0, r));
+	} else {
+		// ignore
+		rec->samples_skipped += r;
+	}
 	return r;
 }
 
@@ -59,6 +63,7 @@ int AudioRecorder::command(ModuleCommand cmd, int param) {
 	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
 		samples_skipped += buf.length;
 		buf.clear();
+		buf.set_channels(2);
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
 		return buf.length;

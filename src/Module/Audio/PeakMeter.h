@@ -19,13 +19,13 @@ struct PeakMeterData{
 	float super_peak, super_peak_t;
 	Array<float> spec;
 
+	PeakMeterData();
 	void reset();
 	void update(Array<float> &buf, float dt);
 	float get_sp();
 };
 
-class PeakMeter : public AudioVisualizer
-{
+class PeakMeter : public AudioVisualizer {
 	friend class PeakMeterDisplay;
 public:
 	PeakMeter();
@@ -40,12 +40,13 @@ public:
 
 //private:
 	void clear_data();
+	void _set_channels(int num_channels);
 	void find_peaks(AudioBuffer &buf);
 	void find_spectrum(AudioBuffer &buf);
 
 	float i_to_freq(int i);
 
-	PeakMeterData r, l;
+	Array<PeakMeterData> channels;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

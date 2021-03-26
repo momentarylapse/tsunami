@@ -27,10 +27,7 @@ PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	enabled = false;
 	handler_id_draw = -1;
 	handler_id_lbut = -1;
-	r = new PeakMeterData;
-	l = new PeakMeterData;
-	r->reset();
-	l->reset();
+	channels.resize(2);
 
 	mode_constraint = constraint;
 	mode = Mode::PEAKS;
@@ -55,8 +52,6 @@ PeakMeterDisplay::~PeakMeterDisplay() {
 	if (handler_id_lbut >= 0)
 		panel->remove_event_handler(handler_id_lbut);
 	set_source(nullptr);
-	delete r;
-	delete l;
 }
 
 void PeakMeterDisplay::set_source(PeakMeter *_source) {
@@ -150,23 +145,26 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 
 	if (mode == Mode::PEAKS) {
 
-		float bb = 1;
+		float bb = 2;
 		if (w > h) {
-			draw_peak(c, rect(area.x1, area.x2, area.y1, area.my() - bb), *l, bg);
-			draw_peak(c, rect(area.x1, area.x2, area.my() + bb, area.y2), *r, bg);
+			float dy = (h + bb) / channels.num - bb;
+			for (int i=0; i<channels.num; i++)
+				draw_peak(c, rect(area.x1, area.x2, area.y1 + i*dy, area.y1 + i*dy + dy - bb), channels[i], bg);
 		} else if (h > w) {
-			draw_peak(c, rect(area.x1, area.mx() - bb, area.y1, area.y2), *l, bg);
-			draw_peak(c, rect(area.mx() + bb, area.x2, area.y1, area.y2), *r, bg);
+			float dx = (w + bb) / channels.num - bb;
+			for (int i=0; i<channels.num; i++)
+				draw_peak(c, rect(area.x1 + i*dx, area.x1 + i*dx + dx - bb, area.y1, area.y2), channels[0], bg);
 		}
 	} else {
 		c->set_color(bg);
 		c->draw_rect(area);
 		c->set_color(AudioView::colors.text);
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * w;
-		int n = min(100, l->spec.num);
-		for (int i=0;i<n;i++) {
+		int n = min(100, channels[0].spec.num);
+		for (int i=0; i<n; i++) {
 			float x0 = area.x1 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * w;
-			float hh = h * l->spec[i];
+			float hh = h * channels[0].spec[i]; //max(channels[0].spec[i], channels[1].spec[i]);
+			// TODO stereo?
 			c->draw_rect(rect(x0, x0 + dx, area.y2 - hh, area.y2));
 		}
 	}
@@ -194,8 +192,7 @@ bool PeakMeterDisplay::on_right_button_down() {
 // in PeakMeter/SignalChain's thread
 void PeakMeterDisplay::on_update() {
 	if (source) {
-		*l = source->l;
-		*r = source->r;
+		channels = source->channels;
 	}
 	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	if (panel)

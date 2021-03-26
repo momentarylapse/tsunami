@@ -19,15 +19,13 @@ AudioSucker::AudioSucker() :
 	source = nullptr;
 }
 
-int AudioSucker::do_suck(int buffer_size)
-{
+int AudioSucker::do_suck(int buffer_size) {
 	AudioBuffer temp;
 	temp.resize(buffer_size);
 	return source->read_audio(temp);
 }
 
-int AudioSucker::command(ModuleCommand cmd, int param)
-{
+int AudioSucker::command(ModuleCommand cmd, int param) {
 	if (cmd == ModuleCommand::SUCK)
 		return do_suck(param);
 	return COMMAND_NOT_HANDLED;

@@ -25,6 +25,7 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 		return r;
 
 	PerformanceMonitor::start_busy(visualizer->perf_channel);
+	visualizer->buffer->buf.set_channels(buf.channels);
 	visualizer->buffer->write(buf);
 
 	while (visualizer->buffer->available() >= visualizer->chunk_size) {

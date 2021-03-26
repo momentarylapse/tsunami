@@ -109,18 +109,20 @@ void AudioBuffer::set_zero() {
 	peaks.clear();
 }
 
-void AudioBuffer::set_channels(int _channels) {
-	if (_channels < 1 or _channels >= MAX_CHANNELS)
+void AudioBuffer::set_channels(int new_channels) {
+	if (new_channels < 1 or new_channels >= MAX_CHANNELS)
+		return;
+	if (channels == new_channels)
 		return;
 
 	// add new channels
-	for (int i=MEM_CHANNELS; i<max(_channels, MIN_CHANNELS); i++)
+	for (int i=MEM_CHANNELS; i<max(new_channels, MIN_CHANNELS); i++)
 		c[i].resize(length);
 	// remove old channels
-	for (int i=max(_channels, MIN_CHANNELS); i<MEM_CHANNELS; i++)
+	for (int i=max(new_channels, MIN_CHANNELS); i<MEM_CHANNELS; i++)
 		c[i].clear();
 
-	channels = _channels;
+	channels = new_channels;
 	peaks.clear();
 }
 
@@ -276,6 +278,7 @@ inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const Aud
 	}
 }
 
+// @TESTME skipping bug...?
 inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length, float volume) {
 	for (int tc=0; tc<target.channels; tc++) {
 		int sc = min(tc, source.channels-1);
@@ -518,6 +521,7 @@ inline float _clamp_(float f) {
 }
 
 // always outputting stereo... (for OutputStreams)
+// TODO add channels parameter!
 void AudioBuffer::interleave(float *p, float volume) const {
 	float *pl = &c[0][0];
 	float *pr = &c[1][0];
@@ -550,30 +554,42 @@ void AudioBuffer::interleave(float *p, float volume) const {
 	}
 }
 
-void AudioBuffer::deinterleave(const float *p, int num_channels) {
+void AudioBuffer::deinterleave(const float *p, int source_channels) {
 	float *pl = &c[0][0];
 	float *pr = &c[1][0];
-	if (num_channels == 1) {
+	if (source_channels == 1) {
+		// mono -> mono
+		memcpy(pl, p, length * sizeof(float));
+
 		if (channels == 2) {
-			for (int i=0; i<length; i++) {
-				*pl ++ = *p;
-				*pr ++ = *p ++;
-			}
-		} else {
-			memcpy(pl, p, length * sizeof(float));
+			// mono -> stereo
+			memcpy(pr, p, length * sizeof(float));
 		}
-	} else if (num_channels == 2) {
-		if (channels == 2) {
+	} else if (source_channels == 2) {
+		if (channels >= 2) {
+			// stereo -> stereo
 			for (int i=0; i<length; i++) {
 				*pl ++ = *p ++;
 				*pr ++ = *p ++;
 			}
-		} else {
+		} else if (channels == 1) {
+			// stereo -> mono
 			for (int i=0; i<length; i++) {
 				*pl ++ = *p ++;
 				p ++;
 			}
 		}
+	} else {
+		// complex...
+		int nc = min(channels, source_channels);
+		for (int i=0; i<length; i++) {
+			for (int ci=0; ci<nc; ci++)
+				c[ci][i] = *p ++;
+			// too many input channels?
+			for (int ci=nc; ci<source_channels; ci++)
+				p ++;
+		}
+
 	}
 }
 

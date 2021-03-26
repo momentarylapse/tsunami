@@ -9,8 +9,7 @@
 
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(int size)
-{
+RingBuffer::RingBuffer(int size) {
 	buf.resize(size);
 	read_pos = 0;
 	write_pos = 0;
@@ -21,22 +20,18 @@ RingBuffer::RingBuffer(int size)
 	available_write = size - 1;
 }
 
-RingBuffer::~RingBuffer()
-{
+RingBuffer::~RingBuffer() {
 }
 
-void RingBuffer::__init__(int size)
-{
+void RingBuffer::__init__(int size) {
 	new(this) RingBuffer(size);
 }
 
-void RingBuffer::__delete__()
-{
+void RingBuffer::__delete__() {
 	this->RingBuffer::~RingBuffer();
 }
 
-void RingBuffer::clear()
-{
+void RingBuffer::clear() {
 	std::unique_lock<std::shared_timed_mutex> lock(buf.mtx);
 
 	write_pos = 0;
@@ -46,9 +41,13 @@ void RingBuffer::clear()
 	available_write = buf.length - 1;
 }
 
+void RingBuffer::set_channels(int channels) {
+	std::unique_lock<std::shared_timed_mutex> lock(buf.mtx);
+	buf.set_channels(channels);
+}
+
 // how many samples are readable?
-int RingBuffer::available()
-{
+int RingBuffer::available() {
 	return available_read;
 	/*if (write_pos < read_pos)
 		return write_pos - read_pos + buf.length;
@@ -58,8 +57,7 @@ int RingBuffer::available()
 // how many samples are writable?
 //   why -1?
 //      - if we write until read_pos=write_pos -> empty again!
-int RingBuffer::writable_size()
-{
+int RingBuffer::writable_size() {
 	return available_write;
 	/*if (read_pos <= write_pos)
 		return read_pos - write_pos + buf.length - 1;
@@ -67,8 +65,7 @@ int RingBuffer::writable_size()
 }
 
 // use with care!
-void RingBuffer::_move_read_pos(int delta)
-{
+void RingBuffer::_move_read_pos(int delta) {
 	read_pos += delta;
 	if (read_pos >= buf.length)
 		read_pos -= buf.length;
@@ -77,8 +74,7 @@ void RingBuffer::_move_read_pos(int delta)
 }
 
 // use with care!
-void RingBuffer::_move_write_pos(int delta)
-{
+void RingBuffer::_move_write_pos(int delta) {
 	write_pos += delta;
 	if (write_pos >= buf.length)
 		write_pos -= buf.length;
@@ -86,8 +82,7 @@ void RingBuffer::_move_write_pos(int delta)
 	available_write -= delta;
 }
 
-int RingBuffer::read(AudioBuffer& b)
-{
+int RingBuffer::read(AudioBuffer& b) {
 	AudioBuffer ref;
 	read_ref(ref, b.length);
 	int samples_a = ref.length;
@@ -104,8 +99,7 @@ int RingBuffer::read(AudioBuffer& b)
 	return samples_a + ref.length;
 }
 
-int RingBuffer::write(const AudioBuffer& b)
-{
+int RingBuffer::write(const AudioBuffer& b) {
 	AudioBuffer ref;
 	write_ref(ref, b.length);
 	int samples_a = ref.length;
@@ -133,38 +127,34 @@ int RingBuffer::write(const AudioBuffer& b)
 
 // size > 0: from read_pos
 // size < 0: from write_pos backwards
-void RingBuffer::peek_ref(AudioBuffer &b, int size)
-{
-	if (size >= 0){
+void RingBuffer::peek_ref(AudioBuffer &b, int size) {
+	if (size >= 0) {
 		size = min(size, available());
 		size = min(size, buf.length - read_pos);
 		b.set_as_ref(buf, read_pos, size);
-	}else{
+	} else {
 		size = min(-size, write_pos.load());
 		b.set_as_ref(buf, write_pos - size, size);
 	}
 }
 
 // get a reference of the internal buffer for reading (later)
-void RingBuffer::read_ref(AudioBuffer &b, int size)
-{
+void RingBuffer::read_ref(AudioBuffer &b, int size) {
 	peek_ref(b, size);
 }
 
-void RingBuffer::read_ref_done(AudioBuffer &b)
-{
+void RingBuffer::read_ref_done(AudioBuffer &b) {
 	_move_read_pos(b.length);
 }
 
 // get a reference of the internal buffer to write into (later)
-void RingBuffer::write_ref(AudioBuffer &b, int size)
-{
+void RingBuffer::write_ref(AudioBuffer &b, int size) {
 	// directly writable size?
-	if (read_pos == 0){
+	if (read_pos == 0) {
 		// if we write to the end, we jump to write_pos=0
 		// ...and that would mean, we're empty...
 		size = min(size, buf.length - write_pos - 1);
-	}else{
+	} else {
 		size = min(size, buf.length - write_pos);
 		if (read_pos > write_pos)
 			size = min(size, read_pos - write_pos);
@@ -172,8 +162,7 @@ void RingBuffer::write_ref(AudioBuffer &b, int size)
 	b.set_as_ref(buf, write_pos, size);
 }
 
-void RingBuffer::write_ref_done(AudioBuffer &b)
-{
+void RingBuffer::write_ref_done(AudioBuffer &b) {
 	_move_write_pos(b.length);
 }
 

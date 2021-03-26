@@ -83,22 +83,22 @@ void BinaryBuffer::set_pos(int _pos) {
 
 
 void BinaryBuffer::operator<<(int i) {
-	data += string((char*)&i, sizeof(i));
+	data += bytes((char*)&i, sizeof(i));
 }
 void BinaryBuffer::operator<<(float f) {
-	data += string((char*)&f, sizeof(f));
+	data += bytes((char*)&f, sizeof(f));
 }
 void BinaryBuffer::operator<<(bool b) {
-	data += string((char*)&b, sizeof(b));
+	data += bytes((char*)&b, sizeof(b));
 }
 void BinaryBuffer::operator<<(char c) {
-	data += string((char*)&c, sizeof(c));
+	data += bytes((char*)&c, sizeof(c));
 }
 void BinaryBuffer::operator<<(const string &s) {
-	data += string((char*)&s.num, sizeof(int));
+	data += bytes((char*)&s.num, sizeof(int));
 	data += s;
 }
 void BinaryBuffer::operator<<(const vector &v) {
-	data += string((char*)&v, sizeof(v));
+	data += bytes((char*)&v, sizeof(v));
 }
 

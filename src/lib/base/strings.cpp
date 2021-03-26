@@ -26,17 +26,20 @@
 	#include <sys/stat.h>
 #endif
 
+bytes bytes_repeat(const bytes &s, int n);
 string str_unescape(const string &str);
-string str_repeat(const string &s, int n);
 string str_escape(const string &str);
 
 
 
-string::string() {
+
+
+
+bytes::bytes() {
 	init(sizeof(unsigned char));
 }
 
-string::string(const char *str) {
+bytes::bytes(const char *str) {
 	init(sizeof(unsigned char));
 	int l = strlen(str);
 	resize(l);
@@ -44,14 +47,220 @@ string::string(const char *str) {
 		memcpy(data, str, l);
 }
 
-string::string(const void *str, int l) {
+bytes::bytes(const void *str, int l) {
 	init(sizeof(unsigned char));
 	resize(l);
 	if (l > 0)
 		memcpy(data, str, l);
 }
 
+bytes::bytes(const bytes &s) {
+	init(sizeof(unsigned char));
+	simple_assign(&s);
+}
+
+bytes::bytes(bytes &&s) {
+	init(sizeof(unsigned char));
+	exchange(s);
+}
+
+void bytes::__init__() {
+	new(this) bytes;
+}
+
+bytes::~bytes() {
+	clear();
+}
+
+bool bytes::operator == (const bytes &s) const {
+	if (num != s.num)
+		return false;
+	return compare(s) == 0;
+}
+
+int bytes::compare(const bytes &s) const {
+	auto a = (unsigned char*)data;
+	auto b = (unsigned char*)s.data;
+	int n = min(num, s.num);
+	for (int i=0; i<n; i++) {
+		if (*a != *b)
+			return (int)*a - (int)*b;
+		a ++;
+		b ++;
+	}
+	return num - s.num;
+}
+
+char hex_nibble(int v) {
+	if (v < 10)
+		return '0' + v;
+	return 'a' + v - 10;
+}
+
+// convert binary data to a hex-code-string
+// inverted:
+//    false:   12.34.56.78
+//    true:    78563412
+string _bytes_hex_(const bytes &s, bool inverted) {
+	string str;
+	//if (inverted)
+	//	str = "0x";
+	unsigned char *c_data = (unsigned char *)s.data;
+	for (int i=0;i<s.num;i++) {
+		int dd;
+		if (inverted)
+			dd = c_data[s.num - i - 1];
+		else
+			dd = c_data[i];
+		int c1 = (dd & 15);
+		int c2 = (dd >> 4);
+		str.add(hex_nibble(c2));
+		str.add(hex_nibble(c1));
+		if ((!inverted) and (i < s.num - 1))
+			str.add('.');
+	}
+	return str;
+}
+
+string bytes::hex() const {
+	return _bytes_hex_(*this, false);
+}
+
+int bytes::hash() const {
+	int id = 0;
+	int n = num / 4;
+	int *str_i = (int*)data;
+	for (int i=0;i<n;i++) {
+		int t = str_i[i];
+		id = id ^ t;
+	}
+	int r = num - (n * 4);
+	int t = 0;
+	if (r == 1)
+		t = (str_i[n] & 0x000000ff);
+	else if (r == 2)
+		t = (str_i[n] & 0x0000ffff);
+	else if (r == 3)
+		t = (str_i[n] & 0x00ffffff);
+	id = id ^ t;
+	return id;
+}
+
+static const unsigned int md5_s[64] = {
+	7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
+	5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
+	4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
+	6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
+};
+static const unsigned int md5_K[64] = {
+	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
+	0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+	0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
+	0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+	0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
+	0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+	0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
+	0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+	0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+	0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+	0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+	0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+	0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
+	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
+};
+
+string bytes::md5() const {
+	unsigned int a0 = 0x67452301;
+	unsigned int b0 = 0xEFCDAB89;
+	unsigned int c0 = 0x98BADCFE;
+	unsigned int d0 = 0x10325476;
+	unsigned long long message_length = num * 8;
+	bytes message = *this;
+	message.add(0x80);
+	while ((message.num % 64) != 56)
+		message.add(0x00);
+	message += bytes(&message_length, 8);
+
+	// blocks of 512 bit = 64 byte = 16 uints
+	int n = message.num / 64;
+	unsigned int *M = (unsigned int*)&message[0];
+
+	for (int j=0; j<n; j++) {
+
+		unsigned int A = a0;
+		unsigned int B = b0;
+		unsigned int C = c0;
+		unsigned int D = d0;
+
+		unsigned int F, g;
+		for (int i=0; i<64; i++) {
+			if (i < 16) {
+	            F = (B & C) | ((~B) & D);
+	            g = i;
+			} else if (i < 32) {
+	            F = (B & D) | (C & (~ D));
+	            g = (5*i + 1) % 16;
+			} else if (i < 48) {
+	            F = B ^ C ^ D;
+	            g = (3*i + 5) % 16;
+			} else {
+	            F = C ^ (B | (~ D));
+	            g = (7*i) % 16;
+			}
+	        unsigned int temp = D;
+	        D = C;
+	        C = B;
+	        unsigned int t = A + F + md5_K[i] + M[g];
+	        unsigned int shift = md5_s[i];
+	        B = B + ((t << shift) | (t >> (32 - shift)));
+	        A = temp;
+		}
+	    a0 = a0 + A;
+	    b0 = b0 + B;
+	    c0 = c0 + C;
+	    d0 = d0 + D;
+		M += 16;
+	}
+	string out;
+	out += string(&a0, 4) + string(&b0, 4) + string(&c0, 4) + string(&d0, 4);
+
+	return out.hex().replace(".", "");
+}
+
+bytes bytes_repeat(const bytes &s, int n) {
+	bytes r;
+	for (int i=0; i<n; i++)
+		r += s;
+	return r;
+}
+
+bytes bytes::repeat(int n) const {
+	return bytes_repeat(*this, n);
+}
+
+
+
+
+
+
+
+
+
+
+string::string() : bytes() {}
+
+string::string(const char *str) : bytes(str) {}
+
+string::string(const void *str, int l) : bytes(str, l) {}
+
 string::string(const string &s) {
+	init(sizeof(unsigned char));
+	simple_assign(&s);
+}
+
+string::string(const bytes &s) {
 	init(sizeof(unsigned char));
 	simple_assign(&s);
 }
@@ -61,12 +270,9 @@ string::string(string &&s) {
 	exchange(s);
 }
 
-void string::__init__() {
-	new(this) string;
-}
-
-string::~string() {
-	clear();
+string::string(bytes &&s) {
+	init(sizeof(unsigned char));
+	exchange(s);
 }
 
 bool string::operator == (const string &s) const {
@@ -139,19 +345,6 @@ int string::rfind(const string &s, int start) const {
 			return i;
 	}
 	return -1;
-}
-
-int string::compare(const string &s) const {
-	auto a = (unsigned char*)data;
-	auto b = (unsigned char*)s.data;
-	int n = min(num, s.num);
-	for (int i=0; i<n; i++) {
-		if (*a != *b)
-			return (int)*a - (int)*b;
-		a ++;
-		b ++;
-	}
-	return num - s.num;
 }
 
 int string::icompare(const string &s) const {
@@ -437,41 +630,6 @@ string p2s(const void *p) {
 	return string(tmp);
 }
 
-char hex_nibble(int v) {
-	if (v < 10)
-		return '0' + v;
-	return 'a' + v - 10;
-}
-
-// convert binary data to a hex-code-string
-// inverted:
-//    false:   12.34.56.78
-//    true:    78563412
-string _str_hex_(const string &s, bool inverted) {
-	string str;
-	//if (inverted)
-	//	str = "0x";
-	unsigned char *c_data = (unsigned char *)s.data;
-	for (int i=0;i<s.num;i++) {
-		int dd;
-		if (inverted)
-			dd = c_data[s.num - i - 1];
-		else
-			dd = c_data[i];
-		int c1 = (dd & 15);
-		int c2 = (dd >> 4);
-		str.add(hex_nibble(c2));
-		str.add(hex_nibble(c1));
-		if ((!inverted) and (i < s.num - 1))
-			str.add('.');
-	}
-	return str;
-}
-
-string string::hex() const {
-	return _str_hex_(*this, false);
-}
-
 inline int hex_nibble_to_value(char c) {
 	if ((c >= '0') and (c <= '9'))
 		return c - '0';
@@ -495,11 +653,11 @@ string string::unhex() const {
 	return r;
 }
 
-string d2h(const void *data, int bytes)
-{	return string((const char*)data, bytes).hex();	}
+string d2h(const void *data, int num_bytes)
+{	return bytes((const char*)data, num_bytes).hex();	}
 
-string i2h(int64 data, int bytes)
-{	return _str_hex_(string((const char*)&data, bytes), true);	}
+string i2h(int64 data, int num_bytes)
+{	return _bytes_hex_(bytes((const char*)&data, num_bytes), true);	}
 
 string i2h_min(int64 data) {
 	string r;
@@ -547,10 +705,11 @@ struct xf_format_data {
 	string apply_justify(const string &s) {
 		if (width <= 0 or fill_zeros)
 			return s;
+		int len = s.utf8len();
 		if (left_justify)
-			return s + str_repeat(" ", width - s.num);
+			return s + bytes_repeat(" ", width - len);
 		else
-			return str_repeat(" ", width - s.num) + s;
+			return bytes_repeat(" ", width - len) + s;
 	}
 };
 
@@ -619,7 +778,7 @@ template<> string _xf_str_(const string &f, int64 value) {
 		n_zeros = ff.width;
 	if (ff.decimals >= 0)
 		n_zeros = ff.decimals;
-	s = str_repeat("0", n_zeros - size) + s;
+	s = bytes_repeat("0", n_zeros - size) + s;
 	if (ff.type == 'x' and ff.sharp)
 		s = "0x" + s;
 
@@ -796,110 +955,6 @@ bool string::_bool() const
 bool s2b(const string &s)
 {	return s._bool();	}
 
-int string::hash() const
-{
-	int id = 0;
-	int n = num / 4;
-	int *str_i = (int*)data;
-	for (int i=0;i<n;i++) {
-		int t = str_i[i];
-		id = id ^ t;
-	}
-	int r = num - (n * 4);
-	int t = 0;
-	if (r == 1)
-		t = (str_i[n] & 0x000000ff);
-	else if (r == 2)
-		t = (str_i[n] & 0x0000ffff);
-	else if (r == 3)
-		t = (str_i[n] & 0x00ffffff);
-	id = id ^ t;
-	return id;
-}
-
-static const unsigned int md5_s[64] = {
-	7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
-	5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
-	4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
-	6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
-};
-static const unsigned int md5_K[64] = {
-	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
-	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
-	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
-	0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
-	0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
-	0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
-	0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
-	0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
-	0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
-	0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
-	0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
-	0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
-	0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
-	0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
-	0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
-	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
-};
-
-string string::md5() const {
-	unsigned int a0 = 0x67452301;
-	unsigned int b0 = 0xEFCDAB89;
-	unsigned int c0 = 0x98BADCFE;
-	unsigned int d0 = 0x10325476;
-	unsigned long long message_length = num * 8;
-	string message = *this;
-	message.add(0x80);
-	while ((message.num % 64) != 56)
-		message.add(0x00);
-	message += string(&message_length, 8);
-
-	// blocks of 512 bit = 64 byte = 16 uints
-	int n = message.num / 64;
-	unsigned int *M = (unsigned int*)&message[0];
-
-	for (int j=0; j<n; j++) {
-
-		unsigned int A = a0;
-		unsigned int B = b0;
-		unsigned int C = c0;
-		unsigned int D = d0;
-
-		unsigned int F, g;
-		for (int i=0; i<64; i++) {
-			if (i < 16) {
-	            F = (B & C) | ((~B) & D);
-	            g = i;
-			} else if (i < 32) {
-	            F = (B & D) | (C & (~ D));
-	            g = (5*i + 1) % 16;
-			} else if (i < 48) {
-	            F = B ^ C ^ D;
-	            g = (3*i + 5) % 16;
-			} else {
-	            F = C ^ (B | (~ D));
-	            g = (7*i) % 16;
-			}
-	        unsigned int temp = D;
-	        D = C;
-	        C = B;
-	        unsigned int t = A + F + md5_K[i] + M[g];
-	        unsigned int shift = md5_s[i];
-	        B = B + ((t << shift) | (t >> (32 - shift)));
-	        A = temp;
-		}
-	    a0 = a0 + A;
-	    b0 = b0 + B;
-	    c0 = c0 + C;
-	    d0 = d0 + D;
-		M += 16;
-	}
-	string out;
-	out += string(&a0, 4) + string(&b0, 4) + string(&c0, 4) + string(&d0, 4);
-
-	return out.hex().replace(".", "");
-}
-
 bool is_whitespace_x(char c) {
 	return ((c == ' ') or (c == '\t') or (c == '\n') or (c == '\r') or (c == '\0'));
 }
@@ -923,12 +978,12 @@ string string::unescape() const {
 	return str_unescape(*this);
 }
 
-string string::repeat(int n) const {
-	return str_repeat(*this, n);
-}
-
 string string::repr() const {
 	return "\"" + escape() + "\"";
+}
+
+string string::repeat(int n) const {
+	return bytes::repeat(n);
 }
 
 string implode(const Array<string> &a, const string &glue) {
@@ -964,13 +1019,6 @@ bool string::match(const string &glob) const {
 	return true;
 }
 
-string str_repeat(const string &s, int n) {
-	string r;
-	for (int i=0; i<n; i++)
-		r += s;
-	return r;
-}
-
 int string::utf8len() const {
 	int l = 0;
 	for (int i=0; i<num; i++) {
@@ -986,29 +1034,29 @@ int string::utf8len() const {
 string utf8_char(unsigned int code) {
 	char r[6] = "";
 	if ((code & 0xffffff80) == 0) { // 7bit
-		return string((char*)&code, 1);
+		return bytes((char*)&code, 1);
 	} else if ((code & 0xfffff800) == 0) { // 11bit
 		r[1] = (code & 0x003f) | 0x80;        // 00-05
 		r[0] = ((code & 0x07c0) >> 6) | 0xc0; // 06-10
-		return string(r, 2);
+		return bytes(r, 2);
 	} else if ((code & 0xffff0000) == 0) { // 16bit
 		r[2] = (code & 0x003f) | 0x80;         // 00-05
 		r[1] = ((code & 0x0fc0) >> 6) | 0x80;  // 06-11
 		r[0] = ((code & 0xf000) >> 12) | 0xe0; // 12-15
-		return string(r, 3);
+		return bytes(r, 3);
 	} else if ((code & 0xffe00000) == 0) { // 21bit
 		r[3] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[2] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
 		r[1] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
 		r[0] = ((code & 0x001c0000) >> 18) | 0xf0; // 18-20
-		return string(r, 4);
+		return bytes(r, 4);
 	} else if ((code & 0xffe00000) == 0) { // 26bit
 		r[4] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[3] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
 		r[2] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
 		r[1] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
 		r[1] = ((code & 0x03000000) >> 24) | 0xf4; // 24-25
-		return string(r, 5);
+		return bytes(r, 5);
 	} else { // 31bit
 		r[5] = (code & 0x0000003f) | 0x80;         // 00-05
 		r[4] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
@@ -1016,7 +1064,7 @@ string utf8_char(unsigned int code) {
 		r[2] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
 		r[1] = ((code & 0x3f000000) >> 24) | 0x80; // 24-29
 		r[0] = ((code & 0x40000000) >> 30) | 0xfc; // 30
-		return string(r, 6);
+		return bytes(r, 6);
 	}
 }
 

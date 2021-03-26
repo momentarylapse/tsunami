@@ -8,20 +8,19 @@ class Exception;
 
 #define REGEX_MAX_MATCHES			128
 
-//--------------------------------------------------------------
-// cool string class
+class string;
 
-class string : public Array<char> {
+class bytes : public Array<char> {
 	public:
 
 	// constructors
-	string();
-	string(const string &s);
-	string(string &&s);
-	string(const char *str);
-	string(const void *str, int l);
+	bytes();
+	bytes(const bytes &s);
+	bytes(bytes &&s);
+	bytes(const char *str);
+	bytes(const void *str, int l);
 	void _cdecl __init__();
-	~string();
+	~bytes();
 
 	// functions
 	void _cdecl add(unsigned char c)
@@ -30,25 +29,77 @@ class string : public Array<char> {
 	{	resize(num + 1);	for (int i=num-2;i>=pos;i--) (*this)[i+1] = (*this)[i];	(*this)[pos] = c;	}
 	void _cdecl erase(int index)
 	{	delete_single(index);	}
+	string _cdecl hex() const;
+	int _cdecl hash() const;
+	string _cdecl md5() const;
+	int _cdecl compare(const bytes &s) const;
+	bytes _cdecl repeat(int n) const;
+
+	// operators
+	void _cdecl operator = (const bytes &s)
+	{	simple_assign(&s);	}
+	void _cdecl operator = (bytes &&s)
+	{	exchange(s);	}
+	void _cdecl operator += (const bytes &s)
+	{	simple_append(&s);	}
+	bytes _cdecl operator + (const bytes &s) const
+	{	bytes r = *this;	r += s;	return r;	}
+	friend bytes _cdecl operator + (const char *s1, const bytes &s2)
+	{	return bytes(s1) + s2;	}
+	bool _cdecl operator == (const bytes &s) const;
+	bool _cdecl operator != (const bytes &s) const
+	{	return !(*this == s);	}
+	bool _cdecl operator < (const bytes &s) const
+	{	return compare(s) < 0;	}
+	bool _cdecl operator > (const bytes &s) const
+	{	return compare(s) > 0;	}
+	bool _cdecl operator <= (const bytes &s) const
+	{	return compare(s) <= 0;	}
+	bool _cdecl operator >= (const bytes &s) const
+	{	return compare(s) >= 0;	}
+	unsigned char operator[] (int index) const
+	{	return ((unsigned char*)data)[index];	}
+	unsigned char &operator[] (int index)
+	{	return ((unsigned char*)data)[index];	}
+	unsigned char &_cdecl back()
+	{	return (*this)[num - 1];	}
+	unsigned char _cdecl back() const
+	{	return (*this)[num - 1];	}
+};
+
+//--------------------------------------------------------------
+// cool string class
+
+class string : public bytes {
+	public:
+
+	// constructors
+	string();
+	string(const bytes &s);
+	string(const string &s);
+	string(bytes &&s);
+	string(string &&s);
+	string(const char *str);
+	string(const void *str, int l);
+
+	// functions
+	string _cdecl repeat(int n) const;
 	int _cdecl find(const string &s, int start = 0) const;
 	int _cdecl rfind(const string &s, int start = -1) const;
 	bool has_char(char c) const;
 	string _cdecl substr(int start, int length) const;
 	string _cdecl head(int size) const;
 	string _cdecl tail(int size) const;
-	int _cdecl compare(const string &s) const;
 	int _cdecl icompare(const string &s) const;
 	void _cdecl _replace0(int start, int length, const string &s);
 	string _cdecl replace(const string &sub, const string &by) const;
 	string _cdecl reverse() const;
 	string _cdecl trim() const;
-	string _cdecl repeat(int n) const;
 	Array<string> _cdecl explode(const string &s) const;
 	Array<string> _cdecl split_any(const string &splitters) const;
 	Array<string> _cdecl parse_tokens(const string &splitters = "") const;
 	string _cdecl lower() const;
 	string _cdecl upper() const;
-	string _cdecl hex() const;
 	string _cdecl unhex() const;
 	bool _cdecl match(const string &glob) const;
 	string repr() const;
@@ -59,14 +110,13 @@ class string : public Array<char> {
 	string latin_to_utf8() const;
 	Array<int> utf8_to_utf32() const;
 	Array<int> utf16_to_utf32() const;
-	int _cdecl hash() const;
-	string _cdecl md5() const;
 	int _cdecl _int() const;
 	long long _cdecl i64() const;
 	float _cdecl _float() const;
 	double _cdecl f64() const;
 	bool _cdecl _bool() const;
 	const char *c_str() const;
+
 
 	// operators
 	void _cdecl operator = (const string &s)
@@ -90,14 +140,6 @@ class string : public Array<char> {
 	{	return compare(s) <= 0;	}
 	bool _cdecl operator >= (const string &s) const
 	{	return compare(s) >= 0;	}
-	unsigned char operator[] (int index) const
-	{	return ((unsigned char*)data)[index];	}
-	unsigned char &operator[] (int index)
-	{	return ((unsigned char*)data)[index];	}
-	unsigned char &_cdecl back()
-	{	return (*this)[num - 1];	}
-	unsigned char _cdecl back() const
-	{	return (*this)[num - 1];	}
 };
 
 

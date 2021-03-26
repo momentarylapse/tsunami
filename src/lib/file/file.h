@@ -100,9 +100,9 @@ public:
 	// really low level
 	int _cdecl read_buffer(void *buffer, int size);
 	int _cdecl write_buffer(const void *buffer, int size);
-	int _cdecl read_buffer(string &str);
-	int _cdecl write_buffer(const string &str);
-	string read_complete();
+	int _cdecl read_buffer(bytes &data);
+	int _cdecl write_buffer(const bytes &data);
+	bytes read_complete();
 
 	// medium level
 	virtual char read_char();
@@ -142,9 +142,9 @@ extern File *FileCreate(const Path &filename);
 extern File *FileCreateText(const Path &filename);
 extern File *FileAppend(const Path &filename);
 extern void FileClose(File *f);
-extern string FileRead(const Path &filename);
+extern bytes FileRead(const Path &filename);
 extern string FileReadText(const Path &filename);
-extern void FileWrite(const Path &filename, const string &str);
+extern void FileWrite(const Path &filename, const bytes &data);
 extern void FileWriteText(const Path &filename, const string &str);
 
 

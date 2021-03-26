@@ -16,6 +16,9 @@
 
 #define NEW_NEW_PARSING 0
 
+
+const int MAX_IMPORT_DIRECTORY_PARENTS = 5;
+
 namespace kaba {
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message);
@@ -2788,15 +2791,23 @@ Path import_dir_match(const Path &dir0, const string &name) {
 	return Path::EMPTY;
 }
 
+Path find_installed_lib_import(const string &name) {
+	for (auto &dir: Array<Path>({hui::Application::directory, hui::Application::directory_static})) {
+		auto path = (hui::Application::directory_static << "lib" << name).canonical(); // TODO...
+		if (file_exists(path))
+			return path;
+	}
+	return name;
+}
 
 Path find_import(Script *s, const string &_name) {
 	string name = _name.replace(".kaba", "");
 	name = name.replace(".", "/") + ".kaba";
 
 	if (name.head(2) == "@/")
-		return (hui::Application::directory_static << "lib" << name.substr(2, -1)).canonical(); // TODO...
+		return find_installed_lib_import(name.substr(2, -1));
 
-	for (int i=0; i<5; i++) {
+	for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
 		Path filename = import_dir_match((s->filename.parent() << string("../").repeat(i)).canonical(), name);
 		if (!filename.is_empty())
 			return filename;

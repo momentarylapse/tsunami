@@ -22,7 +22,7 @@ public:
 	void __init__();
 	void __delete__();
 
-	string data;
+	bytes data;
 	int pos;
 	void set_pos(int pos);
 	int get_pos();

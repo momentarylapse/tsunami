@@ -217,9 +217,9 @@ void FileClose(File *f) {
 	}
 }
 
-string FileRead(const Path &filename) {
+bytes FileRead(const Path &filename) {
 	File *f = FileOpen(filename);
-	string r = f->read_complete();
+	bytes r = f->read_complete();
 	FileClose(f);
 	return r;
 }
@@ -231,9 +231,9 @@ string FileReadText(const Path &filename) {
 	return r;
 }
 
-void FileWrite(const Path &filename, const string &str) {
+void FileWrite(const Path &filename, const bytes &buf) {
 	File *f = FileCreate(filename);
-	f->write_buffer(str);
+	f->write_buffer(buf);
 	FileClose(f);
 }
 
@@ -381,15 +381,16 @@ void File::WriteFileFormatVersion(bool binary,int fvv)
 #define CHUNK_SIYE		2048
 
 // read the complete file into the buffer
-string File::read_complete() {
-	string buf;
-	string chunk;
+bytes File::read_complete() {
+	bytes buf;
+	bytes chunk;
 	chunk.resize(CHUNK_SIYE);
 	int t_len = CHUNK_SIYE;
-	while(t_len > 0) {
-		t_len = read_buffer(chunk.data, chunk.num);
+	while (t_len > 0) {
+		t_len = read_buffer(chunk);
 
-		buf += string(chunk.data, t_len);
+		if (t_len > 0)
+			buf += bytes(chunk.data, t_len);
 	}
 	return buf;
 }
@@ -412,12 +413,12 @@ int File::write_buffer(const void *buffer, int size) {
 	return r;
 }
 
-int File::read_buffer(string &str) {
-	return read_buffer(str.data, str.num);
+int File::read_buffer(bytes &data) {
+	return read_buffer(data.data, data.num);
 }
 
-int File::write_buffer(const string &str) {
-	return write_buffer(str.data, str.num);
+int File::write_buffer(const bytes &data) {
+	return write_buffer(data.data, data.num);
 }
 
 static void read_buffer_asserted(File *f, void *buf, int size) {

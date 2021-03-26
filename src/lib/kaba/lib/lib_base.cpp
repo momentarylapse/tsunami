@@ -45,8 +45,8 @@ void _cdecl kaba_print(const string &str)
 {	printf("%s%s", str.c_str(), kaba_print_postfix.c_str()); fflush(stdout);	}
 void _cdecl kaba_cstringout(char *str)
 {	kaba_print(str);	}
-string _cdecl kaba_binary(const char *p, int length)
-{	return string(p, length);	}
+bytes _cdecl kaba_binary(const char *p, int length)
+{	return bytes(p, length);	}
 int _cdecl _Float2Int(float f)
 {	return (int)f;	}
 double _cdecl _Float2Float64(float f)

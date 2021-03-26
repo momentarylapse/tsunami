@@ -325,7 +325,7 @@ bool Socket::is_connected() {
 
 char _net_temp_buf_[65536];
 
-string Socket::read(int size) {
+bytes Socket::read(int size) {
 	if (s < 0)
 		return "";
 
@@ -355,10 +355,10 @@ string Socket::read(int size) {
 		sender.port = ntohs(addr.sin_port);
 	}
 	//msg_write("Read: " + string(_net_temp_buf_, r).hex(false));
-	return string(_net_temp_buf_, r);
+	return bytes(_net_temp_buf_, r);
 }
 
-bool Socket::write(const string &buf) {
+bool Socket::write(const bytes &buf) {
 	if (s < 0)
 		return false;
 

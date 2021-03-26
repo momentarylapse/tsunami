@@ -45,8 +45,8 @@ public:
 	//BinaryBuffer buffer;
 
 	// send / receive directly
-	string read(int size);
-	bool write(const string &buf);
+	bytes read(int size);
+	bool write(const bytes &buf);
 	bool can_write();
 	bool can_read();
 

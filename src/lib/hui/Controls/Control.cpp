@@ -418,32 +418,32 @@ void Control::notify(const string &message, bool is_default) {
 
 	Window *win = panel->win;
 	if (this == win->main_input_control) {
-		if (message == "hui:mouse-move")
+		if (message == EventID::MOUSE_MOVE) {
 			win->on_mouse_move();
-		else if (message == "hui:mouse-wheel")
+		} else if (message == EventID::MOUSE_WHEEL) {
 			win->on_mouse_wheel();
-		else if (message == "hui:mouse-enter")
+		} else if (message == EventID::MOUSE_ENTER) {
 			win->on_mouse_enter();
-		else if (message == "hui:mouse-leave")
+		} else if (message == EventID::MOUSE_LEAVE) {
 			win->on_mouse_leave();
-		else if (message == "hui:left-button-down")
+		} else if (message == EventID::LEFT_BUTTON_DOWN) {
 			win->on_left_button_down();
-		else if (message == "hui:left-button-up")
+		} else if (message == EventID::LEFT_BUTTON_UP) {
 			win->on_left_button_up();
-		else if (message == "hui:middle-button-down")
+		} else if (message == EventID::MIDDLE_BUTTON_DOWN) {
 			win->on_middle_button_down();
-		else if (message == "hui:middle-button-up")
+		} else if (message == EventID::MIDDLE_BUTTON_UP) {
 			win->on_middle_button_up();
-		else if (message == "hui:right-button-down")
+		} else if (message == EventID::RIGHT_BUTTON_DOWN) {
 			win->on_right_button_down();
-		else if (message == "hui:right-button-up")
+		} else if (message == EventID::RIGHT_BUTTON_UP) {
 			win->on_right_button_up();
-		else if (message == "hui:key-down") {
+		} else if (message == EventID::KEY_DOWN) {
 			win->on_key_down();
 			WinTrySendByKeyCode(win, GetEvent()->key_code);
-		} else if (message == "hui:key-up")
+		} else if (message == "hui:key-up") {
 			win->on_key_up();
-		else if (message == "hui:draw") {
+		} else if (message == "hui:draw") {
 			Painter p(win, id);
 			win->on_draw(&p);
 		}

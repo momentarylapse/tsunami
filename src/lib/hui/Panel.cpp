@@ -176,7 +176,7 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 
 		// send the event
 
-		if (e->message == "hui:draw") {
+		if (e->message == EventID::DRAW) {
 			if (ee.function_p) {
 				Painter p(this, e->id);
 				ee.function_p(&p);

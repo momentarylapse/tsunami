@@ -1059,8 +1059,8 @@ string _suggest_filename(Song *s, const Path &dir) {
 	string ext = "nami";
 	if (song_is_simple_audio(s))
 		ext = "ogg";
-	else if (song_is_simple_midi(s))
-		ext = "midi";
+	//else if (song_is_simple_midi(s))
+	//	ext = "midi";
 
 	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
@@ -1101,8 +1101,8 @@ void TsunamiWindow::on_export_selection() {
 }
 
 void TsunamiWindow::on_quick_export() {
-	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory.str());
-	if (session->storage->save(song, dir + _suggest_filename(song, dir)))
+	auto dir = Path(hui::Config.get_str("QuickExportDir", hui::Application::directory.str()));
+	if (session->storage->save(song, dir << _suggest_filename(song, dir)))
 		view->set_message(_("file saved"));
 }
 

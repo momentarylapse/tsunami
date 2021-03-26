@@ -267,6 +267,16 @@ gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpoin
 	return false;
 }
 
+int decode_gtk_keyval(int keyval) {
+	for (int i=0; i<NUM_KEYS; i++)
+		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
+		if (HuiKeyID[i] == keyval)
+			return i;
+	for (int i=0; i<26; i++)
+		if (keyval == 'A' + i)
+			return KEY_A + i;
+	return -1;
+}
 
 void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
 
@@ -277,11 +287,7 @@ void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
 
 	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
 	// convert GDK keyvalue into HUI key id
-	key = -1;
-	for (int i=0; i<NUM_KEYS; i++)
-		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
-		if (HuiKeyID[i] == keyval)
-			key = i;
+	key = decode_gtk_keyval(keyval);
 	key_code = key;
 	if (key < 0)
 		return;
@@ -312,11 +318,7 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code) {
 
 	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
 	// convert GDK keyvalue into HUI key id
-	key = -1;
-	for (int i=0; i<NUM_KEYS; i++)
-		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
-		if (HuiKeyID[i] == keyvalue)
-			key = i;
+	key = decode_gtk_keyval(keyvalue);
 	key_code = key;
 	if (key < 0)
 		return;

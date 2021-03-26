@@ -29,7 +29,7 @@ const int AudioBuffer::PEAK_OFFSET_EXP = 3;
 const int AudioBuffer::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
 const int AudioBuffer::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 
-const int MAX_CHANNELS = 2;
+const int MAX_CHANNELS = 16;
 
 
 AudioBuffer::AudioBuffer() {
@@ -499,7 +499,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 	return !wtb_overflow;
 }
 
-bool AudioBuffer::exports(string &data, int _channels, SampleFormat format) const {
+bool AudioBuffer::exports(bytes &data, int _channels, SampleFormat format) const {
 	data.resize(length * _channels * (format_get_bits(format) / 8));
 	return _export(data.data, _channels, format, false);
 }

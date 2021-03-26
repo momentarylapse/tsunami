@@ -17,8 +17,7 @@
 
 enum class SampleFormat;
 
-class AudioBuffer
-{
+class AudioBuffer {
 public:
 	AudioBuffer();
 	AudioBuffer(const AudioBuffer &b);
@@ -31,13 +30,13 @@ public:
 
 	void operator=(const AudioBuffer &b);
 	void operator=(AudioBuffer &&b);
-	void __assign__(const AudioBuffer &other){ *this = other; }
+	void __assign__(const AudioBuffer &other) { *this = other; }
 
 	int offset, length;
 	int channels;
-	Array<float> c[2];
+	Array<float> c[16];
 
-	Array<string> peaks;
+	Array<bytes> peaks;
 
 	std::shared_timed_mutex mtx;
 
@@ -63,7 +62,7 @@ public:
 
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;
-	bool _cdecl exports(string &data, int channels, SampleFormat format) const;
+	bool _cdecl exports(bytes &data, int channels, SampleFormat format) const;
 	void _cdecl interleave(float *p, float volume) const;
 	void _cdecl deinterleave(const float *p, int num_channels);
 

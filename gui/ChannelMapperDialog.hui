@@ -1,0 +1,8 @@
+Dialog channel-mapper-dialog "Channel mapper" width=300 height=200 resizable headerbar
+	Grid main "" vertical
+		Group gr-input "Input"
+			DrawingArea peaks-in "" noexpandy expandx height=30
+		Group gr-map "Map" expandx
+			Grid grid "" expandx
+		Group gr-output "Output"
+			DrawingArea peaks-out "" noexpandy height=30

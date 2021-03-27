@@ -4,13 +4,13 @@ Dialog track_dialog "Spur" width=380 height=516
 			Edit name "" expandx
 		Group g_volume "Volume"
 			Grid ? "" noexpandx
-				Text t_volume "Volume" right disabled
+				Label t_volume "Volume" right disabled
 				SpinButton volume "0" range=-10000:10:0.1 expandx
-				Text /db "dB"
+				Label /db "dB"
 				---|
-				Text t_panning "Balance" right disabled
+				Label t_panning "Balance" right disabled
 				SpinButton panning "0" range=-100:100:1 "tooltip=+100% = right, -100% = left"
-				Text /percent "%"
+				Label /percent "%"
 		Group g_instrument "Instrument"
 			Grid ? ""
 				ComboBox instrument "" expandx ignorefocus
@@ -20,7 +20,7 @@ Dialog track_dialog "Spur" width=380 height=516
 					Button edit_tuning "" image=hui:edit flat ignorefocus
 		Group g_synth "Synthesizer"
 			Grid synth ""
-		Text ? "" expandy
+		Label ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus

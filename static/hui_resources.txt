@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-68
+70
 # Resource
 Menu
 menu_fake
@@ -69,7 +69,7 @@ flat,huge,expandx,ignorefocus
 3
 0
 0
-Text
+Label
 ?
 expandy
 1
@@ -401,6 +401,55 @@ ok
 default,image=hui:ok
 0
 1
+0
+# Resource
+Dialog
+channel-mapper-dialog
+width=300,height=200,resizable,headerbar
+0
+0
+1
+Grid
+main
+vertical
+0
+0
+3
+Group
+gr-input
+
+0
+0
+1
+DrawingArea
+peaks-in
+noexpandy,expandx,height=30
+0
+0
+0
+Group
+gr-map
+expandx
+1
+0
+1
+Grid
+grid
+expandx
+0
+0
+0
+Group
+gr-output
+
+2
+0
+1
+DrawingArea
+peaks-out
+noexpandy,height=30
+0
+0
 0
 # Resource
 Dialog
@@ -2484,7 +2533,7 @@ vertical
 0
 0
 3
-Text
+Label
 t_output
 bold,center
 0
@@ -5731,7 +5780,7 @@ expandx
 0
 0
 0
-Text
+Label
 message
 italic
 0
@@ -5743,19 +5792,19 @@ multi_grid
 1
 0
 3
-Text
+Label
 rdt_multi_target
 bold
 0
 0
 0
-Text
+Label
 rdt_multi_type
 bold
 1
 0
 0
-Text
+Label
 rdt_multi_source
 bold
 2
@@ -5779,7 +5828,7 @@ noexpandy
 0
 0
 2
-Text
+Label
 time
 width=120
 0
@@ -5833,9 +5882,46 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+image=hui:ok,default
+1
+0
+0
+# Resource
+Dialog
+recording-setup-dialog
+width=300,height=200
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+mapping-grid
+
+0
+0
+0
+Grid
+?
+vertical
+1
+0
+2
+CheckBox
+show-channels
+
+0
+0
+0
+CheckBox
+show-missing
+
 1
 0
 0
@@ -6463,7 +6549,7 @@ Grid
 0
 0
 4
-Text
+Label
 ad_t_samplerate
 right,disabled,hgroup=a
 0
@@ -6475,7 +6561,7 @@ expandx,editable
 1
 0
 0
-Text
+Label
 ad_t_format
 right,disabled
 0
@@ -6621,7 +6707,7 @@ flat,image=hui:save
 1
 0
 0
-Text
+Label
 name
 bold,center,expandx
 2
@@ -6779,7 +6865,7 @@ noexpandx
 0
 0
 6
-Text
+Label
 t_volume
 right,disabled
 0
@@ -6791,13 +6877,13 @@ range=-10000:10:0.1,expandx
 1
 0
 0
-Text
+Label
 db
 
 2
 0
 0
-Text
+Label
 t_panning
 right,disabled
 0
@@ -6809,7 +6895,7 @@ range=-100:100:1
 1
 1
 0
-Text
+Label
 percent
 
 2
@@ -6863,7 +6949,7 @@ synth
 0
 0
 0
-Text
+Label
 ?
 expandy
 4
@@ -7190,7 +7276,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-606
+613
 # Text
 /bars-add
 Add bars...
@@ -7584,6 +7670,18 @@ Number
 
 bar_edit_dialog/t_result_bpm
 => Bpm
+
+channel-mapper-dialog/channel-mapper-dialog
+Channel mapper
+
+channel-mapper-dialog/gr-input
+Input
+
+channel-mapper-dialog/gr-map
+Map
+
+channel-mapper-dialog/gr-output
+Output
 
 configurable-selection-dialog/configurable-selection-dialog
 Module
@@ -8662,6 +8760,15 @@ Start recording
 record_dialog/time
 0:00
 
+recording-setup-dialog/recording-setup-dialog
+Recording setup
+
+recording-setup-dialog/show-channels
+Channels
+Map individual channels
+recording-setup-dialog/show-missing
+Missing devices
+Show devices that are currently not available
 sample-manager-dialog/group-edit
 Edit
 

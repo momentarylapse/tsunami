@@ -202,6 +202,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("stop", hui::KEY_CONTROL + hui::KEY_T);
 	event("record", [=]{ on_record(); });
 	set_key_code("record", hui::KEY_CONTROL + hui::KEY_R);
+	event("record-setup", [=]{ session->set_mode(EditMode::DefaultCaptureSetup); });
 	event("playback-range-lock", [=]{ view->set_playback_range_locked(!view->playback_range_locked); });
 	event("show-log", [=]{ on_show_log(); });
 	event("about", [=]{ on_about(); });

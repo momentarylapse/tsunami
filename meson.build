@@ -501,6 +501,7 @@ sources = [
 	'src/View/SideBar/CaptureConsoleModes/CaptureConsoleModeMulti.cpp',
 	'src/View/SideBar/AudioEditorConsole.cpp',
 	'src/View/SideBar/CaptureConsole.cpp',
+	'src/View/SideBar/CaptureSetupConsole.cpp',
 	'src/View/SideBar/CurveConsole.cpp',
 	'src/View/SideBar/DummyEditorConsole.cpp',
 	'src/View/SideBar/MidiEditorConsole.cpp',

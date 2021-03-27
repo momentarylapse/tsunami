@@ -4,15 +4,15 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 			Group grp_source "Source"
 				ComboBox source "" expandx
 			---|
-			Text message "" italic
+			Label message "" italic
 		Grid multi_grid ""
-			Text rdt_multi_target "Target" bold
-			Text rdt_multi_type "Type" bold
-			Text rdt_multi_source "Source" bold
+			Label rdt_multi_target "Target" bold
+			Label rdt_multi_type "Type" bold
+			Label rdt_multi_source "Source" bold
 		Group rdt_capture "Recording"
 			Grid ? "" vertical
 				Grid ? "" noexpandy
-					Text time "0:00" width=120
+					Label time "0:00" width=120
 					DrawingArea level "" height=25
 				Grid ? "" homogenousx
 					Button start "" flat huge expandx image=hui:media-record "tooltip=Start recording"
@@ -21,5 +21,5 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 					Button new_version "" flat huge image=hui:new "tooltip=Start new version"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button /ok "OK" image=hui:ok default
 

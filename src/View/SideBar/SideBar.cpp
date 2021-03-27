@@ -16,6 +16,7 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
+#include "CaptureSetupConsole.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../TsunamiWindow.h"
@@ -53,6 +54,7 @@ SideBar::SideBar(Session *_session) {
 	curve_console = new CurveConsole(session);
 	sample_ref_console = new SampleRefConsole(session);
 	capture_console = new CaptureConsole(session);
+	capture_setup_console = new CaptureSetupConsole(session);
 
 	add_console(song_console);
 	add_console(sample_manager);
@@ -63,6 +65,7 @@ SideBar::SideBar(Session *_session) {
 	add_console(curve_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);
+	add_console(capture_setup_console);
 
 	event("close", [=]{ on_close(); });
 

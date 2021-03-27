@@ -20,13 +20,11 @@ class MidiRecorder;
 class PeakMeter;
 class PeakMeterDisplay;
 
-class CaptureConsoleModeMulti: public CaptureConsoleMode
-{
+class CaptureConsoleModeMulti: public CaptureConsoleMode {
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
 
-	struct CaptureItem
-	{
+	struct CaptureItem {
 		Track *track;
 		AudioInput *input_audio;
 		MidiInput *input_midi;

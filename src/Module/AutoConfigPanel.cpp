@@ -340,7 +340,7 @@ public:
 			type = DeviceType::MIDI_INPUT;
 	}
 	void update_list() {
-		list = session->device_manager->device_list(type);
+		list = session->device_manager->good_device_list(type);
 		if (panel) {
 			panel->reset(id);
 			for (auto *d: list)
@@ -351,7 +351,7 @@ public:
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		id = "device-" + i2s(i);
 		panel = p;
-		p->add_combo_box("!width=150,expandx", 1, i, id);
+		p->add_combo_box("!expandx", 1, i, id);
 		p->event(id, callback);
 		update_list();
 	}

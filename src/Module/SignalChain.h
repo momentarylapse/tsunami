@@ -35,7 +35,7 @@ public:
 
 	void unregister();
 
-	void reset();
+	void reset(bool hard);
 	void save(const Path &filename);
 	static SignalChain *load(Session *session, const Path &filename);
 

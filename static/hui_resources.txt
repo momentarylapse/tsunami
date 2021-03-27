@@ -5903,7 +5903,7 @@ vertical
 2
 Grid
 mapping-grid
-
+expandx
 0
 0
 0
@@ -5912,17 +5912,11 @@ Grid
 vertical
 1
 0
-2
-CheckBox
-show-channels
-
-0
-0
-0
+1
 CheckBox
 show-missing
-
-1
+disabled
+0
 0
 0
 # Resource
@@ -7276,7 +7270,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-613
+612
 # Text
 /bars-add
 Add bars...
@@ -8763,9 +8757,6 @@ record_dialog/time
 recording-setup-dialog/recording-setup-dialog
 Recording setup
 
-recording-setup-dialog/show-channels
-Channels
-Map individual channels
 recording-setup-dialog/show-missing
 Missing devices
 Show devices that are currently not available

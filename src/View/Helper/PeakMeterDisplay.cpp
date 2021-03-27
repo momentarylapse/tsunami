@@ -14,8 +14,12 @@
 #include "../../Module/Audio/PeakMeter.h"
 
 
+
+Array<int> create_default_channel_map(int n_in, int n_out);
+
+
 const int PeakMeterDisplay::SPACE_BETWEEN_CHANNELS = 2;
-const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 6;
+const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 8;
 
 PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	align.w = 120;
@@ -91,9 +95,8 @@ void PeakMeterDisplay::set_channel_map(const Array<int> &_channel_map) {
 }
 
 void PeakMeterDisplay::connect() {
-	channel_map = {};
-	for (int i=0; i<source->channels.num; i++)
-		channel_map.add(i);
+	if (channel_map.num == 0)
+		channel_map = create_default_channel_map(source->channels.num, source->channels.num);
 
 	source->subscribe(this, [=]{ on_update(); });
 	if (mode == Mode::SPECTRUM)

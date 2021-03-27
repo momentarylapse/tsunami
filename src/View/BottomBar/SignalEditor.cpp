@@ -531,7 +531,7 @@ public:
 	}
 
 	void on_reset() {
-		chain->reset();
+		chain->reset(false);
 	}
 
 	/*void on_load() {

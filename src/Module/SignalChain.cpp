@@ -90,7 +90,7 @@ SignalChain::~SignalChain() {
 		//thread->kill();
 		thread = nullptr;
 	}
-	stop();
+	stop_hard();
 	for (Module *m: weak(modules))
 		m->unsubscribe(this);
 	PerformanceMonitor::delete_channel(perf_channel_suck);
@@ -325,13 +325,18 @@ void SignalChain::update_ports() {
 		port_out.add(p.module->port_out[p.port]);
 }
 
-void SignalChain::reset() {
-	msg_write("aaaargh  reset");
-	for (int i=modules.num-1; i>=3; i--)
-		delete_module(modules[i].get());
+void SignalChain::reset(bool hard) {
+	stop_hard();
+	if (hard)
+		for (auto *m: weak(modules))
+			m->belongs_to_system = false;
 
-	connect(modules[0].get(), 0, modules[1].get(), 0);
-	connect(modules[1].get(), 0, modules[2].get(), 0);
+	for (int i=modules.num-1; i>=0; i--)
+		if (!modules[i]->belongs_to_system)
+			delete_module(modules[i].get());
+
+	//connect(modules[0].get(), 0, modules[1].get(), 0);
+	//connect(modules[1].get(), 0, modules[2].get(), 0);
 }
 
 Module* SignalChain::add(ModuleType type, const string &sub_type) {

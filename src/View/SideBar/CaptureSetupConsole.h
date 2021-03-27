@@ -30,18 +30,25 @@ public:
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
 
-	struct CaptureItem {
+	struct CaptureTrackData {
 		Track *track;
-		AudioInput *input_audio;
-		MidiInput *input_midi;
 		PeakMeterDisplay *peak_meter_display;
-		PeakMeter *peak_meter;
 		Device *device;
 		string id_source, id_target, id_type, id_peaks, id_group, id_grid, id_mapper;
 		Array<int> channel_map;
 	};
-	Array<CaptureItem> items;
+	Array<CaptureTrackData> tracks;
 
+	struct CaptureInputData {
+		Device *device;
+		AudioInput *input_audio;
+		MidiInput *input_midi;
+		PeakMeter *peak_meter;
+		SignalType type;
+	};
+	Array<CaptureInputData> inputs;
+	CaptureInputData *get_input_by_device(Device *dev);
 
+	void rebuild_chain();
 	shared<SignalChain> chain;
 };

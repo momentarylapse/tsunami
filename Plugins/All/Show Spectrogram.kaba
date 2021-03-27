@@ -100,7 +100,7 @@ class ShowSpectrogram extends SongPlugin
 			int offset = (buf.length - N) * t / NT
 		
 			for j in 0:N
-				sub[j] = buf.r[offset + j]
+				sub[j] = buf.c[0][offset + j]
 			fft_r2c(sub, f)
 			float ww = float(N) / song.sample_rate
 			for i in 0:NF

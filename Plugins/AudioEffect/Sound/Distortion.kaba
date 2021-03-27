@@ -17,8 +17,6 @@ class Distortion extends AudioEffect
 		float a = max(10000 * pow(config.gain, 2), 0.01)
 		float b = 1 / atan(a)
 	
-		for i in 0:buf.length
-			buf.l[i] = b * atan(buf.l[i] * a)
-		if buf.channels > 1
-			for i in 0:buf.length
-				buf.r[i] = b * atan(buf.r[i] * a)
+		for c in buf.c
+			for x in c
+				x = b * atan(x * a)

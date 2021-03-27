@@ -11,8 +11,8 @@ int offset
 DummySynthesizer synth
 
 void fill(out AudioBuffer buf)
-	buf.r = 0
-	buf.l = 0
+	buf.c[0] = 0
+	buf.c[1] = 0
 	
 	if offset == 0
 		synth.add_metronome_click(offset_out, 1, 0, 880)

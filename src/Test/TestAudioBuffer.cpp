@@ -10,13 +10,11 @@
 #include "TestAudioBuffer.h"
 #include "../Data/Audio/AudioBuffer.h"
 
-TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer")
-{
+TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer") {
 }
 
 
-Array<UnitTest::Test> TestAudioBuffer::tests()
-{
+Array<UnitTest::Test> TestAudioBuffer::tests() {
 	Array<Test> list;
 	list.add({"resize", TestAudioBuffer::test_resize});
 	list.add({"append", TestAudioBuffer::test_append});
@@ -27,8 +25,7 @@ Array<UnitTest::Test> TestAudioBuffer::tests()
 	return list;
 }
 
-void TestAudioBuffer::test_resize()
-{
+void TestAudioBuffer::test_resize() {
 	AudioBuffer buf;
 	buf.resize(4);
 	assert_equal(buf, make_buf({0,0,0,0}, {0,0,0,0}));
@@ -41,16 +38,14 @@ void TestAudioBuffer::test_resize()
 	assert_equal(buf, make_buf({1,1}, {-1,0}));
 }
 
-void TestAudioBuffer::test_scale()
-{
+void TestAudioBuffer::test_scale() {
 	auto buf = make_buf({1,-1}, {0, 2});
 	buf.mix_stereo(0.5f);
 
 	assert_equal(buf, make_buf({0.5f, -0.5f}, {0, 1}));
 }
 
-void TestAudioBuffer::test_ref()
-{
+void TestAudioBuffer::test_ref() {
 	auto buf = make_buf({1,2,3,4,5}, {-1,-2,-3,-4,-5});
 
 	AudioBuffer r = buf.ref(2, 4);
@@ -63,16 +58,14 @@ void TestAudioBuffer::test_ref()
 	assert_equal(r, make_buf({3,4}, {-3,-4}));
 }
 
-void TestAudioBuffer::test_append()
-{
+void TestAudioBuffer::test_append() {
 	auto buf = make_buf({1,2,3}, {-1,-2,-3});
 	buf.append(make_buf({0,1}, {2,3}));
 
 	assert_equal(buf, make_buf({1,2,3,0,1}, {-1,-2,-3,2,3}));
 }
 
-void TestAudioBuffer::test_set()
-{
+void TestAudioBuffer::test_set() {
 	auto buf = make_buf({1,2,3,4}, {-1,-2,-3,-4});
 
 	buf.set(make_buf({10,11},{12,13}), -1, 1.0f);
@@ -82,8 +75,7 @@ void TestAudioBuffer::test_set()
 	assert_equal(buf, make_buf({11,2,3,10}, {13,-2,-3,12}));
 }
 
-void TestAudioBuffer::test_ref_write()
-{
+void TestAudioBuffer::test_ref_write() {
 	auto buf = make_buf({1,2,3,4,5}, {-1,-2,-3,-4,-5});
 
 	AudioBuffer r;

@@ -25,7 +25,6 @@ class Noise extends AudioSource
 				b = r.normal(0, 0.2) * config.volume
 	
 	override int read(out AudioBuffer buf)
-		do(buf.l)
-		if buf.channels > 1
-			do(buf.r)
+		for c in buf.c
+			do(c)
 		return len(buf)

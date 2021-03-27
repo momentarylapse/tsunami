@@ -34,7 +34,7 @@ public:
 
 	int offset, length;
 	int channels;
-	Array<float> c[16];
+	Array<Array<float>> c;
 
 	Array<bytes> peaks;
 

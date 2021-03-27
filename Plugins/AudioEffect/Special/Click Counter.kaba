@@ -23,7 +23,7 @@ class ClickCounter extends AudioEffect
 	override void process(out AudioBuffer buf)
 	
 		float[] temp
-		temp = buf.r + buf.l
+		temp = buf.c[0] #+ buf.c[1]
 	
 		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
 	

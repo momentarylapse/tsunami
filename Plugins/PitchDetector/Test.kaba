@@ -11,7 +11,7 @@ class TestDetector extends PitchDetector
 	override void process(MidiEventBuffer midi, AudioBuffer buf)
 		#print(len(buf))
 		complex[] z
-		fft_r2c(buf.l, z)
+		fft_r2c(buf.c[0], z)
 		
 		int N = len(buf)
 		print(N)

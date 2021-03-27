@@ -4,6 +4,12 @@
 use tsunami
 
 
+float abs_max(float[] buf)
+	float m = 0.0
+	for b in buf
+		m = max(m, abs(b))
+	return m
+
 
 class Volume extends AudioEffect
 	class Config extends Module.Config
@@ -22,20 +28,13 @@ class Volume extends AudioEffect
 	override void process(out AudioBuffer buf)
 		float factor = config.volume
 		if config.maximize
-			float max = 0
-			for i in 0:len(buf)
-				if abs(buf.l[i]) > max
-					max = abs(buf.l[i])
-			if buf.channels > 1
-				for i in 0:len(buf)
-					if abs(buf.r[i]) > max
-						max = abs(buf.r[i])
-			factor = 1 / max
-		for i in 0:len(buf)
-			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
-		if buf.channels > 1
-			for i in 0:len(buf)
-				buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
+			float _max = 0
+			for cc in buf.c
+				_max = max(_max, abs_max(cc))
+			factor = 1 / _max
+		for cc in buf.c
+			for b in cc
+				b = clamp(b * factor, -1, 1)
 	
 	class Panel extends ConfigPanel
 		override Volume *c

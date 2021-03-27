@@ -40,27 +40,28 @@ class Monofier extends AudioEffect
 			sl = -sl
 		
 		if config.distance == 0
+			# pure mix
 			for i in 0:len(buf)
-				float x = sl * buf.l[i] + sr * buf.r[i]
-				buf.l[i] = x
-				buf.r[i] = x
+				float x = sl * buf.c[0][i] + sr * buf.c[1][i]
+				buf.c[0][i] = x
+				buf.c[1][i] = x
 		else if config.distance > 0
 			# delay right channel
 			for i in 0:len(buf)
-				float x = sl * buf.l[i] + sr * temp[offset]
-				temp[offset] = buf.r[i]
+				float x = sl * buf.c[0][i] + sr * temp[offset]
+				temp[offset] = buf.c[1][i]
 				offset ++
 				if offset >= n
 					offset = 0
-				buf.l[i] = x
-				buf.r[i] = x
+				buf.c[0][i] = x
+				buf.c[1][i] = x
 		else if config.distance < 0
 			# delay left channel
 			for i in 0:len(buf)
-				float x = sl * temp[offset] + sr * buf.r[i]
-				temp[offset] = buf.l[i]
+				float x = sl * temp[offset] + sr * buf.c[1][i]
+				temp[offset] = buf.c[0][i]
 				offset ++
 				if offset >= n
 					offset = 0
-				buf.l[i] = x
-				buf.r[i] = x
+				buf.c[0][i] = x
+				buf.c[1][i] = x

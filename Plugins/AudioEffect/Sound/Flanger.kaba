@@ -21,12 +21,10 @@ class PluginConfig extends Module.Config
 class Flanger extends AudioEffect
 	PluginConfig config
 	
-	float[] temp_r
-	float[] temp_l
+	AudioBuffer buf_temp
 	int offset
 	override void reset_state()
-		temp_r.clear()
-		temp_l.clear()
+		buf_temp.clear()
 		offset = 0
 
 	void do_flanger(out float[] b, out float[] temp)
@@ -59,11 +57,10 @@ class Flanger extends AudioEffect
 	
 	override void process(out AudioBuffer buf)
 		int delay_samples = session.sample_rate() * config.delay + 1
-		temp_r.resize(delay_samples)
-		temp_l.resize(delay_samples)
+		buf_temp.set_channels(buf.channels)
+		buf_temp.resize(delay_samples)
 	
-		do_flanger(buf.l, temp_l)
-		if buf.channels > 1
-			do_flanger(buf.r, temp_r)
+		for c, i in buf.c
+			do_flanger(buf.c[i], buf_temp.c[i])
 	
-		offset += buf.length
+		offset += len(buf)

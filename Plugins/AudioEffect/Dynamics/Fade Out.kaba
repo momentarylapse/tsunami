@@ -7,7 +7,6 @@ class FadeOut extends AudioEffect
 	override void process(out AudioBuffer buf)
 		for i in 0:len(buf)
 			float vol = 1 - float(i) / len(buf)
-			buf.l[i] = buf.l[i] * vol
-			if buf.channels > 1
-				buf.r[i] = buf.r[i] * vol
+			for c in buf.c
+				c[i] = c[i] * vol
 

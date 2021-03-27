@@ -35,8 +35,9 @@ Array<string> diff_buffer(AudioBuffer *a, AudioBuffer *b, const string &ee) {
 		r.add(ee + "channels");
 	if (a->length != b->length)
 		r.add(ee + "length");
-	if (a->c[0] != b->c[0] or a->c[1] != b->c[1])
-		r.add(ee + "data");
+	for (int i=0; i<a->channels; i++)
+		if (a->c[i] != b->c[i])
+			r.add(ee + "data");
 	return r;
 }
 

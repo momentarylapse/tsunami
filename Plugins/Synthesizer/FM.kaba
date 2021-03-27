@@ -490,7 +490,7 @@ class FMRenderer extends PitchRenderer
 			# transport
 			for o in osc
 				if o.conf.target_out
-					buf.l[i] += o.output
+					buf.c[0][i] += o.output
 				for t,j in o.conf.target
 					if t
 						osc[j].input += o.output

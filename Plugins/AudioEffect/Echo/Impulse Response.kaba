@@ -47,12 +47,11 @@ class Folding extends AudioEffect
 	float[] h
 	complex[] HH
 	
-	float[] overlapr
-	float[] overlapl
+	AudioBuffer buf_overlap
 	
 	override void on_config()
 		if weak(config.sample)
-			h = config.sample.origin.buf.l
+			h = config.sample.origin.buf.c[0]
 		else
 			h = [1.0]
 		reset_state()
@@ -61,14 +60,14 @@ class Folding extends AudioEffect
 		if not weak(config.sample)
 			return
 		
+		buf_overlap.set_channels(buf.channels)
+		
 		# apply
-		do(buf.l, overlapl)
-		if buf.channels > 1
-			do(buf.r, overlapr)
+		for c,i in buf.c
+			do(c, buf_overlap.c[i])
 	
 	override void reset_state()
-		overlapr.clear()
-		overlapl.clear()
+		buf_overlap.clear()
 		HH.clear()
 	
 	void do(out float[] buf, out float[] overlap)

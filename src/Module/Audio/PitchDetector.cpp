@@ -68,11 +68,10 @@ void DummyPitchDetector::__init__() {
 
 void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 	Array<float> temp;
-	temp = buf.c[0] + buf.c[1];
+	temp = buf.c[0];// + buf.c[1];
 
 	// fft
 	Array<complex> bufc;
-	bufc.resize(buf.length / 2 + 1);
 	FastFourierTransform::fft_r2c(temp, bufc);
 
 	int i0 = freq_to_index(F_MIN);

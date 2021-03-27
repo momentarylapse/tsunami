@@ -44,6 +44,6 @@ class FindClicks extends SongPlugin
 	override void apply()
 		for t in weak(song.tracks)
 			for l in weak(t.layers)
-				for b in l.buffers
-					unclick(b.r, l, b.offset)
-					unclick(b.l, l, b.offset)
+				for buf in l.buffers
+					for c in buf.c
+						unclick(c, l, buf.offset)

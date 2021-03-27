@@ -63,7 +63,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	buf.set_zero();
 	synth->render(buf);
 
-	if (synth->auto_generate_stereo)
+	if (synth->auto_generate_stereo and (buf.channels > 1))
 		buf.c[1] = buf.c[0];
 
 	synth->events.clear();

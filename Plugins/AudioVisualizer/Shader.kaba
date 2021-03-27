@@ -422,7 +422,7 @@ uniform float iVolume;
 	
 	void on_draw()
 		_time += timer.get()
-		float volume = c.buffer.r.max()
+		float volume = c.buffer.c[0].max()
 		
 		#nix.start()
 		nix.reset_to_color(color.RED)

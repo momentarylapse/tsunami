@@ -56,9 +56,8 @@ class Equalizer15 extends AudioEffect
 		fft_c2r_inv(f, b)
 
 	override void process(out AudioBuffer buf)
-		equalize(buf.l)
-		if buf.channels > 1
-			equalize(buf.r)
+		for c in buf.c
+			equalize(c)
 		f.clear()
 	
 	override ConfigPanel *create_panel()

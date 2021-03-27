@@ -158,10 +158,10 @@ class HammondRenderer extends PitchRenderer
 				x += delta_phi
 				if x > 8*pi
 					x = loop(x, 0, 2*pi)
-			buf.l[i] += d * volume
+			buf.c[0][i] += d * volume
 
 		if stutter_offset < len(stutter)
-			buf.l *= stutter[stutter_offset:]
+			buf.c[0] *= stutter[stutter_offset:]
 			stutter_offset += len(buf)
 		buf.auto_generate_channels()
 		filter.apply(buf)

@@ -153,7 +153,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 		} else if (h > w) {
 			float dx = (w + bb) / channels.num - bb;
 			for (int i=0; i<channels.num; i++)
-				draw_peak(c, rect(area.x1 + i*dx, area.x1 + i*dx + dx - bb, area.y1, area.y2), channels[0], bg);
+				draw_peak(c, rect(area.x1 + i*dx, area.x1 + i*dx + dx - bb, area.y1, area.y2), channels[i], bg);
 		}
 	} else {
 		c->set_color(bg);

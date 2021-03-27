@@ -84,9 +84,11 @@ class Compressor extends AudioEffect
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		
-		compress(buf.l, squares_l, &gain_l)
+		compress(buf.c[0], squares_l, &gain_l)
 		if buf.channels > 1
-			compress(buf.r, squares_r, &gain_r)
+			compress(buf.c[1], squares_r, &gain_r)
+		if buf.channels > 2
+			session.e("Compressor: channels>2")
 
 class CompressorGrid extends Grid
 	int hover, selected

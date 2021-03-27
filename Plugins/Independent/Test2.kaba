@@ -9,15 +9,15 @@ class Test extends TsunamiPlugin
 		AudioBuffer buf
 		buf.resize(CHUNK_SIZE * NUM_CHUNKS)
 		float omega = 0.13
-		for i in 0:buf.length
-			buf.r[i] = sin(omega * i)
+		for i in 0:len(buf)
+			buf.c[0][i] = sin(omega * i)
 		
 		for j in 0:NUM_CHUNKS
 			print("-----")
 			complex[] c
 			float[] b, b2
 			for i in 0:CHUNK_SIZE
-				b.add(buf.r[i + j*CHUNK_SIZE])
+				b.add(buf.c[0][i + j*CHUNK_SIZE])
 			fft_r2c(b, c)
 			for i in 20:25
 				c[i].x = 0
@@ -28,13 +28,13 @@ class Test extends TsunamiPlugin
 			fft_c2r_inv(c, b2)
 			b2 /= CHUNK_SIZE
 			for i in 0:CHUNK_SIZE
-				buf.l[i + j*CHUNK_SIZE] = b2[i]
+				buf.c[1][i + j*CHUNK_SIZE] = b2[i]
 		
 		float dmax = 0
 		float step_max = 0
 		for i in 1:buf.length
-			dmax = max(dmax, abs(buf.l[i] - buf.r[i]))
-			step_max = max(step_max, abs(buf.l[i] - buf.l[i-1]))
+			dmax = max(dmax, abs(buf.c[1][i] - buf.c[0][i]))
+			step_max = max(step_max, abs(buf.c[1][i] - buf.c[1][i-1]))
 			if step_max > 0.2
 				print("AAAAARGH!!!!!!")
 				print(i)
@@ -42,6 +42,6 @@ class Test extends TsunamiPlugin
 		print("________")
 		print(dmax)
 		print(step_max)
-		print(buf.l.max())
+		print(buf.c[1].max())
 		
 		stop()

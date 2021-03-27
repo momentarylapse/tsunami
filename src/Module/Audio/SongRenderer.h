@@ -96,7 +96,7 @@ public:
 	bool allow_loop;
 	bool loop;
 
-	float get_peak(const Track *track);
+	void get_peak(const Track *track, float p[2]);
 	void clear_peaks();
 };
 

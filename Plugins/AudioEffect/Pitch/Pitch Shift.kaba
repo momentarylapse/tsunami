@@ -55,9 +55,8 @@ class PitchShift extends AudioEffect
 		b /= N
 
 	void process_chunk(out AudioBuffer buf)
-		shift_buf(buf.l, config.factor)
-		if buf.channels > 1
-			shift_buf(buf.r, config.factor)
+		for c in buf.c
+			shift_buf(c, config.factor)
 			
 		int other = 1 - prev_no
 			
@@ -66,8 +65,8 @@ class PitchShift extends AudioEffect
 		print("{{len(buf)}}  {{n}}")
 		for i in 0:n
 			float t = float(i) / n
-			buf.l[i] = t * buf.l[i] + (1-t) * prev_chunk[other].l[i]
-			buf.r[i] = t * buf.r[i] + (1-t) * prev_chunk[other].r[i]
+			for c,k in buf.c
+				buf.c[k][i] = t * buf.c[k][i] + (1-t) * prev_chunk[other].c[k][i]
 		
 		prev_no = other
 		

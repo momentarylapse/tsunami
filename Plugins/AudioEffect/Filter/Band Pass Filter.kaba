@@ -14,8 +14,8 @@ class LowPassFilter extends AudioEffect
 	Config config
 	
 	
-	float[2] _in, _out
-	bool[2] used
+	float[] _in, _out
+	bool[] used
 	
 	override void reset_state()
 		used[0] = false
@@ -51,6 +51,8 @@ class LowPassFilter extends AudioEffect
 		_out[c] = buf[len(buf) - 1]
 		
 	override void process(out AudioBuffer buf)
-		do(buf.r, 0)
-		if buf.channels > 1
-			do(buf.l, 1)
+		_in.resize(buf.channels)
+		_out.resize(buf.channels)
+		used.resize(buf.channels)
+		for c,i in buf.c
+			do(c, i)

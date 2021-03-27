@@ -83,7 +83,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	song_renderer = sr;
 	track = t;
 	offset = 0;
-	peak = 0;
+	peak[0] = peak[1] = 0;
 	direct_mode = song_renderer and song_renderer->direct_mode;
 	if (direct_mode)
 		synth = t->synth;
@@ -414,10 +414,10 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list) {
 		}
 }
 
-float get_max_volume(AudioBuffer &buf) {
+float get_max_volume(const Array<float> &buf) {
 	float peak = 0;
-	for (int i=0; i<buf.length; i++)
-		peak = max(peak, (float)fabs(buf.c[0][i]));
+	for (int i=0; i<buf.num; i++)
+		peak = max(peak, (float)fabs(buf[i]));
 	return peak;
 }
 
@@ -432,7 +432,8 @@ int TrackRenderer::read(AudioBuffer &buf) {
 
 	buf.mix_stereo(track->volume, track->panning);
 
-	peak = max(peak, get_max_volume(buf));
+	peak[0] = max(peak[0], get_max_volume(buf.c[0]));
+	peak[1] = max(peak[1], get_max_volume(buf.c[1]));
 	perf_end();
 	return buf.length;
 }

@@ -5,4 +5,4 @@ use tsunami
 class RToL extends AudioEffect
 	override void process(out AudioBuffer buf)
 		if buf.channels > 1
-			buf.l = buf.r
+			buf.c[0] = buf.c[1]

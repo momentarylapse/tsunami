@@ -101,7 +101,7 @@ class ShowSpectrum extends SongPlugin
 	
 		complex[] fr, fl
 	
-		int len2 = len(buf.r) / 2 + 1
+		int len2 = len(buf) / 2 + 1
 		fr.resize(len2)
 		fl.resize(len2)
 		#ff.clear()
@@ -109,7 +109,7 @@ class ShowSpectrum extends SongPlugin
 		#fft_r2c(buf.l, fl)
 		buf.get_spectrum(fr, fl, 4096)
 	
-		float ww = float(len(buf.r)) / song.sample_rate
+		float ww = float(len(buf)) / song.sample_rate
 		for i in 0:N
 			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))

@@ -42,9 +42,8 @@ class HullCurve extends AudioEffect
 			b[i] = b[i] * pow(10, db / 20)
 
 	override void process(out AudioBuffer buf)
-		hull(buf.l)
-		if buf.channels > 1
-			hull(buf.r)
+		for c in buf.c
+			hull(c)
 
 	override ConfigPanel *create_panel()
 		return new HullCurvePanel(self)

@@ -276,7 +276,7 @@ class UnisonRenderer extends PitchRenderer
 				osc.phi[k] = phi
 			
 			# transport
-			buf.l[i] += output
+			buf.c[0][i] += output
 		buf.auto_generate_channels()
 		return true
 

@@ -173,7 +173,7 @@ class HammondRenderer extends PitchRenderer
 		for i in 1:NUM_HARMONICS
 			b += osci[i].read(n) * (synth.config.intensity[i] * A[i])
 
-		buf.l += b * env.read(n)
+		buf.c[0] += b * env.read(n)
 		#for i in 0:len(buf)
 #
 #			float d = 0
@@ -188,7 +188,7 @@ class HammondRenderer extends PitchRenderer
 		#env.read(len(buf))
 
 		if stutter_offset < len(stutter)
-			buf.l *= stutter[stutter_offset:]
+			buf.c[0] *= stutter[stutter_offset:]
 			stutter_offset += len(buf)
 		buf.auto_generate_channels()
 		filter.apply(buf)

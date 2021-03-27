@@ -4,13 +4,11 @@ use tsunami
 
 class Reverse extends AudioEffect
 	override void process(out AudioBuffer buf)
-		int n = buf.length / 2
-		for i in 0:n
-			int j = buf.length - i - 1
-			float x = buf.r[i]
-			buf.r[i] = buf.r[j]
-			buf.r[j] = x
-			x = buf.l[i]
-			buf.l[i] = buf.l[j]
-			buf.l[j] = x
+		int n = len(buf) / 2
+		for c in buf.c
+			for i in 0:n
+				int j = len(buf) - i - 1
+				float x = c[i]
+				c[i] = c[j]
+				c[j] = x
 

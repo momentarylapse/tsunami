@@ -269,8 +269,8 @@ void PluginManager::link_app_script_data() {
 	kaba::declare_class_element("AudioBuffer.length", &AudioBuffer::length);
 	kaba::declare_class_element("AudioBuffer.channels", &AudioBuffer::channels);
 	kaba::declare_class_element("AudioBuffer.c", &AudioBuffer::c);
-	kaba::_declare_class_element("AudioBuffer.l", _offsetof(AudioBuffer, c[0]));
-	kaba::_declare_class_element("AudioBuffer.r", _offsetof(AudioBuffer, c[1]));
+	//kaba::_declare_class_element("AudioBuffer.l", _offsetof(AudioBuffer, c[0]));
+	//kaba::_declare_class_element("AudioBuffer.r", _offsetof(AudioBuffer, c[1]));
 	kaba::declare_class_element("AudioBuffer.peaks", &AudioBuffer::peaks);
 	kaba::link_external_class_func("AudioBuffer.__init__", &AudioBuffer::__init__);
 	kaba::link_external_class_func("AudioBuffer.__delete__", &AudioBuffer::__delete__);
@@ -278,6 +278,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("AudioBuffer.__assign__", &AudioBuffer::__assign__);
 	kaba::link_external_class_func("AudioBuffer.range", &AudioBuffer::range);
 	kaba::link_external_class_func("AudioBuffer.resize", &AudioBuffer::resize);
+	kaba::link_external_class_func("AudioBuffer.set_channels", &AudioBuffer::set_channels);
 	kaba::link_external_class_func("AudioBuffer.add", &AudioBuffer::add);
 	kaba::link_external_class_func("AudioBuffer.set", &AudioBuffer::set);
 	kaba::link_external_class_func("AudioBuffer.set_as_ref", &AudioBuffer::set_as_ref);

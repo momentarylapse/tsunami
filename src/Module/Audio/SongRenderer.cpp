@@ -314,18 +314,19 @@ void SongRenderer::update_tracks() {
 	}
 }
 
-float SongRenderer::get_peak(const Track *t) {
+void SongRenderer::get_peak(const Track *t, float p[2]) {
 	for (auto &tr: tracks)
 		if (tr->track.get() == t) {
-			float r = tr->peak;
-			tr->peak = 0;
-			return r;
+			p[0] = tr->peak[0];
+			p[1] = tr->peak[1];
+			tr->peak[0] = 0;
+			tr->peak[1] = 0;
+			return;
 		}
-	return 0;
 }
 
 void SongRenderer::clear_peaks() {
 	for (auto &tr: tracks)
-		tr->peak = 0;
+		tr->peak[0] = tr->peak[1] = 0;
 }
 

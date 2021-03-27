@@ -247,21 +247,20 @@ class BiquadFilter
 				prev_y[i] = 0
 			
 	Parameters params
-	ChannelState l, r
+	ChannelState[] state
 
 	void __init__()
 		reset()
 	void reset()
-		l.reset()
-		r.reset()
+		for s in state
+			s.reset()
 	void create(int mode, float freq, float q, float gain, float _sample_rate)
 		params.create(mode, freq, q, gain, _sample_rate)
 	void apply(out AudioBuffer buf)
-		let input_l = buf.l
-		params.apply(input_l, buf.l, l.prev_x, l.prev_y)
-		if buf.channels > 1
-			let input_r = buf.r
-			params.apply(input_r, buf.r, r.prev_x, r.prev_y)
+		state.resize(buf.channels)
+		for c,i in buf.c
+			let input = buf.c[i]
+			params.apply(input, c, state[i].prev_x, state[i].prev_y)
 
 
 

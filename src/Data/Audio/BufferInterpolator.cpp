@@ -10,8 +10,7 @@
 #include "AudioBuffer.h"
 
 
-void BufferInterpolator::interpolate_channel_linear(Array<float> &in, Array<float> &out)
-{
+void BufferInterpolator::interpolate_channel_linear(Array<float> &in, Array<float> &out) {
 	out[0] = in[0];
 	out.back() = in.back();
 
@@ -26,17 +25,15 @@ void BufferInterpolator::interpolate_channel_linear(Array<float> &in, Array<floa
 	}
 }
 
-double BufferInterpolator::cubic_inter(double A, double B, double C, double D, float t)
-{
+double BufferInterpolator::cubic_inter(double A, double B, double C, double D, float t) {
 	double a = D/2 - C*3.0/2 + B*3.0/2 - A/2;
 	double b = A - B*5.0/2 + C*2 - D/2;
 	double c = (C-A)/2;
 	return a*t*t*t + b*t*t + c*t + B;
 }
 
-void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float> &out)
-{
-	if (in.num < 3){
+void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float> &out) {
+	if (in.num < 3) {
 		interpolate_channel_linear(in, out);
 		return;
 	}
@@ -49,17 +46,16 @@ void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float
 		double t = x - j;
 		if (j >= 1 and j < in.num - 2) {
 			out[i] = cubic_inter(in[j-1], in[j], in[j+1], in[j+2], t);
-		}else if (j == 0){
+		} else if (j == 0) {
 			out[i] = cubic_inter(in[1], in[0], in[1], in[2], t);
-		}else if (j == in.num - 2){
+		} else if (j == in.num - 2) {
 			out[i] = cubic_inter(in[j-1], in[j], in[j+1], in[j], t);
 		}
 	}
 }
 
 
-void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<float> &out)
-{
+void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
 	Array<complex> z;
 
 	FastFourierTransform::fft_r2c(in, z);
@@ -70,8 +66,7 @@ void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<flo
 	out.resize(size);
 }
 
-void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out, Method method)
-{
+void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out, Method method) {
 	if (method == Method::LINEAR) {
 		interpolate_channel_linear(in, out);
 	} else if (method == Method::CUBIC) {
@@ -83,8 +78,7 @@ void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out
 	}
 }
 
-void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, Method method)
-{
+void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, Method method) {
 	out.set_channels(in.channels);
 	out.offset = in.offset;
 	for (int i=0; i<in.channels; i++)

@@ -22,8 +22,8 @@ class VolumeChecker extends SongPlugin
 			if n < 0
 				break
 			
-			float _max = max(buf.r.max(), buf.l.max())
-			float _min = min(buf.r.min(), buf.l.min())
+			float _max = max(buf.c[0].max(), buf.c[1].max())
+			float _min = min(buf.c[0].min(), buf.c[1].min())
 			vol_max = max(vol_max, max(abs(_max), abs(_min)))
 			done += n
 			p.set("checking", float(done) / float(range.length))

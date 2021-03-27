@@ -5,7 +5,4 @@ use tsunami
 class Swap extends AudioEffect
 	override void process(out AudioBuffer buf)
 		if buf.channels > 1
-			float[] temp
-			temp = buf.l
-			buf.l = buf.r
-			buf.r = temp
+			buf.c.swap(0, 1)

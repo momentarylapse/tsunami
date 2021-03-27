@@ -35,7 +35,7 @@ public:
 	bool direct_mode;
 	int offset;
 
-	float peak;
+	float peak[2];
 
 	void set_pos(int pos);
 

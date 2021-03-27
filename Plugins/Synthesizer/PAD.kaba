@@ -82,11 +82,11 @@ class PADRenderer extends PitchRenderer
 		for i in 0:len(buf)
 			float d = prebuf[pos]
 				
-			buf.l[i] += d
+			buf.c[0][i] += d
 			pos ++
 			if pos >= N
 				pos = 0
-		buf.l *= env.read(len(buf))
+		buf.c[0] *= env.read(len(buf))
 		buf.auto_generate_channels()
 		return !env.just_killed
 	

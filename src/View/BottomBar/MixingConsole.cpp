@@ -276,8 +276,12 @@ public:
 		p->set_color(AudioView::colors.background);
 		p->draw_rect(0, 0, w, h);
 		p->set_color(AudioView::colors.text);
-		float f = sqrt(console->view->renderer->get_peak(track));
-		p->draw_rect(0, h * (1 - f), w, h * f);
+		float peak[2];
+		console->view->renderer->get_peak(track, peak);
+		peak[0] = sqrt(peak[0]);
+		peak[1] = sqrt(peak[1]);
+		p->draw_rect(0,   h * (1 - peak[0]), w/2, h * peak[0]);
+		p->draw_rect(w/2, h * (1 - peak[1]), w/2, h * peak[1]);
 	}
 	string nice_title() {
 		string s = track->nice_name();

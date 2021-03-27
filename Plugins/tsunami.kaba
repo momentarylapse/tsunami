@@ -187,7 +187,8 @@ class AudioVisualizer extends Module
 class AudioBuffer
 	int offset, length
 	int channels
-	float[] l, r
+	#float[] l, r
+	float[][] c
 	string[] peaks
 	extern void __init__()
 	extern void __delete__()
@@ -195,6 +196,7 @@ class AudioBuffer
 	extern void clear()
 	extern const Range range()
 	extern void resize(int length)
+	extern void set_channels(int channels)
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume)
 	#extern void mix_stereo(float volume, float panning)
@@ -202,16 +204,14 @@ class AudioBuffer
 	extern selfref AudioBuffer __subarray__(int start, int end)
 	extern const void get_spectrum(out complex[] spec_r, out complex[] spec_l, int samples)
 	void scale(float factor)
-		l *= factor
-		if channels > 1
-			r *= factor
+		for cc in c
+			cc *= factor
 	void __imul__(float[] f)
-		l *= f
-		if channels > 1
-			r *= f
+		for cc in c
+			cc *= f
 	void auto_generate_channels()
 		if channels > 1
-			r = l
+			c[1] = c[0]
 
 extern void interpolate_buffer(AudioBuffer in, out AudioBuffer out, int method)
 

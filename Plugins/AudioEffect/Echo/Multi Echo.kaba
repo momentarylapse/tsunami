@@ -22,7 +22,7 @@ class MultiEcho extends AudioEffect
 	Config config
 	
 	class ReflectorState
-		float[] buf_r, buf_l
+		AudioBuffer buf
 		int offset
 	ReflectorState[] refl
 
@@ -51,12 +51,11 @@ class MultiEcho extends AudioEffect
 		refl.resize(n)
 		for r,i in refl
 			int delay_samples = session.sample_rate() * config.refl[i].delay
-			r.buf_l.resize(delay_samples)
-			r.buf_r.resize(delay_samples)
+			r.buf.set_channels(buf.channels)
+			r.buf.resize(delay_samples)
 	
-			do_delay(buf.l, r.buf_l, r, config.refl[i])
-			if buf.channels > 1
-				do_delay(buf.r, r.buf_r, r, config.refl[i])
+			for c,k in buf.c
+				do_delay(c, r.buf.c[k], r, config.refl[i])
 	
 			r.offset += len(buf)
 	

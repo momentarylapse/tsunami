@@ -22,7 +22,7 @@ class Echo extends AudioEffect
 			feedback = 0.5
 			delay = 0.15
 	Config config
-	float[] buf_r, buf_l
+	AudioBuffer buf_temp
 	int offset
 
 
@@ -48,17 +48,15 @@ class Echo extends AudioEffect
 	override void process(out AudioBuffer buf)
 
 		int delay_samples = session.sample_rate() * config.delay
-		buf_r.resize(delay_samples)
-		buf_l.resize(delay_samples)
+		buf_temp.set_channels(buf.channels)
+		buf_temp.resize(delay_samples)
 	
-		do_delay(buf.l, buf_l)
-		if buf.channels > 1
-			do_delay(buf.r, buf_r)
+		for c,i in buf.c
+			do_delay(c, buf_temp.c[i])
 	
 		offset += len(buf)
 	
 	override void reset_state()
-		buf_r.clear()
-		buf_l.clear()
+		buf_temp.clear()
 		offset = 0
 		on_config()

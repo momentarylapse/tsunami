@@ -38,13 +38,15 @@ const int MAX_CHANNELS = 16;
 AudioBuffer::AudioBuffer() {
 	offset = 0;
 	length = 0;
-	channels = 2;
+	channels = 0;
+	set_channels(2);
 }
 
 AudioBuffer::AudioBuffer(int _length, int _channels) {
 	offset = 0;
 	length = 0;
-	channels = _channels;
+	channels = 0;
+	set_channels(_channels);
 	resize(_length);
 }
 
@@ -53,8 +55,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i] = b.c[i];
+	c = b.c;
 }
 
 // move constructor
@@ -62,8 +63,7 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i] = std::move(b.c[i]);
+	c = std::move(b.c);
 }
 
 void AudioBuffer::__init__() {
@@ -79,8 +79,7 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i] = b.c[i];
+	c = b.c;
 	peaks = b.peaks;
 }
 
@@ -89,23 +88,22 @@ void AudioBuffer::operator=(AudioBuffer &&b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i] = std::move(b.c[i]);
+	c = std::move(b.c);
 	peaks = std::move(b.peaks);
 }
 
 AudioBuffer::~AudioBuffer() {}
 
 void AudioBuffer::clear() {
-	for (int i=0; i<MAX_CHANNELS; i++)
-		c[i].clear();
+	for (auto &cc: c)
+		cc.clear();
 	length = 0;
 	peaks.clear();
 }
 
 void AudioBuffer::set_zero() {
-	for (int i=0; i<channels; i++)
-		memset(&c[i][0], 0, sizeof(float) * length);
+	for (auto &cc: c)
+		memset(&cc[0], 0, sizeof(float) * length);
 	peaks.clear();
 }
 
@@ -115,14 +113,14 @@ void AudioBuffer::set_channels(int new_channels) {
 	if (channels == new_channels)
 		return;
 
-	// add new channels
-	for (int i=MEM_CHANNELS; i<max(new_channels, MIN_CHANNELS); i++)
-		c[i].resize(length);
-	// remove old channels
-	for (int i=max(new_channels, MIN_CHANNELS); i<MEM_CHANNELS; i++)
-		c[i].clear();
-
+	int c_num_before = c.num;
 	channels = new_channels;
+	c.resize(MEM_CHANNELS);
+
+	// add new channels
+	for (int i=c_num_before; i<c.num; i++)
+		c[i].resize(length);
+
 	peaks.clear();
 }
 
@@ -144,8 +142,8 @@ void AudioBuffer::resize(int _length) {
 
 	if (_length < length)
 		_truncate_peaks(_length);
-	for (int i = 0; i < MEM_CHANNELS; i++)
-		c[i].resize(_length);
+	for (auto &cc: c)
+		cc.resize(_length);
 	length = _length;
 }
 
@@ -163,15 +161,14 @@ void fa_make_own(Array<float> &a) {
 void AudioBuffer::make_own() {
 	if (is_ref()) {
 		//msg_write("bb::make_own!");
-		for (int i=0; i<MEM_CHANNELS; i++)
-			fa_make_own(c[i]);
+		for (auto &cc: c)
+			fa_make_own(cc);
 	}
 }
 
 void AudioBuffer::swap_ref(AudioBuffer &b) {
 	// buffer
-	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i].exchange(b.c[i]);
+	c.exchange(b.c);
 
 	// peaks
 	peaks.exchange(b.peaks);
@@ -189,16 +186,15 @@ void AudioBuffer::append(const AudioBuffer &b) {
 
 void float_array_swap_values(Array<float> &a, Array<float> &b) {
 	for (int i=0;i<a.num;i++) {
-		float t = a[i];
-		a[i] = b[i];
-		b[i] = t;
+		std::swap(a[i], b[i]);
 	}
 }
 
+// USAGE???
 void AudioBuffer::swap_value(AudioBuffer &b) {
 	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
-	for (int i=0; i<MEM_CHANNELS; i++)
+	for (int i=0; i<min(channels, b.channels); i++)
 		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
@@ -325,6 +321,7 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 	length = _length;
 	offset = _offset + source.offset;
 	channels = source.channels;
+	c.resize(MEM_CHANNELS);
 	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i].set_ref(source.c[i].sub(_offset, _length));
 }

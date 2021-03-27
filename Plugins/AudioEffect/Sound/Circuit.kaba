@@ -21,7 +21,7 @@ class CircuitEffect extends AudioEffect
 	
 	override void process(out AudioBuffer buf)
 		float dt = 1.0 / session.sample_rate()
-		for f in buf.l
+		for f in buf.c[0]
 			float I_in = f / 40
 			c.time_step(I_in, dt)
 			f = c.nodes[1].phi / 2

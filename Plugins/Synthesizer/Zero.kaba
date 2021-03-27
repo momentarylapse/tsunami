@@ -17,11 +17,11 @@ class ZeroRenderer extends PitchRenderer
 		if fade_out
 			for i in 0:len(buf)
 				volume *= 0.999
-				buf.l[i] += sin(phase) * volume
+				buf.c[0][i] += sin(phase) * volume
 				phase += delta_phi
 		else
 			for i in 0:len(buf)
-				buf.l[i] += sin(phase) * volume
+				buf.c[0][i] += sin(phase) * volume
 				phase += delta_phi
 	
 		buf.auto_generate_channels()

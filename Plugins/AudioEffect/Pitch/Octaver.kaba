@@ -17,6 +17,5 @@ class Octaver extends AudioEffect
 			bb = (bb * bb) * config.level + bb * (1 - config.level)
 
 	override void process(out AudioBuffer buf)
-		do_octaver(buf.l)
-		if buf.channels > 1
-			do_octaver(buf.r)
+		for c in buf.c
+			do_octaver(c)

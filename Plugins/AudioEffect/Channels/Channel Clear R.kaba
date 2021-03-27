@@ -5,4 +5,4 @@ use tsunami
 
 class ClearR extends AudioEffect
 	override void process(out AudioBuffer buf)
-		buf.r = 0
+		buf.c[1] = 0

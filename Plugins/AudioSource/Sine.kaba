@@ -17,12 +17,13 @@ class SineSource extends AudioSource
 	int offset
 	override void reset_state()
 		offset = 0
-	override int read(out AudioBuffer buf)
+	void create_sin(out float[] buf)
 		let f = pitch_to_freq(config.pitch)
 		float w_f = 1.0 / float(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
 		for i in 0:len(buf)
-			buf.l[i] = sin((i + offset) * w_f) * config.volume
-		if buf.channels > 1
-			buf.r = buf.l
+			buf[i] = sin((i + offset) * w_f) * config.volume
+	override int read(out AudioBuffer buf)
+		for c in buf.c
+			create_sin(c)
 		offset += len(buf)
 		return len(buf)

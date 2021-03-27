@@ -362,6 +362,10 @@ void AudioOutput::_kill_dev() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
+		pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
+		pa_stream_set_write_callback(pulse_stream, nullptr, nullptr);
+		pa_stream_set_underflow_callback(pulse_stream, nullptr, nullptr);
+
 		pa_stream_disconnect(pulse_stream);
 		_pulse_test_error("pa_stream_disconnect");
 

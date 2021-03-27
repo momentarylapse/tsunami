@@ -71,7 +71,7 @@ public:
 	static const int PEAK_CHUNK_SIZE;
 	static const int PEAK_OFFSET_EXP;
 	static const int PEAK_FINEST_SIZE;
-	static const int PEAK_MAGIC_LEVEL4;
+	static const int PEAK_MAGIC_LEVEL2;
 
 	void _cdecl invalidate_peaks(const Range &r);
 

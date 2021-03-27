@@ -51,6 +51,8 @@ enum class ModuleType {
 	// plug-in (not really Modules)
 	SONG_PLUGIN,
 	TSUNAMI_PLUGIN,
+	// internal stuff
+	OTHER,
 };
 
 enum class ModuleCommand {

@@ -8,8 +8,8 @@
 #include "FavoriteManager.h"
 #include "../Module/Module.h"
 #include "../lib/base/pointer.h"
-#include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
+#include "../lib/xfile/xml.h"
 #include "../Tsunami.h"
 #include "../Session.h"
 
@@ -26,40 +26,56 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 	if (!file_exists(filename))
 		return;
 	try {
-		auto f = ownify(FileOpenText(filename));
-		int n = f->read_int();
-		for (int i=0; i<n; i++) {
+		xml::Parser p;
+		p.load(filename);
+		if (p.elements.num == 0)
+			throw Exception("no root element");
+		auto &root = p.elements[0];
+		auto *mm = root.find("list");
+		for (auto &e: mm->elements) {
 			Favorite ff;
-			string type = f->read_str();
-			ff.type = Module::type_from_name(type);
-			ff.config_name = f->read_str();
-			ff.name = f->read_str();
-			ff.options = f->read_str();
+			string cat = e.value("category");
+			ff.type = Module::type_from_name(cat);
+			ff.config_name = e.value("class");
+			ff.name = e.value("name");
+			ff.version = e.value("version")._int();
+			ff.options = e.text;
 			ff.read_only = read_only;
-			ff.version = Module::VERSION_LEGACY;
 			set(ff);
 		}
 	} catch (Exception &e) {
-		session->e(e.message());
+		session->e("loading profile: " + e.message());
 	}
 }
 
 void FavoriteManager::load(Session *session) {
-	load_from_file(tsunami->directory_static << "favorites_demo.txt", true, session);
-	load_from_file(tsunami->directory << "favorites.txt", false, session);
+	load_from_file(tsunami->directory_static << "profiles-demo.xml", true, session);
+	load_from_file(tsunami->directory << "profiles.xml", false, session);
+	save(session);
 	loaded = true;
 }
 
 void FavoriteManager::save(Session *session) {
 	try {
-		auto f = ownify(FileCreateText(tsunami->directory << "favorites.txt"));
-		f->write_int(favorites.num);
-		for (Favorite &ff: favorites) {
-			f->write_str(Module::type_to_name(ff.type));
-			f->write_str(ff.config_name);
-			f->write_str(ff.name);
-			f->write_str(ff.options);
-		}
+		xml::Parser p;
+		xml::Element root("profiles");
+		xml::Element hh("head");
+		hh.add_attribute("version", "1.0");
+		root.add(hh);
+		xml::Element mm("list");
+		for (Favorite &ff: favorites)
+			if (!ff.read_only) {
+				xml::Element e("profile");
+				e.add_attribute("category", Module::type_to_name(ff.type));
+				e.add_attribute("class", ff.config_name);
+				e.add_attribute("version", i2s(ff.version));
+				e.add_attribute("name", ff.name);
+				e.text = ff.options;
+				mm.add(e);
+			}
+		root.add(mm);
+		p.elements.add(root);
+		p.save(tsunami->directory << "profiles.xml");
 	} catch (Exception &e) {
 		session->e(e.message());
 	}
@@ -167,9 +183,7 @@ public:
 };
 
 string FavoriteManager::select_name(hui::Window *win, Module *c, bool save) {
-	auto dlg = new FavoriteSelectionDialog(win, get_list(c), save);
+	auto dlg = ownify(new FavoriteSelectionDialog(win, get_list(c), save));
 	dlg->run();
-	string sel = dlg->selection;
-	delete dlg;
-	return sel;
+	return dlg->selection;
 }

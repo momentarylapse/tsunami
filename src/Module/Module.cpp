@@ -229,6 +229,8 @@ string Module::type_to_name(ModuleType type) {
 		return "SignalChain";
 	if (type == ModuleType::TSUNAMI_PLUGIN)
 		return "TsunamiPlugin";
+	if (type == ModuleType::OTHER)
+		return "Other";
 	return "???";
 }
 
@@ -256,6 +258,10 @@ ModuleType Module::type_from_name(const string &str) {
 		return ModuleType::AUDIO_VISUALIZER;
 	if (str == "SignalChain")
 		return ModuleType::SIGNAL_CHAIN;
+	if (str == "TsunamiPlugin")
+		return ModuleType::TSUNAMI_PLUGIN;
+	if (str == "Other")
+		return ModuleType::OTHER;
 	return (ModuleType)-1;
 }
 

@@ -36,6 +36,9 @@ public:
 	bool on_right_button_down() override;
 	void on_update();
 	void enable(bool enabled);
+	void set_channel_map(const Array<int> &channel_map);
+
+	static int good_size(int num_channels);
 
 private:
 
@@ -52,6 +55,11 @@ private:
 	Mode mode_constraint;
 
 	bool enabled;
+
+	Array<int> channel_map;
+
+	static const int SPACE_BETWEEN_CHANNELS;
+	static const int CHANNEL_SIZE_RECOMMENDED;
 };
 
 #endif /* PEAKMETERDISPLAY_H_ */

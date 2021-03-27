@@ -14,6 +14,9 @@
 #include "../../Module/Audio/PeakMeter.h"
 
 
+const int PeakMeterDisplay::SPACE_BETWEEN_CHANNELS = 2;
+const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 6;
+
 PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	align.w = 120;
 	align.h = 25;
@@ -75,7 +78,23 @@ void PeakMeterDisplay::enable(bool _enabled) {
 	enabled = _enabled;
 }
 
+void make_channel_map_canonical(Array<int> &channel_map) {
+	for (int i=0; i<channel_map.num; i++)
+		if (channel_map[i] < 0)
+			channel_map[i] = i;
+}
+
+void PeakMeterDisplay::set_channel_map(const Array<int> &_channel_map) {
+	channel_map = _channel_map;
+	make_channel_map_canonical(channel_map);
+	//msg_write("PMD map " + ia2s(channel_map));
+}
+
 void PeakMeterDisplay::connect() {
+	channel_map = {};
+	for (int i=0; i<source->channels.num; i++)
+		channel_map.add(i);
+
 	source->subscribe(this, [=]{ on_update(); });
 	if (mode == Mode::SPECTRUM)
 		source->request_spectrum();
@@ -145,7 +164,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 
 	if (mode == Mode::PEAKS) {
 
-		float bb = 2;
+		float bb = SPACE_BETWEEN_CHANNELS;
 		if (w > h) {
 			float dy = (h + bb) / channels.num - bb;
 			for (int i=0; i<channels.num; i++)
@@ -192,9 +211,15 @@ bool PeakMeterDisplay::on_right_button_down() {
 // in PeakMeter/SignalChain's thread
 void PeakMeterDisplay::on_update() {
 	if (source) {
-		channels = source->channels;
+		channels.clear();
+		for (int &c: channel_map)
+			channels.add(source->channels[min(c, source->channels.num-1)]);
 	}
 	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	if (panel)
 		panel->redraw(id);
+}
+
+int PeakMeterDisplay::good_size(int num_channels) {
+	return (CHANNEL_SIZE_RECOMMENDED + SPACE_BETWEEN_CHANNELS) * num_channels - SPACE_BETWEEN_CHANNELS;
 }

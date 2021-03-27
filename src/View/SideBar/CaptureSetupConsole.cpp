@@ -37,20 +37,42 @@ public:
 		num_in = _n_in;
 		num_out = _n_out;
 		peak_meter = pm;
+		map.resize(num_out);
+
 		from_resource("channel-mapper-dialog");
 		set_target("grid");
+		add_label("def", 1, 0, "l-in-def");
 		for (int i=0; i<num_in; i++)
-			add_label(format("in %d", i), 1+i, 0, format("l-in-%d", i));
+			add_label(format("in %d", i), 2+i, 0, format("l-in-%d", i));
 		for (int o=0; o<num_out; o++)
 			add_label(format("out %d", o), 0, 1+o, format("l-out-%d", o));
 
-		for (int i=0; i<num_in; i++)
-			for (int o=0; o<num_out; o++)
-				add_check_box("", 1+i, 1+o, format("c-%d-%d", i, o));
+		for (int i=-1; i<num_in; i++)
+			for (int o=0; o<num_out; o++) {
+				string id = format("c-%d:%d", o, i);
+				add_radio_button("", 2+i, 1+o, id);
+				if (map[o] == i)
+					check(id, true);
+				event(id, [&] {
+					auto xx = hui::GetEvent()->id.substr(2, -1).explode(":");
+					int oo = xx[0]._int();
+					int ii = xx[1]._int();
+					//if (is_checked(id)) {
+						map[oo] = ii;
+
+						//msg_write(format(" %d %d   ", ii, oo) + ia2s(map));
+						peak_meter_display_out->set_channel_map(map);
+					//}
+				});
+			}
 
 
 		peak_meter_display_in = new PeakMeterDisplay(this, "peaks-in", peak_meter);
+		set_options("peaks-in", format("height=%d", PeakMeterDisplay::good_size(num_in)));
 		peak_meter_display_out = new PeakMeterDisplay(this, "peaks-out", peak_meter);
+		set_options("peaks-out", format("height=%d", PeakMeterDisplay::good_size(num_out)));
+
+		peak_meter_display_out->set_channel_map(map);
 	}
 };
 
@@ -98,6 +120,10 @@ void CaptureSetupConsole::on_enter() {
 		//add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		add_label("Source", 0, 0, c.id_type);
 		if (t->type == SignalType::AUDIO) {
+			for (int i=0; i<t->channels; i++)
+				c.channel_map.add(-1);
+
+
 			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
 			add_combo_box(_("        - none -"), 1, 0, c.id_source);
 			for (Device *d: sources_audio)
@@ -128,7 +154,7 @@ void CaptureSetupConsole::on_enter() {
 			chain->connect(c.peak_meter, 0, out, 0);
 			data.add({c.track, c.input_midi, nullptr});
 		}
-		add_drawing_area("!height=30,noexpandy", 1, 1, c.id_peaks);
+		add_drawing_area(format("!height=%d,noexpandy", PeakMeterDisplay::good_size(t->channels)), 1, 1, c.id_peaks);
 		c.peak_meter_display = new PeakMeterDisplay(this, c.id_peaks, c.peak_meter);
 
 		items.add(c);
@@ -146,6 +172,7 @@ void CaptureSetupConsole::on_enter() {
 				auto dlg = new ChannelMapDialog(this, c.device->channels, c.track->channels, c.channel_map, c.peak_meter);
 				dlg->run();
 				delete dlg;
+				c.peak_meter_display->set_channel_map(c.channel_map);
 			});
 		}
 }

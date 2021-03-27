@@ -1,28 +1,25 @@
 /*
- * FavoriteManager.cpp
+ * ProfileManager.cpp
  *
  *  Created on: 13.04.2014
  *      Author: michi
  */
 
-#include "FavoriteManager.h"
 #include "../Module/Module.h"
 #include "../lib/base/pointer.h"
 #include "../lib/hui/hui.h"
 #include "../lib/xfile/xml.h"
 #include "../Tsunami.h"
 #include "../Session.h"
+#include "ProfileManager.h"
 
-const string FavoriteManager::DEFAULT_NAME = ":def:";
+const string ProfileManager::DEFAULT_NAME = ":def:";
 
-FavoriteManager::FavoriteManager() {
+ProfileManager::ProfileManager() {
 	loaded = false;
 }
 
-FavoriteManager::~FavoriteManager() {
-}
-
-void FavoriteManager::load_from_file(const Path &filename, bool read_only, Session *session) {
+void ProfileManager::load_from_file(const Path &filename, bool read_only, Session *session) {
 	if (!file_exists(filename))
 		return;
 	try {
@@ -33,10 +30,10 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 		auto &root = p.elements[0];
 		auto *mm = root.find("list");
 		for (auto &e: mm->elements) {
-			Favorite ff;
+			Profile ff;
 			string cat = e.value("category");
-			ff.type = Module::type_from_name(cat);
-			ff.config_name = e.value("class");
+			ff.category = Module::category_from_name(cat);
+			ff._class = e.value("class");
 			ff.name = e.value("name");
 			ff.version = e.value("version")._int();
 			ff.options = e.text;
@@ -48,14 +45,14 @@ void FavoriteManager::load_from_file(const Path &filename, bool read_only, Sessi
 	}
 }
 
-void FavoriteManager::load(Session *session) {
+void ProfileManager::load(Session *session) {
 	load_from_file(tsunami->directory_static << "profiles-demo.xml", true, session);
 	load_from_file(tsunami->directory << "profiles.xml", false, session);
 	save(session);
 	loaded = true;
 }
 
-void FavoriteManager::save(Session *session) {
+void ProfileManager::save(Session *session) {
 	try {
 		xml::Parser p;
 		xml::Element root("profiles");
@@ -63,11 +60,11 @@ void FavoriteManager::save(Session *session) {
 		hh.add_attribute("version", "1.0");
 		root.add(hh);
 		xml::Element mm("list");
-		for (Favorite &ff: favorites)
+		for (auto &ff: profiles)
 			if (!ff.read_only) {
 				xml::Element e("profile");
-				e.add_attribute("category", Module::type_to_name(ff.type));
-				e.add_attribute("class", ff.config_name);
+				e.add_attribute("category", Module::category_to_name(ff.category));
+				e.add_attribute("class", ff._class);
 				e.add_attribute("version", i2s(ff.version));
 				e.add_attribute("name", ff.name);
 				e.text = ff.options;
@@ -81,18 +78,18 @@ void FavoriteManager::save(Session *session) {
 	}
 }
 
-Array<string> FavoriteManager::get_list(Module *c) {
+Array<string> ProfileManager::get_list(Module *c) {
 	if (!loaded)
 		load(c->session);
 	Array<string> r;
-	for (Favorite &f: favorites) {
-		if ((f.type == c->module_type) and (f.config_name == c->module_subtype))
+	for (auto &f: profiles) {
+		if ((f.category == c->module_category) and (f._class == c->module_class))
 			r.add(f.name);
 	}
 	return r;
 }
 
-void FavoriteManager::apply(Module *c, const string &name, bool notify) {
+void ProfileManager::apply(Module *c, const string &name, bool notify) {
 	c->reset_config();
 	if (name == DEFAULT_NAME) {
 		if (notify)
@@ -101,20 +98,20 @@ void FavoriteManager::apply(Module *c, const string &name, bool notify) {
 	}
 	if (!loaded)
 		load(c->session);
-	for (Favorite &f: favorites) {
-		if ((f.type == c->module_type) and (f.config_name == c->module_subtype) and (f.name == name))
+	for (auto &f: profiles) {
+		if ((f.category == c->module_category) and (f._class == c->module_class) and (f.name == name))
 			c->config_from_string(f.version, f.options);
 	}
 	if (notify)
 		c->notify();
 }
 
-void FavoriteManager::save(Module *c, const string &name) {
+void ProfileManager::save(Module *c, const string &name) {
 	if (!loaded)
 		load(c->session);
-	Favorite f;
-	f.type = c->module_type;
-	f.config_name = c->module_subtype;
+	Profile f;
+	f.category = c->module_category;
+	f._class = c->module_class;
 	f.name = name;
 	f.read_only = false;
 	f.options = c->config_to_string();
@@ -122,15 +119,15 @@ void FavoriteManager::save(Module *c, const string &name) {
 	save(c->session);
 }
 
-void FavoriteManager::set(const Favorite &ff) {
-	for (Favorite &f: favorites) {
-		if ((f.type == ff.type) and (f.config_name == ff.config_name) and (f.name == ff.name)) {
+void ProfileManager::set(const Profile &ff) {
+	for (auto &f: profiles) {
+		if ((f.category == ff.category) and (f._class == ff._class) and (f.name == ff.name)) {
 			f.options = ff.options;
 			return;
 		}
 	}
 
-	favorites.add(ff);
+	profiles.add(ff);
 }
 
 
@@ -182,7 +179,7 @@ public:
 	string selection;
 };
 
-string FavoriteManager::select_name(hui::Window *win, Module *c, bool save) {
+string ProfileManager::select_name(hui::Window *win, Module *c, bool save) {
 	auto dlg = ownify(new FavoriteSelectionDialog(win, get_list(c), save));
 	dlg->run();
 	return dlg->selection;

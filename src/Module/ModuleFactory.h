@@ -12,15 +12,15 @@
 
 class Module;
 class Session;
-enum class ModuleType;
+enum class ModuleCategory;
 
 class ModuleFactory
 {
 public:
-	static Module *create(Session *session, ModuleType type, const string &sub_type);
-	static Module *_create_dummy(ModuleType type);
-	static Module *_create_special(Session *session, ModuleType type, const string &sub_type);
-	static string base_class(ModuleType);
+	static Module *create(Session *session, ModuleCategory type, const string &sub_type);
+	static Module *_create_dummy(ModuleCategory type);
+	static Module *_create_special(Session *session, ModuleCategory type, const string &sub_type);
+	static string base_class(ModuleCategory);
 };
 
 #endif /* SRC_MODULE_MODULEFACTORY_H_ */

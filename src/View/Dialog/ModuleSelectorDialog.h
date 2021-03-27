@@ -11,16 +11,16 @@
 #include "../../lib/hui/hui.h"
 
 class Session;
-enum class ModuleType;
+enum class ModuleCategory;
 
 class ModuleSelectorDialog: public hui::Dialog {
 public:
-	ModuleSelectorDialog(hui::Window *_parent, ModuleType type, Session *session, const string &old_name = "");
+	ModuleSelectorDialog(hui::Window *_parent, ModuleCategory type, Session *session, const string &old_name = "");
 
 	void on_list_select();
 	void on_select();
 
-	ModuleType type;
+	ModuleCategory type;
 	Session *session;
 	struct Label {
 		string full;

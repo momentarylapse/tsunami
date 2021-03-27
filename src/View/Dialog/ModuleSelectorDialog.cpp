@@ -20,12 +20,12 @@ ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 	return l;
 }
 
-ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleType _type, Session *_session, const string &old_name) :
+ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory _type, Session *_session, const string &old_name) :
 	hui::Dialog("configurable-selection-dialog", _parent)
 {
 	type = _type;
 	session = _session;
-	set_title(Module::type_to_name(type));
+	set_title(Module::category_to_name(type));
 	auto tnames = session->plugin_manager->find_module_sub_types_grouped(type);
 
 	for (string &s: tnames) {

@@ -519,7 +519,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 	color cc = colors.text;
 	cc.a = 0.4f;
 	Array<SampleRef*> *p = nullptr;
-	if (synth and (synth->module_subtype == "Sample")) {
+	if (synth and (synth->module_class == "Sample")) {
 		auto *c = synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}

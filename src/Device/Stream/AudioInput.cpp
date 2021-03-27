@@ -179,7 +179,7 @@ string AudioInput::Config::auto_conf(const string &name) const {
 }
 
 AudioInput::AudioInput(Session *_session) :
-		Module(ModuleType::STREAM, "AudioInput"),
+		Module(ModuleCategory::STREAM, "AudioInput"),
 		buffer(1048576) {
 	session = _session;
 	_sample_rate = session->sample_rate();

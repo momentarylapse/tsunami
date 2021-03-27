@@ -11,7 +11,7 @@
 #include "../../Data/base.h"
 
 BeatSource::BeatSource() :
-	Module(ModuleType::BEAT_SOURCE, "")
+	Module(ModuleCategory::BEAT_SOURCE, "")
 {
 	out = new Output(this);
 	port_out.add(out);
@@ -36,6 +36,6 @@ int BeatSource::Output::read_beats(Array<Beat> &beats, int samples) {
 
 
 BeatSource *CreateBeatSource(Session *session, const string &name) {
-	return (BeatSource*)ModuleFactory::create(session, ModuleType::BEAT_SOURCE, name);
+	return (BeatSource*)ModuleFactory::create(session, ModuleCategory::BEAT_SOURCE, name);
 }
 

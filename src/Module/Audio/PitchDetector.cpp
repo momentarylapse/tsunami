@@ -28,7 +28,7 @@ int freq_to_index(float f) {
 }
 
 PitchDetector::PitchDetector() {
-	module_type = ModuleType::PITCH_DETECTOR;
+	module_category = ModuleCategory::PITCH_DETECTOR;
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
 	loud_enough = false;
@@ -59,7 +59,7 @@ int PitchDetector::read(MidiEventBuffer& midi) {
 
 
 DummyPitchDetector::DummyPitchDetector() {
-	module_subtype = "Dummy";
+	module_class = "Dummy";
 }
 
 void DummyPitchDetector::__init__() {

@@ -11,7 +11,7 @@
 #include "../lib/hui/hui.h"
 
 
-Plugin::Plugin(const Path &_filename, ModuleType _type) {
+Plugin::Plugin(const Path &_filename, ModuleCategory _type) {
 	type = _type;
 	filename = _filename;
 	index = -1;

@@ -220,7 +220,7 @@ string AudioOutput::Config::auto_conf(const string &name) const {
 
 
 AudioOutput::AudioOutput(Session *_session) :
-	Module(ModuleType::STREAM, "AudioOutput"),
+	Module(ModuleCategory::STREAM, "AudioOutput"),
 	ring_buf(1048576) {
 	state = State::NO_DEVICE;
 	session = _session;

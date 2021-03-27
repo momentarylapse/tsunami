@@ -30,7 +30,7 @@ MidiRecorder::Output::Output(MidiRecorder *r) : Port(SignalType::MIDI, "out") {
 }
 
 MidiRecorder::MidiRecorder() :
-	Module(ModuleType::PLUMBING, "MidiRecorder")
+	Module(ModuleCategory::PLUMBING, "MidiRecorder")
 {
 	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &source, "in"});

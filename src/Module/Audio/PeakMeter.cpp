@@ -48,7 +48,7 @@ void PeakMeterData::update(Array<float> &buf, float dt) {
 }
 
 PeakMeter::PeakMeter() {
-	module_subtype = "PeakMeter";
+	module_class = "PeakMeter";
 	spectrum_requests = 0;
 	_set_channels(2);
 }

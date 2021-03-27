@@ -12,7 +12,7 @@
 
 
 MidiSucker::MidiSucker() :
-	Module(ModuleType::PLUMBING, "MidiSucker")
+	Module(ModuleCategory::PLUMBING, "MidiSucker")
 {
 	port_in.add({SignalType::MIDI, &source, "in"});
 	source = nullptr;

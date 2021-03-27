@@ -49,9 +49,9 @@ static float module_port_out_y(Module *m, int index) {
 }
 
 string module_header(Module *m) {
-	if (m->module_subtype.num > 0)
-		return m->module_subtype;
-	return m->type_to_name(m->module_type);
+	if (m->module_class.num > 0)
+		return m->module_class;
+	return m->category_to_name(m->module_category);
 }
 
 
@@ -75,16 +75,16 @@ public:
 		event_x("area", "hui:key-down", [=]{ on_key_down(); });
 
 
-		event("signal_chain_add_audio_source", [=]{ on_add(ModuleType::AUDIO_SOURCE); });
-		event("signal_chain_add_audio_effect", [=]{ on_add(ModuleType::AUDIO_EFFECT); });
-		event("signal_chain_add_stream", [=]{ on_add(ModuleType::STREAM); });
-		event("signal_chain_add_plumbing", [=]{ on_add(ModuleType::PLUMBING); });
-		event("signal_chain_add_audio_visualizer", [=]{ on_add(ModuleType::AUDIO_VISUALIZER); });
-		event("signal_chain_add_midi_source", [=]{ on_add(ModuleType::MIDI_SOURCE); });
-		event("signal_chain_add_midi_effect", [=]{ on_add(ModuleType::MIDI_EFFECT); });
-		event("signal_chain_add_synthesizer", [=]{ on_add(ModuleType::SYNTHESIZER); });
-		event("signal_chain_add_pitch_detector", [=]{ on_add(ModuleType::PITCH_DETECTOR); });
-		event("signal_chain_add_beat_source", [=]{ on_add(ModuleType::BEAT_SOURCE); });
+		event("signal_chain_add_audio_source", [=]{ on_add(ModuleCategory::AUDIO_SOURCE); });
+		event("signal_chain_add_audio_effect", [=]{ on_add(ModuleCategory::AUDIO_EFFECT); });
+		event("signal_chain_add_stream", [=]{ on_add(ModuleCategory::STREAM); });
+		event("signal_chain_add_plumbing", [=]{ on_add(ModuleCategory::PLUMBING); });
+		event("signal_chain_add_audio_visualizer", [=]{ on_add(ModuleCategory::AUDIO_VISUALIZER); });
+		event("signal_chain_add_midi_source", [=]{ on_add(ModuleCategory::MIDI_SOURCE); });
+		event("signal_chain_add_midi_effect", [=]{ on_add(ModuleCategory::MIDI_EFFECT); });
+		event("signal_chain_add_synthesizer", [=]{ on_add(ModuleCategory::SYNTHESIZER); });
+		event("signal_chain_add_pitch_detector", [=]{ on_add(ModuleCategory::PITCH_DETECTOR); });
+		event("signal_chain_add_beat_source", [=]{ on_add(ModuleCategory::BEAT_SOURCE); });
 		event("signal_chain_reset", [=]{ on_reset(); });
 		event("signal_chain_activate", [=]{ on_activate(); });
 		event("signal_chain_delete", [=]{ on_delete(); });
@@ -514,7 +514,7 @@ public:
 	}
 
 
-	void on_add(ModuleType type) {
+	void on_add(ModuleCategory type) {
 		Array<string> names = session->plugin_manager->find_module_sub_types(type);
 		if (names.num > 1) {
 			string name = session->plugin_manager->choose_module(win, session, type);

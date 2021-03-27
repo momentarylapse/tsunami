@@ -29,23 +29,23 @@ Array<UnitTest::Test> TestPlugins::tests() {
 	auto *pm = Session::GLOBAL->plugin_manager;
 	for (auto &pf: pm->plugin_files)
 		list.add({"compile:" + pf.filename.str(), [pf]{ test_compile(pf.type, pf.filename); }});
-	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
+	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AUDIO_EFFECT);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")
 			list.add({"audio-effect:" + name, [name]{ test_audio_effect(name); }});
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_SOURCE);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AUDIO_SOURCE);
 	for (auto &name: names)
 		list.add({"audio-source:" + name, [name]{ test_audio_source(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_EFFECT);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MIDI_EFFECT);
 	for (auto &name: names)
 		list.add({"midi-effect:" + name, [name]{ test_midi_effect(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_SOURCE);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MIDI_SOURCE);
 	for (auto &name: names)
 		list.add({"midi-source:" + name, [name]{ test_midi_source(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::SYNTHESIZER);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::SYNTHESIZER);
 	for (auto &name: names)
 		list.add({"synthesizer:" + name, [name]{ test_synthesizer(name); }});
 
@@ -54,7 +54,7 @@ Array<UnitTest::Test> TestPlugins::tests() {
 }
 
 
-void TestPlugins::test_compile(ModuleType type, const Path &filename) {
+void TestPlugins::test_compile(ModuleCategory type, const Path &filename) {
 
 	try {
 		auto s = kaba::load(filename);
@@ -116,8 +116,8 @@ void TestPlugins::test_midi_source(const string &name) {
 
 void TestPlugins::test_synthesizer(const string &name) {
 	auto *chain = new SignalChain(Session::GLOBAL, "chain");
-	auto *source = chain->add(ModuleType::MIDI_SOURCE, "Metronome");
-	auto *synth = chain->add(ModuleType::SYNTHESIZER, name);
+	auto *source = chain->add(ModuleCategory::MIDI_SOURCE, "Metronome");
+	auto *synth = chain->add(ModuleCategory::SYNTHESIZER, name);
 	chain->connect(source, 0, synth, 0);
 
 	AudioBuffer buf;

@@ -28,11 +28,11 @@ const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 
 
-Module::Module(ModuleType type, const string &sub_type) {
+Module::Module(ModuleCategory type, const string &sub_type) {
 	//msg_write("new Module " + p2s(this));
 	//msg_write(type_to_name(type) + "   " + sub_type);
-	module_type = type;
-	module_subtype = sub_type;
+	module_category = type;
+	module_class = sub_type;
 	session = Session::GLOBAL;
 	enabled = true;
 	module_x = module_y = 0;
@@ -54,7 +54,7 @@ Module::~Module() {
 }
 
 
-void Module::__init__(ModuleType type, const string &sub_type) {
+void Module::__init__(ModuleCategory type, const string &sub_type) {
 	new(this) Module(type, sub_type);
 }
 
@@ -66,7 +66,7 @@ void Module::__delete__() {
 // internal use for creation
 void Module::set_session_etc(Session *_session, const string &sub_type) {
 	session = _session;
-	module_subtype = sub_type;
+	module_class = sub_type;
 	auto *c = get_config();
 	if (c) {
 		c->_module = this;
@@ -135,7 +135,7 @@ void Module::config_from_string(int _version, const string &param) {
 	} else {
 		if (_version != VERSION_LATEST and _version != version()) {
 			// ... TODO
-			session->e(format("%s: version request:%d current:%d", module_subtype, _version, version()));
+			session->e(format("%s: version request:%d current:%d", module_class, _version, version()));
 		}
 
 		config->from_string(param, session);
@@ -152,7 +152,7 @@ void Module::config_from_any(int _version, const Any &param) {
 
 	if (_version != VERSION_LATEST and _version != version()) {
 		// ... TODO
-		session->e(format("%s: version request:%d current:%d", module_subtype, _version, version()));
+		session->e(format("%s: version request:%d current:%d", module_class, _version, version()));
 	}
 
 	config->from_any(param, session);
@@ -196,7 +196,7 @@ void Module::changed() {
 
 // don't copy the func_edit
 Module *Module::copy() const {
-	Module *clone = ModuleFactory::create(session, module_type, module_subtype);
+	Module *clone = ModuleFactory::create(session, module_category, module_class);
 	string param = config_to_string();
 	clone->config_from_string(Module::VERSION_LATEST, param);
 	clone->_config_latest_history = param;
@@ -204,65 +204,65 @@ Module *Module::copy() const {
 }
 
 
-string Module::type_to_name(ModuleType type) {
-	if (type == ModuleType::AUDIO_SOURCE)
+string Module::category_to_name(ModuleCategory cat) {
+	if (cat == ModuleCategory::AUDIO_SOURCE)
 		return "AudioSource";
-	if (type == ModuleType::AUDIO_EFFECT)
+	if (cat == ModuleCategory::AUDIO_EFFECT)
 		return "AudioEffect";
-	if (type == ModuleType::SYNTHESIZER)
+	if (cat == ModuleCategory::SYNTHESIZER)
 		return "Synthesizer";
-	if (type == ModuleType::MIDI_SOURCE)
+	if (cat == ModuleCategory::MIDI_SOURCE)
 		return "MidiSource";
-	if (type == ModuleType::MIDI_EFFECT)
+	if (cat == ModuleCategory::MIDI_EFFECT)
 		return "MidiEffect";
-	if (type == ModuleType::BEAT_SOURCE)
+	if (cat == ModuleCategory::BEAT_SOURCE)
 		return "BeatSource";
-	if (type == ModuleType::AUDIO_VISUALIZER)
+	if (cat == ModuleCategory::AUDIO_VISUALIZER)
 		return "AudioVisualizer";
-	if (type == ModuleType::PITCH_DETECTOR)
+	if (cat == ModuleCategory::PITCH_DETECTOR)
 		return "PitchDetector";
-	if (type == ModuleType::STREAM)
+	if (cat == ModuleCategory::STREAM)
 		return "Stream";
-	if (type == ModuleType::PLUMBING)
+	if (cat == ModuleCategory::PLUMBING)
 		return "Plumbing";
-	if (type == ModuleType::SIGNAL_CHAIN)
+	if (cat == ModuleCategory::SIGNAL_CHAIN)
 		return "SignalChain";
-	if (type == ModuleType::TSUNAMI_PLUGIN)
+	if (cat == ModuleCategory::TSUNAMI_PLUGIN)
 		return "TsunamiPlugin";
-	if (type == ModuleType::OTHER)
+	if (cat == ModuleCategory::OTHER)
 		return "Other";
 	return "???";
 }
 
 
-ModuleType Module::type_from_name(const string &str) {
+ModuleCategory Module::category_from_name(const string &str) {
 	if (str == "AudioSource")
-		return ModuleType::AUDIO_SOURCE;
+		return ModuleCategory::AUDIO_SOURCE;
 	if (str == "Plumbing")
-		return ModuleType::PLUMBING;
+		return ModuleCategory::PLUMBING;
 	if (str == "Stream")
-		return ModuleType::STREAM;
+		return ModuleCategory::STREAM;
 	if (str == "AudioEffect" or str == "Effect")
-		return ModuleType::AUDIO_EFFECT;
+		return ModuleCategory::AUDIO_EFFECT;
 	if (str == "Synthesizer" or str == "Synth")
-		return ModuleType::SYNTHESIZER;
+		return ModuleCategory::SYNTHESIZER;
 	if (str == "MidiEffect")
-		return ModuleType::MIDI_EFFECT;
+		return ModuleCategory::MIDI_EFFECT;
 	if (str == "MidiSource")
-		return ModuleType::MIDI_SOURCE;
+		return ModuleCategory::MIDI_SOURCE;
 	if (str == "BeatSource")
-		return ModuleType::BEAT_SOURCE;
+		return ModuleCategory::BEAT_SOURCE;
 	if (str == "PitchDetector")
-		return ModuleType::PITCH_DETECTOR;
+		return ModuleCategory::PITCH_DETECTOR;
 	if (str == "AudioVisualizer")
-		return ModuleType::AUDIO_VISUALIZER;
+		return ModuleCategory::AUDIO_VISUALIZER;
 	if (str == "SignalChain")
-		return ModuleType::SIGNAL_CHAIN;
+		return ModuleCategory::SIGNAL_CHAIN;
 	if (str == "TsunamiPlugin")
-		return ModuleType::TSUNAMI_PLUGIN;
+		return ModuleCategory::TSUNAMI_PLUGIN;
 	if (str == "Other")
-		return ModuleType::OTHER;
-	return (ModuleType)-1;
+		return ModuleCategory::OTHER;
+	return (ModuleCategory)-1;
 }
 
 void Module::_plug_in(int in_port, Module *source, int source_port) {

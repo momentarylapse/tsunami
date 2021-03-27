@@ -11,7 +11,7 @@
 #include "../../Data/Rhythm/Bar.h"
 
 BarStreamer::BarStreamer(BarCollection &_bars) {
-	module_subtype = "BarStreamer";
+	module_class = "BarStreamer";
 	bars = _bars;
 	offset = 0;
 }

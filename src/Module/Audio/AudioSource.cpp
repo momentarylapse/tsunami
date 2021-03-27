@@ -11,7 +11,7 @@
 
 
 AudioSource::AudioSource() :
-	Module(ModuleType::AUDIO_SOURCE, "")
+	Module(ModuleCategory::AUDIO_SOURCE, "")
 {
 	out = new Output(this);
 	port_out.add(out);
@@ -37,5 +37,5 @@ int AudioSource::Output::read_audio(AudioBuffer& buf) {
 }
 
 AudioSource *CreateAudioSource(Session *session, const string &name) {
-	return (AudioSource*)ModuleFactory::create(session, ModuleType::AUDIO_SOURCE, name);
+	return (AudioSource*)ModuleFactory::create(session, ModuleCategory::AUDIO_SOURCE, name);
 }

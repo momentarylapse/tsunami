@@ -20,7 +20,7 @@
 
 Array<string> diff_module(Module *a, Module *b, const string &ee) {
 	Array<string> r;
-	if (a->module_subtype != b->module_subtype)
+	if (a->module_class != b->module_class)
 		r.add(ee + "type");
 	if (a->config_to_string() != b->config_to_string())
 		r.add(ee + "config");

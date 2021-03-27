@@ -11,7 +11,7 @@
 #include "../../Stuff/BackupManager.h"
 #include "../../lib/file/file.h"
 
-AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::PLUMBING, "AudioBackup") {
+AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "AudioBackup") {
 	session = _session;
 	out = new Output(this);
 	port_out.add(out);

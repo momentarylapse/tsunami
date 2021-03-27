@@ -1,47 +1,45 @@
 /*
- * FavoriteManager.h
+ * ProfileManager.h
  *
  *  Created on: 13.04.2014
  *      Author: michi
  */
 
-#ifndef FAVORITEMANAGER_H_
-#define FAVORITEMANAGER_H_
+#pragma once
 
 #include "../lib/base/base.h"
 
 class Path;
 class Module;
-enum class ModuleType;
+enum class ModuleCategory;
 namespace hui {
 	class Window;
 }
 class Session;
 
-class FavoriteManager {
+class ProfileManager {
 public:
-	FavoriteManager();
-	virtual ~FavoriteManager();
+	ProfileManager();
 
 	static const string DEFAULT_NAME;
 
-	struct Favorite {
+	struct Profile {
+		ModuleCategory category;
+		string _class;
 		string name;
-		string config_name;
 		string options;
 		int version;
-		ModuleType type;
 		bool read_only;
 	};
 
 	bool loaded;
-	Array<Favorite> favorites;
+	Array<Profile> profiles;
 
 	void load(Session *session);
 	void load_from_file(const Path &filename, bool read_only, Session *session);
 	void save(Session *session);
 
-	void set(const Favorite &f);
+	void set(const Profile &f);
 
 	Array<string> get_list(Module *c);
 	void apply(Module *c, const string &name, bool notify);
@@ -49,5 +47,3 @@ public:
 
 	string select_name(hui::Window *win, Module *c, bool save);
 };
-
-#endif /* FAVORITEMANAGER_H_ */

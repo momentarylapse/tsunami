@@ -13,7 +13,7 @@
 
 
 AudioSucker::AudioSucker() :
-	Module(ModuleType::PLUMBING, "AudioSucker")
+	Module(ModuleCategory::PLUMBING, "AudioSucker")
 {
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;

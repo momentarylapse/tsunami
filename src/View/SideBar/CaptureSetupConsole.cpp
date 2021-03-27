@@ -201,18 +201,18 @@ void CaptureSetupConsole::rebuild_chain() {
 		ii.device = c.device;
 
 		if (c.track->type == SignalType::AUDIO) {
-			ii.input_audio = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
+			ii.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 			ii.input_audio->set_device(c.device);
-			ii.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-			auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+			ii.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 			chain->connect(ii.input_audio, 0, ii.peak_meter, 0);
 			chain->connect(ii.peak_meter, 0, sucker, 0);
 		} else if (c.track->type == SignalType::MIDI) {
-			ii.input_midi = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
+			ii.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 			ii.input_midi->set_device(c.device);
 			auto *synth = chain->_add(c.track->synth->copy());
-			ii.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-			auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+			ii.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 			chain->connect(ii.input_midi, 0, synth, 0);
 			chain->connect(synth, 0, ii.peak_meter, 0);
 			chain->connect(ii.peak_meter, 0, sucker, 0);

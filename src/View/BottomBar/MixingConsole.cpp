@@ -174,7 +174,7 @@ public:
 		if (selected_module) {
 			config_panel = new ModulePanel(m);
 
-			if (m->module_type == ModuleType::AUDIO_EFFECT) {
+			if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
 				AudioEffect *fx = (AudioEffect*)m;
 				config_panel->set_func_enable([=](bool enabled){ track->enable_effect(fx, enabled); });
 				config_panel->set_func_delete([=]{ track->delete_effect(fx); });
@@ -240,7 +240,7 @@ public:
 		}
 	}
 	void on_add_fx() {
-		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
+		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleCategory::AUDIO_EFFECT);
 		if (name == "")
 			return;
 		auto *effect = CreateAudioEffect(console->session, name);
@@ -264,7 +264,7 @@ public:
 		track->move_midi_effect(s, t);
 	}
 	void on_add_midi_fx() {
-		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::MIDI_EFFECT);
+		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleCategory::MIDI_EFFECT);
 		if (name == "")
 			return;
 		auto *effect = CreateMidiEffect(console->session, name);
@@ -310,12 +310,12 @@ public:
 		// fx list
 		reset("fx");
 		for (auto *fx: weak(track->fx))
-			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
+			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_class);
 
 		// midi fx list
 		reset("midi-fx");
 		for (auto *fx: weak(track->midi_fx))
-			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
+			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_class);
 		
 		update_fx_list_selection();
 	}

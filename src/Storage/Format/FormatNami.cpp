@@ -145,7 +145,7 @@ public:
 		parent->add_effect(me);
 	}
 	void write(File *f) override {
-		f->write_str(me->module_subtype);
+		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(1); // chunk version
 		f->write_int(0);
@@ -173,7 +173,7 @@ public:
 		parent->__fx.add(me);
 	}
 	void write(File *f) override {
-		f->write_str(me->module_subtype);
+		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(0);
 		f->write_int(0);
@@ -649,7 +649,7 @@ public:
 		song->tracks.back()->midi_fx.add(me);
 	}
 	void write(File *f) override {
-		f->write_str(me->module_subtype);
+		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(0); // reserved
 		f->write_int(me->version());
@@ -962,7 +962,7 @@ public:
 		parent->set_synthesizer(me);
 	}
 	void write(File *f) override {
-		f->write_str(me->module_subtype);
+		f->write_str(me->module_class);
 		f->write_str(me->config_to_string());
 		f->write_str("");
 		f->write_int(1);

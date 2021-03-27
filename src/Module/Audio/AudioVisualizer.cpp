@@ -39,7 +39,7 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 }
 
 AudioVisualizer::AudioVisualizer() :
-	Module(ModuleType::AUDIO_VISUALIZER, "")
+	Module(ModuleCategory::AUDIO_VISUALIZER, "")
 {
 	port_out.add(new Output(this));
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
@@ -66,7 +66,7 @@ void AudioVisualizer::set_chunk_size(int _chunk_size) {
 
 // TODO: move to PluginManager?
 AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name) {
-	return (AudioVisualizer*)ModuleFactory::create(session, ModuleType::AUDIO_VISUALIZER, name);
+	return (AudioVisualizer*)ModuleFactory::create(session, ModuleCategory::AUDIO_VISUALIZER, name);
 }
 
 

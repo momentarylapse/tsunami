@@ -59,9 +59,9 @@
 #include "../View/Painter/GridPainter.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
+#include "ProfileManager.h"
 #include "SongPlugin.h"
 #include "TsunamiPlugin.h"
-#include "FavoriteManager.h"
 
 namespace kaba {
 	extern shared_array<Script> _public_scripts_;
@@ -70,7 +70,7 @@ namespace kaba {
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager() {
-	favorites = new FavoriteManager;
+	profiles = new ProfileManager;
 
 	find_plugins();
 
@@ -180,9 +180,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Session.create_child", &Session::create_child);
 
 
-	Module module(ModuleType::AUDIO_EFFECT, "");
+	Module module(ModuleCategory::AUDIO_EFFECT, "");
 	kaba::declare_class_size("Module", sizeof(Module));
-	kaba::declare_class_element("Module.name", &Module::module_subtype);
+	kaba::declare_class_element("Module.name", &Module::module_class);
 	kaba::declare_class_element("Module.session", &Module::session);
 	kaba::declare_class_element("Module." + kaba::IDENTIFIER_SHARED_COUNT, &Module::_pointer_ref_counter);
 	kaba::link_external_class_func("Module.__init__", &Module::__init__);
@@ -761,7 +761,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf) {
 	} catch(...) {}
 }
 
-void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleType type) {
+void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleCategory type) {
 	Path dir = _dir;
 	if (group.num > 0)
 		dir <<= group;
@@ -777,7 +777,7 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 	}
 }
 
-void PluginManager::find_plugins_in_dir(const Path &rel, const string &group, ModuleType type) {
+void PluginManager::find_plugins_in_dir(const Path &rel, const string &group, ModuleCategory type) {
 	find_plugins_in_dir_absolute(plugin_dir_static() << rel, group, type);
 	if (plugin_dir_local() != plugin_dir_static())
 		find_plugins_in_dir_absolute(plugin_dir_local() << rel, group, type);
@@ -800,42 +800,42 @@ void PluginManager::find_plugins() {
 
 	// "AudioSource"
 #ifndef OS_WINDOWS
-	find_plugins_in_dir("AudioSource", "", ModuleType::AUDIO_SOURCE);
+	find_plugins_in_dir("AudioSource", "", ModuleCategory::AUDIO_SOURCE);
 
 	// "AudioEffect"
-	find_plugins_in_dir("AudioEffect", "Channels", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Dynamics", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Echo", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Filter", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Pitch", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Repair", ModuleType::AUDIO_EFFECT);
-	find_plugins_in_dir("AudioEffect", "Sound", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Channels", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Dynamics", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Echo", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Filter", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Pitch", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Repair", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Sound", ModuleCategory::AUDIO_EFFECT);
 	// hidden...
-	find_plugins_in_dir("AudioEffect", "Special", ModuleType::AUDIO_EFFECT);
+	find_plugins_in_dir("AudioEffect", "Special", ModuleCategory::AUDIO_EFFECT);
 
 	// "AudioVisualizer"
-	find_plugins_in_dir("AudioVisualizer", "", ModuleType::AUDIO_VISUALIZER);
+	find_plugins_in_dir("AudioVisualizer", "", ModuleCategory::AUDIO_VISUALIZER);
 
 	// "MidiSource"
-	find_plugins_in_dir("MidiSource", "", ModuleType::MIDI_SOURCE);
+	find_plugins_in_dir("MidiSource", "", ModuleCategory::MIDI_SOURCE);
 
 	// "MidiEffect"
-	find_plugins_in_dir("MidiEffect", "", ModuleType::MIDI_EFFECT);
+	find_plugins_in_dir("MidiEffect", "", ModuleCategory::MIDI_EFFECT);
 
 	// "BeatSource"
-	find_plugins_in_dir("BeatSource", "", ModuleType::BEAT_SOURCE);
+	find_plugins_in_dir("BeatSource", "", ModuleCategory::BEAT_SOURCE);
 
 	// "BeatSource"
-	find_plugins_in_dir("PitchDetector", "", ModuleType::PITCH_DETECTOR);
+	find_plugins_in_dir("PitchDetector", "", ModuleCategory::PITCH_DETECTOR);
 
 	// "All"
-	find_plugins_in_dir("All", "", ModuleType::SONG_PLUGIN);
+	find_plugins_in_dir("All", "", ModuleCategory::SONG_PLUGIN);
 
 	// rest
-	find_plugins_in_dir("Independent", "", ModuleType::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "", ModuleCategory::TSUNAMI_PLUGIN);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer", "", ModuleType::SYNTHESIZER);
+	find_plugins_in_dir("Synthesizer", "", ModuleCategory::SYNTHESIZER);
 #endif
 }
 
@@ -864,22 +864,22 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	add_plugins_in_dir("Independent", m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
 }
 
-void PluginManager::apply_favorite(Module *c, const string &name, bool notify) {
-	favorites->apply(c, name, notify);
+void PluginManager::apply_profile(Module *c, const string &name, bool notify) {
+	profiles->apply(c, name, notify);
 }
 
-void PluginManager::save_favorite(Module *c, const string &name) {
-	favorites->save(c, name);
+void PluginManager::save_profile(Module *c, const string &name) {
+	profiles->save(c, name);
 }
 
 
-string PluginManager::select_favorite_name(hui::Window *win, Module *c, bool save) {
-	return favorites->select_name(win, c, save);
+string PluginManager::select_profile_name(hui::Window *win, Module *c, bool save) {
+	return profiles->select_name(win, c, save);
 }
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const Path &filename) {
+Plugin *PluginManager::load_and_compile_plugin(ModuleCategory type, const Path &filename) {
 	for (Plugin *p: plugins)
 		if (filename == p->filename)
 			return p;
@@ -895,14 +895,14 @@ Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const Path &file
 }
 
 
-Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const string &name) {
+Plugin *PluginManager::get_plugin(Session *session, ModuleCategory type, const string &name) {
 	for (PluginFile &pf: plugin_files) {
 		if ((pf.name.replace(" ", "") == name.replace(" ", "")) and (pf.type == type)) {
 			Plugin *p = load_and_compile_plugin(type, pf.filename);
 			return p;
 		}
 	}
-	session->e(format(_("Can't find %s plugin: %s ..."), Module::type_to_name(type), name));
+	session->e(format(_("Can't find %s plugin: %s ..."), Module::category_to_name(type), name));
 	return nullptr;
 }
 
@@ -919,29 +919,29 @@ Path PluginManager::plugin_dir_local() {
 }
 
 
-Array<string> PluginManager::find_module_sub_types(ModuleType type) {
+Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 	Array<string> names;
 	for (auto &pf: plugin_files)
 		if (pf.type == type)
 			names.add(pf.name);
 
-	if (type == ModuleType::AUDIO_SOURCE) {
+	if (type == ModuleCategory::AUDIO_SOURCE) {
 		names.add("SongRenderer");
 		//names.add("BufferStreamer");
-	} else if (type == ModuleType::MIDI_EFFECT) {
+	} else if (type == ModuleCategory::MIDI_EFFECT) {
 		names.add("Dummy");
-	} else if (type == ModuleType::BEAT_SOURCE) {
+	} else if (type == ModuleCategory::BEAT_SOURCE) {
 		//names.add("BarStreamer");
-	} else if (type == ModuleType::AUDIO_VISUALIZER) {
+	} else if (type == ModuleCategory::AUDIO_VISUALIZER) {
 		names.add("PeakMeter");
-	} else if (type == ModuleType::SYNTHESIZER) {
+	} else if (type == ModuleCategory::SYNTHESIZER) {
 		names.add("Dummy");
 		//names.add("Sample");
-	} else if (type == ModuleType::STREAM) {
+	} else if (type == ModuleCategory::STREAM) {
 		names.add("AudioInput");
 		names.add("AudioOutput");
 		names.add("MidiInput");
-	} else if (type == ModuleType::PLUMBING) {
+	} else if (type == ModuleCategory::PLUMBING) {
 		names.add("AudioBackup");
 		names.add("AudioJoiner");
 		names.add("AudioRecorder");
@@ -950,14 +950,14 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type) {
 		names.add("MidiJoiner");
 		names.add("MidiRecorder");
 		names.add("MidiSucker");
-	} else if (type == ModuleType::PITCH_DETECTOR) {
+	} else if (type == ModuleCategory::PITCH_DETECTOR) {
 		names.add("Dummy");
 	}
 	return names;
 }
 
-Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type) {
-	if (type == ModuleType::AUDIO_EFFECT) {
+Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) {
+	if (type == ModuleCategory::AUDIO_EFFECT) {
 		Array<string> names;
 		for (auto &pf: plugin_files)
 			if (pf.type == type)
@@ -967,7 +967,7 @@ Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type) {
 	return find_module_sub_types(type);
 }
 
-string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name) {
+string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, const string &old_name) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num == 1)
 		return names[0];

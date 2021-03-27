@@ -18,12 +18,12 @@ namespace kaba {
 };
 
 class Session;
-enum class ModuleType;
+enum class ModuleCategory;
 
 // represents a compiled script
 class Plugin {
 public:
-	Plugin(const Path &filename, ModuleType type);
+	Plugin(const Path &filename, ModuleCategory type);
 
 	Path filename;
 	int file_date;
@@ -31,7 +31,7 @@ public:
 	shared<kaba::Script> s;
 
 	bool usable(Session *session);
-	ModuleType type;
+	ModuleCategory type;
 	string error_message;
 
 	string get_error();

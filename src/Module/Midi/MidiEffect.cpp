@@ -26,7 +26,7 @@ int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
 }
 
 MidiEffect::MidiEffect() :
-	Module(ModuleType::MIDI_EFFECT, "")
+	Module(ModuleCategory::MIDI_EFFECT, "")
 {
 	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &source, "in"});
@@ -66,6 +66,6 @@ void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name) {
-	return (MidiEffect*)ModuleFactory::create(session, ModuleType::MIDI_EFFECT, name);
+	return (MidiEffect*)ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, name);
 }
 

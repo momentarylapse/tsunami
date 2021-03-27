@@ -90,10 +90,10 @@ string channel_title(PerfChannelInfo &c) {
 		return c.name;
 
 	auto *m = reinterpret_cast<Module*>(c.p);
-	if (m->module_subtype != "")
-		return m->module_subtype;
+	if (m->module_class != "")
+		return m->module_class;
 
-	return m->type_to_name(m->module_type);
+	return m->category_to_name(m->module_category);
 }
 
 void CpuDisplay::on_draw(Painter* p) {

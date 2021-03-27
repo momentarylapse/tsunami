@@ -27,7 +27,7 @@ void SongPlugin::__delete__() {
 
 
 SongPlugin *CreateSongPlugin(Session *session, const string &name) {
-	Plugin *p = session->plugin_manager->get_plugin(session, ModuleType::SONG_PLUGIN, name);
+	Plugin *p = session->plugin_manager->get_plugin(session, ModuleCategory::SONG_PLUGIN, name);
 	auto sp = reinterpret_cast<SongPlugin*>(p->create_instance(session, "*.SongPlugin"));
 
 	// dummy?

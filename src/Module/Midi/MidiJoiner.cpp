@@ -9,7 +9,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Midi/MidiData.h"
 
-MidiJoiner::MidiJoiner() : Module(ModuleType::PLUMBING, "MidiJoiner") {
+MidiJoiner::MidiJoiner() : Module(ModuleCategory::PLUMBING, "MidiJoiner") {
 	out = new Output(this);
 	port_out.add(out);
 	port_in.add({SignalType::MIDI, &a, "a"});

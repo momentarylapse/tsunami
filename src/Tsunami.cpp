@@ -113,7 +113,7 @@ void show_song(Song *song) {
 		msg_write(format("  track '%s'", t->nice_name()));
 		msg_write("    type: " + signal_type_name(t->type));
 		if (t->type == SignalType::MIDI) {
-			msg_write(format("    synth: %s v%d", t->synth->module_subtype, t->synth->version()));
+			msg_write(format("    synth: %s v%d", t->synth->module_class, t->synth->version()));
 		}
 		for (TrackLayer *l: weak(t->layers)) {
 			msg_write("    layer");
@@ -128,9 +128,9 @@ void show_song(Song *song) {
 			n += l->samples.num;
 		}
 		for (auto *fx: weak(t->fx))
-			msg_write(format("    fx: %s v%d", fx->module_subtype, fx->version()));
+			msg_write(format("    fx: %s v%d", fx->module_class, fx->version()));
 		for (auto *fx: weak(t->midi_fx))
-			msg_write(format("    midifx: %s v%d", fx->module_subtype, fx->version()));
+			msg_write(format("    midifx: %s v%d", fx->module_class, fx->version()));
 	}
 	msg_write(format("  refs: %d / %d", n, song->samples.num));
 	for (Tag &t: song->tags)
@@ -235,13 +235,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->win->hide();
 		Module *m = nullptr;
 		if (a[0] == "fx") {
-			m = ModuleFactory::create(session, ModuleType::AUDIO_EFFECT, a[1]);
+			m = ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, a[1]);
 			configure_module(session->win.get(), m);
 		} else if (a[0] == "mfx") {
-			m = ModuleFactory::create(session, ModuleType::MIDI_EFFECT, a[1]);
+			m = ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, a[1]);
 			configure_module(session->win.get(), m);
 		} else if (a[0] == "synth") {
-			m = ModuleFactory::create(session, ModuleType::SYNTHESIZER, a[1]);
+			m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
 			configure_module(session->win.get(), m);
 		} else if (a[0] == "vis") {
 			m = CreateAudioVisualizer(session, a[1]);

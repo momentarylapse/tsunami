@@ -40,7 +40,7 @@ PluginConsole::~PluginConsole() {
 }
 
 void PluginConsole::on_add_button() {
-	string name = session->plugin_manager->choose_module(this, session, ModuleType::TSUNAMI_PLUGIN, "");
+	string name = session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, "");
 	if (name != "")
 		session->execute_tsunami_plugin(name);
 }

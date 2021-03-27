@@ -59,9 +59,9 @@ void CaptureConsoleModeMidi::enter() {
 	chain = session->create_signal_chain_system("capture");
 
 
-	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
+	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 	input->subscribe(this, [=]{ update_device_list(); });
-	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
+	auto *recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
 	for (Track *t: weak(view->song->tracks))
@@ -69,8 +69,8 @@ void CaptureConsoleModeMidi::enter() {
 			set_target(t);
 			
 	//preview_synth->plug(0, input, 0);
-	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	preview_stream = (AudioOutput*)chain->add(ModuleType::STREAM, "AudioOutput");
+	peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+	preview_stream = (AudioOutput*)chain->add(ModuleCategory::STREAM, "AudioOutput");
 	chain->mark_all_modules_as_system();
 	
 

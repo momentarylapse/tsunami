@@ -51,7 +51,7 @@ public:
 
 
 DummySynthesizer::DummySynthesizer() {
-	module_subtype = "Dummy";
+	module_class = "Dummy";
 	auto_generate_stereo = true;
 }
 

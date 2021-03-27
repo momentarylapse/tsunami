@@ -69,21 +69,21 @@ void CaptureConsoleModeMulti::enter() {
 		}
 
 		if (t->type == SignalType::AUDIO) {
-			c.input_audio = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
-			c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-			auto *recorder_audio = chain->add(ModuleType::PLUMBING, "AudioRecorder");
-			auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+			c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
+			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+			auto *recorder_audio = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
+			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 			chain->connect(c.input_audio, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, recorder_audio, 0);
 			chain->connect(recorder_audio, 0, sucker, 0);
 			data.add({c.track, c.input_audio, recorder_audio});
 		} else if (t->type == SignalType::MIDI) {
-			c.input_midi = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
-			auto *recorder_midi = chain->add(ModuleType::PLUMBING, "MidiRecorder");
+			c.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
+			auto *recorder_midi = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
 			auto *synth = chain->_add(t->synth->copy());
-			c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
-			auto *out = chain->add(ModuleType::STREAM, "AudioOutput");
+			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
 			chain->connect(c.input_midi, 0, recorder_midi, 0);
 			chain->connect(recorder_midi, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);

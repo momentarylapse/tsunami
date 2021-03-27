@@ -15,7 +15,7 @@
 const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
 TsunamiPlugin::TsunamiPlugin() :
-	Module(ModuleType::TSUNAMI_PLUGIN, "")
+	Module(ModuleCategory::TSUNAMI_PLUGIN, "")
 {
 }
 
@@ -40,5 +40,5 @@ void TsunamiPlugin::stop_request()
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
-	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleType::TSUNAMI_PLUGIN, name);
+	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleCategory::TSUNAMI_PLUGIN, name);
 }

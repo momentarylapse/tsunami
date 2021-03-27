@@ -16,7 +16,7 @@ class Module;
 class Session;
 class Path;
 enum class SignalType;
-enum class ModuleType;
+enum class ModuleCategory;
 class SuckerThread;
 
 class SignalChain : public Module {
@@ -43,11 +43,11 @@ public:
 
 	shared_array<Module> modules;
 	Module* _add(Module *m);
-	Module* add(ModuleType type, const string &sub_type = "");
+	Module* add(ModuleCategory type, const string &sub_type = "");
 	void delete_module(Module *m);
 	int module_index(Module *m);
 
-	Module *get_by_type(ModuleType type, const string &sub_type);
+	Module *get_by_type(ModuleCategory type, const string &sub_type);
 
 	struct Cable {
 		SignalType type;

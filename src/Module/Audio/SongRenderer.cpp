@@ -23,7 +23,7 @@
 
 
 SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
-	module_subtype = "SongRenderer";
+	module_class = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
 	channels = 2;

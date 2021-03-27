@@ -31,7 +31,7 @@ class Port;
 class InPortDescription;
 class Any;
 
-enum class ModuleType {
+enum class ModuleCategory {
 	// plug-ins
 	AUDIO_SOURCE,
 	AUDIO_EFFECT,
@@ -69,9 +69,9 @@ enum class ModuleCommand {
 class Module : public Sharable<Observable<VirtualBase>> {
 public:
 
-	Module(ModuleType type, const string &sub_type);
+	Module(ModuleCategory type, const string &sub_type);
 	virtual ~Module();
-	void _cdecl __init__(ModuleType type, const string &sub_type);
+	void _cdecl __init__(ModuleCategory type, const string &sub_type);
 	void _cdecl __delete__() override;
 
 	void set_session_etc(Session *session, const string &sub_type);
@@ -83,8 +83,8 @@ public:
 
 
 	// basic
-	ModuleType module_type;
-	string module_subtype;
+	ModuleCategory module_category;
+	string module_class;
 	Session *session;
 	float module_x, module_y;
 	const kaba::Class *_class;
@@ -142,8 +142,8 @@ public:
 
 
 
-	static string type_to_name(ModuleType type);
-	static ModuleType type_from_name(const string &name);
+	static string category_to_name(ModuleCategory cat);
+	static ModuleCategory category_from_name(const string &name);
 
 	shared_array<Module> children;
 };

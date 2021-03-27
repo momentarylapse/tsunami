@@ -24,7 +24,7 @@ int AudioEffect::Output::read_audio(AudioBuffer &buf) {
 }
 
 AudioEffect::AudioEffect() :
-	Module(ModuleType::AUDIO_EFFECT, "")
+	Module(ModuleCategory::AUDIO_EFFECT, "")
 {
 	source = nullptr;
 	out = new Output(this);
@@ -56,5 +56,5 @@ int AudioEffect::read(AudioBuffer &buf) {
 
 
 AudioEffect *CreateAudioEffect(Session *session, const string &name) {
-	return (AudioEffect*)ModuleFactory::create(session, ModuleType::AUDIO_EFFECT, name);
+	return (AudioEffect*)ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, name);
 }

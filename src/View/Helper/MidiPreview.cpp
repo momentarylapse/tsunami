@@ -18,7 +18,7 @@
 class MidiPreviewSource : public MidiSource {
 public:
 	MidiPreviewSource() {
-		module_subtype = "MidiPreviewSource";
+		module_class = "MidiPreviewSource";
 		mode = Mode::END_OF_STREAM;
 		ttl = -1;
 		volume = 1.0f;
@@ -134,11 +134,11 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	source = new MidiPreviewSource;
 	chain = session->create_signal_chain_system("midi-preview");
 	chain->_add(source);
-	joiner = chain->add(ModuleType::PLUMBING, "MidiJoiner");
-	recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
+	joiner = chain->add(ModuleCategory::PLUMBING, "MidiJoiner");
+	recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
 //	synth->setInstrument(view->cur_track->instrument);
 	synth = chain->_add(_synth);
-	out = chain->add(ModuleType::STREAM, "AudioOutput");
+	out = chain->add(ModuleCategory::STREAM, "AudioOutput");
 
 	input = nullptr;
 	input_device = nullptr;
@@ -167,7 +167,7 @@ void MidiPreview::end() {
 }
 
 void MidiPreview::_start_input() {
-	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
+	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 	chain->connect(input, 0, recorder, 0);
 	//chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	chain->start();

@@ -31,7 +31,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 		remove_control("header");
 	} else {
 		outer = this;
-		set_string("name", module->module_subtype);
+		set_string("name", module->module_class);
 	}
 
 	p = module->create_panel();
@@ -126,10 +126,10 @@ void ModulePanel::set_func_detune(std::function<void()> f) {
 }
 
 void ModulePanel::on_load() {
-	string name = session->plugin_manager->select_favorite_name(win, module, false);
+	string name = session->plugin_manager->select_profile_name(win, module, false);
 	if (name.num == 0)
 		return;
-	session->plugin_manager->apply_favorite(module, name, false);
+	session->plugin_manager->apply_profile(module, name, false);
 	module->changed();
 	//if (func_edit)
 	//	func_edit(old_param);
@@ -137,10 +137,10 @@ void ModulePanel::on_load() {
 }
 
 void ModulePanel::on_save() {
-	string name = session->plugin_manager->select_favorite_name(win, module, true);
+	string name = session->plugin_manager->select_profile_name(win, module, true);
 	if (name.num == 0)
 		return;
-	session->plugin_manager->save_favorite(module, name);
+	session->plugin_manager->save_profile(module, name);
 }
 
 void ModulePanel::on_enabled() {
@@ -192,7 +192,7 @@ void ModulePanel::on_detune() {
 ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
 	module = _module;
 	module_panel = new ModulePanel(module, this, ModulePanel::Mode::DEFAULT_S);
-	set_title(module->module_subtype);
+	set_title(module->module_class);
 	set_size(CONFIG_PANEL_WIDTH, 300);
 	//m->set_options("grid", "expandx");
 	embed(module_panel, "content", 0, 0);

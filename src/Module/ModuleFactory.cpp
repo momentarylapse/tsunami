@@ -33,8 +33,8 @@
 #include "../Session.h"
 
 
-Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type) {
-	if (type == ModuleType::PLUMBING) {
+Module* ModuleFactory::_create_special(Session* session, ModuleCategory type, const string& sub_type) {
+	if (type == ModuleCategory::PLUMBING) {
 		if (sub_type == "BeatMidifier")
 			return new BeatMidifier;
 		if (sub_type == "AudioJoiner")
@@ -51,28 +51,28 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new MidiRecorder;
 		if (sub_type == "MidiSucker")
 			return new MidiSucker;
-	} else if (type == ModuleType::AUDIO_SOURCE) {
+	} else if (type == ModuleCategory::AUDIO_SOURCE) {
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song.get(), true);
-	} else if (type == ModuleType::AUDIO_EFFECT) {
+	} else if (type == ModuleCategory::AUDIO_EFFECT) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new AudioEffect;
-	} else if (type == ModuleType::MIDI_EFFECT) {
+	} else if (type == ModuleCategory::MIDI_EFFECT) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new MidiEffect;
-	} else if (type == ModuleType::SYNTHESIZER) {
+	} else if (type == ModuleCategory::SYNTHESIZER) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummySynthesizer;
-	} else if (type == ModuleType::PITCH_DETECTOR) {
+	} else if (type == ModuleCategory::PITCH_DETECTOR) {
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummyPitchDetector;
-	} else if (type == ModuleType::BEAT_SOURCE) {
+	} else if (type == ModuleCategory::BEAT_SOURCE) {
 		if (sub_type == "BarStreamer")
 			{}//return new BarStreamer()
-	} else if (type == ModuleType::AUDIO_VISUALIZER) {
+	} else if (type == ModuleCategory::AUDIO_VISUALIZER) {
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
-	} else if (type == ModuleType::STREAM) {
+	} else if (type == ModuleCategory::STREAM) {
 		if (sub_type == "AudioOutput")
 			return new AudioOutput(session);
 		if (sub_type == "AudioInput")
@@ -83,27 +83,27 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 	return nullptr;
 }
 
-Module* ModuleFactory::_create_dummy(ModuleType type) {
-	if (type == ModuleType::SYNTHESIZER)
+Module* ModuleFactory::_create_dummy(ModuleCategory type) {
+	if (type == ModuleCategory::SYNTHESIZER)
 		return new DummySynthesizer;
-	if (type == ModuleType::AUDIO_SOURCE)
+	if (type == ModuleCategory::AUDIO_SOURCE)
 		return new AudioSource;
-	if (type == ModuleType::AUDIO_VISUALIZER)
+	if (type == ModuleCategory::AUDIO_VISUALIZER)
 		return new AudioVisualizer;
-	if (type == ModuleType::MIDI_SOURCE)
+	if (type == ModuleCategory::MIDI_SOURCE)
 		return new MidiSource;
-	if (type == ModuleType::AUDIO_EFFECT)
+	if (type == ModuleCategory::AUDIO_EFFECT)
 		return new AudioEffect;
-	if (type == ModuleType::MIDI_EFFECT)
+	if (type == ModuleCategory::MIDI_EFFECT)
 		return new MidiEffect;
 	return nullptr;
 }
 
-string ModuleFactory::base_class(ModuleType type) {
-	return Module::type_to_name(type);
+string ModuleFactory::base_class(ModuleCategory type) {
+	return Module::category_to_name(type);
 }
 
-void _extract_subtype_and_config(ModuleType type, const string &s, string &subtype, string &config) {
+void _extract_subtype_and_config(ModuleCategory type, const string &s, string &subtype, string &config) {
 	subtype = s;
 	config = "";
 	int pp = s.find(":");
@@ -111,12 +111,12 @@ void _extract_subtype_and_config(ModuleType type, const string &s, string &subty
 		subtype = s.head(pp);
 		config = s.substr(pp + 1, -1);
 	}
-	if ((type == ModuleType::SYNTHESIZER) and (subtype == ""))
+	if ((type == ModuleCategory::SYNTHESIZER) and (subtype == ""))
 		subtype = "Dummy";
 }
 
 // can be pre-configured with sub_type="ModuleName:config..."
-Module* ModuleFactory::create(Session* session, ModuleType type, const string& _sub_type) {
+Module* ModuleFactory::create(Session* session, ModuleCategory type, const string& _sub_type) {
 	string sub_type, config;
 	_extract_subtype_and_config(type, _sub_type, sub_type, config);
 
@@ -141,7 +141,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& _
 		m->set_session_etc(session, sub_type);
 
 	// type specific initialization
-	if (m and type == ModuleType::SYNTHESIZER)
+	if (m and type == ModuleCategory::SYNTHESIZER)
 		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 	
 	if (config != "")

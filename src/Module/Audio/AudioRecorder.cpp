@@ -37,7 +37,7 @@ AudioRecorder::Output::Output(AudioRecorder *r) : Port(SignalType::AUDIO, "out")
 }
 
 AudioRecorder::AudioRecorder() :
-	Module(ModuleType::PLUMBING, "AudioRecorder")
+	Module(ModuleCategory::PLUMBING, "AudioRecorder")
 {
 	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &source, "in"});

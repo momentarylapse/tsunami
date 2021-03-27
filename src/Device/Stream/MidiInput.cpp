@@ -69,7 +69,7 @@ string MidiInput::Config::auto_conf(const string &name) const {
 	return "";
 }
 
-MidiInput::MidiInput(Session *_session) : Module(ModuleType::STREAM, "MidiInput") {
+MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
 	state = State::NO_DEVICE;

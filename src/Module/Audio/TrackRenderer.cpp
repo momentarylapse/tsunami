@@ -79,7 +79,7 @@ void TrackRenderer::reset_state() {
 }
 
 TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
-	module_subtype = "TrackRenderer";
+	module_class = "TrackRenderer";
 	song_renderer = sr;
 	track = t;
 	offset = 0;

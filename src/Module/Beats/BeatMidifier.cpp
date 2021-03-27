@@ -13,8 +13,8 @@
 #include "../../Data/base.h"
 
 BeatMidifier::BeatMidifier() {
-	module_type = ModuleType::PLUMBING;
-	module_subtype = "BeatMidifier";
+	module_category = ModuleCategory::PLUMBING;
+	module_class = "BeatMidifier";
 	beat_source = nullptr;
 	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 

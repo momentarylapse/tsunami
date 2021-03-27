@@ -74,7 +74,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 
 
 Synthesizer::Synthesizer() :
-	Module(ModuleType::SYNTHESIZER, "")
+	Module(ModuleCategory::SYNTHESIZER, "")
 {
 	out = new Output(this);
 	port_out.add(out);
@@ -227,10 +227,10 @@ void Synthesizer::reset_state() {
 }
 
 bool Synthesizer::is_default() {
-	return (module_subtype == "Dummy") and (tuning.is_default());
+	return (module_class == "Dummy") and (tuning.is_default());
 }
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name) {
-	return (Synthesizer*)ModuleFactory::create(session, ModuleType::SYNTHESIZER, name);
+	return (Synthesizer*)ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, name);
 }
 

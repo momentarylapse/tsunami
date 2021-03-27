@@ -276,9 +276,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	signal_chain = session->create_signal_chain_system("playback");
-	renderer = (SongRenderer*)signal_chain->add(ModuleType::AUDIO_SOURCE, "SongRenderer");
-	peak_meter = (PeakMeter*)signal_chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	output_stream = (AudioOutput*)signal_chain->add(ModuleType::STREAM, "AudioOutput");
+	renderer = (SongRenderer*)signal_chain->add(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
+	peak_meter = (PeakMeter*)signal_chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+	output_stream = (AudioOutput*)signal_chain->add(ModuleCategory::STREAM, "AudioOutput");
 	signal_chain->connect(renderer, 0, peak_meter, 0);
 	signal_chain->connect(peak_meter, 0, output_stream, 0);
 	signal_chain->mark_all_modules_as_system();

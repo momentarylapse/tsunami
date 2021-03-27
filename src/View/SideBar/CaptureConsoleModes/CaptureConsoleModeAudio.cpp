@@ -66,16 +66,16 @@ void CaptureConsoleModeAudio::enter() {
 
 	chain = session->create_signal_chain_system("capture");
 
-	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
+	input = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 	input->subscribe(this, [=]{ update_device_list(); });
 
-	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 
-	auto *backup = (AudioBackup*)chain->add(ModuleType::PLUMBING, "AudioBackup");
+	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
 	backup->set_backup_mode(BACKUP_MODE_TEMP);
 
-	auto *recorder = chain->add(ModuleType::PLUMBING, "AudioRecorder");
-	auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+	auto *recorder = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
+	auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 	chain->mark_all_modules_as_system();
 
 	chain->connect(input, 0, peak_meter, 0);

@@ -65,7 +65,7 @@ public:
 
 
 SignalChain::SignalChain(Session *s, const string &_name) :
-	Module(ModuleType::SIGNAL_CHAIN, "")
+	Module(ModuleCategory::SIGNAL_CHAIN, "")
 {
 	session = s;
 	name = _name;
@@ -135,9 +135,9 @@ bool is_system_module(Module *m) {
 	return m->belongs_to_system;
 }
 
-Module *SignalChain::get_by_type(ModuleType type, const string &sub_type) {
+Module *SignalChain::get_by_type(ModuleCategory type, const string &sub_type) {
 	for (Module *m: weak(modules))
-		if (m->module_type == type and m->module_subtype == sub_type)
+		if (m->module_category == type and m->module_class == sub_type)
 			return m;
 	return nullptr;
 }
@@ -234,8 +234,8 @@ void SignalChain::save(const Path& filename) {
 	xml::Element mm("modules");
 	for (Module *m: weak(modules)) {
 		xml::Element e("module");
-		e.add(xml::Element("category", m->type_to_name(m->module_type)));
-		e.add(xml::Element("class", m->module_subtype));
+		e.add(xml::Element("category", m->category_to_name(m->module_category)));
+		e.add(xml::Element("class", m->module_class));
 		e.add(xml::Element("version", i2s(m->version())));
 		e.add(xml::Element("position").with("x", f2s(m->module_x, 0)).with("y", f2s(m->module_y, 0)));
 		if (m->allow_config_in_chain)
@@ -285,7 +285,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
 			} else*/ {
-				auto itype = Module::type_from_name(type);
+				auto itype = Module::category_from_name(type);
 				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
 				m = chain->_add(ModuleFactory::create(session, itype, sub_type));
@@ -339,7 +339,7 @@ void SignalChain::reset(bool hard) {
 	//connect(modules[1].get(), 0, modules[2].get(), 0);
 }
 
-Module* SignalChain::add(ModuleType type, const string &sub_type) {
+Module* SignalChain::add(ModuleCategory type, const string &sub_type) {
 	return _add(ModuleFactory::create(session, type, sub_type));
 }
 

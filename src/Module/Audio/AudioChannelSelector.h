@@ -25,10 +25,13 @@ public:
 
 	Port *source;
 
+	int num_in;
 	Array<int> map;
-	void _cdecl set_map(const Array<int> &map);
+	void _cdecl set_map(int num_in, const Array<int> &map);
 
 	void apply(const AudioBuffer &buf_in, AudioBuffer &buf_out);
+
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOCHANNELSELECTOR_H_ */

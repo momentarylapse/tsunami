@@ -16,6 +16,8 @@ AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::PLUMBING, 
 	port_out.add(out);
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
+
+	num_in = 2;
 }
 
 int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
@@ -23,6 +25,7 @@ int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 		return buf.length;
 
 	AudioBuffer buf_in;
+	buf_in.set_channels(cs->num_in);
 	buf_in.resize(buf.length);
 	int r = cs->source->read_audio(buf_in);
 
@@ -36,7 +39,8 @@ AudioChannelSelector::Output::Output(AudioChannelSelector *_cs) : Port(SignalTyp
 	cs = _cs;
 }
 
-void AudioChannelSelector::set_map(const Array<int> &_map) {
+void AudioChannelSelector::set_map(int _n_in, const Array<int> &_map) {
+	num_in = _n_in;
 	map = _map;
 }
 
@@ -47,6 +51,14 @@ void AudioChannelSelector::apply(const AudioBuffer &buf_in, AudioBuffer &buf_out
 			i = clamp(map[o], 0, buf_in.channels - 1);
 		memcpy(&buf_out.c[o][0], &buf_in.c[i][0], sizeof(float) * buf_in.length);
 	}
+}
+
+int AudioChannelSelector::command(ModuleCommand cmd, int param) {
+	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+		num_in = param;
+		return 0;
+	}
+	return COMMAND_NOT_HANDLED;
 }
 
 

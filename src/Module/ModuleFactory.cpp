@@ -34,53 +34,53 @@
 #include "../Session.h"
 
 
-Module* ModuleFactory::_create_special(Session* session, ModuleCategory type, const string& sub_type) {
-	if (type == ModuleCategory::PLUMBING) {
-		if (sub_type == "BeatMidifier")
+Module* ModuleFactory::_create_special(Session* session, ModuleCategory category, const string& _class) {
+	if (category == ModuleCategory::PLUMBING) {
+		if (_class == "BeatMidifier")
 			return new BeatMidifier;
-		if (sub_type == "AudioJoiner")
+		if (_class == "AudioJoiner")
 			return new AudioJoiner;
-		if (sub_type == "AudioSucker")
-			return new AudioSucker;
-		if (sub_type == "AudioBackup")
+		if (_class == "AudioSucker")
+			return new AudioSucker(session);
+		if (_class == "AudioBackup")
 			return new AudioBackup(session);
-		if (sub_type == "AudioRecorder")
+		if (_class == "AudioRecorder")
 			return new AudioRecorder;
-		if (sub_type == "AudioChannelSelector")
+		if (_class == "AudioChannelSelector")
 			return new AudioChannelSelector;
-		if (sub_type == "MidiJoiner")
+		if (_class == "MidiJoiner")
 			return new MidiJoiner;
-		if (sub_type == "MidiRecorder")
+		if (_class == "MidiRecorder")
 			return new MidiRecorder;
-		if (sub_type == "MidiSucker")
+		if (_class == "MidiSucker")
 			return new MidiSucker;
-	} else if (type == ModuleCategory::AUDIO_SOURCE) {
-		if (sub_type == "SongRenderer")
+	} else if (category == ModuleCategory::AUDIO_SOURCE) {
+		if (_class == "SongRenderer")
 			return new SongRenderer(session->song.get(), true);
-	} else if (type == ModuleCategory::AUDIO_EFFECT) {
-		if (sub_type == "Dummy" or sub_type == "")
+	} else if (category == ModuleCategory::AUDIO_EFFECT) {
+		if (_class == "Dummy" or _class == "")
 			return new AudioEffect;
-	} else if (type == ModuleCategory::MIDI_EFFECT) {
-		if (sub_type == "Dummy" or sub_type == "")
+	} else if (category == ModuleCategory::MIDI_EFFECT) {
+		if (_class == "Dummy" or _class == "")
 			return new MidiEffect;
-	} else if (type == ModuleCategory::SYNTHESIZER) {
-		if (sub_type == "Dummy" or sub_type == "")
+	} else if (category == ModuleCategory::SYNTHESIZER) {
+		if (_class == "Dummy" or _class == "")
 			return new DummySynthesizer;
-	} else if (type == ModuleCategory::PITCH_DETECTOR) {
-		if (sub_type == "Dummy" or sub_type == "")
+	} else if (category == ModuleCategory::PITCH_DETECTOR) {
+		if (_class == "Dummy" or _class == "")
 			return new DummyPitchDetector;
-	} else if (type == ModuleCategory::BEAT_SOURCE) {
-		if (sub_type == "BarStreamer")
+	} else if (category == ModuleCategory::BEAT_SOURCE) {
+		if (_class == "BarStreamer")
 			{}//return new BarStreamer()
-	} else if (type == ModuleCategory::AUDIO_VISUALIZER) {
-		if (sub_type == "PeakMeter")
+	} else if (category == ModuleCategory::AUDIO_VISUALIZER) {
+		if (_class == "PeakMeter")
 			return new PeakMeter;
-	} else if (type == ModuleCategory::STREAM) {
-		if (sub_type == "AudioOutput")
+	} else if (category == ModuleCategory::STREAM) {
+		if (_class == "AudioOutput")
 			return new AudioOutput(session);
-		if (sub_type == "AudioInput")
+		if (_class == "AudioInput")
 			return new AudioInput(session);
-		if (sub_type == "MidiInput")
+		if (_class == "MidiInput")
 			return new MidiInput(session);
 	}
 	return nullptr;

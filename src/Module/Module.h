@@ -64,6 +64,7 @@ enum class ModuleCommand {
 	ACCUMULATION_CLEAR,
 	ACCUMULATION_GET_SIZE,
 	SUCK,
+	SET_INPUT_CHANNELS,
 };
 
 class Module : public Sharable<Observable<VirtualBase>> {

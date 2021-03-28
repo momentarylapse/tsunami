@@ -162,7 +162,8 @@ AudioInput::Output::Output(AudioInput *s) :
 }
 
 int AudioInput::Output::read_audio(AudioBuffer &buf) {
-	buf.set_channels(stream->num_channels);
+	//buf.set_channels(stream->num_channels);
+	// reader (AudioSucker) decides on number of channel!
 
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
 	if (stream->buffer.available() < buf.length)

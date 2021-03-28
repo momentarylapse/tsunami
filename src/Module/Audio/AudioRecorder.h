@@ -11,6 +11,7 @@
 
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../Module.h"
+#include "../ModuleConfiguration.h"
 #include "../Port/Port.h"
 #include <mutex>
 
@@ -26,16 +27,28 @@ public:
 	};
 
 	void _accumulate(bool enable);
+	void set_channels(int channels);
 
 	void reset_state() override;
 	int command(ModuleCommand cmd, int param) override;
+	void on_config() override;
 
 	Port *source;
 	AudioBuffer buf;
-	bool accumulating;
 	std::mutex mtx_buf;
 
 	int64 samples_skipped = 0;
+
+
+	class Config : public ModuleConfiguration {
+	public:
+		int channels;
+		bool accumulating;
+		void reset() override;
+		string auto_conf(const string &name) const override;
+	} config;
+
+	ModuleConfiguration* get_config() const override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIORECORDER_H_ */

@@ -7,6 +7,7 @@
 
 #include "CaptureConsoleModeMulti.h"
 #include "../CaptureConsole.h"
+#include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/Song.h"
@@ -50,6 +51,7 @@ void CaptureConsoleModeMulti::enter() {
 		c.id_type = "type-" + i2s(i);
 		c.id_source = "source-" + i2s(i);
 		c.id_peaks = "peaks-" + i2s(i);
+		c.id_mapper = "mapper-" + i2s(i);
 		cc->set_target("multi_grid");
 		cc->add_label(t->nice_name(), 0, i*2+1, c.id_target);
 		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
@@ -58,6 +60,7 @@ void CaptureConsoleModeMulti::enter() {
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->add_string(c.id_source, d->get_name());
+			cc->add_button("C", 3, i*2+1, c.id_mapper);
 		} else if (t->type == SignalType::MIDI) {
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_midi)
@@ -69,6 +72,23 @@ void CaptureConsoleModeMulti::enter() {
 		items.add(c);
 		cc->event(c.id_source, [=]{ on_source(); });
 	}
+
+	for (auto &c: items)
+		if (c.track->type == SignalType::AUDIO) {
+			cc->event(c.id_mapper, [&] {
+				if (!c.device)
+					return;
+				msg_write("MAPPER...");
+				msg_write(c.device->channels);
+				msg_write(c.track->channels);
+				msg_write(ia2s(c.channel_map));
+				auto map = c.channel_map;
+				auto dlg = new ChannelMapDialog(cc, c.device->channels, c.track->channels, map, c.peak_meter);
+				dlg->run();
+				delete dlg;
+				c.set_map(map);
+			});
+		}
 
 	update_data_from_items();
 	

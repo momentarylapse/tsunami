@@ -55,9 +55,11 @@ public:
 		PeakMeter *peak_meter;
 		Module *recorder;
 		Device *device;
-		string id_source, id_target, id_type, id_peaks;
+		string id_source, id_target, id_type, id_peaks, id_mapper;
+		Array<int> channel_map;
 
 		void set_device(Device *dev, SignalChain *chain);
+		void set_map(const Array<int> &map);
 	};
 	Array<CaptureItem> items;
 	void update_data_from_items();

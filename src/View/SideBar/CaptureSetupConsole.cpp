@@ -8,6 +8,7 @@
 #include "CaptureSetupConsole.h"
 #include "../Mode/ViewModeCapture.h"
 #include "../Helper/PeakMeterDisplay.h"
+#include "../Dialog/ChannelMapperDialog.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Data/Song.h"
@@ -23,7 +24,6 @@
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 
-string i2s_small(int i);
 
 Array<int> create_default_channel_map(int n_in, int n_out) {
 	Array<int> map;
@@ -32,57 +32,6 @@ Array<int> create_default_channel_map(int n_in, int n_out) {
 	return map;
 }
 
-class ChannelMapDialog : public hui::Dialog {
-public:
-	int num_in, num_out;
-	Array<int> &map;
-	owned<PeakMeterDisplay> peak_meter_display_in;
-	owned<PeakMeterDisplay> peak_meter_display_out;
-	PeakMeter *peak_meter;
-
-	ChannelMapDialog(hui::Panel *parent, int _n_in, int _n_out, Array<int> &_map, PeakMeter *pm) :
-			hui::Dialog("Channel map", 400, 400, parent->win, false),
-			map(_map) {
-		num_in = _n_in;
-		num_out = _n_out;
-		peak_meter = pm;
-		map.resize(num_out);
-
-		from_resource("channel-mapper-dialog");
-		set_target("grid");
-		for (int i=0; i<num_in; i++)
-			add_label("in" + i2s_small(i+1), 1+i, 0, format("l-in-%d", i));
-		for (int o=0; o<num_out; o++)
-			add_label("out" + i2s_small(o+1), 0, 1+o, format("l-out-%d", o));
-
-		for (int i=0; i<num_in; i++)
-			for (int o=0; o<num_out; o++) {
-				string id = format("c-%d:%d", o, i);
-				add_radio_button("", 1+i, 1+o, id);
-				if (map[o] == i)
-					check(id, true);
-				event(id, [&] {
-					auto xx = hui::GetEvent()->id.substr(2, -1).explode(":");
-					int oo = xx[0]._int();
-					int ii = xx[1]._int();
-					//if (is_checked(id)) {
-						map[oo] = ii;
-
-						//msg_write(format(" %d %d   ", ii, oo) + ia2s(map));
-						peak_meter_display_out->set_channel_map(map);
-					//}
-				});
-			}
-
-
-		peak_meter_display_in = new PeakMeterDisplay(this, "peaks-in", peak_meter);
-		set_options("peaks-in", format("height=%d", PeakMeterDisplay::good_size(num_in)));
-		peak_meter_display_out = new PeakMeterDisplay(this, "peaks-out", peak_meter);
-		set_options("peaks-out", format("height=%d", PeakMeterDisplay::good_size(num_out)));
-
-		peak_meter_display_out->set_channel_map(map);
-	}
-};
 
 
 CaptureSetupConsole::CaptureSetupConsole(Session *session) :
@@ -204,7 +153,8 @@ void CaptureSetupConsole::rebuild_chain() {
 			ii.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 			ii.input_audio->set_device(c.device);
 			ii.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
+			auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");
+			sucker->set_channels(c.device->channels);
 			chain->connect(ii.input_audio, 0, ii.peak_meter, 0);
 			chain->connect(ii.peak_meter, 0, sucker, 0);
 		} else if (c.track->type == SignalType::MIDI) {

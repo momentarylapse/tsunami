@@ -17,6 +17,7 @@
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/Audio/AudioChannelSelector.h"
 //#include "../../../Module/Midi/MidiSucker.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/ModuleFactory.h"
@@ -95,11 +96,10 @@ void CaptureConsoleModeMulti::enter() {
 			cc->event(c.id_mapper, [&] {
 				if (!c.device)
 					return;
-				auto map = c.channel_map;
-				auto dlg = new ChannelMapDialog(cc, c.device->channels, c.track->channels, map, c.peak_meter);
+				auto dlg = new ChannelMapDialog(cc, c.channel_selector);
 				dlg->run();
 				delete dlg;
-				c.set_map(map);
+				c.set_map(c.channel_selector->config.map);
 			});
 		}
 		cc->event(c.id_active, [&] {

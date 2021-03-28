@@ -14,6 +14,8 @@
 class PeakMeter;
 class PeakMeterDisplay;
 
+class AudioChannelSelector;
+
 
 
 class ChannelMapDialog : public hui::Dialog {
@@ -23,8 +25,9 @@ public:
 	owned<PeakMeterDisplay> peak_meter_display_in;
 	owned<PeakMeterDisplay> peak_meter_display_out;
 	PeakMeter *peak_meter;
+	AudioChannelSelector *selector;
 
-	ChannelMapDialog(hui::Panel *parent, int n_in, int n_out, Array<int> &map, PeakMeter *pm);
+	ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *selector);
 };
 
 #endif /* SRC_VIEW_DIALOG_CHANNELMAPPERDIALOG_H_ */

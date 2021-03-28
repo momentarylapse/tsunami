@@ -39,6 +39,8 @@ AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::PLUMBING, 
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
 
+	peak_meter = new PeakMeter;
+
 	auto _class = session->plugin_manager->get_class("AudioChannelSelectorConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
@@ -61,8 +63,11 @@ int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 	buf_in.resize(buf.length);
 	int r = cs->source->read_audio(buf_in);
 
-	if (r > 0)
+	if (r > 0) {
+		if (cs->peak_meter)
+			cs->peak_meter->process(buf_in);
 		cs->apply(buf_in.ref(0, r), buf);
+	}
 
 	return r;
 }
@@ -89,6 +94,7 @@ void AudioChannelSelector::apply(const AudioBuffer &buf_in, AudioBuffer &buf_out
 int AudioChannelSelector::command(ModuleCommand cmd, int param) {
 	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
 		config.channels = param;
+		peak_meter->command(cmd, param);
 		changed();
 		return 0;
 	}

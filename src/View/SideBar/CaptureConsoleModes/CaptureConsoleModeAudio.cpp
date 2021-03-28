@@ -75,9 +75,10 @@ void CaptureConsoleModeAudio::enter() {
 	c.device = c.input_audio->get_device();
 	c.channel_map = create_default_channel_map(c.device->channels, channels);
 
-	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
 	c.channel_selector->set_channel_map(c.device->channels, c.channel_map);
+	c.peak_meter = c.channel_selector->peak_meter.get();
+//	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
 	backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
 	backup->set_backup_mode(BackupMode::TEMP);
@@ -88,8 +89,7 @@ void CaptureConsoleModeAudio::enter() {
 
 	chain->mark_all_modules_as_system();
 
-	chain->connect(c.input_audio, 0, c.peak_meter, 0);
-	chain->connect(c.peak_meter, 0, c.channel_selector, 0);
+	chain->connect(c.input_audio, 0, c.channel_selector, 0);
 	chain->connect(c.channel_selector, 0, backup, 0);
 	chain->connect(backup, 0, c.accumulator, 0);
 	chain->connect(c.accumulator, 0, sucker, 0);
@@ -112,11 +112,10 @@ void CaptureConsoleModeAudio::enter() {
 	cc->event(c.id_mapper, [&] {
 		if (!c.device)
 			return;
-		auto map = c.channel_map;
-		auto dlg = new ChannelMapDialog(cc, c.device->channels, c.track->channels, map, c.peak_meter);
+		auto dlg = new ChannelMapDialog(cc, c.channel_selector);
 		dlg->run();
 		delete dlg;
-		c.set_map(map);
+		c.set_map(c.channel_selector->config.map);
 	});
 }
 

@@ -11,6 +11,7 @@
 #include "../Port/Port.h"
 #include "../Module.h"
 #include "../ModuleConfiguration.h"
+#include "PeakMeter.h"
 
 class AudioChannelSelector : public Module {
 public:
@@ -42,6 +43,8 @@ public:
 	} config;
 
 	ModuleConfiguration* get_config() const override;
+
+	owned<PeakMeter> peak_meter;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOCHANNELSELECTOR_H_ */

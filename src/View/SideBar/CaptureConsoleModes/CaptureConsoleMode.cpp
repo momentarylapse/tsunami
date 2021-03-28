@@ -60,6 +60,7 @@ void CaptureConsoleMode::update_data_from_items() {
 			c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
+			//c.peak_meter = c.channel_selector->peak_meter.get();
 			c.accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
 			c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
 			auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");

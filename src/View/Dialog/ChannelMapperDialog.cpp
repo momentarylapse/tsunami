@@ -7,17 +7,18 @@
 
 #include "ChannelMapperDialog.h"
 #include "../Helper/PeakMeterDisplay.h"
+#include "../../Module/Audio/AudioChannelSelector.h"
 
 string i2s_small(int i);
 
 
-ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, int _n_in, int _n_out, Array<int> &_map, PeakMeter *pm) :
+ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *sel) :
 		hui::Dialog("Channel map", 400, 400, parent->win, false),
-		map(_map) {
-	num_in = _n_in;
-	num_out = _n_out;
-	peak_meter = pm;
-	map.resize(num_out);
+		map(sel->config.map) {
+	selector = sel;
+	num_in = selector->config.channels;
+	num_out = map.num;
+	peak_meter = selector->peak_meter.get();
 
 	from_resource("channel-mapper-dialog");
 	set_target("grid");

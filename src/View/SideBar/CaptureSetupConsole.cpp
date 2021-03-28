@@ -98,12 +98,12 @@ void CaptureSetupConsole::on_enter() {
 	for (auto &c: tracks)
 		if (c.track->type == SignalType::AUDIO) {
 			event(c.id_mapper, [&] {
-				if (!c.device)
+				/*if (!c.device)
 					return;
-				auto dlg = new ChannelMapDialog(this, c.device->channels, c.track->channels, c.channel_map, get_input_by_device(c.device)->peak_meter);
+				auto dlg = new ChannelMapDialog(this, c.device->channels, c.track->channels, c.channel_map, get_input_by_device(c.device)->ch);
 				dlg->run();
 				delete dlg;
-				c.peak_meter_display->set_channel_map(c.channel_map);
+				c.peak_meter_display->set_channel_map(c.channel_map);*/
 			});
 		}
 }

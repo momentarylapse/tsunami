@@ -21,8 +21,8 @@ class Any;
 
 class ModuleConfiguration : public VirtualBase {
 public:
-	ModuleConfiguration(){ _module = nullptr; _class = nullptr; }
-	virtual ~ModuleConfiguration(){}
+	ModuleConfiguration() { _module = nullptr; kaba_class = nullptr; }
+	virtual ~ModuleConfiguration() {}
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 	virtual void _cdecl reset(){}
@@ -33,8 +33,9 @@ public:
 	void from_any(const Any &a, Session *session);
 	virtual string auto_conf(const string &name) const;
 	void changed();
+
 	Module *_module;
-	const kaba::Class *_class;
+	const kaba::Class *kaba_class;
 };
 
 string var_to_string(const kaba::Class *c, char *v);

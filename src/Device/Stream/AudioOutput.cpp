@@ -240,7 +240,7 @@ AudioOutput::AudioOutput(Session *_session) :
 		kaba::class_add_elementx("device", device_pointer_class, &Config::device);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
-	config._class = _class;
+	config.kaba_class = _class;
 
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;

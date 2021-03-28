@@ -69,12 +69,12 @@ enum class ModuleCommand {
 class Module : public Sharable<Observable<VirtualBase>> {
 public:
 
-	Module(ModuleCategory type, const string &sub_type);
+	Module(ModuleCategory category, const string &_class);
 	virtual ~Module();
-	void _cdecl __init__(ModuleCategory type, const string &sub_type);
+	void _cdecl __init__(ModuleCategory category, const string &_class);
 	void _cdecl __delete__() override;
 
-	void set_session_etc(Session *session, const string &sub_type);
+	void set_session_etc(Session *session, const string &_class);
 
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_READ_END_OF_STREAM;
@@ -85,9 +85,10 @@ public:
 	// basic
 	ModuleCategory module_category;
 	string module_class;
+	string module_name;
 	Session *session;
 	float module_x, module_y;
-	const kaba::Class *_class;
+	const kaba::Class *kaba_class;
 
 	Module *copy() const;
 

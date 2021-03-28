@@ -92,7 +92,7 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 		kaba::class_add_elementx("free_flow", kaba::TypeBool, &Config::free_flow);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
-	config._class = _class;
+	config.kaba_class = _class;
 
 	timer = new hui::Timer;
 	offset = 0;

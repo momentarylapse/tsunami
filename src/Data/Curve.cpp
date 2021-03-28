@@ -93,7 +93,7 @@ Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &pr
 	Array<Target> list;
 	auto *pd = c->get_config();
 	if (pd) {
-		list.append(enumerate_type((char*)pd, pd->_class, prefix, prefix_nice));
+		list.append(enumerate_type((char*)pd, pd->kaba_class, prefix, prefix_nice));
 	}
 	return list;
 }

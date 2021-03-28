@@ -227,7 +227,7 @@ string ModuleConfiguration::to_string() const {
 }
 
 Any ModuleConfiguration::to_any() const {
-	auto a = var_to_any(_class, (const char*)this);
+	auto a = var_to_any(kaba_class, (const char*)this);
 	if (module_config_debug)
 		msg_write("to_any: " + a.str());
 	return a;
@@ -247,7 +247,7 @@ void ModuleConfiguration::from_string_legacy(const string &s, Session *session) 
 	reset();
 	int pos = 0;
 	try  {
-		var_from_string_legacy(_class, (char*)this, s, pos, session);
+		var_from_string_legacy(kaba_class, (char*)this, s, pos, session);
 	} catch (Exception &e) {
 		session->e(e.message());
 	}
@@ -257,7 +257,7 @@ void ModuleConfiguration::from_string_legacy(const string &s, Session *session) 
 void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	reset();
 	try {
-		var_from_any(_class, (char*)this, a, session);
+		var_from_any(kaba_class, (char*)this, a, session);
 	} catch (Exception &e) {
 		msg_write(a.str());
 		session->e(/*this->_module->module_subtype + ": " +*/ e.message());
@@ -272,9 +272,9 @@ bool ac_name_match(const string &const_name, const string &var_name) {
 }
 
 string ModuleConfiguration::auto_conf(const string &name) const {
-	if (!_class)
+	if (!kaba_class)
 		return "";
-	auto *ps = _class->owner;
+	auto *ps = kaba_class->owner;
 	if (!ps)
 		return "";
 	for (auto c: weak(ps->base_class->constants)) {

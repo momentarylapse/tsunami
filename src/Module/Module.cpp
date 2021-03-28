@@ -27,17 +27,26 @@ const string Module::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
 const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 
+string guess_nice_module_name(const string &_class) {
+	if (_class.head(5) == "Audio")
+		return _class.substr(5, -1);
+	if (_class.head(4) == "Midi")
+		return _class.substr(4, -1);
+	return _class;
+}
 
-Module::Module(ModuleCategory type, const string &sub_type) {
+
+Module::Module(ModuleCategory category, const string &_class) {
 	//msg_write("new Module " + p2s(this));
-	//msg_write(type_to_name(type) + "   " + sub_type);
-	module_category = type;
-	module_class = sub_type;
+	//msg_write(category_to_str(category) + "   " + _class);
+	module_category = category;
+	module_class = _class;
+	module_name = guess_nice_module_name(_class);
 	session = Session::GLOBAL;
 	enabled = true;
 	module_x = module_y = 0;
 	allow_config_in_chain = false;
-	_class = nullptr;
+	kaba_class = nullptr;
 	belongs_to_system = false;
 	func_edit = [=] { notify(); };
 	perf_channel = PerformanceMonitor::create_channel("module", this);
@@ -54,8 +63,8 @@ Module::~Module() {
 }
 
 
-void Module::__init__(ModuleCategory type, const string &sub_type) {
-	new(this) Module(type, sub_type);
+void Module::__init__(ModuleCategory category, const string &_class) {
+	new(this) Module(category, _class);
 }
 
 void Module::__delete__() {
@@ -64,18 +73,18 @@ void Module::__delete__() {
 
 
 // internal use for creation
-void Module::set_session_etc(Session *_session, const string &sub_type) {
+void Module::set_session_etc(Session *_session, const string &_class) {
 	session = _session;
-	module_class = sub_type;
+	module_class = _class;
 	auto *c = get_config();
 	if (c) {
 		c->_module = this;
-		c->_class = kaba::get_dynamic_type(c);
+		c->kaba_class = kaba::get_dynamic_type(c);
 		/*msg_write("config class: " + p2s(c->_class) + "  " + sub_type);
 		if (c->_class)
 			msg_write(c->_class->name);*/
 	}
-	_class = kaba::get_dynamic_type(this);
+	kaba_class = kaba::get_dynamic_type(this);
 
 	reset_config();
 	reset_state();
@@ -85,21 +94,21 @@ void Module::set_session_etc(Session *_session, const string &sub_type) {
 // default version:
 //   look for a Module.config in the plugin class
 ModuleConfiguration *Module::get_config() const {
-	if (!_class)
+	if (!kaba_class)
 		return nullptr;
-	for (auto &e: _class->elements)
+	for (auto &e: kaba_class->elements)
 		if ((e.name == "config") and (e.type->get_root()->long_name() == "tsunami.Module.Config")) {
 			auto *config = reinterpret_cast<ModuleConfiguration*>((char*)this + e.offset);
-			config->_class = e.type;
+			config->kaba_class = e.type;
 			return config;
 		}
 	return nullptr;
 }
 
 int Module::version() const {
-	if (!_class)
+	if (!kaba_class)
 		return 1;
-	for (auto *c: weak(_class->constants))
+	for (auto *c: weak(kaba_class->constants))
 		if ((c->name == "VERSION") and (c->type->name == "int"))
 			return c->as_int();
 	return 1;

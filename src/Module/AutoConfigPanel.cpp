@@ -367,9 +367,9 @@ public:
 };
 
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session) {
-	auto *ps = config->_class->owner;
+	auto *ps = config->kaba_class->owner;
 	Array<AutoConfigData*> r;
-	for (auto &e: config->_class->elements) {
+	for (auto &e: config->kaba_class->elements) {
 		if (e.type == kaba::TypeFloat32) {
 			if (e.name == "pitch") {
 				auto *a = new AutoConfigDataPitch(e.name);

@@ -236,6 +236,7 @@ void SignalChain::save(const Path& filename) {
 		xml::Element e("module");
 		e.add(xml::Element("category", m->category_to_str(m->module_category)));
 		e.add(xml::Element("class", m->module_class));
+		e.add(xml::Element("name", m->module_name));
 		e.add(xml::Element("version", i2s(m->version())));
 		e.add(xml::Element("position").with("x", f2s(m->module_x, 0)).with("y", f2s(m->module_y, 0)));
 		if (m->allow_config_in_chain)
@@ -291,6 +292,8 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 				m = chain->_add(ModuleFactory::create(session, itype, sub_type));
 			}
 			m->config_from_string(version, e.value("config"));
+			if (name.num > 0)
+				m->module_name = name;
 			m->module_x = e.find("position")->value("x")._float();
 			m->module_y = e.find("position")->value("y")._float();
 		}

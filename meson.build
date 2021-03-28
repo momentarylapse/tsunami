@@ -369,6 +369,7 @@ sources = [
 	'src/lib/xfile/pdf.cpp',
 	'src/lib/xfile/xml.cpp',
 	'src/Module/Audio/AudioBackup.cpp',
+	'src/Module/Audio/AudioChannelSelector.cpp',
 	'src/Module/Audio/AudioEffect.cpp',
 	'src/Module/Audio/AudioJoiner.cpp',
 	'src/Module/Audio/AudioRecorder.cpp',

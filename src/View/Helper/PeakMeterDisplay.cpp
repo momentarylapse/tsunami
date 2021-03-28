@@ -95,8 +95,6 @@ void PeakMeterDisplay::set_channel_map(const Array<int> &_channel_map) {
 }
 
 void PeakMeterDisplay::connect() {
-	if (channel_map.num == 0)
-		channel_map = create_default_channel_map(source->channels.num, source->channels.num);
 
 	source->subscribe(this, [=]{ on_update(); });
 	if (mode == Mode::SPECTRUM)
@@ -215,8 +213,12 @@ bool PeakMeterDisplay::on_right_button_down() {
 void PeakMeterDisplay::on_update() {
 	if (source) {
 		channels.clear();
-		for (int &c: channel_map)
-			channels.add(source->channels[min(c, source->channels.num-1)]);
+		if (channel_map.num > 0) {
+			for (int &c: channel_map)
+				channels.add(source->channels[min(c, source->channels.num-1)]);
+		} else {
+			channels = source->channels;
+		}
 	}
 	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	if (panel)

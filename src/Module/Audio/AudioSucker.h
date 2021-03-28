@@ -12,8 +12,7 @@
 
 class Port;
 
-class AudioSucker : public Module
-{
+class AudioSucker : public Module {
 public:
 	AudioSucker();
 
@@ -22,6 +21,9 @@ public:
 	Port *source;
 
 	int command(ModuleCommand cmd, int param) override;
+
+	int channels;
+	void set_channels(int channels);
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOSUCKER_H_ */

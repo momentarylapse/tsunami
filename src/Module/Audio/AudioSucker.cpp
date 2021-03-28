@@ -10,6 +10,7 @@
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
 #include "../../Data/Audio/AudioBuffer.h"
+#include "../../lib/file/msg.h"
 
 
 AudioSucker::AudioSucker() :
@@ -17,12 +18,18 @@ AudioSucker::AudioSucker() :
 {
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
+	channels = 2;
 }
 
 int AudioSucker::do_suck(int buffer_size) {
 	AudioBuffer temp;
+	temp.set_channels(channels);
 	temp.resize(buffer_size);
 	return source->read_audio(temp);
+}
+
+void AudioSucker::set_channels(int _channels) {
+	channels = _channels;
 }
 
 int AudioSucker::command(ModuleCommand cmd, int param) {

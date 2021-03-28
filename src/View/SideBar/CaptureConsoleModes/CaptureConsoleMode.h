@@ -20,6 +20,7 @@ class SignalChain;
 class Module;
 class AudioInput;
 class MidiInput;
+class AudioChannelSelector;
 class PeakMeter;
 class PeakMeterDisplay;
 class Device;
@@ -49,6 +50,7 @@ public:
 		Track *track;
 		AudioInput *input_audio;
 		MidiInput *input_midi;
+		AudioChannelSelector *channel_selector;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;
 		Module *recorder;

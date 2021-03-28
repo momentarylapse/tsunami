@@ -902,7 +902,7 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleCategory type, const s
 			return p;
 		}
 	}
-	session->e(format(_("Can't find %s plugin: %s ..."), Module::category_to_name(type), name));
+	session->e(format(_("Can't find %s plugin: %s ..."), Module::category_to_str(type), name));
 	return nullptr;
 }
 
@@ -943,6 +943,7 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 		names.add("MidiInput");
 	} else if (type == ModuleCategory::PLUMBING) {
 		names.add("AudioBackup");
+		names.add("AudioChannelSelector");
 		names.add("AudioJoiner");
 		names.add("AudioRecorder");
 		names.add("AudioSucker");

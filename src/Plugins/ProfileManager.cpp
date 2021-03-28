@@ -32,7 +32,7 @@ void ProfileManager::load_from_file(const Path &filename, bool read_only, Sessio
 		for (auto &e: mm->elements) {
 			Profile ff;
 			string cat = e.value("category");
-			ff.category = Module::category_from_name(cat);
+			ff.category = Module::category_from_str(cat);
 			ff._class = e.value("class");
 			ff.name = e.value("name");
 			ff.version = e.value("version")._int();
@@ -63,7 +63,7 @@ void ProfileManager::save(Session *session) {
 		for (auto &ff: profiles)
 			if (!ff.read_only) {
 				xml::Element e("profile");
-				e.add_attribute("category", Module::category_to_name(ff.category));
+				e.add_attribute("category", Module::category_to_str(ff.category));
 				e.add_attribute("class", ff._class);
 				e.add_attribute("version", i2s(ff.version));
 				e.add_attribute("name", ff.name);

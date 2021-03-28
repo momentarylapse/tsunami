@@ -25,7 +25,7 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory 
 {
 	type = _type;
 	session = _session;
-	set_title(Module::category_to_name(type));
+	set_title(Module::category_to_str(type));
 	auto tnames = session->plugin_manager->find_module_sub_types_grouped(type);
 
 	for (string &s: tnames) {

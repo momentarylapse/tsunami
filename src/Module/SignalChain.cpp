@@ -234,7 +234,7 @@ void SignalChain::save(const Path& filename) {
 	xml::Element mm("modules");
 	for (Module *m: weak(modules)) {
 		xml::Element e("module");
-		e.add(xml::Element("category", m->category_to_name(m->module_category)));
+		e.add(xml::Element("category", m->category_to_str(m->module_category)));
 		e.add(xml::Element("class", m->module_class));
 		e.add(xml::Element("version", i2s(m->version())));
 		e.add(xml::Element("position").with("x", f2s(m->module_x, 0)).with("y", f2s(m->module_y, 0)));
@@ -285,7 +285,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
 			} else*/ {
-				auto itype = Module::category_from_name(type);
+				auto itype = Module::category_from_str(type);
 				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
 				m = chain->_add(ModuleFactory::create(session, itype, sub_type));

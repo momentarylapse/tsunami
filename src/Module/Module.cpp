@@ -204,7 +204,7 @@ Module *Module::copy() const {
 }
 
 
-string Module::category_to_name(ModuleCategory cat) {
+string Module::category_to_str(ModuleCategory cat) {
 	if (cat == ModuleCategory::AUDIO_SOURCE)
 		return "AudioSource";
 	if (cat == ModuleCategory::AUDIO_EFFECT)
@@ -235,7 +235,7 @@ string Module::category_to_name(ModuleCategory cat) {
 }
 
 
-ModuleCategory Module::category_from_name(const string &str) {
+ModuleCategory Module::category_from_str(const string &str) {
 	if (str == "AudioSource")
 		return ModuleCategory::AUDIO_SOURCE;
 	if (str == "Plumbing")

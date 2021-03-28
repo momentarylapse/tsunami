@@ -129,7 +129,7 @@ public:
 
 
 	static const int COMMAND_NOT_HANDLED;
-	virtual int command(ModuleCommand cmd, int param){ return COMMAND_NOT_HANDLED; }
+	virtual int command(ModuleCommand cmd, int param) { return COMMAND_NOT_HANDLED; }
 
 
 
@@ -142,8 +142,8 @@ public:
 
 
 
-	static string category_to_name(ModuleCategory cat);
-	static ModuleCategory category_from_name(const string &name);
+	static string category_to_str(ModuleCategory cat);
+	static ModuleCategory category_from_str(const string &str);
 
 	shared_array<Module> children;
 };

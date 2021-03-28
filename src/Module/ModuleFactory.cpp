@@ -13,6 +13,7 @@
 #include "Module.h"
 #include "Audio/SongRenderer.h"
 #include "Audio/AudioBackup.h"
+#include "Audio/AudioChannelSelector.h"
 #include "Audio/AudioJoiner.h"
 #include "Audio/AudioRecorder.h"
 #include "Audio/AudioEffect.h"
@@ -45,6 +46,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory type, co
 			return new AudioBackup(session);
 		if (sub_type == "AudioRecorder")
 			return new AudioRecorder;
+		if (sub_type == "AudioChannelSelector")
+			return new AudioChannelSelector;
 		if (sub_type == "MidiJoiner")
 			return new MidiJoiner;
 		if (sub_type == "MidiRecorder")
@@ -100,7 +103,7 @@ Module* ModuleFactory::_create_dummy(ModuleCategory type) {
 }
 
 string ModuleFactory::base_class(ModuleCategory type) {
-	return Module::category_to_name(type);
+	return Module::category_to_str(type);
 }
 
 void _extract_subtype_and_config(ModuleCategory type, const string &s, string &subtype, string &config) {

@@ -93,7 +93,7 @@ string channel_title(PerfChannelInfo &c) {
 	if (m->module_class != "")
 		return m->module_class;
 
-	return m->category_to_name(m->module_category);
+	return m->category_to_str(m->module_category);
 }
 
 void CpuDisplay::on_draw(Painter* p) {

@@ -69,12 +69,18 @@ void CaptureConsoleModeAudio::enter() {
 
 	items[0].peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 
+	int channels = items[0].track->channels;
+
 	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
-	backup->set_backup_mode(BACKUP_MODE_TEMP);
+	backup->set_backup_mode(BackupMode::TEMP);
 
 	auto *recorder = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
 	auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 	chain->mark_all_modules_as_system();
+
+	backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
+	recorder->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
+	sucker->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
 
 	chain->connect(items[0].input_audio, 0, items[0].peak_meter, 0);
 	chain->connect(items[0].peak_meter, 0, backup, 0);
@@ -85,6 +91,7 @@ void CaptureConsoleModeAudio::enter() {
 	update_device_list();
 
 	cc->peak_meter->set_source(items[0].peak_meter);
+	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
 
 	chain->start(); // for preview
 	view->mode_capture->set_data({{items[0].track, items[0].input_audio, recorder}});

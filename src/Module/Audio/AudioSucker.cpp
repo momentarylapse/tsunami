@@ -12,7 +12,11 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../lib/file/msg.h"
+
+
+namespace kaba {
+	VirtualTable* get_vtable(const VirtualBase *p);
+}
 
 
 
@@ -24,11 +28,6 @@ string AudioSucker::Config::auto_conf(const string &name) const {
 	if (name == "channels")
 		return "1:16";
 	return "";
-}
-
-
-namespace kaba {
-	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
 

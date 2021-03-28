@@ -2,7 +2,11 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 	Grid ? "" vertical
 		Grid single_grid ""
 			Group grp_source "Source"
-				ComboBox source "" expandx
+				Grid ? ""
+					ComboBox source "" expandx
+					Button channel-mapper "C"
+					---|
+					DrawingArea level "" height=20 noexpandy
 			---|
 			Label message "" italic
 		Grid multi_grid ""
@@ -11,9 +15,7 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 			Label rdt_multi_source "Source" bold
 		Group rdt_capture "Recording"
 			Grid ? "" vertical
-				Grid ? "" noexpandy
-					Label time "0:00" width=120
-					DrawingArea level "" height=25
+				Label time "0:00"
 				Grid ? "" homogenousx
 					Button start "" flat huge expandx image=hui:media-record "tooltip=Start recording"
 					Button pause "" flat huge image=hui:media-pause "tooltip=Pause/continue recording"

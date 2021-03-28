@@ -43,7 +43,7 @@ public:
 	class Config : public ModuleConfiguration {
 	public:
 		int channels;
-		bool accumulating;
+		bool accumulate;
 		void reset() override;
 		string auto_conf(const string &name) const override;
 	} config;

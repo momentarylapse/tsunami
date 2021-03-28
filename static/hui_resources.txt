@@ -5774,11 +5774,29 @@ grp_source
 0
 0
 1
+Grid
+?
+
+0
+0
+3
 ComboBox
 source
 expandx
 0
 0
+0
+Button
+channel-mapper
+
+1
+0
+0
+DrawingArea
+level
+height=20,noexpandy
+0
+1
 0
 Label
 message
@@ -5822,22 +5840,10 @@ vertical
 0
 0
 2
-Grid
-?
-noexpandy
-0
-0
-2
 Label
 time
-width=120
+
 0
-0
-0
-DrawingArea
-level
-height=25
-1
 0
 0
 Grid
@@ -7270,7 +7276,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-612
+613
 # Text
 /bars-add
 Add bars...
@@ -8720,6 +8726,9 @@ Format
 
 raw_config_dialog/t_samplerate
 Samplerate
+
+record_dialog/channel-mapper
+C
 
 record_dialog/dump
 

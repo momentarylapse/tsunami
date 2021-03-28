@@ -11,10 +11,10 @@
 #include "../lib/base/base.h"
 #include "../lib/file/path.h"
 
-enum {
-	BACKUP_MODE_NONE,
-	BACKUP_MODE_TEMP,
-	BACKUP_MODE_KEEP
+enum class BackupMode {
+	NONE,
+	TEMP,
+	KEEP
 };
 
 class File;

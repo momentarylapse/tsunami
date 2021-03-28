@@ -96,7 +96,7 @@ void CaptureConsoleMode::update_data_from_items() {
 void CaptureConsoleMode::CaptureItem::set_map(const Array<int> &_map) {
 	channel_map = _map;
 	peak_meter_display->set_channel_map(channel_map);
-	channel_selector->set_map(device->channels, channel_map);
+	channel_selector->set_channel_map(device->channels, channel_map);
 }
 
 void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chain) {

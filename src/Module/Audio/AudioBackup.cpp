@@ -10,6 +10,27 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Stuff/BackupManager.h"
 #include "../../lib/file/file.h"
+#include "../../Session.h"
+#include "../../Plugins/PluginManager.h"
+
+
+namespace kaba {
+	VirtualTable* get_vtable(const VirtualBase *p);
+}
+
+
+
+void AudioBackup::Config::reset() {
+	channels = 2;
+	format = SampleFormat::SAMPLE_FORMAT_32_FLOAT;
+	backup_mode = BackupMode::TEMP;
+}
+
+string AudioBackup::Config::auto_conf(const string &name) const {
+	if (name == "channels")
+		return "1:16";
+	return "";
+}
 
 AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "AudioBackup") {
 	session = _session;
@@ -19,7 +40,20 @@ AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "
 	source = nullptr;
 
 	backup_file = nullptr;
-	backup_mode = BACKUP_MODE_TEMP;
+
+	auto _class = session->plugin_manager->get_class("AudioBackupConfig");
+	if (_class->elements.num == 0) {
+		kaba::add_class(_class);
+		kaba::class_add_elementx("channels", kaba::TypeInt, &Config::channels);
+		kaba::class_add_elementx("format", kaba::TypeInt, &Config::format);
+		kaba::class_add_elementx("mode", kaba::TypeInt, &Config::backup_mode);
+		_class->_vtable_location_target_ = kaba::get_vtable(&config);
+	}
+	config.kaba_class = _class;
+}
+
+ModuleConfiguration *AudioBackup::get_config() const {
+	return (ModuleConfiguration*)&config;
 }
 
 int AudioBackup::Output::read_audio(AudioBuffer& buf) {
@@ -38,15 +72,16 @@ AudioBackup::Output::Output(AudioBackup *b) : Port(SignalType::AUDIO, "out") {
 	backup = b;
 }
 
-void AudioBackup::set_backup_mode(int mode) {
-	backup_mode = mode;
+void AudioBackup::set_backup_mode(BackupMode mode) {
+	config.backup_mode = mode;
+	changed();
 }
 
 void AudioBackup::save_chunk(const AudioBuffer &buf) {
 	if (backup_file) {
 		// write to file
 		string data;
-		buf.exports(data, 2, SampleFormat::SAMPLE_FORMAT_32_FLOAT);
+		buf.exports(data, config.channels, config.format);
 		backup_file->write_buffer(data);
 	}
 }
@@ -54,7 +89,7 @@ void AudioBackup::save_chunk(const AudioBuffer &buf) {
 void AudioBackup::start() {
 	if (backup_file)
 		stop();
-	if (backup_mode != BACKUP_MODE_NONE)
+	if (config.backup_mode != BackupMode::NONE)
 		backup_file = BackupManager::create_file("raw", session);
 }
 
@@ -73,6 +108,10 @@ int AudioBackup::command(ModuleCommand cmd, int param) {
 		return 0;
 	} else if (cmd == ModuleCommand::STOP) {
 		stop();
+		return 0;
+	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+		config.channels = param;
+		changed();
 		return 0;
 	}
 	return COMMAND_NOT_HANDLED;

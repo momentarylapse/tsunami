@@ -10,8 +10,12 @@
 
 #include "../Port/Port.h"
 #include "../Module.h"
+#include "../ModuleConfiguration.h"
 
 class File;
+
+enum class BackupMode;
+enum class SampleFormat;
 
 class AudioBackup : public Module {
 public:
@@ -27,8 +31,7 @@ public:
 
 	Port *source;
 
-	void _cdecl set_backup_mode(int mode);
-	int backup_mode;
+	void _cdecl set_backup_mode(BackupMode mode);
 	File *backup_file;
 
 	void save_chunk(const AudioBuffer &buf);
@@ -36,6 +39,19 @@ public:
 	void start();
 	void stop();
 	int command(ModuleCommand cmd, int param) override;
+
+
+
+	class Config : public ModuleConfiguration {
+	public:
+		BackupMode backup_mode;
+		int channels;
+		SampleFormat format;
+		void reset() override;
+		string auto_conf(const string &name) const override;
+	} config;
+
+	ModuleConfiguration* get_config() const override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOBACKUP_H_ */

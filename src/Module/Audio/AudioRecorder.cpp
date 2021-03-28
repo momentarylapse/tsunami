@@ -19,7 +19,7 @@ namespace kaba {
 
 void AudioRecorder::Config::reset() {
 	channels = 2;
-	accumulating = false;
+	accumulate = false;
 }
 
 string AudioRecorder::Config::auto_conf(const string &name) const {
@@ -39,7 +39,7 @@ int AudioRecorder::Output::read_audio(AudioBuffer& buf) {
 	if (r <= 0)
 		return r;
 
-	if (rec->config.accumulating) {
+	if (rec->config.accumulate) {
 		// accumulate
 		std::lock_guard<std::mutex> lock(rec->mtx_buf);
 		if (buf.channels > rec->buf.channels)
@@ -68,7 +68,7 @@ AudioRecorder::AudioRecorder() :
 	auto _class = session->plugin_manager->get_class("AudioRecorderConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
-		kaba::class_add_elementx("accumulating", kaba::TypeBool, &Config::accumulating);
+		kaba::class_add_elementx("accumulate", kaba::TypeBool, &Config::accumulate);
 		kaba::class_add_elementx("channels", kaba::TypeInt, &Config::channels);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
@@ -80,8 +80,8 @@ ModuleConfiguration *AudioRecorder::get_config() const {
 }
 
 void AudioRecorder::_accumulate(bool enable) {
-	config.accumulating = enable;
-	notify();
+	config.accumulate = enable;
+	changed();
 }
 
 void AudioRecorder::reset_state() {
@@ -90,7 +90,7 @@ void AudioRecorder::reset_state() {
 
 void AudioRecorder::set_channels(int _channels) {
 	config.channels = _channels;
-	notify();
+	changed();
 }
 
 void AudioRecorder::on_config() {

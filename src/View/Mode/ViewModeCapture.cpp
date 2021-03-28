@@ -12,14 +12,14 @@
 #include "../../Data/Track.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
-#include "../../Module/Audio/AudioRecorder.h"
-#include "../../Module/Midi/MidiRecorder.h"
 #include "../../Module/SignalChain.h"
 #include "../SideBar/SideBar.h"
 #include "../../Session.h"
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 #include "../../Device/Stream/AudioOutput.h"
+#include "../../Module/Audio/AudioAccumulator.h"
+#include "../../Module/Midi/MidiAccumulator.h"
 #include "../Graph/AudioViewLayer.h"
 
 
@@ -55,12 +55,12 @@ MidiInput *CaptureTrackData::midi_input() {
 	return (MidiInput*)input;
 }
 
-AudioRecorder *CaptureTrackData::audio_recorder() {
-	return (AudioRecorder*)recorder;
+AudioAccumulator *CaptureTrackData::audio_recorder() {
+	return (AudioAccumulator*)recorder;
 }
 
-MidiRecorder *CaptureTrackData::midi_recorder() {
-	return (MidiRecorder*)recorder;
+MidiAccumulator *CaptureTrackData::midi_recorder() {
+	return (MidiAccumulator*)recorder;
 }
 
 void CaptureTrackData::insert_midi(int s_start, int delay) {

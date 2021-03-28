@@ -14,7 +14,6 @@
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/Audio/PeakMeter.h"
-#include "../../../Module/Midi/MidiRecorder.h"
 #include "../../../Module/SignalChain.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
@@ -23,6 +22,7 @@
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Stream/AudioOutput.h"
 #include "../../../Device/Stream/MidiInput.h"
+#include "../../../Module/Midi/MidiAccumulator.h"
 
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -61,7 +61,7 @@ void CaptureConsoleModeMidi::enter() {
 
 	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 	input->subscribe(this, [=]{ update_device_list(); });
-	auto *recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
+	auto *accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
 	for (Track *t: weak(view->song->tracks))
@@ -75,8 +75,8 @@ void CaptureConsoleModeMidi::enter() {
 	
 
 	chain->set_buffer_size(512);
-	chain->connect(input, 0, recorder, 0);
-	chain->connect(recorder, 0, preview_synth, 0);
+	chain->connect(input, 0, accumulator, 0);
+	chain->connect(accumulator, 0, preview_synth, 0);
 	chain->connect(preview_synth, 0, peak_meter, 0);
 	chain->connect(peak_meter, 0, preview_stream, 0);
 
@@ -86,7 +86,7 @@ void CaptureConsoleModeMidi::enter() {
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 	chain->start();
-	view->mode_capture->set_data({{(Track*)target, input, recorder}});
+	view->mode_capture->set_data({{(Track*)target, input, accumulator}});
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {

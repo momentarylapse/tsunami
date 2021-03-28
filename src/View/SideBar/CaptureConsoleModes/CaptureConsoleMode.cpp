@@ -60,31 +60,31 @@ void CaptureConsoleMode::update_data_from_items() {
 			c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
-			c.recorder = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
-			c.recorder->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
+			c.accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
+			c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
 			auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 			sucker->set_channels(t->channels);
 			chain->connect(c.peak_meter, 0, c.channel_selector, 0);
-			chain->connect(c.channel_selector, 0, c.recorder, 0);
-			chain->connect(c.recorder, 0, sucker, 0);
+			chain->connect(c.channel_selector, 0, c.accumulator, 0);
+			chain->connect(c.accumulator, 0, sucker, 0);
 			if (c.device)
 				c.set_device(c.device, chain.get());
-			data.add({c.track, c.input_audio, c.recorder});
+			data.add({c.track, c.input_audio, c.accumulator});
 		} else if (t->type == SignalType::MIDI) {
 			c.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-			c.recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
+			c.accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
 			auto *synth = chain->_add(t->synth->copy());
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
 			//if (c.device) {
 			//	c.input_midi->set_device(c.device);
-				chain->connect(c.input_midi, 0, c.recorder, 0);
+				chain->connect(c.input_midi, 0, c.accumulator, 0);
 			//}
-			chain->connect(c.recorder, 0, synth, 0);
+			chain->connect(c.accumulator, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, out, 0);
-			data.add({c.track, c.input_midi, c.recorder});
+			data.add({c.track, c.input_midi, c.accumulator});
 		}
 		c.peak_meter_display->set_source(c.peak_meter);
 	}
@@ -114,7 +114,7 @@ void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chai
 	} else if (track->type == SignalType::MIDI) {
 		if (device) {
 			input_midi->set_device(device);
-			chain->connect(input_midi, 0, recorder, 0);
+			chain->connect(input_midi, 0, accumulator, 0);
 		} else {
 			//input_midi->unconnect();
 		}

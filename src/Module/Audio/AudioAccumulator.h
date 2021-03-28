@@ -1,12 +1,12 @@
 /*
- * AudioRecorder.h
+ * AudioAccumulator.h
  *
  *  Created on: 07.03.2019
  *      Author: michi
  */
 
-#ifndef SRC_MODULE_AUDIO_AUDIORECORDER_H_
-#define SRC_MODULE_AUDIO_AUDIORECORDER_H_
+#ifndef SRC_MODULE_AUDIO_AUDIOACCUMULATOR_H_
+#define SRC_MODULE_AUDIO_AUDIOACCUMULATOR_H_
 
 
 #include "../../Data/Audio/AudioBuffer.h"
@@ -15,15 +15,15 @@
 #include "../Port/Port.h"
 #include <mutex>
 
-class AudioRecorder : public Module {
+class AudioAccumulator : public Module {
 public:
-	AudioRecorder();
+	AudioAccumulator();
 
 	class Output : public Port {
 	public:
-		Output(AudioRecorder *j);
+		Output(AudioAccumulator *a);
 		int read_audio(AudioBuffer &buf) override;
-		AudioRecorder *rec;
+		AudioAccumulator *acc;
 	};
 
 	void _accumulate(bool enable);
@@ -51,4 +51,4 @@ public:
 	ModuleConfiguration* get_config() const override;
 };
 
-#endif /* SRC_MODULE_AUDIO_AUDIORECORDER_H_ */
+#endif /* SRC_MODULE_AUDIO_AUDIOACCUMULATOR_H_ */

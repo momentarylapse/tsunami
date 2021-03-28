@@ -35,19 +35,19 @@
 #include "../Module/Audio/SongRenderer.h"
 #include "../Module/Audio/AudioVisualizer.h"
 #include "../Module/Audio/PitchDetector.h"
-#include "../Module/Audio/AudioRecorder.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Beats/BeatSource.h"
 #include "../Module/Beats/BeatMidifier.h"
 #include "../Module/Midi/MidiEffect.h"
-#include "../Module/Midi/MidiRecorder.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../Device/DeviceManager.h"
 #include "../Device/Stream/AudioInput.h"
 #include "../Device/Stream/AudioOutput.h"
 #include "../Device/Stream/MidiInput.h"
+#include "../Module/Audio/AudioAccumulator.h"
+#include "../Module/Midi/MidiAccumulator.h"
 #include "../Stuff/Clipboard.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ModuleSelectorDialog.h"
@@ -597,10 +597,10 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
 	}
 	
-	kaba::declare_class_element("AudioRecorder.samples_skipped", &AudioRecorder::samples_skipped);
-	kaba::declare_class_element("AudioRecorder.buffer", &AudioRecorder::buf);
+	kaba::declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
+	kaba::declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buf);
 
-	kaba::declare_class_element("MidiRecorder.buffer", &MidiRecorder::buffer);
+	kaba::declare_class_element("MidiAccumulator.buffer", &MidiAccumulator::buffer);
 
 	SignalChain chain(Session::GLOBAL, "");
 	kaba::declare_class_size("SignalChain", sizeof(SignalChain));
@@ -945,11 +945,11 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 		names.add("AudioBackup");
 		names.add("AudioChannelSelector");
 		names.add("AudioJoiner");
-		names.add("AudioRecorder");
+		names.add("AudioAccumulator");
 		names.add("AudioSucker");
 		names.add("BeatMidifier");
 		names.add("MidiJoiner");
-		names.add("MidiRecorder");
+		names.add("MidiAccumulator");
 		names.add("MidiSucker");
 	} else if (type == ModuleCategory::PITCH_DETECTOR) {
 		names.add("Dummy");

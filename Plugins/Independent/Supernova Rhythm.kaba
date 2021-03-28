@@ -62,7 +62,7 @@ class SupernovaRhythm extends TsunamiPlugin
 	SignalChain* chain
 #	PitchDetector
 	TestDetector* pitch_detector
-	MidiRecorder* recorder
+	MidiAccumulator* recorder
 	int runner
 
 	override void on_start()
@@ -76,7 +76,7 @@ class SupernovaRhythm extends TsunamiPlugin
 		let i = chain.add(Module.Type.STREAM, "AudioInput")
 		let p = chain.add(Module.Type.PITCH_DETECTOR, "Test")
 		#let x = chain.add(Module.Type.AUDIO_EFFECT, "Chunksize")
-		let r = chain.add(Module.Type.PLUMBING, "MidiRecorder")
+		let r = chain.add(Module.Type.PLUMBING, "MidiAccumulator")
 		let s = chain.add(Module.Type.PLUMBING, "MidiSucker")
 		chain.connect(i, 0, p, 0)
 		chain.connect(p, 0, r, 0)

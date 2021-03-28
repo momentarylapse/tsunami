@@ -17,7 +17,6 @@
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Action/ActionManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../../Module/Audio/AudioRecorder.h"
 #include "../../../Module/Audio/PeakMeter.h"
 #include "../../../Module/Audio/AudioBackup.h"
 #include "../../../Module/SignalChain.h"
@@ -25,6 +24,7 @@
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Stream/AudioInput.h"
 #include "../../../Device/Stream/AudioOutput.h"
+#include "../../../Module/Audio/AudioAccumulator.h"
 
 #include "../../../Module/Audio/SongRenderer.h"
 
@@ -74,18 +74,18 @@ void CaptureConsoleModeAudio::enter() {
 	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
 	backup->set_backup_mode(BackupMode::TEMP);
 
-	auto *recorder = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
+	auto *accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
 	auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 	chain->mark_all_modules_as_system();
 
 	backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
-	recorder->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
+	accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
 	sucker->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
 
 	chain->connect(items[0].input_audio, 0, items[0].peak_meter, 0);
 	chain->connect(items[0].peak_meter, 0, backup, 0);
-	chain->connect(backup, 0, recorder, 0);
-	chain->connect(recorder, 0, sucker, 0);
+	chain->connect(backup, 0, accumulator, 0);
+	chain->connect(accumulator, 0, sucker, 0);
 
 
 	update_device_list();
@@ -94,7 +94,7 @@ void CaptureConsoleModeAudio::enter() {
 	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
 
 	chain->start(); // for preview
-	view->mode_capture->set_data({{items[0].track, items[0].input_audio, recorder}});
+	view->mode_capture->set_data({{items[0].track, items[0].input_audio, accumulator}});
 
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 }

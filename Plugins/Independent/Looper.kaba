@@ -41,7 +41,7 @@ Grid ? ''
 
 class Looper extends TsunamiPlugin
 	SignalChain* chain
-	AudioRecorder* recorder
+	AudioAccumulator* recorder
 	LooperPanel* panel
 	Song* song
 	
@@ -57,7 +57,7 @@ class Looper extends TsunamiPlugin
 		song = session.song
 		chain = session.create_signal_chain("click-counter")
 		let input = chain.add(Module.Type.STREAM, "AudioInput")
-		recorder = chain.add(Module.Type.PLUMBING, "AudioRecorder")
+		recorder = chain.add(Module.Type.PLUMBING, "AudioAccumulator")
 		let sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)

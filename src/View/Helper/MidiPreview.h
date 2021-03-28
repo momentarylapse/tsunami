@@ -32,7 +32,7 @@ public:
 	Module *joiner;
 	Module *out;
 	MidiPreviewSource *source;
-	Module *recorder;
+	Module *accumulator;
 	Session *session;
 
 	MidiInput *input;

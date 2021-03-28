@@ -1,36 +1,36 @@
 /*
- * MidiRecorder.cpp
+ * MidiAccumulator.cpp
  *
  *  Created on: 07.03.2019
  *      Author: michi
  */
 
-#include "MidiRecorder.h"
+#include "MidiAccumulator.h"
 
 #include "../Port/Port.h"
 #include "../../Data/base.h"
 
 
-int MidiRecorder::Output::read_midi(MidiEventBuffer& buf) {
-	if (!rec->source)
+int MidiAccumulator::Output::read_midi(MidiEventBuffer& buf) {
+	if (!acc->source)
 		return END_OF_STREAM;
 
-	int r = rec->source->read_midi(buf);
+	int r = acc->source->read_midi(buf);
 
-	if (rec->accumulating and (r > 0)) {
-		std::lock_guard<std::mutex> lock(rec->mtx_buf);
-		rec->buffer.append(buf);
+	if (acc->accumulating and (r > 0)) {
+		std::lock_guard<std::mutex> lock(acc->mtx_buf);
+		acc->buffer.append(buf);
 	}
 
 	return r;
 }
 
-MidiRecorder::Output::Output(MidiRecorder *r) : Port(SignalType::MIDI, "out") {
-	rec = r;
+MidiAccumulator::Output::Output(MidiAccumulator *a) : Port(SignalType::MIDI, "out") {
+	acc = a;
 }
 
-MidiRecorder::MidiRecorder() :
-	Module(ModuleCategory::PLUMBING, "MidiRecorder")
+MidiAccumulator::MidiAccumulator() :
+	Module(ModuleCategory::PLUMBING, "MidiAccumulator")
 {
 	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &source, "in"});
@@ -38,11 +38,11 @@ MidiRecorder::MidiRecorder() :
 	accumulating = false;
 }
 
-void MidiRecorder::_accumulate(bool enable) {
+void MidiAccumulator::_accumulate(bool enable) {
 	accumulating = enable;
 }
 
-int MidiRecorder::command(ModuleCommand cmd, int param) {
+int MidiAccumulator::command(ModuleCommand cmd, int param) {
 	if (cmd == ModuleCommand::ACCUMULATION_START) {
 		_accumulate(true);
 		return 0;

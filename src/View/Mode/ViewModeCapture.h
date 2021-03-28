@@ -15,8 +15,8 @@
 class Device;
 class AudioInput;
 class MidiInput;
-class AudioRecorder;
-class MidiRecorder;
+class AudioAccumulator;
+class MidiAccumulator;
 class AudioOutput;
 class Module;
 class SignalChain;
@@ -42,8 +42,8 @@ struct CaptureInputData {
 	CaptureInputData(SignalType type, Module *input, Module *recorder);
 	AudioInput *audio_input();
 	MidiInput *midi_input();
-	AudioRecorder *audio_recorder();
-	MidiRecorder *midi_recorder();
+	AudioAccumulator *audio_recorder();
+	MidiAccumulator *midi_recorder();
 
 	int64 samples_played_before_capture = 0;
 	Array<SyncPoint> sync_points;
@@ -63,8 +63,8 @@ struct CaptureTrackData {
 	SignalType type();
 	AudioInput *audio_input();
 	MidiInput *midi_input();
-	AudioRecorder *audio_recorder();
-	MidiRecorder *midi_recorder();
+	AudioAccumulator *audio_recorder();
+	MidiAccumulator *midi_recorder();
 
 	int64 samples_played_before_capture = 0;
 	Array<SyncPoint> sync_points;

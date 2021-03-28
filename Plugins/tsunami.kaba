@@ -329,11 +329,11 @@ class BeatMidifier extends MidiSource
 	extern override int read(out MidiEventBuffer midi)
 	float volume
 
-class AudioRecorder extends Module
+class AudioAccumulator extends Module
 	int samples_skipped
 	AudioBuffer buffer
 
-class MidiRecorder extends Module
+class MidiAccumulator extends Module
 	MidiEventBuffer buffer
 
 class TrackRenderBuffer

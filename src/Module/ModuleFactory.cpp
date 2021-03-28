@@ -15,7 +15,6 @@
 #include "Audio/AudioBackup.h"
 #include "Audio/AudioChannelSelector.h"
 #include "Audio/AudioJoiner.h"
-#include "Audio/AudioRecorder.h"
 #include "Audio/AudioEffect.h"
 #include "Audio/AudioVisualizer.h"
 #include "Audio/PeakMeter.h"
@@ -23,7 +22,6 @@
 #include "Midi/MidiEffect.h"
 #include "Midi/MidiJoiner.h"
 #include "Midi/MidiSource.h"
-#include "Midi/MidiRecorder.h"
 #include "Midi/MidiSucker.h"
 #include "Audio/PitchDetector.h"
 #include "Beats/BeatMidifier.h"
@@ -32,6 +30,8 @@
 #include "../Plugins/Plugin.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
+#include "Audio/AudioAccumulator.h"
+#include "Midi/MidiAccumulator.h"
 
 
 Module* ModuleFactory::_create_special(Session* session, ModuleCategory category, const string& _class) {
@@ -44,14 +44,14 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 			return new AudioSucker(session);
 		if (_class == "AudioBackup")
 			return new AudioBackup(session);
-		if (_class == "AudioRecorder")
-			return new AudioRecorder;
+		if (_class == "AudioAccumulator")
+			return new AudioAccumulator;
 		if (_class == "AudioChannelSelector")
 			return new AudioChannelSelector;
 		if (_class == "MidiJoiner")
 			return new MidiJoiner;
-		if (_class == "MidiRecorder")
-			return new MidiRecorder;
+		if (_class == "MidiAccumulator")
+			return new MidiAccumulator;
 		if (_class == "MidiSucker")
 			return new MidiSucker;
 	} else if (category == ModuleCategory::AUDIO_SOURCE) {

@@ -1,11 +1,12 @@
 /*
- * AudioRecorder.cpp
+ * AudioAccumulator.cpp
  *
  *  Created on: 07.03.2019
  *      Author: michi
  */
 
-#include "AudioRecorder.h"
+#include "AudioAccumulator.h"
+
 #include "../Port/Port.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
@@ -17,12 +18,12 @@ namespace kaba {
 }
 
 
-void AudioRecorder::Config::reset() {
+void AudioAccumulator::Config::reset() {
 	channels = 2;
 	accumulate = false;
 }
 
-string AudioRecorder::Config::auto_conf(const string &name) const {
+string AudioAccumulator::Config::auto_conf(const string &name) const {
 	if (name == "channels")
 		return "1:16";
 	return "";
@@ -30,34 +31,34 @@ string AudioRecorder::Config::auto_conf(const string &name) const {
 
 
 
-int AudioRecorder::Output::read_audio(AudioBuffer& buf) {
-	if (!rec->source)
+int AudioAccumulator::Output::read_audio(AudioBuffer& buf) {
+	if (!acc->source)
 		return buf.length;
 
-	int r = rec->source->read_audio(buf);
+	int r = acc->source->read_audio(buf);
 
 	if (r <= 0)
 		return r;
 
-	if (rec->config.accumulate) {
+	if (acc->config.accumulate) {
 		// accumulate
-		std::lock_guard<std::mutex> lock(rec->mtx_buf);
-		if (buf.channels > rec->buf.channels)
-			rec->buf.set_channels(buf.channels);
-		rec->buf.append(buf.ref(0, r));
+		std::lock_guard<std::mutex> lock(acc->mtx_buf);
+		//if (buf.channels > acc->buf.channels)
+		//	acc->buf.set_channels(buf.channels);
+		acc->buf.append(buf.ref(0, r));
 	} else {
 		// ignore
-		rec->samples_skipped += r;
+		acc->samples_skipped += r;
 	}
 	return r;
 }
 
-AudioRecorder::Output::Output(AudioRecorder *r) : Port(SignalType::AUDIO, "out") {
-	rec = r;
+AudioAccumulator::Output::Output(AudioAccumulator *a) : Port(SignalType::AUDIO, "out") {
+	acc = a;
 }
 
-AudioRecorder::AudioRecorder() :
-	Module(ModuleCategory::PLUMBING, "AudioRecorder")
+AudioAccumulator::AudioAccumulator() :
+	Module(ModuleCategory::PLUMBING, "AudioAccumulator")
 {
 	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &source, "in"});
@@ -65,7 +66,7 @@ AudioRecorder::AudioRecorder() :
 
 
 
-	auto _class = session->plugin_manager->get_class("AudioRecorderConfig");
+	auto _class = session->plugin_manager->get_class("AudioAccumulatorConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
 		kaba::class_add_elementx("accumulate", kaba::TypeBool, &Config::accumulate);
@@ -75,29 +76,29 @@ AudioRecorder::AudioRecorder() :
 	config.kaba_class = _class;
 }
 
-ModuleConfiguration *AudioRecorder::get_config() const {
+ModuleConfiguration *AudioAccumulator::get_config() const {
 	return (ModuleConfiguration*)&config;
 }
 
-void AudioRecorder::_accumulate(bool enable) {
+void AudioAccumulator::_accumulate(bool enable) {
 	config.accumulate = enable;
 	changed();
 }
 
-void AudioRecorder::reset_state() {
+void AudioAccumulator::reset_state() {
 	samples_skipped = 0;
 }
 
-void AudioRecorder::set_channels(int _channels) {
+void AudioAccumulator::set_channels(int _channels) {
 	config.channels = _channels;
 	changed();
 }
 
-void AudioRecorder::on_config() {
+void AudioAccumulator::on_config() {
 	buf.set_channels(config.channels);
 }
 
-int AudioRecorder::command(ModuleCommand cmd, int param) {
+int AudioAccumulator::command(ModuleCommand cmd, int param) {
 	if (cmd == ModuleCommand::ACCUMULATION_START) {
 		_accumulate(true);
 		return 0;

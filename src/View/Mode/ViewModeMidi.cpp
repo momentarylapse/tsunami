@@ -9,7 +9,6 @@
 #include "ViewModeEdit.h"
 #include "../../Module/SignalChain.h"
 #include "../../Module/Synth/Synthesizer.h"
-#include "../../Module/Midi/MidiRecorder.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -21,6 +20,7 @@
 #include "../../Device/Device.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/MidiInput.h"
+#include "../../Module/Midi/MidiAccumulator.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../AudioView.h"
@@ -167,7 +167,7 @@ void ViewModeMidi::ri_insert() {
 
 
 void ViewModeMidi::on_midi_input() {
-	auto rec = (MidiRecorder*)preview->recorder;
+	auto rec = (MidiAccumulator*)preview->accumulator;
 
 	if (input_capture) {
 

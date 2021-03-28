@@ -135,7 +135,7 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	chain = session->create_signal_chain_system("midi-preview");
 	chain->_add(source);
 	joiner = chain->add(ModuleCategory::PLUMBING, "MidiJoiner");
-	recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
+	accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
 //	synth->setInstrument(view->cur_track->instrument);
 	synth = chain->_add(_synth);
 	out = chain->add(ModuleCategory::STREAM, "AudioOutput");
@@ -146,7 +146,7 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	chain->connect(source, 0, joiner, 0);
 	chain->connect(joiner, 0, synth, 0);
 	chain->connect(synth, 0, out, 0);
-	chain->connect(recorder, 0, joiner, 1);
+	chain->connect(accumulator, 0, joiner, 1);
 
 	chain->mark_all_modules_as_system();
 }
@@ -168,7 +168,7 @@ void MidiPreview::end() {
 
 void MidiPreview::_start_input() {
 	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-	chain->connect(input, 0, recorder, 0);
+	chain->connect(input, 0, accumulator, 0);
 	//chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	chain->start();
 	chain->command(ModuleCommand::ACCUMULATION_START, 0);

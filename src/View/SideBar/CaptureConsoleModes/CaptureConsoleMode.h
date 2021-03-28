@@ -53,7 +53,7 @@ public:
 		AudioChannelSelector *channel_selector;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;
-		Module *recorder;
+		Module *accumulator;
 		Device *device;
 		string id_source, id_target, id_type, id_peaks, id_mapper;
 		Array<int> channel_map;

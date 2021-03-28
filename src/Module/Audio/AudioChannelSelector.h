@@ -34,6 +34,9 @@ public:
 	int command(ModuleCommand cmd, int param) override;
 
 
+	ConfigPanel *create_panel() override;
+
+
 	class Config : public ModuleConfiguration {
 	public:
 		int channels;

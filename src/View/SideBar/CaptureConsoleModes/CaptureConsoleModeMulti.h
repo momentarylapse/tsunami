@@ -24,17 +24,6 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode {
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
 
-	struct CaptureItem {
-		Track *track;
-		AudioInput *input_audio;
-		MidiInput *input_midi;
-		PeakMeterDisplay *peak_meter_display;
-		PeakMeter *peak_meter;
-		Device *device;
-		string id_source, id_target, id_type, id_peaks;
-	};
-	Array<CaptureItem> items;
-
 
 public:
 	CaptureConsoleModeMulti(CaptureConsole *cc);

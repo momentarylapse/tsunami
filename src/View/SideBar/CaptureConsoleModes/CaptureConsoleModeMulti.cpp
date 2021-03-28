@@ -34,10 +34,6 @@ void CaptureConsoleModeMulti::enter() {
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
-	chain = session->create_signal_chain_system("capture-multi");
-
-	Array<CaptureTrackData> data;
-
 	// target list multi
 	for (Track *t: weak(song->tracks)) {
 		if ((t->type != SignalType::AUDIO) and (t->type != SignalType::MIDI))
@@ -67,39 +63,16 @@ void CaptureConsoleModeMulti::enter() {
 			for (Device *d: sources_midi)
 				cc->add_string(c.id_source, d->get_name());
 		}
-
-		if (t->type == SignalType::AUDIO) {
-			c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
-			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-			auto *recorder_audio = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
-			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
-			chain->connect(c.input_audio, 0, c.peak_meter, 0);
-			chain->connect(c.peak_meter, 0, recorder_audio, 0);
-			chain->connect(recorder_audio, 0, sucker, 0);
-			data.add({c.track, c.input_audio, recorder_audio});
-		} else if (t->type == SignalType::MIDI) {
-			c.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-			auto *recorder_midi = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
-			auto *synth = chain->_add(t->synth->copy());
-			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-			//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
-			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
-			chain->connect(c.input_midi, 0, recorder_midi, 0);
-			chain->connect(recorder_midi, 0, synth, 0);
-			chain->connect(synth, 0, c.peak_meter, 0);
-			chain->connect(c.peak_meter, 0, out, 0);
-			data.add({c.track, c.input_midi, recorder_midi});
-		}
-		cc->add_drawing_area("!height=30,noexpandy", 2, i*2+2, c.id_peaks);
-		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, c.peak_meter);
+		cc->add_drawing_area(format("!height=%d,noexpandy", PeakMeterDisplay::good_size(t->channels)), 2, i*2+2, c.id_peaks);
+		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, nullptr);
 
 		items.add(c);
 		cc->event(c.id_source, [=]{ on_source(); });
 	}
-	chain->mark_all_modules_as_system();
+
+	update_data_from_items();
 	
 	chain->start();
-	view->mode_capture->set_data(data);
 }
 
 void CaptureConsoleModeMulti::allow_change_device(bool allow) {

@@ -22,6 +22,20 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../Graph/AudioViewLayer.h"
 
+
+
+CaptureInputData::CaptureInputData() : CaptureInputData(SignalType::AUDIO, nullptr, nullptr) {}
+CaptureInputData::CaptureInputData(SignalType _type, Module *_input, Module *_recorder) {
+	type = _type;
+	input = _input;
+	recorder = _recorder;
+}
+
+
+
+
+
+
 CaptureTrackData::CaptureTrackData() : CaptureTrackData(nullptr, nullptr, nullptr) {}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_recorder) {
 	target = _target;
@@ -65,6 +79,13 @@ bool layer_available(TrackLayer *l, const Range &r) {
 	return true;
 }
 
+TrackLayer *find_or_create_available_layer(Track *target, const Range &r) {
+	for (auto *l: weak(target->layers))
+		if (layer_available(l, r))
+			return l;
+	return target->add_layer();
+}
+
 void CaptureTrackData::insert_audio(int s_start, int delay) {
 	Song *song = target->song;
 
@@ -76,14 +97,7 @@ void CaptureTrackData::insert_audio(int s_start, int delay) {
 	Range r = Range(i0, buf.length);
 	song->begin_action_group();
 
-	TrackLayer *layer = nullptr;
-	for (auto *l: weak(target->layers))
-		if (layer_available(l, r)) {
-			layer = l;
-			break;
-		}
-	if (!layer)
-		layer = target->add_layer();
+	TrackLayer *layer = find_or_create_available_layer(target, r);
 
 	AudioBuffer tbuf;
 	auto *a = layer->edit_buffers(tbuf, r);

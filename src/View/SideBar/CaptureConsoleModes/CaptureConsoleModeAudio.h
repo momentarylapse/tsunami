@@ -19,10 +19,7 @@ class SignalChain;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode {
 public:
-	AudioInput *input;
-	PeakMeter *peak_meter;
 	Array<Device*> sources;
-	Track *target;
 
 public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc);

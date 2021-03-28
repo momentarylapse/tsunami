@@ -12,6 +12,7 @@
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
+class Device;
 class AudioInput;
 class MidiInput;
 class AudioRecorder;
@@ -30,10 +31,33 @@ struct SyncPoint {
 	int delay(int64 samples_played_before_capture);
 };
 
+
+
+struct CaptureInputData {
+	SignalType type;
+	Device *device;
+	Module *recorder;
+	Module *input;
+	CaptureInputData();
+	CaptureInputData(SignalType type, Module *input, Module *recorder);
+	AudioInput *audio_input();
+	MidiInput *midi_input();
+	AudioRecorder *audio_recorder();
+	MidiRecorder *midi_recorder();
+
+	int64 samples_played_before_capture = 0;
+	Array<SyncPoint> sync_points;
+
+	void start_sync_before(AudioOutput *out);
+	void sync(AudioOutput *out);
+	int get_sync_delay();
+};
+
 struct CaptureTrackData {
 	Track *target;
 	Module *recorder;
 	Module *input;
+	Array<int> channel_map;
 	CaptureTrackData();
 	CaptureTrackData(Track *target, Module *input, Module *recorder);
 	SignalType type();
@@ -70,6 +94,7 @@ public:
 
 	virtual Set<Track*> prevent_playback() override;
 
+	Array<CaptureInputData> inputs;
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;

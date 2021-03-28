@@ -13,9 +13,15 @@
 
 class CaptureConsole;
 class Song;
+class Track;
 class AudioView;
 class Session;
 class SignalChain;
+class AudioInput;
+class MidiInput;
+class PeakMeter;
+class PeakMeterDisplay;
+class Device;
 
 class CaptureConsoleMode : public VirtualBase {
 public:
@@ -35,6 +41,20 @@ public:
 	Song *song;
 	AudioView *view;
 	shared<SignalChain> chain;
+
+
+
+	struct CaptureItem {
+		Track *track;
+		AudioInput *input_audio;
+		MidiInput *input_midi;
+		PeakMeterDisplay *peak_meter_display;
+		PeakMeter *peak_meter;
+		Device *device;
+		string id_source, id_target, id_type, id_peaks;
+	};
+	Array<CaptureItem> items;
+	void update_data_from_items();
 };
 
 

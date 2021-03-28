@@ -80,27 +80,23 @@ void CaptureConsoleModeMulti::allow_change_device(bool allow) {
 		cc->enable(c.id_source, allow);
 }
 
+Device* CaptureConsoleModeMulti::get_source(SignalType type, int i) {
+	if (i >= 0) {
+		if (type == SignalType::AUDIO)
+			return sources_audio[i];
+		if (type == SignalType::MIDI)
+			return sources_midi[i];
+	}
+	return nullptr;
+}
+
 void CaptureConsoleModeMulti::on_source() {
 	int index = hui::GetEvent()->id.substr(7, -1)._int();
 	if (index < 0 or index >= items.num)
 		return;
 	int n = cc->get_int("");
 	auto &c = items[index];
-	if (c.track->type == SignalType::AUDIO) {
-		if (n > 0) {
-			c.input_audio->set_device(sources_audio[n - 1]);
-		}
-	} else if (c.track->type == SignalType::MIDI) {
-		if (n > 0) {
-			c.input_midi->set_device(sources_midi[n - 1]);
-		} else {
-			c.input_midi->unconnect();
-		}
-	}
-	/*if ((n >= 0) and (n < sources.num)) {
-		chosen_device = sources[n];
-		input->set_device(chosen_device);
-	}*/
+	c.set_device(get_source(c.track->type, n - 1), chain.get());
 }
 
 void CaptureConsoleModeMulti::leave() {

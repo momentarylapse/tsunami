@@ -19,10 +19,12 @@ class AudioRecorder;
 class MidiRecorder;
 class PeakMeter;
 class PeakMeterDisplay;
+enum class SignalType;
 
 class CaptureConsoleModeMulti: public CaptureConsoleMode {
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
+	Device *get_source(SignalType type, int i);
 
 
 public:

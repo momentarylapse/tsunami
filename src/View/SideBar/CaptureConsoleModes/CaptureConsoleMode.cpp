@@ -43,6 +43,8 @@ void CaptureConsoleMode::sync() {
 		d.sync(view->output_stream);
 }
 
+// TODO fix transport in unconnected midi chains
+
 void CaptureConsoleMode::update_data_from_items() {
 
 	chain = session->create_signal_chain_system("capture");
@@ -56,27 +58,54 @@ void CaptureConsoleMode::update_data_from_items() {
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			auto *recorder_audio = chain->add(ModuleCategory::PLUMBING, "AudioRecorder");
 			auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
-			chain->connect(c.input_audio, 0, c.peak_meter, 0);
+			if (c.device) {
+				c.input_audio->set_device(c.device);
+				chain->connect(c.input_audio, 0, c.peak_meter, 0);
+			}
 			chain->connect(c.peak_meter, 0, recorder_audio, 0);
 			chain->connect(recorder_audio, 0, sucker, 0);
 			data.add({c.track, c.input_audio, recorder_audio});
 		} else if (t->type == SignalType::MIDI) {
 			c.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-			auto *recorder_midi = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
+			c.recorder = chain->add(ModuleCategory::PLUMBING, "MidiRecorder");
 			auto *synth = chain->_add(t->synth->copy());
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
-			chain->connect(c.input_midi, 0, recorder_midi, 0);
-			chain->connect(recorder_midi, 0, synth, 0);
+			//if (c.device) {
+			//	c.input_midi->set_device(c.device);
+				chain->connect(c.input_midi, 0, c.recorder, 0);
+			//}
+			chain->connect(c.recorder, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, out, 0);
-			data.add({c.track, c.input_midi, recorder_midi});
+			data.add({c.track, c.input_midi, c.recorder});
 		}
 		c.peak_meter_display->set_source(c.peak_meter);
 	}
 	chain->mark_all_modules_as_system();
 
 	view->mode_capture->set_data(data);
+}
+
+void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chain) {
+	device = _dev;
+
+	if (track->type == SignalType::AUDIO) {
+		if (device) {
+			input_audio->set_device(device);
+			chain->connect(input_audio, 0, peak_meter, 0);
+		} else {
+			chain->disconnect(input_audio, 0, peak_meter, 0);
+		}
+	} else if (track->type == SignalType::MIDI) {
+		if (device) {
+			input_midi->set_device(device);
+			chain->connect(input_midi, 0, recorder, 0);
+		} else {
+			//input_midi->unconnect();
+		}
+	}
+	peak_meter->reset_state();
 }
 

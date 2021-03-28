@@ -31,6 +31,11 @@ namespace kaba {
 #endif
 
 
+// device
+//   config.device sets cur_device
+//   config.device auto selects
+//   don't set to null!
+
 
 static const int DEFAULT_CHUNK_SIZE = 512;
 

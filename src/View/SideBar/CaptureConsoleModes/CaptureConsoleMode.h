@@ -17,6 +17,7 @@ class Track;
 class AudioView;
 class Session;
 class SignalChain;
+class Module;
 class AudioInput;
 class MidiInput;
 class PeakMeter;
@@ -50,8 +51,11 @@ public:
 		MidiInput *input_midi;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;
+		Module *recorder;
 		Device *device;
 		string id_source, id_target, id_type, id_peaks;
+
+		void set_device(Device *dev, SignalChain *chain);
 	};
 	Array<CaptureItem> items;
 	void update_data_from_items();

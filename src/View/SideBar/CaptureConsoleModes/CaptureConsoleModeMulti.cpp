@@ -43,45 +43,58 @@ void CaptureConsoleModeMulti::enter() {
 			continue;
 		CaptureItem c;
 		int i = items.num;
+		c.device = nullptr;
+		c.track = t;
+		c.enabled = false;
 		c.input_audio = nullptr;
 		c.input_midi = nullptr;
-		c.track = t;
-		c.device = nullptr;
+		c.id_group = "group-" + i2s(i);
+		c.id_grid = "grid-" + i2s(i);
 		c.id_target = "target-" + i2s(i);
-		c.id_type = "type-" + i2s(i);
+		c.id_active = "active-" + i2s(i);
 		c.id_source = "source-" + i2s(i);
 		c.id_peaks = "peaks-" + i2s(i);
 		c.id_mapper = "mapper-" + i2s(i);
 		cc->set_target("multi_grid");
-		cc->add_label(t->nice_name(), 0, i*2+1, c.id_target);
-		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
+		cc->add_group("!expandx\\" + t->nice_name(), 0, i, c.id_group);
+		cc->set_target(c.id_group);
+		cc->add_grid("!expandx", 0, 0, c.id_grid);
+		cc->set_target(c.id_grid);
+		//cc->add_label(_("Source"), 0, 0, "");
+		cc->add_check_box("!switch", 0, 0, c.id_active);
+		cc->set_tooltip(c.id_active, _("Enable recording for this track?"));
+
+		//cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO) {
+			//c.device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
+
 			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
-			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
+			cc->add_combo_box(_("        - none -"), 1, 0, c.id_source);
 			for (Device *d: sources_audio)
 				cc->add_string(c.id_source, d->get_name());
-			cc->add_button("C", 3, i*2+1, c.id_mapper);
+			cc->add_button("C", 2, 0, c.id_mapper);
+			cc->set_tooltip(c.id_mapper, _("Channel map..."));
 		} else if (t->type == SignalType::MIDI) {
+			//c.device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_midi)
 				cc->add_string(c.id_source, d->get_name());
 		}
-		cc->add_drawing_area(format("!height=%d,noexpandy", PeakMeterDisplay::good_size(t->channels)), 2, i*2+2, c.id_peaks);
+		cc->set_tooltip(c.id_source, _("Source device"));
+		cc->add_drawing_area(format("!height=%d,noexpandy,hidden", PeakMeterDisplay::good_size(t->channels)), 1, 1, c.id_peaks);
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, nullptr);
+		c.peak_meter_display->set_visible(false);
 
 		items.add(c);
 		cc->event(c.id_source, [=]{ on_source(); });
 	}
 
-	for (auto &c: items)
+	for (auto &c: items) {
 		if (c.track->type == SignalType::AUDIO) {
 			cc->event(c.id_mapper, [&] {
 				if (!c.device)
 					return;
-				msg_write("MAPPER...");
-				msg_write(c.device->channels);
-				msg_write(c.track->channels);
-				msg_write(ia2s(c.channel_map));
 				auto map = c.channel_map;
 				auto dlg = new ChannelMapDialog(cc, c.device->channels, c.track->channels, map, c.peak_meter);
 				dlg->run();
@@ -89,6 +102,10 @@ void CaptureConsoleModeMulti::enter() {
 				c.set_map(map);
 			});
 		}
+		cc->event(c.id_active, [&] {
+			c.enable(cc->is_checked(""));
+		});
+	}
 
 	update_data_from_items();
 	
@@ -96,8 +113,10 @@ void CaptureConsoleModeMulti::enter() {
 }
 
 void CaptureConsoleModeMulti::allow_change_device(bool allow) {
-	for (auto &c: items)
+	for (auto &c: items) {
 		cc->enable(c.id_source, allow);
+		cc->enable(c.id_mapper, allow);
+	}
 }
 
 Device* CaptureConsoleModeMulti::get_source(SignalType type, int i) {
@@ -124,10 +143,7 @@ void CaptureConsoleModeMulti::leave() {
 		c.peak_meter_display->set_source(nullptr);
 
 		delete c.peak_meter_display;
-		cc->remove_control(c.id_target);
-		cc->remove_control(c.id_type);
-		cc->remove_control(c.id_source);
-		cc->remove_control(c.id_peaks);
+		cc->remove_control(c.id_group);
 	}
 	items.clear();
 	session->remove_signal_chain(chain.get());

@@ -5809,24 +5809,6 @@ multi_grid
 
 1
 0
-3
-Label
-rdt_multi_target
-bold
-0
-0
-0
-Label
-rdt_multi_type
-bold
-1
-0
-0
-Label
-rdt_multi_source
-bold
-2
-0
 0
 Group
 rdt_capture
@@ -5866,7 +5848,7 @@ flat,huge,image=hui:media-pause
 0
 Button
 dump
-flat,huge,image=hui:delete
+flat,huge,image=hui:delete,danger
 2
 0
 0
@@ -5884,13 +5866,13 @@ buttonbar
 2
 Button
 cancel
-image=hui:cancel
+image=hui:cancel,danger
 0
 0
 0
 Button
 ok
-image=hui:ok,default
+image=hui:ok,default,important
 1
 0
 0
@@ -7276,7 +7258,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-613
+610
 # Text
 /bars-add
 Add bars...
@@ -8744,15 +8726,6 @@ record_dialog/pause
 Pause/continue recording
 record_dialog/rdt_capture
 Recording
-
-record_dialog/rdt_multi_source
-Source
-
-record_dialog/rdt_multi_target
-Target
-
-record_dialog/rdt_multi_type
-Type
 
 record_dialog/record_dialog
 Aufnahme

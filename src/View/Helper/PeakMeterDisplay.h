@@ -40,6 +40,8 @@ public:
 
 	static int good_size(int num_channels);
 
+	void set_visible(bool visible);
+
 private:
 
 	void connect();

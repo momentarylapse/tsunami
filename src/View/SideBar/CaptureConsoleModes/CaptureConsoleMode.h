@@ -48,18 +48,21 @@ public:
 
 	struct CaptureItem {
 		Track *track;
+		Device *device;
+		bool enabled;
+
 		AudioInput *input_audio;
 		MidiInput *input_midi;
 		AudioChannelSelector *channel_selector;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;
 		Module *accumulator;
-		Device *device;
-		string id_source, id_target, id_type, id_peaks, id_mapper;
+		string id_group, id_grid, id_source, id_target, id_active, id_peaks, id_mapper;
 		Array<int> channel_map;
 
 		void set_device(Device *dev, SignalChain *chain);
 		void set_map(const Array<int> &map);
+		void enable(bool enabled);
 	};
 	Array<CaptureItem> items;
 	void update_data_from_items();

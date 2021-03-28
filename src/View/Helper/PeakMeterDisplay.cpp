@@ -94,8 +94,13 @@ void PeakMeterDisplay::set_channel_map(const Array<int> &_channel_map) {
 	//msg_write("PMD map " + ia2s(channel_map));
 }
 
-void PeakMeterDisplay::connect() {
+void PeakMeterDisplay::set_visible(bool vis) {
+	if (panel)
+		panel->hide_control(id, !vis);
+	hidden = !vis;
+}
 
+void PeakMeterDisplay::connect() {
 	source->subscribe(this, [=]{ on_update(); });
 	if (mode == Mode::SPECTRUM)
 		source->request_spectrum();

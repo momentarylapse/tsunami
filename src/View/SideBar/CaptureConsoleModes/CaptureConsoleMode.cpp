@@ -93,6 +93,11 @@ void CaptureConsoleMode::update_data_from_items() {
 	view->mode_capture->set_data(data);
 }
 
+void CaptureConsoleMode::CaptureItem::enable(bool _enabled) {
+	enabled = _enabled;
+	msg_write("ENABLE " + b2s(enabled));
+}
+
 void CaptureConsoleMode::CaptureItem::set_map(const Array<int> &_map) {
 	channel_map = _map;
 	peak_meter_display->set_channel_map(channel_map);
@@ -119,6 +124,9 @@ void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chai
 			//input_midi->unconnect();
 		}
 	}
+
+	peak_meter_display->set_visible(device);
+
 	//id_peaks
 	peak_meter->reset_state();
 }

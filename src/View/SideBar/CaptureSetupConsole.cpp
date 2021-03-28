@@ -70,7 +70,7 @@ void CaptureSetupConsole::on_enter() {
 		set_target(c.id_grid);
 		//add_label(t->nice_name(), 0, i*2+1, c.id_target);
 		//add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
-		add_label("Source", 0, 0, c.id_type);
+		add_label(_("Source"), 0, 0, c.id_type);
 		c.channel_map = create_default_channel_map(t->channels, t->channels);
 
 		if (t->type == SignalType::AUDIO) {

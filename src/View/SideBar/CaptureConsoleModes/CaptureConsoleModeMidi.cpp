@@ -80,7 +80,8 @@ void CaptureConsoleModeMidi::enter() {
 	chain->connect(preview_synth, 0, peak_meter, 0);
 	chain->connect(peak_meter, 0, preview_stream, 0);
 
-	cc->peak_meter->set_source(peak_meter);
+	cc->peak_meter_display->set_source(peak_meter);
+	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(2)));
 
 	update_device_list();
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
@@ -109,7 +110,7 @@ void CaptureConsoleModeMidi::update_device_list() {
 
 void CaptureConsoleModeMidi::leave() {
 	session->device_manager->unsubscribe(this);
-	cc->peak_meter->set_source(nullptr);
+	cc->peak_meter_display->set_source(nullptr);
 	session->remove_signal_chain(chain.get());
 	chain = nullptr;
 }

@@ -38,7 +38,7 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	peak_meter = new PeakMeterDisplay(this, "level", nullptr);
+	peak_meter_display = new PeakMeterDisplay(this, "level", nullptr);
 
 
 	event("cancel", [=]{ on_cancel(); });

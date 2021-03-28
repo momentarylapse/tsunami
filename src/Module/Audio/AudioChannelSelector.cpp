@@ -134,28 +134,35 @@ public:
 			for (int o=0; o<num_out; o++) {
 				string id = format("c-%d:%d", o, i);
 				add_radio_button("", 1+i, 1+o, id);
-				if (map[o] == i)
-					check(id, true);
 				event(id, [&] {
 					auto xx = hui::GetEvent()->id.substr(2, -1).explode(":");
 					int oo = xx[0]._int();
 					int ii = xx[1]._int();
-					//if (is_checked(id)) {
-						map[oo] = ii;
-
-						//msg_write(format(" %d %d   ", ii, oo) + ia2s(map));
-						peak_meter_display_out->set_channel_map(map);
-					//}
+					map[oo] = ii;
+					changed();
+					peak_meter_display_out->set_channel_map(map);
 				});
 			}
 
 
 		peak_meter_display_in = new PeakMeterDisplay(this, "peaks-in", peak_meter);
-		set_options("peaks-in", format("height=%d", PeakMeterDisplay::good_size(num_in)));
 		peak_meter_display_out = new PeakMeterDisplay(this, "peaks-out", peak_meter);
-		set_options("peaks-out", format("height=%d", PeakMeterDisplay::good_size(num_out)));
 
+		// TODO: needed?
+		update();
+	}
+
+	void update() override {
+		for (int i=0; i<num_in; i++)
+			for (int o=0; o<num_out; o++) {
+				string id = format("c-%d:%d", o, i);
+				if (map[o] == i)
+					check(id, true);
+			}
 		peak_meter_display_out->set_channel_map(map);
+
+		set_options("peaks-in", format("height=%d", PeakMeterDisplay::good_size(num_in)));
+		set_options("peaks-out", format("height=%d", PeakMeterDisplay::good_size(num_out)));
 	}
 };
 

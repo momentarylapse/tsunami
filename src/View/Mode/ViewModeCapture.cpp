@@ -123,6 +123,7 @@ void CaptureTrackData::insert(int pos) {
 void CaptureTrackData::start_sync_before(AudioOutput *out) {
 	sync_points.clear();
 	samples_played_before_capture = out->samples_played();
+	samples_skiped_before_capture = audio_recorder()->samples_skipped;
 }
 
 void CaptureTrackData::sync(AudioOutput *out) {
@@ -211,6 +212,13 @@ void ViewModeCapture::set_data(const Array<CaptureTrackData> &_data) {
 
 
 void ViewModeCapture::insert() {
+
+	// FIXME stupid hack
+	if (data.num > 0)
+		for (auto &d: data)
+			d.sync_points.clear();
+
+
 	song->begin_action_group();
 	for (auto &d: data)
 		d.insert(view->get_playback_selection(true).start());

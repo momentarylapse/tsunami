@@ -67,6 +67,7 @@ struct CaptureTrackData {
 	MidiAccumulator *midi_recorder();
 
 	int64 samples_played_before_capture = 0;
+	int64 samples_skiped_before_capture = 0;
 	Array<SyncPoint> sync_points;
 
 	void insert(int pos);

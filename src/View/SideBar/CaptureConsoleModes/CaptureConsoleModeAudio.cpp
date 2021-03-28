@@ -73,10 +73,9 @@ void CaptureConsoleModeAudio::enter() {
 	c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 	c.input_audio->subscribe(this, [=]{ update_device_list(); });
 	c.device = c.input_audio->get_device();
-	c.channel_map = create_default_channel_map(c.device->channels, channels);
 
 	c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
-	c.channel_selector->set_channel_map(c.device->channels, c.channel_map);
+	c.set_map(create_default_channel_map(c.device->channels, channels));
 	c.peak_meter = c.channel_selector->peak_meter.get();
 //	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
@@ -97,7 +96,11 @@ void CaptureConsoleModeAudio::enter() {
 
 	update_device_list();
 
-	cc->peak_meter_display->set_channel_map(c.channel_map);
+	c.channel_selector->subscribe(this, [&] {
+		cc->peak_meter_display->set_channel_map(c.channel_map());
+	});
+
+	cc->peak_meter_display->set_channel_map(c.channel_map());
 	cc->peak_meter_display->set_source(c.peak_meter);
 	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
 
@@ -112,10 +115,9 @@ void CaptureConsoleModeAudio::enter() {
 	cc->event(c.id_mapper, [&] {
 		if (!c.device)
 			return;
-		auto dlg = new ChannelMapDialog(cc, c.channel_selector);
+		//ModuleExternalDialog(c.channel_selector, cc);
+		auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
 		dlg->run();
-		delete dlg;
-		c.set_map(c.channel_selector->config.map);
 	});
 }
 

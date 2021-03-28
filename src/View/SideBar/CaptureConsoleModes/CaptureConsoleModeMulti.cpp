@@ -96,10 +96,8 @@ void CaptureConsoleModeMulti::enter() {
 			cc->event(c.id_mapper, [&] {
 				if (!c.device)
 					return;
-				auto dlg = new ChannelMapDialog(cc, c.channel_selector);
+				auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
 				dlg->run();
-				delete dlg;
-				c.set_map(c.channel_selector->config.map);
 			});
 		}
 		cc->event(c.id_active, [&] {

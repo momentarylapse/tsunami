@@ -11,7 +11,9 @@
 
 
 ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *sel) :
-		hui::Dialog("Channel map", 400, 400, parent->win, false) {
+		hui::Dialog("Channel map", 300, 100, parent->win, false) {
+	set_options("", "headerbar,resizable");
+	set_title("Channel map");
 	add_grid("", 0, 0, "root");
 	embed(sel->create_panel(), "root", 0, 0);
 }

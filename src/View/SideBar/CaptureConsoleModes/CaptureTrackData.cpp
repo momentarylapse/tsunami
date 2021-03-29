@@ -12,6 +12,7 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/TrackLayer.h"
 #include "../../../Module/SignalChain.h"
+#include "../../../Stuff/BackupManager.h"
 #include "../../../Session.h"
 #include "../../../Device/Device.h"
 #include "../../../Device/DeviceManager.h"
@@ -19,6 +20,7 @@
 #include "../../../Device/Stream/MidiInput.h"
 #include "../../../Device/Stream/AudioOutput.h"
 #include "../../../Module/Audio/AudioAccumulator.h"
+#include "../../../Module/Audio/AudioBackup.h"
 #include "../../../Module/Audio/AudioChannelSelector.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Midi/MidiAccumulator.h"
@@ -178,7 +180,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
 		peak_meter = channel_selector->peak_meter.get();
 		accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
-		//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
+		backup = chain->add(ModuleCategory::PLUMBING, "AudioBackup");
 		auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 
 		// configure
@@ -187,13 +189,17 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 			peak_meter_display->set_channel_map(channel_map());
 		});
 		accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
+		backup->command(ModuleCommand::SET_INPUT_CHANNELS, track->channels);
+		backup->command(ModuleCommand::ACCUMULATION_STOP, 0);
+		((AudioBackup*)backup)->set_backup_mode(BackupMode::TEMP);
 		sucker->set_channels(t->channels);
 		set_map(create_default_channel_map(device->channels, track->channels));
 
 		// link
 		chain->connect(input, 0, channel_selector, 0);
 		chain->connect(channel_selector, 0, accumulator, 0);
-		chain->connect(accumulator, 0, sucker, 0);
+		chain->connect(accumulator, 0, backup, 0);
+		chain->connect(backup, 0, sucker, 0);
 
 	} else if (t->type == SignalType::MIDI) {
 		if (!device)
@@ -202,6 +208,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		// create modules
 		input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 		accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
+		//backup = chain->add(ModuleCategory::PLUMBING, "MidiBackup");
 		synth = (Synthesizer*)chain->_add(t->synth->copy());
 		peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 		//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");

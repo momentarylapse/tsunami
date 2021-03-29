@@ -29,8 +29,6 @@
 #include "../../../Device/Stream/AudioOutput.h"
 #include "../../../Module/Audio/AudioAccumulator.h"
 
-//#include "../../../Module/Audio/SongRenderer.h"
-
 
 Array<int> create_default_channel_map(int n_in, int n_out);
 
@@ -41,6 +39,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	a.id_source = "source";
 	a.id_mapper = "channel-mapper";
 	a.id_peaks = "level";
+	a.peak_meter_display = cc->peak_meter_display.get();
 	items.add(a);
 
 	cc->event("source", [=]{ on_source(); });
@@ -73,48 +72,22 @@ void CaptureConsoleModeAudio::enter() {
 	chain = session->create_signal_chain_system("capture");
 
 	auto &c = items[0];
-	c.chain = chain.get();
-	int channels = c.track->channels;
+	c.add_into_signal_chain(chain.get());
 
-	c.input = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
-	c.input->subscribe(this, [=]{ update_device_list(); });
-	auto device = c.audio_input()->get_device();
 
-	c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
-	c.set_map(create_default_channel_map(device->channels, channels));
-	c.peak_meter = c.channel_selector->peak_meter.get();
-//	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	c.backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
-	c.backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
-	((AudioBackup*)c.backup)->set_backup_mode(BackupMode::TEMP);
-	c.accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
-	c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
-	auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
-	sucker->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
-
-	chain->mark_all_modules_as_system();
-
-	chain->connect(c.input, 0, c.channel_selector, 0);
-	chain->connect(c.channel_selector, 0, c.backup, 0);
-	chain->connect(c.backup, 0, c.accumulator, 0);
-	chain->connect(c.accumulator, 0, sucker, 0);
+	update_data_from_items();
 
 	update_device_list();
+	c.input->subscribe(this, [=]{ update_device_list(); });
+	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
 
 	c.channel_selector->subscribe(this, [&] {
 		cc->peak_meter_display->set_channel_map(c.channel_map());
 	});
 
-	cc->peak_meter_display->set_channel_map(c.channel_map());
-	cc->peak_meter_display->set_source(c.peak_meter);
-	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
-
-	view->mode_capture->set_data(items);
-
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 
-	c.peak_meter_display = cc->peak_meter_display.get();
 	cc->event(c.id_mapper, [&] {
 		//ModuleExternalDialog(c.channel_selector, cc);
 		auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));

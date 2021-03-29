@@ -78,10 +78,10 @@ void CaptureConsoleModeAudio::enter() {
 
 	c.input = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 	c.input->subscribe(this, [=]{ update_device_list(); });
-	c.device = c.audio_input()->get_device();
+	auto device = c.audio_input()->get_device();
 
 	c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
-	c.set_map(create_default_channel_map(c.device->channels, channels));
+	c.set_map(create_default_channel_map(device->channels, channels));
 	c.peak_meter = c.channel_selector->peak_meter.get();
 //	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
@@ -116,8 +116,6 @@ void CaptureConsoleModeAudio::enter() {
 
 	c.peak_meter_display = cc->peak_meter_display.get();
 	cc->event(c.id_mapper, [&] {
-		if (!c.device)
-			return;
 		//ModuleExternalDialog(c.channel_selector, cc);
 		auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
 		dlg->run();
@@ -139,7 +137,7 @@ void CaptureConsoleModeAudio::update_device_list() {
 
 	// select current
 	foreachi(Device *d, sources, i)
-		if (d == items[0].device)
+		if (d == items[0].get_device())
 			cc->set_int("source", i);
 }
 

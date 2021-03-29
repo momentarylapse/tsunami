@@ -40,7 +40,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
 	if ((n >= 0) and (n < sources.num)) {
-		items[0].midi_input()->set_device(sources[n]);
+		items[0].set_device(sources[n]);
 	}
 }
 
@@ -84,7 +84,7 @@ void CaptureConsoleModeMidi::enter() {
 	chain->connect(c.peak_meter, 0, preview_stream, 0);
 
 	cc->peak_meter_display->set_source(c.peak_meter);
-	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(2)));
+	cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(2)));
 
 	update_device_list();
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
@@ -94,7 +94,7 @@ void CaptureConsoleModeMidi::enter() {
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {
-	cc->enable("source", allow);
+	items[0].allow_edit(allow);
 }
 
 void CaptureConsoleModeMidi::update_device_list() {

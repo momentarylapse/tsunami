@@ -37,9 +37,7 @@ struct SyncPoint {
 };
 
 
-struct CaptureTrackData {
-	//CaptureTrackData();
-	//CaptureTrackData(Track *target, Module *input, Module *recorder);
+struct CaptureTrackData : public VirtualBase {
 
 	SignalType type();
 
@@ -61,7 +59,7 @@ struct CaptureTrackData {
 	int get_sync_delay();
 
 	Track *track = nullptr;
-	Device *device = nullptr;
+	Device *get_device();
 	bool enabled = false;
 	bool allowing_edit = true;
 	hui::Panel *panel = nullptr;
@@ -81,6 +79,8 @@ struct CaptureTrackData {
 	void enable(bool enabled);
 	void allow_edit(bool allow);
 	void accumulate(bool acc);
+
+	void add_into_signal_chain(SignalChain *chain, Device *preferred_device = nullptr);
 };
 
 

@@ -45,7 +45,6 @@ void CaptureConsoleModeMulti::enter() {
 		int i = items.num;
 		c.track = t;
 		c.panel = cc;
-		c.chain = chain.get();
 		c.id_group = "group-" + i2s(i);
 		c.id_grid = "grid-" + i2s(i);
 		c.id_active = "active-" + i2s(i);
@@ -61,15 +60,10 @@ void CaptureConsoleModeMulti::enter() {
 		cc->set_tooltip(c.id_active, _("Enable recording for this track?"));
 
 		if (t->type == SignalType::AUDIO) {
-			c.device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
-
-			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
 			cc->add_combo_box("", 1, 0, c.id_source);
 			cc->add_button("C", 2, 0, c.id_mapper);
 			cc->set_tooltip(c.id_mapper, _("Channel map..."));
 		} else if (t->type == SignalType::MIDI) {
-			c.device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
-
 			cc->add_combo_box("", 1, 0, c.id_source);
 		}
 		cc->set_tooltip(c.id_source, _("Source device"));
@@ -81,13 +75,13 @@ void CaptureConsoleModeMulti::enter() {
 		cc->event(c.id_source, [=]{ on_source(); });
 	}
 
+	update_data_from_items();
+
 	update_device_list();
 
 	for (auto &c: items) {
 		if (c.track->type == SignalType::AUDIO) {
 			cc->event(c.id_mapper, [&] {
-				if (!c.device)
-					return;
 				auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
 				dlg->run();
 			});
@@ -95,9 +89,10 @@ void CaptureConsoleModeMulti::enter() {
 		cc->event(c.id_active, [&] {
 			c.enable(cc->is_checked(""));
 		});
+		c.input->subscribe(this, [=] {
+			update_device_list();
+		});
 	}
-
-	update_data_from_items();
 	
 	chain->start();
 }
@@ -157,7 +152,7 @@ void CaptureConsoleModeMulti::update_device_list() {
 
 		// select current
 		foreachi(Device *d, sources, i)
-			if (d == c.device)
+			if (d == c.get_device())
 				c.panel->set_int(c.id_source, i);
 	}
 }

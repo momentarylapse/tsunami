@@ -56,10 +56,15 @@ void CaptureConsoleMode::update_data_from_items() {
 
 	for (auto &c: items) {
 		auto t = c.track;
+		c.chain = chain.get();
+
 		if (t->type == SignalType::AUDIO) {
 			c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
 			//c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
+			c.channel_selector->subscribe(this, [&] {
+				c.peak_meter_display->set_channel_map(c.channel_map());
+			});
 			c.peak_meter = c.channel_selector->peak_meter.get();
 			c.accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
 			c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
@@ -67,13 +72,12 @@ void CaptureConsoleMode::update_data_from_items() {
 			sucker->set_channels(t->channels);
 			chain->connect(c.channel_selector, 0, c.accumulator, 0);
 			chain->connect(c.accumulator, 0, sucker, 0);
-			if (c.device)
-				c.set_device(c.device, chain.get());
+			if (c.device) {
+				c.input_audio->set_device(c.device);
+				c.set_map(create_default_channel_map(c.device->channels, c.track->channels));
+			}
 			data.add({c.track, c.input_audio, c.accumulator});
 
-			c.channel_selector->subscribe(this, [&] {
-				c.peak_meter_display->set_channel_map(c.channel_map());
-			});
 		} else if (t->type == SignalType::MIDI) {
 			c.input_midi = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
 			c.accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
@@ -81,16 +85,20 @@ void CaptureConsoleMode::update_data_from_items() {
 			c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 			//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
-			//if (c.device) {
-			//	c.input_midi->set_device(c.device);
-				chain->connect(c.input_midi, 0, c.accumulator, 0);
-			//}
+			if (c.device) {
+				c.input_midi->set_device(c.device);
+				//chain->connect(c.input_midi, 0, c.accumulator, 0);
+			}
 			chain->connect(c.accumulator, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, out, 0);
 			data.add({c.track, c.input_midi, c.accumulator});
 		}
 		c.peak_meter_display->set_source(c.peak_meter);
+		c.panel->enable(c.id_source, c.enabled and c.allowing_edit);
+		c.panel->enable(c.id_mapper, c.enabled and c.allowing_edit);
+		if (c.enabled)
+			c.enable(true);
 	}
 	chain->mark_all_modules_as_system();
 
@@ -98,15 +106,37 @@ void CaptureConsoleMode::update_data_from_items() {
 }
 
 void CaptureConsoleMode::CaptureTrackItem::enable(bool _enabled) {
+	if (_enabled == enabled)
+		return;
 	enabled = _enabled;
-	msg_write("ENABLE " + b2s(enabled));
-	if (panel and id_active.num > 0)
+
+	if (track->type == SignalType::AUDIO) {
+		if (enabled) {
+			chain->connect(input_audio, 0, channel_selector, 0);
+		} else {
+			chain->disconnect(input_audio, 0, channel_selector, 0);
+		}
+	} else if (track->type == SignalType::MIDI) {
+		if (device) {
+			chain->connect(input_midi, 0, accumulator, 0);
+		} else {
+			//input_midi->unconnect();
+		}
+	}
+
+	if (panel) {
 		panel->check(id_active, enabled);
+		panel->enable(id_source, enabled and allowing_edit);
+		panel->enable(id_mapper, enabled and allowing_edit);
+	}
+	peak_meter_display->set_visible(enabled);
 }
 
 void CaptureConsoleMode::CaptureTrackItem::allow_edit(bool _allow) {
 	allowing_edit = _allow;
-	msg_write("ALLOW " + b2s(allowing_edit));
+	panel->enable(id_active, allowing_edit);
+	panel->enable(id_source, allowing_edit and enabled);
+	panel->enable(id_mapper, allowing_edit and enabled);
 }
 
 Array<int> CaptureConsoleMode::CaptureTrackItem::channel_map() {
@@ -117,29 +147,23 @@ void CaptureConsoleMode::CaptureTrackItem::set_map(const Array<int> &_map) {
 	channel_selector->set_channel_map(device->channels, _map);
 }
 
-void CaptureConsoleMode::CaptureTrackItem::set_device(Device *_dev, SignalChain *chain) {
+void CaptureConsoleMode::CaptureTrackItem::set_device(Device *_dev) {
 	device = _dev;
-	enable(device);
+	//if (!device)
+	//	enable(false);
 
-	if (track->type == SignalType::AUDIO) {
-		if (device) {
+	if (device) {
+		if (track->type == SignalType::AUDIO) {
 			input_audio->set_device(device);
-			chain->connect(input_audio, 0, channel_selector, 0);
-
 			set_map(create_default_channel_map(device->channels, track->channels));
-		} else {
-			chain->disconnect(input_audio, 0, channel_selector, 0);
-		}
-	} else if (track->type == SignalType::MIDI) {
-		if (device) {
+		} else if (track->type == SignalType::MIDI) {
 			input_midi->set_device(device);
-			chain->connect(input_midi, 0, accumulator, 0);
-		} else {
-			//input_midi->unconnect();
 		}
 	}
 
+	if (device)
+		enable(true);
+
 	peak_meter->reset_state();
-	peak_meter_display->set_visible(device);
 }
 

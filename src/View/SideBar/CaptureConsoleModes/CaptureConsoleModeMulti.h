@@ -34,6 +34,7 @@ public:
 	void allow_change_device(bool allow) override;
 
 	void on_source();
+	void update_device_list();
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEMULTI_H_ */

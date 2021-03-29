@@ -37,6 +37,9 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
 	CaptureTrackItem a;
 	a.panel = cc;
+	a.id_source = "source";
+	a.id_mapper = "channel-mapper";
+	a.id_peaks = "level";
 	items.add(a);
 
 	cc->event("source", [=]{ on_source(); });
@@ -45,7 +48,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
 	if ((n >= 0) and (n < sources.num))
-		items[0].set_device(sources[n], chain.get());
+		items[0].set_device(sources[n]);
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
@@ -69,6 +72,7 @@ void CaptureConsoleModeAudio::enter() {
 	chain = session->create_signal_chain_system("capture");
 
 	auto &c = items[0];
+	c.chain = chain.get();
 	int channels = c.track->channels;
 
 	c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
@@ -94,7 +98,6 @@ void CaptureConsoleModeAudio::enter() {
 	chain->connect(backup, 0, c.accumulator, 0);
 	chain->connect(c.accumulator, 0, sucker, 0);
 
-
 	update_device_list();
 
 	c.channel_selector->subscribe(this, [&] {
@@ -105,13 +108,11 @@ void CaptureConsoleModeAudio::enter() {
 	cc->peak_meter_display->set_source(c.peak_meter);
 	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
 
-	chain->start(); // for preview
 	view->mode_capture->set_data({{c.track, c.input_audio, c.accumulator}});
 
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 
-	c.id_mapper = "channel-mapper";
 	c.peak_meter_display = cc->peak_meter_display.get();
 	cc->event(c.id_mapper, [&] {
 		if (!c.device)
@@ -120,6 +121,11 @@ void CaptureConsoleModeAudio::enter() {
 		auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
 		dlg->run();
 	});
+
+
+	c.enable(true);
+
+	chain->start(); // for preview
 }
 
 void CaptureConsoleModeAudio::update_device_list() {
@@ -137,8 +143,9 @@ void CaptureConsoleModeAudio::update_device_list() {
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {
-	cc->enable("source", allow);
-	cc->enable("channel-mapper", allow);
+	items[0].allow_edit(allow);
+	//cc->enable("source", allow);
+	//cc->enable("channel-mapper", allow);
 }
 
 void CaptureConsoleModeAudio::leave() {

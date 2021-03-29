@@ -91,10 +91,15 @@ int CaptureTrackData::get_sync_delay() {
 
 
 void CaptureTrackData::accumulate(bool acc) {
-	if (acc and enabled)
+	if (acc and enabled) {
 		accumulator->command(ModuleCommand::ACCUMULATION_START, 0);
-	else
+		if (backup)
+			backup->command(ModuleCommand::ACCUMULATION_START, 0);
+	} else {
 		accumulator->command(ModuleCommand::ACCUMULATION_STOP, 0);
+		if (backup)
+			backup->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	}
 }
 
 void CaptureTrackData::enable(bool _enabled) {

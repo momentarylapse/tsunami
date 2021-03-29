@@ -33,6 +33,7 @@ public:
 
 	void _cdecl set_backup_mode(BackupMode mode);
 	File *backup_file;
+	bool accumulating;
 
 	void save_chunk(const AudioBuffer &buf);
 

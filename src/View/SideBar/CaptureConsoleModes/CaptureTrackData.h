@@ -70,7 +70,8 @@ struct CaptureTrackData : public VirtualBase {
 	PeakMeterDisplay *peak_meter_display = nullptr;
 	PeakMeter *peak_meter = nullptr;
 	Module *accumulator = nullptr;
-	Synthesizer *synth;
+	Module *backup = nullptr;
+	Synthesizer *synth = nullptr;
 	string id_group, id_grid, id_source, id_active, id_peaks, id_mapper;
 	Array<int> channel_map();
 

@@ -39,6 +39,7 @@ AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
 
+	accumulating = true;
 	backup_file = nullptr;
 
 	auto _class = session->plugin_manager->get_class("AudioBackupConfig");
@@ -62,7 +63,7 @@ int AudioBackup::Output::read_audio(AudioBuffer& buf) {
 
 	int r = backup->source->read_audio(buf);
 
-	if (r > 0)
+	if (r > 0 and backup->accumulating)
 		backup->save_chunk(buf.ref(0, r));
 
 	return r;
@@ -78,7 +79,7 @@ void AudioBackup::set_backup_mode(BackupMode mode) {
 }
 
 void AudioBackup::save_chunk(const AudioBuffer &buf) {
-	if (backup_file) {
+	if (backup_file and accumulating) {
 		// write to file
 		string data;
 		buf.exports(data, config.channels, config.format);
@@ -108,6 +109,12 @@ int AudioBackup::command(ModuleCommand cmd, int param) {
 		return 0;
 	} else if (cmd == ModuleCommand::STOP) {
 		stop();
+		return 0;
+	} else if (cmd == ModuleCommand::ACCUMULATION_START) {
+		accumulating = true;
+		return 0;
+	} else if (cmd == ModuleCommand::ACCUMULATION_STOP) {
+		accumulating = false;
 		return 0;
 	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
 		config.channels = param;

@@ -84,9 +84,9 @@ void CaptureConsoleModeAudio::enter() {
 	c.set_map(create_default_channel_map(device->channels, channels));
 	c.peak_meter = c.channel_selector->peak_meter.get();
 //	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	auto *backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
-	backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
-	backup->set_backup_mode(BackupMode::TEMP);
+	c.backup = (AudioBackup*)chain->add(ModuleCategory::PLUMBING, "AudioBackup");
+	c.backup->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
+	((AudioBackup*)c.backup)->set_backup_mode(BackupMode::TEMP);
 	c.accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
 	c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, channels);
 	auto *sucker = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
@@ -95,8 +95,8 @@ void CaptureConsoleModeAudio::enter() {
 	chain->mark_all_modules_as_system();
 
 	chain->connect(c.input, 0, c.channel_selector, 0);
-	chain->connect(c.channel_selector, 0, backup, 0);
-	chain->connect(backup, 0, c.accumulator, 0);
+	chain->connect(c.channel_selector, 0, c.backup, 0);
+	chain->connect(c.backup, 0, c.accumulator, 0);
 	chain->connect(c.accumulator, 0, sucker, 0);
 
 	update_device_list();

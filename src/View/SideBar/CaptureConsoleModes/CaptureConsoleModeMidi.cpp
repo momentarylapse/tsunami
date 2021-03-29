@@ -6,6 +6,7 @@
  */
 
 #include "CaptureConsoleModeMidi.h"
+#include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Song.h"

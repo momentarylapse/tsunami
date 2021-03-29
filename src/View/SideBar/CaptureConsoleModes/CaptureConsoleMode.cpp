@@ -6,6 +6,7 @@
  */
 
 #include "CaptureConsoleMode.h"
+#include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
 #include "../../../Module/SignalChain.h"
 #include "../../../Data/base.h"

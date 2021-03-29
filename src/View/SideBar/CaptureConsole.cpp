@@ -15,6 +15,7 @@
 #include "CaptureConsoleModes/CaptureConsoleModeAudio.h"
 #include "CaptureConsoleModes/CaptureConsoleModeMidi.h"
 #include "CaptureConsoleModes/CaptureConsoleModeMulti.h"
+#include "CaptureConsoleModes/CaptureTrackData.h"
 
 #include "CaptureConsole.h"
 

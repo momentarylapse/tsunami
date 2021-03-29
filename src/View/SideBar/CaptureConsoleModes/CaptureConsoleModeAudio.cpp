@@ -6,6 +6,7 @@
  */
 
 #include "CaptureConsoleModeAudio.h"
+#include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
 #include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/Song.h"

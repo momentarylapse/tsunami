@@ -146,7 +146,7 @@ void CaptureConsoleModeMulti::update_device_list() {
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
 	for (auto &c: items) {
-		Array<Device*> sources = sources_audio;
+		auto sources = sources_audio;
 		if (c.track->type == SignalType::MIDI)
 			sources = sources_midi;
 

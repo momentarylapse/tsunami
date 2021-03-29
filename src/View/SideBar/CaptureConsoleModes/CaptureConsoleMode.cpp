@@ -70,6 +70,7 @@ void CaptureConsoleMode::update_data_from_items() {
 			c.accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
 			auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 			sucker->set_channels(t->channels);
+			chain->connect(c.input_audio, 0, c.channel_selector, 0);
 			chain->connect(c.channel_selector, 0, c.accumulator, 0);
 			chain->connect(c.accumulator, 0, sucker, 0);
 			if (c.device) {
@@ -87,16 +88,18 @@ void CaptureConsoleMode::update_data_from_items() {
 			auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
 			if (c.device) {
 				c.input_midi->set_device(c.device);
-				//chain->connect(c.input_midi, 0, c.accumulator, 0);
 			}
+			chain->connect(c.input_midi, 0, c.accumulator, 0);
 			chain->connect(c.accumulator, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, out, 0);
 			data.add({c.track, c.input_midi, c.accumulator});
 		}
 		c.peak_meter_display->set_source(c.peak_meter);
-		c.panel->enable(c.id_source, c.enabled and c.allowing_edit);
-		c.panel->enable(c.id_mapper, c.enabled and c.allowing_edit);
+		if (c.id_source.num > 0)
+			c.panel->enable(c.id_source, c.enabled and c.allowing_edit);
+		if (c.id_mapper.num > 0)
+			c.panel->enable(c.id_mapper, c.enabled and c.allowing_edit);
 		if (c.enabled)
 			c.enable(true);
 	}
@@ -105,11 +108,20 @@ void CaptureConsoleMode::update_data_from_items() {
 	view->mode_capture->set_data(data);
 }
 
+
+
+void CaptureConsoleMode::CaptureTrackItem::accumulate(bool acc) {
+	if (acc and enabled)
+		accumulator->command(ModuleCommand::ACCUMULATION_START, 0);
+	else
+		accumulator->command(ModuleCommand::ACCUMULATION_STOP, 0);
+}
+
 void CaptureConsoleMode::CaptureTrackItem::enable(bool _enabled) {
 	if (_enabled == enabled)
 		return;
 	enabled = _enabled;
-
+/*
 	if (track->type == SignalType::AUDIO) {
 		if (enabled) {
 			chain->connect(input_audio, 0, channel_selector, 0);
@@ -122,21 +134,26 @@ void CaptureConsoleMode::CaptureTrackItem::enable(bool _enabled) {
 		} else {
 			//input_midi->unconnect();
 		}
-	}
+	}*/
 
 	if (panel) {
 		panel->check(id_active, enabled);
-		panel->enable(id_source, enabled and allowing_edit);
-		panel->enable(id_mapper, enabled and allowing_edit);
+		if (id_source.num > 0)
+			panel->enable(id_source, enabled and allowing_edit);
+		if (id_mapper.num > 0)
+			panel->enable(id_mapper, enabled and allowing_edit);
 	}
 	peak_meter_display->set_visible(enabled);
 }
 
 void CaptureConsoleMode::CaptureTrackItem::allow_edit(bool _allow) {
 	allowing_edit = _allow;
-	panel->enable(id_active, allowing_edit);
-	panel->enable(id_source, allowing_edit and enabled);
-	panel->enable(id_mapper, allowing_edit and enabled);
+	if (id_active.num > 0)
+		panel->enable(id_active, allowing_edit);
+	if (id_source.num > 0)
+		panel->enable(id_source, allowing_edit and enabled);
+	if (id_mapper.num > 0)
+		panel->enable(id_mapper, allowing_edit and enabled);
 }
 
 Array<int> CaptureConsoleMode::CaptureTrackItem::channel_map() {
@@ -167,3 +184,19 @@ void CaptureConsoleMode::CaptureTrackItem::set_device(Device *_dev) {
 	peak_meter->reset_state();
 }
 
+void CaptureConsoleMode::accumulation_start() {
+	for (auto &c: items)
+		c.accumulate(true);
+	//chain->command(ModuleCommand::ACCUMULATION_START, 0);
+}
+
+void CaptureConsoleMode::accumulation_stop() {
+	for (auto &c: items)
+		c.accumulate(false);
+	//chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+}
+
+void CaptureConsoleMode::accumulation_clear() {
+	accumulation_stop();
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
+}

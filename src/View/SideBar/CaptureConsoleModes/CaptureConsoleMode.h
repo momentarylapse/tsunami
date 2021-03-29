@@ -41,6 +41,10 @@ public:
 	void end_sync();
 	void sync();
 
+	void accumulation_start();
+	void accumulation_stop();
+	void accumulation_clear();
+
 	CaptureConsole *cc;
 	Session *session;
 	Song *song;
@@ -70,6 +74,7 @@ public:
 		void set_map(const Array<int> &map);
 		void enable(bool enabled);
 		void allow_edit(bool allow);
+		void accumulate(bool acc);
 	};
 	Array<CaptureTrackItem> items;
 	void update_data_from_items();

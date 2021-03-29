@@ -121,7 +121,7 @@ void CaptureConsole::on_start() {
 	mode->start_sync_before();
 	
 	view->signal_chain->start();
-	chain->command(ModuleCommand::ACCUMULATION_START, 0);
+	mode->accumulation_start();
 	mode->allow_change_device(false);
 	enable("start", false);
 	enable("pause", true);
@@ -132,8 +132,7 @@ void CaptureConsole::on_start() {
 
 void CaptureConsole::on_dump() {
 	view->stop();
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
+	mode->accumulation_clear();
 	mode->allow_change_device(true);
 	enable("start", true);
 	enable("pause", false);
@@ -146,7 +145,8 @@ void CaptureConsole::on_dump() {
 void CaptureConsole::on_pause() {
 	// TODO...
 	view->signal_chain->stop();
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+
+	mode->accumulation_stop();
 	mode->allow_change_device(true);
 	enable("start", true);
 	enable("pause", false);
@@ -156,7 +156,7 @@ void CaptureConsole::on_pause() {
 
 void CaptureConsole::on_ok() {
 	view->stop();
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	mode->accumulation_stop();
 	if (has_data())
 		view->mode_capture->insert();
 	session->set_mode(EditMode::Default);
@@ -170,7 +170,7 @@ void CaptureConsole::on_cancel() {
 void CaptureConsole::on_new_version() {
 	if (has_data()) {
 		view->stop();
-		chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+		mode->accumulation_stop();
 		view->mode_capture->insert();
 		on_dump();
 	}
@@ -186,7 +186,7 @@ void CaptureConsole::update_time() {
 
 void CaptureConsole::on_output_end_of_stream() {
 	view->stop();
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	mode->accumulation_stop();
 	enable("start", true);
 	enable("pause", false);
 	enable("dump", true);

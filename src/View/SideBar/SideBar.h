@@ -22,7 +22,6 @@ class SampleRefConsole;
 class SampleManagerConsole;
 class CurveConsole;
 class CaptureConsole;
-class CaptureSetupConsole;
 class AudioView;
 class SideBarConsole;
 class Session;
@@ -48,7 +47,6 @@ public:
 		CURVE_CONSOLE,
 		SAMPLEREF_CONSOLE,
 		CAPTURE_CONSOLE,
-		CAPTURE_SETUP_CONSOLE,
 		NUM_CONSOLES
 	};
 
@@ -69,7 +67,6 @@ public:
 	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;
-	CaptureSetupConsole *capture_setup_console;
 
 	owned_array<SideBarConsole> consoles;
 	void add_console(SideBarConsole *c);

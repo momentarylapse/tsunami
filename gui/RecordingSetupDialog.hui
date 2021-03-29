@@ -1,6 +1,0 @@
-Dialog recording-setup-dialog "Recording setup" width=300 height=200
-	Grid ? "" vertical
-		Grid mapping-grid "" expandx
-		Grid ? "" vertical
-			CheckBox show-missing "Missing devices" "tooltip=Show devices that are currently not available" disabled
-

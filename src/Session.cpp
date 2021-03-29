@@ -45,7 +45,6 @@ const string EditMode::DefaultSamples = "default/samples";
 const string EditMode::DefaultMixing = "default/mixing";
 const string EditMode::DefaultMastering = "default/mastering";
 const string EditMode::DefaultSampleRef = "default/sample-ref";
-const string EditMode::DefaultCaptureSetup = "default/capture-setup";
 const string EditMode::EditTrack = "edit-track";
 const string EditMode::Capture = "capture";
 const string EditMode::ScaleBars = "scale-bars";
@@ -182,9 +181,6 @@ void Session::set_mode(const string &mode) {
 	} else if (mode == EditMode::DefaultSampleRef) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
-	} else if (mode == EditMode::DefaultCaptureSetup) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::CAPTURE_SETUP_CONSOLE);
 	} else {
 		e("unknown mode: " + mode);
 		return;

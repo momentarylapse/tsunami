@@ -28,7 +28,12 @@
 #include "../../../lib/hui/hui.h"
 
 
-Array<int> create_default_channel_map(int n_in, int n_out);
+Array<int> create_default_channel_map(int n_in, int n_out) {
+	Array<int> map;
+	for (int o=0; o<n_out; o++)
+		map.add(min(o, n_in-1));
+	return map;
+}
 
 
 // TODO: subscribe to input and catch device change -> update channel map...

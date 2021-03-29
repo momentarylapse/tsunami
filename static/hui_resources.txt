@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-70
+69
 # Resource
 Menu
 menu_fake
@@ -5878,37 +5878,6 @@ image=hui:ok,default,important
 0
 # Resource
 Dialog
-recording-setup-dialog
-width=300,height=200
-0
-0
-1
-Grid
-?
-vertical
-0
-0
-2
-Grid
-mapping-grid
-expandx
-0
-0
-0
-Grid
-?
-vertical
-1
-0
-1
-CheckBox
-show-missing
-disabled
-0
-0
-0
-# Resource
-Dialog
 sample-manager-dialog
 width=400,height=400,allow-parent
 0
@@ -7264,7 +7233,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-611
+609
 # Text
 /bars-add
 Add bars...
@@ -8742,12 +8711,6 @@ Start recording
 record_dialog/time
 0:00
 
-recording-setup-dialog/recording-setup-dialog
-Recording setup
-
-recording-setup-dialog/show-missing
-Missing devices
-Show devices that are currently not available
 sample-manager-dialog/group-edit
 Edit
 

@@ -22,7 +22,6 @@ public:
 	static const string DefaultMixing;
 	static const string DefaultMastering;
 	static const string DefaultSampleRef;
-	static const string DefaultCaptureSetup;
 	static const string EditTrack;
 	static const string Capture;
 	static const string ScaleBars;

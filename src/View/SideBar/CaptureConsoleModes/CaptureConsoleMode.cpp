@@ -9,6 +9,8 @@
 #include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
 #include "../../../Module/SignalChain.h"
+#include "../../../Module/Audio/AudioChannelSelector.h"
+#include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Session.h"
@@ -46,6 +48,36 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 	view->mode_capture->set_data(items);
+
+
+	session->device_manager->subscribe(this, [=]{ update_device_list(); });
+
+
+	for (auto &c: items) {
+		cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
+
+		c.input->subscribe(this, [=] {
+			update_device_list();
+		});
+
+		c.channel_selector->subscribe(this, [&] {
+			cc->peak_meter_display->set_channel_map(c.channel_map());
+		});
+
+		if (c.id_mapper.num > 0 and c.channel_selector) {
+			cc->event(c.id_mapper, [&] {
+				//ModuleExternalDialog(c.channel_selector, cc);
+				auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
+				dlg->run();
+			});
+		}
+		if (c.id_active.num > 0)
+			cc->event(c.id_active, [&] {
+				c.enable(cc->is_checked(""));
+			});
+	}
+
+	update_device_list();
 }
 
 Device* CaptureConsoleMode::get_source(SignalType type, int i) {
@@ -97,4 +129,20 @@ void CaptureConsoleMode::accumulation_stop() {
 void CaptureConsoleMode::accumulation_clear() {
 	accumulation_stop();
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
+}
+
+void CaptureConsoleMode::leave() {
+	chain->stop();
+	session->device_manager->unsubscribe(this);
+
+	for (int id: event_ids)
+		cc->remove_event_handler(id);
+	event_ids.clear();
+
+	for (auto &c: items) {
+		c.peak_meter_display->set_source(nullptr);
+	}
+	items.clear();
+	session->remove_signal_chain(chain.get());
+	chain = nullptr;
 }

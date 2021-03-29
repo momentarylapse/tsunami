@@ -8,25 +8,14 @@
 #include "CaptureConsoleModeMulti.h"
 #include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
-#include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/Song.h"
 #include "../../../Session.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
-#include "../../../Stuff/BackupManager.h"
-#include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"
-#include "../../../Module/Audio/AudioChannelSelector.h"
-//#include "../../../Module/Midi/MidiSucker.h"
-#include "../../../Module/Synth/Synthesizer.h"
-#include "../../../Module/ModuleFactory.h"
 #include "../../../Module/SignalChain.h"
-#include "../../../Device/Device.h"
-#include "../../../Device/DeviceManager.h"
-#include "../../../Device/Stream/AudioInput.h"
-#include "../../../Device/Stream/MidiInput.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -41,6 +30,7 @@ void CaptureConsoleModeMulti::enter() {
 			continue;
 		if (!view->sel.has(t))
 			continue;
+
 		CaptureTrackData c;
 		int i = items.num;
 		c.track = t;
@@ -72,27 +62,14 @@ void CaptureConsoleModeMulti::enter() {
 		c.peak_meter_display->set_visible(false);
 
 		items.add(c);
-		cc->event(c.id_source, [=]{ on_source(); });
+
+		event_ids.add(cc->event(c.id_source, [=] {
+			on_source();
+		}));
 	}
 
 	update_data_from_items();
 
-	update_device_list();
-
-	for (auto &c: items) {
-		if (c.track->type == SignalType::AUDIO) {
-			cc->event(c.id_mapper, [&] {
-				auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
-				dlg->run();
-			});
-		}
-		cc->event(c.id_active, [&] {
-			c.enable(cc->is_checked(""));
-		});
-		c.input->subscribe(this, [=] {
-			update_device_list();
-		});
-	}
 	
 	chain->start();
 }
@@ -117,10 +94,9 @@ void CaptureConsoleModeMulti::leave() {
 		c.peak_meter_display->set_source(nullptr);
 
 		delete c.peak_meter_display;
+		c.peak_meter_display = nullptr;
 		cc->remove_control(c.id_group);
 	}
-	items.clear();
-	session->remove_signal_chain(chain.get());
-	chain = nullptr;
+	CaptureConsoleMode::leave();
 }
 

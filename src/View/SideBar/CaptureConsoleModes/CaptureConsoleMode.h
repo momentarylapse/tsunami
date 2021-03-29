@@ -34,7 +34,7 @@ class CaptureConsoleMode : public VirtualBase {
 public:
 	CaptureConsoleMode(CaptureConsole *cc);
 	virtual void enter() = 0;
-	virtual void leave() = 0;
+	virtual void leave();
 	
 	virtual void allow_change_device(bool allow) = 0;
 
@@ -56,6 +56,7 @@ public:
 
 	Array<CaptureTrackData> items;
 	void update_data_from_items();
+	Array<int> event_ids;
 
 
 	Array<Device*> sources_audio;

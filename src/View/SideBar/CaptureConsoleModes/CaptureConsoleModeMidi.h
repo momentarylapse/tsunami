@@ -11,27 +11,14 @@
 #include "CaptureConsoleMode.h"
 #include "../../../lib/base/base.h"
 
-class MidiInput;
-class Device;
-class Track;
-class Synthesizer;
-class AudioOutput;
-class PeakMeter;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode {
-	Array<Device*> sources;
-
-
 public:
 	CaptureConsoleModeMidi(CaptureConsole *cc);
-	void on_source();
-	void on_target();
-	void set_target(const Track *t);
-	void enter() override;
-	void leave() override;
-	void allow_change_device(bool allow) override;
 
-	void update_device_list();
+	void on_source();
+	void enter() override;
+	void allow_change_device(bool allow) override;
 };
 
 

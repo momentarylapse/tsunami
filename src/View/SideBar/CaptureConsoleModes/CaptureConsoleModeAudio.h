@@ -20,10 +20,10 @@ class SignalChain;
 class CaptureConsoleModeAudio : public CaptureConsoleMode {
 public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc);
+
 	void on_source();
 	void set_target(Track *t);
 	void enter() override;
-	void leave() override;
 	void allow_change_device(bool allow) override;
 };
 

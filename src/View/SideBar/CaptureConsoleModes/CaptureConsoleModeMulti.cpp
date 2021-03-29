@@ -103,16 +103,6 @@ void CaptureConsoleModeMulti::allow_change_device(bool allow) {
 	}
 }
 
-Device* CaptureConsoleModeMulti::get_source(SignalType type, int i) {
-	if (i >= 0) {
-		if (type == SignalType::AUDIO)
-			return sources_audio[i];
-		if (type == SignalType::MIDI)
-			return sources_midi[i];
-	}
-	return nullptr;
-}
-
 void CaptureConsoleModeMulti::on_source() {
 	int index = hui::GetEvent()->id.substr(7, -1)._int();
 	if (index < 0 or index >= items.num)
@@ -134,25 +124,3 @@ void CaptureConsoleModeMulti::leave() {
 	chain = nullptr;
 }
 
-
-
-void CaptureConsoleModeMulti::update_device_list() {
-	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
-	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
-
-	for (auto &c: items) {
-		auto sources = sources_audio;
-		if (c.track->type == SignalType::MIDI)
-			sources = sources_midi;
-
-		// add all
-		c.panel->reset(c.id_source);
-		for (Device *d: sources)
-			c.panel->set_string(c.id_source, d->get_name());
-
-		// select current
-		foreachi(Device *d, sources, i)
-			if (d == c.get_device())
-				c.panel->set_int(c.id_source, i);
-	}
-}

@@ -28,6 +28,7 @@ class CaptureTrackData;
 namespace hui {
 	class Panel;
 }
+enum class SignalType;
 
 class CaptureConsoleMode : public VirtualBase {
 public:
@@ -55,6 +56,12 @@ public:
 
 	Array<CaptureTrackData> items;
 	void update_data_from_items();
+
+
+	Array<Device*> sources_audio;
+	Array<Device*> sources_midi;
+	Device *get_source(SignalType type, int i);
+	void update_device_list();
 };
 
 

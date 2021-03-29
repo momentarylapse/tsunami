@@ -11,26 +11,17 @@
 #include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
-#include "../../../Data/TrackLayer.h"
 #include "../../../Data/base.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
-#include "../../../Stuff/BackupManager.h"
-#include "../../../Action/ActionManager.h"
-#include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../../Module/Audio/PeakMeter.h"
-#include "../../../Module/Audio/AudioBackup.h"
-#include "../../../Module/Audio/AudioChannelSelector.h"
 #include "../../../Module/SignalChain.h"
+
+
 #include "../../../Device/Device.h"
+#include "../../../Module/Audio/AudioChannelSelector.h"
 #include "../../../Device/DeviceManager.h"
-#include "../../../Device/Stream/AudioInput.h"
-#include "../../../Device/Stream/AudioOutput.h"
-#include "../../../Module/Audio/AudioAccumulator.h"
 
-
-Array<int> create_default_channel_map(int n_in, int n_out);
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
@@ -47,8 +38,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 
 void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
-	if ((n >= 0) and (n < sources.num))
-		items[0].set_device(sources[n]);
+	items[0].set_device(get_source(SignalType::AUDIO, n));
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
@@ -98,20 +88,6 @@ void CaptureConsoleModeAudio::enter() {
 	c.enable(true);
 
 	chain->start(); // for preview
-}
-
-void CaptureConsoleModeAudio::update_device_list() {
-	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
-
-	// add all
-	cc->reset("source");
-	for (Device *d: sources)
-		cc->set_string("source", d->get_name());
-
-	// select current
-	foreachi(Device *d, sources, i)
-		if (d == items[0].get_device())
-			cc->set_int("source", i);
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {

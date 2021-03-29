@@ -200,9 +200,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("pause", [=]{ on_pause(); });
 	event("stop", [=]{ on_stop(); });
 	set_key_code("stop", hui::KEY_CONTROL + hui::KEY_T);
-	event("record", [=]{ on_record(); });
+	event("record", [=]{ on_record(false); });
 	set_key_code("record", hui::KEY_CONTROL + hui::KEY_R);
-	event("record-setup", [=]{ session->set_mode(EditMode::DefaultCaptureSetup); });
+	event("record-simple", [=]{ on_record(false); });
+	event("record-complex", [=]{ on_record(true); });
 	event("playback-range-lock", [=]{ view->set_playback_range_locked(!view->playback_range_locked); });
 	event("show-log", [=]{ on_show_log(); });
 	event("about", [=]{ on_about(); });
@@ -868,7 +869,11 @@ void TsunamiWindow::on_insert_sample() {
 	song->insert_selected_samples(view->sel);
 }
 
-void TsunamiWindow::on_record() {
+
+extern bool _capture_console_force_complex_;
+
+void TsunamiWindow::on_record(bool complex) {
+	_capture_console_force_complex_ = complex;
 	session->set_mode(EditMode::Capture);
 }
 

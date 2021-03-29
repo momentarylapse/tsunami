@@ -6791,11 +6791,17 @@ record
 image=hui:media-record,important
 14
 0
-1
+2
 Item
-record-setup
+record-simple
 
 0
+0
+0
+Item
+record-complex
+
+1
 0
 0
 Separator
@@ -7258,7 +7264,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-610
+611
 # Text
 /bars-add
 Add bars...
@@ -8991,8 +8997,11 @@ Play
 toolbar/record
 Record
 
-toolbar/record-setup
-Setup...
+toolbar/record-complex
+Complex...
+
+toolbar/record-simple
+Record
 
 toolbar/stop
 Stop

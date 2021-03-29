@@ -94,7 +94,7 @@ public:
 	void on_play_loop();
 	void on_pause();
 	void on_stop();
-	void on_record();
+	void on_record(bool complex);
 	void on_add_bars();
 	void on_add_pause();
 	void on_delete_bars();

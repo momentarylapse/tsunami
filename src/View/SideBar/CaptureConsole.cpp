@@ -24,7 +24,7 @@
 #include "../../EditModes.h"
 
 
-
+bool _capture_console_force_complex_ = false;
 
 
 CaptureConsole::CaptureConsole(Session *session):
@@ -73,11 +73,11 @@ void CaptureConsole::on_enter() {
 				num_midi ++;
 		}
 
-	if ((num_audio == 1) and (num_midi == 0)) {
+	if ((num_audio == 1) and (num_midi == 0) and !_capture_console_force_complex_) {
 		mode = mode_audio.get();
-	} else if ((num_audio == 0) and (num_midi == 1)) {
+	} else if ((num_audio == 0) and (num_midi == 1) and !_capture_console_force_complex_) {
 		mode = mode_midi.get();
-	} else { // TYPE_TIME
+	} else {
 		mode = mode_multi.get();
 	}
 
@@ -89,7 +89,7 @@ void CaptureConsole::on_enter() {
 	view->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 
 	// automatically start
-	if (num_audio + num_midi == 1)
+	if (num_audio + num_midi == 1 and !_capture_console_force_complex_)
 		on_start();
 }
 

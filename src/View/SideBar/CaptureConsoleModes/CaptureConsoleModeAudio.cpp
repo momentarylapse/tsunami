@@ -58,8 +58,6 @@ void CaptureConsoleModeAudio::enter() {
 		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
 			set_target(t);
 
-	chain = session->create_signal_chain_system("capture");
-
 
 	update_data_from_items();
 

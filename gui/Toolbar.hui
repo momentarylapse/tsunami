@@ -14,6 +14,7 @@ Toolbar toolbar ""
 	Item pause "Pause" image=hui:media-pause
 	Item stop "Stop" image=hui:media-stop
 	Menu record "Record" image=hui:media-record important
-		Item record-setup "Setup..."
+		Item record-simple "Record"
+		Item record-complex "Complex..."
 	Separator
 	Item mode-edit-check "Edit" image=hui:edit important checkable

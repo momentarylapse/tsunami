@@ -30,8 +30,6 @@ void CaptureConsoleModeMidi::on_source() {
 void CaptureConsoleModeMidi::enter() {
 	cc->hide_control("single_grid", false);
 
-	chain = session->create_signal_chain_system("capture");
-
 	{
 		CaptureTrackData c;
 		c.id_peaks = "level";

@@ -24,6 +24,9 @@ class AudioChannelSelector;
 class PeakMeter;
 class PeakMeterDisplay;
 class Device;
+namespace hui {
+	class Panel;
+}
 
 class CaptureConsoleMode : public VirtualBase {
 public:
@@ -46,25 +49,28 @@ public:
 
 
 
-	struct CaptureItem {
-		Track *track;
-		Device *device;
-		bool enabled;
+	struct CaptureTrackItem {
+		Track *track = nullptr;
+		Device *device = nullptr;
+		bool enabled = false;
+		bool allowing_edit = true;
+		hui::Panel *panel;
 
-		AudioInput *input_audio;
-		MidiInput *input_midi;
-		AudioChannelSelector *channel_selector;
-		PeakMeterDisplay *peak_meter_display;
-		PeakMeter *peak_meter;
-		Module *accumulator;
+		AudioInput *input_audio = nullptr;
+		MidiInput *input_midi = nullptr;
+		AudioChannelSelector *channel_selector = nullptr;
+		PeakMeterDisplay *peak_meter_display = nullptr;
+		PeakMeter *peak_meter = nullptr;
+		Module *accumulator = nullptr;
 		string id_group, id_grid, id_source, id_target, id_active, id_peaks, id_mapper;
 		Array<int> channel_map();
 
 		void set_device(Device *dev, SignalChain *chain);
 		void set_map(const Array<int> &map);
 		void enable(bool enabled);
+		void allow_edit(bool allow);
 	};
-	Array<CaptureItem> items;
+	Array<CaptureTrackItem> items;
 	void update_data_from_items();
 };
 

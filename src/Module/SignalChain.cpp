@@ -197,7 +197,10 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 	disconnect_out(source, source_port);
 	disconnect_in(target, target_port);
 
-	target->_plug_in(target_port, source, source_port);
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		target->_plug_in(target_port, source, source_port);
+	}
 	notify(MESSAGE_ADD_CABLE);
 }
 
@@ -211,7 +214,10 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 	for (Module *target: weak(modules))
 		for (auto &p: target->port_in) {
 			if ((*p.port) == sp) {
-				*p.port = nullptr;
+				{
+					std::lock_guard<std::mutex> lock(mutex);
+					*p.port = nullptr;
+				}
 				notify(MESSAGE_DELETE_CABLE);
 			}
 		}
@@ -219,7 +225,10 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 
 void SignalChain::disconnect_in(Module *target, int target_port) {
 	auto tp = target->port_in[target_port];
-	*(tp.port) = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		*(tp.port) = nullptr;
+	}
 	notify(MESSAGE_DELETE_CABLE);
 }
 

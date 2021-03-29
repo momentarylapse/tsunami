@@ -35,7 +35,8 @@ Array<int> create_default_channel_map(int n_in, int n_out);
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
-	CaptureItem a;
+	CaptureTrackItem a;
+	a.panel = cc;
 	items.add(a);
 
 	cc->event("source", [=]{ on_source(); });

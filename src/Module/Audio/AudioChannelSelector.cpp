@@ -60,6 +60,7 @@ int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 	if (!cs->source)
 		return buf.length;
 
+
 	AudioBuffer buf_in;
 	buf_in.set_channels(cs->config.channels);
 	buf_in.resize(buf.length);

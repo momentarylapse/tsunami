@@ -42,13 +42,10 @@ void CaptureConsoleModeMulti::enter() {
 			continue;
 		if (!view->sel.has(t))
 			continue;
-		CaptureItem c;
+		CaptureTrackItem c;
 		int i = items.num;
-		c.device = nullptr;
 		c.track = t;
-		c.enabled = false;
-		c.input_audio = nullptr;
-		c.input_midi = nullptr;
+		c.panel = cc;
 		c.id_group = "group-" + i2s(i);
 		c.id_grid = "grid-" + i2s(i);
 		c.id_target = "target-" + i2s(i);

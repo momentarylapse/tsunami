@@ -97,21 +97,29 @@ void CaptureConsoleMode::update_data_from_items() {
 	view->mode_capture->set_data(data);
 }
 
-void CaptureConsoleMode::CaptureItem::enable(bool _enabled) {
+void CaptureConsoleMode::CaptureTrackItem::enable(bool _enabled) {
 	enabled = _enabled;
 	msg_write("ENABLE " + b2s(enabled));
+	if (panel and id_active.num > 0)
+		panel->check(id_active, enabled);
 }
 
-Array<int> CaptureConsoleMode::CaptureItem::channel_map() {
+void CaptureConsoleMode::CaptureTrackItem::allow_edit(bool _allow) {
+	allowing_edit = _allow;
+	msg_write("ALLOW " + b2s(allowing_edit));
+}
+
+Array<int> CaptureConsoleMode::CaptureTrackItem::channel_map() {
 	return channel_selector->config.map;
 }
 
-void CaptureConsoleMode::CaptureItem::set_map(const Array<int> &_map) {
+void CaptureConsoleMode::CaptureTrackItem::set_map(const Array<int> &_map) {
 	channel_selector->set_channel_map(device->channels, _map);
 }
 
-void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chain) {
+void CaptureConsoleMode::CaptureTrackItem::set_device(Device *_dev, SignalChain *chain) {
 	device = _dev;
+	enable(device);
 
 	if (track->type == SignalType::AUDIO) {
 		if (device) {
@@ -131,9 +139,7 @@ void CaptureConsoleMode::CaptureItem::set_device(Device *_dev, SignalChain *chai
 		}
 	}
 
-	peak_meter_display->set_visible(device);
-
-	//id_peaks
 	peak_meter->reset_state();
+	peak_meter_display->set_visible(device);
 }
 

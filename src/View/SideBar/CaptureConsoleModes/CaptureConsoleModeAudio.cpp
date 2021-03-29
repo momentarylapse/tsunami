@@ -36,7 +36,7 @@ Array<int> create_default_channel_map(int n_in, int n_out);
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
-	CaptureTrackItem a;
+	CaptureTrackData a;
 	a.panel = cc;
 	a.id_source = "source";
 	a.id_mapper = "channel-mapper";
@@ -76,9 +76,9 @@ void CaptureConsoleModeAudio::enter() {
 	c.chain = chain.get();
 	int channels = c.track->channels;
 
-	c.input_audio = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
-	c.input_audio->subscribe(this, [=]{ update_device_list(); });
-	c.device = c.input_audio->get_device();
+	c.input = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
+	c.input->subscribe(this, [=]{ update_device_list(); });
+	c.device = c.audio_input()->get_device();
 
 	c.channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
 	c.set_map(create_default_channel_map(c.device->channels, channels));
@@ -94,7 +94,7 @@ void CaptureConsoleModeAudio::enter() {
 
 	chain->mark_all_modules_as_system();
 
-	chain->connect(c.input_audio, 0, c.channel_selector, 0);
+	chain->connect(c.input, 0, c.channel_selector, 0);
 	chain->connect(c.channel_selector, 0, backup, 0);
 	chain->connect(backup, 0, c.accumulator, 0);
 	chain->connect(c.accumulator, 0, sucker, 0);
@@ -109,7 +109,7 @@ void CaptureConsoleModeAudio::enter() {
 	cc->peak_meter_display->set_source(c.peak_meter);
 	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(channels)));
 
-	view->mode_capture->set_data({{c.track, c.input_audio, c.accumulator}});
+	view->mode_capture->set_data(items);
 
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 

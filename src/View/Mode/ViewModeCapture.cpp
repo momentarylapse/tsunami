@@ -49,7 +49,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 
 	int offset = view->get_playback_selection(true).offset;
 	for (auto &d: data) {
-		auto *l = view->get_layer(d.target->layers[0].get());
+		auto *l = view->get_layer(d.track->layers[0].get());
 		if (d.type() == SignalType::AUDIO) {
 			auto *rec = d.audio_recorder();
 
@@ -73,7 +73,8 @@ void ViewModeCapture::draw_post(Painter *c) {
 Set<Track*> ViewModeCapture::prevent_playback() {
 	Set<Track*> prev;
 	for (auto &d: data)
-		prev.add(d.target);
+		if (d.enabled)
+			prev.add(d.track);
 	return prev;
 }
 

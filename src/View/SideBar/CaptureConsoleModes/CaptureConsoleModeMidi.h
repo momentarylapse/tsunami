@@ -19,13 +19,7 @@ class AudioOutput;
 class PeakMeter;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode {
-	MidiInput *input;
 	Array<Device*> sources;
-	const Track *target;
-	Synthesizer *preview_synth;
-	PeakMeter *peak_meter;
-	AudioOutput *preview_stream;
-
 
 
 public:

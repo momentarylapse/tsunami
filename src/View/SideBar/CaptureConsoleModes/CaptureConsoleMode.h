@@ -24,6 +24,7 @@ class AudioChannelSelector;
 class PeakMeter;
 class PeakMeterDisplay;
 class Device;
+class CaptureTrackData;
 namespace hui {
 	class Panel;
 }
@@ -52,31 +53,7 @@ public:
 	shared<SignalChain> chain;
 
 
-
-	struct CaptureTrackItem {
-		Track *track = nullptr;
-		Device *device = nullptr;
-		bool enabled = false;
-		bool allowing_edit = true;
-		hui::Panel *panel = nullptr;
-		SignalChain *chain = nullptr;
-
-		AudioInput *input_audio = nullptr;
-		MidiInput *input_midi = nullptr;
-		AudioChannelSelector *channel_selector = nullptr;
-		PeakMeterDisplay *peak_meter_display = nullptr;
-		PeakMeter *peak_meter = nullptr;
-		Module *accumulator = nullptr;
-		string id_group, id_grid, id_source, id_target, id_active, id_peaks, id_mapper;
-		Array<int> channel_map();
-
-		void set_device(Device *dev);
-		void set_map(const Array<int> &map);
-		void enable(bool enabled);
-		void allow_edit(bool allow);
-		void accumulate(bool acc);
-	};
-	Array<CaptureTrackItem> items;
+	Array<CaptureTrackData> items;
 	void update_data_from_items();
 };
 

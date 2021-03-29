@@ -6,6 +6,7 @@
  */
 
 #include "CaptureConsoleModeMulti.h"
+#include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
 #include "../../Dialog/ChannelMapperDialog.h"
 #include "../../../Data/base.h"
@@ -40,14 +41,13 @@ void CaptureConsoleModeMulti::enter() {
 			continue;
 		if (!view->sel.has(t))
 			continue;
-		CaptureTrackItem c;
+		CaptureTrackData c;
 		int i = items.num;
 		c.track = t;
 		c.panel = cc;
 		c.chain = chain.get();
 		c.id_group = "group-" + i2s(i);
 		c.id_grid = "grid-" + i2s(i);
-		c.id_target = "target-" + i2s(i);
 		c.id_active = "active-" + i2s(i);
 		c.id_source = "source-" + i2s(i);
 		c.id_peaks = "peaks-" + i2s(i);

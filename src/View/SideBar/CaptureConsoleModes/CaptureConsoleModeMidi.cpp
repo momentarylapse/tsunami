@@ -28,12 +28,11 @@
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	input = nullptr;
-	target = nullptr;
+	CaptureTrackData c;
+	c.id_peaks = "level";
+	c.id_source = "source";
 
-	peak_meter = nullptr;
-	preview_synth = nullptr;
-	preview_stream = nullptr;
+	items.add(c);
 
 	cc->event("source", [=]{ on_source(); });
 }
@@ -41,15 +40,15 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
 	if ((n >= 0) and (n < sources.num)) {
-		input->set_device(sources[n]);
+		items[0].midi_input()->set_device(sources[n]);
 	}
 }
 
 
 void CaptureConsoleModeMidi::set_target(const Track *t) {
-	target = t;
-	preview_synth = (Synthesizer*)t->synth.get()->copy();
-	chain->_add(preview_synth);
+	items[0].track = const_cast<Track*>(t);
+	items[0].synth = (Synthesizer*)t->synth.get()->copy();
+	chain->_add(items[0].synth);
 
 	//cc->enable("start", true);
 }
@@ -59,10 +58,13 @@ void CaptureConsoleModeMidi::enter() {
 
 	chain = session->create_signal_chain_system("capture");
 
+	auto &c = items[0];
+	c.chain = chain.get();
+	c.panel = cc;
 
-	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-	input->subscribe(this, [=]{ update_device_list(); });
-	auto *accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
+	c.input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
+	c.input->subscribe(this, [=]{ update_device_list(); });
+	c.accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
 	for (Track *t: weak(view->song->tracks))
@@ -70,25 +72,25 @@ void CaptureConsoleModeMidi::enter() {
 			set_target(t);
 			
 	//preview_synth->plug(0, input, 0);
-	peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	preview_stream = (AudioOutput*)chain->add(ModuleCategory::STREAM, "AudioOutput");
+	c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+	auto preview_stream = (AudioOutput*)chain->add(ModuleCategory::STREAM, "AudioOutput");
 	chain->mark_all_modules_as_system();
 	
 
 	chain->set_buffer_size(512);
-	chain->connect(input, 0, accumulator, 0);
-	chain->connect(accumulator, 0, preview_synth, 0);
-	chain->connect(preview_synth, 0, peak_meter, 0);
-	chain->connect(peak_meter, 0, preview_stream, 0);
+	chain->connect(c.input, 0, c.accumulator, 0);
+	chain->connect(c.accumulator, 0, c.synth, 0);
+	chain->connect(c.synth, 0, c.peak_meter, 0);
+	chain->connect(c.peak_meter, 0, preview_stream, 0);
 
-	cc->peak_meter_display->set_source(peak_meter);
+	cc->peak_meter_display->set_source(c.peak_meter);
 	cc->set_options("level", format("height=%d", PeakMeterDisplay::good_size(2)));
 
 	update_device_list();
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 	chain->start();
-	view->mode_capture->set_data({{(Track*)target, input, accumulator}});
+	view->mode_capture->set_data(items);
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {
@@ -105,7 +107,7 @@ void CaptureConsoleModeMidi::update_device_list() {
 
 	// select current
 	foreachi(Device *d, sources, i)
-		if (d == input->get_device())
+		if (d == items[0].midi_input()->get_device())
 			cc->set_int("source", i);
 }
 

@@ -159,6 +159,8 @@ rect PagePainter::clip() const {
 
 Parser::Parser() {
 	current_painter = nullptr;
+	page_width = 595.276f;
+	page_height = 841.89f;
 }
 
 Parser::~Parser() {
@@ -174,10 +176,16 @@ void Parser::__delete__() {
 	this->Parser::~Parser();
 }
 
-Painter* Parser::add_page(float w, float h) {
+
+void Parser::set_page_size(float w, float h) {
+	page_width = w;
+	page_height = h;
+}
+
+Painter* Parser::add_page() {
 	auto page = new Page;
-	page->width = w;
-	page->height = h;
+	page->width = page_width;
+	page->height = page_height;
 	pages.add(page);
 	if (current_painter)
 		delete current_painter;
@@ -240,7 +248,7 @@ void Parser::save(const Path &filename) {
 		f->write_buffer(format("%d 0 obj\n", page_id[i]));
 		f->write_buffer("  << /Type /Page\n");
 		f->write_buffer("     /Parent 3 0 R\n");
-		f->write_buffer(format("     /MediaBox [0 0 %d %d]\n", p->width, p->height));
+		f->write_buffer(format("     /MediaBox [0 0 %.3f %.3f]\n", p->width, p->height));
 		f->write_buffer(format("     /Contents %d 0 R\n", stream_id[i]));
 		f->write_buffer(format("     /Resources << /ProcSet %d 0 R\n", proc_id));
 		string fff;

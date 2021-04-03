@@ -784,6 +784,7 @@ void SIAddPackageHui();
 void SIAddPackageNix();
 void SIAddPackageNet();
 void SIAddPackageImage();
+void SIAddPackageDoc();
 void SIAddPackageVulkan();
 
 CompilerConfiguration::CompilerConfiguration() {
@@ -863,6 +864,7 @@ void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
 	SIAddPackageNix();
 	SIAddPackageNet();
 	SIAddPackageThread();
+	SIAddPackageDoc();
 	SIAddPackageVulkan();
 
 	add_package("base");

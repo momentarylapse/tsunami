@@ -25,7 +25,7 @@ class Parser;
 
 
 struct Page {
-	int width, height;
+	float width, height;
 	string content;
 };
 
@@ -78,12 +78,15 @@ public:
 	void __init__();
 	void __delete__();
 
-	Painter *add_page(float width, float height);
+	void set_page_size(float width, float height);
+
+	Painter *add_page();
 	void save(const Path &filename);
 
 private:
 	Array<Page*> pages;
 	Array<string> font_names;
+	float page_width, page_height;
 
 	Painter *current_painter;
 

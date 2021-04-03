@@ -1,4 +1,3 @@
-#include "../../file/file.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "common.h"
@@ -32,11 +31,9 @@ namespace kaba {
 #ifdef _X_USE_HUI_
 	static hui::Event *_event;
 	static hui::Panel *_panel;
-	static hui::Painter *_painter;
 	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
 	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
 	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
-	#define GetDAPainter(x)	int_p(&_painter->x)-int_p(_painter)
 	void HuiSetIdleFunctionKaba(Function *f) {
 		auto *ff = (hui::kaba_callback*)f->address;
 		hui::SetIdleFunction(ff);
@@ -74,14 +71,13 @@ namespace kaba {
 #else
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
-	#define GetDAPainter(x)	0
 	#define GetDAPanel(x) 0
 #endif
 
 #ifdef _X_USE_HUI_
 	#define hui_p(p)		(void*)p
 #else
-	#define hui_p(p)		NULL
+	#define hui_p(p)		nullptr
 #endif
 
 
@@ -89,8 +85,6 @@ extern const Class *TypeObject;
 extern const Class *TypeIntList;
 extern const Class *TypeIntPs;
 extern const Class *TypeStringList;
-extern const Class *TypeFloatList;
-extern const Class *TypeComplexList;
 extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
 extern const Class *TypePath;

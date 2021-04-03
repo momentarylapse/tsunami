@@ -13,6 +13,7 @@
 #if HAS_LIB_GL
 #define _X_USE_NIX_
 #endif
+#define _X_USE_PDF_
 
 //#####################################################################
 // Hui-API

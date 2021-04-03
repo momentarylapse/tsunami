@@ -318,6 +318,7 @@ sources = [
 	'src/lib/kaba/lib/exception.cpp',
 	'src/lib/kaba/lib/lib.cpp',
 	'src/lib/kaba/lib/lib_base.cpp',
+	'src/lib/kaba/lib/lib_doc.cpp',
 	'src/lib/kaba/lib/lib_hui.cpp',
 	'src/lib/kaba/lib/lib_image.cpp',
 	'src/lib/kaba/lib/lib_kaba.cpp',

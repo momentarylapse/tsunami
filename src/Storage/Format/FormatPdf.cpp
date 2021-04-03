@@ -71,10 +71,10 @@ FormatPdf::LineData::LineData(Track *t, float _y0, float _y1) {
 }
 
 int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
-	int slack = song->sample_rate / 30;
+	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, true, MidiMode::CLASSICAL);
+	mp->set_context(rect(x0, x0+w, y0-25, y0+90), t->instrument, true, MidiMode::CLASSICAL);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(2, true);
 
@@ -97,13 +97,13 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	auto midi = t->layers[0]->midi.get_notes(r_inside);
 	mp->draw(p, midi);
 
-	return y0 + 100;
+	return y0 + 50;
 }
 
 int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
-	float string_dy = 26;
+	float string_dy = 13;
 
-	int slack = song->sample_rate / 30;
+	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
 	int n = t->instrument.string_pitch.num;
@@ -148,14 +148,14 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 		float x = cam->sample2screen(b.range.offset);
 		if (b.level == 0) {
 			p->set_color(colors->text_soft1);
-			p->set_line_width(2);
+			p->set_line_width(1);
 		} else {
 			p->set_color(colors->text_soft3);
-			p->set_line_width(1);
+			p->set_line_width(0.5f);
 		}
 		p->draw_line(x, y, x, y + h);
 	}
-	p->set_line_width(1);
+	p->set_line_width(0.5f);
 }
 
 void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r) {
@@ -177,28 +177,29 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 			p->set_color(colors->text_soft2);
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
-			p->set_font_size(15);
-			float dx = 20;
+			p->set_font_size(8);
+			float dx = 10;
 			if (b == bars[0])
-				dx += 30;
-			p->draw_str(x + dx, y-5, s);
+				dx += 15;
+			p->draw_str(x + dx, y-2.5f, s);
 		}
 
 		// part?
 		auto *m = get_bar_part(song, b->offset);
 		if (m) {
 			p->set_color(colors->text);
-			p->draw_line(x - 20, y - 65, x - 20, y - 35);
-			p->draw_line(x - 20, y - 65, x + 20, y - 65);
-			p->draw_line(x - 20, y - 35, x + 20, y - 35);
-			p->set_font_size(20);
-			p->draw_str(x - 15, y-60, m->nice_text());
+			p->draw_line(x - 10, y - 32.5f, x - 10, y - 17.5f);
+			p->draw_line(x - 10, y - 32.5f, x + 10, y - 32.5f);
+			p->draw_line(x - 10, y - 17.5f, x + 10, y - 17.5f);
+			p->set_font_size(10);
+			p->draw_str(x - 7.5f, y-30, m->nice_text());
 		}
 	}
 }
 
 int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
-	float track_space = 20;
+	float track_space = 10;
+	p->set_line_width(0.5f);
 
 	cam->pos = r.offset;
 	cam->pixels_per_sample = (double)cam->area.width() / (double)r.length;
@@ -207,13 +208,13 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	auto bars = song->bars.get_bars(r + 1000);
 	if (bars.num > 0) {
 		p->set_color(colors->text_soft1);
-		p->set_font_size(20);
-		p->draw_str(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
+		p->set_font_size(10);
+		p->draw_str(x0 + 2.5f, y0 - 7.5f, i2s(bars[0]->index_text + 1));
 	}
 
 	line_data.clear();
 
-	draw_bar_markers(p, x0, w, y0, 100, r);
+	draw_bar_markers(p, x0, w, y0, 50, r);
 
 	foreachi (Track* t, weak(song->tracks), ti) {
 		if (t->type != SignalType::MIDI)
@@ -236,15 +237,15 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	}
 
 	// line connector
-	p->set_line_width(3);
+	p->set_line_width(1.5f);
 	p->set_color(colors->text_soft1);
 	float sy0 = line_data[0].y0;
 	float sy1 = line_data.back().y1;
-	p->draw_line(x0 - 5, sy0, x0 - 5, sy1);
-	p->draw_line(x0, sy0 - 10, x0 - 5, sy0);
-	p->draw_line(x0, sy1 + 10, x0 - 5, sy1);
-	p->draw_line(x0 + w + 5, sy0, x0 + w + 5, sy1);
-	p->set_line_width(1);
+	p->draw_line(x0 - 2.5f, sy0, x0 - 2.5f, sy1);
+	p->draw_line(x0, sy0 - 5, x0 - 2.5f, sy0);
+	p->draw_line(x0, sy1 + 5, x0 - 2.5f, sy1);
+	p->draw_line(x0 + w + 2.5f, sy0, x0 + w + 2.5f, sy1);
+	p->set_line_width(0.5f);
 
 	return y0;
 }
@@ -280,11 +281,14 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 
 	float page_width = 1200;
 	float page_height = 2000;
+	// A4
+	page_width = 595.276f;
+	page_height = 841.89f;
 
 	pdf::Parser parser;
-	//auto parser = pdf::save(od->filename);
+	parser.set_page_size(page_width, page_height);
 
-	float border = 50;
+	float border = 25;
 
 	cam = new ViewPort(nullptr);
 	cam->area = rect(border, page_width - border, 0, page_height);
@@ -299,33 +303,33 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	float x0 = border;
 	float w = page_width - 2*border;
 
-	float avg_scale = 130.0f / od->song->sample_rate * od->parameters["horizontal-scale"]._float();
+	float avg_scale = 65.0f / od->song->sample_rate * od->parameters["horizontal-scale"]._float();
 	float avg_samples_per_line = w / avg_scale;
 
 	int samples = od->song->range_with_time().end();
 	//int num_lines =  / samples_per_line + 1;
-	float y0 = 140;
-	float line_space = 50;
+	float y0 = 70;
+	float line_space = 25;
 
 	bool first_page = true;
 
 
-	auto p = parser.add_page(page_width, page_height);
+	auto p = parser.add_page();
 
 	if (first_page) {
 		p->set_color(colors->text);
-		p->set_font("Times", 50, false, false);
-		//p->set_font("Helvetica", 50, false, false);
-		p->draw_str(200, 50, od->song->get_tag("title"));
+		p->set_font("Times", 26, false, false);
+		//p->set_font("Helvetica", 25, false, false);
+		p->draw_str(100, 25, od->song->get_tag("title"));
 		if (od->song->get_tag("artist").num > 0) {
 			p->set_font("Courier", 15, false, false);
 			p->set_font_size(15);
 			p->set_color(colors->text_soft2);
-			p->draw_str(p->width - 300, 50, "by " + od->song->get_tag("artist"));
+			p->draw_str(p->width - 150, 25, "by " + od->song->get_tag("artist"));
 		}
 		first_page = false;
 	}
-	p->set_font("Helvetica", 15, false, false);
+	p->set_font("Helvetica", 8, false, false);
 
 	pdf_bpm = 0;
 
@@ -343,8 +347,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 		// new page?
 		float dy = y0 - y_prev;
 		if (y0 + dy > page_height and offset < samples) {
-			p = parser.add_page(page_width, page_height);
-			y0 = 100;
+			p = parser.add_page();
+			y0 = 50;
 		}
 	}
 

@@ -281,7 +281,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	float page_width = 1200;
 	float page_height = 2000;
 
-	auto parser = pdf::save(od->filename);
+	pdf::Parser parser;
+	//auto parser = pdf::save(od->filename);
 
 	float border = 50;
 
@@ -309,7 +310,7 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	bool first_page = true;
 
 
-	auto p = parser->add_page(page_width, page_height);
+	auto p = parser.add_page(page_width, page_height);
 
 	if (first_page) {
 		p->set_color(colors->text);
@@ -342,14 +343,12 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 		// new page?
 		float dy = y0 - y_prev;
 		if (y0 + dy > page_height and offset < samples) {
-			delete p;
-			p = parser->add_page(page_width, page_height);
+			p = parser.add_page(page_width, page_height);
 			y0 = 100;
 		}
 	}
 
+	parser.save(od->filename);
 	delete cam;
 	delete mp;
-	delete p;
-	delete parser;
 }

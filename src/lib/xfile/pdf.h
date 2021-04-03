@@ -70,20 +70,25 @@ public:
 };
 
 class Parser {
+	friend class PagePainter;
 public:
 	Parser();
 	~Parser();
-	Painter *add_page(float width, float height);
-	void end();
 
-	File *f;
+	void __init__();
+	void __delete__();
+
+	Painter *add_page(float width, float height);
+	void save(const Path &filename);
+
+private:
 	Array<Page*> pages;
 	Array<string> font_names;
 
+	Painter *current_painter;
+
 	int font_id(const string &name);
 };
-
-Parser *save(const Path &filename);
 
 }
 

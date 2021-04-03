@@ -11,14 +11,12 @@
 #include "../math/math.h"
 #include "../file/file.h"
 
-namespace pdf
-{
+namespace pdf {
 
 
 
 
-PagePainter::PagePainter(Parser* _parser, Page *_page)
-{
+PagePainter::PagePainter(Parser* _parser, Page *_page) {
 	parser = _parser;
 	page = _page;
 	width = page->width;
@@ -32,13 +30,11 @@ PagePainter::PagePainter(Parser* _parser, Page *_page)
 	set_color(Black);
 }
 
-PagePainter::~PagePainter()
-{
+PagePainter::~PagePainter() {
 	delete col;
 }
 
-void PagePainter::set_color(const color& c)
-{
+void PagePainter::set_color(const color& c) {
 	*col = c;
 	page->content += format("     %.2f %.2f %.2f RG\n", c.r, c.g, c.b);
 	page->content += format("     %.2f %.2f %.2f rg\n", c.r, c.g, c.b);
@@ -46,67 +42,54 @@ void PagePainter::set_color(const color& c)
 	//page->content += format("     %.2f ca\n", c.a);
 }
 
-void PagePainter::set_font(const string& font, float size, bool bold, bool italic)
-{
+void PagePainter::set_font(const string& font, float size, bool bold, bool italic) {
 	font_name = font;
 	font_size = size;
 }
 
-void PagePainter::set_font_size(float size)
-{
+void PagePainter::set_font_size(float size) {
 	font_size = size;
 }
 
-void PagePainter::set_antialiasing(bool enabled)
-{
+void PagePainter::set_antialiasing(bool enabled) {
 }
 
-void PagePainter::set_line_width(float w)
-{
+void PagePainter::set_line_width(float w) {
 	line_width = w;
 	page->content += format("     %.1f w\n", w);
 }
 
-void PagePainter::set_line_dash(const Array<float>& dash, float offset)
-{
+void PagePainter::set_line_dash(const Array<float>& dash, float offset) {
 }
 
-void PagePainter::set_fill(bool fill)
-{
+void PagePainter::set_fill(bool fill) {
 	filling = fill;
 }
 
-void PagePainter::set_clip(const rect& r)
-{
+void PagePainter::set_clip(const rect& r) {
 }
 
-void PagePainter::draw_point(float x, float y)
-{
+void PagePainter::draw_point(float x, float y) {
 }
 
-void PagePainter::draw_line(float x1, float y1, float x2, float y2)
-{
+void PagePainter::draw_line(float x1, float y1, float x2, float y2) {
 	page->content += format("     %.1f %.1f m\n", x1, height-y1);
 	page->content += format("     %.1f %.1f l\n", x2, height-y2);
 	page->content += "     S\n";
 }
 
-void PagePainter::draw_lines(const Array<complex>& p)
-{
+void PagePainter::draw_lines(const Array<complex>& p) {
 }
 
-void PagePainter::draw_polygon(const Array<complex>& p)
-{
+void PagePainter::draw_polygon(const Array<complex>& p) {
 }
 
-void PagePainter::draw_rect(float x1, float y1, float w, float h)
-{
+void PagePainter::draw_rect(float x1, float y1, float w, float h) {
 	draw_rect(rect(x1, x1+w, y1, y1+h));
 	//page->content += format("     %.1f %.1f %.1f %.1f re\n", x1, height-y1-h, w, h);
 }
 
-void PagePainter::draw_rect(const rect& r)
-{
+void PagePainter::draw_rect(const rect& r) {
 	page->content += format("     %.1f %.1f %.1f %.1f re\n", r.x1, height-r.y2, r.width(), r.height());
 	if (filling)
 		page->content += "     f\n";
@@ -114,8 +97,7 @@ void PagePainter::draw_rect(const rect& r)
 		page->content += "     S\n";
 }
 
-void PagePainter::draw_circle(float x, float y, float radius)
-{
+void PagePainter::draw_circle(float x, float y, float radius) {
 	complex p[12];
 	float rr = radius * 0.6f;
 	p[0] = complex(x,        height-y-radius);
@@ -139,16 +121,14 @@ void PagePainter::draw_circle(float x, float y, float radius)
 		page->content += "     S\n";
 }
 
-static string _pdf_str_filter(const string &str)
-{
+static string _pdf_str_filter(const string &str) {
 	string x = str.replace(u8"\u266f", "#").replace(u8"\u266d", "b");
 	x = x.replace(u8"ä", "ae").replace(u8"ö", "oe").replace(u8"ü", "ue").replace(u8"ß", "ss");
 	x = x.replace(u8"Ä", "Ae").replace(u8"Ö", "Oe").replace(u8"Ü", "Ue");
 	return x;
 }
 
-void PagePainter::draw_str(float x, float y, const string& str)
-{
+void PagePainter::draw_str(float x, float y, const string& str) {
 	y = height - y - font_size*0.8f;
 	float dx = x - text_x;
 	float dy = y - text_y;
@@ -159,52 +139,52 @@ void PagePainter::draw_str(float x, float y, const string& str)
 	text_y = y;
 }
 
-float PagePainter::get_str_width(const string& str)
-{
+float PagePainter::get_str_width(const string& str) {
 	return font_size * str.num * 0.5f;
 }
 
-void PagePainter::draw_image(float x, float y, const Image *image)
-{
+void PagePainter::draw_image(float x, float y, const Image *image) {
 }
 
-void PagePainter::draw_mask_image(float x, float y, const Image *image)
-{
+void PagePainter::draw_mask_image(float x, float y, const Image *image) {
 }
 
-rect PagePainter::area() const
-{
+rect PagePainter::area() const {
 	return rect(0, width, 0, height);
 }
 
-rect PagePainter::clip() const
-{
+rect PagePainter::clip() const {
 	return area();
 }
 
-Parser::Parser()
-{
-	f = nullptr;
+Parser::Parser() {
+	current_painter = nullptr;
 }
 
-Parser::~Parser()
-{
-	if (f){
-		end();
-	}
+Parser::~Parser() {
+	if (current_painter)
+		delete current_painter;
 }
 
-Painter* Parser::add_page(float w, float h)
-{
+void Parser::__init__() {
+	new(this) Parser;
+}
+
+void Parser::__delete__() {
+	this->Parser::~Parser();
+}
+
+Painter* Parser::add_page(float w, float h) {
 	auto page = new Page;
 	page->width = w;
 	page->height = h;
 	pages.add(page);
+	if (current_painter)
+		delete current_painter;
 	return new PagePainter(this, page);
 }
 
-int Parser::font_id(const string &name)
-{
+int Parser::font_id(const string &name) {
 	for (int i=0; i<font_names.num; i++)
 		if (name == font_names[i])
 			return i;
@@ -212,8 +192,8 @@ int Parser::font_id(const string &name)
 	return font_names.num - 1;
 }
 
-void Parser::end()
-{
+void Parser::save(const Path &filename) {
+	auto f = FileCreate(filename);
 	Array<int> pos;
 	Array<int> page_id;
 	for (int i=0; i<pages.num; i++)
@@ -250,7 +230,7 @@ void Parser::end()
 		f->write_buffer(format("%d 0 R", page_id[i]));
 	}
 	f->write_buffer("]\n");
-	f->write_buffer("     /Count " + i2s(pages.num) + "\n");
+	f->write_buffer(format("     /Count %d\n", pages.num));
 	f->write_buffer("  >>\n");
 	f->write_buffer("endobj\n");
 
@@ -318,13 +298,6 @@ void Parser::end()
 
 	f->write_buffer("%%EOF\n");
 	delete f;
-	f = nullptr;
-}
-
-Parser* save(const Path &filename) {
-	auto p = new Parser;
-	p->f = FileCreate(filename);
-	return p;
 }
 
 

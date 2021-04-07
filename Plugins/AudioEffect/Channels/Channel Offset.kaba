@@ -1,0 +1,18 @@
+use tsunami
+
+const string AUTO_CONFIG_OFFSETL = "-1:1:0.001:1:"
+const string AUTO_CONFIG_OFFSETR = "-1:1:0.001:1:"
+
+class ChannelOffset extends AudioEffect
+	class Config extends Module.Config
+		float offset_l, offset_r
+		override void reset()
+			offset_l = 0
+			offset_r = 0
+
+	Config config
+	
+	override void process(out AudioBuffer buf)
+		buf.c[0] += config.offset_l
+		if buf.channels > 1
+			buf.c[1] += config.offset_r

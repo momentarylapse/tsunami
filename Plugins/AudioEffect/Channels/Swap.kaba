@@ -5,4 +5,7 @@ use tsunami
 class Swap extends AudioEffect
 	override void process(out AudioBuffer buf)
 		if buf.channels > 1
-			buf.c.swap(0, 1)
+			#buf.c.swap(0, 1)
+			let t = buf.c[0]
+			buf.c[0] = buf.c[1]
+			buf.c[1] = t

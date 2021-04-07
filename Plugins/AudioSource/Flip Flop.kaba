@@ -1,0 +1,32 @@
+use tsunami
+use helper.tone
+
+const string AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
+
+
+class FlipFlopSource extends AudioSource
+	class Config extends Module.Config
+		float period
+		override void reset()
+			period = 1
+
+	Config config
+	float t
+	
+	override void reset_state()
+		t = 0
+
+	void create_flip(out float[] buf)
+		for i in 0:len(buf)
+			buf[i] = 1
+			if t > config.period
+				buf[i] = -1
+			t += 1.0 / float(DEFAULT_SAMPLE_RATE)
+			if t > config.period*2
+				t = 0
+
+	override int read(out AudioBuffer buf)
+		create_flip(buf.c[0])
+		if len(buf.c) > 1
+			buf.c[1] = buf.c[0]
+		return len(buf)

@@ -1,0 +1,48 @@
+use tsunami
+use helper.tone
+
+const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const string AUTO_CONFIG_FREQMIN = "1:40000:1:1:Hz"
+const string AUTO_CONFIG_FREQMAX = "1:40000:1:1:Hz"
+const string AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
+
+
+class SweepSource extends AudioSource
+	class Config extends Module.Config
+		float volume
+		float freq_min, freq_max
+		float period
+		override void reset()
+			volume = 0.8
+			freq_min = 20
+			freq_max = 20000
+			period = 5
+
+	Config config
+	float phase
+	#float freq
+	float t
+	
+	override void reset_state()
+		phase = 0
+		#freq = config.freq_min
+		t = 0
+
+	void create_sweep(out float[] buf)
+		float B = log(config.freq_max / config.freq_min) / config.period
+		
+		for i in 0:len(buf)
+			buf[i] = sin(phase) * config.volume
+			float freq = config.freq_min * exp(B * t)
+			float w = freq * 2.0 * pi
+			phase += w / float(DEFAULT_SAMPLE_RATE)
+			t += 1.0 / float(DEFAULT_SAMPLE_RATE)
+			if t > config.period
+				t = 0
+				phase = 0
+
+	override int read(out AudioBuffer buf)
+		create_sweep(buf.c[0])
+		if len(buf.c) > 1
+			buf.c[1] = buf.c[0]
+		return len(buf)

@@ -1,0 +1,18 @@
+use tsunami
+use helper.tone
+
+const string AUTO_CONFIG_LEVEL = "-1:1:0.01:100:%"
+
+
+class FlipFlopSource extends AudioSource
+	class Config extends Module.Config
+		float level
+		override void reset()
+			level = 1
+
+	Config config
+
+	override int read(out AudioBuffer buf)
+		for c in buf.c
+			c = config.level
+		return len(buf)

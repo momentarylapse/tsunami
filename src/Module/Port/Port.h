@@ -16,8 +16,7 @@ class AudioBuffer;
 class MidiEventBuffer;
 class Beat;
 
-class Port : public VirtualBase
-{
+class Port : public VirtualBase {
 public:
 	Port(SignalType type, const string &name);
 	virtual ~Port(){}
@@ -30,6 +29,7 @@ public:
 
 	static const int END_OF_STREAM;
 	static const int NOT_ENOUGH_DATA;
+	static const int NO_SOURCE;
 
 
 	virtual int _cdecl read_audio(AudioBuffer &buf){ return 0; }
@@ -37,10 +37,9 @@ public:
 	virtual int _cdecl read_beats(Array<Beat> &beats, int samples){ return 0; };
 };
 
-class InPortDescription
-{
+class InPortDescription {
 public:
-	InPortDescription(){}
+	InPortDescription() {}
 	InPortDescription(SignalType type, Port **port, const string &name);
 	SignalType type;
 	Port **port;

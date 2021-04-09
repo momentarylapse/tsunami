@@ -44,5 +44,5 @@ int MidiJoiner::Output::read_midi(MidiEventBuffer& buf) {
 	}
 
 	// no sources present
-	return END_OF_STREAM;
+	return NO_SOURCE;
 }

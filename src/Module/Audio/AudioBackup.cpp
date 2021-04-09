@@ -59,7 +59,7 @@ ModuleConfiguration *AudioBackup::get_config() const {
 
 int AudioBackup::Output::read_audio(AudioBuffer& buf) {
 	if (!backup->source)
-		return buf.length;
+		return NO_SOURCE;
 
 	int r = backup->source->read_audio(buf);
 

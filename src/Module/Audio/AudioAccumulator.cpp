@@ -33,7 +33,7 @@ string AudioAccumulator::Config::auto_conf(const string &name) const {
 
 int AudioAccumulator::Output::read_audio(AudioBuffer& buf) {
 	if (!acc->source)
-		return buf.length;
+		return NO_SOURCE;
 
 	int r = acc->source->read_audio(buf);
 

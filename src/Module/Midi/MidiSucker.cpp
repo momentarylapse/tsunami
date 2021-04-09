@@ -26,6 +26,8 @@ int MidiSucker::command(ModuleCommand cmd, int param) {
 }
 
 int MidiSucker::update(int buffer_size) {
+	if (!source)
+		return Port::NO_SOURCE;
 	MidiEventBuffer buf;
 	buf.samples = buffer_size;
 	return source->read_midi(buf);

@@ -13,7 +13,7 @@
 
 int MidiAccumulator::Output::read_midi(MidiEventBuffer& buf) {
 	if (!acc->source)
-		return END_OF_STREAM;
+		return NO_SOURCE;
 
 	int r = acc->source->read_midi(buf);
 

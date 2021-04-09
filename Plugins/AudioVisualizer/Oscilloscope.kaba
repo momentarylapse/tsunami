@@ -11,13 +11,16 @@ class OscilloscopePanel extends ConfigPanel
 	override void __init__(Module _osci)
 		from_source("
 DrawingArea area '' height=200 expandy")
-		
-		c.panel = &self
 	
 		event_x("area", "hui:draw", on_draw)
+		
+		c.subscribe(self, on_update, "Change")
 	
 	override void __delete__()
-		c.panel = nil
+		c.unsubscribe(self)
+	
+	void on_update()
+		redraw("area")
 	
 	void on_draw(Painter p)
 		float w = p.width
@@ -26,11 +29,11 @@ DrawingArea area '' height=200 expandy")
 		p.set_color(colors.background)
 		p.draw_rect(0, 0, w, h)
 		
-		AudioBuffer *buf = &c.buffer
+		let buf = &c.buffer
 		p.set_color(color(0,1,0, 0.2))
 		#p.set_line_width(0.5)
 		float x0, y0, x1, y1
-		for i in 0:buf.length
+		for i in 0:len(buf)
 			x1 = w * (buf.c[0][i] / 2 + 0.5)
 			y1 = h * (buf.c[1][i] / 2 + 0.5)
 			p.set_color(color(0,1,0, float(i) / NUM_SAMPLES))
@@ -40,20 +43,13 @@ DrawingArea area '' height=200 expandy")
 			y0 = y1
 
 class Oscilloscope extends AudioVisualizer
-	int n
 	AudioBuffer buffer
-	OscilloscopePanel *panel
-	
-	override void __init__()
-		panel = nil
 	
 	override void reset_state()
-		n = 0
+		buffer.clear()
 	
 	override void process(AudioBuffer buf)
 		buffer = buf
-		if panel
-			panel.redraw("area")
 		
 	override ConfigPanel* create_panel()
 		return new OscilloscopePanel(self)

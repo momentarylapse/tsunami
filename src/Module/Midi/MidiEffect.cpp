@@ -21,7 +21,7 @@ MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::MIDI, "out") {
 
 int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
 	if (!fx->source)
-		return buf.samples;
+		return NO_SOURCE;
 	return fx->source->read_midi(buf);
 }
 

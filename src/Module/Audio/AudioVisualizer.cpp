@@ -12,6 +12,7 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Data/base.h"
 #include "../../Stuff/PerformanceMonitor.h"
+#include "../../lib/hui/Callback.h"
 
 AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "out") {
 	visualizer = v;
@@ -19,7 +20,7 @@ AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "o
 
 int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 	if (!visualizer->source)
-		return 0;
+		return NO_SOURCE;
 	int r = visualizer->source->read_audio(buf);
 	if (r <= 0)
 		return r;
@@ -35,6 +36,10 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 		visualizer->buffer->read_ref_done(b);
 	}
 	PerformanceMonitor::end_busy(visualizer->perf_channel);
+
+	hui::RunLater(0.001f, [=] {
+		visualizer->notify();
+	});
 	return r;
 }
 

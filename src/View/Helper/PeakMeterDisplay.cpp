@@ -15,8 +15,6 @@
 
 
 
-Array<int> create_default_channel_map(int n_in, int n_out);
-
 
 const int PeakMeterDisplay::SPACE_BETWEEN_CHANNELS = 2;
 const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 8;

@@ -34,7 +34,7 @@ Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out") {
 
 int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	if (!synth->source)
-		return 0;
+		return NO_SOURCE;
 //	printf("synth read %d\n", buf.length);
 	synth->source_run_out = false;
 	// get from source...

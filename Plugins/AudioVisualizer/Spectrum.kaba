@@ -71,18 +71,19 @@ class SpectrumPanel extends ConfigPanel
 		from_source("
 DrawingArea area '' height=200 expandy")
 		
-		c.panels.add(&self)
-		
 		grid.init(self, "area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+		
+		c.subscribe(self, on_update, "Change")
 	
 	override void __delete__()
-		for p,i in c.panels
-			if p == &self
-				c.panels.remove(i)
+		c.unsubscribe(self)
+	
+	void on_update()
+		grid.set(c.ffl, c.ffr)
+		redraw("area")
 
 class Spectrum extends AudioVisualizer
-	SpectrumPanel*[] panels
 	
 	float[] ffr, ffl
 	float peak_max
@@ -126,9 +127,6 @@ class Spectrum extends AudioVisualizer
 	
 	override void process(AudioBuffer buf)
 		do(buf)
-		for p in panels
-			p.grid.set(ffl, ffr)
-			p.redraw("area")
 		
 	override ConfigPanel* create_panel()
 		return new SpectrumPanel(self)

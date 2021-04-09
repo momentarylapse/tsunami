@@ -36,7 +36,7 @@ int AudioJoiner::Output::read_audio(AudioBuffer& buf) {
 	} else if (joiner->b) {
 		return joiner->b->read_audio(buf);
 	}
-	return buf.length;
+	return NO_SOURCE;
 }
 
 AudioJoiner::Output::Output(AudioJoiner *j) : Port(SignalType::AUDIO, "out") {

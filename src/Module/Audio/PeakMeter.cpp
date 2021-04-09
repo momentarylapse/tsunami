@@ -11,7 +11,6 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
 
 
 const int PeakMeter::SPECTRUM_SIZE = 30;
@@ -116,7 +115,6 @@ void PeakMeter::process(AudioBuffer& buf) {
 	find_peaks(buf);
 	if (spectrum_requests > 0)
 		find_spectrum(buf);
-	notify();
 }
 
 void PeakMeter::reset_state() {

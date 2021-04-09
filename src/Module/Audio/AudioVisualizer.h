@@ -15,8 +15,7 @@ class AudioBuffer;
 class RingBuffer;
 class Session;
 
-class AudioVisualizer : public Module
-{
+class AudioVisualizer : public Module {
 public:
 	AudioVisualizer();
 	~AudioVisualizer() override;
@@ -26,8 +25,7 @@ public:
 
 	Port *source;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioVisualizer *v);
 		int read_audio(AudioBuffer &buf) override;

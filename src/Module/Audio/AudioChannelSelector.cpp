@@ -58,7 +58,7 @@ ModuleConfiguration *AudioChannelSelector::get_config() const {
 
 int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 	if (!cs->source)
-		return buf.length;
+		return NO_SOURCE;
 
 
 	AudioBuffer buf_in;
@@ -67,8 +67,11 @@ int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 	int r = cs->source->read_audio(buf_in);
 
 	if (r > 0) {
-		if (cs->peak_meter)
+		if (cs->peak_meter) {
 			cs->peak_meter->process(buf_in);
+			// FIXME should we go to main thread?
+			cs->peak_meter->notify();
+		}
 		cs->apply(buf_in.ref(0, r), buf);
 	}
 

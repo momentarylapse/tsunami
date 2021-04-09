@@ -42,8 +42,6 @@ void AudioEffect::__delete__() {
 }
 
 int AudioEffect::read(AudioBuffer &buf) {
-	if (!source)
-		return buf.length;
 	sample_rate = session->sample_rate();
 	int samples = source->read_audio(buf);
 	

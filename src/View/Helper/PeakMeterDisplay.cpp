@@ -217,10 +217,11 @@ void PeakMeterDisplay::on_update() {
 	if (source) {
 		channels.clear();
 		if (channel_map.num > 0) {
+			auto cc = source->read_channels();
 			for (int &c: channel_map)
-				channels.add(source->channels[min(c, source->channels.num-1)]);
+				channels.add(cc[min(c, cc.num-1)]);
 		} else {
-			channels = source->channels;
+			channels = source->read_channels();
 		}
 	}
 	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));

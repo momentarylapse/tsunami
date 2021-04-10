@@ -12,6 +12,10 @@
 #include "../lib/file/msg.h"
 
 
+// notify()
+//   should be called from the main/gui thread!
+
+
 static const int MESSAGE_DEBUG_LEVEL = 0;
 
 static string dummy_string;

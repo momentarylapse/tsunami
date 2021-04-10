@@ -249,10 +249,15 @@ void PluginManager::link_app_script_data() {
 	AudioVisualizer avis;
 	kaba::declare_class_size("AudioVisualizer", sizeof(AudioVisualizer));
 	kaba::declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
+	kaba::declare_class_element("AudioVisualizer.ring_buffer", &AudioVisualizer::buffer);
+	kaba::declare_class_element("AudioVisualizer.next_writing", &AudioVisualizer::next_writing);
 	kaba::link_external_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
 	kaba::link_external_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
 	kaba::link_external_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
 	kaba::link_external_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
+	kaba::link_external_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
+	kaba::link_external_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
+	kaba::link_external_class_func("AudioVisualizer.flip", &AudioVisualizer::flip);
 
 	DummyPitchDetector pd;
 	kaba::declare_class_size("PitchDetector", sizeof(PitchDetector));

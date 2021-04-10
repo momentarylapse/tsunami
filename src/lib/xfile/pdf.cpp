@@ -60,6 +60,10 @@ void PagePainter::set_line_width(float w) {
 }
 
 void PagePainter::set_line_dash(const Array<float>& dash, float offset) {
+	page->content += "     [";
+	for (float d: dash)
+		page->content += format("%.0f ", d);
+	page->content += format("] %.0f d\n", offset);
 }
 
 void PagePainter::set_fill(bool fill) {
@@ -79,9 +83,24 @@ void PagePainter::draw_line(float x1, float y1, float x2, float y2) {
 }
 
 void PagePainter::draw_lines(const Array<complex>& p) {
+	if (p.num < 2)
+		return;
+	page->content += format("     %.1f %.1f m\n", p[0].x, height-p[0].y);
+	for (int i=1; i<p.num; i++)
+		page->content += format("     %.1f %.1f l\n", p[i].x, height-p[i].y);
+	page->content += "     S\n";
 }
 
 void PagePainter::draw_polygon(const Array<complex>& p) {
+	if (p.num < 2)
+		return;
+	page->content += format("     %.1f %.1f m\n", p[0].x, height-p[0].y);
+	for (int i=1; i<p.num; i++)
+		page->content += format("     %.1f %.1f l\n", p[i].x, height-p[i].y);
+	if (filling)
+		page->content += "     f\n";
+	else
+		page->content += "     s\n";
 }
 
 void PagePainter::draw_rect(float x1, float y1, float w, float h) {

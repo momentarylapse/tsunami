@@ -25,13 +25,9 @@ extern const Class *TypePath;
 void SIAddPackageDoc() {
 	add_package("doc");
 
-
 	const Class *TypePdf = add_type("pdf", 0);
 	const Class *TypePdfParser = add_type("Parser", sizeof(pdf::Parser), Flags::NONE, TypePdf);
 
-
-	Painter *add_page(float width, float height);
-	void save(const Path &filename);
 
 	add_class(TypePdfParser);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, pdf_p(mf(&pdf::Parser::__init__)));

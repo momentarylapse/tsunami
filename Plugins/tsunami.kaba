@@ -179,10 +179,15 @@ class MidiEffect extends Module
 class AudioVisualizer extends Module
 	Module.Port *out
 	int chunk_size
+	RingBuffer* ring_buffer
+	int next_writing
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(out AudioBuffer buf)
 	extern void set_chunk_size(int chunk_size)
+	extern void lock()
+	extern void unlock()
+	extern void flip()
 
 class AudioBuffer
 	int offset, length

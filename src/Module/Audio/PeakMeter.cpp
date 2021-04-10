@@ -56,7 +56,8 @@ PeakMeter::~PeakMeter() {
 }
 
 void PeakMeter::_set_channels(int num_channels) {
-	channels.resize(num_channels);
+	channels[0].resize(num_channels);
+	channels[1].resize(num_channels);
 }
 
 inline float nice_peak(float p) {
@@ -66,11 +67,11 @@ inline float nice_peak(float p) {
 void PeakMeter::find_peaks(AudioBuffer &buf) {
 	float dt = (float)buf.length / (float)session->sample_rate();
 	for (int i=0; i<buf.channels; i++)
-		channels[i].update(buf.c[i], dt);
+		channels[next_writing][i].update(buf.c[i], dt);
 }
 
 void PeakMeter::clear_data() {
-	for (auto &c: channels)
+	for (auto &c: channels[next_writing])
 		c.reset();
 }
 
@@ -88,7 +89,7 @@ void PeakMeter::unrequest_spectrum() {
 
 void PeakMeter::find_spectrum(AudioBuffer &buf) {
 	for (int i=0; i<buf.channels; i++) {
-		auto &c = channels[i];
+		auto &c = channels[next_writing][i];
 
 		Array<complex> zz;
 		FastFourierTransform::fft_r2c(buf.c[i], zz);
@@ -109,15 +110,22 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 }
 
 void PeakMeter::process(AudioBuffer& buf) {
+	std::lock_guard<std::mutex> lock(mutex);
 	clear_data();
 	_set_channels(buf.channels);
 
 	find_peaks(buf);
 	if (spectrum_requests > 0)
 		find_spectrum(buf);
+	flip();
 }
 
 void PeakMeter::reset_state() {
 	clear_data();
 	notify();
+}
+
+Array<PeakMeterData> PeakMeter::read_channels() {
+	std::lock_guard<std::mutex> lock(mutex);
+	return channels[1 - next_writing];
 }

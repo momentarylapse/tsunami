@@ -3,7 +3,7 @@
 	<head>
 		<version>1.0</version>
 		<system>false</system>
-		<name>microphone-spectrum</name>
+		<name>new</name>
 	</head>
 	<modules>
 		<module>
@@ -12,19 +12,19 @@
 			<name>Input</name>
 			<version>1</version>
 			<position>
-				<x>198</x>
-				<y>160</y>
+				<x>146</x>
+				<y>82</y>
 			</position>
 			<config>{device: {}}</config>
 		</module>
 		<module>
 			<category>AudioVisualizer</category>
-			<class>Spectrum</class>
+			<class>Oscilloscope</class>
 			<name />
 			<version>1</version>
 			<position>
-				<x>423</x>
-				<y>162</y>
+				<x>409</x>
+				<y>106</y>
 			</position>
 		</module>
 		<module>
@@ -33,8 +33,8 @@
 			<name>Sucker</name>
 			<version>1</version>
 			<position>
-				<x>640</x>
-				<y>144</y>
+				<x>663</x>
+				<y>147</y>
 			</position>
 			<config>{channels: 2}</config>
 		</module>

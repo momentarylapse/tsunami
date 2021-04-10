@@ -14,7 +14,7 @@ class PeakMeterDisplay;
 class AudioBuffer;
 
 
-struct PeakMeterData{
+struct PeakMeterData {
 	float peak;
 	float super_peak, super_peak_t;
 	Array<float> spec;
@@ -46,7 +46,9 @@ public:
 
 	float i_to_freq(int i);
 
-	Array<PeakMeterData> channels;
+	Array<PeakMeterData> channels[2];
+	Array<PeakMeterData> read_channels();
+
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

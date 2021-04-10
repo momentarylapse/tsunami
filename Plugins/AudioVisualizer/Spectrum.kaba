@@ -80,12 +80,14 @@ DrawingArea area '' height=200 expandy")
 		c.unsubscribe(self)
 	
 	void on_update()
-		grid.set(c.ffl, c.ffr)
+		c.lock()
+		grid.set(c.ffl[1-c.next_writing], c.ffr[1-c.next_writing])
+		c.unlock()
 		redraw("area")
 
 class Spectrum extends AudioVisualizer
 	
-	float[] ffr, ffl
+	float[][2] ffr, ffl
 	float peak_max
 	
 	override void __init__()
@@ -95,8 +97,9 @@ class Spectrum extends AudioVisualizer
 	void do(AudioBuffer buf)
 		complex[] fl, fr
 		buf.get_spectrum(fl, fr, 4096)
-		ffl.clear()
-		ffr.clear()
+		float[] tffl, tffr
+		tffl.clear()
+		tffr.clear()
 	
 		float ww = float(len(buf)) / session.sample_rate()
 		for i in 0:N
@@ -115,18 +118,23 @@ class Spectrum extends AudioVisualizer
 				amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
 				if bmaxl < amp
 					bmaxl = amp
-			ffl.add(bmaxl)
-			ffr.add(bmaxr)
+			tffl.add(bmaxl)
+			tffr.add(bmaxr)
 
 		float mmax = sqr(len(buf)) / 4
 		if mmax > 0
-			ffl /= mmax
-			ffr /= mmax
-		peak_max = max(ffr.max(), ffl.max())
+			tffl /= mmax
+			tffr /= mmax
+		peak_max = max(tffr.max(), tffl.max())
 		peak_max = 0.01
+		ffl[next_writing] = tffl
+		ffr[next_writing] = tffr
 	
 	override void process(AudioBuffer buf)
+		lock()
 		do(buf)
+		flip()
+		unlock()
 		
 	override ConfigPanel* create_panel()
 		return new SpectrumPanel(self)

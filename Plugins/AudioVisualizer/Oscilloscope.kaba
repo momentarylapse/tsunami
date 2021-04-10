@@ -29,7 +29,8 @@ DrawingArea area '' height=200 expandy")
 		p.set_color(colors.background)
 		p.draw_rect(0, 0, w, h)
 		
-		let buf = &c.buffer
+		AudioBuffer buf
+		c.ring_buffer.peek_ref(buf, 4096)
 		p.set_color(color(0,1,0, 0.2))
 		#p.set_line_width(0.5)
 		float x0, y0, x1, y1
@@ -43,13 +44,13 @@ DrawingArea area '' height=200 expandy")
 			y0 = y1
 
 class Oscilloscope extends AudioVisualizer
-	AudioBuffer buffer
+	#AudioBuffer buffer
 	
 	override void reset_state()
-		buffer.clear()
+		#buffer.clear()
 	
 	override void process(AudioBuffer buf)
-		buffer = buf
+		#buffer = buf
 		
 	override ConfigPanel* create_panel()
 		return new OscilloscopePanel(self)

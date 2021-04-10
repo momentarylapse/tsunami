@@ -53,10 +53,6 @@ AudioVisualizer::AudioVisualizer() :
 	chunk_size = 2084;
 }
 
-AudioVisualizer::~AudioVisualizer() {
-	delete buffer;
-}
-
 void AudioVisualizer::__init__() {
 	new(this) AudioVisualizer;
 }
@@ -67,6 +63,21 @@ void AudioVisualizer::__delete__() {
 
 void AudioVisualizer::set_chunk_size(int _chunk_size) {
 	chunk_size = _chunk_size;
+}
+
+void AudioVisualizer::lock() {
+
+}
+
+void AudioVisualizer::unlock() {
+
+}
+
+void AudioVisualizer::flip() {
+	if (next_writing > 0)
+		next_writing = 0;
+	else
+		next_writing = 1;
 }
 
 // TODO: move to PluginManager?

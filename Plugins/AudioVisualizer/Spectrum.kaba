@@ -81,7 +81,7 @@ DrawingArea area '' height=200 expandy")
 	
 	void on_update()
 		c.lock()
-		grid.set(c.ffl[1-c.next_writing], c.ffr[1-c.next_writing])
+		grid.set(c.ffl[c.current_reading], c.ffr[c.current_reading])
 		c.unlock()
 		redraw("area")
 
@@ -131,10 +131,8 @@ class Spectrum extends AudioVisualizer
 		ffr[next_writing] = tffr
 	
 	override void process(AudioBuffer buf)
-		lock()
 		do(buf)
 		flip()
-		unlock()
 		
 	override ConfigPanel* create_panel()
 		return new SpectrumPanel(self)

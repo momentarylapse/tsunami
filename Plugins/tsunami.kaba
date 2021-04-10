@@ -181,6 +181,7 @@ class AudioVisualizer extends Module
 	int chunk_size
 	RingBuffer* ring_buffer
 	int next_writing
+	int current_reading
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(out AudioBuffer buf)

@@ -110,7 +110,7 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 }
 
 void PeakMeter::process(AudioBuffer& buf) {
-	std::lock_guard<std::mutex> lock(mutex);
+	//std::lock_guard<std::mutex> lock(mutex);
 	clear_data();
 	_set_channels(buf.channels);
 
@@ -127,5 +127,5 @@ void PeakMeter::reset_state() {
 
 Array<PeakMeterData> PeakMeter::read_channels() {
 	std::lock_guard<std::mutex> lock(mutex);
-	return channels[1 - next_writing];
+	return channels[current_reading];
 }

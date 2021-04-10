@@ -29,12 +29,17 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 	visualizer->buffer->buf.set_channels(buf.channels);
 	visualizer->buffer->write(buf);
 
+	if (visualizer->buffer->available() < visualizer->chunk_size)
+		return r;
+
+	visualizer->lock();
 	while (visualizer->buffer->available() >= visualizer->chunk_size) {
 		AudioBuffer b;
 		visualizer->buffer->read_ref(b, visualizer->chunk_size);
 		visualizer->process(b);
 		visualizer->buffer->read_ref_done(b);
 	}
+	visualizer->unlock();
 	PerformanceMonitor::end_busy(visualizer->perf_channel);
 
 	hui::RunLater(0.001f, [=] {
@@ -78,6 +83,7 @@ void AudioVisualizer::flip() {
 		next_writing = 0;
 	else
 		next_writing = 1;
+	current_reading = 1 - next_writing;
 }
 
 // TODO: move to PluginManager?

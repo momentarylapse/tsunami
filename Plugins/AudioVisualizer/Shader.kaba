@@ -422,7 +422,9 @@ uniform float iVolume;
 	
 	void on_draw()
 		_time += timer.get()
-		float volume = c.buffer.c[0].max()
+		c.lock()
+		float volume = c.buffer[c.current_reading].c[0].max()
+		c.unlock()
 		
 		#nix.start()
 		nix.reset_to_color(color.RED)
@@ -436,10 +438,11 @@ uniform float iVolume;
 		#NixEnd()
 
 class ShaderVis extends AudioVisualizer
-	AudioBuffer buffer
+	AudioBuffer[2] buffer
 	
 	override void process(AudioBuffer buf)
-		buffer = buf
+		buffer[next_writing] = buf
+		flip()
 		
 	override ConfigPanel* create_panel()
 		return new ShaderPanel(self)

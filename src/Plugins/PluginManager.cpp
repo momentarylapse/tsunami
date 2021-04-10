@@ -251,6 +251,7 @@ void PluginManager::link_app_script_data() {
 	kaba::declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
 	kaba::declare_class_element("AudioVisualizer.ring_buffer", &AudioVisualizer::buffer);
 	kaba::declare_class_element("AudioVisualizer.next_writing", &AudioVisualizer::next_writing);
+	kaba::declare_class_element("AudioVisualizer.current_reading", &AudioVisualizer::current_reading);
 	kaba::link_external_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
 	kaba::link_external_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
 	kaba::link_external_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);

@@ -39,6 +39,7 @@ public:
 
 
 	int next_writing = 0;
+	int current_reading = 1;
 	std::mutex mutex;
 	void lock();
 	void unlock();

@@ -9,6 +9,8 @@
 		<module>
 			<category>AudioVisualizer</category>
 			<class>Shader</class>
+			<name />
+			<version>1</version>
 			<position>
 				<x>95</x>
 				<y>75</y>
@@ -17,19 +19,24 @@
 		<module>
 			<category>Stream</category>
 			<class>AudioInput</class>
+			<name>Input</name>
+			<version>1</version>
 			<position>
 				<x>55</x>
 				<y>11</y>
 			</position>
-			<config>(())</config>
+			<config>{device: {}}</config>
 		</module>
 		<module>
 			<category>Plumbing</category>
 			<class>AudioSucker</class>
+			<name>Sucker</name>
+			<version>1</version>
 			<position>
 				<x>163</x>
 				<y>187</y>
 			</position>
+			<config>{channels: 2}</config>
 		</module>
 	</modules>
 	<cables>

@@ -423,8 +423,8 @@ void SignalChain::stop_hard() {
 }
 
 
-bool SignalChain::is_paused() {
-	return state == State::PAUSED;
+bool SignalChain::is_prepared() {
+	return state != State::UNPREPARED;
 }
 
 int SignalChain::command(ModuleCommand cmd, int param) {
@@ -446,8 +446,8 @@ int SignalChain::command(ModuleCommand cmd, int param) {
 	return Module::COMMAND_NOT_HANDLED;
 }
 
-bool SignalChain::is_playback_active() {
-	return (state == State::ACTIVE) or (state == State::PAUSED);
+bool SignalChain::is_active() {
+	return state == State::ACTIVE;
 }
 
 // running in gui thread!

@@ -636,7 +636,7 @@ class SignalChain extends Module
 	extern void disconnect(Module source, int source_port, Module target, int target_port)
 	extern void start()
 	extern void stop()
-	extern const bool is_paused()
+	extern const bool is_prepared()
 	extern const bool is_active()
 	extern void set_update_dt(float dt)
 	extern void set_buffer_size(int size)

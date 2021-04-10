@@ -380,7 +380,7 @@ public:
 		p->set_color(view->colors.text);
 		if (hover.type == hover.TYPE_BUTTON_PLAY)
 			p->set_color(view->colors.hover);
-		p->draw_str(area_play.x1, area_play.y1, chain->is_playback_active() ? u8"\u23F9" : u8"\u25B6");
+		p->draw_str(area_play.x1, area_play.y1, chain->is_active() ? u8"\u23F9" : u8"\u25B6");
 	}
 
 	void on_chain_update() {
@@ -402,7 +402,7 @@ public:
 		} else if (sel.type == sel.TYPE_PORT_OUT) {
 			chain->disconnect_out(sel.module, sel.port);
 		} else if (sel.type == sel.TYPE_BUTTON_PLAY) {
-			if (chain->is_playback_active())
+			if (chain->is_active())
 				chain->stop();
 			else
 				chain->start();

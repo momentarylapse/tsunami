@@ -87,8 +87,8 @@ public:
 		PAUSED
 	};
 	State state;
-	bool is_paused();
-	bool is_playback_active();
+	bool is_prepared();
+	bool is_active();
 
 
 	void set_buffer_size(int size);

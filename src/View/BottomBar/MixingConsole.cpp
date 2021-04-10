@@ -405,14 +405,14 @@ MixingConsole::~MixingConsole() {
 }
 
 void MixingConsole::on_chain_state_change() {
-	if (peak_runner_id and !view->signal_chain->is_playback_active()) {
+	if (peak_runner_id and !view->is_playback_active()) {
 		hui::CancelRunner(peak_runner_id);
 		peak_runner_id = -1;
 		// clear
 		view->renderer->clear_peaks();
 		for (auto &m: mixer)
 			m->redraw("peaks");
-	} else if (peak_runner_id == -1 and view->signal_chain->is_playback_active()) {
+	} else if (peak_runner_id == -1 and view->is_playback_active()) {
 		peak_runner_id = hui::RunRepeated(0.1f, [=]{ for (auto *m: mixer) m->redraw("peaks"); });
 	}
 }

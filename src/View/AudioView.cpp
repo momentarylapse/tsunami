@@ -159,7 +159,7 @@ bool view_should_show_peaks(AudioView *view) {
 	if (view->session->win->bottom_bar)
 		if (view->session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE))
 			return false;
-	return view->signal_chain->is_playback_active();
+	return view->is_playback_active();
 }
 
 
@@ -1511,7 +1511,7 @@ void AudioView::enable(bool _enabled) {
 
 
 void AudioView::play() {
-	if (signal_chain->is_paused()) {
+	if (signal_chain->is_prepared()) {
 		signal_chain->start();
 		return;
 	}
@@ -1521,7 +1521,7 @@ void AudioView::play() {
 }
 
 void AudioView::prepare_playback(const Range &range, bool allow_loop) {
-	if (signal_chain->is_playback_active())
+	if (signal_chain->is_active() or signal_chain->is_prepared())
 		stop();
 
 	renderer->allow_loop = allow_loop;
@@ -1549,12 +1549,13 @@ void AudioView::pause(bool _pause) {
 		signal_chain->start();
 }
 
+// playing or paused?
 bool AudioView::is_playback_active() {
-	return signal_chain->is_playback_active();
+	return signal_chain->is_active() or signal_chain->is_prepared();
 }
 
 bool AudioView::is_paused() {
-	return signal_chain->is_paused();
+	return signal_chain->is_prepared();
 }
 
 int loop_in_range(int pos, const Range &r) {

@@ -174,7 +174,7 @@ Grid ? '' vertical
 			fs *= (1 + pow(closeness,5) * 0.2)
 		bool paused = false
 		if chain
-			paused = chain.is_paused()
+			paused = not chain.is_active()
 		if paused
 			p.set_font_size(fs)
 			p.set_color(color.interpolate(colors.grid, colors.background, 0.2))
@@ -192,10 +192,10 @@ Grid ? '' vertical
 	
 	void on_area_left_button_down()
 		if chain
-			if chain.is_paused()
-				chain.start()
-			else
+			if chain.is_active()
 				chain.stop()
+			else
+				chain.start()
 		redraw("area")
 	
 	void on_area_right_button_down()

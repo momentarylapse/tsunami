@@ -624,8 +624,8 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("SignalChain.disconnect", &SignalChain::disconnect);
 	kaba::link_external_class_func("SignalChain.set_update_dt", &SignalChain::set_tick_dt);
 	kaba::link_external_class_func("SignalChain.set_buffer_size", &SignalChain::set_buffer_size);
-	kaba::link_external_class_func("SignalChain.is_paused", &SignalChain::is_paused);
-	kaba::link_external_class_func("SignalChain.is_active", &SignalChain::is_playback_active);
+	kaba::link_external_class_func("SignalChain.is_prepared", &SignalChain::is_prepared);
+	kaba::link_external_class_func("SignalChain.is_active", &SignalChain::is_active);
 
 	kaba::declare_class_size("AudioView", sizeof(AudioView));
 	kaba::declare_class_element("AudioView.cam", &AudioView::cam);

@@ -50,6 +50,8 @@ public:
 	Array<PeakMeterData> read_channels();
 
 
+	ConfigPanel *create_panel() override;
+
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;
 	static const float FREQ_MAX;

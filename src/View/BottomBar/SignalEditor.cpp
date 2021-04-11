@@ -377,9 +377,10 @@ public:
 		float rot0[] = {1,0,0,1};
 		p->set_transform(rot0, complex::ZERO);
 		area_play = rect(10, 30, p->height - 30, p->height - 10);
-		p->set_color(view->colors.text);
+		p->set_color(view->colors.text_soft2);
 		if (hover.type == hover.TYPE_BUTTON_PLAY)
-			p->set_color(view->colors.hover);
+			p->set_color(view->colors.text);
+		p->set_font_size(20);
 		p->draw_str(area_play.x1, area_play.y1, chain->is_active() ? u8"\u23F9" : u8"\u25B6");
 	}
 

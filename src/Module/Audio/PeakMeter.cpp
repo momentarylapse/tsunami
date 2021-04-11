@@ -11,6 +11,8 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Session.h"
+#include "../ConfigPanel.h"
+#include "../../View/Helper/PeakMeterDisplay.h"
 
 
 const int PeakMeter::SPECTRUM_SIZE = 30;
@@ -128,4 +130,21 @@ void PeakMeter::reset_state() {
 Array<PeakMeterData> PeakMeter::read_channels() {
 	std::lock_guard<std::mutex> lock(mutex);
 	return channels[current_reading];
+}
+
+class PeakMeterPanel : public ConfigPanel {
+public:
+	PeakMeterPanel(PeakMeter *p) : ConfigPanel(p) {
+		add_grid("", 0, 0, "root");
+		set_target("root");
+		add_drawing_area("!expandx,noexpandy,height=20", 0, 0, "area");
+
+		pmd = new PeakMeterDisplay(this, "area", p);
+	}
+
+	owned<PeakMeterDisplay> pmd;
+};
+
+ConfigPanel* PeakMeter::create_panel() {
+	return new PeakMeterPanel(this);
 }

@@ -91,7 +91,7 @@ static std::mutex runner_mutex;
 		//printf("rl >>\n");
 
 		c->gtk_id = -1;
-		c->delete_me;
+		c->delete_me = true;
 		return FALSE;
 	}
 
@@ -147,6 +147,7 @@ int RunLater(float time, const Callback &c)
 		{
 			std::lock_guard<std::mutex> lock(runner_mutex);
 			//msg_write("rl lock 0");
+			//printf("%d\n", _hui_runners_.num);
 			_hui_runners_.add(r);
 			_hui_runners_cleanup_();
 			//msg_write("rl lock z");

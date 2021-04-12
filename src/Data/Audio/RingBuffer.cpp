@@ -127,20 +127,35 @@ int RingBuffer::write(const AudioBuffer& b) {
 
 // size > 0: from read_pos
 // size < 0: from write_pos backwards
-void RingBuffer::peek_ref(AudioBuffer &b, int size) {
-	if (size >= 0) {
+void RingBuffer::peek(AudioBuffer &b, int size, PeekMode mode) {
+	if (mode == PeekMode::FORWARD_REF) {
 		size = min(size, available());
 		size = min(size, buf.length - read_pos);
 		b.set_as_ref(buf, read_pos, size);
-	} else {
+	} else if (mode == PeekMode::FORWARD_COPY_WRAP) {
+		// TODO implement
+		printf("RingBuffer.peek(FORWARD_COPY_WRAP...\n");
+	} else if (mode == PeekMode::BACKWARD_REF) {
 		size = min(-size, write_pos.load());
 		b.set_as_ref(buf, write_pos - size, size);
+	} else if (mode == PeekMode::BACKWARD_COPY_WRAP) {
+		b.resize(size);
+		int wp = write_pos.load();
+		int target_offset = 0;
+		int source_offset_end = wp; // end of range!
+		while (size > 0) {
+			int chunk = min(size, source_offset_end);
+			b.set_x(buf, source_offset_end - chunk, chunk, target_offset, 1.0f);
+			size -= chunk;
+			target_offset += chunk;
+			source_offset_end = buf.length;
+		}
 	}
 }
 
 // get a reference of the internal buffer for reading (later)
 void RingBuffer::read_ref(AudioBuffer &b, int size) {
-	peek_ref(b, size);
+	peek(b, size, PeekMode::FORWARD_REF);
 }
 
 void RingBuffer::read_ref_done(AudioBuffer &b) {

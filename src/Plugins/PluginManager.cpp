@@ -300,11 +300,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("RingBuffer.write", &RingBuffer::write);
 	kaba::link_external_class_func("RingBuffer.read_ref", &RingBuffer::read_ref);
 	kaba::link_external_class_func("RingBuffer.read_ref_done", &RingBuffer::read_ref_done);
-	kaba::link_external_class_func("RingBuffer.peek_ref", &RingBuffer::peek_ref);
+	kaba::link_external_class_func("RingBuffer.peek", &RingBuffer::peek);
 	kaba::link_external_class_func("RingBuffer.write_ref", &RingBuffer::write_ref);
 	kaba::link_external_class_func("RingBuffer.write_ref_done", &RingBuffer::write_ref_done);
-//	kaba::link_external_class_func("RingBuffer.move_read_pos", &RingBuffer::move_read_pos);
-//	kaba::link_external_class_func("RingBuffer.move_write_pos", &RingBuffer::move_write_pos);
 	kaba::link_external_class_func("RingBuffer.clear", &RingBuffer::clear);
 
 	kaba::declare_class_size("Sample", sizeof(Sample));

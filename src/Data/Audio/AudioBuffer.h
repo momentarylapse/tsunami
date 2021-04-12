@@ -53,10 +53,10 @@ public:
 	void _cdecl swap_ref(AudioBuffer &b);
 	void _cdecl swap_value(AudioBuffer &b);
 	void _cdecl append(const AudioBuffer &b);
-	void _cdecl set(const AudioBuffer &b, int offset, float volume = 1.0f);
-	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume = 1.0f);
-	void _cdecl add(const AudioBuffer &b, int offset, float volume = 1.0f);
-	void _cdecl set_as_ref(const AudioBuffer &b, int offset, int length);
+	void _cdecl set(const AudioBuffer &source, int target_offset, float volume = 1.0f);
+	void _cdecl set_x(const AudioBuffer &source, int source_offset, int length, int target_offset, float volume = 1.0f);
+	void _cdecl add(const AudioBuffer &source, int offset, float volume = 1.0f);
+	void _cdecl set_as_ref(const AudioBuffer &source, int offset, int length);
 
 	AudioBuffer _cdecl ref(int start, int end);
 

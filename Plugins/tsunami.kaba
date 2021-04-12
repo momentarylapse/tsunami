@@ -203,8 +203,8 @@ class AudioBuffer
 	extern const Range range()
 	extern void resize(int length)
 	extern void set_channels(int channels)
-	extern void set(AudioBuffer b, int offset, float volume)
-	extern void add(AudioBuffer b, int offset, float volume)
+	extern void set(AudioBuffer source, int target_offset, float volume)
+	extern void add(AudioBuffer source, int offset, float volume)
 	#extern void mix_stereo(float volume, float panning)
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
 	extern selfref AudioBuffer __subarray__(int start, int end)
@@ -228,13 +228,16 @@ class RingBuffer
 	extern void write(AudioBuffer b)
 	extern void read_ref(out AudioBuffer b, int size)
 	extern void read_ref_done(AudioBuffer b)
-	extern void peek_ref(out AudioBuffer b, int size)
+	extern void peek(out AudioBuffer b, int size, int mode)
 	extern void write_ref(AudioBuffer b, int size)
 	extern void write_ref_done(AudioBuffer b)
-	#extern void move_read_pos(int delta)
-	#extern void move_write_pos(int delta)
 	extern void clear()
 	void __assign__(RingBuffer o)
+	enum PeekMode
+		FORWARD_REF
+		FORWARD_COPY_WRAP
+		BACKWARD_REF
+		BACKWARD_COPY_WRAP
 
 
 # general "interface"

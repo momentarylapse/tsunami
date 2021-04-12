@@ -268,6 +268,7 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume) {
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
+// offsets must be valid!
 inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length) {
 	for (int tc=0; tc<target.channels; tc++) {
 		int sc = min(tc, source.channels-1);
@@ -290,33 +291,41 @@ inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, con
 	}
 }
 
-// this[offset:] = source[:length]
-void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume) {
+// this[target_offset:] = source[source_offset:length]
+void AudioBuffer::set_x(const AudioBuffer &source, int source_offset, int _length, int target_offset, float volume) {
 	/*if (source.channels > channels)
 		printf("AudioBuffer.set_x: channels >\n");*/
 
-	_length = min(_length, source.length);
+	if (target_offset < 0) {
+		source_offset += -target_offset;
+		_length -= -target_offset;
+		target_offset = 0;
+	}
+	if (source_offset < 0) {
+		target_offset += -source_offset;
+		_length -= -source_offset;
+		source_offset = 0;
+	}
+	_length = min(min(_length, source.length - source_offset), length - target_offset);
 
-	// relative to self
-	int i0 = max(0, _offset);
-	int i1 = min(_length + _offset, length);
-	if (i1 <= i0)
+	if (_length <= 0)
 		return;
 
 	// set buffers
 	if (volume == 1.0f) {
-		_buf_copy_samples_(*this, i0, source, i0 - _offset, i1 - i0);
+		_buf_copy_samples_(*this, target_offset, source, source_offset, _length);
 	} else {
-		_buf_copy_samples_scale_(*this, i0, source, i0 - _offset, i1 - i0, volume);
+		_buf_copy_samples_scale_(*this, target_offset, source, source_offset, _length, volume);
 	}
-	invalidate_peaks(Range(i0 + offset, i1 - i0));
+	invalidate_peaks(Range(target_offset, _length));
 }
 
 // this[offset:] = source[:]
-void AudioBuffer::set(const AudioBuffer &source, int _offset, float volume) {
-	set_x(source, _offset, source.length, volume);
+void AudioBuffer::set(const AudioBuffer &source, int target_offset, float volume) {
+	set_x(source, 0, source.length, target_offset, volume);
 }
 
+// this[:] = source[offset:offset+length] ???
 void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length) {
 	clear();
 	length = _length;

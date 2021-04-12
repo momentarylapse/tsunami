@@ -29,10 +29,17 @@ public:
 	int read(AudioBuffer &b);
 	int write(const AudioBuffer &b);
 
+	enum class PeekMode {
+		FORWARD_REF,
+		FORWARD_COPY_WRAP,
+		BACKWARD_REF,
+		BACKWARD_COPY_WRAP,
+	};
+
 	void read_ref(AudioBuffer &b, int size);
 	void read_ref_done(AudioBuffer &b);
 	void read_ref_cancel(AudioBuffer &b);
-	void peek_ref(AudioBuffer &b, int size);
+	void peek(AudioBuffer &b, int size, PeekMode mode);
 	void write_ref(AudioBuffer &b, int size);
 	void write_ref_done(AudioBuffer &b);
 	void write_ref_cancel(AudioBuffer &b);

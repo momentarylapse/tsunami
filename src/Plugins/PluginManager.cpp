@@ -180,10 +180,12 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Session.create_child", &Session::create_child);
 
 
+	{
 	Module module(ModuleCategory::AUDIO_EFFECT, "");
 	kaba::declare_class_size("Module", sizeof(Module));
 	kaba::declare_class_element("Module.name", &Module::module_class);
 	kaba::declare_class_element("Module.session", &Module::session);
+	kaba::declare_class_element("Module.port_out", &Module::port_out);
 	kaba::declare_class_element("Module." + kaba::IDENTIFIER_SHARED_COUNT, &Module::_pointer_ref_counter);
 	kaba::link_external_class_func("Module.__init__", &Module::__init__);
 	kaba::link_external_virtual("Module.__delete__", &Module::__delete__, &module);
@@ -203,6 +205,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Module.copy", &Module::copy);
 	kaba::link_external_class_func("Module.plug_in", &Module::_plug_in);
 	kaba::link_external_class_func("Module.unplug_in", &Module::_unplug_in);
+	}
 
 
 	ModuleConfiguration plugin_data;
@@ -224,28 +227,34 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("ConfigPanel.changed", &ConfigPanel::changed);
 	kaba::declare_class_element("ConfigPanel.c", &ConfigPanel::c);
 
+	{
 	AudioSource asource;
 	kaba::declare_class_size("AudioSource", sizeof(AudioSource));
 	kaba::link_external_class_func("AudioSource.__init__", &AudioSource::__init__);
 	kaba::link_external_virtual("AudioSource.__delete__", &AudioSource::__delete__, &asource);
 	kaba::link_external_virtual("AudioSource.read", &AudioSource::read, &asource);
+	}
 
+	{
 	AudioEffect aeffect;
 	kaba::declare_class_size("AudioEffect", sizeof(AudioEffect));
 	kaba::declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
-	kaba::declare_class_element("AudioEffect.out", &AudioEffect::out);
 	kaba::declare_class_element("AudioEffect.source", &AudioEffect::source);
 	kaba::link_external_class_func("AudioEffect.__init__", &AudioEffect::__init__);
 	kaba::link_external_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
 	kaba::link_external_virtual("AudioEffect.process", &AudioEffect::process, &aeffect);
 	kaba::link_external_virtual("AudioEffect.read", &AudioEffect::read, &aeffect);
+	}
 
+	{
 	MidiEffect meffect;
 	kaba::declare_class_size("MidiEffect", sizeof(MidiEffect));
 	kaba::link_external_class_func("MidiEffect.__init__", &MidiEffect::__init__);
 	kaba::link_external_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
 	kaba::link_external_virtual("MidiEffect.process", &MidiEffect::process, &meffect);
+	}
 
+	{
 	AudioVisualizer avis;
 	kaba::declare_class_size("AudioVisualizer", sizeof(AudioVisualizer));
 	kaba::declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
@@ -259,7 +268,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
 	kaba::link_external_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
 	kaba::link_external_class_func("AudioVisualizer.flip", &AudioVisualizer::flip);
+	}
 
+	{
 	DummyPitchDetector pd;
 	kaba::declare_class_size("PitchDetector", sizeof(PitchDetector));
 	kaba::declare_class_element("PitchDetector.frequency", &PitchDetector::frequency);
@@ -269,6 +280,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("PitchDetector.__init__", &DummyPitchDetector::__init__);
 	kaba::link_external_virtual("PitchDetector.read", &PitchDetector::read, &pd);
 	kaba::link_external_virtual("PitchDetector.process", &DummyPitchDetector::process, &pd);
+	}
 
 	kaba::declare_class_size("AudioBuffer", sizeof(AudioBuffer));
 	kaba::declare_class_element("AudioBuffer.offset", &AudioBuffer::offset);
@@ -335,6 +347,7 @@ void PluginManager::link_app_script_data() {
 
 
 
+	{
 	Port port(SignalType::AUDIO, "");
 	kaba::declare_class_size("Module.Port", sizeof(Port));
 	kaba::link_external_class_func("Module.Port.__init__", &Port::__init__);
@@ -342,7 +355,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("Module.Port.read_audio", &Port::read_audio, &port);
 	kaba::link_external_virtual("Module.Port.read_midi", &Port::read_midi, &port);
 	kaba::link_external_virtual("Module.Port.read_beats", &Port::read_beats, &port);
+	}
 
+	{
 	MidiSource msource;
 	kaba::declare_class_size("MidiSource", sizeof(MidiSource));
 	kaba::declare_class_element("MidiSource.bh_midi", &MidiSource::bh_midi);
@@ -355,8 +370,10 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("MidiSource.skip", &MidiSource::skip);
 	kaba::link_external_class_func("MidiSource.note_x", &MidiSource::note_x);
 	kaba::link_external_class_func("MidiSource.skip_x", &MidiSource::skip_x);
+	}
 
 
+	{
 	BeatMidifier bmidifier;
 	kaba::declare_class_size("BeatMidifier", sizeof(BeatMidifier));
 	kaba::link_external_class_func("BeatMidifier.__init__", &BeatMidifier::__init__);
@@ -364,7 +381,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("BeatMidifier.read", &BeatMidifier::read, &bmidifier);
 	kaba::link_external_virtual("BeatMidifier.reset", &BeatMidifier::reset, &bmidifier);
 	kaba::declare_class_element("BeatMidifier.volume", &BeatMidifier::volume);
+	}
 
+	//{
 	Synthesizer synth;
 	kaba::declare_class_size("Synthesizer", sizeof(Synthesizer));
 	kaba::declare_class_element("Synthesizer.sample_rate", &Synthesizer::sample_rate);
@@ -373,7 +392,6 @@ void PluginManager::link_app_script_data() {
 	kaba::declare_class_element("Synthesizer.active_pitch", &Synthesizer::active_pitch);
 	kaba::_declare_class_element("Synthesizer.freq", _offsetof(Synthesizer, tuning.freq));
 	kaba::declare_class_element("Synthesizer.delta_phi", &Synthesizer::delta_phi);
-	kaba::declare_class_element("Synthesizer.out", &Synthesizer::out);
 	kaba::declare_class_element("Synthesizer.auto_generate_stereo", &Synthesizer::auto_generate_stereo);
 	kaba::declare_class_element("Synthesizer.render_by_ref", &Synthesizer::render_by_ref);
 	kaba::link_external_class_func("Synthesizer.__init__", &Synthesizer::__init__);
@@ -383,7 +401,9 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("Synthesizer.on_config", &Synthesizer::on_config, &synth);
 	kaba::link_external_virtual("Synthesizer.reset_state", &Synthesizer::reset_state, &synth);
 	kaba::link_external_class_func("Synthesizer.set_sample_rate", &Synthesizer::set_sample_rate);
+	//}
 
+	{
 	PitchRenderer pren(&synth, 0);
 	kaba::declare_class_size("PitchRenderer", sizeof(PitchRenderer));
 	kaba::declare_class_element("PitchRenderer.synth", &PitchRenderer::synth);
@@ -395,6 +415,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_virtual("PitchRenderer.on_start", &PitchRenderer::on_start, &pren);
 	kaba::link_external_virtual("PitchRenderer.on_end", &PitchRenderer::on_end, &pren);
 	kaba::link_external_virtual("PitchRenderer.on_config", &PitchRenderer::on_config, &pren);
+	}
 
 
 	DummySynthesizer dsynth;
@@ -574,7 +595,7 @@ void PluginManager::link_app_script_data() {
 	AudioInput input(Session::GLOBAL);
 	kaba::declare_class_size("AudioInput", sizeof(AudioInput));
 	kaba::declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
-	kaba::declare_class_element("AudioInput.out", &AudioInput::out);
+	//kaba::declare_class_element("AudioInput.out", &AudioInput::out);
 	kaba::link_external_class_func("AudioInput.__init__", &AudioInput::__init__);
 	kaba::link_external_virtual("AudioInput.__delete__", &AudioInput::__delete__, &input);
 	kaba::link_external_class_func("AudioInput.start", &AudioInput::start);

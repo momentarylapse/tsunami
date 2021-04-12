@@ -27,8 +27,7 @@ AudioEffect::AudioEffect() :
 	Module(ModuleCategory::AUDIO_EFFECT, "")
 {
 	source = nullptr;
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 }

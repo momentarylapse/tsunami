@@ -379,11 +379,11 @@ void TrackRenderer::render_audio(AudioBuffer &buf) {
 }
 
 void TrackRenderer::render_time(AudioBuffer &buf) {
-	synth->out->read_audio(buf);
+	synth->port_out[0]->read_audio(buf);
 }
 
 void TrackRenderer::render_midi(AudioBuffer &buf) {
-	synth->out->read_audio(buf);
+	synth->port_out[0]->read_audio(buf);
 }
 
 void TrackRenderer::render_group(AudioBuffer &buf) {

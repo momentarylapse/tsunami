@@ -200,8 +200,7 @@ AudioInput::AudioInput(Session *_session) :
 	portaudio_stream = nullptr;
 #endif
 
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 
 
 	dev_man = session->device_manager;

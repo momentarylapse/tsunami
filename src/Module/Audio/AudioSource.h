@@ -26,7 +26,6 @@ public:
 		int read_audio(AudioBuffer &buf) override;
 		AudioSource *source;
 	};
-	Output *out;
 
 	// to be implemented by plugins
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }

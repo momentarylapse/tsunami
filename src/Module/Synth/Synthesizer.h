@@ -90,7 +90,6 @@ public:
 		int read_audio(AudioBuffer &buf) override;
 
 	};
-	Output *out;
 
 	Port *source;
 

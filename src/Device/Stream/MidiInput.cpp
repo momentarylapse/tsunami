@@ -81,8 +81,7 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 	device_manager = session->device_manager;
 	cur_device = nullptr;
 
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	auto _class = session->plugin_manager->get_class("MidiInputConfig");
@@ -274,7 +273,7 @@ int MidiInput::do_capturing() {
 #endif
 
 	if (current_midi.samples > 0)
-		out->feed(current_midi);
+		((Output*)(port_out[0]))->feed(current_midi);
 
 	return current_midi.samples;
 }

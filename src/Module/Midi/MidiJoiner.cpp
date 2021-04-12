@@ -10,8 +10,7 @@
 #include "../../Data/Midi/MidiData.h"
 
 MidiJoiner::MidiJoiner() : Module(ModuleCategory::PLUMBING, "MidiJoiner") {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &a, "a"});
 	port_in.add({SignalType::MIDI, &b, "b"});
 	a = nullptr;

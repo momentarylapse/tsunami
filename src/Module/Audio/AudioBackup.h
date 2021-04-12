@@ -27,7 +27,6 @@ public:
 		int read_audio(AudioBuffer &buf) override;
 		AudioBackup *backup;
 	};
-	Output *out;
 
 	Port *source;
 

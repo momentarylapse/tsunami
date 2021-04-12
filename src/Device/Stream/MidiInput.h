@@ -68,7 +68,6 @@ public:
 		MidiEventBuffer events;
 		MidiInput *input;
 	};
-	Output *out;
 
 	int _sample_rate;
 

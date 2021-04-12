@@ -13,8 +13,7 @@
 BeatSource::BeatSource() :
 	Module(ModuleCategory::BEAT_SOURCE, "")
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 }
 
 void BeatSource::__init__() {

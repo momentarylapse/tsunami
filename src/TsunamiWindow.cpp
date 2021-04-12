@@ -451,7 +451,7 @@ void TsunamiWindow::on_track_render() {
 	AudioBuffer buf;
 	buf.resize(range.length);
 
-	write_into_buffer(renderer.out, buf, range.length, p.get());
+	write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
 
 	song->begin_action_group();
 	Track *t = song->add_track(SignalType::AUDIO_STEREO);

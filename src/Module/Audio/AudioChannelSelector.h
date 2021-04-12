@@ -23,7 +23,6 @@ public:
 		int read_audio(AudioBuffer &buf) override;
 		AudioChannelSelector *cs;
 	};
-	Output *out;
 
 	Port *source;
 

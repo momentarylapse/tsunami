@@ -66,7 +66,6 @@ public:
 
 		AudioInput *stream;
 	};
-	Output *out;
 
 	void _cdecl set_chunk_size(int size);
 	int chunk_size;

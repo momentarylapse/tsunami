@@ -12,8 +12,7 @@
 AudioJoiner::AudioJoiner() :
 	Module(ModuleCategory::PLUMBING, "AudioJoiner")
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &a, "a"});
 	port_in.add({SignalType::AUDIO, &b, "b"});
 	a = nullptr;

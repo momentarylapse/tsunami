@@ -76,8 +76,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 Synthesizer::Synthesizer() :
 	Module(ModuleCategory::SYNTHESIZER, "")
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add({SignalType::MIDI, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;

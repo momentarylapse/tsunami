@@ -36,8 +36,7 @@ string AudioChannelSelector::Config::auto_conf(const string &name) const {
 
 
 AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::PLUMBING, "AudioChannelSelector") {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
 

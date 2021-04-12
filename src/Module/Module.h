@@ -137,7 +137,7 @@ public:
 
 	// ports
 	Array<InPortDescription> port_in;
-	Array<Port*> port_out;
+	owned_array<Port> port_out;
 	void _plug_in(int in_port, Module *source, int out_port);
 	void _unplug_in(int in_port);
 

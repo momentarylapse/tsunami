@@ -35,4 +35,4 @@ class SineSource extends AudioSource
 		source.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
 		synth.plug_in(0, source, 0)
 	override int read(out AudioBuffer buf)
-		return synth.out.read_audio(buf)
+		return synth.port_out[0].read_audio(buf)

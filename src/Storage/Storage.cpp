@@ -225,7 +225,7 @@ bool Storage::render_export_selection(Song *song, const SongSelection &sel, cons
 	SongRenderer renderer(song);
 	renderer.set_range(sel.range());
 	renderer.allow_layers(sel.layers());
-	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
+	return save_via_renderer(renderer.port_out[0], filename, renderer.get_num_samples(), song->tags);
 }
 
 bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags) {

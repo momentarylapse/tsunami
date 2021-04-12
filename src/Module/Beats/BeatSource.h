@@ -26,7 +26,6 @@ public:
 		int read_beats(Array<Beat> &beats, int samples) override;
 		BeatSource *source;
 	};
-	Output *out;
 
 	virtual int _cdecl read(Array<Beat> &beats, int samples){ return samples; }
 	virtual void _cdecl reset(){}

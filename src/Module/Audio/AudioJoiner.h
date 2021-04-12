@@ -11,19 +11,16 @@
 #include "../Port/Port.h"
 #include "../Module.h"
 
-class AudioJoiner : public Module
-{
+class AudioJoiner : public Module {
 public:
 	AudioJoiner();
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioJoiner *j);
 		int read_audio(AudioBuffer &buf) override;
 		AudioJoiner *joiner;
 	};
-	Output *out;
 
 	Port *a, *b;
 };

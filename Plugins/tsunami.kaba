@@ -99,6 +99,8 @@ class ConfigPanel extends Panel
 class Module as shared extends Object
 	string name
 	Session* session
+	#owned Port[] port_out
+	Port*[] port_out
 	extern void __init__(int type, string sub_type)
 	extern override void __delete__()
 	void __assign__(Module o)
@@ -163,7 +165,6 @@ class Module as shared extends Object
 		SIGNAL_CHAIN
 
 class AudioEffect extends Module
-	Module.Port *out
 	Module.Port *source
 	extern void __init__()
 	extern override void __delete__()
@@ -171,13 +172,11 @@ class AudioEffect extends Module
 	extern virtual int read(out AudioBuffer buf)
 
 class MidiEffect extends Module
-	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(out MidiNoteBuffer midi)
 
 class AudioVisualizer extends Module
-	Module.Port *out
 	int chunk_size
 	RingBuffer* ring_buffer
 	int next_writing
@@ -246,7 +245,6 @@ class AudioSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(out AudioBuffer buf)
-	Module.Port *out
 
 class MidiProduceData
 	Bar* bar
@@ -296,7 +294,6 @@ class Synthesizer extends Module
 	bool auto_generate_stereo
 	bool render_by_ref
 	MidiEventBuffer events
-	Module.Port *out
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual void render(out AudioBuffer buf)

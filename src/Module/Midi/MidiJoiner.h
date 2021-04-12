@@ -22,7 +22,6 @@ public:
 		int read_midi(MidiEventBuffer &buf) override;
 		MidiJoiner *joiner;
 	};
-	Output *out;
 
 	Port *a, *b;
 };

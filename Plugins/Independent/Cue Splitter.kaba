@@ -86,7 +86,7 @@ class CueSplitter extends TsunamiPlugin
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
 			let _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
-			session.storage.save_via_renderer(r.out, dir << _fn, end - offset, tags)
+			session.storage.save_via_renderer(r.port_out[0], dir << _fn, end - offset, tags)
 		print("-----------------done")
 		stop()
 		

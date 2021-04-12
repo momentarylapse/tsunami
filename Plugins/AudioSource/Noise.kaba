@@ -16,6 +16,8 @@ class Noise extends AudioSource
 	Config config
 	Random r
 	
+	void __assign__(Noise n)
+	
 	void do(out float[] buf)
 		if config.type == "uniform"
 			for b in buf
@@ -23,7 +25,7 @@ class Noise extends AudioSource
 		else if config.type == "gauss"
 			for b in buf
 				b = r.normal(0, 0.2) * config.volume
-	
+
 	override int read(out AudioBuffer buf)
 		for c in buf.c
 			do(c)

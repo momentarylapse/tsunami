@@ -39,7 +39,6 @@ public:
 		int read_audio(AudioBuffer &buf) override;
 		AudioEffect *fx;
 	};
-	Output *out;
 
 	Port *source;
 

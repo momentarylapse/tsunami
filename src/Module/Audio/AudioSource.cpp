@@ -9,12 +9,10 @@
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
 
-
 AudioSource::AudioSource() :
 	Module(ModuleCategory::AUDIO_SOURCE, "")
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 }
 
 void AudioSource::__init__() {

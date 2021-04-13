@@ -77,9 +77,9 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 	tab = t;
 	module = m;
 	foreachi(auto &pd, m->port_in, i)
-		in.add(new SignalEditorModulePort(tab, pd.type, module_port_in_x(module), module_port_in_y(module, i), false));
+		in.add(new SignalEditorModulePort(tab, module, i, pd.type, module_port_in_x(module), module_port_in_y(module, i), false));
 	foreachi(auto p, m->port_out, i)
-		out.add(new SignalEditorModulePort(tab, p->type, module_port_out_x(module), module_port_out_y(module, i), true));
+		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module), module_port_out_y(module, i), true));
 	for (auto p: in + out)
 		add_child(p);
 }

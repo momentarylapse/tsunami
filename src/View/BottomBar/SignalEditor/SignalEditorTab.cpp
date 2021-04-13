@@ -340,7 +340,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 		p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
 	}
 
-	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
+	/*if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 		p->set_color(view->colors.text);
 		if (hover.target_module) {
 			p->set_line_width(5);
@@ -353,7 +353,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 		} else {
 			p->draw_line(sel.dx, sel.dy, hui::GetEvent()->mx, hui::GetEvent()->my);
 		}
-	}
+	}*/
 
 
 	float mx = hui::GetEvent()->mx;
@@ -378,20 +378,34 @@ void SignalEditorTab::on_draw(Painter* p) {
 }
 
 void SignalEditorTab::on_chain_update() {
-	background->children.clear();
-	modules.clear();
-	cables.clear();
-
-	for (auto m: weak(chain->modules)) {
-		auto mm = new SignalEditorModule(this, m);
-		modules.add(mm);
-		background->add_child(mm);
+	// delete old modules
+	Array<SignalEditorModule*> to_del;
+	for (auto m: modules)
+		if (weak(chain->modules).find(m->module) < 0)
+			to_del.add(m);
+	for (auto m: to_del) {
+		modules.erase(modules.find(m));
+		background->delete_child(m);
 	}
+
+	// add new modules
+	for (auto m: weak(chain->modules))
+		if (!get_module(m)) {
+			auto mm = new SignalEditorModule(this, m);
+			modules.add(mm);
+			background->add_child(mm);
+		}
+
+	// cables
+	for (auto c: cables)
+		background->delete_child(c);
+	cables.clear();
 	for (auto c: chain->cables()) {
 		auto cc = new SignalEditorCable(this, c);
 		cables.add(cc);
 		background->add_child(cc);
 	}
+
 	graph->hover = HoverData();
 
 

@@ -18,9 +18,11 @@ enum class SignalType;
 class SignalEditorModulePort : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
+	Module *module;
 	SignalType type;
 	bool is_out;
-	SignalEditorModulePort(SignalEditorTab *t, SignalType _type, float dx, float dy, bool out);
+	int index;
+	SignalEditorModulePort(SignalEditorTab *t, Module *m, int _index, SignalType _type, float dx, float dy, bool out);
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(float mx, float my) override;
 	string get_tip() override;

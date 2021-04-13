@@ -1858,7 +1858,7 @@ void AudioView::mdp_prepare(MouseDelayAction *a) {
 }
 
 void AudioView::mdp_run(MouseDelayAction *a) {
-	scene_graph->mdp_run(a);
+	scene_graph->mdp_run(a, mx, my);
 }
 
 void AudioView::mdp_prepare(hui::Callback update) {

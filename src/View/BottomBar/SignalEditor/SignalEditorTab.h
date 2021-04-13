@@ -19,6 +19,8 @@ class Module;
 struct Cable;
 enum class ModuleCategory;
 enum class SignalType;
+class SignalEditorModule;
+class SignalEditorBackground;
 
 
 class SignalEditorTab : public hui::Panel {
@@ -56,6 +58,12 @@ public:
 	owned<scenegraph::SceneGraph> graph;
 	ScrollBar *scroll_bar_h;
 	ScrollBar *scroll_bar_v;
+	SignalEditorBackground *background;
+	Array<SignalEditorModule*> modules;
+	Set<Module*> sel_modules;
+
+	void select_module(Module *m, bool add=false);
+	void update_module_positions();
 
 
 	Selection get_hover(float mx, float my);
@@ -85,6 +93,8 @@ public:
 	void on_module_configure();
 
 
+	void popup_chain();
+	void popup_module();
 
 };
 

@@ -50,24 +50,24 @@ public:
 		mode = _mode;
 		start_pos = view->get_mouse_pos_snap();
 	}
-	void on_start() override {
+	void on_start(float mx, float my) override {
 		range = RangeTo(view->get_mouse_pos_snap(), start_pos);
 		view->hover().y0 = view->mdp()->y0;
-		view->hover().y1 = view->my;
+		view->hover().y1 = my;
 		view->selection_mode = mode;
 		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
 		view->set_selection(view->mode->get_selection(range, mode));
 	}
-	void on_update() override {
+	void on_update(float mx, float my) override {
 		// cheap auto scrolling
-		if (view->mx < 50)
+		if (mx < 50)
 			view->cam.move(-10 / view->cam.pixels_per_sample);
-		if (view->mx > view->area.width() - 50)
+		if (mx > view->area.width() - 50)
 			view->cam.move(10 / view->cam.pixels_per_sample);
 
 		range.set_start(view->get_mouse_pos_snap());
-		view->hover().y1 = view->my;
+		view->hover().y1 = my;
 		if (view->select_xor)
 			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
 		else
@@ -106,16 +106,16 @@ public:
 		mouse_pos0 = view->hover().pos;
 		ref_pos = hover_reference_pos(view->hover());
 	}
-	void on_start() override {
+	void on_start(float mx, float my) override {
 		action = new ActionSongMoveSelection(view->song, sel, false);
 	}
-	void on_update() override {
+	void on_update(float mx, float my) override {
 		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
 		view->snap_to_grid(p);
 		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
 		action->set_param_and_notify(view->song, dpos);
 	}
-	void on_finish() override {
+	void on_finish(float mx, float my) override {
 		view->song->execute(action);
 	}
 	void on_cancel() override {

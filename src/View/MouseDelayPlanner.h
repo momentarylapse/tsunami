@@ -21,9 +21,9 @@ class MouseDelayAction {
 public:
 	MouseDelayAction() {}
 	virtual ~MouseDelayAction() {}
-	virtual void on_start() {}
-	virtual void on_update() {}
-	virtual void on_finish() {}
+	virtual void on_start(float mx, float my) {}
+	virtual void on_update(float mx, float my) {}
+	virtual void on_finish(float mx, float my) {}
 	virtual void on_cancel() {}
 	virtual void on_clean_up() {}
 	virtual void on_draw_post(Painter *p) {}
@@ -41,11 +41,11 @@ public:
 	typedef std::function<void()> Callback;
 	owned<MouseDelayAction> action;
 	void prepare(MouseDelayAction *action);
-	void start_acting();
-	bool update();
+	void start_acting(float mx, float my);
+	bool update(float mx, float my);
 	bool has_focus();
 	bool acting();
-	void finish();
+	void finish(float mx, float my);
 	void cancel();
 	void draw_post(Painter *p);
 };

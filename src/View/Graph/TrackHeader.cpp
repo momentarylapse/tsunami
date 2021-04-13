@@ -238,7 +238,7 @@ public:
 
 		view->draw_cursor_hover(c, track->track->nice_name());
 	}
-	void on_finish() override {
+	void on_finish(float mx, float my) override {
 		int target = get_track_move_target(false);
 		track->track->move(target);
 	}

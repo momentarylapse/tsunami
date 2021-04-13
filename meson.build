@@ -444,6 +444,7 @@ sources = [
 	'src/Test/TestTrackVersion.cpp',
 	'src/Test/UnitTest.cpp',
 	'src/View/BottomBar/SignalEditor/SignalEditorBackground.cpp',
+	'src/View/BottomBar/SignalEditor/SignalEditorModule.cpp',
 	'src/View/BottomBar/SignalEditor/SignalEditorTab.cpp',
 	'src/View/BottomBar/BottomBar.cpp',
 	'src/View/BottomBar/DeviceConsole.cpp',

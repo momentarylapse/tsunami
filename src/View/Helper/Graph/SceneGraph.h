@@ -43,7 +43,7 @@ public:
 
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);
-	void mdp_run(MouseDelayAction *action);
+	void mdp_run(MouseDelayAction *action, float mx, float my);
 	void mdp_prepare(Callback update);
 
 	float mx, my;

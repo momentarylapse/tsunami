@@ -58,3 +58,13 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	p->set_transform(rot0, complex::ZERO);
 }
 
+bool SignalEditorBackground::on_left_button_down(float mx, float my) {
+	tab->select_module(nullptr);
+	return true;
+}
+
+bool SignalEditorBackground::on_right_button_down(float mx, float my) {
+	tab->popup_chain();
+	return true;
+}
+

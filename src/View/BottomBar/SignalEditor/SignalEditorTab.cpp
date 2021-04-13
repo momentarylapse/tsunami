@@ -7,6 +7,7 @@
 
 #include "SignalEditorTab.h"
 #include "SignalEditorBackground.h"
+#include "SignalEditorModule.h"
 #include "../SignalEditor.h"
 #include "../../AudioView.h"
 #include "../../HoverData.h"
@@ -105,7 +106,8 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	graph = new scenegraph::SceneGraph([&]{});
 	auto hbox = new scenegraph::VBox;
 	graph->add_child(hbox);
-	hbox->add_child(new SignalEditorBackground(this));
+	background = new SignalEditorBackground(this);
+	hbox->add_child(background);
 	scroll_bar_h = new ScrollBarHorizontal();
 	scroll_bar_h->constrained = false;
 	scroll_bar_h->update(1,1);
@@ -152,6 +154,8 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_CABLE);
 	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_MODULE);
 	chain->subscribe(this, [=]{ on_chain_delete(); }, chain->MESSAGE_DELETE);
+
+	on_chain_update();
 }
 SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
@@ -321,8 +325,8 @@ void SignalEditorTab::on_draw(Painter* p) {
 	float rot[4] = {1,0,0,1};
 	p->set_transform(rot, view_offset);
 
-	for (auto *m: weak(chain->modules))
-		draw_module(p, m);
+	//for (auto *m: weak(chain->modules))
+	//	draw_module(p, m);
 
 	for (auto &c: chain->cables())
 		draw_cable(p, c);
@@ -370,10 +374,20 @@ void SignalEditorTab::on_draw(Painter* p) {
 		tip = graph->hover.node->get_tip();
 	if (tip.num > 0)
 		AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
-	//draw_cursor_hover(c, msg, mx, my, song_area());
 }
 
 void SignalEditorTab::on_chain_update() {
+	background->children.clear();
+	modules.clear();
+
+	for (auto m: weak(chain->modules)) {
+		auto mm = new SignalEditorModule(this, m);
+		modules.add(mm);
+		background->add_child(mm);
+	}
+	graph->hover = HoverData();
+
+
 	redraw("area");
 }
 
@@ -385,14 +399,14 @@ void SignalEditorTab::on_left_button_down() {
 	float mx = hui::GetEvent()->mx;
 	float my = hui::GetEvent()->my;
 	graph->on_left_button_down(mx, my);
-	hover = get_hover(mx, my);
+	/*hover = get_hover(mx, my);
 	sel = hover;
 	apply_sel();
 	if (sel.type == sel.TYPE_PORT_IN) {
 		chain->disconnect_in(sel.module, sel.port);
 	} else if (sel.type == sel.TYPE_PORT_OUT) {
 		chain->disconnect_out(sel.module, sel.port);
-	}
+	}*/
 	redraw("area");
 }
 
@@ -400,7 +414,7 @@ void SignalEditorTab::on_left_button_up() {
 	float mx = hui::GetEvent()->mx;
 	float my = hui::GetEvent()->my;
 	graph->on_left_button_up(mx, my);
-	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
+	/*if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 		if (hover.target_module) {
 			if (sel.type == sel.TYPE_PORT_IN) {
 				chain->disconnect_out(hover.target_module, hover.target_port);
@@ -416,7 +430,7 @@ void SignalEditorTab::on_left_button_up() {
 		auto *m = sel.module;
 		m->module_x = MODULE_GRID * (int)(m->module_x / MODULE_GRID + 0.5f);
 		m->module_y = MODULE_GRID * (int)(m->module_y / MODULE_GRID + 0.5f);
-	}
+	}*/
 	redraw("area");
 }
 
@@ -424,7 +438,7 @@ void SignalEditorTab::on_mouse_move() {
 	float mx = hui::GetEvent()->mx;
 	float my = hui::GetEvent()->my;
 	graph->on_mouse_move(mx, my);
-	if (hui::GetEvent()->lbut) {
+	/*if (hui::GetEvent()->lbut) {
 		if (sel.type == sel.TYPE_MODULE) {
 			auto *m = sel.module;
 			m->module_x = mx + sel.dx - view_offset.x;
@@ -445,7 +459,7 @@ void SignalEditorTab::on_mouse_move() {
 		}
 	} else {
 		hover = get_hover(mx, my);
-	}
+	}*/
 	redraw("area");
 }
 
@@ -453,15 +467,17 @@ void SignalEditorTab::on_right_button_down() {
 	float mx = hui::GetEvent()->mx;
 	float my = hui::GetEvent()->my;
 	graph->on_right_button_down(mx, my);
-	hover = get_hover(mx, my);
+	/*hover = get_hover(mx, my);
 	sel = hover;
-	apply_sel();
+	apply_sel();*/
+}
 
-	if (hover.type == hover.TYPE_MODULE) {
-		editor->menu_module->open_popup(this);
-	} else if (hover.type < 0) {
-		editor->menu_chain->open_popup(this);
-	}
+void SignalEditorTab::popup_chain() {
+	editor->menu_chain->open_popup(this);
+}
+
+void SignalEditorTab::popup_module() {
+	editor->menu_module->open_popup(this);
 }
 
 void SignalEditorTab::on_key_down() {
@@ -549,15 +565,30 @@ void SignalEditorTab::on_save() {
 
 
 void SignalEditorTab::on_module_delete() {
-	if (sel.type == sel.TYPE_MODULE) {
-		chain->delete_module(sel.module);
-		hover = sel = Selection();
-		apply_sel();
-	}
+	for (auto m: sel_modules)
+		chain->delete_module(m);
+	select_module(nullptr);
 }
 
 void SignalEditorTab::on_module_configure() {
 	apply_sel();
+}
+
+void SignalEditorTab::select_module(Module *m, bool add) {
+	if (!add)
+		sel_modules.clear();
+	if (m)
+		sel_modules.add(m);
+	editor->show_config(m);
+	redraw("area");
+}
+
+void SignalEditorTab::update_module_positions() {
+	for (auto *m: weak(background->children)) {
+		m->align.dx = ((SignalEditorModule*)m)->module->module_x;
+		m->align.dy = ((SignalEditorModule*)m)->module->module_y;
+	}
+	redraw("area");
 }
 
 

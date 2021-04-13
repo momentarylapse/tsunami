@@ -73,7 +73,7 @@ bool SceneGraph::on_left_button_down(float mx, float my) {
 
 bool SceneGraph::on_left_button_up(float mx, float my) {
 	set_mouse(mx, my);
-	mdp->finish();
+	mdp->finish(mx, my);
 	hover = get_hover_data(mx, my);
 
 	auto nodes = collect_children_down(this);
@@ -113,7 +113,7 @@ bool SceneGraph::on_right_button_down(float mx, float my) {
 bool SceneGraph::on_mouse_move(float mx, float my) {
 	set_mouse(mx, my);
 
-	if (!mdp->update()) {
+	if (!mdp->update(mx, my)) {
 		hover = get_hover_data(mx, my);
 
 		auto nodes = collect_children_down(this);
@@ -182,16 +182,16 @@ void SceneGraph::mdp_prepare(MouseDelayAction *a) {
 	mdp->prepare(a);
 }
 
-void SceneGraph::mdp_run(MouseDelayAction *a) {
+void SceneGraph::mdp_run(MouseDelayAction *a, float mx, float my) {
 	mdp->prepare(a);
-	mdp->start_acting();
+	mdp->start_acting(mx, my);
 }
 
 class MouseDelayActionWrapper : public MouseDelayAction {
 public:
 	hui::Callback callback;
 	MouseDelayActionWrapper(hui::Callback c) { callback = c; }
-	void on_update() override { callback(); }
+	void on_update(float mx, float my) override { callback(); }
 };
 
 void SceneGraph::mdp_prepare(hui::Callback update) {

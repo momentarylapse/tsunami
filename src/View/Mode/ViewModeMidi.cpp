@@ -264,10 +264,10 @@ public:
 		pitch = _pitch;
 		pos0 = vlayer->view->hover().pos;
 	}
-	void on_start() override {
+	void on_start(float mx, float my) override {
 		view->mode_edit_midi->start_midi_preview(pitch, 1.0f);
 	}
-	void on_finish() override {
+	void on_finish(float mx, float my) override {
 		auto notes = get_creation_notes();
 
 		if (notes.num > 0) {

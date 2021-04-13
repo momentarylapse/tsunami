@@ -25,15 +25,15 @@ void MouseDelayPlanner::prepare(MouseDelayAction *a) {
 	action = a;
 }
 
-bool MouseDelayPlanner::update() {
+bool MouseDelayPlanner::update(float mx, float my) {
 	if (acting()) {
-		action->on_update();
+		action->on_update(mx, my);
 		//view->force_redraw();
 	} else if (has_focus()) {
 		auto e = hui::GetEvent();
 		dist += fabs(e->dx) + fabs(e->dy);
 		if (dist > min_move_to_start)
-			start_acting();
+			start_acting(mx, my);
 	}
 	return has_focus();
 }
@@ -42,18 +42,18 @@ bool MouseDelayPlanner::acting() {
 	return _started_acting;
 }
 
-void MouseDelayPlanner::start_acting() {
+void MouseDelayPlanner::start_acting(float mx, float my) {
 	_started_acting = true;
-	action->on_start();
+	action->on_start(mx, my);
 }
 
 bool MouseDelayPlanner::has_focus() {
 	return dist >= 0;
 }
 
-void MouseDelayPlanner::finish() {
+void MouseDelayPlanner::finish(float mx, float my) {
 	if (acting()) {
-		action->on_finish();
+		action->on_finish(mx, my);
 		action->on_clean_up();
 		action = nullptr;
 		_started_acting = false;

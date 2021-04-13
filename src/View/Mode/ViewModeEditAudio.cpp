@@ -50,11 +50,10 @@ public:
 		view = v;
 		p = _p;
 	}
-	void on_start() override {
+	void on_start(float mx, float my) override {
 	}
-	void on_update() override {
-		auto e = hui::GetEvent();
-		p->target = view->cam.screen2sample(e->mx);
+	void on_update(float mx, float my) override {
+		p->target = view->cam.screen2sample(mx);
 	}
 	void on_draw_post(Painter *c) override {
 		c->draw_str(100, 100, "MOVING");

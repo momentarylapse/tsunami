@@ -20,6 +20,7 @@ struct Cable;
 enum class ModuleCategory;
 enum class SignalType;
 class SignalEditorModule;
+class SignalEditorCable;
 class SignalEditorBackground;
 
 
@@ -60,7 +61,10 @@ public:
 	ScrollBar *scroll_bar_v;
 	SignalEditorBackground *background;
 	Array<SignalEditorModule*> modules;
+	Array<SignalEditorCable*> cables;
 	Set<Module*> sel_modules;
+
+	SignalEditorModule *get_module(Module *m);
 
 	void select_module(Module *m, bool add=false);
 	void update_module_positions();

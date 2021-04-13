@@ -8,6 +8,7 @@
 #include "SignalEditorTab.h"
 #include "SignalEditorBackground.h"
 #include "SignalEditorModule.h"
+#include "SignalEditorCable.h"
 #include "../SignalEditor.h"
 #include "../../AudioView.h"
 #include "../../HoverData.h"
@@ -322,17 +323,17 @@ void SignalEditorTab::on_draw(Painter* p) {
 	//draw_background(p);
 	p->set_font_size(12);
 
-	float rot[4] = {1,0,0,1};
-	p->set_transform(rot, view_offset);
+	//float rot[4] = {1,0,0,1};
+	//p->set_transform(rot, view_offset);
 
 	//for (auto *m: weak(chain->modules))
 	//	draw_module(p, m);
 
-	for (auto &c: chain->cables())
-		draw_cable(p, c);
+	//for (auto &c: chain->cables())
+	//	draw_cable(p, c);
 
-	for (auto *m: weak(chain->modules))
-		draw_ports(p, m);
+	//for (auto *m: weak(chain->modules))
+	//	draw_ports(p, m);
 
 	for (auto &pp: chain->_ports_out){
 		p->set_color(Red);
@@ -357,15 +358,15 @@ void SignalEditorTab::on_draw(Painter* p) {
 
 	float mx = hui::GetEvent()->mx;
 	float my = hui::GetEvent()->my;
-	Selection hh = get_hover(mx, my);
+	/*Selection hh = get_hover(mx, my);
 	if (hh.type == hover.TYPE_PORT_IN)
 		AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my, p->area());
 	if (hh.type == hover.TYPE_PORT_OUT)
-		AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());
+		AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());*/
 
 
-	float rot0[] = {1,0,0,1};
-	p->set_transform(rot0, complex::ZERO);
+	//float rot0[] = {1,0,0,1};
+	//p->set_transform(rot0, complex::ZERO);
 
 
 
@@ -379,11 +380,17 @@ void SignalEditorTab::on_draw(Painter* p) {
 void SignalEditorTab::on_chain_update() {
 	background->children.clear();
 	modules.clear();
+	cables.clear();
 
 	for (auto m: weak(chain->modules)) {
 		auto mm = new SignalEditorModule(this, m);
 		modules.add(mm);
 		background->add_child(mm);
+	}
+	for (auto c: chain->cables()) {
+		auto cc = new SignalEditorCable(this, c);
+		cables.add(cc);
+		background->add_child(cc);
 	}
 	graph->hover = HoverData();
 
@@ -591,5 +598,10 @@ void SignalEditorTab::update_module_positions() {
 	redraw("area");
 }
 
-
+SignalEditorModule *SignalEditorTab::get_module(Module *m) {
+	for (auto mm: modules)
+		if (mm->module == m)
+			return mm;
+	return nullptr;
+}
 

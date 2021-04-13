@@ -7,7 +7,9 @@
 
 #include "SignalEditorModule.h"
 #include "SignalEditorTab.h"
+#include "SignalEditorPort.h"
 #include "../../../Module/Module.h"
+#include "../../../Module/Port/Port.h"
 #include "../../AudioView.h"
 #include "../../MouseDelayPlanner.h"
 
@@ -18,6 +20,22 @@ const float MODULE_HEIGHT = 23;
 const float MODULE_GRID = 23;
 string module_header(Module *m);
 
+
+static float module_port_in_x(Module *m) {
+	return - 5;
+}
+
+static float module_port_in_y(Module *m, int index) {
+	return MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
+}
+
+static float module_port_out_x(Module *m) {
+	return MODULE_WIDTH + 5;
+}
+
+static float module_port_out_y(Module *m, int index) {
+	return MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
+}
 
 
 class MouseDelayModuleDnD : public MouseDelayAction {
@@ -53,9 +71,17 @@ public:
 };
 
 
+
+
 SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegraph::NodeRel(m->module_x, m->module_y, MODULE_WIDTH, MODULE_HEIGHT) {
 	tab = t;
 	module = m;
+	foreachi(auto &pd, m->port_in, i)
+		in.add(new SignalEditorModulePort(tab, pd.type, module_port_in_x(module), module_port_in_y(module, i), false));
+	foreachi(auto p, m->port_out, i)
+		out.add(new SignalEditorModulePort(tab, p->type, module_port_out_x(module), module_port_out_y(module, i), true));
+	for (auto p: in + out)
+		add_child(p);
 }
 
 void SignalEditorModule::on_draw(Painter *p) {
@@ -68,7 +94,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 		bg = view->colors.hoverify(bg);
 	p->set_color(bg);
 	p->set_roundness(view->CORNER_RADIUS);
-	rect r = area;//module_rect(m);
+	rect r = area;
 	p->draw_rect(r);
 	p->set_roundness(0);
 	p->set_font_size(AudioView::FONT_SIZE);// * 1.2f);

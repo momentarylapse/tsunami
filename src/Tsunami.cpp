@@ -20,6 +20,7 @@
 #include "Module/Synth/Synthesizer.h"
 #include "TsunamiWindow.h"
 #include "Session.h"
+#include "EditModes.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
@@ -266,8 +267,10 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->execute_tsunami_plugin(plugin_file);
 
 
-	if (chain_file != "")
+	if (chain_file != "") {
 		session->add_signal_chain(SignalChain::load(session, chain_file));
+		session->set_mode(EditMode::XSignalEditor);
+	}
 
 
 	return allow_window;

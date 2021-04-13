@@ -19,6 +19,12 @@ enum class SignalType;
 enum class ModuleCategory;
 class SuckerThread;
 
+struct Cable {
+	SignalType type;
+	Module *source, *target;
+	int source_port, target_port;
+};
+
 class SignalChain : public Module {
 	friend class SuckerThread;
 public:
@@ -49,11 +55,6 @@ public:
 
 	Module *get_by_type(ModuleCategory type, const string &sub_type);
 
-	struct Cable {
-		SignalType type;
-		Module *source, *target;
-		int source_port, target_port;
-	};
 	Array<Cable> cables();
 	struct PortX {
 		Module *module;

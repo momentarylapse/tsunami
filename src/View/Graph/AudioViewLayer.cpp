@@ -59,7 +59,7 @@ int hover_buffer(HoverData &hover) {
 class LayerScrollBar : public ScrollBar {
 public:
 	AudioViewLayer *vlayer;
-	LayerScrollBar(AudioViewLayer *l) : ScrollBar(l->view) {
+	LayerScrollBar(AudioViewLayer *l) {
 		vlayer = l;
 		align.horizontal = AlignData::Mode::RIGHT;
 		hidden = true;

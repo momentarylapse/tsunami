@@ -6,19 +6,19 @@
  */
 
 #include "../Graph/ScrollBar.h"
+#include "../Helper/Graph/SceneGraph.h"
 
 #include "../AudioView.h"
 
 const float SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
 
-ScrollBar::ScrollBar(AudioView *_view) {
+ScrollBar::ScrollBar() {
 	align.vertical = AlignData::Mode::FILL;
 	align.horizontal = AlignData::Mode::LEFT;
 	align.w = AudioView::SCROLLBAR_WIDTH;
 	align.dz = 120;
-	view = _view;
 }
-ScrollBarHorizontal::ScrollBarHorizontal(AudioView *_view) : ScrollBar(_view) {
+ScrollBarHorizontal::ScrollBarHorizontal() : ScrollBar() {
 	align.vertical = AlignData::Mode::BOTTOM;
 	align.horizontal = AlignData::Mode::FILL;
 	align.h = AudioView::SCROLLBAR_WIDTH;
@@ -91,9 +91,11 @@ bool ScrollBar::on_left_button_down(float mx, float my) {
 		drag_update(mx, my);
 	}
 
-	view->mdp_prepare([=]{
-		drag_update(mx, my);
-	});
+	if (auto g = graph()) {
+		g->mdp_prepare([=] {
+			drag_update(g->mx, g->my);
+		});
+	}
 	return true;
 }
 

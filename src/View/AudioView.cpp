@@ -213,12 +213,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll_bar_y = new ScrollBar(this);
+	scroll_bar_y = new ScrollBar();
 	scroll_bar_y->auto_hide = true;
 	scroll_bar_y->set_callback([=] {
 		thm.update_immediately(this, song, song_area());
 	});
-	scroll_bar_time = new ScrollBarHorizontal(this);
+	scroll_bar_time = new ScrollBarHorizontal();
 	scroll_bar_time->set_callback([=] {
 		cam.dirty_jump(song->range_with_time().start() + scroll_bar_time->offset);
 	});
@@ -1059,7 +1059,6 @@ void AudioView::update_tracks() {
 		}
 	}
 
-	rebuild_scene_graph();
 	hover().node = nullptr;
 
 	// TODO: detect order change
@@ -1073,24 +1072,6 @@ void AudioView::update_tracks() {
 	for (auto *v: vlayer_del)
 		if (v)
 			background->delete_child(v);
-}
-
-void AudioView::rebuild_scene_graph() {
-	/*scene_graph->children.clear();
-	scene_graph->children.add(background);
-	scene_graph->children.add(scroll_bar_h);
-	scene_graph->children.add(scroll_bar_w);
-
-	for (auto *v: vlayer)
-		scene_graph->children.add(v);
-	for (auto *v: vtrack)
-		scene_graph->children.add(v);
-
-	scene_graph->children.add(metronome_overlay_vlayer);
-	scene_graph->children.add(time_scale);
-	scene_graph->children.add(cursor_start);
-	scene_graph->children.add(cursor_end);
-	scene_graph->children.add(selection_marker);*/
 }
 
 bool need_metro_overlay(Song *song, AudioView *view) {

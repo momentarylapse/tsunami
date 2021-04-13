@@ -1,9 +1,7 @@
 
-#ifndef _MATH_COMPLEX_INCLUDED_
-#define _MATH_COMPLEX__INCLUDED_
+#pragma once
 
-class complex
-{
+class complex {
 public:
 	float x, y;
 	complex(){};
@@ -39,4 +37,3 @@ public:
 };
 
 
-#endif

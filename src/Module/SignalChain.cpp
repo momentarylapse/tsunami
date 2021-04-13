@@ -162,7 +162,7 @@ void SignalChain::delete_module(Module *m) {
 	notify(MESSAGE_DELETE_MODULE);
 }
 
-Array<SignalChain::Cable> SignalChain::cables() {
+Array<Cable> SignalChain::cables() {
 	Array<Cable> cables;
 	for (Module *target: weak(modules)) {
 		foreachi (auto tp, target->port_in, tpi) {

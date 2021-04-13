@@ -175,7 +175,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("show-mixing-console", [=]{ on_mixing_console(); });
 	set_key_code("show-mixing-console", hui::KEY_CONTROL + hui::KEY_M);
 	event("show-devices", [=]{ on_settings(); });
-	event("show-signal-chain", [=]{ bottom_bar->toggle(BottomBar::SIGNAL_EDITOR); });
+	event("show-signal-chain", [=]{ session->set_mode(EditMode::XSignalEditor); });
 	event("show-mastering-console", [=]{ on_mastering_console(); });
 	event("show-fx-console", [=]{ on_fx_console(); });
 	event("sample_from_selection", [=]{ on_sample_from_selection(); });

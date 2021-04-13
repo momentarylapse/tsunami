@@ -12,12 +12,10 @@
 #include "../Helper/Graph/Node.h"
 
 class Painter;
-class AudioView;
 
 class ScrollBar : public scenegraph::Node {
 public:
-	ScrollBar(AudioView *view);
-	//ScrollBar(AudioView *view);
+	ScrollBar();
 	bool constrained = true;
 	float offset = 0;
 	float page_size = 0;
@@ -35,14 +33,13 @@ public:
 
 	void update_geometry(const rect &target_area) override;
 
-	AudioView *view;
 	std::function<void()> callback;
 	void set_callback(std::function<void()> callback);
 };
 
 class ScrollBarHorizontal : public ScrollBar {
 public:
-	ScrollBarHorizontal(AudioView *view);
+	ScrollBarHorizontal();
 };
 
 #endif /* SRC_VIEW_GRAPH_SCROLLBAR_H_ */

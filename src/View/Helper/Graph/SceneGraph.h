@@ -22,11 +22,11 @@ public:
 	using Callback = std::function<void()>;
 	SceneGraph(Callback cb_set_current);
 
-	bool on_left_button_down() override;
-	bool on_left_button_up() override;
-	bool on_left_double_click() override;
-	bool on_right_button_down() override;
-	bool on_mouse_move() override;
+	bool on_left_button_down(float mx, float my) override;
+	bool on_left_button_up(float mx, float my) override;
+	bool on_left_double_click(float mx, float my) override;
+	bool on_right_button_down(float mx, float my) override;
+	bool on_mouse_move(float mx, float my) override;
 	bool allow_handle_click_when_gaining_focus() override;
 
 	//ViewNode *get_hover();
@@ -47,7 +47,7 @@ public:
 	void mdp_prepare(Callback update);
 
 	float mx, my;
-	void set_mouse();
+	void set_mouse(float mx, float my);
 };
 
 }

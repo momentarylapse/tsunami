@@ -60,7 +60,7 @@ public:
 			c->draw_mask_image(area.x1, area.y1, view->images.x.get());
 		}
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		vtrack->set_muted(!vtrack->track->muted);
 		return true;
 	}
@@ -77,7 +77,7 @@ public:
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->draw_mask_image(area.x1, area.y1, view->images.solo.get());
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		vtrack->set_solo(!vtrack->solo);
 		return true;
 	}
@@ -94,7 +94,7 @@ public:
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
 		c->draw_mask_image(area.x1, area.y1, view->images.config.get());
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		view->session->set_mode(EditMode::DefaultTrack);
 		return true;
 	}
@@ -259,7 +259,7 @@ public:
 	}
 };
 
-bool TrackHeader::on_left_button_down() {
+bool TrackHeader::on_left_button_down(float mx, float my) {
 	if (view->select_xor) {
 		view->toggle_select_track_with_content_in_cursor(vtrack);
 	} else {
@@ -273,12 +273,12 @@ bool TrackHeader::on_left_button_down() {
 	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
 	return true;
 }
-bool TrackHeader::on_left_double_click() {
+bool TrackHeader::on_left_double_click(float mx, float my) {
 	view->session->set_mode(EditMode::DefaultTrack);
 	return true;
 }
 
-bool TrackHeader::on_right_button_down() {
+bool TrackHeader::on_right_button_down(float mx, float my) {
 	if (!view->sel.has(vtrack->track)) {
 		view->exclusively_select_layer(vtrack->first_layer());
 		view->select_under_cursor();

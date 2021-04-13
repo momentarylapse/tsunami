@@ -46,11 +46,11 @@ void Node::delete_child(Node* child) {
 			children.erase(i);
 }
 
-Node *Node::root() {
+SceneGraph *Node::graph() {
 	Node *r = this;
 	while (r->parent)
 		r = r->parent;
-	return r;
+	return dynamic_cast<SceneGraph*>(r);
 }
 
 bool Node::is_cur_hover() {
@@ -61,7 +61,7 @@ bool Node::is_cur_hover() {
 }
 
 bool Node::is_cur_hover_non_recursive() {
-	if (auto *sg = dynamic_cast<SceneGraph*>(root())) {
+	if (auto *sg = graph()) {
 		return sg->hover.node == this;
 	}
 	return false;

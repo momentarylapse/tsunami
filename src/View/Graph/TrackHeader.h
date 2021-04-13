@@ -27,9 +27,9 @@ public:
 	color color_frame();
 	color color_text();
 
-	bool on_left_button_down() override;
-	bool on_left_double_click() override;
-	bool on_right_button_down() override;
+	bool on_left_button_down(float mx, float my) override;
+	bool on_left_double_click(float mx, float my) override;
+	bool on_right_button_down(float mx, float my) override;
 	
 	void update_geometry_recursive(const rect &target_area) override;
 };

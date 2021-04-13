@@ -31,7 +31,7 @@ public:
 	void set_area(const rect &r);
 	void update(float page, float content);
 
-	bool on_left_button_down() override;
+	bool on_left_button_down(float mx, float my) override;
 
 	void update_geometry(const rect &target_area) override;
 

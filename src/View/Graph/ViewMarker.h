@@ -20,9 +20,9 @@ public:
 	void on_draw(Painter *c) override;
 	HoverData get_hover_data(float mx, float my) override;
 
-	bool on_left_button_down() override;
-	bool on_left_double_click() override;
-	bool on_right_button_down() override;
+	bool on_left_button_down(float mx, float my) override;
+	bool on_left_double_click(float mx, float my) override;
+	bool on_right_button_down(float mx, float my) override;
 
 	TrackMarker *marker;
 };

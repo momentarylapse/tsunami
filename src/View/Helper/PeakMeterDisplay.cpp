@@ -47,8 +47,13 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	panel = _panel;
 	id = _id;
 
-	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){ area = p->area(); on_draw(p); });
-	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
+	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){
+		area = p->area();
+		on_draw(p);
+	});
+	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{
+		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
 }
 
 PeakMeterDisplay::~PeakMeterDisplay() {
@@ -193,7 +198,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 	}
 }
 
-bool PeakMeterDisplay::on_left_button_down() {
+bool PeakMeterDisplay::on_left_button_down(float mx, float my) {
 	if (mode_constraint != Mode::BOTH)
 		return true;
 	if (mode == Mode::SPECTRUM) {
@@ -208,7 +213,7 @@ bool PeakMeterDisplay::on_left_button_down() {
 	return true;
 }
 
-bool PeakMeterDisplay::on_right_button_down() {
+bool PeakMeterDisplay::on_right_button_down(float mx, float my) {
 	return true;
 }
 

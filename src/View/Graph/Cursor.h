@@ -28,7 +28,7 @@ public:
 	Range drag_range;
 	int is_end;
 
-	bool on_left_button_down() override;
+	bool on_left_button_down(float mx, float my) override;
 };
 
 class SelectionMarker : public scenegraph::NodeFree {

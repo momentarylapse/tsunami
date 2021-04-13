@@ -42,14 +42,14 @@ public:
 	string get_tip() override {
 		return _("playback range");
 	}
-	bool on_left_button_down() override {
-		return parent->on_left_button_down();
+	bool on_left_button_down(float mx, float my) override {
+		return parent->on_left_button_down(mx, my);
 	}
-	bool on_right_button_down() override {
+	bool on_right_button_down(float mx, float my) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
-	bool on_left_double_click() override {
+	bool on_left_double_click(float mx, float my) override {
 		view->sel = SongSelection::from_range(view->song, view->playback_wish_range).filter(view->sel.layers());
 		view->update_selection();
 		return true;
@@ -81,11 +81,11 @@ public:
 	string get_tip() override {
 		return _("locked");
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		view->set_playback_range_locked(false);
 		return true;
 	}
-	bool on_right_button_down() override {
+	bool on_right_button_down(float mx, float my) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
@@ -113,11 +113,11 @@ public:
 	string get_tip() override {
 		return _("looping");
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		view->set_playback_loop(false);
 		return true;
 	}
-	bool on_right_button_down() override {
+	bool on_right_button_down(float mx, float my) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
@@ -150,7 +150,7 @@ void TimeScale::on_draw(Painter* c) {
 	gp->draw_time_numbers(c);
 }
 
-bool TimeScale::on_left_button_down() {
+bool TimeScale::on_left_button_down(float mx, float my) {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
@@ -162,7 +162,7 @@ bool TimeScale::on_left_button_down() {
 	return true;
 }
 
-bool TimeScale::on_right_button_down() {
+bool TimeScale::on_right_button_down(float mx, float my) {
 	view->open_popup(view->menu_song.get());
 	return true;
 }

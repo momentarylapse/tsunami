@@ -24,7 +24,7 @@ Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	align.vertical = AlignData::Mode::FILL;
 }
 
-bool Background::on_left_button_down() {
+bool Background::on_left_button_down(float mx, float my) {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
@@ -37,7 +37,7 @@ bool Background::on_left_button_down() {
 	return true;
 }
 
-bool Background::on_right_button_down() {
+bool Background::on_right_button_down(float mx, float my) {
 	view->open_popup(view->menu_song.get());
 	return true;
 }

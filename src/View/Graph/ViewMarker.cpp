@@ -35,15 +35,15 @@ HoverData ViewMarker::get_hover_data(float mx, float my) {
 void ViewMarker::on_draw(Painter *p) {
 }
 
-bool ViewMarker::on_left_button_down() {
+bool ViewMarker::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool ViewMarker::on_left_double_click() {
+bool ViewMarker::on_left_double_click(float mx, float my) {
 	return true;
 }
 
-bool ViewMarker::on_right_button_down() {
+bool ViewMarker::on_right_button_down(float mx, float my) {
 	return true;
 }
 

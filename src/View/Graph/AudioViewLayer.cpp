@@ -501,7 +501,7 @@ void AudioViewLayer::update_header() {
 	//header->children[0]->hidden = layer->track->has_version_selection();
 }
 
-bool AudioViewLayer::on_left_button_down() {
+bool AudioViewLayer::on_left_button_down(float mx, float my) {
 	view->sel_temp = view->sel; // for diff selection
 
 	view->mode->left_click_handle(this);
@@ -523,7 +523,7 @@ bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
 	return false;
 }
 
-bool AudioViewLayer::on_left_double_click() {
+bool AudioViewLayer::on_left_double_click(float mx, float my) {
 	auto &h = view->hover();
 	int buffer_index = hover_buffer(h);
 
@@ -543,7 +543,7 @@ bool AudioViewLayer::on_left_double_click() {
 	return true;
 }
 
-bool AudioViewLayer::on_right_button_down() {
+bool AudioViewLayer::on_right_button_down(float mx, float my) {
 	auto &h = view->hover();
 	if (view->hover_any_object()) {
 		if (!view->hover_selected_object()) {

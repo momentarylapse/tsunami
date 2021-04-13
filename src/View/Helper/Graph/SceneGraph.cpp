@@ -53,8 +53,8 @@ SceneGraph::SceneGraph(hui::Callback _cb_set_currtent) {
 	cb_set_current = _cb_set_currtent;
 }
 
-bool SceneGraph::on_left_button_down() {
-	set_mouse();
+bool SceneGraph::on_left_button_down(float mx, float my) {
+	set_mouse(mx, my);
 	hover = get_hover_data(mx, my);
 
 	if (hui::GetEvent()->just_focused)
@@ -66,52 +66,52 @@ bool SceneGraph::on_left_button_down() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
-			if (c->on_left_button_down())
+			if (c->on_left_button_down(mx, my))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_left_button_up() {
-	set_mouse();
+bool SceneGraph::on_left_button_up(float mx, float my) {
+	set_mouse(mx, my);
 	mdp->finish();
 	hover = get_hover_data(mx, my);
 
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
-			if (c->on_left_button_up())
+			if (c->on_left_button_up(mx, my))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_left_double_click() {
-	set_mouse();
+bool SceneGraph::on_left_double_click(float mx, float my) {
+	set_mouse(mx, my);
 	hover = get_hover_data(mx, my);
 	set_current(hover);
 
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
-			if (c->on_left_double_click())
+			if (c->on_left_double_click(mx, my))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_right_button_down() {
-	set_mouse();
+bool SceneGraph::on_right_button_down(float mx, float my) {
+	set_mouse(mx, my);
 	hover = get_hover_data(mx, my);
 	set_current(hover);
 
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
-			if (c->on_right_button_down())
+			if (c->on_right_button_down(mx, my))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_mouse_move() {
-	set_mouse();
+bool SceneGraph::on_mouse_move(float mx, float my) {
+	set_mouse(mx, my);
 
 	if (!mdp->update()) {
 		hover = get_hover_data(mx, my);
@@ -119,7 +119,7 @@ bool SceneGraph::on_mouse_move() {
 		auto nodes = collect_children_down(this);
 		for (auto *c: nodes)
 			if (c->hover(mx, my))
-				if (c->on_mouse_move())
+				if (c->on_mouse_move(mx, my))
 					return true;
 	}
 	return false;
@@ -167,9 +167,9 @@ void SceneGraph::on_draw(Painter *p) {
 		mdp->action->on_draw_post(p);
 }
 
-void SceneGraph::set_mouse() {
-	mx = hui::GetEvent()->mx;
-	my = hui::GetEvent()->my;
+void SceneGraph::set_mouse(float _mx, float _my) {
+	mx = _mx;
+	my = _my;
 	//select_xor = win->get_key(hui::KEY_CONTROL);
 }
 

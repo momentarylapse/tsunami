@@ -30,7 +30,9 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 		scene_graph->update_geometry_recursive(p->area());
 		scene_graph->on_draw(p);
 	});
-	parent->event_x(id, "hui:left-button-down", [=]{ scene_graph->on_left_button_down(); });
+	parent->event_x(id, "hui:left-button-down", [=]{
+		scene_graph->on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
 }
 
 
@@ -190,7 +192,7 @@ public:
 	CpuDisplayAdapter *adapter;
 };
 
-bool CpuDisplay::on_left_button_down() {
+bool CpuDisplay::on_left_button_down(float mx, float my) {
 	if (!dlg)
 		dlg = new CpuDisplayDialog(session);
 	dlg->show();

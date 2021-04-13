@@ -79,20 +79,20 @@ void ScrollBar::update(float page, float content) {
 		offset = max(min(offset, content_size - page_size), 0.0f);
 }
 
-bool ScrollBar::on_left_button_down() {
+bool ScrollBar::on_left_button_down(float mx, float my) {
 	if (horizontal)
-		mouse_offset = (view->mx - area.x1) * content_size / area.width() - offset;
+		mouse_offset = (mx - area.x1) * content_size / area.width() - offset;
 	else
-		mouse_offset = (view->my - area.y1) * content_size / area.height() - offset;
+		mouse_offset = (my - area.y1) * content_size / area.height() - offset;
 
 	// outside?!?
 	if (mouse_offset < 0 or mouse_offset > page_size) {
 		mouse_offset = page_size / 2;
-		drag_update(view->mx, view->my);
+		drag_update(mx, my);
 	}
 
 	view->mdp_prepare([=]{
-		drag_update(view->mx, view->my);
+		drag_update(mx, my);
 	});
 	return true;
 }

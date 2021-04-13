@@ -18,6 +18,8 @@ class HoverData;
 
 namespace scenegraph {
 
+class SceneGraph;
+
 class Node : public Sharable<Observable<VirtualBase>> {
 public:
 	Node();
@@ -25,11 +27,11 @@ public:
 
 	virtual bool allow_handle_click_when_gaining_focus() { return true; }
 
-	virtual bool on_left_button_down() { return false; }
-	virtual bool on_left_button_up() { return false; }
-	virtual bool on_left_double_click() { return false; }
-	virtual bool on_right_button_down() { return false; }
-	virtual bool on_mouse_move() { return false; }
+	virtual bool on_left_button_down(float mx, float my) { return false; }
+	virtual bool on_left_button_up(float mx, float my) { return false; }
+	virtual bool on_left_double_click(float mx, float my) { return false; }
+	virtual bool on_right_button_down(float mx, float my) { return false; }
+	virtual bool on_mouse_move(float mx, float my) { return false; }
 
 	virtual bool hover(float mx, float my);
 	virtual void on_draw(Painter *p) {}
@@ -45,7 +47,7 @@ public:
 	virtual void update_geometry(const rect &target_area);
 	virtual void update_geometry_recursive(const rect &target_area);
 
-	Node *root();
+	SceneGraph *graph();
 
 	Node *parent;
 	struct AlignData {

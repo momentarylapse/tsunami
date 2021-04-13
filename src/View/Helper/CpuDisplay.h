@@ -30,7 +30,7 @@ public:
 	CpuDisplay(Session *session, Callback request_redraw);
 	virtual ~CpuDisplay();
 
-	bool on_left_button_down() override;
+	bool on_left_button_down(float mx, float my) override;
 	void on_draw(Painter *p) override;
 	void update();
 	void enable(bool active);

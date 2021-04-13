@@ -57,7 +57,7 @@ string Cursor::get_tip() {
 	return _("cursor");
 }
 
-bool Cursor::on_left_button_down() {
+bool Cursor::on_left_button_down(float mx, float my) {
 	drag_range = view->sel.range_raw;
 	/*if (!is_end)
 		drag_range.invert();*/

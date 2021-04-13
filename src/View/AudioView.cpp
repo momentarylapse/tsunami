@@ -143,7 +143,7 @@ public:
 		p->draw_str(area.mx()-10, area.my()-10, "▲");
 		p->set_font_size(view->FONT_SIZE);
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		if (view->session->win->bottom_bar->visible)
 			return false;
 		view->session->win->bottom_bar->_show();
@@ -556,14 +556,14 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	scene_graph->on_mouse_move();
+	scene_graph->on_mouse_move(mx, my);
 
 	force_redraw();
 }
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	scene_graph->on_left_button_down();
+	scene_graph->on_left_button_down(mx, my);
 
 	force_redraw();
 	update_menu();
@@ -590,7 +590,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	scene_graph->on_left_button_up();
+	scene_graph->on_left_button_up(mx, my);
 
 	force_redraw();
 	update_menu();
@@ -609,7 +609,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	scene_graph->on_right_button_down();
+	scene_graph->on_right_button_down(mx, my);
 }
 
 void AudioView::on_right_button_up() {
@@ -627,7 +627,7 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
-	scene_graph->on_left_double_click();
+	scene_graph->on_left_double_click(mx, my);
 	mode->on_left_double_click();
 	force_redraw();
 	update_menu();

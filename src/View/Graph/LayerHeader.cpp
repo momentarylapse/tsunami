@@ -46,7 +46,7 @@ public:
 		c->set_color(get_color());
 		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker.get());
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		vlayer->layer->set_muted(!vlayer->layer->muted);
 		return true;
 	}
@@ -63,7 +63,7 @@ public:
 		//c->drawStr(area.x1, area.y1, "S");
 		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo.get());
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		vlayer->set_solo(!vlayer->solo);
 		return true;
 	}
@@ -84,7 +84,7 @@ public:
 		else
 			c->draw_str(area.x1, area.y1, u8"\u2b71");
 	}
-	bool on_left_button_down() override {
+	bool on_left_button_down(float mx, float my) override {
 		if (vlayer->represents_imploded)
 			vlayer->view->explode_track(vlayer->layer->track);
 		else
@@ -203,7 +203,7 @@ void LayerHeader::on_draw(Painter *c) {
 	c->set_font("", -1, false, false);
 }
 
-bool LayerHeader::on_left_button_down() {
+bool LayerHeader::on_left_button_down(float mx, float my) {
 	if (vlayer->represents_imploded) {
 		vlayer->view->explode_track(vlayer->layer->track);
 		return true;
@@ -221,7 +221,7 @@ bool LayerHeader::on_left_button_down() {
 	return true;
 }
 
-bool LayerHeader::on_right_button_down() {
+bool LayerHeader::on_right_button_down(float mx, float my) {
 	auto *view = vlayer->view;
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);

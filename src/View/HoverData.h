@@ -65,6 +65,10 @@ public:
 		SCROLLBAR_MIDI,
 		CURVE_POINT,
 		CURVE_POINT_NONE,
+		MODULE,
+		PORT_IN,
+		PORT_OUT,
+		CABLE,
 	};
 	Type type;
 

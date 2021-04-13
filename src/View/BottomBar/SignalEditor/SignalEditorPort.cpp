@@ -22,28 +22,39 @@ class MouseDelayCableCreate : public MouseDelayAction {
 public:
 	SignalEditorTab *tab;
 	SignalEditorModulePort *port;
+	SignalEditorModulePort *target = nullptr;
 	MouseDelayCableCreate(SignalEditorTab *t, SignalEditorModulePort *p) {
 		tab = t;
 		port = p;
 	}
 	void on_update(float mx, float my) override {
+		tab->graph->hover = tab->graph->get_hover_data(mx, my);
+		target = nullptr;
+		if (tab->graph->hover.type == HoverData::Type::PORT_IN or tab->graph->hover.type == HoverData::Type::PORT_OUT) {
+			auto pp = static_cast<SignalEditorModulePort*>(tab->graph->hover.node);
+			if ((pp->module != port->module) and (pp->is_out != port->is_out) and (pp->type == port->type))
+				target = pp;
+		}
+		if (!target)
+			tab->graph->hover = HoverData();
 	}
 	void on_finish(float mx, float my) override {
+		if (target) {
+			if (port->is_out)
+				tab->chain->connect(port->module, port->index, target->module, target->index);
+			else
+				tab->chain->connect(target->module, target->index, port->module, port->index);
+		}
 	}
 	virtual void on_draw_post(Painter *p) {
 		p->set_color(tab->view->colors.text);
-		/*if (hover.target_module) {
+		if (target) {
 			p->set_line_width(5);
-			Module *t = hover.target_module;
-			if (hover.type == hover.TYPE_PORT_IN)
-				p->draw_line(sel.dx, sel.dy, module_port_out_x(t), module_port_out_y(t, hover.target_port));
-			else
-				p->draw_line(sel.dx, sel.dy, module_port_in_x(t), module_port_in_y(t, hover.target_port));
+			p->draw_line(port->area.mx(), port->area.my(), target->area.mx(), target->area.my());
 			p->set_line_width(1);
-		} else*/ {
+		} else {
 			p->draw_line(port->area.mx(), port->area.my(), hui::GetEvent()->mx, hui::GetEvent()->my);
 		}
-
 	}
 };
 
@@ -82,6 +93,14 @@ string SignalEditorModulePort::get_tip() {
 		return _("output: ") + signal_type_name(type);
 	else
 		return _("input: ") + signal_type_name(type);
+}
+
+HoverData SignalEditorModulePort::get_hover_data(float mx, float my) {
+	auto h = HoverData();
+	h.node = this;
+	h.index = index;
+	h.type = is_out ? HoverData::Type::PORT_OUT : HoverData::Type::PORT_IN;
+	return h;
 }
 
 

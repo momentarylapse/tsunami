@@ -26,6 +26,7 @@ public:
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(float mx, float my) override;
 	string get_tip() override;
+	HoverData get_hover_data(float mx, float my) override;
 };
 
 

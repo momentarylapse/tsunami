@@ -60,9 +60,11 @@ void CaptureConsoleMode::update_data_from_items() {
 			update_device_list();
 		});
 
-		c.channel_selector->subscribe(this, [&] {
-			cc->peak_meter_display->set_channel_map(c.channel_map());
-		});
+		if (c.channel_selector) {
+			c.channel_selector->subscribe(this, [&] {
+				cc->peak_meter_display->set_channel_map(c.channel_map());
+			});
+		}
 
 		if (c.id_mapper.num > 0 and c.channel_selector) {
 			cc->event(c.id_mapper, [&] {

@@ -50,6 +50,9 @@ void CaptureConsoleModeMidi::enter() {
 
 	chain->set_buffer_size(512);
 
+	auto &c = items[0];
+	c.enable(true);
+
 	chain->start();
 }
 

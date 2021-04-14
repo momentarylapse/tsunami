@@ -32,6 +32,7 @@ public:
 	virtual bool on_left_double_click(float mx, float my) { return false; }
 	virtual bool on_right_button_down(float mx, float my) { return false; }
 	virtual bool on_mouse_move(float mx, float my) { return false; }
+	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
 
 	virtual bool hover(float mx, float my);
 	virtual void on_draw(Painter *p) {}
@@ -67,6 +68,10 @@ public:
 	rect area;
 	int z;
 	bool hidden;
+
+	Array<Node*> collect_children(bool include_hidden);
+	Array<Node*> collect_children_up();
+	Array<Node*> collect_children_down();
 };
 
 class NodeFree : public Node {

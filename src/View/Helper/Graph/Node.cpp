@@ -110,6 +110,40 @@ void Node::update_geometry_recursive(const rect &target_area) {
 		c->update_geometry_recursive(area);
 }
 
+
+Array<Node*> Node::collect_children(bool include_hidden) {
+	Array<Node*> nodes;
+	for (auto *c: weak(children))
+		if (!c->hidden or include_hidden) {
+			nodes.add(c);
+			nodes.append(c->collect_children(include_hidden));
+		}
+	return nodes;
+}
+
+Array<Node*> Node::collect_children_up() {
+	auto nodes = collect_children(false);
+	for (int i=0; i<nodes.num; i++)
+		for (int j=i+1; j<nodes.num; j++)
+			if (nodes[i]->z > nodes[j]->z)
+				nodes.swap(i, j);
+	return nodes;
+}
+
+Array<Node*> Node::collect_children_down() {
+	auto nodes = collect_children(false);
+	for (int i=0; i<nodes.num; i++)
+		for (int j=i+1; j<nodes.num; j++)
+			if (nodes[i]->z < nodes[j]->z)
+				nodes.swap(i, j);
+	return nodes;
+}
+
+
+
+
+
+
 NodeFree::NodeFree() : Node(0, 0) {
 }
 

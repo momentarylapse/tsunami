@@ -17,48 +17,14 @@
 #include "../../../Module/SignalChain.h"
 #include "../../Helper/Graph/SceneGraph.h"
 #include "../../Helper/Graph/Node.h"
-#include "../../Graph/ScrollBar.h"
+#include "../../Helper/Graph/Scrollable.h"
+#include "../../Helper/Graph/ScrollBar.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../../Data/base.h"
 #include "../../../Session.h"
 #include "../../../Storage/Storage.h"
 #include "../../../Plugins/PluginManager.h"
 
-
-
-
-const float MODULE_WIDTH = 140;
-const float MODULE_HEIGHT = 23;
-const float MODULE_GRID = 23;
-
-string module_header(Module *m) {
-	if (m->module_name.num > 0)
-		return m->module_name;
-	if (m->module_class.num > 0)
-		return m->module_class;
-	return m->category_to_str(m->module_category);
-}
-
-
-static rect module_rect(Module *m) {
-	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
-}
-
-static float module_port_in_x(Module *m) {
-	return m->module_x - 5;
-}
-
-static float module_port_in_y(Module *m, int index) {
-	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
-}
-
-static float module_port_out_x(Module *m) {
-	return m->module_x + MODULE_WIDTH + 5;
-}
-
-static float module_port_out_y(Module *m, int index) {
-	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
-}
 
 
 
@@ -105,10 +71,14 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	chain = _chain;
 
 	graph = new scenegraph::SceneGraph([&]{});
+	pad = new ScrollPad();
+	pad->align.dz = 5;
+	graph->add_child(pad);
 	auto hbox = new scenegraph::VBox;
 	graph->add_child(hbox);
 	background = new SignalEditorBackground(this);
 	hbox->add_child(background);
+	pad->connect_scrollable(background);
 	scroll_bar_h = new ScrollBarHorizontal();
 	scroll_bar_h->constrained = false;
 	scroll_bar_h->update(1,1);
@@ -198,10 +168,10 @@ void SignalEditorTab::on_draw(Painter* p) {
 	graph->update_geometry_recursive(p->area());
 	graph->on_draw(p);
 
-	for (auto &pp: chain->_ports_out){
+	/*for (auto &pp: chain->_ports_out){
 		p->set_color(Red);
 		p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
-	}
+	}*/
 
 
 	float mx = hui::GetEvent()->mx;
@@ -225,7 +195,7 @@ void SignalEditorTab::on_chain_update() {
 			to_del.add(m);
 	for (auto m: to_del) {
 		modules.erase(modules.find(m));
-		background->delete_child(m);
+		pad->delete_child(m);
 	}
 
 	// add new modules
@@ -233,17 +203,17 @@ void SignalEditorTab::on_chain_update() {
 		if (!get_module(m)) {
 			auto mm = new SignalEditorModule(this, m);
 			modules.add(mm);
-			background->add_child(mm);
+			pad->add_child(mm);
 		}
 
 	// cables
 	for (auto c: cables)
-		background->delete_child(c);
+		pad->delete_child(c);
 	cables.clear();
 	for (auto c: chain->cables()) {
 		auto cc = new SignalEditorCable(this, c);
 		cables.add(cc);
-		background->add_child(cc);
+		pad->add_child(cc);
 	}
 
 	graph->hover = HoverData();
@@ -298,28 +268,21 @@ void SignalEditorTab::on_key_down() {
 		on_module_delete();
 
 	if (key == hui::KEY_UP)
-		move_cam(0, 10);
+		pad->move_view(0, 10);
 	if (key == hui::KEY_DOWN)
-		move_cam(0, -10);
+		pad->move_view(0, -10);
 	if (key == hui::KEY_LEFT)
-		move_cam(10, 0);
+		pad->move_view(10, 0);
 	if (key == hui::KEY_RIGHT)
-		move_cam(-10, 0);
-}
-
-void SignalEditorTab::move_cam(float dx, float dy) {
-	// TODO restrict...
-	view_offset.x -= dx;
-	view_offset.y -= dy;
-	scroll_bar_h->offset = view_offset.x;
-	scroll_bar_h->update(graph->area.width(), 1000);
-	redraw("area");
+		pad->move_view(-10, 0);
 }
 
 void SignalEditorTab::on_mouse_wheel() {
 	float dx = hui::GetEvent()->scroll_x;
 	float dy = hui::GetEvent()->scroll_y;
-	move_cam(dx*10, dy*10);
+	//move_cam(dx*10, dy*10);
+	pad->move_view(-dx*10, -dy*10);
+	redraw("area");
 }
 
 void SignalEditorTab::on_activate() {
@@ -335,7 +298,7 @@ void SignalEditorTab::on_delete() {
 
 
 void SignalEditorTab::on_add(ModuleCategory type) {
-	Array<string> names = session->plugin_manager->find_module_sub_types(type);
+	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
 		string name = session->plugin_manager->choose_module(win, session, type);
 		if (name.num > 0) {
@@ -348,6 +311,7 @@ void SignalEditorTab::on_add(ModuleCategory type) {
 		m->module_x = graph->mx;
 		m->module_y = graph->my;
 	}
+	update_module_positions();
 }
 
 void SignalEditorTab::on_reset() {
@@ -387,9 +351,9 @@ void SignalEditorTab::select_module(Module *m, bool add) {
 }
 
 void SignalEditorTab::update_module_positions() {
-	for (auto *m: weak(background->children)) {
-		m->align.dx = ((SignalEditorModule*)m)->module->module_x;
-		m->align.dy = ((SignalEditorModule*)m)->module->module_y;
+	for (auto *m: modules) {
+		m->align.dx = m->module->module_x;
+		m->align.dy = m->module->module_y;
 	}
 	redraw("area");
 }

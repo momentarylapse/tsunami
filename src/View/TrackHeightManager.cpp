@@ -13,7 +13,7 @@
 #include "../Data/TrackLayer.h"
 #include "Graph/AudioViewLayer.h"
 #include "Graph/AudioViewTrack.h"
-#include "Graph/ScrollBar.h"
+#include "Helper/Graph/ScrollBar.h"
 
 TrackHeightManager::TrackHeightManager() {
 	animating = false;

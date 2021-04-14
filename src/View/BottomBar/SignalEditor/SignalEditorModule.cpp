@@ -18,7 +18,15 @@
 const float MODULE_WIDTH = 140;
 const float MODULE_HEIGHT = 23;
 const float MODULE_GRID = 23;
-string module_header(Module *m);
+
+string module_header(Module *m) {
+	if (m->module_name.num > 0)
+		return m->module_name;
+	if (m->module_class.num > 0)
+		return m->module_class;
+	return m->category_to_str(m->module_category);
+}
+
 
 
 static float module_port_in_x(Module *m) {

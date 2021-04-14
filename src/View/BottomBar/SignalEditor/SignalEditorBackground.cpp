@@ -27,35 +27,32 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	p->draw_rect(area);
 	p->set_line_width(0.7f);
 
-
-	float rot[4] = {1,0,0,1};
-	p->set_transform(rot, tab->view_offset);
+	auto p0 = pad->unproject(complex(area.x1, area.y1));
+	auto p1 = pad->unproject(complex(area.x2, area.y2));
 
 	float D = MODULE_GRID;
-	int i0 = -tab->view_offset.x / D;
-	int i1 = (w - tab->view_offset.x) / D;
+	int i0 = floor(p0.x / D);
+	int i1 = ceil(p1.x / D);
 	for (int i=i0; i<=i1; i++) {
-		float x = i * D;
+		float x = pad->project(complex(i * D, 0)).x;
 		if ((i % 5) == 0)
 			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
 		else
 			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
-		p->draw_line(x, -tab->view_offset.y, x, h - tab->view_offset.y);
+		p->draw_line(x, area.y1, x, area.y2);
 	}
-	int j0 = -tab->view_offset.y / D;
-	int j1 = (h - tab->view_offset.y) / D;
+	int j0 = floor(p0.y / D);
+	int j1 = ceil(p1.y / D);
 	for (int j=j0; j<=j1; j++) {
-		float y = j * D;
+		float y = pad->project(complex(0, j * D)).y;
 		if ((j % 5) == 0)
 			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
 		else
 			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
-		p->draw_line(-tab->view_offset.x, y, w - tab->view_offset.x, y);
+		p->draw_line(area.x1, y, area.x2, y);
 	}
 
 	p->set_line_width(1);
-	float rot0[] = {1,0,0,1};
-	p->set_transform(rot0, complex::ZERO);
 }
 
 bool SignalEditorBackground::on_left_button_down(float mx, float my) {

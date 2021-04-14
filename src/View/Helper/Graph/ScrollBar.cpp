@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#include "../Graph/ScrollBar.h"
-#include "../Helper/Graph/SceneGraph.h"
+#include "ScrollBar.h"
+#include "SceneGraph.h"
 
-#include "../AudioView.h"
+#include "../../AudioView.h"
 
 const float SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
 

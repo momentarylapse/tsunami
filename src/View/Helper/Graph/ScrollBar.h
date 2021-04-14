@@ -5,11 +5,9 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_GRAPH_SCROLLBAR_H_
-#define SRC_VIEW_GRAPH_SCROLLBAR_H_
+#pragma once
 
-#include "../../lib/base/base.h"
-#include "../Helper/Graph/Node.h"
+#include "Node.h"
 
 class Painter;
 
@@ -41,5 +39,3 @@ class ScrollBarHorizontal : public ScrollBar {
 public:
 	ScrollBarHorizontal();
 };
-
-#endif /* SRC_VIEW_GRAPH_SCROLLBAR_H_ */

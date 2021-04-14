@@ -27,6 +27,7 @@ public:
 	bool on_left_double_click(float mx, float my) override;
 	bool on_right_button_down(float mx, float my) override;
 	bool on_mouse_move(float mx, float my) override;
+	bool on_mouse_wheel(float dx, float dy) override;
 	bool allow_handle_click_when_gaining_focus() override;
 
 	//ViewNode *get_hover();

@@ -25,7 +25,7 @@
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "../Graph/AudioViewLayer.h"
-#include "../Graph/ScrollBar.h"
+#include "../Helper/Graph/ScrollBar.h"
 #include "../MouseDelayPlanner.h"
 #include "../Helper/MidiPreview.h"
 #include "../Painter/GridPainter.h"

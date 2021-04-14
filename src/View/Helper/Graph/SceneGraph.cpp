@@ -15,35 +15,6 @@
 
 namespace scenegraph {
 
-Array<Node*> collect_children(Node *n, bool include_hidden) {
-	Array<Node*> nodes;
-	for (auto *c: weak(n->children))
-		if (!c->hidden or include_hidden) {
-			nodes.add(c);
-			nodes.append(collect_children(c, include_hidden));
-		}
-	return nodes;
-}
-
-Array<Node*> collect_children_up(Node *n) {
-	auto nodes = collect_children(n, false);
-	for (int i=0; i<nodes.num; i++)
-		for (int j=i+1; j<nodes.num; j++)
-			if (nodes[i]->z > nodes[j]->z)
-				nodes.swap(i, j);
-	return nodes;
-}
-
-Array<Node*> collect_children_down(Node *n) {
-	auto nodes = collect_children(n, false);
-	for (int i=0; i<nodes.num; i++)
-		for (int j=i+1; j<nodes.num; j++)
-			if (nodes[i]->z < nodes[j]->z)
-				nodes.swap(i, j);
-	return nodes;
-}
-
-
 SceneGraph::SceneGraph(hui::Callback _cb_set_currtent) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
@@ -63,7 +34,7 @@ bool SceneGraph::on_left_button_down(float mx, float my) {
 
 	set_current(hover);
 
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
 			if (c->on_left_button_down(mx, my))
@@ -76,7 +47,7 @@ bool SceneGraph::on_left_button_up(float mx, float my) {
 	mdp->finish(mx, my);
 	hover = get_hover_data(mx, my);
 
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
 			if (c->on_left_button_up(mx, my))
@@ -89,7 +60,7 @@ bool SceneGraph::on_left_double_click(float mx, float my) {
 	hover = get_hover_data(mx, my);
 	set_current(hover);
 
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
 			if (c->on_left_double_click(mx, my))
@@ -102,7 +73,7 @@ bool SceneGraph::on_right_button_down(float mx, float my) {
 	hover = get_hover_data(mx, my);
 	set_current(hover);
 
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
 			if (c->on_right_button_down(mx, my))
@@ -116,7 +87,7 @@ bool SceneGraph::on_mouse_move(float mx, float my) {
 	if (!mdp->update(mx, my)) {
 		hover = get_hover_data(mx, my);
 
-		auto nodes = collect_children_down(this);
+		auto nodes = collect_children_down();
 		for (auto *c: nodes)
 			if (c->hover(mx, my))
 				if (c->on_mouse_move(mx, my))
@@ -125,8 +96,21 @@ bool SceneGraph::on_mouse_move(float mx, float my) {
 	return false;
 }
 
+bool SceneGraph::on_mouse_wheel(float dx, float dy) {
+	//set_mouse(mx, my);
+	//hover = get_hover_data(mx, my);
+	//set_current(hover);
+
+	auto nodes = collect_children_down();
+	for (auto *c: nodes)
+		if (c->hover(mx, my))
+			if (c->on_mouse_wheel(dx, dy))
+				return true;
+	return false;
+}
+
 bool SceneGraph::allow_handle_click_when_gaining_focus() {
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
 			return c->allow_handle_click_when_gaining_focus();
@@ -134,7 +118,7 @@ bool SceneGraph::allow_handle_click_when_gaining_focus() {
 }
 
 HoverData SceneGraph::get_hover_data(float mx, float my) {
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
@@ -144,7 +128,7 @@ HoverData SceneGraph::get_hover_data(float mx, float my) {
 }
 
 string SceneGraph::get_tip() {
-	auto nodes = collect_children_down(this);
+	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
@@ -156,7 +140,7 @@ void SceneGraph::on_draw(Painter *p) {
 	auto xxx = p->clip();
 	p->set_clip(area);
 
-	auto nodes = collect_children_up(this);
+	auto nodes = collect_children_up();
 	for (auto *n: nodes) {
 		//p->set_clip(area and n->area);
 		n->on_draw(p);

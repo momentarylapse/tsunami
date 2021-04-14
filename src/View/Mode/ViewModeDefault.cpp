@@ -32,7 +32,7 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
-#include "../Graph/ScrollBar.h"
+#include "../Helper/Graph/ScrollBar.h"
 
 float marker_alpha_factor(float w, float w_group, bool border);
 Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);

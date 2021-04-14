@@ -8,11 +8,12 @@
 #pragma once
 
 #include "../../Helper/Graph/Node.h"
+#include "../../Helper/Graph/Scrollable.h"
 
 class SignalEditorTab;
 
 
-class SignalEditorBackground : public scenegraph::Node {
+class SignalEditorBackground : public Scrollable<scenegraph::Node> {
 public:
 	SignalEditorTab *tab;
 	SignalEditorBackground(SignalEditorTab *t);

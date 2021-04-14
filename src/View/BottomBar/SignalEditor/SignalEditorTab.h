@@ -14,7 +14,6 @@ class SignalEditor;
 class SignalChain;
 class Session;
 class AudioView;
-class ScrollBar;
 class Module;
 struct Cable;
 enum class ModuleCategory;
@@ -22,6 +21,8 @@ enum class SignalType;
 class SignalEditorModule;
 class SignalEditorCable;
 class SignalEditorBackground;
+class ScrollPad;
+class ScrollBar;
 
 
 class SignalEditorTab : public hui::Panel {
@@ -34,12 +35,10 @@ public:
 	AudioView *view;
 	SignalChain *chain;
 
-	complex view_offset = complex(0,0);
-	float view_zoom = 1;
-
 	owned<scenegraph::SceneGraph> graph;
 	ScrollBar *scroll_bar_h;
 	ScrollBar *scroll_bar_v;
+	ScrollPad *pad;
 	SignalEditorBackground *background;
 	Array<SignalEditorModule*> modules;
 	Array<SignalEditorCable*> cables;
@@ -63,7 +62,6 @@ public:
 	void on_mouse_move();
 	void on_right_button_down();
 	void on_key_down();
-	void move_cam(float dx, float dy);
 	void on_mouse_wheel();
 	void on_activate();
 	void on_delete();

@@ -37,7 +37,7 @@
 #include "../../Module/Audio/SongRenderer.h"
 #include "../Graph/AudioViewTrack.h"
 #include "../Graph/LayerHeader.h"
-#include "../Graph/ScrollBar.h"
+#include "../Helper/Graph/ScrollBar.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Painter/MidiPainter.h"
 

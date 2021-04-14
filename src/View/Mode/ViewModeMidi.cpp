@@ -235,11 +235,12 @@ void ViewModeMidi::on_start() {
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;
 	sb->hidden = false;
-	sb->set_callback([=] {
-		float _pitch_max = 128 - sb->offset;
-			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
+	sb->set_callback([=] (float offset) {
+		float _pitch_max = 128 - offset;
+		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 	});
-	sb->update(EDIT_PITCH_SHOW_COUNT, 128);
+	sb->set_content(0, 128);
+	sb->set_view_size(EDIT_PITCH_SHOW_COUNT);
 
 	if (!song->time_track())
 		session->q(_("Midi editing is far easier with a metronome track. Do you want to add one?"), {"track-add-beats:" + _("yes")});
@@ -413,7 +414,11 @@ void ViewModeMidi::jump_octave(int delta) {
 void ViewModeMidi::set_rep_key(int k) {
 	if (rep_key_runner >= 0)
 		hui::CancelRunner(rep_key_runner);
-	rep_key_runner = hui::RunLater(0.8f, [=]{ rep_key_runner = -1; rep_key_num = -1; rep_key = -1; });
+	rep_key_runner = hui::RunLater(0.8f, [=] {
+		rep_key_runner = -1;
+		rep_key_num = -1;
+		rep_key = -1;
+	});
 
 	if (k == rep_key)
 		rep_key_num ++;
@@ -755,7 +760,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 
 	} else if (mode == MidiMode::LINEAR) {
 		l->scroll_bar->hidden = false;
-		l->scroll_bar->offset = 127 - cur_vlayer()->edit_pitch_max;
+		l->scroll_bar->set_view_offset(127 - cur_vlayer()->edit_pitch_max);
 		//l->scroll_bar->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
 	}
 

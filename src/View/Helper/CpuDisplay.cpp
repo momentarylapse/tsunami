@@ -21,7 +21,7 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 	id = _id;
 	cpu_display = _cpu_display;
 
-	scene_graph = new scenegraph::SceneGraph([] {});
+	scene_graph = new scenegraph::SceneGraph();
 	scene_graph->add_child(cpu_display);
 	cpu_display->align.horizontal = scenegraph::Node::AlignData::Mode::FILL;
 	cpu_display->align.vertical = scenegraph::Node::AlignData::Mode::FILL;

@@ -15,13 +15,20 @@
 
 namespace scenegraph {
 
-SceneGraph::SceneGraph(hui::Callback _cb_set_currtent) {
+SceneGraph::SceneGraph() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 	mx = -1;
 	my = -1;
 	mdp = new MouseDelayPlanner(this);
-	cb_set_current = _cb_set_currtent;
+}
+
+void SceneGraph::set_callback_set_current(hui::Callback f) {
+	cb_set_current = f;
+}
+
+void SceneGraph::set_callback_redraw(hui::Callback f) {
+	cb_redraw = f;
 }
 
 bool SceneGraph::on_left_button_down(float mx, float my) {
@@ -159,7 +166,8 @@ void SceneGraph::set_mouse(float _mx, float _my) {
 
 void SceneGraph::set_current(const HoverData &h) {
 	cur_selection = h;
-	cb_set_current();
+	if (cb_set_current)
+		cb_set_current();
 }
 
 void SceneGraph::mdp_prepare(MouseDelayAction *a) {

@@ -101,6 +101,13 @@ void Node::update_geometry(const rect &target_area) {
 	}
 }
 
+void Node::set_hidden(bool hide) {
+	if (hide != hidden) {
+		hidden = hide;
+		request_redraw();
+	}
+}
+
 void Node::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
 	if (parent)
@@ -137,6 +144,12 @@ Array<Node*> Node::collect_children_down() {
 			if (nodes[i]->z < nodes[j]->z)
 				nodes.swap(i, j);
 	return nodes;
+}
+
+void Node::request_redraw() {
+	if (auto g = graph())
+		if (g->cb_redraw)
+			g->cb_redraw();
 }
 
 

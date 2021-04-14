@@ -37,6 +37,7 @@ public:
 
 	complex view_pos = complex(0,0);
 	rect content_area = rect::EMPTY;
+	void set_content(const rect &r);
 
 	ScrollPad();
 
@@ -47,6 +48,8 @@ public:
 
 	complex project(const complex &p);
 	complex unproject(const complex &p);
+
+	void _update_scrolling();
 
 	template<class T>
 	void connect_scrollable(Scrollable<T> *s) {

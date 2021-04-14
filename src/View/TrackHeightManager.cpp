@@ -138,11 +138,12 @@ void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r) {
 		h += l->height;
 
 	// available
-	v->scroll_bar_y->update(r.height(), h);
+	v->scroll_bar_y->set_view_size(r.height());
+	v->scroll_bar_y->set_content(0, h);
 
 
 	// distribute
-	float y0 = r.y1 - v->scroll_bar_y->offset;
+	float y0 = r.y1 - v->scroll_bar_y->get_view_offset();
 	for (auto *l: v->vlayer) {
 		l->area_target = rect(r.x1, r.x2, y0, y0 + l->height);
 		y0 += l->height;

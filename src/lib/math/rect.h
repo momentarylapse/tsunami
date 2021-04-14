@@ -25,6 +25,7 @@ public:
 	bool _cdecl operator==(const rect &r) const;
 	bool _cdecl operator!=(const rect &r) const;
 	rect _cdecl operator&&(const rect &r) const;
+	rect _cdecl operator||(const rect &r) const;
 
 	static const rect ID;
 	static const rect EMPTY;

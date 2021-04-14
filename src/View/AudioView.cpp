@@ -201,7 +201,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_dummy, mode_edit, mode_scale_bars, mode_scale_marker, mode_curve, mode_capture};
 	set_mode(mode_default);
 
-	scene_graph = new scenegraph::SceneGraph([=]{ set_current(scene_graph->cur_selection); });
+	scene_graph = new scenegraph::SceneGraph();
+	scene_graph->set_callback_set_current([=] {
+		set_current(scene_graph->cur_selection);
+	});
+	scene_graph->set_callback_redraw([=] {
+		force_redraw();
+	});
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
 	time_scale = new TimeScale(this);
@@ -213,14 +219,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll_bar_y = new ScrollBar();
+	scroll_bar_y = new ScrollBar(); // pixels
 	scroll_bar_y->auto_hide = true;
-	scroll_bar_y->set_callback([=] {
+	scroll_bar_y->set_callback([=] (float offset) {
 		thm.update_immediately(this, song, song_area());
 	});
-	scroll_bar_time = new ScrollBarHorizontal();
-	scroll_bar_time->set_callback([=] {
-		cam.dirty_jump(song->range_with_time().start() + scroll_bar_time->offset);
+	scroll_bar_time = new ScrollBarHorizontal(); // samples
+	scroll_bar_time->set_callback([=] (float offset) {
+		cam.dirty_jump(offset);
 	});
 	scroll_bar_time->constrained = false;
 
@@ -1090,7 +1096,8 @@ bool AudioView::update_scene_graph() {
 	bool animating = thm.update(this, song, song_area());
 
 	scroll_bar_time->hidden = !scroll_bar_w_needed;
-	scroll_bar_time->update(cam.range().length, song->range_with_time().length);
+	scroll_bar_time->set_view_size(cam.range().length);
+	scroll_bar_time->set_content(song->range_with_time());
 
 	for (auto *v: vlayer) {
 		v->update_header();
@@ -1404,9 +1411,9 @@ void AudioView::select_sample(SampleRef *s, bool diff) {
 
 void ensure_layer_on_screen(AudioView *view, AudioViewLayer *l) {
 	if (l->area.y1 < view->song_area().y1)
-		view->scroll_bar_y->set_offset(view->scroll_bar_y->offset - (view->song_area().y1 - l->area.y1));
+		view->scroll_bar_y->set_view_offset(view->scroll_bar_y->view_offset - (view->song_area().y1 - l->area.y1));
 	if (l->area.y2 > view->song_area().y2)
-		view->scroll_bar_y->set_offset(view->scroll_bar_y->offset - (view->song_area().y2 - l->area.y2));
+		view->scroll_bar_y->set_view_offset(view->scroll_bar_y->view_offset - (view->song_area().y2 - l->area.y2));
 }
 
 void AudioView::set_current(const HoverData &h) {
@@ -1760,8 +1767,8 @@ HoverData AudioView::hover_time(float mx, float my) {
 
 void AudioView::cam_changed() {
 	notify(MESSAGE_VIEW_CHANGE);
-	scroll_bar_time->update(cam.range().length, song->range_with_time().length);
-	scroll_bar_time->offset = cam.pos - song->range_with_time().start();
+	scroll_bar_time->set_view(cam.range());
+	scroll_bar_time->set_content(song->range_with_time());
 	force_redraw();
 }
 

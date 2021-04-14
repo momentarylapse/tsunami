@@ -70,23 +70,16 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	session = ed->session;
 	chain = _chain;
 
-	graph = new scenegraph::SceneGraph([&]{});
+	graph = new scenegraph::SceneGraph();
+	graph->set_callback_redraw([=] {
+		redraw("area");
+	});
 	pad = new ScrollPad();
 	pad->align.dz = 5;
 	graph->add_child(pad);
-	auto hbox = new scenegraph::VBox;
-	graph->add_child(hbox);
 	background = new SignalEditorBackground(this);
-	hbox->add_child(background);
+	graph->add_child(background);
 	pad->connect_scrollable(background);
-	scroll_bar_h = new ScrollBarHorizontal();
-	scroll_bar_h->constrained = false;
-	scroll_bar_h->update(1,1);
-	scroll_bar_h->hidden = true;
-	scroll_bar_h->set_callback([=]{
-		//move_cam()
-	});
-	hbox->add_child(scroll_bar_h);
 	graph->add_child(new SignalEditorPlayButton(this));
 
 	event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
@@ -166,6 +159,7 @@ void SignalEditorTab::draw_arrow(Painter *p, const complex &m, const complex &_d
 void SignalEditorTab::on_draw(Painter* p) {
 	p->set_font_size(view->FONT_SIZE);
 	graph->update_geometry_recursive(p->area());
+	pad->_update_scrolling();
 	graph->on_draw(p);
 
 	/*for (auto &pp: chain->_ports_out){
@@ -219,7 +213,7 @@ void SignalEditorTab::on_chain_update() {
 	graph->hover = HoverData();
 
 
-	redraw("area");
+	update_module_positions();
 }
 
 void SignalEditorTab::on_chain_delete() {
@@ -268,21 +262,19 @@ void SignalEditorTab::on_key_down() {
 		on_module_delete();
 
 	if (key == hui::KEY_UP)
-		pad->move_view(0, 10);
-	if (key == hui::KEY_DOWN)
 		pad->move_view(0, -10);
+	if (key == hui::KEY_DOWN)
+		pad->move_view(0, 10);
 	if (key == hui::KEY_LEFT)
-		pad->move_view(10, 0);
-	if (key == hui::KEY_RIGHT)
 		pad->move_view(-10, 0);
+	if (key == hui::KEY_RIGHT)
+		pad->move_view(10, 0);
 }
 
 void SignalEditorTab::on_mouse_wheel() {
 	float dx = hui::GetEvent()->scroll_x;
 	float dy = hui::GetEvent()->scroll_y;
-	//move_cam(dx*10, dy*10);
-	pad->move_view(-dx*10, -dy*10);
-	redraw("area");
+	pad->move_view(dx*10, dy*10);
 }
 
 void SignalEditorTab::on_activate() {
@@ -351,11 +343,18 @@ void SignalEditorTab::select_module(Module *m, bool add) {
 }
 
 void SignalEditorTab::update_module_positions() {
+	// temporarily set a 1:1 coord system
+	pad->Node::update_geometry_recursive(pad->area);
+	rect r = rect::EMPTY;
+	if (modules.num > 0)
+		r = modules[0]->area;
+
 	for (auto *m: modules) {
 		m->align.dx = m->module->module_x;
 		m->align.dy = m->module->module_y;
+		r = r || m->area;
 	}
-	redraw("area");
+	pad->set_content(r);
 }
 
 SignalEditorModule *SignalEditorTab::get_module(Module *m) {

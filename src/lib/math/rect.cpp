@@ -72,9 +72,20 @@ void range_intersect(float a1, float a2, float b1, float b2, float &o1, float &o
 	//o2 = max(o1, o2);
 }
 
+// intersection
 rect rect::operator &&(const rect &r) const {
 	rect o = r;
 	range_intersect(x1, x2, r.x1, r.x2, o.x1, o.x2);
 	range_intersect(y1, y2, r.y1, r.y2, o.y1, o.y2);
+	return o;
+}
+
+// hull
+rect rect::operator ||(const rect &r) const {
+	rect o;
+	o.x1 = min(x1, r.x1);
+	o.y1 = min(y1, r.y1);
+	o.x2 = max(x2, r.x2);
+	o.y2 = max(y2, r.y2);
 	return o;
 }

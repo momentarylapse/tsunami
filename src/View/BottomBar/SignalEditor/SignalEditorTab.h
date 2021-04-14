@@ -36,8 +36,6 @@ public:
 	SignalChain *chain;
 
 	owned<scenegraph::SceneGraph> graph;
-	ScrollBar *scroll_bar_h;
-	ScrollBar *scroll_bar_v;
 	ScrollPad *pad;
 	SignalEditorBackground *background;
 	Array<SignalEditorModule*> modules;

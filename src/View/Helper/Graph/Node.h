@@ -68,10 +68,12 @@ public:
 	rect area;
 	int z;
 	bool hidden;
+	void set_hidden(bool hide);
 
 	Array<Node*> collect_children(bool include_hidden);
 	Array<Node*> collect_children_up();
 	Array<Node*> collect_children_down();
+	void request_redraw();
 };
 
 class NodeFree : public Node {

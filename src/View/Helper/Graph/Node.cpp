@@ -8,6 +8,8 @@
 #include "Node.h"
 #include "SceneGraph.h"
 
+#include "../../../lib/file/msg.h"
+
 namespace scenegraph {
 
 Node::Node() : Node(0, 0) {

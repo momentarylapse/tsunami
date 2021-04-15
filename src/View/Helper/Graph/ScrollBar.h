@@ -18,9 +18,7 @@ public:
 	bool constrained = true;
 
 
-	//float offset = 0;
 	float get_view_offset() const;
-	//float get_size() const;
 
 	// view/page
 	float view_offset = 0;
@@ -47,10 +45,7 @@ public:
 
 	void drag_update(float mx, float my);
 
-	//void set_offset(float offset);
 	void on_draw(Painter *c) override;
-	//void set_area(const rect &r);
-	//void update(float page, float content);
 
 	bool on_left_button_down(float mx, float my) override;
 

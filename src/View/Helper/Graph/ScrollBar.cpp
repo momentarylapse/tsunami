@@ -42,14 +42,6 @@ void ScrollBar::drag_update(float mx, float my) {
 		cb_update_view(view_offset);
 }
 
-/*void ScrollBar::set_offset(float _offset) {
-	offset = _offset;
-	if (constrained)
-		offset = max(min(offset, content_size - page_size), 0.0f);
-	if (callback)
-		callback();
-}*/
-
 void ScrollBar::on_draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
@@ -74,18 +66,15 @@ void ScrollBar::on_draw(Painter *c) {
 	c->set_roundness(0);
 }
 
-
-/*void ScrollBar::set_area(const rect &r) {
-	area = r;
-}*/
-
-
 void ScrollBar::set_view(float start, float end) {
-	view_offset = start;
-	view_size = end - start;
+	float size = end - start;
 	if (constrained)
-		view_offset = max(min(view_offset, content_offset + content_size - view_size), content_offset);
-	request_redraw();
+		start = max(min(start, content_offset + content_size - size), content_offset);
+	if ((start != view_offset) or (view_size != size)) {
+		view_offset = start;
+		view_size = size;
+		request_redraw();
+	}
 }
 
 void ScrollBar::set_view(const Range &r) {
@@ -93,10 +82,12 @@ void ScrollBar::set_view(const Range &r) {
 }
 
 void ScrollBar::set_view_offset(float offset) {
-	view_offset = offset;
 	if (constrained)
-		view_offset = max(min(view_offset, content_offset + content_size - view_size), content_offset);
-	request_redraw();
+		offset = max(min(offset, content_offset + content_size - view_size), content_offset);
+	if (offset != view_offset) {
+		view_offset = offset;
+		request_redraw();
+	}
 }
 
 void ScrollBar::move_view(float d) {
@@ -106,34 +97,28 @@ void ScrollBar::move_view(float d) {
 }
 
 void ScrollBar::set_view_size(float size) {
-	view_size = size;
-	request_redraw();
+	if (size != view_size) {
+		view_size = size;
+		request_redraw();
+	}
 }
 
 void ScrollBar::set_content(float start, float end) {
-	content_offset = start;
-	content_size = max(end - start, view_size/100);
-	request_redraw();
+	int size = max(end - start, view_size/100);
+	if ((start != content_offset) or (size != content_size)) {
+		content_offset = start;
+		content_size = size;
+		request_redraw();
+	}
 }
 
 void ScrollBar::set_content(const Range &r) {
 	set_content(r.start(), r.end());
 }
 
-/*void ScrollBar::update(float page, float content) {
-	page_size = page;
-	content_size = max(content, page/100);
-	if (constrained)
-		offset = max(min(offset, content_size - page_size), 0.0f);
-}*/
-
 float ScrollBar::get_view_offset() const {
 	return view_offset;
 }
-
-/*float ScrollBar::get_size() const {
-	return view_size / content_size;
-}*/
 
 bool ScrollBar::on_left_button_down(float mx, float my) {
 	if (horizontal)

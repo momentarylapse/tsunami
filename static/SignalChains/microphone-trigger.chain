@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>new</name>
+	</head>
+	<modules>
+		<module>
+			<category>Stream</category>
+			<class>AudioInput</class>
+			<name>Input</name>
+			<version>1</version>
+			<position>
+				<x>146</x>
+				<y>82</y>
+			</position>
+			<config>{device: {}}</config>
+		</module>
+		<module>
+			<category>Plumbing</category>
+			<class>AudioSucker</class>
+			<name>Sucker</name>
+			<version>1</version>
+			<position>
+				<x>663</x>
+				<y>147</y>
+			</position>
+			<config>{channels: 2}</config>
+		</module>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>Trigger</class>
+			<name />
+			<version>1</version>
+			<position>
+				<x>391</x>
+				<y>138</y>
+			</position>
+			<config>{blocking: 0.1, threshold: 0.5}</config>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="2" port="0" />
+			<target id="1" port="0" />
+		</cable>
+		<cable>
+			<source id="0" port="0" />
+			<target id="2" port="0" />
+		</cable>
+	</cables>
+</chain>

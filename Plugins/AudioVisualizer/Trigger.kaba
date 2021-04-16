@@ -1,0 +1,108 @@
+# Image = hui:media-play
+# Title[Deutsch] = Oszilloskop
+use hui
+use tsunami
+
+const int NUM_SAMPLES = 4096
+
+class TriggerPanel extends ConfigPanel
+	override Trigger* c
+	
+	override void __init__(Module _osci)
+		from_source("
+Grid ? '' vertical
+	DrawingArea area '' height=200 expandy
+	Grid ? ''
+		Label l-threshold 'Threshold' right disabled
+		SpinButton threshold '' range=0:1:0.01 expandx
+		---|
+		Label l-blocking 'Blocking' right disabled
+		SpinButton blocking '' range=0:1000
+		Label ? 'ms'")
+		
+		event_x("area", "hui:draw", on_draw)
+		event("threshold", on_threshold)
+		event("blocking", on_blocking)
+		
+		c.subscribe(self, on_update, "Change")
+	
+	override void __delete__()
+		c.unsubscribe(self)
+	
+	override void update()
+		set_float("threshold", c.config.threshold)
+		set_float("blocking", c.config.blocking * 1000)
+	
+	void on_update()
+		redraw("area")
+	
+	func on_threshold()
+		c.config.threshold = get_float("threshold")
+		changed()
+	
+	func on_blocking()
+		c.config.blocking = get_float("blocking") / 1000
+		changed()
+	
+	void on_draw(Painter p)
+		float w = p.width
+		float h = p.height
+		
+		p.set_color(colors.background)
+		p.draw_rect(0, 0, w, h)
+		
+		float[] curve_before, curve_after
+		c.lock()
+		curve_before = c.curve_before
+		curve_after = c.curve_after
+		c.unlock()
+		
+		p.set_line_width(0.7)
+		p.set_color(color(0,1,0, 0.5))
+		p.draw_line(0,h/2, w,h/2)
+		p.draw_line(w/2,0, w/2,h)
+		
+		p.set_color(color(0,1,0, 1))
+		p.set_line_width(1.5)
+		complex[] z
+		for v,i in curve_before
+			z.add(complex(w/2 - len(curve_before) + i, h/2 - h * v / 2))
+		for v,i in curve_after
+			z.add(complex(w/2 + i, h/2 - h * v / 2))
+		p.draw_lines(z)
+
+class TriggerConfig extends Module.Config
+	float threshold
+	float blocking
+	
+	override void reset()
+		threshold = 0.5
+		blocking = 0.1
+
+class Trigger extends AudioVisualizer
+	float[] curve_before
+	float[] curve_after
+	int blocked
+	
+	TriggerConfig config
+	
+	override void reset_state()
+		blocked = -1
+		curve_before.clear()
+		curve_after.clear()
+	
+	override void process(AudioBuffer buf)
+
+		for b,i in buf.c[0]
+			if blocked < 0
+				if abs(b) > config.threshold
+					# start trigger
+					blocked = config.blocking * session.sample_rate()
+					curve_before = buf.c[0][:i]
+					curve_after = buf.c[0][i:]
+			else
+				blocked --
+		
+	override ConfigPanel* create_panel()
+		return new TriggerPanel(self)
+

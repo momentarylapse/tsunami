@@ -501,6 +501,7 @@ sources = [
 	'src/View/Mode/ViewModeMidi.cpp',
 	'src/View/Mode/ViewModeScaleBars.cpp',
 	'src/View/Mode/ViewModeScaleMarker.cpp',
+	'src/View/Painter/BasicGridPainter.cpp',
 	'src/View/Painter/BufferPainter.cpp',
 	'src/View/Painter/GridPainter.cpp',
 	'src/View/Painter/MidiPainter.cpp',

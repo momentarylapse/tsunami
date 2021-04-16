@@ -32,12 +32,19 @@ public:
 
 	bool on_left_button_down(float mx, float my) override;
 	void on_draw(Painter *p) override;
+
+	void draw_background(Painter *p);
+	void draw_graphs(Painter *p);
+	void draw_table(Painter *p);
+
 	void update();
 	void enable(bool active);
 
 	Session *session;
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
+	bool large;
+	rect area_graph;
 
 	Callback request_redraw;
 

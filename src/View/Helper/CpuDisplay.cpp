@@ -17,6 +17,7 @@
 #include "../../TsunamiWindow.h"
 #include "../AudioView.h"
 #include "../Graph/AudioViewLayer.h"
+#include "../Painter/BasicGridPainter.h"
 
 static const float UPDATE_DT = 2.0f;
 
@@ -110,34 +111,47 @@ string channel_title(PerfChannelInfo &c) {
 	return c.name;
 }
 
-void CpuDisplay::on_draw(Painter* p) {
-	float x00 = area.x1;
-	float y00 = area.y1;
-	int w = area.width();
-	int h = area.height();
-	bool large = (h > 50);
-
-	auto old_clip = p->clip();
-	p->set_clip(area);
-
-	p->set_color(large ? view->colors.background : view->colors.background_overlay);
+void CpuDisplay::draw_background(Painter* p) {
+	auto col_bg = large ? view->colors.background : view->colors.background_overlay;
+	p->set_color(col_bg);
 	p->draw_rect(area);
-	p->set_line_width(large ? 2.0f : 1.0f);
 
-	// graphs
+	if (!large)
+		return;
+
+	BasicGridPainter grid;
+	GridColors gc = {col_bg, Black, view->colors.grid, Black};
+	grid.set_context(area_graph, gc);
+
+	// horizontal time grid
+	grid.plan_linear(-area_graph.width(), 0, 20);
+	grid.draw(p);
+
+	// vertical percentage grid
+	grid.horizontal = false;
+	grid.plan_linear(0, 1, 20);
+	grid.draw(p);
+
+}
+
+void CpuDisplay::draw_graphs(Painter* p) {
+	float h = area_graph.height();
 	for (auto &c: channels) {
 		p->set_color(type_color(c.name));
 		for (int j=1; j<c.stats.num; j++) {
-			float x0 = area.x2 - (c.stats.num - (j-1)) * 2;
-			float x1 = area.x2 - (c.stats.num -  j   ) * 2;
-			float y0 = area.y1 + h * (1 - c.stats[j-1].cpu);
-			float y1 = area.y1 + h * (1 - c.stats[j].cpu);
+			float x0 = area_graph.x2 - (c.stats.num - (j-1)) * 2;
+			float x1 = area_graph.x2 - (c.stats.num -  j   ) * 2;
+			float y0 = area_graph.y1 + h * (1 - c.stats[j-1].cpu);
+			float y1 = area_graph.y1 + h * (1 - c.stats[j].cpu);
 			if (x1 >= 2)
 				p->draw_line(x0, y0, x1, y1);
 		}
 	}
-	
-	
+
+}
+
+void CpuDisplay::draw_table(Painter* p) {
+
 	if (large) {
 		p->set_font_size(10);
 		p->set_color(view->colors.text_soft1);
@@ -174,6 +188,9 @@ void CpuDisplay::on_draw(Painter* p) {
 			t ++;
 		}
 	} else {
+		float x0 = area.x1;
+		float y0 = area.y1;
+		float h = area.height();
 	
 		p->set_font_size(7);
 	
@@ -182,11 +199,30 @@ void CpuDisplay::on_draw(Painter* p) {
 			if (c.stats.num > 0) {
 				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
-				p->draw_str(x00 + 7 + (t/2) * 30, y00 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
+				p->draw_str(x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
 				t ++;
 			}
 		}
 	}
+}
+
+void CpuDisplay::on_draw(Painter* p) {
+	int h = area.height();
+	large = (h > 50);
+	area_graph = area;
+	//if (large)
+	//	area_graph = rect(area.x1, area.x2, area.y1 + 8, area.y2 - 8);
+
+	auto old_clip = p->clip();
+	p->set_clip(area);
+
+	draw_background(p);
+
+	p->set_line_width(large ? 2.0f : 1.0f);
+	draw_graphs(p);
+
+	draw_table(p);
+
 	p->set_clip(old_clip);
 }
 
@@ -205,6 +241,8 @@ public:
 };
 
 bool CpuDisplay::on_left_button_down(float mx, float my) {
+	if (large)
+		return true;
 	if (!dlg)
 		dlg = new CpuDisplayDialog(session);
 	dlg->show();

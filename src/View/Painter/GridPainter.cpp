@@ -254,8 +254,3 @@ void GridPainter::draw_whatever(Painter *c, int beat_partition) {
 	else
 		draw_time(c);
 }
-
-void GridPainter::set_context(const rect& _area, const GridColors& c) {
-	area = _area;
-	colors = c;
-}

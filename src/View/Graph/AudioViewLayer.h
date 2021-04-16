@@ -106,6 +106,7 @@ public:
 	void update_header();
 
 	ScrollBar *scroll_bar;
+	int perf_channel;
 };
 
 #endif /* SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_ */

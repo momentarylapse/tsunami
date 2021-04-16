@@ -103,7 +103,6 @@ public:
 	void _stop_sucking();
 
 	std::mutex mutex;
-	int perf_channel_suck;
 
 	void mark_all_modules_as_system();
 };

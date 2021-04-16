@@ -11,8 +11,12 @@
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
 #include "../../Module/Module.h"
+#include "../../Module/SignalChain.h"
+#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../TsunamiWindow.h"
 #include "../AudioView.h"
+#include "../Graph/AudioViewLayer.h"
 
 static const float UPDATE_DT = 2.0f;
 
@@ -76,7 +80,7 @@ void CpuDisplay::enable(bool active) {
 }
 
 color type_color(const string &t) {
-	if (t == "view")
+	if ((t == "view") or (t == "layer") or (t == "SignalEditor"))
 		return color(1, 0.1f, 0.9f, 0.2f);
 	if (t == "peak")
 		return color(1, 0.1f, 0.9f, 0.9f);
@@ -88,14 +92,22 @@ color type_color(const string &t) {
 }
 
 string channel_title(PerfChannelInfo &c) {
-	if (c.name != "module")
-		return c.name;
+	if (c.name == "module") {
+		auto *m = reinterpret_cast<Module*>(c.p);
+		if (m->module_category == ModuleCategory::SIGNAL_CHAIN) {
+			auto *chain = reinterpret_cast<SignalChain*>(c.p);
+			return chain->name;
+		}
+		if (m->module_class != "")
+			return m->module_class;
 
-	auto *m = reinterpret_cast<Module*>(c.p);
-	if (m->module_class != "")
-		return m->module_class;
-
-	return m->category_to_str(m->module_category);
+		return m->category_to_str(m->module_category);
+	} else if (c.name == "layer") {
+		auto *l = reinterpret_cast<AudioViewLayer*>(c.p);
+		if (l->layer)
+			return l->layer->track->nice_name();
+	}
+	return c.name;
 }
 
 void CpuDisplay::on_draw(Painter* p) {
@@ -154,7 +166,7 @@ void CpuDisplay::on_draw(Painter* p) {
 				p->draw_str(20 + dx, 30  + t * 20, name);
 				p->draw_str(160, 30  + t * 20, format("%.1f%%", c.stats.back().cpu * 100));
 				p->draw_str(210, 30  + t * 20, format("%.2fms", c.stats.back().avg * 1000));
-				p->draw_str(280, 30  + t * 20, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
+				p->draw_str(280, 30  + t * 20, format("%.1f/s", (float)c.stats.back().counter / UPDATE_DT));
 				indent.add(dx);
 			} else {
 				indent.add(0);

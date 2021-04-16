@@ -75,8 +75,6 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	if (ugly_hack_slow)
 		tick_dt *= 10;
 
-	perf_channel_suck = PerformanceMonitor::create_channel("suck", this);
-
 	sucking = false;
 	thread = nullptr;//new AudioSuckerThread(this);
 	buffer_size = hui::Config.get_int("SignalChain.BufferSize", DEFAULT_BUFFER_SIZE);
@@ -93,7 +91,6 @@ SignalChain::~SignalChain() {
 	stop_hard();
 	for (Module *m: weak(modules))
 		m->unsubscribe(this);
-	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
 
 void SignalChain::__init__(Session *s, const string &_name) {
@@ -119,6 +116,7 @@ Module *SignalChain::_add(Module *m) {
 
 	m->reset_state();
 	modules.add(m);
+	PerformanceMonitor::set_parent(m->perf_channel, perf_channel);
 	notify(MESSAGE_ADD_MODULE);
 	m->subscribe(this, [=]{ on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	return m;
@@ -484,13 +482,13 @@ void SignalChain::_stop_sucking() {
 
 int SignalChain::do_suck() {
 	std::lock_guard<std::mutex> lock(mutex);
-	PerformanceMonitor::start_busy(perf_channel_suck);
+	PerformanceMonitor::start_busy(perf_channel);
 	int s = Port::END_OF_STREAM;
 	for (auto *m: weak(modules)) {
 		int r = m->command(ModuleCommand::SUCK, buffer_size);
 		s = max(s, r);
 	}
-	PerformanceMonitor::end_busy(perf_channel_suck);
+	PerformanceMonitor::end_busy(perf_channel);
 	return s;
 }
 

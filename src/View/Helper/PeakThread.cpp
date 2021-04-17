@@ -40,6 +40,7 @@ void PeakThread::on_run() {
 			}
 		}
 		hui::Sleep(0.05f);
+		Thread::cancelation_point();
 	}
 }
 

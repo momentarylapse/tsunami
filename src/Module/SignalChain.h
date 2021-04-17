@@ -94,13 +94,13 @@ public:
 
 	void set_buffer_size(int size);
 	static const int DEFAULT_BUFFER_SIZE;
-	bool sucking;
 	int buffer_size;
 	float no_data_wait;
-	owned<SuckerThread> thread;
+	owned<SuckerThread> sucker_thread;
 	int do_suck();
 	void _start_sucking();
-	void _stop_sucking();
+	void _stop_sucking_soft();
+	void _stop_sucking_hard();
 
 	std::mutex mutex;
 

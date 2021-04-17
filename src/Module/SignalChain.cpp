@@ -38,21 +38,22 @@ const int SignalChain::DEFAULT_BUFFER_SIZE = 2048;
 
 class SuckerThread : public Thread {
 public:
-	SignalChain *sucker;
-	bool keep_running = true;
+	SignalChain *chain;
+	std::atomic<bool> sucking;
 
-	SuckerThread(SignalChain *s) {
-		sucker = s;
+	SuckerThread(SignalChain *c) {
+		chain = c;
+		sucking = true;
 	}
 
 	void on_run() override {
-		while(keep_running) {
-			if (sucker->sucking) {
-				int r = sucker->do_suck();
+		while (true) {
+			if (sucking) {
+				int r = chain->do_suck();
 				if (r == Port::END_OF_STREAM)
 					break;
 				if (r == Port::NOT_ENOUGH_DATA) {
-					hui::Sleep(sucker->no_data_wait);
+					hui::Sleep(chain->no_data_wait);
 					continue;
 				}
 			} else {
@@ -75,19 +76,12 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	if (ugly_hack_slow)
 		tick_dt *= 10;
 
-	sucking = false;
-	thread = nullptr;//new AudioSuckerThread(this);
+	//sucker_thread = new SuckerThread(this);
 	buffer_size = hui::Config.get_int("SignalChain.BufferSize", DEFAULT_BUFFER_SIZE);
 	no_data_wait = 0.005f;
 }
 
 SignalChain::~SignalChain() {
-	if (thread) {
-		thread->keep_running = false;
-		thread->join();
-		//thread->kill();
-		thread = nullptr;
-	}
 	stop_hard();
 	for (Module *m: weak(modules))
 		m->unsubscribe(this);
@@ -371,8 +365,7 @@ void SignalChain::prepare_start() {
 		for (auto *m: weak(modules))
 			m->command(ModuleCommand::PREPARE_START, 0);
 	}
-	if (!sucking)
-		_start_sucking();
+	_start_sucking();
 	state = State::PAUSED;
 }
 
@@ -383,6 +376,7 @@ void SignalChain::start() {
 
 	if (state == State::UNPREPARED)
 		prepare_start();
+	_start_sucking();
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
@@ -399,6 +393,7 @@ void SignalChain::stop() {
 	if (state != State::ACTIVE)
 		return;
 	session->debug("chain", "stop");
+	_stop_sucking_soft();
 
 	hui::CancelRunner(hui_runner);
 
@@ -414,7 +409,7 @@ void SignalChain::stop() {
 void SignalChain::stop_hard() {
 	session->debug("chain", "stop HARD");
 	stop();
-	_stop_sucking();
+	_stop_sucking_hard();
 	reset_state();
 	state = State::UNPREPARED;
 	notify(MESSAGE_STATE_CHANGE);
@@ -462,22 +457,29 @@ void SignalChain::set_buffer_size(int size) {
 
 
 void SignalChain::_start_sucking() {
-	if (sucking)
+	if (sucker_thread) {
+		session->debug("chain", "unpause suck");
+		sucker_thread->sucking = true;
 		return;
+	}
 	session->debug("chain", "start suck");
-	thread = new SuckerThread(this);
-	thread->run();
-	sucking = true;
+	sucker_thread = new SuckerThread(this);
+	sucker_thread->run();
 }
 
-void SignalChain::_stop_sucking() {
-	if (thread) {
-		session->debug("chain", "stop suck");
-		thread->keep_running = false;
-		thread->join();
-		thread = nullptr;
+void SignalChain::_stop_sucking_soft() {
+	if (sucker_thread) {
+		session->debug("chain", "pause suck");
+		sucker_thread->sucking = false;
 	}
-	sucking = false;
+}
+
+void SignalChain::_stop_sucking_hard() {
+	if (sucker_thread) {
+		session->debug("chain", "stop suck");
+		sucker_thread->kill();
+		sucker_thread = nullptr;
+	}
 }
 
 int SignalChain::do_suck() {

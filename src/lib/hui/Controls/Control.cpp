@@ -98,7 +98,7 @@ Control::~Control() {
 
 	//msg_write("widget: " + p2s(widget));
 #ifdef HUI_API_GTK
-	if (widget)
+	if (widget and (type != CONTROL_CHECKBOX)) // switch bug.... not sure why...
 		gtk_widget_destroy(widget);
 	widget = nullptr;
 	//unset_widgets_rec(this);

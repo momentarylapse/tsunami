@@ -13,14 +13,20 @@
 
 namespace hui {
 
-void on_gtk_checkbox_clicked(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void on_gtk_checkbox_clicked(GtkWidget *widget, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
-void on_gtk_switch_clicked(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void on_gtk_switch_clicked(GtkWidget *widget, GParamSpec *pspec, gpointer data) {
+	//msg_write(" - switch clicked " + p2s(pspec) + "  " + p2s(data));
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
-void on_gtk_switch_clicked2(GtkWidget *widget, gboolean state, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+bool on_gtk_switch_clicked2(GtkWidget *widget, gboolean state, gpointer data) {
+	//msg_write(" - switch change " + p2s(data));
+	//reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+	return false;
+}
 
 ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 	Control(CONTROL_CHECKBOX, id)
@@ -31,8 +37,8 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 		is_switch = false;
 	if (is_switch) {
 		widget = gtk_switch_new();
-		//g_signal_connect(G_OBJECT(widget), "notify::active", G_CALLBACK(&on_gtk_switch_clicked), this);
-		g_signal_connect(G_OBJECT(widget), "state-set", G_CALLBACK(&on_gtk_switch_clicked2), this);
+		g_signal_connect(G_OBJECT(widget), "notify::active", G_CALLBACK(&on_gtk_switch_clicked), this);
+		//g_signal_connect(G_OBJECT(widget), "state-set", G_CALLBACK(&on_gtk_switch_clicked2), this);
 	} else {
 		widget = gtk_check_button_new_with_label(sys_str(parts[0]));
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_checkbox_clicked), this);

@@ -80,11 +80,13 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 	solo = false;
 	align.dz = 2;
 
-	perf_channel = -1;
+	/*perf_channel = -1;
 	if (layer) {
 		perf_channel = PerformanceMonitor::create_channel("layer", this);
 		PerformanceMonitor::set_parent(perf_channel, view->perf_channel);
-	}
+	}*/
+	if (layer)
+		set_perf_name("vlayer");
 
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
@@ -108,8 +110,8 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 AudioViewLayer::~AudioViewLayer() {
 	if (layer)
 		layer->track->unsubscribe(this);
-	if (perf_channel >= 0)
-		PerformanceMonitor::delete_channel(perf_channel);
+	//if (perf_channel >= 0)
+	//	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioViewLayer::on_layer_change() {
@@ -462,7 +464,7 @@ void AudioViewLayer::set_solo(bool _solo) {
 void AudioViewLayer::on_draw(Painter *c) {
 	if (represents_imploded)
 		return;
-	PerformanceMonitor::start_busy(perf_channel);
+	//PerformanceMonitor::start_busy(perf_channel);
 
 	Track *t = layer->track;
 
@@ -487,7 +489,7 @@ void AudioViewLayer::on_draw(Painter *c) {
 	draw_markers(c, layer->markers_sorted(), view->hover());
 
 	draw_fades(c);
-	PerformanceMonitor::end_busy(perf_channel);
+	//PerformanceMonitor::end_busy(perf_channel);
 }
 
 

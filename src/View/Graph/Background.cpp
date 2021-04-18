@@ -22,6 +22,7 @@ Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
+	set_perf_name("background");
 }
 
 bool Background::on_left_button_down(float mx, float my) {

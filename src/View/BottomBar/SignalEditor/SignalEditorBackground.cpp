@@ -16,6 +16,7 @@ SignalEditorBackground::SignalEditorBackground(SignalEditorTab *t) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 	tab = t;
+	set_perf_name("background");
 }
 
 

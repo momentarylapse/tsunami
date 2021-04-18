@@ -64,6 +64,7 @@ public:
 SignalEditorModulePort::SignalEditorModulePort(SignalEditorTab *t, Module *m, int _index, SignalType _type, float dx, float dy, bool out) :
 		scenegraph::NodeRel(dx - R, dy - R, R*2, R*2) {
 
+	set_perf_name("se:port");
 	tab = t;
 	module = m;
 	index = _index;

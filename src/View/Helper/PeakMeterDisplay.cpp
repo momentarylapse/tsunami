@@ -24,6 +24,7 @@ PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	align.h = good_size(2);
 	align.horizontal = align.Mode::LEFT;
 	align.vertical = align.Mode::TOP;
+	set_perf_name("peak");
 	panel = nullptr;
 	source = nullptr;
 	enabled = false;
@@ -46,7 +47,7 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 
 	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){
 		area = p->area();
-		on_draw(p);
+		draw_recursive(p);
 	});
 	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{
 		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);

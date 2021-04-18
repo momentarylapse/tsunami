@@ -38,7 +38,6 @@
 #include "../Module/Audio/PeakMeter.h"
 #include "../Module/SignalChain.h"
 #include "../Plugins/TsunamiPlugin.h"
-#include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
@@ -129,6 +128,7 @@ public:
 		align.dz = 200;
 		align.horizontal = align.Mode::LEFT;
 		align.vertical = align.Mode::BOTTOM;
+		set_perf_name("button");
 		view = _view;
 	}
 	void on_draw(Painter *p) override {
@@ -160,8 +160,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	song = session->song.get();
 	_optimize_view_requested = false;
 
-	perf_channel = PerformanceMonitor::create_channel("view", this);
-
 	color_schemes.add(ColorSchemeBright());
 	color_schemes.add(ColorSchemeDark());
 
@@ -190,6 +188,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	set_mode(mode_default);
 
 	scene_graph = new scenegraph::SceneGraph();
+	scene_graph->set_perf_name("view");
 	scene_graph->set_callback_set_current([=] {
 		set_current(scene_graph->cur_selection);
 	});
@@ -389,8 +388,6 @@ AudioView::~AudioView() {
 	song->unsubscribe(this);
 
 	peak_thread->hard_stop();
-
-	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioView::set_antialiasing(bool set) {
@@ -1257,7 +1254,9 @@ void AudioView::draw_song(Painter *c) {
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-	scene_graph->on_draw(c);
+	//scene_graph->on_draw(c);
+	scene_graph->draw(c);
+
 
 	// playing/capturing position
 	if (is_playback_active())
@@ -1278,7 +1277,6 @@ void AudioView::draw_song(Painter *c) {
 	if (tip.num > 0)
 		draw_boxed_str(c, song_area().mx(), area.y2 - 50, tip, colors.text_soft1, colors.background_track_selected, 0);
 
-
 	if (message.ttl > 0) {
 		draw_message(c, message);
 		message.ttl -= 0.03f;
@@ -1295,7 +1293,6 @@ void AudioView::draw_song(Painter *c) {
 int frame = 0;
 
 void AudioView::on_draw(Painter *c) {
-	PerformanceMonitor::start_busy(perf_channel);
 
 	colors = basic_colors;
 	if (!win->is_active(id))
@@ -1313,8 +1310,6 @@ void AudioView::on_draw(Painter *c) {
 	//c->draw_str(100, 100, i2s(frame++));
 
 	colors = basic_colors;
-
-	PerformanceMonitor::end_busy(perf_channel);
 }
 
 void AudioView::perform_optimize_view() {

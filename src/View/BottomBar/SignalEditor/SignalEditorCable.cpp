@@ -20,6 +20,7 @@ SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scene
 	source_port = c.source_port;
 	target_port = c.target_port;
 	type = c.type;
+	set_perf_name("se:cable");
 }
 
 void SignalEditorCable::on_draw(Painter *p) {

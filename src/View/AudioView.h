@@ -358,8 +358,6 @@ public:
 	void prepare_menu(hui::Menu *menu);
 	void open_popup(hui::Menu *menu);
 
-	int perf_channel;
-
 
 	void set_cursor_pos(int pos);
 	int cursor_pos();

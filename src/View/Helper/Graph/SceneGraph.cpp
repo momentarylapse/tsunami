@@ -21,6 +21,7 @@ SceneGraph::SceneGraph() {
 	mx = -1;
 	my = -1;
 	mdp = new MouseDelayPlanner(this);
+	set_perf_name("graph");
 }
 
 void SceneGraph::set_callback_set_current(hui::Callback f) {
@@ -144,14 +145,25 @@ string SceneGraph::get_tip() {
 }
 
 void SceneGraph::on_draw(Painter *p) {
-	auto xxx = p->clip();
-	p->set_clip(area);
+	//auto xxx = p->clip();
+	//p->set_clip(area);
 
-	auto nodes = collect_children_up();
+	/*auto nodes = collect_children_up();
 	for (auto *n: nodes) {
 		//p->set_clip(area and n->area);
 		n->on_draw(p);
 	}
+	p->set_clip(xxx);*/
+
+	//if (mdp->acting())
+	//	mdp->action->on_draw_post(p);
+}
+
+void SceneGraph::draw(Painter *p) {
+	auto xxx = p->clip();
+	p->set_clip(area);
+
+	draw_recursive(p);
 	p->set_clip(xxx);
 
 	if (mdp->acting())

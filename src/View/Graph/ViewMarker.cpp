@@ -12,6 +12,7 @@
 
 ViewMarker::ViewMarker(AudioViewTrack *parent, TrackMarker *_marker) {
 	marker = _marker;
+	set_perf_name("marker");
 }
 
 

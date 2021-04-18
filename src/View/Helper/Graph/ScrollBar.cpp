@@ -20,6 +20,7 @@ ScrollBar::ScrollBar() {
 	align.horizontal = AlignData::Mode::LEFT;
 	align.w = AudioView::SCROLLBAR_WIDTH;
 	align.dz = 120;
+	set_perf_name("scrollbar");
 }
 ScrollBarHorizontal::ScrollBarHorizontal() : ScrollBar() {
 	align.vertical = AlignData::Mode::BOTTOM;

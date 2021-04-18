@@ -130,6 +130,7 @@ TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioVie
 	align.horizontal = AlignData::Mode::FILL;
 	align.dz = 120;
 	view = _view;
+	set_perf_name("time");
 
 	add_child(new PlaybackRange(this));
 	add_child(new PlaybackLockSymbol(this));

@@ -13,6 +13,7 @@
 const float dphi = 2.0f;
 
 Dial::Dial(const string &_label, float vmin, float vmax) : Node(60, 60) {
+	set_perf_name("dial");
 	label = _label;
 	val_min = vmin;
 	val_max = vmax;

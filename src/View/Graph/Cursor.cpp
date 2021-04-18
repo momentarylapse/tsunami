@@ -15,8 +15,9 @@
 
 
 Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
-	view = _view;
 	align.dz = 50;
+	set_perf_name("cursor");
+	view = _view;
 	is_end = end;
 	drag_range = Range::NONE;
 }
@@ -78,6 +79,7 @@ bool Cursor::on_left_button_down(float mx, float my) {
 SelectionMarker::SelectionMarker(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
 	align.dz = 49;
+	set_perf_name("selection");
 }
 
 void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color &col) {

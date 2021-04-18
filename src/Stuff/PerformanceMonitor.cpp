@@ -98,13 +98,26 @@ int PerformanceMonitor::create_channel(const string &name, void *p) {
 }
 
 void PerformanceMonitor::set_parent(int channel, int parent) {
+	if (channel < 0)
+		return;
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	channels[channel].parent = parent;
 #endif
 }
 
+void PerformanceMonitor::set_name(int channel, const string &name) {
+	if (channel < 0)
+		return;
+#if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
+	channels[channel].name = name;
+#endif
+}
+
 void PerformanceMonitor::delete_channel(int channel) {
+	if (channel < 0)
+		return;
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	channels[channel].used = false;

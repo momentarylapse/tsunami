@@ -37,6 +37,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::No
 			midi_mode_wanted = view->midi_view_mode;
 
 	imploded = false;
+	set_perf_name("vtrack");
 
 	if (track) {
 		add_child(new TrackHeader(this));

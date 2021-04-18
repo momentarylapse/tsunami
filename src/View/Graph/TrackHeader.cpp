@@ -105,6 +105,7 @@ public:
 
 TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	align.dz = 70;
+	set_perf_name("header");
 	vtrack = t;
 	view = vtrack->view;
 	float x0 = 5;

@@ -24,6 +24,7 @@ class Node : public Sharable<Observable<VirtualBase>> {
 public:
 	Node();
 	Node(float w, float h);
+	virtual ~Node();
 
 	virtual bool allow_handle_click_when_gaining_focus() { return true; }
 
@@ -35,6 +36,8 @@ public:
 	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
 
 	virtual bool hover(float mx, float my);
+
+	void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
 	virtual HoverData get_hover_data(float mx, float my);
 	void add_child(Node *child);
@@ -69,6 +72,9 @@ public:
 	int z;
 	bool hidden;
 	void set_hidden(bool hide);
+
+	int perf_channel;
+	void set_perf_name(const string &name);
 
 	Array<Node*> collect_children(bool include_hidden);
 	Array<Node*> collect_children_up();

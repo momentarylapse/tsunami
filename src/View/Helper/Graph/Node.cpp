@@ -8,9 +8,27 @@
 #include "Node.h"
 #include "SceneGraph.h"
 
-#include "../../../lib/file/msg.h"
+#include "../../../Stuff/PerformanceMonitor.h"
+
+//#include "../../../lib/file/msg.h"
 
 namespace scenegraph {
+
+
+void sort_nodes_up(Array<Node*> &nodes) {
+	for (int i=0; i<nodes.num; i++)
+		for (int j=i+1; j<nodes.num; j++)
+			if (nodes[i]->z > nodes[j]->z)
+				nodes.swap(i, j);
+}
+
+void sort_nodes_down(Array<Node*> &nodes) {
+	for (int i=0; i<nodes.num; i++)
+		for (int j=i+1; j<nodes.num; j++)
+			if (nodes[i]->z < nodes[j]->z)
+				nodes.swap(i, j);
+}
+
 
 Node::Node() : Node(0, 0) {
 }
@@ -29,6 +47,11 @@ Node::Node(float w, float h) {
 	area = rect::EMPTY;
 	hidden = false;
 	z = 0;
+	perf_channel = PerformanceMonitor::create_channel("node", this);
+}
+
+Node::~Node() {
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 bool Node::hover(float mx, float my) {
@@ -40,6 +63,7 @@ bool Node::hover(float mx, float my) {
 void Node::add_child(Node* child) {
 	children.add(child);
 	child->parent = this;
+	PerformanceMonitor::set_parent(child->perf_channel, perf_channel);
 }
 
 void Node::delete_child(Node* child) {
@@ -103,11 +127,28 @@ void Node::update_geometry(const rect &target_area) {
 	}
 }
 
+void Node::draw_recursive(Painter *p) {
+	if (hidden)
+		return;
+	PerformanceMonitor::start_busy(perf_channel);
+	on_draw(p);
+	auto nodes = weak(children);
+	sort_nodes_up(nodes);
+	for (auto *c: nodes)
+		if (!c->hidden)
+			c->draw_recursive(p);
+	PerformanceMonitor::end_busy(perf_channel);
+}
+
 void Node::set_hidden(bool hide) {
 	if (hide != hidden) {
 		hidden = hide;
 		request_redraw();
 	}
+}
+
+void Node::set_perf_name(const string &name) {
+	PerformanceMonitor::set_name(perf_channel, name);
 }
 
 void Node::update_geometry_recursive(const rect &target_area) {
@@ -132,19 +173,13 @@ Array<Node*> Node::collect_children(bool include_hidden) {
 
 Array<Node*> Node::collect_children_up() {
 	auto nodes = collect_children(false);
-	for (int i=0; i<nodes.num; i++)
-		for (int j=i+1; j<nodes.num; j++)
-			if (nodes[i]->z > nodes[j]->z)
-				nodes.swap(i, j);
+	sort_nodes_up(nodes);
 	return nodes;
 }
 
 Array<Node*> Node::collect_children_down() {
 	auto nodes = collect_children(false);
-	for (int i=0; i<nodes.num; i++)
-		for (int j=i+1; j<nodes.num; j++)
-			if (nodes[i]->z < nodes[j]->z)
-				nodes.swap(i, j);
+	sort_nodes_down(nodes);
 	return nodes;
 }
 
@@ -174,6 +209,7 @@ NodeRel::NodeRel(float dx, float dy, float w, float h) : Node(w, h) {
 HBox::HBox() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
+	set_perf_name("hbox");
 }
 void HBox::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
@@ -205,6 +241,7 @@ void HBox::update_geometry_recursive(const rect &target_area) {
 VBox::VBox() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
+	set_perf_name("vbox");
 }
 
 void VBox::update_geometry_recursive(const rect &target_area) {

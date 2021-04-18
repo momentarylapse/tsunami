@@ -42,8 +42,6 @@ public:
 	Array<SignalEditorCable*> cables;
 	Set<Module*> sel_modules;
 
-	int perf_channel;
-
 	SignalEditorModule *get_module(Module *m);
 
 	void select_module(Module *m, bool add=false);

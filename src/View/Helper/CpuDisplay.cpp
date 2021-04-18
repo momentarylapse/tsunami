@@ -33,7 +33,7 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 
 	parent->event_xp(id, "hui:draw", [=](Painter* p){
 		scene_graph->update_geometry_recursive(p->area());
-		scene_graph->on_draw(p);
+		scene_graph->draw(p);
 	});
 	parent->event_x(id, "hui:left-button-down", [=]{
 		scene_graph->on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
@@ -60,6 +60,8 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 
 	dlg = nullptr;
 
+	set_perf_name("cpu");
+
 	if (hui::Config.get_bool("CpuDisplay", false))
 		enable(true);
 }
@@ -81,7 +83,7 @@ void CpuDisplay::enable(bool active) {
 }
 
 color type_color(const string &t) {
-	if ((t == "view") or (t == "layer") or (t == "SignalEditor"))
+	if ((t == "view") or (t == "graph") or (t == "node") or (t == "SignalEditor"))
 		return color(1, 0.1f, 0.9f, 0.2f);
 	if (t == "peak")
 		return color(1, 0.1f, 0.9f, 0.9f);
@@ -103,10 +105,10 @@ string channel_title(PerfChannelInfo &c) {
 			return m->module_class;
 
 		return m->category_to_str(m->module_category);
-	} else if (c.name == "layer") {
+	} else if (c.name == "vlayer") {
 		auto *l = reinterpret_cast<AudioViewLayer*>(c.p);
 		if (l->layer)
-			return l->layer->track->nice_name();
+			return "L:" + l->layer->track->nice_name();
 	}
 	return c.name;
 }
@@ -137,6 +139,8 @@ void CpuDisplay::draw_background(Painter* p) {
 void CpuDisplay::draw_graphs(Painter* p) {
 	float h = area_graph.height();
 	for (auto &c: channels) {
+		if (c.parent >= 0)
+			continue;
 		p->set_color(type_color(c.name));
 		for (int j=1; j<c.stats.num; j++) {
 			float x0 = area_graph.x2 - (c.stats.num - (j-1)) * 2;
@@ -161,12 +165,14 @@ void CpuDisplay::draw_table(Painter* p) {
 		
 		int t = 0;
 		Array<int> indent;
+		color col0;
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
-				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
-				p->set_color(col);
+				if (c.parent < 0)
+					col0 = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
+				p->set_color(col0);
 				if (c.stats.back().counter == 0)
-					p->set_color(color::interpolate(col, view->colors.background, 0.7f));
+					p->set_color(color::interpolate(col0, view->colors.background, 0.7f));
 				int dx = 0;
 				if (c.parent >= 0) {
 					for (int i=0; i<channels.num; i++)
@@ -176,11 +182,12 @@ void CpuDisplay::draw_table(Painter* p) {
 							}
 				}
 				string name = channel_title(c);
-				p->set_font_size(10);
-				p->draw_str(20 + dx, 30  + t * 20, name);
-				p->draw_str(160, 30  + t * 20, format("%.1f%%", c.stats.back().cpu * 100));
-				p->draw_str(210, 30  + t * 20, format("%.2fms", c.stats.back().avg * 1000));
-				p->draw_str(280, 30  + t * 20, format("%.1f/s", (float)c.stats.back().counter / UPDATE_DT));
+				p->set_font_size(7);
+				int dy = 9;
+				p->draw_str(20 + dx, 30  + t * dy, name);
+				p->draw_str(160, 30  + t * dy, format("%.1f%%", c.stats.back().cpu * 100));
+				p->draw_str(210, 30  + t * dy, format("%.2fms", c.stats.back().avg * 1000));
+				p->draw_str(280, 30  + t * dy, format("%.1f/s", (float)c.stats.back().counter / UPDATE_DT));
 				indent.add(dx);
 			} else {
 				indent.add(0);
@@ -196,7 +203,7 @@ void CpuDisplay::draw_table(Painter* p) {
 	
 		int t = 0;
 		for (auto &c: channels) {
-			if (c.stats.num > 0) {
+			if ((c.stats.num > 0) and (c.parent < 0)) {
 				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
 				p->draw_str(x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));

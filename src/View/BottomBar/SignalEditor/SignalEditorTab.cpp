@@ -24,7 +24,6 @@
 #include "../../../Session.h"
 #include "../../../Storage/Storage.h"
 #include "../../../Plugins/PluginManager.h"
-#include "../../../Stuff/PerformanceMonitor.h"
 
 
 
@@ -36,6 +35,7 @@ public:
 	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel(50, -50, 20, 20) {
 		align.dz = 30;
 		align.vertical = AlignData::Mode::BOTTOM;
+		set_perf_name("button");
 		tab = t;
 		chain = tab->chain;
 	}
@@ -71,12 +71,11 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	session = ed->session;
 	chain = _chain;
 
-	perf_channel = PerformanceMonitor::create_channel("SignalEditor", this);
-
 	graph = new scenegraph::SceneGraph();
 	graph->set_callback_redraw([=] {
 		redraw("area");
 	});
+	graph->set_perf_name("SignalEditor");
 	pad = new ScrollPad();
 	pad->align.dz = 5;
 	graph->add_child(pad);
@@ -126,7 +125,6 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 }
 SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
-	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {
@@ -161,11 +159,10 @@ void SignalEditorTab::draw_arrow(Painter *p, const complex &m, const complex &_d
 
 
 void SignalEditorTab::on_draw(Painter* p) {
-	PerformanceMonitor::start_busy(perf_channel);
 	p->set_font_size(view->FONT_SIZE);
 	graph->update_geometry_recursive(p->area());
 	pad->_update_scrolling();
-	graph->on_draw(p);
+	graph->draw(p);
 
 	/*for (auto &pp: chain->_ports_out){
 		p->set_color(Red);
@@ -184,7 +181,6 @@ void SignalEditorTab::on_draw(Painter* p) {
 		p->set_font_size(view->FONT_SIZE);
 		AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
 	}
-	PerformanceMonitor::end_busy(perf_channel);
 }
 
 void SignalEditorTab::on_chain_update() {

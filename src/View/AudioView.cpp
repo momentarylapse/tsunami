@@ -273,6 +273,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	renderer = (SongRenderer*)signal_chain->add(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
 	peak_meter = (PeakMeter*)signal_chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	output_stream = (AudioOutput*)signal_chain->add(ModuleCategory::STREAM, "AudioOutput");
+	output_stream->set_volume(hui::Config.get_float("Output.Volume", 1.0f));
 	signal_chain->connect(renderer, 0, peak_meter, 0);
 	signal_chain->connect(peak_meter, 0, output_stream, 0);
 	signal_chain->mark_all_modules_as_system();
@@ -382,6 +383,7 @@ AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
 		hui::CancelRunner(draw_runner_id);
 
+	hui::Config.set_float("Output.Volume", output_stream->get_volume());
 	output_stream->unsubscribe(this);
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);

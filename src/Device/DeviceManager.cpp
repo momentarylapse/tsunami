@@ -255,7 +255,7 @@ void DeviceManager::write_config() {
 	string midi_api_name = api_descriptions[(int)midi_api].name;
 
 	//hui::Config.set_str("Output.ChosenDevice", chosen_device);
-	hui::Config.set_float("Output.Volume", output_volume);
+	//hui::Config.set_float("Output.Volume", output_volume);
 	hui::Config.set_str("Output.Devices[" + audio_api_name + "]", devs2str(output_devices));
 	hui::Config.set_str("Input.Devices[" + audio_api_name + "]", devs2str(input_devices));
 	hui::Config.set_str("MidiInput.Devices[" + midi_api_name + "]", devs2str(midi_input_devices));
@@ -438,7 +438,8 @@ void DeviceManager::init() {
 	input_devices = str2devs(hui::Config.get_str("Input.Devices[" + audio_api_name + "]", ""), DeviceType::AUDIO_INPUT);
 	midi_input_devices = str2devs(hui::Config.get_str("MidiInput.Devices[" + midi_api_name + "]", ""), DeviceType::MIDI_INPUT);
 
-	output_volume = hui::Config.get_float("Output.Volume", 1.0f);
+	output_volume = 1;
+	//output_volume = hui::Config.get_float("Output.Volume", 1.0f);
 
 	// audio
 	if (audio_api == ApiType::PULSE)

@@ -374,7 +374,8 @@ MixingConsole::MixingConsole(Session *session) :
 
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, PeakMeterDisplay::Mode::PEAKS);
 	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter, PeakMeterDisplay::Mode::SPECTRUM);
-	set_float("output-volume", device_manager->get_output_volume());
+	//set_float("output-volume", device_manager->get_output_volume());
+	set_float("output-volume", view->output_stream->get_volume());
 	
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
@@ -387,7 +388,11 @@ MixingConsole::MixingConsole(Session *session) :
 	view->subscribe(this, [=]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
 	song->subscribe(this, [=]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
 
-	device_manager->subscribe(this, [=]{ on_update_device_manager(); });
+	//device_manager->subscribe(this, [=]{ on_update_device_manager(); });
+	view->output_stream->subscribe(this, [=]{
+		set_float("output-volume", view->output_stream->get_volume());
+
+	});
 	load_data();
 
 
@@ -401,7 +406,8 @@ MixingConsole::~MixingConsole() {
 		hui::CancelRunner(peak_runner_id);
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
-	device_manager->unsubscribe(this);
+	view->output_stream->unsubscribe(this);
+	//device_manager->unsubscribe(this);
 }
 
 void MixingConsole::on_chain_state_change() {
@@ -418,7 +424,8 @@ void MixingConsole::on_chain_state_change() {
 }
 
 void MixingConsole::on_output_volume() {
-	device_manager->set_output_volume(get_float(""));
+	view->output_stream->set_volume(get_float(""));
+	//device_manager->set_output_volume(get_float(""));
 }
 
 void MixingConsole::show_fx(Track *t) {
@@ -458,7 +465,7 @@ void MixingConsole::load_data() {
 }
 
 void MixingConsole::on_update_device_manager() {
-	set_float("output-volume", device_manager->get_output_volume());
+	//set_float("output-volume", device_manager->get_output_volume());
 }
 
 void MixingConsole::on_tracks_change() {

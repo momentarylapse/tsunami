@@ -22,11 +22,8 @@ const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 8;
 PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	align.w = 120;
 	align.h = good_size(2);
-	align.dx = 90;
-	align.dy = -20;
 	align.horizontal = align.Mode::LEFT;
-	align.vertical = align.Mode::BOTTOM;
-	align.dz = 100;
+	align.vertical = align.Mode::TOP;
 	panel = nullptr;
 	source = nullptr;
 	enabled = false;

@@ -49,11 +49,12 @@
 #include "Graph/Cursor.h"
 #include "Graph/TimeScale.h"
 #include "Helper/Graph/ScrollBar.h"
+#include "Helper/Dial.h"
+#include "Helper/PeakThread.h"
+#include "Helper/CpuDisplay.h"
 #include "Painter/BufferPainter.h"
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
-#include "Helper/PeakThread.h"
-#include "Helper/CpuDisplay.h"
 #include "SideBar/SideBar.h"
 #include "BottomBar/BottomBar.h"
 
@@ -131,8 +132,6 @@ public:
 		view = _view;
 	}
 	void on_draw(Painter *p) override {
-		if (view->session->win->bottom_bar->visible)
-			return;
 		color c = view->colors.background_overlay;
 		if (is_cur_hover())
 			c = view->colors.hoverify(c);
@@ -144,8 +143,6 @@ public:
 		p->set_font_size(view->FONT_SIZE);
 	}
 	bool on_left_button_down(float mx, float my) override {
-		if (view->session->win->bottom_bar->visible)
-			return false;
 		view->session->win->bottom_bar->_show();
 		return true;
 	}
@@ -153,15 +150,6 @@ public:
 		return _("show control panel");
 	}
 };
-
-
-bool view_should_show_peaks(AudioView *view) {
-	if (view->session->win->bottom_bar)
-		if (view->session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE))
-			return false;
-	return view->is_playback_active();
-}
-
 
 AudioView::AudioView(Session *_session, const string &_id) :
 	cam(this)
@@ -294,10 +282,36 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	peak_meter_display = new PeakMeterDisplay(peak_meter, PeakMeterDisplay::Mode::BOTH);
+	peak_meter_display->align.dx = 90;
+	peak_meter_display->align.dy = -20;
+	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
+	peak_meter_display->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
+	peak_meter_display->align.dz = 100;
 	peak_meter_display->hidden = true;
 	scene_graph->add_child(peak_meter_display);
 
-	scene_graph->add_child(new BottomBarExpandButton(this));
+	output_volume_dial = new Dial(_("output"), 0, 100);
+	output_volume_dial->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
+	output_volume_dial->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
+	output_volume_dial->align.dx = 230;
+	output_volume_dial->align.dy = 0;
+	output_volume_dial->align.dz = 100;
+	//output_volume_dial->reference_value = 50;
+	output_volume_dial->unit = "%";
+	output_volume_dial->set_value(output_stream->get_volume() * 100);
+	output_volume_dial->set_callback([&] (float v) {
+		output_stream->set_volume(v / 100.0f);
+	});
+	output_stream->subscribe(this, [&] {
+		output_volume_dial->set_value(output_stream->get_volume() * 100);
+	}, output_stream->MESSAGE_CHANGE);
+	output_volume_dial->hidden = true;
+	scene_graph->add_child(output_volume_dial);
+
+	bottom_bar_expand_button = new BottomBarExpandButton(this);
+	scene_graph->add_child(bottom_bar_expand_button);
+
+	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
 	mx = my = 0;
 
@@ -368,6 +382,7 @@ AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
 		hui::CancelRunner(draw_runner_id);
 
+	output_stream->unsubscribe(this);
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
@@ -941,9 +956,23 @@ void AudioView::on_stream_tick() {
 	force_redraw();
 }
 
-void AudioView::on_stream_state_change() {
-	peak_meter_display->hidden = !view_should_show_peaks(this);
+
+void AudioView::update_onscreen_displays() {
+	peak_meter_display->hidden = true;
+	output_volume_dial->hidden = true;
+	bottom_bar_expand_button->hidden = true;
+
+	if (session->win->bottom_bar)
+		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
+			peak_meter_display->hidden = !is_playback_active();
+			output_volume_dial->hidden = !is_playback_active();
+			bottom_bar_expand_button->hidden = false;
+		}
 	force_redraw();
+}
+
+void AudioView::on_stream_state_change() {
+	update_onscreen_displays();
 }
 
 void AudioView::on_update() {

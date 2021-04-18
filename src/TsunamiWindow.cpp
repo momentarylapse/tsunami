@@ -995,12 +995,10 @@ void TsunamiWindow::on_side_bar_update() {
 	update_menu();
 }
 
-bool view_should_show_peaks(AudioView *view);
-
 void TsunamiWindow::on_bottom_bar_update() {
 	if (!bottom_bar->visible)
 		activate(view->id);
-	view->peak_meter_display->hidden = !view_should_show_peaks(view);
+	view->update_onscreen_displays();
 	update_menu();
 }
 

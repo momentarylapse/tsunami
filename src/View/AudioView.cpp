@@ -1530,7 +1530,7 @@ void AudioView::enable(bool _enabled) {
 
 
 void AudioView::play() {
-	if (signal_chain->is_prepared()) {
+	if (signal_chain->is_prepared() and !signal_chain->is_active()) {
 		signal_chain->start();
 		return;
 	}
@@ -1574,7 +1574,7 @@ bool AudioView::is_playback_active() {
 }
 
 bool AudioView::is_paused() {
-	return signal_chain->is_prepared();
+	return signal_chain->is_prepared() and !signal_chain->is_active();
 }
 
 int loop_in_range(int pos, const Range &r) {

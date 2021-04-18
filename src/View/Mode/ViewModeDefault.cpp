@@ -232,6 +232,9 @@ void scroll_y(AudioView *view, float dy) {
 
 void ViewModeDefault::on_mouse_wheel() {
 	auto e = hui::GetEvent();
+	if (view->scene_graph->on_mouse_wheel(e->scroll_x, e->scroll_y))
+		return;
+
 	if (fabs(e->scroll_y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL)) {
 			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);

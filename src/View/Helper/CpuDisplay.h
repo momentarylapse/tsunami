@@ -31,6 +31,7 @@ public:
 	virtual ~CpuDisplay();
 
 	bool on_left_button_down(float mx, float my) override;
+	bool on_mouse_wheel(float dx, float dy) override;
 	void on_draw(Painter *p) override;
 
 	void draw_background(Painter *p);
@@ -52,6 +53,10 @@ public:
 
 
 	Array<PerfChannelInfo> channels;
+	Array<int> expanded;
+	bool show_sleeping;
+	bool show_total;
+	float scroll_offset;
 };
 
 

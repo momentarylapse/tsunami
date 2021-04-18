@@ -1,0 +1,6 @@
+Dialog cpu-display-dialog "Cpu Monitor" width=460 height=420 resizable headerbar borderwidth=0 allowparent
+	Grid ? "" vertical
+		DrawingArea area ""
+		Grid ? "" buttonbar
+			CheckBox show-sleeping "Sleeping" "tooltip=Show sleeping items"
+			CheckBox show-total "Total" "tooltip=Show timings including time spent in children"

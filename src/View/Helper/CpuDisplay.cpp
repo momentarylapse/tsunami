@@ -17,6 +17,7 @@
 #include "../../TsunamiWindow.h"
 #include "../AudioView.h"
 #include "../Graph/AudioViewLayer.h"
+#include "../Graph/AudioViewTrack.h"
 #include "../Painter/BasicGridPainter.h"
 
 static const float UPDATE_DT = 2.0f;
@@ -38,6 +39,9 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 	parent->event_x(id, "hui:left-button-down", [=]{
 		scene_graph->on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
 	});
+	parent->event_x(id, "hui:mouse-wheel", [=]{
+		scene_graph->on_mouse_wheel(hui::GetEvent()->scroll_x, hui::GetEvent()->scroll_y);
+	});
 }
 
 
@@ -57,6 +61,8 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 	perf_mon = session->perf_mon;
 	view = session->view;
 	request_redraw = _request_redraw;
+	show_sleeping = false;
+	scroll_offset = 0;
 
 	dlg = nullptr;
 
@@ -105,10 +111,14 @@ string channel_title(PerfChannelInfo &c) {
 			return m->module_class;
 
 		return m->category_to_str(m->module_category);
+	} else if (c.name == "vtrack") {
+		auto *t = reinterpret_cast<AudioViewTrack*>(c.p);
+		if (t->track)
+			return t->track->nice_name();
 	} else if (c.name == "vlayer") {
 		auto *l = reinterpret_cast<AudioViewLayer*>(c.p);
 		if (l->layer)
-			return "L:" + l->layer->track->nice_name();
+			return l->layer->track->nice_name() + format(" v%d", l->layer->version_number()+1);
 	}
 	return c.name;
 }
@@ -151,27 +161,56 @@ void CpuDisplay::draw_graphs(Painter* p) {
 				p->draw_line(x0, y0, x1, y1);
 		}
 	}
+}
 
+bool is_sleeping(PerfChannelInfo &c) {
+	if (c.stats.num == 0)
+		return true;
+	return c.stats.back().counter == 0;
+}
+
+
+void draw_str_r(Painter *p, float x, float y, const string &s) {
+	float w = p->get_str_width(s);
+	p->draw_str(x - w, y, s);
 }
 
 void CpuDisplay::draw_table(Painter* p) {
-
 	if (large) {
+		float xoff[3] = {200, 270, 340};
+
 		p->set_font_size(10);
 		p->set_color(view->colors.text_soft1);
-		p->draw_str(150, 10, "cpu");
-		p->draw_str(210, 10, "avg");
-		p->draw_str(270, 10, "freq");
+		draw_str_r(p, xoff[0], 10, "cpu");
+		draw_str_r(p, xoff[1], 10, "avg");
+		draw_str_r(p, xoff[2], 10, "freq");
+
+		p->set_color(view->colors.text_soft3);
+		p->draw_str(xoff[0], 10, " %");
+		p->draw_str(xoff[1], 10, " ms");
+		p->draw_str(xoff[2], 10, " Hz");
 		
 		int t = 0;
 		Array<int> indent;
 		color col0;
+		int skip_until_indent = -1;
+
+		float max_avg = 0;
+		for (auto &c: channels)
+			if (c.stats.num > 0)
+				max_avg = max(max_avg, c.stats.back().avg);
+
+
+		float y = scroll_offset + 30;
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
 				if (c.parent < 0)
 					col0 = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col0);
-				if (c.stats.back().counter == 0)
+				bool highlight = !is_sleeping(c);
+				//if (!show_total)
+				highlight = (c.stats.back().avg > (max_avg / 10));
+				if (!highlight)
 					p->set_color(color::interpolate(col0, view->colors.background, 0.7f));
 				int dx = 0;
 				if (c.parent >= 0) {
@@ -182,17 +221,21 @@ void CpuDisplay::draw_table(Painter* p) {
 							}
 				}
 				string name = channel_title(c);
-				p->set_font_size(7);
-				int dy = 9;
-				p->draw_str(20 + dx, 30  + t * dy, name);
-				p->draw_str(160, 30  + t * dy, format("%.1f%%", c.stats.back().cpu * 100));
-				p->draw_str(210, 30  + t * dy, format("%.2fms", c.stats.back().avg * 1000));
-				p->draw_str(280, 30  + t * dy, format("%.1f/s", (float)c.stats.back().counter / UPDATE_DT));
+				p->set_font_size(9);
+				int dy = 12;
+				p->draw_str(20 + dx, y, name);
+				draw_str_r(p, xoff[0], y, format("%.1f", c.stats.back().cpu * 100));
+				draw_str_r(p, xoff[1], y, format("%.2f", c.stats.back().avg * 1000));
+				draw_str_r(p, xoff[2], y, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
 				indent.add(dx);
+				y += dy;
+
+				/*if (expanded.find(c.id) < 0) {
+					skip_until_indent = dx;
+				}*/
 			} else {
 				indent.add(0);
 			}
-			t ++;
 		}
 	} else {
 		float x0 = area.x1;
@@ -203,7 +246,7 @@ void CpuDisplay::draw_table(Painter* p) {
 	
 		int t = 0;
 		for (auto &c: channels) {
-			if ((c.stats.num > 0) and (c.parent < 0)) {
+			if (!is_sleeping(c) and (c.parent < 0)) {
 				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
 				p->set_color(col);
 				p->draw_str(x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
@@ -235,13 +278,22 @@ void CpuDisplay::on_draw(Painter* p) {
 
 class CpuDisplayDialog : public hui::Dialog {
 public:
-	CpuDisplayDialog(Session *session) : hui::Dialog("cpu", 380, 260, session->win.get()->win, true) {
-		set_options("", "resizable,borderwidth=0");
-		add_drawing_area("", 0, 0, "area");
-
+	CpuDisplayDialog(Session *session) : hui::Dialog("cpu-display-dialog", session->win.get()->win) {
 		auto cpu_display = new CpuDisplay(session, [&]{ redraw("area"); });
 		adapter = new CpuDisplayAdapter(this, "area", cpu_display);
-		event("hui:close", [=]{ hide(); });
+		check("show-sleeping", cpu_display->show_sleeping);
+		check("show-total", cpu_display->show_total);
+		event("hui:close", [=] {
+			hide();
+		});
+		event("show-sleeping", [=] {
+			cpu_display->show_sleeping = is_checked("");
+			cpu_display->update();
+		});
+		event("show-total", [=] {
+			cpu_display->show_total = is_checked("");
+			cpu_display->update();
+		});
 	}
 
 	CpuDisplayAdapter *adapter;
@@ -256,30 +308,39 @@ bool CpuDisplay::on_left_button_down(float mx, float my) {
 	return true;
 }
 
+bool CpuDisplay::on_mouse_wheel(float dx, float dy) {
+	if (large) {
+		scroll_offset = min(scroll_offset - dy * 10, 0.0f);
+		request_redraw();
+	}
+	return true;
+}
+
 void ch_sort(Array<PerfChannelInfo> &channels) {
 	for (int i=0; i<channels.num; i++)
 		for (int j=i+1; j<channels.num; j++) {
 			if (channels[i].name.compare(channels[j].name) < 0) {
 				channels.swap(i, j);
-			} else if ((channels[i].name.compare(channels[j].name) == 0) and (channels[i].stats.back().cpu < channels[j].stats.back().cpu)) {
+			} else if ((channels[i].name.compare(channels[j].name) == 0)) { // and (channels[i].stats.back().cpu < channels[j].stats.back().cpu)) {
 				channels.swap(i, j);
 			}
 		}
 }
 
-Array<PerfChannelInfo> ch_children(const Array<PerfChannelInfo> &channels, int parent) {
+Array<PerfChannelInfo> ch_children(const Array<PerfChannelInfo> &channels, int parent, bool allow_sleeping) {
 	Array<PerfChannelInfo> r;
 	for (auto &c: channels)
 		if (c.parent == parent)
-			r.add(c);
+			if (!is_sleeping(c) or allow_sleeping)
+				r.add(c);
 	ch_sort(r);
 	return r;
 }
 
-Array<PerfChannelInfo> ch_tree_sort(const Array<PerfChannelInfo> &ch) {
-	auto r = ch_children(ch, -1);
+Array<PerfChannelInfo> ch_tree_sort(const Array<PerfChannelInfo> &ch, bool allow_sleeping) {
+	auto r = ch_children(ch, -1, allow_sleeping);
 	for (int i=0; i<r.num; i++) {
-		auto x = ch_children(ch, r[i].id);
+		auto x = ch_children(ch, r[i].id, allow_sleeping);
 		foreachi (auto &c, x, j)
 			r.insert(c, i+j+1);
 	}
@@ -287,6 +348,16 @@ Array<PerfChannelInfo> ch_tree_sort(const Array<PerfChannelInfo> &ch) {
 }
 
 void CpuDisplay::update() {
-	channels = ch_tree_sort(perf_mon->get_info());
+	channels = ch_tree_sort(perf_mon->get_info(), show_sleeping);
+	if (!show_total) {
+		for (auto &c: channels)
+			if (c.stats.num > 0) {
+				auto nodes = ch_children(channels, c.id, false);
+				for (auto &n: nodes) {
+					c.stats.back().cpu -= n.stats.back().cpu;
+					c.stats.back().avg -= n.stats.back().avg;
+				}
+			}
+	}
 	request_redraw();
 }

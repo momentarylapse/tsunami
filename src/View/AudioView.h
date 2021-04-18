@@ -143,6 +143,8 @@ public:
 	bool _optimize_view_requested;
 	void update_menu();
 
+	int perf_channel;
+
 	string id;
 
 	Array<ColorScheme> color_schemes;

@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-69
+70
 # Resource
 Menu
 menu_fake
@@ -505,6 +505,43 @@ preview
 image=hui:media-play
 1
 1
+0
+# Resource
+Dialog
+cpu-display-dialog
+width=460,height=420,resizable,headerbar,borderwidth=0,allowparent
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+DrawingArea
+area
+
+0
+0
+0
+Grid
+?
+buttonbar
+1
+0
+2
+CheckBox
+show-sleeping
+
+0
+0
+0
+CheckBox
+show-total
+
+1
+0
 0
 # Resource
 Dialog
@@ -7233,7 +7270,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-609
+612
 # Text
 /bars-add
 Add bars...
@@ -7661,6 +7698,15 @@ Preview
 configurable_dialog/save_favorite
 
 save parameter
+cpu-display-dialog/cpu-display-dialog
+Cpu Monitor
+
+cpu-display-dialog/show-sleeping
+Sleeping
+Show sleeping items
+cpu-display-dialog/show-total
+Total
+Show timings including time spent in children
 curve-target-dialog/curve-target-dialog
 Target
 

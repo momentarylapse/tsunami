@@ -8,6 +8,10 @@
 #include "AudioView.h"
 #include "MouseDelayPlanner.h"
 #include "Helper/Graph/SceneGraph.h"
+#include "Helper/Graph/ScrollBar.h"
+#include "Helper/Dial.h"
+#include "Helper/PeakThread.h"
+#include "Helper/CpuDisplay.h"
 #include "Helper/PeakMeterDisplay.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeEdit.h"
@@ -18,6 +22,16 @@
 #include "Mode/ViewModeCapture.h"
 #include "Mode/ViewModeScaleBars.h"
 #include "Mode/ViewModeScaleMarker.h"
+#include "Graph/AudioViewLayer.h"
+#include "Graph/AudioViewTrack.h"
+#include "Graph/Background.h"
+#include "Graph/Cursor.h"
+#include "Graph/TimeScale.h"
+#include "Painter/BufferPainter.h"
+#include "Painter/GridPainter.h"
+#include "Painter/MidiPainter.h"
+#include "SideBar/SideBar.h"
+#include "BottomBar/BottomBar.h"
 #include "../Session.h"
 #include "../EditModes.h"
 #include "../Tsunami.h"
@@ -42,20 +56,7 @@
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
-#include "Graph/AudioViewLayer.h"
-#include "Graph/AudioViewTrack.h"
-#include "Graph/Background.h"
-#include "Graph/Cursor.h"
-#include "Graph/TimeScale.h"
-#include "Helper/Graph/ScrollBar.h"
-#include "Helper/Dial.h"
-#include "Helper/PeakThread.h"
-#include "Helper/CpuDisplay.h"
-#include "Painter/BufferPainter.h"
-#include "Painter/GridPainter.h"
-#include "Painter/MidiPainter.h"
-#include "SideBar/SideBar.h"
-#include "BottomBar/BottomBar.h"
+#include "../Stuff/PerformanceMonitor.h"
 
 
 const float AudioView::FONT_SIZE = 10.0f;
@@ -108,19 +109,6 @@ Image *ExpandImageMask(Image *im, float d) {
 }
 
 
-
-void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow) {
-	c->set_fill(false);
-	c->set_line_width(3);
-	c->set_color(col_shadow);
-	c->draw_str(x, y, str);
-
-	c->set_fill(true);
-	c->set_line_width(1);
-	c->set_color(col_text);
-	c->draw_str(x, y, str);
-}
-
 class BottomBarExpandButton : public scenegraph::Node {
 public:
 	AudioView *view;
@@ -160,6 +148,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	song = session->song.get();
 	_optimize_view_requested = false;
 
+	perf_channel = PerformanceMonitor::create_channel("view", this);
+
 	color_schemes.add(ColorSchemeBright());
 	color_schemes.add(ColorSchemeDark());
 
@@ -195,6 +185,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->set_callback_redraw([=] {
 		force_redraw();
 	});
+	PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
 	time_scale = new TimeScale(this);
@@ -381,6 +372,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
 		hui::CancelRunner(draw_runner_id);
+	PerformanceMonitor::delete_channel(perf_channel);
 
 	hui::Config.set_float("Output.Volume", output_stream->get_volume());
 	output_stream->unsubscribe(this);
@@ -1293,6 +1285,7 @@ void AudioView::draw_song(Painter *c) {
 int frame = 0;
 
 void AudioView::on_draw(Painter *c) {
+	PerformanceMonitor::start_busy(perf_channel);
 
 	colors = basic_colors;
 	if (!win->is_active(id))
@@ -1310,6 +1303,7 @@ void AudioView::on_draw(Painter *c) {
 	//c->draw_str(100, 100, i2s(frame++));
 
 	colors = basic_colors;
+	PerformanceMonitor::end_busy(perf_channel);
 }
 
 void AudioView::perform_optimize_view() {

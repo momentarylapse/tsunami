@@ -20,7 +20,7 @@ PeakThread::PeakThread(AudioView *_view) {
 	song = view->song;
 	allow_running = true;
 	updating = false;
-	perf_channel = PerformanceMonitor::create_channel("peak", this);
+	perf_channel = PerformanceMonitor::create_channel("peakthread", this);
 }
 
 PeakThread::~PeakThread() {

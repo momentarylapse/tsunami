@@ -30,4 +30,4 @@ Dialog new_dialog "New file" width=250 height=80 headerbar closebutton=no
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			---|
-			Button ok "New" default image=hui:ok
+			Button ok "Create" default image=hui:ok

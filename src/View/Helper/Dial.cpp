@@ -75,7 +75,7 @@ void Dial::on_draw(Painter *p) {
 
 
 	Array<complex> z;
-	p->set_line_width(2);
+	p->set_line_width(3);
 	p->set_color(AudioView::colors.text_soft3);
 	float r = min(area.width()/2, area.height()/2) - 3;
 	draw_arc(p, val_min, val_max, r);

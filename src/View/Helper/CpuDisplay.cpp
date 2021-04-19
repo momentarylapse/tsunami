@@ -28,6 +28,7 @@ CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, Cpu
 	cpu_display = _cpu_display;
 
 	scene_graph = new scenegraph::SceneGraph();
+	scene_graph->set_perf_name("cpu");
 	scene_graph->add_child(cpu_display);
 	cpu_display->align.horizontal = scenegraph::Node::AlignData::Mode::FILL;
 	cpu_display->align.vertical = scenegraph::Node::AlignData::Mode::FILL;
@@ -89,10 +90,12 @@ void CpuDisplay::enable(bool active) {
 }
 
 color type_color(const string &t) {
-	if ((t == "view") or (t == "graph") or (t == "node") or (t == "SignalEditor"))
+	if ((t == "view") or (t == "graph") or (t == "node"))
 		return color(1, 0.1f, 0.9f, 0.2f);
-	if (t == "peak")
-		return color(1, 0.1f, 0.9f, 0.9f);
+	if (t == "peakthread")
+		return color(1, 0.9f, 0.2f, 0.2f);
+	if (t == "SignalEditor")
+		return color(1, 0.9f, 0.8f, 0.1f);
 	if (t == "module")
 		return color(1, 0.2f, 0.2f, 0.9f);
 	if (t == "suck")
@@ -120,6 +123,8 @@ string channel_title(PerfChannelInfo &c) {
 		if (l->layer)
 			return l->layer->track->nice_name() + format(" v%d", l->layer->version_number()+1);
 	}
+	if (c.name.head(3) == "se:")
+		return c.name.substr(3, -1);
 	return c.name;
 }
 
@@ -196,9 +201,12 @@ void CpuDisplay::draw_table(Painter* p) {
 		int skip_until_indent = -1;
 
 		float max_avg = 0;
+		float max_cpu = 0;
 		for (auto &c: channels)
-			if (c.stats.num > 0)
+			if (c.stats.num > 0) {
 				max_avg = max(max_avg, c.stats.back().avg);
+				max_cpu = max(max_cpu, c.stats.back().cpu);
+			}
 
 
 		float y = scroll_offset + 30;
@@ -209,7 +217,7 @@ void CpuDisplay::draw_table(Painter* p) {
 				p->set_color(col0);
 				bool highlight = !is_sleeping(c);
 				//if (!show_total)
-				highlight = (c.stats.back().avg > (max_avg / 10));
+				highlight = (c.stats.back().avg > (max_avg / 10)) or (c.stats.back().cpu > (max_cpu / 10));
 				if (!highlight)
 					p->set_color(color::interpolate(col0, view->colors.background, 0.7f));
 				int dx = 0;

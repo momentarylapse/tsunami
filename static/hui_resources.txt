@@ -8368,7 +8368,7 @@ new_dialog/num_bars
 10
 
 new_dialog/ok
-New
+Create
 
 new_dialog/pattern
 

@@ -32,6 +32,7 @@ public:
 	virtual bool on_left_button_up(float mx, float my) { return false; }
 	virtual bool on_left_double_click(float mx, float my) { return false; }
 	virtual bool on_right_button_down(float mx, float my) { return false; }
+	virtual bool on_right_button_up(float mx, float my) { return false; }
 	virtual bool on_mouse_move(float mx, float my) { return false; }
 	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
 
@@ -71,6 +72,7 @@ public:
 	rect area;
 	int z;
 	bool hidden;
+	bool clip;
 	void set_hidden(bool hide);
 
 	int perf_channel;

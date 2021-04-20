@@ -90,6 +90,7 @@ void Dial::on_draw(Painter *p) {
 		auto q2 = rel_to_pos(1, r+4);
 		p->draw_line(q1.x, q1.y, q2.x, q2.y);
 	}
+	p->set_line_width(4);
 	p->set_color(AudioView::colors.text);
 	{
 		auto q1 = rel_to_pos((value - val_min) / (val_max - val_min), r);

@@ -7,6 +7,7 @@
 
 #include "CpuDisplay.h"
 #include "Graph/SceneGraph.h"
+#include "../MouseDelayPlanner.h"
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
@@ -22,30 +23,29 @@
 
 static const float UPDATE_DT = 2.0f;
 
-CpuDisplayAdapter::CpuDisplayAdapter(hui::Panel* _parent, const string& _id, CpuDisplay *_cpu_display) {
-	parent = _parent;
-	id = _id;
-	cpu_display = _cpu_display;
-
-	scene_graph = new scenegraph::SceneGraph();
-	scene_graph->set_perf_name("cpu");
-	scene_graph->add_child(cpu_display);
-	cpu_display->align.horizontal = scenegraph::Node::AlignData::Mode::FILL;
-	cpu_display->align.vertical = scenegraph::Node::AlignData::Mode::FILL;
-
-	parent->event_xp(id, "hui:draw", [=](Painter* p){
-		scene_graph->update_geometry_recursive(p->area());
-		scene_graph->draw(p);
-	});
-	parent->event_x(id, "hui:left-button-down", [=]{
-		scene_graph->on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
-	});
-	parent->event_x(id, "hui:mouse-wheel", [=]{
-		scene_graph->on_mouse_wheel(hui::GetEvent()->scroll_x, hui::GetEvent()->scroll_y);
-	});
-}
 
 
+class CpuDisplayDialog : public hui::Dialog {
+public:
+	CpuDisplayDialog(Session *session) : hui::Dialog("cpu-display-dialog", session->win.get()->win) {
+		auto cpu_display = new CpuDisplay(session, [&]{ redraw("area"); });
+		graph = scenegraph::SceneGraph::create_integrated(this, "area", cpu_display, "cpu");
+		check("show-sleeping", cpu_display->show_sleeping);
+		check("show-total", cpu_display->show_total);
+		event("hui:close", [=] {
+			hide();
+		});
+		event("show-sleeping", [=] {
+			cpu_display->show_sleeping = is_checked("");
+			cpu_display->update();
+		});
+		event("show-total", [=] {
+			cpu_display->show_total = is_checked("");
+			cpu_display->update();
+		});
+	}
+	owned<scenegraph::SceneGraph> graph;
+};
 
 
 CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scenegraph::NodeFree() {
@@ -283,29 +283,6 @@ void CpuDisplay::on_draw(Painter* p) {
 
 	p->set_clip(old_clip);
 }
-
-class CpuDisplayDialog : public hui::Dialog {
-public:
-	CpuDisplayDialog(Session *session) : hui::Dialog("cpu-display-dialog", session->win.get()->win) {
-		auto cpu_display = new CpuDisplay(session, [&]{ redraw("area"); });
-		adapter = new CpuDisplayAdapter(this, "area", cpu_display);
-		check("show-sleeping", cpu_display->show_sleeping);
-		check("show-total", cpu_display->show_total);
-		event("hui:close", [=] {
-			hide();
-		});
-		event("show-sleeping", [=] {
-			cpu_display->show_sleeping = is_checked("");
-			cpu_display->update();
-		});
-		event("show-total", [=] {
-			cpu_display->show_total = is_checked("");
-			cpu_display->update();
-		});
-	}
-
-	CpuDisplayAdapter *adapter;
-};
 
 bool CpuDisplay::on_left_button_down(float mx, float my) {
 	if (large)

@@ -60,16 +60,4 @@ public:
 };
 
 
-
-class CpuDisplayAdapter : public VirtualBase {
-public:
-	CpuDisplayAdapter(hui::Panel *parent, const string &id, CpuDisplay *cpu_display);
-
-	CpuDisplay *cpu_display;
-	scenegraph::SceneGraph *scene_graph;
-
-	hui::Panel *parent;
-	string id;
-};
-
 #endif /* SRC_VIEW_HELPER_CPUDISPLAY_H_ */

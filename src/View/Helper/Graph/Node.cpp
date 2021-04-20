@@ -10,7 +10,7 @@
 
 #include "../../../Stuff/PerformanceMonitor.h"
 
-//#include "../../../lib/file/msg.h"
+#include "../../../lib/image/Painter.h"
 
 namespace scenegraph {
 
@@ -46,6 +46,7 @@ Node::Node(float w, float h) {
 	parent = nullptr;
 	area = rect::EMPTY;
 	hidden = false;
+	clip = false;
 	z = 0;
 	perf_channel = PerformanceMonitor::create_channel("node", this);
 }
@@ -131,12 +132,20 @@ void Node::draw_recursive(Painter *p) {
 	if (hidden)
 		return;
 	PerformanceMonitor::start_busy(perf_channel);
+
+	rect clip_before = p->clip();
+	if (clip)
+		p->set_clip(area);
+
 	on_draw(p);
 	auto nodes = weak(children);
 	sort_nodes_up(nodes);
 	for (auto *c: nodes)
 		if (!c->hidden)
 			c->draw_recursive(p);
+
+	if (clip)
+		p->set_clip(clip_before);
 	PerformanceMonitor::end_busy(perf_channel);
 }
 

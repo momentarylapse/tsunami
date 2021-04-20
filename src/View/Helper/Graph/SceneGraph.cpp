@@ -89,6 +89,18 @@ bool SceneGraph::on_right_button_down(float mx, float my) {
 	return false;
 }
 
+bool SceneGraph::on_right_button_up(float mx, float my) {
+	set_mouse(mx, my);
+	hover = get_hover_data(mx, my);
+
+	auto nodes = collect_children_down();
+	for (auto *c: nodes)
+		if (c->hover(mx, my))
+			if (c->on_right_button_up(mx, my))
+				return true;
+	return false;
+}
+
 bool SceneGraph::on_mouse_move(float mx, float my) {
 	set_mouse(mx, my);
 
@@ -200,6 +212,53 @@ public:
 
 void SceneGraph::mdp_prepare(hui::Callback update) {
 	mdp->prepare(new MouseDelayActionWrapper(update));
+}
+
+void SceneGraph::integrate(hui::Panel *panel, const string &id, bool fill) {
+	if (fill) {
+		for (auto c: weak(children)) {
+			c->align.horizontal = Node::AlignData::Mode::FILL;
+			c->align.vertical = Node::AlignData::Mode::FILL;
+		}
+	}
+
+	set_callback_redraw([=] {
+		panel->redraw(id);
+	});
+	panel->event_xp(id, "hui:draw", [=](Painter* p) {
+		update_geometry_recursive(p->area());
+		draw(p);
+	});
+	panel->event_x(id, "hui:left-button-down", [=] {
+		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+	panel->event_x(id, "hui:left-button-up", [=] {
+		on_left_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+	panel->event_x(id, "hui:left-double-click", [=] {
+		on_left_double_click(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+	panel->event_x(id, "hui:right-button-down", [=] {
+		on_right_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+	panel->event_x(id, "hui:right-button-up", [=] {
+		on_right_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+	panel->event_x(id, "hui:mouse-wheel", [=] {
+		on_mouse_wheel(hui::GetEvent()->scroll_x, hui::GetEvent()->scroll_y);
+	});
+	panel->event_x(id, "hui:mouse-move", [=] {
+		on_mouse_move(hui::GetEvent()->mx, hui::GetEvent()->my);
+	});
+}
+
+SceneGraph *SceneGraph::create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, bool fill) {
+	auto graph = new SceneGraph();
+	graph->set_perf_name(perf_name);
+	graph->add_child(node);
+
+	graph->integrate(panel, id, fill);
+	return graph;
 }
 
 }

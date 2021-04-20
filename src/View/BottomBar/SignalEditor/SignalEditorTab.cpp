@@ -32,7 +32,7 @@ class SignalEditorPlayButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel(50, -50, 20, 20) {
+	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel(32, -32, 20, 20) {
 		align.dz = 30;
 		align.vertical = AlignData::Mode::BOTTOM;
 		set_perf_name("button");
@@ -40,23 +40,53 @@ public:
 		chain = tab->chain;
 	}
 	void on_draw(Painter *p) override {
-		p->set_color(tab->view->colors.text_soft2);
-		if (this->is_cur_hover())
-			p->set_color(tab->view->colors.text);
-		p->set_font_size(20);
-		p->draw_str(area.x1, area.y1, chain->is_active() ? u8"\u23F9" : u8"\u25B6");
+		color col = tab->view->colors.text_soft2;
+		if (!chain->is_active()) {
+			col = tab->view->colors.text_soft1;
+			if (this->is_cur_hover())
+				col = tab->view->colors.text;
+		}
+		p->set_color(col);
+		p->set_font_size(18);
+		p->draw_str(area.x1, area.y1, u8"\u25B6");
 	}
 	bool on_left_button_down(float mx, float my) override {
-		if (chain->is_active())
-			chain->stop();
-		else
-			chain->start();
+		chain->start();
 		return true;
 	}
 	string get_tip() override {
-		if (chain->is_active())
-			return _("stop");
 		return _("start");
+	}
+};
+
+class SignalEditorStopButton : public scenegraph::NodeRel {
+public:
+	SignalEditorTab *tab;
+	SignalChain *chain;
+	SignalEditorStopButton(SignalEditorTab *t) : scenegraph::NodeRel(72, -32, 20, 20) {
+		align.dz = 30;
+		align.vertical = AlignData::Mode::BOTTOM;
+		set_perf_name("button");
+		tab = t;
+		chain = tab->chain;
+	}
+	void on_draw(Painter *p) override {
+		color col = tab->view->colors.text_soft2;
+		if (chain->is_active()) {
+			col = tab->view->colors.text_soft1;
+			if (this->is_cur_hover())
+				col = tab->view->colors.text;
+		}
+		p->set_color(col);
+		p->set_font_size(18);
+		p->draw_str(area.x1, area.y1, u8"\u23F9");
+	}
+	bool on_left_button_down(float mx, float my) override {
+		chain->stop();
+		return true;
+	}
+	string get_tip() override {
+		return _("stop");
 	}
 };
 
@@ -100,6 +130,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	graph->add_child(background);
 	pad->connect_scrollable(background);
 	graph->add_child(new SignalEditorPlayButton(this));
+	graph->add_child(new SignalEditorStopButton(this));
 
 	event_x("area", "hui:key-down", [=]{ on_key_down(); });
 

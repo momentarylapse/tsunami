@@ -1191,12 +1191,12 @@ float AudioView::draw_str_constrained(Painter *p, float x, float y, float w_max,
 
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area) {
-	c->set_font("", -1, true, false);
+	//c->set_font("", -1, true, false);
 	float w = c->get_str_width(msg);
-	float x = min(max(mx - 20.0f, area.x1 + 2.0f), area.x2 - w);
-	float y = min(max(my + 30, area.y1 + 2.0f), area.y2 - FONT_SIZE - 5);
+	float x = clamp(mx - 20.0f, area.x1 + 2.0f, area.x2 - w);
+	float y = clamp(my + 30, area.y1 + 2.0f, area.y2 - FONT_SIZE - 5);
 	draw_boxed_str(c, x, y, msg, colors.background, colors.text_soft1);
-	c->set_font("", -1, false, false);
+	//c->set_font("", -1, false, false);
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg) {

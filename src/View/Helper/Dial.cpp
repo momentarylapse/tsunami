@@ -113,6 +113,11 @@ bool Dial::on_mouse_wheel(float dx, float dy) {
 	return true;
 }
 
+string Dial::get_tip() {
+	//return label;
+	return "";
+}
+
 void Dial::set_callback(std::function<void(float)> callback) {
 	cb_update = callback;
 }

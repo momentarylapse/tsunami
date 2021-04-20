@@ -35,6 +35,8 @@ public:
 	bool on_left_button_down(float mx, float my) override;
 	bool on_mouse_wheel(float dx, float dy) override;
 
+	string get_tip() override;
+
 	std::function<void(float)> cb_update;
 	void set_callback(std::function<void(float)> callback);
 };

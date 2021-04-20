@@ -8,6 +8,7 @@
 #include "Dial.h"
 #include "../../lib/image/Painter.h"
 #include "../AudioView.h"
+#include "Graph/SceneGraph.h"
 
 
 const float dphi = 2.0f;
@@ -53,8 +54,7 @@ complex Dial::rel_to_pos(float rel, float R) {
 }
 
 void Dial::on_draw(Painter *p) {
-	p->set_color(Black);
-	//p->draw_rect(area);
+	p->set_antialiasing(true);
 
 	// label
 	p->set_color(AudioView::colors.text_soft1);
@@ -75,6 +75,7 @@ void Dial::on_draw(Painter *p) {
 
 
 	Array<complex> z;
+	p->set_option("line-cap", "square");
 	p->set_line_width(3);
 	p->set_color(AudioView::colors.text_soft3);
 	float r = min(area.width()/2, area.height()/2) - 3;
@@ -98,10 +99,20 @@ void Dial::on_draw(Painter *p) {
 		p->draw_line(q1.x, q1.y, q2.x, q2.y);
 	}
 	draw_arc(p, reference_value, value, r);
+	p->set_option("line-cap", "butt");
 	p->set_line_width(1);
 }
 
 bool Dial::on_left_button_down(float mx, float my) {
+	if (auto g = graph()) {
+		g->mdp_prepare([=] {
+			//drag_update(g->mx, g->my);
+			auto e = hui::GetEvent();
+			set_value(clamp(value - e->dy * (val_max - val_min) * 0.002f, val_min, val_max));
+			if (cb_update)
+				cb_update(value);
+		});
+	}
 	return true;
 }
 

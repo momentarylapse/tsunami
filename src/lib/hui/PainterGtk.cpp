@@ -102,6 +102,24 @@ void Painter::set_roundness(float radius) {
 	corner_radius = radius;
 }
 
+void Painter::set_option(const string &key, const string &value) {
+	if (key == "line-join") {
+		if (value == "miter")
+			cairo_set_line_join(cr, CAIRO_LINE_JOIN_MITER);
+		else if (value == "round")
+			cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
+		else if (value == "bevel")
+			cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
+	} else if (key == "line-cap") {
+		if (value == "butt")
+			cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+		else if (value == "round")
+			cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+		else if (value == "square")
+			cairo_set_line_cap(cr, CAIRO_LINE_CAP_SQUARE);
+	}
+}
+
 void Painter::set_clip(const rect &r) {
 	cairo_reset_clip(cr);
 	cairo_rectangle(cr, max(r.x1, 0.0f), max(r.y1, 0.0f), min(r.width(), (float)width), min(r.height(), (float)height));

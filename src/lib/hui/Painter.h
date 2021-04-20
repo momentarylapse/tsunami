@@ -14,8 +14,7 @@ class complex;
 class rect;
 class color;
 
-namespace hui
-{
+namespace hui {
 
 class Window;
 
@@ -60,6 +59,7 @@ class Painter : public ::Painter {
 	void _cdecl draw_image(float x, float y, const Image *image) override;
 	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
 	void _cdecl set_transform(float rot[], const complex &offset) override;
+	void _cdecl set_option(const string &key, const string &value) override;
 	rect _cdecl clip() const override;
 };
 

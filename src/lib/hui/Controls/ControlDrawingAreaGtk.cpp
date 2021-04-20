@@ -105,6 +105,14 @@ void win_set_mouse_pos(Window *win, float x, float y) {
 	win->input.y = y;
 }
 
+void win_set_modifier_keys(Window *win) {
+	win->input.key_code = 0;
+	if (win->get_key(KEY_CONTROL)) //win->mod & GDK_CONTROL_MASK)
+		win->input.key_code += KEY_CONTROL;
+	if (win->get_key(KEY_SHIFT)) //mod & GDK_SHIFT_MASK)
+		win->input.key_code += KEY_SHIFT;
+}
+
 template<class T>
 void win_set_input(Window *win, T *event) {
 	if (event->type == GDK_ENTER_NOTIFY) {
@@ -250,6 +258,7 @@ gboolean on_gtk_area_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer
 gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	if (c->panel->win) {
+		win_set_modifier_keys(c->panel->win);
 		if (event->direction == GDK_SCROLL_UP) {
 			c->panel->win->input.scroll_y = 1;
 		} else if (event->direction == GDK_SCROLL_DOWN) {
@@ -367,6 +376,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 	double x0, y0;
 	gtk_gesture_drag_get_start_point(gesture, &x0, &y0);
 	win_set_mouse_pos(c->panel->win, float(x0 + offset_x), float(y0 + offset_y));
+	win_set_modifier_keys(c->panel->win);
 	c->panel->win->input.lb = true;
 	c->panel->win->input.mb = false;
 	c->panel->win->input.rb = false;
@@ -377,6 +387,7 @@ void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, doubl
 	auto c = reinterpret_cast<Control*>(user_data);
 	static int nn = 0;
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+	win_set_modifier_keys(c->panel->win);
 #if GTK_CHECK_VERSION(4,0,0)
 	auto mod = gtk_event_controller_get_current_event_state(controller);
 	c->panel->win->input.lb = (mod & GDK_BUTTON1_MASK);
@@ -405,6 +416,7 @@ void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, doub
 	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = (float)dx;
 	c->panel->win->input.scroll_y = (float)dy;
+	win_set_modifier_keys(c->panel->win);
 	c->notify(EventID::MOUSE_WHEEL, false);
 }
 

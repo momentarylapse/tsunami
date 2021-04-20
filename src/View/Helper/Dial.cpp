@@ -108,7 +108,10 @@ bool Dial::on_left_button_down(float mx, float my) {
 		g->mdp_prepare([=] {
 			//drag_update(g->mx, g->my);
 			auto e = hui::GetEvent();
-			set_value(clamp(value - e->dy * (val_max - val_min) * 0.002f, val_min, val_max));
+			if (e->key_code & hui::KEY_SHIFT)
+				set_value(clamp(value - e->dy * (val_max - val_min) * 0.0002f, val_min, val_max));
+			else
+				set_value(clamp(value - e->dy * (val_max - val_min) * 0.002f, val_min, val_max));
 			if (cb_update)
 				cb_update(value);
 		});
@@ -117,8 +120,11 @@ bool Dial::on_left_button_down(float mx, float my) {
 }
 
 bool Dial::on_mouse_wheel(float dx, float dy) {
-	// TODO check shift key for high precision
-	set_value(clamp(value + dy * (val_max - val_min) * 0.02f, val_min, val_max));
+	auto e = hui::GetEvent();
+	if (e->key_code & hui::KEY_SHIFT)
+		set_value(clamp(value + dy * (val_max - val_min) * 0.02f, val_min, val_max));
+	else
+		set_value(clamp(value + dy * (val_max - val_min) * 0.02f, val_min, val_max));
 	if (cb_update)
 		cb_update(value);
 	return true;

@@ -55,12 +55,7 @@ public:
 	void on_draw(Painter* p);
 	void on_chain_update();
 	void on_chain_delete();
-	void on_left_button_down();
-	void on_left_button_up();
-	void on_mouse_move();
-	void on_right_button_down();
 	void on_key_down();
-	void on_mouse_wheel();
 	void on_activate();
 	void on_delete();
 	void on_add(ModuleCategory type);

@@ -71,25 +71,36 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	session = ed->session;
 	chain = _chain;
 
-	graph = new scenegraph::SceneGraph();
-	graph->set_callback_redraw([=] {
-		redraw("area");
-	});
-	graph->set_perf_name("SignalEditor");
 	pad = new ScrollPad();
 	pad->align.dz = 5;
-	graph->add_child(pad);
+	graph = scenegraph::SceneGraph::create_integrated(this, "area", pad, "SignalEditor", [=] (Painter *p) {
+		p->set_font_size(view->FONT_SIZE);
+		graph->update_geometry_recursive(p->area());
+		pad->_update_scrolling();
+		graph->draw(p);
+
+		/*for (auto &pp: chain->_ports_out){
+			p->set_color(Red);
+			p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
+		}*/
+
+
+		float mx = hui::GetEvent()->mx;
+		float my = hui::GetEvent()->my;
+
+		string tip;
+		if (graph->hover.node)
+			tip = graph->hover.node->get_tip();
+		if (tip.num > 0) {
+			p->set_font_size(view->FONT_SIZE);
+			AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
+		}
+	});
 	background = new SignalEditorBackground(this);
 	graph->add_child(background);
 	pad->connect_scrollable(background);
 	graph->add_child(new SignalEditorPlayButton(this));
 
-	event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
-	event_x("area", "hui:mouse-move", [=]{ on_mouse_move(); });
-	event_x("area", "hui:left-button-down", [=]{ on_left_button_down(); });
-	event_x("area", "hui:left-button-up", [=]{ on_left_button_up(); });
-	event_x("area", "hui:right-button-down", [=]{ on_right_button_down(); });
-	event_x("area", "hui:mouse-wheel", [=]{ on_mouse_wheel(); });
 	event_x("area", "hui:key-down", [=]{ on_key_down(); });
 
 
@@ -222,33 +233,6 @@ void SignalEditorTab::on_chain_delete() {
 	editor->remove_tab(this);
 }
 
-void SignalEditorTab::on_left_button_down() {
-	float mx = hui::GetEvent()->mx;
-	float my = hui::GetEvent()->my;
-	graph->on_left_button_down(mx, my);
-	redraw("area");
-}
-
-void SignalEditorTab::on_left_button_up() {
-	float mx = hui::GetEvent()->mx;
-	float my = hui::GetEvent()->my;
-	graph->on_left_button_up(mx, my);
-	redraw("area");
-}
-
-void SignalEditorTab::on_mouse_move() {
-	float mx = hui::GetEvent()->mx;
-	float my = hui::GetEvent()->my;
-	graph->on_mouse_move(mx, my);
-	redraw("area");
-}
-
-void SignalEditorTab::on_right_button_down() {
-	float mx = hui::GetEvent()->mx;
-	float my = hui::GetEvent()->my;
-	graph->on_right_button_down(mx, my);
-}
-
 void SignalEditorTab::popup_chain() {
 	editor->menu_chain->open_popup(this);
 }
@@ -262,21 +246,6 @@ void SignalEditorTab::on_key_down() {
 
 	if (key == hui::KEY_DELETE)
 		on_module_delete();
-
-	if (key == hui::KEY_UP)
-		pad->move_view(0, -10);
-	if (key == hui::KEY_DOWN)
-		pad->move_view(0, 10);
-	if (key == hui::KEY_LEFT)
-		pad->move_view(-10, 0);
-	if (key == hui::KEY_RIGHT)
-		pad->move_view(10, 0);
-}
-
-void SignalEditorTab::on_mouse_wheel() {
-	float dx = hui::GetEvent()->scroll_x;
-	float dy = hui::GetEvent()->scroll_y;
-	pad->move_view(dx*10, dy*10);
 }
 
 void SignalEditorTab::on_activate() {

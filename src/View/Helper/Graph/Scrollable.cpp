@@ -7,6 +7,7 @@
 
 #include "Scrollable.h"
 #include "ScrollBar.h"
+#include "../../../lib/hui/Event.h"
 
 
 ScrollPad::ScrollPad() : scenegraph::NodeRel(0,0,0,0) {
@@ -48,8 +49,20 @@ complex ScrollPad::unproject(const complex &p) {
 }
 
 bool ScrollPad::on_mouse_wheel(float dx, float dy) {
-	move_view(dx, dy);
+	move_view(dx * 10, dy * 10);
 	return true;
+}
+
+bool ScrollPad::on_key(int key) {
+	if (key == hui::KEY_UP)
+		move_view(0, -10);
+	if (key == hui::KEY_DOWN)
+		move_view(0, 10);
+	if (key == hui::KEY_LEFT)
+		move_view(-10, 0);
+	if (key == hui::KEY_RIGHT)
+		move_view(10, 0);
+	return false;
 }
 
 void ScrollPad::move_view(float dx, float dy) {

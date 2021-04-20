@@ -35,6 +35,7 @@ public:
 	bool on_right_button_up(float mx, float my) override;
 	bool on_mouse_move(float mx, float my) override;
 	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_key(int key) override;
 	bool allow_handle_click_when_gaining_focus() override;
 
 	//ViewNode *get_hover();
@@ -59,8 +60,8 @@ public:
 	float mx, my;
 	void set_mouse(float mx, float my);
 
-	void integrate(hui::Panel *panel, const string &id, bool fill);
-	static SceneGraph *create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, bool fill=true);
+	void integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill);
+	static SceneGraph *create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, std::function<void(Painter *)> custom_draw=nullptr, bool fill=true);
 };
 
 }

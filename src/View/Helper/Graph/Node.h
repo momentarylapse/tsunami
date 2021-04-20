@@ -28,6 +28,7 @@ public:
 
 	virtual bool allow_handle_click_when_gaining_focus() { return true; }
 
+	// return: block upwards propagation
 	virtual bool on_left_button_down(float mx, float my) { return false; }
 	virtual bool on_left_button_up(float mx, float my) { return false; }
 	virtual bool on_left_double_click(float mx, float my) { return false; }
@@ -35,6 +36,7 @@ public:
 	virtual bool on_right_button_up(float mx, float my) { return false; }
 	virtual bool on_mouse_move(float mx, float my) { return false; }
 	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
+	virtual bool on_key(int key) { return false; }
 
 	virtual bool hover(float mx, float my);
 

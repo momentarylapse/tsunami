@@ -129,6 +129,15 @@ bool SceneGraph::on_mouse_wheel(float dx, float dy) {
 	return false;
 }
 
+bool SceneGraph::on_key(int key) {
+	auto nodes = collect_children_down();
+	for (auto *c: nodes)
+		//if (c->hover(mx, my))
+			if (c->on_key(key))
+				return true;
+	return false;
+}
+
 bool SceneGraph::allow_handle_click_when_gaining_focus() {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
@@ -214,7 +223,7 @@ void SceneGraph::mdp_prepare(hui::Callback update) {
 	mdp->prepare(new MouseDelayActionWrapper(update));
 }
 
-void SceneGraph::integrate(hui::Panel *panel, const string &id, bool fill) {
+void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill) {
 	if (fill) {
 		for (auto c: weak(children)) {
 			c->align.horizontal = Node::AlignData::Mode::FILL;
@@ -226,38 +235,53 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, bool fill) {
 		panel->redraw(id);
 	});
 	panel->event_xp(id, "hui:draw", [=](Painter* p) {
-		update_geometry_recursive(p->area());
-		draw(p);
+		if (custom_draw) {
+			custom_draw(p);
+		} else {
+			update_geometry_recursive(p->area());
+			draw(p);
+		}
 	});
 	panel->event_x(id, "hui:left-button-down", [=] {
 		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:left-button-up", [=] {
 		on_left_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:left-double-click", [=] {
 		on_left_double_click(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-down", [=] {
 		on_right_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-up", [=] {
 		on_right_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-wheel", [=] {
 		on_mouse_wheel(hui::GetEvent()->scroll_x, hui::GetEvent()->scroll_y);
+		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-move", [=] {
 		on_mouse_move(hui::GetEvent()->mx, hui::GetEvent()->my);
+		request_redraw();
+	});
+	panel->event_x(id, "hui:key-down", [=] {
+		on_key(hui::GetEvent()->key_code);
+		request_redraw();
 	});
 }
 
-SceneGraph *SceneGraph::create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, bool fill) {
+SceneGraph *SceneGraph::create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, std::function<void(Painter *)> custom_draw, bool fill) {
 	auto graph = new SceneGraph();
 	graph->set_perf_name(perf_name);
 	graph->add_child(node);
 
-	graph->integrate(panel, id, fill);
+	graph->integrate(panel, id, custom_draw, fill);
 	return graph;
 }
 

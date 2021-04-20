@@ -42,6 +42,7 @@ public:
 	ScrollPad();
 
 	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_key(int key) override;
 	void update_geometry_recursive(const rect &target_area) override;
 
 	void move_view(float dx, float dy);

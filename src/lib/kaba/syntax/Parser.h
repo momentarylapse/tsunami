@@ -42,12 +42,13 @@ public:
 	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2);
 
 	Array<const Class*> get_wanted_param_types(shared<Node> link);
-	shared<Node> check_param_link(shared<Node> link, const Class *type, const string &f_name = "", int param_no = -1);
+	shared<Node> check_param_link(shared<Node> link, const Class *type, const string &f_name = "", int param_no = -1, int num_params = 1);
 
 	shared<Node> apply_type_cast(int tc, shared<Node> param, const Class *wanted);
 	shared<Node> apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<int> &casts, const Array<const Class*> &wanted);
 	bool direct_param_match(const shared<Node> operand, const shared_array<Node> &params);
 	bool param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty);
+	string param_match_with_cast_error(const shared_array<Node> &params, Array<const Class*> &wanted);
 	shared<Node> apply_params_direct(shared<Node> operand, shared_array<Node> &params);
 	shared<Node> force_concrete_type(shared<Node> node);
 	void force_concrete_types(shared_array<Node> &nodes);
@@ -71,6 +72,7 @@ public:
 	shared<Node> build_abstract_dict(const Array<shared<Node>> &el);
 	shared<Node> parse_dict(Block *block);
 	shared<Node> build_abstract_tuple(const Array<shared<Node>> &el);
+	shared<Node> build_function_pipe(const shared<Node> &input, const shared<Node> &func);
 
 	const Class *get_constant_type(const string &str);
 	void get_constant_value(const string &str, Value &value);

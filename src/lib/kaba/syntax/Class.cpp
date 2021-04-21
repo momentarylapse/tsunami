@@ -178,6 +178,9 @@ bool Class::is_pointer_owned() const
 bool Class::is_pointer_silent() const
 { return type == Type::POINTER_SILENT; }
 
+bool Class::is_interface() const
+{ return type == Type::INTERFACE; }
+
 bool Class::is_dict() const
 { return type == Type::DICT; }
 
@@ -492,6 +495,16 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			if (config.verbose)
 				msg_write("OVERRIDE    " + orig->signature());
 			f->virtual_index = orig->virtual_index;
+			//f->flags = orig->flags;
+			// don't copy __INIT_FILL_ALL_PARAMS etc...
+			// better copy one-by-one for now
+			if (flags_has(orig->flags, Flags::CONST)) {
+				if (auto self = f->__get_var(IDENTIFIER_SELF))
+					flags_set(self->flags, Flags::CONST);
+				flags_set(f->flags, Flags::CONST);
+			}
+			if (flags_has(orig->flags, Flags::SELFREF))
+				flags_set(f->flags, Flags::SELFREF);
 			functions[orig_index] = f;
 		} else {
 			functions.add(f);

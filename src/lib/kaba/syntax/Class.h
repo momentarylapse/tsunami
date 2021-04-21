@@ -56,6 +56,7 @@ public:
 		FUNCTION,
 		DICT,
 		PRODUCT, // (a,b) in (A x B)
+		INTERFACE,
 	};
 	Type type;
 	Flags flags;
@@ -68,6 +69,7 @@ public:
 	bool is_pointer_shared() const;
 	bool is_pointer_owned() const;
 	bool is_pointer_silent() const;
+	bool is_interface() const;
 	bool fully_parsed() const;
 	Array<ClassElement> elements;
 	Array<ClassInitializers> initializers;

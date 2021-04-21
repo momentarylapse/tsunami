@@ -28,13 +28,13 @@ class Peak
 		gain = _gain
 		q = _q
 	
-	complex z(float g0)
+	const complex z(float g0)
 		return [pitch_to_freq(pitch), gain + g0]
 	#float q()
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
 	
-	void create_filter(out BiquadFilter f, float sample_rate)
+	const void create_filter(out BiquadFilter f, float sample_rate)
 		float freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 

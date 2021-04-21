@@ -7,8 +7,8 @@ class Curve
 	void __init__()
 		col = colors.text_soft1
 		col_below = color(0.3, 0.3, 1, 0.3)
-	virtual float get(float x)
-	virtual float[] get_list(float[] xx)
+	virtual const float get(float x)
+	virtual const float[] get_list(float[] xx)
 		float[] r
 		r.resize(len(xx))
 		for x,i in xx

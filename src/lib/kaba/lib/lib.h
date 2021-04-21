@@ -32,6 +32,7 @@ void script_make_dict(Class *t, SyntaxTree *ps = nullptr);
 
 
 extern const string IDENTIFIER_CLASS;
+extern const string IDENTIFIER_INTERFACE;
 extern const string IDENTIFIER_FUNC;
 extern const string IDENTIFIER_FUNC_INIT;
 extern const string IDENTIFIER_FUNC_DELETE;
@@ -47,6 +48,7 @@ extern const string IDENTIFIER_FUNC_SHARED_CREATE;
 extern const string IDENTIFIER_SUPER;
 extern const string IDENTIFIER_SELF;
 extern const string IDENTIFIER_EXTENDS;
+extern const string IDENTIFIER_IMPLEMENTS;
 extern const string IDENTIFIER_STATIC;
 extern const string IDENTIFIER_NEW;
 extern const string IDENTIFIER_DELETE;
@@ -142,6 +144,7 @@ enum class OperatorID {
 	DEREFERENCE,   // *
 	REFERENCE,     // &
 	ARRAY,         // [...]
+	FUNCTION_PIPE, // |>
 	_COUNT_
 };
 

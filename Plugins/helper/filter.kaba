@@ -64,7 +64,7 @@ class BiquadFilter
 			b[0] = 1
 			b[1] = 0
 			b[2] = 0
-		float gain(float f, float sample_rate)
+		const float gain(float f, float sample_rate)
 			complex z
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
@@ -73,7 +73,7 @@ class BiquadFilter
 		
 			float fac = H.abs() / y.abs()
 			return factor_to_db(fac)
-		float phase_shift(float f, float sample_rate)
+		const float phase_shift(float f, float sample_rate)
 			complex z
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)

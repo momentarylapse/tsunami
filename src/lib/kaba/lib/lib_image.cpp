@@ -89,6 +89,11 @@ void SIAddPackageImage() {
 				func_add_param("r", TypeFloat32);
 			class_add_func_virtualx("set_antialiasing", TypeVoid, &Painter::set_antialiasing);
 				func_add_param("enabled", TypeBool);
+			class_add_func_virtualx("set_font", TypeVoid, &Painter::set_font);
+				func_add_param("font", TypeString);
+				func_add_param("size", TypeFloat32);
+				func_add_param("bold", TypeBool);
+				func_add_param("italic", TypeBool);
 			class_add_func_virtualx("set_font_size", TypeVoid, &Painter::set_font_size);
 				func_add_param("size", TypeFloat32);
 			class_add_func_virtualx("set_fill", TypeVoid, &Painter::set_fill);
@@ -122,10 +127,15 @@ void SIAddPackageImage() {
 				func_add_param("x", TypeFloat32);
 				func_add_param("y", TypeFloat32);
 				func_add_param("str", TypeString);
+			class_add_func_virtualx("get_str_width", TypeFloat32, &Painter::get_str_width);
+				func_add_param("str", TypeString);
 			class_add_func_virtualx("draw_image", TypeVoid, &Painter::draw_image);
 				func_add_param("x", TypeFloat32);
 				func_add_param("y", TypeFloat32);
 				func_add_param("image", TypeImage);
+			class_add_func_virtualx("set_option", TypeVoid, &Painter::set_option);
+				func_add_param("key", TypeString);
+				func_add_param("value", TypeString);
 			class_set_vtable(ImagePainter);
 }
 

@@ -38,6 +38,10 @@ void SIAddPackageDoc() {
 		class_add_func("add_page", TypeBasePainterP, pdf_p(mf(&pdf::Parser::add_page)));
 		class_add_func("save", TypeVoid, pdf_p(mf(&pdf::Parser::save)));
 			func_add_param("filename", TypePath);
+
+	add_class(TypePdf);
+		class_add_func("add_font_directory", TypeVoid, pdf_p(&pdf::add_font_directory), Flags::STATIC);
+			func_add_param("dir", TypePath);
 }
 
 };

@@ -1261,7 +1261,7 @@ lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp lib/file/file.h lib/ba
 lib/xfile/chunked.o : lib/xfile/chunked.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/xfile/chunked.h
 	$(CPP) -c lib/xfile/chunked.cpp -o $@ $(CXXFLAGS)
 
-lib/xfile/pdf.o : lib/xfile/pdf.cpp lib/xfile/pdf.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/image/Painter.h lib/image/image.h lib/config.h lib/image/color.h lib/math/math.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h
+lib/xfile/pdf.o : lib/xfile/pdf.cpp lib/xfile/pdf.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/image/Painter.h lib/image/image.h lib/config.h lib/image/color.h lib/math/math.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h
 	$(CPP) -c lib/xfile/pdf.cpp -o $@ $(CXXFLAGS)
 
 lib/xfile/xml.o : lib/xfile/xml.cpp lib/xfile/xml.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h

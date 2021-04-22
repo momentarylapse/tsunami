@@ -91,6 +91,9 @@ public:
 		f->read_int();
 		f->read_int();
 		f->read_int();
+
+		if (me->compression > 0)
+			cur_op(this)->session->w("whole-file compression deprecated");
 	}
 	void write(File *f) override {
 		f->write_int(me->sample_rate);

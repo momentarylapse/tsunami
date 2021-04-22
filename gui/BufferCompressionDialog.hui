@@ -1,0 +1,14 @@
+Dialog buffer-compression-dialog "Compression" width=250 height=50 headerbar resizable closebutton=no
+	Grid ? "" vertical
+		Grid ? ""
+			Label l-codec "Codec" disabled right
+			ComboBox codec "" expandx
+			---|
+			Label l-quality "Quality" disabled right
+			ComboBox quality "" disabled
+		Grid ? "" buttonbar
+			Button /cancel "Cancel"
+			---|
+			Button /ok "Ok" default
+
+		

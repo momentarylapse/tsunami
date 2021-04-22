@@ -458,6 +458,7 @@ sources = [
 	'src/View/Dialog/BarAddDialog.cpp',
 	'src/View/Dialog/BarDeleteDialog.cpp',
 	'src/View/Dialog/BarEditDialog.cpp',
+	'src/View/Dialog/BufferCompressionDialog.cpp',
 	'src/View/Dialog/ChannelMapperDialog.cpp',
 	'src/View/Dialog/DetuneSynthesizerDialog.cpp',
 	'src/View/Dialog/HelpDialog.cpp',

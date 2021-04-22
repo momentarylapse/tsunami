@@ -22,6 +22,7 @@
 #include "View/Dialog/PauseEditDialog.h"
 #include "View/Dialog/TrackRoutingDialog.h"
 #include "View/Dialog/QuestionDialog.h"
+#include "View/Dialog/BufferCompressionDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 //#include "View/BottomBar/DeviceConsole.h"
@@ -136,10 +137,14 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("buffer-delete", [=]{ on_buffer_delete(); });
 	event("buffer-make-movable", [=]{ on_buffer_make_movable(); });
 	event("buffer-compress", [=]{
+		auto dlg = ownify(new BufferCompressionDialog(this));
+		dlg->run();
+		if (dlg->codec == "")
+			return;
 		foreachi (auto &buf, view->cur_layer()->buffers, i)
 			if (buf.range().is_inside(view->hover_before_leave.pos)) {
 				auto comp = new AudioBuffer::Compressed;
-				comp->codec = "ogg";
+				comp->codec = dlg->codec;
 				comp->data = session->storage->compress(buf, comp->codec);
 				if (comp->data.num > 0) {
 					buf.compressed = comp;

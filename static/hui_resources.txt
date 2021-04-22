@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-70
+71
 # Resource
 Menu
 menu_fake
@@ -399,6 +399,67 @@ image=hui:cancel
 Button
 ok
 default,image=hui:ok
+0
+1
+0
+# Resource
+Dialog
+buffer-compression-dialog
+width=250,height=50,headerbar,resizable,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+
+0
+0
+4
+Label
+l-codec
+disabled,right
+0
+0
+0
+ComboBox
+codec
+expandx
+1
+0
+0
+Label
+l-quality
+disabled,right
+0
+1
+0
+ComboBox
+quality
+disabled
+1
+1
+0
+Grid
+?
+buttonbar
+1
+0
+2
+Button
+cancel
+
+0
+0
+0
+Button
+ok
+default
 0
 1
 0
@@ -7264,7 +7325,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-612
+615
 # Text
 /bars-add
 Add bars...
@@ -7661,6 +7722,15 @@ Number
 
 bar_edit_dialog/t_result_bpm
 => Bpm
+
+buffer-compression-dialog/buffer-compression-dialog
+Compression
+
+buffer-compression-dialog/l-codec
+Codec
+
+buffer-compression-dialog/l-quality
+Quality
 
 channel-mapper-dialog/channel-mapper-dialog
 Channel mapper

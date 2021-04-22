@@ -45,7 +45,6 @@ public:
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
 	bool large;
-	rect area_graph;
 
 	Callback request_redraw;
 

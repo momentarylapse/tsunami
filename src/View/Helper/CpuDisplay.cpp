@@ -56,6 +56,7 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 	align.horizontal = AlignData::Mode::RIGHT;
 	align.vertical = AlignData::Mode::BOTTOM;
 	align.dz = 100;
+	clip = true;
 	hidden = true;
 
 	session = _session;
@@ -138,10 +139,10 @@ void CpuDisplay::draw_background(Painter* p) {
 
 	BasicGridPainter grid;
 	GridColors gc = {col_bg, Black, view->colors.grid, Black};
-	grid.set_context(area_graph, gc);
+	grid.set_context(area, gc);
 
 	// horizontal time grid
-	grid.plan_linear(-area_graph.width(), 0, 20);
+	grid.plan_linear(-area.width(), 0, 20);
 	grid.draw(p);
 
 	// vertical percentage grid
@@ -152,16 +153,16 @@ void CpuDisplay::draw_background(Painter* p) {
 }
 
 void CpuDisplay::draw_graphs(Painter* p) {
-	float h = area_graph.height();
+	float h = area.height();
 	for (auto &c: channels) {
 		if (c.parent >= 0)
 			continue;
 		p->set_color(type_color(c.name));
 		for (int j=1; j<c.stats.num; j++) {
-			float x0 = area_graph.x2 - (c.stats.num - (j-1)) * 2;
-			float x1 = area_graph.x2 - (c.stats.num -  j   ) * 2;
-			float y0 = area_graph.y1 + h * (1 - c.stats[j-1].cpu);
-			float y1 = area_graph.y1 + h * (1 - c.stats[j].cpu);
+			float x0 = area.x2 - (c.stats.num - (j-1)) * 2;
+			float x1 = area.x2 - (c.stats.num -  j   ) * 2;
+			float y0 = area.y1 + h * (1 - c.stats[j-1].cpu);
+			float y1 = area.y1 + h * (1 - c.stats[j].cpu);
 			if (x1 >= 2)
 				p->draw_line(x0, y0, x1, y1);
 		}
@@ -267,12 +268,6 @@ void CpuDisplay::draw_table(Painter* p) {
 void CpuDisplay::on_draw(Painter* p) {
 	int h = area.height();
 	large = (h > 50);
-	area_graph = area;
-	//if (large)
-	//	area_graph = rect(area.x1, area.x2, area.y1 + 8, area.y2 - 8);
-
-	auto old_clip = p->clip();
-	p->set_clip(area);
 
 	draw_background(p);
 
@@ -280,8 +275,6 @@ void CpuDisplay::on_draw(Painter* p) {
 	draw_graphs(p);
 
 	draw_table(p);
-
-	p->set_clip(old_clip);
 }
 
 bool CpuDisplay::on_left_button_down(float mx, float my) {

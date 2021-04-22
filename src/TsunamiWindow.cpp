@@ -145,14 +145,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 			if (view->sel.has(l))
 				for (auto &buf: l->buffers)
 					if (buf.range().overlaps(view->sel.range())) {
-						auto comp = new AudioBuffer::Compressed;
+						shared<AudioBuffer::Compressed> comp = new AudioBuffer::Compressed;
 						comp->codec = dlg->codec;
 						comp->data = session->storage->compress(buf, comp->codec);
 						if (comp->data.num > 0) {
 							buf.compressed = comp;
 							l->notify();
-						} else {
-							delete comp;
 						}
 					}
 	});

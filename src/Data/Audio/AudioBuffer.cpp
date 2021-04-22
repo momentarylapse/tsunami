@@ -56,6 +56,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 	length = b.length;
 	channels = b.channels;
 	c = b.c;
+	compressed = b.compressed;
 }
 
 // move constructor
@@ -64,6 +65,7 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b) {
 	length = b.length;
 	channels = b.channels;
 	c = std::move(b.c);
+	compressed = b.compressed;
 }
 
 void AudioBuffer::__init__() {
@@ -81,7 +83,7 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 	channels = b.channels;
 	c = b.c;
 	peaks = b.peaks;
-	//compressed = b.compressed.get();
+	compressed = b.compressed;
 }
 
 void AudioBuffer::operator=(AudioBuffer &&b) {
@@ -91,8 +93,7 @@ void AudioBuffer::operator=(AudioBuffer &&b) {
 	channels = b.channels;
 	c = std::move(b.c);
 	peaks = std::move(b.peaks);
-	// TODO
-	//compressed = std::move(b.compressed);
+	compressed = b.compressed;
 }
 
 AudioBuffer::~AudioBuffer() {}
@@ -186,7 +187,7 @@ void AudioBuffer::swap_ref(AudioBuffer &b) {
 	std::swap(channels, b.channels);
 
 	// TODO
-	//std::swap(compressed, b.compressed);
+	std::swap(compressed, b.compressed);
 }
 
 void AudioBuffer::append(const AudioBuffer &b) {

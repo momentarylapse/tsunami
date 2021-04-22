@@ -83,11 +83,11 @@ public:
 	void _truncate_peaks(int length);
 
 
-	struct Compressed {
+	struct Compressed : Sharable<Empty> {
 		bytes data;
 		string codec;
 	};
-	owned<Compressed> compressed;
+	shared<Compressed> compressed;
 	bool has_compressed() const;
 	void invalidate_compressed();
 };

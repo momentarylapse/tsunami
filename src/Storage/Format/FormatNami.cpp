@@ -96,7 +96,7 @@ public:
 		f->write_int(me->sample_rate);
 		f->write_int((int)me->default_format);
 		f->write_int(2); // channels
-		f->write_int(me->compression);
+		f->write_int(0); // compression (deprecated)
 		f->write_int(0); // reserved
 		f->write_int(0);
 		f->write_int(0);
@@ -227,94 +227,10 @@ public:
 };
 
 #if HAS_LIB_FLAC == 0
-
-string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p) {
-	return "";
-}
-
 void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p) {
 }
 
 #else
-
-FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data) {
-	string *data = (string*)client_data;
-	for (unsigned int i=0; i<bytes; i++)
-		data->add(buffer[i]);
-
-	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
-}
-
-// TODO: allow mono...
-string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p) {
-	string data;
-
-
-	bool ok = true;
-	FLAC__StreamEncoderInitStatus init_status;
-
-	int channels = 2;
-	int bits = min(format_get_bits(song->default_format), 24);
-	float scale = pow(2.0f, bits-1);
-
-	// allocate the encoder
-	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
-	if (!encoder) {
-		p->error("flac: allocating encoder");
-		return "";
-	}
-
-	ok &= FLAC__stream_encoder_set_verify(encoder, true);
-	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
-	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, DEFAULT_SAMPLE_RATE); // we don't really care...
-	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.length);
-
-	// initialize encoder
-	if (ok) {
-		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, nullptr, nullptr, nullptr, (void*)&data);
-		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK) {
-			p->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
-			ok = false;
-		}
-	}
-
-	// read blocks of samples from WAVE file and feed to encoder
-	if (ok) {
-		FLAC__int32 *flac_pcm = new FLAC__int32 [CHUNK_SAMPLES/*samples*/ * 2/*channels*/];
-
-		int p0 = 0;
-		size_t left = (size_t)b.length;
-		while (ok and left) {
-			size_t need = (left > CHUNK_SAMPLES ? (size_t)CHUNK_SAMPLES : (size_t)left);
-			{
-				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-				for (unsigned int i=0;i<need;i++) {
-					flac_pcm[i * 2 + 0] = (int)(b.c[0][p0 + i] * scale);
-					flac_pcm[i * 2 + 1] = (int)(b.c[1][p0 + i] * scale);
-				}
-				/* feed samples to encoder */
-				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
-			}
-			left -= need;
-			p0 += CHUNK_SAMPLES;
-		}
-
-		delete[] flac_pcm;
-	}
-
-	ok &= FLAC__stream_encoder_finish(encoder);
-
-	if (!ok) {
-		p->error("flac: encoding: FAILED");
-		p->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
-	}
-
-	FLAC__stream_encoder_delete(encoder);
-
-	return data;
-}
 
 struct UncompressData {
 	AudioBuffer *buf;
@@ -532,15 +448,8 @@ public:
 		f->write_int(format_get_bits(song->default_format));
 
 		string data;
-		if (song->compression == 0) {
-			if (!me->exports(data, me->channels, song->default_format))
-				warn(_("Amplitude too large, signal distorted."));
-		}else{
-
-			int uncompressed_size = me->length * me->channels * format_get_bits(song->default_format) / 8;
-			data = compress_buffer(*me, song, this);
-			cur_op(this)->session->i(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
-		}
+		if (!me->exports(data, me->channels, song->default_format))
+			warn(_("Amplitude too large, signal distorted."));
 		f->write_buffer(data);
 	}
 };

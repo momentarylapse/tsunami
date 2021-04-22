@@ -44,7 +44,6 @@ SongConsole::SongConsole(Session *session) :
 
 	event("samplerate", [=]{ on_samplerate(); });
 	event("format", [=]{ on_format(); });
-	event("compress", [=]{ on_compression(); });
 	event_x("tags", "hui:change", [=]{ on_tags_edit(); });
 	event_x("tags", "hui:right-button-down", [=]{ on_tags_right_click(); });
 	event("tag-add", [=]{ on_tag_add(); });
@@ -78,7 +77,6 @@ void SongConsole::load_data() {
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		if (song->default_format == POSSIBLE_FORMATS[i])
 			set_int("format", i);
-	check("compress", song->compression > 0);
 }
 
 void SongConsole::on_samplerate() {
@@ -89,10 +87,6 @@ void SongConsole::on_format() {
 	int i = get_int("");
 	if (i >= 0)
 		song->set_default_format(POSSIBLE_FORMATS[i]);
-}
-
-void SongConsole::on_compression() {
-	song->set_compression(is_checked("") ? 1 : 0);
 }
 
 void SongConsole::on_tags_edit() {

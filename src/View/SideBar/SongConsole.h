@@ -21,7 +21,6 @@ public:
 
 	void on_samplerate();
 	void on_format();
-	void on_compression();
 	void on_track_list();
 	void on_tags_edit();
 	void on_tags_right_click();

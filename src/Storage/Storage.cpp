@@ -306,7 +306,7 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	Path filename = "/tmp/tsunami-compress." + codec;
 	save_via_renderer(bs.port_out[0], filename, buffer.length, {});
 	auto data = FileRead(filename);
-	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 4 * buffer.channels)));
+	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 2 * buffer.channels)));
 	file_delete(filename);
 	return data;
 }

@@ -6561,23 +6561,11 @@ right,disabled
 0
 1
 0
-Grid
-?
-
-1
-1
-2
 ComboBox
 format
 expandx,expandx
-0
-0
-0
-CheckBox
-compress
-
 1
-0
+1
 0
 Group
 ad_t_tags
@@ -7276,7 +7264,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-613
+612
 # Text
 /bars-add
 Add bars...
@@ -8943,9 +8931,6 @@ Samplerate
 song_dialog/ad_t_tags
 Tags
 
-song_dialog/compress
-Compression
-When saving. EXPERIMENTAL! (don't use!)
 song_dialog/end
 
 Position of the last audio chunk/midi note

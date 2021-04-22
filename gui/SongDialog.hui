@@ -19,9 +19,7 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 				ComboBox samplerate "" expandx editable "tooltip=How many samples to play per second. This only affects playback, audio data will not be altered to correct the resulting pitch change!"
 				---|
 				Label ad_t_format "Format" right disabled
-				Grid ? ""
-					ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
-					CheckBox compress "Compression" "tooltip=When saving. EXPERIMENTAL! (don\'t use!)"
+				ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
 		Group ad_t_tags "Tags"
 			ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
 		Group ad_t_edit "Edit"

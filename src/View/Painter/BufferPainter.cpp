@@ -133,6 +133,12 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 	double view_pos_rel = view->cam.screen2sample(0);
 	c->set_antialiasing(view->antialiasing);
 
+	if (b.has_compressed()) {
+		c->set_color(Red);
+		c->set_font_size(8);
+		c->draw_str((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, "compressed:" + b.compressed->codec);
+	}
+
 	//float w = area.width();
 	float h = area.height();
 	float hf = h / (2 * b.channels);

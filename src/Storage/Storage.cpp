@@ -298,3 +298,21 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 	session->e(_("unknown file extension: ") + ext);
 	return nullptr;
 }
+
+#include "../Module/Audio/BufferStreamer.h"
+
+bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
+	BufferStreamer bs(&buffer);
+	Path filename = "/tmp/tsunami-compress." + codec;
+	save_via_renderer(bs.port_out[0], filename, buffer.length, {});
+	auto data = FileRead(filename);
+	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 4 * buffer.channels)));
+	file_delete(filename);
+	return data;
+}
+
+void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
+	Path filename = "/tmp/tsunami-compress." + codec;
+	FileWrite(filename, data);
+	load_buffer(&buffer, filename);
+}

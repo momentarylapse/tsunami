@@ -57,6 +57,9 @@ public:
 	static string options_out;
 
 	Session *session;
+
+	bytes compress(AudioBuffer &buffer, const string &codec);
+	void decompress(AudioBuffer &buffer, const string &codec, const bytes &data);
 };
 
 #endif /* STORAGE_H_ */

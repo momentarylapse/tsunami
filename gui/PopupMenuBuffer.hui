@@ -2,6 +2,7 @@ Menu popup-menu-buffer ""
 	Item header "Audio buffer" disabled
 	Separator
 	Item /buffer-make-movable "Make movable"
+	Item /buffer-compress "Compress..."
 	Item /buffer-delete "Delete"
 	Separator
 	Item /track-add-marker "Add marker"

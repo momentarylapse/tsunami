@@ -3757,7 +3757,7 @@ popup-menu-buffer
 
 0
 0
-9
+10
 Item
 header
 disabled
@@ -3777,27 +3777,33 @@ buffer-make-movable
 0
 0
 Item
-buffer-delete
+buffer-compress
 
 3
+0
+0
+Item
+buffer-delete
+
+4
 0
 0
 Separator
 
 
-4
+5
 0
 0
 Item
 track-add-marker
 
-5
+6
 0
 0
 Menu
 menu-version
 
-6
+7
 0
 7
 Item
@@ -3845,7 +3851,7 @@ checkable
 Menu
 menu-track
 
-7
+8
 0
 8
 Item
@@ -3947,7 +3953,7 @@ track-properties
 Menu
 menu-song
 
-8
+9
 0
 4
 Menu
@@ -7270,7 +7276,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-612
+613
 # Text
 /bars-add
 Add bars...
@@ -7287,6 +7293,9 @@ Edit...
 /bars-scale
 Scale
 scale selected bars (by moving the selection on the left)
+/buffer-compress
+Compress...
+
 /buffer-delete
 Delete
 

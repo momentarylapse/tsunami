@@ -6,6 +6,7 @@
  */
 
 #include "FormatNami.h"
+#include "../Storage.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../lib/file/file.h"
@@ -317,7 +318,7 @@ string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p) {
 
 struct UncompressData {
 	AudioBuffer *buf;
-	string *data;
+	bytes *data;
 	int sample_offset;
 	int byte_offset;
 	int bits;
@@ -325,7 +326,7 @@ struct UncompressData {
 };
 
 void FlacUncompressMetaCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data) {
-	UncompressData *d = (UncompressData*)client_data;
+	auto d = (UncompressData*)client_data;
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO) {
 		d->bits = metadata->data.stream_info.bits_per_sample;
 		d->channels = metadata->data.stream_info.channels;
@@ -366,7 +367,7 @@ static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__Stream
 	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p) {
+void uncompress_buffer(AudioBuffer &b, bytes &data, FileChunkBasic *p) {
 	bool ok = true;
 
 	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
@@ -421,10 +422,25 @@ public:
 		me->channels = f->read_int();
 		int bits = f->read_int(); // bit (16)
 
-		string data;
 
-		int bytes = context->layers.back().size - 16;
-		data.resize(bytes);//num * (bits / 8) * channels);
+		bytes data;
+
+		if (bits == 0) {
+			msg_write("read compressed...");
+			auto com = new AudioBuffer::Compressed;
+			com->codec = f->read_str();
+			int n = f->read_int();
+			data.resize(n);
+			f->read_buffer(data);
+			cur_op(this)->session->storage->decompress(*me, com->codec, data);
+			me->compressed = com;
+			return;
+		}
+
+		// TODO get rid of all (old-style) compressed files!
+
+		int num_bytes = context->layers.back().size - 16;
+		data.resize(num_bytes);//num * (bits / 8) * channels);
 
 		// read chunk'ed
 		int offset = 0;
@@ -452,19 +468,18 @@ public:
 		f->write_int(me->offset);
 		f->write_int(me->length);
 		f->write_int(me->channels);
-		f->write_int(format_get_bits(song->default_format));
-
-		string data;
-		if (song->compression == 0) {
+		if (me->has_compressed()) {
+			f->write_int(0);
+			f->write_str(me->compressed->codec);
+			f->write_int(me->compressed->data.num);
+			f->write_buffer(me->compressed->data);
+		} else {
+			f->write_int(format_get_bits(song->default_format));
+			bytes data;
 			if (!me->exports(data, me->channels, song->default_format))
 				warn(_("Amplitude too large, signal distorted."));
-		}else{
-
-			int uncompressed_size = me->length * me->channels * format_get_bits(song->default_format) / 8;
-			data = compress_buffer(*me, song, this);
-			cur_op(this)->session->i(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+			f->write_buffer(data);
 		}
-		f->write_buffer(data);
 	}
 };
 
@@ -501,7 +516,6 @@ public:
 
 		Song *song = (Song*)root->base->get();
 		if (song->compression > 0) {
-			//throw Exception("can't read compressed nami files yet");
 			uncompress_buffer(*me, data, this);
 
 		}else{

@@ -222,7 +222,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 	c->set_color(cc);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
-	int l = view->prefered_buffer_layer * 4;
+	int l = view->prefered_buffer_layer * 2 * b.channels;
 	if (l >= 0) {
 		double bzf = view->buffer_zoom_factor;
 

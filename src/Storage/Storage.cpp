@@ -304,7 +304,11 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	BufferStreamer bs(&buffer);
 	Path filename = "/tmp/tsunami-compress." + codec;
+
+	auto dir0 = this->current_directory;
 	save_via_renderer(bs.port_out[0], filename, buffer.length, {});
+	current_directory = dir0;
+
 	auto data = FileRead(filename);
 	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 2 * buffer.channels)));
 	file_delete(filename);
@@ -314,5 +318,8 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
 	Path filename = "/tmp/tsunami-compress." + codec;
 	FileWrite(filename, data);
+
+	auto dir0 = this->current_directory;
 	load_buffer(&buffer, filename);
+	current_directory = dir0;
 }

@@ -141,18 +141,20 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		dlg->run();
 		if (dlg->codec == "")
 			return;
-		foreachi (auto &buf, view->cur_layer()->buffers, i)
-			if (buf.range().is_inside(view->hover_before_leave.pos)) {
-				auto comp = new AudioBuffer::Compressed;
-				comp->codec = dlg->codec;
-				comp->data = session->storage->compress(buf, comp->codec);
-				if (comp->data.num > 0) {
-					buf.compressed = comp;
-					view->cur_layer()->notify();
-				} else {
-					delete comp;
-				}
-			}
+		for (auto l: song->layers())
+			if (view->sel.has(l))
+				for (auto &buf: l->buffers)
+					if (buf.range().overlaps(view->sel.range())) {
+						auto comp = new AudioBuffer::Compressed;
+						comp->codec = dlg->codec;
+						comp->data = session->storage->compress(buf, comp->codec);
+						if (comp->data.num > 0) {
+							buf.compressed = comp;
+							l->notify();
+						} else {
+							delete comp;
+						}
+					}
 	});
 
 	event("edit-track-groups", [=]{ auto *dlg = new TrackRoutingDialog(this, song); dlg->run(); delete dlg; });
@@ -535,12 +537,17 @@ void TsunamiWindow::on_buffer_delete() {
 }
 
 void TsunamiWindow::on_buffer_make_movable() {
-	for (auto &buf: view->cur_layer()->buffers) {
-		if (buf.range().is_inside(view->hover_before_leave.pos)) {
-			auto s = SongSelection::from_range(song, buf.range()).filter({view->cur_layer()}).filter(0);
-			song->create_samples_from_selection(s, true);
+	for (auto l: song->layers())
+		if (view->sel.has(l)) {
+			Array<Range> ranges;
+			for (auto &buf: l->buffers)
+				if (buf.range().overlaps(view->sel.range()))
+					ranges.add(buf.range());
+			for (auto &r: ranges) {
+				auto s = SongSelection::from_range(song, r).filter({l}).filter(0);
+				song->create_samples_from_selection(s, true);
+			}
 		}
-	}
 }
 
 void TsunamiWindow::on_layer_midi_mode_linear() {

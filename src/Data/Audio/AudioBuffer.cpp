@@ -81,6 +81,7 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 	channels = b.channels;
 	c = b.c;
 	peaks = b.peaks;
+	//compressed = b.compressed.get();
 }
 
 void AudioBuffer::operator=(AudioBuffer &&b) {
@@ -90,6 +91,8 @@ void AudioBuffer::operator=(AudioBuffer &&b) {
 	channels = b.channels;
 	c = std::move(b.c);
 	peaks = std::move(b.peaks);
+	// TODO
+	//compressed = std::move(b.compressed);
 }
 
 AudioBuffer::~AudioBuffer() {}
@@ -99,12 +102,14 @@ void AudioBuffer::clear() {
 		cc.clear();
 	length = 0;
 	peaks.clear();
+	invalidate_compressed();
 }
 
 void AudioBuffer::set_zero() {
 	for (auto &cc: c)
 		memset(&cc[0], 0, sizeof(float) * length);
 	peaks.clear();
+	invalidate_compressed();
 }
 
 void AudioBuffer::set_channels(int new_channels) {
@@ -122,6 +127,7 @@ void AudioBuffer::set_channels(int new_channels) {
 		c[i].resize(length);
 
 	peaks.clear();
+	invalidate_compressed();
 }
 
 void AudioBuffer::_truncate_peaks(int _length) {
@@ -146,6 +152,7 @@ void AudioBuffer::resize(int _length) {
 	for (auto &cc: c)
 		cc.resize(_length);
 	length = _length;
+	invalidate_compressed();
 }
 
 bool AudioBuffer::is_ref() const
@@ -177,6 +184,9 @@ void AudioBuffer::swap_ref(AudioBuffer &b) {
 	std::swap(length, b.length);
 	std::swap(offset, b.offset);
 	std::swap(channels, b.channels);
+
+	// TODO
+	//std::swap(compressed, b.compressed);
 }
 
 void AudioBuffer::append(const AudioBuffer &b) {
@@ -199,6 +209,7 @@ void AudioBuffer::swap_value(AudioBuffer &b) {
 		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
+	invalidate_compressed();
 }
 
 // mixing a mono track will scale by (1,1) in the center
@@ -242,6 +253,7 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 	}
 
 	peaks.clear();
+	invalidate_compressed();
 }
 
 
@@ -266,6 +278,7 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume) {
 		}
 	}
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
+	invalidate_compressed();
 }
 
 // offsets must be valid!
@@ -431,6 +444,8 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 				c[1][i] = c[0][i];
 		}
 	}
+	peaks.clear();
+	invalidate_compressed();
 }
 
 
@@ -598,6 +613,8 @@ void AudioBuffer::deinterleave(const float *p, int source_channels) {
 		}
 
 	}
+	peaks.clear();
+	invalidate_compressed();
 }
 
 Range AudioBuffer::range() const {
@@ -752,4 +769,12 @@ int AudioBuffer::_update_peaks_prepare() {
 	//_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
 
 	return n;
+}
+
+bool AudioBuffer::has_compressed() const {
+	return compressed.get();
+}
+
+void AudioBuffer::invalidate_compressed() {
+	compressed = nullptr;
 }

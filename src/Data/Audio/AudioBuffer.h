@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_AUDIO_AUDIOBUFFER_H_
 #define SRC_DATA_AUDIO_AUDIOBUFFER_H_
 
+#include "../../lib/base/pointer.h"
 #include "../Range.h"
 #include <shared_mutex>
 
@@ -80,6 +81,15 @@ public:
 	void _update_peaks_chunk(int index);
 	bool _peaks_chunk_needs_update(int index);
 	void _truncate_peaks(int length);
+
+
+	struct Compressed {
+		bytes data;
+		string codec;
+	};
+	owned<Compressed> compressed;
+	bool has_compressed() const;
+	void invalidate_compressed();
 };
 
 #endif /* SRC_AUDIO_AUDIOBUFFER_H_ */

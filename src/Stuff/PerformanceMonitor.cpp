@@ -115,6 +115,12 @@ void PerformanceMonitor::set_name(int channel, const string &name) {
 #endif
 }
 
+string PerformanceMonitor::get_name(int channel) {
+	if (channel < 0 or channel >= channels.num)
+		return "";
+	return channels[channel].name;
+}
+
 void PerformanceMonitor::delete_channel(int channel) {
 	if (channel < 0)
 		return;

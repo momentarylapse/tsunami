@@ -13,7 +13,10 @@
 //namespace scenegraph {
 	class ScrollBar;
 	class ScrollBarHorizontal;
-//}
+namespace scenegraph {
+	class HBox;
+	class VBox;
+}
 
 class ScrollPad;
 
@@ -34,6 +37,8 @@ class ScrollPad : public scenegraph::NodeRel {
 public:
 	ScrollBar *scrollbar_v;
 	ScrollBarHorizontal *scrollbar_h;
+	scenegraph::HBox *hbox;
+	scenegraph::VBox *vbox;
 
 	complex view_pos = complex(0,0);
 	rect content_area = rect::EMPTY;

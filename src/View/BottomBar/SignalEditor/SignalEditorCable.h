@@ -26,5 +26,6 @@ public:
 	//bool on_left_button_down(float mx, float my) override;
 	//bool on_right_button_down(float mx, float my) override;
 	//string get_tip() override;
+	bool hover(float mx, float my) override;
 };
 

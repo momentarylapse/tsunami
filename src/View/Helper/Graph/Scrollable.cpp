@@ -28,8 +28,8 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel(0,0,0,0) {
 	scrollbar_v->constrained = false;
 	scrollbar_h->auto_hide = true;
 	scrollbar_v->auto_hide = true;
-	auto hbox = new scenegraph::HBox();
-	auto vbox = new scenegraph::VBox();
+	hbox = new scenegraph::HBox();
+	vbox = new scenegraph::VBox();
 	vbox->add_child(hbox);
 	vbox->add_child(scrollbar_h);
 	hbox->add_child(scrollbar_v);
@@ -85,7 +85,7 @@ void ScrollPad::_update_scrolling() {
 void ScrollPad::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
 	for (auto c: collect_children(false))
-		if (c != scrollbar_h and c != scrollbar_v) {
+		if (c != scrollbar_h and c != scrollbar_v and c != hbox and c != vbox) {
 			c->area.x1 -= view_pos.x;
 			c->area.x2 -= view_pos.x;
 			c->area.y1 -= view_pos.y;

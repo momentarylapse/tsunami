@@ -36,6 +36,7 @@ public:
 
 	static int create_channel(const string &name, void *p);
 	static void set_name(int channel, const string &name);
+	static string get_name(int channel);
 	static void set_parent(int channel, int parent);
 	static void delete_channel(int channel);
 	static void start_busy(int channel);

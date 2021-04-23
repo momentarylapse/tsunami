@@ -101,12 +101,14 @@ class HBox : public Node {
 public:
 	HBox();
 	void update_geometry_recursive(const rect &target_area) override;
+	bool hover(float mx, float my) override { return false; }
 };
 
 class VBox : public Node {
 public:
 	VBox();
 	void update_geometry_recursive(const rect &target_area) override;
+	bool hover(float mx, float my) override { return false; }
 };
 
 }

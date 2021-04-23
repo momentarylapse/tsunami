@@ -137,7 +137,6 @@ void Node::draw_recursive(Painter *p) {
 	if (clip)
 		p->set_clip(area);
 
-	on_draw(p);
 	auto nodes = weak(children);
 	sort_nodes_up(nodes);
 	for (auto *c: nodes)

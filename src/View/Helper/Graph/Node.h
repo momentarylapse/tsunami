@@ -84,6 +84,8 @@ public:
 	Array<Node*> collect_children_up();
 	Array<Node*> collect_children_down();
 	void request_redraw();
+
+	static bool show_debug;
 };
 
 class NodeFree : public Node {

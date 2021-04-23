@@ -14,6 +14,8 @@
 
 namespace scenegraph {
 
+bool Node::show_debug = false;
+
 
 void sort_nodes_up(Array<Node*> &nodes) {
 	for (int i=0; i<nodes.num; i++)
@@ -136,6 +138,17 @@ void Node::draw_recursive(Painter *p) {
 	rect clip_before = p->clip();
 	if (clip)
 		p->set_clip(area);
+
+	on_draw(p);
+
+	if (show_debug) {
+		p->set_font_size(8);
+		p->set_color(is_cur_hover_non_recursive() ? Red : Green);
+		p->draw_str(area.x1, area.y1, PerformanceMonitor::get_name(perf_channel));
+		p->set_fill(false);
+		p->draw_rect(area);
+		p->set_fill(true);
+	}
 
 	auto nodes = weak(children);
 	sort_nodes_up(nodes);

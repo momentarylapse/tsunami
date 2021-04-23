@@ -22,6 +22,8 @@ SceneGraph::SceneGraph() {
 	my = -1;
 	mdp = new MouseDelayPlanner(this);
 	set_perf_name("graph");
+
+	show_debug = hui::Config.get_bool("scene-graph.debug", false);
 }
 
 void SceneGraph::set_callback_set_current(hui::Callback f) {

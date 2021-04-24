@@ -847,7 +847,7 @@ void AudioView::update_buffer_zoom() {
 
 void _try_set_good_cur_layer(AudioView *v) {
 	for (auto *l: v->vlayers)
-		if (l->layer->track == v->_prev_selection.track()) {
+		if (v->get_track(l->layer->track) == v->_prev_selection.vtrack) {
 			v->session->debug("view", "  -> set by track");
 			v->__set_cur_layer(l);
 			return;
@@ -999,7 +999,15 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
 	return dummy_vlayer.get();
 }
 
+AudioViewTrack *get_vtrack_x(AudioView *v, Track *t) {
+	for (auto vt: v->vtracks)
+		if (vt->track == t)
+			return vt;
+	return nullptr;
+}
+
 void AudioView::update_tracks() {
+
 	Array<AudioViewTrack*> vtrack2;
 	Array<AudioViewLayer*> vlayer2;
 	vtrack2.resize(song->tracks.num);
@@ -1009,15 +1017,15 @@ void AudioView::update_tracks() {
 		bool found = false;
 
 		// find existing
-		foreachi(auto *v, vtracks, vi)
-			if (v) {
+		foreachi(auto *v, vtracks, vi) {
+			if (v)
 				if (v->track == t) {
 					vtrack2[ti] = v;
 					vtracks[vi] = nullptr;
 					found = true;
 					break;
 				}
-			}
+		}
 
 		// new track
 		if (!found) {
@@ -1025,6 +1033,9 @@ void AudioView::update_tracks() {
 			background->add_child(vtrack2[ti]);
 		}
 	}
+	// delete deleted
+	auto vtrack_del = vtracks;
+	vtracks = vtrack2;
 
 
 	int li = 0;
@@ -1046,7 +1057,7 @@ void AudioView::update_tracks() {
 		// new layer
 		if (!found) {
 			vlayer2[li] = new AudioViewLayer(this, l);
-			background->add_child(vlayer2[li]);
+			get_track(l->track)->add_child(vlayer2[li]);
 			sel.add(l);
 		}
 
@@ -1054,9 +1065,7 @@ void AudioView::update_tracks() {
 	}
 
 	// delete deleted
-	auto vtrack_del = vtracks;
 	auto vlayer_del = vlayers;
-	vtracks = vtrack2;
 	vlayers = vlayer2;
 	thm.set_dirty();
 
@@ -1087,18 +1096,19 @@ void AudioView::update_tracks() {
 	}
 
 	hover().node = nullptr;
+	_prev_selection.clear();
 
 	// TODO: detect order change
 	check_consistency();
 	notify(MESSAGE_VTRACK_CHANGE);
 
 
-	for (auto *v: vtrack_del)
-		if (v)
-			background->delete_child(v);
 	for (auto *v: vlayer_del)
 		if (v)
-			background->delete_child(v);
+			v->parent->delete_child(v);
+	for (auto *v: vtrack_del)
+		if (v)
+			v->parent->delete_child(v);
 }
 
 bool need_metro_overlay(Song *song, AudioView *view) {
@@ -1456,7 +1466,7 @@ void AudioView::set_current(const HoverData &h) {
 		force_redraw();
 		notify(MESSAGE_CUR_LAYER_CHANGE);
 	}
-	if (cur_track() != _prev_selection.track()) {
+	if (cur_vtrack() != _prev_selection.vtrack) {
 		notify(MESSAGE_CUR_TRACK_CHANGE);
 	}
 }
@@ -1815,10 +1825,10 @@ void AudioView::toggle_select_track_with_content_in_cursor(AudioViewTrack *t) {
 }
 
 void AudioView::prepare_menu(hui::Menu *menu) {
-	auto *vl = hover().vlayer;
-	auto *vt = hover().vtrack;
-	auto *l = hover().layer();
-	auto *t = hover().track();
+	auto vl = hover().vlayer;
+	auto vt = hover().vtrack;
+	auto l = vl ? vl->layer : nullptr;
+	auto t = vt ? vt->track : nullptr;
 	// midi mode
 	if (t) {
 		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);

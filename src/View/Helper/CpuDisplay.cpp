@@ -64,6 +64,7 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 	view = session->view;
 	request_redraw = _request_redraw;
 	show_sleeping = false;
+	show_total = true;
 	scroll_offset = 0;
 
 	dlg = nullptr;

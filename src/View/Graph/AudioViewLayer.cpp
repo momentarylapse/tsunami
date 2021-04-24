@@ -49,7 +49,7 @@ const int PITCH_SHOW_COUNT = 30;
 
 
 int hover_buffer(HoverData &hover) {
-	if (!hover.layer())
+	if (!hover.vlayer)
 		return -1;
 	foreachi (auto &b, hover.layer()->buffers, i)
 		if (b.range().is_inside(hover.pos))
@@ -80,8 +80,7 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 	solo = false;
 	align.dz = 2;
 
-	if (layer)
-		set_perf_name("vlayer");
+	set_perf_name("vlayer");
 
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;

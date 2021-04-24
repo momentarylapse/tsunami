@@ -14,13 +14,11 @@
 
 #include <zlib.h>
 
-int endian_big_to_little(int i)
-{
+int endian_big_to_little(int i) {
 	return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >> 8) | ((i & 0xff000000) >> 24);
 }
 
-int read_int_big_endian(File *f)
-{
+int read_int_big_endian(File *f) {
 	int a = f->read_byte();
 	int b = f->read_byte();
 	int c = f->read_byte();
@@ -29,47 +27,45 @@ int read_int_big_endian(File *f)
 }
 
 
-static unsigned char png_paeth(int a, int b, int c)
-{
+static unsigned char png_paeth(int a, int b, int c) {
   int pa = abs(b - c);
   int pb = abs(a - c);
   int pc = abs(a + b - c - c);
 
-  if ((pc < pa) && (pc < pb))
+  if ((pc < pa) and (pc < pb))
 	  return c;
   if (pb < pa)
 	  return b;
   return a;
 }
 
-void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, int type)
-{
-	if (type == 0){
-	}else if (type == 1){
+void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, int type) {
+	if (type == 0) {
+	} else if (type == 1) {
 		for (int i=stride; i<num; i++)
 			cur[i] = cur[i] + cur[i - stride];
-	}else if (type == 2){
+	} else if (type == 2) {
 		for (int i=0; i<num; i++)
 			cur[i] = cur[i] + prev[i];
-	}else if (type == 3){
+	} else if (type == 3) {
 		for (int i=0; i<stride; i++)
 			cur[i] = cur[i] + prev[i] / 2;
 		for (int i=stride; i<num; i++)
 			cur[i] = cur[i] + (cur[i - stride] + prev[i]) / 2;
-	}else if (type == 4){
+	} else if (type == 4) {
 		for (int i=0; i<stride; i++)
 			cur[i] = cur[i] + prev[i];
 		for (int i=stride; i<num; i++)
 			cur[i] = cur[i] + png_paeth(cur[i - stride], prev[i], prev[i - stride]);
-	}else
+	} else {
 		msg_error("png: unhandled filter type: " + i2s(type));
+	}
 }
 
-void image_load_png(const Path &filename, Image &image)
-{
+void image_load_png(const Path &filename, Image &image) {
 	char buf[8];
 	File *f = nullptr;
-	try{
+	try {
 	f = FileOpen(filename);
 
 	// intro
@@ -79,14 +75,14 @@ void image_load_png(const Path &filename, Image &image)
 
 	int bytes_per_pixel = 1;
 
-	while (!f->end()){
+	while (!f->end()) {
 		// read chunk
 		int size = read_int_big_endian(f);//endian_big_to_little(f->ReadInt());
 		f->read_buffer(buf, 4);
 		string name = string(buf, 4);
 		//msg_write(size);
 		//msg_write("chunk: " + name);
-		if (name == "IHDR"){
+		if (name == "IHDR") {
 			int w = read_int_big_endian(f);
 			int h = read_int_big_endian(f);
 			image.create(w, h, Black);
@@ -95,23 +91,25 @@ void image_load_png(const Path &filename, Image &image)
 			// 0 = gray, 2 = rgb, 6 = rgba
 			if (bits_per_channel != 8)
 				throw string("unhandled bits per channel: " + i2s(bits_per_channel));
-			if (type == 2){
+			if (type == 2) {
 				bytes_per_pixel = 3;
-			}else if (type == 6){
+			} else if (type == 6) {
 				bytes_per_pixel = 4;
 				image.alpha_used = true;
-			}else
+			} else {
 				throw string("unhandled color type: " + i2s(type));
+			}
 
 			f->seek(size - 10);
-		}else if (name == "IDAT"){
+		} else if (name == "IDAT") {
 			int size0 = data.num;
 			data.resize(size0 + size);
 			f->read_buffer(&data[size0], size);
-		}else if (name == "IEND"){
+		} else if (name == "IEND") {
 			break;
-		}else
+		} else {
 			f->seek(size);
+		}
 		f->read_int(); // crc
 	}
 
@@ -127,16 +125,18 @@ void image_load_png(const Path &filename, Image &image)
 
 	int bytes_per_line = image.width * bytes_per_pixel;
 
-	for (int y=0;y<image.height;y++){
+	for (int y=0; y<image.height; y++) {
 		int i0 = y * (bytes_per_line + 1);
 		int filter_type = dest[i0];
 
 		unsigned char *l_cur = (unsigned char*)&dest[i0 + 1];
 		unsigned char *l_prev = (unsigned char*)&dest[i0 - bytes_per_line];
+		if (i0 == 0)
+			l_prev = l_cur;
 		png_unfilter(l_cur, l_prev, bytes_per_line, bytes_per_pixel, filter_type);
 
 		int i = 0;
-		for (int x=0;x<image.width;x++){
+		for (int x=0; x<image.width; x++) {
 			float r = l_cur[i ++] / 255.0f;
 			float g = l_cur[i ++] / 255.0f;
 			float b = l_cur[i ++] / 255.0f;
@@ -148,8 +148,8 @@ void image_load_png(const Path &filename, Image &image)
 	}
 	FileClose(f);
 
-	}catch(FileError &e){
-	}catch(string &s){
+	} catch(FileError &e) {
+	} catch(string &s) {
 		msg_error("png: " + s);
 		if (f)
 			FileClose(f);
@@ -157,5 +157,5 @@ void image_load_png(const Path &filename, Image &image)
 }
 
 #else
-void image_load_png(const string &filename, Image &image){}
+void image_load_png(const string &filename, Image &image) {}
 #endif

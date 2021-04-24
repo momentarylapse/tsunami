@@ -779,13 +779,13 @@ dev-tab
 3
 ListView
 output-list
-format=mmmm,reorderable
+format=mmm,reorderable
 0
 0
 0
 ListView
 input-list
-format=mmmm,reorderable
+format=mmm,reorderable
 1
 0
 0
@@ -7808,13 +7808,13 @@ device-manager/dev-tab
 Output\\Input\\Midi Input
 
 device-manager/input-list
-#\\status\\name\\info
+#\\\\Device
 drag and drop to change order of preference\nright click to ignore or delete
 device-manager/midi-input-list
-#\\status\\name
+#\\\\Device
 drag and drop to change order of preference\nright click to ignore or delete
 device-manager/output-list
-#\\status\\name\\info
+#\\\\Device
 drag and drop to change order of preference\nright click to ignore or delete
 dummy-editor/dummy-editor
 Editing

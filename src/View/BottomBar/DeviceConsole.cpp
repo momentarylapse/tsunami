@@ -72,19 +72,23 @@ string DeviceConsole::to_format(const Device *d) {
 		pre = "<b>";
 		post = "</b>";
 	}
-	string status = pre + (d->present ? "<big>✔</big>" : "<big>✘</big> <small>(missing)</small>") + post;
-	string index = i2s(fav_index(d) + 1);
+	string status_icon = pre + (d->present ? "<big>✔</big>" : "<big>✘</big>") + post;
+	string index = i2s(fav_index(d) + 1) + "   ";
 	if (!d->visible)
-		index = "<small>(ignored)</small>";
+		index = "";
 	index = pre + index + post;
 	string name = pre + shorten(d->get_name(), 64) + post;
-	if (d->type == DeviceType::AUDIO_OUTPUT or d->type == DeviceType::AUDIO_INPUT) {
-		string info = pre + format("%d channels", d->channels) + post;
-		return format("%s\\%s\\%s\\%s", index, status, name, info);
-	} else if (d->type == DeviceType::MIDI_INPUT) {
-		return format("%s\\%s\\%s", index, status, name);
-	}
-	return "";
+	Array<string> infos;
+	if (d == session->device_manager->choose_device(d->type))
+		infos.add("preferred");
+	if (!d->present)
+		infos.add("missing");
+	if (!d->visible)
+		infos.add("ignored");
+	if (d->type == DeviceType::AUDIO_OUTPUT or d->type == DeviceType::AUDIO_INPUT)
+		infos.add(format("%d channels", d->channels));
+	string info = pre + implode(infos, ", ") + post;
+	return format("%s\\%s\\%s\n<small>    %s</small>", index, status_icon, name, info);
 }
 
 int DeviceConsole::fav_index(const Device *d) {

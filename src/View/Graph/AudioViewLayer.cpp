@@ -80,11 +80,6 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 	solo = false;
 	align.dz = 2;
 
-	/*perf_channel = -1;
-	if (layer) {
-		perf_channel = PerformanceMonitor::create_channel("layer", this);
-		PerformanceMonitor::set_parent(perf_channel, view->perf_channel);
-	}*/
 	if (layer)
 		set_perf_name("vlayer");
 
@@ -110,8 +105,6 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 AudioViewLayer::~AudioViewLayer() {
 	if (layer)
 		layer->track->unsubscribe(this);
-	//if (perf_channel >= 0)
-	//	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioViewLayer::on_layer_change() {

@@ -315,8 +315,8 @@ public:
 	owned<BufferPainter> buffer_painter;
 	owned<GridPainter> grid_painter;
 
-	Array<AudioViewTrack*> vtrack;
-	Array<AudioViewLayer*> vlayer;
+	Array<AudioViewTrack*> vtracks;
+	Array<AudioViewLayer*> vlayers;
 	AudioViewLayer *metronome_overlay_vlayer;
 	shared<AudioViewTrack> dummy_vtrack;
 	shared<AudioViewLayer> dummy_vlayer;

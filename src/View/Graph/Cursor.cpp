@@ -29,7 +29,7 @@ void Cursor::on_draw(Painter* c) {
 		float r = 4;
 		c->set_line_width(4);
 		c->set_color(col);//view->colors.selection_boundary);
-		for (auto *v: view->vlayer)
+		for (auto *v: view->vlayers)
 			if (view->sel.has(v->layer)) {
 				c->draw_line(x - r, v->area.y1, x + r, v->area.y1);
 				c->draw_line(x, v->area.y1, x, v->area.y2);
@@ -87,7 +87,7 @@ void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color
 	float x2 = view->cam.sample2screen(view->song->bar_offset(bar_gap));
 	p->set_color(col);
 	p->set_line_width(2.5f);
-	for (auto *t: view->vlayer)
+	for (auto *t: view->vlayers)
 		if (t->layer->type == SignalType::BEATS) {
 			p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
 			p->draw_line(x2, t->area.y1, x2, t->area.y2);

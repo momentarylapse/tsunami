@@ -439,9 +439,9 @@ void MixingConsole::load_data() {
 	foreachi (auto &m, mixer, i) {
 		if (!m->vtrack)
 			break;
-		if (i >= view->vtrack.num)
+		if (i >= view->vtracks.num)
 			break;
-		if (m->vtrack != view->vtrack[i])
+		if (m->vtrack != view->vtracks[i])
 			break;
 		n_ok ++;
 	}
@@ -452,9 +452,9 @@ void MixingConsole::load_data() {
 	mixer.resize(n_ok);
 
 	// add new
-	foreachi(auto *t, view->vtrack, i) {
+	foreachi(auto *t, view->vtracks, i) {
 		if (i >= n_ok) {
-			TrackMixer *m = new TrackMixer(t, this);
+			auto m = new TrackMixer(t, this);
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
 			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));

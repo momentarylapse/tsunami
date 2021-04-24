@@ -648,7 +648,7 @@ void AudioView::on_left_double_click() {
 
 AudioViewLayer *AudioView::next_layer(AudioViewLayer *ll) {
 	bool found = false;
-	for (auto *l: vlayer) {
+	for (auto *l: vlayers) {
 		if (found and !l->hidden)
 			return l;
 		if (l == ll)
@@ -658,7 +658,7 @@ AudioViewLayer *AudioView::next_layer(AudioViewLayer *ll) {
 }
 AudioViewLayer *AudioView::prev_layer(AudioViewLayer *ll) {
 	AudioViewLayer *prev = nullptr;
-	for (auto *l: vlayer) {
+	for (auto *l: vlayers) {
 		if (l == ll and prev)
 			return prev;
 		if (!l->hidden)
@@ -702,22 +702,22 @@ void AudioView::toggle_track_mute() {
 
 void AudioView::toggle_track_solo() {
 	if (cur_vtrack()->solo) {
-		for (auto *vt: vtrack)
+		for (auto *vt: vtracks)
 			vt->set_solo(false);
 	} else {
-		for (auto *vt: vtrack)
+		for (auto *vt: vtracks)
 			vt->set_solo(sel.has(vt->track));
 	}
 }
 
 void AudioView::toggle_layer_mute() {
 	bool any_unmuted = false;
-	for (auto *l: vlayer)
+	for (auto *l: vlayers)
 		if (sel.has(l->layer) and !l->layer->muted)
 			any_unmuted = true;
 
 	song->begin_action_group();
-	for (auto *l: vlayer)
+	for (auto *l: vlayers)
 		if (sel.has(l->layer))
 			l->layer->set_muted(any_unmuted);
 	song->end_action_group();
@@ -725,17 +725,17 @@ void AudioView::toggle_layer_mute() {
 
 void AudioView::toggle_layer_solo() {
 	bool any_solo = false;
-	for (auto *l: vlayer)
+	for (auto *l: vlayers)
 		if (sel.has(l->layer) and l->solo)
 			any_solo = true;
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (sel.has(t->track)) {
 			if (any_solo) {
-				for (auto *l: vlayer)
+				for (auto *l: vlayers)
 					if (l->track() == t->track)
 						l->set_solo(false);
 			} else {
-				for (auto *l: vlayer)
+				for (auto *l: vlayers)
 					if (l->track() == t->track)
 						l->set_solo(sel.has(l->layer));
 			}
@@ -744,11 +744,11 @@ void AudioView::toggle_layer_solo() {
 
 void AudioView::toggle_track_exploded() {
 	bool any_imploded = false;
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (sel.has(t->track) and t->imploded and t->track->layers.num > 0)
 			any_imploded = true;
 
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (sel.has(t->track) and t->track->layers.num > 0) {
 			if (any_imploded)
 				explode_track(t->track);
@@ -846,15 +846,15 @@ void AudioView::update_buffer_zoom() {
 }
 
 void _try_set_good_cur_layer(AudioView *v) {
-	for (auto *l: v->vlayer)
+	for (auto *l: v->vlayers)
 		if (l->layer->track == v->_prev_selection.track()) {
 			v->session->debug("view", "  -> set by track");
 			v->__set_cur_layer(l);
 			return;
 		}
-	if (v->vlayer.num > 0) {
+	if (v->vlayers.num > 0) {
 		v->session->debug("view", "  -> set first layer");
-		v->__set_cur_layer(v->vlayer[0]);
+		v->__set_cur_layer(v->vlayers[0]);
 	} else {
 		v->session->debug("view", "....no vlayers");
 	}
@@ -863,28 +863,28 @@ void _try_set_good_cur_layer(AudioView *v) {
 void AudioView::check_consistency() {
 
 	// cur_vlayer = null
-	if (!cur_vlayer() and (vlayer.num > 0)) {
+	if (!cur_vlayer() and (vlayers.num > 0)) {
 		session->debug("view", "cur_vlayer = nil");
 		//msg_write(msg_get_trace());
 		session->debug("view", "  -> setting first");
-		__set_cur_layer(vlayer[0]);
+		__set_cur_layer(vlayers[0]);
 	}
 
 	// cur_vlayer illegal?
-	if (cur_vlayer() and (vlayer.find(cur_vlayer()) < 0)) {
+	if (cur_vlayer() and (vlayers.find(cur_vlayer()) < 0)) {
 		session->debug("view", "cur_vlayer illegal...");
 		//msg_write(msg_get_trace());
 		_try_set_good_cur_layer(this);
 	}
 
 	// illegal midi mode?
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if ((t->midi_mode() == MidiMode::TAB) and (t->track->instrument.string_pitch.num == 0))
 			t->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void AudioView::implode_track(Track *t) {
-	for (auto *l: vlayer)
+	for (auto *l: vlayers)
 		if (l->layer->track == t) {
 			l->represents_imploded = l->layer->is_main();
 			l->hidden = !l->layer->is_main();
@@ -895,7 +895,7 @@ void AudioView::implode_track(Track *t) {
 }
 
 void AudioView::explode_track(Track *t) {
-	for (auto *l: vlayer)
+	for (auto *l: vlayers)
 		if (l->layer->track == t) {
 			l->represents_imploded = false;
 			l->hidden = false;
@@ -919,8 +919,8 @@ void AudioView::on_song_new() {
 
 void AudioView::on_song_finished_loading() {
 	session->debug("view", "------finish loading");
-	if ((vlayer.num >= 12) and (vtrack.num >= 2)) {
-		for (auto *t: vtrack)
+	if ((vlayers.num >= 12) and (vtracks.num >= 2)) {
+		for (auto *t: vtracks)
 			if (t->track->layers.num > 1)
 				implode_track(t->track);
 	}
@@ -980,7 +980,7 @@ void AudioView::update_peaks_now(AudioBuffer &buf) {
 }
 
 AudioViewTrack *AudioView::get_track(Track *track) {
-	for (auto t: vtrack) {
+	for (auto t: vtracks) {
 		if (t->track == track)
 			return t;
 	}
@@ -988,7 +988,7 @@ AudioViewTrack *AudioView::get_track(Track *track) {
 }
 
 AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
-	for (auto l: vlayer) {
+	for (auto l: vlayers) {
 		if (l->layer == layer)
 			return l;
 	}
@@ -1009,11 +1009,11 @@ void AudioView::update_tracks() {
 		bool found = false;
 
 		// find existing
-		foreachi(auto *v, vtrack, vi)
+		foreachi(auto *v, vtracks, vi)
 			if (v) {
 				if (v->track == t) {
 					vtrack2[ti] = v;
-					vtrack[vi] = nullptr;
+					vtracks[vi] = nullptr;
 					found = true;
 					break;
 				}
@@ -1026,17 +1026,18 @@ void AudioView::update_tracks() {
 		}
 	}
 
+
 	int li = 0;
-	for (TrackLayer *l: song->layers()) {
+	for (auto l: song->layers()) {
 
 		bool found = false;
 
 		// find existing
-		foreachi(auto *v, vlayer, vi)
+		foreachi(auto *v, vlayers, vi)
 			if (v) {
 				if (v->layer == l) {
 					vlayer2[li] = v;
-					vlayer[vi] = nullptr;
+					vlayers[vi] = nullptr;
 					found = true;
 					break;
 				}
@@ -1053,33 +1054,33 @@ void AudioView::update_tracks() {
 	}
 
 	// delete deleted
-	auto vtrack_del = vtrack;
-	auto vlayer_del = vlayer;
-	vtrack = vtrack2;
-	vlayer = vlayer2;
+	auto vtrack_del = vtracks;
+	auto vlayer_del = vlayers;
+	vtracks = vtrack2;
+	vlayers = vlayer2;
 	thm.set_dirty();
 
 	// guess where to create new tracks
-	foreachi(auto *v, vtrack, i) {
+	foreachi(auto *v, vtracks, i) {
 		if (v->area.height() == 0) {
 			if (i > 0) {
-				v->area = vtrack[i-1]->area;
+				v->area = vtracks[i-1]->area;
 				v->area.y1 = v->area.y2;
-			} else if (vtrack.num > 1) {
-				v->area = vtrack[i+1]->area;
+			} else if (vtracks.num > 1) {
+				v->area = vtracks[i+1]->area;
 				v->area.y2 = v->area.y1;
 			}
 		}
 	}
 
 	// guess where to create new tracks
-	foreachi(auto *v, vlayer, i) {
+	foreachi(auto *v, vlayers, i) {
 		if (v->area.height() == 0) {
 			if (i > 0) {
-				v->area = vlayer[i-1]->area;
+				v->area = vlayers[i-1]->area;
 				v->area.y1 = v->area.y2;
-			} else if (vtrack.num > 1) {
-				v->area = vlayer[i+1]->area;
+			} else if (vtracks.num > 1) {
+				v->area = vlayers[i+1]->area;
 				v->area.y2 = v->area.y1;
 			}
 		}
@@ -1119,7 +1120,7 @@ bool AudioView::update_scene_graph() {
 	scroll_bar_time->set_view_size(cam.range().length);
 	scroll_bar_time->set_content(song->range_with_time());
 
-	for (auto *v: vlayer) {
+	for (auto *v: vlayers) {
 		v->update_header();
 	}
 
@@ -1326,7 +1327,7 @@ void AudioView::request_optimize_view() {
 
 void AudioView::update_menu() {
 	MidiMode common_midi_mode = midi_view_mode;
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (t->track)
 			if ((t->track->type == SignalType::MIDI) and (t->midi_mode_wanted != midi_view_mode))
 				common_midi_mode = MidiMode::DONT_CARE;
@@ -1344,7 +1345,7 @@ void AudioView::update_peaks() {
 void AudioView::set_midi_view_mode(MidiMode mode) {
 	midi_view_mode = mode;
 	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		t->set_midi_mode(mode);
 	//forceRedraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
@@ -1469,7 +1470,7 @@ Track *AudioView::cur_track() {
 }
 
 AudioViewTrack *AudioView::cur_vtrack() {
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (t->track == cur_track())
 			return t;
 	return nullptr;
@@ -1617,7 +1618,7 @@ void AudioView::playback_click() {
 }
 
 bool AudioView::has_any_solo_track() {
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (t->solo)
 			return true;
 	return false;
@@ -1627,14 +1628,14 @@ Set<const Track*> AudioView::get_playable_tracks() {
 	Set<const Track*> tracks;
 	auto prevented = mode->prevent_playback();
 	bool any_solo = has_any_solo_track();
-	for (auto *t: vtrack)
+	for (auto *t: vtracks)
 		if (!t->track->muted and (t->solo or !any_solo) and !prevented.contains(t->track))
 			tracks.add(t->track);
 	return tracks;
 }
 
 bool AudioView::has_any_solo_layer(Track *t) {
-	for (auto *v: vlayer)
+	for (auto *v: vlayers)
 		if (v->solo and (v->layer->track == t))
 			return true;
 	return false;
@@ -1648,7 +1649,7 @@ Set<const TrackLayer*> AudioView::get_playable_layers() {
 		if (!tracks.contains(t))
 			continue;
 		bool any_solo = has_any_solo_layer(t);
-		for (auto *l: vlayer)
+		for (auto *l: vlayers)
 			if ((l->layer->track == t) and (l->solo or !any_solo) and !l->layer->muted)
 				layers.add(l->layer);
 	}

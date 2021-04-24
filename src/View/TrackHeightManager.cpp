@@ -45,10 +45,10 @@ float smooth_parametrization(float t) {
 }
 
 void set_track_areas_from_layers(AudioView *view) {
-	for (auto *v: view->vtrack) {
+	for (auto *v: view->vtracks) {
 		bool first = true;
 
-		for (auto *l: view->vlayer) {
+		for (auto *l: view->vlayers) {
 			if (l->layer->track != v->track)
 				continue;
 
@@ -71,7 +71,7 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r) {
 		animating = true;
 		_dirty = false;
 
-		for (auto *v: view->vlayer)
+		for (auto *v: view->vlayers)
 			v->area_last = v->area;
 	}
 
@@ -81,13 +81,13 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r) {
 
 		// instant change?
 		if (!animating) {
-			for (auto *v: view->vlayer)
+			for (auto *v: view->vlayers)
 				v->area = v->area_target;
 		}
 	}
 
 	// force instant changes on x-axis
-	for (auto *v: view->vlayer) {
+	for (auto *v: view->vlayers) {
 		v->area.x1 = v->area_target.x1 = v->area_last.x1 = r.x1;
 		v->area.x2 = v->area_target.x2 = v->area_last.x2 = r.x2;
 	}
@@ -103,7 +103,7 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r) {
 		t = 1;
 		animating = false;
 	}
-	for (auto *v: view->vlayer) {
+	for (auto *v: view->vlayers) {
 		v->area = rect_inter(v->area_last, v->area_target, smooth_parametrization(t));
 		v->align.w = v->area.width();
 		v->align.h = v->area.height();
@@ -119,14 +119,14 @@ void TrackHeightManager::update_immediately(AudioView *view, Song *a, const rect
 	animating = false;
 	_dirty = false;
 
-	for (auto *v : view->vlayer)
+	for (auto *v : view->vlayers)
 		v->area = v->area_target;
 
 	set_track_areas_from_layers(view);
 }
 
 void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r) {
-	for (auto *l: v->vlayer) {
+	for (auto *l: v->vlayers) {
 		l->height = v->mode->layer_suggested_height(l) * v->cam.scale_y;
 		if (l->hidden)
 			l->height = 0;
@@ -134,7 +134,7 @@ void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r) {
 
 	// wanted space
 	float h = 0;
-	for (auto *l: v->vlayer)
+	for (auto *l: v->vlayers)
 		h += l->height;
 
 	// available
@@ -144,7 +144,7 @@ void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r) {
 
 	// distribute
 	float y0 = r.y1 - v->scroll_bar_y->get_view_offset();
-	for (auto *l: v->vlayer) {
+	for (auto *l: v->vlayers) {
 		l->area_target = rect(r.x1, r.x2, y0, y0 + l->height);
 		y0 += l->height;
 	}

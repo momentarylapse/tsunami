@@ -69,11 +69,11 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 
 void Background::on_draw(Painter* c) {
 	int yy = area.y1;
-	if (view->vlayer.num > 0)
-		yy = view->vlayer.back()->area.y2;
+	if (view->vlayers.num > 0)
+		yy = view->vlayers.back()->area.y2;
 
 	// tracks
-	for (auto *l: view->vlayer)
+	for (auto *l: view->vlayers)
 		if (l->on_screen())
 			view->mode->draw_layer_background(c, l);
 
@@ -94,7 +94,7 @@ void Background::on_draw(Painter* c) {
 
 	// lines between tracks
 	AudioViewLayer *prev = nullptr;
-	for (auto *l: view->vlayer) {
+	for (auto *l: view->vlayers) {
 		draw_layer_separator(c, prev, l);
 		prev = l;
 	}

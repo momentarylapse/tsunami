@@ -249,7 +249,7 @@ void ViewModeMidi::on_start() {
 void ViewModeMidi::on_end() {
 	preview = nullptr;
 
-	for (auto *v: view->vlayer)
+	for (auto *v: view->vlayers)
 		v->scroll_bar->hidden = true;
 }
 

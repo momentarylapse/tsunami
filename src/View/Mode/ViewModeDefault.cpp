@@ -303,7 +303,7 @@ void expand_layer_selection(AudioView *view, bool up) {
 	// select only between
 	float y0 = min(vlayer->area.y1, first_layer->area.y1);
 	float y1 = max(vlayer->area.y2, first_layer->area.y2);
-	for (auto *l: view->vlayer)
+	for (auto *l: view->vlayers)
 		view->sel.set(l->layer, l->area.my() > y0 and l->area.my() < y1);
 
 	view->set_current(vlayer->get_hover_data(0,0));
@@ -470,7 +470,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, i
 		y1 = t;
 	}
 
-	for (auto vl: view->vlayer) {
+	for (auto vl: view->vlayers) {
 		TrackLayer *l = vl->layer;
 		if ((y1 < vl->area.y1) or (y0 > vl->area.y2))
 			continue;
@@ -504,7 +504,7 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 		y1 = t;
 	}
 	Set<const TrackLayer*> _layers;
-	for (auto vt: view->vlayer) {
+	for (auto vt: view->vlayers) {
 		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
 			_layers.add(vt->layer);
 	}

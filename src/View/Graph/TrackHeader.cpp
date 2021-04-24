@@ -223,9 +223,9 @@ public:
 		auto *view = track->view;
 		//int orig = get_track_index(moving_track);
 		int t = get_track_move_target(true);
-		int y = view->vtrack.back()->area.y2;
-		if (t < view->vtrack.num)
-			y = view->vtrack[t]->area.y1;
+		int y = view->vtracks.back()->area.y2;
+		if (t < view->vtracks.num)
+			y = view->vtracks[t]->area.y1;
 
 		c->set_color(view->colors.selection_boundary);
 		c->set_line_width(2.0f);
@@ -247,7 +247,7 @@ public:
 	int get_track_move_target(bool visual) {
 		auto *view = track->view;
 		int orig = get_track_index(track->track);
-		foreachi(auto vt, view->vtrack, i) {
+		foreachi(auto vt, view->vtracks, i) {
 			int y = (vt->area.y1 + vt->area.y2) / 2;
 			if (y > view->my) {
 				if (visual or (i <= orig))

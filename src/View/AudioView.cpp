@@ -1293,8 +1293,6 @@ void AudioView::draw_song(Painter *c) {
 		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [=]{ force_redraw(); });
 }
 
-int frame = 0;
-
 void AudioView::on_draw(Painter *c) {
 	PerformanceMonitor::start_busy(perf_channel);
 
@@ -1311,6 +1309,7 @@ void AudioView::on_draw(Painter *c) {
 	if (enabled)
 		draw_song(c);
 
+	static int frame = 0;
 	//c->draw_str(100, 100, i2s(frame++));
 
 	colors = basic_colors;

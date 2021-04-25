@@ -353,11 +353,10 @@ void Window::show_cursor(bool show) {
 #endif
 }
 
-extern int GtkAreaMouseSet;
-extern int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
 // relative to Interior
 void Window::set_cursor_pos(int x, int y) {
+#if 0
 	if (main_input_control) {
 		//msg_write(format("set cursor %d %d  ->  %d %d", (int)input.x, (int)input.y, x, y));
 		GtkAreaMouseSet = 2;
@@ -376,6 +375,7 @@ void Window::set_cursor_pos(int x, int y) {
 		::SetCursorPos(x + r.left, y + r.top);
 #endif
 	}
+#endif
 }
 
 void Window::set_maximized(bool maximized) {

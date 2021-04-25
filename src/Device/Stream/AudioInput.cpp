@@ -148,6 +148,8 @@ int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void 
 				buf.write_ref_done(b);
 			}
 		}
+	} else {
+		hui::RunLater(0.001f, [=] { input->session->w("stream callback error"); });
 	}
 	return 0;
 }
@@ -388,20 +390,27 @@ void AudioInput::_create_dev() {
 
 #if HAS_LIB_PORTAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		session->i("open def stream");
+
+		// on windows, some devices will stutter, due to some mysterious limit of 100 requests/s
+		int chunk_size = 256;
+		chunk_size = _sample_rate / 50; // ~50 requests per second
+		// nah, that doesn't work either:
+		/*paFramesPerBufferUnspecified*/
 
 		if (cur_device->is_default()) {
-			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 2, 0, paFloat32, _sample_rate, 256,
+			session->i(format("open def stream %d  %d", _sample_rate, num_channels));
+			PaError err = Pa_OpenDefaultStream(&portaudio_stream, num_channels, 0, paFloat32, _sample_rate, chunk_size,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
 		} else {
+			session->i(format("open stream %d  %d", _sample_rate, num_channels));
 			PaStreamParameters params;
 			params.channelCount = num_channels;
 			params.sampleFormat = paFloat32;
 			params.device = cur_device->index_in_lib;
 			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, 0,
+			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, chunk_size,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}

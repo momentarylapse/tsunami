@@ -326,7 +326,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	if (channels > 0) {
 		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
 		d->name = dev->name;
-		d->channels = min(channels, 2);
+		d->channels = channels;
 		d->index_in_lib = index;
 		if (type == DeviceType::AUDIO_OUTPUT)
 			d->default_by_lib = (index == Pa_GetDefaultOutputDevice());

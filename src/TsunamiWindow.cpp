@@ -324,7 +324,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 }
 
 void TsunamiCleanUp(Session *session) {
-	foreachi(Session *s, weak(tsunami->sessions), i)
+	auto sessions = weak(tsunami->sessions);
+	foreachi(Session *s, sessions, i)
 		if (s == session and s->auto_delete) {
 			//msg_write("--------Tsunami erase...");
 			tsunami->sessions.erase(i);
@@ -354,7 +355,8 @@ TsunamiWindow::~TsunamiWindow() {
 	delete bottom_bar;
 	delete view;
 
-	hui::RunLater(0.010f, [=]{ TsunamiCleanUp(session); });
+	auto _session = session;
+	hui::RunLater(0.010f, [_session]{ TsunamiCleanUp(_session); });
 }
 
 void TsunamiWindow::on_about() {

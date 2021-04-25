@@ -12,7 +12,7 @@
 #include "Graph/Node.h"
 
 class PeakMeter;
-class PeakMeterData;
+struct PeakMeterData;
 namespace hui {
 	class Panel;
 }

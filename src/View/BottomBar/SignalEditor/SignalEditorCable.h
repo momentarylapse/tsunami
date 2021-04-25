@@ -11,7 +11,7 @@
 
 class SignalEditorTab;
 class Module;
-class Cable;
+struct Cable;
 enum class SignalType;
 
 

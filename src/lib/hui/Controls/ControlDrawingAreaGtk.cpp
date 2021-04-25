@@ -16,9 +16,9 @@
 static std::thread::id main_thread_id = std::this_thread::get_id();
 
 
-#if !GTK_CHECK_VERSION(3,24,0)
+/*#if !GTK_CHECK_VERSION(3,24,0)
 #error gtk >= 3.24 required
-#endif
+#endif*/
 
 #define STUPID_HACK 0
 
@@ -383,6 +383,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 	c->notify(EventID::MOUSE_MOVE, false);
 }
 
+#if GTK_CHECK_VERSION(3,24,0)
 void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	static int nn = 0;
@@ -411,7 +412,6 @@ void on_gtk_motion_leave(GtkEventControllerMotion *controller, gpointer user_dat
 	c->notify(EventID::MOUSE_LEAVE, false);
 }
 
-// gtk 3.24
 void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, double dy, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = (float)dx;
@@ -448,6 +448,7 @@ void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint 
 	c->panel->win->input.key_code = key_code;
 	c->notify(EventID::KEY_UP, false);
 }
+#endif
 
 #if GTK_CHECK_VERSION(4,0,0)
 void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
@@ -503,10 +504,12 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	//mask = GDK_ALL_EVENTS_MASK;
 //	g_object_set(G_OBJECT(da), "events", mask, NULL);
 
+#if GTK_CHECK_VERSION(3,24,0)
 	auto handler_key = gtk_event_controller_key_new(da);
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
 	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_key);
+#endif
 
 #if GTK_CHECK_VERSION(4,0,0)
 	auto gesture_click = gtk_gesture_click_new(da);
@@ -514,6 +517,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, gesture_click);
 #endif
 
+#if GTK_CHECK_VERSION(3,24,0)
 	auto handler_motion = gtk_event_controller_motion_new(da);
 	g_signal_connect(G_OBJECT(handler_motion), "motion", G_CALLBACK(&on_gtk_gesture_motion), this);
 	// somehow getting ignored?
@@ -527,6 +531,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 
 ///	auto handler_drag = gtk_gesture_drag_new(da);
 ///	g_signal_connect(G_OBJECT(handler_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
+#endif
 
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);

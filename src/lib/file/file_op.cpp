@@ -126,6 +126,10 @@ void file_rename(const Path &source, const Path &target) {
 	for (auto &p: target.all_parents())
 		dir_create(p);
 
+	// linux automatically overwrites, windows will fail rename()
+	if (file_exists(target))
+		file_delete(target);
+
 	if (rename(source.str().c_str(), target.str().c_str()) != 0)
 		throw FileError(format("can not rename file '%s' -> '%s'", source, target));
 }

@@ -325,7 +325,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	int channels = (type == DeviceType::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
 	if (channels > 0) {
 		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
-		d->name = dev->name;
+		d->name = string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name;
 		d->channels = channels;
 		d->index_in_lib = index;
 		if (type == DeviceType::AUDIO_OUTPUT)
@@ -345,6 +345,7 @@ void DeviceManager::_update_devices_audio_portaudio() {
 	for (Device *d: input_devices)
 		d->present = false;
 
+	// make sure, the default is first...
 	_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, Pa_GetDefaultOutputDevice());
 	_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, Pa_GetDefaultInputDevice());
 

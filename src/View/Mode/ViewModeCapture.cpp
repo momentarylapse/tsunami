@@ -86,12 +86,17 @@ void ViewModeCapture::set_data(const Array<CaptureTrackData> &_data) {
 void ViewModeCapture::insert() {
 
 	// FIXME stupid hack
-	if (data.num > 1) {
+	auto clear_sync_data = [this] {
 		session->i("HACK: ignoring sync data");
-		for (auto &d: data)
+		for (auto& d : data)
 			d.sync_points.clear();
-	}
-
+	};
+#ifdef OS_WINDOWS
+	clear_sync_data();
+#else
+	if (data.num > 1)
+		clear_sync_data();
+#endif
 
 	song->begin_action_group();
 	for (auto &d: data)

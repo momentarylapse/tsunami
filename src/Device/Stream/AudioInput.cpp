@@ -391,9 +391,8 @@ void AudioInput::_create_dev() {
 #if HAS_LIB_PORTAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
+		int chunk_size = hui::Config.get_int("portaudio.chunk-size", 256);
 		// on windows, some devices will stutter, due to some mysterious limit of 100 requests/s
-		int chunk_size = 256;
-		chunk_size = _sample_rate / 50; // ~50 requests per second
 		// nah, that doesn't work either:
 		/*paFramesPerBufferUnspecified*/
 

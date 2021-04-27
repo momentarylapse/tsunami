@@ -198,8 +198,9 @@ int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 		//printf("/XXX end of data...\n");
+		//return paComplete;
 	}
-	return 0;
+	return paContinue;
 }
 
 #endif
@@ -333,8 +334,10 @@ void AudioOutput::_create_dev() {
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
 
+		int chunk_size = hui::Config.get_int("portaudio.chunk-size", 256);
+		//256*4; // paFramesPerBufferUnspecified
 		if (cur_device->is_default()) {
-			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, paFramesPerBufferUnspecified,//256,
+			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, chunk_size,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
 		} else {
@@ -344,7 +347,7 @@ void AudioOutput::_create_dev() {
 			params.device = cur_device->index_in_lib;
 			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, nullptr, &params, dev_sample_rate, paFramesPerBufferUnspecified,//256,
+			PaError err = Pa_OpenStream(&portaudio_stream, nullptr, &params, dev_sample_rate, chunk_size,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}

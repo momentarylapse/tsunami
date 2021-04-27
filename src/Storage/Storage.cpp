@@ -156,6 +156,11 @@ bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
 }
 
 Path Storage::temp_saving_file(const string &ext) {
+	for (int i = 0; i < 1000; i++) {
+		Path p = (tsunami->directory << format("-temp-saving-%03d-.", i)).with(ext);
+		if (!file_exists(p))
+			return p;
+	}
 	return (tsunami->directory << "-temp-saving-.").with(ext);
 }
 
@@ -163,7 +168,7 @@ Path Storage::temp_saving_file(const string &ext) {
 bool Storage::save(Song *song, const Path &filename) {
 	current_directory = filename.parent();
 
-	FormatDescriptor *d = get_format(filename.extension(), 0);
+	auto d = get_format(filename.extension(), 0);
 	if (!d)
 		return false;
 
@@ -201,7 +206,7 @@ bool Storage::save(Song *song, const Path &filename) {
 }
 
 bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {
-	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
+	auto d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return false;
 
@@ -303,7 +308,7 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 
 bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	BufferStreamer bs(&buffer);
-	Path filename = "/tmp/tsunami-compress." + codec;
+	Path filename = temp_saving_file(codec);
 
 	auto dir0 = this->current_directory;
 	save_via_renderer(bs.port_out[0], filename, buffer.length, {});
@@ -316,10 +321,11 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 }
 
 void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
-	Path filename = "/tmp/tsunami-compress." + codec;
+	Path filename = temp_saving_file(codec);
 	FileWrite(filename, data);
 
 	auto dir0 = this->current_directory;
 	load_buffer(&buffer, filename);
 	current_directory = dir0;
+	file_delete(filename);
 }

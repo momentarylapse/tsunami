@@ -32,6 +32,7 @@ public:
 	void _cdecl __delete__() override;
 
 	int sample_rate;
+	bool apply_to_whole_buffer;
 
 	class Output : public Port {
 	public:

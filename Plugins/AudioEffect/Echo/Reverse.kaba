@@ -3,6 +3,9 @@
 use tsunami
 
 class Reverse extends AudioEffect
+	override void __init__()
+		apply_to_whole_buffer = true
+
 	override void process(out AudioBuffer buf)
 		int n = len(buf) / 2
 		for c in buf.c

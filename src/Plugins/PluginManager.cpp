@@ -239,6 +239,7 @@ void PluginManager::link_app_script_data() {
 	AudioEffect aeffect;
 	kaba::declare_class_size("AudioEffect", sizeof(AudioEffect));
 	kaba::declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
+	kaba::declare_class_element("AudioEffect.apply_to_whole_buffer", &AudioEffect::apply_to_whole_buffer);
 	kaba::declare_class_element("AudioEffect.source", &AudioEffect::source);
 	kaba::link_external_class_func("AudioEffect.__init__", &AudioEffect::__init__);
 	kaba::link_external_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);

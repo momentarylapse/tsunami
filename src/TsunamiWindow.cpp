@@ -658,14 +658,19 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	AudioBuffer buf;
 	auto *a = l->edit_buffers(buf, r);
 
-	int chunk_size = 2048;
-	int done = 0;
-	while (done < r.length) {
-		p->set((float) done / (float) r.length);
+	if (fx->apply_to_whole_buffer) {
+		fx->process(buf);
+	} else {
 
-		auto ref = buf.ref(done, min(done + chunk_size, r.length));
-		fx->process(ref);
-		done += chunk_size;
+		int chunk_size = 2048;
+		int done = 0;
+		while (done < r.length) {
+			p->set((float) done / (float) r.length);
+
+			auto ref = buf.ref(done, min(done + chunk_size, r.length));
+			fx->process(ref);
+			done += chunk_size;
+		}
 	}
 
 	l->edit_buffers_finish(a);

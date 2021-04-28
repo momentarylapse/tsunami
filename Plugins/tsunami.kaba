@@ -165,6 +165,7 @@ class Module as shared extends Object
 		SIGNAL_CHAIN
 
 class AudioEffect extends Module
+	bool apply_to_whole_buffer
 	Module.Port *source
 	extern void __init__()
 	extern override void __delete__()

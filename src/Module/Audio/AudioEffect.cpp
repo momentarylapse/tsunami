@@ -30,6 +30,7 @@ AudioEffect::AudioEffect() :
 	port_out.add(new Output(this));
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	apply_to_whole_buffer = false;
 }
 
 void AudioEffect::__init__() {

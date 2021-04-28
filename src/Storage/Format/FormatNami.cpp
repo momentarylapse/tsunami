@@ -342,16 +342,14 @@ public:
 		int bits = f->read_int(); // bit (16)
 
 
-		bytes data;
 
 		if (bits == 0) {
-			msg_write("read compressed...");
 			auto com = new AudioBuffer::Compressed;
 			com->codec = f->read_str();
 			int n = f->read_int();
-			data.resize(n);
-			f->read_buffer(data);
-			cur_op(this)->session->storage->decompress(*me, com->codec, data);
+			com->data.resize(n);
+			f->read_buffer(com->data);
+			cur_op(this)->session->storage->decompress(*me, com->codec, com->data);
 			me->compressed = com;
 			return;
 		}
@@ -359,6 +357,7 @@ public:
 		// TODO get rid of all (old-style) compressed files!
 
 		int num_bytes = context->layers.back().size - 16;
+		bytes data;
 		data.resize(num_bytes);//num * (bits / 8) * channels);
 
 		// read chunk'ed

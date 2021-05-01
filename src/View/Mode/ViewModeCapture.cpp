@@ -50,7 +50,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 			auto *rec = d.audio_recorder();
 
 			view->buffer_painter->set_context(l->area);
-			view->buffer_painter->set_color(view->colors.capture_marker, color::interpolate(view->colors.capture_marker, view->colors.background, 0.3f));
+			view->buffer_painter->set_color(view->colors.capture_marker, l->background_color());
 
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			view->update_peaks_now(rec->buf);

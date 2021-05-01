@@ -28,12 +28,12 @@ public:
 	void draw_buffer_selection(Painter *c, AudioBuffer &b, int offset);
 
 	void set_context(const rect &area);
-	void set_color(const color &col1, const color &col2);
+	void set_color(const color &fg, const color &bg);
 	void set_clip(const Range &r);
 
 	AudioView *view;
 	rect area;
-	color col1, col2;
+	color col1, col2, col2sel;
 	float x0, x1;
 };
 

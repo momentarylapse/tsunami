@@ -122,9 +122,9 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 	view->buffer_painter->set_context(l->area);
 
 	if (is_playable())
-		view->buffer_painter->set_color(view->colors.text_soft1, view->colors.text_soft3);
+		view->buffer_painter->set_color(view->colors.text_soft1, view->colors.background);
 	else
-		view->buffer_painter->set_color(view->colors.text_soft3, view->colors.text_soft3);
+		view->buffer_painter->set_color(view->colors.text_soft3, view->colors.background);
 
 	for (auto *layer: weak(track->layers)) {
 		auto rr = layer->active_version_ranges();

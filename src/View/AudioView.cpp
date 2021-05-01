@@ -1297,9 +1297,9 @@ void AudioView::draw_song(Painter *c) {
 void AudioView::on_draw(Painter *c) {
 	PerformanceMonitor::start_busy(perf_channel);
 
-	colors = basic_colors;
-	if (!win->is_active(id))
-		colors = basic_colors.disabled();
+	//colors = basic_colors;
+	//if (!win->is_active(id))
+	//	colors = basic_colors.disabled();
 
 	area = c->area();
 	clip = c->clip();
@@ -1313,7 +1313,7 @@ void AudioView::on_draw(Painter *c) {
 	static int frame = 0;
 	//c->draw_str(100, 100, i2s(frame++));
 
-	colors = basic_colors;
+	//colors = basic_colors;
 	PerformanceMonitor::end_busy(perf_channel);
 }
 
@@ -1901,4 +1901,8 @@ void AudioView::mdp_run(MouseDelayAction *a) {
 
 void AudioView::mdp_prepare(hui::Callback update) {
 	scene_graph->mdp_prepare(update);
+}
+
+bool view_has_focus(AudioView *view) {
+	return view->win->is_active(view->id);
 }

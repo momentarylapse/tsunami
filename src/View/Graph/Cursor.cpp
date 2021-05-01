@@ -13,6 +13,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../Graph/AudioViewLayer.h"
 
+bool view_has_focus(AudioView *view);
 
 Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 	align.dz = 50;
@@ -23,7 +24,11 @@ Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 }
 
 void Cursor::on_draw(Painter* c) {
-	color col = color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
+	color col = view->colors.selection_boundary;//color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
+
+	if (!view_has_focus(view))
+		col = color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.5f);
+
 	if (!is_end) {
 		float x = view->cam.sample2screen(pos());
 		float r = 4;

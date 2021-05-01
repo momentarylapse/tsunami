@@ -94,7 +94,7 @@ void CaptureConsole::on_enter() {
 }
 
 void CaptureConsole::on_leave() {
-	view->mode_capture->data.clear();
+	//view->mode_capture->data.clear();
 	chain = nullptr;
 	view->mode_capture->chain = nullptr;
 	view->signal_chain->unsubscribe(this);

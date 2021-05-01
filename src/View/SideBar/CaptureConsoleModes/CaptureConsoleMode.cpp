@@ -145,7 +145,8 @@ void CaptureConsoleMode::leave() {
 	event_ids.clear();
 
 	for (auto &c: items()) {
-		c.peak_meter_display->set_source(nullptr);
+		if (c.peak_meter_display)
+			c.peak_meter_display->set_source(nullptr);
 	}
 	items().clear();
 	session->remove_signal_chain(chain.get());

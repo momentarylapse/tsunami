@@ -12,6 +12,7 @@
 #include "../Port/Port.h"
 #include "../../lib/base/pointer.h"
 #include <mutex>
+#include <atomic>
 
 class AudioBuffer;
 class RingBuffer;
@@ -20,6 +21,7 @@ class Session;
 class AudioVisualizer : public Module {
 public:
 	AudioVisualizer();
+	~AudioVisualizer() override;
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
@@ -41,6 +43,7 @@ public:
 	int next_writing = 0;
 	int current_reading = 1;
 	std::mutex mutex;
+	std::atomic<int> notify_counter;
 	void lock();
 	void unlock();
 	void flip();

@@ -90,7 +90,7 @@ void CaptureConsoleModeMulti::on_source() {
 }
 
 void CaptureConsoleModeMulti::leave() {
-	for (auto c: items()) {
+	for (auto &c: items()) {
 		c.peak_meter_display->set_source(nullptr);
 
 		delete c.peak_meter_display;

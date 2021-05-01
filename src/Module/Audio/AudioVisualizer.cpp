@@ -13,6 +13,7 @@
 #include "../../Data/base.h"
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../../lib/hui/Callback.h"
+#include "../../lib/hui/Application.h"
 
 AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "out") {
 	visualizer = v;
@@ -42,8 +43,10 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 	visualizer->unlock();
 	PerformanceMonitor::end_busy(visualizer->perf_channel);
 
+	visualizer->notify_counter ++;
 	hui::RunLater(0.001f, [=] {
 		visualizer->notify();
+		visualizer->notify_counter --;
 	});
 	return r;
 }
@@ -56,6 +59,14 @@ AudioVisualizer::AudioVisualizer() :
 	source = nullptr;
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;
+	notify_counter = 0;
+}
+
+AudioVisualizer::~AudioVisualizer() {
+	// make sure all notifications have been handled
+	while (notify_counter > 0) {
+		hui::Application::do_single_main_loop();
+	}
 }
 
 void AudioVisualizer::__init__() {

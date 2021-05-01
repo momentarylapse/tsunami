@@ -6,7 +6,13 @@
  */
 
 #include "ColorScheme.h"
+#include "../lib/base/map.h"
 #include <math.h>
+
+namespace hui {
+	class Panel;
+	void get_style_colors(Panel *p, const string &id, Map<string,color> &colors);
+}
 
 color col_inter(const color a, const color &b, float t) {
 	float e = 0.7f;
@@ -107,5 +113,21 @@ ColorSchemeDark::ColorSchemeDark() {
 	hover = White;
 	gamma = 0.3f;
 	name = "dark";
+	auto_generate();
+}
+
+ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
+	//{"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"};
+	Map<string,color> colors;
+	hui::get_style_colors(p, id, colors);
+	//background = colors["bg_color"];
+	background = colors["base_color"];
+	text = colors["text_color"];
+	//selection = colors["selected_fg_color"];
+	selection = color(1, 0.3f, 0.3f, 0.9f);
+	//this->background
+	hover = White;
+	gamma = 0.3f;
+	name = "system";
 	auto_generate();
 }

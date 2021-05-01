@@ -32,6 +32,22 @@ GdkGLContext *gtk_gl_context = nullptr;
 
 static Set<ControlDrawingArea*> _recently_deleted_areas;
 
+color color_from_gdk(const GdkRGBA &gcol);
+
+void get_style_colors(Panel *p, const string &id, Map<string,color> &colors) {
+	auto c = p->_get_control_(id);
+	if (!c)
+		return;
+	//colors.resize(10);
+	GtkStyleContext *sc = gtk_widget_get_style_context(c->widget);
+	GdkRGBA cc;
+	Array<string> names = {"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"};
+	for (auto &name: names) {
+		gtk_style_context_lookup_color(sc, name.c_str(), &cc);
+		colors.set(name, color_from_gdk(cc));
+	}
+}
+
 
 
 gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {

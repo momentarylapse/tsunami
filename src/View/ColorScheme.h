@@ -11,6 +11,10 @@
 #include "../lib/base/base.h"
 #include "../lib/image/color.h"
 
+namespace hui {
+	class Panel;
+}
+
 class ColorScheme {
 public:
 
@@ -68,6 +72,11 @@ public:
 class ColorSchemeDark : public ColorScheme {
 public:
 	ColorSchemeDark();
+};
+
+class ColorSchemeSystem : public ColorScheme {
+public:
+	ColorSchemeSystem(hui::Panel *p, const string &id);
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

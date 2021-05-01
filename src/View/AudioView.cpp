@@ -152,8 +152,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	color_schemes.add(ColorSchemeBright());
 	color_schemes.add(ColorSchemeDark());
+	color_schemes.add(ColorSchemeSystem(win, id));
 
-	set_color_scheme(hui::Config.get_str("View.ColorScheme", "bright"));
+	set_color_scheme(hui::Config.get_str("View.ColorScheme", "system"));
 
 	midi_view_mode = (MidiMode)hui::Config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 

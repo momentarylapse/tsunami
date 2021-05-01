@@ -34,24 +34,34 @@ int col_f_to_i16(float f)
 float col_i16_to_f(int i)
 {	return (float)i / 65535.0f;	}
 
-void ControlColorButton::__set_color(const color& c) {
+
+GdkRGBA color_to_gdk(const color &c) {
 	GdkRGBA gcol;
 	gcol.red = c.r;
 	gcol.green = c.g;
 	gcol.blue = c.b;
 	gcol.alpha = c.a;
-	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+	return gcol;
 }
 
-color ControlColorButton::get_color() {
+color color_from_gdk(const GdkRGBA &gcol) {
 	color col;
-	GdkRGBA gcol;
-	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
 	col.r = (float)gcol.red;
 	col.g = (float)gcol.green;
 	col.b = (float)gcol.blue;
 	col.a = (float)gcol.alpha;
 	return col;
+}
+
+void ControlColorButton::__set_color(const color& c) {
+	GdkRGBA gcol = color_to_gdk(c);
+	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+}
+
+color ControlColorButton::get_color() {
+	GdkRGBA gcol;
+	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+	return color_from_gdk(gcol);
 }
 
 void ControlColorButton::__set_option(const string &op, const string &value) {

@@ -259,7 +259,7 @@ void BufferPainter::set_context(const rect &_area) {
 	area = _area;
 	x0 = area.x1;
 	x1 = area.x2;
-	col = view->colors.text;
+	col = view->colors.text_soft1;
 }
 
 void BufferPainter::set_color(const color &_col) {

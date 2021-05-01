@@ -22,7 +22,7 @@
 
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();
-	panel->add_label("!expandx,center,disabled\\<i>" + _("none") + "</i>", 0, 0, "");
+	panel->add_label("!expandx,center,disabled\\<i>" + _("only for midi or time tracks") + "</i>", 0, 0, "");
 	return panel;
 }
 

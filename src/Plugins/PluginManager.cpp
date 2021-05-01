@@ -67,6 +67,10 @@ namespace kaba {
 	extern shared_array<Script> _public_scripts_;
 };
 
+namespace hui {
+	void get_style_colors(Panel *p, const string &id, Map<string,color> &colors);
+}
+
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager() {
@@ -129,6 +133,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external("ChooseModule", (void*)&choose_module);
 	kaba::link_external("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
 	kaba::link_external("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
+	kaba::link_external("get_style_colors", (void*)&hui::get_style_colors);
 
 	kaba::declare_class_size("Clipboard", sizeof(Clipboard));
 	kaba::declare_class_element("Clipboard.temp", &Clipboard::temp);

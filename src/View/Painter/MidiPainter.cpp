@@ -633,7 +633,7 @@ void MidiPainter::draw_clef_tab(Painter *c) {
 
 
 	if (is_playable)
-		c->set_color(colors.text);
+		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
 
@@ -755,7 +755,7 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 	c->set_antialiasing(false);
 	
 	if (is_playable)
-		c->set_color(colors.text);
+		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
 

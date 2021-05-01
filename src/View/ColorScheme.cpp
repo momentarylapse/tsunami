@@ -123,6 +123,9 @@ ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
 	//background = colors["bg_color"];
 	background = colors["base_color"];
 	text = colors["text_color"];
+	text = colors["fg_color"];
+	text = colors["selected_fg_color"];
+	text_soft1 = colors["fg_color"];
 	//selection = colors["selected_fg_color"];
 	selection = color(1, 0.3f, 0.3f, 0.9f);
 	//this->background

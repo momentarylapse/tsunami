@@ -774,3 +774,6 @@ extern Sample* SelectSample(Session session, Panel panel, Sample* old)
 extern string ChooseModule(Panel parent, Session session, int type, string old_name)
 
 extern void draw_boxed_str(Painter c, float x, float y, string str, color col_text, color col_bg)
+
+#extern void get_style_colors(Panel p, string id, color{} colors)
+extern void get_style_colors(Panel p, string id, (string,color)[] colors)

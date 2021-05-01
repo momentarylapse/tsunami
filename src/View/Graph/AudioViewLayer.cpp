@@ -158,7 +158,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 		auto active_ranges = layer->active_version_ranges();
 		auto inactive_ranges = layer->inactive_version_ranges();
 		for (auto &b: layer->buffers) {
-			view->buffer_painter->set_color(view->colors.text);
+			view->buffer_painter->set_color(view->colors.text_soft1);
 			for (Range &r: active_ranges) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
@@ -170,7 +170,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 			}
 		}
 	} else {
-		view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
+		view->buffer_painter->set_color(is_playable() ? view->colors.text_soft1 : view->colors.text_soft3);
 		for (auto &b: layer->buffers)
 			view->buffer_painter->draw_buffer(c, b, b.offset);
 

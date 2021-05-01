@@ -18,7 +18,7 @@ namespace hui {
 class ColorScheme {
 public:
 
-	void auto_generate();
+	void auto_generate(bool keep_soft_text = false);
 	ColorScheme disabled() const;
 
 	// basic

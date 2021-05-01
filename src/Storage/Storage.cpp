@@ -311,7 +311,8 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	Path filename = temp_saving_file(codec);
 
 	auto dir0 = this->current_directory;
-	save_via_renderer(bs.port_out[0], filename, buffer.length, {});
+	if (!save_via_renderer(bs.port_out[0], filename, buffer.length, {}))
+		return {};
 	current_directory = dir0;
 
 	auto data = FileRead(filename);

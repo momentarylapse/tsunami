@@ -16,15 +16,6 @@ PluginConsole::PluginConsole(Session *s) :
 	BottomBar::Console(_("Plugins"), s)
 {
 	from_resource("plugin-console");
-	/*add_grid("!expandy", 0, 0, "main-grid");
-	set_target("main-grid");
-	add_scroller("", 0, 0, "scroller");
-	add_label("!angle=90,bold,width=60,expandy\\" + _("no plugins yet"), 1, 0, "no-plugins-label");
-	add_button("!expandy,noexpandx", 2, 0, "add");
-	set_image("add", "hui:add");
-	set_tooltip("add", _("add plugin"));
-	set_target("scroller");
-	add_grid("", 0, 0, "panel-grid");*/
 	next_x = 0;
 
 	event("add", [=]{ on_add_button(); });

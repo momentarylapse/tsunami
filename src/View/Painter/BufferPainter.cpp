@@ -150,7 +150,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 
 
 	int di = view->detail_steps;
-	c->set_color(col);
+	//c->set_color(col1);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
 	int pm = AudioBuffer::PEAK_MAGIC_LEVEL2 * b.channels;
@@ -160,7 +160,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l) {
-			c->set_color(color::interpolate(col, Red, 0.3f));
+			c->set_color(color::interpolate(col1, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
 			c->set_antialiasing(false);
 			return;
@@ -169,15 +169,15 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 		// maximum
 		double _bzf = bzf;
 		int ll = l;
-		color cc = col;
-		cc.a *= 0.3f;
-		c->set_color(cc);
+		//color cc = col;
+		//cc.a *= 0.3f;
+		c->set_color(col2);
 		for (int ci=0; ci<b.channels; ci++)
 			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
 
 
 		// mean square
-		c->set_color(col);
+		c->set_color(col1);
 		for (int ci=0; ci<b.channels; ci++)
 			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, bzf, hf, x0, x1, y0[ci], b.peaks[l+b.channels+ci], offset);
 
@@ -187,7 +187,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 			int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[pm].num);
 			for (int i=0; i<nn; i++) {
 				if (b._peaks_chunk_needs_update(i)) {
-					c->set_color(color::interpolate(col, Red, 0.3f));
+					c->set_color(color::interpolate(col1, Red, 0.3f));
 					float xx0 = max((float)view->cam.sample2screen(offset + i*b.PEAK_CHUNK_SIZE), x0);
 					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
 					c->draw_rect(xx0, area.y1, xx1 - xx0, h);
@@ -217,9 +217,9 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 
 
 	int di = view->detail_steps;
-	color cc = col;
-	cc.a = 0.7f;
-	c->set_color(cc);
+	//color cc = col;
+	//cc.a = 0.7f;
+	//c->set_color(cc);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
 	int l = view->prefered_buffer_layer * 2 * b.channels;
@@ -229,7 +229,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l) {
-			c->set_color(color::interpolate(col, Red, 0.3f));
+			c->set_color(color::interpolate(col1, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
 			c->set_antialiasing(false);
 			return;
@@ -259,11 +259,13 @@ void BufferPainter::set_context(const rect &_area) {
 	area = _area;
 	x0 = area.x1;
 	x1 = area.x2;
-	col = view->colors.text_soft1;
+	col1 = view->colors.text_soft1;
+	col2 = view->colors.text_soft3;
 }
 
-void BufferPainter::set_color(const color &_col) {
-	col = _col;
+void BufferPainter::set_color(const color &_col1, const color& _col2) {
+	col1 = _col1;
+	col2 = _col2;
 }
 
 void BufferPainter::set_clip(const Range &r) {

@@ -38,13 +38,14 @@ void get_style_colors(Panel *p, const string &id, Map<string,color> &colors) {
 	auto c = p->_get_control_(id);
 	if (!c)
 		return;
-	//colors.resize(10);
 	GtkStyleContext *sc = gtk_widget_get_style_context(c->widget);
-	GdkRGBA cc;
-	Array<string> names = {"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"};
+	Array<string> names = {"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders", "warning_wolor", "error_color", "success_color"};
 	for (auto &name: names) {
-		gtk_style_context_lookup_color(sc, name.c_str(), &cc);
-		colors.set(name, color_from_gdk(cc));
+		GdkRGBA cc;
+		if (gtk_style_context_lookup_color(sc, ("theme_" + name).c_str(), &cc))
+			colors.set(name, color_from_gdk(cc));
+		else if (gtk_style_context_lookup_color(sc, name.c_str(), &cc))
+			colors.set(name, color_from_gdk(cc));
 	}
 }
 

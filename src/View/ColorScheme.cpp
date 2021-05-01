@@ -33,7 +33,7 @@ ColorScheme ColorScheme::disabled() const {
 	return c;
 }
 
-void ColorScheme::auto_generate() {
+void ColorScheme::auto_generate(bool keep_soft_text) {
 
 	if (text.r > background.r) {
 		high_contrast_a = White;
@@ -59,10 +59,13 @@ void ColorScheme::auto_generate() {
 	preview_marker = color(1, 0, 0.7f, 0);
 	preview_marker_internal = color(0.25f, 0, 0.7f, 0);
 	capture_marker = color(1, 0.7f, 0, 0);
-	text_soft1 = col_inter(background, text, 0.82f);
-	text_soft3 = col_inter(background, col_inter(text, selection, 0.2f), 0.5f);
-	text_soft2 = col_inter(text_soft3, text_soft1, 0.4f);
-	grid = col_inter(background, col_inter(text, selection, 0.4f), 0.35f);
+	if (!keep_soft_text) {
+		text_soft1 = col_inter(background, text, 0.82f);
+		text_soft3 = col_inter(background, col_inter(text, selection, 0.2f), 0.5f);
+		text_soft2 = col_inter(text_soft3, text_soft1, 0.4f);
+	}
+	//grid = col_inter(background, col_inter(text, selection, 0.4f), 0.35f);
+	grid = text_soft3;// col_inter(background, text_soft1, 0.35f);
 	grid_selected = col_inter(grid, selection, 0.4f);
 
 	//grid = text_soft3;
@@ -125,12 +128,21 @@ ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
 	text = colors["text_color"];
 	text = colors["fg_color"];
 	text = colors["selected_fg_color"];
+
+	gamma = 1.0f;
+	if (text.r > background.r) // dark theme
+		gamma = 0.3f;
+
 	text_soft1 = colors["fg_color"];
+	if (text == text_soft1) {
+		text_soft1 = col_inter(background, text, 0.67f);
+	}
+	text_soft2 = col_inter(background, text_soft1, 0.7f);
+	text_soft3 = col_inter(background, text_soft1, 0.4f);
 	//selection = colors["selected_fg_color"];
 	selection = color(1, 0.3f, 0.3f, 0.9f);
 	//this->background
 	hover = White;
-	gamma = 0.3f;
 	name = "system";
-	auto_generate();
+	auto_generate(true);
 }

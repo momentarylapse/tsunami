@@ -154,23 +154,27 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 
 void AudioViewLayer::draw_track_buffers(Painter *c) {
 	view->buffer_painter->set_context(area);
+	auto text_soft4 = color::interpolate(view->colors.text_soft3, view->colors.background, 0.3f);
 	if (is_playable() and layer->track->has_version_selection()) {
 		auto active_ranges = layer->active_version_ranges();
 		auto inactive_ranges = layer->inactive_version_ranges();
 		for (auto &b: layer->buffers) {
-			view->buffer_painter->set_color(view->colors.text_soft1);
+			view->buffer_painter->set_color(view->colors.text_soft1, view->colors.text_soft2);
 			for (Range &r: active_ranges) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
-			view->buffer_painter->set_color(view->colors.text_soft3);
+			view->buffer_painter->set_color(view->colors.text_soft3, text_soft4);
 			for (Range &r: inactive_ranges) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
 		}
 	} else {
-		view->buffer_painter->set_color(is_playable() ? view->colors.text_soft1 : view->colors.text_soft3);
+		if (is_playable())
+			view->buffer_painter->set_color(view->colors.text_soft1, view->colors.text_soft3);
+		else
+			view->buffer_painter->set_color(view->colors.text_soft3, text_soft4);
 		for (auto &b: layer->buffers)
 			view->buffer_painter->draw_buffer(c, b, b.offset);
 
@@ -178,10 +182,10 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 
 	if (view->sel.has(layer)) {
 		// selection
-		view->buffer_painter->set_color(view->colors.selection_boundary);
+		view->buffer_painter->set_color(view->colors.selection_boundary, color::interpolate(view->colors.selection_boundary, view->colors.background, 0.15f));
 		view->buffer_painter->set_clip(view->cursor_range());
 		for (AudioBuffer &b: layer->buffers)
-			view->buffer_painter->draw_buffer_selection(c, b, b.offset);
+			view->buffer_painter->draw_buffer(c, b, b.offset);
 	}
 }
 
@@ -222,7 +226,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 	// buffer
 	if (s->type() == SignalType::AUDIO) {
 		view->buffer_painter->set_context(area);
-		view->buffer_painter->set_color(col);
+		view->buffer_painter->set_color(col, color::interpolate(col, view->colors.background, 0.3f));
 		view->buffer_painter->draw_buffer(c, s->buf(), s->pos);
 	} else if (s->type() == SignalType::MIDI) {
 		draw_midi(c, s->midi(), true, s->pos);

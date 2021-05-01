@@ -16,7 +16,6 @@ class CaptureTrackData;
 class ViewModeCapture : public ViewModeDefault {
 public:
 	ViewModeCapture(AudioView *view);
-	virtual ~ViewModeCapture();
 
 	void on_start() override;
 	void on_end() override;
@@ -30,7 +29,6 @@ public:
 	virtual Set<Track*> prevent_playback() override;
 
 	Array<CaptureTrackData> data;
-	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;
 	
 	void insert();

@@ -38,22 +38,25 @@ void CaptureConsoleMode::sync() {
 		d.sync(view->output_stream);
 }
 
+
+Array<CaptureTrackData> &CaptureConsoleMode::items() {
+	return this->view->mode_capture->data;
+}
+
 void CaptureConsoleMode::update_data_from_items() {
 
 	chain = session->create_signal_chain_system("capture");
 
-	for (auto &c: items)
+	for (auto &c: items())
 		c.add_into_signal_chain(chain.get());
 
 	chain->mark_all_modules_as_system();
-
-	view->mode_capture->set_data(items);
 
 
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 
-	for (auto &c: items) {
+	for (auto &c: items()) {
 		cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
 
 		c.input->subscribe(this, [=] {
@@ -97,7 +100,7 @@ void CaptureConsoleMode::update_device_list() {
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
-	for (auto &c: items) {
+	for (auto &c: items()) {
 		auto sources = sources_audio;
 		if (c.track->type == SignalType::MIDI)
 			sources = sources_midi;
@@ -117,13 +120,13 @@ void CaptureConsoleMode::update_device_list() {
 
 
 void CaptureConsoleMode::accumulation_start() {
-	for (auto &c: items)
+	for (auto &c: items())
 		c.accumulate(true);
 	//chain->command(ModuleCommand::ACCUMULATION_START, 0);
 }
 
 void CaptureConsoleMode::accumulation_stop() {
-	for (auto &c: items)
+	for (auto &c: items())
 		c.accumulate(false);
 	//chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 }
@@ -141,10 +144,10 @@ void CaptureConsoleMode::leave() {
 		cc->remove_event_handler(id);
 	event_ids.clear();
 
-	for (auto &c: items) {
+	for (auto &c: items()) {
 		c.peak_meter_display->set_source(nullptr);
 	}
-	items.clear();
+	items().clear();
 	session->remove_signal_chain(chain.get());
 	chain = nullptr;
 }

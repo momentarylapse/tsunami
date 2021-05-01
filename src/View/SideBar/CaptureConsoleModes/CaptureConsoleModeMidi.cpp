@@ -23,7 +23,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 
 void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
-	items[0].set_device(get_source(SignalType::MIDI, n));
+	items()[0].set_device(get_source(SignalType::MIDI, n));
 }
 
 
@@ -36,13 +36,13 @@ void CaptureConsoleModeMidi::enter() {
 		c.id_source = "source";
 		c.peak_meter_display = cc->peak_meter_display.get();
 		c.panel = cc;
-		items.add(c);
+		items().add(c);
 	}
 
 
 	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t) and (t->type == SignalType::MIDI))
-			items[0].track = t;
+			items()[0].track = t;
 
 	update_data_from_items();
 
@@ -50,14 +50,14 @@ void CaptureConsoleModeMidi::enter() {
 
 	chain->set_buffer_size(512);
 
-	auto &c = items[0];
+	auto &c = items()[0];
 	c.enable(true);
 
 	chain->start();
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {
-	items[0].allow_edit(allow);
+	items()[0].allow_edit(allow);
 }
 
 

@@ -32,7 +32,7 @@ void CaptureConsoleModeMulti::enter() {
 			continue;
 
 		CaptureTrackData c;
-		int i = items.num;
+		int i = items().num;
 		c.track = t;
 		c.panel = cc;
 		c.id_group = "group-" + i2s(i);
@@ -61,7 +61,7 @@ void CaptureConsoleModeMulti::enter() {
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, nullptr);
 		c.peak_meter_display->set_visible(false);
 
-		items.add(c);
+		items().add(c);
 
 		event_ids.add(cc->event(c.id_source, [=] {
 			on_source();
@@ -75,22 +75,22 @@ void CaptureConsoleModeMulti::enter() {
 }
 
 void CaptureConsoleModeMulti::allow_change_device(bool allow) {
-	for (auto &c: items) {
+	for (auto &c: items()) {
 		c.allow_edit(allow);
 	}
 }
 
 void CaptureConsoleModeMulti::on_source() {
 	int index = hui::GetEvent()->id.substr(7, -1)._int();
-	if (index < 0 or index >= items.num)
+	if (index < 0 or index >= items().num)
 		return;
 	int n = cc->get_int("");
-	auto &c = items[index];
+	auto &c = items()[index];
 	c.set_device(get_source(c.track->type, n));
 }
 
 void CaptureConsoleModeMulti::leave() {
-	for (auto c: items) {
+	for (auto c: items()) {
 		c.peak_meter_display->set_source(nullptr);
 
 		delete c.peak_meter_display;

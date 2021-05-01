@@ -28,13 +28,13 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 
 void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
-	items[0].set_device(get_source(SignalType::AUDIO, n));
+	items()[0].set_device(get_source(SignalType::AUDIO, n));
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
-	items[0].track = t;
+	items()[0].track = t;
 
-	bool ok = (items[0].track->type == SignalType::AUDIO);
+	bool ok = (items()[0].track->type == SignalType::AUDIO);
 	cc->set_string("message", "");
 	if (!ok)
 		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::AUDIO).c_str()));
@@ -51,7 +51,7 @@ void CaptureConsoleModeAudio::enter() {
 		a.id_mapper = "channel-mapper";
 		a.id_peaks = "level";
 		a.peak_meter_display = cc->peak_meter_display.get();
-		items.add(a);
+		items().add(a);
 	}
 
 	for (Track *t: weak(view->song->tracks))
@@ -64,12 +64,12 @@ void CaptureConsoleModeAudio::enter() {
 	event_ids.add(cc->event("source", [=]{ on_source(); }));
 
 
-	auto &c = items[0];
+	auto &c = items()[0];
 	c.enable(true);
 
 	chain->start(); // for preview
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {
-	items[0].allow_edit(allow);
+	items()[0].allow_edit(allow);
 }

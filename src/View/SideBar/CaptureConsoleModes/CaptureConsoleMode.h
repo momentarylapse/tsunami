@@ -54,7 +54,7 @@ public:
 	shared<SignalChain> chain;
 
 
-	Array<CaptureTrackData> items;
+	Array<CaptureTrackData> &items();
 	void update_data_from_items();
 	Array<int> event_ids;
 

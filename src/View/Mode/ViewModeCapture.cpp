@@ -30,10 +30,6 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 	chain = nullptr;
 }
 
-ViewModeCapture::~ViewModeCapture() {
-	set_data({});
-}
-
 void ViewModeCapture::on_start() {
 	set_side_bar(SideBar::CAPTURE_CONSOLE);
 }
@@ -76,10 +72,6 @@ Set<Track*> ViewModeCapture::prevent_playback() {
 		if (d.enabled)
 			prev.add(d.track);
 	return prev;
-}
-
-void ViewModeCapture::set_data(const Array<CaptureTrackData> &_data) {
-	data = _data;
 }
 
 

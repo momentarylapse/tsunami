@@ -363,10 +363,13 @@ class TrackMarker as shared
 class Bar as shared
 	int[] beats
 	int divisor
+	int total_sub_beats
 	int index
 	int index_text
 	int length
 	int offset
+	void __init__()
+	extern void __init__(int length, int beats, int sub_beats)
 	extern const float bpm(float sample_rate)
 	extern const Range range()
 	enum EditMode

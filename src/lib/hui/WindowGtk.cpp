@@ -208,7 +208,7 @@ void Window::__delete__() {
 }
 
 void Window::request_destroy() {
-	if (parent) {
+	if (parent_window) {
 		gtk_dialog_response(GTK_DIALOG(window), GTK_RESPONSE_DELETE_EVENT);
 	}
 	requested_destroy = true;

@@ -1,0 +1,259 @@
+use tsunami
+use hui
+use helper.grid
+
+const int FRAME_SIZE = 1024
+const int FRAME_STEP = 512/2
+const float BPM_MIN = 50
+const float BPM_MAX = 180
+
+const int NN = 4
+
+# cut into chunks ("frames")
+# novelty function
+#   for chunks
+#     root of mean square (rms)
+# for beat lengths
+#   self correlation of novelty
+# peak
+#   best array element
+#   fit parable around best
+#   optimize
+
+func rms(float[] b) -> float
+	float r = 0
+	for bb in b
+		r += bb^2
+	return sqrt(r / len(b))
+
+func calc_novelty(AudioBuffer buf) -> float[]
+	float[] novelty
+	float prev = 0
+	for i in 0:len(buf):FRAME_STEP
+		float r = rms(buf[i:i+FRAME_SIZE].c[0])
+		float d = r - prev
+		if d < 0
+			d = 0
+		
+		novelty.add(d)
+		#buf[i:i+FRAME_STEP].c[0] = d
+		
+		prev = r
+	return novelty
+
+func self_correlation(float[] novelty, int d) -> float
+	float corr = 0
+	for i in d:len(novelty)
+		corr += novelty[i-d] * novelty[i]
+	return corr / (len(novelty) - d)
+
+func find_beats(AudioBuffer buf, int sample_rate)
+	let novelty = calc_novelty(buf)
+	int dmin = sample_rate / float(FRAME_STEP) * (60./BPM_MAX)
+	int dmax = sample_rate / float(FRAME_STEP) * (60.0/BPM_MIN)
+	for d in dmin:dmax
+		let c = self_correlation(novelty, d)
+		print("{{float(sample_rate)/(d*FRAME_STEP)*60|.1}}   {{c}}")
+
+class CorrelationGrid extends Grid
+	complex[] curve
+	float bpm_opt
+	int i_opt
+	float[] para
+	int hover_peak = -1
+	
+	SelfCorrelationDialog* dlg
+	
+	int mouse_index()
+		let q = [for c in curve project2(c)]
+		int index = 0
+		float dmin = mx
+		for c,i in q
+			let d = abs(mx - c.x)
+			if d < dmin
+				dmin = d
+				index = i
+		return index
+	
+	int peak_around_mouse()
+		int index = mouse_index()
+		int imax = index
+		float ymax = 0
+		for c,i in curve[index-10:index+10]
+			if c.y > ymax
+				ymax = c.y
+				imax = index-10+i
+		return imax
+		
+	
+	override void on_draw(Painter p)
+		if hover_peak >= 0
+			p.set_color([1,1,1, 0.1])
+			float x0 = x_axis.project(curve[max(hover_peak-10, 0)].x)
+			float x1 = x_axis.project(curve[min(hover_peak+10, len(curve)-1)].x)
+			p.draw_rect(rect(x0,x1, 0,p.height))
+	
+		let q = [for c in curve project2(c)]
+		p.set_line_width(2)
+		p.set_color(colors.text_soft2)
+		p.draw_lines(q)
+		
+		p.set_color(colors.selection)
+		let x = x_axis.project(bpm_opt)
+		p.draw_line(x, 0, x, p.height)
+		p.set_font_size(8)
+		p.draw_str(x+3, plot_rect.y2-20, "{{bpm_opt|.1}} bpm")
+		
+		
+		for c,i in curve[i_opt-NN:i_opt+NN+1]
+			float y = (para[1] - para[2] * (i-para[0])^2)
+			complex pp = project2(complex(curve[i_opt-NN+i].x, y))
+			p.draw_circle(pp.x, pp.y, 3)
+	
+	override void on_mouse_move()
+		hover_peak = peak_around_mouse()
+		redraw()
+	override void on_left_button_down()
+		hover_peak = peak_around_mouse()
+		float bpm1 = curve[max(hover_peak-10, 0)].x
+		float bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
+		dlg.create_curve(bpm0, bpm1)
+
+func weight_parable(float[] p, float[] yy) -> float
+	float w = 0
+	for y,i in yy
+		w += (y - (p[1] - p[2] * (i-p[0])^2))^2
+	return w
+
+float[] optimize_parable(float[] p0, float[] yy)
+	let p = p0
+	float epsilon = 0.002
+	for i in 0:10000
+		int d = i % 3
+		float w = weight_parable(p, yy)
+		#print("{{p}}   {{w}}")
+		let pnext = p
+		pnext[d] += epsilon
+		let wx = weight_parable(pnext, yy)
+		if wx < w
+			p[d] += epsilon
+		else
+			p[d] -= epsilon
+	return p
+
+class SelfCorrelationDialog extends Dialog
+	CorrelationGrid* grid
+	int beats_per_bar = 4
+	bool discrete = true
+	GuessBpm* fb
+	float[] novelty
+	int buf_len
+	
+	void __init__(GuessBpm _fb, AudioBuffer buf)
+		super.__init__("Beat finder", 800, 500, _fb.session.win, false)
+		set_options("", "headerbar,resizable,closebutton=false")
+		from_source("
+Grid ? '' vertical
+	Grid ? ''
+		Grid ? ''
+			Label l-beats 'Beats per bar' right disabled
+			SpinButton beats '' range=1:16
+			---|
+			.
+			CheckBox discrete 'Round to integer'
+		DrawingArea area '' expandx
+	Grid ? '' buttonbar
+		Button cancel Cancel
+		---|
+		Button ok Create default")
+		set_int("beats", beats_per_bar)
+		check("discrete", discrete)
+		fb = &_fb
+		buf_len = len(buf)
+		novelty = calc_novelty(buf)
+	
+		grid = new CorrelationGrid()
+		grid.dlg = &self
+		
+		grid.init(self, "area")
+		grid.x_axis.set(BPM_MIN, BPM_MAX, true, "bpm")
+		grid.y_axis.set(0, 100, false, "%")
+		
+		event("hui:close", on_cancel)
+		event("cancel", on_cancel)
+		event("ok", on_ok)
+		event("beats", on_beats)
+		event("discrete", on_discrete)
+		
+		create_curve(BPM_MIN, BPM_MAX)
+		
+	func on_cancel()
+		destroy()
+	
+	func on_ok()
+		let song = fb.session.song
+		song.begin_action_group()
+		if not song.time_track()
+			song.add_track(SignalType.TIME, 0)
+		int length = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt
+		Bar bar = Bar(length, beats_per_bar, 1)
+		for i in 0:buf_len / length
+			song.add_bar(i, bar, Bar.EditMode.IGNORE)
+		song.end_action_group()
+		destroy()
+	
+	func on_beats()
+		beats_per_bar = get_int("")
+		create_curve(BPM_MIN, BPM_MAX)
+	
+	func on_discrete()
+		discrete = is_checked("")
+		create_curve(BPM_MIN, BPM_MAX)
+	
+	func d_to_bpm(int d) -> float
+		let sample_rate = fb.session.sample_rate()
+		return float(sample_rate * beats_per_bar) / (d * FRAME_STEP) * 60
+	
+	func bpm_to_d(float bpm) -> float
+		let sample_rate = fb.session.sample_rate()
+		return sample_rate * beats_per_bar / FRAME_STEP * (60. / bpm)
+	
+	func create_curve(float peak_bpm_min, float peak_bpm_max)
+		grid.curve.clear()
+		let sample_rate = fb.session.sample_rate()
+		#find_beats(buf, song.sample_rate)
+		int dmin = bpm_to_d(BPM_MAX)
+		int dmax = bpm_to_d(BPM_MIN)
+		float _cmax = 0
+		int i_opt = -1
+		for d in dmin:dmax
+			let c = self_correlation(novelty, d)
+			let bpm = d_to_bpm(d)
+			grid.curve.add([bpm, c])
+			if c > _cmax and bpm >= peak_bpm_min and bpm <= peak_bpm_max
+				_cmax = c
+				i_opt = d - dmin
+		let cmax = [for c in grid.curve c.y].max()
+		grid.curve = [for c in grid.curve complex(c.x, c.y/cmax*100)]
+		grid.bpm_opt = d_to_bpm(dmin + i_opt)
+		grid.i_opt = i_opt
+		
+		# parable initial
+		grid.para = [NN, 100*_cmax/cmax, 0.2]#((1-grid.curve[i_opt-1].y) + (1-grid.curve[i_opt-1].y)) / 2]
+		#grid.para = optimize_parable(grid.para, [for c in grid.curve[i_opt-NN:i_opt+NN+1] c.y])
+		grid.bpm_opt = d_to_bpm(dmin + i_opt - NN + grid.para[0])
+		if discrete
+			grid.bpm_opt = float(int(grid.bpm_opt + 0.5))
+		
+		grid.redraw()
+
+
+class GuessBpm extends SongPlugin
+	override void apply()
+		for t in weak(song.tracks)
+			for l in weak(t.layers)
+				for buf in l.buffers
+					let dlg = new SelfCorrelationDialog(self, buf)
+					dlg.run()
+					del dlg
+					return

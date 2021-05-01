@@ -149,11 +149,13 @@ void PluginManager::link_app_script_data() {
 	kaba::declare_class_size("Bar", sizeof(Bar));
 	kaba::declare_class_element("Bar.beats", &Bar::beats);
 	kaba::declare_class_element("Bar.divisor", &Bar::divisor);
+	kaba::declare_class_element("Bar.total_sub_beats", &Bar::total_sub_beats);
 	kaba::declare_class_element("Bar.length", &Bar::length);
 	kaba::declare_class_element("Bar.index", &Bar::index);
 	kaba::declare_class_element("Bar.index_text", &Bar::index_text);
 	kaba::declare_class_element("Bar.offset", &Bar::offset);
 	kaba::declare_class_element("Bar." + kaba::IDENTIFIER_SHARED_COUNT, &Bar::_pointer_ref_counter);
+	kaba::link_external_class_func("Bar." + kaba::IDENTIFIER_FUNC_INIT, &Bar::__init__);
 	kaba::link_external_class_func("Bar.range", &Bar::range);
 	kaba::link_external_class_func("Bar.bpm", &Bar::bpm);
 

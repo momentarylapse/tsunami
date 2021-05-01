@@ -47,6 +47,7 @@ class Bar : public Sharable<BarPattern> {
 public:
 	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int divisor);
+	void __init__(int length, int num_beats, int divisor);
 	bool is_pause();
 
 	string format_beats(bool fancy=true) const;

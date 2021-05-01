@@ -83,6 +83,10 @@ Bar::Bar(const BarPattern &b) /*: Sharable<BarPattern>(b)*/ {
 Bar::Bar(int _length, int _num_beats, int _num_sub_beats) : Bar(BarPattern(_length, _num_beats, _num_sub_beats))
 {}
 
+void Bar::__init__(int _length, int _num_beats, int _num_sub_beats) {
+	new(this) Bar(_length, _num_beats, _num_sub_beats);
+}
+
 const BarPattern &Bar::pattern() const {
 	return *(const BarPattern*)this;
 }

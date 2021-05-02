@@ -140,7 +140,7 @@ TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioVie
 void TimeScale::on_draw(Painter* c) {
 	GridColors g;
 	g.bg = view->colors.background_track;
-	g.bg_sel = view->colors.background_track_selection;
+	g.bg_sel = g.bg;//view->colors.background_track_selection;
 	g.fg = g.fg_sel = view->colors.grid;
 
 	auto *gp = view->grid_painter.get();

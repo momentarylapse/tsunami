@@ -66,7 +66,7 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	}
 	//grid = col_inter(background, col_inter(text, selection, 0.4f), 0.35f);
 	grid = text_soft3;// col_inter(background, text_soft1, 0.35f);
-	grid_selected = col_inter(grid, selection, 0.4f);
+	grid_selected = col_inter(grid, selection, 0.7f);
 
 	//grid = text_soft3;
 	sample = text_soft2;
@@ -101,8 +101,8 @@ color ColorScheme::hoverify(const color &c) const {
 
 ColorSchemeBright::ColorSchemeBright() {
 	background = White;
-	text = color(1, 0.3f, 0.3f, 0.3f);
-	selection = color(1, 0.2f, 0.2f, 0.7f);
+	text = color(1, 0.15f, 0.15f, 0.15f);
+	selection = color(1, 0.35f, 0.35f, 0.8f);
 	hover = White;
 	gamma = 1.0f;
 	name = "bright";

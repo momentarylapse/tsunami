@@ -58,11 +58,32 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 	if (l1 and l2) {
 		same_track = (l1->layer->track == l2->layer->track);
 	}
-	if (same_track)
-		c->set_line_dash({3.0f,10.0f}, 0);
+
+	float sx0, sx1;
+	view->cam.range2screen_clip(view->sel.range(), area, sx0, sx1);
 
 	c->set_color(AudioView::colors.grid);
-	c->draw_line(area.x1, y, area.x2, y);
+
+	if (sel_any and !view->sel.range().is_empty()) {
+		if (same_track)
+			c->set_line_dash({3.0f,10.0f}, 0);
+		c->draw_line(area.x1, y, sx0, y);
+
+		c->set_color(AudioView::colors.grid_selected);
+		if (same_track)
+			c->set_line_dash({3.0f,10.0f}, loop(sx0, 0.0f, 13.0f));
+		c->draw_line(sx0, y, sx1, y);
+
+		c->set_color(AudioView::colors.grid);
+		if (same_track)
+			c->set_line_dash({3.0f,10.0f}, loop(sx1, 0.0f, 13.0f));
+		c->draw_line(sx1, y, area.x2, y);
+	} else {
+		if (same_track)
+			c->set_line_dash({3.0f,10.0f}, 0);
+		c->draw_line(area.x1, y, area.x2, y);
+	}
+
 	c->set_line_dash({}, 0);
 
 }

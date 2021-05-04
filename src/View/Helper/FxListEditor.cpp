@@ -71,7 +71,7 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, const str
 
 	auto *song = track->song;
 	song->subscribe(this, [=]{ update(); }, song->MESSAGE_ENABLE_FX);
-	//track->subscribe(this, [=]{ update(); }, track->MESSAGE_CHANGE);
+	track->subscribe(this, [=]{ update(); }, track->MESSAGE_ANY);
 
 	update();
 }

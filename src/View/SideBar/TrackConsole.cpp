@@ -131,7 +131,6 @@ void TrackConsole::load_data() {
 		}
 		embed(panel, "synth", 0, 0);
 
-		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
 	} else {
 		hide_control("td_t_bars", true);
 		set_string("tuning", "");
@@ -152,13 +151,17 @@ void TrackConsole::update_strings() {
 }
 
 void TrackConsole::set_track(Track *t) {
+	if (t == track)
+		return;
 	if (track)
 		track->unsubscribe(this);
 	fx_editor = nullptr;
 	track = t;
 	load_data();
-	if (track)
+	if (track) {
+		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
 		track->subscribe(this, [=]{ on_update(); });
+	}
 }
 
 void TrackConsole::on_name() {

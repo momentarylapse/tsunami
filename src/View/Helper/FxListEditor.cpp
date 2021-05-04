@@ -78,6 +78,7 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, const str
 
 FxListEditor::~FxListEditor() {
 	track->song->unsubscribe(this);
+	track->unsubscribe(this);
 	for (int e: event_ids)
 		panel->remove_event_handler(e);
 	select_module(nullptr);
@@ -162,8 +163,12 @@ void FxListEditor::on_fx_right_click() {
 
 void FxListEditor::on_fx_delete() {
 	int n = panel->get_int(id_fx_list);
-	if (n >= 0)
-		track->delete_effect(track->fx[n].get());
+	if (n >= 0) {
+		auto t = track;
+		hui::RunLater(0.001f, [t,n] {
+			t->delete_effect(t->fx[n].get());
+		});
+	}
 }
 
 void FxListEditor::on_fx_enabled() {

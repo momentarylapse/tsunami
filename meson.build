@@ -486,6 +486,7 @@ sources = [
 	'src/View/Helper/Graph/ScrollBar.cpp',
 	'src/View/Helper/CpuDisplay.cpp',
 	'src/View/Helper/Dial.cpp',
+	'src/View/Helper/FxListEditor.cpp',
 	'src/View/Helper/MidiPreview.cpp',
 	'src/View/Helper/ModulePanel.cpp',
 	'src/View/Helper/PeakMeterDisplay.cpp',

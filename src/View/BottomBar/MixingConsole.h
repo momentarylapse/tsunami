@@ -45,8 +45,6 @@ public:
 
 	int peak_runner_id;
 	
-	owned<hui::Menu> menu_fx;
-	
 	void show_fx(Track *t);
 };
 

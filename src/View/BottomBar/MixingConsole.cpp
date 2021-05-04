@@ -8,8 +8,9 @@
 #include "MixingConsole.h"
 #include "../Helper/PeakMeterDisplay.h"
 #include "../Helper/ModulePanel.h"
-#include <math.h>
-
+#include "../Helper/FxListEditor.h"
+#include "../AudioView.h"
+#include "../Graph/AudioViewTrack.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -22,28 +23,8 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
-#include "../AudioView.h"
-#include "../Graph/AudioViewTrack.h"
+#include <math.h>
 
-class TrackSelectionDialog : public hui::Dialog {
-public:
-	Song *song;
-	Track *selected = nullptr;
-	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog("track-selector", parent) {
-		song = _song;
-		for (Track *t: weak(song->tracks))
-			add_string("tracks", t->nice_name());
-		event("tracks", [=]{ on_select(); });
-		event("ok", [=]{ on_select(); });
-		event("cancel", [=]{ request_destroy(); });
-	}
-	void on_select() {
-		int n = get_int("");
-		if (n >= 0)
-			selected = song->tracks[n].get();
-		request_destroy();
-	}
-};
 
 class TrackMixer: public hui::Panel {
 public:
@@ -51,7 +32,6 @@ public:
 		set_spacing(0);
 		from_resource("track-mixer2");
 
-		track = nullptr;
 		vtrack = nullptr;
 		editing = false;
 		console = c;
@@ -79,41 +59,25 @@ public:
 		event(pan_slider_id, [=]{ on_panning(); });
 		event(mute_id, [=]{ on_mute(); });
 		event("solo", [=]{ on_solo(); });
-		event_x("fx", "hui:select", [=]{ on_fx_select(); });
-		event_x("fx", "hui:change", [=]{ on_fx_edit(); });
-		event_x("fx", "hui:move", [=]{ on_fx_move(); });
-		event_x("fx", "hui:right-button-down", [=]{ on_fx_right_click(); });
-		event("add-fx", [=]{ on_add_fx(); });
-		event("fx-add", [=]{ on_add_fx(); });
-		event("fx-delete", [=]{ on_fx_delete(); });
-		event("fx-enabled", [=]{ on_fx_enabled(); });
-		event("fx-copy-from-track", [=]{ on_fx_copy_from_track(); });
-		event_x("midi-fx", "hui:select", [=]{ on_midi_fx_select(); });
-		event_x("midi-fx", "hui:change", [=]{ on_midi_fx_edit(); });
-		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
-		event("add-midi-fx", [=]{ on_add_midi_fx(); });
 		event_xp("peaks", "hui:draw", [=](Painter* p){ on_peak_draw(p); });
 		event("show-fx", [=]{ on_show_fx(is_checked("")); });
 
 		vtrack = t;
-		track = t->track;
-		auto *song = console->session->song.get();
-		song->subscribe(this, [=]{ update(); }, song->MESSAGE_ENABLE_FX);
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
+		fx_editor = new FxListEditor(vtrack, this, "fx", "midi-fx");
 		update();
 	}
 	~TrackMixer() {
-		select_module(nullptr);
-		console->session->song->unsubscribe(this);
+		fx_editor->select_module(nullptr);
 		clear_track();
 	}
 
 	void on_volume() {
 		editing = true;
-		if (track) {
+		if (track()) {
 			if (parent->is_checked("link-volumes"))
-				track->song->change_all_track_volumes(track, slider2vol(get_float("")));
+				track()->song->change_all_track_volumes(track(), slider2vol(get_float("")));
 			else
 				vtrack->set_volume(slider2vol(get_float("")));
 		}
@@ -140,136 +104,24 @@ public:
 		if (vtrack)
 			vtrack->unsubscribe(this);
 		vtrack = nullptr;
-		track = nullptr;
-		select_module(nullptr);
+		fx_editor->select_module(nullptr);
 	}
 	void on_vtrack_delete() {
 		clear_track();
 	}
 	void on_show_fx(bool show) {
 		if (show)
-			console->show_fx(track);
+			console->show_fx(track());
 		else
 			console->show_fx(nullptr);
 	}
 	void show_fx(bool show) {
 		reveal("revealer-fx", show);
 		check("show-fx", show);
-		select_module(nullptr);
+		fx_editor->select_module(nullptr);
 	}
 
-	Module *selected_module = nullptr;
-	owned<ModulePanel> config_panel;
-
-	void select_module(Module *m) {
-		if (selected_module)
-			selected_module->unsubscribe(this);
-
-		config_panel = nullptr;
-
-		selected_module = m;
-
-		string config_grid_id = "grid-config";
-
-		if (selected_module) {
-			config_panel = new ModulePanel(m);
-
-			if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
-				AudioEffect *fx = (AudioEffect*)m;
-				config_panel->set_func_enable([=](bool enabled){ track->enable_effect(fx, enabled); });
-				config_panel->set_func_delete([=]{ track->delete_effect(fx); });
-			} else { // MIDI_EFFECT
-				MidiEffect *fx = (MidiEffect*)m;
-				config_panel->set_func_enable([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
-				config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
-			}
-			embed(config_panel.get(), config_grid_id, 0, 0);
-
-			m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);
-		}
-
-		update_fx_list_selection();
-		reveal("config-revealer", m);
-	}
-
-	void on_fx_select() {
-		int n = get_int("");
-		if (n >= 0)
-			select_module(track->fx[n].get());
-		else
-			select_module(nullptr);
-	}
-	void on_fx_edit() {
-		int n = hui::GetEvent()->row;
-		if (n >= 0)
-			track->enable_effect(track->fx[n].get(), get_cell("", n, hui::GetEvent()->column)._bool());
-	}
-	void on_fx_move() {
-		int s = hui::GetEvent()->row;
-		int t = hui::GetEvent()->row_target;
-		track->move_effect(s, t);
-	}
-	void on_fx_right_click() {
-		int n = hui::GetEvent()->row;
-		console->menu_fx->enable("fx-delete", n >= 0);
-		console->menu_fx->enable("fx-enabled", n >= 0);
-		if (n >= 0)
-			console->menu_fx->check("fx-enabled", track->fx[n]->enabled);
-		console->menu_fx->open_popup(this);
-	}
-	void on_fx_delete() {
-		int n = get_int("fx");
-		if (n >= 0)
-			track->delete_effect(track->fx[n].get());
-	}
-	void on_fx_enabled() {
-		int n = get_int("fx");
-		if (n >= 0)
-			track->enable_effect(track->fx[n].get(), !track->fx[n]->enabled);
-	}
-	void on_fx_copy_from_track() {
-		auto dlg = ownify(new TrackSelectionDialog(win, track->song));
-		dlg->run();
-		if (dlg->selected and dlg->selected != track) {
-			track->song->begin_action_group();
-			foreachb (auto *fx, weak(track->fx))
-				track->delete_effect(fx);
-			for (auto *fx: weak(dlg->selected->fx))
-				track->add_effect((AudioEffect*)fx->copy());
-			track->song->end_action_group();
-		}
-	}
-	void on_add_fx() {
-		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleCategory::AUDIO_EFFECT);
-		if (name == "")
-			return;
-		auto *effect = CreateAudioEffect(console->session, name);
-		track->add_effect(effect);
-	}
-	void on_midi_fx_select() {
-		int n = get_int("");
-		if (n >= 0)
-			select_module(track->midi_fx[n].get());
-		else
-			select_module(nullptr);
-	}
-	void on_midi_fx_edit() {
-		int n = hui::GetEvent()->row;
-		if (n >= 0)
-			track->enable_midi_effect(track->midi_fx[n].get(), get_cell("", n, hui::GetEvent()->column)._bool());
-	}
-	void on_midi_fx_move() {
-		int s = hui::GetEvent()->row;
-		int t = hui::GetEvent()->row_target;
-		track->move_midi_effect(s, t);
-	}
-	void on_add_midi_fx() {
-		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleCategory::MIDI_EFFECT);
-		if (name == "")
-			return;
-		auto *effect = CreateMidiEffect(console->session, name);
-		track->add_midi_effect(effect);
-	}
+	owned<FxListEditor> fx_editor;
 	void on_peak_draw(Painter* p) {
 		int w = p->width;
 		int h = p->height;
@@ -277,14 +129,14 @@ public:
 		p->draw_rect(0, 0, w, h);
 		p->set_color(AudioView::colors.text);
 		float peak[2];
-		console->view->renderer->get_peak(track, peak);
+		console->view->renderer->get_peak(track(), peak);
 		peak[0] = sqrt(peak[0]);
 		peak[1] = sqrt(peak[1]);
 		p->draw_rect(0,   h * (1 - peak[0]), w/2, h * peak[0]);
 		p->draw_rect(w/2, h * (1 - peak[1]), w/2, h * peak[1]);
 	}
 	string nice_title() {
-		string s = track->nice_name();
+		string s = track()->nice_name();
 		if (vtrack->solo)
 			s = u8"\u00bb " + s + u8" \u00ab";
 		if (s.num > 16)
@@ -296,34 +148,16 @@ public:
 			return;
 		if (editing)
 			return;
-		set_float(vol_slider_id, vol2slider(track->volume));
-		set_float(pan_slider_id, track->panning);
-		check(mute_id, track->muted);
+		set_float(vol_slider_id, vol2slider(track()->volume));
+		set_float(pan_slider_id, track()->panning);
+		check(mute_id, track()->muted);
 		check("solo", vtrack->solo);
-		bool is_playable = vtrack->view->get_playable_tracks().contains(track);
+		bool is_playable = vtrack->view->get_playable_tracks().contains(track());
 		enable(id_name, is_playable);
 		if (is_playable)
 			set_string(id_name, nice_title());
 		else
 			set_string(id_name, "<s>" + nice_title() + "</s>");
-
-		// fx list
-		reset("fx");
-		for (auto *fx: weak(track->fx))
-			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_class);
-
-		// midi fx list
-		reset("midi-fx");
-		for (auto *fx: weak(track->midi_fx))
-			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_class);
-		
-		update_fx_list_selection();
-	}
-	void update_fx_list_selection() {
-		if (track) {
-			set_int("fx", weak(track->fx).find((AudioEffect*)selected_module));
-			set_int("midi-fx", weak(track->midi_fx).find((MidiEffect*)selected_module));
-		}
 	}
 
 
@@ -345,7 +179,12 @@ public:
 	}
 
 
-	Track *track;
+	Track *track() const {
+		if (!vtrack)
+			return nullptr;
+		return vtrack->track;
+	}
+
 	AudioViewTrack *vtrack;
 	//Slider *volume_slider;
 	//Slider *panning_slider;
@@ -379,8 +218,6 @@ MixingConsole::MixingConsole(Session *session) :
 	
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
-	
-	menu_fx = hui::CreateResourceMenu("popup-menu-fx-list");
 
 	event("output-volume", [=]{ on_output_volume(); });
 
@@ -430,7 +267,7 @@ void MixingConsole::on_output_volume() {
 
 void MixingConsole::show_fx(Track *t) {
 	for (auto &m: mixer)
-		m->show_fx(m->track == t);
+		m->show_fx(m->track() == t);
 }
 
 void MixingConsole::load_data() {

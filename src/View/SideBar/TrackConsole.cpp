@@ -9,6 +9,7 @@
 #include "../../Data/base.h"
 #include "../Helper/Slider.h"
 #include "../Helper/ModulePanel.h"
+#include "../Helper/FxListEditor.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../Dialog/DetuneSynthesizerDialog.h"
@@ -49,6 +50,7 @@ TrackConsole::TrackConsole(Session *session) :
 	editing = false;
 	from_resource("track_dialog");
 	set_decimals(1);
+	set_mode(Mode::FX);
 
 	auto instruments = Instrument::enumerate();
 	for (auto &i: instruments)
@@ -61,10 +63,21 @@ TrackConsole::TrackConsole(Session *session) :
 	event("edit_tuning", [=]{ on_edit_tuning(); });
 
 	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
-	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultFx); });
+	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultTrackFx); });
 	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
-	event("edit_midi", [=]{ session->set_mode(EditMode::DefaultTrack); });
-	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultMidiFx); });
+	event("edit_midi", [=]{ session->set_mode(EditMode::EditTrack); });
+	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultTrackMidiFx); });
+	event("edit_synth", [=]{ session->set_mode(EditMode::DefaultTrackSynth); });
+}
+
+void TrackConsole::set_mode(Mode m) {
+	mode = m;
+	hide_control("g_fx", (mode != Mode::FX) and (mode != Mode::MIDI_FX));
+	if (mode == Mode::FX)
+		set_int("tc", 0);
+	if (mode == Mode::MIDI_FX)
+		set_int("tc", 1);
+	hide_control("g_synth", (mode != Mode::SYNTH));
 }
 
 void TrackConsole::on_enter() {
@@ -96,9 +109,10 @@ void TrackConsole::load_data() {
 		set_options("name", "placeholder=" + track->nice_name());
 		set_float("volume", amplitude2db(track->volume));
 		set_float("panning", track->panning * 100.0f);
-		hide_control("edit_midi", track->type != SignalType::MIDI);
-		hide_control("edit_midi_fx", track->type != SignalType::MIDI);
-		enable("_edit_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
+		enable("edit_midi", track->type == SignalType::MIDI);
+		//hide_control("edit_midi_fx", track->type != SignalType::MIDI);
+		//hide_control("edit_synth", track->type != SignalType::MIDI);
+		enable("edit_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
 		enable("select_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
 
 		auto instruments = Instrument::enumerate();
@@ -116,6 +130,8 @@ void TrackConsole::load_data() {
 			panel = create_dummy_synth_panel();
 		}
 		embed(panel, "synth", 0, 0);
+
+		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
 	} else {
 		hide_control("td_t_bars", true);
 		set_string("tuning", "");
@@ -138,6 +154,7 @@ void TrackConsole::update_strings() {
 void TrackConsole::set_track(Track *t) {
 	if (track)
 		track->unsubscribe(this);
+	fx_editor = nullptr;
 	track = t;
 	load_data();
 	if (track)

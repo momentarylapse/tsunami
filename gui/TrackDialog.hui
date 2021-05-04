@@ -2,29 +2,40 @@ Dialog track_dialog "Spur" width=380 height=516
 	Grid ? "" vertical
 		Group g_name "Name"
 			Edit name "" expandx
-		Group g_volume "Volume"
-			Grid ? "" noexpandx
-				Label t_volume "Volume" right disabled
-				SpinButton volume "0" range=-10000:10:0.1 expandx
-				Label /db "dB"
-				---|
-				Label t_panning "Balance" right disabled
-				SpinButton panning "0" range=-100:100:1 "tooltip=+100% = right, -100% = left"
-				Label /percent "%"
-		Group g_instrument "Instrument"
-			Grid ? ""
-				ComboBox instrument "" expandx ignorefocus
-				---|
-				Grid ? ""
-					Text tuning "" expandx
-					Button edit_tuning "" image=hui:edit flat ignorefocus
-		Group g_synth "Synthesizer"
-			Grid synth ""
-		Label ? "" expandy
+		Scroller scroller ? expandy
+			Grid ? "" vertical
+				Group g_volume "Volume"
+					Grid ? "" noexpandx
+						Label t_volume "Volume" right disabled
+						SpinButton volume "0" range=-10000:10:0.1 expandx
+						Label /db "dB"
+						---|
+						Label t_panning "Balance" right disabled
+						SpinButton panning "0" range=-100:100:1 "tooltip=+100% = right, -100% = left"
+						Label /percent "%"
+				Group g_instrument "Instrument"
+					Grid ? ""
+						ComboBox instrument "" expandx ignorefocus
+						---|
+						Grid ? ""
+							Text tuning "" expandx
+							Button edit_tuning "" image=hui:edit flat ignorefocus
+				Group g_fx "Effects"
+					Grid ? "" expandx
+						TabControl tc "audio\\midi" noframe noexpandy
+							Grid grid-fx "" expandy vertical
+								ListView fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
+							Grid grid-midi-fx "" expandy vertical
+								ListView midi-fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx
+						---|
+						Revealer config-revealer "" slide=right
+							Grid grid-config ""
+				Group g_synth "Synthesizer"
+					Grid synth ""
 		Group td_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus
 				Button /edit_fx "Fx" link ignorefocus
+				Button /edit_synth "Synth" link ignorefocus
 				Button /edit_midi "Midi" link ignorefocus
-				Button /edit_midi_fx "Midi-Fx" link ignorefocus
 				Button /edit_curves "Curves" link ignorefocus

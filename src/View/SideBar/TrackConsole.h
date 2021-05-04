@@ -13,6 +13,7 @@
 class Track;
 class Slider;
 class ModulePanel;
+class FxListEditor;
 
 class TrackConsole: public SideBarConsole {
 public:
@@ -38,6 +39,15 @@ public:
 	Track *track;
 	hui::Panel *panel;
 	bool editing;
+	owned<FxListEditor> fx_editor;
+
+	enum class Mode {
+		FX,
+		MIDI_FX,
+		SYNTH
+	};
+	Mode mode;
+	void set_mode(Mode m);
 };
 
 #endif /* TRACKCONSOLE_H_ */

@@ -14,7 +14,6 @@ class Session;
 class Track;
 class Module;
 class ModulePanel;
-class AudioViewTrack;
 namespace hui {
 	class Panel;
 	class Menu;
@@ -24,17 +23,18 @@ namespace hui {
 //todo set/unset track...
 class FxListEditor : public VirtualBase {
 public:
-	FxListEditor(AudioViewTrack *t, hui::Panel *p, const string &_id, const string &_id_midi);
+	FxListEditor(Track *t, hui::Panel *p, const string &_id, const string &_id_midi, bool hexpand);
 	~FxListEditor();
 	hui::Panel *panel;
 	string id_fx_list;
 	string id_midi_fx_list;
-	AudioViewTrack *vtrack;
+	Track *track;
 	Module *selected_module = nullptr;
 	owned<ModulePanel> config_panel;
+	Array<int> event_ids;
+	int module_panel_mode;
 
 	Session *session() const;
-	Track *track() const;
 	void select_module(Module *m);
 	void on_fx_select();
 	void on_fx_edit();

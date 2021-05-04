@@ -65,7 +65,7 @@ public:
 		vtrack = t;
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
-		fx_editor = new FxListEditor(vtrack, this, "fx", "midi-fx");
+		fx_editor = new FxListEditor(track(), this, "fx", "midi-fx", false);
 		update();
 	}
 	~TrackMixer() {

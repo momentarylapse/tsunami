@@ -25,6 +25,7 @@
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Mode/ViewModeScaleMarker.h"
 #include "View/SideBar/SideBar.h"
+#include "View/SideBar/TrackConsole.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MixingConsole.h"
 
@@ -39,6 +40,9 @@ const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "AddSignalChain";
 const string EditMode::Default = "default";
 const string EditMode::DefaultSong = "default/song";
 const string EditMode::DefaultTrack = "default/track";
+const string EditMode::DefaultTrackFx = "default/track/fx";
+const string EditMode::DefaultTrackMidiFx = "default/track/midi-fx";
+const string EditMode::DefaultTrackSynth = "default/track/synth";
 const string EditMode::DefaultFx = "default/fx";
 const string EditMode::DefaultMidiFx = "default/midi-fx";
 const string EditMode::DefaultSamples = "default/samples";
@@ -162,6 +166,18 @@ void Session::set_mode(const string &mode) {
 	} else if (mode == EditMode::DefaultTrack) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::TRACK_CONSOLE);
+	} else if (mode == EditMode::DefaultTrackFx) {
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::TRACK_CONSOLE);
+		win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
+	} else if (mode == EditMode::DefaultTrackMidiFx) {
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::TRACK_CONSOLE);
+		win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
+	} else if (mode == EditMode::DefaultTrackSynth) {
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::TRACK_CONSOLE);
+		win->side_bar->track_console->set_mode(TrackConsole::Mode::SYNTH);
 	} else if (mode == EditMode::DefaultSong) {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SONG_CONSOLE);

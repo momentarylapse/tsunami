@@ -502,7 +502,7 @@ void TsunamiWindow::on_track_edit_midi() {
 }
 
 void TsunamiWindow::on_track_edit_fx() {
-	session->set_mode(EditMode::DefaultFx);
+	session->set_mode(EditMode::DefaultTrackFx);
 }
 
 void TsunamiWindow::on_track_add_marker() {

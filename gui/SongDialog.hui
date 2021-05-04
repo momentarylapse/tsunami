@@ -1,27 +1,29 @@
 Dialog song_dialog "Sound-Datei" width=430 height=375
 	Grid ? "" expandy vertical
-		Group grp-info "Info"
-			Grid ? ""
-				Label t-start "Start" hgroup=a right disabled
-				Label start "" bold expandx "tooltip=Position of the first audio chunk/midi note"
-				---|
-				Label t-end "End" right disabled
-				Label end "" bold "tooltip=Position of the last audio chunk/midi note"
-				---|
-				Label t-length "Length" right disabled
-				Label length "" bold "tooltip=Overall time between the first and last audio chunk/midi note"
-				---|
-				Label t-samples "Samples" right disabled
-				Label samples "" bold "tooltip=Total number of samples (the smallest possible time interval in the file)"
-		Group grp-format "Format"
-			Grid ? ""
-				Label ad_t_samplerate "Samplerate" right disabled hgroup=a
-				ComboBox samplerate "" expandx editable "tooltip=How many samples to play per second. This only affects playback, audio data will not be altered to correct the resulting pitch change!"
-				---|
-				Label ad_t_format "Format" right disabled
-				ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
-		Group ad_t_tags "Tags"
-			ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
+		Scroller ? '' expandy
+			Grid ? '' vertical
+				Group grp-info "Info"
+					Grid ? ""
+						Label t-start "Start" hgroup=a right disabled
+						Label start "" bold expandx "tooltip=Position of the first audio chunk/midi note"
+						---|
+						Label t-end "End" right disabled
+						Label end "" bold "tooltip=Position of the last audio chunk/midi note"
+						---|
+						Label t-length "Length" right disabled
+						Label length "" bold "tooltip=Overall time between the first and last audio chunk/midi note"
+						---|
+						Label t-samples "Samples" right disabled
+						Label samples "" bold "tooltip=Total number of samples (the smallest possible time interval in the file)"
+				Group grp-format "Format"
+					Grid ? ""
+						Label ad_t_samplerate "Samplerate" right disabled hgroup=a
+						ComboBox samplerate "" expandx editable "tooltip=How many samples to play per second. This only affects playback, audio data will not be altered to correct the resulting pitch change!"
+						---|
+						Label ad_t_format "Format" right disabled
+						ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
+				Group ad_t_tags "Tags"
+					ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre" noexpandy height=200
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_samples "Samples" link ignorefocus

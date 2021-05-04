@@ -16,6 +16,9 @@ public:
 	static const string Default;
 	static const string DefaultSong;
 	static const string DefaultTrack;
+	static const string DefaultTrackFx;
+	static const string DefaultTrackSynth;
+	static const string DefaultTrackMidiFx;
 	static const string DefaultFx;
 	static const string DefaultMidiFx;
 	static const string DefaultSamples;

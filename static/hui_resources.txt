@@ -6531,7 +6531,19 @@ Grid
 expandy,vertical
 0
 0
-4
+2
+Scroller
+?
+expandy
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
 Group
 grp-info
 
@@ -6636,14 +6648,14 @@ ad_t_tags
 1
 ListView
 tags
-format=TT
+format=TT,noexpandy,height=200
 0
 0
 0
 Group
 ad_t_edit
 
-3
+1
 0
 1
 Grid
@@ -6889,7 +6901,7 @@ Grid
 vertical
 0
 0
-6
+3
 Group
 g_name
 
@@ -6902,10 +6914,22 @@ expandx
 0
 0
 0
+Scroller
+scroller
+expandy
+1
+0
+1
+Grid
+?
+vertical
+0
+0
+4
 Group
 g_volume
 
-1
+0
 0
 1
 Grid
@@ -6953,7 +6977,7 @@ percent
 Group
 g_instrument
 
-2
+1
 0
 1
 Grid
@@ -6987,6 +7011,60 @@ image=hui:edit,flat,ignorefocus
 0
 0
 Group
+g_fx
+
+2
+0
+1
+Grid
+?
+expandx
+0
+0
+2
+TabControl
+tc
+noframe,noexpandy
+0
+0
+2
+Grid
+grid-fx
+expandy,vertical
+0
+0
+1
+ListView
+fx
+format=Ct,reorderable,nobar,noexpandy,expandx,height=100
+0
+0
+0
+Grid
+grid-midi-fx
+expandy,vertical
+1
+0
+1
+ListView
+midi-fx
+format=Ct,reorderable,nobar,noexpandy,expandx
+0
+0
+0
+Revealer
+config-revealer
+slide=right
+0
+1
+1
+Grid
+grid-config
+
+0
+0
+0
+Group
 g_synth
 
 3
@@ -6998,16 +7076,10 @@ synth
 0
 0
 0
-Label
-?
-expandy
-4
-0
-0
 Group
 td_t_edit
 
-5
+2
 0
 1
 Grid
@@ -7029,13 +7101,13 @@ link,ignorefocus
 0
 0
 Button
-edit_midi
+edit_synth
 link,ignorefocus
 2
 0
 0
 Button
-edit_midi_fx
+edit_midi
 link,ignorefocus
 3
 0
@@ -7325,7 +7397,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-615
+621
 # Text
 /bars-add
 Add bars...
@@ -7404,6 +7476,9 @@ Samples
 
 /edit_song
 File
+
+/edit_synth
+Synth
 
 /edit_track
 Track
@@ -9130,6 +9205,12 @@ Select track
 track-selector/tracks
 tracks
 
+track_dialog/fx
+enabled\\name
+
+track_dialog/g_fx
+Effects
+
 track_dialog/g_instrument
 Instrument
 
@@ -9142,14 +9223,23 @@ Synthesizer
 track_dialog/g_volume
 Volume
 
+track_dialog/midi-fx
+enabled\\name
+
 track_dialog/panning
 0
 +100% = right, -100% = left
+track_dialog/scroller
+?
+
 track_dialog/t_panning
 Balance
 
 track_dialog/t_volume
 Volume
+
+track_dialog/tc
+audio\\midi
 
 track_dialog/td_t_edit
 Edit

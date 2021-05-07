@@ -30,28 +30,28 @@ int SerializerX86::fc_begin(Function *f, const Array<SerialNodeParam> &params, c
 		p0 = 1;
 
 	// push parameters onto stack
-	for (int p=params.num-1;p>=p0;p--){
-		if (params[p].type){
+	for (int p=params.num-1; p>=p0; p--) {
+		if (params[p].type) {
 			int s = mem_align(params[p].type->size, 4);
-			for (int j=0;j<s/4;j++)
+			for (int j=0; j<s/4; j++)
 				cmd.add_cmd(Asm::INST_PUSH, param_shift(params[p], s - 4 - j * 4, TypeInt));
 			push_size += s;
 		}
 	}
 
-	if (config.abi == Abi::WINDOWS_32){
+	if (config.abi == Abi::X86_WINDOWS) {
 		// more than 4 byte have to be returned -> give return address as very last parameter!
 		if (type->uses_return_by_memory())
 			cmd.add_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 	}
 
 	// _cdecl: push class instance as first parameter
-	if (!f->is_static()){
+	if (!f->is_static()) {
 		cmd.add_cmd(Asm::INST_PUSH, params[0]);
 		push_size += config.pointer_size;
 	}
 	
-	if (config.abi == Abi::GNU_32){
+	if (config.abi == Abi::X86_GNU) {
 		// more than 4 byte have to be returned -> give return address as very first parameter!
 		if (type->uses_return_by_memory())
 			cmd.add_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
@@ -69,17 +69,17 @@ void SerializerX86::fc_end(int push_size, const SerialNodeParam &ret)
 		cmd.add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_ESP), param_imm(TypeChar, push_size));
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->uses_return_by_memory())){
-		if (type == TypeFloat32)
+	if ((type != TypeVoid) and !type->uses_return_by_memory()) {
+		if (type == TypeFloat32) {
 			if (config.compile_os)
 				cmd.add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
 			else
 				cmd.add_cmd(Asm::INST_FSTP, ret);
-		else if (type->size == 1){
+		} else if (type->size == 1) {
 			int v = cmd.add_virtual_reg(Asm::REG_AL);
 			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(type, v));
 			cmd.set_virtual_reg(v, cmd.cmd.num - 2, cmd.cmd.num - 1);
-		}else{
+		} else {
 			int v = cmd.add_virtual_reg(Asm::REG_EAX);
 			cmd.add_cmd(Asm::INST_MOV, ret, param_vreg(type, v));
 			cmd.set_virtual_reg(v, cmd.cmd.num - 2, cmd.cmd.num - 1);

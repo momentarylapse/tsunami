@@ -525,7 +525,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	//syntax_tree->ShowNode(com, cur_func);
 	Node *override_ret = nullptr;
 #if 1
-	if (node_is_assign_mem(com)) {
+	if (node_is_assign_mem(com) /*and (config.abi == Abi::AMD64_GNU)*/) {
 		auto dst = com->params[0].get();
 		auto src = com->params[1].get();
 		if (src->kind == NodeKind::FUNCTION_CALL or src->kind == NodeKind::INLINE_CALL) {

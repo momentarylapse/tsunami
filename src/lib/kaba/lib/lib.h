@@ -391,12 +391,14 @@ typedef void t_func();
 
 enum class Abi {
 	NATIVE = -1,
-	GNU_32,
-	GNU_64,
-	WINDOWS_32,
-	WINDOWS_64,
-	GNU_ARM_32,
-	GNU_ARM_64,
+	UNKNOWN = -2,
+
+	X86_GNU = 0,
+	AMD64_GNU,
+	X86_WINDOWS,
+	AMD64_WINDOWS,
+	ARM32_GNU,
+	ARM64_GNU,
 };
 
 class CompilerConfiguration {
@@ -404,6 +406,7 @@ public:
 	CompilerConfiguration();
 	Asm::InstructionSet instruction_set;
 	Abi abi;
+	Abi native_abi;
 	bool interpreted;
 	bool allow_std_lib;
 
@@ -465,7 +468,7 @@ void* mf(T tmf) {
 }
 
 
-void init(Asm::InstructionSet instruction_set = Asm::InstructionSet::NATIVE, Abi abi = Abi::NATIVE, bool allow_std_lib = true);
+void init(Abi abi = Abi::NATIVE, bool allow_std_lib = true);
 void clean_up();
 
 

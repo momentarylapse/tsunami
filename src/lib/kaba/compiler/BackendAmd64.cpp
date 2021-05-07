@@ -19,14 +19,19 @@ BackendAmd64::BackendAmd64(Serializer *s) : BackendX86(s) {
 	// rax, rcx, rdx
 	map_reg_root = {0,1,2};
 
-	if (config.abi == Abi::WINDOWS_64) {
+	if (config.abi == Abi::AMD64_WINDOWS) {
 		// rcx, rdx, r8, r9
 		param_regs_root = { 1, 2, 8, 9 };
 		max_xmm_params = 4;
+		// volatile: rax, rcx, rdx, r8-11, xmm0-5 (can override)
+		// non-volatile: rbx, rbp, rdi, rsi, rsp, r12-r15, xmm6-15 (keep saved!)
+		// https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention?view=msvc-160
 	} else {
 		// rdi, rsi, rdx, rcx, r8, r9
 		param_regs_root = {7, 6, 2, 1, 8, 9 };
 		max_xmm_params = 8;
+		// non-volatile: rbx, rsp, rbp, r12-r15
+		// volatile: rest
 	}
 }
 
@@ -243,23 +248,36 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 
 	// return as _very_ first parameter
 	if (type->uses_return_by_memory()) {
-		params.insert(insert_reference(ret), 0);
+		if ((config.abi == Abi::AMD64_WINDOWS) and !is_static and params[0].type->is_some_pointer())
+			params.insert(insert_reference(ret), 1);
+		else
+			params.insert(insert_reference(ret), 0);
 	}
 
 	// map params...
 	Array<SerialNodeParam> reg_param;
-	Array<SerialNodeParam> stack_param;
+	Array<int> reg_param_root;
 	Array<SerialNodeParam> xmm_param;
+	Array<int> xmm_param_root;
+	Array<SerialNodeParam> stack_param;
+	int reg_param_counter = 0;
+	int xmm_param_counter = 0;
 	for (auto &p: params) {
 		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_some_pointer()) {
-			if (reg_param.num < param_regs_root.num) {
+			if (reg_param_counter < param_regs_root.num) {
 				reg_param.add(p);
+				reg_param_root.add(param_regs_root[reg_param_counter ++]);
+				if (config.abi == Abi::AMD64_WINDOWS)
+					xmm_param_counter ++;
 			} else {
 				stack_param.add(p);
 			}
 		} else if ((p.type == TypeFloat32) or (p.type == TypeFloat64)) {
-			if (xmm_param.num < max_xmm_params) {
+			if (xmm_param_counter < max_xmm_params) {
 				xmm_param.add(p);
+				xmm_param_root.add(Asm::REG_XMM0 + (xmm_param_counter ++));
+				if (config.abi == Abi::AMD64_WINDOWS)
+					reg_param_counter++;
 			} else {
 				stack_param.add(p);
 			}
@@ -270,19 +288,32 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 
 	// push parameters onto stack
 	push_size = 8 * stack_param.num;
-	if (push_size > 127)
-		insert_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeInt, push_size));
-	else if (push_size > 0)
-		insert_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, push_size));
-	foreachb(SerialNodeParam &p, stack_param) {
-		insert_cmd(Asm::INST_MOV, param_preg(p.type, get_reg(0, p.type->size)), p);
-		insert_cmd(Asm::INST_PUSH, p_rax);
+	if (stack_param.num > 0) {
+		if (config.abi == Abi::AMD64_WINDOWS) {
+			// TODO optimize... don't push, just write into stack
+			push_size += 32;
+		}
+		// stack pointer is already low enough to include stack parameters
+		// to compensate the following push's pre-increase rsp
+		if (push_size > 127)
+			insert_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeInt, push_size));
+		else if (push_size > 0)
+			insert_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, push_size));
+		//}
+		foreachb (SerialNodeParam &p, stack_param) {
+			insert_cmd(Asm::INST_MOV, param_preg(p.type, get_reg(0, p.type->size)), p);
+			insert_cmd(Asm::INST_PUSH, p_rax);
+		}
+		if (config.abi == Abi::AMD64_WINDOWS) {
+			push_size -= 32;
+			insert_cmd(Asm::INST_SUB, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, 32));
+		}
 	}
 	max_push_size = max(max_push_size, (int)push_size);
 
 	// xmm0-7
 	foreachib(auto &p, xmm_param, i) {
-		int reg = Asm::REG_XMM0 + i;
+		int reg = xmm_param_root[i];
 		if (p.type == TypeFloat64)
 			insert_cmd(Asm::INST_MOVSD, param_preg(TypeReg128, reg), p);
 		else
@@ -292,7 +323,7 @@ int BackendAmd64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNo
 	func_param_virts = {};
 
 	foreachib(auto &p, reg_param, i) {
-		int root = param_regs_root[i];
+		int root = reg_param_root[i];
 		int preg = get_reg(root, p.type->size);
 		if (preg >= 0) {
 			int v = cmd.add_virtual_reg(preg);
@@ -336,23 +367,38 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 				break;
 			}
 	}
+	// windows: self before return
+	if ((param.num == 2) and (config.abi == Abi::AMD64_WINDOWS) and param[1]->type->is_some_pointer()) {
+		param.swap(0, 1);
+	}
+
 	for (int i=0;i<f->num_params;i++)
 		param.add(f->var[i].get());
 
 	// map params...
 	Array<Variable*> reg_param;
-	Array<Variable*> stack_param;
+	Array<int> reg_param_root;
 	Array<Variable*> xmm_param;
+	Array<int> xmm_param_root;
+	Array<Variable*> stack_param;
+	int reg_param_counter = 0;
+	int xmm_param_counter = 0;
 	for (Variable *p: param) {
 		if ((p->type == TypeInt) or (p->type == TypeInt64) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_some_pointer()) {
-			if (reg_param.num < param_regs_root.num) {
+			if (reg_param_counter < param_regs_root.num) {
 				reg_param.add(p);
+				reg_param_root.add(param_regs_root[reg_param_counter ++]);
+				if (config.abi == Abi::AMD64_WINDOWS)
+					xmm_param_counter ++;
 			} else {
 				stack_param.add(p);
 			}
 		} else if ((p->type == TypeFloat32) or (p->type == TypeFloat64)) {
-			if (xmm_param.num < max_xmm_params) {
+			if (xmm_param_counter < max_xmm_params) {
 				xmm_param.add(p);
+				xmm_param_root.add(Asm::REG_XMM0 + (xmm_param_counter ++));
+				if (config.abi == Abi::AMD64_WINDOWS)
+					reg_param_counter ++;
 			} else {
 				stack_param.add(p);
 			}
@@ -362,8 +408,8 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	}
 
 	// xmm0-7
-	foreachib(Variable *p, xmm_param, i){
-		int reg = Asm::REG_XMM0 + i;
+	foreachib (Variable *p, xmm_param, i){
+		int reg = xmm_param_root[i];
 		if (p->type == TypeFloat64)
 			insert_cmd(Asm::INST_MOVSD, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
 		else
@@ -372,8 +418,8 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 
 	}
 
-	foreachib(Variable *p, reg_param, i) {
-		int root = param_regs_root[i];
+	foreachib (Variable *p, reg_param, i) {
+		int root = reg_param_root[i];
 		int preg = get_reg(root, p->type->size);
 		if (preg >= 0) {
 			int v = cmd.add_virtual_reg(preg);
@@ -392,7 +438,9 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 
 	// get parameters from stack
 	foreachb(Variable *p, stack_param) {
-		do_error("func with stack...");
+		// variables are already where expect them ([rbp+...])
+		if (config.abi != Abi::AMD64_WINDOWS)
+			do_error("func with stack...");
 		/*int s = 8;
 		add_cmd(Asm::inst_push, p);
 		push_size += s;*/
@@ -428,7 +476,7 @@ void BackendAmd64::process_references() {
 
 // so far not used... x86 also implements both...
 void BackendAmd64::add_function_intro_frame(int stack_alloc_size) {
-	if (config.abi == Abi::WINDOWS_64)
+	if (config.abi == Abi::AMD64_WINDOWS)
 		stack_alloc_size += 32; // shadow space
 
 	int_p reg_bp = Asm::REG_RBP;

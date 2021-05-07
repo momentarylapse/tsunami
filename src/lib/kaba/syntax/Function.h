@@ -72,7 +72,7 @@ public:
 	bool needs_overriding;
 	int num_slightly_hidden_vars;
 	// for compilation...
-	int64 _var_size, _param_size;
+	int64 _var_size;
 	int _logical_line_no;
 	int _exp_no;
 	void *address;

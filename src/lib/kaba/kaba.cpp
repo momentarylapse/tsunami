@@ -28,7 +28,7 @@
 
 namespace kaba {
 
-string Version = "0.19.11.1";
+string Version = "0.19.12.0";
 
 //#define ScriptDebug
 
@@ -316,13 +316,13 @@ void execute_single_script_command(const string &cmd) {
 	s->compile();
 
 
-	if (kaba::config.interpreted) {
+	if (config.interpreted) {
 		s->interpreter->run("--command-func--");
 		return;
 	}
 
 // execute
-	if (kaba::config.instruction_set == Asm::QueryLocalInstructionSet()) {
+	if (config.abi == config.native_abi) {
 		typedef void void_func();
 		void_func *f = (void_func*)func->address;
 		if (f)

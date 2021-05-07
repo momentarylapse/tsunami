@@ -491,7 +491,7 @@ struct InstructionWithParamsList : public Array<InstructionWithParams> {
 };
 
 void init(InstructionSet instruction_set = InstructionSet::NATIVE);
-InstructionSet QueryLocalInstructionSet();
+InstructionSet guess_native_instruction_set();
 bool assemble(const char *code, char *oc, int &ocs);
 string disassemble(void *code, int length = -1, bool allow_comments = true);
 

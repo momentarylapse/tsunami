@@ -748,7 +748,7 @@ bool get_instruction_allow_gen_reg(int inst)
 
 
 
-InstructionSet QueryLocalInstructionSet() {
+InstructionSet guess_native_instruction_set() {
 #ifdef CPU_AMD64
 	return InstructionSet::AMD64;
 #endif
@@ -766,7 +766,7 @@ InstructionSet QueryLocalInstructionSet() {
 
 void init(InstructionSet set) {
 	if (set == InstructionSet::NATIVE)
-		set = QueryLocalInstructionSet();
+		set = guess_native_instruction_set();
 
 	instruction_set.set = set;
 	instruction_set.pointer_size = 4;

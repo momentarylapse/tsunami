@@ -497,28 +497,28 @@ int BackendX86::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 		p0 = 1;
 
 	// push parameters onto stack
-	for (int p=params.num-1;p>=p0;p--){
-		if (params[p].type){
+	for (int p=params.num-1; p>=p0; p--) {
+		if (params[p].type) {
 			int s = mem_align(params[p].type->size, 4);
-			for (int j=0;j<s/4;j++)
+			for (int j=0; j<s/4; j++)
 				insert_cmd(Asm::INST_PUSH, param_shift(params[p], s - 4 - j * 4, TypeInt));
 			push_size += s;
 		}
 	}
 
-	if (config.abi == Abi::WINDOWS_32){
+	if (config.abi == Abi::X86_WINDOWS) {
 		// more than 4 byte have to be returned -> give return address as very last parameter!
 		if (type->uses_return_by_memory())
 			insert_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 	}
 
 	// _cdecl: push class instance as first parameter
-	if (!is_static){
+	if (!is_static) {
 		insert_cmd(Asm::INST_PUSH, params[0]);
 		push_size += config.pointer_size;
 	}
 
-	if (config.abi == Abi::GNU_32){
+	if (config.abi == Abi::X86_GNU) {
 		// more than 4 byte have to be returned -> give return address as very first parameter!
 		if (type->uses_return_by_memory())
 			insert_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
@@ -528,7 +528,7 @@ int BackendX86::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 
 void BackendX86::mark_regs_busy_at_call(int index) {
 	// call violates all used registers...
-	for (int i=0;i<map_reg_root.num;i++) {
+	for (int i=0; i<map_reg_root.num; i++) {
 		int v = cmd.add_virtual_reg(get_reg(i, 4));
 		cmd.use_virtual_reg(v, index, index);
 	}
@@ -1122,16 +1122,8 @@ void BackendX86::add_function_intro_frame(int stack_alloc_size) {
 // convert    SerialNode[] cmd   into    Asm::Instruction..List list
 void BackendX86::assemble() {
 	// intro + allocate stack memory
-	if (config.instruction_set != Asm::InstructionSet::ARM)
-		stack_max_size += max_push_size;
+	stack_max_size += max_push_size;
 	stack_max_size = mem_align(stack_max_size, config.stack_frame_align);
-
-	if (config.instruction_set == Asm::InstructionSet::ARM) {
-		foreachi(GlobalRef &g, global_refs, i) {
-			g.label = list->add_label(format("_kaba_ref_%d_%d", cur_func_index, i));
-			list->add2(Asm::INST_DD, Asm::param_imm((int_p)g.p, 4));
-		}
-	}
 
 	list->insert_label(cur_func->_label);
 

@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <assert.h>
 
+// RtlAddFunctionTable, RtlInstallFunctionTableCallback on Windows...?
+
 
 namespace kaba {
 

@@ -440,7 +440,7 @@ void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 					return;
 				}
 			}
-		msg_error("could not override " + c->name + "." + f->name);
+		msg_error(format("could not override %s.%s", c->name, f->name));
 	} else {
 		// name alone is not enough for matching...
 		/*foreachi(ClassFunction &ff, c->functions, i)
@@ -472,7 +472,7 @@ Function* class_add_func(const string &name, const Class *return_type, void *fun
 }
 
 int get_virtual_index(void *func, const string &tname, const string &name) {
-	if ((config.abi == Abi::WINDOWS_32) or (config.abi == Abi::WINDOWS_64)) {
+	if ((config.native_abi == Abi::X86_WINDOWS) or (config.native_abi == Abi::AMD64_WINDOWS)) {
 		if (!func)
 			return 0;
 		unsigned char* pp = (unsigned char*)func;
@@ -516,7 +516,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 			msg_write(p2s(pp));
 			msg_write(Asm::disassemble(func, 16));
 		}
-	} else if (config.abi == Abi::WINDOWS_64) {
+	} else if (config.native_abi == Abi::AMD64_WINDOWS) {
 		msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
 	} else {
@@ -790,9 +790,40 @@ void SIAddPackageImage();
 void SIAddPackageDoc();
 void SIAddPackageVulkan();
 
+
+Asm::InstructionSet extract_instruction_set(Abi abi) {
+	if ((abi == Abi::X86_GNU) or (abi == Abi::X86_WINDOWS))
+		return Asm::InstructionSet::X86;
+	if ((abi == Abi::AMD64_GNU) or (abi == Abi::AMD64_WINDOWS))
+		return Asm::InstructionSet::AMD64;
+	if ((abi == Abi::ARM32_GNU) or (abi == Abi::ARM64_GNU))
+		return Asm::InstructionSet::ARM;
+	//if (abi == Abi::NATIVE)
+	return Asm::InstructionSet::NATIVE;
+}
+
+Abi guess_native_abi() {
+	auto instruction_set = Asm::guess_native_instruction_set();
+	if (instruction_set == Asm::InstructionSet::AMD64) {
+#ifdef OS_WINDOWS
+		return Abi::AMD64_WINDOWS;
+#endif
+		return Abi::AMD64_GNU;
+	} else if (config.instruction_set == Asm::InstructionSet::X86) {
+#ifdef OS_WINDOWS
+		return Abi::X86_WINDOWS;
+#endif
+		return Abi::X86_GNU;
+	} else if (config.instruction_set == Asm::InstructionSet::ARM) {
+		return Abi::ARM32_GNU;
+	}
+	return Abi::UNKNOWN;
+}
+
 CompilerConfiguration::CompilerConfiguration() {
-	abi = Abi::NATIVE;
-	instruction_set = Asm::InstructionSet::NATIVE;
+	native_abi = guess_native_abi();
+	abi = native_abi;
+	instruction_set = extract_instruction_set(abi);
 	interpreted = false;
 	allow_std_lib = true;
 	pointer_size = sizeof(void*);
@@ -824,31 +855,20 @@ CompilerConfiguration::CompilerConfiguration() {
 	function_address_offset = element_offset(&Function::address); // offsetof(Function, address);
 }
 
-void init(Asm::InstructionSet instruction_set, Abi abi, bool allow_std_lib) {
-	Asm::init(instruction_set);
-	config.instruction_set = Asm::instruction_set.set;
-	if (abi == Abi::NATIVE){
-		if (config.instruction_set == Asm::InstructionSet::AMD64){
-			abi = Abi::GNU_64;
-#ifdef OS_WINDOWS
-			abi = Abi::WINDOWS_64;
-#endif
-		}else if (config.instruction_set == Asm::InstructionSet::X86){
-			abi = Abi::GNU_32;
-#ifdef OS_WINDOWS
-			abi = Abi::WINDOWS_32;
-#endif
-		}else if (config.instruction_set == Asm::InstructionSet::ARM){
-			abi = Abi::GNU_ARM_32;
-		}
+void init(Abi abi, bool allow_std_lib) {
+	if (abi == Abi::NATIVE) {
+		config.abi = config.native_abi;
+	} else {
+		config.abi = abi;
 	}
-	config.abi = abi;
+	config.instruction_set = extract_instruction_set(config.abi);
+	Asm::init(config.instruction_set);
 	config.allow_std_lib = allow_std_lib;
 	config.pointer_size = Asm::instruction_set.pointer_size;
-	if ((abi != Abi::NATIVE) or (instruction_set != Asm::InstructionSet::NATIVE))
-		config.super_array_size = mem_align(config.pointer_size + 3 * sizeof(int), config.pointer_size);
-	else
+	if (abi == Abi::NATIVE)
 		config.super_array_size = sizeof(DynamicArray);
+	else
+		config.super_array_size = mem_align(config.pointer_size + 3 * sizeof(int), config.pointer_size);
 
 	config.function_align = 2 * config.pointer_size;
 	config.stack_frame_align = 2 * config.pointer_size;

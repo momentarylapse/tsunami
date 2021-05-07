@@ -387,7 +387,7 @@ void Class::link_virtual_table() {
 	if (parent)
 		for (int i=0; i<parent->vtable.num; i++)
 			vtable[i] = parent->vtable[i];
-	if (config.abi == Abi::WINDOWS_32)
+	if (config.abi == Abi::X86_WINDOWS)
 		vtable[0] = mf(&VirtualBase::__delete_external__);
 	else
 		vtable[1] = mf(&VirtualBase::__delete_external__);
@@ -428,7 +428,7 @@ void Class::link_external_virtual_table(void *p) {
 	for (int i=0; i<vtable.num; i++)
 		vtable[i] = t[i];
 	// this should also link the "real" c++ destructor
-	if ((config.abi == Abi::WINDOWS_32) or (config.abi == Abi::WINDOWS_64))
+	if ((config.abi == Abi::X86_WINDOWS) or (config.abi == Abi::AMD64_WINDOWS))
 		vtable[0] = mf(&VirtualBase::__delete_external__);
 	else
 		vtable[1] = mf(&VirtualBase::__delete_external__);

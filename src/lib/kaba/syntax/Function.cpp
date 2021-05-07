@@ -55,8 +55,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	literal_return_type = _return_type;
 	name_space = _name_space;
 	flags = _flags;
-	auto_declared = false;;
-	_param_size = 0;
+	auto_declared = false;
 	_var_size = 0;
 	_logical_line_no = -1;
 	_exp_no = -1;

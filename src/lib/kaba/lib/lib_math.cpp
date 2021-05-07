@@ -168,8 +168,15 @@ complex op_complex_div(complex &a, complex &b) { return a / b; }
 
 class KabaComplex : public complex {
 public:
-	void assign(const complex& o) {
+	void assign(const complex &o) {
 		*(complex*)this = o;
+	}
+};
+
+class KabaVector : public vector {
+public:
+	void assign(const vector &o) {
+		*(vector*)this = o;
 	}
 };
 
@@ -297,6 +304,9 @@ public:
 	}
 	void init(float r, float g, float b, float a) {
 		*(color*)this = color(a, r, g, b);
+	}
+	void assign(const color &o) {
+		*(color*)this = o;
 	}
 };
 
@@ -467,7 +477,7 @@ void SIAddPackageMath() {
 		class_add_const("EX", TypeVector, (void*)&vector::EX);
 		class_add_const("EY", TypeVector, (void*)&vector::EY);
 		class_add_const("EZ", TypeVector, (void*)&vector::EZ);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVector, TypeVector, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVector, TypeVector, InlineID::CHUNK_ASSIGN, mf(&KabaVector::assign));
 		add_operator(OperatorID::EQUAL, TypeBool, TypeVector, TypeVector, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::ADD, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_ADD);
 		add_operator(OperatorID::SUBTRACT, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_SUBTRACT);
@@ -591,7 +601,7 @@ void SIAddPackageMath() {
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
 			func_add_param("a", TypeFloat32);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN, mf(&KabaColor::assign));
 		add_operator(OperatorID::EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_EQUAL);
 		// color
 		class_add_const("WHITE",  TypeColor, (void*)&White);

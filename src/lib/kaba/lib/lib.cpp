@@ -978,9 +978,6 @@ void _declare_class_element(const string &name, int offset) {
 }
 
 void _link_external_virtual(const string &name, void *p, void *instance) {
-#ifdef OS_WINDOWS
-	return;
-#endif
 	VirtualTable *v = *(VirtualTable**)instance;
 
 

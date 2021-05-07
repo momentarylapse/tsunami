@@ -802,7 +802,7 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;
-		pf.name = e.str().replace(".kaba", "");
+		pf.name = e.no_ext().str();
 		pf.filename = dir << e;
 		pf.group = group;
 		get_plugin_file_data(pf);
@@ -832,7 +832,6 @@ void PluginManager::find_plugins() {
 	kaba::config.compile_silently = true;
 
 	// "AudioSource"
-#ifndef OS_WINDOWS
 	find_plugins_in_dir("AudioSource", "", ModuleCategory::AUDIO_SOURCE);
 
 	// "AudioEffect"
@@ -869,7 +868,6 @@ void PluginManager::find_plugins() {
 
 	// "Synthesizer"
 	find_plugins_in_dir("Synthesizer", "", ModuleCategory::SYNTHESIZER);
-#endif
 }
 
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {

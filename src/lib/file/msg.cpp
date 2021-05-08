@@ -92,6 +92,9 @@ void msg_add_str(const string &str) {
 	log_buffer += str;
 	log_buffer.add('\n');
 	printf("%s\n", str.c_str());
+#ifdef OS_WINDOWS
+	fflush(stdout);
+#endif
 }
 
 

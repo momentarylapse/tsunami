@@ -215,7 +215,7 @@ struct CPUInstruction
 	bool match(InstructionWithParams &iwp);
 	void print() const
 	{
-		printf("inst: %s   %.4x (%d) %d  %s\n", name.c_str(), code, code_size, cap, has_modrm ? "modr/m" : "");
+		msg_write(format("inst: %s   %.4x (%d) %d  %s", name, code, code_size, cap, has_modrm ? "modr/m" : ""));
 		param1.print();
 		param2.print();
 	}
@@ -1563,7 +1563,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 					if ((value >= 0x80000000) or (-value >= 0x80000000)) {
 						msg_write("-----");
 						inst.print();
-						raise_error(format("RIP relative more than 32 bit: %lx from %p", p.value, &oc[ocs]));
+						raise_error(format("RIP relative more than 32 bit: %x from %s", p.value, p2s(&oc[ocs])));
 					}
 				}else{
 					size = SIZE_64; // Ov/Mv...

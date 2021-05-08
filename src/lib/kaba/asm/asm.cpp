@@ -709,7 +709,7 @@ void InstructionParamFuzzy::print() const
 	}else{
 		t += "	None";
 	}
-	printf("%s\n", t.c_str());
+	msg_write(t);
 }
 
 const string GetInstructionName(int inst)

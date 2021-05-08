@@ -106,22 +106,32 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 		msg_write("get nice...");
 
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
-	mem = (char*)VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	int prot = PAGE_READWRITE;
+	if (executable) {
+		prot = PAGE_EXECUTE_READWRITE;
+	}
 #else
-
 	int prot = PROT_READ | PROT_WRITE;
 	int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE;
 	if (executable) {
 		prot |= PROT_EXEC;
 		flags |= MAP_EXECUTABLE;
 	}
+#endif
 
 	// try in 32bit distance from current opcode
 	for (int i=0; i<10000; i++) {
 		void *addr0 = get_nice_random_addr();
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+		mem = (char *)VirtualAlloc(addr0, size, MEM_COMMIT | MEM_RESERVE, prot);
+#else
 		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
 		mem = (char*)mmap(addr0, size, prot, flags, -1, 0);
-		if ((int_p)mem != -1) {
+		if ((int_p)mem == -1)
+			mem = nullptr;
+#endif
+
+		if (mem) {
 			if (config.verbose)
 				printf("%d  %p  ->  %p\n", i, addr0, mem);
 			if (labs((int_p)mem - (int_p)addr0) < 2000000000)
@@ -131,13 +141,19 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 				msg_write("...try again");
 		}
 		if (i > 5000) {
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+#else
 			prot |= PROT_EXEC;
 			flags |= MAP_EXECUTABLE | MAP_FIXED;
+#endif
 		}
 	}
 	//script->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
 
 	// no?...ok, try anywhere
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+	mem = (char*)VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+#else
 	mem = (char*)mmap(nullptr, size, prot, flags, -1, 0);
 	if ((int_p)mem == -1)
 		mem = nullptr;

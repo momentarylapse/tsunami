@@ -162,8 +162,8 @@ void hui_default_error_handler() {
 		msg_write(_("...done"));
 	}
 
-	foreachb(Window *w, _all_windows_)
-		delete w;
+	//foreachb(Window *w, _all_windows_)
+	//	delete w;
 	msg_write(_("                  Close dialog box to exit program."));
 
 	//HuiMultiline=true;

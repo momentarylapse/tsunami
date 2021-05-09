@@ -337,6 +337,10 @@ enum class InstID {
 	INVALID = -1
 };
 
+#ifdef OVERFLOW
+#undef OVERFLOW
+#endif
+
 enum class ArmCond {
 	EQUAL,
 	NOT_EQUAL,

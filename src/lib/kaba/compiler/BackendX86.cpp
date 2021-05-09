@@ -628,7 +628,6 @@ void BackendX86::add_function_intro_params(Function *f) {
 bool dist_fits_32bit(int64 a, void *b);
 
 void correct_far_mem_access(BackendX86 *be) {
-	if (config.abi != Abi::AMD64_GNU)
 
 	for (int i=0; i<be->cmd.cmd.num; i++) {
 		auto &c = be->cmd.cmd[i];
@@ -638,11 +637,10 @@ void correct_far_mem_access(BackendX86 *be) {
 				auto p1 = c.p[1];
 
 				int reg = be->find_unused_reg(i, i, config.pointer_size);
-				auto p_reg = be->param_vreg(TypePointer, reg);
 
 				be->cmd.next_cmd_target(i);
-				be->insert_cmd(Asm::InstID::MOV, p_reg, param_imm(TypePointer, p1.p)); // prepare input into register
-				be->cmd.set_cmd_param(i+1, 1, p_reg); // change input in original instruction
+				be->insert_cmd(Asm::InstID::MOV, be->param_vreg(TypePointer, reg), param_imm(TypePointer, p1.p)); // prepare input into register
+				be->cmd.set_cmd_param(i+1, 1, be->param_deref_vreg(p1.type, reg)); // change input in original instruction
 				be->cmd.set_virtual_reg(reg, i, i + 1);
 			}
 		}
@@ -685,7 +683,7 @@ void BackendX86::do_mapping() {
 	for (int i=0; i<cmd.cmd.num; i++)
 		correct_unallowed_param_combis2(cmd.cmd[i]);
 
-	if (config.abi == Abi::AMD64_GNU)
+	if (config.instruction_set == Asm::InstructionSet::AMD64)
 		correct_far_mem_access(this);
 
 	serializer->cmd_list_out("map:z", "end");

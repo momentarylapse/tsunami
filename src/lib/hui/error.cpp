@@ -8,8 +8,6 @@
 #include "hui.h"
 #include "internal.h"
 
-
-
 #ifdef _X_USE_NET_
 	#include "../net/net.h"
 #endif
@@ -22,22 +20,23 @@ namespace hui
 extern Callback _idle_function_, _error_function_;
 extern bool _screen_opened_;
 
-void _HuiSignalHandler(int) {
+static void _hui_signal_handler(int s) {
 	_error_function_();
 }
+
 
 // apply a function to be executed when a critical error occures
 void SetErrorFunction(const Callback &function) {
 	_error_function_ = function;
 	if (function) {
-		signal(SIGSEGV, &_HuiSignalHandler);
-		/*signal(SIGINT, &_HuiSignalHandler);
-		signal(SIGILL, &_HuiSignalHandler);
-		signal(SIGTERM, &_HuiSignalHandler);
-		signal(SIGABRT, &_HuiSignalHandler);*/
-		/*signal(SIGFPE, &_HuiSignalHandler);
-		signal(SIGBREAK, &_HuiSignalHandler);
-		signal(SIGABRT_COMPAT, &_HuiSignalHandler);*/
+		signal(SIGSEGV, &_hui_signal_handler);
+		//signal(SIGINT, &_hui_signal_handler);
+		signal(SIGILL, &_hui_signal_handler);
+		/*signal(SIGTERM, &_hui_signal_handler);
+		signal(SIGABRT, &_hui_signal_handler);
+		signal(SIGFPE, &_hui_signal_handler);
+		signal(SIGBREAK, &_hui_signal_handler);
+		signal(SIGABRT_COMPAT, &_hui_signal_handler);*/
 	}
 }
 

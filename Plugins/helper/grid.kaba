@@ -218,8 +218,8 @@ class GridAxis extends AxisData
 class Grid extends Object
 	bool allow_bg
 	float x0, y0
-	rect plot_rect
-	float x, y, w, h
+	rect plot_area
+	#float x, y, w, h
 	
 	Panel *panel
 	string id
@@ -233,6 +233,7 @@ class Grid extends Object
 	color col_text
 	color col_hover
 	color col_sel
+
 	
 	void data_init()
 		col_grid = colors.grid
@@ -266,10 +267,10 @@ class Grid extends Object
 			float yy = y_axis.project(t.value)
 			if yy < y_axis.area.y1 or yy > y_axis.area.y2
 				continue
-			c.draw_line(x, yy, x + w, yy)
+			c.draw_line(plot_area.x1, yy, plot_area.x2, yy)
 			if len(t.label) > 0
 				c.set_color(col_line)
-				c.draw_line(x, yy, x + 6, yy)
+				c.draw_line(plot_area.x1, yy, plot_area.x1 + 6, yy)
 				c.draw_str(x0 + 2, yy - 3, t.label)
 	
 	void draw_axis_x(Painter c, GridPartition part)
@@ -278,11 +279,11 @@ class Grid extends Object
 			float xx = x_axis.project(t.value)
 			if xx < x_axis.area.x1 or xx > x_axis.area.x2
 				continue
-			c.draw_line(xx, y, xx, y + h)
+			c.draw_line(xx, plot_area.y1, xx, plot_area.y2)
 			if len(t.label) > 0
 				c.set_color(col_line)
-				c.draw_line(xx, y + h - 6, xx, y + h)
-				c.draw_str(xx - 8, y + h + 8, t.label)
+				c.draw_line(xx, plot_area.y2 - 6, xx, plot_area.y2)
+				c.draw_str(xx - 8, plot_area.y2 + 8, t.label)
 	
 	rect get_plot_region(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
@@ -293,12 +294,12 @@ class Grid extends Object
 		x0 = _x0
 		y0 = _y0 + 3
 	
-		plot_rect = get_plot_region(_x0, _y0, _w, _h)
+		plot_area = get_plot_region(_x0, _y0, _w, _h)
 		_y0 += 3
-		x = plot_rect.x1
-		y = plot_rect.y1
-		w = plot_rect.width()
-		h = plot_rect.height()
+		float x = plot_area.x1
+		float y = plot_area.y1
+		float w = plot_area.width()
+		float h = plot_area.height()
 		
 		x_axis.offset = x
 		x_axis.size = w
@@ -311,7 +312,6 @@ class Grid extends Object
 		if allow_bg
 			c.set_color(col_bg)
 			c.draw_rect(x, y, w, h)
-	
 		c.set_line_width(0.9)
 		c.set_font_size(7)
 		GridPartition part = x_axis.get_partition()
@@ -320,16 +320,15 @@ class Grid extends Object
 		draw_axis_y(c, part)
 	
 	void draw_curve(Painter c, FloatInterpolator fi, bool fill_below)
-		float[] tt, yy
 		complex[] pp
-		tt = rangef(0, 1, 0.003)
-		yy = fi.get_list(tt)
+		let tt = rangef(0, 1, 0.003)
+		let yy = fi.get_list(tt)
 		for t,i in tt
 			complex zz = project2(complex(x_axis.rel2val(t), yy[i]))
 			pp.add(zz)
 		if fill_below
-			pp.add(complex(x + w, y + h))
-			pp.add(complex(x, y + h))
+			pp.add(complex(plot_area.x2, plot_area.y2))
+			pp.add(complex(plot_area.x1, plot_area.y2))
 			c.set_color(color(0.3, 0.3, 1, 0.3))
 			c.draw_polygon(pp)
 			pp.resize(len(pp) - 2)
@@ -348,8 +347,8 @@ class Grid extends Object
 			complex zz = project2(complex(x, y))
 			pp.add(zz)
 		if fill_below
-			pp.add(complex(x + w, y + h))
-			pp.add(complex(x, y + h))
+			pp.add(complex(plot_area.x2, plot_area.y2))
+			pp.add(complex(plot_area.x1, plot_area.y2))
 			c.set_color(curve.col_below)
 			c.draw_polygon(pp)
 			pp.resize(len(pp) - 2)
@@ -362,8 +361,8 @@ class Grid extends Object
 		for p in _p
 			pp.add(project2(p))
 		if fill_below
-			pp.add(complex(x + w, y + h))
-			pp.add(complex(x, y + h))
+			pp.add(complex(plot_area.x2, plot_area.y2))
+			pp.add(complex(plot_area.x1, plot_area.y2))
 			color col2 = col
 			col2.a = 0.3
 			c.set_color(col2)
@@ -439,9 +438,9 @@ class Grid extends Object
 	void on_draw_all(Painter c)
 		float w = c.width
 		float h = c.height
-	
+
 		draw_background(c, 0, 0, w, h)
-		c.clip(plot_rect)
+		c.clip(plot_area)
 		on_draw(c)
 	
 	void redraw()
@@ -453,7 +452,7 @@ class Grid extends Object
 	
 	void on_left_button_down_all()
 		update_mouse()
-		if plot_rect.inside(mx, my)
+		if plot_area.inside(mx, my)
 			on_left_button_down()
 		if x_axis.area.inside(mx, my)
 			x_axis.on_left_button_down()
@@ -462,12 +461,12 @@ class Grid extends Object
 	
 	void on_left_button_up_all()
 		update_mouse()
-		if plot_rect.inside(mx, my)
+		if plot_area.inside(mx, my)
 			on_left_button_up()
 	
 	void on_right_button_down_all()
 		update_mouse()
-		if plot_rect.inside(mx, my)
+		if plot_area.inside(mx, my)
 			on_right_button_down()
 		if x_axis.area.inside(mx, my)
 			x_axis.on_right_button_down()
@@ -476,7 +475,7 @@ class Grid extends Object
 	
 	void on_right_button_up_all()
 		update_mouse()
-		if plot_rect.inside(mx, my)
+		if plot_area.inside(mx, my)
 			on_right_button_up()
 	
 	void on_mouse_move_all()
@@ -486,7 +485,7 @@ class Grid extends Object
 	
 	void on_mouse_wheel_all()
 		update_mouse()
-		if plot_rect.inside(mx, my)
+		if plot_area.inside(mx, my)
 			on_mouse_wheel()
 		if x_axis.area.inside(mx, my)
 			x_axis.on_mouse_wheel(mx)

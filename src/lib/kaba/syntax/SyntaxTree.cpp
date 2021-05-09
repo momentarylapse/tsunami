@@ -1181,23 +1181,19 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 
 
 void MapLVSX86Return(Function *f, int64 &stack_offset) {
-	if (f->literal_return_type->uses_return_by_memory()) {
-		foreachi (auto v, f->var, i)
-			if (v->name == IDENTIFIER_RETURN_VAR) {
-				v->_offset = stack_offset;
-				stack_offset += config.pointer_size;
-			}
-	}
+	foreachi (auto v, f->var, i)
+		if (v->name == IDENTIFIER_RETURN_VAR) {
+			v->_offset = stack_offset;
+			stack_offset += config.pointer_size;
+		}
 }
 
 void MapLVSX86Self(Function *f, int64 &stack_offset) {
-	if (!f->is_static()) {
-		foreachi (auto v, f->var, i)
-			if (v->name == IDENTIFIER_SELF) {
-				v->_offset = stack_offset;
-				stack_offset += config.pointer_size;
-			}
-	}
+	foreachi (auto v, f->var, i)
+		if (v->name == IDENTIFIER_SELF) {
+			v->_offset = stack_offset;
+			stack_offset += config.pointer_size;
+		}
 }
 
 void SyntaxTree::map_local_variables_to_stack() {
@@ -1210,16 +1206,20 @@ void SyntaxTree::map_local_variables_to_stack() {
 
 			if (config.abi == Abi::X86_WINDOWS) {
 				// map "self" to the VERY first parameter
-				MapLVSX86Self(f, stack_offset);
+				if (!f->is_static())
+					MapLVSX86Self(f, stack_offset);
 
 				// map "-return-" to the first parameter
-				MapLVSX86Return(f, stack_offset);
+				if (f->literal_return_type->uses_return_by_memory())
+					MapLVSX86Return(f, stack_offset);
 			} else {
 				// map "-return-" to the VERY first parameter
-				MapLVSX86Return(f, stack_offset);
+				if (f->literal_return_type->uses_return_by_memory())
+					MapLVSX86Return(f, stack_offset);
 
 				// map "self" to the first parameter
-				MapLVSX86Self(f, stack_offset);
+				if (!f->is_static())
+					MapLVSX86Self(f, stack_offset);
 			}
 
 			foreachi (auto v, f->var, i) {
@@ -1244,7 +1244,20 @@ void SyntaxTree::map_local_variables_to_stack() {
 			// offsets to stack pointer (for push parameters)
 
 			if (config.abi == Abi::AMD64_WINDOWS) {
+
+				// map "self" to the VERY first parameter
+				if (!f->is_static())
+					MapLVSX86Self(f, stack_offset);
+
+				// map "-return-" to the first parameter
+				if (f->literal_return_type->uses_return_by_memory())
+					MapLVSX86Return(f, stack_offset);
+
 				foreachi(auto v, f->var, i) {
+					if (!f->is_static() and (v->name == IDENTIFIER_SELF))
+						continue;
+					if (v->name == IDENTIFIER_RETURN_VAR)
+						continue;
 					if (i < f->num_params) {
 						// parameters
 						int s = 8;

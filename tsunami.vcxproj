@@ -101,13 +101,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>;HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>;HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -449,6 +449,7 @@
     <ClCompile Include="src\Stuff\CLIParser.cpp" />
     <ClCompile Include="src\Stuff\Clipboard.cpp" />
     <ClCompile Include="src\Stuff\Diff.cpp" />
+    <ClCompile Include="src\Stuff\ErrorHandler.cpp" />
     <ClCompile Include="src\Stuff\Log.cpp" />
     <ClCompile Include="src\Stuff\Observable.cpp" />
     <ClCompile Include="src\Stuff\PerformanceMonitor.cpp" />
@@ -866,6 +867,7 @@
     <ClInclude Include="src\Stuff\CLIParser.h" />
     <ClInclude Include="src\Stuff\Clipboard.h" />
     <ClInclude Include="src\Stuff\Diff.h" />
+    <ClInclude Include="src\Stuff\ErrorHandler.h" />
     <ClInclude Include="src\Stuff\Log.h" />
     <ClInclude Include="src\Stuff\Observable.h" />
     <ClInclude Include="src\Stuff\PerformanceMonitor.h" />

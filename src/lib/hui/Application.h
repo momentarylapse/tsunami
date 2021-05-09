@@ -18,8 +18,9 @@ namespace hui {
 class Window;
 
 enum {
-	FLAG_LOAD_RESOURCE = 1,
+	FLAG_DONT_LOAD_RESOURCE = 1,
 	FLAG_SILENT = 2,
+	FLAG_NO_ERROR_HANDLER = 4,
 	FLAG_UNIQUE = 16,
 };
 

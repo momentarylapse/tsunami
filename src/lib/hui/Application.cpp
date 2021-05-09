@@ -50,13 +50,14 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	ComboBoxSeparator = "\\";
 	_using_language_ = false;
-	SetDefaultErrorHandler(nullptr);
+	if ((flags & FLAG_NO_ERROR_HANDLER) == 0)
+		SetDefaultErrorHandler(nullptr);
 
 	if (file_exists(directory << "config.txt"))
 		Config.load(directory << "config.txt");
 
 
-	if (flags & FLAG_LOAD_RESOURCE)
+	if ((flags & FLAG_DONT_LOAD_RESOURCE) == 0)
 		LoadResource(directory_static << "hui_resources.txt");
 
 	if (def_lang.num > 0)

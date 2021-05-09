@@ -49,26 +49,31 @@ static Callback _eh_cleanup_function_;
 class ReportDialog : public Dialog {
 public:
 	ReportDialog(Window *parent) :
-		Dialog(_("Bug Report"), 450, 400, parent, false)
+		Dialog(_("Bug report"), 600, 500, parent, false)
 	{
+		set_options("", "headerbar,resizable,closebutton=no");
+		set_title(_("Bug report"));
+		set_info_text("this does not work anymore... I've changed my server", {"warning"});
+
 		add_grid("", 0, 0, "root");
 		set_target("root");
 
-		add_group(_("Name:"), 0, 0, "grp_name");
-		add_group(_("Comment/what happened:"), 0, 1, "grp_comment");
-		add_label("!wrap//" + _("Your comments and the contents of the file message.txt will be sent."), 0, 2, "t_explanation");
+		add_group(_("Name:"), 0, 0, "grp-name");
+		add_group(_("Comment / what happened:"), 0, 1, "grp-comment");
+		add_label("!wrap//" + _("Your comments and the contents of the file message.txt will be sent."), 0, 2, "t-explanation");
 		add_grid("!buttonbar", 0, 3, "buttonbar");
 
-		set_target("grp_name");
+		set_target("grp-name");
 		add_edit(_("(anonymous)"), 0, 0, "sender");
 
-		set_target("grp_comment");
-		add_multiline_edit("!expandy,expandx//" + _("Just happened somehow..."), 0, 0, "comment");
+		set_target("grp-comment");
+		add_multiline_edit("!expandy,expandx//", 0, 0, "comment");
+		set_string("comment", _("Just happened somehow..."));
 
 		set_target("buttonbar");
 		add_button(_("Cancel"),0, 0,"cancel");
 		set_image("cancel", "hui:cancel");
-		add_def_button(_("Ok"), 1, 0 ,"ok");
+		add_button("!default,\\" + _("Ok"), 0, 1 ,"ok");
 		set_image("ok", "hui:ok");
 
 		event("ok", [=]{ on_ok(); });
@@ -91,9 +96,9 @@ public:
 };
 
 void SendBugReport(Window *parent) {
-	ReportDialog *dlg = new ReportDialog(parent);
+	auto dlg = new ReportDialog(parent);
 	dlg->run();
-	delete(dlg);
+	delete dlg;
 }
 
 #endif
@@ -101,49 +106,64 @@ void SendBugReport(Window *parent) {
 class ErrorDialog : public Dialog {
 public:
 	ErrorDialog() :
-		Dialog(_("Error"), 600, 500, nullptr, false)
+		Dialog(_("Error"), 800, 600, nullptr, false)
 	{
+		set_options("", "headerbar,resizable,closebutton=no");
+		set_title(_("Error"));
 		add_grid("", 0, 0, "root");
 		set_target("root");
-		add_label(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
-		add_list_view(_("Messages"), 0, 1, "message_list");
+		//add_label(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
+		add_list_view("!nobar", 0, 1, "message-list");
 		add_grid("!buttonbar", 0, 2, "buttonbar");
 		set_target("buttonbar");
-		add_button(_("open message.txt"), 0, 0, "show_log");
-		add_button(_("Send bug report to Michi"), 1, 0, "send_report");
-		add_button(_("Ok"), 2, 0, "ok");
+		if (false) {
+			add_button(_("Open log"), 0, 0, "show-log");
+			set_tooltip("show-log", _("open the 'message.txt' file in a text editor"));
+		}
+		add_button(_("Bug report"), 1, 0, "send-report");
+		set_tooltip("send-report", _("send a bug report to Michi"));
+		add_button(_("Ok"), 0, 1, "ok");
 		set_image("ok", "hui:ok");
+		set_options("ok", "danger,default");
+		set_tooltip("ok", _("will close the program"));
+
+		set_info_text(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), {"error"});
 
 	#ifdef _X_USE_NET_
-		event("send_report", std::bind(&ErrorDialog::on_send_bug_report, this));
+		event("send-report", [=] {
+			SendBugReport(this);
+		});
 	#else
-		enable("send_report", false);
-		set_tooltip("send_report", _("Program was compiled without network support..."));
+		enable("send-report", false);
+		set_tooltip("send-report", _("Program was compiled without network support..."));
 	#endif
+
+		int n = 0;
 		for (int i=1023;i>=0;i--){
 			string temp = msg_get_str(i);
-			if (temp.num > 0)
-				add_string("message_list", temp);
+			if (temp.num > 0) {
+				add_string("message-list", temp);
+				n ++;
+			}
 		}
-		event("show_log", [=]{ on_show_log(); });
-		//event("cancel", std::bind(&ErrorDialog::onClose, this));
-		event("hui:win_close", [=]{ on_close(); });
-		event("ok", [=]{ on_close(); });
-	}
+		set_int("message-list", n-1);
 
-	void on_show_log() {
-		OpenDocument("message.txt");
-	}
-
-	void on_send_bug_report() {
-		SendBugReport(this);
-	}
-
-	void on_close() {
-		msg_write("real close");
-		exit(0);
+		event("show-log", [=] {
+			OpenDocument("message.txt");
+		});
+		event("hui:win_close", [=] {
+			exit(1);
+		});
+		event("ok", [=] {
+			exit(1);
+		});
 	}
 };
+
+void show_crash_window() {
+	auto dlg = new ErrorDialog;
+	dlg->run();
+}
 
 void hui_default_error_handler() {
 	_idle_function_ = nullptr;
@@ -162,8 +182,11 @@ void hui_default_error_handler() {
 		msg_write(_("...done"));
 	}
 
-	//foreachb(Window *w, _all_windows_)
+	foreachb(Window *w, _all_windows_) {
+		w->hide();
+	}
 	//	delete w;
+
 	msg_write(_("                  Close dialog box to exit program."));
 
 	//HuiMultiline=true;
@@ -172,10 +195,8 @@ void hui_default_error_handler() {
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 
 	// dialog
-	if (_screen_opened_) {
-		ErrorDialog *dlg = new ErrorDialog;
-		dlg->run();
-	}
+	if (_screen_opened_)
+		show_crash_window();
 
 	//HuiEnd();
 	exit(1);

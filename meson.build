@@ -432,6 +432,7 @@ sources = [
 	'src/Stuff/CLIParser.cpp',
 	'src/Stuff/Clipboard.cpp',
 	'src/Stuff/Diff.cpp',
+	'src/Stuff/ErrorHandler.cpp',
 	'src/Stuff/Log.cpp',
 	'src/Stuff/Observable.cpp',
 	'src/Stuff/PerformanceMonitor.cpp',

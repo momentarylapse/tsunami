@@ -28,6 +28,7 @@
 #include "Stuff/PerformanceMonitor.h"
 #include "Stuff/BackupManager.h"
 #include "Stuff/Diff.h"
+#include "Stuff/ErrorHandler.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Device/DeviceManager.h"
@@ -43,7 +44,7 @@
 #include "Data/SampleRef.h"
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.107.0";
+const string AppVersion = "0.7.107.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -52,7 +53,7 @@ bool ugly_hack_slow = false;
 
 
 Tsunami::Tsunami() :
-	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
+	hui::Application("tsunami", "English", hui::FLAG_NO_ERROR_HANDLER)
 {
 	device_manager = nullptr;
 	log = nullptr;
@@ -79,6 +80,8 @@ void Tsunami::on_end() {
 
 bool Tsunami::on_startup(const Array<string> &arg) {
 	tsunami = this;
+
+	ErrorHandler::init();
 
 	perf_mon = new PerformanceMonitor;
 

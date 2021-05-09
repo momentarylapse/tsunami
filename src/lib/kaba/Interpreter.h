@@ -14,7 +14,7 @@ namespace kaba {
 class Script;
 class SyntaxTree;
 class Function;
-class SerializerX;
+class Serializer;
 class CommandList;
 class SerialNode;
 class SerialNodeParam;
@@ -24,7 +24,7 @@ public:
 	Interpreter(Script *s);
 	~Interpreter();
 
-	void add_function(Function *f, SerializerX *ser);
+	void add_function(Function *f, Serializer *ser);
 
 	Script *script;
 	//Asm::InstructionWithParamsList *list
@@ -35,7 +35,7 @@ public:
 	struct IFunction {
 		Function *f;
 		//CommandList* cmd;
-		SerializerX* ser;
+		Serializer* ser;
 	};
 	Array<IFunction> functions;
 
@@ -43,12 +43,12 @@ public:
 		string stack;
 		int offset;
 		Array<string> temps;
-		//SerializerX *ser;
+		//Serializer *ser;
 	};
 
 	void run(const string &name);
-	void run_function(Function *f, SerializerX *ser);
-	int run_command(int index, SerialNode &n, SerializerX *ser, Frame &f);
+	void run_function(Function *f, Serializer *ser);
+	int run_command(int index, SerialNode &n, Serializer *ser, Frame &f);
 
 	void do_error(const string &s);
 

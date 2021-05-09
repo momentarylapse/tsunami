@@ -5,7 +5,7 @@
  *      Author: michi
  */
 #include "../kaba.h"
-#include "../lib/dynamic.h"
+#include "../dynamic/dynamic.h"
 #include "../asm/asm.h"
 #include "../../file/file.h"
 #include <stdio.h>

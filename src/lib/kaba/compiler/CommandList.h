@@ -9,6 +9,13 @@
 
 #include "../../base/base.h"
 
+namespace Asm {
+	enum class RegID;
+	enum class RegRoot;
+	enum class ArmCond;
+	enum class InstID;
+}
+
 
 namespace kaba {
 
@@ -25,8 +32,8 @@ class Class;
 // represents a register
 // (or rather the data inside, since many VirtualRegisters might be mapped to the same physical register)
 struct VirtualRegister {
-	int reg;
-	int reg_root;
+	Asm::RegID reg;
+	Asm::RegRoot reg_root;
 	int first, last;
 };
 
@@ -52,21 +59,21 @@ struct CommandList {
 	Serializer *ser = nullptr;
 
 	//void add_reg_channel(int reg, int first, int last);
-	int add_virtual_reg(int reg);
+	int add_virtual_reg(Asm::RegID reg);
 	void set_virtual_reg(int v, int first, int last);
 	void use_virtual_reg(int v, int first, int last);
 	SerialNodeParam _add_temp(const Class *t);
-	void add_cmd(int cond, int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
-	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
-	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2);
-	void add_cmd(int inst, const SerialNodeParam &p);
-	void add_cmd(int inst);
-	void set_cmd_param(SerialNode &c, int param_index, const SerialNodeParam &p);
+	void add_cmd(Asm::ArmCond cond, Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
+	void add_cmd(Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
+	void add_cmd(Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2);
+	void add_cmd(Asm::InstID inst, const SerialNodeParam &p);
+	void add_cmd(Asm::InstID inst);
+	void set_cmd_param(int index, int param_index, const SerialNodeParam &p);
 	void next_cmd_target(int index);
 	void remove_cmd(int index);
 	void remove_temp_var(int v);
 	void move_param(SerialNodeParam &p, int from, int to);
-	int add_marker(int m = -1);
+	int add_label(int m = -1);
 };
 
 

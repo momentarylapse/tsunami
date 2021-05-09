@@ -44,14 +44,14 @@ int TaskReturnOffset;
 void add_esp_add(Asm::InstructionWithParamsList *list,int d) {
 	if (d > 0) {
 		if (d > 120)
-			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 4));
+			list->add2(Asm::InstID::ADD, Asm::param_reg(Asm::RegID::ESP), Asm::param_imm(d, 4));
 		else
-			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 1));
+			list->add2(Asm::InstID::ADD, Asm::param_reg(Asm::RegID::ESP), Asm::param_imm(d, 1));
 	} else if (d < 0) {
 		if (d < -120)
-			list->add2(Asm::INST_SUB, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(-d, 4));
+			list->add2(Asm::InstID::SUB, Asm::param_reg(Asm::RegID::ESP), Asm::param_imm(-d, 4));
 		else
-			list->add2(Asm::INST_SUB, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(-d, 1));
+			list->add2(Asm::InstID::SUB, Asm::param_reg(Asm::RegID::ESP), Asm::param_imm(-d, 1));
 	}
 }
 
@@ -69,7 +69,7 @@ void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
 	}
 	typedef void init_func(void *);
 	//msg_write("global init: " + v.type->name);
-	init_func *ff = (init_func*)cf->address;
+	auto ff = (init_func*)(int_p)cf->address;
 	if (ff)
 		ff(g_var);
 }
@@ -137,7 +137,7 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 			if (labs((int_p)mem - (int_p)addr0) < 2000000000)
 				return mem;
 			//munmap(mem, size);
-			if (config.verbose)
+			//if (config.verbose)
 				msg_write("...try again");
 		}
 		if (i > 5000) {
@@ -271,7 +271,7 @@ void Script::CompileOsEntryPoint() {
 			do_error("os entry point: no 'void main()' found");
 
 	// call
-	Asm::add_instruction(opcode, opcode_size, Asm::INST_CALL, Asm::param_imm(0, 4));
+	Asm::add_instruction(opcode, opcode_size, Asm::InstID::CALL, Asm::param_imm(0, 4));
 	TaskReturnOffset = opcode_size;
 	OCORA = Asm::OCParam;
 	align_opcode();
@@ -372,11 +372,11 @@ void Script::LinkOsEntryPoint() {
 	if (!f)
 		do_error_internal("os entry point missing...");
 
-	int lll = (int_p)f->address - syntax->asm_meta_info->code_origin - TaskReturnOffset;
+	int64 lll = f->address - syntax->asm_meta_info->code_origin - TaskReturnOffset;
 	//printf("insert   %d  an %d\n", lll, OCORA);
 	//msg_write(lll);
 	//msg_write(i2h(lll,4));
-	*(int*)&opcode[OCORA] = lll;
+	*(int*)&opcode[OCORA] = (int)lll;
 }
 
 bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert) {
@@ -442,7 +442,7 @@ void Script::link_functions() {
 		bool found = false;
 		for (Function *f: syntax->functions)
 			if (f->name == name) {
-				*(int*)&opcode[l.pos] = (int_p)f->address - (syntax->asm_meta_info->code_origin + l.pos + 4);
+				*(int*)&opcode[l.pos] = (int)(f->address - (syntax->asm_meta_info->code_origin + l.pos + 4));
 				found = true;
 				break;
 			}
@@ -451,7 +451,7 @@ void Script::link_functions() {
 	}
 	for (int n: function_vars_to_link) {
 		int64 p = (n + 0xefef0000);
-		int64 q = (int_p)syntax->functions[n]->address;
+		int64 q = syntax->functions[n]->address;
 		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
 			do_error_link("could not link function as variable: " + syntax->functions[n]->signature());
 	}

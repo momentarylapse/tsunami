@@ -21,329 +21,342 @@ struct InstructionSetData {
 extern InstructionSetData instruction_set;
 
 // single registers
-enum {
-	REG_EAX, REG_ECX, REG_EDX, REG_EBX, REG_ESP, REG_ESI, REG_EDI, REG_EBP, // 4 byte
-	REG_AX, REG_CX, REG_DX, REG_BX, REG_BP, REG_SP, REG_SI, REG_DI, // 2 byte
-	REG_AL, REG_CL, REG_DL, REG_BL, REG_AH, REG_CH, REG_DH, REG_BH, // 1 byte
-	REG_CS, REG_DS, REG_SS, REG_ES, REG_FS, REG_GS, // segment
-	REG_CR0, REG_CR1, REG_RC2, REG_CR3, REG_CR4,
-	REG_ST0, REG_ST1, REG_ST2, REG_ST3, REG_ST4, REG_ST5, REG_ST6, REG_ST7,
-	REG_RAX, REG_RCX, REG_RDX, REG_RBX, REG_RSP, REG_RSI, REG_RDI, REG_RBP, // 8 byte
-	REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7, // ARM
-	REG_R8, REG_R9, REG_R10, REG_R11, REG_R12, REG_R13, REG_R14, REG_R15, // ARM 4 byte / AMD64 8 byte
-	REG_R8D, REG_R9D, REG_R10D, REG_R11D, REG_R12D, REG_R13D, REG_R14D, REG_R15D,
-	REG_XMM0, REG_XMM1, REG_XMM2, REG_XMM3, REG_XMM4, REG_XMM5, REG_XMM6, REG_XMM7, // 16 byte
-	REG_S0,  REG_S1,  REG_S2,  REG_S3,  REG_S4,  REG_S5,  REG_S6,  REG_S7, // ARM float
-	REG_S8,  REG_S9,  REG_S10, REG_S11, REG_S12, REG_S13, REG_S14, REG_S15,
-	REG_S16, REG_S17, REG_S18, REG_S19, REG_S20, REG_S21, REG_S22, REG_S23,
-	REG_S24, REG_S25, REG_S26, REG_S27, REG_S28, REG_S29, REG_S30, REG_S31,
-	NUM_REGISTERS
+enum class RegID {
+	INVALID = -1,
+	EAX, ECX, EDX, EBX, ESP, ESI, EDI, EBP, // 4 byte
+	AX, CX, DX, BX, BP, SP, SI, DI, // 2 byte
+	AL, CL, DL, BL, AH, CH, DH, BH, // 1 byte
+	CS, DS, SS, ES, FS, GS, // segment
+	CR0, CR1, RC2, CR3, CR4,
+	ST0, ST1, ST2, ST3, ST4, ST5, ST6, ST7,
+	RAX, RCX, RDX, RBX, RSP, RSI, RDI, RBP, // 8 byte
+	R0, R1, R2, R3, R4, R5, R6, R7, // ARM
+	R8, R9, R10, R11, R12, R13, R14, R15, // ARM 4 byte / AMD64 8 byte
+	R8D, R9D, R10D, R11D, R12D, R13D, R14D, R15D,
+	XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, // 16 byte
+	S0,  S1,  S2,  S3,  S4,  S5,  S6,  S7, // ARM float
+	S8,  S9,  S10, S11, S12, S13, S14, S15,
+	S16, S17, S18, S19, S20, S21, S22, S23,
+	S24, S25, S26, S27, S28, S29, S30, S31,
+	COUNT
 };
 
-const int NUM_REG_ROOTS = 40;
+enum class RegRoot {
+	A, C, D, B, SP, SI, DI, BP,
+	R0=A,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,R14,R15,
+	S0=32,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,
+	X0,X1,X2,X3,X4,X5,X6,X7,
+	NONE,
+	COUNT,
+};
+
 const int MAX_REG_SIZE = 16;
 
-extern int RegRoot[];
-extern int RegResize[NUM_REG_ROOTS][MAX_REG_SIZE + 1];
-string get_reg_name(int reg);
+
+extern RegRoot reg_root[];
+extern RegID reg_from_root[(int)RegRoot::COUNT][MAX_REG_SIZE + 1];
+string get_reg_name(RegID reg);
 
 
 
-enum {
+enum class InstID {
 	// data instructions
-	INST_DB,
-	INST_DW,
-	INST_DD,
-	INST_DS,
-	INST_DZ,
-	INST_ALIGN_OPCODE,
+	DB,
+	DW,
+	DD,
+	DS,
+	DZ,
+	ALIGN_OPCODE,
 
-	INST_ADD,
-	INST_ADC,	   // add with carry
-	INST_SUB,
-	INST_SBB,	   // subtract with borrow
-	INST_INC,
-	INST_DEC,
-	INST_MUL,
-	INST_IMUL,
-	INST_DIV,
-	INST_IDIV,
-	INST_MOV,
-	INST_MOVZX,
-	INST_MOVSX,
-	INST_MOVSXD,
-	INST_AND,
-	INST_OR,
-	INST_XOR,
-	INST_NOT,
-	INST_NEG,
-	INST_POP,
-	INST_POPA,
-	INST_PUSH,
-	INST_PUSHA,
+	ADD,
+	ADC,	   // add with carry
+	SUB,
+	SBB,	   // subtract with borrow
+	INC,
+	DEC,
+	MUL,
+	IMUL,
+	DIV,
+	IDIV,
+	MOV,
+	MOVZX,
+	MOVSX,
+	MOVSXD,
+	AND,
+	OR,
+	XOR,
+	NOT,
+	NEG,
+	POP,
+	POPA,
+	PUSH,
+	PUSHA,
 	
-	INST_JO,
-	INST_JNO,
-	INST_JB,
-	INST_JNB,
-	INST_JZ,
-	INST_JNZ,
-	INST_JBE,
-	INST_JNBE,
-	INST_JS,
-	INST_JNS,
-	INST_JP,
-	INST_JNP,
-	INST_JL,
-	INST_JNL,
-	INST_JLE,
-	INST_JNLE,
+	JO,
+	JNO,
+	JB,
+	JNB,
+	JZ,
+	JNZ,
+	JBE,
+	JNBE,
+	JS,
+	JNS,
+	JP,
+	JNP,
+	JL,
+	JNL,
+	JLE,
+	JNLE,
 	
-	INST_CMP,
+	CMP,
 	
-	INST_SETO,
-	INST_SETNO,
-	INST_SETB,
-	INST_SETNB,
-	INST_SETZ,
-	INST_SETNZ,
-	INST_SETBE,
-	INST_SETNBE,
-	INST_SETS,
-	INST_SETNS,
-	INST_SETP,
-	INST_SETNP,
-	INST_SETL,
-	INST_SETNL,
-	INST_SETLE,
-	INST_SETNLE,
+	SETO,
+	SETNO,
+	SETB,
+	SETNB,
+	SETZ,
+	SETNZ,
+	SETBE,
+	SETNBE,
+	SETS,
+	SETNS,
+	SETP,
+	SETNP,
+	SETL,
+	SETNL,
+	SETLE,
+	SETNLE,
 	
-	INST_SLDT,
-	INST_STR,
-	INST_LLDT,
-	INST_LTR,
-	INST_VERR,
-	INST_VERW,
-	INST_SGDT,
-	INST_SIDT,
-	INST_LGDT,
-	INST_LIDT,
-	INST_SMSW,
-	INST_LMSW,
+	SLDT,
+	STR,
+	LLDT,
+	LTR,
+	VERR,
+	VERW,
+	SGDT,
+	SIDT,
+	LGDT,
+	LIDT,
+	SMSW,
+	LMSW,
 	
-	INST_TEST,
-	INST_XCHG,
-	INST_LEA,
-	INST_NOP,
-	INST_CBW_CWDE,
-	INST_CGQ_CWD,
-	INST_MOVS_DS_ESI_ES_EDI,	// mov string
-	INST_MOVS_B_DS_ESI_ES_EDI,
-	INST_CMPS_DS_ESI_ES_EDI,	// cmp string
-	INST_CMPS_B_DS_ESI_ES_EDI,
-	INST_ROL,
-	INST_ROR,
-	INST_RCL,
-	INST_RCR,
-	INST_SHL,
-	INST_SHR,
-	INST_SAR,
-	INST_RET,
-	INST_LEAVE,
-	INST_RET_FAR,
-	INST_INT,
-	INST_IRET,
+	TEST,
+	XCHG,
+	LEA,
+	NOP,
+	CBW_CWDE,
+	CGQ_CWD,
+	MOVS_DS_ESI_ES_EDI,	// mov string
+	MOVS_B_DS_ESI_ES_EDI,
+	CMPS_DS_ESI_ES_EDI,	// cmp string
+	CMPS_B_DS_ESI_ES_EDI,
+	ROL,
+	ROR,
+	RCL,
+	RCR,
+	SHL,
+	SHR,
+	SAR,
+	RET,
+	LEAVE,
+	RET_FAR,
+	INT,
+	IRET,
 	
 	// x87
-	INST_FADD,
-	INST_FMUL,
-	INST_FSUB,
-	INST_FDIV,
-	INST_FLD,
-	INST_FLD1,
-	INST_FLDZ,
-	INST_FLDPI,
-	INST_FXCH,
-	INST_FST,
-	INST_FSTP,
-	INST_FILD,
-	INST_FADDP,
-	INST_FMULP,
-	INST_FSUBP,
-	INST_FDIVP,
-	INST_FLDCW,
-	INST_FNSTCW,
-	INST_FNSTSW,
-	INST_FISTP,
-	INST_FSQRT,
-	INST_FSIN,
-	INST_FCOS,
-	INST_FPTAN,
-	INST_FPATAN,
-	INST_FYL2X,
-	INST_FCHS,
-	INST_FABS,
-	INST_FUCOMPP,
+	FADD,
+	FMUL,
+	FSUB,
+	FDIV,
+	FLD,
+	FLD1,
+	FLDZ,
+	FLDPI,
+	FXCH,
+	FST,
+	FSTP,
+	FILD,
+	FADDP,
+	FMULP,
+	FSUBP,
+	FDIVP,
+	FLDCW,
+	FNSTCW,
+	FNSTSW,
+	FISTP,
+	FSQRT,
+	FSIN,
+	FCOS,
+	FPTAN,
+	FPATAN,
+	FYL2X,
+	FCHS,
+	FABS,
+	FUCOMPP,
 	
-	INST_LOOP,
-	INST_LOOPE,
-	INST_LOOPNE,
-	INST_IN,
-	INST_OUT,
+	LOOP,
+	LOOPE,
+	LOOPNE,
+	IN,
+	OUT,
 	
-	INST_CALL,
-	INST_CALL_FAR,
-	INST_JMP,
-	INST_JMP_FAR,
-	INST_LOCK,
-	INST_REP,
-	INST_REPNE,
-	INST_HLT,
-	INST_CMC,
-	INST_CLC,
-	INST_STC,
-	INST_CLI,
-	INST_STI,
-	INST_CLD,
-	INST_STD,
+	CALL,
+	CALL_FAR,
+	JMP,
+	JMP_FAR,
+	LOCK,
+	REP,
+	REPNE,
+	HLT,
+	CMC,
+	CLC,
+	STC,
+	CLI,
+	STI,
+	CLD,
+	STD,
 
 	// sse
-	INST_MOVSS,
-	INST_MOVSD,
-	INST_MOVUPS,
-	INST_MOVAPS,
-	INST_MOVLPS,
-	INST_MOVHPS,
-	INST_ADDSS,
-	INST_ADDSD,
-	INST_ADDPS,
-	INST_SUBSS,
-	INST_SUBSD,
-	INST_MULSS,
-	INST_MULSD,
-	INST_DIVSS,
-	INST_DIVSD,
-	INST_SQRTSS,
-	INST_SQRTSD,
-	INST_MINSS,
-	INST_MINSD,
-	INST_MAXSS,
-	INST_MAXSD,
-	INST_CVTSS2SD,
-	INST_CVTSD2SS,
-	INST_CVTTSS2SI,
-	INST_CVTTSD2SI,
-	INST_CVTSI2SS,
-	INST_CVTSI2SD,
-	INST_COMISS,
-	INST_COMISD,
-	INST_UCOMISS,
-	INST_UCOMISD,
+	MOVSS,
+	MOVSD,
+	MOVUPS,
+	MOVAPS,
+	MOVLPS,
+	MOVHPS,
+	ADDSS,
+	ADDSD,
+	ADDPS,
+	SUBSS,
+	SUBSD,
+	MULSS,
+	MULSD,
+	DIVSS,
+	DIVSD,
+	SQRTSS,
+	SQRTSD,
+	MINSS,
+	MINSD,
+	MAXSS,
+	MAXSD,
+	CVTSS2SD,
+	CVTSD2SS,
+	CVTTSS2SI,
+	CVTTSD2SI,
+	CVTSI2SS,
+	CVTSI2SD,
+	COMISS,
+	COMISD,
+	UCOMISS,
+	UCOMISD,
 
-	INST_SYSCALL,
-	INST_SYSRET,
-	INST_SYSENTER,
-	INST_SYSEXIT,
+	SYSCALL,
+	SYSRET,
+	SYSENTER,
+	SYSEXIT,
 
 	
 	// ARM
-	INST_B,
-	INST_BL,
-	INST_BLX,
+	B,
+	BL,
+	BLX,
 
-	INST_MULS,
-	INST_ADDS,
-	INST_SUBS,
-	INST_RSBS,
-	INST_ADCS,
-	INST_SBCS,
-	INST_RSCS,
-	INST_ANDS,
-	INST_BICS,
-	INST_XORS,
-	INST_ORS,
-	INST_MOVS,
-	INST_MVNS,
+	MULS,
+	ADDS,
+	SUBS,
+	RSBS,
+	ADCS,
+	SBCS,
+	RSCS,
+	ANDS,
+	BICS,
+	XORS,
+	ORS,
+	MOVS,
+	MVNS,
 
-	INST_LDR,
-	INST_LDRB,
-//	INST_STR,
-	INST_STRB,
+	LDR,
+	LDRB,
+//	STR,
+	STRB,
 
-	INST_LDMIA,
-	INST_LDMIB,
-	INST_LDMDA,
-	INST_LDMDB,
-	INST_STMIA,
-	INST_STMIB,
-	INST_STMDA,
-	INST_STMDB,
+	LDMIA,
+	LDMIB,
+	LDMDA,
+	LDMDB,
+	STMIA,
+	STMIB,
+	STMDA,
+	STMDB,
 
-	INST_RSB,
-	INST_SBC,
-	INST_RSC,
-	INST_TST,
-	INST_TEQ,
-	INST_CMN,
-	INST_BIC,
-	INST_MVN,
+	RSB,
+	SBC,
+	RSC,
+	TST,
+	TEQ,
+	CMN,
+	BIC,
+	MVN,
 
 	// ARM float
-	INST_FMACS,
-	INST_FNMACS,
-	INST_FMSCS,
-	INST_FNMSCS,
-	INST_FMULS,
-	INST_FNMULS,
-	INST_FADDS,
-	INST_FSUBS,
-	INST_FDIVS,
-	INST_FCPYS,
-	INST_FABSS,
-	INST_FNEGS,
-	INST_FSQRTS,
-	INST_FCMPS,
-	INST_FCMPES,
-	INST_FCMPZS,
-	INST_FCMPEZS,
-	INST_CVTDS,
-	INST_FTOUIS,
-	INST_FTOUIZS,
-	INST_FTOSIS,
-	INST_FTOSIZS,
-	INST_FUITOS,
-	INST_FSITOS,
-	INST_FMRS,
-	INST_FMSR,
-	INST_FLDS,
-	INST_FSTS,
+	FMACS,
+	FNMACS,
+	FMSCS,
+	FNMSCS,
+	FMULS,
+	FNMULS,
+	FADDS,
+	FSUBS,
+	FDIVS,
+	FCPYS,
+	FABSS,
+	FNEGS,
+	FSQRTS,
+	FCMPS,
+	FCMPES,
+	FCMPZS,
+	FCMPEZS,
+	CVTDS,
+	FTOUIS,
+	FTOUIZS,
+	FTOSIS,
+	FTOSIZS,
+	FUITOS,
+	FSITOS,
+	FMRS,
+	FMSR,
+	FLDS,
+	FSTS,
 
 	// fake
-	INST_MODULO,
+	MODULO,
+	LABEL,
+	ASM,
 
-	NUM_INSTRUCTION_NAMES
+	NUM_INSTRUCTION_NAMES,
+	INVALID = -1
 };
 
-enum {
-	ARM_COND_EQUAL,
-	ARM_COND_NOT_EQUAL,
-	ARM_COND_CARRY_SET,
-	ARM_COND_CARRY_CLEAR,
-	ARM_COND_NEGATIVE,
-	ARM_COND_POSITIVE,
-	ARM_COND_OVERFLOW,
-	ARM_COND_NO_OVERFLOW,
-	ARM_COND_UNSIGNED_HIGHER,
-	ARM_COND_UNSIGNED_LOWER_SAME,
-	ARM_COND_GREATER_EQUAL,
-	ARM_COND_LESS_THAN,
-	ARM_COND_GREATER_THAN,
-	ARM_COND_LESS_EQUAL,
-	ARM_COND_ALWAYS,
-	ARM_COND_UNKNOWN,
+enum class ArmCond {
+	EQUAL,
+	NOT_EQUAL,
+	CARRY_SET,
+	CARRY_CLEAR,
+	NEGATIVE,
+	POSITIVE,
+	OVERFLOW,
+	NO_OVERFLOW,
+	UNSIGNED_HIGHER,
+	UNSIGNED_LOWER_SAME,
+	GREATER_EQUAL,
+	LESS_THAN,
+	GREATER_THAN,
+	LESS_EQUAL,
+	ALWAYS,
+	UNKNOWN = -1,
 };
 
-const string GetInstructionName(int inst);
+const string get_instruction_name(InstID inst);
 
 struct GlobalVar {
 	string name;
@@ -397,12 +410,14 @@ struct MetaInfo {
 };
 
 struct Register;
+enum class ParamType;
+enum class DispMode;
 
 // a real parameter (usable)
 struct InstructionParam {
 	InstructionParam();
-	int type;
-	int disp;
+	ParamType type;
+	DispMode disp;
 	Register *reg, *reg2;
 	bool deref;
 	int size;
@@ -413,8 +428,8 @@ struct InstructionParam {
 };
 
 struct InstructionWithParams {
-	int inst;
-	int condition; // ARM
+	InstID inst;
+	ArmCond condition;
 	InstructionParam p[3];
 	int line, col;
 	int size;
@@ -441,11 +456,11 @@ enum {
 };
 
 extern InstructionParam param_none;
-InstructionParam param_reg(int reg);
+InstructionParam param_reg(RegID reg);
 InstructionParam param_reg_set(int set);
-InstructionParam param_deref_reg(int reg, int size);
-InstructionParam param_deref_reg_shift(int reg, int shift, int size);
-InstructionParam param_deref_reg_shift_reg(int reg, int reg2, int size);
+InstructionParam param_deref_reg(RegID reg, int size);
+InstructionParam param_deref_reg_shift(RegID reg, int shift, int size);
+InstructionParam param_deref_reg_shift_reg(RegID reg, RegID reg2, int size);
 InstructionParam param_imm(int64 value, int size);
 InstructionParam param_deref_imm(int64 value, int size);
 InstructionParam param_label(int64 value, int size);
@@ -456,8 +471,8 @@ struct InstructionWithParamsList : public Array<InstructionWithParams> {
 	~InstructionWithParamsList();
 
 //	void add_easy(int inst, int param1_type = PK_NONE, int param1_size = -1, void *param1 = NULL, int param2_type = PK_NONE, int param2_size = -1, void *param2 = NULL);
-	void add2(int inst, const InstructionParam &p1 = param_none, const InstructionParam &p2 = param_none);
-	void add_arm(int cond, int inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
+	void add2(InstID inst, const InstructionParam &p1 = param_none, const InstructionParam &p2 = param_none);
+	void add_arm(ArmCond cond, InstID inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
 
 
 	// new label system
@@ -503,15 +518,15 @@ public:
 	int line, column;
 };
 
-void add_instruction(char *oc, int &ocs, int inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
+void add_instruction(char *oc, int &ocs, Asm::InstID inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
 void set_instructionSet(int set);
-bool immediate_allowed(int inst);
+bool immediate_allowed(InstID inst);
 extern int OCParam;
 extern MetaInfo *CurrentMetaInfo;
 
-void get_instruction_param_flags(int inst, bool &p1_read, bool &p1_write, bool &p2_read, bool &p2_write);
-bool get_instruction_allow_const(int inst);
-bool get_instruction_allow_gen_reg(int inst);
+void get_instruction_param_flags(InstID inst, bool &p1_read, bool &p1_write, bool &p2_read, bool &p2_write);
+bool get_instruction_allow_const(InstID inst);
+bool get_instruction_allow_gen_reg(InstID inst);
 
 };
 

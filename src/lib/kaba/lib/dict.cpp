@@ -1,8 +1,8 @@
 
 #include "../kaba.h"
-#include "common.h"
-#include "exception.h"
-#include "dynamic.h"
+#include "lib.h"
+#include "../dynamic/exception.h"
+#include "../dynamic/dynamic.h"
 #include "../../base/map.h"
 
 namespace kaba {

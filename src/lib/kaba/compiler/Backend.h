@@ -10,6 +10,12 @@
 #include "../kaba.h"
 #include "serializer.h"
 
+namespace Asm {
+	enum class RegID;
+	enum class RegRoot;
+	enum class InstID;
+}
+
 namespace kaba {
 
 class Serializer;
@@ -37,20 +43,20 @@ public:
 	Serializer *serializer;
 
 
-	Array<int> map_reg_root;
+	Array<Asm::RegRoot> map_reg_root;
 
 	virtual void do_mapping() = 0;
 
 
-	bool is_reg_root_used_in_interval(int reg_root, int first, int last);
-	int find_unused_reg(int first, int last, int size, int exclude = -1);
-	int reg_resize(int reg, int size);
+	bool is_reg_root_used_in_interval(Asm::RegRoot reg_root, int first, int last);
+	int find_unused_reg(int first, int last, int size, Asm::RegRoot exclude = (Asm::RegRoot)-1);
+	Asm::RegID reg_resize(Asm::RegID reg, int size);
 
-	SerialNodeParam param_vreg(const Class *type, int vreg, int preg = -1);
-	SerialNodeParam param_deref_vreg(const Class *type, int vreg, int preg = -1);
+	SerialNodeParam param_vreg(const Class *type, int vreg, Asm::RegID preg = (Asm::RegID)-1);
+	SerialNodeParam param_deref_vreg(const Class *type, int vreg, Asm::RegID preg = (Asm::RegID)-1);
 
 
-	void insert_cmd(int inst, const SerialNodeParam &p1 = p_none, const SerialNodeParam &p2 = p_none, const SerialNodeParam &p3 = p_none);
+	void insert_cmd(Asm::InstID inst, const SerialNodeParam &p1 = p_none, const SerialNodeParam &p2 = p_none, const SerialNodeParam &p3 = p_none);
 	//SerialNodeParam insert_reference(const SerialNodeParam &param, const Class *type = nullptr);
 
 
@@ -71,7 +77,7 @@ public:
 
 
 
-	static int get_reg(int root, int size);
+	static Asm::RegID get_reg(Asm::RegRoot root, int size);
 
 	void do_error(const string &e);
 

@@ -1,5 +1,4 @@
 #include "../kaba.h"
-#include "../lib/common.h"
 #include "Parser.h"
 #include "../../file/file.h"
 

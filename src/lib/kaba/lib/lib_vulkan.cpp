@@ -2,8 +2,8 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "../../math/matrix.h"
-#include "common.h"
-#include "exception.h"
+#include "lib.h"
+#include "../dynamic/exception.h"
 
 #ifdef _X_USE_VULKAN_
 	#include "../../vulkan/vulkan.h"

@@ -10,7 +10,8 @@
 
 
 #include "../../base/base.h"
-#include "../lib/common.h"
+#include "../../base/pointer.h"
+//#include "../lib/common.h"
 
 namespace kaba {
 
@@ -71,14 +72,12 @@ enum class NodeKind {
 	DEREF_LOCAL_MEMORY,
 	REGISTER,
 	DEREF_REGISTER,
-	MARKER,
-	DEREF_MARKER,
+	LABEL,
+	DEREF_LABEL,
 	IMMEDIATE,
 	GLOBAL_LOOKUP,       // ARM
 	DEREF_GLOBAL_LOOKUP, // ARM
 };
-
-class Node;
 
 // single operand/command
 class Node : public Sharable<Empty> {
@@ -131,25 +130,6 @@ void clear_nodes(Array<Node*> &nodes, Node *keep);
 
 string kind2str(NodeKind kind);
 string node2str(SyntaxTree *s, Node *n);
-
-// {...}-block
-class Block : public Node {
-public:
-	Block(Function *f, Block *parent);
-	Array<Variable*> vars;
-	Function *function;
-	Block *parent;
-	void *_start, *_end; // opcode range
-	int _label_start, _label_end;
-	int level;
-	void add(shared<Node> c);
-	void set(int index, shared<Node> c);
-	
-	const Class *name_space() const;
-
-	Variable *get_var(const string &name) const;
-	Variable *add_var(const string &name, const Class *type, Flags flags = Flags::NONE);
-};
 
 }
 

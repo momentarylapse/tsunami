@@ -67,10 +67,10 @@ inline void func_from_rip_test_script(StackFrameInfo &r, shared<Script> s, void 
 	foreachi (Function *f, s->syntax->functions, i) {
 		if (from_package and !f->throws_exceptions())
 			continue;
-		void *frip = f->address;
-		if (frip >= rip)
+		int64 frip = f->address;
+		if (frip >= (int64)rip)
 			continue;
-		int_p offset = (int_p)rip - (int_p)frip;
+		int64 offset = (int64)rip - frip;
 		if (offset >= r.offset)
 			continue;
 		if (from_package and offset >= 500)

@@ -17,52 +17,56 @@ namespace Asm {
 
 
 // groups of registers
-enum {
-	REG_GROUP_NONE,
-	REG_GROUP_GENERAL,
-	REG_GROUP_GENERAL2,
-	REG_GROUP_SEGMENT,
-	REG_GROUP_FLAGS,
-	REG_GROUP_CONTROL,
-	REG_GROUP_X87,
-	REG_GROUP_XMM,
-	REG_GROUP_VFP, // ARM-float
+enum class RegGroup {
+	INVALID = -1,
+	NONE,
+	GENERAL,
+	GENERAL2,
+	SEGMENT,
+	FLAGS,
+	CONTROL,
+	X87,
+	XMM,
+	VFP, // ARM-float
 };
 
 // parameter types
-enum {
-	PARAMT_IMMEDIATE,
-	PARAMT_REGISTER,
-	PARAMT_REGISTER_OR_MEM, // ...
-	PARAMT_MEMORY,
-	PARAMT_REGISTER_SET,
-	//PARAMT_SIB,
-	PARAMT_NONE,
-	PARAMT_INVALID
+enum class ParamType {
+	IMMEDIATE,
+	REGISTER,
+	REGISTER_OR_MEM, // ...
+	MEMORY,
+	REGISTER_SET,
+	//SIB,
+	NONE,
+	INVALID
 };
 
 // displacement for registers
-enum {
-	DISP_MODE_NONE,     // reg
-	DISP_MODE_8,        // reg + 8bit
-	DISP_MODE_16,       // reg + 16bit
-	DISP_MODE_32,       // reg + 32bit
-	DISP_MODE_SIB,      // SIB-byte
-	DISP_MODE_8_SIB,    // SIB-byte + 8bit
-	DISP_MODE_REG2,     // reg + reg2
-	DISP_MODE_8_REG2,   // reg + reg2 + 8bit
-	DISP_MODE_16_REG2   // reg + reg2 + 16bit
+enum class DispMode {
+	NONE,     // reg
+	_8,        // reg + 8bit
+	_16,       // reg + 16bit
+	_32,       // reg + 32bit
+	SIB,      // SIB-byte
+	_8_SIB,    // SIB-byte + 8bit
+	REG2,     // reg + reg2
+	_8_REG2,   // reg + reg2 + 8bit
+	_16_REG2   // reg + reg2 + 16bit
 };
 
 
 
 struct Register {
 	string name;
-	int id, group, size;
+	RegID id;
+	RegGroup group;
+	int size;
 	bool extend_mod_rm;
 };
-extern Array<Register> Registers;
-extern Array<Register*> RegisterByID;
+extern Array<Register> registers;
+extern Array<Register*> register_by_id;
+#define RegisterByID(r)  register_by_id[(int)r]
 
 
 
@@ -95,18 +99,18 @@ string x86_disassemble(void *_code_,int length,bool allow_comments);
 
 void raise_error(const string &str);
 
-void add_reg(const string &name, int id, int group, int size, int root = -1);
+void add_reg(const string &name, RegID id, RegGroup group, int size, RegRoot root = RegRoot::NONE);
 
 void insert_val(char *oc, int &ocs, int64 val, int size);
-string SizeOut(int size);
+string size_out(int size);
 
 extern bool DebugAsm;
 
 // which part of the modr/m byte is used
-enum {
-	MRM_NONE,
-	MRM_REG,
-	MRM_MOD_RM
+enum class ModRM {
+	NONE,
+	REG,
+	MOD_RM
 };
 
 
@@ -117,10 +121,10 @@ struct InstructionParamFuzzy {
 	bool allow_memory_indirect;	// [eax]    [eax + ...]
 	bool allow_immediate;		// 0x12.34...
 	bool allow_register;		// eax
-	int _type_;					// approximate type.... (UnFuzzy without mod/rm)
+	ParamType _type_;			// approximate type.... (UnFuzzy without mod/rm)
 	Register *reg;				// if != NULL  -> force a single register
-	int reg_group;
-	int mrm_mode;				// which part of the modr/m byte is used?
+	RegGroup reg_group;
+	ModRM mrm_mode;				// which part of the modr/m byte is used?
 	int size;
 	bool immediate_is_relative;	// for jump
 
@@ -132,14 +136,14 @@ struct InstructionParamFuzzy {
 
 
 struct InstructionName {
-	int inst;
+	InstID inst;
 	//const string name;
 	const char *name;
 	int rw1, rw2; // parameter is read(1), modified(2) or both (3)
 	// 32 -> don't allow gen reg
 	// 64 -> don't allow immediate
 };
-extern const InstructionName InstructionNames[];
+extern const InstructionName instruction_names[];
 
 
 

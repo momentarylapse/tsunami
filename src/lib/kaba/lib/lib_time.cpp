@@ -1,7 +1,7 @@
 #include "../../file/file.h"
 #include "../kaba.h"
 #include "../../config.h"
-#include "common.h"
+#include "lib.h"
 
 #ifdef _X_USE_HUI_
 	#include "../../hui/hui.h"

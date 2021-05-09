@@ -1,5 +1,4 @@
 #include "../kaba.h"
-#include "../lib/common.h"
 #include "../asm/asm.h"
 #include "Parser.h"
 #include "SyntaxTree.h"

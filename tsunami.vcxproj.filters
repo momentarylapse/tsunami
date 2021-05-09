@@ -640,28 +640,25 @@
     <ClCompile Include="src\lib\kaba\compiler\serializer.cpp">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_amd64.cpp">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_arm.cpp">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_x86.cpp">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\SerializerX.cpp">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\SerialNode.cpp">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\dynamic\call.cpp">
+      <Filter>src\lib\kaba\dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\dynamic\dynamic.cpp">
+      <Filter>src\lib\kaba\dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\dynamic\exception.cpp">
+      <Filter>src\lib\kaba\dynamic</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\dict.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\dynamic.cpp">
-      <Filter>src\lib\kaba\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\exception.cpp">
+    <ClCompile Include="src\lib\kaba\lib\extern.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib.cpp">
@@ -694,9 +691,6 @@
     <ClCompile Include="src\lib\kaba\lib\lib_os.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_sound.cpp">
-      <Filter>src\lib\kaba\lib</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_threads.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
@@ -706,6 +700,9 @@
     <ClCompile Include="src\lib\kaba\lib\lib_vulkan.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Block.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Class.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
@@ -713,6 +710,9 @@
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Function.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Identifier.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
@@ -724,6 +724,9 @@
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Operator.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Parser.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
@@ -733,8 +736,17 @@
     <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Statement.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Variable.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\CompilerConfiguration.cpp">
+      <Filter>src\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\Interpreter.cpp">
       <Filter>src\lib\kaba</Filter>
@@ -1905,35 +1917,32 @@
     <ClInclude Include="src\lib\kaba\compiler\serializer.h">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\kaba\compiler\serializer_amd64.h">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\kaba\compiler\serializer_arm.h">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\kaba\compiler\serializer_x86.h">
-      <Filter>src\lib\kaba\compiler</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\kaba\compiler\SerializerX.h">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\compiler\SerialNode.h">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\kaba\lib\common.h">
-      <Filter>src\lib\kaba\lib</Filter>
+    <ClInclude Include="src\lib\kaba\dynamic\call.h">
+      <Filter>src\lib\kaba\dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\dynamic\dynamic.h">
+      <Filter>src\lib\kaba\dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\dynamic\exception.h">
+      <Filter>src\lib\kaba\dynamic</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\lib\dict.h">
       <Filter>src\lib\kaba\lib</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\kaba\lib\dynamic.h">
-      <Filter>src\lib\kaba\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\kaba\lib\exception.h">
+    <ClInclude Include="src\lib\kaba\lib\extern.h">
       <Filter>src\lib\kaba\lib</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\lib\lib.h">
       <Filter>src\lib\kaba\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Block.h">
+      <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Class.h">
       <Filter>src\lib\kaba\syntax</Filter>
@@ -1941,7 +1950,16 @@
     <ClInclude Include="src\lib\kaba\syntax\Constant.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Flags.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Function.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Identifier.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Inline.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\lexical.h">
@@ -1950,11 +1968,23 @@
     <ClInclude Include="src\lib\kaba\syntax\Node.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Operator.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Parser.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Statement.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\SyntaxTree.h">
       <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\syntax\Variable.h">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\CompilerConfiguration.h">
+      <Filter>src\lib\kaba</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\Interpreter.h">
       <Filter>src\lib\kaba</Filter>
@@ -2547,193 +2577,196 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
-      <UniqueIdentifier>{0FE890E8-49E7-52B8-2686-2B8A7B34AA6B}</UniqueIdentifier>
+      <UniqueIdentifier>{608E9A3A-EB47-8CB2-E8AC-B908D044AF71}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action">
-      <UniqueIdentifier>{A54362CA-BA20-DD80-3175-DF05A3A5E118}</UniqueIdentifier>
+      <UniqueIdentifier>{FFF8A239-E807-4C93-5400-E08B1DFCC7DC}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Bar">
-      <UniqueIdentifier>{65CC8973-3941-6D29-F9FC-8F133B82CAB2}</UniqueIdentifier>
+      <UniqueIdentifier>{7D5209BF-1C66-80AE-5AE4-B70C408176EF}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Curve">
-      <UniqueIdentifier>{08F816C5-F075-D90C-2F9A-FAE367531062}</UniqueIdentifier>
+      <UniqueIdentifier>{3413DD3F-9962-A010-BF46-643A4CCC3AC6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Sample">
-      <UniqueIdentifier>{95AAB60A-7704-0012-0BD0-5C3C39F4A573}</UniqueIdentifier>
+      <UniqueIdentifier>{EEACBEB5-8182-293E-874F-C8A146E81AF0}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Song">
-      <UniqueIdentifier>{A1D58E0F-5145-2683-1647-273513AB82E3}</UniqueIdentifier>
+      <UniqueIdentifier>{8AC48890-A23C-B6A4-EF4A-8ECD5A57447D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Song\Data">
-      <UniqueIdentifier>{3C9CBAC0-C16F-7F29-5718-E5E089B1BA4F}</UniqueIdentifier>
+      <UniqueIdentifier>{E316BA75-DA29-0DDE-D295-152607D5C52A}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Tag">
-      <UniqueIdentifier>{7DB28834-9931-96AE-EC7D-15D9E8BA3F9B}</UniqueIdentifier>
+      <UniqueIdentifier>{8314E8AC-3D53-B328-5CD6-20D28B7409F9}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track">
-      <UniqueIdentifier>{D5E6D1A7-BE84-5333-FA00-0DAE659A5263}</UniqueIdentifier>
+      <UniqueIdentifier>{D0DC988C-5D00-0296-F7D1-7A305B4654F3}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Buffer">
-      <UniqueIdentifier>{849563C2-2578-8AB7-5C85-A2418EBD0119}</UniqueIdentifier>
+      <UniqueIdentifier>{4DFE68BB-6BC7-E6DD-DAE5-526BDB12F154}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Data">
-      <UniqueIdentifier>{6AECEBF0-1689-1417-09DB-C2C4072193A0}</UniqueIdentifier>
+      <UniqueIdentifier>{F525ED14-8EB7-4942-4289-4E52A7598BD8}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Effect">
-      <UniqueIdentifier>{D9DC5CC6-35F5-A0CA-AA56-C2ADADE4094E}</UniqueIdentifier>
+      <UniqueIdentifier>{0FDFDF36-DFD2-915D-4E79-DDC7410DCD5D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Layer">
-      <UniqueIdentifier>{22B8F7E2-DE87-F529-F8FC-BAA579982E75}</UniqueIdentifier>
+      <UniqueIdentifier>{D3CB2010-0F29-1876-6EF3-CBA0DAE98475}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Marker">
-      <UniqueIdentifier>{02DFAC27-ABF9-0230-B2C6-D7B405D23484}</UniqueIdentifier>
+      <UniqueIdentifier>{741A42A5-2DE3-559B-49F0-59123FCC341B}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Midi">
-      <UniqueIdentifier>{6640268C-1862-A926-CFC9-68E6DB910256}</UniqueIdentifier>
+      <UniqueIdentifier>{835C5018-D0C3-66EB-0DB5-7D8BD57199C1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Sample">
-      <UniqueIdentifier>{897A0072-8E53-77A4-76ED-FC4C8EE813F9}</UniqueIdentifier>
+      <UniqueIdentifier>{C2E220A0-1737-D12D-FE36-BC2919AB26DF}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Synthesizer">
-      <UniqueIdentifier>{D74E7C00-A541-DE64-4423-07095E162100}</UniqueIdentifier>
+      <UniqueIdentifier>{9C2BCDBE-4E51-08F0-6273-E9C036B6D956}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Data">
-      <UniqueIdentifier>{85E01F0B-54D3-2377-8AB8-1C27B4EE5EEE}</UniqueIdentifier>
+      <UniqueIdentifier>{57224E09-C6AD-EAD5-C58B-E4C2B8891DF6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Data\Audio">
-      <UniqueIdentifier>{4DE5CF12-3E56-2DEA-7938-6501AEFFDEE1}</UniqueIdentifier>
+      <UniqueIdentifier>{529A093D-FEAE-8845-EC1D-1DFD576656DA}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Data\Midi">
-      <UniqueIdentifier>{BD78C8A0-6069-D534-E6D4-CD66C66945BF}</UniqueIdentifier>
+      <UniqueIdentifier>{8659096F-81E1-A278-F850-54EAC411BFC4}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Data\Rhythm">
-      <UniqueIdentifier>{228EA2E1-25A0-AD59-42E1-048DAF6F41F6}</UniqueIdentifier>
+      <UniqueIdentifier>{52D5B454-5450-6C86-4E7A-355FA6056D9B}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Device">
-      <UniqueIdentifier>{474EA3FC-9AD4-82DD-5CE6-173C6ABACA00}</UniqueIdentifier>
+      <UniqueIdentifier>{F61BB7F0-B412-1995-800B-55AFCB428EE7}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Device\Stream">
-      <UniqueIdentifier>{25EC9E82-8661-84ED-1C32-37EA1A4D55D7}</UniqueIdentifier>
+      <UniqueIdentifier>{5F207113-6267-CFD4-FDF4-3A4F592D705D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib">
-      <UniqueIdentifier>{AC34BC64-2D5A-2383-0C64-35E4F32580C3}</UniqueIdentifier>
+      <UniqueIdentifier>{08D8AFB0-118E-0530-3356-DA63390BA68B}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\any">
-      <UniqueIdentifier>{DF79CEEE-C39F-7138-D9D1-EC6EF84780B6}</UniqueIdentifier>
+      <UniqueIdentifier>{E6395F97-1262-892B-C72A-19D53E1D5A94}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\base">
-      <UniqueIdentifier>{02FC1DBD-14D9-6024-9F58-BB7B4B3DCE3C}</UniqueIdentifier>
+      <UniqueIdentifier>{1CD7C7FD-95F2-F2EC-906B-A41D32B8D4DE}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\file">
-      <UniqueIdentifier>{13931412-9ECF-EE48-EA1A-595A59717BE9}</UniqueIdentifier>
+      <UniqueIdentifier>{1A5D14BB-AAD9-CB56-CC27-035460D45A26}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\hui">
-      <UniqueIdentifier>{E7CFCD26-CF6A-EA3D-447A-ED536C4E8387}</UniqueIdentifier>
+      <UniqueIdentifier>{4846DF27-AF07-B6E7-20F3-447B55FAF214}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\hui\Controls">
-      <UniqueIdentifier>{B47729EE-9497-FD44-2CF0-943018F9B706}</UniqueIdentifier>
+      <UniqueIdentifier>{A6B75DE0-DF88-5608-7FBC-4389873895C4}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\image">
-      <UniqueIdentifier>{C7EE1DDB-1731-4756-457E-9AEB3E4F5551}</UniqueIdentifier>
+      <UniqueIdentifier>{B8C15A12-AAB0-0B88-B35F-7D9F5C7F243D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba">
-      <UniqueIdentifier>{D40F1EA3-6D4A-5A19-F889-3647596AFCCC}</UniqueIdentifier>
+      <UniqueIdentifier>{CFE2A055-A05B-CD47-1978-607BDFAF4ED1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba\asm">
-      <UniqueIdentifier>{0DC2B751-5ACB-5E55-7DEB-4329D94C5096}</UniqueIdentifier>
+      <UniqueIdentifier>{EB38B8E6-9325-06D2-F5A6-52232D36B07A}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba\compiler">
-      <UniqueIdentifier>{D599DEB2-98DE-623E-F294-5CD261FC2820}</UniqueIdentifier>
+      <UniqueIdentifier>{BB3741ED-4025-6076-52CB-4EE6B1D7151D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\kaba\dynamic">
+      <UniqueIdentifier>{0455632A-450A-581B-AD6F-C46863F8916A}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba\lib">
-      <UniqueIdentifier>{EC9BA5E4-EC25-F53F-8D3D-A0002FC48F47}</UniqueIdentifier>
+      <UniqueIdentifier>{6BFCF173-78ED-0F8A-DE99-3F1A312C3869}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba\syntax">
-      <UniqueIdentifier>{BE3641A2-ED7D-3ACB-8082-09239E71EC89}</UniqueIdentifier>
+      <UniqueIdentifier>{46638E7F-66C7-5512-3BC7-BE1EF4B3C2D0}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\math">
-      <UniqueIdentifier>{AB0EDA1B-789B-366B-6FD7-8FA2E23CEC69}</UniqueIdentifier>
+      <UniqueIdentifier>{83402C09-2D08-22B6-D7D8-5F753380551D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\net">
-      <UniqueIdentifier>{86761829-1B44-1B08-ADF3-D96CB99A6F3E}</UniqueIdentifier>
+      <UniqueIdentifier>{96EC2E55-B6DD-8845-02E6-16C5945EA7C4}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\nix">
-      <UniqueIdentifier>{6B584725-37A5-3ADE-8C25-68121BC8AF71}</UniqueIdentifier>
+      <UniqueIdentifier>{DB1F9645-D225-B7BB-9A2B-1E1A379EE62B}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\threads">
-      <UniqueIdentifier>{ACAF3D47-4FC7-9952-677C-09E24AAFA115}</UniqueIdentifier>
+      <UniqueIdentifier>{14BBB008-23DE-A994-3C04-A1FE89C7FF21}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\xfile">
-      <UniqueIdentifier>{EC42989E-8562-FB45-3B24-506AB0A62CB0}</UniqueIdentifier>
+      <UniqueIdentifier>{3ECEFC62-F40A-EAE1-6E60-06E8FBFFA21E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module">
-      <UniqueIdentifier>{8F228B00-1620-2766-38A8-90351DB3A642}</UniqueIdentifier>
+      <UniqueIdentifier>{1EC0A33A-8356-D484-3F53-54C5FC5AF680}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module\Audio">
-      <UniqueIdentifier>{664F25F3-C24E-9B5C-305D-19237E615B4C}</UniqueIdentifier>
+      <UniqueIdentifier>{451F94A1-8086-40B7-00B5-47B430E2773B}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module\Beats">
-      <UniqueIdentifier>{28B4EB8A-ED97-8F4C-FA90-4C3BAAC060C8}</UniqueIdentifier>
+      <UniqueIdentifier>{D5B6A682-609B-1421-4E79-52D93CBA3F60}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module\Midi">
-      <UniqueIdentifier>{97D82520-3C8B-BD8B-82BD-EF89A5A1569F}</UniqueIdentifier>
+      <UniqueIdentifier>{427F8F2F-0BA2-0D45-BBE0-ECA195BD51EA}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module\Port">
-      <UniqueIdentifier>{E781DA20-7BC2-94D2-6AF5-97F4C962002E}</UniqueIdentifier>
+      <UniqueIdentifier>{359C5BB6-7687-4DCF-9B07-8A9104F66D0A}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Module\Synth">
-      <UniqueIdentifier>{7A04524D-D106-6E8C-8822-F27CCDFCD2B4}</UniqueIdentifier>
+      <UniqueIdentifier>{3A7853ED-974D-51DE-DE55-8E7936FA3F56}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Plugins">
-      <UniqueIdentifier>{DB92EDFB-E024-EB26-4483-7003D00B2CFF}</UniqueIdentifier>
+      <UniqueIdentifier>{ACFF0EC9-617B-2590-3F5B-ED5234D742EE}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Storage">
-      <UniqueIdentifier>{88266225-25A0-1C75-1099-0ACDAD8D98C1}</UniqueIdentifier>
+      <UniqueIdentifier>{FEEFCB93-C0EF-68F9-7546-2986E6D28C18}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Storage\Dialog">
-      <UniqueIdentifier>{1F881BE4-0852-5D77-D10D-BDB5A434DF6F}</UniqueIdentifier>
+      <UniqueIdentifier>{AF87B1A7-2978-261A-C60E-094EF218F319}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Storage\Format">
-      <UniqueIdentifier>{FE71955A-EBC3-84B6-5B40-806249729D18}</UniqueIdentifier>
+      <UniqueIdentifier>{391EAB6D-5D57-4710-E2FE-C3DC6F4536F6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Stuff">
-      <UniqueIdentifier>{C995FF0D-BC13-1C96-8E70-ED326A508784}</UniqueIdentifier>
+      <UniqueIdentifier>{F05ACB72-9DAD-5BE3-ED2A-1F67FBD31D90}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Test">
-      <UniqueIdentifier>{12A02AED-7019-DBF5-9667-3AAA50BD8329}</UniqueIdentifier>
+      <UniqueIdentifier>{EFBBB3D4-0826-3092-DBDE-B36BF4E12821}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View">
-      <UniqueIdentifier>{6CA9787F-9986-58CF-E362-D1D2280AC233}</UniqueIdentifier>
+      <UniqueIdentifier>{8DC30A71-2A76-A197-D669-AD4913A4CD54}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\BottomBar">
-      <UniqueIdentifier>{FED66460-EE63-6325-6983-B56DE78AACE9}</UniqueIdentifier>
+      <UniqueIdentifier>{A27BCFCF-9464-5FC2-52B0-009234601C4C}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\BottomBar\SignalEditor">
-      <UniqueIdentifier>{AB01061E-582C-B412-EA69-FD7D4F8EC686}</UniqueIdentifier>
+      <UniqueIdentifier>{EC7BC4A6-81AE-0706-9B6A-C0C05307F54D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Dialog">
-      <UniqueIdentifier>{2872F915-131D-8306-E60D-37B87473BFAD}</UniqueIdentifier>
+      <UniqueIdentifier>{1C8E0349-4F74-68B0-42A0-2708A1F96378}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Graph">
-      <UniqueIdentifier>{8108B1DD-4FBC-3B32-23F5-ABE2F56B508D}</UniqueIdentifier>
+      <UniqueIdentifier>{0F613BA7-A2C1-A71E-ACFC-3F4D04778EF8}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Helper">
-      <UniqueIdentifier>{296DA4BF-46C8-1FA3-2A9D-58F5E6036918}</UniqueIdentifier>
+      <UniqueIdentifier>{E691149C-75D2-DF17-B04E-09C1E48638F1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Helper\Graph">
-      <UniqueIdentifier>{276CC1C0-7889-72DA-D772-078EE81423D4}</UniqueIdentifier>
+      <UniqueIdentifier>{F930ECD5-2B7F-A875-9C49-51A363A9BABA}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Mode">
-      <UniqueIdentifier>{B3175D7D-607D-3480-CF3C-7BB54DA607AB}</UniqueIdentifier>
+      <UniqueIdentifier>{4FB2B98E-40DF-9552-1AC7-B6B2A5B50704}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Painter">
-      <UniqueIdentifier>{BC30AAE0-B5EE-96F6-623E-DE42CF8C6382}</UniqueIdentifier>
+      <UniqueIdentifier>{6C725F0A-FE99-3EB5-88C4-E769D2ED9F2F}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\SideBar">
-      <UniqueIdentifier>{FB2A60A1-5900-0F67-2A50-9A259A20EA2D}</UniqueIdentifier>
+      <UniqueIdentifier>{B91181B8-F423-3E8B-65F5-C6E98D71C908}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\SideBar\CaptureConsoleModes">
-      <UniqueIdentifier>{657C62EC-BECC-E230-D916-43BDEDED80AE}</UniqueIdentifier>
+      <UniqueIdentifier>{32AC4544-A78D-508B-6802-EFC6C479E821}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

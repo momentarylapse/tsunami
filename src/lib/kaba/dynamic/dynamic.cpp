@@ -1,7 +1,7 @@
 #include "dynamic.h"
 #include "../kaba.h"
-#include "common.h"
 #include "exception.h"
+#include "call.h"
 #include "../../any/any.h"
 
 namespace kaba {
@@ -11,8 +11,7 @@ extern const Class *TypeFloatList;
 extern const Class *TypeBoolList;
 extern const Class *TypeAny;
 extern const Class *TypePath;
-	
-bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param);
+
 
 	
 	
@@ -59,13 +58,13 @@ void _kaba_array_sort_pf(DynamicArray &array, Function *f, bool reverse) {
 	char **p = (char**)array.data;
 	T r1, r2;
 	for (int i=0; i<array.num; i++) {
-		if (!call_function(f, f->address, &r1, {*p}))
+		if (!call_function(f, &r1, {*p}))
 			kaba_raise_exception(new KabaException("call failed " + f->long_name()));
 
 		//T *pp = (T*)(*p + offset_by);
 		char **q = p + 1;
 		for (int j=i+1; j<array.num; j++) {
-			if (!call_function(f, f->address, &r2, {*q}))
+			if (!call_function(f, &r2, {*q}))
 				kaba_raise_exception(new KabaException("call failed"));
 			if ((r1 > r2) xor reverse) {
 				array.simple_swap(i, j);
@@ -406,7 +405,7 @@ DynamicArray kaba_map(Function *func, DynamicArray *a) {
 	for (int i=0; i<a->num; i++) {
 		void *po = r.simple_element(i);
 		void *pi = a->simple_element(i);
-		bool ok = call_function(func, func->address, po, {pi});
+		bool ok = call_function(func, po, {pi});
 		if (!ok)
 			kaba_raise_exception(new KabaException("map(): failed to dynamically call " + func->signature()));
 	}
@@ -428,28 +427,28 @@ void assert_return_type(Function *f, const Class *ret) {
 void kaba_call0(Function *func) {
 	assert_num_params(func, 0);
 	assert_return_type(func, TypeVoid);
-	if (!call_function(func, func->address, nullptr, {}))
+	if (!call_function(func, nullptr, {}))
 		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
 }
 
 void kaba_call1(Function *func, void *p1) {
 	assert_num_params(func, 1);
 	assert_return_type(func, TypeVoid);
-	if (!call_function(func, func->address, nullptr, {p1}))
+	if (!call_function(func, nullptr, {p1}))
 		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
 }
 
 void kaba_call2(Function *func, void *p1, void *p2) {
 	assert_num_params(func, 2);
 	assert_return_type(func, TypeVoid);
-	if (!call_function(func, func->address, nullptr, {p1, p2}))
+	if (!call_function(func, nullptr, {p1, p2}))
 		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
 }
 
 void kaba_call3(Function *func, void *p1, void *p2, void *p3) {
 	assert_num_params(func, 3);
 	assert_return_type(func, TypeVoid);
-	if (!call_function(func, func->address, nullptr, {p1, p2, p3}))
+	if (!call_function(func, nullptr, {p1, p2, p3}))
 		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
 }
 

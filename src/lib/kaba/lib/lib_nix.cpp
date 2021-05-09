@@ -1,8 +1,8 @@
 #include "../../file/file.h"
 #include "../kaba.h"
 #include "../../config.h"
-#include "common.h"
-#include "exception.h"
+#include "lib.h"
+#include "../dynamic/exception.h"
 
 #ifdef _X_USE_NIX_
 	#include "../../nix/nix.h"

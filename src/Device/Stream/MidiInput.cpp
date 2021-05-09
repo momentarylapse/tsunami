@@ -12,7 +12,7 @@
 #include "../../Data/base.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
-#include "../../lib/kaba/lib/common.h"
+#include "../../lib/kaba/lib/extern.h"
 #include "../../Plugins/PluginManager.h"
 
 namespace kaba {

@@ -3,8 +3,8 @@
 #include "../../base/map.h"
 #include "../kaba.h"
 #include "../../config.h"
-#include "common.h"
-#include "exception.h"
+#include "lib.h"
+#include "../dynamic/exception.h"
 
 #ifdef _X_USE_ALGEBRA_
 	#include "../../algebra/algebra.h"

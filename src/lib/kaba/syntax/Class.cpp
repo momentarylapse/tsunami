@@ -1,6 +1,5 @@
 #include "../../base/base.h"
 #include "../kaba.h"
-#include "../lib/common.h"
 #include "../../file/file.h"
 #include "Class.h"
 
@@ -401,7 +400,7 @@ void Class::link_virtual_table() {
 				//vtable.resize(cf.virtual_index + 1);
 			if (config.verbose)
 				msg_write("VIRTUAL   " + i2s(cf->virtual_index) + "   " + cf->signature());
-			vtable[cf->virtual_index] = cf->address;
+			vtable[cf->virtual_index] = (void*)cf->address;
 		}
 		if (cf->needs_overriding) {
 			msg_error("needs overriding: " + cf->signature());
@@ -416,7 +415,7 @@ void Class::link_external_virtual_table(void *p) {
 	int max_vindex = 1;
 	for (auto *cf: weak(functions))
 		if (cf->virtual_index >= 0) {
-			cf->address = t[cf->virtual_index];
+			cf->address = (int_p)t[cf->virtual_index];
 			if (cf->virtual_index >= vtable.num)
 				max_vindex = max(max_vindex, cf->virtual_index);
 		}

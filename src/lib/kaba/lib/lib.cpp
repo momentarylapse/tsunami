@@ -10,9 +10,9 @@
 #include <string.h>
 
 #include "../kaba.h"
-#include "common.h"
-#include "exception.h"
+#include "lib.h"
 #include "dict.h"
+#include "../dynamic/exception.h"
 #include "../../config.h"
 #include "../../math/complex.h"
 #include "../../any/any.h"
@@ -26,99 +26,6 @@
 
 
 namespace kaba {
-
-
-const string IDENTIFIER_CLASS = "class";
-const string IDENTIFIER_INTERFACE = "interface";
-const string IDENTIFIER_FUNC = "func";
-const string IDENTIFIER_FUNC_INIT = "__init__";
-const string IDENTIFIER_FUNC_DELETE = "__delete__";
-const string IDENTIFIER_FUNC_ASSIGN = "__assign__";
-const string IDENTIFIER_FUNC_GET = "__get__";
-const string IDENTIFIER_FUNC_SET = "__set__";
-const string IDENTIFIER_FUNC_LENGTH = "__length__";
-const string IDENTIFIER_FUNC_STR = "__str__";
-const string IDENTIFIER_FUNC_REPR = "__repr__";
-const string IDENTIFIER_FUNC_SUBARRAY = "__subarray__";
-const string IDENTIFIER_FUNC_SHARED_CLEAR = "_clear";
-const string IDENTIFIER_FUNC_SHARED_CREATE = "_create";
-const string IDENTIFIER_SUPER = "super";
-const string IDENTIFIER_SELF = "self";
-const string IDENTIFIER_EXTENDS = "extends";
-const string IDENTIFIER_IMPLEMENTS = "implements";
-const string IDENTIFIER_STATIC = "static";
-const string IDENTIFIER_NEW = "new";
-const string IDENTIFIER_DELETE = "del";
-const string IDENTIFIER_SIZEOF = "sizeof";
-const string IDENTIFIER_TYPE = "type";
-const string IDENTIFIER_STR = "str";
-const string IDENTIFIER_REPR = "repr";
-const string IDENTIFIER_LEN = "len";
-const string IDENTIFIER_LET = "let";
-const string IDENTIFIER_NAMESPACE = "namespace";
-const string IDENTIFIER_RETURN_VAR = "-return-";
-const string IDENTIFIER_VTABLE_VAR = "-vtable-";
-const string IDENTIFIER_SHARED_COUNT = "_shared_ref_count";
-const string IDENTIFIER_ENUM = "enum";
-const string IDENTIFIER_CONST = "const";
-const string IDENTIFIER_OUT = "out";
-const string IDENTIFIER_OVERRIDE = "override";
-const string IDENTIFIER_VIRTUAL = "virtual";
-const string IDENTIFIER_EXTERN = "extern";
-//const string IDENTIFIER_ACCESSOR = "accessor";
-const string IDENTIFIER_SELFREF = "selfref";
-const string IDENTIFIER_WEAK = "weak";
-const string IDENTIFIER_SHARED = "shared";
-const string IDENTIFIER_OWNED = "owned";
-const string IDENTIFIER_PURE = "pure";
-const string IDENTIFIER_THROWS = "throws";
-const string IDENTIFIER_USE = "use";
-const string IDENTIFIER_IMPORT = "import";
-const string IDENTIFIER_RETURN = "return";
-const string IDENTIFIER_RAISE = "raise";
-const string IDENTIFIER_TRY = "try";
-const string IDENTIFIER_EXCEPT = "except";
-const string IDENTIFIER_IF = "if";
-const string IDENTIFIER_ELSE = "else";
-const string IDENTIFIER_WHILE = "while";
-const string IDENTIFIER_FOR = "for";
-const string IDENTIFIER_IN = "in";
-const string IDENTIFIER_AS = "as";
-const string IDENTIFIER_BREAK = "break";
-const string IDENTIFIER_CONTINUE = "continue";
-const string IDENTIFIER_PASS = "pass";
-const string IDENTIFIER_AND = "and";
-const string IDENTIFIER_OR = "or";
-const string IDENTIFIER_XOR = "xor";
-const string IDENTIFIER_NOT = "not";
-const string IDENTIFIER_IS = "is";
-const string IDENTIFIER_ASM = "asm";
-const string IDENTIFIER_MAP = "map";
-const string IDENTIFIER_LAMBDA = "lambda";
-const string IDENTIFIER_SORTED = "sorted";
-const string IDENTIFIER_DYN = "dyn";
-const string IDENTIFIER_CALL = "call";
-
-CompilerConfiguration config;
-
-struct ExternalLinkData {
-	string name;
-	void *pointer;
-};
-Array<ExternalLinkData> ExternalLinks;
-
-struct ClassOffsetData {
-	string class_name, element;
-	int offset;
-	bool is_virtual;
-};
-Array<ClassOffsetData> ClassOffsets;
-
-struct ClassSizeData {
-	string class_name;
-	int size;
-};
-Array<ClassSizeData> ClassSizes;
 
 
 //------------------------------------------------------------------------------------------------//
@@ -324,47 +231,6 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 //                                           operators                                            //
 //------------------------------------------------------------------------------------------------//
 
-//   without type information ("primitive")
-
-PrimitiveOperator PrimitiveOperators[(int)OperatorID::_COUNT_] = {
-	{"=",  OperatorID::ASSIGN,        true,  0, IDENTIFIER_FUNC_ASSIGN, 3, false},
-	{"+",  OperatorID::ADD,           false, 11, "__add__", 3, false},
-	{"-",  OperatorID::SUBTRACT,      false, 11, "__sub__", 3, false},
-	{"*",  OperatorID::MULTIPLY,      false, 12, "__mul__", 3, false},
-	{"/",  OperatorID::DIVIDE,        false, 12, "__div__", 3, false},
-	{"-",  OperatorID::NEGATIVE,      false, 13, "__neg__", 2, false}, // -1 etc
-	{"+=", OperatorID::ADDS,          true,  0,  "__iadd__", 3, false},
-	{"-=", OperatorID::SUBTRACTS,     true,  0,  "__isub__", 3, false},
-	{"*=", OperatorID::MULTIPLYS,     true,  0,  "__imul__", 3, false},
-	{"/=", OperatorID::DIVIDES,       true,  0,  "__idiv__", 3, false},
-	{"==", OperatorID::EQUAL,         false, 8,  "__eq__", 3, false},
-	{"!=", OperatorID::NOTEQUAL,      false, 8,  "__ne__", 3, false},
-	{IDENTIFIER_NOT,OperatorID::NEGATE,        false, 2,  "__not__", 2, false},
-	{"<",  OperatorID::SMALLER,       false, 9,  "__lt__", 3, false},
-	{">",  OperatorID::GREATER,       false, 9,  "__gt__", 3, false},
-	{"<=", OperatorID::SMALLER_EQUAL, false, 9,  "__le__", 3, false},
-	{">=", OperatorID::GREATER_EQUAL, false, 9,  "__ge__", 3, false},
-	{IDENTIFIER_AND, OperatorID::AND, false, 4,  "__and__", 3, false},
-	{IDENTIFIER_OR,  OperatorID::OR,  false, 3,  "__or__", 3, false},
-	{"%",  OperatorID::MODULO,        false, 12, "__mod__", 3, false},
-	{"&",  OperatorID::BIT_AND,       false, 7, "__bitand__", 3, false},
-	{"|",  OperatorID::BIT_OR,        false, 5, "__bitor__", 3, false},
-	{"<<", OperatorID::SHIFT_LEFT,    false, 10, "__lshift__", 3, false},
-	{">>", OperatorID::SHIFT_RIGHT,   false, 10, "__rshift__", 3, false},
-	{"++", OperatorID::INCREASE,      true,  2, "__inc__", 1, false},
-	{"--", OperatorID::DECREASE,      true,  2, "__dec__", 1, false},
-	{IDENTIFIER_IS, OperatorID::IS,   false, 2,  "-none-", 3, false},
-	{IDENTIFIER_IN, OperatorID::IN,   false, 12, "__contains__", 3, true}, // INVERTED
-	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", 3, false},
-	{"^",  OperatorID::EXPONENT,      false, 14,  "__exp__", 3, false},
-	{",",  OperatorID::COMMA,      false, 1,  "-none-", 3, false},
-	{"*",  OperatorID::DEREFERENCE,      false, 15,  "__get__", 2, false},
-	{"&",  OperatorID::REFERENCE,      false, 15,  "-none-", 2, false},
-	{"[...]",  OperatorID::ARRAY,      false, 16,  "-none-", 3, false},
-	{"|>",  OperatorID::FUNCTION_PIPE,      false, 0,  "-none-", 3, false}
-// Level = 15 - (official C-operator priority)
-// priority from "C als erste Programmiersprache", page 552
-};
 
 //   with type information
 
@@ -460,7 +326,7 @@ Function* class_add_func(const string &name, const Class *return_type, void *fun
 	cur_package->syntax->functions.add(f);
 	f->address_preprocess = func;
 	if (config.allow_std_lib)
-		f->address = func;
+		f->address = (int_p)func;
 	cur_func = f;
 
 
@@ -591,27 +457,9 @@ void add_ext_var(const string &name, const Class *type, void *var) {
 
 
 
-Array<Statement*> Statements;
-
 Function *add_func(const string &name, const Class *return_type, void *func, Flags flag) {
 	add_class(cur_package->base_class());
 	return class_add_func(name, return_type, func, flag);
-}
-
-Statement *statement_from_id(StatementID id) {
-	for (auto *s: Statements)
-		if (s->id == id)
-			return s;
-	return nullptr;
-}
-
-int add_statement(const string &name, StatementID id, int num_params = 0) {
-	Statement *s = new Statement;
-	s->name = name;
-	s->id = id;
-	s->num_params = num_params;
-	Statements.add(s);
-	return 0;
 }
 
 void func_set_inline(InlineID index) {
@@ -740,40 +588,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 }
 
 
-void SIAddStatements() {
-	// statements
-	add_statement(IDENTIFIER_RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_IF, StatementID::IF, 2); // [CMP, BLOCK]
-	add_statement("-if/else-", StatementID::IF_ELSE, 3); // [CMP, BLOCK, ELSE-BLOCK]
-	add_statement(IDENTIFIER_WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
-	add_statement("-for-array-", StatementID::FOR_ARRAY, 4); // [VAR, INDEX, ARRAY, BLOCK]
-	add_statement("-for-range-", StatementID::FOR_RANGE, 5); // [VAR, START, STOP, STEP, BLOCK]
-	add_statement(IDENTIFIER_FOR, StatementID::FOR_DIGEST, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
-	add_statement(IDENTIFIER_BREAK, StatementID::BREAK);
-	add_statement(IDENTIFIER_CONTINUE, StatementID::CONTINUE);
-	add_statement(IDENTIFIER_NEW, StatementID::NEW, 1);
-	add_statement(IDENTIFIER_DELETE, StatementID::DELETE, 1);
-	add_statement(IDENTIFIER_SIZEOF, StatementID::SIZEOF, 1);
-	add_statement(IDENTIFIER_TYPE, StatementID::TYPE, 1);
-	add_statement(IDENTIFIER_STR, StatementID::STR, 1);
-	add_statement(IDENTIFIER_REPR, StatementID::REPR, 1);
-	add_statement(IDENTIFIER_LEN, StatementID::LEN, 1);
-	add_statement(IDENTIFIER_LET, StatementID::LET);
-	add_statement(IDENTIFIER_ASM, StatementID::ASM);
-	//add_statement(IDENTIFIER_RAISE, StatementID::RAISE); NOPE, now it's a function!
-	add_statement(IDENTIFIER_TRY, StatementID::TRY); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_EXCEPT, StatementID::EXCEPT); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_PASS, StatementID::PASS);
-	add_statement(IDENTIFIER_MAP, StatementID::MAP);
-	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
-	add_statement(IDENTIFIER_SORTED, StatementID::SORTED);
-	add_statement(IDENTIFIER_DYN, StatementID::DYN);
-	add_statement(IDENTIFIER_CALL, StatementID::CALL);
-	add_statement(IDENTIFIER_WEAK, StatementID::WEAK, 1);
-}
-
-
-
+void SIAddStatements();
 
 void SIAddXCommands();
 void SIAddPackageBase();
@@ -791,69 +606,6 @@ void SIAddPackageDoc();
 void SIAddPackageVulkan();
 
 
-Asm::InstructionSet extract_instruction_set(Abi abi) {
-	if ((abi == Abi::X86_GNU) or (abi == Abi::X86_WINDOWS))
-		return Asm::InstructionSet::X86;
-	if ((abi == Abi::AMD64_GNU) or (abi == Abi::AMD64_WINDOWS))
-		return Asm::InstructionSet::AMD64;
-	if ((abi == Abi::ARM32_GNU) or (abi == Abi::ARM64_GNU))
-		return Asm::InstructionSet::ARM;
-	//if (abi == Abi::NATIVE)
-	return Asm::InstructionSet::NATIVE;
-}
-
-Abi guess_native_abi() {
-	auto instruction_set = Asm::guess_native_instruction_set();
-	if (instruction_set == Asm::InstructionSet::AMD64) {
-#ifdef OS_WINDOWS
-		return Abi::AMD64_WINDOWS;
-#endif
-		return Abi::AMD64_GNU;
-	} else if (config.instruction_set == Asm::InstructionSet::X86) {
-#ifdef OS_WINDOWS
-		return Abi::X86_WINDOWS;
-#endif
-		return Abi::X86_GNU;
-	} else if (config.instruction_set == Asm::InstructionSet::ARM) {
-		return Abi::ARM32_GNU;
-	}
-	return Abi::UNKNOWN;
-}
-
-CompilerConfiguration::CompilerConfiguration() {
-	native_abi = guess_native_abi();
-	abi = native_abi;
-	instruction_set = extract_instruction_set(abi);
-	interpreted = false;
-	allow_std_lib = true;
-	pointer_size = sizeof(void*);
-	super_array_size = sizeof(DynamicArray);
-
-	allow_simplification = true;
-	allow_registers = true;
-	allow_simplify_consts = true;
-	stack_mem_align = 8;
-	function_align = 2 * pointer_size;
-	stack_frame_align = 2 * pointer_size;
-
-	compile_silently = false;
-	verbose = false;
-	verbose_func_filter = "*";
-	verbose_stage_filter = "*";
-	show_compiler_stats = true;
-
-	compile_os = false;
-	remove_unused = false;
-	use_new_serializer = true;
-	override_variables_offset = false;
-	variables_offset = 0;
-	override_code_origin = false;
-	code_origin = 0;
-	add_entry_point = false;
-	no_function_frame = false;
-
-	function_address_offset = element_offset(&Function::address); // offsetof(Function, address);
-}
 
 void init(Abi abi, bool allow_std_lib) {
 	if (abi == Abi::NATIVE) {
@@ -919,98 +671,6 @@ void init(Abi abi, bool allow_std_lib) {
 	// -> now done by regression tests!
 }
 
-void reset_external_data() {
-	ExternalLinks.clear();
-	ClassOffsets.clear();
-	ClassSizes.clear();
-}
-
-// program variables - specific to the surrounding program, can't always be there...
-void link_external(const string &name, void *pointer) {
-	ExternalLinkData l;
-	l.name = name;
-	l.pointer = pointer;
-	if (abs((int_p)pointer) < 1000)
-		msg_error("probably a virtual function: " + name);
-	ExternalLinks.add(l);
-
-	Array<string> names = name.explode(":");
-	string sname = names[0].replace("@list", "[]").replace("@@", ".");
-	for (auto p: packages)
-		foreachi(Function *f, p->syntax->functions, i)
-			if (f->cname(p->base_class()) == sname) {
-				int n = f->num_params;
-				if (!f->is_static())
-					n ++;
-				if (names.num > 0)
-					if (n != names[1]._int())
-						continue;
-				f->address = pointer;
-			}
-}
-
-void *get_external_link(const string &name) {
-	for (ExternalLinkData &l: ExternalLinks)
-		if (l.name == name)
-			return l.pointer;
-	return nullptr;
-}
-
-void declare_class_size(const string &class_name, int size) {
-	ClassSizeData d;
-	d.class_name = class_name;
-	d.size = size;
-	ClassSizes.add(d);
-}
-
-void split_namespace(const string &name, string &class_name, string &element) {
-	int p = name.rfind(".");
-	class_name = name.substr(0, p);
-	element = name.tail(name.num - p - 1);
-}
-
-void _declare_class_element(const string &name, int offset) {
-	ClassOffsetData d;
-	split_namespace(name, d.class_name, d.element);
-	d.offset = offset;
-	d.is_virtual = false;
-	ClassOffsets.add(d);
-}
-
-void _link_external_virtual(const string &name, void *p, void *instance) {
-	VirtualTable *v = *(VirtualTable**)instance;
-
-
-	ClassOffsetData d;
-	split_namespace(name, d.class_name, d.element);
-	d.offset = get_virtual_index(p, d.class_name, d.element);
-	d.is_virtual = true;
-	ClassOffsets.add(d);
-
-	link_external(name, v[d.offset]);
-}
-
-int process_class_offset(const string &class_name, const string &element, int offset) {
-	for (auto &d: ClassOffsets)
-		if ((d.class_name == class_name) and (d.element == element))
-			return d.offset;
-	return offset;
-}
-
-int process_class_size(const string &class_name, int size) {
-	for (auto &d: ClassSizes)
-		if (d.class_name == class_name)
-			return d.size;
-	return size;
-}
-
-int process_class_num_virtuals(const string &class_name, int num_virtual) {
-	for (auto &d: ClassOffsets)
-		if ((d.class_name == class_name) and (d.is_virtual))
-			num_virtual = max(num_virtual, d.offset + 1);
-	return num_virtual;
-}
-
 void clean_up() {
 	delete_all_scripts(true, true);
 
@@ -1018,38 +678,4 @@ void clean_up() {
 
 	reset_external_data();
 }
-
-
-bool CompilerConfiguration::allow_output_func(const Function *f) {
-	if (!verbose)
-		return false;
-	if (!f)
-		return true;
-	Array<string> filters = verbose_func_filter.explode(",");
-	for (auto &fil: filters)
-		if (f->long_name().match(fil))
-			return true;
-	return false;
-}
-
-bool CompilerConfiguration::allow_output_stage(const string &stage) {
-	if (!verbose)
-		return false;
-	auto filters = verbose_stage_filter.explode(",");
-	for (auto &fil: filters)
-		if (stage.match(fil))
-			return true;
-	return false;
-}
-
-bool CompilerConfiguration::allow_output(const Function *f, const string &stage) {
-	if (!verbose)
-		return false;
-	if (!allow_output_func(f))
-		return false;
-	if (!allow_output_stage(stage))
-		return false;
-	return true;
-}
-
 };

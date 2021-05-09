@@ -1,4 +1,6 @@
 
+#pragma once
+
 class DynamicArray;
 class string;
 class Any;

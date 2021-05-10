@@ -74,7 +74,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	clef = nullptr;
 	is_playable = true;
 	as_reference = false;
-	allow_shadows = false;
+	allow_shadows = true;
 	force_shadows = false;
 	pitch_min = PITCH_MIN_DEFAULT;
 	pitch_max = PITCH_MAX_DEFAULT;
@@ -113,7 +113,9 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 	if (state & MidiPainter::STATE_HOVER)
 		col = color::interpolate(col, colors.hover, 0.5f);
 
-	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
+	col_shadow = color::interpolate(col, colors.background_track, 0.3f);
+	//col_shadow = col;
+	//col_shadow.a = 0.5f;
 }
 
 
@@ -554,7 +556,6 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState s
 		if (n->is(NOTE_FLAG_TENUTO)) {
 			c->set_line_width(3);
 			c->draw_line(x, y + rr*2, x1+20, y + rr*2);
-			c->set_line_width(1);
 		}
 	}
 
@@ -598,13 +599,28 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 	c->set_antialiasing(false);
 }
 
+
+// "shadow" to indicate length
+void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col) {
+	//x1 += r;
+	c->set_color(col);
+	c->draw_rect(x1, y - rr*0.7f - rx, x2 - x1 + rx, rr*2*0.7f + rx*2);
+}
+
+void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col) {
+	c->set_color(col);
+	c->set_line_width(3 * clef_line_width);
+	float x = (x1 + x2) / 2;
+	c->draw_line(x1, y, x - dx, y);
+	c->draw_line(x + dx, y, x2, y);
+}
+
 void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle) {
 	//x1 += r;
 	// "shadow" to indicate length
-	if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
-		c->set_color(col_shadow);
-		c->draw_rect(x1, y - rr*0.7f - rx, x2 - x1 + rx, rr*2*0.7f + rx*2);
-	}
+	if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
+		//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
+		draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
 
 	// the note circle
 	c->set_color(col);
@@ -619,7 +635,7 @@ void MidiPainter::draw_clef_tab(Painter *c) {
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
-	c->set_line_width(area.height() / 150);
+	c->set_line_width(clef_line_width);
 	c->set_antialiasing(true);
 
 	// clef lines
@@ -628,7 +644,6 @@ void MidiPainter::draw_clef_tab(Painter *c) {
 		float y = string_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
-	c->set_line_width(1);
 	c->set_antialiasing(false);
 
 
@@ -657,14 +672,23 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.6f;
+
 	if (x2 - x1 > quality.tab_text_threshold and rr > 5) {
 		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
+		float dx = rr * 0.8f * tt.num;
+
+		// "shadow" to indicate length
+		if (allow_shadows and (x2 - x1 > quality.shadow_threshold*1.5f)) {
+			//draw_shadow(c, x1, x2, y, 2, rr, col, col_shadow);
+			dx += rr * 1.0f;
+			draw_shadow2(c, x1, x2, y, dx, clef_line_width, col_shadow);
+		}
 
 		// hide the string line to make the number more readable
 		color cc = colors.background_track;
 		cc.a = 0.5f;
+
 		c->set_color(cc);
-		float dx = rr * 0.8f * tt.num;
 		c->draw_rect(rect(x - dx, x + dx, y - 2, y + 2));
 
 		// fret number as symbol
@@ -744,14 +768,13 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
-	c->set_line_width(area.height() / 150);
+	c->set_line_width(clef_line_width);
 	c->set_antialiasing(true);
 
 	for (int i=0; i<10; i+=2) {
 		float y = clef_pos_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
-	c->set_line_width(1);
 	c->set_antialiasing(false);
 	
 	if (is_playable)
@@ -858,6 +881,7 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	} else {
 		_draw_notes(c, notes);
 	}
+	c->set_line_width(1);
 	c->set_clip(xxx);
 }
 
@@ -883,11 +907,13 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	clef_dy = min(area.height() / 13, 30.0f);
 	clef_y0 = area.y2 - area.height() / 2 + 2 * clef_dy;
 
+	clef_line_width = area.height() / 150;
+
 	mode = _mode;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;
-	allow_shadows = (mode == MidiMode::LINEAR);
+	allow_shadows = true;//(mode == MidiMode::LINEAR);
 	force_shadows = false;
 
 	pitch_min = PITCH_MIN_DEFAULT;
@@ -918,7 +944,7 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 	quality.factor = q;
 	quality.rhythm_zoom_min = 40 / q / song->sample_rate;
 	quality.notes_zoom_min = 20 / q / song->sample_rate;
-	quality.shadow_threshold = rr*1.5f / q;
+	quality.shadow_threshold = rr*4.0f / q;
 	quality.note_circle_threshold = 6 / q;
 	quality.tab_text_threshold = rr/4 / q;
 	quality.antialiasing = antialiasing;
@@ -926,5 +952,5 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 }
 void MidiPainter::set_force_shadows(bool force) {
 	force_shadows = force;
-	allow_shadows = force or (mode == MidiMode::LINEAR);
+	allow_shadows = force;// or (mode == MidiMode::LINEAR);
 }

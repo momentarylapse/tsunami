@@ -126,6 +126,7 @@ public:
 
 	float string_dy;
 	float string_y0;
+	float clef_line_width;
 	MidiMode mode;
 	float rr;
 	Range cur_range;

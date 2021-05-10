@@ -25,24 +25,6 @@
     <ClCompile Include="src\Action\Bar\ActionBarEdit.cpp">
       <Filter>src\Action\Bar</Filter>
     </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveAdd.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveAddPoint.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveDelete.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveDeletePoint.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveEdit.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveEditPoint.cpp">
-      <Filter>src\Action\Curve</Filter>
-    </ClCompile>
     <ClCompile Include="src\Action\Sample\ActionSampleAdd.cpp">
       <Filter>src\Action\Sample</Filter>
     </ClCompile>
@@ -111,6 +93,24 @@
     </ClCompile>
     <ClCompile Include="src\Action\Track\Buffer\ActionTrackSetChannels.cpp">
       <Filter>src\Action\Track\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackAddCurve.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackCurveAddPoint.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackCurveDeletePoint.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackCurveEditPoint.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackDeleteCurve.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Curve\ActionTrackEditCurve.cpp">
+      <Filter>src\Action\Track\Curve</Filter>
     </ClCompile>
     <ClCompile Include="src\Action\Track\Data\ActionTrackEditMuted.cpp">
       <Filter>src\Action\Track\Data</Filter>
@@ -1353,24 +1353,6 @@
     <ClInclude Include="src\Action\Bar\ActionBarEdit.h">
       <Filter>src\Action\Bar</Filter>
     </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveAdd.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveAddPoint.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveDelete.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveDeletePoint.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveEdit.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Curve\ActionCurveEditPoint.h">
-      <Filter>src\Action\Curve</Filter>
-    </ClInclude>
     <ClInclude Include="src\Action\Sample\ActionSampleAdd.h">
       <Filter>src\Action\Sample</Filter>
     </ClInclude>
@@ -1439,6 +1421,24 @@
     </ClInclude>
     <ClInclude Include="src\Action\Track\Buffer\ActionTrackSetChannels.h">
       <Filter>src\Action\Track\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackAddCurve.h">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackCurveAddPoint.h">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackCurveDeletePoint.h">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackCurveEditPoint.h">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackDeleteCurve.h">
+      <Filter>src\Action\Track\Curve</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action\Track\Curve\ActionTrackEditCurve.h">
+      <Filter>src\Action\Track\Curve</Filter>
     </ClInclude>
     <ClInclude Include="src\Action\Track\Data\ActionTrackEditMuted.h">
       <Filter>src\Action\Track\Data</Filter>
@@ -2591,9 +2591,6 @@
     <Filter Include="src\Action\Bar">
       <UniqueIdentifier>{1166C58C-FA04-056F-0A4C-57E4012BE4E0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Action\Curve">
-      <UniqueIdentifier>{A77FA866-A2F6-A5BA-6A56-368298C7EB49}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Action\Sample">
       <UniqueIdentifier>{E80B9A6A-8569-C629-041E-4522A858048F}</UniqueIdentifier>
     </Filter>
@@ -2611,6 +2608,9 @@
     </Filter>
     <Filter Include="src\Action\Track\Buffer">
       <UniqueIdentifier>{18196E57-FCA2-57A8-B68A-1C8404DF4C46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Action\Track\Curve">
+      <UniqueIdentifier>{829716B0-54DC-0ED7-061E-22B60311CDF4}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Action\Track\Data">
       <UniqueIdentifier>{BFBE3014-AD0C-1608-1659-06D55EFBA0B6}</UniqueIdentifier>

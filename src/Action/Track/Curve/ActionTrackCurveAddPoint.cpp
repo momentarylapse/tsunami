@@ -1,15 +1,15 @@
 /*
- * ActionCurveAddPoint.cpp
+ * ActionTrackCurveAddPoint.cpp
  *
  *  Created on: 06.10.2017
  *      Author: michi
  */
 
-#include "ActionCurveAddPoint.h"
-#include "../../Data/Song.h"
-#include "../../Data/Curve.h"
+#include "ActionTrackCurveAddPoint.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Curve.h"
 
-ActionCurveAddPoint::ActionCurveAddPoint(shared<Curve> _curve, int _pos, float _value) {
+ActionTrackCurveAddPoint::ActionTrackCurveAddPoint(shared<Curve> _curve, int _pos, float _value) {
 	curve = _curve;
 	index = curve->points.num;
 	pos = _pos;
@@ -22,7 +22,7 @@ ActionCurveAddPoint::ActionCurveAddPoint(shared<Curve> _curve, int _pos, float _
 		}
 }
 
-void* ActionCurveAddPoint::execute(Data* d) {
+void* ActionTrackCurveAddPoint::execute(Data* d) {
 	Curve::Point p;
 	p.pos = pos;
 	p.value = value;
@@ -31,7 +31,7 @@ void* ActionCurveAddPoint::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionCurveAddPoint::undo(Data* d) {
+void ActionTrackCurveAddPoint::undo(Data* d) {
 	curve->points.erase(index);
 }
 

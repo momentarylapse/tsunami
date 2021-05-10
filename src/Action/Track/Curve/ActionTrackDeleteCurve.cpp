@@ -1,20 +1,20 @@
 /*
- * ActionCurveDelete.cpp
+ * ActionTrackDeleteCurve.cpp
  *
  *  Created on: 06.10.2017
  *      Author: michi
  */
 
-#include "ActionCurveDelete.h"
-#include "../../Data/Track.h"
-#include "../../Data/Curve.h"
+#include "ActionTrackDeleteCurve.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Curve.h"
 
-ActionCurveDelete::ActionCurveDelete(Track *t, int _index) {
+ActionTrackDeleteCurve::ActionTrackDeleteCurve(Track *t, int _index) {
 	track = t;
 	index = _index;
 }
 
-void* ActionCurveDelete::execute(Data* d) {
+void* ActionTrackDeleteCurve::execute(Data* d) {
 	curve = track->curves[index];
 	curve->fake_death();
 	track->curves.erase(index);
@@ -24,7 +24,7 @@ void* ActionCurveDelete::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionCurveDelete::undo(Data* d) {
+void ActionTrackDeleteCurve::undo(Data* d) {
 	track->curves.insert(curve, index);
 	track->notify(track->MESSAGE_ADD_CURVE);
 }

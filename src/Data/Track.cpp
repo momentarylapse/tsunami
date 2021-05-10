@@ -13,13 +13,13 @@
 #include "base.h"
 #include "Song.h"
 #include "Audio/AudioBuffer.h"
-#include "../Action/Curve/ActionCurveAdd.h"
-#include "../Action/Curve/ActionCurveAddPoint.h"
-#include "../Action/Curve/ActionCurveDelete.h"
-#include "../Action/Curve/ActionCurveDeletePoint.h"
-#include "../Action/Curve/ActionCurveEdit.h"
-#include "../Action/Curve/ActionCurveEditPoint.h"
 #include "../Action/Track/Buffer/ActionTrackSetChannels.h"
+#include "../Action/Track/Curve/ActionTrackAddCurve.h"
+#include "../Action/Track/Curve/ActionTrackCurveAddPoint.h"
+#include "../Action/Track/Curve/ActionTrackCurveDeletePoint.h"
+#include "../Action/Track/Curve/ActionTrackCurveEditPoint.h"
+#include "../Action/Track/Curve/ActionTrackDeleteCurve.h"
+#include "../Action/Track/Curve/ActionTrackEditCurve.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
@@ -295,29 +295,29 @@ Curve *Track::add_curve(const string &name, CurveTarget &target) {
 	auto c = new Curve;
 	c->name = name;
 	c->target = target;
-	song->execute(new ActionCurveAdd(this, c, curves.num));
+	song->execute(new ActionTrackAddCurve(this, c, curves.num));
 	return c;
 }
 void Track::delete_curve(Curve *curve) {
 	foreachi(auto c, curves, i)
 		if (c == curve)
-			song->execute(new ActionCurveDelete(this, i));
+			song->execute(new ActionTrackDeleteCurve(this, i));
 }
 
 void Track::edit_curve(Curve *curve, const string &name, float min, float max) {
-	song->execute(new ActionCurveEdit(this, curve, name, min, max));
+	song->execute(new ActionTrackEditCurve(this, curve, name, min, max));
 }
 
 void Track::curve_add_point(Curve *curve, int pos, float value) {
-	song->execute(new ActionCurveAddPoint(curve, pos, value));
+	song->execute(new ActionTrackCurveAddPoint(curve, pos, value));
 }
 
 void Track::curve_delete_point(Curve *curve, int index) {
-	song->execute(new ActionCurveDeletePoint(curve, index));
+	song->execute(new ActionTrackCurveDeletePoint(curve, index));
 }
 
 void Track::curve_edit_point(Curve *curve, int index, int pos, float value) {
-	song->execute(new ActionCurveEditPoint(curve, index, pos, value));
+	song->execute(new ActionTrackCurveEditPoint(curve, index, pos, value));
 }
 
 

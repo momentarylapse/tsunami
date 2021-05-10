@@ -29,6 +29,7 @@ public:
 	void on_delete();
 	void on_list_edit();
 	void on_list_select();
+	void on_list_right_click();
 
 	void on_enter() override;
 	void on_leave() override;
@@ -38,6 +39,8 @@ public:
 
 	string id_list;
 	Track *track();
+
+	owned<hui::Menu> popup_menu;
 };
 
 #endif /* CURVECONSOLE_H_ */

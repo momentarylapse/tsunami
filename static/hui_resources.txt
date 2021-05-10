@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-71
+72
 # Resource
 Menu
 menu_fake
@@ -616,41 +616,17 @@ Grid
 vertical
 0
 0
-3
+2
 ListView
 curves
 expandx,format=mTT
 0
 0
 0
-Grid
-controller_buttons
-
-1
-0
-3
-Button
-add
-image=hui:add
-0
-0
-0
-Button
-delete
-image=hui:delete
-1
-0
-0
-Button
-target
-
-2
-0
-0
 Group
 cc_group_edit
 
-2
+1
 0
 1
 Grid
@@ -4073,6 +4049,31 @@ song-properties
 0
 # Resource
 Menu
+popup-menu-curve
+
+0
+0
+3
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+curve-delete
+
+2
+0
+0
+# Resource
+Menu
 popup-menu-device
 
 0
@@ -7397,7 +7398,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-621
+622
 # Text
 /bars-add
 Add bars...
@@ -7443,6 +7444,9 @@ Step left
 
 /cursor-move-right
 Step right
+
+/curve-delete
+Delete
 
 /db
 dB
@@ -7866,9 +7870,6 @@ Kurven
 
 curve_console/curves
 Target\\min\\max
-
-curve_console/target
-Parameter
 
 detune_synthesizer_dialog/all_octaves
 All octaves
@@ -8574,6 +8575,9 @@ Bar
 
 popup-menu-buffer/header
 Audio buffer
+
+popup-menu-curve/header
+Curve
 
 popup-menu-device/header
 Device

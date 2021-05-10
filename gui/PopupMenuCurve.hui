@@ -1,0 +1,4 @@
+Menu popup-menu-curve ""
+	Item header "Curve" disabled
+	Separator
+	Item /curve-delete "Delete"

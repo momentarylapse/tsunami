@@ -23,9 +23,12 @@ CurveConsole::CurveConsole(Session *session) :
 
 	id_list = "curves";
 
-	event("delete", [=]{ on_delete(); });
+	popup_menu = hui::CreateResourceMenu("popup-menu-curve");
+
+	event("curve-delete", [=]{ on_delete(); });
 	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
+	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
 	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
 	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultTrackFx); });
@@ -131,6 +134,11 @@ void CurveConsole::on_list_edit() {
 		max = get_cell(id_list, n, col)._float();
 	track()->edit_curve(c, name, min, max);
 	view->force_redraw();
+}
+
+void CurveConsole::on_list_right_click() {
+	popup_menu->enable("curve-delete", curve());
+	popup_menu->open_popup(this);
 }
 
 Curve* CurveConsole::curve() {

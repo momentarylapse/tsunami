@@ -32,10 +32,11 @@ public:
 	float value2screen(float value);
 	float screen2value(float y);
 
-	Curve *curve;
+	string target;
+	Curve *_curve;
 	AudioViewTrack *cur_vtrack();
 	Track *cur_track();
-	void set_curve(Curve *c);
+	void set_curve_target(const string &id);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECURVE_H_ */

@@ -22,13 +22,12 @@ namespace kaba {
 
 struct CurveTarget {
 	float *p;
-	string temp_name;
+	string id;
 	string temp_name_nice;
 	CurveTarget();
 	explicit CurveTarget(float *p);
-	CurveTarget(float *p, const string &name, const string &name_nice);
-	void from_string(const string &str, Track *t);
-	string str(Track *t) const;
+	CurveTarget(float *p, const string &id, const string &name_nice);
+	void from_id(const string &id, Track *t);
 	string nice_str(Track *t) const;
 	//Track *track(Song *s) const;
 

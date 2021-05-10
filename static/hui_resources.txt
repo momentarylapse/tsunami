@@ -619,7 +619,7 @@ vertical
 3
 ListView
 curves
-expandx,format=tTT
+expandx,format=mTT
 0
 0
 0

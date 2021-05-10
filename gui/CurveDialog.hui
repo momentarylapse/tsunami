@@ -1,6 +1,6 @@
 Dialog curve_console "Kurven" width=380 height=516
 	Grid ? "" vertical
-		ListView curves "Target\\min\\max" expandx format=tTT
+		ListView curves "Target\\min\\max" expandx format=mTT
 		Grid controller_buttons ""
 			Button add "" image=hui:add
 			Button delete "" image=hui:delete

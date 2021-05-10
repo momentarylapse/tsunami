@@ -19,7 +19,7 @@
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
-	curve = nullptr;
+	_curve = nullptr;
 }
 
 
@@ -36,18 +36,24 @@ Track *ViewModeCurve::cur_track() {
 }
 
 void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
-	if (!curve)
+	if (target == "")
 		return;
+
+	if (!_curve) {
+		CurveTarget t;
+		t.from_id(target, cur_track());
+		_curve = cur_track()->add_curve("", t);
+	}
 
 	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
 		int pos = view->get_mouse_pos();
 		float value = screen2value(view->my);
-		cur_track()->curve_add_point(curve, pos, value);
+		cur_track()->curve_add_point(_curve, pos, value);
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
 		view->mdp_prepare([=] {
 			int pos = view->get_mouse_pos();
 			float value = screen2value(view->my);
-			cur_track()->curve_edit_point(curve, view->cur_selection.index, pos, value);
+			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);
 		});
 	}
 }
@@ -55,9 +61,9 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 void ViewModeCurve::on_key_down(int k) {
 	ViewModeDefault::on_key_down(k);
 
-	if (curve and (view->cur_selection.type == HoverData::Type::CURVE_POINT))
+	if (_curve and (view->cur_selection.type == HoverData::Type::CURVE_POINT))
 		if (k == hui::KEY_DELETE){
-			cur_track()->curve_delete_point(curve, view->cur_selection.index);
+			cur_track()->curve_delete_point(_curve, view->cur_selection.index);
 			view->cur_selection.clear();
 		}
 }
@@ -69,18 +75,18 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 		return;
 
 	rect r = t->area;
-	if (curve) {
+	if (_curve) {
 
 		// lines
 		c->set_line_width(1.0f);
 		c->set_color(view->colors.text);
 		Array<complex> pp;
 		for (int x=r.x1; x<r.x2; x+=3)
-			pp.add(complex(x, value2screen(curve->get(cam->screen2sample(x)))));
+			pp.add(complex(x, value2screen(_curve->get(cam->screen2sample(x)))));
 		c->draw_lines(pp);
 
 		// points
-		foreachi(auto &p, curve->points, i) {
+		foreachi(auto &p, _curve->points, i) {
 			float r = 3;
 			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index)) {
 				c->set_color(view->colors.selection_boundary_hover);
@@ -118,8 +124,8 @@ HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float 
 	s.type = HoverData::Type::CURVE_POINT_NONE;
 
 	// curve points
-	if (curve) {
-		foreachi(auto &p, curve->points, i) {
+	if (_curve) {
+		foreachi(auto &p, _curve->points, i) {
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
 			if ((fabs(mx - x) < 10) and (fabs(my - y) < 10)) {
@@ -133,21 +139,30 @@ HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float 
 	return s;
 }
 
-void ViewModeCurve::set_curve(Curve* c) {
-	curve = c;
+void ViewModeCurve::set_curve_target(const string &id) {
+	target = id;
+	_curve = nullptr;
+	if (cur_track())
+		for (auto *c: weak(cur_track()->curves))
+			if (c->target.id == target)
+				_curve = c;
 	view->force_redraw();
 }
 
 float ViewModeCurve::value2screen(float value) {
-	if ((!curve) or (!cur_track()))
+	if (!cur_track())
 		return 0;
-	return cur_vtrack()->area.y2 - cur_vtrack()->area.height() * (value - curve->min) / (curve->max - curve->min);
+	if (!_curve)
+		return cur_vtrack()->area.y2 - cur_vtrack()->area.height() * value;
+	return cur_vtrack()->area.y2 - cur_vtrack()->area.height() * (value - _curve->min) / (_curve->max - _curve->min);
 }
 
 float ViewModeCurve::screen2value(float y) {
-	if ((!curve) or (!cur_vtrack()))
+	if (!cur_vtrack())
 		return 0;
-	return curve->min + (cur_vtrack()->area.y2 - y) / cur_vtrack()->area.height() * (curve->max - curve->min);
+	if (!_curve)
+		return (cur_vtrack()->area.y2 - y) / cur_vtrack()->area.height();
+	return _curve->min + (cur_vtrack()->area.y2 - y) / cur_vtrack()->area.height() * (_curve->max - _curve->min);
 }
 
 string ViewModeCurve::get_tip() {

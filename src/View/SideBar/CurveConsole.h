@@ -15,6 +15,7 @@ class Song;
 class Track;
 class AudioView;
 class Curve;
+class CurveTarget;
 class Session;
 
 class CurveConsole : public SideBarConsole {
@@ -25,9 +26,7 @@ public:
 	void on_update();
 
 	void update_list();
-	void on_add();
 	void on_delete();
-	void on_target();
 	void on_list_edit();
 	void on_list_select();
 
@@ -35,7 +34,7 @@ public:
 	void on_leave() override;
 
 	Curve* curve();
-	Array<Curve*> curves;
+	Array<CurveTarget> targets;
 
 	string id_list;
 	Track *track();

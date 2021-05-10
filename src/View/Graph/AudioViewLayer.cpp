@@ -525,7 +525,7 @@ bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
 				if (view->mode_edit_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
 					return true;
 	if (view->mode == view->mode_curve)
-		if (view->hover().type == HoverData::Type::CURVE_POINT)
+		if (this == view->cur_vlayer())
 			return true;
 	if (view->hover_any_object())
 		return true;

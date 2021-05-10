@@ -208,7 +208,7 @@ public:
 			string new_target = implode(xx.sub(2, -1), ":");
 
 			if (track) {
-				me->target.from_string(new_target, track);
+				me->target.from_id(new_target, track);
 				track->curves.add(me);
 				info(format("import curve %s -> '%s'/%s", old_target, track->nice_name(), new_target));
 			} else {
@@ -241,7 +241,7 @@ public:
 	void read(File *f) override {
 		f->read_int();
 		me->name = f->read_str();
-		me->target.from_string(f->read_str(), parent);
+		me->target.from_id(f->read_str(), parent);
 		me->min = f->read_float();
 		me->max = f->read_float();
 		int n = f->read_int();
@@ -256,7 +256,7 @@ public:
 	void write(File *f) override {
 		f->write_int(0); // version
 		f->write_str(me->name);
-		f->write_str(me->target.str(parent));
+		f->write_str(me->target.id);
 		f->write_float(me->min);
 		f->write_float(me->max);
 		f->write_int(me->points.num);

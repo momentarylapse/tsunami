@@ -28,18 +28,10 @@ CurveTarget::CurveTarget(float *_p) {
 	p = _p;
 }
 
-CurveTarget::CurveTarget(float *_p, const string &name, const string &name_nice) {
+CurveTarget::CurveTarget(float *_p, const string &_id, const string &name_nice) {
 	p = _p;
-	temp_name = name;
+	id = _id;
 	temp_name_nice = name_nice;
-}
-
-string CurveTarget::str(Track *t) const {
-	auto list = enumerate_track(t);
-	for (auto &ct : list)
-		if (ct.p == p)
-			return ct.temp_name;
-	return "";
 }
 
 string CurveTarget::nice_str(Track *t) const {
@@ -50,14 +42,14 @@ string CurveTarget::nice_str(Track *t) const {
 	return "";
 }
 
-void CurveTarget::from_string(const string &str, Track *t) {
+void CurveTarget::from_id(const string &_id, Track *t) {
 	auto targets = enumerate_track(t);
 	p = nullptr;
 	for (auto &ct: targets)
-		if (ct.str(t) == str)
+		if (ct.id == _id)
 			*this = ct;
 	if (!p)
-		msg_error("can't find curve target " + str);
+		msg_error("can't find curve target " + _id);
 }
 
 Array<CurveTarget> CurveTarget::enumerate_track(Track *t) {

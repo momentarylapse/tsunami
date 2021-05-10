@@ -26,6 +26,8 @@ CurveConsole::CurveConsole(Session *session) :
 	popup_menu = hui::CreateResourceMenu("popup-menu-curve");
 
 	event("curve-delete", [=]{ on_delete(); });
+	event("curve-linear", [=]{ on_type(CurveType::LINEAR); });
+	event("curve-exponential", [=]{ on_type(CurveType::EXPONENTIAL); });
 	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
@@ -97,14 +99,15 @@ void CurveConsole::update_list() {
 }
 
 void CurveConsole::on_delete() {
-	int n = get_int(id_list);
-	if (n >= 0) {
-		auto c = track_find_curve(track(), targets[n].id);
-		if (c) {
-			track()->delete_curve(c);
-			view->mode_curve->set_curve_target("");
-		}
+	if (auto c = curve()) {
+		track()->delete_curve(c);
+		view->mode_curve->set_curve_target("");
 	}
+}
+
+void CurveConsole::on_type(CurveType type) {
+	if (auto c = curve())
+		track()->edit_curve(c, c->name, c->min, c->max, type);
 }
 
 void CurveConsole::on_list_select() {
@@ -132,12 +135,18 @@ void CurveConsole::on_list_edit() {
 		min = get_cell(id_list, n, col)._float();
 	else if (col == 2)
 		max = get_cell(id_list, n, col)._float();
-	track()->edit_curve(c, name, min, max);
+	track()->edit_curve(c, name, min, max, c->type);
 	view->force_redraw();
 }
 
 void CurveConsole::on_list_right_click() {
 	popup_menu->enable("curve-delete", curve());
+	popup_menu->enable("curve-linear", curve());
+	popup_menu->enable("curve-exponential", curve());
+	if (auto c = curve()) {
+		popup_menu->check("curve-linear", c->type == CurveType::LINEAR);
+		popup_menu->check("curve-exponential", c->type == CurveType::EXPONENTIAL);
+	}
 	popup_menu->open_popup(this);
 }
 

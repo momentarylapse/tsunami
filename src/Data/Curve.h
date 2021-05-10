@@ -36,20 +36,20 @@ struct CurveTarget {
 	static Array<CurveTarget> enumerate_type(char *p, const kaba::Class *t, const string &prefix, const string &prefix_nice);
 };
 
+enum class CurveType {
+	LINEAR,
+	EXPONENTIAL,
+};
+
 class Curve : public Sharable<Observable<VirtualBase>> {
 public:
 	Curve();
 	virtual ~Curve();
 
-	enum {
-		TYPE_LINEAR,
-		TYPE_LOG,
-	};
-
 	string name;
 	CurveTarget target;
 	float temp_value;
-	int type;
+	CurveType type;
 
 	float min, max;
 

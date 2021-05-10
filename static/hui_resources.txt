@@ -4053,7 +4053,7 @@ popup-menu-curve
 
 0
 0
-3
+5
 Item
 header
 disabled
@@ -4067,9 +4067,21 @@ Separator
 0
 0
 Item
+curve-linear
+checkable
+2
+0
+0
+Item
+curve-exponential
+checkable
+3
+0
+0
+Item
 curve-delete
 
-2
+4
 0
 0
 # Resource
@@ -7398,7 +7410,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-622
+624
 # Text
 /bars-add
 Add bars...
@@ -8575,6 +8587,12 @@ Bar
 
 popup-menu-buffer/header
 Audio buffer
+
+popup-menu-curve/curve-exponential
+Exponential
+
+popup-menu-curve/curve-linear
+Linear
 
 popup-menu-curve/header
 Curve

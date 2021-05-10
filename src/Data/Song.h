@@ -9,7 +9,6 @@
 #define SRC_DATA_SONG_H_
 
 #include "Data.h"
-#include "Curve.h"
 #include "Rhythm/BarCollection.h"
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"

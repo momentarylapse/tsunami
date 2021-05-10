@@ -25,6 +25,7 @@ class CrossFadeOld;
 class TrackMarker;
 class Curve;
 class CurveTarget;
+enum class CurveType;
 enum class SignalType;
 
 
@@ -79,7 +80,7 @@ public:
 	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
 	Curve* _cdecl add_curve(const string &name, CurveTarget &target);
 	void _cdecl delete_curve(Curve *curve);
-	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max);
+	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max, CurveType type);
 	//void _cdecl curve_set_targets(Curve *curve, CurveTarget &target);
 	void _cdecl curve_add_point(Curve *curve, int pos, float value);
 	void _cdecl curve_delete_point(Curve *curve, int index);

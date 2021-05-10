@@ -14,6 +14,7 @@
 #include "../Module/Midi/MidiEffect.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
+#include <math.h>
 
 string i2s_small(int); // MidiData.cpp ?
 
@@ -98,7 +99,7 @@ Array<CurveTarget> CurveTarget::enumerate_type(char *pp, const kaba::Class *t, c
 Curve::Curve() {
 	min = 0;
 	max = 1;
-	type = TYPE_LINEAR;
+	type = CurveType::LINEAR;
 	temp_value = 0;
 }
 
@@ -114,7 +115,10 @@ float Curve::get(int pos) {
 		if (pos < points[i].pos) {
 			float dv = points[i].value - points[i-1].value;
 			float dp = (float)(points[i].pos - points[i-1].pos);
-			return points[i-1].value + dv * (pos - points[i-1].pos) / dp;
+			if (type == CurveType::LINEAR)
+				return points[i-1].value + dv * (pos - points[i-1].pos) / dp;
+			if (type == CurveType::EXPONENTIAL)
+				return points[i-1].value * exp(log(abs(points[i].value / points[i-1].value)) * (pos - points[i-1].pos) / dp);
 		}
 	return points.back().value;
 }

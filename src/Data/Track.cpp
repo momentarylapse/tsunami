@@ -304,8 +304,8 @@ void Track::delete_curve(Curve *curve) {
 			song->execute(new ActionTrackDeleteCurve(this, i));
 }
 
-void Track::edit_curve(Curve *curve, const string &name, float min, float max) {
-	song->execute(new ActionTrackEditCurve(this, curve, name, min, max));
+void Track::edit_curve(Curve *curve, const string &name, float min, float max, CurveType type) {
+	song->execute(new ActionTrackEditCurve(this, curve, name, min, max, type));
 }
 
 void Track::curve_add_point(Curve *curve, int pos, float value) {

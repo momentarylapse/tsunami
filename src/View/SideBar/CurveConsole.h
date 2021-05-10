@@ -16,6 +16,7 @@ class Track;
 class AudioView;
 class Curve;
 class CurveTarget;
+enum class CurveType;
 class Session;
 
 class CurveConsole : public SideBarConsole {
@@ -27,6 +28,7 @@ public:
 
 	void update_list();
 	void on_delete();
+	void on_type(CurveType type);
 	void on_list_edit();
 	void on_list_select();
 	void on_list_right_click();

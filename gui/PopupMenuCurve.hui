@@ -1,4 +1,6 @@
 Menu popup-menu-curve ""
 	Item header "Curve" disabled
 	Separator
+	Item curve-linear "Linear" checkable
+	Item curve-exponential "Exponential" checkable
 	Item /curve-delete "Delete"

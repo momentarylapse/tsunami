@@ -244,6 +244,7 @@ public:
 		me->target.from_id(f->read_str(), parent);
 		me->min = f->read_float();
 		me->max = f->read_float();
+		me->type = (CurveType)f->read_int();
 		int n = f->read_int();
 		for (int i=0; i<n; i++) {
 			Curve::Point p;
@@ -259,6 +260,7 @@ public:
 		f->write_str(me->target.id);
 		f->write_float(me->min);
 		f->write_float(me->max);
+		f->write_int((int)me->type);
 		f->write_int(me->points.num);
 		for (auto p: me->points) {
 			f->write_int(p.pos);

@@ -52,7 +52,7 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
 		view->mdp_prepare([=] {
 			int pos = view->get_mouse_pos();
-			float value = screen2value(view->my);
+			float value = clamp(screen2value(view->my), _curve->min, _curve->max);
 			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);
 		});
 	}

@@ -6,7 +6,6 @@
  */
 
 #include "ActionCurveEditPoint.h"
-#include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
 ActionCurveEditPoint::ActionCurveEditPoint(shared<Curve> _curve, int _index, int _pos, float _value) {

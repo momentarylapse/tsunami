@@ -186,9 +186,54 @@ public:
 	}
 };
 
-class FileChunkCurve : public FileChunk<Song,Curve> {
+// deprecated
+class __FileChunkCurve : public FileChunk<Song,Curve> {
 public:
-	FileChunkCurve() : FileChunk<Song,Curve>("curve") {}
+	__FileChunkCurve() : FileChunk<Song,Curve>("curve") {}
+	void create() override {
+		me = new Curve;
+	}
+	void read(File *f) override {
+		Track *track = nullptr;
+
+		f->read_int();
+		me->name = f->read_str();
+		int n = f->read_int();
+		for (int i=0; i<n; i++) {
+			string old_target = f->read_str();
+			auto xx = old_target.explode(":");
+			if (xx.num >= 2)
+				if (xx[0] == "t")
+					track = parent->tracks[xx[1]._int()].get();
+			string new_target = implode(xx.sub(2, -1), ":");
+
+			if (track) {
+				me->target.from_string(new_target, track);
+				track->curves.add(me);
+				info(format("import curve %s -> '%s'/%s", old_target, track->nice_name(), new_target));
+			} else {
+				warn("import curve failed: " + old_target);
+			}
+		}
+		me->min = f->read_float();
+		me->max = f->read_float();
+		n = f->read_int();
+		for (int i=0; i<n; i++) {
+			Curve::Point p;
+			p.pos = f->read_int();
+			p.value = f->read_float();
+			me->points.add(p);
+		}
+		if (track)
+			track->notify(track->MESSAGE_ADD_CURVE);
+	}
+	void write(File *f) override {
+	}
+};
+
+class FileChunkCurve : public FileChunk<Track,Curve> {
+public:
+	FileChunkCurve() : FileChunk<Track,Curve>("curve") {}
 	void create() override {
 		me = new Curve;
 		parent->curves.add(me);
@@ -196,15 +241,10 @@ public:
 	void read(File *f) override {
 		f->read_int();
 		me->name = f->read_str();
-		int n = f->read_int();
-		for (int i=0; i<n; i++) {
-			Curve::Target t;
-			t.from_string(f->read_str(), parent);
-			me->targets.add(t);
-		}
+		me->target.from_string(f->read_str(), parent);
 		me->min = f->read_float();
 		me->max = f->read_float();
-		n = f->read_int();
+		int n = f->read_int();
 		for (int i=0; i<n; i++) {
 			Curve::Point p;
 			p.pos = f->read_int();
@@ -216,9 +256,7 @@ public:
 	void write(File *f) override {
 		f->write_int(0); // version
 		f->write_str(me->name);
-		f->write_int(me->targets.num);
-		for (auto t: me->targets)
-			f->write_str(t.str(parent));
+		f->write_str(me->target.str(parent));
 		f->write_float(me->min);
 		f->write_float(me->max);
 		f->write_int(me->points.num);
@@ -1041,6 +1079,7 @@ public:
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
+		add_child(new FileChunkCurve);
 		add_child(new FileChunkTrackBar); // deprecated
 		add_child(new FileChunkMarkerOld); // deprecated
 		add_child(new _FileChunkTrackSampleRef); // deprecated
@@ -1086,6 +1125,7 @@ public:
 				write_sub("synth", me->synth.get());
 		if (me->layers[0]->midi.num > 0)
 			write_sub("midi", &me->layers[0]->midi);
+		write_sub_parray("curve", me->curves);
 	}
 };
 
@@ -1112,7 +1152,7 @@ public:
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);
 		add_child(new FileChunkGlobalEffect);
-		add_child(new FileChunkCurve);
+		add_child(new __FileChunkCurve);
 		add_child(new FileChunkSend);
 		add_child(new FileChunkSecret);
 	}
@@ -1130,7 +1170,6 @@ public:
 		write_sub_parray("bar", me->bars);
 		write_sub_parray("sample", me->samples);
 		write_sub_parray("track", me->tracks);
-		write_sub_parray("curve", me->curves);
 		bool needs_send = false;
 		for (Track *t: weak(me->tracks))
 			if (t->send_target)
@@ -1170,6 +1209,9 @@ public:
 	}
 	void on_warn(const string &message) override {
 		od->warn(message);
+	}
+	void on_info(const string &message) override {
+		od->info(message);
 	}
 };
 

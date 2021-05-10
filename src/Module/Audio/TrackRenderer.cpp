@@ -17,6 +17,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/Curve.h"
 #include "../../Data/CrossFade.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
@@ -24,6 +25,7 @@
 #include "../../lib/math/math.h"
 #include "../../Session.h"
 
+const int CURVE_CHUNK = 512;
 
 
 bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos) {
@@ -421,8 +423,40 @@ float get_max_volume(const Array<float> &buf) {
 	return peak;
 }
 
+
+void apply_curves(Track *track, int pos) {
+	for (Curve *c: weak(track->curves))
+		c->apply(pos);
+}
+
+void unapply_curves(Track *track) {
+	for (Curve *c: weak(track->curves))
+		c->unapply();
+}
+
 int TrackRenderer::read(AudioBuffer &buf) {
 	perf_start();
+
+	if (track->curves.num >= 0) {
+		for (int d=0; d<buf.length; d+=CURVE_CHUNK) {
+			AudioBuffer tbuf;
+			tbuf.set_as_ref(buf, d, min(buf.length- d, CURVE_CHUNK));
+			read_basic(tbuf);
+		}
+	} else {
+		read_basic(buf);
+	}
+
+
+	peak[0] = max(peak[0], get_max_volume(buf.c[0]));
+	peak[1] = max(peak[1], get_max_volume(buf.c[1]));
+	perf_end();
+	return buf.length;
+}
+
+int TrackRenderer::read_basic(AudioBuffer &buf) {
+	msg_write(buf.offset);
+	apply_curves(track.get(), buf.offset);
 	render_no_fx(buf);
 
 	auto _fx = fx;
@@ -432,8 +466,6 @@ int TrackRenderer::read(AudioBuffer &buf) {
 
 	buf.mix_stereo(track->volume, track->panning);
 
-	peak[0] = max(peak[0], get_max_volume(buf.c[0]));
-	peak[1] = max(peak[1], get_max_volume(buf.c[1]));
-	perf_end();
+	unapply_curves(track.get());
 	return buf.length;
 }

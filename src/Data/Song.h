@@ -23,7 +23,6 @@ class Track;
 class TrackLayer;
 class Sample;
 class Synthesizer;
-class Curve;
 class SongSelection;
 class AudioBuffer;
 class BarPattern;
@@ -56,9 +55,6 @@ public:
 	static const string MESSAGE_DELETE_TRACK;
 	static const string MESSAGE_ADD_EFFECT;
 	static const string MESSAGE_DELETE_EFFECT;
-	static const string MESSAGE_ADD_CURVE;
-	static const string MESSAGE_DELETE_CURVE;
-	static const string MESSAGE_EDIT_CURVE;
 	static const string MESSAGE_ADD_SAMPLE;
 	static const string MESSAGE_DELETE_SAMPLE;
 	static const string MESSAGE_ADD_LAYER;
@@ -118,13 +114,6 @@ public:
 	void _cdecl delete_selected_samples(const SongSelection &sel);
 	void _cdecl delete_selection(const SongSelection &sel);
 	void _cdecl create_samples_from_selection(const SongSelection &sel, bool auto_delete);
-	Curve* _cdecl add_curve(const string &name, Array<Curve::Target> &targets);
-	void _cdecl delete_curve(Curve *curve);
-	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max);
-	void _cdecl curve_set_targets(Curve *curve, Array<Curve::Target> &targets);
-	void _cdecl curve_add_point(Curve *curve, int pos, float value);
-	void _cdecl curve_delete_point(Curve *curve, int index);
-	void _cdecl curve_edit_point(Curve *curve, int index, int pos, float value);
 
 	// helper
 	Sample* _cdecl get_sample_by_uid(int uid);
@@ -138,7 +127,6 @@ public:
 	shared_array<AudioEffect> __fx;
 	shared_array<Track> tracks;
 	shared_array<Sample> samples;
-	shared_array<Curve> curves;
 	BarCollection bars;
 
 	Any secret_data;

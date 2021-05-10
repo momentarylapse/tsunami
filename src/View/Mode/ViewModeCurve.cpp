@@ -8,7 +8,7 @@
 #include "ViewModeCurve.h"
 #include "../AudioView.h"
 #include "../../Data/Curve.h"
-#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
@@ -27,8 +27,12 @@ void ViewModeCurve::on_start() {
 	set_side_bar(SideBar::CURVE_CONSOLE);
 }
 
-AudioViewTrack *ViewModeCurve::cur_track() {
+AudioViewTrack *ViewModeCurve::cur_vtrack() {
 	return view->cur_vtrack();
+}
+
+Track *ViewModeCurve::cur_track() {
+	return view->cur_track();
 }
 
 void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
@@ -38,12 +42,12 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
 		int pos = view->get_mouse_pos();
 		float value = screen2value(view->my);
-		song->curve_add_point(curve, pos, value);
+		cur_track()->curve_add_point(curve, pos, value);
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
 		view->mdp_prepare([=] {
 			int pos = view->get_mouse_pos();
 			float value = screen2value(view->my);
-			song->curve_edit_point(curve, view->cur_selection.index, pos, value);
+			cur_track()->curve_edit_point(curve, view->cur_selection.index, pos, value);
 		});
 	}
 }
@@ -53,7 +57,7 @@ void ViewModeCurve::on_key_down(int k) {
 
 	if (curve and (view->cur_selection.type == HoverData::Type::CURVE_POINT))
 		if (k == hui::KEY_DELETE){
-			song->curve_delete_point(curve, view->cur_selection.index);
+			cur_track()->curve_delete_point(curve, view->cur_selection.index);
 			view->cur_selection.clear();
 		}
 }
@@ -61,7 +65,7 @@ void ViewModeCurve::on_key_down(int k) {
 void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 	ViewModeDefault::draw_track_data(c, t);
 
-	if (t != cur_track())
+	if (t != cur_vtrack())
 		return;
 
 	rect r = t->area;
@@ -93,7 +97,7 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 }
 
 void ViewModeCurve::draw_post(Painter* c) {
-	auto *t = cur_track();
+	auto *t = cur_vtrack();
 	if (!t)
 		return;
 	color col = view->colors.text;
@@ -137,13 +141,13 @@ void ViewModeCurve::set_curve(Curve* c) {
 float ViewModeCurve::value2screen(float value) {
 	if ((!curve) or (!cur_track()))
 		return 0;
-	return cur_track()->area.y2 - cur_track()->area.height() * (value - curve->min) / (curve->max - curve->min);
+	return cur_vtrack()->area.y2 - cur_vtrack()->area.height() * (value - curve->min) / (curve->max - curve->min);
 }
 
 float ViewModeCurve::screen2value(float y) {
-	if ((!curve) or (!cur_track()))
+	if ((!curve) or (!cur_vtrack()))
 		return 0;
-	return curve->min + (cur_track()->area.y2 - y) / cur_track()->area.height() * (curve->max - curve->min);
+	return curve->min + (cur_vtrack()->area.y2 - y) / cur_vtrack()->area.height() * (curve->max - curve->min);
 }
 
 string ViewModeCurve::get_tip() {

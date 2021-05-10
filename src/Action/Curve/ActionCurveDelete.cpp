@@ -6,29 +6,26 @@
  */
 
 #include "ActionCurveDelete.h"
-#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/Curve.h"
 
-ActionCurveDelete::ActionCurveDelete(int _index) {
+ActionCurveDelete::ActionCurveDelete(Track *t, int _index) {
+	track = t;
 	index = _index;
 }
 
 void* ActionCurveDelete::execute(Data* d) {
-	Song *a = dynamic_cast<Song*>(d);
-
-	curve = a->curves[index];
+	curve = track->curves[index];
 	curve->fake_death();
-	a->curves.erase(index);
+	track->curves.erase(index);
 
-	a->notify(a->MESSAGE_DELETE_CURVE);
+	track->notify(track->MESSAGE_DELETE_CURVE);
 
 	return nullptr;
 }
 
 void ActionCurveDelete::undo(Data* d) {
-	Song *a = dynamic_cast<Song*>(d);
-
-	a->curves.insert(curve, index);
-	a->notify(a->MESSAGE_ADD_CURVE);
+	track->curves.insert(curve, index);
+	track->notify(track->MESSAGE_ADD_CURVE);
 }
 

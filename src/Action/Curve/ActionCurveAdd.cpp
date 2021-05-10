@@ -6,30 +6,27 @@
  */
 
 #include "ActionCurveAdd.h"
-#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/Curve.h"
 
-ActionCurveAdd::ActionCurveAdd(shared<Curve> _curve, int _index) {
+ActionCurveAdd::ActionCurveAdd(Track *t, shared<Curve> _curve, int _index) {
+	track = t;
 	curve = _curve;
 	index = _index;
 }
 
 void* ActionCurveAdd::execute(Data* d) {
-	Song *a = dynamic_cast<Song*>(d);
-
-	a->curves.insert(curve, index);
-	a->notify(a->MESSAGE_ADD_CURVE);
+	track->curves.insert(curve, index);
+	track->notify(track->MESSAGE_ADD_CURVE);
 
 	return curve.get();
 }
 
 void ActionCurveAdd::undo(Data* d) {
-	Song *a = dynamic_cast<Song*>(d);
-
 	curve->fake_death();
-	a->curves.erase(index);
+	track->curves.erase(index);
 
-	a->notify(a->MESSAGE_DELETE_CURVE);
+	track->notify(track->MESSAGE_DELETE_CURVE);
 }
 
 

@@ -6,7 +6,6 @@
  */
 
 #include "ActionCurveDeletePoint.h"
-#include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
 

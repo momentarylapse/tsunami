@@ -15,7 +15,6 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
-#include "../../Data/Curve.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
 
@@ -101,27 +100,13 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf) {
 	render_send_target(buf, nullptr);
 }
 
-void apply_curves(Song *audio, int pos) {
-	for (Curve *c: weak(audio->curves))
-		c->apply(pos);
-}
-
-void unapply_curves(Song *audio) {
-	for (Curve *c: weak(audio->curves))
-		c->unapply();
-}
-
 void SongRenderer::read_basic(AudioBuffer &buf) {
 	range_cur = Range(pos, buf.length);
 	channels = buf.channels;
 
-	apply_curves(song, pos);
-
 	// render without fx
 	buf.set_zero();
 	render_song_no_fx(buf);
-
-	unapply_curves(song);
 
 	pos += buf.length;
 }
@@ -148,16 +133,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 	buf.offset = pos;
 
-	if (song->curves.num >= 0) {
-		int chunk = 1024;
-		for (int d=0; d<size; d+=chunk) {
-			AudioBuffer tbuf;
-			tbuf.set_as_ref(buf, d, min(size - d, chunk));
-			read_basic(tbuf);
-		}
-	} else {
-		read_basic(buf);
-	}
+	read_basic(buf);
 
 	if ((pos >= _range.end()) and allow_loop and loop) {
 		reset_state();

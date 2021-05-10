@@ -12,19 +12,12 @@
 #include "Sample.h"
 #include "CrossFade.h"
 #include "SongSelection.h"
-#include "Curve.h"
 #include "TrackMarker.h"
 #include "Rhythm/Bar.h"
 #include "../Action/ActionManager.h"
 #include "../Action/Bar/ActionBarAdd.h"
 #include "../Action/Bar/ActionBarDelete.h"
 #include "../Action/Bar/ActionBarEdit.h"
-#include "../Action/Curve/ActionCurveAdd.h"
-#include "../Action/Curve/ActionCurveAddPoint.h"
-#include "../Action/Curve/ActionCurveDelete.h"
-#include "../Action/Curve/ActionCurveDeletePoint.h"
-#include "../Action/Curve/ActionCurveEdit.h"
-#include "../Action/Curve/ActionCurveEditPoint.h"
 #include "../Action/Sample/ActionSampleAdd.h"
 #include "../Action/Sample/ActionSampleDelete.h"
 #include "../Action/Sample/ActionSampleEditName.h"
@@ -81,9 +74,6 @@ const string Song::MESSAGE_ADD_TRACK = "AddTrack";
 const string Song::MESSAGE_DELETE_TRACK = "DeleteTrack";
 const string Song::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Song::MESSAGE_DELETE_EFFECT = "DeleteEffect";
-const string Song::MESSAGE_ADD_CURVE = "AddCurve";
-const string Song::MESSAGE_DELETE_CURVE = "DeleteCurve";
-const string Song::MESSAGE_EDIT_CURVE = "EditCurve";
 const string Song::MESSAGE_ADD_SAMPLE = "AddSample";
 const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
 const string Song::MESSAGE_ADD_LAYER = "AddLayer";
@@ -151,7 +141,6 @@ void Song::reset() {
 
 	tracks.clear();
 	samples.clear();
-	curves.clear();
 
 	action_manager->reset();
 
@@ -397,39 +386,6 @@ void Song::delete_bar(int index, bool affect_midi) {
 
 void Song::delete_time_interval(int index, const Range &range) {
 	//execute(new ActionBarDelete(index, affect_midi));
-}
-
-Curve *Song::add_curve(const string &name, Array<Curve::Target> &targets) {
-	auto c = new Curve;
-	c->name = name;
-	c->targets = targets;
-	execute(new ActionCurveAdd(c, curves.num));
-	return c;
-}
-void Song::delete_curve(Curve *curve) {
-	foreachi(auto c, curves, i)
-		if (c == curve)
-			execute(new ActionCurveDelete(i));
-}
-
-void Song::edit_curve(Curve *curve, const string &name, float min, float max) {
-	execute(new ActionCurveEdit(curve, name, min, max, curve->targets));
-}
-
-void Song::curve_set_targets(Curve *curve, Array<Curve::Target> &targets) {
-	execute(new ActionCurveEdit(curve, curve->name, curve->min, curve->max, targets));
-}
-
-void Song::curve_add_point(Curve *curve, int pos, float value) {
-	execute(new ActionCurveAddPoint(curve, pos, value));
-}
-
-void Song::curve_delete_point(Curve *curve, int index) {
-	execute(new ActionCurveDeletePoint(curve, index));
-}
-
-void Song::curve_edit_point(Curve *curve, int index, int pos, float value) {
-	execute(new ActionCurveEditPoint(curve, index, pos, value));
 }
 
 void Song::invalidate_all_peaks() {

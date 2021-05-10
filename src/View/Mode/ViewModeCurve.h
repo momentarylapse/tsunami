@@ -33,7 +33,8 @@ public:
 	float screen2value(float y);
 
 	Curve *curve;
-	AudioViewTrack *cur_track();
+	AudioViewTrack *cur_vtrack();
+	Track *cur_track();
 	void set_curve(Curve *c);
 };
 

@@ -15,15 +15,15 @@ class Curve;
 
 class ActionCurveEdit : public Action {
 public:
-	ActionCurveEdit(shared<Curve> curve, const string &name, float min, float max, Array<Curve::Target> &targets);
+	ActionCurveEdit(Track *t, shared<Curve> curve, const string &name, float min, float max);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
+	Track *track;
 	shared<Curve> curve;
 	string name;
 	float min, max;
-	Array<Curve::Target> targets;
 };
 
 #endif /* SRC_ACTION_CURVE_ACTIONCURVEEDIT_H_ */

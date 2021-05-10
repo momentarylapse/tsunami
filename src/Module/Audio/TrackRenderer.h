@@ -47,6 +47,7 @@ public:
 	void render_group(AudioBuffer &buf);
 	void render_no_fx(AudioBuffer &buf);
 	int read(AudioBuffer &buf) override;
+	int read_basic(AudioBuffer &buf);
 
 	void fill_midi_streamer();
 	int get_first_usable_layer();

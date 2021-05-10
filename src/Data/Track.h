@@ -23,6 +23,8 @@ class Synthesizer;
 class AudioEffect;
 class CrossFadeOld;
 class TrackMarker;
+class Curve;
+class CurveTarget;
 enum class SignalType;
 
 
@@ -39,6 +41,9 @@ public:
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 	static const string MESSAGE_REPLACE_SYNTHESIZER;
+	static const string MESSAGE_ADD_CURVE;
+	static const string MESSAGE_DELETE_CURVE;
+	static const string MESSAGE_EDIT_CURVE;
 
 	void _cdecl invalidate_all_peaks();
 
@@ -72,6 +77,13 @@ public:
 	void _cdecl edit_synthesizer();
 	void _cdecl detune_synthesizer(const float tuning[MAX_PITCH]);
 	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
+	Curve* _cdecl add_curve(const string &name, CurveTarget &target);
+	void _cdecl delete_curve(Curve *curve);
+	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max);
+	//void _cdecl curve_set_targets(Curve *curve, CurveTarget &target);
+	void _cdecl curve_add_point(Curve *curve, int pos, float value);
+	void _cdecl curve_delete_point(Curve *curve, int index);
+	void _cdecl curve_edit_point(Curve *curve, int index, int pos, float value);
 
 
 // data
@@ -95,6 +107,8 @@ public:
 
 	shared<Synthesizer> synth;
 	void _register_synth(Synthesizer *s);
+
+	shared_array<Curve> curves;
 
 	shared_array<TrackMarker> _markers_old;
 

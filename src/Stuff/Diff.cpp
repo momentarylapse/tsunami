@@ -127,6 +127,9 @@ Array<string> diff_track(Track *ta, Track *tb, const string &ee) {
 	if (ta->panning != tb->panning)
 		r.add(ee + "panning");
 
+	if (ta->curves.num != tb->curves.num)
+		r.add("#curves");
+
 	r += diff_module(ta->synth.get(), tb->synth.get(), ee + "synth.");
 
 	if (ta->fx.num != tb->fx.num)
@@ -166,9 +169,6 @@ Array<string> diff_song(Song *a, Song *b) {
 		r.add("#samples");
 	for (int i=0; i<min(a->samples.num, b->samples.num); i++)
 		r += diff_sample(a->samples[i].get(), b->samples[i].get(), format("sample[i].", i));
-
-	if (a->curves.num != b->curves.num)
-		r.add("#curves");
 
 	if (a->tracks.num != b->tracks.num)
 		r.add("#tracks");

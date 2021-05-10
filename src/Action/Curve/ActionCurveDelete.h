@@ -11,14 +11,16 @@
 #include "../Action.h"
 
 class Curve;
+class Track;
 
 class ActionCurveDelete : public Action {
 public:
-	ActionCurveDelete(int index);
+	ActionCurveDelete(Track *t, int index);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
+	Track *track;
 	shared<Curve> curve;
 	int index;
 };

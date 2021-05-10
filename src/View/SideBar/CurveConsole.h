@@ -12,6 +12,7 @@
 #include "../../lib/math/math.h"
 
 class Song;
+class Track;
 class AudioView;
 class Curve;
 class Session;
@@ -37,6 +38,7 @@ public:
 	Array<Curve*> curves;
 
 	string id_list;
+	Track *track();
 };
 
 #endif /* CURVECONSOLE_H_ */

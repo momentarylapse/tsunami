@@ -9,9 +9,16 @@
 #include "TrackLayer.h"
 #include "TrackMarker.h"
 #include "CrossFade.h"
+#include "Curve.h"
 #include "base.h"
 #include "Song.h"
 #include "Audio/AudioBuffer.h"
+#include "../Action/Curve/ActionCurveAdd.h"
+#include "../Action/Curve/ActionCurveAddPoint.h"
+#include "../Action/Curve/ActionCurveDelete.h"
+#include "../Action/Curve/ActionCurveDeletePoint.h"
+#include "../Action/Curve/ActionCurveEdit.h"
+#include "../Action/Curve/ActionCurveEditPoint.h"
 #include "../Action/Track/Buffer/ActionTrackSetChannels.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
@@ -51,6 +58,9 @@ const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
+const string Track::MESSAGE_ADD_CURVE = "AddCurve";
+const string Track::MESSAGE_DELETE_CURVE = "DeleteCurve";
+const string Track::MESSAGE_EDIT_CURVE = "EditCurve";
 
 Track::Track(SignalType _type, Synthesizer *_synth) {
 	//msg_write("  new Track " + p2s(this));
@@ -279,6 +289,35 @@ void Track::merge_layers() {
 
 void Track::mark_dominant(const Array<const TrackLayer*> &layers, const Range &range) {
 	song->execute(new ActionTrackLayerMarkDominant(this, layers, range));
+}
+
+Curve *Track::add_curve(const string &name, CurveTarget &target) {
+	auto c = new Curve;
+	c->name = name;
+	c->target = target;
+	song->execute(new ActionCurveAdd(this, c, curves.num));
+	return c;
+}
+void Track::delete_curve(Curve *curve) {
+	foreachi(auto c, curves, i)
+		if (c == curve)
+			song->execute(new ActionCurveDelete(this, i));
+}
+
+void Track::edit_curve(Curve *curve, const string &name, float min, float max) {
+	song->execute(new ActionCurveEdit(this, curve, name, min, max));
+}
+
+void Track::curve_add_point(Curve *curve, int pos, float value) {
+	song->execute(new ActionCurveAddPoint(curve, pos, value));
+}
+
+void Track::curve_delete_point(Curve *curve, int index) {
+	song->execute(new ActionCurveDeletePoint(curve, index));
+}
+
+void Track::curve_edit_point(Curve *curve, int index, int pos, float value) {
+	song->execute(new ActionCurveEditPoint(curve, index, pos, value));
 }
 
 

@@ -64,9 +64,12 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		SetLanguage(Config.get_str("Language", def_lang));
 
 
+#ifdef OS_LINUX
 	if (file_exists(directory_static << "icon.svg"))
 		set_property("logo", (directory_static << "icon.svg").str());
-	else if (file_exists(directory_static << "icon.png"))
+	else
+#endif
+	if (file_exists(directory_static << "icon.png"))
 		set_property("logo", (directory_static << "icon.png").str());
 	else if (file_exists(directory_static << "icon.ico"))
 		set_property("logo", (directory_static << "icon.ico").str());

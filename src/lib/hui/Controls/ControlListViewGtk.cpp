@@ -285,6 +285,17 @@ int ControlListView::get_int() {
 	return -1;
 }
 
+void ControlListView::__set_float(float f) {
+	//gtk_tree_view_scroll_to_point(GTK_TREE_VIEW(widget), 0, f);
+	//auto v = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(widget));
+	//gtk_adjustment_set_value(GTK_ADJUSTMENT(v), f);
+}
+
+float ControlListView::get_float() {
+	auto v = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(widget));
+	return gtk_adjustment_get_value(GTK_ADJUSTMENT(v));
+}
+
 void ControlListView::__change_string(int row, const string& str) {
 	if (row < 0)
 		return;

@@ -13,8 +13,7 @@
 namespace hui
 {
 
-class ControlListView : public Control
-{
+class ControlListView : public Control {
 public:
 	ControlListView(const string &text, const string &id, Panel *panel);
 	string get_string() override;
@@ -22,6 +21,8 @@ public:
 	void __add_string(const string &str) override;
 	void __set_int(int i) override;
 	int get_int() override;
+	void __set_float(float f) override;
+	float get_float() override;
 	void __change_string(int row, const string &str) override;
 	void __remove_string(int row) override;
 	string get_cell(int row, int column) override;

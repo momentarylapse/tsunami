@@ -76,6 +76,7 @@ Curve *track_find_curve(Track *t, const string &id) {
 }
 
 void CurveConsole::update_list() {
+	float scroll = get_float(id_list);
 	reset(id_list);
 
 	auto t = track();
@@ -89,6 +90,7 @@ void CurveConsole::update_list() {
 		if (ct.id == view->mode_curve->target)
 			set_int(id_list, i);
 	}
+	set_float(id_list, scroll);
 }
 
 void CurveConsole::on_delete() {

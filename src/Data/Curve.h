@@ -20,7 +20,8 @@ namespace kaba {
 };
 
 
-struct CurveTarget {
+class CurveTarget {
+public:
 	float *p;
 	string id;
 	string temp_name_nice;

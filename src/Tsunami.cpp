@@ -44,7 +44,7 @@
 #include "Data/SampleRef.h"
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.107.1";
+const string AppVersion = "0.7.108.0";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;

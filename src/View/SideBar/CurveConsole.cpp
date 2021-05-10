@@ -89,7 +89,7 @@ void CurveConsole::update_list() {
 		if (auto c = track_find_curve(t, ct.id))
 			add_string(id_list, format("<b>%s</b>\\%.3f\\%.3f", ct.nice_str(t), c->min, c->max));
 		else
-			add_string(id_list, format("<i>%s</i>\\(0)\\(1)", ct.nice_str(t)));
+			add_string(id_list, format("<i><span alpha=\"50%%\">%s</span></i>\\(0)\\(1)", ct.nice_str(t)));
 		if (ct.id == view->mode_curve->target)
 			set_int(id_list, i);
 	}

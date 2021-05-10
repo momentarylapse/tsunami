@@ -78,12 +78,22 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 	if (_curve) {
 
 		// lines
-		c->set_line_width(1.0f);
-		c->set_color(view->colors.text);
+		c->set_line_width(2.0f);
+		c->set_color(view->colors.selection_boundary);
 		Array<complex> pp;
 		for (int x=r.x1; x<r.x2; x+=3)
 			pp.add(complex(x, value2screen(_curve->get(cam->screen2sample(x)))));
 		c->draw_lines(pp);
+
+
+		// fill
+		c->set_line_width(2.0f);
+		color cc = view->colors.selection_internal;
+		cc.a = 0.2f;
+		c->set_color(cc);
+		pp.add(complex(r.x2, r.y2));
+		pp.add(complex(r.x1, r.y2));
+		c->draw_polygon(pp);
 
 		// points
 		foreachi(auto &p, _curve->points, i) {

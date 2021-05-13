@@ -20,7 +20,7 @@ Image im0
 
 class SpecGrid extends Grid
 	override void on_draw(Painter c)
-		rect r = plot_rect
+		rect r = plot_area
 		int w = r.width()
 		int h = r.height()
 		

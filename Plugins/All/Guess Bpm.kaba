@@ -102,7 +102,7 @@ class CorrelationGrid extends Grid
 		let x = x_axis.project(bpm_opt)
 		p.draw_line(x, 0, x, p.height)
 		p.set_font_size(8)
-		p.draw_str(x+3, plot_rect.y2-20, "{{bpm_opt|.1}} bpm")
+		p.draw_str(x+3, plot_area.y2-20, "{{bpm_opt|.1}} bpm")
 		
 		
 		for c,i in curve[i_opt-NN:i_opt+NN+1]

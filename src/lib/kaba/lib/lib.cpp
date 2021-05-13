@@ -404,7 +404,7 @@ Function* class_add_func_virtual(const string &name, const Class *return_type, v
 	string tname = cur_class->name;
 	int index = get_virtual_index(func, tname, name);
 	//msg_write("virtual: " + tname + "." + name);
-		//msg_write(index);
+	//msg_write(index);
 	Function *f = class_add_func(name, return_type, func, flag);
 	cur_func->virtual_index = index;
 	if (index >= cur_class->vtable.num)

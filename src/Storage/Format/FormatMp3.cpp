@@ -12,6 +12,9 @@
 #include "../../Data/Track.h"
 #include "../../Data/Song.h"
 #include "../../Data/base.h"
+#define MINIMP3_IMPLEMENTATION
+#define MINIMP3_FLOAT_OUTPUT
+#include "../Helper/minimp3.h"
 
 FormatDescriptorMp3::FormatDescriptorMp3() :
 	FormatDescriptor("Mp3", "mp3", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
@@ -19,24 +22,21 @@ FormatDescriptorMp3::FormatDescriptorMp3() :
 }
 
 // (-_-) 4*7bit big endian
-static int read_mp3_28bit(File *f)
-{
+static int read_mp3_28bit(File *f) {
 	unsigned char d[4];
 	f->read_buffer(d, 4);
 
 	return (d[3] & 0x7f) | ((d[2] & 0x7f) << 7) | ((d[1] & 0x7f) << 14) | ((d[0] & 0x7f) << 21);
 }
 
-static int read_32bit_be(File *f)
-{
+static int read_32bit_be(File *f) {
 	unsigned char d[4];
 	f->read_buffer(d, 4);
 
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
-static string tag_from_mp3(const string &key)
-{
+static string tag_from_mp3(const string &key) {
 	if (key == "TALB")
 		return "album";
 	if (key == "TPE1")
@@ -52,46 +52,49 @@ static string tag_from_mp3(const string &key)
 	return key;
 }
 
-void FormatMp3::load_track(StorageOperationData *od)
-{
+void FormatMp3::load_track(StorageOperationData *od) {
 	Track *t = od->track;
 
-	unsigned char *data = new unsigned char[4096];
+	//unsigned char *data = new unsigned char[4096];
+	bytes data;
 	File *f = nullptr;
 
-	try{
+	try {
 		f = FileOpen(od->filename);
 
 
-		while(true){
+		while(true) {
 			int pos0 = f->get_pos();
-			f->read_buffer(data, 4);
-			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)){
+			data.resize(4);
+			f->read_buffer(data);
+			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)) {
 				msg_write("== mp3-header ==");
-				int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
-				int FREQS[] = {44100, 48000, 32000, 0};
+				const int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
+				const int FREQS[] = {44100, 48000, 32000, 0};
 				bool error_correction = ((data[1] & 0x01) > 0);
-				msg_write(error_correction);
+				msg_write(format("correction: %d", (int)error_correction));
 				int bit_rate_index = ((data[2] & 0xf0) >> 4);
 				int freq_index = ((data[2] & 0x06) >> 2);
 				int bit_rate = BIT_RATES[bit_rate_index];
-				t->song->sample_rate = FREQS[freq_index];
-				msg_write(bit_rate);
-				msg_write(t->song->sample_rate);
+				od->suggest_samplerate(FREQS[freq_index]);
+				//t->song->sample_rate = FREQS[freq_index];
+				msg_write(format("bitrate: %d", bit_rate));
+				msg_write(format("samplerate: %d", FREQS[freq_index]));
 				bool padding = ((data[2] & 0x02) > 0);
 				int mode = ((data[3] & 0xc0) >> 6);
-				msg_write(mode);
+				msg_write(format("mode: %d", mode));
 
 				if (error_correction)
-					f->read_buffer(data, 2);
-				if (mode == 3){
+					f->read_word();
+					//f->read_buffer(data, 2);
+				if (mode == 3) {
 					// mono...
-				}else{
+				} else {
 					// 9+3+8+4*(12+9+8+4+1)
 				}
 				//f->SetPos(pos0 + size + 10, true);
 				break;
-			}else if ((data[0] == 'I') and (data[1] == 'D') and (data[2] == '3')){
+			} else if ((data[0] == 'I') and (data[1] == 'D') and (data[2] == '3')) {
 				msg_write("== ID3-Tags ==");
 				int version = data[3];
 				int v_min = f->read_byte();
@@ -100,25 +103,27 @@ void FormatMp3::load_track(StorageOperationData *od)
 				int size = read_mp3_28bit(f);
 				//msg_write(size);
 				int r = 0;
-				while (r < size - 3){
-					if (version == 2){
-						f->read_buffer(data, 3);
-						string key = string(data, 3);
+				while (r < size - 3) {
+					if (version == 2) {
+						data.resize(3);
+						string key = data;
 						//if (key[0] != 0)
 						//	msg_write(key);
-						f->read_buffer(data, 3);
+						f->read_buffer(data);
 						unsigned int _size = data[2] + (data[1] << 8) + (data[0] << 16);
 						//msg_write(_size);
 						r += 6 + _size;
-						if (_size < 1024){
-							f->read_buffer(data, _size);
-						}else{
+						if (_size < 1024) {
+							data.resize(_size);
+							f->read_buffer(data);
+						} else {
 							f->seek(_size);
 						}
 
-					}else if ((version == 3) or (version == 4)){
-						f->read_buffer(data, 4);
-						string key = string(data, 4);
+					} else if ((version == 3) or (version == 4)) {
+						data.resize(4);
+						f->read_buffer(data);
+						string key = data;
 						//if (key[0] != 0)
 						//	msg_write(key);
 						int _size;
@@ -126,12 +131,13 @@ void FormatMp3::load_track(StorageOperationData *od)
 							_size = read_mp3_28bit(f);
 						else
 							_size = read_32bit_be(f);
-						f->read_buffer(data, 2); // flags
+						f->read_word(); // flags
 						//msg_write(_size);
 						r += 12 + _size;
-						if ((_size < 1024) and (_size > 0)){
-							f->read_buffer(data, _size);
-							string val = string(data+1, _size-1);
+						if ((_size < 1024) and (_size > 0)) {
+							data.resize(_size);
+							f->read_buffer(data);
+							string val = string(&data[1], _size-1);
 							int type = data[0];
 							if (key == "COMM")
 								val = val.substr(3, -1);
@@ -143,46 +149,84 @@ void FormatMp3::load_track(StorageOperationData *od)
 							//msg_write(val);
 
 							// will be added by wave loading...
-//							t->song->addTag(tag_from_mp3(key), val);
-						}else{
+							od->suggest_tag(tag_from_mp3(key), val);
+						} else {
 							f->seek(_size);
 						}
 
-					}else{
+					} else {
 						od->error(format("unsupported ID3 version: v2.%d.%d", version, v_min));
 						break;
 					}
 				}
 				f->set_pos(pos0 + size + 10);
-			}else{
-				msg_write("unknown header:");
-				msg_write(string(data, 4).hex());
-				msg_write(string(data, 4));
+			} else {
+				od->error("unknown header: " + data.hex());
+				msg_write(data);
 				break;
 			}
 		}
 
-		if (system("which avconv") == 0){
+		f->set_pos(0);
+
+		static mp3dec_t mp3d;
+		mp3dec_init(&mp3d);
+
+		data.clear();
+
+		int channels = 2;
+
+		od->info("mp3 decoder: https://github.com/lieff/minimp3");
+
+		//msg_write("start");
+		int sample_offset = 0;
+		int bytes_offset = 0;
+		while (true) {
+			if (data.num < 4096*4) {
+				bytes temp;
+				temp.resize(4096*5 - data.num);
+				int size = f->read_buffer(temp);
+				//msg_write(format("R  %d", size));
+				if (size > 0) {
+					temp.resize(size);
+					data += temp;
+				}
+				od->set((float)f->get_pos() / (float)f->get_size());
+			}
+
+			mp3dec_frame_info_t info;
+			float pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
+			int samples = mp3dec_decode_frame(&mp3d, &data[0], data.num, pcm, &info);
+			//msg_write(format("D  %d  %d", samples, info.frame_bytes));
+			if ((samples == 0) and (info.frame_bytes == 0))
+				break;
+			channels = info.channels;
+			import_data(od->layer, &pcm[0], channels, SampleFormat::SAMPLE_FORMAT_32_FLOAT, samples, sample_offset);
+			sample_offset += samples;
+			bytes_offset += info.frame_bytes;
+			data = bytes(&data[info.frame_bytes], data.num - info.frame_bytes);
+		}
+
+
+		/*if (system("which avconv") == 0) {
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(format("yes | avconv -i \"%s\" \"%s\"", od->filename, tmp).c_str());
 			od->storage->load_track(od->layer, tmp, od->offset);
 			od->storage->current_directory = od->filename.parent();
 			file_delete(tmp);
-		}else if (system("which ffmpeg") == 0){
+		} else if (system("which ffmpeg") == 0) {
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(format("yes | ffmpeg -i \"%s\" \"%s\"", od->filename, tmp).c_str());
 			od->storage->load_track(od->layer, tmp, od->offset);
 			od->storage->current_directory = od->filename.parent();
 			file_delete(tmp);
-		}else
-			od->error("need external program 'avconv' to decode");
+		} else
+			od->error("need external program 'avconv' to decode");*/
 
 
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		od->error(e.message());
 	}
-
-	delete[](data);
 
 	if (f)
 		FileClose(f);

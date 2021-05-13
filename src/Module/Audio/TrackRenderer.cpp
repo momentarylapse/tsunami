@@ -455,7 +455,6 @@ int TrackRenderer::read(AudioBuffer &buf) {
 }
 
 int TrackRenderer::read_basic(AudioBuffer &buf) {
-	msg_write(buf.offset);
 	apply_curves(track.get(), buf.offset);
 	render_no_fx(buf);
 

@@ -241,7 +241,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	} else if (com->kind == NodeKind::INLINE_CALL) {
 		serialize_inline_function(com, params, ret);
 	} else if (com->kind == NodeKind::POINTER_CALL) {
-		add_pointer_call(params[0], params.sub(1, -1), ret);
+		add_pointer_call(params[0], params.sub_ref(1), ret);
 	} else if (com->kind == NodeKind::STATEMENT) {
 		serialize_statement(com, ret, block, index);
 	} else if (com->kind == NodeKind::BLOCK) {

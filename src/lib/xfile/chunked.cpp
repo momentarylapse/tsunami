@@ -89,7 +89,7 @@ void FileChunkBasic::set_root(ChunkedFileParser *r) {
 
 string str_clamp(const string &s, int l) {
 	if (s.num > l)
-		return s.substr(0, l);
+		return s.sub(0, l);
 	return s;
 }
 

@@ -34,6 +34,8 @@ class bytes : public Array<char> {
 	string _cdecl md5() const;
 	int _cdecl compare(const bytes &s) const;
 	bytes _cdecl repeat(int n) const;
+	bytes _cdecl sub(int start, int end = MAGIC_END_INDEX) const;
+	bytes _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const;
 
 	// operators
 	void _cdecl operator = (const bytes &s)
@@ -88,6 +90,8 @@ class string : public bytes {
 	int _cdecl rfind(const string &s, int start = -1) const;
 	bool has_char(char c) const;
 	string _cdecl substr(int start, int length) const;
+	string _cdecl sub(int start, int end = MAGIC_END_INDEX) const;
+	string _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const;
 	string _cdecl head(int size) const;
 	string _cdecl tail(int size) const;
 	int _cdecl icompare(const string &s) const;

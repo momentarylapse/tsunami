@@ -65,7 +65,7 @@ bool is_function_pointer(const Class *c) {
 
 
 Array<const Class*> get_function_pointer_param_types(const Class *fp) {
-	return fp->param[0]->param.sub(0, fp->param[0]->param.num - 1);
+	return fp->param[0]->param.sub_ref(0, -1); // skip return value
 }
 
 const Class *get_function_pointer_return_type(const Class *fp) {
@@ -1705,7 +1705,7 @@ void Parser::link_most_important_operator(shared_array<Node> &operands, shared_a
 	if (op_no->id == OperatorID::COMMA) {
 		int first = mio, last = mio;
 		get_comma_range(_operators, mio, first, last);
-		auto n = build_abstract_tuple(operands.sub(first, last - first + 1));
+		auto n = build_abstract_tuple(operands.sub_ref(first, last + 1));
 		operands[first] = n;
 		for (int i=last-1; i>=first; i--) {
 			_operators.erase(i);

@@ -70,7 +70,7 @@ void LogConsole::reload() {
 
 void LogConsole::on_log_add() {
 	auto messages = log->all(session);
-	for (auto &m: messages.sub(messages_loaded, -1))
+	for (auto &m: messages.sub_ref(messages_loaded))
 		console_add_message(this, m);
 	messages_loaded = messages.num;
 }

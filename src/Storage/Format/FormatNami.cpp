@@ -205,7 +205,7 @@ public:
 			if (xx.num >= 2)
 				if (xx[0] == "t")
 					track = parent->tracks[xx[1]._int()].get();
-			string new_target = implode(xx.sub(2, -1), ":");
+			string new_target = implode(xx.sub_ref(2), ":");
 
 			if (track) {
 				me->target.from_id(new_target, track);

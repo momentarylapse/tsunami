@@ -399,7 +399,7 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 		pos ++;
 	} else if (cur[0] == '\"' or cur[0] == '\'') {
 		a.create_type(Any::TYPE_STRING);
-		a.as_string() = cur.substr(1, -2).unescape();
+		a.as_string() = cur.sub(1, -1).unescape();
 		pos ++;
 	} else {
 		// token (string without quotes)

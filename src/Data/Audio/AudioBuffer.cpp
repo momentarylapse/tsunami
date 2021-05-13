@@ -347,7 +347,7 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 	channels = source.channels;
 	c.resize(MEM_CHANNELS);
 	for (int i=0; i<MEM_CHANNELS; i++)
-		c[i].set_ref(source.c[i].sub(_offset, _length));
+		c[i].set_ref(source.c[i].sub_ref(_offset, _offset+_length));
 }
 
 

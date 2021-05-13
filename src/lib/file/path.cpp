@@ -108,13 +108,13 @@ const char *Path::c_str() const {
 bool Path::is_relative() const {
 	if (is_empty())
 		return true;
-	return (s.head(1) != SEPARATOR) and (s.substr(1,2) != ":/");
+	return (s.head(1) != SEPARATOR) and (s.sub(1,3) != ":/");
 }
 
 bool Path::is_absolute() const {
 	if (is_empty())
 		return false;
-	return (s.head(1) == SEPARATOR) or (s.substr(1,2) == ":/");
+	return (s.head(1) == SEPARATOR) or (s.sub(1,3) == ":/");
 }
 
 bool Path::is_in(const Path &p) const {
@@ -131,7 +131,7 @@ bool Path::has_dir_ending() const {
 }
 
 string Path::basename() const {
-	int i = s.substr(0, s.num-1).rfind(SEPARATOR);
+	int i = s.sub(0, -1).rfind(SEPARATOR);
 	if (i >= 0)
 		return s.tail(s.num - i - 1).replace(SEPARATOR, "");
 	return s;
@@ -187,7 +187,7 @@ Path Path::relative_to(const Path &p) const {
 	string me = canonical().s;
 	if (me.head(dir.num) != dir)
 		return EMPTY;
-	return Path(me.substr(dir.num, -1));
+	return Path(me.sub(dir.num));
 }
 
 // cancel '/x/../'

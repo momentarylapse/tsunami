@@ -212,7 +212,7 @@ void sa_sort_i(Array<string> &a) {
 
 // search a directory for files matching a filter
 void dir_search_single(const Path &dir, const string &filter, Array<string> &dir_list, Array<string> &file_list) {
-	string filter2 = filter.substr(1, filter.num - 1);
+	string filter2 = filter.sub(1);
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;

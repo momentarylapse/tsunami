@@ -222,7 +222,7 @@ string msg_get_str(int index)
 	index = (log_pos.num - 1 - index);
 	if (index < 0)
 		return "";
-	return log_buffer.substr(log_pos[index], log_length[index]);
+	return log_buffer.sub(log_pos[index], log_pos[index] + log_length[index]);
 }
 
 int msg_get_buffer_size()
@@ -236,7 +236,7 @@ string msg_get_buffer(int max_size)
 		return log_buffer;
 	else
 		// not all -> use only the latest log
-		return log_buffer.substr(log_buffer.num - max_size, max_size);
+		return log_buffer.tail(max_size);
 }
 
 void msg_todo(const string &str)

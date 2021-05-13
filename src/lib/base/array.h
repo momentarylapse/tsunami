@@ -14,6 +14,7 @@
 
 class DynamicArray {
 public:
+	static const int MAGIC_END_INDEX;
 	void _cdecl init(int _element_size_);
 	void _cdecl simple_reserve(int size);
 	void _cdecl simple_resize(int size);
@@ -37,7 +38,7 @@ public:
 	void _cdecl simple_swap(int i1, int i2);
 	void _cdecl simple_move(int source, int target);
 	void _cdecl reverse();
-	DynamicArray _cdecl ref_subarray(int start, int end);
+	DynamicArray _cdecl ref_subarray(int start, int end = MAGIC_END_INDEX) const;
 	int _cdecl simple_index(const void *p) const;
 	void* simple_element(int index);
 	void _cdecl simple_clear();
@@ -189,13 +190,23 @@ public:
 				return i;
 		return -1;
 	}
-	Array<T> _cdecl sub(int start, int num_elements) const {
-		Array<T> s;
-		if ((num_elements < 0) or (num_elements > num - start))
-			num_elements = num - start;
-		s.num = num_elements;
+	template<class O>
+	O _cdecl sub_ref_as(int start, int end = MAGIC_END_INDEX) const {
+		//return reinterpret_cast<Array<T>>(DynamicArray::ref_subarray(start, end));
+		O s;
+		if (start < 0)
+			start += num;
+		if (end == MAGIC_END_INDEX)
+			end = num;
+		if (end < 0)
+			end += num;
+		if (end >= start)
+			s.num = end - start;
 		s.data = ((T*)this->data) + start;
 		return s;
+	}
+	Array<T> _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const {
+		return sub_ref_as<Array<T>>(start, end);
 	}
 
 	bool operator == (const Array<T> &o) const {

@@ -225,7 +225,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
-		session->execute_tsunami_plugin(a[0], a.sub(1, -1));
+		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 	});
 #ifndef NDEBUG
 	p.mode("--list-tests", {}, "debug: list internal unit tests", [&](const Array<string> &) {

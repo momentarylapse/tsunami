@@ -103,12 +103,12 @@ bool CLIParser::try_run_mode(const Mode &m, const Array<string> &arg) {
 		i0 = 1;
 	}
 
-	int n = m.grab_parameters(arg.sub(i0, -1));
+	int n = m.grab_parameters(arg.sub_ref(i0));
 	if (n < 0)
 		die("missing parameter for command: " + m.str());
 	if (n < arg.num-i0)
 		die("too many parameters for command: " + m.str());
-	m.callback(arg.sub(i0, n));
+	m.callback(arg.sub_ref(i0, i0 + n));
 	return true;
 }
 

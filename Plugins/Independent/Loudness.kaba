@@ -1,0 +1,112 @@
+use tsunami
+use helper.filter
+use hui
+
+func lufs_to_color(float l) -> color
+	let cc = [color(0,0,0,0.2), color(1,0,0,0.2), color(1,1,0,0.2), color(1,1,1,0.5)]
+	let ff = [-20., -10., -5., 0.]
+	if l > ff[2]
+		float a = (l-ff[2]) / (ff[3]-ff[2])
+		return cc[2] * (1-a) + cc[3] * a
+	if l > ff[1]
+		float a = (l-ff[1]) / (ff[2]-ff[1])
+		return cc[1] * (1-a) + cc[2] * a
+	if l > ff[0]
+		float a = (l-ff[0]) / (ff[1]-ff[0])
+		return cc[0] * (1-a) + cc[1] * a
+	return cc[0]
+
+
+
+class XPanel extends ConfigPanel
+	
+	void __init__(Loudness l)
+		super.__init__(l)
+		from_source("
+Grid ? ''
+	Label l-max 'max loudness' right disabled
+	Label max 'calculating...' bold
+	Label l-lufs 'LUFS'
+	---|
+	Label l-gated 'gated loudness' right disabled
+	Label gated '' bold
+	Label l-lufs 'LUFS'")
+		set_string("max", "{{l.max_loudness|.2}}")
+		set_string("gated", "{{l.gated_loudness|.2}}")
+
+
+class Loudness extends TsunamiPlugin
+
+	float[] loudness
+	float[] z
+	int dT
+	
+	float max_loudness
+	float gated_loudness
+
+	func override on_start()
+		print("on start")
+		
+		AudioBuffer buf
+		let renderer = new SongRenderer(session.song)
+		renderer.render(session.song.range(), buf)
+		del renderer
+		
+		# EQ
+		BiquadFilter f
+		f.create(FILTER_HIGH_SHELF, 1666, 0, 4, session.sample_rate())
+		f.apply(buf)
+		f.create(FILTER_HIGH_PASS, 50, 0, 0, session.sample_rate())
+		f.apply(buf)
+		
+		# 400 ms
+		int T = session.sample_rate() * 0.4
+		dT = T / 4
+		
+		
+		#for i in 0:len(buf):dT
+		int n_chunks = len(buf) / dT
+		for c in 0:n_chunks
+			int i0 = c * dT
+			float z0 = 0
+			float z1 = 0
+			for j in 0:T
+				z0 += buf.c[0][i0 + j]^2
+				z1 += buf.c[1][i0 + j]^2
+			z0 /= T
+			z1 /= T
+			z.add(z0 + z1)
+			let l = -0.691 + 10 * log(z0 + z1) / log(10)
+			loudness.add(l)
+		#print(str(loudness))
+		
+		max_loudness = loudness.max()
+		
+		#gated_loudness = 0
+		float gamma = lkfs_gated(-70) - 10
+		gated_loudness = lkfs_gated(gamma)
+		
+		#print("max: {{max_loudness}}")
+		#print("gated: {{gated_loudness}}")
+	
+	func lkfs_gated(float gamma) -> float
+		int n_gated = 0
+		float gated_z_sum = 0
+		for l,i in loudness
+			if l > gamma
+				gated_z_sum += z[i]
+				n_gated ++
+		return -0.691 + 10 * log(gated_z_sum / n_gated) / log(10)
+			
+		
+	func override on_draw_post(Painter p)
+		let v = session.view.cur_vlayer()
+		for l,i in loudness
+			float x0 = session.view.cam.sample2screen(i*dT)
+			float x1 = session.view.cam.sample2screen(i*dT + dT)
+			p.set_color(lufs_to_color(l))
+			p.draw_rect(rect(x0,x1, v.area.y1,v.area.y2))
+
+	func override create_panel() -> ConfigPanel*
+		return new XPanel(self)
+		

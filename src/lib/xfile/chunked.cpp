@@ -200,9 +200,7 @@ void FileChunkBasic::read_contents() {
 				break;
 			}
 		if (!ok) {
-			string tt;
-			tt.resize(context->end() - f->get_pos());
-			f->read_buffer(tt);
+			auto tt = f->read_buffer(context->end() - f->get_pos());
 			//msg_write(tt.substr(0, 100).hex());
 
 			if (root)

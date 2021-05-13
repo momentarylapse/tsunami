@@ -40,35 +40,38 @@ public:
 
 class KabaFile : public File {
 public:
-	void _cdecl __delete__()
-	{ this->~KabaFile(); }
-	int _cdecl _write_buffer(const string &s)
-	{ return write_buffer(s); }
-	string _cdecl _read_buffer(int size)
-	{
-		string s;
-		s.resize(size);
-		int r = read_buffer(s);
-		s.resize(r);
-		return s;
+	void _cdecl __delete__() {
+		this->~KabaFile();
 	}
-	void _cdecl _read_int(int &i)
-	{ KABA_EXCEPTION_WRAPPER(i = read_int()); }
-	void _cdecl _read_float(float &f)
-	{ KABA_EXCEPTION_WRAPPER(f = read_float()); }
-	void _cdecl _read_bool(bool &b)
-	{ KABA_EXCEPTION_WRAPPER(b = read_bool()); }
-	void _cdecl _read_vector(vector &v)
-	{ KABA_EXCEPTION_WRAPPER(read_vector(&v)); }
-	void _cdecl _read_str(string &s)
-	{ KABA_EXCEPTION_WRAPPER(s = read_str()); }
-	void _cdecl _write_vector(const vector &v)
-	{ KABA_EXCEPTION_WRAPPER(write_vector(&v)); }
+	int _cdecl _write_buffer(const string &s) {
+		return write_buffer(s);
+	}
+	bytes _cdecl _read_buffer(int size) {
+		return read_buffer(size);
+	}
+	void _cdecl _read_int(int &i) {
+		KABA_EXCEPTION_WRAPPER(i = read_int());
+	}
+	void _cdecl _read_float(float &f) {
+		 KABA_EXCEPTION_WRAPPER(f = read_float());
+	}
+	void _cdecl _read_bool(bool &b) {
+		KABA_EXCEPTION_WRAPPER(b = read_bool());
+	}
+	void _cdecl _read_vector(vector &v) {
+		KABA_EXCEPTION_WRAPPER(read_vector(&v));
+	}
+	void _cdecl _read_str(string &s) {
+		KABA_EXCEPTION_WRAPPER(s = read_str());
+	}
+	void _cdecl _write_vector(const vector &v) {
+		KABA_EXCEPTION_WRAPPER(write_vector(&v));
+	}
 
-	void _write_int(int i){ write_int(i); }
-	void _write_float(float f){ write_float(f); }
-	void _write_bool(bool b){ write_bool(b); }
-	void _write_str(const string &s){ write_str(s); }
+	void _write_int(int i) { write_int(i); }
+	void _write_float(float f) { write_float(f); }
+	void _write_bool(bool b) { write_bool(b); }
+	void _write_str(const string &s) { write_str(s); }
 };
 
 /*class KabaFileNotFoundError : public KabaFileError

@@ -168,9 +168,7 @@ void FormatSoundFont2::sfSample::print() {
 }
 
 string read_str(File *f, int l) {
-	string s;
-	s.resize(l);
-	f->read_buffer(s);
+	string s = f->read_buffer(l);
 	int p0 = s.find(string("\0", 1), 0);
 	if (p0 >= 0)
 		return s.head(p0);
@@ -324,9 +322,7 @@ void FormatSoundFont2::read_chunk(File *f) {
 			instrument_generators.add(g);
 		}
 	} else {
-		string t;
-		t.resize(l);
-		f->read_buffer(t);
+		bytes t = f->read_buffer(l);
 		od->session->debug("sf2", t.hex());
 	}
 

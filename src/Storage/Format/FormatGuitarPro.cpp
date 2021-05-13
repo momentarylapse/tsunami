@@ -49,37 +49,25 @@ static void write_str41(File *f, const string &s)
 	write_str1(f, s);
 }
 
-static string read_str1(File *f)
-{
+static string read_str1(File *f){
 	int l = f->read_byte();
 	//msg_write(l);
-	string s;
-	s.resize(l);
-	f->read_buffer(s.data, l);
-	return s;
+	return f->read_buffer(l);
 }
 
-static string read_str1c(File *f, int size)
-{
+static string read_str1c(File *f, int size) {
 	int l = f->read_byte();
-	string s;
-	s.resize(size);
-	f->read_buffer(s.data, size);
+	string s = f->read_buffer(size);
 	s.resize(l);
 	return s;
 }
 
-static string read_str4(File *f)
-{
+static string read_str4(File *f) {
 	int l = f->read_int();
-	string s;
-	s.resize(l);
-	f->read_buffer(s.data, l);
-	return s;
+	return f->read_buffer(l);
 }
 
-static string read_str41(File *f)
-{
+static string read_str41(File *f) {
 	int l = f->read_int();
 	/*msg_write(l);
 	string s;
@@ -182,16 +170,14 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 {
 	od = _od;
 	song = od->song;
-	char data[16];
 	tracks.clear();
 	measures.clear();
 
 	try{
 		f = FileOpen(od->filename);
 
-		string s;
-		s = read_str1c(f, 30);
-		msg_write("version: "+s);
+		string s = read_str1c(f, 30);
+		msg_write("version: " + s);
 		version = -1;
 		if (s[20] == '3')
 			version = 300;
@@ -226,7 +212,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 
 		if (version >= 400){
 			f->read_byte(); // key signature
-			f->read_buffer(data, 3);
+			f->read_buffer(3);
 			f->read_byte(); // octave
 		}else{
 			f->read_int(); // key

@@ -60,7 +60,7 @@ void FormatRaw::save_via_renderer(StorageOperationData *od) {
 	int done = 0;
 	int samples_read;
 	while ((samples_read = r->read_audio(buf)) > 0) {
-		string data;
+		bytes data;
 		buf.resize(samples_read);
 		if (!buf.exports(data, channels, format))
 			od->warn(_("Amplitude too large, signal distorted."));
@@ -78,7 +78,8 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	int sample_rate = od->parameters["samplerate"]._int();
 	auto format = format_from_code(od->parameters["format"].str());
 
-	char *data = new char[CHUNK_SIZE];
+	//char *data = new char[CHUNK_SIZE];
+	bytes data;
 	File *f = nullptr;
 
 	od->suggest_samplerate(sample_rate);
@@ -92,24 +93,24 @@ void FormatRaw::load_track(StorageOperationData *od) {
 		//int samples = size / byte_per_sample;
 
 		if (offset > 0)
-			f->read_buffer(data, offset);
+			f->read_buffer(offset);
 
 		long long read = 0;
 		int nn = 0;
 		int nice_buffer_size = 10000;//CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size) {
 			int toread = (int)min((int64)nice_buffer_size, size - read);
-			int r = f->read_buffer(data, toread);
+			data = f->read_buffer(toread);
 			nn ++;
 			if (nn > 16) {
 				od->set((float)read / (float)size);
 				nn = 0;
 			}
-			if (r > 0) {
-				int dsamples = r / byte_per_sample;
+			if (data.num > 0) {
+				int dsamples = data.num / byte_per_sample;
 				int _offset = read / byte_per_sample + od->offset;
-				import_data(od->layer, data, channels, format, dsamples, _offset);
-				read += r;
+				import_data(od->layer, &data[0], channels, format, dsamples, _offset);
+				read += data.num;
 			} else {
 				throw Exception("could not read in raw file...");
 			}
@@ -118,8 +119,6 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	} catch(Exception &e) {
 		od->error(e.message());
 	}
-
-	delete[](data);
 
 	if (f)
 		FileClose(f);

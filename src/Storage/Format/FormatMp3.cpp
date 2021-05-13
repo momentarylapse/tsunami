@@ -65,8 +65,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 		while(true) {
 			int pos0 = f->get_pos();
-			data.resize(4);
-			f->read_buffer(data);
+			data = f->read_buffer(4);
 			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)) {
 				msg_write("== mp3-header ==");
 				const int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
@@ -86,7 +85,6 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 				if (error_correction)
 					f->read_word();
-					//f->read_buffer(data, 2);
 				if (mode == 3) {
 					// mono...
 				} else {
@@ -109,21 +107,18 @@ void FormatMp3::load_track(StorageOperationData *od) {
 						string key = data;
 						//if (key[0] != 0)
 						//	msg_write(key);
-						f->read_buffer(data);
+						data = f->read_buffer(3);
 						unsigned int _size = data[2] + (data[1] << 8) + (data[0] << 16);
 						//msg_write(_size);
 						r += 6 + _size;
 						if (_size < 1024) {
-							data.resize(_size);
-							f->read_buffer(data);
+							data = f->read_buffer(_size);
 						} else {
 							f->seek(_size);
 						}
 
 					} else if ((version == 3) or (version == 4)) {
-						data.resize(4);
-						f->read_buffer(data);
-						string key = data;
+						string key = f->read_buffer(4);
 						//if (key[0] != 0)
 						//	msg_write(key);
 						int _size;
@@ -135,8 +130,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 						//msg_write(_size);
 						r += 12 + _size;
 						if ((_size < 1024) and (_size > 0)) {
-							data.resize(_size);
-							f->read_buffer(data);
+							data = f->read_buffer(_size);
 							string val = string(&data[1], _size-1);
 							int type = data[0];
 							if (key == "COMM")
@@ -183,14 +177,9 @@ void FormatMp3::load_track(StorageOperationData *od) {
 		int bytes_offset = 0;
 		while (true) {
 			if (data.num < 4096*4) {
-				bytes temp;
-				temp.resize(4096*5 - data.num);
-				int size = f->read_buffer(temp);
+				bytes temp = f->read_buffer(4096*5 - data.num);
 				//msg_write(format("R  %d", size));
-				if (size > 0) {
-					temp.resize(size);
-					data += temp;
-				}
+				data += temp;
 				od->set((float)f->get_pos() / (float)f->get_size());
 			}
 

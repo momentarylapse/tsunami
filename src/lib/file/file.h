@@ -100,7 +100,7 @@ public:
 	// really low level
 	int _cdecl read_buffer(void *buffer, int size);
 	int _cdecl write_buffer(const void *buffer, int size);
-	int _cdecl read_buffer(bytes &data);
+	bytes _cdecl read_buffer(int size);
 	int _cdecl write_buffer(const bytes &data);
 	bytes read_complete();
 

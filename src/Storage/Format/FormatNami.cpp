@@ -387,8 +387,7 @@ public:
 			auto com = new AudioBuffer::Compressed;
 			com->codec = f->read_str();
 			int n = f->read_int();
-			com->data.resize(n);
-			f->read_buffer(com->data);
+			com->data = f->read_buffer(n);
 			cur_op(this)->session->storage->decompress(*me, com->codec, com->data);
 			me->compressed = com;
 			return;

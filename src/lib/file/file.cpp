@@ -378,20 +378,15 @@ void File::WriteFileFormatVersion(bool binary,int fvv)
 	write_word(fvv);
 }
 
-#define CHUNK_SIYE		2048
+#define CHUNK_SIZE		2048
 
 // read the complete file into the buffer
 bytes File::read_complete() {
-	bytes buf;
-	bytes chunk;
-	chunk.resize(CHUNK_SIYE);
-	int t_len = CHUNK_SIYE;
-	while (t_len > 0) {
-		t_len = read_buffer(chunk);
-
-		if (t_len > 0)
-			buf += bytes(chunk.data, t_len);
-	}
+	bytes buf, chunk;
+	do {
+		chunk = read_buffer(CHUNK_SIZE);
+		buf += chunk;
+	} while (chunk.num > 0);
 	return buf;
 }
 
@@ -413,8 +408,14 @@ int File::write_buffer(const void *buffer, int size) {
 	return r;
 }
 
-int File::read_buffer(bytes &data) {
-	return read_buffer(data.data, data.num);
+bytes File::read_buffer(int size) {
+	bytes data;
+	data.resize(size);
+	int len = read_buffer(data.data, data.num);
+	if (len < 0)
+		return bytes();
+	data.resize(len);
+	return data;
 }
 
 int File::write_buffer(const bytes &data) {

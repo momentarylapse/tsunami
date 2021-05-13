@@ -134,7 +134,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 							string val = string(&data[1], _size-1);
 							int type = data[0];
 							if (key == "COMM")
-								val = val.substr(3, -1);
+								val = val.sub(3);
 							if ((type == 1) or (type == 2))
 								val = val.utf16_to_utf8();
 							else if (type == 0)

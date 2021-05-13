@@ -24,9 +24,8 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 	event("add_first", [=]{ on_add_first(); });
 }
 
-void TuningDialog::update()
-{
-	for (int i=tuning.num; i<gui_num_strings; i++){
+void TuningDialog::update() {
+	for (int i=tuning.num; i<gui_num_strings; i++) {
 		string id = format("string%d", i);
 		remove_control(id);
 		remove_control(id + "_label");
@@ -36,9 +35,9 @@ void TuningDialog::update()
 	remove_control("add_first");
 
 	set_target("td_g_tuning");
-	foreachi(int t, tuning, i){
+	foreachi(int t, tuning, i) {
 		string id = format("string%d", i);
-		if (i >= gui_num_strings){
+		if (i >= gui_num_strings) {
 			add_label(i2s(i+1), 0, 100 - i, id + "_label");
 			add_combo_box("", 1, 100 - i, id);
 			add_button("", 2, 100 - i, "delete_" + id);
@@ -55,7 +54,7 @@ void TuningDialog::update()
 		}
 		set_int(id, MAX_PITCH - 1 - t);
 	}
-	if (tuning.num == 0){
+	if (tuning.num == 0) {
 		add_button("", 0, 0, "add_first");
 		set_image("add_first", "hui:add");
 	}
@@ -63,42 +62,37 @@ void TuningDialog::update()
 	gui_num_strings = tuning.num;
 }
 
-void TuningDialog::on_ok()
-{
+void TuningDialog::on_ok() {
 	Instrument i = track->instrument;
 	i.string_pitch = tuning;
 	track->set_instrument(i);
 	request_destroy();
 }
 
-void TuningDialog::on_edit()
-{
+void TuningDialog::on_edit() {
 	string id = hui::GetEvent()->id;
-	int n = id.substr(6, -1)._int();
+	int n = id.sub(6)._int();
 	int p = MAX_PITCH - 1 - get_int(id);
 	tuning[n] = p;
 }
 
-void TuningDialog::on_delete()
-{
+void TuningDialog::on_delete() {
 	string id = hui::GetEvent()->id;
-	int n = id.substr(7+6, -1)._int();
+	int n = id.sub(7+6)._int();
 	tuning.erase(n);
 
 	hui::RunLater(0.001f, [=]{ update(); });
 }
 
-void TuningDialog::on_add()
-{
+void TuningDialog::on_add() {
 	string id = hui::GetEvent()->id;
-	int n = id.substr(4+6, -1)._int();
+	int n = id.sub(4+6)._int();
 	tuning.insert(tuning[n], n);
 
 	hui::RunLater(0.001f, [=]{ update(); });
 }
 
-void TuningDialog::on_add_first()
-{
+void TuningDialog::on_add_first() {
 	tuning.add(69);
 
 	hui::RunLater(0.001f, [=]{ update(); });

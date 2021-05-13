@@ -81,7 +81,7 @@ void CaptureConsoleModeMulti::allow_change_device(bool allow) {
 }
 
 void CaptureConsoleModeMulti::on_source() {
-	int index = hui::GetEvent()->id.substr(7, -1)._int();
+	int index = hui::GetEvent()->id.sub(7)._int();
 	if (index < 0 or index >= items().num)
 		return;
 	int n = cc->get_int("");

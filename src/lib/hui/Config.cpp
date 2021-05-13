@@ -81,9 +81,9 @@ bool Configuration::has(const string& name) const {
 static string _parse_value(const string &s) {
 	string r = s.trim();
 	if (r.head(1) == "\"" and r.tail(1) == "\"")
-		return r.substr(1, r.num-2).unescape();
+		return r.sub(1, -1).unescape();
 	if (r.head(1) == "\'" and r.tail(1) == "\'")
-		return r.substr(1, r.num-2).replace("\\\'", "\'");
+		return r.sub(1, -1).replace("\\\'", "\'");
 	return r;
 }
 
@@ -98,7 +98,7 @@ bool Configuration::load(const Path &filename) {
 			int num = f->read_int();
 			for (int i=0;i<num;i++) {
 				string temp = f->read_str();
-				string key = temp.substr(3, temp.num - 3);
+				string key = temp.sub(3);
 				string value = f->read_str();
 				map.set(key, value);
 			}
@@ -109,7 +109,7 @@ bool Configuration::load(const Path &filename) {
 				string temp = f->read_str();
 				if (temp == "#")
 					break;
-				string key = temp.substr(3, temp.num - 3).lower().replace(" ", "-");
+				string key = temp.sub(3).lower().replace(" ", "-");
 				string value = f->read_str();
 				map.set(key, value);
 			}
@@ -126,7 +126,7 @@ bool Configuration::load(const Path &filename) {
 				}
 				int p = s.find("=");
 				if (p >= 0) {
-					map.set(s.head(p).replace(" ", ""), _parse_value(s.substr(p+1, -1)));
+					map.set(s.head(p).replace(" ", ""), _parse_value(s.sub(p+1)));
 				}
 			}
 		}

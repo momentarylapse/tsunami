@@ -438,7 +438,7 @@ void import_includes(Script *s) {
 
 void Script::link_functions() {
 	for (Asm::WantedLabel &l: functions_to_link) {
-		string name = l.name.substr(10, -1);
+		string name = l.name.sub(10);
 		bool found = false;
 		for (Function *f: syntax->functions)
 			if (f->name == name) {
@@ -518,7 +518,7 @@ void parse_magic_linker_string(SyntaxTree *s) {
 					continue;
 				if (x[0] == '\t') {
 					if (d and x.find(":")) {
-						auto y = x.substr(1, -1).explode(":");
+						auto y = x.sub(1).explode(":");
 						link_external(y[0], d->get_symbol(y[1], s->script));
 					}
 				} else {

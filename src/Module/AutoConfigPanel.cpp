@@ -30,9 +30,9 @@ string to_camel_case(const string &s) {
 			continue;
 		} else {
 			if (next_upper)
-				r += s.substr(i, 1).upper();
+				r += s.sub(i, i+1).upper();
 			else
-				r += s.substr(i, 1);
+				r += s.sub(i, i+1);
 			next_upper = false;
 		}
 	}

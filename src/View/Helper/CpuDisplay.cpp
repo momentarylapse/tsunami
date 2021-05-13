@@ -126,7 +126,7 @@ string channel_title(PerfChannelInfo &c) {
 			return l->layer->track->nice_name() + format(" v%d", l->layer->version_number()+1);
 	}
 	if (c.name.head(3) == "se:")
-		return c.name.substr(3, -1);
+		return c.name.sub(3);
 	return c.name;
 }
 

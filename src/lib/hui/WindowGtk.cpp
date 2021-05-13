@@ -457,7 +457,7 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 	string id = "default";
 	for (string &o: options)
 		if (o.head(3) == "id=")
-			id = o.substr(3, -1);
+			id = o.sub(3);
 
 	auto infobar = _get_info_bar(id);
 

@@ -158,7 +158,7 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 	string by = _by;
 	bool reverse = false;
 	if (_by.head(1) == "-") {
-		by = by.substr(1,-1);
+		by = by.sub(1);
 		reverse = true;
 	}
 

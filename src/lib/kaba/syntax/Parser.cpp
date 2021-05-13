@@ -164,9 +164,9 @@ void Parser::get_constant_value(const string &str, Value &value) {
 	if (value.type == TypeChar) {
 		value.as_int() = str.unescape()[1];
 	} else if (value.type == TypeString) {
-		value.as_string() = str.substr(1, -2).unescape();
+		value.as_string() = str.sub(1, -1).unescape();
 	} else if (value.type == TypeCString) {
-		strcpy((char*)value.p(), str.substr(1, -2).unescape().c_str());
+		strcpy((char*)value.p(), str.sub(1, -1).unescape().c_str());
 	} else if (value.type == TypeInt) {
 		value.as_int() = (int)s2i2(str);
 	} else if (value.type == TypeInt64) {
@@ -1043,7 +1043,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 		int pe = (p0 < 0) ? s.num : p0;
 		if (pe > pos) {
 			auto *c = tree->add_constant(TypeString);
-			c->as_string() = s.substr(pos, pe-pos);
+			c->as_string() = s.sub(pos, pe);
 			parts.add(tree->add_node_const(c));
 		}
 		if (p0 < 0)
@@ -1053,13 +1053,13 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 		if (p1 < 0)
 			do_error("string interpolation '{{' not ending with '}}'");
 			
-		string xx = s.substr(p0+2, p1 - p0 - 2);
+		string xx = s.sub(p0+2, p1);
 
 		// "expr|format" ?
 		string fmt;
 		int pp = xx.find("|");
 		if (pp >= 0) {
-			fmt = xx.substr(pp + 1, -1);
+			fmt = xx.sub(pp + 1);
 			xx = xx.head(pp);
 		}
 
@@ -2863,7 +2863,7 @@ Path find_import(Script *s, const string &_name) {
 	name = name.replace(".", "/") + ".kaba";
 
 	if (name.head(2) == "@/")
-		return find_installed_lib_import(name.substr(2, -1));
+		return find_installed_lib_import(name.sub(2));
 
 	for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
 		Path filename = import_dir_match((s->filename.parent() << string("../").repeat(i)).canonical(), name);
@@ -2893,7 +2893,7 @@ void Parser::parse_import() {
 	}
 	
 	if (name.match("\"*\""))
-		name = name.substr(1, name.num - 2); // remove ""
+		name = name.sub(1, -1); // remove ""
 		
 	
 	// internal packages?

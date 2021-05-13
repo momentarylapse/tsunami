@@ -129,7 +129,7 @@ string GetLanguageR(const string &ns, Resource &cmd) {
 
 	if (cmd.options.num > 0) {
 		if (cmd.title.head(1) == "!")
-			return "!" + implode(cmd.options, ",") + "," + cmd.title.substr(1, -1);
+			return "!" + implode(cmd.options, ",") + "," + cmd.title.sub(1);
 		else
 			return pre + cmd.title;
 	}

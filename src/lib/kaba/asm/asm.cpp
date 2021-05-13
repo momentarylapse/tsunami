@@ -989,7 +989,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			printf("deref:   ");
 		so("Deref:");
 		//bool u16 = use_mode16;
-		GetParam(p, param.substr(1, -2), list, pn);
+		GetParam(p, param.sub(1, -1), list, pn);
 		p.size = SIZE_UNKNOWN;
 		p.deref = true;
 		//use_mode16 = u16;
@@ -999,7 +999,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		if (DebugAsm)
 			printf("String:   ");
 		char *ps = new char[param.num - 1];
-		strcpy(ps, param.substr(1, -2).c_str());
+		strcpy(ps, param.sub(1, -1).c_str());
 		p.value = (int_p)ps;
 		p.type = ParamType::IMMEDIATE;
 
@@ -1032,7 +1032,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				offset = i;
 				break;
 			}
-		part = param.substr(offset, -1);
+		part = param.sub(offset);
 		GetParam(sub, part, list, pn);
 		if (sub.type == ParamType::IMMEDIATE) {
 			//msg_write("c2 = im");

@@ -87,7 +87,7 @@ void declare_class_size(const string &class_name, int size) {
 
 void split_namespace(const string &name, string &class_name, string &element) {
 	int p = name.rfind(".");
-	class_name = name.substr(0, p);
+	class_name = name.sub(0, p);
 	element = name.tail(name.num - p - 1);
 }
 

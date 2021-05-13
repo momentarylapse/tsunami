@@ -26,12 +26,12 @@ bool split_num_string(const string &n, string &out, int &after) {
 		return false;
 	if (n[1] >= '0' and n[1] <= '9') {
 		int num = n.head(2)._int();
-		out = n.substr(2, num);
+		out = n.sub(2, 2 + num);
 		after = num + 2;
 		return true;
 	}
 	int num = n.head(1)._int();
-	out = n.substr(1, num);
+	out = n.sub(1, 1+num);
 	after = num + 1;
 	return true;
 }
@@ -45,7 +45,7 @@ string printify(const string &n) {
 		if (n[after] == 'I') {
 			int after2;
 			string out2;
-			if (!split_num_string(n.substr(after+1, -1),  out2, after2))
+			if (!split_num_string(n.sub(after+1),  out2, after2))
 				return n + format("----a %d", after);
 			return out + "<" + out2 + ">";
 		} else {

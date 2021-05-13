@@ -138,7 +138,7 @@ public:
 				string id = format("c-%d:%d", o, i);
 				add_radio_button("", 1+i, 1+o, id);
 				event(id, [&] {
-					auto xx = hui::GetEvent()->id.substr(2, -1).explode(":");
+					auto xx = hui::GetEvent()->id.sub(2).explode(":");
 					int oo = xx[0]._int();
 					int ii = xx[1]._int();
 					map[oo] = ii;

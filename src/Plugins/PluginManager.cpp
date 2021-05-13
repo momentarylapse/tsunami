@@ -790,7 +790,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf) {
 		string content = FileRead(pf.filename);
 		int p = content.find("// Image = hui:");
 		if (p >= 0)
-			pf.image = content.substr(p + 11, content.find("\n") - p - 11);
+			pf.image = content.sub(p + 11, content.find("\n"));
 	} catch(...) {}
 }
 

@@ -89,7 +89,6 @@ class string : public bytes {
 	int _cdecl find(const string &s, int start = 0) const;
 	int _cdecl rfind(const string &s, int start = -1) const;
 	bool has_char(char c) const;
-	string _cdecl substr(int start, int length) const;
 	string _cdecl sub(int start, int end = MAGIC_END_INDEX) const;
 	string _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const;
 	string _cdecl head(int size) const;

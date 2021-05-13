@@ -242,12 +242,6 @@ bytes bytes::repeat(int n) const {
 
 bytes _cdecl bytes::sub_ref(int start, int end) const {
 	return sub_ref_as<bytes>(start, end);
-	/*bytes r;
-	if ((size < 0) or (size > num - start))
-		size = num - start;
-	r.num = size;
-	r.data = this->data + start;
-	return r;*/
 }
 
 bytes _cdecl bytes::sub(int start, int end) const {
@@ -297,42 +291,16 @@ bool string::operator == (const string &s) const {
 	return compare(s) == 0;
 }
 
-string string::substr(int start, int length) const {
-	string r;
-	if (start >= num)
-		return r;
-	if (start < 0) {
-		// start from the end
-		start = num + start;
-		if (start < 0)
-			return r;
-	}
-	if (length < 0) {
-		length = num - start + length + 1;
-	}
-	if (start + length > num)
-		length = num - start;
-	if (length > 0) {
-		r.resize(length);
-		memcpy(r.data, &((unsigned char*)data)[start], length);
-	}
-	return r;
-}
-
 string string::sub_ref(int start, int end) const {
-
-
-	//printf("sub....(%d)   %d %d ", num, start, end);
-	if (start < 0)
+	/*if (start < 0)
 		start += num;
 	if (end == MAGIC_END_INDEX)
 		end = num;
-	if (end < 0)
+	else if (end < 0)
 		end += num;
 	int new_num = 0;
 	if (end >= start)
-		new_num = end - start;
-	//printf(">> %d %d   %d\n", start, end, new_num);
+		new_num = end - start;*/
 
 	return sub_ref_as<string>(start, end);
 }
@@ -351,10 +319,10 @@ string string::head(int size) const {
 }
 
 string string::tail(int size) const {
-	//if (size == 0)
-	//	return "";
+	if (size == 0)
+		return "";
 	size = min(size, num);
-	return substr(num - size, size);
+	return sub(- size);
 }
 
 int string::find(const string &s, int start) const {

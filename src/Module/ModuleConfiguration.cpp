@@ -93,14 +93,14 @@ string get_next(const string &var_temp, int &pos) {
 				i ++;
 			} else if (var_temp[i] == '"') {
 				pos = i + 1;
-				return var_temp.substr(start + 1, i - start - 1).unescape();
+				return var_temp.sub(start + 1, i).unescape();
 			}
 		} else if ((var_temp[i] == ' ') or (var_temp[i] == ']') or (var_temp[i] == ')') or (var_temp[i] == '[') or (var_temp[i] == '(')) {
 			pos = i;
-			return var_temp.substr(start, i - start);
+			return var_temp.sub(start, i);
 		}
 	}
-	return var_temp.substr(start, -1);
+	return var_temp.sub(start);
 }
 
 void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
@@ -197,7 +197,7 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		if (a.is_string()) {
 			string ss = a.str();
 			if ((ss.head(7) == "sample:") and session->song) {
-				int uid = h2i(ss.substr(7,-1));
+				int uid = h2i(ss.sub(7));
 				auto s = session->song->get_sample_by_uid(uid);
 				if (s)
 					*(shared<SampleRef>*)v = s->create_ref();

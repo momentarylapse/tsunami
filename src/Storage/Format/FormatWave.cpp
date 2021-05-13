@@ -202,11 +202,11 @@ void FormatWave::load_track(StorageOperationData *od) {
 						offset ++;
 						continue;
 					}
-					string key = buf.substr(offset, 4);
-					int length = *(int*)buf.substr(offset + 4, 4).data;
+					string key = buf.sub(offset, offset + 4);
+					int length = *(int*)buf.sub(offset + 4, offset + 8).data;
 					if (offset + 8 + length > buf.num)
 						break;
-					string value = buf.substr(offset + 8, length - 1);
+					string value = buf.sub(offset + 8, offset + 8 + length - 1);
 					//msg_write(key + " : " + value.hex() + " - " + value);
 					offset += 8 + length;
 

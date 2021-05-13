@@ -29,9 +29,9 @@ const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 string guess_nice_module_name(const string &_class) {
 	if (_class.head(5) == "Audio")
-		return _class.substr(5, -1);
+		return _class.sub(5);
 	if (_class.head(4) == "Midi")
-		return _class.substr(4, -1);
+		return _class.sub(4);
 	return _class;
 }
 

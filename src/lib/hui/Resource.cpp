@@ -28,7 +28,7 @@ string Resource::value(const string &key, const string &fallback) {
 	int n = key.num + 1;
 	for (string &o: options)
 		if (o.head(n) == key+"=")
-			return o.substr(n, -1);
+			return o.sub(n);
 	return fallback;
 }
 
@@ -237,7 +237,7 @@ int res_get_indent(const string &line) {
 
 void res_add_option(Resource &c, const string &option) {
 	if (option.head(8) == "tooltip=") {
-		c.tooltip = option.substr(8, -1);
+		c.tooltip = option.sub(8);
 		return;
 	}
 	c.options.add(option);
@@ -259,7 +259,7 @@ bool res_load_line(const string &l, Resource &c, bool literally) {
 	if ((id == "?") and !literally)
 		id = "rand_id:" + i2s(randi(1000000));
 	if (id.head(1) == "/" and !literally)
-		id = id.substr(1, -1);
+		id = id.sub(1);
 
 	// dummy
 	if (tokens[0] == ".")

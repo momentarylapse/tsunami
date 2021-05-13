@@ -83,7 +83,7 @@ void Toolbar::from_resource(Resource *res) {
 			bool ok = false;
 			for (string &o: cmd.options)
 				if (o.find("menu=") == 0) {
-					add_menu_by_id(title, cmd.image(), o.substr(5, -1), cmd.id);
+					add_menu_by_id(title, cmd.image(), o.sub(5), cmd.id);
 					item.back()->set_tooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 					ok = true;
 				}

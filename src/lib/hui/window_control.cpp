@@ -76,7 +76,7 @@ string get_option_from_title(const string &title) {
 	auto r = title.explode(ComboBoxSeparator);
 	if (r.num > 0)
 		if (r[0].head(1) == "!")
-			return r[0].substr(1, -1);
+			return r[0].sub(1);
 	return "";
 
 }
@@ -90,7 +90,7 @@ string option_value(const string &options, const string &key) {
 		int p = x.find("=", 0);
 		if (p >= 0)
 			if (x.head(p) == key)
-				return x.substr(p + 1, -1);
+				return x.sub(p + 1);
 	}
 	return "";
 }

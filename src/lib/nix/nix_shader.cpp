@@ -97,7 +97,7 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 		if (pos1 < 0)
 			break;
 
-		string tag = source.substr(pos0 + 1, pos1 - pos0 - 1);
+		string tag = source.sub(pos0 + 1, pos1);
 		if ((tag.num > 64) or (tag.find("<") >= 0))
 			continue;
 
@@ -105,7 +105,7 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 		if (pos2 < 0)
 			continue;
 		ShaderSourcePart p;
-		p.source = source.substr(pos1 + 1, pos2 - pos1 - 1);
+		p.source = source.sub(pos1 + 1, pos2);
 		pos = pos2 + tag.num + 3;
 		if (tag == "VertexShader") {
 			p.type = GL_VERTEX_SHADER;
@@ -141,7 +141,7 @@ string get_inside_of_tag(const string &source, const string &tag) {
 	int pos1 = source.find("</" + tag + ">", pos0);
 	if (pos1 < 0)
 		return "";
-	return source.substr(pos0, pos1 - pos0);
+	return source.sub(pos0, pos1);
 }
 
 string expand_shader_source(const string &source, ShaderMetaData &meta) {
@@ -151,14 +151,14 @@ string expand_shader_source(const string &source, ShaderMetaData &meta) {
 		if (p < 0)
 			break;
 		int p2 = r.find("\n", p);
-		string imp = r.substr(p + 7, p2 - p - 7).replace(" ", "");
+		string imp = r.sub(p + 7, p2).replace(" ", "");
 		//msg_error("import '" + imp + "'");
 
 		bool found = false;
 		for (auto &m: shader_modules)
 			if (m.meta.name == imp) {
 				//msg_error("FOUND");
-				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.substr(p2, -1);
+				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.sub(p2);
 				found = true;
 			}
 		if (!found)

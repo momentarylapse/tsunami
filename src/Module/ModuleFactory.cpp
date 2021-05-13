@@ -112,7 +112,7 @@ void _extract_subtype_and_config(ModuleCategory type, const string &s, string &s
 	int pp = s.find(":");
 	if (pp >= 0) {
 		subtype = s.head(pp);
-		config = s.substr(pp + 1, -1);
+		config = s.sub(pp + 1);
 	}
 	if ((type == ModuleCategory::SYNTHESIZER) and (subtype == ""))
 		subtype = "Dummy";

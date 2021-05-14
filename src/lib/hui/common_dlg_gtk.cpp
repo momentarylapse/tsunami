@@ -184,7 +184,7 @@ void InfoBox(Window *win,const string &title,const string &text) {
 
 void ErrorBox(Window *win,const string &title,const string &text) {
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg=gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text));
+	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text));
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_window_resize(GTK_WINDOW(dlg), 300, 100);
 	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
@@ -193,15 +193,23 @@ void ErrorBox(Window *win,const string &title,const string &text) {
 	gtk_widget_destroy(dlg);
 }
 
-Array<char*> sa2ca_nt(const Array<string> &a) {
+static Array<char*> sa2ca_nt(const Array<string> &a) {
 	Array<char*> _a_;
-	for (string &s: a) {
-		char *p = new char[s.num + 1];
-		strcpy(p, s.c_str());
-		_a_.add(p);
-	}
+	for (string &s: a)
+		if (a.num > 0) {
+			char *p = new char[s.num + 1];
+			strcpy(p, s.c_str());
+			_a_.add(p);
+		}
 	_a_.add(nullptr);
 	return _a_;
+}
+
+static void ca_free(Array<char*> &a) {
+	for (char *aa: a)
+		if (aa)
+			delete[] aa;
+	a.clear();
 }
 
 void AboutBox(Window *win) {
@@ -211,24 +219,37 @@ void AboutBox(Window *win) {
 			Application::set_property("license", FileRead(Application::directory_static << "license_small.txt"));
 
 	// author list
-	auto authors = Application::get_property("author").explode(";");
-	auto _a_ = sa2ca_nt(authors);
+	auto authors = sa2ca_nt(Application::get_property("author").explode(";"));
+	auto artists = sa2ca_nt(Application::get_property("artist").explode(";"));
+	auto designers = sa2ca_nt(Application::get_property("designer").explode(";"));
+	auto documenters = sa2ca_nt(Application::get_property("documenter").explode(";"));
+	auto translators = sa2ca_nt(Application::get_property("translator").explode(";"));
 
 	GError *error = nullptr;
 	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(Application::get_property("logo").c_str(), &error);
-	gtk_show_about_dialog(get_window_save(win),
-		"program-name", Application::get_property("name").c_str(),
-		"website", Application::get_property("website").c_str(),
-		"version", Application::get_property("version").c_str(),
-		"license", Application::get_property("license").c_str(),
-		"comments", sys_str(Application::get_property("comment").c_str()),
-		"authors", _a_.data,
-		"logo", _logo,
-		"copyright", Application::get_property("copyright").c_str(),
-		nullptr);
+	auto dlg = gtk_about_dialog_new();
+	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dlg), Application::get_property("name").c_str());
+	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dlg), Application::get_property("version").c_str());
+	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dlg), Application::get_property("comment").c_str());
+	gtk_about_dialog_set_license(GTK_ABOUT_DIALOG(dlg), Application::get_property("license").c_str());
+	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dlg), Application::get_property("website").c_str());
+	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), _logo);
+	gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dlg), (const char**)authors.data);
+	if (designers.num > 1)
+		gtk_about_dialog_add_credit_section(GTK_ABOUT_DIALOG(dlg), "Designed by", (const char**)designers.data);
+	if (documenters.num > 1)
+		gtk_about_dialog_set_documenters(GTK_ABOUT_DIALOG(dlg), (const char**)documenters.data);
+	//if (translators.num > 0)
+	//gtk_about_dialog_set_translator_credits(GTK_ABOUT_DIALOG(dlg), "no one :P");//(const char**)translators.data);
+	gtk_window_set_transient_for(GTK_WINDOW(dlg), GTK_WINDOW(win->window));
+	gtk_dialog_run(GTK_DIALOG(dlg));
+	gtk_widget_destroy(dlg);
 
-	for (char *aa: _a_)
-		delete(aa);
+	ca_free(authors);
+	ca_free(artists);
+	ca_free(designers);
+	ca_free(documenters);
+	ca_free(translators);
 }
 
 };

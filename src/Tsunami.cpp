@@ -66,7 +66,9 @@ Tsunami::Tsunami() :
 	set_property("comment", _("Editor for audio files"));
 	set_property("website", "http://michi.is-a-geek.org/software");
 	set_property("copyright", "© 2007-2021 by Michael Ankele");
-	set_property("author", "Michael Ankele <michi@lupina.de>");
+	set_property("author", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
+	//set_property("designer", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
+	set_property("documenter", "no one :P");
 }
 
 Tsunami::~Tsunami() {

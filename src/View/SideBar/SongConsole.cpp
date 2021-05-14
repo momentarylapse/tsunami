@@ -49,7 +49,12 @@ SongConsole::SongConsole(Session *session) :
 	event("tag-add", [=]{ on_tag_add(); });
 	event("tag-delete", [=]{ on_tag_delete(); });
 
-	event("edit_samples", [=]{ on_edit_samples(); });
+	event("edit_track", [=] {
+		session->set_mode(EditMode::DefaultTrack);
+	});
+	event("edit_samples", [=] {
+		session->set_mode(EditMode::DefaultSamples);
+	});
 
 	song->subscribe(this, [=]{ on_update(); });
 }
@@ -115,10 +120,6 @@ void SongConsole::on_tag_delete() {
 	int s = get_int("tags");
 	if (s >= 0)
 		song->delete_tag(s);
-}
-
-void SongConsole::on_edit_samples() {
-	session->set_mode(EditMode::DefaultSamples);
 }
 
 void SongConsole::on_update() {

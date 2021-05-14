@@ -29,9 +29,16 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	event("mute", [=]{ on_mute(); });
 	event("track", [=]{ on_track(); });
 
-	event("edit_song", [=]{ on_edit_song(); });
-	event("edit_track", [=]{ on_edit_track(); });
-	event("edit_sample", [=]{ on_edit_sample(); });
+	event("edit_song", [=] {
+		session->set_mode(EditMode::DefaultSong);
+	});
+	event("edit_track", [=] {
+		session->set_mode(EditMode::DefaultTrack);
+	});
+	event("edit_samples", [=] {
+		bar()->sample_manager->set_selection({sample->origin.get()});
+		session->set_mode(EditMode::DefaultSamples);
+	});
 
 	view->subscribe(this, [=]{ on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
@@ -67,19 +74,6 @@ void SampleRefConsole::on_volume() {
 	sample->unsubscribe(this);
 	layer->edit_sample_ref(sample, db2amplitude(get_float("")), sample->muted);
 	sample->subscribe(this, [=]{ on_update(); });
-}
-
-void SampleRefConsole::on_edit_song() {
-	session->set_mode(EditMode::DefaultSong);
-}
-
-void SampleRefConsole::on_edit_track() {
-	session->set_mode(EditMode::DefaultTrack);
-}
-
-void SampleRefConsole::on_edit_sample() {
-	bar()->sample_manager->set_selection({sample->origin.get()});
-	session->set_mode(EditMode::DefaultSamples);
 }
 
 void SampleRefConsole::load_data() {

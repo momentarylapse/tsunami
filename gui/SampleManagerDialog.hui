@@ -4,3 +4,5 @@ Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 		Group group-edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit_samples "Samples" link ignorefocus disabled

@@ -27,8 +27,6 @@ public:
 	void on_tag_add();
 	void on_tag_delete();
 
-	void on_edit_samples();
-
 	void on_update();
 	
 	hui::Menu *menu_tags;

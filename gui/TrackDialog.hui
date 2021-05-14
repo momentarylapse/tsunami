@@ -35,6 +35,9 @@ Dialog track_dialog "Spur" width=380 height=516
 		Group td_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit_track "Track" link ignorefocus disabled
+				Label /edit-separator "›" disabled
 				Button /edit_fx "Fx" link ignorefocus
 				Button /edit_synth "Synth" link ignorefocus
 				Button /edit_midi "Midi" link ignorefocus

@@ -9,6 +9,7 @@
 #include "../AudioView.h"
 #include "../Mode/ViewModeCurve.h"
 #include "../Mode/ViewModeDefault.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/Curve.h"
@@ -31,9 +32,21 @@ CurveConsole::CurveConsole(Session *session) :
 	event_x(id_list, "hui:select", [=]{ on_list_select(); });
 	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
-	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
-	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
-	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultTrackFx); });
+	event("edit_song", [=] {
+		session->set_mode(EditMode::DefaultSong);
+	});
+	event("edit_track", [=] {
+		session->set_mode(EditMode::DefaultTrack);
+	});
+	event("edit_fx", [=] {
+		session->set_mode(EditMode::DefaultTrackFx);
+	});
+	event("edit_synth", [=] {
+		session->set_mode(EditMode::DefaultTrackSynth);
+	});
+	event("edit_midi", [=] {
+		session->set_mode(EditMode::EditTrack);
+	});
 
 }
 
@@ -55,6 +68,8 @@ void CurveConsole::on_enter() {
 	view->mode_curve->set_curve_target("");
 	update_list();
 	auto t = track();
+	enable("edit_synth", t->type == SignalType::MIDI);
+	enable("edit_midi", t->type == SignalType::MIDI);
 	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
 	t->subscribe(this, [=]{ on_update(); }, t->MESSAGE_ADD_CURVE);
 	t->subscribe(this, [=]{ on_update(); }, t->MESSAGE_DELETE_CURVE);

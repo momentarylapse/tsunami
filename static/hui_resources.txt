@@ -634,23 +634,53 @@ Grid
 
 0
 0
-3
+8
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
+Label
+edit-separator
+disabled
+1
+0
+0
 Button
 edit_track
 link,ignorefocus
-1
+2
+0
+0
+Label
+edit-separator
+disabled
+3
 0
 0
 Button
 edit_fx
 link,ignorefocus
-2
+4
+0
+0
+Button
+edit_synth
+link,ignorefocus
+5
+0
+0
+Button
+edit_midi
+link,ignorefocus
+6
+0
+0
+Button
+edit_curves
+link,ignorefocus,disabled
+7
 0
 0
 # Resource
@@ -2502,23 +2532,53 @@ Grid
 
 0
 0
-3
+8
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
-Button
-edit_track
-link,ignorefocus
+Label
+edit-separator
+disabled
 1
 0
 0
 Button
-edit_midi_fx
+edit_track
 link,ignorefocus
 2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
+Button
+edit_fx
+link,ignorefocus
+4
+0
+0
+Button
+edit_synth
+link,ignorefocus
+5
+0
+0
+Button
+edit_midi
+link,ignorefocus,disabled
+6
+0
+0
+Button
+edit_curves
+link,ignorefocus
+7
 0
 0
 # Resource
@@ -6023,11 +6083,23 @@ Grid
 
 0
 0
-1
+3
 Button
 edit_song
 link,ignorefocus
 0
+0
+0
+Label
+edit-separator
+disabled
+1
+0
+0
+Button
+edit_samples
+link,ignorefocus,disabled
+2
 0
 0
 # Resource
@@ -6114,23 +6186,41 @@ Grid
 
 0
 0
-3
+6
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
-Button
-edit_track
-link,ignorefocus
+Label
+edit-separator
+disabled
 1
 0
 0
 Button
-edit_sample
+edit_samples
 link,ignorefocus
 2
+0
+0
+Button
+edit_track
+link,ignorefocus
+3
+0
+0
+Label
+edit-separator
+disabled
+4
+0
+0
+Button
+edit_sample
+link,ignorefocus,disabled
+5
 0
 0
 # Resource
@@ -6676,11 +6766,29 @@ Grid
 
 0
 0
+4
+Button
+edit_song
+link,ignorefocus,disabled
+0
+0
+0
+Label
+edit-separator
+disabled
 1
+0
+0
+Button
+edit_track
+link,ignorefocus
+2
+0
+0
 Button
 edit_samples
 link,ignorefocus
-0
+3
 0
 0
 # Resource
@@ -7100,35 +7208,53 @@ Grid
 
 0
 0
-5
+8
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
+Label
+edit-separator
+disabled
+1
+0
+0
+Button
+edit_track
+link,ignorefocus,disabled
+2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
 Button
 edit_fx
 link,ignorefocus
-1
+4
 0
 0
 Button
 edit_synth
 link,ignorefocus
-2
+5
 0
 0
 Button
 edit_midi
 link,ignorefocus
-3
+6
 0
 0
 Button
 edit_curves
 link,ignorefocus
-4
+7
 0
 0
 # Resource
@@ -7410,7 +7536,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-624
+625
 # Text
 /bars-add
 Add bars...
@@ -7475,6 +7601,9 @@ Remove (missing)
 /device-hide
 Ignore
 
+/edit-separator
+›
+
 /edit_curves
 Curves
 
@@ -7484,8 +7613,8 @@ Fx
 /edit_midi
 Midi
 
-/edit_midi_fx
-Midi-Fx
+/edit_sample
+Sample
 
 /edit_samples
 Samples
@@ -8930,8 +9059,8 @@ Preview\\Duration\\Name\\Usage
 sample-manager-dialog/sample-manager-dialog
 Sample Manager
 
-sample_ref_dialog/edit_sample
-Sample
+sample_ref_dialog/edit_samples
+Samples
 
 sample_ref_dialog/ld_t_edit
 Edit

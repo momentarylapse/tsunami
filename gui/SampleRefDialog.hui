@@ -13,6 +13,9 @@ Dialog sample_ref_dialog "Sample" width=375 height=230
 		Group ld_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button edit_samples "Samples" link ignorefocus
 				Button /edit_track "Track" link ignorefocus
-				Button edit_sample "Sample" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit_sample "Sample" link ignorefocus disabled
 

@@ -26,10 +26,6 @@ public:
 	void on_track();
 	void on_volume();
 
-	void on_edit_song();
-	void on_edit_track();
-	void on_edit_sample();
-
 	void on_view_cur_sample_change();
 	void on_update();
 

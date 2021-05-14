@@ -26,4 +26,7 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 					ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre" noexpandy height=200
 		Group ad_t_edit "Edit"
 			Grid ? ""
+				Button /edit_song "Song" link ignorefocus disabled
+				Label /edit-separator "›" disabled
+				Button /edit_track "Track" link ignorefocus
 				Button /edit_samples "Samples" link ignorefocus

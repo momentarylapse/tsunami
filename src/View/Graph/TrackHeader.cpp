@@ -20,6 +20,8 @@
 
 
 
+color hash_color(int h);
+
 
 
 
@@ -115,12 +117,23 @@ TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, AudioVie
 	add_child(new TrackButtonConfig(this, x0+dx*2, 22));
 }
 
+color group_color(const Track *group) {
+	int index = 0;
+	for (auto *t: weak(group->song->tracks))
+		if (t->type == SignalType::GROUP) {
+			if (t == group)
+				return hash_color(index * 5 + 10);
+			index ++;
+		}
+	return Black;
+}
+
 color TrackHeader::color_bg() {
 	auto *track = vtrack->track;
 	color col;
 	if (track->type == SignalType::GROUP) {
 		if (view->sel.has(track))
-			col = view->colors.blob_bg_alt_selected;
+			col = group_color(track);//view->colors.blob_bg_alt_selected;
 		else
 			col = view->colors.blob_bg_alt_hidden;
 	} else {
@@ -139,7 +152,7 @@ color TrackHeader::color_frame() {
 	color col;
 	if (track->type == SignalType::GROUP) {
 		if (view->sel.has(track))
-			col = view->colors.blob_bg_alt_selected;
+			col = group_color(track);//view->colors.blob_bg_alt_selected;
 		else
 			col = view->colors.blob_bg_alt;
 	} else {
@@ -182,8 +195,26 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
 }
 
+Array<const Track*> track_group_colors(Track *t) {
+	Array<const Track*> c;
+	if (t->type == SignalType::GROUP)
+		c.add(t);
+
+	if (t->send_target)
+		c.append(track_group_colors(t->send_target));
+	return c;
+}
+
 void TrackHeader::on_draw(Painter *c) {
 	auto *track = vtrack->track;
+
+	auto group_colors = track_group_colors(track);
+	foreachi (auto g, group_colors, i) {
+		c->set_color(group_color(g));//(gc));
+		float x = vtrack->area.x1 + 5*(group_colors.num - i - 1);
+		c->draw_rect(rect(x, x + 5, vtrack->area.y1, vtrack->area.y2));
+		//MidiPainter::pitch_color(track->send_target->nice_name().hash() % MAX_PITCH)
+	}
 
 	c->set_antialiasing(true);
 	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
@@ -207,11 +238,11 @@ void TrackHeader::on_draw(Painter *c) {
 	// icons
 	auto *icon = view->images.track_audio.get();
 	if (track->type == SignalType::BEATS)
-		icon = view->images.track_time.get(); // "⏱"
+		icon = view->images.track_time.get();
 	else if (track->type == SignalType::MIDI)
-		icon = view->images.track_midi.get(); // "♫"
+		icon = view->images.track_midi.get();
 	else if (track->type == SignalType::GROUP)
-		icon = view->images.track_group.get(); // "G"
+		icon = view->images.track_group.get();
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
 }
 

@@ -20,11 +20,15 @@
 #include "../../Module/ConfigPanel.h"
 #include "../../Module/SignalChain.h"
 #include "../../Session.h"
+#include "../../EditModes.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
 #include <math.h>
 
+
+Array<const Track*> track_group_colors(Track *t);
+color group_color(const Track *group);
 
 class TrackMixer: public hui::Panel {
 public:
@@ -55,11 +59,14 @@ public:
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 		add_string(vol_slider_id, format(u8"%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
+		event_xp(id_name, "hui:draw", [=] (Painter* p) { on_name_draw(p); });
+		event_x(id_name, "hui:left-button-down", [=] { on_name_left_click(); });
+		event_x(id_name, "hui:left-double-click", [=] { on_name_double_click(); });
 		event(vol_slider_id, [=]{ on_volume(); });
 		event(pan_slider_id, [=]{ on_panning(); });
 		event(mute_id, [=]{ on_mute(); });
 		event("solo", [=]{ on_solo(); });
-		event_xp("peaks", "hui:draw", [=](Painter* p){ on_peak_draw(p); });
+		event_xp("peaks", "hui:draw", [=] (Painter* p) { on_peak_draw(p); });
 		event("show-fx", [=]{ on_show_fx(is_checked("")); });
 
 		vtrack = t;
@@ -71,6 +78,70 @@ public:
 	~TrackMixer() {
 		fx_editor->select_module(nullptr);
 		clear_track();
+	}
+
+	void on_name_draw(Painter *p) {
+		auto t = track();
+		if (!t)
+			return;
+
+		auto view = console->view;
+		bool is_playable = view->get_playable_tracks().contains(track());
+
+
+
+		auto group_colors = track_group_colors(track());
+		if (group_colors.num > 0) {
+			color c = group_color(group_colors[0]);
+			if (t->type == SignalType::GROUP)
+				c = color::interpolate(c, view->colors.background, 0.2f);//0.4f);
+			else
+				c = color::interpolate(c, view->colors.background, 0.8f);
+			p->set_color(c);
+			p->draw_rect(rect(0, p->width, 0, p->height));
+		}
+		foreachi (auto g, group_colors, i) {
+			p->set_color(group_color(g));//(gc));
+			float y = 5*(group_colors.num - i - 1);
+			p->draw_rect(rect(0, p->width, y, y+5));
+			//MidiPainter::pitch_color(track->send_target->nice_name().hash() % MAX_PITCH)
+		}
+
+		//enable(id_name, is_playable);
+		string tt = nice_title();
+		if (is_playable) {
+			if (t->type == SignalType::GROUP)
+				p->set_color(view->colors.background);
+			else
+				p->set_color(view->colors.text_soft1);
+			p->set_font("", view->FONT_SIZE, true, false);
+			float w = p->get_str_width(tt);
+			p->draw_str((p->width - w) / 2, 8, tt);
+		} else {
+			p->set_color(view->colors.text_soft3);
+			p->set_font("", view->FONT_SIZE, false, true);
+			//set_string(id_name, "<s>" + nice_title() + "</s>");
+			float w = p->get_str_width(tt);
+			p->draw_str((p->width - w) / 2, 8, tt);
+		}
+	}
+
+	void on_name_left_click() {
+		auto view = console->view;
+		if (view->select_xor) {
+			view->toggle_select_track_with_content_in_cursor(vtrack);
+		} else {
+			if (view->sel.has(vtrack->track)) {
+				view->set_selection(view->sel.restrict_to_track(vtrack->track));
+			} else {
+				view->exclusively_select_track(vtrack);
+				view->select_under_cursor();
+			}
+		}
+	}
+
+	void on_name_double_click() {
+		console->session->set_mode(EditMode::DefaultTrack);
 	}
 
 	void on_volume() {
@@ -158,6 +229,7 @@ public:
 			set_string(id_name, nice_title());
 		else
 			set_string(id_name, "<s>" + nice_title() + "</s>");
+		redraw(id_name);
 	}
 
 
@@ -193,7 +265,6 @@ public:
 	string pan_slider_id;
 	string mute_id;
 	string id_separator;
-	AudioView *view;
 	bool editing;
 	MixingConsole *console;
 };

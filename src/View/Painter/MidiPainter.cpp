@@ -38,7 +38,7 @@ const float NOTE_NECK_WIDTH = 2.0f;
 const float NOTE_FLAG_DX = 10.0f;
 const float NOTE_FLAG_DY = 15.0f;
 
-static const color PITCH_COLORS[12] = {
+const color PITCH_COLORS[12] = {
 	color(1, 1.000000, 0.400000, 0.400000), // C
 	color(1, 0.900000, 0.700000, 0.400000),
 	color(1, 0.800000, 0.800000, 0.400000), // D
@@ -93,6 +93,9 @@ void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, Hov
 	new(this) MidiPainter(_song, _cam, _sel, _hover, _colors);
 }
 
+color hash_color(int h) {
+	return PITCH_COLORS[((h*7 + 11*h*h) & 0x0fffffff) % 12];
+}
 
 color MidiPainter::pitch_color(int pitch) {
 	return PITCH_COLORS[pitch % 12];

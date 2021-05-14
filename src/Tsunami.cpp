@@ -140,7 +140,7 @@ void show_song(Song *song) {
 	}
 	msg_write(format("  refs: %d / %d", n, song->samples.num));
 	for (Tag &t: song->tags)
-		msg_write(format("  tag: %s = %s", t.key, t.value));
+		msg_write(format("  tag: %s = '%s'", t.key, t.value));
 }
 
 extern bool module_config_debug;

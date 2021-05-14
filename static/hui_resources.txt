@@ -7282,9 +7282,9 @@ width=100,expandy,vertical
 0
 0
 4
-Text
+DrawingArea
 name
-center,bold,marginbottom=5
+height=27,noexpandy
 0
 0
 0

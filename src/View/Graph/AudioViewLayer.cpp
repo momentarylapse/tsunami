@@ -40,11 +40,12 @@
 #include "../Graph/LayerHeader.h"
 #include "../Helper/Graph/ScrollBar.h"
 #include "../Helper/SymbolRenderer.h"
-#include "../Painter/MidiPainter.h"
 
 
 
 const int PITCH_SHOW_COUNT = 30;
+
+color hash_color(int h);
 
 
 
@@ -148,7 +149,7 @@ void AudioViewLayer::update_midi_key_changes() {
 }
 
 color AudioViewLayer::marker_color(const TrackMarker *m) {
-	return MidiPainter::pitch_color(m->text.hash() % MAX_PITCH);
+	return hash_color(m->text.hash());
 }
 
 

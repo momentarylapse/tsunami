@@ -128,17 +128,42 @@ color group_color(const Track *group) {
 	return Black;
 }
 
+Array<const Track*> track_group_colors(Track *t) {
+	Array<const Track*> c;
+	if (t->type == SignalType::GROUP)
+		c.add(t);
+
+	if (t->send_target)
+		c.append(track_group_colors(t->send_target));
+	return c;
+}
+
+color track_header_main_color(Track *track, AudioView *view) {
+	//if (view->sel.has(track)) {
+		auto group_colors = track_group_colors(track);
+		if (group_colors.num > 0) {
+			color c = group_color(group_colors[0]);
+			/*if (track->type == SignalType::GROUP)
+				c = color::interpolate(c, view->colors.background, 0.3f);
+			else*/
+			return color::interpolate(c, view->colors.background, 0.5f);
+		} else {
+			return view->colors.blob_bg_selected;
+		}
+	/*} else {
+		if (track->type == SignalType::GROUP)
+			return view->colors.blob_bg_alt_hidden;
+		else
+			return view->colors.blob_bg_hidden;
+	}*/
+}
+
 color TrackHeader::color_bg() {
 	auto *track = vtrack->track;
-	color col;
-	if (track->type == SignalType::GROUP) {
-		if (view->sel.has(track))
-			col = group_color(track);//view->colors.blob_bg_alt_selected;
-		else
-			col = view->colors.blob_bg_alt_hidden;
-	} else {
-		if (view->sel.has(track))
-			col = view->colors.blob_bg_selected;
+	color col = track_header_main_color(track, view);
+	if (!view->sel.has(track)) {
+		if ((track->type == SignalType::GROUP) or track->send_target)
+			col = color::interpolate(col, view->colors.background, 0.6f);//view->colors.blob_bg_alt_hidden;
 		else
 			col = view->colors.blob_bg_hidden;
 	}
@@ -150,12 +175,16 @@ color TrackHeader::color_bg() {
 color TrackHeader::color_frame() {
 	auto *track = vtrack->track;
 	color col;
+
+	//if (view->sel.has(track))
+		return color_bg();
+	/*col = track_header_main_color(track, view);
 	if (track->type == SignalType::GROUP) {
 		if (view->sel.has(track))
 			col = group_color(track);//view->colors.blob_bg_alt_selected;
 		else
 			col = view->colors.blob_bg_alt;
-	} else {
+	} else*/ {
 		if (view->sel.has(track))
 			col = view->colors.blob_bg_selected;
 		else
@@ -193,16 +222,6 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	children[1]->hidden |= (view->song->tracks.num == 1);
 	
 	Node::update_geometry_recursive(target_area);
-}
-
-Array<const Track*> track_group_colors(Track *t) {
-	Array<const Track*> c;
-	if (t->type == SignalType::GROUP)
-		c.add(t);
-
-	if (t->send_target)
-		c.append(track_group_colors(t->send_target));
-	return c;
 }
 
 void TrackHeader::on_draw(Painter *c) {

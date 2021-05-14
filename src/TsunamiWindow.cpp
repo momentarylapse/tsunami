@@ -460,7 +460,7 @@ void TsunamiWindow::on_track_render() {
 	if (view->get_playable_layers() != view->sel.layers()) {
 		int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
-				{_("respecting solo and mute, ignoring selection"), _("respecting selection and mute, but ignoring solo")}, true);
+				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true);
 		if (answer == 1)
 			renderer.allow_layers(view->sel.layers());
 		else if (answer < 0)
@@ -1120,7 +1120,19 @@ void TsunamiWindow::on_save_as() {
 
 void TsunamiWindow::on_render_export_selection() {
 	if (session->storage->ask_save_render_export(this)) {
-		if (session->storage->render_export_selection(song, view->sel, hui::Filename))
+
+		auto sel = view->sel;
+		if (view->get_playable_layers() != view->sel.layers()) {
+			int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
+					{_("All non-muted"), _("From selection")},
+					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true);
+			if (answer == 0)
+				sel = SongSelection::from_range(song, view->sel.range()).filter(view->get_playable_layers());
+			else if (answer < 0)
+				return;
+		}
+
+		if (session->storage->render_export_selection(song, sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}
 }

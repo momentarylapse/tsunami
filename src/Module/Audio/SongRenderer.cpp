@@ -61,7 +61,7 @@ void SongRenderer::__delete__() {
 
 int SongRenderer::get_first_usable_track(Track *target) {
 	foreachi(auto *tr, tracks, i)
-		if (!tr->track->muted and allowed_tracks.contains(tr->track.get()) and (tr->track->send_target == target))
+		if (allowed_tracks.contains(tr->track.get()) and (tr->track->send_target == target))
 			return i;
 	return -1;
 }
@@ -81,8 +81,6 @@ void SongRenderer::render_send_target(AudioBuffer &buf, Track* target) {
 		for (int i=i0+1;i<tracks.num;i++){
 			Track *t = tracks[i]->track.get();
 			if (!allowed_tracks.contains(t))
-				continue;
-			if (t->muted)
 				continue;
 			if (t->send_target != target)
 				continue;

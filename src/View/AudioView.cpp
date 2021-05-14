@@ -1634,12 +1634,20 @@ bool AudioView::has_any_solo_track() {
 	return false;
 }
 
+bool allow_track_playback(AudioViewTrack *t, const Set<Track*> &prevented, bool any_solo) {
+	if (prevented.contains(t->track))
+		return false;
+	if (t->solo)
+		return true;
+	return !t->track->muted and !any_solo;
+}
+
 Set<const Track*> AudioView::get_playable_tracks() {
 	Set<const Track*> tracks;
-	auto prevented = mode->prevent_playback();
+	auto prevented = mode->prevent_playback(); // capturing?
 	bool any_solo = has_any_solo_track();
 	for (auto *t: vtracks)
-		if (!t->track->muted and (t->solo or !any_solo) and !prevented.contains(t->track))
+		if (allow_track_playback(t, prevented, any_solo))
 			tracks.add(t->track);
 	return tracks;
 }
@@ -1651,6 +1659,12 @@ bool AudioView::has_any_solo_layer(Track *t) {
 	return false;
 }
 
+bool allow_layer_playback(AudioViewLayer *l, bool any_solo) {
+	if (l->solo)
+		return true;
+	return !l->layer->muted and !any_solo;
+}
+
 Set<const TrackLayer*> AudioView::get_playable_layers() {
 	auto tracks = get_playable_tracks();
 
@@ -1660,7 +1674,7 @@ Set<const TrackLayer*> AudioView::get_playable_layers() {
 			continue;
 		bool any_solo = has_any_solo_layer(t);
 		for (auto *l: vlayers)
-			if ((l->layer->track == t) and (l->solo or !any_solo) and !l->layer->muted)
+			if ((l->layer->track == t) and allow_layer_playback(l, any_solo))
 				layers.add(l->layer);
 	}
 	return layers;

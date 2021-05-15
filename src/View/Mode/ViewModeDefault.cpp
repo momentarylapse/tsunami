@@ -359,11 +359,11 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 	if (l->track()->layers.num > 1)
 		scale = 0.7f;
 	if (l->layer->type == SignalType::AUDIO)
-		return view->MAX_TRACK_CHANNEL_HEIGHT * n_ch * scale;
+		return theme.MAX_TRACK_CHANNEL_HEIGHT * n_ch * scale;
 	else if (l->layer->type == SignalType::MIDI)
-		return view->MAX_TRACK_CHANNEL_HEIGHT * 2 * scale;
+		return theme.MAX_TRACK_CHANNEL_HEIGHT * 2 * scale;
 	else
-		return view->TIME_SCALE_HEIGHT * 2;
+		return theme.TIME_SCALE_HEIGHT * 2;
 }
 
 Bar *song_bar_at(Song *s, int pos);

@@ -568,11 +568,11 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l)) {
 		auto mode = l->midi_mode();
 		if (mode == MidiMode::LINEAR)
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 8;
+			return theme.MAX_TRACK_CHANNEL_HEIGHT * 8;
 		else if (mode == MidiMode::CLASSICAL)
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+			return theme.MAX_TRACK_CHANNEL_HEIGHT * 4;
 		else // TAB
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+			return theme.MAX_TRACK_CHANNEL_HEIGHT * 4;
 	}
 
 	return ViewModeDefault::layer_suggested_height(l);
@@ -768,7 +768,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	// editing rect
 	auto xxx = c->clip();
 	c->set_clip(l->area and view->song_area());
-	c->set_color(view->colors.text_soft1);
+	c->set_color(theme.text_soft1);
 	c->set_fill(false);
 	if (mode == MidiMode::TAB) {
 		int y = mp->string_to_screen(string_no);

@@ -549,6 +549,8 @@ class ColorScheme
 	color blob_bg
 	color blob_bg_selected
 	color blob_bg_hidden
+	color[12] pitch
+	extern static color pitch_color(int p)
 	extern const color hoverify(color c)
 
 class SceneGraph
@@ -730,7 +732,6 @@ class MidiPainter
 	extern void set_context(rect area, Instrument i, bool playable, int mode)
 	extern void draw(Painter p, MidiNoteBuffer midi)
 	extern void draw_background(Painter c)
-	extern static color pitch_color(int p)
 	AudioView.ViewPort* cam
 
 class GridColors

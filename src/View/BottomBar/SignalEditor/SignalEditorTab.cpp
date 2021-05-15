@@ -40,11 +40,11 @@ public:
 		chain = tab->chain;
 	}
 	void on_draw(Painter *p) override {
-		color col = tab->view->colors.text_soft2;
+		color col = theme.text_soft2;
 		if (!chain->is_active()) {
-			col = tab->view->colors.text_soft1;
+			col = theme.text_soft1;
 			if (this->is_cur_hover())
-				col = tab->view->colors.text;
+				col = theme.text;
 		}
 		p->set_color(col);
 		p->set_font_size(18);
@@ -71,11 +71,11 @@ public:
 		chain = tab->chain;
 	}
 	void on_draw(Painter *p) override {
-		color col = tab->view->colors.text_soft2;
+		color col = theme.text_soft2;
 		if (chain->is_active()) {
-			col = tab->view->colors.text_soft1;
+			col = theme.text_soft1;
 			if (this->is_cur_hover())
-				col = tab->view->colors.text;
+				col = theme.text;
 		}
 		p->set_color(col);
 		p->set_font_size(18);
@@ -104,7 +104,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 	pad = new ScrollPad();
 	pad->align.dz = 5;
 	graph = scenegraph::SceneGraph::create_integrated(this, "area", pad, "SignalEditor", [=] (Painter *p) {
-		p->set_font_size(view->FONT_SIZE);
+		p->set_font_size(theme.FONT_SIZE);
 		graph->update_geometry_recursive(p->area());
 		pad->_update_scrolling();
 		graph->draw(p);
@@ -122,7 +122,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 		if (graph->hover.node)
 			tip = graph->hover.node->get_tip();
 		if (tip.num > 0) {
-			p->set_font_size(view->FONT_SIZE);
+			p->set_font_size(theme.FONT_SIZE);
 			AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
 		}
 	});
@@ -171,20 +171,20 @@ SignalEditorTab::~SignalEditorTab() {
 
 color SignalEditorTab::signal_color_base(SignalType type) {
 	if (type == SignalType::AUDIO)
-		return view->colors.red;
+		return theme.red;
 	if (type == SignalType::MIDI)
-		return view->colors.green;
+		return theme.green;
 	if (type == SignalType::BEATS)
-		return view->colors.blue;
-	return view->colors.white;
+		return theme.blue;
+	return theme.white;
 }
 
 color SignalEditorTab::signal_color(SignalType type, bool hover) {
 	color c = signal_color_base(type);
-	c = color::interpolate(c, view->colors.text, 0.2f);
-	//c = color::interpolate(c, view->colors.background, 0.2f);
+	c = color::interpolate(c, theme.text, 0.2f);
+	//c = color::interpolate(c, colors.background, 0.2f);
 	if (hover)
-		c = view->colors.hoverify(c);
+		c = theme.hoverify(c);
 	return c;
 }
 
@@ -201,7 +201,7 @@ void SignalEditorTab::draw_arrow(Painter *p, const complex &m, const complex &_d
 
 
 void SignalEditorTab::on_draw(Painter* p) {
-	p->set_font_size(view->FONT_SIZE);
+	p->set_font_size(theme.FONT_SIZE);
 	graph->update_geometry_recursive(p->area());
 	pad->_update_scrolling();
 	graph->draw(p);
@@ -220,7 +220,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 	if (graph->hover.node)
 		tip = graph->hover.node->get_tip();
 	if (tip.num > 0) {
-		p->set_font_size(view->FONT_SIZE);
+		p->set_font_size(theme.FONT_SIZE);
 		AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
 	}
 }

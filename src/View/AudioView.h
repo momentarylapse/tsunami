@@ -148,21 +148,8 @@ public:
 	string id;
 
 	Array<ColorScheme> color_schemes;
-	static ColorScheme basic_colors;
-	static ColorScheme colors;
 	void set_color_scheme(const string &name);
 
-	static const int SAMPLE_FRAME_HEIGHT;
-	static const int TIME_SCALE_HEIGHT;
-	static const float LINE_WIDTH;
-	static const float CORNER_RADIUS;
-	static const float FONT_SIZE;
-	static const int MAX_TRACK_CHANNEL_HEIGHT;
-	static const int TRACK_HANDLE_WIDTH;
-	static const int LAYER_HANDLE_WIDTH;
-	static const int TRACK_HANDLE_HEIGHT;
-	static const int TRACK_HANDLE_HEIGHT_SMALL;
-	static const int SCROLLBAR_WIDTH;
 	static const int SNAPPING_DIST;
 
 	HoverData &hover();

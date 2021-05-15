@@ -264,8 +264,8 @@ void BufferPainter::set_context(const rect &_area) {
 	area = _area;
 	x0 = area.x1;
 	x1 = area.x2;
-	col1 = view->colors.text_soft1;
-	col2 = view->colors.text_soft3;
+	col1 = theme.text_soft1;
+	col2 = theme.text_soft3;
 }
 
 void BufferPainter::set_color(const color &fg, const color &bg) {

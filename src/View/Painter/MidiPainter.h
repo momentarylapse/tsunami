@@ -91,7 +91,7 @@ public:
 	SongSelection *sel;
 	HoverData *hover;
 	Song *song;
-	ColorScheme &colors;
+	ColorScheme &local_theme;
 
 	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
 	void set_shift(int shift);

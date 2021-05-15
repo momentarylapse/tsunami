@@ -79,7 +79,7 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 
 		// lines
 		c->set_line_width(2.0f);
-		c->set_color(view->colors.selection_boundary);
+		c->set_color(theme.selection_boundary);
 		Array<complex> pp;
 		for (int x=r.x1; x<r.x2; x+=3)
 			pp.add(complex(x, value2screen(_curve->get(cam->screen2sample(x)))));
@@ -88,7 +88,7 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 
 		// fill
 		c->set_line_width(2.0f);
-		color cc = view->colors.selection_internal;
+		color cc = theme.selection_internal;
 		cc.a = 0.2f;
 		c->set_color(cc);
 		pp.add(complex(r.x2, r.y2));
@@ -99,13 +99,13 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 		foreachi(auto &p, _curve->points, i) {
 			float r = 3;
 			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index)) {
-				c->set_color(view->colors.selection_boundary_hover);
+				c->set_color(theme.selection_boundary_hover);
 				r = 5;
 			} else if ((view->cur_selection.type == HoverData::Type::CURVE_POINT) and (i == view->cur_selection.index)) {
 				// TODO.... selected...
-				c->set_color(view->colors.selection_boundary);
+				c->set_color(theme.selection_boundary);
 			} else {
-				c->set_color(view->colors.text);
+				c->set_color(theme.text);
 			}
 			c->draw_circle(cam->sample2screen(p.pos), value2screen(p.value), r);
 		}
@@ -116,7 +116,7 @@ void ViewModeCurve::draw_post(Painter* c) {
 	auto *t = cur_vtrack();
 	if (!t)
 		return;
-	color col = view->colors.text;
+	color col = theme.text;
 	col.a = 0.1f;
 	float d = 12;
 	c->set_color(col);

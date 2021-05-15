@@ -34,9 +34,9 @@ public:
 		hidden = (view->playback_wish_range.length == 0) and !view->is_playback_active();
 	}
 	void on_draw(Painter *p) override {
-		p->set_color(AudioView::colors.blob_bg_selected);
+		p->set_color(theme.blob_bg_selected);
 		if (view->is_playback_active())
-			p->set_color(AudioView::colors.preview_marker);
+			p->set_color(theme.preview_marker);
 		p->draw_rect(area.x1, area.y1, area.width(), 5);
 	}
 	string get_tip() override {
@@ -69,13 +69,13 @@ public:
 	}
 	void update_geometry(const rect &target_area) override {
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
-		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		area = rect(x, x + 20, area.y1, area.y1 + theme.TIME_SCALE_HEIGHT);
 		hidden = !view->playback_range_locked;
 	}
 	void on_draw(Painter *p) override {
-		p->set_color(view->colors.text);
+		p->set_color(theme.text);
 		if (this->is_cur_hover())
-			p->set_color(view->colors.hoverify(view->colors.text));
+			p->set_color(theme.hoverify(theme.text));
 		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\U0001f512");
 	}
 	string get_tip() override {
@@ -101,13 +101,13 @@ public:
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
 		if (view->playback_range_locked)
 			x += 20;
-		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		area = rect(x, x + 20, area.y1, area.y1 + theme.TIME_SCALE_HEIGHT);
 		hidden = !view->looping();
 	}
 	void on_draw(Painter *p) override {
-		p->set_color(view->colors.text);
+		p->set_color(theme.text);
 		if (this->is_cur_hover())
-			p->set_color(view->colors.hoverify(view->colors.text));
+			p->set_color(theme.hoverify(theme.text));
 		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\u21bb");
 	}
 	string get_tip() override {
@@ -126,7 +126,7 @@ public:
 
 
 
-TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioView::TIME_SCALE_HEIGHT) {
+TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, theme.TIME_SCALE_HEIGHT) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.dz = 120;
 	view = _view;
@@ -139,9 +139,9 @@ TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, AudioVie
 
 void TimeScale::on_draw(Painter* c) {
 	GridColors g;
-	g.bg = view->colors.background_track;
-	g.bg_sel = g.bg;//view->colors.background_track_selection;
-	g.fg = g.fg_sel = view->colors.grid;
+	g.bg = theme.background_track;
+	g.bg_sel = g.bg;//colors.background_track_selection;
+	g.fg = g.fg_sel = theme.grid;
 
 	auto *gp = view->grid_painter.get();
 	gp->set_context(area, g);

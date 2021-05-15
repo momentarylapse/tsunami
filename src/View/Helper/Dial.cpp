@@ -57,27 +57,27 @@ void Dial::on_draw(Painter *p) {
 	p->set_antialiasing(true);
 
 	// label
-	p->set_color(AudioView::colors.text_soft1);
+	p->set_color(theme.text_soft1);
 	float w = p->get_str_width(label);
 	p->draw_str(area.mx() - w/2, area.y2 - 10, label);
 
 
 	// value
-	p->set_color(AudioView::colors.text);
-	p->set_font_size(AudioView::FONT_SIZE * 0.8f);
+	p->set_color(theme.text);
+	p->set_font_size(theme.FONT_SIZE * 0.8f);
 	auto vv = f2s(value, digits);
 	if (unit.num > 0)
 		vv += " " + unit;
 	w = p->get_str_width(vv);
 	p->draw_str(area.mx() - w/2, area.my() - p->font_size/2, vv);
-	p->set_font_size(AudioView::FONT_SIZE);
+	p->set_font_size(theme.FONT_SIZE);
 
 
 
 	Array<complex> z;
 	p->set_option("line-cap", "square");
 	p->set_line_width(3);
-	p->set_color(AudioView::colors.text_soft3);
+	p->set_color(theme.text_soft3);
 	float r = min(area.width()/2, area.height()/2) - 3;
 	draw_arc(p, val_min, val_max, r);
 
@@ -92,7 +92,7 @@ void Dial::on_draw(Painter *p) {
 		p->draw_line(q1.x, q1.y, q2.x, q2.y);
 	}
 	p->set_line_width(4);
-	p->set_color(AudioView::colors.text);
+	p->set_color(theme.text);
 	{
 		auto q1 = rel_to_pos((value - val_min) / (val_max - val_min), r);
 		auto q2 = rel_to_pos((value - val_min) / (val_max - val_min), r-7);

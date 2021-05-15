@@ -47,7 +47,7 @@ public:
 		}
 	}
 	virtual void on_draw_post(Painter *p) {
-		p->set_color(tab->view->colors.text);
+		p->set_color(theme.text);
 		if (target) {
 			p->set_line_width(5);
 			p->draw_line(port->area.mx(), port->area.my(), target->area.mx(), target->area.my());

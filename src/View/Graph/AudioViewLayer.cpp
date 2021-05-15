@@ -155,17 +155,17 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 
 void AudioViewLayer::draw_track_buffers(Painter *c) {
 	view->buffer_painter->set_context(area);
-	//auto text_soft4 = color::interpolate(view->colors.text_soft3, view->colors.background, 0.3f);
+	//auto text_soft4 = color::interpolate(colors.text_soft3, colors.background, 0.3f);
 	if (is_playable() and layer->track->has_version_selection()) {
 		auto active_ranges = layer->active_version_ranges();
 		auto inactive_ranges = layer->inactive_version_ranges();
 		for (auto &b: layer->buffers) {
-			view->buffer_painter->set_color(view->colors.text_soft1, background_color());
+			view->buffer_painter->set_color(theme.text_soft1, background_color());
 			for (Range &r: active_ranges) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
-			view->buffer_painter->set_color(view->colors.text_soft3, background_color());
+			view->buffer_painter->set_color(theme.text_soft3, background_color());
 			for (Range &r: inactive_ranges) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
@@ -173,9 +173,9 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 		}
 	} else {
 		if (is_playable())
-			view->buffer_painter->set_color(view->colors.text_soft1, background_color());
+			view->buffer_painter->set_color(theme.text_soft1, background_color());
 		else
-			view->buffer_painter->set_color(view->colors.text_soft3, background_color());
+			view->buffer_painter->set_color(theme.text_soft3, background_color());
 		for (auto &b: layer->buffers)
 			view->buffer_painter->draw_buffer(c, b, b.offset);
 
@@ -183,7 +183,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 
 	if (view->sel.has(layer)) {
 		// selection
-		view->buffer_painter->set_color(view->colors.selection_boundary, background_selection_color());
+		view->buffer_painter->set_color(theme.selection_boundary, background_selection_color());
 		view->buffer_painter->set_clip(view->cursor_range());
 		for (AudioBuffer &b: layer->buffers)
 			view->buffer_painter->draw_buffer_selection(c, b, b.offset);
@@ -203,8 +203,8 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 	color col2 = col;
 	col2.a *= 0.5f;
 	c->set_color(col2);
-	c->draw_rect(asx, area.y1,                             aex - asx, view->SAMPLE_FRAME_HEIGHT);
-	c->draw_rect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);
+	c->draw_rect(asx, area.y1,                              aex - asx, theme.SAMPLE_FRAME_HEIGHT);
+	c->draw_rect(asx, area.y2 - theme.SAMPLE_FRAME_HEIGHT, aex - asx, theme.SAMPLE_FRAME_HEIGHT);
 
 	c->set_color(col);
 	c->set_line_width(2);
@@ -216,11 +216,11 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 
 
 void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
-	color col = view->colors.sample;
+	color col = theme.sample;
 	if (view->sel.has(s))
-		col = view->colors.sample_selected;
+		col = theme.sample_selected;
 	if (view->hover().sample == s)
-		col = view->colors.hoverify(col);
+		col = theme.hoverify(col);
 
 	draw_sample_frame(c, s, col, 0);
 
@@ -310,7 +310,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	if (sel)
 		c->set_font("", -1, true, false);
 
-	float w = c->get_str_width(text) + view->CORNER_RADIUS * 2;
+	float w = c->get_str_width(text) + theme.CORNER_RADIUS * 2;
 	float x0, x1, gx0, gx1;
 	view->cam.range2screen(group_range, gx0, gx1);
 	float w_threshold = view->high_details ? 30 : 50;
@@ -323,28 +323,28 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 
 	w = max(w, x1 - x0);
 
-	color col = view->colors.text;
-	color col_bg = color::interpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.6f);
+	color col = theme.text;
+	color col_bg = color::interpolate(theme.blob_bg_hidden, marker_color(marker), 0.6f);
 	color col_frame = marker_color(marker);
 	if (sel) {
-		col = view->colors.text;
-		//col_bg = view->colors.blob_bg_selected;//color::interpolate(col_bg, view->colors.selection, 0.6f);
-		//col_frame = view->colors.blob_bg_selected;//color::interpolate(col_frame, view->colors.selection, 0.6f);
-		col_bg = color::interpolate(col_bg, view->colors.blob_bg_selected, 0.8f);
-		col_frame = color::interpolate(col_frame, view->colors.blob_bg_selected, 0.8f);
-		//col_frame = view->colors.selection;
+		col = theme.text;
+		//col_bg = colors.blob_bg_selected;//color::interpolate(col_bg, colors.selection, 0.6f);
+		//col_frame = colors.blob_bg_selected;//color::interpolate(col_frame, colors.selection, 0.6f);
+		col_bg = color::interpolate(col_bg, theme.blob_bg_selected, 0.8f);
+		col_frame = color::interpolate(col_frame, theme.blob_bg_selected, 0.8f);
+		//col_frame = colors.selection;
 	}
 	if (hover) {
-		col = view->colors.hoverify(col);
-		col_frame = view->colors.hoverify(col_frame);
-		col_bg = view->colors.hoverify(col_bg);
+		col = theme.hoverify(col);
+		col_frame = theme.hoverify(col_frame);
+		col_bg = theme.hoverify(col_bg);
 	}
 
 	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
 	if (marker->range.is_empty())
 		allow_label = (view->cam.dsample2screen(2000) > 1);
 	float lw = c->get_str_width(text);
-	float dx = max(view->CORNER_RADIUS, (x1-x0)/2 - lw/2);
+	float dx = max(theme.CORNER_RADIUS, (x1-x0)/2 - lw/2);
 	if (allow_label) {
 		view->draw_boxed_str(c,  x0 + dx, y0 + frame_height, text, col, col_bg);
 	}
@@ -373,7 +373,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + frame_height));
 	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + dx, y0 + 8, text));
 
-	c->set_font("", view->FONT_SIZE, false, false);
+	c->set_font("", theme.FONT_SIZE, false, false);
 }
 
 
@@ -430,13 +430,13 @@ bool AudioViewLayer::is_playable() {
 }
 
 color AudioViewLayer::background_color() {
-	return (view->sel.has(layer)) ? view->colors.background_track_selected : view->colors.background_track;
+	return (view->sel.has(layer)) ? theme.background_track_selected : theme.background_track;
 }
 
 color AudioViewLayer::background_selection_color() {
 	if (view->selection_mode == SelectionMode::RECT)
 		return background_color(); // complex selection rect as overlay...
-	return (view->sel.has(layer)) ? view->colors.background_track_selection : view->colors.background_track;
+	return (view->sel.has(layer)) ? theme.background_track_selection : theme.background_track;
 }
 
 bool AudioView::editing_layer(AudioViewLayer *l) {
@@ -495,8 +495,8 @@ GridColors AudioViewLayer::grid_colors() {
 	GridColors g;
 	g.bg = background_color();
 	g.bg_sel = background_selection_color();
-	g.fg = view->colors.grid;
-	g.fg_sel = (view->sel.has(layer)) ? view->colors.grid_selected : view->colors.grid;
+	g.fg = theme.grid;
+	g.fg_sel = (view->sel.has(layer)) ? theme.grid_selected : theme.grid;
 	return g;
 }
 

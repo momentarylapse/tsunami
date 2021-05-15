@@ -42,23 +42,23 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	height = h;
 	width = w;
 
-	p->set_color(view->colors.background);
+	p->set_color(theme.background);
 	p->draw_rect(0, 0, w, h);
 
 	if (hover >= 0) {
 		if (is_checked("all_octaves")) {
-			color c = color::interpolate(view->colors.background, view->colors.capture_marker, 0.1f);
+			color c = color::interpolate(theme.background, theme.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
 				p->draw_rect(pitch2x(i), 0, pitch2x(1), h);
 		}
-		color c = color::interpolate(view->colors.background, view->colors.capture_marker, 0.2f);
+		color c = color::interpolate(theme.background, theme.capture_marker, 0.2f);
 		p->set_color(c);
 		p->draw_rect(pitch2x(hover), 0, pitch2x(1), h);
 	}
 
 	// grid
-	p->set_color(view->colors.text_soft3);
+	p->set_color(theme.text_soft3);
 	for (int i=1; i<MAX_PITCH; i++) {
 		float x = pitch2x(i);
 		p->draw_line(x, 0, x, h);
@@ -77,7 +77,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 
 
 	// reference
-	p->set_color(view->colors.preview_marker);
+	p->set_color(theme.preview_marker);
 	for (int i=0; i<MAX_PITCH; i++) {
 		float y = pitch2y(i);
 		if (mode_relative) {
@@ -91,7 +91,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 
 	// current tuning
 	p->set_line_width(2.0f);
-	p->set_color(view->colors.capture_marker);
+	p->set_color(theme.capture_marker);
 	for (int i=0; i<MAX_PITCH; i++) {
 		float y = pitch2y(freq_to_pitch(synth->tuning.freq[i]));
 		if (mode_relative) {
@@ -105,7 +105,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 
 
 	if (hover >= 0) {
-		p->set_color(view->colors.text);
+		p->set_color(theme.text);
 		p->draw_str(20, 17, pitch_name(hover));
 		p->draw_str(70, 17, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}

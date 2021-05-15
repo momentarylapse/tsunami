@@ -151,7 +151,7 @@ void draw_peak(Painter *c, const rect &r, PeakMeterData &d, const color &bg) {
 	else
 		c->draw_rect(rect(r.x1, r.x2, r.y2 - h  * nice_peak(d.peak), r.y2));
 
-	c->set_color(AudioView::colors.text);
+	c->set_color(theme.text);
 	if (sp > 0) {
 		if (w > h)
 			c->draw_rect(r.x1 + w * nice_peak(sp), r.y1, 2, h);
@@ -167,7 +167,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 	float h = area.height();
 	float boundary = 0;
 
-	color bg = (parent ? AudioView::colors.background_overlay : AudioView::colors.background);
+	color bg = (parent ? theme.background_overlay : theme.background);
 
 	if (mode == Mode::PEAKS) {
 
@@ -184,7 +184,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 	} else {
 		c->set_color(bg);
 		c->draw_rect(area);
-		c->set_color(AudioView::colors.text);
+		c->set_color(theme.text);
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * w;
 		int n = min(100, channels[0].spec.num);
 		for (int i=0; i<n; i++) {

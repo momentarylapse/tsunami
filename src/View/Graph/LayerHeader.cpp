@@ -34,7 +34,7 @@ public:
 	}
 	color get_color() {
 		if (is_cur_hover())
-			return vlayer->view->colors.hoverify(header->color_text());
+			return theme.hoverify(header->color_text());
 		return header->color_text();
 	}
 };
@@ -96,7 +96,7 @@ public:
 	}
 };
 
-LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel(0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel(0, 0, theme.LAYER_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	z = 70;
 	align.horizontal = AlignData::Mode::RIGHT;
 	set_perf_name("header");
@@ -113,11 +113,11 @@ color LayerHeader::color_bg() {
 	auto *view = vlayer->view;
 	color col;
 	if (view->sel.has(layer))
-		col = view->colors.blob_bg_selected;
+		col = theme.blob_bg_selected;
 	else
-		col = view->colors.blob_bg_hidden;
+		col = theme.blob_bg_hidden;
 	if (is_cur_hover())
-		col = view->colors.hoverify(col);
+		col = theme.hoverify(col);
 	return col;
 }
 
@@ -126,11 +126,11 @@ color LayerHeader::color_frame() {
 	auto *view = vlayer->view;
 	color col;
 	if (view->sel.has(layer))
-		col = view->colors.blob_bg_selected;
+		col = theme.blob_bg_selected;
 	else
-		col = view->colors.blob_bg;
+		col = theme.blob_bg;
 	if (is_cur_hover())
-		col = view->colors.hoverify(col);
+		col = theme.hoverify(col);
 	return col;
 }
 
@@ -142,11 +142,11 @@ color LayerHeader::color_text() {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
 	if (playable())
-		return view->colors.text;
+		return theme.text;
 	if (view->sel.has(layer)) {
-		return view->colors.text_soft1;
+		return theme.text_soft1;
 	} else {
-		return view->colors.text_soft2;
+		return theme.text_soft2;
 	}
 }
 
@@ -156,10 +156,10 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
 
-	align.h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	align.w = AudioView::LAYER_HANDLE_WIDTH;
+	align.h = extended ? theme.TRACK_HANDLE_HEIGHT : theme.TRACK_HANDLE_HEIGHT_SMALL;
+	align.w = theme.LAYER_HANDLE_WIDTH;
 	if (vlayer->represents_imploded)
-		align.w = AudioView::LAYER_HANDLE_WIDTH * 1.6f;
+		align.w = theme.LAYER_HANDLE_WIDTH * 1.6f;
 		
 		
 	for (auto *c: weak(children))
@@ -183,7 +183,7 @@ void LayerHeader::on_draw(Painter *c) {
 	c->set_antialiasing(false);
 	
 	
-	c->set_font("", view->FONT_SIZE, playable(), false);
+	c->set_font("", theme.FONT_SIZE, playable(), false);
 	c->set_color(color_text());
 	
 	if (vlayer->represents_imploded) {

@@ -51,7 +51,7 @@ void SignalEditorCable::on_draw(Painter *p) {
 	p->set_line_dash({}, 0);
 	p->set_line_width(1);
 
-	p->set_color(color::interpolate(base_color, tab->view->colors.text, 0.1f));
+	p->set_color(color::interpolate(base_color, theme.text, 0.1f));
 	//p->set_color(base_color);
 	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 }

@@ -43,7 +43,7 @@ public:
 	}
 	color get_color() {
 		if (is_cur_hover())
-			return view->colors.hoverify(header->color_text());
+			return theme.hoverify(header->color_text());
 		return header->color_text();
 	}
 };
@@ -105,7 +105,7 @@ public:
 	}
 };
 
-TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, theme.TRACK_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	align.dz = 70;
 	set_perf_name("header");
 	vtrack = t;
@@ -122,7 +122,7 @@ color group_color(const Track *group) {
 	for (auto *t: weak(group->song->tracks))
 		if (t->type == SignalType::GROUP) {
 			if (t == group)
-				return hash_color(index * 5 + 10);
+				return hash_color(index * 7 + 10);
 			index ++;
 		}
 	return Black;
@@ -144,17 +144,17 @@ color track_header_main_color(Track *track, AudioView *view) {
 		if (group_colors.num > 0) {
 			color c = group_color(group_colors[0]);
 			/*if (track->type == SignalType::GROUP)
-				c = color::interpolate(c, view->colors.background, 0.3f);
+				c = color::interpolate(c, colors.background, 0.3f);
 			else*/
-			return color::interpolate(c, view->colors.background, 0.5f);
+			return color::interpolate(c, theme.background, 0.5f);
 		} else {
-			return view->colors.blob_bg_selected;
+			return theme.blob_bg_selected;
 		}
 	/*} else {
 		if (track->type == SignalType::GROUP)
-			return view->colors.blob_bg_alt_hidden;
+			return colors.blob_bg_alt_hidden;
 		else
-			return view->colors.blob_bg_hidden;
+			return colors.blob_bg_hidden;
 	}*/
 }
 
@@ -163,12 +163,12 @@ color TrackHeader::color_bg() {
 	color col = track_header_main_color(track, view);
 	if (!view->sel.has(track)) {
 		if ((track->type == SignalType::GROUP) or track->send_target)
-			col = color::interpolate(col, view->colors.background, 0.6f);//view->colors.blob_bg_alt_hidden;
+			col = color::interpolate(col, theme.background, 0.6f);//colors.blob_bg_alt_hidden;
 		else
-			col = view->colors.blob_bg_hidden;
+			col = theme.blob_bg_hidden;
 	}
 	if (is_cur_hover())
-		col = view->colors.hoverify(col);
+		col = theme.hoverify(col);
 	return col;
 }
 
@@ -181,17 +181,17 @@ color TrackHeader::color_frame() {
 	/*col = track_header_main_color(track, view);
 	if (track->type == SignalType::GROUP) {
 		if (view->sel.has(track))
-			col = group_color(track);//view->colors.blob_bg_alt_selected;
+			col = group_color(track);//colors.blob_bg_alt_selected;
 		else
-			col = view->colors.blob_bg_alt;
+			col = colors.blob_bg_alt;
 	} else*/ {
 		if (view->sel.has(track))
-			col = view->colors.blob_bg_selected;
+			col = theme.blob_bg_selected;
 		else
-			col = view->colors.blob_bg;
+			col = theme.blob_bg;
 	}
 	if (is_cur_hover())
-		col = view->colors.hoverify(col);
+		col = theme.hoverify(col);
 	return col;
 }
 
@@ -202,11 +202,11 @@ bool TrackHeader::playable() {
 
 color TrackHeader::color_text() {
 	if (playable())
-		return view->colors.text;
+		return theme.text;
 	if (view->sel.has(vtrack->track))
-		return view->colors.text_soft1;
+		return theme.text_soft1;
 	else
-		return view->colors.text_soft2;
+		return theme.text_soft2;
 }
 
 
@@ -215,7 +215,7 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_track(track);
 
-	align.h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	align.h = extended ? theme.TRACK_HANDLE_HEIGHT : theme.TRACK_HANDLE_HEIGHT_SMALL;
 		
 	for (auto *c: weak(children))
 		c->hidden = !extended;
@@ -240,7 +240,7 @@ void TrackHeader::on_draw(Painter *c) {
 	c->set_antialiasing(false);
 
 	// track title
-	c->set_font("", view->FONT_SIZE, playable(), false);
+	c->set_font("", theme.FONT_SIZE, playable(), false);
 	c->set_color(color_text());
 	string title = track->nice_name();
 	if (vtrack->solo)
@@ -277,12 +277,12 @@ public:
 		if (t < view->vtracks.num)
 			y = view->vtracks[t]->area.y1;
 
-		c->set_color(view->colors.selection_boundary);
+		c->set_color(theme.selection_boundary);
 		c->set_line_width(2.0f);
 		c->draw_line(view->area.x1,  y,  view->area.x2,  y);
 		c->set_line_width(1.0f);
 
-		/*c->setColor(view->colors.selection_internal);
+		/*c->setColor(colors.selection_internal);
 		rect r = view->vtrack[orig]->area;
 		r.x2 = view->TRACK_HANDLE_WIDTH;
 		c->drawRect(r);*/

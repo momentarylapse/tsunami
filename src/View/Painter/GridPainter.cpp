@@ -8,6 +8,7 @@
 #include "GridPainter.h"
 
 #include "../AudioView.h"
+#include "../ColorScheme.h"
 #include "../ViewPort.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
@@ -20,7 +21,7 @@ string i2s_small(int i);
 
 
 GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_scheme) :
-	 color_scheme(_scheme) {
+	 local_theme(_scheme) {
 	sel = _sel;
 	if (!sel)
 		sel = new SongSelection;
@@ -87,7 +88,7 @@ void GridPainter::draw_time(Painter *c) {
 }
 
 void GridPainter::draw_time_numbers(Painter *c) {
-	c->set_font("", AudioView::FONT_SIZE, false, false);
+	c->set_font("", local_theme.FONT_SIZE, false, false);
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam->pixels_per_sample; // >= 10 pixel
 	double dt = dl / song->sample_rate;
 	double ldt = log10(dt);
@@ -105,7 +106,7 @@ void GridPainter::draw_time_numbers(Painter *c) {
 	int nx0 = ceil(cam->screen2sample(area.x1) / dl);
 	int nx1 = ceil(cam->screen2sample(area.x2) / dl);
 
-	c->set_color(color_scheme.text_soft3);//grid);
+	c->set_color(local_theme.text_soft3);//grid);
 	for (int n=nx0; n<nx1; n++) {
 		if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25) {
 			if (n % 5 == 0)
@@ -178,7 +179,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	int s1 = cam->screen2sample(area.x2);
 	auto bars = song->bars.get_bars(RangeTo(s0, s1));
 
-	c->set_font("", AudioView::FONT_SIZE, true, false);
+	c->set_font("", local_theme.FONT_SIZE, true, false);
 	float change_block_until = -1;
 	bool block_reported = false;
 	for (Bar *b: bars) {
@@ -187,11 +188,11 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 
 		color halo_col = color(0,0,0,0);
 		if (sel->has(b))
-			halo_col = color_scheme.blob_bg_selected;
+			halo_col = local_theme.blob_bg_selected;
 		if (hover->bar == b) {
 			if (halo_col.a == 0)
-				halo_col = color_scheme.blob_bg;
-			halo_col = color_scheme.hoverify(halo_col);
+				halo_col = local_theme.blob_bg;
+			halo_col = local_theme.hoverify(halo_col);
 		}
 
 		string label = " ";
@@ -199,7 +200,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			label = i2s(b->index_text + 1);
 
 		if (halo_col.a > 0) {
-			AudioView::draw_boxed_str(c, xx + 4, area.y1+5, label, color_scheme.text, halo_col);
+			AudioView::draw_boxed_str(c, xx + 4, area.y1+5, label, local_theme.text, halo_col);
 		} else {
 			float f1 = min(1.0f, dx_bar / 60.0f);
 			if ((b->index_text % 5) == 0)
@@ -207,7 +208,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			if ((b->index_text % 25) == 0)
 				f1 *= 5;
 			if (f1 > 0.9f){
-				c->set_color(color_scheme.text_soft1);
+				c->set_color(local_theme.text_soft1);
 				c->draw_str(xx + 4, area.y1+5, label);
 			}
 		}
@@ -227,8 +228,8 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			prev_bpm = bpm;
 		}
 		if (s.num > 0) {
-			c->set_font("", AudioView::FONT_SIZE * 0.8f, false, false);
-			c->set_color(color_scheme.text_soft1);
+			c->set_font("", local_theme.FONT_SIZE_SMALL, false, false);
+			c->set_color(local_theme.text_soft1);
 			float xxx = max(xx + 4, 20.0f);
 			if (xxx > change_block_until) {
 				c->draw_str(xxx, area.y2 - 15, s);
@@ -240,12 +241,12 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 				block_reported = true;
 				
 			}
-			c->set_font("", AudioView::FONT_SIZE, true, false);
+			c->set_font("", local_theme.FONT_SIZE, true, false);
 		}
 	}
-	c->set_font("", AudioView::FONT_SIZE, false, false);
+	c->set_font("", local_theme.FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);
-	c->set_line_width(AudioView::LINE_WIDTH);
+	c->set_line_width(local_theme.LINE_WIDTH);
 }
 
 void GridPainter::draw_whatever(Painter *c, int beat_partition) {

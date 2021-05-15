@@ -82,7 +82,7 @@ void SettingsDialog::load_data() {
 	// color scheme
 	foreachi(auto &b, view->color_schemes, i) {
 		add_string("color_scheme", b.name);
-		if (b.name == view->colors.name)
+		if (b.name == theme.name)
 			set_int("color_scheme", i);
 	}
 

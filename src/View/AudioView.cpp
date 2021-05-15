@@ -59,20 +59,7 @@
 #include "../Stuff/PerformanceMonitor.h"
 
 
-const float AudioView::FONT_SIZE = 10.0f;
-const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
-const float AudioView::LINE_WIDTH = 1.0f;
-const float AudioView::CORNER_RADIUS = 8.0f;
-const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
-const int AudioView::TIME_SCALE_HEIGHT = 20;
-const int AudioView::TRACK_HANDLE_WIDTH = 120;
-const int AudioView::LAYER_HANDLE_WIDTH = 60;
-const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
-const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
-const int AudioView::SCROLLBAR_WIDTH = 20;
 const int AudioView::SNAPPING_DIST = 8;
-ColorScheme AudioView::basic_colors;
-ColorScheme AudioView::colors;
 
 
 const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
@@ -120,15 +107,15 @@ public:
 		view = _view;
 	}
 	void on_draw(Painter *p) override {
-		color c = view->colors.background_overlay;
+		color c = theme.background_overlay;
 		if (is_cur_hover())
-			c = view->colors.hoverify(c);
+			c = theme.hoverify(c);
 		p->set_color(c);
 		p->draw_circle(area.mx(), area.my(),40);
-		p->set_color(view->colors.text_soft3);
+		p->set_color(theme.text_soft3);
 		p->set_font_size(17);
 		p->draw_str(area.mx()-10, area.my()-10, "▲");
-		p->set_font_size(view->FONT_SIZE);
+		p->set_font_size(theme.FONT_SIZE);
 	}
 	bool on_left_button_down(float mx, float my) override {
 		view->session->win->bottom_bar->_show();
@@ -234,8 +221,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(cpu_display);
 
 	buffer_painter = new BufferPainter(this);
-	grid_painter = new GridPainter(song, &cam, &sel, &hover(), colors);
-	midi_painter = new MidiPainter(song, &cam, &sel, &hover(), colors);
+	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
+	midi_painter = new MidiPainter(song, &cam, &sel, &hover(), theme);
 
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 20;
@@ -406,12 +393,11 @@ void AudioView::set_mouse_wheel_speed(float speed) {
 
 void AudioView::set_color_scheme(const string &name) {
 	hui::Config.set_str("View.ColorScheme", name);
-	basic_colors = color_schemes[0];
+	theme = color_schemes[0];
 	for (auto &b: color_schemes)
 		if (b.name == name)
-			basic_colors = b;
+			theme = b;
 
-	colors = basic_colors;
 	force_redraw();
 }
 
@@ -452,9 +438,9 @@ void AudioView::set_mouse() {
 int AudioView::mouse_over_sample(SampleRef *s) {
 	if ((mx >= s->area.x1) and (mx < s->area.x2)) {
 		int offset = cam.screen2sample(mx) - s->pos;
-		if ((my >= s->area.y1) and (my < s->area.y1 + SAMPLE_FRAME_HEIGHT))
+		if ((my >= s->area.y1) and (my < s->area.y1 + theme.SAMPLE_FRAME_HEIGHT))
 			return offset;
-		if ((my >= s->area.y2 - SAMPLE_FRAME_HEIGHT) and (my < s->area.y2))
+		if ((my >= s->area.y2 - theme.SAMPLE_FRAME_HEIGHT) and (my < s->area.y2))
 			return offset;
 	}
 	return -1;
@@ -1138,7 +1124,7 @@ bool AudioView::update_scene_graph() {
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {
 		metronome_overlay_vlayer->layer = song->time_track()->layers[0].get();
-		metronome_overlay_vlayer->area = rect(song_area().x1, song_area().x2, song_area().y1, song_area().y1 + this->TIME_SCALE_HEIGHT*2);
+		metronome_overlay_vlayer->area = rect(song_area().x1, song_area().x2, song_area().y1, song_area().y1 + theme.TIME_SCALE_HEIGHT*2);
 	}
 	return animating;
 }
@@ -1152,17 +1138,17 @@ rect AudioView::song_area() {
 
 rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str) {
 	float w = c->get_str_width(str);
-	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + c->font_size + CORNER_RADIUS);
+	return rect(x-theme.CORNER_RADIUS, x + w + theme.CORNER_RADIUS, y-theme.CORNER_RADIUS, y + c->font_size + theme.CORNER_RADIUS);
 }
 
 void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align) {
 	rect r = get_boxed_str_rect(c, x, y, str);
-	float dx =r.width() / 2 - CORNER_RADIUS;
+	float dx =r.width() / 2 - theme.CORNER_RADIUS;
 	dx *= (align - 1);
 	r.x1 += dx;
 	r.x2 += dx;
 	c->set_color(col_bg);
-	c->set_roundness(CORNER_RADIUS);
+	c->set_roundness(theme.CORNER_RADIUS);
 	c->draw_rect(r);
 	c->set_roundness(0);
 	c->set_color(col_text);
@@ -1171,7 +1157,7 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 
 void AudioView::draw_framed_box(Painter *p, const rect &r, const color &bg, const color &frame, float frame_width) {
 	p->set_color(bg);
-	p->set_roundness(CORNER_RADIUS);
+	p->set_roundness(theme.CORNER_RADIUS);
 	p->draw_rect(r);
 	
 	p->set_fill(false);
@@ -1206,8 +1192,8 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float
 	//c->set_font("", -1, true, false);
 	float w = c->get_str_width(msg);
 	float x = clamp(mx - 20.0f, area.x1 + 2.0f, area.x2 - w);
-	float y = clamp(my + 30, area.y1 + 2.0f, area.y2 - FONT_SIZE - 5);
-	draw_boxed_str(c, x, y, msg, colors.background, colors.text_soft1);
+	float y = clamp(my + 30, area.y1 + 2.0f, area.y2 - theme.FONT_SIZE - 5);
+	draw_boxed_str(c, x, y, msg, theme.background, theme.text_soft1);
 	//c->set_font("", -1, false, false);
 }
 
@@ -1220,12 +1206,12 @@ void AudioView::draw_message(Painter *c, Message &m) {
 	float ym = area.my();
 	float a = min(m.ttl*8, 1.0f);
 	a = pow(a, 0.4f);
-	color c1 = colors.high_contrast_a;
-	color c2 = colors.high_contrast_b;
+	color c1 = theme.high_contrast_a;
+	color c2 = theme.high_contrast_b;
 	c1.a = c2.a = a;
-	c->set_font_size(FONT_SIZE * m.size * a);
+	c->set_font_size(theme.FONT_SIZE * m.size * a);
 	draw_boxed_str(c, xm, ym, m.text, c1, c2, 0);
-	c->set_font_size(FONT_SIZE);
+	c->set_font_size(theme.FONT_SIZE);
 }
 
 void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time, bool show_circle) {
@@ -1233,12 +1219,12 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 	if ((x >= song_area().x1) and (x <= song_area().x2)) {
 		color cc = col;
 		if (hover)
-			cc = colors.selection_boundary_hover;
+			cc = theme.selection_boundary_hover;
 		c->set_color(cc);
 		c->set_line_width(2.0f);
 		c->draw_line(x, area.y1, x, area.y2);
 		if (show_time)
-			draw_boxed_str(c,  x, song_area().my(), song->get_time_str_long(pos), cc, colors.background);
+			draw_boxed_str(c,  x, song_area().my(), song->get_time_str_long(pos), cc, theme.background);
 		c->set_line_width(1.0f);
 		if (show_circle)
 			c->draw_circle(x, song_area().y2, 8);
@@ -1264,7 +1250,7 @@ void AudioView::draw_song(Painter *c) {
 
 	// playing/capturing position
 	if (is_playback_active())
-		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
+		draw_time_line(c, playback_pos(), theme.preview_marker, false, true);
 
 	mode->draw_post(c);
 	for (auto *plugin: weak(session->plugins))
@@ -1279,7 +1265,7 @@ void AudioView::draw_song(Painter *c) {
 
 	tip = mode->get_tip();
 	if (tip.num > 0)
-		draw_boxed_str(c, song_area().mx(), area.y2 - 50, tip, colors.text_soft1, colors.background_track_selected, 0);
+		draw_boxed_str(c, song_area().mx(), area.y2 - 50, tip, theme.text_soft1, theme.background_track_selected, 0);
 
 	if (message.ttl > 0) {
 		draw_message(c, message);
@@ -1297,23 +1283,18 @@ void AudioView::draw_song(Painter *c) {
 void AudioView::on_draw(Painter *c) {
 	PerformanceMonitor::start_busy(perf_channel);
 
-	//colors = basic_colors;
-	//if (!win->is_active(id))
-	//	colors = basic_colors.disabled();
-
 	area = c->area();
 	clip = c->clip();
 
-	c->set_font_size(FONT_SIZE);
-	c->set_line_width(LINE_WIDTH);
+	c->set_font_size(theme.FONT_SIZE);
+	c->set_line_width(theme.LINE_WIDTH);
 
 	if (enabled)
 		draw_song(c);
 
-	static int frame = 0;
+	//static int frame = 0;
 	//c->draw_str(100, 100, i2s(frame++));
 
-	//colors = basic_colors;
 	PerformanceMonitor::end_busy(perf_channel);
 }
 

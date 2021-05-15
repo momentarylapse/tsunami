@@ -41,7 +41,7 @@ void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 		for (int i=i0; i<i1; i++)
 			m = max(m, (float)fabs(b.c[0][i]));
 		for (int y=h*(1-m)/2; y<=h*(1+m)/2; y++)
-			im.set_pixel(x, y, view->colors.text);
+			im.set_pixel(x, y, theme.text);
 	}
 }
 
@@ -52,7 +52,7 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 		float y = h * clamp((80 - n->pitch) / 50.0f, 0.0f, 1.0f);
 		float x0 = w * clamp((float)n->range.offset / (float)m.samples, 0.0f, 1.0f);
 		float x1 = w * clamp((float)n->range.end() / (float)m.samples, 0.0f, 1.0f);
-		color c = MidiPainter::pitch_color(n->pitch);
+		color c = theme.pitch[(int)n->pitch % 12];
 		for (int x=x0; x<=x1; x++)
 			im.set_pixel(x, y, c);
 	}

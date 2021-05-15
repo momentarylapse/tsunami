@@ -96,26 +96,26 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 void SignalEditorModule::on_draw(Painter *p) {
 	auto view = tab->view;
 
-	color bg = view->colors.blob_bg;
+	color bg = theme.blob_bg;
 	if (tab->sel_modules.contains(module))
-		bg = view->colors.blob_bg_selected;
+		bg = theme.blob_bg_selected;
 	if (is_cur_hover())
-		bg = view->colors.hoverify(bg);
+		bg = theme.hoverify(bg);
 	p->set_color(bg);
-	p->set_roundness(view->CORNER_RADIUS);
+	p->set_roundness(theme.CORNER_RADIUS);
 	rect r = area;
 	p->draw_rect(r);
 	p->set_roundness(0);
-	p->set_font_size(AudioView::FONT_SIZE);// * 1.2f);
+	p->set_font_size(theme.FONT_SIZE);// * 1.2f);
 	if (tab->sel_modules.contains(module)) {
-		p->set_color(view->colors.text);
+		p->set_color(theme.text);
 		p->set_font("", -1, true, false);
 	} else {
-		p->set_color(view->colors.text_soft1);
+		p->set_color(theme.text_soft1);
 	}
 	string type = module_header(module);
 	AudioView::draw_str_constrained(p, r.mx(), r.my() - p->font_size/2, r.width() - 12, type, 0);
-	p->set_font("", AudioView::FONT_SIZE, false, false);
+	p->set_font("", theme.FONT_SIZE, false, false);
 
 }
 

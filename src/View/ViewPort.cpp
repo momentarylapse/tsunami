@@ -152,7 +152,7 @@ rect ViewPort::nice_mapping_area() {
 	float x0 = area.x1;
 	float x1 = area.x2;
 	if (x1 - x0 > 800)
-		x0 += AudioView::TRACK_HANDLE_WIDTH;
+		x0 += theme.TRACK_HANDLE_WIDTH;
 	float w = x1 - x0;
 	x0 += w * BORDER_FACTOR;
 	x1 -= w * BORDER_FACTOR;

@@ -93,7 +93,7 @@ void ViewModeEdit::draw_post(Painter *c) {
 
 
 	// layer border
-	color col = view->colors.text;
+	color col = theme.text;
 	col.a = 0.1f;
 	float d = 12;
 	c->set_color(col);

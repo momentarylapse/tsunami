@@ -113,7 +113,7 @@ void PluginManager::link_app_script_data() {
 
 	// api definition
 	kaba::link_external("device_manager", &tsunami->device_manager);
-	kaba::link_external("colors", &AudioView::colors);
+	kaba::link_external("colors", &theme);
 	kaba::link_external("clipboard", &tsunami->clipboard);
 	//kaba::link_external("view_input", &export_view_input);
 	kaba::link_external("db2amp", (void*)&db2amplitude);
@@ -701,7 +701,9 @@ void PluginManager::link_app_script_data() {
 	kaba::declare_class_element("ColorScheme.blob_bg", &ColorScheme::blob_bg);
 	kaba::declare_class_element("ColorScheme.blob_bg_selected", &ColorScheme::blob_bg_selected);
 	kaba::declare_class_element("ColorScheme.blob_bg_hidden", &ColorScheme::blob_bg_hidden);
+	kaba::declare_class_element("ColorScheme.pitch", &ColorScheme::pitch);
 	kaba::link_external_class_func("ColorScheme.hoverify", &ColorScheme::hoverify);
+	kaba::link_external("ColorScheme.pitch_color", (void*)&ColorScheme::pitch_color);
 
 	kaba::link_external_class_func("Storage.load", &Storage::load);
 	kaba::link_external_class_func("Storage.save", &Storage::save);
@@ -726,7 +728,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("MidiPainter.set_context", &MidiPainter::set_context);
 	kaba::link_external_class_func("MidiPainter.draw", &MidiPainter::draw);
 	kaba::link_external_class_func("MidiPainter.draw_background", &MidiPainter::draw_background);
-	kaba::link_external_class_func("MidiPainter.pitch_color", &MidiPainter::pitch_color);
+	//kaba::link_external_class_func("MidiPainter.pitch_color", &MidiPainter::pitch_color);
 
 
 	kaba::declare_class_size("GridPainter", sizeof(GridPainter));

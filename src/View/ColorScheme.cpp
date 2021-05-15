@@ -14,6 +14,40 @@ namespace hui {
 	void get_style_colors(Panel *p, const string &id, Map<string,color> &colors);
 }
 
+
+const float ColorScheme::FONT_SIZE = 10.0f;
+const float ColorScheme::FONT_SIZE_SMALL = FONT_SIZE * 0.8f;
+const int ColorScheme::MAX_TRACK_CHANNEL_HEIGHT = 74;
+const float ColorScheme::LINE_WIDTH = 1.0f;
+const float ColorScheme::CORNER_RADIUS = 8.0f;
+const int ColorScheme::SAMPLE_FRAME_HEIGHT = 20;
+const int ColorScheme::TIME_SCALE_HEIGHT = 20;
+const int ColorScheme::TRACK_HANDLE_WIDTH = 120;
+const int ColorScheme::LAYER_HANDLE_WIDTH = 60;
+const int ColorScheme::TRACK_HANDLE_HEIGHT = TIME_SCALE_HEIGHT * 2;
+const int ColorScheme::TRACK_HANDLE_HEIGHT_SMALL = TIME_SCALE_HEIGHT;
+const float ColorScheme::SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
+const float ColorScheme::SCROLLBAR_D = 5;
+const float ColorScheme::SCROLLBAR_WIDTH = 20;
+
+ColorScheme theme;
+
+
+const color PITCH_COLORS[12] = {
+	color(1, 1.000000, 0.400000, 0.400000), // C
+	color(1, 0.900000, 0.700000, 0.400000),
+	color(1, 0.800000, 0.800000, 0.400000), // D
+	color(1, 0.700000, 0.900000, 0.400000),
+	color(1, 0.400000, 0.900000, 0.400000), // E
+	color(1, 0.400000, 0.900000, 0.700000), // F
+	color(1, 0.400000, 0.900000, 1.000000),
+	color(1, 0.400000, 0.700000, 1.000000), // G
+	color(1, 0.400000, 0.400000, 1.000000),
+	color(1, 0.700000, 0.400000, 1.000000), // A
+	color(1, 1.000000, 0.400000, 1.000000),
+	color(1, 1.000000, 0.400000, 0.700000)  // B
+};
+
 color col_inter(const color a, const color &b, float t) {
 	float e = 0.7f;
 	color c;
@@ -92,6 +126,15 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	green = color(1, 0, 0.7f, 0);
 	blue = color(1, 0.1f, 0.1f, 1);
 	white = White;
+
+	for (int i=0; i<12; i++) {
+		pitch[i] = PITCH_COLORS[i];
+		pitch_text[i] = color::interpolate(pitch[i], text, 0.2f);
+	}
+}
+
+color ColorScheme::pitch_color(int p) {
+	return PITCH_COLORS[p % 12];
 }
 
 color ColorScheme::hoverify(const color &c) const {

@@ -10,22 +10,19 @@
 
 #include "../../AudioView.h"
 
-const float SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
-const float D = 5;
-
 // TODO who owns the view_offset? -> callback needed/not?
 
 ScrollBar::ScrollBar() {
 	align.vertical = AlignData::Mode::FILL;
 	align.horizontal = AlignData::Mode::LEFT;
-	align.w = AudioView::SCROLLBAR_WIDTH;
+	align.w = theme.SCROLLBAR_WIDTH;
 	align.dz = 120;
 	set_perf_name("scrollbar");
 }
 ScrollBarHorizontal::ScrollBarHorizontal() : ScrollBar() {
 	align.vertical = AlignData::Mode::BOTTOM;
 	align.horizontal = AlignData::Mode::FILL;
-	align.h = AudioView::SCROLLBAR_WIDTH;
+	align.h = theme.SCROLLBAR_WIDTH;
 	horizontal = true;
 }
 
@@ -44,22 +41,23 @@ void ScrollBar::drag_update(float mx, float my) {
 }
 
 void ScrollBar::on_draw(Painter *c) {
-	c->set_color(AudioView::colors.background);
+	c->set_color(theme.background);
 	c->draw_rect(area);
 	bool _hover = is_cur_hover();
-	c->set_color(_hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
+	c->set_color(_hover ? theme.text_soft1 : theme.text_soft3);
 	float f = view_size / content_size;
 	if (constrained)
 		f = min(f, 1.0f);
+	const float D = theme.SCROLLBAR_D;
 	if (horizontal) {
 		float w = area.width() - 2*D;
-		float ww = max(w * f, SCROLLBAR_MINIMUM_HANDLE_SIZE);
+		float ww = max(w * f, theme.SCROLLBAR_MINIMUM_HANDLE_SIZE);
 		c->set_roundness(area.height()/2 - D);
 		float x0 = project(view_offset);
 		c->draw_rect(rect(x0, x0 + ww, area.y1 + D, area.y2 - D));
 	} else {
 		float h = area.height() - 2*D;
-		float hh = max(h * f, SCROLLBAR_MINIMUM_HANDLE_SIZE);
+		float hh = max(h * f, theme.SCROLLBAR_MINIMUM_HANDLE_SIZE);
 		c->set_roundness(area.width()/2 - D);
 		float y0 = project(view_offset);
 		c->draw_rect(rect(area.x1 + D, area.x2 - D, y0, y0 + hh));
@@ -143,6 +141,7 @@ bool ScrollBar::on_left_button_down(float mx, float my) {
 }
 
 float ScrollBar::project(float x) const {
+	const float D = theme.SCROLLBAR_D;
 	if (horizontal)
 		return area.x1 + D + (x - content_offset) / content_size * (area.width() - 2*D);
 	else
@@ -150,6 +149,7 @@ float ScrollBar::project(float x) const {
 }
 
 float ScrollBar::unproject(float x) const {
+	const float D = theme.SCROLLBAR_D;
 	if (horizontal)
 		return (x - area.x1 - D) * content_size / (area.width() - 2*D) + content_offset;
 	else

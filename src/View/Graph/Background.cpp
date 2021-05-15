@@ -62,19 +62,19 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 	float sx0, sx1;
 	view->cam.range2screen_clip(view->sel.range(), area, sx0, sx1);
 
-	c->set_color(AudioView::colors.grid);
+	c->set_color(theme.grid);
 
 	if (sel_any and !view->sel.range().is_empty()) {
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, 0);
 		c->draw_line(area.x1, y, sx0, y);
 
-		c->set_color(AudioView::colors.grid_selected);
+		c->set_color(theme.grid_selected);
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, loop(sx0, 0.0f, 13.0f));
 		c->draw_line(sx0, y, sx1, y);
 
-		c->set_color(AudioView::colors.grid);
+		c->set_color(theme.grid);
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, loop(sx1, 0.0f, 13.0f));
 		c->draw_line(sx1, y, area.x2, y);
@@ -100,11 +100,11 @@ void Background::on_draw(Painter* c) {
 
 	// free space below tracks
 	if (yy < area.y2) {
-		c->set_color(AudioView::colors.background);
+		c->set_color(theme.background);
 		rect rr = rect(area.x1, area.x2, yy, area.y2);
 		GridColors g;
-		g.bg = g.bg_sel = view->colors.background;
-		g.fg = g.fg_sel = view->colors.grid;
+		g.bg = g.bg_sel = theme.background;
+		g.fg = g.fg_sel = theme.grid;
 		c->draw_rect(rr);
 		view->grid_painter->set_context(rr, g);
 		if (view->song->bars.num > 0)

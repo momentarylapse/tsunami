@@ -24,7 +24,7 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	int w = area.width();
 	int h = area.height();
 	auto view = tab->view;
-	p->set_color(view->colors.background);
+	p->set_color(theme.background);
 	p->draw_rect(area);
 	p->set_line_width(0.7f);
 
@@ -37,9 +37,9 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	for (int i=i0; i<=i1; i++) {
 		float x = pad->project(complex(i * D, 0)).x;
 		if ((i % 5) == 0)
-			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
+			p->set_color(color::interpolate(theme.background, theme.grid, 0.5f));
 		else
-			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
+			p->set_color(color::interpolate(theme.background, theme.grid, 0.2f));
 		p->draw_line(x, area.y1, x, area.y2);
 	}
 	int j0 = floor(p0.y / D);
@@ -47,9 +47,9 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	for (int j=j0; j<=j1; j++) {
 		float y = pad->project(complex(0, j * D)).y;
 		if ((j % 5) == 0)
-			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.5f));
+			p->set_color(color::interpolate(theme.background, theme.grid, 0.5f));
 		else
-			p->set_color(color::interpolate(view->colors.background, view->colors.grid, 0.2f));
+			p->set_color(color::interpolate(theme.background, theme.grid, 0.2f));
 		p->draw_line(area.x1, y, area.x2, y);
 	}
 

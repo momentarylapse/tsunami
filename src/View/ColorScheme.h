@@ -15,11 +15,29 @@ namespace hui {
 	class Panel;
 }
 
+extern const color PITCH_COLORS[12];
+
 class ColorScheme {
 public:
 
 	void auto_generate(bool keep_soft_text = false);
 	ColorScheme disabled() const;
+
+
+	static const float FONT_SIZE;
+	static const float FONT_SIZE_SMALL;
+	static const int SAMPLE_FRAME_HEIGHT;
+	static const int TIME_SCALE_HEIGHT;
+	static const float LINE_WIDTH;
+	static const float CORNER_RADIUS;
+	static const int MAX_TRACK_CHANNEL_HEIGHT;
+	static const int TRACK_HANDLE_WIDTH;
+	static const int LAYER_HANDLE_WIDTH;
+	static const int TRACK_HANDLE_HEIGHT;
+	static const int TRACK_HANDLE_HEIGHT_SMALL;
+	static const float SCROLLBAR_WIDTH;
+	static const float SCROLLBAR_D;
+	static const float SCROLLBAR_MINIMUM_HANDLE_SIZE;
 
 	// basic
 	color background;
@@ -60,7 +78,12 @@ public:
 	color sample(bool selected, bool hover);
 	color buffer(bool selected, bool hover);
 	color layer_header(bool selected, bool hover);*/
+
+	color pitch[12];
+	color pitch_text[12];
+	color pitch_soft1[12], pitch_soft2[12];
 	
+	static color pitch_color(int p);
 	color hoverify(const color &c) const;
 };
 
@@ -78,5 +101,8 @@ class ColorSchemeSystem : public ColorScheme {
 public:
 	ColorSchemeSystem(hui::Panel *p, const string &id);
 };
+
+
+extern ColorScheme theme;
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

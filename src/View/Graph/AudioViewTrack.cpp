@@ -122,9 +122,9 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 	view->buffer_painter->set_context(l->area);
 
 	if (is_playable())
-		view->buffer_painter->set_color(view->colors.text_soft1, view->colors.background);
+		view->buffer_painter->set_color(theme.text_soft1, theme.background);
 	else
-		view->buffer_painter->set_color(view->colors.text_soft3, view->colors.background);
+		view->buffer_painter->set_color(theme.text_soft3, theme.background);
 
 	for (auto *layer: weak(track->layers)) {
 		auto rr = layer->active_version_ranges();
@@ -144,7 +144,7 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 	/*if (view->sel.has(layer)){
 		// selection
 		for (AudioBuffer &b: layer->buffers){
-			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+			draw_buffer_selection(c, b, view_pos_rel, colors.selection_boundary, view->sel.range);
 		}
 	}*/
 }

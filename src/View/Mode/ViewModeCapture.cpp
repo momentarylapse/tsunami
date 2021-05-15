@@ -50,7 +50,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 			auto *rec = d.audio_recorder();
 
 			view->buffer_painter->set_context(l->area);
-			view->buffer_painter->set_color(view->colors.capture_marker, l->background_color());
+			view->buffer_painter->set_color(theme.capture_marker, l->background_color());
 
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			view->update_peaks_now(rec->buf);
@@ -63,7 +63,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 	}
 	
 	int l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	view->draw_time_line(c, offset + l, view->colors.capture_marker, false, true);
+	view->draw_time_line(c, offset + l, theme.capture_marker, false, true);
 }
 
 Set<Track*> ViewModeCapture::prevent_playback() {

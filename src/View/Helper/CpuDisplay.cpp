@@ -102,7 +102,7 @@ color type_color(const string &t) {
 		return color(1, 0.2f, 0.2f, 0.9f);
 	if (t == "suck")
 		return color(1, 0.9f, 0.1f, 0.1f);
-	return AudioView::colors.text_soft1;
+	return theme.text_soft1;
 }
 
 string channel_title(PerfChannelInfo &c) {
@@ -131,7 +131,7 @@ string channel_title(PerfChannelInfo &c) {
 }
 
 void CpuDisplay::draw_background(Painter* p) {
-	auto col_bg = large ? view->colors.background : view->colors.background_overlay;
+	auto col_bg = large ? theme.background : theme.background_overlay;
 	p->set_color(col_bg);
 	p->draw_rect(area);
 
@@ -139,7 +139,7 @@ void CpuDisplay::draw_background(Painter* p) {
 		return;
 
 	BasicGridPainter grid;
-	GridColors gc = {col_bg, Black, view->colors.grid, Black};
+	GridColors gc = {col_bg, Black, theme.grid, Black};
 	grid.set_context(area, gc);
 
 	// horizontal time grid
@@ -187,12 +187,12 @@ void CpuDisplay::draw_table(Painter* p) {
 		float xoff[3] = {200, 270, 340};
 
 		p->set_font_size(10);
-		p->set_color(view->colors.text_soft1);
+		p->set_color(theme.text_soft1);
 		draw_str_r(p, xoff[0], 10, "cpu");
 		draw_str_r(p, xoff[1], 10, "avg");
 		draw_str_r(p, xoff[2], 10, "freq");
 
-		p->set_color(view->colors.text_soft3);
+		p->set_color(theme.text_soft3);
 		p->draw_str(xoff[0], 10, " %");
 		p->draw_str(xoff[1], 10, " ms");
 		p->draw_str(xoff[2], 10, " Hz");
@@ -215,13 +215,13 @@ void CpuDisplay::draw_table(Painter* p) {
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
 				if (c.parent < 0)
-					col0 = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
+					col0 = color::interpolate(type_color(c.name), theme.text, 0.5f);
 				p->set_color(col0);
 				bool highlight = !is_sleeping(c);
 				//if (!show_total)
 				highlight = (c.stats.back().avg > (max_avg / 10)) or (c.stats.back().cpu > (max_cpu / 10));
 				if (!highlight)
-					p->set_color(color::interpolate(col0, view->colors.background, 0.7f));
+					p->set_color(color::interpolate(col0, theme.background, 0.7f));
 				int dx = 0;
 				if (c.parent >= 0) {
 					for (int i=0; i<channels.num; i++)
@@ -257,7 +257,7 @@ void CpuDisplay::draw_table(Painter* p) {
 		int t = 0;
 		for (auto &c: channels) {
 			if (!is_sleeping(c) and (c.parent < 0)) {
-				color col = color::interpolate(type_color(c.name), view->colors.text, 0.5f);
+				color col = color::interpolate(type_color(c.name), theme.text, 0.5f);
 				p->set_color(col);
 				p->draw_str(x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
 				t ++;

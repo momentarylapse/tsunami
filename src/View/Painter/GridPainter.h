@@ -33,7 +33,7 @@ public:
 	Song *song;
 	SongSelection *sel;
 	HoverData *hover;
-	ColorScheme &color_scheme;
+	ColorScheme &local_theme;
 };
 
 #endif /* SRC_VIEW_PAINTER_GRIDPAINTER_H_ */

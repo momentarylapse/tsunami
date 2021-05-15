@@ -24,16 +24,16 @@ Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 }
 
 void Cursor::on_draw(Painter* c) {
-	color col = view->colors.selection_boundary;//color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
+	color col = theme.selection_boundary;//color::interpolate(colors.selection_boundary, colors.background_track_selected, 0.2f);
 
 	if (!view_has_focus(view))
-		col = color::interpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.5f);
+		col = color::interpolate(theme.selection_boundary, theme.background_track_selected, 0.5f);
 
 	if (!is_end) {
 		float x = view->cam.sample2screen(pos());
 		float r = 4;
 		c->set_line_width(4);
-		c->set_color(col);//view->colors.selection_boundary);
+		c->set_color(col);//colors.selection_boundary);
 		for (auto *v: view->vlayers)
 			if (view->sel.has(v->layer)) {
 				c->draw_line(x - r, v->area.y1, x + r, v->area.y1);
@@ -119,7 +119,7 @@ void SelectionMarker::on_draw(Painter* p) {
 		}else if (view->selection_mode == SelectionMode::RECT) {
 			float x1, x2;
 			view->cam.range2screen_clip(sel.range(), view->clip, x1, x2);
-			p->set_color(view->colors.selection_internal);
+			p->set_color(theme.selection_internal);
 			p->set_fill(false);
 			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
 			p->set_fill(true);
@@ -130,7 +130,7 @@ void SelectionMarker::on_draw(Painter* p) {
 
 	// bar gap selection
 	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
-		draw_bar_gap_selector(p, view->cur_selection.index, view->colors.text_soft1);
+		draw_bar_gap_selector(p, view->cur_selection.index, theme.text_soft1);
 	if (hover.type == HoverData::Type::BAR_GAP)
-		draw_bar_gap_selector(p, view->hover().index, view->colors.hover);
+		draw_bar_gap_selector(p, view->hover().index, theme.hover);
 }

@@ -94,9 +94,9 @@ public:
 		if (group_colors.num > 0) {
 			color c = group_color(group_colors[0]);
 			if (t->type == SignalType::GROUP)
-				c = color::interpolate(c, view->colors.background, 0.2f);//0.4f);
+				c = color::interpolate(c, theme.background, 0.2f);//0.4f);
 			else
-				c = color::interpolate(c, view->colors.background, 0.8f);
+				c = color::interpolate(c, theme.background, 0.8f);
 			p->set_color(c);
 			p->draw_rect(rect(0, p->width, 0, p->height));
 		}
@@ -111,15 +111,15 @@ public:
 		string tt = nice_title();
 		if (is_playable) {
 			if (t->type == SignalType::GROUP)
-				p->set_color(view->colors.background);
+				p->set_color(theme.background);
 			else
-				p->set_color(view->colors.text_soft1);
-			p->set_font("", view->FONT_SIZE, true, false);
+				p->set_color(theme.text_soft1);
+			p->set_font("", theme.FONT_SIZE, true, false);
 			float w = p->get_str_width(tt);
 			p->draw_str((p->width - w) / 2, 8, tt);
 		} else {
-			p->set_color(view->colors.text_soft3);
-			p->set_font("", view->FONT_SIZE, false, true);
+			p->set_color(theme.text_soft3);
+			p->set_font("", theme.FONT_SIZE, false, true);
 			//set_string(id_name, "<s>" + nice_title() + "</s>");
 			float w = p->get_str_width(tt);
 			p->draw_str((p->width - w) / 2, 8, tt);
@@ -196,9 +196,9 @@ public:
 	void on_peak_draw(Painter* p) {
 		int w = p->width;
 		int h = p->height;
-		p->set_color(AudioView::colors.background);
+		p->set_color(theme.background);
 		p->draw_rect(0, 0, w, h);
-		p->set_color(AudioView::colors.text);
+		p->set_color(theme.text);
 		float peak[2];
 		console->view->renderer->get_peak(track(), peak);
 		peak[0] = sqrt(peak[0]);

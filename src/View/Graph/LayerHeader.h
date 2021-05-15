@@ -21,10 +21,10 @@ public:
 
 	HoverData get_hover_data(float mx, float my) override;
 
-	bool playable();
-	color color_bg();
-	color color_frame();
-	color color_text();
+	bool playable() const;
+	color color_bg() const;
+	color color_frame() const;
+	color color_text() const;
 
 	bool on_left_button_down(float mx, float my) override;
 	bool on_right_button_down(float mx, float my) override;

@@ -43,9 +43,9 @@ public:
 	bool on_left_double_click(float mx, float my) override;
 	bool on_right_button_down(float mx, float my) override;
 
-	bool allow_handle_click_when_gaining_focus() override;
+	bool allow_handle_click_when_gaining_focus() const override;
 
-	string get_tip() override;
+	string get_tip() const override;
 	HoverData get_hover_data(float mx, float my) override;
 	HoverData get_hover_data_default(float mx, float my);
 
@@ -53,8 +53,8 @@ public:
 	void on_track_change();
 
 
-	color background_color();
-	color background_selection_color();
+	color background_color() const;
+	color background_selection_color() const;
 
 	void draw_track_buffers(Painter *c);
 
@@ -91,7 +91,7 @@ public:
 	void set_edit_pitch_min_max(float pitch_min, float pitch_max);
 	float edit_pitch_min, edit_pitch_max;
 
-	virtual bool is_playable();
+	virtual bool is_playable() const;
 
 	void update_midi_key_changes();
 	Array<MidiKeyChange> midi_key_changes;

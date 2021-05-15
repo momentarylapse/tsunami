@@ -57,7 +57,7 @@ Node::~Node() {
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-bool Node::hover(float mx, float my) {
+bool Node::hover(float mx, float my) const {
 	if (hidden)
 		return false;
 	return area.inside(mx, my);
@@ -75,21 +75,21 @@ void Node::delete_child(Node* child) {
 			children.erase(i);
 }
 
-SceneGraph *Node::graph() {
-	Node *r = this;
+SceneGraph *Node::graph() const {
+	Node *r = const_cast<Node*>(this);
 	while (r->parent)
 		r = r->parent;
 	return dynamic_cast<SceneGraph*>(r);
 }
 
-bool Node::is_cur_hover() {
+bool Node::is_cur_hover() const {
 	for (auto *c: weak(children))
 		if (c->is_cur_hover())
 			return true;
 	return is_cur_hover_non_recursive();
 }
 
-bool Node::is_cur_hover_non_recursive() {
+bool Node::is_cur_hover_non_recursive() const {
 	if (auto *sg = graph()) {
 		return sg->hover.node == this;
 	}
@@ -102,7 +102,7 @@ HoverData Node::get_hover_data(float mx, float my) {
 	return h;
 }
 
-string Node::get_tip() {
+string Node::get_tip() const {
 	return "";
 }
 
@@ -182,7 +182,7 @@ void Node::update_geometry_recursive(const rect &target_area) {
 }
 
 
-Array<Node*> Node::collect_children(bool include_hidden) {
+Array<Node*> Node::collect_children(bool include_hidden) const {
 	Array<Node*> nodes;
 	for (auto *c: weak(children))
 		if (!c->hidden or include_hidden) {
@@ -192,13 +192,13 @@ Array<Node*> Node::collect_children(bool include_hidden) {
 	return nodes;
 }
 
-Array<Node*> Node::collect_children_up() {
+Array<Node*> Node::collect_children_up() const {
 	auto nodes = collect_children(false);
 	sort_nodes_up(nodes);
 	return nodes;
 }
 
-Array<Node*> Node::collect_children_down() {
+Array<Node*> Node::collect_children_down() const {
 	auto nodes = collect_children(false);
 	sort_nodes_down(nodes);
 	return nodes;

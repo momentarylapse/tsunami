@@ -8,6 +8,7 @@
 #include "../Graph/LayerHeader.h"
 
 #include "../Helper/Graph/Node.h"
+#include "../Helper/Drawing.h"
 #include "../AudioView.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
@@ -32,7 +33,7 @@ public:
 		h.node = this;
 		return h;
 	}
-	color get_color() {
+	color get_color() const {
 		if (is_cur_hover())
 			return theme.hoverify(header->color_text());
 		return header->color_text();
@@ -50,7 +51,7 @@ public:
 		vlayer->layer->set_muted(!vlayer->layer->muted);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("toggle mute");
 	}
 };
@@ -67,7 +68,7 @@ public:
 		vlayer->set_solo(!vlayer->solo);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("toggle solo");
 	}
 };
@@ -91,7 +92,7 @@ public:
 			vlayer->view->implode_track(vlayer->layer->track);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return vlayer->represents_imploded ? _("explode") : _("implode");
 	}
 };
@@ -108,7 +109,7 @@ LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel(0, 0, theme.LA
 	add_child(new LayerButtonExplode(this, x0+dx*2, 22));
 }
 
-color LayerHeader::color_bg() {
+color LayerHeader::color_bg() const {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
 	color col;
@@ -121,7 +122,7 @@ color LayerHeader::color_bg() {
 	return col;
 }
 
-color LayerHeader::color_frame() {
+color LayerHeader::color_frame() const {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
 	color col;
@@ -134,11 +135,11 @@ color LayerHeader::color_frame() {
 	return col;
 }
 
-bool LayerHeader::playable() {
+bool LayerHeader::playable() const {
 	return vlayer->view->get_playable_layers().contains(vlayer->layer);
 }
 
-color LayerHeader::color_text() {
+color LayerHeader::color_text() const {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
 	if (playable())
@@ -179,7 +180,7 @@ void LayerHeader::on_draw(Painter *c) {
 
 	float h = area.height();
 	c->set_antialiasing(true);
-	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
+	draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
 	c->set_antialiasing(false);
 	
 	
@@ -187,7 +188,7 @@ void LayerHeader::on_draw(Painter *c) {
 	c->set_color(color_text());
 	
 	if (vlayer->represents_imploded) {
-		AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "explode");
+		draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "explode");
 		if (_hover)
 			c->draw_str(area.x1 + 25, area.y1 + 25,  u8"\u2b73   \u2b73   \u2b73");
 	} else {
@@ -196,7 +197,7 @@ void LayerHeader::on_draw(Painter *c) {
 		string title = "v" + i2s(layer->version_number() + 1);
 		if (vlayer->solo)
 			title = u8"\u00bb " + title + u8" \u00ab";
-		float ww = AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);
+		float ww = draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);
 		if (!playable())
 			c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);
 	}

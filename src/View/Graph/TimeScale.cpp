@@ -39,7 +39,7 @@ public:
 			p->set_color(theme.preview_marker);
 		p->draw_rect(area.x1, area.y1, area.width(), 5);
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("playback range");
 	}
 	bool on_left_button_down(float mx, float my) override {
@@ -78,7 +78,7 @@ public:
 			p->set_color(theme.hoverify(theme.text));
 		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\U0001f512");
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("locked");
 	}
 	bool on_left_button_down(float mx, float my) override {
@@ -110,7 +110,7 @@ public:
 			p->set_color(theme.hoverify(theme.text));
 		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\u21bb");
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("looping");
 	}
 	bool on_left_button_down(float mx, float my) override {

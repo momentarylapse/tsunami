@@ -130,7 +130,7 @@ bool Dial::on_mouse_wheel(float dx, float dy) {
 	return true;
 }
 
-string Dial::get_tip() {
+string Dial::get_tip() const {
 	//return label;
 	return "";
 }

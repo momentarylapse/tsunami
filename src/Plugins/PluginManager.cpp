@@ -12,6 +12,7 @@
 #include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
+#include "../View/Helper/Drawing.h"
 #include "../Data/base.h"
 #include "../Data/Song.h"
 #include "../Data/SongSelection.h"
@@ -131,7 +132,7 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
 	kaba::link_external("SelectSample", (void*)&SampleManagerConsole::select);
 	kaba::link_external("ChooseModule", (void*)&choose_module);
-	kaba::link_external("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
+	kaba::link_external("draw_boxed_str", (void*)&draw_boxed_str);
 	kaba::link_external("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	kaba::link_external("get_style_colors", (void*)&hui::get_style_colors);
 

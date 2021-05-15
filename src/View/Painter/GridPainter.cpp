@@ -14,10 +14,10 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../Graph/AudioViewTrack.h"
+#include "../Helper/Drawing.h"
 
 
 color col_inter(const color a, const color &b, float t);
-string i2s_small(int i);
 
 
 GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_scheme) :
@@ -200,7 +200,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			label = i2s(b->index_text + 1);
 
 		if (halo_col.a > 0) {
-			AudioView::draw_boxed_str(c, xx + 4, area.y1+5, label, local_theme.text, halo_col);
+			draw_boxed_str(c, xx + 4, area.y1+5, label, local_theme.text, halo_col);
 		} else {
 			float f1 = min(1.0f, dx_bar / 60.0f);
 			if ((b->index_text % 5) == 0)

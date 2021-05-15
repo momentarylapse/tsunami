@@ -140,7 +140,7 @@ bool SceneGraph::on_key(int key) {
 	return false;
 }
 
-bool SceneGraph::allow_handle_click_when_gaining_focus() {
+bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		if (c->hover(mx, my))
@@ -158,7 +158,7 @@ HoverData SceneGraph::get_hover_data(float mx, float my) {
 	return HoverData();
 }
 
-string SceneGraph::get_tip() {
+string SceneGraph::get_tip() const {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)

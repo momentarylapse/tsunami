@@ -26,7 +26,7 @@ public:
 	Node(float w, float h);
 	virtual ~Node();
 
-	virtual bool allow_handle_click_when_gaining_focus() { return true; }
+	virtual bool allow_handle_click_when_gaining_focus() const { return true; }
 
 	// return: block upwards propagation
 	virtual bool on_left_button_down(float mx, float my) { return false; }
@@ -38,7 +38,7 @@ public:
 	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
 	virtual bool on_key(int key) { return false; }
 
-	virtual bool hover(float mx, float my);
+	virtual bool hover(float mx, float my) const;
 
 	void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
@@ -46,15 +46,15 @@ public:
 	void add_child(Node *child);
 	void delete_child(Node *child);
 
-	bool is_cur_hover();
-	bool is_cur_hover_non_recursive();
+	bool is_cur_hover() const;
+	bool is_cur_hover_non_recursive() const;
 
-	virtual string get_tip();
+	virtual string get_tip() const;
 
 	virtual void update_geometry(const rect &target_area);
 	virtual void update_geometry_recursive(const rect &target_area);
 
-	SceneGraph *graph();
+	SceneGraph *graph() const;
 
 	Node *parent;
 	struct AlignData {
@@ -80,9 +80,9 @@ public:
 	int perf_channel;
 	void set_perf_name(const string &name);
 
-	Array<Node*> collect_children(bool include_hidden);
-	Array<Node*> collect_children_up();
-	Array<Node*> collect_children_down();
+	Array<Node*> collect_children(bool include_hidden) const;
+	Array<Node*> collect_children_up() const;
+	Array<Node*> collect_children_down() const;
 	void request_redraw();
 
 	static bool show_debug;
@@ -103,14 +103,14 @@ class HBox : public Node {
 public:
 	HBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(float mx, float my) override { return false; }
+	bool hover(float mx, float my) const override { return false; }
 };
 
 class VBox : public Node {
 public:
 	VBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(float mx, float my) override { return false; }
+	bool hover(float mx, float my) const override { return false; }
 };
 
 }

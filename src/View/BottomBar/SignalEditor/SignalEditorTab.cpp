@@ -19,6 +19,7 @@
 #include "../../Helper/Graph/Node.h"
 #include "../../Helper/Graph/Scrollable.h"
 #include "../../Helper/Graph/ScrollBar.h"
+#include "../../Helper/Drawing.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../../Data/base.h"
 #include "../../../Session.h"
@@ -54,7 +55,7 @@ public:
 		chain->start();
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("start");
 	}
 };
@@ -85,7 +86,7 @@ public:
 		chain->stop();
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("stop");
 	}
 };
@@ -123,7 +124,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 			tip = graph->hover.node->get_tip();
 		if (tip.num > 0) {
 			p->set_font_size(theme.FONT_SIZE);
-			AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
+			draw_cursor_hover(p, tip, mx, my, graph->area);
 		}
 	});
 	background = new SignalEditorBackground(this);
@@ -221,7 +222,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 		tip = graph->hover.node->get_tip();
 	if (tip.num > 0) {
 		p->set_font_size(theme.FONT_SIZE);
-		AudioView::draw_cursor_hover(p, tip, mx, my, graph->area);
+		draw_cursor_hover(p, tip, mx, my, graph->area);
 	}
 }
 

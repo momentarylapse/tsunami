@@ -1189,6 +1189,9 @@
     <ClCompile Include="src\View\Helper\Dial.cpp">
       <Filter>src\View\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="src\View\Helper\Drawing.cpp">
+      <Filter>src\View\Helper</Filter>
+    </ClCompile>
     <ClCompile Include="src\View\Helper\FxListEditor.cpp">
       <Filter>src\View\Helper</Filter>
     </ClCompile>
@@ -2244,6 +2247,9 @@
     <ClInclude Include="src\Storage\Format\FormatWave.h">
       <Filter>src\Storage\Format</Filter>
     </ClInclude>
+    <ClInclude Include="src\Storage\Helper\minimp3.h">
+      <Filter>src\Storage\Helper</Filter>
+    </ClInclude>
     <ClInclude Include="src\Storage\Storage.h">
       <Filter>src\Storage</Filter>
     </ClInclude>
@@ -2437,6 +2443,9 @@
       <Filter>src\View\Helper</Filter>
     </ClInclude>
     <ClInclude Include="src\View\Helper\Dial.h">
+      <Filter>src\View\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\Helper\Drawing.h">
       <Filter>src\View\Helper</Filter>
     </ClInclude>
     <ClInclude Include="src\View\Helper\FxListEditor.h">
@@ -2734,6 +2743,9 @@
     </Filter>
     <Filter Include="src\Storage\Format">
       <UniqueIdentifier>{099ED05C-69A7-FF58-AF67-D51C2C698E38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Storage\Helper">
+      <UniqueIdentifier>{3DA8B25F-A980-3AF7-83AA-65FB4E637DEB}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Stuff">
       <UniqueIdentifier>{2504A039-A78F-EFEE-3C53-E8989AD0BDFD}</UniqueIdentifier>

@@ -45,21 +45,21 @@ void Cursor::on_draw(Painter* c) {
 	view->draw_time_line(c, pos(), col, is_cur_hover(), false, true);
 }
 
-int Cursor::pos() {
+int Cursor::pos() const {
 	if (is_end)
 		return view->sel.range_raw.end();
 	else
 		return view->sel.range_raw.start();
 }
 
-bool Cursor::hover(float mx, float my) {
+bool Cursor::hover(float mx, float my) const {
 	if (my < view->song_area().y2 - 20)
 		return false;
 	float x = view->cam.sample2screen(pos());
 	return (fabs(x - mx) < 10);
 }
 
-string Cursor::get_tip() {
+string Cursor::get_tip() const {
 	return _("cursor");
 }
 

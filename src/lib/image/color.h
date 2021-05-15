@@ -34,6 +34,7 @@ public:
 	bool operator==(const color &c) const;
 	bool operator!=(const color &c) const;
 	void _cdecl clamp();
+	color with_alpha(float a) const;
 	string _cdecl str() const;
 	string _cdecl hex() const;
 

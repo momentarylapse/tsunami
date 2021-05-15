@@ -40,7 +40,8 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::No
 	set_perf_name("vtrack");
 
 	if (track) {
-		add_child(new TrackHeader(this));
+		header = new TrackHeader(this);
+		add_child(header);
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_CHANGE);
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_ADD_EFFECT);
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_DELETE_EFFECT);
@@ -49,6 +50,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::No
 		track->subscribe(this, [=]{ track = NULL; }, track->MESSAGE_DELETE);
 	} else {
 		hidden = true;
+		header = nullptr;
 	}
 }
 

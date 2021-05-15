@@ -130,6 +130,8 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	for (int i=0; i<12; i++) {
 		pitch[i] = PITCH_COLORS[i];
 		pitch_text[i] = color::interpolate(pitch[i], text, 0.2f);
+		pitch_soft1[i] = color::interpolate(pitch[i], background, 0.5f);
+		pitch_soft2[i] = color::interpolate(pitch[i], background, 0.75f);
 	}
 }
 

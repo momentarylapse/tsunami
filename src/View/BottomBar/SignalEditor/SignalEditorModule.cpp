@@ -13,6 +13,7 @@
 #include "../../AudioView.h"
 #include "../../MouseDelayPlanner.h"
 
+#include "../../Helper/Drawing.h"
 #include "../../Helper/Graph/SceneGraph.h"
 
 const float MODULE_WIDTH = 140;
@@ -114,7 +115,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 		p->set_color(theme.text_soft1);
 	}
 	string type = module_header(module);
-	AudioView::draw_str_constrained(p, r.mx(), r.my() - p->font_size/2, r.width() - 12, type, 0);
+	draw_str_constrained(p, r.mx(), r.my() - p->font_size/2, r.width() - 12, type, TextAlign::CENTER);
 	p->set_font("", theme.FONT_SIZE, false, false);
 
 }
@@ -133,6 +134,6 @@ bool SignalEditorModule::on_right_button_down(float mx, float my) {
 	return true;
 }
 
-string SignalEditorModule::get_tip() {
+string SignalEditorModule::get_tip() const {
 	return "module...";
 }

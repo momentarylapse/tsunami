@@ -9,8 +9,10 @@
 #include "../Helper/PeakMeterDisplay.h"
 #include "../Helper/ModulePanel.h"
 #include "../Helper/FxListEditor.h"
+#include "../Helper/Drawing.h"
 #include "../AudioView.h"
 #include "../Graph/AudioViewTrack.h"
+#include "../Graph/TrackHeader.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -27,8 +29,8 @@
 #include <math.h>
 
 
-Array<const Track*> track_group_colors(Track *t);
-color group_color(const Track *group);
+Array<int> track_group_colors(Track *t);
+int group_color(const Track *group);
 
 class TrackMixer: public hui::Panel {
 public:
@@ -72,10 +74,12 @@ public:
 		vtrack = t;
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
+		vtrack->view->subscribe(this, [=] { redraw(id_name); }, AudioView::MESSAGE_SELECTION_CHANGE);
 		fx_editor = new FxListEditor(track(), this, "fx", "midi-fx", false);
 		update();
 	}
 	~TrackMixer() {
+		vtrack->view->unsubscribe(this);
 		fx_editor->select_module(nullptr);
 		clear_track();
 	}
@@ -88,42 +92,29 @@ public:
 		auto view = console->view;
 		bool is_playable = view->get_playable_tracks().contains(track());
 
-
+		p->set_color(vtrack->header->color_bg());
+		p->set_roundness(theme.CORNER_RADIUS);
+		p->draw_rect(rect(0, p->width, -theme.CORNER_RADIUS, p->height));
+		p->set_roundness(0);
 
 		auto group_colors = track_group_colors(track());
-		if (group_colors.num > 0) {
-			color c = group_color(group_colors[0]);
-			if (t->type == SignalType::GROUP)
-				c = color::interpolate(c, theme.background, 0.2f);//0.4f);
-			else
-				c = color::interpolate(c, theme.background, 0.8f);
-			p->set_color(c);
-			p->draw_rect(rect(0, p->width, 0, p->height));
-		}
-		foreachi (auto g, group_colors, i) {
-			p->set_color(group_color(g));//(gc));
+		foreachi (int g, group_colors, i) {
+			p->set_color(theme.pitch_soft1[g]);
 			float y = 5*(group_colors.num - i - 1);
 			p->draw_rect(rect(0, p->width, y, y+5));
-			//MidiPainter::pitch_color(track->send_target->nice_name().hash() % MAX_PITCH)
 		}
 
-		//enable(id_name, is_playable);
 		string tt = nice_title();
+		p->set_color(vtrack->header->color_text());
 		if (is_playable) {
-			if (t->type == SignalType::GROUP)
-				p->set_color(theme.background);
-			else
-				p->set_color(theme.text_soft1);
 			p->set_font("", theme.FONT_SIZE, true, false);
-			float w = p->get_str_width(tt);
-			p->draw_str((p->width - w) / 2, 8, tt);
 		} else {
-			p->set_color(theme.text_soft3);
 			p->set_font("", theme.FONT_SIZE, false, true);
 			//set_string(id_name, "<s>" + nice_title() + "</s>");
-			float w = p->get_str_width(tt);
-			p->draw_str((p->width - w) / 2, 8, tt);
+			//float w = p->get_str_width(tt);
+			//p->draw_str((p->width - w) / 2, 8, tt);
 		}
+		draw_str_constrained(p, p->width/2, 8, p->width, tt, TextAlign::CENTER);
 	}
 
 	void on_name_left_click() {
@@ -210,8 +201,6 @@ public:
 		string s = track()->nice_name();
 		if (vtrack->solo)
 			s = u8"\u00bb " + s + u8" \u00ab";
-		if (s.num > 16)
-			return s.head(8) + ".." + s.tail(8);
 		return s;
 	}
 	void update() {
@@ -223,12 +212,6 @@ public:
 		set_float(pan_slider_id, track()->panning);
 		check(mute_id, track()->muted);
 		check("solo", vtrack->solo);
-		bool is_playable = vtrack->view->get_playable_tracks().contains(track());
-		enable(id_name, is_playable);
-		if (is_playable)
-			set_string(id_name, nice_title());
-		else
-			set_string(id_name, "<s>" + nice_title() + "</s>");
 		redraw(id_name);
 	}
 

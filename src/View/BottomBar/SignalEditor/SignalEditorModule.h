@@ -23,5 +23,5 @@ public:
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(float mx, float my) override;
 	bool on_right_button_down(float mx, float my) override;
-	string get_tip() override;
+	string get_tip() const override;
 };

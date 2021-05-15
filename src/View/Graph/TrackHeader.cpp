@@ -8,6 +8,7 @@
 #include "../Graph/TrackHeader.h"
 
 #include "../Helper/Graph/Node.h"
+#include "../Helper/Drawing.h"
 #include "../AudioView.h"
 #include "../MouseDelayPlanner.h"
 #include "../../Data/base.h"
@@ -17,11 +18,6 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../Graph/AudioViewTrack.h"
-
-
-
-color hash_color(int h);
-
 
 
 
@@ -41,7 +37,7 @@ public:
 		h.node = this;
 		return h;
 	}
-	color get_color() {
+	color get_color() const {
 		if (is_cur_hover())
 			return theme.hoverify(header->color_text());
 		return header->color_text();
@@ -66,7 +62,7 @@ public:
 		vtrack->set_muted(!vtrack->track->muted);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("toggle mute");
 	}
 };
@@ -83,7 +79,7 @@ public:
 		vtrack->set_solo(!vtrack->solo);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("toggle solo");
 	}
 };
@@ -100,7 +96,7 @@ public:
 		view->session->set_mode(EditMode::DefaultTrack);
 		return true;
 	}
-	string get_tip() override {
+	string get_tip() const override {
 		return _("edit track properties");
 	}
 };
@@ -117,21 +113,21 @@ TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, theme.TR
 	add_child(new TrackButtonConfig(this, x0+dx*2, 22));
 }
 
-color group_color(const Track *group) {
+int group_color(const Track *group) {
 	int index = 0;
 	for (auto *t: weak(group->song->tracks))
 		if (t->type == SignalType::GROUP) {
 			if (t == group)
-				return hash_color(index * 7 + 10);
+				return (index * 7 + 10) % 12;
 			index ++;
 		}
-	return Black;
+	return -1;
 }
 
-Array<const Track*> track_group_colors(Track *t) {
-	Array<const Track*> c;
+Array<int> track_group_colors(Track *t) {
+	Array<int> c;
 	if (t->type == SignalType::GROUP)
-		c.add(t);
+		c.add(group_color(t));
 
 	if (t->send_target)
 		c.append(track_group_colors(t->send_target));
@@ -139,31 +135,20 @@ Array<const Track*> track_group_colors(Track *t) {
 }
 
 color track_header_main_color(Track *track, AudioView *view) {
-	//if (view->sel.has(track)) {
-		auto group_colors = track_group_colors(track);
-		if (group_colors.num > 0) {
-			color c = group_color(group_colors[0]);
-			/*if (track->type == SignalType::GROUP)
-				c = color::interpolate(c, colors.background, 0.3f);
-			else*/
-			return color::interpolate(c, theme.background, 0.5f);
-		} else {
-			return theme.blob_bg_selected;
-		}
-	/*} else {
-		if (track->type == SignalType::GROUP)
-			return colors.blob_bg_alt_hidden;
-		else
-			return colors.blob_bg_hidden;
-	}*/
+	auto group_colors = track_group_colors(track);
+	if (group_colors.num > 0) {
+		return theme.pitch_soft1[group_colors[0]];
+	} else {
+		return theme.blob_bg_selected;
+	}
 }
 
-color TrackHeader::color_bg() {
+color TrackHeader::color_bg() const {
 	auto *track = vtrack->track;
 	color col = track_header_main_color(track, view);
 	if (!view->sel.has(track)) {
 		if ((track->type == SignalType::GROUP) or track->send_target)
-			col = color::interpolate(col, theme.background, 0.6f);//colors.blob_bg_alt_hidden;
+			col = color::interpolate(col, theme.background, 0.6f);
 		else
 			col = theme.blob_bg_hidden;
 	}
@@ -172,7 +157,9 @@ color TrackHeader::color_bg() {
 	return col;
 }
 
-color TrackHeader::color_frame() {
+
+// obsolete
+color TrackHeader::color_frame() const {
 	auto *track = vtrack->track;
 	color col;
 
@@ -195,18 +182,18 @@ color TrackHeader::color_frame() {
 	return col;
 }
 
-bool TrackHeader::playable() {
+bool TrackHeader::playable() const {
 	auto *track = vtrack->track;
 	return view->get_playable_tracks().contains(track);
 }
 
-color TrackHeader::color_text() {
+color TrackHeader::color_text() const {
 	if (playable())
 		return theme.text;
 	if (view->sel.has(vtrack->track))
 		return theme.text_soft1;
 	else
-		return theme.text_soft2;
+		return theme.text_soft1.with_alpha(0.5f);
 }
 
 
@@ -229,14 +216,14 @@ void TrackHeader::on_draw(Painter *c) {
 
 	auto group_colors = track_group_colors(track);
 	foreachi (auto g, group_colors, i) {
-		c->set_color(group_color(g));//(gc));
+		c->set_color(theme.pitch_soft1[g]);//(gc));
 		float x = vtrack->area.x1 + 5*(group_colors.num - i - 1);
 		c->draw_rect(rect(x, x + 5, vtrack->area.y1, vtrack->area.y2));
 		//MidiPainter::pitch_color(track->send_target->nice_name().hash() % MAX_PITCH)
 	}
 
 	c->set_antialiasing(true);
-	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
+	draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
 	c->set_antialiasing(false);
 
 	// track title
@@ -245,7 +232,7 @@ void TrackHeader::on_draw(Painter *c) {
 	string title = track->nice_name();
 	if (vtrack->solo)
 		title = u8"\u00bb " + title + u8" \u00ab";
-	AudioView::draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
+	draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);
 		c->set_line_width(1.7f);

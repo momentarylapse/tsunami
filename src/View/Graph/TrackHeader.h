@@ -22,10 +22,11 @@ public:
 	void on_draw(Painter *c) override;
 	HoverData get_hover_data(float mx, float my) override;
 	
-	bool playable();
-	color color_bg();
-	color color_frame();
-	color color_text();
+	bool playable() const;
+	color color_bg() const;
+	color color_frame() const;
+	color color_text() const;
+	string nice_title() const;
 
 	bool on_left_button_down(float mx, float my) override;
 	bool on_left_double_click(float mx, float my) override;

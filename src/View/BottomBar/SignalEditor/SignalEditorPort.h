@@ -25,7 +25,7 @@ public:
 	SignalEditorModulePort(SignalEditorTab *t, Module *m, int _index, SignalType _type, float dx, float dy, bool out);
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(float mx, float my) override;
-	string get_tip() override;
+	string get_tip() const override;
 	HoverData get_hover_data(float mx, float my) override;
 };
 

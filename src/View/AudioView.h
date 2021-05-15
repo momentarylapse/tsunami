@@ -130,12 +130,6 @@ public:
 	void draw_song(Painter *c);
 	int draw_runner_id;
 
-	static rect get_boxed_str_rect(Painter *c, float x, float y, const string &str);
-	static void draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align=1);
-	static void draw_framed_box(Painter *p, const rect &r, const color &bg, const color &frame, float frame_width);
-	static float draw_str_constrained(Painter *p, float x, float y, float w_max, const string &str, int align=1);
-
-	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area);
 	void draw_cursor_hover(Painter *c, const string &msg);
 
 	void request_optimize_view();

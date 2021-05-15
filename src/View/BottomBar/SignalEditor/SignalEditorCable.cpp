@@ -56,6 +56,6 @@ void SignalEditorCable::on_draw(Painter *p) {
 	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 }
 
-bool SignalEditorCable::hover(float mx, float my) {
+bool SignalEditorCable::hover(float mx, float my) const {
 	return false;
 }

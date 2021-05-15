@@ -36,7 +36,7 @@ public:
 	bool on_mouse_move(float mx, float my) override;
 	bool on_mouse_wheel(float dx, float dy) override;
 	bool on_key(int key) override;
-	bool allow_handle_click_when_gaining_focus() override;
+	bool allow_handle_click_when_gaining_focus() const override;
 
 	//ViewNode *get_hover();
 	HoverData get_hover_data(float mx, float my) override;
@@ -44,7 +44,7 @@ public:
 	void draw(Painter *p);
 	void on_draw(Painter *p) override;
 
-	string get_tip() override;
+	string get_tip() const override;
 
 	HoverData hover;
 	HoverData cur_selection;

@@ -89,7 +89,7 @@ bool SignalEditorModulePort::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-string SignalEditorModulePort::get_tip() {
+string SignalEditorModulePort::get_tip() const {
 	if (is_out)
 		return _("output: ") + signal_type_name(type);
 	else

@@ -491,6 +491,7 @@ sources = [
 	'src/View/Helper/Graph/ScrollBar.cpp',
 	'src/View/Helper/CpuDisplay.cpp',
 	'src/View/Helper/Dial.cpp',
+	'src/View/Helper/Drawing.cpp',
 	'src/View/Helper/FxListEditor.cpp',
 	'src/View/Helper/MidiPreview.cpp',
 	'src/View/Helper/ModulePanel.cpp',
@@ -547,6 +548,7 @@ install_subdir('static/Midi Fonts', install_dir : join_paths(get_option('datadir
 install_subdir('static/SignalChains', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/favorites_demo.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/hui_resources.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
+install_data('static/icon.png', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/icon.svg', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license_small.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))

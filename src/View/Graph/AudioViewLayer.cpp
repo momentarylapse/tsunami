@@ -40,6 +40,7 @@
 #include "../Graph/LayerHeader.h"
 #include "../Helper/Graph/ScrollBar.h"
 #include "../Helper/SymbolRenderer.h"
+#include "../Helper/Drawing.h"
 
 
 
@@ -346,7 +347,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	float lw = c->get_str_width(text);
 	float dx = max(theme.CORNER_RADIUS, (x1-x0)/2 - lw/2);
 	if (allow_label) {
-		view->draw_boxed_str(c,  x0 + dx, y0 + frame_height, text, col, col_bg);
+		draw_boxed_str(c,  x0 + dx, y0 + frame_height, text, col, col_bg);
 	}
 
 
@@ -371,7 +372,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	c->draw_rect(x0, y0, x1-x0, frame_height);
 
 	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + frame_height));
-	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + dx, y0 + 8, text));
+	marker_label_areas.set(marker, get_boxed_str_rect(c,  x0 + dx, y0 + 8, text));
 
 	c->set_font("", theme.FONT_SIZE, false, false);
 }
@@ -425,15 +426,15 @@ void AudioViewLayer::set_edit_pitch_min_max(float _min, float _max) {
 	view->force_redraw();
 }
 
-bool AudioViewLayer::is_playable() {
+bool AudioViewLayer::is_playable() const {
 	return view->get_playable_layers().contains(layer);
 }
 
-color AudioViewLayer::background_color() {
+color AudioViewLayer::background_color() const {
 	return (view->sel.has(layer)) ? theme.background_track_selected : theme.background_track;
 }
 
-color AudioViewLayer::background_selection_color() {
+color AudioViewLayer::background_selection_color() const {
 	if (view->selection_mode == SelectionMode::RECT)
 		return background_color(); // complex selection rect as overlay...
 	return (view->sel.has(layer)) ? theme.background_track_selection : theme.background_track;
@@ -519,7 +520,7 @@ bool AudioViewLayer::on_left_button_down(float mx, float my) {
 }
 
 // TODO put somewhere more reasonable
-bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
+bool AudioViewLayer::allow_handle_click_when_gaining_focus() const {
 	if (view->mode == view->mode_edit)
 		if (view->mode_edit->mode == view->mode_edit_midi)
 			if (view->hover().type == HoverData::Type::MIDI_PITCH)
@@ -593,7 +594,7 @@ bool AudioViewLayer::on_right_button_down(float mx, float my) {
 	return true;
 }
 
-string AudioViewLayer::get_tip() {
+string AudioViewLayer::get_tip() const {
 	auto &h = view->hover();
 	if (h.sample)
 		return _("sample ") + h.sample->origin->name;

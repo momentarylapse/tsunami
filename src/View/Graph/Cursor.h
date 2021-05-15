@@ -19,10 +19,10 @@ public:
 	Cursor(AudioView *view, bool end);
 
 	void on_draw(Painter *p) override;
-	bool hover(float mx, float my) override;
-	string get_tip() override;
+	bool hover(float mx, float my) const override;
+	string get_tip() const override;
 
-	int pos();
+	int pos() const;
 
 	AudioView *view;
 	Range drag_range;
@@ -34,7 +34,7 @@ public:
 class SelectionMarker : public scenegraph::NodeFree {
 public:
 	SelectionMarker(AudioView *view);
-	bool hover(float mx, float my) override { return false; }
+	bool hover(float mx, float my) const override { return false; }
 
 	AudioView *view;
 	void on_draw(Painter *p) override;

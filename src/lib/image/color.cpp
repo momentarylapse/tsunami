@@ -18,6 +18,9 @@ const color Purple = color(1, 1, 0.5f, 0);
 //                                             colors                                             //
 //------------------------------------------------------------------------------------------------//
 
+color color::with_alpha(float _a) const {
+	return color(_a, r, g, b);
+}
 
 string color::str() const {
 	return format("(%.3f, %.3f, %.3f, %.3f)", r, g, b, a);

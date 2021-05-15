@@ -508,6 +508,7 @@
     <ClCompile Include="src\View\Helper\Graph\ScrollBar.cpp" />
     <ClCompile Include="src\View\Helper\CpuDisplay.cpp" />
     <ClCompile Include="src\View\Helper\Dial.cpp" />
+    <ClCompile Include="src\View\Helper\Drawing.cpp" />
     <ClCompile Include="src\View\Helper\FxListEditor.cpp" />
     <ClCompile Include="src\View\Helper\MidiPreview.cpp" />
     <ClCompile Include="src\View\Helper\ModulePanel.cpp" />
@@ -861,6 +862,7 @@
     <ClInclude Include="src\Storage\Format\FormatRaw.h" />
     <ClInclude Include="src\Storage\Format\FormatSoundFont2.h" />
     <ClInclude Include="src\Storage\Format\FormatWave.h" />
+    <ClInclude Include="src\Storage\Helper\minimp3.h" />
     <ClInclude Include="src\Storage\Storage.h" />
     <ClInclude Include="src\Storage\StorageOperationData.h" />
     <ClInclude Include="src\Stuff\BackupManager.h" />
@@ -926,6 +928,7 @@
     <ClInclude Include="src\View\Helper\Graph\ScrollBar.h" />
     <ClInclude Include="src\View\Helper\CpuDisplay.h" />
     <ClInclude Include="src\View\Helper\Dial.h" />
+    <ClInclude Include="src\View\Helper\Drawing.h" />
     <ClInclude Include="src\View\Helper\FxListEditor.h" />
     <ClInclude Include="src\View\Helper\MidiPreview.h" />
     <ClInclude Include="src\View\Helper\ModulePanel.h" />

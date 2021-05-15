@@ -15,6 +15,7 @@ class Painter;
 class AudioView;
 class AudioViewLayer;
 class MidiKeyChange;
+class TrackHeader;
 enum class MidiMode;
 
 
@@ -35,6 +36,7 @@ public:
 
 	AudioView *view;
 	Track *track;
+	TrackHeader *header;
 	AudioViewLayer *first_layer();
 	Array<int> reference_tracks;
 	bool solo;

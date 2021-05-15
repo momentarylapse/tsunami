@@ -17,7 +17,7 @@ public:
 	TimeScale(AudioView *view);
 	void on_draw(Painter *p) override;
 
-	bool allow_handle_click_when_gaining_focus() override { return false; }
+	bool allow_handle_click_when_gaining_focus() const override { return false; }
 
 	bool on_left_button_down(float mx, float my) override;
 	bool on_right_button_down(float mx, float my) override;

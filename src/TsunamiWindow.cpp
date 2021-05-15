@@ -916,7 +916,7 @@ void TsunamiWindow::on_delete_layer() {
 	if (view->cur_track()->layers.num > 1)
 		view->cur_track()->delete_layer(view->cur_layer());
 	else
-		session->e(_("can not delete the only version of a track"));
+		on_delete_track();
 }
 
 void TsunamiWindow::on_layer_make_track() {

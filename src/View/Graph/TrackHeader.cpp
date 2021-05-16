@@ -22,7 +22,6 @@
 
 
 
-
 class TrackHeaderButton : public scenegraph::NodeRel {
 public:
 	AudioView *view;
@@ -144,7 +143,7 @@ color track_header_main_color(Track *track, AudioView *view) {
 	}
 }
 
-color TrackHeader::color_bg() const {
+color TrackHeader::color_bg(bool allow_hover) const {
 	auto *track = vtrack->track;
 	color col = track_header_main_color(track, view);
 	if (!view->sel.has(track)) {
@@ -153,35 +152,11 @@ color TrackHeader::color_bg() const {
 		else
 			col = theme.blob_bg_hidden;
 	}
-	if (is_cur_hover())
+	if (is_cur_hover() and allow_hover)
 		col = theme.hoverify(col);
 	return col;
 }
 
-
-// obsolete
-color TrackHeader::color_frame() const {
-	auto *track = vtrack->track;
-	color col;
-
-	//if (view->sel.has(track))
-		return color_bg();
-	/*col = track_header_main_color(track, view);
-	if (track->type == SignalType::GROUP) {
-		if (view->sel.has(track))
-			col = group_color(track);//colors.blob_bg_alt_selected;
-		else
-			col = colors.blob_bg_alt;
-	} else*/ {
-		if (view->sel.has(track))
-			col = theme.blob_bg_selected;
-		else
-			col = theme.blob_bg;
-	}
-	if (is_cur_hover())
-		col = theme.hoverify(col);
-	return col;
-}
 
 bool TrackHeader::playable() const {
 	auto *track = vtrack->track;
@@ -212,6 +187,13 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
 }
 
+string TrackHeader::nice_title() const {
+	string title = vtrack->track->nice_name();
+	if (vtrack->solo)
+		title = u8"\u00bb " + title + u8" \u00ab";
+	return title;
+}
+
 void TrackHeader::on_draw(Painter *c) {
 	auto *track = vtrack->track;
 
@@ -224,15 +206,13 @@ void TrackHeader::on_draw(Painter *c) {
 	}
 
 	c->set_antialiasing(true);
-	draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
+	draw_box(c, area, color_bg());
 	c->set_antialiasing(false);
 
 	// track title
 	c->set_font("", theme.FONT_SIZE, playable(), false);
 	c->set_color(color_text());
-	string title = track->nice_name();
-	if (vtrack->solo)
-		title = u8"\u00bb " + title + u8" \u00ab";
+	string title = nice_title();
 	draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);

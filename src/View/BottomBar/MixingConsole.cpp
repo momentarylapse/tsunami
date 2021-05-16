@@ -30,25 +30,32 @@
 
 
 Array<int> track_group_colors(Track *t);
+Array<Track*> track_group_members(Track *group, bool with_self);
+
+const int TRACK_MIXER_WIDTH = 100;
+const int TRACK_MIXER_WIDTH_SHRUNK = 20;
 
 class TrackMixer: public hui::Panel {
 public:
+	int shrink_button_x = 0;
+
 	TrackMixer(AudioViewTrack *t, MixingConsole *c) {
 		set_spacing(0);
 		from_resource("track-mixer2");
 
-		vtrack = nullptr;
-		editing = false;
 		console = c;
 
 		reveal("revealer-fx", false);
 		reveal("config-revealer", false);
+		set_options("grid-volume", format("width=%d", TRACK_MIXER_WIDTH));
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
 		vol_slider_id = "volume";
 		pan_slider_id = "panning";
 		mute_id = "mute";
+		solo_id = "solo";
+		fx_id = "show-fx";
 		add_string(pan_slider_id, "-1\\L");
 		add_string(pan_slider_id, "0\\");
 		add_string(pan_slider_id, "1\\R");
@@ -67,9 +74,9 @@ public:
 		event(vol_slider_id, [=]{ on_volume(); });
 		event(pan_slider_id, [=]{ on_panning(); });
 		event(mute_id, [=]{ on_mute(); });
-		event("solo", [=]{ on_solo(); });
+		event(solo_id, [=]{ on_solo(); });
 		event_xp("peaks", "hui:draw", [=] (Painter* p) { on_peak_draw(p); });
-		event("show-fx", [=]{ on_show_fx(is_checked("")); });
+		event(fx_id, [=]{ on_show_fx(is_checked("")); });
 
 		vtrack = t;
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
@@ -84,6 +91,16 @@ public:
 		clear_track();
 	}
 
+	void set_shrunk(bool _shrink) {
+		shrunk = _shrink;
+		hide_control(vol_slider_id, shrunk);
+		hide_control(pan_slider_id, shrunk);
+		hide_control(mute_id, shrunk);
+		hide_control(solo_id, shrunk);
+		hide_control(fx_id, shrunk);
+		set_options("grid-volume", format("width=%d", shrunk ? TRACK_MIXER_WIDTH_SHRUNK : TRACK_MIXER_WIDTH));
+	}
+
 	void on_name_draw(Painter *p) {
 		auto t = track();
 		if (!t)
@@ -92,7 +109,7 @@ public:
 		auto view = console->view;
 		bool is_playable = view->get_playable_tracks().contains(track());
 
-		p->set_color(vtrack->header->color_bg());
+		p->set_color(vtrack->header->color_bg(false));
 		p->set_roundness(theme.CORNER_RADIUS);
 		p->draw_rect(rect(0, p->width, -theme.CORNER_RADIUS, p->height));
 		p->set_roundness(0);
@@ -104,17 +121,28 @@ public:
 			p->draw_rect(rect(0, p->width, y, y+5));
 		}
 
-		string tt = nice_title();
-		p->set_color(vtrack->header->color_text());
-		if (is_playable) {
-			p->set_font("", theme.FONT_SIZE, true, false);
-		} else {
-			p->set_font("", theme.FONT_SIZE, false, true);
-			//set_string(id_name, "<s>" + nice_title() + "</s>");
-			//float w = p->get_str_width(tt);
-			//p->draw_str((p->width - w) / 2, 8, tt);
+		if (!shrunk) {
+			string tt = vtrack->header->nice_title();
+			p->set_color(vtrack->header->color_text());
+			if (is_playable) {
+				p->set_font("", theme.FONT_SIZE, true, false);
+			} else {
+				p->set_font("", theme.FONT_SIZE, false, true);
+				//set_string(id_name, "<s>" + nice_title() + "</s>");
+				//float w = p->get_str_width(tt);
+				//p->draw_str((p->width - w) / 2, 8, tt);
+			}
+			draw_str_constrained(p, p->width/2, 8, p->width, tt, TextAlign::CENTER);
 		}
-		draw_str_constrained(p, p->width/2, 8, p->width, tt, TextAlign::CENTER);
+
+		if (vtrack->track->type == SignalType::GROUP) {
+			bool any_shrunk = false;
+			for (auto gm: track_group_members(vtrack->track, false))
+				if (console->mixer[gm->get_index()]->shrunk)
+					any_shrunk = true;
+			shrink_button_x = p->width - 10;
+			p->draw_str(shrink_button_x, 8, any_shrunk ? ">" : "<");
+		}
 	}
 
 	void set_current() {
@@ -129,6 +157,17 @@ public:
 	void on_name_left_click() {
 		set_current();
 		auto view = console->view;
+
+		if (vtrack->track->type == SignalType::GROUP and (hui::GetEvent()->mx > shrink_button_x)) {
+			bool any_shrunk = false;
+			for (auto gm: track_group_members(vtrack->track, false))
+				if (console->mixer[gm->get_index()]->shrunk)
+					any_shrunk = true;
+			for (auto gm: track_group_members(vtrack->track, false))
+				console->mixer[gm->get_index()]->set_shrunk(!any_shrunk);
+			redraw(id_name);
+		}
+
 		if (view->select_xor) {
 			view->toggle_select_track_with_content_in_cursor(vtrack);
 		} else {
@@ -217,12 +256,6 @@ public:
 		p->draw_rect(0,   h * (1 - peak[0]), w/2, h * peak[0]);
 		p->draw_rect(w/2, h * (1 - peak[1]), w/2, h * peak[1]);
 	}
-	string nice_title() {
-		string s = track()->nice_name();
-		if (vtrack->solo)
-			s = u8"\u00bb " + s + u8" \u00ab";
-		return s;
-	}
 	void update() {
 		if (!vtrack)
 			return;
@@ -260,15 +293,14 @@ public:
 		return vtrack->track;
 	}
 
-	AudioViewTrack *vtrack;
-	//Slider *volume_slider;
-	//Slider *panning_slider;
+	AudioViewTrack *vtrack = nullptr;
 	string id_name;
 	string vol_slider_id;
 	string pan_slider_id;
-	string mute_id;
+	string mute_id, solo_id, fx_id;
 	string id_separator;
-	bool editing;
+	bool editing = false;
+	bool shrunk = false;
 	MixingConsole *console;
 };
 
@@ -330,7 +362,10 @@ void MixingConsole::on_chain_state_change() {
 		for (auto &m: mixer)
 			m->redraw("peaks");
 	} else if (peak_runner_id == -1 and view->is_playback_active()) {
-		peak_runner_id = hui::RunRepeated(0.1f, [=]{ for (auto *m: mixer) m->redraw("peaks"); });
+		peak_runner_id = hui::RunRepeated(0.1f, [=] {
+			for (auto *m: mixer)
+				m->redraw("peaks");
+		});
 	}
 }
 

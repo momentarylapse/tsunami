@@ -33,6 +33,13 @@ void draw_boxed_str(Painter *c, float x, float y, const string &str, const color
 	c->draw_str(x + dx, y, str);
 }
 
+void draw_box(Painter *p, const rect &r, const color &bg) {
+	p->set_color(bg);
+	p->set_roundness(theme.CORNER_RADIUS);
+	p->draw_rect(r);
+	p->set_roundness(0);
+}
+
 void draw_framed_box(Painter *p, const rect &r, const color &bg, const color &frame, float frame_width) {
 	p->set_color(bg);
 	p->set_roundness(theme.CORNER_RADIUS);

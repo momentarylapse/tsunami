@@ -155,8 +155,14 @@ bool Control::has_focus() {
 	return gtk_widget_has_focus(widget);
 }
 
+
+static Array<Panel::SizeGroup> global_size_groups;
+
 Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
-	for (auto &g: panel->size_groups)
+	auto *size_groups = &panel->size_groups;
+	if (name.head(1) == "/")
+		size_groups = &global_size_groups;
+	for (auto &g: *size_groups)
 		if (g.name == name)
 			return &g;
 	Panel::SizeGroup gg;
@@ -168,8 +174,8 @@ Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
 	if (mode == 3)
 		mm = GTK_SIZE_GROUP_BOTH;
 	gg.group = gtk_size_group_new(mm);
-	panel->size_groups.add(gg);
-	return &panel->size_groups.back();
+	size_groups->add(gg);
+	return &size_groups->back();
 }
 
 void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css) {

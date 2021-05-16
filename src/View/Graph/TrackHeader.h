@@ -23,8 +23,7 @@ public:
 	HoverData get_hover_data(float mx, float my) override;
 	
 	bool playable() const;
-	color color_bg() const;
-	color color_frame() const;
+	color color_bg(bool allow_hover = true) const;
 	color color_text() const;
 	string nice_title() const;
 

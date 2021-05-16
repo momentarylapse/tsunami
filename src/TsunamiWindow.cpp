@@ -543,11 +543,12 @@ bool track_is_in_group(Track *t, Track *group) {
 	return false;
 }
 
-Array<Track*> track_group_members(Track *group) {
+Array<Track*> track_group_members(Track *group, bool with_self) {
 	Array<Track*> tracks;
 	for (auto t: weak(group->song->tracks))
-		if (track_is_in_group(t, group))
-			tracks.add(t);
+		if ((t != group) or with_self)
+			if (track_is_in_group(t, group))
+				tracks.add(t);
 	return tracks;
 }
 
@@ -558,7 +559,7 @@ void TsunamiWindow::on_track_ungroup() {
 		foreachb (auto t, tracks) {
 			auto group = track_top_group(t);
 			if (group and (group != t)) {
-				auto members = track_group_members(group);
+				auto members = track_group_members(group, true);
 				t->set_send_target(nullptr);
 				t->move(members.back()->get_index());
 			}

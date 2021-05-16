@@ -6804,13 +6804,13 @@ height=27,noexpandy
 0
 Slider
 panning
-range=-1:1:0.01,expandx,origin=no,ignorefocus
+range=-1:1:0.01,expandx,origin=no,ignorefocus,vgroup=/track-mixer-panning
 1
 0
 0
 Grid
 ?
-
+vgroup=/track-mixer-volume
 2
 0
 2
@@ -6822,7 +6822,7 @@ range=0:1:0.001,vertical,width=80,expandy,ignorefocus
 0
 DrawingArea
 peaks
-width=5,noexpandx
+width=5,noexpandx,vgroup=/track-mixer-peaks
 1
 0
 0

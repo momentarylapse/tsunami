@@ -3,10 +3,10 @@ Dialog track-mixer2 ""
 		Grid ? "" expandy
 			Grid grid-volume "" width=100 expandy vertical
 				DrawingArea name "" height=27 noexpandy
-				Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance" ignorefocus
-				Grid ? ""
+				Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance" ignorefocus vgroup=/track-mixer-panning
+				Grid ? "" vgroup=/track-mixer-volume
 					Slider volume "0" range=0:1:0.001 vertical width=80 expandy "tooltip=Volume in dB" ignorefocus
-					DrawingArea peaks "" width=5 noexpandx
+					DrawingArea peaks "" width=5 noexpandx vgroup=/track-mixer-peaks
 				Grid ? ""
 					Label ? "" width=5
 					ToggleButton mute "M" "tooltip=Mute" flat small height=20 expandx padding=1 ignorefocus

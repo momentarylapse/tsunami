@@ -34,9 +34,13 @@ void SceneGraph::set_callback_redraw(hui::Callback f) {
 	cb_redraw = f;
 }
 
+void SceneGraph::update_hover() {
+	hover = get_hover_data(mx, my);
+}
+
 bool SceneGraph::on_left_button_down(float mx, float my) {
 	set_mouse(mx, my);
-	hover = get_hover_data(mx, my);
+	update_hover();
 
 	if (hui::GetEvent()->just_focused)
 		if (!allow_handle_click_when_gaining_focus())
@@ -67,7 +71,7 @@ bool SceneGraph::on_left_button_up(float mx, float my) {
 
 bool SceneGraph::on_left_double_click(float mx, float my) {
 	set_mouse(mx, my);
-	hover = get_hover_data(mx, my);
+	update_hover();
 	set_current(hover);
 
 	auto nodes = collect_children_down();
@@ -80,7 +84,7 @@ bool SceneGraph::on_left_double_click(float mx, float my) {
 
 bool SceneGraph::on_right_button_down(float mx, float my) {
 	set_mouse(mx, my);
-	hover = get_hover_data(mx, my);
+	update_hover();
 	set_current(hover);
 
 	auto nodes = collect_children_down();
@@ -93,7 +97,7 @@ bool SceneGraph::on_right_button_down(float mx, float my) {
 
 bool SceneGraph::on_right_button_up(float mx, float my) {
 	set_mouse(mx, my);
-	hover = get_hover_data(mx, my);
+	update_hover();
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
@@ -107,7 +111,7 @@ bool SceneGraph::on_mouse_move(float mx, float my) {
 	set_mouse(mx, my);
 
 	if (!mdp->update(mx, my)) {
-		hover = get_hover_data(mx, my);
+		update_hover();
 
 		auto nodes = collect_children_down();
 		for (auto *c: nodes)

@@ -59,6 +59,7 @@ public:
 
 	float mx, my;
 	void set_mouse(float mx, float my);
+	void update_hover();
 
 	void integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill);
 	static SceneGraph *create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, std::function<void(Painter *)> custom_draw=nullptr, bool fill=true);

@@ -27,6 +27,7 @@ public:
 	virtual void on_cancel() {}
 	virtual void on_clean_up() {}
 	virtual void on_draw_post(Painter *p) {}
+	scenegraph::SceneGraph *scene_graph = nullptr;
 };
 
 class MouseDelayPlanner {

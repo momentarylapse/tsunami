@@ -8,6 +8,7 @@
 #include "../Graph/TrackHeader.h"
 
 #include "../Helper/Graph/Node.h"
+#include "../Helper/Graph/SceneGraph.h"
 #include "../Helper/Drawing.h"
 #include "../AudioView.h"
 #include "../MouseDelayPlanner.h"
@@ -252,12 +253,26 @@ void TrackHeader::on_draw(Painter *c) {
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
 }
 
+bool track_is_in_group(Track *t, Track *g) {
+	if (t == g)
+		return true;
+	if (t->send_target == g)
+		return true;
+	if (t->send_target)
+		return track_is_in_group(t->send_target, g);
+	return false;
+}
+
 class MouseDelayDndTrack : public MouseDelayAction {
 public:
-	AudioViewTrack *track;
-	MouseDelayDndTrack(AudioViewTrack *t) { track = t; }
+	AudioViewTrack *vtrack;
+	AudioView *view;
+	MouseDelayDndTrack(AudioViewTrack *t) {
+		vtrack = t;
+		view = vtrack->view;
+	}
 	void on_draw_post(Painter *c) override {
-		auto *view = track->view;
+		scene_graph->update_hover();
 		//int orig = get_track_index(moving_track);
 		int t = get_track_move_target(true);
 		int y = view->vtracks.back()->area.y2;
@@ -266,7 +281,7 @@ public:
 
 		c->set_color(theme.selection_boundary);
 		c->set_line_width(2.0f);
-		c->draw_line(view->area.x1,  y,  view->area.x2,  y);
+		c->draw_line(view->area.x1, y, view->area.x2, y);
 		c->set_line_width(1.0f);
 
 		/*c->setColor(colors.selection_internal);
@@ -274,16 +289,29 @@ public:
 		r.x2 = view->TRACK_HANDLE_WIDTH;
 		c->drawRect(r);*/
 
-		view->draw_cursor_hover(c, track->track->nice_name());
+		auto g = get_target_group();
+		if (g) {
+			c->set_color(theme.pitch[group_color(g)].with_alpha(0.2f));
+			for (auto gt: weak(view->song->tracks))
+				if (track_is_in_group(gt, g)) {
+					auto gvt = view->get_track(gt);
+					c->draw_rect(gvt->area);
+				}
+		}
+
+		view->draw_cursor_hover(c, vtrack->track->nice_name());
 	}
 	void on_finish(float mx, float my) override {
 		int target = get_track_move_target(false);
-		track->track->move(target);
+		auto g = get_target_group();
+		vtrack->track->song->begin_action_group();
+		vtrack->track->move(target);
+		vtrack->track->set_send_target(g);
+		vtrack->track->song->end_action_group();
 	}
 
 	int get_track_move_target(bool visual) {
-		auto *view = track->view;
-		int orig = get_track_index(track->track);
+		int orig = get_track_index(vtrack->track);
 		foreachi(auto vt, view->vtracks, i) {
 			int y = (vt->area.y1 + vt->area.y2) / 2;
 			if (y > view->my) {
@@ -294,6 +322,20 @@ public:
 			}
 		}
 		return visual ? view->song->tracks.num : (view->song->tracks.num-1);
+	}
+	Track *get_target_group() {
+		int target = get_track_move_target(true);
+		auto v = view->hover().vtrack;
+		if (!v)
+			return nullptr;
+		if (v->track->type == SignalType::GROUP) {
+			if (target == get_track_index(v->track))
+				return v->track->send_target;
+			return v->track;
+		}
+		if (v->track->send_target)
+			return v->track->send_target;
+		return nullptr;
 	}
 };
 

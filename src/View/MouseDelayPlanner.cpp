@@ -23,6 +23,7 @@ void MouseDelayPlanner::prepare(MouseDelayAction *a) {
 	x0 = scene_graph->mx;
 	y0 = scene_graph->my;
 	action = a;
+	action->scene_graph = scene_graph;
 }
 
 bool MouseDelayPlanner::update(float mx, float my) {

@@ -1622,7 +1622,6 @@ void AudioView::set_playback_range_locked(bool locked) {
 void AudioView::set_cursor_pos(int pos) {
 	sel.range_raw = Range(pos, 0);
 	select_under_cursor();
-	//update_selection();
 	cam.make_sample_visible(pos, 0);
 }
 
@@ -1672,6 +1671,7 @@ void AudioView::select_object() {
 	} else if (hover().note) {
 		sel.add(hover().note);
 	}
+	update_selection();
 }
 
 void AudioView::toggle_object() {
@@ -1684,6 +1684,7 @@ void AudioView::toggle_object() {
 	} else if (hover().note) {
 		sel.toggle(hover().note);
 	}
+	update_selection();
 }
 
 bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
@@ -1698,11 +1699,13 @@ bool AudioView::exclusively_select_track(AudioViewTrack *t) {
 	sel._layers.clear();
 	for (auto *l: weak(t->track->layers))
 		sel.add(l);
+	update_selection();
 	return had_sel;
 }
 
 void AudioView::toggle_select_layer(AudioViewLayer *l) {
 	sel.toggle(l->layer);
+	update_selection();
 }
 
 void AudioView::exclusively_select_object() {
@@ -1744,6 +1747,7 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 	else
 		sel = sel || SongSelection::from_range(song, sel.range()).filter({l->layer});
 	//toggle_select_layer();
+	update_selection();
 }
 
 // hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
@@ -1755,14 +1759,17 @@ void AudioView::toggle_select_track_with_content_in_cursor(AudioViewTrack *t) {
 		for (auto *l: weak(t->track->layers))
 			sel = sel || SongSelection::from_range(song, sel.range()).filter({l});
 	}
+	update_selection();
 	//toggle_select_layer();
 }
 
 void AudioView::prepare_menu(hui::Menu *menu) {
-	auto vl = hover().vlayer;
-	auto vt = hover().vtrack;
+	auto vl = cur_vlayer();//hover().vlayer;
+	auto vt = cur_vtrack();//hover().vtrack;
+
 	auto l = vl ? vl->layer : nullptr;
 	auto t = vt ? vt->track : nullptr;
+
 	// midi mode
 	if (t) {
 		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);

@@ -30,7 +30,6 @@
 
 
 Array<int> track_group_colors(Track *t);
-int group_color(const Track *group);
 
 class TrackMixer: public hui::Panel {
 public:
@@ -63,6 +62,7 @@ public:
 
 		event_xp(id_name, "hui:draw", [=] (Painter* p) { on_name_draw(p); });
 		event_x(id_name, "hui:left-button-down", [=] { on_name_left_click(); });
+		event_x(id_name, "hui:right-button-down", [=] { on_name_right_click(); });
 		event_x(id_name, "hui:left-double-click", [=] { on_name_double_click(); });
 		event(vol_slider_id, [=]{ on_volume(); });
 		event(pan_slider_id, [=]{ on_panning(); });
@@ -117,7 +117,17 @@ public:
 		draw_str_constrained(p, p->width/2, 8, p->width, tt, TextAlign::CENTER);
 	}
 
+	void set_current() {
+		auto view = console->view;
+		HoverData h;
+		h.vtrack = vtrack;
+		h.vlayer = vtrack->first_layer();
+		view->set_current(h);
+		view->select_xor = win->get_key(hui::KEY_CONTROL);
+	}
+
 	void on_name_left_click() {
+		set_current();
 		auto view = console->view;
 		if (view->select_xor) {
 			view->toggle_select_track_with_content_in_cursor(vtrack);
@@ -130,8 +140,18 @@ public:
 			}
 		}
 	}
+	void on_name_right_click() {
+		set_current();
+		auto view = console->view;
+		if (!view->sel.has(vtrack->track)) {
+			view->exclusively_select_layer(vtrack->first_layer());
+			view->select_under_cursor();
+		}
+		view->open_popup(view->menu_track.get());
+	}
 
 	void on_name_double_click() {
+		set_current();
 		console->session->set_mode(EditMode::DefaultTrack);
 	}
 

@@ -486,12 +486,17 @@ void TsunamiWindow::on_track_render() {
 }
 
 void TsunamiWindow::on_delete_track() {
-	if (view->cur_track()) {
-		try {
-			song->delete_track(view->cur_track());
-		} catch (Exception &e) {
-			session->e(e.message());
+	auto tracks = view->sel.tracks();
+	if (tracks.num > 0) {
+		song->begin_action_group();
+		for (auto t: tracks) {
+			try {
+				song->delete_track(const_cast<Track*>(t));
+			} catch (Exception &e) {
+				session->e(e.message());
+			}
 		}
+		song->end_action_group();
 	} else {
 		session->e(_("No track selected"));
 	}
@@ -913,10 +918,19 @@ void TsunamiWindow::on_add_layer() {
 }
 
 void TsunamiWindow::on_delete_layer() {
-	if (view->cur_track()->layers.num > 1)
-		view->cur_track()->delete_layer(view->cur_layer());
-	else
-		on_delete_track();
+	try {
+		auto layers = view->sel.layers();
+		for (auto l: layers) {
+			auto t = l->track;
+			if (t->layers.num > 1) {
+				t->delete_layer(const_cast<TrackLayer*>(l));
+			} else {
+				song->delete_track(t);
+			}
+		}
+	} catch(Exception &e) {
+		session->e(e.message());
+	}
 }
 
 void TsunamiWindow::on_layer_make_track() {

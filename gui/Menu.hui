@@ -31,14 +31,13 @@ Menu menu ""
 	Menu /menu-track "Track"
 		Item track_import "Import from file..." image=hui:open
 		Item track_render "Render from selection"
-		Item edit-track-groups "Routing..."
 		Separator
 		Menu /menu-track-new "Add new track"
 			Item /track-add-audio-mono "Audio (mono)" image=hui:add
 			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
 			Item /track-add-midi "Midi" image=hui:add
 			Item /track-add-beats "Metronome" image=hui:add
-			Item /track-add-group "Group" image=hui:add
+			Item /track-add-group "Group/master" image=hui:add
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add

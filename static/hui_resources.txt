@@ -1565,7 +1565,7 @@ menu-track
 
 2
 0
-5
+4
 Item
 track_import
 image=hui:open
@@ -1578,22 +1578,16 @@ track_render
 1
 0
 0
-Item
-edit-track-groups
-
-2
-0
-0
 Separator
 
 
-3
+2
 0
 0
 Menu
 menu-track-new
 
-4
+3
 0
 5
 Item
@@ -3530,32 +3524,32 @@ Separator
 0
 0
 Item
-bars-delete
+bars-edit
 
 2
 0
 0
 Item
-bars-edit
-
-3
-0
-0
-Item
 bars-scale
 image=hui:zoom-in
-4
+3
 0
 0
 Item
 bars-add
 flat,image=hui:add
-5
+4
 0
 0
 Item
 bars-add-pause
 image=hui:add
+5
+0
+0
+Item
+bars-delete
+
 6
 0
 0
@@ -3577,16 +3571,10 @@ menu-track
 9
 0
 4
-Item
-track-delete
-
-0
-0
-0
 Menu
 menu-convert
 
-1
+0
 0
 2
 Item
@@ -3604,7 +3592,7 @@ track-convert-stereo
 Menu
 menu-edit
 
-2
+1
 0
 3
 Item
@@ -3621,6 +3609,12 @@ track-edit-fx
 0
 Item
 track-edit-curves
+
+2
+0
+0
+Item
+track-delete
 
 2
 0
@@ -3635,163 +3629,6 @@ Menu
 menu-song
 
 10
-0
-4
-Menu
-menu-track-new
-
-0
-0
-4
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
-1
-0
-0
-Item
-track-add-midi
-image=hui:add
-2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-song-edit-samples
-
-1
-0
-0
-Item
-show-mixing-console
-
-2
-0
-0
-Item
-song-properties
-
-3
-0
-0
-# Resource
-Menu
-popup-menu-bar-gap
-
-0
-0
-8
-Item
-header
-disabled
-0
-0
-0
-Separator
-
-
-1
-0
-0
-Item
-bars-add
-flat,image=hui:add
-2
-0
-0
-Item
-bars-add-pause
-image=hui:add
-3
-0
-0
-Separator
-
-
-4
-0
-0
-Item
-track-add-marker
-
-5
-0
-0
-Menu
-menu-track
-
-6
-0
-4
-Item
-track-delete
-
-0
-0
-0
-Menu
-menu-convert
-
-1
-0
-2
-Item
-track-convert-mono
-
-0
-0
-0
-Item
-track-convert-stereo
-
-1
-0
-0
-Menu
-menu-edit
-
-2
-0
-3
-Item
-layer-edit
-
-0
-0
-0
-Item
-track-edit-fx
-
-1
-0
-0
-Item
-track-edit-curves
-
-2
-0
-0
-Item
-track-properties
-
-3
-0
-0
-Menu
-menu-song
-
-7
 0
 4
 Menu
@@ -3846,6 +3683,49 @@ Item
 song-properties
 
 3
+0
+0
+# Resource
+Menu
+popup-menu-bar-gap
+
+0
+0
+6
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+bars-add
+flat,image=hui:add
+2
+0
+0
+Item
+bars-add-pause
+image=hui:add
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
+track-add-marker
+
+5
 0
 0
 # Resource
@@ -3951,16 +3831,10 @@ menu-track
 8
 0
 8
-Item
-track-delete
-
-0
-0
-0
 Menu
 menu-convert
 
-1
+0
 0
 2
 Item
@@ -3978,7 +3852,7 @@ track-convert-stereo
 Menu
 menu-midi-mode
 
-2
+1
 0
 3
 Item
@@ -4002,7 +3876,7 @@ checkable
 Menu
 menu-edit
 
-3
+2
 0
 3
 Item
@@ -4026,18 +3900,24 @@ track-edit-curves
 Item
 track-muted
 checkable
-4
+3
 0
 0
 Item
 track-solo
 checkable
-5
+4
 0
 0
 Item
 track-explode
 checkable
+5
+0
+0
+Item
+track-delete
+
 6
 0
 0
@@ -4230,7 +4110,7 @@ popup-menu-layer
 
 0
 0
-14
+16
 Item
 header
 disabled
@@ -4244,21 +4124,15 @@ Separator
 0
 0
 Item
-layer-delete
-
-2
-0
-0
-Item
 layer-add
 
-3
+2
 0
 0
 Menu
 menu-edit
 
-4
+3
 0
 3
 Item
@@ -4282,37 +4156,37 @@ track-edit-curves
 Item
 layer-mark-dominant
 
-5
+4
 0
 0
 Item
 layer-make-track
 
-6
+5
 0
 0
 Item
 layer-merge
 
-7
+6
 0
 0
 Item
 layer-muted
 checkable
-8
+7
 0
 0
 Item
 layer-solo
 checkable
-9
+8
 0
 0
 Menu
 menu-midi-mode
 
-10
+9
 0
 3
 Item
@@ -4333,28 +4207,40 @@ checkable
 2
 0
 0
+Item
+layer-delete
+
+10
+0
+0
 Separator
 
 
 11
 0
 0
-Menu
-menu-track
+Item
+track-add-marker
 
 12
 0
-6
-Item
-track-delete
-
 0
+Separator
+
+
+13
 0
 0
 Menu
+menu-track
+
+14
+0
+7
+Menu
 menu-convert
 
-1
+0
 0
 2
 Item
@@ -4365,6 +4251,24 @@ track-convert-mono
 0
 Item
 track-convert-stereo
+
+1
+0
+0
+Menu
+menu-group
+
+1
+0
+2
+Item
+track-create-group
+
+0
+0
+0
+Item
+track-ungroup
 
 1
 0
@@ -4388,15 +4292,21 @@ checkable
 0
 0
 Item
-track-properties
+track-delete
 
 5
+0
+0
+Item
+track-properties
+
+6
 0
 0
 Menu
 menu-song
 
-13
+15
 0
 4
 Menu
@@ -4459,7 +4369,7 @@ popup-menu-marker
 
 0
 0
-9
+6
 Item
 header
 disabled
@@ -4494,216 +4404,6 @@ Separator
 
 
 5
-0
-0
-Menu
-menu-version
-
-6
-0
-7
-Item
-layer-delete
-
-0
-0
-0
-Item
-layer-add
-
-1
-0
-0
-Item
-layer-mark-dominant
-
-2
-0
-0
-Item
-layer-make-track
-
-3
-0
-0
-Item
-layer-merge
-
-4
-0
-0
-Item
-layer-muted
-checkable
-5
-0
-0
-Item
-layer-solo
-checkable
-6
-0
-0
-Menu
-menu-track
-
-7
-0
-8
-Item
-track-delete
-
-0
-0
-0
-Menu
-menu-convert
-
-1
-0
-2
-Item
-track-convert-mono
-
-0
-0
-0
-Item
-track-convert-stereo
-
-1
-0
-0
-Menu
-menu-midi-mode
-
-2
-0
-3
-Item
-track-midi-mode-linear
-checkable
-0
-0
-0
-Item
-track-midi-mode-tab
-checkable
-1
-0
-0
-Item
-track-midi-mode-classical
-checkable
-2
-0
-0
-Menu
-menu-edit
-
-3
-0
-3
-Item
-layer-edit
-
-0
-0
-0
-Item
-track-edit-fx
-
-1
-0
-0
-Item
-track-edit-curves
-
-2
-0
-0
-Item
-track-muted
-checkable
-4
-0
-0
-Item
-track-solo
-checkable
-5
-0
-0
-Item
-track-explode
-checkable
-6
-0
-0
-Item
-track-properties
-
-7
-0
-0
-Menu
-menu-song
-
-8
-0
-4
-Menu
-menu-track-new
-
-0
-0
-5
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
-1
-0
-0
-Item
-track-add-midi
-image=hui:add
-2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Item
-song-edit-samples
-
-1
-0
-0
-Item
-show-mixing-console
-
-2
-0
-0
-Item
-song-properties
-
-3
 0
 0
 # Resource
@@ -4876,7 +4576,7 @@ popup-menu-sample
 
 0
 0
-10
+7
 Item
 header
 disabled
@@ -4917,216 +4617,6 @@ Item
 track-add-marker
 
 6
-0
-0
-Menu
-menu-version
-
-7
-0
-7
-Item
-layer-delete
-
-0
-0
-0
-Item
-layer-add
-
-1
-0
-0
-Item
-layer-mark-dominant
-
-2
-0
-0
-Item
-layer-make-track
-
-3
-0
-0
-Item
-layer-merge
-
-4
-0
-0
-Item
-layer-muted
-checkable
-5
-0
-0
-Item
-layer-solo
-checkable
-6
-0
-0
-Menu
-menu-track
-
-8
-0
-8
-Item
-track-delete
-
-0
-0
-0
-Menu
-menu-convert
-
-1
-0
-2
-Item
-track-convert-mono
-
-0
-0
-0
-Item
-track-convert-stereo
-
-1
-0
-0
-Menu
-menu-midi-mode
-
-2
-0
-3
-Item
-track-midi-mode-linear
-checkable
-0
-0
-0
-Item
-track-midi-mode-tab
-checkable
-1
-0
-0
-Item
-track-midi-mode-classical
-checkable
-2
-0
-0
-Menu
-menu-edit
-
-3
-0
-3
-Item
-layer-edit
-
-0
-0
-0
-Item
-track-edit-fx
-
-1
-0
-0
-Item
-track-edit-curves
-
-2
-0
-0
-Item
-track-muted
-checkable
-4
-0
-0
-Item
-track-solo
-checkable
-5
-0
-0
-Item
-track-explode
-checkable
-6
-0
-0
-Item
-track-properties
-
-7
-0
-0
-Menu
-menu-song
-
-9
-0
-4
-Menu
-menu-track-new
-
-0
-0
-5
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
-1
-0
-0
-Item
-track-add-midi
-image=hui:add
-2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Item
-song-edit-samples
-
-1
-0
-0
-Item
-show-mixing-console
-
-2
-0
-0
-Item
-song-properties
-
-3
 0
 0
 # Resource
@@ -5372,7 +4862,7 @@ menu-track-new
 
 2
 0
-4
+5
 Item
 track-add-audio-mono
 image=hui:add
@@ -5395,6 +4885,12 @@ Item
 track-add-beats
 image=hui:add
 3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
 0
 0
 Item
@@ -5452,7 +4948,7 @@ popup-menu-track
 
 0
 0
-14
+15
 Item
 header
 disabled
@@ -5465,16 +4961,10 @@ Separator
 1
 0
 0
-Item
-track-delete
-
-2
-0
-0
 Menu
 menu-convert
 
-3
+2
 0
 2
 Item
@@ -5492,7 +4982,7 @@ track-convert-stereo
 Menu
 menu-midi-mode
 
-4
+3
 0
 3
 Item
@@ -5516,7 +5006,7 @@ checkable
 Menu
 menu-edit
 
-5
+4
 0
 3
 Item
@@ -5535,6 +5025,24 @@ Item
 track-edit-curves
 
 2
+0
+0
+Menu
+menu-group
+
+5
+0
+2
+Item
+track-create-group
+
+0
+0
+0
+Item
+track-ungroup
+
+1
 0
 0
 Item
@@ -5556,27 +5064,33 @@ checkable
 0
 0
 Item
-track-properties
+track-delete
 
 9
+0
+0
+Item
+track-properties
+
+10
 0
 0
 Separator
 
 
-10
+11
 0
 0
 Item
 track-add-marker
 
-11
+12
 0
 0
 Menu
 menu-version
 
-12
+13
 0
 7
 Item
@@ -5624,7 +5138,7 @@ checkable
 Menu
 menu-song
 
-13
+14
 0
 4
 Menu
@@ -7536,7 +7050,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-625
+627
 # Text
 /bars-add
 Add bars...
@@ -7641,7 +7155,7 @@ Delete
 Go down one track
 
 /layer-edit
-Contents
+Contents...
 
 /layer-make-track
 Turn into track
@@ -7653,10 +7167,10 @@ Mark selection as dominant
 Merge...
 
 /layer-muted
-Layer muted
+Mute
 
 /layer-solo
-Layer solo
+Solo
 
 /layer-up
 Go up one track
@@ -7665,10 +7179,10 @@ Go up one track
 Delete
 
 /marker-edit
-Edit
+Edit...
 
 /marker-resize
-Resize
+Resize...
 
 /menu-convert
 Convert
@@ -7678,6 +7192,9 @@ Edit
 
 /menu-file
 File
+
+/menu-group
+Group
 
 /menu-midi-mode
 Midi mode
@@ -7749,7 +7266,7 @@ Delete
 Insert statically
 
 /sample-properties
-Properties
+Properties...
 
 /save
 Save
@@ -7764,7 +7281,7 @@ Settings...
 Mixing
 
 /song-edit-samples
-Manage samples
+Manage samples...
 
 /song-properties
 Properties
@@ -7779,10 +7296,10 @@ Audio (stereo)
 Metronome
 
 /track-add-group
-Group
+Group/master
 
 /track-add-marker
-Add marker
+Add marker...
 
 /track-add-midi
 Midi
@@ -7793,14 +7310,17 @@ Mono
 /track-convert-stereo
 Stereo
 
+/track-create-group
+Create group
+
 /track-delete
 Delete
 
 /track-edit-curves
-Curves
+Curves...
 
 /track-edit-fx
-Effects
+Effects...
 
 /track-explode
 Explode
@@ -7815,13 +7335,16 @@ Linear
 Tabulature
 
 /track-muted
-Muted
+Mute
 
 /track-properties
-Properties
+Properties...
 
 /track-solo
 Solo
+
+/track-ungroup
+Ungroup
 
 /undo
 Undo
@@ -8209,9 +7732,6 @@ Bars
 
 menu/delete_time
 Delete selected interval
-
-menu/edit-track-groups
-Routing...
 
 menu/export_selection
 Save selection...

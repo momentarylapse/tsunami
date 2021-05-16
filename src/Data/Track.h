@@ -48,8 +48,8 @@ public:
 
 	void _cdecl invalidate_all_peaks();
 
-	string _cdecl nice_name();
-	int _cdecl get_index();
+	string _cdecl nice_name() const;
+	int _cdecl get_index() const;
 
 	// actions
 	void _cdecl set_name(const string &name);
@@ -114,7 +114,7 @@ public:
 	shared_array<TrackMarker> _markers_old;
 
 	Array<CrossFadeOld> _fades_old;
-	bool has_version_selection();
+	bool has_version_selection() const;
 
 	Song *song;
 };

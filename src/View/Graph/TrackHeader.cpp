@@ -253,15 +253,7 @@ void TrackHeader::on_draw(Painter *c) {
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
 }
 
-bool track_is_in_group(Track *t, Track *g) {
-	if (t == g)
-		return true;
-	if (t->send_target == g)
-		return true;
-	if (t->send_target)
-		return track_is_in_group(t->send_target, g);
-	return false;
-}
+bool track_is_in_group(Track *t, Track *g);
 
 class MouseDelayDndTrack : public MouseDelayAction {
 public:

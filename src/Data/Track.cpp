@@ -103,7 +103,7 @@ Range Track::range() const {
 	return r;
 }
 
-int get_same_type_index(Track *t) {
+int get_same_type_index(const Track *t) {
 	if (!t->song)
 		return -1;
 	int n = 0;
@@ -128,7 +128,7 @@ string track_base_name(SignalType type) {
 	return _("Track");
 }
 
-string Track::nice_name() {
+string Track::nice_name() const {
 	if (name.num > 0)
 		return name;
 	int n = get_same_type_index(this);
@@ -140,9 +140,9 @@ string Track::nice_name() {
 	//return format(_("Track %d"), n+1);
 }
 
-int Track::get_index() {
+int Track::get_index() const {
 	//assert(song);
-	return weak(song->tracks).find(this);
+	return weak(song->tracks).find(const_cast<Track*>(this));
 }
 
 void Track::invalidate_all_peaks() {
@@ -153,7 +153,7 @@ void Track::invalidate_all_peaks() {
 
 
 
-bool Track::has_version_selection() {
+bool Track::has_version_selection() const {
 	for (auto *l: weak(layers))
 		if (l->fades.num > 0)
 			return true;

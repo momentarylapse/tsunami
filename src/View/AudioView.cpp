@@ -1763,6 +1763,15 @@ void AudioView::toggle_select_track_with_content_in_cursor(AudioViewTrack *t) {
 	//toggle_select_layer();
 }
 
+
+Array<Track*> selected_tracks_sorted(AudioView *view) {
+	Array<Track*> tracks;
+	for (auto t: weak(view->song->tracks))
+		if (view->sel.has(t))
+			tracks.add(t);
+	return tracks;
+}
+
 void AudioView::prepare_menu(hui::Menu *menu) {
 	auto vl = cur_vlayer();//hover().vlayer;
 	auto vt = cur_vtrack();//hover().vtrack;
@@ -1812,6 +1821,15 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 		menu->enable("layer-add-dominant", t->layers.num > 1);// and sel.layers.num == 1);
 		menu->enable("layer-make-track", t->layers.num > 1);
 		//menu->enable("layer-delete", !l->is_main());
+	}
+
+	// group
+	if (t) {
+		bool any_in_group = false;
+		for (auto t: sel.tracks())
+			if (t->send_target)
+				any_in_group = true;
+		menu->enable("track-ungroup", any_in_group);
 	}
 
 	menu->check("play-loop", looping());

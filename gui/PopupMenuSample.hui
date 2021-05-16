@@ -3,41 +3,6 @@ Menu popup-menu-sample ""
 	Separator
 	Item /sample-insert "Insert statically"
 	Item /sample-delete "Delete"
-	Item /sample-properties "Properties"
+	Item /sample-properties "Properties..."
 	Separator
-	Item /track-add-marker "Add marker"
-	Menu /menu-version "Version"
-		Item /layer-delete "Delete"
-		Item /layer-add "Add version"
-		Item /layer-mark-dominant "Mark selection as dominant"
-		Item /layer-make-track "Turn into track"
-		Item /layer-merge "Merge..."
-		Item /layer-muted "Layer muted" checkable
-		Item /layer-solo "Layer solo" checkable
-	Menu /menu-track "Track"
-		Item /track-delete "Delete"
-		Menu /menu-convert "Convert"
-			Item /track-convert-mono "Mono"
-			Item /track-convert-stereo "Stereo"
-		Menu /menu-midi-mode "Midi mode"
-			Item /track-midi-mode-linear "Linear" checkable
-			Item /track-midi-mode-tab "Tabulature" checkable
-			Item /track-midi-mode-classical "Classical" checkable
-		Menu /menu-edit "Edit"
-			Item /layer-edit "Contents"
-			Item /track-edit-fx "Effects"
-			Item /track-edit-curves "Curves"
-		Item /track-muted "Muted" checkable
-		Item /track-solo "Solo" checkable
-		Item /track-explode "Explode" checkable
-		Item /track-properties "Properties"
-	Menu /menu-song "File"
-		Menu /menu-track-new "Add new track"
-			Item /track-add-audio-mono "Audio (mono)" image=hui:add
-			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
-			Item /track-add-midi "Midi" image=hui:add
-			Item /track-add-beats "Metronome" image=hui:add
-			Item /track-add-group "Group" image=hui:add
-		Item /song-edit-samples "Manage samples"
-		Item /show-mixing-console "Mixing"
-		Item /song-properties "Properties"
+	Item /track-add-marker "Add marker..."

@@ -40,7 +40,7 @@ J	nami
 groups
 J	colors
 	keep next to each other
-	drag and drop group/ungroup
+~	drag and drop group/ungroup
 	popup -> group selected
 J	delete master -> ungroup
 

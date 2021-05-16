@@ -117,10 +117,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-add-group", [=]{ song->add_track(SignalType::GROUP); });
 	event("track-add-beats", [=]{ on_add_time_track(); });
 	event("track-add-midi", [=]{ on_add_midi_track(); });
-	event("track-delete", [=]{ on_delete_track(); });
+	event("track-delete", [=]{ on_track_delete(); });
+	event("track-create-group", [=]{ on_track_group(); });
+	event("track-ungroup", [=]{ on_track_ungroup(); });
 	//event("layer-edit-midi", [=]{ on_track_edit_midi(); });
 	//set_key_code("layer-edit-midi", hui::KEY_ALT + hui::KEY_E);
-	event("mode-edit-check", [=]{
+	event("mode-edit-check", [=] {
 		if (view->mode == view->mode_edit)
 			session->set_mode(EditMode::Default);
 		else
@@ -155,8 +157,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 					}
 	});
 
-	event("edit-track-groups", [=]{ auto *dlg = new TrackRoutingDialog(this, song); dlg->run(); delete dlg; });
-	set_key_code("edit-track-groups", hui::KEY_G + hui::KEY_CONTROL);
+	event("edit-track-groups", [=] {
+		auto dlg = ownify(new TrackRoutingDialog(this, song));
+		dlg->run();
+	});
 
 	event("track-midi-mode-linear", [=]{ on_layer_midi_mode_linear(); });
 	event("track-midi-mode-tab", [=]{ on_layer_midi_mode_tab(); });
@@ -485,7 +489,7 @@ void TsunamiWindow::on_track_render() {
 
 }
 
-void TsunamiWindow::on_delete_track() {
+void TsunamiWindow::on_track_delete() {
 	auto tracks = view->sel.tracks();
 	if (tracks.num > 0) {
 		song->begin_action_group();
@@ -499,6 +503,67 @@ void TsunamiWindow::on_delete_track() {
 		song->end_action_group();
 	} else {
 		session->e(_("No track selected"));
+	}
+}
+
+Array<Track*> selected_tracks_sorted(AudioView *view);
+
+void TsunamiWindow::on_track_group() {
+	auto tracks = selected_tracks_sorted(view);
+	if (tracks.num > 0) {
+		song->begin_action_group();
+		int first_index = tracks[0]->get_index();
+		auto group = song->add_track(SignalType::GROUP, first_index);
+		// add to group
+		for (auto t: tracks)
+			t->set_send_target(group);
+		// move into connected group
+		foreachi (auto t, tracks, i)
+			t->move(first_index + i + 1);
+		song->end_action_group();
+	}
+}
+
+
+Track *track_top_group(Track *t) {
+	if (t->send_target)
+		return track_top_group(t->send_target);
+	if (t->type == SignalType::GROUP)
+		return t;
+	return nullptr;
+}
+
+bool track_is_in_group(Track *t, Track *group) {
+	if (t == group)
+		return true;
+	if (t->send_target == group)
+		return true;
+	if (t->send_target)
+		return track_is_in_group(t->send_target, group);
+	return false;
+}
+
+Array<Track*> track_group_members(Track *group) {
+	Array<Track*> tracks;
+	for (auto t: weak(group->song->tracks))
+		if (track_is_in_group(t, group))
+			tracks.add(t);
+	return tracks;
+}
+
+void TsunamiWindow::on_track_ungroup() {
+	auto tracks = selected_tracks_sorted(view);
+	if (tracks.num > 0) {
+		song->begin_action_group();
+		foreachb (auto t, tracks) {
+			auto group = track_top_group(t);
+			if (group and (group != t)) {
+				auto members = track_group_members(group);
+				t->set_send_target(nullptr);
+				t->move(members.back()->get_index());
+			}
+		}
+		song->end_action_group();
 	}
 }
 

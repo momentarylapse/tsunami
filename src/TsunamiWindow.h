@@ -55,13 +55,15 @@ public:
 	void on_add_audio_track_stereo();
 	void on_add_time_track();
 	void on_add_midi_track();
-	void on_delete_track();
+	void on_track_delete();
 	void on_track_render();
 	void on_track_edit_midi();
 	void on_track_edit_fx();
 	void on_track_add_marker();
 	void on_track_convert_mono();
 	void on_track_convert_stereo();
+	void on_track_group();
+	void on_track_ungroup();
 	void on_buffer_delete();
 	void on_buffer_make_movable();
 	void on_layer_midi_mode_linear();

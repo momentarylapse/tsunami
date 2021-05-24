@@ -4,5 +4,5 @@ use tsunami
 
 
 class ClearR extends AudioEffect
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		buf.c[1] = 0

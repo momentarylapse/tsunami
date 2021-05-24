@@ -10,11 +10,11 @@ use tsunami
 #https://www.shadertoy.com/view/tsKXR3  fluid
 #https://www.shadertoy.com/view/ttKGDt  star...
 
-const int NUM_SAMPLES = 2048
+const NUM_SAMPLES = 2048
 
 
 
-const string[] SOURCE = ["
+const SOURCE = ["
 /*	2D Chladni patterns, see for instance:
 	http://paulbourke.net/geometry/chladni/
 	www.386dx25.de 
@@ -346,14 +346,14 @@ void main() {
 
 
 class ShaderPanel extends ConfigPanel
-	override ShaderVis* c
-	Shader* shader
-	float _time
-	Timer timer
-	int id_runner
-	int type
+	var override c: ShaderVis*
+	var shader: Shader*
+	var _time: float
+	var timer: Timer
+	var id_runner: int
+	var type: int
 	
-	override void __init__(Module _m)
+	func override __init__(_m: Module)
 		from_source("
 Grid ? '' vertical
 	ComboBox type 'Chladni by 386dx25\\Creation... by Danguafer\\Very fast procedural ocean by afl_ext\\Phantom Star by kasari39\\glowingMarblingBlack by nasana'
@@ -368,27 +368,27 @@ Grid ? '' vertical
 		event_x("area", "hui:unrealize", on_unrealize)
 		event("type", on_type)
 	
-	override void __delete__()
+	func override __delete__()
 		#print("delete")
 		hui.cancel_runner(id_runner)
 		#set_options("area", "make-current-gl")
 		#del s
 		#NixKill()
 	
-	void on_step()
+	func on_step()
 		redraw("area")
 	
-	void on_type()
+	func on_type()
 		type = get_int("")
 		update_shader()
 		
-	void on_unrealize()
+	func on_unrealize()
 		print("unreal...")
 		#set_options("area", "make-current-gl")
 		#del s
 		#NixKill()
 		
-	void update_shader()
+	func update_shader()
 		string frag = SOURCE[type]
 		
 		shader = Shader.create("
@@ -414,13 +414,13 @@ uniform float iVolume;
 </FragmentShader>
 ")
 	
-	void on_realize()
+	func on_realize()
 		nix.init()
 		update_shader()
 		
 		id_runner = hui.run_repeated(0.03, self, on_step)
 	
-	void on_draw()
+	func on_draw()
 		_time += timer.get()
 		c.lock()
 		float volume = c.buffer[c.current_reading].c[0].max()
@@ -438,12 +438,12 @@ uniform float iVolume;
 		#NixEnd()
 
 class ShaderVis extends AudioVisualizer
-	AudioBuffer[2] buffer
+	var buffer: AudioBuffer[2]
 	
-	override void process(AudioBuffer buf)
+	func override process(buf: AudioBuffer)
 		buffer[next_writing] = buf
 		flip()
 		
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new ShaderPanel(self)
 

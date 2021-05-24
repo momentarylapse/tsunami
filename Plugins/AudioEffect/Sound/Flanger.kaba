@@ -3,31 +3,31 @@
 
 use tsunami
 
-const string AUTO_CONFIG_DELAY = "0:0.02:0.1:1000:ms"
-const string AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"
-const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
+const AUTO_CONFIG_DELAY = "0:0.02:0.1:1000:ms"
+const AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"
+const AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
 
 
 class PluginConfig extends Module.Config
-	float delay
-	float speed
-	float depth
-	override void reset()
+	var delay: float
+	var speed: float
+	var depth: float
+	func override reset()
 		depth = 0.5
 		speed = 0.3
 		delay = 0.01
 
 
 class Flanger extends AudioEffect
-	PluginConfig config
+	var config: PluginConfig
 	
-	AudioBuffer buf_temp
-	int offset
-	override void reset_state()
+	var buf_temp: AudioBuffer
+	var offset: int
+	func override reset_state()
 		buf_temp.clear()
 		offset = 0
 
-	void do_flanger(out float[] b, out float[] temp)
+	func do_flanger(out b: float[], out temp: float[])
 		int p = offset % len(temp)
 		float sample_rate = session.sample_rate()
 	
@@ -55,7 +55,7 @@ class Flanger extends AudioEffect
 				p = 0
 
 	
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		int delay_samples = session.sample_rate() * config.delay + 1
 		buf_temp.set_channels(buf.channels)
 		buf_temp.resize(delay_samples)

@@ -4,7 +4,7 @@
 use tsunami
 
 
-float abs_max(float[] buf)
+func abs_max(buf: float[]) -> float
 	float m = 0.0
 	for b in buf
 		m = max(m, abs(b))
@@ -13,19 +13,19 @@ float abs_max(float[] buf)
 
 class Volume extends AudioEffect
 	class Config extends Module.Config
-		float volume
-		bool maximize
+		var volume: float
+		var maximize: bool
 	
-		override void reset()
+		func override reset()
 			volume = 1
 			maximize = false
 
-	Config config
+	var config: Config
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new Volume.Panel(self)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		float factor = config.volume
 		if config.maximize
 			float _max = 0
@@ -37,9 +37,9 @@ class Volume extends AudioEffect
 				b = clamp(b * factor, -1, 1)
 	
 	class Panel extends ConfigPanel
-		override Volume *c
-		Slider *slider
-		override void __init__(Module _v)
+		var override c: Volume*
+		var slider: Slider*
+		func override __init__(_v: Module)
 			add_grid("!width=400", 0, 0, "table1")
 			set_target("table1")
 			add_check_box("Maximize", 0, 1, "max")
@@ -53,22 +53,22 @@ class Volume extends AudioEffect
 	
 			event("max", on_max)
 	
-		override void __delete__()
+		func override __delete__()
 			del slider
 
-		override void update()
+		func override update()
 			slider.set(c.config.volume)
 			check("max", c.config.maximize)
 			enable("volume", !c.config.maximize)
 			enable("volume_slider", !c.config.maximize)
 
-		void on_max()
+		func on_max()
 			c.config.maximize = is_checked("max")
 			enable("volume", !c.config.maximize)
 			enable("volume_slider", !c.config.maximize)
 			changed()
 
-		void on_volume()
+		func on_volume()
 			c.config.volume = slider.get()
 			changed()
 

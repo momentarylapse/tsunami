@@ -4,27 +4,27 @@ use helper.tone
 
 # hopefully, soon, we will have recursive modules... then this will become obsolete!!!
 
-const string AUTO_CONFIG_PITCH = "" #"0:10000:0.1:1:Hz"
-const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const AUTO_CONFIG_PITCH = "" #"0:10000:0.1:1:Hz"
+const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
 
 class SineSource extends AudioSource
 	class Config extends Module.Config
-		float pitch
-		float volume
-		override void reset()
+		var pitch: float
+		var volume: float
+		func override reset()
 			pitch = 64
 			volume = 0.8
 
-	Config config
-	int offset
-	Synthesizer* synth = nil
-	MidiSource* source = nil
-	override void __delete__()
+	var config: Config
+	var offset: int
+	var synth: Synthesizer* = nil
+	var source: MidiSource* = nil
+	func override __delete__()
 		if synth
 			del synth
 			del source
-	override void reset_state()
+	func override reset_state()
 		offset = 0
 		if synth
 			del synth
@@ -34,5 +34,5 @@ class SineSource extends AudioSource
 		#dyn({"pitch":config.pitch, "volume":config.volume})
 		source.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
 		synth.plug_in(0, source, 0)
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		return synth.port_out[0].read_audio(buf)

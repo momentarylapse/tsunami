@@ -2,32 +2,32 @@
 # Title[Deutsch] = Monofizieren
 use tsunami
 
-const string AUTO_CONFIG_PANNING = "-1:1:1:100:%"
-const string AUTO_CONFIG_DISTANCE = "-2:2:0.1:100:cm"
-const string AUTO_CONFIG_INVERT = ""
+const AUTO_CONFIG_PANNING = "-1:1:1:100:%"
+const AUTO_CONFIG_DISTANCE = "-2:2:0.1:100:cm"
+const AUTO_CONFIG_INVERT = ""
 
-const float SPEED_OF_SOUND = 320.0 # m/s
+const SPEED_OF_SOUND = 320.0 # m/s
 
 
 class Monofier extends AudioEffect
 	class Config extends Module.Config
-		float panning
-		bool invert
-		float distance
-		override void reset()
+		var panning: float
+		var invert: bool
+		var distance: float
+		func override reset()
 			panning = 0 # INVERTED.... for historic reasons...
 			distance = 0
 			invert = false
 	
 
-	Config config
-	float[] temp
-	int offset
+	var config: Config
+	var temp: float[]
+	var offset: int
 
-	override void reset_state()
+	func override reset_state()
 		offset = 0
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		if buf.channels == 1
 			return
 

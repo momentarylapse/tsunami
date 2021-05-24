@@ -2,7 +2,7 @@ use tsunami
 
 class Delay extends MidiEffect
 	
-	override void process(out MidiNoteBuffer midi)
+	func override process(out midi: MidiNoteBuffer)
 		int length = 1000000#midi.getRange().length
 		int num = length / 20
 		for i in 0:num

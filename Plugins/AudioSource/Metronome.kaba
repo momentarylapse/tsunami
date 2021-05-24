@@ -9,45 +9,45 @@ use MidiSource.Metronome
 
 class Metronome extends AudioSource
 	class Config extends Module.Config
-		float beats_per_minute
-		float volume
-		int beats_per_measure
-		override void reset()
+		var beats_per_minute: float
+		var volume: float
+		var beats_per_measure: int
+		func override reset()
 			volume = 0.3
 			beats_per_minute = 90
 			beats_per_measure = 4
 
-	Config config
-	Synthesizer* synth = nil
-	MetronomeSource* source = nil
+	var config: Config
+	var synth: Synthesizer* = nil
+	var source: MetronomeSource* = nil
 	
-	void create_stuff()
+	func create_stuff()
 		synth = CreateSynthesizer(session, "")
 		source = CreateMidiSource(session, "Metronome")
 		synth.plug_in(0, source, 0)
 	
-	override void __delete__()
+	func override __delete__()
 		if source
 			del source
 			del synth
 
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		return synth.port_out[0].read_audio(buf)
 		
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		#return source.create_panel()
 		# how to deal with configuration/string exports...
 		
 		return new MetronomePanel(self)
 	
-	override void on_config()
+	func override on_config()
 		if !source
 			create_stuff()
 		source.config.volume = config.volume
 		source.set_beats(config.beats_per_measure, 1)
 		source.set_bpm(config.beats_per_minute)
 	
-	override void reset_state()
+	func override reset_state()
 		if not source
 			create_stuff()
 		synth.reset_state()
@@ -55,8 +55,8 @@ class Metronome extends AudioSource
 
 	
 class MetronomePanel extends ConfigPanel
-	override Metronome *c
-	override void __init__(Module _m)
+	var override c: Metronome*
+	func override __init__(_m: Module)
 		add_grid("", 0, 0, "table2")
 		set_target("table2")
 		add_label("!right,disabled\\Speed", 0, 0, "")
@@ -74,21 +74,21 @@ class MetronomePanel extends ConfigPanel
 	
 		update()
 
-	override void update()
+	func override update()
 		set_float("beats_per_minute", c.config.beats_per_minute)
 		set_int("beats_per_measure", c.config.beats_per_measure)
 		set_float("volume", c.config.volume * 100)
 		#SliderSet(self, "volume", c.config.volume)
 
-	void on_bpm()
+	func on_bpm()
 		c.config.beats_per_minute = get_float("")
 		changed()
 
-	void on_beats()
+	func on_beats()
 		c.config.beats_per_measure = get_int("")
 		changed()
 
-	void on_volume()
+	func on_volume()
 		c.config.volume = get_float("") / 100
 		#m.config.volume = SliderGet(self, "volume")
 		changed()

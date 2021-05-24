@@ -8,18 +8,18 @@ use helper.grid
 ##show
 ##disasm
 
-const int N = 4096*2 # fft size
-const int NT = 512 # time bins
-const int NF = 512*2 # freq bins
-const float MIN_FREQ = 60.0
-const float MAX_FREQ = 3000.0
-const float MIN_VOL = 0.0 - 60.0
-const float MAX_VOL = 0.0
+const N = 4096*2 # fft size
+const NT = 512 # time bins
+const NF = 512*2 # freq bins
+const MIN_FREQ = 60.0
+const MAX_FREQ = 3000.0
+const MIN_VOL = -60.0
+const MAX_VOL = 0.0
 
-Image im0
+var im0: Image
 
 class SpecGrid extends Grid
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 		rect r = plot_area
 		int w = r.width()
 		int h = r.height()
@@ -43,8 +43,8 @@ class SpecGrid extends Grid
 #		delete(im)
 
 class SpectrumDialog extends Dialog
-	SpecGrid grid
-	void __init__(ShowSpectrogram plugin, Song song)
+	var grid: SpecGrid
+	func __init__(plugin: ShowSpectrogram, song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable")
 		from_source("
@@ -63,11 +63,11 @@ Grid ? ''
 	
 		event("close", on_close)
 
-	void on_close()
+	func on_close()
 		destroy()
 
-color f2col(float _f)
-	let f = sqrt(_f)
+func f2col(_f: float) -> color
+	var f = sqrt(_f)
 	if f < 0.333
 		return color(0, 0, f*3, f*3)
 	else if f < 0.6666
@@ -76,10 +76,10 @@ color f2col(float _f)
 
 class ShowSpectrogram extends SongPlugin
 
-	SpectrumDialog *dlg
-	float[NF][NT] sg
+	var dlg: SpectrumDialog*
+	var sg: float[NF][NT]
 
-	void show_spec(Song *song)
+	func show_spec(song: Song*)
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf
@@ -133,7 +133,7 @@ class ShowSpectrogram extends SongPlugin
 		dlg.run()
 		del dlg
 
-	override void apply()
+	func override apply()
 	
 		if session.view.sel.range().length > 0
 			show_spec(song)

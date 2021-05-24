@@ -1,12 +1,12 @@
 use tsunami
 
 class ChaosSource extends BeatSource
-	int offset
+	var offset: int
 	
-	override void reset_state()
+	func override reset_state()
 		offset = 0
 		
-	override int read(out Beat[] beats, int samples)
+	func override read(out beats: Beat[], samples: int) -> int
 		int sample_rate = session.sample_rate()
 	
 		while offset < samples

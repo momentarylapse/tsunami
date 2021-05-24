@@ -5,50 +5,50 @@ use tsunami
 use helper.tone
 
 #const int freq = 44100
-const int f_min = 50
-const int f_max = 5000
+const f_min = 50
+const f_max = 5000
 
-const float threshold = 5.0
+const threshold = 5.0
 
 
-const int BUFFER_SIZE = 4096
-AudioBuffer buf
+const BUFFER_SIZE = 4096
+var buf: AudioBuffer
 
-SuperNovaWindow *win
+var win: SuperNovaWindow*
 
 class PlayedData
-	int note
-	int length
-	int offset
-	bool correct
+	var note: int
+	var length: int
+	var offset: int
+	var correct: bool
 
-PlayedData[] played
-int Offset
+var played: PlayedData[]
+var Offset: int
 
-float get_freq(float i)
+func get_freq(i: float) -> float
 	return i / (BUFFER_SIZE / 2) * song.sample_rate / 2
 
-float Frequency, Volume, Error
-bool LoudEnough
+var Frequency, Volume, Error: float
+var LoudEnough: bool
 
-int[6] StringPitch
-int HandPosition
+var StringPitch: int[6]
+var HandPosition: int
 
-Track *MidiTrack
-int LessonLength
+var MidiTrack: Track*
+var LessonLength: int
 
-float Score
-float ScoreFactor
-float TotalScore
+var Score: float
+var ScoreFactor: float
+var TotalScore: float
 
-int Mode
+var Mode: int
 enum
 	ModeConfig
 	ModeLesson
-string[] LessonName
+var LessonName: string[]
 
-float error
-string get_note(float f)
+var error: float
+func get_note(f: float) -> string
 	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
 	int rel = f2i(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
@@ -57,10 +57,10 @@ string get_note(float f)
 	#note = i2s(n)
 
 class SuperNovaWindow extends Window
-	int hover
-	float w, h
-	Painter *c
-	void __init__()
+	var hover: int
+	var w, h: float
+	var c: Painter*
+	func __init__()
 		super.__init__("Supernova", -1, -1, 1024, 600)
 		addGrid("", 0, 0, "table1")
 		setTarget("table1")
@@ -79,18 +79,18 @@ class SuperNovaWindow extends Window
 		event("cancel", &onCancel)
 		setFullscreen(true)
 	
-	override void __delete__()
+	func override __delete__()
 		if Mode == ModeLesson
 			StopLesson()
 	
-	void onClose()
+	func onClose()
 		destroy()
 	
-	void onCancel()
+	func onCancel()
 		StopLesson()
 		redraw("drawing")
 
-	void drawVolume()
+	func drawVolume()
 		c.setColor(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = c.height - 5
@@ -99,10 +99,10 @@ class SuperNovaWindow extends Window
 		c.setColor(color(1, 0.6, 0.6, 0.6))
 		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 	
-	float sample2x(float s)
+	func sample2x(s: float) -> float
 		return (s - Offset) / 700.0 + 500
 	
-	void drawSheet(float y0)
+	func drawSheet(y0: float)
 		c.setColor(color(1, 0.6, 0.6, 0.6))
 		for i in 0:6
 			float ly = h - (i + 1) * 30
@@ -122,12 +122,12 @@ class SuperNovaWindow extends Window
 			c.setColor(color.BLACK)
 			c.drawStr(sample2x(n.range.offset), ly-12, f)
 			
-	void drawScore()
+	func drawScore()
 		c.setColor(color.BLACK)
 		c.setFontSize(24)
 		c.drawStr(w - 220, 50, Score.str2(0) + " Punkte")
 		
-	void drawLesson()
+	func drawLesson()
 	
 		drawVolume()
 	
@@ -157,7 +157,7 @@ class SuperNovaWindow extends Window
 		else
 			c.drawStr(w / 2 - 30, h / 2 - 20, "zu leise")
 	
-	void drawConfig()
+	func drawConfig()
 		c.setFontSize(20)
 		for l,i in LessonName
 			if i == hover
@@ -169,7 +169,7 @@ class SuperNovaWindow extends Window
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	override void on_draw(Painter p)
+	func override on_draw(p: Painter)
 		c = p
 		c.setColor(color.WHITE)
 		c.setFontSize(12)
@@ -182,7 +182,7 @@ class SuperNovaWindow extends Window
 		else if Mode == ModeLesson
 			drawLesson()
 		
-	override void on_mouse_move()
+	func override on_mouse_move()
 		if Mode != ModeConfig
 			return
 		hover = -1
@@ -192,13 +192,13 @@ class SuperNovaWindow extends Window
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
 		redraw("drawing")
-	override void on_left_button_down()
+	func override on_left_button_down()
 		if Mode != ModeConfig
 			return
 		if hover >= 0
 			StartLesson(LessonName[hover])
 
-void UpdateInput()
+func UpdateInput()
 	int available = input.current_buffer.available()
 	
 	if available > BUFFER_SIZE
@@ -263,7 +263,7 @@ void UpdateInput()
 
 	win.redraw("drawing")
 
-void StartLesson(string name)
+func StartLesson(name: string)
 	Offset = 0
 	Score = 0
 	played.clear()
@@ -305,7 +305,7 @@ void StartLesson(string name)
 	win.enable("cancel", true)
 	Mode = ModeLesson
 
-void StopLesson()
+func StopLesson()
 	view.stream.stop()
 	input.removeObserver(nil)
 	input.stop()
@@ -315,9 +315,9 @@ void StopLesson()
 	win.enable("speed", true)
 	win.enable("cancel", false)
 
-complex[] bufc
+var bufc: complex[]
 
-void main()
+func main()
 	MidiTrack = nil
 	Mode = ModeConfig
 			

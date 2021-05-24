@@ -38,6 +38,7 @@ extern const string IDENTIFIER_STR;
 extern const string IDENTIFIER_REPR;
 extern const string IDENTIFIER_LEN;
 extern const string IDENTIFIER_LET;
+extern const string IDENTIFIER_VAR;
 extern const string IDENTIFIER_NAMESPACE;
 extern const string IDENTIFIER_RETURN_VAR;
 extern const string IDENTIFIER_VTABLE_VAR;

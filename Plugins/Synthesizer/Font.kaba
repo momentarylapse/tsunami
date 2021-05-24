@@ -5,14 +5,14 @@ use helper.tone
 
 # a single file
 class MidiFont
-	string name
-	Song* song = nil
-	Session* sub
+	var name: string
+	var song: Song* = nil
+	var sub: Session*
 	
-	void __init__(string _name)
+	func __init__(_name: string)
 		name = _name
 	
-	void load(Session session)
+	func load(session: Session)
 		if song
 			return
 		sub = session.create_child()
@@ -20,7 +20,7 @@ class MidiFont
 		sub.song = song
 		sub.storage.load(song, hui.app_directory_static << "Midi Fonts/{{name}}.nami")
 	
-	string[] instruments(Session session)
+	func instruments(session: Session) -> string[]
 		load(session)
 		string[] ii
 		for t in song.tracks
@@ -28,88 +28,89 @@ class MidiFont
 				ii.add(t.name)
 		return ii
 	
-	Synthesizer* get_synth(Session session, string name)
+	func get_synth(session: Session, name: string) -> Synthesizer*
 		load(session)
 		if not song
 			return nil
 		# match by name
 		for t in song.tracks
 			if t.type == SignalType.MIDI and t.name == name
-				let m = t.synth.copy()
+				var m = t.synth.copy()
 				Synthesizer* s = m
 				return s
 		# fist midi track...
 		for t in song.tracks
 			if t.type == SignalType.MIDI
-				let m = t.synth.copy()
+				var m = t.synth.copy()
 				Synthesizer* s = m
 				return s
 		return nil
 
 class FontList
-	MidiFont*[] fonts
+	var fonts: MidiFont*[]
 	
-	int find(string name)
+	func find(name: string) -> int
 		for f,i in fonts
 			if f.name == name
 				return i
 		return -1
 		
-	string[] get_names()
+	func get_names() -> string[]
 		string[] list
 		for s in fonts
 			list.add(s.name)
 		return list
 		
-	string[] instruments(Session session, string name)
+	func instruments(session: Session, name: string) -> string[]
 		for f in fonts
 			if f.name == name
 				return f.instruments(session)
 		return []
 
 	#string[] find_drumsets()
-	void update()
-		let list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
+	func update()
+		var list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
 		for e in list
 			string name = str(e)[:-5]
 			if find(name) >= 0
 				continue
 			fonts.add(new MidiFont(name))
 	
-	MidiFont* get(Session session, string name)
+	func get(session: Session, name: string) -> MidiFont*
 		update()
 		int n = find(name)
 		if n < 0
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
 			return nil
-		let f = fonts[n]
+		var f = fonts[n]
 		return f
 		#f.load(session)
 		#return f.song
 	
-	Synthesizer* get_synth(Session session, string name, string instrument)
-		let font = get(session, name)
+	func get_synth(session: Session, name: string, instrument: string) -> Synthesizer*
+		var font = get(session, name)
 		if not font
 			return nil
 		return font.get_synth(session, instrument)
 
-FontList font_list
+var font_list: FontList
+
 
 class FontConfig extends Module.Config
-	string name
-	string instrument
-	override void reset()
+	var name: string
+	var instrument: string
+	func override reset()
 		name = ""
 		instrument = ""
 
 class FontSynthesizer extends Synthesizer
-	FontConfig config
-	Synthesizer* synth = nil
-	override void __delete__()
+	var config: FontConfig
+	var synth: Synthesizer* = nil
+	func override __delete__()
 		if synth
 			del synth
-	override void on_config()
+	func override on_config()
 		if synth
 			del synth
 			synth = nil
@@ -118,23 +119,23 @@ class FontSynthesizer extends Synthesizer
 		if synth
 			synth.set_sample_rate(sample_rate)
 			synth.on_config()
-	override void render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer)
 		if !synth
 			return
 		synth.events = events
 		synth.render(buf)
 	
-	override void reset_state()
+	func override reset_state()
 		if synth
 			synth.reset_state()
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new FontPanel(self)
 
 class FontPanel extends ConfigPanel
-	FontConfig *sc
-	override FontSynthesizer *c
-	override void __init__(Module _s)
+	var sc: FontConfig*
+	var override c: FontSynthesizer*
+	func override __init__(_s: Module)
 		#super.__init__(_s)
 		sc = &c.config
 		add_grid("", 0, 0, "grid")
@@ -146,10 +147,10 @@ class FontPanel extends ConfigPanel
 		event("sets", on_select)
 		event("instruments", on_instruments)
 
-	override void update()
+	func override update()
 		print("update....")
 		reset("sets")
-		let sets = font_list.get_names()
+		var sets = font_list.get_names()
 		if len(sets) > 0
 			enable("sets", true)
 			set_string("sets", "  - none -")
@@ -164,7 +165,7 @@ class FontPanel extends ConfigPanel
 			set_int("sets", 0)
 
 		reset("instruments")
-		let instruments = font_list.instruments(c.session, sc.name)
+		var instruments = font_list.instruments(c.session, sc.name)
 		bool match = false
 		for ins,i in instruments
 			add_string("instruments", ins)
@@ -175,7 +176,7 @@ class FontPanel extends ConfigPanel
 			set_int("instruments", 0)
 		
 		
-	void on_select()
+	func on_select()
 		int n = get_int("")-1
 		sc.name = ""
 		if n >= 0 and n < len(font_list.fonts)
@@ -183,10 +184,10 @@ class FontPanel extends ConfigPanel
 		changed()
 		update()
 	
-	void on_instruments()
+	func on_instruments()
 		int n = get_int("")
 		sc.instrument = ""
-		let instruments = font_list.instruments(c.session, sc.name)
+		var instruments = font_list.instruments(c.session, sc.name)
 		if n >= 0 and n < len(instruments)
 			sc.instrument = instruments[n]
 		changed()

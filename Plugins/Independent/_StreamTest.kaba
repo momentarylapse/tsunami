@@ -3,24 +3,24 @@ use AudioSource.Silence
 use hui
 
 class _StreamTest extends TsunamiPlugin
-	SignalChain* chain
-	SilenceSource* source
-	AudioOutput* out
-	int runner
-	override void on_start()
+	var chain: SignalChain*
+	var source: SilenceSource*
+	var _out: AudioOutput*
+	var runner: int
+	func override on_start()
 	
 		chain = session.create_signal_chain("test")
 		source = chain.add(Module.Type.AUDIO_SOURCE, "Silence")
-		out = chain.add(Module.Type.STREAM, "AudioOutput")
-		chain.connect(source, 0, out, 0)
+		_out = chain.add(Module.Type.STREAM, "AudioOutput")
+		chain.connect(source, 0, _out, 0)
 		
 		runner = hui.run_repeated(0.1, self, on_tick)
 		
 		chain.start()
 
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 		del chain
 	
-	void on_tick()
-		print("{{out.samples_played()}}\t{{source.offset}}")
+	func on_tick()
+		print("{{_out.samples_played()}}\t{{source.offset}}")

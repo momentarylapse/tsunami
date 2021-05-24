@@ -21,8 +21,8 @@ use tsunami
 
 
 class LooperPanel extends ConfigPanel
-	override Looper* c
-	override void __init__(Module _c)
+	var override c: Looper*
+	func override __init__(_c: Module)
 		from_source("
 Grid ? ''
 	Label rec-time '' expandx
@@ -32,33 +32,33 @@ Grid ? ''
 		event("button", on_button)
 		c.panel = &self
 	
-	void _update()
+	func _update()
 		set_string("rec-time", c.session.song.get_time_str_long(len(c.recorder.buffer)))
 			
 	
-	void on_button()
+	func on_button()
 		c.tab()
 
 class Looper extends TsunamiPlugin
-	SignalChain* chain
-	AudioAccumulator* recorder
-	LooperPanel* panel
-	Song* song
+	var chain: SignalChain*
+	var recorder: AudioAccumulator*
+	var panel: LooperPanel*
+	var song: Song*
 	
-	int length
+	var length: int
 	
-	int runner
-	int mode
+	var runner: int
+	var mode: int
 	
-	override void on_start()
+	func override on_start()
 		panel = nil
 		length = 0
 		mode = 0
 		song = session.song
 		chain = session.create_signal_chain("click-counter")
-		let input = chain.add(Module.Type.STREAM, "AudioInput")
+		var input = chain.add(Module.Type.STREAM, "AudioInput")
 		recorder = chain.add(Module.Type.PLUMBING, "AudioAccumulator")
-		let sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
+		var sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		
@@ -67,30 +67,30 @@ class Looper extends TsunamiPlugin
 		
 		chain.start()
 		
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 		#chain.unsubscribe(&self)
 		del chain
 	
-	void on_update()
+	func on_update()
 		if panel
 			panel._update()
-	void tab()
+	func tab()
 		if mode == 0
 			rec_start()
 		else if mode == 1
 			rec_stop()
 	
-	void rec_start()
+	func rec_start()
 		recorder.command(Module.Command.ACCUMULATION_START, 0)
 		mode = 1
-	void rec_stop()
+	func rec_stop()
 		recorder.command(Module.Command.ACCUMULATION_STOP, 0)
 		
 		length = len(recorder.buffer)
-		let t = song.add_track(SignalType.AUDIO, 0)
+		var t = song.add_track(SignalType.AUDIO, 0)
 		AudioBuffer tbuf
-		let a = t.layers[0].edit_buffers(tbuf, Range(0, length))
+		var a = t.layers[0].edit_buffers(tbuf, Range(0, length))
 		tbuf.set(recorder.buffer, 0, 1.0)
 		t.layers[0].edit_buffers_finish(a)
 		
@@ -102,5 +102,5 @@ class Looper extends TsunamiPlugin
 		session.view.play()
 		session.view.optimize_view()
 
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new LooperPanel(self)

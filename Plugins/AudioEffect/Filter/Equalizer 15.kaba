@@ -6,27 +6,27 @@ use tsunami
 
 
 
-const int NUM_BANDS = 15
-const float MIN_FREQ = 20.0
-const float MAX_FREQ = 20000.0
+const NUM_BANDS = 15
+const MIN_FREQ = 20.0
+const MAX_FREQ = 20000.0
 
 
 class Equalizer15 extends AudioEffect
 	class Config extends Module.Config
-		float[NUM_BANDS] factor
+		var factor: float[NUM_BANDS]
 
-		override void reset()
+		func override reset()
 			for f in factor
 				f = 1
 
 
-	Config config
+	var config: Config
 
-	float[NUM_BANDS] FreqMin, FreqMax
+	var FreqMin, FreqMax: float[NUM_BANDS]
 
-	complex[] f
+	var f: complex[]
 
-	override void __init__()
+	func override __init__()
 
 		for i in 0:NUM_BANDS
 			FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
@@ -34,7 +34,7 @@ class Equalizer15 extends AudioEffect
 		FreqMin[0] = 0
 		FreqMax[NUM_BANDS - 1] = 1000000
 
-	void equalize(out float[] b)
+	func equalize(out b: float[])
 		int _STACK_ALIGNMENT_
 		float sample_rate = session.sample_rate()
 	
@@ -55,18 +55,18 @@ class Equalizer15 extends AudioEffect
 		# transform back
 		fft_c2r_inv(f, b)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		for c in buf.c
 			equalize(c)
 		f.clear()
 	
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new Equalizer15Panel(self)
 
 class Equalizer15Panel extends ConfigPanel
-	override Equalizer15 *c
+	var override c: Equalizer15*
 
-	override void __init__(Module _eq)
+	func override __init__(_eq: Module)
 		add_grid("", 0, 1, "grid")
 		set_target("grid")
 		for i in 0:NUM_BANDS
@@ -85,14 +85,14 @@ class Equalizer15Panel extends ConfigPanel
 	
 		update()
 
-	void on_event()
+	func on_event()
 		Event *e = hui.get_event()
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_{{i}}")
 				c.config.factor[i] = get_float("") * 2
 				changed()
 		
-	override void update()
+	func override update()
 		for i in 0:NUM_BANDS
 			set_float("slider_{{i}}", c.config.factor[i] / 2)
 	

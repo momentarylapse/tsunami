@@ -3,7 +3,7 @@
 use tsunami
 
 class LToR extends AudioEffect
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		if buf.channels > 1
 			buf.c[1] = buf.c[0]
 

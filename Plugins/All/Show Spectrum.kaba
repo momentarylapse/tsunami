@@ -4,35 +4,35 @@ use hui
 use tsunami
 use helper.grid
 
-const int N = 512
-const float MIN_FREQ = 20.0
-const float MAX_FREQ = 20000.0
-const float MIN_VOL = 0.0 - 60.0
-const float MAX_VOL = 0.0
+const N = 512
+const MIN_FREQ = 20.0
+const MAX_FREQ = 20000.0
+const MIN_VOL = -60.0
+const MAX_VOL = 0.0
 
-SpectrumDialog *dlg
+var dlg: SpectrumDialog*
 
 enum
 	TYPE_LINEAR
 	TYPE_LOG
 
 #float[] x, yr, yl
-float[] ffr, ffl
+var ffr, ffl: float[]
 
 #GridData grid
 
 #int w, h
 
-float todb(float v)
+func todb(v: float) -> float
 	return log(v) / log(10) * 10
 
-float peak_max
+var peak_max: float
 
 class SpecGrid extends Grid
-	int type
-	complex[] pr, pl
+	var type: int
+	var pr, pl: complex[]
 
-	void create_lines()
+	func create_lines()
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
@@ -47,7 +47,7 @@ class SpecGrid extends Grid
 				float vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
-	void set_type(int t)
+	func set_type(t: int)
 		type = t
 		if type == TYPE_LINEAR
 			y_axis.set(0, peak_max, false, "")
@@ -57,13 +57,13 @@ class SpecGrid extends Grid
 			y_axis.set(vol_min, vol_max, false, "db")
 		create_lines()
 
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 		draw_curve_b(c, pr, true, color.RED)
 		draw_curve_b(c, pl, true, color.BLUE)
 
 class SpectrumDialog extends Dialog
-	SpecGrid grid
-	void __init__(SongPlugin plugin)
+	var grid: SpecGrid
+	func __init__(plugin: SongPlugin)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable")
 		from_source("
@@ -83,15 +83,15 @@ Grid ? ''
 	
 		set_int("type", TYPE_LOG)
 
-	void on_type()
+	func on_type()
 		grid.set_type(get_int("type"))
 		grid.redraw()
 
-	void on_close()
+	func on_close()
 		destroy()
 
 class ShowSpectrum extends SongPlugin
-	void show_spec(Song *song)
+	func show_spec(song: Song)
 		dlg = new SpectrumDialog(self)
 	
 		AudioBuffer buf
@@ -144,7 +144,7 @@ class ShowSpectrum extends SongPlugin
 		ffr.clear()
 		ffl.clear()
 
-	override void apply()
+	func override apply()
 		if session.view.sel.range().length > 0
 			show_spec(song)
 		else

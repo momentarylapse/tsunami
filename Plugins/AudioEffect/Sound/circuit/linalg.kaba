@@ -1,8 +1,8 @@
 
 class Matrix
-	float[] e
-	int n = 0
-	int m = 0
+	var e: float[]
+	var n = 0
+	var m = 0
 	void __init__()
 	void __init__(float[][] el)
 		n = len(el) # rows

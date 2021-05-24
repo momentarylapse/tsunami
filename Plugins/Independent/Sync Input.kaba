@@ -1,16 +1,16 @@
 use hui
 use tsunami
 
-Window *dlg
+var dlg: Window*
 
-const int SAMPLE_RATE = 44100
-const int offset_out = 20000
-int offset_in
-int offset
+const SAMPLE_RATE = 44100
+const offset_out = 20000
+var offset_in: int
+var offset: int
 
-DummySynthesizer synth
+var synth: DummySynthesizer
 
-void fill(out AudioBuffer buf)
+func fill(out buf: AudioBuffer)
 	buf.c[0] = 0
 	buf.c[1] = 0
 	
@@ -18,7 +18,7 @@ void fill(out AudioBuffer buf)
 		synth.add_metronome_click(offset_out, 1, 0, 880)
 		synth.read(buf)
 
-void sync()
+func sync()
 	bool found = false
 	for i in 0:len(input.cur_buf)
 		if abs(input.cur_buf.r[i]) > 0.1
@@ -31,7 +31,7 @@ void sync()
 	else
 		offset_in += len(input.cur_buf)
 
-void main()
+func main()
 	synth.sample_rate = SAMPLE_RATE
 	
 	dlg = new Dialog("Sync", 200, 80, MainWin, false)

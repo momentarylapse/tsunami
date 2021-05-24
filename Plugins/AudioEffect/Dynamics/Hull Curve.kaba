@@ -6,31 +6,31 @@ use helper.grid
 
 
 
-const int MIN_VOL = -55
-const int MAX_VOL = 35
+const MIN_VOL = -55
+const MAX_VOL = 35
 
 
 
 class HullCurve extends AudioEffect
 	class Config extends Module.Config
-		complex[] curve
+		var curve: complex[]
 
-		const void fill_inter(out FloatInterpolator fi)
+		func const fill_inter(out fi: FloatInterpolator)
 			fi.set_type("cubic-spline-notang")
 			fi.add(curve[0].y, 0)
 			for i in 1:len(curve)
 				fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 			fi.normalize()
 
-		override void reset()
+		func override reset()
 			curve.clear()
 			curve.add(complex(0, 0))
 			curve.add(complex(1, 0))
 
 
-	Config config
+	var config: Config
 
-	void hull(out float[] b)
+	func hull(out b: float[])
 	
 		FloatInterpolator fi
 		config.fill_inter(fi)
@@ -41,19 +41,19 @@ class HullCurve extends AudioEffect
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		for c in buf.c
 			hull(c)
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new HullCurvePanel(self)
 
 class HullGrid extends Grid
-	HullCurve.Config* config
-	ConfigPanel *cp
-	int hover, selected
+	var config: HullCurve.Config*
+	var cp: ConfigPanel*
+	var hover, selected: int
 
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 	
 		# curve + area below
 		FloatInterpolator fi
@@ -65,12 +65,12 @@ class HullGrid extends Grid
 			draw_point2(c, config.curve[i], i == selected, i == hover)
 
 	# left button down -> select
-	override void on_left_button_down()
+	func override on_left_button_down()
 		selected = hover
 		redraw()
 
 	# [Delete] -> remove point
-	override void on_key_down()
+	func override on_key_down()
 		if hui.get_event().key == KEY_DELETE
 			if selected > 0 and selected < len(config.curve)-1
 				config.curve.remove(selected)
@@ -79,7 +79,7 @@ class HullGrid extends Grid
 				redraw()
 
 	# right button down -> new point
-	override void on_right_button_down()
+	func override on_right_button_down()
 		for i in 1:len(config.curve)
 			complex q = project2(config.curve[i - 1])
 			complex p = project2(config.curve[i])
@@ -91,7 +91,7 @@ class HullGrid extends Grid
 				i = len(config.curve)
 				break
 
-	override void on_mouse_move()
+	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l and (selected >= 0)
 			config.curve[selected] = get_mouse2()
@@ -118,9 +118,9 @@ class HullGrid extends Grid
 		redraw()
 
 class HullCurvePanel extends ConfigPanel
-	HullGrid grid
-	override HullCurve* c
-	override void __init__(Module _h)
+	var grid: HullGrid
+	var override c: HullCurve*
+	func override __init__(_h: Module)
 		from_source("
 Grid ? '' vertical
 	DrawingArea drawing '' grabfocus height=250
@@ -138,6 +138,6 @@ Grid ? '' vertical
 	
 		grid.redraw()
 	
-	override void update()
+	func override update()
 		redraw("drawing")
 

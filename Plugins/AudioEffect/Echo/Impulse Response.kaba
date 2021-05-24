@@ -1,8 +1,8 @@
 use tsunami
 
-const string AUTO_CONFIG_SAMPLE = ""
+const AUTO_CONFIG_SAMPLE = ""
 
-void fold(float[] x, float[] h, out complex[] HH, out float[] result)
+func fold(x: float[], h: float[], out HH: complex[], out result: float[])
 	int N = len(x)
 	int K = len(h)
 	
@@ -26,7 +26,7 @@ void fold(float[] x, float[] h, out complex[] HH, out float[] result)
 	result /= N + K
 	
 
-void test()
+func test()
 	print("--------test")
 	float[] x = [1.0, 1.0, 0.0, 1.0]
 	float[] h = [0.5, 0.5, 0.0, 0.0]
@@ -38,25 +38,25 @@ void test()
 
 class Folding extends AudioEffect
 	class Config extends Module.Config
-		shared SampleRef sample
-		override void reset()
+		var sample: shared SampleRef
+		func override reset()
 			sample = nil
 
-	Config config
+	var config: Config
 
-	float[] h
-	complex[] HH
+	var h: float[]
+	var HH: complex[]
 	
-	AudioBuffer buf_overlap
+	var buf_overlap: AudioBuffer
 	
-	override void on_config()
+	func override on_config()
 		if weak(config.sample)
 			h = config.sample.origin.buf.c[0]
 		else
 			h = [1.0]
 		reset_state()
 	
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		if not weak(config.sample)
 			return
 		
@@ -66,11 +66,11 @@ class Folding extends AudioEffect
 		for c,i in buf.c
 			do(c, buf_overlap.c[i])
 	
-	override void reset_state()
+	func override reset_state()
 		buf_overlap.clear()
 		HH.clear()
 	
-	void do(out float[] buf, out float[] overlap)
+	func do(out buf: float[], out overlap: float[])
 		float[] y
 		int N = len(buf)
 		int K = len(h)

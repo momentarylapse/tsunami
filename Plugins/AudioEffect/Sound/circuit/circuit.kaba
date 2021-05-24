@@ -2,10 +2,10 @@ use linalg
 
 
 class Node
-	float phi = 0
-	complex pos
-	void __init__()
-	void __init__(complex p)
+	var phi = 0.0
+	var pos: complex
+	func __init__()
+	func __init__(p: complex)
 		pos = p
 
 enum
@@ -17,7 +17,7 @@ enum
 	TYPE_DIODE
 	NUM_TYPES
 
-string edge_name(int t)
+func edge_name(t: int) -> string
 	if t == TYPE_CABLE
 		return "Cable"
 	if t == TYPE_SOURCE
@@ -32,7 +32,7 @@ string edge_name(int t)
 		return "Diode"
 	return "???"
 
-int edge_type(string s)
+func edge_type(s: string) -> int
 	for i in 0:NUM_TYPES
 		if s == edge_name(i)
 			return i
@@ -40,116 +40,115 @@ int edge_type(string s)
 	
 
 # ARGH
-float[] empty()
+func empty() -> float[]
 	float[] r
 	return r
 
 class Edge
-	int type
-	int a, b
-	float I, U
-	float[4] param
-	void __init__(int _type, int[] n, float[] p)
+	var type: int
+	var a, b: int
+	var I, U: float
+	var param: float[4]
+	func __init__(_type: int, n: int[], p: float[])
 		type = _type
 		a = n[0]
 		b = n[1]
 		for pp,i in p
 			param[i] = pp
 		#print(str(self))
-	void __assign__(Edge o)
+	func __assign__(o: Edge)
 		pass
-	virtual float g(float dt)
+	func virtual const g(dt: float) -> float
 		return 0.0
-	virtual float I_off(float dt)
+	func virtual const I_off(dt: float) -> float
 		return 0.0
-	virtual void update(Node[] nodes, float dt)
+	func virtual update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	virtual void iterate(float dt)
+	func virtual iterate(dt: float)
 		pass
-	virtual void reset_state()
-	virtual string[] param_names()
-		string[] r
-		return r
+	func virtual reset_state()
+	func virtual const param_names() -> string[]
+		return []
 
 class Cable extends Edge
-	void __init__(int[] n)
+	func __init__(n: int[])
 		super.__init__(TYPE_CABLE, n, empty())
-	override float g(float dt)
+	func override g(dt: float) -> float
 		return 1000
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 
 class Source extends Edge
-	void __init__(int[] n, float i)
+	func __init__(n: int[], i: float)
 		super.__init__(TYPE_SOURCE, n, [i, 10000.0])
-	override float g(float dt)
+	func override g(dt: float) -> float
 		return 1 / param[1]
-	override float I_off(float dt)
+	func override I_off(dt: float) -> float
 		return -param[0]
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt) + param[0]
-	override string[] param_names()
+	func override param_names() -> string[]
 		return ["I", "R"]
 
 class Resistor extends Edge
-	void __init__(int[] n, float R)
+	func __init__(n: int[], R: float)
 		super.__init__(TYPE_RESISTOR, n, [R])
-	override float g(float dt)
+	func override g(dt: float) -> float
 		return 1 / param[0]
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	override string[] param_names()
+	func override param_names() -> string[]
 		return ["R"]
 
 class Capacitor extends Edge
-	float U_prev = 0
-	void __init__(int[] n, float C)
+	var U_prev = 0.0
+	func __init__(n: int[], C: float)
 		super.__init__(TYPE_CAPACITOR, n, [C])
-	override float g(float dt)
+	func override g(dt: float) -> float
 		return param[0] / dt
-	override float I_off(float dt)
+	func override I_off(dt: float) -> float
 		return U_prev * param[0] / dt
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = (U - U_prev) * g(dt)
-	override void iterate(float dt)
+	func override iterate(dt: float)
 		U_prev = U
-	override string[] param_names()
+	func override param_names() -> string[]
 		return ["C"]
-	override void reset_state()
+	func override reset_state()
 		U_prev = 0
 
 class Inductor extends Edge
-	float I_prev = 0
-	void __init__(int[] n, float L)
+	var I_prev = 0.0
+	func __init__(n: int[], L: float)
 		super.__init__(TYPE_INDUCTOR, n, [L])
-	override float g(float dt)
+	func override g(dt: float) -> float
 		return dt / param[0]
-	override float I_off(float dt)
+	func override I_off(dt: float) -> float
 		return -I_prev
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_prev + U * g(dt)
-	override void iterate(float dt)
+	func override iterate(dt: float)
 		I_prev = I
-	override string[] param_names()
+	func override param_names() -> string[]
 		return ["L"]
-	override void reset_state()
+	func override reset_state()
 		I_prev = 0
 
 #const float DIODE_DEFAULT_VT = 0.02585
 #const float DIODE_DEFAULT_IS = 0.0000000001
-const float[] DIODE_DEFAULT_PARAMS = [0.02585, 0.0-23.0258, 1.5]
+const DIODE_DEFAULT_PARAMS = [0.02585, -23.0258, 1.5]
 
 class Diode extends Edge
-	float u_low, u_high
-	float i_low, i_high
-	float g_low, g_high
-	void __init__(int[] n)
+	var u_low, u_high: float
+	var i_low, i_high: float
+	var g_low, g_high: float
+	func __init__(n: int[])
 		super.__init__(TYPE_DIODE, n, DIODE_DEFAULT_PARAMS)
 		U = param[0]
 		u_low = -0.5
@@ -159,71 +158,71 @@ class Diode extends Edge
 		#0.000001
 		i_high = I_sch(u_high) - u_high*g_high
 		i_low = I_sch(u_low) - u_low*g_low
-	override string[] param_names()
+	func override param_names() -> string[]
 		return ["V_t", "ln(I_s)", "q"]
-	float I_sch(float u)
+	func const I_sch(u: float) -> float
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	float I_id(float u)
+	func const I_id(u: float) -> float
 		if u > u_high
 			return u*g_high + i_high
 		if u < u_low
 			return u*g_low + i_low
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	override float g(float dt)
+	func override g(dt: float) -> float
 		if U > u_high
 			return g_high
 		if U < u_low
 			return g_low
 		return exp(param[1] + U / param[2] / param[0]) / (param[2]*param[0])
-	override float I_off(float dt)
+	func override I_off(dt: float) -> float
 		if U > u_high
 			return -i_high
 		if U < u_low
 			return -i_low
 		return g(dt) * U - I_id(U)
-	override void update(Node[] nodes, float dt)
+	func override update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_id(U)
 
 class SimResult
-	float[][] U, I
-	float[][] phi
-	void clear()
+	var U, I: float[][]
+	var phi: float[][]
+	func clear()
 		U.clear()
 		I.clear()
 		phi.clear()
 
 class Circuit
-	Node[] nodes
-	Edge*[] edges
-	int out
+	var nodes: Node[]
+	var edges: Edge*[]
+	var _out: int
 	
-	void __init__()
+	func __init__()
 		reset_default()
 		
-	void clear()
+	func clear()
 		nodes.clear()
-		out = 1
+		_out = 1
 		for e in edges
 			del e
 		edges.clear()
 	
-	void reset_default()
+	func reset_default()
 		clear()
 		nodes.add(Node(complex(0.2, 0.3)))
 		nodes.add(Node(complex(0.2, 0.7)))
 	
-	void reset_state()
+	func reset_state()
 		for e in edges
 			e.reset_state()
 	
-	void quick_out()
+	func quick_out()
 		string s
 		for e in edges
 			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
-	void create_G(out Matrix G, float dt)
+	func create_G(out G: Matrix, dt: float)
 		int n = len(nodes)-1
 		G.clear(n,n)
 		for e in edges
@@ -238,7 +237,7 @@ class Circuit
 			if b >= 0
 				G.add(b, b, g)
 	
-	void create_I(out float[] I, float I_in, float dt)
+	func create_I(out I: float[], I_in: float, dt: float)
 		int n = len(nodes)-1
 		I = [I_in]
 		I.resize(n)
@@ -251,7 +250,7 @@ class Circuit
 			if b >= 0
 				I[b] -= I_off
 
-	void optimizer_step(float I_in, float dt)
+	func optimizer_step(I_in: float, dt: float)
 		int n = len(nodes)-1
 		Matrix G
 		create_G(G, dt)
@@ -275,7 +274,7 @@ class Circuit
 		for e in edges
 			e.update(nodes, dt)
 	
-	void time_step(float I_in, float dt)
+	func time_step(I_in: float, dt: float)
 		
 		#print("-----")
 		for i in 0:15
@@ -285,14 +284,14 @@ class Circuit
 		for e in edges
 			e.iterate(dt)
 	
-	float get_xxxx()
+	func get_xxxx() -> float
 		float Uin = nodes[1].phi
-		float Uout = nodes[out].phi
+		float Uout = nodes[_out].phi
 		float factor = Uout / Uin
 		#print(factor)
 		return factor
 	
-	void simulate(float t_max, float dt, float amp, float omega, int type, out SimResult res)
+	func simulate(t_max: float, dt: float, amp: float, omega: float, type: int, out res: SimResult)
 		for t in 0:t_max:dt
 		
 			# input
@@ -319,7 +318,7 @@ class Circuit
 			res.I.add(I)
 			res.phi.add(phi)
 	
-	string export()
+	func export() -> string
 		string s
 		for n in nodes
 			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
@@ -329,10 +328,10 @@ class Circuit
 			for i in 0:n
 				s += ":{{e.param[i]}}"
 			s += "\n"
-		s += "Out:{{out}}\n"
+		s += "Out:{{_out}}\n"
 		return s
 	
-	void import(string s)
+	func import(s: string)
 		clear()
 		string[] lines = s.explode("\n")
 		for l in lines
@@ -342,7 +341,7 @@ class Circuit
 			if x[0] == "Node"
 				nodes.add(Node(complex(float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
-				out = int(x[1])
+				_out = int(x[1])
 			else
 				int t = edge_type(x[0])
 				int[] n = [int(x[1]), int(x[2])]
@@ -350,7 +349,7 @@ class Circuit
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
 	
-	Edge* add_default(int[]n, int t)
+	func add_default(n: int[], t: int) -> Edge*
 		Edge* e = nil
 		if t == TYPE_CABLE
 			e = new Cable(n)
@@ -369,7 +368,7 @@ class Circuit
 		edges.add(e)
 		return e
 
-void _main()
+func _main()
 	Circuit c
 	#c.edges.add(new Resistor([0,1], 1))
 	#c.nodes.add(Node(complex(0,0)))
@@ -381,7 +380,7 @@ void _main()
 	c.simulate(1, 1, 0.1, 1, 0, res)
 	print(str(c))
 
-void __main()
+func __main()
 	Diode* d = new Diode([0,0])
 	return
 	for f in 0.5:1.5:0.01

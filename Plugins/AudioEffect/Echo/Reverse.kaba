@@ -3,10 +3,10 @@
 use tsunami
 
 class Reverse extends AudioEffect
-	override void __init__()
+	func override __init__()
 		apply_to_whole_buffer = true
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		int n = len(buf) / 2
 		for c in buf.c
 			for i in 0:n

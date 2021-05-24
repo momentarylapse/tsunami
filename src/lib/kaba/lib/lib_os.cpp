@@ -193,7 +193,7 @@ public:
 void SIAddPackageOSPath() {
 	add_package("os");
 
-	TypePath = add_type("Path", sizeof(Path));
+	TypePath = add_type("Path", config.super_array_size);
 
 	add_class(TypePath);
 		class_add_element("_s", TypeString, 0);

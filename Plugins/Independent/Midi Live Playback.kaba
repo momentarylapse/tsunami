@@ -1,10 +1,10 @@
 use tsunami
 
 class MLPPanel extends ConfigPanel
-	override MidiLivePlayback* c
-	Session* session
-	ConfigPanel* synth_panel
-	void __init__(Session _session, MidiLivePlayback _mlp)
+	var override c: MidiLivePlayback*
+	var session: Session*
+	var synth_panel: ConfigPanel*
+	func __init__(_session: Session, _mlp: MidiLivePlayback)
 		super.__init__(_mlp)
 		session = &_session
 		from_source("Grid grid ''
@@ -14,7 +14,7 @@ class MLPPanel extends ConfigPanel
 		synth_panel = nil
 		
 	
-	void on_select_synth()
+	func on_select_synth()
 		if synth_panel
 			del synth_panel
 		string name = ChooseModule(self, session, Module.Type.SYNTHESIZER, c.synth.name)
@@ -28,10 +28,10 @@ class MLPPanel extends ConfigPanel
 		
 
 class MidiLivePlayback extends TsunamiPlugin
-	Module* m_in, m_out
-	Synthesizer* synth
-	SignalChain* chain
-	override void on_start()
+	var m_in, m_out: Module*
+	var synth: Synthesizer*
+	var chain: SignalChain*
+	func override on_start()
 		chain = session.create_signal_chain("midi-live")
 		m_in = chain.add(Module.Type.STREAM, "MidiInput")
 		m_out = chain.add(Module.Type.STREAM, "AudioOutput")
@@ -40,7 +40,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.connect(synth, 0, m_out, 0)
 		chain.start()
 	
-	void set_synth(string name)
+	func set_synth(name: string)
 		chain.stop()
 		chain.reset_state()
 		chain.delete(synth)
@@ -51,8 +51,8 @@ class MidiLivePlayback extends TsunamiPlugin
 		
 		chain.start()
 		
-	override void on_stop()
+	func override on_stop()
 		del chain
 	
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new MLPPanel(session, self)

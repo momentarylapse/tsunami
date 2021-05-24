@@ -3,24 +3,24 @@ use helper.tone
 
 
 class SampleConfig extends Module.Config
-	shared SampleRef[] samples
-	override void __delete__()
+	var samples: shared SampleRef[]
+	func override __delete__()
 		reset()
-	override void reset()
+	func override reset()
 		samples.clear()
 
 
 class SampleRenderer extends PitchRenderer
-	shared SampleRef sample
-	MidiEventBuffer events
-	override SampleSynthesizer *synth
-	override void on_config()
+	var sample: shared SampleRef
+	var events: MidiEventBuffer
+	var override synth: SampleSynthesizer*
+	func override on_config()
 		sample = nil
 		if pitch < len(synth.config.samples)
 			sample = synth.config.samples[pitch]
-	override void on_start(float volume)
+	func override on_start(volume: float)
 		events.add(MidiEvent(0, 0, volume))
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		if not weak(sample) or (len(events) == 0)
 			return false
 		int[] to_del
@@ -35,23 +35,23 @@ class SampleRenderer extends PitchRenderer
 	
 
 class SampleSynthesizer extends Synthesizer
-	SampleConfig config
+	var config: SampleConfig
 	
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new SampleRenderer(self, pitch)
 	
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel
-	SampleConfig *sc
-	override SampleSynthesizer *c
-	override void __init__(Module _s)
+	var sc: SampleConfig*
+	var override c: SampleSynthesizer*
+	func override __init__(_s: Module)
 		sc = &c.config
 		add_list_view("!expandx\\Note\\Sample", 0, 0, "list")
 		event("list", on_select)
 
-	override void update()
+	func override update()
 		reset("list")
 		for i in 0:MAX_PITCH
 			string name = ""
@@ -60,7 +60,7 @@ class SamplePanel extends ConfigPanel
 					name = sc.samples[i].origin.name
 			set_string("list", pitch_name(i) + "\\" + name)
 		
-	void on_select()
+	func on_select()
 		int n = get_int("")
 		if n < 0
 			return
@@ -69,7 +69,7 @@ class SamplePanel extends ConfigPanel
 		Sample *old = nil
 		if weak(sc.samples[n])
 			old = weak(sc.samples[n].origin)
-		let s = SelectSample(c.session, self, old)
+		var s = SelectSample(c.session, self, old)
 		if s != old
 			sc.samples[n] = nil
 			if s

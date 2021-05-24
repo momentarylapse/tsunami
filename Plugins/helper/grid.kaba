@@ -3,30 +3,30 @@ use tsunami
 use tone
 
 class Curve
-	color col, col_below
-	void __init__()
+	var col, col_below: color
+	func __init__()
 		col = colors.text_soft1
 		col_below = color(0.3, 0.3, 1, 0.3)
-	virtual const float get(float x)
-	virtual const float[] get_list(float[] xx)
+	func virtual const get(x: float) -> float
+	func virtual const get_list(xx: float[]) -> float[]
 		float[] r
 		r.resize(len(xx))
 		for x,i in xx
 			r[i] = get(x)
 		return r
 
-float log2lin(float f, float f_min, float f_max)
+func log2lin(f: float, f_min: float, f_max: float) -> float
 	return exp(f * log(f_max / f_min)) * f_min
 
-float lin2log(float f, float f_min, float f_max)
+func lin2log(f: float, f_min: float, f_max: float) -> float
 	return log(f / f_min) / log(f_max / f_min)
 
 class GridTick
-	float value, weight
-	string label
+	var value, weight: float
+	var label: string
 
 class GridPartition
-	GridTick[] tick
+	var tick: GridTick[]
 
 #enum
 #	UNIT_NONE
@@ -37,36 +37,36 @@ class GridPartition
 #	UNIT_PERCENT
 
 class AxisData extends Object
-	float val_min, val_max
-	float val_min_min, val_max_max
-	bool log_scale
-	string unit
+	var val_min, val_max: float
+	var val_min_min, val_max_max: float
+	var log_scale: bool
+	var unit: string
 	
 
 class GridAxis extends AxisData
-	float offset, size
-	rect area
-	float min_label_dist
-	bool freq_as_pitch
-	Grid* grid
-	Menu* menu
-	string _id
+	var offset, size: float
+	var area: rect
+	var min_label_dist: float
+	var freq_as_pitch: bool
+	var grid: Grid*
+	var menu: Menu* = nil
+	var _id: string
 	
 	#override void __init__()
-	override void __init__()
+	func override __init__()
 		_id = p2s(&self)
 		freq_as_pitch = false
 		set(0, 1, false, "")
 		menu = nil
-	override void __delete__()
+	func override __delete__()
 		if menu
 			del menu
 	
-	void set_events()
+	func set_events()
 		grid.panel.event_o("{{_id}}-mode-freq-hz", self, on_mode_freq_hz)
 		grid.panel.event_o("{{_id}}-mode-pitch", self, on_mode_pitch)
 	
-	void set(float _val_min, float _val_max, bool _log, string _unit)
+	func set(_val_min: float, _val_max: float, _log: bool, _unit: string)
 		val_min = _val_min
 		val_max = _val_max
 		val_min_min = _val_min
@@ -74,22 +74,22 @@ class GridAxis extends AxisData
 		log_scale = _log
 		unit = _unit
 	
-	float rel2val(float __v)
+	func rel2val(__v: float) -> float
 		if log_scale
 			return log2lin(__v, val_min_min, val_max_max)
 		return __v * (val_max_max - val_min_min) + val_min_min
 		
-	float project(float __v)
+	func project(__v: float) -> float
 		if log_scale
 			return lin2log(__v, val_min, val_max) * size + offset
 		return ((__v - val_min) / (val_max - val_min)) * size + offset
 
-	float unproject(float __v)
+	func unproject(__v: float) -> float
 		if log_scale
 			return log2lin((__v - offset) / size, val_min, val_max)
 		return (__v - offset) / size * (val_max - val_min) + val_min
 	
-	void zoom(float p, float dz)
+	func zoom(p: float, dz: float)
 		float m = unproject(p)
 		if log_scale
 			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
@@ -99,10 +99,10 @@ class GridAxis extends AxisData
 			val_max = clamp(m + (val_max - m) * pow(0.9, dz), val_min_min, val_max_max)
 		grid.redraw()
 		
-	void on_left_button_down()
+	func on_left_button_down()
 		pass
 		
-	void on_right_button_down()
+	func on_right_button_down()
 		if menu
 			del menu
 		menu = new Menu()
@@ -115,18 +115,18 @@ class GridAxis extends AxisData
 			menu.add("unit: {{unit}}", "-dummy-")
 		menu.popup(grid.panel)
 	
-	void on_mode_freq_hz()
+	func on_mode_freq_hz()
 		freq_as_pitch = false
 		grid.redraw()
-	void on_mode_pitch()
+	func on_mode_pitch()
 		freq_as_pitch = true
 		grid.redraw()
 	
-	void on_mouse_wheel(float mm)
+	func on_mouse_wheel(mm: float)
 		if grid.panel.win.get_key(KEY_CONTROL)
 			zoom(mm, hui.get_event().scroll_y)
 
-	GridPartition get_lin_partition()
+	func get_lin_partition() -> GridPartition
 		float d = (val_max - val_min) / size * 150
 		GridPartition r
 		float step = 1
@@ -149,7 +149,7 @@ class GridAxis extends AxisData
 		
 		return r
 		
-	GridPartition get_log_partition()
+	func get_log_partition() -> GridPartition
 		float pixel_per_decade = abs(size / log(val_max / val_min)) * log(10)
 		float size_param = pixel_per_decade / min_label_dist
 		GridPartition r
@@ -176,7 +176,7 @@ class GridAxis extends AxisData
 					r.tick.add([vv, 0.2, ""])
 		return r
 		
-	GridPartition get_pitch_partition()
+	func get_pitch_partition() -> GridPartition
 		GridPartition r
 		float pitch_min = freq_to_pitch(val_min)
 		float pitch_max = freq_to_pitch(val_max)
@@ -208,7 +208,7 @@ class GridAxis extends AxisData
 			r.tick.add(tt)
 		return r
 		
-	GridPartition get_partition()
+	func get_partition() -> GridPartition
 		if log_scale
 			if freq_as_pitch
 				return get_pitch_partition()
@@ -216,26 +216,26 @@ class GridAxis extends AxisData
 		return get_lin_partition()
 
 class Grid extends Object
-	bool allow_bg
-	float x0, y0
-	rect plot_area
-	#float x, y, w, h
+	var allow_bg: bool
+	var x0, y0: float
+	var plot_area: rect
+	#var x, y, w, h: float
 	
-	Panel *panel
-	string id
-	float mx, my
+	var panel: Panel*
+	var id: string
+	var mx, my: float
 	
-	GridAxis x_axis, y_axis
+	var x_axis, y_axis: GridAxis
 	
-	color col_bg
-	color col_grid
-	color col_line
-	color col_text
-	color col_hover
-	color col_sel
+	var col_bg: color
+	var col_grid: color
+	var col_line: color
+	var col_text: color
+	var col_hover: color
+	var col_sel: color
 
 	
-	void data_init()
+	func data_init()
 		col_grid = colors.grid
 		col_text = colors.text
 		col_line = colors.text_soft1
@@ -248,20 +248,20 @@ class Grid extends Object
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
 
-	complex project2(complex z)
+	func project2(z: complex) -> complex
 		return complex(x_axis.project(z.x), y_axis.project(z.y))
 
-	vector project3(vector z)
+	func project3(z: vector) -> vector
 		return vector(x_axis.project(z.x), y_axis.project(z.y), z.z)
 
-	complex unproject2(complex z)
+	func unproject2(z: complex) -> complex
 		return complex(x_axis.unproject(z.x), y_axis.unproject(z.y))
 
-	vector unproject3(vector z)
+	func unproject3(z: vector) -> vector
 		return vector(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
 	
 	
-	void draw_axis_y(Painter c, GridPartition part)
+	func draw_axis_y(c: Painter, part: GridPartition)
 		for t in part.tick
 			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
@@ -273,7 +273,7 @@ class Grid extends Object
 				c.draw_line(plot_area.x1, yy, plot_area.x1 + 6, yy)
 				c.draw_str(x0 + 2, yy - 3, t.label)
 	
-	void draw_axis_x(Painter c, GridPartition part)
+	func draw_axis_x(c: Painter, part: GridPartition)
 		for t in part.tick
 			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
@@ -285,10 +285,10 @@ class Grid extends Object
 				c.draw_line(xx, plot_area.y2 - 6, xx, plot_area.y2)
 				c.draw_str(xx - 8, plot_area.y2 + 8, t.label)
 	
-	rect get_plot_region(float _x0, float _y0, float _w, float _h)
+	func get_plot_region(_x0: float, _y0: float, _w: float, _h: float) -> rect
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
 
-	void draw_background(Painter c, float _x0, float __y0, float _w, float _h)
+	func draw_background(c: Painter, _x0: float, __y0: float, _w: float, _h: float)
 		float _y0 = __y0
 	
 		x0 = _x0
@@ -319,10 +319,10 @@ class Grid extends Object
 		part = y_axis.get_partition()
 		draw_axis_y(c, part)
 	
-	void draw_curve(Painter c, FloatInterpolator fi, bool fill_below)
+	func draw_curve(c: Painter, fi: FloatInterpolator, fill_below: bool)
 		complex[] pp
-		let tt = rangef(0, 1, 0.003)
-		let yy = fi.get_list(tt)
+		var tt = rangef(0, 1, 0.003)
+		var yy = fi.get_list(tt)
 		for t,i in tt
 			complex zz = project2(complex(x_axis.rel2val(t), yy[i]))
 			pp.add(zz)
@@ -336,7 +336,7 @@ class Grid extends Object
 		c.set_color(col_line)
 		c.draw_lines(pp)
 	
-	void draw_curve_c(Painter c, Curve curve, bool fill_below)
+	func draw_curve_c(c: Painter, curve: Curve, fill_below: bool)
 		float[] tt, yy
 		complex[] pp
 		tt = rangef(0, 1, 0.003)
@@ -356,7 +356,7 @@ class Grid extends Object
 		c.set_color(curve.col)
 		c.draw_lines(pp)
 	
-	void draw_curve_b(Painter c, complex[] _p, bool fill_below, color col)
+	func draw_curve_b(c: Painter, _p: complex[], fill_below: bool, col: color)
 		complex[] pp
 		for p in _p
 			pp.add(project2(p))
@@ -373,18 +373,18 @@ class Grid extends Object
 		c.draw_lines(pp)
 	
 	
-	color point_color(bool selected, bool hover)
+	func point_color(selected: bool, hover: bool) -> color
 		if hover
 			return color.interpolate(col_hover, col_line, 0.0)
 		if selected
 			return color.interpolate(col_sel, col_line, 0.5)#color(0.7, 0, 0, 1)
 		return col_line
 	
-	void draw_point_xy(Painter c, float x, float y, bool selected, bool hover)
-		let z = complex(x, y)
+	func draw_point_xy(c: Painter, x: float, y: float, selected: bool, hover: bool)
+		var z = complex(x, y)
 		draw_point2(c, z, selected, hover)
 	
-	void draw_point2(Painter c, complex p, bool selected, bool hover)
+	func draw_point2(c: Painter, p: complex, selected: bool, hover: bool)
 		complex pp = project2(p)
 		c.set_color(point_color(selected, hover))
 		float radius = 3
@@ -392,7 +392,7 @@ class Grid extends Object
 			radius = 4
 		c.draw_circle(pp.x, pp.y, radius)
 	
-	void draw_point3(Painter c, vector p, bool selected, bool hover)
+	func draw_point3(c: Painter, p: vector, selected: bool, hover: bool)
 		vector pp = project3(p)
 		c.set_color(point_color(selected, hover))
 		float radius = 3
@@ -401,7 +401,7 @@ class Grid extends Object
 			radius = 4
 		c.draw_circle(pp.x, pp.y, radius)
 	
-	void draw_line2(Painter c, complex p0, complex p1, bool selected, bool hover)
+	func draw_line2(c: Painter, p0: complex, p1: complex, selected: bool, hover: bool)
 		complex pp0 = project2(p0)
 		complex pp1 = project2(p1)
 		c.set_color(col_line)
@@ -413,29 +413,29 @@ class Grid extends Object
 			c.set_color(color(0.7, 0, 0, 1))
 		c.draw_line(pp0.x, pp0.y, pp1.x, pp1.y)
 	
-	complex get_mouse2()
+	func get_mouse2() -> complex
 		float mx = hui.get_event().mouse_x
 		float my = hui.get_event().mouse_y
 		return unproject2(complex(mx, my))
 	
-	vector get_mouse3(float z)
+	func get_mouse3(z: float) -> vector
 		float mx = hui.get_event().mouse_x
 		float my = hui.get_event().mouse_y
 		return unproject3(vector(mx, my, z))
 		
-	bool mouse_over_point2(complex q)
+	func mouse_over_point2(q: complex) -> bool
 		float mx = hui.get_event().mouse_x
 		float my = hui.get_event().mouse_y
 		complex p = project2(q)
 		return (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 		
-	bool mouse_over_point3(vector q)
+	func mouse_over_point3(q: vector) -> bool
 		return mouse_over_point2(complex(q.x, q.y))
 
 		
 
 	
-	void on_draw_all(Painter c)
+	func on_draw_all(c: Painter)
 		float w = c.width
 		float h = c.height
 
@@ -443,14 +443,14 @@ class Grid extends Object
 		c.clip(plot_area)
 		on_draw(c)
 	
-	void redraw()
+	func redraw()
 		panel.redraw(id)
 	
-	void update_mouse()
+	func update_mouse()
 		mx = hui.get_event().mouse_x
 		my = hui.get_event().mouse_y
 	
-	void on_left_button_down_all()
+	func on_left_button_down_all()
 		update_mouse()
 		if plot_area.inside(mx, my)
 			on_left_button_down()
@@ -459,12 +459,12 @@ class Grid extends Object
 		if y_axis.area.inside(mx, my)
 			y_axis.on_left_button_down()
 	
-	void on_left_button_up_all()
+	func on_left_button_up_all()
 		update_mouse()
 		if plot_area.inside(mx, my)
 			on_left_button_up()
 	
-	void on_right_button_down_all()
+	func on_right_button_down_all()
 		update_mouse()
 		if plot_area.inside(mx, my)
 			on_right_button_down()
@@ -473,17 +473,17 @@ class Grid extends Object
 		if y_axis.area.inside(mx, my)
 			y_axis.on_right_button_down()
 	
-	void on_right_button_up_all()
+	func on_right_button_up_all()
 		update_mouse()
 		if plot_area.inside(mx, my)
 			on_right_button_up()
 	
-	void on_mouse_move_all()
+	func on_mouse_move_all()
 		update_mouse()
 		#if plot_rect.inside(mx, my)
 		on_mouse_move()
 	
-	void on_mouse_wheel_all()
+	func on_mouse_wheel_all()
 		update_mouse()
 		if plot_area.inside(mx, my)
 			on_mouse_wheel()
@@ -492,10 +492,10 @@ class Grid extends Object
 		if y_axis.area.inside(mx, my)
 			y_axis.on_mouse_wheel(my)
 	
-	void on_key_down_all()
+	func on_key_down_all()
 		on_key_down()
 
-	void init(Panel _panel, string _id)
+	func init(_panel: Panel, _id: string)
 		data_init()
 		panel = &_panel
 		id = _id
@@ -510,11 +510,11 @@ class Grid extends Object
 		x_axis.set_events()
 		y_axis.set_events()
 	
-	virtual void on_draw(Painter c)
-	virtual void on_left_button_down()
-	virtual void on_left_button_up()
-	virtual void on_right_button_down()
-	virtual void on_right_button_up()
-	virtual void on_mouse_move()
-	virtual void on_mouse_wheel()
-	virtual void on_key_down()
+	func virtual on_draw(c: Painter)
+	func virtual on_left_button_down()
+	func virtual on_left_button_up()
+	func virtual on_right_button_down()
+	func virtual on_right_button_up()
+	func virtual on_mouse_move()
+	func virtual on_mouse_wheel()
+	func virtual on_key_down()

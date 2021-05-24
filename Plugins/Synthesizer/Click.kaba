@@ -3,15 +3,15 @@ use helper.tone
 
 
 class ClickRenderer extends PitchRenderer
-	float volume = 0
-	float phase = 0
-	float scale = 0.9995
-	override ClickSynthesizer* synth
+	var volume = 0.
+	var phase = 0.
+	var scale = 0.9995
+	var override synth: ClickSynthesizer*
 
-	override void on_start(float v)
+	func override on_start(v: float)
 		volume = max(v, volume)
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 			buf.c[0][i] += sin(phase) * volume
 			phase += delta_phi
@@ -23,5 +23,5 @@ class ClickRenderer extends PitchRenderer
 
 class ClickSynthesizer extends Synthesizer
 
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new ClickRenderer(self, pitch)

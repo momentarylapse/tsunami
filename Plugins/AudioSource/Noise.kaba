@@ -1,24 +1,24 @@
 use tsunami
 
-const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
-const string AUTO_CONFIG_TYPE = "uniform|gauss"
+const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const AUTO_CONFIG_TYPE = "uniform|gauss"
 
 
 
 class Noise extends AudioSource
 	class Config extends Module.Config
-		float volume
-		string type
-		override void reset()
+		var volume: float
+		var type: string
+		func override reset()
 			volume = 1
 			type = "uniform"
 
-	Config config
-	Random r
+	var config: Config
+	var r: Random
 	
-	void __assign__(Noise n)
+	func __assign__(n: Noise)
 	
-	void do(out float[] buf)
+	func do(out buf: float[])
 		if config.type == "uniform"
 			for b in buf
 				b = r.uniform(-1,1) * config.volume
@@ -26,7 +26,7 @@ class Noise extends AudioSource
 			for b in buf
 				b = r.normal(0, 0.2) * config.volume
 
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		for c in buf.c
 			do(c)
 		return len(buf)

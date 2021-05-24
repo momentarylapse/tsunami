@@ -1,16 +1,16 @@
 use tsunami
 
 class SongSpectrum extends TsunamiPlugin
-	Module* spec
-	override void on_start()
+	var spec: Module*
+	func override on_start()
 		# very crappy topology :P
-		let chain = session.view.signal_chain
+		var chain = session.view.signal_chain
 		spec = chain.add(Module.Type.AUDIO_VISUALIZER, "Spectrum")
 		chain.connect(session.view.renderer, 0, spec, 0)
 		chain.connect(spec, 0, session.view.output_stream, 0)
-	override void on_stop()
-		let chain = session.view.signal_chain
+	func override on_stop()
+		var chain = session.view.signal_chain
 		chain.delete(spec)
 		chain.connect(session.view.renderer, 0, session.view.output_stream, 0)
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return spec.create_panel()

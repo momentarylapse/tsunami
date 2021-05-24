@@ -7,33 +7,33 @@ use helper.curves
 
 
 
-const float MIN_FREQ = 20.0
-const float MAX_FREQ = 20000.0
-const int MIN_VOL = -55
-const int MAX_VOL = 35
+const MIN_FREQ = 20.0
+const MAX_FREQ = 20000.0
+const MIN_VOL = -55
+const MAX_VOL = 35
 
 
 
 class Biquad extends AudioEffect
 	class Config extends Module.Config
-		float a1, a2
-		float b0, b1, b2
+		var a1, a2: float
+		var b0, b1, b2: float
 
-		override void reset()
+		func override reset()
 			a1 = 0
 			a2 = 0
 			b0 = 1
 			b1 = 0
 			b2 = 0
 
-		const void create_filter(out BiquadFilter.Parameters p)
+		func const create_filter(out p: BiquadFilter.Parameters)
 			p.a[1] = a1
 			p.a[2] = a2
 			p.b[0] = b0
 			p.b[1] = b1
 			p.b[2] = b2
 
-		void from_filter(BiquadFilter.Parameters p)
+		func from_filter(p: BiquadFilter.Parameters)
 			a1 = p.a[1]
 			a2 = p.a[2]
 			b0 = p.b[0]
@@ -41,36 +41,36 @@ class Biquad extends AudioEffect
 			b2 = p.b[2]
 		
 
-	Config config
+	var config: Config
 
-	BiquadGrid* grid = nil
+	var grid: BiquadGrid* = nil
 
-	BiquadFilter filter # state
+	var filter: BiquadFilter
 	
-	override void on_config()
+	func override on_config()
 		config.create_filter(filter.params)
 	
-	override void reset_state()
+	func override reset_state()
 		filter.reset()
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		filter.apply(buf)
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new BiquadPanel(self)
 
 
 class BiquadGrid extends Grid
-	Biquad.Config* c
-	BiquadPanel* cp
-	float sample_rate
-	SpectrumCurve spectrum
+	var c: Biquad.Config*
+	var cp: BiquadPanel*
+	var sample_rate: float
+	var spectrum: SpectrumCurve
 	
 	
-	override void __init__()
-	override void __delete__()
+	func override __init__()
+	func override __delete__()
 
-	override void on_draw(Painter p)
+	func override on_draw(p: Painter)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -86,19 +86,19 @@ class BiquadGrid extends Grid
 		draw_curve_c(p, phase, false)
 
 
-	void set_buffer(AudioBuffer buf)
+	func set_buffer(buf: AudioBuffer)
 		spectrum.set(buf, sample_rate)
 		redraw()
 
-	override void on_right_button_down()
-		let dlg = new PresetDialog(cp)
+	func override on_right_button_down()
+		var dlg = new PresetDialog(cp)
 		dlg.run()
 		del dlg
 
 class BiquadPanel extends ConfigPanel
-	BiquadGrid grid
-	override Biquad* c
-	override void __init__(Module _biquad)
+	var grid: BiquadGrid
+	var override c: Biquad*
+	func override __init__(_biquad: Module)
 		super.__init__(_biquad)
 		from_source("
 Grid ? '' vertical
@@ -124,14 +124,14 @@ Grid ? '' vertical
 		
 		c.grid = &grid
 		
-		let ids = ["a1", "a2", "b0", "b1", "b2"]
+		var ids = ["a1", "a2", "b0", "b1", "b2"]
 		for id in ids
 			event(id, on_change)
 	
-	override void __delete__()
+	func override __delete__()
 		c.grid = nil
 		
-	override void update()
+	func override update()
 		set_float("a1", c.config.a1)
 		set_float("a2", c.config.a2)
 		set_float("b0", c.config.b0)
@@ -139,7 +139,7 @@ Grid ? '' vertical
 		set_float("b2", c.config.b2)
 		grid.redraw()
 	
-	void on_change()
+	func on_change()
 		c.config.a1 = get_float("a1")
 		c.config.a2 = get_float("a2")
 		c.config.b0 = get_float("b0")
@@ -148,8 +148,8 @@ Grid ? '' vertical
 		c.changed()
 
 class PresetDialog extends Dialog
-	BiquadPanel *bp
-	void __init__(BiquadPanel* _p)
+	var bp: BiquadPanel*
+	func __init__(_p: BiquadPanel*)
 		super.__init__("preset", 400, 100, _p.win, false)
 		bp = _p
 		from_source("
@@ -172,7 +172,7 @@ Grid ? '' vertical
 		Button apply 'Apply'
 ")
 		event("apply", on_apply)
-	void on_apply()
+	func on_apply()
 		BiquadFilter.Parameters p
 		float sample_rate = bp.c.session.sample_rate()
 		int t = get_int("type")

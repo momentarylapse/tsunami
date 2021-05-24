@@ -2,9 +2,9 @@ use tsunami
 use helper.filter
 use hui
 
-func lufs_to_color(float l) -> color
-	let cc = [color(0,0,0,0.2), color(1,0,0,0.2), color(1,1,0,0.2), color(1,1,1,0.5)]
-	let ff = [-20., -10., -5., 0.]
+func lufs_to_color(l: float) -> color
+	var cc = [color(0,0,0,0.2), color(1,0,0,0.2), color(1,1,0,0.2), color(1,1,1,0.5)]
+	var ff = [-20., -10., -5., 0.]
 	if l > ff[2]
 		float a = (l-ff[2]) / (ff[3]-ff[2])
 		return cc[2] * (1-a) + cc[3] * a
@@ -20,7 +20,7 @@ func lufs_to_color(float l) -> color
 
 class XPanel extends ConfigPanel
 	
-	void __init__(Loudness l)
+	func __init__(l: Loudness)
 		super.__init__(l)
 		from_source("
 Grid ? ''
@@ -37,18 +37,18 @@ Grid ? ''
 
 class Loudness extends TsunamiPlugin
 
-	float[] loudness
-	float[] z
-	int dT
+	var loudness: float[]
+	var z: float[]
+	var dT: int
 	
-	float max_loudness
-	float gated_loudness
+	var max_loudness: float
+	var gated_loudness: float
 
 	func override on_start()
 		print("on start")
 		
 		AudioBuffer buf
-		let renderer = new SongRenderer(session.song)
+		var renderer = new SongRenderer(session.song)
 		renderer.render(session.song.range(), buf)
 		del renderer
 		
@@ -76,7 +76,7 @@ class Loudness extends TsunamiPlugin
 			z0 /= T
 			z1 /= T
 			z.add(z0 + z1)
-			let l = -0.691 + 10 * log(z0 + z1) / log(10)
+			var l = -0.691 + 10 * log(z0 + z1) / log(10)
 			loudness.add(l)
 		#print(str(loudness))
 		
@@ -89,7 +89,7 @@ class Loudness extends TsunamiPlugin
 		#print("max: {{max_loudness}}")
 		#print("gated: {{gated_loudness}}")
 	
-	func lkfs_gated(float gamma) -> float
+	func lkfs_gated(gamma: float) -> float
 		int n_gated = 0
 		float gated_z_sum = 0
 		for l,i in loudness
@@ -99,8 +99,8 @@ class Loudness extends TsunamiPlugin
 		return -0.691 + 10 * log(gated_z_sum / n_gated) / log(10)
 			
 		
-	func override on_draw_post(Painter p)
-		let v = session.view.cur_vlayer()
+	func override on_draw_post(p: Painter)
+		var v = session.view.cur_vlayer()
 		for l,i in loudness
 			float x0 = session.view.cam.sample2screen(i*dT)
 			float x1 = session.view.cam.sample2screen(i*dT + dT)

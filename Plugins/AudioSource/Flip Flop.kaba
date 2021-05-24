@@ -1,22 +1,22 @@
 use tsunami
 use helper.tone
 
-const string AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
+const AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
 
 
 class FlipFlopSource extends AudioSource
 	class Config extends Module.Config
-		float period
-		override void reset()
+		var period: float
+		func override reset()
 			period = 1
 
-	Config config
-	float t
+	var config: Config
+	var t: float
 	
-	override void reset_state()
+	func override reset_state()
 		t = 0
 
-	void create_flip(out float[] buf)
+	func create_flip(out buf: float[])
 		for i in 0:len(buf)
 			buf[i] = 1
 			if t > config.period
@@ -25,7 +25,7 @@ class FlipFlopSource extends AudioSource
 			if t > config.period*2
 				t = 0
 
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		create_flip(buf.c[0])
 		if len(buf.c) > 1
 			buf.c[1] = buf.c[0]

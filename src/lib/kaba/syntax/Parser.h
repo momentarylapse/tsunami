@@ -88,15 +88,17 @@ public:
 	Class *parse_class_header(Class *_namespace, int &offset0);
 	void post_process_newly_parsed_class(Class *c, int size);
 	void skip_parse_class();
-	Function *parse_function_header(Class *name_space, Flags flags0);
+	Function *parse_function_header_old(Class *name_space, Flags flags0);
 	Function *parse_function_header_new(Class *name_space, Flags flags0);
 	void skip_parsing_function_body(Function *f);
 	void parse_function_body(Function *f);
 	bool parse_function_command(Function *f, int indent0);
 	const Class *parse_type(const Class *ns);
 	//const Class *parse_product_type(const Class *ns);
-	void parse_global_variable_def(bool single, Block *block, Flags flags0);
-	void parse_named_const(const string &name, const Class *type, Class *name_space, Block *block);
+	void parse_global_variable_def_old(Block *block, Flags flags0);
+	void parse_class_variable_declaration(const Class *ns, Block *block, int &_offset, Flags flags0 = Flags::NONE);
+	void parse_named_const_old(const string &name, const Class *type, Class *name_space, Block *block);
+	void parse_named_const_new(Class *name_space, Block *block);
 	shared<Node> parse_and_eval_const(Block *block, const Class *type);
 	static PrimitiveOperator *which_primitive_operator(const string &name, int param_flags = 3);
 	static Statement *which_statement(const string &name);
@@ -146,6 +148,7 @@ public:
 	shared<Node> parse_statement_repr(Block *block);
 	shared<Node> parse_statement_len(Block *block);
 	shared<Node> parse_statement_let(Block *block);
+	shared<Node> parse_statement_var(Block *block);
 	shared<Node> parse_statement_map(Block *block);
 	shared<Node> parse_statement_lambda(Block *block);
 	shared<Node> parse_statement_sorted(Block *block);

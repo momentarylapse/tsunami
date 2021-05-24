@@ -4,34 +4,34 @@ use hui
 use tsunami
 use helper.grid
 
-const float MIN_DB = -60.0
+const MIN_DB = -60.0
 
 
 class Compressor extends AudioEffect
 	class Config extends Module.Config
-		complex[] curve
-		float attack, release
+		var curve: complex[]
+		var attack, release: float
 
-		const void fill_inter(out FloatInterpolator fi)
+		func const fill_inter(out fi: FloatInterpolator)
 			fi.set_type("lerp")
 			fi.add(curve[0].y, 0)
 			for i in 1:len(curve)
 				fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 			fi.normalize()
 
-		override void reset()
+		func override reset()
 			curve.clear()
 			curve.add(complex(MIN_DB, MIN_DB))
 			curve.add(complex(0, 0))
 			attack = 0.01
 			release = 0.1
-	Config config
+	var config: Config
 	
 	
-	float gain_r, gain_l
-	float[] squares_r
-	float[] squares_l
-	override void reset_state()
+	var gain_r, gain_l: float
+	var squares_r: float[]
+	var squares_l: float[]
+	func override reset_state()
 		gain_r = 1
 		gain_l = 1
 		squares_r.clear()
@@ -39,9 +39,9 @@ class Compressor extends AudioEffect
 		squares_l.clear()
 		squares_l.resize(70)
 
-	float dgain_attack, dgain_release
+	var dgain_attack, dgain_release: float
 
-	void compress(out float[] b, out float[] squares, out float *gain)
+	func compress(out b: float[], out squares: float[], out gain: float*)
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
@@ -77,10 +77,10 @@ class Compressor extends AudioEffect
 			# apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new CompressorPanel(self)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		
@@ -91,11 +91,11 @@ class Compressor extends AudioEffect
 			session.e("Compressor: channels>2")
 
 class CompressorGrid extends Grid
-	int hover, selected
-	Compressor.Config* config
-	ConfigPanel* cp
+	var hover, selected: int
+	var config: Compressor.Config*
+	var cp: ConfigPanel*
 
-	override void on_draw(Painter p)
+	func override on_draw(p: Painter)
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
@@ -105,12 +105,12 @@ class CompressorGrid extends Grid
 			draw_point2(p, config.curve[i], i == selected, i == hover)
 
 	# left button down -> select
-	override void on_left_button_down()
+	func override on_left_button_down()
 		selected = hover
 		redraw()
 
 	# right button down -> new point
-	override void on_right_button_down()
+	func override on_right_button_down()
 		complex m = get_mouse2()
 		for i in 1:len(config.curve)
 			complex q = config.curve[i - 1]
@@ -122,7 +122,7 @@ class CompressorGrid extends Grid
 				redraw()
 				break
 
-	override void on_mouse_move()
+	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l and (selected > 0)
 			config.curve[selected] = get_mouse2()
@@ -142,7 +142,7 @@ class CompressorGrid extends Grid
 					hover = i
 		redraw()
 
-	override void on_key_down()
+	func override on_key_down()
 		int k = hui.get_event().key
 
 		# [Delete] -> remove point
@@ -153,9 +153,9 @@ class CompressorGrid extends Grid
 			redraw()
 
 class CompressorPanel extends ConfigPanel
-	override Compressor *c
-	CompressorGrid grid
-	override void __init__(Module _fx)
+	var override c: Compressor*
+	var grid: CompressorGrid
+	func override __init__(_fx: Module)
 		add_grid("", 0, 0, "table1")
 		set_target("table1")
 		add_drawing_area("!grabfocus,height=200,expandy\\", 0, 0, "drawing_area")
@@ -180,12 +180,12 @@ class CompressorPanel extends ConfigPanel
 	
 		update()
 	
-	override void update()
+	func override update()
 		grid.redraw()
 		set_float("attack", grid.config.attack * 1000)
 		set_float("release", grid.config.release * 1000)
 
-	void on_edit()
+	func on_edit()
 		grid.config.attack = get_float("attack") / 1000.0
 		grid.config.release = get_float("release") / 1000.0
 		changed()

@@ -3,7 +3,7 @@ use tsunami
 
 class SingleSamples extends AudioEffect
 	
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		if !source
 			return -1
 		for i in 0:len(buf)

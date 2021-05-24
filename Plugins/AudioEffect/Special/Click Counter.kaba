@@ -1,26 +1,26 @@
 use tsunami
 
-const float THRESHOLD1 = 0.20
-const float THRESHOLD2 = 0.15
-const float RECOVER_TIME = 0.40
+const THRESHOLD1 = 0.20
+const THRESHOLD2 = 0.15
+const RECOVER_TIME = 0.40
 
 class ClickCounter extends AudioEffect
-	int counter
-	float volume
-	bool active
-	int active_ttl
+	var counter: int
+	var volume: float
+	var active: bool
+	var active_ttl: int
 	
-	bool emit # read/reset by outside world...
+	var emit: bool
 	# TODO make callbacks possible!
 	
-	override void reset_state()
+	func override reset_state()
 		counter = 0
 		volume = 0
 		active = false
 		emit = false
 		active_ttl = -1
 	
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 	
 		float[] temp
 		temp = buf.c[0] #+ buf.c[1]

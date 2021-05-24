@@ -4,31 +4,31 @@ use filter
 
 
 class BiquadGainCurve extends Curve
-	BiquadFilter filter
-	float sample_rate
-	override float get(float freq)
+	var filter: BiquadFilter
+	var sample_rate: float
+	func override get(freq: float) -> float
 		return filter.params.gain(freq, sample_rate)
 
 class BiquadPhaseShiftCurve extends Curve
-	BiquadFilter filter
-	float sample_rate
-	override float get(float freq)
+	var filter: BiquadFilter
+	var sample_rate: float
+	func override get(freq: float) -> float
 		return filter.params.phase_shift(freq, sample_rate)
 
 
 class SpectrumCurve extends Curve
-	float[] spec
-	float sample_rate
-	RingBuffer *ring
-	int N
-	override void __init__()
+	var spec: float[]
+	var sample_rate: float
+	var ring: RingBuffer*
+	var N: int
+	func override __init__()
 		ring = new RingBuffer(65536)
 		N = 4096*2
 		sample_rate = DEFAULT_SAMPLE_RATE
 		col = colors.text_soft2
-	override void __delete__()
+	func override __delete__()
 		del ring
-	void set(AudioBuffer buf, float _sample_rate)
+	func set(buf: AudioBuffer, _sample_rate: float)
 		sample_rate = _sample_rate
 		ring.write(buf)
 	
@@ -42,7 +42,7 @@ class SpectrumCurve extends Curve
 			for z,i in zr
 				spec[i] = log(z.abs())
 			ring.read_ref_done(b)
-	override float get(float freq)
+	func override get(freq: float) -> float
 		int i = freq * N / sample_rate
 		if i >= len(spec)-2
 			return 0

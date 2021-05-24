@@ -2,13 +2,13 @@ use tsunami
 use hui
 
 class _StreamTest extends TsunamiPlugin
-	SignalChain* chain
-	AudioInput* input
-	AudioAccumulator* recorder
-	int runner
-	int nn
-	bool acc
-	override void on_start()
+	var chain: SignalChain*
+	var input: AudioInput*
+	var recorder: AudioAccumulator*
+	var runner: int
+	var nn: int
+	var acc: bool
+	func override on_start()
 	
 		chain = session.create_signal_chain("test")
 		input = chain.add(Module.Type.STREAM, "AudioInput")
@@ -23,11 +23,11 @@ class _StreamTest extends TsunamiPlugin
 		
 		chain.start()
 
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 		del chain
 	
-	void on_tick()
+	func on_tick()
 		print("{{input.samples_recorded()}}\t{{recorder.samples_skipped}}")
 		nn ++
 		if nn > 100

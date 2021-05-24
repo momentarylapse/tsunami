@@ -8,26 +8,26 @@ enum
 	MODE_BOUNCE
 	MODE_BOUNCE_WALK
 
-const float UPDATE_DT = 1.0 / 50
-const float MAX_BACKGROUND_REDNESS = 0.7
-const int MOTION_BLUR_COUNT = 20
+const UPDATE_DT = 1.0 / 50
+const MAX_BACKGROUND_REDNESS = 0.7
+const MOTION_BLUR_COUNT = 20
 
 # part uncertainty...
-const int DELTA = 400
+const DELTA = 400
 
 class BlurredDot
-	complex pos, pos0
-	bool has_prev = false
-	void move(float x, float y)
+	var pos, pos0: complex
+	var has_prev = false
+	func move(x: float, y: float)
 		pos0 = pos
 		pos.x = x
 		pos.y = y
 		has_prev = true
-	void jump(float x, float y)
+	func jump(x: float, y: float)
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	void draw(Painter p, color c, float r)
+	func draw(p: Painter, c: color, r: float)
 		if has_prev
 			float dt = 1.0 / MOTION_BLUR_COUNT
 			color cc = c
@@ -41,19 +41,19 @@ class BlurredDot
 			p.draw_circle(pos.x, pos.y, r)
 
 class MetronomePanel extends ConfigPanel
-	Metronome *metro
-	float fraction_prev
+	var metro: Metronome*
+	var fraction_prev: float
 	
-	bool fullscreen
-	bool allow_blink_background
-	bool allow_blink_number
-	int mode
-	Menu *popup_menu
+	var fullscreen: bool
+	var allow_blink_background: bool
+	var allow_blink_number: bool
+	var mode: int
+	var popup_menu: Menu*
 	
-	BlurredDot dot
-	int sr_id
+	var dot: BlurredDot
+	var sr_id: int
 	
-	void __init__(Metronome *_metro)
+	func __init__(_metro: Metronome*)
 		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
@@ -88,14 +88,14 @@ Grid ? '' vertical
 		
 		sr_id = hui.run_repeated(UPDATE_DT, &self, on_update)
 	
-	override void __delete__()
+	func override __delete__()
 		hui.cancel_runner(sr_id)
 		del popup_menu
 	
-	void on_update()
+	func on_update()
 		redraw("area")
 	
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -177,7 +177,7 @@ Grid ? '' vertical
 		
 		fraction_prev = beat_fraction
 	
-	void draw_part_info(Painter p, int cur_bar_index)
+	func draw_part_info(p: Painter, cur_bar_index: int)
 		float w = p.width
 		float h = p.height
 		
@@ -217,7 +217,7 @@ Grid ? '' vertical
 			p.draw_str(20, 5 + fs*1.2 + 5, "> {{change}}")
 				
 	
-	void on_area_right_button_down()
+	func on_area_right_button_down()
 		popup_menu.check("blink-background", allow_blink_background)
 		popup_menu.check("blink-number", allow_blink_number)
 		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
@@ -225,23 +225,23 @@ Grid ? '' vertical
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
 		popup_menu.popup(&self)
 	
-	void on_blink_background()
+	func on_blink_background()
 		allow_blink_background = !allow_blink_background
 		hui.app_config["Plugins/Metronome/AllowBlinkBackground"] = allow_blink_background
 	
-	void on_blink_number()
+	func on_blink_number()
 		allow_blink_number = !allow_blink_number
 		hui.app_config["Plugins/Metronome/AllowBlinkNumber"] = allow_blink_number
 	
-	void on_mode_circle()
+	func on_mode_circle()
 		mode = MODE_CIRCLE
 		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
-	void on_mode_bounce()
+	func on_mode_bounce()
 		mode = MODE_BOUNCE
 		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
-	void on_mode_bounce_walk()
+	func on_mode_bounce_walk()
 		mode = MODE_BOUNCE_WALK
 		hui.app_config["Plugins/Metronome/Mode"] = mode
 	
@@ -251,14 +251,14 @@ Grid ? '' vertical
 #		#show_control()
 
 
-int bar_index(Song* song, int offset)
+func bar_index(song: Song*, offset: int) -> int
 	for b,i in song.bars
 		if b.offset >= offset
 			return i
 	return 0
 
 
-TrackMarker* get_part(Track t, int offset)
+func get_part(t: Track, offset: int) -> TrackMarker*
 	for m in weak(t.layers[0].markers)
 		if m.range.inside(offset)
 			return m
@@ -266,13 +266,13 @@ TrackMarker* get_part(Track t, int offset)
 
 class Metronome extends TsunamiPlugin
 	
-	override void on_start()
+	func override on_start()
 		
 		session.view.signal_chain.set_update_dt(UPDATE_DT)
 		session.view.signal_chain.set_buffer_size(1024)
 			
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new MetronomePanel(&self)
 		
-	override void on_stop()
+	func override on_stop()
 		pass

@@ -4,29 +4,29 @@ use hui
 use tsunami
 
 class Part
-	string title
-	float foffset
+	var title: string
+	var foffset: float
 #	void __init__()
 
-string sanitize(string s)
-	let t = s.replace("/", " - ")
+func sanitize(s: string) -> string
+	var t = s.replace("/", " - ")
 	#t = t.replace("", " - ")
 	return t
 
 class CueSplitter extends TsunamiPlugin
 	
-	override void on_start()
+	func override on_start()
 		if hui.file_dialog_open(session.win, "", "", "*.cue", "*.cue")
 			load_cue(hui.filename)
 	
-	void load_cue(Path filename)
-		let dir = filename.parent()
+	func load_cue(filename: Path)
+		var dir = filename.parent()
 		string fn
 		string year, album, artist
 		Part*[] parts
 		Part *cur = nil
 		try
-			let f = Filesystem.open_text(filename)
+			var f = Filesystem.open_text(filename)
 			while true
 				string s
 				f >> s
@@ -48,9 +48,9 @@ class CueSplitter extends TsunamiPlugin
 					cur.title = s[11:-1]
 					print(cur.title)
 				if s.head(10) == "    INDEX "
-					let soff = s[13:]
+					var soff = s[13:]
 					print(soff)
-					let xx = soff.explode(":")
+					var xx = soff.explode(":")
 					cur.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
 					print(cur.foffset)
 		except
@@ -85,7 +85,7 @@ class CueSplitter extends TsunamiPlugin
 				print(end)
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
-			let _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
+			var _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
 			session.storage.save_via_renderer(r.port_out[0], dir << _fn, end - offset, tags)
 		print("-----------------done")
 		stop()

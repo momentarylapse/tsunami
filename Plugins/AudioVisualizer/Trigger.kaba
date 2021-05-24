@@ -3,12 +3,12 @@
 use hui
 use tsunami
 
-const int NUM_SAMPLES = 4096
+const NUM_SAMPLES = 4096
 
 class TriggerPanel extends ConfigPanel
-	override Trigger* c
+	var override c: Trigger*
 	
-	override void __init__(Module _osci)
+	func override __init__(_osci: Module)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area '' height=200 expandy
@@ -26,14 +26,14 @@ Grid ? '' vertical
 		
 		c.subscribe(self, on_update, "Change")
 	
-	override void __delete__()
+	func override __delete__()
 		c.unsubscribe(self)
 	
-	override void update()
+	func override update()
 		set_float("threshold", c.config.threshold)
 		set_float("blocking", c.config.blocking * 1000)
 	
-	void on_update()
+	func on_update()
 		redraw("area")
 	
 	func on_threshold()
@@ -44,7 +44,7 @@ Grid ? '' vertical
 		c.config.blocking = get_float("blocking") / 1000
 		changed()
 	
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		
@@ -72,26 +72,26 @@ Grid ? '' vertical
 		p.draw_lines(z)
 
 class TriggerConfig extends Module.Config
-	float threshold
-	float blocking
+	var threshold: float
+	var blocking: float
 	
-	override void reset()
+	func override reset()
 		threshold = 0.5
 		blocking = 0.1
 
 class Trigger extends AudioVisualizer
-	float[] curve_before
-	float[] curve_after
-	int blocked
+	var curve_before: float[]
+	var curve_after: float[]
+	var blocked: int
 	
-	TriggerConfig config
+	var config: TriggerConfig
 	
-	override void reset_state()
+	func override reset_state()
 		blocked = -1
 		curve_before.clear()
 		curve_after.clear()
 	
-	override void process(AudioBuffer buf)
+	func override process(buf: AudioBuffer)
 
 		for b,i in buf.c[0]
 			if blocked < 0
@@ -103,6 +103,6 @@ class Trigger extends AudioVisualizer
 			else
 				blocked --
 		
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new TriggerPanel(self)
 

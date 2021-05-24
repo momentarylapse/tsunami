@@ -2,20 +2,20 @@ use tsunami
 
 
 class Chunksize extends AudioEffect
-	RingBuffer* ring_buffer
+	var ring_buffer: RingBuffer*
 	
 	class Config extends Module.Config
-		int size
-		override void reset()
+		var size: int
+		func override reset()
 			size = 4096
-	Config config
+	var config: Config
 	
-	override void __init__()
+	func override __init__()
 		ring_buffer = new RingBuffer(1<<20)
-	override void __delete__()
+	func override __delete__()
 		del ring_buffer
 	
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		if !source
 			return -1
 		

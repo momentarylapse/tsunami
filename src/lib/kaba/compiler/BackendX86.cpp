@@ -331,6 +331,27 @@ void BackendX86::correct_implement_commands() {
 
 			i += 2;
 		} else if (c.inst == Asm::InstID::CMP) {
+			if (c.p[0].type->size > config.pointer_size and false) {
+				do_error("chunk cmp... currently done by the Serializer!");
+				// chunk cmp
+				auto p1 = c.p[1];
+				auto p2 = c.p[2];
+				cmd.remove_cmd(i);
+
+				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(serializer->num_labels ++));
+
+				int reg = find_unused_reg(i, i, 1);
+				auto t = param_vreg(TypeBool, reg);
+
+				insert_cmd(Asm::InstID::CMP, param_shift(p1, 0, TypeInt), param_shift(p2, 0, TypeInt));
+				insert_cmd(Asm::InstID::SETZ, t);
+				for (int k=1; k<p1.type->size/4; k++) {
+					insert_cmd(Asm::InstID::CMP, param_shift(p1, k*4, TypeInt), param_shift(p2, k*4, TypeInt));
+					//insert_cmd(Asm::InstID::SETZ, param_vreg(TypeBool, val));
+					//insert_cmd(Asm::InstID::AND, param_vreg(TypeBool, val));
+				}
+				cmd.set_virtual_reg(reg, i, cmd.next_cmd_index-1);
+			}
 /*			// TODO also check p[0]
 			if (((c.p[1].kind == NodeKind::CONSTANT_BY_ADDRESS) or (c.p[1].kind == NodeKind::IMMEDIATE)) and (c.p[1].type->size == 8)) {
 				int64 ii = c.p[1].p;

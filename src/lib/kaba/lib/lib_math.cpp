@@ -569,18 +569,6 @@ void SIAddPackageMath() {
 		class_add_element("b", TypeFloat32, 8);
 		class_add_element("a", TypeFloat32, 12);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&color::str), Flags::PURE);
-		class_add_func("__add__", TypeColor, mf(&color::operator+), Flags::PURE);
-			func_add_param("o", TypeColor);
-		class_add_func("__adds__", TypeVoid, mf(&color::operator+=));
-			func_add_param("o", TypeColor);
-		class_add_func("__sub__", TypeColor, mf(&color::operator-), Flags::PURE);
-			func_add_param("o", TypeColor);
-		class_add_func("__subs__", TypeVoid, mf(&color::operator-=));
-			func_add_param("o", TypeColor);
-		class_add_funcx("__mul__", TypeColor, &KabaColor::mul_f, Flags::PURE);
-			func_add_param("f", TypeFloat32);
-		class_add_funcx("__mul__", TypeColor, &KabaColor::mul_c, Flags::PURE);
-			func_add_param("c", TypeColor);
 		class_add_funcx("hsb", TypeColor, &color::hsb, Flags::_STATIC__PURE);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
@@ -603,6 +591,12 @@ void SIAddPackageMath() {
 			func_add_param("a", TypeFloat32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN, mf(&KabaColor::assign));
 		add_operator(OperatorID::EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_EQUAL);
+		add_operator(OperatorID::ADD, TypeColor, TypeColor, TypeColor, InlineID::NONE, mf(&color::operator+));
+		add_operator(OperatorID::ADDS, TypeVoid, TypeColor, TypeColor, InlineID::NONE, mf(&color::operator+=));
+		add_operator(OperatorID::SUBTRACT, TypeColor, TypeColor, TypeColor, InlineID::NONE, mf(&color::operator-));
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeColor, TypeColor, InlineID::NONE, mf(&color::operator-=));
+		add_operator(OperatorID::MULTIPLY, TypeColor, TypeColor, TypeFloat32, InlineID::NONE, mf(&KabaColor::mul_f));
+		add_operator(OperatorID::MULTIPLY, TypeColor, TypeColor, TypeColor, InlineID::NONE, mf(&KabaColor::mul_c));
 		// color
 		class_add_const("WHITE",  TypeColor, (void*)&White);
 		class_add_const("BLACK",  TypeColor, (void*)&Black);
@@ -627,7 +621,7 @@ void SIAddPackageMath() {
 			func_add_param("l1", TypeVector);
 			func_add_param("l2", TypeVector);
 			func_add_param("inter", TypeVector);
-		class_add_func("inverse", TypeVoid, mf(&plane::inverse), Flags::PURE);
+		class_add_func("inverse", TypePlane, mf(&plane::inverse), Flags::PURE);
 		class_add_func("distance", TypeFloat32, mf(&plane::distance), Flags::PURE);
 			func_add_param("p", TypeVector);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&plane::str), Flags::PURE);
@@ -665,12 +659,6 @@ void SIAddPackageMath() {
 		class_add_element("_33", TypeFloat32, 60);
 		class_add_element("e", TypeFloatArray4x4, 0);
 		class_add_element("_e", TypeFloatArray16, 0);
-		class_add_func("__imul__", TypeVoid, mf(&matrix::imul));
-			func_add_param("other", TypeMatrix);
-		class_add_func("__mul__", TypeMatrix, mf(&matrix::mul), Flags::PURE);
-			func_add_param("other", TypeMatrix);
-		class_add_func("__mul__", TypeVector, mf(&matrix::mul_v), Flags::PURE);
-			func_add_param("other", TypeVector);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&matrix::str), Flags::PURE);
 		class_add_func("transform", TypeVector, mf(&matrix::transform), Flags::PURE);
 			func_add_param("v", TypeVector);
@@ -708,6 +696,9 @@ void SIAddPackageMath() {
 		class_add_const("ID", TypeMatrix, (void*)&matrix::ID);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix, TypeMatrix, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix, TypeMatrix, InlineID::CHUNK_EQUAL);
+		add_operator(OperatorID::MULTIPLY, TypeMatrix, TypeMatrix, TypeMatrix, InlineID::NONE, mf(&matrix::mul));
+		add_operator(OperatorID::MULTIPLY, TypeVector, TypeMatrix, TypeVector, InlineID::NONE, mf(&matrix::mul_v));
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeMatrix, TypeMatrix, InlineID::NONE, mf(&matrix::imul));
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11", TypeFloat32, 0);
@@ -721,15 +712,13 @@ void SIAddPackageMath() {
 		class_add_element("_33", TypeFloat32, 32);
 		class_add_element("e", TypeFloatArray3x3, 0);
 		class_add_element("_e", TypeFloatArray9, 0);
-		class_add_func("__mul__", TypeMatrix3, mf(&matrix3::mul), Flags::PURE);
-			func_add_param("other", TypeMatrix3);
-		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), Flags::PURE);
-			func_add_param("other", TypeVector);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, mf(&matrix3::str), Flags::PURE);
 		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), Flags::PURE);
 		class_add_const("ID", TypeMatrix3, (void*)&matrix3::ID);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_EQUAL);
+		add_operator(OperatorID::MULTIPLY, TypeMatrix3, TypeMatrix3, TypeMatrix3, InlineID::NONE, mf(&matrix3::mul));
+		add_operator(OperatorID::MULTIPLY, TypeVector, TypeMatrix3, TypeVector, InlineID::NONE, mf(&matrix3::mul_v));
 	
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);

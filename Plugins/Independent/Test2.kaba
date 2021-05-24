@@ -1,11 +1,11 @@
 use hui
 use tsunami
 
-const int CHUNK_SIZE = 1024
-const int NUM_CHUNKS = 4
+const CHUNK_SIZE = 1024
+const NUM_CHUNKS = 4
 
 class Test extends TsunamiPlugin
-	override void on_start()
+	func override on_start()
 		AudioBuffer buf
 		buf.resize(CHUNK_SIZE * NUM_CHUNKS)
 		float omega = 0.13

@@ -192,6 +192,11 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				call1<int,CBR>(ff, ret, param);
 				return true;
 			}
+		} else if (f->literal_return_type == TypeInt64) {
+			if (ptype[0] == TypeInt) {
+				call1<int64,int>(ff, ret, param);
+				return true;
+			}
 		} else if (f->literal_return_type == TypeBool or f->literal_return_type == TypeChar) {
 			if (ptype[0] == TypeInt) {
 				call1<char,int>(ff, ret, param);

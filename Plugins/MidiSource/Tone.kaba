@@ -1,25 +1,25 @@
 use tsunami
 
-const string AUTO_CONFIG_PITCH = "0:127"
-const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const AUTO_CONFIG_PITCH = "0:127"
+const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
 
 class ToneConfig extends Module.Config
-	float pitch
-	float volume
-	override void reset()
+	var pitch: float
+	var volume: float
+	func override reset()
 		pitch = 64
 		volume = 0.5
 
 class ToneSource extends MidiSource
-	ToneConfig config
+	var config: ToneConfig
 
-	bool started
+	var started: bool
 	
-	override void reset_state()
+	func override reset_state()
 		started = false
 		
-	override int read(out MidiEventBuffer midi)
+	func override read(out midi: MidiEventBuffer) -> int
 		if !started
 			midi.add(MidiEvent(0, config.pitch, config.volume))
 			started = true

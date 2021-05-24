@@ -3,12 +3,12 @@
 use hui
 use tsunami
 
-const int NUM_SAMPLES = 4096
+const NUM_SAMPLES = 4096
 
 class OscilloscopePanel extends ConfigPanel
-	override Oscilloscope* c
+	var override c: Oscilloscope*
 	
-	override void __init__(Module _osci)
+	func override __init__(_osci: Module)
 		from_source("
 DrawingArea area '' height=200 expandy")
 	
@@ -16,13 +16,13 @@ DrawingArea area '' height=200 expandy")
 		
 		c.subscribe(self, on_update, "Change")
 	
-	override void __delete__()
+	func override __delete__()
 		c.unsubscribe(self)
 	
-	void on_update()
+	func on_update()
 		redraw("area")
 	
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		
@@ -46,12 +46,12 @@ DrawingArea area '' height=200 expandy")
 class Oscilloscope extends AudioVisualizer
 	#AudioBuffer buffer
 	
-	override void reset_state()
+	func override reset_state()
 		#buffer.clear()
 	
-	override void process(AudioBuffer buf)
+	func override process(buf: AudioBuffer)
 		#buffer = buf
 		
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new OscilloscopePanel(self)
 

@@ -2,14 +2,14 @@ use hui
 use tsunami
 
 # t in [0,1]
-float step(float t)
+func step(t: float) -> float
 	return 1 - 1/(exp((t-0.5)*12) + 1)
 
 class SoftPaste extends SongPlugin
-	void soft_paste(AudioBuffer source, out TrackLayer dest, Range r)
+	func soft_paste(source: AudioBuffer, out dest: TrackLayer, r: Range)
 		int l = min(len(source), len(r))
 		AudioBuffer buf
-		let a = dest.edit_buffers(buf, Range(r.offset, l))
+		var a = dest.edit_buffers(buf, Range(r.offset, l))
 		int ll = min(2000, l/4)
 		for i in 0:l
 			float x = 1
@@ -21,7 +21,7 @@ class SoftPaste extends SongPlugin
 			buf.c[1][i] = x * source.c[1][i] + (1-x) * buf.c[1][i]
 		dest.edit_buffers_finish(a)
 	
-	bool check_clipboard()
+	func check_clipboard() -> bool
 		if len(clipboard.temp.tracks) == 0
 			return false
 		if clipboard.temp.tracks[0].type != SignalType.AUDIO
@@ -29,7 +29,7 @@ class SoftPaste extends SongPlugin
 		return true
 		
 	
-	override void apply()
+	func override apply()
 		if !check_clipboard()
 			session.e("'Soft Paste': needs a single audio track in clipboard!")
 			return

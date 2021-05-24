@@ -2,8 +2,8 @@ use hui
 use tsunami
 
 
-func get_part(Song s, int offset) -> TrackMarker*
-	let t = s.time_track()
+func get_part(s: Song, offset: int) -> TrackMarker*
+	var t = s.time_track()
 	if !t
 		return nil
 	for m in weak(t.layers[0].markers)
@@ -14,9 +14,9 @@ func get_part(Song s, int offset) -> TrackMarker*
 
 
 class PLPanel extends ConfigPanel
-	PracticeLooper* looper
+	var looper: PracticeLooper*
 	
-	func __init__(PracticeLooper l)
+	func __init__(l: PracticeLooper)
 		super.__init__(l)
 		from_source("
 Grid ? '' vertical
@@ -42,18 +42,18 @@ Grid ? '' vertical
 		looper.set_speed(get_float("speed"))
 
 
-func scale_range(Range r, float s) -> Range
+func scale_range(r: Range, s: float) -> Range
 	return RangeTo(r.start() * s, r.end() * s)
 
 
 class PracticeLooper extends TsunamiPlugin
-	int runner
-	SignalChain* chain
-	SongRenderer* renderer
-	Song* song
-	bool altered_speed = false
-	float current_speed = 1
-	Range old_sel
+	var runner: int
+	var chain: SignalChain*
+	var renderer: SongRenderer*
+	var song: Song*
+	var altered_speed = false
+	var current_speed = 1.
+	var old_sel: Range
 	
 	func override on_start()
 		song = session.song
@@ -90,7 +90,7 @@ class PracticeLooper extends TsunamiPlugin
 		altered_speed = false
 		current_speed = 1
 	
-	func set_speed(float speed)
+	func set_speed(speed: float)
 		if altered_speed
 			reset()
 		song.begin_action_group()

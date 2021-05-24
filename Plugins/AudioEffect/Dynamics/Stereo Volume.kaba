@@ -3,22 +3,22 @@
 
 use tsunami
 
-const string AUTO_CONFIG_VOLUME_RIGHT = "0:2:0.1:100:%"
-const string AUTO_CONFIG_VOLUME_LEFT = "0:2:0.1:100:%"
+const AUTO_CONFIG_VOLUME_RIGHT = "0:2:0.1:100:%"
+const AUTO_CONFIG_VOLUME_LEFT = "0:2:0.1:100:%"
 
 
 class Volume extends AudioEffect
 	class Config extends Module.Config
-		float volume_right
-		float volume_left
+		var volume_right: float
+		var volume_left: float
 	
-		override void reset()
+		func override reset()
 			volume_right = 1
 			volume_left = 1
 
-	Config config
+	var config: Config
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		buf.c[0] *= config.volume_right
 		if buf.channels > 1
 			buf.c[1] *= config.volume_left

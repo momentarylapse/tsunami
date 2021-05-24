@@ -47,6 +47,22 @@ void reset_external_data() {
 	ClassSizes.clear();
 }
 
+extern const Class *TypeStringAutoCast;
+
+
+string decode_symbol_name(const string &name) {
+	return name.replace("lib__", "").replace("@list", "[]").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
+}
+
+string function_link_name(Function *f) {
+	string name = decode_symbol_name(f->cname(f->owner()->base_class));
+	if (!f->is_static())
+		name += ":" + decode_symbol_name(f->name_space->name);
+	for (auto &p: f->literal_param_type)
+		name += ":" + decode_symbol_name(p->name);
+	return name;
+}
+
 // program variables - specific to the surrounding program, can't always be there...
 void link_external(const string &name, void *pointer) {
 	ExternalLinkData l;
@@ -56,16 +72,14 @@ void link_external(const string &name, void *pointer) {
 		msg_error("probably a virtual function: " + name);
 	ExternalLinks.add(l);
 
-	Array<string> names = name.explode(":");
-	string sname = names[0].replace("@list", "[]").replace("@@", ".");
+
+	auto names = name.explode(":");
+	string sname = decode_symbol_name(names[0]);
 	for (auto p: packages)
 		foreachi(Function *f, p->syntax->functions, i)
 			if (f->cname(p->base_class()) == sname) {
-				int n = f->num_params;
-				if (!f->is_static())
-					n ++;
-				if (names.num > 0)
-					if (n != names[1]._int())
+				if (names.num > 1)
+					if (name != function_link_name(f))
 						continue;
 				f->address = (int_p)pointer;
 			}

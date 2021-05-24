@@ -452,117 +452,117 @@ void init_shaders() {
 	try {
 
 	Shader::default_3d = nix::Shader::create(
-		"<VertexShader>\n"
-		"#version 330 core\n"
-		"#extension GL_ARB_separate_shader_objects : enable"
-		"\n"
-		"struct Matrix { mat4 model, view, project; };\n"
-		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
-		"\n"
-		"layout(location = 0) in vec3 in_position;\n"
-		"layout(location = 1) in vec3 in_normal;\n"
-		"layout(location = 2) in vec2 in_uv;\n"
-		"\n"
-		"layout(location = 0) out vec3 out_pos; // camera space\n"
-		"layout(location = 1) out vec3 out_normal;\n"
-		"layout(location = 2) out vec2 out_uv;\n"
-		"\n"
-		"void main() {\n"
-		"	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);\n"
-		"	out_normal = (matrix.view * matrix.model * vec4(in_normal, 0)).xyz;\n"
-		"	out_uv = in_uv;\n"
-		"	out_pos = (matrix.view * matrix.model * vec4(in_position, 1)).xyz;\n"
-		"}\n"
-		"</VertexShader>\n"
-		"<FragmentShader>\n"
-		"#version 330 core\n"
-		"#extension GL_ARB_separate_shader_objects : enable"
-		"\n"
-		"struct Matrix { mat4 model, view, project; };\n"
-		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
-		"struct Material { vec4 albedo, emission; float roughness, metal; };\n"
-		"/*layout(binding = 2)*/ uniform Material material;\n"
-		"struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };\n"
-		"uniform int num_lights = 0;\n"
-		"/*layout(binding = 1)*/ uniform LightData { Light light[32]; };\n"
-		"\n"
-		"layout(location = 0) in vec3 in_pos;\n"
-		"layout(location = 1) in vec3 in_normal;\n"
-		"layout(location = 2) in vec2 in_uv;\n"
-		"uniform sampler2D tex0;\n"
-		"out vec4 out_color;\n"
-		"\n"
-		"vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {\n"
-		"	float attenuation = 1.0;\n"
-		"	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;\n"
-		"	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;\n"
-		"	if (l.radius > 0) {\n"
-		"		LD = normalize(in_pos - LP);\n"
-		"		attenuation = min(l.radius / length(in_pos - LP), 1);\n"
-		"	}\n"
-		"	float d = max(-dot(n, LD), 0) * attenuation;\n"
-		"	vec4 color = material.albedo * material.roughness * l.color * (1 - l.harshness) / 2;\n"
-		"	color += material.albedo * l.color * l.harshness * d;\n"
-		"	color *= tex_col;\n"
-		"	if ((d > 0) && (material.roughness < 0.8)) {\n"
-		"		vec3 e = normalize(in_pos); // eye dir\n"
-		"		vec3 rl = reflect(LD, n);\n"
-		"		float ee = max(-dot(e, rl), 0);\n"
-		"		float shininess = 5 / (1.1 - material.roughness);\n"
-		"		color += (1 - material.roughness) * l.color * l.harshness * pow(ee, shininess);\n"
-		"	}\n"
-		"	return color;\n"
-		"}\n"
-		"\n"
-		"void main() {\n"
-		"	vec3 n = normalize(in_normal);\n"
-		"	out_color = material.emission;\n"
-		"	vec4 tex_col = texture(tex0, in_uv);\n"
-		"	for (int i=0; i<num_lights; i++)\n"
-		"		out_color += basic_lighting(light[i], n, tex_col);\n"
-		"	out_color.a = material.albedo.a * tex_col.a;\n"
-		"}\n"
-		"</FragmentShader>");
+R"foodelim(<VertexShader>
+#version 330 core
+#extension GL_ARB_separate_shader_objects : enable
+
+struct Matrix { mat4 model, view, project; };
+/*layout(binding = 0)*/ uniform Matrix matrix;
+
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
+
+layout(location = 0) out vec3 out_pos; // camera space
+layout(location = 1) out vec3 out_normal;
+layout(location = 2) out vec2 out_uv;
+
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
+	out_normal = (matrix.view * matrix.model * vec4(in_normal, 0)).xyz;
+	out_uv = in_uv;
+	out_pos = (matrix.view * matrix.model * vec4(in_position, 1)).xyz;
+}
+</VertexShader>
+<FragmentShader>
+#version 330 core
+#extension GL_ARB_separate_shader_objects : enable
+
+struct Matrix { mat4 model, view, project; };
+/*layout(binding = 0)*/ uniform Matrix matrix;
+struct Material { vec4 albedo, emission; float roughness, metal; };
+/*layout(binding = 2)*/ uniform Material material;
+struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };
+uniform int num_lights = 0;
+/*layout(binding = 1)*/ uniform LightData { Light light[32]; };
+
+layout(location = 0) in vec3 in_pos;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
+uniform sampler2D tex0;
+out vec4 out_color;
+
+vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {
+	float attenuation = 1.0;
+	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;
+	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;
+	if (l.radius > 0) {
+		LD = normalize(in_pos - LP);
+		attenuation = min(l.radius / length(in_pos - LP), 1);
+	}
+	float d = max(-dot(n, LD), 0) * attenuation;
+	vec4 color = material.albedo * material.roughness * l.color * (1 - l.harshness) / 2;
+	color += material.albedo * l.color * l.harshness * d;
+	color *= tex_col;
+	if ((d > 0) && (material.roughness < 0.8)) {
+		vec3 e = normalize(in_pos); // eye dir
+		vec3 rl = reflect(LD, n);
+		float ee = max(-dot(e, rl), 0);
+		float shininess = 5 / (1.1 - material.roughness);
+		color += (1 - material.roughness) * l.color * l.harshness * pow(ee, shininess);
+	}
+	return color;
+}
+
+void main() {
+	vec3 n = normalize(in_normal);
+	out_color = material.emission;
+	vec4 tex_col = texture(tex0, in_uv);
+	for (int i=0; i<num_lights; i++)
+		out_color += basic_lighting(light[i], n, tex_col);
+	out_color.a = material.albedo.a * tex_col.a;
+}
+</FragmentShader>)foodelim");
 	Shader::default_3d->filename = "-default 3d-";
 
 
 
 	Shader::default_2d = nix::Shader::create(
-		"<VertexShader>\n"
-		"#version 330 core\n"
-		"#extension GL_ARB_separate_shader_objects : enable"
-		"\n"
-		"struct Matrix { mat4 model, view, project; };\n"
-		"/*layout(binding = 0)*/ uniform Matrix matrix;\n"
-		"\n"
-		"layout(location = 0) in vec3 in_position;\n"
-		"layout(location = 1) in vec4 in_color;\n"
-		"layout(location = 2) in vec2 in_uv;\n"
-		"\n"
-		"layout(location = 0) out vec2 out_uv;\n"
-		"layout(location = 1) out vec4 out_color;\n"
-		"\n"
-		"void main() {\n"
-		"	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);\n"
-		"	out_uv = in_uv;\n"
-		"	out_color = in_color;\n"
-		"}\n"
-		"\n"
-		"</VertexShader>\n"
-		"<FragmentShader>\n"
-		"#version 330 core\n"
-		"#extension GL_ARB_separate_shader_objects : enable"
-		"\n"
-		"layout(location = 0) in vec2 in_uv;\n"
-		"layout(location = 1) in vec4 in_color;\n"
-		"uniform sampler2D tex0;\n"
-		"out vec4 color;\n"
-		"\n"
-		"void main() {\n"
-		"	color = texture(tex0, in_uv);\n"
-		"	color *= in_color;\n"
-		"}\n"
-		"</FragmentShader>");
+R"foodelim(<VertexShader>
+#version 330 core
+#extension GL_ARB_separate_shader_objects : enable
+
+struct Matrix { mat4 model, view, project; };
+/*layout(binding = 0)*/ uniform Matrix matrix;
+
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec4 in_color;
+layout(location = 2) in vec2 in_uv;
+
+layout(location = 0) out vec2 out_uv;
+layout(location = 1) out vec4 out_color;
+
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
+	out_uv = in_uv;
+	out_color = in_color;
+}
+
+</VertexShader>
+<FragmentShader>
+#version 330 core
+#extension GL_ARB_separate_shader_objects : enable
+
+layout(location = 0) in vec2 in_uv;
+layout(location = 1) in vec4 in_color;
+uniform sampler2D tex0;
+out vec4 color;
+
+void main() {
+	color = texture(tex0, in_uv);
+	color *= in_color;
+}
+</FragmentShader>)foodelim");
 		Shader::default_2d->filename = "-default 2d-";
 	} catch(Exception &e) {
 		msg_error(e.message());

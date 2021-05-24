@@ -1,26 +1,26 @@
 use tsunami
 use Special.Envelope
 
-const string AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
-const string AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"
-const string AUTO_CONFIG_MIX = "0:1:1:100:%"
+const AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
+const AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"
+const AUTO_CONFIG_MIX = "0:1:1:100:%"
 
 class Config extends Module.Config
-	float attack
-	float sustain
-	float mix
-	override void reset()
+	var attack: float
+	var sustain: float
+	var mix: float
+	func override reset()
 		attack = 2
 		sustain = 0.2
 		mix = 1.0
 
 class TransientDesigner extends AudioEffect
-	Config config
+	var config: Config
 	
-	AudioBuffer buf_fast, buf_att, buf_sus
-	Envelope env_fast, env_att, env_sus
+	var buf_fast, buf_att, buf_sus: AudioBuffer
+	var env_fast, env_att, env_sus: Envelope
 	
-	override void on_config()
+	func override on_config()
 		env_fast.session = session
 		env_fast.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.0001)")
 		env_att.session = session
@@ -28,12 +28,12 @@ class TransientDesigner extends AudioEffect
 		env_sus.session = session
 		env_sus.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.00000002)") # ~100ms release
 	
-	override void reset_state()
+	func override reset_state()
 		env_fast.reset_state()
 		env_att.reset_state()
 		env_sus.reset_state()
 
-	void do(out float[] buf, int c, float[] h_fast, float[] h_att, float[] h_sus)
+	func do(out buf: float[], c: int, h_fast: float[], h_att: float[], h_sus: float[])
 		
 		for i in 0:len(buf)
 			# gain?
@@ -53,7 +53,7 @@ class TransientDesigner extends AudioEffect
 			#buf[i] = gain*2
 			#buf[i] = hs
 			
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		buf_fast = buf
 		env_fast.process(buf_fast)
 		buf_att = buf

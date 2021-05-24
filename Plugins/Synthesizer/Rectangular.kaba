@@ -3,19 +3,16 @@ use helper.tone
 
 
 class RectangleRenderer extends PitchRenderer
-	float volume
-	float phase
-	override RectangularSynthesizer *synth
-	override void __init__(Synthesizer s, int pitch)
-		volume = 0
-		phase = 0
+	var volume = 0.
+	var phase = 0.
+	var override synth: RectangularSynthesizer*
 
-	override void on_start(float v)
+	func override on_start(v: float)
 		volume = v
-	override void on_end()
+	func override on_end()
 		volume = 0
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 			float d = sin(phase)
 			if d > 0
@@ -30,6 +27,6 @@ class RectangleRenderer extends PitchRenderer
 
 class RectangularSynthesizer extends Synthesizer
 
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new RectangleRenderer(self, pitch)
 

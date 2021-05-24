@@ -3,14 +3,14 @@ use hui
 
 class XPanel extends ConfigPanel
 	
-	void __init__(X m)
+	func __init__(m: X)
 		super.__init__(m)
 		from_source("
 Grid ? '' vertical
 	Button b ''
 	DrawingArea area ''")
 		event_x("area", "hui:draw", on_draw)
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		#color{} cols
@@ -35,6 +35,6 @@ Grid ? '' vertical
 #			p.draw_rect(rect(w/2,w, i*20,i*20 + 20))
 
 class X extends TsunamiPlugin
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new XPanel(self)
 		

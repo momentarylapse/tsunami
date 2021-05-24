@@ -2,10 +2,10 @@ use hui
 use tsunami
 use helper.tone
 
-const int MAX_VOICES = 15
+const MAX_VOICES = 15
 
-const float OSCI_RADIUS = 15.0
-const float LINK_LENGTH = OSCI_RADIUS * 5.0
+const OSCI_RADIUS = 15.0
+const LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 
@@ -15,14 +15,14 @@ enum
 	TYPE_SAW
 
 class UnisonConfig extends Module.Config
-	float amplitude
-	float initial, peak, sustain
-	float attack, decay, release
-	int type
-	int num_voices
-	float detune, blend
+	var amplitude: float
+	var initial, peak, sustain: float
+	var attack, decay, release: float
+	var type: int
+	var num_voices: int
+	var detune, blend: float
 	
-	override void reset()
+	func override reset()
 		num_voices = 3
 		detune = 0.10
 		blend = 0.5
@@ -36,14 +36,14 @@ class UnisonConfig extends Module.Config
 		type = TYPE_SINE
 
 class UnisonPanel extends ConfigPanel
-	UnisonConfig *fc
+	var fc: UnisonConfig*
 	
-	float width, height
+	var width, height: float
 	
-	int moving, hover
+	var moving, hover: int
 	
-	override UnisonSynthesizer *c
-	override void __init__(Module _s)
+	var override c: UnisonSynthesizer*
+	func override __init__(_s: Module)
 		fc = &c.config
 		
 		from_source("
@@ -76,22 +76,22 @@ Grid ? ''
 		event("blend", on_spin_button)
 		event("amplitude", on_spin_button)
 	
-	float t2x(float t)
+	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)
-	float v2y(float v)
+	func v2y(v: float) -> float
 		return height - 100*v
-	float x2t(float x)
+	func x2t(x: float) -> float
 		return sqr(max(x,0) / width / 0.7)
-	float y2v(float y)
+	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
-	void draw_curve_exp(Painter p, float t0, float v0, float t1, float v1, color col)
+	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		float e = log(v1/v0)
 		complex[] cc
 		for a in 0:1.01:0.05
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
 			cc.add(complex(t2x(t), v2y(v)))
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -101,11 +101,11 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
-	void draw_curve_lin(Painter p, float t0, float v0, float t1, float v1, color col)
+	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		complex[] cc
 		cc.add(complex(t2x(t0), v2y(v0)))
 		cc.add(complex(t2x(t1), v2y(v1)))
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -116,8 +116,8 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	
-	void draw_grabber(Painter p, float t0, float v0, float t1, float v1, color col, bool hover)
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+	func draw_grabber(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		if hover
 			col2 = colors.hoverify(col2)
 		p.set_color(col2)
@@ -125,7 +125,7 @@ Grid ? ''
 		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
 		p.set_line_width(1)
 	
-	void draw_envelope(Painter p, UnisonConfig o)
+	func draw_envelope(p: Painter, o: UnisonConfig)
 		float t0 = 0
 		float t1 = t0 + o.attack
 		float t2 = t1 + o.decay
@@ -150,7 +150,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100|.0}} %")
 		
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -158,12 +158,12 @@ Grid ? ''
 		
 		draw_envelope(p, fc)
 	
-	int get_hover()
-		let e = hui.get_event()
+	func get_hover() -> int
+		var e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if my > v2y(1.1)
-			let o = fc
+			var o = fc
 			if abs(mx - t2x(o.attack)) < 10
 				return -10
 			if abs(mx - t2x(o.attack + o.decay)) < 10
@@ -174,19 +174,19 @@ Grid ? ''
 				return -13
 		return -1
 	
-	void on_left_button_down()
+	func on_left_button_down()
 		hover = get_hover()
 		moving = -1
 		if hover < -5
 			moving = hover
-	void on_left_button_up()
+	func on_left_button_up()
 		moving = -1
-	void on_mouse_move()
-		let e = hui.get_event()
+	func on_mouse_move()
+		var e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if moving < -5
-			let o = fc
+			var o = fc
 			if moving == -10
 				o.attack = clamp(x2t(mx), 0.0002, 2)
 			if moving == -11
@@ -201,8 +201,8 @@ Grid ? ''
 			hover = get_hover()
 		redraw("area")
 
-	void on_spin_button()
-		let o = fc
+	func on_spin_button()
+		var o = fc
 		o.type = get_int("type")
 		o.num_voices = get_int("voices")
 		o.detune = get_float("detune")
@@ -210,8 +210,8 @@ Grid ? ''
 		o.amplitude = get_float("amplitude")
 		changed()
 	
-	override void update()
-		let o = fc
+	func override update()
+		var o = fc
 		set_int("type", o.type)
 		set_int("voices", o.num_voices)
 		set_float("detune", o.detune)
@@ -221,35 +221,35 @@ Grid ? ''
 
 
 class OscillatorState
-	float volume
-	float[MAX_VOICES] phi
-	EnvelopeADSR env
-	void __init__()
+	var volume: float
+	var phi: float[MAX_VOICES]
+	var env: EnvelopeADSR
+	func __init__()
 		volume = 0
 		for p in phi
 			p = 0
 		env.reset()
 
 class UnisonRenderer extends PitchRenderer
-	OscillatorState osc
-	override UnisonSynthesizer *synth
+	var osc: OscillatorState
+	var override synth: UnisonSynthesizer*
 
-	override void on_end()
+	func override on_end()
 		osc.env.end()
 
-	override void on_start(float _volume)
+	func override on_start(_volume: float)
 		osc.env.start(_volume * synth.config.amplitude)
-		let c = &synth.config
+		var c = &synth.config
 
-	override void on_config()
-		let c = &synth.config
+	func override on_config()
+		var c = &synth.config
 		osc.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
 		osc.env.set2(c.initial, c.peak)
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 	
-		let c = &synth.config
-		let vv = [for k in 0:c.num_voices c.blend]
+		var c = &synth.config
+		var vv = [for k in 0:c.num_voices c.blend]
 		vv[c.num_voices/2] = 1.0
 		
 		for i in 0:len(buf)
@@ -281,12 +281,12 @@ class UnisonRenderer extends PitchRenderer
 		return true
 
 class UnisonSynthesizer extends Synthesizer
-	UnisonConfig config
+	var config: UnisonConfig
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new UnisonPanel(self)
 
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new UnisonRenderer(self, pitch)
 
 			

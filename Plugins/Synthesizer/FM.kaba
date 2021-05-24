@@ -2,10 +2,10 @@ use hui
 use tsunami
 use helper.tone
 
-const int NUM_OSCILLATORS = 6
+const NUM_OSCILLATORS = 6
 
-const float OSCI_RADIUS = 15.0
-const float LINK_LENGTH = OSCI_RADIUS * 5.0
+const OSCI_RADIUS = 15.0
+const LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 
@@ -15,16 +15,16 @@ enum
 	TYPE_SAW
 
 class OscillatorConfig
-	float factor
-	float amplitude
-	float initial, peak, sustain
-	float attack, decay, release
-	int type
-	bool[NUM_OSCILLATORS] target
-	bool target_out
-	void __init__()
+	var factor: float
+	var amplitude: float
+	var initial, peak, sustain: float
+	var attack, decay, release: float
+	var type: int
+	var target: bool[NUM_OSCILLATORS]
+	var target_out: bool
+	func __init__()
 		reset()
-	void reset()
+	func reset()
 		factor = 1
 		amplitude = 0.1
 		initial = 0.01
@@ -37,7 +37,7 @@ class OscillatorConfig
 		for t in target
 			t = false
 		target_out = false
-	bool active()
+	func active() -> bool
 		if target_out
 			return true
 		for t in target
@@ -46,42 +46,42 @@ class OscillatorConfig
 		return false
 
 class OscillatorLink
-	int source, dest
+	var source, dest: int
 
 class FMConfig extends Module.Config
-	OscillatorConfig[NUM_OSCILLATORS] osc
+	var osc: OscillatorConfig[NUM_OSCILLATORS]
 	#OscillatorLink[] link
-	override void reset()
+	func override reset()
 		#link.clear()
 		for o in osc
 			o.reset()
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		osc[0].target_out = true
-	void clear_links()
+	func clear_links()
 		for o in osc
 			for t in o.target
 				t = false
 			o.target_out = false
 
 class FMPanel extends ConfigPanel
-	FMConfig *fc
-	int chosen
-	Menu* menu_top
-	Menu* menu_osci
+	var fc: FMConfig*
+	var chosen: int
+	var menu_top: Menu*
+	var menu_osci: Menu*
 	
-	float width, height
-	complex[NUM_OSCILLATORS] p_osci
-	complex p_out
+	var width, height: float
+	var p_osci: complex[NUM_OSCILLATORS]
+	var p_out: complex
 	
-	int moving, hover
+	var moving, hover: int
 	
-	void add_top(string label, string id)
+	func add_top(label: string, id: string)
 		menu_top.add(label, "top-" + id)
 		event("top-" + id, on_topology)
 	
-	override FMSynthesizer *c
-	override void __init__(Module _s)
+	var override c: FMSynthesizer*
+	func override __init__(_s: Module)
 		fc = &c.config
 		
 		from_source("
@@ -131,7 +131,7 @@ Grid ? ''
 		event("type-square", on_type_square)
 		event("type-saw", on_type_saw)
 	
-	void update_osci_pos()
+	func update_osci_pos()
 		# initial
 		p_out = complex(40, 60)
 		for p,i in p_osci
@@ -143,15 +143,15 @@ Grid ? ''
 				p += complex(1000,1000)
 		for i in 0:2000
 			iterate_osci_pos()
-	complex _f_link(complex a, complex b)
+	func _f_link(a: complex, b: complex) -> complex
 		float d = (b - a).abs()
 		complex dir = (b - a) * (1/d)
 		return dir * (d - LINK_LENGTH) * 0.1 + complex(0, (b.y-a.y) * 0.05)
-	complex _f_free(complex a, complex b)
+	func _f_free(a: complex, b: complex) -> complex
 		float d = (b - a).abs()
 		complex dir = (b - a) * (1/d)
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
-	void iterate_osci_pos()
+	func iterate_osci_pos()
 		complex[NUM_OSCILLATORS] f
 		for o,i in fc.osc
 			f[i] = complex(0,0)
@@ -166,16 +166,16 @@ Grid ? ''
 				f[i] += _f_link(p_osci[i], p_out)
 		for o,i in fc.osc
 			p_osci[i] += f[i]
-	bool linked(int i, int j)
+	func linked(i: int, j: int) -> bool
 		return fc.osc[i].target[j] or fc.osc[j].target[i]
 	
-	complex osci_pos(int index)
+	func osci_pos(index: int) -> complex
 		if index < 0
 			return p_out
 		return p_osci[index]
 
-	void draw_type(Painter p, complex z, int type, float _dx, float amp)
-		let dx = _dx / pi
+	func draw_type(p: Painter, z: complex, type: int, _dx: float, amp: float)
+		var dx = _dx / pi
 		float v0 = 0
 		float t0 = -pi
 		for t in -pi:pi+0.1:0.1
@@ -192,10 +192,10 @@ Grid ? ''
 			t0 = t
 			v0 = v
 	
-	void draw_osci(Painter p, int index)
-		let z = osci_pos(index)
-		let bg = colors.blob_bg
-		let col = colors.text_soft1
+	func draw_osci(p: Painter, index: int)
+		var z = osci_pos(index)
+		var bg = colors.blob_bg
+		var col = colors.text_soft1
 		if index == chosen
 			bg = colors.blob_bg_selected
 			col = colors.text
@@ -204,7 +204,7 @@ Grid ? ''
 		p.set_color(bg)
 		p.draw_circle(z.x, z.y, 15)
 	
-		let o = fc.osc[index]
+		var o = fc.osc[index]
 		p.set_color(col)
 		draw_type(p, z - complex(0,2), o.type, 9, 5.5)
 		int f = o.factor + 0.5
@@ -212,28 +212,28 @@ Grid ? ''
 		#p.set_color(colors.text_soft1)
 		p.draw_str(z.x-4, z.y+6, "x{{f}}")
 	
-	void draw_link(Painter p, int a, int b)
+	func draw_link(p: Painter, a: int, b: int)
 		p.set_color(colors.text_soft1)
-		let z1 = osci_pos(a)
-		let z2 = osci_pos(b)
+		var z1 = osci_pos(a)
+		var z2 = osci_pos(b)
 		p.draw_line(z1.x - 18, z1.y, z2.x + 18, z2.y)
 	
-	float t2x(float t)
+	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)
-	float v2y(float v)
+	func v2y(v: float) -> float
 		return height - 100*v
-	float x2t(float x)
+	func x2t(x: float) -> float
 		return sqr(max(x,0) / width / 0.7)
-	float y2v(float y)
+	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
-	void draw_curve_exp(Painter p, float t0, float v0, float t1, float v1, color col)
+	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		float e = log(v1/v0)
 		complex[] cc
 		for a in 0:1.01:0.05
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
 			cc.add(complex(t2x(t), v2y(v)))
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -243,11 +243,11 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
-	void draw_curve_lin(Painter p, float t0, float v0, float t1, float v1, color col)
+	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		complex[] cc
 		cc.add(complex(t2x(t0), v2y(v0)))
 		cc.add(complex(t2x(t1), v2y(v1)))
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -258,8 +258,8 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	
-	void draw_grabber(Painter p, float t0, float v0, float t1, float v1, color col, bool hover)
-		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
+	func draw_grabber(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
+		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		if hover
 			col2 = colors.hoverify(col2)
 		p.set_color(col2)
@@ -267,7 +267,7 @@ Grid ? ''
 		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
 		p.set_line_width(1)
 	
-	void draw_envelope(Painter p, OscillatorConfig o)
+	func draw_envelope(p: Painter, o: OscillatorConfig)
 		float t0 = 0
 		float t1 = t0 + o.attack
 		float t2 = t1 + o.decay
@@ -292,7 +292,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100|.0}} %")
 		
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -316,16 +316,16 @@ Grid ? ''
 		
 		draw_envelope(p, fc.osc[chosen])
 	
-	int get_hover()
-		let e = hui.get_event()
+	func get_hover() -> int
+		var e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		for i in 0:NUM_OSCILLATORS
-			let z = osci_pos(i)
+			var z = osci_pos(i)
 			if abs(mx - z.x) + abs(my - z.y) < 20
 				return i
 		if my > v2y(1.1) and chosen >= 0
-			let o = &fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			if abs(mx - t2x(o.attack)) < 10
 				return -10
 			if abs(mx - t2x(o.attack + o.decay)) < 10
@@ -336,21 +336,21 @@ Grid ? ''
 				return -13
 		return -1
 	
-	void on_left_button_down()
+	func on_left_button_down()
 		hover = get_hover()
 		moving = -1
 		if hover >= 0
 			set_chosen(hover)
 		else if hover < -5
 			moving = hover
-	void on_left_button_up()
+	func on_left_button_up()
 		moving = -1
-	void on_mouse_move()
-		let e = hui.get_event()
+	func on_mouse_move()
+		var e = hui.get_event()
 		float mx = e.mouse_x
 		float my = e.mouse_y
 		if moving < -5 and chosen >= 0
-			let o = &fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			if moving == -10
 				o.attack = clamp(x2t(mx), 0.0002, 2)
 			if moving == -11
@@ -366,7 +366,7 @@ Grid ? ''
 		redraw("area")
 				
 		
-	void on_right_button_down()
+	func on_right_button_down()
 		hover = get_hover()
 		if hover >= 0
 			set_chosen(hover)
@@ -374,13 +374,13 @@ Grid ? ''
 		else
 			menu_top.popup(self)
 	
-	void set_chosen(int i)
+	func set_chosen(i: int)
 		chosen = i
 		redraw("area")
 		update()
 	
-	void on_topology()
-		let code = hui.get_event().id[4:]
+	func on_topology()
+		var code = hui.get_event().id[4:]
 		fc.clear_links()
 		for i in 0:len(code)
 			if code[i] == 'x'
@@ -392,32 +392,32 @@ Grid ? ''
 		redraw("area")
 		changed()
 	
-	void on_type_sine()
+	func on_type_sine()
 		fc.osc[chosen].type = TYPE_SINE
 		redraw("area")
 		changed()
 	
-	void on_type_square()
+	func on_type_square()
 		fc.osc[chosen].type = TYPE_SQUARE
 		redraw("area")
 		changed()
 		
-	void on_type_saw()
+	func on_type_saw()
 		fc.osc[chosen].type = TYPE_SAW
 		redraw("area")
 		changed()
 
-	void on_spin_button()
+	func on_spin_button()
 		if chosen < 0
 			return
-		let o = &fc.osc[chosen]
+		var o = &fc.osc[chosen]
 		o.factor = get_float("factor")
 		o.amplitude = get_float("amplitude")
 		changed()
 	
-	override void update()
+	func override update()
 		if chosen >= 0
-			let o = &fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			set_float("factor", o.factor)
 			set_float("amplitude", o.amplitude)
 		update_osci_pos()
@@ -425,31 +425,31 @@ Grid ? ''
 
 
 class OscillatorState
-	float input = 0
-	float output = 0
-	float volume = 0
-	float phi = 0
-	EnvelopeADSR env
-	OscillatorConfig conf
-	void __init__()
+	var input = 0.
+	var output = 0.
+	var volume = 0.
+	var phi = 0.
+	var env: EnvelopeADSR
+	var conf: OscillatorConfig
+	func __init__()
 		env.reset()
 
 class FMRenderer extends PitchRenderer
-	OscillatorState[] osc
-	int num_osc_active = 0
-	override FMSynthesizer* synth
+	var osc: OscillatorState[]
+	var num_osc_active = 0
+	var override synth: FMSynthesizer*
 
-	override void on_end()
+	func override on_end()
 		for o,oi in osc
 			o.env.end()
 
-	override void on_start(float _volume)
+	func override on_start(_volume: float)
 		num_osc_active = len(osc)
 		for o in osc
 			# TODO: volume should only effect "output" oscs
 			o.env.start(_volume * o.conf.amplitude)
 
-	override void on_config()
+	func override on_config()
 		int n = 0
 		for c in synth.config.osc
 			if !c.active()
@@ -463,7 +463,7 @@ class FMRenderer extends PitchRenderer
 			n ++
 		osc.resize(n)
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 
 			for o in osc
@@ -498,12 +498,12 @@ class FMRenderer extends PitchRenderer
 		return true
 
 class FMSynthesizer extends Synthesizer
-	FMConfig config
+	var config: FMConfig
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new FMPanel(self)
 
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new FMRenderer(self, pitch)
 
 			

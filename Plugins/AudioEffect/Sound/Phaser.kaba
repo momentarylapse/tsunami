@@ -1,19 +1,19 @@
 use tsunami
 use helper.filter
 
-const string AUTO_CONFIG_FMIN = "0:10000:1:1:Hz"
-const string AUTO_CONFIG_FMAX = "0:10000:1:1:Hz"
-const string AUTO_CONFIG_LFO = "0:5:0.1:1:Hz"
-const string AUTO_CONFIG_Q = "0:20:0.1:1:"
-const string AUTO_CONFIG_MIX = "0:1:1:100:%"
+const AUTO_CONFIG_FMIN = "0:10000:1:1:Hz"
+const AUTO_CONFIG_FMAX = "0:10000:1:1:Hz"
+const AUTO_CONFIG_LFO = "0:5:0.1:1:Hz"
+const AUTO_CONFIG_Q = "0:20:0.1:1:"
+const AUTO_CONFIG_MIX = "0:1:1:100:%"
 
 class Config extends Module.Config
-	float f_min
-	float f_max
-	float lfo
-	float q
-	float mix
-	override void reset()
+	var f_min: float
+	var f_max: float
+	var lfo: float
+	var q: float
+	var mix: float
+	func override reset()
 		f_min = 60
 		f_max = 5000
 		lfo = 1
@@ -21,18 +21,18 @@ class Config extends Module.Config
 		mix = 0.5
 
 class LowPassFilter extends AudioEffect
-	Config config
-	BiquadMultiFilter filter1, filter2
-	float phase
+	var config: Config
+	var filter1, filter2: BiquadMultiFilter
+	var phase: float
 
-	override void reset_state()
+	func override reset_state()
 		filter1.reset()
 		filter2.reset()
 
-	override void on_config()
+	func override on_config()
 		pass
 		
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		float[] f1, f2, q, gain
 		f1.resize(len(buf))
 		f2.resize(len(buf))

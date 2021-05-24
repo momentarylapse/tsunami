@@ -1,14 +1,14 @@
 use tsunami
 
-const string AUTO_CONFIG_PITCH = "0:127:1:1:"
-const string AUTO_CONFIG_TEXT = ""
-const string AUTO_CONFIG_BEAT_PARTITION = "1:8"
+const AUTO_CONFIG_PITCH = "0:127:1:1:"
+const AUTO_CONFIG_TEXT = ""
+const AUTO_CONFIG_BEAT_PARTITION = "1:8"
 
-void append(out int[] a, int[] b)
+func append(out a: int[], b: int[])
 	for x in b
 		a.add(x)
 
-int[] morse(string str)
+func morse(str: string) -> int[]
 	int[] l
 	for c in str
 		if c == 'a'
@@ -67,27 +67,27 @@ int[] morse(string str)
 
 
 class Config extends Module.Config
-	float pitch
-	string text
-	int beat_partition
+	var pitch: float
+	var text: string
+	var beat_partition: int
 	
-	override void reset()
+	func override reset()
 		pitch = 60
 		text = "test"
 		beat_partition = 2
 
 class Morse extends MidiSource
-	Config config
-	int pos
+	var config: Config
+	var pos: int
 	
-	override void reset_state()
+	func override reset_state()
 		pos = 0
 	
-	override bool on_produce(out MidiProduceData data)
+	func override on_produce(out data: MidiProduceData) -> bool
 		if pos >= len(config.text)
 			return false
-		let c = config.text[pos:pos+1]
-		let l = morse(c)
+		var c = config.text[pos:pos+1]
+		var l = morse(c)
 		for ll in l
 			note_x(config.pitch, 1.0, 0, ll, config.beat_partition)
 			skip_x(0, ll+1, config.beat_partition)

@@ -1,9 +1,9 @@
 use tsunami
 
 class SilenceSource extends AudioSource
-	int offset
-	override void reset_state()
+	var offset: int
+	func override reset_state()
 		offset = 0
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		offset += len(buf)
 		return len(buf)

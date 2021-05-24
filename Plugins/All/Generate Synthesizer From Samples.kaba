@@ -3,7 +3,7 @@ use Synthesizer.Sample
 use AudioEffect.Pitch.PitchShift
 use hui
 
-int get_instruments(any p, any i)
+func get_instruments(p: any, i: any) -> int
 	int ins = 0
 	for z in p["zones"].as_array()
 		if z.has("instrument")
@@ -11,19 +11,19 @@ int get_instruments(any p, any i)
 			#keys += int(z["keys"][1]) - int(z["keys"][0]) + 1
 	return ins
 
-int get_samples(any p, any i)
+func get_samples(p: any, i: any) -> int
 	int samples = 0
 	for z in p["zones"].as_array()
 		if z.has("instrument")
-			let ii = i[int(z["instrument"])]
+			var ii = i[int(z["instrument"])]
 			for zz in ii["zones"].as_array()
 				if zz.has("sample")
 					samples ++
 	return samples
 
 class PresetDialog extends hui.Dialog
-	int selected
-	void __init__(SongPlugin plug)
+	var selected: int
+	func __init__(plug: SongPlugin)
 		super.__init__("Presets", 500, 700, plug.session.win, false)
 		set_options("", "headerbar,closebutton=no,resizable")
 		from_source("
@@ -36,7 +36,7 @@ Grid ? ''
 		Button ok 'Ok' default")
 		#for i in plug.song.secret_data["instruments"].as_array()
 		#	dlg.add_string("instrument", "{{i["name"]}}\\{{get_keys(i)}}\\{{get_samples(i)}}")
-		let ii = plug.song.secret_data["instruments"]
+		var ii = plug.song.secret_data["instruments"]
 		for p in plug.song.secret_data["presets"].as_array()
 			add_string("presets", "{{p["name"]}}\\{{get_instruments(p, ii)}}\\{{get_samples(p, ii)}}")
 		selected = 0
@@ -45,32 +45,32 @@ Grid ? ''
 		event("ok", on_ok)
 		event("presets", on_ok)
 		event("cancel", on_cancel)
-	void on_ok()
+	func on_ok()
 		selected = get_int("presets")
 		destroy()
-	void on_cancel()
+	func on_cancel()
 		selected = -1
 		destroy()
 
-int choose_preset(SongPlugin plug)
-	let dlg = new PresetDialog(plug)
+func choose_preset(plug: SongPlugin) -> int
+	var dlg = new PresetDialog(plug)
 	dlg.run()
 	int sel = dlg.selected
 	del dlg
 	return sel
 
 class XXX extends SongPlugin
-	override void apply()
+	func override apply()
 		if not song.secret_data.has("instruments")
 			session.e("no sf2 data found")
 			return
 
 		int pre = choose_preset(self)
 		
-	#	let prog = new ProgressX("generating sound font", session.win)
+	#	var prog = new ProgressX("generating sound font", session.win)
 
 		print("creating track")
-		let track = song.add_track(SignalType.MIDI, 0)
+		var track = song.add_track(SignalType.MIDI, 0)
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample")
 		print("set synth")
@@ -79,10 +79,10 @@ class XXX extends SongPlugin
 		
 
 		print("make")
-		let p = song.secret_data["presets"][pre]
+		var p = song.secret_data["presets"][pre]
 		for z in p["zones"].as_array()
 			if z.has("instrument")
-				let ii = song.secret_data["instruments"][int(z["instrument"])]
+				var ii = song.secret_data["instruments"][int(z["instrument"])]
 				for zz in ii["zones"].as_array()
 					if not zz.has("sample")
 						continue
@@ -90,7 +90,7 @@ class XXX extends SongPlugin
 						continue
 					int k0 = int(zz["keys"][0])
 					int k1 = int(zz["keys"][1]) + 1
-					let s = song.samples[int(zz["sample"])]
+					var s = song.samples[int(zz["sample"])]
 					if zz.has("root-key")
 						s.set_value("pitch", str(zz["root-key"]))
 					if zz.has("start-loop")
@@ -112,7 +112,7 @@ class XXX extends SongPlugin
 	#							prog.set("pitch shift", 0.2)
 
 	#	prog.set("remove samples", 0.7)
-		let to_del = [for s in weak(session.song.samples) s if s.ref_count == 0]
+		var to_del = [for s in weak(session.song.samples) s if s.ref_count == 0]
 		for s in to_del
 			session.song.delete_sample(s)
 	#	del prog
@@ -120,7 +120,7 @@ class XXX extends SongPlugin
 		
 
 	
-	void shift(out Song song, out SampleSynthesizer synth, Sample source, int from, int to)
+	func shift(out song: Song, out synth: SampleSynthesizer, source: Sample, from: int, to: int)
 		print("shift {{from}} -> {{to}}")
 		#let buf = *source.origin.buf
 		
@@ -132,7 +132,7 @@ class XXX extends SongPlugin
 	#	ps.process(buf)
 		interpolate_buffer(*source.buf, buf, 0)
 		
-		let t = new Sample("new", buf)
+		var t = new Sample("new", buf)
 		song.add_sample(t)
 		
 		synth.config.samples[to] = t.create_ref()

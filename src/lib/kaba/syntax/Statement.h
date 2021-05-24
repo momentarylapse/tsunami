@@ -41,6 +41,7 @@ enum class StatementID {
 	REPR,
 	LEN,
 	LET,
+	VAR,
 	MAP,
 	LAMBDA,
 	SORTED,

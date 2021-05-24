@@ -2,18 +2,18 @@
 # Title[Deutsch] = Klicks Entfernen
 use tsunami
 
-const int MAX_CLICK_SAMPLES = 128
-const int MIN_CLICK_SAMPLES = 8
-const float CLICK_ABS_THRESHOLD = 0.0
-const float CLICK_DIFF_THRESHOLD = 0.4
+const MAX_CLICK_SAMPLES = 128
+const MIN_CLICK_SAMPLES = 8
+const CLICK_ABS_THRESHOLD = 0.0
+const CLICK_DIFF_THRESHOLD = 0.4
 
-bool click_start(float last, float cur)
+func click_start(last: float, cur: float) -> bool
 	return abs(cur) > CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
 
-bool click_end(float last, float cur)
+func click_end(last: float, cur: float) -> bool
 	return abs(cur) < CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
 
-int[] find_clicks(float[] b)
+func find_clicks(b: float[]) -> int[]
 	int[] clicks
 	for i in 1:len(b)-1
 		if click_start(b[i-1], b[i])
@@ -33,7 +33,7 @@ int[] find_clicks(float[] b)
 	print(clicks)
 	return clicks
 
-void unclick(out float[] b, out TrackLayer l, int offset)
+func unclick(out b: float[], out l: TrackLayer, offset: int)
 	int[] clicks = find_clicks(b)
 	for i in 0:len(clicks):2
 		l.add_marker(new TrackMarker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click"))
@@ -41,7 +41,7 @@ void unclick(out float[] b, out TrackLayer l, int offset)
 
 class FindClicks extends SongPlugin
 
-	override void apply()
+	func override apply()
 		for t in weak(song.tracks)
 			for l in weak(t.layers)
 				for buf in l.buffers

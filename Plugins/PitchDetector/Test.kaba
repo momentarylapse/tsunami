@@ -1,13 +1,13 @@
 use tsunami
 use helper.tone
 
-const int MIN_DETECT_PITCH = 40
-const int MAX_DETECT_PITCH = 100
-const int MAX_SCAN_PITCH = 200
+const MIN_DETECT_PITCH = 40
+const MAX_DETECT_PITCH = 100
+const MAX_SCAN_PITCH = 200
 
 class TestDetector extends PitchDetector
-	float[] pitch_power
-	float[] pitch_power2
+	var pitch_power: float[]
+	var pitch_power2: float[]
 	override void process(MidiEventBuffer midi, AudioBuffer buf)
 		#print(len(buf))
 		complex[] z

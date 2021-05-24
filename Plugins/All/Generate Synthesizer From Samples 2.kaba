@@ -2,12 +2,12 @@ use tsunami
 use hui
 
 class XXX extends SongPlugin
-	override void apply()
+	func override apply()
 		if not song.secret_data.has("instruments")
 			session.e("no sf2 data found")
 			return
 		
-	#	let prog = new ProgressX("generating sound font", session.win)
+	#	var prog = new ProgressX("generating sound font", session.win)
 		
 
 		print("make")
@@ -15,15 +15,15 @@ class XXX extends SongPlugin
 			import_preset(p)
 		
 	
-	void import_preset(any p)
+	func import_preset(p: any)
 		print("import {{p["name"]}}")
 				
-		let track = song.add_track(SignalType.MIDI, -1)
+		var track = song.add_track(SignalType.MIDI, -1)
 		track.set_name(str(p["name"]))
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample Zones")
 		print("set synth")
-		let synth = track.synth
+		var synth = track.synth
 		track.set_synthesizer(weak(synth))
 			
 		any a
@@ -45,7 +45,7 @@ class XXX extends SongPlugin
 			#if z.has("vel")
 			#print("P {{z}}")
 				
-			let ii = song.secret_data["instruments"][int(z["instrument"])]
+			var ii = song.secret_data["instruments"][int(z["instrument"])]
 			for zz in ii["zones"].as_array()
 				if not zz.has("sample")
 					continue
@@ -55,7 +55,7 @@ class XXX extends SongPlugin
 				int offset = 0
 				for k in 0:index
 					offset += len(song.samples[k].buf)
-				let s = song.samples[index]
+				var s = song.samples[index]
 				#print("I {{zz}}")
 
 				
@@ -86,7 +86,7 @@ class XXX extends SongPlugin
 		#print(a)
 		synth.config_from_any(1, a)
 
-void import_from_zone(out any o, any i, int offset)
+func import_from_zone(out o: any, i: any, offset: int)
 	if i.has("keys")
 		o["pitch_min"] = int(i["keys"][0])
 		o["pitch_max"] = int(i["keys"][1])

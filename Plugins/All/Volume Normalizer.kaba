@@ -3,11 +3,11 @@ use tsunami
 
 class VolumeChecker extends SongPlugin
 
-	float vol_max
-	bool check()
+	var vol_max: float
+	func check() -> bool
 		SongRenderer *renderer = new SongRenderer(song)
 		
-		let p = new ProgressX("checking", self.session.win)
+		var p = new ProgressX("checking", self.session.win)
 		
 		Range range = song.range()
 		AudioBuffer buf
@@ -34,7 +34,7 @@ class VolumeChecker extends SongPlugin
 		del renderer
 		return !cancelled
 		
-	void ask()
+	func ask()
 		string q = "Song reaches a peak volume of {{vol_max * 100.0|.1}}% ({{amp2db(vol_max)|.1}}dB)\n"
 		if vol_max > 0.95 and vol_max < 1.0
 			hui.info_box(session.win, "Info", "{{q}} seems fine...")
@@ -50,7 +50,7 @@ class VolumeChecker extends SongPlugin
 				t.set_volume(t.volume / vol_max * 0.999)
 			session.song.end_action_group()
 
-	override void apply()
+	func override apply()
 		if check()
 			ask()
 		

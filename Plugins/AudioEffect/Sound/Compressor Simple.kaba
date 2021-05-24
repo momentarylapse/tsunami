@@ -3,23 +3,23 @@
 
 use tsunami
 
-const float MIN_DB = 0.0 - 60.0
+const MIN_DB = -60.0
 
-const string AUTO_CONFIG_THRESHOLD = "-60:0:1:1:db"
-const string AUTO_CONFIG_RATIO = "1:60:0.1:1:"
-const string AUTO_CONFIG_ATTACK = "0:1:1:1000:ms"
-const string AUTO_CONFIG_RELEASE = "0:1:1:1000:ms"
-const string AUTO_CONFIG_SOFTNESS = "0:1:0.1:100:%"
-const string AUTO_CONFIG_UPWARD = ""
+const AUTO_CONFIG_THRESHOLD = "-60:0:1:1:db"
+const AUTO_CONFIG_RATIO = "1:60:0.1:1:"
+const AUTO_CONFIG_ATTACK = "0:1:1:1000:ms"
+const AUTO_CONFIG_RELEASE = "0:1:1:1000:ms"
+const AUTO_CONFIG_SOFTNESS = "0:1:0.1:100:%"
+const AUTO_CONFIG_UPWARD = ""
 
 class CompressorConfig extends Module.Config
-	float threshold
-	float ratio
-	float attack, release
-	float softness
-	bool upward
+	var threshold: float
+	var ratio: float
+	var attack, release: float
+	var softness: float
+	var upward: bool
 
-	override void reset()
+	func override reset()
 		threshold = -20
 		ratio = 4
 		attack = 0.01
@@ -29,14 +29,14 @@ class CompressorConfig extends Module.Config
 
 
 class Compressor extends AudioEffect
-	CompressorConfig config
+	var config: CompressorConfig
 	
 	
-	float gain_r, gain_l
-	float[] squares_r
-	float[] squares_l
+	var gain_r, gain_l: float
+	var squares_r: float[]
+	var squares_l: float[]
 	
-	override void reset_state()
+	func override reset_state()
 		gain_r = 1
 		gain_l = 1
 		squares_r.clear()
@@ -44,9 +44,9 @@ class Compressor extends AudioEffect
 		squares_l.clear()
 		squares_l.resize(70)
 
-	float dgain_attack, dgain_release
+	var dgain_attack, dgain_release: float
 
-	void compress(out float[] b, out float[] squares, out float *gain)
+	func compress(out b: float[], out squares: float[], out gain: float*)
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
@@ -86,7 +86,7 @@ class Compressor extends AudioEffect
 			# apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		

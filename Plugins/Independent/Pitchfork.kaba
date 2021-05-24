@@ -3,19 +3,19 @@
 use tsunami
 
 class PitchFork extends TsunamiPlugin
-	SignalChain* chain
-	Module* source
-	override void on_start()
+	var chain: SignalChain*
+	var source: Module*
+	func override on_start()
 	
 		chain = session.create_signal_chain("pitch-fork")
 		source = chain.add(Module.Type.AUDIO_SOURCE, "Sine")
-		let output = chain.add(Module.Type.STREAM, "AudioOutput")
+		var output = chain.add(Module.Type.STREAM, "AudioOutput")
 		chain.connect(source, 0, output, 0)
 		
 		chain.start()
 	
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return source.create_panel()
 
-	override void on_stop()
+	func override on_stop()
 		del chain

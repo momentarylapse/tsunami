@@ -1,28 +1,28 @@
 use tsunami
 use helper.tone
 
-const string AUTO_CONFIG_PITCH = "" #"0:10000:0.1:1:Hz"
-const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const AUTO_CONFIG_PITCH = "" #"0:10000:0.1:1:Hz"
+const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
 
 class SineSource extends AudioSource
 	class Config extends Module.Config
-		float pitch
-		float volume
-		override void reset()
+		var pitch: float
+		var volume: float
+		func override reset()
 			pitch = 64
 			volume = 0.8
 
-	Config config
-	int offset
-	override void reset_state()
+	var config: Config
+	var offset: int
+	func override reset_state()
 		offset = 0
-	void create_sin(out float[] buf)
-		let f = pitch_to_freq(config.pitch)
+	func create_sin(out buf: float[])
+		var f = pitch_to_freq(config.pitch)
 		float w_f = 1.0 / float(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
 		for i in 0:len(buf)
 			buf[i] = sin((i + offset) * w_f) * config.volume
-	override int read(out AudioBuffer buf)
+	func override read(out buf: AudioBuffer) -> int
 		for c in buf.c
 			create_sin(c)
 		offset += len(buf)

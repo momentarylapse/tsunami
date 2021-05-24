@@ -1172,9 +1172,15 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 	}
 	if (n->kind == NodeKind::OPERATOR) {
 		Operator *op = n->as_op();
-		auto r = new Node(NodeKind::INLINE_CALL, (int_p)op->f, n->type, n->is_const);
-		r->params = n->params;
-		return r;
+		if (op->f->inline_no != InlineID::NONE) {
+			auto r = new Node(NodeKind::INLINE_CALL, (int_p)op->f, n->type, n->is_const);
+			r->params = n->params;
+			return r;
+		} else {
+			auto r = new Node(NodeKind::FUNCTION_CALL, (int_p)op->f, n->type, n->is_const);
+			r->params = n->params;
+			return r;
+		}
 	}
 	return n;
 }

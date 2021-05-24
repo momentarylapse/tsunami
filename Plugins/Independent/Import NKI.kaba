@@ -6,21 +6,21 @@ use tsunami
 
 class ImportNKI extends TsunamiPlugin
 	
-	override void on_start()
+	func override on_start()
 		if hui.file_dialog_open(session.win, "", "", "*.nki", "*.nki")
 			load_nki(hui.filename)
 		stop()
-	void load_nki(Path filename)
+	func load_nki(filename: Path)
 		print(filename)
-		let dir = Path(str(filename)[:-4] + " Samples")
+		var dir = Path(str(filename)[:-4] + " Samples")
 		print(dir)
 		
-		let list = Filesystem.search(dir, "*.wav", "f")
+		var list = Filesystem.search(dir, "*.wav", "f")
 		for e in list
 		
 			AudioBuffer buf
 			session.storage.load_buffer(buf, dir << e)
-			let s = new Sample(e, buf)
+			var s = new Sample(e, buf)
 			session.song.add_sample(s)
 			if str(e)[-5:] != "r.wav"
 				print(int(str(e)[:2]))

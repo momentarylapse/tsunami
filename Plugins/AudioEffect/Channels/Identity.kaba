@@ -3,5 +3,5 @@
 use tsunami
 
 class Identity extends AudioEffect
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		pass

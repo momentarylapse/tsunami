@@ -38,6 +38,7 @@ const string IDENTIFIER_STR = "str";
 const string IDENTIFIER_REPR = "repr";
 const string IDENTIFIER_LEN = "len";
 const string IDENTIFIER_LET = "let";
+const string IDENTIFIER_VAR = "var";
 const string IDENTIFIER_NAMESPACE = "namespace";
 const string IDENTIFIER_RETURN_VAR = "-return-";
 const string IDENTIFIER_VTABLE_VAR = "-vtable-";

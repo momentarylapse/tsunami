@@ -4,29 +4,29 @@ use helper.tone
 
 class SampleConfig extends Module.Config
 	class Zone
-		shared SampleRef sample
-		int pitch_original
-		int pitch_min, pitch_max
-		int start_loop, end_loop
-		float vel_min, vel_max
-		float attack, sustain, release
-	Zone[] zones
-	override void __delete__()
+		var sample: shared SampleRef
+		var pitch_original: int
+		var pitch_min, pitch_max: int
+		var start_loop, end_loop: int
+		var vel_min, vel_max: float
+		var attack, sustain, release: float
+	var zones: Zone[]
+	func override __delete__()
 		reset()
-	override void reset()
+	func override reset()
 		zones.clear()
 
 
 class SampleRenderer extends PitchRenderer
-	SampleConfig.Zone* zone
-	AudioBuffer data
-	EnvelopeADSR env
-	int offset
-	int start_loop, end_loop
-	bool allow_loop
+	var zone: SampleConfig.Zone*
+	var data: AudioBuffer
+	var env: EnvelopeADSR
+	var offset: int
+	var start_loop, end_loop: int
+	var allow_loop: bool
 	
-	override SampleSynthesizer *synth
-	override void on_config()
+	var override synth: SampleSynthesizer*
+	func override on_config()
 		synth.render_by_ref = false
 		zone = nil
 		offset = 0
@@ -53,12 +53,12 @@ class SampleRenderer extends PitchRenderer
 #					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
 					break
 				
-	override void on_start(float volume)
+	func override on_start(volume: float)
 		env.start(volume)
 		offset = 0
-	override void on_end()
+	func override on_end()
 		env.end()
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		if not zone
 			return false
 		int done = 0
@@ -84,23 +84,23 @@ class SampleRenderer extends PitchRenderer
 	
 	
 class SampleSynthesizer extends Synthesizer
-	SampleConfig config
+	var config: SampleConfig
 	
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new SampleRenderer(self, pitch)
 	
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel
-	SampleConfig *sc
-	override SampleSynthesizer *c
-	override void __init__(Module _s)
+	var sc: SampleConfig*
+	var override c: SampleSynthesizer*
+	func override __init__(_s: Module)
 		sc = &c.config
 		add_list_view("!expandx\\Note range\\Sample", 0, 0, "list")
 		#event("list", on_select)
 
-	override void update()
+	func override update()
 		reset("list")
 		for z in sc.zones
 			string name = ""

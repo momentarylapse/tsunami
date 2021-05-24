@@ -2,12 +2,12 @@ use tsunami
 use helper.tone
 
 class ZeroRenderer extends PitchRenderer
-	float phase = 0
-	float volume = 0
-	bool fade_out = false
+	var phase = 0.
+	var volume = 0.
+	var fade_out = false
 	
 	# use += ... otherwise would overwrite previous notes...!!!!
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		#print(buf.length)
 		
 #		float freq = pitch_to_freq(pitch)
@@ -29,16 +29,16 @@ class ZeroRenderer extends PitchRenderer
 		# keep alive?
 		return volume > 0.001
 		
-	override void on_start(float _volume)
+	func override on_start(_volume: float)
 		print("MIDI START {{_volume}}")
 		volume = _volume * 0.3
 		fade_out = false
-	override void on_end()
+	func override on_end()
 		print("MIDI END")
 		fade_out = true
 
 class Zero extends Synthesizer
 
 	# messy :P
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new ZeroRenderer(self, pitch)

@@ -3,30 +3,30 @@
 
 use tsunami
 
-const string AutoConfigFactor = "0:2:0.1:100:%"
+const AutoConfigFactor = "0:2:0.1:100:%"
 
-const int CHUNK_SIZE = 1024
-const int OVERLAP = 512
+const CHUNK_SIZE = 1024
+const OVERLAP = 512
 
 
 class PitchShift extends AudioEffect
 	class Config extends Module.Config
-		float factor
+		var factor: float
 
-		override void reset()
+		func override reset()
 			factor = 1
 
-	Config config
+	var config: Config
 	
-	AudioBuffer[2] prev_chunk
-	int prev_no
+	var prev_chunk: AudioBuffer[2]
+	var prev_no: int
 	
-	override void reset_state()
+	func override reset_state()
 		prev_chunk[0].clear()
 		prev_chunk[1].clear()
 		prev_no = 0
 		
-	void shift_buf(out float[] b, float factor)
+	func shift_buf(out b: float[], factor: float)
 		complex[] buf1, buf2
 		fft_r2c(b, buf1)
 		int N = len(b)
@@ -54,7 +54,7 @@ class PitchShift extends AudioEffect
 		fft_c2r_inv(buf2, b)
 		b /= N
 
-	void process_chunk(out AudioBuffer buf)
+	func process_chunk(out buf: AudioBuffer)
 		for c in buf.c
 			shift_buf(c, config.factor)
 			
@@ -71,7 +71,7 @@ class PitchShift extends AudioEffect
 		prev_no = other
 		
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		for offset in 0:len(buf):CHUNK_SIZE
 			int end = min(offset + CHUNK_SIZE, len(buf))
 			process_chunk(buf[offset:end])

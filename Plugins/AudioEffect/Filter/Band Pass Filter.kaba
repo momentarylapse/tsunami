@@ -2,22 +2,22 @@
 # Title[Deutsch] = Band Pass Filter
 use tsunami
 
-const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
+const AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
 
 
 class LowPassFilter extends AudioEffect
 	class Config extends Module.Config
-		float frequency
-		override void reset()
+		var frequency: float
+		func override reset()
 			frequency = 1000
 
-	Config config
+	var config: Config
 	
 	
-	float[] _in, _out
-	bool[] used
+	var _in, _out: float[]
+	var used: bool[]
 	
-	override void reset_state()
+	func override reset_state()
 		used[0] = false
 		used[1] = false
 
@@ -25,7 +25,7 @@ class LowPassFilter extends AudioEffect
 	# y[i] := α * (y[i-1] + x[i] - x[i-1])
 	# z[i] := α * x[i] + (1-α) * z[i-1]
 	
-	void do(out float[] buf, int c)
+	func do(out buf: float[], c: int)
 		float RC = 1 / (2 * pi * config.frequency)
 		float dt = 1.0 / session.sample_rate()
 		float aa = dt / (RC + dt)
@@ -50,7 +50,7 @@ class LowPassFilter extends AudioEffect
 		_in[c] = prev_in
 		_out[c] = buf[len(buf) - 1]
 		
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		_in.resize(buf.channels)
 		_out.resize(buf.channels)
 		used.resize(buf.channels)

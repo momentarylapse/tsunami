@@ -5,8 +5,8 @@ enum
 	MODE_FORWARD
 	MODE_LOOP
 
-TrackMarker* get_part(Song s, int offset)
-	let t = s.time_track()
+func get_part(s: Song, offset: int) -> TrackMarker*
+	var t = s.time_track()
 	if !t
 		return nil
 	for m in weak(t.layers[0].markers)
@@ -17,9 +17,9 @@ TrackMarker* get_part(Song s, int offset)
 
 
 class PPPanel extends ConfigPanel
-	Looper* looper
+	var looper: Looper*
 	
-	void __init__(Looper l)
+	func __init__(l: Looper)
 		super.__init__(l)
 		from_source("
 Button forward 'Forward' expandx expandy")
@@ -27,20 +27,20 @@ Button forward 'Forward' expandx expandy")
 
 		event("forward", on_forward)
 	
-	void on_forward()
+	func on_forward()
 		print("forward")
 		looper.go_forward()
 		
 
 class Looper extends TsunamiPlugin
-	int runner
-	int mode
-	SignalChain* chain
-	SongRenderer* renderer
-	Song* song
-	TrackMarker* cur_part
+	var runner: int
+	var mode: int
+	var chain: SignalChain*
+	var renderer: SongRenderer*
+	var song: Song*
+	var cur_part: TrackMarker*
 	
-	override void on_start()
+	func override on_start()
 		cur_part = nil
 		song = session.song
 		chain = session.view.signal_chain
@@ -48,28 +48,28 @@ class Looper extends TsunamiPlugin
 		runner = hui.run_repeated(0.05, self, on_update)
 		mode = MODE_FORWARD
 		
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 			
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new PPPanel(self)
 	
-	void on_leave_part()
+	func on_leave_part()
 		print("leaving " + cur_part.text)
 		#go_forward
-	void on_enter_part()
+	func on_enter_part()
 		print("entering " + cur_part.text)
 		renderer.set_range(cur_part.range)
 		renderer.set_loop(true)
 		mode = MODE_LOOP
-	void go_forward()
+	func go_forward()
 		renderer.set_range(song.range())
 		renderer.set_loop(false)
 		mode = MODE_FORWARD
 	
-	void on_update()
+	func on_update()
 		int pos = renderer.get_pos(0)
-		let p = get_part(song, pos)
+		var p = get_part(song, pos)
 		if p != cur_part
 			if cur_part
 				on_leave_part()

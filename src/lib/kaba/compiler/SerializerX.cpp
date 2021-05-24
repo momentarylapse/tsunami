@@ -335,16 +335,26 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::CHUNK_ASSIGN:
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
-/*		case InlineID::CHUNK_EQUAL:{
-			int val = add_virtual_reg(Asm::REG_AL);
-			cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], 0, TypeInt), param_shift(param[1], 0, TypeInt));
-			cmd.add_cmd(Asm::InstID::SETZ, ret);
-			for (int i=1; i<com->params[0]->type->size/4; i++) {
-				cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], i*4, TypeInt), param_shift(param[1], i*4, TypeInt));
-				cmd.add_cmd(Asm::InstID::SETZ, param_vreg(TypeBool, val));
-				cmd.add_cmd(Asm::InstID::AND, param_vreg(TypeBool, val));
+		case InlineID::CHUNK_EQUAL:
+			if (param[0].type->size > config.pointer_size) {
+				// chunk cmp
+				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
+				for (int k=0; k<param[0].type->size/4; k++) {
+					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt), param_shift(param[1], k*4, TypeInt));
+					cmd.add_cmd(Asm::InstID::SETZ, ret);
+					if (k < param[0].type->size/4 - 1)
+						cmd.add_cmd(Asm::InstID::JNZ, param_label32(label_after_cmp));
+				}
+				cmd.add_label(label_after_cmp);
+			} else {
+				cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
+				cmd.add_cmd(Asm::InstID::SETZ, ret);
 			}
-			}break;*/
+			break;
+		case InlineID::CHUNK_NOT_EQUAL:
+			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
+			cmd.add_cmd(Asm::InstID::SETNZ, ret);
+			break;
 // int
 		case InlineID::INT_ADD_ASSIGN:
 		case InlineID::INT64_ADD_ASSIGN:

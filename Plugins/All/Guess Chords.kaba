@@ -3,7 +3,7 @@ use helper.tone
 
 
 class XXX extends SongPlugin
-	override void apply()
+	func override apply()
 		if len(song.bars) == 0
 			session.e("song doesn't contain any bars")
 			return
@@ -18,13 +18,13 @@ class XXX extends SongPlugin
 		if n == 0
 			session.e("no midi track selected")
 
-	void guess_chords(out TrackLayer l, Range r)
+	func guess_chords(out l: TrackLayer, r: Range)
 		for b in song.bars.get_bars(r)
 			Range rr = b.range()
 			string chord = guess_chord(l.midi.get_notes(rr), rr)
 			l.add_marker(new TrackMarker(b.range(), chord))
 	
-	int score_overlap(MidiNote*[] midi, int[] pitch, Range r)
+	func score_overlap(midi: MidiNote*[], pitch: int[], r: Range) -> int
 		int score = 0
 		for n in midi
 			for p in pitch
@@ -32,7 +32,7 @@ class XXX extends SongPlugin
 					score += (n.range and r).length
 		return score
 	
-	string guess_chord(MidiNote*[] midi, Range r)
+	func guess_chord(midi: MidiNote*[], r: Range) -> string
 		Chord best
 		int best_score = 0
 		for p in 0:12
@@ -47,7 +47,7 @@ class XXX extends SongPlugin
 		return best.name()
 		
 		
-	int first_bar(int offset)
+	func first_bar(offset: int) -> int
 		for b,i in song.bars
 			if b.offset >= offset -100
 				return i

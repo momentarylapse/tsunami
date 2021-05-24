@@ -9,45 +9,45 @@ use helper.curves
 
 
 
-const float MIN_FREQ = 20.0
-const float MAX_FREQ = 20000.0
-const int MIN_VOL = -55
-const int MAX_VOL = 35
+const MIN_FREQ = 20.0
+const MAX_FREQ = 20000.0
+const MIN_VOL = -55
+const MAX_VOL = 35
 
 
 class Peak
-	bool enabled
-	int mode
-	float pitch
-	float gain
-	float q
-	void __init__(int _mode, float _pitch, float _gain, float _q)
+	var enabled: bool
+	var mode: int
+	var pitch: float
+	var gain: float
+	var q: float
+	func __init__(_mode: int, _pitch: float, _gain: float, _q: float)
 		enabled = true
 		mode = _mode
 		pitch = _pitch
 		gain = _gain
 		q = _q
 	
-	const complex z(float g0)
+	func const z(g0: float) -> complex
 		return [pitch_to_freq(pitch), gain + g0]
 	#float q()
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
 	
-	const void create_filter(out BiquadFilter f, float sample_rate)
+	func const create_filter(out f: BiquadFilter, sample_rate: float)
 		float freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
 
 class EqCurve extends Curve
-	float gain
-	Peak[] peaks
-	float sample_rate
-	void set(Equalizer.Config c, float _sample_rate)
+	var gain: float
+	var peaks: Peak[]
+	var sample_rate: float
+	func set(c: Equalizer.Config, _sample_rate: float)
 		gain = c.gain
 		peaks = c.peaks
 		sample_rate = _sample_rate
-	override float get(float freq)
+	func override get(freq: float) -> float
 		#float pitch = freq_to_pitch(f)
 		float r = gain
 		for p in peaks
@@ -61,32 +61,32 @@ class EqCurve extends Curve
 
 class Equalizer extends AudioEffect
 	class Config extends Module.Config
-		float gain
-		Peak[] peaks
+		var gain: float
+		var peaks: Peak[]
 
-		override void reset()
+		func override reset()
 			gain = 0
 			peaks.clear()
 			peaks.add(Peak(FILTER_HIGH_PASS, 30, -10, 2))
 			peaks.add(Peak(FILTER_LOW_PASS, 100, -10, 2))
 
-	EqualizerGrid* grid = nil
+	var grid: EqualizerGrid* = nil
 
-	Config config
+	var config: Config
 
-	BiquadFilter[] filter # state
+	var filter: BiquadFilter[]
 	
-	override void on_config()
+	func override on_config()
 		filter.clear()
 		filter.resize(len(config.peaks))
 		for p,stage in config.peaks
 			p.create_filter(filter[stage], session.sample_rate())
 	
-	override void reset_state()
+	func override reset_state()
 		for f in filter
 			f.reset()
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		# global gain
 		buf.scale(db_to_factor(config.gain))
 		
@@ -98,27 +98,27 @@ class Equalizer extends AudioEffect
 		if grid
 			grid.set_buffer(buf)
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new EqualizerPanel(self)
 
 
-const int HOVER_NONE = -1
-const int HOVER_GAIN = -2
+const HOVER_NONE = -1
+const HOVER_GAIN = -2
 
 class EqualizerGrid extends Grid
-	Equalizer.Config* c
-	EqualizerPanel* cp
-	float sample_rate
-	int hover = HOVER_NONE
-	int selected = HOVER_NONE
-	SpectrumCurve spectrum
+	var c: Equalizer.Config*
+	var cp: EqualizerPanel*
+	var sample_rate: float
+	var hover = HOVER_NONE
+	var selected = HOVER_NONE
+	var spectrum: SpectrumCurve
 	
-	Menu* menu = nil
+	var menu: Menu* = nil
 	
-	override void __delete__()
+	func override __delete__()
 		if menu
 			del menu
-	void init2()
+	func init2()
 		panel.event_o("add-peak", self, on_add_peak)
 		panel.event_o("add-low-pass", self, on_add_peak)
 		panel.event_o("add-high-pass", self, on_add_peak)
@@ -127,7 +127,7 @@ class EqualizerGrid extends Grid
 		panel.event_o("peak-toggle-enabled", self, on_peak_toggle_enabled)
 		panel.event_o("peak-delete", self, on_peak_delete)
 
-	override void on_draw(Painter p)
+	func override on_draw(p: Painter)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -172,11 +172,11 @@ class EqualizerGrid extends Grid
 			
 
 	# left button down -> select
-	override void on_left_button_down()
+	func override on_left_button_down()
 		selected = hover
 		redraw()
 
-	override void on_mouse_wheel()
+	func override on_mouse_wheel()
 		float dy = hui.get_event().scroll_y
 		if hover >= 0
 			if dy > 0
@@ -186,10 +186,10 @@ class EqualizerGrid extends Grid
 			cp.changed()
 			redraw()
 	
-	vector right_click_mouse_pos
+	var right_click_mouse_pos: vector
 
 	# right button down -> new point
-	override void on_right_button_down()
+	func override on_right_button_down()
 		right_click_mouse_pos = get_mouse3(0)
 		if menu
 			del menu
@@ -212,7 +212,7 @@ class EqualizerGrid extends Grid
 		menu.popup(panel)
 	
 	# hui events
-	void on_add_peak()
+	func on_add_peak()
 		string id = hui.get_event().id
 		int t = FILTER_PEAK
 		if id == "add-low-pass"
@@ -230,12 +230,12 @@ class EqualizerGrid extends Grid
 		cp.changed()
 		redraw()
 	
-	void on_peak_toggle_enabled()
+	func on_peak_toggle_enabled()
 		if selected >= 0
 			c.peaks[selected].enabled = not c.peaks[selected].enabled
 			cp.changed()
 			redraw()
-	void on_peak_delete()
+	func on_peak_delete()
 		if selected >= 0
 			c.peaks.remove(selected)
 			cp.changed()
@@ -243,7 +243,7 @@ class EqualizerGrid extends Grid
 			selected = hover
 			redraw()
 
-	override void on_mouse_move()
+	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l
 			if selected >= 0
@@ -264,19 +264,19 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	# [Delete] -> remove point
-	override void on_key_down()
+	func override on_key_down()
 		if hui.get_event().key == KEY_DELETE
 			on_peak_delete()
 
-	void set_buffer(AudioBuffer buf)
+	func set_buffer(buf: AudioBuffer)
 		spectrum.set(buf, sample_rate)
 		redraw()
 
 class EqualizerPanel extends ConfigPanel
-	EqualizerGrid grid
-	int num_peaks
-	override Equalizer* c
-	override void __init__(Module _eq)
+	var grid: EqualizerGrid
+	var num_peaks: int
+	var override c: Equalizer*
+	func override __init__(_eq: Module)
 		super.__init__(_eq)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
@@ -294,10 +294,10 @@ class EqualizerPanel extends ConfigPanel
 		
 		c.grid = &grid
 	
-	override void __delete__()
+	func override __delete__()
 		c.grid = nil
 		
-	override void update()
+	func override update()
 		grid.redraw()
 
 

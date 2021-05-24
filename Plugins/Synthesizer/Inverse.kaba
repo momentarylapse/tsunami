@@ -2,8 +2,8 @@ use tsunami
 
 
 class InverseSynthesizer extends Synthesizer
-	DummySynthesizer sub
-	override void render(out AudioBuffer buf)
+	var sub: DummySynthesizer
+	func override render(out buf: AudioBuffer)
 		sub.set_sample_rate(sample_rate)
 		sub.events = events
 		for e in sub.events

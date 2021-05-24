@@ -2,8 +2,8 @@ use tsunami
 
 
 class HeavySynthesizer extends Synthesizer
-	DummySynthesizer sub
-	override void render(out AudioBuffer buf)
+	var sub: DummySynthesizer
+	func override render(out buf: AudioBuffer)
 		sub.set_sample_rate(sample_rate)
 		for e in events
 			MidiEvent ee = e

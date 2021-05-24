@@ -4,28 +4,28 @@ use hui
 use tsunami
 use helper.tone
 
-const int freq = 44100
-const int f_min = 50
-const int f_max = 5000
+const freq = 44100
+const f_min = 50
+const f_max = 5000
 
-const float threshold = 5.0
+const threshold = 5.0
 
 
-const int buf_size = 4096
-float[] buf
+const buf_size = 4096
+var buf: float[]
 
-Window *win
+var win: Window*
 
-int[] played
+var played: int[]
 
-float get_freq(float i)
+func get_freq(i: float) -> float
 	return i / (buf_size / 2) * freq / 2
 
-float Frequency, Volume, Error
-bool LoudEnough
+var Frequency, Volume, Error: float
+var LoudEnough: bool
 
-float error
-string get_note(float f)
+var error: float
+func get_note(f: float) -> string
 	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
 	int rel = int(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
@@ -33,7 +33,7 @@ string get_note(float f)
 	#loopf(fl, 0, 1)
 	#note = i2s(n)
 
-void DrawVolume(Painter *c)
+func DrawVolume(c: Painter)
 	c.set_color(color(0.8, 0.8, 0.8, 1))
 	float y0 = 30
 	float y1 = c.height - 5
@@ -42,7 +42,7 @@ void DrawVolume(Painter *c)
 	c.set_color(color(0.6, 0.6, 0.6, 1))
 	c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void Draw(Painter *c)
+func Draw(c: Painter)
 	c.set_color(color.WHITE)
 	c.set_font_size(12)
 	int w = c.width
@@ -67,11 +67,11 @@ void Draw(Painter *c)
 	else
 		c.draw_str(w / 2 - 30, h / 2 - 20, "too quiet")
 
-void OnClose()
+func OnClose()
 	del win
 	win = nil
 
-void UpdateInput()
+func UpdateInput()
 	int[1] stack_corrector # needed for stack alignment (T_T)
 	
 	int num = clamp(len(input.cur_buf), 0, buf_size)
@@ -124,9 +124,9 @@ void UpdateInput()
 	win.redraw("drawing")
 
 
-complex[] bufc
+var bufc: complex[]
 
-void main()
+func main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
 	win.addDrawingArea("", 0, 0, "drawing")
 	

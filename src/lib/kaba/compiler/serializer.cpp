@@ -1032,6 +1032,9 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 
 }
 
+
+string function_link_name(Function *f);
+
 void Script::compile_functions(char *oc, int &ocs) {
 	auto *list = new Asm::InstructionWithParamsList(0);
 	Array<int> func_offset;
@@ -1040,12 +1043,12 @@ void Script::compile_functions(char *oc, int &ocs) {
 	int func_no = 0;
 	for (Function *f: syntax->functions) {
 		if (f->is_extern()) {
-			string name = f->cname(f->owner()->base_class);
-			f->address = (int_p)get_external_link(format("%s:%d", name, f->num_params));
+			string name = function_link_name(f);
+			f->address = (int_p)get_external_link(name);
 			if (f->address == 0)
-				f->address = (int_p)get_external_link(name);
+				f->address = (int_p)get_external_link(f->cname(f->owner()->base_class));
 			if (f->address == 0)
-				do_error_link(format("external function '%s:%d' not linkable", name, f->num_params));
+				do_error_link(format("external function '%s' not linkable", name));
 		} else {
 			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
 		}

@@ -48,6 +48,7 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_REPR, StatementID::REPR, 1);
 	add_statement(IDENTIFIER_LEN, StatementID::LEN, 1);
 	add_statement(IDENTIFIER_LET, StatementID::LET);
+	add_statement(IDENTIFIER_VAR, StatementID::VAR);
 	add_statement(IDENTIFIER_ASM, StatementID::ASM);
 	//add_statement(IDENTIFIER_RAISE, StatementID::RAISE); NOPE, now it's a function!
 	add_statement(IDENTIFIER_TRY, StatementID::TRY); // return: ParamType will be defined by the parser!

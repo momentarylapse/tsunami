@@ -2,24 +2,24 @@ use tsunami
 
 # pitch is in MIDI notation (69 = A4 = 440Hz)
 
-float pitch_to_freq(float pitch)
+func pitch_to_freq(pitch: float) -> float
 	return 440 * pow(2, (pitch - 69.0) / 12.0)
 
-float freq_to_pitch(float freq)
+func freq_to_pitch(freq: float) -> float
 	return log(freq / 440.0) / log(2) * 12.0 + 69.0
 
 # "scientific" notation
 #   naive MIDI octave is off by 1
-int pitch_get_octave(int pitch)
+func pitch_get_octave(pitch: int) -> int
 	return (pitch / 12) - 1
 
-int pitch_from_octave_and_rel(int rel, int octave)
+func pitch_from_octave_and_rel(rel: int, octave: int) -> int
 	return rel + octave * 12 + 12
 
-int pitch_to_rel(int pitch)
+func pitch_to_rel(pitch: int) -> int
 	return pitch % 12
 
-int char_to_rel_pitch(char c)
+func char_to_rel_pitch(c: char) -> int
 	if c == 'c'
 		return 0
 	if c == 'd'
@@ -35,7 +35,7 @@ int char_to_rel_pitch(char c)
 	if c == 'h'
 		return 11
 
-string rel_pitch_name(int pitch_rel)
+func rel_pitch_name(pitch_rel: int) -> string
 	if (pitch_rel == 0)
 		return "C"
 	if (pitch_rel == 1)
@@ -62,13 +62,13 @@ string rel_pitch_name(int pitch_rel)
 		return "B"
 	return "???"
 
-string pitch_name(int pitch)
+func pitch_name(pitch: int) -> string
 	string name_rel = rel_pitch_name(pitch_to_rel(pitch))
 	string name_oct = str(pitch_get_octave(pitch))
 	return name_rel + name_oct
 
 
-string chord_type_name(int t)
+func chord_type_name(t: int) -> string
 	if t == Chord.MAJOR
 		return "maj"
 	if t == Chord.MINOR
@@ -119,9 +119,9 @@ class Chord
 		SINGLE_TONE
 		# 2 tones (intervals > prime)
 		NUM_TYPES = 19 # SINGLE_TONE + 12
-	int base_tone
-	int type
-	const int[] pitch()
+	var base_tone: int
+	var type: int
+	func const pitch() -> int[]
 		if type == MAJOR
 			return [base_tone, base_tone + 4, base_tone + 7]
 		if type == MINOR
@@ -153,12 +153,12 @@ class Chord
 		if type > SINGLE_TONE
 			return [base_tone, base_tone + (type - SINGLE_TONE)]
 		return []
-	string name()
+	func name() -> string
 		if type < 0
 			return "???"
 		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + chord_type_name(type)
 
-	static Chord[] parse(string str)
+	func static parse(str: string) -> Chord[]
 		Chord[] chords
 		for a,i in str
 			Chord c
@@ -177,8 +177,8 @@ class Chord
 			chords.add(c)
 		return chords
 	
-	const bool match_pitch(int[] _pitches)
-		let pp = pitch()
+	func const match_pitch(_pitches: int[]) -> bool
+		var pp = pitch()
 		for _p in _pitches
 			bool found = false
 			for p in pp
@@ -190,7 +190,7 @@ class Chord
 		
 
 
-	static Chord guess(int[] pitches)
+	func static guess(pitches: int[]) -> Chord
 		int sig = pitch_signature(pitches)
 		Chord c
 		for b in 0:12
@@ -203,7 +203,7 @@ class Chord
 		c.type = -1
 		return c
 
-int pitch_signature(int[] pitches)
+func pitch_signature(pitches: int[]) -> int
 	int s = 0
 	for p in pitches
 		s = s | (1 << (p % 12))

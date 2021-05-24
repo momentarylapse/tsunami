@@ -3,24 +3,24 @@
 use tsunami
 use helper.filter
 
-const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
+const AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
 
 
 class LowPassFilter extends AudioEffect
 	class Config extends Module.Config
-		float frequency
-		override void reset()
+		var frequency: float
+		func override reset()
 			frequency = 1000
 
-	Config config
-	BiquadFilter filter
+	var config: Config
+	var filter: BiquadFilter
 
-	override void reset_state()
+	func override reset_state()
 		filter.reset()
 
-	override void on_config()
+	func override on_config()
 		#filter.create(FILTER_HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
 		filter.create(FILTER_HIGH_PASS, config.frequency, 1, 0, session.sample_rate())
 		
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		filter.apply(buf)

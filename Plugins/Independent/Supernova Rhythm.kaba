@@ -3,12 +3,12 @@ use PitchDetector.Test
 use hui
 
 class SNRPanel extends ConfigPanel
-	override SupernovaRhythm* c
-	MidiPainter* mp
-	GridPainter* gp
-	AudioView.ViewPort* cam
+	var override c: SupernovaRhythm*
+	var mp: MidiPainter*
+	var gp: GridPainter*
+	var cam: AudioView.ViewPort*
 	
-	override void __init__(Module _c)
+	func override __init__(_c: Module)
 		from_source("
 Grid ? ''
 	DrawingArea area '' expandx
@@ -24,9 +24,9 @@ Grid ? ''
 		event("button", on_button)
 		event_x("area", "hui:draw", on_draw)
 	
-	void on_button()
+	func on_button()
 	
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		rect r = rect(0, p.width, 0, p.height)
 		cam.area = r
 		int pos = c.recorder.buffer.samples
@@ -40,7 +40,7 @@ Grid ? ''
 		gp.draw_time(p)
 		gp.draw_time_numbers(p)
 		
-		let midi = c.recorder.buffer.get_notes(cam.range())
+		var midi = c.recorder.buffer.get_notes(cam.range())
 		
 		Instrument ii
 		ii.type = 6#1
@@ -57,15 +57,15 @@ Grid ? ''
 			p.draw_line(x, 0, x, pp/13)
 
 class SupernovaRhythm extends TsunamiPlugin
-	SNRPanel* panel
-	MidiNoteBuffer midi
-	SignalChain* chain
+	var panel: SNRPanel*
+	var midi: MidiNoteBuffer
+	var chain: SignalChain*
 #	PitchDetector
-	TestDetector* pitch_detector
-	MidiAccumulator* recorder
-	int runner
+	var pitch_detector: TestDetector*
+	var recorder: MidiAccumulator*
+	var runner: int
 
-	override void on_start()
+	func override on_start()
 		panel = nil
 		
 		int dt = 4400 # 100 ms
@@ -73,11 +73,11 @@ class SupernovaRhythm extends TsunamiPlugin
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
 		
 		chain = session.create_signal_chain("supernova.recorder")
-		let i = chain.add(Module.Type.STREAM, "AudioInput")
-		let p = chain.add(Module.Type.PITCH_DETECTOR, "Test")
+		var i = chain.add(Module.Type.STREAM, "AudioInput")
+		var p = chain.add(Module.Type.PITCH_DETECTOR, "Test")
 		#let x = chain.add(Module.Type.AUDIO_EFFECT, "Chunksize")
-		let r = chain.add(Module.Type.PLUMBING, "MidiAccumulator")
-		let s = chain.add(Module.Type.PLUMBING, "MidiSucker")
+		var r = chain.add(Module.Type.PLUMBING, "MidiAccumulator")
+		var s = chain.add(Module.Type.PLUMBING, "MidiSucker")
 		chain.connect(i, 0, p, 0)
 		chain.connect(p, 0, r, 0)
 		chain.connect(r, 0, s, 0)
@@ -88,16 +88,16 @@ class SupernovaRhythm extends TsunamiPlugin
 		chain.command(Module.Command.ACCUMULATION_START, 0)
 		runner = hui.run_repeated(0.05, self, on_update)
 		
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 		del chain
 	
-	void on_update()
+	func on_update()
 		if panel
 			panel.redraw("area")
 	
 
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		panel = new SNRPanel(self)
 		return panel
 

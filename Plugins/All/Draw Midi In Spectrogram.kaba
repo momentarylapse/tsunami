@@ -9,26 +9,26 @@ use helper.tone
 ##show
 ##disasm
 
-const int N = 4096*2 # fft size
-const int NT = 512 # time bins
-const int NF = 512*2 # freq bins
-const float MIN_FREQ = 60.0
-const float MAX_FREQ = 3000.0
-const float MIN_VOL = 0.0 - 60.0
-const float MAX_VOL = 0.0
+const N = 4096*2 # fft size
+const NT = 512 # time bins
+const NF = 512*2 # freq bins
+const MIN_FREQ = 60.0
+const MAX_FREQ = 3000.0
+const MIN_VOL = -60.0
+const MAX_VOL = 0.0
 
-Image im0
+var im0: Image
 
 class SpecGrid extends Grid
-	DrawMidiInSpectrogram *plugin
-	float x_offset, x_scale
-	int x_to_sample(float x)
+	var plugin: DrawMidiInSpectrogram*
+	var x_offset, x_scale: float
+	func x_to_sample(x: float) -> int
 		return x_scale * x
-	float sample_to_x(int s)
+	func sample_to_x(s: int) -> float
 		return s / x_scale
-	int create_pitch
-	float create_x
-	override void on_draw(Painter c)
+	var create_pitch: int
+	var create_x: float
+	func override on_draw(c: Painter)
 		rect r = plot_area
 		int w = r.width()
 		int h = r.height()
@@ -73,26 +73,26 @@ class SpecGrid extends Grid
 			
 			
 	
-	override void on_left_button_down()
+	func override on_left_button_down()
 		complex z = get_mouse2()
 		create_x = z.x
 		create_pitch = freq_to_pitch(z.y+0.5)
 		redraw()
-	override void on_left_button_up()
+	func override on_left_button_up()
 		complex z = get_mouse2()
 		plugin.midi.add(new MidiNote(RangeTo(x_to_sample(create_x), x_to_sample(z.x)), create_pitch, 1.0))
 		create_pitch = -1
 		redraw()
-	override void on_mouse_move()
+	func override on_mouse_move()
 		redraw()
 		
 
 class SpectrumDialog extends Dialog
-	SpecGrid grid
-	Song* song
-	shared Track[] tracks
-	DrawMidiInSpectrogram* dmis
-	void __init__(SongPlugin plugin, Song _song)
+	var grid: SpecGrid
+	var song: Song*
+	var tracks: shared Track[]
+	var dmis: DrawMidiInSpectrogram*
+	func __init__(plugin: SongPlugin, _song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable,closebutton=no")
 		from_source("
@@ -126,22 +126,22 @@ Grid ? ''
 	
 		event("close", on_close)
 		event("export", on_export)
-	override void __delete__()
+	func override __delete__()
 
-	void on_close()
+	func on_close()
 		destroy()
 		
-	void on_export()
+	func on_export()
 		int n = get_int("target")
 		if n < 0
 			return
-		let t = tracks[n]
+		var t = tracks[n]
 		t.layers[0].insert_midi_data(0, dmis.midi)
 		
 		destroy()
 
-color f2col(float _f)
-	let f = sqrt(_f)
+func f2col(_f: float) -> color
+	var f = sqrt(_f)
 	if f < 0.333
 		return color(0, 0, f * 3, f*0.3)
 	else if f < 0.6666
@@ -150,11 +150,11 @@ color f2col(float _f)
 
 class DrawMidiInSpectrogram extends SongPlugin
 
-	SpectrumDialog *dlg
-	MidiNoteBuffer midi
-	float[NF][NT] sg
+	var dlg: SpectrumDialog*
+	var midi: MidiNoteBuffer
+	var sg: float[NF][NT]
 
-	void show_spec(Song *song)
+	func show_spec(song: Song)
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf
@@ -208,7 +208,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 		dlg.run()
 		del dlg
 
-	override void apply()
+	func override apply()
 	
 		if session.view.sel.range().length > 0
 			show_spec(song)

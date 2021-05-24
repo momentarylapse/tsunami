@@ -13,133 +13,133 @@ use hui
 use kaba
 use os
 
-const int NUM_PEAK_LEVELS = 24
+const NUM_PEAK_LEVELS = 24
 
-const int DEFAULT_SAMPLE_RATE = 44100
+const DEFAULT_SAMPLE_RATE = 44100
 
-const int MAX_PITCH = 128
+const MAX_PITCH = 128
 
 class Range
-	int offset, length
-	extern const int start()
-	extern const int end()
-	const bool inside(int pos)
+	var offset, length: int
+	func extern const start() -> int
+	func extern const end() -> int
+	func const inside(pos: int) -> bool
 		return pos >= offset and pos < offset + length
-	extern const bool overlaps(Range o)
-	extern const bool covers(Range o)
-	extern const Range __and__(Range o)
-	extern const string __str__()
+	func extern const overlaps(o: Range) -> bool
+	func extern const covers(o: Range) -> bool
+	func extern const __and__(o: Range) -> Range
+	func extern const __str__() -> string
 	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
-const Range RangeTo(int start, int end)
+func const RangeTo(start: int, end: int) -> Range
 	return Range(start, end - start)
 
 
 class MidiNote as shared
-	Range range
-	float pitch
-	float volume
-	int stringno = -1
-	int clef_position = -1
-	int modifier = 0
-	int flags = 0
-	void __init__()
-	void __init__(Range r, float _pitch, float _volume)
+	var range: Range
+	var pitch: float
+	var volume: float
+	var stringno = -1
+	var clef_position = -1
+	var modifier = 0
+	var flags = 0
+	func __init__()
+	func __init__(r: Range, _pitch: float, _volume: float)
 		range = r
 		pitch = _pitch
 		volume = _volume
-	extern void set(int mask)
-	extern const bool is(int mask)
-	extern const MidiNote* copy(int offset)
+	func extern set(mask: int)
+	func extern const is(mask: int) -> bool
+	func extern const copy(offset: int) -> MidiNote*
 
 class MidiEvent
-	int pos
-	float pitch
-	float volume
-	int flags = 0
-	int stringno = -1
-	int clef_position = -1
-	void __init__()
-	void __init__(int _pos, float _pitch, float _volume)
+	var pos: int
+	var pitch: float
+	var volume: float
+	var flags = 0
+	var stringno = -1
+	var clef_position = -1
+	func __init__()
+	func __init__(_pos: int, _pitch: float, _volume: float)
 		pos = _pos
 		pitch = _pitch
 		volume = _volume
-	const string __str__()
+	func const __str__() -> string
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
 class MidiEventBuffer extends MidiEvent[]
-	int samples
-	extern override void __init__()
-	extern const MidiNoteBuffer get_notes(Range r)
-	extern const MidiEvent[] get_events(Range r)
-	extern const Range get_range()
-	void add_note(MidiNote n)
+	var samples: int
+	func extern override __init__()
+	func extern const get_notes(r: Range) -> MidiNoteBuffer
+	func extern const get_events(r: Range) -> MidiEvent[]
+	func extern const get_range() -> Range
+	func add_note(n: MidiNote)
 		add(MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(MidiEvent(n.range.end(), n.pitch, 0))
-	extern void add_metronome_click(int pos, int level, float volume)
+	func extern add_metronome_click(pos: int, level: int, volume: float)
 
 class MidiNoteBuffer extends shared MidiNote[]
-	int samples
-	extern override void __init__()
-	extern override void __delete__()
+	var samples: int
+	func extern override __init__()
+	func extern override __delete__()
 	#extern selfref MidiNoteBuffer get_notes(Range r)
-	extern selfref MidiNote*[] get_notes(Range r)
-	extern selfref MidiEvent[] get_events(Range r)
-	extern const Range get_range()
+	func extern selfref get_notes(r: Range) -> MidiNote*[]
+	func extern selfref get_events(r: Range) -> MidiEvent[]
+	func extern const get_range() -> Range
 
 
 class ConfigPanel extends Panel
-	extern void __init__(Module c)
-	extern override void __delete__()
-	extern virtual void update()
-	extern virtual void set_large(bool large)
-	extern void changed()
-	Module *c
+	func extern __init__(c: Module)
+	func extern override __delete__()
+	func extern virtual update()
+	func extern virtual set_large(large: bool)
+	func extern changed()
+	var c: Module*
 
 class Module as shared extends Object
-	string name
-	Session* session
-	#owned Port[] port_out
-	Port*[] port_out
-	extern void __init__(int type, string sub_type)
-	extern override void __delete__()
-	void __assign__(Module o)
+	var name: string
+	var session: Session*
+	#var port_out: owned Port[]
+	var port_out: Port*[]
+	func extern __init__(type: int, sub_type: string)
+	func extern override __delete__()
+	func __assign__(o: Module)
 		pass
-	extern void reset_config()
-	extern virtual void reset_state()
-	extern void changed()
-	extern virtual int command(int cmd, int param)
-	extern void plug_in(int in_port, Module source, int out_port)
-	extern void unplug_in(int in_port)
-	extern void subscribe(Object handler, Object->void f, string message)
-	extern void unsubscribe(Object handler)
-	extern const Module* copy()
+	func extern reset_config()
+	func extern virtual reset_state()
+	func extern changed()
+	func extern virtual command(cmd: int, param: int) -> int
+	func extern plug_in(in_port: int, source: Module, out_port: int)
+	func extern unplug_in(in_port: int)
+	func extern subscribe(handler: Object, f: Object->void, message: string)
+	func extern unsubscribe(handler: Object)
+	func extern const copy() -> Module*
 	
 	class Port
-		extern void __init__()
-		extern virtual void __delete__()
-		extern virtual int read_audio(out AudioBuffer buf)
-		extern virtual int read_midi(out MidiEventBuffer midi)
-		extern virtual int read_beats(out Beat[] beats, int samples)
+		func extern __init__()
+		func extern virtual __delete__()
+		func extern virtual read_audio(out buf: AudioBuffer) -> int
+		func extern virtual read_midi(out midi: MidiEventBuffer) -> int
+		func extern virtual read_beats(out beats: Beat[], samples: int) -> int
 		
 	class Config
-		extern void __init__()
-		extern virtual void __delete__()
-		extern virtual void reset()
-		extern const string to_string()
-		extern void from_string(string s, Session session)
-		extern virtual string auto_conf(string name)
+		func extern __init__()
+		func extern virtual __delete__()
+		func extern virtual reset()
+		func extern const to_string() -> string
+		func extern from_string(s: string, session: Session)
+		func extern virtual auto_conf(name: string) -> string
 
-	extern virtual ConfigPanel *create_panel()
-	extern virtual void on_config()
-	extern virtual Module.Config* get_config()
-	extern const string config_to_string()
-	extern const any config_to_any()
-	extern void config_from_string(int version, string s)
-	extern void config_from_any(int version, any a)
+	func extern virtual create_panel() -> ConfigPanel*
+	func extern virtual on_config()
+	func extern virtual get_config() -> Module.Config*
+	func extern const config_to_string() -> string
+	func extern const config_to_any() -> any
+	func extern config_from_string(version: int, s: string)
+	func extern config_from_any(version: int, a: any)
 
-	const int VERSION_LATEST = -1
-	const int VERSION_LEGACY = -2
+	const VERSION_LATEST = -1
+	const VERSION_LEGACY = -2
 
 	enum Command
 		START
@@ -165,74 +165,74 @@ class Module as shared extends Object
 		SIGNAL_CHAIN
 
 class AudioEffect extends Module
-	bool apply_to_whole_buffer
-	Module.Port *source
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual void process(out AudioBuffer buf)
-	extern virtual int read(out AudioBuffer buf)
+	var apply_to_whole_buffer: bool
+	var source: Module.Port*
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual process(out buf: AudioBuffer)
+	func extern virtual read(out buf: AudioBuffer) -> int
 
 class MidiEffect extends Module
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual void process(out MidiNoteBuffer midi)
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual process(out midi: MidiNoteBuffer)
 
 class AudioVisualizer extends Module
-	int chunk_size
-	RingBuffer* ring_buffer
-	int next_writing
-	int current_reading
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual void process(out AudioBuffer buf)
-	extern void set_chunk_size(int chunk_size)
-	extern void lock()
-	extern void unlock()
-	extern void flip()
+	var chunk_size: int
+	var ring_buffer: RingBuffer*
+	var next_writing: int
+	var current_reading: int
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual process(out buf: AudioBuffer)
+	func extern set_chunk_size(chunk_size: int)
+	func extern lock()
+	func extern unlock()
+	func extern flip()
 
 class AudioBuffer
-	int offset, length
-	int channels
-	#float[] l, r
-	float[][] c
-	string[] peaks
-	extern void __init__()
-	extern void __delete__()
-	extern void __assign__(AudioBuffer other)
-	extern void clear()
-	extern const Range range()
-	extern void resize(int length)
-	extern void set_channels(int channels)
-	extern void set(AudioBuffer source, int target_offset, float volume)
-	extern void add(AudioBuffer source, int offset, float volume)
+	var offset, length: int
+	var channels: int
+	#var l, r: float[]
+	var c: float[][]
+	var peaks: string[]
+	func extern __init__()
+	func extern __delete__()
+	func extern __assign__(other: AudioBuffer)
+	func extern clear()
+	func extern const range() -> Range
+	func extern resize(length: int)
+	func extern set_channels(channels: int)
+	func extern set(source: AudioBuffer, target_offset: int, volume: float)
+	func extern add(source: AudioBuffer, offset: int, volume: float)
 	#extern void mix_stereo(float volume, float panning)
-	extern void set_as_ref(AudioBuffer source, int offset, int length)
-	extern selfref AudioBuffer __subarray__(int start, int end)
-	extern const void get_spectrum(out complex[] spec_r, out complex[] spec_l, int samples)
-	void scale(float factor)
+	func extern set_as_ref(source: AudioBuffer, offset: int, length: int)
+	func extern selfref __subarray__(start: int, end: int) -> AudioBuffer
+	func extern const get_spectrum(out spec_r: complex[], out spec_l: complex[], samples: int)
+	func scale(factor: float)
 		for cc in c
 			cc *= factor
-	void __imul__(float[] f)
+	func __imul__(f: float[])
 		for cc in c
 			cc *= f
-	void auto_generate_channels()
+	func auto_generate_channels()
 		if channels > 1
 			c[1] = c[0]
 
-extern void interpolate_buffer(AudioBuffer in, out AudioBuffer out, int method)
+func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
 
 class RingBuffer
-	extern void __init__(int size)
-	extern const int available()
-	extern void read(out AudioBuffer b)
-	extern void write(AudioBuffer b)
-	extern void read_ref(out AudioBuffer b, int size)
-	extern void read_ref_done(AudioBuffer b)
-	extern void peek(out AudioBuffer b, int size, int mode)
-	extern void write_ref(AudioBuffer b, int size)
-	extern void write_ref_done(AudioBuffer b)
-	extern void clear()
-	void __assign__(RingBuffer o)
+	func extern __init__(size: int)
+	func extern const available() -> int
+	func extern read(out b: AudioBuffer)
+	func extern write(b: AudioBuffer)
+	func extern read_ref(out b: AudioBuffer, size: int)
+	func extern read_ref_done(b: AudioBuffer)
+	func extern peek(out b: AudioBuffer, size: int, mode: int)
+	func extern write_ref(b: AudioBuffer, size: int)
+	func extern write_ref_done(b: AudioBuffer)
+	func extern clear()
+	func __assign__(o: RingBuffer)
 	enum PeekMode
 		FORWARD_REF
 		FORWARD_COPY_WRAP
@@ -243,116 +243,116 @@ class RingBuffer
 # general "interface"
 
 class AudioSource extends Module
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual int read(out AudioBuffer buf)
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual read(out buf: AudioBuffer) -> int
 
 class MidiProduceData
-	Bar* bar
-	int beat_no
+	var bar: Bar*
+	var beat_no: int
 
 class MidiSource extends Module
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual int read(out MidiEventBuffer midi)
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual read(out midi: MidiEventBuffer) -> int
 	# crappy experimental note api:
-	extern virtual bool on_produce(MidiProduceData data)
-	extern void note(float pitch, float volume, int beats)
-	extern void skip(int beats)
-	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
-	extern void skip_x(int beats, int sub_beats, int beat_partition)
-	MidiEventBuffer* bh_midi
+	func extern virtual on_produce(data: MidiProduceData) -> bool
+	func extern note(pitch: float, volume: float, beats: int)
+	func extern skip(beats: int)
+	func extern note_x(pitch: float, volume: float, beats: int, sub_beats: int, beat_partition: int)
+	func extern skip_x(beats: int, sub_beats: int, beat_partition: int)
+	var bh_midi: MidiEventBuffer*
 	#extern void set_beat_source(BeatPort *source)
 
 class PitchDetector extends MidiSource
-	float frequency, volume
-	int pitch
-	bool loud_enough
-	extern override void __init__()
-	extern override int read(out MidiEventBuffer midi)
-	extern virtual void process(out MidiEventBuffer midi, AudioBuffer buf)
+	var frequency, volume: float
+	var pitch: int
+	var loud_enough: bool
+	func extern override __init__()
+	func extern override read(out midi: MidiEventBuffer) -> int
+	func extern virtual process(out midi: MidiEventBuffer, buf: AudioBuffer)
 
 class PitchRenderer
-	extern void __init__(Synthesizer synth, int pitch)
-	extern virtual void __delete__()
-	void __assign__(PitchRenderer o)
+	func extern __init__(synth: Synthesizer, pitch: int)
+	func extern virtual __delete__()
+	func __assign__(o: PitchRenderer)
 		pass
-	extern virtual bool render(out AudioBuffer buf) # return: keep alive
+	func extern virtual render(out buf: AudioBuffer) -> bool
 	#extern virtual void on_event(MidiEvent e)
-	extern virtual void on_start(float volume)
-	extern virtual void on_end()
-	extern virtual void on_config()
-	int pitch
-	float delta_phi
-	Synthesizer *synth
+	func extern virtual on_start(volume: float)
+	func extern virtual on_end()
+	func extern virtual on_config()
+	var pitch: int
+	var delta_phi: float
+	var synth: Synthesizer*
 
 class Synthesizer extends Module
-	int sample_rate
-	int keep_notes
-	float[MAX_PITCH] freq
-	float[MAX_PITCH] delta_phi
-	int[] active_pitch
-	bool auto_generate_stereo
-	bool render_by_ref
-	MidiEventBuffer events
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual void render(out AudioBuffer buf)
-	extern override void on_config()
-	extern override void reset_state()
-	extern virtual PitchRenderer* create_pitch_renderer(int pitch)
-	extern void set_sample_rate(int sample_rate)
+	var sample_rate: int
+	var keep_notes: int
+	var freq: float[MAX_PITCH]
+	var delta_phi: float[MAX_PITCH]
+	var active_pitch: int[]
+	var auto_generate_stereo: bool
+	var render_by_ref: bool
+	var events: MidiEventBuffer
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual render(out buf: AudioBuffer)
+	func extern override on_config()
+	func extern override reset_state()
+	func extern virtual create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func extern set_sample_rate(sample_rate: int)
 
 class DummySynthesizer extends Synthesizer
-	extern override void __init__()
+	func extern override __init__()
 	#extern overwrite void __delete__()
-	extern override void render(out AudioBuffer buf)
-	extern override PitchRenderer *create_pitch_renderer(int pitch)
+	func extern override render(out buf: AudioBuffer)
+	func extern override create_pitch_renderer(pitch: int) -> PitchRenderer*
 
 class EnvelopeADSR
-	extern void __init__()
-	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
-	extern void set2(float initial, float peak)
-	extern void reset()
-	extern void start(float volume)
-	extern void end()
-	extern float get()
-	extern float[] read(int n)
-	bool just_killed
+	func extern __init__()
+	func extern set(t_attack: float, t_decay: float, sustain: float, t_release: float, sample_rate: int)
+	func extern set2(initial: float, peak: float)
+	func extern reset()
+	func extern start(volume: float)
+	func extern end()
+	func extern get() -> float
+	func extern read(n: int) -> float[]
+	var just_killed: bool
 
 
 class BeatSource extends Module
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual int read(out Beat[] beats, int samples)
-	extern virtual const int beats_per_bar()
-	extern virtual const int cur_beat()
-	extern virtual const int cur_bar()
-	extern virtual const float beat_fraction()
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual read(out beats: Beat[], samples: int) -> int
+	func extern virtual const beats_per_bar() -> int
+	func extern virtual const cur_beat() -> int
+	func extern virtual const cur_bar() -> int
+	func extern virtual const beat_fraction() -> float
 
 class BeatMidifier extends MidiSource
-	extern override void __init__()
+	func extern override __init__()
 	#extern override void __delete__()
-	extern override int read(out MidiEventBuffer midi)
-	float volume
+	func extern override read(out midi: MidiEventBuffer) -> int
+	var volume: float
 
 class AudioAccumulator extends Module
-	int samples_skipped
-	AudioBuffer buffer
+	var samples_skipped: int
+	var buffer: AudioBuffer
 
 class MidiAccumulator extends Module
-	MidiEventBuffer buffer
+	var buffer: MidiEventBuffer
 
 class TrackRenderBuffer
-	int dummy
+	var dummy: int
 
 class TrackMarker as shared
-	void __init__(Range r, string t)
+	func __init__(r: Range, t: string)
 		range = r
 		text = t
-	Range range
-	string text
-	shared AudioEffect[] fx
+	var range: Range
+	var text: string
+	var fx: shared AudioEffect[]
 
 
 #class BarPattern
@@ -361,17 +361,17 @@ class TrackMarker as shared
 #	int[] beats
 
 class Bar as shared
-	int[] beats
-	int divisor
-	int total_sub_beats
-	int index
-	int index_text
-	int length
-	int offset
-	void __init__()
-	extern void __init__(int length, int beats, int sub_beats)
-	extern const float bpm(float sample_rate)
-	extern const Range range()
+	var beats: int[]
+	var divisor: int
+	var total_sub_beats: int
+	var index: int
+	var index_text: int
+	var length: int
+	var offset: int
+	func __init__()
+	func extern __init__(length: int, beats: int, sub_beats: int)
+	func extern const bpm(sample_rate: float) -> float
+	func extern const range() -> Range
 	enum EditMode
 		IGNORE
 		INSERT_SILENCE
@@ -380,64 +380,64 @@ class Bar as shared
 
 
 class Beat
-	Range range
-	int bar_index
-	int bar_no = 0
-	int beat_no = 0
-	int level
+	var range: Range
+	var bar_index: int
+	var bar_no = 0
+	var beat_no = 0
+	var level: int
 
-	void __init__()
-	void __init__(int _offset, int _level)
+	func __init__()
+	func __init__(_offset: int, _level: int)
 		range = Range(_offset, 0)
 		level = _level
 
 class BarCollection extends shared Bar[]
-	extern selfref Bar*[] get_bars(Range r)
-	extern selfref Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
-	extern const int get_next_beat(int pos)
-	extern const int get_prev_beat(int pos)
+	func extern selfref get_bars(r: Range) -> Bar*[]
+	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
+	func extern const get_next_beat(pos: int) -> int
+	func extern const get_prev_beat(pos: int) -> int
 
 class TrackLayer as shared
-	int type
-	Track *track
-	AudioBuffer[] buffers
-	MidiNoteBuffer midi
-	shared SampleRef[] samples
-	shared TrackMarker[] markers
+	var type: int
+	var track: Track*
+	var buffers: AudioBuffer[]
+	var midi: MidiNoteBuffer
+	var samples: shared SampleRef[]
+	var markers: shared TrackMarker[]
 	
-	extern void get_buffers(out AudioBuffer buf, Range r)
-	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
-	extern void *edit_buffers(out AudioBuffer buf, Range r)
-	extern void edit_buffers_finish(void *a)
-	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
-	extern void add_midi_note(MidiNote *n)
+	func extern get_buffers(out buf: AudioBuffer, r: Range)
+	func extern read_buffers(out buf: AudioBuffer, r: Range, allow_ref: bool)
+	func extern edit_buffers(out buf: AudioBuffer, r: Range) -> void*
+	func extern edit_buffers_finish(a: void*)
+	func extern insert_midi_data(offset: int, midi: MidiNoteBuffer)
+	func extern add_midi_note(n: MidiNote*)
 	#extern void add_midi_notes(MidiNoteBuffer midi)
-	extern void delete_midi_note(MidiNote *n)
-	extern SampleRef* add_sample_ref(int pos, Sample* sample)
-	extern void delete_sample_ref(SampleRef *ref)
-	extern void edit_sample_ref(SampleRef *ref, float volume, bool mute)
-	extern TrackMarker* add_marker(TrackMarker m)
-	extern void delete_marker(TrackMarker *marker)
-	extern void edit_marker(TrackMarker *marker, Range range, string text)
+	func extern delete_midi_note(n: MidiNote*)
+	func extern add_sample_ref(pos: int, sample: Sample*) -> SampleRef*
+	func extern delete_sample_ref(ref: SampleRef*)
+	func extern edit_sample_ref(ref: SampleRef*, volume: float, mute: bool)
+	func extern add_marker(m: TrackMarker) -> TrackMarker*
+	func extern delete_marker(marker: TrackMarker*)
+	func extern edit_marker(marker: TrackMarker*, range: Range, text: string)
 
 class Sample as shared # TODO
-	string name
-	int type
-	AudioBuffer* buf
-	MidiNoteBuffer midi
-	float volume
-	int uid
-	int ref_count
-	Tag[] tags
-	extern void __init__(string name, AudioBuffer buf)
-	extern SampleRef* create_ref()
-	extern const string get_value(string key)
-	extern void set_value(string key, string value)
+	var name: string
+	var type: int
+	var buf: AudioBuffer*
+	var midi: MidiNoteBuffer
+	var volume: float
+	var uid: int
+	var ref_count: int
+	var tags: Tag[]
+	func extern __init__(name: string, buf: AudioBuffer)
+	func extern create_ref() -> SampleRef*
+	func extern const get_value(key: string) -> string
+	func extern set_value(key: string, value: string)
 
 class SampleRef as shared
-	shared Sample origin
-	extern void __init__(shared Sample sam)
-	extern virtual void __delete__()
+	var origin: shared Sample
+	func extern __init__(sam: shared Sample)
+	func extern virtual __delete__()
 
 
 enum SignalType
@@ -449,225 +449,225 @@ enum SignalType
 	GROUP
 
 class Instrument
-	int type
-	int[] string_pitch
+	var type: int
+	var string_pitch: int[]
 
 class Track as shared
-	int type
-	string name
-	shared TrackLayer[] layers
+	var type: int
+	var name: string
+	var layers: shared TrackLayer[]
 
-	float volume, panning
-	bool muted
+	var volume, panning: float
+	var muted: bool
 	
-	shared AudioEffect[] fx
-	shared MidiEffect[] midi_fx
+	var fx: shared AudioEffect[]
+	var midi_fx: shared MidiEffect[]
 	
-	shared Synthesizer synth
-	Instrument instrument
+	var synth: shared Synthesizer
+	var instrument: Instrument
 
 	# editing
-	Song *song
+	var song: Song*
 	
-	extern const string nice_name()
+	func extern const nice_name() -> string
 
 	#TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern void set_name(string name)
-	extern void set_muted(bool muted)
-	extern void set_volume(float volume)
-	extern void set_panning(float panning)
-	extern void add_effect(AudioEffect effect)
-	extern void delete_effect(int index)
-	extern void edit_effect(int index)
-	extern void enable_effect(int index, bool enabled)
-	extern void set_synthesizer(Synthesizer synth)
+	func extern set_name(name: string)
+	func extern set_muted(muted: bool)
+	func extern set_volume(volume: float)
+	func extern set_panning(panning: float)
+	func extern add_effect(effect: AudioEffect)
+	func extern delete_effect(index: int)
+	func extern edit_effect(index: int)
+	func extern enable_effect(index: int, enabled: bool)
+	func extern set_synthesizer(synth: Synthesizer)
 
 class Tag
-	string key, value
+	var key, value: string
 
 class Song as shared
-	Path filename
-	Tag[] tags
-	int sample_rate
+	var filename: Path
+	var tags: Tag[]
+	var sample_rate: int
 
-	float volume
+	var volume: float
 	
-	shared Track[] tracks
-	shared Sample[] samples
+	var tracks: shared Track[]
+	var samples: shared Sample[]
 	
-	BarCollection bars
+	var bars: BarCollection
 
-	any secret_data
+	var secret_data: any
 	
-	extern void __init__(Session session, int sample_rate)
-	extern virtual void __delete__()
+	func extern __init__(session: Session, sample_rate: int)
+	func extern virtual __delete__()
 	
-	extern const Range range()
-	extern selfref Track* time_track()
-	extern selfref TrackLayer*[] layers()
+	func extern const range() -> Range
+	func extern selfref time_track() -> Track*
+	func extern selfref layers() -> TrackLayer*[]
 	
-	extern Track* add_track(int type, int index)
-	extern void delete_track(int index)
-	extern void add_bar(int index, Bar b, int mode)
-	extern void add_pause(int index, int length, int mode)
-	extern void edit_bar(int index, Bar b, int mode)
-	extern void delete_bar(int index, bool affect_midi)
-	extern void add_sample(Sample s)
-	extern void delete_sample(Sample s)
+	func extern add_track(type: int, index: int) -> Track*
+	func extern delete_track(index: int)
+	func extern add_bar(index: int, b: Bar, mode: int)
+	func extern add_pause(index: int, length: int, mode: int)
+	func extern edit_bar(index: int, b: Bar, mode: int)
+	func extern delete_bar(index: int, affect_midi: bool)
+	func extern add_sample(s: Sample)
+	func extern delete_sample(s: Sample)
 	
-	extern void undo()
-	extern void redo()
-	extern void reset_history()
-	extern void begin_action_group()
-	extern void end_action_group()
+	func extern undo()
+	func extern redo()
+	func extern reset_history()
+	func extern begin_action_group()
+	func extern end_action_group()
 	
-	extern const string get_time_str(int t)
-	extern const string get_time_str_fuzzy(int t, float dt)
-	extern const string get_time_str_long(int t)
+	func extern const get_time_str(t: int) -> string
+	func extern const get_time_str_fuzzy(t: int, dt: float) -> string
+	func extern const get_time_str_long(t: int) -> string
 
 class SongSelection
-	Range range_raw
-	extern const Range range()
-	extern const bool has_track(Track t)
-	extern const bool has_layer(TrackLayer t)
-	extern const bool has_marker(TrackMarker m)
-	extern const bool has_note(MidiNote n)
-	extern const bool has_bar(Bar b)
+	var range_raw: Range
+	func extern const range() -> Range
+	func extern const has_track(t: Track) -> bool
+	func extern const has_layer(t: TrackLayer) -> bool
+	func extern const has_marker(m: TrackMarker) -> bool
+	func extern const has_note(n: MidiNote) -> bool
+	func extern const has_bar(b: Bar) -> bool
 
 class ColorScheme
-	color background
-	color background_track
-	color background_track_selected
-	color text
-	color text_soft1
-	color text_soft2
-	color text_soft3
-	color grid
-	color selection
-	color hover
-	color blob_bg
-	color blob_bg_selected
-	color blob_bg_hidden
-	color[12] pitch
-	extern static color pitch_color(int p)
-	extern const color hoverify(color c)
+	var background: color
+	var background_track: color
+	var background_track_selected: color
+	var text: color
+	var text_soft1: color
+	var text_soft2: color
+	var text_soft3: color
+	var grid: color
+	var selection: color
+	var hover: color
+	var blob_bg: color
+	var blob_bg_selected: color
+	var blob_bg_hidden: color
+	var pitch: color[12]
+	func extern static pitch_color(p: int) -> color
+	func extern const hoverify(c: color) -> color
 
 class SceneGraph
 	class Node as shared
-		rect area
+		var area: rect
 
 class AudioView extends Object
 	class ViewPort
-		extern void __init__(AudioView* view)
-		extern const Range range()
-		extern void set_range(Range r)
-		extern float64 sample2screen64(float64 s)
-		extern float sample2screen(float s)
-		extern float64 screen2sample64(float64 s)
-		extern float screen2sample(float s)
-		rect area
+		func extern __init__(view: AudioView*)
+		func extern const range() -> Range
+		func extern set_range(r: Range)
+		func extern sample2screen64(s: float64) -> float64
+		func extern sample2screen(s: float) -> float
+		func extern screen2sample64(s: float64) -> float64
+		func extern screen2sample(s: float) -> float
+		var area: rect
 	
 	class Layer extends SceneGraph.Node
-		TrackLayer* layer
+		var layer: TrackLayer*
 		
-	SongSelection sel
-	SongRenderer* renderer
-	SignalChain* signal_chain
-	AudioOutput* output_stream
-	ViewPort cam
-	extern void subscribe(Object handler, Object->void f, string message)
-	extern void unsubscribe(Object handler)
-	extern void prepare_playback(Range r, bool allow_loop)
-	extern void play()
-	extern void set_playback_loop(bool loop)
-	extern void optimize_view()
-	extern Layer* cur_vlayer()
-	extern void* cur_vtrack()
-	extern void update_selection()
+	var sel: SongSelection
+	var renderer: SongRenderer*
+	var signal_chain: SignalChain*
+	var output_stream: AudioOutput*
+	var cam: ViewPort
+	func extern subscribe(handler: Object, f: Object->void, message: string)
+	func extern unsubscribe(handler: Object)
+	func extern prepare_playback(r: Range, allow_loop: bool)
+	func extern play()
+	func extern set_playback_loop(loop: bool)
+	func extern optimize_view()
+	func extern cur_vlayer() -> Layer*
+	func extern cur_vtrack() -> void*
+	func extern update_selection()
 
 class SongRenderer extends AudioSource
-	extern void __init__(Song s)
-	extern override void __delete__()
-	extern void render(Range r, out AudioBuffer buf)
-	extern void set_range(Range r)
-	extern void set_loop(bool l)
-	extern override int read(out AudioBuffer b)
+	func extern __init__(s: Song)
+	func extern override __delete__()
+	func extern render(r: Range, out buf: AudioBuffer)
+	func extern set_range(r: Range)
+	func extern set_loop(l: bool)
+	func extern override read(out b: AudioBuffer) -> int
 	#extern override void reset_state()
-	extern const Range range()
-	extern const int get_pos(int delta)
-	extern void set_pos(int pos)
-	extern selfref BeatSource* get_beat_source()
+	func extern const range() -> Range
+	func extern const get_pos(delta: int) -> int
+	func extern set_pos(pos: int)
+	func extern selfref get_beat_source() -> BeatSource*
 
 
 class AudioOutput extends Module
-	extern void __init__(Session session)
-	extern override void __delete__()
-	extern void stop()
-	extern void start()
-	extern const bool is_playing()
-	extern const float get_volume()
-	extern void set_volume(float volume)
-	extern const int samples_played()
+	func extern __init__(session: Session)
+	func extern override __delete__()
+	func extern stop()
+	func extern start()
+	func extern const is_playing() -> bool
+	func extern const get_volume() -> float
+	func extern set_volume(volume: float)
+	func extern const samples_played() -> int
 
 class AudioInput extends Module
-	RingBuffer current_buffer
-	AudioBuffer buffer
-	extern void __init__(Session session)
-	extern override void __delete__()
-	extern bool start()
-	extern void stop()
-	extern const bool is_capturing()
-	extern const int sample_rate()
-	extern const int samples_recorded()
+	var current_buffer: RingBuffer
+	var buffer: AudioBuffer
+	func extern __init__(session: Session)
+	func extern override __delete__()
+	func extern start() -> bool
+	func extern stop()
+	func extern const is_capturing() -> bool
+	func extern const sample_rate() -> int
+	func extern const samples_recorded() -> int
 
 class Storage
-	extern bool load(out Song s, Path filename)
-	extern bool save(Song s, Path filename)
-	extern bool save_via_renderer(Module.Port source, Path filename, int num_samples, Tag[] tags)
-	extern bool load_buffer(out AudioBuffer buf, Path filename)
-	Path current_directory
+	func extern load(out s: Song, filename: Path) -> bool
+	func extern save(s: Song, filename: Path) -> bool
+	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> bool
+	func extern load_buffer(out buf: AudioBuffer, filename: Path) -> bool
+	var current_directory: Path
 
 # create via Session.add_signal_chain()
 class SignalChain extends Module
-	extern void __init__(Session session, string name)
-	extern override void __delete__()
-	extern void __del_override__()
-	extern override int command(int cmd, int param)
-	extern override void reset_state()
-	extern Module* add(int type, string name)
-	extern Module* _add(Module m)
-	extern void delete(Module m)
-	extern void connect(Module source, int source_port, Module target, int target_port)
-	extern void disconnect(Module source, int source_port, Module target, int target_port)
-	extern void start()
-	extern void stop()
-	extern const bool is_prepared()
-	extern const bool is_active()
-	extern void set_update_dt(float dt)
-	extern void set_buffer_size(int size)
+	func extern __init__(session: Session, name: string)
+	func extern override __delete__()
+	func extern __del_override__()
+	func extern override command(cmd: int, param: int) -> int
+	func extern override reset_state()
+	func extern add(type: int, name: string) -> Module*
+	func extern _add(m: Module) -> Module*
+	func extern delete(m: Module)
+	func extern connect(source: Module, source_port: int, target: Module, target_port: int)
+	func extern disconnect(source: Module, source_port: int, target: Module, target_port: int)
+	func extern start()
+	func extern stop()
+	func extern const is_prepared() -> bool
+	func extern const is_active() -> bool
+	func extern set_update_dt(dt: float)
+	func extern set_buffer_size(size: int)
 
 class Session as shared extends Object
-	int id
-	#TsunamiWindow* win
-	Window* win
-	Song* song
-	AudioView* view
-	Storage* storage
+	var id: int
+	#var win: TsunamiWindow*
+	var win: Window*
+	var song: Song*
+	var view: AudioView*
+	var storage: Storage*
 	
-	extern const int sample_rate()
+	func extern const sample_rate() -> int
 	
 	#DeviceManager* device_manager
 	#PluginManager* plugin_manager
 	
-	extern const Session* create_child()
-	extern SignalChain* create_signal_chain(string name)
-	extern SignalChain* load_signal_chain(Path filename)
+	func extern const create_child() -> Session*
+	func extern create_signal_chain(name: string) -> SignalChain*
+	func extern load_signal_chain(filename: Path) -> SignalChain*
 
 	# logging
-	extern const void i(string msg)
-	extern const void w(string msg)
-	extern const void e(string msg)
+	func extern const i(msg: string)
+	func extern const w(msg: string)
+	func extern const e(msg: string)
 
 
 #class PluginContext
@@ -678,42 +678,42 @@ class Session as shared extends Object
 #	Range range
 
 class Slider
-	extern void __init__(Panel panel, string id_slider, string id_edit, float v_min, float v_max, float factor, Object->void func, float value)
-	extern virtual void __delete__()
-	extern float get()
-	extern void set(float f)
+	func extern __init__(panel: Panel, id_slider: string, id_edit: string, v_min: float, v_max: float, factor: float, func: Object->void, value: float)
+	func extern virtual __delete__()
+	func extern get() -> float
+	func extern set(f: float)
 
 class TsunamiPlugin extends Module
-	extern void __init__()
-	extern override void __delete__()
-	extern virtual void on_start()
-	extern virtual void on_stop()
-	extern virtual void on_draw_post(Painter p)
-	extern void stop()
-	string[] args
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual on_start()
+	func extern virtual on_stop()
+	func extern virtual on_draw_post(p: Painter)
+	func extern stop()
+	var args: string[]
 
 class SongPlugin extends Object
-	extern override void __init__()
-	extern override void __delete__()
-	extern virtual void apply()
-	Session* session
-	Song* song
+	func extern override __init__()
+	func extern override __delete__()
+	func extern virtual apply()
+	var session: Session*
+	var song: Song*
 
 #class Progress
 #	extern void __init__(string title, Window *parent)
 #	virtual extern void __delete__()
 #	extern void set(string msg, float progress)
 class ProgressX
-	extern void __init__(string title, Window parent)
-	extern virtual void __delete__()
-	extern void set(string msg, float progress)
-	extern void cancel()
-	extern const bool is_cancelled()
+	func extern __init__(title: string, parent: Window)
+	func extern virtual __delete__()
+	func extern set(msg: string, progress: float)
+	func extern cancel()
+	func extern const is_cancelled() -> bool
 
 class Clipboard
-	Song* temp
-	extern const bool has_data()
-	extern bool prepare_layer_map(AudioView view, out TrackLayer*[] sources, out TrackLayer*[] targets)
+	var temp: Song*
+	func extern const has_data() -> bool
+	func extern prepare_layer_map(view: AudioView, out sources: TrackLayer*[], out targets: TrackLayer*[]) -> bool
 
 
 enum MidiMode
@@ -728,53 +728,53 @@ class HoverData
 
 class MidiPainter
 	#extern void __init__(AudioView* view)
-	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
-	extern void set_context(rect area, Instrument i, bool playable, int mode)
-	extern void draw(Painter p, MidiNoteBuffer midi)
-	extern void draw_background(Painter c)
-	AudioView.ViewPort* cam
+	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
+	func extern set_context(area: rect, i: Instrument, playable: bool, mode: int)
+	func extern draw(p: Painter, midi: MidiNoteBuffer)
+	func extern draw_background(c: Painter)
+	var cam: AudioView.ViewPort*
 
 class GridColors
-	color bg, bg_sel
-	color fg, fg_sel
+	var bg, bg_sel: color
+	var fg, fg_sel: color
 
 class GridPainter
-	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
-	extern void set_context(rect area, GridColors col)
-	extern void draw_empty_background(Painter p)
-	extern void draw_bars(Painter p, int partition)
-	extern void draw_bar_numbers(Painter p)
-	extern void draw_time(Painter p)
-	extern void draw_time_numbers(Painter p)
+	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
+	func extern set_context(area: rect, col: GridColors)
+	func extern draw_empty_background(p: Painter)
+	func extern draw_bars(p: Painter, partition: int)
+	func extern draw_bar_numbers(p: Painter)
+	func extern draw_time(p: Painter)
+	func extern draw_time_numbers(p: Painter)
 
 
 #extern PluginContext plugin_context
-extern ColorScheme colors
+var extern colors: ColorScheme
 
-extern Clipboard* clipboard
+var extern clipboard: Clipboard*
 
-extern float db2amp(float db)
-extern float amp2db(float amp)
+func extern db2amp(db: float) -> float
+func extern amp2db(amp: float) -> float
 
 
-extern void fft_c2c(complex[] in, out complex[] out, bool inverse)
-extern void fft_r2c(float[] in, out complex[] out)
-extern void fft_c2r_inv(complex[] in, out float[] out)
+func extern fft_c2c(in: complex[], out _out: complex[], inverse: bool)
+func extern fft_r2c(in: float[], out _out: complex[])
+func extern fft_c2r_inv(in: complex[], out _out: float[])
 
-extern Module* CreateModule(Session session, int type, string name)
-extern Synthesizer* CreateSynthesizer(Session session, string name)
-extern AudioSource* CreateAudioSource(Session session, string name)
-extern AudioEffect* CreateAudioEffect(Session session, string name)
-extern MidiSource* CreateMidiSource(Session session, string name)
-extern MidiEffect* CreateMidiEffect(Session session, string name)
-extern BeatMidifier* CreateBeatMidifier(Session session)
-extern BeatSource* CreateBeatSource(Session session, string name)
-extern Sample* SelectSample(Session session, Panel panel, Sample* old)
+func extern CreateModule(session: Session, type: int, name: string) -> Module*
+func extern CreateSynthesizer(session: Session, name: string) -> Synthesizer*
+func extern CreateAudioSource(session: Session, name: string) -> AudioSource*
+func extern CreateAudioEffect(session: Session, name: string) -> AudioEffect*
+func extern CreateMidiSource(session: Session, name: string) -> MidiSource*
+func extern CreateMidiEffect(session: Session, name: string) -> MidiEffect*
+func extern CreateBeatMidifier(session: Session) -> BeatMidifier*
+func extern CreateBeatSource(session: Session, name: string) -> BeatSource*
+func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> Sample*
 #extern void SetTempBackupFilename(Path filename)
 
-extern string ChooseModule(Panel parent, Session session, int type, string old_name)
+func extern ChooseModule(parent: Panel, session: Session, type: int, old_name: string) -> string
 
-extern void draw_boxed_str(Painter c, float x, float y, string str, color col_text, color col_bg)
+func extern draw_boxed_str(c: Painter, x: float, y: float, str: string, col_text: color, col_bg: color)
 
 #extern void get_style_colors(Panel p, string id, color{} colors)
 extern void get_style_colors(Panel p, string id, (string,color)[] colors)

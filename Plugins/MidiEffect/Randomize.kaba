@@ -1,23 +1,23 @@
 use tsunami
 
-const string AutoConfigTimeDelay = "-2:2:1:1000:ms"
-const string AutoConfigTimeVariation = "0:1:1:1000:ms"
-const string AutoConfigVolume = "0:1:1:100:%"
+const AutoConfigTimeDelay = "-2:2:1:1000:ms"
+const AutoConfigTimeVariation = "0:1:1:1000:ms"
+const AutoConfigVolume = "0:1:1:100:%"
 
 class Config extends Module.Config
-	float TimeDelay
-	float TimeVariation
-	float Volume
+	var TimeDelay: float
+	var TimeVariation: float
+	var Volume: float
 	
-	override void reset()
+	func override reset()
 		TimeDelay = 0
 		TimeVariation = 0.01
 		Volume = 0
 
 class Randomize extends MidiEffect
-	Config config
+	var config: Config
 	
-	override void process(out MidiNoteBuffer midi)
+	func override process(out midi: MidiNoteBuffer)
 		float delay = session.sample_rate() * config.TimeDelay
 		float var = session.sample_rate() * config.TimeVariation
 		for n in midi

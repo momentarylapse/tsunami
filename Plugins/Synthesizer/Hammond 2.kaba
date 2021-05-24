@@ -4,22 +4,22 @@ use helper.tone
 use helper.grid
 use helper.filter
 
-const int NUM_HARMONICS = 9
-const float[] HARMONIC_FREQS = [0.5, 1.0, 1.498823530, 2.0, 2.997647060, 4.0, 5.040941178, 5.995294120, 8.0]
+const NUM_HARMONICS = 9
+const HARMONIC_FREQS = [0.5, 1.0, 1.498823530, 2.0, 2.997647060, 4.0, 5.040941178, 5.995294120, 8.0]
 
-const float DECAY = 0.01
-const float SUSTAIN = 0.7
+const DECAY = 0.01
+const SUSTAIN = 0.7
 
 
-float RA(float f)
+func RA(f: float) -> float
 	return 12194.0^2 * f^4 / ((f^2 + 20.6^2) * sqrt((f^2 + 107.7^2) * (f^2 + 737.9^2)) * (f^2 + 12194.0^2))
 
 class HammondConfig extends Module.Config
-	float[NUM_HARMONICS] intensity
-	float attack
-	float release
-	float key_stutter
-	override void reset()
+	var intensity: float[NUM_HARMONICS]
+	var attack: float
+	var release: float
+	var key_stutter: float
+	func override reset()
 		for i in intensity
 			i = 0
 		intensity[0] = 0.2
@@ -31,26 +31,26 @@ class HammondConfig extends Module.Config
 		key_stutter = 0.5
 
 class HammondGrid extends Grid
-	HammondConfig *hc
-	HammondPanel *p
-	int selected, hover
+	var hc: HammondConfig*
+	var p: HammondPanel*
+	var selected, hover: int
 
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 	
 		# points
 		for i,n in hc.intensity
-			let z0 = complex(n+1, 0)
-			let z1 = complex(n+1, i)
+			var z0 = complex(n+1, 0)
+			var z1 = complex(n+1, i)
 			c.set_line_width(2)
 			draw_line2(c, z0, z1, n == selected, n == hover)
 			draw_point2(c, z1, n == selected, n == hover)
 			
 	# left button down -> select
-	override void on_left_button_down()
+	func override on_left_button_down()
 		selected = hover
 		redraw()
 
-	override void on_mouse_move()
+	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l and (selected >= 0)
 			hc.intensity[selected] = clamp(get_mouse2().y, 0, 1)
@@ -59,16 +59,16 @@ class HammondGrid extends Grid
 		# hover?
 			hover = -1
 			for i,n in hc.intensity
-				let p = project2(complex(n+1, i))
+				var p = project2(complex(n+1, i))
 				if (mx > p.x - 10) and (mx < p.x + 10)
 					hover = n
 		redraw()
 
 class HammondPanel extends ConfigPanel
-	override HammondSynthesizer *c
-	HammondConfig *hc
-	HammondGrid grid
-	override void __init__(Module _s)
+	var override c: HammondSynthesizer*
+	var hc: HammondConfig*
+	var grid: HammondGrid
+	func override __init__(_s: Module)
 		from_source("
 Grid ? '' vertical
 	Grid ? ''
@@ -95,19 +95,19 @@ Grid ? '' vertical
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	void on_change()
+	func on_change()
 		hc.key_stutter = get_float("stutter") / 100
 		hc.attack = get_float("attack") / 1000
 		hc.release = get_float("release") / 1000
 		changed()
 	
-	override void update()
+	func override update()
 		redraw("drawing")
 		set_float("stutter", hc.key_stutter * 100)
 		set_float("attack", hc.attack * 1000)
 		set_float("release", hc.release * 1000)
 
-float[] create_stutter(float intensity)
+func create_stutter(intensity: float) -> float[]
 	float[] stutter
 	stutter.resize(440) # 10ms
 	stutter = 1
@@ -122,11 +122,11 @@ float[] create_stutter(float intensity)
 	return stutter
 
 class SineGenerator
-	float phi = 0
-	float delta_phi = 0
-	void set_omega(float omega)
+	var phi = 0.
+	var delta_phi = 0.
+	func set_omega(omega: float)
 		delta_phi = omega
-	float[] read(int n)
+	func read(n: int) -> float[]
 		float[] f
 		f.resize(n)
 		for i in 0:n
@@ -136,16 +136,16 @@ class SineGenerator
 		return f
 
 class HammondRenderer extends PitchRenderer
-	float volume = 0
-	float[NUM_HARMONICS] phi
-	float[NUM_HARMONICS] A
-	SineGenerator[NUM_HARMONICS] osci
-	float[] stutter
-	int stutter_offset
-	EnvelopeADSR env
-	BiquadFilter filter
-	override HammondSynthesizer* synth
-	override void __init__(Synthesizer s, int pitch)
+	var volume = 0.
+	var phi: float[NUM_HARMONICS]
+	var A: float[NUM_HARMONICS]
+	var osci: SineGenerator[NUM_HARMONICS]
+	var stutter: float[]
+	var stutter_offset: int
+	var env: EnvelopeADSR
+	var filter: BiquadFilter
+	var override synth: HammondSynthesizer*
+	func override __init__(s: Synthesizer, pitch: int)
 		for o,i in osci
 			o.set_omega(delta_phi * HARMONIC_FREQS[i])
 		for x in phi
@@ -155,18 +155,18 @@ class HammondRenderer extends PitchRenderer
 			
 		#print(str(A))
 		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
-	override void on_config()
+	func override on_config()
 		stutter = create_stutter(synth.config.key_stutter)
 		env.set(synth.config.attack, DECAY, SUSTAIN, synth.config.release, synth.sample_rate)
 
-	override void on_end()
+	func override on_end()
 		env.end()
-	override void on_start(float volume)
+	func override on_start(volume: float)
 		env.start(volume)
 		stutter_offset = 0
 		#filter.reset()
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		int n = len(buf)
 		
 		float[] b = osci[0].read(n) * (synth.config.intensity[0] * A[0])
@@ -196,11 +196,11 @@ class HammondRenderer extends PitchRenderer
 		return !env.just_killed
 
 class HammondSynthesizer extends Synthesizer
-	HammondConfig config
+	var config: HammondConfig
 
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new HammondPanel(&self)
 	
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new HammondRenderer(self, pitch)

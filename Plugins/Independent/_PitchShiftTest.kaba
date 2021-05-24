@@ -5,11 +5,11 @@ use tsunami
 
 class PitchShift extends TsunamiPlugin
 
-	complex[] buf1
-	complex[] buf2
+	var buf1: complex[]
+	var buf2: complex[]
 	
 	
-	void shift_buf_bad(float[] b, out float[] out, float factor)
+	func shift_buf_bad(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		float f = 1.0 / len(b)
 		int N = len(b)
@@ -25,10 +25,10 @@ class PitchShift extends TsunamiPlugin
 			if ii_s < N
 				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
 
-		out.resize(N)
-		fft_c2r_inv(buf2, out)
+		_out.resize(N)
+		fft_c2r_inv(buf2, _out)
 
-	void shift_buf(float[] b, out float[] out, float factor)
+	func shift_buf(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
@@ -53,11 +53,11 @@ class PitchShift extends TsunamiPlugin
 					buf2[j] += M * buf1[i]
 
 
-		out.resize(N)
-		fft_c2r_inv(buf2, out)
-		out /= N
+		_out.resize(N)
+		fft_c2r_inv(buf2, _out)
+		_out /= N
 		
-	void shift_buf_fast(float[] b, out float[] out, float factor)
+	func shift_buf_fast(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
@@ -81,11 +81,11 @@ class PitchShift extends TsunamiPlugin
 					complex M = M0 * (1/x)
 					buf2[j] += M * buf1[i]
 
-		out.resize(N)
-		fft_c2r_inv(buf2, out)
-		out /= N
+		_out.resize(N)
+		fft_c2r_inv(buf2, _out)
+		_out /= N
 
-	override void on_start()
+	func override on_start()
 		bool show_val = false
 		bool show_fft = false
 		
@@ -93,7 +93,7 @@ class PitchShift extends TsunamiPlugin
 		float k = 100
 		print("----------- orig ------------")
 		print("k={{k}}")
-		let buf = [for i in 0:N sin(2*pi*k*i / float(N))]
+		var buf = [for i in 0:N sin(2*pi*k*i / float(N))]
 #		print(buf)
 #		print("fft:")
 		
@@ -105,7 +105,7 @@ class PitchShift extends TsunamiPlugin
 		print("----------- off-grid ------------")
 		float k2 = k + 0.42341
 		print("k={{k2}}")
-		let buf_off = [for i in 0:N sin(2*pi*k2*i / float(N))]
+		var buf_off = [for i in 0:N sin(2*pi*k2*i / float(N))]
 		if show_val
 			print(buf_off)
 		
@@ -114,7 +114,7 @@ class PitchShift extends TsunamiPlugin
 		if show_fft
 			print(str(z2))
 		
-	#	let c = [for i in 0:N/2+1 sin(pi*(k2-i2f(i))) / (pi*(k2-i))]
+	#	var c = [for i in 0:N/2+1 sin(pi*(k2-i2f(i))) / (pi*(k2-i))]
 	#	#let c = [for i in 0:N/2 200 / (pi*(k-i))]
 	#	print("guess....")
 	#	print(c)

@@ -6,15 +6,15 @@ use helper.tone
 
 
 class PitchRecognitionPanel extends ConfigPanel
-	override PitchRecognition* c
-	float note_error
+	var override c: PitchRecognition*
+	var note_error: float
 	
-	override void __init__(Module _p)
+	func override __init__(_p: Module)
 		add_drawing_area("", 5, 5, "drawing")
 	
 		event_x("drawing", "hui:draw", on_draw)
 
-	string get_note(float f)
+	func get_note(f: float) -> string
 		float pitch = log(f / 440.0) / log(2.0) * 12 + 69
 		int rel = int(pitch + 0.5) % 12
 		note_error = loop(pitch, -0.5, 0.5)
@@ -22,7 +22,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		#loopf(fl, 0, 1)
 		#note = i2s(n)
 
-	void draw_volume(Painter p)
+	func draw_volume(p: Painter)
 		p.set_color(color(0.8, 0.8, 0.8, 1))
 		float y0 = 30
 		float y1 = p.height - 5
@@ -31,7 +31,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		p.set_color(color(0.6, 0.6, 0.6, 1))
 		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	void on_draw(Painter p)
+	func on_draw(p: Painter)
 		p.set_color(colors.background)
 		p.set_font_size(12)
 		p.draw_rect(0, 0, p.width, p.height)
@@ -61,32 +61,32 @@ class PitchRecognitionPanel extends ConfigPanel
 
 class PitchRecognition extends TsunamiPlugin
 	
-	SignalChain* chain
-	PitchDetector* pitch_detector
-	PitchRecognitionPanel* panel
-	int runner
+	var chain: SignalChain*
+	var pitch_detector: PitchDetector*
+	var panel: PitchRecognitionPanel*
+	var runner: int
 	
-	override void on_start()
+	func override on_start()
 		panel = nil
 		chain = session.create_signal_chain("pitch-recognition")
-		let input = chain.add(Module.Type.STREAM, "AudioInput")
+		var input = chain.add(Module.Type.STREAM, "AudioInput")
 		pitch_detector = chain.add(Module.Type.PITCH_DETECTOR, "")
-		let out = chain.add(Module.Type.PLUMBING, "MidiSucker")
+		var out = chain.add(Module.Type.PLUMBING, "MidiSucker")
 		chain.connect(input, 0, pitch_detector, 0)
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
 		runner = hui.run_repeated(0.05, self, on_update)
 		
-	override void on_stop()
+	func override on_stop()
 		hui.cancel_runner(runner)
 		del chain
 	
-	void on_update()
+	func on_update()
 		if panel
 			panel.redraw("drawing")
 	
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		panel = new PitchRecognitionPanel(self)
 		return panel
 	

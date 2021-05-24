@@ -3,16 +3,16 @@ use helper.tone
 
 
 class SinusRenderer extends PitchRenderer
-	float volume = 0
-	float phase = 0
-	override SinusSynthesizer* synth
+	var volume = 0.
+	var phase = 0.
+	var override synth: SinusSynthesizer*
 
-	override void on_start(float v)
+	func override on_start(v: float)
 		volume = v
-	override void on_end()
+	func override on_end()
 		volume = 0
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 			buf.c[0][i] += sin(phase) * volume
 			phase += delta_phi
@@ -23,5 +23,5 @@ class SinusRenderer extends PitchRenderer
 
 class SinusSynthesizer extends Synthesizer
 
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new SinusRenderer(self, pitch)

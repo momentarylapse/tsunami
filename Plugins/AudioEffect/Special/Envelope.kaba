@@ -1,27 +1,27 @@
 use tsunami
 
-const string AUTO_CONFIG_A = "0:1:0.0001:1:"
-const string AUTO_CONFIG_B = "0:1:0.0001:1:"
-const string AUTO_CONFIG_C = "0:1:0.0001:1:"
+const AUTO_CONFIG_A = "0:1:0.0001:1:"
+const AUTO_CONFIG_B = "0:1:0.0001:1:"
+const AUTO_CONFIG_C = "0:1:0.0001:1:"
 
 class EnvConfig extends Module.Config
-	float a, b, c
-	override void reset()
+	var a, b, c: float
+	func override reset()
 		a = 0.1
 		b = 0.01
 		c = 0.0
 
 class Envelope extends AudioEffect
-	EnvConfig config
-	float[2] value
-	float[2] dvalue
+	var config: EnvConfig
+	var value: float[2]
+	var dvalue: float[2]
 	
-	override void reset_state()
+	func override reset_state()
 		for i in 0:2
 			value[i] = 0
 			dvalue[i] = 0
 
-	void do(out float[] buf, int c)
+	func do(out buf: float[], c: int)
 		
 		float v = value[c]
 		float dv = dvalue[c]
@@ -41,7 +41,7 @@ class Envelope extends AudioEffect
 		value[c] = v
 		dvalue[c] = dv
 			
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		do(buf.c[0], 0)
 		if buf.channels > 1
 			do(buf.c[1], 1)

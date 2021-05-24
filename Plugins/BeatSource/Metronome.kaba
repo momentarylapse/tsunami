@@ -1,35 +1,35 @@
 use tsunami
 
-const string AUTO_CONFIG_BPM = "1:360:1:1:/min"
-const string AUTO_CONFIG_BEATS = "1:20"
-const string AUTO_CONFIG_SUB_BEATS = "1:20"
+const AUTO_CONFIG_BPM = "1:360:1:1:/min"
+const AUTO_CONFIG_BEATS = "1:20"
+const AUTO_CONFIG_SUB_BEATS = "1:20"
 
 class Config extends Module.Config
 	
 	# rhythm
-	float bpm
-	int beats
-	int sub_beats
+	var bpm: float
+	var beats: int
+	var sub_beats: int
 	
-	override void reset()
+	func override reset()
 		bpm = 90
 		beats = 4
 		sub_beats = 1
 
 class MetronomeSource extends BeatSource
-	Config config
+	var config: Config
 	
 	# state/output
-	int next_beat
-	int next_sub_beat
+	var next_beat: int
+	var next_sub_beat: int
 
-	int offset_sub_beat
-	float fraction_beat
-	int samples_beat
-	int samples_sub_beat
+	var offset_sub_beat: int
+	var fraction_beat: float
+	var samples_beat: int
+	var samples_sub_beat: int
 	
 
-	override void reset_state()
+	func override reset_state()
 
 		offset_sub_beat = 0
 		next_beat = 0
@@ -38,7 +38,7 @@ class MetronomeSource extends BeatSource
 		
 		on_config()
 		
-	override int read(out Beat[] beats, int samples)
+	func override read(out beats: Beat[], samples: int) -> int
 	
 		# render clicks
 		while offset_sub_beat < samples
@@ -67,32 +67,32 @@ class MetronomeSource extends BeatSource
 		
 		return samples
 	
-	override int beats_per_bar()
+	func override beats_per_bar() -> int
 		return config.beats
 	
-	override int cur_beat()
+	func override cur_beat() -> int
 		if next_beat == 0
 			return config.beats - 1
 		return next_beat - 1
 	
-	override float beat_fraction()
+	func override beat_fraction() -> float
 		return fraction_beat
 
-	int cur_sub_beat()
+	func cur_sub_beat() -> int
 		if next_sub_beat == 0
 			return config.sub_beats - 1
 		return next_sub_beat - 1
 	
-	void set_bpm(float bpm)
+	func set_bpm(bpm: float)
 		config.bpm = bpm
 		changed()
 	
-	void set_beats(int beats, int sub_beats)
+	func set_beats(beats: int, sub_beats: int)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()
 	
-	override void on_config()
+	func override on_config()
 		float sample_rate = session.sample_rate()
 		float dt_b = 60.0 / config.bpm
 		float dt_s = dt_b / config.sub_beats

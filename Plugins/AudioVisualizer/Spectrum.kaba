@@ -4,29 +4,29 @@ use hui
 use tsunami
 use helper.grid
 
-const int NUM_SAMPLES = 4096
-const float MIN_FREQ = 20.0
-const float MAX_FREQ = 20000.0
-const int N = 512
+const NUM_SAMPLES = 4096
+const MIN_FREQ = 20.0
+const MAX_FREQ = 20000.0
+const N = 512
 
 enum
 	TYPE_LINEAR
 	TYPE_LOGARITHM
 
-float todb(float v)
+func todb(v: float) -> float
 	if v <= 0.000000001
 		return -100
 	return log(v) / log(10) * 10
 
 class SpecGrid extends Grid
-	int type
-	complex[] pr, pl
-	float[] ffr, ffl
+	var type: int
+	var pr, pl: complex[]
+	var ffr, ffl: float[]
 	
-	override void __init__()
+	func override __init__()
 		set_type(TYPE_LOGARITHM)
 	
-	void set(float[] _ffl, float[] _ffr)
+	func set(_ffl: float[], _ffr: float[])
 		ffl = _ffl
 		ffr = _ffr
 		
@@ -34,7 +34,7 @@ class SpecGrid extends Grid
 		#print(str(pr))
 		
 
-	void create_lines()
+	func create_lines()
 		pr.resize(len(ffr))
 		pl.resize(len(ffl))
 		for i in 0:len(ffr)
@@ -49,7 +49,7 @@ class SpecGrid extends Grid
 				#float db_min = db_max - 80
 				pr[i].y = todb(ffr[i])#clamp(todb(ffr[i]), db_min, db_max)
 				pl[i].y = todb(ffl[i])#clamp(todb(ffl[i]), db_min, db_max)
-	void set_type(int t)
+	func set_type(t: int)
 		type = t
 		if type == TYPE_LINEAR
 			y_axis.set(0, 1, false, "")
@@ -59,15 +59,15 @@ class SpecGrid extends Grid
 			y_axis.set(db_min, db_max, false, "db")
 		create_lines()
 
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 		draw_curve_b(c, pr, true, color.RED)
 		draw_curve_b(c, pl, true, color.BLUE)
 
 class SpectrumPanel extends ConfigPanel
-	override Spectrum* c
-	SpecGrid grid
+	var override c: Spectrum*
+	var grid: SpecGrid
 	
-	override void __init__(Module _sp)
+	func override __init__(_sp: Module)
 		from_source("
 DrawingArea area '' height=200 expandy")
 		
@@ -76,10 +76,10 @@ DrawingArea area '' height=200 expandy")
 		
 		c.subscribe(self, on_update, "Change")
 	
-	override void __delete__()
+	func override __delete__()
 		c.unsubscribe(self)
 	
-	void on_update()
+	func on_update()
 		c.lock()
 		grid.set(c.ffl[c.current_reading], c.ffr[c.current_reading])
 		c.unlock()
@@ -87,14 +87,14 @@ DrawingArea area '' height=200 expandy")
 
 class Spectrum extends AudioVisualizer
 	
-	float[][2] ffr, ffl
-	float peak_max
+	var ffr, ffl: float[][2]
+	var peak_max: float
 	
-	override void __init__()
+	func override __init__()
 		set_chunk_size(NUM_SAMPLES)
 		
 	
-	void do(AudioBuffer buf)
+	func do(buf: AudioBuffer)
 		complex[] fl, fr
 		buf.get_spectrum(fl, fr, 4096)
 		float[] tffl, tffr
@@ -130,11 +130,11 @@ class Spectrum extends AudioVisualizer
 		ffl[next_writing] = tffl
 		ffr[next_writing] = tffr
 	
-	override void process(AudioBuffer buf)
+	func override process(buf: AudioBuffer)
 		do(buf)
 		flip()
 		
-	override ConfigPanel* create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new SpectrumPanel(self)
 
 

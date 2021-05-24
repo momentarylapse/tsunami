@@ -4,29 +4,29 @@
 use tsunami
 use helper.grid
 
-const string AUTO_CONFIG_DELAY = "0:1:1:1000:ms"
-const string AUTO_CONFIG_VOLUME = "0:2:0.1:100:%"
-const string AUTO_CONFIG_FEEDBACK = "0:1:0.1:100:%"
+const AUTO_CONFIG_DELAY = "0:1:1:1000:ms"
+const AUTO_CONFIG_VOLUME = "0:2:0.1:100:%"
+const AUTO_CONFIG_FEEDBACK = "0:1:0.1:100:%"
 
 
 
 
 class Echo extends AudioEffect
 	class Config extends Module.Config
-		float delay
-		float volume
-		float feedback
+		var delay: float
+		var volume: float
+		var feedback: float
 
-		override void reset()
+		func override reset()
 			volume = 0.2
 			feedback = 0.5
 			delay = 0.15
-	Config config
-	AudioBuffer buf_temp
-	int offset
+	var config: Config
+	var buf_temp: AudioBuffer
+	var offset: int
 
 
-	void do_delay(out float[] b, out float[] d)
+	func do_delay(out b: float[], out d: float[])
 		int p = offset % len(d)
 		for bb in b
 	
@@ -45,7 +45,7 @@ class Echo extends AudioEffect
 				p = 0
 
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 
 		int delay_samples = session.sample_rate() * config.delay
 		buf_temp.set_channels(buf.channels)
@@ -56,7 +56,7 @@ class Echo extends AudioEffect
 	
 		offset += len(buf)
 	
-	override void reset_state()
+	func override reset_state()
 		buf_temp.clear()
 		offset = 0
 		on_config()

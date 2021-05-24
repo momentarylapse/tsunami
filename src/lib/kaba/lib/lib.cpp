@@ -655,6 +655,7 @@ void init(Abi abi, bool allow_std_lib) {
 	add_type_cast(20, TypeFloat32, TypeInt, "float.__int__");
 	add_type_cast(10, TypeInt, TypeChar, "int.__char__");
 	add_type_cast(20, TypeChar, TypeInt, "char.__int__");
+	add_type_cast(30, TypeBoolList, TypeBool, "bool[].__bool__");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	add_type_cast(50, TypePointer, TypeString, "p2s");
 	add_package("math");

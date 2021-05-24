@@ -2,20 +2,20 @@
 # Title[Deutsch] = Oktavieren
 use tsunami
 
-const string AUTO_CONFIG_LEVEL = "0:1:0.1:100:%"
+const AUTO_CONFIG_LEVEL = "0:1:0.1:100:%"
 
 
 class Octaver extends AudioEffect
 	class Config extends Module.Config
-		float level
-		override void reset()
+		var level: float
+		func override reset()
 			level = 0.5
-	Config config
+	var config: Config
 
-	void do_octaver(out float[] b)
+	func do_octaver(out b: float[])
 		for bb in b
 			bb = (bb * bb) * config.level + bb * (1 - config.level)
 
-	override void process(out AudioBuffer buf)
+	func override process(out buf: AudioBuffer)
 		for c in buf.c
 			do_octaver(c)

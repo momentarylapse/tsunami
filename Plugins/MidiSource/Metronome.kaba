@@ -1,43 +1,43 @@
 use tsunami
 
-const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
-const string AUTO_CONFIG_BPM = "1:360:1:1:/min"
-const string AUTO_CONFIG_BEATS = "1:20"
-const string AUTO_CONFIG_SUB_BEATS = "1:20"
+const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+const AUTO_CONFIG_BPM = "1:360:1:1:/min"
+const AUTO_CONFIG_BEATS = "1:20"
+const AUTO_CONFIG_SUB_BEATS = "1:20"
 
 class Config extends Module.Config
 	
 	# sound
-	float volume
+	var volume: float
 	
 	# rhythm
-	float bpm
-	int beats
-	int sub_beats
+	var bpm: float
+	var beats: int
+	var sub_beats: int
 	
-	override void reset()
+	func override reset()
 		volume = 1
 		bpm = 90
 		beats = 4
 		sub_beats = 1
 
 class MetronomeSource extends MidiSource
-	Config config
+	var config: Config
 	
-	bool pause
+	var pause: bool
 	
 	# state/output
-	int cur_beat
-	int cur_sub_beat
+	var cur_beat: int
+	var cur_sub_beat: int
 
-	int offset_sub_beat
-	float fraction_beat
+	var offset_sub_beat: int
+	var fraction_beat: float
 	#float fraction_sub_beat
-	int samples_beat
-	int samples_sub_beat
+	var samples_beat: int
+	var samples_sub_beat: int
 	
 
-	override void reset_state()
+	func override reset_state()
 		offset_sub_beat = 0
 		cur_beat = 0
 		cur_sub_beat = -1
@@ -48,7 +48,7 @@ class MetronomeSource extends MidiSource
 		
 		on_config()
 		
-	override int read(out MidiEventBuffer midi)
+	func override read(out midi: MidiEventBuffer) -> int
 		if pause
 			return midi.samples
 	
@@ -77,20 +77,20 @@ class MetronomeSource extends MidiSource
 		
 		return midi.samples
 	
-	void set_bpm(float bpm)
+	func set_bpm(bpm: float)
 		config.bpm = bpm
 		changed()
 	
-	void set_beats(int beats, int sub_beats)
+	func set_beats(beats: int, sub_beats: int)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()
 	
-	void set_pause(bool _pause)
+	func set_pause(_pause: bool)
 		pause = _pause
 		changed()
 	
-	override void on_config()
+	func override on_config()
 		float sample_rate = session.sample_rate()
 		float dt_b = 60.0 / config.bpm
 		float dt_s = dt_b / config.sub_beats

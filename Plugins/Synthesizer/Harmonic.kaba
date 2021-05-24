@@ -3,13 +3,13 @@ use tsunami
 use helper.tone
 use helper.grid
 
-const int NUM_HARMONICS = 10
+const NUM_HARMONICS = 10
 
 
 class HarmonicConfig extends Module.Config
-	float[NUM_HARMONICS] intensity
-	float release
-	override void reset()
+	var intensity: float[NUM_HARMONICS]
+	var release: float
+	func override reset()
 		intensity[0] = 0.3
 		intensity[1] = 0.1
 		for i in 2:NUM_HARMONICS
@@ -17,11 +17,11 @@ class HarmonicConfig extends Module.Config
 		release = 0.02
 
 class HarmonicGrid extends Grid
-	HarmonicConfig *hc
-	HarmonicPanel *p
-	int Selected, Hover
+	var hc: HarmonicConfig*
+	var p: HarmonicPanel*
+	var Selected, Hover: int
 
-	override void on_draw(Painter c)
+	func override on_draw(c: Painter)
 	
 		# points
 		for i,n in hc.intensity
@@ -32,11 +32,11 @@ class HarmonicGrid extends Grid
 			draw_point2(c, z1, n == Selected, n == Hover)
 			
 	# left button down -> select
-	override void on_left_button_down()
+	func override on_left_button_down()
 		Selected = Hover
 		redraw()
 
-	override void on_mouse_move()
+	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l and (Selected >= 0)
 			hc.intensity[Selected] = clamp(get_mouse2().y, 0, 1)
@@ -51,10 +51,10 @@ class HarmonicGrid extends Grid
 		redraw()
 
 class HarmonicPanel extends ConfigPanel
-	override HarmonicSynthesizer *c
-	HarmonicConfig *hc
-	HarmonicGrid grid
-	override void __init__(Module _s)
+	var override c: HarmonicSynthesizer*
+	var hc: HarmonicConfig*
+	var grid: HarmonicGrid
+	func override __init__(_s: Module)
 		add_grid("", 0, 0, "main_table")
 		set_target("main_table")
 		add_grid("", 0, 0, "table1")
@@ -72,29 +72,29 @@ class HarmonicPanel extends ConfigPanel
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	void on_change()
+	func on_change()
 		hc.release = get_float("release") / 1000
 		changed()
 	
-	override void update()
+	func override update()
 		redraw("drawing")
 		set_float("release", hc.release * 1000)
 
 
 class HarmonicRenderer extends PitchRenderer
-	float volume = 0
-	float phi = 0
-	EnvelopeADSR env
-	override HarmonicSynthesizer* synth
-	override void on_config()
+	var volume = 0.
+	var phi = 0.
+	var env: EnvelopeADSR
+	var override synth: HarmonicSynthesizer*
+	func override on_config()
 		env.set(0.01, 0.01, 0.7, synth.config.release, synth.sample_rate)
 
-	override void on_end()
+	func override on_end()
 		env.end()
-	override void on_start(float volume)
+	func override on_start(volume: float)
 		env.start(volume)
 
-	override bool render(out AudioBuffer buf)
+	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 			volume = env.get()
 
@@ -114,11 +114,11 @@ class HarmonicRenderer extends PitchRenderer
 		return volume > 0
 
 class HarmonicSynthesizer extends Synthesizer
-	HarmonicConfig config
+	var config: HarmonicConfig
 
 
-	override ConfigPanel *create_panel()
+	func override create_panel() -> ConfigPanel*
 		return new HarmonicPanel(self)
 	
-	override PitchRenderer* create_pitch_renderer(int pitch)
+	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
 		return new HarmonicRenderer(self, pitch)

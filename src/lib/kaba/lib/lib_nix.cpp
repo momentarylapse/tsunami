@@ -12,7 +12,7 @@ namespace kaba {
 
 
 #ifdef _X_USE_NIX_
-	#define nix_p(p)		(void*)p
+	#define nix_p(p)		p
 
 
 #pragma GCC push_options
@@ -95,96 +95,96 @@ void SIAddPackageNix() {
 	TypeUniformBuffer	= add_type  ("UniformBuffer", sizeof(nix::UniformBuffer));
 	
 	add_class(TypeVertexBuffer);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::VertexBuffer::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::VertexBuffer::__init__));
 			func_add_param("format", TypeString);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::VertexBuffer::__delete__)));
-		class_add_func("update", TypeVoid, nix_p(mf(&nix::VertexBuffer::update)));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::VertexBuffer::__delete__));
+		class_add_func("update", TypeVoid, nix_p(&nix::VertexBuffer::update));
 			func_add_param("index", TypeInt);
 			func_add_param("data", TypeDynamicArray);
-		class_add_func("create_rect", TypeVoid, nix_p(mf(&nix::VertexBuffer::create_rect)));
+		class_add_func("create_rect", TypeVoid, nix_p(&nix::VertexBuffer::create_rect));
 			func_add_param("dest", TypeRect);
 			func_add_param("source", TypeRect);
-		class_add_func("count", TypeInt, nix_p(mf(&nix::VertexBuffer::count)));
+		class_add_func("count", TypeInt, nix_p(&nix::VertexBuffer::count));
 
 
 	add_class(TypeTexture);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::Texture::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::Texture::__init__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::Texture::__init3__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::Texture::__init3__));
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::Texture::__delete__)));
-		class_add_func("overwrite", TypeVoid, nix_p(mf(&nix::Texture::overwrite)));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__));
+		class_add_func("overwrite", TypeVoid, nix_p(&nix::Texture::overwrite));
 			func_add_param("image", TypeImage);
-		class_add_func("read", TypeVoid, nix_p(mf(&nix::Texture::read)));
+		class_add_func("read", TypeVoid, nix_p(&nix::Texture::read));
 			func_add_param("image", TypeImage);
-		class_add_func("read_float", TypeVoid, nix_p(mf(&nix::Texture::read_float)));
+		class_add_func("read_float", TypeVoid, nix_p(&nix::Texture::read_float));
 			func_add_param("data", TypeFloatList);
-		class_add_func("write_float", TypeVoid, nix_p(mf(&nix::Texture::write_float)));
+		class_add_func("write_float", TypeVoid, nix_p(&nix::Texture::write_float));
 			func_add_param("data", TypeFloatList);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 		class_add_func("load", TypeTextureP, nix_p(&__LoadTexture), Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_elementx("width", TypeInt, &nix::Texture::width);
-		class_add_elementx("height", TypeInt, &nix::Texture::height);
+		class_add_element("width", TypeInt, nix_p(&nix::Texture::width));
+		class_add_element("height", TypeInt, nix_p(&nix::Texture::height));
 
 	add_class(TypeImageTexture);
 		class_derive_from(TypeTexture, false, false);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::ImageTexture::__init__)), Flags::OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::ImageTexture::__init__), Flags::OVERRIDE);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture, false, false);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::DepthBuffer::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::DepthBuffer::__init__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture, false, false);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::CubeMap::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::CubeMap::__init__));
 			func_add_param("size", TypeInt);
 
 	add_class(TypeFrameBuffer);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::FrameBuffer::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::FrameBuffer::__init__));
 			func_add_param("attachments", TypeTexturePList);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::FrameBuffer::__delete__)));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::FrameBuffer::__delete__));
 		class_add_const("DEFAULT", TypeFrameBufferP, nix_p(&nix::FrameBuffer::DEFAULT));
-		class_add_elementx("width", TypeInt, &nix::FrameBuffer::width);
-		class_add_elementx("height", TypeInt, &nix::FrameBuffer::height);
-		class_add_elementx("color_attachments", TypeTexturePList, &nix::FrameBuffer::color_attachments);
-		class_add_elementx("depth_buffer", TypeDepthBufferP, &nix::FrameBuffer::depth_buffer);
+		class_add_element("width", TypeInt, nix_p(&nix::FrameBuffer::width));
+		class_add_element("height", TypeInt, nix_p(&nix::FrameBuffer::height));
+		class_add_element("color_attachments", TypeTexturePList, nix_p(&nix::FrameBuffer::color_attachments));
+		class_add_element("depth_buffer", TypeDepthBufferP, nix_p(&nix::FrameBuffer::depth_buffer));
 
 	add_class(TypeShader);
-		class_add_func("location", TypeInt, nix_p(mf(&nix::Shader::get_location)));
+		class_add_func("location", TypeInt, nix_p(&nix::Shader::get_location));
 			func_add_param("name", TypeString);
-		class_add_func("link_uniform_block", TypeVoid, nix_p(mf(&nix::Shader::link_uniform_block)));
+		class_add_func("link_uniform_block", TypeVoid, nix_p(&nix::Shader::link_uniform_block));
 			func_add_param("name", TypeString);
 			func_add_param("binding", TypeInt);
-		class_add_func("set_float", TypeVoid, nix_p(mf(&nix::Shader::set_float)));
+		class_add_func("set_float", TypeVoid, nix_p(&nix::Shader::set_float));
 			func_add_param("loc", TypeInt);
 			func_add_param("f", TypeFloat32);
-		class_add_func("set_matrix", TypeVoid, nix_p(mf(&nix::Shader::set_matrix)));
+		class_add_func("set_matrix", TypeVoid, nix_p(&nix::Shader::set_matrix));
 			func_add_param("loc", TypeInt);
 			func_add_param("m", TypeMatrix);
-		class_add_func("set_color", TypeVoid, nix_p(mf(&nix::Shader::set_color)));
+		class_add_func("set_color", TypeVoid, nix_p(&nix::Shader::set_color));
 			func_add_param("loc", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_func("set_int", TypeVoid, nix_p(mf(&nix::Shader::set_int)));
+		class_add_func("set_int", TypeVoid, nix_p(&nix::Shader::set_int));
 			func_add_param("loc", TypeInt);
 			func_add_param("i", TypeInt);
-		class_add_func("set", TypeVoid, nix_p(mf(&nix::Shader::set_data)));
+		class_add_func("set", TypeVoid, nix_p(&nix::Shader::set_data));
 			func_add_param("loc", TypeInt);
 			func_add_param("data", TypePointer);
 			func_add_param("size", TypeInt);
-		class_add_func("dispatch", TypeVoid, nix_p(mf(&nix::Shader::dispatch)));
+		class_add_func("dispatch", TypeVoid, nix_p(&nix::Shader::dispatch));
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
@@ -197,12 +197,12 @@ void SIAddPackageNix() {
 
 
 		add_class(TypeUniformBuffer);
-			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::UniformBuffer::__init__)));
-			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::UniformBuffer::__delete__)));
-			class_add_func("update", TypeVoid, nix_p(mf(&nix::UniformBuffer::update)));
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::UniformBuffer::__init__));
+			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::UniformBuffer::__delete__));
+			class_add_func("update", TypeVoid, nix_p(&nix::UniformBuffer::update));
 				func_add_param("data", TypePointer);
 				func_add_param("size", TypeInt);
-			class_add_func("update", TypeVoid, nix_p(mf(&nix::UniformBuffer::update_array)));
+			class_add_func("update", TypeVoid, nix_p(&nix::UniformBuffer::update_array));
 				func_add_param("data", TypeDynamicArray);
 	
 		// drawing
@@ -284,7 +284,7 @@ void SIAddPackageNix() {
 		func_add_param("t", TypeTexturePList);
 	add_func("set_shader", TypeVoid, nix_p(&nix::SetShader), Flags::STATIC);
 		func_add_param("s", TypeShader);
-	add_func("bind_uniform", TypeVoid, nix_p(mf(&nix::BindUniform)), Flags::STATIC);
+	add_func("bind_uniform", TypeVoid, nix_p(&nix::BindUniform), Flags::STATIC);
 		func_add_param("buf", TypeUniformBuffer);
 		func_add_param("binding", TypeInt);
 	add_func("screen_shot_to_image", TypeVoid, nix_p(&nix::ScreenShotToImage), Flags::STATIC);
@@ -294,37 +294,37 @@ void SIAddPackageNix() {
 	//add_ext_var("fullscreen", TypeBool, nix_p(&nix::Fullscreen));
 
 	// alpha operations
-	add_const("ALPHA_NONE",             TypeInt, nix_p(ALPHA_NONE));
-	add_const("ALPHA_ZERO",             TypeInt, nix_p(ALPHA_ZERO));
-	add_const("ALPHA_ONE",              TypeInt, nix_p(ALPHA_ONE));
-	add_const("ALPHA_COLOR_KEY",        TypeInt, nix_p(ALPHA_COLOR_KEY_SMOOTH));
-	add_const("ALPHA_COLOR_KEY_HARD",   TypeInt, nix_p(ALPHA_COLOR_KEY_HARD));
-	add_const("ALPHA_ADD",              TypeInt, nix_p(ALPHA_ADD));
-	add_const("ALPHA_MATERIAL",         TypeInt, nix_p(ALPHA_MATERIAL));
-	add_const("ALPHA_SOURCE_COLOR",     TypeInt, nix_p(ALPHA_SOURCE_COLOR));
-	add_const("ALPHA_SOURCE_INV_COLOR", TypeInt, nix_p(ALPHA_SOURCE_INV_COLOR));
-	add_const("ALPHA_SOURCE_ALPHA",     TypeInt, nix_p(ALPHA_SOURCE_ALPHA));
-	add_const("ALPHA_SOURCE_INV_ALPHA", TypeInt, nix_p(ALPHA_SOURCE_INV_ALPHA));
-	add_const("ALPHA_DEST_COLOR",       TypeInt, nix_p(ALPHA_DEST_COLOR));
-	add_const("ALPHA_DEST_INV_COLOR",   TypeInt, nix_p(ALPHA_DEST_INV_COLOR));
-	add_const("ALPHA_DEST_ALPHA",       TypeInt, nix_p(ALPHA_DEST_ALPHA));
-	add_const("ALPHA_DEST_INV_ALPHA",   TypeInt, nix_p(ALPHA_DEST_INV_ALPHA));
+	add_enum("ALPHA_NONE",             TypeInt, nix_p(ALPHA_NONE));
+	add_enum("ALPHA_ZERO",             TypeInt, nix_p(ALPHA_ZERO));
+	add_enum("ALPHA_ONE",              TypeInt, nix_p(ALPHA_ONE));
+	add_enum("ALPHA_COLOR_KEY",        TypeInt, nix_p(ALPHA_COLOR_KEY_SMOOTH));
+	add_enum("ALPHA_COLOR_KEY_HARD",   TypeInt, nix_p(ALPHA_COLOR_KEY_HARD));
+	add_enum("ALPHA_ADD",              TypeInt, nix_p(ALPHA_ADD));
+	add_enum("ALPHA_MATERIAL",         TypeInt, nix_p(ALPHA_MATERIAL));
+	add_enum("ALPHA_SOURCE_COLOR",     TypeInt, nix_p(ALPHA_SOURCE_COLOR));
+	add_enum("ALPHA_SOURCE_INV_COLOR", TypeInt, nix_p(ALPHA_SOURCE_INV_COLOR));
+	add_enum("ALPHA_SOURCE_ALPHA",     TypeInt, nix_p(ALPHA_SOURCE_ALPHA));
+	add_enum("ALPHA_SOURCE_INV_ALPHA", TypeInt, nix_p(ALPHA_SOURCE_INV_ALPHA));
+	add_enum("ALPHA_DEST_COLOR",       TypeInt, nix_p(ALPHA_DEST_COLOR));
+	add_enum("ALPHA_DEST_INV_COLOR",   TypeInt, nix_p(ALPHA_DEST_INV_COLOR));
+	add_enum("ALPHA_DEST_ALPHA",       TypeInt, nix_p(ALPHA_DEST_ALPHA));
+	add_enum("ALPHA_DEST_INV_ALPHA",   TypeInt, nix_p(ALPHA_DEST_INV_ALPHA));
 	// stencil operations
-	add_const("STENCIL_NONE",               TypeInt, nix_p(STENCIL_NONE));
-	add_const("STENCIL_INCREASE",           TypeInt, nix_p(STENCIL_INCREASE));
-	add_const("STENCIL_DECREASE",           TypeInt, nix_p(STENCIL_DECREASE));
-	add_const("STENCIL_SET",                TypeInt, nix_p(STENCIL_SET));
-	add_const("STENCIL_MASK_EQUAL",         TypeInt, nix_p(STENCIL_MASK_EQUAL));
-	add_const("STENCIL_MASK_NOT_EQUAL",     TypeInt, nix_p(STENCIL_MASK_NOT_EQUAL));
-	add_const("STENCIL_MASK_LESS",          TypeInt, nix_p(STENCIL_MASK_LESS));
-	add_const("STENCIL_MASK_LESS_EQUAL",    TypeInt, nix_p(STENCIL_MASK_LESS_EQUAL));
-	add_const("STENCIL_MASK_GREATER",       TypeInt, nix_p(STENCIL_MASK_GREATER));
-	add_const("STENCIL_MASK_GREATER_EQUAL", TypeInt, nix_p(STENCIL_MASK_GREATER_EQUAL));
-	add_const("STENCIL_RESET",              TypeInt, nix_p(STENCIL_RESET));
+	add_enum("STENCIL_NONE",               TypeInt, nix_p(STENCIL_NONE));
+	add_enum("STENCIL_INCREASE",           TypeInt, nix_p(STENCIL_INCREASE));
+	add_enum("STENCIL_DECREASE",           TypeInt, nix_p(STENCIL_DECREASE));
+	add_enum("STENCIL_SET",                TypeInt, nix_p(STENCIL_SET));
+	add_enum("STENCIL_MASK_EQUAL",         TypeInt, nix_p(STENCIL_MASK_EQUAL));
+	add_enum("STENCIL_MASK_NOT_EQUAL",     TypeInt, nix_p(STENCIL_MASK_NOT_EQUAL));
+	add_enum("STENCIL_MASK_LESS",          TypeInt, nix_p(STENCIL_MASK_LESS));
+	add_enum("STENCIL_MASK_LESS_EQUAL",    TypeInt, nix_p(STENCIL_MASK_LESS_EQUAL));
+	add_enum("STENCIL_MASK_GREATER",       TypeInt, nix_p(STENCIL_MASK_GREATER));
+	add_enum("STENCIL_MASK_GREATER_EQUAL", TypeInt, nix_p(STENCIL_MASK_GREATER_EQUAL));
+	add_enum("STENCIL_RESET",              TypeInt, nix_p(STENCIL_RESET));
 	// fog
-	add_const("FOG_LINEAR", TypeInt, nix_p(FOG_LINEAR));
-	add_const("FOG_EXP",    TypeInt, nix_p(FOG_EXP));
-	add_const("FOG_EXP2",   TypeInt, nix_p(FOG_EXP2));
+	add_enum("FOG_LINEAR", TypeInt, nix_p(FOG_LINEAR));
+	add_enum("FOG_EXP",    TypeInt, nix_p(FOG_EXP));
+	add_enum("FOG_EXP2",   TypeInt, nix_p(FOG_EXP2));
 
 
 	add_ext_var("vb_temp", TypeVertexBufferP, nix_p(&nix::vb_temp));

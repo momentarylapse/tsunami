@@ -12,7 +12,7 @@
 namespace kaba {
 
 #ifdef _X_USE_NET_
-	#define net_p(p)		(void*)p
+	#define net_p(p)		p
 	static NetAddress *_addr;
 	#define GetDAAddress(x)			int_p(&_addr->x)-int_p(_addr)
 #else
@@ -23,9 +23,9 @@ namespace kaba {
 	#define GetDAAddress(x)			0
 #endif
 #ifdef _X_ALLOW_X_
-	#define x_p(p)		(void*)p
+	#define x_p(p)		p
 #else
-	#define x_p(p)		NULL
+	#define x_p(p)		nullptr
 #endif
 
 extern const Class *TypeIntPs;
@@ -72,29 +72,29 @@ void SIAddPackageNet() {
 
 
 	add_class(TypeNetAddress);
-		class_add_element("host", TypeString, GetDAAddress(host));
-		class_add_element("port", TypeInt, GetDAAddress(port));
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(mf(&NetAddress::__init__)));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(mf(&NetAddress::__delete__)));
+		class_add_element("host", TypeString, net_p(&NetAddress::host));
+		class_add_element("port", TypeInt, net_p(&NetAddress::port));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(&NetAddress::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(&NetAddress::__delete__));
 
 	add_class(TypeSocket);
-		class_add_elementx("uid", TypeInt, &Socket::uid);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(mf(&Socket::__init__)));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(mf(&Socket::__delete__)));
-		class_add_func("accept", TypeSocketP, net_p(mf(&Socket::accept)));
-		class_add_func("close", TypeVoid, net_p(mf(&Socket::close)));
-		class_add_func("set_blocking", TypeVoid, net_p(mf(&Socket::set_blocking)));
+		class_add_element("uid", TypeInt, net_p(&Socket::uid));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(&Socket::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(&Socket::__delete__));
+		class_add_func("accept", TypeSocketP, net_p(&Socket::accept));
+		class_add_func("close", TypeVoid, net_p(&Socket::close));
+		class_add_func("set_blocking", TypeVoid, net_p(&Socket::set_blocking));
 			func_add_param("block", TypeBool);
-		class_add_func("set_target", TypeVoid, net_p(mf(&Socket::set_target)));
+		class_add_func("set_target", TypeVoid, net_p(&Socket::set_target));
 			func_add_param("target", TypeNetAddress);
-		class_add_func("get_sender", TypeNetAddress, net_p(mf(&Socket::get_sender)));
-		class_add_func("read", TypeString, net_p(mf(&Socket::read)));
+		class_add_func("get_sender", TypeNetAddress, net_p(&Socket::get_sender));
+		class_add_func("read", TypeString, net_p(&Socket::read));
 			func_add_param("size", TypeInt);
-		class_add_func("write", TypeBool, net_p(mf(&Socket::write)));
+		class_add_func("write", TypeBool, net_p(&Socket::write));
 			func_add_param("buf", TypeString);
-		class_add_func("can_read", TypeBool, net_p(mf(&Socket::can_read)));
-		class_add_func("can_write", TypeBool, net_p(mf(&Socket::can_write)));
-		class_add_func("is_connected", TypeBool, net_p(mf(&Socket::is_connected)));
+		class_add_func("can_read", TypeBool, net_p(&Socket::can_read));
+		class_add_func("can_write", TypeBool, net_p(&Socket::can_write));
+		class_add_func("is_connected", TypeBool, net_p(&Socket::is_connected));
 
 		class_add_func("listen", TypeSocketP, net_p(&__socket_listen__), Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("port", TypeInt);
@@ -106,38 +106,38 @@ void SIAddPackageNet() {
 			func_add_param("port", TypeInt);
 
 	add_class(TypeBinaryBuffer);
-		class_add_elementx("data", TypeString, &BinaryBuffer::data);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(mf(&BinaryBuffer::__init__)));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(mf(&BinaryBuffer::__delete__)));
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(int&))&BinaryBuffer::operator>>)));
+		class_add_element("data", TypeString, net_p(&BinaryBuffer::data));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(&BinaryBuffer::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(&BinaryBuffer::__delete__));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int&))&BinaryBuffer::operator>>));
 			func_add_param("i", TypeIntPs);
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(float&))&BinaryBuffer::operator>>)));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(float&))&BinaryBuffer::operator>>));
 			func_add_param("f", TypeFloatPs);
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(bool&))&BinaryBuffer::operator>>)));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool&))&BinaryBuffer::operator>>));
 			func_add_param("b", TypeBoolPs);
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(char&))&BinaryBuffer::operator>>)));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(char&))&BinaryBuffer::operator>>));
 			func_add_param("c", TypeCharPs);
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(string&))&BinaryBuffer::operator>>)));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(string&))&BinaryBuffer::operator>>));
 			func_add_param("s", TypeString);
-		class_add_func("__rshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(vector&))&BinaryBuffer::operator>>)));
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(vector&))&BinaryBuffer::operator>>));
 			func_add_param("v", TypeVector);
-		class_add_func("clear", TypeVoid, net_p(mf(&BinaryBuffer::clear)));
-		class_add_func("start_block", TypeVoid, net_p(mf(&BinaryBuffer::start_block)));
-		class_add_func("end_block", TypeVoid, net_p(mf(&BinaryBuffer::end_block)));
-		class_add_func("set_pos", TypeVoid, net_p(mf(&BinaryBuffer::set_pos)));
+		class_add_func("clear", TypeVoid, net_p(&BinaryBuffer::clear));
+		class_add_func("start_block", TypeVoid, net_p(&BinaryBuffer::start_block));
+		class_add_func("end_block", TypeVoid, net_p(&BinaryBuffer::end_block));
+		class_add_func("set_pos", TypeVoid, net_p(&BinaryBuffer::set_pos));
 			func_add_param("pos", TypeInt);
-		class_add_func("get_pos", TypeInt, net_p(mf(&BinaryBuffer::get_pos)));
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(int))&BinaryBuffer::operator<<)));
+		class_add_func("get_pos", TypeInt, net_p(&BinaryBuffer::get_pos));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int))&BinaryBuffer::operator<<));
 			func_add_param("i", TypeInt);
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(float))&BinaryBuffer::operator<<)));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(float))&BinaryBuffer::operator<<));
 			func_add_param("f", TypeFloat32);
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(bool))&BinaryBuffer::operator<<)));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool))&BinaryBuffer::operator<<));
 			func_add_param("b", TypeBool);
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(char))&BinaryBuffer::operator<<)));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(char))&BinaryBuffer::operator<<));
 			func_add_param("c", TypeChar);
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(const string &))&BinaryBuffer::operator<<)));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const string &))&BinaryBuffer::operator<<));
 			func_add_param("s", TypeString);
-		class_add_func("__lshift__", TypeVoid, net_p(mf((void(BinaryBuffer::*)(const vector &))&BinaryBuffer::operator<<)));
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const vector &))&BinaryBuffer::operator<<));
 			func_add_param("v", TypeVector);
 }
 

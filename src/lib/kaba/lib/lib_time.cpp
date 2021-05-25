@@ -26,24 +26,24 @@ void SIAddPackageTime() {
 
 
 	add_class(TypeDate);
-		class_add_elementx("time", TypeInt64, &Date::time);
-		class_add_funcx("format", TypeString, &Date::format, Flags::PURE);
+		class_add_element("time", TypeInt64, &Date::time);
+		class_add_func("format", TypeString, &Date::format, Flags::PURE);
 			func_add_param("f", TypeString);
-		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &Date::str, Flags::PURE);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Date::__assign__);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &Date::str, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Date::__assign__);
 			func_add_param("o", TypeDate);
-		class_add_funcx("now", TypeDate, &Date::now, Flags::STATIC);
+		class_add_func("now", TypeDate, &Date::now, Flags::STATIC);
 
 
 	add_class(TypeTimer);
-		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Timer::reset);
-		class_add_funcx("get", TypeFloat32, &hui::Timer::get);
-		class_add_funcx("reset", TypeVoid, &hui::Timer::reset);
-		class_add_funcx("peek", TypeFloat32, &hui::Timer::peek);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Timer::reset);
+		class_add_func("get", TypeFloat32, &hui::Timer::get);
+		class_add_func("reset", TypeVoid, &hui::Timer::reset);
+		class_add_func("peek", TypeFloat32, &hui::Timer::peek);
 
 
 
-	add_funcx("sleep", TypeVoid, &hui::Sleep, Flags::STATIC);
+	add_func("sleep", TypeVoid, &hui::Sleep, Flags::STATIC);
 		func_add_param("duration", TypeFloat32);
 }
 

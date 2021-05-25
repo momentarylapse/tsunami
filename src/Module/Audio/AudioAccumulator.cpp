@@ -69,8 +69,8 @@ AudioAccumulator::AudioAccumulator() :
 	auto _class = session->plugin_manager->get_class("AudioAccumulatorConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
-		kaba::class_add_elementx("accumulate", kaba::TypeBool, &Config::accumulate);
-		kaba::class_add_elementx("channels", kaba::TypeInt, &Config::channels);
+		kaba::class_add_element("accumulate", kaba::TypeBool, &Config::accumulate);
+		kaba::class_add_element("channels", kaba::TypeInt, &Config::channels);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config.kaba_class = _class;

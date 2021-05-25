@@ -44,9 +44,9 @@ AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "
 	auto _class = session->plugin_manager->get_class("AudioBackupConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
-		kaba::class_add_elementx("channels", kaba::TypeInt, &Config::channels);
-		kaba::class_add_elementx("format", kaba::TypeInt, &Config::format);
-		kaba::class_add_elementx("mode", kaba::TypeInt, &Config::backup_mode);
+		kaba::class_add_element("channels", kaba::TypeInt, &Config::channels);
+		kaba::class_add_element("format", kaba::TypeInt, &Config::format);
+		kaba::class_add_element("mode", kaba::TypeInt, &Config::backup_mode);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config.kaba_class = _class;

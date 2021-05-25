@@ -84,115 +84,115 @@ void SIAddPackageKaba() {
 	
 	
 	add_class(TypeClassElement);
-		class_add_elementx("name", TypeString, &ClassElement::name);
-		class_add_elementx("type", TypeClassP, &ClassElement::type);
-		class_add_elementx("offset", TypeInt, &ClassElement::offset);
+		class_add_element("name", TypeString, &ClassElement::name);
+		class_add_element("type", TypeClassP, &ClassElement::type);
+		class_add_element("offset", TypeInt, &ClassElement::offset);
 
 
 	add_class(TypeClass);
-		class_add_elementx("name", TypeString, &Class::name);
-		class_add_elementx("size", TypeInt, &Class::size);
-		class_add_elementx("type", TypeInt, &Class::type);
-		class_add_elementx("parent", TypeClassP, &Class::parent);
-		class_add_elementx("param", TypeClassPList, &Class::param);
-		class_add_elementx("namespace", TypeClassP, &Class::name_space);
-		class_add_elementx("elements", TypeClassElementList, &Class::elements);
-		class_add_elementx("functions", TypeFunctionPList, &Class::functions);
-		class_add_elementx("classes", TypeClassPList, &Class::classes);
-		class_add_elementx("constants", TypeConstantPList, &Class::constants);
-		class_add_elementx("static_variables", TypeVariablePList, &Class::static_variables);
-		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
+		class_add_element("name", TypeString, &Class::name);
+		class_add_element("size", TypeInt, &Class::size);
+		class_add_element("type", TypeInt, &Class::type);
+		class_add_element("parent", TypeClassP, &Class::parent);
+		class_add_element("param", TypeClassPList, &Class::param);
+		class_add_element("namespace", TypeClassP, &Class::name_space);
+		class_add_element("elements", TypeClassElementList, &Class::elements);
+		class_add_element("functions", TypeFunctionPList, &Class::functions);
+		class_add_element("classes", TypeClassPList, &Class::classes);
+		class_add_element("constants", TypeConstantPList, &Class::constants);
+		class_add_element("static_variables", TypeVariablePList, &Class::static_variables);
+		class_add_func("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
 			func_add_param("c", TypeClass);
-		class_add_funcx("is_pointer", TypeBool, &Class::is_pointer, Flags::PURE);
-		class_add_funcx("is_super_array", TypeBool, &Class::is_super_array, Flags::PURE);
-		class_add_funcx("is_array", TypeBool, &Class::is_array, Flags::PURE);
-		class_add_funcx("is_dict", TypeBool, &Class::is_dict, Flags::PURE);
-		class_add_funcx("get_func", TypeFunctionP, &Class::get_func, Flags::PURE); // selfref
+		class_add_func("is_pointer", TypeBool, &Class::is_pointer, Flags::PURE);
+		class_add_func("is_super_array", TypeBool, &Class::is_super_array, Flags::PURE);
+		class_add_func("is_array", TypeBool, &Class::is_array, Flags::PURE);
+		class_add_func("is_dict", TypeBool, &Class::is_dict, Flags::PURE);
+		class_add_func("get_func", TypeFunctionP, &Class::get_func, Flags::PURE); // selfref
 			func_add_param("name", TypeString);
 			func_add_param("return_type", TypeClass);
 			func_add_param("params", TypeClassPList);
-		class_add_funcx("long_name", TypeString, &Class::long_name, Flags::PURE);
-		class_add_funcx("cname", TypeString, &Class::cname, Flags::PURE);
+		class_add_func("long_name", TypeString, &Class::long_name, Flags::PURE);
+		class_add_func("cname", TypeString, &Class::cname, Flags::PURE);
 			func_add_param("ns", TypeClassP);
-		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &ClassX::repr, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &ClassX::repr, Flags::PURE);
 
 	add_class(TypeClassP);
-		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &class_repr, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &class_repr, Flags::PURE);
 
 	add_class(TypeFunction);
-		class_add_elementx("name", TypeString, &Function::name);
-		class_add_funcx("long_name", TypeString, &Function::long_name, Flags::PURE);
-		class_add_funcx("cname", TypeString, &Function::cname, Flags::PURE);
+		class_add_element("name", TypeString, &Function::name);
+		class_add_func("long_name", TypeString, &Function::long_name, Flags::PURE);
+		class_add_func("cname", TypeString, &Function::cname, Flags::PURE);
 			func_add_param("ns", TypeClassP);
-		class_add_funcx("signature", TypeString, &Function::signature, Flags::PURE);
+		class_add_func("signature", TypeString, &Function::signature, Flags::PURE);
 			func_add_param("ns", TypeClassP);
-		class_add_elementx("namespace", TypeClassP, &Function::name_space);
-		class_add_elementx("num_params", TypeInt, &Function::num_params);
-		class_add_elementx("var", TypeVariablePList, &Function::var);
-		class_add_elementx("param_type", TypeClassPList, &Function::literal_param_type);
-		class_add_elementx("return_type", TypeClassP, &Function::literal_return_type);
-		class_add_funcx("is_static", TypeBool, &Function::is_static, Flags::PURE);
-		class_add_funcx("is_pure", TypeBool, &Function::is_pure, Flags::PURE);
-		class_add_funcx("is_const", TypeBool, &Function::is_const, Flags::PURE);
-		class_add_funcx("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
-		class_add_funcx("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
-		class_add_funcx("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
-		class_add_elementx("needs_overriding", TypeBool, &Function::needs_overriding);
-		class_add_elementx("virtual_index", TypeInt, &Function::virtual_index);
-		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
-		class_add_elementx("code", TypeFunctionCodeP, &Function::address);
-		class_add_funcx(IDENTIFIER_FUNC_STR, TypeString, &FunctionX::repr, Flags::PURE);
+		class_add_element("namespace", TypeClassP, &Function::name_space);
+		class_add_element("num_params", TypeInt, &Function::num_params);
+		class_add_element("var", TypeVariablePList, &Function::var);
+		class_add_element("param_type", TypeClassPList, &Function::literal_param_type);
+		class_add_element("return_type", TypeClassP, &Function::literal_return_type);
+		class_add_func("is_static", TypeBool, &Function::is_static, Flags::PURE);
+		class_add_func("is_pure", TypeBool, &Function::is_pure, Flags::PURE);
+		class_add_func("is_const", TypeBool, &Function::is_const, Flags::PURE);
+		class_add_func("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
+		class_add_func("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
+		class_add_func("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
+		class_add_element("needs_overriding", TypeBool, &Function::needs_overriding);
+		class_add_element("virtual_index", TypeInt, &Function::virtual_index);
+		class_add_element("inline_index", TypeInt, &Function::inline_no);
+		class_add_element("code", TypeFunctionCodeP, &Function::address);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &FunctionX::repr, Flags::PURE);
 
 	//add_class(TypeFunctionP);
 
 	add_class(TypeVariable);
-		class_add_elementx("name", TypeString, &Variable::name);
-		class_add_elementx("type", TypeClassP, &Variable::type);
-		class_add_funcx("is_const", TypeBool, &Variable::is_const);
-		class_add_funcx("is_extern", TypeBool, &Variable::is_extern);
+		class_add_element("name", TypeString, &Variable::name);
+		class_add_element("type", TypeClassP, &Variable::type);
+		class_add_func("is_const", TypeBool, &Variable::is_const);
+		class_add_func("is_extern", TypeBool, &Variable::is_extern);
 		
 	add_class(TypeConstant);
-		class_add_elementx("name", TypeString, &Constant::name);
-		class_add_elementx("type", TypeClassP, &Constant::type);
+		class_add_element("name", TypeString, &Constant::name);
+		class_add_element("type", TypeClassP, &Constant::type);
 
 	add_class(TypeScript);
-		class_add_elementx("name", TypeString, &Script::filename);
-		class_add_elementx("used_by_default", TypeBool, &Script::used_by_default);
-		class_add_funcx("classes", TypeClassPList, &Script::classes, Flags::PURE);
-		class_add_funcx("functions", TypeFunctionPList, &Script::functions, Flags::PURE);
-		class_add_funcx("variables", TypeVariablePList, &Script::variables, Flags::PURE);
-		class_add_funcx("constants", TypeConstantPList, &Script::constants, Flags::PURE);
-		class_add_funcx("base_class", TypeClassP, &Script::base_class, Flags::PURE);
-		class_add_funcx("load", TypeScriptP, &__load_script__, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_element("name", TypeString, &Script::filename);
+		class_add_element("used_by_default", TypeBool, &Script::used_by_default);
+		class_add_func("classes", TypeClassPList, &Script::classes, Flags::PURE);
+		class_add_func("functions", TypeFunctionPList, &Script::functions, Flags::PURE);
+		class_add_func("variables", TypeVariablePList, &Script::variables, Flags::PURE);
+		class_add_func("constants", TypeConstantPList, &Script::constants, Flags::PURE);
+		class_add_func("base_class", TypeClassP, &Script::base_class, Flags::PURE);
+		class_add_func("load", TypeScriptP, &__load_script__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("just_analize", TypeBool);
-		class_add_funcx("create", TypeScriptP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create", TypeScriptP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
 			func_add_param("just_analize", TypeBool);
-		class_add_funcx("delete", TypeVoid, &remove_script, Flags::STATIC);
+		class_add_func("delete", TypeVoid, &remove_script, Flags::STATIC);
 			func_add_param("script", TypeScript);
-		class_add_funcx("execute_single_command", TypeVoid, &__execute_single_command__, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("execute_single_command", TypeVoid, &__execute_single_command__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("cmd", TypeString);
 	
 	add_class(TypeStatement);
-		class_add_elementx("name", TypeString, &Statement::name);
-		class_add_elementx("id", TypeInt, &Statement::id);
-		class_add_elementx("num_params", TypeInt, &Statement::num_params);
+		class_add_element("name", TypeString, &Statement::name);
+		class_add_element("id", TypeInt, &Statement::id);
+		class_add_element("num_params", TypeInt, &Statement::num_params);
 		
 	add_class(TypeScriptPList);
-		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &shared_array<Script>::__init__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &shared_array<Script>::__init__);
 
 	add_class(TypeClassElementList);
-		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
-		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<ClassElement>::clear);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<ClassElement>::clear);
 
-	add_funcx("get_dynamic_type", TypeClassP, &get_dynamic_type, Flags::_STATIC__PURE);
+	add_func("get_dynamic_type", TypeClassP, &get_dynamic_type, Flags::_STATIC__PURE);
 		func_add_param("p", TypePointer);
-	add_funcx("disassemble", TypeString, &Asm::disassemble, Flags::_STATIC__PURE);
+	add_func("disassemble", TypeString, &Asm::disassemble, Flags::_STATIC__PURE);
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);
-	add_funcx("show_func", TypeVoid, &show_func, Flags::STATIC);
+	add_func("show_func", TypeVoid, &show_func, Flags::STATIC);
 		func_add_param("f", TypeFunction);
 
 	add_ext_var("packages", TypeScriptPList, (void*)&packages);

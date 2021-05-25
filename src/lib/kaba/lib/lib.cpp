@@ -234,7 +234,7 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 
 //   with type information
 
-void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func) {
+void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func) {
 	Operator *o = new Operator;
 	o->owner = cur_package->syntax;
 	o->primitive = &PrimitiveOperators[(int)primitive_op];
@@ -258,18 +258,23 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 
 	if (!flags_has(flags, Flags::STATIC)) {
 		add_class(c);
-		o->f = class_add_func(o->primitive->function_name, return_type, func, flags);
+		o->f = class_add_func_x(o->primitive->function_name, return_type, func, flags);
 		if (p)
 			func_add_param("b", p);
 	} else {
 		add_class(c);
-		o->f = class_add_func(o->primitive->function_name, return_type, func, flags);
+		o->f = class_add_func_x(o->primitive->function_name, return_type, func, flags);
 		func_add_param("a", c);
 		if (p)
 			func_add_param("b", p);
 	}
 	func_set_inline(inline_index);
 	cur_package->syntax->operators.add(o);
+}
+
+
+void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index) {
+	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, nullptr);
 }
 
 
@@ -283,7 +288,7 @@ Class *add_class(const Class *root_type) {
 	return cur_class;
 }
 
-void class_add_element(const string &name, const Class *type, int offset, Flags flag) {
+void class_add_element_x(const string &name, const Class *type, int offset, Flags flag) {
 	cur_class->elements.add(ClassElement(name, type, offset));
 }
 
@@ -321,7 +326,7 @@ void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 }
 
 
-Function* class_add_func(const string &name, const Class *return_type, void *func, Flags flags) {
+Function* class_add_func_x(const string &name, const Class *return_type, void *func, Flags flags) {
 	Function *f = new Function(name, return_type, cur_class, flags);
 	cur_package->syntax->functions.add(f);
 	f->address_preprocess = func;
@@ -335,6 +340,10 @@ Function* class_add_func(const string &name, const Class *return_type, void *fun
 	else
 		_class_add_member_func(cur_class, f, flags);
 	return f;
+}
+
+Function* class_add_func(const string &name, const Class *return_type, nullptr_t func, Flags flag) {
+	return class_add_func_x(name, return_type, nullptr, flag);
 }
 
 int get_virtual_index(void *func, const string &tname, const string &name) {
@@ -400,12 +409,12 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 	return -1;
 }
 
-Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, Flags flag) {
+Function* class_add_func_virtual_x(const string &name, const Class *return_type, void *func, Flags flag) {
 	string tname = cur_class->name;
 	int index = get_virtual_index(func, tname, name);
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
-	Function *f = class_add_func(name, return_type, func, flag);
+	Function *f = class_add_func_x(name, return_type, func, flag);
 	cur_func->virtual_index = index;
 	if (index >= cur_class->vtable.num)
 		cur_class->vtable.resize(index + 1);
@@ -457,9 +466,9 @@ void add_ext_var(const string &name, const Class *type, void *var) {
 
 
 
-Function *add_func(const string &name, const Class *return_type, void *func, Flags flag) {
+Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag) {
 	add_class(cur_package->base_class());
-	return class_add_func(name, return_type, func, flag);
+	return class_add_func_x(name, return_type, func, flag);
 }
 
 void func_set_inline(InlineID index) {
@@ -499,40 +508,40 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	if (p->can_memcpy()) {
 		if (!p->uses_call_by_reference()){
 			if (p->is_pointer()){
-				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<void*>::__init__);
-				class_add_funcx("add", TypeVoid, &DynamicArray::append_p_single);
+				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<void*>::__init__);
+				class_add_func("add", TypeVoid, &DynamicArray::append_p_single);
 					func_add_param("x", p);
-				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_p_single);
+				class_add_func("insert", TypeVoid, &DynamicArray::insert_p_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
-				class_add_funcx("__contains__", TypeBool, &PointerList::__contains__);
+				class_add_func("__contains__", TypeBool, &PointerList::__contains__);
 					func_add_param("x", p);
 			}else if (p == TypeFloat32){
-				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<float>::__init__);
-				class_add_funcx("add", TypeVoid, &DynamicArray::append_f_single);
+				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<float>::__init__);
+				class_add_func("add", TypeVoid, &DynamicArray::append_f_single);
 					func_add_param("x", p);
-				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_f_single);
+				class_add_func("insert", TypeVoid, &DynamicArray::insert_f_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
 			}else if (p == TypeFloat64){
-				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<double>::__init__);
-				class_add_funcx("add", TypeVoid, &DynamicArray::append_d_single);
+				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<double>::__init__);
+				class_add_func("add", TypeVoid, &DynamicArray::append_d_single);
 					func_add_param("x", p);
-				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_d_single);
+				class_add_func("insert", TypeVoid, &DynamicArray::insert_d_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
 			}else if (p->size == 4){
-				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<int>::__init__);
-				class_add_funcx("add", TypeVoid, &DynamicArray::append_4_single);
+				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<int>::__init__);
+				class_add_func("add", TypeVoid, &DynamicArray::append_4_single);
 					func_add_param("x", p);
-				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_4_single);
+				class_add_func("insert", TypeVoid, &DynamicArray::insert_4_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
 			}else if (p->size == 1){
-				class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<char>::__init__);
-				class_add_funcx("add", TypeVoid, &DynamicArray::append_1_single);
+				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<char>::__init__);
+				class_add_func("add", TypeVoid, &DynamicArray::append_1_single);
 					func_add_param("x", p);
-				class_add_funcx("insert", TypeVoid, &DynamicArray::insert_1_single);
+				class_add_func("insert", TypeVoid, &DynamicArray::insert_1_single);
 					func_add_param("x", p);
 					func_add_param("index", TypeInt);
 			}else{
@@ -540,19 +549,19 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 			}
 		}else{
 			// __init__ must be defined manually...!
-			class_add_funcx("add", TypeVoid, &DynamicArray::append_single);
+			class_add_func("add", TypeVoid, &DynamicArray::append_single);
 				func_add_param("x", p);
-			class_add_funcx("insert", TypeVoid, &DynamicArray::insert_single);
+			class_add_func("insert", TypeVoid, &DynamicArray::insert_single);
 				func_add_param("x", p);
 				func_add_param("index", TypeInt);
 		}
-		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &DynamicArray::simple_clear);
-		class_add_funcx("clear", TypeVoid, &DynamicArray::simple_clear);
-		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &DynamicArray::simple_assign);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &DynamicArray::simple_clear);
+		class_add_func("clear", TypeVoid, &DynamicArray::simple_clear);
+		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &DynamicArray::simple_assign);
 			func_add_param("other", t);
-		class_add_funcx("remove", TypeVoid, &DynamicArray::delete_single);
+		class_add_func("remove", TypeVoid, &DynamicArray::delete_single);
 			func_add_param("index", TypeInt);
-		class_add_funcx("resize", TypeVoid, &DynamicArray::simple_resize);
+		class_add_func("resize", TypeVoid, &DynamicArray::simple_resize);
 			func_add_param("num", TypeInt);
 	}else if (p == TypeString or p == TypeAny or p == TypePath){
 		// handled manually later...

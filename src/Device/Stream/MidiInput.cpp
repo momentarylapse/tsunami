@@ -87,8 +87,8 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 	auto _class = session->plugin_manager->get_class("MidiInputConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
-		kaba::class_add_elementx("device", device_pointer_class, &Config::device);
-		kaba::class_add_elementx("free_flow", kaba::TypeBool, &Config::free_flow);
+		kaba::class_add_element("device", device_pointer_class, &Config::device);
+		kaba::class_add_element("free_flow", kaba::TypeBool, &Config::free_flow);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config.kaba_class = _class;

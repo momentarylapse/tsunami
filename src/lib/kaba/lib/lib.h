@@ -77,36 +77,92 @@ const Class *add_type_a(const Class *sub_type, int array_length, const string &n
 const Class *add_type_l(const Class *sub_type, const string &name = "");
 const Class *add_type_d(const Class *sub_type, const string &name = "");
 const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params);
-Function *add_func(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
+
+
+Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
+// version: regular function
 template<class T>
-Function *add_funcx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
-	return add_func(name, return_type, (void*)func, flag);
+Function *add_func(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
+	return add_func_x(name, return_type, (void*)func, flag);
 }
+
 void func_set_inline(InlineID index);
 void func_add_param(const string &name, const Class *type, Flags flags = Flags::CONST);
 Class *add_class(const Class *root_type);
-void class_add_element(const string &name, const Class *type, int offset, Flags flag = Flags::NONE);
+void class_add_element_x(const string &name, const Class *type, int offset, Flags flag = Flags::NONE);
 template<class T>
-void class_add_elementx(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
-	class_add_element(name, type, element_offset(p), flag);
+void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
+	// allows &Class::element
+	class_add_element_x(name, type, element_offset(p), flag);
 }
-Function* class_add_func(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
+
+
+
+Function* class_add_func_x(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
+// version: null
+Function* class_add_func(const string &name, const Class *return_type, nullptr_t func, Flags flag = Flags::NONE);
+// version: regular function
+template <typename R, typename ...Args>
+Function* class_add_func(const string &name, const Class *return_type, R (*func)(Args...), Flags flag = Flags::NONE) {
+	return class_add_func_x(name, return_type, (void*)func, flag);
+}
+// version: member function
+template <typename T, typename R, typename ...Args>
+Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...), Flags flag = Flags::NONE) {
+	return class_add_func_x(name, return_type, mf(func), flag);
+}
+// version: const member function
+template <typename T, typename R, typename ...Args>
+Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...) const, Flags flag = Flags::NONE) {
+	return class_add_func_x(name, return_type, mf(func), flag);
+}
+
+
+
+
+
+Function* class_add_func_virtual_x(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
 template<class T>
-Function* class_add_funcx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
-	return class_add_func(name, return_type, mf(func), flag);
+Function* class_add_func_virtual(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
+	return class_add_func_virtual_x(name, return_type, mf(func), flag);
 }
-Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
-template<class T>
-Function* class_add_func_virtualx(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
-	return class_add_func_virtual(name, return_type, mf(func), flag);
-}
+
+
 void class_link_vtable(void *p);
 void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable);
 void add_const(const string &name, const Class *type, const void *value);
 void class_add_const(const string &name, const Class *type, const void *value);
+template<class T>
+void add_enum(const string &name, const Class *type, T e) {
+	// for enums and nullptr!
+	add_const(name, type, (const void*)(int_p)e);
+}
+
+
 void add_ext_var(const string &name, const Class *type, void *var);
 void add_type_cast(int penalty, const Class *source, const Class *dest, const string &cmd);
-void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func = nullptr);
+
+
+
+void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func = nullptr);
+// version: no function
+void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index);
+// version: regular function
+template <typename R, typename ...Args>
+void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, R (*func)(Args...)) {
+	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, (void*)func);
+}
+// version: member function
+template <typename T, typename R, typename ...Args>
+void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, R (T::*func)(Args...)) {
+	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, mf(func));
+}
+// version: const member function
+template <typename T, typename R, typename ...Args>
+void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, R (T::*func)(Args...) const) {
+	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, mf(func));
+}
+
 
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \

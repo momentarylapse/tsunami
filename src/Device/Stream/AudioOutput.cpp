@@ -237,8 +237,8 @@ AudioOutput::AudioOutput(Session *_session) :
 	auto _class = session->plugin_manager->get_class("AudioOutputConfig");//new kaba::Class("Config", sizeof(config), nullptr, nullptr);
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
-		kaba::class_add_elementx("volume", kaba::TypeFloat32, &Config::volume);
-		kaba::class_add_elementx("device", device_pointer_class, &Config::device);
+		kaba::class_add_element("volume", kaba::TypeFloat32, &Config::volume);
+		kaba::class_add_element("device", device_pointer_class, &Config::device);
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config.kaba_class = _class;

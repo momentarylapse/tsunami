@@ -8,7 +8,7 @@ const MAX_SCAN_PITCH = 200
 class TestDetector extends PitchDetector
 	var pitch_power: float[]
 	var pitch_power2: float[]
-	override void process(MidiEventBuffer midi, AudioBuffer buf)
+	func override process(midi: MidiEventBuffer, buf: AudioBuffer)
 		#print(len(buf))
 		complex[] z
 		fft_r2c(buf.c[0], z)

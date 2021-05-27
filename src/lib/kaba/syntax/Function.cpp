@@ -13,6 +13,9 @@ namespace kaba {
 
 string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 
+Array<BindingTemplate*> binding_templates;
+
+
 
 Function::Function(const string &_name, const Class *_return_type, const Class *_name_space, Flags _flags) {
 	name = _name;
@@ -84,6 +87,20 @@ string Function::create_slightly_hidden_name() {
 
 Variable *Function::__get_var(const string &name) const {
 	return block->get_var(name);
+}
+
+Variable *Function::add_param(const string &name, const Class *type, Flags flags) {
+	auto v = block->add_var(name, type);
+	if (!flags_has(flags, Flags::OUT))
+		flags_set(v->flags, Flags::CONST);
+	literal_param_type.add(type);
+	num_params ++;
+	return v;
+}
+
+void Function::set_return_type(const Class *type) {
+	literal_return_type = type;
+	effective_return_type = type;
 }
 
 string Function::signature(const Class *ns) const {

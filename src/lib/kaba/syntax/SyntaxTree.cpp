@@ -406,30 +406,28 @@ shared<Node> SyntaxTree::exlink_add_class_func(Function *f, Function *cf) {
 	return link;
 }
 
-shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns, bool prefer_class) {
+shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns) {
 	shared_array<Node> links;
 
 
 	// recursively up the namespaces
 	while (ns) {
 
-		if (!prefer_class) {
-			// named constants
-			for (auto *c: weak(ns->constants))
-				if (name == c->name)
-					return {add_node_const(c)};
+		// named constants
+		for (auto *c: weak(ns->constants))
+			if (name == c->name)
+				return {add_node_const(c)};
 
-			for (auto *v: weak(ns->static_variables))
-				if (v->name == name)
-					return {add_node_global(v)};
+		for (auto *v: weak(ns->static_variables))
+			if (v->name == name)
+				return {add_node_global(v)};
 
-			// then the (real) functions
-			for (auto *f: weak(ns->functions))
-				if (f->name == name and f->is_static())
-					links.add(add_node_func_name(f));
-			if (links.num > 0 and !prefer_class)
-				return links;
-		}
+		// then the (real) functions
+		for (auto *f: weak(ns->functions))
+			if (f->name == name and f->is_static())
+				links.add(add_node_func_name(f));
+		if (links.num > 0)
+			return links;
 
 		// types
 		for (auto *c: weak(ns->classes))
@@ -474,47 +472,42 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	return {};
 }
 
-shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, const Class *ns, bool prefer_class) {
-	if (block and !prefer_class) {
+shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, const Class *ns) {
+	if (block) {
 		auto n = get_existence_block(name, block);
 		if (n.num > 0)
 			return n;
 	}
 
 	// shared stuff (global variables, functions)
-	auto links = get_existence_global(name, ns, prefer_class);
+	auto links = get_existence_global(name, ns);
 	if (links.num > 0)
 		return links;
 
-	if (!prefer_class) {
-		// then the statements
-		auto s = Parser::which_statement(name);
-		if (s) {
-			//return {add_node_statement(s->id)};
-			shared<Node> n = new Node(NodeKind::STATEMENT, (int64)s, TypeVoid);
-			n->set_num_params(s->num_params);
-			return {n};
-		}
-
-		// operators
-		auto w = parser->which_primitive_operator(name, 2); // negate/not...
-		if (w)
-			return {new Node(NodeKind::PRIMITIVE_OPERATOR, (int_p)w, TypeUnknown)};
+	// then the statements
+	auto s = Parser::which_statement(name);
+	if (s) {
+		//return {add_node_statement(s->id)};
+		shared<Node> n = new Node(NodeKind::STATEMENT, (int64)s, TypeVoid);
+		n->set_num_params(s->num_params);
+		return {n};
 	}
 
+	// operators
+	auto w = parser->which_primitive_operator(name, 2); // negate/not...
+	if (w)
+		return {new Node(NodeKind::PRIMITIVE_OPERATOR, (int_p)w, TypeUnknown)};
+
 	// in include files (only global)...
-	links.append(get_existence_global(name, imported_symbols.get(), prefer_class));
+	links.append(get_existence_global(name, imported_symbols.get()));
 
-
-	if (links.num == 0 and prefer_class)
-		return get_existence(name, block, ns, false);
 
 	// ...unknown
 	return links;
 }
 
 Function *SyntaxTree::required_func_global(const string &name) {
-	auto links = get_existence(name, nullptr, base_class, false);
+	auto links = get_existence(name, nullptr, base_class);
 	if (links.num == 0)
 		do_error(format("internal error: '%s()' not found????", name));
 	return links[0]->as_func();

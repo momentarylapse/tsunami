@@ -39,11 +39,15 @@ void Block::set(int index, shared<Node> c) {
 }
 
 Variable *Block::add_var(const string &name, const Class *type, Flags flags) {
+	return insert_var(function->var.num, name, type, flags);
+}
+
+Variable *Block::insert_var(int index, const string &name, const Class *type, Flags flags) {
 	if (get_var(name))
 		function->owner()->do_error(format("variable '%s' already declared in this context", name));
 	Variable *v = new Variable(name, type);
 	v->flags = flags;
-	function->var.add(v);
+	function->var.insert(v, index);
 	vars.add(v);
 	return v;
 }

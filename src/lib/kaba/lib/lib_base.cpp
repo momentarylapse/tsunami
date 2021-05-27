@@ -405,10 +405,60 @@ public:
 	Array<bool> _cdecl ne2(float x) IMPLEMENT_OP2(!=, float, bool)
 };
 
+static const bool USE_DYNAMIC_BIND = false;
+
+Function *create_binding(BindingTemplate *lt, char *first) {
+	if (lt->counter != 0)
+		kaba_raise_exception(new KabaException("repeatedly binding the same function currently not supported"));
+
+	if (config.verbose)
+		msg_write("creating dynamic binding...");
+
+	lt->counter ++;
+	auto tree = lt->outer->owner();
+	char *p0 = first - lt->captures_local[0]->_offset;
+	if (config.verbose)
+		for (auto v: lt->captures_local)
+			msg_write(v->name + "  " + v->type->name + "  " + var_repr(p0 + v->_offset, v->type));
+
+	auto ff = tree->add_function("-bind-", lt->inner->literal_return_type, tree->base_class, Flags::STATIC);
+	for (int i=0; i<lt->inner->num_params - lt->captures_local.num; i++)
+		ff->add_param(lt->inner->var[i]->name, lt->inner->literal_param_type[i], lt->inner->var[i]->flags);
+	auto script = lt->outer->owner()->script;
+
+
+	foreachi (auto v, lt->captures_local, i) {
+		void *pc = lt->captures_global[i]->memory;
+		if (USE_DYNAMIC_BIND) {
+			// allocate
+			pc = &lt->capture_data[lt->capture_data_used];
+			lt->capture_data_used += v->type->size;
+		}
+
+		// save to capture
+		memcpy(pc, p0 + v->_offset, v->type->size);
+
+		if (USE_DYNAMIC_BIND) {
+			bool found = false;
+			for (char *p = (char*)lt->bind_temp->block->_start; p<lt->bind_temp->block->_end; p++) {
+				int_p dd = (int_p)lt->captures_global[i]->memory - (int_p)p - 4;
+				if ((int)dd == *(int*)p) {
+					found = true;
+					*(int*)p = (int_p)pc - (int_p)p - 4;
+				}
+			}
+			if (!found)
+				msg_error("create dynamic bind: COULD NOT FIND: " + v->name);
+		}
+	}
+
+	// TODO COPY!!!!
+
+	return lt->bind_temp;
+}
 
 
 void SIAddXCommands() {
-
 
 	add_func("@sorted", TypeDynamicArray, &kaba_array_sort, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("list", TypePointer);
@@ -444,6 +494,10 @@ void SIAddXCommands() {
 		func_add_param("p1", TypePointer);
 		func_add_param("p2", TypePointer);
 		func_add_param("p3", TypePointer);
+
+	add_func("@create_binding", TypeFunctionP, &create_binding, Flags::_STATIC__RAISES_EXCEPTIONS);
+		func_add_param("template", TypePointer);
+		func_add_param("p0", TypePointer);
 }
 
 

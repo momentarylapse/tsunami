@@ -1252,7 +1252,7 @@ shared<Node> Parser::parse_operand(Block *block, const Class *ns, bool prefer_cl
 		operands = {tree->add_node_class(t)};
 	} else {
 		// direct operand
-		operands = tree->get_existence(Exp.cur, block, ns, prefer_class);
+		operands = tree->get_existence(Exp.cur, block, ns);
 		if (operands.num > 0) {
 
 			if (operands[0]->kind == NodeKind::STATEMENT) {
@@ -2404,8 +2404,7 @@ shared<Node> Parser::add_converter_str(shared<Node> sub, bool repr) {
 	// "universal" var2str() or var_repr()
 	auto *c = tree->add_constant_pointer(TypeClassP, t);
 
-	shared_array<Node> links = tree->get_existence(repr ? "@var_repr" : "@var2str", nullptr, nullptr, false);
-	Function *f = links[0]->as_func();
+	Function *f = tree->required_func_global(repr ? "@var_repr" : "@var2str");
 
 	auto cmd = tree->add_node_call(f);
 	cmd->set_param(0, sub->ref());
@@ -2542,6 +2541,7 @@ shared<Node> Parser::parse_statement_map(Block *block) {
 	return cmd;
 }
 
+
 shared<Node> Parser::parse_statement_lambda(Block *block) {
 	Exp.next(); // "lambda"
 	auto *prev_func = cur_func;
@@ -2550,25 +2550,28 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 	f->_logical_line_no = Exp.get_line_no();
 	f->_exp_no = Exp.cur_exp;
 
+	f->block->parent = block;
+
 	cur_func = f;
 
 	Exp.next(); // '('
 
 	// parameter list
 	if (Exp.cur != ")")
-		for (int k=0;;k++) {
+		while (true) {
 			// like variable definitions
 
 			Flags flags = parse_flags();
 
-			// type of parameter variable
-			const Class *param_type = parse_type(tree->base_class); // force
-			auto v = f->block->add_var(Exp.cur, param_type);
-			if (!flags_has(flags, Flags::OUT))
-				flags_set(v->flags, Flags::CONST);
-			f->literal_param_type.add(param_type);
+			string param_name = Exp.cur;
 			Exp.next();
-			f->num_params ++;
+			if (Exp.cur != ":")
+				do_error("':' after parameter name expected");
+			Exp.next();
+
+			// type of parameter variable
+			auto param_type = parse_type(tree->base_class); // force
+			auto v = f->add_param(param_name, param_type, flags);
 
 			if (Exp.cur == ")")
 				break;
@@ -2585,8 +2588,6 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 	f->literal_return_type = cmd->type;
 	f->effective_return_type = cmd->type;
 
-	f->update_parameters_after_parsing();
-
 	if (cmd->type == TypeVoid) {
 		f->block->add(cmd);
 	} else {
@@ -2596,9 +2597,102 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 		f->block->add(ret);
 	}
 
+	f->block->parent = nullptr;
+
 	tree->base_class->add_function(tree, f, false, false);
 
-	return tree->add_node_func_name(f);
+	Set<Variable*> captures;
+	auto find_captures = [block, &captures](shared<Node> n) {
+		if (n->kind == NodeKind::VAR_LOCAL) {
+			auto v = n->as_local();
+			for (auto vv: block->function->var)
+				if (v == vv)
+					captures.add(v);
+		}
+		return n;
+	};
+	tree->transform_block(f->block.get(), find_captures);
+	if (captures.num > 0) {
+		if (config.verbose)
+			msg_write("CAPTURES:");
+		auto lt = new BindingTemplate;
+		binding_templates.add(lt);
+		lt->outer = block->function;
+		lt->inner = f;
+		lt->captures_local = captures;
+		lt->capture_data.resize(10000); // 10k...
+		for (auto v: captures) {
+			if (config.verbose)
+				msg_write("  * " + v->name);
+			//f->block->vars.insert()
+
+			auto vvv = f->block->insert_var(f->num_params, v->name, v->type);
+			//if (!flags_has(flags, Flags::OUT))
+			//flags_set(v->flags, Flags::CONST);
+			f->literal_param_type.add(v->type);
+			f->num_params ++;
+
+
+			auto replace_local = [v,vvv](shared<Node> n) {
+				if (n->kind == NodeKind::VAR_LOCAL)
+					if (n->as_local() == v)
+						n->link_no = (int_p)vvv;
+				return n;
+			};
+			tree->transform_block(f->block.get(), replace_local);
+		}
+
+		f->update_parameters_after_parsing();
+
+
+		// bind wrapper template
+		auto *bind_wrapper = tree->add_function("-bind-wrapper-", f->literal_return_type, tree->base_class, Flags::STATIC);
+	{
+		for (int k=0; k<f->num_params-captures.num; k++) {
+			auto v = bind_wrapper->add_param(f->var[k]->name, f->var[k]->type, f->var[k]->flags);
+		}
+		bind_wrapper->update_parameters_after_parsing();
+		bind_wrapper->num_params = f->num_params - captures.num;
+		auto vfp = bind_wrapper->block->add_var("f", tree->make_class_func(bind_wrapper));
+		auto fp = tree->add_node_local(vfp);
+		bind_wrapper->block->add(tree->add_node_operator_by_inline(InlineID::POINTER_ASSIGN, fp, tree->add_node_func_name(f)));
+
+		auto cc = new Node(NodeKind::POINTER_CALL, 0, f->literal_return_type);
+		cc->set_num_params(f->num_params + 1);
+		cc->set_param(0, fp);
+		for (int k=0; k<f->num_params-captures.num; k++)
+			cc->set_param(1 + k, tree->add_node_local(bind_wrapper->var[k].get()));
+		foreachi (auto cap, captures, k) {
+			auto v = new Variable(format("-bind-ref-%d-", k), cap->type);
+			flags_set(v->flags, Flags::STATIC);
+			lt->captures_global.add(v);
+			tree->base_class->static_variables.add(v);
+			// f->num_params
+			//auto pp = new Node(NodeKind::MEMORY, (int_p)&lt->capture_data[k], cap->type);
+			auto pp = tree->add_node_global(v);
+			cc->set_param(1 + bind_wrapper->num_params + k, pp);
+		}
+
+		auto ret = tree->add_node_statement(StatementID::RETURN);
+		ret->set_num_params(1);
+		ret->set_param(0, cc);
+		bind_wrapper->block->add(ret);
+	}
+		lt->bind_temp = bind_wrapper;
+
+		// runtime bind command
+		auto fbind = tree->required_func_global("@create_binding");
+		auto rr = tree->add_node_call(fbind);
+		rr->type = tree->make_class_func(bind_wrapper);
+		rr->set_param(0, tree->add_node_const(tree->add_constant_pointer(TypePointer, lt)));
+		rr->set_param(1, tree->add_node_local(lt->captures_local[0])->ref());
+		return rr;
+	} else {
+
+		f->update_parameters_after_parsing();
+
+		return tree->add_node_func_name(f);
+	}
 }
 
 shared<Node> Parser::parse_statement_sorted(Block *block) {
@@ -2614,8 +2708,7 @@ shared<Node> Parser::parse_statement_sorted(Block *block) {
 	if (params[1]->type != TypeString)
 		do_error("sorted(): second parameter must be a string");
 
-	auto links = tree->get_existence("@sorted", nullptr, nullptr, false);
-	Function *f = links[0]->as_func();
+	Function *f = tree->required_func_global("@sorted");
 
 	auto cmd = tree->add_node_call(f);
 	cmd->set_param(0, params[0]);
@@ -2643,8 +2736,7 @@ shared<Node> Parser::make_dynamical(shared<Node> node) {
 
 	auto *c = tree->add_constant_pointer(TypeClassP, node->type);
 
-	auto links = tree->get_existence("@dyn", nullptr, nullptr, false);
-	Function *f = links[0]->as_func();
+	Function *f = tree->required_func_global("@dyn");
 
 	auto cmd = tree->add_node_call(f);
 	cmd->set_param(0, node->ref());
@@ -3189,6 +3281,8 @@ bool Parser::parse_class(Class *_namespace) {
 				do_error("interfaces can not have data elements");
 			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
 			continue;
+		} else {
+			do_error("unknown definition inside a class");
 		}
 
 		Flags flags = parse_flags();
@@ -3554,7 +3648,7 @@ Function *Parser::parse_function_header_old(Class *name_space, Flags flags) {
 	flags = parse_flags(flags);
 	
 // return type
-	const Class *return_type = parse_type(name_space); // force...
+	auto return_type = parse_type(name_space); // force...
 
 	Function *f = tree->add_function(Exp.cur, return_type, name_space, flags);
 	if (config.verbose)
@@ -3575,11 +3669,8 @@ Function *Parser::parse_function_header_old(Class *name_space, Flags flags) {
 			auto pflags = parse_flags();
 
 			// type of parameter variable
-			const Class *param_type = parse_type(name_space); // force
-			auto v = f->block->add_var(Exp.cur, param_type);
-			if (!flags_has(pflags, Flags::OUT))
-				flags_set(v->flags, Flags::CONST);
-			f->literal_param_type.add(param_type);
+			auto param_type = parse_type(name_space); // force
+			auto v = f->add_param(Exp.cur, param_type, pflags);
 			Exp.next();
 			f->num_params ++;
 
@@ -3643,12 +3734,8 @@ Function *Parser::parse_function_header_new(Class *name_space, Flags flags) {
 			Exp.next();
 
 			// type of parameter variable
-			const Class *param_type = parse_type(name_space); // force
-			auto v = f->block->add_var(param_name, param_type);
-			if (!flags_has(param_flags, Flags::OUT))
-				flags_set(v->flags, Flags::CONST);
-			f->literal_param_type.add(param_type);
-			f->num_params ++;
+			auto param_type = parse_type(name_space); // force
+			auto v = f->add_param(param_name, param_type, param_flags);
 
 			if (Exp.cur == ")")
 				break;
@@ -3662,9 +3749,7 @@ Function *Parser::parse_function_header_new(Class *name_space, Flags flags) {
 	if (Exp.cur == "->") {
 		// return type
 		Exp.next();
-		const Class *return_type = parse_type(name_space); // force...
-		f->literal_return_type = return_type;
-		f->effective_return_type = return_type;
+		f->set_return_type(parse_type(name_space));
 	}
 
 	if (!Exp.end_of_line())
@@ -3824,6 +3909,7 @@ void Parser::parse_top_level() {
 			parse_class_variable_declaration(tree->base_class, tree->root_of_all_evil->block.get(), offset, Flags::STATIC);
 
 		} else {
+			do_error("unknown top level definition");
 
 			// type of definition
 			bool is_function = false;

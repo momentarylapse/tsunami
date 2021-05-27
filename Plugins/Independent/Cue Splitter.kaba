@@ -91,4 +91,4 @@ class CueSplitter extends TsunamiPlugin
 		stop()
 		
 		
-	override void on_stop()
+	func override on_stop()

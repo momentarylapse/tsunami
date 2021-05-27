@@ -777,4 +777,4 @@ func extern ChooseModule(parent: Panel, session: Session, type: int, old_name: s
 func extern draw_boxed_str(c: Painter, x: float, y: float, str: string, col_text: color, col_bg: color)
 
 #extern void get_style_colors(Panel p, string id, color{} colors)
-extern void get_style_colors(Panel p, string id, (string,color)[] colors)
+func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])

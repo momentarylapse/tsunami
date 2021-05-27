@@ -237,7 +237,7 @@ void Script::_map_global_variables_to_memory(char *mem, int &offset, char *addre
 			v->memory = get_external_link(v->cname(name_space, name_space->owner->base_class));
 			if (!v->memory)
 				do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));
-		} else {
+		} else if (!v->memory) {
 			int size_aligned = mem_align(v->type->size, 4);
 			v->memory = &address[offset];
 			offset += size_aligned;

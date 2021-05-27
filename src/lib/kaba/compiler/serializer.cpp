@@ -1035,6 +1035,14 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 
 string function_link_name(Function *f);
 
+void function_update_address(Function *f, Asm::InstructionWithParamsList *list) {
+	f->address = list->_label_value(f->_label);
+	for (Block *b: f->all_blocks()) {
+		b->_start = (void*)list->_label_value(b->_label_start);
+		b->_end = (void*)list->_label_value(b->_label_end);
+	}
+}
+
 void Script::compile_functions(char *oc, int &ocs) {
 	auto *list = new Asm::InstructionWithParamsList(0);
 	Array<int> func_offset;
@@ -1086,13 +1094,8 @@ void Script::compile_functions(char *oc, int &ocs) {
 
 	// get function addresses
 	for (auto *f: syntax->functions)
-		if (!f->is_extern()) {
-			f->address = list->_label_value(f->_label);
-			for (Block *b: f->all_blocks()) {
-				b->_start = (void*)list->_label_value(b->_label_start);
-				b->_end = (void*)list->_label_value(b->_label_end);
-			}
-		}
+		if (!f->is_extern())
+			function_update_address(f, list);
 
 	if (!config.interpreted)
 		delete list;

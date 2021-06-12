@@ -19,18 +19,10 @@
 
 namespace nix{
 
-void TestGLError(const char*);
-
 
 matrix view_matrix, projection_matrix;
-matrix world_matrix, world_view_projection_matrix;
-
-Texture *RenderingToTexture = NULL;
-
-#ifdef OS_WINDOWS
-	extern HDC hDC;
-	extern HGLRC hRC;
-#endif
+matrix model_matrix, model_view_projection_matrix;
+FrameBuffer *cur_framebuffer = nullptr;
 
 
 FrameBuffer *FrameBuffer::DEFAULT = new FrameBuffer();
@@ -40,11 +32,11 @@ FrameBuffer::FrameBuffer() {
 	width = height = 0;
 
 	frame_buffer = 0;
+	multi_samples = 0;
 }
 
 FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
 	glGenFramebuffers(1, &frame_buffer);
-	TestGLError("FrameBuffer: glGenFramebuffers");
 	update(attachments);
 }
 
@@ -67,71 +59,85 @@ void FrameBuffer::update(const Array<Texture*> &attachments) {
 void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 	depth_buffer = nullptr;
 	color_attachments = {};
+	int samples = 0;
 
 	for (auto *a: attachments) {
-		if (a->type == a->Type::DEPTH)
+		if ((a->type == a->Type::DEPTH) or (a->type == a->Type::RENDERBUFFER))
 			depth_buffer = (DepthBuffer*)a;
 		else
 			color_attachments.add(a);
-		width = a->width;
-		height = a->height;
+		if (a->width > 0) {
+			width = a->width;
+			height = a->height;
+		}
+		if (a->samples > 0)
+			samples = a->samples;
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-	TestGLError("FrameBuffer: glBindFramebuffer");
 
 
 
 	if (depth_buffer) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->texture, 0);
-		TestGLError("FrameBuffer: glFramebufferTexture2D");
+		if (depth_buffer->type == Texture::Type::RENDERBUFFER) {
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth_buffer->texture);
+		} else {
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->texture, 0);
+		}
 		glDrawBuffer(GL_NONE);
-		TestGLError("DepthTexture: glDrawBuffer");
 		glReadBuffer(GL_NONE);
-		TestGLError("DepthTexture: glReadBuffer");
 	}
 
 	Array<GLenum> draw_buffers;
 	int target =  GL_TEXTURE_2D;
 	if (cube_face >= 0)
 		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cube_face;
-	foreachi (Texture *t, color_attachments, i) {
+	if (samples > 0)
+		target = GL_TEXTURE_2D_MULTISAMPLE;
+	foreachi (auto *t, color_attachments, i) {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, t->texture, 0);
-		TestGLError("FrameBuffer: glFramebufferTexture2D");
 		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);
 	}
 	glDrawBuffers(draw_buffers.num, &draw_buffers[0]);
-	TestGLError("FrameBuffer: glDrawBuffers");
 
 
+	_check();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::_check() {
 	auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		msg_error("FrameBuffer: framebuffer != complete");
 		if (status == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
 			msg_write("incomplete att");
-		//if (r == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
+		//if (status == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
 		//	msg_write("incomplete dim");
 		if (status == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
 			msg_write("missing att");
 		if (status == GL_FRAMEBUFFER_UNSUPPORTED)
 			msg_write("unsup");
 	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	TestGLError("FrameBuffer: glBindFramebuffer(0)");
 }
 
 rect FrameBuffer::area() const {
 	return rect(0, width, 0, height);
 }
 
-void BindFrameBuffer(FrameBuffer *fb) {
+void bind_frame_buffer(FrameBuffer *fb) {
 	glBindFramebuffer(GL_FRAMEBUFFER, fb->frame_buffer);
-	TestGLError("BindFrameBuffer: glBindFramebuffer()");
+	cur_framebuffer = fb;
 
-	SetViewport(fb->area());
+	set_viewport(fb->area());
 }
 
+void resolve_multisampling(FrameBuffer *target, FrameBuffer *source) {
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target->frame_buffer);
+	//glBindFramebuffer(GL_READ_FRAMEBUFFER, source->frame_buffer);
+	//glBlitFramebuffer(0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitNamedFramebuffer(source->frame_buffer, target->frame_buffer, 0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
 
 
 matrix create_pixel_projection_matrix() {
@@ -141,19 +147,17 @@ matrix create_pixel_projection_matrix() {
 }
 
 
-void SetViewport(const rect &area) {
+void set_viewport(const rect &area) {
 	target_rect = area;
 	target_width = max((int)area.width(), 1);
 	target_height = max((int)area.height(), 1);
 
-	// screen
-	glViewport(area.x1, area.y1, area.width(), area.height());
-	TestGLError("glViewport");
+	glViewport(area.x1, cur_framebuffer->height - area.height() + area.y1, area.width(), area.height());
 }
 
-void SetWorldMatrix(const matrix &mat) {
-	world_matrix = mat;
-	world_view_projection_matrix = projection_matrix * view_matrix * world_matrix;
+void set_model_matrix(const matrix &mat) {
+	model_matrix = mat;
+	model_view_projection_matrix = projection_matrix * view_matrix * model_matrix;
 }
 
 
@@ -162,13 +166,13 @@ void SetWorldMatrix(const matrix &mat) {
 //           false -> Pixel-Angaben~~~
 // beide Bilder sind um View3DCenterX,View3DCenterY (3D als Fluchtpunkt) verschoben
 
-void SetProjectionPerspective() {
-	SetProjectionPerspectiveExt((float)target_width / 2, (float)target_height / 2, (float)target_height, (float)target_height, 0.001f, 10000);
+void set_projection_perspective() {
+	set_projection_perspective_ext((float)target_width / 2, (float)target_height / 2, (float)target_height, (float)target_height, 0.001f, 10000);
 }
 
 // center_x/y: pixel coordinates of perspective center
 // height_1/width_1: pixel sizes of 45° frustrum
-void SetProjectionPerspectiveExt(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max) {
+void set_projection_perspective_ext(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max) {
 	// perspective projection
 	auto t = matrix::translation(
 		vector(center_x / float(target_width) * 2.0f - 1,
@@ -179,205 +183,54 @@ void SetProjectionPerspectiveExt(float center_x, float center_y, float width_1, 
 			2 * height_1 / target_height,
 			- 1); // z reflection: right/left handedness
 
-	SetProjectionMatrix(t * p * s);
+	set_projection_matrix(t * p * s);
 }
 
 // center_x/y: pixel coordinates of (0,0,0)
 // map_width/height: pixel sizes of projected base vectors
-void SetProjectionOrthoExt(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max) {
+void set_projection_ortho_ext(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max) {
 	auto scale = matrix::scale(2.0f / float(target_width) * map_width, -2.0f / float(target_height) * map_height, 2 / (z_max - z_min));
 	auto trans = matrix::translation(vector(2 * center_x / target_width - 1, 1 - 2 * center_y / target_height, -(z_max + z_min) / (z_max - z_min)));
-	SetProjectionMatrix(trans * scale);
+	set_projection_matrix(trans * scale);
 }
 
-void SetProjectionOrtho(bool relative) {
-	matrix m;
-	if (relative) {
-		// orthogonal projection (relative [0,1]x[0x1] coordinates)
-		auto t = matrix::translation(vector(-0.5f, -0.5f, 0));
-		auto s = matrix::scale(2.0f, -2.0f, 1);
-		m = s * t;
-	} else {
-		// orthogonal projection (pixel coordinates)
-		//NixSetProjectionOrthoExt(0, 0, 1, 1, )
-		m = create_pixel_projection_matrix();
-	}
-
-	SetProjectionMatrix(m);
+void set_projection_ortho_relative() {
+	// orthogonal projection (relative [0,1]x[0x1] coordinates)
+	auto t = matrix::translation(vector(-0.5f, -0.5f, 0));
+	auto s = matrix::scale(2.0f, -2.0f, 1);
+	set_projection_matrix(s * t);
 }
 
-void SetProjectionMatrix(const matrix &m) {
+// orthogonal projection (pixel coordinates)
+void set_projection_ortho_pixel() {
+	set_projection_matrix(create_pixel_projection_matrix());
+}
+
+void set_projection_matrix(const matrix &m) {
 	projection_matrix = m;
-	world_view_projection_matrix = projection_matrix * view_matrix * world_matrix;
+	model_view_projection_matrix = projection_matrix * view_matrix * model_matrix;
 }
 
-void SetViewMatrix(const matrix &m) {
+void set_view_matrix(const matrix &m) {
 	view_matrix = m;
 }
 
 
-#ifdef OS_WINDOWS
-	#ifdef HUI_API_GTK
-		#include <gdk/gdkwin32.h>
-	#endif
-	extern HWND hWndSubWindow;
-	extern bool nixDevNeedsUpdate;
-#endif
 
 
-#if 0
-//bool StartFrame() {
-//	return StartFrameIntoTexture(NULL);
-//}
-
-bool StartFrameIntoTexture(Texture *texture) {
-	TestGLError("Start prae");
-
-
-#ifdef OS_WINDOWS
-	if (nixDevNeedsUpdate){
-		wglDeleteContext(hRC);
-	PIXELFORMATDESCRIPTOR pfd={	sizeof(PIXELFORMATDESCRIPTOR),
-								1,						// versions nummer
-								PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-								PFD_TYPE_RGBA,
-								32,//NixFullscreen?depth:NixDesktopDepth,
-								//8, 0, 8, 8, 8, 16, 8, 24,
-								0, 0, 0, 0, 0, 0, 0, 0, 0,
-								0, 0, 0, 0,
-								24,						// 24bit Z-Buffer
-								8,						// 8bit stencil buffer
-								0,						// no "Auxiliary"-buffer
-								PFD_MAIN_PLANE,
-								0, 0, 0, 0 };
-		GtkWidget *gl_widget = NixWindow->_get_control_(NixControlID)->widget;
-	
-		hDC = GetDC((HWND)GDK_WINDOW_HWND(gtk_widget_get_window(gl_widget)));
-		//hDC = GetDC(hWndSubWindow);
-		if (!hDC){
-			HuiErrorBox(NixWindow, "Fehler", "GetDC..." + i2s(GetLastError()));
-			exit(0);
-		}
-		int OGLPixelFormat = ChoosePixelFormat(hDC, &pfd);
-		SetPixelFormat(hDC, OGLPixelFormat, &pfd);
-		hRC=wglCreateContext(hDC);
-		if (!hRC){
-			HuiErrorBox(NixWindow, "Fehler", "wglCreateContext...");
-			exit(0);
-		}
-		int rr=wglMakeCurrent(hDC, hRC);
-		if (rr != 1){
-			HuiErrorBox(NixWindow, "Fehler", "wglMakeCurrent...");
-			exit(0);
-		}
-		NixSetCull(CullDefault);
-		nixDevNeedsUpdate = false;
-	}
-#endif
-
-	RenderingToTexture=texture;
-	//msg_write("Start " + p2s(texture));
-	if (!texture){
-		#ifdef OS_WINDOWS
-	//		if (OGLDynamicTextureSupport)
-	//			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-			/*if (!wglMakeCurrent(hDC,hRC)){
-				msg_error("wglMakeCurrent");
-				msg_write(GetLastError());
-				return false;
-			}*/
-		#endif
-
-	}else{
-
-		glBindFramebuffer(GL_FRAMEBUFFER, texture->frame_buffer);
-		//glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, texture->glDepthRenderBuffer );
-		/*glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texture->glTexture, 0 );
-		glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, texture->glDepthRenderBuffer );
-		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-		if (status == GL_FRAMEBUFFER_COMPLETE_EXT){
-			//msg_write("hurra");
-		}else{
-			msg_write("we're screwed! (NixStart with dynamic texture target)");
-			return false;
-		}*/
-	}
-	TestGLError("Start 1");
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glDisable(GL_SCISSOR_TEST);
-	//glClearStencil(0);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glClear(GL_COLOR_BUFFER_BIT);
-	TestGLError("Start 2a");
-	glClear(GL_DEPTH_BUFFER_BIT);
-	TestGLError("Start 2b");
-	glClear(GL_STENCIL_BUFFER_BIT);
-	//glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	TestGLError("Start 2");
-
-	// adjust target size
-	if (!texture){
-		auto *e = hui::GetEvent();
-		SetViewport(e->column, e->row);
-	}else{
-		// texture
-		SetViewport(texture->width, texture->height);
-	}
-
-	/*if (texture < 0)
-		NixUpdateInput();*/
-
-	//msg_write("-ok?");
-	TestGLError("Start post");
-	return true;
-}
-#endif
-
-void SetScissor(const rect &_r)
-{
-	bool enable_scissors = true;
-	rect r = _r;
-	if (r.x1 < 0){
-		enable_scissors=false;
-		r = target_rect;
-	}
-	if (enable_scissors)
+void set_scissor(const rect &r) {
+	if (r.width() > 0) {
 		glEnable(GL_SCISSOR_TEST);
-	else
+		glScissor((int)r.x1, cur_framebuffer->height - (int)r.y2, (int)r.width(), (int)r.height());
+	} else {
 		glDisable(GL_SCISSOR_TEST);
-	glScissor((int)r.x1, target_height - (int)r.y2, (int)r.width(), (int)r.height());
-	glClearDepth(1.0f);
-	TestGLError("Scissor");
-}
-
-void EndFrame() {
-	TestGLError("End prae");
-	glDisable(GL_SCISSOR_TEST);
-	if (!RenderingToTexture){
-		// auf den Bildschirm
-		#ifdef OS_WINDOWS
-			if (RenderingToTexture<0)
-				SwapBuffers(hDC);
-		#endif
-		#ifdef OS_LINUX
-			#ifdef NIX_ALLOW_FULLSCREEN
-				if (NixFullscreen)
-					XF86VidModeSetViewPort(x_display,screen,0,NixDesktopHeight-NixScreenHeight);
-			#endif
-			//glutSwapBuffers();
-			/*if (GLDoubleBuffered){
-			}*/
-		#endif
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	TestGLError("End post");
+	//glClearDepth(1.0f);
 }
 
 
 
-void ScreenShotToImage(Image &image) {
+void screen_shot_to_image(Image &image) {
 	image.create(target_width, target_height, Black);
 	glReadBuffer(GL_FRONT);
 	glReadPixels(	0,
@@ -389,16 +242,17 @@ void ScreenShotToImage(Image &image) {
 
 #ifdef _X_USE_HUI_
 
-void StartFrameHui() {
+void start_frame_hui() {
 	int fb;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
 	FrameBuffer::DEFAULT->frame_buffer = fb;
 	FrameBuffer::DEFAULT->width = hui::GetEvent()->column;
 	FrameBuffer::DEFAULT->height = hui::GetEvent()->row;
-	SetViewport(FrameBuffer::DEFAULT->area());
+	cur_framebuffer = FrameBuffer::DEFAULT;
+	set_viewport(FrameBuffer::DEFAULT->area());
 }
 
-void EndFrameHui() {
+void end_frame_hui() {
 	FrameBuffer::DEFAULT->frame_buffer = 0;
 }
 
@@ -410,18 +264,20 @@ void EndFrameHui() {
 #endif
 
 #if HAS_LIB_GLFW
-void StartFrameGLFW(void *win) {
+void start_frame_glfw(void *win) {
 	GLFWwindow* window = (GLFWwindow*)win;
 	glfwMakeContextCurrent(window);
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
 	FrameBuffer::DEFAULT->width = w;
 	FrameBuffer::DEFAULT->height = h;
+	cur_framebuffer = FrameBuffer::DEFAULT;
 
-	SetViewport(FrameBuffer::DEFAULT->area());
+	set_viewport(FrameBuffer::DEFAULT->area());
 }
 
-void EndFrameGLFW(void *win) {
+void end_frame_glfw(void *win) {
+	glFlush();
 	GLFWwindow* window = (GLFWwindow*)win;
 	glfwSwapBuffers(window);
 }

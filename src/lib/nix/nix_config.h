@@ -8,8 +8,7 @@
 \*----------------------------------------------------------------------------*/
 #if HAS_LIB_GL
 
-#ifndef _NIX_CONFIG_EXISTS_
-#define _NIX_CONFIG_EXISTS_
+#pragma once
 
 #include "../config.h"
 
@@ -56,68 +55,63 @@ typedef void callback_function();
 
 #define NIX_MAX_TEXTURELEVELS	8
 
+namespace nix {
 
 // alpha modes
-enum {
-	ALPHA_NONE,
-	ALPHA_COLOR_KEY = 10,
-	ALPHA_COLOR_KEY_SMOOTH,
-	ALPHA_COLOR_KEY_HARD,
-	ALPHA_ADD,
-	ALPHA_MATERIAL,
+enum class AlphaMode {
+	NONE,
+	COLOR_KEY = 10,
+	COLOR_KEY_SMOOTH,
+	COLOR_KEY_HARD,
+	ADD,
+	MATERIAL,
 };
 
 // alpha parameters ("functions")
-enum {
-	ALPHA_ZERO,
-	ALPHA_ONE,
-	ALPHA_SOURCE_COLOR,
-	ALPHA_SOURCE_INV_COLOR,
-	ALPHA_SOURCE_ALPHA,
-	ALPHA_SOURCE_INV_ALPHA,
-	ALPHA_DEST_COLOR,
-	ALPHA_DEST_INV_COLOR,
-	ALPHA_DEST_ALPHA,
-	ALPHA_DEST_INV_ALPHA,
+enum class Alpha {
+	ZERO,
+	ONE,
+	SOURCE_COLOR,
+	SOURCE_INV_COLOR,
+	SOURCE_ALPHA,
+	SOURCE_INV_ALPHA,
+	DEST_COLOR,
+	DEST_INV_COLOR,
+	DEST_ALPHA,
+	DEST_INV_ALPHA,
 };
 
-enum {
-	CULL_NONE,
-	CULL_CCW,
-	CULL_CW,
-	CULL_DEFAULT = CULL_CCW
+enum class CullMode {
+	NONE,
+	CCW,
+	CW,
+	DEFAULT = CCW
 };
 
-enum {
-	STENCIL_NONE,
-	STENCIL_INCREASE,
-	STENCIL_DECREASE,
-	STENCIL_DECREASE_NOT_NEGATIVE,
-	STENCIL_SET,
-	STENCIL_MASK_EQUAL,
-	STENCIL_MASK_NOT_EQUAL,
-	STENCIL_MASK_LESS,
-	STENCIL_MASK_LESS_EQUAL,
-	STENCIL_MASK_GREATER,
-	STENCIL_MASK_GREATER_EQUAL,
-	STENCIL_RESET
+enum class StencilOp {
+	NONE,
+	INCREASE,
+	DECREASE,
+	DECREASE_NOT_NEGATIVE,
+	SET,
+	MASK_EQUAL,
+	MASK_NOT_EQUAL,
+	MASK_LESS,
+	MASK_LESS_EQUAL,
+	MASK_GREATER,
+	MASK_GREATER_EQUAL,
+	RESET
 };
 
-enum {
-	FOG_LINEAR,
-	FOG_EXP,
-	FOG_EXP2
+enum class FogMode {
+	LINEAR,
+	EXP,
+	EXP2
 };
 
-
-namespace nix {
 
 //extern int device_width, device_height;						// render target size (window, won't change)
 extern int target_width, target_height;						// current render target size (window/texture)
-extern bool Fullscreen;
-
-extern Path texture_dir;
-extern int MaxVideoTextureSize;
 
 class VertexBuffer;
 extern VertexBuffer *vb_temp; // vertex buffer for 1-frame geometries
@@ -125,4 +119,3 @@ extern VertexBuffer *vb_temp; // vertex buffer for 1-frame geometries
 
 #endif
 
-#endif

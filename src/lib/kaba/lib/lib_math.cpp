@@ -131,21 +131,6 @@ Array<float> _cdecl float_range(float start, float end, float step) {
 	return a;
 }
 
-template<class T>
-T _cdecl x_max(T a, T b) {
-	return max(a,b);
-}
-
-template<class T>
-T _cdecl x_min(T a, T b) {
-	return min(a, b);
-}
-
-template<class T>
-T _cdecl x_abs(T x) {
-	return abs(x);
-}
-
 vector _quat_vec_mul(quaternion &a, vector &b)
 {	return a * b;	}
 
@@ -933,14 +918,14 @@ void SIAddPackageMath() {
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("abs", TypeInt, &x_abs<int>, Flags::_STATIC__PURE);
+	add_func("abs", TypeInt, &abs<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
 	add_func("sign", TypeInt, &sign<int>, Flags::_STATIC__PURE);
 		func_add_param("i", TypeInt);
-	add_func("min", TypeInt, &x_min<int>, Flags::_STATIC__PURE);
+	add_func("min", TypeInt, &min<int>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
-	add_func("max", TypeInt, &x_max<int>, Flags::_STATIC__PURE);
+	add_func("max", TypeInt, &max<int>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
 	// mathematical
@@ -982,10 +967,10 @@ void SIAddPackageMath() {
 		func_add_param("f", TypeFloat32);
 	add_func("sign", TypeFloat32, &sign<float>, Flags::_STATIC__PURE);
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, &x_min<float>, Flags::_STATIC__PURE);
+	add_func("min", TypeFloat32, &min<float>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, &x_max<float>, Flags::_STATIC__PURE);
+	add_func("max", TypeFloat32, &max<float>, Flags::_STATIC__PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
 	// lists

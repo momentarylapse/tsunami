@@ -8,37 +8,13 @@
 
 #include <stdio.h>
 
-#ifdef OS_WINDOWS
-	#define _WIN32_WINDOWS 0x500
-	#include <stdio.h>
-	#include <io.h>
-	#include <direct.h>
-	#include <mmsystem.h>
-	#pragma warning(disable : 4995)
-	#ifdef NIX_ALLOW_VIDEO_TEXTURE
-		#include "vfw.h"
-	#endif
-#endif
-
-#ifdef OS_LINUX
-#ifdef NIX_ALLOW_FULLSCREEN
-	#include <X11/extensions/xf86vmode.h>
-#endif
-	#include <X11/keysym.h>
-	#include <stdlib.h>
-	#include <sys/time.h>
-	#include <sys/types.h>
-	#include <fcntl.h>
-	#include <unistd.h>
-	#include <fcntl.h>
-	#include <unistd.h>
-	#include <sys/stat.h>
-#endif
 
 #ifdef OS_WINDOWS
+	#include <windows.h>
+	#include <GL\glew.h>
 	#include <gl\gl.h>
-	#include <gl\glext.h>
-	#include <gl\wglext.h>
+	//#include <gl\glext.h>
+	//#include <gl\wglext.h>
 #endif
 #ifdef OS_LINUX
 	#define GL_GLEXT_PROTOTYPES
@@ -54,7 +30,7 @@ extern int current_program;
 
 
 extern matrix view_matrix, projection_matrix;
-extern matrix world_matrix, world_view_projection_matrix;
+extern matrix model_matrix, model_view_projection_matrix;
 
 
 

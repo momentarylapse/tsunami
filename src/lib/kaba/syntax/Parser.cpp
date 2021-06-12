@@ -324,6 +324,8 @@ shared<Node> Parser::parse_operand_extension_array(shared<Node> operand, Block *
 			f->set_param(1, index);
 			f->set_param(2, index2);
 			return f;
+		} else {
+			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, IDENTIFIER_FUNC_SUBARRAY, operand->type->name));
 		}
 	}
 
@@ -3211,7 +3213,7 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 	// parent class
 	if (Exp.cur == IDENTIFIER_EXTENDS) {
 		Exp.next();
-		const Class *parent = parse_type(_namespace); // force
+		auto parent = parse_type(_namespace); // force
 		if (!parent->fully_parsed())
 			return nullptr;
 			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
@@ -3221,7 +3223,7 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 
 	if (Exp.cur == IDENTIFIER_IMPLEMENTS) {
 		Exp.next();
-		const Class *parent = parse_type(_namespace); // force
+		auto parent = parse_type(_namespace); // force
 		if (!parent->fully_parsed())
 			return nullptr;
 		_class->derive_from(parent, true);

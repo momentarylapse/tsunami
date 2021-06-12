@@ -18,8 +18,8 @@ namespace nix{
 
 // textures
 void init_textures();
-void ReleaseTextures();
-void ReincarnateTextures();
+void release_textures();
+void reincarnate_textures();
 
 
 
@@ -31,11 +31,13 @@ public:
 		CUBE,
 		DEPTH,
 		IMAGE,
-		VOLUME
+		VOLUME,
+		MULTISAMPLE,
+		RENDERBUFFER
 	};
 	Type type;
 	Path filename;
-	int width, height, nz;
+	int width, height, nz, samples;
 	bool valid;
 	
 	unsigned int texture;
@@ -56,9 +58,16 @@ public:
 	void _cdecl reload();
 	void _cdecl unload();
 
-	void _cdecl set_options(const string &op);
+	void _cdecl set_options(const string &op) const;
 
 	static Texture* _cdecl load(const Path &filename);
+};
+
+
+class TextureMultiSample : public Texture {
+public:
+	TextureMultiSample(int width, int height, int samples, const string &format);
+	void _cdecl __init__(int width, int height, int samples, const string &format);
 };
 
 class ImageTexture : public Texture {
@@ -73,6 +82,12 @@ public:
 	void _cdecl __init__(int width, int height);
 };
 
+class RenderBuffer : public Texture {
+public:
+	RenderBuffer(int width, int height);
+	RenderBuffer(int width, int height, int samples);
+};
+
 class CubeMap : public Texture {
 public:
 	CubeMap(int size);
@@ -84,8 +99,8 @@ public:
 };
 
 
-void _cdecl SetTexture(Texture *texture);
-void _cdecl SetTextures(const Array<Texture*> &textures);
+void _cdecl set_texture(Texture *texture);
+void _cdecl set_textures(const Array<Texture*> &textures);
 
 //extern Array<Texture*> textures;
 extern int tex_cube_level;

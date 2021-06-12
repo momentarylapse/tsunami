@@ -179,6 +179,7 @@ string _cdecl b2s(bool b);
 string _cdecl p2s(const void *p);
 string _cdecl ia2s(const Array<int> &a);
 string _cdecl fa2s(const Array<float> &a);
+string _cdecl f64a2s(const Array<double> &a);
 string _cdecl ba2s(const Array<bool> &a);
 string _cdecl sa2s(const Array<string> &a);
 int _cdecl s2i(const string &s);

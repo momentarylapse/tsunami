@@ -15,6 +15,7 @@
 
 #include "nix.h"
 
+#include "nix_config.h"
 #include "nix_common.h"
 
 
@@ -22,46 +23,8 @@ extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.5.0";
+string version = "0.13.6.0";
 
-
-// libraries (in case Visual C++ is used)
-//#pragma comment(lib,"opengl32.lib")
-//#pragma comment(lib,"glu32.lib")
-//#pragma comment(lib,"glut32.lib")
-//#pragma comment(lib,"glaux.lib ")
-//#ifdef NIX_ALLOW_VIDEO_TEXTURE
-//	#pragma comment(lib,"strmiids.lib")
-//	#pragma comment(lib,"vfw32.lib")
-//#endif
-
-
-
-/*
-libraries to link:
-
--lwinmm
--lcomctl32
--lkernel32
--luser32
--lgdi32
--lwinspool
--lcomdlg32
--ladvapi32
--lshell32
--lole32
--loleaut32
--luuid
--lodbc32
--lodbccp32
--lwinmm
--lgdi32
--lwsock32
--lopengl32
--lglu32
--lvfw_avi32
--lvfw_ms32
-*/
 
 
 void TestGLError(const char *pos) {
@@ -86,17 +49,10 @@ void TestGLError(const char *pos) {
 #endif
 }
 
-// things'n'stuff
-int FontGlyphWidth[256];
-
 
 //int device_width, device_height;
-int target_width, target_height;						// render target size (window/texture)
+int target_width, target_height; // render target size (window/texture) but relative to viewport!
 rect target_rect;
-bool Fullscreen;
-callback_function *RefillAllVertexBuffers = NULL;
-
-int MaxVideoTextureSize=256;
 
 
 Fog fog;
@@ -106,8 +62,6 @@ Fog fog;
 
 //#define ENABLE_INDEX_BUFFERS
 
-// shader files
-int glShaderCurrent = 0;
 
 
 void MatrixOut(matrix &m) {
@@ -125,29 +79,78 @@ void mout(matrix &m) {
 	msg_write(format("		%f	%f	%f	%f",m._30,m._31,m._32,m._33));
 }
 
-void Init() {
+// https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions
+void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param) {
+	auto const src_str = [source]() {
+		switch (source)
+		{
+		case GL_DEBUG_SOURCE_API: return "API";
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM: return "WINDOW SYSTEM";
+		case GL_DEBUG_SOURCE_SHADER_COMPILER: return "SHADER COMPILER";
+		case GL_DEBUG_SOURCE_THIRD_PARTY: return "THIRD PARTY";
+		case GL_DEBUG_SOURCE_APPLICATION: return "APPLICATION";
+		case GL_DEBUG_SOURCE_OTHER: return "OTHER";
+		}
+		return "?";
+	}();
+
+	auto const type_str = [type]() {
+		switch (type)
+		{
+		case GL_DEBUG_TYPE_ERROR: return "ERROR";
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "DEPRECATED_BEHAVIOR";
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: return "UNDEFINED_BEHAVIOR";
+		case GL_DEBUG_TYPE_PORTABILITY: return "PORTABILITY";
+		case GL_DEBUG_TYPE_PERFORMANCE: return "PERFORMANCE";
+		case GL_DEBUG_TYPE_MARKER: return "MARKER";
+		case GL_DEBUG_TYPE_OTHER: return "OTHER";
+		}
+		return "?";
+	}();
+
+	auto const severity_str = [severity]() {
+		switch (severity) {
+		case GL_DEBUG_SEVERITY_NOTIFICATION: return "NOTIFICATION";
+		case GL_DEBUG_SEVERITY_LOW: return "LOW";
+		case GL_DEBUG_SEVERITY_MEDIUM: return "MEDIUM";
+		case GL_DEBUG_SEVERITY_HIGH: return "HIGH";
+		}
+		return "?";
+	}();
+
+	msg_error(format("%s, %s, %s, %d: %s", src_str, type_str, severity_str, id, message));
+}
+
+void init() {
 	//if (Usable)
 	//	return;
 
-	msg_write("Nix");
+	msg_write("nix");
 	msg_right();
 	msg_write("[" + version + "]");
 
 	msg_write(string("OpenGL: ") + (char*)glGetString(GL_VERSION));
 	msg_write(string("Renderer: ") + (char*)glGetString(GL_RENDERER));
 	msg_write(string("GLSL: ") + (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-	
 
-	Fullscreen = false; // before nix is started, we're hopefully not in fullscreen mode
-
-	// reset data
-	RefillAllVertexBuffers = NULL;
+#ifdef OS_WINDOWS
+	GLenum err = glewInit();
+	if (GLEW_OK != err) {
+		/* Problem: glewInit failed, something is seriously wrong. */
+		msg_error((const char*)glewGetErrorString(err));
+	}
+#endif
 
 
 	// default values of the engine
-	world_matrix = matrix::ID;
+	model_matrix = matrix::ID;
 	view_matrix = matrix::ID;
 	projection_matrix = matrix::ID;
+
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+	glDebugMessageCallback(message_callback, nullptr);
 
 
 
@@ -155,13 +158,13 @@ void Init() {
 	init_shaders();
 	init_vertex_buffers();
 
-	SetCull(CULL_DEFAULT);
-	SetWire(false);
-	SetAlpha(ALPHA_NONE);
-	SetMaterial(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
-	SetProjectionPerspective();
-	SetZ(true, true);
-	SetShader(Shader::default_3d);
+	set_cull(CullMode::DEFAULT);
+	set_wire(false);
+	set_alpha(AlphaMode::NONE);
+	set_material(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
+	set_projection_perspective();
+	set_z(true, true);
+	set_shader(Shader::default_3d);
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
@@ -173,34 +176,51 @@ void Init() {
 	msg_left();
 }
 
-void Kill() {
+void kill() {
 	msg_write("nix.kill");
-	KillDeviceObjects();
+	kill_device_objects();
 	glDeleteVertexArrays(1, &VertexArrayID);
 }
 
 // erlaubt dem Device einen Neustart
-void KillDeviceObjects()
-{
+void kill_device_objects() {
 	// textures
-	ReleaseTextures();
+	release_textures();
 }
 
-void ReincarnateDeviceObjects()
-{
+void reincarnate_device_objects() {
 	// textures
-	ReincarnateTextures();
-	if (RefillAllVertexBuffers)
-		RefillAllVertexBuffers();
+	reincarnate_textures();
 }
 
+
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+
+int total_mem() {
+	GLint total_mem_kb = 0;
+	glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+	int err = glGetError();
+	if (err == GL_NO_ERROR)
+		return total_mem_kb;
+	return -1;
+}
+
+int available_mem() {
+	GLint cur_avail_mem_kb = 0;
+	glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+	int err = glGetError();
+	if (err == GL_NO_ERROR)
+		return cur_avail_mem_kb;
+	return -1;
+}
 
 
 
 // shoot down windows
 void KillWindows()
 {
-#ifdef OS_WINDOWS
+/*#ifdef OS_WINDOWS
 	HANDLE t;
 	OpenProcessToken(	GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,&t);
 	_TOKEN_PRIVILEGES tp;
@@ -210,35 +230,33 @@ void KillWindows()
 	AdjustTokenPrivileges(t,FALSE,&tp,0,NULL,0);
 	InitiateSystemShutdown(NULL,(win_str)hui_tchar_str("Resistance is futile!"),10,TRUE,FALSE);
 	//ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE,0);
-#endif
+#endif*/
 }
 
 
 
-void SetWire(bool wire) {
+void set_wire(bool wire) {
 	if (wire) {
-		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDisable(GL_CULL_FACE);
 	} else {
-		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_CULL_FACE);
 	}
-	TestGLError("SetWire");
 }
 
-void SetCull(int mode) {
+void set_cull(CullMode mode) {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
-	if (mode == CULL_NONE)
+	if (mode == CullMode::NONE)
 		glDisable(GL_CULL_FACE);
-	if (mode == CULL_CCW)
+	if (mode == CullMode::CCW)
 		glCullFace(GL_FRONT);
-	if (mode == CULL_CW)
+	if (mode == CullMode::CW)
 		glCullFace(GL_BACK);
-	TestGLError("SetCull");
 }
 
-void SetZ(bool write, bool test) {
+void set_z(bool write, bool test) {
 	if (test) {
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
@@ -255,10 +273,9 @@ void SetZ(bool write, bool test) {
 			glDisable(GL_DEPTH_TEST);
 		}
 	}
-	TestGLError("SetZ");
 }
 
-void SetOffset(float offset) {
+void set_offset(float offset) {
 	if (fabs(offset) > 0.01f) {
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(offset, offset);
@@ -268,16 +285,14 @@ void SetOffset(float offset) {
 	}
 }
 
-void SetAlpha(int mode)
-{
+void set_alpha(AlphaMode mode) {
 	//glDisable(GL_ALPHA_TEST);
-	switch (mode){
-		case ALPHA_NONE:
+	switch (mode) {
+		case AlphaMode::NONE:
 			glDisable(GL_BLEND);
-			TestGLError("SetAlpha b");
 			break;
-		case ALPHA_COLOR_KEY_HARD:
-		case ALPHA_COLOR_KEY_SMOOTH:
+		case AlphaMode::COLOR_KEY_HARD:
+		case AlphaMode::COLOR_KEY_SMOOTH:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			/*glEnable(GL_ALPHA_TEST);
@@ -286,111 +301,96 @@ void SetAlpha(int mode)
 			else
 				glAlphaFunc(GL_GEQUAL,0.04f);*/
 			break;
-		case ALPHA_MATERIAL:
+		case AlphaMode::MATERIAL:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			break;
 	}
-	TestGLError("SetAlpha");
 }
 
-void SetAlphaM(int mode)
-{	SetAlpha(mode);	}
+void set_alpha_mode(AlphaMode mode) {
+	set_alpha(mode);
+}
 
-unsigned int OGLGetAlphaMode(int mode) {
-	if (mode == ALPHA_ZERO)
+unsigned int OGLGetAlphaMode(Alpha mode) {
+	if (mode == Alpha::ZERO)
 		return GL_ZERO;
-	if (mode == ALPHA_ONE)
+	if (mode == Alpha::ONE)
 		return GL_ONE;
-	if (mode == ALPHA_SOURCE_COLOR)
+	if (mode == Alpha::SOURCE_COLOR)
 		return GL_SRC_COLOR;
-	if (mode == ALPHA_SOURCE_INV_COLOR)
+	if (mode == Alpha::SOURCE_INV_COLOR)
 		return GL_ONE_MINUS_SRC_COLOR;
-	if (mode == ALPHA_SOURCE_ALPHA)
+	if (mode == Alpha::SOURCE_ALPHA)
 		return GL_SRC_ALPHA;
-	if (mode == ALPHA_SOURCE_INV_ALPHA)
+	if (mode == Alpha::SOURCE_INV_ALPHA)
 		return GL_ONE_MINUS_SRC_ALPHA;
-	if (mode == ALPHA_DEST_COLOR)
+	if (mode == Alpha::DEST_COLOR)
 		return GL_DST_COLOR;
-	if (mode == ALPHA_DEST_INV_COLOR)
+	if (mode == Alpha::DEST_INV_COLOR)
 		return GL_ONE_MINUS_DST_COLOR;
-	if (mode == ALPHA_DEST_ALPHA)
+	if (mode == Alpha::DEST_ALPHA)
 		return GL_DST_ALPHA;
-	if (mode == ALPHA_DEST_INV_ALPHA)
+	if (mode == Alpha::DEST_INV_ALPHA)
 		return GL_ONE_MINUS_DST_ALPHA;
 	// GL_SRC_ALPHA_SATURATE
 	return GL_ZERO;
 }
 
-void SetAlpha(int src,int dst) {
+void set_alpha(Alpha src, Alpha dst) {
 	glEnable(GL_BLEND);
 	//glDisable(GL_ALPHA_TEST);
-	glBlendFunc(OGLGetAlphaMode(src),OGLGetAlphaMode(dst));
-	TestGLError("SetAlphaII");
+	glBlendFunc(OGLGetAlphaMode(src), OGLGetAlphaMode(dst));
 }
 
-void SetAlphaSD(int src,int dst)
-{	SetAlpha(src,dst);	}
-
-void SetAlpha(float factor) {
-	msg_error("deprecated... SetAlpha(factor)");
-	/*glDisable(GL_ALPHA_TEST);
-	float di[4];
-	glGetMaterialfv(GL_FRONT,GL_DIFFUSE,di);
-	di[3]=factor;
-	glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,di);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	TestGLError("SetAlphaF");*/
+void set_alpha_sd(Alpha src,Alpha dst) {
+	set_alpha(src, dst);
 }
 
-void SetStencil(int mode, unsigned long param)
-{
+
+void set_stencil(StencilOp mode, unsigned long param) {
 	glStencilMask(0xffffffff);
 	
-	if (mode == STENCIL_NONE){
+	if (mode == StencilOp::NONE) {
 		glDisable(GL_STENCIL_TEST);
-	}else if (mode == STENCIL_RESET){
+	} else if (mode == StencilOp::RESET) {
 		glClearStencil(param);
 		glClear(GL_STENCIL_BUFFER_BIT);
-	}else if ((mode == STENCIL_INCREASE) or (mode == STENCIL_DECREASE) or (mode == STENCIL_DECREASE_NOT_NEGATIVE) or (mode == STENCIL_SET)){
+	} else if ((mode == StencilOp::INCREASE) or (mode == StencilOp::DECREASE) or (mode == StencilOp::DECREASE_NOT_NEGATIVE) or (mode == StencilOp::SET)) {
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_ALWAYS,param,0xffffffff);
-		if (mode == STENCIL_INCREASE)
+		if (mode == StencilOp::INCREASE)
 			glStencilOp(GL_KEEP,GL_KEEP,GL_INCR);
-		else if ((mode == STENCIL_DECREASE) or (mode == STENCIL_DECREASE_NOT_NEGATIVE))
+		else if ((mode == StencilOp::DECREASE) or (mode == StencilOp::DECREASE_NOT_NEGATIVE))
 			glStencilOp(GL_KEEP,GL_KEEP,GL_DECR);
-		else if (mode == STENCIL_SET)
+		else if (mode == StencilOp::SET)
 			glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
-	}else if ((mode == STENCIL_MASK_EQUAL) or (mode == STENCIL_MASK_NOT_EQUAL) or (mode == STENCIL_MASK_LESS_EQUAL) or (mode == STENCIL_MASK_LESS) or (mode == STENCIL_MASK_GREATER_EQUAL) or (mode == STENCIL_MASK_GREATER)){
+	} else if ((mode == StencilOp::MASK_EQUAL) or (mode == StencilOp::MASK_NOT_EQUAL) or (mode == StencilOp::MASK_LESS_EQUAL) or (mode == StencilOp::MASK_LESS) or (mode == StencilOp::MASK_GREATER_EQUAL) or (mode == StencilOp::MASK_GREATER)) {
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-		if (mode == STENCIL_MASK_EQUAL)
+		if (mode == StencilOp::MASK_EQUAL)
 			glStencilFunc(GL_EQUAL,param,0xffffffff);
-		else if (mode == STENCIL_MASK_NOT_EQUAL)
+		else if (mode == StencilOp::MASK_NOT_EQUAL)
 			glStencilFunc(GL_NOTEQUAL,param,0xffffffff);
-		else if (mode == STENCIL_MASK_LESS_EQUAL)
+		else if (mode == StencilOp::MASK_LESS_EQUAL)
 			glStencilFunc(GL_LEQUAL,param,0xffffffff);
-		else if (mode == STENCIL_MASK_LESS)
+		else if (mode == StencilOp::MASK_LESS)
 			glStencilFunc(GL_LESS,param,0xffffffff);
-		else if (mode == STENCIL_MASK_GREATER_EQUAL)
+		else if (mode == StencilOp::MASK_GREATER_EQUAL)
 			glStencilFunc(GL_GEQUAL,param,0xffffffff);
-		else if (mode == STENCIL_MASK_GREATER)
+		else if (mode == StencilOp::MASK_GREATER)
 			glStencilFunc(GL_GREATER,param,0xffffffff);
 	}
-	TestGLError("SetStencil");
 }
 
 // mode=FogLinear:			start/end
 // mode=FogExp/FogExp2:		density
-void SetFog(int mode,float start,float end,float density,const color &c)
-{
+void set_fog(int mode,float start,float end,float density,const color &c) {
 	fog.density = density;
 	fog._color = c;
-	//TestGLError("SetFog");
 }
 
-void EnableFog(bool Enabled)
+void enable_fog(bool Enabled)
 {
 	fog.density = 0;
 }

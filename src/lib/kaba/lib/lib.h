@@ -12,6 +12,7 @@
 #include "../syntax/Flags.h"
 #include "extern.h"
 #include "../../base/pointer.h"
+#include <cstddef>
 
 namespace kaba {
 
@@ -188,8 +189,8 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 // T[] += T[]
 #define IMPLEMENT_IOP(OP, TYPE) \
 { \
-	int n = min(num, b.num); \
-	TYPE *pa = (TYPE*)data; \
+	int n = ::min(this->num, b.num); \
+	TYPE *pa = (TYPE*)this->data; \
 	TYPE *pb = (TYPE*)b.data; \
 	for (int i=0;i<n;i++) \
 		*(pa ++) OP *(pb ++); \
@@ -198,8 +199,8 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 // T[] += x
 #define IMPLEMENT_IOP2(OP, TYPE) \
 { \
-	TYPE *pa = (TYPE*)data; \
-	for (int i=0;i<num;i++) \
+	TYPE *pa = (TYPE*)this->data; \
+	for (int i=0;i<this->num;i++) \
 		*(pa ++) OP x; \
 }
 
@@ -207,10 +208,10 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 // R[] = T[] + T[]
 #define IMPLEMENT_OP(OP, TYPE, RETURN) \
 { \
-	int n = min(num, b.num); \
+	int n = ::min(this->num, b.num); \
 	Array<RETURN> r; \
 	r.resize(n); \
-	TYPE *pa = (TYPE*)data; \
+	TYPE *pa = (TYPE*)this->data; \
 	TYPE *pb = (TYPE*)b.data; \
 	RETURN *pr = (RETURN*)r.data; \
 	for (int i=0;i<n;i++) \
@@ -221,20 +222,20 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 #define IMPLEMENT_OP2(OP, TYPE, RETURN) \
 { \
 	Array<RETURN> r; \
-	r.resize(num); \
-	TYPE *pa = (TYPE*)data; \
+	r.resize(this->num); \
+	TYPE *pa = (TYPE*)this->data; \
 	RETURN *pr = (RETURN*)r.data; \
-	for (int i=0;i<num;i++) \
+	for (int i=0;i<this->num;i++) \
 		*(pr ++) = *(pa ++) OP x; \
 	return r; \
 }
 // R[] = F(T[], T[])
 #define IMPLEMENT_OPF(F, TYPE, RETURN) \
 { \
-	int n = min(num, b.num); \
+	int n = ::min(this->num, b.num); \
 	Array<RETURN> r; \
 	r.resize(n); \
-	TYPE *pa = (TYPE*)data; \
+	TYPE *pa = (TYPE*)this->data; \
 	TYPE *pb = (TYPE*)b.data; \
 	RETURN *pr = (RETURN*)r.data; \
 	for (int i=0;i<n;i++) \
@@ -246,10 +247,10 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 #define IMPLEMENT_OPF2(F, TYPE, RETURN) \
 { \
 	Array<RETURN> r; \
-	r.resize(num); \
-	TYPE *pa = (TYPE*)data; \
+	r.resize(this->num); \
+	TYPE *pa = (TYPE*)this->data; \
 	RETURN *pr = (RETURN*)r.data; \
-	for (int i=0;i<num;i++) \
+	for (int i=0;i<this->num;i++) \
 		*(pr ++) = F(*(pa ++), x); \
 	return r; \
 }

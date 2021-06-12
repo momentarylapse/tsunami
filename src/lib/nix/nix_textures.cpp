@@ -20,171 +20,18 @@
 
 namespace nix{
 
-Path texture_dir;
-
 shared_array<Texture> textures;
 Texture *default_texture = nullptr;
 Texture *tex_text = nullptr;
 int tex_cube_level = -1;
 
 
-//void SetDefaultShaderData(int num_textures, const vector &cam_pos);
-
-
-
-//--------------------------------------------------------------------------------------------------
-// avi files
-//--------------------------------------------------------------------------------------------------
-
-#ifdef NIX_ALLOW_VIDEO_TEXTURE
-
-
-struct s_avi_info
-{
-	AVISTREAMINFO		psi;										// Pointer To A Structure Containing Stream Info
-	PAVISTREAM			pavi;										// Handle To An Open Stream
-	PGETFRAME			pgf;										// Pointer To A GetFrame Object
-	BITMAPINFOHEADER	bmih;										// Header Information For DrawDibDraw Decoding
-	long				lastframe;									// Last Frame Of The Stream
-	int					width;										// Video Width
-	int					height;										// Video Height
-	char				*pdata;										// Pointer To Texture Data
-	unsigned char*		data;										// Pointer To Our Resized Image
-	HBITMAP hBitmap;												// Handle To A Device Dependant Bitmap
-	float time,fps;
-	int ActualFrame;
-	HDRAWDIB hdd;												// Handle For Our Dib
-	HDC hdc;										// Creates A Compatible Device Context
-}*avi_info[NIX_MAX_TEXTURES];
-
-
-static void avi_flip(void* buffer,int w,int h)
-{
-	unsigned char *b = (BYTE *)buffer;
-	char temp;
-    for (int x=0;x<w;x++)
-    	for (int y=0;y<h/2;y++){
-    		temp=b[(x+(h-y-1)*w)*3+2];
-    		b[(x+(h-y-1)*w)*3+2]=b[(x+y*w)*3  ];
-    		b[(x+y*w)*3  ]=temp;
-
-    		temp=b[(x+(h-y-1)*w)*3+1];
-    		b[(x+(h-y-1)*w)*3+1]=b[(x+y*w)*3+1];
-    		b[(x+y*w)*3+1]=temp;
-
-    		temp=b[(x+(h-y-1)*w)*3  ];
-    		b[(x+(h-y-1)*w)*3  ]=b[(x+y*w)*3+2];
-    		b[(x+y*w)*3+2]=temp;
-    	}
-}
-
-static int GetBestVideoSize(int s)
-{
-	return NixMaxVideoTextureSize;
-}
-
-void avi_grab_frame(int texture,int frame)									// Grabs A Frame From The Stream
-{
-	if (texture<0)
-		return;
-	if (!avi_info[texture])
-		return;
-	if (avi_info[texture]->ActualFrame==frame)
-		return;
-	int w=NixTextureWidth[texture];
-	int h=NixTextureHeight[texture];
-	msg_write(w);
-	msg_write(h);
-	avi_info[texture]->ActualFrame=frame;
-	LPBITMAPINFOHEADER lpbi;									// Holds The Bitmap Header Information
-	lpbi = (LPBITMAPINFOHEADER)AVIStreamGetFrame(avi_info[texture]->pgf, frame);	// Grab Data From The AVI Stream
-	avi_info[texture]->pdata=(char *)lpbi+lpbi->biSize+lpbi->biClrUsed * sizeof(RGBQUAD);	// Pointer To Data Returned By AVIStreamGetFrame
-
-	// Convert Data To Requested Bitmap Format
-	DrawDibDraw (avi_info[texture]->hdd, avi_info[texture]->hdc, 0, 0, w, h, lpbi, avi_info[texture]->pdata, 0, 0, avi_info[texture]->width, avi_info[texture]->height, 0);
-	
-
-	//avi_flip(avi_info[texture]->data,w,h);	// Swap The Red And Blue Bytes (GL Compatability)
-
-	// Update The Texture
-	glBindTexture(GL_TEXTURE_2D,OGLTexture[texture]);
-	glEnable(GL_TEXTURE_2D);
-	glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, avi_info[texture]->data);
-	//gluBuild2DMipmaps(GL_TEXTURE_2D,3,w,h,GL_RGB,GL_UNSIGNED_BYTE,AVIdata);
-}
-
-bool avi_open(int texture,LPCSTR szFile)
-{
-	avi_info[texture]->hdc = CreateCompatibleDC(0);
-	avi_info[texture]->hdd = DrawDibOpen();
-
-	// Opens The AVI Stream
-	if (AVIStreamOpenFromFile(&avi_info[texture]->pavi, sys_str_f(szFile), streamtypeVIDEO, 0, OF_READ, NULL) !=0){
-		msg_error("Failed To Open The AVI Stream");
-		return false;
-	}
-
-	AVIStreamInfo(avi_info[texture]->pavi, &avi_info[texture]->psi, sizeof(avi_info[texture]->psi));						// Reads Information About The Stream Into psi
-	avi_info[texture]->width=avi_info[texture]->psi.rcFrame.right-avi_info[texture]->psi.rcFrame.left;					// Width Is Right Side Of Frame Minus Left
-	avi_info[texture]->height=avi_info[texture]->psi.rcFrame.bottom-avi_info[texture]->psi.rcFrame.top;
-
-	avi_info[texture]->lastframe=AVIStreamLength(avi_info[texture]->pavi);
-	avi_info[texture]->fps=float(avi_info[texture]->lastframe)/float(AVIStreamSampleToTime(avi_info[texture]->pavi,avi_info[texture]->lastframe)/1000.0f);
-
-	avi_info[texture]->bmih.biSize = sizeof (BITMAPINFOHEADER);					// Size Of The BitmapInfoHeader
-	avi_info[texture]->bmih.biPlanes = 1;											// Bitplanes
-	avi_info[texture]->bmih.biBitCount = 24;										// Bits Format We Want (24 Bit, 3 Bytes)
-//	avi_info[texture]->bmih.biWidth = AVI_TEXTURE_WIDTH;											// Width We Want (256 Pixels)
-//	avi_info[texture]->bmih.biHeight = AVI_TEXTURE_HEIGHT;										// Height We Want (256 Pixels)
-	avi_info[texture]->bmih.biCompression = BI_RGB;								// Requested Mode = RGB
-
-	avi_info[texture]->hBitmap = CreateDIBSection (avi_info[texture]->hdc, (BITMAPINFO*)(&avi_info[texture]->bmih), DIB_RGB_COLORS, (void**)(&avi_info[texture]->data), NULL, 0);
-	SelectObject (avi_info[texture]->hdc, avi_info[texture]->hBitmap);								// Select hBitmap Into Our Device Context (hdc)
-
-	avi_info[texture]->pgf=AVIStreamGetFrameOpen(avi_info[texture]->pavi, NULL);						// Create The PGETFRAME	Using Our Request Mode
-	if (avi_info[texture]->pgf==NULL){
-		msg_error("Failed To Open The AVI Frame");
-		return false;
-	}
-
-	NixTextureWidth[texture]=GetBestVideoSize(avi_info[texture]->width);
-	NixTextureHeight[texture]=GetBestVideoSize(avi_info[texture]->height);
-	msg_write(NixTextureWidth[texture]);
-	msg_write(NixTextureHeight[texture]);
-
-	avi_info[texture]->time=0;
-	avi_info[texture]->ActualFrame=1;
-	avi_grab_frame(texture,1);
-	return true;
-}
-
-void avi_close(int texture)
-{
-	if (!avi_info[texture])
-		return;
-	DeleteObject(avi_info[texture]->hBitmap);										// Delete The Device Dependant Bitmap Object
-	DrawDibClose(avi_info[texture]->hdd);											// Closes The DrawDib Device Context
-	AVIStreamGetFrameClose(avi_info[texture]->pgf);								// Deallocates The GetFrame Resources
-	AVIStreamRelease(avi_info[texture]->pavi);										// Release The Stream
-	//AVIFileExit();												// Release The File
-}
-
-#endif
-
-
-
-//#endif
 
 //--------------------------------------------------------------------------------------------------
 // common stuff
 //--------------------------------------------------------------------------------------------------
 
 void init_textures() {
-	#ifdef NIX_ALLOW_VIDEO_TEXTURE
-		// allow AVI textures
-		AVIFileInit();
-	#endif
-
 
 	default_texture = new Texture;
 	Image image;
@@ -194,14 +41,14 @@ void init_textures() {
 	tex_text = new Texture;
 }
 
-void ReleaseTextures() {
+void release_textures() {
 	for (Texture *t: weak(textures)) {
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 		glDeleteTextures(1, &t->texture);
 	}
 }
 
-void ReincarnateTextures() {
+void reincarnate_textures() {
 	for (Texture *t: weak(textures)) {
 		glGenTextures(1, &t->texture);
 		t->reload();
@@ -239,16 +86,13 @@ Texture::Texture() {
 	type = Type::DEFAULT;
 	internal_format = 0;
 	valid = true;
-#ifdef NIX_ALLOW_VIDEO_TEXTURE
-	avi_info = NULL;
-#endif
 	glGenTextures(1, &texture);
-	width = height = nz = 0;
+	width = height = nz = samples = 0;
 }
 
 
 Texture::Texture(int w, int h, const string &_format) : Texture() {
-	msg_write(format("creating texture [%d x %d] ", w, h) + _format);
+	msg_write(format("creating texture [%d x %d: %s] ", w, h, _format));
 	width = w;
 	height = h;
 
@@ -256,14 +100,12 @@ Texture::Texture(int w, int h, const string &_format) : Texture() {
 	auto d = parse_format(_format);
 	internal_format = d.internal_format;
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, d.components, d.x, 0);
-	TestGLError("Texture: glTexImage2D");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	TestGLError("Texture: parameter");
 }
 
 Texture::Texture(int w, int h, int _nz, const string &_format) : Texture() {
-	msg_write(format("creating texture [%d x %d x %d] ", w, h, _nz) + _format);
+	msg_write(format("creating texture [%d x %d x %d: %s] ", w, h, _nz, _format));
 	width = w;
 	height = h;
 	nz = _nz;
@@ -273,10 +115,8 @@ Texture::Texture(int w, int h, int _nz, const string &_format) : Texture() {
 	auto d = parse_format(_format);
 	internal_format = d.internal_format;
 	glTexImage3D(GL_TEXTURE_3D, 0, internal_format, width, height, nz, 0, d.components, d.x, 0);
-	TestGLError("Texture: glTexImage3D");
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	TestGLError("Texture: parameter");
 }
 
 Texture::~Texture() {
@@ -309,71 +149,39 @@ void TextureClear() {
 Texture *Texture::load(const Path &filename) {
 	if (filename.is_empty())
 		return nullptr;
-	for (Texture *t: weak(textures))
-		if (filename == t->filename)
-			return t->valid ? t : nullptr;
 
 	// test existence
-	if (!file_exists(texture_dir << filename))
+	if (!file_exists(filename))
 		throw Exception("texture file does not exist: " + filename.str());
 
 	Texture *t = new Texture;
-	t->filename = filename;
-	t->reload();
-	textures.add(t);
-	return t;
+	try {
+		t->filename = filename;
+		t->reload();
+		textures.add(t);
+		return t;
+	} catch (...) {
+		delete t;
+	}
+	return nullptr;
 }
 
 void Texture::reload() {
 	msg_write("loading texture: " + filename.str());
 
-	Path _filename = texture_dir << filename;
-
 	// test the file's existence
-	if (!file_exists(_filename))
+	if (!file_exists(filename))
 		throw Exception("texture file does not exist!");
 
-	#ifdef NIX_ALLOW_VIDEO_TEXTURE
-		avi_info[texture]=NULL;
-	#endif
-
 	string extension = filename.extension();
-
-// AVI
-	if (extension == "avi") {
-		//msg_write("avi");
-		#ifdef NIX_ALLOW_VIDEO_TEXTURE
-			avi_info[texture]=new s_avi_info;
-
-			glBindTexture(GL_TEXTURE_2D, texture);
-			glEnable(GL_TEXTURE_2D);
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-			if (!avi_open(texture,SysFileName(t->Filename))){
-				avi_info[texture]=NULL;
-				return;
-			}
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t->Width, t->Height, 0, GL_RGB, GL_UNSIGNED_BYTE, avi_info[texture]->data);
-		#else
-			msg_error("Support for video textures is not activated!!!");
-			msg_write("-> un-comment the NIX_ALLOW_VIDEO_TEXTURE definition in the source file \"00_config.h\" and recompile the program");
-			return;
-		#endif
-	} else {
-		auto image = Image::load(_filename);
-		overwrite(*image);
-		delete image;
-	}
+	auto image = Image::load(filename);
+	overwrite(*image);
+	delete image;
 }
 
 void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &image) {
 	if (!t)
 		return;
-
-	#ifdef NIX_ALLOW_VIDEO_TEXTURE
-		avi_info[texture]=NULL;
-	#endif
 
 	image.set_mode(Image::Mode::RGBA);
 
@@ -383,17 +191,15 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 	if (!image.error){
 		//glEnable(target);
 		glBindTexture(target, t->texture);
-		TestGLError("OverwriteTexture a");
 		glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		TestGLError("OverwriteTexture b");
-		if (t->type == t->Type::CUBE){
+		if (t->type == t->Type::CUBE) {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		} else if (t->type == t->Type::DYNAMIC){
+		} else if (t->type == t->Type::DYNAMIC) {
 			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		} else {
@@ -401,7 +207,6 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
-		TestGLError("OverwriteTexture c");
 #ifdef GL_GENERATE_MIPMAP
 		//if (image.alpha_used) {
 			t->internal_format = GL_RGBA8;
@@ -410,10 +215,8 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 		//	t->internal_format = GL_RGB8;
 		//	glTexImage2D(subtarget, 0, GL_RGB8, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data.data);
 		//}
-		TestGLError("OverwriteTexture d");
 		if (t->type == t->Type::DEFAULT)
 			glGenerateMipmap(GL_TEXTURE_2D);
-		TestGLError("OverwriteTexture e");
 #else
 		if (image.alpha_used)
 			gluBuild2DMipmaps(subtarget,4,image.width,image.height,GL_RGBA,GL_UNSIGNED_BYTE, image.data.data);
@@ -431,8 +234,14 @@ void OverwriteTexture__(Texture *t, int target, int subtarget, const Image &imag
 	}
 }
 
-void Texture::set_options(const string &options) {
-	glBindTexture(GL_TEXTURE_2D, texture);
+void Texture::set_options(const string &options) const {
+	unsigned int target = GL_TEXTURE_2D;
+	if (type == Type::MULTISAMPLE) {
+		target = GL_TEXTURE_2D_MULTISAMPLE;
+		return;
+	}
+
+	glBindTexture(target, texture);
 	for (auto &x: options.explode(",")) {
 		auto y = x.explode("=");
 		if (y.num != 2)
@@ -442,29 +251,28 @@ void Texture::set_options(const string &options) {
 		if (key == "wrap") {
 			if (value == "repeat") {
 				//glBindTexture(0, texture);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			} else if (value == "clamp") {
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+				glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 			} else {
 				throw Exception("unknown value for key: " + x);
 			}
 		} else if ((key == "magfilter") or (key == "minfilter")) {
 			auto filter = (key == "magfilter") ? GL_TEXTURE_MAG_FILTER : GL_TEXTURE_MIN_FILTER;
 			if (value == "linear") {
-				glTexParameteri(GL_TEXTURE_2D, filter, GL_LINEAR);
+				glTexParameteri(target, filter, GL_LINEAR);
 			} else if (value == "nearest") {
-				glTexParameteri(GL_TEXTURE_2D, filter, GL_NEAREST);
+				glTexParameteri(target, filter, GL_NEAREST);
 			} else if (value == "trilinear") {
-				glTexParameteri(GL_TEXTURE_2D, filter, GL_LINEAR_MIPMAP_LINEAR);
+				glTexParameteri(target, filter, GL_LINEAR_MIPMAP_LINEAR);
 			} else {
 				throw Exception("unknown value for key: " + x);
 			}
 		} else {
 			throw Exception("unknown key: " + key);
 		}
-		TestGLError("Texture.set_options");
 	}
 }
 
@@ -473,13 +281,13 @@ void Texture::overwrite(const Image &image) {
 }
 
 void Texture::read(Image &image) {
-	SetTexture(this);
+	set_texture(this);
 	image.create(width, height, Black);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data.data);
 }
 
 void Texture::read_float(Array<float> &data) {
-	SetTexture(this);
+	set_texture(this);
 	if ((internal_format == GL_R8) or (internal_format == GL_R32F)) {
 		data.resize(width * height);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, data.data); // 1 channel
@@ -490,7 +298,7 @@ void Texture::read_float(Array<float> &data) {
 }
 
 void Texture::write_float(Array<float> &data, int nx, int ny, int nz) {
-	SetTexture(this);
+	set_texture(this);
 	if (type == Type::VOLUME) {
 		if ((internal_format == GL_R8) or (internal_format == GL_R32F)) {
 			glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, nx, ny, nz, 0, GL_RED, GL_FLOAT, &data[0]);
@@ -514,33 +322,30 @@ void Texture::unload() {
 	glDeleteTextures(1, (unsigned int*)&texture);
 }
 
-void SetTexture(Texture *t) {
+void set_texture(Texture *t) {
 	//refresh_texture(t);
 	if (!t)
 		t = default_texture;
 
 	tex_cube_level = -1;
 	glActiveTexture(GL_TEXTURE0);
-	TestGLError("SetTex .a");
 	if (t->type == Texture::Type::CUBE){
 		glEnable(GL_TEXTURE_CUBE_MAP);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, t->texture);
 		tex_cube_level = 0;
-		TestGLError("SetTex b cm");
 	} else if (t->type == Texture::Type::IMAGE){
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 		glBindImageTexture(0, t->texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, t->internal_format);
-		TestGLError("SetTex b");
 	} else if (t->type == Texture::Type::VOLUME){
 		glBindTexture(GL_TEXTURE_3D, t->texture);
-		TestGLError("SetTex b");
+	} else if (t->type == Texture::Type::MULTISAMPLE){
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, t->texture);
 	} else {
 		glBindTexture(GL_TEXTURE_2D, t->texture);
-		TestGLError("SetTex b");
 	}
 }
 
-void SetTextures(const Array<Texture*> &textures) {
+void set_textures(const Array<Texture*> &textures) {
 	/*for (int i=0;i<num_textures;i++)
 		if (texture[i] >= 0)
 			refresh_texture(texture[i]);*/
@@ -554,49 +359,40 @@ void SetTextures(const Array<Texture*> &textures) {
 		if (t->type == t->Type::CUBE) {
 			glBindTexture(GL_TEXTURE_CUBE_MAP, t->texture);
 			tex_cube_level = i;
+		} else if (t->type == Texture::Type::IMAGE){
+			glBindTexture(GL_TEXTURE_2D, t->texture);
+			glBindImageTexture(0, t->texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, t->internal_format);
 		} else if (t->type == t->Type::VOLUME) {
 			glBindTexture(GL_TEXTURE_3D, t->texture);
+		} else if (t->type == t->Type::MULTISAMPLE) {
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, t->texture);
 		} else {
 			glBindTexture(GL_TEXTURE_2D, t->texture);
 		}
-		//TestGLError("SetTex"+i2s(i));
 	}
-	TestGLError("SetTextures");
 }
 
-void SetTextureVideoFrame(int texture,int frame)
-{
-#ifdef NIX_ALLOW_VIDEO_TEXTURE
-	if (texture<0)
-		return;
-	if (!avi_info[texture])
-		return;
-	if (frame>avi_info[texture]->lastframe)
-		frame=0;
-	avi_grab_frame(texture,frame);
-	avi_info[texture]->time=float(frame)/avi_info[texture]->fps;
-#endif
-}
 
-void TextureVideoMove(int texture,float elapsed)
-{
-#ifdef NIX_ALLOW_VIDEO_TEXTURE
-	if (texture<0)
-		return;
-	if (!avi_info[texture])
-		return;
-	msg_write("<NixTextureVideoMove>");
-	avi_info[texture]->time+=elapsed;
-	if (avi_info[texture]->time*avi_info[texture]->fps>avi_info[texture]->lastframe)
-		avi_info[texture]->time=0;
-	avi_grab_frame(texture,int(avi_info[texture]->time*avi_info[texture]->fps));
-	msg_write("</NixTextureVideoMove>");
-#endif
-}
 
+TextureMultiSample::TextureMultiSample(int w, int h, int _samples, const string &_format) : Texture() {
+	msg_write(format("creating texture [%d x %d, %d samples: %s]", w, h, _samples, _format));
+	width = w;
+	height = h;
+	samples = _samples;
+	type = Type::MULTISAMPLE;
+
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+	auto d = parse_format(_format);
+	internal_format = d.internal_format;
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE);
+	//glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, d.components, d.x, 0);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+}
 
 ImageTexture::ImageTexture(int _width, int _height, const string &_format) {
-	msg_write(format("creating image texture [%d x %d] ", _width, _height) + _format);
+	msg_write(format("creating image texture [%d x %d: %s] ", _width, _height, _format));
 	filename = "-image-";
 	width = _width;
 	height = _height;
@@ -606,15 +402,14 @@ ImageTexture::ImageTexture(int _width, int _height, const string &_format) {
 	auto d = parse_format(_format);
 	internal_format = d.internal_format;
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, d.components, d.x, 0);
-	TestGLError("ImageTexture: glTexImage2D");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	TestGLError("ImageTexture: aaaa");
 }
 
 void ImageTexture::__init__(int width, int height, const string &format) {
 	new(this) ImageTexture(width, height, format);
 }
+
 
 DepthBuffer::DepthBuffer(int _width, int _height) {
 	msg_write(format("creating depth texture [%d x %d] ", _width, _height));
@@ -627,11 +422,8 @@ DepthBuffer::DepthBuffer(int _width, int _height) {
 
 	// as renderbuffer -> can't sample from it!
 	/*glGenRenderbuffers(1, &texture);
-	TestGLError("FrameBuffer: glGenRenderbuffers");
 	glBindRenderbuffer(GL_RENDERBUFFER, texture);
-	TestGLError("FrameBuffer: glBindRenderbuffer");
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	TestGLError("FrameBuffer: glRenderbufferStorage");*/
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);*/
 
 	// as texture -> can sample!
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -642,13 +434,29 @@ DepthBuffer::DepthBuffer(int _width, int _height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	TestGLError("DepthTexture: aaaa");
 }
 
 void DepthBuffer::__init__(int width, int height) {
 	new(this) DepthBuffer(width, height);
 }
 
+RenderBuffer::RenderBuffer(int w, int h) : RenderBuffer(w, h, 0) {}
+
+RenderBuffer::RenderBuffer(int w, int h, int _samples) {
+	filename = "-render-buffer-";
+	type = Type::RENDERBUFFER;
+	width = w;
+	height = h;
+	samples = _samples;
+	internal_format = GL_DEPTH24_STENCIL8;
+
+	glGenRenderbuffers(1, &texture);
+	glBindRenderbuffer(GL_RENDERBUFFER, texture);
+	if (samples > 0)
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, internal_format, width, height);
+	else
+		glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
+}
 
 
 static int NixCubeMapTarget[] = {
@@ -684,7 +492,7 @@ void CubeMap::fill_side(int side, Texture *source) {
 	if (source->type == Type::CUBE)
 		return;
 	Image image;
-	image.load(texture_dir << source->filename);
+	image.load(source->filename);
 	overwrite_side(side, image);
 }
 

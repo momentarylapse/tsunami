@@ -544,8 +544,12 @@ void Class::derive_from(const Class* root, bool increase_size) {
 			ff = f->create_dummy_clone(this);
 			ff->_label = f->_label;
 			ff->address = f->address;
-			//ff->literal_return_type = this;
-			//ff->return_type = this;
+
+			// leave it for now
+			//   script_make_super_array() is looking for DynamicArray as a return type
+			// nahhh, let's do it here
+			ff->literal_return_type = this;
+			ff->effective_return_type = this;
 		}
 		if (config.verbose)
 			msg_write("INHERIT   " + ff->signature());

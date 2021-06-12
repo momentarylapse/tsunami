@@ -8,6 +8,7 @@
  */
 
 #include "RingBuffer.h"
+#include <mutex>
 
 RingBuffer::RingBuffer(int size) {
 	buf.resize(size);

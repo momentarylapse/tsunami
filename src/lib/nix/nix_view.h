@@ -7,34 +7,31 @@
 
 #if HAS_LIB_GL
 
-#ifndef _NIX_VIEW_EXISTS_
-#define _NIX_VIEW_EXISTS_
+#pragma once
 
 class Image;
 
-namespace nix{
+namespace nix {
 
 class Texture;
 class DepthBuffer;
 
 
-void _cdecl SetProjectionPerspective();
-void _cdecl SetProjectionPerspectiveExt(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max);
-void _cdecl SetProjectionOrtho(bool relative);
-void _cdecl SetProjectionOrthoExt(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max);
-void _cdecl SetProjectionMatrix(const matrix &mat);
+void _cdecl set_projection_perspective();
+void _cdecl set_projection_perspective_ext(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max);
+void _cdecl set_projection_ortho_relative();
+void _cdecl set_projection_ortho_pixel();
+void _cdecl set_projection_ortho_ext(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max);
+void _cdecl set_projection_matrix(const matrix &mat);
 
-void _cdecl SetWorldMatrix(const matrix &mat);
-void _cdecl SetViewMatrix(const matrix &view_mat);
+void _cdecl set_model_matrix(const matrix &mat);
+void _cdecl set_view_matrix(const matrix &view_mat);
 
-void _cdecl SetViewport(const rect &area);
+void _cdecl set_viewport(const rect &area);
 
-//bool _cdecl StartFrame();
-//bool _cdecl StartFrameIntoTexture(Texture *t);
-void _cdecl SetScissor(const rect &r);
-//void _cdecl EndFrame();
+void _cdecl set_scissor(const rect &r);
 
-void _cdecl ScreenShotToImage(Image &image);
+void _cdecl screen_shot_to_image(Image &image);
 
 class FrameBuffer : public Sharable<Empty> {
 public:
@@ -49,23 +46,25 @@ public:
 	DepthBuffer *depth_buffer;
 	unsigned int frame_buffer;
 	int width, height;
+	int multi_samples;
 	rect area() const;
+
+	void _check();
 
 	static FrameBuffer *DEFAULT;
 };
 
-void BindFrameBuffer(FrameBuffer *fb);
+void bind_frame_buffer(FrameBuffer *fb);
 
 
-void StartFrameHui();
-void EndFrameHui();
+void start_frame_hui();
+void end_frame_hui();
 #if HAS_LIB_GLFW
-void StartFrameGLFW(void *win);
-void EndFrameGLFW(void *win);
+void start_frame_glfw(void *win);
+void end_frame_glfw(void *win);
 #endif
 
 };
 
 #endif
 
-#endif

@@ -576,8 +576,7 @@ string f2s_clean(float f, int dez) {
 }
 
 // convert a float to a string
-string f642s(double f,int dez)
-{
+string f642s(double f, int dez) {
 	/*strcpy(str,"");
 	if (f<0) {
 		strcat(str,"-");
@@ -605,8 +604,7 @@ string f642s(double f,int dez)
 }
 
 // convert a float to a string
-string f2sf(float f)
-{
+string f2sf(float f) {
 	char tmp[128];
 	sprintf(tmp, "%f", f);
 	string t = string(tmp);
@@ -617,8 +615,7 @@ string f2sf(float f)
 }
 
 // convert a float to a string
-string f642sf(double f)
-{
+string f642sf(double f) {
 	char tmp[128];
 	sprintf(tmp, "%f", f);
 	string t = string(tmp);
@@ -702,6 +699,7 @@ string str_quote(const string &s) { return s.repr(); }
 
 MAKE_ARRAY_STR(ia2s, int, i2s);
 MAKE_ARRAY_STR(fa2s, float, f2sf);
+MAKE_ARRAY_STR(f64a2s, double, f642sf);
 MAKE_ARRAY_STR(ba2s, bool, b2s);
 MAKE_ARRAY_STR(sa2s, string, str_quote);
 

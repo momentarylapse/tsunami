@@ -15,13 +15,14 @@ namespace nix{
 class VertexBuffer;
 class Texture;
 
-void _cdecl ResetToColor(const color &c);
-void _cdecl ResetZ();
+void _cdecl clear(const color &c);
+void _cdecl clear_color(const color &c);
+void _cdecl clear_z();
 
-void _cdecl DrawTriangles(VertexBuffer *vb);
-void _cdecl DrawInstancedTriangles(VertexBuffer *vb, int count);
-void _cdecl DrawLines(VertexBuffer *vb, bool contiguous);
-void _cdecl DrawPoints(VertexBuffer *vb);
+void _cdecl draw_triangles(VertexBuffer *vb);
+void _cdecl draw_instanced_triangles(VertexBuffer *vb, int count);
+void _cdecl draw_lines(VertexBuffer *vb, bool contiguous);
+void _cdecl draw_points(VertexBuffer *vb);
 
 };
 

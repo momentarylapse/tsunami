@@ -80,6 +80,7 @@ const Class *TypeFloatList;
 const Class *TypeFloatArray;
 const Class *TypeFloatArrayP;
 const Class *TypeFloatDict;
+const Class *TypeFloat64List;
 const Class *TypeComplex;
 const Class *TypeComplexList;
 const Class *TypeStringList;
@@ -493,16 +494,16 @@ public:
 	}
 };
 
-void script_make_super_array(Class *t, SyntaxTree *ps)
-{
+void script_make_super_array(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
 	t->derive_from(TypeDynamicArray, false);
 	t->param[0] = p;
 	add_class(t);
 
-	Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
-	sub->literal_return_type = t;
-	sub->effective_return_type= t;
+	// already done by derive_from()
+	//Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
+	//sub->literal_return_type = t;
+	//sub->effective_return_type = t;
 
 	// FIXME  wrong for complicated classes
 	if (p->can_memcpy()) {
@@ -658,6 +659,7 @@ void init(Abi abi, bool allow_std_lib) {
 
 
 	add_type_cast(10, TypeInt, TypeFloat32, "int.__float__");
+	add_type_cast(10, TypeInt, TypeFloat64, "int.__float64__");
 	add_type_cast(10, TypeInt, TypeInt64, "int.__int64__");
 	add_type_cast(15, TypeInt64, TypeInt, "int64.__int__");
 	add_type_cast(10, TypeFloat32, TypeFloat64,"float.__float64__");

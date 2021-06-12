@@ -50,7 +50,7 @@ public:
 
 void init_vertex_buffers();
 
-void SetVertexBuffer(VertexBuffer *vb);
+void bind_vertex_buffer(VertexBuffer *vb);
 
 };
 

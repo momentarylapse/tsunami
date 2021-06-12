@@ -7,13 +7,12 @@
 
 #if HAS_LIB_GL
 
-#ifndef _NIX_LIGHT_EXISTS_
-#define _NIX_LIGHT_EXISTS_
+#pragma once
 
 
 namespace nix{
 
-void _cdecl SetMaterial(const color &albedo, float roughness, float metal, const color &emission);
+void _cdecl set_material(const color &albedo, float roughness, float metal, const color &emission);
 
 
 
@@ -35,7 +34,5 @@ struct BasicLight {
 };
 
 };
-
-#endif
 
 #endif

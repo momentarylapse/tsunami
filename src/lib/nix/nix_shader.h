@@ -26,7 +26,7 @@ public:
 	void update_array(const DynamicArray &a);
 };
 
-void BindUniform(UniformBuffer *ub, int binding);
+void bind_uniform(UniformBuffer *ub, int binding);
 
 class Shader : public Sharable<Empty> {
 public:
@@ -77,10 +77,8 @@ public:
 
 
 void init_shaders();
-void _cdecl DeleteAllShaders();
-void _cdecl SetShader(Shader *s);
-
-extern Path shader_dir;
+void _cdecl delete_all_shaders();
+void _cdecl set_shader(Shader *s);
 
 
 };

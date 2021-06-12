@@ -17,7 +17,7 @@ namespace nix{
 Material material;
 
 
-void SetMaterial(const color &albedo, float roughness, float metal, const color &emission) {
+void set_material(const color &albedo, float roughness, float metal, const color &emission) {
 	material.albedo = albedo;
 	material.roughness = roughness;
 	material.metal = metal;

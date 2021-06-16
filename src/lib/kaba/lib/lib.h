@@ -148,6 +148,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func = nullptr);
 // version: no function
 void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index);
+void add_operator(OperatorID primitive_op, const Class* return_type, const Class* param_type1, const Class* param_type2, InlineID inline_index, nullptr_t func);
 // version: regular function
 template <typename R, typename ...Args>
 void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, R (*func)(Args...)) {

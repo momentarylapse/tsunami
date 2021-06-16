@@ -14,6 +14,24 @@ void db_out(const string &s) {
 #endif
 
 
+Array<void*> prepare_const_func_params(shared<Node> c, bool allow_placeholder) {
+	Array<void*> p;
+	for (int i=0;i<c->params.num;i++) {
+		if (c->params[i]->kind == NodeKind::DEREFERENCE and c->params[i]->params[0]->kind == NodeKind::CONSTANT) {
+			db_out("pp: " + c->params[i]->params[0]->str(tree->base_class));
+			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
+		} else if (c->params[i]->kind == NodeKind::CONSTANT) {
+			db_out("p: " + c->params[i]->str(tree->base_class));
+			p.add(c->params[i]->as_const()->p());
+		} else if (c->params[i]->kind == NodeKind::PLACEHOLDER and allow_placeholder) {
+			p.add(nullptr);
+		} else {
+			return {};
+		}
+	}
+	return p;
+}
+
 shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 	db_out("??? " + f->signature());
 
@@ -31,18 +49,9 @@ shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 	db_out("-addr");
 
 	// parameters
-	Array<void*> p;
-	for (int i=0;i<c->params.num;i++) {
-		if (c->params[i]->kind == NodeKind::DEREFERENCE and c->params[i]->params[0]->kind == NodeKind::CONSTANT) {
-			db_out("pp: " + c->params[i]->params[0]->str(tree->base_class));
-			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
-		} else if (c->params[i]->kind == NodeKind::CONSTANT) {
-			db_out("p: " + c->params[i]->str(tree->base_class));
-			p.add(c->params[i]->as_const()->p());
-		} else {
-			return c;
-		}
-	}
+	auto p = prepare_const_func_params(c, false);
+	if (p.num < c->params.num)
+		return c;
 	db_out("-param const");
 
 	Value temp;
@@ -119,10 +128,40 @@ void rec_assign(void *a, void *b, const Class *type) {
 	}
 }
 
+shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Function *f) {
+	db_out("EVAL CONSTRUCTOR");
+	auto t = f->name_space;
+	if (!Value::can_init(t))
+		return c;
+
+	void *ff = f->address_preprocess;
+	if (!ff)
+		return c;
+	db_out("-addr");
+
+	// parameters
+	auto p = prepare_const_func_params(c, true);
+	if (p.num < c->params.num)
+		return c;
+	db_out("-param const");
+
+	Value temp;
+	temp.init(t);
+	p[0] = temp.p();
+	if (!call_function(f, ff, nullptr, p))
+		return c;
+	auto r = tree->add_node_const(tree->add_constant(t));
+	r->as_const()->set(temp);
+	db_out(">>>  " + r->str(tree->base_class));
+	return r;
+}
+
 // BEFORE transforming to call-by-reference!
 shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
 	if (c->kind == NodeKind::OPERATOR) {
 		return eval_function_call(this, c, c->as_op()->f);
+	} else if (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
+		return eval_constructor_function(this, c, c->as_func());
 	} else if (c->kind == NodeKind::FUNCTION_CALL) {
 		return eval_function_call(this, c, c->as_func());
 	}

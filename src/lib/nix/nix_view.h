@@ -49,6 +49,9 @@ public:
 	int multi_samples;
 	rect area() const;
 
+	void clear_color(int index, const color &c);
+	void clear_depth(float depth);
+
 	void _check();
 
 	static FrameBuffer *DEFAULT;

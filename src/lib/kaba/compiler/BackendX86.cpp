@@ -648,21 +648,27 @@ void BackendX86::add_function_intro_params(Function *f) {
 
 bool dist_fits_32bit(int64 a, void *b);
 
-void correct_far_mem_access(BackendX86 *be) {
+void BackendX86::correct_far_mem_access() {
 
-	for (int i=0; i<be->cmd.cmd.num; i++) {
-		auto &c = be->cmd.cmd[i];
+	for (int i=0; i<cmd.cmd.num; i++) {
+		auto &c = cmd.cmd[i];
 
 		if (c.p[1].kind == NodeKind::CONSTANT_BY_ADDRESS) {
-			if (!dist_fits_32bit(c.p[1].p, be->script->opcode)) {
+			if (!dist_fits_32bit(c.p[1].p + c.p[1].shift, script->opcode)) {
 				auto p1 = c.p[1];
 
-				int reg = be->find_unused_reg(i, i, config.pointer_size);
 
-				be->cmd.next_cmd_target(i);
-				be->insert_cmd(Asm::InstID::MOV, be->param_vreg(TypePointer, reg), param_imm(TypePointer, p1.p)); // prepare input into register
-				be->cmd.set_cmd_param(i+1, 1, be->param_deref_vreg(p1.type, reg)); // change input in original instruction
-				be->cmd.set_virtual_reg(reg, i, i + 1);
+				// will be converted to immediate anyways...?
+				bool imm_allowed = Asm::get_instruction_allow_const(c.inst);
+				if (imm_allowed and (c.p[1].type->size <= 4))
+					continue;
+
+				int reg = find_unused_reg(i, i, config.pointer_size);
+
+				cmd.next_cmd_target(i);
+				insert_cmd(Asm::InstID::MOV, param_vreg(TypePointer, reg), param_imm(TypePointer, p1.p + p1.shift)); // prepare input into register
+				cmd.set_cmd_param(i+1, 1, param_deref_vreg(p1.type, reg)); // change input in original instruction
+				cmd.set_virtual_reg(reg, i, i + 1);
 			}
 		}
 	}
@@ -705,7 +711,7 @@ void BackendX86::do_mapping() {
 		correct_unallowed_param_combis2(cmd.cmd[i]);
 
 	if (config.instruction_set == Asm::InstructionSet::AMD64)
-		correct_far_mem_access(this);
+		correct_far_mem_access();
 
 	serializer->cmd_list_out("map:z", "end");
 }
@@ -1056,9 +1062,9 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
-		if ((imm_allowed) and (p.type->is_pointer())) {
+		if (imm_allowed and p.type->is_pointer()) {
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
-		} else if ((p.type->size <= 4) and (imm_allowed)) {
+		} else if (imm_allowed and (p.type->size <= 4)) {
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
 		} else {
 			return Asm::param_deref_imm(p.p + p.shift, p.type->size);

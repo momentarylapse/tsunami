@@ -34,8 +34,21 @@ string get_option_from_title(const string &title) {
 	return "";
 }
 
+string option_key(const string &x) {
+	auto xx = x.explode("=");
+	return xx[0];
+}
+
+Array<string> option_keys(const string &options) {
+	auto x = options.explode(",");
+	Array<string> keys;
+	for (auto &y: x)
+		keys.add(option_key(y));
+	return keys;
+}
+
 bool option_has(const string &options, const string &key) {
-	return sa_contains(options.explode(","), key);
+	return sa_contains(option_keys(options), key);
 }
 
 string option_value(const string &options, const string &key) {

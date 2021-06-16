@@ -61,6 +61,7 @@ public:
 	void resolve_deref_temp_and_local();
 	void correct_params_indirect_in();
 	void correct_unallowed_param_combis2(SerialNode &node);
+	void correct_far_mem_access();
 
 	void add_stack_var(TempVar &v, SerialNodeParam &p);
 	void scan_temp_var_usage();

@@ -12,6 +12,7 @@
 
 
 #if 0
+//#include "../../file/msg.h"
 void db_out(const string &s) {
 	msg_write(s);
 }
@@ -219,6 +220,11 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 				call1<float,CBR>(ff, ret, param);
 				return true;
 			}
+		} else if (f->literal_return_type == TypeVector) {
+			if (ptype[0]->uses_call_by_reference()) {
+				call1<vec3,CBR>(ff, ret, param);
+				return true;
+			}
 		} else if (f->literal_return_type == TypeQuaternion) {
 			if (ptype[0]->uses_call_by_reference()) {
 				call1<vec4,CBR>(ff, ret, param);
@@ -294,6 +300,12 @@ bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) 
 			}
 		}*/
 	} else if (ptype.num == 4) {
+		if (f->literal_return_type == TypeVoid) {
+			if ((ptype[0] == TypeVector) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+				((void(*)(void*, float, float, float))ff)(param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
+				return true;
+			}
+		}
 		if (f->literal_return_type->_amd64_allow_pass_in_xmm() and (f->literal_return_type->size == 16)) { // rect, color, plane, quaternion
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
 				call4<vec4,float,float,float,float>(ff, ret, param);

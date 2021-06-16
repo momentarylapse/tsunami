@@ -132,10 +132,12 @@ void BackendAmd64::implement_mov_chunk(const SerialNodeParam &p1, const SerialNo
 	//cmd.remove_cmd(i);
 	//msg_error("CORRECT MOV " + p1.type->name);
 
-	for (int j=0; j<size/8; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 8, TypeInt64), param_shift(p2, j * 8, TypeInt64));
-	for (int j=8*(size/8); j<size; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeChar), param_shift(p2, j, TypeChar));
+	for (int offset=0; offset<size-7; offset+=8)
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt64), param_shift(p2, offset, TypeInt64));
+	for (int offset=8*(size/8); offset<size-3; offset+=4)
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt), param_shift(p2, offset, TypeInt));
+	for (int offset=4*(size/4); offset<size; offset++)
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeChar), param_shift(p2, offset, TypeChar));
 }
 
 

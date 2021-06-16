@@ -36,7 +36,7 @@ FrameBuffer::FrameBuffer() {
 }
 
 FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
-	glGenFramebuffers(1, &frame_buffer);
+	glCreateFramebuffers(1, &frame_buffer);
 	update(attachments);
 }
 
@@ -95,6 +95,7 @@ void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 	if (samples > 0)
 		target = GL_TEXTURE_2D_MULTISAMPLE;
 	foreachi (auto *t, color_attachments, i) {
+		//glNamedFramebufferTexture(frame_buffer, GL_COLOR_ATTACHMENT0 + i, t->texture, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, t->texture, 0);
 		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);
 	}
@@ -123,6 +124,14 @@ void FrameBuffer::_check() {
 
 rect FrameBuffer::area() const {
 	return rect(0, width, 0, height);
+}
+
+void FrameBuffer::clear_color(int index, const color &c) {
+	glClearNamedFramebufferfv(frame_buffer, GL_COLOR, index, (float*)&c);
+}
+
+void FrameBuffer::clear_depth(float depth) {
+	glClearNamedFramebufferfv(frame_buffer, GL_DEPTH, 0, &depth);
 }
 
 void bind_frame_buffer(FrameBuffer *fb) {

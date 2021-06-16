@@ -87,12 +87,11 @@ string SerialNodeParam::str(Serializer *ser) const {
 		else if (kind == NodeKind::LABEL)
 			return ser->list->label[p].name;
 		else if (kind == NodeKind::LOCAL_MEMORY)
-			n = guess_local_mem(p, ser);
+			n = guess_local_mem(p + shift, ser);
 		else if (kind == NodeKind::MEMORY)
-			n = "0x" + i2h(p, config.pointer_size);
+			n = "0x" + i2h(p + shift, config.pointer_size);
 		else if (kind == NodeKind::IMMEDIATE)
-			n = guess_constant(p, ser);
-
+			n = guess_constant(p + shift, ser);
 		else if (kind == NodeKind::VAR_LOCAL)
 			n = ((Variable*)p)->name;
 		else if (kind == NodeKind::VAR_GLOBAL)
@@ -103,7 +102,7 @@ string SerialNodeParam::str(Serializer *ser) const {
 			if (config.compile_os)
 				n = "@" + p2s((void*)(int_p)p);
 			else
-				n = var_repr((void*)(int_p)p, type) + " @" + p2s((void*)(int_p)p);
+				n = var_repr((void*)(int_p)(p + shift), type) + " @" + p2s((void*)(int_p)p);
 		} else if (kind == NodeKind::FUNCTION)
 			n = ((Function*)p)->signature(TypeVoid);
 		str = "(" + type_name_safe(type) + ") <" + kind2str(kind) + "> " + n;

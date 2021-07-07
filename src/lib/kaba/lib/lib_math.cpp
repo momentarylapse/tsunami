@@ -1,5 +1,15 @@
 #include "../../file/file.h"
 #include "../../math/math.h"
+#include "../../math/vector.h"
+#include "../../math/complex.h"
+#include "../../math/quaternion.h"
+#include "../../math/matrix.h"
+#include "../../math/matrix3.h"
+#include "../../math/plane.h"
+#include "../../math/rect.h"
+#include "../../math/interpolation.h"
+#include "../../math/random.h"
+#include "../../image/color.h"
 #include "../../base/map.h"
 #include "../kaba.h"
 #include "../../config.h"
@@ -442,8 +452,8 @@ void SIAddPackageMath() {
 		class_add_func("dir2ang2", TypeVector, &vector::dir2ang2, Flags::PURE);
 			func_add_param("up", TypeVector);
 		class_add_func("ang2dir", TypeVector, &vector::ang2dir, Flags::PURE);
-		class_add_func("rotate", TypeVector, &vector::rotate, Flags::PURE);
-			func_add_param("ang", TypeVector);
+//		class_add_func("rotate", TypeVector, &vector::rotate, Flags::PURE);
+//			func_add_param("ang", TypeVector);
 //		class_add_func("__div__", TypeVector, vector::untransform), Flags::PURE);
 //			func_add_param("m", TypeMatrix);
 		class_add_func("ortho", TypeVector, &vector::ortho, Flags::PURE);
@@ -464,13 +474,13 @@ void SIAddPackageMath() {
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
-		class_add_func("ang_add", TypeVector, &VecAngAdd, Flags::_STATIC__PURE);
+/*		class_add_func("ang_add", TypeVector, &VecAngAdd, Flags::_STATIC__PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
 		class_add_func("ang_interpolate", TypeVector, &VecAngInterpolate, Flags::_STATIC__PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
-			func_add_param("t", TypeFloat32);
+			func_add_param("t", TypeFloat32);*/
 		class_add_const("0", TypeVector, &vector::ZERO);
 		class_add_const("O", TypeVector, &vector::ZERO);
 		class_add_const("EX", TypeVector, &vector::EX);

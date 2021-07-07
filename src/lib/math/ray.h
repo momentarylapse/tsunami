@@ -5,12 +5,16 @@
  *      Author: michi
  */
 
-#ifndef RAY_H_
-#define RAY_H_
+#pragma once
+
+#include "math.h"
+#include "vector.h"
+
+class vector;
+class plane;
 
 
-class Ray
-{
+class Ray {
 public:
 	Ray();
 	Ray(const vector &a, const vector &b);
@@ -19,5 +23,3 @@ public:
 	bool _cdecl intersect_plane(const plane &pl, vector &c) const;
 };
 
-
-#endif /* RAY_H_ */

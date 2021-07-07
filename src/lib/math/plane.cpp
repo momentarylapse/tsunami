@@ -1,4 +1,5 @@
-#include "math.h"
+#include "plane.h"
+#include "matrix.h"
 
 //------------------------------------------------------------------------------------------------//
 //                                             planes                                             //
@@ -19,9 +20,9 @@ float LineIntersectsTriangleF, LineIntersectsTriangleG;
 // plane containing a, b, c
 plane plane::from_points(const vector &a,const vector &b,const vector &c) {
 	plane pl;
-	pl.n = (b-a) ^ (c - a);
+	pl.n = vector::cross(b - a, c - a);
 	pl.n.normalize();
-	pl.d = - (pl.n*a);
+	pl.d = - vector::dot(pl.n, a);
 	return pl;
 }
 
@@ -29,7 +30,7 @@ plane plane::from_points(const vector &a,const vector &b,const vector &c) {
 plane plane::from_point_normal(const vector &p,const vector &n) {
 	plane pl;
 	pl.n = n;
-	pl.d = -(n*p);
+	pl.d = - vector::dot(n, p);
 	return pl;
 }
 
@@ -38,7 +39,7 @@ plane plane::from_point_normal(const vector &p,const vector &n) {
 plane plane::transform(const matrix &m) const {
 	plane plo;
 	// transform the normal vector  (n' = R n)
-	plo.n = n.transform_normal(m);
+	plo.n = m.transform_normal(n);
 	// offset (d' = d - < T, n' >)
 	plo.d= d - plo.n.x*m._03 - plo.n.y*m._13 - plo.n.z*m._23;
 	return plo;
@@ -48,14 +49,14 @@ plane plane::transform(const matrix &m) const {
 // (false if parallel!)
 bool plane::intersect_line(const vector &l1, const vector &l2, vector &i) const  {
 	float _d = -d;
-	float e = n*l1;
-	float f = n*l2;
+	float e = vector::dot(n, l1);
+	float f = vector::dot(n, l2);
 	if (e==f) // parallel?
 		return false;
-	float t=(_d-f)/(e-f);
+	float t= (_d-f) / (e-f);
 	//if ((t>=0)&&(t<=1)){
 		//i = l1 + t*(l2-l1);
-		i = l2 + t*(l1-l2);
+		i = l2 + t * (l1-l2);
 		return true;
 }
 
@@ -117,6 +118,10 @@ bool LineIntersectsTriangle2(const plane &pl,const vector &t1,const vector &t2,c
 
 // distance <point p> to <plane pl>
 float plane::distance(const vector &p) const {
-	return n * p + d;
+	return vector::dot(n, p) + d;
 }
+
+
+bool inf_pl(plane p)
+{   return (inf_v(p.n) || inf_f(p.d));  }
 

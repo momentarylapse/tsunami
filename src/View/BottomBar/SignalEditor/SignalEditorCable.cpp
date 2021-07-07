@@ -12,6 +12,8 @@
 #include "../../../Module/SignalChain.h"
 #include "../../../Module/Module.h"
 #include "../../AudioView.h"
+#include "../../../lib/math/complex.h"
+#include "../../../lib/math/interpolation.h"
 
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel(0,0,0,0) {
 	tab = t;

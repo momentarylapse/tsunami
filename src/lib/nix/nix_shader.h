@@ -7,26 +7,12 @@
 
 #if HAS_LIB_GL
 
-#ifndef _NIX_SHADER_EXISTS_
-#define _NIX_SHADER_EXISTS_
+#pragma once
 
 #include "../base/pointer.h"
+#include "../file/path.h"
 
-namespace nix{
-
-class UniformBuffer {
-public:
-	unsigned int buffer;
-	UniformBuffer();
-	~UniformBuffer();
-
-	void __init__();
-	void __delete__();
-	void update(void *data, int size);
-	void update_array(const DynamicArray &a);
-};
-
-void bind_uniform(UniformBuffer *ub, int binding);
+namespace nix {
 
 class Shader : public Sharable<Empty> {
 public:
@@ -34,12 +20,19 @@ public:
 	int program;
 	Shader();
 	~Shader();
-	void _cdecl set_float(int location, float f);
-	void _cdecl set_int(int location, int i);
-	void _cdecl set_data(int location, const float *data, int size);
-	void _cdecl set_matrix(int location, const matrix &m);
-	void _cdecl set_color(int location, const color &c);
+	void _cdecl set_float_l(int location, float f);
+	void _cdecl set_int_l(int location, int i);
+	void _cdecl set_floats_l(int location, const float *data, int num);
+	void _cdecl set_matrix_l(int location, const matrix &m);
+	void _cdecl set_color_l(int location, const color &c);
 	int _cdecl get_location(const string &name);
+
+	void _cdecl set_float(const string &name, float f);
+	void _cdecl set_int(const string &name, int i);
+	void _cdecl set_floats(const string &name, const float *data, int num);
+	void _cdecl set_matrix(const string &name, const matrix &m);
+	void _cdecl set_color(const string &name, const color &c);
+
 	bool _cdecl link_uniform_block(const string &name, int binding);
 	
 	void _cdecl dispatch(int nx, int ny, int nz);
@@ -85,4 +78,3 @@ void _cdecl set_shader(Shader *s);
 
 #endif
 
-#endif

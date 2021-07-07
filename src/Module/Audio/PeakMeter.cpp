@@ -11,6 +11,7 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Session.h"
+#include "../../lib/math/complex.h"
 #include "../ConfigPanel.h"
 #include "../../View/Helper/PeakMeterDisplay.h"
 

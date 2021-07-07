@@ -7,10 +7,9 @@
 
 #include "Node.h"
 #include "SceneGraph.h"
-
 #include "../../../Stuff/PerformanceMonitor.h"
-
 #include "../../../lib/image/Painter.h"
+#include "../../../lib/image/color.h"
 
 namespace scenegraph {
 

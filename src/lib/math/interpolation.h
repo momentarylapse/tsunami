@@ -5,8 +5,10 @@
  *      Author: michi
  */
 
-#ifndef INTERPOLATION_H_
-#define INTERPOLATION_H_
+#pragma once
+
+
+#include "../base/base.h"
 
 template<class T>
 class Interpolator
@@ -63,5 +65,3 @@ private:
 	bool closed;
 };
 
-
-#endif /* INTERPOLATION_H_ */

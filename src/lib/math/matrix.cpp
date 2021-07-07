@@ -1,5 +1,8 @@
-#include "math.h"
-#include "../file/file.h"
+#include "matrix.h"
+#include "vector.h"
+#include "plane.h"
+#include "quaternion.h"
+#include "../file/msg.h"
 
 // ZXY -> object transformation
 // der Vektor nach vorne (0,0,1) wird
@@ -22,6 +25,9 @@
 
 const float f_m_id[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
 const matrix matrix::ID = matrix(f_m_id);
+
+
+matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
 
 matrix::matrix(const float f[16]) {
 	for (int i=0;i<16;i++)

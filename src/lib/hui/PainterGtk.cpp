@@ -6,7 +6,8 @@
  */
 
 #include "hui.h"
-#include "../math/math.h"
+#include "../math/complex.h"
+#include "../math/rect.h"
 #include "Controls/Control.h"
 #include "Controls/ControlDrawingArea.h"
 #include "Painter.h"

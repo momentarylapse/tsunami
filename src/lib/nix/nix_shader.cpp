@@ -9,8 +9,9 @@
 
 #include "nix.h"
 #include "nix_common.h"
+#include "../file/file.h"
 
-namespace nix{
+namespace nix {
 
 const int TYPE_LAYOUT = -41;
 const int TYPE_MODULE = -42;
@@ -21,43 +22,13 @@ Shader *Shader::default_3d = nullptr;
 Shader *Shader::_current_ = nullptr;
 Shader *Shader::default_load = nullptr;
 
+string vertex_module_default = "vertex-default-nix";
+
 static shared_array<Shader> shaders;
 
 int current_program = 0;
 
 string shader_error;
-
-
-UniformBuffer::UniformBuffer() {
-	glGenBuffers(1, &buffer);
-}
-
-UniformBuffer::~UniformBuffer() {
-	glDeleteBuffers(1, &buffer);
-}
-
-void UniformBuffer::__init__() {
-	new(this) UniformBuffer();
-}
-
-void UniformBuffer::__delete__() {
-	this->~UniformBuffer();
-}
-
-void UniformBuffer::update(void *data, int size) {
-	glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-	glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
-}
-
-void UniformBuffer::update_array(const DynamicArray &a) {
-	glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-	glBufferData(GL_UNIFORM_BUFFER, a.num * a.element_size, a.data, GL_DYNAMIC_DRAW);
-}
-
-void bind_uniform(UniformBuffer *ub, int index) {
-	//glUniformBlockBinding(program, index, 0);
-	glBindBufferBase(GL_UNIFORM_BUFFER, index, ub->buffer);
-}
 
 
 int create_empty_shader_program() {
@@ -84,6 +55,8 @@ static Array<ShaderModule> shader_modules;
 
 Array<ShaderSourcePart> get_shader_parts(const string &source) {
 	Array<ShaderSourcePart> parts;
+	bool has_vertex = false;
+	bool has_fragment = false;
 	int pos = 0;
 	while (pos < source.num - 5) {
 		int pos0 = source.find("<", pos);
@@ -106,8 +79,10 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 		pos = pos2 + tag.num + 3;
 		if (tag == "VertexShader") {
 			p.type = GL_VERTEX_SHADER;
+			has_vertex = true;
 		} else if (tag == "FragmentShader") {
 			p.type = GL_FRAGMENT_SHADER;
+			has_fragment = true;
 		} else if (tag == "ComputeShader") {
 			p.type = GL_COMPUTE_SHADER;
 		} else if (tag == "TessControlShader") {
@@ -125,6 +100,10 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 			continue;
 		}
 		parts.add(p);
+	}
+	if (has_fragment and !has_vertex) {
+		msg_write(" ...auto import " + vertex_module_default);
+		parts.add({GL_VERTEX_SHADER, format("#import %s\n", vertex_module_default)});
 	}
 	return parts;
 }
@@ -154,7 +133,7 @@ string expand_shader_source(const string &source, ShaderMetaData &meta) {
 		bool found = false;
 		for (auto &m: shader_modules)
 			if (m.meta.name == imp) {
-				//msg_error("FOUND");
+				//msg_error("FOUND " + imp);
 				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.sub(p2);
 				found = true;
 			}
@@ -301,8 +280,8 @@ Shader *Shader::load(const Path &filename) {
 		return default_load;
 
 	for (Shader *s: weak(shaders))
-		if ((s->filename == filename) and (s->program >= 0))
-			return s;
+		if (s->filename == filename)
+			return (s->program >= 0) ? s : nullptr;
 
 	msg_write("loading shader: " + filename.str());
 
@@ -312,6 +291,10 @@ Shader *Shader::load(const Path &filename) {
 		shader->filename = filename;
 
 	return shader;
+}
+
+void select_default_vertex_module(const string &name) {
+	vertex_module_default = name;
 }
 
 Shader::Shader() {
@@ -335,8 +318,11 @@ void delete_all_shaders() {
 }
 
 void set_shader(Shader *s) {
-	if (s == nullptr)
-		s = Shader::default_3d;
+	if (s == nullptr) {
+		msg_error("setting null shader");
+		return;
+	}
+	//	s = Shader::default_3d;
 	Shader::_current_ = s;
 	current_program = s->program;
 	glUseProgram(current_program);
@@ -349,6 +335,8 @@ int Shader::get_location(const string &name) {
 }
 
 bool Shader::link_uniform_block(const string &name, int binding) {
+	if (program < 0)
+		return false;
 	int index = glGetUniformBlockIndex(program, name.c_str());
 	if (index < 0)
 		return false;
@@ -356,60 +344,80 @@ bool Shader::link_uniform_block(const string &name, int binding) {
 	return true;
 }
 
-void Shader::set_data(int location, const float *data, int size) {
+void Shader::set_floats_l(int location, const float *data, int num) {
 	if (location < 0)
 		return;
 	//NixSetShader(this);
-	if (size == sizeof(float)) {
-		glUniform1f(location, *data);
-	} else if (size == sizeof(float)*2) {
-		glUniform2fv(location, 1, data);
-	} else if (size == sizeof(float)*3) {
-		glUniform3fv(location, 1, data);
-	} else if (size == sizeof(float)*4) {
-		glUniform4fv(location, 1, data);
-	} else if (size == sizeof(float)*16) {
-		glUniformMatrix4fv(location, 1, GL_FALSE, (float*)data);
+	if (num == 1) {
+		glProgramUniform1f(program, location, *data);
+	} else if (num == 2) {
+		glProgramUniform2fv(program, location, 1, data);
+	} else if (num == 3) {
+		glProgramUniform3fv(program, location, 1, data);
+	} else if (num == 4) {
+		glProgramUniform4fv(program, location, 1, data);
+	} else if (num == 16) {
+		glProgramUniformMatrix4fv(program, location, 1, GL_FALSE, (float*)data);
 	}
 }
 
-void Shader::set_int(int location, int i) {
+void Shader::set_int_l(int location, int i) {
 	if (location < 0)
 		return;
-	glUniform1i(location, i);
+	glProgramUniform1i(program, location, i);
 }
 
-void Shader::set_float(int location, float f) {
+void Shader::set_float_l(int location, float f) {
 	if (location < 0)
 		return;
-	glUniform1f(location, f);
+	glProgramUniform1f(program, location, f);
 }
 
-void Shader::set_color(int location, const color &c) {
+void Shader::set_color_l(int location, const color &c) {
 	if (location < 0)
 		return;
-	glUniform4fv(location, 1, (float*)&c);
+	glProgramUniform4fv(program, location, 1, (float*)&c);
 }
 
-void Shader::set_matrix(int location, const matrix &m) {
+void Shader::set_matrix_l(int location, const matrix &m) {
 	if (location < 0)
 		return;
-	glUniformMatrix4fv(location, 1, GL_FALSE, (float*)&m);
+	glProgramUniformMatrix4fv(program, location, 1, GL_FALSE, (float*)&m);
+}
+
+void Shader::set_int(const string &name, int i) {
+	set_int_l(get_location(name), i);
+}
+
+void Shader::set_float(const string &name, float f) {
+	set_float_l(get_location(name), f);
+}
+
+void Shader::set_color(const string &name, const color &c) {
+	set_color_l(get_location(name), c);
+}
+
+void Shader::set_matrix(const string &name, const matrix &m) {
+	set_matrix_l(get_location(name), m);
+}
+
+void Shader::set_floats(const string &name, const float *data, int num) {
+	set_floats_l(get_location(name), data, num);
 }
 
 void Shader::set_default_data() {
-	set_matrix(location[LOCATION_MATRIX_MVP], model_view_projection_matrix);
-	set_matrix(location[LOCATION_MATRIX_M], model_matrix);
-	set_matrix(location[LOCATION_MATRIX_V], view_matrix);
-	set_matrix(location[LOCATION_MATRIX_P], projection_matrix);
+	set_matrix_l(location[LOCATION_MATRIX_MVP], model_view_projection_matrix);
+	set_matrix_l(location[LOCATION_MATRIX_M], model_matrix);
+	set_matrix_l(location[LOCATION_MATRIX_V], view_matrix);
+	set_matrix_l(location[LOCATION_MATRIX_P], projection_matrix);
 	for (int i=0; i<NIX_MAX_TEXTURELEVELS; i++)
-		set_int(location[LOCATION_TEX + i], i);
+		set_int_l(location[LOCATION_TEX + i], i);
 	if (tex_cube_level >= 0)
-		set_int(location[LOCATION_TEX_CUBE], tex_cube_level);
-	set_color(location[LOCATION_MATERIAL_ALBEDO], material.albedo);
-	set_float(location[LOCATION_MATERIAL_ROUGHNESS], material.roughness);
-	set_float(location[LOCATION_MATERIAL_METAL], material.metal);
-	set_color(location[LOCATION_MATERIAL_EMISSION], material.emission);
+		set_int_l(location[LOCATION_TEX_CUBE], tex_cube_level);
+	set_color_l(location[LOCATION_MATERIAL_ALBEDO], material.albedo);
+	set_float_l(location[LOCATION_MATERIAL_ROUGHNESS], material.roughness);
+	set_float_l(location[LOCATION_MATERIAL_METAL], material.metal);
+	set_color_l(location[LOCATION_MATERIAL_EMISSION], material.emission);
 }
 
 void Shader::dispatch(int nx, int ny, int nz) {
@@ -421,9 +429,10 @@ void Shader::dispatch(int nx, int ny, int nz) {
 void init_shaders() {
 	try {
 
-	Shader::default_3d = nix::Shader::create(
-R"foodelim(<VertexShader>
-#version 330 core
+
+		//ShaderModule
+		shader_modules.add({{"", vertex_module_default},
+R"foodelim(
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
@@ -433,19 +442,29 @@ layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_uv;
 
-layout(location = 0) out vec3 out_pos; // camera space
-layout(location = 1) out vec3 out_normal;
-layout(location = 2) out vec2 out_uv;
+layout(location = 0) out vec3 out_normal;
+layout(location = 1) out vec2 out_uv;
+layout(location = 2) out vec4 out_pos; // camera space
 
 void main() {
 	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
 	out_normal = (matrix.view * matrix.model * vec4(in_normal, 0)).xyz;
 	out_uv = in_uv;
-	out_pos = (matrix.view * matrix.model * vec4(in_position, 1)).xyz;
+	out_pos = matrix.view * matrix.model * vec4(in_position, 1);
 }
+)foodelim"});
+
+
+
+	Shader::default_3d = nix::Shader::create(
+R"foodelim(
+<Layout>
+	version = 330 core
+</Layout>
+<VertexShader>
+#import vertex-default-nix
 </VertexShader>
 <FragmentShader>
-#version 330 core
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
@@ -456,9 +475,9 @@ struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; 
 uniform int num_lights = 0;
 /*layout(binding = 1)*/ uniform LightData { Light light[32]; };
 
-layout(location = 0) in vec3 in_pos;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in vec2 in_uv;
+layout(location = 0) in vec3 in_normal;
+layout(location = 1) in vec2 in_uv;
+layout(location = 2) in vec4 in_pos;
 uniform sampler2D tex0;
 out vec4 out_color;
 
@@ -467,15 +486,15 @@ vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {
 	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;
 	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;
 	if (l.radius > 0) {
-		LD = normalize(in_pos - LP);
-		attenuation = min(l.radius / length(in_pos - LP), 1);
+		LD = normalize(in_pos.xyz - LP);
+		attenuation = min(l.radius / length(in_pos.xyz - LP), 1);
 	}
 	float d = max(-dot(n, LD), 0) * attenuation;
 	vec4 color = material.albedo * material.roughness * l.color * (1 - l.harshness) / 2;
 	color += material.albedo * l.color * l.harshness * d;
 	color *= tex_col;
 	if ((d > 0) && (material.roughness < 0.8)) {
-		vec3 e = normalize(in_pos); // eye dir
+		vec3 e = normalize(in_pos.xyz); // eye dir
 		vec3 rl = reflect(LD, n);
 		float ee = max(-dot(e, rl), 0);
 		float shininess = 5 / (1.1 - material.roughness);
@@ -498,8 +517,10 @@ void main() {
 
 
 	Shader::default_2d = nix::Shader::create(
-R"foodelim(<VertexShader>
-#version 330 core
+R"foodelim(<Layout>
+	version = 330 core
+</Layout>
+<VertexShader>
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
@@ -520,7 +541,6 @@ void main() {
 
 </VertexShader>
 <FragmentShader>
-#version 330 core
 #extension GL_ARB_separate_shader_objects : enable
 
 layout(location = 0) in vec2 in_uv;

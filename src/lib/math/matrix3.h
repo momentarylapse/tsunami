@@ -1,6 +1,8 @@
 
-#ifndef _MATH_MATRIX3_INCLUDED_
-#define _MATH_MATRIX3_INCLUDED_
+#pragma once
+
+
+#include "math.h"
 
 class vector;
 
@@ -51,6 +53,3 @@ public:
 };
 
 
-
-
-#endif

@@ -8,7 +8,7 @@
 #include "../../Data/Audio/BufferInterpolator.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../Graph/AudioViewLayer.h"
-
+#include "../../lib/math/complex.h"
 
 struct RubberPoint {
 	int source, target;

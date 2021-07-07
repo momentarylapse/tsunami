@@ -12,6 +12,7 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../lib/math/complex.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
 #include "../SideBar/SideBar.h"

@@ -378,7 +378,9 @@
     <ClCompile Include="src\lib\net\net.cpp" />
     <ClCompile Include="src\lib\net\Socket.cpp" />
     <ClCompile Include="src\lib\nix\nix.cpp" />
+    <ClCompile Include="src\lib\nix\nix_buffer.cpp" />
     <ClCompile Include="src\lib\nix\nix_draw.cpp" />
+    <ClCompile Include="src\lib\nix\nix_framebuffer.cpp" />
     <ClCompile Include="src\lib\nix\nix_light.cpp" />
     <ClCompile Include="src\lib\nix\nix_shader.cpp" />
     <ClCompile Include="src\lib\nix\nix_textures.cpp" />
@@ -794,9 +796,11 @@
     <ClInclude Include="src\lib\net\net.h" />
     <ClInclude Include="src\lib\net\Socket.h" />
     <ClInclude Include="src\lib\nix\nix.h" />
+    <ClInclude Include="src\lib\nix\nix_buffer.h" />
     <ClInclude Include="src\lib\nix\nix_common.h" />
     <ClInclude Include="src\lib\nix\nix_config.h" />
     <ClInclude Include="src\lib\nix\nix_draw.h" />
+    <ClInclude Include="src\lib\nix\nix_framebuffer.h" />
     <ClInclude Include="src\lib\nix\nix_light.h" />
     <ClInclude Include="src\lib\nix\nix_shader.h" />
     <ClInclude Include="src\lib\nix\nix_textures.h" />

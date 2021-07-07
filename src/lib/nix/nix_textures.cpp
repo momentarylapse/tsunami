@@ -11,6 +11,7 @@
 #include "nix.h"
 #include "nix_common.h"
 #include "../image/image.h"
+#include "../file/file.h"
 
 // management:
 //  Texture.load()
@@ -72,6 +73,8 @@ unsigned int parse_format(const string &_format) {
 		return GL_RGBA32F;
 	if (_format == "r:f16")
 		return GL_R16F;
+	if (_format == "rgb:f16")
+		return GL_RGB16F;
 	if (_format == "rgba:f16")
 		return GL_RGBA16F;
 	if (_format == "d24s8")
@@ -100,7 +103,6 @@ int mip_levels(int width, int height) {
 
 
 void Texture::_create_2d(int w, int h, const string &_format) {
-	msg_write(format("creating texture [%d x %d: %s] ", w, h, _format));
 	width = w;
 	height = h;
 	type = Type::DEFAULT;
@@ -108,7 +110,7 @@ void Texture::_create_2d(int w, int h, const string &_format) {
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 	glTextureStorage2D(texture, mip_levels(width, height), internal_format, width, height);
-	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST);
 	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -116,6 +118,7 @@ void Texture::_create_2d(int w, int h, const string &_format) {
 }
 
 Texture::Texture(int w, int h, const string &_format) : Texture() {
+	msg_write(format("creating texture [%d x %d: %s] ", w, h, _format));
 	_create_2d(w, h, _format);
 }
 
@@ -389,6 +392,7 @@ ImageTexture::ImageTexture(int _width, int _height, const string &_format) {
 	width = _width;
 	height = _height;
 	type = Type::IMAGE;
+	internal_format = parse_format(_format);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 	glTextureStorage2D(texture, 1, internal_format, width, height);

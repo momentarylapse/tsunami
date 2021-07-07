@@ -8,11 +8,11 @@
 #ifndef FASTFOURIERTRANSFORM_H_
 #define FASTFOURIERTRANSFORM_H_
 
-#include "../lib/file/file.h"
-#include "../lib/math/math.h"
+#include "../lib/base/base.h"
 
-namespace FastFourierTransform
-{
+class complex;
+
+namespace FastFourierTransform {
 	void _cdecl fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse);
 	void _cdecl fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse);
 	void _cdecl fft_r2c(Array<float> &in, Array<complex> &out);

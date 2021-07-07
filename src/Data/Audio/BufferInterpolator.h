@@ -11,8 +11,7 @@
 #include "../../lib/base/base.h"
 class AudioBuffer;
 
-class BufferInterpolator
-{
+class BufferInterpolator {
 public:
 
 	enum class Method{

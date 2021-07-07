@@ -45,9 +45,11 @@
 
 #include <math.h>
 #include "../base/base.h"
-#include "../file/file.h"
-//#include "../hui/hui.h"
-#include "../math/math.h"
+
+class vector;
+class rect;
+class matrix;
+class color;
 
 
 typedef void callback_function();
@@ -115,6 +117,7 @@ extern int target_width, target_height;						// current render target size (wind
 
 class VertexBuffer;
 extern VertexBuffer *vb_temp; // vertex buffer for 1-frame geometries
+extern VertexBuffer *vb_temp_i;
 };
 
 #endif

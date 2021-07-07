@@ -17,13 +17,13 @@
 
 #include "nix_config.h"
 #include "nix_common.h"
+#include "../file/msg.h"
 
-
-extern unsigned int VertexArrayID;
 
 namespace nix{
 
-string version = "0.13.7.0";
+string version = "0.13.9.1";
+// currently, requiring OpenGL 4.5
 
 
 
@@ -186,7 +186,6 @@ void init() {
 void kill() {
 	msg_write("nix.kill");
 	kill_device_objects();
-	glDeleteVertexArrays(1, &VertexArrayID);
 }
 
 // erlaubt dem Device einen Neustart
@@ -396,7 +395,7 @@ void set_stencil(StencilOp mode, unsigned long param) {
 
 // mode=FogLinear:			start/end
 // mode=FogExp/FogExp2:		density
-void set_fog(int mode,float start,float end,float density,const color &c) {
+void set_fog(FogMode mode,float start,float end,float density,const color &c) {
 	fog.density = density;
 	fog._color = c;
 }

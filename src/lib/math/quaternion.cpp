@@ -1,4 +1,8 @@
+#include "quaternion.h"
+#include "vector.h"
+#include "matrix.h"
 #include "math.h"
+#include <math.h>
 #include "../file/file.h"
 
 //------------------------------------------------------------------------------------------------//
@@ -80,8 +84,8 @@ quaternion quaternion::operator * (const quaternion &q) const {
 vector quaternion::operator * (const vector &v) const {
 	vector r = v * (w*w - x*x - y*y - z*z);
 	vector *vv = (vector*)&x;
-	r += 2 * w * (*vv) ^ v;
-	r += 2 * ((*vv) * v) * (*vv);
+	r += 2 * w * vector::cross(*vv, v);
+	r += 2 * vector::dot(*vv, v) * (*vv);
 	return r;
 }
 
@@ -272,9 +276,9 @@ float quaternion::get_angle() const {
 
 quaternion quaternion::drag(const vector &up, const vector &dang, bool reset_z) {
 	quaternion T, TT, q;
-	bool is_not_z = (up.x != 0) || (up.y != 0) || (up.z < 0);
+	bool is_not_z = (up.x != 0) or (up.y != 0) or (up.z < 0);
 	if (is_not_z) {
-		vector ax = vector::EZ ^ up;
+		vector ax = vector::cross(vector::EZ, up);
 		ax.normalize();
 		vector up2 = up;
 		up2.normalize();
@@ -294,4 +298,8 @@ quaternion quaternion::drag(const vector &up, const vector &dang, bool reset_z) 
 	if (is_not_z)
 		q = TT * q * T;
 	return q;
+}
+
+bool inf_q(const quaternion &q) {
+	return (inf_f(q.x) or inf_f(q.y) or inf_f(q.z) or inf_f(q.z));
 }

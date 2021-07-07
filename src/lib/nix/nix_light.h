@@ -10,6 +10,11 @@
 #pragma once
 
 
+#include "../math/matrix.h"
+#include "../math/vector.h"
+#include "../image/color.h"
+
+
 namespace nix{
 
 void _cdecl set_material(const color &albedo, float roughness, float metal, const color &emission);

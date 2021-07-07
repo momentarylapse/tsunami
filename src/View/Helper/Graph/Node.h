@@ -10,7 +10,7 @@
 
 #include "../../../lib/base/base.h"
 #include "../../../lib/base/pointer.h"
-#include "../../../lib/math/math.h"
+#include "../../../lib/math/rect.h"
 #include "../../../Stuff/Observable.h"
 
 class Painter;

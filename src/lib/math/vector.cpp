@@ -1,7 +1,107 @@
-#include "math.h"
+#include "vector.h"
+#include "matrix.h"
+#include "plane.h"
+#include <math.h>
+
+bool inf_v(const vector &v)
+{   return (inf_f(v.x) || inf_f(v.y) || inf_f(v.z));  }
+
 
 //------------------------------------------------------------------------------------------------//
-//                                            vectors                                             //
+//                                            vec2                                                //
+//------------------------------------------------------------------------------------------------//
+
+
+
+const vec2 vec2::ZERO = vec2(0, 0);
+const vec2 vec2::EX = vec2(1, 0);
+const vec2 vec2::EY = vec2(0, 1);
+
+vec2::vec2(float x, float y) {
+	this->x = x;
+	this->y = y;
+}
+
+// assignment operators
+void vec2::operator += (const vec2& v) {
+	x += v.x;
+	y += v.y;
+}
+
+void vec2::operator -= (const vec2& v) {
+	x -= v.x;
+	y -= v.y;
+}
+
+void vec2::operator *= (float f) {
+	x *= f;
+	y *= f;
+}
+
+void vec2::operator /= (float f) {
+	x /= f;
+	y /= f;
+}
+
+// unitary operator(s)
+vec2 vec2::operator - () const {
+	return vec2(-x, -y);
+}
+
+// binary operators
+vec2 vec2::operator + (const vec2 &v) const {
+	return vec2(x+v.x ,y+v.y);
+}
+
+vec2 vec2::operator - (const vec2 &v) const {
+	return vec2(x-v.x, y-v.y);
+}
+
+vec2 vec2::operator * (float f) const {
+	return vec2(x*f, y*f);
+}
+
+vec2 vec2::operator / (float f) const {
+	return vec2(x/f, y/f);
+}
+
+bool vec2::operator == (const vec2 &v) const {
+	return ((x==v.x) and (y==v.y));
+}
+
+bool vec2::operator != (const vec2 &v) const {
+	return !((x==v.x) and (y==v.y));
+}
+
+string vec2::str() const {
+	return format("(%f, %f)", x, y);
+}
+
+// real length of the vec2
+float vec2::length() const {
+	return sqrtf( x*x + y*y );
+}
+
+// scale to length 1
+void vec2::normalize() {
+	float l = length();
+	if (l > 0)
+		*this /= l;
+	else
+		*this = vec2::EY;
+}
+
+// scale to length 1
+vec2 vec2::normalized() const {
+	float l = length();
+	if (l == 0)
+		return vec2::EY;
+	return *this / l;
+}
+
+
+//------------------------------------------------------------------------------------------------//
+//                                            vector                                                //
 //------------------------------------------------------------------------------------------------//
 
 
@@ -17,32 +117,28 @@ vector::vector(float x, float y, float z) {
 }
 
 // assignment operators
-vector& vector::operator += (const vector& v) {
+void vector::operator += (const vector& v) {
 	x += v.x;
 	y += v.y;
 	z += v.z;
-	return *this;
 }
 
-vector& vector::operator -= (const vector& v) {
+void vector::operator -= (const vector& v) {
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
-	return *this;
 }
 
-vector& vector::operator *= (float f) {
+void vector::operator *= (float f) {
 	x *= f;
 	y *= f;
 	z *= f;
-	return *this;
 }
 
-vector& vector::operator /= (float f) {
+void vector::operator /= (float f) {
 	x /= f;
 	y /= f;
 	z /= f;
-	return *this;
 }
 
 // unitary operator(s)
@@ -75,13 +171,15 @@ bool vector::operator != (const vector &v) const {
 	return !((x==v.x) and (y==v.y) and (z==v.z));
 }
 
+#if 1
 float vector::operator * (const vector &v) const {
-	return x*v.x + y*v.y + z*v.z;
+	return dot(*this, v);
 }
 
 vector vector::operator ^ (const vector &v) const {
-	return vector( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x );
+	return cross(*this, v);
 }
+#endif
 
 string vector::str() const {
 	return format("(%f, %f, %f)", x, y, z);
@@ -182,6 +280,7 @@ vector vector::cross(const vector &v1,const vector &v2) {
 
 }
 
+#if 0
 // Koordinaten-Transformation
 // matrix * vector(x,y,z,1)
 vector vector::transform(const matrix &m) const {
@@ -210,6 +309,7 @@ vector vector::transform3(const matrix3 &m) const {
 	vo.z= x*m._20 + y*m._21 + z*m._22;
 	return vo;
 }
+#endif
 
 // vector(0,0,1) wird um ang rotiert
 // ZXY, da nur im Spiel-Koordinaten-System
@@ -246,6 +346,8 @@ vector vector::dir2ang2(const vector &up) const {
 	return QuaternionToAngle(q);*/
 }
 
+
+#if 0
 // adds two angles (juxtaposition of rotations)
 vector VecAngAdd(const vector &ang1,const vector &ang2) {
 	auto q1 = quaternion::rotation(ang1);
@@ -267,6 +369,7 @@ vector vector::rotate(const vector &ang) const {
 	matrix m = matrix::rotation(ang);
 	return transform(m);
 }
+#endif
 
 // which one is the largest coordinate of this vector
 int vector::important_plane() const {
@@ -319,7 +422,7 @@ void vector::_max(const vector &test_partner) {
 
 
 float _vec_length_(const vector &v) {
-	return sqrt(v*v);
+	return sqrt(vector::dot(v, v));
 }
 
 float _vec_length_fuzzy_(const vector &v) {
@@ -331,7 +434,7 @@ float _vec_length_fuzzy_(const vector &v) {
 }
 
 void _vec_normalize_(vector &v) {
-	float inv_norm = 1.0f / sqrt(v*v);
+	float inv_norm = 1.0f / v.length();
 	v *= inv_norm;
 }
 
@@ -341,5 +444,184 @@ bool _vec_between_(const vector &v,const vector &a,const vector &b) {
 }
 
 float _vec_factor_between_(const vector &v,const vector &a,const vector &b) {
-	return ((v-a)*(b-a)) / ((b-a)*(b-a));
+	return vector::dot(v-a, b-a) / vector::dot(b-a, b-a);
 }
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------//
+//                                            vec4                                                //
+//------------------------------------------------------------------------------------------------//
+
+
+
+
+const vec4 vec4::ZERO = vec4(0, 0, 0, 0);
+const vec4 vec4::EX = vec4(1, 0, 0, 0);
+const vec4 vec4::EY = vec4(0, 1, 0, 0);
+const vec4 vec4::EZ = vec4(0, 0, 1, 0);
+const vec4 vec4::EW = vec4(0, 0, 0, 1);
+
+vec4::vec4(float x, float y, float z, float w) {
+	this->x = x;
+	this->y = y;
+	this->z = z;
+	this->w = w;
+}
+
+// assignment operators
+void vec4::operator += (const vec4& v) {
+	x += v.x;
+	y += v.y;
+	z += v.z;
+	w += v.w;
+}
+
+void vec4::operator -= (const vec4& v) {
+	x -= v.x;
+	y -= v.y;
+	z -= v.z;
+	w -= v.w;
+}
+
+void vec4::operator *= (float f) {
+	x *= f;
+	y *= f;
+	z *= f;
+	w *= f;
+}
+
+void vec4::operator /= (float f) {
+	x /= f;
+	y /= f;
+	z /= f;
+	w /= f;
+}
+
+// unitary operator(s)
+vec4 vec4::operator - () const {
+	return vec4(-x, -y, -z, -w);
+}
+
+// binary operators
+vec4 vec4::operator + (const vec4 &v) const {
+	return vec4(x+v.x ,y+v.y, z+v.z, w+v.w);
+}
+
+vec4 vec4::operator - (const vec4 &v) const {
+	return vec4(x-v.x, y-v.y, z-v.z, w-v.w);
+}
+
+vec4 vec4::operator * (float f) const {
+	return vec4(x*f, y*f, z*f, w*f);
+}
+
+vec4 vec4::operator / (float f) const {
+	return vec4(x/f, y/f, z/f, w/f);
+}
+
+bool vec4::operator == (const vec4 &v) const {
+	return ((x==v.x) and (y==v.y) and (z==v.z) and (w==v.w));
+}
+
+bool vec4::operator != (const vec4 &v) const {
+	return !((x==v.x) and (y==v.y) and (z==v.z) and (w==v.w));
+}
+
+string vec4::str() const {
+	return format("(%f, %f, %f, %f)", x, y, z, w);
+}
+
+// real length of the vec4
+float vec4::length() const {
+	return sqrtf( x*x + y*y + z*z + w*w );
+}
+
+// scale to length 1
+void vec4::normalize() {
+	float l = length();
+	if (l > 0)
+		*this /= l;
+	else
+		*this = vec4::EW;
+}
+
+// scale to length 1
+vec4 vec4::normalized() const {
+	float l = length();
+	if (l == 0)
+		return vec4::EW;
+	return *this / l;
+}
+
+
+
+
+
+int vec4::argmin() const {
+	int n = 0;
+	float m = (*this)[0];
+	for (int i=1; i<3; i++)
+		if ((*this)[i] < m) {
+			n = i;
+			m = (*this)[i];
+		}
+	return n;
+}
+
+int vec4::argmax() const {
+	int n = 0;
+	float m = (*this)[0];
+	for (int i=1; i<3; i++)
+		if ((*this)[i] > m) {
+			n = i;
+			m = (*this)[i];
+		}
+	return n;
+}
+
+float vec4::sum() const {
+	return x + y + z + w;
+}
+
+float &vec4::operator[](int index) {
+	auto vv = &x;
+	return vv[index];
+}
+
+float vec4::operator[](int index) const {
+	auto vv = &x;
+	return vv[index];
+}
+
+
+
+int ivec4::find(int x) const {
+	if (i == x)
+		return 0;
+	if (j == x)
+		return 1;
+	if (k == x)
+		return 2;
+	if (l == x)
+		return 3;
+	return -1;
+}
+
+int &ivec4::operator[](int index) {
+	auto vv = &i;
+	return vv[index];
+}
+
+int ivec4::operator[](int index) const {
+	auto vv = &i;
+	return vv[index];
+}
+
+
+
+

@@ -5,8 +5,11 @@
  *      Author: michi
  */
 
-#include "math.h"
-#include "../file/file.h"
+#include "interpolation.h"
+#include "complex.h"
+#include "vector.h"
+#include "quaternion.h"
+#include "../file/msg.h"
 
 
 

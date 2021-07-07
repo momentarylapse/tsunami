@@ -1,9 +1,12 @@
 
-#ifndef _MATH_QUATERNION_INCLUDED_
-#define _MATH_QUATERNION_INCLUDED_
+#pragma once
+
+
+#include "math.h"
 
 class vector;
 class matrix;
+class string;
 
 class quaternion {
 public:
@@ -51,4 +54,6 @@ public:
 	static quaternion _cdecl drag(const vector &up, const vector &dang, bool reset_z);
 };
 
-#endif
+
+
+bool inf_q(const quaternion &q);

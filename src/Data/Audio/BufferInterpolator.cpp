@@ -7,6 +7,7 @@
 
 #include "BufferInterpolator.h"
 #include "../../Plugins/FastFourierTransform.h"
+#include "../../lib/math/complex.h"
 #include "AudioBuffer.h"
 
 

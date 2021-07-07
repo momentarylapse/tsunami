@@ -1,4 +1,4 @@
-#include "math.h"
+#include "rect.h"
 
 const rect rect::ID = rect(0,1,0,1);
 const rect rect::EMPTY = rect(0,0,0,0);

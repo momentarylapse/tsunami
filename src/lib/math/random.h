@@ -1,9 +1,10 @@
 
-#ifndef RANDOM_H_
-#define RANDOM_H_
+#pragma once
 
-class Random
-{
+
+#include "math.h"
+
+class Random {
 public:
 	Random();
 	void _cdecl __init__();
@@ -24,5 +25,3 @@ private:
 	int c;
 };
 
-
-#endif

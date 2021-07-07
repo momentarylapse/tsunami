@@ -7,6 +7,7 @@
 
 #include "Dial.h"
 #include "../../lib/image/Painter.h"
+#include "../../lib/math/complex.h"
 #include "../AudioView.h"
 #include "Graph/SceneGraph.h"
 

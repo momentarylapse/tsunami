@@ -24,7 +24,10 @@ void draw_triangles(VertexBuffer *vb) {
 
 	bind_vertex_buffer(vb);
 
-	glDrawArrays(GL_TRIANGLES, 0, vb->count()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	if (vb->is_indexed())
+		glDrawElements(GL_TRIANGLES, vb->index.count, vb->index.type, (void*)0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, vb->count()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 }
 
 void draw_instanced_triangles(VertexBuffer *vb, int count) {

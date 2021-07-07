@@ -8,7 +8,8 @@
 #include "pdf.h"
 #include "../image/image.h"
 #include "../image/Painter.h"
-#include "../math/math.h"
+#include "../math/rect.h"
+#include "../math/complex.h"
 #include "../file/file.h"
 
 namespace pdf {

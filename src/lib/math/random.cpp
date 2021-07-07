@@ -1,4 +1,5 @@
-#include "math.h"
+#include "random.h"
+#include "vector.h"
 #include "../file/file.h"
 
 #define PHI 0x9e3779b9

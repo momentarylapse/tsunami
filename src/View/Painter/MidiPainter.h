@@ -10,7 +10,7 @@
 
 #include <functional>
 #include "../../lib/base/base.h"
-#include "../../lib/math/math.h"
+#include "../../lib/math/rect.h"
 #include "../../Data/Range.h"
 #include "../../Data/Midi/Scale.h"
 

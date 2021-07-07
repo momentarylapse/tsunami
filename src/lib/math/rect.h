@@ -1,12 +1,10 @@
 
-#ifndef _MATH_RECT_INCLUDED_
-#define _MATH_RECT_INCLUDED_
+#pragma once
 
-#include "../base/base.h"
+#include "math.h"
 
 class string;
 
-// types
 class rect {
 public:
 	float x1, x2, y1, y2;
@@ -30,5 +28,3 @@ public:
 	static const rect ID;
 	static const rect EMPTY;
 };
-
-#endif

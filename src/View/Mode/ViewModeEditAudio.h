@@ -9,7 +9,6 @@
 #define SRC_VIEW_MODE_VIEWMODEEDITAUDIO_H_
 
 #include "ViewModeDefault.h"
-#include "../../lib/math/math.h"
 
 class TrackLayer;
 

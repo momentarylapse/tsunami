@@ -11,6 +11,7 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Plugins/FastFourierTransform.h"
+#include "../../lib/math/complex.h"
 
 
 

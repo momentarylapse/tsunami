@@ -10,6 +10,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Data/Track.h"
 #include "../AudioView.h"
+#include "../../lib/math/vector.h"
 #include <math.h>
 
 const int RELATIVE_NUM_PITCHES = 6;
@@ -43,35 +44,35 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	width = w;
 
 	p->set_color(theme.background);
-	p->draw_rect(0, 0, w, h);
+	p->draw_rect(p->area());
 
 	if (hover >= 0) {
 		if (is_checked("all_octaves")) {
 			color c = color::interpolate(theme.background, theme.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
-				p->draw_rect(pitch2x(i), 0, pitch2x(1), h);
+				p->draw_rect(rect(pitch2x(i), pitch2x(i+1), 0, h));
 		}
 		color c = color::interpolate(theme.background, theme.capture_marker, 0.2f);
 		p->set_color(c);
-		p->draw_rect(pitch2x(hover), 0, pitch2x(1), h);
+		p->draw_rect(rect(pitch2x(hover), pitch2x(hover+1), 0, h));
 	}
 
 	// grid
 	p->set_color(theme.text_soft3);
 	for (int i=1; i<MAX_PITCH; i++) {
 		float x = pitch2x(i);
-		p->draw_line(x, 0, x, h);
+		p->draw_line({x, 0}, {x, h});
 	}
 	if (mode_relative) {
 		for (int i=-RELATIVE_NUM_PITCHES; i<=RELATIVE_NUM_PITCHES; i++) {
 			float y = relpitch2y(i, 0);
-			p->draw_line(0, y, w, y);
+			p->draw_line({0, y}, {w, y});
 		}
 	} else {
 		for (int i=0; i<=MAX_PITCH; i++) {
 			float y = pitch2y(i);
-			p->draw_line(0, y, w, y);
+			p->draw_line({0, y}, {w, y});
 		}
 	}
 
@@ -85,7 +86,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
-		p->draw_line(x0, y, x1, y);
+		p->draw_line({x0, y}, {x1, y});
 		p->set_line_width(2.0f);
 	}
 
@@ -99,15 +100,15 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
-		p->draw_line(x0, y, x1, y);
+		p->draw_line({x0, y}, {x1, y});
 	}
 	p->set_line_width(1.0f);
 
 
 	if (hover >= 0) {
 		p->set_color(theme.text);
-		p->draw_str(20, 17, pitch_name(hover));
-		p->draw_str(70, 17, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
+		p->draw_str({20, 17}, pitch_name(hover));
+		p->draw_str({70, 17}, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}
 }
 
@@ -139,9 +140,9 @@ void DetuneSynthesizerDialog::on_left_button_down() {
 	if (hover >= 0) {
 		auto tuning = track->synth->tuning;
 		if (mode_relative) {
-			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::GetEvent()->my, hover));
+			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::GetEvent()->m.y, hover));
 		} else {
-			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::GetEvent()->my));
+			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::GetEvent()->m.y));
 		}
 		track->detune_synthesizer(tuning.freq);
 		redraw("detune_area");
@@ -154,8 +155,8 @@ void DetuneSynthesizerDialog::on_left_button_up() {
 void DetuneSynthesizerDialog::on_mouse_move() {
 	hover = -1;
 	auto e = hui::GetEvent();
-	if ((e->mx >= 0) and (e->mx < width))
-		hover = (e->mx / width * MAX_PITCH);
+	if ((e->m.x >= 0) and (e->m.x < width))
+		hover = (e->m.x / width * MAX_PITCH);
 
 	redraw("detune_area");
 }
@@ -166,8 +167,8 @@ void DetuneSynthesizerDialog::on_mouse_wheel() {
 		float speed = mode_relative ? 0.01f : 0.1f;
 		bool all_octaves = is_checked("all_octaves");
 		auto tuning = track->synth->tuning;
-		if (e->scroll_y != 0) {
-			float dpitch = speed * e->scroll_y;
+		if (e->scroll.y != 0) {
+			float dpitch = speed * e->scroll.y;
 			if (all_octaves) {
 				for (int i=(hover % 12); i<MAX_PITCH; i+=12)
 					tuning.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);

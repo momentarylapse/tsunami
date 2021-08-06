@@ -17,7 +17,7 @@ class Painter;
 class Image;
 class color;
 class rect;
-class complex;
+class vec2;
 class File;
 
 namespace pdf {
@@ -55,17 +55,16 @@ public:
 	void _cdecl set_line_dash(const Array<float> &dash, float offset) override;
 	void _cdecl set_fill(bool fill) override;
 	void _cdecl set_clip(const rect &r) override;
-	void _cdecl draw_point(float x, float y) override;
-	void _cdecl draw_line(float x1, float y1, float x2, float y2) override;
-	void _cdecl draw_lines(const Array<complex> &p) override;
-	void _cdecl draw_polygon(const Array<complex> &p) override;
-	void _cdecl draw_rect(float x1, float y1, float w, float h) override;
+	void _cdecl draw_point(const vec2 &p) override;
+	void _cdecl draw_line(const vec2 &a, const vec2 &b) override;
+	void _cdecl draw_lines(const Array<vec2> &p) override;
+	void _cdecl draw_polygon(const Array<vec2> &p) override;
 	void _cdecl draw_rect(const rect &r) override;
-	void _cdecl draw_circle(float x, float y, float radius) override;
-	void _cdecl draw_str(float x, float y, const string &str) override;
+	void _cdecl draw_circle(const vec2 &c, float radius) override;
+	void _cdecl draw_str(const vec2 &p, const string &str) override;
 	float _cdecl get_str_width(const string &str) override;
-	void _cdecl draw_image(float x, float y, const Image *image) override;
-	void _cdecl draw_mask_image(float x, float y, const Image *image) override;
+	void _cdecl draw_image(const vec2 &d, const Image *image) override;
+	void _cdecl draw_mask_image(const vec2 &d, const Image *image) override;
 	rect area() const override;
 	rect clip() const override;
 

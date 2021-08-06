@@ -12,6 +12,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
 #include "../Graph/AudioViewLayer.h"
+#include "../../lib/math/vector.h"
 
 bool view_has_focus(AudioView *view);
 
@@ -36,9 +37,9 @@ void Cursor::on_draw(Painter* c) {
 		c->set_color(col);//colors.selection_boundary);
 		for (auto *v: view->vlayers)
 			if (view->sel.has(v->layer)) {
-				c->draw_line(x - r, v->area.y1, x + r, v->area.y1);
-				c->draw_line(x, v->area.y1, x, v->area.y2);
-				c->draw_line(x - r, v->area.y2, x + r, v->area.y2);
+				c->draw_line({x - r, v->area.y1}, {x + r, v->area.y1});
+				c->draw_line({x, v->area.y1}, {x, v->area.y2});
+				c->draw_line({x - r, v->area.y2}, {x + r, v->area.y2});
 			}
 		c->set_line_width(1);
 	}
@@ -52,18 +53,18 @@ int Cursor::pos() const {
 		return view->sel.range_raw.start();
 }
 
-bool Cursor::hover(float mx, float my) const {
-	if (my < view->song_area().y2 - 20)
+bool Cursor::hover(const vec2 &m) const {
+	if (m.y < view->song_area().y2 - 20)
 		return false;
 	float x = view->cam.sample2screen(pos());
-	return (fabs(x - mx) < 10);
+	return (fabs(x - m.x) < 10);
 }
 
 string Cursor::get_tip() const {
 	return _("cursor");
 }
 
-bool Cursor::on_left_button_down(float mx, float my) {
+bool Cursor::on_left_button_down(const vec2 &m) {
 	drag_range = view->sel.range_raw;
 	/*if (!is_end)
 		drag_range.invert();*/
@@ -94,9 +95,9 @@ void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color
 	p->set_line_width(2.5f);
 	for (auto *t: view->vlayers)
 		if (t->layer->type == SignalType::BEATS) {
-			p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-			p->draw_line(x2, t->area.y1, x2, t->area.y2);
-			p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
+			p->draw_line({x2 - 5, t->area.y1}, {x2 + 5, t->area.y1});
+			p->draw_line({x2, t->area.y1}, {x2, t->area.y2});
+			p->draw_line({x2 - 5, t->area.y2}, {x2 + 5, t->area.y2});
 	}
 	p->set_line_width(1.0f);
 }

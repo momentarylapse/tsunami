@@ -28,6 +28,7 @@
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"
 #include "../../lib/hui/Controls/Control.h"
+#include "../../lib/math/vector.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "../../Device/Stream/AudioOutput.h"
 #include "../Graph/AudioViewLayer.h"
@@ -50,24 +51,24 @@ public:
 		mode = _mode;
 		start_pos = view->get_mouse_pos_snap();
 	}
-	void on_start(float mx, float my) override {
+	void on_start(const vec2 &m) override {
 		range = RangeTo(view->get_mouse_pos_snap(), start_pos);
 		view->hover().y0 = view->mdp()->y0;
-		view->hover().y1 = my;
+		view->hover().y1 = m.y;
 		view->selection_mode = mode;
 		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
 		view->set_selection(view->mode->get_selection(range, mode));
 	}
-	void on_update(float mx, float my) override {
+	void on_update(const vec2 &m) override {
 		// cheap auto scrolling
-		if (mx < 50)
+		if (m.x < 50)
 			view->cam.move(-10 / view->cam.pixels_per_sample);
-		if (mx > view->area.width() - 50)
+		if (m.x > view->area.width() - 50)
 			view->cam.move(10 / view->cam.pixels_per_sample);
 
 		range.set_start(view->get_mouse_pos_snap());
-		view->hover().y1 = my;
+		view->hover().y1 = m.y;
 		if (view->select_xor)
 			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
 		else
@@ -106,16 +107,16 @@ public:
 		mouse_pos0 = view->hover().pos;
 		ref_pos = hover_reference_pos(view->hover());
 	}
-	void on_start(float mx, float my) override {
+	void on_start(const vec2 &m) override {
 		action = new ActionSongMoveSelection(view->song, sel, false);
 	}
-	void on_update(float mx, float my) override {
+	void on_update(const vec2 &m) override {
 		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
 		view->snap_to_grid(p);
 		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
 		action->set_param_and_notify(view->song, dpos);
 	}
-	void on_finish(float mx, float my) override {
+	void on_finish(const vec2 &m) override {
 		view->song->execute(action);
 	}
 	void on_cancel() override {
@@ -232,22 +233,22 @@ void scroll_y(AudioView *view, float dy) {
 
 void ViewModeDefault::on_mouse_wheel() {
 	auto e = hui::GetEvent();
-	if (view->scene_graph->on_mouse_wheel(e->scroll_x, e->scroll_y))
+	if (view->scene_graph->on_mouse_wheel(e->scroll))
 		return;
 
-	if (fabs(e->scroll_y) > 0.1f) {
+	if (fabs(e->scroll.y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL)) {
-			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);
+			cam->zoom(exp(e->scroll.y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->m.x);
 		} else if (win->get_key(hui::KEY_SHIFT)) {
-			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
+			cam->move(e->scroll.y * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 		} else {
-			scroll_y(view, e->scroll_y * view->mouse_wheel_speed * view->ScrollSpeed);
+			scroll_y(view, e->scroll.y * view->mouse_wheel_speed * view->ScrollSpeed);
 		}
 	}
 
 	// horizontal scroll
-	if (fabs(e->scroll_x) > 0.1f)
-		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
+	if (fabs(e->scroll.x) > 0.1f)
+		cam->move(e->scroll.x * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 }
 
 void playback_seek_relative(AudioView *view, float dt) {
@@ -306,7 +307,7 @@ void expand_layer_selection(AudioView *view, bool up) {
 	for (auto *l: view->vlayers)
 		view->sel.set(l->layer, l->area.my() > y0 and l->area.my() < y1);
 
-	view->set_current(vlayer->get_hover_data(0,0));
+	view->set_current(vlayer->get_hover_data({0,0}));
 	//exclusively_select_layer(vlayer);
 	view->select_under_cursor();
 
@@ -348,8 +349,8 @@ void ViewModeDefault::on_command(const string &id) {
 	if (id == "hui:gesture-zoom-end") {
 	}
 	if (id == "hui:gesture-zoom") {
-		view->cam.zoom(hui::GetEvent()->scroll_x/_zoom_0_, view->mx);
-		_zoom_0_ = hui::GetEvent()->scroll_x;
+		view->cam.zoom(hui::GetEvent()->scroll.x/_zoom_0_, view->m.x);
+		_zoom_0_ = hui::GetEvent()->scroll.x;
 	}
 }
 
@@ -446,14 +447,14 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 			view->cam.range2screen(m->range, x0, x1);
 			col.a *= marker_alpha_factor(x1 - x0, (x1-x0)*2, m == g[0]);
 			c->set_color(col);
-			c->draw_line(x0, l->area.y1, x0, l->area.y2);
+			c->draw_line({x0, l->area.y1}, {x0, l->area.y2});
 		}
 	}
 	c->set_line_width(1.0f);
 }
 
-HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
-	return vlayer->get_hover_data_default(mx, my);
+HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
+	return vlayer->get_hover_data_default(m);
 }
 
 SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {

@@ -11,6 +11,7 @@
 #include "../../Stuff/Observable.h"
 #include "../../lib/base/set.h"
 
+class vec2;
 enum class MidiMode;
 enum class SelectionMode;
 class AudioView;
@@ -49,7 +50,7 @@ public:
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change() {}
 
-	virtual HoverData get_hover_data(AudioViewLayer *vlayer, float mx, float my);
+	virtual HoverData get_hover_data(AudioViewLayer *vlayer, const vec2 &m);
 
 	virtual void draw_track_background(Painter *c, AudioViewTrack *t) {}
 	virtual void draw_layer_background(Painter *c, AudioViewLayer *l) {}

@@ -16,14 +16,15 @@ namespace scenegraph {
 	class SceneGraph;
 }
 class Painter;
+class vec2;
 
 class MouseDelayAction {
 public:
 	MouseDelayAction() {}
 	virtual ~MouseDelayAction() {}
-	virtual void on_start(float mx, float my) {}
-	virtual void on_update(float mx, float my) {}
-	virtual void on_finish(float mx, float my) {}
+	virtual void on_start(const vec2 &m) {}
+	virtual void on_update(const vec2 &m) {}
+	virtual void on_finish(const vec2 &m) {}
 	virtual void on_cancel() {}
 	virtual void on_clean_up() {}
 	virtual void on_draw_post(Painter *p) {}
@@ -42,11 +43,11 @@ public:
 	typedef std::function<void()> Callback;
 	owned<MouseDelayAction> action;
 	void prepare(MouseDelayAction *action);
-	void start_acting(float mx, float my);
-	bool update(float mx, float my);
+	void start_acting(const vec2 &m);
+	bool update(const vec2 &m);
 	bool has_focus();
 	bool acting();
-	void finish(float mx, float my);
+	void finish(const vec2 &m);
 	void cancel();
 	void draw_post(Painter *p);
 };

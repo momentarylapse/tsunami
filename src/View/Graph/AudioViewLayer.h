@@ -39,15 +39,15 @@ public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_left_double_click(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_left_double_click(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
 
 	bool allow_handle_click_when_gaining_focus() const override;
 
 	string get_tip() const override;
-	HoverData get_hover_data(float mx, float my) override;
-	HoverData get_hover_data_default(float mx, float my);
+	HoverData get_hover_data(const vec2 &m) override;
+	HoverData get_hover_data_default(const vec2 &m);
 
 	void on_layer_change();
 	void on_track_change();

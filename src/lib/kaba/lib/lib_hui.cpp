@@ -88,6 +88,7 @@ extern const Class *TypeStringList;
 extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
 extern const Class *TypePath;
+extern const Class *TypeVec2;
 //extern const Class *TypeTimer;
 const Class *TypeHuiWindowP;
 
@@ -578,10 +579,8 @@ void SIAddPackageHui() {
 	add_class(TypeHuiEvent);
 		class_add_element("id", TypeString, GetDAEvent(id));
 		class_add_element("message", TypeString, GetDAEvent(message));
-		class_add_element("mouse_x", TypeFloat32, GetDAEvent(mx));
-		class_add_element("mouse_y", TypeFloat32, GetDAEvent(my));
-		class_add_element("scroll_x", TypeFloat32, GetDAEvent(scroll_x));
-		class_add_element("scroll_y", TypeFloat32, GetDAEvent(scroll_y));
+		class_add_element("mouse", TypeVec2, GetDAEvent(m));
+		class_add_element("scroll", TypeVec2, GetDAEvent(scroll));
 		class_add_element("key", TypeInt, GetDAEvent(key_code));
 		class_add_element("width", TypeInt, GetDAEvent(width));
 		class_add_element("height", TypeInt, GetDAEvent(height));

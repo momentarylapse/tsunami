@@ -12,10 +12,10 @@
 #include "../../../Module/SignalChain.h"
 #include "../../../Module/Module.h"
 #include "../../AudioView.h"
-#include "../../../lib/math/complex.h"
+#include "../../../lib/math/vector.h"
 #include "../../../lib/math/interpolation.h"
 
-SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel(0,0,0,0) {
+SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {
 	tab = t;
 	source = c.source;
 	target = c.target;
@@ -31,13 +31,13 @@ void SignalEditorCable::on_draw(Painter *p) {
 	auto ps = ms->out[source_port];
 	auto pt = mt->in[target_port];
 
-	complex p0 = complex(ps->area.mx(), ps->area.my());
-	complex p1 = complex(pt->area.mx(), pt->area.my());
+	vec2 p0 = ps->area.m();
+	vec2 p1 = pt->area.m();
 
-	float length = (p1 - p0).abs();
-	Interpolator<complex> inter(Interpolator<complex>::TYPE_CUBIC_SPLINE);
-	inter.add2(p0, complex(length,0));
-	inter.add2(p1, complex(length,0));
+	float length = (p1 - p0).length();
+	Interpolator<vec2> inter(Interpolator<vec2>::TYPE_CUBIC_SPLINE);
+	inter.add2(p0, vec2(length,0));
+	inter.add2(p1, vec2(length,0));
 
 	color base_color = tab->signal_color(type, false);
 
@@ -46,7 +46,7 @@ void SignalEditorCable::on_draw(Painter *p) {
 	//p->set_color(color::interpolate(base_color, view->colors.background, 0.1f));
 	p->set_line_width(2.0f);
 	p->set_line_dash({5, 2}, 0);
-	Array<complex> cc;
+	Array<vec2> cc;
 	for (float t=0; t<=1.0f; t+=0.025f)
 		cc.add(inter.get(t));
 	p->draw_lines(cc);
@@ -58,6 +58,6 @@ void SignalEditorCable::on_draw(Painter *p) {
 	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 }
 
-bool SignalEditorCable::hover(float mx, float my) const {
+bool SignalEditorCable::hover(const vec2 &m) const {
 	return false;
 }

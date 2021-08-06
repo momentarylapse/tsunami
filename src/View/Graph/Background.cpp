@@ -14,6 +14,7 @@
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
 #include "../Graph/AudioViewLayer.h"
+#include "../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
@@ -25,7 +26,7 @@ Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	set_perf_name("background");
 }
 
-bool Background::on_left_button_down(float mx, float my) {
+bool Background::on_left_button_down(const vec2 &m) {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
@@ -38,7 +39,7 @@ bool Background::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool Background::on_right_button_down(float mx, float my) {
+bool Background::on_right_button_down(const vec2 &m) {
 	view->open_popup(view->menu_song.get());
 	return true;
 }
@@ -67,21 +68,21 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 	if (sel_any and !view->sel.range().is_empty()) {
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, 0);
-		c->draw_line(area.x1, y, sx0, y);
+		c->draw_line({area.x1, y}, {sx0, y});
 
 		c->set_color(theme.grid_selected);
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, loop(sx0, 0.0f, 13.0f));
-		c->draw_line(sx0, y, sx1, y);
+		c->draw_line({sx0, y}, {sx1, y});
 
 		c->set_color(theme.grid);
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, loop(sx1, 0.0f, 13.0f));
-		c->draw_line(sx1, y, area.x2, y);
+		c->draw_line({sx1, y}, {area.x2, y});
 	} else {
 		if (same_track)
 			c->set_line_dash({3.0f,10.0f}, 0);
-		c->draw_line(area.x1, y, area.x2, y);
+		c->draw_line({area.x1, y}, {area.x2, y});
 	}
 
 	c->set_line_dash({}, 0);
@@ -122,8 +123,8 @@ void Background::on_draw(Painter* c) {
 	draw_layer_separator(c, prev, nullptr);
 }
 
-HoverData Background::get_hover_data(float mx, float my) {
-	auto h = view->hover_time(mx, my);
+HoverData Background::get_hover_data(const vec2 &m) {
+	auto h = view->hover_time(m);
 	h.node = this;
 	return h;
 }

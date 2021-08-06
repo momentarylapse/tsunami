@@ -45,7 +45,7 @@ void Serializer::add_virtual_function_call(Function *f, const Array<SerialNodePa
 	cmd.add_cmd(Asm::InstID::MOV, t1, params[0]); // self
 	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt, config.pointer_size * f->virtual_index)); // vtable + n
 	cmd.add_cmd(Asm::InstID::MOV, t3, deref_temp(t2, TypeFunctionCodeP)); // vtable[n]
-	cmd.add_cmd(Asm::InstID::CALL, ret, t3); // the actual call
+	cmd.add_cmd(Asm::InstID::CALL_MEMBER, ret, t3); // the actual call
 }
 
 int Serializer::function_call_push_params(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
@@ -633,11 +633,11 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			break;
 		case InlineID::VECTOR_MULTIPLY_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
 		case InlineID::VECTOR_DIVIDE_ASSIGN:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
+				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
 		case InlineID::VECTOR_SUBTARCT_ASSIGN:
 			for (int i=0;i<3;i++)

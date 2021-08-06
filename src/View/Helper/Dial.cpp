@@ -10,6 +10,7 @@
 #include "../../lib/math/complex.h"
 #include "../AudioView.h"
 #include "Graph/SceneGraph.h"
+#include "../../lib/math/vector.h"
 
 
 const float dphi = 2.0f;
@@ -33,7 +34,7 @@ void Dial::set_value(float v) {
 	request_redraw();
 }
 
-void Dial::drag_update(float mx, float my) {
+void Dial::drag_update(const vec2 &m) {
 }
 
 float Dial::value_to_rel(float v) const {
@@ -41,7 +42,7 @@ float Dial::value_to_rel(float v) const {
 }
 
 void Dial::draw_arc(Painter *p, float v0, float v1, float R) {
-	Array<complex> z;
+	Array<vec2> z;
 	int n = 20;
 	for (int i=0; i<=n; i++)
 		//z.add(rel_to_pos((float)i / (float)n, R));
@@ -49,9 +50,9 @@ void Dial::draw_arc(Painter *p, float v0, float v1, float R) {
 	p->draw_lines(z);
 }
 
-complex Dial::rel_to_pos(float rel, float R) {
+vec2 Dial::rel_to_pos(float rel, float R) {
 	float phi = -dphi + dphi * 2 * rel;
-	return complex(area.mx() + sin(phi) * R, area.my() - cos(phi) * R);
+	return vec2(area.mx() + sin(phi) * R, area.my() - cos(phi) * R);
 }
 
 void Dial::on_draw(Painter *p) {
@@ -60,7 +61,7 @@ void Dial::on_draw(Painter *p) {
 	// label
 	p->set_color(theme.text_soft1);
 	float w = p->get_str_width(label);
-	p->draw_str(area.mx() - w/2, area.y2 - 10, label);
+	p->draw_str({area.mx() - w/2, area.y2 - 10}, label);
 
 
 	// value
@@ -70,12 +71,12 @@ void Dial::on_draw(Painter *p) {
 	if (unit.num > 0)
 		vv += " " + unit;
 	w = p->get_str_width(vv);
-	p->draw_str(area.mx() - w/2, area.my() - p->font_size/2, vv);
+	p->draw_str({area.mx() - w/2, area.my() - p->font_size/2}, vv);
 	p->set_font_size(theme.FONT_SIZE);
 
 
 
-	Array<complex> z;
+	Array<vec2> z;
 	p->set_option("line-cap", "square");
 	p->set_line_width(3);
 	p->set_color(theme.text_soft3);
@@ -85,34 +86,34 @@ void Dial::on_draw(Painter *p) {
 	{
 		auto q1 = rel_to_pos(0, r);
 		auto q2 = rel_to_pos(0, r+4);
-		p->draw_line(q1.x, q1.y, q2.x, q2.y);
+		p->draw_line(q1, q2);
 	}
 	{
 		auto q1 = rel_to_pos(1, r);
 		auto q2 = rel_to_pos(1, r+4);
-		p->draw_line(q1.x, q1.y, q2.x, q2.y);
+		p->draw_line(q1, q2);
 	}
 	p->set_line_width(4);
 	p->set_color(theme.text);
 	{
 		auto q1 = rel_to_pos((value - val_min) / (val_max - val_min), r);
 		auto q2 = rel_to_pos((value - val_min) / (val_max - val_min), r-7);
-		p->draw_line(q1.x, q1.y, q2.x, q2.y);
+		p->draw_line(q1, q2);
 	}
 	draw_arc(p, reference_value, value, r);
 	p->set_option("line-cap", "butt");
 	p->set_line_width(1);
 }
 
-bool Dial::on_left_button_down(float mx, float my) {
+bool Dial::on_left_button_down(const vec2 &m) {
 	if (auto g = graph()) {
 		g->mdp_prepare([=] {
 			//drag_update(g->mx, g->my);
 			auto e = hui::GetEvent();
 			if (e->key_code & hui::KEY_SHIFT)
-				set_value(clamp(value - e->dy * (val_max - val_min) * 0.0002f, val_min, val_max));
+				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.0002f, val_min, val_max));
 			else
-				set_value(clamp(value - e->dy * (val_max - val_min) * 0.002f, val_min, val_max));
+				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.002f, val_min, val_max));
 			if (cb_update)
 				cb_update(value);
 		});
@@ -120,12 +121,12 @@ bool Dial::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool Dial::on_mouse_wheel(float dx, float dy) {
+bool Dial::on_mouse_wheel(const vec2 &d) {
 	auto e = hui::GetEvent();
 	if (e->key_code & hui::KEY_SHIFT)
-		set_value(clamp(value + dy * (val_max - val_min) * 0.02f, val_min, val_max));
+		set_value(clamp(value + d.y * (val_max - val_min) * 0.02f, val_min, val_max));
 	else
-		set_value(clamp(value + dy * (val_max - val_min) * 0.02f, val_min, val_max));
+		set_value(clamp(value + d.y * (val_max - val_min) * 0.02f, val_min, val_max));
 	if (cb_update)
 		cb_update(value);
 	return true;

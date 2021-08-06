@@ -17,8 +17,8 @@ class Background : public scenegraph::NodeFree {
 public:
 	Background(AudioView *view);
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
 	bool allow_handle_click_when_gaining_focus() const override { return false; }
 
 	void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2);
@@ -26,7 +26,7 @@ public:
 	void on_draw(Painter *p) override;
 
 	AudioView *view;
-	HoverData get_hover_data(float mx, float my);
+	HoverData get_hover_data(const vec2 &m);
 };
 
 #endif /* SRC_VIEW_GRAPH_BACKGROUND_H_ */

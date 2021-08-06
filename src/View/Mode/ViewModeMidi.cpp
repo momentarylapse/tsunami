@@ -265,10 +265,10 @@ public:
 		pitch = _pitch;
 		pos0 = vlayer->view->hover().pos;
 	}
-	void on_start(float mx, float my) override {
+	void on_start(const vec2 &m) override {
 		view->mode_edit_midi->start_midi_preview(pitch, 1.0f);
 	}
-	void on_finish(float mx, float my) override {
+	void on_finish(const vec2 &m) override {
 		auto notes = get_creation_notes();
 
 		if (notes.num > 0) {
@@ -672,8 +672,8 @@ inline bool hover_note_linear(const MidiNote &n, HoverData &s, ViewModeMidi *vmm
 	return n.range.is_inside(s.pos);
 }
 
-HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
-	auto s = ViewModeDefault::get_hover_data(vlayer, mx, my);
+HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
+	auto s = ViewModeDefault::get_hover_data(vlayer, m);
 	if (s.type != s.Type::LAYER)
 		return s;
 	if (!editing(vlayer))
@@ -687,7 +687,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 
 	/*if (creation_mode != CreationMode::SELECT)*/{
 		if ((mode == MidiMode::CLASSICAL)) {
-			s.clef_position = mp->screen_to_clef_pos(my);
+			s.clef_position = mp->screen_to_clef_pos(m.y);
 			int upos = l->track->instrument.get_clef().position_to_uniclef(s.clef_position);
 			s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
 			s.pitch = uniclef_to_pitch(upos, s.modifier);
@@ -701,7 +701,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 				}
 		} else if ((mode == MidiMode::TAB)) {
 			//s.pitch = cur_track->y2pitch_classical(my, modifier);
-			s.clef_position = mp->screen_to_string(my);
+			s.clef_position = mp->screen_to_string(m.y);
 			s.modifier = modifier;
 			s.type = HoverData::Type::CLEF_POSITION;
 
@@ -712,8 +712,8 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 					return s;
 				}
 		} else if (mode == MidiMode::LINEAR) {
-			s.pitch = mp->y2pitch_linear(my);
-			s.clef_position = mp->y2clef_linear(my, s.modifier);
+			s.pitch = mp->y2pitch_linear(m.y);
+			s.clef_position = mp->y2clef_linear(m.y, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
 
 			for (auto *n: weak(l->midi))
@@ -774,19 +774,19 @@ void ViewModeMidi::draw_post(Painter *c) {
 		int y = mp->string_to_screen(string_no);
 		int y1 = y - mp->clef_dy/2;
 		int y2 = y + mp->clef_dy/2;
-		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(rect(x1, x2, y1, y2));
 	} else if (mode == MidiMode::CLASSICAL) {
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = mp->pitch2y_classical(p2);
 		int y2 = mp->pitch2y_classical(p1);
-		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(rect(x1, x2, y1, y2));
 	} else if (mode == MidiMode::LINEAR) {
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = mp->pitch2y_linear(p2);
 		int y2 = mp->pitch2y_linear(p1);
-		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(rect(x1, x2, y1, y2));
 	}
 	c->set_clip(xxx);
 	c->set_fill(true);

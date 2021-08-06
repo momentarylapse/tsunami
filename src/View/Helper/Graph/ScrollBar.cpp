@@ -30,12 +30,12 @@ void ScrollBar::set_callback(std::function<void(float)> f) {
 	cb_update_view = f;
 }
 
-void ScrollBar::drag_update(float mx, float my) {
+void ScrollBar::drag_update(const vec2 &m) {
 	//unproject(mx) - view_offset = mouse_offset
 	if (horizontal)
-		set_view_offset(unproject(mx) - mouse_offset);
+		set_view_offset(unproject(m.x) - mouse_offset);
 	else
-		set_view_offset(unproject(my) - mouse_offset);
+		set_view_offset(unproject(m.y) - mouse_offset);
 	if (cb_update_view)
 		cb_update_view(view_offset);
 }
@@ -119,22 +119,22 @@ float ScrollBar::get_view_offset() const {
 	return view_offset;
 }
 
-bool ScrollBar::on_left_button_down(float mx, float my) {
+bool ScrollBar::on_left_button_down(const vec2 &m) {
 	if (horizontal)
-		mouse_offset = unproject(mx) - view_offset;
+		mouse_offset = unproject(m.x) - view_offset;
 	else
-		mouse_offset = unproject(my) - view_offset;
+		mouse_offset = unproject(m.y) - view_offset;
 
 	// outside?!?
 	if (mouse_offset < 0 or mouse_offset > view_size) {
 		// make the cursor the middle of the scroller
 		mouse_offset = view_size / 2;
-		drag_update(mx, my);
+		drag_update(m);
 	}
 
 	if (auto g = graph()) {
 		g->mdp_prepare([=] {
-			drag_update(g->mx, g->my);
+			drag_update(g->m);
 		});
 	}
 	return true;

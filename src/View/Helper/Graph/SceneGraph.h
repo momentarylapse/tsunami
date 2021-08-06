@@ -28,18 +28,18 @@ public:
 	void set_callback_set_current(Callback f);
 	void set_callback_redraw(Callback f);
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_left_button_up(float mx, float my) override;
-	bool on_left_double_click(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
-	bool on_right_button_up(float mx, float my) override;
-	bool on_mouse_move(float mx, float my) override;
-	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_left_button_up(const vec2 &m) override;
+	bool on_left_double_click(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
+	bool on_right_button_up(const vec2 &m) override;
+	bool on_mouse_move(const vec2 &m) override;
+	bool on_mouse_wheel(const vec2 &d) override;
 	bool on_key(int key) override;
 	bool allow_handle_click_when_gaining_focus() const override;
 
 	//ViewNode *get_hover();
-	HoverData get_hover_data(float mx, float my) override;
+	HoverData get_hover_data(const vec2 &m) override;
 
 	void draw(Painter *p);
 	void on_draw(Painter *p) override;
@@ -54,11 +54,11 @@ public:
 
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);
-	void mdp_run(MouseDelayAction *action, float mx, float my);
+	void mdp_run(MouseDelayAction *action, const vec2 &m);
 	void mdp_prepare(Callback update);
 
-	float mx, my;
-	void set_mouse(float mx, float my);
+	vec2 m;
+	void set_mouse(const vec2 &m);
 	void update_hover();
 
 	void integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill);

@@ -9,6 +9,7 @@
 #include "../../lib/image/image.h"
 #include "../../lib/image/Painter.h"
 #include "../../lib/hui/hui.h"
+#include "../../lib/math/vector.h"
 #include <math.h>
 
 #define ENABLED 1
@@ -37,7 +38,7 @@ struct Symbol {
 		p->set_color(White);
 		p->set_font_size(size);
 		p->set_font("Sans", size, bold, false);
-		p->draw_str(0, 0, text);
+		p->draw_str({0, 0}, text);
 		hui::end_image_paint(&im, p);
 	}
 
@@ -98,7 +99,7 @@ void draw(Painter *p, float x, float y, float size, const string &s, bool bold, 
 		if (align == -1)
 			dx = - sym->im.width;
 		//p->drawImage(x + dx, y, sym->im);
-		p->draw_mask_image(x + dx, y, &sym->im);
+		p->draw_mask_image({x + dx, y}, &sym->im);
 	} else {
 		p->set_font_size(size);
 		float dx = 0;
@@ -106,7 +107,7 @@ void draw(Painter *p, float x, float y, float size, const string &s, bool bold, 
 			dx = - p->get_str_width(s) / 2;
 		if (align == -1)
 			dx = - p->get_str_width(s);
-		p->draw_str(x + dx, y, s);
+		p->draw_str({x + dx, y}, s);
 	}
 }
 

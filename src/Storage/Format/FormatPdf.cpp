@@ -18,13 +18,14 @@
 #include "../../lib/xfile/pdf.h"
 #include "../../lib/image/Painter.h"
 #include "../../lib/math/rect.h"
+#include "../../lib/math/vector.h"
 #include "../Dialog/PdfConfigDialog.h"
 #include "../../View/ViewPort.h"
 #include "../../View/Painter/MidiPainter.h"
 #include "../../View/ColorScheme.h"
 #include "../../View/Helper/SymbolRenderer.h"
-#include <math.h>
 #include "../../View/HoverData.h"
+#include <math.h>
 
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
 static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
@@ -89,7 +90,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	p->set_color(colors->text_soft1);
 	for (int i=0; i<10; i+=2) {
 		float y = mp->clef_pos_to_screen(i);
-		p->draw_line(x0, y, x0 + w, y);
+		p->draw_line(vec2(x0, y), vec2(x0 + w, y));
 	}
 	//p->draw_str(x0, y0, clef.symbol);
 
@@ -122,7 +123,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	p->set_color(colors->text_soft1);
 	for (int i=0; i<t->instrument.string_pitch.num; i++) {
 		float y = mp->string_to_screen(i);
-		p->draw_line(x0, y, x0 + w, y);
+		p->draw_line({x0, y}, {x0 + w, y});
 	}
 
 	// midi
@@ -153,7 +154,7 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 			p->set_color(colors->text_soft3);
 			p->set_line_width(0.5f);
 		}
-		p->draw_line(x, y, x, y + h);
+		p->draw_line({x, y}, {x, y + h});
 	}
 	p->set_line_width(0.5f);
 }
@@ -181,18 +182,18 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 			float dx = 10;
 			if (b == bars[0])
 				dx += 15;
-			p->draw_str(x + dx, y-2.5f, s);
+			p->draw_str({x + dx, y-2.5f}, s);
 		}
 
 		// part?
 		auto *m = get_bar_part(song, b->offset);
 		if (m) {
 			p->set_color(colors->text);
-			p->draw_line(x - 10, y - 32.5f, x - 10, y - 17.5f);
-			p->draw_line(x - 10, y - 32.5f, x + 10, y - 32.5f);
-			p->draw_line(x - 10, y - 17.5f, x + 10, y - 17.5f);
+			p->draw_line({x - 10, y - 32.5f}, {x - 10, y - 17.5f});
+			p->draw_line({x - 10, y - 32.5f}, {x + 10, y - 32.5f});
+			p->draw_line({x - 10, y - 17.5f}, {x + 10, y - 17.5f});
 			p->set_font_size(10);
-			p->draw_str(x - 7.5f, y-30, m->nice_text());
+			p->draw_str({x - 7.5f, y-30}, m->nice_text());
 		}
 	}
 }
@@ -209,7 +210,7 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	if (bars.num > 0) {
 		p->set_color(colors->text_soft1);
 		p->set_font_size(10);
-		p->draw_str(x0 + 2.5f, y0 - 7.5f, i2s(bars[0]->index_text + 1));
+		p->draw_str({x0 + 2.5f, y0 - 7.5f}, i2s(bars[0]->index_text + 1));
 	}
 
 	line_data.clear();
@@ -241,10 +242,10 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	p->set_color(colors->text_soft1);
 	float sy0 = line_data[0].y0;
 	float sy1 = line_data.back().y1;
-	p->draw_line(x0 - 2.5f, sy0, x0 - 2.5f, sy1);
-	p->draw_line(x0, sy0 - 5, x0 - 2.5f, sy0);
-	p->draw_line(x0, sy1 + 5, x0 - 2.5f, sy1);
-	p->draw_line(x0 + w + 2.5f, sy0, x0 + w + 2.5f, sy1);
+	p->draw_line({x0 - 2.5f, sy0}, {x0 - 2.5f, sy1});
+	p->draw_line({x0, sy0 - 5}, {x0 - 2.5f, sy0});
+	p->draw_line({x0, sy1 + 5}, {x0 - 2.5f, sy1});
+	p->draw_line({x0 + w + 2.5f, sy0}, {x0 + w + 2.5f, sy1});
 	p->set_line_width(0.5f);
 
 	return y0;
@@ -320,12 +321,12 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 		p->set_color(colors->text);
 		p->set_font("Times", 26, false, false);
 		//p->set_font("Helvetica", 25, false, false);
-		p->draw_str(100, 25, od->song->get_tag("title"));
+		p->draw_str(vec2(100, 25), od->song->get_tag("title"));
 		if (od->song->get_tag("artist").num > 0) {
 			p->set_font("Courier", 15, false, false);
 			p->set_font_size(15);
 			p->set_color(colors->text_soft2);
-			p->draw_str(p->width - 150, 25, "by " + od->song->get_tag("artist"));
+			p->draw_str(vec2(p->width - 150, 25), "by " + od->song->get_tag("artist"));
 		}
 		first_page = false;
 	}

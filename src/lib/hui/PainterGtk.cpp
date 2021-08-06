@@ -6,7 +6,7 @@
  */
 
 #include "hui.h"
-#include "../math/complex.h"
+#include "../math/vec2.h"
 #include "../math/rect.h"
 #include "Controls/Control.h"
 #include "Controls/ControlDrawingArea.h"
@@ -135,20 +135,20 @@ rect Painter::clip() const {
 	return rect((float)x1, (float)x2, (float)y1, (float)y2);
 }
 
-void Painter::draw_point(float x, float y) {
+void Painter::draw_point(const vec2 &p) {
 	if (!cr)
 		return;
 }
 
-void Painter::draw_line(float x1, float y1, float x2, float y2) {
+void Painter::draw_line(const vec2 &a, const vec2 &b) {
 	if (!cr)
 		return;
-	cairo_move_to(cr, x1 + 0.5f, y1 + 0.5f);
-	cairo_line_to(cr, x2 + 0.5f, y2 + 0.5f);
+	cairo_move_to(cr, a.x + 0.5f, a.y + 0.5f);
+	cairo_line_to(cr, b.x + 0.5f, b.y + 0.5f);
 	cairo_stroke(cr);
 }
 
-void Painter::draw_lines(const Array<complex> &p) {
+void Painter::draw_lines(const Array<vec2> &p) {
 	if (!cr)
 		return;
 	if (p.num == 0)
@@ -161,7 +161,7 @@ void Painter::draw_lines(const Array<complex> &p) {
 	cairo_stroke(cr);
 }
 
-void Painter::draw_polygon(const Array<complex> &p) {
+void Painter::draw_polygon(const Array<vec2> &p) {
 	if (!cr)
 		return;
 	if (p.num == 0)
@@ -178,13 +178,13 @@ void Painter::draw_polygon(const Array<complex> &p) {
 }
 
 // y = (typically) top of text
-void Painter::draw_str(float x, float y, const string &str) {
+void Painter::draw_str(const vec2 &p, const string &str) {
 	if (!cr)
 		return;
 	pango_cairo_update_layout(cr, layout);
 	pango_layout_set_text(layout, (char*)str.data, str.num);
 	float dy = (float)pango_layout_get_baseline(layout) / 1000.0f;
-	cairo_move_to(cr, x, y - dy + font_size);
+	cairo_move_to(cr, p.x, p.y - dy + font_size);
 
 	if (mode_fill) {
 		pango_cairo_show_layout(cr, layout);
@@ -207,19 +207,19 @@ float Painter::get_str_width(const string &str) {
 	return (float)w / 1000.0f;
 }
 
-void Painter::draw_rect(float x, float y, float w, float h) {
+void Painter::draw_rect(const rect &r) {
 	if (!cr)
 		return;
 	if (corner_radius > 0) {
-		float r = corner_radius;
+		float R = corner_radius;
 		cairo_new_sub_path(cr);
-		cairo_arc(cr, x + w - r, y + r, r, -pi/2, 0);
-		cairo_arc(cr, x + w - r, y + h - r, r, 0, pi/2);
-		cairo_arc(cr, x + r, y + h - r, r, pi/2, pi);
-		cairo_arc(cr, x + r, y + r, r, pi, pi*3/2);
+		cairo_arc(cr, r.x2 - R, r.y1 + R, R, -pi/2, 0);
+		cairo_arc(cr, r.x2 - R, r.y2 - R, R, 0, pi/2);
+		cairo_arc(cr, r.x1 + R, r.y2 - R, R, pi/2, pi);
+		cairo_arc(cr, r.x1 + R, r.y1 + R, R, pi, pi*3/2);
 		cairo_close_path(cr);
 	} else {
-		cairo_rectangle(cr, x, y, w, h);
+		cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
 	}
 
 	if (mode_fill)
@@ -228,14 +228,10 @@ void Painter::draw_rect(float x, float y, float w, float h) {
 		cairo_stroke(cr);
 }
 
-void Painter::draw_rect(const rect &r) {
-	draw_rect(r.x1, r.y1, r.width(), r.height());
-}
-
-void Painter::draw_circle(float x, float y, float radius) {
+void Painter::draw_circle(const vec2 &c, float radius) {
 	if (!cr)
 		return;
-	cairo_arc(cr, x, y, radius, 0, 2 * pi);
+	cairo_arc(cr, c.x, c.y, radius, 0, 2 * pi);
 
 	if (mode_fill)
 		cairo_fill(cr);
@@ -243,7 +239,7 @@ void Painter::draw_circle(float x, float y, float radius) {
 		cairo_stroke(cr);
 }
 
-void Painter::draw_image(float x, float y, const Image *image) {
+void Painter::draw_image(const vec2 &d, const Image *image) {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
@@ -256,7 +252,7 @@ void Painter::draw_image(float x, float y, const Image *image) {
                                                          image->height,
 	    image->width * 4);
 
-	cairo_set_source_surface(cr, img, x, y);
+	cairo_set_source_surface(cr, img, d.x, d.y);
 	cairo_paint(cr);
 	cairo_surface_destroy(img);
 	cairo_set_source(cr, p);
@@ -264,7 +260,7 @@ void Painter::draw_image(float x, float y, const Image *image) {
 #endif
 }
 
-void Painter::draw_mask_image(float x, float y, const Image *image) {
+void Painter::draw_mask_image(const vec2 &d, const Image *image) {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
@@ -275,7 +271,7 @@ void Painter::draw_mask_image(float x, float y, const Image *image) {
                                                          image->height,
 	    image->width * 4);
 
-	cairo_mask_surface(cr, img, x, y);
+	cairo_mask_surface(cr, img, d.x, d.y);
 	cairo_surface_destroy(img);
 #endif
 }
@@ -329,7 +325,7 @@ void Painter::set_fill(bool fill) {
 	mode_fill = fill;
 }
 
-void Painter::set_transform(float *rot, const complex &offset) {
+void Painter::set_transform(float *rot, const vec2 &offset) {
 	cairo_matrix_t m;
 
 

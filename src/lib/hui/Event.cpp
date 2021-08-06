@@ -97,17 +97,15 @@ Event *GetEvent() {
 string Event::_text;
 
 Event::Event(const string &_id, const string &_message) {
-	dx = 0;
-	dy = 0;
-	scroll_x = 0;
-	scroll_y = 0;
+	m = {0,0};
+	d = {0,0};
+	scroll = {0,0};
 	pressure = 0;
 	id = _id;
 	message = _message;
 	is_default = true;
 	height = width = 0;
 	key_code = -1;
-	mx = my = 0;
 	win = nullptr;
 	row = row_target = 0;
 	rbut = mbut = lbut = false;

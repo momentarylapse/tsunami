@@ -25,7 +25,7 @@ public:
 	int function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) override;
 	void function_call_post(int push_size, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
 	void add_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
-	void add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) override;
+	void add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret, bool is_static) override;
 
 
 	void add_function_outro(Function *f) override;

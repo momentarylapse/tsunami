@@ -20,6 +20,7 @@
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
 #include "../Painter/BasicGridPainter.h"
+#include "../../lib/math/vector.h"
 
 static const float UPDATE_DT = 2.0f;
 
@@ -165,7 +166,7 @@ void CpuDisplay::draw_graphs(Painter* p) {
 			float y0 = area.y1 + h * (1 - c.stats[j-1].cpu);
 			float y1 = area.y1 + h * (1 - c.stats[j].cpu);
 			if (x1 >= 2)
-				p->draw_line(x0, y0, x1, y1);
+				p->draw_line({x0, y0}, {x1, y1});
 		}
 	}
 }
@@ -179,7 +180,7 @@ bool is_sleeping(PerfChannelInfo &c) {
 
 void draw_str_r(Painter *p, float x, float y, const string &s) {
 	float w = p->get_str_width(s);
-	p->draw_str(x - w, y, s);
+	p->draw_str({x - w, y}, s);
 }
 
 void CpuDisplay::draw_table(Painter* p) {
@@ -193,9 +194,9 @@ void CpuDisplay::draw_table(Painter* p) {
 		draw_str_r(p, xoff[2], 10, "freq");
 
 		p->set_color(theme.text_soft3);
-		p->draw_str(xoff[0], 10, " %");
-		p->draw_str(xoff[1], 10, " ms");
-		p->draw_str(xoff[2], 10, " Hz");
+		p->draw_str({xoff[0], 10}, " %");
+		p->draw_str({xoff[1], 10}, " ms");
+		p->draw_str({xoff[2], 10}, " Hz");
 		
 		int t = 0;
 		Array<int> indent;
@@ -222,7 +223,7 @@ void CpuDisplay::draw_table(Painter* p) {
 				highlight = (c.stats.back().avg > (max_avg / 10)) or (c.stats.back().cpu > (max_cpu / 10));
 				if (!highlight)
 					p->set_color(color::interpolate(col0, theme.background, 0.7f));
-				int dx = 0;
+				float dx = 0;
 				if (c.parent >= 0) {
 					for (int i=0; i<channels.num; i++)
 						if (channels[i].id == c.parent)
@@ -232,8 +233,8 @@ void CpuDisplay::draw_table(Painter* p) {
 				}
 				string name = channel_title(c);
 				p->set_font_size(9);
-				int dy = 12;
-				p->draw_str(20 + dx, y, name);
+				float dy = 12;
+				p->draw_str({20 + dx, y}, name);
 				draw_str_r(p, xoff[0], y, format("%.1f", c.stats.back().cpu * 100));
 				draw_str_r(p, xoff[1], y, format("%.2f", c.stats.back().avg * 1000));
 				draw_str_r(p, xoff[2], y, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
@@ -259,7 +260,7 @@ void CpuDisplay::draw_table(Painter* p) {
 			if (!is_sleeping(c) and (c.parent < 0)) {
 				color col = color::interpolate(type_color(c.name), theme.text, 0.5f);
 				p->set_color(col);
-				p->draw_str(x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12, format("%2.0f%%", c.stats.back().cpu * 100));
+				p->draw_str({x0 + 7 + (t/2) * 30, y0 + h / 2-10 + (t%2)*12}, format("%2.0f%%", c.stats.back().cpu * 100));
 				t ++;
 			}
 		}
@@ -278,7 +279,7 @@ void CpuDisplay::on_draw(Painter* p) {
 	draw_table(p);
 }
 
-bool CpuDisplay::on_left_button_down(float mx, float my) {
+bool CpuDisplay::on_left_button_down(const vec2 &m) {
 	if (large)
 		return true;
 	if (!dlg)
@@ -287,9 +288,9 @@ bool CpuDisplay::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool CpuDisplay::on_mouse_wheel(float dx, float dy) {
+bool CpuDisplay::on_mouse_wheel(const vec2 &d) {
 	if (large) {
-		scroll_offset = min(scroll_offset - dy * 10, 0.0f);
+		scroll_offset = min(scroll_offset - d.y * 10, 0.0f);
 		request_redraw();
 	}
 	return true;

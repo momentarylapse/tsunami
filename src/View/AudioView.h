@@ -151,7 +151,7 @@ public:
 	SongSelection sel;
 	SongSelection sel_temp;
 
-	HoverData hover_time(float mx, float my);
+	HoverData hover_time(const vec2 &m);
 	int get_mouse_pos();
 	int get_mouse_pos_snap();
 
@@ -180,7 +180,7 @@ public:
 	float mouse_wheel_speed;
 	void set_mouse_wheel_speed(float speed);
 
-	int mx, my;
+	vec2 m;
 	bool select_xor = false;
 
 	void select_none();

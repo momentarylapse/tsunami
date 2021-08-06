@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Node.h"
-#include "../../../lib/math/complex.h"
 
 //namespace scenegraph {
 	class ScrollBar;
@@ -40,20 +39,20 @@ public:
 	scenegraph::HBox *hbox;
 	scenegraph::VBox *vbox;
 
-	complex view_pos = complex(0,0);
+	vec2 view_pos = vec2::ZERO;
 	rect content_area = rect::EMPTY;
 	void set_content(const rect &r);
 
 	ScrollPad();
 
-	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_mouse_wheel(const vec2 &d) override;
 	bool on_key(int key) override;
 	void update_geometry_recursive(const rect &target_area) override;
 
-	void move_view(float dx, float dy);
+	void move_view(const vec2 &d);
 
-	complex project(const complex &p);
-	complex unproject(const complex &p);
+	vec2 project(const vec2 &p);
+	vec2 unproject(const vec2 &p);
 
 	void _update_scrolling();
 

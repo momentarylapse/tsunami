@@ -18,7 +18,7 @@ public:
 	SignalEditorTab *tab;
 	SignalEditorBackground(SignalEditorTab *t);
 	void on_draw(Painter *p) override;
-	bool on_left_button_down(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
 };
 

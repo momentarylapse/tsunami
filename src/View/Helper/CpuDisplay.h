@@ -30,8 +30,8 @@ public:
 	CpuDisplay(Session *session, Callback request_redraw);
 	virtual ~CpuDisplay();
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_mouse_wheel(const vec2 &d) override;
 	void on_draw(Painter *p) override;
 
 	void draw_background(Painter *p);

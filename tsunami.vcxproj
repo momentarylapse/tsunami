@@ -373,6 +373,8 @@
     <ClCompile Include="src\lib\math\random.cpp" />
     <ClCompile Include="src\lib\math\ray.cpp" />
     <ClCompile Include="src\lib\math\rect.cpp" />
+    <ClCompile Include="src\lib\math\vec2.cpp" />
+    <ClCompile Include="src\lib\math\vec4.cpp" />
     <ClCompile Include="src\lib\math\vector.cpp" />
     <ClCompile Include="src\lib\net\BinaryBuffer.cpp" />
     <ClCompile Include="src\lib\net\net.cpp" />
@@ -791,6 +793,8 @@
     <ClInclude Include="src\lib\math\random.h" />
     <ClInclude Include="src\lib\math\ray.h" />
     <ClInclude Include="src\lib\math\rect.h" />
+    <ClInclude Include="src\lib\math\vec2.h" />
+    <ClInclude Include="src\lib\math\vec4.h" />
     <ClInclude Include="src\lib\math\vector.h" />
     <ClInclude Include="src\lib\net\BinaryBuffer.h" />
     <ClInclude Include="src\lib\net\net.h" />

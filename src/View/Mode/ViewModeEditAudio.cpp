@@ -50,13 +50,13 @@ public:
 		view = v;
 		p = _p;
 	}
-	void on_start(float mx, float my) override {
+	void on_start(const vec2 &m) override {
 	}
-	void on_update(float mx, float my) override {
-		p->target = view->cam.screen2sample(mx);
+	void on_update(const vec2 &m) override {
+		p->target = view->cam.screen2sample(m.x);
 	}
 	void on_draw_post(Painter *c) override {
-		c->draw_str(100, 100, "MOVING");
+		c->draw_str({100, 100}, "MOVING");
 	}
 	void on_clean_up() override {
 	}
@@ -119,20 +119,16 @@ Range ViewModeEditAudio::range_target() {
 	return RangeTo(view->hover().pos-r, view->hover().pos+r);
 }
 
-void draw_line(Painter *p, const complex &a, const complex &b) {
-	p->draw_line(a.x, a.y, b.x, b.y);
-}
-
-void draw_arrow(Painter *p, const complex &a, const complex &b) {
-	float l = (b-a).abs();
+void draw_arrow(Painter *p, const vec2 &a, const vec2 &b) {
+	float l = (b-a).length();
 	if (l < 0.0001f)
 		return;
-	complex dir = (b-a) / l;
-	complex e = complex(dir.y, -dir.x);
+	vec2 dir = (b-a) / l;
+	vec2 e = vec2(dir.y, -dir.x);
 	float r = min(l, 15.0f);
-	draw_line(p, a, b);
-	draw_line(p, b, b - r * (dir + e));
-	draw_line(p, b, b - r * (dir - e));
+	p->draw_line(a, b);
+	p->draw_line(b, b - r * (dir + e));
+	p->draw_line(b, b - r * (dir - e));
 }
 
 void ViewModeEditAudio::draw_post(Painter *p) {
@@ -159,13 +155,13 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 			p->set_line_width((i == rubber.selected) ? 4 : 2);
 			p->set_color(Red);
 			x1 = view->cam.sample2screen(q.source);
-			p->draw_line(x1, y1, x1, y2);
+			p->draw_line({x1, y1}, {x1, y2});
 			p->set_color(Green);
 			x2 = view->cam.sample2screen(q.target);
-			p->draw_line(x2, y1, x2, y2);
+			p->draw_line({x2, y1}, {x2, y2});
 			p->set_color(White);
-			draw_arrow(p, complex(x1, y1 + (y2-y1)*0.25f), complex(x2, y1 + (y2-y1)*0.25f));
-			draw_arrow(p, complex(x1, y1 + (y2-y1)*0.75f), complex(x2, y1 + (y2-y1)*0.75f));
+			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.25f), vec2(x2, y1 + (y2-y1)*0.25f));
+			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.75f), vec2(x2, y1 + (y2-y1)*0.75f));
 			p->set_line_width(1);
 		}
 	}
@@ -223,7 +219,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 			}
 		vlayer->layer->edit_buffers_finish(a);
 	} else if (edit_mode == EditMode::RUBBER) {
-		float mx = view->mx;
+		float mx = view->m.x;
 
 		rubber.hover = -1;
 		foreachi(auto &q, rubber.points, i) {

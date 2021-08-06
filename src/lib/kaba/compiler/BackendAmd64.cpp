@@ -220,9 +220,9 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 	function_call_post(push_size, params, ret);
 }
 
-void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret, bool is_static) {
 	serializer->call_used = true;
-	int push_size = function_call_pre(params, ret, true);
+	int push_size = function_call_pre(params, ret, is_static);
 
 	insert_cmd(Asm::InstID::MOV, p_rax, fp);
 	insert_cmd(Asm::InstID::CALL, p_rax);

@@ -13,7 +13,7 @@
 class Image;
 class color;
 class rect;
-class complex;
+class vec2;
 
 class Painter : public VirtualBase {
 public:
@@ -29,18 +29,17 @@ public:
 	virtual void _cdecl set_line_dash(const Array<float> &dash, float offset) = 0;
 	virtual void _cdecl set_fill(bool fill) = 0;
 	virtual void _cdecl set_clip(const rect &r) = 0;
-	virtual void _cdecl draw_point(float x, float y) = 0;
-	virtual void _cdecl draw_line(float x1, float y1, float x2, float y2) = 0;
-	virtual void _cdecl draw_lines(const Array<complex> &p) = 0;
-	virtual void _cdecl draw_polygon(const Array<complex> &p) = 0;
-	virtual void _cdecl draw_rect(float x1, float y1, float w, float h) = 0;
+	virtual void _cdecl draw_point(const vec2 &p) = 0;
+	virtual void _cdecl draw_line(const vec2 &a, const vec2 &b) = 0;
+	virtual void _cdecl draw_lines(const Array<vec2> &p) = 0;
+	virtual void _cdecl draw_polygon(const Array<vec2> &p) = 0;
 	virtual void _cdecl draw_rect(const rect &r) = 0;
-	virtual void _cdecl draw_circle(float x, float y, float radius) = 0;
-	virtual void _cdecl draw_str(float x, float y, const string &str) = 0;
+	virtual void _cdecl draw_circle(const vec2 &p, float radius) = 0;
+	virtual void _cdecl draw_str(const vec2 &p, const string &str) = 0;
 	virtual float _cdecl get_str_width(const string &str) = 0;
-	virtual void _cdecl draw_image(float x, float y, const Image *image) = 0;
-	virtual void _cdecl draw_mask_image(float x, float y, const Image *image) = 0;
-	virtual void _cdecl set_transform(float rot[], const complex &offset) {}
+	virtual void _cdecl draw_image(const vec2 &p, const Image *image) = 0;
+	virtual void _cdecl draw_mask_image(const vec2 &p, const Image *image) = 0;
+	virtual void _cdecl set_transform(float rot[], const vec2 &offset) {}
 	virtual void _cdecl set_option(const string &key, const string &value) {}
 	int width = 0;
 	int height = 0;

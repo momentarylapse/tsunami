@@ -1,5 +1,6 @@
 #include "../../file/file.h"
 #include "../../math/math.h"
+#include "../../math/vec2.h"
 #include "../../math/vector.h"
 #include "../../math/complex.h"
 #include "../../math/quaternion.h"
@@ -50,6 +51,8 @@ extern const Class *TypeStringList;
 extern const Class *TypeComplexList;
 extern const Class *TypeFloatList;
 extern const Class *TypeVectorList;
+extern const Class *TypeVec2;
+extern const Class *TypeVec2List;
 extern const Class *TypeMatrix;
 extern const Class *TypePlane;
 extern const Class *TypePlaneList;
@@ -65,41 +68,42 @@ extern const Class *TypeAnyDict;
 
 float _cdecl f_sqr(float f){	return f*f;	}
 
-class ComplexList : public Array<complex> {
+template<class T>
+class VectorList : public Array<T> {
 public:
-	complex _cdecl sum() {
-		complex r = complex(0, 0);
-		for (int i=0;i<num;i++)
+	T _cdecl sum() {
+		T r = T::ZERO;
+		for (int i=0;i<this->num;i++)
 			r += (*this)[i];
 		return r;
 	}
 	float _cdecl sum2() {
 		float r = 0;
-		for (int i=0;i<num;i++)
+		for (int i=0;i<this->num;i++)
 			r += (*this)[i].abs_sqr();
 		return r;
 	}
 	
 	// a += b
-	void _cdecl iadd(ComplexList &b)	IMPLEMENT_IOP(+=, complex)
-	void _cdecl isub(ComplexList &b)	IMPLEMENT_IOP(-=, complex)
-	void _cdecl imul(ComplexList &b)	IMPLEMENT_IOP(*=, complex)
-	void _cdecl idiv(ComplexList &b)	IMPLEMENT_IOP(/=, complex)
+	void _cdecl iadd(VectorList<T> &b)	IMPLEMENT_IOP(+=, T)
+	void _cdecl isub(VectorList<T> &b)	IMPLEMENT_IOP(-=, T)
+	void _cdecl imul(VectorList<T> &b)	IMPLEMENT_IOP(*=, T)
+	void _cdecl idiv(VectorList<T> &b)	IMPLEMENT_IOP(/=, T)
 
 	// a = b + c
-	Array<complex> _cdecl add(ComplexList &b)	IMPLEMENT_OP(+, complex, complex)
-	Array<complex> _cdecl sub(ComplexList &b)	IMPLEMENT_OP(-, complex, complex)
-	Array<complex> _cdecl mul(ComplexList &b)	IMPLEMENT_OP(*, complex, complex)
-	Array<complex> _cdecl div(ComplexList &b)	IMPLEMENT_OP(/, complex, complex)
+	Array<T> _cdecl add(VectorList<T> &b)	IMPLEMENT_OP(+, T, T)
+	Array<T> _cdecl sub(VectorList<T> &b)	IMPLEMENT_OP(-, T, T)
+	Array<T> _cdecl mul(VectorList<T> &b)	IMPLEMENT_OP(*, T, T)
+	Array<T> _cdecl div(VectorList<T> &b)	IMPLEMENT_OP(/, T, T)
 
 	// a += x
-	void _cdecl iadd_scalar(complex x)	IMPLEMENT_IOP2(+=, complex)
-	void _cdecl isub_scalar(complex x)	IMPLEMENT_IOP2(-=, complex)
-	void _cdecl imul_scalar(complex x)	IMPLEMENT_IOP2(*=, complex)
-	void _cdecl idiv_scalar(complex x)	IMPLEMENT_IOP2(/=, complex)
-	void _cdecl imul_scalar_f(float x)	IMPLEMENT_IOP2(*=, complex)
-	void _cdecl idiv_scalar_f(float x)	IMPLEMENT_IOP2(/=, complex)
-	void _cdecl assign_scalar(complex x)	IMPLEMENT_IOP2(=, complex)
+	void _cdecl iadd_scalar(T x)	IMPLEMENT_IOP2(+=, T)
+	void _cdecl isub_scalar(T x)	IMPLEMENT_IOP2(-=, T)
+	void _cdecl imul_scalar(T x)	IMPLEMENT_IOP2(*=, T)
+	void _cdecl idiv_scalar(T x)	IMPLEMENT_IOP2(/=, T)
+	void _cdecl imul_scalar_f(float x)	IMPLEMENT_IOP2(*=, T)
+	void _cdecl idiv_scalar_f(float x)	IMPLEMENT_IOP2(/=, T)
+	void _cdecl assign_scalar(T x)	IMPLEMENT_IOP2(=, T)
 };
 
 class AnyList : public Array<Any> {
@@ -151,47 +155,38 @@ public:
 
 
 
-class KabaComplex : public complex {
+template<class T>
+class KabaVector : public T {
 public:
-	void assign(const complex &o) {
-		*(complex*)this = o;
+	void assign(const T &o) {
+		*(T*)this = o;
 	}
-	complex negate() const {
-		return -(*(complex*)this);
+	T negate() const {
+		return -(*(T*)this);
 	}
-	void init(float x, float y) {
-		*(complex*)this = complex(x, y);
+	float mul_vv(const T &v) const {
+		return T::dot(*(T*)this, v);
 	}
-	static complex set(float x, float y) {
-		return complex(x, y);
+	T mul_vf(float f) const {
+		return *(T*)this * f;
 	}
-};
-
-class KabaVector : public vector {
-public:
-	void assign(const vector &o) {
-		*(vector*)this = o;
-	}
-	vector negate() const {
-		return -(*(vector*)this);
-	}
-	float mul_vv(const vector &v) const {
-		return vector::dot(*(vector*)this, v);
-	}
-	vector mul_vf(float f) const {
-		return *(vector*)this * f;
-	}
-	static vector mul_fv(float f, const vector &v) {
+	static T mul_fv(float f, const T &v) {
 		return f * v;
 	}
-	vector div_f(float f) const {
-		return *(vector*)this / f;
+	T div_f(float f) const {
+		return *(T*)this / f;
 	}
-	void init(float x, float y, float z) {
-		*(vector*)this = vector(x,y,z);
+	void init3(float x, float y, float z) {
+		*(T*)this = T(x,y,z);
 	}
-	static vector set(float x, float y, float z) {
-		return vector(x, y, z);
+	void init2(float x, float y) {
+		*(T*)this = T(x,y);
+	}
+	static T set3(float x, float y, float z) {
+		return T(x, y, z);
+	}
+	static T set2(float x, float y) {
+		return T(x, y);
 	}
 };
 
@@ -341,6 +336,8 @@ void SIAddPackageMath() {
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));
 	TypeComplexList = add_type_l(TypeComplex);
+	TypeVec2 = add_type("vec2", sizeof(vec2));
+	TypeVec2List = add_type_l(TypeVec2);
 	TypeVector = add_type("vector", sizeof(vector));
 	TypeVectorList = add_type_l(TypeVector);
 	TypeRect = add_type("rect", sizeof(rect));
@@ -371,6 +368,7 @@ void SIAddPackageMath() {
 		if (config.abi == Abi::AMD64_GNU) {
 			// not on windows!
 			flags_set(((Class*)TypeComplex)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+			flags_set(((Class*)TypeVec2)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 			flags_set(((Class*)TypeQuaternion)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 			flags_set(((Class*)TypeVector)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 			flags_set(((Class*)TypeColor)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
@@ -396,14 +394,14 @@ void SIAddPackageMath() {
 		class_add_func("bar", TypeComplex, &complex::bar, Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &complex::str, Flags::PURE);
 		class_add_const("I", TypeComplex, &complex::I);
-		class_add_func("_create", TypeComplex, &KabaComplex::set, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeComplex, &KabaVector<complex>::set2, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::COMPLEX_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaComplex::init);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaVector<complex>::init2);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);	
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplex, TypeComplex, InlineID::CHUNK_ASSIGN, &KabaComplex::assign);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplex, TypeComplex, InlineID::CHUNK_ASSIGN, &KabaVector<complex>::assign);
 		add_operator(OperatorID::ADD, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_ADD, &complex::operator+);
 		add_operator(OperatorID::SUBTRACT, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_SUBTRACT, (decltype(&complex::operator+)) &complex::operator-);
 		add_operator(OperatorID::MULTIPLY, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY, (decltype(&complex::operator+)) &complex::operator*);
@@ -415,27 +413,71 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY_ASSIGN, (decltype(&complex::operator+=)) &complex::operator*=);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_DIVIDE_ASSIGN, (decltype(&complex::operator+=)) &complex::operator/=);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeComplex, TypeComplex, InlineID::CHUNK_EQUAL, &complex::operator==);
-		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::COMPLEX_NEGATE, &KabaComplex::negate);
+		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::COMPLEX_NEGATE, &KabaVector<complex>::negate);
 
 	add_class(TypeComplexList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &ComplexList::__init__);
-		class_add_func("sum", TypeComplex, &ComplexList::sum, Flags::PURE);
-		class_add_func("sum2", TypeFloat32, &ComplexList::sum2, Flags::PURE);
-		add_operator(OperatorID::ADD, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::add);
-		add_operator(OperatorID::SUBTRACT, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::sub);
-		add_operator(OperatorID::MULTIPLY, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::mul);
-		add_operator(OperatorID::DIVIDE, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::div);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::iadd);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::isub);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::imul);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &ComplexList::idiv);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &ComplexList::iadd_scalar);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &ComplexList::isub_scalar);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &ComplexList::imul_scalar);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &ComplexList::idiv_scalar);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &ComplexList::imul_scalar_f);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &ComplexList::idiv_scalar_f);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &ComplexList::assign_scalar);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &VectorList<complex>::__init__);
+		class_add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::PURE);
+		class_add_func("sum2", TypeFloat32, &VectorList<complex>::sum2, Flags::PURE);
+		add_operator(OperatorID::ADD, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::add);
+		add_operator(OperatorID::SUBTRACT, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::sub);
+		add_operator(OperatorID::MULTIPLY, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::mul);
+		add_operator(OperatorID::DIVIDE, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::div);
+		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::iadd);
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::isub);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::imul);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::idiv);
+		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::iadd_scalar);
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::isub_scalar);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::imul_scalar);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::idiv_scalar);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &VectorList<complex>::imul_scalar_f);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &VectorList<complex>::idiv_scalar_f);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::assign_scalar);
+
+
+	add_class(TypeVec2);
+		class_add_element("x", TypeFloat32, &vec2::x);
+		class_add_element("y", TypeFloat32, &vec2::y);
+		//class_add_element("_e", TypeFloatArray2, 0);
+		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeFloat32, type_p(&vec2::length), Flags::PURE);
+		class_add_func("length", TypeFloat32, type_p(&vec2::length), Flags::PURE);
+		//class_add_func("length_sqr", TypeFloat32, type_p(&vec2::length_sqr), Flags::PURE);
+		//class_add_func("length_fuzzy", TypeFloat32, type_p(&vec2::length_fuzzy), Flags::PURE);
+		class_add_func("normalized", TypeVector, &vec2::normalized, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &vec2::str, Flags::PURE);
+		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::_STATIC__PURE);
+			func_add_param("v1", TypeVector);
+			func_add_param("v2", TypeVector);
+		class_add_func("_create", TypeVector, &KabaVector<vec2>::set2, Flags::_STATIC__PURE);
+			func_set_inline(InlineID::VECTOR_SET);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
+			func_add_param("z", TypeFloat32);
+		// ignored, but useful for docu
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaVector<vec2>::init2);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
+		class_add_const("0", TypeVector, &vec2::ZERO);
+		class_add_const("O", TypeVector, &vec2::ZERO);
+		class_add_const("EX", TypeVector, &vec2::EX);
+		class_add_const("EY", TypeVector, &vec2::EY);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVec2, TypeVec2, InlineID::CHUNK_ASSIGN, &KabaVector<vec2>::assign);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeVec2, TypeVec2, InlineID::CHUNK_EQUAL, &vec2::operator==);
+		add_operator(OperatorID::ADD, TypeVec2, TypeVec2, TypeVec2, InlineID::VECTOR_ADD, &vec2::operator+);
+		add_operator(OperatorID::SUBTRACT, TypeVec2, TypeVec2, TypeVec2, InlineID::VECTOR_SUBTRACT, (decltype(&vec2::operator+)) &vec2::operator-);
+		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVec2, TypeVec2, InlineID::VECTOR_MULTIPLY_VV, &KabaVector<vec2>::mul_vv);
+		add_operator(OperatorID::MULTIPLY, TypeVec2, TypeVec2, TypeFloat32, InlineID::VECTOR_MULTIPLY_VF, &KabaVector<vec2>::mul_vf);
+		add_operator(OperatorID::MULTIPLY, TypeVec2, TypeFloat32, TypeVec2, InlineID::VECTOR_MULTIPLY_FV, &KabaVector<vec2>::mul_fv);
+		add_operator(OperatorID::DIVIDE, TypeVec2, TypeVec2, TypeFloat32, InlineID::VECTOR_DIVIDE_VF, &KabaVector<vec2>::div_f);
+		add_operator(OperatorID::ADDS, TypeVoid, TypeVec2, TypeVec2, InlineID::VECTOR_ADD_ASSIGN, &vec2::operator+=);
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec2, TypeVec2, InlineID::VECTOR_SUBTARCT_ASSIGN, &vec2::operator-=);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec2, TypeFloat32, InlineID::VECTOR_MULTIPLY_ASSIGN, &vec2::operator*=);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec2, TypeFloat32, InlineID::VECTOR_DIVIDE_ASSIGN, &vec2::operator/=);
+		add_operator(OperatorID::NEGATIVE, TypeVec2, nullptr, TypeVec2, InlineID::VECTOR_NEGATE, &KabaVector<vec2>::negate);
+
+	add_class(TypeVec2List);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<vec2>::__init__);
 
 	
 	add_class(TypeVector);
@@ -443,6 +485,7 @@ void SIAddPackageMath() {
 		class_add_element("y", TypeFloat32, &vector::y);
 		class_add_element("z", TypeFloat32, &vector::z);
 		class_add_element("_e", TypeFloatArray3, 0);
+		class_add_element("_xy", TypeVec2, &vector::x);
 		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeFloat32, type_p(&vector::length), Flags::PURE);
 		class_add_func("length", TypeFloat32, type_p(&vector::length), Flags::PURE);
 		class_add_func("length_sqr", TypeFloat32, type_p(&vector::length_sqr), Flags::PURE);
@@ -464,13 +507,13 @@ void SIAddPackageMath() {
 		class_add_func("cross", TypeVector, &vector::cross, Flags::_STATIC__PURE);
 			func_add_param("v1", TypeVector);
 			func_add_param("v2", TypeVector);
-		class_add_func("_create", TypeVector, &KabaVector::set, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeVector, &KabaVector<vector>::set3, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::VECTOR_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
 		// ignored, but useful for docu
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaVector::init);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaVector<vector>::init3);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
@@ -486,19 +529,19 @@ void SIAddPackageMath() {
 		class_add_const("EX", TypeVector, &vector::EX);
 		class_add_const("EY", TypeVector, &vector::EY);
 		class_add_const("EZ", TypeVector, &vector::EZ);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVector, TypeVector, InlineID::CHUNK_ASSIGN, &KabaVector::assign);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVector, TypeVector, InlineID::CHUNK_ASSIGN, &KabaVector<vector>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeVector, TypeVector, InlineID::CHUNK_EQUAL, &vector::operator==);
 		add_operator(OperatorID::ADD, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_ADD, &vector::operator+);
 		add_operator(OperatorID::SUBTRACT, TypeVector, TypeVector, TypeVector, InlineID::VECTOR_SUBTRACT, (decltype(&vector::operator+)) &vector::operator-);
-		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVector, TypeVector, InlineID::VECTOR_MULTIPLY_VV, &KabaVector::mul_vv);
-		add_operator(OperatorID::MULTIPLY, TypeVector, TypeVector, TypeFloat32, InlineID::VECTOR_MULTIPLY_VF, &KabaVector::mul_vf);
-		add_operator(OperatorID::MULTIPLY, TypeVector, TypeFloat32, TypeVector, InlineID::VECTOR_MULTIPLY_FV, &KabaVector::mul_fv);
-		add_operator(OperatorID::DIVIDE, TypeVector, TypeVector, TypeFloat32, InlineID::VECTOR_DIVIDE_VF, &KabaVector::div_f);
+		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVector, TypeVector, InlineID::VECTOR_MULTIPLY_VV, &KabaVector<vector>::mul_vv);
+		add_operator(OperatorID::MULTIPLY, TypeVector, TypeVector, TypeFloat32, InlineID::VECTOR_MULTIPLY_VF, &KabaVector<vector>::mul_vf);
+		add_operator(OperatorID::MULTIPLY, TypeVector, TypeFloat32, TypeVector, InlineID::VECTOR_MULTIPLY_FV, &KabaVector<vector>::mul_fv);
+		add_operator(OperatorID::DIVIDE, TypeVector, TypeVector, TypeFloat32, InlineID::VECTOR_DIVIDE_VF, &KabaVector<vector>::div_f);
 		add_operator(OperatorID::ADDS, TypeVoid, TypeVector, TypeVector, InlineID::VECTOR_ADD_ASSIGN, &vector::operator+=);
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVector, TypeVector, InlineID::VECTOR_SUBTARCT_ASSIGN, &vector::operator-=);
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVector, TypeFloat32, InlineID::VECTOR_MULTIPLY_ASSIGN, &vector::operator*=);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVector, TypeFloat32, InlineID::VECTOR_DIVIDE_ASSIGN, &vector::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVector, nullptr, TypeVector, InlineID::VECTOR_NEGATE, &KabaVector::negate);
+		add_operator(OperatorID::NEGATIVE, TypeVector, nullptr, TypeVector, InlineID::VECTOR_NEGATE, &KabaVector<vector>::negate);
 	
 	add_class(TypeVectorList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<vector>::__init__);
@@ -543,17 +586,17 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::NONE, &quaternion::imul);
 	
 	add_class(TypeRect);
-		class_add_element("x1", TypeFloat32, 0);
-		class_add_element("x2", TypeFloat32, 4);
-		class_add_element("y1", TypeFloat32, 8);
-		class_add_element("y2", TypeFloat32, 12);
+		class_add_element("x1", TypeFloat32, &rect::x1);
+		class_add_element("x2", TypeFloat32, &rect::x2);
+		class_add_element("y1", TypeFloat32, &rect::y1);
+		class_add_element("y2", TypeFloat32, &rect::y2);
 		class_add_const("ID", TypeRect, &rect::ID);
 		class_add_func("width", TypeFloat32, &rect::width, Flags::PURE);
 		class_add_func("height", TypeFloat32, &rect::height, Flags::PURE);
 		class_add_func("area", TypeFloat32, &rect::area, Flags::PURE);
+		class_add_func("m", TypeVec2, &rect::m, Flags::PURE);
 		class_add_func("inside", TypeBool, &rect::inside, Flags::PURE);
-			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);
+			func_add_param("p", TypeVec2);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &rect::str, Flags::PURE);
 		class_add_func("_create", TypeRect, &KabaRect::set, Flags::_STATIC__PURE);
 			func_set_inline(InlineID::RECT_SET);
@@ -570,10 +613,10 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::EQUAL, TypeBool, TypeRect, TypeRect, InlineID::CHUNK_EQUAL);
 	
 	add_class(TypeColor);
-		class_add_element("r", TypeFloat32, 0);
-		class_add_element("g", TypeFloat32, 4);
-		class_add_element("b", TypeFloat32, 8);
-		class_add_element("a", TypeFloat32, 12);
+		class_add_element("r", TypeFloat32, &color::r);
+		class_add_element("g", TypeFloat32, &color::g);
+		class_add_element("b", TypeFloat32, &color::b);
+		class_add_element("a", TypeFloat32, &color::a);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &color::str, Flags::PURE);
 		class_add_func("hsb", TypeColor, &color::hsb, Flags::_STATIC__PURE);
 			func_add_param("h", TypeFloat32);
@@ -618,11 +661,11 @@ void SIAddPackageMath() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<color>::__init__);
 
 	add_class(TypePlane);
-		class_add_element("a", TypeFloat32, 0);
-		class_add_element("b", TypeFloat32, 4);
-		class_add_element("c", TypeFloat32, 8);
-		class_add_element("d", TypeFloat32, 12);
-		class_add_element("n", TypeVector, 0);
+		class_add_element("_a", TypeFloat32, 0);
+		class_add_element("_b", TypeFloat32, 4);
+		class_add_element("_c", TypeFloat32, 8);
+		class_add_element("d", TypeFloat32, &plane::d);
+		class_add_element("n", TypeVector, &plane::n);
 		class_add_func("intersect_line", TypeBool, &plane::intersect_line, Flags::PURE);
 			func_add_param("l1", TypeVector);
 			func_add_param("l2", TypeVector);
@@ -719,6 +762,7 @@ void SIAddPackageMath() {
 		class_add_element("e", TypeFloatArray3x3, 0);
 		class_add_element("_e", TypeFloatArray9, 0);
 		class_add_const("ID", TypeMatrix3, &matrix3::ID);
+		class_add_const("0", TypeMatrix3, &matrix3::ZERO);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &matrix3::str, Flags::PURE);
 		class_add_func("inverse", TypeMatrix3, &matrix3::inverse, Flags::PURE);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix3, TypeMatrix3, InlineID::CHUNK_ASSIGN);

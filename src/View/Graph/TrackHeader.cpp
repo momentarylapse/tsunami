@@ -19,6 +19,7 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../Graph/AudioViewTrack.h"
+#include "../../lib/math/vector.h"
 
 
 
@@ -27,13 +28,13 @@ public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader *header;
-	TrackHeaderButton(TrackHeader *th, float dx, float dy) : scenegraph::NodeRel(dx, dy, 16, 16) {
+	TrackHeaderButton(TrackHeader *th, float dx, float dy) : scenegraph::NodeRel({dx, dy}, 16, 16) {
 		vtrack = th->vtrack;
 		header = th;
 		view = th->view;
 	}
-	HoverData get_hover_data(float mx, float my) override {
-		auto h = header->get_hover_data(mx, my);
+	HoverData get_hover_data(const vec2 &m) override {
+		auto h = header->get_hover_data(m);
 		h.node = this;
 		return h;
 	}
@@ -52,13 +53,13 @@ public:
 
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1-2, "\U0001f50a");
-		c->draw_mask_image(area.x1, area.y1, view->images.speaker.get());
+		c->draw_mask_image({area.x1, area.y1}, view->images.speaker.get());
 		if (track->muted) {
 			c->set_color(color(1, 0.7f, 0, 0));
-			c->draw_mask_image(area.x1, area.y1, view->images.x.get());
+			c->draw_mask_image({area.x1, area.y1}, view->images.x.get());
 		}
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		vtrack->set_muted(!vtrack->track->muted);
 		return true;
 	}
@@ -73,9 +74,9 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->draw_mask_image(area.x1, area.y1, view->images.solo.get());
+		c->draw_mask_image({area.x1, area.y1}, view->images.solo.get());
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		vtrack->set_solo(!vtrack->solo);
 		return true;
 	}
@@ -90,9 +91,9 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
-		c->draw_mask_image(area.x1, area.y1, view->images.config.get());
+		c->draw_mask_image({area.x1, area.y1}, view->images.config.get());
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		view->session->set_mode(EditMode::DefaultTrack);
 		return true;
 	}
@@ -101,7 +102,7 @@ public:
 	}
 };
 
-TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel(0, 0, theme.TRACK_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
+TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel({0, 0}, theme.TRACK_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	align.dz = 70;
 	set_perf_name("header");
 	vtrack = t;
@@ -213,11 +214,11 @@ void TrackHeader::on_draw(Painter *c) {
 	c->set_font("", theme.FONT_SIZE, playable(), false);
 	c->set_color(color_text());
 	string title = nice_title();
-	draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
+	draw_str_constrained(c, {area.x1 + 23, area.y1 + 5}, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);
 		c->set_line_width(1.7f);
-		c->draw_line(area.x1 + 23, area.y1+5+5, area.x1+23+ww, area.y1+5+5);
+		c->draw_line({area.x1 + 23, area.y1+5+5}, {area.x1+23+ww, area.y1+5+5});
 		c->set_line_width(1);
 	}
 	c->set_font("", -1, false, false);
@@ -230,7 +231,7 @@ void TrackHeader::on_draw(Painter *c) {
 		icon = view->images.track_midi.get();
 	else if (track->type == SignalType::GROUP)
 		icon = view->images.track_group.get();
-	c->draw_mask_image(area.x1 + 5, area.y1 + 5, icon);
+	c->draw_mask_image({area.x1 + 5, area.y1 + 5}, icon);
 }
 
 bool track_is_in_group(Track *t, Track *g);
@@ -247,13 +248,13 @@ public:
 		scene_graph->update_hover();
 		//int orig = get_track_index(moving_track);
 		int t = get_track_move_target(true);
-		int y = view->vtracks.back()->area.y2;
+		float y = view->vtracks.back()->area.y2;
 		if (t < view->vtracks.num)
 			y = view->vtracks[t]->area.y1;
 
 		c->set_color(theme.selection_boundary);
 		c->set_line_width(2.0f);
-		c->draw_line(view->area.x1, y, view->area.x2, y);
+		c->draw_line({view->area.x1, y}, {view->area.x2, y});
 		c->set_line_width(1.0f);
 
 		/*c->setColor(colors.selection_internal);
@@ -273,7 +274,7 @@ public:
 
 		view->draw_cursor_hover(c, vtrack->track->nice_name());
 	}
-	void on_finish(float mx, float my) override {
+	void on_finish(const vec2 &m) override {
 		int target = get_track_move_target(false);
 		auto g = get_target_group();
 		vtrack->track->song->begin_action_group();
@@ -286,7 +287,7 @@ public:
 		int orig = get_track_index(vtrack->track);
 		foreachi(auto vt, view->vtracks, i) {
 			int y = (vt->area.y1 + vt->area.y2) / 2;
-			if (y > view->my) {
+			if (y > view->m.y) {
 				if (visual or (i <= orig))
 					return i;
 				else
@@ -311,7 +312,7 @@ public:
 	}
 };
 
-bool TrackHeader::on_left_button_down(float mx, float my) {
+bool TrackHeader::on_left_button_down(const vec2 &m) {
 	if (view->select_xor) {
 		view->toggle_select_track_with_content_in_cursor(vtrack);
 	} else {
@@ -325,12 +326,12 @@ bool TrackHeader::on_left_button_down(float mx, float my) {
 	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
 	return true;
 }
-bool TrackHeader::on_left_double_click(float mx, float my) {
+bool TrackHeader::on_left_double_click(const vec2 &m) {
 	view->session->set_mode(EditMode::DefaultTrack);
 	return true;
 }
 
-bool TrackHeader::on_right_button_down(float mx, float my) {
+bool TrackHeader::on_right_button_down(const vec2 &m) {
 	if (!view->sel.has(vtrack->track)) {
 		view->exclusively_select_layer(vtrack->first_layer());
 		view->select_under_cursor();
@@ -339,8 +340,8 @@ bool TrackHeader::on_right_button_down(float mx, float my) {
 	return true;
 }
 
-HoverData TrackHeader::get_hover_data(float mx, float my) {
-	auto h = Node::get_hover_data(mx, my);
+HoverData TrackHeader::get_hover_data(const vec2 &m) {
+	auto h = Node::get_hover_data(m);
 	h.vtrack = vtrack;
 	h.vlayer = vtrack->first_layer();
 	return h;

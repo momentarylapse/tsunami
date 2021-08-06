@@ -24,9 +24,9 @@ public:
 	int index;
 	SignalEditorModulePort(SignalEditorTab *t, Module *m, int _index, SignalType _type, float dx, float dy, bool out);
 	void on_draw(Painter *p) override;
-	bool on_left_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
 	string get_tip() const override;
-	HoverData get_hover_data(float mx, float my) override;
+	HoverData get_hover_data(const vec2 &m) override;
 };
 
 

@@ -7,7 +7,7 @@
 
 #include "BufferPainter.h"
 #include "../AudioView.h"
-#include "../../lib/math/complex.h"
+#include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
 #include "../../Data/Range.h"
 #include "../../Data/Audio/AudioBuffer.h"
@@ -20,7 +20,7 @@ BufferPainter::BufferPainter(AudioView *_view) {
 
 
 
-static Array<complex> tt;
+static Array<vec2> tt;
 
 inline void draw_line_buffer(Painter *c, double view_pos, double zoom, float hf, float x0, float x1, float y0, const Array<float> &buf, int offset) {
 	int nl = 0;
@@ -37,7 +37,7 @@ inline void draw_line_buffer(Painter *c, double view_pos, double zoom, float hf,
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 - buf[i] * hf;
 		if (zoom > 5)
-			c->draw_circle(p, tt[nl].y, 2);
+			c->draw_circle({(float)p, tt[nl].y}, 2);
 		nl ++;
 	}
 	c->draw_lines(tt);
@@ -59,7 +59,7 @@ inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 - buf[i] * hf;
 		if (zoom > 5)
-			c->draw_circle(p, tt[nl].y, 4);
+			c->draw_circle({(float)p, tt[nl].y}, 4);
 		nl ++;
 	}
 	tt.resize(nl);
@@ -136,7 +136,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 	if (b.has_compressed()) {
 		c->set_color(Red);
 		c->set_font_size(8);
-		c->draw_str((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, "compressed:" + b.compressed->codec);
+		c->draw_str(vec2((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1), "compressed:" + b.compressed->codec);
 	}
 
 	//float w = area.width();
@@ -161,7 +161,8 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l) {
 			c->set_color(color::interpolate(col1, Red, 0.3f));
-			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
+			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
+			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
 			c->set_antialiasing(false);
 			return;
 		}
@@ -190,7 +191,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 					c->set_color(color::interpolate(col1, Red, 0.3f));
 					float xx0 = max((float)view->cam.sample2screen(offset + i*b.PEAK_CHUNK_SIZE), x0);
 					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
-					c->draw_rect(xx0, area.y1, xx1 - xx0, h);
+					c->draw_rect(rect(xx0, xx1, area.y1, area.y1 + h));
 				}
 			}
 		}
@@ -235,7 +236,8 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l) {
 			c->set_color(color::interpolate(col1, Red, 0.3f));
-			c->draw_rect((offset - view_pos_rel) * view->cam.pixels_per_sample, area.y1, b.length * view->cam.pixels_per_sample, h);
+			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
+			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
 			c->set_antialiasing(false);
 			return;
 		}

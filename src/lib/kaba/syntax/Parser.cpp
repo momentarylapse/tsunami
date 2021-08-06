@@ -209,83 +209,30 @@ void Parser::do_error(const string &str, int override_exp_no, int override_line)
 	throw Exception(str, expr, physical_line, pos, tree->script);
 }
 
-shared_array<Node> Parser::parse_operand_extension_element(shared<Node> operand) {
-	Exp.next();
-	operand = force_concrete_type(operand);
+const Class *get_user_friendly_type(shared<Node> operand) {
 	const Class *type = operand->type;
 	bool deref = false;
 	bool only_static = false;
 
 	if (operand->kind == NodeKind::CLASS) {
 		// referencing class functions
-		type = operand->as_class();
-		only_static = true;
+		return operand->as_class();
 	} else if (type->is_some_pointer()) {
-		// pointer -> dereference
-		type = type->param[0];
-		deref = true;
+		return type->param[0];
 	}
+	return type;
+}
 
-	// super
-	if ((type->parent) and (Exp.cur == IDENTIFIER_SUPER)) {
-		Exp.next();
-		if (deref) {
-			operand->type = type->parent->get_pointer();
-			return {operand};
-		}
-		return {operand->ref(type->parent->get_pointer())};
-	}
-
-
-	// find element
-	if (!only_static) {
-		for (auto &e: type->elements)
-			if (Exp.cur == e.name) {
-				Exp.next();
-				if (deref)
-					return {operand->deref_shift(e.offset, e.type)};
-				else
-					return {operand->shift(e.offset, e.type)};
-			}
-	}
-	for (auto *c: weak(type->constants))
-		if (Exp.cur == c->name) {
-			Exp.next();
-			return {tree->add_node_const(c)};
-		}
-	for (auto *v: weak(type->static_variables))
-		if (Exp.cur == v->name) {
-			Exp.next();
-			return {tree->add_node_global(v)};
-		}
-		
-	// sub-class
-	for (auto *c: weak(type->classes))
-		if (Exp.cur == c->name) {
-			Exp.next();
-			return {tree->add_node_class(c)};
-		}
-
-
-	if (deref and !only_static)
-		operand = operand->deref();
-
-	string f_name = Exp.cur;
-
-	// class function?
-	shared_array<Node> links;
-	for (auto *cf: weak(type->functions))
-		if (f_name == cf->name) {
-			links.add(tree->add_node_func_name(cf));
-			if (!cf->is_static() and !only_static)
-				links.back()->params.add(tree->cp_node(operand));
-		}
+shared_array<Node> Parser::parse_operand_extension_element(shared<Node> operand) {
+	Exp.next();
+	operand = force_concrete_type(operand);
+	auto links = tree->get_element_of(operand, Exp.cur);
 	if (links.num > 0) {
 		Exp.next();
 		return links;
 	}
 
-	do_error(format("unknown element of '%s'", type->long_name()));
+	do_error(format("unknown element of '%s'", get_user_friendly_type(operand)->long_name()));
 	return {};
 }
 
@@ -2291,16 +2238,21 @@ shared<Node> Parser::parse_statement_len(Block *block) {
 	if (sub->type->is_array())
 		return tree->add_node_const(tree->add_constant_int(sub->type->array_length));
 
+	// __length__() function?
+	auto *f = sub->type->get_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {});
+	if (f)
+		return tree->add_node_member_call(f, sub);
+
 	// element "int num/length"?
 	for (auto &e: sub->type->elements)
 		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
 			return sub->shift(e.offset, e.type);
 		}
 		
-	// __length__() function?
-	auto *f = sub->type->get_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {});
-	if (f)
-		return tree->add_node_member_call(f, sub);
+	// length() function?
+	for (auto f: sub->type->functions)
+		if ((f->name == "length") and (f->num_params == 0))
+			return tree->add_node_member_call(f.get(), sub);
 
 
 	do_error(format("don't know how to get the length of an object of class '%s'", sub->type->long_name()));
@@ -3261,7 +3213,6 @@ bool Parser::parse_class(Class *_namespace) {
 
 		if (Exp.cur == IDENTIFIER_ENUM) {
 			parse_enum(_class);
-			continue;
 		} else if ((Exp.cur == IDENTIFIER_CLASS) or (Exp.cur == IDENTIFIER_INTERFACE)) {
 			//msg_write("sub....");
 			int cur_line = Exp.get_line_no();
@@ -3270,73 +3221,20 @@ bool Parser::parse_class(Class *_namespace) {
 				skip_parse_class();
 			}
 			//msg_write(">>");
-			continue;
 		} else if (Exp.cur == IDENTIFIER_FUNC) {
 			auto f = parse_function_header_new(_class, _class->is_interface() ? Flags::VIRTUAL : Flags::NONE);
 			skip_parsing_function_body(f);
-			continue;
 		} else if (Exp.cur == IDENTIFIER_CONST) {
 			parse_named_const(_class, tree->root_of_all_evil->block.get());
-			continue;
 		} else if (Exp.cur == IDENTIFIER_VAR) {
 			if (_class->is_interface())
 				do_error("interfaces can not have data elements");
 			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
-			continue;
+		} else if (Exp.cur == IDENTIFIER_USE) {
+			parse_class_use_statement(_class);
 		} else {
 			do_error("unknown definition inside a class");
 		}
-
-		// DEPRECATED
-#if 0
-		Flags flags = parse_flags();
-
-		auto type = parse_type(_class); // force
-		while (!Exp.end_of_line()) {
-			//int indent = Exp.cur_line->indent;
-			
-			string name = Exp.cur;
-			Exp.next();
-
-			// is a function?
-			bool is_function = false;
-			if (Exp.cur == "(")
-			    is_function = true;
-			if (is_function) {
-				Exp.set(ie);
-				if (_class->is_interface())
-					flags_set(flags, Flags::VIRTUAL);
-				auto f = parse_function_header_old(_class, flags);
-				skip_parsing_function_body(f);
-				break;
-			}
-
-			if (flags_has(flags, Flags::CONST)) {
-				parse_named_const_old(name, type, _class, tree->root_of_all_evil->block.get());
-				break;
-			}
-
-			if (_class->is_interface())
-				do_error("interfaces can not have data elements");
-			do_error("deprecated class element declaration");
-
-			parser_class_add_element(this, _class, name, type, flags, _offset);
-
-			if (Exp.cur == "=") {
-				Exp.next();
-				auto cv = parse_and_eval_const(tree->root_of_all_evil->block.get(), type);
-				Constant *c_value = cv->as_const();
-				ClassInitializers init = {_class->elements.num - 1, c_value};
-				_class->initializers.add(init);
-			}
-
-			if ((Exp.cur != ",") and !Exp.end_of_line())
-				do_error("',' or newline expected after class element");
-			if (Exp.end_of_line())
-				break;
-			Exp.next();
-		}
-#endif
 	}
 
 	post_process_newly_parsed_class(_class, _offset);
@@ -3535,6 +3433,22 @@ void Parser::parse_class_variable_declaration(const Class *ns, Block *block, int
 			cc->initializers.add(init);
 		}
 	}
+}
+
+void Parser::parse_class_use_statement(const Class *c) {
+	Exp.next(); // "use"
+	string name = Exp.cur;
+	bool found = false;
+	for (auto &e: c->elements)
+		if (e.name == name) {
+			e.allow_indirect_use = true;
+			found = true;
+		}
+	if (!found)
+		do_error(format("use: class '%s' does not have an element '%s'", c->name, name));
+
+	Exp.next();
+	expect_new_line();
 }
 
 bool peek_commands_super(ExpressionBuffer &Exp) {

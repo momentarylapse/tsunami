@@ -397,6 +397,7 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 	{InstID::MODULO, "modulo"},
 	{InstID::LABEL, "-label-"},
 	{InstID::ASM, "-asm-"},
+	{InstID::CALL_MEMBER, "call-member"},
 
 	{InstID::INVALID,			"???"}
 };

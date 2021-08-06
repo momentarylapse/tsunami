@@ -33,7 +33,7 @@ class SignalEditorPlayButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel(32, -32, 20, 20) {
+	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({32, -32}, 20, 20) {
 		align.dz = 30;
 		align.vertical = AlignData::Mode::BOTTOM;
 		set_perf_name("button");
@@ -49,9 +49,9 @@ public:
 		}
 		p->set_color(col);
 		p->set_font_size(18);
-		p->draw_str(area.x1, area.y1, u8"\u25B6");
+		p->draw_str({area.x1, area.y1}, u8"\u25B6");
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		chain->start();
 		return true;
 	}
@@ -64,7 +64,7 @@ class SignalEditorStopButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorStopButton(SignalEditorTab *t) : scenegraph::NodeRel(72, -32, 20, 20) {
+	SignalEditorStopButton(SignalEditorTab *t) : scenegraph::NodeRel({72, -32}, 20, 20) {
 		align.dz = 30;
 		align.vertical = AlignData::Mode::BOTTOM;
 		set_perf_name("button");
@@ -80,9 +80,9 @@ public:
 		}
 		p->set_color(col);
 		p->set_font_size(18);
-		p->draw_str(area.x1, area.y1, u8"\u23F9");
+		p->draw_str({area.x1, area.y1}, u8"\u23F9");
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		chain->stop();
 		return true;
 	}
@@ -116,15 +116,14 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 		}*/
 
 
-		float mx = hui::GetEvent()->mx;
-		float my = hui::GetEvent()->my;
+		auto m = hui::GetEvent()->m;
 
 		string tip;
 		if (graph->hover.node)
 			tip = graph->hover.node->get_tip();
 		if (tip.num > 0) {
 			p->set_font_size(theme.FONT_SIZE);
-			draw_cursor_hover(p, tip, mx, my, graph->area);
+			draw_cursor_hover(p, tip, m, graph->area);
 		}
 	});
 	background = new SignalEditorBackground(this);
@@ -189,10 +188,10 @@ color SignalEditorTab::signal_color(SignalType type, bool hover) {
 	return c;
 }
 
-void SignalEditorTab::draw_arrow(Painter *p, const complex &m, const complex &_d, float length) {
-	complex d = _d / _d.abs();
-	complex e = d * complex::I;
-	Array<complex> pp;
+void SignalEditorTab::draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length) {
+	vec2 d = _d / _d.length();
+	vec2 e = vec2(d.y,-d.x);
+	Array<vec2> pp;
 	pp.add(m + d * length);
 	pp.add(m - d * length + e * length / 2);
 	pp.add(m - d * length * 0.8f);
@@ -213,8 +212,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 	}*/
 
 
-	float mx = hui::GetEvent()->mx;
-	float my = hui::GetEvent()->my;
+	auto m = hui::GetEvent()->m;
 
 
 	string tip;
@@ -222,7 +220,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 		tip = graph->hover.node->get_tip();
 	if (tip.num > 0) {
 		p->set_font_size(theme.FONT_SIZE);
-		draw_cursor_hover(p, tip, mx, my, graph->area);
+		draw_cursor_hover(p, tip, m, graph->area);
 	}
 }
 
@@ -298,13 +296,13 @@ void SignalEditorTab::on_add(ModuleCategory type) {
 		string name = session->plugin_manager->choose_module(win, session, type);
 		if (name.num > 0) {
 			auto *m = chain->add(type, name);
-			m->module_x = graph->mx;
-			m->module_y = graph->my;
+			m->module_x = graph->m.x;
+			m->module_y = graph->m.y;
 		}
 	} else {
 		auto *m = chain->add(type);
-		m->module_x = graph->mx;
-		m->module_y = graph->my;
+		m->module_x = graph->m.x;
+		m->module_y = graph->m.y;
 	}
 	update_module_positions();
 }

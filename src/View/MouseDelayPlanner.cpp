@@ -20,21 +20,21 @@ void MouseDelayPlanner::prepare(MouseDelayAction *a) {
 	if (action)
 		cancel();
 	dist = 0;
-	x0 = scene_graph->mx;
-	y0 = scene_graph->my;
+	x0 = scene_graph->m.x;
+	y0 = scene_graph->m.y;
 	action = a;
 	action->scene_graph = scene_graph;
 }
 
-bool MouseDelayPlanner::update(float mx, float my) {
+bool MouseDelayPlanner::update(const vec2 &m) {
 	if (acting()) {
-		action->on_update(mx, my);
+		action->on_update(m);
 		//view->force_redraw();
 	} else if (has_focus()) {
 		auto e = hui::GetEvent();
-		dist += fabs(e->dx) + fabs(e->dy);
+		dist += fabs(e->d.x) + fabs(e->d.y);
 		if (dist > min_move_to_start)
-			start_acting(mx, my);
+			start_acting(m);
 	}
 	return has_focus();
 }
@@ -43,18 +43,18 @@ bool MouseDelayPlanner::acting() {
 	return _started_acting;
 }
 
-void MouseDelayPlanner::start_acting(float mx, float my) {
+void MouseDelayPlanner::start_acting(const vec2 &m) {
 	_started_acting = true;
-	action->on_start(mx, my);
+	action->on_start(m);
 }
 
 bool MouseDelayPlanner::has_focus() {
 	return dist >= 0;
 }
 
-void MouseDelayPlanner::finish(float mx, float my) {
+void MouseDelayPlanner::finish(const vec2 &m) {
 	if (acting()) {
-		action->on_finish(mx, my);
+		action->on_finish(m);
 		action->on_clean_up();
 		action = nullptr;
 		_started_acting = false;

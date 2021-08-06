@@ -43,11 +43,11 @@ public:
 	void set_content(float start, float end);
 	void set_content(const Range &r);
 
-	void drag_update(float mx, float my);
+	void drag_update(const vec2 &m);
 
 	void on_draw(Painter *c) override;
 
-	bool on_left_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
 
 	void update_geometry(const rect &target_area) override;
 

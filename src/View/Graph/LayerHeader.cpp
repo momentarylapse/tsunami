@@ -16,6 +16,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
+#include "../../lib/math/vector.h"
 
 
 
@@ -24,12 +25,12 @@ class LayerHeaderButton : public scenegraph::NodeRel {
 public:
 	AudioViewLayer *vlayer;
 	LayerHeader *header;
-	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : scenegraph::NodeRel(dx, dy, 16, 16) {
+	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : scenegraph::NodeRel({dx, dy}, 16, 16) {
 		vlayer = lh->vlayer;
 		header = lh;
 	}
-	HoverData get_hover_data(float mx, float my) override {
-		auto h = header->get_hover_data(mx, my);
+	HoverData get_hover_data(const vec2 &m) override {
+		auto h = header->get_hover_data(m);
 		h.node = this;
 		return h;
 	}
@@ -45,9 +46,9 @@ public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
-		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.speaker.get());
+		c->draw_mask_image({area.x1, area.y1}, vlayer->view->images.speaker.get());
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		vlayer->layer->set_muted(!vlayer->layer->muted);
 		return true;
 	}
@@ -62,9 +63,9 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1, "S");
-		c->draw_mask_image(area.x1, area.y1, vlayer->view->images.solo.get());
+		c->draw_mask_image({area.x1, area.y1}, vlayer->view->images.solo.get());
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		vlayer->set_solo(!vlayer->solo);
 		return true;
 	}
@@ -81,11 +82,11 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		if (vlayer->represents_imploded)
-			c->draw_str(area.x1, area.y1, u8"\u2b73");
+			c->draw_str({area.x1, area.y1}, u8"\u2b73");
 		else
-			c->draw_str(area.x1, area.y1, u8"\u2b71");
+			c->draw_str({area.x1, area.y1}, u8"\u2b71");
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		if (vlayer->represents_imploded)
 			vlayer->view->explode_track(vlayer->layer->track);
 		else
@@ -97,7 +98,7 @@ public:
 	}
 };
 
-LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel(0, 0, theme.LAYER_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
+LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel({0, 0}, theme.LAYER_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	z = 70;
 	align.horizontal = AlignData::Mode::RIGHT;
 	set_perf_name("header");
@@ -188,24 +189,24 @@ void LayerHeader::on_draw(Painter *c) {
 	c->set_color(color_text());
 	
 	if (vlayer->represents_imploded) {
-		draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "explode");
+		draw_str_constrained(c, {area.x1 + 5, area.y1 + 5}, area.width() - 10, "explode");
 		if (_hover)
-			c->draw_str(area.x1 + 25, area.y1 + 25,  u8"\u2b73   \u2b73   \u2b73");
+			c->draw_str({area.x1 + 25, area.y1 + 25},  u8"\u2b73   \u2b73   \u2b73");
 	} else {
 
 		// track title
 		string title = "v" + i2s(layer->version_number() + 1);
 		if (vlayer->solo)
 			title = u8"\u00bb " + title + u8" \u00ab";
-		float ww = draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);
+		float ww = draw_str_constrained(c, {area.x1 + 5, area.y1 + 5}, area.width() - 10, title);
 		if (!playable())
-			c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);
+			c->draw_line({area.x1 + 5, area.y1+5+5}, {area.x1+5+ww, area.y1+5+5});
 	}
 
 	c->set_font("", -1, false, false);
 }
 
-bool LayerHeader::on_left_button_down(float mx, float my) {
+bool LayerHeader::on_left_button_down(const vec2 &m) {
 	if (vlayer->represents_imploded) {
 		vlayer->view->explode_track(vlayer->layer->track);
 		return true;
@@ -223,7 +224,7 @@ bool LayerHeader::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool LayerHeader::on_right_button_down(float mx, float my) {
+bool LayerHeader::on_right_button_down(const vec2 &m) {
 	auto *view = vlayer->view;
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);
@@ -232,9 +233,9 @@ bool LayerHeader::on_right_button_down(float mx, float my) {
 	view->open_popup(view->menu_layer.get());
 	return true;
 }
-HoverData LayerHeader::get_hover_data(float mx, float my) {
+HoverData LayerHeader::get_hover_data(const vec2 &m) {
 	auto *view = vlayer->view;
-	auto h = Node::get_hover_data(mx, my);
+	auto h = Node::get_hover_data(m);
 	h.vtrack = view->get_track(vlayer->layer->track);
 	h.vlayer = vlayer;
 	return h;

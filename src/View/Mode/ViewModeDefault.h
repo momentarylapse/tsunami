@@ -30,7 +30,7 @@ public:
 	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;
 	SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1) override;
 
-	HoverData get_hover_data(AudioViewLayer *vlayer, float mx, float my) override;
+	HoverData get_hover_data(AudioViewLayer *vlayer, const vec2 &m) override;
 
 
 	void left_click_handle(AudioViewLayer *vlayer) override;

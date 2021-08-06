@@ -46,7 +46,7 @@ void GridPainter::draw_empty_background(Painter *c) {
 		float x1, x2;
 		cam->range2screen_clip(sel->range(), area, x1, x2);
 		c->set_color(colors.bg_sel);
-		c->draw_rect(x1, area.y1, x2-x1, area.height());
+		c->draw_rect(rect(x1, x2, area.y1, area.y2));
 
 	} else {
 		c->set_color(colors.bg);
@@ -82,8 +82,8 @@ void GridPainter::draw_time(Painter *c) {
 			c->set_color(((n % 10) == 0) ? c2s : c1s);
 		else
 			c->set_color(((n % 10) == 0) ? c2 : c1);
-		int xx = cam->sample2screen(sample);
-		c->draw_line(xx, area.y1, xx, area.y2);
+		float xx = cam->sample2screen(sample);
+		c->draw_line({xx, area.y1}, {xx, area.y2});
 	}
 }
 
@@ -110,10 +110,10 @@ void GridPainter::draw_time_numbers(Painter *c) {
 	for (int n=nx0; n<nx1; n++) {
 		if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25) {
 			if (n % 5 == 0)
-				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1 + 4, song->get_time_str_fuzzy((double)n * dl, dt * 5));
+				c->draw_str(vec2(cam->sample2screen(n * dl) + 2, area.y1 + 4), song->get_time_str_fuzzy((double)n * dl, dt * 5));
 		} else {
 			if ((n % 10) == 0)
-				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1 + 4, song->get_time_str_fuzzy((double)n * dl, dt * 10));
+				c->draw_str(vec2(cam->sample2screen(n * dl) + 2, area.y1 + 4), song->get_time_str_fuzzy((double)n * dl, dt * 10));
 		}
 	}
 }
@@ -129,7 +129,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 	for (Bar *b: bars) {
 		if (b->is_pause())
 			continue;
-		int xx = cam->sample2screen(b->range().offset);
+		float xx = cam->sample2screen(b->range().offset);
 
 		float dx_bar = cam->dsample2screen(b->range().length);
 		float dx_beat = dx_bar / b->beats.num;
@@ -146,7 +146,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 				c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
 			else
 				c->set_color(col_inter(colors.bg, colors.fg, f1));
-			c->draw_line(xx, area.y1, xx, area.y2);
+			c->draw_line({xx, area.y1}, {xx, area.y2});
 		}
 
 		if (f2 >= 0.1f) {
@@ -159,12 +159,12 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 			for (Beat &bb: beats) {
 				if (bb.level == 0)
 					continue;
-				int x = cam->sample2screen(bb.range.offset);
+				float x = cam->sample2screen(bb.range.offset);
 				if (bb.level > 1)
 					c->set_color(sel->range().is_inside(bb.range.offset) ? c2s : c2);
 				else
 					c->set_color(sel->range().is_inside(bb.range.offset) ? c1s : c1);
-				c->draw_line(x, area.y1, x, area.y2);
+				c->draw_line({x, area.y1}, {x, area.y2});
 			}
 		}
 	}
@@ -200,7 +200,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			label = i2s(b->index_text + 1);
 
 		if (halo_col.a > 0) {
-			draw_boxed_str(c, xx + 4, area.y1+5, label, local_theme.text, halo_col);
+			draw_boxed_str(c, {xx + 4, area.y1+5}, label, local_theme.text, halo_col);
 		} else {
 			float f1 = min(1.0f, dx_bar / 60.0f);
 			if ((b->index_text % 5) == 0)
@@ -209,7 +209,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 				f1 *= 5;
 			if (f1 > 0.9f){
 				c->set_color(local_theme.text_soft1);
-				c->draw_str(xx + 4, area.y1+5, label);
+				c->draw_str({xx + 4, area.y1+5}, label);
 			}
 		}
 
@@ -232,11 +232,11 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			c->set_color(local_theme.text_soft1);
 			float xxx = max(xx + 4, 20.0f);
 			if (xxx > change_block_until) {
-				c->draw_str(xxx, area.y2 - 15, s);
+				c->draw_str({xxx, area.y2 - 15}, s);
 				change_block_until = xxx + c->get_str_width(s);
 				block_reported = false;
 			} else if (!block_reported) {
-				c->draw_str(change_block_until, area.y2 - 15, "...!");
+				c->draw_str({change_block_until, area.y2 - 15}, "...!");
 				change_block_until += c->get_str_width("...!");
 				block_reported = true;
 				

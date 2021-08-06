@@ -147,12 +147,9 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 
 	CurWindow = win;
 	e->win = win;
-	e->mx = win->input.x;
-	e->my = win->input.y;
-	e->dx = win->input.dx;
-	e->dy = win->input.dy;
-	e->scroll_x = win->input.scroll_x;
-	e->scroll_y = win->input.scroll_y;
+	e->m = {win->input.x, win->input.y};
+	e->d = {win->input.dx, win->input.dy};
+	e->scroll = {win->input.scroll_x, win->input.scroll_y};
 	e->pressure = win->input.pressure;
 	e->lbut = win->input.lb;
 	e->mbut = win->input.mb;

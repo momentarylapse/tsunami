@@ -41,10 +41,12 @@ bytes::bytes() {
 
 bytes::bytes(const char *str) {
 	init(sizeof(unsigned char));
-	int l = strlen(str);
-	resize(l);
-	if (l > 0)
-		memcpy(data, str, l);
+	if (str) {
+		int l = strlen(str);
+		resize(l);
+		if (l > 0)
+			memcpy(data, str, l);
+	}
 }
 
 bytes::bytes(const void *str, int l) {

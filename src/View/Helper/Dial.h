@@ -22,18 +22,18 @@ public:
 	string unit;
 
 	float value_to_rel(float v) const;
-	complex rel_to_pos(float rel, float R);
+	vec2 rel_to_pos(float rel, float R);
 
 	float get_value() const;
 	void set_value(float v);
 
-	void drag_update(float mx, float my);
+	void drag_update(const vec2 &m);
 
 	void on_draw(Painter *p) override;
 	void draw_arc(Painter *p, float v0, float v1, float R);
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_mouse_wheel(float dx, float dy) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_mouse_wheel(const vec2 &d) override;
 
 	string get_tip() const override;
 

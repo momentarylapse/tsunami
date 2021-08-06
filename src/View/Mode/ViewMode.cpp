@@ -26,7 +26,7 @@ HoverData &ViewMode::hover() {
 	return view->cam;
 }*/
 
-HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
+HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	return HoverData();
 }
 

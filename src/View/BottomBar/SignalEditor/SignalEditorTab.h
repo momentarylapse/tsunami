@@ -50,7 +50,7 @@ public:
 
 	color signal_color_base(SignalType type);
 	color signal_color(SignalType type, bool hover);
-	void draw_arrow(Painter *p, const complex &m, const complex &_d, float length);
+	void draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length);
 
 	void on_draw(Painter* p);
 	void on_chain_update();

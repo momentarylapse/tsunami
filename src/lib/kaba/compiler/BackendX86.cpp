@@ -442,14 +442,14 @@ void BackendX86::correct_implement_commands() {
 			func_params.add(c.p[0]);
 			cmd.remove_cmd(i);
 			i --;
-		} else if (c.inst == Asm::InstID::CALL) {
+		} else if ((c.inst == Asm::InstID::CALL) or (c.inst == Asm::InstID::CALL_MEMBER)) {
 
 			if (c.p[1].type == TypeFunctionCodeP) {
 				//do_error("indirect call...");
 				auto fp = c.p[1];
 				auto ret = c.p[0];
 				cmd.remove_cmd(i);
-				add_pointer_call(fp, func_params, ret);
+				add_pointer_call(fp, func_params, ret, (c.inst == Asm::InstID::CALL));
 			} else if (is_typed_function_pointer(c.p[1].type)) {
 				do_error("BACKEND: POINTER CALL");
 			} else {
@@ -514,9 +514,9 @@ void BackendX86::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 	function_call_post(push_size, params, ret);
 }
 
-void BackendX86::add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
+void BackendX86::add_pointer_call(const SerialNodeParam &fp, const Array<SerialNodeParam> &params, const SerialNodeParam &ret, bool is_static) {
 	serializer->call_used = true;
-	int push_size = function_call_pre(params, ret, true);
+	int push_size = function_call_pre(params, ret, is_static);
 
 	insert_cmd(Asm::InstID::MOV, p_eax, fp);
 	insert_cmd(Asm::InstID::CALL, p_eax);

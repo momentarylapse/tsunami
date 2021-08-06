@@ -356,6 +356,8 @@ sources = [
 	'src/lib/math/random.cpp',
 	'src/lib/math/ray.cpp',
 	'src/lib/math/rect.cpp',
+	'src/lib/math/vec2.cpp',
+	'src/lib/math/vec4.cpp',
 	'src/lib/math/vector.cpp',
 	'src/lib/net/BinaryBuffer.cpp',
 	'src/lib/net/net.cpp',

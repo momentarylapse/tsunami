@@ -28,8 +28,8 @@ void ViewModeScaleBars::draw_post(Painter *c) {
 	cam->range2screen_clip(view->sel.range(), view->area, x1, x2);
 
 	c->set_color(color(0.1f, 1, 1, 1));
-	c->draw_rect(x1, view->area.y1, 30, view->area.height());
-	c->draw_rect(x2 - 30, view->area.y1, 30, view->area.height());
+	c->draw_rect(rect(x1, x1 + 30, view->area.y1, view->area.y2));
+	c->draw_rect(rect(x2 - 30, x2, view->area.y1, view->area.y2));
 }
 
 string ViewModeScaleBars::get_tip() {

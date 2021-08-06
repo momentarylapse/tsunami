@@ -10,6 +10,7 @@
 #define SRC_LIB_HUI_EVENT_
 
 #include "../base/base.h"
+#include "../math/vec2.h"
 #include "Callback.h"
 
 namespace hui {
@@ -26,9 +27,8 @@ class Event {
 	Window *win;
 	string message, id;
 	bool is_default;
-	float mx, my;
-	float dx, dy;
-	float scroll_x, scroll_y;
+	vec2 m, d;
+	vec2 scroll;
 	float pressure;
 	int key_code;
 	int width, height;

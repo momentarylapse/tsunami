@@ -10,6 +10,7 @@
 #include "../AudioView.h"
 #include "../Painter/GridPainter.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
@@ -21,7 +22,7 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 class PlaybackRange : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackRange(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 0, 0) {
+	PlaybackRange(TimeScale *time_scale) : scenegraph::NodeRel({0, 0}, 0, 0) {
 		view = time_scale->view;
 		align.horizontal = AlignData::Mode::FILL;
 	}
@@ -37,25 +38,25 @@ public:
 		p->set_color(theme.blob_bg_selected);
 		if (view->is_playback_active())
 			p->set_color(theme.preview_marker);
-		p->draw_rect(area.x1, area.y1, area.width(), 5);
+		p->draw_rect(rect(area.x1, area.x2, area.y1, area.y1 + 5));
 	}
 	string get_tip() const override {
 		return _("playback range");
 	}
-	bool on_left_button_down(float mx, float my) override {
-		return parent->on_left_button_down(mx, my);
+	bool on_left_button_down(const vec2 &m) override {
+		return parent->on_left_button_down(m);
 	}
-	bool on_right_button_down(float mx, float my) override {
+	bool on_right_button_down(const vec2 &m) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
-	bool on_left_double_click(float mx, float my) override {
+	bool on_left_double_click(const vec2 &m) override {
 		view->sel = SongSelection::from_range(view->song, view->playback_wish_range).filter(view->sel.layers());
 		view->update_selection();
 		return true;
 	}
-	HoverData get_hover_data(float mx, float my)  override {
-		auto h = view->hover_time(mx, my);
+	HoverData get_hover_data(const vec2 &m)  override {
+		auto h = view->hover_time(m);
 		h.node = this;
 		return h;
 	}
@@ -64,7 +65,7 @@ public:
 class PlaybackLockSymbol : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackLockSymbol(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 20, 20) {
+	PlaybackLockSymbol(TimeScale *time_scale) : scenegraph::NodeRel({0, 0}, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_geometry(const rect &target_area) override {
@@ -76,16 +77,16 @@ public:
 		p->set_color(theme.text);
 		if (this->is_cur_hover())
 			p->set_color(theme.hoverify(theme.text));
-		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\U0001f512");
+		p->draw_str({area.x1 + 8, area.y1 + 3}, u8"\U0001f512");
 	}
 	string get_tip() const override {
 		return _("locked");
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		view->set_playback_range_locked(false);
 		return true;
 	}
-	bool on_right_button_down(float mx, float my) override {
+	bool on_right_button_down(const vec2 &m) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
@@ -94,7 +95,7 @@ public:
 class PlaybackLoopSymbol : public scenegraph::NodeRel {
 public:
 	AudioView *view;
-	PlaybackLoopSymbol(TimeScale *time_scale) : scenegraph::NodeRel(0, 0, 20, 20) {
+	PlaybackLoopSymbol(TimeScale *time_scale) : scenegraph::NodeRel({0, 0}, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_geometry(const rect &target_area) override {
@@ -108,16 +109,16 @@ public:
 		p->set_color(theme.text);
 		if (this->is_cur_hover())
 			p->set_color(theme.hoverify(theme.text));
-		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\u21bb");
+		p->draw_str({area.x1 + 8, area.y1 + 3}, u8"\u21bb");
 	}
 	string get_tip() const override {
 		return _("looping");
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		view->set_playback_loop(false);
 		return true;
 	}
-	bool on_right_button_down(float mx, float my) override {
+	bool on_right_button_down(const vec2 &m) override {
 		view->open_popup(view->menu_playback_range.get());
 		return true;
 	}
@@ -126,7 +127,7 @@ public:
 
 
 
-TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel(0, 0, 100, theme.TIME_SCALE_HEIGHT) {
+TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel({0, 0}, 100, theme.TIME_SCALE_HEIGHT) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.dz = 120;
 	view = _view;
@@ -151,7 +152,7 @@ void TimeScale::on_draw(Painter* c) {
 	gp->draw_time_numbers(c);
 }
 
-bool TimeScale::on_left_button_down(float mx, float my) {
+bool TimeScale::on_left_button_down(const vec2 &m) {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
@@ -163,13 +164,13 @@ bool TimeScale::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool TimeScale::on_right_button_down(float mx, float my) {
+bool TimeScale::on_right_button_down(const vec2 &m) {
 	view->open_popup(view->menu_song.get());
 	return true;
 }
 
-HoverData TimeScale::get_hover_data(float mx, float my) {
-	auto h = view->hover_time(mx, my);
+HoverData TimeScale::get_hover_data(const vec2 &m) {
+	auto h = view->hover_time(m);
 	h.node = this;
 	return h;
 }

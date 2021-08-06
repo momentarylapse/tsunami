@@ -44,6 +44,7 @@ public:
 
 
 	static const matrix3 ID;
+	static const matrix3 ZERO;
 	
 	
 	matrix3 _cdecl inverse() const;

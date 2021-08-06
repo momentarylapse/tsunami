@@ -195,7 +195,7 @@ SyntaxTree::SyntaxTree(Script *_script) {
 	base_class = new Class("-base-", 0, this);
 	_base_class = base_class;
 	imported_symbols = new Class("-imported-", 0, this);
-	root_of_all_evil = new Function("-root-", TypeVoid, base_class);
+	root_of_all_evil = new Function("-root-", TypeVoid, base_class, Flags::STATIC);
 
 
 	flag_string_const_as_cstring = false;
@@ -395,6 +395,14 @@ shared<Node> SyntaxTree::exlink_add_element(Function *f, ClassElement &e) {
 	return self->shift(e.offset, e.type);
 }
 
+shared<Node> SyntaxTree::exlink_add_element_indirect(Function *f, ClassElement &e, ClassElement &e2) {
+	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
+	if (e.type->is_some_pointer())
+		return self->shift(e.offset, e.type)->deref_shift(e2.offset, e2.type);
+	else
+		return self->shift(e.offset + e2.offset, e2.type);
+}
+
 // functions of our "self" class
 shared<Node> SyntaxTree::exlink_add_class_func(Function *f, Function *cf) {
 	auto link = add_node_func_name(cf);
@@ -445,6 +453,114 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 	return {};
 }
 
+// indirect ("use")
+shared_array<Node> get_existence_element_indirect(SyntaxTree *tree, const string &name, Function *f, const Class *c, ClassElement &e) {
+	auto et = e.type;
+	if (et->is_some_pointer())
+		et = et->param[0];
+	for (auto &ee: et->elements)
+		if (ee.name == name)
+			return {tree->exlink_add_element_indirect(f, e, ee)};
+
+	// functions... TODO
+	/*shared_array<Node> op;
+	for (auto *cf: weak(f->name_space->functions))
+		if (cf->name == name)
+			op.add(exlink_add_class_func(f, cf));*/
+	return {};
+}
+
+shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name) {
+	//operand = force_concrete_type(operand);
+	const Class *type = operand->type;
+	bool deref = false;
+	bool only_static = false;
+
+	if (operand->kind == NodeKind::CLASS) {
+		// referencing class functions
+		type = operand->as_class();
+		only_static = true;
+	} else if (type->is_some_pointer()) {
+		// pointer -> dereference
+		type = type->param[0];
+		deref = true;
+	}
+
+	// super
+	if (type->parent and (name == IDENTIFIER_SUPER)) {
+		if (deref) {
+			operand->type = type->parent->get_pointer();
+			return {operand};
+		}
+		return {operand->ref(type->parent->get_pointer())};
+	}
+
+
+	// find element
+	if (!only_static) {
+		for (auto &e: type->elements)
+			if (name == e.name) {
+				// direct
+				if (deref)
+					return {operand->deref_shift(e.offset, e.type)};
+				else
+					return {operand->shift(e.offset, e.type)};
+			} else if (e.allow_indirect_use) {
+
+				auto v = deref ? operand->deref_shift(e.offset, e.type) : operand->shift(e.offset, e.type);
+				auto links = get_element_of(v, name);
+				if (links.num > 0)
+					return links;
+
+				// indirect ("use")
+				/*auto et = e.type;
+				if (e.type->is_some_pointer())
+					et = e.type->param[0];
+				for (auto &ee: et->elements)
+					if (name == ee.name) {
+						shared<Node> parent;
+						if (deref)
+							parent = operand->deref_shift(e.offset, e.type);
+						else
+							parent = operand->shift(e.offset, e.type);
+						if (e.type->is_some_pointer())
+							return {parent->deref_shift(ee.offset, ee.type)};
+						else
+							return {parent->shift(ee.offset, ee.type)};
+
+					}*/
+			}
+	}
+	for (auto *c: weak(type->constants))
+		if (name == c->name) {
+			return {add_node_const(c)};
+		}
+	for (auto *v: weak(type->static_variables))
+		if (name == v->name) {
+			return {add_node_global(v)};
+		}
+
+	// sub-class
+	for (auto *c: weak(type->classes))
+		if (name == c->name) {
+			return {add_node_class(c)};
+		}
+
+
+	if (deref and !only_static)
+		operand = operand->deref();
+
+	// class function?
+	shared_array<Node> links;
+	for (auto *cf: weak(type->functions))
+		if (name == cf->name) {
+			links.add(add_node_func_name(cf));
+			if (!cf->is_static() and !only_static)
+				links.back()->params.add(cp_node(operand));
+		}
+	return links;
+}
+
 shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *block) {
 	Function *f = block->function;
 
@@ -452,20 +568,15 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	auto *v = block->get_var(name);
 	if (v)
 		return {add_node_local(v)};
+
+	// self.x?
 	if (!f->is_static()) {
-		if ((name == IDENTIFIER_SUPER) and (f->name_space->parent))
-			return {add_node_local(f->__get_var(IDENTIFIER_SELF), f->name_space->parent)};
-		// class elements (within a class function)
-		for (auto &e: f->name_space->elements)
-			if (e.name == name)
-				return {exlink_add_element(f, e)};
-		shared_array<Node> op;
-		for (auto *cf: weak(f->name_space->functions))
-			if (cf->name == name)
-				op.add(exlink_add_class_func(f, cf));
-		if (op.num > 0)
-			return op;
+		auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
+		auto links = get_element_of(self, name);
+		if (links.num > 0)
+			return links;
 	}
+
 	for (auto *v: weak(f->name_space->static_variables))
 		if (v->name == name)
 			return {add_node_global(v)};

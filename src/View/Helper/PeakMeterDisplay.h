@@ -32,8 +32,8 @@ public:
 	void set_source(PeakMeter *source);
 
 	void on_draw(Painter *p) override;
-	bool on_left_button_down(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
 	void on_update();
 	void enable(bool enabled);
 	void set_channel_map(const Array<int> &channel_map);

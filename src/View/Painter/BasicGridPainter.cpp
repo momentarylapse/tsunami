@@ -7,6 +7,7 @@
 
 #include "BasicGridPainter.h"
 #include "../../lib/image/Painter.h"
+#include "../../lib/math/vec2.h"
 #include <cmath>
 
 color col_inter(const color a, const color &b, float t);
@@ -89,12 +90,12 @@ void BasicGridPainter::draw(Painter *p) {
 	if (horizontal) {
 		for (auto &t: ticks) {
 			p->set_color(col[t.weight]);
-			p->draw_line(t.x, area.y1, t.x, area.y2);
+			p->draw_line({t.x, area.y1}, {t.x, area.y2});
 		}
 	} else {
 		for (auto &t: ticks) {
 			p->set_color(col[t.weight]);
-			p->draw_line(area.x1, t.x, area.x2, t.x);
+			p->draw_line({area.x1, t.x}, {area.x2, t.x});
 		}
 	}
 	p->set_line_width(1);

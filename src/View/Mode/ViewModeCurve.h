@@ -26,7 +26,7 @@ public:
 
 	string get_tip() override;
 
-	HoverData get_hover_data(AudioViewLayer *vlayer, float mx, float my) override;
+	HoverData get_hover_data(AudioViewLayer *vlayer, const vec2 &m) override;
 
 
 	float value2screen(float value);

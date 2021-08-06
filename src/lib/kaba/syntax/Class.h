@@ -20,6 +20,7 @@ public:
 	string name;
 	const Class *type;
 	int64 offset;
+	bool allow_indirect_use;
 	ClassElement();
 	ClassElement(const string &name, const Class *type, int64 offset);
 	string signature(bool include_class) const;

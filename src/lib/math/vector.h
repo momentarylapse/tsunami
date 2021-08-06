@@ -6,45 +6,17 @@
 
 class matrix;
 class matrix3;
-
-class vec2 {
-public:
-	float x, y;
-	vec2(){};
-	vec2(float x, float y);
-	// assignment operators
-	void _cdecl operator += (const vec2& v);
-	void _cdecl operator -= (const vec2& v);
-	void _cdecl operator *= (float f);
-	void _cdecl operator /= (float f);
-	// unitary operator(s)
-	vec2 _cdecl operator - () const;
-	// binary operators
-	vec2 _cdecl operator + (const vec2 &v) const;
-	vec2 _cdecl operator - (const vec2 &v) const;
-	vec2 _cdecl operator * (float f) const;
-	vec2 _cdecl operator / (float f) const;
-	friend vec2 _cdecl operator * (float f, const vec2 &v)
-	{	return v*f;	}
-	bool _cdecl operator == (const vec2 &v) const;
-	bool _cdecl operator != (const vec2 &v) const;
-	float _cdecl operator * (const vec2 &v) const;
-	string _cdecl str() const;
-
-	float _cdecl length() const;
-	float _cdecl length_sqr() const;
-	float _cdecl length_fuzzy() const;
-	void _cdecl normalize();
-	vec2 _cdecl normalized() const;
-
-	static const vec2 ZERO, EX, EY;
-};
+class vec2;
 
 class vector {
 public:
 	float x, y, z;
 	vector(){};
 	vector(float x, float y, float z);
+	vector(const vec2 &xy, float z);
+
+	vec2 &xy();
+
 	// assignment operators
 	void _cdecl operator += (const vector& v);
 	void _cdecl operator -= (const vector& v);
@@ -111,56 +83,4 @@ bool _vec_between_(const vector &v,const vector &a,const vector &b);
 float _vec_factor_between_(const vector &v,const vector &a,const vector &b);
 
 bool inf_v(const vector &v);
-
-
-
-
-class vec4 {
-public:
-	float x, y, z, w;
-	vec4(){};
-	vec4(float x, float y, float z, float w);
-	// assignment operators
-	void _cdecl operator += (const vec4& v);
-	void _cdecl operator -= (const vec4& v);
-	void _cdecl operator *= (float f);
-	void _cdecl operator /= (float f);
-	// unitary operator(s)
-	vec4 _cdecl operator - () const;
-	// binary operators
-	vec4 _cdecl operator + (const vec4 &v) const;
-	vec4 _cdecl operator - (const vec4 &v) const;
-	vec4 _cdecl operator * (float f) const;
-	vec4 _cdecl operator / (float f) const;
-	friend vec4 _cdecl operator * (float f, const vec4 &v)
-	{	return v*f;	}
-	bool _cdecl operator == (const vec4 &v) const;
-	bool _cdecl operator != (const vec4 &v) const;
-	float _cdecl operator * (const vec4 &v) const;
-	string _cdecl str() const;
-
-	float _cdecl length() const;
-	float _cdecl length_sqr() const;
-	float _cdecl length_fuzzy() const;
-	void _cdecl normalize();
-	vec4 _cdecl normalized() const;
-
-	int argmin() const;
-	int argmax() const;
-	float sum() const;
-	float &operator[](int index);
-	float operator[](int index) const;
-
-	static const vec4 ZERO, EX, EY, EZ, EW;
-};
-
-
-class ivec4 {
-public:
-	int i,j,k,l;
-
-	int find(int x) const;
-	int &operator[](int index);
-	int operator[](int index) const;
-};
 

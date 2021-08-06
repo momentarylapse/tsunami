@@ -10,6 +10,7 @@
 #include "../../../Stuff/PerformanceMonitor.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/image/color.h"
+#include "../../../lib/math/vector.h"
 
 namespace scenegraph {
 
@@ -56,10 +57,10 @@ Node::~Node() {
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-bool Node::hover(float mx, float my) const {
+bool Node::hover(const vec2 &m) const {
 	if (hidden)
 		return false;
-	return area.inside(mx, my);
+	return area.inside(m);
 }
 
 void Node::add_child(Node* child) {
@@ -95,7 +96,7 @@ bool Node::is_cur_hover_non_recursive() const {
 	return false;
 }
 
-HoverData Node::get_hover_data(float mx, float my) {
+HoverData Node::get_hover_data(const vec2 &m) {
 	HoverData h;
 	h.node = this;
 	return h;
@@ -143,7 +144,7 @@ void Node::draw_recursive(Painter *p) {
 	if (show_debug) {
 		p->set_font_size(8);
 		p->set_color(is_cur_hover_non_recursive() ? Red : Green);
-		p->draw_str(area.x1, area.y1, PerformanceMonitor::get_name(perf_channel));
+		p->draw_str({area.x1, area.y1}, PerformanceMonitor::get_name(perf_channel));
 		p->set_fill(false);
 		p->draw_rect(area);
 		p->set_fill(true);
@@ -217,11 +218,11 @@ void Node::request_redraw() {
 NodeFree::NodeFree() : Node(0, 0) {
 }
 
-NodeRel::NodeRel(float dx, float dy, float w, float h) : Node(w, h) {
+NodeRel::NodeRel(const vec2 &d, float w, float h) : Node(w, h) {
 	align.horizontal = AlignData::Mode::LEFT;
-	align.dx = dx;
+	align.dx = d.x;
 	align.vertical = AlignData::Mode::TOP;
-	align.dy = dy;
+	align.dy = d.y;
 }
 
 

@@ -97,17 +97,17 @@ void ViewModeEdit::draw_post(Painter *c) {
 	col.a = 0.1f;
 	float d = 12;
 	c->set_color(col);
-	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, l->area.y1-d, l->area.y1));
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, l->area.y2, l->area.y2+d));
 	d = 2;
 	col.a = 0.7f;
 	c->set_color(col);
-	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
+	c->draw_rect(rect(view->song_area().x1, l->area.x2, l->area.y1-d, l->area.y1));
+	c->draw_rect(rect(view->song_area().x1, l->area.x2, l->area.y2, l->area.y2+d));
 }
 
-HoverData ViewModeEdit::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
-	return mode->get_hover_data(vlayer, mx, my);
+HoverData ViewModeEdit::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
+	return mode->get_hover_data(vlayer, m);
 }
 
 SongSelection ViewModeEdit::get_selection_for_rect(const Range &r, int y0, int y1) {

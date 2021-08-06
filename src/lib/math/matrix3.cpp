@@ -9,7 +9,9 @@
 
 
 const float f_m3_id[9] = { 1,0,0 , 0,1,0 , 0,0,1 };
+const float f_m3_zero[9] = { 0,0,0 , 0,0,0 , 0,0,0 };
 const matrix3 matrix3::ID = matrix3(f_m3_id);
+const matrix3 matrix3::ZERO = matrix3(f_m3_zero);
 
 matrix3::matrix3(const float f[9]) {
 	for (int i=0;i<9;i++)

@@ -784,6 +784,12 @@
     <ClCompile Include="src\lib\math\rect.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\math\vec2.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\vec4.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\math\vector.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
@@ -2032,6 +2038,12 @@
       <Filter>src\lib\math</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\math\rect.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\math\vec2.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\math\vec4.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\math\vector.h">

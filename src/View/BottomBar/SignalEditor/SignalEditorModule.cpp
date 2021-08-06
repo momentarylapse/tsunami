@@ -52,7 +52,7 @@ public:
 	Set<Module*> sel;
 	SignalEditorTab *tab;
 	Array<float> px0, py0;
-	float mx0, my0;
+	vec2 m0;
 	MouseDelayModuleDnD(SignalEditorTab *t) {
 		tab = t;
 		sel = tab->sel_modules;
@@ -60,17 +60,16 @@ public:
 			px0.add(m->module_x);
 			py0.add(m->module_y);
 		}
-		mx0 = tab->graph->mx;
-		my0 = tab->graph->my;
+		m0 = tab->graph->m;
 	}
-	void on_update(float mx, float my) override {
-		foreachi (auto m, sel, i) {
-			m->module_x = px0[i] + mx - mx0;
-			m->module_y = py0[i] + my - my0;
+	void on_update(const vec2 &m) override {
+		foreachi (auto mm, sel, i) {
+			mm->module_x = px0[i] + m.x - m0.x;
+			mm->module_y = py0[i] + m.y - m0.y;
 		}
 		tab->update_module_positions();
 	}
-	void on_finish(float mx, float my) override {
+	void on_finish(const vec2 &m) override {
 		for (auto m: sel) {
 			m->module_x = round(m->module_x / MODULE_GRID) * MODULE_GRID;
 			m->module_y = round(m->module_y / MODULE_GRID) * MODULE_GRID;
@@ -82,7 +81,7 @@ public:
 
 
 
-SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegraph::NodeRel(m->module_x, m->module_y, MODULE_WIDTH, MODULE_HEIGHT) {
+SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegraph::NodeRel({m->module_x, m->module_y}, MODULE_WIDTH, MODULE_HEIGHT) {
 	tab = t;
 	module = m;
 	set_perf_name("se:module");
@@ -115,19 +114,19 @@ void SignalEditorModule::on_draw(Painter *p) {
 		p->set_color(theme.text_soft1);
 	}
 	string type = module_header(module);
-	draw_str_constrained(p, r.mx(), r.my() - p->font_size/2, r.width() - 12, type, TextAlign::CENTER);
+	draw_str_constrained(p, {r.mx(), r.my() - p->font_size/2}, r.width() - 12, type, TextAlign::CENTER);
 	p->set_font("", theme.FONT_SIZE, false, false);
 
 }
 
-bool SignalEditorModule::on_left_button_down(float mx, float my) {
+bool SignalEditorModule::on_left_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
 		tab->select_module(module, tab->win->get_key(hui::KEY_CONTROL));
 	tab->graph->mdp_prepare(new MouseDelayModuleDnD(tab));
 	return true;
 }
 
-bool SignalEditorModule::on_right_button_down(float mx, float my) {
+bool SignalEditorModule::on_right_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
 		tab->select_module(module, tab->win->get_key(hui::KEY_CONTROL));
 	tab->popup_module();

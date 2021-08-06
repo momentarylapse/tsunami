@@ -112,13 +112,13 @@ public:
 		if (is_cur_hover())
 			c = theme.hoverify(c);
 		p->set_color(c);
-		p->draw_circle(area.mx(), area.my(),40);
+		p->draw_circle(area.m(), 40);
 		p->set_color(theme.text_soft3);
 		p->set_font_size(17);
-		p->draw_str(area.mx()-10, area.my()-10, "▲");
+		p->draw_str(area.m() - vec2(10,10),  "▲");
 		p->set_font_size(theme.FONT_SIZE);
 	}
-	bool on_left_button_down(float mx, float my) override {
+	bool on_left_button_down(const vec2 &m) override {
 		view->session->win->bottom_bar->_show();
 		return true;
 	}
@@ -293,7 +293,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
-	mx = my = 0;
+	m = {0,0};
 
 	message.ttl = -1;
 
@@ -431,24 +431,23 @@ void AudioView::set_mode(ViewMode *m) {
 }
 
 void AudioView::set_mouse() {
-	mx = hui::GetEvent()->mx;
-	my = hui::GetEvent()->my;
+	m = hui::GetEvent()->m;
 	select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
-	if ((mx >= s->area.x1) and (mx < s->area.x2)) {
-		int offset = cam.screen2sample(mx) - s->pos;
-		if ((my >= s->area.y1) and (my < s->area.y1 + theme.SAMPLE_FRAME_HEIGHT))
+	if ((m.x >= s->area.x1) and (m.x < s->area.x2)) {
+		int offset = cam.screen2sample(m.x) - s->pos;
+		if ((m.y >= s->area.y1) and (m.y < s->area.y1 + theme.SAMPLE_FRAME_HEIGHT))
 			return offset;
-		if ((my >= s->area.y2 - theme.SAMPLE_FRAME_HEIGHT) and (my < s->area.y2))
+		if ((m.y >= s->area.y2 - theme.SAMPLE_FRAME_HEIGHT) and (m.y < s->area.y2))
 			return offset;
 	}
 	return -1;
 }
 
 void AudioView::selection_update_pos(HoverData &s) {
-	s.pos = cam.screen2sample(mx);
+	s.pos = cam.screen2sample(m.x);
 }
 
 void AudioView::update_selection() {
@@ -483,7 +482,7 @@ void AudioView::set_selection(const SongSelection &s) {
 
 bool AudioView::mouse_over_time(int pos) {
 	int ssx = cam.sample2screen(pos);
-	return ((mx >= ssx - 5) and (mx <= ssx + 5));
+	return ((m.x >= ssx - 5) and (m.x <= ssx + 5));
 }
 
 
@@ -556,14 +555,14 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	scene_graph->on_mouse_move(mx, my);
+	scene_graph->on_mouse_move(m);
 
 	force_redraw();
 }
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	scene_graph->on_left_button_down(mx, my);
+	scene_graph->on_left_button_down(m);
 
 	force_redraw();
 	update_menu();
@@ -590,7 +589,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	scene_graph->on_left_button_up(mx, my);
+	scene_graph->on_left_button_up(m);
 
 	force_redraw();
 	update_menu();
@@ -609,7 +608,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	scene_graph->on_right_button_down(mx, my);
+	scene_graph->on_right_button_down(m);
 }
 
 void AudioView::on_right_button_up() {
@@ -627,7 +626,7 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
-	scene_graph->on_left_double_click(mx, my);
+	scene_graph->on_left_double_click(m);
 	mode->on_left_double_click();
 	force_redraw();
 	update_menu();
@@ -662,7 +661,7 @@ void AudioView::move_to_layer(int delta) {
 	else
 		vlayer = prev_layer(vlayer);
 
-	set_current(vlayer->get_hover_data(0,0));
+	set_current(vlayer->get_hover_data({0,0}));
 	exclusively_select_layer(vlayer);
 	select_under_cursor();
 }
@@ -1137,19 +1136,17 @@ rect AudioView::song_area() {
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
-	::draw_cursor_hover(c, msg, mx, my, song_area());
+	::draw_cursor_hover(c, msg, m, song_area());
 }
 
 void AudioView::draw_message(Painter *c, Message &m) {
-	float xm = area.mx();
-	float ym = area.my();
 	float a = min(m.ttl*8, 1.0f);
 	a = pow(a, 0.4f);
 	color c1 = theme.high_contrast_a;
 	color c2 = theme.high_contrast_b;
 	c1.a = c2.a = a;
 	c->set_font_size(theme.FONT_SIZE * m.size * a);
-	draw_boxed_str(c, xm, ym, m.text, c1, c2, TextAlign::CENTER);
+	draw_boxed_str(c, area.m(), m.text, c1, c2, TextAlign::CENTER);
 	c->set_font_size(theme.FONT_SIZE);
 }
 
@@ -1161,12 +1158,12 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 			cc = theme.selection_boundary_hover;
 		c->set_color(cc);
 		c->set_line_width(2.0f);
-		c->draw_line(x, area.y1, x, area.y2);
+		c->draw_line({x, area.y1}, {x, area.y2});
 		if (show_time)
-			draw_boxed_str(c,  x, song_area().my(), song->get_time_str_long(pos), cc, theme.background);
+			draw_boxed_str(c,  {x, song_area().my()}, song->get_time_str_long(pos), cc, theme.background);
 		c->set_line_width(1.0f);
 		if (show_circle)
-			c->draw_circle(x, song_area().y2, 8);
+			c->draw_circle({x, song_area().y2}, 8);
 	}
 }
 
@@ -1204,7 +1201,7 @@ void AudioView::draw_song(Painter *c) {
 
 	tip = mode->get_tip();
 	if (tip.num > 0)
-		draw_boxed_str(c, song_area().mx(), area.y2 - 50, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
+		draw_boxed_str(c, {song_area().mx(), area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 
 	if (message.ttl > 0) {
 		draw_message(c, message);
@@ -1283,11 +1280,11 @@ void AudioView::set_midi_view_mode(MidiMode mode) {
 }
 
 void AudioView::zoom_in() {
-	cam.zoom(exp( ZoomSpeed), mx);
+	cam.zoom(exp( ZoomSpeed), m.x);
 }
 
 void AudioView::zoom_out() {
-	cam.zoom(exp(-ZoomSpeed), mx);
+	cam.zoom(exp(-ZoomSpeed), m.x);
 }
 
 void AudioView::select_all() {
@@ -1714,7 +1711,7 @@ void AudioView::exclusively_select_object() {
 }
 
 int AudioView::get_mouse_pos() {
-	return cam.screen2sample(mx);
+	return cam.screen2sample(m.x);
 }
 
 int AudioView::get_mouse_pos_snap() {
@@ -1723,12 +1720,12 @@ int AudioView::get_mouse_pos_snap() {
 	return pos;
 }
 
-HoverData AudioView::hover_time(float mx, float my) {
+HoverData AudioView::hover_time(const vec2 &m) {
 	HoverData s;
 	s.pos = get_mouse_pos();
 	s.pos_snap = get_mouse_pos_snap();
 	s.range = Range(s.pos, 0);
-	s.y0 = s.y1 = my;
+	s.y0 = s.y1 = m.y;
 	s.type = HoverData::Type::TIME;
 	return s;
 }
@@ -1855,7 +1852,7 @@ void AudioView::mdp_prepare(MouseDelayAction *a) {
 }
 
 void AudioView::mdp_run(MouseDelayAction *a) {
-	scene_graph->mdp_run(a, mx, my);
+	scene_graph->mdp_run(a, m);
 }
 
 void AudioView::mdp_prepare(hui::Callback update) {

@@ -18,8 +18,7 @@ namespace scenegraph {
 SceneGraph::SceneGraph() {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
-	mx = -1;
-	my = -1;
+	m = {-1, -1};
 	mdp = new MouseDelayPlanner(this);
 	set_perf_name("graph");
 
@@ -35,11 +34,11 @@ void SceneGraph::set_callback_redraw(hui::Callback f) {
 }
 
 void SceneGraph::update_hover() {
-	hover = get_hover_data(mx, my);
+	hover = get_hover_data(m);
 }
 
-bool SceneGraph::on_left_button_down(float mx, float my) {
-	set_mouse(mx, my);
+bool SceneGraph::on_left_button_down(const vec2 &m) {
+	set_mouse(m);
 	update_hover();
 
 	if (hui::GetEvent()->just_focused)
@@ -50,87 +49,87 @@ bool SceneGraph::on_left_button_down(float mx, float my) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_left_button_down(mx, my))
+		if (c->hover(m))
+			if (c->on_left_button_down(m))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_left_button_up(float mx, float my) {
-	set_mouse(mx, my);
-	mdp->finish(mx, my);
-	hover = get_hover_data(mx, my);
+bool SceneGraph::on_left_button_up(const vec2 &m) {
+	set_mouse(m);
+	mdp->finish(m);
+	hover = get_hover_data(m);
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_left_button_up(mx, my))
+		if (c->hover(m))
+			if (c->on_left_button_up(m))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_left_double_click(float mx, float my) {
-	set_mouse(mx, my);
+bool SceneGraph::on_left_double_click(const vec2 &m) {
+	set_mouse(m);
 	update_hover();
 	set_current(hover);
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_left_double_click(mx, my))
+		if (c->hover(m))
+			if (c->on_left_double_click(m))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_right_button_down(float mx, float my) {
-	set_mouse(mx, my);
+bool SceneGraph::on_right_button_down(const vec2 &m) {
+	set_mouse(m);
 	update_hover();
 	set_current(hover);
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_right_button_down(mx, my))
+		if (c->hover(m))
+			if (c->on_right_button_down(m))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_right_button_up(float mx, float my) {
-	set_mouse(mx, my);
+bool SceneGraph::on_right_button_up(const vec2 &m) {
+	set_mouse(m);
 	update_hover();
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_right_button_up(mx, my))
+		if (c->hover(m))
+			if (c->on_right_button_up(m))
 				return true;
 	return false;
 }
 
-bool SceneGraph::on_mouse_move(float mx, float my) {
-	set_mouse(mx, my);
+bool SceneGraph::on_mouse_move(const vec2 &m) {
+	set_mouse(m);
 
-	if (!mdp->update(mx, my)) {
+	if (!mdp->update(m)) {
 		update_hover();
 
 		auto nodes = collect_children_down();
 		for (auto *c: nodes)
-			if (c->hover(mx, my))
-				if (c->on_mouse_move(mx, my))
+			if (c->hover(m))
+				if (c->on_mouse_move(m))
 					return true;
 	}
 	return false;
 }
 
-bool SceneGraph::on_mouse_wheel(float dx, float dy) {
-	//set_mouse(mx, my);
-	//hover = get_hover_data(mx, my);
+bool SceneGraph::on_mouse_wheel(const vec2 &d) {
+	//set_mouse(m);
+	//hover = get_hover_data(m);
 	//set_current(hover);
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			if (c->on_mouse_wheel(dx, dy))
+		if (c->hover(m))
+			if (c->on_mouse_wheel(d))
 				return true;
 	return false;
 }
@@ -138,7 +137,7 @@ bool SceneGraph::on_mouse_wheel(float dx, float dy) {
 bool SceneGraph::on_key(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		//if (c->hover(mx, my))
+		//if (c->hover(m))
 			if (c->on_key(key))
 				return true;
 	return false;
@@ -147,17 +146,17 @@ bool SceneGraph::on_key(int key) {
 bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
+		if (c->hover(m))
 			return c->allow_handle_click_when_gaining_focus();
 	return false;
 }
 
-HoverData SceneGraph::get_hover_data(float mx, float my) {
+HoverData SceneGraph::get_hover_data(const vec2 &m) {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
-			return c->get_hover_data(mx, my);
+		if (c->hover(m))
+			return c->get_hover_data(m);
 
 	return HoverData();
 }
@@ -166,7 +165,7 @@ string SceneGraph::get_tip() const {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
-		if (c->hover(mx, my))
+		if (c->hover(m))
 			return c->get_tip();
 	return "";
 }
@@ -197,9 +196,8 @@ void SceneGraph::draw(Painter *p) {
 		mdp->action->on_draw_post(p);
 }
 
-void SceneGraph::set_mouse(float _mx, float _my) {
-	mx = _mx;
-	my = _my;
+void SceneGraph::set_mouse(const vec2 &_m) {
+	m = _m;
 	//select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
@@ -213,16 +211,16 @@ void SceneGraph::mdp_prepare(MouseDelayAction *a) {
 	mdp->prepare(a);
 }
 
-void SceneGraph::mdp_run(MouseDelayAction *a, float mx, float my) {
+void SceneGraph::mdp_run(MouseDelayAction *a, const vec2 &m) {
 	mdp->prepare(a);
-	mdp->start_acting(mx, my);
+	mdp->start_acting(m);
 }
 
 class MouseDelayActionWrapper : public MouseDelayAction {
 public:
 	hui::Callback callback;
 	MouseDelayActionWrapper(hui::Callback c) { callback = c; }
-	void on_update(float mx, float my) override { callback(); }
+	void on_update(const vec2 &m) override { callback(); }
 };
 
 void SceneGraph::mdp_prepare(hui::Callback update) {
@@ -249,31 +247,31 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 		}
 	});
 	panel->event_x(id, "hui:left-button-down", [=] {
-		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_left_button_down(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:left-button-up", [=] {
-		on_left_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_left_button_up(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:left-double-click", [=] {
-		on_left_double_click(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_left_double_click(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-down", [=] {
-		on_right_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_right_button_down(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-up", [=] {
-		on_right_button_up(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_right_button_up(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-wheel", [=] {
-		on_mouse_wheel(hui::GetEvent()->scroll_x, hui::GetEvent()->scroll_y);
+		on_mouse_wheel(hui::GetEvent()->scroll);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-move", [=] {
-		on_mouse_move(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_mouse_move(hui::GetEvent()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:key-down", [=] {

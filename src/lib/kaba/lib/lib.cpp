@@ -85,6 +85,8 @@ const Class *TypeComplex;
 const Class *TypeComplexList;
 const Class *TypeStringList;
 const Class *TypeStringDict;
+const Class *TypeVec2;
+const Class *TypeVec2List;
 const Class *TypeVectorArray;
 const Class *TypeVectorArrayP;
 const Class *TypeVectorList;
@@ -511,7 +513,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps) {
 	// FIXME  wrong for complicated classes
 	if (p->can_memcpy()) {
 		if (!p->uses_call_by_reference()){
-			if (p->is_pointer()){
+			if (p->is_some_pointer()){
 				class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<void*>::__init__);
 				class_add_func("add", TypeVoid, &DynamicArray::append_p_single);
 					func_add_param("x", p);

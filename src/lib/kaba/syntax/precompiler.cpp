@@ -156,7 +156,7 @@ void Parser::pre_compiler(bool just_analyse)
 		Exp.set(0, i);
 		if (Exp.cur[0] == '#') {
 			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
-		} else if ((Exp.line[i].exp[0].name == IDENTIFIER_USE) or (Exp.line[i].exp[0].name == IDENTIFIER_IMPORT)) {
+		} else if ((Exp.cur_line->indent == 0) and ((Exp.line[i].exp[0].name == IDENTIFIER_USE) or (Exp.line[i].exp[0].name == IDENTIFIER_IMPORT))) {
 			parse_import();
 			Exp.line.erase(i);
 			i --;

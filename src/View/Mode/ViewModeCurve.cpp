@@ -12,7 +12,7 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
-#include "../../lib/math/complex.h"
+#include "../../lib/math/vector.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
 #include "../SideBar/SideBar.h"
@@ -48,12 +48,12 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 
 	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
 		int pos = view->get_mouse_pos();
-		float value = screen2value(view->my);
+		float value = screen2value(view->m.y);
 		cur_track()->curve_add_point(_curve, pos, value);
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
 		view->mdp_prepare([=] {
 			int pos = view->get_mouse_pos();
-			float value = clamp(screen2value(view->my), _curve->min, _curve->max);
+			float value = clamp(screen2value(view->m.y), _curve->min, _curve->max);
 			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);
 		});
 	}
@@ -81,9 +81,9 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 		// lines
 		c->set_line_width(2.0f);
 		c->set_color(theme.selection_boundary);
-		Array<complex> pp;
+		Array<vec2> pp;
 		for (int x=r.x1; x<r.x2; x+=3)
-			pp.add(complex(x, value2screen(_curve->get(cam->screen2sample(x)))));
+			pp.add(vec2(x, value2screen(_curve->get(cam->screen2sample(x)))));
 		c->draw_lines(pp);
 
 
@@ -92,8 +92,8 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 		color cc = theme.selection_internal;
 		cc.a = 0.2f;
 		c->set_color(cc);
-		pp.add(complex(r.x2, r.y2));
-		pp.add(complex(r.x1, r.y2));
+		pp.add(vec2(r.x2, r.y2));
+		pp.add(vec2(r.x1, r.y2));
 		c->draw_polygon(pp);
 
 		// points
@@ -108,7 +108,7 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 			} else {
 				c->set_color(theme.text);
 			}
-			c->draw_circle(cam->sample2screen(p.pos), value2screen(p.value), r);
+			c->draw_circle({(float)cam->sample2screen(p.pos), value2screen(p.value)}, r);
 		}
 	}
 }
@@ -121,17 +121,17 @@ void ViewModeCurve::draw_post(Painter* c) {
 	col.a = 0.1f;
 	float d = 12;
 	c->set_color(col);
-	c->draw_rect(view->song_area().x1, t->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), d);
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y1-d, t->area.y1));
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y2, t->area.y2 + d));
 	d = 2;
 	col.a = 0.7f;
 	c->set_color(col);
-	c->draw_rect(view->song_area().x1, t->area.y1-d, view->song_area().width(), d);
-	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), d);
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y1-d, t->area.y1));
+	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y2, t->area.y2 + d));
 }
 
-HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
-	auto s = vlayer->Node::get_hover_data(mx, my);//ViewModeDefault::get_hover_data(vlayer, mx, my);
+HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
+	auto s = vlayer->Node::get_hover_data(m);//ViewModeDefault::get_hover_data(vlayer, mx, my);
 	s.type = HoverData::Type::CURVE_POINT_NONE;
 
 	// curve points
@@ -139,7 +139,7 @@ HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float 
 		foreachi(auto &p, _curve->points, i) {
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
-			if ((fabs(mx - x) < 10) and (fabs(my - y) < 10)) {
+			if ((fabs(m.x - x) < 10) and (fabs(m.y - y) < 10)) {
 				s.type = HoverData::Type::CURVE_POINT;
 				s.index = i;
 				return s;

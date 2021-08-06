@@ -20,16 +20,16 @@ public:
 	AudioViewTrack *vtrack;
 	TrackHeader(AudioViewTrack *t);
 	void on_draw(Painter *c) override;
-	HoverData get_hover_data(float mx, float my) override;
+	HoverData get_hover_data(const vec2 &m) override;
 	
 	bool playable() const;
 	color color_bg(bool allow_hover = true) const;
 	color color_text() const;
 	string nice_title() const;
 
-	bool on_left_button_down(float mx, float my) override;
-	bool on_left_double_click(float mx, float my) override;
-	bool on_right_button_down(float mx, float my) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_left_double_click(const vec2 &m) override;
+	bool on_right_button_down(const vec2 &m) override;
 	
 	void update_geometry_recursive(const rect &target_area) override;
 };

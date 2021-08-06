@@ -50,7 +50,7 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 		draw_recursive(p);
 	});
 	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{
-		on_left_button_down(hui::GetEvent()->mx, hui::GetEvent()->my);
+		on_left_button_down(hui::GetEvent()->m);
 	});
 }
 
@@ -154,9 +154,9 @@ void draw_peak(Painter *c, const rect &r, PeakMeterData &d, const color &bg) {
 	c->set_color(theme.text);
 	if (sp > 0) {
 		if (w > h)
-			c->draw_rect(r.x1 + w * nice_peak(sp), r.y1, 2, h);
+			c->draw_rect(rect(r.x1 + w * nice_peak(sp), r.x1 + w * nice_peak(sp) + 2, r.y1, r.y1 + h));
 		else
-			c->draw_rect(r.x1, r.y2 - h * nice_peak(sp), w, 2);
+			c->draw_rect(rect(r.x1, r.x1 + w, r.y2 - h * nice_peak(sp), r.y2 - h * nice_peak(sp) + 2));
 	}
 }
 
@@ -196,7 +196,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 	}
 }
 
-bool PeakMeterDisplay::on_left_button_down(float mx, float my) {
+bool PeakMeterDisplay::on_left_button_down(const vec2 &m) {
 	if (mode_constraint != Mode::BOTH)
 		return true;
 	if (mode == Mode::SPECTRUM) {
@@ -211,7 +211,7 @@ bool PeakMeterDisplay::on_left_button_down(float mx, float my) {
 	return true;
 }
 
-bool PeakMeterDisplay::on_right_button_down(float mx, float my) {
+bool PeakMeterDisplay::on_right_button_down(const vec2 &m) {
 	return true;
 }
 

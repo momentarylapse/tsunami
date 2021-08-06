@@ -11,6 +11,7 @@
 #include "../../../lib/base/base.h"
 #include "../../../lib/base/pointer.h"
 #include "../../../lib/math/rect.h"
+#include "../../../lib/math/vec2.h"
 #include "../../../Stuff/Observable.h"
 
 class Painter;
@@ -29,20 +30,20 @@ public:
 	virtual bool allow_handle_click_when_gaining_focus() const { return true; }
 
 	// return: block upwards propagation
-	virtual bool on_left_button_down(float mx, float my) { return false; }
-	virtual bool on_left_button_up(float mx, float my) { return false; }
-	virtual bool on_left_double_click(float mx, float my) { return false; }
-	virtual bool on_right_button_down(float mx, float my) { return false; }
-	virtual bool on_right_button_up(float mx, float my) { return false; }
-	virtual bool on_mouse_move(float mx, float my) { return false; }
-	virtual bool on_mouse_wheel(float dx, float dy) { return false; }
+	virtual bool on_left_button_down(const vec2 &m) { return false; }
+	virtual bool on_left_button_up(const vec2 &m) { return false; }
+	virtual bool on_left_double_click(const vec2 &m) { return false; }
+	virtual bool on_right_button_down(const vec2 &m) { return false; }
+	virtual bool on_right_button_up(const vec2 &m) { return false; }
+	virtual bool on_mouse_move(const vec2 &m) { return false; }
+	virtual bool on_mouse_wheel(const vec2 &d) { return false; }
 	virtual bool on_key(int key) { return false; }
 
-	virtual bool hover(float mx, float my) const;
+	virtual bool hover(const vec2 &m) const;
 
 	void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
-	virtual HoverData get_hover_data(float mx, float my);
+	virtual HoverData get_hover_data(const vec2 &m);
 	void add_child(Node *child);
 	void delete_child(Node *child);
 
@@ -95,7 +96,7 @@ public:
 
 class NodeRel : public Node {
 public:
-	NodeRel(float dx, float dy, float w, float h);
+	NodeRel(const vec2 &d, float w, float h);
 };
 
 
@@ -103,14 +104,14 @@ class HBox : public Node {
 public:
 	HBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(float mx, float my) const override { return false; }
+	bool hover(const vec2 &m) const override { return false; }
 };
 
 class VBox : public Node {
 public:
 	VBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(float mx, float my) const override { return false; }
+	bool hover(const vec2 &m) const override { return false; }
 };
 
 }

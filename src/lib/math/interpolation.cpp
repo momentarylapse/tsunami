@@ -8,6 +8,7 @@
 #include "interpolation.h"
 #include "complex.h"
 #include "vector.h"
+#include "vec2.h"
 #include "quaternion.h"
 #include "../file/msg.h"
 
@@ -67,19 +68,11 @@ void Interpolator<T>::close(float dt)
 
 
 template<class T>
-T _inter_zero_();
+T _inter_zero_() { return T::ZERO; }
 
 template<>
 inline float _inter_zero_<float>()
 {	return 0;	}
-
-template<>
-inline vector _inter_zero_<vector>()
-{	return v_0;	}
-
-template<>
-inline complex _inter_zero_<complex>()
-{	return complex(0,0);	}
 
 template<>
 inline quaternion _inter_zero_<quaternion>()
@@ -230,7 +223,7 @@ inline T _inter_cubic_spline_tang_(const typename Interpolator<T>::Part &p, floa
 }
 
 template<class T>
-T _inter_angular_lerp_(const typename Interpolator<T>::Part &p, float t);
+T _inter_angular_lerp_(const typename Interpolator<T>::Part &p, float t) { return _inter_zero_<T>(); }
 
 template<>
 inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t) {
@@ -239,12 +232,6 @@ inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t)
 	auto q = quaternion::interpolate(q0, q1, t);
 	return q.get_angles();
 }
-template<>
-inline float _inter_angular_lerp_(const Interpolator<float>::Part &p, float t)
-{	return 0;	}
-template<>
-inline complex _inter_angular_lerp_(const Interpolator<complex>::Part &p, float t)
-{	return complex(0,0);	}
 
 
 template<class T>
@@ -319,6 +306,7 @@ Array<T> Interpolator<T>::getList(Array<float> &t)
 
 template class Interpolator<float>;
 template class Interpolator<vector>;
+template class Interpolator<vec2>;
 template class Interpolator<complex>;
 //template class Interpolator<quaternion>;
 

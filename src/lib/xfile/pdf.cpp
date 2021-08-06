@@ -9,7 +9,7 @@
 #include "../image/image.h"
 #include "../image/Painter.h"
 #include "../math/rect.h"
-#include "../math/complex.h"
+#include "../math/vec2.h"
 #include "../file/file.h"
 
 namespace pdf {
@@ -558,16 +558,16 @@ void PagePainter::set_fill(bool fill) {
 void PagePainter::set_clip(const rect& r) {
 }
 
-void PagePainter::draw_point(float x, float y) {
+void PagePainter::draw_point(const vec2 &p) {
 }
 
-void PagePainter::draw_line(float x1, float y1, float x2, float y2) {
-	page->content += format("     %.1f %.1f m\n", x1, height-y1);
-	page->content += format("     %.1f %.1f l\n", x2, height-y2);
+void PagePainter::draw_line(const vec2 &a, const vec2 &b) {
+	page->content += format("     %.1f %.1f m\n", a.x, height-a.y);
+	page->content += format("     %.1f %.1f l\n", b.x, height-b.y);
 	page->content += "     S\n";
 }
 
-void PagePainter::draw_lines(const Array<complex>& p) {
+void PagePainter::draw_lines(const Array<vec2>& p) {
 	if (p.num < 2)
 		return;
 	page->content += format("     %.1f %.1f m\n", p[0].x, height-p[0].y);
@@ -576,7 +576,7 @@ void PagePainter::draw_lines(const Array<complex>& p) {
 	page->content += "     S\n";
 }
 
-void PagePainter::draw_polygon(const Array<complex>& p) {
+void PagePainter::draw_polygon(const Array<vec2>& p) {
 	if (p.num < 2)
 		return;
 	page->content += format("     %.1f %.1f m\n", p[0].x, height-p[0].y);
@@ -586,11 +586,6 @@ void PagePainter::draw_polygon(const Array<complex>& p) {
 		page->content += "     f\n";
 	else
 		page->content += "     s\n";
-}
-
-void PagePainter::draw_rect(float x1, float y1, float w, float h) {
-	draw_rect(rect(x1, x1+w, y1, y1+h));
-	//page->content += format("     %.1f %.1f %.1f %.1f re\n", x1, height-y1-h, w, h);
 }
 
 void PagePainter::draw_rect(const rect& r) {
@@ -603,21 +598,21 @@ void PagePainter::draw_rect(const rect& r) {
 
 
 // TODO optimize
-void PagePainter::draw_circle(float x, float y, float radius) {
-	complex p[12];
+void PagePainter::draw_circle(const vec2 &c, float radius) {
+	vec2 p[12];
 	float rr = radius * 0.6f;
-	p[0] = complex(x,        height-y-radius);
-	p[1] = complex(x+rr,     height-y-radius);
-	p[2] = complex(x+radius, height-y-rr);
-	p[3] = complex(x+radius, height-y);
-	p[4] = complex(x+radius, height-y+rr);
-	p[5] = complex(x+rr,     height-y+radius);
-	p[6] = complex(x,        height-y+radius);
-	p[7] = complex(x-rr,     height-y+radius);
-	p[8] = complex(x-radius, height-y+rr);
-	p[9] = complex(x-radius, height-y);
-	p[10]= complex(x-radius, height-y-rr);
-	p[11]= complex(x-rr,     height-y-radius);
+	p[0] = vec2(c.x,        height-c.y-radius);
+	p[1] = vec2(c.x+rr,     height-c.y-radius);
+	p[2] = vec2(c.x+radius, height-c.y-rr);
+	p[3] = vec2(c.x+radius, height-c.y);
+	p[4] = vec2(c.x+radius, height-c.y+rr);
+	p[5] = vec2(c.x+rr,     height-c.y+radius);
+	p[6] = vec2(c.x,        height-c.y+radius);
+	p[7] = vec2(c.x-rr,     height-c.y+radius);
+	p[8] = vec2(c.x-radius, height-c.y+rr);
+	p[9] = vec2(c.x-radius, height-c.y);
+	p[10]= vec2(c.x-radius, height-c.y-rr);
+	p[11]= vec2(c.x-rr,     height-c.y-radius);
 	page->content += format("     %.1f %.1f m\n", p[0].x, p[0].y);
 	for (int i=0; i<12; i+=3)
 		page->content += format("     %.1f %.1f %.1f %.1f %.1f %.1f c\n", p[i+1].x, p[i+1].y, p[i+2].x, p[i+2].y, p[(i+3)%12].x, p[(i+3)%12].y);
@@ -654,16 +649,16 @@ static string _pdf_str_encode(const string &str) {
 	return x;
 }
 
-void PagePainter::draw_str(float x, float y, const string& str) {
-	y = height - y - font_size*0.8f;
-	float dx = x - text_x;
-	float dy = y - text_y;
+void PagePainter::draw_str(const vec2 &_p, const string& str) {
+	vec2 p = vec2(_p.x, height - _p.y - font_size*0.8f);
+	float dx = p.x - text_x;
+	float dy = p.y - text_y;
 	auto f = parser->font_get(font_name);
 	string s = _pdf_str_encode(_pdf_str_filter(str, f));
 	page->content += format("     %s %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", f->internal_name, font_size, dx, dy, s);
 
-	text_x = x;
-	text_y = y;
+	text_x = p.x;
+	text_y = p.y;
 }
 
 float PagePainter::get_str_width(const string& str) {
@@ -684,10 +679,10 @@ float PagePainter::get_str_width(const string& str) {
 	return font_size * s.num * 0.5f;
 }
 
-void PagePainter::draw_image(float x, float y, const Image *image) {
+void PagePainter::draw_image(const vec2 &d, const Image *image) {
 }
 
-void PagePainter::draw_mask_image(float x, float y, const Image *image) {
+void PagePainter::draw_mask_image(const vec2 &d, const Image *image) {
 }
 
 rect PagePainter::area() const {

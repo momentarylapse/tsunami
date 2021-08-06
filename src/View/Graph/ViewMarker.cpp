@@ -16,8 +16,8 @@ ViewMarker::ViewMarker(AudioViewTrack *parent, TrackMarker *_marker) {
 }
 
 
-HoverData ViewMarker::get_hover_data(float mx, float my) {
-	auto h = Node::get_hover_data(mx, my);
+HoverData ViewMarker::get_hover_data(const vec2 &m) {
+	auto h = Node::get_hover_data(m);
 	//h.vlayer = this;
 	h.marker = marker;
 	//h.vtrack = view->get_track(layer->track);
@@ -36,15 +36,15 @@ HoverData ViewMarker::get_hover_data(float mx, float my) {
 void ViewMarker::on_draw(Painter *p) {
 }
 
-bool ViewMarker::on_left_button_down(float mx, float my) {
+bool ViewMarker::on_left_button_down(const vec2 &m) {
 	return true;
 }
 
-bool ViewMarker::on_left_double_click(float mx, float my) {
+bool ViewMarker::on_left_double_click(const vec2 &m) {
 	return true;
 }
 
-bool ViewMarker::on_right_button_down(float mx, float my) {
+bool ViewMarker::on_right_button_down(const vec2 &m) {
 	return true;
 }
 

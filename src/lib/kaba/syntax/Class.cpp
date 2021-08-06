@@ -8,12 +8,14 @@ namespace kaba {
 ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;
+	allow_indirect_use = false;
 }
 
 ClassElement::ClassElement(const string &_name, const Class *_type, int64 _offset) {
 	name = _name;
 	offset = _offset;
 	type = _type;
+	allow_indirect_use = false;
 }
 
 string ClassElement::signature(bool include_class) const {

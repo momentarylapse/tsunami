@@ -41,6 +41,7 @@
 #include "../Helper/Graph/ScrollBar.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Helper/Drawing.h"
+#include "../../lib/math/vector.h"
 
 
 
@@ -67,8 +68,8 @@ public:
 		align.horizontal = AlignData::Mode::RIGHT;
 		hidden = true;
 	}
-	HoverData get_hover_data(float mx, float my) override {
-		auto h = ScrollBar::get_hover_data(mx, my);
+	HoverData get_hover_data(const vec2 &m) override {
+		auto h = ScrollBar::get_hover_data(m);
 		h.vlayer = vlayer;
 		return h;
 	}
@@ -204,15 +205,15 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 	color col2 = col;
 	col2.a *= 0.5f;
 	c->set_color(col2);
-	c->draw_rect(asx, area.y1,                              aex - asx, theme.SAMPLE_FRAME_HEIGHT);
-	c->draw_rect(asx, area.y2 - theme.SAMPLE_FRAME_HEIGHT, aex - asx, theme.SAMPLE_FRAME_HEIGHT);
+	c->draw_rect(rect(asx, aex, area.y1,                             area.y1 + theme.SAMPLE_FRAME_HEIGHT));
+	c->draw_rect(rect(asx, aex, area.y2 - theme.SAMPLE_FRAME_HEIGHT, area.y2));
 
 	c->set_color(col);
 	c->set_line_width(2);
-	c->draw_line(asx, area.y1, asx, area.y2);
-	c->draw_line(aex, area.y1, aex, area.y2);
-	c->draw_line(asx, area.y1, aex, area.y1);
-	c->draw_line(asx, area.y2, aex, area.y2);
+	c->draw_line({asx, area.y1}, {asx, area.y2});
+	c->draw_line({aex, area.y1}, {aex, area.y2});
+	c->draw_line({asx, area.y1}, {aex, area.y1});
+	c->draw_line({asx, area.y2}, {aex, area.y2});
 }
 
 
@@ -347,7 +348,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	float lw = c->get_str_width(text);
 	float dx = max(theme.CORNER_RADIUS, (x1-x0)/2 - lw/2);
 	if (allow_label) {
-		draw_boxed_str(c,  x0 + dx, y0 + frame_height, text, col, col_bg);
+		draw_boxed_str(c,  {x0 + dx, y0 + frame_height}, text, col, col_bg);
 	}
 
 
@@ -358,21 +359,21 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 		color cl = col_frame;
 		cl.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, true);
 		c->set_color(cl);
-		c->draw_line(x0, area.y1, x0, area.y2);
+		c->draw_line({x0, area.y1}, {x0, area.y2});
 	}
 	// right line
 	color cr = col_frame;
 	cr.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, last);
 	c->set_color(cr);
-	c->draw_line(x1, area.y1, x1, area.y2);
+	c->draw_line({x1, area.y1}, {x1, area.y2});
 	c->set_line_width(1.0f);
 
 	// top
 	c->set_color(col_frame);
-	c->draw_rect(x0, y0, x1-x0, frame_height);
+	c->draw_rect(rect(x0, x1, y0, y0 + frame_height));
 
 	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + frame_height));
-	marker_label_areas.set(marker, get_boxed_str_rect(c,  x0 + dx, y0 + 8, text));
+	marker_label_areas.set(marker, get_boxed_str_rect(c,  {x0 + dx, y0 + 8}, text));
 
 	c->set_font("", theme.FONT_SIZE, false, false);
 }
@@ -410,8 +411,8 @@ void AudioViewLayer::draw_fades(Painter *c) {
 		float x1, x2;
 		view->cam.range2screen(f.range(), x1, x2);
 		c->set_color(color(1,0,0.7f,0));
-		c->draw_line(x1, area.y1, x1, area.y2);
-		c->draw_line(x2, area.y1, x2, area.y2);
+		c->draw_line({x1, area.y1}, {x1, area.y2});
+		c->draw_line({x2, area.y1}, {x2, area.y2});
 
 		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.INWARD, 50);
 	}
@@ -512,7 +513,7 @@ void AudioViewLayer::update_header() {
 	//header->children[0]->hidden = layer->track->has_version_selection();
 }
 
-bool AudioViewLayer::on_left_button_down(float mx, float my) {
+bool AudioViewLayer::on_left_button_down(const vec2 &m) {
 	view->sel_temp = view->sel; // for diff selection
 
 	view->mode->left_click_handle(this);
@@ -534,7 +535,7 @@ bool AudioViewLayer::allow_handle_click_when_gaining_focus() const {
 	return false;
 }
 
-bool AudioViewLayer::on_left_double_click(float mx, float my) {
+bool AudioViewLayer::on_left_double_click(const vec2 &m) {
 	auto &h = view->hover();
 	int buffer_index = hover_buffer(h);
 
@@ -554,7 +555,7 @@ bool AudioViewLayer::on_left_double_click(float mx, float my) {
 	return true;
 }
 
-bool AudioViewLayer::on_right_button_down(float mx, float my) {
+bool AudioViewLayer::on_right_button_down(const vec2 &m) {
 	auto &h = view->hover();
 	if (view->hover_any_object()) {
 		if (!view->hover_selected_object()) {
@@ -613,12 +614,12 @@ string AudioViewLayer::get_tip() const {
 	return "";
 }
 
-HoverData AudioViewLayer::get_hover_data(float mx, float my) {
-	return view->mode->get_hover_data(this, mx, my);
+HoverData AudioViewLayer::get_hover_data(const vec2 &m) {
+	return view->mode->get_hover_data(this, m);
 }
 
-HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
-	auto s = view->hover_time(mx, my);
+HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
+	auto s = view->hover_time(m);
 	s.vlayer = this;
 	s.node = this;
 	s.vtrack = view->get_track(layer->track);
@@ -626,10 +627,10 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 
 	// markers
 	for (int i=0; i<min(layer->markers.num, marker_areas.num); i++) {
-		auto *m = layer->markers[i].get();
-		if (marker_areas.contains(m) and marker_label_areas.contains(m))
-			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)) {
-				s.marker = m;
+		auto *mm = layer->markers[i].get();
+		if (marker_areas.contains(mm) and marker_label_areas.contains(mm))
+			if (marker_areas[mm].inside(m) or marker_label_areas[mm].inside(m)) {
+				s.marker = mm;
 				s.type = HoverData::Type::MARKER;
 				return s;
 			}
@@ -653,7 +654,7 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 			int offset = 0;
 			for (int i=0; i<view->song->bars.num+1; i++) {
 				float x = view->cam.sample2screen(offset);
-				if (fabs(x - mx) < view->SNAPPING_DIST) {
+				if (fabs(x - m.x) < view->SNAPPING_DIST) {
 					s.index = i;
 					s.type = HoverData::Type::BAR_GAP;
 					s.pos = offset;
@@ -669,7 +670,7 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 		for (auto *b: bars) {
 			float x = view->cam.sample2screen(b->range().offset);
 			// test for label area...
-			if ((mx >= x) and (mx < x + 36) and (my < area.y1 + 20)) {
+			if ((m.x >= x) and (m.x < x + 36) and (m.y < area.y1 + 20)) {
 				//b.range.
 				s.bar = b;
 				s.index = b->index;

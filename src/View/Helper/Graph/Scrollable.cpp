@@ -10,7 +10,7 @@
 #include "../../../lib/hui/Event.h"
 
 
-ScrollPad::ScrollPad() : scenegraph::NodeRel(0,0,0,0) {
+ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 	set_perf_name("scrollpad");
@@ -18,11 +18,11 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel(0,0,0,0) {
 	scrollbar_v = new ScrollBar();
 	scrollbar_h->set_callback([&] (float offset) {
 		view_pos.x = offset;
-		move_view(0,0);
+		move_view({0,0});
 	});
 	scrollbar_v->set_callback([&] (float offset) {
 		view_pos.y = offset;
-		move_view(0,0);
+		move_view({0,0});
 	});
 	scrollbar_h->constrained = false;
 	scrollbar_v->constrained = false;
@@ -39,34 +39,34 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel(0,0,0,0) {
 
 
 // coord -> screen
-complex ScrollPad::project(const complex &p) {
+vec2 ScrollPad::project(const vec2 &p) {
 	return p - view_pos;
 }
 
 // screen -> coord
-complex ScrollPad::unproject(const complex &p) {
+vec2 ScrollPad::unproject(const vec2 &p) {
 	return p + view_pos;
 }
 
-bool ScrollPad::on_mouse_wheel(float dx, float dy) {
-	move_view(dx * 10, dy * 10);
+bool ScrollPad::on_mouse_wheel(const vec2 &d) {
+	move_view(d * 10);
 	return true;
 }
 
 bool ScrollPad::on_key(int key) {
 	if (key == hui::KEY_UP)
-		move_view(0, -10);
+		move_view({0, -10});
 	if (key == hui::KEY_DOWN)
-		move_view(0, 10);
+		move_view({0, 10});
 	if (key == hui::KEY_LEFT)
-		move_view(-10, 0);
+		move_view({-10, 0});
 	if (key == hui::KEY_RIGHT)
-		move_view(10, 0);
+		move_view({10, 0});
 	return false;
 }
 
-void ScrollPad::move_view(float dx, float dy) {
-	view_pos += complex(dx, dy);
+void ScrollPad::move_view(const vec2 &d) {
+	view_pos += d;
 	_update_scrolling();
 	request_redraw();
 }

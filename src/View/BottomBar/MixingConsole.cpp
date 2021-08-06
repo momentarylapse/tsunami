@@ -26,6 +26,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
+#include "../../lib/math/vector.h"
 #include <math.h>
 
 
@@ -132,7 +133,7 @@ public:
 				//float w = p->get_str_width(tt);
 				//p->draw_str((p->width - w) / 2, 8, tt);
 			}
-			draw_str_constrained(p, p->width/2, 8, p->width, tt, TextAlign::CENTER);
+			draw_str_constrained(p, {p->width/2.0f, 8}, p->width, tt, TextAlign::CENTER);
 		}
 
 		if (vtrack->track->type == SignalType::GROUP) {
@@ -141,7 +142,7 @@ public:
 				if (console->mixer[gm->get_index()]->shrunk)
 					any_shrunk = true;
 			shrink_button_x = p->width - 10;
-			p->draw_str(shrink_button_x, 8, any_shrunk ? ">" : "<");
+			p->draw_str(vec2(shrink_button_x, 8), any_shrunk ? ">" : "<");
 		}
 	}
 
@@ -158,7 +159,7 @@ public:
 		set_current();
 		auto view = console->view;
 
-		if (vtrack->track->type == SignalType::GROUP and (hui::GetEvent()->mx > shrink_button_x)) {
+		if (vtrack->track->type == SignalType::GROUP and (hui::GetEvent()->m.x > shrink_button_x)) {
 			bool any_shrunk = false;
 			for (auto gm: track_group_members(vtrack->track, false))
 				if (console->mixer[gm->get_index()]->shrunk)
@@ -247,14 +248,14 @@ public:
 		int w = p->width;
 		int h = p->height;
 		p->set_color(theme.background);
-		p->draw_rect(0, 0, w, h);
+		p->draw_rect(rect(0, w, 0, h));
 		p->set_color(theme.text);
 		float peak[2];
 		console->view->renderer->get_peak(track(), peak);
 		peak[0] = sqrt(peak[0]);
 		peak[1] = sqrt(peak[1]);
-		p->draw_rect(0,   h * (1 - peak[0]), w/2, h * peak[0]);
-		p->draw_rect(w/2, h * (1 - peak[1]), w/2, h * peak[1]);
+		p->draw_rect(rect(0, w/2,  h * (1 - peak[0]), 1));
+		p->draw_rect(rect(w/2, w, h * (1 - peak[1]), 1));
 	}
 	void update() {
 		if (!vtrack)

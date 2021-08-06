@@ -110,10 +110,12 @@ Any::Any(const string &s) : Any() {
 	as_string() = s;
 }
 
-Any::Any(const void *p) : Any() {
-	create_type(TYPE_POINTER);
-	as_pointer() = p;
-}
+Any::Any(const char *s) : Any(string(s)) {}
+
+//Any::Any(const void *p) : Any() {
+//	create_type(TYPE_POINTER);
+//	as_pointer() = p;
+//}
 
 Any::Any(const Array<Any> &a) : Any() {
 	create_type(TYPE_ARRAY);

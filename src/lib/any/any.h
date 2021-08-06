@@ -26,10 +26,11 @@ public:
 	Any(float f);
 	Any(bool b);
 	Any(const string &s);
+	Any(const char *s);
 	Any(const Array<Any> &a);
 	Any(const Array<int> &a);
 	Any(const AnyMap&m);
-	Any(const void *p);
+	//Any(const void *p);
 	~Any();
 	void _cdecl clear();
 	Any ref();

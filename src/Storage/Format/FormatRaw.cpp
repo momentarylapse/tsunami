@@ -33,7 +33,7 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 	if (!od->parameters.has("format"))
 		od->parameters.map_set("format", "f32");
 	if (!od->parameters.has("channels"))
-		od->parameters.map_set("channels", 2);
+		od->parameters.map_set("channels", 1);
 
 
 	auto dlg = ownify(new RawConfigDialog(od, od->win));

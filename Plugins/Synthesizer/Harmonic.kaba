@@ -25,8 +25,8 @@ class HarmonicGrid extends Grid
 	
 		# points
 		for i,n in hc.intensity
-			complex z0 = complex(n+1, 0)
-			complex z1 = complex(n+1, i)
+			var z0 = vec2(n+1, 0)
+			var z1 = vec2(n+1, i)
 			c.set_line_width(2)
 			draw_line2(c, z0, z1, n == Selected, n == Hover)
 			draw_point2(c, z1, n == Selected, n == Hover)
@@ -45,8 +45,8 @@ class HarmonicGrid extends Grid
 		# hover?
 			Hover = -1
 			for i,n in hc.intensity
-				complex p = project2(complex(n+1, i))
-				if (mx > p.x - 10) and (mx < p.x + 10)
+				var p = project2(vec2(n+1, i))
+				if (m.x > p.x - 10) and (m.x < p.x + 10)
 					Hover = n
 		redraw()
 

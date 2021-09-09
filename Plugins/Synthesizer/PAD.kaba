@@ -17,7 +17,7 @@ class PADConfig extends Module.Config
 		bwscale = 0.7
 		detune = 0.03
 	
-	func fill_curve(out c: complex[], n0: int)
+	func fill_curve(out c: vec2[], n0: int)
 		c.clear()
 		float n = n0 + 1
 		float nn = n + 0.03 * n * n
@@ -25,7 +25,7 @@ class PADConfig extends Module.Config
 		for x in 0.5 : 8.5 : 0.01
 			float dx = x - n
 			float y = exp(-dx*dx/_bw/_bw) * A[n0]
-			c.add(complex(x, y))
+			c.add(vec2(x, y))
 
 func gauss(f: float, bw: float) -> float
 	float x = f / bw
@@ -110,14 +110,14 @@ class PADGrid extends Grid
 		pc.A.resize(8)
 	
 		# curve + area below
-		complex[] curve
+		vec2[] curve
 		for a,i in pc.A
 			pc.fill_curve(curve, i)
 			draw_curve_b(c, curve, false, color.RED)
 	
 		# points
 		for a,i in pc.A
-			draw_point2(c, complex(i+1, a), i == selected, i == hover)
+			draw_point2(c, vec2(i+1, a), i == selected, i == hover)
 			
 	# left button down -> select
 	func override on_left_button_down()
@@ -133,8 +133,8 @@ class PADGrid extends Grid
 		# hover?
 			hover = -1
 			for a,i in pc.A
-				complex p = project2(complex(i+1, a))
-				if (mx > p.x - 10) and (mx < p.x + 10)
+				var p = project2(vec2(i+1, a))
+				if (m.x > p.x - 10) and (m.x < p.x + 10)
 					hover = i
 		redraw()
 

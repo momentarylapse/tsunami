@@ -54,7 +54,7 @@ Grid ? ''
 		
 		for pp,i in c.pitch_detector.pitch_power2
 			float x = (i-20) * 4
-			p.draw_line(x, 0, x, pp/13)
+			p.draw_line([x, 0], [x, pp/13])
 
 class SupernovaRhythm extends TsunamiPlugin
 	var panel: SNRPanel*

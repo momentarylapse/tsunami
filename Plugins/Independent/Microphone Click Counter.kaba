@@ -38,19 +38,19 @@ class ClickCounterPanel extends ConfigPanel
 		float y0 = 30
 		float y1 = p.height - 5
 		float h = y1 - y0
-		p.draw_rect(5, y0 + h * (1 - c.click_counter.volume), 5, h)
+		p.draw_rect([5, 10, y0 + h * (1 - c.click_counter.volume), y0 + h * (2 - c.click_counter.volume)])
 		p.set_color(colors.text_soft2)
-		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 	func on_draw(p: Painter)
 		p.set_color(colors.background)
 		p.set_font_size(12)
-		p.draw_rect(0, 0, p.width, p.height)
+		p.draw_rect([0, p.width, 0, p.height])
 	
 		draw_volume(p)
 	
 		p.set_color(colors.text)
-		p.draw_str(100, 100, str(c.click_counter.counter))
+		p.draw_str([100, 100], str(c.click_counter.counter))
 
 	func on_increase()
 		c.click_counter.counter ++

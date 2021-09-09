@@ -86,32 +86,32 @@ Grid ? ''
 		return max((height - y), 0) / 100
 	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		float e = log(v1/v0)
-		complex[] cc
+		vec2[] cc
 		for a in 0:1.01:0.05
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
-			cc.add(complex(t2x(t), v2y(v)))
+			cc.add(vec2(t2x(t), v2y(v)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(complex(t2x(t1), v2y(0)))
-		cc.add(complex(t2x(t0), v2y(0)))
+		cc.add(vec2(t2x(t1), v2y(0)))
+		cc.add(vec2(t2x(t0), v2y(0)))
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		complex[] cc
-		cc.add(complex(t2x(t0), v2y(v0)))
-		cc.add(complex(t2x(t1), v2y(v1)))
+		vec2[] cc
+		cc.add(vec2(t2x(t0), v2y(v0)))
+		cc.add(vec2(t2x(t1), v2y(v1)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(complex(t2x(t1), v2y(0)))
-		cc.add(complex(t2x(t0), v2y(0)))
+		cc.add(vec2(t2x(t1), v2y(0)))
+		cc.add(vec2(t2x(t0), v2y(0)))
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
@@ -122,7 +122,7 @@ Grid ? ''
 			col2 = colors.hoverify(col2)
 		p.set_color(col2)
 		p.set_line_width(2.0)
-		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
+		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
 		p.set_line_width(1)
 	
 	func draw_envelope(p: Painter, o: UnisonConfig)
@@ -142,26 +142,26 @@ Grid ? ''
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
-			p.draw_str(width - 100, height - 20, "attack {{o.attack * 1000|.1}} ms")
+			p.draw_str([width - 100, height - 20], "attack {{o.attack * 1000|.1}} ms")
 		else if hover == -11
-			p.draw_str(width - 100, height - 20, "decay {{o.decay * 1000|.1}} ms")
+			p.draw_str([width - 100, height - 20], "decay {{o.decay * 1000|.1}} ms")
 		else if hover == -12
-			p.draw_str(width - 100, height - 20, "release {{o.release * 1000|.1}} ms")
+			p.draw_str([width - 100, height - 20], "release {{o.release * 1000|.1}} ms")
 		else if hover == -13
-			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100|.0}} %")
+			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
 	func on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
-		p.draw_rect(0, 0, width, height)
+		p.draw_rect([0, width, 0, height])
 		
 		draw_envelope(p, fc)
 	
 	func get_hover() -> int
 		var e = hui.get_event()
-		float mx = e.mouse_x
-		float my = e.mouse_y
+		float mx = e.mouse.x
+		float my = e.mouse.y
 		if my > v2y(1.1)
 			var o = fc
 			if abs(mx - t2x(o.attack)) < 10
@@ -183,8 +183,8 @@ Grid ? ''
 		moving = -1
 	func on_mouse_move()
 		var e = hui.get_event()
-		float mx = e.mouse_x
-		float my = e.mouse_y
+		float mx = e.mouse.x
+		float my = e.mouse.y
 		if moving < -5
 			var o = fc
 			if moving == -10

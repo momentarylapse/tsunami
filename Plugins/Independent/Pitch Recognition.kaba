@@ -27,14 +27,14 @@ class PitchRecognitionPanel extends ConfigPanel
 		float y0 = 30
 		float y1 = p.height - 5
 		float h = y1 - y0
-		p.draw_rect(5, y0 + h * (1 - c.pitch_detector.volume), 5, h)
+		p.draw_rect([5, 10, y0 + h * (1 - c.pitch_detector.volume), y0 + h * (2 - c.pitch_detector.volume)])
 		p.set_color(color(0.6, 0.6, 0.6, 1))
-		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 	func on_draw(p: Painter)
 		p.set_color(colors.background)
 		p.set_font_size(12)
-		p.draw_rect(0, 0, p.width, p.height)
+		p.draw_rect([0, p.width, 0, p.height])
 	
 		draw_volume(p)
 	
@@ -47,17 +47,17 @@ class PitchRecognitionPanel extends ConfigPanel
 		p.set_color(colors.text_soft1)
 		for i in 0:9
 			float w = i * 0.125 * pi - pi / 2
-			p.draw_line(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
+			p.draw_line([x + r1 * sin(w), y - r1 * cos(w)], [x + r2 * sin(w), y - r2 * cos(w)])
 	
 		p.set_color(colors.text)
 		if c.pitch_detector.loud_enough
-			p.draw_str(x - 8, y - r2 - 22, get_note(c.pitch_detector.frequency))
-			p.draw_str(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
-			p.draw_str(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-			p.draw_str(5, 5, "{{c.pitch_detector.frequency|.1}} Hz")
-			p.draw_line(x, y, x + r * sin(note_error * pi), y - r * cos(note_error * pi))
+			p.draw_str([x - 8, y - r2 - 22], get_note(c.pitch_detector.frequency))
+			p.draw_str([x + r2 * 0.7 + 6, y - r2 * 0.7 - 22], "#")
+			p.draw_str([x - r2 * 0.7 - 10, y - r2 * 0.7 - 22], "b")
+			p.draw_str([5, 5], "{{c.pitch_detector.frequency|.1}} Hz")
+			p.draw_line([x, y], [x + r * sin(note_error * pi), y - r * cos(note_error * pi)])
 		else
-			p.draw_str(x - 30, y - 20, "too quiet")
+			p.draw_str([x - 30, y - 20], "too quiet")
 
 class PitchRecognition extends TsunamiPlugin
 	

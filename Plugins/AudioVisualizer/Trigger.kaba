@@ -49,7 +49,7 @@ Grid ? '' vertical
 		float h = p.height
 		
 		p.set_color(colors.background)
-		p.draw_rect(0, 0, w, h)
+		p.draw_rect([0, w, 0, h])
 		
 		float[] curve_before, curve_after
 		c.lock()
@@ -59,16 +59,16 @@ Grid ? '' vertical
 		
 		p.set_line_width(0.7)
 		p.set_color(color(0,1,0, 0.5))
-		p.draw_line(0,h/2, w,h/2)
-		p.draw_line(w/2,0, w/2,h)
+		p.draw_line([0,h/2], [w,h/2])
+		p.draw_line([w/2,0], [w/2,h])
 		
 		p.set_color(color(0,1,0, 1))
 		p.set_line_width(1.5)
-		complex[] z
+		vec2[] z
 		for v,i in curve_before
-			z.add(complex(w/2 - len(curve_before) + i, h/2 - h * v / 2))
+			z.add(vec2(w/2 - len(curve_before) + i, h/2 - h * v / 2))
 		for v,i in curve_after
-			z.add(complex(w/2 + i, h/2 - h * v / 2))
+			z.add(vec2(w/2 + i, h/2 - h * v / 2))
 		p.draw_lines(z)
 
 class TriggerConfig extends Module.Config

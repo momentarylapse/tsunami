@@ -28,7 +28,7 @@ class Peak
 		gain = _gain
 		q = _q
 	
-	func const z(g0: float) -> complex
+	func const z(g0: float) -> vec2
 		return [pitch_to_freq(pitch), gain + g0]
 	#float q()
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
@@ -140,35 +140,35 @@ class EqualizerGrid extends Grid
 		p.set_line_width(2)
 		p.set_color(colors.text_soft2)
 		p.set_line_dash([8.0,5.0])
-		p.draw_line(0,y, p.width,y)
+		p.draw_line([0,y], [p.width,y])
 		p.set_line_dash([8.0,0.0])
 	
 		# points
 		for pk,i in c.peaks
-			complex pp = project2(pk.z(c.gain))
+			var pp = project2(pk.z(c.gain))
 			
 			p.set_line_width(2)
 			color col = point_color(i == selected, i == hover)
 			color col2 = col
 			col2.a = 0.6
 			p.set_color(col2)
-			p.draw_line(pp.x, 0, pp.x, p.height)
+			p.draw_line([pp.x, 0], [pp.x, p.height])
 			
 			p.set_font_size(12)
-			draw_boxed_str(p, pp.x-5, 10, str(i+1), col_text, colors.text_soft3)
+			draw_boxed_str(p, [pp.x-5, 10], str(i+1), col_text, colors.text_soft3)
 			
 			draw_point2(p, pk.z(c.gain), i == selected, i == hover)
 			if i == hover
 				p.set_font_size(8)
 				p.set_color(col_hover)
-				p.draw_str(pp.x - 20, pp.y - 65, filter_name(pk.mode))
-				p.draw_str(pp.x - 20, pp.y - 50, "{{pitch_to_freq(pk.pitch)|.1}} Hz")
-				p.draw_str(pp.x - 20, pp.y - 35, "{{pk.gain|.1}} dB")
-				p.draw_str(pp.x - 20, pp.y - 20, "Q {{pk.q|.1}}")
+				p.draw_str([pp.x - 20, pp.y - 65], filter_name(pk.mode))
+				p.draw_str([pp.x - 20, pp.y - 50], "{{pitch_to_freq(pk.pitch)|.1}} Hz")
+				p.draw_str([pp.x - 20, pp.y - 35], "{{pk.gain|.1}} dB")
+				p.draw_str([pp.x - 20, pp.y - 20], "Q {{pk.q|.1}}")
 		if hover == HOVER_GAIN
 			p.set_font_size(8)
 			p.set_color(col_hover)
-			p.draw_str(mx - 20, y_axis.project(c.gain) - 20, "Gain {{c.gain|.1}} dB")
+			p.draw_str([m.x - 20, y_axis.project(c.gain) - 20], "Gain {{c.gain|.1}} dB")
 			
 
 	# left button down -> select
@@ -177,7 +177,7 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	func override on_mouse_wheel()
-		float dy = hui.get_event().scroll_y
+		float dy = hui.get_event().scroll.y
 		if hover >= 0
 			if dy > 0
 				c.peaks[hover].q *= 1.04
@@ -256,7 +256,7 @@ class EqualizerGrid extends Grid
 		else
 		# mouse over?
 			hover = -1
-			if abs(my - y_axis.project(c.gain)) < 10
+			if abs(m.y - y_axis.project(c.gain)) < 10
 				hover = HOVER_GAIN
 			for i in 0:len(c.peaks)
 				if mouse_over_point2(c.peaks[i].z(c.gain))

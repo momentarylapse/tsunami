@@ -9,7 +9,7 @@ const MIN_DB = -60.0
 
 class Compressor extends AudioEffect
 	class Config extends Module.Config
-		var curve: complex[]
+		var curve: vec2[]
 		var attack, release: float
 
 		func const fill_inter(out fi: FloatInterpolator)
@@ -21,8 +21,8 @@ class Compressor extends AudioEffect
 
 		func override reset()
 			curve.clear()
-			curve.add(complex(MIN_DB, MIN_DB))
-			curve.add(complex(0, 0))
+			curve.add(vec2(MIN_DB, MIN_DB))
+			curve.add(vec2(0, 0))
 			attack = 0.01
 			release = 0.1
 	var config: Config
@@ -111,10 +111,10 @@ class CompressorGrid extends Grid
 
 	# right button down -> new point
 	func override on_right_button_down()
-		complex m = get_mouse2()
+		var m = get_mouse2()
 		for i in 1:len(config.curve)
-			complex q = config.curve[i - 1]
-			complex p = config.curve[i]
+			var q = config.curve[i - 1]
+			var p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
 				cp.changed()

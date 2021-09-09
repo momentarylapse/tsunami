@@ -36,7 +36,7 @@ class SpecGrid extends Grid
 		for x in 0:w
 			for y in 0:h
 				im.set_pixel(x, y, im0.get_pixel(x * xa + xb, y * ya + yb))
-		c.draw_image(r.x1, r.y1, im)
+		c.draw_image([r.x1, r.y1], im)
 	
 		#Image *im = im0.scale(r.width(), r.height())
 #		c.DrawImage(r.x1, r.y1, *im)

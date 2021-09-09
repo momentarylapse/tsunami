@@ -13,7 +13,7 @@ const MAX_VOL = 35
 
 class HullCurve extends AudioEffect
 	class Config extends Module.Config
-		var curve: complex[]
+		var curve: vec2[]
 
 		func const fill_inter(out fi: FloatInterpolator)
 			fi.set_type("cubic-spline-notang")
@@ -24,8 +24,8 @@ class HullCurve extends AudioEffect
 
 		func override reset()
 			curve.clear()
-			curve.add(complex(0, 0))
-			curve.add(complex(1, 0))
+			curve.add(vec2(0, 0))
+			curve.add(vec2(1, 0))
 
 
 	var config: Config
@@ -81,9 +81,9 @@ class HullGrid extends Grid
 	# right button down -> new point
 	func override on_right_button_down()
 		for i in 1:len(config.curve)
-			complex q = project2(config.curve[i - 1])
-			complex p = project2(config.curve[i])
-			if (mx > q.x) and (mx < p.x)
+			var q = project2(config.curve[i - 1])
+			var p = project2(config.curve[i])
+			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(get_mouse2(), i)
 				cp.changed()
 				selected = i
@@ -112,8 +112,8 @@ class HullGrid extends Grid
 		# mouse over?
 			hover = -1
 			for c,i in config.curve
-				complex p = project2(c)
-				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+				var p = project2(c)
+				if len(m - p) < 5
 					hover = i
 		redraw()
 

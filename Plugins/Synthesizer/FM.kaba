@@ -71,14 +71,14 @@ class FMPanel extends ConfigPanel
 	var menu_osci: Menu*
 	
 	var width, height: float
-	var p_osci: complex[NUM_OSCILLATORS]
-	var p_out: complex
+	var p_osci: vec2[NUM_OSCILLATORS]
+	var p_out: vec2
 	
 	var moving, hover: int
 	
 	func add_top(label: string, id: string)
-		menu_top.add(label, "top-" + id)
-		event("top-" + id, on_topology)
+		menu_top.add(label, "top-{{id}}")
+		event("top-{{id}}", on_topology)
 	
 	var override c: FMSynthesizer*
 	func override __init__(_s: Module)
@@ -133,28 +133,28 @@ Grid ? ''
 	
 	func update_osci_pos()
 		# initial
-		p_out = complex(40, 60)
+		p_out = vec2(40, 60)
 		for p,i in p_osci
-			p = complex(100+15*i, i*20)#complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
+			p = vec2(100+15*i, i*20)#vec2((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
 			bool has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
 				has_links = has_links or t
 			if !has_links
-				p += complex(1000,1000)
+				p += vec2(1000,1000)
 		for i in 0:2000
 			iterate_osci_pos()
-	func _f_link(a: complex, b: complex) -> complex
-		float d = (b - a).abs()
-		complex dir = (b - a) * (1/d)
-		return dir * (d - LINK_LENGTH) * 0.1 + complex(0, (b.y-a.y) * 0.05)
-	func _f_free(a: complex, b: complex) -> complex
-		float d = (b - a).abs()
-		complex dir = (b - a) * (1/d)
+	func _f_link(a: vec2, b: vec2) -> vec2
+		float d = len(b - a)
+		vec2 dir = (b - a) * (1/d)
+		return dir * (d - LINK_LENGTH) * 0.1 + vec2(0, (b.y-a.y) * 0.05)
+	func _f_free(a: vec2, b: vec2) -> vec2
+		float d = len(b - a)
+		vec2 dir = (b - a) * (1/d)
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
 	func iterate_osci_pos()
-		complex[NUM_OSCILLATORS] f
+		vec2[NUM_OSCILLATORS] f
 		for o,i in fc.osc
-			f[i] = complex(0,0)
+			f[i] = vec2(0,0)
 			for o2,j in fc.osc
 				if i == j
 					continue
@@ -169,12 +169,12 @@ Grid ? ''
 	func linked(i: int, j: int) -> bool
 		return fc.osc[i].target[j] or fc.osc[j].target[i]
 	
-	func osci_pos(index: int) -> complex
+	func osci_pos(index: int) -> vec2
 		if index < 0
 			return p_out
 		return p_osci[index]
 
-	func draw_type(p: Painter, z: complex, type: int, _dx: float, amp: float)
+	func draw_type(p: Painter, z: vec2, type: int, _dx: float, amp: float)
 		var dx = _dx / pi
 		float v0 = 0
 		float t0 = -pi
@@ -188,7 +188,7 @@ Grid ? ''
 			else if type == TYPE_SAW
 				v = -1 + 2*loop(t, 0, pi) / pi
 			if t > t0
-				p.draw_line(z.x + t0*dx, z.y - v0*amp, z.x + t*dx, z.y - v*amp)
+				p.draw_line([z.x + t0*dx, z.y - v0*amp], [z.x + t*dx, z.y - v*amp])
 			t0 = t
 			v0 = v
 	
@@ -202,21 +202,21 @@ Grid ? ''
 		if index == hover
 			bg = colors.hoverify(bg)
 		p.set_color(bg)
-		p.draw_circle(z.x, z.y, 15)
+		p.draw_circle([z.x, z.y], 15)
 	
 		var o = fc.osc[index]
 		p.set_color(col)
-		draw_type(p, z - complex(0,2), o.type, 9, 5.5)
+		draw_type(p, z - vec2(0,2), o.type, 9, 5.5)
 		int f = o.factor + 0.5
 		p.set_font_size(7)
 		#p.set_color(colors.text_soft1)
-		p.draw_str(z.x-4, z.y+6, "x{{f}}")
+		p.draw_str([z.x-4, z.y+6], "x{{f}}")
 	
 	func draw_link(p: Painter, a: int, b: int)
 		p.set_color(colors.text_soft1)
 		var z1 = osci_pos(a)
 		var z2 = osci_pos(b)
-		p.draw_line(z1.x - 18, z1.y, z2.x + 18, z2.y)
+		p.draw_line([z1.x - 18, z1.y], [z2.x + 18, z2.y])
 	
 	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)
@@ -228,32 +228,32 @@ Grid ? ''
 		return max((height - y), 0) / 100
 	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		float e = log(v1/v0)
-		complex[] cc
+		vec2[] cc
 		for a in 0:1.01:0.05
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
-			cc.add(complex(t2x(t), v2y(v)))
+			cc.add(vec2(t2x(t), v2y(v)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(complex(t2x(t1), v2y(0)))
-		cc.add(complex(t2x(t0), v2y(0)))
+		cc.add(vec2(t2x(t1), v2y(0)))
+		cc.add(vec2(t2x(t0), v2y(0)))
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		complex[] cc
-		cc.add(complex(t2x(t0), v2y(v0)))
-		cc.add(complex(t2x(t1), v2y(v1)))
+		vec2[] cc
+		cc.add(vec2(t2x(t0), v2y(v0)))
+		cc.add(vec2(t2x(t1), v2y(v1)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(complex(t2x(t1), v2y(0)))
-		cc.add(complex(t2x(t0), v2y(0)))
+		cc.add(vec2(t2x(t1), v2y(0)))
+		cc.add(vec2(t2x(t0), v2y(0)))
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
@@ -264,7 +264,7 @@ Grid ? ''
 			col2 = colors.hoverify(col2)
 		p.set_color(col2)
 		p.set_line_width(2.0)
-		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
+		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
 		p.set_line_width(1)
 	
 	func draw_envelope(p: Painter, o: OscillatorConfig)
@@ -284,26 +284,26 @@ Grid ? ''
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
-			p.draw_str(width - 100, height - 20, "attack {{o.attack * 1000|.1}} ms")
+			p.draw_str([width - 100, height - 20], "attack {{o.attack * 1000|.1}} ms")
 		else if hover == -11
-			p.draw_str(width - 100, height - 20, "decay {{o.decay * 1000|.0}} ms")
+			p.draw_str([width - 100, height - 20], "decay {{o.decay * 1000|.0}} ms")
 		else if hover == -12
-			p.draw_str(width - 100, height - 20, "release {{o.release * 1000|.0}} ms")
+			p.draw_str([width - 100, height - 20], "release {{o.release * 1000|.0}} ms")
 		else if hover == -13
-			p.draw_str(width - 100, height - 20, "sustain {{o.sustain * 100|.0}} %")
+			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
 	func on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
-		p.draw_rect(0, 0, width, height)
+		p.draw_rect([0,width, 0,height])
 		
 		p.set_roundness(5)
 		p.set_color(colors.blob_bg_hidden)
-		p.draw_rect(0, p_out.y-20, p_out.x+15, 40)
+		p.draw_rect([0, p_out.x+15, p_out.y-20, p_out.y+20])
 		p.set_roundness(0)
 		p.set_color(colors.text_soft1)
-		p.draw_str(p_out.x-32, p_out.y-10, "out")
+		p.draw_str([p_out.x-32, p_out.y-10], "out")
 		
 		for j in 0:NUM_OSCILLATORS
 			draw_osci(p, j)
@@ -318,8 +318,8 @@ Grid ? ''
 	
 	func get_hover() -> int
 		var e = hui.get_event()
-		float mx = e.mouse_x
-		float my = e.mouse_y
+		float mx = e.mouse.x
+		float my = e.mouse.y
 		for i in 0:NUM_OSCILLATORS
 			var z = osci_pos(i)
 			if abs(mx - z.x) + abs(my - z.y) < 20
@@ -347,8 +347,8 @@ Grid ? ''
 		moving = -1
 	func on_mouse_move()
 		var e = hui.get_event()
-		float mx = e.mouse_x
-		float my = e.mouse_y
+		float mx = e.mouse.x
+		float my = e.mouse.y
 		if moving < -5 and chosen >= 0
 			var o = &fc.osc[chosen]
 			if moving == -10

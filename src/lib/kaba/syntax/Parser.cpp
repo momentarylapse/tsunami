@@ -2400,16 +2400,26 @@ shared<Node> Parser::parse_statement_let(Block *block) {
 	return cmd;
 }
 
+Array<string> parse_comma_sep_list(Parser *p) {
+	Array<string> names;
+
+	names.add(p->Exp.cur);
+	p->Exp.next();
+
+	while (p->Exp.cur == ",") {
+		p->Exp.next(); // ","
+		names.add(p->Exp.cur);
+		p->Exp.next();
+	}
+	return names;
+}
+
 // local (variable) definitions...
 shared<Node> Parser::parse_statement_var(Block *block) {
-	Array<string> names;
+	Exp.next(); // "var"
 	const Class *type = nullptr;
 
-	do {
-		Exp.next(); // "var" or ","
-		names.add(Exp.cur);
-		Exp.next();
-	} while (Exp.cur == ",");
+	auto names = parse_comma_sep_list(this);
 
 	// explicit type?
 	if (Exp.cur == ":") {
@@ -3227,13 +3237,13 @@ bool Parser::parse_class(Class *_namespace) {
 		} else if (Exp.cur == IDENTIFIER_CONST) {
 			parse_named_const(_class, tree->root_of_all_evil->block.get());
 		} else if (Exp.cur == IDENTIFIER_VAR) {
-			if (_class->is_interface())
-				do_error("interfaces can not have data elements");
+			Exp.next(); // "var"
 			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
 		} else if (Exp.cur == IDENTIFIER_USE) {
 			parse_class_use_statement(_class);
 		} else {
-			do_error("unknown definition inside a class");
+			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
+			//do_error("unknown definition inside a class");
 		}
 	}
 
@@ -3370,21 +3380,13 @@ void Parser::parse_named_const(Class *name_space, Block *block) {
 }
 
 void Parser::parse_class_variable_declaration(const Class *ns, Block *block, int &_offset, Flags flags0) {
-	Exp.next(); // "var"
+	if (ns->is_interface())
+		do_error("interfaces can not have data elements");
 
 	Flags flags = parse_flags(flags0);
 
-	Array<string> names;
+	auto names = parse_comma_sep_list(this);
 	const Class *type = nullptr;
-
-	names.add(Exp.cur);
-	Exp.next();
-
-	while (Exp.cur == ",") {
-		Exp.next(); // ","
-		names.add(Exp.cur);
-		Exp.next();
-	}
 
 	// explicit type?
 	if (Exp.cur == ":") {
@@ -3780,6 +3782,7 @@ void Parser::parse_top_level() {
 			parse_named_const(tree->base_class, tree->root_of_all_evil->block.get());
 
 		} else if (Exp.cur == IDENTIFIER_VAR) {
+			Exp.next(); // "var"
 			int offset = 0;
 			parse_class_variable_declaration(tree->base_class, tree->root_of_all_evil->block.get(), offset, Flags::STATIC);
 

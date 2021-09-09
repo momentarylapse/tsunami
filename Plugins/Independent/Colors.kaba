@@ -26,9 +26,9 @@ Grid ? '' vertical
 			p.set_color(c.e1)
 			p.draw_rect(rect(0,w, i*20,i*20 + 20))
 			p.set_color(color.BLACK)
-			p.draw_str(0,i*20, c.e0)
+			p.draw_str([0,i*20], c.e0)
 			p.set_color(color.WHITE)
-			p.draw_str(200,i*20, c.e0)
+			p.draw_str([200,i*20], c.e0)
 #		find_colors(self, "area", cols)
 #		for c,i in cols
 #			p.set_color(c)

@@ -30,7 +30,7 @@ var peak_max: float
 
 class SpecGrid extends Grid
 	var type: int
-	var pr, pl: complex[]
+	var pr, pl: vec2[]
 
 	func create_lines()
 		pr.resize(N)

@@ -14,7 +14,7 @@ const MOTION_BLUR_COUNT = 20
 
 
 class BlurredDot
-	var pos, pos0: complex
+	var pos, pos0: vec2
 	var has_prev = false
 	func move(x: float, y: float)
 		pos0 = pos
@@ -33,10 +33,10 @@ class BlurredDot
 			p.set_color(cc)
 			for t in 0.0:1.0:dt
 				float tt = pow(t-0.5, 3)*4+0.5
-				p.draw_circle(pos.x * tt + pos0.x * (1-tt), pos.y * tt + pos0.y * (1-tt), r)
+				p.draw_circle([pos.x * tt + pos0.x * (1-tt), pos.y * tt + pos0.y * (1-tt)], r)
 		else
 			p.set_color(c)
-			p.draw_circle(pos.x, pos.y, r)
+			p.draw_circle(pos, r)
 
 class MetronomePanel extends ConfigPanel
 	var override c: Metronome*
@@ -128,19 +128,19 @@ Grid ? '' vertical
 		if allow_blink_background
 			bg = color.interpolate(color.RED, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
-		p.draw_rect(0, 0, w, h)
+		p.draw_rect([0, w, 0, h])
 		
 		if mode == MODE_CIRCLE
 			# circle
 			p.set_line_width(r*0.05)
 			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
 			p.set_fill(false)
-			p.draw_circle(x0, y0, r)
+			p.draw_circle([x0, y0], r)
 		
 			# top point
 			p.set_fill(true)
 			p.set_color(colors.text_soft3)
-			p.draw_circle(x0, y0 - r, r*0.07)
+			p.draw_circle([x0, y0 - r], r*0.07)
 		
 			# moving point
 			float t = beat_fraction - 0.5
@@ -156,9 +156,9 @@ Grid ? '' vertical
 			for i in 0:num_beats
 				float tx = loop((i + 0.5)/num_beats, 0, 1)
 				if i == 0
-					p.draw_circle(w * tx, y0 + r, r*0.05)
+					p.draw_circle([w * tx, y0 + r], r*0.05)
 				else
-					p.draw_circle(w * tx, y0 + r, r*0.03)
+					p.draw_circle([w * tx, y0 + r], r*0.03)
 			
 			float t = beat_fraction
 			float tx = loop(bar_fraction + 0.5/num_beats, 0, 1)
@@ -178,7 +178,7 @@ Grid ? '' vertical
 		if paused
 			p.set_font_size(fs)
 			p.set_color(color.interpolate(colors.grid, colors.background, 0.2))
-			p.draw_str(x0-fs*0.4, y0-fs/2, "⏸")
+			p.draw_str([x0-fs*0.4, y0-fs/2], "⏸")
 		else
 			if cur_beat == 0
 				p.set_color(colors.text)
@@ -186,7 +186,7 @@ Grid ? '' vertical
 				fs *= 0.8
 				p.set_color(colors.text_soft2)
 			p.set_font_size(fs)
-			p.draw_str(x0-fs*0.4, y0-fs/2, str(cur_beat + 1))
+			p.draw_str([x0-fs*0.4, y0-fs/2], str(cur_beat + 1))
 		
 		fraction_prev = beat_fraction
 	

@@ -774,7 +774,7 @@ func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> Sample
 
 func extern ChooseModule(parent: Panel, session: Session, type: int, old_name: string) -> string
 
-func extern draw_boxed_str(c: Painter, x: float, y: float, str: string, col_text: color, col_bg: color)
+func extern draw_boxed_str(c: Painter, p: vec2, str: string, col_text: color, col_bg: color)
 
 #extern void get_style_colors(Panel p, string id, color{} colors)
 func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])

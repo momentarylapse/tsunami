@@ -24,8 +24,8 @@ public:
 	void __delete__();
 	void update(const Array<Texture*> &attachments);
 	void update_x(const Array<Texture*> &attachments, int cube_face);
-	Array<Texture*> color_attachments;
-	DepthBuffer *depth_buffer;
+	shared_array<Texture> color_attachments;
+	shared<DepthBuffer> depth_buffer;
 	unsigned int frame_buffer;
 	int width, height;
 	int multi_samples;

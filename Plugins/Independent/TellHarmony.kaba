@@ -73,5 +73,5 @@ class TellHarmony extends TsunamiPlugin
 			float x2 = session.view.cam.sample2screen(h.range.end())
 			p.draw_rect(rect(x1, x2, v.area.y1, v.area.y2))
 			p.set_color(colors.text)
-			p.draw_str(x1, v.area.y1, "{{h.chord.name()}}")
-			p.draw_str(x1, v.area.y1+30, [for _p in h.pp rel_pitch_name(_p)].join(" "))
+			p.draw_str([x1, v.area.y1], "{{h.chord.name()}}")
+			p.draw_str([x1, v.area.y1+30], [for _p in h.pp rel_pitch_name(_p)].join(" "))

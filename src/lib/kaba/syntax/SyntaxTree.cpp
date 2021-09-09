@@ -13,6 +13,7 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
 extern const Class *TypeSharedPointer;
 extern const Class *TypeMatrix;
+extern const Class *TypeVec2;
 
 extern ExpressionBuffer *cur_exp_buf;
 
@@ -233,7 +234,7 @@ void SyntaxTree::digest() {
 	transform([&](shared<Node> n){
 		if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
 			return n;
-		if ((n->type == TypeVector) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
+		if ((n->type == TypeVector) or (n->type == TypeVec2) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
 			return make_constructor_static(n, "_create");
 		}
 		if (n->type == TypeQuaternion) {

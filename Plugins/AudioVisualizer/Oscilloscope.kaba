@@ -27,7 +27,7 @@ DrawingArea area '' height=200 expandy")
 		float h = p.height
 		
 		p.set_color(colors.background)
-		p.draw_rect(0, 0, w, h)
+		p.draw_rect([0, w, 0, h])
 		
 		AudioBuffer buf
 		c.ring_buffer.peek(buf, NUM_SAMPLES, RingBuffer.PeekMode.BACKWARD_COPY_WRAP)
@@ -39,7 +39,7 @@ DrawingArea area '' height=200 expandy")
 			y1 = h * (buf.c[1][i] / 2 + 0.5)
 			p.set_color(color(0,1,0, float(i) / NUM_SAMPLES))
 			if i > 0
-				p.draw_line(x0, y0, x1, y1)
+				p.draw_line([x0, y0], [x1, y1])
 			x0 = x1
 			y0 = y1
 

@@ -56,7 +56,7 @@ func find_beats(buf: AudioBuffer, sample_rate: int)
 		print("{{float(sample_rate)/(d*FRAME_STEP)*60|.1}}   {{c}}")
 
 class CorrelationGrid extends Grid
-	var curve: complex[]
+	var curve: vec2[]
 	var bpm_opt: float
 	var i_opt: int
 	var para: float[]
@@ -67,9 +67,9 @@ class CorrelationGrid extends Grid
 	func mouse_index() -> int
 		var q = [for c in curve project2(c)]
 		int index = 0
-		float dmin = mx
+		float dmin = m.x
 		for c,i in q
-			var d = abs(mx - c.x)
+			var d = abs(m.x - c.x)
 			if d < dmin
 				dmin = d
 				index = i
@@ -100,15 +100,15 @@ class CorrelationGrid extends Grid
 		
 		p.set_color(colors.selection)
 		var x = x_axis.project(bpm_opt)
-		p.draw_line(x, 0, x, p.height)
+		p.draw_line([x, 0], [x, p.height])
 		p.set_font_size(8)
-		p.draw_str(x+3, plot_area.y2-20, "{{bpm_opt|.1}} bpm")
+		p.draw_str([x+3, plot_area.y2-20], "{{bpm_opt|.1}} bpm")
 		
 		
 		for c,i in curve[i_opt-NN:i_opt+NN+1]
 			float y = (para[1] - para[2] * (i-para[0])^2)
-			complex pp = project2(complex(curve[i_opt-NN+i].x, y))
-			p.draw_circle(pp.x, pp.y, 3)
+			var pp = project2(vec2(curve[i_opt-NN+i].x, y))
+			p.draw_circle([pp.x, pp.y], 3)
 	
 	func override on_mouse_move()
 		hover_peak = peak_around_mouse()
@@ -234,7 +234,7 @@ Grid ? '' vertical
 				_cmax = c
 				i_opt = d - dmin
 		var cmax = [for c in grid.curve c.y].max()
-		grid.curve = [for c in grid.curve complex(c.x, c.y/cmax*100)]
+		grid.curve = [for c in grid.curve vec2(c.x, c.y/cmax*100)]
 		grid.bpm_opt = d_to_bpm(dmin + i_opt)
 		grid.i_opt = i_opt
 		

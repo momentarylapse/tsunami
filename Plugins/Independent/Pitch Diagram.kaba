@@ -38,34 +38,34 @@ func DrawVolume(c: Painter)
 	float y0 = 30
 	float y1 = c.height - 5
 	float h = y1 - y0
-	c.draw_rect(5, y0 + h * (1 - Volume), 5, h)
+	c.draw_rect([5, 10, y0 + h * (1 - Volume), y0 + h * (2 - Volume)])
 	c.set_color(color(0.6, 0.6, 0.6, 1))
-	c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+	c.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 func Draw(c: Painter)
 	c.set_color(color.WHITE)
 	c.set_font_size(12)
 	int w = c.width
 	int h = c.height
-	c.draw_rect(0, 0, w, h)
+	c.draw_rect([0, w, 0, h])
 	
 	DrawVolume(c)
 	
 	c.set_color(color.BLACK)
-	c.draw_str(20, 20, "{{Frequency|.1}} Hz")
-	c.draw_str(20, 40, "{{Volume|.3}}")
+	c.draw_str([20, 20], "{{Frequency|.1}} Hz")
+	c.draw_str([20, 40], "{{Volume|.3}}")
 	for p,i in played
 		if p < 0
 			continue
 		float x = i
 		float y = h - h * (p - 40.0) / 60.0
-		c.draw_line(x, y, x + 2, y)
+		c.draw_line([x, y], [x + 2, y])
 	
 	c.set_color(color.BLACK)
 	if LoudEnough
-		c.draw_str(120, 20, rel_pitch_name(played[len(played) - 1] % 12))
+		c.draw_str([120, 20], rel_pitch_name(played[len(played) - 1] % 12))
 	else
-		c.draw_str(w / 2 - 30, h / 2 - 20, "too quiet")
+		c.draw_str([w / 2 - 30, h / 2 - 20], "too quiet")
 
 func OnClose()
 	del win

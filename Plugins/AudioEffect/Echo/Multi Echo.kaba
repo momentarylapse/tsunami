@@ -96,9 +96,9 @@ class MultiEchoGrid extends Grid
 		float dt = 0.05
 		float dv = pow(r.feedback, dt/r.delay)
 		int n = min(100, x_axis.val_max/dt + 1)
-		complex[] cc
+		vec2[] cc
 		for i in 0:n
-			cc.add(project2(complex(t, v)))
+			cc.add(project2(vec2(t, v)))
 			v *= dv
 			t += dt
 		c.set_color(color.interpolate(color.RED, colors.text_soft2, 0.3))
@@ -112,13 +112,13 @@ class MultiEchoGrid extends Grid
 		int n = min(100, x_axis.val_max/r.delay)
 		c.set_line_width(1.5)
 		for i in 0:n
-			complex p = project2(complex(t, v))
+			vec2 p = project2(vec2(t, v))
 			if i == 0
 				c.set_color(colors.text_soft1)
 			else
-				draw_point2(c, complex(t,v), false, false)
+				draw_point2(c, vec2(t,v), false, false)
 				c.set_color(colors.text_soft2)
-			c.draw_line(p.x, c.height, p.x, p.y)
+			c.draw_line([p.x, c.height], [p.x, p.y])
 			v *= r.feedback
 			t += r.delay
 		c.set_line_width(1)
@@ -132,9 +132,7 @@ class MultiEchoGrid extends Grid
 	
 		# points
 		for r,i in config.refl
-			complex z
-			z.x = r.delay
-			z.y = r.volume
+			var z = vec2(r.delay, r.volume)
 			draw_point2(c, z, i == selected, i == hover)
 	
 		if hover >= 0
@@ -146,9 +144,9 @@ class MultiEchoGrid extends Grid
 		float x = x_axis.project(r.delay)
 		float y = y_axis.project(r.volume)
 		
-		p.draw_str(x - 20, y - 50, "delay: {{r.delay * 1000|.0}} ms")
-		p.draw_str(x - 20, y - 35, "volume: {{r.volume * 100.0|.0}} %")
-		p.draw_str(x - 20, y - 20, "feedback: {{r.feedback * 100|.1}} %")
+		p.draw_str([x - 20, y - 50], "delay: {{r.delay * 1000|.0}} ms")
+		p.draw_str([x - 20, y - 35], "volume: {{r.volume * 100.0|.0}} %")
+		p.draw_str([x - 20, y - 20], "feedback: {{r.feedback * 100|.1}} %")
 
 	# left button down -> select
 	func override on_left_button_down()
@@ -187,11 +185,9 @@ class MultiEchoGrid extends Grid
 
 	func get_hover() -> int
 		for r,i in config.refl
-			complex z
-			z.x = r.delay
-			z.y = r.volume
-			complex p = project2(z)
-			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+			var z = vec2(r.delay, r.volume)
+			var p = project2(z)
+			if (m.x > p.x - 5) and (m.x < p.x + 5) and (m.y > p.y - 5) and (m.y < p.y + 5)
 				return i
 		return -1
 
@@ -207,7 +203,7 @@ class MultiEchoGrid extends Grid
 	
 	func override on_mouse_wheel()
 		if hover >= 0
-			config.refl[hover].feedback *= exp(hui.get_event().scroll_y * 0.02)
+			config.refl[hover].feedback *= exp(hui.get_event().scroll.y * 0.02)
 			redraw()
 			cp.changed()
 

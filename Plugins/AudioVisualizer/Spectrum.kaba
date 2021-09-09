@@ -20,7 +20,7 @@ func todb(v: float) -> float
 
 class SpecGrid extends Grid
 	var type: int
-	var pr, pl: complex[]
+	var pr, pl: vec2[]
 	var ffr, ffl: float[]
 	
 	func override __init__()

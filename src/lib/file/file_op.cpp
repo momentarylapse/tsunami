@@ -180,7 +180,13 @@ string file_hash(const Path &filename, const string &type) {
 
 string shell_execute(const string &cmd) {
 #ifdef OS_LINUX
-	FILE *f = popen(cmd.c_str(), "r");
+	// thread safe...
+	char *s = new char[cmd.num + 1];
+	memcpy(s, cmd.data, cmd.num);
+	s[cmd.num] = 0;
+	FILE *f = popen(s, "r");
+	delete[] s;
+	//FILE *f = popen(cmd.c_str(), "r");
 	string buffer;
 
 	while (true) {

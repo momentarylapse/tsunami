@@ -57,12 +57,12 @@ void SIAddPackageThread() {
 		class_add_func("run", TypeBool, thread_p(&ThreadedWork::run));
 			func_add_param("total_size", TypeInt);
 			func_add_param("partition_size", TypeInt);
-		class_add_func_virtual("on_step", TypeVoid, thread_p(&ThreadedWork::doStep));
+		class_add_func_virtual("on_step", TypeVoid, thread_p(&ThreadedWork::on_step));
 			func_add_param("index", TypeInt);
 			func_add_param("worker_id", TypeInt);
-		class_add_func_virtual("on_status", TypeBool, thread_p(&ThreadedWork::onStatus));
-		class_add_func("get_total", TypeInt, thread_p(&ThreadedWork::getTotal));
-		class_add_func("get_done", TypeInt, thread_p(&ThreadedWork::getDone));
+		class_add_func_virtual("on_status", TypeBool, thread_p(&ThreadedWork::on_status));
+		class_add_func("get_total", TypeInt, thread_p(&ThreadedWork::get_total));
+		class_add_func("get_done", TypeInt, thread_p(&ThreadedWork::get_done));
 #ifdef _X_USE_THREADS_
 		class_set_vtable(ThreadedWork);
 #endif

@@ -64,6 +64,7 @@ enum class InstID {
 	DB,
 	DW,
 	DD,
+	DQ,
 	DS,
 	DZ,
 	ALIGN_OPCODE,
@@ -250,6 +251,16 @@ enum class InstID {
 	UCOMISS,
 	UCOMISD,
 
+	WRMSR,
+	RDTSC,
+	RDMSR,
+	RDPMC,
+	CPUID,
+	LFENCE,
+	MFENCE,
+	SFENCE,
+	CLFLUSH,
+
 	SYSCALL,
 	SYSRET,
 	SYSENTER,
@@ -396,12 +407,12 @@ struct AsmData {
 struct BitChange {
 	int cmd_pos;
 	int offset; // relative to code_origin (Opcode[0])
-	int bits;
+	int bits_size;
 };
 
 struct MetaInfo {
 	int64 code_origin; // how to interpret opcode buffer[0]
-	bool mode16;
+	int bits_size;
 	int line_offset; // number of script lines preceding asm block (to give correct error messages)
 
 	//Array<Label> label;
@@ -411,7 +422,7 @@ struct MetaInfo {
 	Array<BitChange> bit_change;
 	Array<GlobalVar> global_var;
 
-	MetaInfo();
+	MetaInfo(int bits_size);
 };
 
 struct Register;
@@ -429,6 +440,8 @@ struct InstructionParam {
 	int64 value; // disp or immediate
 	bool is_label;
 	bool write_back;
+
+	bool has_explicit_size() const;
 	string str(bool hide_size = false);
 };
 
@@ -440,7 +453,7 @@ struct InstructionWithParams {
 	int size;
 	int addr_size;
 	int param_size;
-	string str(bool hide_size = false);
+	string str();
 };
 
 
@@ -483,12 +496,11 @@ struct InstructionWithParamsList : public Array<InstructionWithParams> {
 	// new label system
 	int create_label(const string &name);
 	int _find_label(const string &name);
-	void insert_label(int index);
+	void insert_location_label(int index);
 	int64 _label_value(int index);
 
 
-	int add_label(const string &name);
-	int get_label(const string &name);
+	int find_or_create_label(const string &name);
 	void *get_label_value(const string &name);
 
 	void add_wanted_label(int pos, int label_no, int inst_no, bool rel, bool abs, int size);

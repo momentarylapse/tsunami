@@ -203,7 +203,7 @@ SyntaxTree::SyntaxTree(Script *_script) {
 	flag_function_pointer_as_code = false;
 	flag_immortal = false;
 	script = _script;
-	asm_meta_info = new Asm::MetaInfo;
+	asm_meta_info = new Asm::MetaInfo(config.pointer_size);
 	parser = nullptr;
 }
 

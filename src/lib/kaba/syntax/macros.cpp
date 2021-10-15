@@ -147,8 +147,7 @@ void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just
 }
 
 // ... maybe some time later
-void Parser::pre_compiler(bool just_analyse)
-{
+void Parser::parse_macros(bool just_analyse) {
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
 	
@@ -156,10 +155,6 @@ void Parser::pre_compiler(bool just_analyse)
 		Exp.set(0, i);
 		if (Exp.cur[0] == '#') {
 			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
-		} else if ((Exp.cur_line->indent == 0) and ((Exp.line[i].exp[0].name == IDENTIFIER_USE) or (Exp.line[i].exp[0].name == IDENTIFIER_IMPORT))) {
-			parse_import();
-			Exp.line.erase(i);
-			i --;
 		} else {
 			Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
 

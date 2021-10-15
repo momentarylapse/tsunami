@@ -245,10 +245,10 @@ OBJ = Action/Bar/Action__ScaleData.o \
  lib/kaba/syntax/Identifier.o \
  lib/kaba/syntax/implicit.o \
  lib/kaba/syntax/lexical.o \
+ lib/kaba/syntax/macros.o \
  lib/kaba/syntax/Node.o \
  lib/kaba/syntax/Operator.o \
  lib/kaba/syntax/Parser.o \
- lib/kaba/syntax/precompiler.o \
  lib/kaba/syntax/preprocessor.o \
  lib/kaba/syntax/Statement.o \
  lib/kaba/syntax/SyntaxTree.o \
@@ -1177,6 +1177,9 @@ lib/kaba/syntax/implicit.o : lib/kaba/syntax/implicit.cpp lib/kaba/kaba.h lib/ba
 lib/kaba/syntax/lexical.o : lib/kaba/syntax/lexical.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/kaba/syntax/lexical.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/Class.h lib/base/pointer.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Flags.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h
 	$(CPP) -c lib/kaba/syntax/lexical.cpp -o $@ $(CXXFLAGS)
 
+lib/kaba/syntax/macros.o : lib/kaba/syntax/macros.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/file/path.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/CompilerConfiguration.h lib/kaba/syntax/Flags.h lib/kaba/lib/extern.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h lib/kaba/syntax/Parser.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
+	$(CPP) -c lib/kaba/syntax/macros.cpp -o $@ $(CXXFLAGS)
+
 lib/kaba/syntax/Node.o : lib/kaba/syntax/Node.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/file/path.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/CompilerConfiguration.h lib/kaba/syntax/Flags.h lib/kaba/lib/extern.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
 	$(CPP) -c lib/kaba/syntax/Node.cpp -o $@ $(CXXFLAGS)
 
@@ -1185,9 +1188,6 @@ lib/kaba/syntax/Operator.o : lib/kaba/syntax/Operator.cpp lib/kaba/syntax/Operat
 
 lib/kaba/syntax/Parser.o : lib/kaba/syntax/Parser.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/file/path.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/CompilerConfiguration.h lib/kaba/syntax/Flags.h lib/kaba/lib/extern.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/kaba/syntax/Parser.h lib/config.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/common.h
 	$(CPP) -c lib/kaba/syntax/Parser.cpp -o $@ $(CXXFLAGS)
-
-lib/kaba/syntax/precompiler.o : lib/kaba/syntax/precompiler.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/file/path.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/CompilerConfiguration.h lib/kaba/syntax/Flags.h lib/kaba/lib/extern.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h lib/kaba/syntax/Parser.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
-	$(CPP) -c lib/kaba/syntax/precompiler.cpp -o $@ $(CXXFLAGS)
 
 lib/kaba/syntax/preprocessor.o : lib/kaba/syntax/preprocessor.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/file/path.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/CompilerConfiguration.h lib/kaba/syntax/Flags.h lib/kaba/lib/extern.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/kaba/syntax/Block.h lib/kaba/syntax/Operator.h lib/kaba/syntax/Variable.h lib/kaba/syntax/Identifier.h lib/kaba/syntax/Inline.h lib/kaba/syntax/Statement.h lib/kaba/dynamic/call.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
 	$(CPP) -c lib/kaba/syntax/preprocessor.cpp -o $@ $(CXXFLAGS)

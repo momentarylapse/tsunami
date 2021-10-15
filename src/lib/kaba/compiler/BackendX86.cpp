@@ -1109,7 +1109,7 @@ void BackendX86::assemble() {
 	stack_max_size += max_push_size;
 	stack_max_size = mem_align(stack_max_size, config.stack_frame_align);
 
-	list->insert_label(cur_func->_label);
+	list->insert_location_label(cur_func->_label);
 
 	if (!config.no_function_frame)
 		add_function_intro_frame(stack_max_size); // param intro later...
@@ -1117,7 +1117,7 @@ void BackendX86::assemble() {
 	for (auto &c: cmd.cmd) {
 
 		if (c.inst == Asm::InstID::LABEL) {
-			list->insert_label(c.p[0].p);
+			list->insert_location_label(c.p[0].p);
 		} else if (c.inst == Asm::InstID::ASM) {
 			add_asm_block();
 		} else {

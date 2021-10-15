@@ -49,7 +49,7 @@ struct FakeTexture {
 		typedef FakeTexture Texture;
 		typedef FakeTexture FrameBuffer;
 		typedef int Shader;
-		typedef int UniformBuffer;
+		typedef int Buffer;
 	};
 	#define nix_p(p)		nullptr
 #endif

@@ -102,7 +102,7 @@ Parser::Parser(SyntaxTree *t) {
 void Parser::parse_buffer(const string &buffer, bool just_analyse) {
 	Exp.analyse(tree, buffer);
 
-	pre_compiler(just_analyse);
+	parse_macros(just_analyse);
 
 	parse();
 
@@ -3761,12 +3761,11 @@ void Parser::parse_top_level() {
 	// global definitions (enum, class, variables and functions)
 	while (!Exp.end_of_file()) {
 
-
-		/*if ((Exp.cur == "import") or (Exp.cur == "use")) {
-			ParseImport();
+		if ((Exp.cur == IDENTIFIER_IMPORT) or (Exp.cur == IDENTIFIER_USE)) {
+			parse_import();
 
 		// enum
-		} else*/ if (Exp.cur == IDENTIFIER_ENUM) {
+		} else if (Exp.cur == IDENTIFIER_ENUM) {
 			parse_enum(tree->base_class);
 
 		// class

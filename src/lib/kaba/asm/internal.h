@@ -77,14 +77,17 @@ struct ParserState {
 	bool end_of_code;
 	int line_no;
 	int column_no;
-	int default_size;
+	int default_param_size;
+	int default_addr_size;
 	int param_size, addr_size;
+	int explicit_size;
 	bool extend_mod_rm_base;
 	bool extend_mod_rm_reg;
 	bool extend_mod_rm_index;
 	int full_register_size;
 	InstructionWithParamsList *list;
 	void init();
+	void set_bits(int bits_size);
 	void reset(InstructionWithParamsList *_list);
 	string get_label(int i);
 };

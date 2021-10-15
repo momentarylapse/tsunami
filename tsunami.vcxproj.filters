@@ -721,6 +721,9 @@
     <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\macros.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
@@ -728,9 +731,6 @@
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Parser.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\precompiler.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">

@@ -880,11 +880,12 @@ void BackendARM::assemble() {
 	// intro + allocate stack memory
 
 	foreachi(GlobalRef &g, global_refs, i) {
-		g.label = list->add_label(format("_kaba_ref_%d_%d", cur_func_index, i));
+		g.label = list->create_label(format("_kaba_ref_%d_%d", cur_func_index, i));
+		list->insert_location_label(g.label);
 		list->add2(Asm::InstID::DD, Asm::param_imm((int_p)g.p, 4));
 	}
 
-	list->insert_label(cur_func->_label);
+	list->insert_location_label(cur_func->_label);
 
 	if (!config.no_function_frame)
 		add_function_intro_frame(stack_max_size);
@@ -893,7 +894,7 @@ void BackendARM::assemble() {
 	for (int i=0;i<cmd.cmd.num;i++) {
 
 		if (cmd.cmd[i].inst == Asm::InstID::LABEL) {
-			list->insert_label(cmd.cmd[i].p[0].p);
+			list->insert_location_label(cmd.cmd[i].p[0].p);
 		} else if (cmd.cmd[i].inst == Asm::InstID::ASM) {
 			do_error("asm block insert..."); //AddAsmBlock(list, script);
 		} else {

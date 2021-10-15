@@ -76,6 +76,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -90,6 +91,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -103,12 +105,14 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -352,10 +356,10 @@
     <ClCompile Include="src\lib\kaba\syntax\Identifier.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\implicit.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\lexical.cpp" />
+    <ClCompile Include="src\lib\kaba\syntax\macros.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Operator.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Parser.cpp" />
-    <ClCompile Include="src\lib\kaba\syntax\precompiler.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Statement.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp" />

@@ -13,7 +13,7 @@
 namespace hui
 {
 
-void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
+GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *w); // -> hui_menu_gtk.cpp
 
 void on_gtk_toggle_button_toggle(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
@@ -36,7 +36,7 @@ void ControlToggleButton::__set_string(const string &str) {
 }
 
 void ControlToggleButton::set_image(const string& str) {
-	GtkWidget *im = (GtkWidget*)get_gtk_image(str, GTK_ICON_SIZE_BUTTON);
+	GtkWidget *im = get_gtk_image_x(str, GTK_ICON_SIZE_BUTTON, widget);
 	gtk_button_set_image(GTK_BUTTON(widget), im);
 	#if GTK_CHECK_VERSION(3,6,0)
 		if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)

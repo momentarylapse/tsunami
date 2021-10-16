@@ -2067,19 +2067,19 @@ homogenousx
 4
 ToggleButton
 mode-classical
-flat,huge,expandx,ignorefocus
+image=midi-mode-classical,flat,huge,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 mode-tab
-flat,huge,ignorefocus
+image=midi-mode-tab,flat,huge,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 mode-linear
-flat,huge,ignorefocus
+image=midi-mode-linear,flat,huge,expandx,ignorefocus
 2
 0
 0
@@ -2115,19 +2115,19 @@ flat,huge,expandx,ignorefocus
 0
 ToggleButton
 mode-note
-flat,huge,expandx,ignorefocus
+image=midi-mode-single-note,flat,huge,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 mode-interval
-flat,huge,expandx,ignorefocus
+image=midi-mode-interval,flat,huge,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 mode-chord
-flat,huge,expandx,ignorefocus
+image=midi-mode-chord,flat,huge,expandx,ignorefocus
 3
 0
 0
@@ -2163,25 +2163,25 @@ homogenousx
 15
 ToggleButton
 chord-major
-flat,big,expandx,ignorefocus
+image=chord-major,flat,big,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 chord-minor
-flat,big,expandx,ignorefocus
+image=chord-minor,flat,big,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 chord-diminished
-flat,big,expandx,ignorefocus
+image=chord-diminished,image=aaa,flat,big,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 chord-augmented
-flat,big,expandx,ignorefocus
+image=chord-augmented,flat,big,expandx,ignorefocus
 3
 0
 0
@@ -7911,7 +7911,7 @@ midi_editor/apply_string
 𝄛
 Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)
 midi_editor/chord-augmented
-+
+
 Augmented chord
 midi_editor/chord-augmented-major7
 +M⁷
@@ -7920,7 +7920,7 @@ midi_editor/chord-augmented7
 +⁷
 Augmented 7th chord
 midi_editor/chord-diminished
--
+
 Diminished chord
 midi_editor/chord-diminished7
 -⁷
@@ -7941,13 +7941,13 @@ midi_editor/chord-inversion-none
 0
 Root position
 midi_editor/chord-major
-M
+
 Major chord
 midi_editor/chord-major7
 M⁷
 Major 7th chord
 midi_editor/chord-minor
-m
+
 Minor chord
 midi_editor/chord-minor-major7
 mM⁷
@@ -8040,25 +8040,25 @@ midi_editor/midi_editor
 Midi
 
 midi_editor/mode-chord
-𝅘𝅥𝅘𝅥𝅘𝅥
+
 Create chords
 midi_editor/mode-classical
-𝄞
+
 Classical sheet view style
 midi_editor/mode-interval
-𝅘𝅥𝅘𝅥
+
 Create intervals
 midi_editor/mode-linear
-𝆱
+
 Linear view style
 midi_editor/mode-note
-𝅘𝅥
+
 Create single notes
 midi_editor/mode-select
 I
 Select
 midi_editor/mode-tab
-TAB
+
 Guitar tab view style (only string instruments)
 midi_editor/modifier-flat
 ♭

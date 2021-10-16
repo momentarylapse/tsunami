@@ -33,9 +33,9 @@ Dialog midi_editor "Midi" width=300 height=516
 						ToggleButton chord-augmented7 "" image=chord-augmented-seventh flat "tooltip=Augmented 7th chord" ignorefocus
 						ToggleButton chord-augmented-major7 "" image=chord-augmented-major-seventh flat "tooltip=Augmented major 7th chord" ignorefocus
 						---|
-						ToggleButton chord-inversion-none "0" flat big expandx "tooltip=Root position" ignorefocus
-						ToggleButton chord-inversion-1 "-1" flat big expandx "tooltip=1st inversion (root note on top)" ignorefocus
-						ToggleButton chord-inversion-2 "-2" flat big expandx "tooltip=2nd inversion (root and third on top)" ignorefocus
+						ToggleButton chord-inversion-none "" image=chord-inversion-0 flat big expandx "tooltip=Root position" ignorefocus
+						ToggleButton chord-inversion-1 "" image=chord-inversion-1 flat big expandx "tooltip=1st inversion (root note on top)" ignorefocus
+						ToggleButton chord-inversion-2 "" image=chord-inversion-2 flat big expandx "tooltip=2nd inversion (root and third on top)" ignorefocus
 		Group grp-length "Note length"
 			Grid ? "" homogenousx
 				ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note" ignorefocus

@@ -2235,19 +2235,19 @@ image=chord-augmented-major-seventh,flat,ignorefocus
 0
 ToggleButton
 chord-inversion-none
-flat,big,expandx,ignorefocus
+image=chord-inversion-0,flat,big,expandx,ignorefocus
 0
 3
 0
 ToggleButton
 chord-inversion-1
-flat,big,expandx,ignorefocus
+image=chord-inversion-1,flat,big,expandx,ignorefocus
 1
 3
 0
 ToggleButton
 chord-inversion-2
-flat,big,expandx,ignorefocus
+image=chord-inversion-2,flat,big,expandx,ignorefocus
 2
 3
 0
@@ -7932,13 +7932,13 @@ midi_editor/chord-half-diminished7
 
 Half diminished 7th chord
 midi_editor/chord-inversion-1
--1
+
 1st inversion (root note on top)
 midi_editor/chord-inversion-2
--2
+
 2nd inversion (root and third on top)
 midi_editor/chord-inversion-none
-0
+
 Root position
 midi_editor/chord-major
 

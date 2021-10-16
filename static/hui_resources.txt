@@ -2187,49 +2187,49 @@ image=chord-augmented,flat,big,expandx,ignorefocus
 0
 ToggleButton
 chord-dominant7
-flat,ignorefocus
+image=chord-dominant-seventh,flat,ignorefocus
 0
 1
 0
 ToggleButton
 chord-major7
-flat,ignorefocus
+image=chord-major-seventh,flat,ignorefocus
 1
 1
 0
 ToggleButton
 chord-minor7
-flat,ignorefocus
+image=chord-minor-seventh,flat,ignorefocus
 2
 1
 0
 ToggleButton
 chord-minor-major7
-flat,ignorefocus
+image=chord-minor-major-seventh,flat,ignorefocus
 3
 1
 0
 ToggleButton
 chord-half-diminished7
-flat,ignorefocus
+image=chord-half-diminished-seventh,flat,ignorefocus
 0
 2
 0
 ToggleButton
 chord-diminished7
-flat,ignorefocus
+image=chord-diminished-seventh,flat,ignorefocus
 1
 2
 0
 ToggleButton
 chord-augmented7
-flat,ignorefocus
+image=chord-augmented-seventh,flat,ignorefocus
 2
 2
 0
 ToggleButton
 chord-augmented-major7
-flat,ignorefocus
+image=chord-augmented-major-seventh,flat,ignorefocus
 3
 2
 0
@@ -7914,22 +7914,22 @@ midi_editor/chord-augmented
 
 Augmented chord
 midi_editor/chord-augmented-major7
-+M⁷
+
 Augmented major 7th chord
 midi_editor/chord-augmented7
-+⁷
+
 Augmented 7th chord
 midi_editor/chord-diminished
 
 Diminished chord
 midi_editor/chord-diminished7
--⁷
+
 Diminished 7th chord
 midi_editor/chord-dominant7
-D⁷
+
 Dominant 7th chord
 midi_editor/chord-half-diminished7
-ø⁷
+
 Half diminished 7th chord
 midi_editor/chord-inversion-1
 -1
@@ -7944,16 +7944,16 @@ midi_editor/chord-major
 
 Major chord
 midi_editor/chord-major7
-M⁷
+
 Major 7th chord
 midi_editor/chord-minor
 
 Minor chord
 midi_editor/chord-minor-major7
-mM⁷
+
 Minor major 7th chord
 midi_editor/chord-minor7
-m⁷
+
 Minor 7th chord
 midi_editor/flag-none
 ✂

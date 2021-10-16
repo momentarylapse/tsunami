@@ -23,15 +23,15 @@ Dialog midi_editor "Midi" width=300 height=516
 						ToggleButton chord-diminished "" image=chord-diminished image=aaa flat big expandx "tooltip=Diminished chord" ignorefocus
 						ToggleButton chord-augmented "" image=chord-augmented flat big expandx "tooltip=Augmented chord" ignorefocus
 						---|
-						ToggleButton chord-dominant7 "D⁷" flat "tooltip=Dominant 7th chord" ignorefocus
-						ToggleButton chord-major7 "M⁷" flat "tooltip=Major 7th chord" ignorefocus
-						ToggleButton chord-minor7 "m⁷" flat "tooltip=Minor 7th chord" ignorefocus
-						ToggleButton chord-minor-major7 "mM⁷" flat "tooltip=Minor major 7th chord" ignorefocus
+						ToggleButton chord-dominant7 "" image=chord-dominant-seventh flat "tooltip=Dominant 7th chord" ignorefocus
+						ToggleButton chord-major7 "" image=chord-major-seventh flat "tooltip=Major 7th chord" ignorefocus
+						ToggleButton chord-minor7 "" image=chord-minor-seventh flat "tooltip=Minor 7th chord" ignorefocus
+						ToggleButton chord-minor-major7 "" image=chord-minor-major-seventh flat "tooltip=Minor major 7th chord" ignorefocus
 						---|
-						ToggleButton chord-half-diminished7 "ø⁷" flat "tooltip=Half diminished 7th chord" ignorefocus
-						ToggleButton chord-diminished7 "-⁷" flat "tooltip=Diminished 7th chord" ignorefocus
-						ToggleButton chord-augmented7 "+⁷" flat "tooltip=Augmented 7th chord" ignorefocus
-						ToggleButton chord-augmented-major7 "+M⁷" flat "tooltip=Augmented major 7th chord" ignorefocus
+						ToggleButton chord-half-diminished7 "" image=chord-half-diminished-seventh flat "tooltip=Half diminished 7th chord" ignorefocus
+						ToggleButton chord-diminished7 "" image=chord-diminished-seventh flat "tooltip=Diminished 7th chord" ignorefocus
+						ToggleButton chord-augmented7 "" image=chord-augmented-seventh flat "tooltip=Augmented 7th chord" ignorefocus
+						ToggleButton chord-augmented-major7 "" image=chord-augmented-major-seventh flat "tooltip=Augmented major 7th chord" ignorefocus
 						---|
 						ToggleButton chord-inversion-none "0" flat big expandx "tooltip=Root position" ignorefocus
 						ToggleButton chord-inversion-1 "-1" flat big expandx "tooltip=1st inversion (root note on top)" ignorefocus

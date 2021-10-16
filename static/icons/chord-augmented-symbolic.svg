@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   sodipodi:docname="chord-major-symbolic.svg"
+   sodipodi:docname="chord-augmented-symbolic.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +91,15 @@
          height="0.52916664"
          x="42.555595"
          y="47.879032" />
+      <g
+         aria-label="♯"
+         id="text12349"
+         style="font-size:6.85401px;line-height:1.25;letter-spacing:0px;word-spacing:0px;stroke-width:0.0453365"
+         transform="matrix(0.80636349,0,0,0.80636349,8.0525565,8.4688095)">
+        <path
+           d="m 43.126502,40.982426 h 0.153947 l 0.01673,0.01673 v 1.017392 l 0.398255,-0.200801 0.01004,0.0067 v 0.471882 q -0.01004,0.02343 -0.408295,0.224228 v 1.248313 l 0.408299,-0.18407 v 0.451802 q -0.0033,0.01339 -0.408295,0.237615 v 0.993965 l -0.01673,0.01339 h -0.153947 l -0.01673,-0.01339 v -0.913645 l -0.963845,0.468536 v 1.157953 l -0.01673,0.01339 H 41.98864 l -0.01673,-0.01339 V 44.90474 l -0.431723,0.200801 v -0.475229 q 0,-0.02008 0.431723,-0.220881 v -1.268394 h -0.0067 l -0.425029,0.187415 v -0.46519 l 0.431723,-0.217534 v -0.960499 l 0.01673,-0.01339 h 0.140561 l 0.01673,0.01339 v 0.876832 l 0.963845,-0.448456 v -1.114446 z m -0.980579,2.084984 v 1.2617 l 0.963845,-0.465189 v -1.244967 z"
+           id="path13039" />
+      </g>
     </g>
   </g>
 </svg>

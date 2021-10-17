@@ -10,8 +10,7 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
 class Panel;
 
@@ -23,6 +22,8 @@ public:
 	void __set_string(const string &str) override;
 	void set_image(const string &str) override;
 	void __set_option(const string &op, const string &value) override;
+
+	GtkIconSize image_size;
 };
 
 };

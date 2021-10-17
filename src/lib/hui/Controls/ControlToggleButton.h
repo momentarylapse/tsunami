@@ -10,11 +10,9 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class ControlToggleButton : public Control
-{
+class ControlToggleButton : public Control {
 public:
 	ControlToggleButton(const string &text, const string &id);
 	string get_string() override;
@@ -23,6 +21,8 @@ public:
 	void __check(bool checked) override;
 	bool is_checked() override;
 	void __set_option(const string &op, const string &value) override;
+
+	GtkIconSize image_size;
 };
 
 };

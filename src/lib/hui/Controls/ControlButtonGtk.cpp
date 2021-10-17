@@ -37,6 +37,7 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 		widget = gtk_button_new_with_label(sys_str(parts[0]));
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_button_press), this);
 	}
+	image_size = GTK_ICON_SIZE_BUTTON;
 	set_options(get_option_from_title(title));
 
 //	SetImageById(this, id);
@@ -72,6 +73,10 @@ void ControlButton::__set_option(const string &op, const string &value) {
 		auto sc = gtk_widget_get_style_context(widget);
 		gtk_style_context_remove_class(sc, GTK_STYLE_CLASS_SUGGESTED_ACTION);
 		gtk_style_context_add_class(sc, GTK_STYLE_CLASS_DESTRUCTIVE_ACTION);
+	} else if (op == "big") {
+		image_size = GTK_ICON_SIZE_DND;
+	} else if (op == "huge") {
+		image_size = GTK_ICON_SIZE_DIALOG;
 	}
 }
 

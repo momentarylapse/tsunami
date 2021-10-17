@@ -200,6 +200,15 @@ GtkIconTheme *get_hui_icon_theme() {
 	return hui_icon_theme;
 }
 
+int absolute_gtk_size(int s) {
+	if (s == GTK_ICON_SIZE_BUTTON)
+		return 16;
+	if (s == GTK_ICON_SIZE_DND)
+		return 32;
+	if (s == GTK_ICON_SIZE_DIALOG)
+		return 48;
+	return s;
+}
 
 GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *widget) {
 	if (image == "")
@@ -208,10 +217,11 @@ GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *wid
 		// internal
 		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), size);
 	} else if (image.find(".") < 0) {
+		size = (GtkIconSize)absolute_gtk_size((int)size);
 		auto theme = get_hui_icon_theme();
-		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), 32, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), size, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info)
-			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), 32, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), size, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		auto sc = gtk_widget_get_style_context(widget);
 
 		gboolean was_sym = true;

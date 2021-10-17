@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666665 8.4666665"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="note-length-half-symbolic.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#ff6600"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="16.768851"
+     inkscape:cx="7.0666738"
+     inkscape:cy="16.33982"
+     inkscape:window-width="1920"
+     inkscape:window-height="1020"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="text2168"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:snap-to-guides="true"
+     inkscape:snap-grids="true"
+     units="px"
+     width="32px"
+     scale-x="0.5">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1371"
+       originx="0"
+       originy="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect2423"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-40.968096,-41.529032)">
+    <g
+       aria-label="𝅝𝄞"
+       id="text2168"
+       style="font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583">
+      <rect
+         style="font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;opacity:0.219706;stroke-width:0.245342;stroke-linejoin:round;stroke-dasharray:0.981369, 0.245342"
+         id="rect1226-5"
+         width="6.3499985"
+         height="0.52916664"
+         x="42.026432"
+         y="47.879032" />
+      <g
+         aria-label="𝅗𝅥"
+         id="text4546"
+         style="font-size:6.30326px;-inkscape-font-specification:'sans-serif, Normal';stroke-width:0.0416935">
+        <path
+           d="m 45.813014,42.65554 h 0.151279 v 5.294739 q 0,0.201704 -0.107156,0.397105 -0.100852,0.189098 -0.277343,0.340376 -0.176491,0.151278 -0.384499,0.245827 -0.208008,0.08825 -0.416015,0.08825 -0.302557,0 -0.497958,-0.138672 -0.189098,-0.144975 -0.189098,-0.434925 0,-0.321466 0.176492,-0.573596 0.182794,-0.258434 0.472744,-0.403409 0.28995,-0.151278 0.61772,-0.151278 0.277343,0 0.453834,0.138671 z m -1.550602,5.943974 q 0,0.06303 0.04412,0.113459 0.05043,0.05043 0.132369,0.05043 0.220614,0 0.548383,-0.182794 0.220614,-0.126065 0.397106,-0.277344 0.182794,-0.157581 0.28995,-0.308859 0.107155,-0.157582 0.107155,-0.264737 0,-0.06934 -0.03782,-0.113459 -0.03152,-0.05043 -0.119762,-0.05043 -0.119762,0 -0.28995,0.07564 -0.170188,0.07564 -0.359286,0.195401 -0.182795,0.119762 -0.346679,0.264737 -0.163885,0.138672 -0.264737,0.27104 -0.100853,0.132369 -0.100853,0.226917 z"
+           id="path30821" />
+      </g>
+    </g>
+  </g>
+</svg>

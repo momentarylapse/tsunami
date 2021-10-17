@@ -2265,43 +2265,43 @@ homogenousx
 9
 ToggleButton
 length-whole
-flat,big,expandx,ignorefocus
+image=note-length-whole,flat,big,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 length-half
-flat,big,expandx,ignorefocus
+image=note-length-half,flat,big,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 length-quarter
-flat,big,expandx,ignorefocus
+image=note-length-quarter,flat,big,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 length-eighth
-flat,big,expandx,ignorefocus
+image=note-length-eigth,flat,big,expandx,ignorefocus
 3
 0
 0
 ToggleButton
 length-sixteenth
-flat,big,expandx,ignorefocus
+image=note-length-sixteenth,flat,big,expandx,ignorefocus
 4
 0
 0
 ToggleButton
 length-dotted
-flat,big,ignorefocus
+image=note-length-dotted,flat,big,ignorefocus
 0
 1
 0
 ToggleButton
 length-triplet
-flat,big,ignorefocus
+image=note-length-triplet,flat,big,ignorefocus
 1
 1
 0
@@ -2330,26 +2330,26 @@ homogenousx
 0
 4
 ToggleButton
-modifier-none
-flat,big,expandx,ignorefocus
-0
-0
-0
-ToggleButton
 modifier-sharp
 flat,big,expandx,ignorefocus
-1
+0
 0
 0
 ToggleButton
 modifier-flat
 flat,big,expandx,ignorefocus
-2
+1
 0
 0
 ToggleButton
 modifier-natural
 flat,big,expandx,ignorefocus
+2
+0
+0
+ToggleButton
+modifier-none
+flat,big,expandx,ignorefocus,disabled
 3
 0
 0
@@ -2367,25 +2367,25 @@ homogenousx
 4
 Button
 flag-none
-big,expandx,ignorefocus
+image=hui:delete,big,expandx,ignorefocus
 0
 0
 0
 Button
 flag-trill
-big,expandx,ignorefocus
+image=note-flag-trill,big,expandx,ignorefocus
 1
 0
 0
 Button
 flag-staccato
-big,expandx,ignorefocus
+image=note-flag-staccato,big,expandx,ignorefocus
 2
 0
 0
 Button
 flag-tenuto
-big,expandx,ignorefocus
+image=note-flag-tenuto,big,expandx,ignorefocus
 3
 0
 0
@@ -7956,16 +7956,16 @@ midi_editor/chord-minor7
 
 Minor 7th chord
 midi_editor/flag-none
-✂
+
 Clear all flags
 midi_editor/flag-staccato
-.
+
 Set staccato flag
 midi_editor/flag-tenuto
-_
+
 Set tenuto flag
 midi_editor/flag-trill
-𝆖
+
 Set trill flag
 midi_editor/grp-flags
 Flags
@@ -8004,28 +8004,28 @@ midi_editor/length-custom
 ...
 Custom note length (L,P)
 midi_editor/length-dotted
-𝅘𝅥.
+
 Dotted note (+50% length, combines with any basic note length)
 midi_editor/length-eighth
-𝅘𝅥𝅮
+
 Eighth note (E)
 midi_editor/length-half
-𝅗𝅥
+
 Half note
 midi_editor/length-quarter
-𝅘𝅥
+
 Quarter note (Q)
 midi_editor/length-result
 
 Resulting note length / beat partition
 midi_editor/length-sixteenth
-𝅘𝅥𝅯
+
 Sixteenth note (S)
 midi_editor/length-triplet
-𝅘𝅥𝅮/₃
+
 Triplet note (combines with any basic note length)
 midi_editor/length-whole
-𝅝
+
 Whole note
 midi_editor/me_group_creation
 Edit mode

@@ -239,14 +239,15 @@ void MidiEditorConsole::update() {
 	check("chord-inversion-1", mode->chord_inversion == 1);
 	check("chord-inversion-2", mode->chord_inversion == 2);
 
-	check("modifier-none", mode->modifier == NoteModifier::NONE);
+	//check("modifier-none", mode->modifier == NoteModifier::NONE);
 	check("modifier-sharp", mode->modifier == NoteModifier::SHARP);
 	check("modifier-flat", mode->modifier == NoteModifier::FLAT);
 	check("modifier-natural", mode->modifier == NoteModifier::NATURAL);
 
 	MidiMode _mode = view->get_layer(layer)->midi_mode();
 
-	enable("modifier-none", _mode == MidiMode::CLASSICAL);
+	//enable("modifier-none", _mode == MidiMode::CLASSICAL);
+	enable("modifier-none", false);
 	enable("modifier-sharp", _mode == MidiMode::CLASSICAL);
 	enable("modifier-flat", _mode == MidiMode::CLASSICAL);
 	enable("modifier-natural", _mode == MidiMode::CLASSICAL);

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666665 8.4666665"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="note-flag-trill-symbolic.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#ff6600"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="13.837965"
+     inkscape:cx="24.823014"
+     inkscape:cy="9.1776499"
+     inkscape:window-width="1920"
+     inkscape:window-height="1020"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="text2168"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:snap-to-guides="true"
+     inkscape:snap-grids="true"
+     units="px"
+     width="32px"
+     scale-x="0.5">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1371"
+       originx="0"
+       originy="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect2423"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-40.968096,-41.529032)">
+    <g
+       aria-label="𝅝𝄞"
+       id="text2168"
+       style="font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583">
+      <g
+         aria-label="𝆖"
+         id="text64993"
+         style="font-size:13.1859px;stroke-width:0.0872196">
+        <path
+           d="m 46.053928,44.601127 q 0.421949,0 0.553808,0.118673 0.131859,0.105487 0.131859,0.395577 0.250532,-0.276904 0.501064,-0.395577 0.263718,-0.118673 0.540622,-0.118673 0.303275,0 0.474692,0.171416 0.184603,0.171417 0.184603,0.461507 0,0.22416 -0.145045,0.435135 -0.145045,0.210974 -0.395577,0.210974 -0.184603,0 -0.303276,-0.0923 -0.118673,-0.0923 -0.118673,-0.263718 0,-0.118673 0.05274,-0.210975 0.03956,-0.07911 0.03956,-0.118673 0,-0.131859 -0.158231,-0.131859 -0.131859,0 -0.316461,0.145045 -0.171417,0.145045 -0.276904,0.448321 l -0.909827,2.478949 h -1.081244 l 0.145045,-0.395577 -0.342833,0.210974 q -0.237347,0.145045 -0.514251,0.276904 -0.276903,0.118673 -0.566993,0.118673 -0.395577,0 -0.659295,-0.145045 -0.250532,-0.158231 -0.250532,-0.501064 0,-0.105487 0.05274,-0.303276 0.06593,-0.197788 0.158231,-0.487878 l 0.632923,-1.872398 h -0.975756 l 0.145045,-0.435134 h 0.96257 l 0.29009,-0.923013 1.068058,-0.646109 h 0.263718 l -0.540622,1.569122 z m -0.303276,0.96257 q 0.02637,-0.07911 0.03956,-0.15823 0.01319,-0.07912 0.01319,-0.131859 0,-0.0923 -0.06593,-0.158231 -0.05274,-0.07912 -0.342833,-0.07912 h -0.830712 l -0.80434,2.373462 q -0.01319,0.03956 -0.02637,0.07912 0,0.03956 0,0.07912 0,0.237346 0.237347,0.237346 0.105487,0 0.316461,-0.105487 0.22416,-0.105487 0.474693,-0.263718 0.250532,-0.158231 0.421948,-0.303276 z"
+           id="path65550" />
+      </g>
+    </g>
+  </g>
+</svg>

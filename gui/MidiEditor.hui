@@ -38,29 +38,29 @@ Dialog midi_editor "Midi" width=300 height=516
 						ToggleButton chord-inversion-2 "" image=chord-inversion-2 flat big expandx "tooltip=2nd inversion (root and third on top)" ignorefocus
 		Group grp-length "Note length"
 			Grid ? "" homogenousx
-				ToggleButton length-whole "𝅝" flat big expandx "tooltip=Whole note" ignorefocus
-				ToggleButton length-half "𝅗𝅥" flat big expandx "tooltip=Half note" ignorefocus
-				ToggleButton length-quarter "𝅘𝅥" flat big expandx "tooltip=Quarter note (Q)" ignorefocus
-				ToggleButton length-eighth "𝅘𝅥𝅮" flat big expandx "tooltip=Eighth note (E)" ignorefocus
-				ToggleButton length-sixteenth "𝅘𝅥𝅯" flat big expandx "tooltip=Sixteenth note (S)" ignorefocus
+				ToggleButton length-whole "" image=note-length-whole flat big expandx "tooltip=Whole note" ignorefocus
+				ToggleButton length-half "" image=note-length-half flat big expandx "tooltip=Half note" ignorefocus
+				ToggleButton length-quarter "" image=note-length-quarter flat big expandx "tooltip=Quarter note (Q)" ignorefocus
+				ToggleButton length-eighth "" image=note-length-eigth flat big expandx "tooltip=Eighth note (E)" ignorefocus
+				ToggleButton length-sixteenth "" image=note-length-sixteenth flat big expandx "tooltip=Sixteenth note (S)" ignorefocus
 				---|
-				ToggleButton length-dotted "𝅘𝅥." flat big "tooltip=Dotted note (+50% length, combines with any basic note length)" ignorefocus
-				ToggleButton length-triplet "𝅘𝅥𝅮/₃" flat big "tooltip=Triplet note (combines with any basic note length)" ignorefocus
+				ToggleButton length-dotted "" image=note-length-dotted flat big "tooltip=Dotted note (+50% length, combines with any basic note length)" ignorefocus
+				ToggleButton length-triplet "" image=note-length-triplet flat big "tooltip=Triplet note (combines with any basic note length)" ignorefocus
 				.
 				Button length-custom "..." flat big "tooltip=Custom note length (L,P)" ignorefocus
 				Text length-result "" "tooltip=Resulting note length / beat partition"
 		Group grp-modifier "Modifier"
 			Grid ? "" homogenousx
-				ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx ignorefocus
 				ToggleButton modifier-sharp "♯" flat big "tooltip=Sharp - new note is 1 semitone above the key" expandx ignorefocus
 				ToggleButton modifier-flat "♭" flat big "tooltip=Flat - new note is 1 semitone below the key" expandx ignorefocus
 				ToggleButton modifier-natural "♮" flat big "tooltip=Natural - new note ignores any modifiers in the key" expandx ignorefocus
+				ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx ignorefocus disabled
 		Group grp-flags "Flags"
 			Grid ? "" homogenousx
-				Button flag-none "✂" big expandx "tooltip=Clear all flags" ignorefocus
-				Button flag-trill "𝆖" big expandx "tooltip=Set trill flag" ignorefocus
-				Button flag-staccato "." big expandx "tooltip=Set staccato flag" ignorefocus
-				Button flag-tenuto "_" big expandx "tooltip=Set tenuto flag" ignorefocus
+				Button flag-none "" image=hui:delete big expandx "tooltip=Clear all flags" ignorefocus
+				Button flag-trill "" image=note-flag-trill big expandx "tooltip=Set trill flag" ignorefocus
+				Button flag-staccato "" image=note-flag-staccato big expandx "tooltip=Set staccato flag" ignorefocus
+				Button flag-tenuto "" image=note-flag-tenuto big expandx "tooltip=Set tenuto flag" ignorefocus
 		Group grp_operations "Operations"
 			Grid ? "" homogenousx
 				Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus

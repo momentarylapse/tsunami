@@ -25,7 +25,7 @@
      showgrid="true"
      inkscape:zoom="17.598686"
      inkscape:cx="24.319998"
-     inkscape:cy="21.592521"
+     inkscape:cy="14.77383"
      inkscape:window-width="1920"
      inkscape:window-height="1020"
      inkscape:window-x="0"
@@ -36,8 +36,8 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:snap-to-guides="true"
-     inkscape:snap-grids="true"
+     inkscape:snap-to-guides="false"
+     inkscape:snap-grids="false"
      units="px"
      width="32px"
      scale-x="0.5">
@@ -62,7 +62,7 @@
          aria-label="T A B"
          id="text3422"
          style="font-size:2.44074px;stroke-width:0.0161445"
-         transform="translate(2.6242557,-0.18626453)">
+         transform="translate(2.7320539,-0.15060173)">
         <path
            d="m 41.68203,42.649349 h 1.505203 v 0.2026 h -0.631637 v 1.576709 H 42.313667 V 42.851949 H 41.68203 Z"
            id="path8156" />

@@ -86,17 +86,23 @@ Grid
 
 0
 0
-2
+3
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
+Label
+edit-separator
+disabled
+1
+0
+0
 Button
 edit_track
 link,ignorefocus
-1
+2
 0
 0
 # Resource
@@ -802,19 +808,19 @@ vertical
 0
 0
 4
-Text
+Label
 warning
 center,italic,bold,expandx
 0
 0
 0
-Text
+Label
 more-warning
 
 1
 0
 0
-Text
+Label
 ?
 expandy
 2
@@ -831,17 +837,23 @@ Grid
 
 0
 0
-2
+3
 Button
 edit_song
 link,ignorefocus
 0
 0
 0
+Label
+edit-separator
+disabled
+1
+0
+0
 Button
 edit_track
 link,ignorefocus
-1
+2
 0
 0
 # Resource
@@ -900,7 +912,7 @@ vertical
 0
 0
 5
-Text
+Label
 comment_no_fx
 center,italic
 0
@@ -924,7 +936,7 @@ expandx,flat,image=hui:add
 2
 0
 0
-Text
+Label
 ?
 expandy
 3
@@ -2299,7 +2311,7 @@ flat,big,ignorefocus
 3
 1
 0
-Text
+Label
 length-result
 
 4
@@ -2449,7 +2461,7 @@ ignorefocus
 1
 0
 0
-Text
+Label
 t_input
 right,disabled
 0
@@ -2461,7 +2473,7 @@ expandx,ignorefocus
 1
 1
 0
-Text
+Label
 t_input_volume
 right,disabled
 0
@@ -2844,7 +2856,7 @@ image=hui:properties,flat,menu=popup_fx_menu
 0
 0
 0
-Text
+Label
 name
 bold,center,expandx
 1
@@ -2930,7 +2942,7 @@ expandx,editable
 0
 0
 0
-Text
+Label
 per_second
 
 1
@@ -2996,7 +3008,7 @@ nd_g_metronome_params
 0
 0
 9
-Text
+Label
 nd_t_bpm
 right,disabled
 0
@@ -3008,13 +3020,13 @@ range=0:999:0.1
 1
 0
 0
-Text
+Label
 per_minute
 
 2
 0
 0
-Text
+Label
 nd_t_bars
 right,disabled
 0
@@ -3026,7 +3038,7 @@ range=0:999
 1
 1
 0
-Text
+Label
 nd_t_beats
 right,disabled
 0
@@ -3099,7 +3111,7 @@ Grid
 0
 0
 3
-Text
+Label
 t_duration
 right,disabled
 0
@@ -3111,7 +3123,7 @@ range=0:10000:0.001,expandx
 1
 0
 0
-Text
+Label
 t_s
 
 2
@@ -3160,7 +3172,7 @@ Grid
 0
 0
 3
-Text
+Label
 t_duration
 right,disabled
 0
@@ -3172,7 +3184,7 @@ range=0:10000:0.001,expandx
 1
 0
 0
-Text
+Label
 s
 
 2
@@ -5350,7 +5362,7 @@ Grid
 0
 0
 6
-Text
+Label
 t_format
 right,disabled
 0
@@ -5362,7 +5374,7 @@ expandx
 1
 0
 0
-Text
+Label
 t_channels
 right,disabled
 0
@@ -5386,7 +5398,7 @@ channels:stereo
 1
 0
 0
-Text
+Label
 t_samplerate
 right,disabled
 0
@@ -5647,7 +5659,7 @@ range=-10000:10:0.1,expandx
 0
 0
 0
-Text
+Label
 db
 
 1
@@ -5659,7 +5671,7 @@ ignorefocus
 2
 0
 0
-Text
+Label
 ?
 expandy
 3
@@ -5732,31 +5744,31 @@ Grid
 0
 0
 13
-Text
+Label
 ssd_t_samples
 
 1
 0
 0
-Text
+Label
 ssd_t_rate
 
 2
 0
 0
-Text
+Label
 ssd_t_rate_inv
 
 3
 0
 0
-Text
+Label
 ssd_t_factor
 
 4
 0
 0
-Text
+Label
 ssd_t_orig
 
 0
@@ -5780,7 +5792,7 @@ range=1:,expandx
 3
 1
 0
-Text
+Label
 ssd_t_new
 
 0
@@ -5816,7 +5828,7 @@ Grid
 1
 0
 2
-Text
+Label
 ssd_t_method
 
 0
@@ -5840,9 +5852,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 1
 0
 0
@@ -5914,7 +5926,7 @@ Grid
 0
 0
 10
-Text
+Label
 pdp_language
 right,disabled
 0
@@ -5926,7 +5938,7 @@ expandx
 1
 0
 0
-Text
+Label
 pdp_colorscheme
 right,disabled
 0
@@ -5938,7 +5950,7 @@ expandx
 1
 1
 0
-Text
+Label
 t_scroll_speed
 right,disabled
 0
@@ -5950,7 +5962,7 @@ scroll_speed
 1
 2
 0
-Text
+Label
 t_quality
 right,disabled
 0
@@ -5974,7 +5986,7 @@ high_details
 1
 0
 0
-Text
+Label
 t_debug
 right,disabled
 0
@@ -5998,7 +6010,7 @@ Grid
 0
 0
 8
-Text
+Label
 t_audio_api
 right,disabled
 0
@@ -6010,7 +6022,7 @@ expandx
 1
 0
 0
-Text
+Label
 t_midi_api
 right,disabled
 0
@@ -6022,7 +6034,7 @@ expandx
 1
 1
 0
-Text
+Label
 t_prebuffer_size
 right,disabled
 0
@@ -6034,7 +6046,7 @@ prebuffer_size
 1
 2
 0
-Text
+Label
 t_suck_size
 right,disabled
 0
@@ -6064,7 +6076,7 @@ Grid
 2
 0
 6
-Text
+Label
 pdt_defaultartist
 right,disabled
 0
@@ -6076,7 +6088,7 @@ default_artist
 1
 0
 0
-Text
+Label
 t_quick_export_dir
 right,disabled
 0
@@ -6100,7 +6112,7 @@ image=hui:find
 1
 0
 0
-Text
+Label
 pdt_oggrate
 right,disabled
 0
@@ -6609,7 +6621,7 @@ Grid
 0
 1
 2
-Text
+Label
 tuning
 expandx
 0

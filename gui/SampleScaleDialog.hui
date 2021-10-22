@@ -2,24 +2,24 @@ Dialog sample_scale_dialog "Scale sample" width=250 height=80
 	Grid ? "" vertical
 		Grid ? "" 5 3
 			.
-			Text ssd_t_samples "Samples"
-			Text ssd_t_rate "Sample rate"
-			Text ssd_t_rate_inv "Sample rate"
-			Text ssd_t_factor "Factor %"
+			Label ssd_t_samples "Samples"
+			Label ssd_t_rate "Sample rate"
+			Label ssd_t_rate_inv "Sample rate"
+			Label ssd_t_factor "Factor %"
 			---|
-			Text ssd_t_orig "Original"
+			Label ssd_t_orig "Original"
 			SpinButton samples_orig "1" range=1: expandx disabled
 			SpinButton rate_orig "1" range=1: expandx disabled
 			SpinButton rate_inv_orig "1" range=1: expandx
 			---|
-			Text ssd_t_new "New"
+			Label ssd_t_new "New"
 			SpinButton samples_new "1" range=1: expandx
 			SpinButton rate_new "1" range=1: expandx
 			SpinButton rate_inv_new "1" range=1: expandx disabled
 			SpinButton factor "0" range=0:1000:0.01 expandx
 		Grid ? ""
-			Text ssd_t_method "Method"
+			Label ssd_t_method "Method"
 			ComboBox method "Linear\\Cubic\\Sinc\\Fourier" expandx
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			Button /ok "OK" default image=hui:ok

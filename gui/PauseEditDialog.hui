@@ -1,9 +1,9 @@
 Dialog pause_edit_dialog "Edit pause" width=250 height=80 headerbar closebutton=no
 	Grid ? "" vertical
 		Grid ? ""
-			Text t_duration "Duration" right disabled
+			Label t_duration "Duration" right disabled
 			SpinButton duration "1.0" range=0:10000:0.001 expandx
-			Text /s "s"
+			Label /s "s"
 		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel

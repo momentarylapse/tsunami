@@ -7,9 +7,9 @@ Dialog sample_ref_dialog "Sample" width=375 height=230
 		Group ld_t_volume "Volume"
 			Grid ? ""
 				SpinButton volume "0" range=-10000:10:0.1 expandx
-				Text /db "dB"
+				Label /db "dB"
 				CheckBox mute "Muted" ignorefocus
-		Text ? "" expandy
+		Label ? "" expandy
 		Group ld_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus

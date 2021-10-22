@@ -48,7 +48,7 @@ Dialog midi_editor "Midi" width=300 height=516
 				ToggleButton length-triplet "" image=note-length-triplet flat big "tooltip=Triplet note (combines with any basic note length)" ignorefocus
 				.
 				Button length-custom "..." flat big "tooltip=Custom note length (L,P)" ignorefocus
-				Text length-result "" "tooltip=Resulting note length / beat partition"
+				Label length-result "" "tooltip=Resulting note length / beat partition"
 		Group grp-modifier "Modifier"
 			Grid ? "" homogenousx
 				ToggleButton modifier-sharp "♯" flat big "tooltip=Sharp - new note is 1 semitone above the key" expandx ignorefocus
@@ -76,10 +76,10 @@ Dialog midi_editor "Midi" width=300 height=516
 					CheckBox input_active "Active" ignorefocus
 					CheckBox input_capture "Capture" ignorefocus
 				---|
-				Text t_input "Source" right disabled
+				Label t_input "Source" right disabled
 				ComboBox input "" expandx ignorefocus
 				---|
-				Text t_input_volume "Volume" right disabled
+				Label t_input_volume "Volume" right disabled
 				Grid ? ""
 					RadioButton input_volume:key "Key speed" "tooltip=Use the key pressure of the input device" ignorefocus
 					RadioButton input_volume:max "Maximum" "tooltip=Ignore key pressure and always use 100% volume" ignorefocus

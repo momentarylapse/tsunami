@@ -57,7 +57,7 @@ public:
 	void on_add_midi_track();
 	void on_track_delete();
 	void on_track_render();
-	void on_track_edit_midi();
+	void on_track_edit();
 	void on_track_edit_fx();
 	void on_track_add_marker();
 	void on_track_convert_mono();

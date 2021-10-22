@@ -18,7 +18,7 @@ Dialog track_dialog "Spur" width=380 height=516
 						ComboBox instrument "" expandx ignorefocus
 						---|
 						Grid ? ""
-							Text tuning "" expandx
+							Label tuning "" expandx
 							Button edit_tuning "" image=hui:edit flat ignorefocus
 				Expander g_fx "Effects"
 					Grid ? "" expandx

@@ -31,8 +31,8 @@ public:
 	bool is_enabled();
 
 	void *execute(Action *a);
-	void undo();
-	void redo();
+	bool undo();
+	bool redo();
 
 	void group_begin();
 	void group_end();

@@ -516,8 +516,8 @@ class Song as shared
 	func extern add_sample(s: Sample)
 	func extern delete_sample(s: Sample)
 	
-	func extern undo()
-	func extern redo()
+	func extern undo() -> bool
+	func extern redo() -> bool
 	func extern reset_history()
 	func extern begin_action_group()
 	func extern end_action_group()

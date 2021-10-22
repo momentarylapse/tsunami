@@ -28,14 +28,12 @@ Data::~Data() {
 
 
 
-void Data::redo() {
-	action_manager->redo();
+bool Data::redo() {
+	return action_manager->redo();
 }
 
-
-
-void Data::undo() {
-	action_manager->undo();
+bool Data::undo() {
+	return action_manager->undo();
 }
 
 

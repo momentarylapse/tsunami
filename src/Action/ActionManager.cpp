@@ -98,24 +98,26 @@ void *ActionManager::execute(Action *a) {
 
 
 
-void ActionManager::undo() {
+bool ActionManager::undo() {
 	if (!undoable())
-		return;
+		return false;
 
 	_edit_start();
 	action[-- cur_pos]->undo(data);
 	_edit_end();
+	return true;
 }
 
 
 
-void ActionManager::redo() {
+bool ActionManager::redo() {
 	if (!redoable())
-		return;
+		return false;
 
 	_edit_start();
 	action[cur_pos ++]->redo(data);
 	_edit_end();
+	return true;
 }
 
 bool ActionManager::undoable() {

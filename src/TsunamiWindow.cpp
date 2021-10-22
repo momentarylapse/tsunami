@@ -669,11 +669,13 @@ void TsunamiWindow::on_show_log() {
 }
 
 void TsunamiWindow::on_undo() {
-	song->undo();
+	if (song->undo())
+		view->set_message(_("undone"));
 }
 
 void TsunamiWindow::on_redo() {
-	song->redo();
+	if (song->redo())
+		view->set_message(_("redone"));
 }
 
 void TsunamiWindow::on_send_bug_report() {

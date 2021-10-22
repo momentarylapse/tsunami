@@ -32,8 +32,8 @@ public:
 
 	void reset_history();
 	void *execute(Action *a);
-	void _cdecl undo();
-	void _cdecl redo();
+	bool _cdecl undo();
+	bool _cdecl redo();
 	void _cdecl begin_action_group();
 	void _cdecl end_action_group();
 

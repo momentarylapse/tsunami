@@ -81,6 +81,7 @@ const string Song::MESSAGE_EDIT_LAYER = "EditLayer";
 const string Song::MESSAGE_DELETE_LAYER = "DeleteLayer";
 const string Song::MESSAGE_CHANGE_CHANNELS = "ChangeChannels";
 const string Song::MESSAGE_EDIT_BARS = "EditBars";
+const string Song::MESSAGE_SCALE_BARS = "ScaleBars";
 const string Song::MESSAGE_ENABLE_FX = "EnableFx";
 
 bool Tag::operator ==(const Tag &o) const {

@@ -50,6 +50,11 @@ public:
 	void lock();
 	bool try_lock();
 	void unlock();
+
+
+	struct XMessageData {
+		int i[8];
+	} x_message_data;
 };
 
 #endif /* SRC_DATA_DATA_H_ */

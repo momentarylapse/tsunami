@@ -61,6 +61,7 @@ public:
 	static const string MESSAGE_DELETE_LAYER;
 	static const string MESSAGE_CHANGE_CHANNELS;
 	static const string MESSAGE_EDIT_BARS;
+	static const string MESSAGE_SCALE_BARS;
 	static const string MESSAGE_ENABLE_FX;
 
 

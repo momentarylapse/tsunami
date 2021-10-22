@@ -33,6 +33,10 @@ void *ActionBar__Edit::execute(Data *d) {
 	std::swap(divisor, bar->divisor);
 	bar->update_total();
 
+
+	s->x_message_data = {index, length, bar->length};
+	s->notify_direct(s->MESSAGE_SCALE_BARS);
+
 	s->notify(s->MESSAGE_EDIT_BARS);
 
 	return nullptr;

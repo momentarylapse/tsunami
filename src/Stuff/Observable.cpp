@@ -206,3 +206,12 @@ void ObservableData::notify(const string &message) {
 		notify_send();
 }
 
+void ObservableData::notify_direct(const string &message) {
+	auto mq = message_queue;
+
+	message_queue = {&message};
+	notify_send();
+
+	message_queue = mq;
+}
+

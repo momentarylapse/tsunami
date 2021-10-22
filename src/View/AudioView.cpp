@@ -336,19 +336,40 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
 	song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
 	//song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
-	song->subscribe(this, [=]{
+	auto apply_bar_scale = [=](int i) {
+		auto b = song->bars[song->x_message_data.i[0]].get();
+		msg_write(format("%d %d %d", song->x_message_data.i[0], song->x_message_data.i[1], song->x_message_data.i[2]));
+		msg_write(b->range().str());
+		if (i <= b->offset) {
+			msg_write("A");
+			return i;
+		}
+		if (i >= b->offset + song->x_message_data.i[1]) {
+			msg_write("B");
+			return i - song->x_message_data.i[1] + song->x_message_data.i[2];
+		}
+		msg_write("x");
+		return b->offset + (int)((float)(i - b->offset) * (float)song->x_message_data.i[2] / (float)song->x_message_data.i[1]);
+	};
+	song->subscribe(this, [=] {
+		msg_write(sel.range_raw.str());
+		sel.range_raw.set_start(apply_bar_scale(sel.range_raw.start()));
+		sel.range_raw.set_end(apply_bar_scale(sel.range_raw.end()));
+		//update_selection();
+	}, song->MESSAGE_SCALE_BARS);
+	song->subscribe(this, [=] {
 		on_song_new();
 		on_song_finished_loading();
 		enable(true);
 	}, song->MESSAGE_FINISHED_LOADING);
-	song->subscribe(this, [=]{
+	song->subscribe(this, [=] {
 		enable(false);
 	}, song->MESSAGE_START_LOADING);
-	song->subscribe(this, [=]{
+	song->subscribe(this, [=] {
 		peak_thread->stop_update();
 	}, song->MESSAGE_BEFORE_CHANGE);
-	song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
-	song->subscribe(this, [=]{
+	song->subscribe(this, [=] { on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
+	song->subscribe(this, [=] {
 		force_redraw();
 		update_menu();
 	}, song->MESSAGE_ANY);

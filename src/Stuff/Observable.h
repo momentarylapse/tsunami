@@ -20,6 +20,7 @@ public:
 
 	void notify_begin();
 	void notify(const string &message);
+	void notify_direct(const string &message);
 	void notify_end();
 	void notify_enqueue(const string &message);
 	void notify_send();
@@ -78,6 +79,9 @@ public:
 	}
 	void notify(const string &message = MESSAGE_CHANGE) const {
 		observable_data.notify(message);
+	}
+	void notify_direct(const string &message = MESSAGE_CHANGE) const {
+		observable_data.notify_direct(message);
 	}
 	void notify_end() const {
 		observable_data.notify_end();

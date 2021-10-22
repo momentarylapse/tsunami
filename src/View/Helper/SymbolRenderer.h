@@ -11,6 +11,7 @@
 #include "../../lib/base/base.h"
 
 class Painter;
+class vec2;
 
 
 namespace SymbolRenderer {
@@ -18,7 +19,7 @@ namespace SymbolRenderer {
 
 	Symbol *make_symbol(float size, bool bold, const string &s, bool);
 	Symbol *get_symbol(float size, bool bold, const string &s);
-	void draw(Painter *p, float x, float y, float size, const string &s, bool bold = false, int align = 1);
+	void draw(Painter *p, const vec2 &pos, float size, const string &s, bool bold = false, int align = 1);
 	float width(Painter *p, float size, const string &s, bool bold = false);
 
 	void enable(bool enabled);

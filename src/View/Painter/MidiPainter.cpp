@@ -538,7 +538,7 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState s
 	if (n->flags > 0) {
 		float x = (x1 + x2) / 2;
 		if (n->is(NOTE_FLAG_TRILL))
-			SymbolRenderer::draw(c, x, y - rr*3, rr, "tr", true, 0);
+			SymbolRenderer::draw(c, {x, y - rr*4}, rr*1.5f, "tr", true, 0);
 			//c->draw_str(x, y - rr*3, "tr~");
 		if (n->is(NOTE_FLAG_STACCATO))
 			c->draw_circle({x + rr, y + rr*2}, 2);
@@ -682,11 +682,11 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 		// fret number as symbol
 		c->set_color(col);
-		SymbolRenderer::draw(c, x, y - font_size/2, font_size, tt, true, 0);
+		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
 
 		draw_note_flags(c, n, state, x1, x2, y);
 	} else {
-		SymbolRenderer::draw(c, x, y - font_size/2, font_size, "e", true, 0);
+		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, "e", true, 0);
 	}
 }
 
@@ -716,11 +716,13 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2) {
+		c->set_line_width(clef_line_width);
 		c->set_color(local_theme.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->draw_line({x - clef_dy, y}, {x + clef_dy, y});
 	}
 	for (int i=-2; i>=p; i-=2) {
+		c->set_line_width(clef_line_width);
 		c->set_color(local_theme.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->draw_line({x - clef_dy, y}, {x + clef_dy, y});
@@ -731,8 +733,7 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	if ((n->modifier != NoteModifier::NONE) and (rr >= 3)) {
 		c->set_color(local_theme.text);
 		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
-		float size = rr*2.8f;
-		SymbolRenderer::draw(c, x - size*1.0f, y - size*0.5f , size, modifier_symbol(n->modifier));
+		SymbolRenderer::draw(c, {x - modifier_font_size*1.0f, y - modifier_font_size*0.5f}, modifier_font_size, modifier_symbol(n->modifier));
 	}
 }
 
@@ -741,11 +742,14 @@ void MidiPainter::draw_key_symbol(Painter *c, const MidiKeyChange &kc) {
 
 	c->set_font_size(clef_dy*4);
 	c->draw_str({x + 10, clef_pos_to_screen(8)}, clef->symbol);
-	c->set_font_size(clef_dy);
+
+
+	//SymbolRenderer::draw(c, x - size*1.0f, y - size*0.5f , size, modifier_symbol(n->modifier));
+	//c->set_font_size(clef_dy);
 
 	for (int i=0; i<7; i++) {
 		if (kc.key.modifiers[i] != NoteModifier::NONE)
-			c->draw_str({x + 18 + clef_dy*3.0f + clef_dy*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - clef_dy*0.5f}, modifier_symbol(kc.key.modifiers[i]));
+			SymbolRenderer::draw(c, {x + 18 + modifier_font_size*3.0f + modifier_font_size*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - modifier_font_size/2}, modifier_font_size, modifier_symbol(kc.key.modifiers[i]));
 	}
 	c->set_font_size(local_theme.FONT_SIZE);
 }
@@ -914,6 +918,8 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 1.3f, 2.0f);
 	if (mode == MidiMode::TAB)
 		rr = min(string_dy/2, 13.0f);
+
+	modifier_font_size = rr * 2.8f;
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {

@@ -129,6 +129,7 @@ public:
 	float clef_line_width;
 	MidiMode mode;
 	float rr;
+	float modifier_font_size;
 	Range cur_range;
 
 

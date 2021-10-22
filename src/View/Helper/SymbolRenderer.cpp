@@ -90,24 +90,23 @@ Symbol *get_symbol(float size, bool bold, const string &s) {
 	return make_symbol(size, bold, s);
 }
 
-void draw(Painter *p, float x, float y, float size, const string &s, bool bold, int align) {
+void draw(Painter *p, const vec2 &pos, float size, const string &s, bool bold, int align) {
+	vec2 d = {0,0};
 	if (enabled) {
 		auto sym = get_symbol(size, bold, s);
-		float dx = 0;
 		if (align == 0)
-			dx = - sym->im.width / 2;
+			d.x = - sym->im.width / 2;
 		if (align == -1)
-			dx = - sym->im.width;
+			d.x = - sym->im.width;
 		//p->drawImage(x + dx, y, sym->im);
-		p->draw_mask_image({x + dx, y}, &sym->im);
+		p->draw_mask_image(pos + d, &sym->im);
 	} else {
 		p->set_font_size(size);
-		float dx = 0;
 		if (align == 0)
-			dx = - p->get_str_width(s) / 2;
+			d.x = - p->get_str_width(s) / 2;
 		if (align == -1)
-			dx = - p->get_str_width(s);
-		p->draw_str({x + dx, y}, s);
+			d.x = - p->get_str_width(s);
+		p->draw_str(pos + d, s);
 	}
 }
 

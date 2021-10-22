@@ -421,6 +421,22 @@ MidiPainter* midi_context(AudioViewLayer *l) {
 	return mp;
 }
 
+void ViewModeDefault::draw_selected_layer_highlight(Painter *p, const rect &area) {
+	float d = 12;
+	p->set_color(theme.text.with_alpha(0.1f));
+	p->draw_rect(rect(view->song_area().x1, area.x2, area.y1-d, area.y1));
+	p->draw_rect(rect(view->song_area().x1, area.x2, area.y2, area.y2+d));
+	d = 2;
+	p->set_color(theme.text.with_alpha(0.7f));
+	p->draw_rect(rect(view->song_area().x1, area.x2, area.y1-d, area.y1));
+	p->draw_rect(rect(view->song_area().x1, area.x2, area.y2, area.y2+d));
+}
+
+void ViewModeDefault::draw_post(Painter *p) {
+	if (session->mode.match("default/track*"))
+		draw_selected_layer_highlight(p, view->cur_vtrack()->area);
+}
+
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	view->grid_painter->set_context(l->area, l->grid_colors());
 	view->grid_painter->draw_empty_background(c);

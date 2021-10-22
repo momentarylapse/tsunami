@@ -24,7 +24,9 @@ public:
 	float layer_suggested_height(AudioViewLayer *l) override;
 	int suggest_move_cursor(const Range &cursor, bool forward) override;
 
-	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
+	void draw_selected_layer_highlight(Painter *p, const rect &area);
+	void draw_post(Painter *p) override;
+	void draw_layer_background(Painter *p, AudioViewLayer *l) override;
 
 	SongSelection get_selection_for_range(const Range &r) override;
 	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;

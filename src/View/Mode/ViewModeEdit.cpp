@@ -89,21 +89,7 @@ void ViewModeEdit::draw_layer_background(Painter *c, AudioViewLayer *l) {
 void ViewModeEdit::draw_post(Painter *c) {
 	mode->draw_post(c);
 
-	auto *l = view->cur_vlayer();
-
-
-	// layer border
-	color col = theme.text;
-	col.a = 0.1f;
-	float d = 12;
-	c->set_color(col);
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, l->area.y1-d, l->area.y1));
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, l->area.y2, l->area.y2+d));
-	d = 2;
-	col.a = 0.7f;
-	c->set_color(col);
-	c->draw_rect(rect(view->song_area().x1, l->area.x2, l->area.y1-d, l->area.y1));
-	c->draw_rect(rect(view->song_area().x1, l->area.x2, l->area.y2, l->area.y2+d));
+	ViewModeDefault::draw_selected_layer_highlight(c, view->cur_vlayer()->area);
 }
 
 HoverData ViewModeEdit::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {

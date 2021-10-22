@@ -115,19 +115,8 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 
 void ViewModeCurve::draw_post(Painter* c) {
 	auto *t = cur_vtrack();
-	if (!t)
-		return;
-	color col = theme.text;
-	col.a = 0.1f;
-	float d = 12;
-	c->set_color(col);
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y1-d, t->area.y1));
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y2, t->area.y2 + d));
-	d = 2;
-	col.a = 0.7f;
-	c->set_color(col);
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y1-d, t->area.y1));
-	c->draw_rect(rect(view->song_area().x1, view->song_area().x2, t->area.y2, t->area.y2 + d));
+	if (t)
+		ViewModeDefault::draw_selected_layer_highlight(c, t->area);
 }
 
 HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {

@@ -120,8 +120,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-delete", [=]{ on_track_delete(); });
 	event("track-create-group", [=]{ on_track_group(); });
 	event("track-ungroup", [=]{ on_track_ungroup(); });
-	//event("layer-edit-midi", [=]{ on_track_edit_midi(); });
-	//set_key_code("layer-edit-midi", hui::KEY_ALT + hui::KEY_E);
 	event("mode-edit-check", [=] {
 		if (view->mode == view->mode_edit)
 			session->set_mode(EditMode::Default);
@@ -130,7 +128,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	});
 	event("layer-edit", [=]{ on_track_edit_midi(); });
 	set_key_code("layer-edit", hui::KEY_ALT + hui::KEY_E);
-	event("layer-edit-curves", [=]{ session->set_mode(EditMode::Curves); });
+	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
 	event("track-edit-fx", [=]{ on_track_edit_fx(); });
 	event("track-add-marker", [=]{ on_track_add_marker(); });
 	set_key_code("track-add-marker", hui::KEY_CONTROL + hui::KEY_J);

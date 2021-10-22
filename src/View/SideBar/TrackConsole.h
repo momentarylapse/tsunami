@@ -46,7 +46,6 @@ public:
 		MIDI_FX,
 		SYNTH
 	};
-	Mode mode;
 	void set_mode(Mode m);
 };
 

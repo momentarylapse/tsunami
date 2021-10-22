@@ -63,21 +63,20 @@ TrackConsole::TrackConsole(Session *session) :
 	event("edit_tuning", [=]{ on_edit_tuning(); });
 
 	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
-	event("edit_fx", [=]{ session->set_mode(EditMode::DefaultTrackFx); });
 	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
 	event("edit_midi", [=]{ session->set_mode(EditMode::EditTrack); });
-	event("edit_midi_fx", [=]{ session->set_mode(EditMode::DefaultTrackMidiFx); });
-	event("edit_synth", [=]{ session->set_mode(EditMode::DefaultTrackSynth); });
 }
 
-void TrackConsole::set_mode(Mode m) {
-	mode = m;
-	hide_control("g_fx", (mode != Mode::FX) and (mode != Mode::MIDI_FX));
-	if (mode == Mode::FX)
+void TrackConsole::set_mode(Mode mode) {
+	if (mode == Mode::FX) {
+		expand("g_fx", 0, true);
 		set_int("tc", 0);
-	if (mode == Mode::MIDI_FX)
+	} else if (mode == Mode::MIDI_FX) {
+		expand("g_fx", 0, true);
 		set_int("tc", 1);
-	hide_control("g_synth", (mode != Mode::SYNTH));
+	} else if (mode == Mode::SYNTH) {
+		expand("g_synth", 0, true);
+	}
 }
 
 void TrackConsole::on_enter() {

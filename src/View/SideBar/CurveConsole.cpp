@@ -38,12 +38,6 @@ CurveConsole::CurveConsole(Session *session) :
 	event("edit_track", [=] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_fx", [=] {
-		session->set_mode(EditMode::DefaultTrackFx);
-	});
-	event("edit_synth", [=] {
-		session->set_mode(EditMode::DefaultTrackSynth);
-	});
 	event("edit_midi", [=] {
 		session->set_mode(EditMode::EditTrack);
 	});

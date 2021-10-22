@@ -85,14 +85,12 @@ Dialog midi_editor "Midi" width=300 height=516
 					RadioButton input_volume:max "Maximum" "tooltip=Ignore key pressure and always use 100% volume" ignorefocus
 		Expander me_group_reference "Reference tracks" hidden
 			ListView reference_tracks "" height=200 noexpandy nobar select-multi
-		Text ? "" expandy
+		Label ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link ignorefocus
 				Label /edit-separator "›" disabled
 				Button /edit_track "Track" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_fx "Fx" link ignorefocus
-				Button /edit_synth "Synth" link ignorefocus
 				Button /edit_midi "Midi" link ignorefocus disabled
 				Button /edit_curves "Curves" link ignorefocus

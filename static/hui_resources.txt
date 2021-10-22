@@ -634,7 +634,7 @@ Grid
 
 0
 0
-8
+6
 Button
 edit_song
 link,ignorefocus
@@ -660,27 +660,15 @@ disabled
 0
 0
 Button
-edit_fx
+edit_midi
 link,ignorefocus
 4
 0
 0
 Button
-edit_synth
-link,ignorefocus
-5
-0
-0
-Button
-edit_midi
-link,ignorefocus
-6
-0
-0
-Button
 edit_curves
 link,ignorefocus,disabled
-7
+5
 0
 0
 # Resource
@@ -2509,7 +2497,7 @@ height=200,noexpandy,nobar,select-multi
 0
 0
 0
-Text
+Label
 ?
 expandy
 8
@@ -2526,7 +2514,7 @@ Grid
 
 0
 0
-8
+6
 Button
 edit_song
 link,ignorefocus
@@ -2552,27 +2540,15 @@ disabled
 0
 0
 Button
-edit_fx
-link,ignorefocus
-4
-0
-0
-Button
-edit_synth
-link,ignorefocus
-5
-0
-0
-Button
 edit_midi
 link,ignorefocus,disabled
-6
+4
 0
 0
 Button
 edit_curves
 link,ignorefocus
-7
+5
 0
 0
 # Resource
@@ -6609,7 +6585,7 @@ percent
 2
 1
 0
-Group
+Expander
 g_instrument
 
 1
@@ -6645,7 +6621,7 @@ image=hui:edit,flat,ignorefocus
 1
 0
 0
-Group
+Expander
 g_fx
 
 2
@@ -6699,7 +6675,7 @@ grid-config
 0
 0
 0
-Group
+Expander
 g_synth
 
 3
@@ -6722,7 +6698,7 @@ Grid
 
 0
 0
-8
+6
 Button
 edit_song
 link,ignorefocus
@@ -6748,27 +6724,15 @@ disabled
 0
 0
 Button
-edit_fx
+edit_midi
 link,ignorefocus
 4
 0
 0
 Button
-edit_synth
-link,ignorefocus
-5
-0
-0
-Button
-edit_midi
-link,ignorefocus
-6
-0
-0
-Button
 edit_curves
 link,ignorefocus
-7
+5
 0
 0
 # Resource
@@ -7050,7 +7014,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-627
+625
 # Text
 /bars-add
 Add bars...
@@ -7121,9 +7085,6 @@ Ignore
 /edit_curves
 Curves
 
-/edit_fx
-Fx
-
 /edit_midi
 Midi
 
@@ -7135,9 +7096,6 @@ Samples
 
 /edit_song
 File
-
-/edit_synth
-Synth
 
 /edit_track
 Track

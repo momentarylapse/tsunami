@@ -254,8 +254,8 @@ public:
 		console->view->renderer->get_peak(track(), peak);
 		peak[0] = sqrt(peak[0]);
 		peak[1] = sqrt(peak[1]);
-		p->draw_rect(rect(0, w/2,  h * (1 - peak[0]), 1));
-		p->draw_rect(rect(w/2, w, h * (1 - peak[1]), 1));
+		p->draw_rect(rect(0, w/2,  h * (1 - peak[0]), h));
+		p->draw_rect(rect(w/2, w, h * (1 - peak[1]), h));
 	}
 	void update() {
 		if (!vtrack)

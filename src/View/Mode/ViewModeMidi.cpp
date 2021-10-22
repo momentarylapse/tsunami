@@ -104,8 +104,15 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 
 void ViewModeMidi::set_modifier(NoteModifier mod) {
-	modifier = mod;
-	view->set_message(modifier_symbol(mod), 4);
+	if (mod == modifier) {
+		modifier = NoteModifier::NONE;
+	} else {
+		modifier = mod;
+	}
+	if (modifier == NoteModifier::NONE)
+		view->set_message(_("no modifier"));
+	else
+		view->set_message(modifier_symbol(modifier), 2);
 	notify();
 }
 
@@ -442,12 +449,11 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 
 	string t;
 	if (n > 4) {
-		t = text + " x " + i2s(n);
+		t = text + u8" \u00d7 " + i2s(n);
 	} else {
-		for (int i=0; i<n; i++)
-			t += text;
+		t = (text + " ").repeat(n).trim();
 	}
-	m->view->set_message(t, 6);
+	m->view->set_message(t, 2);
 }
 
 void ViewModeMidi::on_key_down(int k) {
@@ -522,13 +528,13 @@ void ViewModeMidi::on_key_down(int k) {
 
 	if (k == hui::KEY_Q)
 		// quarter
-		set_note_lengthx(this, 1, 1, rep_key_num, u8"\U0001d15f  ");
+		set_note_lengthx(this, 1, 1, rep_key_num, u8"\U0001d15f");
 	if (k == hui::KEY_W)
 		// 8th
-		set_note_lengthx(this, 1, 2, rep_key_num, u8"\U0001d160  ");
+		set_note_lengthx(this, 1, 2, rep_key_num, u8"\U0001d160");
 	if (k == hui::KEY_S)
 		// 16th
-		set_note_lengthx(this, 1, 4, rep_key_num, u8"\U0001d161  ");
+		set_note_lengthx(this, 1, 4, rep_key_num, u8"\U0001d161");
 
 	if (k == hui::KEY_T)
 		set_note_lengthx(this, 1, 3, rep_key_num, "⅓");

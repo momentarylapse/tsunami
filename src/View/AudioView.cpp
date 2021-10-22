@@ -1142,10 +1142,9 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
 void AudioView::draw_message(Painter *c, Message &m) {
 	float a = min(m.ttl*8, 1.0f);
 	a = pow(a, 0.4f);
-	color c1 = theme.high_contrast_a;
-	color c2 = theme.high_contrast_b;
-	c1.a = c2.a = a;
-	c->set_font_size(theme.FONT_SIZE * m.size * a);
+	color c1 = theme.high_contrast_a.with_alpha(a);
+	color c2 = theme.high_contrast_b.with_alpha(a);
+	c->set_font_size(theme.FONT_SIZE * 1.3f * m.size * a);
 	draw_boxed_str(c, area.m(), m.text, c1, c2, TextAlign::CENTER);
 	c->set_font_size(theme.FONT_SIZE);
 }

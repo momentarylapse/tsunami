@@ -707,18 +707,23 @@ bool TsunamiWindow::allow_termination() {
 
 void TsunamiWindow::on_copy() {
 	app->clipboard->copy(view);
+	view->set_message(_("copied"));
 }
 
 void TsunamiWindow::on_paste() {
 	app->clipboard->paste(view);
+	view->set_message(_("pasted"));
 }
 
 void TsunamiWindow::on_paste_as_samples() {
 	app->clipboard->paste_as_samples(view);
+	view->set_message(_("pasted (sample)"));
+
 }
 
 void TsunamiWindow::on_paste_time() {
 	app->clipboard->paste_with_time(view);
+	view->set_message(_("pasted (time)"));
 }
 
 void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win) {

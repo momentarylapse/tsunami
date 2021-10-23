@@ -18,12 +18,7 @@ public:
 	
 	void fake_death();
 
-	void notify_begin();
 	void notify(const string &message);
-	void notify_direct(const string &message);
-	void notify_end();
-	void notify_enqueue(const string &message);
-	void notify_send();
 
 	typedef std::function<void()> Callback;
 	typedef std::function<void(VirtualBase*)> CallbackP;
@@ -48,11 +43,6 @@ public:
 		Notification(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
 	};
 
-	// current notifies
-	Array<const string*> message_queue;
-	int notify_level;
-
-	const string* cur_message;
 	VirtualBase *me;
 };
 
@@ -74,20 +64,8 @@ public:
 		observable_data.subscribe(this, observer, nullptr, callback_p, message);
 	}
 
-	void notify_begin() const {
-		observable_data.notify_begin();
-	}
 	void notify(const string &message = MESSAGE_CHANGE) const {
 		observable_data.notify(message);
-	}
-	void notify_direct(const string &message = MESSAGE_CHANGE) const {
-		observable_data.notify_direct(message);
-	}
-	void notify_end() const {
-		observable_data.notify_end();
-	}
-	const string& cur_message() const {
-		return *observable_data.cur_message;
 	}
 	void fake_death() const {
 		observable_data.fake_death();

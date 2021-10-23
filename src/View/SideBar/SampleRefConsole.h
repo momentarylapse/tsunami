@@ -31,6 +31,8 @@ public:
 
 	TrackLayer *layer;
 	SampleRef *sample;
+
+	bool editing;
 };
 
 #endif /* SAMPLEREFCONSOLE_H_ */

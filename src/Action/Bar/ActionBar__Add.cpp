@@ -22,6 +22,7 @@ void *ActionBar__Add::execute(Data *d) {
 	assert(index <= s->bars.num);
 
 	s->bars.insert(bar, index);
+	s->bars._update_offsets();
 	s->notify(s->MESSAGE_EDIT_BARS);
 
 	return nullptr;
@@ -31,6 +32,7 @@ void ActionBar__Add::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->bars.erase(index);
+	s->bars._update_offsets();
 	s->notify(s->MESSAGE_EDIT_BARS);
 }
 

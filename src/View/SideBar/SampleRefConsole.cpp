@@ -24,6 +24,7 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	from_resource("sample_ref_dialog");
 	layer = nullptr;
 	sample = nullptr;
+	editing = false;
 
 	event("volume", [=]{ on_volume(); });
 	event("mute", [=]{ on_mute(); });
@@ -57,11 +58,11 @@ void SampleRefConsole::on_name() {
 void SampleRefConsole::on_mute() {
 	if (!sample)
 		return;
-	sample->unsubscribe(this);
+	editing = true;
 	layer->edit_sample_ref(sample, sample->volume, is_checked(""));
 
 	enable("volume", !sample->muted);
-	sample->subscribe(this, [=]{ on_update(); });
+	editing = true;
 }
 
 void SampleRefConsole::on_track() {
@@ -71,9 +72,9 @@ void SampleRefConsole::on_track() {
 void SampleRefConsole::on_volume() {
 	if (!sample)
 		return;
-	sample->unsubscribe(this);
+	editing = true;
 	layer->edit_sample_ref(sample, db2amplitude(get_float("")), sample->muted);
-	sample->subscribe(this, [=]{ on_update(); });
+	editing = false;
 }
 
 void SampleRefConsole::load_data() {
@@ -103,15 +104,17 @@ void SampleRefConsole::on_view_cur_sample_change() {
 		sample->unsubscribe(this);
 	layer = view->cur_layer();
 	sample = view->cur_sample();
-	if (sample)
-		sample->subscribe(this, [=]{ on_update(); });
+	if (sample) {
+		sample->subscribe(this, [=] {
+			sample->unsubscribe(this);
+			sample = nullptr;
+		}, sample->MESSAGE_DELETE);
+		sample->subscribe(this, [=] { on_update(); });
+	}
 	load_data();
 }
 
 void SampleRefConsole::on_update() {
-	if (sample->cur_message() == sample->MESSAGE_DELETE){
-		sample->unsubscribe(this);
-		sample = nullptr;
-	}
-	load_data();
+	if (!editing)
+		load_data();
 }

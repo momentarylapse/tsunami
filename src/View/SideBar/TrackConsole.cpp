@@ -159,6 +159,7 @@ void TrackConsole::set_track(Track *t) {
 	load_data();
 	if (track) {
 		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
+		track->subscribe(this, [=]{ set_track(nullptr); }, track->MESSAGE_DELETE);
 		track->subscribe(this, [=]{ on_update(); });
 	}
 }
@@ -200,10 +201,6 @@ void TrackConsole::on_view_cur_track_change() {
 }
 
 void TrackConsole::on_update() {
-	if (track->cur_message() == track->MESSAGE_DELETE) {
-		set_track(nullptr);
-	} else {
-		if (!editing)
-			load_data();
-	}
+	if (!editing)
+		load_data();
 }

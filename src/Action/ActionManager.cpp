@@ -70,7 +70,7 @@ bool ActionManager::_try_merge_into_head(Action *a) {
 }
 
 void ActionManager::_edit_start() {
-	data->notify_direct(Data::MESSAGE_BEFORE_CHANGE);
+	data->notify(Data::MESSAGE_BEFORE_CHANGE);
 	_lock();
 }
 

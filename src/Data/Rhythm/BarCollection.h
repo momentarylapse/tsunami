@@ -30,6 +30,8 @@ public:
 	Range expand(const Range &r, int sub_beat_partition) const;
 	Range range() const;
 	Range sub_range(const Range &indices) const;
+
+	void _update_offsets();
 };
 
 

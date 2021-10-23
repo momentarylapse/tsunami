@@ -139,3 +139,11 @@ Range BarCollection::range() const {
 	return Range(0, pos0);
 }
 
+void BarCollection::_update_offsets() {
+	int pos = 0;
+	foreachi(Bar *b, weak(*this), i) {
+		b->offset = pos;
+		pos += b->length;
+	}
+}
+

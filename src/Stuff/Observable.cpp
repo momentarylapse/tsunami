@@ -94,8 +94,6 @@ ObservableData::Notification::Notification(VirtualBase *o, const string *_messag
 
 ObservableData::ObservableData() {
 	me = nullptr; // it is only useful, when set by subscribe anyways...
-	notify_level = 0;
-	cur_message = nullptr;
 }
 
 ObservableData::~ObservableData() {
@@ -140,33 +138,32 @@ static bool om_match(const string &m, const ObservableData::Subscription &r) {
 	return false;
 }
 
-void ObservableData::notify_send() {
-	if (!me) {
-		message_queue.clear();
+
+void ObservableData::notify(const string &message) {
+	if (!me)
 		return;
-	}
 
 	Array<Notification> notifications;
 
 	// decide whom to send what
-	for (const string *m: message_queue) {
-		//msg_write("send " + observable_name + ": " + queue[i]);
-		for (auto &r: subscriptions) {
-			if (om_match(*m, r))
-				notifications.add(Notification(r.observer, m, r.callback, r.callback_p));
-		}
-	}
+	//msg_write("send " + observable_name + ": " + queue[i]);
+	for (auto &r: subscriptions) {
+		if (om_match(message, r))
+			notifications.add(Notification(r.observer, &message, r.callback, r.callback_p));
 
-	message_queue.clear();
+		// why don't we just send in this loop?
+		// I guess it has something to do with recursion... but what...???
+		// still needed without grouping/etc
+	}
 
 	// send
 	for (auto &n: notifications) {
 		if (MESSAGE_DEBUG_LEVEL >= 1) {
-			msg_write(format("send %s  ---%s--->> %s", get_obs_name(me), *n.message, get_obs_name(n.observer)));
+			msg_write(format("send %s  ---%s--->> %s", get_obs_name(me), message, get_obs_name(n.observer)));
 			msg_right();
 		}
 
-		cur_message = n.message;
+		//cur_message = n.message;
 		if (n.callback)
 			n.callback();
 		else if (n.callback_p)
@@ -177,41 +174,3 @@ void ObservableData::notify_send() {
 		}
 	}
 }
-
-
-void ObservableData::notify_enqueue(const string &message) {
-	// already enqueued?
-	for (const string *m: message_queue)
-		if (&message == m)
-			return;
-
-	// add
-	message_queue.add(&message);
-}
-
-void ObservableData::notify_begin() {
-	notify_level ++;
-}
-
-void ObservableData::notify_end() {
-	notify_level --;
-	if (notify_level == 0)
-		notify_send();
-}
-
-
-void ObservableData::notify(const string &message) {
-	notify_enqueue(message);
-	if (notify_level == 0)
-		notify_send();
-}
-
-void ObservableData::notify_direct(const string &message) {
-	auto mq = message_queue;
-
-	message_queue = {&message};
-	notify_send();
-
-	message_queue = mq;
-}
-

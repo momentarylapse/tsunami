@@ -23,7 +23,7 @@ ControlLabel::ControlLabel(const string &title, const string &id) :
 #else
 	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
 #endif
-	flag_bold = flag_italic = flag_big = flag_small = false;
+	flag_bold = flag_italic = false;
 	flag_underline = flag_strikeout = false;
 	set_options(get_option_from_title(title));
 	ControlLabel::__set_string(title);
@@ -46,10 +46,6 @@ void ControlLabel::__set_string(const string &str) {
 		s = "<u>" + s + "</u>";
 	if (flag_strikeout)
 		s = "<s>" + s + "</s>";
-	if (flag_big)
-		s = "<big>" + s + "</big>";
-	else if (flag_small)
-		s = "<small>" + s + "</small>";
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 
@@ -74,10 +70,6 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 		flag_bold = true;
 	}else if (op == "italic"){
 		flag_italic = true;
-	}else if (op == "big"){
-		flag_big = true;
-	}else if (op == "small"){
-		flag_small = true;
 	}else if (op == "underline"){
 		flag_underline = true;
 	}else if (op == "strikeout"){

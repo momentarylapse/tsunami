@@ -14,8 +14,7 @@ namespace hui
 {
 
 
-class ControlLabel : public Control
-{
+class ControlLabel : public Control {
 public:
 	ControlLabel(const string &text, const string &id);
 	string get_string() override;
@@ -23,7 +22,7 @@ public:
 	void __set_option(const string &op, const string &value) override;
 
 	string text;
-	bool flag_bold, flag_italic, flag_big, flag_small, flag_underline, flag_strikeout;
+	bool flag_bold, flag_italic, flag_underline, flag_strikeout;
 };
 
 };

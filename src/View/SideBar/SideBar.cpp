@@ -40,7 +40,7 @@ SideBar::SideBar(Session *_session) {
 	set_image("close", "hui:close");
 	add_button("!noexpandx,flat", 1, 0, "large");
 	set_image("large", "hui:up");
-	add_label("!big,bold,expandx,center\\...", 2, 0, "title");
+	add_label("!huge,bold,expandx,center\\...", 2, 0, "title");
 
 	hide_control("large", true);
 

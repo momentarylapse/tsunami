@@ -270,10 +270,10 @@ void Control::set_options(const string &options) {
 			grab_focus = false;
 			gtk_widget_set_can_focus(widget, false);
 		} else if (op == "big") {
-			set_style_for_widget(widget, id, "{font-size: 150%}");
+			set_style_for_widget(widget, id, "{font-size: 125%}");
 			__set_option(op, val);
 		} else if (op == "huge") {
-			set_style_for_widget(widget, id, "{font-size: 180%}");
+			set_style_for_widget(widget, id, "{font-size: 150%}");
 			__set_option(op, val);
 		} else if (op == "small") {
 			set_style_for_widget(widget, id, "{font-size: 75%}");

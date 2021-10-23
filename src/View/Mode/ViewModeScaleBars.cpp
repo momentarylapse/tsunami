@@ -66,6 +66,11 @@ void ViewModeScaleBars::on_key_down(int k) {
 void ViewModeScaleBars::perform_scale() {
 	float factor = (float)view->sel.range().length / (float)scaling_range_orig.length;
 
+	// select current bar range
+	//  (because the selection range will be scaled automatically by view)
+	view->sel.range_raw = scaling_range_orig;
+	view->update_selection();
+
 	song->begin_action_group();
 	foreachb(int i, scaling_sel) {
 		BarPattern bb = *song->bars[i];

@@ -4,11 +4,11 @@
 <svg
    width="32"
    height="32"
-   viewBox="0 0 8.4666666 8.4666666"
+   viewBox="0 0 8.4666665 8.4666665"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   sodipodi:docname="aaa-symbolic.svg"
+   sodipodi:docname="note-flag-dead-symbolic.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -20,12 +20,12 @@
      borderopacity="1.0"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="false"
+     inkscape:pagecheckerboard="0"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="40.461003"
-     inkscape:cx="11.962135"
-     inkscape:cy="14.112354"
+     inkscape:zoom="13.837965"
+     inkscape:cx="24.823014"
+     inkscape:cy="9.1776499"
      inkscape:window-width="1920"
      inkscape:window-height="1020"
      inkscape:window-x="0"
@@ -39,11 +39,8 @@
      inkscape:snap-to-guides="true"
      inkscape:snap-grids="true"
      units="px"
-     width="16px"
-     scale-x="0.5"
-     showborder="true"
-     inkscape:showpageshadow="true"
-     showguides="false">
+     width="32px"
+     scale-x="0.5">
     <inkscape:grid
        type="xygrid"
        id="grid1371"
@@ -51,7 +48,19 @@
        originy="0" />
   </sodipodi:namedview>
   <defs
-     id="defs2" />
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect2423"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -61,20 +70,14 @@
        aria-label="𝅝𝄞"
        id="text2168"
        style="font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583">
-      <rect
-         style="opacity:1;stroke:none;stroke-width:0.529166;stroke-linejoin:round;stroke-dasharray:2.11666, 0.529166"
-         id="rect1150"
-         width="3.174998"
-         height="3.174998"
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0700042"
          x="43.084763"
-         y="44.174858" />
-      <rect
-         style="opacity:1;stroke:none;stroke-width:0.53;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:2.12, 0.53;stroke-dashoffset:0"
-         id="rect1394"
-         width="7.408329"
-         height="0.52916634"
-         x="41.497261"
-         y="42.587364" />
+         y="45.762363"
+         id="text69243"><tspan
+           sodipodi:role="line"
+           id="tspan73027">👋✋👍a</tspan></text>
     </g>
   </g>
 </svg>

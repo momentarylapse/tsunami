@@ -191,11 +191,13 @@ HuiImage *get_image(const string &filename) {
 	return &_all_images_.back();
 }
 
-static GtkIconTheme *hui_icon_theme = nullptr;
 GtkIconTheme *get_hui_icon_theme() {
+	static GtkIconTheme *hui_icon_theme = nullptr;
 	if (!hui_icon_theme) {
 		hui_icon_theme = gtk_icon_theme_new();
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
+		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "48x48"));
 	}
 	return hui_icon_theme;
 }

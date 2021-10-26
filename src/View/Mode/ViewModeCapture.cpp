@@ -90,7 +90,7 @@ void ViewModeCapture::insert() {
 		clear_sync_data();
 #endif
 
-	song->begin_action_group();
+	song->begin_action_group("insert capture");
 	for (auto &d: data)
 		d.insert(view->get_playback_selection(true).start());
 	song->end_action_group();

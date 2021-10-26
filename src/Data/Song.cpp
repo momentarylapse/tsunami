@@ -282,7 +282,7 @@ void Song::insert_selected_samples(const SongSelection &sel) {
 }
 
 void Song::delete_selected_samples(const SongSelection &sel) {
-	action_manager->group_begin();
+	action_manager->group_begin("delete selected samples");
 	for (Track *t: weak(tracks))
 		for (TrackLayer *l: weak(t->layers)) {
 			for (int j=l->samples.num-1; j>=0; j--)

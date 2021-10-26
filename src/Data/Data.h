@@ -34,7 +34,7 @@ public:
 	void *execute(Action *a);
 	bool _cdecl undo();
 	bool _cdecl redo();
-	void _cdecl begin_action_group();
+	void _cdecl begin_action_group(const string &name);
 	void _cdecl end_action_group();
 
 	Session *session;

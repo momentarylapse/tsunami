@@ -130,7 +130,7 @@ bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 		return false;
 	}
 
-	od.song->begin_action_group();
+	od.song->begin_action_group("load track");
 
 	f->load_track(&od);
 

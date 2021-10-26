@@ -97,7 +97,7 @@ FormatDescriptorFlac::FormatDescriptorFlac() :
 void FormatFlac::load_track(StorageOperationData *od)
 {
 	Track *t = od->track;
-	t->song->begin_action_group();
+	t->song->begin_action_group("flac load track");
 
 	FLAC__StreamDecoder *decoder = nullptr;
 

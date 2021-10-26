@@ -199,7 +199,7 @@ void TrackLayer::add_midi_note(MidiNote *n) {
 }
 
 void TrackLayer::add_midi_notes(const MidiNoteBuffer &notes) {
-	track->song->begin_action_group();
+	track->song->begin_action_group("add midi notes");
 	for (MidiNote *n: weak(notes))
 		add_midi_note(n);
 	track->song->end_action_group();

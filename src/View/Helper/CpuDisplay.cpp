@@ -89,7 +89,7 @@ void CpuDisplay::enable(bool active) {
 	request_redraw();
 
 	if (active)
-		perf_mon->subscribe(this, [=]{ update(); });
+		perf_mon->subscribe(this, [=]{ update(); }, perf_mon->MESSAGE_ANY);
 }
 
 color type_color(const string &t) {

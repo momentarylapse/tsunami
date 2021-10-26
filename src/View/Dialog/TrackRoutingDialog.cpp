@@ -67,7 +67,7 @@ bool has_track_name(Song *s, const string &name) {
 }
 
 void TrackRoutingDialog::on_add_group() {
-	song->begin_action_group();
+	song->begin_action_group("add track group");
 	auto *t = song->add_track(SignalType::GROUP);
 	song->end_action_group();
 	load();

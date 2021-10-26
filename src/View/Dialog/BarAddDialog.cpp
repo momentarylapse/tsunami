@@ -85,7 +85,7 @@ void BarAddDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	new_bar.set_bpm(bpm, song->sample_rate);
 
-	song->begin_action_group();
+	song->begin_action_group("add bars");
 
 	if (!song->time_track())
 		song->add_track(SignalType::BEATS, 0);

@@ -45,7 +45,7 @@ void MidiEffect::__delete__() {
 void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
-	l->song()->begin_action_group();
+	l->song()->begin_action_group("midi fx process layer");
 
 	for (int i=l->midi.num-1; i>=0; i--)
 		if (sel.has(l->midi[i].get()))

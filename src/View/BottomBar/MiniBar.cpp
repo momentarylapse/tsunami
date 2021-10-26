@@ -33,8 +33,8 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 	event("select-snap-mode-bars", [=]{ on_selection_snap_mode(SelectionSnapMode::BAR); });
 	event("select-snap-mode-parts", [=]{ on_selection_snap_mode(SelectionSnapMode::PART); });
 
-	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
-	dev_manager->subscribe(this, [=]{ on_volume_change(); });
+	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
+	dev_manager->subscribe(this, [=]{ on_volume_change(); }, dev_manager->MESSAGE_ANY);
 	view->subscribe(this, [=]{ on_view_settings_change(); }, view->MESSAGE_SETTINGS_CHANGE);
 }
 

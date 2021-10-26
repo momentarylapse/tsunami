@@ -175,7 +175,7 @@ void Clipboard::paste(AudioView *view) {
 		return;
 
 
-	s->begin_action_group();
+	s->begin_action_group("paste");
 
 	int offset = view->sel.range().start();
 	foreachi(auto *ls, source_list, i)
@@ -194,7 +194,7 @@ void Clipboard::paste_as_samples(AudioView *view) {
 		return;
 
 
-	s->begin_action_group();
+	s->begin_action_group("paste as samples");
 
 	int offset = view->sel.range().start();
 	foreachi(auto *ls, source_list, i)
@@ -207,7 +207,7 @@ void Clipboard::paste_with_time(AudioView *view) {
 	if (!has_data())
 		return;
 	Song *s = view->song;
-	s->begin_action_group();
+	s->begin_action_group("paste with time");
 
 	int offset = view->cursor_pos();
 	int index = 0;

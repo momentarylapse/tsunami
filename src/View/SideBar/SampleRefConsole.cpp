@@ -109,7 +109,7 @@ void SampleRefConsole::on_view_cur_sample_change() {
 			sample->unsubscribe(this);
 			sample = nullptr;
 		}, sample->MESSAGE_DELETE);
-		sample->subscribe(this, [=] { on_update(); });
+		sample->subscribe(this, [=] { on_update(); }, sample->MESSAGE_ANY);
 	}
 	load_data();
 }

@@ -70,7 +70,7 @@ SideBar::SideBar(Session *_session) {
 	visible = false;
 	active_console = -1;
 
-	subscribe(session->view, [=]{ session->view->on_update(); }); // EVIL HACK?!?
+	subscribe(session->view, [=]{ session->view->on_update(); }, MESSAGE_ANY); // EVIL HACK?!?
 }
 
 SideBar::~SideBar() {

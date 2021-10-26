@@ -58,7 +58,7 @@ BarEditDialog::BarEditDialog(hui::Window *parent, Song *_song, const Array<int> 
 }
 
 void BarEditDialog::on_ok() {
-	song->begin_action_group();
+	song->begin_action_group("edit bars");
 	int mode = get_int("mode");
 	if (mode == 0) {
 		float bpm = get_float("bpm");

@@ -160,7 +160,7 @@ void TrackConsole::set_track(Track *t) {
 	if (track) {
 		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
 		track->subscribe(this, [=]{ set_track(nullptr); }, track->MESSAGE_DELETE);
-		track->subscribe(this, [=]{ on_update(); });
+		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_ANY);
 	}
 }
 

@@ -31,7 +31,7 @@ PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
 void PauseAddDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	float duration = get_float("duration");
-	song->begin_action_group();
+	song->begin_action_group("add pause");
 
 	if (!song->time_track())
 		song->add_track(SignalType::BEATS, 0);

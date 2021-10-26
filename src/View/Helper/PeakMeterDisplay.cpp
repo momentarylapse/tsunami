@@ -102,7 +102,7 @@ void PeakMeterDisplay::set_visible(bool vis) {
 }
 
 void PeakMeterDisplay::connect() {
-	source->subscribe(this, [=]{ on_update(); });
+	source->subscribe(this, [=]{ on_update(); }, source->MESSAGE_ANY);
 	if (mode == Mode::SPECTRUM)
 		source->request_spectrum();
 }

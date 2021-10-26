@@ -336,7 +336,7 @@ MixingConsole::MixingConsole(Session *session) :
 	view->output_stream->subscribe(this, [=]{
 		set_float("output-volume", view->output_stream->get_volume());
 
-	});
+	}, view->output_stream->MESSAGE_ANY);
 	load_data();
 
 

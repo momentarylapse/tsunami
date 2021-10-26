@@ -53,14 +53,13 @@ public:
 	static const string MESSAGE_DELETE;
 	static const string MESSAGE_ANY;
 
-	//void subscribe(Observer *observer, const string &message = MESSAGE_ANY);
 	void unsubscribe(VirtualBase *observer) {
 		observable_data.unsubscribe(observer);
 	}
-	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message = MESSAGE_ANY) {
+	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message) {
 		observable_data.subscribe(this, observer, callback, nullptr, message);
 	}
-	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback_p, const string &message = MESSAGE_ANY) {
+	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback_p, const string &message) {
 		observable_data.subscribe(this, observer, nullptr, callback_p, message);
 	}
 

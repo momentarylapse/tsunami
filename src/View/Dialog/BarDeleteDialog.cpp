@@ -40,7 +40,7 @@ void BarDeleteDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	bar_dialog_replace_by_pause = is_checked("replace-by-pause");
 
-	song->begin_action_group();
+	song->begin_action_group("delete bars");
 
 	if (bar_dialog_replace_by_pause) {
 		int length = 0;

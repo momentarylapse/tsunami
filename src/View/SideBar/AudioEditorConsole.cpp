@@ -18,7 +18,7 @@ AudioEditorConsole::AudioEditorConsole(Session *session) :
 	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
 	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
 
-	view->mode_edit_audio->subscribe(this, [=] { update(); });
+	view->mode_edit_audio->subscribe(this, [=] { update(); }, view->mode_edit_audio->MESSAGE_ANY);
 	update();
 }
 

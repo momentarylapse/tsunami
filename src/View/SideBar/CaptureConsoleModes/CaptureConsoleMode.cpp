@@ -53,7 +53,7 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->subscribe(this, [=]{ update_device_list(); });
+	session->device_manager->subscribe(this, [=]{ update_device_list(); }, session->device_manager->MESSAGE_ANY);
 
 
 	for (auto &c: items()) {
@@ -61,12 +61,12 @@ void CaptureConsoleMode::update_data_from_items() {
 
 		c.input->subscribe(this, [=] {
 			update_device_list();
-		});
+		}, c.input->MESSAGE_ANY);
 
 		if (c.channel_selector) {
 			c.channel_selector->subscribe(this, [&] {
 				cc->peak_meter_display->set_channel_map(c.channel_map());
-			});
+			}, c.channel_selector->MESSAGE_ANY);
 		}
 
 		if (c.id_mapper.num > 0 and c.channel_selector) {

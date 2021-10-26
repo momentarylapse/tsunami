@@ -245,7 +245,7 @@ void SampleManagerConsole::on_create_from_selection() {
 void SampleManagerConsole::on_delete() {
 	auto sel = get_selected();
 
-	song->action_manager->group_begin();
+	song->action_manager->group_begin("delete samples");
 	for (Sample* s: sel) {
 		try {
 			song->delete_sample(s);
@@ -348,8 +348,8 @@ void SampleManagerConsole::on_preview() {
 	}
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this, [=]{ on_progress_cancel(); });
-	preview.chain->subscribe(this, [=]{ on_preview_tick(); });
+	progress->subscribe(this, [=]{ on_progress_cancel(); }, progress->MESSAGE_ANY);
+	preview.chain->subscribe(this, [=]{ on_preview_tick(); }, preview.chain->MESSAGE_ANY);
 	preview.chain->subscribe(this, [=]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	preview.chain->start();
 }

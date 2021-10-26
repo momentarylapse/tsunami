@@ -472,10 +472,10 @@ void MidiEditorConsole::clear() {
 }
 
 void MidiEditorConsole::on_enter() {
-	session->device_manager->subscribe(this, [=]{ update_input_device_list(); });
+	session->device_manager->subscribe(this, [=]{ update_input_device_list(); }, session->device_manager->MESSAGE_ANY);
 	view->subscribe(this, [=]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, [=]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
-	mode->subscribe(this, [=]{ on_settings_change(); });
+	mode->subscribe(this, [=]{ on_settings_change(); }, mode->MESSAGE_ANY);
 	set_layer(view->cur_layer());
 }
 
@@ -493,7 +493,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 	if (layer) {
 
 		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
-		view->cur_vtrack()->subscribe(this, [=]{ update(); });
+		view->cur_vtrack()->subscribe(this, [=]{ update(); }, AudioViewTrack::MESSAGE_ANY);
 
 		/*auto v = view->get_layer(layer);
 		if (v)
@@ -520,7 +520,7 @@ int align_to_beats(int pos, Array<Beat> &beats) {
 void MidiEditorConsole::on_quantize() {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, mode->sub_beat_partition);
 
-	song->begin_action_group();
+	song->begin_action_group("quantize midi");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: weak(notes)) {
 		view->sel.set(n, false);
@@ -539,7 +539,7 @@ void MidiEditorConsole::on_apply_string() {
 	if (QuestionDialogInt::aborted)
 		return;
 
-	song->begin_action_group();
+	song->begin_action_group("midi apply string");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: weak(notes))
 		layer->midi_note_set_string(n, string_no);
@@ -552,7 +552,7 @@ void MidiEditorConsole::on_apply_hand_position() {
 		return;
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
-	song->begin_action_group();
+	song->begin_action_group("midi apply hand position");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: weak(notes)) {
  		int stringno = 0;
@@ -570,7 +570,7 @@ void MidiEditorConsole::on_apply_pitch_shift() {
 	if (QuestionDialogInt::aborted)
 		return;
 
-	song->begin_action_group();
+	song->begin_action_group("midi pitch shift");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: weak(notes))
 		layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
@@ -578,7 +578,7 @@ void MidiEditorConsole::on_apply_pitch_shift() {
 }
 
 void MidiEditorConsole::on_apply_flags(int mask) {
-	song->begin_action_group();
+	song->begin_action_group("midi apply flags");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);
 	if (mask == 0) {
 		for (auto *n: weak(notes))

@@ -277,7 +277,7 @@ public:
 	void on_finish(const vec2 &m) override {
 		int target = get_track_move_target(false);
 		auto g = get_target_group();
-		vtrack->track->song->begin_action_group();
+		vtrack->track->song->begin_action_group("move track");
 		vtrack->track->move(target);
 		vtrack->track->set_send_target(g);
 		vtrack->track->song->end_action_group();

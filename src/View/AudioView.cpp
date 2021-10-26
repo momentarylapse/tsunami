@@ -693,7 +693,7 @@ void AudioView::toggle_track_mute() {
 		if (sel.has(t) and !t->muted)
 			any_unmuted = true;
 
-	song->begin_action_group();
+	song->begin_action_group("track mute toggle");
 	for (auto *t: weak(song->tracks))
 		if (sel.has(t))
 			t->set_muted(any_unmuted);
@@ -716,7 +716,7 @@ void AudioView::toggle_layer_mute() {
 		if (sel.has(l->layer) and !l->layer->muted)
 			any_unmuted = true;
 
-	song->begin_action_group();
+	song->begin_action_group("layer mute toggle");
 	for (auto *l: vlayers)
 		if (sel.has(l->layer))
 			l->layer->set_muted(any_unmuted);

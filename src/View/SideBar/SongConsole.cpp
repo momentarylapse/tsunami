@@ -56,7 +56,7 @@ SongConsole::SongConsole(Session *session) :
 		session->set_mode(EditMode::DefaultSamples);
 	});
 
-	song->subscribe(this, [=]{ on_update(); });
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ANY);
 }
 
 SongConsole::~SongConsole() {

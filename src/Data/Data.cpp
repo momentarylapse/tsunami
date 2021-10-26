@@ -42,8 +42,8 @@ void *Data::execute(Action *a) {
 	return action_manager->execute(a);
 }
 
-void Data::begin_action_group() {
-	action_manager->group_begin();
+void Data::begin_action_group(const string &name) {
+	action_manager->group_begin(name);
 }
 
 void Data::end_action_group() {

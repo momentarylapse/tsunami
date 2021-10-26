@@ -71,7 +71,7 @@ void ViewModeScaleBars::perform_scale() {
 	view->sel.range_raw = scaling_range_orig;
 	view->update_selection();
 
-	song->begin_action_group();
+	song->begin_action_group("scale bars");
 	foreachb(int i, scaling_sel) {
 		BarPattern bb = *song->bars[i];
 		bb.length = (int)((float)bb.length * factor);

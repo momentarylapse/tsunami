@@ -181,7 +181,7 @@ void FxListEditor::on_fx_copy_from_track() {
 	auto dlg = ownify(new TrackSelectionDialog(panel->win, track->song));
 	dlg->run();
 	if (dlg->selected and dlg->selected != track) {
-		track->song->begin_action_group();
+		track->song->begin_action_group("copy fx from track");
 		foreachb (auto *fx, weak(track->fx))
 			track->delete_effect(fx);
 		for (auto *fx: weak(dlg->selected->fx))

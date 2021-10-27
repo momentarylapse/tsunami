@@ -22,7 +22,7 @@ public:
 	DummyActionGroup(const string &name) {
 		_name_ = name;
 	}
-	string name() const { return _name_; }
+	string name() const override { return _name_; }
 	void build(Data *d) override {}
 };
 
@@ -207,8 +207,7 @@ void ActionManager::_unlock() {
 
 string ActionManager::get_current_action() const {
 	if (prev_action)
-		if (auto g = dynamic_cast<DummyActionGroup*>(prev_action))
-			return g->name();
-	return "???";
+		return prev_action->name();
+	return "<none>";
 }
 

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONMANAGER_H_
-#define ACTIONMANAGER_H_
+#pragma once
 
 #include "../lib/base/base.h"
 #include "Action.h"
@@ -79,4 +78,3 @@ private:
 	owned<hui::Timer> timer;
 };
 
-#endif /* ACTIONMANAGER_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
-#define SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Data/Audio/AudioBuffer.h"
@@ -16,11 +15,11 @@ class ActionSongSetDefaultFormat : public Action {
 public:
 	ActionSongSetDefaultFormat(SampleFormat format, int compression);
 
+	string name() const override { return ":##:set default format"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 	SampleFormat format;
 	int compression;
 };
-
-#endif /* SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_ */

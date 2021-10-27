@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTION_H_
-#define ACTION_H_
+#pragma once
 
 #include "../Data/Data.h"
 #include "../lib/base/pointer.h"
@@ -15,14 +14,15 @@ class Data;
 
 class Action {
 public:
-	Action(){}
+	Action() {}
 	virtual ~Action() {}
+
+	virtual string name() const { return "?"; };
 
 	virtual void *execute(Data *d) = 0;
 	virtual void undo(Data *d) = 0;
 	virtual void redo(Data *d);
 
-	virtual bool is_trivial(){ return false; }
+	virtual bool is_trivial() { return false; }
 };
 
-#endif /* ACTION_H_ */

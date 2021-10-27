@@ -245,7 +245,7 @@ void SampleManagerConsole::on_create_from_selection() {
 void SampleManagerConsole::on_delete() {
 	auto sel = get_selected();
 
-	song->action_manager->group_begin("delete samples");
+	song->begin_action_group(_("delete samples"));
 	for (Sample* s: sel) {
 		try {
 			song->delete_sample(s);
@@ -253,7 +253,7 @@ void SampleManagerConsole::on_delete() {
 			session->e(e.message());
 		}
 	}
-	song->action_manager->group_end();
+	song->end_action_group();
 
 	// hui bug
 	set_int(id_list, -1);

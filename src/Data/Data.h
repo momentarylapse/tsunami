@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_DATA_DATA_H_
-#define SRC_DATA_DATA_H_
+#pragma once
 
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
@@ -57,4 +56,3 @@ public:
 	} x_message_data;
 };
 
-#endif /* SRC_DATA_DATA_H_ */

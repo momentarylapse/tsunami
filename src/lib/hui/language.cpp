@@ -150,6 +150,8 @@ string GetLanguageT(const string &ns, const string &id, const string &tooltip) {
 string GetLanguageS(const string &str) {
 	if (!_using_language_)
 		return str;
+	if (str.head(4) == ":##:")
+		return GetLanguageS(str.sub_ref(4));
 	for (Language::Translation &t: cur_lang->trans){
 		if (str == t.orig)
 			return t.trans;

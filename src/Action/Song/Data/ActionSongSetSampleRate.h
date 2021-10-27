@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_SONG_DATA_ACTIONSONGSETSAMPLERATE_H_
-#define SRC_ACTION_SONG_DATA_ACTIONSONGSETSAMPLERATE_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 
@@ -16,10 +15,10 @@ class ActionSongSetSampleRate : public ActionMergable<int> {
 public:
 	ActionSongSetSampleRate(Song *s, int sample_rate);
 
+	string name() const override { return ":##:set samplerate"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 	bool mergable(Action *a) override;
 };
-
-#endif /* SRC_ACTION_SONG_DATA_ACTIONSONGSETSAMPLERATE_H_ */

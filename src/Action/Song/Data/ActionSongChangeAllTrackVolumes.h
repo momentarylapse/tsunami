@@ -5,9 +5,6 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_SONG_DATA_ACTIONSONGCHANGEALLTRACKVOLUMES_H_
-#define SRC_ACTION_SONG_DATA_ACTIONSONGCHANGEALLTRACKVOLUMES_H_
-
 #include "../../ActionMergable.h"
 
 class Song;
@@ -16,6 +13,8 @@ class Track;
 class ActionSongChangeAllTrackVolumes : public ActionMergable<float> {
 public:
 	ActionSongChangeAllTrackVolumes(Song *s, Track *t, float volume);
+
+	string name() const override { return ":##:set volume"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -26,4 +25,3 @@ public:
 	Array<float> old_volumes;
 };
 
-#endif /* SRC_ACTION_SONG_DATA_ACTIONSONGCHANGEALLTRACKVOLUMES_H_ */

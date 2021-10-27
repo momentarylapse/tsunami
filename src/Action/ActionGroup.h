@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONGROUP_H_
-#define ACTIONGROUP_H_
+#pragma once
 
 #include "Action.h"
 #include "../Data/Data.h"
@@ -18,8 +17,6 @@ class ActionGroup: public Action {
 	friend class ActionManager;
 public:
 	ActionGroup();
-
-	//string name() override { return "-group-"; }
 
 	virtual void build(Data *d) = 0;
 
@@ -37,4 +34,3 @@ private:
 	owned_array<Action> action;
 };
 
-#endif /* ACTIONGROUP_H_ */

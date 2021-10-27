@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_SONG_ACTIONSONGMOVESELECTION_H_
-#define SRC_ACTION_SONG_ACTIONSONGMOVESELECTION_H_
+#pragma once
 
 
 #include "../Action.h"
@@ -21,6 +20,8 @@ class SongSelection;
 class ActionSongMoveSelection: public Action {
 public:
 	ActionSongMoveSelection(Song *s, const SongSelection &sel, bool move_buffers);
+
+	string name() const override { return ":##:move selection"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -58,4 +59,3 @@ private:
 	int param;
 };
 
-#endif /* SRC_ACTION_SONG_ACTIONSONGMOVESELECTION_H_ */

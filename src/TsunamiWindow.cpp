@@ -310,10 +310,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->signal_chain->subscribe(this, [=]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [=]{ on_update(); }, song->action_manager->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [=] {
-		view->set_message("undo " + song->action_manager->get_current_action());
+		view->set_message(_("undo ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [=] {
-		view->set_message("redo " + song->action_manager->get_current_action());
+		view->set_message(_("redo ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
 	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
 	app->clipboard->subscribe(this, [=]{ on_update(); }, app->clipboard->MESSAGE_ANY);
@@ -387,7 +387,7 @@ void TsunamiWindow::on_add_audio_track_stereo() {
 }
 
 void TsunamiWindow::on_add_time_track() {
-	song->begin_action_group("add time track");
+	song->begin_action_group(_("add time track"));
 	try {
 		song->add_track(SignalType::BEATS, 0);
 
@@ -484,7 +484,7 @@ void TsunamiWindow::on_track_render() {
 
 	write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
 
-	song->begin_action_group("render track");
+	song->begin_action_group(_("render track"));
 	Track *t = song->add_track(SignalType::AUDIO_STEREO);
 	AudioBuffer buf_track;
 	auto *a = t->layers[0]->edit_buffers(buf_track, range);
@@ -498,7 +498,7 @@ void TsunamiWindow::on_track_render() {
 void TsunamiWindow::on_track_delete() {
 	auto tracks = view->sel.tracks();
 	if (tracks.num > 0) {
-		song->begin_action_group("delete track");
+		song->begin_action_group(_("delete tracks"));
 		for (auto t: tracks) {
 			try {
 				song->delete_track(const_cast<Track*>(t));
@@ -517,7 +517,7 @@ Array<Track*> selected_tracks_sorted(AudioView *view);
 void TsunamiWindow::on_track_group() {
 	auto tracks = selected_tracks_sorted(view);
 	if (tracks.num > 0) {
-		song->begin_action_group("group tracks");
+		song->begin_action_group(_("group tracks"));
 		int first_index = tracks[0]->get_index();
 		auto group = song->add_track(SignalType::GROUP, first_index);
 		// add to group
@@ -561,7 +561,7 @@ Array<Track*> track_group_members(Track *group, bool with_self) {
 void TsunamiWindow::on_track_ungroup() {
 	auto tracks = selected_tracks_sorted(view);
 	if (tracks.num > 0) {
-		song->begin_action_group("ungroup tracks");
+		song->begin_action_group(_("ungroup tracks"));
 		foreachb (auto t, tracks) {
 			auto group = track_top_group(t);
 			if (group and (group != t)) {
@@ -787,7 +787,7 @@ void TsunamiWindow::on_menu_execute_audio_effect() {
 
 	if (!configure_module(this, fx.get()))
 		return;
-	song->begin_action_group("apply audio fx");
+	song->begin_action_group(_("apply audio fx"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
@@ -808,7 +808,7 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 
 	if (!configure_module(this, s.get()))
 		return;
-	song->begin_action_group("audio source");
+	song->begin_action_group(_("audio source"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
@@ -830,7 +830,7 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 	if (!configure_module(this, fx.get()))
 		return;
 	
-	song->action_manager->group_begin("apply midi fx");
+	song->begin_action_group(_("apply midi fx"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
@@ -838,7 +838,7 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 				fx->process_layer(l, view->sel);
 				n_layers ++;
 			}
-	song->action_manager->group_end();
+	song->end_action_group();
 	
 	if (n_layers == 0)
 		session->e(_("no midi tracks selected"));
@@ -853,7 +853,7 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 	if (!configure_module(this, s.get()))
 		return;
 	
-	song->begin_action_group("midi source");
+	song->begin_action_group(_("midi source"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
@@ -893,7 +893,7 @@ void TsunamiWindow::on_delete() {
 void TsunamiWindow::on_delete_shift() {
 	if (view->sel.is_empty())
 		return;
-	song->begin_action_group("delete shift");
+	song->begin_action_group(_("delete shift"));
 	song->delete_selection(view->sel);
 	auto sel = SongSelection::from_range(song, RangeTo(view->cursor_range().end(), 2000000000)).filter(view->sel.layers());
 	auto a = new ActionSongMoveSelection(song, sel, true);
@@ -995,7 +995,7 @@ void TsunamiWindow::on_add_layer() {
 }
 
 void TsunamiWindow::on_delete_layer() {
-	song->begin_action_group("delete layer");
+	song->begin_action_group(_("delete layers"));
 	try {
 		auto layers = view->sel.layers();
 		for (auto l: layers) {

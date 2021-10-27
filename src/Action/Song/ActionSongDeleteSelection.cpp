@@ -29,7 +29,7 @@ void ActionSongDeleteSelection::build(Data *d) {
 		for (auto l: weak(t->layers)) {
 			// buffer boxes
 			if (sel.has(l) and !sel.range().is_none())
-				DeleteBuffersFromTrackLayer(s, t, l, sel);
+				delete_buffers_from_track_layer(s, t, l, sel);
 
 			// midi
 			for (int i=l->midi.num-1; i>=0; i--)
@@ -49,7 +49,7 @@ void ActionSongDeleteSelection::build(Data *d) {
 	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel) {
+void ActionSongDeleteSelection::delete_buffers_from_track_layer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel) {
 	int i0 = sel.range().start();
 	int i1 = sel.range().end();
 	foreachib(AudioBuffer &b, l->buffers, n) {

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_
-#define SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_
+#pragma once
 
 #include "../../Data/Song.h"
 #include "../ActionGroup.h"
@@ -17,10 +16,11 @@ class ActionSongDeleteSelection : public ActionGroup {
 public:
 	ActionSongDeleteSelection(const SongSelection &sel);
 
+	string name() const override { return ":##:delete selection"; }
+
 	void build(Data *d) override;
-	void DeleteBuffersFromTrackLayer(Song *s, Track *t, TrackLayer *l, const SongSelection &sel);
+	void delete_buffers_from_track_layer(Song *s, Track *t, TrackLayer *l, const SongSelection &sel);
 
 	const SongSelection &sel;
 };
 
-#endif /* SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_ */

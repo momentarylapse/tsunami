@@ -53,7 +53,7 @@ class PracticeLooper extends TsunamiPlugin
 	var song: Song*
 	var altered_speed = false
 	var current_speed = 1.
-	var old_sel: Range
+#	var old_sel: Range
 	
 	func override on_start()
 		song = session.song
@@ -84,7 +84,7 @@ class PracticeLooper extends TsunamiPlugin
 	func reset()
 		if not altered_speed
 			return
-		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, current_speed)
+#		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, current_speed)
 		session.view.cam.set_range(scale_range(session.view.cam.range(), current_speed))
 		song.undo()
 		altered_speed = false
@@ -93,7 +93,7 @@ class PracticeLooper extends TsunamiPlugin
 	func set_speed(speed: float)
 		if altered_speed
 			reset()
-		song.begin_action_group()
+		song.begin_action_group("set speed")
 		for b,i in song.bars
 			Bar bb
 			bb.beats = b.beats
@@ -101,9 +101,9 @@ class PracticeLooper extends TsunamiPlugin
 			bb.length = b.length / speed
 			song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
 		song.end_action_group()
-		old_sel = session.view.sel.range_raw
+#		old_sel = session.view.sel.range_raw
 		session.view.cam.set_range(scale_range(session.view.cam.range(), 1. / speed))
-		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, 1. / speed)
-		session.view.update_selection()
+#		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, 1. / speed)
+#		session.view.update_selection()
 		altered_speed = true
 		current_speed = speed

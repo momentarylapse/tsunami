@@ -519,7 +519,7 @@ class Song as shared
 	func extern undo() -> bool
 	func extern redo() -> bool
 	func extern reset_history()
-	func extern begin_action_group()
+	func extern begin_action_group(name: string)
 	func extern end_action_group()
 	
 	func extern const get_time_str(t: int) -> string

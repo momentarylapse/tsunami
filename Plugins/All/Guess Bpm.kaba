@@ -192,7 +192,7 @@ Grid ? '' vertical
 	
 	func on_ok()
 		var song = fb.session.song
-		song.begin_action_group()
+		song.begin_action_group("guess bpm")
 		if not song.time_track()
 			song.add_track(SignalType.TIME, 0)
 		int length = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt

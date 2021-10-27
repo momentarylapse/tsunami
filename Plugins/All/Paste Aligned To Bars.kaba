@@ -29,7 +29,7 @@ class XXX extends SongPlugin
 			
 		update_bars(clipboard.temp.bars)
 
-		song.begin_action_group()
+		song.begin_action_group("paste")
 		for ls,i in source_layers
 			paste(session.view.sel.range().offset, ls, target_layers[i])
 		song.end_action_group()

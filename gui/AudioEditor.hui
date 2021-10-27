@@ -2,10 +2,10 @@ Dialog audio-editor "Audio" width=300 height=516
 	Grid ? "" vertical
 		Group group-mode "Edit mode"
 			Grid ? "" homogenousx
-				ToggleButton mode-select "" image=select flat huge expandx "tooltip=Select" ignorefocus
-				ToggleButton mode-smoothen "" image=audio-mode-smoothen flat huge expandx "tooltip=Smoothen out... TODO" ignorefocus
-				ToggleButton mode-clone "" image=audio-mode-clone flat huge expandx "tooltip=Copy/paste chunks of audio" ignorefocus
-				ToggleButton mode-rubber "" image=audio-mode-stretch flat huge expandx "tooltip=Rubber band stretching" ignorefocus
+				ToggleButton mode-select "" image=select flat big expandx "tooltip=Select" ignorefocus height=50
+				ToggleButton mode-smoothen "" image=audio-mode-smoothen flat big expandx "tooltip=Smoothen out... TODO" ignorefocus
+				ToggleButton mode-clone "" image=audio-mode-clone flat big expandx "tooltip=Copy/paste chunks of audio" ignorefocus
+				ToggleButton mode-rubber "" image=audio-mode-stretch flat big expandx "tooltip=Rubber band stretching" ignorefocus
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

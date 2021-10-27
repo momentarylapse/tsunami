@@ -47,25 +47,25 @@ homogenousx
 4
 ToggleButton
 mode-select
-image=select,flat,huge,expandx,ignorefocus
+image=select,flat,big,expandx,ignorefocus,height=50
 0
 0
 0
 ToggleButton
 mode-smoothen
-image=audio-mode-smoothen,flat,huge,expandx,ignorefocus
+image=audio-mode-smoothen,flat,big,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 mode-clone
-image=audio-mode-clone,flat,huge,expandx,ignorefocus
+image=audio-mode-clone,flat,big,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 mode-rubber
-image=audio-mode-stretch,flat,huge,expandx,ignorefocus
+image=audio-mode-stretch,flat,big,expandx,ignorefocus
 3
 0
 0
@@ -2367,7 +2367,7 @@ homogenousx
 4
 Button
 flag-none
-image=hui:delete,expandx,ignorefocus
+image=hui:delete,expandx,ignorefocus,height=32
 0
 0
 0
@@ -2403,31 +2403,31 @@ homogenousx
 5
 Button
 quantize
-big,expandx,ignorefocus
+image=midi-quantize,big,expandx,ignorefocus
 0
 0
 0
 Button
 apply_string
-big,expandx,ignorefocus
+image=midi-set-string,big,expandx,ignorefocus
 1
 0
 0
 Button
 apply_hand_position
-big,expandx,ignorefocus
+image=midi-set-hand,big,expandx,ignorefocus
 2
 0
 0
 Button
 apply_pitch_shift
-big,expandx,ignorefocus
+image=midi-pitch-shift,big,expandx,ignorefocus
 3
 0
 0
 Button
 add_key_change
-big,ignorefocus
+image=midi-set-key,big,ignorefocus
 0
 1
 0
@@ -7869,16 +7869,16 @@ menu_fake/stop
 Stop
 
 midi_editor/add_key_change
-𝄞♯
+
 Add a key change at the cursor position
 midi_editor/apply_hand_position
-✋
+
 Set hand position: find positions on the fretboard for the selected notes (TAB mode)
 midi_editor/apply_pitch_shift
-↕
+
 Shift the pitch up or down
 midi_editor/apply_string
-𝄛
+
 Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)
 midi_editor/chord-augmented
 
@@ -8043,7 +8043,7 @@ midi_editor/modifier-sharp
 ♯
 Sharp - new note is 1 semitone above the key
 midi_editor/quantize
-Q
+
 Quantize: align selected notes to grid of sub beats
 midi_editor/t_input
 Source

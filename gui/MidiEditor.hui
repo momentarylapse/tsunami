@@ -57,18 +57,18 @@ Dialog midi_editor "Midi" width=300 height=516
 				ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx ignorefocus disabled
 		Group grp-flags "Flags"
 			Grid ? "" homogenousx
-				Button flag-none "" image=hui:delete expandx "tooltip=Clear all flags" ignorefocus
+				Button flag-none "" image=hui:delete expandx "tooltip=Clear all flags" ignorefocus height=32
 				Button flag-trill "" image=note-flag-trill expandx "tooltip=Set trill flag" ignorefocus
 				Button flag-staccato "" image=note-flag-staccato expandx "tooltip=Set staccato flag" ignorefocus
 				Button flag-tenuto "" image=note-flag-tenuto expandx "tooltip=Set tenuto flag" ignorefocus
 		Group grp_operations "Operations"
 			Grid ? "" homogenousx
-				Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus
-				Button apply_string "𝄛" big "tooltip=Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)" expandx ignorefocus
-				Button apply_hand_position "✋" big "tooltip=Set hand position: find positions on the fretboard for the selected notes (TAB mode)" expandx ignorefocus
-				Button apply_pitch_shift "↕" big "tooltip=Shift the pitch up or down" expandx ignorefocus
+				Button quantize "" image=midi-quantize big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus
+				Button apply_string "" image=midi-set-string big "tooltip=Set string: assign selected notes to this string and find the correct fret position without changing the pitch (TAB mode)" expandx ignorefocus
+				Button apply_hand_position "" image=midi-set-hand big "tooltip=Set hand position: find positions on the fretboard for the selected notes (TAB mode)" expandx ignorefocus
+				Button apply_pitch_shift "" image=midi-pitch-shift big "tooltip=Shift the pitch up or down" expandx ignorefocus
 				---|
-				Button add_key_change "𝄞♯" big "tooltip=Add a key change at the cursor position" ignorefocus
+				Button add_key_change "" image=midi-set-key big "tooltip=Add a key change at the cursor position" ignorefocus
 		Expander grp_input "Keyboard input"
 			Grid ? ""
 				.

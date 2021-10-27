@@ -196,8 +196,10 @@ GtkIconTheme *get_hui_icon_theme() {
 	if (!hui_icon_theme) {
 		hui_icon_theme = gtk_icon_theme_new();
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
-		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "48x48"));
+		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+		// guess, only 64x64 is used... could skip the others
 	}
 	return hui_icon_theme;
 }

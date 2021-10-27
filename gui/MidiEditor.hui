@@ -5,11 +5,11 @@ Dialog midi_editor "Midi" width=300 height=516
 				ToggleButton mode-classical "" image=midi-mode-classical flat huge expandx "tooltip=Classical sheet view style" ignorefocus
 				ToggleButton mode-tab "" image=midi-mode-tab flat huge expandx "tooltip=Guitar tab view style (only string instruments)" ignorefocus
 				ToggleButton mode-linear "" image=midi-mode-linear flat huge expandx "tooltip=Linear view style" ignorefocus
-				Label dummy1 ""
+				Label dummy "" expandx
 		Group me_group_creation "Edit mode"
 			Grid ? "" vertical
 				Grid ? "" homogenousx
-					ToggleButton mode-select "I" flat big expandx "tooltip=Select" ignorefocus
+					ToggleButton mode-select "" image=select flat big expandx "tooltip=Select" ignorefocus height=50
 					ToggleButton mode-note "" image=midi-mode-single-note flat big expandx "tooltip=Create single notes" ignorefocus
 					ToggleButton mode-interval "" image=midi-mode-interval flat big expandx "tooltip=Create intervals" ignorefocus
 					ToggleButton mode-chord "" image=midi-mode-chord flat big expandx "tooltip=Create chords" ignorefocus
@@ -57,10 +57,10 @@ Dialog midi_editor "Midi" width=300 height=516
 				ToggleButton modifier-none "" flat big "tooltip=None - new note is only affected by the current key (defined via the \"key change\" operation below)" expandx ignorefocus disabled
 		Group grp-flags "Flags"
 			Grid ? "" homogenousx
-				Button flag-none "" image=hui:delete big expandx "tooltip=Clear all flags" ignorefocus
-				Button flag-trill "" image=note-flag-trill big expandx "tooltip=Set trill flag" ignorefocus
-				Button flag-staccato "" image=note-flag-staccato big expandx "tooltip=Set staccato flag" ignorefocus
-				Button flag-tenuto "" image=note-flag-tenuto big expandx "tooltip=Set tenuto flag" ignorefocus
+				Button flag-none "" image=hui:delete expandx "tooltip=Clear all flags" ignorefocus
+				Button flag-trill "" image=note-flag-trill expandx "tooltip=Set trill flag" ignorefocus
+				Button flag-staccato "" image=note-flag-staccato expandx "tooltip=Set staccato flag" ignorefocus
+				Button flag-tenuto "" image=note-flag-tenuto expandx "tooltip=Set tenuto flag" ignorefocus
 		Group grp_operations "Operations"
 			Grid ? "" homogenousx
 				Button quantize "Q" big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus

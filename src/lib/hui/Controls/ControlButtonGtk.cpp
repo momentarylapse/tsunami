@@ -52,7 +52,7 @@ void ControlButton::__set_string(const string &str) {
 }
 
 void ControlButton::set_image(const string& str) {
-	GtkWidget *im = get_gtk_image_x(str, GTK_ICON_SIZE_BUTTON, widget);
+	GtkWidget *im = get_gtk_image_x(str, image_size, widget);
 	gtk_button_set_image(GTK_BUTTON(widget), im);
 #if GTK_CHECK_VERSION(3,6,0)
 	if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)

@@ -47,25 +47,25 @@ homogenousx
 4
 ToggleButton
 mode-select
-flat,huge,expandx,ignorefocus
+image=select,flat,huge,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 mode-smoothen
-flat,huge,expandx,ignorefocus
+image=audio-mode-smoothen,flat,huge,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 mode-clone
-image=hui:copy,flat,huge,expandx,ignorefocus
+image=audio-mode-clone,flat,huge,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 mode-rubber
-flat,huge,expandx,ignorefocus
+image=audio-mode-stretch,flat,huge,expandx,ignorefocus
 3
 0
 0
@@ -2084,8 +2084,8 @@ image=midi-mode-linear,flat,huge,expandx,ignorefocus
 0
 0
 Label
-dummy1
-
+dummy
+expandx
 3
 0
 0
@@ -2109,7 +2109,7 @@ homogenousx
 4
 ToggleButton
 mode-select
-flat,big,expandx,ignorefocus
+image=select,flat,big,expandx,ignorefocus,height=50
 0
 0
 0
@@ -2367,25 +2367,25 @@ homogenousx
 4
 Button
 flag-none
-image=hui:delete,big,expandx,ignorefocus
+image=hui:delete,expandx,ignorefocus
 0
 0
 0
 Button
 flag-trill
-image=note-flag-trill,big,expandx,ignorefocus
+image=note-flag-trill,expandx,ignorefocus
 1
 0
 0
 Button
 flag-staccato
-image=note-flag-staccato,big,expandx,ignorefocus
+image=note-flag-staccato,expandx,ignorefocus
 2
 0
 0
 Button
 flag-tenuto
-image=note-flag-tenuto,big,expandx,ignorefocus
+image=note-flag-tenuto,expandx,ignorefocus
 3
 0
 0
@@ -7332,13 +7332,13 @@ audio-editor/mode-clone
 
 Copy/paste chunks of audio
 audio-editor/mode-rubber
-↔
+
 Rubber band stretching
 audio-editor/mode-select
-I
+
 Select
 audio-editor/mode-smoothen
-Sm
+
 Smoothen out... TODO
 bar_add_dialog/bad_t_beats
 Beats
@@ -8025,7 +8025,7 @@ midi_editor/mode-note
 
 Create single notes
 midi_editor/mode-select
-I
+
 Select
 midi_editor/mode-tab
 

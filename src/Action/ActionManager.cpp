@@ -152,12 +152,17 @@ bool ActionManager::is_enabled() {
 }
 
 class DummyActionGroup : public ActionGroup {
-	virtual void build(Data *d) {}
+	string _name_;
+public:
+	DummyActionGroup(const string &name) {
+		_name_ = name;
+	}
+	void build(Data *d) override {}
 };
 
-void ActionManager::group_begin() {
+void ActionManager::group_begin(const string &name) {
 	if (!cur_group){
-		cur_group = new DummyActionGroup;
+		cur_group = new DummyActionGroup(name);
 		_edit_start();
 	}
 	cur_group_level ++;

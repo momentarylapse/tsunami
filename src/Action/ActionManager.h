@@ -34,7 +34,7 @@ public:
 	bool undo();
 	bool redo();
 
-	void group_begin();
+	void group_begin(const string &name);
 	void group_end();
 
 	bool undoable();

@@ -309,6 +309,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 	view->signal_chain->subscribe(this, [=]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [=]{ on_update(); }, song->action_manager->MESSAGE_ANY);
+	song->action_manager->subscribe(this, [=] {
+		view->set_message("undo " + song->action_manager->get_current_action());
+	}, song->action_manager->MESSAGE_UNDO_ACTION);
+	song->action_manager->subscribe(this, [=] {
+		view->set_message("redo " + song->action_manager->get_current_action());
+	}, song->action_manager->MESSAGE_REDO_ACTION);
 	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
 	app->clipboard->subscribe(this, [=]{ on_update(); }, app->clipboard->MESSAGE_ANY);
 	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
@@ -670,13 +676,11 @@ void TsunamiWindow::on_show_log() {
 }
 
 void TsunamiWindow::on_undo() {
-	if (song->undo())
-		view->set_message(_("undone"));
+	song->undo();
 }
 
 void TsunamiWindow::on_redo() {
-	if (song->redo())
-		view->set_message(_("redone"));
+	song->redo();
 }
 
 void TsunamiWindow::on_send_bug_report() {
@@ -991,6 +995,7 @@ void TsunamiWindow::on_add_layer() {
 }
 
 void TsunamiWindow::on_delete_layer() {
+	song->begin_action_group("delete layer");
 	try {
 		auto layers = view->sel.layers();
 		for (auto l: layers) {
@@ -1004,6 +1009,7 @@ void TsunamiWindow::on_delete_layer() {
 	} catch(Exception &e) {
 		session->e(e.message());
 	}
+	song->end_action_group();
 }
 
 void TsunamiWindow::on_layer_make_track() {
@@ -1306,7 +1312,7 @@ void TsunamiWindow::on_edit_bars() {
 		auto dlg = ownify(new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]));
 		dlg->run();
 	} else {
-		hui::ErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
+		session->e(_("Can only edit bars or a single pause at a time."));
 	}
 }
 

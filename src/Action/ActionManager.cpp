@@ -14,6 +14,23 @@
 #include "../Data/Data.h"
 #include <assert.h>
 
+
+
+class DummyActionGroup : public ActionGroup {
+	string _name_;
+public:
+	DummyActionGroup(const string &name) {
+		_name_ = name;
+	}
+	string name() const { return _name_; }
+	void build(Data *d) override {}
+};
+
+
+const string ActionManager::MESSAGE_DO_ACTION = "DoAction";
+const string ActionManager::MESSAGE_UNDO_ACTION = "UndoAction";
+const string ActionManager::MESSAGE_REDO_ACTION = "RedoAction";
+
 ActionManager::ActionManager(Data *_data) {
 	data = _data;
 	cur_group = nullptr;
@@ -93,6 +110,7 @@ void *ActionManager::execute(Action *a) {
 		_add_to_history(a);
 
 	_edit_end();
+	notify(MESSAGE_DO_ACTION);
 	return r;
 }
 
@@ -104,7 +122,9 @@ bool ActionManager::undo() {
 
 	_edit_start();
 	action[-- cur_pos]->undo(data);
+	prev_action = action[cur_pos];
 	_edit_end();
+	notify(MESSAGE_UNDO_ACTION);
 	return true;
 }
 
@@ -115,8 +135,10 @@ bool ActionManager::redo() {
 		return false;
 
 	_edit_start();
+	prev_action = action[cur_pos];
 	action[cur_pos ++]->redo(data);
 	_edit_end();
+	notify(MESSAGE_REDO_ACTION);
 	return true;
 }
 
@@ -151,17 +173,8 @@ bool ActionManager::is_enabled() {
 	return enabled;
 }
 
-class DummyActionGroup : public ActionGroup {
-	string _name_;
-public:
-	DummyActionGroup(const string &name) {
-		_name_ = name;
-	}
-	void build(Data *d) override {}
-};
-
 void ActionManager::group_begin(const string &name) {
-	if (!cur_group){
+	if (!cur_group) {
 		cur_group = new DummyActionGroup(name);
 		_edit_start();
 	}
@@ -190,5 +203,12 @@ void ActionManager::_unlock() {
 	lock_level --;
 	if (lock_level == 0)
 		data->unlock();
+}
+
+string ActionManager::get_current_action() const {
+	if (prev_action)
+		if (auto g = dynamic_cast<DummyActionGroup*>(prev_action))
+			return g->name();
+	return "???";
 }
 

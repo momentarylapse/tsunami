@@ -26,6 +26,12 @@ class ActionManager : public Observable<VirtualBase> {
 public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
+
+
+	static const string MESSAGE_DO_ACTION;
+	static const string MESSAGE_UNDO_ACTION;
+	static const string MESSAGE_REDO_ACTION;
+
 	void reset();
 	void enable(bool enabled);
 	bool is_enabled();
@@ -41,6 +47,8 @@ public:
 	bool redoable();
 	bool is_save();
 	void mark_current_as_save();
+
+	string get_current_action() const;
 
 private:
 	void _truncate_future_history();
@@ -65,6 +73,7 @@ private:
 	// group
 	int cur_group_level;
 	owned<ActionGroup> cur_group;
+	Action *prev_action = nullptr;
 
 	// for merging
 	owned<hui::Timer> timer;

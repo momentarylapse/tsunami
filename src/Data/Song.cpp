@@ -319,8 +319,8 @@ void Song::renameLayer(int index, const string &name) {
 }*/
 
 void Song::delete_track(Track *track) {
-	if (tracks.num < 2)
-		throw Error(_("At least one layer has to exist."));
+	if (tracks.num <= 1)
+		throw Error(_("At least one track has to exist."));
 	execute(new ActionTrackDelete(track));
 }
 

@@ -220,9 +220,6 @@
     <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSample.cpp">
       <Filter>src\Action\Track\Sample</Filter>
     </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.cpp">
-      <Filter>src\Action\Track\Sample</Filter>
-    </ClCompile>
     <ClCompile Include="src\Action\Track\Sample\ActionTrackPasteAsSample.cpp">
       <Filter>src\Action\Track\Sample</Filter>
     </ClCompile>
@@ -1561,9 +1558,6 @@
       <Filter>src\Action\Track\Sample</Filter>
     </ClInclude>
     <ClInclude Include="src\Action\Track\Sample\ActionTrackInsertSample.h">
-      <Filter>src\Action\Track\Sample</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.h">
       <Filter>src\Action\Track\Sample</Filter>
     </ClInclude>
     <ClInclude Include="src\Action\Track\Sample\ActionTrackPasteAsSample.h">

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_
-#define SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Data/Audio/AudioBuffer.h"
@@ -16,6 +15,8 @@ class TrackLayer;
 class ActionTrackEditBuffer : public Action {
 public:
 	ActionTrackEditBuffer(TrackLayer *l, const Range &_range);
+
+	string name() const override { return ":##:edit buffer"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -27,5 +28,3 @@ private:
 	AudioBuffer box;
 	int index;
 };
-
-#endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_ */

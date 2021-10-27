@@ -31,7 +31,7 @@
 #include "../Action/Tag/ActionTagEdit.h"
 #include "../Action/Track/ActionTrackAdd.h"
 #include "../Action/Track/ActionTrackDelete.h"
-#include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
+#include "../Action/Track/Sample/ActionTrackInsertSample.h"
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Audio/AudioEffect.h"
@@ -277,12 +277,16 @@ Track *Song::add_track_after(SignalType type, Track *ref) {
 }
 
 void Song::insert_selected_samples(const SongSelection &sel) {
-	if (sel.num_samples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(sel));
+	begin_action_group(":##:insert samples");
+	for (auto l: layers())
+		foreachib(SampleRef *ss, weak(l->samples), si)
+			if (sel.has(ss))
+				execute(new ActionTrackInsertSample(l, si));
+	end_action_group();
 }
 
 void Song::delete_selected_samples(const SongSelection &sel) {
-	action_manager->group_begin("delete selected samples");
+	action_manager->group_begin(":##:delete selected samples");
 	for (Track *t: weak(tracks))
 		for (TrackLayer *l: weak(t->layers)) {
 			for (int j=l->samples.num-1; j>=0; j--)

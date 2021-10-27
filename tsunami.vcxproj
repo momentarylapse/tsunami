@@ -189,7 +189,6 @@
     <ClCompile Include="src\Action\Track\Sample\ActionTrackDeleteSample.cpp" />
     <ClCompile Include="src\Action\Track\Sample\ActionTrackEditSample.cpp" />
     <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSample.cpp" />
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.cpp" />
     <ClCompile Include="src\Action\Track\Sample\ActionTrackPasteAsSample.cpp" />
     <ClCompile Include="src\Action\Track\Sample\ActionTrackSampleFromSelection.cpp" />
     <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackDetuneSynthesizer.cpp" />
@@ -638,7 +637,6 @@
     <ClInclude Include="src\Action\Track\Sample\ActionTrackDeleteSample.h" />
     <ClInclude Include="src\Action\Track\Sample\ActionTrackEditSample.h" />
     <ClInclude Include="src\Action\Track\Sample\ActionTrackInsertSample.h" />
-    <ClInclude Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.h" />
     <ClInclude Include="src\Action\Track\Sample\ActionTrackPasteAsSample.h" />
     <ClInclude Include="src\Action\Track\Sample\ActionTrackSampleFromSelection.h" />
     <ClInclude Include="src\Action\Track\Synthesizer\ActionTrackDetuneSynthesizer.h" />

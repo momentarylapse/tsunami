@@ -614,6 +614,7 @@ void TsunamiWindow::on_buffer_delete() {
 }
 
 void TsunamiWindow::on_buffer_make_movable() {
+	song->begin_action_group("make movable");
 	for (auto l: song->layers())
 		if (view->sel.has(l)) {
 			Array<Range> ranges;
@@ -625,6 +626,7 @@ void TsunamiWindow::on_buffer_make_movable() {
 				song->create_samples_from_selection(s, true);
 			}
 		}
+	song->end_action_group();
 }
 
 void TsunamiWindow::on_layer_midi_mode_linear() {

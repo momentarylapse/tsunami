@@ -168,7 +168,6 @@ sources = [
 	'src/Action/Track/Sample/ActionTrackDeleteSample.cpp',
 	'src/Action/Track/Sample/ActionTrackEditSample.cpp',
 	'src/Action/Track/Sample/ActionTrackInsertSample.cpp',
-	'src/Action/Track/Sample/ActionTrackInsertSelectedSamples.cpp',
 	'src/Action/Track/Sample/ActionTrackPasteAsSample.cpp',
 	'src/Action/Track/Sample/ActionTrackSampleFromSelection.cpp',
 	'src/Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.cpp',

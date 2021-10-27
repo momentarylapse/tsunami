@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_MIDI_ACTIONTRACKMOVEMIDIEFFECT_H_
-#define SRC_ACTION_TRACK_MIDI_ACTIONTRACKMOVEMIDIEFFECT_H_
+#pragma once
 
 #include "../../Action.h"
 class AudioEffect;
@@ -16,6 +15,8 @@ class ActionTrackMoveMidiEffect: public Action {
 public:
 	ActionTrackMoveMidiEffect(Track *track, int source, int target);
 
+	string name() const override { return ":##:move midi fx"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ private:
 	int source;
 	int target;
 };
-
-#endif /* SRC_ACTION_TRACK_MIDI_ACTIONTRACKMOVEMIDIEFFECT_H_ */

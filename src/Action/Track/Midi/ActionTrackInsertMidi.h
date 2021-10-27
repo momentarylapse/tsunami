@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKINSERTMIDI_H_
-#define ACTIONTRACKINSERTMIDI_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Data/Midi/MidiData.h"
@@ -16,6 +15,8 @@ class TrackLayer;
 class ActionTrackInsertMidi : public Action {
 public:
 	ActionTrackInsertMidi(TrackLayer *l, int offset, const MidiNoteBuffer &midi);
+
+	string name() const override { return ":##:add midi"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -27,5 +28,3 @@ private:
 	Array<int> inserted_at;
 	bool applied;
 };
-
-#endif /* ACTIONTRACKINSERTMIDI_H_ */

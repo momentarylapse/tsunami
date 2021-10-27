@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITSYNTHESIZER_H_
-#define ACTIONTRACKEDITSYNTHESIZER_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 class Track;
@@ -14,6 +13,8 @@ class Track;
 class ActionTrackEditSynthesizer: public ActionMergable<string> {
 public:
 	ActionTrackEditSynthesizer(Track *t);
+
+	string name() const override { return ":##:edit synthesizer"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -24,5 +25,3 @@ public:
 private:
 	Track *track;
 };
-
-#endif /* ACTIONTRACKEDITSYNTHESIZER_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERDELETE_H_
-#define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERDELETE_H_
+#pragma once
 
 #include "../../ActionGroup.h"
 
@@ -16,10 +15,10 @@ class ActionTrackLayerDelete : public ActionGroup {
 public:
 	ActionTrackLayerDelete(Track *t, int index);
 
+	string name() const override { return ":##:delete layer"; }
+
 	void build(Data *d) override;
 
 	Track *track;
 	int index;
 };
-
-#endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERDELETE_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_ACTIONTRACKADD_H_
-#define SRC_ACTION_TRACK_ACTIONTRACKADD_H_
+#pragma once
 
 #include "../Action.h"
 
@@ -16,6 +15,8 @@ class ActionTrackAdd : public Action {
 public:
 	ActionTrackAdd(Track *t, int index);
 
+	string name() const override { return ":##:add track"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -23,5 +24,3 @@ private:
 	shared<Track> track;
 	int index;
 };
-
-#endif /* SRC_ACTION_TRACK_ACTIONTRACKADD_H_ */

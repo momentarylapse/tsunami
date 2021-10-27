@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKADDMIDINOTE_H_
-#define ACTIONTRACKADDMIDINOTE_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -17,6 +16,8 @@ class ActionTrackAddMidiNote : public Action {
 public:
 	ActionTrackAddMidiNote(TrackLayer *l, MidiNote *n);
 
+	string name() const override { return ":##:add midi"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -25,5 +26,3 @@ private:
 	shared<MidiNote> note;
 	int insert_index;
 };
-
-#endif /* ACTIONTRACKADDMIDINOTE_H_ */

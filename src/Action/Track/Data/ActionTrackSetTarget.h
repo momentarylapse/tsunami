@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKSETTARGET_H_
-#define SRC_ACTION_TRACK_DATA_ACTIONTRACKSETTARGET_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -16,6 +15,8 @@ class ActionTrackSetTarget : public Action {
 public:
 	ActionTrackSetTarget(Track *t, Track *target);
 
+	string name() const override { return ":##:set track target"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -23,5 +24,3 @@ private:
 	Track *track;
 	Track *target;
 };
-
-#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETTARGET_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKFADEDELETE_H_
-#define SRC_ACTION_TRACK_LAYER_ACTIONTRACKFADEDELETE_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Data/CrossFade.h"
@@ -17,6 +16,8 @@ class ActionTrackFadeDelete : public Action {
 public:
 	ActionTrackFadeDelete(TrackLayer *t, int index);
 
+	string name() const override { return ":##:delete fade"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ public:
 	CrossFade fade;
 	int index;
 };
-
-#endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKFADEDELETE_H_ */

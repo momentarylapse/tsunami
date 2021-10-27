@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_
-#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 class Track;
@@ -14,6 +13,8 @@ class Track;
 class ActionTrackEditVolume : public ActionMergable<float> {
 public:
 	ActionTrackEditVolume(Track *t, float volume);
+
+	string name() const override { return ":##:set volume"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -23,5 +24,3 @@ public:
 private:
 	Track *track;
 };
-
-#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_ */

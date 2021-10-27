@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKADDEFFECT_H_
-#define ACTIONTRACKADDEFFECT_H_
+#pragma once
 
 #include "../../Action.h"
 class Track;
@@ -16,6 +15,8 @@ class ActionTrackAddEffect: public Action {
 public:
 	ActionTrackAddEffect(Track *t, shared<AudioEffect> effect);
 
+	string name() const override { return ":##:add fx"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -23,5 +24,3 @@ private:
 	shared<AudioEffect> effect;
 	Track *track;
 };
-
-#endif /* ACTIONTRACKADDEFFECT_H_ */

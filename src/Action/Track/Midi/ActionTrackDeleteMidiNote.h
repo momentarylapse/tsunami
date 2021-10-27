@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKDELETEMIDINOTE_H_
-#define ACTIONTRACKDELETEMIDINOTE_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -17,6 +16,8 @@ class ActionTrackDeleteMidiNote: public Action {
 public:
 	ActionTrackDeleteMidiNote(TrackLayer *l, int index);
 
+	string name() const override { return ":##:delete midi"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -25,5 +26,3 @@ private:
 	shared<MidiNote> note;
 	int index;
 };
-
-#endif /* ACTIONTRACKDELETEMIDINOTE_H_ */

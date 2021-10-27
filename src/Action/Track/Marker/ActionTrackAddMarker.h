@@ -5,8 +5,7 @@
  *      Author: ankele
  */
 
-#ifndef SRC_ACTION_TRACK_MARKER_ACTIONTRACKADDMARKER_H_
-#define SRC_ACTION_TRACK_MARKER_ACTIONTRACKADDMARKER_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -18,6 +17,8 @@ class ActionTrackAddMarker: public Action {
 public:
 	ActionTrackAddMarker(TrackLayer *l, const TrackMarker *marker);
 
+	string name() const override { return ":##:add marker"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -25,5 +26,3 @@ private:
 	shared<TrackMarker> marker;
 	TrackLayer *layer;
 };
-
-#endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKADDMARKER_H_ */

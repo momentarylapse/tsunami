@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_
-#define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_
+#pragma once
 
 #include "../../ActionGroup.h"
 #include "../../../Data/Range.h"
@@ -18,6 +17,8 @@ class Range;
 class ActionTrackLayerActivateVersion : public ActionGroup {
 public:
 	ActionTrackLayerActivateVersion(TrackLayer *layer, const Range &r, bool activate);
+
+	string name() const override { return ":##:dominant"; }
 
 	void build(Data *d) override;
 
@@ -33,6 +34,8 @@ class ActionTrackLayerMarkDominant : public ActionGroup {
 public:
 	ActionTrackLayerMarkDominant(Track *track, const Array<const TrackLayer*> &layers, const Range &range);
 
+	string name() const override { return ":##:dominant"; }
+
 	void build(Data *d) override;
 
 	Track *track;
@@ -42,5 +45,3 @@ public:
 	void set_active(TrackLayer *l, const Range &r, Data *d);
 	void set_inactive(TrackLayer *l, const Range &r, Data *d);
 };
-
-#endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_ */

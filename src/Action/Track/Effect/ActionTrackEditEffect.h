@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITEFFECT_H_
-#define ACTIONTRACKEDITEFFECT_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 class AudioEffect;
@@ -14,6 +13,8 @@ class AudioEffect;
 class ActionTrackEditEffect: public ActionMergable<string> {
 public:
 	ActionTrackEditEffect(AudioEffect *fx);
+
+	string name() const override { return ":##:edit fx"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -24,5 +25,3 @@ public:
 private:
 	AudioEffect *fx;
 };
-
-#endif /* ACTIONTRACKEDITEFFECT_H_ */

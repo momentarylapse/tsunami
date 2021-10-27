@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_MIDI_ACTIONTRACKEDITMIDINOTE_H_
-#define SRC_ACTION_TRACK_MIDI_ACTIONTRACKEDITMIDINOTE_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -19,6 +18,8 @@ class ActionTrackEditMidiNote : public Action {
 public:
 	ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote> n, const Range &range, float pitch, float volume, int stringno, int flags);
 
+	string name() const override { return ":##:edit midi"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -27,5 +28,3 @@ private:
 	shared<MidiNote> note;
 	shared<MidiNote> note2;
 };
-
-#endif /* SRC_ACTION_TRACK_MIDI_ACTIONTRACKEDITMIDINOTE_H_ */

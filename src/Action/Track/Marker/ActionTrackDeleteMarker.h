@@ -5,8 +5,7 @@
  *      Author: ankele
  */
 
-#ifndef SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_
-#define SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_
+#pragma once
 
 #include "../../Action.h"
 class TrackLayer;
@@ -16,6 +15,8 @@ class ActionTrackDeleteMarker: public Action {
 public:
 	ActionTrackDeleteMarker(shared<TrackLayer> l, int index);
 
+	string name() const override { return ":##:delete marker"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ private:
 	shared<TrackMarker> marker;
 	shared<TrackLayer> layer;
 };
-
-#endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_ */

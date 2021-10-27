@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKDELETEMIDIEFFECT_H_
-#define ACTIONTRACKDELETEMIDIEFFECT_H_
+#pragma once
 
 #include "../../../Module/Midi/MidiEffect.h"
 #include "../../Action.h"
@@ -16,6 +15,8 @@ class ActionTrackDeleteMidiEffect: public Action {
 public:
 	ActionTrackDeleteMidiEffect(Track *t, int index);
 
+	string name() const override { return ":##:delete midi fx"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ private:
 	Track *track;
 	int index;
 };
-
-#endif /* ACTIONTRACKDELETEEFFECT_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITMIDIEFFECT_H_
-#define ACTIONTRACKEDITMIDIEFFECT_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 class Track;
@@ -15,6 +14,8 @@ class MidiEffect;
 class ActionTrackEditMidiEffect: public ActionMergable<string> {
 public:
 	ActionTrackEditMidiEffect(MidiEffect *fx);
+
+	string name() const override { return ":##:edit midi fx"; }
 
 	void *execute(Data *d) override;
 	void redo(Data *d) override;
@@ -25,5 +26,3 @@ public:
 private:
 	MidiEffect *fx;
 };
-
-#endif /* ACTIONTRACKEDITMIDIEFFECT_H_ */

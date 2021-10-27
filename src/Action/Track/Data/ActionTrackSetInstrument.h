@@ -5,8 +5,7 @@
  *      Author: ankele
  */
 
-#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_
-#define SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 #include "../../../Data/Midi/Instrument.h"
@@ -16,6 +15,8 @@ class MidiNote;
 class ActionTrackSetInstrument: public ActionMergable<Instrument> {
 public:
 	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
+
+	string name() const override { return ":##:set instrument"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -32,5 +33,3 @@ private:
 	};
 	Array<StringChange> string_change;
 };
-
-#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKSETSYNTHESIZER_H_
-#define ACTIONTRACKSETSYNTHESIZER_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -17,6 +16,8 @@ class ActionTrackSetSynthesizer : public Action {
 public:
 	ActionTrackSetSynthesizer(Track *t, Synthesizer *synth);
 
+	string name() const override { return ":##:set synthesizer"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ private:
 	Track *track;
 	shared<Synthesizer> synth;
 };
-
-#endif /* ACTIONTRACKSETSYNTHESIZER_H_ */

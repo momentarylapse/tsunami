@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_SYNTHESIZER_ACTIONTRACKDETUNESYNTHESIZER_H_
-#define SRC_ACTION_TRACK_SYNTHESIZER_ACTIONTRACKDETUNESYNTHESIZER_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Module/Synth/Synthesizer.h"
@@ -16,6 +15,8 @@ class ActionTrackDetuneSynthesizer: public Action {
 public:
 	ActionTrackDetuneSynthesizer(Track *t, const float tuning[MAX_PITCH]);
 
+	string name() const override { return ":##:detune synthesizer"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -23,5 +24,3 @@ private:
 	Track *track;
 	float tuning[MAX_PITCH];
 };
-
-#endif /* SRC_ACTION_TRACK_SYNTHESIZER_ACTIONTRACKDETUNESYNTHESIZER_H_ */

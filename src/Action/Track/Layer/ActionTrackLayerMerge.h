@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_
-#define SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_
+#pragma once
 
 #include "../../ActionGroup.h"
 
@@ -16,9 +15,9 @@ class ActionTrackLayerMerge : public ActionGroup {
 public:
 	ActionTrackLayerMerge(Track *t);
 
+	string name() const override { return ":##:merge layers"; }
+
 	void build(Data *d) override;
 
 	Track *track;
 };
-
-#endif /* SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_ */

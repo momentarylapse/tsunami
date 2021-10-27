@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACKSETCHANNELS_H_
-#define SRC_ACTION_TRACK_BUFFER_ACTIONTRACKSETCHANNELS_H_
+#pragma once
 
 #include "../../ActionGroup.h"
 
@@ -17,9 +16,9 @@ public:
 	ActionTrackSetChannels(Track *t, int channels);
 	void build(Data *d) override;
 
+	string name() const override { return ":##:set channels"; }
+
 private:
 	Track *track;
 	int channels;
 };
-
-#endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKSETCHANNELS_H_ */

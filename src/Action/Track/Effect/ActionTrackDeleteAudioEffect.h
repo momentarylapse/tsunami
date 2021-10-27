@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKDELETEEFFECT_H_
-#define ACTIONTRACKDELETEEFFECT_H_
+#pragma once
 
 #include "../../Action.h"
 class Track;
@@ -16,6 +15,8 @@ class ActionTrackDeleteEffect: public Action {
 public:
 	ActionTrackDeleteEffect(Track *t, int index);
 
+	string name() const override { return ":##:delete fx"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -24,5 +25,3 @@ private:
 	Track *track;
 	int index;
 };
-
-#endif /* ACTIONTRACKDELETEEFFECT_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_ACTIONTRACKMOVE_H_
-#define SRC_ACTION_TRACK_ACTIONTRACKMOVE_H_
+#pragma once
 
 #include "../Action.h"
 
@@ -16,10 +15,10 @@ class ActionTrackMove: public Action {
 public:
 	ActionTrackMove(Track *track, int target);
 
+	string name() const override { return ":##:move track"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 	int origin, target;
 };
-
-#endif /* SRC_ACTION_TRACK_ACTIONTRACKMOVE_H_ */

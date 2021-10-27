@@ -310,10 +310,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->signal_chain->subscribe(this, [=]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [=]{ on_update(); }, song->action_manager->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [=] {
-		view->set_message(_("undo ") + hui::GetLanguageS(song->action_manager->get_current_action()));
+		view->set_message(_("undo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [=] {
-		view->set_message(_("redo ") + hui::GetLanguageS(song->action_manager->get_current_action()));
+		view->set_message(_("redo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
 	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
 	app->clipboard->subscribe(this, [=]{ on_update(); }, app->clipboard->MESSAGE_ANY);

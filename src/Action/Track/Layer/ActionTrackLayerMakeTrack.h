@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMAKETRACK_H_
-#define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMAKETRACK_H_
+#pragma once
 
 #include "../../ActionGroup.h"
 
@@ -16,9 +15,9 @@ class ActionTrackLayerMakeTrack : public ActionGroup {
 public:
 	ActionTrackLayerMakeTrack(TrackLayer *layer);
 
+	string name() const override { return ":##:layer -> track"; }
+
 	void build(Data *d) override;
 
 	TrackLayer *layer;
 };
-
-#endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMAKETRACK_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERADD_H_
-#define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERADD_H_
+#pragma once
 
 #include "../../Action.h"
 
@@ -17,11 +16,11 @@ class ActionTrackLayerAdd : public Action {
 public:
 	ActionTrackLayerAdd(Track *t, shared<TrackLayer> l);
 
+	string name() const override { return ":##:add layer"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 private:
 	Track *track;
 	shared<TrackLayer> layer;
 };
-
-#endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERADD_H_ */

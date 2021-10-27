@@ -5,16 +5,16 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKTOGGLEMIDIEFFECTENABLED_H_
-#define ACTIONTRACKTOGGLEMIDIEFFECTENABLED_H_
+#pragma once
 
 #include "../../Action.h"
 class MidiEffect;
 
-class ActionTrackToggleMidiEffectEnabled: public Action
-{
+class ActionTrackToggleMidiEffectEnabled: public Action {
 public:
 	ActionTrackToggleMidiEffectEnabled(MidiEffect *fx);
+
+	string name() const override { return ":##:enable midi fx"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -22,5 +22,3 @@ public:
 private:
 	MidiEffect *fx;
 };
-
-#endif /* ACTIONTRACKTOGGLEMIDIEFFECTENABLED_H_ */

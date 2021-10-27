@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_MARKER_ACTIONTRACKEDITMARKER_H_
-#define SRC_ACTION_TRACK_MARKER_ACTIONTRACKEDITMARKER_H_
+#pragma once
 
 #include "../../Action.h"
 #include "../../../Data/Range.h"
@@ -18,6 +17,8 @@ class ActionTrackEditMarker: public Action {
 public:
 	ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m, const Range &range, const string &text);
 
+	string name() const override { return ":##:edit marker"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
@@ -27,5 +28,3 @@ private:
 	Range range;
 	string text;
 };
-
-#endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKEDITMARKER_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_
-#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_
+#pragma once
 
 #include "../../ActionMergable.h"
 class Track;
@@ -14,6 +13,8 @@ class Track;
 class ActionTrackEditPanning : public ActionMergable<float> {
 public:
 	ActionTrackEditPanning(Track *t, float panning);
+
+	string name() const override { return ":##:track panning"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -23,5 +24,3 @@ public:
 private:
 	Track *track;
 };
-
-#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_ */

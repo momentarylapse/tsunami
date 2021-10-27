@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_
-#define SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_
+#pragma once
 
 #include "../ActionGroup.h"
 
@@ -16,9 +15,9 @@ class ActionTrackDelete : public ActionGroup {
 public:
 	ActionTrackDelete(Track *track);
 
+	string name() const override { return ":##:delete track"; }
+
 	void build(Data *d) override;
 
 	Track *track;
 };
-
-#endif /* SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_ */

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKTOGGLEEFFECTENABLED_H_
-#define ACTIONTRACKTOGGLEEFFECTENABLED_H_
+#pragma once
 
 #include "../../Action.h"
 class AudioEffect;
@@ -15,11 +14,11 @@ class ActionTrackToggleEffectEnabled: public Action {
 public:
 	ActionTrackToggleEffectEnabled(AudioEffect *fx);
 
+	string name() const override { return ":##:enable fx"; }
+
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
 	AudioEffect *fx;
 };
-
-#endif /* ACTIONTRACKTOGGLEEFFECTENABLED_H_ */

@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#pragma once
+
 #include "../../ActionMergable.h"
 
 class Song;

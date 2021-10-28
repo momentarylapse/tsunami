@@ -21,8 +21,7 @@ namespace FastFourierTransform
 
 static std::mutex planer_mtx;
 
-inline void fft_c2c_4(complex *in, complex *out, int stride)
-{
+inline void fft_c2c_4(const complex *in, complex *out, int stride) {
 	complex e0 = in[0]      + in[stride*2];
 	complex e1 = in[0]      - in[stride*2];
 	complex o0 = in[stride] + in[stride*3];
@@ -33,8 +32,7 @@ inline void fft_c2c_4(complex *in, complex *out, int stride)
 	out[3] = e1 + o1 * complex::I;
 }
 
-inline void fft_c2c_inv_4(complex *in, complex *out, int stride)
-{
+inline void fft_c2c_inv_4(const complex *in, complex *out, int stride) {
 	complex e0 = in[0]      + in[stride*2];
 	complex e1 = in[0]      - in[stride*2];
 	complex o0 = in[stride] + in[stride*3];
@@ -60,8 +58,7 @@ static const complex exp_8_inv[4] = {
 static Array<complex*> exp_2n, exp_2n_inv;
 static Array<complex*> fft_temp_out;
 
-inline void fft_c2c_8(complex *in, complex *out, int stride)
-{
+inline void fft_c2c_8(const complex *in, complex *out, int stride) {
 	complex e[4], o[4];
 	fft_c2c_4(in, e, stride * 2);
 	fft_c2c_4(&in[stride], o, stride * 2);
@@ -75,8 +72,7 @@ inline void fft_c2c_8(complex *in, complex *out, int stride)
 	out[7] = e[3] - o[3] * exp_8[3];
 }
 
-inline void fft_c2c_inv_8(complex *in, complex *out, int stride)
-{
+inline void fft_c2c_inv_8(const complex *in, complex *out, int stride) {
 	complex e[4], o[4];
 	fft_c2c_inv_4(in, e, stride * 2);
 	fft_c2c_inv_4(&in[stride], o, stride * 2);
@@ -90,19 +86,18 @@ inline void fft_c2c_inv_8(complex *in, complex *out, int stride)
 	out[7] = e[3] - o[3] * exp_8_inv[3];
 }
 
-void fft_c2c_2n(complex *in, complex *out, int n, int n2, int stride, bool inv)
-{
+void fft_c2c_2n(const complex *in, complex *out, int n, int n2, int stride, bool inv) {
 	complex *o = fft_temp_out[n];
 	complex *exp_const = inv ? exp_2n_inv[n] : exp_2n[n];
-	if (n2 == 16){
-		if (inv){
+	if (n2 == 16) {
+		if (inv) {
 			fft_c2c_inv_8(in, out, stride * 2);
 			fft_c2c_inv_8(&in[stride], o, stride * 2);
-		}else{
+		} else {
 			fft_c2c_8(in, out, stride * 2);
 			fft_c2c_8(&in[stride], o, stride * 2);
 		}
-	}else{
+	} else {
 		fft_c2c_2n(in, out, n - 1, n2 >> 1, stride * 2, inv);
 		fft_c2c_2n(&in[stride], o, n - 1, n2 >> 1, stride * 2, inv);
 	}
@@ -115,18 +110,17 @@ void fft_c2c_2n(complex *in, complex *out, int n, int n2, int stride, bool inv)
 		out[i] += o[i] * exp_const[i];
 }
 
-void _init_fft_(int n)
-{
-	if ((exp_2n.num <= n) or (fft_temp_out.num <= n)){
+void _init_fft_(int n) {
+	if ((exp_2n.num <= n) or (fft_temp_out.num <= n)) {
 		fft_temp_out.resize(n+1);
 		exp_2n.resize(n+1);
 		exp_2n_inv.resize(n+1);
 		int n2 = 1;
-		for (int i=0;i<=n;i++){
-			if (!exp_2n[i]){
+		for (int i=0;i<=n;i++) {
+			if (!exp_2n[i]) {
 				exp_2n[i]     = new complex[n2/2];
 				exp_2n_inv[i] = new complex[n2/2];
-				for (int k=0;k<n2/2;k++){
+				for (int k=0;k<n2/2;k++) {
 					exp_2n[i][k]     = complex(cos(2*pi / (float)n2 * (float)k), -sin(2*pi / (float)n2 * (float)k));
 					exp_2n_inv[i][k] = complex(cos(2*pi / (float)n2 * (float)k),  sin(2*pi / (float)n2 * (float)k));
 				}
@@ -138,8 +132,7 @@ void _init_fft_(int n)
 	}
 }
 
-void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
-{
+void fft_c2c_michi(const Array<complex> &in, Array<complex> &out, bool inverse) {
 	out.resize(in.num);
 
 	int n2 = in.num;
@@ -147,21 +140,22 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 	while (n2 != (1 << n))
 		n ++;
 
-	if (n == 2){
+	if (n == 2) {
 		if (inverse)
 			fft_c2c_inv_4(&in[0], &out[0], 1);
 		else
 			fft_c2c_4(&in[0], &out[0], 1);
-	}else if (n == 3){
+	} else if (n == 3) {
 		if (inverse)
 			fft_c2c_inv_8(&in[0], &out[0], 1);
 		else
 			fft_c2c_8(&in[0], &out[0], 1);
-	}else if (n > 3){
+	} else if (n > 3) {
 		_init_fft_(n);
 		fft_c2c_2n(&in[0], &out[0], n, n2, 1, inverse);
-	}else
+	} else {
 		msg_error("fft_c2c_michi: no power of two... in.num = " + i2s(in.num));
+	}
 }
 
 #if defined(__x86_64__)
@@ -206,8 +200,7 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 
 #endif
 
-void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
-{
+void fft_c2c(const Array<complex> &in, Array<complex> &out, bool inverse) {
 	out.resize(in.num);
 	//align_stack
 
@@ -220,8 +213,7 @@ void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 	planer_mtx.unlock();
 }
 
-void fft_r2c(Array<float> &in, Array<complex> &out)
-{
+void fft_r2c(const Array<float> &in, Array<complex> &out) {
 	if (in.num == 0)
 		return;
 
@@ -237,8 +229,7 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 	planer_mtx.unlock();
 }
 
-void fft_c2r_inv(Array<complex> &in, Array<float> &out)
-{
+void fft_c2r_inv(const Array<complex> &in, Array<float> &out) {
 	if (out.num == 0)
 		return;
 

@@ -4936,7 +4936,7 @@ popup-menu-track
 
 0
 0
-15
+16
 Item
 header
 disabled
@@ -4992,9 +4992,27 @@ checkable
 0
 0
 Menu
-menu-edit
+menu-audio-mode
 
 4
+0
+2
+Item
+track-audio-mode-peaks
+checkable
+0
+0
+0
+Item
+track-audio-mode-spectrum
+checkable
+1
+0
+0
+Menu
+menu-edit
+
+5
 0
 3
 Item
@@ -5018,7 +5036,7 @@ track-edit-curves
 Menu
 menu-group
 
-5
+6
 0
 2
 Item
@@ -5036,49 +5054,49 @@ track-ungroup
 Item
 track-muted
 checkable
-6
+7
 0
 0
 Item
 track-solo
 checkable
-7
+8
 0
 0
 Item
 track-explode
 checkable
-8
+9
 0
 0
 Item
 track-delete
 
-9
+10
 0
 0
 Item
 track-properties
 
-10
+11
 0
 0
 Separator
 
 
-11
+12
 0
 0
 Item
 track-add-marker
 
-12
+13
 0
 0
 Menu
 menu-version
 
-13
+14
 0
 7
 Item
@@ -5126,7 +5144,7 @@ checkable
 Menu
 menu-song
 
-14
+15
 0
 4
 Menu
@@ -7026,7 +7044,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-625
+628
 # Text
 /bars-add
 Add bars...
@@ -7154,6 +7172,9 @@ Edit...
 /marker-resize
 Resize...
 
+/menu-audio-mode
+Audio mode
+
 /menu-convert
 Convert
 
@@ -7273,6 +7294,12 @@ Add marker...
 
 /track-add-midi
 Midi
+
+/track-audio-mode-peaks
+Peaks
+
+/track-audio-mode-spectrum
+Spectrum
 
 /track-convert-mono
 Mono

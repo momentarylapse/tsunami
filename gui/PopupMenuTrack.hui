@@ -8,6 +8,9 @@ Menu popup-menu-track ""
 		Item /track-midi-mode-linear "Linear" checkable
 		Item /track-midi-mode-tab "Tabulature" checkable
 		Item /track-midi-mode-classical "Classical" checkable
+	Menu /menu-audio-mode "Audio mode"
+		Item /track-audio-mode-peaks "Peaks" checkable
+		Item /track-audio-mode-spectrum "Spectrum" checkable
 	Menu /menu-edit "Edit"
 		Item /layer-edit "Contents"
 		Item /track-edit-fx "Effects"

@@ -1792,11 +1792,14 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	if (t) {
 		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
 		menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
+		menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
 	}
 	if (vt) {
 		menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
 		menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
 		menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
+		menu->check("track-audio-mode-peaks", vt->audio_mode == AudioViewMode::PEAKS);
+		menu->check("track-audio-mode-spectrum", vt->audio_mode == AudioViewMode::SPECTRUM);
 	}
 	
 	// mute/solo

@@ -164,6 +164,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-midi-mode-linear", [=]{ on_layer_midi_mode_linear(); });
 	event("track-midi-mode-tab", [=]{ on_layer_midi_mode_tab(); });
 	event("track-midi-mode-classical", [=]{ on_layer_midi_mode_classical(); });
+	event("track-audio-mode-peaks", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
+	event("track-audio-mode-spectrum", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
 	
 	//event("track-muted", [=]{ view->cur_track()->set_muted(!view->cur_track()->muted); });
 	set_key_code("track-muted", hui::KEY_ALT + hui::KEY_M);

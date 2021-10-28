@@ -12,10 +12,16 @@
 #include "../../Data/Range.h"
 #include "../../Data/Audio/AudioBuffer.h"
 
+#include "../Graph/AudioViewTrack.h" // AudioViewMode...
+#include "../../lib/math/complex.h"
+#include "../../Plugins/FastFourierTransform.h"
+#include "../../Session.h"
+
 BufferPainter::BufferPainter(AudioView *_view) {
 	view = _view;
 	area = rect(0,0,0,0);
 	x0 = x1 = 0;
+	mode = AudioViewMode::PEAKS;
 }
 
 
@@ -130,6 +136,13 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 }
 
 void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
+	if (mode == AudioViewMode::PEAKS)
+		draw_peaks(c, b, offset);
+	else if (mode == AudioViewMode::SPECTRUM)
+		draw_spectrum(c, b, offset);
+}
+
+void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	double view_pos_rel = view->cam.screen2sample(0);
 	c->set_antialiasing(view->antialiasing);
 
@@ -204,6 +217,132 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
+float sum_abs(const Array<complex> &z) {
+	float r = 0;
+	for (auto &x: z)
+		r += x.abs();
+	return r;
+}
+
+float max_abs(const Array<complex> &z) {
+	float r = 0;
+	for (auto &x: z)
+		r = max(r, x.abs());
+	return r;
+}
+
+const int SPECTRUM_CHUNK = 512;
+const int SPECTRUM_FFT_INPUT = SPECTRUM_CHUNK * 8;
+const int SPECTRUM_N = 256;
+const float MIN_FREQ = 60.0f;
+const float MAX_FREQ = 3000.0f;
+
+bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
+	if (b.spectrum.num > 0)
+		return false;
+
+	float ww = (float)SPECTRUM_FFT_INPUT / sample_rate;
+
+	Array<complex> z;
+	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
+		FastFourierTransform::fft_r2c(b.c[0].sub_ref(i * SPECTRUM_CHUNK, i * SPECTRUM_CHUNK + SPECTRUM_FFT_INPUT), z);
+		for (int k=0; k<SPECTRUM_N; k++) {
+			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * k);
+			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * (k + 1));
+			int j0 = fmin * ww;
+			int j1 = fmax * ww + 1;
+			j0 = clamp(j0, 0, z.num);
+			j1 = clamp(j1, 0, z.num);
+			float f = max_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
+			// / (SPECTRUM_FFT_INPUT / 2 / SPECTRUM_N);
+			f = clamp(f, 0.0f, 1.0f);
+			//f = 1-exp(-f);
+			b.spectrum.add(254 * f);
+		}
+	}
+	return true;
+}
+
+Image _spec_image_;
+
+struct SpectrumImage {
+	AudioBuffer *buf;
+	Image *image;
+};
+static Array<SpectrumImage> spectrum_images;
+
+Image *get_spectrum_image(AudioBuffer &b) {
+	for (auto &si: spectrum_images)
+		if (si.buf == &b)
+			return si.image;
+	SpectrumImage s;
+	s.buf = &b;
+	s.image = new Image;
+	spectrum_images.add(s);
+	return s.image;
+}
+
+color col_heat_map(float f) {
+	//f = sqrt(f);
+	if (f < 0.333f)
+		return color(f*3, 0, 0, f*3);
+	if (f < 0.6666f)
+		return color(1, f*3 - 1, 0, 2 - f*3);
+	return color(1, 1, f*3 - 2, 0);
+}
+
+
+Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
+	auto im = get_spectrum_image(b);
+	if (prepare_spectrum(b, sample_rate)) {
+		im->create(b.length/SPECTRUM_CHUNK, SPECTRUM_N, Black);
+
+		for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
+			float x1, x2;
+			for (int k=0; k<SPECTRUM_N; k++) {
+				float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
+				//f = 1-exp(-f*2);
+				//f = 1/(exp((0.5f-f) * 3) + 1);
+				//im->set_pixel(i, k, col_heat_map(f));//White.with_alpha(1-exp(-f)));
+				im->set_pixel(i, SPECTRUM_N - 1 - k, col_heat_map(f));//White.with_alpha(1-exp(-f)));
+			}
+		}
+	}
+	return im;
+}
+
+void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
+	auto im = render_spectrum_image(b, this->view->session->sample_rate());
+
+	if (false) {
+
+	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
+		float x1, x2;
+		view->cam.range2screen(Range(offset + i * SPECTRUM_CHUNK, SPECTRUM_CHUNK), x1, x2);
+		for (int k=0; k<SPECTRUM_N; k++) {
+			float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
+			c->set_color(White.with_alpha(1-exp(-f)));
+			c->draw_rect(rect(x1, x2, area.y2 - area.height() * k / SPECTRUM_N, area.y2 - area.height() * (k+1) / SPECTRUM_N));
+		}
+	}
+
+	} else {
+
+	//float x = view->cam.sample2screen_f(offset);
+	float x1, x2;
+	view->cam.range2screen(Range(offset, b.length), x1, x2);
+
+	float scale[] = {(x2 - x1) / im->width, 0.0f, 0.0f, area.height() / im->height};
+	c->set_transform(scale, vec2(x1, area.y1));
+	c->draw_image({0,0}, im);
+	scale[0] = 1.0f;
+	scale[3] = 1.0f;
+	c->set_transform(scale, {0,0});
+
+	}
+
+}
+
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset) {
 	std::swap(col2, col2sel);
 	draw_buffer(c, b, offset);
@@ -262,12 +401,13 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 	c->set_antialiasing(false);
 }
 
-void BufferPainter::set_context(const rect &_area) {
+void BufferPainter::set_context(const rect &_area, AudioViewMode _mode) {
 	area = _area;
 	x0 = area.x1;
 	x1 = area.x2;
 	col1 = theme.text_soft1;
 	col2 = theme.text_soft3;
+	mode = _mode;
 }
 
 void BufferPainter::set_color(const color &fg, const color &bg) {

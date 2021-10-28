@@ -103,6 +103,7 @@ void AudioBuffer::clear() {
 		cc.clear();
 	length = 0;
 	peaks.clear();
+	spectrum.clear();
 	invalidate_compressed();
 }
 
@@ -110,6 +111,7 @@ void AudioBuffer::set_zero() {
 	for (auto &cc: c)
 		memset(&cc[0], 0, sizeof(float) * length);
 	peaks.clear();
+	spectrum.clear();
 	invalidate_compressed();
 }
 
@@ -128,6 +130,7 @@ void AudioBuffer::set_channels(int new_channels) {
 		c[i].resize(length);
 
 	peaks.clear();
+	spectrum.clear();
 	invalidate_compressed();
 }
 
@@ -153,6 +156,7 @@ void AudioBuffer::resize(int _length) {
 	for (auto &cc: c)
 		cc.resize(_length);
 	length = _length;
+	spectrum.clear();
 	invalidate_compressed();
 }
 
@@ -181,6 +185,7 @@ void AudioBuffer::swap_ref(AudioBuffer &b) {
 
 	// peaks
 	peaks.exchange(b.peaks);
+	spectrum.exchange(b.spectrum);
 
 	std::swap(length, b.length);
 	std::swap(offset, b.offset);
@@ -210,7 +215,10 @@ void AudioBuffer::swap_value(AudioBuffer &b) {
 		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
+	spectrum.clear();
+	b.spectrum.clear();
 	invalidate_compressed();
+	b.invalidate_compressed();
 }
 
 // mixing a mono track will scale by (1,1) in the center
@@ -254,6 +262,7 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 	}
 
 	peaks.clear();
+	spectrum.clear();
 	invalidate_compressed();
 }
 
@@ -658,6 +667,8 @@ void AudioBuffer::invalidate_peaks(const Range &_range) {
 
 	for (int i=i0; i<i1; i++)
 		peaks[pm][i] = 255;
+
+	spectrum.clear();
 }
 
 inline float fabsmax(float *p) {

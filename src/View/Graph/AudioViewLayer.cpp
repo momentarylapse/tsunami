@@ -156,7 +156,8 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 
 
 void AudioViewLayer::draw_track_buffers(Painter *c) {
-	view->buffer_painter->set_context(area);
+	view->buffer_painter->set_context(area, vtrack()->audio_mode);
+
 	//auto text_soft4 = color::interpolate(colors.text_soft3, colors.background, 0.3f);
 	if (is_playable() and layer->track->has_version_selection()) {
 		auto active_ranges = layer->active_version_ranges();
@@ -228,7 +229,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 
 	// buffer
 	if (s->type() == SignalType::AUDIO) {
-		view->buffer_painter->set_context(area);
+		view->buffer_painter->set_context(area, vtrack()->audio_mode);
 		view->buffer_painter->set_color(col, background_color());
 		view->buffer_painter->draw_buffer(c, s->buf(), s->pos);
 	} else if (s->type() == SignalType::MIDI) {

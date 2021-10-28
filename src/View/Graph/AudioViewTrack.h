@@ -18,6 +18,11 @@ class MidiKeyChange;
 class TrackHeader;
 enum class MidiMode;
 
+enum class AudioViewMode {
+	PEAKS,
+	SPECTRUM
+};
+
 
 class AudioViewTrack : public scenegraph::NodeFree {
 public:
@@ -47,6 +52,9 @@ public:
 	void set_midi_mode(MidiMode mode);
 	MidiMode midi_mode_wanted;
 	MidiMode midi_mode();
+
+	void set_audio_mode(AudioViewMode mode);
+	AudioViewMode audio_mode;
 
 	bool imploded;
 };

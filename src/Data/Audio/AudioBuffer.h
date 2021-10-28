@@ -38,6 +38,7 @@ public:
 	Array<Array<float>> c;
 
 	Array<bytes> peaks;
+	bytes spectrum;
 
 	std::shared_timed_mutex mtx;
 

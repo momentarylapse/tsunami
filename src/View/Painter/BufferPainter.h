@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_PAINTER_BUFFERPAINTER_H_
-#define SRC_VIEW_PAINTER_BUFFERPAINTER_H_
+#pragma once
 
 #include "../../lib/base/base.h"
 #include "../../lib/math/rect.h"
@@ -18,8 +17,9 @@ class AudioBuffer;
 class color;
 class Range;
 
-class BufferPainter
-{
+enum class AudioViewMode;
+
+class BufferPainter {
 public:
 	BufferPainter(AudioView *view);
 
@@ -27,7 +27,10 @@ public:
 	void draw_buffer(Painter *c, AudioBuffer &b, int offset);
 	void draw_buffer_selection(Painter *c, AudioBuffer &b, int offset);
 
-	void set_context(const rect &area);
+	void draw_peaks(Painter *c, AudioBuffer &b, int offset);
+	void draw_spectrum(Painter *c, AudioBuffer &b, int offset);
+
+	void set_context(const rect &area, AudioViewMode mode);
 	void set_color(const color &fg, const color &bg);
 	void set_clip(const Range &r);
 
@@ -35,6 +38,5 @@ public:
 	rect area;
 	color col1, col2, col2sel;
 	float x0, x1;
+	AudioViewMode mode;
 };
-
-#endif /* SRC_VIEW_PAINTER_BUFFERPAINTER_H_ */

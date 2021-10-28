@@ -31,6 +31,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::No
 	view = _view;
 	track = _track;
 	solo = false;
+	audio_mode = AudioViewMode::PEAKS;
 	midi_mode_wanted = MidiMode::CLASSICAL;
 	if (view)
 		if (view->midi_view_mode != MidiMode::DONT_CARE)
@@ -113,6 +114,12 @@ void AudioViewTrack::set_midi_mode(MidiMode mode) {
 	view->force_redraw();
 }
 
+
+void AudioViewTrack::set_audio_mode(AudioViewMode mode) {
+	audio_mode = mode;
+	notify();
+}
+
 MidiMode AudioViewTrack::midi_mode() {
 	if ((midi_mode_wanted == MidiMode::TAB) and (track->instrument.string_pitch.num > 0))
 		return MidiMode::TAB;
@@ -121,7 +128,7 @@ MidiMode AudioViewTrack::midi_mode() {
 
 void AudioViewTrack::draw_imploded_data(Painter *c) {
 	auto *l = view->get_layer(track->layers[0].get());
-	view->buffer_painter->set_context(l->area);
+	view->buffer_painter->set_context(l->area, audio_mode);
 
 	if (is_playable())
 		view->buffer_painter->set_color(theme.text_soft1, theme.background);

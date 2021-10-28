@@ -32,11 +32,47 @@ Grid
 vertical
 0
 0
+4
+Group
+grp-view
+
+0
+0
+1
+Grid
+?
+homogenousx
+0
+0
+4
+ToggleButton
+mode-peaks
+image=audio-mode-peaks,flat,huge,expandx,ignorefocus
+0
+0
+0
+ToggleButton
+mode-spectrum
+image=audio-mode-spectrum,flat,huge,expandx,ignorefocus
+1
+0
+0
+Label
+dummy
+expandx
+2
+0
+0
+Label
+dummy
+expandx
 3
+0
+0
 Group
 group-mode
 
-0
+1
 0
 1
 Grid
@@ -72,13 +108,13 @@ image=audio-mode-stretch,flat,big,expandx,ignorefocus
 Label
 ?
 expandy
-1
+2
 0
 0
 Group
 group-edit
 
-2
+3
 0
 1
 Grid
@@ -7044,7 +7080,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-628
+631
 # Text
 /bars-add
 Add bars...
@@ -7355,9 +7391,15 @@ Edit
 audio-editor/group-mode
 Edit mode
 
+audio-editor/grp-view
+View
+
 audio-editor/mode-clone
 
 Copy/paste chunks of audio
+audio-editor/mode-peaks
+
+Show peaks
 audio-editor/mode-rubber
 
 Rubber band stretching
@@ -7367,6 +7409,9 @@ Select
 audio-editor/mode-smoothen
 
 Smoothen out... TODO
+audio-editor/mode-spectrum
+
+Show spectrum
 bar_add_dialog/bad_t_beats
 Beats
 

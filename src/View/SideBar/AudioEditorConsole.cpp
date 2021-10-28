@@ -1,5 +1,6 @@
 #include "AudioEditorConsole.h"
 #include "../Mode/ViewModeEditAudio.h"
+#include "../Graph/AudioViewTrack.h"
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
@@ -11,6 +12,9 @@ AudioEditorConsole::AudioEditorConsole(Session *session) :
 {
 	from_resource("audio-editor");
 
+	event("mode-peaks", [=]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); update(); });
+	event("mode-spectrum", [=]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); update(); });
+
 	event("mode-select", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT); });
 	event("mode-smoothen", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN); });
 	event("mode-clone", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE); });
@@ -20,6 +24,8 @@ AudioEditorConsole::AudioEditorConsole(Session *session) :
 
 	view->mode_edit_audio->subscribe(this, [=] { update(); }, view->mode_edit_audio->MESSAGE_ANY);
 	update();
+
+	view->subscribe(this, [=]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 AudioEditorConsole::~AudioEditorConsole() {
@@ -41,6 +47,11 @@ void AudioEditorConsole::set_layer(TrackLayer *t) {
 }
 
 void AudioEditorConsole::update() {
+	if (view->cur_vtrack()) {
+		check("mode-peaks", view->cur_vtrack()->audio_mode == AudioViewMode::PEAKS);
+		check("mode-spectrum", view->cur_vtrack()->audio_mode == AudioViewMode::SPECTRUM);
+	}
+
 	check("mode-select", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::SELECT);
 	check("mode-smoothen", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::SMOOTHEN);
 	check("mode-clone", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::CLONE);

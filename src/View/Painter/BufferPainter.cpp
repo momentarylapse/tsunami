@@ -243,6 +243,7 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 
 	float ww = (float)SPECTRUM_FFT_INPUT / sample_rate;
 
+	bytes spectrum;
 	Array<complex> z;
 	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
 		FastFourierTransform::fft_r2c(b.c[0].sub_ref(i * SPECTRUM_CHUNK, i * SPECTRUM_CHUNK + SPECTRUM_FFT_INPUT), z);
@@ -253,13 +254,17 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 			int j1 = fmax * ww + 1;
 			j0 = clamp(j0, 0, z.num);
 			j1 = clamp(j1, 0, z.num);
-			float f = max_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
+			float f = sum_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
+			//float f = max_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
 			// / (SPECTRUM_FFT_INPUT / 2 / SPECTRUM_N);
 			f = clamp(f, 0.0f, 1.0f);
 			//f = 1-exp(-f);
-			b.spectrum.add(254 * f);
+			spectrum.add(254 * f);
 		}
 	}
+	b.mtx.lock();
+	b.spectrum.exchange(spectrum);
+	b.mtx.unlock();
 	return true;
 }
 

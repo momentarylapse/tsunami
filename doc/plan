@@ -81,3 +81,10 @@ X	double click on faders -> reset
 	plugins
 		stereo separator
 		compressor
+
+
+
+== bugs ==
+
+* pulseaudio playback "out of data" ...argh
+* Equalizer plugin illegal memory access

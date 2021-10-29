@@ -198,7 +198,9 @@ public:
 			start += num;
 		if (end == MAGIC_END_INDEX)
 			end = num;
-		if (end < 0)
+		else if (end > num)
+			end = num;
+		else if (end < 0)
 			end += num;
 		if (end >= start)
 			s.num = end - start;

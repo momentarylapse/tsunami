@@ -238,11 +238,11 @@ void ViewModeDefault::on_mouse_wheel() {
 
 	if (fabs(e->scroll.y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL)) {
-			cam->zoom(exp(e->scroll.y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->m.x);
+			scroll_y(view, e->scroll.y * view->mouse_wheel_speed * view->ScrollSpeed);
 		} else if (win->get_key(hui::KEY_SHIFT)) {
 			cam->move(e->scroll.y * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 		} else {
-			scroll_y(view, e->scroll.y * view->mouse_wheel_speed * view->ScrollSpeed);
+			cam->zoom(exp(e->scroll.y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->m.x);
 		}
 	}
 

@@ -5,7 +5,7 @@ Dialog help-dialog "Help" width=400 height=300
 				Grid ? "" vertical
 					Group g_navigation "Navigation"
 						Grid ? ""
-							Label mouse-move "scroll" hgroup=a
+							Label mouse-move "Shift+scroll" hgroup=a
 							Label l-move "Move"
 							---|
 							Label key-move "← / →" hgroup=a
@@ -14,7 +14,7 @@ Dialog help-dialog "Help" width=400 height=300
 							Label key-move-fast "Pg-up / down" hgroup=a
 							Label l-move-fast "Move fast"
 							---|
-							Label mouse-zoom "Ctrl+scroll" hgroup=a
+							Label mouse-zoom "scroll" hgroup=a
 							Label l-zoom "Zoom"
 							---|
 							Label key-zoom "+ / -" hgroup=a
@@ -49,6 +49,9 @@ Dialog help-dialog "Help" width=400 height=300
 							---|
 							Label key-mixer "Ctrl+M"
 							Label l-mixer "Mixer"
+							---|
+							Label key-edit "Alt+E"
+							Label l-edit "Edit mode"
 		Grid ? "" buttonbar
 			Label first-time-message "This dialog can be found in the menu ?/Help" hidden
 			Button /close "Close"

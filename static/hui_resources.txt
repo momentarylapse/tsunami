@@ -1176,7 +1176,7 @@ Grid
 
 0
 0
-10
+12
 Label
 key-open
 hgroup=a
@@ -1236,6 +1236,18 @@ l-mixer
 
 1
 4
+0
+Label
+key-edit
+
+0
+5
+0
+Label
+l-edit
+
+1
+5
 0
 Grid
 ?
@@ -7080,7 +7092,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-631
+633
 # Text
 /bars-add
 Add bars...
@@ -7655,6 +7667,9 @@ Ctrl+C / V
 help-dialog/key-delete
 Delete
 
+help-dialog/key-edit
+Alt+E
+
 help-dialog/key-loop
 Ctrl+L
 
@@ -7691,6 +7706,9 @@ Copy / Paste
 help-dialog/l-delete
 Delete selection
 
+help-dialog/l-edit
+Edit mode
+
 help-dialog/l-loop
 Loop
 
@@ -7722,10 +7740,10 @@ help-dialog/l-zoom
 Zoom
 
 help-dialog/mouse-move
-scroll
+Shift+scroll
 
 help-dialog/mouse-zoom
-Ctrl+scroll
+scroll
 
 help-dialog/tab
 Basics\\Recording

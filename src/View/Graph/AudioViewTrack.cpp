@@ -118,6 +118,9 @@ void AudioViewTrack::set_midi_mode(MidiMode mode) {
 void AudioViewTrack::set_audio_mode(AudioViewMode mode) {
 	audio_mode = mode;
 	notify();
+	view->update_menu(); // FIXME
+	view->thm.set_dirty();
+	view->force_redraw();
 }
 
 MidiMode AudioViewTrack::midi_mode() {

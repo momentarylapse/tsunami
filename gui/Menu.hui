@@ -36,7 +36,7 @@ Menu menu ""
 			Item /track-add-audio-mono "Audio (mono)" image=hui:add
 			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
 			Item /track-add-midi "Midi" image=hui:add
-			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-beats "Metronome..." image=hui:add
 			Item /track-add-group "Group/master" image=hui:add
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete

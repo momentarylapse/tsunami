@@ -21,6 +21,7 @@
 #include "View/Dialog/PauseAddDialog.h"
 #include "View/Dialog/PauseEditDialog.h"
 #include "View/Dialog/TrackRoutingDialog.h"
+#include "View/Dialog/TimeTrackAddDialog.h"
 #include "View/Dialog/QuestionDialog.h"
 #include "View/Dialog/BufferCompressionDialog.h"
 #include "View/BottomBar/BottomBar.h"
@@ -389,19 +390,8 @@ void TsunamiWindow::on_add_audio_track_stereo() {
 }
 
 void TsunamiWindow::on_add_time_track() {
-	song->begin_action_group(_("add time track"));
-	try {
-		song->add_track(SignalType::BEATS, 0);
-
-		// some default data
-		auto b = BarPattern(0, 4, 1);
-		b.set_bpm(90, song->sample_rate);
-		for (int i=0; i<10; i++)
-			song->add_bar(-1, b, false);
-	} catch (Exception &e) {
-		session->e(e.message());
-	}
-	song->end_action_group();
+	auto dlg = ownify(new TimeTrackAddDialog(song, this));
+	dlg->run();
 }
 
 void TsunamiWindow::on_import_backup() {

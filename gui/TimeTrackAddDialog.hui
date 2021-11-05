@@ -1,0 +1,22 @@
+Dialog time-track-add-dialog "New metronome" width=250 height=80 headerbar closebutton=no
+	Grid ? "" vertical
+		CheckBox add-bars "Add bars"
+		Revealer metro-revealer ""
+			Grid ? ""
+				Label nd_t_bpm "Speed" right disabled
+				SpinButton beats_per_minute "90" range=0:999:0.1
+				Label /per_minute "/min"
+				---|
+				Label nd_t_bars "Bars" right disabled
+				SpinButton num_bars "10" range=0:999
+				---|
+				Label nd_t_beats "Beats" right disabled
+				Grid ? ""
+					SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
+					Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
+				ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
+				ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button ok "Create" default image=hui:ok

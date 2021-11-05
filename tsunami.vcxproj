@@ -499,6 +499,7 @@
     <ClCompile Include="src\View\Dialog\QuestionDialog.cpp" />
     <ClCompile Include="src\View\Dialog\SampleScaleDialog.cpp" />
     <ClCompile Include="src\View\Dialog\SettingsDialog.cpp" />
+    <ClCompile Include="src\View\Dialog\TimeTrackAddDialog.cpp" />
     <ClCompile Include="src\View\Dialog\TrackRoutingDialog.cpp" />
     <ClCompile Include="src\View\Dialog\TuningDialog.cpp" />
     <ClCompile Include="src\View\Graph\AudioViewLayer.cpp" />
@@ -922,6 +923,7 @@
     <ClInclude Include="src\View\Dialog\QuestionDialog.h" />
     <ClInclude Include="src\View\Dialog\SampleScaleDialog.h" />
     <ClInclude Include="src\View\Dialog\SettingsDialog.h" />
+    <ClInclude Include="src\View\Dialog\TimeTrackAddDialog.h" />
     <ClInclude Include="src\View\Dialog\TrackRoutingDialog.h" />
     <ClInclude Include="src\View\Dialog\TuningDialog.h" />
     <ClInclude Include="src\View\Graph\AudioViewLayer.h" />

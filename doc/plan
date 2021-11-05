@@ -20,8 +20,8 @@ J repair midi files
 J	move cam to selected track
 	allow delayed action on focus click
 	don't double draw selected buffers
-	delete multiple layers
-	delete only layer -> delete track
+J	delete multiple layers
+J	delete only layer -> delete track
 	auto select after delete layer
 
 * render

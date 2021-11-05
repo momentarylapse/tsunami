@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-72
+73
 # Resource
 Menu
 menu_fake
@@ -6458,6 +6458,121 @@ bold,center,expandx
 0
 0
 # Resource
+Dialog
+time-track-add-dialog
+width=250,height=80,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
+CheckBox
+add-bars
+
+0
+0
+0
+Revealer
+metro-revealer
+
+1
+0
+1
+Grid
+?
+
+0
+0
+9
+Label
+nd_t_bpm
+right,disabled
+0
+0
+0
+SpinButton
+beats_per_minute
+range=0:999:0.1
+1
+0
+0
+Label
+per_minute
+
+2
+0
+0
+Label
+nd_t_bars
+right,disabled
+0
+1
+0
+SpinButton
+num_bars
+range=0:999
+1
+1
+0
+Label
+nd_t_beats
+right,disabled
+0
+2
+0
+Grid
+?
+
+1
+2
+2
+SpinButton
+beats
+range=1:1000:1,expandx
+0
+0
+0
+Edit
+pattern
+expandx,hidden
+1
+0
+0
+ToggleButton
+complex
+image=hui:edit
+2
+2
+0
+ComboBox
+divisor
+
+3
+2
+0
+Grid
+?
+buttonbar
+2
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
+# Resource
 Toolbar
 toolbar
 
@@ -7092,7 +7207,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-633
+645
 # Text
 /bars-add
 Add bars...
@@ -7332,7 +7447,7 @@ Audio (mono)
 Audio (stereo)
 
 /track-add-beats
-Metronome
+Metronome...
 
 /track-add-group
 Group/master
@@ -8864,6 +8979,42 @@ load parameter
 synth_panel/save_favorite
 
 load parameter
+time-track-add-dialog/add-bars
+Add bars
+
+time-track-add-dialog/beats
+1
+beats per bar
+time-track-add-dialog/beats_per_minute
+90
+
+time-track-add-dialog/complex
+
+complex beat pattern
+time-track-add-dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+time-track-add-dialog/nd_t_bars
+Bars
+
+time-track-add-dialog/nd_t_beats
+Beats
+
+time-track-add-dialog/nd_t_bpm
+Speed
+
+time-track-add-dialog/num_bars
+10
+
+time-track-add-dialog/ok
+Create
+
+time-track-add-dialog/pattern
+
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
+time-track-add-dialog/time-track-add-dialog
+New metronome
+
 toolbar/mode-edit-check
 Edit
 

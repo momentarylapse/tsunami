@@ -478,6 +478,7 @@ sources = [
 	'src/View/Dialog/QuestionDialog.cpp',
 	'src/View/Dialog/SampleScaleDialog.cpp',
 	'src/View/Dialog/SettingsDialog.cpp',
+	'src/View/Dialog/TimeTrackAddDialog.cpp',
 	'src/View/Dialog/TrackRoutingDialog.cpp',
 	'src/View/Dialog/TuningDialog.cpp',
 	'src/View/Graph/AudioViewLayer.cpp',

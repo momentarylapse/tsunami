@@ -212,7 +212,7 @@ bool LayerHeader::on_left_button_down(const vec2 &m) {
 		return true;
 	}
 	auto *view = vlayer->view;
-	if (view->select_xor) {
+	if (view->selecting_xor()) {
 		view->toggle_select_layer_with_content_in_cursor(vlayer);
 	} else {
 		if (view->exclusively_select_layer(vlayer)) {

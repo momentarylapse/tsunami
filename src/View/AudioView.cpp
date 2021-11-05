@@ -445,7 +445,6 @@ void AudioView::set_mode(ViewMode *m) {
 
 void AudioView::set_mouse() {
 	m = hui::GetEvent()->m;
-	select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
@@ -1180,11 +1179,11 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 	}
 }
 
-bool AudioView::shift_key() const {
+bool AudioView::selecting_or() const {
 	return session->win->get_key(hui::KEY_SHIFT);
 }
 
-bool AudioView::control_key() const {
+bool AudioView::selecting_xor() const {
 	return session->win->get_key(hui::KEY_CONTROL);
 }
 

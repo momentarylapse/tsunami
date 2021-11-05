@@ -69,7 +69,7 @@ public:
 
 		range.set_start(view->get_mouse_pos_snap());
 		view->hover().y1 = m.y;
-		if (view->select_xor)
+		if (view->selecting_xor())
 			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
 		else
 			view->set_selection(view->mode->get_selection(range, mode));
@@ -155,7 +155,7 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 
 void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
-	if (view->select_xor) {
+	if (view->selecting_xor()) {
 		// differential selection
 
 		if (view->hover_any_object()) {

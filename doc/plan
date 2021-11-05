@@ -5,6 +5,9 @@
 * audio editor...
 
 * dialog for "locking" tracks/data
+* cursor handles on layers (shift key)
+* shift + click extends selection
+* shift + home/end extends selection
 
 
 

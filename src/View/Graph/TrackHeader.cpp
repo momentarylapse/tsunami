@@ -313,7 +313,7 @@ public:
 };
 
 bool TrackHeader::on_left_button_down(const vec2 &m) {
-	if (view->select_xor) {
+	if (view->selecting_xor()) {
 		view->toggle_select_track_with_content_in_cursor(vtrack);
 	} else {
 		if (view->sel.has(vtrack->track)) {

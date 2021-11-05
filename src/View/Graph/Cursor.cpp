@@ -48,7 +48,7 @@ void Cursor::on_draw(Painter* c) {
 	view->draw_time_line(c, pos(), col, is_cur_hover(), false);
 
 
-	if (view->shift_key()) {
+	if (view->selecting_or()) {
 		float x = view->cam.sample2screen(pos());
 		if ((x >= view->song_area().x1) and (x <= view->song_area().x2)) {
 			color cc = col;
@@ -70,7 +70,7 @@ int Cursor::pos() const {
 }
 
 bool Cursor::hover(const vec2 &m) const {
-	if (!view->shift_key())
+	if (!view->selecting_or())
 		return false;
 
 	float x = view->cam.sample2screen(pos());

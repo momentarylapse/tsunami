@@ -181,7 +181,9 @@ public:
 	void set_mouse_wheel_speed(float speed);
 
 	vec2 m;
-	bool select_xor = false;
+
+	bool selecting_or() const;
+	bool selecting_xor() const;
 
 	void select_none();
 	void select_all();
@@ -224,9 +226,6 @@ public:
 
 	Session *session;
 	TsunamiWindow *win;
-
-	bool shift_key() const;
-	bool control_key() const;
 
 	Song *song;
 

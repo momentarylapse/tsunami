@@ -152,7 +152,6 @@ public:
 		h.vtrack = vtrack;
 		h.vlayer = vtrack->first_layer();
 		view->set_current(h);
-		view->select_xor = win->get_key(hui::KEY_CONTROL);
 	}
 
 	void on_name_left_click() {
@@ -169,7 +168,7 @@ public:
 			redraw(id_name);
 		}
 
-		if (view->select_xor) {
+		if (view->selecting_xor()) {
 			view->toggle_select_track_with_content_in_cursor(vtrack);
 		} else {
 			if (view->sel.has(vtrack->track)) {

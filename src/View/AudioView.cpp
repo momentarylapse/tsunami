@@ -804,6 +804,9 @@ void AudioView::on_key_down() {
 				session->set_mode(EditMode::Default);
 		}
 	}
+	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT)) {
+		force_redraw();
+	}
 	mode->on_key_down(k);
 }
 
@@ -1162,7 +1165,7 @@ void AudioView::draw_message(Painter *c, Message &m) {
 	c->set_font_size(theme.FONT_SIZE);
 }
 
-void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time, bool show_circle) {
+void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time) {
 	float x = cam.sample2screen(pos);
 	if ((x >= song_area().x1) and (x <= song_area().x2)) {
 		color cc = col;
@@ -1174,9 +1177,15 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 		if (show_time)
 			draw_boxed_str(c,  {x, song_area().my()}, song->get_time_str_long(pos), cc, theme.background);
 		c->set_line_width(1.0f);
-		if (show_circle)
-			c->draw_circle({x, song_area().y2}, 8);
 	}
+}
+
+bool AudioView::shift_key() const {
+	return session->win->get_key(hui::KEY_SHIFT);
+}
+
+bool AudioView::control_key() const {
+	return session->win->get_key(hui::KEY_CONTROL);
 }
 
 void AudioView::draw_song(Painter *c) {

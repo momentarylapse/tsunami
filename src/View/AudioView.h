@@ -126,7 +126,7 @@ public:
 	void zoom_in();
 	void zoom_out();
 
-	void draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time = false, bool show_circle = false);
+	void draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time = false);
 	void draw_song(Painter *c);
 	int draw_runner_id;
 
@@ -224,6 +224,9 @@ public:
 
 	Session *session;
 	TsunamiWindow *win;
+
+	bool shift_key() const;
+	bool control_key() const;
 
 	Song *song;
 

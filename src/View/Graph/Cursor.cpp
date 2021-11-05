@@ -13,6 +13,8 @@
 #include "../../Data/TrackLayer.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../../lib/math/vector.h"
+#include "../../Session.h"
+#include "../../TsunamiWindow.h"
 
 bool view_has_focus(AudioView *view);
 
@@ -43,7 +45,21 @@ void Cursor::on_draw(Painter* c) {
 			}
 		c->set_line_width(1);
 	}
-	view->draw_time_line(c, pos(), col, is_cur_hover(), false, true);
+	view->draw_time_line(c, pos(), col, is_cur_hover(), false);
+
+
+	if (view->shift_key()) {
+		float x = view->cam.sample2screen(pos());
+		if ((x >= view->song_area().x1) and (x <= view->song_area().x2)) {
+			color cc = col;
+			if (is_cur_hover())
+				cc = theme.selection_boundary_hover;
+			for (auto *v: view->vlayers)
+				if (view->sel.has(v->layer)) {
+					c->draw_circle({x, v->area.my()}, 6);
+				}
+		}
+	}
 }
 
 int Cursor::pos() const {
@@ -54,10 +70,20 @@ int Cursor::pos() const {
 }
 
 bool Cursor::hover(const vec2 &m) const {
-	if (m.y < view->song_area().y2 - 20)
+	if (!view->shift_key())
 		return false;
+
 	float x = view->cam.sample2screen(pos());
-	return (fabs(x - m.x) < 10);
+	for (auto *v: view->vlayers)
+		if (view->sel.has(v->layer)) {
+			if ((m - vec2(x, v->area.my())).length() < 10)
+				return true;
+		}
+	return false;
+
+	/*if (m.y < view->song_area().y2 - 20)
+		return false;
+	return (fabs(x - m.x) < 10);*/
 }
 
 string Cursor::get_tip() const {

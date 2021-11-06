@@ -155,8 +155,14 @@ public:
 	}
 
 	void on_name_left_click() {
-		set_current();
 		auto view = console->view;
+
+		if (view->selecting_xor()) {
+			view->toggle_select_track_with_content_in_cursor(vtrack);
+			return;
+		}
+
+		set_current();
 
 		if (vtrack->track->type == SignalType::GROUP and (hui::GetEvent()->m.x > shrink_button_x)) {
 			bool any_shrunk = false;
@@ -168,15 +174,11 @@ public:
 			redraw(id_name);
 		}
 
-		if (view->selecting_xor()) {
-			view->toggle_select_track_with_content_in_cursor(vtrack);
+		if (view->sel.has(vtrack->track)) {
+			view->set_selection(view->sel.restrict_to_track(vtrack->track));
 		} else {
-			if (view->sel.has(vtrack->track)) {
-				view->set_selection(view->sel.restrict_to_track(vtrack->track));
-			} else {
-				view->exclusively_select_track(vtrack);
-				view->select_under_cursor();
-			}
+			view->exclusively_select_track(vtrack);
+			view->select_under_cursor();
 		}
 	}
 	void on_name_right_click() {

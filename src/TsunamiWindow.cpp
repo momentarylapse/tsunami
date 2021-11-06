@@ -257,6 +257,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("cam-move-left", hui::KEY_PAGE_UP);
 	set_key_code("cursor-jump-start", hui::KEY_HOME);
 	set_key_code("cursor-jump-end", hui::KEY_END);
+	set_key_code("cursor-expand-start", hui::KEY_HOME + hui::KEY_SHIFT);
+	set_key_code("cursor-expand-end", hui::KEY_END + hui::KEY_SHIFT);
 	set_key_code("cursor-move-left", hui::KEY_LEFT);
 	set_key_code("cursor-move-right", hui::KEY_RIGHT);
 	set_key_code("cursor-expand-left", hui::KEY_LEFT + hui::KEY_SHIFT);

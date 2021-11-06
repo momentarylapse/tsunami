@@ -280,9 +280,7 @@ void playback_seek_relative(AudioView *view, float dt) {
 	view->set_playback_pos(pos);
 }
 
-void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
-	int pos = view->sel.range_raw.end();
-	pos = m->suggest_move_cursor(Range(pos, 0), forward);
+void expand_sel_range(AudioView *view, int pos) {
 	view->sel.range_raw.set_end(pos);
 
 	view->select_under_cursor();
@@ -360,9 +358,17 @@ void ViewModeDefault::on_command(const string &id) {
 		if (id == "cursor-move-left")
 			view->set_cursor_pos(suggest_move_cursor(view->cursor_range(), false));
 		if (id == "cursor-expand-right")
-			expand_sel_range(view, this, true);
+			expand_sel_range(view, suggest_move_cursor(Range(view->sel.range_raw.end(), 0), true));
 		if (id == "cursor-expand-left")
-			expand_sel_range(view, this, false);
+			expand_sel_range(view, suggest_move_cursor(Range(view->sel.range_raw.end(), 0), false));
+		if (id == "cursor-jump-start")
+			view->set_cursor_pos(song->range_with_time().start());
+		if (id == "cursor-jump-end")
+			view->set_cursor_pos(song->range_with_time().end());
+		if (id == "cursor-expand-start")
+			expand_sel_range(view, song->range_with_time().start());
+		if (id == "cursor-expand-end")
+			expand_sel_range(view, song->range_with_time().end());
 	}
 
 	if (id == "hui:gesture-zoom-begin") {

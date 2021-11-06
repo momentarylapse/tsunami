@@ -776,10 +776,6 @@ void AudioView::on_command(const string &id) {
 		cam.move(ScrollSpeedFast * dt / cam.pixels_per_sample);
 	if (id == "cam-move-left")
 		cam.move(- ScrollSpeedFast * dt / cam.pixels_per_sample);
-	if (id == "cursor-jump-start")
-		set_cursor_pos(song->range_with_time().start());
-	if (id == "cursor-jump-end")
-		set_cursor_pos(song->range_with_time().end());
 
 	// vertical zoom
 	if (id == "vertical-zoom-in")
@@ -804,14 +800,17 @@ void AudioView::on_key_down() {
 				session->set_mode(EditMode::Default);
 		}
 	}
-	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT)) {
+	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT))
 		force_redraw();
-	}
+
 	mode->on_key_down(k);
 }
 
 void AudioView::on_key_up() {
 	int k = hui::GetEvent()->key_code;
+	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT))
+		force_redraw();
+
 	mode->on_key_up(k);
 }
 

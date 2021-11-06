@@ -34,6 +34,11 @@ public:
 		h.node = this;
 		return h;
 	}
+	virtual void on_click() {}
+	bool on_left_button_down(const vec2 &m) override {
+		on_click();
+		return true;
+	}
 	color get_color() const {
 		if (is_cur_hover())
 			return theme.hoverify(header->color_text());
@@ -48,9 +53,8 @@ public:
 		c->set_color(get_color());
 		c->draw_mask_image({area.x1, area.y1}, vlayer->view->images.speaker.get());
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
 		vlayer->layer->set_muted(!vlayer->layer->muted);
-		return true;
 	}
 	string get_tip() const override {
 		return _("toggle mute");
@@ -65,9 +69,8 @@ public:
 		//c->drawStr(area.x1, area.y1, "S");
 		c->draw_mask_image({area.x1, area.y1}, vlayer->view->images.solo.get());
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
 		vlayer->set_solo(!vlayer->solo);
-		return true;
 	}
 	string get_tip() const override {
 		return _("toggle solo");
@@ -86,12 +89,11 @@ public:
 		else
 			c->draw_str({area.x1, area.y1}, u8"\u2b71");
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
 		if (vlayer->represents_imploded)
 			vlayer->view->explode_track(vlayer->layer->track);
 		else
 			vlayer->view->implode_track(vlayer->layer->track);
-		return true;
 	}
 	string get_tip() const override {
 		return vlayer->represents_imploded ? _("explode") : _("implode");
@@ -215,6 +217,7 @@ bool LayerHeader::on_left_button_down(const vec2 &m) {
 	if (view->selecting_xor()) {
 		view->toggle_select_layer_with_content_in_cursor(vlayer);
 	} else {
+		view->set_current(view->hover());
 		if (view->exclusively_select_layer(vlayer)) {
 			view->set_selection(view->sel.restrict_to_layer(vlayer->layer));
 		} else {
@@ -226,6 +229,7 @@ bool LayerHeader::on_left_button_down(const vec2 &m) {
 
 bool LayerHeader::on_right_button_down(const vec2 &m) {
 	auto *view = vlayer->view;
+	view->set_current(view->hover());
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);
 		view->select_under_cursor();

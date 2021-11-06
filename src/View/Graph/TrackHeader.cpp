@@ -38,6 +38,11 @@ public:
 		h.node = this;
 		return h;
 	}
+	virtual void on_click() {}
+	bool on_left_button_down(const vec2 &m) override {
+		on_click();
+		return true;
+	}
 	color get_color() const {
 		if (is_cur_hover())
 			return theme.hoverify(header->color_text());
@@ -59,9 +64,8 @@ public:
 			c->draw_mask_image({area.x1, area.y1}, view->images.x.get());
 		}
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
 		vtrack->set_muted(!vtrack->track->muted);
-		return true;
 	}
 	string get_tip() const override {
 		return _("toggle mute");
@@ -76,9 +80,8 @@ public:
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->draw_mask_image({area.x1, area.y1}, view->images.solo.get());
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
 		vtrack->set_solo(!vtrack->solo);
-		return true;
 	}
 	string get_tip() const override {
 		return _("toggle solo");
@@ -93,9 +96,9 @@ public:
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
 		c->draw_mask_image({area.x1, area.y1}, view->images.config.get());
 	}
-	bool on_left_button_down(const vec2 &m) override {
+	void on_click() override {
+		view->set_current(view->hover());
 		view->session->set_mode(EditMode::DefaultTrack);
-		return true;
 	}
 	string get_tip() const override {
 		return _("edit track properties");
@@ -316,6 +319,7 @@ bool TrackHeader::on_left_button_down(const vec2 &m) {
 	if (view->selecting_xor()) {
 		view->toggle_select_track_with_content_in_cursor(vtrack);
 	} else {
+		view->set_current(view->hover());
 		if (view->sel.has(vtrack->track)) {
 			view->set_selection(view->sel.restrict_to_track(vtrack->track));
 		} else {
@@ -332,6 +336,7 @@ bool TrackHeader::on_left_double_click(const vec2 &m) {
 }
 
 bool TrackHeader::on_right_button_down(const vec2 &m) {
+	view->set_current(view->hover());
 	if (!view->sel.has(vtrack->track)) {
 		view->exclusively_select_layer(vtrack->first_layer());
 		view->select_under_cursor();

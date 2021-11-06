@@ -558,6 +558,7 @@ bool AudioViewLayer::on_left_double_click(const vec2 &m) {
 
 bool AudioViewLayer::on_right_button_down(const vec2 &m) {
 	auto &h = view->hover();
+	view->set_current(h);
 	if (view->hover_any_object()) {
 		if (!view->hover_selected_object()) {
 			//select object exclusively

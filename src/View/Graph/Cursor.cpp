@@ -32,7 +32,7 @@ void Cursor::on_draw(Painter* c) {
 	if (!view_has_focus(view))
 		col = color::interpolate(theme.selection_boundary, theme.background_track_selected, 0.5f);
 
-	if (!is_end) {
+	if (is_end) {
 		float x = view->cam.sample2screen(pos());
 		float r = 4;
 		c->set_line_width(4);

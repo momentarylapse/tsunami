@@ -46,14 +46,23 @@ public:
 	SelectionMode mode;
 	Range range;
 	int start_pos;
-	MouseDelaySelect(AudioView *v, SelectionMode _mode) {
+	bool keep_start;
+	MouseDelaySelect(AudioView *v, SelectionMode _mode, bool _keep_start) {
 		view = v;
 		mode = _mode;
-		start_pos = view->get_mouse_pos_snap();
+		keep_start = _keep_start;
+		if (keep_start) {
+			start_pos = view->sel.range_raw.start();
+		} else {
+			start_pos = view->get_mouse_pos_snap();
+		}
 	}
 	void on_start(const vec2 &m) override {
-		range = RangeTo(view->get_mouse_pos_snap(), start_pos);
-		view->hover().y0 = view->mdp()->y0;
+		range = RangeTo(start_pos, view->get_mouse_pos_snap());
+		if (keep_start)
+			view->hover().y0 = view->cur_vlayer()->area.my();
+		else
+			view->hover().y0 = view->mdp()->y0;
 		view->hover().y1 = m.y;
 		view->selection_mode = mode;
 		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
@@ -67,7 +76,7 @@ public:
 		if (m.x > view->area.width() - 50)
 			view->cam.move(10 / view->cam.pixels_per_sample);
 
-		range.set_start(view->get_mouse_pos_snap());
+		range.set_end(view->get_mouse_pos_snap());
 		view->hover().y1 = m.y;
 		if (view->selecting_xor())
 			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
@@ -141,8 +150,8 @@ public:
 MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s) {
 	return new MouseDelayObjectsDnD(l, s);
 }
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode) {
-	return new MouseDelaySelect(v, mode);
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start) {
+	return new MouseDelaySelect(v, mode, keep_start);
 }
 
 
@@ -185,13 +194,12 @@ void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 	}
 }
 
-void ViewModeDefault::start_selection_rect(SelectionMode mode) {
-	view->mdp_prepare(CreateMouseDelaySelect(view, mode));
+void ViewModeDefault::start_selection_rect(SelectionMode mode, bool keep_start) {
+	view->mdp_prepare(CreateMouseDelaySelect(view, mode, keep_start));
 }
 
 void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
-	//auto range = RangeTo(view->sel.range_raw.start(), view->get_mouse_pos_snap());
-	auto range = RangeTo(view->get_mouse_pos_snap(), view->sel.range_raw.end());
+	auto range = RangeTo(view->sel.range_raw.start(), view->get_mouse_pos_snap());
 
 	view->hover().y0 = view->cur_vlayer()->area.my();
 	view->hover().y1 = view->m.y;
@@ -199,7 +207,7 @@ void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
 	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 
 	view->set_selection(view->mode->get_selection(range, SelectionMode::TRACK_RECT));
-	start_selection_rect(SelectionMode::TRACK_RECT);
+	start_selection_rect(SelectionMode::TRACK_RECT, true);
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
@@ -273,9 +281,9 @@ void playback_seek_relative(AudioView *view, float dt) {
 }
 
 void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
-	int pos = view->sel.range_raw.start();
+	int pos = view->sel.range_raw.end();
 	pos = m->suggest_move_cursor(Range(pos, 0), forward);
-	view->sel.range_raw.set_start(pos);
+	view->sel.range_raw.set_end(pos);
 
 	view->select_under_cursor();
 	view->cam.make_sample_visible(pos, 0);

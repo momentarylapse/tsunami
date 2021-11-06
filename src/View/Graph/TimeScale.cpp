@@ -13,7 +13,7 @@
 #include "../../lib/math/vector.h"
 
 
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
 
 
 
@@ -159,7 +159,7 @@ bool TimeScale::on_left_button_down(const vec2 &m) {
 		int pos = view->hover().pos_snap;
 		view->set_cursor_pos(pos);
 		view->hover().range = Range(pos, 0);
-		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
+		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME, false));
 	}
 	return true;
 }

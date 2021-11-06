@@ -17,7 +17,7 @@
 #include "../../lib/math/vector.h"
 
 
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
 
 Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
@@ -34,7 +34,7 @@ bool Background::on_left_button_down(const vec2 &m) {
 		view->set_cursor_pos(pos);
 		view->hover().range = Range(pos, 0);
 
-		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
+		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME, false));
 	}
 	return true;
 }

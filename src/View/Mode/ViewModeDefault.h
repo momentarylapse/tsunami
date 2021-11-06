@@ -42,7 +42,7 @@ public:
 	void left_click_handle_void_or(AudioViewLayer *vlayer) override;
 	void left_click_handle_void_xor(AudioViewLayer *vlayer) override;
 
-	void start_selection_rect(SelectionMode mode);
+	void start_selection_rect(SelectionMode mode, bool keep_start = false);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

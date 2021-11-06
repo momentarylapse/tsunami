@@ -39,6 +39,7 @@ public:
 	void left_click_handle_object(AudioViewLayer *vlayer) override;
 	void left_click_handle_object_xor(AudioViewLayer *vlayer) override;
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_void_or(AudioViewLayer *vlayer) override;
 	void left_click_handle_void_xor(AudioViewLayer *vlayer) override;
 
 	void start_selection_rect(SelectionMode mode);

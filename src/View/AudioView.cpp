@@ -168,9 +168,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	scene_graph = new scenegraph::SceneGraph();
 	scene_graph->set_perf_name("view");
-	scene_graph->set_callback_set_current([=] {
-		set_current(scene_graph->cur_selection);
-	});
+	/*scene_graph->set_callback_set_current([=] {
+		if (!selecting_or())
+			set_current(scene_graph->cur_selection);
+	});*/
 	scene_graph->set_callback_redraw([=] {
 		force_redraw();
 	});

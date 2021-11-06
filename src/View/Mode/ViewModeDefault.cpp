@@ -156,36 +156,50 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
 	if (view->selecting_xor()) {
-		// differential selection
 
+		// differential selection
 		if (view->hover_any_object()) {
 			left_click_handle_object_xor(vlayer);
 		} else {
 			left_click_handle_void_xor(vlayer);
 		}
-	} else {
-		// normal click
+	} else if (view->selecting_or()) {
 
-
-		if (view->is_playback_active()) {
-			view->playback_click();
+		// extending selection
+		if (view->hover_any_object()) {
+			left_click_handle_object_or(vlayer);
 		} else {
-
-
-			// really normal click
-
-			if (view->hover_any_object()) {
-				left_click_handle_object(vlayer);
-			} else {
-				left_click_handle_void(vlayer);
-			}
+			left_click_handle_void_or(vlayer);
 		}
+	} else if (view->is_playback_active()) {
 
+		view->playback_click();
+	} else {
+
+		// really normal click
+		if (view->hover_any_object()) {
+			left_click_handle_object(vlayer);
+		} else {
+			left_click_handle_void(vlayer);
+		}
 	}
 }
 
 void ViewModeDefault::start_selection_rect(SelectionMode mode) {
 	view->mdp_prepare(CreateMouseDelaySelect(view, mode));
+}
+
+void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
+	//auto range = RangeTo(view->sel.range_raw.start(), view->get_mouse_pos_snap());
+	auto range = RangeTo(view->get_mouse_pos_snap(), view->sel.range_raw.end());
+
+	view->hover().y0 = view->cur_vlayer()->area.my();
+	view->hover().y1 = view->m.y;
+	view->selection_mode = SelectionMode::TRACK_RECT;
+	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
+
+	view->set_selection(view->mode->get_selection(range, SelectionMode::TRACK_RECT));
+	start_selection_rect(SelectionMode::TRACK_RECT);
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {

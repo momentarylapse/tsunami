@@ -651,22 +651,6 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	// bars
 	if (layer->track->type == SignalType::BEATS) {
 
-		// bar gaps
-		if (view->cam.dsample2screen(view->session->sample_rate()) > 20) {
-			int offset = 0;
-			for (int i=0; i<view->song->bars.num+1; i++) {
-				float x = view->cam.sample2screen(offset);
-				if (fabs(x - m.x) < view->SNAPPING_DIST) {
-					s.index = i;
-					s.type = HoverData::Type::BAR_GAP;
-					s.pos = offset;
-					return s;
-				}
-				if (i < view->song->bars.num)
-					offset += view->song->bars[i]->length;
-			}
-		}
-
 		// bars
 		auto bars = view->song->bars.get_bars(RangeTo(s.pos, Range::END));
 		for (auto *b: bars) {
@@ -678,6 +662,22 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 				s.index = b->index;
 				s.type = HoverData::Type::BAR;
 				return s;
+			}
+		}
+
+		// bar gaps
+		/*if (view->cam.dsample2screen(view->session->sample_rate()) > 20)*/ {
+			int offset = 0;
+			for (int i=0; i<view->song->bars.num+1; i++) {
+				float x = view->cam.sample2screen(offset);
+				if (fabs(x - m.x) < view->SNAPPING_DIST) {
+					s.index = i;
+					s.type = HoverData::Type::BAR_GAP;
+					s.pos = offset;
+					return s;
+				}
+				if (i < view->song->bars.num)
+					offset += view->song->bars[i]->length;
 			}
 		}
 	}

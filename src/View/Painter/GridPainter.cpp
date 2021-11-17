@@ -147,6 +147,17 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 			else
 				c->set_color(col_inter(colors.bg, colors.fg, f1));
 			c->draw_line({xx, area.y1}, {xx, area.y2});
+
+
+			// end of last bar
+			if (b == bars.back()) {
+				if (sel->range().is_inside(b->range().end()))
+					c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
+				else
+					c->set_color(col_inter(colors.bg, colors.fg, f1));
+				float x = cam->sample2screen(b->range().end());
+				c->draw_line({x, area.y1}, {x, area.y2});
+			}
 		}
 
 		if (f2 >= 0.1f) {

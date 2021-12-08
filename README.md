@@ -2,6 +2,8 @@
 
 Tsunami is an open-source digital audio workstation (DAW). It is designed for ease of use and not-looking-crappy™.
 
+### Features
+
 It was mostly developed for my personal home recording needs, i.e.
  * multi-track mixing
  * multi-version audio recording
@@ -9,12 +11,17 @@ It was mostly developed for my personal home recording needs, i.e.
  * midi editing
  * synthesizers
  * samples
+ * plugin system
 
 ![tsunami1](https://user-images.githubusercontent.com/6715031/58601128-cc391680-8287-11e9-9a9f-3db9e57f763b.png)
 
+### Plugin system
+
+Tsunami uses its own just-in-time compiler for plugin code. Currently this mostly works on x86/amd64 CPUs.
+
 ## Getting started
 
-### Prerequisits
+### Prerequisites
 
 Use linux!
 
@@ -27,19 +34,35 @@ Several required libraries (install the developer version):
 * vorbis
 * flac
 * fftw3
+* opengl
 * unwind
 * zlib
 * dl
 
 (some are optional, but would require to edit the Makefile,... so just install)
 
+#### Arch / Manjaro
 
-It is also recommended to install additional fonts for some "exotic" (musical) characters:
-* ttf-symbola
-* gnu-free-fonts
+```
+sudo pacman -S gtk3 libogg libvorbis flac fftw libpulse alsa-lib libunwind
+```
+
+#### Ubuntu
+
+```
+sudo apt-get install git make g++
+sudo apt-get install libgtk-3-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev libportaudio19-dev
+```
+
+If the portaudio package can not be installed on ubuntu, try without and later use `make -f Makefile-pulseaudio` instead of `make`.
 
 
-### Installing
+#### Windows
+
+There is experimental support for Visual Studio 2019. Libraries are best installed via vcpkg. Sadly, the latest vcpkg version replaces gtk3 with gtk4, so you need to checkout an older commit.
+
+
+### Building, installing
 
 The usual
 ```
@@ -50,7 +73,6 @@ sudo make install
 
 Alternatively, you can use **meson** to compile:
 ```
-mkdir build
 meson build
 cd build
 ninja
@@ -65,6 +87,6 @@ Well `tsunami --run-tests` will show you available tests and `tsunami --run-test
 
 Just me (Michael Ankele).
 
-## Acknowledgements
+## Acknowledgments
 
 Huge thanks to the two people who tried using tsunami and complained in extremely helpful ways: 2er0 and Benji!

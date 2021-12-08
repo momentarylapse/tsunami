@@ -48,16 +48,19 @@ public:
 	shared<Node> apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<int> &casts, const Array<const Class*> &wanted);
 	bool direct_param_match(const shared<Node> operand, const shared_array<Node> &params);
 	bool param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty);
-	string param_match_with_cast_error(const shared_array<Node> &params, Array<const Class*> &wanted);
-	shared<Node> apply_params_direct(shared<Node> operand, shared_array<Node> &params);
+	string param_match_with_cast_error(const shared_array<Node> &params, const Array<const Class*> &wanted);
+	shared<Node> apply_params_direct(shared<Node> operand, const shared_array<Node> &params);
 	shared<Node> force_concrete_type(shared<Node> node);
+	shared<Node> force_concrete_type_if_function(shared<Node> node);
 	void force_concrete_types(shared_array<Node> &nodes);
 	shared<Node> deref_if_pointer(shared<Node> node);
 	shared<Node> add_converter_str(shared<Node> sub, bool repr);
+	shared<Node> wrap_function_into_callable(Function *f);
 
 	void link_most_important_operator(shared_array<Node> &operand, shared_array<Node> &_operator, Array<int> &op_exp);
-	shared_array<Node> make_class_node_callable(const Class *t, shared_array<Node> &params);
+	shared_array<Node> turn_class_into_constructor(const Class *t, const shared_array<Node> &params);
 	shared<Node> make_func_node_callable(const shared<Node> l);
+	shared<Node> make_func_pointer_node_callable(const shared<Node> l);
 	shared<Node> link_unary_operator(PrimitiveOperator *op, shared<Node> operand, Block *block);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, shared<Node> cmd);
 
@@ -112,7 +115,7 @@ public:
 	const Class *parse_type_extension_array(const Class *c);
 	const Class *parse_type_extension_dict(const Class *c);
 	const Class *parse_type_extension_pointer(const Class *c);
-	const Class *parse_type_extension_func(const Class *c);
+	const Class *parse_type_extension_func(const Class *c, const Class *ns);
 	const Class *parse_type_extension_child(const Class *c);
 	shared<Node> parse_single_func_param(Block *block);
 	void parse_complete_command(Block *block);
@@ -158,18 +161,30 @@ public:
 
 	void auto_implement_add_virtual_table(shared<Node> self, Function *f, const Class *t);
 	void auto_implement_add_child_constructors(shared<Node> self, Function *f, const Class *t, bool allow_elements_from_parent);
-	void auto_implement_constructor(Function *f, const Class *t, bool allow_parent_constructor);
-	void auto_implement_destructor(Function *f, const Class *t);
-	void auto_implement_assign(Function *f, const Class *t);
-	void auto_implement_array_clear(Function *f, const Class *t);
-	void auto_implement_array_resize(Function *f, const Class *t);
-	void auto_implement_array_add(Function *f, const Class *t);
-	void auto_implement_array_remove(Function *f, const Class *t);
+	void auto_implement_regular_constructor(Function *f, const Class *t, bool allow_parent_constructor);
+	void auto_implement_regular_destructor(Function *f, const Class *t);
+	void auto_implement_regular_assign(Function *f, const Class *t);
+	void auto_implement_array_constructor(Function *f, const Class *t);
+	void auto_implement_array_destructor(Function *f, const Class *t);
+	void auto_implement_array_assign(Function *f, const Class *t);
+	void auto_implement_super_array_constructor(Function *f, const Class *t);
+	void auto_implement_super_array_destructor(Function *f, const Class *t);
+	void auto_implement_super_array_assign(Function *f, const Class *t);
+	void auto_implement_super_array_clear(Function *f, const Class *t);
+	void auto_implement_super_array_resize(Function *f, const Class *t);
+	void auto_implement_super_array_add(Function *f, const Class *t);
+	void auto_implement_super_array_remove(Function *f, const Class *t);
+	void auto_implement_dict_constructor(Function *f, const Class *t);
+	void auto_implement_shared_constructor(Function *f, const Class *t);
+	void auto_implement_shared_destructor(Function *f, const Class *t);
 	void auto_implement_shared_assign(Function *f, const Class *t);
 	void auto_implement_shared_clear(Function *f, const Class *t);
 	void auto_implement_shared_create(Function *f, const Class *t);
 	void auto_implement_owned_clear(Function *f, const Class *t);
 	void auto_implement_owned_assign(Function *f, const Class *t);
+	void auto_implement_callable_constructor(Function *f, const Class *t);
+	void auto_implement_callable_fp_call(Function *f, const Class *t);
+	void auto_implement_callable_bind_call(Function *f, const Class *t);
 	void auto_implement_functions(const Class *t);
 	
 	SyntaxTree *tree;

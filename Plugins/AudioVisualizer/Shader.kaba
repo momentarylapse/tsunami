@@ -433,7 +433,7 @@ uniform float iVolume;
 		nix.set_shader(shader)
 		shader.set_float("iTime", _time)
 		shader.set_float("iVolume", volume)
-		nix.vb_temp.create_rect(rect(-1,1, -1,1), rect.ID)
+		nix.vb_temp.create_quad(rect.ID_SYM, rect.ID)
 		nix.draw_triangles(vb_temp)
 		#NixEnd()
 

@@ -3,6 +3,7 @@
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 #include "../../file/file.h"
+#include "../../base/callable.h"
 #include <algorithm>
 #include <math.h>
 #include <cstdio>
@@ -12,11 +13,9 @@ namespace kaba {
 
 extern const Class *TypeDynamicArray;
 extern const Class *TypeSharedPointer;
-const Class *TypeAbstractList;
-const Class *TypeAbstractDict;
-const Class *TypeAbstractTuple;
 extern const Class *TypeStringAutoCast;
 extern const Class *TypeDictBase;
+extern const Class *TypeCallableBase;
 extern const Class *TypeFloat;
 extern const Class *TypePointerList;
 extern const Class *TypeObject;
@@ -42,12 +41,26 @@ extern const Class *TypeAny;
 
 
 static string kaba_print_postfix = "\n";
-void _cdecl kaba_print(const string &str)
-{	printf("%s%s", str.c_str(), kaba_print_postfix.c_str()); fflush(stdout);	}
-void _cdecl kaba_cstringout(char *str)
-{	kaba_print(str);	}
-bytes _cdecl kaba_binary(const char *p, int length)
-{	return bytes(p, length);	}
+void _cdecl kaba_print(const string &str) {
+	printf("%s%s", str.c_str(), kaba_print_postfix.c_str()); fflush(stdout);
+}
+
+void _cdecl kaba_cstringout(char *str) {
+	kaba_print(str);
+}
+
+bytes _cdecl kaba_binary(const char *p, int length) {
+	return bytes(p, length);
+}
+
+#if 0
+void* kaba_malloc(int size) {
+	msg_error("MALLOC " + i2s(size));
+	return malloc(size);
+}
+#else
+#define kaba_malloc malloc
+#endif
 
 template<class S, class T>
 T _cdecl kaba_cast(S s) {
@@ -58,6 +71,10 @@ bool _cdecl kaba_cast(void* s) {
 	return (s != nullptr);
 }
 
+
+static void kaba_ping() {
+	msg_write("<ping>");
+}
 
 static void kaba_int_out(int a) {
 	msg_write("out: " + i2s(a));
@@ -363,57 +380,12 @@ string XList<double>::str() const {
 using FloatList = XList<float>;
 using Float64List = XList<double>;
 
-static const bool USE_DYNAMIC_BIND = false;
-
-Function *create_binding(BindingTemplate *lt, char *first) {
-	if (lt->counter != 0)
-		kaba_raise_exception(new KabaException("repeatedly binding the same function currently not supported"));
-
-	if (config.verbose)
-		msg_write("creating dynamic binding...");
-
-	lt->counter ++;
-	auto tree = lt->outer->owner();
-	char *p0 = first - lt->captures_local[0]->_offset;
-	if (config.verbose)
-		for (auto v: lt->captures_local)
-			msg_write(v->name + "  " + v->type->name + "  " + var_repr(p0 + v->_offset, v->type));
-
-	auto ff = tree->add_function("-bind-", lt->inner->literal_return_type, tree->base_class, Flags::STATIC);
-	for (int i=0; i<lt->inner->num_params - lt->captures_local.num; i++)
-		ff->add_param(lt->inner->var[i]->name, lt->inner->literal_param_type[i], lt->inner->var[i]->flags);
-	auto script = lt->outer->owner()->script;
-
-
-	foreachi (auto v, lt->captures_local, i) {
-		void *pc = lt->captures_global[i]->memory;
-		if (USE_DYNAMIC_BIND) {
-			// allocate
-			pc = &lt->capture_data[lt->capture_data_used];
-			lt->capture_data_used += v->type->size;
-		}
-
-		// save to capture
-		memcpy(pc, p0 + v->_offset, v->type->size);
-
-		if (USE_DYNAMIC_BIND) {
-			bool found = false;
-			for (char *p = (char*)lt->bind_temp->block->_start; p<lt->bind_temp->block->_end; p++) {
-				int_p dd = (int_p)lt->captures_global[i]->memory - (int_p)p - 4;
-				if ((int)dd == *(int*)p) {
-					found = true;
-					*(int*)p = (int_p)pc - (int_p)p - 4;
-				}
-			}
-			if (!found)
-				msg_error("create dynamic bind: COULD NOT FIND: " + v->name);
-		}
+class KabaCallableBase : public Callable<void()> {
+public:
+	void __init__() {
+		new(this) KabaCallableBase();
 	}
-
-	// TODO COPY!!!!
-
-	return lt->bind_temp;
-}
+};
 
 
 void SIAddXCommands() {
@@ -428,15 +400,17 @@ void SIAddXCommands() {
 	add_func("@var_repr", TypeString, &var_repr, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("@map", TypeDynamicArray, &kaba_map, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("func", TypeFunctionP);
-		func_add_param("array", TypePointer);
+//	add_func("@map", TypeDynamicArray, &kaba_map, Flags::_STATIC__RAISES_EXCEPTIONS);
+//		func_add_param("func", TypeFunctionP);
+//		func_add_param("array", TypePointer);
 	add_func("@dyn", TypeAny, &kaba_dyn, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
 	add_func("@xmap", TypeDynamicArray, &kaba_xmap, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("func", TypeFunctionP);
+		func_add_param("f", TypeCallableBase);
 		func_add_param("array", TypeDynamic);
+		func_add_param("t1", TypeClassP);
+		func_add_param("t2", TypeClassP);
 
 	add_func("@call0", TypeVoid, &kaba_call0, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("f", TypeFunctionP);
@@ -452,10 +426,6 @@ void SIAddXCommands() {
 		func_add_param("p1", TypePointer);
 		func_add_param("p2", TypePointer);
 		func_add_param("p3", TypePointer);
-
-	add_func("@create_binding", TypeFunctionP, &create_binding, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("template", TypePointer);
-		func_add_param("p0", TypePointer);
 }
 
 
@@ -482,11 +452,9 @@ void SIAddPackageBase() {
 	TypeFloat64			= add_type  ("float64", sizeof(double), Flags::CALL_BY_VALUE);
 	TypeChar			= add_type  ("char", sizeof(char), Flags::CALL_BY_VALUE);
 	TypeDynamicArray	= add_type  ("@DynamicArray", config.super_array_size);
-	TypeAbstractList	= add_type  ("-abstract-list-", config.super_array_size);
-	TypeAbstractDict	= add_type  ("-abstract-dict-", config.super_array_size);
-	TypeAbstractTuple	= add_type  ("-abstract-tuple-", config.super_array_size);
 	TypeDictBase		= add_type  ("@DictBase",   config.super_array_size);
 	TypeSharedPointer	= add_type  ("@SharedPointer", config.pointer_size);
+	TypeCallableBase	= add_type  ("@CallableBase", sizeof(Callable<void()>));
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
 	TypeExceptionP		= add_type_p(TypeException);
@@ -552,12 +520,21 @@ void SIAddPackageBase() {
 	TypeCharPs      = add_type_p(TypeChar, Flags::SILENT);
 	TypeCString     = add_type_a(TypeChar, 256, "cstring");	// cstring := char[256]
 	TypeString      = add_type_l(TypeChar, "string");	// string := char[]
-	TypeStringAutoCast = add_type("-string-auto-cast-", config.super_array_size);	// string := char[]
+	TypeStringAutoCast = add_type("<string-auto-cast>", config.super_array_size);	// string := char[]
 	TypeStringList  = add_type_l(TypeString);
 
 	TypeIntDict     = add_type_d(TypeInt);
 	TypeFloatDict   = add_type_d(TypeFloat);
 	TypeStringDict  = add_type_d(TypeString);
+
+
+	add_class(TypeCallableBase);
+		class_add_element("_fp", TypePointer, &KabaCallableBase::fp);
+		class_add_element("_pp", TypePointer, &KabaCallableBase::pp);
+		//class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallableBase::__init__);
+		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, nullptr);
+			func_set_inline(InlineID::CHUNK_ASSIGN);
+		class_add_func_virtual("call", TypeVoid, &KabaCallableBase::operator(), Flags::CONST);
 	
 
 
@@ -962,12 +939,13 @@ void SIAddPackageBase() {
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);
 	// memory
-	add_func("@malloc", TypePointer, &malloc, Flags::STATIC);
+	add_func("@malloc", TypePointer, &kaba_malloc, Flags::STATIC);
 		func_add_param("size", TypeInt);
 	add_func("@free", TypeVoid, &free, Flags::STATIC);
 		func_add_param("p", TypePointer);
 
 	// basic testing
+	add_func("_ping", TypeVoid, &kaba_ping, Flags::STATIC);
 	add_func("_int_out", TypeVoid, &kaba_int_out, Flags::STATIC);
 		func_add_param("i", TypeInt);
 	add_func("_float_out", TypeVoid, &kaba_float_out, Flags::STATIC);

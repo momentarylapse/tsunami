@@ -8,12 +8,11 @@
 #include "Interpreter.h"
 #include "kaba.h"
 #include "compiler/serializer.h"
+#include "dynamic/call.h"
 #include "../file/msg.h"
 
 namespace kaba {
 
-
-bool call_function(Function *f, void *ret, const Array<void*> &param);
 
 Interpreter::Interpreter(Script *s) {
 	script = s;

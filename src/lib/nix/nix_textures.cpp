@@ -39,7 +39,7 @@ void init_textures() {
 	default_texture = new Texture(16, 16, "rgba:i8");
 	Image image;
 	image.create(16, 16, White);
-	default_texture->overwrite(image);
+	default_texture->override(image);
 
 	tex_text = new Texture;
 }
@@ -195,7 +195,7 @@ void Texture::reload() {
 
 	string extension = filename.extension();
 	auto image = Image::load(filename);
-	overwrite(*image);
+	override(*image);
 	delete image;
 }
 
@@ -233,7 +233,7 @@ void Texture::set_options(const string &options) const {
 	}
 }
 
-void Texture::overwrite(const Image &image) {
+void Texture::override(const Image &image) {
 	if (image.error)
 		return;
 
@@ -475,7 +475,7 @@ CubeMap::CubeMap(int size, const string &_format) {
 		Image im;
 		im.create(size, size, Red);
 		for (int i=0; i<6; i++)
-			overwrite_side(i, im);
+			override_side(i, im);
 	}
 }
 
@@ -490,11 +490,11 @@ void CubeMap::fill_side(int side, Texture *source) {
 		return;
 	Image image;
 	image.load(source->filename);
-	overwrite_side(side, image);
+	override_side(side, image);
 }
 
-void CubeMap::overwrite_side(int side, const Image &image) {
-	//_overwrite(GL_TEXTURE_CUBE_MAP, NixCubeMapTarget[side], image);
+void CubeMap::override_side(int side, const Image &image) {
+	//_override(GL_TEXTURE_CUBE_MAP, NixCubeMapTarget[side], image);
 	if (image.error)
 		return;
 	if (width != image.width or height != image.height)

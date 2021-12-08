@@ -24,7 +24,7 @@ namespace kaba {
 #define reg_s0 param_preg(TypeFloat32, Asm::RegID::S0)
 #define reg_s1 param_preg(TypeFloat32, Asm::RegID::S1)
 
-bool is_typed_function_pointer(const Class *c);
+//bool is_typed_function_pointer(const Class *c);
 
 BackendARM::BackendARM(Serializer *s) : Backend(s) {
 	map_reg_root = {Asm::RegRoot::R0, Asm::RegRoot::R1};
@@ -474,8 +474,8 @@ void BackendARM::correct_implement_commands() {
 				cmd.remove_cmd(i);
 				cmd.next_cmd_target(i);
 				add_pointer_call(fp, func_params, ret);
-			} else if (is_typed_function_pointer(c.p[1].type)) {
-				do_error("BACKEND: POINTER CALL");
+//			} else if (is_typed_function_pointer(c.p[1].type)) {
+//				do_error("BACKEND: POINTER CALL");
 			} else {
 				//func_params.add(c.p[0]);
 				auto *f = ((Function*)c.p[1].p);

@@ -12,6 +12,7 @@ namespace kaba {
 extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
 extern const Class *TypeSharedPointer;
+extern const Class *TypeCallableBase;
 extern const Class *TypeMatrix;
 extern const Class *TypeVec2;
 
@@ -19,6 +20,8 @@ extern ExpressionBuffer *cur_exp_buf;
 
 bool is_func(shared<Node> n);
 
+const string class_name_might_need_parantheses(const Class *t);
+bool type_needs_alignment(const Class *t);
 
 
 static shared_array<Node> _transform_insert_before_;
@@ -49,39 +52,75 @@ shared<Node> SyntaxTree::cp_node(shared<Node> c) {
 	return cmd;
 }
 
-const Class *SyntaxTree::make_class_func(Function *f) {
+const Class *SyntaxTree::make_class_callable_fp(Function *f) {
 	auto params = f->literal_param_type;
 	if (!f->is_static())
 		params.insert(f->name_space, 0);
 	if (params.num == 0)
-		return make_class_func({TypeVoid}, f->literal_return_type);
-	return make_class_func(params, f->literal_return_type);
+		return make_class_callable_fp({TypeVoid}, f->literal_return_type);
+	return make_class_callable_fp(params, f->literal_return_type);
 	//return TypeFunctionP;
 }
 
-const Class *SyntaxTree::make_class_func(const Array<const Class*> &param, const Class *ret) {
-
+string make_callable_signature(const Array<const Class*> &param, const Class *ret) {
 	// maybe some day...
 	string params;// = param->name;
 	for (int i=0; i<param.num; i++) {
 		if (i > 0)
 			params += ",";
-		params += param[i]->name;
+		params += class_name_might_need_parantheses(param[i]);
 	}
 	if (param.num > 1)
 		params = "(" + params + ")";
-	auto params_ret = param;
 	if (param.num == 0 or (param.num == 1 and param[0] == TypeVoid)) {
 		params = "void";
+	}
+	return params + "->" + class_name_might_need_parantheses(ret);
+}
+
+const Class *SyntaxTree::make_class_callable_fp(const Array<const Class*> &param, const Class *ret) {
+
+	string name = make_callable_signature(param, ret);
+
+	auto params_ret = param;
+	if ((param.num == 1) and (param[0] == TypeVoid))
 		params_ret = {};
-	}
 	params_ret.add(ret);
-	auto ff = make_class("<func " + params + "->" + ret->name + ">", Class::Type::FUNCTION, 0, 0, nullptr, params_ret, base_class);
-	if (!ff->parent) {
-		const_cast<Class*>(ff)->derive_from(TypeFunction, true);
+
+	auto ff = make_class("Callable(" + name + ")", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
+	return make_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, base_class);
+	//return make_class(name, Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
+}
+
+const Class *SyntaxTree::make_class_callable_bind(const Array<const Class*> &param, const Class *ret, const Array<const Class*> &binds) {
+
+	string name = make_callable_signature(param, ret);
+
+	auto params_ret = param;
+	if ((param.num == 1) and (param[0] == TypeVoid))
+		params_ret = {};
+	params_ret.add(ret);
+
+	static int unique_bind_counter = 0;
+
+	auto t = (Class*)make_class("<bind-" + i2s(unique_bind_counter++) + ">", Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
+	int offset = t->size;
+	int i = 0;
+	for (auto &b: binds) {
+		if (type_needs_alignment(b))
+			offset = mem_align(offset, 4);
+		auto el = ClassElement("capture" + i2s(i ++), b, offset);
+		offset += b->size;
+		t->elements.add(el);
 	}
-	//auto p = ff->get_pointer();
-	return make_class(params + "->" + ret->name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, base_class);
+	t->size = offset;
+
+	for (auto &e: t->elements)
+		if (e.name == "_fp")
+			e.type = make_class_callable_fp(param + binds, ret);
+
+	add_missing_function_headers_for_class(t);
+	return t;
 }
 
 shared<Node> SyntaxTree::add_node_statement(StatementID id) {
@@ -94,7 +133,7 @@ shared<Node> SyntaxTree::add_node_statement(StatementID id) {
 // virtual call, if func is virtual
 shared<Node> SyntaxTree::add_node_member_call(Function *f, const shared<Node> inst, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
-	if ((f->virtual_index >= 0) and (!force_non_virtual)) {
+	if ((f->virtual_index >= 0) and !force_non_virtual) {
 		c = new Node(NodeKind::VIRTUAL_CALL, (int_p)f, f->literal_return_type, true);
 	} else {
 		c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type, true);
@@ -118,7 +157,7 @@ shared<Node> SyntaxTree::add_node_call(Function *f) {
 }
 
 shared<Node> SyntaxTree::add_node_func_name(Function *f) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, make_class_func(f), true);
+	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, true);
 }
 
 shared<Node> SyntaxTree::add_node_class(const Class *c) {
@@ -658,6 +697,8 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	(const_cast<Class*>(ns))->classes.add(t);
 	t->name_space = ns;
 	
+	// ->derive_from() will overwrite params!!!
+
 	t->array_length = max(array_size, 0);
 	if (t->is_super_array() or t->is_dict()) {
 		t->derive_from(TypeDynamicArray, false); // we already set its size!
@@ -668,6 +709,7 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	} else if (t->is_array()) {
 		if (params[0]->needs_constructor() and !params[0]->get_default_constructor())
 			do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()));
+		t->param = params;
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
 		//t->derive_from(TypeSharedPointer, true);
@@ -676,6 +718,16 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	} else if (t->type == Class::Type::FUNCTION) {
 		t->derive_from(TypeFunction, true);
 		t->param = params;
+	} else if (t->is_callable_fp()) {
+		t->derive_from(TypeCallableBase, true);
+		t->functions.clear(); // don't inherit call() with specific types!
+		t->param = params;
+		add_missing_function_headers_for_class(t);
+	} else if (t->is_callable_bind()) {
+		t->derive_from(TypeCallableBase, true);
+		t->functions.clear(); // don't inherit call() with specific types!
+		t->param = params;
+		//add_missing_function_headers_for_class(t); // later... depending on the bind variables
 	//} else if (t->type == Class::Type::PRODUCT) {
 	//	add_missing_function_headers_for_class(t);
 	}
@@ -695,17 +747,17 @@ const Class *SyntaxTree::make_class(const string &name, Class::Type type, int si
 }
 
 const Class *SyntaxTree::make_class_super_array(const Class *element_type) {
-	string name = element_type->name + "[]";
+	string name = class_name_might_need_parantheses(element_type) + "[]";
 	return make_class(name, Class::Type::SUPER_ARRAY, config.super_array_size, -1, TypeDynamicArray, {element_type}, element_type->name_space);
 }
 
 const Class *SyntaxTree::make_class_array(const Class *element_type, int num_elements) {
-	string name = element_type->name + format("[%d]", num_elements);
+	string name = class_name_might_need_parantheses(element_type) + format("[%d]", num_elements);
 	return make_class(name, Class::Type::ARRAY, element_type->size * num_elements, num_elements, nullptr, {element_type}, element_type->name_space);
 }
 
 const Class *SyntaxTree::make_class_dict(const Class *element_type) {
-	string name = element_type->name + "{}";
+	string name = class_name_might_need_parantheses(element_type) + "{}";
 	return make_class(name, Class::Type::DICT, config.super_array_size, 0, TypeDictBase, {element_type}, element_type->name_space);
 }
 
@@ -1075,9 +1127,7 @@ bool node_is_executable(shared<Node> n) {
 }
 
 shared<Node> SyntaxTree::conv_class_and_func_to_const(shared<Node> n) {
-	if (n->kind == NodeKind::FUNCTION) {
-		return add_node_const(add_constant_pointer(TypeFunctionP, n->as_func()));
-	} else if (n->kind == NodeKind::CLASS) {
+	if (n->kind == NodeKind::CLASS) {
 		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
 	}
 	return n;

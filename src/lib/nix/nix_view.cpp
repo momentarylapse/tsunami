@@ -65,12 +65,13 @@ void set_projection_perspective_ext(float center_x, float center_y, float width_
 		vector(center_x / float(target_width) * 2.0f - 1,
 			1 - center_y / float(target_height) * 2.0f,
 			0));
-	auto p = matrix::perspective(pi / 2, 1, z_min, z_max);
+	auto p = matrix::perspective(pi / 2, 1, z_min, z_max, true);
 	auto s = matrix::scale(2 * width_1 / target_width,
 			2 * height_1 / target_height,
 			- 1); // z reflection: right/left handedness
+	static const float EEE[] = {1,0,0,0, 0,1,0,0, 0,0,-1,0, 0,0,0,1}; // UNDO z-flip... :P
 
-	set_projection_matrix(t * p * s);
+	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * t * p * matrix(EEE) * s);
 }
 
 // center_x/y: pixel coordinates of (0,0,0)
@@ -78,19 +79,19 @@ void set_projection_perspective_ext(float center_x, float center_y, float width_
 void set_projection_ortho_ext(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max) {
 	auto scale = matrix::scale(2.0f / float(target_width) * map_width, -2.0f / float(target_height) * map_height, 2 / (z_max - z_min));
 	auto trans = matrix::translation(vector(2 * center_x / target_width - 1, 1 - 2 * center_y / target_height, -(z_max + z_min) / (z_max - z_min)));
-	set_projection_matrix(trans * scale);
+	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * trans * scale);
 }
 
 void set_projection_ortho_relative() {
 	// orthogonal projection (relative [0,1]x[0x1] coordinates)
 	auto t = matrix::translation(vector(-0.5f, -0.5f, 0));
 	auto s = matrix::scale(2.0f, -2.0f, 1);
-	set_projection_matrix(s * t);
+	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * s * t);
 }
 
 // orthogonal projection (pixel coordinates)
 void set_projection_ortho_pixel() {
-	set_projection_matrix(create_pixel_projection_matrix());
+	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * create_pixel_projection_matrix());
 }
 
 void set_projection_matrix(const matrix &m) {

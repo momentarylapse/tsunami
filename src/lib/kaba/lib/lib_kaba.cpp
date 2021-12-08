@@ -148,8 +148,8 @@ void SIAddPackageKaba() {
 	add_class(TypeVariable);
 		class_add_element("name", TypeString, &Variable::name);
 		class_add_element("type", TypeClassP, &Variable::type);
-		class_add_func("is_const", TypeBool, &Variable::is_const);
-		class_add_func("is_extern", TypeBool, &Variable::is_extern);
+		class_add_func("is_const", TypeBool, &Variable::is_const, Flags::PURE);
+		class_add_func("is_extern", TypeBool, &Variable::is_extern, Flags::PURE);
 		
 	add_class(TypeConstant);
 		class_add_element("name", TypeString, &Constant::name);

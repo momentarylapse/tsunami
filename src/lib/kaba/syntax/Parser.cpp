@@ -13,7 +13,7 @@
 #endif
 
 
-#define NEW_NEW_PARSING 0
+#define NEW_NEW_PARSING 1
 
 
 const int MAX_IMPORT_DIRECTORY_PARENTS = 5;
@@ -25,9 +25,6 @@ void test_node_recursion(shared<Node> root, const Class *ns, const string &messa
 ExpressionBuffer *cur_exp_buf = nullptr;
 
 
-extern const Class *TypeAbstractList;
-extern const Class *TypeAbstractDict;
-extern const Class *TypeAbstractTuple;
 extern const Class *TypeIntList;
 extern const Class *TypeAnyList;
 extern const Class *TypeAnyDict;
@@ -42,7 +39,8 @@ const int TYPE_CAST_REFERENCE = -3;
 const int TYPE_CAST_OWN_STRING = -10;
 const int TYPE_CAST_ABSTRACT_LIST = -20;
 const int TYPE_CAST_ABSTRACT_TUPLE = -30;
-const int TYPE_CAST_CLASSIFY = -31;
+const int TYPE_CAST_TUPLE_AS_CONSTRUCTOR = -31;
+const int TYPE_CAST_FUNCTION_AS_CALLABLE = -32;
 const int TYPE_CAST_MAKE_SHARED = -40;
 const int TYPE_CAST_MAKE_OWNED = -41;
 
@@ -51,25 +49,43 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 
 
 
-bool is_typed_function_pointer(const Class *c) {
-	if (c->is_pointer() and c->param[0]->parent == TypeFunction)
-		return true;
-	return false;
-}
-
+#if 0
 bool is_function_pointer(const Class *c) {
 	if (c ==  TypeFunctionP)
 		return true;
 	return is_typed_function_pointer(c);
 }
+#endif
 
 
-Array<const Class*> get_function_pointer_param_types(const Class *fp) {
-	return fp->param[0]->param.sub_ref(0, -1); // skip return value
+const Class *give_useful_type(Parser *p, shared<Node> node) {
+	if (node->type == TypeUnknown)
+		return p->force_concrete_type(node)->type;
+	return node->type;
 }
 
-const Class *get_function_pointer_return_type(const Class *fp) {
-	return fp->param[0]->param.back();
+
+// usable for pointer AND Callable class!
+Array<const Class*> get_callable_param_types(const Class *fp) {
+	if (fp->is_pointer())
+		return fp->param[0]->param.sub_ref(0, -1); // skip return value
+	return fp->param.sub_ref(0, -1); // skip return value
+}
+
+const Class *get_callable_return_type(const Class *fp) {
+	if (fp->is_pointer())
+		return fp->param[0]->param.back();
+	return fp->param.back();
+}
+
+Array<const Class*> get_callable_capture_types(const Class *fp) {
+	if (fp->is_pointer())
+		return get_callable_capture_types(fp->param[0]);
+	Array<const Class*> binds;
+	for (auto &e: fp->elements)
+		if (e.name.head(7) == "capture")
+			binds.add(e.type);
+	return binds;
 }
 
 int64 s2i2(const string &str) {
@@ -286,11 +302,11 @@ shared<Node> Parser::parse_operand_extension_array(shared<Node> operand, Block *
 	}
 
 	// allowed?
-	bool allowed = ((operand->type->is_array()) or (operand->type->usable_as_super_array()));
+	bool allowed = (operand->type->is_array() or operand->type->usable_as_super_array());
 	bool pparray = false;
 	if (!allowed)
 		if (operand->type->is_pointer()) {
-			if ((!operand->type->param[0]->is_array()) and (!operand->type->param[0]->usable_as_super_array()))
+			if (!operand->type->param[0]->is_array() and !operand->type->param[0]->usable_as_super_array())
 				do_error(format("using pointer type '%s' as an array (like in C) is not allowed any more", operand->type->long_name()));
 			allowed = true;
 			pparray = (operand->type->param[0]->usable_as_super_array());
@@ -342,6 +358,21 @@ shared<Node> Parser::make_func_node_callable(const shared<Node> l) {
 	return r;
 }
 
+shared<Node> Parser::make_func_pointer_node_callable(const shared<Node> l) {
+	auto f = l->type->param[0]->get_call();
+
+	shared<Node> c;
+	if (f->virtual_index >= 0) {
+		c = new Node(NodeKind::VIRTUAL_CALL, (int_p)f, f->literal_return_type, true);
+	} else {
+		do_error("function pointer call should be virtual???");
+		c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type, true);
+	}
+	c->set_num_params(f->num_params + 1);
+	c->set_instance(l->deref());
+	return c;
+}
+
 shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *param_type) {
 	//if ((t == TypeInt) and (param_type == TypeFloat32))
 	//	return add_node_call(get_existence("f2i", nullptr, nullptr, false)[0]->as_func());
@@ -366,7 +397,7 @@ shared<Node> SyntaxTree::add_node_constructor(Function *f) {
 	return n;
 }
 
-shared_array<Node> Parser::make_class_node_callable(const Class *t, shared_array<Node> &params) {
+shared_array<Node> Parser::turn_class_into_constructor(const Class *t, const shared_array<Node> &params) {
 	if (((t == TypeInt) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeChar)) and (params.num == 1))
 		return {tree->make_fake_constructor(t, params[0]->type)};
 	
@@ -376,7 +407,10 @@ shared_array<Node> Parser::make_class_node_callable(const Class *t, shared_array
 	//shared<Node> dummy = add_node_local(vv);
 	shared_array<Node> links;
 	for (auto *cf: t->get_constructors())
-		links.add(tree->add_node_constructor(cf));
+		if (cf->num_params == params.num)
+			links.add(tree->add_node_constructor(cf));
+	if (links.num == 0)
+		do_error(format("class %s does not have a constructor with %d parameters", t->long_name(), params.num));
 	return links;
 }
 
@@ -486,7 +520,8 @@ shared<Node> Parser::parse_operand_extension_call(const shared_array<Node> &link
 			links[i] = make_func_node_callable(l);
 		} else if (l->kind == NodeKind::CLASS) {
 			auto *t = l->as_class();
-			return try_to_match_apply_params(make_class_node_callable(t, params), params);
+			return try_to_match_apply_params(turn_class_into_constructor(t, params), params);
+#if 0
 		} else if (is_typed_function_pointer(l->type)) {
 			auto c = new Node(NodeKind::POINTER_CALL, 0, get_function_pointer_return_type(l->type));
 			c->set_num_params(1 + get_function_pointer_param_types(l->type).num);
@@ -497,6 +532,10 @@ shared<Node> Parser::parse_operand_extension_call(const shared_array<Node> &link
 			c->set_num_params(1);
 			c->set_param(0, l);
 			return try_to_match_params({c});*/
+#endif
+		} else if (l->type->is_callable()) {
+			links[i] = make_func_pointer_node_callable(l);
+			//return tree->add_node_member_call(l->type->param[0]->get_call(), l->deref(), params);
 		} else {
 			do_error("can't call " + kind2str(l->kind));
 		}
@@ -546,10 +585,10 @@ const Class *Parser::parse_type_extension_pointer(const Class *c) {
 	return c->get_pointer();
 }
 
-const Class *Parser::parse_type_extension_func(const Class *c) {
+const Class *Parser::parse_type_extension_func(const Class *c, const Class *ns) {
 	Exp.next(); // "->"
-	auto tt = parse_type(TypeVoid);
-	return tree->make_class_func({c}, tt);
+	auto tt = parse_type(ns);
+	return tree->make_class_callable_fp({c}, tt);
 }
 
 const Class *Parser::parse_type_extension_child(const Class *c) {
@@ -591,12 +630,15 @@ Array<const Class*> node_extract_param_types(const shared<Node> n) {
 shared<Node> Parser::parse_operand_extension(const shared_array<Node> &operands, Block *block, bool prefer_type) {
 
 	// special
-	if (is_type_tuple(operands[0]) and (Exp.cur == "->")) {
-		Exp.next();
-		auto ret = parse_type(block->name_space());
-		auto t = tree->make_class_func(class_tuple_extract_classes(operands[0]), ret);
+	if (false) {
+		if (is_type_tuple(operands[0]) and (Exp.cur == "->")) {
+			do_error("do we ever reach this point?");
+			Exp.next();
+			auto ret = parse_type(block->name_space());
+			auto t = tree->make_class_callable_fp(class_tuple_extract_classes(operands[0]), ret);
 
-		return parse_operand_extension({tree->add_node_class(t)}, block, prefer_type);
+			return parse_operand_extension({tree->add_node_class(t)}, block, prefer_type);
+		}
 	}
 
 	// special
@@ -612,7 +654,7 @@ shared<Node> Parser::parse_operand_extension(const shared_array<Node> &operands,
 		} else if (Exp.cur == "{") {
 			t = parse_type_extension_dict(t);
 		} else if (Exp.cur == "->") {
-			t = parse_type_extension_func(t);
+			t = parse_type_extension_func(t, block->name_space());
 		} else if (Exp.cur == ".") {
 			t = parse_type_extension_child(t);
 		}
@@ -679,7 +721,7 @@ Array<const Class*> Parser::get_wanted_param_types(shared<Node> link) {
 		for (auto *c: t->get_constructors())
 			return c->literal_param_type;
 	} else if (link->kind == NodeKind::POINTER_CALL) {
-		return get_function_pointer_param_types(link->params[0]->type);
+		return get_callable_param_types(link->params[0]->type);
 	} else {
 		do_error("evil function...kind: "+kind2str(link->kind));
 	}
@@ -783,16 +825,17 @@ bool Parser::param_match_with_cast(const shared<Node> operand, const shared_arra
 	return true;
 }
 
-string Parser::param_match_with_cast_error(const shared_array<Node> &params, Array<const Class*> &wanted) {
+string Parser::param_match_with_cast_error(const shared_array<Node> &params, const Array<const Class*> &wanted) {
 	if (wanted.num != params.num)
 		return format("%d parameters given, %d expected", params.num, wanted.num);
 	for (int p=0; p<params.num; p++) {
 		int penalty, cast;
 		if (!type_match_with_cast(params[p], false, wanted[p], penalty, cast)) {
+			auto pt = give_useful_type(this, params[p]);
 			if (params.num > 1)
-				return format("type '%s' given, '%s' expected for parameter #%d", params[p]->type->long_name(), wanted[p]->long_name(), p+1);
+				return format("type '%s' given, '%s' expected for parameter #%d", pt->long_name(), wanted[p]->long_name(), p+1);
 			else
-				return format("type '%s' given, '%s' expected", params[p]->type->long_name(), wanted[p]->long_name());
+				return format("type '%s' given, '%s' expected", pt->long_name(), wanted[p]->long_name());
 		}
 	}
 	return "";
@@ -820,7 +863,7 @@ int node_param_offset(shared<Node> operand) {
 	return offset;
 }
 
-shared<Node> Parser::apply_params_direct(shared<Node> operand, shared_array<Node> &params) {
+shared<Node> Parser::apply_params_direct(shared<Node> operand, const shared_array<Node> &params) {
 	int offset = node_param_offset(operand);
 	auto r = operand->shallow_copy();
 	for (int p=0; p<params.num; p++)
@@ -839,7 +882,7 @@ shared<Node> Parser::apply_params_with_cast(shared<Node> operand, const shared_a
 }
 
 shared<Node> Parser::build_abstract_list(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::ARRAY_BUILDER, 0, TypeAbstractList, true);
+	auto c = new Node(NodeKind::ARRAY_BUILDER, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -847,7 +890,7 @@ shared<Node> Parser::build_abstract_list(const Array<shared<Node>> &el) {
 }
 
 shared<Node> Parser::build_abstract_dict(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::DICT_BUILDER, 0, TypeAbstractDict, true);
+	auto c = new Node(NodeKind::DICT_BUILDER, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -855,7 +898,7 @@ shared<Node> Parser::build_abstract_dict(const Array<shared<Node>> &el) {
 }
 
 shared<Node> Parser::build_abstract_tuple(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::TUPLE, 0, TypeAbstractTuple, true);
+	auto c = new Node(NodeKind::TUPLE, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -1125,7 +1168,7 @@ const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const C
 			name += ",";
 		name += c->name;
 	}
-	auto c = const_cast<Class*>(tree->make_class("("+name+")", Class::Type::OTHER, size, -1, nullptr, classes, tree->_base_class.get()));
+	auto c = const_cast<Class*>(tree->make_class("("+name+")", Class::Type::PRODUCT, size, -1, nullptr, classes, tree->_base_class.get()));
 	if (c->elements.num == 0) {
 		int offset = 0;
 		foreachi (auto &cc, classes, i) {
@@ -1270,7 +1313,7 @@ shared<Node> Parser::parse_primitive_operator(Block *block) {
 	return 0;
 }*/
 
-bool type_match_classify(shared<Node> node, Function *f_constructor, int &penalty) {
+bool type_match_tuple_as_contructor(shared<Node> node, Function *f_constructor, int &penalty) {
 	if (f_constructor->literal_param_type.num != node->params.num)
 		return false;
 
@@ -1327,7 +1370,7 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 			return true;
 		}
 	}
-	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeAbstractList) {
+	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeUnknown) {
 		if (wanted->is_super_array()) {
 			auto t = wanted->get_array_element();
 			int pen, c;
@@ -1343,15 +1386,45 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 			cast = TYPE_CAST_ABSTRACT_LIST;
 			return true;
 		}
+		// TODO: only for tuples
 		for (auto *f: wanted->get_constructors()) {
-			if (type_match_classify(node, f, penalty)) {
-				cast = TYPE_CAST_CLASSIFY;
+			if (type_match_tuple_as_contructor(node, f, penalty)) {
+				cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
 				return true;
 			}
 		}
 	}
-	if ((node->kind == NodeKind::TUPLE) and (given == TypeAbstractTuple)) {
-		//if (wanted->is)
+	if ((node->kind == NodeKind::TUPLE) and (given == TypeUnknown)) {
+
+		for (auto *f: wanted->get_constructors()) {
+			if (type_match_tuple_as_contructor(node, f, penalty)) {
+				cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
+				return true;
+			}
+		}
+
+		if (!wanted->is_product())
+			return false;
+		if (wanted->param.num != node->params.num)
+			return false;
+		for (int i=0; i<node->params.num; i++)
+			if (!type_match(node->params[i]->type, wanted->param[i]))
+				return false;
+		msg_write("product");
+		cast = TYPE_CAST_ABSTRACT_TUPLE;
+		return true;
+	}
+	if ((node->kind == NodeKind::FUNCTION) and (given == TypeUnknown)) {
+		if (wanted->is_callable()) {
+			auto f = node->as_func();
+			auto ft = f->owner()->make_class_callable_fp(f);
+			if (type_match(ft, wanted)) {
+				cast = TYPE_CAST_FUNCTION_AS_CALLABLE;
+				return true;
+			}
+
+		}
+
 	}
 	if (wanted == TypeStringAutoCast) {
 		//Function *cf = given->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
@@ -1398,8 +1471,16 @@ shared<Node> Parser::apply_type_cast(int tc, shared<Node> node, const Class *wan
 		node->type = wanted;
 		return node;
 	}
+	if (tc == TYPE_CAST_ABSTRACT_TUPLE) {
+		msg_error("AUTO TUPLE");
+		node->type = wanted;
+		return node;
+	}
+	if (tc == TYPE_CAST_FUNCTION_AS_CALLABLE) {
+		return force_concrete_type(node);
+	}
 
-	if (tc == TYPE_CAST_CLASSIFY) {
+	if (tc == TYPE_CAST_TUPLE_AS_CONSTRUCTOR) {
 		Array<int> c;
 		c.resize(node->params.num);
 		for (auto *f: wanted->get_constructors()) {
@@ -1679,10 +1760,11 @@ void Parser::link_most_important_operator(shared_array<Node> &operands, shared_a
 		// well... we're abusing that we will always get the FIRST 2 pipe elements!!!
 		_operators[mio] = build_function_pipe(param1, param2);
 	} else {
+		param2 = force_concrete_type_if_function(param2);
 		// regular operator
 		_operators[mio] = link_operator(op_no, param1, param2);
 		if (!_operators[mio])
-			do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, param2->type->long_name()), op_exp[mio]);
+			do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), op_exp[mio]);
 	}
 
 // remove from list
@@ -2131,6 +2213,7 @@ shared<Node> Parser::parse_statement_new(Block *block) {
 		if (constr->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
 			do_error("constructor call expected after 'new'");
 		constr->kind = NodeKind::FUNCTION_CALL;
+		constr->type = TypeVoid;
 
 		auto ff = constr->as_func();
 		auto tt = ff->name_space;
@@ -2269,13 +2352,40 @@ const Class *type_more_abstract(const Class *a, const Class *b) {
 	return nullptr;
 }
 
+shared<Node> Parser::wrap_function_into_callable(Function *f) {
+	auto t = tree->make_class_callable_fp(f);
+
+	for (auto *cf: t->param[0]->get_constructors())
+		if (cf->num_params == 1) {
+			auto cmd = tree->add_node_statement(StatementID::NEW);
+			auto con = tree->add_node_constructor(cf);
+			auto fp = tree->add_constant(TypeFunctionP);
+			fp->as_int64() = (int_p)f;
+			con = apply_params_direct(con, {tree->add_node_const(fp)});
+			con->kind = NodeKind::FUNCTION_CALL;
+			con->type = TypeVoid;
+
+			cmd->type = t;
+			cmd->set_param(0, con);
+			return cmd;
+		}
+	do_error("X");
+	return nullptr;
+}
+
 void Parser::force_concrete_types(shared_array<Node> &nodes) {
 	for (int i=0; i<nodes.num; i++)
 		nodes[i] = force_concrete_type(nodes[i].get());
 }
 
+shared<Node> Parser::force_concrete_type_if_function(shared<Node> node) {
+	if (node->kind == NodeKind::FUNCTION)
+		return wrap_function_into_callable(node->as_func());
+	return node;
+}
+
 shared<Node> Parser::force_concrete_type(shared<Node> node) {
-	if (node->type != TypeAbstractList and node->type != TypeAbstractDict and node->type != TypeAbstractTuple)
+	if (node->type != TypeUnknown)
 		return node;
 
 	if (node->kind == NodeKind::ARRAY_BUILDER) {
@@ -2324,8 +2434,10 @@ shared<Node> Parser::force_concrete_type(shared<Node> node) {
 		return node;
 	} else if (node->kind == NodeKind::TUPLE) {
 		auto type = merge_type_tuple_into_product(tree, node_extract_param_types(node));
-		auto xx = make_class_node_callable(type, node->params);
+		auto xx = turn_class_into_constructor(type, node->params);
 		return try_to_match_apply_params(xx, node->params);
+	} else if (node->kind == NodeKind::FUNCTION) {
+		return wrap_function_into_callable(node->as_func());
 	} else {
 		do_error("unhandled abstract type: " + kind2str(node->kind));
 	}
@@ -2435,7 +2547,9 @@ shared<Node> Parser::parse_statement_var(Block *block) {
 			do_error(format("'var' declaration with '=' only allowed with a single variable name, %d given", names.num));
 
 		auto rhs = parse_operand_super_greedy(block);
-		if (!type) {
+		if (type) {
+			rhs = force_concrete_type_if_function(rhs);
+		} else {
 			rhs = force_concrete_type(rhs);
 			type = rhs->type;
 		}
@@ -2461,15 +2575,19 @@ Array<const Class*> func_effective_params(const Function *f) {
 }
 
 Array<const Class*> node_call_effective_params(shared<Node> node) {
+	if (node->type->is_callable())
+		return get_callable_param_types(node->type);
 	if (node->kind == NodeKind::FUNCTION)
 		return func_effective_params(node->as_func());
-	return get_function_pointer_param_types(node->type);
+	return get_callable_param_types(node->type);
 }
 
 const Class *node_call_return_type(shared<Node> node) {
+	if (node->type->is_callable())
+		return get_callable_return_type(node->type);
 	if (node->kind == NodeKind::FUNCTION)
 		return node->as_func()->literal_return_type;
-	return get_function_pointer_return_type(node->type);
+	return get_callable_return_type(node->type);
 }
 
 shared<Node> Parser::parse_statement_map(Block *block) {
@@ -2479,8 +2597,9 @@ shared<Node> Parser::parse_statement_map(Block *block) {
 	auto params = parse_call_parameters(block);
 	if (params.num != 2)
 		do_error("map() expects 2 parameters");
-	if (!is_typed_function_pointer(params[0]->type) and (params[0]->kind != NodeKind::FUNCTION))
-		do_error("map(): first parameter must be a function or function pointer");
+	params[0] = force_concrete_type(params[0]);
+	if (!params[0]->type->is_callable())
+		do_error("map(): first parameter must be callable");
 	params[1] = force_concrete_type(params[1]);
 	if (!params[1]->type->is_super_array())
 		do_error("map(): second parameter must be a list[]");
@@ -2492,15 +2611,13 @@ shared<Node> Parser::parse_statement_map(Block *block) {
 	if (p[0] != params[1]->type->param[0])
 		do_error("map(): function parameter does not match list type");
 
-	auto *f = tree->required_func_global("@map");
+	auto *f = tree->required_func_global("@xmap");
 
 	auto cmd = tree->add_node_call(f);
-	if (params[0]->kind == NodeKind::FUNCTION) {
-		cmd->set_param(0, tree->add_node_const(tree->add_constant_pointer(TypeFunctionP, params[0]->as_func())));
-	} else {
-		cmd->set_param(0, params[0]);
-	}
+	cmd->set_param(0, params[0]);
 	cmd->set_param(1, params[1]);
+	cmd->set_param(2, tree->add_node_class(p[0]));
+	cmd->set_param(3, tree->add_node_class(p[1]));
 	cmd->type = tree->make_class_super_array(rt);
 	return cmd;
 }
@@ -2510,7 +2627,9 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 	Exp.next(); // "lambda"
 	auto *prev_func = cur_func;
 
-	auto *f = tree->add_function("-lambda-", TypeUnknown, tree->base_class, Flags::STATIC);
+	static int unique_lambda_counter = 0;
+
+	auto *f = tree->add_function("<lambda-" + i2s(unique_lambda_counter ++) + ">", TypeUnknown, tree->base_class, Flags::STATIC);
 	f->_logical_line_no = Exp.get_line_no();
 	f->_exp_no = Exp.cur_exp;
 
@@ -2548,6 +2667,7 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 
 	cur_func = prev_func;
 
+	// lambda body
 	auto cmd = parse_operand_greedy(f->block.get());
 	f->literal_return_type = cmd->type;
 	f->effective_return_type = cmd->type;
@@ -2565,6 +2685,7 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 
 	tree->base_class->add_function(tree, f, false, false);
 
+	// find captures
 	Set<Variable*> captures;
 	auto find_captures = [block, &captures](shared<Node> n) {
 		if (n->kind == NodeKind::VAR_LOCAL) {
@@ -2576,19 +2697,26 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 		return n;
 	};
 	tree->transform_block(f->block.get(), find_captures);
+
+	auto param_types = f->literal_param_type;
+
 	if (captures.num > 0) {
 		if (config.verbose)
 			msg_write("CAPTURES:");
-		auto lt = new BindingTemplate;
+		/*auto lt = new BindingTemplate;
 		binding_templates.add(lt);
 		lt->outer = block->function;
 		lt->inner = f;
 		lt->captures_local = captures;
-		lt->capture_data.resize(10000); // 10k...
+		lt->capture_data.resize(10000); // 10k...*/
+
+		Array<const Class*> capture_types;
+
 		for (auto v: captures) {
 			if (config.verbose)
 				msg_write("  * " + v->name);
 			//f->block->vars.insert()
+			capture_types.add(v->type);
 
 			auto vvv = f->block->insert_var(f->num_params, v->name, v->type);
 			//if (!flags_has(flags, Flags::OUT))
@@ -2608,49 +2736,32 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 
 		f->update_parameters_after_parsing();
 
+		auto bind_wrapper_type = tree->make_class_callable_bind(param_types, f->literal_return_type, capture_types);
 
-		// bind wrapper template
-		auto *bind_wrapper = tree->add_function("-bind-wrapper-", f->literal_return_type, tree->base_class, Flags::STATIC);
-	{
-		for (int k=0; k<f->num_params-captures.num; k++) {
-			auto v = bind_wrapper->add_param(f->var[k]->name, f->var[k]->type, f->var[k]->flags);
-		}
-		bind_wrapper->update_parameters_after_parsing();
-		bind_wrapper->num_params = f->num_params - captures.num;
-		auto vfp = bind_wrapper->block->add_var("f", tree->make_class_func(bind_wrapper));
-		auto fp = tree->add_node_local(vfp);
-		bind_wrapper->block->add(tree->add_node_operator_by_inline(InlineID::POINTER_ASSIGN, fp, tree->add_node_func_name(f)));
 
-		auto cc = new Node(NodeKind::POINTER_CALL, 0, f->literal_return_type);
-		cc->set_num_params(f->num_params + 1);
-		cc->set_param(0, fp);
-		for (int k=0; k<f->num_params-captures.num; k++)
-			cc->set_param(1 + k, tree->add_node_local(bind_wrapper->var[k].get()));
-		foreachi (auto cap, captures, k) {
-			auto v = new Variable(format("-bind-ref-%d-", k), cap->type);
-			flags_set(v->flags, Flags::STATIC);
-			lt->captures_global.add(v);
-			tree->base_class->static_variables.add(v);
-			// f->num_params
-			//auto pp = new Node(NodeKind::MEMORY, (int_p)&lt->capture_data[k], cap->type);
-			auto pp = tree->add_node_global(v);
-			cc->set_param(1 + bind_wrapper->num_params + k, pp);
+		auto create_inner_lambda = wrap_function_into_callable(f);
+
+
+		for (auto *cf: bind_wrapper_type->get_constructors()) {
+			auto cmd = tree->add_node_statement(StatementID::NEW);
+			auto con = tree->add_node_constructor(cf);
+			shared_array<Node> params = {create_inner_lambda.get()};
+			for (auto &c: captures)
+				params.add(tree->add_node_local(c));
+			con = apply_params_direct(con, params);
+			con->kind = NodeKind::FUNCTION_CALL;
+			con->type = TypeVoid;
+
+			cmd->type = tree->make_class_callable_fp(param_types, f->literal_return_type);
+			//cmd->type = bind_wrapper_type->get_pointer();
+			cmd->set_param(0, con);
+			return cmd;
 		}
 
-		auto ret = tree->add_node_statement(StatementID::RETURN);
-		ret->set_num_params(1);
-		ret->set_param(0, cc);
-		bind_wrapper->block->add(ret);
-	}
-		lt->bind_temp = bind_wrapper;
 
-		// runtime bind command
-		auto fbind = tree->required_func_global("@create_binding");
-		auto rr = tree->add_node_call(fbind);
-		rr->type = tree->make_class_func(bind_wrapper);
-		rr->set_param(0, tree->add_node_const(tree->add_constant_pointer(TypePointer, lt)));
-		rr->set_param(1, tree->add_node_local(lt->captures_local[0])->ref());
-		return rr;
+		do_error("lambda bind failed...");
+		return nullptr;
+
 	} else {
 
 		f->update_parameters_after_parsing();
@@ -2683,13 +2794,13 @@ shared<Node> Parser::parse_statement_sorted(Block *block) {
 }
 
 shared<Node> Parser::make_dynamical(shared<Node> node) {
-	if (node->kind == NodeKind::ARRAY_BUILDER and node->type == TypeAbstractList) {
+	if (node->kind == NodeKind::ARRAY_BUILDER and node->type == TypeUnknown) {
 		for (int i=0; i<node->params.num; i++)
 			node->params[i] = make_dynamical(node->params[i].get());
 		// TODO create...
 		node->type = TypeAnyList;
 		//return node;
-	} else  if (node->kind == NodeKind::DICT_BUILDER and node->type == TypeAbstractDict) {
+	} else  if (node->kind == NodeKind::DICT_BUILDER and node->type == TypeUnknown) {
 		for (int i=1; i<node->params.num; i+=2)
 			node->params[i] = make_dynamical(node->params[i].get());
 		// TODO create...
@@ -2717,12 +2828,14 @@ shared<Node> Parser::parse_statement_dyn(Block *block) {
 }
 
 shared<Node> Parser::parse_statement_call(Block *block) {
+#if 0
 	Exp.next(); // "call"
 	string name = Exp.cur;
 
 	auto params = parse_call_parameters(block);
 	if (params.num == 0)
 		do_error("call() expects at least 1 parameter");
+	params[0] = force_concrete_type(params[0]);
 	if (!is_function_pointer(params[0]->type))
 		do_error("call(): first parameter must be a function pointer ..." + params[0]->type->long_name());
 
@@ -2756,10 +2869,12 @@ shared<Node> Parser::parse_statement_call(Block *block) {
 		return cmd;
 
 	}
+#endif
+	return nullptr;
 }
 
 shared<Node> Parser::parse_statement_weak(Block *block) {
-	Exp.next(); // "call"
+	Exp.next(); // "weak"
 	string name = Exp.cur;
 
 	auto params = parse_call_parameters(block);
@@ -3102,7 +3217,7 @@ void Parser::parse_enum(Class *_namespace) {
 	Exp.cur_line --;
 }
 
-inline bool type_needs_alignment(const Class *t) {
+bool type_needs_alignment(const Class *t) {
 	if (t->is_array())
 		return type_needs_alignment(t->get_array_element());
 	return (t->size >= 4);
@@ -3662,9 +3777,9 @@ void Parser::parse_function_body(Function *f) {
 		if (peek_commands_super(Exp)) {
 			more_to_parse = parse_function_command(f, indent0);
 
-			auto_implement_constructor(f, f->name_space, false);
+			auto_implement_regular_constructor(f, f->name_space, false);
 		} else {
-			auto_implement_constructor(f, f->name_space, true);
+			auto_implement_regular_constructor(f, f->name_space, true);
 		}
 	}
 
@@ -3677,7 +3792,7 @@ void Parser::parse_function_body(Function *f) {
 
 	// auto implement destructor?
 	if (f->name == IDENTIFIER_FUNC_DELETE)
-		auto_implement_destructor(f, f->name_space);
+		auto_implement_regular_destructor(f, f->name_space);
 	cur_func = nullptr;
 
 	Exp.cur_line --;

@@ -39,7 +39,7 @@ void _post_config_vertex_buffer(VertexBuffer *vb) {
 		auto &a = vb->attr[i];
 		glEnableVertexArrayAttrib(vb->vao, i);
 		glVertexArrayAttribBinding(vb->vao, i, i);
-		glVertexArrayVertexBuffer(vb->vao, i, a.buffer, 0, a.stride);
+		glVertexArrayVertexBuffer(vb->vao, i, a.buffer, a.offset, vb->buf.stride);
 		if (gl_is_integer(a.type)) // argh!
 			glVertexArrayAttribIFormat(vb->vao, i, a.num_components, a.type, 0);
 		else
@@ -59,7 +59,7 @@ void ___post_config_vertex_buffer_old(VertexBuffer *vb) {
 		auto &a = vb->attr[i];
 		glEnableVertexAttribArray(i);
 		glBindBuffer(GL_ARRAY_BUFFER, a.buffer);
-		glVertexAttribPointer(i, a.num_components, a.type, a.normalized, a.stride, (void*)0);//a.stride, (void*)a.offset);
+		glVertexAttribPointer(i, a.num_components, a.type, a.normalized, vb->buf.stride, (void*)(int_p)a.offset);
 		glVertexAttribDivisor(i, a.divisor);
 	}
 	glBindVertexArray(0);
@@ -129,10 +129,10 @@ VertexBuffer::VertexBuffer(const string &_f) {
 	}
 
 	auto xx = f.explode(",");
-	num_buffers = num_attributes = xx.num;
+	num_attributes = xx.num;
 	if (num_attributes > MAX_VB_ATTRIBUTES) {
 		throw Exception("VertexBuffer: too many attributes: " + f);
-		num_buffers = num_attributes = 0;
+		num_attributes = 0;
 	}
 
 	if (allow_separate_vertex_arrays) {
@@ -141,32 +141,34 @@ VertexBuffer::VertexBuffer(const string &_f) {
 		vao = global_vao;
 	}
 
+	glCreateBuffers(1, &buf.buffer);
+	buf.count = 0;
+	buf.stride = 0;
+
+	int offset = 0;
 	for (int i=0; i<xx.num; i++) {
 		string &x = xx[i];
-		auto &b = buf[i];
-		b.count = 0;
 
 		auto &a = attr[i];
-		glCreateBuffers(1, &b.buffer);
-		a.buffer = b.buffer;
+		a.buffer = buf.buffer;
 		a.normalized = false;
 		a.divisor = 0;
-		a.stride = 0;
 		// "2f" "3fn" "4i" etc
 		if (!parse_vb_component(x, a.type, a.num_components))
 			throw Exception("VertexBuffer: unhandled format: " + x);
 		a.normalized = (x.find("n") >= 0);
 
-		a.stride = a.num_components * gl_component_size(a.type);
+		a.offset = offset;
+		offset += a.num_components * gl_component_size(a.type);
 	}
+	buf.stride = offset;
 
 	_post_config_vertex_buffer(this);
 }
 
 
 VertexBuffer::~VertexBuffer() {
-	for (int i=0; i<num_buffers; i++)
-		glDeleteBuffers(1, &buf[i].buffer);
+	glDeleteBuffers(1, &buf.buffer);
 	if (allow_separate_vertex_arrays)
 		glDeleteVertexArrays(1, &vao);
 }
@@ -185,11 +187,9 @@ void VertexBuffer::set_per_instance(int index) {
 	attr[index].divisor = 1;
 }
 
-void VertexBuffer::update(int index, const DynamicArray &a) {
-	if (index < 0 or index >= num_buffers)
-		throw Exception("VertexBuffer: invalid index " + i2s(index));
-	buf[index].count = a.num;
-	glNamedBufferData(buf[index].buffer, a.num * a.element_size, a.data, GL_STATIC_DRAW);
+void VertexBuffer::update(const DynamicArray &a) {
+	buf.count = a.num;
+	glNamedBufferData(buf.buffer, a.num * a.element_size, a.data, GL_STATIC_DRAW);
 	//glNamedBufferStorage
 }
 
@@ -207,30 +207,30 @@ void VertexBuffer::update_index(const DynamicArray &a) {
 }
 
 int VertexBuffer::count() const {
-	return buf[0].count;
+	return buf.count;
 }
 
 bool VertexBuffer::is_indexed() const {
 	return index.buffer > 0;
 }
 
-void VertexBuffer::create_rect(const rect &d, const rect &s) {
+void VertexBuffer::create_quad(const rect &d, const rect &s) {
 	if (is_indexed()) {
-		Array<vector> p = {{d.x1,d.y1,0}, {d.x1,d.y2,0}, {d.x2,d.y1,0}, {d.x2,d.y2,0}};
-		Array<vector> n = {{0,0,1}, {0,0,1}, {0,0,1}, {0,0,1}};
-		Array<float> uv = {s.x1,s.y1, s.x1,s.y2, s.x2,s.y1, s.x2,s.y2};
-		update(0, p);
-		update(1, n);
-		update(2, uv);
+		Array<Vertex1> v = {{{d.x1,d.y1,0}, {0,0,1}, s.x1,s.y1},
+		                    {{d.x1,d.y2,0}, {0,0,1}, s.x1,s.y2},
+		                    {{d.x2,d.y1,0}, {0,0,1}, s.x2,s.y1},
+		                    {{d.x2,d.y2,0}, {0,0,1}, s.x2,s.y2}};
+		update(v);
 		Array<unsigned char> index = {0,1,3, 0,3,2};
 		update_index(index);
 	} else {
-		Array<vector> p = {{d.x1,d.y1,0}, {d.x1,d.y2,0}, {d.x2,d.y2,0},  {d.x1,d.y1,0}, {d.x2,d.y2,0}, {d.x2,d.y1,0}};
-		Array<vector> n = {{0,0,1}, {0,0,1}, {0,0,1},  {0,0,1}, {0,0,1}, {0,0,1}};
-		Array<float> uv = {s.x1,s.y1, s.x1,s.y2, s.x2,s.y2,  s.x1,s.y1, s.x2,s.y2, s.x2,s.y1};
-		update(0, p);
-		update(1, n);
-		update(2, uv);
+		Array<Vertex1> v = {{{d.x1,d.y1,0}, {0,0,1}, s.x1,s.y1},
+		                    {{d.x1,d.y2,0}, {0,0,1}, s.x1,s.y2},
+		                    {{d.x2,d.y2,0}, {0,0,1}, s.x2,s.y2},
+		                    {{d.x1,d.y1,0}, {0,0,1}, s.x1,s.y1},
+		                    {{d.x2,d.y2,0}, {0,0,1}, s.x2,s.y2},
+		                    {{d.x2,d.y1,0}, {0,0,1}, s.x2,s.y1}};
+		update(v);
 	}
 }
 

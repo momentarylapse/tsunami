@@ -64,6 +64,7 @@ const Class *TypeAnyDict;
 const Class *TypeDynamic;
 const Class *TypeDynamicArray;
 const Class *TypeDictBase;
+const Class *TypeCallableBase;
 const Class *TypeSharedPointer;
 const Class *TypePointerList;
 const Class *TypeCharPs;
@@ -227,7 +228,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 }
 
 const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params) {
-	return cur_package->syntax->make_class_func(params, ret_type);
+	return cur_package->syntax->make_class_callable_fp(params, ret_type);
 }
 
 //------------------------------------------------------------------------------------------------//

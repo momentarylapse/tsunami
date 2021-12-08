@@ -230,7 +230,8 @@ void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Bloc
 		case StatementID::NEW:{
 			// malloc()
 			auto f = syntax_tree->required_func_global("@malloc");
-			add_function_call(f, {param_imm(TypeInt, ret.type->param[0]->size)}, ret);
+			auto type = com->params[0]->as_func()->name_space; // ret.type->param[0]
+			add_function_call(f, {param_imm(TypeInt, type->size)}, ret);
 
 			// __init__()
 			auto sub = com->params[0]->shallow_copy();

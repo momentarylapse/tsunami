@@ -66,7 +66,7 @@ public:
 	static matrix _cdecl rotation(const quaternion &q) { return rotation_q(q); }
 	static matrix _cdecl scale(float fx,float fy,float fz);
 	static matrix _cdecl reflection(const plane &pl);
-	static matrix _cdecl perspective(float fovy, float aspect, float z_near, float z_far);
+	static matrix _cdecl perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym);
 };
 
 

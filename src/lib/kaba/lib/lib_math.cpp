@@ -590,6 +590,8 @@ void SIAddPackageMath() {
 		class_add_element("y1", TypeFloat32, &rect::y1);
 		class_add_element("y2", TypeFloat32, &rect::y2);
 		class_add_const("ID", TypeRect, &rect::ID);
+		class_add_const("ID_SYM", TypeRect, &rect::ID_SYM);
+		class_add_const("EMPTY", TypeRect, &rect::EMPTY);
 		class_add_func("width", TypeFloat32, &rect::width, Flags::PURE);
 		class_add_func("height", TypeFloat32, &rect::height, Flags::PURE);
 		class_add_func("area", TypeFloat32, &rect::area, Flags::PURE);
@@ -742,6 +744,7 @@ void SIAddPackageMath() {
 			func_add_param("aspect", TypeFloat32);
 			func_add_param("z_near", TypeFloat32);
 			func_add_param("z_far", TypeFloat32);
+			func_add_param("z_sym", TypeBool);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMatrix, TypeMatrix, InlineID::CHUNK_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMatrix, TypeMatrix, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::MULTIPLY, TypeMatrix, TypeMatrix, TypeMatrix, InlineID::NONE, &matrix::mul);

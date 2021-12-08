@@ -50,7 +50,7 @@ public:
 	void _cdecl __init__(int width, int height, const string &format);
 	void _cdecl __delete__();
 
-	void _cdecl overwrite(const Image &image);
+	void _cdecl override(const Image &image);
 	void _cdecl read(Image &image);
 	void _cdecl read_float(Array<float> &data);
 	void _cdecl write_float(Array<float> &data);
@@ -106,7 +106,7 @@ public:
 	CubeMap(int size, const string &format);
 	void _cdecl __init__(int size, const string &format);
 
-	void _cdecl overwrite_side(int side, const Image &image);
+	void _cdecl override_side(int side, const Image &image);
 	void _cdecl fill_side(int side, Texture *source);
 	void _cdecl render_to_cube_map(vector &pos, callback_function *render_scene, int mask);
 };

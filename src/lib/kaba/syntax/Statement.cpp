@@ -58,7 +58,7 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
 	add_statement(IDENTIFIER_SORTED, StatementID::SORTED);
 	add_statement(IDENTIFIER_DYN, StatementID::DYN);
-	add_statement(IDENTIFIER_CALL, StatementID::CALL);
+	//add_statement(IDENTIFIER_CALL, StatementID::CALL);
 	add_statement(IDENTIFIER_WEAK, StatementID::WEAK, 1);
 }
 

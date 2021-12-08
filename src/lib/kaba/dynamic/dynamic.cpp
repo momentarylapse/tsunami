@@ -3,6 +3,7 @@
 #include "exception.h"
 #include "call.h"
 #include "../../any/any.h"
+#include "../../base/callable.h"
 
 namespace kaba {
 	
@@ -235,14 +236,29 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 
 string class_repr(const Class *c) {
 	if (c)
-		return "<class " + c->long_name() + ">";
-	return "<class -nil->";
+		return c->long_name();
+	return "nil";
 }
 
+// probably deprecated...?
 string func_repr(const Function *f) {
 	if (f)
 		return "<func " + f->long_name() + ">";
 	return "<func -nil->";
+}
+
+
+Array<const Class*> get_callable_param_types(const Class *fp);
+const Class *get_callable_return_type(const Class *fp);
+string make_callable_signature(const Array<const Class*> &param, const Class *ret);
+string callable_signature(const Class *type) {
+	auto pp = get_callable_param_types(type);
+	auto r = get_callable_return_type(type);
+	return make_callable_signature(pp, r);
+}
+
+string callable_repr(const void *p, const Class *type) {
+	return "<callable " + callable_signature(type) + ">";
 }
 
 string _cdecl var_repr(const void *p, const Class *type) {
@@ -256,7 +272,10 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		return b2s(*(bool*)p);
 	} else if (type == TypeClass) {
 		return class_repr((Class*)p);
+	} else if (type->is_callable_fp() or type->is_callable_bind()) {
+		return callable_repr(p, type);
 	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
+		// probably not...
 		return func_repr((Function*)p);
 	} else if (type == TypeAny) {
 		return ((Any*)p)->repr();
@@ -377,21 +396,10 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 
 Array<const Class*> func_effective_params(const Function *f);
 
-DynamicArray kaba_xmap(Function *func, DynamicArray *a, const Class *t) {
-	msg_write("xmap " + p2s(a) + " " + p2s(t));
-	msg_write(a->num);
-	msg_write(fa2s(*(Array<float>*)a));
-	msg_write(t->long_name());
-	return kaba_map(func, a);
-}
+DynamicArray kaba_xmap(void *fff, DynamicArray *a, const Class *ti, const Class *to) {
+	//msg_write("xmap " + ti->long_name() + " -> " + to->long_name());
 
-DynamicArray kaba_map(Function *func, DynamicArray *a) {
 	DynamicArray r;
-	auto p = func_effective_params(func);
-	if (p.num != 1)
-		kaba_raise_exception(new KabaException("map(): only functions with exactly 1 parameter allowed"));
-	auto *ti = p[0];
-	auto *to = func->literal_return_type;
 	r.init(to->size);
 	if (to->needs_constructor()) {
 		if (to == TypeString) {
@@ -405,9 +413,9 @@ DynamicArray kaba_map(Function *func, DynamicArray *a) {
 	for (int i=0; i<a->num; i++) {
 		void *po = r.simple_element(i);
 		void *pi = a->simple_element(i);
-		bool ok = call_function(func, po, {pi});
+		bool ok = call_callable(fff, po, {pi}, to, {ti});
 		if (!ok)
-			kaba_raise_exception(new KabaException("map(): failed to dynamically call " + func->signature()));
+			kaba_raise_exception(new KabaException(format("map(): failed to dynamically call %s -> %s", ti->long_name(), to->long_name())));
 	}
 	return r;
 }

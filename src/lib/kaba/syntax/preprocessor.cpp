@@ -56,7 +56,7 @@ shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 
 	Value temp;
 	temp.init(f->literal_return_type);
-	if (!call_function(f, ff, temp.p(), p))
+	if (!call_function(f, temp.p(), p))
 		return c;
 	auto r = tree->add_node_const(tree->add_constant(f->literal_return_type));
 	r->as_const()->set(temp);
@@ -148,7 +148,7 @@ shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Functio
 	Value temp;
 	temp.init(t);
 	p[0] = temp.p();
-	if (!call_function(f, ff, nullptr, p))
+	if (!call_function(f, nullptr, p))
 		return c;
 	auto r = tree->add_node_const(tree->add_constant(t));
 	r->as_const()->set(temp);
@@ -221,7 +221,7 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 		p.add(c->params[1]->as_const()->p());
 
 		int64 new_addr;
-		if (!call_function(f, f->address_preprocess, &new_addr, p))
+		if (!call_function(f, &new_addr, p))
 			return c;
 
 		c->params[0]->link_no = new_addr;

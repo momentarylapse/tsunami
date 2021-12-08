@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
+#include "../../base/callable.h"
 
 #ifdef _X_USE_HUI_
 	#include "../../hui/hui.h"
@@ -34,37 +35,33 @@ namespace kaba {
 	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
 	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
 	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
-	void HuiSetIdleFunctionKaba(Function *f) {
-		auto *ff = (hui::kaba_callback*)f->address;
-		hui::SetIdleFunction(ff);
+	void HuiSetIdleFunctionKaba(Callable<void()> &c) {
+		hui::SetIdleFunction([&c]{ c(); });
 	}
-	int HuiRunLaterKaba(float dt, hui::EventHandler *p, Function *f) {
-		auto *ff = (hui::kaba_member_callback*)f->address;
-		return hui::RunLater(dt, [ff,p]{ ff(p); });
+	int HuiRunLaterKaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
+		return hui::RunLater(dt, [&c,p]{ c(p); });
 	}
-	int HuiRunRepeatedKaba(float dt, hui::EventHandler *p, Function *f) {
-		auto *ff = (hui::kaba_member_callback*)f->address;
-		return hui::RunRepeated(dt, [ff,p]{ ff(p); });
+	int HuiRunRepeatedKaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
+		return hui::RunRepeated(dt, [&c,p]{ c(p); });
 	}
 	class KabaPanelWrapper : public hui::Panel {
 	public:
-		void _kaba_event(const string &id, Function *f) {
-			_kaba_event_o(id, this, f);
+		void _kaba_event(const string &id, Callable<void(hui::EventHandler*)> &c) {
+			_kaba_event_o(id, this, c);
 		}
-		void _kaba_event_o(const string &id, hui::EventHandler *handler, Function *f) {
-			auto *ff = (hui::kaba_member_callback*)f->address;
-			event(id, [=]{ ff(handler); });
+		void _kaba_event_o(const string &id, hui::EventHandler *handler, Callable<void(hui::EventHandler*)> &c) {
+			event(id, [&c,handler]{ c(handler); });
 		}
-		void _kaba_event_x(const string &id, const string &msg, Function *f) {
+		void _kaba_event_x(const string &id, const string &msg, void *f) {
 			_kaba_event_ox(id, msg, this, f);
 		}
-		void _kaba_event_ox(const string &id, const string &msg, hui::EventHandler *handler, Function *f) {
+		void _kaba_event_ox(const string &id, const string &msg, hui::EventHandler *handler, void *f) {
 			if (msg == "hui:draw"){
-				auto *ff = (hui::kaba_member_callback_p*)f->address;
-				event_xp(id, msg, [=](Painter *p){ ff(handler, p); });
+				auto &ff = *(Callable<void(hui::EventHandler*, Painter*)>*)f;
+				event_xp(id, msg, [&ff,handler](Painter *p){ ff(handler, p); });
 			}else{
-				auto *ff = (hui::kaba_member_callback*)f->address;
-				event_x(id, msg, [=]{ ff(handler); });
+				auto &ff = *(Callable<void(hui::EventHandler*)>*)f;
+				event_x(id, msg, [&ff,handler]{ ff(handler); });
 			}
 		}
 	};

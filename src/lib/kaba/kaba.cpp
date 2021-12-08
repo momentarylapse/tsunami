@@ -13,9 +13,6 @@
 #include <cassert>
 
 #include "../config.h"
-#ifdef _X_ALLOW_X_
-	#include "../../meta.h"
-#endif
 
 #ifdef OS_LINUX
 	#include <sys/mman.h>
@@ -26,7 +23,7 @@
 
 namespace kaba {
 
-string Version = "0.19.14.4";
+string Version = "0.19.15.0";
 
 //#define ScriptDebug
 

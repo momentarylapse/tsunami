@@ -28,5 +28,6 @@ public:
 	rect _cdecl operator||(const rect &r) const;
 
 	static const rect ID;
+	static const rect ID_SYM;
 	static const rect EMPTY;
 };

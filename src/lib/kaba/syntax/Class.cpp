@@ -71,9 +71,12 @@ bool type_match(const Class *given, const Class *wanted) {
 	if (given->is_pointer() and wanted->is_pointer()) {
 		if (given->param[0]->is_derived_from(wanted->param[0]))
 			return true;
-		if (given->param[0]->type == Class::Type::FUNCTION and wanted->param[0]->type == Class::Type::FUNCTION)
-			return func_pointer_match(given, wanted);
+		//if (given->param[0]->type == Class::Type::FUNCTION and wanted->param[0]->type == Class::Type::FUNCTION)
+		//	return func_pointer_match(given, wanted);
 	}
+
+	if (given->is_callable() and wanted->is_callable())
+		return func_pointer_match(given, wanted);
 
 	if (wanted->is_super_array()) {
 		if (given->is_super_array()) {
@@ -185,6 +188,21 @@ bool Class::is_interface() const
 bool Class::is_dict() const
 { return type == Type::DICT; }
 
+bool Class::is_product() const
+{ return type == Type::PRODUCT; }
+
+bool Class::is_callable() const {
+	if (is_pointer())
+		return param[0]->is_callable_fp() or param[0]->is_callable_bind();
+	return false;
+}
+
+bool Class::is_callable_fp() const
+{ return type == Type::CALLABLE_FUNCTION_POINTER; }
+
+bool Class::is_callable_bind() const
+{ return type == Type::CALLABLE_BIND; }
+
 bool Class::uses_call_by_reference() const {
 	return (!force_call_by_value() and !is_pointer()) or is_array();
 }
@@ -256,6 +274,10 @@ bool Class::needs_constructor() const {
 		return param[0]->needs_constructor();
 	if (vtable.num > 0)
 		return true;
+	if (is_product())
+		for (auto p: param)
+			if (p->get_default_constructor())
+				return true;
 	if (parent)
 		if (parent->needs_constructor())
 			return true;
@@ -372,6 +394,14 @@ Function *Class::get_get(const Class *index) const {
 	return nullptr;
 }
 
+Function *Class::get_call() const {
+	for (auto *cf: weak(functions)) {
+		if (cf->name == "call")
+			return cf;
+	}
+	return nullptr;
+}
+
 Function *Class::get_virtual_function(int virtual_index) const {
 	for (auto *f: weak(functions))
 		if (f->virtual_index == virtual_index)
@@ -449,9 +479,14 @@ bool class_func_match(Function *a, Function *b) {
 	return true;
 }
 
+string class_name_might_need_parantheses(const Class *t) {
+	if (t->is_callable() /*or t->is_product()*/)
+		return "(" + t->name + ")";
+	return t->name;
+}
 
 const Class *Class::get_pointer() const {
-	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, {this}, name_space);
+	return owner->make_class(class_name_might_need_parantheses(this) + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, {this}, name_space);
 }
 
 const Class *Class::get_root() const {

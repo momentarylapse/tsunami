@@ -683,6 +683,7 @@
     <ClInclude Include="src\lib\any\any.h" />
     <ClInclude Include="src\lib\base\array.h" />
     <ClInclude Include="src\lib\base\base.h" />
+    <ClInclude Include="src\lib\base\callable.h" />
     <ClInclude Include="src\lib\base\macros.h" />
     <ClInclude Include="src\lib\base\map.h" />
     <ClInclude Include="src\lib\base\pointer.h" />

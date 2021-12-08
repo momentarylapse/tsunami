@@ -15,7 +15,7 @@ namespace kaba {
 
 
 
-bool is_typed_function_pointer(const Class *c);
+//bool is_typed_function_pointer(const Class *c);
 
 BackendX86::BackendX86(Serializer *s) : Backend(s) {
 
@@ -450,8 +450,8 @@ void BackendX86::correct_implement_commands() {
 				auto ret = c.p[0];
 				cmd.remove_cmd(i);
 				add_pointer_call(fp, func_params, ret, (c.inst == Asm::InstID::CALL));
-			} else if (is_typed_function_pointer(c.p[1].type)) {
-				do_error("BACKEND: POINTER CALL");
+//			} else if (is_typed_function_pointer(c.p[1].type)) {
+//				do_error("BACKEND: POINTER CALL");
 			} else {
 				//func_params.add(c.p[0]);
 				auto *f = ((Function*)c.p[1].p);

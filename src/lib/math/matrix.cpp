@@ -311,14 +311,25 @@ matrix matrix::reflection(const plane &pl) {
 	return m;
 }
 
-matrix matrix::perspective(float fovy, float aspect, float z_near, float z_far) {
+// keep ALL axes aligned!
+// z_sym=true:   P (x,y,z0) = (.,.,-1)   P (x,y,z1) = (.,.,+1)
+// z_sym=false:  P (x,y,z0) = (.,., 0)   P (x,y,z1) = (.,.,+1)
+// maps the POSITIVE z-half-space
+matrix matrix::perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym) {
 	matrix m;
 	float f = 1 / tan(fovy / 2);
-	float ndz = z_near - z_far;
-	m._00 = f / aspect; m._01 = 0; m._02 = 0;                      m._03 = 0;
-	m._10 = 0;          m._11 = f; m._12 = 0;                      m._13 = 0;
-	m._20 = 0;          m._21 = 0; m._22 = (z_near + z_far) / ndz; m._23 = 2 * z_near * z_far / ndz;
-	m._30 = 0;          m._31 = 0; m._32 = -1;                     m._33 = 0;
+	float ndz = z_far - z_near;
+	if (z_sym) {
+		m._00 = f / aspect; m._01 = 0; m._02 = 0;                      m._03 = 0;
+		m._10 = 0;          m._11 = f; m._12 = 0;                      m._13 = 0;
+		m._20 = 0;          m._21 = 0; m._22 = (z_near + z_far) / ndz; m._23 =-2 * z_near * z_far / ndz;
+		m._30 = 0;          m._31 = 0; m._32 = 1;                      m._33 = 0;
+	} else {
+		m._00 = f / aspect; m._01 = 0; m._02 = 0;           m._03 = 0;
+		m._10 = 0;          m._11 = f; m._12 = 0;           m._13 = 0;
+		m._20 = 0;          m._21 = 0; m._22 = z_far / ndz; m._23 =-z_near * z_far / ndz;
+		m._30 = 0;          m._31 = 0; m._32 = 1;           m._33 = 0;
+	}
 	return m;
 }
 

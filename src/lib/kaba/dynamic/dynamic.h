@@ -19,8 +19,8 @@ DynamicArray kaba_array_sort(DynamicArray &array, const Class *type, const strin
 string var_repr(const void *p, const Class *type);
 string var2str(const void *p, const Class *type);
 Any kaba_dyn(const void *var, const Class *type);
-DynamicArray kaba_map(Function *func, DynamicArray *a);
-DynamicArray kaba_xmap(Function *func, DynamicArray *a, const Class *type);
+//DynamicArray kaba_map(void *fff, DynamicArray *a);
+DynamicArray kaba_xmap(void *fff, DynamicArray *a, const Class *t1, const Class *t2);
 void kaba_call0(Function *func);
 void kaba_call1(Function *func, void *p1);
 void kaba_call2(Function *func, void *p1, void *p2);

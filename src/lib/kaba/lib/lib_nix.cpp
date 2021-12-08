@@ -106,11 +106,10 @@ void SIAddPackageNix() {
 			func_add_param("format", TypeString);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::VertexBuffer::__delete__));
 		class_add_func("update", TypeVoid, nix_p(&nix::VertexBuffer::update));
-			func_add_param("index", TypeInt);
-			func_add_param("data", TypeDynamicArray);
+			func_add_param("vertices", TypeDynamicArray);
 		class_add_func("update_index", TypeVoid, nix_p(&nix::VertexBuffer::update_index));
-			func_add_param("data", TypeDynamicArray);
-		class_add_func("create_rect", TypeVoid, nix_p(&nix::VertexBuffer::create_rect));
+			func_add_param("indices", TypeDynamicArray);
+		class_add_func("create_quad", TypeVoid, nix_p(&nix::VertexBuffer::create_quad));
 			func_add_param("dest", TypeRect);
 			func_add_param("source", TypeRect);
 		class_add_func("count", TypeInt, nix_p(&nix::VertexBuffer::count));
@@ -124,7 +123,7 @@ void SIAddPackageNix() {
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__));
 		class_add_func("set_options", TypeVoid, nix_p(&nix::Texture::set_options));
 			func_add_param("op", TypeString);
-		class_add_func("overwrite", TypeVoid, nix_p(&nix::Texture::overwrite));
+		class_add_func("override", TypeVoid, nix_p(&nix::Texture::override));
 			func_add_param("image", TypeImage);
 		class_add_func("read", TypeVoid, nix_p(&nix::Texture::read));
 			func_add_param("image", TypeImage);
@@ -276,8 +275,7 @@ void SIAddPackageNix() {
 		func_add_param("contiguous", TypeBool);
 	add_func("draw_points", TypeVoid, nix_p(&nix::draw_points), Flags::STATIC);
 		func_add_param("vb", TypeVertexBuffer);
-	add_func("set_alpha", TypeVoid, nix_p(&nix::set_alpha_mode), Flags::STATIC);
-		func_add_param("mode", TypeInt);
+	add_func("disable_alpha", TypeVoid, nix_p(&nix::disable_alpha), Flags::STATIC);
 	add_func("set_alpha", TypeVoid, nix_p(&nix::set_alpha_sd), Flags::STATIC);
 		func_add_param("source", TypeInt);
 		func_add_param("dest", TypeInt);
@@ -335,13 +333,8 @@ void SIAddPackageNix() {
 	//add_ext_var("fullscreen", TypeBool, nix_p(&nix::Fullscreen));
 
 	// alpha operations
-	add_enum("ALPHA_NONE",             TypeInt, nix_p(nix::AlphaMode::NONE));
 	add_enum("ALPHA_ZERO",             TypeInt, nix_p(nix::Alpha::ZERO));
 	add_enum("ALPHA_ONE",              TypeInt, nix_p(nix::Alpha::ONE));
-	add_enum("ALPHA_COLOR_KEY",        TypeInt, nix_p(nix::AlphaMode::COLOR_KEY_SMOOTH));
-	add_enum("ALPHA_COLOR_KEY_HARD",   TypeInt, nix_p(nix::AlphaMode::COLOR_KEY_HARD));
-	add_enum("ALPHA_ADD",              TypeInt, nix_p(nix::AlphaMode::ADD));
-	add_enum("ALPHA_MATERIAL",         TypeInt, nix_p(nix::AlphaMode::MATERIAL));
 	add_enum("ALPHA_SOURCE_COLOR",     TypeInt, nix_p(nix::Alpha::SOURCE_COLOR));
 	add_enum("ALPHA_SOURCE_INV_COLOR", TypeInt, nix_p(nix::Alpha::SOURCE_INV_COLOR));
 	add_enum("ALPHA_SOURCE_ALPHA",     TypeInt, nix_p(nix::Alpha::SOURCE_ALPHA));

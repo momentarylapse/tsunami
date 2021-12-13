@@ -20,7 +20,7 @@ extern ExpressionBuffer *cur_exp_buf;
 
 bool is_func(shared<Node> n);
 
-const string class_name_might_need_parantheses(const Class *t);
+string class_name_might_need_parantheses(const Class *t);
 bool type_needs_alignment(const Class *t);
 
 

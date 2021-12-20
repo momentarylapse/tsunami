@@ -41,6 +41,7 @@ public:
 	virtual void _cdecl draw_mask_image(const vec2 &p, const Image *image) = 0;
 	virtual void _cdecl set_transform(float rot[], const vec2 &offset) {}
 	virtual void _cdecl set_option(const string &key, const string &value) {}
+	virtual bool _cdecl allow_images() const { return true; }
 	int width = 0;
 	int height = 0;
 	float font_size = 12;

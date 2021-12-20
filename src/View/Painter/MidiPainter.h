@@ -31,6 +31,7 @@ class Synthesizer;
 class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
+struct QuantizedNote;
 
 class MidiKeyChange {
 public:
@@ -94,6 +95,7 @@ public:
 	ColorScheme &local_theme;
 
 	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
+	void set_line_weight(float s);
 	void set_shift(int shift);
 	void set_linear_range(float pitch_min, float pitch_max);
 	void set_quality(float quality, bool antialiasing);
@@ -144,6 +146,17 @@ public:
 	int y2pitch_linear(float y);
 	int y2clef_classical(float y, NoteModifier &mod);
 	int y2clef_linear(float y, NoteModifier &mod);
+
+
+	float scale;
+	float neck_length_single;
+	float neck_length_group;
+	float neck_width;
+	float bar_distance;
+	float bar_width;
+	float flag_dx, flag_dy;
+	void draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset);
+	void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bool neck_offset);
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDIPAINTER_H_ */

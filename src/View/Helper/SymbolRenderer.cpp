@@ -92,7 +92,7 @@ Symbol *get_symbol(float size, bool bold, const string &s) {
 
 void draw(Painter *p, const vec2 &pos, float size, const string &s, bool bold, int align) {
 	vec2 d = {0,0};
-	if (enabled) {
+	if (enabled and p->allow_images()) {
 		auto sym = get_symbol(size, bold, s);
 		if (align == 0)
 			d.x = - sym->im.width / 2;

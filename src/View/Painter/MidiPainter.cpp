@@ -177,7 +177,7 @@ struct QuantizedNote {
 		end = int((float)r.end() / spu + 0.5f);
 		length = end - offset;
 		base_length = length;
-		x = y = 0;
+		x = y_min = y_max = 0;
 		col = White;
 		triplet = (length == 2) or (length == 4) or (length == 8);
 		punctured = (length == 9) or (length == 18) or (length == 36);
@@ -187,7 +187,7 @@ struct QuantizedNote {
 			base_length = (base_length / 3) * 2;
 		up = true;
 	}
-	float x, y;
+	float x, y_min, y_max;
 	int offset, length, end;
 	MidiNote *n;
 	color col;
@@ -196,11 +196,10 @@ struct QuantizedNote {
 	bool up;
 };
 
-void draw_single_ndata(Painter *c, QuantizedNote &d, float rr, bool neck_offset) {
-	float neck_length = max(NOTE_NECK_LENGTH, rr*7);
-	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
+void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset) {
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
+	float y = d.up ? d.y_min : d.y_max;
 
 	float neck_dy0 = 0;
 	if (neck_offset)
@@ -208,34 +207,33 @@ void draw_single_ndata(Painter *c, QuantizedNote &d, float rr, bool neck_offset)
 
 	if (d.base_length == SIXTEENTH) {
 		c->set_line_width(neck_width);
-		c->draw_line({d.x, d.y + neck_dy0}, {d.x, d.y + e * neck_length});
-		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line({d.x, d.y + e * neck_length}, {d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY)});
-		c->draw_line({d.x, d.y + e * (neck_length - NOTE_BAR_DISTANCE)}, {d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_BAR_DISTANCE - NOTE_FLAG_DY)});
+		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
+		c->set_line_width(bar_width);
+		c->draw_line({d.x, y + e * neck_length_single}, {d.x + flag_dx, y + e * (neck_length_single - flag_dy)});
+		c->draw_line({d.x, y + e * (neck_length_single - bar_distance)}, {d.x + flag_dx, y + e * (neck_length_single - bar_distance - flag_dy)});
 	} else if (d.base_length == EIGHTH) {
 		c->set_line_width(neck_width);
-		c->draw_line({d.x, d.y + neck_dy0}, {d.x, d.y + e * neck_length});
-		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line({d.x, d.y + e * neck_length}, {d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY)});
+		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
+		c->set_line_width(bar_width);
+		c->draw_line({d.x, y + e * neck_length_single}, {d.x + flag_dx, y + e * (neck_length_single - flag_dy)});
 	} else if (d.base_length == QUARTER) {
 		c->set_line_width(neck_width);
-		c->draw_line({d.x, d.y + neck_dy0}, {d.x, d.y + e * neck_length});
+		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
 	}
 
 	if (d.punctured)
-		c->draw_circle({d.x + rr, d.y + rr}, 2);
+		c->draw_circle({d.x + rr, y + rr}, 2);
 	if (d.triplet)
-		c->draw_str({d.x, d.y + e*neck_length + e * 9 - 4}, "3");
+		c->draw_str({d.x, y + e*neck_length_single + e * 9 - 4}, "3");
 }
 
-void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr, bool neck_offset) {
-	float neck_length = max(NOTE_NECK_LENGTH, rr*6);
-	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
-	float e = d[0].up ? -1 : 1;
+void MidiPainter::draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bool neck_offset) {
+	bool up = d[0].up;
+	float e = up ? -1 : 1;
 	float x0 = d[0].x;
-	float y0 = d[0].y;
+	float y0 = up ? d[0].y_min : d[0].y_max;
 	float x1 = d.back().x;
-	float y1 = d.back().y;
+	float y1 = up ? d.back().y_min : d.back().y_max;
 	float dx = x1 - x0;
 	float dy = y1 - y0;
 	float m = dy / dx;
@@ -243,8 +241,8 @@ void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr, bool 
 	// optimize neck length
 	float dy0min = 0;
 	for (auto &dd: d)
-		dy0min = max(dy0min, e * (dd.y - (y0 + m * (dd.x - x0))));
-	y0 += e * max(neck_length, dy0min + neck_length * 0.8f);
+		dy0min = max(dy0min, e * (dd.y_min - (y0 + m * (dd.x - x0))));
+	y0 += e * max(neck_length_group, dy0min + neck_length_group * 0.8f);
 
 	// draw necks
 	float neck_dy0 = 0;
@@ -255,11 +253,12 @@ void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr, bool 
 	for (auto &dd: d)
 		if (dd.n) {
 			c->set_color(dd.col);
-			c->draw_line({dd.x, dd.y + neck_dy0}, {dd.x, y0 + m * (dd.x - x0)});
+			float yy = up ? dd.y_min : dd.y_max;
+			c->draw_line({dd.x, yy + neck_dy0}, {dd.x, y0 + m * (dd.x - x0)});
 		}
 
 	// bar
-	c->set_line_width(NOTE_BAR_WIDTH);
+	c->set_line_width(bar_width);
 	float t0 = 0;
 	for (int i=0; i<d.num; i++) {
 		float xx = d[i].x;
@@ -279,9 +278,9 @@ void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr, bool 
 			c->set_color(d[i].col);
 			c->draw_line({x0 + dx*t0, y0 + dy*t0}, {x0 + dx*t1, y0 + dy*t1});
 			if (d[i].length <= SIXTEENTH)
-				c->draw_line({x0 + dx*t0, y0 + dy*t0 - e*NOTE_BAR_DISTANCE}, {x0 + dx*t1, y0 + dy*t1 - e*NOTE_BAR_DISTANCE});
+				c->draw_line({x0 + dx*t0, y0 + dy*t0 - e*bar_distance}, {x0 + dx*t1, y0 + dy*t1 - e*bar_distance});
 			if (d[i].punctured)
-				c->draw_circle({d[i].x + rr, d[i].y + rr}, 2);
+				c->draw_circle({d[i].x + rr, d[i].y_min + rr}, 2);
 		}
 		t0 = t1;
 	}
@@ -359,8 +358,8 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 
 		//d.x = mp->cam->sample2screen(n->range.offset + mp->shift);
 		d.x = mp->cam->sample2screen(n->range.center() + mp->shift);
-		d.y = y_func(n);
-		d.up = (d.y >= y_mid);
+		d.y_min = d.y_max = y_func(n);
+		d.up = (d.y_min >= y_mid);
 
 
 		color col_shadow;
@@ -371,7 +370,9 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 			if (ndata.back().offset == d.offset) {
 				// use higher note...
 				if (d.n->pitch > ndata.back().n->pitch)
-					ndata[ndata.num - 1] = d;
+					std::swap(ndata.back(), d);
+				ndata.back().y_min = min(ndata.back().y_min, d.y_min);
+				ndata.back().y_max = max(ndata.back().y_max, d.y_max);
 				continue;
 			}
 
@@ -481,9 +482,9 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		for (auto &g: groups) {
 			if (g.num == 1)
-				draw_single_ndata(c, g[0], rr, neck_offset);
+				draw_single_ndata(c, g[0], neck_offset);
 			else
-				draw_group_ndata(c, g, rr, neck_offset);
+				draw_group_ndata(c, g, neck_offset);
 		}
 
 	}
@@ -662,7 +663,7 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.6f;
 
-	if (x2 - x1 > quality.tab_text_threshold and rr > 5) {
+	if (x2 - x1 > quality.tab_text_threshold /*and rr > 5*/) {
 		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
 		float dx = rr * 0.8f * tt.num;
 
@@ -686,7 +687,10 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 		draw_note_flags(c, n, state, x1, x2, y);
 	} else {
-		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, "e", true, 0);
+		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
+		c->set_color(col);
+		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
+		draw_note_flags(c, n, state, x1, x2, y);
 	}
 }
 
@@ -912,14 +916,28 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	pitch_min = PITCH_MIN_DEFAULT;
 	pitch_max = PITCH_MAX_DEFAULT;
 
+	set_line_weight(1.0f);
+}
+
+void MidiPainter::set_line_weight(float s) {
+	scale = s;
+
 	if (mode == MidiMode::CLASSICAL)
-		rr = min(clef_dy/2, 10.0f);
+		rr = min(clef_dy * 0.42f, 10.0f);
 	if (mode == MidiMode::LINEAR)
 		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 1.3f, 2.0f);
 	if (mode == MidiMode::TAB)
 		rr = min(string_dy/2, 13.0f);
 
 	modifier_font_size = rr * 2.8f;
+
+	neck_length_single = max(NOTE_NECK_LENGTH, rr*7);
+	neck_length_group = max(NOTE_NECK_LENGTH, rr*6);
+	neck_width = max(NOTE_NECK_WIDTH * scale, rr/3);
+	bar_distance = NOTE_BAR_DISTANCE * scale;
+	bar_width = NOTE_BAR_WIDTH * scale;
+	flag_dx = NOTE_FLAG_DX * scale;
+	flag_dy = NOTE_FLAG_DY * scale;
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {

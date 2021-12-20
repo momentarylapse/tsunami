@@ -65,6 +65,7 @@ public:
 	float _cdecl get_str_width(const string &str) override;
 	void _cdecl draw_image(const vec2 &d, const Image *image) override;
 	void _cdecl draw_mask_image(const vec2 &d, const Image *image) override;
+	bool _cdecl allow_images() const { return false; }
 	rect area() const override;
 	rect clip() const override;
 

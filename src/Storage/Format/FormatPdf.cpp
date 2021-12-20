@@ -76,8 +76,9 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
 	mp->set_context(rect(x0, x0+w, y0-25, y0+90), t->instrument, true, MidiMode::CLASSICAL);
+	mp->set_line_weight(0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
-	mp->set_quality(2, true);
+	mp->set_quality(200, true);
 
 	float ya = mp->clef_pos_to_screen(8);
 	float yb = mp->clef_pos_to_screen(0);
@@ -110,8 +111,11 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	int n = t->instrument.string_pitch.num;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
+	mp->set_line_weight(0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
-	mp->set_quality(2, true);
+	mp->set_quality(200, true);
+	/*mp->rr *= 1.3f;
+	mp->neck_width *= 0.7f;*/
 
 	float sy0 = mp->string_to_screen(n - 1) - string_dy/2;
 	float sy1 = mp->string_to_screen(0) + string_dy/2;

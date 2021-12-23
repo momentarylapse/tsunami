@@ -28,11 +28,6 @@ namespace kaba {
 	#define x_p(p)		nullptr
 #endif
 
-extern const Class *TypeIntPs;
-extern const Class *TypeFloatPs;
-extern const Class *TypeBoolPs;
-extern const Class *TypeCharPs;
-
 const Class *TypeNetAddress;
 const Class *TypeSocket;
 const Class *TypeSocketP;
@@ -110,17 +105,17 @@ void SIAddPackageNet() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, net_p(&BinaryBuffer::__init__));
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, net_p(&BinaryBuffer::__delete__));
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int&))&BinaryBuffer::operator>>));
-			func_add_param("i", TypeIntPs);
+			func_add_param("i", TypeInt, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(float&))&BinaryBuffer::operator>>));
-			func_add_param("f", TypeFloatPs);
+			func_add_param("f", TypeFloat32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool&))&BinaryBuffer::operator>>));
-			func_add_param("b", TypeBoolPs);
+			func_add_param("b", TypeBool, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(char&))&BinaryBuffer::operator>>));
-			func_add_param("c", TypeCharPs);
+			func_add_param("c", TypeChar, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(string&))&BinaryBuffer::operator>>));
-			func_add_param("s", TypeString);
+			func_add_param("s", TypeString, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(vector&))&BinaryBuffer::operator>>));
-			func_add_param("v", TypeVector);
+			func_add_param("v", TypeVector, Flags::OUT);
 		class_add_func("clear", TypeVoid, net_p(&BinaryBuffer::clear));
 		class_add_func("start_block", TypeVoid, net_p(&BinaryBuffer::start_block));
 		class_add_func("end_block", TypeVoid, net_p(&BinaryBuffer::end_block));

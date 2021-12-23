@@ -24,13 +24,13 @@ string kind2str(NodeKind kind) {
 		return "constant";
 	if (kind == NodeKind::CONSTANT_BY_ADDRESS)
 		return "constant by addr";
-	if (kind == NodeKind::FUNCTION_CALL)
+	if (kind == NodeKind::CALL_FUNCTION)
 		return "call";
-	if (kind == NodeKind::POINTER_CALL)
-		return "pointer call";
-	if (kind == NodeKind::INLINE_CALL)
+	if (kind == NodeKind::CALL_RAW_POINTER)
+		return "raw pointer call";
+	if (kind == NodeKind::CALL_INLINE)
 		return "inline";
-	if (kind == NodeKind::VIRTUAL_CALL)
+	if (kind == NodeKind::CALL_VIRTUAL)
 		return "virtual call";
 	if (kind == NodeKind::STATEMENT)
 		return "statement";
@@ -112,13 +112,13 @@ string Node::sig(const Class *ns) const {
 		return t + as_func()->cname(ns);
 	if (kind == NodeKind::CONSTANT)
 		return t + as_const()->str();
-	if (kind == NodeKind::FUNCTION_CALL)
+	if (kind == NodeKind::CALL_FUNCTION)
 		return as_func()->signature(ns);
-	if (kind == NodeKind::POINTER_CALL)
+	if (kind == NodeKind::CALL_RAW_POINTER)
 		return t + "(...)";
-	if (kind == NodeKind::INLINE_CALL)
+	if (kind == NodeKind::CALL_INLINE)
 		return as_func()->signature(ns);
-	if (kind == NodeKind::VIRTUAL_CALL)
+	if (kind == NodeKind::CALL_VIRTUAL)
 		return as_func()->signature(ns);
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return as_func()->signature(ns);
@@ -203,6 +203,14 @@ Node *Node::modifiable() {
 Node *Node::make_const() {
 	is_const = true;
 	return this;
+}
+
+bool Node::is_call() const {
+	return (kind == NodeKind::CALL_FUNCTION) or (kind == NodeKind::CALL_VIRTUAL) or (kind == NodeKind::CALL_RAW_POINTER);
+}
+
+bool Node::is_function() const {
+	return (kind == NodeKind::CALL_FUNCTION) or (kind == NodeKind::CALL_VIRTUAL) or (kind == NodeKind::CALL_INLINE) or (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION);
 }
 
 Block *Node::as_block() const {

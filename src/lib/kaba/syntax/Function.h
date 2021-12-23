@@ -16,6 +16,7 @@ class Class;
 class Block;
 class SyntaxTree;
 class Variable;
+class Node;
 enum class InlineID;
 enum class Flags;
 
@@ -32,6 +33,8 @@ public:
 	string cname(const Class *ns) const;
 	// parameters (linked to intern variables)
 	int num_params;
+	int mandatory_params;
+	shared_array<Node> default_parameters;
 	// block of code
 	shared<Block> block;
 	// local variables

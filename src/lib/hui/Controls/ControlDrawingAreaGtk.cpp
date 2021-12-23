@@ -567,7 +567,7 @@ ControlDrawingArea::~ControlDrawingArea() {
 #endif
 
 	// clean-up list later
-	hui::RunLater(10, [=]{ _recently_deleted_areas.erase(this); });
+	hui::RunLater(10, [=,this]{ _recently_deleted_areas.erase(this); });
 }
 
 void ControlDrawingArea::make_current() {
@@ -604,7 +604,7 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 			g_signal_connect(G_OBJECT(gesture_zoom), "end", G_CALLBACK(&on_gtk_gesture_zoom_end), this);
 		}
 	} else if (op == "noeventcompression") {
-		hui::RunLater(0.01f, [=] {
+		hui::RunLater(0.01f, [=,this] {
 			gdk_window_set_event_compression(GDK_WINDOW(gtk_widget_get_window(widget)), false);
 		});
 	}
@@ -620,7 +620,7 @@ void ControlDrawingArea::redraw()
 	// non
 	if (std::this_thread::get_id() != main_thread_id){
 		//printf("readraw from other thread...redirect\n");
-		hui::RunLater(0, [=]{ redraw(); });
+		hui::RunLater(0, [=,this]{ redraw(); });
 		return;
 	}
 

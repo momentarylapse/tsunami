@@ -51,15 +51,16 @@ void FrameBuffer::update(const Array<Texture*> &attachments) {
 }
 
 void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
-	depth_buffer = nullptr;
-	color_attachments = {};
+	// prevent deleting textures
+	shared<DepthBuffer> new_depth_buffer;
+	shared_array<Texture> new_attachments;
 	int samples = 0;
 
 	for (auto *a: attachments) {
 		if ((a->type == a->Type::DEPTH) or (a->type == a->Type::RENDERBUFFER))
-			depth_buffer = (DepthBuffer*)a;
+			new_depth_buffer = (DepthBuffer*)a;
 		else
-			color_attachments.add(a);
+			new_attachments.add(a);
 		if (a->width > 0) {
 			width = a->width;
 			height = a->height;
@@ -67,6 +68,8 @@ void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 		if (a->samples > 0)
 			samples = a->samples;
 	}
+	depth_buffer = new_depth_buffer;
+	color_attachments = new_attachments;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 

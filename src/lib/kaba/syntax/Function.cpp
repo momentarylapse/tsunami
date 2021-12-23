@@ -21,6 +21,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	name = _name;
 	block = new Block(this, nullptr);
 	num_params = 0;
+	mandatory_params = 0;
 	effective_return_type = _return_type;
 	literal_return_type = _return_type;
 	name_space = _name_space;
@@ -91,7 +92,9 @@ Variable *Function::__get_var(const string &name) const {
 
 Variable *Function::add_param(const string &name, const Class *type, Flags flags) {
 	auto v = block->add_var(name, type);
-	if (!flags_has(flags, Flags::OUT))
+	if (flags_has(flags, Flags::OUT))
+		flags_set(v->flags, Flags::OUT);
+	else
 		flags_set(v->flags, Flags::CONST);
 	literal_param_type.add(type);
 	num_params ++;
@@ -111,6 +114,8 @@ string Function::signature(const Class *ns) const {
 	for (int i=0; i<num_params; i++) {
 		if (i > 0)
 			r += ", ";
+		if (flags_has(var[i]->flags, Flags::OUT))
+			r += "out ";
 		r += literal_param_type[i]->cname(ns);
 	}
 	return r + ")";
@@ -138,7 +143,13 @@ Array<Block*> Function::all_blocks() {
 
 
 void Function::update_parameters_after_parsing() {
-	// save "original" param types (Var[].Type gets altered for call by reference)
+	mandatory_params = num_params;
+	for (int i=default_parameters.num-1; i>=0; i--)
+		if (default_parameters[i])
+			mandatory_params = i;
+
+
+	// save "original" param types (var[].type gets altered for call by reference)
 	for (int i=literal_param_type.num;i<num_params;i++)
 		literal_param_type.add(var[i]->type);
 	// but only, if not existing yet...
@@ -160,11 +171,13 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 	f->needs_overriding = true;
 
 	f->num_params = num_params;
+	f->default_parameters = default_parameters;
 	f->literal_param_type = literal_param_type;
 	for (int i=0; i<num_params; i++) {
 		f->block->add_var(var[i]->name, var[i]->type);
 		f->var[i]->flags = var[i]->flags;
 	}
+	f->mandatory_params = num_params;
 
 	f->virtual_index = virtual_index;
 

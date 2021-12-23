@@ -1,9 +1,6 @@
 #include "plane.h"
 #include "matrix.h"
-
-//------------------------------------------------------------------------------------------------//
-//                                             planes                                             //
-//------------------------------------------------------------------------------------------------//
+#include "vec2.h"
 
 
 plane::plane(const vector &_n, float _d) {
@@ -15,7 +12,7 @@ string plane::str() const {
 	return format("(%f, %f, %f, %f)", n.x, n.y, n.z, d);
 }
 
-float LineIntersectsTriangleF, LineIntersectsTriangleG;
+vec2 line_intersects_triangle_fg;
 
 // plane containing a, b, c
 plane plane::from_points(const vector &a,const vector &b,const vector &c) {
@@ -65,53 +62,47 @@ plane plane::inverse() const {
 	return plane(-n, d);
 }
 
-// P = A + f*( B - A ) + g*( C - A )
-void GetBaryCentric(const vector &P,const vector &A,const vector &B,const vector &C,float &f,float &g) {
-	// Bezugs-System: A
-	vector ba=B-A,ca=C-A,dir;
-	plane pl = plane::from_points(A,B,C); // Ebene des Dreiecks
-	dir=pl.n; // Normalen-Vektor
-	vector pvec;
-	pvec=vector::cross(dir,ca); // Laenge: |ca|         Richtung: Dreiecks-Ebene, orth zu ca
-	float det=vector::dot(ba,pvec); // = |ba| * |ca| * cos( pvec->ba )   -> =Flaeche des Parallelogramms
+vec2 bary_centric2(const plane &pl, const vector &P, const vector &A, const vector &B, const vector &C) {
+	// relative to: A
+	vector ba = B - A;
+	vector ca = C - A;
+	vector dir = pl.n; // normal vector
+	vector pvec = vector::cross(dir, ca); // length: |ca|         direction: triangle area, orthogonal to ca
+	float det = vector::dot(ba, pvec); // = |ba| * |ca| * cos( pvec->ba )   -> = area of parallelogram
 	vector pa;
-	if (det>0) {
-		pa=P-A;
+	if (det > 0) {
+		pa = P - A;
 	} else {
-		pa=A-P;
-		det=-det;
+		pa = A - P;
+		det = -det;
 	}
-	f=vector::dot(pa,pvec);
-	vector qvec;
-	qvec=vector::cross(pa,ba);
-	g=vector::dot(dir,qvec);
-	//float t=VecDotProduct(ca,qvec);
-	float InvDet=1.0f/det;
-	//t*=InvDet;
-	f*=InvDet;
-	g*=InvDet;
+	float f = vector::dot(pa, pvec);
+	vector qvec = vector::cross(pa,ba);
+	float g = vector::dot(dir, qvec);
+	float inv_det = 1.0f / det;
+	return vec2(f, g) * inv_det;
 }
 
-// wird das Dreieck(t1,t2,t3) von der Geraden(l1,l2) geschnitten?
-// Schnittpunkt = col
-bool LineIntersectsTriangle(const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm) {
-	plane p = plane::from_points(t1,t2,t3);
-	if (!p.intersect_line(l1, l2, col))
-		return false;
-	GetBaryCentric(col,t1,t2,t3,LineIntersectsTriangleF,LineIntersectsTriangleG);
-	if ((LineIntersectsTriangleF>0)&&(LineIntersectsTriangleG>0)&&(LineIntersectsTriangleF+LineIntersectsTriangleG<1))
-		return true;
-	return false;
+// P = A + f*( B - A ) + g*( C - A )
+vec2 bary_centric(const vector &P, const vector &A, const vector &B, const vector &C) {
+	plane pl = plane::from_points(A, B, C); // plane of the triangle
+	return bary_centric2(pl, P, A, B, C);
 }
- 
-// wird das Dreieck(t1,t2,t3) von der Geraden(l1,l2) geschnitten?
-// Schnittpunkt = col
-// ------------ GetBaryCentric....
-bool LineIntersectsTriangle2(const plane &pl,const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm) {
+
+// do the triangle(t1,t2,t3) and the line(l1,l2) intersect?
+//   intersection = col
+bool line_intersects_triangle(const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col) {
+	plane p = plane::from_points(t1,t2,t3);
+	return line_intersects_triangle2(p, t1, t2, t3, l1, l2, col);
+}
+
+// do the triangle(t1,t2,t3) and the line(l1,l2) intersect?
+//   intersection = col
+bool line_intersects_triangle2(const plane &pl,const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col) {
 	if (!pl.intersect_line(l1, l2, col))
 		return false;
-	GetBaryCentric(col,t1,t2,t3,LineIntersectsTriangleF,LineIntersectsTriangleG);
-	if ((LineIntersectsTriangleF>0)&&(LineIntersectsTriangleG>0)&&(LineIntersectsTriangleF+LineIntersectsTriangleG<1))
+	line_intersects_triangle_fg = bary_centric2(pl, col,t1,t2,t3);
+	if ((line_intersects_triangle_fg.x>0) and (line_intersects_triangle_fg.y>0) and (line_intersects_triangle_fg.x+line_intersects_triangle_fg.y<1))
 		return true;
 	return false;
 }
@@ -122,6 +113,7 @@ float plane::distance(const vector &p) const {
 }
 
 
-bool inf_pl(plane p)
-{   return (inf_v(p.n) || inf_f(p.d));  }
+bool inf_pl(plane p) {
+	return (inf_v(p.n) or inf_f(p.d));
+}
 

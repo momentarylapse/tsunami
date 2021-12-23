@@ -25,7 +25,7 @@ PrimitiveOperator PrimitiveOperators[(int)OperatorID::_COUNT_] = {
 	{"/=", OperatorID::DIVIDES,       true,  0,  "__idiv__", 3, false},
 	{"==", OperatorID::EQUAL,         false, 8,  "__eq__", 3, false},
 	{"!=", OperatorID::NOTEQUAL,      false, 8,  "__ne__", 3, false},
-	{IDENTIFIER_NOT,OperatorID::NEGATE,        false, 2,  "__not__", 2, false},
+	{IDENTIFIER_NOT,OperatorID::NEGATE,false, 2,  "__not__", 2, false},
 	{"<",  OperatorID::SMALLER,       false, 9,  "__lt__", 3, false},
 	{">",  OperatorID::GREATER,       false, 9,  "__gt__", 3, false},
 	{"<=", OperatorID::SMALLER_EQUAL, false, 9,  "__le__", 3, false},
@@ -44,10 +44,11 @@ PrimitiveOperator PrimitiveOperators[(int)OperatorID::_COUNT_] = {
 	{IDENTIFIER_EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", 3, false},
 	{"^",  OperatorID::EXPONENT,      false, 14,  "__exp__", 3, false},
 	{",",  OperatorID::COMMA,      false, 1,  "-none-", 3, false},
-	{"*",  OperatorID::DEREFERENCE,      false, 15,  "__get__", 2, false},
-	{"&",  OperatorID::REFERENCE,      false, 15,  "-none-", 2, false},
-	{"[...]",  OperatorID::ARRAY,      false, 16,  "-none-", 3, false},
-	{"|>",  OperatorID::FUNCTION_PIPE,      false, 0,  "-none-", 3, false}
+	{"*",  OperatorID::DEREFERENCE,   false, 15,  "__get__", 2, false},
+	{"&",  OperatorID::REFERENCE,     false, 15,  "-none-", 2, false},
+	{"[...]",  OperatorID::ARRAY,     false, 16,  "-none-", 3, false},
+	{"|>",  OperatorID::FUNCTION_PIPE,false, 0,  "-none-", 3, false},
+	{IDENTIFIER_AS, OperatorID::AS,   false, 15,  "-none-", 3, false}
 // Level = 15 - (official C-operator priority)
 // priority from "C als erste Programmiersprache", page 552
 };

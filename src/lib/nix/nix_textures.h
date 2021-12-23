@@ -108,7 +108,6 @@ public:
 
 	void _cdecl override_side(int side, const Image &image);
 	void _cdecl fill_side(int side, Texture *source);
-	void _cdecl render_to_cube_map(vector &pos, callback_function *render_scene, int mask);
 };
 
 

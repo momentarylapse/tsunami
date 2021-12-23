@@ -51,7 +51,6 @@ public:
 		ARRAY,
 		SUPER_ARRAY,
 		POINTER,
-		POINTER_SILENT, // pointer silent (&)
 		POINTER_SHARED,
 		POINTER_OWNED,
 		FUNCTION,
@@ -71,7 +70,6 @@ public:
 	bool is_some_pointer() const;
 	bool is_pointer_shared() const;
 	bool is_pointer_owned() const;
-	bool is_pointer_silent() const;
 	bool is_interface() const;
 	bool is_product() const;
 	bool is_callable() const;

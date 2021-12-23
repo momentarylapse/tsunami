@@ -60,6 +60,7 @@ enum class OperatorID {
 	REFERENCE,     // &
 	ARRAY,         // [...]
 	FUNCTION_PIPE, // |>
+	AS,            // as
 	_COUNT_
 };
 

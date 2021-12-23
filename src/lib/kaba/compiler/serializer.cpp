@@ -172,7 +172,7 @@ SerialNodeParam Serializer::add_dereference(const SerialNodeParam &param, const 
 
 
 bool node_is_assign_mem(Node *n) {
-	if (n->kind == NodeKind::INLINE_CALL) {
+	if (n->kind == NodeKind::CALL_INLINE) {
 		return (n->as_func()->inline_no == InlineID::CHUNK_ASSIGN);
 	}
 	// nope...
@@ -198,7 +198,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	if (node_is_assign_mem(com) /*and (config.abi == Abi::AMD64_GNU)*/) {
 		auto dst = com->params[0].get();
 		auto src = com->params[1].get();
-		if (src->kind == NodeKind::FUNCTION_CALL or src->kind == NodeKind::INLINE_CALL) {
+		if (src->kind == NodeKind::CALL_FUNCTION or src->kind == NodeKind::CALL_INLINE) {
 			if (dst->kind == NodeKind::VAR_LOCAL or dst->kind == NodeKind::VAR_GLOBAL or dst->kind == NodeKind::LOCAL_ADDRESS) {
 				override_ret = dst;
 				com = src;
@@ -214,7 +214,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	if (override_ret) {
 		ret = serialize_parameter(override_ret, block, index);
 	} else {
-		bool create_constructor_for_return = ((com->kind != NodeKind::STATEMENT) and (com->kind != NodeKind::FUNCTION_CALL) and (com->kind != NodeKind::VIRTUAL_CALL));
+		bool create_constructor_for_return = ((com->kind != NodeKind::STATEMENT) and (com->kind != NodeKind::CALL_FUNCTION) and (com->kind != NodeKind::CALL_VIRTUAL));
 		ret = add_temp(com->type, create_constructor_for_return);
 	}
 
@@ -234,13 +234,13 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	}
 
 
-	if (com->kind == NodeKind::FUNCTION_CALL) {
+	if (com->kind == NodeKind::CALL_FUNCTION) {
 		add_function_call(com->as_func(), params, ret);
-	} else if (com->kind == NodeKind::VIRTUAL_CALL) {
+	} else if (com->kind == NodeKind::CALL_VIRTUAL) {
 		add_member_function_call(com->as_func(), params, ret);
-	} else if (com->kind == NodeKind::INLINE_CALL) {
+	} else if (com->kind == NodeKind::CALL_INLINE) {
 		serialize_inline_function(com, params, ret);
-	} else if (com->kind == NodeKind::POINTER_CALL) {
+	} else if (com->kind == NodeKind::CALL_RAW_POINTER) {
 		add_pointer_call(params[0], params.sub_ref(1), ret);
 	} else if (com->kind == NodeKind::STATEMENT) {
 		serialize_statement(com, ret, block, index);
@@ -957,7 +957,7 @@ Serializer::Serializer(Script *s, Asm::InstructionWithParamsList *_list) {
 }
 
 bool is_func(shared<Node> n) {
-	return (n->kind == NodeKind::FUNCTION_CALL or n->kind == NodeKind::VIRTUAL_CALL or n->kind == NodeKind::FUNCTION);
+	return (n->kind == NodeKind::CALL_FUNCTION or n->kind == NodeKind::CALL_VIRTUAL or n->kind == NodeKind::FUNCTION);
 }
 
 int check_needed(SyntaxTree *tree, Function *f) {

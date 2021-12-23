@@ -41,7 +41,7 @@ public:
 	shared<Node> link_operator(PrimitiveOperator *primop, shared<Node> param1, shared<Node> param2);
 	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2);
 
-	Array<const Class*> get_wanted_param_types(shared<Node> link);
+	Array<const Class*> get_wanted_param_types(shared<Node> link, int &mandatory_params);
 	shared<Node> check_param_link(shared<Node> link, const Class *type, const string &f_name = "", int param_no = -1, int num_params = 1);
 
 	shared<Node> apply_type_cast(int tc, shared<Node> param, const Class *wanted);
@@ -66,6 +66,7 @@ public:
 
 	shared<Node> link_special_operator_is(shared<Node> param1, shared<Node> param2);
 	shared<Node> link_special_operator_in(shared<Node> param1, shared<Node> param2);
+	shared<Node> link_special_operator_as(shared<Node> param1, shared<Node> param2);
 	shared<Node> make_dynamical(shared<Node> node);
 	Array<const Class*> type_list_from_nodes(const shared_array<Node> &nn);
 
@@ -91,8 +92,7 @@ public:
 	Class *parse_class_header(Class *_namespace, int &offset0);
 	void post_process_newly_parsed_class(Class *c, int size);
 	void skip_parse_class();
-	Function *parse_function_header_old(Class *name_space, Flags flags0);
-	Function *parse_function_header_new(Class *name_space, Flags flags0);
+	Function *parse_function_header(Class *name_space, Flags flags0);
 	void skip_parsing_function_body(Function *f);
 	void parse_function_body(Function *f);
 	bool parse_function_command(Function *f, int indent0);
@@ -155,7 +155,7 @@ public:
 	shared<Node> parse_statement_lambda(Block *block);
 	shared<Node> parse_statement_sorted(Block *block);
 	shared<Node> parse_statement_dyn(Block *block);
-	shared<Node> parse_statement_call(Block *block);
+	shared<Node> parse_statement_raw_function_pointer(Block *block);
 	shared<Node> parse_statement_weak(Block *block);
 
 

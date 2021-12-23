@@ -10,11 +10,7 @@ class vector;
 namespace kaba {
 
 
-extern const Class *TypeIntPs;
-extern const Class *TypeFloatPs;
-extern const Class *TypeBoolPs;
 extern const Class *TypeDate;
-extern const Class *TypeStringList;
 const Class *TypePath;
 const Class *TypePathList;
 
@@ -202,19 +198,19 @@ void SIAddPackageOSPath() {
 			func_add_param("p", TypeString);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Path::__delete__);
 		class_add_func("absolute", TypePath, &Path::absolute, Flags::CONST);
-		class_add_func("dirname", TypeString, &Path::dirname, Flags::_CONST__PURE);
-		class_add_func("basename", TypeString, &Path::basename, Flags::_CONST__PURE);
-		class_add_func("basename_no_ext", TypeString, &Path::basename_no_ext, Flags::_CONST__PURE);
-		class_add_func("extension", TypeString, &Path::extension, Flags::_CONST__PURE);
-		class_add_func("canonical", TypePath, &Path::canonical, Flags::_CONST__PURE);
-		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &Path::str, Flags::_CONST__PURE);
-		class_add_func("is_empty", TypeBool, &Path::is_empty, Flags::_CONST__PURE);
-		class_add_func("is_relative", TypeBool, &Path::is_relative, Flags::_CONST__PURE);
-		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::_CONST__PURE);
-		class_add_func("parent", TypePath, &Path::parent, Flags::_CONST__PURE);
-		class_add_func("compare", TypeInt, &Path::compare, Flags::_CONST__PURE);
+		class_add_func("dirname", TypeString, &Path::dirname, Flags::PURE);
+		class_add_func("basename", TypeString, &Path::basename, Flags::PURE);
+		class_add_func("basename_no_ext", TypeString, &Path::basename_no_ext, Flags::PURE);
+		class_add_func("extension", TypeString, &Path::extension, Flags::PURE);
+		class_add_func("canonical", TypePath, &Path::canonical, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &Path::str, Flags::PURE);
+		class_add_func("is_empty", TypeBool, &Path::is_empty, Flags::PURE);
+		class_add_func("is_relative", TypeBool, &Path::is_relative, Flags::PURE);
+		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::PURE);
+		class_add_func("parent", TypePath, &Path::parent, Flags::PURE);
+		class_add_func("compare", TypeInt, &Path::compare, Flags::PURE);
 			func_add_param("p", TypePath);
-		class_add_func("relative_to", TypePath, &Path::relative_to, Flags::_CONST__PURE);
+		class_add_func("relative_to", TypePath, &Path::relative_to, Flags::PURE);
 			func_add_param("p", TypePath);
 		class_add_const("EMPTY", TypePath, &Path::EMPTY);
 		class_add_func("@from_str", TypePath, &KabaPath::from_str, Flags::_STATIC__PURE);
@@ -233,7 +229,7 @@ void SIAddPackageOSPath() {
 	TypePathList = add_type_l(TypePath);
 
 	add_class(TypePath);
-		class_add_func("all_parents", TypePathList, &Path::all_parents, Flags::_CONST__PURE);
+		class_add_func("all_parents", TypePathList, &Path::all_parents, Flags::PURE);
 
 	add_class(TypePathList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<Path>::__init__);
@@ -283,17 +279,17 @@ void SIAddPackageOS() {
 		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_vector, Flags::RAISES_EXCEPTIONS);
 			func_add_param("v", TypeVector);
 		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_str, Flags::RAISES_EXCEPTIONS);
-			func_add_param("s", TypeString);
+			func_add_param("s", TypeString, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_bool, Flags::RAISES_EXCEPTIONS);
-			func_add_param("b", TypeBoolPs);
+			func_add_param("b", TypeBool, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_int, Flags::RAISES_EXCEPTIONS);
-			func_add_param("i", TypeIntPs);
+			func_add_param("i", TypeInt, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_float, Flags::RAISES_EXCEPTIONS);
-			func_add_param("x", TypeFloatPs);
+			func_add_param("x", TypeFloat32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_vector, Flags::RAISES_EXCEPTIONS);
-			func_add_param("v", TypeVector);
+			func_add_param("v", TypeVector, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_str, Flags::RAISES_EXCEPTIONS);
-			func_add_param("s", TypeString);
+			func_add_param("s", TypeString, Flags::OUT);
 		class_add_func("end", TypeBool, &KabaFile::end);
 
 	add_class(TypeFileError);

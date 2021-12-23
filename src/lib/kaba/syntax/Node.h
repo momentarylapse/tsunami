@@ -37,10 +37,10 @@ enum class NodeKind {
 	FUNCTION,           // = just the name
 	CONSTANT,
 	// execution
-	FUNCTION_CALL,      // = real function call
-	VIRTUAL_CALL,       // = virtual function call
-	INLINE_CALL,        // = function defined inside the compiler...
-	POINTER_CALL,       // = function call via pointer
+	CALL_FUNCTION,      // = real function call
+	CALL_VIRTUAL,       // = virtual function call
+	CALL_INLINE,        // = function defined inside the compiler...
+	CALL_RAW_POINTER,   // = function call via a raw pointer
 	STATEMENT,          // = if/while/break/...
 	BLOCK,              // = block of commands {...}
 	OPERATOR,
@@ -98,6 +98,8 @@ public:
 	~Node();
 	Node *modifiable();
 	Node *make_const();
+	bool is_call() const;
+	bool is_function() const;
 	Block *as_block() const;
 	Function *as_func() const;
 	const Class *as_class() const;

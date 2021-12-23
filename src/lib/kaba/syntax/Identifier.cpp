@@ -81,7 +81,7 @@ const string IDENTIFIER_MAP = "map";
 const string IDENTIFIER_LAMBDA = "lambda";
 const string IDENTIFIER_SORTED = "sorted";
 const string IDENTIFIER_DYN = "dyn";
-const string IDENTIFIER_CALL = "call";
+const string IDENTIFIER_RAW_FUNCTION_POINTER = "raw_function_pointer";
 
 
 }

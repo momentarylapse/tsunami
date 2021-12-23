@@ -321,7 +321,7 @@ class Grid extends Object
 	
 	func draw_curve(c: Painter, fi: FloatInterpolator, fill_below: bool)
 		vec2[] pp
-		var tt = rangef(0, 1, 0.003)
+		var tt = range(0, 1, 0.003)
 		var yy = fi.get_list(tt)
 		for t,i in tt
 			var zz = project2([x_axis.rel2val(t), yy[i]])
@@ -339,7 +339,7 @@ class Grid extends Object
 	func draw_curve_c(c: Painter, curve: Curve, fill_below: bool)
 		float[] tt, yy
 		vec2[] pp
-		tt = rangef(0, 1, 0.003)
+		tt = range(0, 1, 0.003)
 		#yy = curve.get_list(tt)
 		for t,i in tt
 			float x = x_axis.rel2val(t)

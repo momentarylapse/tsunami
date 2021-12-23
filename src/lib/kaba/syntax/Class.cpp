@@ -64,7 +64,7 @@ bool type_match(const Class *given, const Class *wanted) {
 		return true;
 
 	// FIXME... quick'n'dirty hack to allow nil as parameter
-	if ((given == TypePointer) and wanted->is_pointer() and !wanted->is_pointer_silent())
+	if ((given == TypePointer) and wanted->is_pointer())
 		return true;
 
 	// compatible pointers (of same or derived class)
@@ -168,19 +168,16 @@ bool Class::is_super_array() const
 { return type == Type::SUPER_ARRAY; }
 
 bool Class::is_pointer() const
-{ return type == Type::POINTER or type == Type::POINTER_SILENT /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */; }
+{ return type == Type::POINTER /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */; }
 
 bool Class::is_some_pointer() const
-{ return type == Type::POINTER or type == Type::POINTER_SILENT  or type == Type::POINTER_SHARED or type == Type::POINTER_OWNED; }
+{ return type == Type::POINTER  or type == Type::POINTER_SHARED or type == Type::POINTER_OWNED; }
 
 bool Class::is_pointer_shared() const
 { return type == Type::POINTER_SHARED; }
 
 bool Class::is_pointer_owned() const
 { return type == Type::POINTER_OWNED; }
-
-bool Class::is_pointer_silent() const
-{ return type == Type::POINTER_SILENT; }
 
 bool Class::is_interface() const
 { return type == Type::INTERFACE; }

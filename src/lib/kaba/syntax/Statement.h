@@ -46,8 +46,8 @@ enum class StatementID {
 	LAMBDA,
 	SORTED,
 	DYN,
-	CALL,
-	WEAK
+	WEAK,
+	RAW_FUNCTION_POINTER
 };
 
 class Statement {

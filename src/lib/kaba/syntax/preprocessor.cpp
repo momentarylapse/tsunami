@@ -162,7 +162,7 @@ shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
 		return eval_function_call(this, c, c->as_op()->f);
 	} else if (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
 		return eval_constructor_function(this, c, c->as_func());
-	} else if (c->kind == NodeKind::FUNCTION_CALL) {
+	} else if (c->kind == NodeKind::CALL_FUNCTION) {
 		return eval_function_call(this, c, c->as_func());
 	}
 	return conv_eval_const_func_nofunc(c);
@@ -204,7 +204,7 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 
 // may not use AddConstant()!!!
 shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
-	if (c->kind == NodeKind::INLINE_CALL) {
+	if (c->kind == NodeKind::CALL_INLINE) {
 		auto *f = c->as_func();
 		//if (!f->is_pure or !f->address_preprocess)
 		//	return c;

@@ -80,7 +80,6 @@ namespace kaba {
 
 extern const Class *TypeObject;
 extern const Class *TypeIntList;
-extern const Class *TypeIntPs;
 extern const Class *TypeStringList;
 extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
@@ -416,8 +415,8 @@ void SIAddPackageHui() {
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
 		class_add_func("get_mouse", TypeBool, hui_p(&hui::Window::get_mouse));
-			func_add_param("x", TypeIntPs);
-			func_add_param("y", TypeIntPs);
+			func_add_param("x", TypeInt, Flags::OUT);
+			func_add_param("y", TypeInt, Flags::OUT);
 			func_add_param("button", TypeInt);
 			func_add_param("change", TypeInt);
 		class_add_func("get_key", TypeBool, hui_p(&hui::Window::get_key));

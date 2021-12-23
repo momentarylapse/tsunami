@@ -55,16 +55,10 @@ int Serializer::function_call_push_params(Function *f, const Array<SerialNodePar
 }
 
 void Serializer::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
-
 	call_used = true;
 	int push_size = function_call_push_params(nullptr, params, ret);
 
-	auto t1 = add_temp(TypePointer);
-	if (config.compile_os)
-		cmd.add_cmd(Asm::InstID::MOV, t1, pointer); // function pointer
-	else
-		cmd.add_cmd(Asm::InstID::ADD, t1, pointer, param_imm(TypeInt, config.function_address_offset)); // function pointer
-	cmd.add_cmd(Asm::InstID::CALL, ret, deref_temp(t1, TypeFunctionCodeP)); // the actual call
+	cmd.add_cmd(Asm::InstID::CALL, ret, pointer); // the actual call
 }
 
 void Serializer::add_function_outro(Function *f) {
@@ -112,7 +106,7 @@ SerialNodeParam Serializer::serialize_parameter(Node *link, Block *block, int in
 			p.kind = NodeKind::LABEL;
 			p.p = fp->_label;
 		}*/
-	} else if ((link->kind == NodeKind::OPERATOR) or (link->kind == NodeKind::FUNCTION_CALL) or (link->kind == NodeKind::INLINE_CALL) or (link->kind == NodeKind::VIRTUAL_CALL) or (link->kind == NodeKind::POINTER_CALL) or (link->kind == NodeKind::STATEMENT)) {
+	} else if ((link->kind == NodeKind::OPERATOR) or (link->kind == NodeKind::CALL_FUNCTION) or (link->kind == NodeKind::CALL_INLINE) or (link->kind == NodeKind::CALL_VIRTUAL) or (link->kind == NodeKind::CALL_RAW_POINTER) or (link->kind == NodeKind::STATEMENT)) {
 		p = serialize_node(link, block, index);
 	} else if (link->kind == NodeKind::REFERENCE) {
 		auto param = serialize_parameter(link->params[0].get(), block, index);
@@ -274,6 +268,14 @@ void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Bloc
 			break;
 		case StatementID::PASS:
 			break;
+		case StatementID::RAW_FUNCTION_POINTER: {
+			if (config.compile_os)
+				do_error("raw_function_pointer() for os not implemented yet");
+			auto func = serialize_parameter(com->params[0].get(), block, index);
+			auto t1 = add_temp(TypePointer);
+			cmd.add_cmd(Asm::InstID::ADD, t1, func, param_imm(TypeInt, config.function_address_offset)); // Function* pointer
+			cmd.add_cmd(Asm::InstID::MOV, ret, deref_temp(t1, TypeFunctionCodeP)); // the actual call
+			}break;
 		default:
 			do_error("statement unimplemented: " + com->as_statement()->name);
 	}

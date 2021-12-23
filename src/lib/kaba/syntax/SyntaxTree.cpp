@@ -134,9 +134,9 @@ shared<Node> SyntaxTree::add_node_statement(StatementID id) {
 shared<Node> SyntaxTree::add_node_member_call(Function *f, const shared<Node> inst, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
 	if ((f->virtual_index >= 0) and !force_non_virtual) {
-		c = new Node(NodeKind::VIRTUAL_CALL, (int_p)f, f->literal_return_type, true);
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, true);
 	} else {
-		c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type, true);
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true);
 	}
 	c->set_num_params(f->num_params + 1);
 	c->set_instance(inst);
@@ -148,7 +148,7 @@ shared<Node> SyntaxTree::add_node_member_call(Function *f, const shared<Node> in
 // non-member!
 shared<Node> SyntaxTree::add_node_call(Function *f) {
 	// FIXME: literal_return_type???
-	shared<Node> c = new Node(NodeKind::FUNCTION_CALL, (int_p)f, f->literal_return_type, true);
+	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true);
 	if (f->is_static())
 		c->set_num_params(f->num_params);
 	else
@@ -639,7 +639,7 @@ shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, c
 	auto s = Parser::which_statement(name);
 	if (s) {
 		//return {add_node_statement(s->id)};
-		shared<Node> n = new Node(NodeKind::STATEMENT, (int64)s, TypeVoid);
+		auto n = new Node(NodeKind::STATEMENT, (int_p)s, TypeVoid);
 		n->set_num_params(s->num_params);
 		return {n};
 	}
@@ -794,13 +794,25 @@ shared<Node> SyntaxTree::conv_calls(shared<Node> c) {
 			return c;
 		}
 
-	if ((c->kind == NodeKind::FUNCTION_CALL) or (c->kind == NodeKind::VIRTUAL_CALL) or (c->kind == NodeKind::POINTER_CALL) or (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
+	if (c->is_call() or (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)) {
 		auto r = c->shallow_copy();
 		bool changed = false;
 
+		auto needs_conversion = [&c] (int j) {
+			if (c->params[j]->type->uses_call_by_reference())
+				return true;
+			if (c->is_function()) {
+				auto f = c->as_func();
+				int param_offset = f->is_static() ? 0 : 1;
+				if ((j >= param_offset) and (flags_has(f->var[j - param_offset]->flags, Flags::OUT)))
+					return true;
+			}
+			return false;
+		};
+
 		// parameters, instance: class as reference
 		for (int j=0;j<c->params.num;j++)
-			if (c->params[j] and c->params[j]->type->uses_call_by_reference()) {
+			if (c->params[j] and needs_conversion(j)) {
 				r->set_param(j, c->params[j]->ref());
 				changed = true;
 			}
@@ -903,17 +915,17 @@ void SyntaxTree::convert_call_by_reference() {
 					//msg_write("CONV SELF....");
 					v->type = v->type->get_pointer();
 
-					// internal usage...
+					// usage inside the function
 					transform_block(f->block.get(), [&](shared<Node> n){ return conv_cbr(n, v); });
 				}
 		}
 
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
-			if (f->var[j]->type->uses_call_by_reference()) {
+			if (f->var[j]->type->uses_call_by_reference() or flags_has(f->var[j]->flags, Flags::OUT)) {
 				f->var[j]->type = f->var[j]->type->get_pointer();
 
-				// internal usage...
+				// usage inside the function
 				transform_block(f->block.get(), [&](shared<Node> n){ return conv_cbr(n, f->var[j].get()); });
 			}
 	}
@@ -1318,9 +1330,9 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 }
 
 shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
-	if (n->kind == NodeKind::FUNCTION_CALL) {
+	if (n->kind == NodeKind::CALL_FUNCTION) {
 		if (n->as_func()->inline_no != InlineID::NONE) {
-			auto r = new Node(NodeKind::INLINE_CALL, n->link_no, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_INLINE, n->link_no, n->type, n->is_const);
 			r->params = n->params;
 			return r;
 		}
@@ -1328,11 +1340,11 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 	if (n->kind == NodeKind::OPERATOR) {
 		Operator *op = n->as_op();
 		if (op->f->inline_no != InlineID::NONE) {
-			auto r = new Node(NodeKind::INLINE_CALL, (int_p)op->f, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_INLINE, (int_p)op->f, n->type, n->is_const);
 			r->params = n->params;
 			return r;
 		} else {
-			auto r = new Node(NodeKind::FUNCTION_CALL, (int_p)op->f, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_FUNCTION, (int_p)op->f, n->type, n->is_const);
 			r->params = n->params;
 			return r;
 		}

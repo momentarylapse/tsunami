@@ -39,7 +39,8 @@ void set_viewport(const rect &area) {
 	target_width = max((int)area.width(), 1);
 	target_height = max((int)area.height(), 1);
 
-	glViewport(area.x1, cur_framebuffer->height - area.height() + area.y1, area.width(), area.height());
+	//glViewport(area.x1, cur_framebuffer->height - area.height() + area.y1, area.width(), area.height());
+	glViewport(area.x1, area.y1, area.width(), area.height());
 }
 
 void set_model_matrix(const matrix &mat) {
@@ -82,11 +83,12 @@ void set_projection_ortho_ext(float center_x, float center_y, float map_width, f
 	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * trans * scale);
 }
 
+// orthogonal projection (relative [0,1]x[0,1]x[0,1] coordinates)
+// y-axis downwards
 void set_projection_ortho_relative() {
-	// orthogonal projection (relative [0,1]x[0x1] coordinates)
 	auto t = matrix::translation(vector(-0.5f, -0.5f, 0));
 	auto s = matrix::scale(2.0f, -2.0f, 1);
-	set_projection_matrix(matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) * s * t);
+	set_projection_matrix(/*matrix::translation(vector(0,0,0.5f)) * matrix::scale(1,1,0.5f) */ s * t);
 }
 
 // orthogonal projection (pixel coordinates)

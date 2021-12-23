@@ -67,16 +67,12 @@ const Class *TypeDictBase;
 const Class *TypeCallableBase;
 const Class *TypeSharedPointer;
 const Class *TypePointerList;
-const Class *TypeCharPs;
-const Class *TypeBoolPs;
 const Class *TypeBoolList;
-const Class *TypeIntPs;
 const Class *TypeIntP;
 const Class *TypeIntList;
 const Class *TypeIntArray;
 const Class *TypeIntDict;
 const Class *TypeFloatP;
-const Class *TypeFloatPs;
 const Class *TypeFloatList;
 const Class *TypeFloatArray;
 const Class *TypeFloatArrayP;
@@ -175,16 +171,12 @@ const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) 
 	if (name == "") {
 		if (flags_has(flag, Flags::SHARED))
 			name = "shared " + sub_type->name;
-		else if (flags_has(flag, Flags::SILENT))
-			name = sub_type->name + "&";
 		else
 			name = sub_type->name + "*";
 	}
 	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::POINTER;
-	if (flags_has(flag, Flags::SILENT))
-		t->type = Class::Type::POINTER_SILENT;
-	else if (flags_has(flag, Flags::SHARED))
+	if (flags_has(flag, Flags::SHARED))
 		t->type = Class::Type::POINTER_SHARED;
 	__add_class__(t, sub_type->name_space);
 	return t;
@@ -485,11 +477,31 @@ void func_set_inline(InlineID index) {
 
 void func_add_param(const string &name, const Class *type, Flags flags) {
 	if (cur_func) {
+		// FIXME: use call-by-reference type?
 		Variable *v = new Variable(name, type);
 		v->flags = flags;
 		cur_func->var.add(v);
 		cur_func->literal_param_type.add(type);
 		cur_func->num_params ++;
+		cur_func->mandatory_params = cur_func->num_params;
+	}
+}
+
+void func_add_param_def(const string &name, const Class *type, const void *p, Flags flags) {
+	if (cur_func) {
+		// FIXME: use call-by-reference type?
+		Variable *v = new Variable(name, type);
+		v->flags = flags;
+		cur_func->var.add(v);
+		cur_func->literal_param_type.add(type);
+		cur_func->num_params ++;
+		//cur_func->mandatory_params = cur_func->num_params;
+
+		Constant *c = cur_package->syntax->add_constant(type, cur_class);
+		if (type == TypeInt)
+			c->as_int() = (int_p)p;
+		cur_func->default_parameters.resize(cur_func->num_params - 1);
+		cur_func->default_parameters.add(cur_package->syntax->add_node_const(c));
 	}
 }
 

@@ -37,6 +37,10 @@ nix::Shader* __CreateShader(const string &source) {
 
 #pragma GCC pop_options
 
+class KabaShader : public nix::Shader {
+public:
+	void __delete__() { this->Shader::~Shader(); }
+};
 
 
 #else
@@ -135,6 +139,7 @@ void SIAddPackageNix() {
 			func_add_param("filename", TypePath);
 		class_add_element("width", TypeInt, nix_p(&nix::Texture::width));
 		class_add_element("height", TypeInt, nix_p(&nix::Texture::height));
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, nix_p(&nix::Texture::_pointer_ref_counter));
 
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture, false, false);
@@ -143,6 +148,7 @@ void SIAddPackageNix() {
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 			func_add_param("format", TypeString);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeImageTexture);
 		class_derive_from(TypeTexture, false, false);
@@ -150,6 +156,7 @@ void SIAddPackageNix() {
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture, false, false);
@@ -157,12 +164,14 @@ void SIAddPackageNix() {
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::CubeMap::__init__));
 			func_add_param("size", TypeInt);
 			func_add_param("format", TypeString);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&nix::Texture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeFrameBuffer);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(&nix::FrameBuffer::__init__));
@@ -173,8 +182,10 @@ void SIAddPackageNix() {
 		class_add_element("height", TypeInt, nix_p(&nix::FrameBuffer::height));
 		class_add_element("color_attachments", TypeTexturePList, nix_p(&nix::FrameBuffer::color_attachments));
 		class_add_element("depth_buffer", TypeDepthBufferP, nix_p(&nix::FrameBuffer::depth_buffer));
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, nix_p(&nix::FrameBuffer::_pointer_ref_counter));
 
 	add_class(TypeShader);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(&KabaShader::__delete__));
 		class_add_func("location", TypeInt, nix_p(&nix::Shader::get_location));
 			func_add_param("name", TypeString);
 		class_add_func("link_uniform_block", TypeVoid, nix_p(&nix::Shader::link_uniform_block));
@@ -222,6 +233,7 @@ void SIAddPackageNix() {
 			func_add_param("source", TypeString);
 		class_add_const("DEFAULT_3D", TypeShaderP, nix_p(&nix::Shader::default_3d));
 		class_add_const("DEFAULT_2D", TypeShaderP, nix_p(&nix::Shader::default_2d));
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, nix_p(&nix::Shader::_pointer_ref_counter));
 
 
 	add_class(TypeBuffer);

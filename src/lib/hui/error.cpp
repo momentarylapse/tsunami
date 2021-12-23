@@ -75,9 +75,9 @@ public:
 		add_button("!default,\\" + _("Ok"), 0, 1 ,"ok");
 		set_image("ok", "hui:ok");
 
-		event("ok", [=]{ on_ok(); });
-		event("cancel", [=]{ request_destroy(); });
-		event("hui:close", [=]{ request_destroy(); });
+		event("ok", [=,this]{ on_ok(); });
+		event("cancel", [=,this]{ request_destroy(); });
+		event("hui:close", [=,this]{ request_destroy(); });
 	}
 
 	void on_ok() {
@@ -129,7 +129,7 @@ public:
 		set_info_text(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), {"error"});
 
 	#ifdef _X_USE_NET_
-		event("send-report", [=] {
+		event("send-report", [=,this] {
 			SendBugReport(this);
 		});
 	#else
@@ -147,13 +147,13 @@ public:
 		}
 		set_int("message-list", n-1);
 
-		event("show-log", [=] {
+		event("show-log", [=,this] {
 			OpenDocument("message.txt");
 		});
-		event("hui:win_close", [=] {
+		event("hui:win_close", [=,this] {
 			exit(1);
 		});
-		event("ok", [=] {
+		event("ok", [=,this] {
 			exit(1);
 		});
 	}

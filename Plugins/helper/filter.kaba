@@ -103,10 +103,10 @@ class BiquadFilter
 				create_all_pass(freq, q, sample_rate)
 
 		func create_peak(f_res: float, Q: float, gain: float, sample_rate: float)
-			float g = db_to_factor(gain)
-			float c = 1 / tan(pi * f_res / sample_rate)
-			float B = 1 / Q
-			float a0 = c*c + B*c + 1
+			var g = db_to_factor(gain)
+			var c = 1 / tan(pi * f_res / sample_rate)
+			var B = 1 / Q
+			var a0 = c*c + B*c + 1
 			b[0] = (c*c + B*c*g + 1) / a0
 			a[1] = (2 - 2*c*c) / a0
 			b[1] = a[1]
@@ -114,8 +114,8 @@ class BiquadFilter
 			b[2] = (c*c - B*g*c + 1) / a0
 
 		func create_notch(f_res: float, Q: float, sample_rate: float)
-			float c = tan(pi * f_res / sample_rate)
-			float a0 = 1 + c/Q + c*c
+			var c = tan(pi * f_res / sample_rate)
+			var a0 = 1 + c/Q + c*c
 			b[0] = (1 + c*c) / a0
 			b[1] = 2 * (c*c - 1) / a0
 			b[2] = b[0]
@@ -129,8 +129,8 @@ class BiquadFilter
 #			a[1] = b[0]-1
 #			a[2] = 0
 			var q = sqrt(2) #20 / _q
-			float c = tan(pi * f_res / sample_rate)
-			float a0 = 1 + c*q + c*c
+			var c = tan(pi * f_res / sample_rate)
+			var a0 = 1 + c*q + c*c
 			b[0] = c*c / a0
 			b[1] = 2 * b[0]
 			b[2] = b[0]
@@ -144,8 +144,8 @@ class BiquadFilter
 #			a[1] = -b[0]
 #			a[2] = 0
 			var q = sqrt(2) #20 / _q
-			float c = tan(pi * f_res / sample_rate)
-			float a0 = 1 + c*q + c*c
+			var c = tan(pi * f_res / sample_rate)
+			var a0 = 1 + c*q + c*c
 			b[0] = 1 / a0
 			b[1] = - 2 * b[0]
 			b[2] = b[0]
@@ -153,8 +153,8 @@ class BiquadFilter
 			a[2] = (1 - c*q + c*c) / a0
 
 		func create_low_shelf(f_res: float, q: float, gain: float, sample_rate: float)
-			float V = db_to_factor(abs(gain))
-			float c = tan(pi * f_res / sample_rate)
+			var V = db_to_factor(abs(gain))
+			var c = tan(pi * f_res / sample_rate)
 		
 			if gain > 0
 				float a0 = 1 + sqrt(2)*c + c*c
@@ -182,8 +182,8 @@ class BiquadFilter
 #			a[2] = 0
 
 		func create_high_shelf(f_res: float, q: float, gain: float, sample_rate: float)
-			float V = db_to_factor(abs(gain))
-			float c = tan(pi * f_res / sample_rate)
+			var V = db_to_factor(abs(gain))
+			var c = tan(pi * f_res / sample_rate)
 		
 			if gain > 0
 				float a0 = 1 + sqrt(2)*c + c*c
@@ -203,9 +203,9 @@ class BiquadFilter
 		
 		# y[i] := α * (y[i-1] + x[i] - x[i-1])
 		func create_high_pass_linear(f_res: float, sample_rate: float)
-			float RC = 1 / (2 * pi * f_res)
-			float dt = 1.0 / sample_rate
-			float α = RC / (RC + dt)
+			var RC = 1 / (2 * pi * f_res)
+			var dt = 1.0 / sample_rate
+			var α = RC / (RC + dt)
 			b[0] = α
 			b[1] = -α
 			b[2] = 0
@@ -214,9 +214,9 @@ class BiquadFilter
 
 		# y[i] := α * x[i] + (1-α) * y[i-1]
 		func create_low_pass_linear(f_res: float, sample_rate: float)
-			float RC = 1 / (2 * pi * f_res)
-			float dt = 1.0 / sample_rate
-			float α = dt / (RC + dt)
+			var RC = 1 / (2 * pi * f_res)
+			var dt = 1.0 / sample_rate
+			var α = dt / (RC + dt)
 			b[0] = α
 			b[1] = 0
 			b[2] = 0
@@ -224,12 +224,12 @@ class BiquadFilter
 			a[2] = 0
 	
 		func create_all_pass(freq: float, q: float, sample_rate: float)
-			float phi = 2 * pi * freq / sample_rate
-			float l = 1 - phi / q
+			var phi = 2 * pi * freq / sample_rate
+			var l = 1 - phi / q
 			create_all_pass_z(l * complex(cos(phi), sin(phi)))
 
 		func create_all_pass_z(z: complex)
-			float l = z.abs()
+			var l = z.abs()
 			b[0] = l*l
 			b[1] = - 2 * z.x
 			b[2] = 1

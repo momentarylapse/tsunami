@@ -13,7 +13,7 @@ class _StreamTest extends TsunamiPlugin
 		chain = session.create_signal_chain("test")
 		input = chain.add(Module.Type.STREAM, "AudioInput")
 		recorder = chain.add(Module.Type.PLUMBING, "AudioAccumulator")
-		Module* sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
+		var sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
 		

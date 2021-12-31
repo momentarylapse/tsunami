@@ -345,12 +345,12 @@ class Circuit
 			else
 				int t = edge_type(x[0])
 				int[] n = [int(x[1]), int(x[2])]
-				Edge* e = add_default(n, t)
+				var e: Edge* = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
 	
 	func add_default(n: int[], t: int) -> Edge*
-		Edge* e = nil
+		var e: Edge* = nil
 		if t == TYPE_CABLE
 			e = new Cable(n)
 		else if t == TYPE_SOURCE
@@ -381,7 +381,7 @@ func _main()
 	print(str(c))
 
 func __main()
-	Diode* d = new Diode([0,0])
+	var d = new Diode([0,0])
 	return
 	for f in 0.5:1.5:0.01
 	#	print(f)

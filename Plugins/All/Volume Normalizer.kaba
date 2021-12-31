@@ -5,7 +5,7 @@ class VolumeChecker extends SongPlugin
 
 	var vol_max: float
 	func check() -> bool
-		SongRenderer *renderer = new SongRenderer(song)
+		var renderer = new SongRenderer(song)
 		
 		var p = new ProgressX("checking", self.session.win)
 		

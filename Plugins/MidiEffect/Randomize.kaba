@@ -19,8 +19,8 @@ class Randomize extends MidiEffect
 	
 	func override process(out midi: MidiNoteBuffer)
 		float delay = session.sample_rate() * config.TimeDelay
-		float var = session.sample_rate() * config.TimeVariation
+		float variation = session.sample_rate() * config.TimeVariation
 		for n in midi
-			int dt = randi(var*2) - var + delay
+			int dt = randi(variation*2) - variation + delay
 			n.range.offset += dt
 			n.volume *= rand(config.Volume) + 1 - config.Volume

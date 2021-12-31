@@ -36,14 +36,14 @@ class MidiFont
 		for t in song.tracks
 			if t.type == SignalType.MIDI and t.name == name
 				var m = t.synth.copy()
-				Synthesizer* s = m
-				return s
+				var s: Synthesizer* = m
+				return s #m as Synthesizer*
 		# fist midi track...
 		for t in song.tracks
 			if t.type == SignalType.MIDI
 				var m = t.synth.copy()
-				Synthesizer* s = m
-				return s
+				var s: Synthesizer* = m
+				return s #m as Synthesizer*
 		return nil
 
 class FontList

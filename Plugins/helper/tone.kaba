@@ -158,9 +158,9 @@ class Chord
 			return "???"
 		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + chord_type_name(type)
 
-	func static parse(str: string) -> Chord[]
+	func static parse(s: string) -> Chord[]
 		Chord[] chords
-		for a,i in str
+		for a,i in s
 			Chord c
 			if a >= 'a' and a <= 'h'
 				c.type = MINOR
@@ -170,8 +170,8 @@ class Chord
 				c.base_tone = char_to_rel_pitch(a + 32) + 48
 			else
 				continue
-			if i < len(str) - 1
-				if str[i + 1] == '#'
+			if i < len(s) - 1
+				if s[i + 1] == '#'
 					c.base_tone ++
 					i ++
 			chords.add(c)

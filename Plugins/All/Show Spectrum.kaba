@@ -95,7 +95,7 @@ class ShowSpectrum extends SongPlugin
 		dlg = new SpectrumDialog(self)
 	
 		AudioBuffer buf
-		SongRenderer* renderer = new SongRenderer(song)
+		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 		del renderer
 	

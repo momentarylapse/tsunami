@@ -23,8 +23,8 @@ class CueSplitter extends TsunamiPlugin
 		var dir = filename.parent()
 		string fn
 		string year, album, artist
-		Part*[] parts
-		Part *cur = nil
+		var parts: Part*[]
+		var cur: Part* = nil
 		try
 			var f = Filesystem.open_text(filename)
 			while true
@@ -60,7 +60,7 @@ class CueSplitter extends TsunamiPlugin
 			return
 		
 		session.storage.load(session.song, dir << fn)
-		SongRenderer* r = new SongRenderer(session.song)
+		var r = new SongRenderer(session.song)
 		
 		for p,i in parts
 			print("-----")

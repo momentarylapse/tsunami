@@ -105,7 +105,7 @@ Grid ? ''
 		Button close 'Close' image=hui:close default
 		Button export 'Export' image=hui:save")
 		
-		AudioView* view = plugin.session.view
+		var view = plugin.session.view
 		dmis = &plugin
 		song = plugin.session.song
 		
@@ -158,7 +158,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf
-		SongRenderer* renderer = new SongRenderer(song)
+		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 		del renderer
 	

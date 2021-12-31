@@ -54,7 +54,7 @@ Grid ? ''
 	Grid ? '' buttonbar
 		Button close 'Close' image=hui:close")
 		
-		AudioView* view = plugin.session.view
+		var view = plugin.session.view
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range().offset / float(song.sample_rate), view.sel.range().end() / float(song.sample_rate), false, "s")
@@ -83,7 +83,7 @@ class ShowSpectrogram extends SongPlugin
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf
-		SongRenderer* renderer = new SongRenderer(song)
+		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 		del renderer
 	

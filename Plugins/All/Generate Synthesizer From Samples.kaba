@@ -74,7 +74,7 @@ class XXX extends SongPlugin
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample")
 		print("set synth")
-		SampleSynthesizer* synth = weak(track.synth)
+		var synth: SampleSynthesizer* = weak(track.synth)
 		track.set_synthesizer(synth)
 		
 

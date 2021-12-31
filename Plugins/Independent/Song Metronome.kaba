@@ -70,7 +70,7 @@ Grid ? '' vertical
 		popup_menu = new Menu()
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		Menu *sub_mode = new Menu()
+		var sub_mode = new Menu()
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
@@ -102,7 +102,7 @@ Grid ? '' vertical
 		float y0 = h / 2
 		float r = min(x0, y0) * 0.9
 		
-		BeatSource* source = metro.session.view.renderer.get_beat_source()
+		var source = metro.session.view.renderer.get_beat_source()
 		if !source
 			return
 		
@@ -181,19 +181,19 @@ Grid ? '' vertical
 		float w = p.width
 		float h = p.height
 		
-		Song* song = metro.session.song
-		Track* t = song.time_track()
+		var song = metro.session.song
+		var t = song.time_track()
 		if !t
 			return
 		
-		Bar* cur_bar = weak(song.bars[cur_bar_index])
-		Bar* next_bar = nil
+		var cur_bar = weak(song.bars[cur_bar_index])
+		var next_bar: Bar* = nil
 		if cur_bar_index + 1 < len(song.bars)
 			next_bar = weak(song.bars[cur_bar_index + 1])
 		
 		int offset = cur_bar.offset
-		TrackMarker *cur_part = get_part(t, offset + DELTA)
-		TrackMarker *next_part = get_part(t, offset + cur_bar.length + DELTA)
+		var cur_part = get_part(t, offset + DELTA)
+		var next_part = get_part(t, offset + cur_bar.length + DELTA)
 		p.set_color(colors.text_soft2)
 		float fs = h * 0.08
 		p.set_font_size(fs)

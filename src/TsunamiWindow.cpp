@@ -135,27 +135,27 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("buffer-delete", [=]{ on_buffer_delete(); });
 	event("buffer-make-movable", [=]{ on_buffer_make_movable(); });
 	event("buffer-compress", [=]{
-		auto dlg = ownify(new BufferCompressionDialog(this));
-		dlg->run();
-		if (dlg->codec == "")
-			return;
-		for (auto l: song->layers())
-			if (view->sel.has(l))
-				for (auto &buf: l->buffers)
-					if (buf.range().overlaps(view->sel.range())) {
-						shared<AudioBuffer::Compressed> comp = new AudioBuffer::Compressed;
-						comp->codec = dlg->codec;
-						comp->data = session->storage->compress(buf, comp->codec);
-						if (comp->data.num > 0) {
-							buf.compressed = comp;
-							l->notify();
+		auto dlg = new BufferCompressionDialog(this);
+		hui::fly(dlg, [dlg, this] {
+			if (dlg->codec == "")
+				return;
+			for (auto l: song->layers())
+				if (view->sel.has(l))
+					for (auto &buf: l->buffers)
+						if (buf.range().overlaps(view->sel.range())) {
+							shared<AudioBuffer::Compressed> comp = new AudioBuffer::Compressed;
+							comp->codec = dlg->codec;
+							comp->data = session->storage->compress(buf, comp->codec);
+							if (comp->data.num > 0) {
+								buf.compressed = comp;
+								l->notify();
+							}
 						}
-					}
+		});
 	});
 
 	event("edit-track-groups", [=] {
-		auto dlg = ownify(new TrackRoutingDialog(this, song));
-		dlg->run();
+		hui::fly(new TrackRoutingDialog(this, song));
 	});
 
 	event("track-midi-mode-linear", [=]{ on_layer_midi_mode_linear(); });
@@ -375,8 +375,7 @@ void TsunamiWindow::on_about() {
 }
 
 void TsunamiWindow::on_help() {
-	auto dlg = ownify(new HelpDialog(this));
-	dlg->run();
+	hui::fly(new HelpDialog(this));
 }
 
 void TsunamiWindow::on_add_audio_track_mono() {
@@ -388,8 +387,7 @@ void TsunamiWindow::on_add_audio_track_stereo() {
 }
 
 void TsunamiWindow::on_add_time_track() {
-	auto dlg = ownify(new TimeTrackAddDialog(song, this));
-	dlg->run();
+	hui::fly(new TimeTrackAddDialog(song, this));
 }
 
 void TsunamiWindow::on_import_backup() {
@@ -579,8 +577,7 @@ void TsunamiWindow::on_track_edit_fx() {
 void TsunamiWindow::on_track_add_marker() {
 	if (view->cur_track()) {
 		Range range = view->sel.range();
-		auto dlg = ownify(new MarkerDialog(this, view->cur_layer(), range, ""));
-		dlg->run();
+		hui::fly(new MarkerDialog(this, view->cur_layer(), range, ""));
 	} else {
 		session->e(_("No track selected"));
 	}
@@ -656,8 +653,7 @@ void TsunamiWindow::on_delete_marker() {
 
 void TsunamiWindow::on_edit_marker() {
 	if (view->cur_selection.marker) {
-		auto dlg = ownify(new MarkerDialog(this, view->cur_layer(), view->cur_selection.marker));
-		dlg->run();
+		hui::fly(new MarkerDialog(this, view->cur_layer(), view->cur_selection.marker));
 	} else {
 		session->e(_("No marker selected"));
 	}
@@ -784,93 +780,106 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 
 void TsunamiWindow::on_menu_execute_audio_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
-	int n_layers = 0;
 
-	auto fx = ownify(CreateAudioEffect(session, name));
+	auto fx = CreateAudioEffect(session, name);
+	msg_error("TODO...");
 
-	if (!configure_module(this, fx.get()))
-		return;
-	song->begin_action_group(_("apply audio fx"));
-	for (Track *t: weak(song->tracks))
-		for (auto *l: weak(t->layers))
-			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				fx_process_layer(l, view->sel.range(), fx.get(), this);
-				n_layers ++;
-			}
-	song->end_action_group();
-	
-	if (n_layers == 0)
-		session->e(_("no audio tracks selected"));
+	configure_module(this, fx, [this, fx] {
+		int n_layers = 0;
+		song->begin_action_group(_("apply audio fx"));
+		for (Track *t: weak(song->tracks))
+			for (auto *l: weak(t->layers))
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
+					fx_process_layer(l, view->sel.range(), fx, this);
+					n_layers ++;
+				}
+		song->end_action_group();
+
+		if (n_layers == 0)
+			session->e(_("no audio tracks selected"));
+		delete fx;
+	});
 }
 
 void TsunamiWindow::on_menu_execute_audio_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
-	int n_layers = 0;
 
-	auto s = ownify(CreateAudioSource(session, name));
+	auto s = CreateAudioSource(session, name);
 
-	if (!configure_module(this, s.get()))
-		return;
-	song->begin_action_group(_("audio source"));
-	for (Track *t: weak(song->tracks))
-		for (auto *l: weak(t->layers))
-			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				source_process_layer(l, view->sel.range(), s.get(), this);
-				n_layers ++;
-			}
-	song->end_action_group();
-	
-	if (n_layers == 0)
-		session->e(_("no audio tracks selected"));
+	configure_module(this, s, [s, this] {
+		int n_layers = 0;
+		song->begin_action_group(_("audio source"));
+		for (Track *t: weak(song->tracks))
+			for (auto *l: weak(t->layers))
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
+					source_process_layer(l, view->sel.range(), s, this);
+					n_layers ++;
+				}
+		song->end_action_group();
+
+		if (n_layers == 0)
+			session->e(_("no audio tracks selected"));
+		delete s;
+	}, [s] {
+		delete s;
+	});
 }
 
 void TsunamiWindow::on_menu_execute_midi_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
-	int n_layers = 0;
 
-	auto fx = ownify(CreateMidiEffect(session, name));
+	auto fx = CreateMidiEffect(session, name);
 
-	if (!configure_module(this, fx.get()))
-		return;
-	
-	song->begin_action_group(_("apply midi fx"));
-	for (Track *t: weak(song->tracks))
-		for (auto *l: weak(t->layers))
-			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-				fx->reset_state();
-				fx->process_layer(l, view->sel);
-				n_layers ++;
-			}
-	song->end_action_group();
-	
-	if (n_layers == 0)
-		session->e(_("no midi tracks selected"));
+	configure_module(this, fx, [fx, this] {
+		int n_layers = 0;
+
+		song->begin_action_group(_("apply midi fx"));
+		for (Track *t: weak(song->tracks))
+			for (auto *l: weak(t->layers))
+				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+					fx->reset_state();
+					fx->process_layer(l, view->sel);
+					n_layers ++;
+				}
+		song->end_action_group();
+
+		if (n_layers == 0)
+			session->e(_("no midi tracks selected"));
+
+		delete fx;
+	}, [fx] {
+		delete fx;
+	});
 }
 
 void TsunamiWindow::on_menu_execute_midi_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
-	int n_layers = 0;
 
-	auto s = ownify(CreateMidiSource(session, name));
+	auto s = CreateMidiSource(session, name);
 
-	if (!configure_module(this, s.get()))
-		return;
-	
-	song->begin_action_group(_("midi source"));
-	for (Track *t: weak(song->tracks))
-		for (auto *l: weak(t->layers))
-			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-				s->reset_state();
-				MidiEventBuffer buf;
-				buf.samples = view->sel.range().length;
-				s->read(buf);
-				l->insert_midi_data(view->sel.range().offset, midi_events_to_notes(buf));
-				n_layers ++;
-			}
-	song->end_action_group();
-	
-	if (n_layers == 0)
-		session->e(_("no midi tracks selected"));
+	configure_module(this, s, [s, this] {
+		int n_layers = 0;
+
+		song->begin_action_group(_("midi source"));
+		for (Track *t: weak(song->tracks))
+			for (auto *l: weak(t->layers))
+				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+					s->reset_state();
+					MidiEventBuffer buf;
+					buf.samples = view->sel.range().length;
+					s->read(buf);
+					l->insert_midi_data(view->sel.range().offset, midi_events_to_notes(buf));
+					n_layers ++;
+				}
+		song->end_action_group();
+
+		if (n_layers == 0)
+			session->e(_("no midi tracks selected"));
+
+		delete s;
+	}, [s] {
+		delete s;
+	});
 }
 
 void TsunamiWindow::on_menu_execute_song_plugin() {
@@ -930,8 +939,7 @@ void TsunamiWindow::on_command(const string & id) {
 }
 
 void TsunamiWindow::on_settings() {
-	auto dlg = ownify(new SettingsDialog(view, this));
-	dlg->run();
+	hui::fly(new SettingsDialog(view, this));
 }
 
 void TsunamiWindow::on_track_import() {
@@ -1145,8 +1153,7 @@ void TsunamiWindow::on_exit() {
 }
 
 void TsunamiWindow::on_new() {
-	auto dlg = ownify(new NewDialog(this));
-	dlg->run();
+	hui::fly(new NewDialog(this));
 }
 
 void TsunamiWindow::on_open() {
@@ -1271,18 +1278,15 @@ int pref_bar_index(AudioView *view) {
 }
 
 void TsunamiWindow::on_add_bars() {
-	auto dlg = ownify(new BarAddDialog(win, song, pref_bar_index(view)));
-	dlg->run();
+	hui::fly(new BarAddDialog(win, song, pref_bar_index(view)));
 }
 
 void TsunamiWindow::on_add_pause() {
-	auto dlg = ownify(new PauseAddDialog(win, song, pref_bar_index(view)));
-	dlg->run();
+	hui::fly(new PauseAddDialog(win, song, pref_bar_index(view)));
 }
 
 void TsunamiWindow::on_delete_bars() {
-	auto dlg = ownify(new BarDeleteDialog(win, song, view->sel.bar_indices(song)));
-	dlg->run();
+	hui::fly(new BarDeleteDialog(win, song, view->sel.bar_indices(song)));
 }
 
 void TsunamiWindow::on_delete_time_interval() {
@@ -1318,11 +1322,9 @@ void TsunamiWindow::on_edit_bars() {
 			num_bars++;
 	}
 	if (num_bars > 0 and num_pauses == 0) {
-		auto dlg = ownify(new BarEditDialog(win, song, view->sel.bar_indices(song)));
-		dlg->run();
+		hui::fly(new BarEditDialog(win, song, view->sel.bar_indices(song)));
 	} else if (num_bars == 0 and num_pauses == 1) {
-		auto dlg = ownify(new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]));
-		dlg->run();
+		hui::fly(new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]));
 	} else {
 		session->e(_("Can only edit bars or a single pause at a time."));
 	}

@@ -255,7 +255,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			auto *dlg = new hui::Window("", 800, 600);
 			dlg->add_grid("", 0, 0, "root");
 			dlg->embed(p, "root", 0,0);
-			dlg->run();
+			hui::fly(dlg);
 		} else {
 			msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
 		}

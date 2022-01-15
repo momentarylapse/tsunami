@@ -596,6 +596,5 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_add_key_change() {
-	auto dlg = ownify(new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::"));
-	dlg->run();
+	hui::fly(new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::"));
 }

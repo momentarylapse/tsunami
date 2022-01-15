@@ -31,13 +31,13 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win)
 	auto *p = new ModulePanel(track->synth.get(), nullptr, ModulePanel::Mode::DEFAULT_H);
 	//p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([=]{
-		string name = session->plugin_manager->choose_module(win, session, ModuleCategory::SYNTHESIZER, track->synth->module_class);
-		if (name != "")
-			track->set_synthesizer(CreateSynthesizer(session, name));
+		session->plugin_manager->choose_module(win, session, ModuleCategory::SYNTHESIZER, [track, session] (const string &name) {
+			if (name != "")
+				track->set_synthesizer(CreateSynthesizer(session, name));
+		}, track->synth->module_class);
 	});
 	p->set_func_detune([=]{
-		auto dlg = ownify(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win));
-		dlg->run();
+		hui::fly(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win));
 	});
 	return p;
 }
@@ -192,8 +192,7 @@ void TrackConsole::on_instrument() {
 }
 
 void TrackConsole::on_edit_tuning() {
-	auto dlg = ownify(new TuningDialog(win, track));
-	dlg->run();
+	hui::fly(new TuningDialog(win, track));
 }
 
 void TrackConsole::on_view_cur_track_change() {

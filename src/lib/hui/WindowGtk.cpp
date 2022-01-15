@@ -2,6 +2,7 @@
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
+#include "../base/pointer.h"
 #ifdef HUI_API_GTK
 
 
@@ -333,7 +334,54 @@ void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_dat
 	delete win;
 }
 
-void Window::run(const Callback &cb) {
+namespace WindowFlightManager {
+	static shared_array<Window> windows;
+	void add(Window *win) {
+		windows.add(win);
+	}
+	void remove(Window *win) {
+		for (int i=0; i<windows.num; i++)
+			if (windows[i] == win)
+				windows.erase(i);
+	}
+}
+
+void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user_data) {
+	auto win = reinterpret_cast<Window*>(user_data);
+	if (win->end_run_callback)
+		win->end_run_callback();
+	//gtk_window_destroy(GTK_WINDOW(self));
+	WindowFlightManager::remove(win);
+}
+
+void Window::_fly(Callback cb) {
+	show();
+	int uid = unique_id;
+	string last_id = "";
+
+	WindowFlightManager::add(win);
+
+
+#if GTK_CHECK_VERSION(4,0,0)
+	end_run_callback = cb;
+	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response_fly), this);
+	gtk_window_present(GTK_WINDOW(window));
+#else
+	// hmmmm, gtk_dialog_response() seems to be ignored here...?!?
+	/*if (get_parent()) {
+		msg_write("...dialog");
+		gtk_dialog_run(GTK_DIALOG(window));
+	} else {*/
+		while (!requested_destroy) {
+			Application::do_single_main_loop();
+			Sleep(0.005f);
+		}
+//	}
+	delete this;
+#endif
+}
+
+void Window::_run(Callback cb) {
 	show();
 	int uid = unique_id;
 	string last_id = "";
@@ -354,6 +402,14 @@ void Window::run(const Callback &cb) {
 		}
 //	}
 #endif
+}
+
+void fly(Window *win, Callback cb) {
+	win->_fly(cb);
+}
+
+void run(Window *win, Callback cb) {
+	win->_run(cb);
 }
 
 #if GTK_CHECK_VERSION(4,0,0)

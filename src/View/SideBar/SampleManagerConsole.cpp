@@ -269,8 +269,7 @@ void SampleManagerConsole::on_scale() {
 	for (Sample* s: sel) {
 		if (s->type != SignalType::AUDIO)
 			continue;
-		auto dlg = ownify(new SampleScaleDialog(parent->win, s));
-		dlg->run();
+		hui::fly(new SampleScaleDialog(parent->win, s));
 	}
 }
 
@@ -461,8 +460,9 @@ public:
 	string list_id;
 };
 
-Sample *SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old) {
-	auto s = ownify(new SampleSelector(session, parent, old));
-	s->run();
-	return s->selected;
+void SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old, std::function<void(Sample*)> cb) {
+	auto s = new SampleSelector(session, parent, old);
+	hui::fly(s, [s, cb] {
+		cb(s->selected);
+	});
 }

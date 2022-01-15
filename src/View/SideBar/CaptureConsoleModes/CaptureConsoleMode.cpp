@@ -72,8 +72,7 @@ void CaptureConsoleMode::update_data_from_items() {
 		if (c.id_mapper.num > 0 and c.channel_selector) {
 			cc->event(c.id_mapper, [&] {
 				//ModuleExternalDialog(c.channel_selector, cc);
-				auto dlg = ownify(new ChannelMapDialog(cc, c.channel_selector));
-				dlg->run();
+				hui::fly(new ChannelMapDialog(cc, c.channel_selector));
 			});
 		}
 		if (c.id_active.num > 0)

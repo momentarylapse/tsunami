@@ -9,6 +9,7 @@
 #define HUIPANEL_H_
 
 #include "hui.h"
+#include "../base/pointer.h"
 
 
 class Painter;
@@ -26,7 +27,7 @@ class EventKeyCode;
 class Control;
 class ControlRadioButton;
 
-class Panel : public EventHandler {
+class Panel : public Sharable<EventHandler> {
 	friend class Control;
 	friend class ControlRadioButton;
 	friend class Menu;

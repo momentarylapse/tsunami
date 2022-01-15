@@ -95,8 +95,7 @@ public:
 };
 
 void SendBugReport(Window *parent) {
-	auto dlg = new ReportDialog(parent);
-	dlg->run([dlg] { delete dlg; });
+	hui::fly(new ReportDialog(parent));
 }
 
 #endif
@@ -159,8 +158,7 @@ public:
 };
 
 void show_crash_window() {
-	auto dlg = new ErrorDialog;
-	dlg->run([dlg] { delete dlg; });
+	hui::fly(new ErrorDialog);
 }
 
 void hui_default_error_handler() {

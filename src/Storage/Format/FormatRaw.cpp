@@ -37,7 +37,7 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 
 
 	auto dlg = ownify(new RawConfigDialog(od, od->win));
-	dlg->run();
+	dlg->_run();
 	return dlg->ok;
 }
 

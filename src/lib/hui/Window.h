@@ -79,7 +79,8 @@ public:
 	void _cdecl request_destroy();
 
 	// the window
-	void _cdecl run(const Callback &cb = nullptr);
+	void _run(Callback cb = nullptr);
+	void _fly(Callback cb = nullptr);
 	void _cdecl show();
 	void _cdecl hide();
 	void _cdecl set_maximized(bool maximized);
@@ -217,6 +218,10 @@ public:
 	SourceWindow(const string &source, Window *parent);
 	void _cdecl __init_ext__(const string &source, Window *parent);
 };
+
+
+void run(Window *win, Callback cb = nullptr);
+void fly(Window *win, Callback cb = nullptr);
 
 
 

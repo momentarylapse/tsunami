@@ -28,6 +28,6 @@ public:
 };
 
 
-bool configure_module(hui::Window *win, Module *m);
+void configure_module(hui::Window *win, Module *m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
 
 #endif /* SRC_MODULE_CONFIGPANEL_H_ */

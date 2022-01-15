@@ -1,4 +1,4 @@
-project('tsunami', 'cpp', default_options : ['cpp_std=c++14', 'warning_level=1', 'optimization=2', 'debug=true'])
+project('tsunami', 'cpp', default_options : ['cpp_std=c++17', 'warning_level=1', 'optimization=2', 'debug=true'])
 add_project_arguments('-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])
 
 #install_data
@@ -10,13 +10,13 @@ cc = meson.get_compiler('cpp')
 # mandatory dependencies
 mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')
-gtk3dep = dependency('gtk+-3.0')
-add_project_arguments('-DHAS_LIB_GTK3=1', language : ['cpp'])
+gtk4dep = dependency('gtk-4.0')
+add_project_arguments('-DHAS_LIB_GTK4=1', language : ['cpp'])
 zlibdep = dependency('zlib')
 add_project_arguments('-DHAS_LIB_ZLIB=1', language : ['cpp'])
 fftw3dep = dependency('fftw3f')
 add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])
-deps = [mdep, threaddep, gtk3dep, zlibdep, fftw3dep]
+deps = [mdep, threaddep, gtk4dep, zlibdep, fftw3dep]
 
 # optional dependency: ogg
 d1 = cc.find_library('ogg', required : false)

@@ -179,8 +179,9 @@ public:
 	string selection;
 };
 
-string ProfileManager::select_name(hui::Window *win, Module *c, bool save) {
-	auto dlg = ownify(new FavoriteSelectionDialog(win, get_list(c), save));
-	dlg->run();
-	return dlg->selection;
+void ProfileManager::select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
+	auto dlg = new FavoriteSelectionDialog(win, get_list(c), save);
+	hui::fly(dlg, [dlg, cb] {
+		cb(dlg->selection);
+	});
 }

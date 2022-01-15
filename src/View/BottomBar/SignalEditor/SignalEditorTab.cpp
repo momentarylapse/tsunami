@@ -293,18 +293,20 @@ void SignalEditorTab::on_delete() {
 void SignalEditorTab::on_add(ModuleCategory type) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		string name = session->plugin_manager->choose_module(win, session, type);
-		if (name.num > 0) {
-			auto *m = chain->add(type, name);
-			m->module_x = graph->m.x;
-			m->module_y = graph->m.y;
-		}
+		session->plugin_manager->choose_module(win, session, type, [this, type] (const string &name) {
+			if (name.num > 0) {
+				auto *m = chain->add(type, name);
+				m->module_x = graph->m.x;
+				m->module_y = graph->m.y;
+			}
+			update_module_positions();
+		});
 	} else {
 		auto *m = chain->add(type);
 		m->module_x = graph->m.x;
 		m->module_y = graph->m.y;
+		update_module_positions();
 	}
-	update_module_positions();
 }
 
 void SignalEditorTab::on_reset() {

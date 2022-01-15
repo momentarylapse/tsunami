@@ -59,14 +59,14 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 		//set_options("grid", format("height=%d,expandy", CONFIG_PANEL_MIN_HEIGHT));
 	}
 
-	outer->event("enabled", [=]{ on_enabled(); });
-	outer->event("delete", [=]{ on_delete(); });
-	outer->event("load_favorite", [=]{ on_load(); });
-	outer->event("save_favorite", [=]{ on_save(); });
-	outer->event("show_large", [=]{ on_large(); });
-	outer->event("show_external", [=]{ on_external(); });
-	outer->event("replace", [=]{ on_replace(); });
-	outer->event("detune", [=]{ on_detune(); });
+	outer->event("enabled", [this] { on_enabled(); });
+	outer->event("delete", [this] { on_delete(); });
+	outer->event("load_favorite", [this] { on_load(); });
+	outer->event("save_favorite", [this] { on_save(); });
+	outer->event("show_large", [this] { on_large(); });
+	outer->event("show_external", [this] { on_external(); });
+	outer->event("replace", [this] { on_replace(); });
+	outer->event("detune", [this] { on_detune(); });
 
 	outer->hide_control("enabled", true);
 	outer->check("enabled", module->enabled);
@@ -79,8 +79,8 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	}
 
 	old_param = module->config_to_string();
-	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
-	module->subscribe(this, [=]{
+	module->subscribe(this, [this] { on_change(); }, module->MESSAGE_CHANGE);
+	module->subscribe(this, [this] {
 		module->unsubscribe(this);
 		module = nullptr;
 		delete p;
@@ -126,21 +126,23 @@ void ModulePanel::set_func_detune(std::function<void()> f) {
 }
 
 void ModulePanel::on_load() {
-	string name = session->plugin_manager->select_profile_name(win, module, false);
-	if (name.num == 0)
-		return;
-	session->plugin_manager->apply_profile(module, name, false);
-	module->changed();
-	//if (func_edit)
-	//	func_edit(old_param);
-	//old_param = module->config_to_string();
+	session->plugin_manager->select_profile_name(win, module, false, [this] (const string &name) {
+		if (name.num == 0)
+			return;
+		session->plugin_manager->apply_profile(module, name, false);
+		module->changed();
+		//if (func_edit)
+		//	func_edit(old_param);
+		//old_param = module->config_to_string();
+	});
 }
 
 void ModulePanel::on_save() {
-	string name = session->plugin_manager->select_profile_name(win, module, true);
-	if (name.num == 0)
-		return;
-	session->plugin_manager->save_profile(module, name);
+	session->plugin_manager->select_profile_name(win, module, true, [this] (const string &name) {
+		if (name.num == 0)
+			return;
+		session->plugin_manager->save_profile(module, name);
+	});
 }
 
 void ModulePanel::on_enabled() {
@@ -196,11 +198,11 @@ ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent)
 	set_size(CONFIG_PANEL_WIDTH, 300);
 	//m->set_options("grid", "expandx");
 	embed(module_panel, "content", 0, 0);
-	module->subscribe(this, [=]{
+	module->subscribe(this, [this] {
 		module = nullptr;
 		request_destroy();
 	}, module->MESSAGE_DELETE);
-	event("hui:close",[=] {
+	event("hui:close",[this] {
 		msg_write("deleting external dialog...soon");
 		hui::RunLater(0.01f, [=] {
 			msg_error("deleting external dialog...");

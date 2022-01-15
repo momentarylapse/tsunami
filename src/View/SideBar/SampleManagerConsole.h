@@ -67,7 +67,7 @@ public:
 	string id_list;
 	owned<hui::Menu> menu_samples;
 
-	static Sample *_cdecl select(Session *session, hui::Panel *parent, Sample *old);
+	static void _cdecl select(Session *session, hui::Panel *parent, Sample *old, std::function<void(Sample*)> cb);
 };
 
 #endif /* SAMPLEMANAGERCONSOLE_H_ */

@@ -907,8 +907,8 @@ void PluginManager::save_profile(Module *c, const string &name) {
 }
 
 
-string PluginManager::select_profile_name(hui::Window *win, Module *c, bool save) {
-	return profiles->select_name(win, c, save);
+void PluginManager::select_profile_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
+	profiles->select_name(win, c, save, cb);
 }
 
 // always push the script... even if an error occurred
@@ -1002,18 +1002,21 @@ Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) 
 	return find_module_sub_types(type);
 }
 
-string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, const string &old_name) {
+void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const string&)> cb, const string &old_name) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
-	if (names.num == 1)
-		return names[0];
-	if (names.num == 0)
-		return "";
+	if (names.num == 1) {
+		cb(names[0]);
+		return;
+	}
+	if (names.num == 0) {
+		cb("");
+		return;
+	}
 
 	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);
-	dlg->run();
-	string name = dlg->_return;
-	delete dlg;
-	return name;
+	hui::fly(dlg, [dlg, cb] {
+		cb(dlg->_return);
+	});
 }
 
 

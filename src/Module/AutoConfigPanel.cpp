@@ -299,14 +299,15 @@ public:
 		Sample *old = nullptr;
 		if (*value)
 			old = (*value)->origin.get();
-		Sample *s = SampleManagerConsole::select(session, panel, old);
-		if (s != old) {
-			*value = nullptr;
-			if (s)
-				*value = s->create_ref();
-			value_to_gui();
-			callback();
-		}
+		SampleManagerConsole::select(session, panel, old, [this, old] (Sample *s) {
+			if (s != old) {
+				*value = nullptr;
+				if (s)
+					*value = s->create_ref();
+				value_to_gui();
+				callback();
+			}
+		});
 	}
 	void value_from_gui() override {
 	}

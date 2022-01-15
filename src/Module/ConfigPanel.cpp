@@ -132,15 +132,19 @@ public:
 
 
 
-bool configure_module(hui::Window *win, Module *m) {
+void configure_module(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel) {
 	auto *config = m->get_config();
-	if (!config)
-		return true;
+	if (!config) {
+		cb();
+		return;
+	}
 
 	auto *dlg = new ConfigurationDialog(m, win);
-	dlg->run();
-	bool ok = dlg->ok;
-	delete dlg;
-	return ok;
+	hui::fly(dlg, [dlg, cb, cb_cancel] {;
+		if (dlg->ok)
+			cb();
+		else
+			cb_cancel();
+	});
 }
 

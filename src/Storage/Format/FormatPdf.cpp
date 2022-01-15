@@ -49,7 +49,7 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 		od->parameters.map_set("tracks", {});
 	
 	auto dlg = ownify(new PdfConfigDialog(od, od->win));
-	dlg->run();
+	dlg->_run();
 	return dlg->ok;
 }
 

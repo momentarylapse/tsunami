@@ -29,9 +29,9 @@ public:
 		song = _song;
 		for (Track *t: weak(song->tracks))
 			add_string("tracks", t->nice_name());
-		event("tracks", [=]{ on_select(); });
-		event("ok", [=]{ on_select(); });
-		event("cancel", [=]{ request_destroy(); });
+		event("tracks", [this] { on_select(); });
+		event("ok", [this] { on_select(); });
+		event("cancel", [this] { request_destroy(); });
 	}
 	void on_select() {
 		int n = get_int("");
@@ -54,24 +54,24 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, const str
 	if (hexpand)
 		module_panel_mode = ModulePanel::Mode::DEFAULT_H;
 	assert(track);
-	event_ids.add(panel->event_x(id_fx_list, "hui:select", [=]{ on_fx_select(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:change", [=]{ on_fx_edit(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:move", [=]{ on_fx_move(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:right-button-down", [=]{ on_fx_right_click(); }));
-	event_ids.add(panel->event("add-fx", [=]{ on_add_fx(); }));
-	event_ids.add(panel->event("fx-add", [=]{ on_add_fx(); }));
-	event_ids.add(panel->event("fx-delete", [=]{ on_fx_delete(); }));
-	event_ids.add(panel->event("fx-enabled", [=]{ on_fx_enabled(); }));
-	event_ids.add(panel->event("fx-copy-from-track", [=]{ on_fx_copy_from_track(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:select", [=]{ on_midi_fx_select(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:change", [=]{ on_midi_fx_edit(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:move", [=]{ on_midi_fx_move(); }));
-	event_ids.add(panel->event("add-midi-fx", [=]{ on_add_midi_fx(); }));
+	event_ids.add(panel->event_x(id_fx_list, "hui:select", [this] { on_fx_select(); }));
+	event_ids.add(panel->event_x(id_fx_list, "hui:change", [this] { on_fx_edit(); }));
+	event_ids.add(panel->event_x(id_fx_list, "hui:move", [this] { on_fx_move(); }));
+	event_ids.add(panel->event_x(id_fx_list, "hui:right-button-down", [this] { on_fx_right_click(); }));
+	event_ids.add(panel->event("add-fx", [this] { on_add_fx(); }));
+	event_ids.add(panel->event("fx-add", [this] { on_add_fx(); }));
+	event_ids.add(panel->event("fx-delete", [this] { on_fx_delete(); }));
+	event_ids.add(panel->event("fx-enabled", [this] { on_fx_enabled(); }));
+	event_ids.add(panel->event("fx-copy-from-track", [this] { on_fx_copy_from_track(); }));
+	event_ids.add(panel->event_x(id_midi_fx_list, "hui:select", [this] { on_midi_fx_select(); }));
+	event_ids.add(panel->event_x(id_midi_fx_list, "hui:change", [this] { on_midi_fx_edit(); }));
+	event_ids.add(panel->event_x(id_midi_fx_list, "hui:move", [this] { on_midi_fx_move(); }));
+	event_ids.add(panel->event("add-midi-fx", [this] { on_add_midi_fx(); }));
 
 
 	auto *song = track->song;
-	song->subscribe(this, [=]{ update(); }, song->MESSAGE_ENABLE_FX);
-	track->subscribe(this, [=]{ update(); }, track->MESSAGE_ANY);
+	song->subscribe(this, [this] { update(); }, song->MESSAGE_ENABLE_FX);
+	track->subscribe(this, [this] { update(); }, track->MESSAGE_ANY);
 
 	update();
 }
@@ -105,24 +105,24 @@ void FxListEditor::select_module(Module *m) {
 
 		if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
 			AudioEffect *fx = (AudioEffect*)m;
-			config_panel->set_func_enable([=](bool enabled) {
+			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_effect(fx, enabled);
 			});
-			config_panel->set_func_delete([=] {
+			config_panel->set_func_delete([this, fx] {
 				track->delete_effect(fx);
 			});
 		} else { // MIDI_EFFECT
 			MidiEffect *fx = (MidiEffect*)m;
-			config_panel->set_func_enable([=](bool enabled) {
+			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_midi_effect(fx, enabled);
 			});
-			config_panel->set_func_delete([=] {
+			config_panel->set_func_delete([this, fx] {
 				track->delete_midi_effect(fx);
 			});
 		}
 		panel->embed(config_panel.get(), config_grid_id, 0, 0);
 
-		m->subscribe(this, [=] {
+		m->subscribe(this, [this] {
 			select_module(nullptr);
 		}, m->MESSAGE_DELETE);
 	}
@@ -178,24 +178,26 @@ void FxListEditor::on_fx_enabled() {
 }
 
 void FxListEditor::on_fx_copy_from_track() {
-	auto dlg = ownify(new TrackSelectionDialog(panel->win, track->song));
-	dlg->run();
-	if (dlg->selected and dlg->selected != track) {
-		track->song->begin_action_group("copy fx from track");
-		foreachb (auto *fx, weak(track->fx))
-			track->delete_effect(fx);
-		for (auto *fx: weak(dlg->selected->fx))
-			track->add_effect((AudioEffect*)fx->copy());
-		track->song->end_action_group();
-	}
+	auto dlg = new TrackSelectionDialog(panel->win, track->song);
+	hui::fly(dlg, [this, dlg] {
+		if (dlg->selected and dlg->selected != track) {
+			track->song->begin_action_group("copy fx from track");
+			foreachb (auto *fx, weak(track->fx))
+				track->delete_effect(fx);
+			for (auto *fx: weak(dlg->selected->fx))
+				track->add_effect((AudioEffect*)fx->copy());
+			track->song->end_action_group();
+		}
+	});
 }
 
 void FxListEditor::on_add_fx() {
-	string name = session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT);
-	if (name == "")
-		return;
-	auto *effect = CreateAudioEffect(session(), name);
-	track->add_effect(effect);
+	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT, [this] (const string &name) {
+		if (name == "")
+			return;
+		auto *effect = CreateAudioEffect(session(), name);
+		track->add_effect(effect);
+	});
 }
 
 void FxListEditor::on_midi_fx_select() {
@@ -219,11 +221,12 @@ void FxListEditor::on_midi_fx_move() {
 }
 
 void FxListEditor::on_add_midi_fx() {
-	string name = session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::MIDI_EFFECT);
-	if (name == "")
-		return;
-	auto *effect = CreateMidiEffect(session(), name);
-	track->add_midi_effect(effect);
+	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::MIDI_EFFECT, [this] (const string &name) {
+		if (name == "")
+			return;
+		auto *effect = CreateMidiEffect(session(), name);
+		track->add_midi_effect(effect);
+	});
 }
 
 void FxListEditor::update_fx_list_selection() {

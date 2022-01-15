@@ -45,12 +45,12 @@ public:
 
 	void apply_profile(Module *c, const string &name, bool notify);
 	void save_profile(Module *c, const string &name);
-	string select_profile_name(hui::Window *win, Module *c, bool save);
+	void select_profile_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
 
 	Array<string> find_module_sub_types(ModuleCategory type);
 	Array<string> find_module_sub_types_grouped(ModuleCategory type);
 
-	static string choose_module(hui::Panel *parent, Session *session, ModuleCategory type, const string &old_name = "");
+	static void choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const string&)> cb, const string &old_name = "");
 
 
 	// not compiled yet

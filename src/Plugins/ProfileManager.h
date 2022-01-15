@@ -45,5 +45,5 @@ public:
 	void apply(Module *c, const string &name, bool notify);
 	void save(Module *c, const string &name);
 
-	string select_name(hui::Window *win, Module *c, bool save);
+	void select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
 };

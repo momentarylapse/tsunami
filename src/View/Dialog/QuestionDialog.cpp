@@ -35,8 +35,7 @@ QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &questio
 }
 
 void QuestionDialogInt::ask(hui::Window *parent, const string &question, std::function<void(int)> cb, const string &options) {
-	auto dlg = ownify(new QuestionDialogInt(parent, question, options, cb));
-	dlg->run();
+	hui::fly(new QuestionDialogInt(parent, question, options, cb));
 }
 
 
@@ -72,8 +71,7 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 }
 
 void QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options, std::function<void(int,int)> cb) {
-	auto dlg = ownify(new QuestionDialogIntInt(parent, question, labels, options, cb));
-	dlg->run();
+	hui::fly(new QuestionDialogIntInt(parent, question, labels, options, cb));
 }
 
 
@@ -102,9 +100,7 @@ QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, 
 }
 
 void QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb) {
-	int r = -1;
-	auto dlg = ownify(new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel, cb));
-	dlg->run();
+	hui::fly(new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel, cb));
 }
 
 

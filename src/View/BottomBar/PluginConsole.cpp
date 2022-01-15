@@ -18,10 +18,10 @@ PluginConsole::PluginConsole(Session *s) :
 	from_resource("plugin-console");
 	next_x = 0;
 
-	event("add", [=]{ on_add_button(); });
+	event("add", [this] { on_add_button(); });
 
-	session->subscribe(this, [=]{ on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
-	session->subscribe(this, [=]{ on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
+	session->subscribe(this, [this] { on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
+	session->subscribe(this, [this] { on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
 }
 
 PluginConsole::~PluginConsole() {
@@ -31,15 +31,16 @@ PluginConsole::~PluginConsole() {
 }
 
 void PluginConsole::on_add_button() {
-	string name = session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, "");
-	if (name != "")
-		session->execute_tsunami_plugin(name);
+	session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, [this] (const string &name) {
+		if (name != "")
+			session->execute_tsunami_plugin(name);
+	});
 }
 
 void PluginConsole::on_add_plugin() {
 	auto *plugin = session->last_plugin;
 	auto *p = new ModulePanel(plugin);
-	p->set_func_delete([=]{ plugin->stop_request(); });
+	p->set_func_delete([this, plugin] { plugin->stop_request(); });
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
 	hide_control("no-plugins-label", true);

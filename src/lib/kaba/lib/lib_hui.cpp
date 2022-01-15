@@ -383,7 +383,7 @@ void SIAddPackageHui() {
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
-		class_add_func("run", TypeVoid, hui_p(&hui::Window::run));
+		//class_add_func("run", TypeVoid, hui_p(&hui::Window::run));
 		class_add_func("destroy", TypeVoid, hui_p(&hui::Window::request_destroy));
 		class_add_func("show", TypeVoid, hui_p(&hui::Window::show));
 		class_add_func("hide", TypeVoid, hui_p(&hui::Window::hide));

@@ -13,6 +13,8 @@
 namespace hui
 {
 
+void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css);
+
 ControlLabel::ControlLabel(const string &title, const string &id) :
 	Control(CONTROL_LABEL, id)
 {
@@ -50,37 +52,37 @@ void ControlLabel::__set_string(const string &str) {
 }
 
 void ControlLabel::__set_option(const string &op, const string &value) {
-	if (op == "wrap"){
+	if (op == "wrap") {
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_label_set_wrap(GTK_LABEL(widget), true);
 #else
 		gtk_label_set_line_wrap(GTK_LABEL(widget), true);
 #endif
-	}else if (op == "center"){
+	} else if (op == "center") {
 #if GTK_CHECK_VERSION(3,16,0)
 		gtk_label_set_xalign(GTK_LABEL(widget), 0.5f);
 #else
 		gtk_misc_set_alignment(GTK_MISC(widget), 0.5f, 0.5f);
 #endif
-	}else if (op == "right"){
+	} else if (op == "right") {
 #if GTK_CHECK_VERSION(3,16,0)
 		gtk_label_set_xalign(GTK_LABEL(widget), 1);
 #else
 		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);
 #endif
-	}else if (op == "angle"){
+	} else if (op == "angle") {
 #if GTK_CHECK_VERSION(4,0,0)
-		msg_error("Label.angle in gtk4...");
+		set_style_for_widget(widget, id, format("{transform: rotate(%.1fdeg);}", value._float()));
 #else
 		gtk_label_set_angle(GTK_LABEL(widget), value._float());
 #endif
-	}else if (op == "bold"){
+	} else if (op == "bold") {
 		flag_bold = true;
-	}else if (op == "italic"){
+	} else if (op == "italic") {
 		flag_italic = true;
-	}else if (op == "underline"){
+	} else if (op == "underline") {
 		flag_underline = true;
-	}else if (op == "strikeout"){
+	} else if (op == "strikeout") {
 		flag_strikeout = true;
 	}
 }

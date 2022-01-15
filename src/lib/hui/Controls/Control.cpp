@@ -109,22 +109,6 @@ Control::~Control() {
 	DBDEL_DONE();
 }
 
-#ifdef HUI_API_WIN
-
-void Control::enable(bool _enabled) {
-}
-
-void Control::hide(bool hidden) {
-}
-
-void Control::setTooltip(const string& str) {
-}
-
-void Control::focus() {
-}
-
-#endif
-
 #ifdef HUI_API_GTK
 
 
@@ -183,29 +167,26 @@ Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
 }
 
 void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css) {
-#if GTK_CHECK_VERSION(4,0,0)
-#else
 	string css = "#" + id.replace(":", "") + _css;
 	//msg_write(css);
-	GError *error = nullptr;
 
 	auto *css_provider = gtk_css_provider_new();
+
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num);
+#else
+	GError *error = nullptr;
 	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num, &error);
 	if (error) {
 		msg_error(string("css: ") + error->message + " (" + css + ")");
 		return;
 	}
-
+#endif
 
 	auto *context = gtk_widget_get_style_context(widget);
 	gtk_style_context_add_provider(context,
-					                                GTK_STYLE_PROVIDER(css_provider),
-													GTK_STYLE_PROVIDER_PRIORITY_USER);
-	/*gtk_style_context_add_provider_for_screen
-	                               (gdk_screen_get_default(),
-	                                GTK_STYLE_PROVIDER(css_provider),
-									GTK_STYLE_PROVIDER_PRIORITY_USER);*/
-#endif
+			GTK_STYLE_PROVIDER(css_provider),
+			GTK_STYLE_PROVIDER_PRIORITY_USER);
 }
 
 Array<std::pair<string, string>> parse_options(const string &options) {
@@ -280,13 +261,13 @@ void Control::set_options(const string &options) {
 			grab_focus = false;
 			gtk_widget_set_can_focus(widget, false);
 		} else if (op == "big") {
-			set_style_for_widget(widget, id, "{font-size: 125%}");
+			set_style_for_widget(widget, id, "{font-size: 125%;}");
 			__set_option(op, val);
 		} else if (op == "huge") {
-			set_style_for_widget(widget, id, "{font-size: 150%}");
+			set_style_for_widget(widget, id, "{font-size: 150%;}");
 			__set_option(op, val);
 		} else if (op == "small") {
-			set_style_for_widget(widget, id, "{font-size: 75%}");
+			set_style_for_widget(widget, id, "{font-size: 75%;}");
 			__set_option(op, val);
 		} else if (op == "disabled") {
 			enable(false);
@@ -317,7 +298,7 @@ void Control::set_options(const string &options) {
 		} else if (op == "marginbottom") {
 			gtk_widget_set_margin_bottom(get_frame(), val._int());
 		} else if (op == "padding") {
-			set_style_for_widget(widget, id, format("{padding: %dpx}", val._int()));
+			set_style_for_widget(widget, id, format("{padding: %dpx;}", val._int()));
 		} else if ((op == "hgroup") or (op == "vgroup")) {
 			if (panel) {
 				auto g = get_size_group(panel, val, (op == "vgroup") ? 2 : 1);

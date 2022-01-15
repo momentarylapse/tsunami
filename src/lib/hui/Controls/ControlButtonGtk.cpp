@@ -66,7 +66,7 @@ void ControlButton::set_image(const string& str) {
 void ControlButton::__set_option(const string &op, const string &value) {
 	if (op == "flat") {
 #if GTK_CHECK_VERSION(4,0,0)
-		msg_error("Button.flat gtk4...");
+		gtk_button_set_has_frame(GTK_BUTTON(widget), false);
 #else
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 #endif

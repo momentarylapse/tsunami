@@ -29,7 +29,7 @@ public:
 	void on_enter() override;
 	void on_leave() override;
 
-	bool allow_close() override;
+	void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) override;
 
 	void on_start();
 	void on_dump();

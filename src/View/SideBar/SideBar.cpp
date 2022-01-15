@@ -85,9 +85,10 @@ void SideBar::add_console(SideBarConsole *c) {
 }
 
 void SideBar::on_close() {
-	if (allow_close())
+	test_allow_close([this] {
 		session->set_mode(EditMode::Default);
-	//_hide();
+		//_hide();
+	}, [] {});
 }
 
 void SideBar::_show() {
@@ -138,10 +139,12 @@ bool SideBar::is_active(int console) {
 	return (active_console == console) and visible;
 }
 
-bool SideBar::allow_close() {
-	if (!visible or active_console < 0)
-		return true;
-	return consoles[active_console]->allow_close();
+void SideBar::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
+	if (!visible or active_console < 0) {
+		cb_yes();
+		return;
+	}
+	consoles[active_console]->test_allow_close(cb_yes, cb_no);
 }
 
 

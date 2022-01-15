@@ -40,7 +40,7 @@ public:
 	void load_key_codes();
 
 	Session* create_session();
-	bool allow_termination();
+	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
 
 	shared_array<Session> sessions;
 

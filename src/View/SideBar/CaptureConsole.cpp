@@ -104,15 +104,19 @@ void CaptureConsole::on_leave() {
 	mode->leave();
 }
 
-bool CaptureConsole::allow_close() {
-	if (!has_data())
-		return true;
+void CaptureConsole::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
+	if (!has_data()) {
+		cb_yes();
+		return;
+	}
 
-	hui::question_box(win, _("Question"), _("Cancel recording?"), [this] (const string &answer) {
-		if (answer == "hui:yes") {}
-		session->e("answer.... ignored");
+	hui::question_box(win, _("Question"), _("Cancel recording?"), [this, cb_yes, cb_no] (const string &answer) {
+		if (answer == "hui:yes") {
+			cb_yes();
+		} else {
+			cb_no();
+		}
 	}, true);
-	return false;
 }
 
 

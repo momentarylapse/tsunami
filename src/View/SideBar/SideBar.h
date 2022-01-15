@@ -56,7 +56,7 @@ public:
 	int active_console;
 	bool visible;
 
-	bool allow_close();
+	void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no);
 
 	SongConsole *song_console;
 	TrackConsole *track_console;
@@ -87,7 +87,7 @@ public:
 	virtual void on_enter() {}
 	virtual void on_leave() {}
 	virtual void on_set_large(bool large) {}
-	virtual bool allow_close() { return true; }
+	virtual void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) { cb_yes(); }
 };
 
 #endif /* BOTTOMBAR_H_ */

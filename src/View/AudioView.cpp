@@ -796,8 +796,9 @@ void AudioView::on_key_down() {
 		if (mdp()->acting()) {
 			mdp()->cancel();
 		} else {
-			if (win->side_bar->allow_close())
+			win->side_bar->test_allow_close([this] {
 				session->set_mode(EditMode::Default);
+			}, [] {});
 		}
 	}
 	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT))

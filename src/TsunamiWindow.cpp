@@ -688,26 +688,31 @@ string title_filename(const Path &filename) {
 	return _("No name");
 }
 
-bool TsunamiWindow::allow_termination() {
-	if (!side_bar->allow_close())
-		return false;
-
-	if (song->action_manager->is_save())
-		return true;
-	hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), [this] (const string &answer) {
-		session->e("delayed choice...");
-		if (answer == "hui:yes") {
-			/*if (!OnSave())
-			 return false;*/
-			on_save();
-			//return true;
-		} else if (answer == "hui:no") {
-			//return true;
+void TsunamiWindow::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
+	side_bar->test_allow_close([this, cb_yes, cb_no] {
+		if (song->action_manager->is_save()) {
+			cb_yes();
+			return;
 		}
-	}, true);
 
-	// cancel
-	return false;
+		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)),
+				[this, cb_yes, cb_no] (const string &answer) {
+			if (answer == "hui:yes") {
+				on_save();
+				if (song->action_manager->is_save())
+					cb_yes();
+				else
+					cb_no();
+			} else if (answer == "hui:no") {
+				cb_yes();
+			} else {
+				// cancel
+				cb_no();
+			}
+		}, true);
+	}, [cb_no] {
+		cb_no();
+	});
 }
 
 void TsunamiWindow::on_copy() {
@@ -1132,11 +1137,11 @@ void TsunamiWindow::on_update() {
 }
 
 void TsunamiWindow::on_exit() {
-	if (allow_termination()) {
+	test_allow_termination([this] {
 		BackupManager::set_save_state(session);
 		//request_destroy();
 		hui::RunLater(0.01f, [=]{ session->win = nullptr; });
-	}
+	}, [] {});
 }
 
 void TsunamiWindow::on_new() {

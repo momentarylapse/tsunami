@@ -124,8 +124,7 @@ public:
 	void on_menu_execute_tsunami_plugin();
 	void on_exit();
 
-	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
-	bool allow_termination();
+	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
 	bool save();
 
 	void update_menu();

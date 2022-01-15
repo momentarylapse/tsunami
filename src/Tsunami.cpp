@@ -296,11 +296,20 @@ Session* Tsunami::create_session() {
 void Tsunami::load_key_codes() {
 }
 
-bool Tsunami::allow_termination() {
-	for (auto *s: weak(sessions))
-		if (!s->win->allow_termination())
-			return false;
-	return true;
+
+void Tsunami::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
+	bool allowed = true;
+
+	for (auto *s: weak(sessions)) {
+		s->win->test_allow_termination([] {}, [&allowed] { allowed = false; });
+		if (!allowed)
+			break;
+	}
+
+	if (allowed)
+		cb_yes();
+	else
+		cb_no();
 }
 
 HUI_EXECUTE(Tsunami);

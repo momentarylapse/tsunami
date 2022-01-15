@@ -233,7 +233,7 @@ bool Storage::render_export_selection(Song *song, const SongSelection &sel, cons
 	return save_via_renderer(renderer.port_out[0], filename, renderer.get_num_samples(), song->tags);
 }
 
-bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags) {
+void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, const hui::FileDialogCallback &cb, const Array<string> &opt) {
 	string filter, filter_show;
 	filter_show = _("all known files");
 	bool first = true;
@@ -265,26 +265,28 @@ bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags) {
 			}
 			filter_show += ")";
 		}
+	Array<string> opts = {"title=" + title, "filter=" + filter, "showfilter=" + filter_show};
+	opts.append(opt);
 	if (flags & FormatDescriptor::Flag::WRITE)
-		return hui::FileDialogSave(win, title, current_directory, filter_show, filter);
+		return hui::file_dialog_save(win, current_directory, opts, cb);
 	else
-		return hui::FileDialogOpen(win, title, current_directory, filter_show, filter);
+		return hui::file_dialog_open(win, current_directory, opts, cb);
 }
 
-bool Storage::ask_open(hui::Window *win) {
-	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ);
+void Storage::ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
+	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ, cb, opt);
 }
 
-bool Storage::ask_save(hui::Window *win) {
-	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE);
+void Storage::ask_save(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
+	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE, cb, opt);
 }
 
-bool Storage::ask_open_import(hui::Window *win) {
-	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ);
+void Storage::ask_open_import(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
+	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ, cb, opt);
 }
 
-bool Storage::ask_save_render_export(hui::Window *win) {
-	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
+void Storage::ask_save_render_export(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
+	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE, cb, opt);
 }
 
 

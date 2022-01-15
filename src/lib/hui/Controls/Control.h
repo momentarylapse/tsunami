@@ -110,6 +110,8 @@ public:
 
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 
+	void _set_css(const string &css);
+
 private:
 	int min_width, min_height;
 };

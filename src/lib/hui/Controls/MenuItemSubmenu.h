@@ -15,13 +15,13 @@ namespace hui
 
 class Menu;
 
-class MenuItemSubmenu : public Control
-{
+class MenuItemSubmenu : public Control {
 public:
 	MenuItemSubmenu(const string &title, Menu *menu, const string &id);
 	virtual ~MenuItemSubmenu();
 
 	Menu *sub_menu;
+	GMenuItem *item;
 };
 
 };

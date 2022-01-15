@@ -10,15 +10,17 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class MenuItem : public Control
-{
+class MenuItem : public Control {
 public:
 	MenuItem(const string &title, const string &id);
 
 	void set_image(const string &image) override;
+
+#if GTK_CHECK_VERSION(4,0,0)
+	GMenuItem *item;
+#endif
 };
 
 };

@@ -49,8 +49,21 @@ void get_style_colors(Panel *p, const string &id, Map<string,color> &colors) {
 	}
 }
 
+#if GTK_CHECK_VERSION(4,0,0)
 
+void on_gtk_area_draw (GtkDrawingArea* drawing_area, cairo_t* cr, int width, int height, gpointer user_data) {
+	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
+	//std::lock_guard<std::mutex> lock(da->mutex);
+	da->cur_cairo = cr;
+	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
+#if STUPID_HACK
+	da->redraw_area.clear();
+#endif
+	da->notify(EventID::DRAW);
+	//msg_write("/draw " + da->id);
+}
 
+#else
 gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
@@ -66,8 +79,16 @@ gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 	return false;
 }
 
+#endif
+
+
+
 int get_screen_scale(GtkWidget *w) {
+#if GTK_CHECK_VERSION(4,0,0)
+	return 1;
+#else
 	return gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(w)));
+#endif
 }
 
 gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data) {
@@ -153,6 +174,49 @@ void win_set_input(Window *win, T *event) {
 	win->input.just_focused = false;
 }
 
+
+
+int decode_gtk_keyval(int keyval) {
+	for (int i=0; i<NUM_KEYS; i++)
+		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
+		if (HuiKeyID[i] == keyval)
+			return i;
+	for (int i=0; i<26; i++)
+		if (keyval == 'A' + i)
+			return KEY_A + i;
+	return -1;
+}
+
+void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
+
+
+	Event::_text = utf32_to_utf8({(int)gdk_keyval_to_unicode(keyval)});
+
+	// yes, gtk3 has a direct event->keyval, but we need the "basic" key (without modifiers)
+
+	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
+	// convert GDK keyvalue into HUI key id
+	key = decode_gtk_keyval(keyval);
+	key_code = key;
+	if (key < 0)
+		return;
+
+
+	// key code?
+	if ((mod & GDK_CONTROL_MASK) > 0)
+		key_code += KEY_CONTROL;
+	if ((mod & GDK_SHIFT_MASK) > 0)
+		key_code += KEY_SHIFT;
+#if GTK_CHECK_VERSION(4,0,0)
+	if ((mod & GDK_META_MASK) > 0)
+		key_code += KEY_ALT;
+#else
+	if (((mod & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)
+		key_code += KEY_ALT;
+#endif
+}
+
+#if !GTK_CHECK_VERSION(4,0,0)
 template<class T>
 void win_set_input_more(Window *win, T *event) {
 	auto dev = gdk_event_get_source_device((GdkEvent*)event);
@@ -283,41 +347,6 @@ gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpoin
 	return false;
 }
 
-int decode_gtk_keyval(int keyval) {
-	for (int i=0; i<NUM_KEYS; i++)
-		//if ((HuiKeyID[i] == keyvalue)or(HuiKeyID2[i] == keyvalue))
-		if (HuiKeyID[i] == keyval)
-			return i;
-	for (int i=0; i<26; i++)
-		if (keyval == 'A' + i)
-			return KEY_A + i;
-	return -1;
-}
-
-void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
-
-
-	Event::_text = utf32_to_utf8({(int)gdk_keyval_to_unicode(keyval)});
-
-	// yes, gtk3 has a direct event->keyval, but we need the "basic" key (without modifiers)
-
-	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
-	// convert GDK keyvalue into HUI key id
-	key = decode_gtk_keyval(keyval);
-	key_code = key;
-	if (key < 0)
-		return;
-
-
-	// key code?
-	if ((mod & GDK_CONTROL_MASK) > 0)
-		key_code += KEY_CONTROL;
-	if ((mod & GDK_SHIFT_MASK) > 0)
-		key_code += KEY_SHIFT;
-	if (((mod & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)
-		key_code += KEY_ALT;
-}
-
 void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code) {
 
 	// convert hardware keycode into GDK keyvalue
@@ -377,6 +406,9 @@ gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer us
 gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
 	return area_process_key(event, (Control*)user_data, false);
 }
+#endif
+
+
 
 void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
@@ -397,7 +429,7 @@ void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, doubl
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
 	win_set_modifier_keys(c->panel->win);
 #if GTK_CHECK_VERSION(4,0,0)
-	auto mod = gtk_event_controller_get_current_event_state(controller);
+	auto mod = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(controller));
 	c->panel->win->input.lb = (mod & GDK_BUTTON1_MASK);
 	c->panel->win->input.mb = (mod & GDK_BUTTON2_MASK);
 	c->panel->win->input.rb = (mod & GDK_BUTTON3_MASK);
@@ -405,18 +437,15 @@ void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, doubl
 	c->notify(EventID::MOUSE_MOVE, false);
 }
 
-// ignored by gtk???
+
 void on_gtk_motion_enter(GtkEventControllerMotion *controller, double x, double y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
-	msg_write("ENTER NEW");
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
 	c->notify(EventID::MOUSE_ENTER, false);
 }
 
-// ignored by gtk???
 void on_gtk_motion_leave(GtkEventControllerMotion *controller, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
-	msg_write("LEAVE");
 	c->notify(EventID::MOUSE_LEAVE, false);
 }
 
@@ -494,8 +523,45 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 		g_signal_connect(G_OBJECT(da), "render", G_CALLBACK(on_gtk_gl_area_render), this);
 	} else {
 		da = gtk_drawing_area_new();
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(da), on_gtk_area_draw, this, nullptr);
+		gtk_widget_set_sensitive(da, true);
+		msg_write(b2s(gtk_widget_get_can_focus(da)));
+		g_object_set(G_OBJECT(da), "can-focus", true, nullptr);
+		msg_write(b2s(gtk_widget_get_can_focus(da)));
+		gtk_widget_set_can_focus(da, true);
+		msg_write(b2s(gtk_widget_get_can_focus(da)));
+#else
 		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(on_gtk_area_draw), this);
+#endif
 	}
+
+#if GTK_CHECK_VERSION(4,0,0)
+	// keys
+	auto handler_key = gtk_event_controller_key_new();
+	gtk_widget_add_controller(da, handler_key);
+	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
+	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
+
+	// click
+	auto gesture_click = gtk_gesture_click_new();
+	gtk_widget_add_controller(da, GTK_EVENT_CONTROLLER(gesture_click));
+	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
+
+
+	// scroll
+	auto handler_scroll = gtk_event_controller_scroll_new(GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
+	gtk_widget_add_controller(da, handler_scroll);
+	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
+
+	// motion
+	auto handler_motion = gtk_event_controller_motion_new();
+	gtk_widget_add_controller(da, handler_motion);
+	g_signal_connect(G_OBJECT(handler_motion), "motion", G_CALLBACK(&on_gtk_gesture_motion), this);
+	// somehow getting ignored?
+	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
+	g_signal_connect(G_OBJECT(handler_motion), "leave", G_CALLBACK(&on_gtk_motion_leave), this);
+#else
 	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
 	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
@@ -518,23 +584,24 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	gtk_widget_add_events(da, GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
 	gtk_widget_add_events(da, GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK);
 	gtk_widget_add_events(da, GDK_SMOOTH_SCROLL_MASK | GDK_TOUCHPAD_GESTURE_MASK);
+
 	//mask = GDK_ALL_EVENTS_MASK;
 //	g_object_set(G_OBJECT(da), "events", mask, NULL);
 
+	// key
 #if GTK_CHECK_VERSION(3,24,0)
 	auto handler_key = gtk_event_controller_key_new(da);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_key);
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
-	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_key);
-	//gtk_widget_add_controller
 #endif
 
-#if GTK_CHECK_VERSION(4,0,0)
-	auto gesture_click = gtk_gesture_click_new(da);
-	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
-	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, gesture_click);
-#endif
+	// scroll
+	auto handler_scroll = gtk_event_controller_scroll_new(da, GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
+	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_scroll);
+	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
 
+	// motion
 #if GTK_CHECK_VERSION(3,24,0)
 	auto handler_motion = gtk_event_controller_motion_new(da);
 	g_signal_connect(G_OBJECT(handler_motion), "motion", G_CALLBACK(&on_gtk_gesture_motion), this);
@@ -542,14 +609,13 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
 	g_signal_connect(G_OBJECT(handler_motion), "leave", G_CALLBACK(&on_gtk_motion_leave), this);
 	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_motion);
+#endif
+#endif
 
-	auto handler_scroll = gtk_event_controller_scroll_new(da, GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
-	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
-	g_object_weak_ref(G_OBJECT(da), (GWeakNotify)g_object_unref, handler_scroll);
+
 
 ///	auto handler_drag = gtk_gesture_drag_new(da);
 ///	g_signal_connect(G_OBJECT(handler_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
-#endif
 
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);
@@ -567,7 +633,7 @@ ControlDrawingArea::~ControlDrawingArea() {
 #endif
 
 	// clean-up list later
-	hui::RunLater(10, [=,this]{ _recently_deleted_areas.erase(this); });
+	hui::RunLater(10, [this]{ _recently_deleted_areas.erase(this); });
 }
 
 void ControlDrawingArea::make_current() {
@@ -597,16 +663,23 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 		make_current();
 	} else if (op == "gesture") {
 		if (value == "zoom") {
+#if GTK_CHECK_VERSION(4,0,0)
+			auto gesture_zoom = gtk_gesture_zoom_new();
+			gtk_widget_add_controller(widget, GTK_EVENT_CONTROLLER(gesture_zoom));
+#else
 			auto gesture_zoom = gtk_gesture_zoom_new(widget);
+#endif
 			gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER (gesture_zoom), GTK_PHASE_TARGET);
 			g_signal_connect(G_OBJECT(gesture_zoom), "scale-changed", G_CALLBACK(&on_gtk_gesture_zoom), this);
 			g_signal_connect(G_OBJECT(gesture_zoom), "begin", G_CALLBACK(&on_gtk_gesture_zoom_begin), this);
 			g_signal_connect(G_OBJECT(gesture_zoom), "end", G_CALLBACK(&on_gtk_gesture_zoom_end), this);
 		}
 	} else if (op == "noeventcompression") {
-		hui::RunLater(0.01f, [=,this] {
+#if !GTK_CHECK_VERSION(4,0,0)
+		hui::RunLater(0.01f, [this] {
 			gdk_window_set_event_compression(GDK_WINDOW(gtk_widget_get_window(widget)), false);
 		});
+#endif
 	}
 }
 
@@ -620,7 +693,7 @@ void ControlDrawingArea::redraw()
 	// non
 	if (std::this_thread::get_id() != main_thread_id){
 		//printf("readraw from other thread...redirect\n");
-		hui::RunLater(0, [=,this]{ redraw(); });
+		hui::RunLater(0, [this]{ redraw(); });
 		return;
 	}
 
@@ -700,7 +773,11 @@ void ControlDrawingArea::redraw_partial(const rect &r)
 		return;
 	}
 
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_queue_draw(widget);
+#else
 	gtk_widget_queue_draw_area(widget, (int)r.x1, (int)r.y1, (int)r.width(), (int)r.height());
+#endif
 #endif
 }
 

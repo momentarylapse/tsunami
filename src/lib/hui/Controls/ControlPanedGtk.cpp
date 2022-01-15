@@ -23,10 +23,17 @@ ControlPaned::ControlPaned(const string &title, const string &id) :
 }
 
 void ControlPaned::add(Control *child, int x, int y) {
+#if GTK_CHECK_VERSION(4,0,0)
+	if (x == 0 and y == 0)
+		gtk_paned_set_start_child(GTK_PANED(widget), child->get_frame());
+	else
+		gtk_paned_set_end_child(GTK_PANED(widget), child->get_frame());
+#else
 	if (x == 0 and y == 0)
 		gtk_paned_add1(GTK_PANED(widget), child->get_frame());
 	else
 		gtk_paned_add2(GTK_PANED(widget), child->get_frame());
+#endif
 }
 
 int ControlPaned::get_int() {

@@ -209,8 +209,10 @@ void SettingsDialog::on_high_details() {
 }
 
 void SettingsDialog::on_qed_find() {
-	if (hui::FileDialogDir(this, _("Quick export directory"), "")) {
-		hui::Config.set_str("QuickExportDir", hui::Filename.str());
-		set_string("quick_export_dir", hui::Filename.str());
-	}
+	hui::file_dialog_dir(this, "", {"title=" + _("Quick export directory")}, [this] (const Path &dir) {
+		if (dir) {
+			hui::Config.set_str("QuickExportDir", dir.str());
+			set_string("quick_export_dir", dir.str());
+		}
+	});
 }

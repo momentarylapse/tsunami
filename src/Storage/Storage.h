@@ -37,12 +37,12 @@ public:
 	bool _cdecl render_export_selection(Song *song, const SongSelection &sel, const Path &filename);
 	bool _cdecl save(Song *song, const Path &filename);
 
-	bool _cdecl ask_by_flags(hui::Window *win, const string &title, int flags);
+	void _cdecl ask_by_flags(hui::Window *win, const string &title, int flags, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
 
-	bool _cdecl ask_open(hui::Window *win);
-	bool _cdecl ask_save(hui::Window *win);
-	bool _cdecl ask_open_import(hui::Window *win);
-	bool _cdecl ask_save_render_export(hui::Window *win);
+	void _cdecl ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
+	void _cdecl ask_save(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
+	void _cdecl ask_open_import(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
+	void _cdecl ask_save_render_export(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
 
 	FormatDescriptor *get_format(const string &ext, int flags);
 

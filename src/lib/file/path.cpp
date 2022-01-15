@@ -90,6 +90,10 @@ bool Path::operator >(const Path &p) const {
 	return compare(p) > 0;
 }
 
+Path::operator bool() const {
+	return !is_empty();
+}
+
 
 // transposes path-strings to the current operating system
 // accepts windows and linux paths ("/" and "\\")

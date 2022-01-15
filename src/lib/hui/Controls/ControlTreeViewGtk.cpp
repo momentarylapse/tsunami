@@ -13,8 +13,6 @@
 namespace hui
 {
 
-void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpointer data);
-void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, const gchar *new_text, gpointer data);
 Array<GType> CreateTypeList(const string &_format, int size);
 void configure_tree_view_columns(Control *c, GtkWidget *view, const string &_format, const Array<string> &parts);
 void on_gtk_list_activate(GtkWidget *widget, void* a, void* b, gpointer data);
@@ -28,7 +26,11 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 	auto parts = split_title(title);
 	string fmt = option_value(get_option_from_title(title), "format");
 
+#if GTK_CHECK_VERSION(4,0,0)
+	GtkWidget *sw = gtk_scrolled_window_new();
+#else
 	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
+#endif
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	// "model"
@@ -47,9 +49,17 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 	frame = sw;
 	if (panel->border_width > 0) {
 		frame = gtk_frame_new(nullptr);
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_frame_set_child(GTK_FRAME(frame), sw);
+#else
 		gtk_container_add(GTK_CONTAINER(frame), sw);
+#endif
 	}
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), view);
+#else
 	gtk_container_add(GTK_CONTAINER(sw), view);
+#endif
 	gtk_widget_show(sw);
 
 	widget = view;

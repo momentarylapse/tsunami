@@ -15,6 +15,8 @@ namespace hui
 // for unique window identifiers
 static int current_uid = 0;
 
+string get_gtk_action_name(const string &id, bool with_scope);
+
 Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
@@ -126,17 +128,6 @@ void Panel::remove_event_handler(int event_handler_id) {
 	for (int i=event_listeners.num-1; i>=0; i--)
 		if (event_listeners[i].uid == event_handler_id)
 			event_listeners.erase(i);
-}
-
-void Panel::set_key_code(const string &id, int key_code, const string &image) {
-	// make sure, each id has only 1 code
-	//   (multiple ids may have the same code)
-	for (auto &e: event_key_codes)
-		if (e.id == id) {
-			e.key_code = key_code;
-			return;
-		}
-	event_key_codes.add(EventKeyCode(id, "", key_code));
 }
 
 bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
@@ -560,6 +551,15 @@ color Panel::get_color(const string &_id) {
 //    for all
 void Panel::enable(const string &_id,bool enabled) {
 	apply_foreach(_id, [=](Control *c) { c->enable(enabled); });
+#if GTK_CHECK_VERSION(4,0,0)
+	if (win) {
+		if (win->action_group) {
+			auto a = g_action_map_lookup_action(G_ACTION_MAP(win->action_group), get_gtk_action_name(_id, false).c_str());
+			if (a)
+				g_simple_action_set_enabled(G_SIMPLE_ACTION(a), enabled);
+		}
+	}
+#endif
 }
 
 // show/hide control

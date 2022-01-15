@@ -459,10 +459,10 @@ void SIAddPackageMath() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaVector<vec2>::init2);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
-		class_add_const("0", TypeVector, &vec2::ZERO);
-		class_add_const("O", TypeVector, &vec2::ZERO);
-		class_add_const("EX", TypeVector, &vec2::EX);
-		class_add_const("EY", TypeVector, &vec2::EY);
+		class_add_const("0", TypeVec2, &vec2::ZERO);
+		class_add_const("O", TypeVec2, &vec2::ZERO);
+		class_add_const("EX", TypeVec2, &vec2::EX);
+		class_add_const("EY", TypeVec2, &vec2::EY);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVec2, TypeVec2, InlineID::CHUNK_ASSIGN, &KabaVector<vec2>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeVec2, TypeVec2, InlineID::CHUNK_EQUAL, &vec2::operator==);
 		add_operator(OperatorID::ADD, TypeVec2, TypeVec2, TypeVec2, InlineID::VEC2_ADD, &vec2::operator+);

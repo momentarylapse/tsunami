@@ -23,7 +23,11 @@ ControlComboBox::ControlComboBox(const string &title, const string &id) :
 	editable = option_has(get_option_from_title(title), "editable");
 	if (editable) {
 		widget = gtk_combo_box_text_new_with_entry();
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_entry_set_activates_default(GTK_ENTRY(gtk_combo_box_get_child(GTK_COMBO_BOX(widget))), true);
+#else
 		gtk_entry_set_activates_default(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(widget))), true);
+#endif
 	} else {
 		widget = gtk_combo_box_text_new();
 	}
@@ -45,7 +49,11 @@ string ControlComboBox::get_string() {
 
 void ControlComboBox::__set_string(const string &str) {
 	if (editable) {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_editable_set_text(GTK_EDITABLE(gtk_combo_box_get_child(GTK_COMBO_BOX(widget))), sys_str(str));
+#else
 		gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(widget))), sys_str(str));
+#endif
 	} else {
 		__add_string(str);
 		//gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget),sys_str(str));

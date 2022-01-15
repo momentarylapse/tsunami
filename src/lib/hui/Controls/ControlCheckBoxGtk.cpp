@@ -41,7 +41,11 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 		//g_signal_connect(G_OBJECT(widget), "state-set", G_CALLBACK(&on_gtk_switch_clicked2), this);
 	} else {
 		widget = gtk_check_button_new_with_label(sys_str(parts[0]));
+#if GTK_CHECK_VERSION(4,0,0)
+		g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&on_gtk_checkbox_clicked), this);
+#else
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_checkbox_clicked), this);
+#endif
 	}
 }
 
@@ -58,17 +62,27 @@ void ControlCheckBox::__set_string(const string &str) {
 }
 
 void ControlCheckBox::__check(bool checked) {
-	if (is_switch)
+	if (is_switch) {
 		gtk_switch_set_active(GTK_SWITCH(widget), checked);
-	else
+	} else {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_check_button_set_active(GTK_CHECK_BUTTON(widget), checked);
+#else
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), checked);
+#endif
+	}
 }
 
 bool ControlCheckBox::is_checked() {
-	if (is_switch)
+	if (is_switch) {
 		return gtk_switch_get_active(GTK_SWITCH(widget));
-	else
+	} else {
+#if GTK_CHECK_VERSION(4,0,0)
+		return gtk_check_button_get_active(GTK_CHECK_BUTTON(widget));
+#else
 		return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+#endif
+	}
 }
 
 };

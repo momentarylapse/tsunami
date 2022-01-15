@@ -35,7 +35,11 @@ ControlRevealer::ControlRevealer(const string &title, const string &id) :
 
 void ControlRevealer::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_revealer_set_child(GTK_REVEALER(widget), child_widget);
+#else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
+#endif
 	children.add(child);
 	child->parent = this;
 }

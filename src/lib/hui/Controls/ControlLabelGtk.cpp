@@ -51,7 +51,11 @@ void ControlLabel::__set_string(const string &str) {
 
 void ControlLabel::__set_option(const string &op, const string &value) {
 	if (op == "wrap"){
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_label_set_wrap(GTK_LABEL(widget), true);
+#else
 		gtk_label_set_line_wrap(GTK_LABEL(widget), true);
+#endif
 	}else if (op == "center"){
 #if GTK_CHECK_VERSION(3,16,0)
 		gtk_label_set_xalign(GTK_LABEL(widget), 0.5f);
@@ -65,7 +69,11 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);
 #endif
 	}else if (op == "angle"){
+#if GTK_CHECK_VERSION(4,0,0)
+		msg_error("Label.angle in gtk4...");
+#else
 		gtk_label_set_angle(GTK_LABEL(widget), value._float());
+#endif
 	}else if (op == "bold"){
 		flag_bold = true;
 	}else if (op == "italic"){

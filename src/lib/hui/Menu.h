@@ -19,8 +19,7 @@ class Menu;
 class Control;
 
 
-class Menu : public VirtualBase
-{
+class Menu : public VirtualBase {
 public:
 	Menu();
 	~Menu();
@@ -47,12 +46,13 @@ public:
 #ifdef HUI_API_GTK
 	void gtk_realize();
 	void gtk_unrealize();
+#if GTK_CHECK_VERSION(4,0,0)
+	GMenu *gmenu;
+#else
 	GtkWidget* widget;
 #endif
-
-#ifdef HUI_API_WIN
-	HMENU hMenu;
 #endif
+
 	Array<Control*> items;
 	Panel *panel;
 

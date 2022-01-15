@@ -75,9 +75,9 @@ public:
 		add_button("!default,\\" + _("Ok"), 0, 1 ,"ok");
 		set_image("ok", "hui:ok");
 
-		event("ok", [=,this]{ on_ok(); });
-		event("cancel", [=,this]{ request_destroy(); });
-		event("hui:close", [=,this]{ request_destroy(); });
+		event("ok", [this]{ on_ok(); });
+		event("cancel", [this]{ request_destroy(); });
+		event("hui:close", [this]{ request_destroy(); });
 	}
 
 	void on_ok() {
@@ -86,9 +86,9 @@ public:
 		string return_msg;
 		try {
 			NetSendBugReport(sender, Application::get_property("name"), Application::get_property("version"), comment);
-			InfoBox(nullptr, "ok", return_msg);
+			info_box(nullptr, "ok", return_msg);
 		} catch (Exception &e) {
-			ErrorBox(nullptr, "error", e.message());
+			error_box(nullptr, "error", e.message());
 		}
 		request_destroy();
 	}
@@ -96,8 +96,7 @@ public:
 
 void SendBugReport(Window *parent) {
 	auto dlg = new ReportDialog(parent);
-	dlg->run();
-	delete dlg;
+	dlg->run([dlg] { delete dlg; });
 }
 
 #endif
@@ -129,7 +128,7 @@ public:
 		set_info_text(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), {"error"});
 
 	#ifdef _X_USE_NET_
-		event("send-report", [=,this] {
+		event("send-report", [this] {
 			SendBugReport(this);
 		});
 	#else
@@ -147,13 +146,13 @@ public:
 		}
 		set_int("message-list", n-1);
 
-		event("show-log", [=,this] {
+		event("show-log", [] {
 			OpenDocument("message.txt");
 		});
-		event("hui:win_close", [=,this] {
+		event("hui:win_close", [] {
 			exit(1);
 		});
-		event("ok", [=,this] {
+		event("ok", [] {
 			exit(1);
 		});
 	}
@@ -161,7 +160,7 @@ public:
 
 void show_crash_window() {
 	auto dlg = new ErrorDialog;
-	dlg->run();
+	dlg->run([dlg] { delete dlg; });
 }
 
 void hui_default_error_handler() {

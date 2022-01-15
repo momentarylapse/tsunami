@@ -195,13 +195,15 @@ void SampleManagerConsole::on_auto_delete() {
 }
 
 void SampleManagerConsole::on_import() {
-	if (!session->storage->ask_open_import(win))
-		return;
-	AudioBuffer buf;
-	if (!session->storage->load_buffer(&buf, hui::Filename))
-		return;
-	song->create_sample_audio(hui::Filename.basename_no_ext(), buf);
-	//setInt("sample_list", items.num - 1);
+	session->storage->ask_open_import(win, [this] (const Path &filename) {
+		if (!filename)
+			return;
+		AudioBuffer buf;
+		if (!session->storage->load_buffer(&buf, filename))
+			return;
+		song->create_sample_audio(filename.basename_no_ext(), buf);
+		//setInt("sample_list", items.num - 1);
+	});
 }
 
 void SampleManagerConsole::on_export() {
@@ -209,12 +211,14 @@ void SampleManagerConsole::on_export() {
 	if (sel.num != 1)
 		return;
 
-	if (session->storage->ask_save_render_export(win)){
-		if (sel[0]->type == SignalType::AUDIO){
-			BufferStreamer rr(sel[0]->buf);
-			session->storage->save_via_renderer(rr.port_out[0], hui::Filename, sel[0]->buf->length, {});
+	session->storage->ask_save_render_export(win, [this, sel] (const Path &filename) {
+		if (filename) {
+			if (sel[0]->type == SignalType::AUDIO){
+				BufferStreamer rr(sel[0]->buf);
+				session->storage->save_via_renderer(rr.port_out[0], filename, sel[0]->buf->length, {});
+			}
 		}
-	}
+	});
 }
 
 void SampleManagerConsole::on_insert() {
@@ -429,14 +433,15 @@ public:
 	}
 
 	void on_import() {
-		if (!session->storage->ask_open_import(win))
-			return;
-		AudioBuffer buf;
-		if (!session->storage->load_buffer(&buf, hui::Filename))
-			return;
-		song->create_sample_audio(hui::Filename.basename_no_ext(), buf);
-		fill_list();
-
+		session->storage->ask_open_import(win, [this] (const Path &filename) {
+			if (!filename)
+				return;
+			AudioBuffer buf;
+			if (!session->storage->load_buffer(&buf, filename))
+				return;
+			song->create_sample_audio(filename.basename_no_ext(), buf);
+			fill_list();
+		});
 	}
 
 	void on_ok() {

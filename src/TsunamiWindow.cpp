@@ -69,10 +69,6 @@
 
 extern const string AppName;
 
-namespace hui {
-extern string file_dialog_default;
-}
-
 TsunamiWindow::TsunamiWindow(Session *_session) :
 		hui::Window(AppName, 800, 600) {
 	session = _session;
@@ -375,7 +371,7 @@ TsunamiWindow::~TsunamiWindow() {
 }
 
 void TsunamiWindow::on_about() {
-	hui::AboutBox(this);
+	hui::about_box(this);
 }
 
 void TsunamiWindow::on_help() {
@@ -457,35 +453,39 @@ void TsunamiWindow::on_track_render() {
 		return;
 	}
 
-	SongRenderer renderer(song);
-	renderer.set_range(range);
-
-	renderer.allow_layers(view->get_playable_layers());
 	if (view->get_playable_layers() != view->sel.layers()) {
-		int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
+		QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
-				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true);
-		if (answer == 1)
-			renderer.allow_layers(view->sel.layers());
-		else if (answer < 0)
-			return;
+				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
+				[this, range] (int answer) {
+					if (answer < 0)
+						return;
+
+					SongRenderer renderer(song);
+					renderer.set_range(range);
+
+					if (answer == 1)
+						renderer.allow_layers(view->sel.layers());
+
+					renderer.allow_layers(view->get_playable_layers());
+
+					auto p = ownify(new ProgressCancelable(_(""), this));
+
+					AudioBuffer buf;
+					buf.resize(range.length);
+
+					write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
+
+					song->begin_action_group(_("render track"));
+					Track *t = song->add_track(SignalType::AUDIO_STEREO);
+					AudioBuffer buf_track;
+					auto *a = t->layers[0]->edit_buffers(buf_track, range);
+					buf_track.set(buf, 0, 1);
+
+					t->layers[0]->edit_buffers_finish(a);
+					song->end_action_group();
+		});
 	}
-
-	auto p = ownify(new ProgressCancelable(_(""), this));
-
-	AudioBuffer buf;
-	buf.resize(range.length);
-
-	write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
-
-	song->begin_action_group(_("render track"));
-	Track *t = song->add_track(SignalType::AUDIO_STEREO);
-	AudioBuffer buf_track;
-	auto *a = t->layers[0]->edit_buffers(buf_track, range);
-	buf_track.set(buf, 0, 1);
-
-	t->layers[0]->edit_buffers_finish(a);
-	song->end_action_group();
 
 }
 
@@ -683,7 +683,7 @@ void TsunamiWindow::on_send_bug_report() {
 }
 
 string title_filename(const Path &filename) {
-	if (!filename.is_empty())
+	if (filename)
 		return filename.basename();
 	return _("No name");
 }
@@ -694,15 +694,17 @@ bool TsunamiWindow::allow_termination() {
 
 	if (song->action_manager->is_save())
 		return true;
-	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true);
-	if (answer == "hui:yes") {
-		/*if (!OnSave())
-		 return false;*/
-		on_save();
-		return true;
-	} else if (answer == "hui:no") {
-		return true;
-	}
+	hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), [this] (const string &answer) {
+		session->e("delayed choice...");
+		if (answer == "hui:yes") {
+			/*if (!OnSave())
+			 return false;*/
+			on_save();
+			//return true;
+		} else if (answer == "hui:no") {
+			//return true;
+		}
+	}, true);
 
 	// cancel
 	return false;
@@ -928,10 +930,12 @@ void TsunamiWindow::on_settings() {
 }
 
 void TsunamiWindow::on_track_import() {
-	if (session->storage->ask_open_import(this)) {
-		Track *t = song->add_track(SignalType::AUDIO_STEREO);
-		session->storage->load_track(t->layers[0].get(), hui::Filename, view->cursor_pos());
-	}
+	session->storage->ask_open_import(this, [this] (const Path &filename) {
+		if (filename) {
+			Track *t = song->add_track(SignalType::AUDIO_STEREO);
+			session->storage->load_track(t->layers[0].get(), filename, view->cursor_pos());
+		}
+	});
 }
 
 void TsunamiWindow::on_remove_sample() {
@@ -1141,16 +1145,18 @@ void TsunamiWindow::on_new() {
 }
 
 void TsunamiWindow::on_open() {
-	if (session->storage->ask_open(this)) {
+	session->storage->ask_open(this, [this] (const Path &filename) {
+		if (!filename)
+			return;
 		if (song->is_empty()) {
-			if (session->storage->load(song, hui::Filename))
+			if (session->storage->load(song, filename))
 				BackupManager::set_save_state(session);
 		} else {
 			auto *s = tsunami->create_session();
 			s->win->show();
-			s->storage->load(s->song.get(), hui::Filename);
+			s->storage->load(s->song.get(), filename);
 		}
-	}
+	});
 }
 
 void TsunamiWindow::on_save() {
@@ -1176,7 +1182,7 @@ bool song_is_simple_midi(Song *s) {
 }
 
 string _suggest_filename(Song *s, const Path &dir) {
-	if (!s->filename.is_empty())
+	if (s->filename)
 		return s->filename.basename();
 	string base = Date::now().format("%Y-%m-%d");
 
@@ -1196,44 +1202,49 @@ string _suggest_filename(Song *s, const Path &dir) {
 }
 
 void TsunamiWindow::on_save_as() {
+	string def;
 	if (song->filename == "")
-		hui::file_dialog_default = _suggest_filename(song, session->storage->current_directory);
+		def = _suggest_filename(song, session->storage->current_directory);
 
-	if (session->storage->ask_save(this)) {
-		if (session->storage->save(song, hui::Filename))
-			view->set_message(_("file saved"));
-	}
-
-	hui::file_dialog_default = "";
+	session->storage->ask_save(this, [this] (const Path &filename) {
+		if (filename)
+			if (session->storage->save(song, filename))
+				view->set_message(_("file saved"));
+	}, {"default=" + def});
 }
 
 void TsunamiWindow::on_render_export_selection() {
-	if (session->storage->ask_save_render_export(this)) {
+	session->storage->ask_save_render_export(this, [this] (const Path &filename) {
+		if (!filename)
+			return;
 
-		auto sel = view->sel;
 		if (view->get_playable_layers() != view->sel.layers()) {
-			int answer = QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
+			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 					{_("All non-muted"), _("From selection")},
-					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true);
-			if (answer == 0)
-				sel = SongSelection::from_range(song, view->sel.range()).filter(view->get_playable_layers());
-			else if (answer < 0)
-				return;
+					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
+					[this, filename] (int answer) {
+						auto sel = view->sel;
+						if (answer == 0)
+							sel = SongSelection::from_range(song, view->sel.range()).filter(view->get_playable_layers());
+						else if (answer < 0)
+							return;
+						if (session->storage->render_export_selection(song, sel, filename))
+							view->set_message(_("file exported"));
+					});
 		}
-
-		if (session->storage->render_export_selection(song, sel, hui::Filename))
-			view->set_message(_("file exported"));
-	}
+	});
 }
 
 Song *copy_song_from_selection(Song *song, const SongSelection &sel);
 
 void TsunamiWindow::on_export_selection() {
-	if (session->storage->ask_save(this)) {
-		auto s = ownify(copy_song_from_selection(song, view->sel));
-		if (session->storage->save(s.get(), hui::Filename))
-			view->set_message(_("file exported"));
-	}
+	session->storage->ask_save(this, [this] (const Path &filename) {
+		if (filename) {
+			auto s = ownify(copy_song_from_selection(song, view->sel));
+			if (session->storage->save(s.get(), filename))
+				view->set_message(_("file exported"));
+		}
+	});
 }
 
 void TsunamiWindow::on_quick_export() {
@@ -1270,7 +1281,7 @@ void TsunamiWindow::on_delete_bars() {
 }
 
 void TsunamiWindow::on_delete_time_interval() {
-	hui::ErrorBox(this, "todo", "todo");
+	hui::error_box(this, "todo", "todo");
 	/*song->action_manager->beginActionGroup();
 
 	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
@@ -1280,7 +1291,7 @@ void TsunamiWindow::on_delete_time_interval() {
 }
 
 void TsunamiWindow::on_insert_time_interval() {
-	hui::ErrorBox(this, "todo", "todo");
+	hui::error_box(this, "todo", "todo");
 	/*song->action_manager->beginActionGroup();
 
 	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){

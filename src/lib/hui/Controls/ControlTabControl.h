@@ -33,6 +33,7 @@ public:
 	int cur_page;
 
 	Array<Control*> pages; // sorted...
+	Array<GtkWidget*> boxes; // sorted...
 };
 
 };

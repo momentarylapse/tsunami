@@ -29,6 +29,7 @@ public:
 	bool operator!=(const Path &p) const;
 	bool operator<(const Path &p) const;
 	bool operator>(const Path &p) const;
+	operator bool() const;
 	int compare(const Path &p) const;
 
 	string str() const;

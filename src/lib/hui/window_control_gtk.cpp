@@ -89,14 +89,23 @@ void Panel::_insert_control_(Control *c, int x, int y) {
 	c->panel = this;
 	if (cur_control) {
 		cur_control->add(c, x, y);
-	}else{
+	} else {
 		root_control = c;
 		// directly into the window...
 		//gtk_container_add(GTK_CONTAINER(plugable), frame);
 		if (plugable) {
 			// this = HuiWindow...
+#if GTK_CHECK_VERSION(4,0,0)
+			gtk_box_append(GTK_BOX(plugable), frame);
+			//g_object_set(G_OBJECT(plugable), "margin-start", 40, nullptr);
+			gtk_widget_set_margin_bottom(plugable, border_width);
+			gtk_widget_set_margin_top(plugable, border_width);
+			gtk_widget_set_margin_start(plugable, border_width);
+			gtk_widget_set_margin_end(plugable, border_width);
+#else
 			gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
 			gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
+#endif
 		}
 	}
 	if (frame != c->widget)

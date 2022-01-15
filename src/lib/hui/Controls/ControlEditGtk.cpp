@@ -23,18 +23,30 @@ ControlEdit::ControlEdit(const string &title, const string &id) :
 {
 	auto parts = split_title(title);
 	widget = gtk_entry_new();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_editable_set_text(GTK_EDITABLE(widget), sys_str(parts[0]));
+#else
 	gtk_entry_set_width_chars(GTK_ENTRY(widget), 3);
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(parts[0]));
+#endif
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&on_gtk_edit_changed), this);
 }
 
 void ControlEdit::__set_string(const string &str) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_editable_set_text(GTK_EDITABLE(widget), sys_str(str));
+#else
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
+#endif
 }
 
 string ControlEdit::get_string() {
+#if GTK_CHECK_VERSION(4,0,0)
+	return de_sys_str(gtk_editable_get_text(GTK_EDITABLE(widget)));
+#else
 	return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
+#endif
 }
 
 void ControlEdit::__reset() {

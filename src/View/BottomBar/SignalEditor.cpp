@@ -80,10 +80,12 @@ void SignalEditor::on_new() {
 }
 
 void SignalEditor::on_load() {
-	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
-		session->storage->current_chain_directory = hui::Filename.parent();
-		session->load_signal_chain(hui::Filename);
-	}
+	hui::file_dialog_open(win, session->storage->current_chain_directory, {"title=" + _("Load a signal chain"), "filter=*.chain", "showfilter=*.chain"}, [this] (const Path &filename) {
+		if (!filename.is_empty()) {
+			session->storage->current_chain_directory = filename.parent();
+			session->load_signal_chain(filename);
+		}
+	});
 }
 
 void SignalEditor::on_chain_switch() {

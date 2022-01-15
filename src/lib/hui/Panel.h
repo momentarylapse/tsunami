@@ -56,7 +56,6 @@ public:
 	int _cdecl event_x(const string &id, const string &msg, const Callback &function);
 	int _cdecl event_xp(const string &id, const string &msg, const CallbackP &function);
 	void _cdecl remove_event_handler(int event_handler_id);
-	void _cdecl set_key_code(const string &id, int key_code, const string &image = "");
 	bool _send_event_(Event *e, bool force_if_not_allowed = false);
 
 	// creating controls
@@ -179,7 +178,6 @@ protected:
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 public:
 	Array<EventListener> event_listeners;
-	Array<EventKeyCode> event_key_codes;
 	int current_event_listener_uid;
 protected:
 

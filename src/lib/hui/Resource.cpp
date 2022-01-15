@@ -199,8 +199,10 @@ Menu *_create_res_menu_(const string &ns, Resource *res) {
 			Menu *sub = _create_res_menu_(ns, &c);
 			menu->add_sub_menu(get_lang(ns, c.id, c.title, true), c.id, sub);
 		}
-		if (menu->items.num > 0)
-			menu->items.back()->enable(c.enabled());
+
+		// deprecated...
+		//if (menu->items.num > 0)
+		//	menu->items.back()->enable(c.enabled());
 	}
 	return menu;
 }

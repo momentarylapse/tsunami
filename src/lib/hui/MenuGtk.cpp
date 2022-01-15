@@ -1,77 +1,64 @@
 #include "Controls/Control.h"
+#include "Controls/MenuItem.h"
+#include "Controls/MenuItemSubmenu.h"
+#include "Controls/MenuItemToggle.h"
 #include "hui.h"
 #include "internal.h"
 #ifdef HUI_API_GTK
 
 
-/*#include "../file/file.h"
-#include <stdio.h>
-#include <signal.h>
-#ifdef HUI_API_WIN
-	#include <shlobj.h>
-	#include <winuser.h>
-	#include <direct.h>
-	#include <commctrl.h>
-	#include <tchar.h>
-	#pragma comment(lib,"winmm.lib")
-	#pragma warning(disable : 4995)
-#endif
-#ifdef OS_LINUX
-	#include <string.h>
-	#include <unistd.h>
-	#include <sys/time.h>
-	#include <sys/timeb.h>
-	#include <time.h>
-	#include <gdk/gdkx.h>
-#endif*/
-
 namespace hui
 {
 
 
+#if !GTK_CHECK_VERSION(4,0,0)
 GtkAccelGroup *accel_group = nullptr;
 
-void try_add_accel(GtkWidget *item, const string &id, Panel *panel)
-{
-	for (auto &c: panel->event_key_codes)
-		if ((id == c.id) and (c.key_code >= 0)){
+void try_add_accel(GtkWidget *item, const string &id, Panel *panel) {
+	for (auto &c: panel->win->get_event_key_codes())
+		if ((id == c.id) and (c.key_code >= 0)) {
 			int k = c.key_code;
 			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((k&KEY_ALT)>0) ? GDK_META_MASK : 0);
 			gtk_widget_add_accelerator(item, "activate", accel_group, HuiKeyID[k & 255], (GdkModifierType)mod, GTK_ACCEL_VISIBLE);
 		}
 }
+#endif
 
-Menu::Menu()
-{
+Menu::Menu() {
 	_MakeUsable_();
 	panel = nullptr;
-	
+
+#if GTK_CHECK_VERSION(4,0,0)
+	gmenu = g_menu_new();
+#else
 	widget = gtk_menu_new();
 	if (accel_group == nullptr)
 		accel_group = gtk_accel_group_new();
+#endif
 }
 
-Menu::~Menu()
-{
+Menu::~Menu() {
 	clear();
 }
 
-void Menu::gtk_realize()
-{
+void Menu::gtk_realize() {
+#if !GTK_CHECK_VERSION(4,0,0)
 	widget = gtk_menu_new();
+#endif
 }
 
 
-void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data)
-{
+#if !GTK_CHECK_VERSION(4,0,0)
+void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data) {
 	Menu *m = (Menu*)user_data;
 	m->set_panel(nullptr);
 }
+#endif
 
 
 // window coordinate system!
-void Menu::open_popup(Panel *panel)
-{
+void Menu::open_popup(Panel *panel) {
+#if !GTK_CHECK_VERSION(4,0,0)
 	gtk_widget_show(widget);
 #if GTK_CHECK_VERSION(3,22,0)
 	gtk_menu_popup_at_pointer(GTK_MENU(widget), nullptr);
@@ -81,19 +68,28 @@ void Menu::open_popup(Panel *panel)
 
 	//g_signal_connect(G_OBJECT(widget), "selection-done", G_CALLBACK(&OnGtkMenuClose), this);
 	set_panel(panel);
+#endif
 }
 
-void Menu::_add(Control *c)
-{
+void Menu::_add(Control *c) {
+#if GTK_CHECK_VERSION(4,0,0)
+	if (c->type == MENU_ITEM_BUTTON) {
+		g_menu_append_item(gmenu, dynamic_cast<MenuItem*>(c)->item);
+	} else if (c->type == MENU_ITEM_SUBMENU) {
+		g_menu_append_item(gmenu, dynamic_cast<MenuItemSubmenu*>(c)->item);
+	}
+	items.add(c);
+	//c->panel = panel;
+#else
 	items.add(c);
 	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);
 	gtk_widget_show(c->widget);
 	c->panel = panel;
+#endif
 }
 
 
-const char *get_gtk_icon_name(const string image)
-{
+const char *get_gtk_icon_name(const string image) {
 	if (image=="hui:open")	return "document-open";
 	if (image=="hui:new")		return "document-new";
 	if (image=="hui:save")	return "document-save";
@@ -195,37 +191,90 @@ GtkIconTheme *get_hui_icon_theme() {
 	static GtkIconTheme *hui_icon_theme = nullptr;
 	if (!hui_icon_theme) {
 		hui_icon_theme = gtk_icon_theme_new();
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "48x48"));
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+#else
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "48x48"));
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+#endif
 		// guess, only 64x64 is used... could skip the others
 	}
 	return hui_icon_theme;
 }
 
-int absolute_gtk_size(int s) {
-	if (s == GTK_ICON_SIZE_BUTTON)
+int absolute_icon_size(IconSize s) {
+	if (s == IconSize::REGULAR)
 		return 16;
-	if (s == GTK_ICON_SIZE_DND)
+	if (s == IconSize::LARGE)
 		return 32;
-	if (s == GTK_ICON_SIZE_DIALOG)
+	if (s == IconSize::HUGE)
 		return 48;
 	return s;
 }
 
-GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *widget) {
+int icon_size_gtk(IconSize s) {
+	if (s == IconSize::REGULAR) {
+#if GTK_CHECK_VERSION(4,0,0)
+		return GTK_ICON_SIZE_NORMAL;
+#else
+		return GTK_ICON_SIZE_BUTTON;
+#endif
+	} else if (s == IconSize::LARGE) {
+#if GTK_CHECK_VERSION(4,0,0)
+		return GTK_ICON_SIZE_LARGE;
+#else
+		return GTK_ICON_SIZE_DND;
+#endif
+	} else if (s == IconSize::HUGE) {
+#if GTK_CHECK_VERSION(4,0,0)
+		return GTK_ICON_SIZE_LARGE;
+#else
+		return GTK_ICON_SIZE_DIALOG;
+#endif
+	} else if (s == IconSize::TOOLBAR_LARGE) {
+#if GTK_CHECK_VERSION(4,0,0)
+		return GTK_ICON_SIZE_LARGE;
+#else
+		return GTK_ICON_SIZE_LARGE_TOOLBAR;
+#endif
+	} else if (s == IconSize::TOOLBAR_SMALL) {
+#if GTK_CHECK_VERSION(4,0,0)
+		return GTK_ICON_SIZE_LARGE;
+#else
+		return GTK_ICON_SIZE_SMALL_TOOLBAR;
+#endif
+	}
+	return 0;
+}
+
+GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget) {
 	if (image == "")
 		return nullptr;
 	if (image.head(4) == "hui:") {
 		// internal
-		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), size);
+#if GTK_CHECK_VERSION(4,0,0)
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image));
+#else
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), (GtkIconSize)icon_size_gtk(size));
+#endif
 	} else if (image.find(".") < 0) {
-		size = (GtkIconSize)absolute_gtk_size((int)size);
+		int _size = absolute_icon_size(size);
 		auto theme = get_hui_icon_theme();
-		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), size, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+#if GTK_CHECK_VERSION(4,0,0)
+		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info)
-			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), size, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+		msg_write("...argh symbolic icons gtk4");
+		return nullptr;
+#else
+		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), _size, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+		if (!info)
+			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), _size, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		auto sc = gtk_widget_get_style_context(widget);
 
 		gboolean was_sym = true;
@@ -236,6 +285,7 @@ GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *wid
 		}
 		return gtk_image_new_from_pixbuf(pixbuf);
 		//return gtk_image_new_from_file(sys_str_f(Application::directory_static << image.sub_ref(7)));
+#endif
 	} else {
 		// file
 		//HuiImage *img = get_image(image);
@@ -248,13 +298,13 @@ GtkWidget *get_gtk_image_x(const string &image, GtkIconSize size, GtkWidget *wid
 		return gtk_image_new_from_file(sys_str_f(Application::directory_static << image));
 	}
 }
-void *get_gtk_image(const string &image, GtkIconSize size) {
+void *get_gtk_image(const string &image, IconSize size) {
 	return get_gtk_image_x(image, size, nullptr);
 }
 
-void *get_gtk_image_pixbuf(const string &image)
-{
-	if (image.head(4) == "hui:"){
+void *get_gtk_image_pixbuf(const string &image) {
+	if (image.head(4) == "hui:") {
+#if !GTK_CHECK_VERSION(4,0,0)
 		// internal
 		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image), 24, (GtkIconLookupFlags)0, nullptr);
 		if (pb){
@@ -262,6 +312,7 @@ void *get_gtk_image_pixbuf(const string &image)
 			g_object_unref(pb);
 			return r;
 		}
+#endif
 	}else{
 		// file
 		HuiImage *img = get_image(image);

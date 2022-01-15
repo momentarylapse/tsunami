@@ -63,6 +63,7 @@ class Window : public Panel {
 	friend class ControlGroup;
 	friend class ControlExpander;
 	friend class Menu;
+	friend class Panel;
 public:
 	Window();
 	Window(const string &title, int width, int height);
@@ -78,7 +79,7 @@ public:
 	void _cdecl request_destroy();
 
 	// the window
-	void _cdecl run();
+	void _cdecl run(const Callback &cb = nullptr);
 	void _cdecl show();
 	void _cdecl hide();
 	void _cdecl set_maximized(bool maximized);
@@ -174,6 +175,24 @@ protected:
 	bool allowed, allow_keys;
 	Window *parent_window;
 	bool requested_destroy;
+
+	Array<EventKeyCode> event_key_codes;
+public:
+	void _cdecl set_key_code(const string &id, int key_code, const string &image = "");
+	Array<EventKeyCode> get_event_key_codes() const { return event_key_codes; }
+protected:
+
+#if GTK_CHECK_VERSION(4,0,0)
+	GtkEventController *shortcut_controller = nullptr;
+	static void _on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data);
+	GSimpleActionGroup *action_group = nullptr;
+	void _try_add_action_(const string &id);
+#endif
+
+public:
+	Callback end_run_callback;
+
+	void _try_send_by_key_code_(int key_code);
 };
 
 

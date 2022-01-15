@@ -12,14 +12,15 @@
 namespace hui
 {
 
-void *get_gtk_image(const string &image, GtkIconSize size); // -> hui_menu_gtk.cpp
+void *get_gtk_image(const string &image, IconSize size); // -> hui_menu_gtk.cpp
 
 void on_gtk_tool_button_click(GtkWidget *widget, gpointer data);
 
 ToolItemToggleButton::ToolItemToggleButton(const string &title, const string &image, const string &id) :
 	Control(TOOL_ITEM_TOGGLEBUTTON, id)
 {
-	GtkWidget *im = (GtkWidget*)get_gtk_image(image, GTK_ICON_SIZE_LARGE_TOOLBAR);
+#if !GTK_CHECK_VERSION(4,0,0)
+	GtkWidget *im = (GtkWidget*)get_gtk_image(image, IconSize::TOOLBAR_LARGE);
 	gtk_widget_show(im);
 	widget = GTK_WIDGET(gtk_toggle_tool_button_new());
 	gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
@@ -27,19 +28,26 @@ ToolItemToggleButton::ToolItemToggleButton(const string &title, const string &im
 	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(widget), im);
 	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_tool_button_click), this);
+#endif
 }
 
 void ToolItemToggleButton::__check(bool checked) {
+#if !GTK_CHECK_VERSION(4,0,0)
 	gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(widget), checked);
+#endif
 }
 
 bool ToolItemToggleButton::is_checked() {
+#if !GTK_CHECK_VERSION(4,0,0)
 	return gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
+#endif
 }
 
 void ToolItemToggleButton::__set_option(const string &op, const string &value) {
+#if !GTK_CHECK_VERSION(4,0,0)
 	if (op == "important")
 		gtk_tool_item_set_is_important(GTK_TOOL_ITEM(widget), true);
+#endif
 }
 
 }

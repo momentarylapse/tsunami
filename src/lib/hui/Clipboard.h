@@ -8,14 +8,12 @@
 #ifndef SRC_LIB_HUI_CLIPBOARD_H_
 #define SRC_LIB_HUI_CLIPBOARD_H_
 
-namespace hui
-{
+namespace hui {
 
-namespace Clipboard
-{
+namespace Clipboard {
 
-void _cdecl Copy(const string &buffer);
-string _cdecl Paste();
+void _cdecl copy(const string &buffer);
+string _cdecl paste();
 
 }
 

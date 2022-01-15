@@ -16,23 +16,25 @@ namespace hui {
 
 class Window;
 
+typedef std::function<void(const Path&)> FileDialogCallback;
+typedef std::function<void(const color&)> ColorDialogCallback;
+typedef std::function<void(const string&)> FontDialogCallback;
+typedef std::function<void(const string&)> QuestionDialogCallback;
+
 // file dialogs
-bool _cdecl FileDialogOpen(Window *win, const string &title, const Path &dir, const string &show_filter, const string &filter);
-bool _cdecl FileDialogSave(Window *win, const string &title, const Path &dir, const string &show_filter, const string &filter);
-bool _cdecl FileDialogDir(Window *win, const string &title, const Path &dir/*, string &root_dir*/);
-extern Path Filename;
-bool _cdecl SelectColor(Window *win, const color &c);
-extern color Color;
-bool _cdecl SelectFont(Window *win, const string &title);
-extern string Fontname;
+void _cdecl file_dialog_open(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl file_dialog_save(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl file_dialog_dir(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl select_color(Window *win, const color &c, const ColorDialogCallback &cb);
+void _cdecl select_font(Window *win, const Array<string> &params, const FontDialogCallback &cb);
 
 // message dialogs
-string _cdecl QuestionBox(Window *win, const string &title, const string &text, bool allow_cancel = false);
-void _cdecl InfoBox(Window *win, const string &title, const string &text);
-void _cdecl ErrorBox(Window *win, const string &title, const string &text);
+void _cdecl question_box(Window *win, const string &title, const string &text, const QuestionDialogCallback &cb, bool allow_cancel = false);
+void _cdecl info_box(Window *win, const string &title, const string &text);
+void _cdecl error_box(Window *win, const string &title, const string &text);
 
 
-void _cdecl AboutBox(Window *win);
+void _cdecl about_box(Window *win);
 
 };
 

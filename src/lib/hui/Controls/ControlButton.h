@@ -23,7 +23,7 @@ public:
 	void set_image(const string &str) override;
 	void __set_option(const string &op, const string &value) override;
 
-	GtkIconSize image_size;
+	IconSize image_size;
 };
 
 };

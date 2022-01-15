@@ -132,6 +132,8 @@ void on_gtk_list_activate(GtkWidget *widget, void* a, void* b, gpointer data)
 void on_gtk_list_select(GtkTreeSelection *selection, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify(EventID::SELECT, false);	}
 
+
+#if !GTK_CHECK_VERSION(4,0,0)
 gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
 	if (event->button != 3) // right
 		return false;
@@ -153,6 +155,7 @@ gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 	c->notify(EventID::RIGHT_BUTTON_DOWN, false);
 	return false;
 }
+#endif
 
 
 void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
@@ -188,21 +191,27 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 {
 	auto parts = split_title(title);
 
+#if GTK_CHECK_VERSION(4,0,0)
+	GtkWidget *sw = gtk_scrolled_window_new();
+#else
 	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
+#endif
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	string fmt = option_value(get_option_from_title(title), "format");
 
 	// "model"
-	Array<GType> types = CreateTypeList(fmt, parts.num);
-	GtkListStore *store = gtk_list_store_newv(types.num, &types[0]);
+	auto types = CreateTypeList(fmt, parts.num);
+	auto store = gtk_list_store_newv(types.num, &types[0]);
 
 	// "view"
-	GtkWidget *view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-	g_object_unref(G_OBJECT(store));
+	auto view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+//	g_object_unref(G_OBJECT(store));
 	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(&on_gtk_list_activate), this);
+#if !GTK_CHECK_VERSION(4,0,0)
 	g_signal_connect(G_OBJECT(view), "button-press-event", G_CALLBACK(&OnGtkListButton), this);
 	gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+#endif
 
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&on_gtk_list_select), this);
@@ -218,10 +227,18 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	frame = sw;
 	if (panel->border_width > 0) {
 		frame = gtk_frame_new(nullptr);
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_frame_set_child(GTK_FRAME(frame), sw);
+#else
 		gtk_container_add(GTK_CONTAINER(frame), sw);
+#endif
 	}
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), view);
+#else
 	gtk_container_add(GTK_CONTAINER(sw), view);
 	gtk_widget_show(sw);
+#endif
 
 	widget = view;
 
@@ -385,6 +402,12 @@ void ControlListView::__set_option(const string &op, const string &value) {
 		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), value._bool());
 	} else if (op == "reorderable") {
 		gtk_tree_view_set_reorderable(GTK_TREE_VIEW(widget), true);
+	} else if (op == "singleclickactivate") {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_list_view_set_single_click_activate(GTK_LIST_VIEW(widget), true);
+#else
+		msg_error("ListView.singleclickactivate gtk3...");
+#endif
 	}
 }
 

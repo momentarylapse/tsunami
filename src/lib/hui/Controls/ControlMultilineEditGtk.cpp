@@ -13,8 +13,10 @@
 namespace hui
 {
 
+#if !GTK_CHECK_VERSION(4,0,0)
 gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+#endif
 
 void on_gtk_multiline_edit_change(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
@@ -25,16 +27,28 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	auto parts = split_title(title);
 	GtkTextBuffer *tb = gtk_text_buffer_new(nullptr);
 	widget = gtk_text_view_new_with_buffer(tb);
+#if GTK_CHECK_VERSION(4,0,0)
+	GtkWidget *scroll = gtk_scrolled_window_new();
+#else
 	GtkWidget *scroll = gtk_scrolled_window_new(nullptr, nullptr);
+#endif
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_show(scroll);
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), widget);
+#else
 	gtk_container_add(GTK_CONTAINER(scroll), widget);
+#endif
 
 	// frame
 	frame = scroll;
 	if (option_has(get_option_from_title(title), "noframe")) { //(border_width > 0){
 		frame = gtk_frame_new(nullptr);
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_frame_set_child(GTK_FRAME(frame), scroll);
+#else
 		gtk_container_add(GTK_CONTAINER(frame), scroll);
+#endif
 	}
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
@@ -76,6 +90,9 @@ void ControlMultilineEdit::set_tab_size(int tab_size) {
 
 void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 	if (op == "handlekeys") {
+#if GTK_CHECK_VERSION(4,0,0)
+		msg_error("MultilineEdit.handlekeys");
+#else
 		handle_keys = true;
 		int mask;
 		g_object_get(G_OBJECT(widget), "events", &mask, nullptr);
@@ -83,6 +100,7 @@ void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 		g_object_set(G_OBJECT(widget), "events", mask, nullptr);
 		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
+#endif
 	} else if (op == "monospace") {
 #if GTK_CHECK_VERSION(3,16,0)
 		gtk_text_view_set_monospace(GTK_TEXT_VIEW(widget), true);

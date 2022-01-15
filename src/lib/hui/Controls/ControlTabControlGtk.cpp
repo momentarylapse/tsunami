@@ -80,6 +80,7 @@ void ControlTabControl::addPage(const string &str) {
 	GtkWidget *inside;
 #if GTK_CHECK_VERSION(3,0,0)
 	inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	boxes.add(inside);
 #else
 	inside = gtk_hbox_new(true, 0);
 #endif
@@ -97,10 +98,16 @@ void ControlTabControl::add(Control *child, int x, int y) {
 	pages[x] = child;
 
 	GtkWidget *child_widget = child->get_frame();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_box_append(GTK_BOX(boxes[x]), child_widget);
+#else
 	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
 	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
+#endif
+#if !GTK_CHECK_VERSION(4,0,0)
 	if (panel)
 		gtk_container_set_border_width(GTK_CONTAINER(target_widget), panel->spacing);
+#endif
 	children.add(child);
 	child->parent = this;
 }

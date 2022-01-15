@@ -27,7 +27,9 @@ ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	float vmax = 100000000000.0f;
 	float step = 1;
 	widget = gtk_spin_button_new_with_range(vmin, vmax, step);
+#if !GTK_CHECK_VERSION(4,0,0)
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
+#endif
 	set_options(get_option_from_title(title));
 
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(parts[0]));
@@ -40,7 +42,11 @@ string ControlSpinButton::get_string() {
 }
 
 void ControlSpinButton::__set_string(const string &str) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_editable_set_text(GTK_EDITABLE(widget), sys_str(str));
+#else
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
+#endif
 }
 
 void ControlSpinButton::__set_int(int i) {

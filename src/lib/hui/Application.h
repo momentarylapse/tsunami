@@ -54,17 +54,18 @@ public:
 	static bool installed; // installed into system folders?
 
 	static Array<string> _args;
+
+	static GtkApplication *application;
+	int try_execute(const Array<string> &args);
 };
 
 }
 
 #define HUI_EXECUTE(APP_CLASS) \
-int hui_main(const Array<string> &arg) { \
-	APP_CLASS::_args = arg; \
+int hui_main(const Array<string> &args) { \
+	APP_CLASS::_args = args; \
 	APP_CLASS *app = new APP_CLASS; \
-	int r = 0; \
-	if (app->on_startup(arg)) \
-		r = app->run(); \
+	int r = app->try_execute(args); \
 	delete app; \
 	return r; \
 }

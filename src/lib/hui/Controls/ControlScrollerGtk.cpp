@@ -15,7 +15,11 @@ namespace hui
 ControlScroller::ControlScroller(const string &title, const string &id) :
 	Control(CONTROL_SCROLLER, id)
 {
+#if GTK_CHECK_VERSION(4,0,0)
+	widget = gtk_scrolled_window_new();
+#else
 	widget = gtk_scrolled_window_new(nullptr, nullptr);
+#endif
 	viewport = nullptr;
 	//viewport = gtk_viewport_new(NULL, NULL);
 	//gtk_container_add(GTK_CONTAINER(widget), viewport);
@@ -30,7 +34,11 @@ ControlScroller::ControlScroller(const string &title, const string &id) :
 void ControlScroller::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_container_add(GTK_CONTAINER(viewport), child_widget);
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(widget), child_widget);
+#else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
+#endif
 	children.add(child);
 	child->parent = this;
 }

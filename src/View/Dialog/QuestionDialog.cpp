@@ -12,21 +12,31 @@
 bool QuestionDialogInt::aborted;
 bool QuestionDialogIntInt::aborted;
 
-QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options) : hui::Dialog("question-dialog-int", _parent){
+QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options, std::function<void(int)> _cb)
+: hui::Dialog("question-dialog-int", _parent) {
+	cb = _cb;
 	result = 0;
 	aborted = true;
 	set_string("question", question);
 	set_options("value", options);
 
-	event("value", [=]{ result = get_int("value"); });
-	event("cancel", [=]{ request_destroy(); });
-	event("ok", [=]{ aborted = false; request_destroy(); });
+	event("value", [this] {
+		result = get_int("value");
+	});
+	event("cancel", [this] {
+		cb(-1);
+		request_destroy();
+	});
+	event("ok", [this] {
+		aborted = false;
+		cb(result);
+		request_destroy();
+	});
 }
 
-int QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
-	auto dlg = ownify(new QuestionDialogInt(parent, question, options));
+void QuestionDialogInt::ask(hui::Window *parent, const string &question, std::function<void(int)> cb, const string &options) {
+	auto dlg = ownify(new QuestionDialogInt(parent, question, options, cb));
 	dlg->run();
-	return dlg->result;
 }
 
 
@@ -35,9 +45,9 @@ int QuestionDialogInt::ask(hui::Window *parent, const string &question, const st
 
 
 
-
-
-QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &question, const Array<string> &labels, const Array<string> &options) : hui::Dialog(_("Question"), 100, 20, _parent, false){
+QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &question, const Array<string> &labels, const Array<string> &options, std::function<void(int,int)> _cb)
+		: hui::Dialog(_("Question"), 100, 20, _parent, false) {
+	cb = _cb;
 	result1 = 0;
 	result2 = 0;
 	aborted = true;
@@ -48,41 +58,53 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 	set_options("value1", options[0]);
 	set_options("value2", options[1]);
 
-	event("value1", [=]{ result1 = get_int("value1"); });
-	event("value2", [=]{ result2 = get_int("value2"); });
-	event("cancel", [=]{ request_destroy(); });
-	event("ok", [=]{ aborted = false; request_destroy(); });
+	event("value1", [this] { result1 = get_int("value1"); });
+	event("value2", [this] { result2 = get_int("value2"); });
+	event("cancel", [this] {
+		request_destroy();
+		cb(-1,-1);
+	});
+	event("ok", [this] {
+		aborted = false;
+		request_destroy();
+		cb(result1, result2);
+	});
 }
 
-std::pair<int,int> QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options) {
-	auto dlg = ownify(new QuestionDialogIntInt(parent, question, labels, options));
+void QuestionDialogIntInt::ask(hui::Window *parent, const string &question, const Array<string> &labels, const Array<string> &options, std::function<void(int,int)> cb) {
+	auto dlg = ownify(new QuestionDialogIntInt(parent, question, labels, options, cb));
 	dlg->run();
-	auto r = std::make_pair(dlg->result1, dlg->result2);
-	return r;
 }
 
 
 
 
-
-int QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
-	int r = -1;
-	auto dlg = ownify(new hui::Dialog(title, 200, 40, parent, false));
-	dlg->add_grid("", 0, 0, "grid");
-	dlg->set_target("grid");
-	dlg->add_label("!margin-top=8,margin-bottom=8,center\\" + text, 0, 0, "text");
-	dlg->add_grid("!expandx", 0, 1, "buttons");
-	dlg->set_target("buttons");
+QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> _cb)
+		: hui::Dialog(title, 100, 40, parent, false) {
+	cb = _cb;
+	result = -1;
+	add_grid("", 0, 0, "grid");
+	set_target("grid");
+	add_label("!margin-top=8,margin-bottom=8,center\\" + text, 0, 0, "text");
+	add_grid("!expandx", 0, 1, "buttons");
+	set_target("buttons");
 	for (int i=0; i<options.num; i++) {
 		string id = format("button-%d", i);
-		dlg->add_button("!expandx,height=36\\" + options[i], i, 0, id);
+		add_button("!expandx,height=36\\" + options[i], i, 0, id);
 		if (tips.num > i)
-			dlg->set_tooltip(id, tips[i]);
-		dlg->event(id, [i,&r,&dlg] { r = i; dlg->request_destroy(); });
+			set_tooltip(id, tips[i]);
+		event(id, [i,this] {
+			result = i;
+			request_destroy();
+			cb(i);
+		});
 	}
-	dlg->run();
-	return r;
 }
 
+void QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb) {
+	int r = -1;
+	auto dlg = ownify(new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel, cb));
+	dlg->run();
+}
 
 

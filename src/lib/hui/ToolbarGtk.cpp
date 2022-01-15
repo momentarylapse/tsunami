@@ -22,12 +22,17 @@ Toolbar::Toolbar(Window *_win, bool vertical) {
 	text_enabled = true;
 	large_icons = true;
 
+#if GTK_CHECK_VERSION(4,0,0)
+	widget = gtk_box_new(vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
+	gtk_widget_add_css_class(widget, "toolbar");
+#else
 	widget = gtk_toolbar_new();
 	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(widget), true);
 	if (vertical)
 		gtk_orientable_set_orientation(GTK_ORIENTABLE(widget), GTK_ORIENTATION_VERTICAL);
 	//configure(true, true);
 	//configure(false, true);
+#endif
 }
 
 Toolbar::~Toolbar() {
@@ -46,10 +51,12 @@ void Toolbar::enable(bool _enabled) {
 }
 
 void Toolbar::configure(bool _text_enabled, bool _large_icons) {
+#if !GTK_CHECK_VERSION(4,0,0)
 	gtk_toolbar_set_style(GTK_TOOLBAR(widget), _text_enabled ? GTK_TOOLBAR_BOTH : GTK_TOOLBAR_ICONS);
 	gtk_toolbar_set_icon_size(GTK_TOOLBAR(widget), _large_icons ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_SMALL_TOOLBAR);
 	text_enabled = _text_enabled;
 	large_icons = _large_icons;
+#endif
 }
 
 void Toolbar::_add(Control *c) {
@@ -57,10 +64,16 @@ void Toolbar::_add(Control *c) {
 	item.add(c);
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(c->widget), true);
 	gtk_widget_show(c->widget);
+
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_box_append(GTK_BOX(widget), c->widget);
+#else
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), GTK_TOOL_ITEM(c->widget), -1);
+#endif
 }
 
 void Toolbar::set_options(const string &options) {
+#if !GTK_CHECK_VERSION(4,0,0)
 	auto r = parse_options(options);
 	for (auto x: r) {
 		auto op = x.first;
@@ -80,6 +93,7 @@ void Toolbar::set_options(const string &options) {
 				gtk_toolbar_set_icon_size(GTK_TOOLBAR(widget), GTK_ICON_SIZE_SMALL_TOOLBAR);
 		}
 	}
+#endif
 }
 
 #endif

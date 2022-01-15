@@ -106,6 +106,15 @@ enum{
 	MENU_ITEM_SEPARATOR,
 };
 
+enum IconSize {
+	SMALL,
+	REGULAR,
+	LARGE,
+	HUGE,
+	TOOLBAR_SMALL,
+	TOOLBAR_LARGE
+};
+
 }
 
 #endif

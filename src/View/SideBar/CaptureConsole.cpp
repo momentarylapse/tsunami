@@ -108,8 +108,11 @@ bool CaptureConsole::allow_close() {
 	if (!has_data())
 		return true;
 
-	string answer = hui::QuestionBox(win, _("Question"), _("Cancel recording?"), true);
-	return (answer == "hui:yes");
+	hui::question_box(win, _("Question"), _("Cancel recording?"), [this] (const string &answer) {
+		if (answer == "hui:yes") {}
+		session->e("answer.... ignored");
+	}, true);
+	return false;
 }
 
 

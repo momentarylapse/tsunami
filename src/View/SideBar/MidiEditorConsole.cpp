@@ -366,10 +366,10 @@ void MidiEditorConsole::on_length_triplet() {
 }
 
 void MidiEditorConsole::on_length_custom() {
-	auto r = QuestionDialogIntInt::ask(win, _("Custom note length and beat sub-partitions (of quarter notes):"), {_("Length"), _("Partition")}, {"range=1:20", "range=1:20"});
-	if (QuestionDialogIntInt::aborted)
-		return;
-	mode->set_note_length_and_partition(r.first, r.second);
+	QuestionDialogIntInt::ask(win, _("Custom note length and beat sub-partitions (of quarter notes):"), {_("Length"), _("Partition")}, {"range=1:20", "range=1:20"}, [this] (int a, int b) {
+		if (!QuestionDialogIntInt::aborted)
+			mode->set_note_length_and_partition(a, b);
+	});
 }
 
 void MidiEditorConsole::on_layer_delete() {
@@ -535,46 +535,50 @@ void MidiEditorConsole::on_quantize() {
 }
 
 void MidiEditorConsole::on_apply_string() {
-	int string_no = QuestionDialogInt::ask(win, _("Move selected notes to which string?"), "range=1:20") - 1;
-	if (QuestionDialogInt::aborted)
-		return;
+	QuestionDialogInt::ask(win, _("Move selected notes to which string?"), [this] (int ii) {
+		if (QuestionDialogInt::aborted)
+			return;
+		int string_no = ii - 1;
 
-	song->begin_action_group("midi apply string");
-	auto notes = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: weak(notes))
-		layer->midi_note_set_string(n, string_no);
-	song->end_action_group();
+		song->begin_action_group("midi apply string");
+		auto notes = layer->midi.get_notes_by_selection(view->sel);
+		for (auto *n: weak(notes))
+			layer->midi_note_set_string(n, string_no);
+		song->end_action_group();
+	}, "range=1:20");
 }
 
 void MidiEditorConsole::on_apply_hand_position() {
-	int hand_position = QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), "range=0:99");
-	if (QuestionDialogInt::aborted)
-		return;
-	auto &string_pitch = layer->track->instrument.string_pitch;
+	QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), [this] (int hand_position) {
+		if (QuestionDialogInt::aborted)
+			return;
+		auto &string_pitch = layer->track->instrument.string_pitch;
 
-	song->begin_action_group("midi apply hand position");
-	auto notes = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: weak(notes)) {
- 		int stringno = 0;
- 		for (int i=0; i<string_pitch.num; i++)
-			if (n->pitch >= string_pitch[i] + hand_position) {
- 				stringno = i;
- 			}
-		layer->midi_note_set_string(n, stringno);
-	}
-	song->end_action_group();
+		song->begin_action_group("midi apply hand position");
+		auto notes = layer->midi.get_notes_by_selection(view->sel);
+		for (auto *n: weak(notes)) {
+			int stringno = 0;
+			for (int i=0; i<string_pitch.num; i++)
+				if (n->pitch >= string_pitch[i] + hand_position) {
+					stringno = i;
+				}
+			layer->midi_note_set_string(n, stringno);
+		}
+		song->end_action_group();
+	}, "range=0:99");
 }
 
 void MidiEditorConsole::on_apply_pitch_shift() {
-	int delta = QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), "range=-99:99");
-	if (QuestionDialogInt::aborted)
-		return;
+	QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), [this] (int delta) {
+		if (QuestionDialogInt::aborted)
+			return;
 
-	song->begin_action_group("midi pitch shift");
-	auto notes = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: weak(notes))
-		layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
-	song->end_action_group();
+		song->begin_action_group("midi pitch shift");
+		auto notes = layer->midi.get_notes_by_selection(view->sel);
+		for (auto *n: weak(notes))
+			layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
+		song->end_action_group();
+	}, "range=-99:99");
 }
 
 void MidiEditorConsole::on_apply_flags(int mask) {

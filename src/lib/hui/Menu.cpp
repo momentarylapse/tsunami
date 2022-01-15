@@ -28,8 +28,7 @@ void Menu::__delete__()
 	this->Menu::~Menu();
 }
 
-void Menu::clear()
-{
+void Menu::clear() {
 	DBDEL("menu", "", this);
 	for (Control *c: items)
 		delete(c);
@@ -37,42 +36,44 @@ void Menu::clear()
 	DBDEL_DONE();
 }
 
-void Menu::add(const string &name, const string &id)
-{
+void Menu::add(const string &name, const string &id) {
 	_add(new MenuItem(name, id));
 }
 
-void Menu::add_with_image(const string &name, const string &image, const string &id)
-{
+void Menu::add_with_image(const string &name, const string &image, const string &id) {
 	_add(new MenuItem(name, id));
+#if !GTK_CHECK_VERSION(4,0,0)
 	items.back()->set_image(image);
+#endif
 }
 
-void Menu::add_checkable(const string &name, const string &id)
-{
+void Menu::add_checkable(const string &name, const string &id) {
 	_add(new MenuItemToggle(name, id));
 }
 
-void Menu::add_separator()
-{
+void Menu::add_separator() {
 	_add(new MenuItemSeparator());
 }
 
-void Menu::add_sub_menu(const string &name, const string &id, Menu *menu)
-{
+void Menu::add_sub_menu(const string &name, const string &id, Menu *menu) {
 	if (menu)
 		_add(new MenuItemSubmenu(name, menu, id));
 }
 
+
+#if !GTK_CHECK_VERSION(4,0,0)
 void try_add_accel(GtkWidget *item, const string &id, Panel *p);
+#endif
 
 void Menu::set_panel(Panel *_panel)
 {
 	panel = _panel;
 	for (Control *c: items){
 		c->panel = panel;
+#if !GTK_CHECK_VERSION(4,0,0)
 		if (panel)
 			try_add_accel(c->widget, c->id, panel);
+#endif
 		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
 		if (s)
 			s->sub_menu->set_panel(panel);
@@ -130,13 +131,14 @@ void Menu::__update_language()
 #endif
 }
 
-Array<Control*> Menu::get_all_controls()
-{
+Array<Control*> Menu::get_all_controls() {
 	Array<Control*> list = items;
-	for (Control *c: items){
+	for (Control *c: items) {
+		if (c->type == MENU_ITEM_SUBMENU) {
 		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
 		if (s)
 			list.append(s->sub_menu->get_all_controls());
+		}
 	}
 	return list;
 }

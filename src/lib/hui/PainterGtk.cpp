@@ -46,14 +46,19 @@ Painter::Painter(Panel *panel, const string &_id) {
 	mode_fill = true;
 	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(panel->_get_control_(id));
 	corner_radius = 0;
-	if (c){
+	if (c) {
 		cr = (cairo_t*)c->cur_cairo;
 //		cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
 		layout = pango_cairo_create_layout(cr);
 
 		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
+#if GTK_CHECK_VERSION(4,0,0)
+		width = gtk_widget_get_width(c->widget);
+		height = gtk_widget_get_height(c->widget);
+#else
 		width = gdk_window_get_width(gtk_widget_get_window(c->widget));
 		height = gdk_window_get_height(gtk_widget_get_window(c->widget));
+#endif
 		set_font("Sans", 16, false, false);
 
 		// might be translated already

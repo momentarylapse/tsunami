@@ -28,7 +28,9 @@
 #endif
 #ifdef OS_LINUX
 #if HAS_LIB_XLIB
+#if !GTK_CHECK_VERSION(4,0,0)
 	#include <gdk/gdkx.h>
+#endif
 #endif
 #endif
 
@@ -36,7 +38,7 @@ namespace hui
 {
 
 
-string Version = "0.6.14.2";
+string Version = "0.7.-1.0";
 
 
 #ifdef OS_WINDOWS
@@ -47,7 +49,9 @@ string Version = "0.6.14.2";
 	HICON hui_win_main_icon;
 #endif
 #ifdef OS_LINUX
+#if !GTK_CHECK_VERSION(4,0,0)
 	Display* x_display;
+#endif
 #endif
 
 
@@ -175,33 +179,32 @@ namespace hui
 {
 
 
-
-void _MakeUsable_()
-{
+void _MakeUsable_() {
 	if (_screen_opened_)
 		return;
-#ifdef HUI_API_WIN
-
-	//InitCommonControls(); comctl32.lib
-	CoInitialize(nullptr);
-	//WinStandartFont=CreateFont(8,0,0,0,FW_NORMAL,FALSE,FALSE,0,ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,DEFAULT_PITCH|FF_SWISS,"MS Sans Serif");
-	hui_win_default_font=(HFONT)GetStockObject(DEFAULT_GUI_FONT);
-
-	hui_win_main_icon=ExtractIcon(hui_win_instance,sys_str(AppFilename),0);
-
-#endif
 #ifdef HUI_API_GTK
+#if GTK_CHECK_VERSION(4,0,0)
+	if (Application::application)
+		return;
+	Application::application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
+	gtk_init();
+#else
 	gtk_init(nullptr, nullptr);
+#endif
 	#ifdef OS_LINUX
+#if !GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_XLIB
 		x_display = XOpenDisplay(0);
 #endif
+#endif
 	#endif
 
+#if !GTK_CHECK_VERSION(4,0,0)
 #if GTK_CHECK_VERSION(3,16,0)
 	invisible_cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_BLANK_CURSOR);
 #else
 	invisible_cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+#endif
 #endif
 
 #endif

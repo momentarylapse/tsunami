@@ -15,7 +15,9 @@ namespace hui
 MenuItemSeparator::MenuItemSeparator() :
 	Control(MENU_ITEM_SEPARATOR, "")
 {
+#if !GTK_CHECK_VERSION(4,0,0)
 	widget = gtk_separator_menu_item_new();
+#endif
 }
 
 };

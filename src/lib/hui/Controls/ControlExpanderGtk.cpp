@@ -56,7 +56,11 @@ void ControlExpander::add(Control *child, int x, int y) {
 #else
 	gtk_widget_set_margin_left(child_widget, ind);
 #endif
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_expander_set_child(GTK_EXPANDER(widget), child_widget);
+#else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
+#endif
 	children.add(child);
 	child->parent = this;
 }

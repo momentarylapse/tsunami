@@ -60,7 +60,18 @@ void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data) {
 
 // window coordinate system!
 void Menu::open_popup(Panel *panel) {
-#if !GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(4,0,0)
+	msg_write("Menu.open_popup() gtk4");
+
+
+	auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(gmenu));
+	gtk_widget_set_parent(w, panel->win->plugable);
+	GdkRectangle rr = {(int)panel->win->input.x, (int)panel->win->input.y, 0, 0};
+	gtk_popover_set_pointing_to(GTK_POPOVER(w), &rr);
+	gtk_popover_popup(GTK_POPOVER(w));
+
+
+#else
 	gtk_widget_show(widget);
 #if GTK_CHECK_VERSION(3,22,0)
 	gtk_menu_popup_at_pointer(GTK_MENU(widget), nullptr);

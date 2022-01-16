@@ -11,11 +11,11 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
 
-void on_gtk_radio_button_toggle(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void on_gtk_radio_button_toggle(GtkWidget *widget, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
 ControlRadioButton::ControlRadioButton(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_RADIOBUTTON, id)
@@ -56,7 +56,11 @@ void ControlRadioButton::__set_string(const string &str) {
 }
 
 void ControlRadioButton::__check(bool checked) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(widget), checked);
+#else
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), checked);
+#endif
 }
 
 string ControlRadioButton::get_string() {
@@ -64,7 +68,11 @@ string ControlRadioButton::get_string() {
 }
 
 bool ControlRadioButton::is_checked() {
+#if GTK_CHECK_VERSION(4,0,0)
+	return (bool)gtk_check_button_get_active(GTK_CHECK_BUTTON(widget));
+#else
 	return (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+#endif
 }
 
 };

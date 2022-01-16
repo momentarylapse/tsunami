@@ -10,11 +10,9 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class ControlRadioButton : public Control
-{
+class ControlRadioButton : public Control {
 public:
 	ControlRadioButton(const string &text, const string &id, Panel *panel);
 	string get_string() override;

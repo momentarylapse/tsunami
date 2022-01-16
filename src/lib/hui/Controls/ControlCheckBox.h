@@ -10,8 +10,7 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
 
 class ControlCheckBox : public Control {

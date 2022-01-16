@@ -15,13 +15,16 @@ namespace hui
 // for unique window identifiers
 static int current_uid = 0;
 
+const int DEFAULT_SPACING = 5;
+const int DEFAULT_WINDOW_BORDER = 10;
+
 string get_gtk_action_name(const string &id, bool with_scope);
 
 Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
-	border_width = 5;
-	spacing = 5;
+	border_width = DEFAULT_WINDOW_BORDER;
+	spacing = DEFAULT_SPACING;
 	id = "";
 	num_float_decimals = 3;
 	root_control = nullptr;

@@ -10,8 +10,9 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
+
+const int FRAME_INDENT = 0; //20;
 
 ControlGroup::ControlGroup(const string &title, const string &id) :
 	Control(CONTROL_GROUP, id)
@@ -33,7 +34,7 @@ void ControlGroup::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	int ind = child->indent;
 	if (ind < 0)
-		ind = 20;
+		ind = FRAME_INDENT;
 #if GTK_CHECK_VERSION(3,12,0)
 	gtk_widget_set_margin_start(child_widget, ind);
 #else

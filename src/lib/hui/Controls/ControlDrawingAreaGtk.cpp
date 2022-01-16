@@ -493,10 +493,34 @@ void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint 
 void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
-	c->panel->win->input.lb = true;
+	int but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
+	c->panel->win->input.lb = (but == GDK_BUTTON_PRIMARY);
+	c->panel->win->input.mb = (but == GDK_BUTTON_MIDDLE);
+	c->panel->win->input.rb = (but == GDK_BUTTON_SECONDARY);
+	if (but == GDK_BUTTON_PRIMARY) {
+		c->notify(EventID::LEFT_BUTTON_DOWN, false);
+		if (n_press >= 2)
+			c->notify(EventID::LEFT_DOUBLE_CLICK, false);
+	} else if (but == GDK_BUTTON_MIDDLE) {
+		c->notify(EventID::MIDDLE_BUTTON_DOWN, false);
+	} else if (but == GDK_BUTTON_SECONDARY) {
+		c->notify(EventID::RIGHT_BUTTON_DOWN, false);
+	}
+}
+void on_gtk_gesture_click_released(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+	int but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
+	c->panel->win->input.lb = false;
 	c->panel->win->input.mb = false;
 	c->panel->win->input.rb = false;
-	c->notify(EventID::LEFT_BUTTON_DOWN, false);
+	if (but == GDK_BUTTON_PRIMARY) {
+		c->notify(EventID::LEFT_BUTTON_UP, false);
+	} else if (but == GDK_BUTTON_MIDDLE) {
+		c->notify(EventID::MIDDLE_BUTTON_UP, false);
+	} else if (but == GDK_BUTTON_SECONDARY) {
+		c->notify(EventID::RIGHT_BUTTON_UP, false);
+	}
 }
 #endif
 
@@ -543,10 +567,12 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
 
-	// click
+	// click left
 	auto gesture_click = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture_click), 0);
 	gtk_widget_add_controller(da, GTK_EVENT_CONTROLLER(gesture_click));
 	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
+	g_signal_connect(G_OBJECT(gesture_click), "released", G_CALLBACK(&on_gtk_gesture_click_released), this);
 
 
 	// scroll

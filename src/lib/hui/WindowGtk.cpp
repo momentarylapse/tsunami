@@ -428,6 +428,8 @@ void Window::set_menu(Menu *_menu) {
 
 		for (auto c: menu->get_all_controls()) {
 			_try_add_action_(c->id);
+			if (!c->enabled)
+				enable(c->id, false);
 		}
 	} else {
 		menu = _menu;

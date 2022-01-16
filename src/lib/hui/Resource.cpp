@@ -200,9 +200,8 @@ Menu *_create_res_menu_(const string &ns, Resource *res) {
 			menu->add_sub_menu(get_lang(ns, c.id, c.title, true), c.id, sub);
 		}
 
-		// deprecated...
-		//if (menu->items.num > 0)
-		//	menu->items.back()->enable(c.enabled());
+		if (sa_contains(c.options, "disabled"))
+			menu->items.back()->enable(false);
 	}
 	return menu;
 }

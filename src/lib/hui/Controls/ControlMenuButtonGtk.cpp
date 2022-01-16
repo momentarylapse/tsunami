@@ -28,7 +28,11 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
 {
 	auto parts = split_title(title);
 	widget = gtk_menu_button_new();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_menu_button_set_label(GTK_MENU_BUTTON(widget), sys_str(parts[0]));
+#else
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
+#endif
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkMenuButtonPress), this);
 
 	menu = NULL;
@@ -38,15 +42,24 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
 }
 
 string ControlMenuButton::get_string() {
+#if GTK_CHECK_VERSION(4,0,0)
+	return gtk_menu_button_get_label(GTK_MENU_BUTTON(widget));
+#else
 	return gtk_button_get_label(GTK_BUTTON(widget));
+#endif
 }
 
 void ControlMenuButton::__set_string(const string &str) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_menu_button_set_label(GTK_MENU_BUTTON(widget), sys_str(str));
+#else
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(str));
+#endif
 }
 
 void ControlMenuButton::set_image(const string& str) {
 #if GTK_CHECK_VERSION(4,0,0)
+	msg_error("TODO: MenuButton.set_image() gtk4");
 #else
 	GtkWidget *im = (GtkWidget*)get_gtk_image(str, IconSize::REGULAR);
 	gtk_button_set_image(GTK_BUTTON(widget), im);
@@ -60,7 +73,7 @@ void ControlMenuButton::set_image(const string& str) {
 void ControlMenuButton::__set_option(const string &op, const string &value) {
 	if (op == "flat") {
 #if GTK_CHECK_VERSION(4,0,0)
-		msg_error("MenuButton.flat gtk4...");
+		gtk_menu_button_set_has_frame(GTK_MENU_BUTTON(widget), false);
 #else
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 #endif

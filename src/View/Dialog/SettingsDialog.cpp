@@ -28,7 +28,7 @@ struct ApiDescription {
 extern ApiDescription api_descriptions[];
 
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
-		hui::Window("settings_dialog", _parent) {
+		hui::Dialog("settings_dialog", _parent) {
 	view = _view;
 	event("language", [=]{ on_language(); });
 	event("color_scheme", [=]{ on_color_scheme(); });

@@ -326,7 +326,6 @@ void Window::show() {
 
 
 void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_data) {
-	msg_write("WINDOW RESPONSE");
 	auto win = reinterpret_cast<Window*>(user_data);
 	if (win->end_run_callback)
 		win->end_run_callback();
@@ -356,28 +355,16 @@ void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user
 
 void Window::_fly(Callback cb) {
 	show();
-	int uid = unique_id;
-	string last_id = "";
 
 	WindowFlightManager::add(win);
 
+	end_run_callback = cb;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	end_run_callback = cb;
 	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response_fly), this);
 	gtk_window_present(GTK_WINDOW(window));
 #else
-	// hmmmm, gtk_dialog_response() seems to be ignored here...?!?
-	/*if (get_parent()) {
-		msg_write("...dialog");
-		gtk_dialog_run(GTK_DIALOG(window));
-	} else {*/
-		while (!requested_destroy) {
-			Application::do_single_main_loop();
-			Sleep(0.005f);
-		}
-//	}
-	delete this;
+	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response_fly), this);
 #endif
 }
 
@@ -387,6 +374,7 @@ void Window::_run(Callback cb) {
 	string last_id = "";
 
 #if GTK_CHECK_VERSION(4,0,0)
+	msg_error("TODO: hui.run() gtk4");
 	end_run_callback = cb;
 	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response), this);
 	gtk_window_present(GTK_WINDOW(window));
@@ -405,6 +393,8 @@ void Window::_run(Callback cb) {
 }
 
 void fly(Window *win, Callback cb) {
+	if (!dynamic_cast<Dialog*>(win))
+		msg_error("hui.fly() only allowed for Dialog!");
 	win->_fly(cb);
 }
 

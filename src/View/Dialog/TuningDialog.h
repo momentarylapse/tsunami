@@ -12,8 +12,7 @@
 
 class Track;
 
-class TuningDialog : public hui::Window
-{
+class TuningDialog : public hui::Dialog {
 public:
 	TuningDialog(hui::Window *parent, Track *t);
 

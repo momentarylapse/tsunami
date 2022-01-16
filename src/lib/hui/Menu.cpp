@@ -65,17 +65,15 @@ void Menu::add_sub_menu(const string &name, const string &id, Menu *menu) {
 void try_add_accel(GtkWidget *item, const string &id, Panel *p);
 #endif
 
-void Menu::set_panel(Panel *_panel)
-{
+void Menu::set_panel(Panel *_panel) {
 	panel = _panel;
-	for (Control *c: items){
+	for (Control *c: items) {
 		c->panel = panel;
 #if !GTK_CHECK_VERSION(4,0,0)
 		if (panel)
 			try_add_accel(c->widget, c->id, panel);
 #endif
-		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
-		if (s)
+		if (auto s = dynamic_cast<MenuItemSubmenu*>(c))
 			s->sub_menu->set_panel(panel);
 	}
 }
@@ -84,15 +82,12 @@ void Menu::set_panel(Panel *_panel)
 int allow_signal_level = 0;
 
 // stupid function for HuiBui....
-void Menu::set_id(const string &id)
-{
+void Menu::set_id(const string &id) {
 }
 
-Menu *Menu::get_sub_menu_by_id(const string &id)
-{
-	for (Control *c: items){
-		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
-		if (s){
+Menu *Menu::get_sub_menu_by_id(const string &id) {
+	for (Control *c: items) {
+		if (auto s = dynamic_cast<MenuItemSubmenu*>(c)) {
 			if (s->id == id)
 				return s->sub_menu;
 			Menu *m = s->sub_menu->get_sub_menu_by_id(id);
@@ -104,8 +99,7 @@ Menu *Menu::get_sub_menu_by_id(const string &id)
 }
 
 
-void Menu::__update_language()
-{
+void Menu::__update_language() {
 #if 0
 	foreach(MenuItem &it, items){
 		if (it.sub_menu)
@@ -135,18 +129,16 @@ Array<Control*> Menu::get_all_controls() {
 	Array<Control*> list = items;
 	for (Control *c: items) {
 		if (c->type == MENU_ITEM_SUBMENU) {
-		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
-		if (s)
-			list.append(s->sub_menu->get_all_controls());
+			if (auto s = dynamic_cast<MenuItemSubmenu*>(c))
+				list.append(s->sub_menu->get_all_controls());
 		}
 	}
 	return list;
 }
 
 
-void Menu::enable(const string &id, bool enabled)
-{
-	for (Control *c: items){
+void Menu::enable(const string &id, bool enabled) {
+	for (Control *c: items) {
 		if (c->id == id)
 			c->enable(enabled);
 		if (c->type == MENU_ITEM_SUBMENU)
@@ -154,21 +146,19 @@ void Menu::enable(const string &id, bool enabled)
 	}
 }
 
-void Menu::check(const string& id, bool checked)
-{
+void Menu::check(const string& id, bool checked) {
 	apply_foreach(id, [checked](Control *c){ c->check(checked); });
 }
 
 
-void Menu::apply_foreach(const string &_id, std::function<void(Control*)> f)
-{
+void Menu::apply_foreach(const string &_id, std::function<void(Control*)> f) {
 	/*for (Control *c: items)
 		c->apply_foreach(_id, f);*/
 
 	// FIXME: menu items don't really know their children.... inconsistent...argh
 	auto list = get_all_controls();
 	for (auto *c: list)
-		if (c->id == _id){
+		if (c->id == _id) {
 			f(c);
 		}
 

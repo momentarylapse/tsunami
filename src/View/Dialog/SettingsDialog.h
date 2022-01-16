@@ -13,7 +13,7 @@
 class AudioView;
 class DeviceConsole;
 
-class SettingsDialog: public hui::Window {
+class SettingsDialog: public hui::Dialog {
 public:
 	SettingsDialog(AudioView *view, hui::Window *parent);
 

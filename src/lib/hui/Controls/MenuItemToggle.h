@@ -20,6 +20,10 @@ public:
 
 	void __check(bool checked) override;
 	bool is_checked() override;
+
+#if GTK_CHECK_VERSION(4,0,0)
+	GMenuItem *item;
+#endif
 };
 
 };

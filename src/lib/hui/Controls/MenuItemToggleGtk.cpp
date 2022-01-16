@@ -14,10 +14,14 @@ namespace hui
 
 gboolean on_get_menu_click(GtkWidget *widget, gpointer data);
 
+string get_gtk_action_name(const string &id, bool with_scope);
+
 MenuItemToggle::MenuItemToggle(const string &title, const string &id) :
 	Control(MENU_ITEM_TOGGLE, id)
 {
-#if !GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(4,0,0)
+	item = g_menu_item_new(get_lang_sys(id, get_lang_sys(id, title), false), get_gtk_action_name(id, true).c_str());
+#else
 	widget = gtk_check_menu_item_new_with_label(get_lang_sys(id, title, false));
 	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(on_get_menu_click), this);
 #endif

@@ -22,6 +22,7 @@ MenuItemSubmenu::MenuItemSubmenu(const string &title, Menu *menu, const string &
 #else
 	widget = gtk_menu_item_new_with_label(get_lang_sys(id, title));
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget), menu->widget);
+	item = nullptr;
 #endif
 	sub_menu = menu;
 }

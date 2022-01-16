@@ -65,6 +65,7 @@ void Menu::open_popup(Panel *panel) {
 
 
 	auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(gmenu));
+
 	gtk_widget_set_parent(w, panel->win->plugable);
 	GdkRectangle rr = {(int)panel->win->input.x, (int)panel->win->input.y, 0, 0};
 	gtk_popover_set_pointing_to(GTK_POPOVER(w), &rr);
@@ -88,6 +89,8 @@ void Menu::_add(Control *c) {
 #if GTK_CHECK_VERSION(4,0,0)
 	if (c->type == MENU_ITEM_BUTTON) {
 		g_menu_append_item(gmenu, dynamic_cast<MenuItem*>(c)->item);
+	} else if (c->type == MENU_ITEM_TOGGLE) {
+		g_menu_append_item(gmenu, dynamic_cast<MenuItemToggle*>(c)->item);
 	} else if (c->type == MENU_ITEM_SUBMENU) {
 		g_menu_append_item(gmenu, dynamic_cast<MenuItemSubmenu*>(c)->item);
 	}

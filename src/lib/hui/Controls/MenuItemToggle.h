@@ -24,6 +24,7 @@ public:
 #if GTK_CHECK_VERSION(4,0,0)
 	GMenuItem *item;
 #endif
+	bool checked = false;
 };
 
 };

@@ -164,12 +164,17 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-audio-mode-peaks", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
 	event("track-audio-mode-spectrum", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
 	
+	add_action_checkable("track-muted");
 	//event("track-muted", [=]{ view->cur_track()->set_muted(!view->cur_track()->muted); });
 	set_key_code("track-muted", hui::KEY_ALT + hui::KEY_M);
+	add_action_checkable("track-solo");
 	//event("track-solo", [=]{ view->cur_vtrack()->set_solo(!view->cur_vtrack()->solo); });
 	set_key_code("track-solo", hui::KEY_ALT + hui::KEY_S);
+	add_action_checkable("layer-muted");
 	set_key_code("layer-muted", hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_M);
+	add_action_checkable("layer-solo");
 	set_key_code("layer-solo", hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_S);
+	add_action_checkable("track-explode");
 	set_key_code("track-explode", hui::KEY_ALT + hui::KEY_X);
 	set_key_code("layer-up", hui::KEY_UP);
 	set_key_code("layer-down", hui::KEY_DOWN);

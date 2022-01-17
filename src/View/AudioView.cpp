@@ -1833,8 +1833,20 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	// convert
 	if (t) {
 		menu->enable("menu-convert", t->type == SignalType::AUDIO);
-		menu->enable("track-convert-stereo", t->channels == 1);
-		menu->enable("track-convert-mono", t->channels == 2);
+		//menu->enable("track-convert-mono", t->type == SignalType::AUDIO);
+		//menu->enable("track-convert-stereo", t->type == SignalType::AUDIO);
+		menu->enable("track-convert-stereo", t->channels == 1 and t->type == SignalType::AUDIO);
+		menu->enable("track-convert-mono", t->channels == 2 and t->type == SignalType::AUDIO);
+	}
+	// view
+	if (t) {
+		menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
+		menu->enable("track-audio-mode-peaks", t->type == SignalType::AUDIO);
+		menu->enable("track-audio-mode-spectrum", t->type == SignalType::AUDIO);
+		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
+		menu->enable("track-midi-mode-linear", t->type == SignalType::MIDI);
+		menu->enable("track-midi-mode-tab", t->type == SignalType::MIDI);
+		menu->enable("track-midi-mode-classical", t->type == SignalType::MIDI);
 	}
 	if (l) {
 		menu->enable("layer-merge", t->layers.num > 1);

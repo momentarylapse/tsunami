@@ -97,6 +97,7 @@ public:
 	void _cdecl set_size_desired(int width, int height);
 	void _cdecl get_size_desired(int &width, int &height);
 	void _cdecl set_menu(Menu *menu);
+	void _connect_menu_to_win(Menu *menu);
 	Menu* _cdecl get_menu();
 	Window* _cdecl get_parent();
 	void _cdecl __set_options(const string &options);

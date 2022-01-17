@@ -28,7 +28,8 @@ MenuItemToggle::MenuItemToggle(const string &title, const string &id) :
 #endif
 }
 
-void MenuItemToggle::__check(bool checked) {
+void MenuItemToggle::__check(bool _checked) {
+	checked = _checked;
 #if GTK_CHECK_VERSION(4,0,0)
 	if (auto a = panel_get_action(panel, id, false))
 		g_action_change_state(G_ACTION(a), g_variant_new_boolean(checked));

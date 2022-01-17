@@ -1,4 +1,5 @@
 #include "Controls/Control.h"
+#include "Controls/MenuItemToggle.h"
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
@@ -412,12 +413,14 @@ void Window::_try_add_action_(const string &id, bool as_checkable) {
 	if (aa)
 		return;
 	if (as_checkable) {
+		//msg_write("ACTION C   " + id);
 		GVariant *state = g_variant_new_boolean(FALSE);
 		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
 		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
 	} else {
+		//msg_write("ACTION     " + id);
 		auto a = g_simple_action_new(name.c_str(), nullptr);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
@@ -433,6 +436,22 @@ GAction *Window::_get_action(const string &id, bool with_scope) {
 
 #endif
 
+void Window::_connect_menu_to_win(Menu *menu) {
+	menu->set_panel(this);
+
+	for (auto c: menu->get_all_controls()) {
+		if (c->type == MENU_ITEM_TOGGLE) {
+			_try_add_action_(c->id, true);
+			if (static_cast<MenuItemToggle*>(c)->checked)
+				static_cast<MenuItemToggle*>(c)->__check(true);
+		} else {
+			_try_add_action_(c->id, false);
+		}
+		if (!c->enabled)
+			enable(c->id, false);
+	}
+}
+
 void Window::set_menu(Menu *_menu) {
 #if GTK_CHECK_VERSION(4,0,0)
 	//action_group = g_simple_action_group_new();
@@ -442,16 +461,7 @@ void Window::set_menu(Menu *_menu) {
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
 		gtk_widget_show(menubar);
 
-		menu->set_panel(this);
-
-		for (auto c: menu->get_all_controls()) {
-			if (c->type == MENU_ITEM_TOGGLE)
-				_try_add_action_(c->id, true);
-			else
-				_try_add_action_(c->id, false);
-			if (!c->enabled)
-				enable(c->id, false);
-		}
+		_connect_menu_to_win(menu);
 	} else {
 		menu = _menu;
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), nullptr);

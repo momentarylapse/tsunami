@@ -282,11 +282,14 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 		int _size = absolute_icon_size(size);
 		auto theme = get_hui_icon_theme();
 #if GTK_CHECK_VERSION(4,0,0)
+		msg_write("SYMBOLIC IMAGE " + image);
+		//return gtk_image_new_from_icon_name(get_gtk_icon_name("hui:open"));
+
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info)
 			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
-		msg_write("...argh symbolic icons gtk4");
-		return nullptr;
+		// TODO use theme???
+		return gtk_image_new_from_paintable(GDK_PAINTABLE(info));
 #else
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), _size, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info)

@@ -37,10 +37,10 @@ void ControlToggleButton::__set_string(const string &str) {
 }
 
 void ControlToggleButton::set_image(const string& str) {
-#if GTK_CHECK_VERSION(4,0,0)
-	msg_error("ToggleButton.image gtk4...");
-#else
 	GtkWidget *im = get_gtk_image_x(str, image_size, widget);
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_button_set_child(GTK_BUTTON(widget), im);
+#else
 	gtk_button_set_image(GTK_BUTTON(widget), im);
 	#if GTK_CHECK_VERSION(3,6,0)
 		if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)

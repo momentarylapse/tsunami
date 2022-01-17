@@ -403,7 +403,7 @@ void run(Window *win, Callback cb) {
 }
 
 #if GTK_CHECK_VERSION(4,0,0)
-void Window::_try_add_action_(const string &id) {
+void Window::_try_add_action_(const string &id, bool as_checkable) {
 	if (id == "")
 		return;
 	string name = get_gtk_action_name(id, false);
@@ -411,10 +411,26 @@ void Window::_try_add_action_(const string &id) {
 	auto aa = g_action_map_lookup_action(G_ACTION_MAP(action_group), name.c_str());
 	if (aa)
 		return;
-	auto a = g_simple_action_new(name.c_str(), nullptr);
-	g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
-	g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
+	if (as_checkable) {
+		GVariant *state = g_variant_new_boolean(FALSE);
+		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
+		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
+		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
+		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
+	} else {
+		auto a = g_simple_action_new(name.c_str(), nullptr);
+		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
+		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
+	}
 }
+
+
+GAction *Window::_get_action(const string &id, bool with_scope) {
+	if (action_group)
+		return g_action_map_lookup_action(G_ACTION_MAP(action_group), get_gtk_action_name(id, with_scope).c_str());
+	return nullptr;
+}
+
 #endif
 
 void Window::set_menu(Menu *_menu) {
@@ -426,8 +442,13 @@ void Window::set_menu(Menu *_menu) {
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
 		gtk_widget_show(menubar);
 
+		menu->set_panel(this);
+
 		for (auto c: menu->get_all_controls()) {
-			_try_add_action_(c->id);
+			if (c->type == MENU_ITEM_TOGGLE)
+				_try_add_action_(c->id, true);
+			else
+				_try_add_action_(c->id, false);
 			if (!c->enabled)
 				enable(c->id, false);
 		}
@@ -491,11 +512,17 @@ void Window::set_key_code(const string &id, int key_code, const string &image) {
 	event_key_codes.add(EventKeyCode(id, "", key_code));
 
 #if GTK_CHECK_VERSION(4,0,0)
-	_try_add_action_(id);
+	_try_add_action_(id, false);
 
 	int mod = (((key_code&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((key_code&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((key_code&KEY_ALT)>0) ? GDK_META_MASK : 0);
 	gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(shortcut_controller),
 		gtk_shortcut_new(gtk_keyval_trigger_new(HuiKeyID[key_code & 255], (GdkModifierType)mod), gtk_named_action_new(get_gtk_action_name(id, true).c_str())));
+#endif
+}
+
+void Window::add_action_checkable(const string &id) {
+#if GTK_CHECK_VERSION(4,0,0)
+	_try_add_action_(id, true);
 #endif
 }
 

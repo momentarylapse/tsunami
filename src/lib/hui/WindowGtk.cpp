@@ -447,8 +447,10 @@ void Window::_connect_menu_to_win(Menu *menu) {
 		} else {
 			_try_add_action_(c->id, false);
 		}
-		if (!c->enabled)
-			enable(c->id, false);
+		if (!c->enabled) {
+			c->enable(false); // update action...
+			//enable(c->id, false);
+		}
 	}
 }
 

@@ -78,7 +78,8 @@ public:
 private:
 	void find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleCategory type);
 	void find_plugins_in_dir(const Path &rel, const string &group, ModuleCategory type);
-	void add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)());
+	using Callback = std::function<void()>;
+	void add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, Callback cb);
 };
 
 #endif /* PLUGINMANAGER_H_ */

@@ -80,61 +80,61 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	int height = hui::Config.get_int("Window.Height", 600);
 	bool maximized = hui::Config.get_bool("Window.Maximized", true);
 
-	event("new", [=]{ on_new(); });
+	event("new", [this]{ on_new(); });
 	set_key_code("new", hui::KEY_N + hui::KEY_CONTROL);
-	event("open", [=]{ on_open(); });
+	event("open", [this]{ on_open(); });
 	set_key_code("open", hui::KEY_O + hui::KEY_CONTROL);
-	event("save", [=]{ on_save(); });
+	event("save", [this]{ on_save(); });
 	set_key_code("save", hui::KEY_S + hui::KEY_CONTROL);
-	event("save_as", [=]{ on_save_as(); });
+	event("save_as", [this]{ on_save_as(); });
 	set_key_code("save_as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	event("copy", [=]{ on_copy(); });
+	event("copy", [this]{ on_copy(); });
 	set_key_code("copy", hui::KEY_C + hui::KEY_CONTROL);
-	event("paste", [=]{ on_paste(); });
+	event("paste", [this]{ on_paste(); });
 	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL);
-	event("paste_as_samples", [=]{ on_paste_as_samples(); });
+	event("paste_as_samples", [this]{ on_paste_as_samples(); });
 	set_key_code("paste_as_samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	event("paste_time", [=]{ on_paste_time(); });
-	event("delete", [=]{ on_delete(); });
+	event("paste_time", [this]{ on_paste_time(); });
+	event("delete", [this]{ on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
-	event("delete-shift", [=]{ on_delete_shift(); });
+	event("delete-shift", [this]{ on_delete_shift(); });
 	set_key_code("delete-shift", hui::KEY_SHIFT + hui::KEY_DELETE);
-	event("render_export_selection", [=]{ on_render_export_selection(); });
+	event("render_export_selection", [this]{ on_render_export_selection(); });
 	set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL);
-	event("export_selection", [=]{ on_export_selection(); });
-	event("quick_export", [=]{ on_quick_export(); });
+	event("export_selection", [this]{ on_export_selection(); });
+	event("quick_export", [this]{ on_quick_export(); });
 	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	event("undo", [=]{ on_undo(); });
+	event("undo", [this]{ on_undo(); });
 	set_key_code("undo", hui::KEY_Z + hui::KEY_CONTROL);
-	event("redo", [=]{ on_redo(); });
+	event("redo", [this]{ on_redo(); });
 	set_key_code("redo", hui::KEY_Y + hui::KEY_CONTROL);
-	event("track_render", [=]{ on_track_render(); });
-	event("track-add-audio-mono", [=]{ on_add_audio_track_mono(); });
-	event("track-add-audio-stereo", [=]{ on_add_audio_track_stereo(); });
-	event("track-add-group", [=]{ song->add_track(SignalType::GROUP); });
-	event("track-add-beats", [=]{ on_add_time_track(); });
-	event("track-add-midi", [=]{ on_add_midi_track(); });
-	event("track-delete", [=]{ on_track_delete(); });
-	event("track-create-group", [=]{ on_track_group(); });
-	event("track-ungroup", [=]{ on_track_ungroup(); });
-	event("mode-edit-check", [=] {
+	event("track_render", [this]{ on_track_render(); });
+	event("track-add-audio-mono", [this]{ on_add_audio_track_mono(); });
+	event("track-add-audio-stereo", [this]{ on_add_audio_track_stereo(); });
+	event("track-add-group", [this]{ song->add_track(SignalType::GROUP); });
+	event("track-add-beats", [this]{ on_add_time_track(); });
+	event("track-add-midi", [this]{ on_add_midi_track(); });
+	event("track-delete", [this]{ on_track_delete(); });
+	event("track-create-group", [this]{ on_track_group(); });
+	event("track-ungroup", [this]{ on_track_ungroup(); });
+	event("mode-edit-check", [this] {
 		if (view->mode == view->mode_edit)
 			session->set_mode(EditMode::Default);
 		else
 			session->set_mode(EditMode::EditTrack);
 	});
-	event("layer-edit", [=]{ on_track_edit(); });
+	event("layer-edit", [this]{ on_track_edit(); });
 	set_key_code("layer-edit", hui::KEY_ALT + hui::KEY_E);
-	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
-	event("track-edit-curves", [=]{ session->set_mode(EditMode::Curves); });
-	event("track-edit-fx", [=]{ on_track_edit_fx(); });
-	event("track-add-marker", [=]{ on_track_add_marker(); });
+	event("edit_curves", [this]{ session->set_mode(EditMode::Curves); });
+	event("track-edit-curves", [this]{ session->set_mode(EditMode::Curves); });
+	event("track-edit-fx", [this]{ on_track_edit_fx(); });
+	event("track-add-marker", [this]{ on_track_add_marker(); });
 	set_key_code("track-add-marker", hui::KEY_CONTROL + hui::KEY_J);
-	event("track-convert-mono", [=]{ on_track_convert_mono(); });
-	event("track-convert-stereo", [=]{ on_track_convert_stereo(); });
-	event("buffer-delete", [=]{ on_buffer_delete(); });
-	event("buffer-make-movable", [=]{ on_buffer_make_movable(); });
-	event("buffer-compress", [=]{
+	event("track-convert-mono", [this]{ on_track_convert_mono(); });
+	event("track-convert-stereo", [this]{ on_track_convert_stereo(); });
+	event("buffer-delete", [this]{ on_buffer_delete(); });
+	event("buffer-make-movable", [this]{ on_buffer_make_movable(); });
+	event("buffer-compress", [this]{
 		auto dlg = new BufferCompressionDialog(this);
 		hui::fly(dlg, [dlg, this] {
 			if (dlg->codec == "")
@@ -154,21 +154,21 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		});
 	});
 
-	event("edit-track-groups", [=] {
+	event("edit-track-groups", [this] {
 		hui::fly(new TrackRoutingDialog(this, song));
 	});
 
-	event("track-midi-mode-linear", [=]{ on_layer_midi_mode_linear(); });
-	event("track-midi-mode-tab", [=]{ on_layer_midi_mode_tab(); });
-	event("track-midi-mode-classical", [=]{ on_layer_midi_mode_classical(); });
-	event("track-audio-mode-peaks", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
-	event("track-audio-mode-spectrum", [=] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
+	event("track-midi-mode-linear", [this]{ on_layer_midi_mode_linear(); });
+	event("track-midi-mode-tab", [this]{ on_layer_midi_mode_tab(); });
+	event("track-midi-mode-classical", [this]{ on_layer_midi_mode_classical(); });
+	event("track-audio-mode-peaks", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
+	event("track-audio-mode-spectrum", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
 	
 	add_action_checkable("track-muted");
-	//event("track-muted", [=]{ view->cur_track()->set_muted(!view->cur_track()->muted); });
+	//event("track-muted", [this]{ view->cur_track()->set_muted(!view->cur_track()->muted); });
 	set_key_code("track-muted", hui::KEY_ALT + hui::KEY_M);
 	add_action_checkable("track-solo");
-	//event("track-solo", [=]{ view->cur_vtrack()->set_solo(!view->cur_vtrack()->solo); });
+	//event("track-solo", [this]{ view->cur_vtrack()->set_solo(!view->cur_vtrack()->solo); });
 	set_key_code("track-solo", hui::KEY_ALT + hui::KEY_S);
 	add_action_checkable("layer-muted");
 	set_key_code("layer-muted", hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_M);
@@ -181,80 +181,80 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("layer-expand-up", hui::KEY_SHIFT + hui::KEY_UP);
 	set_key_code("layer-expand-down", hui::KEY_SHIFT + hui::KEY_DOWN);
 
-	event("layer-add", [=]{ on_add_layer(); });
-	event("layer-delete", [=]{ on_delete_layer(); });
+	event("layer-add", [this]{ on_add_layer(); });
+	event("layer-delete", [this]{ on_delete_layer(); });
 	set_key_code("layer-delete", hui::KEY_CONTROL + hui::KEY_DELETE);
-	event("layer-make-track", [=]{ on_layer_make_track(); });
-	event("layer-merge", [=]{ on_layer_merge(); });
-	event("layer-mark-dominant", [=]{ on_layer_mark_selection_dominant(); });
+	event("layer-make-track", [this]{ on_layer_make_track(); });
+	event("layer-merge", [this]{ on_layer_merge(); });
+	event("layer-mark-dominant", [this]{ on_layer_mark_selection_dominant(); });
 	set_key_code("layer-mark-dominant", hui::KEY_ALT + hui::KEY_D);
-	event("layer-add-dominant", [=]{ on_layer_add_selection_dominant(); });
-	event("bars-add", [=]{ on_add_bars(); });
-	event("bars-add-pause", [=]{ on_add_pause(); });
-	event("bars-delete", [=]{ on_delete_bars(); });
-	event("delete_time", [=]{ on_delete_time_interval(); });
-	event("insert_time", [=]{ on_insert_time_interval(); });
-	event("bars-edit", [=]{ on_edit_bars(); });
-	event("bars-scale", [=]{ on_scale_bars(); });
-	event("sample_manager", [=]{ on_sample_manager(); });
-	event("song-edit-samples", [=]{ on_sample_manager(); });
+	event("layer-add-dominant", [this]{ on_layer_add_selection_dominant(); });
+	event("bars-add", [this]{ on_add_bars(); });
+	event("bars-add-pause", [this]{ on_add_pause(); });
+	event("bars-delete", [this]{ on_delete_bars(); });
+	event("delete_time", [this]{ on_delete_time_interval(); });
+	event("insert_time", [this]{ on_insert_time_interval(); });
+	event("bars-edit", [this]{ on_edit_bars(); });
+	event("bars-scale", [this]{ on_scale_bars(); });
+	event("sample_manager", [this]{ on_sample_manager(); });
+	event("song-edit-samples", [this]{ on_sample_manager(); });
 	add_action_checkable("show-mixing-console");
-	event("show-mixing-console", [=]{ on_mixing_console(); });
+	event("show-mixing-console", [this]{ on_mixing_console(); });
 	set_key_code("show-mixing-console", hui::KEY_CONTROL + hui::KEY_M);
-	event("show-devices", [=]{ on_settings(); });
+	event("show-devices", [this]{ on_settings(); });
 	add_action_checkable("show-signal-chain");
-	event("show-signal-chain", [=]{ session->set_mode(EditMode::XSignalEditor); });
-	event("show-mastering-console", [=]{ on_mastering_console(); });
-	event("show-fx-console", [=]{ on_fx_console(); });
-	event("sample_from_selection", [=]{ on_sample_from_selection(); });
-	event("sample-insert", [=]{ on_insert_sample(); });
+	event("show-signal-chain", [this]{ session->set_mode(EditMode::XSignalEditor); });
+	event("show-mastering-console", [this]{ on_mastering_console(); });
+	event("show-fx-console", [this]{ on_fx_console(); });
+	event("sample_from_selection", [this]{ on_sample_from_selection(); });
+	event("sample-insert", [this]{ on_insert_sample(); });
 	set_key_code("sample-insert", hui::KEY_I + hui::KEY_CONTROL);
-	event("sample-delete", [=]{ on_remove_sample(); });
-	event("marker-delete", [=]{ on_delete_marker(); });
-	event("marker-edit", [=]{ on_edit_marker(); });
-	event("marker-resize", [=]{ on_marker_resize(); });
-	event("track_import", [=]{ on_track_import(); });
-	event("sub_import", [=]{ on_sample_import(); });
-	event("song-properties", [=]{ on_song_properties(); });
+	event("sample-delete", [this]{ on_remove_sample(); });
+	event("marker-delete", [this]{ on_delete_marker(); });
+	event("marker-edit", [this]{ on_edit_marker(); });
+	event("marker-resize", [this]{ on_marker_resize(); });
+	event("track_import", [this]{ on_track_import(); });
+	event("sub_import", [this]{ on_sample_import(); });
+	event("song-properties", [this]{ on_song_properties(); });
 	set_key_code("song-properties", hui::KEY_F4);
-	event("track-properties", [=]{ on_track_properties(); });
-	event("sample-properties", [=]{ on_sample_properties(); });
-	event("settings", [=]{ on_settings(); });
-	event("play", [=]{ on_play(); });
-	event("play-toggle", [=]{ on_play_toggle(); });
+	event("track-properties", [this]{ on_track_properties(); });
+	event("sample-properties", [this]{ on_sample_properties(); });
+	event("settings", [this]{ on_settings(); });
+	event("play", [this]{ on_play(); });
+	event("play-toggle", [this]{ on_play_toggle(); });
 	set_key_code("play-toggle", hui::KEY_SPACE);
 	add_action_checkable("play-loop");
-	event("play-loop", [=]{ on_play_loop(); });
+	event("play-loop", [this]{ on_play_loop(); });
 	set_key_code("play-loop", hui::KEY_CONTROL + hui::KEY_L);
-	event("pause", [=]{ on_pause(); });
-	event("stop", [=]{ on_stop(); });
+	event("pause", [this]{ on_pause(); });
+	event("stop", [this]{ on_stop(); });
 	set_key_code("stop", hui::KEY_CONTROL + hui::KEY_T);
-	event("record", [=]{ on_record(false); });
+	event("record", [this]{ on_record(false); });
 	set_key_code("record", hui::KEY_CONTROL + hui::KEY_R);
-	event("record-simple", [=]{ on_record(false); });
-	event("record-complex", [=]{ on_record(true); });
-	event("playback-range-lock", [=]{ view->set_playback_range_locked(!view->playback_range_locked); });
-	event("show-log", [=]{ on_show_log(); });
-	event("about", [=]{ on_about(); });
-	event("help", [=]{ on_help(); });
+	event("record-simple", [this]{ on_record(false); });
+	event("record-complex", [this]{ on_record(true); });
+	event("playback-range-lock", [this]{ view->set_playback_range_locked(!view->playback_range_locked); });
+	event("show-log", [this]{ on_show_log(); });
+	event("about", [this]{ on_about(); });
+	event("help", [this]{ on_help(); });
 	set_key_code("run_plugin", hui::KEY_SHIFT + hui::KEY_RETURN);
-	event("exit", [=]{ on_exit(); });
+	event("exit", [this]{ on_exit(); });
 	set_key_code("exit", hui::KEY_CONTROL + hui::KEY_Q);
-	event("select_all", [=]{ on_select_all(); });
+	event("select_all", [this]{ on_select_all(); });
 	set_key_code("select_all", hui::KEY_CONTROL + hui::KEY_A);
-	event("select_nothing", [=]{ on_select_none(); });
-	event("select_expand", [=]{ on_select_expand(); });
+	event("select_nothing", [this]{ on_select_none(); });
+	event("select_expand", [this]{ on_select_expand(); });
 	set_key_code("select_expand", hui::KEY_TAB + hui::KEY_SHIFT);
 	add_action_checkable("view-midi-linear");
-	event("view-midi-linear", [=]{ on_view_midi_default(); });
+	event("view-midi-linear", [this]{ on_view_midi_default(); });
 	add_action_checkable("view-midi-tab");
-	event("view-midi-tab", [=]{ on_view_midi_tab(); });
+	event("view-midi-tab", [this]{ on_view_midi_tab(); });
 	add_action_checkable("view-midi-classical");
-	event("view-midi-classical", [=]{ on_view_midi_score(); });
-	event("view-optimal", [=]{ on_view_optimal(); });
-	event("zoom-in", [=]{ on_zoom_in(); });
+	event("view-midi-classical", [this]{ on_view_midi_score(); });
+	event("view-optimal", [this]{ on_view_optimal(); });
+	event("zoom-in", [this]{ on_zoom_in(); });
 	set_key_code("zoom-in", hui::KEY_PLUS);
-	event("zoom-out", [=]{ on_zoom_out(); });
+	event("zoom-out", [this]{ on_zoom_out(); });
 	set_key_code("zoom-out", hui::KEY_MINUS);
 
 	set_key_code("vertical-zoom-in", hui::KEY_PLUS + hui::KEY_SHIFT);
@@ -295,11 +295,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	app->plugin_manager->add_plugins_to_menu(this);
 
 	// events
-	event("hui:close", [=]{ on_exit(); });
+	event("hui:close", [this]{ on_exit(); });
 
 	for (int i=0; i<256; i++) {
-		event("import-backup-" + i2s(i), [=]{ on_import_backup(); });
-		event("delete-backup-" + i2s(i), [=]{ on_delete_backup(); });
+		event("import-backup-" + i2s(i), [this]{ on_import_backup(); });
+		event("delete-backup-" + i2s(i), [this]{ on_delete_backup(); });
 	}
 
 	view = new AudioView(session, "area");
@@ -315,28 +315,28 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	//mini_bar = new MiniBar(bottom_bar, session);
 	//embed(mini_bar.get(), "main-grid", 0, 2);
 
-	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
-	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SELECTION_CHANGE);
-	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
-	view->signal_chain->subscribe(this, [=]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
-	song->action_manager->subscribe(this, [=]{ on_update(); }, song->action_manager->MESSAGE_ANY);
-	song->action_manager->subscribe(this, [=] {
+	view->subscribe(this, [this]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
+	view->subscribe(this, [this]{ on_update(); }, view->MESSAGE_SELECTION_CHANGE);
+	view->subscribe(this, [this]{ on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [this]{ on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->signal_chain->subscribe(this, [this]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
+	song->action_manager->subscribe(this, [this]{ on_update(); }, song->action_manager->MESSAGE_ANY);
+	song->action_manager->subscribe(this, [this] {
 		view->set_message(_("undo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
-	song->action_manager->subscribe(this, [=] {
+	song->action_manager->subscribe(this, [this] {
 		view->set_message(_("redo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
-	app->clipboard->subscribe(this, [=]{ on_update(); }, app->clipboard->MESSAGE_ANY);
-	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
-	side_bar->subscribe(this, [=]{ on_side_bar_update(); }, side_bar->MESSAGE_ANY);
+	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
+	app->clipboard->subscribe(this, [this]{ on_update(); }, app->clipboard->MESSAGE_ANY);
+	bottom_bar->subscribe(this, [this]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
+	side_bar->subscribe(this, [this]{ on_side_bar_update(); }, side_bar->MESSAGE_ANY);
 	
-	event("*", [=]{ view->on_command(hui::GetEvent()->id); });
+	event("*", [this]{ view->on_command(hui::GetEvent()->id); });
 
 	// first time start?
 	if (hui::Config.get_bool("FirstStart", true)) {
-		hui::RunLater(0.2f, [=]{
+		hui::RunLater(0.2f, [this]{
 			on_help();
 			hui::Config.set_bool("FirstStart", false);
 		});
@@ -1159,7 +1159,7 @@ void TsunamiWindow::on_exit() {
 	test_allow_termination([this] {
 		BackupManager::set_save_state(session);
 		//request_destroy();
-		hui::RunLater(0.01f, [=]{ session->win = nullptr; });
+		hui::RunLater(0.01f, [this]{ session->win = nullptr; });
 	}, [] {});
 }
 
@@ -1348,7 +1348,10 @@ void TsunamiWindow::on_scale_bars() {
 void TsunamiWindow::set_big_panel(ModulePanel* p) {
 	big_module_panel = p;
 	if (big_module_panel) {
-		big_module_panel->set_func_close([=]{ msg_write("...close"); remove_control("plugin-grid"); });
+		big_module_panel->set_func_close([this]{
+			msg_write("...close");
+			remove_control("plugin-grid");
+		});
 		int w, h;
 		get_size(w, h);
 		big_module_panel->set_width(w / 2);

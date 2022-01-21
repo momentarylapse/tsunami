@@ -819,12 +819,12 @@ void PluginManager::find_plugins_in_dir(const Path &rel, const string &group, Mo
 		find_plugins_in_dir_absolute(plugin_dir_local() << rel, group, type);
 }
 
-void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)()) {
+void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, Callback cb) {
 	for (auto &f: plugin_files) {
 		if (f.filename.is_in(plugin_dir_static() << dir) or f.filename.is_in(plugin_dir_local() << dir)) {
 			string id = "execute-" + name_space + "--" + f.name;
 			m->add_with_image(f.name, f.image, id);
-			win->event(id, std::bind(function, win));
+			win->event(id, cb);
 		}
 	}
 }
@@ -877,25 +877,25 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	hui::Menu *m = win->get_menu();
 
 	// "Buffer"
-	add_plugins_in_dir("AudioEffect/Channels", m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Dynamics", m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Echo", m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Filter", m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Pitch", m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Repair", m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Sound", m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Channels", m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Dynamics", m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Echo", m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Filter", m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Pitch", m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Repair", m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
+	add_plugins_in_dir("AudioEffect/Sound", m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, [win]{ win->on_menu_execute_audio_effect(); });
 
-	add_plugins_in_dir("AudioSource", m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::on_menu_execute_audio_source);
+	add_plugins_in_dir("AudioSource", m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, [win]{ win->on_menu_execute_audio_source(); });
 
 	// "Midi"
-	add_plugins_in_dir("MidiEffect", m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::on_menu_execute_midi_effect);
-	add_plugins_in_dir("MidiSource", m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::on_menu_execute_midi_source);
+	add_plugins_in_dir("MidiEffect", m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, [win]{ win->on_menu_execute_midi_effect(); });
+	add_plugins_in_dir("MidiSource", m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, [win]{ win->on_menu_execute_midi_source(); });
 
 	// "All"
-	add_plugins_in_dir("All", m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, &TsunamiWindow::on_menu_execute_song_plugin);
+	add_plugins_in_dir("All", m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, [win]{ win->on_menu_execute_song_plugin(); });
 
 	// rest
-	add_plugins_in_dir("Independent", m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
+	add_plugins_in_dir("Independent", m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, [win]{ win->on_menu_execute_tsunami_plugin(); });
 }
 
 void PluginManager::apply_profile(Module *c, const string &name, bool notify) {

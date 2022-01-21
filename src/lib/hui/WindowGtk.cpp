@@ -405,7 +405,7 @@ void run(Window *win, Callback cb) {
 
 #if GTK_CHECK_VERSION(4,0,0)
 void Window::_try_add_action_(const string &id, bool as_checkable) {
-	if (id == "")
+	if ((id == "") or (id == "*") or (id == "hui:close"))
 		return;
 	string name = get_gtk_action_name(id, false);
 	//msg_write(name + "   (...)");
@@ -866,13 +866,13 @@ void Panel::activate(const string &control_id) {
 		gtk_window_present(GTK_WINDOW(win->window));
 	}
 	if (control_id.num > 0)
-		apply_foreach(control_id, [=](Control *c) { c->focus(); });
+		apply_foreach(control_id, [](Control *c) { c->focus(); });
 }
 
 bool Panel::is_active(const string &control_id) {
 	if (control_id.num > 0) {
 		bool r = false;
-		apply_foreach(control_id, [&](Control *c) { r = c->has_focus(); });
+		apply_foreach(control_id, [&r](Control *c) { r = c->has_focus(); });
 		return r;
 	}
 	if (!win)

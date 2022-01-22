@@ -11,6 +11,7 @@
 #include "../lib/file/msg.h"
 #include "../View/Helper/MidiPreview.h"
 #include "../Module/Synth/Synthesizer.h"
+#include "../Module/Midi/MidiPreviewSource.h"
 #include "../Session.h"
 #include <thread>
 
@@ -21,6 +22,7 @@ TestMidiPreview::TestMidiPreview() : UnitTest("midi-preview") {}
 Array<UnitTest::Test> TestMidiPreview::tests() {
 	Array<Test> list;
 	list.add({"preview", TestMidiPreview::test_preview});
+	list.add({"preview-source", TestMidiPreview::test_preview_source});
 	return list;
 }
 
@@ -40,6 +42,23 @@ void TestMidiPreview::test_preview() {
 	msg_write("end");
 	preview->end();
 	sleep(0.3f);
+	delete preview;
+}
+
+void TestMidiPreview::test_preview_source() {
+	auto *synth = CreateSynthesizer(Session::GLOBAL, "");
+	auto *preview = new MidiPreview(Session::GLOBAL, synth);
+	auto source = preview->source;
+	auto chain = preview->chain;
+	chain->set_buffer_size(4);
+
+	msg_write("start");
+	source->start({64}, 10, 1.0f);
+	msg_write(chain->do_suck());
+	source->end();
+	msg_write(chain->do_suck());
+	msg_write(chain->do_suck());
+
 	delete preview;
 }
 

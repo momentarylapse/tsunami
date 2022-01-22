@@ -19,6 +19,7 @@ public:
 	Array<Test> tests() override;
 
 	static void test_preview();
+	static void test_preview_source();
 };
 
 #endif /* SRC_TEST_TESTMIDIPREVIEW_H_ */

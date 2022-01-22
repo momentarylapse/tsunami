@@ -24,6 +24,7 @@
 #include "TestMixer.h"
 #include "TestTrackVersion.h"
 #include "TestPointer.h"
+#include "TestSignalChain.h"
 
 Array<string> UnitTest::event_protocoll;
 
@@ -166,6 +167,7 @@ Array<UnitTest*> UnitTest::all() {
 	tests.add(new TestTrackVersion);
 	tests.add(new TestThreads);
 	tests.add(new TestStreams);
+	tests.add(new TestSignalChain);
 	tests.add(new TestMidiPreview);
 	tests.add(new TestPlugins);
 	return tests;

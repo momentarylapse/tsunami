@@ -470,6 +470,7 @@
     <ClCompile Include="src\Test\TestPointer.cpp" />
     <ClCompile Include="src\Test\TestRhythm.cpp" />
     <ClCompile Include="src\Test\TestRingBuffer.cpp" />
+    <ClCompile Include="src\Test\TestSignalChain.cpp" />
     <ClCompile Include="src\Test\TestStreams.cpp" />
     <ClCompile Include="src\Test\TestThreads.cpp" />
     <ClCompile Include="src\Test\TestTrackVersion.cpp" />
@@ -897,6 +898,7 @@
     <ClInclude Include="src\Test\TestPointer.h" />
     <ClInclude Include="src\Test\TestRhythm.h" />
     <ClInclude Include="src\Test\TestRingBuffer.h" />
+    <ClInclude Include="src\Test\TestSignalChain.h" />
     <ClInclude Include="src\Test\TestStreams.h" />
     <ClInclude Include="src\Test\TestThreads.h" />
     <ClInclude Include="src\Test\TestTrackVersion.h" />

@@ -449,6 +449,7 @@ sources = [
 	'src/Test/TestPointer.cpp',
 	'src/Test/TestRhythm.cpp',
 	'src/Test/TestRingBuffer.cpp',
+	'src/Test/TestSignalChain.cpp',
 	'src/Test/TestStreams.cpp',
 	'src/Test/TestThreads.cpp',
 	'src/Test/TestTrackVersion.cpp',

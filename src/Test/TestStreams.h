@@ -12,8 +12,7 @@
 
 #include "UnitTest.h"
 
-class TestStreams : public UnitTest
-{
+class TestStreams : public UnitTest {
 public:
 	TestStreams();
 

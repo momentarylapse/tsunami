@@ -359,6 +359,7 @@ OBJ = Action/Bar/Action__ScaleData.o \
  Test/TestPointer.o \
  Test/TestRhythm.o \
  Test/TestRingBuffer.o \
+ Test/TestSignalChain.o \
  Test/TestStreams.o \
  Test/TestThreads.o \
  Test/TestTrackVersion.o \
@@ -1521,6 +1522,9 @@ Test/TestRhythm.o : Test/TestRhythm.cpp Test/TestRhythm.h Test/UnitTest.h lib/ba
 Test/TestRingBuffer.o : Test/TestRingBuffer.cpp Test/TestRingBuffer.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/Audio/RingBuffer.h Data/Audio/AudioBuffer.h lib/base/pointer.h Data/Range.h
 	$(CPP) -c Test/TestRingBuffer.cpp -o $@ $(CXXFLAGS)
 
+Test/TestSignalChain.o : Test/TestSignalChain.cpp Test/TestSignalChain.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h
+	$(CPP) -c Test/TestSignalChain.cpp -o $@ $(CXXFLAGS)
+
 Test/TestStreams.o : Test/TestStreams.cpp Test/TestStreams.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/math/math.h Data/base.h Module/Audio/AudioSource.h Module/Module.h lib/base/pointer.h Stuff/Observable.h Module/Port/Port.h Module/SignalChain.h Session.h Device/Stream/AudioOutput.h Data/Audio/RingBuffer.h Data/Audio/AudioBuffer.h Data/Range.h Module/ModuleConfiguration.h
 	$(CPP) -c Test/TestStreams.cpp -o $@ $(CXXFLAGS)
 
@@ -1530,7 +1534,7 @@ Test/TestThreads.o : Test/TestThreads.cpp Test/TestThreads.h Test/UnitTest.h lib
 Test/TestTrackVersion.o : Test/TestTrackVersion.cpp Test/TestTrackVersion.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/base.h Data/Song.h Data/Data.h lib/base/pointer.h lib/file/path.h Stuff/Observable.h Data/Rhythm/BarCollection.h Data/Rhythm/Bar.h Data/Range.h lib/any/any.h lib/file/file.h lib/file/msg.h lib/file/file_op.h Data/Track.h Data/Midi/MidiData.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Data/TrackLayer.h lib/base/set.h Data/CrossFade.h Data/Audio/AudioBuffer.h Session.h
 	$(CPP) -c Test/TestTrackVersion.cpp -o $@ $(CXXFLAGS)
 
-Test/UnitTest.o : Test/UnitTest.cpp Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/file_op.h lib/file/path.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Data/Audio/AudioBuffer.h lib/base/pointer.h Data/Range.h Test/TestAudioBuffer.h Test/TestRingBuffer.h Test/TestInterpolator.h Test/TestRhythm.h Test/TestStreams.h Test/TestThreads.h Test/TestMidiPreview.h Test/TestPlugins.h Test/TestMixer.h Test/TestTrackVersion.h Test/TestPointer.h
+Test/UnitTest.o : Test/UnitTest.cpp Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/file_op.h lib/file/path.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Data/Audio/AudioBuffer.h lib/base/pointer.h Data/Range.h Test/TestAudioBuffer.h Test/TestRingBuffer.h Test/TestInterpolator.h Test/TestRhythm.h Test/TestStreams.h Test/TestThreads.h Test/TestMidiPreview.h Test/TestPlugins.h Test/TestMixer.h Test/TestTrackVersion.h Test/TestPointer.h Test/TestSignalChain.h
 	$(CPP) -c Test/UnitTest.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/SignalEditor/SignalEditorBackground.o : View/BottomBar/SignalEditor/SignalEditorBackground.cpp View/BottomBar/SignalEditor/SignalEditorBackground.h View/Helper/Graph/Node.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/pointer.h lib/math/rect.h lib/math/math.h lib/math/vec2.h Stuff/Observable.h View/Helper/Graph/Scrollable.h View/BottomBar/SignalEditor/SignalEditorTab.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h View/AudioView.h Data/SongSelection.h Data/Range.h Data/Midi/Scale.h View/TrackHeightManager.h View/ViewPort.h View/ColorScheme.h View/HoverData.h

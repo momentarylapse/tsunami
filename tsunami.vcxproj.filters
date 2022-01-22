@@ -1063,6 +1063,9 @@
     <ClCompile Include="src\Test\TestRingBuffer.cpp">
       <Filter>src\Test</Filter>
     </ClCompile>
+    <ClCompile Include="src\Test\TestSignalChain.cpp">
+      <Filter>src\Test</Filter>
+    </ClCompile>
     <ClCompile Include="src\Test\TestStreams.cpp">
       <Filter>src\Test</Filter>
     </ClCompile>
@@ -2338,6 +2341,9 @@
       <Filter>src\Test</Filter>
     </ClInclude>
     <ClInclude Include="src\Test\TestRingBuffer.h">
+      <Filter>src\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Test\TestSignalChain.h">
       <Filter>src\Test</Filter>
     </ClInclude>
     <ClInclude Include="src\Test\TestStreams.h">

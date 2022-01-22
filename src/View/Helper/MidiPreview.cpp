@@ -48,7 +48,8 @@ public:
 		} else if (mode == Mode::END_NOTES) {
 			for (int p: pitch_active)
 				midi.add(MidiEvent(0, p, 0));
-			set_mode(Mode::END_OF_STREAM);
+			set_mode(Mode::FLUSH);
+			ttl = session->sample_rate() * 2;
 		} else if (mode == Mode::CHANGE_NOTES) {
 			for (int p: pitch_active)
 				midi.add(MidiEvent(0, p, 0));
@@ -57,23 +58,29 @@ public:
 			pitch_active = pitch_queued;
 			set_mode(Mode::ACTIVE_NOTES);
 		}
-		if (mode == Mode::ACTIVE_NOTES) {
+
+		if (ttl >= 0) {
 			ttl -= midi.samples;
-			if (ttl < 0)
-				set_mode(Mode::END_NOTES);
+			if (ttl < 0) {
+				if (mode == Mode::ACTIVE_NOTES)
+					set_mode(Mode::END_NOTES);
+				else if (mode == Mode::FLUSH)
+					set_mode(Mode::END_OF_STREAM);
+			}
 		}
 		return midi.samples;
 	}
-	int mode;
-	enum Mode {
+	enum class Mode {
 		WAITING,
 		START_NOTES,
 		CHANGE_NOTES,
 		ACTIVE_NOTES,
 		END_NOTES,
+		FLUSH,
 		END_OF_STREAM
 	};
-	string mode_str(int mode) {
+	Mode mode;
+	string mode_str(Mode mode) {
 		if (mode == Mode::WAITING)
 			return "wait";
 		if (mode == Mode::START_NOTES)
@@ -84,11 +91,13 @@ public:
 			return "active";
 		if (mode == Mode::END_NOTES)
 			return "end";
+		if (mode == Mode::FLUSH)
+			return "flush";
 		if (mode == Mode::END_OF_STREAM)
 			return "eos";
 		return "???";
 	}
-	void set_mode(int new_mode) {
+	void set_mode(Mode new_mode) {
 		o("    " + mode_str(mode) + " -> " + mode_str(new_mode));
 		mode = new_mode;
 	}
@@ -107,9 +116,9 @@ public:
 		ttl = _ttl;
 		volume = _volume;
 
-		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)) {
+		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM) or (mode == Mode::FLUSH)) {
 			set_mode(Mode::START_NOTES);
-		} else if ((mode == Mode::END_NOTES) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
+		} else if ((mode == Mode::END_NOTES) or (mode == Mode::FLUSH) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
 			set_mode(Mode::CHANGE_NOTES);
 		}
 	}

@@ -310,6 +310,7 @@ OBJ = Action/Bar/Action__ScaleData.o \
  Module/Midi/MidiSource.o \
  Module/Midi/MidiSucker.o \
  Module/Port/Port.o \
+ Module/Synth/DebugSynthesizer.o \
  Module/Synth/DummySynthesizer.o \
  Module/Synth/EnvelopeADSR.o \
  Module/Synth/Synthesizer.o \
@@ -1373,6 +1374,9 @@ Module/Midi/MidiSucker.o : Module/Midi/MidiSucker.cpp Module/Midi/MidiSucker.h M
 Module/Port/Port.o : Module/Port/Port.cpp Module/Port/Port.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h
 	$(CPP) -c Module/Port/Port.cpp -o $@ $(CXXFLAGS)
 
+Module/Synth/DebugSynthesizer.o : Module/Synth/DebugSynthesizer.cpp Module/Synth/DebugSynthesizer.h Module/Synth/Synthesizer.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/set.h Data/Midi/MidiData.h lib/base/pointer.h Data/Range.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Module/Module.h Stuff/Observable.h Module/Port/Port.h Module/Synth/EnvelopeADSR.h Data/Audio/AudioBuffer.h
+	$(CPP) -c Module/Synth/DebugSynthesizer.cpp -o $@ $(CXXFLAGS)
+
 Module/Synth/DummySynthesizer.o : Module/Synth/DummySynthesizer.cpp Module/Synth/DummySynthesizer.h Module/Synth/Synthesizer.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/base/set.h Data/Midi/MidiData.h lib/base/pointer.h Data/Range.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Module/Module.h Stuff/Observable.h Module/Port/Port.h Module/Synth/EnvelopeADSR.h Data/Song.h Data/Data.h lib/file/path.h Data/Rhythm/BarCollection.h Data/Rhythm/Bar.h lib/any/any.h lib/file/file.h lib/file/msg.h lib/file/file_op.h Data/Audio/AudioBuffer.h lib/math/math.h
 	$(CPP) -c Module/Synth/DummySynthesizer.cpp -o $@ $(CXXFLAGS)
 
@@ -1499,7 +1503,7 @@ Test/TestAudioBuffer.o : Test/TestAudioBuffer.cpp Test/TestAudioBuffer.h Test/Un
 Test/TestInterpolator.o : Test/TestInterpolator.cpp Test/TestInterpolator.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/Audio/BufferInterpolator.h Data/Audio/AudioBuffer.h lib/base/pointer.h Data/Range.h lib/file/msg.h
 	$(CPP) -c Test/TestInterpolator.cpp -o $@ $(CXXFLAGS)
 
-Test/TestMidiPreview.o : Test/TestMidiPreview.cpp Test/TestMidiPreview.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h View/Helper/MidiPreview.h lib/base/pointer.h Module/SignalChain.h Module/Module.h Stuff/Observable.h Module/Synth/Synthesizer.h lib/base/set.h Data/Midi/MidiData.h Data/Range.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Module/Port/Port.h Session.h
+Test/TestMidiPreview.o : Test/TestMidiPreview.cpp Test/TestMidiPreview.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h View/Helper/MidiPreview.h lib/base/pointer.h Module/SignalChain.h Module/Module.h Stuff/Observable.h Module/Synth/Synthesizer.h lib/base/set.h Data/Midi/MidiData.h Data/Range.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Module/Port/Port.h Module/Midi/MidiPreviewSource.h Module/Midi/MidiSource.h Session.h
 	$(CPP) -c Test/TestMidiPreview.cpp -o $@ $(CXXFLAGS)
 
 Test/TestMixer.o : Test/TestMixer.cpp Test/TestMixer.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Session.h lib/base/pointer.h Stuff/Observable.h Data/base.h Data/Song.h Data/Data.h lib/file/path.h Data/Rhythm/BarCollection.h Data/Rhythm/Bar.h Data/Range.h lib/any/any.h lib/file/file.h lib/file/msg.h lib/file/file_op.h Data/Track.h Data/Midi/MidiData.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Data/TrackLayer.h lib/base/set.h Data/Audio/AudioBuffer.h Module/Audio/SongRenderer.h Module/Audio/AudioSource.h Module/Module.h Module/Port/Port.h

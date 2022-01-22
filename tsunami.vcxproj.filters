@@ -916,6 +916,9 @@
     <ClCompile Include="src\Module\Port\Port.cpp">
       <Filter>src\Module\Port</Filter>
     </ClCompile>
+    <ClCompile Include="src\Module\Synth\DebugSynthesizer.cpp">
+      <Filter>src\Module\Synth</Filter>
+    </ClCompile>
     <ClCompile Include="src\Module\Synth\DummySynthesizer.cpp">
       <Filter>src\Module\Synth</Filter>
     </ClCompile>
@@ -2186,6 +2189,9 @@
     </ClInclude>
     <ClInclude Include="src\Module\Port\Port.h">
       <Filter>src\Module\Port</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Module\Synth\DebugSynthesizer.h">
+      <Filter>src\Module\Synth</Filter>
     </ClInclude>
     <ClInclude Include="src\Module\Synth\DummySynthesizer.h">
       <Filter>src\Module\Synth</Filter>

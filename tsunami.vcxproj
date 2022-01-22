@@ -421,6 +421,7 @@
     <ClCompile Include="src\Module\Midi\MidiSource.cpp" />
     <ClCompile Include="src\Module\Midi\MidiSucker.cpp" />
     <ClCompile Include="src\Module\Port\Port.cpp" />
+    <ClCompile Include="src\Module\Synth\DebugSynthesizer.cpp" />
     <ClCompile Include="src\Module\Synth\DummySynthesizer.cpp" />
     <ClCompile Include="src\Module\Synth\EnvelopeADSR.cpp" />
     <ClCompile Include="src\Module\Synth\Synthesizer.cpp" />
@@ -846,6 +847,7 @@
     <ClInclude Include="src\Module\Midi\MidiSource.h" />
     <ClInclude Include="src\Module\Midi\MidiSucker.h" />
     <ClInclude Include="src\Module\Port\Port.h" />
+    <ClInclude Include="src\Module\Synth\DebugSynthesizer.h" />
     <ClInclude Include="src\Module\Synth\DummySynthesizer.h" />
     <ClInclude Include="src\Module\Synth\EnvelopeADSR.h" />
     <ClInclude Include="src\Module\Synth\Synthesizer.h" />

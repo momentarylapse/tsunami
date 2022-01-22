@@ -400,6 +400,7 @@ sources = [
 	'src/Module/Midi/MidiSource.cpp',
 	'src/Module/Midi/MidiSucker.cpp',
 	'src/Module/Port/Port.cpp',
+	'src/Module/Synth/DebugSynthesizer.cpp',
 	'src/Module/Synth/DummySynthesizer.cpp',
 	'src/Module/Synth/EnvelopeADSR.cpp',
 	'src/Module/Synth/Synthesizer.cpp',

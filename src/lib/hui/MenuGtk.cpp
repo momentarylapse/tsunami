@@ -15,6 +15,8 @@ namespace hui
 GtkAccelGroup *accel_group = nullptr;
 
 void try_add_accel(GtkWidget *item, const string &id, Panel *panel) {
+	if (!panel->win)
+		return;
 	for (auto &c: panel->win->get_event_key_codes())
 		if ((id == c.id) and (c.key_code >= 0)) {
 			int k = c.key_code;

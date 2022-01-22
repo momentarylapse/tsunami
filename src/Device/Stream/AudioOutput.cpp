@@ -27,6 +27,8 @@ namespace kaba {
 #include <portaudio.h>
 #endif
 
+static const bool STREAM_WARNINGS = false;
+
 const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 
 
@@ -104,7 +106,8 @@ void AudioOutput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
 void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) {
 	auto stream = static_cast<AudioOutput*>(userdata);
 	//stream->session->w("pulse: underflow\n");
-	printf("pulse: underflow\n");
+	if (STREAM_WARNINGS)
+		printf("pulse: underflow\n");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
@@ -164,7 +167,8 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 
 	if (available < frames_request) {
 		if (!read_end_of_stream and !buffer_is_cleared)
-			printf("< underflow  %d < %d\n", available, frames_request);
+			if (STREAM_WARNINGS)
+				printf("< underflow  %d < %d\n", available, frames_request);
 		// output silence...
 		fake_samples_played += frames_request - done;
 		for (int i=done; i<frames_request; i++) {

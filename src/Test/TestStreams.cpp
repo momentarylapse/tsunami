@@ -50,16 +50,16 @@ void TestStreams::test_output_stream() {
 	auto *stream = chain->add(ModuleCategory::STREAM, "AudioOutput");
 	chain->connect(source, 0, stream, 0);
 
-	msg_write("play");
+	event("play");
 	chain->start();
 	sleep(1);
-	msg_write("stop");
+	event("stop");
 	chain->stop();
 	sleep(1);
-	msg_write("play");
+	event("play");
 	chain->start();
 	sleep(1);
-	msg_write("stop");
+	event("stop");
 	chain->stop();
 	delete chain;
 
@@ -71,10 +71,10 @@ void TestStreams::test_input_stream() {
 	auto *b = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
 	chain->connect(a, 0, b, 0);
 
-	msg_write("capture");
+	event("capture");
 	chain->start();
 	sleep(2);
-	msg_write("stop");
+	event("stop");
 	chain->stop();
 	delete chain;
 

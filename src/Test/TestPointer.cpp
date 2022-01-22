@@ -19,15 +19,15 @@ class X : public Sharable<VirtualBase> {
 public:
 	X() {
 		instance_count ++;
-		msg_write("X.init " + p2s(this));
+		UnitTest::event("X.init " + p2s(this));
 		s = "hallo";
 	}
 	~X() {
-		msg_write("X.del " + p2s(this));
+		UnitTest::event("X.del " + p2s(this));
 		instance_count --;
 	}
 	void f() {
-		msg_write(s);
+		UnitTest::event(s);
 	}
 
 	static int instance_count;
@@ -57,7 +57,7 @@ void TestPointer::test_owned() {
 		assert_equal(X::instance_count, 1);
 
 		X *p = nullptr;
-		msg_write(x == p);
+		event(b2s(x == p));
 	}
 	assert_equal(X::instance_count, 0);
 }
@@ -120,19 +120,19 @@ void TestPointer::test_shared_array_set_shared_array() {
 		assert_equal(X::instance_count, 4);
 
 		{
-			msg_write("a1");
+			event("a1");
 			shared_array<X> b = {new X(), new X()};
 			assert_equal(X::instance_count, 6);
-			msg_write("a2");
+			event("a2");
 			a = b;
-			msg_write("a3");
+			event("a3");
 			assert_equal(X::instance_count, 2);
-			msg_write("a3b");
+			event("a3b");
 		}
-		msg_write("a4");
+		event("a4");
 		assert_equal(X::instance_count, 2);
 	}
-	msg_write("a5");
+	event("a5");
 	assert_equal(X::instance_count, 0);
 }
 
@@ -142,19 +142,19 @@ void TestPointer::test_shared_array_set_array() {
 		assert_equal(X::instance_count, 4);
 
 		{
-			msg_write("a0");
+			event("a0");
 			shared_array<X> b = {new X(), new X()};
-			msg_write("a1");
+			event("a1");
 			assert_equal(X::instance_count, 6);
-			msg_write("a1b");
+			event("a1b");
 			a = b;
-			msg_write("a2");
+			event("a2");
 			assert_equal(X::instance_count, 2);
 		}
-		msg_write("a3");
+		event("a3");
 		assert_equal(X::instance_count, 2);
 	}
-	msg_write("a4");
+	event("a4");
 	assert_equal(X::instance_count, 0);
 }
 

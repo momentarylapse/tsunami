@@ -25,6 +25,8 @@
 #include "TestTrackVersion.h"
 #include "TestPointer.h"
 
+Array<string> UnitTest::event_protocoll;
+
 UnitTest::UnitTest(const string &_name) {
 	name = _name;
 }
@@ -33,17 +35,21 @@ UnitTest::~UnitTest() {
 }
 
 void UnitTest::run(const string &filter, TestProtocoll &protocoll) {
-	msg_write("<<<<<<<<<<<<<<<<<<<<  " + name + "  >>>>>>>>>>>>>>>>>>>>");
+	printf("\x1b[1m==  %s  ==\x1b[0m\n", name.c_str());
 	for (auto &t: tests()) {
 		if (!filter_match(filter, t.name))
 			continue;
-		msg_write("== " + t.name + " ==");
+		event_protocoll.clear();
+		printf("%s", t.name.c_str());
 		try {
 			t.f();
-			msg_write("  ok");
+			//msg_write("  ok");
+			printf("  \x1b[0;32m ok \x1b[0m\n");
 		} catch(Failure &e) {
+			printf("\x1b[0;31m");
 			msg_error(e.message());
 			protocoll.num_failed ++;
+			printf("\x1b[0m");
 		}
 		protocoll.num_tests_run ++;
 	}
@@ -140,6 +146,15 @@ void UnitTest::assert_equal(const Array<Range> &a, const Array<Range> &b) {
 			throw Failure(format("a!=b\na: %s\nb: %s", ra2s(a), ra2s(b)));
 }
 
+void UnitTest::event(const string &e) {
+	event_protocoll.add(e);
+}
+
+void UnitTest::assert_protocoll(const Array<string> &p) {
+	if (p != event_protocoll)
+		throw Failure("Events: " + sa2s(p) + "  expected: " + sa2s(event_protocoll));
+}
+
 Array<UnitTest*> UnitTest::all() {
 	Array<UnitTest*> tests;
 	tests.add(new TestPointer);
@@ -169,13 +184,18 @@ void UnitTest::run_all(const string &filter) {
 		delete t;
 
 
-	msg_write("\n\n");
+	msg_write("\n");
 	if (protocoll.num_failed > 0) {
+
+		printf("\x1b[1;31m");
 		msg_error(format("%d out of %d tests failed", protocoll.num_failed, protocoll.num_tests_run));
+		printf("\x1b[0m");
 	} else {
+		printf("\x1b[1;32m");
 		msg_write("-----------------------------");
 		msg_write(format("all %d tests succeeded", protocoll.num_tests_run));
 		msg_write("-----------------------------");
+		printf("\x1b[0m");
 	}
 }
 

@@ -68,6 +68,10 @@ public:
 	static void print_all_names();
 
 	static void sleep(float t);
+
+	static Array<string> event_protocoll;
+	static void event(const string &e);
+	static void assert_protocoll(const Array<string> &p);
 };
 #endif
 

@@ -396,6 +396,7 @@ sources = [
 	'src/Module/Midi/MidiEffect.cpp',
 	'src/Module/Midi/MidiEventStreamer.cpp',
 	'src/Module/Midi/MidiJoiner.cpp',
+	'src/Module/Midi/MidiPreviewSource.cpp',
 	'src/Module/Midi/MidiSource.cpp',
 	'src/Module/Midi/MidiSucker.cpp',
 	'src/Module/Port/Port.cpp',

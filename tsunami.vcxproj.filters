@@ -904,6 +904,9 @@
     <ClCompile Include="src\Module\Midi\MidiJoiner.cpp">
       <Filter>src\Module\Midi</Filter>
     </ClCompile>
+    <ClCompile Include="src\Module\Midi\MidiPreviewSource.cpp">
+      <Filter>src\Module\Midi</Filter>
+    </ClCompile>
     <ClCompile Include="src\Module\Midi\MidiSource.cpp">
       <Filter>src\Module\Midi</Filter>
     </ClCompile>
@@ -2170,6 +2173,9 @@
       <Filter>src\Module\Midi</Filter>
     </ClInclude>
     <ClInclude Include="src\Module\Midi\MidiJoiner.h">
+      <Filter>src\Module\Midi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Module\Midi\MidiPreviewSource.h">
       <Filter>src\Module\Midi</Filter>
     </ClInclude>
     <ClInclude Include="src\Module\Midi\MidiSource.h">

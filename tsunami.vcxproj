@@ -417,6 +417,7 @@
     <ClCompile Include="src\Module\Midi\MidiEffect.cpp" />
     <ClCompile Include="src\Module\Midi\MidiEventStreamer.cpp" />
     <ClCompile Include="src\Module\Midi\MidiJoiner.cpp" />
+    <ClCompile Include="src\Module\Midi\MidiPreviewSource.cpp" />
     <ClCompile Include="src\Module\Midi\MidiSource.cpp" />
     <ClCompile Include="src\Module\Midi\MidiSucker.cpp" />
     <ClCompile Include="src\Module\Port\Port.cpp" />
@@ -841,6 +842,7 @@
     <ClInclude Include="src\Module\Midi\MidiEffect.h" />
     <ClInclude Include="src\Module\Midi\MidiEventStreamer.h" />
     <ClInclude Include="src\Module\Midi\MidiJoiner.h" />
+    <ClInclude Include="src\Module\Midi\MidiPreviewSource.h" />
     <ClInclude Include="src\Module\Midi\MidiSource.h" />
     <ClInclude Include="src\Module\Midi\MidiSucker.h" />
     <ClInclude Include="src\Module\Port\Port.h" />

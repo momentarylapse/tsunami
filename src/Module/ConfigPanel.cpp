@@ -20,12 +20,16 @@ ConfigPanel::ConfigPanel(Module *_c) {
 	ignore_change = false;
 	c = _c;
 	if (c)
-		c->subscribe(this, [=]{ if (!ignore_change) update(); }, c->MESSAGE_CHANGE);
+		c->subscribe(this, [this]{
+			if (!ignore_change) update();
+		}, c->MESSAGE_CHANGE);
 }
 
 ConfigPanel::~ConfigPanel() {
+	msg_write("~ConfigPanel");
 	if (c)
 		c->unsubscribe(this);
+	msg_write("/~ConfigPanel");
 }
 
 

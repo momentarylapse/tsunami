@@ -794,6 +794,7 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	msg_error("TODO...");
 
 	configure_module(this, fx, [this, fx] {
+		msg_write("OK");
 		int n_layers = 0;
 		song->begin_action_group(_("apply audio fx"));
 		for (Track *t: weak(song->tracks))
@@ -803,10 +804,15 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 					n_layers ++;
 				}
 		song->end_action_group();
+		msg_write("ok1");
 
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
+		msg_write("ok2");
 		delete fx;
+		msg_write("ok3");
+	}, [fx] {
+		msg_write("CANCEL");
 	});
 }
 

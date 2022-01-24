@@ -116,12 +116,12 @@ public:
 	void on_show_log();
 	void on_import_backup();
 	void on_delete_backup();
-	void on_menu_execute_audio_effect();
-	void on_menu_execute_audio_source();
-	void on_menu_execute_midi_effect();
-	void on_menu_execute_midi_source();
-	void on_menu_execute_song_plugin();
-	void on_menu_execute_tsunami_plugin();
+	void on_menu_execute_audio_effect(const string &name);
+	void on_menu_execute_audio_source(const string &name);
+	void on_menu_execute_midi_effect(const string &name);
+	void on_menu_execute_midi_source(const string &name);
+	void on_menu_execute_song_plugin(const string &name);
+	void on_menu_execute_tsunami_plugin(const string &name);
 	void on_exit();
 
 	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);

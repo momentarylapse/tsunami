@@ -789,9 +789,7 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 	l->edit_buffers_finish(a);
 }
 
-void TsunamiWindow::on_menu_execute_audio_effect() {
-	string name = hui::get_event()->id.explode("--")[1];
-
+void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
 	msg_error("TODO...");
 
@@ -812,8 +810,7 @@ void TsunamiWindow::on_menu_execute_audio_effect() {
 	});
 }
 
-void TsunamiWindow::on_menu_execute_audio_source() {
-	string name = hui::get_event()->id.explode("--")[1];
+void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 
 	auto s = CreateAudioSource(session, name);
 
@@ -836,9 +833,7 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 	});
 }
 
-void TsunamiWindow::on_menu_execute_midi_effect() {
-	string name = hui::get_event()->id.explode("--")[1];
-
+void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
 	configure_module(this, fx, [fx, this] {
@@ -863,9 +858,7 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 	});
 }
 
-void TsunamiWindow::on_menu_execute_midi_source() {
-	string name = hui::get_event()->id.explode("--")[1];
-
+void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
 	configure_module(this, s, [s, this] {
@@ -893,16 +886,12 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 	});
 }
 
-void TsunamiWindow::on_menu_execute_song_plugin() {
-	string name = hui::get_event()->id.explode("--")[1];
-
+void TsunamiWindow::on_menu_execute_song_plugin(const string &name) {
 	auto p = ownify(CreateSongPlugin(session, name));
 	p->apply();
 }
 
-void TsunamiWindow::on_menu_execute_tsunami_plugin() {
-	string name = hui::get_event()->id.explode("--")[1];
-
+void TsunamiWindow::on_menu_execute_tsunami_plugin(const string &name) {
 	session->execute_tsunami_plugin(name);
 }
 

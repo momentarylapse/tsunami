@@ -117,6 +117,9 @@ int Panel::event_x(const string &id, const string &msg, const Callback &function
 	if (!EventID::is_valid(msg))
 		msg_error(format("invalid event message: %s/%s", id, msg));
 	int uid = current_event_listener_uid ++;
+#if GTK_CHECK_VERSION(4,0,0)
+	_try_add_action_(id, false);
+#endif
 	event_listeners.add(EventListener(uid, id, msg, function));
 	return uid;
 }

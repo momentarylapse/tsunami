@@ -97,7 +97,6 @@ public:
 	void _cdecl set_size_desired(int width, int height);
 	void _cdecl get_size_desired(int &width, int &height);
 	void _cdecl set_menu(Menu *menu);
-	void _connect_menu_to_win(Menu *menu);
 	Menu* _cdecl get_menu();
 	Window* _cdecl get_parent();
 	void _cdecl __set_options(const string &options);
@@ -187,11 +186,6 @@ protected:
 
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkEventController *shortcut_controller = nullptr;
-	static void _on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data);
-	GSimpleActionGroup *action_group = nullptr;
-	void _try_add_action_(const string &id, bool checkable);
-public:
-	GAction *_get_action(const string &id, bool with_scope);
 #endif
 
 public:

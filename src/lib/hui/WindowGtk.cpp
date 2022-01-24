@@ -1,5 +1,4 @@
 #include "Controls/Control.h"
-#include "Controls/MenuItemToggle.h"
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
@@ -103,37 +102,10 @@ static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data) {
 
 
 
-string decode_gtk_action(const string &name) {
-	return name.sub_ref(10).unhex();
-}
-
 string get_gtk_action_name(const string &id, bool with_scope) {
 	return format("%shuiactionX%s", with_scope ? "win." : "", id.hex().replace(".", ""));
 	//return format("%shuiaction('%s')", with_scope ? "win." : "", id);
 }
-
-#if GTK_CHECK_VERSION(4,0,0)
-void Window::_on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data) {
-	auto win = static_cast<Window*>(user_data);
-	//string id = g_variant_get_string(parameter, nullptr);
-
-	//msg_write("CALLBACK");
-	GValue value = {0,};
-	g_value_init(&value, G_TYPE_STRING);
-	g_object_get_property(G_OBJECT(simple), "name", &value);
-	string id = string(g_value_get_string(&value));
-	id = decode_gtk_action(id);
-	//msg_write(id);
-	g_value_unset(&value);
-
-	win->_set_cur_id_(id);
-	if (id.num == 0)
-		return;
-	//notify_push(this);
-	Event e = Event(id, EventID::CLICK);
-	win->_send_event_(&e);
-}
-#endif
 
 
 // general window
@@ -174,7 +146,6 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 		if (Application::application) {
 			gtk_application_add_window(Application::application, GTK_WINDOW(window));
 
-			action_group = g_simple_action_group_new();
 			//g_action_map_add_action_entries(G_ACTION_MAP(group), entries, G_N_ELEMENTS(entries), this);
 			gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
 
@@ -403,57 +374,6 @@ void run(Window *win, Callback cb) {
 	win->_run(cb);
 }
 
-#if GTK_CHECK_VERSION(4,0,0)
-void Window::_try_add_action_(const string &id, bool as_checkable) {
-	if ((id == "") or (id == "*") or (id == "hui:close"))
-		return;
-	string name = get_gtk_action_name(id, false);
-	//msg_write(name + "   (...)");
-	auto aa = g_action_map_lookup_action(G_ACTION_MAP(action_group), name.c_str());
-	if (aa)
-		return;
-	if (as_checkable) {
-		//msg_write("ACTION C   " + id);
-		GVariant *state = g_variant_new_boolean(FALSE);
-		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
-		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
-		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
-		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
-	} else {
-		//msg_write("ACTION     " + id);
-		auto a = g_simple_action_new(name.c_str(), nullptr);
-		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
-		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
-	}
-}
-
-
-GAction *Window::_get_action(const string &id, bool with_scope) {
-	if (action_group)
-		return g_action_map_lookup_action(G_ACTION_MAP(action_group), get_gtk_action_name(id, with_scope).c_str());
-	return nullptr;
-}
-
-#endif
-
-void Window::_connect_menu_to_win(Menu *menu) {
-	menu->set_panel(this);
-
-	for (auto c: menu->get_all_controls()) {
-		if (c->type == MENU_ITEM_TOGGLE) {
-			_try_add_action_(c->id, true);
-			if (static_cast<MenuItemToggle*>(c)->checked)
-				static_cast<MenuItemToggle*>(c)->__check(true);
-		} else {
-			_try_add_action_(c->id, false);
-		}
-		if (!c->enabled) {
-			c->enable(false); // update action...
-			//enable(c->id, false);
-		}
-	}
-}
-
 void Window::set_menu(Menu *_menu) {
 #if GTK_CHECK_VERSION(4,0,0)
 	//action_group = g_simple_action_group_new();
@@ -463,7 +383,7 @@ void Window::set_menu(Menu *_menu) {
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
 		gtk_widget_show(menubar);
 
-		_connect_menu_to_win(menu);
+		_connect_menu_to_panel(menu);
 	} else {
 		menu = _menu;
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), nullptr);

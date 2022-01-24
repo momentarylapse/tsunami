@@ -61,7 +61,7 @@ void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data) {
 // window coordinate system!
 void Menu::open_popup(Panel *panel) {
 #if GTK_CHECK_VERSION(4,0,0)
-	panel->win->_connect_menu_to_win(this);
+	panel->_connect_menu_to_panel(this);
 
 	auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(gmenu));
 

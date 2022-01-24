@@ -91,11 +91,7 @@ void ControlMenuButton::set_menu(Menu *m) {
 		menu->set_panel(panel);
 #if GTK_CHECK_VERSION(4,0,0)
 		//msg_error("MenuButton.menu gtk4...");
-		if (panel->win) {
-			panel->win->_connect_menu_to_win(menu);
-		} else {
-			msg_write("MenuButton.set_menu()... no window yet");
-		}
+		panel->_connect_menu_to_panel(menu);
 		auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu->gmenu));
 		gtk_menu_button_set_popover(GTK_MENU_BUTTON(widget), w);
 #else

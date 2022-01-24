@@ -155,6 +155,8 @@ public:
 	void _cdecl set_spacing(int width);
 
 
+	void _connect_menu_to_panel(Menu *menu);
+
 protected:
 
 
@@ -193,6 +195,15 @@ public:
 	Window *win;
 	Panel *parent;
 	Array<Panel*> children;
+
+
+#if GTK_CHECK_VERSION(4,0,0)
+	static void _on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data);
+	GSimpleActionGroup *action_group = nullptr;
+	void _try_add_action_(const string &id, bool checkable);
+public:
+	GAction *_get_action(const string &id, bool with_scope);
+#endif
 };
 
 };

@@ -40,7 +40,7 @@ public:
 	Map<string, string> map;
 };
 
-extern Configuration Config;
+extern Configuration config;
 
 
 

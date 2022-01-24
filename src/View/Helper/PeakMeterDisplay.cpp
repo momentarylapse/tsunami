@@ -50,7 +50,7 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 		draw_recursive(p);
 	});
 	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{
-		on_left_button_down(hui::GetEvent()->m);
+		on_left_button_down(hui::get_event()->m);
 	});
 }
 

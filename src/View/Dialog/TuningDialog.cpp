@@ -70,31 +70,31 @@ void TuningDialog::on_ok() {
 }
 
 void TuningDialog::on_edit() {
-	string id = hui::GetEvent()->id;
+	string id = hui::get_event()->id;
 	int n = id.sub(6)._int();
 	int p = MAX_PITCH - 1 - get_int(id);
 	tuning[n] = p;
 }
 
 void TuningDialog::on_delete() {
-	string id = hui::GetEvent()->id;
+	string id = hui::get_event()->id;
 	int n = id.sub(7+6)._int();
 	tuning.erase(n);
 
-	hui::RunLater(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [=]{ update(); });
 }
 
 void TuningDialog::on_add() {
-	string id = hui::GetEvent()->id;
+	string id = hui::get_event()->id;
 	int n = id.sub(4+6)._int();
 	tuning.insert(tuning[n], n);
 
-	hui::RunLater(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [=]{ update(); });
 }
 
 void TuningDialog::on_add_first() {
 	tuning.add(69);
 
-	hui::RunLater(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [=]{ update(); });
 }
 

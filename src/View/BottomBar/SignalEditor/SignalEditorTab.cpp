@@ -116,7 +116,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 		}*/
 
 
-		auto m = hui::GetEvent()->m;
+		auto m = hui::get_event()->m;
 
 		string tip;
 		if (graph->hover.node)
@@ -212,7 +212,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 	}*/
 
 
-	auto m = hui::GetEvent()->m;
+	auto m = hui::get_event()->m;
 
 
 	string tip;
@@ -272,7 +272,7 @@ void SignalEditorTab::popup_module() {
 }
 
 void SignalEditorTab::on_key_down() {
-	int key = hui::GetEvent()->key_code;
+	int key = hui::get_event()->key_code;
 
 	if (key == hui::KEY_DELETE)
 		on_module_delete();
@@ -286,7 +286,7 @@ void SignalEditorTab::on_delete() {
 		session->e(_("not allowed to delete the main signal chain"));
 		return;
 	}
-	hui::RunLater(0.001f, [=](){ chain->unregister(); });
+	hui::run_later(0.001f, [=](){ chain->unregister(); });
 }
 
 

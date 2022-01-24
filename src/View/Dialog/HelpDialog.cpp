@@ -10,7 +10,7 @@
 HelpDialog::HelpDialog(hui::Window *_parent) :
 	hui::Dialog("help-dialog", _parent)
 {
-	if (hui::Config.get_bool("FirstStart", true))
+	if (hui::config.get_bool("FirstStart", true))
 		hide_control("first-time-message", false);
 	event("close", [=]{ request_destroy(); });
 }

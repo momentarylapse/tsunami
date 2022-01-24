@@ -26,10 +26,10 @@ typedef std::function<void(Painter*)> CallbackP;
 
 
 
-void SetIdleFunction(const Callback &idle_function);
-int RunLater(float time, const Callback &function);
-int RunRepeated(float time, const Callback &function);
-void CancelRunner(int i);
+void set_idle_function(const Callback &idle_function);
+int run_later(float time, const Callback &function);
+int run_repeated(float time, const Callback &function);
+void cancel_runner(int i);
 
 
 }

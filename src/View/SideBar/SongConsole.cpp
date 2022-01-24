@@ -40,23 +40,23 @@ SongConsole::SongConsole(Session *session) :
 
 	load_data();
 
-	menu_tags = hui::CreateResourceMenu("popup-menu-tag");
+	menu_tags = hui::create_resource_menu("popup-menu-tag", this);
 
-	event("samplerate", [=]{ on_samplerate(); });
-	event("format", [=]{ on_format(); });
-	event_x("tags", "hui:change", [=]{ on_tags_edit(); });
-	event_x("tags", "hui:right-button-down", [=]{ on_tags_right_click(); });
-	event("tag-add", [=]{ on_tag_add(); });
-	event("tag-delete", [=]{ on_tag_delete(); });
+	event("samplerate", [this]{ on_samplerate(); });
+	event("format", [this]{ on_format(); });
+	event_x("tags", "hui:change", [this]{ on_tags_edit(); });
+	event_x("tags", "hui:right-button-down", [this]{ on_tags_right_click(); });
+	event("tag-add", [this]{ on_tag_add(); });
+	event("tag-delete", [this]{ on_tag_delete(); });
 
-	event("edit_track", [=] {
+	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_samples", [=] {
+	event("edit_samples", [session] {
 		session->set_mode(EditMode::DefaultSamples);
 	});
 
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ANY);
+	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_ANY);
 }
 
 SongConsole::~SongConsole() {
@@ -95,11 +95,11 @@ void SongConsole::on_format() {
 }
 
 void SongConsole::on_tags_edit() {
-	int r = hui::GetEvent()->row;
+	int r = hui::get_event()->row;
 	if (r < 0)
 		return;
 	Tag t = song->tags[r];
-	if (hui::GetEvent()->column == 0)
+	if (hui::get_event()->column == 0)
 		t.key = get_cell("tags", r, 0);
 	else
 		t.value = get_cell("tags", r, 1);
@@ -107,7 +107,7 @@ void SongConsole::on_tags_edit() {
 }
 
 void SongConsole::on_tags_right_click() {
-	int n = hui::GetEvent()->row;
+	int n = hui::get_event()->row;
 	menu_tags->enable("tag-delete", n >= 0);
 	menu_tags->open_popup(this);
 }

@@ -164,7 +164,7 @@ public:
 
 		set_current();
 
-		if (vtrack->track->type == SignalType::GROUP and (hui::GetEvent()->m.x > shrink_button_x)) {
+		if (vtrack->track->type == SignalType::GROUP and (hui::get_event()->m.x > shrink_button_x)) {
 			bool any_shrunk = false;
 			for (auto gm: track_group_members(vtrack->track, false))
 				if (console->mixer[gm->get_index()]->shrunk)
@@ -348,7 +348,7 @@ MixingConsole::MixingConsole(Session *session) :
 MixingConsole::~MixingConsole() {
 	view->signal_chain->unsubscribe(this);
 	if (peak_runner_id >= 0)
-		hui::CancelRunner(peak_runner_id);
+		hui::cancel_runner(peak_runner_id);
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
 	view->output_stream->unsubscribe(this);
@@ -357,14 +357,14 @@ MixingConsole::~MixingConsole() {
 
 void MixingConsole::on_chain_state_change() {
 	if (peak_runner_id and !view->is_playback_active()) {
-		hui::CancelRunner(peak_runner_id);
+		hui::cancel_runner(peak_runner_id);
 		peak_runner_id = -1;
 		// clear
 		view->renderer->clear_peaks();
 		for (auto &m: mixer)
 			m->redraw("peaks");
 	} else if (peak_runner_id == -1 and view->is_playback_active()) {
-		peak_runner_id = hui::RunRepeated(0.1f, [=] {
+		peak_runner_id = hui::run_repeated(0.1f, [=] {
 			for (auto *m: mixer)
 				m->redraw("peaks");
 		});

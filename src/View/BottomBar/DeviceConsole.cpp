@@ -38,7 +38,7 @@ DeviceConsole::DeviceConsole(Session *session) :
 	event("device-delete", [=]{ on_erase(); });
 	event("device-hide", [=]{ on_device_hide(); });
 
-	popup = hui::CreateResourceMenu("popup-menu-device");
+	popup = hui::create_resource_menu("popup-menu-device", this);
 
 	device_manager->subscribe(this, [=]{ on_add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
 	device_manager->subscribe(this, [=]{ update_full(); }, device_manager->MESSAGE_REMOVE_DEVICE);
@@ -103,7 +103,7 @@ int DeviceConsole::fav_index(const Device *d) {
 }
 
 void DeviceConsole::on_right_click_device(DeviceType type) {
-	int n = hui::GetEvent()->row;
+	int n = hui::get_event()->row;
 	if (n >= 0) {
 		popup_device = device_manager->device_list(type)[n];
 		popup->enable("device-delete", !popup_device->present);
@@ -144,7 +144,7 @@ void DeviceConsole::on_add_device() {
 
 
 void DeviceConsole::on_move_device(DeviceType type) {
-	auto e = hui::GetEvent();
+	auto e = hui::get_event();
 	int source = e->row;
 	int target = e->row_target;
 	//msg_write(format("  move  %d  ->  %d", source, target));

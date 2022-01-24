@@ -659,7 +659,7 @@ ControlDrawingArea::~ControlDrawingArea() {
 #endif
 
 	// clean-up list later
-	hui::RunLater(10, [this]{ _recently_deleted_areas.erase(this); });
+	hui::run_later(10, [this]{ _recently_deleted_areas.erase(this); });
 }
 
 void ControlDrawingArea::make_current() {
@@ -702,7 +702,7 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 		}
 	} else if (op == "noeventcompression") {
 #if !GTK_CHECK_VERSION(4,0,0)
-		hui::RunLater(0.01f, [this] {
+		hui::run_later(0.01f, [this] {
 			gdk_window_set_event_compression(GDK_WINDOW(gtk_widget_get_window(widget)), false);
 		});
 #endif
@@ -719,7 +719,7 @@ void ControlDrawingArea::redraw()
 	// non
 	if (std::this_thread::get_id() != main_thread_id){
 		//printf("readraw from other thread...redirect\n");
-		hui::RunLater(0, [this]{ redraw(); });
+		hui::run_later(0, [this]{ redraw(); });
 		return;
 	}
 
@@ -768,7 +768,7 @@ void ControlDrawingArea::redraw_partial(const rect &r)
 {
 	if (std::this_thread::get_id() != main_thread_id){
 		//printf("readraw from other thread...redirect\n");
-		hui::RunLater(0, [this,r]{ redraw_partial(r); });
+		hui::run_later(0, [this,r]{ redraw_partial(r); });
 		return;
 	}
 	//std::lock_guard<std::mutex> lock(mutex);

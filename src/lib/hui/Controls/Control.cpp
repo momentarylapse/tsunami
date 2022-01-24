@@ -452,7 +452,7 @@ void Control::notify(const string &message, bool is_default) {
 			win->on_right_button_up();
 		} else if (message == EventID::KEY_DOWN) {
 			win->on_key_down();
-			win->_try_send_by_key_code_(GetEvent()->key_code);
+			win->_try_send_by_key_code_(get_event()->key_code);
 		} else if (message == "hui:key-up") {
 			win->on_key_up();
 		} else if (message == "hui:draw") {
@@ -462,7 +462,7 @@ void Control::notify(const string &message, bool is_default) {
 	} else if (type == CONTROL_MULTILINEEDIT) {
 		if (message == "hui:key-down") {
 			if (reinterpret_cast<ControlMultilineEdit*>(this)->handle_keys)
-				win->_try_send_by_key_code_(GetEvent()->key_code);
+				win->_try_send_by_key_code_(get_event()->key_code);
 		}
 	}
 	notify_pop();

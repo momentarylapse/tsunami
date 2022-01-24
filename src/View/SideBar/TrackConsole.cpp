@@ -27,17 +27,17 @@ hui::Panel *create_dummy_synth_panel() {
 	return panel;
 }
 
-hui::Panel *create_synth_panel(Track *track, Session *session, hui::Window *win) {
-	auto *p = new ModulePanel(track->synth.get(), nullptr, ModulePanel::Mode::DEFAULT_H);
-	//p->set_func_edit([=](const string &param){ track->edit_synthesizer(param); });
-	p->set_func_replace([=]{
-		session->plugin_manager->choose_module(win, session, ModuleCategory::SYNTHESIZER, [track, session] (const string &name) {
+hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *parent) {
+	auto *p = new ModulePanel(track->synth.get(), parent, ModulePanel::Mode::DEFAULT_H);
+	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
+	p->set_func_replace([parent, track, session]{
+		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [track, session] (const string &name) {
 			if (name != "")
 				track->set_synthesizer(CreateSynthesizer(session, name));
 		}, track->synth->module_class);
 	});
-	p->set_func_detune([=]{
-		hui::fly(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, win));
+	p->set_func_detune([parent, track, session]{
+		hui::fly(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, parent->win));
 	});
 	return p;
 }
@@ -56,15 +56,15 @@ TrackConsole::TrackConsole(Session *session) :
 	for (auto &i: instruments)
 		set_string("instrument", i.name());
 
-	event("name", [=]{ on_name(); });
-	event("volume", [=]{ on_volume(); });
-	event("panning", [=]{ on_panning(); });
-	event("instrument", [=]{ on_instrument(); });
-	event("edit_tuning", [=]{ on_edit_tuning(); });
+	event("name", [this]{ on_name(); });
+	event("volume", [this]{ on_volume(); });
+	event("panning", [this]{ on_panning(); });
+	event("instrument", [this]{ on_instrument(); });
+	event("edit_tuning", [this]{ on_edit_tuning(); });
 
-	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
-	event("edit_curves", [=]{ session->set_mode(EditMode::Curves); });
-	event("edit_midi", [=]{ session->set_mode(EditMode::EditTrack); });
+	event("edit_song", [session]{ session->set_mode(EditMode::DefaultSong); });
+	event("edit_curves", [session]{ session->set_mode(EditMode::Curves); });
+	event("edit_midi", [session]{ session->set_mode(EditMode::EditTrack); });
 }
 
 void TrackConsole::set_mode(Mode mode) {
@@ -81,7 +81,7 @@ void TrackConsole::set_mode(Mode mode) {
 
 void TrackConsole::on_enter() {
 	set_track(view->cur_track());
-	view->subscribe(this, [=]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, [this]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 
 }
 void TrackConsole::on_leave() {
@@ -124,7 +124,7 @@ void TrackConsole::load_data() {
 
 
 		if (track->synth and track_wants_synth(track)) {
-			panel = create_synth_panel(track, session, win);
+			panel = create_synth_panel(track, session, this);
 		} else {
 			panel = create_dummy_synth_panel();
 		}
@@ -159,8 +159,8 @@ void TrackConsole::set_track(Track *t) {
 	load_data();
 	if (track) {
 		fx_editor = new FxListEditor(track, this, "fx", "midi-fx", true);
-		track->subscribe(this, [=]{ set_track(nullptr); }, track->MESSAGE_DELETE);
-		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_ANY);
+		track->subscribe(this, [this]{ set_track(nullptr); }, track->MESSAGE_DELETE);
+		track->subscribe(this, [this]{ on_update(); }, track->MESSAGE_ANY);
 	}
 }
 

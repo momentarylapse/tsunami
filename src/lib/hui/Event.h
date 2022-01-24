@@ -44,7 +44,7 @@ class Event {
 };
 
 extern Event _hui_event_;
-Event *GetEvent();
+Event *get_event();
 
 class EventKeyCode {
 public:
@@ -73,14 +73,14 @@ public:
 void _InitInput_();
 
 
-void LoadKeyCodes(const string &filename);
-void SaveKeyCodes(const string &filename);
+void load_key_codes(const string &filename);
+void save_key_codes(const string &filename);
 
 // input
-string _cdecl GetKeyName(int key_code);
-string _cdecl GetKeyCodeName(int key_code);
+string _cdecl get_key_name(int key_code);
+string _cdecl get_key_code_name(int key_code);
 //string _cdecl GetKeyChar(int key_code);
-int _cdecl ParseKeyCode(const string &code);
+int _cdecl parse_key_code(const string &code);
 
 
 

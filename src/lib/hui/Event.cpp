@@ -90,7 +90,7 @@ EventKeyCode::EventKeyCode(const string &_id, const string &_message, int _key_c
 }
 
 Event _hui_event_;
-Event *GetEvent() {
+Event *get_event() {
 	return &_hui_event_;
 }
 
@@ -351,7 +351,7 @@ void _InitInput_() {
 	#endif
 }
 
-string GetKeyName(int k) {
+string get_key_name(int k) {
 	if (k==KEY_LCONTROL)	return "ControlL";
 	if (k==KEY_RCONTROL)	return "ControlR";
 	if (k==KEY_LSHIFT)		return "ShiftL";
@@ -454,7 +454,7 @@ string GetKeyName(int k) {
 }
 
 
-string GetKeyCodeName(int key_code) {
+string get_key_code_name(int key_code) {
 	if (key_code < 0)
 		return "";
 	string n;
@@ -464,16 +464,16 @@ string GetKeyCodeName(int key_code) {
 		n += "Shift+";
 	if ((key_code & KEY_ALT) == KEY_ALT)
 		n += "Alt+";
-	n += GetKeyName(key_code % 256);
+	n += get_key_name(key_code % 256);
 	return n;
 }
 
-int ParseKeyCode(const string &s) {
+int parse_key_code(const string &s) {
 	int key = 0;
 	auto xx = s.explode(" + ");
 	for (auto x: xx) {
 		for (int k=0; k<NUM_KEYS; k++)
-			if (x == GetKeyName(k))
+			if (x == get_key_name(k))
 				key |= k;
 		if (x == "Ctrl")
 			key |= KEY_CONTROL;
@@ -590,11 +590,11 @@ string GetKeyChar(int key_code) {
 extern Array<Window*> _hui_windows_;
 
 
-void LoadKeyCodes(const string &filename)
+void load_key_codes(const string &filename)
 {
 }
 
-void SaveKeyCodes(const string &filename)
+void save_key_codes(const string &filename)
 {
 }
 

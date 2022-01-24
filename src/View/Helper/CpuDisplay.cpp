@@ -72,7 +72,7 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 
 	set_perf_name("cpu");
 
-	if (hui::Config.get_bool("CpuDisplay", false))
+	if (hui::config.get_bool("CpuDisplay", false))
 		enable(true);
 }
 

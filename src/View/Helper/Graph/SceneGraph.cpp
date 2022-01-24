@@ -22,7 +22,7 @@ SceneGraph::SceneGraph() {
 	mdp = new MouseDelayPlanner(this);
 	set_perf_name("graph");
 
-	show_debug = hui::Config.get_bool("scene-graph.debug", false);
+	show_debug = hui::config.get_bool("scene-graph.debug", false);
 }
 
 void SceneGraph::set_callback_set_current(hui::Callback f) {
@@ -41,7 +41,7 @@ bool SceneGraph::on_left_button_down(const vec2 &m) {
 	set_mouse(m);
 	update_hover();
 
-	if (hui::GetEvent()->just_focused)
+	if (hui::get_event()->just_focused)
 		if (!allow_handle_click_when_gaining_focus())
 			return true;
 
@@ -247,35 +247,35 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 		}
 	});
 	panel->event_x(id, "hui:left-button-down", [=] {
-		on_left_button_down(hui::GetEvent()->m);
+		on_left_button_down(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:left-button-up", [=] {
-		on_left_button_up(hui::GetEvent()->m);
+		on_left_button_up(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:left-double-click", [=] {
-		on_left_double_click(hui::GetEvent()->m);
+		on_left_double_click(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-down", [=] {
-		on_right_button_down(hui::GetEvent()->m);
+		on_right_button_down(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:right-button-up", [=] {
-		on_right_button_up(hui::GetEvent()->m);
+		on_right_button_up(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-wheel", [=] {
-		on_mouse_wheel(hui::GetEvent()->scroll);
+		on_mouse_wheel(hui::get_event()->scroll);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:mouse-move", [=] {
-		on_mouse_move(hui::GetEvent()->m);
+		on_mouse_move(hui::get_event()->m);
 		request_redraw();
 	});
 	panel->event_x(id, "hui:key-down", [=] {
-		on_key(hui::GetEvent()->key_code);
+		on_key(hui::get_event()->key_code);
 		request_redraw();
 	});
 }

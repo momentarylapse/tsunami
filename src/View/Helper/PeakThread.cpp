@@ -112,6 +112,6 @@ void PeakThread::update_song() {
 }
 
 void PeakThread::notify() {
-	hui::RunLater(0.01f, [=]{ view->force_redraw(); });
+	hui::run_later(0.01f, [=]{ view->force_redraw(); });
 }
 

@@ -24,21 +24,21 @@ CurveConsole::CurveConsole(Session *session) :
 
 	id_list = "curves";
 
-	popup_menu = hui::CreateResourceMenu("popup-menu-curve");
+	popup_menu = hui::create_resource_menu("popup-menu-curve", this);
 
-	event("curve-delete", [=]{ on_delete(); });
-	event("curve-linear", [=]{ on_type(CurveType::LINEAR); });
-	event("curve-exponential", [=]{ on_type(CurveType::EXPONENTIAL); });
-	event_x(id_list, "hui:select", [=]{ on_list_select(); });
-	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
-	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
-	event("edit_song", [=] {
+	event("curve-delete", [this]{ on_delete(); });
+	event("curve-linear", [this]{ on_type(CurveType::LINEAR); });
+	event("curve-exponential", [this]{ on_type(CurveType::EXPONENTIAL); });
+	event_x(id_list, "hui:select", [this]{ on_list_select(); });
+	event_x(id_list, "hui:change", [this]{ on_list_edit(); });
+	event_x(id_list, "hui:right-button-down", [this]{ on_list_right_click(); });
+	event("edit_song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
-	event("edit_track", [=] {
+	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_midi", [=] {
+	event("edit_midi", [session] {
 		session->set_mode(EditMode::EditTrack);
 	});
 
@@ -64,11 +64,11 @@ void CurveConsole::on_enter() {
 	auto t = track();
 	enable("edit_synth", t->type == SignalType::MIDI);
 	enable("edit_midi", t->type == SignalType::MIDI);
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
-	t->subscribe(this, [=]{ on_update(); }, t->MESSAGE_ADD_CURVE);
-	t->subscribe(this, [=]{ on_update(); }, t->MESSAGE_DELETE_CURVE);
-	t->subscribe(this, [=]{ on_update(); }, t->MESSAGE_EDIT_CURVE);
-	view->subscribe(this, [=] {
+	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_NEW);
+	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_ADD_CURVE);
+	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_DELETE_CURVE);
+	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_EDIT_CURVE);
+	view->subscribe(this, [this] {
 		view->mode_curve->set_curve_target("");
 		update_list();
 	}, view->MESSAGE_CUR_LAYER_CHANGE);
@@ -130,8 +130,8 @@ void CurveConsole::on_list_select() {
 }
 
 void CurveConsole::on_list_edit() {
-	int n = hui::GetEvent()->row;
-	int col = hui::GetEvent()->column;
+	int n = hui::get_event()->row;
+	int col = hui::get_event()->column;
 	if (n < 0)
 		return;
 	auto c = track_find_curve(track(), targets[n].id);

@@ -136,8 +136,8 @@ void start_frame_hui() {
 	int fb;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
 	FrameBuffer::DEFAULT->frame_buffer = fb;
-	FrameBuffer::DEFAULT->width = hui::GetEvent()->column;
-	FrameBuffer::DEFAULT->height = hui::GetEvent()->row;
+	FrameBuffer::DEFAULT->width = hui::get_event()->column;
+	FrameBuffer::DEFAULT->height = hui::get_event()->row;
 	cur_framebuffer = FrameBuffer::DEFAULT;
 	set_viewport(FrameBuffer::DEFAULT->area());
 }

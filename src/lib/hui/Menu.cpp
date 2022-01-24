@@ -12,19 +12,16 @@
 #include "Controls/MenuItemSubmenu.h"
 #include "Controls/MenuItemToggle.h"
 
-namespace hui
-{
+namespace hui {
 
 void DBDEL(const string &type, const string &id, void *p);
 void DBDEL_DONE();
 
-void Menu::__init__()
-{
-	new(this) Menu;
+void Menu::__init__(Panel *p) {
+	new(this) Menu(p);
 }
 
-void Menu::__delete__()
-{
+void Menu::__delete__() {
 	this->Menu::~Menu();
 }
 

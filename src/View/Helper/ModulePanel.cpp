@@ -21,6 +21,7 @@ extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	module = _m;
 	session = module->session;
+	menu = nullptr;
 
 	outer = _outer;
 
@@ -72,7 +73,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	outer->check("enabled", module->enabled);
 	
 	auto *mb = (hui::ControlMenuButton*)outer->_get_control_("menu");
-	if (mb) {
+	if (mb and mb->menu) {
 		menu = mb->menu;
 		menu->enable("delete", false);
 		menu->enable("replace", false);
@@ -105,7 +106,8 @@ void ModulePanel::set_func_enable(std::function<void(bool)> f) {
 
 void ModulePanel::set_func_delete(std::function<void()> f) {
 	func_delete = f;
-	menu->enable("delete", f != nullptr);
+	if (menu)
+		menu->enable("delete", f != nullptr);
 }
 
 void ModulePanel::set_func_close(std::function<void()> f) {
@@ -114,12 +116,15 @@ void ModulePanel::set_func_close(std::function<void()> f) {
 
 void ModulePanel::set_func_replace(std::function<void()> f) {
 	func_replace = f;
-	menu->enable("replace", f != nullptr);
+	if (menu)
+		menu->enable("replace", f != nullptr);
+	else
+		msg_error("REPLACE NO MENU");
 }
 
 void ModulePanel::set_func_detune(std::function<void()> f) {
 	func_detune = f;
-	if (f) {
+	if (f and menu) {
 		menu->add_separator();
 		menu->add(_("Detune..."), "detune");
 	}
@@ -152,7 +157,7 @@ void ModulePanel::on_enabled() {
 
 void ModulePanel::on_delete() {
 	if (func_delete)
-		hui::RunLater(0, func_delete);
+		hui::run_later(0, func_delete);
 }
 
 void ModulePanel::copy_into(ModulePanel *c) {
@@ -181,7 +186,7 @@ void ModulePanel::on_change() {
 }
 
 void ModulePanel::on_replace() {
-	hui::RunLater(0.001f, func_replace);
+	hui::run_later(0.001f, func_replace);
 }
 
 void ModulePanel::on_detune() {
@@ -204,7 +209,7 @@ ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent)
 	}, module->MESSAGE_DELETE);
 	event("hui:close",[this] {
 		msg_write("deleting external dialog...soon");
-		hui::RunLater(0.01f, [=] {
+		hui::run_later(0.01f, [this] {
 			msg_error("deleting external dialog...");
 			delete this;
 		});

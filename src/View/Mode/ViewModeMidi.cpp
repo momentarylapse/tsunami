@@ -420,8 +420,8 @@ void ViewModeMidi::jump_octave(int delta) {
 
 void ViewModeMidi::set_rep_key(int k) {
 	if (rep_key_runner >= 0)
-		hui::CancelRunner(rep_key_runner);
-	rep_key_runner = hui::RunLater(0.8f, [=] {
+		hui::cancel_runner(rep_key_runner);
+	rep_key_runner = hui::run_later(0.8f, [=] {
 		rep_key_runner = -1;
 		rep_key_num = -1;
 		rep_key = -1;
@@ -753,7 +753,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 
 		// creation preview
-		if ((!hui::GetEvent()->lbut) and (hover().type == HoverData::Type::MIDI_PITCH)) {
+		if ((!hui::get_event()->lbut) and (hover().type == HoverData::Type::MIDI_PITCH)) {
 			auto notes = get_creation_notes(&hover(), hover().pos);
 			mp->draw(c, notes);
 		}

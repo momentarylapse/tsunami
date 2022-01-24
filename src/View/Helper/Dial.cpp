@@ -109,7 +109,7 @@ bool Dial::on_left_button_down(const vec2 &m) {
 	if (auto g = graph()) {
 		g->mdp_prepare([=] {
 			//drag_update(g->mx, g->my);
-			auto e = hui::GetEvent();
+			auto e = hui::get_event();
 			if (e->key_code & hui::KEY_SHIFT)
 				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.0002f, val_min, val_max));
 			else
@@ -122,7 +122,7 @@ bool Dial::on_left_button_down(const vec2 &m) {
 }
 
 bool Dial::on_mouse_wheel(const vec2 &d) {
-	auto e = hui::GetEvent();
+	auto e = hui::get_event();
 	if (e->key_code & hui::KEY_SHIFT)
 		set_value(clamp(value + d.y * (val_max - val_min) * 0.02f, val_min, val_max));
 	else

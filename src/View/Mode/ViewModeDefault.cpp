@@ -254,7 +254,7 @@ void scroll_y(AudioView *view, float dy) {
 
 
 void ViewModeDefault::on_mouse_wheel() {
-	auto e = hui::GetEvent();
+	auto e = hui::get_event();
 	if (view->scene_graph->on_mouse_wheel(e->scroll))
 		return;
 
@@ -377,8 +377,8 @@ void ViewModeDefault::on_command(const string &id) {
 	if (id == "hui:gesture-zoom-end") {
 	}
 	if (id == "hui:gesture-zoom") {
-		view->cam.zoom(hui::GetEvent()->scroll.x/_zoom_0_, view->m.x);
-		_zoom_0_ = hui::GetEvent()->scroll.x;
+		view->cam.zoom(hui::get_event()->scroll.x/_zoom_0_, view->m.x);
+		_zoom_0_ = hui::get_event()->scroll.x;
 	}
 }
 

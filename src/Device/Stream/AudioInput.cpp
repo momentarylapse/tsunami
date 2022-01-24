@@ -149,7 +149,7 @@ int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void 
 			}
 		}
 	} else {
-		hui::RunLater(0.001f, [=] { input->session->w("stream callback error"); });
+		hui::run_later(0.001f, [=] { input->session->w("stream callback error"); });
 	}
 	return 0;
 }
@@ -391,7 +391,7 @@ void AudioInput::_create_dev() {
 #if HAS_LIB_PORTAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
-		int chunk_size = hui::Config.get_int("portaudio.chunk-size", 256);
+		int chunk_size = hui::config.get_int("portaudio.chunk-size", 256);
 		// on windows, some devices will stutter, due to some mysterious limit of 100 requests/s
 		// nah, that doesn't work either:
 		/*paFramesPerBufferUnspecified*/

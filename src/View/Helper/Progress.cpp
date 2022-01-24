@@ -14,8 +14,8 @@ const float PROGRESS_DT = 0.05f;
 
 Progress::Progress(const string &str, hui::Window *parent) : Progress() {
 	if (parent) {
-		dlg = hui::CreateResourceDialog("progress_dialog", parent);
-		dlg->event("hui:close", [=]{}); // ignore
+		dlg = hui::create_resource_dialog("progress_dialog", parent);
+		dlg->event("hui:close", []{}); // ignore
 		set(str, 0);
 		dlg->show();
 	}
@@ -88,12 +88,12 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 	Progress()
 {
 	if (parent) {
-		dlg = hui::CreateResourceDialog("progress_cancelable_dialog", parent);
+		dlg = hui::create_resource_dialog("progress_cancelable_dialog", parent);
 		dlg->set_string("progress_bar", str);
 		dlg->set_float("progress_bar", 0);
 		dlg->show();
-		dlg->event("hui:close", [=]{ cancel(); });
-		dlg->event("cancel", [=]{ cancel(); });
+		dlg->event("hui:close", [this]{ cancel(); });
+		dlg->event("cancel", [this]{ cancel(); });
 		hui::Application::do_single_main_loop();
 	}
 }

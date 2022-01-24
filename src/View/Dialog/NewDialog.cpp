@@ -66,7 +66,7 @@ void NewDialog::on_ok() {
 
 	song->add_tag("title", _("New Audio File"));
 	song->add_tag("album", AppName);
-	song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
+	song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
 
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);

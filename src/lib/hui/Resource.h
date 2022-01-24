@@ -14,8 +14,8 @@ namespace hui {
 //----------------------------------------------------------------------------------
 // resource handling
 
-Window *_cdecl CreateResourceDialog(const string &id, Window *root);
-Menu *_cdecl CreateResourceMenu(const string &id);
+Window *_cdecl create_resource_dialog(const string &id, Window *root);
+Menu *_cdecl create_resource_menu(const string &id, Panel *panel);
 
 
 
@@ -38,12 +38,12 @@ public:
 	string to_string(int indent = 0);
 };
 
-Resource ParseResource(const string &buffer, bool literal = false);
+Resource parse_resource(const string &buffer, bool literal = false);
 
 
 // resources
-void _cdecl LoadResource(const Path &filename);
-Resource *GetResource(const string &id);
+void _cdecl load_resource(const Path &filename);
+Resource *get_resource(const string &id);
 
 };
 

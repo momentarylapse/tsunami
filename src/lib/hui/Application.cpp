@@ -55,14 +55,14 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		SetDefaultErrorHandler(nullptr);
 
 	if (file_exists(directory << "config.txt"))
-		Config.load(directory << "config.txt");
+		config.load(directory << "config.txt");
 
 
 	if ((flags & FLAG_DONT_LOAD_RESOURCE) == 0)
-		LoadResource(directory_static << "hui_resources.txt");
+		load_resource(directory_static << "hui_resources.txt");
 
 	if (def_lang.num > 0)
-		SetLanguage(Config.get_str("Language", def_lang));
+		set_language(config.get_str("Language", def_lang));
 
 
 #ifdef OS_LINUX
@@ -84,8 +84,8 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 Application::~Application() {
 	//foreachb(Window *w, _all_windows_)
 	//	delete(w);
-	if (Config.changed)
-		Config.save(directory << "config.txt");
+	if (config.changed)
+		config.save(directory << "config.txt");
 	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
 		msg_end();
 
@@ -196,7 +196,7 @@ int Application::try_execute(const Array<string> &args) {
 }
 
 void Application::end() {
-	SetIdleFunction(nullptr);
+	set_idle_function(nullptr);
 #if GTK_CHECK_VERSION(4,0,0)
 	keep_running = false;
 #else

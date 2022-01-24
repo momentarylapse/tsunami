@@ -77,7 +77,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 		tick_dt *= 10;
 
 	//sucker_thread = new SuckerThread(this);
-	buffer_size = hui::Config.get_int("SignalChain.BufferSize", DEFAULT_BUFFER_SIZE);
+	buffer_size = hui::config.get_int("SignalChain.BufferSize", DEFAULT_BUFFER_SIZE);
 	no_data_wait = 0.005f;
 }
 
@@ -386,7 +386,7 @@ void SignalChain::start() {
 
 	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
-	hui_runner = hui::RunRepeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
+	hui_runner = hui::run_repeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
 }
 
 void SignalChain::stop() {
@@ -395,7 +395,7 @@ void SignalChain::stop() {
 	session->debug("chain", "stop");
 	_stop_sucking_soft();
 
-	hui::CancelRunner(hui_runner);
+	hui::cancel_runner(hui_runner);
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);

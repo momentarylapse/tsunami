@@ -54,7 +54,7 @@ public:
 			p->draw_line(port->area.m(), target->area.m());
 			p->set_line_width(1);
 		} else {
-			p->draw_line(port->area.m(), hui::GetEvent()->m);
+			p->draw_line(port->area.m(), hui::get_event()->m);
 		}
 	}
 };

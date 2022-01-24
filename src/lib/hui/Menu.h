@@ -21,9 +21,9 @@ class Control;
 
 class Menu : public VirtualBase {
 public:
-	Menu();
+	Menu(Panel *p);
 	~Menu();
-	void _cdecl __init__();
+	void _cdecl __init__(Panel *p);
 	void _cdecl __delete__();
 	void _cdecl clear();
 	void _cdecl open_popup(Panel *panel);

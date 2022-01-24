@@ -277,7 +277,7 @@ void Panel::add_control(const string &type, const string &title, int x, int y, c
 void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_id) {
 	//msg_write(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 	set_target(parent_id);
-	add_control(cmd.type, GetLanguageR(ns, cmd),
+	add_control(cmd.type, get_language_r(ns, cmd),
 				cmd.x, cmd.y,
 				cmd.id);
 
@@ -292,7 +292,7 @@ void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_i
 		set_image(cmd.id, cmd.image());
 
 
-	string tooltip = GetLanguageT(ns, cmd.id, cmd.tooltip);
+	string tooltip = get_language_t(ns, cmd.id, cmd.tooltip);
 	if (tooltip.num > 0)
 		set_tooltip(cmd.id, tooltip);
 
@@ -301,7 +301,7 @@ void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_i
 }
 
 void Panel::from_resource(const string &id) {
-	Resource *res = GetResource(id);
+	Resource *res = get_resource(id);
 	if (res)
 		set_from_resource(res);
 }
@@ -319,7 +319,7 @@ void Panel::set_from_resource(Resource *res) {
 			win->__set_options(o);
 
 		// title
-		win->set_title(GetLanguage(res->id, res->id));
+		win->set_title(get_language(res->id, res->id));
 
 		// size
 		int width = res->value("width", "0")._int();
@@ -331,7 +331,7 @@ void Panel::set_from_resource(Resource *res) {
 		string toolbar = res->value("toolbar");
 		string menu = res->value("menu");
 		if (menu != "")
-			win->set_menu(CreateResourceMenu(menu));
+			win->set_menu(create_resource_menu(menu, this));
 		if (toolbar != "")
 			win->toolbar[TOOLBAR_TOP]->set_by_id(toolbar);
 	}
@@ -353,7 +353,7 @@ void Panel::set_from_resource(Resource *res) {
 }
 
 void Panel::from_source(const string &buffer) {
-	Resource res = ParseResource(buffer);
+	Resource res = parse_resource(buffer);
 	set_from_resource(&res);
 }
 
@@ -366,7 +366,7 @@ void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_
 	//_addControl(main_id, c, parent_id);
 
 	set_target(parent_id);
-	string title = GetLanguageR(ns, c);
+	string title = get_language_r(ns, c);
 	//if (c.options.num > 0)
 	//	title = "!" + implode(c.options, ",") + "\\" + title;
 	add_control(c.type, title, x, y, c.id);
@@ -377,7 +377,7 @@ void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_
 	if (c.image().num > 0)
 		set_image(c.id, c.image());
 
-	string tooltip = GetLanguageT(ns, c.id, c.tooltip);
+	string tooltip = get_language_t(ns, c.id, c.tooltip);
 	if (tooltip.num > 0)
 		set_tooltip(c.id, tooltip);
 
@@ -386,7 +386,7 @@ void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_
 }
 
 void Panel::embed_source(const string &buffer, const string &parent_id, int x, int y) {
-	Resource res = ParseResource(buffer);
+	Resource res = parse_resource(buffer);
 	embed_resource(res, parent_id, x, y);
 }
 

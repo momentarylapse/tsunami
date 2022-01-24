@@ -44,7 +44,7 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 	PerformanceMonitor::end_busy(visualizer->perf_channel);
 
 	visualizer->notify_counter ++;
-	hui::RunLater(0.001f, [=] {
+	hui::run_later(0.001f, [=] {
 		visualizer->notify();
 		visualizer->notify_counter --;
 	});

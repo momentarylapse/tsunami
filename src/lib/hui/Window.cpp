@@ -45,7 +45,7 @@ void Window::__init_ext__(const string& title, int width, int height) {
 
 // resource constructor
 Window::Window(const string &id, Window *parent) {
-	Resource *res = GetResource(id);
+	Resource *res = get_resource(id);
 	if (!res) {
 		msg_error("Window: undefined resource id: " + id);
 		return;
@@ -102,7 +102,7 @@ void Window::on_close_request() {
 void Window::set_id(const string &_id) {
 	id = _id;
 	if (_using_language_ and (id.num > 0))
-		set_title(GetLanguage(id, id));
+		set_title(get_language(id, id));
 }
 
 // align window relative to another window (like..."top right corner")

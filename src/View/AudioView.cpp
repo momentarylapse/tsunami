@@ -142,9 +142,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	color_schemes.add(ColorSchemeDark());
 	color_schemes.add(ColorSchemeSystem(win, id));
 
-	set_color_scheme(hui::Config.get_str("View.ColorScheme", "system"));
+	set_color_scheme(hui::config.get_str("View.ColorScheme", "system"));
 
-	midi_view_mode = (MidiMode)hui::Config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
+	midi_view_mode = (MidiMode)hui::config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	playback_range_locked = false;
 
@@ -168,11 +168,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	scene_graph = new scenegraph::SceneGraph();
 	scene_graph->set_perf_name("view");
-	/*scene_graph->set_callback_set_current([=] {
+	/*scene_graph->set_callback_set_current([this] {
 		if (!selecting_or())
 			set_current(scene_graph->cur_selection);
 	});*/
-	scene_graph->set_callback_redraw([=] {
+	scene_graph->set_callback_redraw([this] {
 		force_redraw();
 	});
 	PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
@@ -189,11 +189,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	selection_marker = new SelectionMarker(this);
 	scroll_bar_y = new ScrollBar(); // pixels
 	scroll_bar_y->auto_hide = true;
-	scroll_bar_y->set_callback([=] (float offset) {
+	scroll_bar_y->set_callback([this] (float offset) {
 		thm.update_immediately(this, song, song_area());
 	});
 	scroll_bar_time = new ScrollBarHorizontal(); // samples
-	scroll_bar_time->set_callback([=] (float offset) {
+	scroll_bar_time->set_callback([this] (float offset) {
 		cam.dirty_jump(offset);
 	});
 	scroll_bar_time->constrained = false;
@@ -226,14 +226,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
 	midi_painter = new MidiPainter(song, &cam, &sel, &hover(), theme);
 
-	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
+	preview_sleep_time = hui::config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 20;
 	ScrollSpeedFast = 200;
-	ZoomSpeed = hui::Config.get_float("View.ZoomSpeed", 0.1f);
-	set_mouse_wheel_speed(hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
-	set_antialiasing(hui::Config.get_bool("View.Antialiasing", true));
-	set_high_details(hui::Config.get_bool("View.HighDetails", true));
-	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
+	ZoomSpeed = hui::config.get_float("View.ZoomSpeed", 0.1f);
+	set_mouse_wheel_speed(hui::config.get_float("View.MouseWheelSpeed", 1.0f));
+	set_antialiasing(hui::config.get_bool("View.Antialiasing", true));
+	set_high_details(hui::config.get_bool("View.HighDetails", true));
+	hui::config.set_float("View.ZoomSpeed", ZoomSpeed);
 
 	images.speaker = Image::load(tsunami->directory_static << "icons/volume.png");
 	images.solo = Image::load(tsunami->directory_static << "icons/solo.png");
@@ -253,13 +253,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	renderer = (SongRenderer*)signal_chain->add(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
 	peak_meter = (PeakMeter*)signal_chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
 	output_stream = (AudioOutput*)signal_chain->add(ModuleCategory::STREAM, "AudioOutput");
-	output_stream->set_volume(hui::Config.get_float("Output.Volume", 1.0f));
+	output_stream->set_volume(hui::config.get_float("Output.Volume", 1.0f));
 	signal_chain->connect(renderer, 0, peak_meter, 0);
 	signal_chain->connect(peak_meter, 0, output_stream, 0);
 	signal_chain->mark_all_modules_as_system();
 
-	signal_chain->subscribe(this, [=]{ on_stream_tick(); }, Module::MESSAGE_TICK);
-	signal_chain->subscribe(this, [=]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+	signal_chain->subscribe(this, [this]{ on_stream_tick(); }, Module::MESSAGE_TICK);
+	signal_chain->subscribe(this, [this]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
 
 
 	peak_meter_display = new PeakMeterDisplay(peak_meter, PeakMeterDisplay::Mode::BOTH);
@@ -300,44 +300,44 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
-	win->event_xp(id, "hui:draw", [=](Painter *p) { on_draw(p); });
-	win->event_x(id, "hui:mouse-move", [=]{ on_mouse_move(); });
-	win->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
-	win->event_x(id, "hui:left-double-click", [=]{ on_left_double_click(); });
-	win->event_x(id, "hui:left-button-up", [=]{ on_left_button_up(); });
-	win->event_x(id, "hui:middle-button-down", [=]{ on_middle_button_down(); });
-	win->event_x(id, "hui:middle-button-up", [=]{ on_middle_button_up(); });
-	win->event_x(id, "hui:right-button-down", [=]{ on_right_button_down(); });
-	win->event_x(id, "hui:right-button-up", [=]{ on_right_button_up(); });
-	win->event_x(id, "hui:mouse-leave", [=]{ on_mouse_leave(); });
-	win->event_x(id, "hui:key-down", [=]{ on_key_down(); });
-	win->event_x(id, "hui:key-up", [=]{ on_key_up(); });
-	win->event_x(id, "hui:mouse-wheel", [=]{ on_mouse_wheel(); });
-	win->event_x(id, "hui:gesture-zoom", [=]{ mode->on_command("hui:gesture-zoom"); });
-	win->event_x(id, "hui:gesture-zoom-begin", [=]{ mode->on_command("hui:gesture-zoom-begin"); });
-	win->event_x(id, "hui:gesture-zoom-end", [=]{ mode->on_command("hui:gesture-zoom-end"); });
+	win->event_xp(id, "hui:draw", [this](Painter *p) { on_draw(p); });
+	win->event_x(id, "hui:mouse-move", [this]{ on_mouse_move(); });
+	win->event_x(id, "hui:left-button-down", [this]{ on_left_button_down(); });
+	win->event_x(id, "hui:left-double-click", [this]{ on_left_double_click(); });
+	win->event_x(id, "hui:left-button-up", [this]{ on_left_button_up(); });
+	win->event_x(id, "hui:middle-button-down", [this]{ on_middle_button_down(); });
+	win->event_x(id, "hui:middle-button-up", [this]{ on_middle_button_up(); });
+	win->event_x(id, "hui:right-button-down", [this]{ on_right_button_down(); });
+	win->event_x(id, "hui:right-button-up", [this]{ on_right_button_up(); });
+	win->event_x(id, "hui:mouse-leave", [this]{ on_mouse_leave(); });
+	win->event_x(id, "hui:key-down", [this]{ on_key_down(); });
+	win->event_x(id, "hui:key-up", [this]{ on_key_up(); });
+	win->event_x(id, "hui:mouse-wheel", [this]{ on_mouse_wheel(); });
+	win->event_x(id, "hui:gesture-zoom", [this]{ mode->on_command("hui:gesture-zoom"); });
+	win->event_x(id, "hui:gesture-zoom-begin", [this]{ mode->on_command("hui:gesture-zoom-begin"); });
+	win->event_x(id, "hui:gesture-zoom-end", [this]{ mode->on_command("hui:gesture-zoom-end"); });
 
 	win->activate(id);
 
 
-	menu_song = hui::CreateResourceMenu("popup-menu-song");
-	menu_track = hui::CreateResourceMenu("popup-menu-track");
-	menu_layer = hui::CreateResourceMenu("popup-menu-layer");
-	menu_playback_range = hui::CreateResourceMenu("popup-menu-playback-range");
-	menu_sample = hui::CreateResourceMenu("popup-menu-sample");
-	menu_marker = hui::CreateResourceMenu("popup-menu-marker");
-	menu_bar = hui::CreateResourceMenu("popup-menu-bar");
-	menu_bar_gap = hui::CreateResourceMenu("popup-menu-bar-gap");
-	menu_buffer = hui::CreateResourceMenu("popup-menu-buffer");
+	menu_song = hui::create_resource_menu("popup-menu-song", win);
+	menu_track = hui::create_resource_menu("popup-menu-track", win);
+	menu_layer = hui::create_resource_menu("popup-menu-layer", win);
+	menu_playback_range = hui::create_resource_menu("popup-menu-playback-range", win);
+	menu_sample = hui::create_resource_menu("popup-menu-sample", win);
+	menu_marker = hui::create_resource_menu("popup-menu-marker", win);
+	menu_bar = hui::create_resource_menu("popup-menu-bar", win);
+	menu_bar_gap = hui::create_resource_menu("popup-menu-bar-gap", win);
+	menu_buffer = hui::create_resource_menu("popup-menu-buffer", win);
 
-	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
-	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
-	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
-	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
-	song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
-	song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
-	//song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
-	auto apply_bar_scale = [=](int i) {
+	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
+	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
+	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
+	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
+	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
+	song->subscribe(this, [this]{ on_song_new(); }, song->MESSAGE_NEW);
+	//song->subscribe(this, [this]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+	auto apply_bar_scale = [this](int i) {
 		auto b = song->bars[song->x_message_data.i[0]].get();
 		if (i <= b->offset)
 			return i;
@@ -345,24 +345,24 @@ AudioView::AudioView(Session *_session, const string &_id) :
 			return i - song->x_message_data.i[1] + song->x_message_data.i[2];
 		return b->offset + (int)((float)(i - b->offset) * (float)song->x_message_data.i[2] / (float)song->x_message_data.i[1]);
 	};
-	song->subscribe(this, [=] {
+	song->subscribe(this, [this, apply_bar_scale] {
 		sel.range_raw.set_start(apply_bar_scale(sel.range_raw.start()));
 		sel.range_raw.set_end(apply_bar_scale(sel.range_raw.end()));
 		update_selection();
 	}, song->MESSAGE_SCALE_BARS);
-	song->subscribe(this, [=] {
+	song->subscribe(this, [this] {
 		on_song_new();
 		on_song_finished_loading();
 		enable(true);
 	}, song->MESSAGE_FINISHED_LOADING);
-	song->subscribe(this, [=] {
+	song->subscribe(this, [this] {
 		enable(false);
 	}, song->MESSAGE_START_LOADING);
-	song->subscribe(this, [=] {
+	song->subscribe(this, [this] {
 		peak_thread->stop_update();
 	}, song->MESSAGE_BEFORE_CHANGE);
-	song->subscribe(this, [=] { on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
-	song->subscribe(this, [=] {
+	song->subscribe(this, [this] { on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
+	song->subscribe(this, [this] {
 		force_redraw();
 		update_menu();
 	}, song->MESSAGE_ANY);
@@ -374,10 +374,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
-		hui::CancelRunner(draw_runner_id);
+		hui::cancel_runner(draw_runner_id);
 	PerformanceMonitor::delete_channel(perf_channel);
 
-	hui::Config.set_float("Output.Volume", output_stream->get_volume());
+	hui::config.set_float("Output.Volume", output_stream->get_volume());
 	output_stream->unsubscribe(this);
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
@@ -387,7 +387,7 @@ AudioView::~AudioView() {
 
 void AudioView::set_antialiasing(bool set) {
 	antialiasing = set;
-	hui::Config.set_bool("View.Antialiasing", antialiasing);
+	hui::config.set_bool("View.Antialiasing", antialiasing);
 	force_redraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
 }
@@ -395,19 +395,19 @@ void AudioView::set_antialiasing(bool set) {
 void AudioView::set_high_details(bool set) {
 	high_details = set;
 	detail_steps = high_details ? 1 : 3;
-	hui::Config.set_bool("View.HighDetails", high_details);
+	hui::config.set_bool("View.HighDetails", high_details);
 	force_redraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
 }
 
 void AudioView::set_mouse_wheel_speed(float speed) {
 	mouse_wheel_speed = speed;
-	hui::Config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
+	hui::config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
 	notify(MESSAGE_SETTINGS_CHANGE);
 }
 
 void AudioView::set_color_scheme(const string &name) {
-	hui::Config.set_str("View.ColorScheme", name);
+	hui::config.set_str("View.ColorScheme", name);
 	theme = color_schemes[0];
 	for (auto &b: color_schemes)
 		if (b.name == name)
@@ -445,7 +445,7 @@ void AudioView::set_mode(ViewMode *m) {
 }
 
 void AudioView::set_mouse() {
-	m = hui::GetEvent()->m;
+	m = hui::get_event()->m;
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
@@ -630,7 +630,7 @@ void AudioView::on_right_button_up() {
 
 void AudioView::on_mouse_leave() {
 	// TODO check if necessary
-	if (!hui::GetEvent()->lbut and !hui::GetEvent()->rbut) {
+	if (!hui::get_event()->lbut and !hui::get_event()->rbut) {
 		hover().clear();
 		force_redraw();
 	}
@@ -791,7 +791,7 @@ void AudioView::on_command(const string &id) {
 
 
 void AudioView::on_key_down() {
-	int k = hui::GetEvent()->key_code;
+	int k = hui::get_event()->key_code;
 	if (k == hui::KEY_ESCAPE) {
 		if (mdp()->acting()) {
 			mdp()->cancel();
@@ -808,7 +808,7 @@ void AudioView::on_key_down() {
 }
 
 void AudioView::on_key_up() {
-	int k = hui::GetEvent()->key_code;
+	int k = hui::get_event()->key_code;
 	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT))
 		force_redraw();
 
@@ -941,7 +941,7 @@ void AudioView::on_song_change() {
 	session->debug("view", "song.after-change");
 	if (song->history_enabled()) {
 		session->debug("view", "+++");
-		hui::RunLater(0.01f, [=]{ update_peaks(); });
+		hui::run_later(0.01f, [this]{ update_peaks(); });
 	}
 }
 
@@ -1234,7 +1234,7 @@ void AudioView::draw_song(Painter *c) {
 		animating = true;
 
 	if (animating)
-		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [=]{ force_redraw(); });
+		draw_runner_id = hui::run_later(animating ? 0.03f : 0.2f, [this]{ force_redraw(); });
 }
 
 void AudioView::on_draw(Painter *c) {
@@ -1292,7 +1292,7 @@ void AudioView::update_peaks() {
 
 void AudioView::set_midi_view_mode(MidiMode mode) {
 	midi_view_mode = mode;
-	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
+	hui::config.set_int("View.MidiMode", (int)midi_view_mode);
 	for (auto *t: vtracks)
 		t->set_midi_mode(mode);
 	//forceRedraw();

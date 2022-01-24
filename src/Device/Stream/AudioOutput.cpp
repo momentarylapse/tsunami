@@ -86,7 +86,7 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
 		//printf("end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+		hui::run_later(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 	}
 	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
@@ -200,7 +200,7 @@ int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
 		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+		hui::run_later(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 		//printf("/XXX end of data...\n");
 		//return paComplete;
 	}
@@ -234,7 +234,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
 	config.volume = 1;
-	prebuffer_size = hui::Config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
+	prebuffer_size = hui::config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	device_manager = session->device_manager;
@@ -338,7 +338,7 @@ void AudioOutput::_create_dev() {
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
 
-		int chunk_size = hui::Config.get_int("portaudio.chunk-size", 256);
+		int chunk_size = hui::config.get_int("portaudio.chunk-size", 256);
 		//256*4; // paFramesPerBufferUnspecified
 		if (cur_device->is_default()) {
 			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, chunk_size,
@@ -478,7 +478,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 	if (size == source->END_OF_STREAM) {
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		hui::RunLater(0.001f,  [=]{ on_read_end_of_stream(); });
+		hui::run_later(0.001f,  [=]{ on_read_end_of_stream(); });
 		ring_buf.write_ref_cancel(b);
 		return size;
 	}

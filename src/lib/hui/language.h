@@ -49,17 +49,17 @@ class Resource;
 
 
 // language
-Array<string> GetLanguages();
-string GetCurLanguage();
-void _cdecl SetLanguage(const string &language);
+Array<string> get_languages();
+string get_cur_language();
+void _cdecl set_language(const string &language);
 extern bool _using_language_;
 
-string _cdecl GetLanguage(const string &ns, const string &id);
-string _cdecl GetLanguageR(const string &ns, Resource &cmd);
-string _cdecl GetLanguageT(const string &ns, const string &id, const string &tooltip);
-string _cdecl GetLanguageS(const string &str);
-#define L(ns, id)	hui::GetLanguage(ns, id)
-#define _(str)	hui::GetLanguageS(str)
+string _cdecl get_language(const string &ns, const string &id);
+string _cdecl get_language_r(const string &ns, Resource &cmd);
+string _cdecl get_language_t(const string &ns, const string &id, const string &tooltip);
+string _cdecl get_language_s(const string &str);
+#define L(ns, id)	hui::get_language(ns, id)
+#define _(str)	hui::get_language_s(str)
 void _cdecl UpdateAll();
 
 // internal

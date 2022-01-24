@@ -5,6 +5,7 @@
  *      Author: michi
  */
 
+#include "../hui.h"
 #include "ControlMenuButton.h"
 #include "../Menu.h"
 #include "../Resource.h"
@@ -17,15 +18,16 @@ namespace hui
 
 void *get_gtk_image(const string &image, IconSize size); // -> hui_menu_gtk.cpp
 
-Menu *_create_res_menu_(const string &ns, Resource *res); // -> Resource.cpp
+Menu *_create_res_menu_(const string &ns, Resource *res, Panel *p); // -> Resource.cpp
 
 //void OnGtkMenuButtonPress(GtkWidget *widget, gpointer data)
 //{	reinterpret_cast<Control*>(data)->notify("hui:click");	}
 
 
-ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
+ControlMenuButton::ControlMenuButton(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_MENU_BUTTON, id)
 {
+	this->panel = panel; // for the menu...
 	auto parts = split_title(title);
 	widget = gtk_menu_button_new();
 #if GTK_CHECK_VERSION(4,0,0)
@@ -34,8 +36,6 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
 #endif
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkMenuButtonPress), this);
-
-	menu = NULL;
 
 //	SetImageById(this, id);
 	set_options(get_option_from_title(title));
@@ -78,25 +78,28 @@ void ControlMenuButton::__set_option(const string &op, const string &value) {
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 #endif
 	} else if (op == "menu") {
-#if GTK_CHECK_VERSION(4,0,0)
-		msg_error("MenuButton.menu gtk4...");
-#else
-		menu = CreateResourceMenu(value);
-		if (menu) {
-			menu->set_panel(panel);
-			gtk_menu_button_set_popup(GTK_MENU_BUTTON(widget), menu->widget);
-		}
-#endif
+		set_menu(create_resource_menu(value, panel));
 	} else if (op == "menusource") {
+		auto res = parse_resource(value, panel);
+		set_menu(_create_res_menu_("source", &res, panel));
+	}
+}
+
+void ControlMenuButton::set_menu(Menu *m) {
+	menu = m;
+	if (menu) {
+		menu->set_panel(panel);
 #if GTK_CHECK_VERSION(4,0,0)
-		msg_error("MenuButton.menusource gtk4...");
-#else
-		auto res = ParseResource(value);
-		menu = _create_res_menu_("source", &res);
-		if (menu) {
-			menu->set_panel(panel);
-			gtk_menu_button_set_popup(GTK_MENU_BUTTON(widget), menu->widget);
+		//msg_error("MenuButton.menu gtk4...");
+		if (panel->win) {
+			panel->win->_connect_menu_to_win(menu);
+		} else {
+			msg_write("MenuButton.set_menu()... no window yet");
 		}
+		auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu->gmenu));
+		gtk_menu_button_set_popover(GTK_MENU_BUTTON(widget), w);
+#else
+		gtk_menu_button_set_popup(GTK_MENU_BUTTON(widget), menu->widget);
 #endif
 	}
 }

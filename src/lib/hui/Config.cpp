@@ -19,7 +19,7 @@ namespace hui
 	//int _tchar_str_size_(TCHAR *str);
 #endif
 
-Configuration Config;
+Configuration config;
 
 Configuration::Configuration() {
 	loaded = false;

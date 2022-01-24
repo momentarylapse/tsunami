@@ -12,8 +12,8 @@
 
 MouseDelayPlanner::MouseDelayPlanner(scenegraph::SceneGraph *sg) {
 	scene_graph = sg;
-	min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
-	hui::Config.set_int("View.MouseMinMoveToSelect", min_move_to_start);
+	min_move_to_start = hui::config.get_int("View.MouseMinMoveToSelect", 5);
+	hui::config.set_int("View.MouseMinMoveToSelect", min_move_to_start);
 }
 
 void MouseDelayPlanner::prepare(MouseDelayAction *a) {
@@ -31,7 +31,7 @@ bool MouseDelayPlanner::update(const vec2 &m) {
 		action->on_update(m);
 		//view->force_redraw();
 	} else if (has_focus()) {
-		auto e = hui::GetEvent();
+		auto e = hui::get_event();
 		dist += fabs(e->d.x) + fabs(e->d.y);
 		if (dist > min_move_to_start)
 			start_acting(m);

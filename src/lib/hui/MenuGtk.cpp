@@ -26,9 +26,9 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *panel) {
 }
 #endif
 
-Menu::Menu() {
+Menu::Menu(Panel *p) {
 	_MakeUsable_();
-	panel = nullptr;
+	panel = p;
 
 #if GTK_CHECK_VERSION(4,0,0)
 	gmenu = g_menu_new();

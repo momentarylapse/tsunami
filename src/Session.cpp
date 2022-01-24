@@ -132,7 +132,7 @@ void Session::execute_tsunami_plugin(const string& name, const Array<string> &ar
 
 
 void Session::on_plugin_stop_request(TsunamiPlugin *p) {
-	hui::RunLater(0.001f, [this,p]{
+	hui::run_later(0.001f, [this,p]{
 		last_plugin = p;
 		notify(MESSAGE_REMOVE_PLUGIN);
 		p->on_stop();
@@ -205,7 +205,7 @@ void Session::set_mode(const string &mode) {
 		e("unknown mode: " + mode);
 		return;
 	}
-	hui::RunLater(0.1f, [=]{ win->update_menu(); });
+	hui::run_later(0.1f, [=]{ win->update_menu(); });
 	this->mode = mode;
 }
 

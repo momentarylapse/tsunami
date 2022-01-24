@@ -57,12 +57,12 @@ Storage::Storage(Session *_session) {
 	formats.add(new FormatDescriptorMidi());
 	formats.add(new FormatDescriptorPdf());
 
-	current_directory = hui::Config.get_str("CurrentDirectory", "");
+	current_directory = hui::config.get_str("CurrentDirectory", "");
 	current_chain_directory = hui::Application::directory_static << "SignalChains";
 }
 
 Storage::~Storage() {
-	hui::Config.set_str("CurrentDirectory", current_directory.str());
+	hui::config.set_str("CurrentDirectory", current_directory.str());
 
 	for (auto *d: formats)
 		delete d;

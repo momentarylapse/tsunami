@@ -8,8 +8,7 @@
 #include "hui.h"
 #include <mutex>
 
-namespace hui
-{
+namespace hui {
 
 
 
@@ -23,11 +22,9 @@ static std::mutex runner_mutex;
 	int idle_id = -1;
 	static int _next_runner_id_ = 0;
 
-	class HuiGtkRunner
-	{
+	class HuiGtkRunner {
 	public:
-		HuiGtkRunner(const Callback &_func, float _dt)
-		{
+		HuiGtkRunner(const Callback &_func, float _dt) {
 			func = _func;
 			gtk_id = -1;
 			hui_id = _next_runner_id_ ++;
@@ -41,10 +38,9 @@ static std::mutex runner_mutex;
 		bool delete_me;
 	};
 	Array<HuiGtkRunner*> _hui_runners_;
-	void _hui_runners_cleanup_()
-	{
+	void _hui_runners_cleanup_() {
 		for (int i=_hui_runners_.num-1; i>=0; i--)
-			if (_hui_runners_[i]->delete_me){
+			if (_hui_runners_[i]->delete_me) {
 				auto *c = _hui_runners_[i];
 				//printf("del %d\n", c->hui_id);
 				_hui_runners_.erase(i);
@@ -52,17 +48,15 @@ static std::mutex runner_mutex;
 			}
 
 	}
-	HuiGtkRunner *_hui_get_runner_(int id)
-	{
+	HuiGtkRunner *_hui_get_runner_(int id) {
 		for (auto *r: _hui_runners_)
 			if (r->hui_id == id)
 				return r;
 		return nullptr;
 	}
-	/*void _hui_runner_delete_(int id)
-	{
+	/*void _hui_runner_delete_(int id) {
 		for (int i=_hui_runners_.num-1; i>=0; i--)
-			if (_hui_runners_[i]->hui_id == id){
+			if (_hui_runners_[i]->hui_id == id) {
 				auto *c = _hui_runners_[i];
 				_hui_runners_.erase(i);
 				delete c;
@@ -73,8 +67,7 @@ static std::mutex runner_mutex;
 		msg_write(ia2s(ids));
 	}*/
 
-	gboolean GtkIdleFunction(void*)
-	{
+	gboolean GtkIdleFunction(void*) {
 		if (_idle_function_)
 			_idle_function_();
 		else
@@ -82,8 +75,7 @@ static std::mutex runner_mutex;
 		return TRUE;
 	}
 
-	gboolean GtkRunLaterFunction(gpointer data)
-	{
+	gboolean GtkRunLaterFunction(gpointer data) {
 		HuiGtkRunner *c = reinterpret_cast<HuiGtkRunner*>(data);
 		//printf("<<< rl  %d\n", c->hui_id);
 		if (c->func)
@@ -95,8 +87,7 @@ static std::mutex runner_mutex;
 		return FALSE;
 	}
 
-	gboolean GtkRunRepeatedFunction(gpointer data)
-	{
+	gboolean GtkRunRepeatedFunction(gpointer data) {
 		HuiGtkRunner *c = reinterpret_cast<HuiGtkRunner*>(data);
 		//printf("<<< rr %d\n", c->hui_id);
 		if (c->func)
@@ -108,14 +99,13 @@ static std::mutex runner_mutex;
 
 
 
-void SetIdleFunction(const Callback &c)
-{
+void set_idle_function(const Callback &c) {
 #ifdef HUI_API_GTK
 	bool old_idle = (bool)_idle_function_;
 	bool new_idle = (bool)c;
 	if (new_idle and !old_idle)
 		idle_id = g_idle_add_full(300, GtkIdleFunction, nullptr, nullptr);
-	if (!new_idle and old_idle and (idle_id >= 0)){
+	if (!new_idle and old_idle and (idle_id >= 0)) {
 		g_source_remove(idle_id);
 		idle_id = -1;
 	}
@@ -133,8 +123,7 @@ void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*funct
 	_HuiSetIdleFunction(HuiCallback(object, function));
 }*/
 
-int RunLater(float time, const Callback &c)
-{
+int run_later(float time, const Callback &c) {
 	//msg_write("rl lock 0");
 	//std::lock_guard<std::mutex> lock(runner_mutex);
 
@@ -160,8 +149,7 @@ int RunLater(float time, const Callback &c)
 	#endif
 }
 
-int RunRepeated(float time, const Callback &c)
-{
+int run_repeated(float time, const Callback &c) {
 	//msg_write("rr lock 0");
 	//std::lock_guard<std::mutex> lock(runner_mutex);
 
@@ -184,14 +172,13 @@ int RunRepeated(float time, const Callback &c)
 	#endif
 }
 
-void CancelRunner(int id)
-{
+void cancel_runner(int id) {
 	//msg_write("cancel " + i2s(id));
 	std::lock_guard<std::mutex> lock(runner_mutex);
 #ifdef HUI_API_GTK
 	//msg_write("rl cancel a");
 	auto *r = _hui_get_runner_(id);
-	if (r){
+	if (r) {
 		if (r->gtk_id >= 0)
 			g_source_remove(r->gtk_id);
 	//msg_write("rl cancel b");

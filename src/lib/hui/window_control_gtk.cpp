@@ -336,13 +336,13 @@ void Panel::add_revealer(const string &title, int x, int y, const string &id) {
 }
 
 void Panel::add_menu_button(const string &title, int x, int y, const string &id) {
-	_insert_control_(new ControlMenuButton(title, id), x, y);
+	_insert_control_(new ControlMenuButton(title, id, this), x, y);
 }
 
 void Panel::embed_dialog(const string &id, int x, int y) {
 	spacing = 5;
 
-	Resource *res = GetResource(id);
+	Resource *res = get_resource(id);
 	if (!res)
 		return;
 	if (res->type != "Dialog")

@@ -12,7 +12,7 @@
 const string Log::MESSAGE_ADD = "Add";
 
 Log::Log() {
-	allow_debug = hui::Config.get_bool("Log.Debug", false);
+	allow_debug = hui::config.get_bool("Log.Debug", false);
 	allow_console_output = true;
 }
 
@@ -70,6 +70,6 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 	}
 
 	// make sure messages are handled in the gui thread...
-	hui::RunLater(0.01f, [=]{ notify(MESSAGE_ADD); });
+	hui::run_later(0.01f, [=]{ notify(MESSAGE_ADD); });
 	//notify(MESSAGE_ADD);
 }

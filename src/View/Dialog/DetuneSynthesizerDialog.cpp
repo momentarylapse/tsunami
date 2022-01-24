@@ -140,9 +140,9 @@ void DetuneSynthesizerDialog::on_left_button_down() {
 	if (hover >= 0) {
 		auto tuning = track->synth->tuning;
 		if (mode_relative) {
-			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::GetEvent()->m.y, hover));
+			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
 		} else {
-			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::GetEvent()->m.y));
+			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::get_event()->m.y));
 		}
 		track->detune_synthesizer(tuning.freq);
 		redraw("detune_area");
@@ -154,7 +154,7 @@ void DetuneSynthesizerDialog::on_left_button_up() {
 
 void DetuneSynthesizerDialog::on_mouse_move() {
 	hover = -1;
-	auto e = hui::GetEvent();
+	auto e = hui::get_event();
 	if ((e->m.x >= 0) and (e->m.x < width))
 		hover = (e->m.x / width * MAX_PITCH);
 
@@ -163,7 +163,7 @@ void DetuneSynthesizerDialog::on_mouse_move() {
 
 void DetuneSynthesizerDialog::on_mouse_wheel() {
 	if (hover >= 0) {
-		auto e = hui::GetEvent();
+		auto e = hui::get_event();
 		float speed = mode_relative ? 0.01f : 0.1f;
 		bool all_octaves = is_checked("all_octaves");
 		auto tuning = track->synth->tuning;

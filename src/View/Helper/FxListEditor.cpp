@@ -140,20 +140,20 @@ void FxListEditor::on_fx_select() {
 }
 
 void FxListEditor::on_fx_edit() {
-	int n = hui::GetEvent()->row;
+	int n = hui::get_event()->row;
 	if (n >= 0)
-		track->enable_effect(track->fx[n].get(), panel->get_cell("", n, hui::GetEvent()->column)._bool());
+		track->enable_effect(track->fx[n].get(), panel->get_cell("", n, hui::get_event()->column)._bool());
 }
 
 void FxListEditor::on_fx_move() {
-	int s = hui::GetEvent()->row;
-	int t = hui::GetEvent()->row_target;
+	int s = hui::get_event()->row;
+	int t = hui::get_event()->row_target;
 	track->move_effect(s, t);
 }
 
 void FxListEditor::on_fx_right_click() {
-	menu_fx = hui::CreateResourceMenu("popup-menu-fx-list");
-	int n = hui::GetEvent()->row;
+	menu_fx = hui::create_resource_menu("popup-menu-fx-list", panel);
+	int n = hui::get_event()->row;
 	menu_fx->enable("fx-delete", n >= 0);
 	menu_fx->enable("fx-enabled", n >= 0);
 	if (n >= 0)
@@ -165,7 +165,7 @@ void FxListEditor::on_fx_delete() {
 	int n = panel->get_int(id_fx_list);
 	if (n >= 0) {
 		auto t = track;
-		hui::RunLater(0.001f, [t,n] {
+		hui::run_later(0.001f, [t,n] {
 			t->delete_effect(t->fx[n].get());
 		});
 	}
@@ -209,14 +209,14 @@ void FxListEditor::on_midi_fx_select() {
 }
 
 void FxListEditor::on_midi_fx_edit() {
-	int n = hui::GetEvent()->row;
+	int n = hui::get_event()->row;
 	if (n >= 0)
-		track->enable_midi_effect(track->midi_fx[n].get(), panel->get_cell("", n, hui::GetEvent()->column)._bool());
+		track->enable_midi_effect(track->midi_fx[n].get(), panel->get_cell("", n, hui::get_event()->column)._bool());
 }
 
 void FxListEditor::on_midi_fx_move() {
-	int s = hui::GetEvent()->row;
-	int t = hui::GetEvent()->row_target;
+	int s = hui::get_event()->row;
+	int t = hui::get_event()->row_target;
 	track->move_midi_effect(s, t);
 }
 

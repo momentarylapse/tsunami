@@ -35,19 +35,19 @@ SignalEditor::SignalEditor(Session *session) :
 	//add_label("!bold,center,big,expandx", 0, 0, "config-label");
 	//add_label("!bold,center,expandx", 0, 1, "message");
 
-	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
-	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
+	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
+	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
 
 	config_module = nullptr;
 	config_panel = nullptr;
 
-	event("selector", [=]{ on_chain_switch(); });
+	event("selector", [this]{ on_chain_switch(); });
 
 	for (auto *c: weak(session->all_signal_chains))
 		add_chain(c);
 	show_config(nullptr);
 
-	session->subscribe(this, [=] {
+	session->subscribe(this, [this, session] {
 		add_chain(session->all_signal_chains.back().get());
 	}, session->MESSAGE_ADD_SIGNAL_CHAIN);
 }
@@ -100,8 +100,8 @@ void SignalEditor::show_config(Module *m) {
 	config_panel = nullptr;
 	config_module = m;
 	if (m) {
-		config_panel = new ModulePanel(config_module);
-		config_panel->set_func_delete([=] {
+		config_panel = new ModulePanel(config_module, this);
+		config_panel->set_func_delete([this, m] {
 			for (auto *chain: weak(session->all_signal_chains))
 				for (auto *_m: weak(chain->modules))
 					if (m == _m)

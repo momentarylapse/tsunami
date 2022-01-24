@@ -76,9 +76,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	song = session->song.get();
 	app = tsunami;
 
-	int width = hui::Config.get_int("Window.Width", 800);
-	int height = hui::Config.get_int("Window.Height", 600);
-	bool maximized = hui::Config.get_bool("Window.Maximized", true);
+	int width = hui::config.get_int("Window.Width", 800);
+	int height = hui::config.get_int("Window.Height", 600);
+	bool maximized = hui::config.get_bool("Window.Maximized", true);
 
 	event("new", [this]{ on_new(); });
 	set_key_code("new", hui::KEY_N + hui::KEY_CONTROL);
@@ -282,13 +282,13 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// main table
 	set_target("main-grid");
 	add_drawing_area("!grabfocus,gesture=zoom", 0, 0, "area");
-	if (hui::Config.get_bool("View.EventCompression", true) == false)
+	if (hui::config.get_bool("View.EventCompression", true) == false)
 		set_options("area", "noeventcompression");
 
 	toolbar[0]->set_by_id("toolbar");
 	//ToolbarConfigure(false, true);
 
-	set_menu(hui::CreateResourceMenu("menu"));
+	set_menu(hui::create_resource_menu("menu", this));
 	//ToolBarConfigure(true, true);
 	set_maximized(maximized);
 
@@ -322,30 +322,30 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->signal_chain->subscribe(this, [this]{ on_update(); }, view->signal_chain->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this]{ on_update(); }, song->action_manager->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this] {
-		view->set_message(_("undo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
+		view->set_message(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [this] {
-		view->set_message(_("redo: ") + hui::GetLanguageS(song->action_manager->get_current_action()));
+		view->set_message(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
 	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_AFTER_CHANGE);
 	app->clipboard->subscribe(this, [this]{ on_update(); }, app->clipboard->MESSAGE_ANY);
 	bottom_bar->subscribe(this, [this]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
 	side_bar->subscribe(this, [this]{ on_side_bar_update(); }, side_bar->MESSAGE_ANY);
 	
-	event("*", [this]{ view->on_command(hui::GetEvent()->id); });
+	event("*", [this]{ view->on_command(hui::get_event()->id); });
 
 	// first time start?
-	if (hui::Config.get_bool("FirstStart", true)) {
-		hui::RunLater(0.2f, [this]{
+	if (hui::config.get_bool("FirstStart", true)) {
+		hui::run_later(0.2f, [this]{
 			on_help();
-			hui::Config.set_bool("FirstStart", false);
+			hui::config.set_bool("FirstStart", false);
 		});
 	}
 
 	update_menu();
 }
 
-void TsunamiCleanUp(Session *session) {
+void tsunami_clean_up(Session *session) {
 	auto sessions = weak(tsunami->sessions);
 	foreachi(Session *s, sessions, i)
 		if (s == session and s->auto_delete) {
@@ -361,9 +361,9 @@ void TsunamiCleanUp(Session *session) {
 TsunamiWindow::~TsunamiWindow() {
 	int w, h;
 	get_size_desired(w, h);
-	hui::Config.set_int("Window.Width", w);
-	hui::Config.set_int("Window.Height", h);
-	hui::Config.set_bool("Window.Maximized", is_maximized());
+	hui::config.set_int("Window.Width", w);
+	hui::config.set_int("Window.Height", h);
+	hui::config.set_bool("Window.Maximized", is_maximized());
 
 	view->signal_chain->stop_hard();
 	view->unsubscribe(this);
@@ -378,7 +378,7 @@ TsunamiWindow::~TsunamiWindow() {
 	delete view;
 
 	auto _session = session;
-	hui::RunLater(0.010f, [_session]{ TsunamiCleanUp(_session); });
+	hui::run_later(0.010f, [_session]{ tsunami_clean_up(_session); });
 }
 
 void TsunamiWindow::on_about() {
@@ -402,7 +402,7 @@ void TsunamiWindow::on_add_time_track() {
 }
 
 void TsunamiWindow::on_import_backup() {
-	string id = hui::GetEvent()->id;
+	string id = hui::get_event()->id;
 	int uuid = id.explode(":").back()._int();
 	auto filename = BackupManager::get_filename_for_uuid(uuid);
 	if (filename.is_empty())
@@ -423,7 +423,7 @@ void TsunamiWindow::on_import_backup() {
 }
 
 void TsunamiWindow::on_delete_backup() {
-	string id = hui::GetEvent()->id;
+	string id = hui::get_event()->id;
 	int uuid = id.explode(":").back()._int();
 	BackupManager::delete_old(uuid);
 }
@@ -790,7 +790,7 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	auto fx = CreateAudioEffect(session, name);
 	msg_error("TODO...");
@@ -813,7 +813,7 @@ void TsunamiWindow::on_menu_execute_audio_effect() {
 }
 
 void TsunamiWindow::on_menu_execute_audio_source() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	auto s = CreateAudioSource(session, name);
 
@@ -837,7 +837,7 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 }
 
 void TsunamiWindow::on_menu_execute_midi_effect() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	auto fx = CreateMidiEffect(session, name);
 
@@ -864,7 +864,7 @@ void TsunamiWindow::on_menu_execute_midi_effect() {
 }
 
 void TsunamiWindow::on_menu_execute_midi_source() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	auto s = CreateMidiSource(session, name);
 
@@ -894,14 +894,14 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 }
 
 void TsunamiWindow::on_menu_execute_song_plugin() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	auto p = ownify(CreateSongPlugin(session, name));
 	p->apply();
 }
 
 void TsunamiWindow::on_menu_execute_tsunami_plugin() {
-	string name = hui::GetEvent()->id.explode("--")[1];
+	string name = hui::get_event()->id.explode("--")[1];
 
 	session->execute_tsunami_plugin(name);
 }
@@ -1159,7 +1159,7 @@ void TsunamiWindow::on_exit() {
 	test_allow_termination([this] {
 		BackupManager::set_save_state(session);
 		//request_destroy();
-		hui::RunLater(0.01f, [this]{ session->win = nullptr; });
+		hui::run_later(0.01f, [this]{ session->win = nullptr; });
 	}, [] {});
 }
 
@@ -1271,7 +1271,7 @@ void TsunamiWindow::on_export_selection() {
 }
 
 void TsunamiWindow::on_quick_export() {
-	auto dir = Path(hui::Config.get_str("QuickExportDir", hui::Application::directory.str()));
+	auto dir = Path(hui::config.get_str("QuickExportDir", hui::Application::directory.str()));
 	if (session->storage->save(song, dir << _suggest_filename(song, dir)))
 		view->set_message(_("file saved"));
 }

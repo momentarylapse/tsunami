@@ -180,7 +180,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			// default tags
 			session->song->add_tag("title", _("New Audio File"));
 			session->song->add_tag("album", AppName);
-			session->song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
+			session->song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
 			session->song->reset_history();
 
 			session->song->notify(session->song->MESSAGE_FINISHED_LOADING);

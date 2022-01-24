@@ -11,22 +11,21 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
 class Menu;
 
 
-class ControlMenuButton : public Control
-{
+class ControlMenuButton : public Control {
 public:
-	ControlMenuButton(const string &text, const string &id);
+	ControlMenuButton(const string &text, const string &id, Panel *p);
 	string get_string() override;
 	void __set_string(const string &str) override;
 	void set_image(const string &str) override;
 	void __set_option(const string &op, const string &value) override;
 
-	Menu *menu;
+	Menu *menu = nullptr;
+	void set_menu(Menu *menu);
 };
 
 };

@@ -83,7 +83,7 @@ bool Language::Command::match(const string &_ns, const string &_id) {
 }
 
 
-void SetLanguage(const string &language) {
+void set_language(const string &language) {
 	cur_lang = nullptr;
 	_using_language_ = false;
 	for (Language &l: _languages_)
@@ -106,7 +106,7 @@ for (auto &c: cur_lang->cmd) \
 	if (c.match(NS, ID)) \
 		return CMD;
 
-string GetLanguage(const string &ns, const string &id) {
+string get_language(const string &ns, const string &id) {
 	if ((!_using_language_) or (id.num == 0))
 		return "";
 	for (auto &c: cur_lang->cmd)
@@ -117,7 +117,7 @@ string GetLanguage(const string &ns, const string &id) {
 	return "";
 }
 
-string GetLanguageR(const string &ns, Resource &cmd) {
+string get_language_r(const string &ns, Resource &cmd) {
 	string pre;
 	if (cmd.options.num > 0)
 		pre = "!" + implode(cmd.options, ",") + "\\";
@@ -137,7 +137,7 @@ string GetLanguageR(const string &ns, Resource &cmd) {
 }
 
 // tooltip
-string GetLanguageT(const string &ns, const string &id, const string &tooltip) {
+string get_language_t(const string &ns, const string &id, const string &tooltip) {
 	if (tooltip.num > 0)
 		return tooltip;
 	if ((!_using_language_) or (id.num == 0))
@@ -147,11 +147,11 @@ string GetLanguageT(const string &ns, const string &id, const string &tooltip) {
 }
 
 // pre-translated...translations
-string GetLanguageS(const string &str) {
+string get_language_s(const string &str) {
 	if (!_using_language_)
 		return str;
 	if (str.head(4) == ":##:")
-		return GetLanguageS(str.sub_ref(4));
+		return get_language_s(str.sub_ref(4));
 	for (Language::Translation &t: cur_lang->trans){
 		if (str == t.orig)
 			return t.trans;
@@ -189,14 +189,14 @@ void UpdateAll() {
 	}*/
 }
 
-Array<string> GetLanguages() {
+Array<string> get_languages() {
 	Array<string> n;
 	for (Language &l: _languages_)
 		n.add(l.name);
 	return n;
 }
 
-string GetCurLanguage() {
+string get_cur_language() {
 	if (cur_lang)
 		return cur_lang->name;
 	return "";

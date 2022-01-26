@@ -724,19 +724,19 @@ void Panel::_try_add_action_(const string &id, bool as_checkable) {
 	if ((id == "") or (id == "*") or (id == "hui:close"))
 		return;
 	string name = get_gtk_action_name(id, false);
-	//msg_write(name + "   (...)");
+	msg_write(name + "  " + id + "   (...)  " + this->id);
 	auto aa = g_action_map_lookup_action(G_ACTION_MAP(action_group), name.c_str());
 	if (aa)
 		return;
 	if (as_checkable) {
-		//msg_write("ACTION C   " + id);
+		msg_write("ACTION C   " + id);
 		GVariant *state = g_variant_new_boolean(FALSE);
 		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
 		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
 	} else {
-		//msg_write("ACTION     " + id);
+		msg_write("ACTION     " + id);
 		auto a = g_simple_action_new(name.c_str(), nullptr);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));

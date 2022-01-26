@@ -53,7 +53,6 @@ Module::Module(ModuleCategory category, const string &_class) {
 }
 
 Module::~Module() {
-	msg_write("~Module");
 	// unlink sources
 	for (auto &pd: port_in)
 		*pd.port = nullptr;

@@ -791,10 +791,8 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
-	msg_error("TODO...");
 
-	configure_module(this, fx, [this, fx] {
-		msg_write("OK");
+	configure_module_autodel(this, fx, [this, fx] {
 		int n_layers = 0;
 		song->begin_action_group(_("apply audio fx"));
 		for (Track *t: weak(song->tracks))
@@ -804,15 +802,9 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 					n_layers ++;
 				}
 		song->end_action_group();
-		msg_write("ok1");
 
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
-		msg_write("ok2");
-		delete fx;
-		msg_write("ok3");
-	}, [fx] {
-		msg_write("CANCEL");
 	});
 }
 
@@ -820,7 +812,7 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 
 	auto s = CreateAudioSource(session, name);
 
-	configure_module(this, s, [s, this] {
+	configure_module_autodel(this, s, [s, this] {
 		int n_layers = 0;
 		song->begin_action_group(_("audio source"));
 		for (Track *t: weak(song->tracks))
@@ -833,16 +825,13 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
-		delete s;
-	}, [s] {
-		delete s;
 	});
 }
 
 void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
-	configure_module(this, fx, [fx, this] {
+	configure_module_autodel(this, fx, [fx, this] {
 		int n_layers = 0;
 
 		song->begin_action_group(_("apply midi fx"));
@@ -857,17 +846,13 @@ void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
-
-		delete fx;
-	}, [fx] {
-		delete fx;
 	});
 }
 
 void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
-	configure_module(this, s, [s, this] {
+	configure_module_autodel(this, s, [s, this] {
 		int n_layers = 0;
 
 		song->begin_action_group(_("midi source"));
@@ -885,10 +870,6 @@ void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
-
-		delete s;
-	}, [s] {
-		delete s;
 	});
 }
 

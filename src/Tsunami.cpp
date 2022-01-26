@@ -242,13 +242,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Module *m = nullptr;
 		if (a[0] == "fx") {
 			m = ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, a[1]);
-			configure_module(session->win.get(), m);
+			configure_module_autodel(session->win.get(), m);
 		} else if (a[0] == "mfx") {
 			m = ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, a[1]);
-			configure_module(session->win.get(), m);
+			configure_module_autodel(session->win.get(), m);
 		} else if (a[0] == "synth") {
 			m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
-			configure_module(session->win.get(), m);
+			configure_module_autodel(session->win.get(), m);
 		} else if (a[0] == "vis") {
 			m = CreateAudioVisualizer(session, a[1]);
 			auto *p = m->create_panel();

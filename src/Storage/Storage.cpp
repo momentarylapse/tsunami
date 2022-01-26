@@ -70,7 +70,7 @@ Storage::~Storage() {
 }
 
 bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
-	current_directory = filename.parent();
+	current_directory = filename.absolute().parent();
 	auto *d = get_format(filename.extension(), 0);
 	if (!d)
 		return false;
@@ -166,7 +166,7 @@ Path Storage::temp_saving_file(const string &ext) {
 
 // safety: first write to temp file, then (if successful) move
 bool Storage::save(Song *song, const Path &filename) {
-	current_directory = filename.parent();
+	current_directory = filename.absolute().parent();
 
 	auto d = get_format(filename.extension(), 0);
 	if (!d)

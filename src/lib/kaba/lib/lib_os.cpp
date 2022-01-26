@@ -165,6 +165,9 @@ public:
 	bool __contains__(const Path &p) const {
 		return p.is_in(*this);
 	}
+	bool __bool__() const {
+		return !this->is_empty();
+	}
 	static Path from_str(const string &s) {
 		return Path(s);
 	}
@@ -207,6 +210,7 @@ void SIAddPackageOSPath() {
 		class_add_func("is_empty", TypeBool, &Path::is_empty, Flags::PURE);
 		class_add_func("is_relative", TypeBool, &Path::is_relative, Flags::PURE);
 		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::PURE);
+		class_add_func("__bool__", TypeBool, &KabaPath::__bool__, Flags::PURE);
 		class_add_func("parent", TypePath, &Path::parent, Flags::PURE);
 		class_add_func("compare", TypeInt, &Path::compare, Flags::PURE);
 			func_add_param("p", TypePath);

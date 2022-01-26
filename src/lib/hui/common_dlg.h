@@ -22,11 +22,11 @@ typedef std::function<void(const string&)> FontDialogCallback;
 typedef std::function<void(const string&)> QuestionDialogCallback;
 
 // file dialogs
-void _cdecl file_dialog_open(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl file_dialog_save(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl file_dialog_dir(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl select_color(Window *win, const color &c, const ColorDialogCallback &cb);
-void _cdecl select_font(Window *win, const Array<string> &params, const FontDialogCallback &cb);
+void _cdecl file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
+void _cdecl select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb);
+void _cdecl select_font(Window *win, const string &title, const Array<string> &params, const FontDialogCallback &cb);
 
 // message dialogs
 void _cdecl question_box(Window *win, const string &title, const string &text, const QuestionDialogCallback &cb, bool allow_cancel = false);

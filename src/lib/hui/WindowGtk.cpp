@@ -364,7 +364,7 @@ void Window::_run(Callback cb) {
 }
 
 void fly(Window *win, Callback cb) {
-	if (!dynamic_cast<Dialog*>(win))
+	if (!win->parent) //!dynamic_cast<Dialog*>(win))
 		msg_error("hui.fly() only allowed for Dialog!");
 	win->_fly(cb);
 }

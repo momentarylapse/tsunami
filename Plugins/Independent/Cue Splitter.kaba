@@ -16,8 +16,11 @@ func sanitize(s: string) -> string
 class CueSplitter extends TsunamiPlugin
 	
 	func override on_start()
-		if hui.file_dialog_open(session.win, "", "", "*.cue", "*.cue")
-			load_cue(hui.filename)
+		var me = &self
+		var f = func(p: Path)
+			if p
+				me.load_cue(p)
+		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"], f)
 	
 	func load_cue(filename: Path)
 		var dir = filename.parent()

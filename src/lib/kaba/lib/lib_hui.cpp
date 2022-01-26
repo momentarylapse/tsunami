@@ -35,13 +35,13 @@ namespace kaba {
 	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
 	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
 	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
-	void HuiSetIdleFunctionKaba(Callable<void()> &c) {
+	void hui_set_idle_function_kaba(Callable<void()> &c) {
 		hui::set_idle_function([&c]{ c(); });
 	}
-	int HuiRunLaterKaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
+	int hui_run_later_kaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
 		return hui::run_later(dt, [&c,p]{ c(p); });
 	}
-	int HuiRunRepeatedKaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
+	int hui_run_repeated_kaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
 		return hui::run_repeated(dt, [&c,p]{ c(p); });
 	}
 	class KabaPanelWrapper : public hui::Panel {
@@ -65,6 +65,21 @@ namespace kaba {
 			}
 		}
 	};
+	void hui_fly_kaba(hui::Window *win, Callable<void()> &c) {
+		hui::fly(win, [&c]{ if (&c) c(); });
+	}
+	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
+		hui::file_dialog_open(win, title, dir, params, [c] (const Path &p) { c(p); });
+	}
+	void hui_file_dialog_save_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
+		hui::file_dialog_save(win, title, dir, params, [c] (const Path &p) { c(p); });
+	}
+	void hui_file_dialog_dir_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
+		hui::file_dialog_dir(win, title, dir, params, [c] (const Path &p) { c(p); });
+	}
+	void hui_question_box_kaba(hui::Window *win, const string &title, const string &text, Callable<void(const string &)> &c, bool allow_cancel) {
+		hui::question_box(win, title, text, [c] (const string &p) { c(p); }, allow_cancel);
+	}
 #else
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
@@ -113,6 +128,8 @@ void SIAddPackageHui() {
 	auto TypeCallback = add_type_f(TypeVoid, {});
 	auto TypeCallbackObject = add_type_f(TypeVoid, {TypeObject});
 	auto TypeCallbackObjectP = add_type_f(TypeVoid, {TypeObject, TypeHuiPainter});
+	auto TypeCallbackPath = add_type_f(TypeVoid, {TypePath});
+	auto TypeCallbackString = add_type_f(TypeVoid, {TypeString});
 
 
 	add_class(TypeHuiMenu);
@@ -504,18 +521,21 @@ void SIAddPackageHui() {
 		class_add_func("keys", TypeStringList, &hui::Configuration::keys, Flags::CONST);
 	
 	// user interface
-	add_func("set_idle_function", TypeVoid, hui_p(&HuiSetIdleFunctionKaba), Flags::STATIC);
+	add_func("set_idle_function", TypeVoid, hui_p(&hui_set_idle_function_kaba), Flags::STATIC);
 		func_add_param("idle_func", TypeCallback);
-	add_func("run_later", TypeInt, hui_p(&HuiRunLaterKaba), Flags::STATIC);
+	add_func("run_later", TypeInt, hui_p(&hui_run_later_kaba), Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypeObject);
 		func_add_param("f", TypeCallbackObject);
-	add_func("run_repeated", TypeInt, hui_p(&HuiRunRepeatedKaba), Flags::STATIC);
+	add_func("run_repeated", TypeInt, hui_p(&hui_run_repeated_kaba), Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypeObject);
 		func_add_param("f", TypeCallbackObject);
 	add_func("cancel_runner", TypeVoid, hui_p(&hui::cancel_runner), Flags::STATIC);
 		func_add_param("id", TypeInt);
+	add_func("fly", TypeVoid, hui_p(&hui_fly_kaba), Flags::STATIC);
+		func_add_param("win", TypeHuiWindow);
+		func_add_param("idle_func", TypeCallback);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);
 		func_add_param("id", TypeString);
 		func_add_param("key_code", TypeInt);
@@ -528,26 +548,28 @@ void SIAddPackageHui() {
 	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
 	add_func("HuiEnd", TypeVoid, (void*)&hui::End, Flags::STATIC);*/
 	add_func("do_single_main_loop", TypeVoid, hui_p(&hui::Application::do_single_main_loop), Flags::STATIC);
-	add_func("file_dialog_open", TypeBool, hui_p(&hui::file_dialog_open), Flags::STATIC);
+	add_func("file_dialog_open", TypeVoid, hui_p(&hui_file_dialog_open_kaba), Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
-		func_add_param("show_filter", TypeString);
-		func_add_param("filter", TypeString);
-	add_func("file_dialog_save", TypeBool, hui_p(&hui::file_dialog_save), Flags::STATIC);
+		func_add_param("params", TypeStringList);
+		func_add_param("cb", TypeCallbackPath);
+	add_func("file_dialog_save", TypeVoid, hui_p(&hui_file_dialog_save_kaba), Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
-		func_add_param("show_filter", TypeString);
-		func_add_param("filter", TypeString);
-	add_func("file_dialog_dir", TypeBool, hui_p(&hui::file_dialog_dir), Flags::STATIC);
+		func_add_param("params", TypeStringList);
+		func_add_param("cb", TypeCallbackPath);
+	add_func("file_dialog_dir", TypeVoid, hui_p(&hui_file_dialog_dir_kaba), Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
-	add_func("question_box", TypeString, hui_p(&hui::question_box), Flags::STATIC);
+		func_add_param("cb", TypeCallbackPath);
+	add_func("question_box", TypeString, hui_p(&hui_question_box_kaba), Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
+		func_add_param("cb", TypeCallbackString);
 		func_add_param("allow_cancel", TypeBool);
 	add_func("info_box", TypeVoid, hui_p(&hui::info_box), Flags::STATIC);
 		func_add_param("root", TypeHuiWindow);

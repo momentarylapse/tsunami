@@ -91,9 +91,7 @@ class BiquadGrid extends Grid
 		redraw()
 
 	func override on_right_button_down()
-		var dlg = new PresetDialog(cp)
-		dlg.run()
-		del dlg
+		hui.fly(new PresetDialog(cp), nil)#lambda() print("aaa"))
 
 class BiquadPanel extends ConfigPanel
 	var grid: BiquadGrid
@@ -149,9 +147,9 @@ Grid ? '' vertical
 
 class PresetDialog extends Dialog
 	var bp: BiquadPanel*
-	func __init__(_p: BiquadPanel*)
+	func __init__(_p: BiquadPanel)
 		super.__init__("preset", 400, 100, _p.win, false)
-		bp = _p
+		bp = &_p
 		from_source("
 Grid ? '' vertical
 	Grid ? ''

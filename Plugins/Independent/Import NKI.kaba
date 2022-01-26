@@ -7,9 +7,12 @@ use tsunami
 class ImportNKI extends TsunamiPlugin
 	
 	func override on_start()
-		if hui.file_dialog_open(session.win, "", "", "*.nki", "*.nki")
-			load_nki(hui.filename)
-		stop()
+		var me = &self
+		var f = func(p: Path)
+			if p
+				me.load_nki(p)
+			stop()
+		hui.file_dialog_open(session.win, "", "", ["filter=*.nki", "showfilter=*.nki"], f)
 	func load_nki(filename: Path)
 		print(filename)
 		var dir = Path(str(filename)[:-4] + " Samples")

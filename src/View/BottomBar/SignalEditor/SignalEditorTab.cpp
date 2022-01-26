@@ -319,7 +319,7 @@ void SignalEditorTab::on_reset() {
 }*/
 
 void SignalEditorTab::on_save() {
-	hui::file_dialog_save(win, session->storage->current_chain_directory, {"title=" + _("Save the signal chain"), "filter=*.chain", "showfilter=*.chain"}, [this](const Path &filename) {
+	hui::file_dialog_save(win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}, [this](const Path &filename) {
 		if (!filename.is_empty()) {
 			session->storage->current_chain_directory = filename.parent();
 			chain->save(filename);

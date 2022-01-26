@@ -253,7 +253,4 @@ class GuessBpm extends SongPlugin
 		for t in weak(song.tracks)
 			for l in weak(t.layers)
 				for buf in l.buffers
-					var dlg = new SelfCorrelationDialog(self, buf)
-					dlg.run()
-					del dlg
-					return
+					hui.fly(new SelfCorrelationDialog(self, buf), nil)

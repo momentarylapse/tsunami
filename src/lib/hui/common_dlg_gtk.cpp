@@ -6,7 +6,6 @@ namespace hui
 
 
 struct DialogParams {
-	string title;
 	string filter, show_filter;
 	string font;
 	string default_name;
@@ -20,9 +19,7 @@ struct DialogParams {
 				pp = a.num;
 			string key = a.head(pp).replace("-", "");
 			string value = a.sub_ref(pp + 1);
-			if (key == "title")
-				p.title = value;
-			else if (key == "filter")
+			if (key == "filter")
 				p.filter = value;
 			else if ((key == "filtershow") or (key == "showfilter"))
 				p.show_filter = value;
@@ -65,29 +62,31 @@ void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer use
 }
 
 // choose a directory (<dir> will be selected initially)
-void file_dialog_dir(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+void file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
-	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 												_("Cancel").c_str(),	GTK_RESPONSE_CANCEL,
 												_("Open").c_str(),		GTK_RESPONSE_ACCEPT,
 												nullptr);
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), g_file_new_for_path(dir.str().c_str()), nullptr);
+	if (!dir.is_empty())
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), g_file_new_for_path(dir.str().c_str()), nullptr);
 	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
 	GtkWindow *w = get_window_save(win);
-	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												nullptr);
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.str().c_str());
+	if (!dir.is_empty())
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.str().c_str());
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT) {
 		auto fn = Path(gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dlg))).as_dir();
@@ -113,11 +112,11 @@ void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter
 }
 
 // file selection for opening (filter should look like "*.txt")
-void file_dialog_open(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+void file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_OPEN,
 												_("Cancel").c_str(),	GTK_RESPONSE_CANCEL,
@@ -126,9 +125,11 @@ void file_dialog_open(Window *win, const Path &dir, const Array<string> &params,
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	if (p.multiple_files)
 		gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dlg), true);
-	auto path = g_file_new_for_path(dir.c_str());
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
-	//g_object_unref(path);
+	if (!dir.is_empty()) {
+		auto path = g_file_new_for_path(dir.c_str());
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
+		//g_object_unref(path);
+	}
 	add_filters(dlg, p.show_filter, p.filter);
 	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
@@ -136,14 +137,15 @@ void file_dialog_open(Window *win, const Path &dir, const Array<string> &params,
 
 #else
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_OPEN,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												nullptr);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
+	if (!dir.is_empty())
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -177,11 +179,11 @@ static Path try_to_ensure_extension(const Path &filename, const string &filter) 
 
 
 // file selection for saving
-void file_dialog_save(Window *win, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+void file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
 												_("Cancel").c_str(),	GTK_RESPONSE_CANCEL,
@@ -190,9 +192,11 @@ void file_dialog_save(Window *win, const Path &dir, const Array<string> &params,
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 //	gtk_file_chooser_set_current_name();
-	auto path = g_file_new_for_path(dir.c_str());
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
-	//g_object_unref(path);
+	if (!dir.is_empty()) {
+		auto path = g_file_new_for_path(dir.c_str());
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
+		//g_object_unref(path);
+	}
 	if (p.default_name.num > 0)
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
@@ -203,7 +207,7 @@ void file_dialog_save(Window *win, const Path &dir, const Array<string> &params,
 #else
 
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(p.title),
+	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
@@ -211,7 +215,8 @@ void file_dialog_save(Window *win, const Path &dir, const Array<string> &params,
 												nullptr);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dlg), TRUE);
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
+	if (!dir.is_empty())
+		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	if (p.default_name.num > 0)
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
@@ -240,11 +245,11 @@ void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer use
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 
-void select_font(Window *win, const Array<string> &params, const FontDialogCallback &cb) {
+void select_font(Window *win, const string &title, const Array<string> &params, const FontDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(p.title), w);
+	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_font_chooser_set_font(GTK_FONT_CHOOSER(dlg), p.font.c_str());
 
@@ -253,7 +258,7 @@ void select_font(Window *win, const Array<string> &params, const FontDialogCallb
 	gtk_window_present(GTK_WINDOW(dlg));
 #elif GTK_CHECK_VERSION(3,0,0)
 	GtkWindow *w = get_window_save(win);
-	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(p.title), w);
+	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_widget_show_all(dlg);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -282,7 +287,7 @@ void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer us
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 
-void select_color(Window *win, const color &c, const ColorDialogCallback &cb) {
+void select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb) {
 #if GTK_CHECK_VERSION(4,0,0)
 
 	GtkWindow *w = get_window_save(win);

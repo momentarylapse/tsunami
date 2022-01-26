@@ -43,12 +43,14 @@ class VolumeChecker extends SongPlugin
 			q += "increase each track's volume by {{amp2db(1/vol_max)|.1}} dB to reach 100%?"
 		else
 			q += "decrease each track's volume by {{-amp2db(1/vol_max)|.1}} dB to stay below 100%?"
-		string a = hui.question_box(session.win, "Question", q, true)
-		if a == "hui:yes"
-			session.song.begin_action_group("set volume")
-			for t in session.song.tracks
-				t.set_volume(t.volume / vol_max * 0.999)
-			session.song.end_action_group()
+	
+		var f = func(a: string)
+			if a == "hui:yes"
+				session.song.begin_action_group("set volume")
+				for t in session.song.tracks
+					t.set_volume(t.volume / vol_max * 0.999)
+				session.song.end_action_group()
+		hui.question_box(session.win, "Question", q, f, true)
 
 	func override apply()
 		if check()

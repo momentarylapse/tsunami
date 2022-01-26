@@ -205,8 +205,7 @@ class DrawMidiInSpectrogram extends SongPlugin
 
 		dlg.redraw("drawing_area")
 
-		dlg.run()
-		del dlg
+		hui.fly(dlg, nil)
 
 	func override apply()
 	

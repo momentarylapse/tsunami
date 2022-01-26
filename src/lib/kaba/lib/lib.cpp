@@ -695,6 +695,7 @@ void init(Abi abi, bool allow_std_lib) {
 	add_type_cast(50, TypePointer, TypeAny, "math.@pointer2any");
 	add_package("os");
 	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
+	add_type_cast(10, TypePath, TypeBool, "os.Path.__bool__");
 
 
 	// consistency checks

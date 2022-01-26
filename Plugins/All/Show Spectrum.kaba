@@ -138,11 +138,7 @@ class ShowSpectrum extends SongPlugin
 
 		dlg.on_type()
 
-		dlg.run()
-		del dlg
-	
-		ffr.clear()
-		ffl.clear()
+		hui.fly(dlg, nil)
 
 	func override apply()
 		if session.view.sel.range().length > 0

@@ -265,12 +265,12 @@ void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, con
 			}
 			filter_show += ")";
 		}
-	Array<string> opts = {"title=" + title, "filter=" + filter, "showfilter=" + filter_show};
+	Array<string> opts = {"filter=" + filter, "showfilter=" + filter_show};
 	opts.append(opt);
 	if (flags & FormatDescriptor::Flag::WRITE)
-		return hui::file_dialog_save(win, current_directory, opts, cb);
+		return hui::file_dialog_save(win, title, current_directory, opts, cb);
 	else
-		return hui::file_dialog_open(win, current_directory, opts, cb);
+		return hui::file_dialog_open(win, title, current_directory, opts, cb);
 }
 
 void Storage::ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {

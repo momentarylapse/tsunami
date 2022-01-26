@@ -52,12 +52,11 @@ Grid ? ''
 		selected = -1
 		destroy()
 
-func choose_preset(plug: SongPlugin) -> int
+func choose_preset(plug: SongPlugin, f: int->void)
 	var dlg = new PresetDialog(plug)
-	dlg.run()
-	int sel = dlg.selected
-	del dlg
-	return sel
+	var ff = func()
+		f(dlg.selected)
+	hui.fly(dlg, ff)
 
 class XXX extends SongPlugin
 	func override apply()
@@ -65,7 +64,9 @@ class XXX extends SongPlugin
 			session.e("no sf2 data found")
 			return
 
-		int pre = choose_preset(self)
+		choose_preset(self, lambda(pre: int) self.set_preset(pre))
+		
+	func set_preset(pre: int)
 		
 	#	var prog = new ProgressX("generating sound font", session.win)
 

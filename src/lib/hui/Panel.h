@@ -182,9 +182,10 @@ protected:
 public:
 	Array<EventListener> event_listeners;
 	int current_event_listener_uid;
-protected:
+//protected:
 
 	string id;
+protected:
 	int unique_id;
 	string cur_id;
 public:

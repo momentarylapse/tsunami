@@ -55,7 +55,7 @@ public:
 		hui::Dialog("configurable_dialog", parent)
 	{
 		module = m;
-		module_panel = new ModulePanel(module, this, ModulePanel::Mode::DEFAULT_S);
+		module_panel = new ModulePanel(module, this, ModulePanel::Mode::CONFIG_PANEL);
 		set_title(module->module_class);
 		set_size(CONFIG_PANEL_WIDTH, 300);
 		embed(module_panel, "content", 0, 0);

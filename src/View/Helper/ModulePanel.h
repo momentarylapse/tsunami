@@ -30,10 +30,11 @@ public:
 		FIXED_HEIGHT = 512,
 		DEFAULT = HEADER | PROFILES | ENABLE | FIXED_WIDTH,
 		DEFAULT_H = HEADER | PROFILES | ENABLE | FIXED_HEIGHT,
-		DEFAULT_S = HEADER | PROFILES | ENABLE
+		DEFAULT_S = HEADER | PROFILES | ENABLE,
+		CONFIG_PANEL = PROFILES
 	};
 
-	ModulePanel(Module *m, hui::Panel *outer = nullptr, Mode mode = Mode::DEFAULT);
+	ModulePanel(Module *m, hui::Panel *outer, Mode mode = Mode::DEFAULT);
 	~ModulePanel() override;
 	void on_load();
 	void on_save();

@@ -595,12 +595,13 @@ GAction *panel_get_action(Panel *panel, const string &id, bool with_scope) {
 		//msg_error("NO PANEL..." + id);
 		return nullptr;
 	}
+	return panel->_get_action(id, with_scope);
 	if (!panel->win) {
 		//msg_error("NO WINDOW..." + id);
 		return nullptr;
 	}
 
-	return panel->win->_get_action(id, with_scope);
+	//return panel->win->_get_action(id, with_scope);
 }
 
 // switch control to usable/unusable
@@ -724,7 +725,7 @@ void Panel::_try_add_action_(const string &id, bool as_checkable) {
 	if ((id == "") or (id == "*") or (id == "hui:close"))
 		return;
 	string name = get_gtk_action_name(id, false);
-	msg_write(name + "  " + id + "   (...)  " + this->id);
+	msg_write(this->id + ":" + id + "   (...)  ");
 	auto aa = g_action_map_lookup_action(G_ACTION_MAP(action_group), name.c_str());
 	if (aa)
 		return;
@@ -754,6 +755,7 @@ GAction *Panel::_get_action(const string &id, bool with_scope) {
 
 void Panel::_connect_menu_to_panel(Menu *menu) {
 	menu->set_panel(this);
+	msg_error("CONNECT MENU " + id);
 
 	for (auto c: menu->get_all_controls()) {
 		if (c->type == MENU_ITEM_TOGGLE) {

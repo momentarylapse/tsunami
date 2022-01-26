@@ -124,10 +124,13 @@ void Control::enable(bool _enabled) {
     enabled = _enabled;
     if (widget)
     	gtk_widget_set_sensitive(widget, enabled);
+    msg_write("Control.enable " + (panel?panel->id:"") + ":" + id + "   " + b2s(enabled));
 
 #if GTK_CHECK_VERSION(4,0,0)
-    if (auto a = panel_get_action(panel, id, false))
+    if (auto a = panel_get_action(panel, id, false)) {
+        msg_write("Action.enable " + id);
 		g_simple_action_set_enabled(G_SIMPLE_ACTION(a), _enabled);
+    }
 #endif
 }
 

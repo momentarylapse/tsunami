@@ -19,17 +19,16 @@ extern const int CONFIG_PANEL_HEIGHT;
 ConfigPanel::ConfigPanel(Module *_c) {
 	ignore_change = false;
 	c = _c;
-	if (c)
+	if (c) {
 		c->subscribe(this, [this]{
 			if (!ignore_change) update();
 		}, c->MESSAGE_CHANGE);
+	}
 }
 
 ConfigPanel::~ConfigPanel() {
-	msg_write("~ConfigPanel");
 	if (c)
 		c->unsubscribe(this);
-	msg_write("/~ConfigPanel");
 }
 
 
@@ -88,6 +87,7 @@ public:
 	}
 
 	void preview_start() {
+		module->session->e("TODO: preview");
 		/*if (progress)
 			previewEnd();
 		config->configToString();
@@ -152,10 +152,11 @@ void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Call
 	}
 
 	auto *dlg = new ConfigurationDialog(m, win);
+
 	hui::fly(dlg, [dlg, cb, cb_cancel, autodel, m] {
 		if (dlg->ok)
 			cb();
-		else
+		else if (cb_cancel)
 			cb_cancel();
 		if (autodel)
 			hui::run_later(2.1f, [m] { delete m; });

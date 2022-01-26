@@ -302,7 +302,7 @@ void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_dat
 	if (win->end_run_callback)
 		win->end_run_callback();
 	//gtk_window_destroy(GTK_WINDOW(self));
-	delete win;
+	run_later(0.01f, [win] { delete win; });
 }
 
 namespace WindowFlightManager {
@@ -321,8 +321,7 @@ void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user
 	auto win = reinterpret_cast<Window*>(user_data);
 	if (win->end_run_callback)
 		win->end_run_callback();
-	//gtk_window_destroy(GTK_WINDOW(self));
-	WindowFlightManager::remove(win);
+	run_later(0.01f, [win] { WindowFlightManager::remove(win); });
 }
 
 void Window::_fly(Callback cb) {

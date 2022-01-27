@@ -101,6 +101,8 @@ Control::~Control() {
 	if (widget and (type != CONTROL_CHECKBOX)) // switch bug.... not sure why...
 #if GTK_CHECK_VERSION(4,0,0)
 		//g_object_unref(widget);
+		gtk_widget_unparent(widget);
+		// FIXME: probably still exists...
 #else
 		gtk_widget_destroy(widget);
 #endif

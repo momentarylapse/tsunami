@@ -102,8 +102,15 @@ static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data) {
 
 
 
-string get_gtk_action_name(const string &id, bool with_scope) {
-	return format("%shuiactionX%s", with_scope ? "win." : "", id.hex().replace(".", ""));
+string get_gtk_action_name(const string &id, Panel *scope_panel) {
+	string scope;
+	if (scope_panel) {
+		if (scope_panel == scope_panel->win)
+			scope = "win.";
+		else
+			scope = scope_panel->id + ".";
+	}
+	return format("%shuiactionX%s", scope, id.hex().replace(".", ""));
 	//return format("%shuiaction('%s')", with_scope ? "win." : "", id);
 }
 
@@ -148,6 +155,7 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 
 			//g_action_map_add_action_entries(G_ACTION_MAP(group), entries, G_N_ELEMENTS(entries), this);
 			gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
+			msg_error("WIN INSERT ACTION GROUP");
 
 			shortcut_controller = gtk_shortcut_controller_new ();
 			gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
@@ -379,10 +387,11 @@ void Window::set_menu(Menu *_menu) {
 
 	if (_menu) {
 		menu = _menu;
-		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
-		gtk_widget_show(menubar);
 
 		_connect_menu_to_panel(menu);
+
+		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
+		gtk_widget_show(menubar);
 	} else {
 		menu = _menu;
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), nullptr);
@@ -447,7 +456,7 @@ void Window::set_key_code(const string &id, int key_code, const string &image) {
 
 	int mod = (((key_code&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((key_code&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((key_code&KEY_ALT)>0) ? GDK_META_MASK : 0);
 	gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(shortcut_controller),
-		gtk_shortcut_new(gtk_keyval_trigger_new(HuiKeyID[key_code & 255], (GdkModifierType)mod), gtk_named_action_new(get_gtk_action_name(id, true).c_str())));
+		gtk_shortcut_new(gtk_keyval_trigger_new(HuiKeyID[key_code & 255], (GdkModifierType)mod), gtk_named_action_new(get_gtk_action_name(id, this).c_str())));
 #endif
 }
 

@@ -105,7 +105,7 @@ class GridAxis extends AxisData
 	func on_right_button_down()
 		if menu
 			del menu
-		menu = new Menu()
+		menu = new Menu(grid.panel)
 		if unit == "Hz"
 			menu.add("Frequency (Hz)", "{{_id}}-mode-freq-hz")
 			menu.add("Pitch", "{{_id}}-mode-pitch")

@@ -72,10 +72,10 @@ Grid ? '' vertical
 		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
-		popup_menu = new Menu()
+		popup_menu = new Menu(self)
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		var sub_mode = new Menu()
+		var sub_mode = new Menu(self)
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")

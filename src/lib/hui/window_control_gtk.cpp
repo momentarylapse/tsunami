@@ -106,6 +106,12 @@ void Panel::_insert_control_(Control *c, int x, int y) {
 			gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
 			gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
 #endif
+		} else {
+			// sub-panel
+#if GTK_CHECK_VERSION(4,0,0)
+			msg_write("ATTACH ACTION GROUP  " + id);
+			gtk_widget_insert_action_group(c->widget, id.c_str(), G_ACTION_GROUP(action_group));
+#endif
 		}
 	}
 	if (frame != c->widget)

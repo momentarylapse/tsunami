@@ -17,7 +17,7 @@ namespace hui
 void DBDEL(const string &type, const string &id, void *p);
 void DBDEL_DONE();
 
-GAction *panel_get_action(Panel *panel, const string &id, bool with_scope);
+GAction *panel_get_action(Panel *panel, const string &id);
 
 // safety feature... in case we delete the control while it notifies us
 struct _HuiNotifyStackElement {
@@ -123,16 +123,16 @@ GtkWidget *Control::get_frame() {
 }
 
 void Control::enable(bool _enabled) {
-    enabled = _enabled;
-    if (widget)
-    	gtk_widget_set_sensitive(widget, enabled);
-    msg_write("Control.enable " + (panel?panel->id:"") + ":" + id + "   " + b2s(enabled));
+	enabled = _enabled;
+	if (widget)
+		gtk_widget_set_sensitive(widget, enabled);
+	//msg_write("Control.enable " + (panel?panel->id:"") + ":" + id + "   " + b2s(enabled));
 
 #if GTK_CHECK_VERSION(4,0,0)
-    if (auto a = panel_get_action(panel, id, false)) {
-        msg_write("Action.enable " + id);
+	if (auto a = panel_get_action(panel, id)) {
+		//msg_write("Action.enable " + id);
 		g_simple_action_set_enabled(G_SIMPLE_ACTION(a), _enabled);
-    }
+	}
 #endif
 }
 

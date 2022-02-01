@@ -78,10 +78,10 @@ class MultiEchoGrid extends Grid
 	
 	
 	func override __init__()
-		menu_bg = new Menu()
+		menu_bg = new Menu(cp)
 		menu_bg.add("add reflection", "reflection-add")
 		
-		menu_point = new Menu()
+		menu_point = new Menu(cp)
 		menu_point.add("Reflection", "label")
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")

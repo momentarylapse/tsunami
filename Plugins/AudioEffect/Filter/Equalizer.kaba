@@ -196,7 +196,7 @@ class EqualizerGrid extends Grid
 		
 		selected = hover
 		
-		menu = new Menu()
+		menu = new Menu(cp)
 		if selected >= 0
 			if c.peaks[selected].enabled
 				menu.add("disable", "peak-toggle-enabled")

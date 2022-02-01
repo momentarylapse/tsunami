@@ -67,6 +67,8 @@
 #include "View/Graph/AudioViewLayer.h"
 #include "View/Graph/AudioViewTrack.h"
 
+#include "lib/hui/Controls/MenuItemSubmenu.h"
+
 extern const string AppName;
 
 TsunamiWindow::TsunamiWindow(Session *_session) :
@@ -290,7 +292,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	set_menu(hui::create_resource_menu("menu", this));
 	//ToolBarConfigure(true, true);
-	set_maximized(maximized);
+	//set_maximized(maximized);
 
 	app->plugin_manager->add_plugins_to_menu(this);
 

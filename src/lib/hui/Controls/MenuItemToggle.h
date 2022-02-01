@@ -16,7 +16,7 @@ namespace hui
 class MenuItemToggle : public Control
 {
 public:
-	MenuItemToggle(const string &title, const string &id);
+	MenuItemToggle(const string &title, const string &id, Panel *panel);
 
 	void __check(bool checked) override;
 	bool is_checked() override;

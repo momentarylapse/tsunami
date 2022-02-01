@@ -14,7 +14,7 @@ namespace hui {
 
 class MenuItem : public Control {
 public:
-	MenuItem(const string &title, const string &id);
+	MenuItem(const string &title, const string &id, Panel *panel);
 
 	void set_image(const string &image) override;
 

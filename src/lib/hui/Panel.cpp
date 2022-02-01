@@ -6,6 +6,7 @@
  */
 
 #include "Controls/Control.h"
+#include "Controls/MenuItem.h"
 #include "Controls/MenuItemToggle.h"
 #include "hui.h"
 #include "internal.h"
@@ -19,14 +20,14 @@ static int current_uid = 0;
 const int DEFAULT_SPACING = 5;
 const int DEFAULT_WINDOW_BORDER = 10;
 
-string get_gtk_action_name(const string &id, bool with_scope);
+string get_gtk_action_name(const string &id, Panel *scope);
 
 Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
 	border_width = DEFAULT_WINDOW_BORDER;
 	spacing = DEFAULT_SPACING;
-	id = "";
+	id = p2s(this);
 	num_float_decimals = 3;
 	root_control = nullptr;
 	plugable = nullptr;
@@ -343,6 +344,12 @@ void Panel::set_from_resource(Resource *res) {
 	}
 
 	id = res->id;
+#if GTK_CHECK_VERSION(4,0,0)
+	if (root_control) {
+		msg_write("ATTACH ACTION GROUP  " + id);
+		gtk_widget_insert_action_group(root_control->widget, id.c_str(), G_ACTION_GROUP(action_group));
+	}
+#endif
 
 	int bw = res->value("borderwidth", "-1")._int();
 	if (bw >= 0)
@@ -590,18 +597,18 @@ color Panel::get_color(const string &_id) {
 
 
 // might be called from menus in preparation
-GAction *panel_get_action(Panel *panel, const string &id, bool with_scope) {
+GAction *panel_get_action(Panel *panel, const string &id) {
 	if (!panel) {
 		//msg_error("NO PANEL..." + id);
 		return nullptr;
 	}
-	return panel->_get_action(id, with_scope);
+	return panel->_get_action(id);
 	if (!panel->win) {
 		//msg_error("NO WINDOW..." + id);
 		return nullptr;
 	}
 
-	//return panel->win->_get_action(id, with_scope);
+	//return panel->win->_get_action(id);
 }
 
 // switch control to usable/unusable
@@ -720,24 +727,32 @@ void Panel::set_options(const string &_id, const string &options) {
 	}
 }
 
+string panel_scope(Panel *p) {
+	if (!p)
+		return "";
+	if (p == p->win)
+		return "win.";
+	return p->id + ".";
+}
+
 #if GTK_CHECK_VERSION(4,0,0)
 void Panel::_try_add_action_(const string &id, bool as_checkable) {
 	if ((id == "") or (id == "*") or (id == "hui:close"))
 		return;
-	string name = get_gtk_action_name(id, false);
-	msg_write(this->id + ":" + id + "   (...)  ");
+	string name = get_gtk_action_name(id, nullptr);
+	//msg_write(this->id + ":" + id + "   (...)  ");
 	auto aa = g_action_map_lookup_action(G_ACTION_MAP(action_group), name.c_str());
 	if (aa)
 		return;
 	if (as_checkable) {
-		msg_write("ACTION C   " + id);
+		msg_write("ACTION C   " + panel_scope(this) + id);
 		GVariant *state = g_variant_new_boolean(FALSE);
 		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
 		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
 	} else {
-		msg_write("ACTION     " + id);
+		msg_write("ACTION     " + panel_scope(this) + id);
 		auto a = g_simple_action_new(name.c_str(), nullptr);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
@@ -745,9 +760,9 @@ void Panel::_try_add_action_(const string &id, bool as_checkable) {
 }
 
 
-GAction *Panel::_get_action(const string &id, bool with_scope) {
+GAction *Panel::_get_action(const string &id) {
 	if (action_group)
-		return g_action_map_lookup_action(G_ACTION_MAP(action_group), get_gtk_action_name(id, with_scope).c_str());
+		return g_action_map_lookup_action(G_ACTION_MAP(action_group), get_gtk_action_name(id, nullptr).c_str());
 	return nullptr;
 }
 
@@ -760,16 +775,21 @@ void Panel::_connect_menu_to_panel(Menu *menu) {
 	for (auto c: menu->get_all_controls()) {
 		if (c->type == MENU_ITEM_TOGGLE) {
 			_try_add_action_(c->id, true);
-			if (static_cast<MenuItemToggle*>(c)->checked)
-				static_cast<MenuItemToggle*>(c)->__check(true);
-		} else {
+			if (auto i = static_cast<MenuItemToggle*>(c)) {
+				if (i->checked)
+					i->__check(true);
+			}
+		} else if (c->type == MENU_ITEM_BUTTON) {
 			_try_add_action_(c->id, false);
+		} else {
+			//_try_add_action_(c->id, false);
 		}
 		if (!c->enabled) {
 			c->enable(false); // update action...
 			//enable(c->id, false);
 		}
 	}
+	msg_error("/CONNECT MENU " + id);
 }
 
 string decode_gtk_action(const string &name) {

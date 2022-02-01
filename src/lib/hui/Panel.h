@@ -203,7 +203,7 @@ public:
 	GSimpleActionGroup *action_group = nullptr;
 	void _try_add_action_(const string &id, bool checkable);
 public:
-	GAction *_get_action(const string &id, bool with_scope);
+	GAction *_get_action(const string &id);
 #endif
 };
 

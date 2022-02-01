@@ -16,6 +16,7 @@ namespace hui {
 
 void DBDEL(const string &type, const string &id, void *p);
 void DBDEL_DONE();
+string get_gtk_action_name(const string &id, Panel *scope);
 
 void Menu::__init__(Panel *p) {
 	new(this) Menu(p);
@@ -34,18 +35,20 @@ void Menu::clear() {
 }
 
 void Menu::add(const string &name, const string &id) {
-	_add(new MenuItem(name, id));
+	if (items.num < 2)
+	_add(new MenuItem(name, id, panel));
 }
 
 void Menu::add_with_image(const string &name, const string &image, const string &id) {
-	_add(new MenuItem(name, id));
+	_add(new MenuItem(name, id, panel));
 #if !GTK_CHECK_VERSION(4,0,0)
 	items.back()->set_image(image);
 #endif
 }
 
 void Menu::add_checkable(const string &name, const string &id) {
-	_add(new MenuItemToggle(name, id));
+	if (items.num < 2)
+	_add(new MenuItemToggle(name, id, panel));
 }
 
 void Menu::add_separator() {
@@ -63,16 +66,30 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *p);
 #endif
 
 void Menu::set_panel(Panel *_panel) {
+	static int level = 0;
+
+	if (level == 0)
+		msg_error("MENU SET PANEL " + _panel->id);
+	level ++;
+
 	panel = _panel;
 	for (Control *c: items) {
 		c->panel = panel;
-#if !GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(4,0,0)
+		if (auto b = dynamic_cast<MenuItem*>(c)) {
+			//msg_write("UP  " + get_gtk_action_name(b->id, panel) + "    " + b->id);
+			//g_menu_item_set_detailed_action(b->item, get_gtk_action_name(b->id, panel).c_str());
+		}
+#else
 		if (panel)
 			try_add_accel(c->widget, c->id, panel);
 #endif
 		if (auto s = dynamic_cast<MenuItemSubmenu*>(c))
 			s->sub_menu->set_panel(panel);
 	}
+	level --;
+	if (level == 0)
+		msg_error("//MENU SET PANEL " + _panel->id);
 }
 
 // only allow menu callback, if we are in layer 0 (if we don't edit it ourself)

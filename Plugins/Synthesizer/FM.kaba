@@ -105,7 +105,7 @@ Grid ? ''
 		chosen = 0
 		hover = -1
 		
-		menu_top = new Menu()
+		menu_top = new Menu(self)
 		menu_top.add("Topology", "label-top")
 		menu_top.enable("label-top", false)
 		add_top("o", "x")
@@ -121,7 +121,7 @@ Grid ? ''
 		add_top("o-o-o   o-o   o", "x01x3x")
 		add_top("o-(o   o)   o-(o   o)", "x00x33")
 
-		menu_osci = new Menu()
+		menu_osci = new Menu(self)
 		menu_osci.add("Oscillator", "label")
 		menu_osci.enable("label", false)
 		menu_osci.add("sine", "type-sine")

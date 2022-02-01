@@ -157,6 +157,7 @@ private:
 public:
 	GtkWidget *window;
 private:
+public:
 	GtkWidget *vbox, *hbox, *menubar, *statusbar, *headerbar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;

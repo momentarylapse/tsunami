@@ -440,7 +440,7 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	panel->root_control->panel = orig;//panel;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	msg_write("ATTACH ACTION GROUP  " + p2s(panel));
+	msg_error("ATTACH ACTION GROUP  " + p2s(panel));
 	msg_write(id);
 	msg_write(panel->id);
 	msg_write(p2s(win));
@@ -825,21 +825,21 @@ void Panel::_on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointe
 	auto win = panel->win;
 	//string id = g_variant_get_string(parameter, nullptr);
 
-	//msg_write("CALLBACK");
 	GValue value = {0,};
 	g_value_init(&value, G_TYPE_STRING);
 	g_object_get_property(G_OBJECT(simple), "name", &value);
 	string id = string(g_value_get_string(&value));
 	id = decode_gtk_action(id);
+	//msg_write("ACTION CALLBACK " + id);
 	//msg_write(id);
 	g_value_unset(&value);
 
-	win->_set_cur_id_(id);
+	panel->_set_cur_id_(id);
 	if (id.num == 0)
 		return;
 	//notify_push(this);
 	Event e = Event(id, EventID::CLICK);
-	win->_send_event_(&e);
+	panel->_send_event_(&e);
 }
 #endif
 

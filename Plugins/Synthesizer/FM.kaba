@@ -77,8 +77,8 @@ class FMPanel extends ConfigPanel
 	var moving, hover: int
 	
 	func add_top(label: string, id: string)
-		menu_top.add(label, "top-{{id}}")
 		event("top-{{id}}", on_topology)
+		menu_top.add(label, "top-{{id}}")
 	
 	var override c: FMSynthesizer*
 	func override __init__(_s: Module)

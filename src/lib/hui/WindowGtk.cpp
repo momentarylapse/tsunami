@@ -108,7 +108,7 @@ string get_gtk_action_name(const string &id, Panel *scope_panel) {
 		if (scope_panel == scope_panel->win)
 			scope = "win.";
 		else
-			scope = scope_panel->id + ".";
+			scope = p2s(scope_panel) + ".";
 	}
 	return format("%shuiactionX%s", scope, id.hex().replace(".", ""));
 	//return format("%shuiaction('%s')", with_scope ? "win." : "", id);

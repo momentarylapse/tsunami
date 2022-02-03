@@ -35,7 +35,6 @@ void Menu::clear() {
 }
 
 void Menu::add(const string &name, const string &id) {
-	if (items.num < 2)
 	_add(new MenuItem(name, id, panel));
 }
 
@@ -47,7 +46,6 @@ void Menu::add_with_image(const string &name, const string &image, const string 
 }
 
 void Menu::add_checkable(const string &name, const string &id) {
-	if (items.num < 2)
 	_add(new MenuItemToggle(name, id, panel));
 }
 

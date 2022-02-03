@@ -27,13 +27,10 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	parent = outer;
 	bool own_header = (mode & Mode::HEADER);
 
-	msg_error("ModulePanel()");
-
 	from_resource("fx_panel");
 	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
 	if (own_header) {
-		msg_write("HEADER");
 		outer = this;
 		set_string("name", module->module_class);
 	} else {
@@ -78,9 +75,6 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 	outer->check("enabled", module->enabled);
 	
 	auto *mb = (hui::ControlMenuButton*)outer->_get_control_("menu");
-	msg_write(p2s(mb));
-	if (mb)
-		msg_write(p2s(mb->menu));
 	if (mb and mb->menu) {
 		menu = mb->menu;
 		menu->enable("delete", false);
@@ -124,11 +118,8 @@ void ModulePanel::set_func_close(std::function<void()> f) {
 
 void ModulePanel::set_func_replace(std::function<void()> f) {
 	func_replace = f;
-	msg_error("REPLACE");
 	if (menu)
 		menu->enable("replace", f != nullptr);
-	else
-		msg_error("REPLACE NO MENU");
 }
 
 void ModulePanel::set_func_detune(std::function<void()> f) {

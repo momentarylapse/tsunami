@@ -344,12 +344,12 @@ void Panel::set_from_resource(Resource *res) {
 	}
 
 	id = res->id;
-#if GTK_CHECK_VERSION(4,0,0)
+/*#if GTK_CHECK_VERSION(4,0,0)
 	if (root_control) {
-		msg_write("ATTACH ACTION GROUP  " + id);
-		gtk_widget_insert_action_group(root_control->widget, id.c_str(), G_ACTION_GROUP(action_group));
+		msg_write("ATTACH ACTION GROUP  " + p2s(this));
+		gtk_widget_insert_action_group(root_control->widget, p2s(this).c_str(), G_ACTION_GROUP(action_group));
 	}
-#endif
+#endif*/
 
 	int bw = res->value("borderwidth", "-1")._int();
 	if (bw >= 0)
@@ -423,6 +423,14 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 //	if (cur_control) // don't really add... (stop some information propagation between Panels)
 //		cur_control->children.pop();    ...no...now checked in apply_foreach()
 	panel->root_control->panel = orig;//panel;
+
+#if GTK_CHECK_VERSION(4,0,0)
+	msg_write("ATTACH ACTION GROUP  " + p2s(panel));
+	msg_write(id);
+	msg_write(panel->id);
+	msg_write(p2s(win));
+	gtk_widget_insert_action_group(win->window, p2s(panel).c_str(), G_ACTION_GROUP(panel->action_group));
+#endif
 }
 
 void Panel::set_win(Window *_win) {
@@ -752,7 +760,7 @@ void Panel::_try_add_action_(const string &id, bool as_checkable) {
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
 	} else {
-		msg_write("ACTION     " + panel_scope(this) + id);
+		msg_write("ACTION     " + panel_scope(this) + id + "   " + get_gtk_action_name(id, this));
 		auto a = g_simple_action_new(name.c_str(), nullptr);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));

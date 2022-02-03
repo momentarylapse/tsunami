@@ -63,7 +63,7 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 	ogg_quality.add(OggQuality(1.0f, 500));
 
 
-	device_console = new DeviceConsole(view->session);
+	device_console = new DeviceConsole(view->session, this);
 	embed(device_console, "device-console", 0, 0);
 
 	load_data();

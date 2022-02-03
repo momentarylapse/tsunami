@@ -170,6 +170,7 @@ void SIAddPackageHui() {
 		class_derive_from(TypeObject, false, true);
 		class_add_element("win", TypeHuiWindowP, GetDAPanel(win));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::Panel::__init__), Flags::OVERRIDE);
+		//	func_add_param("parent", TypeHuiPanelP);
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Panel::__delete__), Flags::OVERRIDE);
 		class_add_func("set_border_width", TypeVoid, hui_p(&hui::Panel::set_border_width));
 			func_add_param("width", TypeInt);

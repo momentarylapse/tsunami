@@ -19,7 +19,7 @@ class ViewModeMidi;
 
 class MidiEditorConsole : public SideBarConsole {
 public:
-	MidiEditorConsole(Session *session);
+	MidiEditorConsole(Session *session, SideBar *bar);
 	virtual ~MidiEditorConsole();
 
 	void on_enter() override;

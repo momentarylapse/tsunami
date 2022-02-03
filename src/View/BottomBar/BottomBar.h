@@ -25,7 +25,7 @@ class PluginConsole;
 
 class BottomBar : public Observable<hui::Panel> {
 public:
-	BottomBar(Session *session);
+	BottomBar(Session *session, hui::Panel *parent);
 
 
 	enum {
@@ -38,7 +38,7 @@ public:
 
 	class Console : public hui::Panel {
 	public:
-		Console(const string &_title, Session *_session);
+		Console(const string &_title, const string &id, Session *_session, BottomBar *bar);
 		string title;
 		Session *session;
 		Song *song;

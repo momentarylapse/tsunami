@@ -27,8 +27,8 @@
 bool _capture_console_force_complex_ = false;
 
 
-CaptureConsole::CaptureConsole(Session *session):
-	SideBarConsole(_("Recording"), session)
+CaptureConsole::CaptureConsole(Session *session, SideBar *bar):
+	SideBarConsole(_("Recording"), "capture-console", session, bar)
 {
 	mode = nullptr;
 	state = State::EMPTY;

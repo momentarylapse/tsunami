@@ -101,7 +101,7 @@ void FxListEditor::select_module(Module *m) {
 	string config_grid_id = "grid-config";
 
 	if (selected_module) {
-		config_panel = new ModulePanel(m, nullptr, (ModulePanel::Mode)module_panel_mode);
+		config_panel = new ModulePanel(m, panel, (ModulePanel::Mode)module_panel_mode);
 
 		if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
 			AudioEffect *fx = (AudioEffect*)m;

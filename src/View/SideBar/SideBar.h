@@ -28,7 +28,7 @@ class Session;
 
 class SideBar : public Observable<hui::Panel> {
 public:
-	SideBar(Session *session);
+	SideBar(Session *session, hui::Panel *parent);
 	~SideBar() override;
 
 	void on_close();
@@ -77,7 +77,7 @@ public:
 
 class SideBarConsole : public hui::Panel {
 public:
-	SideBarConsole(const string &_title, Session *_session);
+	SideBarConsole(const string &_title, const string &id, Session *_session, SideBar *bar);
 	string title;
 	Session *session;
 	Song *song;

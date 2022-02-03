@@ -15,7 +15,7 @@ class SampleRef;
 
 class SampleRefConsole: public SideBarConsole {
 public:
-	SampleRefConsole(Session *session);
+	SampleRefConsole(Session *session, SideBar *bar);
 	virtual ~SampleRefConsole();
 
 	void load_data();

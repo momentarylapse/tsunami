@@ -18,8 +18,8 @@
 #include "SampleRefConsole.h"
 #include "SampleManagerConsole.h"
 
-SampleRefConsole::SampleRefConsole(Session *session):
-	SideBarConsole(_("Sample properties"), session)
+SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
+	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar)
 {
 	from_resource("sample_ref_dialog");
 	layer = nullptr;

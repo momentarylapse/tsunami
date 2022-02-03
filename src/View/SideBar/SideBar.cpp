@@ -23,7 +23,9 @@
 
 extern const int CONFIG_PANEL_WIDTH;
 
-SideBar::SideBar(Session *_session) {
+SideBar::SideBar(Session *_session, hui::Panel *parent) {
+	set_parent(parent);
+	set_id("side-bar");
 	session = _session;
 	add_revealer("!slide=left", 0, 0, "revealer");
 	set_target("revealer");
@@ -44,15 +46,15 @@ SideBar::SideBar(Session *_session) {
 
 	hide_control("large", true);
 
-	song_console = new SongConsole(session);
-	sample_manager = new SampleManagerConsole(session);
-	track_console = new TrackConsole(session);
-	dummy_editor_console = new DummyEditorConsole(session);
-	audio_editor_console = new AudioEditorConsole(session);
-	midi_editor_console = new MidiEditorConsole(session);
-	curve_console = new CurveConsole(session);
-	sample_ref_console = new SampleRefConsole(session);
-	capture_console = new CaptureConsole(session);
+	song_console = new SongConsole(session, this);
+	sample_manager = new SampleManagerConsole(session, this);
+	track_console = new TrackConsole(session, this);
+	dummy_editor_console = new DummyEditorConsole(session, this);
+	audio_editor_console = new AudioEditorConsole(session, this);
+	midi_editor_console = new MidiEditorConsole(session, this);
+	curve_console = new CurveConsole(session, this);
+	sample_ref_console = new SampleRefConsole(session, this);
+	capture_console = new CaptureConsole(session, this);
 
 	add_console(song_console);
 	add_console(sample_manager);
@@ -148,7 +150,8 @@ void SideBar::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
 }
 
 
-SideBarConsole::SideBarConsole(const string &_title, Session *_session) {
+SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session *_session, SideBar *bar) : hui::Panel(_id, bar) {
+	set_id(_id);
 	title = _title;
 	session = _session;
 	song = session->song.get();

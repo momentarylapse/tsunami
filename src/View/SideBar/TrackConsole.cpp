@@ -42,8 +42,8 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 	return p;
 }
 
-TrackConsole::TrackConsole(Session *session) :
-	SideBarConsole(_("Track"), session)
+TrackConsole::TrackConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("Track"), "track-console", session, bar)
 {
 	track = nullptr;
 	panel = nullptr;

@@ -22,9 +22,10 @@ static string list_id(DeviceType type) {
 
 static const Array<DeviceType> LIST_TYPE = {DeviceType::AUDIO_OUTPUT, DeviceType::AUDIO_INPUT, DeviceType::MIDI_INPUT};
 
-DeviceConsole::DeviceConsole(Session *session) :
-	BottomBar::Console(_("Devices"), session)
+DeviceConsole::DeviceConsole(Session *_session, hui::Panel *parent) :
+	hui::Panel("device-console", parent)
 {
+	session = _session;
 	device_manager = session->device_manager;
 	popup_device = nullptr;
 

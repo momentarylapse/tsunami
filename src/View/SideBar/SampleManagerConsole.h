@@ -22,7 +22,7 @@ class SignalChain;
 
 class SampleManagerConsole : public SideBarConsole {
 public:
-	SampleManagerConsole(Session *session);
+	SampleManagerConsole(Session *session, SideBar *bar);
 	virtual ~SampleManagerConsole();
 
 	void update_list();

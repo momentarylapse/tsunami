@@ -25,6 +25,8 @@ public:
 
 	Module *c;
 	bool ignore_change;
+
+	static hui::Panel *_config_panel_parent_;
 };
 
 

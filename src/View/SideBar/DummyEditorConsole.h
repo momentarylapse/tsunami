@@ -14,7 +14,7 @@ class TrackLayer;
 
 class DummyEditorConsole : public SideBarConsole {
 public:
-	DummyEditorConsole(Session *session);
+	DummyEditorConsole(Session *session, SideBar *bar);
 };
 
 #endif /* SRC_VIEW_SIDEBAR_DUMMYEDITORCONSOLE_H_ */

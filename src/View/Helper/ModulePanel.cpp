@@ -18,13 +18,13 @@ extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
-ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
+ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
+	set_parent(_parent);
 	module = _m;
 	session = module->session;
 	menu = nullptr;
 
-	outer = _outer;
-	parent = outer;
+	outer = _parent;
 	bool own_header = (mode & Mode::HEADER);
 
 	from_resource("fx_panel");
@@ -37,6 +37,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_outer, Mode mode) {
 		remove_control("header");
 	}
 
+	ConfigPanel::_config_panel_parent_ = this;
 	p = module->create_panel();
 	if (p) {
 		embed(p, "content", 0, 0);
@@ -169,7 +170,7 @@ void ModulePanel::copy_into(ModulePanel *c) {
 }
 
 void ModulePanel::on_large() {
-	auto *c = new ModulePanel(module, nullptr);
+	auto *c = new ModulePanel(module, session->win.get());
 	copy_into(c);
 	session->win->set_big_panel(c);
 }

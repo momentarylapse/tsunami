@@ -7,8 +7,8 @@
 
 
 
-AudioEditorConsole::AudioEditorConsole(Session *session) :
-	SideBarConsole(_("Audio editor"), session)
+AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("Audio editor"), "audio-editor", session, bar)
 {
 	from_resource("audio-editor");
 

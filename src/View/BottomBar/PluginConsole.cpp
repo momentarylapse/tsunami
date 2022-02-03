@@ -12,8 +12,8 @@
 #include "../Helper/ModulePanel.h"
 
 
-PluginConsole::PluginConsole(Session *s) :
-	BottomBar::Console(_("Plugins"), s)
+PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
+	BottomBar::Console(_("Plugins"), "plugin-console", s, bar)
 {
 	from_resource("plugin-console");
 	next_x = 0;

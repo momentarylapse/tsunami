@@ -11,8 +11,8 @@
 #include "../../Data/Song.h"
 #include "LogConsole.h"
 
-LogConsole::LogConsole(Session *session) :
-	BottomBar::Console(_("Messages"), session)
+LogConsole::LogConsole(Session *session, BottomBar *bar) :
+	BottomBar::Console(_("Messages"), "log-console", session, bar)
 {
 	log = session->log;
 	messages_loaded = 0;

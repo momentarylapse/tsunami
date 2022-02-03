@@ -10,8 +10,8 @@
 #include "../../EditModes.h"
 
 
-DummyEditorConsole::DummyEditorConsole(Session *session) :
-	SideBarConsole(_("Editor"), session)
+DummyEditorConsole::DummyEditorConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("Editor"), "dummy-editor-console", session, bar)
 {
 	from_resource("dummy-editor");
 

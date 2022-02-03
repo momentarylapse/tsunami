@@ -21,7 +21,7 @@ class Session;
 
 class CurveConsole : public SideBarConsole {
 public:
-	CurveConsole(Session *session);
+	CurveConsole(Session *session, SideBar *bar);
 	virtual ~CurveConsole();
 
 	void on_update();

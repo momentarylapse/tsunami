@@ -14,7 +14,7 @@ class TrackLayer;
 
 class AudioEditorConsole : public SideBarConsole {
 public:
-	AudioEditorConsole(Session *session);
+	AudioEditorConsole(Session *session, SideBar *bar);
 	virtual ~AudioEditorConsole();
 
 	void on_layer_delete();

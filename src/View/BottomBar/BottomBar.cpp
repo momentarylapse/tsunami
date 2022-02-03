@@ -14,7 +14,10 @@
 #include "MiniBar.h"
 #include "../../Session.h"
 
-BottomBar::BottomBar(Session *session) {
+BottomBar::BottomBar(Session *session, hui::Panel *parent) {
+	set_parent(parent);
+	set_id("bottom-bar");
+
 	add_revealer("!slide=up", 0, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
@@ -30,10 +33,10 @@ BottomBar::BottomBar(Session *session) {
 	set_image("close", "hui:close");
 	add_tab_control("!left,expandx,expandy", 0, 1, "choose");
 
-	mixing_console = new MixingConsole(session);
-	signal_editor = new SignalEditor(session);
-	plugin_console = new PluginConsole(session);
-	log_console = new LogConsole(session);
+	mixing_console = new MixingConsole(session, this);
+	signal_editor = new SignalEditor(session, this);
+	plugin_console = new PluginConsole(session, this);
+	log_console = new LogConsole(session, this);
 	add_console(mixing_console, "");
 	add_console(signal_editor, "");
 	add_console(plugin_console, "");
@@ -132,7 +135,7 @@ bool BottomBar::is_active(int console_index) {
 }
 
 
-BottomBar::Console::Console(const string &_title, Session *_session) {
+BottomBar::Console::Console(const string &_title, const string &id, Session *_session, BottomBar *bar) : hui::Panel(id, bar) {
 	title = _title;
 	notify = false;
 	session = _session;

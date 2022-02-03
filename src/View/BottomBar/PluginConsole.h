@@ -16,7 +16,7 @@ class ModulePanel;
 
 class PluginConsole: public BottomBar::Console {
 public:
-	PluginConsole(Session *session);
+	PluginConsole(Session *session, BottomBar *bar);
 	~PluginConsole() override;
 
 	void on_add_button();

@@ -21,8 +21,8 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 	SampleFormat::SAMPLE_FORMAT_32_FLOAT
 };
 
-SongConsole::SongConsole(Session *session) :
-	SideBarConsole(_("File"), session)
+SongConsole::SongConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("File"), "song-console", session, bar)
 {
 	// dialog
 	embed_dialog("song_dialog", 0, 0);

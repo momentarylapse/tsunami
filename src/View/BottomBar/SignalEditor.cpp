@@ -20,8 +20,8 @@
 
 
 
-SignalEditor::SignalEditor(Session *session) :
-	BottomBar::Console(_("Signal Chain"), session)
+SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
+	BottomBar::Console(_("Signal Chain"), "signal-editor", session, bar)
 {
 	grid_id = "main-grid";
 	config_grid_id = "config-panel-grid";

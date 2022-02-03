@@ -115,8 +115,8 @@ public:
 	AudioView *view;
 };
 
-SampleManagerConsole::SampleManagerConsole(Session *session) :
-	SideBarConsole(_("Samples"), session)
+SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("Samples"), "sample-manager-console", session, bar)
 {
 	from_resource("sample-manager-dialog");
 

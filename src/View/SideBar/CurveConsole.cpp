@@ -16,8 +16,8 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 
-CurveConsole::CurveConsole(Session *session) :
-	SideBarConsole(_("Curves"), session)
+CurveConsole::CurveConsole(Session *session, SideBar *bar) :
+	SideBarConsole(_("Curves"), "curve-console", session, bar)
 {
 
 	from_resource("curve_console");

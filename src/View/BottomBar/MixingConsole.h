@@ -21,7 +21,7 @@ class TrackMixer;
 
 class MixingConsole: public BottomBar::Console {
 public:
-	MixingConsole(Session *session);
+	MixingConsole(Session *session, BottomBar *bar);
 	virtual ~MixingConsole();
 
 	void load_data();

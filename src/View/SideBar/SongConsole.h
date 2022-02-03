@@ -13,7 +13,7 @@ class Song;
 
 class SongConsole: public SideBarConsole {
 public:
-	SongConsole(Session *session);
+	SongConsole(Session *session, SideBar *bar);
 	virtual ~SongConsole();
 
 	void load_data();

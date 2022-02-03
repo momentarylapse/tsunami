@@ -32,6 +32,7 @@ class Panel : public Sharable<EventHandler> {
 	friend class ControlRadioButton;
 	friend class Menu;
 public:
+	Panel(const string &id, Panel *parent);
 	Panel();
 	virtual ~Panel();
 	void _cdecl __init__();
@@ -50,7 +51,9 @@ public:
 	virtual void _cdecl on_show(){}
 	virtual void _cdecl on_hide(){}
 
-	void set_win(Window *win);
+	void set_id(const string &id);
+	void set_parent(Panel *parent);
+	void _set_win(Window *win);
 
 	// events
 	int _cdecl event(const string &id, const Callback &function);

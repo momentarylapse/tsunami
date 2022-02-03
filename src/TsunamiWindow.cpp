@@ -308,11 +308,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	session->view = view;
 
 	// side bar
-	side_bar = new SideBar(session);
+	side_bar = new SideBar(session, this);
 	embed(side_bar, "root-grid", 2, 0);
 
 	// bottom bar
-	bottom_bar = new BottomBar(session);
+	bottom_bar = new BottomBar(session, this);
 	embed(bottom_bar, "main-grid", 0, 1);
 	//mini_bar = new MiniBar(bottom_bar, session);
 	//embed(mini_bar.get(), "main-grid", 0, 2);

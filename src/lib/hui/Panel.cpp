@@ -22,6 +22,11 @@ const int DEFAULT_WINDOW_BORDER = 10;
 
 string get_gtk_action_name(const string &id, Panel *scope);
 
+Panel::Panel(const string &_id, Panel *_parent) : Panel() {
+	set_parent(_parent);
+	set_id(_id);
+}
+
 Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
@@ -38,6 +43,7 @@ Panel::Panel() {
 	action_group = g_simple_action_group_new();
 
 	set_target("");
+
 }
 
 Panel::~Panel() {
@@ -45,11 +51,21 @@ Panel::~Panel() {
 }
 
 void Panel::__init__() {
-	new(this) Panel;
+	new(this) Panel();
 }
 
 void Panel::__delete__() {
 	this->Panel::~Panel();
+}
+
+void Panel::set_id(const string &_id) {
+	id = _id;
+}
+
+void Panel::set_parent(Panel *_parent) {
+	parent = _parent;
+	if (parent)
+		_set_win(parent->win);
 }
 
 void DBDEL(const string &type, const string &id, void *p) {
@@ -343,7 +359,7 @@ void Panel::set_from_resource(Resource *res) {
 			win->toolbar[TOOLBAR_TOP]->set_by_id(toolbar);
 	}
 
-	id = res->id;
+	set_id(res->id);
 /*#if GTK_CHECK_VERSION(4,0,0)
 	if (root_control) {
 		msg_write("ATTACH ACTION GROUP  " + p2s(this));
@@ -410,8 +426,7 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 		msg_error("trying to embed an empty panel");
 		return;
 	}
-	panel->parent = this;
-	panel->set_win(win);
+	panel->set_parent(this);
 	children.add(panel);
 
 	Panel* orig = panel->root_control->panel;
@@ -433,10 +448,10 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 #endif
 }
 
-void Panel::set_win(Window *_win) {
+void Panel::_set_win(Window *_win) {
 	win = _win;
 	for (Panel *p: children)
-		p->set_win(win);
+		p->_set_win(win);
 }
 
 

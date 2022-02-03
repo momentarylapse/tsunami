@@ -12,10 +12,9 @@
 
 class Log;
 
-class LogConsole: public BottomBar::Console
-{
+class LogConsole: public BottomBar::Console {
 public:
-	LogConsole(Session *session);
+	LogConsole(Session *session, BottomBar *bar);
 	virtual ~LogConsole();
 
 	void reload();

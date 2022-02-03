@@ -23,7 +23,7 @@ class MidiEventBuffer;
 
 class CaptureConsole : public SideBarConsole {
 public:
-	CaptureConsole(Session *session);
+	CaptureConsole(Session *session, SideBar *bar);
 
 
 	void on_enter() override;

@@ -310,8 +310,8 @@ public:
 
 
 
-MixingConsole::MixingConsole(Session *session) :
-	BottomBar::Console(_("Mixer"), session)
+MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
+	BottomBar::Console(_("Mixer"), "mixing-console", session, bar)
 {
 	device_manager = session->device_manager;
 	id_inner = "inner-grid";

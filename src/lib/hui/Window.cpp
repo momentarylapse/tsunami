@@ -30,11 +30,11 @@ void InputData::reset() {
 	just_focused = false;
 }
 
-Window::Window() {
+Window::Window() : Panel() {
 	_init_("", 0, 0, nullptr, true, WIN_MODE_DUMMY);
 }
 
-Window::Window(const string &title, int width, int height) {
+Window::Window(const string &title, int width, int height) : Panel() {
 	_init_(title, width, height, nullptr, true, 0);
 }
 
@@ -44,7 +44,7 @@ void Window::__init_ext__(const string& title, int width, int height) {
 
 
 // resource constructor
-Window::Window(const string &id, Window *parent) {
+Window::Window(const string &id, Window *parent) : Panel(id, nullptr) {
 	Resource *res = get_resource(id);
 	if (!res) {
 		msg_error("Window: undefined resource id: " + id);

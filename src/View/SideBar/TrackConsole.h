@@ -17,7 +17,7 @@ class FxListEditor;
 
 class TrackConsole: public SideBarConsole {
 public:
-	TrackConsole(Session *session);
+	TrackConsole(Session *session, SideBar *bar);
 
 	void on_enter() override;
 	void on_leave() override;

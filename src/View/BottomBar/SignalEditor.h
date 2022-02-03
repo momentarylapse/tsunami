@@ -22,7 +22,7 @@ class ModulePanel;
 
 class SignalEditor: public BottomBar::Console {
 public:
-	SignalEditor(Session *session);
+	SignalEditor(Session *session, BottomBar *bar);
 	virtual ~SignalEditor();
 
 	void add_chain(SignalChain *c);

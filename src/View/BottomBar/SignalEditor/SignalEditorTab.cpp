@@ -92,7 +92,11 @@ public:
 };
 
 
-SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
+SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : hui::Panel() {
+	set_parent(ed);
+	static int count = 0;
+	set_id(format("signal-editor-tab-%d", count++));
+
 	add_grid("", 0, 0, "grid");
 	set_target("grid");
 	add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");

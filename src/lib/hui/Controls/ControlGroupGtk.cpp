@@ -50,6 +50,14 @@ void ControlGroup::add(Control *child, int x, int y) {
 	child->parent = this;
 }
 
+void ControlGroup::remove_child(Control *child) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_frame_set_child(GTK_FRAME(widget), nullptr);
+#else
+	//gtk_container_add(GTK_CONTAINER(widget), child_widget);
+#endif
+}
+
 };
 
 #endif

@@ -43,6 +43,14 @@ void ControlScroller::add(Control *child, int x, int y) {
 	child->parent = this;
 }
 
+void ControlScroller::remove_child(Control *child) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(widget), nullptr);
+#else
+	//gtk_container_add(GTK_CONTAINER(widget), child_widget);
+#endif
+}
+
 
 void ControlScroller::__set_option(const string& op, const string& value) {
 	GtkPolicyType h_policy, v_policy;

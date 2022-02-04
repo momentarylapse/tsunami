@@ -71,6 +71,10 @@ void ControlGrid::add(Control *child, int x, int y) {
 	}
 }
 
+void ControlGrid::remove_child(Control *child) {
+	gtk_grid_remove(GTK_GRID(widget), child->widget);
+}
+
 void ControlGrid::__set_option(const string &op, const string &value) {
 	if (op == "buttonbar") {
 		button_bar = true;

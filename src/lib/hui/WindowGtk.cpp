@@ -117,7 +117,7 @@ string get_gtk_action_name(const string &id, Panel *scope_panel) {
 
 // general window
 
-void Window::_init_(const string &title, int width, int height, Window *parent, bool allow_parent, int mode) {
+void Window::_init_(const string &title, int width, int height, Window *_parent, bool allow_parent, int mode) {
 	window = nullptr;
 	win = this;
 	headerbar = nullptr;
@@ -127,10 +127,10 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 	if ((mode & WIN_MODE_DUMMY) > 0)
 		return;
 
-	_init_generic_(parent, allow_parent, mode);
+	_init_generic_(_parent, allow_parent, mode);
 
 	// creation
-	if (parent) {
+	if (is_dialog()) {
 		window = gtk_dialog_new();
 
 
@@ -145,7 +145,7 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 #endif
 
 		// dialog -> center on screen or root (if given)    ->  done by gtk....later
-		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent->window));
+		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent_window->window));
 		gtk_window_set_resizable(GTK_WINDOW(window), false);
 	} else {
 #if GTK_CHECK_VERSION(4,0,0)
@@ -155,7 +155,6 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 
 			//g_action_map_add_action_entries(G_ACTION_MAP(group), entries, G_N_ELEMENTS(entries), this);
 			gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
-			msg_error("WIN INSERT ACTION GROUP");
 
 			shortcut_controller = gtk_shortcut_controller_new ();
 			gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
@@ -199,7 +198,7 @@ void Window::_init_(const string &title, int width, int height, Window *parent, 
 #if !GTK_CHECK_VERSION(4,0,0)
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #endif
-	if (parent) {
+	if (is_dialog()) {
 		vbox = gtk_dialog_get_content_area(GTK_DIALOG(window));
 		plugable = vbox;
 		cur_control = nullptr;
@@ -274,7 +273,10 @@ Window::~Window() {
 	if (window) {
 		_clean_up_();
 #if GTK_CHECK_VERSION(4,0,0)
+
+		msg_write("win destroy");
 		gtk_window_destroy(GTK_WINDOW(window));
+		msg_write("/win destroy");
 #else
 		gtk_widget_destroy(window);
 #endif
@@ -292,7 +294,7 @@ void Window::__delete__() {
 }
 
 void Window::request_destroy() {
-	if (parent_window) {
+	if (is_dialog()) {
 		gtk_dialog_response(GTK_DIALOG(window), GTK_RESPONSE_DELETE_EVENT);
 	}
 	requested_destroy = true;
@@ -372,7 +374,7 @@ void Window::_run(Callback cb) {
 }
 
 void fly(Window *win, Callback cb) {
-	if (!win->parent) //!dynamic_cast<Dialog*>(win))
+	if (!win->is_dialog())
 		msg_error("hui.fly() only allowed for Dialog!");
 	win->_fly(cb);
 }
@@ -495,7 +497,7 @@ void Window::set_size(int width, int height) {
 #else
 	desired_width = width;
 	desired_height = height;
-	/*if (parent)
+	/*if (is_dialog())
 		gtk_widget_set_size_request(window, width, height);
 	else*/
 		gtk_window_resize(GTK_WINDOW(window), width, height);

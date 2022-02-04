@@ -64,12 +64,6 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *p);
 #endif
 
 void Menu::set_panel(Panel *_panel) {
-	static int level = 0;
-
-	if (level == 0)
-		msg_error("MENU SET PANEL " + _panel->id);
-	level ++;
-
 	panel = _panel;
 	for (Control *c: items) {
 		c->panel = panel;
@@ -85,9 +79,6 @@ void Menu::set_panel(Panel *_panel) {
 		if (auto s = dynamic_cast<MenuItemSubmenu*>(c))
 			s->sub_menu->set_panel(panel);
 	}
-	level --;
-	if (level == 0)
-		msg_error("//MENU SET PANEL " + _panel->id);
 }
 
 // only allow menu callback, if we are in layer 0 (if we don't edit it ourself)

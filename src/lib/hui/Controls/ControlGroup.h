@@ -10,16 +10,15 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
 
-class ControlGroup : public Control
-{
+class ControlGroup : public Control {
 public:
 	ControlGroup(const string &text, const string &id);
 
 	void add(Control *child, int x, int y) override;
+	void remove_child(Control *child) override;
 };
 
 };

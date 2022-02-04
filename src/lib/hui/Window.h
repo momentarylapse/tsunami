@@ -81,6 +81,7 @@ public:
 	// the window
 	void _run(Callback cb = nullptr);
 	void _fly(Callback cb = nullptr);
+	bool is_dialog();
 	void _cdecl show();
 	void _cdecl hide();
 	void _cdecl set_maximized(bool maximized);

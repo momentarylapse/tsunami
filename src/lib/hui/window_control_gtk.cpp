@@ -109,7 +109,6 @@ void Panel::_insert_control_(Control *c, int x, int y) {
 		} else {
 			// sub-panel
 #if GTK_CHECK_VERSION(4,0,0)
-			msg_write("ATTACH ACTION GROUP  " + id);
 			gtk_widget_insert_action_group(c->widget, id.c_str(), G_ACTION_GROUP(action_group));
 #endif
 		}

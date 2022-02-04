@@ -75,25 +75,32 @@ void unset_widgets_rec(Control *c) {
 }
 
 Control::~Control() {
+	msg_write("del con " + id);
+	msg_right();
 	notify_set_del(this);
 	DBDEL("control", id, this);
+	msg_write("del con 0");
 
 #ifdef HUI_API_GTK
-	g_signal_handlers_disconnect_by_data(widget, this);
+	if (widget)
+		g_signal_handlers_disconnect_by_data(widget, this);
 	//if (widget)
 	//	gtk_widget_destroy(widget);
 	//unset_widgets_rec(this);
 #endif
+	msg_write("del con 1");
 
 	if (parent) {
 		for (int i=0;i<parent->children.num;i++)
 			if (parent->children[i] == this)
 				parent->children.erase(i);
 	}
+	msg_write("del con 2");
 	while (children.num > 0) {
 		Control *c = children.pop();
 		delete c;
 	}
+	msg_write("del con 3");
 
 
 	//msg_write("widget: " + p2s(widget));
@@ -101,16 +108,21 @@ Control::~Control() {
 	if (widget and (type != CONTROL_CHECKBOX)) // switch bug.... not sure why...
 #if GTK_CHECK_VERSION(4,0,0)
 		//g_object_unref(widget);
-		gtk_widget_unparent(widget);
+		//gtk_widget_unparent(get_frame());
+		if (parent)
+			parent->remove_child(this);
 		// FIXME: probably still exists...
 #else
 		gtk_widget_destroy(widget);
 #endif
+	msg_write("del con 4");
 
 	widget = nullptr;
 	//unset_widgets_rec(this);
 #endif
 	DBDEL_DONE();
+	msg_write("/del con");
+	msg_left();
 }
 
 #ifdef HUI_API_GTK

@@ -81,6 +81,7 @@ void DBDEL_DONE() {
 // might be executed repeatedly
 void Panel::_ClearPanel_() {
 	DBDEL("panel", id, this);
+	msg_write("panel clear 1 " + id);
 	event_listeners.clear();
 	if (parent) {
 		// disconnect
@@ -90,18 +91,25 @@ void Panel::_ClearPanel_() {
 			}
 		parent = nullptr;
 	}
+	msg_write("panel clear 2");
 	while (children.num > 0) {
 		Panel *p = children.pop();
 		delete(p);
 	}
+	msg_write("panel clear 3");
 
-	if (root_control)
+	if (root_control) {
+		auto rr = root_control->widget;
 		delete root_control;
+		//gtk_widget_unparent(rr);
+	}
+	msg_write("panel clear 4");
 	root_control = nullptr;
 
 	id.clear();
 	cur_id.clear();
 	DBDEL_DONE();
+	msg_write("panel clear 5");
 }
 
 void Panel::set_border_width(int width) {
@@ -440,10 +448,7 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	panel->root_control->panel = orig;//panel;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	msg_error("ATTACH ACTION GROUP  " + p2s(panel));
-	msg_write(id);
-	msg_write(panel->id);
-	msg_write(p2s(win));
+	//msg_error("ATTACH ACTION GROUP  " + p2s(panel));
 	gtk_widget_insert_action_group(win->window, p2s(panel).c_str(), G_ACTION_GROUP(panel->action_group));
 #endif
 }
@@ -768,14 +773,14 @@ void Panel::_try_add_action_(const string &id, bool as_checkable) {
 	if (aa)
 		return;
 	if (as_checkable) {
-		msg_write("ACTION C   " + panel_scope(this) + id);
+		//msg_write("ACTION C   " + panel_scope(this) + id);
 		GVariant *state = g_variant_new_boolean(FALSE);
 		auto a = g_simple_action_new_stateful(name.c_str(), /*G_VARIANT_TYPE_BOOLEAN*/ nullptr, state);
 		//auto a = g_simple_action_new_stateful(name.c_str(), G_VARIANT_TYPE_BOOLEAN, state);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
 	} else {
-		msg_write("ACTION     " + panel_scope(this) + id + "   " + get_gtk_action_name(id, this));
+		//msg_write("ACTION     " + panel_scope(this) + id + "   " + get_gtk_action_name(id, this));
 		auto a = g_simple_action_new(name.c_str(), nullptr);
 		g_signal_connect(G_OBJECT(a), "activate", G_CALLBACK(_on_menu_action_), this);
 		g_action_map_add_action(G_ACTION_MAP(action_group), G_ACTION(a));
@@ -793,7 +798,6 @@ GAction *Panel::_get_action(const string &id) {
 
 void Panel::_connect_menu_to_panel(Menu *menu) {
 	menu->set_panel(this);
-	msg_error("CONNECT MENU " + id);
 
 	for (auto c: menu->get_all_controls()) {
 		if (c->type == MENU_ITEM_TOGGLE) {
@@ -812,7 +816,6 @@ void Panel::_connect_menu_to_panel(Menu *menu) {
 			//enable(c->id, false);
 		}
 	}
-	msg_error("/CONNECT MENU " + id);
 }
 
 string decode_gtk_action(const string &name) {

@@ -55,13 +55,13 @@ Window::Window(const string &id, Window *parent) : Panel(id, nullptr) {
 	set_from_resource(res);
 }
 
-void Window::_init_generic_(Window *_root, bool _allow_root, int _mode) {
+void Window::_init_generic_(Window *_parent, bool _allow_root, int _mode) {
 	_MakeUsable_();
 	_all_windows_.add(this);
 
 	allowed = true;
 	allow_keys = true;
-	parent_window = _root;
+	parent_window = _parent;
 	main_input_control = nullptr;
 	if (parent_window) {
 		parent_window->allowed = _allow_root;
@@ -78,6 +78,7 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode) {
 }
 
 void Window::_clean_up_() {
+	msg_write("win clean up");
 	for (int i=0; i<4; i++)
 		delete(toolbar[i]);
 
@@ -90,6 +91,7 @@ void Window::_clean_up_() {
 			_all_windows_.erase(i);
 			break;
 		}
+	msg_write("/win clean up");
 }
 
 // default handler when trying to close the windows
@@ -128,6 +130,10 @@ Menu *Window::get_menu() {
 }
 
 Window *Window::get_parent() {
+	return parent_window;
+}
+
+bool Window::is_dialog() {
 	return parent_window;
 }
 

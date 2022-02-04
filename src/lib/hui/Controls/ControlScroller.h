@@ -10,15 +10,15 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class ControlScroller : public Control
-{
+class ControlScroller : public Control {
 public:
 	ControlScroller(const string &text, const string &id);
 
 	void add(Control *child, int x, int y) override;
+	void remove_child(Control *child) override;
+
 	void __set_option(const string &op, const string &value) override;
 
 	GtkWidget *viewport;

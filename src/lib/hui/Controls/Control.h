@@ -102,6 +102,7 @@ public:
 	virtual void completion_clear(){}
 
 	virtual void add(Control *child, int x, int y){}
+	virtual void remove_child(Control *child) {}
 	void set_options(const string &options);
 	virtual void __set_option(const string &op, const string &value){}
 	void get_size(int &w, int &h);

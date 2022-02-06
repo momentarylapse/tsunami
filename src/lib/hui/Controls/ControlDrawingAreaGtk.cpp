@@ -208,7 +208,7 @@ void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
 	if ((mod & GDK_SHIFT_MASK) > 0)
 		key_code += KEY_SHIFT;
 #if GTK_CHECK_VERSION(4,0,0)
-	if ((mod & GDK_META_MASK) > 0)
+	if ((mod & GDK_ALT_MASK) > 0)
 		key_code += KEY_ALT;
 #else
 	if (((mod & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)

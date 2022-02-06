@@ -132,7 +132,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-edit-fx", [this]{ on_track_edit_fx(); });
 	event("track-add-marker", [this]{ on_track_add_marker(); });
 	set_key_code("track-add-marker", hui::KEY_CONTROL + hui::KEY_J);
+	add_action_checkable("track-convert-mono");
 	event("track-convert-mono", [this]{ on_track_convert_mono(); });
+	add_action_checkable("track-convert-stereo");
 	event("track-convert-stereo", [this]{ on_track_convert_stereo(); });
 	event("buffer-delete", [this]{ on_buffer_delete(); });
 	event("buffer-make-movable", [this]{ on_buffer_make_movable(); });
@@ -160,10 +162,16 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		hui::fly(new TrackRoutingDialog(this, song));
 	});
 
+
+	add_action_checkable("track-midi-mode-linear");
 	event("track-midi-mode-linear", [this]{ on_layer_midi_mode_linear(); });
+	add_action_checkable("track-midi-mode-tab");
 	event("track-midi-mode-tab", [this]{ on_layer_midi_mode_tab(); });
+	add_action_checkable("track-midi-mode-classical");
 	event("track-midi-mode-classical", [this]{ on_layer_midi_mode_classical(); });
+	add_action_checkable("track-audio-mode-peaks");
 	event("track-audio-mode-peaks", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
+	add_action_checkable("track-audio-mode-spectrum");
 	event("track-audio-mode-spectrum", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
 	
 	add_action_checkable("track-muted");

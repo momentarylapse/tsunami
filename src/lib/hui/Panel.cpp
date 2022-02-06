@@ -443,8 +443,6 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	if (parent_id.num > 0 and !_get_control_(parent_id))
 		msg_error(parent_id + " not found...embed");
 	_insert_control_(panel->root_control, x, y);
-//	if (cur_control) // don't really add... (stop some information propagation between Panels)
-//		cur_control->children.pop();    ...no...now checked in apply_foreach()
 	panel->root_control->panel = orig;//panel;
 
 #if GTK_CHECK_VERSION(4,0,0)

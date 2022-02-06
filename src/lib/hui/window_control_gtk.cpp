@@ -87,8 +87,8 @@ extern string OptionString, HuiFormatString;
 void Panel::_insert_control_(Control *c, int x, int y) {
 	GtkWidget *frame = c->get_frame();
 	c->panel = this;
-	if (cur_control) {
-		cur_control->add(c, x, y);
+	if (target_control) {
+		target_control->add(c, x, y);
 	} else {
 		root_control = c;
 		// directly into the window...
@@ -241,9 +241,9 @@ void Panel::add_tab_control(const string &title, int x, int y, const string &id)
 }
 
 void Panel::set_target(const string &id) {
-	cur_control = nullptr;
+	target_control = nullptr;
 	if (id.num > 0)
-		cur_control = _get_control_(id);
+		target_control = _get_control_(id);
 }
 
 void Panel::add_list_view(const string &title, int x, int y, const string &id) {
@@ -359,8 +359,8 @@ void Panel::embed_dialog(const string &id, int x, int y) {
 	rr.y = y;
 
 	string parent_id;
-	if (cur_control)
-		parent_id = cur_control->id;
+	if (target_control)
+		parent_id = target_control->id;
 	_add_control(id, rr, parent_id);
 }
 

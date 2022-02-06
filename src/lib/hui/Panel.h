@@ -179,7 +179,7 @@ protected:
 	int desired_width, desired_height;
 #endif
 
-	Control *cur_control;
+	Control *target_control;
 	Control *root_control;
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 public:

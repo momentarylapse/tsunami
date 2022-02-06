@@ -61,12 +61,24 @@ void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data) {
 // window coordinate system!
 void Menu::open_popup(Panel *panel) {
 #if GTK_CHECK_VERSION(4,0,0)
+	// transform into panel coordinates
+	int dx = 0, dy = 0;
+	panel->apply_foreach(panel->_get_cur_id_(), [this, panel, &dx, &dy] (Control *c) {
+		graphene_point_t A{0,0}, B;
+		if (gtk_widget_compute_point (c->widget, panel->root_control->widget, &A, &B)) {
+			dx = (int)B.x;
+			dy = (int)B.y;
+		}
+	});
+
+
 	panel->_connect_menu_to_panel(this);
 
 	auto w = gtk_popover_menu_new_from_model(G_MENU_MODEL(gmenu));
 
 	gtk_widget_set_parent(w, panel->root_control->widget);
-	GdkRectangle rr = {(int)panel->win->input.x, (int)panel->win->input.y, 0, 0};
+	GdkRectangle rr = {(int)panel->win->input.x + dx, (int)panel->win->input.y + dy, 0, 0};
+	// TODO add widget offset relative to panel
 	gtk_popover_set_pointing_to(GTK_POPOVER(w), &rr);
 	gtk_popover_popup(GTK_POPOVER(w));
 

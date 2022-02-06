@@ -201,7 +201,7 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 	if (is_dialog()) {
 		vbox = gtk_dialog_get_content_area(GTK_DIALOG(window));
 		plugable = vbox;
-		cur_control = nullptr;
+		target_control = nullptr;
 	} else {
 		vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 		//gtk_box_pack_start(GTK_BOX(window), vbox, TRUE, TRUE, 0);
@@ -249,9 +249,9 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 		gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_LEFT]->widget, FALSE, FALSE, 0);
 
 		plugable = nullptr;
-		cur_control = nullptr;
+		target_control = nullptr;
 		// free to use...
-		//cur_control = hbox;
+		//target_control = hbox;
 		plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 		gtk_widget_show(plugable);
 		//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);

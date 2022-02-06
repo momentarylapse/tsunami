@@ -30,6 +30,7 @@ ToolItemButton::ToolItemButton(const string &title, const string &image, const s
 		gtk_button_set_label(GTK_BUTTON(widget), sys_str(title));
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
 	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
+	gtk_widget_set_can_focus(widget, false);
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_tool_button_click), this);
 #else
 	gtk_widget_show(im);

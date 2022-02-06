@@ -34,6 +34,8 @@ public:
 
 	bool allow_change_messages;
 	int row_target;
+
+	void on_click(double x, double y);
 };
 
 };

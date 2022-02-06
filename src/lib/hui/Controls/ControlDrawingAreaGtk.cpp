@@ -567,7 +567,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
 
-	// click left
+	// mouse click
 	auto gesture_click = gtk_gesture_click_new();
 	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture_click), 0);
 	gtk_widget_add_controller(da, GTK_EVENT_CONTROLLER(gesture_click));

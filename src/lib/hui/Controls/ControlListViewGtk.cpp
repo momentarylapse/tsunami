@@ -135,27 +135,32 @@ void on_gtk_list_select(GtkTreeSelection *selection, gpointer data)
 
 #if !GTK_CHECK_VERSION(4,0,0)
 gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
-	if (event->button != 3) // right
+	if (event->button != GDK_BUTTON_SECONDARY) // right
 		return false;
 	if (event->type != GDK_BUTTON_PRESS)
 		return false;
-	auto *c = reinterpret_cast<Control*>(user_data);
+	auto *c = reinterpret_cast<ControlListView*>(user_data);
 	if (event->window != gtk_tree_view_get_bin_window(GTK_TREE_VIEW(c->widget)))
 		return false;
-	c->panel->win->input.column = -1;
-	c->panel->win->input.row = -1;
-	GtkTreePath *path = nullptr;
-	int cell_x = 0, cell_y = 0;
-	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(c->widget), event->x, event->y, &path, nullptr, &cell_x, &cell_y)) {
-		gint *indices = gtk_tree_path_get_indices(path);
-		c->panel->win->input.row = indices[0];
-		gtk_tree_path_free(path);
-	}
-
-	c->notify(EventID::RIGHT_BUTTON_DOWN, false);
+	c->on_click(event->x, event->y);
 	return false;
 }
 #endif
+
+void ControlListView::on_click(double x, double y) {
+	panel->win->input.column = -1;
+	panel->win->input.row = -1;
+	GtkTreePath *path = nullptr;
+	int cell_x = 0, cell_y = 0;
+	panel->win->input.x = x;
+	panel->win->input.y = y;
+	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(widget), x, y, &path, nullptr, &cell_x, &cell_y)) {
+		gint *indices = gtk_tree_path_get_indices(path);
+		panel->win->input.row = indices[0];
+		gtk_tree_path_free(path);
+	}
+	notify(EventID::RIGHT_BUTTON_DOWN, false);
+}
 
 
 void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
@@ -186,6 +191,16 @@ void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIt
 }
 
 
+
+#if GTK_CHECK_VERSION(4,0,0)
+static void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
+	auto c = reinterpret_cast<ControlListView*>(user_data);
+	//win_set_mouse_pos(c->panel->win, (float)x, (float)y);
+	c->on_click(x, y);
+}
+#endif
+
+
 ControlListView::ControlListView(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_LISTVIEW, id)
 {
@@ -208,7 +223,14 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	auto view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 //	g_object_unref(G_OBJECT(store));
 	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(&on_gtk_list_activate), this);
-#if !GTK_CHECK_VERSION(4,0,0)
+
+	// capture right click
+#if GTK_CHECK_VERSION(4,0,0)
+	auto gesture_click = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture_click), GDK_BUTTON_SECONDARY);
+	gtk_widget_add_controller(view, GTK_EVENT_CONTROLLER(gesture_click));
+	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_list_gesture_click_pressed), this);
+#else
 	g_signal_connect(G_OBJECT(view), "button-press-event", G_CALLBACK(&OnGtkListButton), this);
 	gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 #endif

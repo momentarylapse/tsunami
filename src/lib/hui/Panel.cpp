@@ -18,7 +18,7 @@ namespace hui
 static int current_uid = 0;
 
 const int DEFAULT_SPACING = 5;
-const int DEFAULT_WINDOW_BORDER = 10;
+const int DEFAULT_WINDOW_BORDER = 8;
 
 string get_gtk_action_name(const string &id, Panel *scope);
 

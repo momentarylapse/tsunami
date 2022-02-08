@@ -17,7 +17,7 @@ class Menu;
 
 class ToolItemMenuButton : public Control {
 public:
-	ToolItemMenuButton(const string &title, Menu *menu, const string &image, const string &id);
+	ToolItemMenuButton(const string &title, Menu *menu, const string &image, const string &id, Panel *panel);
 	void __set_option(const string &op, const string &value) override;
 };
 

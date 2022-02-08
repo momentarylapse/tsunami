@@ -55,7 +55,8 @@ void ControlButton::__set_string(const string &str) {
 void ControlButton::set_image(const string& str) {
 	GtkWidget *im = get_gtk_image_x(str, image_size, widget);
 #if GTK_CHECK_VERSION(4,0,0)
-	gtk_button_set_child(GTK_BUTTON(widget), im);
+	if (get_string() == "")
+		gtk_button_set_child(GTK_BUTTON(widget), im);
 #else
 	gtk_button_set_image(GTK_BUTTON(widget), im);
 #if GTK_CHECK_VERSION(3,6,0)

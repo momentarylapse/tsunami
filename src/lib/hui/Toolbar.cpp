@@ -31,7 +31,7 @@ void Toolbar::add_checkable(const string &title, const string &image, const stri
 void Toolbar::add_menu(const string &title, const string &image, Menu *menu, const string &id) {
 	if (!menu)
 		return;
-	_add(new ToolItemMenuButton(title, menu, image, id));
+	_add(new ToolItemMenuButton(title, menu, image, id, win));
 	menu->set_panel(win);
 }
 

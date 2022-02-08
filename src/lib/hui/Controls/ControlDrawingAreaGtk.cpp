@@ -49,6 +49,9 @@ void get_style_colors(Panel *p, const string &id, Map<string,color> &colors) {
 	}
 }
 
+
+
+
 #if GTK_CHECK_VERSION(4,0,0)
 
 void on_gtk_area_draw (GtkDrawingArea* drawing_area, cairo_t* cr, int width, int height, gpointer user_data) {
@@ -506,6 +509,9 @@ void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double 
 	} else if (but == GDK_BUTTON_SECONDARY) {
 		c->notify(EventID::RIGHT_BUTTON_DOWN, false);
 	}
+
+	if (c->grab_focus)
+		gtk_widget_grab_focus(c->widget);
 }
 void on_gtk_gesture_click_released(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
@@ -521,6 +527,12 @@ void on_gtk_gesture_click_released(GtkGestureClick *gesture, int n_press, double
 	} else if (but == GDK_BUTTON_SECONDARY) {
 		c->notify(EventID::RIGHT_BUTTON_UP, false);
 	}
+}
+
+
+void on_gtk_focus_enter(GtkEventControllerFocus *controller, gpointer user_data) {
+	/*auto c = reinterpret_cast<Control*>(user_data);
+	c->notify(EventID::MOUSE_ENTER, false);*/
 }
 #endif
 
@@ -549,12 +561,6 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 		da = gtk_drawing_area_new();
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(da), on_gtk_area_draw, this, nullptr);
-		gtk_widget_set_sensitive(da, true);
-		msg_write(b2s(gtk_widget_get_can_focus(da)));
-		g_object_set(G_OBJECT(da), "can-focus", true, nullptr);
-		msg_write(b2s(gtk_widget_get_can_focus(da)));
-		gtk_widget_set_can_focus(da, true);
-		msg_write(b2s(gtk_widget_get_can_focus(da)));
 #else
 		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(on_gtk_area_draw), this);
 #endif
@@ -587,6 +593,13 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	// somehow getting ignored?
 	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
 	g_signal_connect(G_OBJECT(handler_motion), "leave", G_CALLBACK(&on_gtk_motion_leave), this);
+
+	// focus
+#if 0
+	auto handler_focus = gtk_event_controller_focus_new();
+	gtk_widget_add_controller(da, handler_focus);
+	g_signal_connect(G_OBJECT(handler_focus), "enter", G_CALLBACK(&on_gtk_focus_enter), this);
+#endif
 #else
 	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
 	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);

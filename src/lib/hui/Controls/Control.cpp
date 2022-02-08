@@ -275,15 +275,25 @@ void Control::set_options(const string &options) {
 		#endif
 		} else if (op == "grabfocus") {
 			grab_focus = val_is_positive(val, true);
-			gtk_widget_set_can_focus(widget, grab_focus);
 #if GTK_CHECK_VERSION(4,0,0)
+			gtk_widget_set_focusable(widget, grab_focus);
 			if (grab_focus) {
-				msg_write("GRAB FOCUS " + b2s(gtk_widget_grab_focus(widget)));
+				gtk_widget_set_focus_on_click(widget, true);
+				// maybe the dialog should choose the focus...?
+				/*run_later(.01f, [this] {
+					msg_write("  GRAB FOCUS " + b2s(gtk_widget_grab_focus(widget)) + "   " + id  + "  " + p2s(this));
+				})*/;
 			}
+#else
+			gtk_widget_set_can_focus(widget, grab_focus);
 #endif
 		} else if (op == "ignorefocus") {
 			grab_focus = false;
+#if GTK_CHECK_VERSION(4,0,0)
+			gtk_widget_set_focusable(widget, false);
+#else
 			gtk_widget_set_can_focus(widget, false);
+#endif
 		} else if (op == "big") {
 			set_style_for_widget(widget, id, "{font-size: 125%;}");
 			__set_option(op, val);

@@ -314,6 +314,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	view = new AudioView(session, "area");
 	session->view = view;
+	hui::run_later(0.01f, [this] {
+		activate("area");
+	});
 
 	// side bar
 	side_bar = new SideBar(session, this);

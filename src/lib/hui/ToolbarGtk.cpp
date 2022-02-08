@@ -63,11 +63,13 @@ void Toolbar::_add(Control *c) {
 	c->panel = win;
 	item.add(c);
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(c->widget), true);
-	gtk_widget_show(c->widget);
 
 #if GTK_CHECK_VERSION(4,0,0)
-	gtk_box_append(GTK_BOX(widget), c->widget);
+	msg_write("a1");
+	gtk_box_append(GTK_BOX(widget), c->get_frame());
+	msg_write("a2");
 #else
+	gtk_widget_show(c->widget);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), GTK_TOOL_ITEM(c->widget), -1);
 #endif
 }

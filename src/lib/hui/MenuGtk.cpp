@@ -297,10 +297,14 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 		//return gtk_image_new_from_icon_name(get_gtk_icon_name("hui:open"));
 
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
-		if (!info)
+		if (!info) {
+			msg_write("nope");
 			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
+		}
 		// TODO use theme???
-		return gtk_image_new_from_paintable(GDK_PAINTABLE(info));
+		auto iii =gtk_image_new_from_paintable(GDK_PAINTABLE(info));
+		gtk_image_set_pixel_size(GTK_IMAGE(iii), _size);
+		return iii;
 #else
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), _size, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info)

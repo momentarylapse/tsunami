@@ -1,6 +1,7 @@
 use hui
 use tsunami
 use helper.tone
+use helper.draw
 
 const NUM_OSCILLATORS = 6
 
@@ -216,7 +217,7 @@ Grid ? ''
 		p.set_color(colors.text_soft1)
 		var z1 = osci_pos(a)
 		var z2 = osci_pos(b)
-		p.draw_line([z1.x - 18, z1.y], [z2.x + 18, z2.y])
+		draw_spline(p, [z2.x + 18, z2.y], [50,0], [z1.x - 18, z1.y], [50,0])
 	
 	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)

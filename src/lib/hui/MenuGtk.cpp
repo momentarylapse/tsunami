@@ -220,9 +220,9 @@ GtkIconTheme *get_hui_icon_theme() {
 		hui_icon_theme = gtk_icon_theme_new();
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
-		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
+		/*gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
 		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "48x48"));
-		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "32x32"));*/
 #else
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons"));
 		gtk_icon_theme_append_search_path(hui_icon_theme, sys_str_f(Application::directory_static << "icons" << "64x64"));
@@ -293,7 +293,7 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 		int _size = absolute_icon_size(size);
 		auto theme = get_hui_icon_theme();
 #if GTK_CHECK_VERSION(4,0,0)
-		msg_write("SYMBOLIC IMAGE " + image);
+		//msg_write("SYMBOLIC IMAGE " + image);
 		//return gtk_image_new_from_icon_name(get_gtk_icon_name("hui:open"));
 
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
@@ -301,6 +301,7 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 			msg_write("nope");
 			info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, (GtkIconLookupFlags)0);//, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		}
+
 		// TODO use theme???
 		auto iii =gtk_image_new_from_paintable(GDK_PAINTABLE(info));
 		gtk_image_set_pixel_size(GTK_IMAGE(iii), _size);

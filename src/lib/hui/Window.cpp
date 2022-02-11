@@ -80,7 +80,10 @@ void Window::_init_generic_(Window *_parent, bool _allow_root, int _mode) {
 void Window::_clean_up_() {
 	msg_write("win clean up");
 	for (int i=0; i<4; i++)
-		delete(toolbar[i]);
+		delete toolbar[i];
+
+	if (header_bar)
+		delete header_bar;
 
 	_ClearPanel_();
 	input.reset();

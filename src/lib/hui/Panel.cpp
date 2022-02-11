@@ -341,6 +341,7 @@ void Panel::set_from_resource(Resource *res) {
 	if (!res)
 		return;
 
+
 	bool res_is_window = ((res->type == "Dialog") or (res->type == "Window"));
 	bool panel_is_window = win and !parent;
 
@@ -365,15 +366,16 @@ void Panel::set_from_resource(Resource *res) {
 			win->set_menu(create_resource_menu(menu, this));
 		if (toolbar != "")
 			win->toolbar[TOOLBAR_TOP]->set_by_id(toolbar);
+
+		for (auto &c: res->children)
+			if (c.type == "HeaderBar") {
+				win->_add_headerbar();
+				for (auto &cc: c.children)
+					_add_control(id, cc, ":header:");
+			}
 	}
 
 	set_id(res->id);
-/*#if GTK_CHECK_VERSION(4,0,0)
-	if (root_control) {
-		msg_write("ATTACH ACTION GROUP  " + p2s(this));
-		gtk_widget_insert_action_group(root_control->widget, p2s(this).c_str(), G_ACTION_GROUP(action_group));
-	}
-#endif*/
 
 	int bw = res->value("borderwidth", "-1")._int();
 	if (bw >= 0)
@@ -382,8 +384,8 @@ void Panel::set_from_resource(Resource *res) {
 
 	// controls
 	if (res_is_window) {
-		for (Resource &cmd: res->children)
-			_add_control(id, cmd, "");
+		if (res->children.num > 0)
+			_add_control(id, res->children[0], "");
 	} else {
 		embed_resource(*res, "", 0, 0);
 	}
@@ -476,6 +478,8 @@ void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f) {
 
 	// FIXME: might be a derived class by kaba....
 	if (panel_equal(win, this)) {
+		if (win->header_bar)
+			win->header_bar->apply_foreach(id, f);
 		if (win->get_menu())
 			win->get_menu()->apply_foreach(id, f);
 		/*if (win->popup)

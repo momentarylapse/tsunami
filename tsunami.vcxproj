@@ -249,6 +249,7 @@
     <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp" />
+    <ClCompile Include="src\lib\hui\Controls\ControlHeaderBar.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp" />
@@ -706,6 +707,7 @@
     <ClInclude Include="src\lib\hui\Controls\ControlExpander.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlGrid.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlGroup.h" />
+    <ClInclude Include="src\lib\hui\Controls\ControlHeaderBar.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlLabel.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlListView.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlMenuButton.h" />

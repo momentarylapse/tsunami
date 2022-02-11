@@ -63,6 +63,25 @@ void load_resource_command7(File *f, Resource *c) {
 	}
 }
 
+void resource_post_process(Resource &res) {
+	if ((res.type == "Dialog") or (res.type == "Window")) {
+		if (res.has("headerbar")) {
+			if (res.children.num >= 0 and res.children[0].type == "Grid")
+				if (res.children[0].children.num >= 0) {
+					auto &c = res.children[0].children.back();
+					if (c.type == "Grid" and c.has("buttonbar")) {
+						Resource hb;
+						hb.id = ":header:";
+						hb.type = "HeaderBar";
+						hb.children = c.children;
+						res.children.add(hb);
+						res.children[0].children.pop();
+					}
+				}
+		}
+	}
+}
+
 void load_resource(const Path &filename) {
 	// dirty...
 	_resources_.clear();
@@ -84,6 +103,7 @@ void load_resource(const Path &filename) {
 			res.children.clear();
 			f->read_comment();
 			load_resource_command7(f, &res);
+			resource_post_process(res);
 			_resources_.add(res);
 		}
 

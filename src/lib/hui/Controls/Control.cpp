@@ -75,7 +75,7 @@ void unset_widgets_rec(Control *c) {
 }
 
 Control::~Control() {
-	msg_write("del con " + id);
+	msg_write("del con " + i2s(type) + "  " + id);
 	msg_right();
 	notify_set_del(this);
 	DBDEL("control", id, this);
@@ -89,17 +89,18 @@ Control::~Control() {
 	//unset_widgets_rec(this);
 #endif
 	msg_write("del con 1");
-
+	while (children.num > 0) {
+		Control *c = children.pop();
+		delete c;
+	}
+	msg_write("del con 2");
+#if GTK_CHECK_VERSION(4,0,0)
 	if (parent) {
 		for (int i=0;i<parent->children.num;i++)
 			if (parent->children[i] == this)
 				parent->children.erase(i);
 	}
-	msg_write("del con 2");
-	while (children.num > 0) {
-		Control *c = children.pop();
-		delete c;
-	}
+#endif
 	msg_write("del con 3");
 
 
@@ -109,8 +110,13 @@ Control::~Control() {
 #if GTK_CHECK_VERSION(4,0,0)
 		//g_object_unref(widget);
 		//gtk_widget_unparent(get_frame());
-		if (parent)
+
+		if (parent) {
 			parent->remove_child(this);
+			for (int i=0;i<parent->children.num;i++)
+				if (parent->children[i] == this)
+					parent->children.erase(i);
+		}
 		// FIXME: probably still exists...
 #else
 		gtk_widget_destroy(widget);

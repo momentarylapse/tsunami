@@ -45,6 +45,7 @@ void ControlRevealer::add(Control *child, int x, int y) {
 }
 
 void ControlRevealer::remove_child(Control *child) {
+	msg_write("Revealer.remove");
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_revealer_set_child(GTK_REVEALER(widget), nullptr);
 #else

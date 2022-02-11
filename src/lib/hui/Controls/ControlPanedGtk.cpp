@@ -37,6 +37,7 @@ void ControlPaned::add(Control *child, int x, int y) {
 }
 
 void ControlPaned::remove_child(Control *child) {
+	msg_write("Paned.remove");
 #if GTK_CHECK_VERSION(4,0,0)
 	if (gtk_paned_get_start_child(GTK_PANED(widget)) == child->widget)
 		gtk_paned_set_start_child(GTK_PANED(widget), nullptr);

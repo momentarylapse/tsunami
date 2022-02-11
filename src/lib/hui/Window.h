@@ -159,7 +159,8 @@ public:
 	GtkWidget *window;
 private:
 public:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar, *headerbar;
+	GtkWidget *vbox, *hbox, *menubar, *statusbar;
+	Control *header_bar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	struct InfoBar {

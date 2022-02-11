@@ -51,6 +51,7 @@ void ControlGroup::add(Control *child, int x, int y) {
 }
 
 void ControlGroup::remove_child(Control *child) {
+	msg_write("Group.remove");
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_frame_set_child(GTK_FRAME(widget), nullptr);
 #else

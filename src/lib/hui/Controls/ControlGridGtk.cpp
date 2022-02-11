@@ -33,26 +33,9 @@ void ControlGrid::add(Control *child, int x, int y) {
 		y = t;
 	}
 	GtkWidget *child_widget = child->get_frame();
-	bool hb = false;
-	if (button_bar) {
-		if (panel and panel->win and panel->win->headerbar)
-			hb = true;
-	}
-
-	if (hb) {
-		if (y == 1)
-			gtk_header_bar_pack_end(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
-		else
-			gtk_header_bar_pack_start(GTK_HEADER_BAR(panel->win->headerbar), child_widget);
-		hide(true);
-	} else {
-		gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
-	}
+	gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
 	child->parent = this;
 	children.add(child);
-
-	if (hb)
-		return;
 
 	if (button_bar) {
 		int width, height;
@@ -72,6 +55,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 }
 
 void ControlGrid::remove_child(Control *child) {
+	msg_write("Grid.remove");
 	gtk_grid_remove(GTK_GRID(widget), child->widget);
 }
 

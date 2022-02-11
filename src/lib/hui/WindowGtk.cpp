@@ -1,4 +1,5 @@
 #include "Controls/Control.h"
+#include "Controls/ControlHeaderBar.h"
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
@@ -120,7 +121,7 @@ string get_gtk_action_name(const string &id, Panel *scope_panel) {
 void Window::_init_(const string &title, int width, int height, Window *_parent, bool allow_parent, int mode) {
 	window = nullptr;
 	win = this;
-	headerbar = nullptr;
+	header_bar = nullptr;
 	statusbar = nullptr;
 	requested_destroy = false;
 
@@ -757,13 +758,8 @@ void Window::__set_options(const string &options) {
 		} else if (op == "statusbar") {
 			enable_statusbar(val_is_positive(val, true));
 		} else if (op == "closebutton") {
-#if GTK_CHECK_VERSION(4,0,0)
-			if (headerbar)
-				gtk_header_bar_set_show_title_buttons(GTK_HEADER_BAR(headerbar), val_is_positive(val, true));
-#else
-			if (headerbar)
-				gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerbar), val_is_positive(val, true));
-#endif
+			if (header_bar)
+				header_bar->set_options(op + "=" + val);
 		} else if (op == "cursor") {
 			show_cursor(val_is_positive(val, true));
 		} else if (op == "borderwidth") {
@@ -775,17 +771,10 @@ void Window::__set_options(const string &options) {
 }
 
 void Window::_add_headerbar() {
-	if (headerbar)
+	if (header_bar)
 		return;
-	headerbar = gtk_header_bar_new();
-
-#if GTK_CHECK_VERSION(4,0,0)
-	gtk_header_bar_set_show_title_buttons(GTK_HEADER_BAR(headerbar), true);
-#else
-	gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerbar), true);
-#endif
-	gtk_widget_show(headerbar);
-	gtk_window_set_titlebar(GTK_WINDOW(window), headerbar);
+	header_bar = new ControlHeaderBar("", ":header:", this);
+	gtk_window_set_titlebar(GTK_WINDOW(window), header_bar->widget);
 }
 
 

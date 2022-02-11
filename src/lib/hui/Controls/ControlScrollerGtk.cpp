@@ -44,6 +44,7 @@ void ControlScroller::add(Control *child, int x, int y) {
 }
 
 void ControlScroller::remove_child(Control *child) {
+	msg_write("Scroller.remove");
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(widget), nullptr);
 #else

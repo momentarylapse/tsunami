@@ -241,6 +241,10 @@ int absolute_icon_size(IconSize s) {
 		return 32;
 	if (s == IconSize::HUGE)
 		return 48;
+	if (s == IconSize::TOOLBAR_LARGE)
+		return 32;
+	if (s == IconSize::TOOLBAR_SMALL)
+		return 24;
 	return s;
 }
 

@@ -400,6 +400,9 @@
     <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
       <Filter>src\lib\hui\Controls</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlHeaderBar.cpp">
+      <Filter>src\lib\hui\Controls</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
       <Filter>src\lib\hui\Controls</Filter>
     </ClCompile>
@@ -1765,6 +1768,9 @@
       <Filter>src\lib\hui\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\ControlGroup.h">
+      <Filter>src\lib\hui\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\hui\Controls\ControlHeaderBar.h">
       <Filter>src\lib\hui\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\ControlLabel.h">

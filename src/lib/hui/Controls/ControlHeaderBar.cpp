@@ -12,9 +12,10 @@
 
 namespace hui {
 
-ControlHeaderBar::ControlHeaderBar(const string &title, const string &id, Panel *panel) :
+ControlHeaderBar::ControlHeaderBar(const string &title, const string &id, Panel *_panel) :
 	Control(CONTROL_HEADER_BAR, id)
 {
+	panel = _panel;
 	widget = gtk_header_bar_new();
 
 #if GTK_CHECK_VERSION(4,0,0)

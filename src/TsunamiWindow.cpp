@@ -281,6 +281,41 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("cursor-expand-left", hui::KEY_LEFT + hui::KEY_SHIFT);
 	set_key_code("cursor-expand-right", hui::KEY_RIGHT + hui::KEY_SHIFT);
 
+
+	set_menu(hui::create_resource_menu("menu", this));
+
+	app->plugin_manager->add_plugins_to_menu(this);
+
+	if (hui::config.get_bool("Window.HeaderBar", false)) {
+		_add_headerbar();
+		set_target(":header:");
+		add_button("", 0, 0, "new");
+		set_image("new", "hui:new");
+		add_button("Open", 1, 0, "open");
+		add_button("", 1, 0, "save");
+		set_image("save", "hui:save");
+
+		add_button("", 4, 1, "mode-edit-check");
+		set_image("mode-edit-check", "hui:edit");
+		add_button("!flat_", 3, 1, "record");
+		set_image("record", "hui:media-record");
+		add_button("!flat", 2, 1, "stop");
+		set_image("stop", "hui:media-stop");
+		add_button("!flat", 1, 1, "pause");
+		set_image("pause", "hui:media-pause");
+		add_button("!flat", 0, 1, "play");
+		set_image("play", "hui:media-play");
+
+		set_target("");
+
+		if (hui::config.get_bool("Window.HideMenu", false))
+			gtk_widget_hide(menubar);
+		gtk_widget_hide(toolbar[0]->widget);
+	} else {
+		toolbar[0]->set_by_id("toolbar");
+		//ToolbarConfigure(false, true);
+	}
+
 	// table structure
 	set_size(width, height);
 	set_border_width(0);
@@ -295,14 +330,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	if (hui::config.get_bool("View.EventCompression", true) == false)
 		set_options("area", "noeventcompression");
 
-	toolbar[0]->set_by_id("toolbar");
-	//ToolbarConfigure(false, true);
-
-	set_menu(hui::create_resource_menu("menu", this));
-	//ToolBarConfigure(true, true);
 	//set_maximized(maximized);
-
-	app->plugin_manager->add_plugins_to_menu(this);
 
 	// events
 	event("hui:close", [this]{ on_exit(); });

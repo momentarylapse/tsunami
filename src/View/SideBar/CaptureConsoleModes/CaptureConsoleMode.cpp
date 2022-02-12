@@ -95,6 +95,8 @@ Device* CaptureConsoleMode::get_source(SignalType type, int i) {
 }
 
 
+string shorten(const string &s, int max_length);
+
 void CaptureConsoleMode::update_device_list() {
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
@@ -107,7 +109,7 @@ void CaptureConsoleMode::update_device_list() {
 		// add all
 		c.panel->reset(c.id_source);
 		for (Device *d: sources)
-			c.panel->set_string(c.id_source, d->get_name());
+			c.panel->set_string(c.id_source, shorten(d->get_name(), 42));
 
 		// select current
 		foreachi(Device *d, sources, i)

@@ -39,6 +39,8 @@ string to_camel_case(const string &s) {
 	return r;
 }
 
+string shorten(const string &s, int max_length);
+
 class AutoConfigData : public VirtualBase {
 public:
 	string name, label, unit;
@@ -345,7 +347,7 @@ public:
 		if (panel) {
 			panel->reset(id);
 			for (auto *d: list)
-				panel->add_string(id, d->get_name());
+				panel->add_string(id, shorten(d->get_name(), 42));
 			panel->set_int(id, list.find(*value));
 		}
 	}

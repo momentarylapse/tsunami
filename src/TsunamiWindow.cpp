@@ -313,7 +313,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		gtk_widget_hide(toolbar[0]->widget);
 	} else {
 		toolbar[0]->set_by_id("toolbar");
-		//ToolbarConfigure(false, true);
 	}
 
 	// table structure

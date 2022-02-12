@@ -8,6 +8,11 @@ Dialog settings_dialog "Settings" width=800 height=600 headerbar resizable borde
 				Label pdp_colorscheme "Color scheme" right disabled
 				ComboBox color_scheme "" expandx
 				---|
+				Label t-controls "Controls" right disabled
+				Grid ? ""
+					RadioButton controls:toolbar "Toolbar" "tooltip=Use an old-fashioned toolbar.\n(Requires a restart)"
+					RadioButton controls:headerbar "Header bar" "tooltip=Put buttons into the header bar.\n(Requires a restart)"
+				---|
 				Label t_scroll_speed "Scroll speed" right disabled
 				SpinButton scroll_speed "" --range=0.1:20:0.1
 				---|

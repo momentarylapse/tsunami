@@ -34,6 +34,8 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 	event("color_scheme", [=]{ on_color_scheme(); });
 	event("ogg_bitrate", [=]{ on_ogg_bitrate(); });
 	event("default_artist", [=]{ on_default_artist(); });
+	event("controls:toolbar", [=]{ on_controls(false); });
+	event("controls:headerbar", [=]{ on_controls(true); });
 	event("scroll_speed", [=]{ on_scroll_speed(); });
 	event("cpu_meter", [=]{ on_cpu_meter(); });
 	event("antialiasing", [=]{ on_antialiasing(); });
@@ -85,6 +87,9 @@ void SettingsDialog::load_data() {
 		if (b.name == theme.name)
 			set_int("color_scheme", i);
 	}
+
+	check("controls:toolbar", !hui::config.get_bool("Window.HeaderBar", true));
+	check("controls:headerbar", hui::config.get_bool("Window.HeaderBar", true));
 
 	// ogg quality
 	float CurOggQuality = hui::config.get_float("OggQuality", 0.5f);
@@ -150,6 +155,10 @@ void SettingsDialog::on_default_artist() {
 
 void SettingsDialog::on_scroll_speed() {
 	view->set_mouse_wheel_speed(get_float(""));
+}
+
+void SettingsDialog::on_controls(bool header) {
+	hui::config.set_bool("Window.HeaderBar", header);
 }
 
 void SettingsDialog::on_audio_api() {

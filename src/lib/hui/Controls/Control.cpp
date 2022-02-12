@@ -14,7 +14,8 @@ namespace hui
 {
 
 
-void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_START(const string &type, const string &id, void *p);
+void DBDEL_X(const string &);
 void DBDEL_DONE();
 
 GAction *panel_get_action(Panel *panel, const string &id);
@@ -75,11 +76,8 @@ void unset_widgets_rec(Control *c) {
 }
 
 Control::~Control() {
-	msg_write("del con " + i2s(type) + "  " + id);
-	msg_right();
+	DBDEL_START(i2s(type), id, this);
 	notify_set_del(this);
-	DBDEL("control", id, this);
-	msg_write("del con 0");
 
 #ifdef HUI_API_GTK
 	if (widget)
@@ -88,12 +86,12 @@ Control::~Control() {
 	//	gtk_widget_destroy(widget);
 	//unset_widgets_rec(this);
 #endif
-	msg_write("del con 1");
+	DBDEL_X("children");
 	while (children.num > 0) {
 		Control *c = children.pop();
 		delete c;
 	}
-	msg_write("del con 2");
+	DBDEL_X("parent");
 #if GTK_CHECK_VERSION(4,0,0)
 	if (parent) {
 		for (int i=0;i<parent->children.num;i++)
@@ -101,7 +99,7 @@ Control::~Control() {
 				parent->children.erase(i);
 	}
 #endif
-	msg_write("del con 3");
+	DBDEL_X("remove");
 
 
 	//msg_write("widget: " + p2s(widget));
@@ -121,14 +119,11 @@ Control::~Control() {
 #else
 		gtk_widget_destroy(widget);
 #endif
-	msg_write("del con 4");
 
 	widget = nullptr;
 	//unset_widgets_rec(this);
 #endif
 	DBDEL_DONE();
-	msg_write("/del con");
-	msg_left();
 }
 
 #ifdef HUI_API_GTK

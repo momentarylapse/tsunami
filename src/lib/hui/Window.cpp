@@ -19,6 +19,8 @@ Array<Window*> _all_windows_;
 
 Window *CurWindow = nullptr;
 
+void DBDEL_X(const string &);
+
 
 void InputData::reset() {
 	x = y = dx = dy = scroll_x = scroll_y = 0;
@@ -78,7 +80,7 @@ void Window::_init_generic_(Window *_parent, bool _allow_root, int _mode) {
 }
 
 void Window::_clean_up_() {
-	msg_write("win clean up");
+	DBDEL_X("win clean up");
 	for (int i=0; i<4; i++)
 		delete toolbar[i];
 
@@ -94,7 +96,7 @@ void Window::_clean_up_() {
 			_all_windows_.erase(i);
 			break;
 		}
-	msg_write("/win clean up");
+	DBDEL_X("/win clean up");
 }
 
 // default handler when trying to close the windows

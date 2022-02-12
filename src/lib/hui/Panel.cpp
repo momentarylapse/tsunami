@@ -68,20 +68,31 @@ void Panel::set_parent(Panel *_parent) {
 		_set_win(parent->win);
 }
 
-void DBDEL(const string &type, const string &id, void *p) {
-	//msg_write("<del " + type + " " + id + " " + p2s(p) + ">");
-	//msg_right();
+#define DEBUG_CONTROLS 0
+
+void DBDEL_START(const string &type, const string &id, void *p) {
+#if DEBUG_CONTROLS
+	msg_write("del " + type + " " + id);
+	msg_right();
+#endif
+}
+
+void DBDEL_X(const string &m) {
+#if DEBUG_CONTROLS
+	msg_write(m);
+#endif
 }
 
 void DBDEL_DONE() {
-	//msg_left();
-	//msg_write("</>");
+#if DEBUG_CONTROLS
+	msg_left();
+	msg_write("/del");
+#endif
 }
 
 // might be executed repeatedly
 void Panel::_ClearPanel_() {
-	DBDEL("panel", id, this);
-	msg_write("panel clear 1 " + id);
+	DBDEL_START("Panel", id, this);
 	event_listeners.clear();
 	if (parent) {
 		// disconnect
@@ -91,25 +102,24 @@ void Panel::_ClearPanel_() {
 			}
 		parent = nullptr;
 	}
-	msg_write("panel clear 2");
+	DBDEL_X("children");
 	msg_right();
 	while (children.num > 0) {
 		Panel *p = children.pop();
 		delete(p);
 	}
 	msg_left();
-	msg_write("panel clear 3");
+	DBDEL_X("root");
 
 	if (root_control)
 		delete root_control;
 
-	msg_write("panel clear 4");
+	DBDEL_X("x");
 	root_control = nullptr;
 
 	id.clear();
 	cur_id.clear();
 	DBDEL_DONE();
-	msg_write("panel clear 5");
 }
 
 void Panel::set_border_width(int width) {

@@ -14,7 +14,7 @@
 
 namespace hui {
 
-void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_START(const string &type, const string &id, void *p);
 void DBDEL_DONE();
 string get_gtk_action_name(const string &id, Panel *scope);
 
@@ -27,7 +27,7 @@ void Menu::__delete__() {
 }
 
 void Menu::clear() {
-	DBDEL("menu", "", this);
+	DBDEL_START("menu", "", this);
 	for (Control *c: items)
 		delete(c);
 	items.clear();

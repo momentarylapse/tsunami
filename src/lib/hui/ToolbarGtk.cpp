@@ -11,7 +11,8 @@
 namespace hui
 {
 
-void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_START(const string &type, const string &id, void *p);
+void DBDEL_X(const string &);
 void DBDEL_DONE();
 
 #ifdef HUI_API_GTK
@@ -36,7 +37,7 @@ Toolbar::Toolbar(Window *_win, bool vertical) {
 }
 
 Toolbar::~Toolbar() {
-	DBDEL("toolbar", id, this);
+	DBDEL_START("toolbar", id, this);
 	reset();
 	DBDEL_DONE();
 }
@@ -65,9 +66,9 @@ void Toolbar::_add(Control *c) {
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(c->widget), true);
 
 #if GTK_CHECK_VERSION(4,0,0)
-	msg_write("a1");
+	DBDEL_X("TB add1");
 	gtk_box_append(GTK_BOX(widget), c->get_frame());
-	msg_write("a2");
+	DBDEL_X("TB add2");
 #else
 	gtk_widget_show(c->widget);
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), GTK_TOOL_ITEM(c->widget), -1);

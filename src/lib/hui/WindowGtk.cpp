@@ -22,7 +22,8 @@ namespace hui
 {
 
 
-void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_START(const string &type, const string &id, void *p);
+void DBDEL_X(const string &m);
 void DBDEL_DONE();
 
 
@@ -269,15 +270,15 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 }
 
 Window::~Window() {
-	DBDEL("window", id, this);
+	DBDEL_START("window", id, this);
 
 	if (window) {
 		_clean_up_();
 #if GTK_CHECK_VERSION(4,0,0)
 
-		msg_write("win destroy");
+		DBDEL_X("win destroy");
 		gtk_window_destroy(GTK_WINDOW(window));
-		msg_write("/win destroy");
+		DBDEL_X("/win destroy");
 #else
 		gtk_widget_destroy(window);
 #endif

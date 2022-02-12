@@ -14,6 +14,8 @@ namespace hui {
 
 const int FRAME_MARGIN = 8;
 
+void DBDEL_X(const string &m);
+
 ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_GRID, id)
 {
@@ -55,7 +57,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 }
 
 void ControlGrid::remove_child(Control *child) {
-	msg_write("Grid.remove");
+	DBDEL_X("Grid.remove");
 	gtk_grid_remove(GTK_GRID(widget), child->get_frame());
 }
 

@@ -189,106 +189,112 @@ void PluginManager::link_app_script_data() {
 
 
 	{
-	Module module(ModuleCategory::AUDIO_EFFECT, "");
-	kaba::declare_class_size("Module", sizeof(Module));
-	kaba::declare_class_element("Module.name", &Module::module_class);
-	kaba::declare_class_element("Module.session", &Module::session);
-	kaba::declare_class_element("Module.port_out", &Module::port_out);
-	kaba::declare_class_element("Module." + kaba::IDENTIFIER_SHARED_COUNT, &Module::_pointer_ref_counter);
-	kaba::link_external_class_func("Module.__init__", &Module::__init__);
-	kaba::link_external_virtual("Module.__delete__", &Module::__delete__, &module);
-	kaba::link_external_virtual("Module.create_panel", &Module::create_panel, &module);
-	kaba::link_external_class_func("Module.reset_config", &Module::reset_config);
-	kaba::link_external_virtual("Module.reset_state", &Module::reset_state, &module);
-	kaba::link_external_class_func("Module.changed", &Module::changed);
-	kaba::link_external_virtual("Module.get_config", &Module::get_config, &module);
-	kaba::link_external_class_func("Module.config_to_string", &Module::config_to_string);
-	kaba::link_external_class_func("Module.config_from_string", &Module::config_from_string);
-	kaba::link_external_class_func("Module.config_to_any", &Module::config_to_any);
-	kaba::link_external_class_func("Module.config_from_any", &Module::config_from_any);
-	kaba::link_external_virtual("Module.on_config", &Module::on_config, &module);
-	kaba::link_external_virtual("Module.command", &Module::command, &module);
-	kaba::link_external_class_func("Module.subscribe", &ObservableKabaWrapper<Module>::subscribe_kaba);
-	kaba::link_external_class_func("Module.unsubscribe", &Module::unsubscribe);
-	kaba::link_external_class_func("Module.copy", &Module::copy);
-	kaba::link_external_class_func("Module.plug_in", &Module::_plug_in);
-	kaba::link_external_class_func("Module.unplug_in", &Module::_unplug_in);
+		Module module(ModuleCategory::AUDIO_EFFECT, "");
+		kaba::declare_class_size("Module", sizeof(Module));
+		kaba::declare_class_element("Module.name", &Module::module_class);
+		kaba::declare_class_element("Module.session", &Module::session);
+		kaba::declare_class_element("Module.port_out", &Module::port_out);
+		kaba::declare_class_element("Module." + kaba::IDENTIFIER_SHARED_COUNT, &Module::_pointer_ref_counter);
+		kaba::link_external_class_func("Module.__init__", &Module::__init__);
+		kaba::link_external_virtual("Module.__delete__", &Module::__delete__, &module);
+		kaba::link_external_virtual("Module.create_panel", &Module::create_panel, &module);
+		kaba::link_external_class_func("Module.reset_config", &Module::reset_config);
+		kaba::link_external_virtual("Module.reset_state", &Module::reset_state, &module);
+		kaba::link_external_class_func("Module.changed", &Module::changed);
+		kaba::link_external_virtual("Module.get_config", &Module::get_config, &module);
+		kaba::link_external_class_func("Module.config_to_string", &Module::config_to_string);
+		kaba::link_external_class_func("Module.config_from_string", &Module::config_from_string);
+		kaba::link_external_class_func("Module.config_to_any", &Module::config_to_any);
+		kaba::link_external_class_func("Module.config_from_any", &Module::config_from_any);
+		kaba::link_external_virtual("Module.on_config", &Module::on_config, &module);
+		kaba::link_external_virtual("Module.command", &Module::command, &module);
+		kaba::link_external_class_func("Module.subscribe", &ObservableKabaWrapper<Module>::subscribe_kaba);
+		kaba::link_external_class_func("Module.unsubscribe", &Module::unsubscribe);
+		kaba::link_external_class_func("Module.copy", &Module::copy);
+		kaba::link_external_class_func("Module.plug_in", &Module::_plug_in);
+		kaba::link_external_class_func("Module.unplug_in", &Module::_unplug_in);
 	}
 
 
-	ModuleConfiguration plugin_data;
-	kaba::declare_class_size("Module.Config", sizeof(ModuleConfiguration));
-	kaba::link_external_class_func("Module.Config.__init__", &ModuleConfiguration::__init__);
-	kaba::link_external_virtual("Module.Config.__delete__", &ModuleConfiguration::__delete__, &plugin_data);
-	kaba::link_external_virtual("Module.Config.reset", &ModuleConfiguration::reset, &plugin_data);
-	kaba::link_external_class_func("Module.Config.from_string", &ModuleConfiguration::from_string);
-	kaba::link_external_class_func("Module.Config.to_string", &ModuleConfiguration::to_string);
-	kaba::link_external_virtual("Module.Config.auto_conf", &ModuleConfiguration::auto_conf, &plugin_data);
+	{
+		ModuleConfiguration plugin_data;
+		kaba::declare_class_size("Module.Config", sizeof(ModuleConfiguration));
+		kaba::link_external_class_func("Module.Config.__init__", &ModuleConfiguration::__init__);
+		kaba::link_external_virtual("Module.Config.__delete__", &ModuleConfiguration::__delete__, &plugin_data);
+		kaba::link_external_virtual("Module.Config.reset", &ModuleConfiguration::reset, &plugin_data);
+		kaba::link_external_class_func("Module.Config.from_string", &ModuleConfiguration::from_string);
+		kaba::link_external_class_func("Module.Config.to_string", &ModuleConfiguration::to_string);
+		kaba::link_external_virtual("Module.Config.auto_conf", &ModuleConfiguration::auto_conf, &plugin_data);
+	}
 
-
-	ConfigPanel config_panel(nullptr);
-	kaba::declare_class_size("ConfigPanel", sizeof(ConfigPanel));
-	kaba::link_external_class_func("ConfigPanel.__init__", &ConfigPanel::__init__);
-	kaba::link_external_virtual("ConfigPanel.__delete__", &ConfigPanel::__delete__, &config_panel);
-	kaba::link_external_virtual("ConfigPanel.update", &ConfigPanel::update, &config_panel);
-	kaba::link_external_virtual("ConfigPanel.set_large", &ConfigPanel::set_large, &config_panel);
-	kaba::link_external_class_func("ConfigPanel.changed", &ConfigPanel::changed);
-	kaba::declare_class_element("ConfigPanel.c", &ConfigPanel::c);
 
 	{
-	AudioSource asource;
-	kaba::declare_class_size("AudioSource", sizeof(AudioSource));
-	kaba::link_external_class_func("AudioSource.__init__", &AudioSource::__init__);
-	kaba::link_external_virtual("AudioSource.__delete__", &AudioSource::__delete__, &asource);
-	kaba::link_external_virtual("AudioSource.read", &AudioSource::read, &asource);
+		ConfigPanel::_hidden_parent_check_ = false;
+		ConfigPanel config_panel(nullptr);
+		kaba::declare_class_size("ConfigPanel", sizeof(ConfigPanel));
+		kaba::link_external_class_func("ConfigPanel.__init__", &ConfigPanel::__init__);
+		kaba::link_external_virtual("ConfigPanel.__delete__", &ConfigPanel::__delete__, &config_panel);
+		kaba::link_external_virtual("ConfigPanel.update", &ConfigPanel::update, &config_panel);
+		kaba::link_external_virtual("ConfigPanel.set_large", &ConfigPanel::set_large, &config_panel);
+		kaba::link_external_class_func("ConfigPanel.changed", &ConfigPanel::changed);
+		kaba::declare_class_element("ConfigPanel.c", &ConfigPanel::c);
+		ConfigPanel::_hidden_parent_check_ = true;
 	}
 
 	{
-	AudioEffect aeffect;
-	kaba::declare_class_size("AudioEffect", sizeof(AudioEffect));
-	kaba::declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
-	kaba::declare_class_element("AudioEffect.apply_to_whole_buffer", &AudioEffect::apply_to_whole_buffer);
-	kaba::declare_class_element("AudioEffect.source", &AudioEffect::source);
-	kaba::link_external_class_func("AudioEffect.__init__", &AudioEffect::__init__);
-	kaba::link_external_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
-	kaba::link_external_virtual("AudioEffect.process", &AudioEffect::process, &aeffect);
-	kaba::link_external_virtual("AudioEffect.read", &AudioEffect::read, &aeffect);
+		AudioSource asource;
+		kaba::declare_class_size("AudioSource", sizeof(AudioSource));
+		kaba::link_external_class_func("AudioSource.__init__", &AudioSource::__init__);
+		kaba::link_external_virtual("AudioSource.__delete__", &AudioSource::__delete__, &asource);
+		kaba::link_external_virtual("AudioSource.read", &AudioSource::read, &asource);
 	}
 
 	{
-	MidiEffect meffect;
-	kaba::declare_class_size("MidiEffect", sizeof(MidiEffect));
-	kaba::link_external_class_func("MidiEffect.__init__", &MidiEffect::__init__);
-	kaba::link_external_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
-	kaba::link_external_virtual("MidiEffect.process", &MidiEffect::process, &meffect);
+		AudioEffect aeffect;
+		kaba::declare_class_size("AudioEffect", sizeof(AudioEffect));
+		kaba::declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
+		kaba::declare_class_element("AudioEffect.apply_to_whole_buffer", &AudioEffect::apply_to_whole_buffer);
+		kaba::declare_class_element("AudioEffect.source", &AudioEffect::source);
+		kaba::link_external_class_func("AudioEffect.__init__", &AudioEffect::__init__);
+		kaba::link_external_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
+		kaba::link_external_virtual("AudioEffect.process", &AudioEffect::process, &aeffect);
+		kaba::link_external_virtual("AudioEffect.read", &AudioEffect::read, &aeffect);
 	}
 
 	{
-	AudioVisualizer avis;
-	kaba::declare_class_size("AudioVisualizer", sizeof(AudioVisualizer));
-	kaba::declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
-	kaba::declare_class_element("AudioVisualizer.ring_buffer", &AudioVisualizer::buffer);
-	kaba::declare_class_element("AudioVisualizer.next_writing", &AudioVisualizer::next_writing);
-	kaba::declare_class_element("AudioVisualizer.current_reading", &AudioVisualizer::current_reading);
-	kaba::link_external_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
-	kaba::link_external_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
-	kaba::link_external_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
-	kaba::link_external_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
-	kaba::link_external_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
-	kaba::link_external_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
-	kaba::link_external_class_func("AudioVisualizer.flip", &AudioVisualizer::flip);
+		MidiEffect meffect;
+		kaba::declare_class_size("MidiEffect", sizeof(MidiEffect));
+		kaba::link_external_class_func("MidiEffect.__init__", &MidiEffect::__init__);
+		kaba::link_external_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
+		kaba::link_external_virtual("MidiEffect.process", &MidiEffect::process, &meffect);
 	}
 
 	{
-	DummyPitchDetector pd;
-	kaba::declare_class_size("PitchDetector", sizeof(PitchDetector));
-	kaba::declare_class_element("PitchDetector.frequency", &PitchDetector::frequency);
-	kaba::declare_class_element("PitchDetector.pitch", &PitchDetector::pitch);
-	kaba::declare_class_element("PitchDetector.volume", &PitchDetector::volume);
-	kaba::declare_class_element("PitchDetector.loud_enough", &PitchDetector::loud_enough);
-	kaba::link_external_class_func("PitchDetector.__init__", &DummyPitchDetector::__init__);
-	kaba::link_external_virtual("PitchDetector.read", &PitchDetector::read, &pd);
-	kaba::link_external_virtual("PitchDetector.process", &DummyPitchDetector::process, &pd);
+		AudioVisualizer avis;
+		kaba::declare_class_size("AudioVisualizer", sizeof(AudioVisualizer));
+		kaba::declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
+		kaba::declare_class_element("AudioVisualizer.ring_buffer", &AudioVisualizer::buffer);
+		kaba::declare_class_element("AudioVisualizer.next_writing", &AudioVisualizer::next_writing);
+		kaba::declare_class_element("AudioVisualizer.current_reading", &AudioVisualizer::current_reading);
+		kaba::link_external_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
+		kaba::link_external_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
+		kaba::link_external_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
+		kaba::link_external_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
+		kaba::link_external_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
+		kaba::link_external_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
+		kaba::link_external_class_func("AudioVisualizer.flip", &AudioVisualizer::flip);
+	}
+
+	{
+		DummyPitchDetector pd;
+		kaba::declare_class_size("PitchDetector", sizeof(PitchDetector));
+		kaba::declare_class_element("PitchDetector.frequency", &PitchDetector::frequency);
+		kaba::declare_class_element("PitchDetector.pitch", &PitchDetector::pitch);
+		kaba::declare_class_element("PitchDetector.volume", &PitchDetector::volume);
+		kaba::declare_class_element("PitchDetector.loud_enough", &PitchDetector::loud_enough);
+		kaba::link_external_class_func("PitchDetector.__init__", &DummyPitchDetector::__init__);
+		kaba::link_external_virtual("PitchDetector.read", &PitchDetector::read, &pd);
+		kaba::link_external_virtual("PitchDetector.process", &DummyPitchDetector::process, &pd);
 	}
 
 	kaba::declare_class_size("AudioBuffer", sizeof(AudioBuffer));
@@ -342,54 +348,54 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Sample.set_value", &Sample::set_value);
 
 	{
-	shared<Sample> sample = new Sample(SignalType::AUDIO);
-	//sample.owner = tsunami->song;
-	SampleRef sampleref(sample.get());
-	kaba::declare_class_size("SampleRef", sizeof(SampleRef));
-	kaba::link_external_class_func("SampleRef.buf", &SampleRef::buf);
-	kaba::link_external_class_func("SampleRef.midi", &SampleRef::midi);
-	kaba::declare_class_element("SampleRef.origin", &SampleRef::origin);
-	kaba::declare_class_element("SampleRef." + kaba::IDENTIFIER_SHARED_COUNT, &SampleRef::_pointer_ref_counter);
-	kaba::link_external_class_func("SampleRef.__init__", &SampleRef::__init__);
-	kaba::link_external_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
+		shared<Sample> sample = new Sample(SignalType::AUDIO);
+		//sample.owner = tsunami->song;
+		SampleRef sampleref(sample.get());
+		kaba::declare_class_size("SampleRef", sizeof(SampleRef));
+		kaba::link_external_class_func("SampleRef.buf", &SampleRef::buf);
+		kaba::link_external_class_func("SampleRef.midi", &SampleRef::midi);
+		kaba::declare_class_element("SampleRef.origin", &SampleRef::origin);
+		kaba::declare_class_element("SampleRef." + kaba::IDENTIFIER_SHARED_COUNT, &SampleRef::_pointer_ref_counter);
+		kaba::link_external_class_func("SampleRef.__init__", &SampleRef::__init__);
+		kaba::link_external_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
 	}
 
 
 
 	{
-	Port port(SignalType::AUDIO, "");
-	kaba::declare_class_size("Module.Port", sizeof(Port));
-	kaba::link_external_class_func("Module.Port.__init__", &Port::__init__);
-	kaba::link_external_virtual("Module.Port.__delete__", &Port::__delete__, &port);
-	kaba::link_external_virtual("Module.Port.read_audio", &Port::read_audio, &port);
-	kaba::link_external_virtual("Module.Port.read_midi", &Port::read_midi, &port);
-	kaba::link_external_virtual("Module.Port.read_beats", &Port::read_beats, &port);
+		Port port(SignalType::AUDIO, "");
+		kaba::declare_class_size("Module.Port", sizeof(Port));
+		kaba::link_external_class_func("Module.Port.__init__", &Port::__init__);
+		kaba::link_external_virtual("Module.Port.__delete__", &Port::__delete__, &port);
+		kaba::link_external_virtual("Module.Port.read_audio", &Port::read_audio, &port);
+		kaba::link_external_virtual("Module.Port.read_midi", &Port::read_midi, &port);
+		kaba::link_external_virtual("Module.Port.read_beats", &Port::read_beats, &port);
 	}
 
 	{
-	MidiSource msource;
-	kaba::declare_class_size("MidiSource", sizeof(MidiSource));
-	kaba::declare_class_element("MidiSource.bh_midi", &MidiSource::bh_midi);
-	kaba::link_external_class_func("MidiSource.__init__", &MidiSource::__init__);
-	kaba::link_external_virtual("MidiSource.__delete__", &MidiSource::__delete__, &msource);
-	kaba::link_external_virtual("MidiSource.read", &MidiSource::read, &msource);
-	kaba::link_external_virtual("MidiSource.reset", &MidiSource::reset, &msource);
-	kaba::link_external_virtual("MidiSource.on_produce", &MidiSource::on_produce, &msource);
-	kaba::link_external_class_func("MidiSource.note", &MidiSource::note);
-	kaba::link_external_class_func("MidiSource.skip", &MidiSource::skip);
-	kaba::link_external_class_func("MidiSource.note_x", &MidiSource::note_x);
-	kaba::link_external_class_func("MidiSource.skip_x", &MidiSource::skip_x);
+		MidiSource msource;
+		kaba::declare_class_size("MidiSource", sizeof(MidiSource));
+		kaba::declare_class_element("MidiSource.bh_midi", &MidiSource::bh_midi);
+		kaba::link_external_class_func("MidiSource.__init__", &MidiSource::__init__);
+		kaba::link_external_virtual("MidiSource.__delete__", &MidiSource::__delete__, &msource);
+		kaba::link_external_virtual("MidiSource.read", &MidiSource::read, &msource);
+		kaba::link_external_virtual("MidiSource.reset", &MidiSource::reset, &msource);
+		kaba::link_external_virtual("MidiSource.on_produce", &MidiSource::on_produce, &msource);
+		kaba::link_external_class_func("MidiSource.note", &MidiSource::note);
+		kaba::link_external_class_func("MidiSource.skip", &MidiSource::skip);
+		kaba::link_external_class_func("MidiSource.note_x", &MidiSource::note_x);
+		kaba::link_external_class_func("MidiSource.skip_x", &MidiSource::skip_x);
 	}
 
 
 	{
-	BeatMidifier bmidifier;
-	kaba::declare_class_size("BeatMidifier", sizeof(BeatMidifier));
-	kaba::link_external_class_func("BeatMidifier.__init__", &BeatMidifier::__init__);
-	//kaba::link_external_virtual("BeatMidifier.__delete__", &MidiSource::__delete__, &bmidifier);
-	kaba::link_external_virtual("BeatMidifier.read", &BeatMidifier::read, &bmidifier);
-	kaba::link_external_virtual("BeatMidifier.reset", &BeatMidifier::reset, &bmidifier);
-	kaba::declare_class_element("BeatMidifier.volume", &BeatMidifier::volume);
+		BeatMidifier bmidifier;
+		kaba::declare_class_size("BeatMidifier", sizeof(BeatMidifier));
+		kaba::link_external_class_func("BeatMidifier.__init__", &BeatMidifier::__init__);
+		//kaba::link_external_virtual("BeatMidifier.__delete__", &MidiSource::__delete__, &bmidifier);
+		kaba::link_external_virtual("BeatMidifier.read", &BeatMidifier::read, &bmidifier);
+		kaba::link_external_virtual("BeatMidifier.reset", &BeatMidifier::reset, &bmidifier);
+		kaba::declare_class_element("BeatMidifier.volume", &BeatMidifier::volume);
 	}
 
 	//{
@@ -413,27 +419,29 @@ void PluginManager::link_app_script_data() {
 	//}
 
 	{
-	PitchRenderer pren(&synth, 0);
-	kaba::declare_class_size("PitchRenderer", sizeof(PitchRenderer));
-	kaba::declare_class_element("PitchRenderer.synth", &PitchRenderer::synth);
-	kaba::declare_class_element("PitchRenderer.pitch", &PitchRenderer::pitch);
-	kaba::declare_class_element("PitchRenderer.delta_phi", &PitchRenderer::delta_phi);
-	kaba::link_external_class_func("PitchRenderer.__init__", &PitchRenderer::__init__);
-	kaba::link_external_virtual("PitchRenderer.__delete__", &PitchRenderer::__delete__, &pren);
-	kaba::link_external_virtual("PitchRenderer.render", &PitchRenderer::render, &pren);
-	kaba::link_external_virtual("PitchRenderer.on_start", &PitchRenderer::on_start, &pren);
-	kaba::link_external_virtual("PitchRenderer.on_end", &PitchRenderer::on_end, &pren);
-	kaba::link_external_virtual("PitchRenderer.on_config", &PitchRenderer::on_config, &pren);
+		PitchRenderer pren(&synth, 0);
+		kaba::declare_class_size("PitchRenderer", sizeof(PitchRenderer));
+		kaba::declare_class_element("PitchRenderer.synth", &PitchRenderer::synth);
+		kaba::declare_class_element("PitchRenderer.pitch", &PitchRenderer::pitch);
+		kaba::declare_class_element("PitchRenderer.delta_phi", &PitchRenderer::delta_phi);
+		kaba::link_external_class_func("PitchRenderer.__init__", &PitchRenderer::__init__);
+		kaba::link_external_virtual("PitchRenderer.__delete__", &PitchRenderer::__delete__, &pren);
+		kaba::link_external_virtual("PitchRenderer.render", &PitchRenderer::render, &pren);
+		kaba::link_external_virtual("PitchRenderer.on_start", &PitchRenderer::on_start, &pren);
+		kaba::link_external_virtual("PitchRenderer.on_end", &PitchRenderer::on_end, &pren);
+		kaba::link_external_virtual("PitchRenderer.on_config", &PitchRenderer::on_config, &pren);
 	}
 
 
-	DummySynthesizer dsynth;
-	kaba::declare_class_size("DummySynthesizer", sizeof(DummySynthesizer));
-	kaba::link_external_class_func("DummySynthesizer.__init__", &DummySynthesizer::__init__);
-	kaba::link_external_virtual("DummySynthesizer.__delete__", &DummySynthesizer::__delete__, &dsynth);
-	kaba::link_external_virtual("DummySynthesizer.render", &DummySynthesizer::render, &dsynth);
-	kaba::link_external_virtual("DummySynthesizer.create_pitch_renderer", &DummySynthesizer::create_pitch_renderer, &dsynth);
-	kaba::link_external_virtual("DummySynthesizer.on_config", &DummySynthesizer::on_config, &dsynth);
+	{
+		DummySynthesizer dsynth;
+		kaba::declare_class_size("DummySynthesizer", sizeof(DummySynthesizer));
+		kaba::link_external_class_func("DummySynthesizer.__init__", &DummySynthesizer::__init__);
+		kaba::link_external_virtual("DummySynthesizer.__delete__", &DummySynthesizer::__delete__, &dsynth);
+		kaba::link_external_virtual("DummySynthesizer.render", &DummySynthesizer::render, &dsynth);
+		kaba::link_external_virtual("DummySynthesizer.create_pitch_renderer", &DummySynthesizer::create_pitch_renderer, &dsynth);
+		kaba::link_external_virtual("DummySynthesizer.on_config", &DummySynthesizer::on_config, &dsynth);
+	}
 
 	kaba::declare_class_size("EnvelopeADSR", sizeof(EnvelopeADSR));
 	kaba::link_external_class_func("EnvelopeADSR.__init__", &EnvelopeADSR::reset);
@@ -490,16 +498,18 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("MidiNoteBuffer.get_notes", &MidiNoteBuffer::get_notes);
 	kaba::link_external_class_func("MidiNoteBuffer.get_range", &MidiNoteBuffer::range);
 
-	BeatSource bsource;
-	kaba::declare_class_size("BeatSource", sizeof(BeatSource));
-	kaba::link_external_class_func("BeatSource.__init__", &BeatSource::__init__);
-	kaba::link_external_virtual("BeatSource.__delete__", &BeatSource::__delete__, &bsource);
-	kaba::link_external_virtual("BeatSource.read", &BeatSource::read, &bsource);
-	kaba::link_external_virtual("BeatSource.reset", &BeatSource::reset, &bsource);
-	kaba::link_external_virtual("BeatSource.beats_per_bar", &BeatSource::beats_per_bar, &bsource);
-	kaba::link_external_virtual("BeatSource.cur_beat", &BeatSource::cur_beat, &bsource);
-	kaba::link_external_virtual("BeatSource.cur_bar", &BeatSource::cur_bar, &bsource);
-	kaba::link_external_virtual("BeatSource.beat_fraction", &BeatSource::beat_fraction, &bsource);
+	{
+		BeatSource bsource;
+		kaba::declare_class_size("BeatSource", sizeof(BeatSource));
+		kaba::link_external_class_func("BeatSource.__init__", &BeatSource::__init__);
+		kaba::link_external_virtual("BeatSource.__delete__", &BeatSource::__delete__, &bsource);
+		kaba::link_external_virtual("BeatSource.read", &BeatSource::read, &bsource);
+		kaba::link_external_virtual("BeatSource.reset", &BeatSource::reset, &bsource);
+		kaba::link_external_virtual("BeatSource.beats_per_bar", &BeatSource::beats_per_bar, &bsource);
+		kaba::link_external_virtual("BeatSource.cur_beat", &BeatSource::cur_beat, &bsource);
+		kaba::link_external_virtual("BeatSource.cur_bar", &BeatSource::cur_bar, &bsource);
+		kaba::link_external_virtual("BeatSource.beat_fraction", &BeatSource::beat_fraction, &bsource);
+	}
 
 	kaba::declare_class_size("TrackMarker", sizeof(TrackMarker));
 	kaba::declare_class_element("TrackMarker.text", &TrackMarker::text);
@@ -553,82 +563,86 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("Track.enable_effect", &Track::enable_effect);
 	kaba::link_external_class_func("Track.set_synthesizer", &Track::set_synthesizer);
 
-	Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
-	kaba::declare_class_size("Song", sizeof(Song));
-	kaba::declare_class_element("Song.filename", &Song::filename);
-	kaba::declare_class_element("Song.tag", &Song::tags);
-	kaba::declare_class_element("Song.sample_rate", &Song::sample_rate);
-	kaba::declare_class_element("Song.tracks", &Song::tracks);
-	kaba::declare_class_element("Song.samples", &Song::samples);
-//	kaba::declare_class_element("Song.layers", &Song::layers);
-	kaba::declare_class_element("Song.bars", &Song::bars);
-	kaba::declare_class_element("Song.secret_data", &Song::secret_data);
-	kaba::declare_class_element("Song." + kaba::IDENTIFIER_SHARED_COUNT, &Song::_pointer_ref_counter);
-	kaba::link_external_class_func("Song.__init__", &Song::__init__);
-	kaba::link_external_virtual("Song.__delete__", &Song::__delete__, &af);
-	kaba::link_external_class_func("Song.add_track", &Song::add_track);
-	kaba::link_external_class_func("Song.delete_track", &Song::delete_track);
-	kaba::link_external_class_func("Song.range", &Song::range);
-	kaba::link_external_class_func("Song.layers", &Song::layers);
-	kaba::link_external_class_func("Song.add_bar", &Song::add_bar);
-	kaba::link_external_class_func("Song.add_pause", &Song::add_pause);
-	kaba::link_external_class_func("Song.edit_bar", &Song::edit_bar);
-	kaba::link_external_class_func("Song.delete_bar", &Song::delete_bar);
-	kaba::link_external_class_func("Song.add_sample", &Song::add_sample);
-	kaba::link_external_class_func("Song.delete_sample", &Song::delete_sample);
-	kaba::link_external_class_func("Song.time_track", &Song::time_track);
-	kaba::link_external_class_func("Song.undo", &Song::undo);
-	kaba::link_external_class_func("Song.redo", &Song::redo);
-	kaba::link_external_class_func("Song.reset_history", &Song::reset_history);
-	kaba::link_external_class_func("Song.begin_action_group", &Song::begin_action_group);
-	kaba::link_external_class_func("Song.end_action_group", &Song::end_action_group);
-	kaba::link_external_class_func("Song.get_time_str", &Song::get_time_str);
-	kaba::link_external_class_func("Song.get_time_str_fuzzy", &Song::get_time_str_fuzzy);
-	kaba::link_external_class_func("Song.get_time_str_long", &Song::get_time_str_long);
-
-	SongRenderer sr(nullptr);
-	kaba::declare_class_size("SongRenderer", sizeof(SongRenderer));
-	kaba::link_external_class_func("SongRenderer.set_range", &SongRenderer::set_range);
-	kaba::link_external_class_func("SongRenderer.set_loop", &SongRenderer::set_loop);
-	kaba::link_external_class_func("SongRenderer.render", &SongRenderer::render);
-	kaba::link_external_class_func("SongRenderer.__init__", &SongRenderer::__init__);
-	kaba::link_external_virtual("SongRenderer.__delete__", &SongRenderer::__delete__, &sr);
-	kaba::link_external_virtual("SongRenderer.read", &SongRenderer::read, &sr);
-	kaba::link_external_virtual("SongRenderer.reset", &SongRenderer::reset_state, &sr);
-	kaba::link_external_class_func("SongRenderer.range", &SongRenderer::range);
-	kaba::link_external_class_func("SongRenderer.get_pos", &SongRenderer::get_pos);
-	kaba::link_external_class_func("SongRenderer.set_pos", &SongRenderer::set_pos);
-	kaba::link_external_class_func("SongRenderer.get_beat_source", &SongRenderer::get_beat_source);
-
 	{
-	AudioInput input(Session::GLOBAL);
-	kaba::declare_class_size("AudioInput", sizeof(AudioInput));
-	kaba::declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
-	//kaba::declare_class_element("AudioInput.out", &AudioInput::out);
-	kaba::link_external_class_func("AudioInput.__init__", &AudioInput::__init__);
-	kaba::link_external_virtual("AudioInput.__delete__", &AudioInput::__delete__, &input);
-	kaba::link_external_class_func("AudioInput.start", &AudioInput::start);
-	kaba::link_external_class_func("AudioInput.stop",	 &AudioInput::stop);
-	kaba::link_external_class_func("AudioInput.is_capturing", &AudioInput::is_capturing);
-	kaba::link_external_class_func("AudioInput.sample_rate", &AudioInput::sample_rate);
-	kaba::link_external_class_func("AudioInput.samples_recorded", &AudioInput::samples_recorded);
-	//kaba::link_external_class_func("AudioInput.set_backup_mode", &AudioInput::set_backup_mode);
+		Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
+		kaba::declare_class_size("Song", sizeof(Song));
+		kaba::declare_class_element("Song.filename", &Song::filename);
+		kaba::declare_class_element("Song.tag", &Song::tags);
+		kaba::declare_class_element("Song.sample_rate", &Song::sample_rate);
+		kaba::declare_class_element("Song.tracks", &Song::tracks);
+		kaba::declare_class_element("Song.samples", &Song::samples);
+	//	kaba::declare_class_element("Song.layers", &Song::layers);
+		kaba::declare_class_element("Song.bars", &Song::bars);
+		kaba::declare_class_element("Song.secret_data", &Song::secret_data);
+		kaba::declare_class_element("Song." + kaba::IDENTIFIER_SHARED_COUNT, &Song::_pointer_ref_counter);
+		kaba::link_external_class_func("Song.__init__", &Song::__init__);
+		kaba::link_external_virtual("Song.__delete__", &Song::__delete__, &af);
+		kaba::link_external_class_func("Song.add_track", &Song::add_track);
+		kaba::link_external_class_func("Song.delete_track", &Song::delete_track);
+		kaba::link_external_class_func("Song.range", &Song::range);
+		kaba::link_external_class_func("Song.layers", &Song::layers);
+		kaba::link_external_class_func("Song.add_bar", &Song::add_bar);
+		kaba::link_external_class_func("Song.add_pause", &Song::add_pause);
+		kaba::link_external_class_func("Song.edit_bar", &Song::edit_bar);
+		kaba::link_external_class_func("Song.delete_bar", &Song::delete_bar);
+		kaba::link_external_class_func("Song.add_sample", &Song::add_sample);
+		kaba::link_external_class_func("Song.delete_sample", &Song::delete_sample);
+		kaba::link_external_class_func("Song.time_track", &Song::time_track);
+		kaba::link_external_class_func("Song.undo", &Song::undo);
+		kaba::link_external_class_func("Song.redo", &Song::redo);
+		kaba::link_external_class_func("Song.reset_history", &Song::reset_history);
+		kaba::link_external_class_func("Song.begin_action_group", &Song::begin_action_group);
+		kaba::link_external_class_func("Song.end_action_group", &Song::end_action_group);
+		kaba::link_external_class_func("Song.get_time_str", &Song::get_time_str);
+		kaba::link_external_class_func("Song.get_time_str_fuzzy", &Song::get_time_str_fuzzy);
+		kaba::link_external_class_func("Song.get_time_str_long", &Song::get_time_str_long);
 	}
 
 	{
-	AudioOutput stream(Session::GLOBAL);
-	kaba::declare_class_size("AudioOutput", sizeof(AudioOutput));
-	kaba::link_external_class_func("AudioOutput.__init__", &AudioOutput::__init__);
-	kaba::link_external_virtual("AudioOutput.__delete__", &AudioOutput::__delete__, &stream);
-	//kaba::link_external_class_func("AudioOutput.setSource", &AudioStream::setSource);
-	kaba::link_external_class_func("AudioOutput.start", &AudioOutput::start);
-	kaba::link_external_class_func("AudioOutput.stop", &AudioOutput::stop);
-	kaba::link_external_class_func("AudioOutput.is_playing", &AudioOutput::is_playing);
-	//kaba::link_external_class_func("AudioOutput.sample_rate", &OutputStream::sample_rate);
-	kaba::link_external_class_func("AudioOutput.get_volume", &AudioOutput::get_volume);
-	kaba::link_external_class_func("AudioOutput.set_volume", &AudioOutput::set_volume);
-	kaba::link_external_class_func("AudioOutput.samples_played", &AudioOutput::samples_played);
-	kaba::link_external_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
+		SongRenderer sr(nullptr);
+		kaba::declare_class_size("SongRenderer", sizeof(SongRenderer));
+		kaba::link_external_class_func("SongRenderer.set_range", &SongRenderer::set_range);
+		kaba::link_external_class_func("SongRenderer.set_loop", &SongRenderer::set_loop);
+		kaba::link_external_class_func("SongRenderer.render", &SongRenderer::render);
+		kaba::link_external_class_func("SongRenderer.__init__", &SongRenderer::__init__);
+		kaba::link_external_virtual("SongRenderer.__delete__", &SongRenderer::__delete__, &sr);
+		kaba::link_external_virtual("SongRenderer.read", &SongRenderer::read, &sr);
+		kaba::link_external_virtual("SongRenderer.reset", &SongRenderer::reset_state, &sr);
+		kaba::link_external_class_func("SongRenderer.range", &SongRenderer::range);
+		kaba::link_external_class_func("SongRenderer.get_pos", &SongRenderer::get_pos);
+		kaba::link_external_class_func("SongRenderer.set_pos", &SongRenderer::set_pos);
+		kaba::link_external_class_func("SongRenderer.get_beat_source", &SongRenderer::get_beat_source);
+	}
+
+	{
+		AudioInput input(Session::GLOBAL);
+		kaba::declare_class_size("AudioInput", sizeof(AudioInput));
+		kaba::declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
+		//kaba::declare_class_element("AudioInput.out", &AudioInput::out);
+		kaba::link_external_class_func("AudioInput.__init__", &AudioInput::__init__);
+		kaba::link_external_virtual("AudioInput.__delete__", &AudioInput::__delete__, &input);
+		kaba::link_external_class_func("AudioInput.start", &AudioInput::start);
+		kaba::link_external_class_func("AudioInput.stop",	 &AudioInput::stop);
+		kaba::link_external_class_func("AudioInput.is_capturing", &AudioInput::is_capturing);
+		kaba::link_external_class_func("AudioInput.sample_rate", &AudioInput::sample_rate);
+		kaba::link_external_class_func("AudioInput.samples_recorded", &AudioInput::samples_recorded);
+		//kaba::link_external_class_func("AudioInput.set_backup_mode", &AudioInput::set_backup_mode);
+	}
+
+	{
+		AudioOutput stream(Session::GLOBAL);
+		kaba::declare_class_size("AudioOutput", sizeof(AudioOutput));
+		kaba::link_external_class_func("AudioOutput.__init__", &AudioOutput::__init__);
+		kaba::link_external_virtual("AudioOutput.__delete__", &AudioOutput::__delete__, &stream);
+		//kaba::link_external_class_func("AudioOutput.setSource", &AudioStream::setSource);
+		kaba::link_external_class_func("AudioOutput.start", &AudioOutput::start);
+		kaba::link_external_class_func("AudioOutput.stop", &AudioOutput::stop);
+		kaba::link_external_class_func("AudioOutput.is_playing", &AudioOutput::is_playing);
+		//kaba::link_external_class_func("AudioOutput.sample_rate", &OutputStream::sample_rate);
+		kaba::link_external_class_func("AudioOutput.get_volume", &AudioOutput::get_volume);
+		kaba::link_external_class_func("AudioOutput.set_volume", &AudioOutput::set_volume);
+		kaba::link_external_class_func("AudioOutput.samples_played", &AudioOutput::samples_played);
+		kaba::link_external_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
 	}
 	
 	kaba::declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
@@ -636,24 +650,26 @@ void PluginManager::link_app_script_data() {
 
 	kaba::declare_class_element("MidiAccumulator.buffer", &MidiAccumulator::buffer);
 
-	SignalChain chain(Session::GLOBAL, "");
-	kaba::declare_class_size("SignalChain", sizeof(SignalChain));
-	kaba::link_external_class_func("SignalChain.__init__", &SignalChain::__init__);
-	kaba::link_external_virtual("SignalChain.__delete__", &SignalChain::__delete__, &chain);
-	kaba::link_external_virtual("SignalChain.reset_state", &SignalChain::reset_state, &chain);
-	kaba::link_external_virtual("SignalChain.command", &SignalChain::command, &chain);
-	kaba::link_external_class_func("SignalChain.__del_override__", &SignalChain::unregister);
-	kaba::link_external_class_func("SignalChain.start", &SignalChain::start);
-	kaba::link_external_class_func("SignalChain.stop", &SignalChain::stop);
-	kaba::link_external_class_func("SignalChain.add", &SignalChain::add);
-	kaba::link_external_class_func("SignalChain._add", &SignalChain::_add);
-	kaba::link_external_class_func("SignalChain.delete", &SignalChain::delete_module);
-	kaba::link_external_class_func("SignalChain.connect", &SignalChain::connect);
-	kaba::link_external_class_func("SignalChain.disconnect", &SignalChain::disconnect);
-	kaba::link_external_class_func("SignalChain.set_update_dt", &SignalChain::set_tick_dt);
-	kaba::link_external_class_func("SignalChain.set_buffer_size", &SignalChain::set_buffer_size);
-	kaba::link_external_class_func("SignalChain.is_prepared", &SignalChain::is_prepared);
-	kaba::link_external_class_func("SignalChain.is_active", &SignalChain::is_active);
+	{
+		SignalChain chain(Session::GLOBAL, "");
+		kaba::declare_class_size("SignalChain", sizeof(SignalChain));
+		kaba::link_external_class_func("SignalChain.__init__", &SignalChain::__init__);
+		kaba::link_external_virtual("SignalChain.__delete__", &SignalChain::__delete__, &chain);
+		kaba::link_external_virtual("SignalChain.reset_state", &SignalChain::reset_state, &chain);
+		kaba::link_external_virtual("SignalChain.command", &SignalChain::command, &chain);
+		kaba::link_external_class_func("SignalChain.__del_override__", &SignalChain::unregister);
+		kaba::link_external_class_func("SignalChain.start", &SignalChain::start);
+		kaba::link_external_class_func("SignalChain.stop", &SignalChain::stop);
+		kaba::link_external_class_func("SignalChain.add", &SignalChain::add);
+		kaba::link_external_class_func("SignalChain._add", &SignalChain::_add);
+		kaba::link_external_class_func("SignalChain.delete", &SignalChain::delete_module);
+		kaba::link_external_class_func("SignalChain.connect", &SignalChain::connect);
+		kaba::link_external_class_func("SignalChain.disconnect", &SignalChain::disconnect);
+		kaba::link_external_class_func("SignalChain.set_update_dt", &SignalChain::set_tick_dt);
+		kaba::link_external_class_func("SignalChain.set_buffer_size", &SignalChain::set_buffer_size);
+		kaba::link_external_class_func("SignalChain.is_prepared", &SignalChain::is_prepared);
+		kaba::link_external_class_func("SignalChain.is_active", &SignalChain::is_active);
+	}
 
 	kaba::declare_class_size("AudioView", sizeof(AudioView));
 	kaba::declare_class_element("AudioView.cam", &AudioView::cam);
@@ -741,46 +757,56 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("GridPainter.draw_time", &GridPainter::draw_time);
 	kaba::link_external_class_func("GridPainter.draw_time_numbers", &GridPainter::draw_time_numbers);
 
-	Slider slider;
-	kaba::declare_class_size("Slider", sizeof(Slider));
-	kaba::link_external_class_func("Slider.__init__", &Slider::__init_ext__);
-	kaba::link_external_virtual("Slider.__delete__", &Slider::__delete__, &slider);
-	kaba::link_external_class_func("Slider.get", &Slider::get);
-	kaba::link_external_class_func("Slider.set", &Slider::set);
+	{
+		Slider slider;
+		kaba::declare_class_size("Slider", sizeof(Slider));
+		kaba::link_external_class_func("Slider.__init__", &Slider::__init_ext__);
+		kaba::link_external_virtual("Slider.__delete__", &Slider::__delete__, &slider);
+		kaba::link_external_class_func("Slider.get", &Slider::get);
+		kaba::link_external_class_func("Slider.set", &Slider::set);
+	}
 
-	SongPlugin song_plugin;
-	kaba::declare_class_size("SongPlugin", sizeof(SongPlugin));
-	kaba::declare_class_element("SongPlugin.session", &SongPlugin::session);
-	kaba::declare_class_element("SongPlugin.song", &SongPlugin::song);
-	kaba::link_external_class_func("SongPlugin.__init__", &SongPlugin::__init__);
-	kaba::link_external_virtual("SongPlugin.__delete__", &SongPlugin::__delete__, &song_plugin);
-	kaba::link_external_virtual("SongPlugin.apply", &SongPlugin::apply, &song_plugin);
+	{
+		SongPlugin song_plugin;
+		kaba::declare_class_size("SongPlugin", sizeof(SongPlugin));
+		kaba::declare_class_element("SongPlugin.session", &SongPlugin::session);
+		kaba::declare_class_element("SongPlugin.song", &SongPlugin::song);
+		kaba::link_external_class_func("SongPlugin.__init__", &SongPlugin::__init__);
+		kaba::link_external_virtual("SongPlugin.__delete__", &SongPlugin::__delete__, &song_plugin);
+		kaba::link_external_virtual("SongPlugin.apply", &SongPlugin::apply, &song_plugin);
+	}
 
-	TsunamiPlugin tsunami_plugin;
-	kaba::declare_class_size("TsunamiPlugin", sizeof(TsunamiPlugin));
-	//kaba::declare_class_element("TsunamiPlugin.session", &TsunamiPlugin, session);
-	kaba::declare_class_element("TsunamiPlugin.args", &TsunamiPlugin::args);
-	kaba::link_external_class_func("TsunamiPlugin.__init__", &TsunamiPlugin::__init__);
-	kaba::link_external_virtual("TsunamiPlugin.__delete__", &TsunamiPlugin::__delete__, &tsunami_plugin);
-	kaba::link_external_virtual("TsunamiPlugin.on_start", &TsunamiPlugin::on_start, &tsunami_plugin);
-	kaba::link_external_virtual("TsunamiPlugin.on_stop", &TsunamiPlugin::on_stop, &tsunami_plugin);
-	kaba::link_external_virtual("TsunamiPlugin.on_draw_post", &TsunamiPlugin::on_draw_post, &tsunami_plugin);
-	kaba::link_external_class_func("TsunamiPlugin.stop", &TsunamiPlugin::stop_request);
+	{
+		TsunamiPlugin tsunami_plugin;
+		kaba::declare_class_size("TsunamiPlugin", sizeof(TsunamiPlugin));
+		//kaba::declare_class_element("TsunamiPlugin.session", &TsunamiPlugin, session);
+		kaba::declare_class_element("TsunamiPlugin.args", &TsunamiPlugin::args);
+		kaba::link_external_class_func("TsunamiPlugin.__init__", &TsunamiPlugin::__init__);
+		kaba::link_external_virtual("TsunamiPlugin.__delete__", &TsunamiPlugin::__delete__, &tsunami_plugin);
+		kaba::link_external_virtual("TsunamiPlugin.on_start", &TsunamiPlugin::on_start, &tsunami_plugin);
+		kaba::link_external_virtual("TsunamiPlugin.on_stop", &TsunamiPlugin::on_stop, &tsunami_plugin);
+		kaba::link_external_virtual("TsunamiPlugin.on_draw_post", &TsunamiPlugin::on_draw_post, &tsunami_plugin);
+		kaba::link_external_class_func("TsunamiPlugin.stop", &TsunamiPlugin::stop_request);
+	}
 
-	Progress *prog = new Progress("", nullptr);
-	kaba::declare_class_size("Progress", sizeof(Progress));
-	kaba::link_external_class_func("Progress.__init__", &Progress::__init__);
-	kaba::link_external_virtual("Progress.__delete__", &Progress::__delete__, prog);
-	kaba::link_external_class_func("Progress.set", &Progress::set_kaba);
-	delete prog;
+	{
+		Progress *prog = new Progress("", nullptr);
+		kaba::declare_class_size("Progress", sizeof(Progress));
+		kaba::link_external_class_func("Progress.__init__", &Progress::__init__);
+		kaba::link_external_virtual("Progress.__delete__", &Progress::__delete__, prog);
+		kaba::link_external_class_func("Progress.set", &Progress::set_kaba);
+		delete prog;
+	}
 
-	ProgressCancelable prog_can;
-	kaba::declare_class_size("ProgressX", sizeof(ProgressCancelable));
-	kaba::link_external_class_func("ProgressX.__init__", &ProgressCancelable::__init__);
-	kaba::link_external_virtual("ProgressX.__delete__", &ProgressCancelable::__delete__, &prog_can);
-	kaba::link_external_class_func("ProgressX.set", &ProgressCancelable::set_kaba);
-	kaba::link_external_class_func("ProgressX.cancel", &ProgressCancelable::cancel);
-	kaba::link_external_class_func("ProgressX.is_cancelled", &ProgressCancelable::is_cancelled);
+	{
+		ProgressCancelable prog_can;
+		kaba::declare_class_size("ProgressX", sizeof(ProgressCancelable));
+		kaba::link_external_class_func("ProgressX.__init__", &ProgressCancelable::__init__);
+		kaba::link_external_virtual("ProgressX.__delete__", &ProgressCancelable::__delete__, &prog_can);
+		kaba::link_external_class_func("ProgressX.set", &ProgressCancelable::set_kaba);
+		kaba::link_external_class_func("ProgressX.cancel", &ProgressCancelable::cancel);
+		kaba::link_external_class_func("ProgressX.is_cancelled", &ProgressCancelable::is_cancelled);
+	}
 }
 
 kaba::Class* PluginManager::get_class(const string &name) {

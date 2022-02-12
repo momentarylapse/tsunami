@@ -253,7 +253,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			m = CreateAudioVisualizer(session, a[1]);
 			auto *dlg = new hui::Window("", 800, 600);
 			dlg->add_grid("", 0, 0, "root");
-			ConfigPanel::_config_panel_parent_ = dlg;
+			ConfigPanel::_hidden_parent_ = dlg;
 			auto *p = m->create_panel();
 			dlg->embed(p, "root", 0,0);
 			hui::fly(dlg);

@@ -37,7 +37,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 		remove_control("header");
 	}
 
-	ConfigPanel::_config_panel_parent_ = this;
+	ConfigPanel::_hidden_parent_ = this;
 	p = module->create_panel();
 	if (p) {
 		embed(p, "content", 0, 0);

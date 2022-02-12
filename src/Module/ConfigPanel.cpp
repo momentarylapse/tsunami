@@ -16,17 +16,18 @@ extern const int CONFIG_PANEL_WIDTH;
 extern const int CONFIG_PANEL_HEIGHT;
 
 
-hui::Panel *ConfigPanel::_config_panel_parent_ = nullptr;
+hui::Panel *ConfigPanel::_hidden_parent_ = nullptr;
+bool ConfigPanel::_hidden_parent_check_ = true;
 
 ConfigPanel::ConfigPanel(Module *_c) : hui::Panel() {
 	static int count = 0;
 	set_id(format("config-panel-%d", count ++));
 
-	if (_config_panel_parent_)
-		set_parent(_config_panel_parent_);
-	else
+	if (_hidden_parent_)
+		set_parent(_hidden_parent_);
+	else if (_hidden_parent_check_)
 		msg_error("TODO: set _config_panel_parent_");
-	_config_panel_parent_ = nullptr;
+	_hidden_parent_ = nullptr;
 
 	ignore_change = false;
 	c = _c;

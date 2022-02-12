@@ -39,6 +39,8 @@ extern void require_main_thread(const string &msg); // hui
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 //extern void pulse_ignore_op(Session*, pa_operation*);
 
+
+// DeviceManager needs to be locked!
 bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
 	//msg_write("wait stream ready");
 	int n = 0;
@@ -108,7 +110,7 @@ void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) 
 	//stream->session->w("pulse: underflow\n");
 	if (STREAM_WARNINGS)
 		printf("pulse: underflow\n");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
 #endif

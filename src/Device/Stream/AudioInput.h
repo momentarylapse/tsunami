@@ -107,9 +107,9 @@ protected:
 	PaStream *portaudio_stream;
 #endif
 
-	bool _pulse_test_error(const string &msg);
 
 #if HAS_LIB_PULSEAUDIO
+	bool _pulse_test_error(const char *msg);
 	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 	static void pulse_input_notify_callback(pa_stream *p, void *userdata);
 	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
@@ -121,7 +121,7 @@ protected:
 	                                             const PaStreamCallbackTimeInfo* timeInfo,
 	                                             PaStreamCallbackFlags statusFlags,
 	                                             void *userData);
-	bool _portaudio_test_error(PaError err, const string &msg);
+	bool _portaudio_test_error(PaError err, const char *msg);
 #endif
 
 public:

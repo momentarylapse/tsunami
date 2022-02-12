@@ -83,12 +83,12 @@ private:
 
 #if HAS_LIB_PULSEAUDIO
 	pa_stream *pulse_stream;
-	bool _pulse_test_error(const string &msg);
+	bool _pulse_test_error(const char *msg);
 #endif
 
 #if HAS_LIB_PORTAUDIO
 	PaStream *portaudio_stream;
-	bool _portaudio_test_error(PaError err, const string &msg);
+	bool _portaudio_test_error(PaError err, const char *msg);
 #endif
 
 	int dev_sample_rate;

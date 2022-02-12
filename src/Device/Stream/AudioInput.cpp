@@ -458,18 +458,17 @@ bool AudioInput::start() {
 	return state == State::CAPTURING;
 }
 
-bool AudioInput::_pulse_test_error(const string &msg) {
 #if HAS_LIB_PULSEAUDIO
+bool AudioInput::_pulse_test_error(const char *msg) {
 	int e = pa_context_errno(session->device_manager->pulse_context);
 	if (e != 0)
 		session->e(format("%s (input): %s", msg, pa_strerror(e)));
 	return (e != 0);
-#endif
-	return false;
 }
+#endif
 
 #if HAS_LIB_PORTAUDIO
-bool AudioInput::_portaudio_test_error(PaError err, const string &msg) {
+bool AudioInput::_portaudio_test_error(PaError err, const char *msg) {
 	if (err != paNoError) {
 		session->e(format("%s: (input): %s", msg, Pa_GetErrorText(err)));
 		return true;

@@ -592,7 +592,7 @@ void AudioOutput::on_config() {
 }
 
 #if HAS_LIB_PULSEAUDIO
-bool AudioOutput::_pulse_test_error(const string &msg) {
+bool AudioOutput::_pulse_test_error(const char *msg) {
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0) {
 		session->e(format("AudioOutput: %s: %s", msg, pa_strerror(e)));
@@ -603,7 +603,7 @@ bool AudioOutput::_pulse_test_error(const string &msg) {
 #endif
 
 #if HAS_LIB_PORTAUDIO
-bool AudioOutput::_portaudio_test_error(PaError err, const string &msg) {
+bool AudioOutput::_portaudio_test_error(PaError err, const char *msg) {
 	if (err != paNoError) {
 		session->e(format("AudioOutput: %s: %s", msg, Pa_GetErrorText(err)));
 		return true;

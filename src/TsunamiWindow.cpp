@@ -286,24 +286,24 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	app->plugin_manager->add_plugins_to_menu(this);
 
-	if (hui::config.get_bool("Window.HeaderBar", false)) {
+	if (hui::config.get_bool("Window.HeaderBar", true)) {
 		_add_headerbar();
 		set_target(":header:");
-		add_button("", 0, 0, "new");
+		add_button("!ignorefocus", 0, 0, "new");
 		set_image("new", "hui:new");
-		add_button("Open", 1, 0, "open");
-		add_button("", 1, 0, "save");
+		add_button("!ignorefocus\\Open", 1, 0, "open");
+		add_button("!ignorefocus", 1, 0, "save");
 		set_image("save", "hui:save");
 
-		add_button("", 4, 1, "mode-edit-check");
+		add_button("!ignorefocus", 4, 1, "mode-edit-check");
 		set_image("mode-edit-check", "hui:edit");
-		add_button("!flat_", 3, 1, "record");
+		add_button("!ignorefocus", 3, 1, "record");
 		set_image("record", "hui:media-record");
-		add_button("!flat", 2, 1, "stop");
+		add_button("!flat,ignorefocus", 2, 1, "stop");
 		set_image("stop", "hui:media-stop");
-		add_button("!flat", 1, 1, "pause");
+		add_button("!flat,ignorefocus", 1, 1, "pause");
 		set_image("pause", "hui:media-pause");
-		add_button("!flat", 0, 1, "play");
+		add_button("!flat,ignorefocus", 0, 1, "play");
 		set_image("play", "hui:media-play");
 
 		set_target("");

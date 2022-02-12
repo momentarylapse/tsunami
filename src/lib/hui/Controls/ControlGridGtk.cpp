@@ -56,7 +56,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 
 void ControlGrid::remove_child(Control *child) {
 	msg_write("Grid.remove");
-	gtk_grid_remove(GTK_GRID(widget), child->widget);
+	gtk_grid_remove(GTK_GRID(widget), child->get_frame());
 }
 
 void ControlGrid::__set_option(const string &op, const string &value) {

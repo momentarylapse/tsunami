@@ -38,8 +38,8 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 }
 
 ControlTabControl::~ControlTabControl() {
-	gtk_widget_hide(widget);
-	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
+	/*gtk_widget_hide(widget);
+	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);*/
 }
 
 string ControlTabControl::get_string() {

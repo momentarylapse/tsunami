@@ -92,17 +92,17 @@ void Panel::_ClearPanel_() {
 		parent = nullptr;
 	}
 	msg_write("panel clear 2");
+	msg_right();
 	while (children.num > 0) {
 		Panel *p = children.pop();
 		delete(p);
 	}
+	msg_left();
 	msg_write("panel clear 3");
 
-	if (root_control) {
-		auto rr = root_control->widget;
+	if (root_control)
 		delete root_control;
-		//gtk_widget_unparent(rr);
-	}
+
 	msg_write("panel clear 4");
 	root_control = nullptr;
 

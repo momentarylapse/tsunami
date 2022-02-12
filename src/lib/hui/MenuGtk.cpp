@@ -116,7 +116,7 @@ void Menu::_add(Control *c) {
 }
 
 
-const char *get_gtk_icon_name(const string image) {
+const char *get_gtk_icon_name_base(const string image) {
 	if (image=="hui:open")	return "document-open";
 	if (image=="hui:new")		return "document-new";
 	if (image=="hui:save")	return "document-save";
@@ -204,6 +204,12 @@ const char *get_gtk_icon_name(const string image) {
 	return "";
 }
 
+string get_gtk_icon_name(const string _image) {
+	string image = _image.replace("-symbolic", "");
+	string post = "-symbolic"; //(_image.find("-symbolic", 0) >= 0) ? "-symbolic" : "";
+	return get_gtk_icon_name_base(image) + post;
+}
+
 HuiImage *get_image(const string &filename) {
 	for (HuiImage &m: _all_images_)
 		if (m.filename == filename)
@@ -289,16 +295,16 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 	if (image.head(4) == "hui:") {
 		// internal
 #if GTK_CHECK_VERSION(4,0,0)
-		return gtk_image_new_from_icon_name(get_gtk_icon_name(image));
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image).c_str());
 #else
-		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), (GtkIconSize)icon_size_gtk(size));
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image).c_str(), (GtkIconSize)icon_size_gtk(size));
 #endif
 	} else if (image.find(".") < 0) {
 		int _size = absolute_icon_size(size);
 		auto theme = get_hui_icon_theme();
 #if GTK_CHECK_VERSION(4,0,0)
 		//msg_write("SYMBOLIC IMAGE " + image);
-		//return gtk_image_new_from_icon_name(get_gtk_icon_name("hui:open"));
+		//return gtk_image_new_from_icon_name(get_gtk_icon_name("hui:open").c_str());
 
 		auto info = gtk_icon_theme_lookup_icon(theme, image.c_str(), nullptr, _size, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_SYMBOLIC);
 		if (!info) {
@@ -345,7 +351,7 @@ void *get_gtk_image_pixbuf(const string &image) {
 	if (image.head(4) == "hui:") {
 #if !GTK_CHECK_VERSION(4,0,0)
 		// internal
-		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image), 24, (GtkIconLookupFlags)0, nullptr);
+		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image).c_str(), 24, (GtkIconLookupFlags)0, nullptr);
 		if (pb){
 			GdkPixbuf *r = gdk_pixbuf_copy(pb);
 			g_object_unref(pb);

@@ -42,6 +42,7 @@ public:
 		Type type;
 		string text;
 		Array<string> responses;
+		bool operator==(const Message &o) const;
 	};
 
 	Array<Message> all(Session *session);
@@ -52,6 +53,7 @@ public:
 private:
 	void add_message(Session *session, Type type, const string &message, const Array<string> &responses);
 	Array<Message> messages;
+	Array<Message> blocked;
 };
 
 #endif /* LOG_H_ */

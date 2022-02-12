@@ -51,9 +51,31 @@ Array<Log::Message> Log::all(Session *session) {
 	return r;
 }
 
+bool Log::Message::operator==(const Log::Message &o) const {
+	return (session == o.session) and (type == o.type) and (text == o.text);
+}
+
 
 void Log::add_message(Session *session, Type type, const string &message, const Array<string> &responses) {
-	messages.add({session, type, message, responses});
+	Message m = {session, type, message, responses};
+	for (auto &b: blocked)
+		if (m == b)
+			return;
+
+	int count = 0;
+	for (auto &mm: messages.sub_ref(max(messages.num - 40, 0)))
+		if (m == mm) {
+			count ++;
+			if (count > 8) {
+				blocked.add(m);
+				hui::run_later(0.1f, [this, session, message] {
+					warn(session, format("message blocked: '%s'", message));
+				});
+				return;
+			}
+		}
+
+	messages.add(m);
 
 	if (allow_console_output) {
 		if (type == Type::ERROR) {

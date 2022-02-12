@@ -154,7 +154,16 @@ void ControlListView::on_click(double x, double y) {
 	int cell_x = 0, cell_y = 0;
 	panel->win->input.x = x;
 	panel->win->input.y = y;
-	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(widget), x, y, &path, nullptr, &cell_x, &cell_y)) {
+#if GTK_CHECK_VERSION(4,0,0)
+	// remove frame/bar
+	int tx, ty;
+	gtk_tree_view_convert_widget_to_bin_window_coords(GTK_TREE_VIEW(widget), x, y, &tx, &ty);
+	x = tx;
+	y = ty;
+#else
+	int tx = x, ty = y;
+#endif
+	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(widget), tx, ty, &path, nullptr, &cell_x, &cell_y)) {
 		gint *indices = gtk_tree_path_get_indices(path);
 		panel->win->input.row = indices[0];
 		gtk_tree_path_free(path);

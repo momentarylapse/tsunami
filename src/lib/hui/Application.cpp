@@ -135,12 +135,14 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 
 
 	// first, assume a local/non-installed version
-	directory = strip_dev_dirs(filename.parent());
+	directory = initial_working_directory; //strip_dev_dirs(filename.parent());
 	directory_static = directory << "static";
 
 #ifdef INSTALL_PREFIX
+	// our build system should define this:
 	Path prefix = INSTALL_PREFIX;
 #else
+	// oh no... fall-back
 	Path prefix = "/usr/local";
 #endif
 
@@ -149,7 +151,6 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 		if (filename.is_in(prefix) or (filename.str().find("/") < 0)) {
 			installed = true;
 			directory_static = prefix << "share" << app_name;
-		//} else if (f) {
 		}
 
 		if (installed) {

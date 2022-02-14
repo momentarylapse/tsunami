@@ -1,9 +1,9 @@
 BIN = ../tsunami
 CPP = g++
 prefix = /usr/local
-GLOBALFLAGS = -fno-omit-frame-pointer -O2 -g -std=c++17 -DHAS_LIB_GTK4=1 -DHAS_LIB_ZLIB=1 -DHAS_LIB_FFTW3=1 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=0 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=1 -DHAS_LIB_DL=1 -DHAS_LIB_GL=0 -D'INSTALL_PREFIX="$(prefix)"'
-CXXFLAGS = `pkg-config --cflags gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa portaudio-2.0 libunwind` $(GLOBALFLAGS)
-CXXFLAGSLINKING = -ldl `pkg-config --cflags --libs gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa portaudio-2.0 libunwind` $(GLOBALFLAGS)
+GLOBALFLAGS = -fno-omit-frame-pointer -O2 -g -std=c++17 -DHAS_LIB_GTK3=1 -DHAS_LIB_ZLIB=1 -DHAS_LIB_FFTW3=1 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=0 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=1 -DHAS_LIB_DL=1 -DHAS_LIB_GL=0 -D'INSTALL_PREFIX="$(prefix)"'
+CXXFLAGS = `pkg-config --cflags gtk+-3.0 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa portaudio-2.0 libunwind` $(GLOBALFLAGS)
+CXXFLAGSLINKING = -ldl `pkg-config --cflags --libs gtk+-3.0 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa portaudio-2.0 libunwind` $(GLOBALFLAGS)
 
 OBJ = Action/Bar/Action__ScaleData.o \
  Action/Bar/Action__ShiftData.o \

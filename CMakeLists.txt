@@ -460,14 +460,28 @@ set(SOURCE
 )
 
 find_package(PkgConfig REQUIRED)
-
-# gtk4 mandatory
-pkg_check_modules(GTK4 REQUIRED gtk4)
-include_directories(${GTK4_INCLUDE_DIRS})
-link_directories(${GTK4_LIBRARY_DIRS})
-list(APPEND DEPS ${GTK4_LIBRARIES})
-add_definitions(${GTK4_CFLAGS_OTHER})
-add_compile_definitions(HAS_LIB_GTK4=1)
+# gtk3|gtk4 mandatory
+set(GTK3_OR_GTK4 "gtk3" CACHE STRING "choose")
+message(STATUS ${GTK3_OR_GTK4})
+if(GTK3_OR_GTK4 STREQUAL "gtk3")
+	message(STATUS "GTK3!!!!!!!")
+	pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+	include_directories(${GTK3_INCLUDE_DIRS})
+	link_directories(${GTK3_LIBRARY_DIRS})
+	list(APPEND DEPS ${GTK3_LIBRARIES})
+	add_definitions(${GTK3_CFLAGS_OTHER})
+	add_compile_definitions(HAS_LIB_GTK3=1)
+endif()
+if(GTK3_OR_GTK4 STREQUAL "gtk4")
+	message(STATUS "GTK4!!!!!!!")
+	pkg_check_modules(GTK4 REQUIRED gtk4)
+	include_directories(${GTK4_INCLUDE_DIRS})
+	link_directories(${GTK4_LIBRARY_DIRS})
+	list(APPEND DEPS ${GTK4_LIBRARIES})
+	add_definitions(${GTK4_CFLAGS_OTHER})
+	add_compile_definitions(HAS_LIB_GTK4=1)
+endif()
+message(STATUS ${DEPS})
 
 # zlib mandatory
 pkg_check_modules(ZLIB REQUIRED zlib)

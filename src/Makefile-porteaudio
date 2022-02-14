@@ -1,9 +1,9 @@
 BIN = ../tsunami
 CPP = g++
-GLOBALFLAGS = -fno-omit-frame-pointer -O2 -g -std=c++17 -DHAS_LIB_GTK4=1 -DHAS_LIB_ZLIB=1 -DHAS_LIB_FFTW3=1 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=0 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=1 -DHAS_LIB_DL=1 -DHAS_LIB_GL=0
-CXXFLAGS =  `pkg-config --cflags gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa` $(GLOBALFLAGS)
-CXXFLAGSLINKING = -lportaudio -lunwind -ldl `pkg-config --cflags --libs gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa` $(GLOBALFLAGS)
 prefix = /usr/local
+GLOBALFLAGS = -fno-omit-frame-pointer -O2 -g -std=c++17 -D'INSTALL_PREFIX="$(prefix)"' -DHAS_LIB_GTK4=1 -DHAS_LIB_ZLIB=1 -DHAS_LIB_FFTW3=1 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=0 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=1 -DHAS_LIB_DL=1 -DHAS_LIB_GL=0
+CXXFLAGS =  `pkg-config --cflags gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa libunwind` $(GLOBALFLAGS)
+CXXFLAGSLINKING = -lportaudio -ldl `pkg-config --cflags --libs gtk4 zlib fftw3f ogg vorbis vorbisfile vorbisenc flac alsa libunwind` $(GLOBALFLAGS)
 
 OBJ = Action/Bar/Action__ScaleData.o \
  Action/Bar/Action__ShiftData.o \
@@ -1040,7 +1040,7 @@ lib/hui/window_control_gtk.o : lib/hui/window_control_gtk.cpp lib/hui/Controls/C
 lib/hui/window_control_win.o : lib/hui/window_control_win.cpp lib/hui/hui.h lib/hui/common.h lib/config.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/base/pointer.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h
 	$(CPP) -c lib/hui/window_control_win.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/WindowGtk.o : lib/hui/WindowGtk.cpp lib/hui/Controls/Control.h lib/image/image.h lib/config.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/image/color.h lib/hui/common.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/hui/language.h lib/hui/hui.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/base/pointer.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h lib/hui/internal.h
+lib/hui/WindowGtk.o : lib/hui/WindowGtk.cpp lib/hui/Controls/Control.h lib/image/image.h lib/config.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/image/color.h lib/hui/common.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/hui/language.h lib/hui/Controls/ControlHeaderBar.h lib/hui/hui.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/base/pointer.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h lib/hui/internal.h
 	$(CPP) -c lib/hui/WindowGtk.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/WindowWin.o : lib/hui/WindowWin.cpp lib/hui/hui.h lib/hui/common.h lib/config.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/file/path.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/math/vec2.h lib/math/math.h lib/hui/Menu.h lib/hui/Panel.h lib/base/pointer.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h

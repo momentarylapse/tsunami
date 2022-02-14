@@ -58,7 +58,9 @@ void ControlGrid::add(Control *child, int x, int y) {
 
 void ControlGrid::remove_child(Control *child) {
 	DBDEL_X("Grid.remove");
+#if GTK_CHECK_VERSION(4,0,0)
 	gtk_grid_remove(GTK_GRID(widget), child->get_frame());
+#endif
 }
 
 void ControlGrid::__set_option(const string &op, const string &value) {

@@ -191,15 +191,9 @@ void DynamicArray::simple_assign(const DynamicArray *a)
 }
 
 void DynamicArray::exchange(DynamicArray &a) {
-	int tnum = num;
-	num = a.num;
-	a.num = tnum;
-	void *tdata = data;
-	data = a.data;
-	a.data = tdata;
-	int tall = allocated;
-	allocated = a.allocated;
-	a.allocated = tall;
+	std::swap(num, a.num);
+	std::swap(data, a.data);
+	std::swap(allocated, a.allocated);
 }
 
 void DynamicArray::simple_clear() {

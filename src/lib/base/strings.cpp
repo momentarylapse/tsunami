@@ -64,6 +64,7 @@ bytes::bytes(const bytes &s) {
 bytes::bytes(bytes &&s) {
 	init(sizeof(unsigned char));
 	exchange(s);
+	s.clear();
 }
 
 void bytes::__init__() {
@@ -72,6 +73,11 @@ void bytes::__init__() {
 
 bytes::~bytes() {
 	clear();
+}
+
+void bytes::operator = (bytes &&s) {
+	exchange(s);
+	s.clear();
 }
 
 bool bytes::operator == (const bytes &s) const {

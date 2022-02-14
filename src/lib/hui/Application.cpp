@@ -138,18 +138,17 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 	directory = strip_dev_dirs(filename.parent());
 	directory_static = directory << "static";
 
+#ifdef INSTALL_PREFIX
+	Path prefix = INSTALL_PREFIX;
+#else
+	Path prefix = "/usr/local";
+#endif
 
 	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 		// installed version?
-		if (filename.is_in("/usr/local") or (filename.str().find("/") < 0)) {
+		if (filename.is_in(prefix) or (filename.str().find("/") < 0)) {
 			installed = true;
-			directory_static = Path("/usr/local/share") << app_name;
-		} else if (filename.is_in("/usr")) {
-			installed = true;
-			directory_static = Path("/usr/share") << app_name;
-		} else if (filename.is_in("/opt")) {
-			installed = true;
-			directory_static = Path("/opt") << app_name;
+			directory_static = prefix << "share" << app_name;
 		//} else if (f) {
 		}
 

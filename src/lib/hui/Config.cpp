@@ -116,17 +116,25 @@ bool Configuration::load(const Path &filename) {
 		} else {
 			// new format
 			f->set_pos(0);
+			string _namespace;
 			while (!f->end()) {
 				string s = f->read_str();
 				if (s.num == 0)
 					continue;
+
 				if (s[0] == '#') {
 					comments.add(s);
-					continue;
-				}
-				int p = s.find("=");
-				if (p >= 0) {
-					map.set(s.head(p).replace(" ", ""), _parse_value(s.sub(p+1)));
+				} else if (s[0] == '[') {
+					_namespace = s.replace("[", "").replace("]", "").trim();
+				} else {
+					int p = s.find("=");
+					if (p >= 0) {
+						string key = s.head(p).trim();
+						if (_namespace.num > 0)
+							key = _namespace + "." + key;
+						string value = _parse_value(s.sub(p+1));
+						map.set(key, value);
+					}
 				}
 			}
 		}

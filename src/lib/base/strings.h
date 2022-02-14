@@ -40,8 +40,7 @@ class bytes : public Array<char> {
 	// operators
 	void _cdecl operator = (const bytes &s)
 	{	simple_assign(&s);	}
-	void _cdecl operator = (bytes &&s)
-	{	exchange(s);	}
+	void _cdecl operator = (bytes &&s);
 	void _cdecl operator += (const bytes &s)
 	{	simple_append(&s);	}
 	bytes _cdecl operator + (const bytes &s) const

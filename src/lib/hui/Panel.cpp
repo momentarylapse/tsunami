@@ -40,7 +40,9 @@ Panel::Panel() {
 
 	unique_id = current_uid ++;
 
+#if GTK_CHECK_VERSION(4,0,0)
 	action_group = g_simple_action_group_new();
+#endif
 
 	set_target("");
 
@@ -638,6 +640,7 @@ color Panel::get_color(const string &_id) {
 
 // might be called from menus in preparation
 GAction *panel_get_action(Panel *panel, const string &id) {
+#if GTK_CHECK_VERSION(4,0,0)
 	if (!panel) {
 		//msg_error("NO PANEL..." + id);
 		return nullptr;
@@ -649,6 +652,9 @@ GAction *panel_get_action(Panel *panel, const string &id) {
 	}
 
 	//return panel->win->_get_action(id);
+#else
+	return nullptr;
+#endif
 }
 
 // switch control to usable/unusable
@@ -811,6 +817,7 @@ GAction *Panel::_get_action(const string &id) {
 void Panel::_connect_menu_to_panel(Menu *menu) {
 	menu->set_panel(this);
 
+#if GTK_CHECK_VERSION(4,0,0)
 	for (auto c: menu->get_all_controls()) {
 		if (c->type == MENU_ITEM_TOGGLE) {
 			_try_add_action_(c->id, true);
@@ -828,6 +835,7 @@ void Panel::_connect_menu_to_panel(Menu *menu) {
 			//enable(c->id, false);
 		}
 	}
+#endif
 }
 
 string decode_gtk_action(const string &name) {

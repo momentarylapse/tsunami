@@ -329,7 +329,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	if (hui::config.get_bool("View.EventCompression", true) == false)
 		set_options("area", "noeventcompression");
 
-	//set_maximized(maximized);
+	set_maximized(maximized);
 
 	// events
 	event("hui:close", [this]{ on_exit(); });

@@ -12,6 +12,9 @@
 
 namespace hui {
 
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
+
 const int FRAME_INDENT = 0; //20;
 
 void on_gtk_expander_expand(GObject* object, GParamSpec *param_spec, gpointer user_data) {
@@ -63,8 +66,17 @@ void ControlExpander::add(Control *child, int x, int y) {
 #else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 #endif
-	children.add(child);
-	child->parent = this;
+	control_link(this, child);
+}
+
+void ControlExpander::remove_child(Control *child) {
+	GtkWidget *child_widget = child->get_frame();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_expander_set_child(GTK_EXPANDER(widget), nullptr);
+#else
+	gtk_container_remove(GTK_CONTAINER(widget), child_widget);
+#endif
+	control_unlink(this, child);
 }
 
 };

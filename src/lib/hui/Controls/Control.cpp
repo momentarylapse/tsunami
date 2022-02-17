@@ -20,6 +20,20 @@ void DBDEL_DONE();
 
 GAction *panel_get_action(Panel *panel, const string &id);
 
+void control_link(Control *parent, Control *child) {
+	//DBDEL_X("link: " + parent->id + " << " + child->id);
+	parent->children.add(child);
+	child->parent = parent;
+}
+
+void control_unlink(Control *parent, Control *child) {
+	DBDEL_X("unlink: " + parent->id + " << " + child->id);
+	for (int i=0; i<parent->children.num; i++)
+		if (parent->children[i] == child)
+			parent->children.erase(i);
+	child->parent = nullptr;
+}
+
 // safety feature... in case we delete the control while it notifies us
 struct _HuiNotifyStackElement {
 	Control *c;
@@ -75,7 +89,41 @@ void unset_widgets_rec(Control *c) {
 	c->widget = nullptr;
 }
 
+
+void control_delete_rec(Control *c) {
+	DBDEL_START(i2s(c->type), c->id, c);
+	notify_set_del(c);
+
+	static int control_delete_level = 0;
+
+//	if (c->widget)
+//		g_signal_handlers_disconnect_by_data(c->widget, c);
+
+	DBDEL_X("children");
+	auto _children = c->children;
+	control_delete_level ++;
+	for (auto child: _children)
+		control_delete_rec(child);
+	control_delete_level --;
+
+
+	if (c->parent and (control_delete_level == 0)) {
+		DBDEL_X("parent " + c->parent->id + " " + i2s(c->parent->type));
+		c->parent->remove_child(c);
+	}
+
+
+	c->widget = nullptr;
+	c->frame = nullptr;
+
+	DBDEL_X("rm");
+
+	delete c;
+	DBDEL_DONE();
+}
+
 Control::~Control() {
+#if 0
 	DBDEL_START(i2s(type), id, this);
 	notify_set_del(this);
 
@@ -87,20 +135,33 @@ Control::~Control() {
 	//unset_widgets_rec(this);
 #endif
 	DBDEL_X("children");
-	while (children.num > 0) {
-		Control *c = children.pop();
+	auto _children = children;
+	for (auto c: _children)
 		delete c;
-	}
-	DBDEL_X("parent");
-#if GTK_CHECK_VERSION(4,0,0)
+/*#if GTK_CHECK_VERSION(4,0,0)
 	if (parent) {
 		for (int i=0;i<parent->children.num;i++)
 			if (parent->children[i] == this)
 				parent->children.erase(i);
 	}
-#endif
-	DBDEL_X("remove");
+#endif*/
+	//DBDEL_X("remove");
 
+
+
+	if (parent) {
+		DBDEL_X("parent " + parent->id + " " + i2s(parent->type));
+		if (parent->type == CONTROL_GRID)
+			((ControlGrid*)parent)->ControlGrid::remove_child(this);
+		else
+			parent->remove_child(this);
+	}
+
+
+	widget = nullptr;
+	frame = nullptr;
+
+#if 0
 
 	//msg_write("widget: " + p2s(widget));
 #ifdef HUI_API_GTK
@@ -123,7 +184,9 @@ Control::~Control() {
 	widget = nullptr;
 	//unset_widgets_rec(this);
 #endif
+#endif
 	DBDEL_DONE();
+#endif
 }
 
 #ifdef HUI_API_GTK

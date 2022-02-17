@@ -12,6 +12,9 @@
 
 namespace hui {
 
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
+
 ControlHeaderBar::ControlHeaderBar(const string &title, const string &id, Panel *_panel) :
 	Control(CONTROL_HEADER_BAR, id)
 {
@@ -33,13 +36,13 @@ void ControlHeaderBar::add(Control *child, int x, int y) {
 		gtk_header_bar_pack_end(GTK_HEADER_BAR(widget), child_widget);
 	else
 		gtk_header_bar_pack_start(GTK_HEADER_BAR(widget), child_widget);
-	child->parent = this;
-	children.add(child);
+	control_link(this, child);
 }
 
 void ControlHeaderBar::remove_child(Control *child) {
 	msg_write("Header.remove");
 	//gtk_grid_remove(GTK_GRID(widget), child->widget);
+	control_unlink(this, child);
 }
 
 void ControlHeaderBar::__set_option(const string &op, const string &value) {

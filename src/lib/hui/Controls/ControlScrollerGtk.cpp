@@ -11,6 +11,8 @@
 
 namespace hui
 {
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
 
 ControlScroller::ControlScroller(const string &title, const string &id) :
 	Control(CONTROL_SCROLLER, id)
@@ -39,8 +41,7 @@ void ControlScroller::add(Control *child, int x, int y) {
 #else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 #endif
-	children.add(child);
-	child->parent = this;
+	control_link(this, child);
 }
 
 void ControlScroller::remove_child(Control *child) {
@@ -48,8 +49,10 @@ void ControlScroller::remove_child(Control *child) {
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(widget), nullptr);
 #else
-	//gtk_container_add(GTK_CONTAINER(widget), child_widget);
+	GtkWidget *child_widget = child->get_frame();
+	gtk_container_remove(GTK_CONTAINER(widget), child_widget);
 #endif
+	control_unlink(this, child);
 }
 
 

@@ -72,7 +72,7 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 #endif
 	} else if (op == "angle") {
 #if GTK_CHECK_VERSION(4,0,0)
-		set_style_for_widget(widget, id, format("{transform: rotate(%.1fdeg);}", value._float()));
+		set_style_for_widget(widget, id, format("{transform: rotate(%.1fdeg);}", -value._float()));
 #else
 		gtk_label_set_angle(GTK_LABEL(widget), value._float());
 #endif

@@ -10,6 +10,7 @@
 
 #include "../../image/image.h"
 #include "../common.h"
+#include "../Event.h"
 #include "../language.h"
 #include <functional>
 
@@ -29,7 +30,7 @@ string option_value(const string &options, const string &key);
 bool val_is_positive(const string &val, bool def = false);
 Array<std::pair<string, string>> parse_options(const string &options);
 
-class Control {
+class Control : public EventHandler {
 public:
 	Control(int _type, const string &_id);
 	virtual ~Control();

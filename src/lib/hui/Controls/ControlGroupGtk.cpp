@@ -12,6 +12,9 @@
 
 namespace hui {
 
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
+
 const int FRAME_INDENT = 0; //20;
 
 ControlGroup::ControlGroup(const string &title, const string &id) :
@@ -46,8 +49,7 @@ void ControlGroup::add(Control *child, int x, int y) {
 #else
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 #endif
-	children.add(child);
-	child->parent = this;
+	control_link(this, child);
 }
 
 void ControlGroup::remove_child(Control *child) {
@@ -55,8 +57,10 @@ void ControlGroup::remove_child(Control *child) {
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_frame_set_child(GTK_FRAME(widget), nullptr);
 #else
-	//gtk_container_add(GTK_CONTAINER(widget), child_widget);
+	GtkWidget *child_widget = child->get_frame();
+	gtk_container_remove(GTK_CONTAINER(widget), child_widget);
 #endif
+	control_unlink(this, child);
 }
 
 };

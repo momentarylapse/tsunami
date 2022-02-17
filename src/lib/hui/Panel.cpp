@@ -70,7 +70,7 @@ void Panel::set_parent(Panel *_parent) {
 		_set_win(parent->win);
 }
 
-#define DEBUG_CONTROLS 0
+#define DEBUG_CONTROLS 1
 
 void DBDEL_START(const string &type, const string &id, void *p) {
 #if DEBUG_CONTROLS
@@ -92,6 +92,9 @@ void DBDEL_DONE() {
 #endif
 }
 
+
+void control_delete_rec(Control *c);
+
 // might be executed repeatedly
 void Panel::_ClearPanel_() {
 	DBDEL_START("Panel", id, this);
@@ -106,6 +109,8 @@ void Panel::_ClearPanel_() {
 	}
 	DBDEL_X("children");
 	msg_right();
+	// make sure to remove child-panels first (otherwise their widgets would get deleted recursively)
+	// Controls are sometimes doubly-owned...
 	while (children.num > 0) {
 		Panel *p = children.pop();
 		delete(p);
@@ -114,7 +119,7 @@ void Panel::_ClearPanel_() {
 	DBDEL_X("root");
 
 	if (root_control)
-		delete root_control;
+		control_delete_rec(root_control);
 
 	DBDEL_X("x");
 	root_control = nullptr;
@@ -452,12 +457,14 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	children.add(panel);
 
 	Panel* orig = panel->root_control->panel;
+	if (orig != panel)
+		msg_error("hmmm, something's fishy..." + id + " : " + panel->id);
 
 	set_target(parent_id);
 	if (parent_id.num > 0 and !_get_control_(parent_id))
 		msg_error(parent_id + " not found...embed");
 	_insert_control_(panel->root_control, x, y);
-	panel->root_control->panel = orig;//panel;
+	panel->root_control->panel = panel;
 
 #if GTK_CHECK_VERSION(4,0,0)
 	//msg_error("ATTACH ACTION GROUP  " + p2s(panel));

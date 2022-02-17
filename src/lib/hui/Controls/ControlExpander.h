@@ -10,11 +10,9 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class ControlExpander : public Control
-{
+class ControlExpander : public Control {
 public:
 	ControlExpander(const string &text, const string &id);
 
@@ -23,6 +21,7 @@ public:
 	bool is_expanded(int row) override;
 
 	void add(Control *child, int x, int y) override;
+	void remove_child(Control *child) override;
 };
 
 };

@@ -14,6 +14,10 @@ namespace hui {
 
 const int FRAME_MARGIN = 8;
 
+
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
+
 void DBDEL_X(const string &m);
 
 ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
@@ -36,8 +40,7 @@ void ControlGrid::add(Control *child, int x, int y) {
 	}
 	GtkWidget *child_widget = child->get_frame();
 	gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
-	child->parent = this;
-	children.add(child);
+	control_link(this, child);
 
 	if (button_bar) {
 		int width, height;
@@ -58,9 +61,14 @@ void ControlGrid::add(Control *child, int x, int y) {
 
 void ControlGrid::remove_child(Control *child) {
 	DBDEL_X("Grid.remove");
+	auto child_widget = child->get_frame();
+	msg_write(p2s(widget) + "  --  " + p2s(child_widget));
 #if GTK_CHECK_VERSION(4,0,0)
-	gtk_grid_remove(GTK_GRID(widget), child->get_frame());
+	gtk_grid_remove(GTK_GRID(widget), child_widget);
+#else
+	gtk_container_remove(GTK_CONTAINER(widget), child_widget);
 #endif
+	control_unlink(this, child);
 }
 
 void ControlGrid::__set_option(const string &op, const string &value) {

@@ -174,7 +174,7 @@ public:
 		string name;
 	};
 	Array<SizeGroup> size_groups;
-protected:
+//protected:
 	void _insert_control_(Control *c, int x, int y);
 	int desired_width, desired_height;
 #endif

@@ -118,7 +118,7 @@ void control_delete_rec(Control *c) {
 
 	DBDEL_X("rm");
 
-	delete c;
+	//delete c;
 	DBDEL_DONE();
 }
 
@@ -563,9 +563,9 @@ void Control::notify(const string &message, bool is_default) {
 void Control::apply_foreach(const string &_id, std::function<void(Control*)> f) {
 	if ((id == _id) or (_id == "*"))
 		f(this);
-	for (Control *c: children)
-		if (c->panel == panel)
-			c->apply_foreach(_id, f);
+	for (int i=0; i<children.num; i++) // f might delete a child...!
+		if (children[i]->panel == panel)
+			children[i]->apply_foreach(_id, f);
 }
 
 void Control::_set_css(const string &css) {

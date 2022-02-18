@@ -10,8 +10,11 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
+
+void control_link(Control *parent, Control *child);
+void control_unlink(Control *parent, Control *child);
+void control_delete_rec(Control *c);
 
 void on_gtk_tab_control_switch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data) {
 	auto c = reinterpret_cast<ControlTabControl*>(data);
@@ -65,10 +68,11 @@ void ControlTabControl::__add_string(const string &str) {
 
 void ControlTabControl::__remove_string(int row) {
 	if (row >= 0 and row < pages.num){
-		delete pages[row];
+		control_delete_rec(pages[row]);
 		pages.erase(row);
+		boxes.erase(row);
+		gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 	}
-	gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 }
 
 void ControlTabControl::__change_string(int row, const string& str) {
@@ -78,12 +82,12 @@ void ControlTabControl::__change_string(int row, const string& str) {
 
 void ControlTabControl::addPage(const string &str) {
 	GtkWidget *inside;
-#if GTK_CHECK_VERSION(3,0,0)
+#if !GTK_CHECK_VERSION(3,0,0)
+	ksdfkjsdhf
+#endif
 	inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	boxes.add(inside);
-#else
-	inside = gtk_hbox_new(true, 0);
-#endif
+	pages.add(nullptr);
 	gtk_box_set_homogeneous(GTK_BOX(inside), true);
 	gtk_widget_show(inside);
 	GtkWidget *label = gtk_label_new(sys_str(str));
@@ -91,8 +95,10 @@ void ControlTabControl::addPage(const string &str) {
 }
 
 void ControlTabControl::add(Control *child, int x, int y) {
-	if (x >= pages.num)
-		pages.resize(x + 1);
+	if (x < 0 or x >= pages.num) {
+		msg_error("TabControl.add: invalid page number");
+		return;
+	}
 	if (pages[x])
 		msg_error("overwriting existing tab page... in " + id);
 	pages[x] = child;
@@ -101,15 +107,33 @@ void ControlTabControl::add(Control *child, int x, int y) {
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_box_append(GTK_BOX(boxes[x]), child_widget);
 #else
-	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
-	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
+	GtkWidget *page_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
+	gtk_container_add(GTK_CONTAINER(page_widget), child_widget);
 #endif
 #if !GTK_CHECK_VERSION(4,0,0)
 	if (panel)
-		gtk_container_set_border_width(GTK_CONTAINER(target_widget), panel->spacing);
+		gtk_container_set_border_width(GTK_CONTAINER(page_widget), panel->spacing);
 #endif
-	children.add(child);
-	child->parent = this;
+	control_link(this, child);
+}
+
+void ControlTabControl::remove_child(Control *child) {
+	int index = pages.find(child);
+	if (index < 0) {
+		msg_error("TabControl:.remove child: child not found");
+		return;
+	}
+
+	GtkWidget *child_widget = child->get_frame();
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_box_remove(GTK_BOX(boxes[index]), child_widget);
+#else
+	GtkWidget *page_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), index);
+	gtk_container_remove(GTK_CONTAINER(page_widget), child_widget);
+#endif
+	pages[index] = nullptr;
+	boxes[index] = nullptr;
+	control_unlink(this, child);
 }
 
 void ControlTabControl::__set_option(const string &op, const string &value) {

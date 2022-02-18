@@ -20,6 +20,11 @@ void control_unlink(Control *parent, Control *child);
 
 void DBDEL_X(const string &m);
 
+/*void on_gtk_destroy(GtkWidget *w, void *p) {
+	auto c = (Control*)p;
+	msg_write(format("DES  %s   c=%s  w=%s", c->id, p2s(c), p2s(w)));
+}*/
+
 ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_GRID, id)
 {
@@ -30,6 +35,8 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->spacing);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->spacing);
 	set_options(get_option_from_title(title));
+
+	//g_signal_connect(G_OBJECT(widget), "destroy", G_CALLBACK(&on_gtk_destroy), this);
 }
 
 void ControlGrid::add(Control *child, int x, int y) {
@@ -41,6 +48,9 @@ void ControlGrid::add(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
 	control_link(this, child);
+
+
+	DBDEL_X(format("Grid.add  %s  cw=%s", child->id, p2s(child->widget)));
 
 	if (button_bar) {
 		int width, height;
@@ -60,9 +70,8 @@ void ControlGrid::add(Control *child, int x, int y) {
 }
 
 void ControlGrid::remove_child(Control *child) {
-	DBDEL_X("Grid.remove");
+	DBDEL_X(format("Grid.remove  %s  cw=%s", child->id, p2s(child->widget)));
 	auto child_widget = child->get_frame();
-	msg_write(p2s(widget) + "  --  " + p2s(child_widget));
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_grid_remove(GTK_GRID(widget), child_widget);
 #else

@@ -113,9 +113,11 @@ void Panel::_insert_control_(Control *c, int x, int y) {
 #endif
 		}
 	}
+#if !GTK_CHECK_VERSION(4,0,0)
 	if (frame != c->widget)
 		gtk_widget_show(frame);
 	gtk_widget_show(c->widget);
+#endif
 	c->enabled = true;
 }
 

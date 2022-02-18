@@ -28,6 +28,7 @@ public:
 	void __set_option(const string &op, const string &value);
 
 	void add(Control *child, int x, int y) override;
+	void remove_child(Control *child) override;
 	void addPage(const string &str);
 
 	int cur_page;

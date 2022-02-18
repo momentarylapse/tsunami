@@ -70,7 +70,7 @@ void Panel::set_parent(Panel *_parent) {
 		_set_win(parent->win);
 }
 
-#define DEBUG_CONTROLS 1
+#define DEBUG_CONTROLS 0
 
 void DBDEL_START(const string &type, const string &id, void *p) {
 #if DEBUG_CONTROLS
@@ -764,7 +764,7 @@ bool Panel::is_revealed(const string &_id) {
 
 void Panel::delete_control(const string &_id) {
 	apply_foreach(_id, [](Control *c) {
-		delete c;
+		control_delete_rec(c);
 	});
 }
 

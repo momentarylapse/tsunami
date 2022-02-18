@@ -42,6 +42,7 @@ ToolItemMenuButton::ToolItemMenuButton(const string &title, Menu *menu, const st
 
 	auto mb = gtk_menu_button_new();
 	gtk_grid_attach(GTK_GRID(frame), mb, 1, 0, 1, 1);
+	gtk_widget_set_focusable(mb, false);
 
 	if (menu) {
 		menu->set_panel(panel);

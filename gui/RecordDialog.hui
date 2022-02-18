@@ -14,10 +14,10 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 			Grid ? "" vertical
 				Label time "0:00"
 				Grid ? "" homogenousx
-					Button start "" flat huge expandx image=hui:media-record "tooltip=Start recording"
-					Button pause "" flat huge image=hui:media-pause "tooltip=Pause/continue recording"
-					Button dump "" flat huge image=hui:delete "tooltip=Dump current recording" danger
-					Button new_version "" flat huge image=hui:new "tooltip=Start new version"
+					Button start "" flat big expandx image=hui:media-record "tooltip=Start recording"
+					Button pause "" flat big image=hui:media-pause "tooltip=Pause/continue recording"
+					Button dump "" flat big image=hui:delete "tooltip=Dump current recording" danger
+					Button new_version "" flat big image=hui:new "tooltip=Start new version"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel danger
 			Button /ok "OK" image=hui:ok default important

@@ -248,9 +248,9 @@ int absolute_icon_size(IconSize s) {
 	if (s == IconSize::HUGE)
 		return 48;
 	if (s == IconSize::TOOLBAR_LARGE)
-		return 32;
+		return 24;//32;
 	if (s == IconSize::TOOLBAR_SMALL)
-		return 24;
+		return 16;
 	return s;
 }
 
@@ -295,7 +295,9 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 	if (image.head(4) == "hui:") {
 		// internal
 #if GTK_CHECK_VERSION(4,0,0)
-		return gtk_image_new_from_icon_name(get_gtk_icon_name(image).c_str());
+		auto iii = gtk_image_new_from_icon_name(get_gtk_icon_name(image).c_str());
+		gtk_image_set_pixel_size(GTK_IMAGE(iii), absolute_icon_size(size));
+		return iii;
 #else
 		return gtk_image_new_from_icon_name(get_gtk_icon_name(image).c_str(), (GtkIconSize)icon_size_gtk(size));
 #endif

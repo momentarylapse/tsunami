@@ -5617,7 +5617,7 @@ image=hui:cancel,danger
 0
 Button
 ok
-image=hui:ok,default,important
+image=hui:ok,important
 1
 0
 0

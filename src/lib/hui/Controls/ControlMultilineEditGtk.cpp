@@ -12,8 +12,10 @@
 
 namespace hui
 {
-
-#if !GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(3,24,0)
+gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
+void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
+#else
 gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 #endif
@@ -90,16 +92,25 @@ void ControlMultilineEdit::set_tab_size(int tab_size) {
 
 void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 	if (op == "handlekeys") {
-#if GTK_CHECK_VERSION(4,0,0)
-		msg_error("MultilineEdit.handlekeys");
-#else
 		handle_keys = true;
+
+#if GTK_CHECK_VERSION(4,0,0)
+		auto handler_key = gtk_event_controller_key_new();
+		gtk_widget_add_controller(widget, handler_key);
+		g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
+		g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
+#elif GTK_CHECK_VERSION(3,24,0)
+		auto handler_key = gtk_event_controller_key_new(widget);
+		g_object_weak_ref(G_OBJECT(widget), (GWeakNotify)g_object_unref, handler_key);
+		g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
+		g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
+#else
 		int mask;
 		g_object_get(G_OBJECT(widget), "events", &mask, nullptr);
 		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
 		g_object_set(G_OBJECT(widget), "events", mask, nullptr);
-		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
-		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
+		g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
+		g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 #endif
 	} else if (op == "monospace") {
 #if GTK_CHECK_VERSION(3,16,0)

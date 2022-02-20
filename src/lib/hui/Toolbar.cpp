@@ -15,6 +15,7 @@
 namespace hui
 {
 
+//void control_delete_rec(Control *c);
 Menu *_create_res_menu_(const string &ns, Resource *res, Panel *p);
 
 
@@ -46,8 +47,16 @@ void Toolbar::add_separator() {
 
 // remove all items from the toolbar
 void Toolbar::reset() {
-	for (int i=0; i<item.num; i++)
-		delete item[i];
+	auto _items = item;
+	for (auto i: _items) {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_box_remove(GTK_BOX(widget), i->get_frame());
+#else
+		gtk_container_remove(GTK_CONTAINER(widget), i->widget);
+#endif
+		delete i;
+		//control_delete_rec(i);
+	}
 	item.clear();
 }
 

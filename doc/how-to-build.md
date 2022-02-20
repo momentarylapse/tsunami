@@ -48,7 +48,7 @@ ninja
 
 If you installed via `sudo make install`, tsunami should be registered in your desktop environment. Probably just find the friendly icon in the menu and click. You can also open a terminal and type `tsunami`.
 
-You can also run tsunami without installing. Open a terminal, and
+Tsunami can also be used without installing. Open a terminal, and
 ```
 cd <REPOSITORY-ROOT>  # important to run the program from here!
 ./build/tsunami

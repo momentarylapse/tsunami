@@ -1,6 +1,11 @@
 use tsunami
 use hui
 
+func smooth(t: float) -> float
+	if t < 0.5
+		return 2*t^2
+	return 1 - 2*(1-t)^2
+
 class MyDialog extends hui.Dialog
 	mlp: MultiLinePainter*
 	config_visible = false
@@ -10,11 +15,14 @@ class MyDialog extends hui.Dialog
 	track_mode: bool[]
 	session: Session*
 	y_offset = 0.0
+	y_offset_start = 0.0
+	y_offset_target = 0.0
+	y_offset_t = -1.0
 	mlv: MultiLineView*
 	
 	line_samples: int[]
 	line_y0: float[]
-	area_width: float
+	area: rect
 
 	func __init__(parent: hui.Window, _mlv: MultiLineView)
 		super.__init__("Multi Line View", 800, 600, parent, true)
@@ -34,8 +42,8 @@ class MyDialog extends hui.Dialog
 		set_target(":header:")
 		add_button("", 0, 0, "play")
 		set_image("play", "hui:media-play")
-		add_button("", 1, 0, "config")
-		set_image("config", "hui:settings")
+		add_button("", 0, 1, "config")
+		set_image("config", "hui:properties")
 		
 		mlv = &_mlv
 		session = mlv.session
@@ -73,8 +81,25 @@ class MyDialog extends hui.Dialog
 	func on_preview_change()
 	func on_preview_tick()
 		if session.view.is_playback_active()
-			# TODO: make sure, on screen!
+			make_sure_sample_on_screen(session.view.playback_pos())
 			redraw("area")
+	
+	func make_sure_sample_on_screen(s: int)
+		if y_offset_t >= 0
+			return
+		float y0 = sample_to_screen(s).y
+		float dy_max = area.height() * 0.3 + 100
+		if y0 < 0
+			set_scroll_target(y0)
+		else if y0 >= area.y2 - dy_max
+			set_scroll_target(y_offset + (y0 - area.y2 + dy_max))
+		
+	func set_scroll_target(y: float)
+		#y_offset = y
+		y_offset_start = y_offset
+		y_offset_target = y
+		y_offset_t = 0
+		redraw("area")
 	
 	func on_close()
 		mlv.stop()
@@ -115,18 +140,23 @@ class MyDialog extends hui.Dialog
 	
 	func on_click()
 		var e = hui.get_event()
-		print(screen_to_sample(e.mouse))
 		session.view.set_playback_pos(screen_to_sample(e.mouse))
 	
 	func screen_to_sample(pos: vec2) -> int
 		for y0,i in line_y0[:-1]
 			if pos.y > y0 and pos.y < line_y0[i+1]
-				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area_width - 2*border)
+				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area.width() - 2*border)
 		return -1
+	
+	func sample_to_screen(s: int) -> vec2
+		for s0,i in line_samples[:-1]
+			if s > s0 and s < line_samples[i+1]
+				return [0,line_y0[i]] # X: TODO
+		return [0,0]
 		
 
 	func override on_draw(p: Painter)
-		area_width = p.width
+		area = [0,p.width, 0,p.height]
 		any conf = dyn([])
 		for t,i in weak(session.song.tracks)
 			if t.type != SignalType.MIDI
@@ -170,6 +200,15 @@ class MyDialog extends hui.Dialog
 					p.draw_line([x, y00], [x, y0])
 		line_samples.add(offset)
 		line_y0.add(y0)
+		
+		if y_offset_t >= 0
+			y_offset = y_offset_start + smooth(y_offset_t) * (y_offset_target - y_offset_start)
+			y_offset_t += 0.1
+			if y_offset_t >= 1
+				y_offset_t = -1
+			hui.run_later(0.02, self, force_redraw)
+	func force_redraw()
+		redraw("area")
 
 class MultiLineView extends TsunamiPlugin
 	dlg: MyDialog*

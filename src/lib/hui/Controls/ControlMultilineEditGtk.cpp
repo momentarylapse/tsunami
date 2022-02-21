@@ -109,8 +109,8 @@ void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 		g_object_get(G_OBJECT(widget), "events", &mask, nullptr);
 		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
 		g_object_set(G_OBJECT(widget), "events", mask, nullptr);
-		g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
-		g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
+		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&on_gtk_area_key_down), this);
+		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&on_gtk_area_key_up), this);
 #endif
 	} else if (op == "monospace") {
 #if GTK_CHECK_VERSION(3,16,0)

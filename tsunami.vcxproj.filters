@@ -1282,6 +1282,9 @@
     <ClCompile Include="src\View\Painter\MidiPainter.cpp">
       <Filter>src\View\Painter</Filter>
     </ClCompile>
+    <ClCompile Include="src\View\Painter\MultiLinePainter.cpp">
+      <Filter>src\View\Painter</Filter>
+    </ClCompile>
     <ClCompile Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleMode.cpp">
       <Filter>src\View\SideBar\CaptureConsoleModes</Filter>
     </ClCompile>
@@ -2563,6 +2566,9 @@
       <Filter>src\View\Painter</Filter>
     </ClInclude>
     <ClInclude Include="src\View\Painter\MidiPainter.h">
+      <Filter>src\View\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\Painter\MultiLinePainter.h">
       <Filter>src\View\Painter</Filter>
     </ClInclude>
     <ClInclude Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleMode.h">

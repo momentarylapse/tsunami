@@ -543,6 +543,7 @@
     <ClCompile Include="src\View\Painter\BufferPainter.cpp" />
     <ClCompile Include="src\View\Painter\GridPainter.cpp" />
     <ClCompile Include="src\View\Painter\MidiPainter.cpp" />
+    <ClCompile Include="src\View\Painter\MultiLinePainter.cpp" />
     <ClCompile Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleMode.cpp" />
     <ClCompile Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleModeAudio.cpp" />
     <ClCompile Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleModeMidi.cpp" />
@@ -972,6 +973,7 @@
     <ClInclude Include="src\View\Painter\BufferPainter.h" />
     <ClInclude Include="src\View\Painter\GridPainter.h" />
     <ClInclude Include="src\View\Painter\MidiPainter.h" />
+    <ClInclude Include="src\View\Painter\MultiLinePainter.h" />
     <ClInclude Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleMode.h" />
     <ClInclude Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleModeAudio.h" />
     <ClInclude Include="src\View\SideBar\CaptureConsoleModes\CaptureConsoleModeMidi.h" />

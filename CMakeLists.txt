@@ -433,6 +433,7 @@ set(SOURCE
 	src/View/Painter/BufferPainter.cpp
 	src/View/Painter/GridPainter.cpp
 	src/View/Painter/MidiPainter.cpp
+	src/View/Painter/MultiLinePainter.cpp
 	src/View/SideBar/CaptureConsoleModes/CaptureConsoleMode.cpp
 	src/View/SideBar/CaptureConsoleModes/CaptureConsoleModeAudio.cpp
 	src/View/SideBar/CaptureConsoleModes/CaptureConsoleModeMidi.cpp

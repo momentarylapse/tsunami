@@ -747,6 +747,12 @@ class GridPainter
 	func extern draw_time(p: Painter)
 	func extern draw_time_numbers(p: Painter)
 
+class MultiLinePainter
+	func extern __init__(song: Song, ColorScheme c)
+	func extern __delete__()
+	func extern set_context(conf: any, page_width: float, border: float, avg_samples_per_line: float)
+	func extern draw_next_line(p: Painter, out offset: int, x0: float, y0: float)
+
 
 #extern PluginContext plugin_context
 var extern colors: ColorScheme

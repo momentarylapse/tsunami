@@ -47,8 +47,16 @@ MultiLinePainter::~MultiLinePainter() {
 }
 
 
+void MultiLinePainter::__init__(Song *s, ColorScheme &c) {
+	new (this) MultiLinePainter(s, c);
+}
 
-int MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
+void MultiLinePainter::__delete__() {
+	this->MultiLinePainter::~MultiLinePainter();
+}
+
+
+float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
 	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
@@ -79,7 +87,7 @@ int MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, float 
 	return y0 + 50;
 }
 
-int MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
+float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
 	float string_dy = 13;
 
 	int slack = song->sample_rate / 15;
@@ -203,7 +211,7 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _bo
 	}
 }
 
-int MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
+float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
 	float track_space = 10;
 	p->set_line_width(0.5f);
 
@@ -244,13 +252,13 @@ int MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const R
 	return y0;
 }
 
-int MultiLinePainter::draw_next_line(Painter *p, int &offset, float x0, float y0) {
+float MultiLinePainter::draw_next_line(Painter *p, int &offset, const vec2 &pos) {
 
 	int line_samples = good_samples(Range(offset, avg_samples_per_line));
 	float scale = w / line_samples;
 	Range r = Range(offset, line_samples);
 
-	y0 = draw_line(p, x0 + border, w, y0, r, scale) + line_space;
+	float y0 = draw_line(p, pos.x + border, w, pos.y, r, scale) + line_space;
 
 	offset += line_samples;
 	return y0;

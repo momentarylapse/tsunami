@@ -109,7 +109,7 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	int offset = 0;
 	while (offset < samples) {
 		float y_prev = y0;
-		y0 = mlp.draw_next_line(p, offset, 0, y0);
+		y0 = mlp.draw_next_line(p, offset, {0, y0});
 
 		// new page?
 		float dy = y0 - y_prev;

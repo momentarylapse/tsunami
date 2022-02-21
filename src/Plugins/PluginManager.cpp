@@ -56,8 +56,9 @@
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
 #include "../View/Helper/Graph/Node.h"
-#include "../View/Painter/MidiPainter.h"
 #include "../View/Painter/GridPainter.h"
+#include "../View/Painter/MidiPainter.h"
+#include "../View/Painter/MultiLinePainter.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "ProfileManager.h"
@@ -756,6 +757,12 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("GridPainter.draw_bar_numbers", &GridPainter::draw_bar_numbers);
 	kaba::link_external_class_func("GridPainter.draw_time", &GridPainter::draw_time);
 	kaba::link_external_class_func("GridPainter.draw_time_numbers", &GridPainter::draw_time_numbers);
+
+	kaba::declare_class_size("MultiLinePainter", sizeof(MultiLinePainter));
+	kaba::link_external_class_func("MultiLinePainter.__init__", &MultiLinePainter::__init__);
+	kaba::link_external_class_func("MultiLinePainter.__delete__", &MultiLinePainter::__delete__);
+	kaba::link_external_class_func("MultiLinePainter.set_context", &MultiLinePainter::set_context);
+	kaba::link_external_class_func("MultiLinePainter.draw_next_line", &MultiLinePainter::draw_next_line);
 
 	{
 		Slider slider;

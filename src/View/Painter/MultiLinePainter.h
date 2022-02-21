@@ -20,11 +20,15 @@ class Painter;
 class Any;
 class SongSelection;
 class HoverData;
+class vec2;
 
 class MultiLinePainter {
 public:
 	MultiLinePainter(Song *s, ColorScheme &c);
 	virtual ~MultiLinePainter();
+
+	void __init__(Song *s, ColorScheme &c);
+	void __delete__();
 
 	struct TrackData {
 		Track *track;
@@ -61,14 +65,14 @@ public:
 	Array<LineData> line_data;
 
 	int good_samples(const Range &r0);
-	int draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
-	int draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
-	int draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale);
+	float draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
+	float draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
+	float draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale);
 
 	void draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r);
 	void draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r);
 
-	int draw_next_line(Painter *p, int &offset, float x0, float y0);
+	float draw_next_line(Painter *p, int &offset, const vec2 &pos);
 };
 
 #endif /* SRC_VIEW_PAINTER_MULTILINEPAINTER_H_ */

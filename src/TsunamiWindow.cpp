@@ -286,7 +286,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	app->plugin_manager->add_plugins_to_menu(this);
 
-	if (hui::config.get_bool("Window.HeaderBar", true)) {
+	if (hui::config.get_bool("Window.HeaderBar", false)) {
 		_add_headerbar();
 		set_target(":header:");
 		add_button("!ignorefocus", 0, 0, "new");

@@ -88,8 +88,8 @@ void SettingsDialog::load_data() {
 			set_int("color_scheme", i);
 	}
 
-	check("controls:toolbar", !hui::config.get_bool("Window.HeaderBar", true));
-	check("controls:headerbar", hui::config.get_bool("Window.HeaderBar", true));
+	check("controls:toolbar", !hui::config.get_bool("Window.HeaderBar", false));
+	check("controls:headerbar", hui::config.get_bool("Window.HeaderBar", false));
 
 	// ogg quality
 	float CurOggQuality = hui::config.get_float("OggQuality", 0.5f);

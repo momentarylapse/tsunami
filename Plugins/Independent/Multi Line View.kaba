@@ -1,0 +1,182 @@
+use tsunami
+use hui
+
+class MyDialog extends hui.Dialog
+	mlp: MultiLinePainter*
+	config_visible = false
+	line_height = 80.0
+	border = 20.0
+	x_scale = 1.0
+	track_mode: bool[]
+	session: Session*
+	y_offset = 0.0
+	mlv: MultiLineView*
+	
+	line_samples: int[]
+	line_y0: float[]
+	area_width: float
+
+	func __init__(parent: hui.Window, _mlv: MultiLineView)
+		super.__init__("Multi Line View", 800, 600, parent, true)
+		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar
+	Grid ? '' vertical
+		Grid ? ''
+			DrawingArea area '' expandx grabfocus
+			Grid config-grid '' noexpandx width=300 hidden
+				Grid ? ''
+					Label l-line-height 'Line height'
+					SpinButton line-height '{{line_height}}' expandx
+					---|
+					Label l-x-scale 'Horizontal scale'
+					SpinButton x-scale '{{x_scale}}' range=0:10:0.01
+				---|
+				ListView tracks 'Track\\Classical\\TAB' format=tCC")
+		set_target(":header:")
+		add_button("", 0, 0, "play")
+		set_image("play", "hui:media-play")
+		add_button("", 1, 0, "config")
+		set_image("config", "hui:settings")
+		
+		mlv = &_mlv
+		session = mlv.session
+		
+		for t,i in weak(session.song.tracks)
+			if t.type == SignalType.MIDI
+				track_mode.add(true)
+				track_mode.add(true)
+				add_string("tracks", "{{t.nice_name()}}\\true\\true")
+			else
+				track_mode.add(false)
+				track_mode.add(false)
+				add_string("tracks", "{{t.nice_name()}}\\false\\false")
+		
+		#var me = &self
+		event("config", on_config)#lambda(me: MyDialog) me.hide_control("config-grid", false))
+		event("line-height", on_update)
+		event("x-scale", on_update)
+		event("play", on_play)
+		event_x("tracks", "hui:change", on_update)
+		event_x("area", "hui:left-button-down", on_click)
+		event_x("area", "hui:mouse-wheel", on_scroll)
+		event_x("area", "hui:key-down", on_key)
+		event("hui:close", on_close)
+		
+		#session.view.signal_chain.subscribe(self, on_preview_change, "Change")
+		session.view.signal_chain.subscribe(self, on_preview_tick, "Tick")
+		
+		mlp = new MultiLinePainter(session.song, colors)
+	
+	func override __delete__()
+		session.view.signal_chain.unsubscribe(self)
+		del mlp
+	
+	func on_preview_change()
+	func on_preview_tick()
+		if session.view.is_playback_active()
+			# TODO: make sure, on screen!
+			redraw("area")
+	
+	func on_close()
+		mlv.stop()
+	
+	func on_play()
+		if session.view.is_playback_active()
+			if session.view.is_paused()
+				session.view.signal_chain.start()
+			else
+				session.view.signal_chain.stop()
+		else
+			session.view.play()
+	
+	func on_key()
+		var e = hui.get_event()
+		if e.key == hui.KEY_SPACE
+			on_play()
+	
+	func on_config()
+		config_visible = not config_visible
+		if config_visible
+			set_options("config-grid", "visible")
+		else
+			set_options("config-grid", "hidden")
+	
+	func on_update()
+		line_height = get_float("line-height")
+		x_scale = get_float("x-scale")
+		for t,i in weak(session.song.tracks)
+			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
+			track_mode[i * 2 + 1] = (get_cell("tracks", i, 2) == "true")
+		redraw("area")
+	
+	func on_scroll()
+		var e = hui.get_event()
+		y_offset = clamp(y_offset + e.scroll.y*20, 0.0, 100000)
+		redraw("area")
+	
+	func on_click()
+		var e = hui.get_event()
+		print(screen_to_sample(e.mouse))
+		session.view.set_playback_pos(screen_to_sample(e.mouse))
+	
+	func screen_to_sample(pos: vec2) -> int
+		for y0,i in line_y0[:-1]
+			if pos.y > y0 and pos.y < line_y0[i+1]
+				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area_width - 2*border)
+		return -1
+		
+
+	func override on_draw(p: Painter)
+		area_width = p.width
+		any conf = dyn([])
+		for t,i in weak(session.song.tracks)
+			if t.type != SignalType.MIDI
+				continue
+			if track_mode[i*2] and track_mode[i*2+1]
+				conf.add(dyn({"index":i, "classical":true, "tab":true}))
+			else if track_mode[i*2]
+				conf.add(dyn({"index":i, "classical":true}))
+			else if track_mode[i*2+1]
+				conf.add(dyn({"index":i, "tab":true}))
+		mlp.set_context(conf, p.width, 44100*p.width/300 / x_scale)
+		mlp.set(dyn({"border": border, "line-height": line_height, "line-spacing": line_height * 0.4, "track_space": line_height * 0.2, "antialiasing": true}))
+		var y0 = 10.0 - y_offset
+		var offset = 0
+		var dy = mlp.get_line_dy()
+		line_samples.clear()
+		line_y0.clear()
+		while offset < session.song.range().end() and y0 < p.height
+			line_samples.add(offset)
+			line_y0.add(y0)
+			var s0 = offset
+			var y00 = y0
+			
+			var line_samples = mlp.next_line_samples(offset)
+			if y0+dy > 0 and y0 < p.height
+				# on screen
+				y0 = mlp.draw_next_line(p, offset, [0, y0])
+			else
+				offset += line_samples
+				y0 += dy
+			
+			#line_samples.add(offset - s0)
+			
+			if session.view.is_playback_active()
+				var pos = session.view.playback_pos()
+				if pos >= s0 and pos < offset
+					var w = p.width - border*2
+					var x = border + float(pos - s0) * w / float(offset - s0)
+					p.set_color([0.2, 0.8, 0.2, 1]) #colors.
+					p.set_line_width(3)
+					p.draw_line([x, y00], [x, y0])
+		line_samples.add(offset)
+		line_y0.add(y0)
+
+class MultiLineView extends TsunamiPlugin
+	dlg: MyDialog*
+
+	func override on_start()
+		dlg = new MyDialog(session.win, self)
+		dlg.show()
+		
+	func override on_stop()
+		del dlg

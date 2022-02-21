@@ -580,6 +580,10 @@ class AudioView extends Object
 	func extern unsubscribe(handler: Object)
 	func extern prepare_playback(r: Range, allow_loop: bool)
 	func extern play()
+	func extern is_playback_active() -> bool
+	func extern is_paused() -> bool
+	func extern playback_pos() -> int
+	func extern set_playback_pos(pos: int)
 	func extern set_playback_loop(loop: bool)
 	func extern optimize_view()
 	func extern cur_vlayer() -> Layer*
@@ -748,10 +752,13 @@ class GridPainter
 	func extern draw_time_numbers(p: Painter)
 
 class MultiLinePainter
-	func extern __init__(song: Song, ColorScheme c)
+	func extern __init__(song: Song, c: ColorScheme)
 	func extern __delete__()
-	func extern set_context(conf: any, page_width: float, border: float, avg_samples_per_line: float)
-	func extern draw_next_line(p: Painter, out offset: int, x0: float, y0: float)
+	func extern set_context(conf: any, page_width: float, avg_samples_per_line: float)
+	func extern set(conf: any)
+	func extern draw_next_line(p: Painter, out offset: int, pos: vec2) -> float
+	func extern next_line_samples(offset: int) -> int
+	func extern get_line_dy() -> float
 
 
 #extern PluginContext plugin_context

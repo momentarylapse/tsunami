@@ -59,6 +59,7 @@
 #include "../View/Painter/GridPainter.h"
 #include "../View/Painter/MidiPainter.h"
 #include "../View/Painter/MultiLinePainter.h"
+#include "../lib/base/callable.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "ProfileManager.h"
@@ -103,9 +104,10 @@ Module *_CreateBeatMidifier(Session *s) {
 template<class T>
 class ObservableKabaWrapper : public T {
 public:
-	void _cdecl subscribe_kaba(hui::EventHandler *handler, kaba::Function *f, const string &message) {
-		auto *ff = (hui::kaba_member_callback*)f->address;
-		T::subscribe(handler, [=] { ff(handler); }, message);
+	void _cdecl subscribe_kaba(hui::EventHandler *handler, Callable<void(VirtualBase*)> *f, const string &message) {
+		T::subscribe(handler, [f, handler] {
+			(*f)(handler);
+		}, message);
 	}
 };
 
@@ -681,6 +683,10 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	kaba::link_external_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
 	kaba::link_external_class_func("AudioView.play", &AudioView::play);
+	kaba::link_external_class_func("AudioView.is_playback_active", &AudioView::is_playback_active);
+	kaba::link_external_class_func("AudioView.is_paused", &AudioView::is_paused);
+	kaba::link_external_class_func("AudioView.playback_pos", &AudioView::playback_pos);
+	kaba::link_external_class_func("AudioView.set_playback_pos", &AudioView::set_playback_pos);
 	kaba::link_external_class_func("AudioView.prepare_playback", &AudioView::prepare_playback);
 	kaba::link_external_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
 	kaba::link_external_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);
@@ -762,7 +768,10 @@ void PluginManager::link_app_script_data() {
 	kaba::link_external_class_func("MultiLinePainter.__init__", &MultiLinePainter::__init__);
 	kaba::link_external_class_func("MultiLinePainter.__delete__", &MultiLinePainter::__delete__);
 	kaba::link_external_class_func("MultiLinePainter.set_context", &MultiLinePainter::set_context);
+	kaba::link_external_class_func("MultiLinePainter.set", &MultiLinePainter::set);
 	kaba::link_external_class_func("MultiLinePainter.draw_next_line", &MultiLinePainter::draw_next_line);
+	kaba::link_external_class_func("MultiLinePainter.next_line_samples", &MultiLinePainter::next_line_samples);
+	kaba::link_external_class_func("MultiLinePainter.get_line_dy", &MultiLinePainter::get_line_dy);
 
 	{
 		Slider slider;

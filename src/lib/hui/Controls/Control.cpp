@@ -368,9 +368,13 @@ void Control::set_options(const string &options) {
 			set_style_for_widget(widget, id, "{font-size: 75%;}");
 			__set_option(op, val);
 		} else if (op == "disabled") {
-			enable(false);
+			enable(!val_is_positive(val, true));
 		} else if (op == "enabled") {
-			enable(true);
+			enable(val_is_positive(val, true));
+		} else if (op == "hidden") {
+			hide(val_is_positive(val, true));
+		} else if (op == "visible") {
+			hide(!val_is_positive(val, true));
 		} else if ((op == "width") or (op == "minwidth")) {
 			min_width = val._int();
 			gtk_widget_set_size_request(get_frame(), min_width, min_height);

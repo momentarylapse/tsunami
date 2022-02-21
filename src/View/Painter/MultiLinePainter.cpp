@@ -60,10 +60,12 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	mp->set_context(rect(x0, x0+w, y0-25, y0+90), t->instrument, true, MidiMode::CLASSICAL);
-	mp->set_line_weight(0.66f);
+	mp->set_context(rect(x0, x0+w, y0-line_height/2, y0+line_height * 1.8f), t->instrument, true, MidiMode::CLASSICAL);
+	mp->set_line_weight(line_height / 75);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
-	mp->set_quality(200, true);
+	mp->set_quality(200, antialiasing);
+
+	p->set_antialiasing(antialiasing);
 
 	float ya = mp->clef_pos_to_screen(8);
 	float yb = mp->clef_pos_to_screen(0);
@@ -84,11 +86,10 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	auto midi = t->layers[0]->midi.get_notes(r_inside);
 	mp->draw(p, midi);
 
-	return y0 + 50;
+	return y0 + line_height;
 }
 
 float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
-	float string_dy = 13;
 
 	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
@@ -96,11 +97,13 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	int n = t->instrument.string_pitch.num;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
-	mp->set_line_weight(0.66f);
+	mp->set_line_weight(line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
-	mp->set_quality(200, true);
+	mp->set_quality(200, antialiasing);
 	/*mp->rr *= 1.3f;
 	mp->neck_width *= 0.7f;*/
+
+	p->set_antialiasing(antialiasing);
 
 	float sy0 = mp->string_to_screen(n - 1) - string_dy/2;
 	float sy1 = mp->string_to_screen(0) + string_dy/2;
@@ -110,6 +113,7 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 
 	// string lines
 	p->set_color(colors->text_soft1);
+	p->set_line_width(line_height / 100);
 	for (int i=0; i<t->instrument.string_pitch.num; i++) {
 		float y = mp->string_to_screen(i);
 		p->draw_line({x0, y}, {x0 + w, y});
@@ -138,18 +142,19 @@ void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float 
 		float x = cam->sample2screen(b.range.offset);
 		if (b.level == 0) {
 			p->set_color(colors->text_soft1);
-			p->set_line_width(1);
+			p->set_line_width(line_height / 50);
 		} else {
 			p->set_color(colors->text_soft3);
-			p->set_line_width(0.5f);
+			p->set_line_width(line_height / 100);
 		}
 		p->draw_line({x, y}, {x, y + h});
 	}
-	p->set_line_width(0.5f);
+	p->set_line_width(line_height / 100);
 }
 
 void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r) {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
+	const float d = line_height / 20;
 	for (auto b: bars){
 		float x = cam->sample2screen(b->offset);
 		double bpm = b->bpm(song->sample_rate);
@@ -167,31 +172,32 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 			p->set_color(colors->text_soft2);
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
-			p->set_font_size(8);
-			float dx = 10;
+			p->set_font_size(line_height / 12.5f);
+			float dx = d*4;
 			if (b == bars[0])
-				dx += 15;
-			p->draw_str({x + dx, y-2.5f}, s);
+				dx += d*6;
+			p->draw_str({x + dx, y-d}, s);
 		}
 
 		// part?
 		auto *m = get_bar_part(song, b->offset);
 		if (m) {
 			p->set_color(colors->text);
-			p->draw_line({x - 10, y - 32.5f}, {x - 10, y - 17.5f});
-			p->draw_line({x - 10, y - 32.5f}, {x + 10, y - 32.5f});
-			p->draw_line({x - 10, y - 17.5f}, {x + 10, y - 17.5f});
-			p->set_font_size(10);
-			p->draw_str({x - 7.5f, y-30}, m->nice_text());
+			p->draw_line({x - d*4, y - d*13}, {x - d*4, y - d*7});
+			p->draw_line({x - d*4, y - d*13}, {x + d*4, y - d*13});
+			p->draw_line({x - d*4, y - d*7},  {x + d*4, y - d*7});
+			p->set_font_size(line_height / 5);
+			p->draw_str({x - d*3, y-d*12}, m->nice_text());
 		}
 	}
 }
 
-void MultiLinePainter::set_context(const Any &conf, float _page_width, float _border, float _avg_samples_per_line) {
+void MultiLinePainter::set_context(const Any &conf, float _page_width, float _avg_samples_per_line) {
 	page_width = _page_width;
-	border = _border;
 	w = page_width - 2 * border;
 	avg_samples_per_line = _avg_samples_per_line;
+	cam->area = rect(border, page_width - border, 0, 2000);
+	string_dy = line_height / 50.0f * 13;
 
 	track_data.clear();
 
@@ -211,24 +217,40 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _bo
 	}
 }
 
+void MultiLinePainter::set(const Any &conf) {
+	if (conf.has("border"))
+		border = conf["border"]._float();
+	if (conf.has("line-space"))
+		line_space = conf["line-space"]._float();
+	if (conf.has("track-space"))
+		track_space = conf["track-space"]._float();
+	if (conf.has("line-height"))
+		line_height = conf["line-height"]._float();
+	if (conf.has("antialiasing"))
+		antialiasing = conf["antialiasing"]._bool();
+	string_dy = line_height / 50.0f * 13;
+	w = page_width - 2 * border;
+	cam->area = rect(border, page_width - border, 0, 2000);
+}
+
 float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
-	float track_space = 10;
-	p->set_line_width(0.5f);
+	p->set_line_width(line_height / 100);
 
 	cam->pos = r.offset;
 	cam->pixels_per_sample = (double)cam->area.width() / (double)r.length;
 
+	const float d = line_height / 20;
 
 	auto bars = song->bars.get_bars(r + 1000);
 	if (bars.num > 0) {
 		p->set_color(colors->text_soft1);
-		p->set_font_size(10);
-		p->draw_str({x0 + 2.5f, y0 - 7.5f}, i2s(bars[0]->index_text + 1));
+		p->set_font_size(line_height / 5);
+		p->draw_str({x0 + d, y0 - d*3}, i2s(bars[0]->index_text + 1));
 	}
 
 	line_data.clear();
 
-	draw_bar_markers(p, x0, w, y0, 50, r);
+	draw_bar_markers(p, x0, w, y0, line_height, r);
 
 	for (auto &tt: track_data) {
 		if (tt.allow_classical)
@@ -239,22 +261,21 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 	}
 
 	// line connector
-	p->set_line_width(1.5f);
+	p->set_line_width(line_height / 33);
 	p->set_color(colors->text_soft1);
 	float sy0 = line_data[0].y0;
 	float sy1 = line_data.back().y1;
-	p->draw_line({x0 - 2.5f, sy0}, {x0 - 2.5f, sy1});
-	p->draw_line({x0, sy0 - 5}, {x0 - 2.5f, sy0});
-	p->draw_line({x0, sy1 + 5}, {x0 - 2.5f, sy1});
-	p->draw_line({x0 + w + 2.5f, sy0}, {x0 + w + 2.5f, sy1});
-	p->set_line_width(0.5f);
+	p->draw_line({x0 - d, sy0}, {x0 - d, sy1});
+	p->draw_line({x0, sy0 - d*2}, {x0 - d, sy0});
+	p->draw_line({x0, sy1 + d*2}, {x0 - d, sy1});
+	p->draw_line({x0 + w + d, sy0}, {x0 + w + d, sy1});
+	p->set_line_width(line_height / 100);
 
 	return y0;
 }
 
 float MultiLinePainter::draw_next_line(Painter *p, int &offset, const vec2 &pos) {
-
-	int line_samples = good_samples(Range(offset, avg_samples_per_line));
+	int line_samples = next_line_samples(offset);
 	float scale = w / line_samples;
 	Range r = Range(offset, line_samples);
 
@@ -262,6 +283,22 @@ float MultiLinePainter::draw_next_line(Painter *p, int &offset, const vec2 &pos)
 
 	offset += line_samples;
 	return y0;
+}
+
+int MultiLinePainter::next_line_samples(int offset) {
+	return good_samples(Range(offset, avg_samples_per_line));
+}
+
+float MultiLinePainter::get_line_dy() {
+	float h = 0;
+	for (auto &tt: track_data) {
+		if (tt.allow_classical)
+			h += line_height;
+		if (tt.allow_tab)
+			h += tt.track->instrument.string_pitch.num * string_dy;
+		h += track_space;
+	}
+	return h;
 }
 
 int MultiLinePainter::good_samples(const Range &r0) {

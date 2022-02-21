@@ -35,7 +35,8 @@ public:
 		bool allow_classical, allow_tab;
 	};
 	Array<TrackData> track_data;
-	void set_context(const Any &conf, float page_width, float border, float avg_samples_per_line);
+	void set_context(const Any &conf, float page_width, float avg_samples_per_line);
+	void set(const Any &conf);
 
 
 	MidiPainter *mp;
@@ -47,6 +48,10 @@ public:
 	float page_width = 1200;
 	float border = 25;
 	float line_space = 25;
+	float track_space = 10;
+	float line_height = 50;
+	bool antialiasing = true;
+	float string_dy = 10;
 
 	float w = 0;
 	float avg_samples_per_line = 0;
@@ -72,7 +77,9 @@ public:
 	void draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r);
 	void draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r);
 
+	int next_line_samples(int offset);
 	float draw_next_line(Painter *p, int &offset, const vec2 &pos);
+	float get_line_dy();
 };
 
 #endif /* SRC_VIEW_PAINTER_MULTILINEPAINTER_H_ */

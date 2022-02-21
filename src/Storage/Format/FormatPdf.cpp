@@ -72,7 +72,10 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	float avg_samples_per_line = (page_width - 2*border) / avg_scale;
 
 	MultiLinePainter mlp(song, _colors);
-	mlp.set_context(od->parameters["tracks"], page_width, border, avg_samples_per_line);
+	mlp.set_context(od->parameters["tracks"], page_width, avg_samples_per_line);
+	Any conf;
+	conf["border"] = border;
+	mlp.set(conf);
 
 	pdf::Parser parser;
 	parser.set_page_size(page_width, page_height);

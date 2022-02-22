@@ -168,7 +168,7 @@ class MyDialog extends hui.Dialog
 			else if track_mode[i*2+1]
 				conf.add(dyn({"index":i, "tab":true}))
 		mlp.set_context(conf, p.width, 44100*p.width/300 / x_scale)
-		mlp.set(dyn({"border": border, "line-height": line_height, "line-spacing": line_height * 0.4, "track_space": line_height * 0.2, "antialiasing": true}))
+		mlp.set(dyn({"border": border, "line-height": line_height, "line-space": line_height * 0.4, "track_space": line_height * 0.2, "antialiasing": true}))
 		var y0 = 10.0 - y_offset
 		var offset = 0
 		var dy = mlp.get_line_dy()

@@ -21,7 +21,7 @@ Tsunami uses its own just-in-time compiler for plugin code. Currently this mostl
 
 ## Getting started
 
-* [how to buildg and run](doc/how-to-build.md)
+* [how to build and run](doc/how-to-build.md)
 * [how to use](doc/using/main.md)
 * [internal design](doc/design/main.md)
 

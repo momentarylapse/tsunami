@@ -154,6 +154,7 @@ void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float 
 
 void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r) {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
+	p->set_antialiasing(antialiasing);
 	const float d = line_height / 20;
 	for (auto b: bars){
 		float x = cam->sample2screen(b->offset);
@@ -293,12 +294,12 @@ float MultiLinePainter::get_line_dy() {
 	float h = 0;
 	for (auto &tt: track_data) {
 		if (tt.allow_classical)
-			h += line_height;
+			h += line_height + track_space;
 		if (tt.allow_tab)
-			h += tt.track->instrument.string_pitch.num * string_dy;
+			h += tt.track->instrument.string_pitch.num * string_dy + track_space;
 		h += track_space;
 	}
-	return h;
+	return h + line_space;
 }
 
 int MultiLinePainter::good_samples(const Range &r0) {

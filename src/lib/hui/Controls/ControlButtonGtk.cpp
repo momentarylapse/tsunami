@@ -75,9 +75,14 @@ void ControlButton::__set_option(const string &op, const string &value) {
 #endif
 	} else if (op == "default") {
 #if GTK_CHECK_VERSION(4,0,0)
+		msg_write("DEFAULT " + id);
 		if (panel->win) { // otherwise gtk will complain
 			gtk_window_set_default_widget(GTK_WINDOW(panel->win->window), widget);
+		} else {
+			msg_error("trying to set default without window..." + id);
 		}
+		auto sc = gtk_widget_get_style_context(widget);
+		gtk_style_context_add_class(sc, "suggested-action");
 #else
 		gtk_widget_set_can_default(widget, true);
 		if (panel->win) // otherwise gtk will complain

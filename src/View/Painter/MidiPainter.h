@@ -32,6 +32,7 @@ class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 struct QuantizedNote;
+class QuantizedNoteGroup;
 
 class MidiKeyChange {
 public:
@@ -156,7 +157,7 @@ public:
 	float bar_width;
 	float flag_dx, flag_dy;
 	void draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset);
-	void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bool neck_offset);
+	void draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool neck_offset);
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDIPAINTER_H_ */

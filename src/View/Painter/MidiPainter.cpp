@@ -44,6 +44,50 @@ MidiKeyChange::MidiKeyChange(double _pos, const Scale &_key) : pos(_pos), key(_k
 MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
 
+
+struct QuantizedNote {
+	QuantizedNote(){ n = nullptr; }
+	QuantizedNote(MidiNote *note, const Range &r, float spu) {
+		n = note;
+		offset = int((float)r.offset / spu + 0.5f);
+		end = int((float)r.end() / spu + 0.5f);
+		length = end - offset;
+		base_length = length;
+		x = y_min = y_max = 0;
+		col = White;
+		triplet = (length == 2) or (length == 4) or (length == 8);
+		punctured = (length == 9) or (length == 18) or (length == 36);
+		if (triplet)
+			base_length = (base_length / 2) * 3;
+		if (punctured)
+			base_length = (base_length / 3) * 2;
+		up = true;
+	}
+	float x, y_min, y_max;
+	int offset, length, end;
+	MidiNote *n;
+	color col;
+	bool triplet, punctured;
+	int base_length; // drawing without triplet/punctured
+	bool up;
+};
+
+class QuantizedNoteGroup {
+public:
+	Array<QuantizedNote> notes;
+	bool starts_on_beat = false;
+	int special_divisor = -1;
+
+	int homogeneous() const {
+		int l = notes[0].length;
+		for (auto &d: notes)
+			if (d.length != l)
+				return -1;
+		return l;
+	}
+};
+
+
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
 	local_theme(_colors)
@@ -169,33 +213,6 @@ int MidiPainter::y2clef_linear(float y, NoteModifier &mod) {
 	return clef->pitch_to_position(pitch, midi_scale, mod);
 }
 
-struct QuantizedNote {
-	QuantizedNote(){ n = nullptr; }
-	QuantizedNote(MidiNote *note, const Range &r, float spu) {
-		n = note;
-		offset = int((float)r.offset / spu + 0.5f);
-		end = int((float)r.end() / spu + 0.5f);
-		length = end - offset;
-		base_length = length;
-		x = y_min = y_max = 0;
-		col = White;
-		triplet = (length == 2) or (length == 4) or (length == 8);
-		punctured = (length == 9) or (length == 18) or (length == 36);
-		if (triplet)
-			base_length = (base_length / 2) * 3;
-		if (punctured)
-			base_length = (base_length / 3) * 2;
-		up = true;
-	}
-	float x, y_min, y_max;
-	int offset, length, end;
-	MidiNote *n;
-	color col;
-	bool triplet, punctured;
-	int base_length; // drawing without triplet/punctured
-	bool up;
-};
-
 void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset) {
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
@@ -227,20 +244,20 @@ void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offs
 		c->draw_str({d.x, y + e*neck_length_single + e * 9 - 4}, "3");
 }
 
-void MidiPainter::draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bool neck_offset) {
-	bool up = d[0].up;
+void MidiPainter::draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool neck_offset) {
+	bool up = d.notes[0].up;
 	float e = up ? -1 : 1;
-	float x0 = d[0].x;
-	float y0 = up ? d[0].y_min : d[0].y_max;
-	float x1 = d.back().x;
-	float y1 = up ? d.back().y_min : d.back().y_max;
+	float x0 = d.notes[0].x;
+	float y0 = up ? d.notes[0].y_min : d.notes[0].y_max;
+	float x1 = d.notes.back().x;
+	float y1 = up ? d.notes.back().y_min : d.notes.back().y_max;
 	float dx = x1 - x0;
 	float dy = y1 - y0;
 	float m = dy / dx;
 
 	// optimize neck length
 	float dy0min = 0;
-	for (auto &dd: d)
+	for (auto &dd: d.notes)
 		dy0min = max(dy0min, e * (dd.y_min - (y0 + m * (dd.x - x0))));
 	y0 += e * max(neck_length_group, dy0min + neck_length_group * 0.8f);
 
@@ -250,7 +267,7 @@ void MidiPainter::draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bo
 		neck_dy0 = e * rr * 1.5f;
 
 	c->set_line_width(neck_width);
-	for (auto &dd: d)
+	for (auto &dd: d.notes)
 		if (dd.n) {
 			c->set_color(dd.col);
 			float yy = up ? dd.y_min : dd.y_max;
@@ -260,38 +277,44 @@ void MidiPainter::draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, bo
 	// bar
 	c->set_line_width(bar_width);
 	float t0 = 0;
-	for (int i=0; i<d.num; i++) {
-		float xx = d[i].x;
-		if (i+1 < d.num) {
-			if (d[i+1].length == d[i].length)
-				xx = (d[i+1].x + d[i].x)/2;
+	for (int i=0; i<d.notes.num; i++) {
+		float xx = d.notes[i].x;
+		if (i+1 < d.notes.num) {
+			if (d.notes[i+1].length == d.notes[i].length)
+				xx = (d.notes[i+1].x + d.notes[i].x)/2;
 				//xx = (d[i+1].x * d[i].length + d[i].x * d[i+1].length)/(d[i].length + d[i+1].length);
-			if (d[i+1].length < d[i].length)
-				xx = d[i+1].x;
+			if (d.notes[i+1].length < d.notes[i].length)
+				xx = d.notes[i+1].x;
 		}
 		if (xx == x0)
-			xx = (x0*2 + d[1].x) / 3;
-		if (xx == x1 and (i+1 < d.num))
-			xx = (x1*4 + d[1-1].x) / 5;
+			xx = (x0*2 + d.notes[1].x) / 3;
+		if (xx == x1 and (i+1 < d.notes.num))
+			xx = (x1*4 + d.notes[1-1].x) / 5;
 		float t1 = (xx - x0) / dx;
-		if (d[i].n){
-			c->set_color(d[i].col);
+		if (d.notes[i].n){
+			c->set_color(d.notes[i].col);
 			c->draw_line({x0 + dx*t0, y0 + dy*t0}, {x0 + dx*t1, y0 + dy*t1});
-			if (d[i].length <= SIXTEENTH)
+			if (d.notes[i].length <= SIXTEENTH)
 				c->draw_line({x0 + dx*t0, y0 + dy*t0 - e*bar_distance}, {x0 + dx*t1, y0 + dy*t1 - e*bar_distance});
-			if (d[i].punctured)
-				c->draw_circle({d[i].x + rr, d[i].y_min + rr}, 2);
+			if (d.notes[i].punctured)
+				c->draw_circle({d.notes[i].x + rr, d.notes[i].y_min + rr}, 2);
 		}
 		t0 = t1;
 	}
-	if (d[0].triplet)
+
+	int div = d.special_divisor;
+	if (div < 0 and d.notes[0].triplet)
+		div = d.notes[0].length == TRIPLET_SIXTEENTH ? 6 : 3;
+	if (div > 0)
+		c->draw_str({x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f)}, i2s(div));
+	//else if (d.notes[0].triplet)
 		//c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 4 + e*9, "3");
-		c->draw_str({x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f)}, "3");
+	//	c->draw_str({x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f)}, "3");
 }
 
 
-bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<QuantizedNote> &group, int beat_end) {
-	group = {d};
+bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, QuantizedNoteGroup &group, int beat_end) {
+	group.notes = {d};
 	for (int j=i+1; j<ndata.num; j++) {
 		// non-continguous?
 		if (ndata[j].offset != ndata[j-1].end)
@@ -304,9 +327,37 @@ bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<Quan
 		// beat finished?
 		if (ndata[j].end > beat_end)
 			break;
-		group.add(ndata[j]);
+		group.notes.add(ndata[j]);
 	}
-	return group.back().end <= beat_end;
+	return group.notes.back().end <= beat_end;
+}
+
+// ugly hard-coded quintuplet detection (TODO should use un-quantized data!)
+bool find_group_x(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, QuantizedNoteGroup &group, int beat_end) {
+	if (ndata.num < i+5)
+		return false;
+	if (ndata[i].length != TRIPLET_SIXTEENTH)
+		return false;
+	if (ndata[i+1].length != SIXTEENTH)
+		return false;
+	if (ndata[i+2].length != TRIPLET_SIXTEENTH)
+		return false;
+	if (ndata[i+3].length != SIXTEENTH)
+		return false;
+	if (ndata[i+4].length != TRIPLET_SIXTEENTH)
+		return false;
+	if (ndata[i+4].end != beat_end)
+		return false;
+
+	for (int j=i+1; j<i+5; j++) {
+		// non-continguous?
+		if (ndata[j].offset != ndata[j-1].end)
+			return false;
+	}
+	for (int j=i+1; j<i+5; j++)
+		group.notes.add(ndata[j]);
+	group.special_divisor = 5;
+	return true;
 }
 
 struct QuantizedBar {
@@ -381,18 +432,6 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 	return ndata;
 }
 
-class QuantizedNoteGroup : public Array<QuantizedNote> {
-public:
-	bool starts_on_beat = false;
-	int homogeneous() {
-		int l = (*this)[0].length;
-		for (auto &d: *this)
-			if (d.length != l)
-				return -1;
-		return l;
-	}
-};
-
 Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, QuantizedBar &qbar) {
 	Array<QuantizedNoteGroup> groups;
 
@@ -410,14 +449,20 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 			QuantizedNoteGroup group;
 			group.starts_on_beat = qbar.start_of_beat(d.offset, beat_index);
 			if (find_group(ndata, d, i, group, beat_end)) {
+				if (group.starts_on_beat and group.notes.num == 1)
+					find_group_x(ndata, d, i, group, beat_end);
 				groups.add(group);
-				i += group.num - 1;
+				i += group.notes.num - 1;
+				continue;
+			} else  {
+				groups.add(group);
+				i += group.notes.num - 1;
 				continue;
 			}
 		}
 
 		QuantizedNoteGroup group;
-		group.add(d);
+		group.notes.add(d);
 		groups.add(group);
 	}
 
@@ -430,12 +475,12 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 					continue;
 				if (groups[i+1].homogeneous() != EIGHTH)
 					continue;
-				if (groups[i].back().end != groups[i+1][0].offset)
+				if (groups[i].notes.back().end != groups[i+1].notes[0].offset)
 					continue;
-				if ((groups[i][0].offset % (QUARTER_PARTITION*2)) != 0)
+				if ((groups[i].notes[0].offset % (QUARTER_PARTITION*2)) != 0)
 					continue;
 
-				groups[i].append(groups[i+1]);
+				groups[i].notes.append(groups[i+1].notes);
 				groups.erase(i+1);
 			}
 		}
@@ -481,8 +526,8 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		auto groups = digest_note_groups(ndata, qbar);
 
 		for (auto &g: groups) {
-			if (g.num == 1)
-				draw_single_ndata(c, g[0], neck_offset);
+			if (g.notes.num == 1)
+				draw_single_ndata(c, g.notes[0], neck_offset);
 			else
 				draw_group_ndata(c, g, neck_offset);
 		}

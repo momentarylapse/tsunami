@@ -90,7 +90,7 @@ class SpecGrid extends Grid
 class SpectrumDialog extends Dialog
 	var grid: SpecGrid
 	var song: Song*
-	var tracks: shared Track[]
+	var tracks: Track shared[]
 	var dmis: DrawMidiInSpectrogram*
 	func __init__(plugin: SongPlugin, _song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)

@@ -335,8 +335,6 @@ bool call_function(Function *f, void *ret, const Array<void*> &param) {
 	//bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param) {
 	db_out("eval: " + f->signature());
 	Array<const Class*> ptype = f->literal_param_type;
-	if (!f->is_static())
-		ptype.insert(f->name_space, 0);
 
 	// TODO handle return in member functions on windows...
 	if ((config.abi == Abi::AMD64_WINDOWS) and !f->is_static() and f->name_space->uses_call_by_reference() and f->literal_return_type->uses_return_by_memory())

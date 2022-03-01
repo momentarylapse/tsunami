@@ -23,7 +23,7 @@ class Function;
 class Variable;
 class Constant;
 class Operator;
-class PrimitiveOperator;
+class AbstractOperator;
 class Statement;
 
 
@@ -44,7 +44,6 @@ enum class NodeKind {
 	STATEMENT,          // = if/while/break/...
 	BLOCK,              // = block of commands {...}
 	OPERATOR,
-	PRIMITIVE_OPERATOR, // tentative...
 	// data altering
 	ADDRESS_SHIFT,      // = . "struct"
 	ARRAY,              // = []
@@ -66,6 +65,18 @@ enum class NodeKind {
 	DICT_BUILDER,		// = {"x":y, ...}
 	TUPLE,				// = (X,Y,...)
 	CONSTRUCTOR_AS_FUNCTION,
+	// abstract syntax tree
+	ABSTRACT_TOKEN,
+	ABSTRACT_OPERATOR,
+	ABSTRACT_ELEMENT,
+	ABSTRACT_CALL,
+	ABSTRACT_TYPE_SHARED,  // shared X
+	ABSTRACT_TYPE_OWNED,   // owned X
+	ABSTRACT_TYPE_POINTER, // X*
+	ABSTRACT_TYPE_LIST,    // X[]
+	ABSTRACT_TYPE_DICT,    // X{}
+	ABSTRACT_TYPE_CALLABLE,// X->Y
+	ABSTRACT_VAR,          // var x ...
 	// compilation
 	VAR_TEMP,
 	DEREF_VAR_TEMP,
@@ -83,6 +94,7 @@ enum class NodeKind {
 class Node : public Sharable<Empty> {
 public:
 	NodeKind kind;
+	int token_id = -1;
 	int64 link_no;
 	// parameters
 	shared_array<Node> params;
@@ -105,7 +117,7 @@ public:
 	const Class *as_class() const;
 	Constant *as_const() const;
 	Operator *as_op() const;
-	PrimitiveOperator *as_prim_op() const;
+	AbstractOperator *as_abstract_op() const;
 	Statement *as_statement() const;
 	void *as_func_p() const;
 	void *as_const_p() const;
@@ -116,9 +128,9 @@ public:
 	void set_param(int index, shared<Node> p);
 	void set_instance(shared<Node> p);
 	void set_type(const Class *type);
-	string sig(const Class *ns) const;
-	string str(const Class *ns) const;
-	void show(const Class *ns) const;
+	string signature(const Class *ns = nullptr) const;
+	string str(const Class *ns = nullptr) const;
+	void show(const Class *ns = nullptr) const;
 
 	shared<Node> shallow_copy() const;
 	shared<Node> ref(const Class *override_type = nullptr) const;

@@ -13,16 +13,24 @@
 #endif
 
 
-#define NEW_NEW_PARSING 1
-
 
 const int MAX_IMPORT_DIRECTORY_PARENTS = 5;
 
 namespace kaba {
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message);
+shared<Node> create_node_token(Parser *p);
+
+Array<const Class*> func_effective_params(const Function *f);
+Array<const Class*> node_call_effective_params(shared<Node> node);
+const Class *node_call_return_type(shared<Node> node);
 
 ExpressionBuffer *cur_exp_buf = nullptr;
+
+void crash() {
+	int *p = nullptr;
+	*p = 4;
+}
 
 
 extern const Class *TypeIntList;
@@ -44,8 +52,16 @@ const int TYPE_CAST_FUNCTION_AS_CALLABLE = -32;
 const int TYPE_CAST_MAKE_SHARED = -40;
 const int TYPE_CAST_MAKE_OWNED = -41;
 
+
+
+struct CastingData {
+	int cast;
+	int penalty;
+	Function *f;
+};
+
 bool type_match(const Class *given, const Class *wanted);
-bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, int &penalty, int &cast);
+bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd);
 
 
 
@@ -194,30 +210,21 @@ void Parser::get_constant_value(const string &str, Value &value) {
 	}
 }
 
+void Parser::do_error(const string &str, shared<Node> node) {
+	do_error(str, node->token_id);
+}
 
-// override_line is logical! not physical
-void Parser::do_error(const string &str, int override_exp_no, int override_line) {
+void Parser::do_error(const string &str, int override_token_id) {
 	// what data do we have?
-	int logical_line = Exp.get_line_no();
-	int exp_no = Exp.cur_exp;
-	int physical_line = 0;
-	int pos = 0;
-	string expr;
+	int token_id = Exp.cur_token();
 
 	// override?
-	if (override_line >= 0) {
-		logical_line = override_line;
-		exp_no = 0;
-	}
-	if (override_exp_no >= 0)
-		exp_no = override_exp_no;
+	if (override_token_id >= 0)
+		token_id = override_token_id;
 
-	// logical -> physical
-	if ((logical_line >= 0) and (logical_line < Exp.line.num)) {
-		physical_line = Exp.line[logical_line].physical_line;
-		pos = Exp.line[logical_line].exp[exp_no].pos;
-		expr = Exp.line[logical_line].exp[exp_no].name;
-	}
+	int physical_line = Exp.token_physical_line_no(token_id);
+	int pos = Exp.token_line_offset(token_id);
+	string expr = Exp.get_token(token_id);
 
 #ifdef CPU_ARM
 	msg_error(str);
@@ -239,31 +246,72 @@ const Class *get_user_friendly_type(shared<Node> operand) {
 	return type;
 }
 
-shared_array<Node> Parser::parse_operand_extension_element(shared<Node> operand) {
-	Exp.next();
-	operand = force_concrete_type(operand);
-	auto links = tree->get_element_of(operand, Exp.cur);
-	if (links.num > 0) {
-		Exp.next();
-		return links;
-	}
+shared<Node> Parser::parse_abstract_operand_extension_element(shared<Node> operand) {
+	Exp.next(); // .
 
-	do_error(format("unknown element of '%s'", get_user_friendly_type(operand)->long_name()));
-	return {};
+	auto el = new Node(NodeKind::ABSTRACT_ELEMENT, 0, TypeUnknown);
+	el->token_id = Exp.cur_token();
+	el->set_num_params(2);
+	el->set_param(0, operand);
+	el->set_param(1, create_node_token(this));
+	Exp.next();
+	return el;
 }
 
-shared<Node> Parser::parse_operand_extension_array(shared<Node> operand, Block *block) {
-	operand = force_concrete_type(operand);
-	operand = deref_if_pointer(operand);
+shared<Node> Parser::parse_abstract_operand_extension_dict(shared<Node> operand) {
+	Exp.next(); // "{"
 
+	if (Exp.cur != "}")
+		do_error("'}' expected after dict 'class{'");
+
+	auto node = new Node(NodeKind::ABSTRACT_TYPE_DICT, 0, TypeUnknown);
+	node->token_id = Exp.cur_token();
+	Exp.next();
+	node->set_num_params(1);
+	node->set_param(0, operand);
+	return node;
+}
+
+shared<Node> Parser::parse_abstract_operand_extension_callable(shared<Node> operand, Block *block) {
+	Exp.next(); // "->"
+
+	auto node = new Node(NodeKind::ABSTRACT_TYPE_CALLABLE, 0, TypeUnknown);
+	node->token_id = Exp.cur_token();
+	node->set_num_params(2);
+	node->set_param(0, operand);
+	node->set_param(1, parse_abstract_operand(block));
+	return node;
+}
+
+shared<Node> Parser::parse_abstract_operand_extension_pointer(shared<Node> operand) {
+	auto node = new Node(NodeKind::ABSTRACT_TYPE_POINTER, 0, TypeUnknown);
+	node->token_id = Exp.cur_token();
+	Exp.next(); // "*"
+	node->set_num_params(1);
+	node->set_param(0, operand);
+	return node;
+}
+
+shared<Node> Parser::parse_abstract_operand_extension_array(shared<Node> operand, Block *block) {
 	// array index...
 	Exp.next();
+
+
+	if (Exp.cur == "]") {
+		auto node = new Node(NodeKind::ABSTRACT_TYPE_LIST, 0, TypeUnknown);
+		node->token_id = Exp.cur_token();
+		Exp.next();
+		node->set_num_params(1);
+		node->set_param(0, operand);
+		return node;
+	}
+
 	shared<Node> index;
 	shared<Node> index2;
 	if (Exp.cur == ":") {
 		index = tree->add_node_const(tree->add_constant_int(0));
 	} else {
-		index = parse_operand_super_greedy(block);
+		index = parse_abstract_operand_greedy(block);
 	}
 	if (Exp.cur == ":") {
 		Exp.next();
@@ -271,73 +319,18 @@ shared<Node> Parser::parse_operand_extension_array(shared<Node> operand, Block *
 			index2 = tree->add_node_const(tree->add_constant_int(DynamicArray::MAGIC_END_INDEX));
 			// magic value (-_-)'
 		} else {
-			index2 = parse_operand_greedy(block);
+			index2 = parse_abstract_operand_greedy(block);
 		}
 	}
 	if (Exp.cur != "]")
 		do_error("']' expected after array index");
 	Exp.next();
 
-	// subarray() ?
+	auto array = tree->add_node_array(operand, index, TypeUnknown);
 	if (index2) {
-		auto *cf = operand->type->get_func(IDENTIFIER_FUNC_SUBARRAY, operand->type, {index->type, index->type});
-		if (cf) {
-			auto f = tree->add_node_member_call(cf, operand);
-			f->is_const = operand->is_const;
-			f->set_param(1, index);
-			f->set_param(2, index2);
-			return f;
-		} else {
-			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, IDENTIFIER_FUNC_SUBARRAY, operand->type->name));
-		}
+		array->set_num_params(3);
+		array->set_param(2, index2);
 	}
-
-	// __get__() ?
-	auto *cf = operand->type->get_get(index->type);
-	if (cf) {
-		auto f = tree->add_node_member_call(cf, operand);
-		f->is_const = operand->is_const;
-		f->set_param(1, index);
-		return f;
-	}
-
-	// allowed?
-	bool allowed = (operand->type->is_array() or operand->type->usable_as_super_array());
-	bool pparray = false;
-	if (!allowed)
-		if (operand->type->is_pointer()) {
-			if (!operand->type->param[0]->is_array() and !operand->type->param[0]->usable_as_super_array())
-				do_error(format("using pointer type '%s' as an array (like in C) is not allowed any more", operand->type->long_name()));
-			allowed = true;
-			pparray = (operand->type->param[0]->usable_as_super_array());
-		}
-	if (!allowed)
-		do_error(format("type '%s' is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()));
-
-
-	if (index->type != TypeInt) {
-		Exp.rewind();
-		do_error(format("type of index for an array needs to be 'int', not '%s'", index->type->long_name()));
-	}
-
-	shared<Node> array;
-
-	// pointer?
-	if (pparray) {
-		do_error("test... anscheinend gibt es [] auf * super array");
-		//array = cp_command(this, Operand);
-/*		Operand->kind = KindPointerAsArray;
-		Operand->type = t->type->parent;
-		deref_command_old(this, Operand);
-		array = Operand->param[0];*/
-	} else if (operand->type->usable_as_super_array()) {
-		array = tree->add_node_dyn_array(operand, index);
-	} else if (operand->type->is_pointer()) {
-		array = tree->add_node_parray(operand, index, operand->type->param[0]->param[0]);
-	} else {
-		array = tree->add_node_array(operand, index);
-	}
-	array->is_const = operand->is_const;
 	return array;
 }
 
@@ -347,10 +340,7 @@ shared<Node> Parser::make_func_node_callable(const shared<Node> l) {
 	auto r = l->shallow_copy();
 	r->kind = NodeKind::CALL_FUNCTION;
 	r->type = f->literal_return_type;
-	if (f->is_static())
-		r->set_num_params(f->num_params);
-	else
-		r->set_num_params(f->num_params + 1);
+	r->set_num_params(f->num_params);
 
 	// virtual?
 	if (f->virtual_index >= 0)
@@ -365,10 +355,10 @@ shared<Node> Parser::make_func_pointer_node_callable(const shared<Node> l) {
 	if (f->virtual_index >= 0) {
 		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, true);
 	} else {
-		do_error("function pointer call should be virtual???");
+		do_error("function pointer call should be virtual???", l);
 		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true);
 	}
-	c->set_num_params(f->num_params + 1);
+	c->set_num_params(f->num_params);
 	c->set_instance(l->deref());
 	return c;
 }
@@ -380,7 +370,7 @@ shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *para
 		param_type = param_type->param[0];
 		
 	string fname = "__" + t->name + "__";
-	auto *cf = param_type->get_func(fname, t, {});
+	auto *cf = param_type->get_member_func(fname, t, {});
 	if (!cf)
 		do_error(format("illegal fake constructor... requires '%s.%s()'", param_type->long_name(), fname));
 	return add_node_member_call(cf, nullptr); // temp var added later...
@@ -390,7 +380,7 @@ shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *para
 }
 
 shared<Node> SyntaxTree::add_node_constructor(Function *f) {
-	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, TypeVoid);
+	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space);
 	auto n = add_node_member_call(f, dummy); // temp var added later...
 	n->kind = NodeKind::CONSTRUCTOR_AS_FUNCTION;
 	n->type = f->name_space;
@@ -407,10 +397,15 @@ shared_array<Node> Parser::turn_class_into_constructor(const Class *t, const sha
 	//shared<Node> dummy = add_node_local(vv);
 	shared_array<Node> links;
 	for (auto *cf: t->get_constructors())
-		if (cf->num_params == params.num)
+		if ((params.num >= cf->mandatory_params-1) and (params.num <= cf->num_params-1)) // skip "self"
 			links.add(tree->add_node_constructor(cf));
-	if (links.num == 0)
+	if (links.num == 0) {
+		for (auto *cf: t->get_constructors()) {
+			msg_write(cf->signature(TypeVoid));
+			msg_write(cf->mandatory_params);
+		}
 		do_error(format("class %s does not have a constructor with %d parameters", t->long_name(), params.num));
+	}
 	return links;
 }
 
@@ -435,7 +430,7 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 	if ((n->kind == NodeKind::CALL_FUNCTION) or (n->kind == NodeKind::CALL_VIRTUAL)) {
 		auto f = n->as_func();
 		int offset = 0;
-		if (!f->is_static()) {
+		if (f->is_member()) {
 			offset = 1;
 			if (f->is_selfref()) {
 				// const(return) = const(instance)
@@ -445,16 +440,30 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 				tree->do_error(f->long_name() + ": member function expects a mutable instance, because it is declared without 'const'");
 			}
 		}
-		for (int i=0; i<f->num_params; i++)
-			if (n->params[i+offset]->is_const and !f->var[i]->is_const())
-				tree->do_error(format("%s: function parameter %d ('%s') is 'out' and does not accept a constant value", f->long_name(), i+1, f->var[i]->name));
+		for (int i=offset; i<f->num_params; i++)
+			if (n->params[i]->is_const and !f->var[i]->is_const())
+				tree->do_error(format("%s: function parameter %d ('%s') is 'out' and does not accept a constant value", f->long_name(), i+1-offset, f->var[i]->name));
 	}
 	return n;
 }
 
-shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &params) {
+bool node_is_member_function_with_instance(shared<Node> n) {
+	if (!n->is_function())
+		return false;
+	auto *f = n->as_func();
+	if (f->is_static())
+		return false;
+	return n->params.num == 0 or n->params[0];
+}
+
+shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &_params) {
 
 	//force_concrete_types(params);
+	auto params = _params;
+	if (node_is_member_function_with_instance(links[0])) {
+		params.insert(links[0]->params[0], 0);
+
+	}
 
 	// direct match...
 	for (shared<Node> operand: links) {
@@ -466,12 +475,12 @@ shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, 
 
 
 	// advanced match...
-	Array<int> casts;
+	Array<CastingData> casts;
 	Array<const Class*> wanted;
 	int min_penalty = 1000000;
 	shared<Node> chosen;
 	for (auto operand: links) {
-		Array<int> cur_casts;
+		Array<CastingData> cur_casts;
 		Array<const Class*> cur_wanted;
 		int cur_penalty;
 		if (!param_match_with_cast(operand, params, cur_casts, cur_wanted, &cur_penalty))
@@ -483,6 +492,7 @@ shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, 
 			min_penalty = cur_penalty;
 		}
 	}
+
 	if (chosen)
 		return check_const_params(tree, apply_params_with_cast(chosen, params, casts, wanted));
 
@@ -490,11 +500,11 @@ shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, 
 	// error message
 
 	if (links.num == 0)
-		do_error("can not call ...");
+		do_error("can not call ...", links[0]);
 
 	if (links.num == 1) {
 		param_match_with_cast(links[0], params, casts, wanted, &min_penalty);
-		do_error("invalid function parameters: " + param_match_with_cast_error(params, wanted));
+		do_error("invalid function parameters: " + param_match_with_cast_error(params, wanted), links[0]);
 	}
 
 	string found = type_list_to_str(type_list_from_nodes(params));
@@ -502,105 +512,24 @@ shared<Node> Parser::try_to_match_apply_params(const shared_array<Node> &links, 
 	for (auto link: links) {
 		//auto p = get_wanted_param_types(link);
 		//available += format("\n * %s for %s", type_list_to_str(p), link->sig(tree->base_class));
-		available += format("\n * %s", link->sig(tree->base_class));
+		available += format("\n * %s", link->signature(tree->base_class));
 	}
-	do_error(format("invalid function parameters: %s given, possible options:%s", found, available));
+	do_error(format("invalid function parameters: %s given, possible options:%s", found, available), links[0]);
 	return shared<Node>();
 }
 
-shared<Node> Parser::parse_operand_extension_call(const shared_array<Node> &links, Block *block) {
+shared<Node> Parser::parse_abstract_operand_extension_call(shared<Node> link, Block *block) {
 
 	// parse all parameters
-	auto params = parse_call_parameters(block);
+	auto params = parse_abstract_call_parameters(block);
 
+	auto node = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown);
+	node->set_num_params(params.num + 1);
+	node->set_param(0, link);
+	foreachi (auto p, params, i)
+		node->set_param(i + 1, p);
 
-	// make links callable
-	foreachi (auto l, links, i) {
-		if (l->kind == NodeKind::FUNCTION) {
-			links[i] = make_func_node_callable(l);
-		} else if (l->kind == NodeKind::CLASS) {
-			auto *t = l->as_class();
-			return try_to_match_apply_params(turn_class_into_constructor(t, params), params);
-#if 0
-		} else if (is_typed_function_pointer(l->type)) {
-			auto c = new Node(NodeKind::POINTER_CALL, 0, get_function_pointer_return_type(l->type));
-			c->set_num_params(1 + get_function_pointer_param_types(l->type).num);
-			c->set_param(0, l);
-			return try_to_match_apply_params({c}, params);
-		/*} else if (l->type == TypeFunctionCodeP) {
-			auto c = new Node(NodeKind::POINTER_CALL, 0, TypeVoid);
-			c->set_num_params(1);
-			c->set_param(0, l);
-			return try_to_match_params({c});*/
-#endif
-		} else if (l->type->is_callable()) {
-			links[i] = make_func_pointer_node_callable(l);
-			//return tree->add_node_member_call(l->type->param[0]->get_call(), l->deref(), params);
-		} else {
-			do_error("can't call " + kind2str(l->kind));
-		}
-	}
-	return try_to_match_apply_params(links, params);
-}
-
-const Class *Parser::parse_type_extension_array(const Class *t) {
-	Exp.next(); // "["
-
-	// no index -> super array
-	if (Exp.cur == "]") {
-		t = tree->make_class_super_array(t);
-	} else {
-
-		// find array index
-		auto c = parse_operand_super_greedy(tree->root_of_all_evil->block.get());
-		c = tree->transform_node(c, [&](shared<Node> n) { return tree->conv_eval_const_func(n); });
-
-		if ((c->kind != NodeKind::CONSTANT) or (c->type != TypeInt))
-			do_error("only constants of type 'int' allowed for size of arrays");
-		int array_size = c->as_const()->as_int();
-		//Exp.next();
-		if (Exp.cur != "]")
-			do_error("']' expected after array size");
-		t = tree->make_class_array(t, array_size);
-	}
-
-	Exp.next();
-	return t;
-}
-
-const Class *Parser::parse_type_extension_dict(const Class *c) {
-	Exp.next(); // "{"
-
-	if (Exp.cur != "}")
-		do_error("'}' expected after dict 'class{'");
-
-	Exp.next();
-
-	return tree->make_class_dict(c);
-}
-
-
-const Class *Parser::parse_type_extension_pointer(const Class *c) {
-	Exp.next(); // "*"
-	return c->get_pointer();
-}
-
-const Class *Parser::parse_type_extension_func(const Class *c, const Class *ns) {
-	Exp.next(); // "->"
-	auto tt = parse_type(ns);
-	return tree->make_class_callable_fp({c}, tt);
-}
-
-const Class *Parser::parse_type_extension_child(const Class *c) {
-	Exp.next(); // "."
-	const Class *sub = nullptr;
-	for (auto *cc: weak(c->classes))
-		if (cc->name == Exp.cur)
-			sub = cc;
-	if (!sub)
-		do_error(format("class '%s' does not have a sub-class '%s'", c->long_name(), Exp.cur));
-	Exp.next();
-	return sub;
+	return node;
 }
 
 bool is_type_tuple(const shared<Node> n) {
@@ -627,11 +556,12 @@ Array<const Class*> node_extract_param_types(const shared<Node> n) {
 }
 
 // find any ".", or "[...]"'s    or operators?
-shared<Node> Parser::parse_operand_extension(const shared_array<Node> &operands, Block *block, bool prefer_type) {
+shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Block *block, bool prefer_class) {
 
+#if 0
 	// special
 	if (false) {
-		if (is_type_tuple(operands[0]) and (Exp.cur == "->")) {
+		if (is_type_tuple(operand) and (Exp.cur == "->")) {
 			do_error("do we ever reach this point?");
 			Exp.next();
 			auto ret = parse_type(block->name_space());
@@ -640,15 +570,15 @@ shared<Node> Parser::parse_operand_extension(const shared_array<Node> &operands,
 			return parse_operand_extension({tree->add_node_class(t)}, block, prefer_type);
 		}
 	}
+#endif
 
+
+#if 0
 	// special
-	if ((operands[0]->kind == NodeKind::CLASS) and ((Exp.cur == "*") or (Exp.cur == "[") or (Exp.cur == "{") or (Exp.cur == "->"))) {
-		if (operands.num > 1)
-			do_error("ambiguous class?!?!?");
-		auto *t = operands[0]->as_class();
+	if (/*(operands[0]->kind == NodeKind::CLASS) and*/ ((Exp.cur == "*") or (Exp.cur == "[") or (Exp.cur == "{") or (Exp.cur == "->"))) {
 
 		if (Exp.cur == "*") {
-			t = parse_type_extension_pointer(t);
+			operand = parse_type_extension_pointer(operand);
 		} else if (Exp.cur == "[") {
 			t = parse_type_extension_array(t);
 		} else if (Exp.cur == "{") {
@@ -661,48 +591,71 @@ shared<Node> Parser::parse_operand_extension(const shared_array<Node> &operands,
 
 		return parse_operand_extension({tree->add_node_class(t)}, block, prefer_type);
 	}
+#endif
 
-	// nothing?
-	auto primop = which_primitive_operator(Exp.cur, 1); // ++,--
+	auto no_identifier_after = [this] {
+		if (Exp.almost_end_of_line())
+			return true;
+		string next = Exp.peek_next();
+		if ((next == ",") or (next == "=") or (next == "[") or (next == "{") or (next == "->") or (next == ")") or (next == "*"))
+			return true;
+		return false;
+	};
+	auto might_declare_pointer_variable = [this] {
+		// a line of "int *p = ..."
+		if (Exp._cur_exp != 1)
+			return false;
+		if (is_number(Exp.cur_line->tokens[0].name[0]))
+			return false;
+		return true;
+	};
 
 	if (Exp.cur == ".") {
-		if (operands.num > 1)
-			do_error("left side of '.' is ambiguous");
-		// class element?
-
-		return parse_operand_extension(parse_operand_extension_element(operands[0]), block, prefer_type);
-
+		// element?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_element(operand), block, prefer_class);
 	} else if (Exp.cur == "[") {
-		if (operands.num > 1)
-			do_error("left side of '[' is ambiguous");
-			
 		// array?
-		return parse_operand_extension({parse_operand_extension_array(operands[0], block)}, block, prefer_type);
-
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_array(operand, block), block, prefer_class);
 	} else if (Exp.cur == "(") {
-		if (prefer_type and operands[0]->kind == NodeKind::CLASS)
-			return operands[0];
+		// call?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_call(operand, block), block, prefer_class);
+	} else if (Exp.cur == "{") {
+		// dict?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_dict(operand), block, prefer_class);
+	} else if (Exp.cur == "->") {
+		// A->B?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_callable(operand, block), block, true);
+	} else if (Exp.cur == IDENTIFIER_SHARED or Exp.cur == IDENTIFIER_OWNED) {
+		auto sub = operand;
+		if (Exp.cur == IDENTIFIER_SHARED) {
+			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED, 0, TypeUnknown);
+		} else { //if (pre == IDENTIFIER_OWNED)
+			operand = new Node(NodeKind::ABSTRACT_TYPE_OWNED, 0, TypeUnknown);
+		}
+		operand->token_id = Exp.cur_token();
+		Exp.next();
+		operand->set_num_params(1);
+		operand->set_param(0, sub);
+		return parse_abstract_operand_extension(operand, block, true);
+	} else {
 
-		return parse_operand_extension({parse_operand_extension_call(operands, block)}, block, prefer_type);
-
-	} else if (primop) {
-		if (operands.num > 1)
-			do_error("left side of ++/-- is ambiguous");
+		if ((Exp.cur == "*" and (prefer_class or no_identifier_after())) or Exp.cur == "ptr") {
+			// FIXME: false positives for "{{pi * 10}}"
+			return parse_abstract_operand_extension(parse_abstract_operand_extension_pointer(operand), block, true);
+		}
 		// unary operator? (++,--)
 
-		for (auto *op: tree->operators)
-			if (op->primitive == primop)
-				if ((op->param_type_1 == operands[0]->type) and !op->param_type_2) {
-					Exp.next();
-					return tree->add_node_operator(op, operands[0], nullptr);
-				}
-		return operands[0];
-	} else {
-		return operands[0];
+		auto op = parse_abstract_operator(1);
+		if (op) {
+			op->set_num_params(1);
+			op->set_param(0, operand);
+			return parse_abstract_operand_extension(op, block, prefer_class);
+		}
+		return operand;
 	}
 
 	// recursion
-	return parse_operand_extension(operands, block, prefer_type);
+	return parse_abstract_operand_extension(operand, block, prefer_class);
 }
 
 
@@ -712,9 +665,13 @@ Array<const Class*> Parser::get_wanted_param_types(shared<Node> link, int &manda
 		auto f = link->as_func();
 		mandatory_params = f->mandatory_params;
 		auto p = f->literal_param_type;
-		if (!f->is_static() and (link->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION))
+		/*if (f->is_member() and (link->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION))
 			if (link->params.num == 0 or !link->params[0])
-				p.insert(f->name_space, 0);
+				p.insert(f->name_space, 0);*/
+		if (link->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
+			//msg_write("FIXME CONSTR AS FUNC");
+			// TODO: what is better, giving here an "effective" parameter set, or offseting from the outside?
+		}
 		return p;
 	} else if (link->kind == NodeKind::CLASS) {
 		// should be caught earlier and turned to func...
@@ -732,7 +689,7 @@ Array<const Class*> Parser::get_wanted_param_types(shared<Node> link, int &manda
 	return {};
 }
 
-shared_array<Node> Parser::parse_call_parameters(Block *block) {
+shared_array<Node> Parser::parse_abstract_call_parameters(Block *block) {
 	if (Exp.cur != "(")
 		do_error("'(' expected in front of function parameter list");
 
@@ -746,7 +703,7 @@ shared_array<Node> Parser::parse_call_parameters(Block *block) {
 			break;
 
 		// find parameter
-		params.add(parse_operand_greedy(block));
+		params.add(parse_abstract_operand_greedy(block));
 
 		if (Exp.cur != ",") {
 			if (Exp.cur == ")")
@@ -770,10 +727,9 @@ shared<Node> Parser::check_param_link(shared<Node> link, const Class *wanted, co
 	if (type_match(given, wanted))
 		return link;
 
-	int pen, tc;
-
-	if (type_match_with_cast(link, false, wanted, pen, tc))
-		return apply_type_cast(tc, link, wanted);
+	CastingData cast;
+	if (type_match_with_cast(link, false, wanted, cast))
+		return apply_type_cast(cast, link, wanted);
 
 	Exp.rewind();
 	if (num_params > 1)
@@ -797,7 +753,7 @@ bool Parser::direct_param_match(const shared<Node> operand, const shared_array<N
 	return true;
 }
 
-bool Parser::param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<int> &casts, Array<const Class*> &wanted, int *max_penalty) {
+bool Parser::param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<CastingData> &casts, Array<const Class*> &wanted, int *max_penalty) {
 	int mandatory_params;
 	wanted = get_wanted_param_types(operand, mandatory_params);
 	if ((params.num < mandatory_params) or (params.num > wanted.num))
@@ -806,9 +762,9 @@ bool Parser::param_match_with_cast(const shared<Node> operand, const shared_arra
 	*max_penalty = 0;
 	for (int p=0; p<params.num; p++) {
 		int penalty;
-		if (!type_match_with_cast(params[p], false, wanted[p], penalty, casts[p]))
+		if (!type_match_with_cast(params[p], false, wanted[p], casts[p]))
 			return false;
-		*max_penalty = max(*max_penalty, penalty);
+		*max_penalty = max(*max_penalty, casts[p].penalty);
 	}
 	return true;
 }
@@ -817,8 +773,8 @@ string Parser::param_match_with_cast_error(const shared_array<Node> &params, con
 	if (wanted.num != params.num)
 		return format("%d parameters given, %d expected", params.num, wanted.num);
 	for (int p=0; p<params.num; p++) {
-		int penalty, cast;
-		if (!type_match_with_cast(params[p], false, wanted[p], penalty, cast)) {
+		CastingData cast;
+		if (!type_match_with_cast(params[p], false, wanted[p], cast)) {
 			auto pt = give_useful_type(this, params[p]);
 			if (params.num > 1)
 				return format("type '%s' given, '%s' expected for parameter #%d", pt->long_name(), wanted[p]->long_name(), p+1);
@@ -829,49 +785,31 @@ string Parser::param_match_with_cast_error(const shared_array<Node> &params, con
 	return "";
 }
 
-bool node_is_member_function_with_instance(shared<Node> n) {
-	if (!n->is_function())
-		return false;
-	auto *f = n->as_func();
-	if (f->is_static())
-		return false;
-	return n->params.num == 0 or n->params[0];
-}
-
-int node_param_offset(shared<Node> operand) {
-	int offset = 0;
-	if (node_is_member_function_with_instance(operand))
-		offset ++;
-	if ((operand->kind == NodeKind::CALL_RAW_POINTER))
-		offset ++;
-	return offset;
-}
-
-shared<Node> Parser::apply_params_direct(shared<Node> operand, const shared_array<Node> &params) {
-	int offset = node_param_offset(operand);
+shared<Node> Parser::apply_params_direct(shared<Node> operand, const shared_array<Node> &params, int offset) {
 	auto r = operand->shallow_copy();
 	for (int p=0; p<params.num; p++)
-		r->set_param(p + offset, params[p]);
+		r->set_param(p+offset, params[p]);
 	return r;
 }
 
-shared<Node> Parser::apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<int> &casts, const Array<const Class*> &wanted) {
-	int offset = node_param_offset(operand);
+shared<Node> Parser::apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<CastingData> &casts, const Array<const Class*> &wanted, int offset) {
 	auto r = operand->shallow_copy();
 	for (int p=0; p<params.num; p++) {
 		auto pp = apply_type_cast(casts[p], params[p], wanted[p]);
-		r->set_param(p + offset, pp);
+		r->set_param(p+offset, pp);
 	}
+
+	// default values
 	if (operand->is_function()) {
 		auto f = operand->as_func();
-		for (int p=params.num; p<f->num_params; p++) {
-			r->set_param(p + offset, f->default_parameters[p]);
+		for (int p=params.num+offset; p<f->num_params; p++) {
+			r->set_param(p, f->default_parameters[p]);
 		}
 	}
 	return r;
 }
 
-shared<Node> Parser::build_abstract_list(const Array<shared<Node>> &el) {
+shared<Node> build_abstract_list(const Array<shared<Node>> &el) {
 	auto c = new Node(NodeKind::ARRAY_BUILDER, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
@@ -879,7 +817,7 @@ shared<Node> Parser::build_abstract_list(const Array<shared<Node>> &el) {
 	return c;
 }
 
-shared<Node> Parser::build_abstract_dict(const Array<shared<Node>> &el) {
+shared<Node> build_abstract_dict(const Array<shared<Node>> &el) {
 	auto c = new Node(NodeKind::DICT_BUILDER, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
@@ -887,7 +825,7 @@ shared<Node> Parser::build_abstract_dict(const Array<shared<Node>> &el) {
 	return c;
 }
 
-shared<Node> Parser::build_abstract_tuple(const Array<shared<Node>> &el) {
+shared<Node> build_abstract_tuple(const Array<shared<Node>> &el) {
 	auto c = new Node(NodeKind::TUPLE, 0, TypeUnknown, true);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
@@ -895,16 +833,16 @@ shared<Node> Parser::build_abstract_tuple(const Array<shared<Node>> &el) {
 	return c;
 }
 
-shared<Node> Parser::link_unary_operator(PrimitiveOperator *po, shared<Node> operand, Block *block) {
-	int _ie = Exp.cur_exp - 1;
+shared<Node> Parser::link_unary_operator(AbstractOperator *po, shared<Node> operand, Block *block) {
+	int _ie = Exp.cur_token() - 1;
 	Operator *op = nullptr;
-	const Class *p2 = operand->type;
+	const Class *p1 = operand->type;
 
 	// exact match?
 	bool ok=false;
 	for (auto *_op: tree->operators)
-		if (po == _op->primitive)
-			if ((!_op->param_type_1) and (type_match(p2, _op->param_type_2))) {
+		if (po == _op->abstract)
+			if ((!_op->param_type_2) and (type_match(p1, _op->param_type_1))) {
 				op = _op;
 				ok = true;
 				break;
@@ -913,94 +851,59 @@ shared<Node> Parser::link_unary_operator(PrimitiveOperator *po, shared<Node> ope
 
 	// needs type casting?
 	if (!ok) {
-		int pen2 = 0;
-		int c2 = -1, c2_best = -1;
-		int pen_min = 100;
+		CastingData current;
+		CastingData best = {-1, 10000};
 		const Class *t_best = nullptr;
 		for (auto *_op: tree->operators)
-			if (po == _op->primitive)
-				if ((!_op->param_type_1) and (type_match_with_cast(operand, false, _op->param_type_2, pen2, c2))) {
+			if (po == _op->abstract)
+				if ((!_op->param_type_2) and (type_match_with_cast(operand, false, _op->param_type_1, current))) {
 					ok = true;
-					if (pen2 < pen_min) {
+					if (current.penalty < best.penalty) {
 						op = _op;
-						pen_min = pen2;
-						c2_best = c2;
-						t_best = _op->param_type_2;
+						best = current;
+						t_best = _op->param_type_1;
 					}
 			}
 		// cast
 		if (ok) {
-			operand = apply_type_cast(c2_best, operand, t_best);
+			operand = apply_type_cast(best, operand, t_best);
 		}
 	}
 
 
 	if (!ok)
-		do_error(format("unknown unitary operator '%s %s'", po->name, p2->long_name()), _ie);
+		do_error(format("unknown unitary operator '%s %s'", po->name, p1->long_name()), _ie);
 	return tree->add_node_operator(op, operand, nullptr);
 }
 
-shared<Node> Parser::parse_set_builder(Block *block) {
+shared<Node> Parser::parse_abstract_set_builder(Block *block) {
 	//Exp.next(); // [
-	auto n_for = parse_for_header(block);
+	auto n_for = parse_abstract_for_header(block);
 
-	auto n_exp = parse_operand_greedy(block);
+	auto n_exp = parse_abstract_operand_greedy(block);
 	
 	shared<Node> n_cmp;
 	if (Exp.cur == IDENTIFIER_IF) {
 		Exp.next(); // if
-		n_cmp = parse_operand_greedy(block);
+		n_cmp = parse_abstract_operand_greedy(block);
 	}
-
 
 	if (Exp.cur != "]")
 		do_error("] expected");
 	Exp.next();
 
-
-	const Class *el_type = n_exp->type;
-	const Class *type = tree->make_class_super_array(el_type);
-	auto *var = block->add_var(block->function->create_slightly_hidden_name(), type);
-
-	// array.add(exp)
-	auto *f_add = type->get_func("add", TypeVoid, {el_type});
-	if (!f_add)
-		do_error("...add() ???");
-	auto n_add = tree->add_node_member_call(f_add, tree->add_node_local(var));
-	n_add->set_param(1, n_exp);
-
-	Block *b;
-	if (n_cmp) {
-		Block *b_if = new Block(block->function, block);
-		Block *b_add = new Block(block->function, b_if);
-		b_add->add(n_add);
-	
-		auto n_if = tree->add_node_statement(StatementID::IF);
-		n_if->set_param(0, n_cmp);
-		n_if->set_param(1, b_add);
-	
-		b_if->add(n_if);
-		b = b_if;
-	} else {
-		b = new Block(block->function, block);
-		b->add(n_add);
-	}
-
-	n_for->set_param(n_for->params.num - 1, b);
-
-	post_process_for(n_for);
-
-	auto n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, type);
-	n->set_num_params(2);
+	auto n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, TypeUnknown);
+	n->set_num_params(3);
 	n->set_param(0, n_for);
-	n->set_param(1, tree->add_node_local(var));
+	n->set_param(1, n_exp);
+	n->set_param(2, n_cmp);
 	return n;
 
 }
 
 
 shared<Node> Parser::apply_format(shared<Node> n, const string &fmt) {
-	auto f = n->type->get_func("format", TypeString, {TypeString});
+	auto f = n->type->get_member_func("format", TypeString, {TypeString});
 	if (!f)
 		do_error(format("format string: no '%s.format(string)' function found", n->type->long_name()));
 	auto *c = tree->add_constant(TypeString);
@@ -1051,13 +954,15 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 		ee.cur_line->physical_line = Exp.cur_line->physical_line;
 		//ee.show();
 		
-		int cl = Exp.get_line_no();
-		int ce = Exp.cur_exp;
-		Exp.line.add(ee.line[0]);
-		Exp.set(0, Exp.line.num-1);
+		int token0 = Exp.cur_token();
+		//int cl = Exp.get_line_no();
+		//int ce = Exp.cur_exp;
+		Exp.lines.add(ee.lines[0]);
+		Exp.update_meta_data();
+		Exp.jump(Exp.lines.back().token_ids[0]);
 		
 		try {
-			auto n = parse_operand_super_greedy(block);
+			auto n = parse_operand_greedy(block, false);
 			n = deref_if_pointer(n);
 
 			if (fmt != "") {
@@ -1068,7 +973,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 			//n->show();
 			parts.add(n);
 		} catch (Exception &e) {
-			Exp.set(ce, cl);
+			Exp.jump(token0);
 			//e.line += cl;
 			//e.column += Exp.
 			
@@ -1076,8 +981,9 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 			do_error(e.text);
 		}
 		
-		Exp.line.pop();
-		Exp.set(ce, cl);
+		Exp.lines.pop();
+		Exp.update_meta_data();
+		Exp.jump(token0);
 		
 		pos = p1 + 2;
 	
@@ -1100,12 +1006,12 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v) {
 	return parts[0];
 }
 
-shared<Node> Parser::parse_list(Block *block) {
+shared<Node> Parser::parse_abstract_list(Block *block) {
 	shared_array<Node> el;
 	while(true) {
 		if (Exp.cur == "]")
 			break;
-		el.add(parse_operand_greedy(block));
+		el.add(parse_abstract_operand_greedy(block));
 		if ((Exp.cur != ",") and (Exp.cur != "]"))
 			do_error("',' or ']' expected");
 		if (Exp.cur == "]")
@@ -1116,23 +1022,17 @@ shared<Node> Parser::parse_list(Block *block) {
 	return build_abstract_list(el);
 }
 
-shared<Node> Parser::parse_dict(Block *block) {
+shared<Node> Parser::parse_abstract_dict(Block *block) {
 	Exp.next(); // {
 	shared_array<Node> el;
 	while(true) {
 		if (Exp.cur == "}")
 			break;
-		auto key = parse_operand_greedy(block);
-		if (key->type != TypeString or key->kind != NodeKind::CONSTANT)
-			do_error("key needs to be a constant string");
-		el.add(key);
+		el.add(parse_abstract_operand_greedy(block)); // key
 		if (Exp.cur != ":")
 			do_error("':' after key expected");
 		Exp.next();
-		auto value = parse_operand_greedy(block);
-		if ((Exp.cur != ",") and (Exp.cur != "}"))
-			do_error("',' or '}' expected");
-		el.add(value);
+		el.add(parse_abstract_operand_greedy(block)); // value
 		if (Exp.cur == "}")
 			break;
 		Exp.next();
@@ -1144,13 +1044,13 @@ shared<Node> Parser::parse_dict(Block *block) {
 const Class *make_pointer_shared(SyntaxTree *tree, const Class *parent) {
 	if (!parent->name_space)
 		tree->do_error("shared not allowed for: " + parent->long_name());
-	return tree->make_class(IDENTIFIER_SHARED + " " + parent->name, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, parent->name_space);
+	return tree->make_class(parent->name + " " + IDENTIFIER_SHARED, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, parent->name_space);
 }
 
 const Class *make_pointer_owned(SyntaxTree *tree, const Class *parent) {
 	if (!parent->name_space)
 		tree->do_error("owned not allowed for: " + parent->long_name());
-	return tree->make_class(IDENTIFIER_OWNED + " " + parent->name, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, parent->name_space);
+	return tree->make_class(parent->name + " " + IDENTIFIER_OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, parent->name_space);
 }
 
 const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const Class*> &classes) {
@@ -1182,128 +1082,71 @@ shared<Node> digest_type(SyntaxTree *tree, shared<Node> n) {
 	return tree->add_node_class(merge_type_tuple_into_product(tree, classes));
 }
 
-const Class *parse_root_type_with_dots(Parser *p, const Class *ns) {
-	string pre = p->Exp.cur;
-	p->Exp.next();
-	//auto t = parse_type(ns);
-	auto t = p->tree->find_root_type_by_name(p->Exp.cur, ns, true);
-	if (!t)
-		p->do_error(format("type expected after '%s'", pre));
-
-	p->Exp.next();
-	while (p->Exp.cur == ".") {
-		t = p->parse_type_extension_child(t);
-	}
+shared<Node> create_node_token(Parser *p) {
+	auto t = new Node(NodeKind::ABSTRACT_TOKEN, (int_p)&p->Exp, TypeUnknown);
+	t->token_id = p->Exp.cur_token();
 	return t;
 }
 
 // minimal operand
 // but with A[...], A(...) etc
-shared<Node> Parser::parse_operand(Block *block, const Class *ns, bool prefer_class) {
-	shared_array<Node> operands;
+shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
+	shared<Node> operand;
 
 	// ( -> one level down and combine commands
 	if (Exp.cur == "(") {
 		Exp.next();
-		operands = {parse_operand_super_greedy(block)};
+		operand = parse_abstract_operand_greedy(block, true);
 		if (Exp.cur != ")")
 			do_error("')' expected");
 		Exp.next();
 	} else if (Exp.cur == "&") { // & -> address operator
 		Exp.next();
-		operands = {parse_operand(block, ns)->ref()};
+		int token = Exp.cur_token();
+		operand = parse_abstract_operand(block)->ref(TypeUnknown);
+		operand->token_id = token;
 	} else if (Exp.cur == "*") { // * -> dereference
 		Exp.next();
-		auto sub = parse_operand(block, ns);
-		if (!sub->type->is_pointer()) {
-			Exp.rewind();
-			do_error("only pointers can be dereferenced using '*'");
-		}
-		operands = {sub->deref()};
+		int token = Exp.cur_token();
+		operand = parse_abstract_operand(block)->deref(TypeUnknown);
+		operand->token_id = token;
 	} else if (Exp.cur == "[") {
 		Exp.next();
 		if (Exp.cur == "for") {
-			operands = {parse_set_builder(block)};
+			operand = parse_abstract_set_builder(block);
 		} else {
-			operands = {parse_list(block)};
+			operand = parse_abstract_list(block);
 		}
 	} else if (Exp.cur == "{") {
-		operands = {parse_dict(block)};
-	} else if (Exp.cur == IDENTIFIER_FUNC) {
-		// local function definition
-		auto f = parse_function_header(tree->_base_class.get(), Flags::STATIC);
-		skip_parsing_function_body(f); // we're still working through the list of all functions and parsing!
-
-		// not sure why, but is necessary:
-		Exp.cur_exp = Exp.cur_line->exp.num - 1;
-		Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-
-		operands = {tree->add_node_func_name(f)};
-	} else if (Exp.cur == IDENTIFIER_SHARED or Exp.cur == IDENTIFIER_OWNED) {
-		string pre = Exp.cur;
-		auto t = parse_root_type_with_dots(this, ns);
-		if (pre == IDENTIFIER_SHARED)
-			t = make_pointer_shared(tree, t);
-		else //if (pre == IDENTIFIER_OWNED)
-			t = make_pointer_owned(tree, t);
-		operands = {tree->add_node_class(t)};
+		operand = parse_abstract_dict(block);
+	} else if (auto s = which_statement(Exp.cur)) {
+		operand = parse_abstract_statement(block);
+	} else if (auto w = which_abstract_operator(Exp.cur, 2)) { // negate/not...
+		operand = new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown);
+		Exp.next();
+		operand->set_num_params(1);
+		operand->set_param(0, parse_abstract_operand(block));
 	} else {
-		// direct operand
-		operands = tree->get_existence(Exp.cur, block, ns);
-		if (operands.num > 0) {
-
-			if (operands[0]->kind == NodeKind::STATEMENT) {
-				operands = {parse_statement(block)};
-
-			} else if (operands[0]->kind == NodeKind::PRIMITIVE_OPERATOR) {
-				// unary operator
-				Exp.next();
-				auto po = operands[0]->as_prim_op();
-				auto sub_command = parse_operand(block, ns);
-				return link_unary_operator(po, sub_command, block);
-			} else {
-				Exp.next();
-				// direct operand!
-
-			}
-		} else {
-			auto t = get_constant_type(Exp.cur);
-			if (t == TypeUnknown)
-				do_error("unknown operand");
-
-			Value v;
-			get_constant_value(Exp.cur, v);
-			Exp.next();
-			
-			if (t == TypeString) {
-				operands = {try_parse_format_string(block, v)};
-			} else {
-				auto *c = tree->add_constant(t);
-				c->set(v);
-				operands = {tree->add_node_const(c)};
-			}
-		}
-
+		operand = create_node_token(this);
+		Exp.next();
 	}
-	if (prefer_class and (operands[0]->kind != NodeKind::CLASS))
-		operands[0] = digest_type(tree, operands[0]);
 
 	if (Exp.end_of_line())
-		return operands[0];
+		return operand;
 
+	//return operand;
 	// resolve arrays, structures, calls...
-	return parse_operand_extension(operands, block, prefer_class);
+	return parse_abstract_operand_extension(operand, block, prefer_class);
 }
 
-// only "primitive" operator -> no type information
-shared<Node> Parser::parse_primitive_operator(Block *block) {
-	auto op = which_primitive_operator(Exp.cur, 3);
+// no type information
+shared<Node> Parser::parse_abstract_operator(int param_flags) {
+	auto op = which_abstract_operator(Exp.cur, param_flags);
 	if (!op)
 		return nullptr;
 
-	// command from operator
-	auto cmd = new Node(NodeKind::PRIMITIVE_OPERATOR, (int_p)op, TypeUnknown);
-	// only provisional (only operator sign, parameters and their types by GetCommand!!!)
+	auto cmd = new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)op, TypeUnknown);
+	cmd->token_id = Exp.cur_token();
 
 	Exp.next();
 	return cmd;
@@ -1319,23 +1162,23 @@ shared<Node> Parser::parse_primitive_operator(Block *block) {
 }*/
 
 bool type_match_tuple_as_contructor(shared<Node> node, Function *f_constructor, int &penalty) {
-	if (f_constructor->literal_param_type.num != node->params.num)
+	if (f_constructor->literal_param_type.num != node->params.num + 1)
 		return false;
 
 	penalty = 20;
-	foreachi (auto *e, weak(node->params), i) {
-		int pen, c;
-		if (!type_match_with_cast(e, false, f_constructor->literal_param_type[i], pen, c))
+	foreachi (auto *e, weak(node->params).sub_ref(1), i) {
+		CastingData cast;
+		if (!type_match_with_cast(e, false, f_constructor->literal_param_type[i], cast))
 			return false;
-		penalty += pen;
+		penalty += cast.penalty;
 	}
 	return true;
 }
 
-bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, int &penalty, int &cast) {
-	penalty = 0;
+bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd) {
+	cd.penalty = 0;
 	auto given = node->type;
-	cast = TYPE_CAST_NONE;
+	cd.cast = TYPE_CAST_NONE;
 	if (type_match(given, wanted))
 		return true;
 	if (wanted == TypeStringAutoCast and given == TypeString)
@@ -1346,15 +1189,15 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 		return false;
 	if (given->is_pointer()) {
 		if (type_match(given->param[0], wanted)) {
-			penalty = 10;
-			cast = TYPE_CAST_DEREFERENCE;
+			cd.penalty = 10;
+			cd.cast = TYPE_CAST_DEREFERENCE;
 			return true;
 		}
 	}
 	if (wanted->is_pointer_shared() and given->is_pointer()) {
 		if (type_match(given->param[0], wanted->param[0])) {
-			penalty = 10;
-			cast = TYPE_CAST_MAKE_SHARED;
+			cd.penalty = 10;
+			cd.cast = TYPE_CAST_MAKE_SHARED;
 			return true;
 		}
 	}
@@ -1368,23 +1211,24 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeUnknown) {
 		if (wanted->is_super_array()) {
 			auto t = wanted->get_array_element();
-			int pen, c;
+			CastingData cast;
 			for (auto *e: weak(node->params)) {
-				if (!type_match_with_cast(e, false, t, pen, c))
+				if (!type_match_with_cast(e, false, t, cast))
 					return false;
-				penalty += pen;
+				cd.penalty += cast.penalty;
 			}
-			cast = TYPE_CAST_ABSTRACT_LIST;
+			cd.cast = TYPE_CAST_ABSTRACT_LIST;
 			return true;
 		}
 		if (wanted == TypeDynamicArray) {
-			cast = TYPE_CAST_ABSTRACT_LIST;
+			cd.cast = TYPE_CAST_ABSTRACT_LIST;
 			return true;
 		}
 		// TODO: only for tuples
 		for (auto *f: wanted->get_constructors()) {
-			if (type_match_tuple_as_contructor(node, f, penalty)) {
-				cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
+			if (type_match_tuple_as_contructor(node, f, cd.penalty)) {
+				cd.cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
+				cd.f = f;
 				return true;
 			}
 		}
@@ -1392,12 +1236,14 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 	if ((node->kind == NodeKind::TUPLE) and (given == TypeUnknown)) {
 
 		for (auto *f: wanted->get_constructors()) {
-			if (type_match_tuple_as_contructor(node, f, penalty)) {
-				cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
+			if (type_match_tuple_as_contructor(node, f, cd.penalty)) {
+				cd.cast = TYPE_CAST_TUPLE_AS_CONSTRUCTOR;
+				cd.f = f;
 				return true;
 			}
 		}
 
+		// FIXME this probably doesn't make sense... we should already know the wanted type!
 		if (!wanted->is_product())
 			return false;
 		if (wanted->param.num != node->params.num)
@@ -1405,8 +1251,8 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 		for (int i=0; i<node->params.num; i++)
 			if (!type_match(node->params[i]->type, wanted->param[i]))
 				return false;
-		msg_write("product");
-		cast = TYPE_CAST_ABSTRACT_TUPLE;
+		msg_error("product");
+		cd.cast = TYPE_CAST_ABSTRACT_TUPLE;
 		return true;
 	}
 	if ((node->kind == NodeKind::FUNCTION) and (given == TypeUnknown)) {
@@ -1414,7 +1260,7 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 			auto f = node->as_func();
 			auto ft = f->owner()->make_class_callable_fp(f);
 			if (type_match(ft, wanted)) {
-				cast = TYPE_CAST_FUNCTION_AS_CALLABLE;
+				cd.cast = TYPE_CAST_FUNCTION_AS_CALLABLE;
 				return true;
 			}
 
@@ -1424,28 +1270,28 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 	if (wanted == TypeStringAutoCast) {
 		//Function *cf = given->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
 		//if (cf) {
-			penalty = 50;
-			cast = TYPE_CAST_OWN_STRING;
+			cd.penalty = 50;
+			cd.cast = TYPE_CAST_OWN_STRING;
 			return true;
 		//}
 	}
 	foreachi(auto &c, TypeCasts, i)
 		if (type_match(given, c.source) and type_match(c.dest, wanted)) {
-			penalty = c.penalty;
-			cast = i;
+			cd.penalty = c.penalty;
+			cd.cast = i;
 			return true;
 		}
 	return false;
 }
 
-shared<Node> Parser::apply_type_cast(int tc, shared<Node> node, const Class *wanted) {
-	if (tc == TYPE_CAST_NONE)
+shared<Node> Parser::apply_type_cast(const CastingData &cast, shared<Node> node, const Class *wanted) {
+	if (cast.cast == TYPE_CAST_NONE)
 		return node;
-	if (tc == TYPE_CAST_DEREFERENCE)
+	if (cast.cast == TYPE_CAST_DEREFERENCE)
 		return node->deref();
-	if (tc == TYPE_CAST_REFERENCE)
+	if (cast.cast == TYPE_CAST_REFERENCE)
 		return node->ref();
-	if (tc == TYPE_CAST_OWN_STRING) {
+	if (cast.cast == TYPE_CAST_OWN_STRING) {
 		return add_converter_str(node, false);
 		/*Function *cf = node->type->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
 		if (cf)
@@ -1453,57 +1299,48 @@ shared<Node> Parser::apply_type_cast(int tc, shared<Node> node, const Class *wan
 		do_error("automatic .str() not implemented yet");
 		return node;*/
 	}
-	if (tc == TYPE_CAST_ABSTRACT_LIST) {
+	if (cast.cast == TYPE_CAST_ABSTRACT_LIST) {
 		if (wanted == TypeDynamicArray)
 			return force_concrete_type(node);
-		int pen, c;
+		CastingData cd2;
 		foreachi (auto e, node->params, i) {
-			if (!type_match_with_cast(e, false, wanted->get_array_element(), pen, c)) {
+			if (!type_match_with_cast(e, false, wanted->get_array_element(), cd2)) {
 				do_error("nope????");
 			}
-			node->params[i] = apply_type_cast(c, e, wanted->get_array_element());
+			node->params[i] = apply_type_cast(cd2, e, wanted->get_array_element());
 		}
 		node->type = wanted;
 		return node;
 	}
-	if (tc == TYPE_CAST_ABSTRACT_TUPLE) {
+	if (cast.cast == TYPE_CAST_ABSTRACT_TUPLE) {
 		msg_error("AUTO TUPLE");
 		node->type = wanted;
 		return node;
 	}
-	if (tc == TYPE_CAST_FUNCTION_AS_CALLABLE) {
+	if (cast.cast == TYPE_CAST_FUNCTION_AS_CALLABLE) {
 		return force_concrete_type(node);
 	}
 
-	if (tc == TYPE_CAST_TUPLE_AS_CONSTRUCTOR) {
-		Array<int> c;
+	if (cast.cast == TYPE_CAST_TUPLE_AS_CONSTRUCTOR) {
+		Array<CastingData> c;
 		c.resize(node->params.num);
-		for (auto *f: wanted->get_constructors()) {
-			if (f->literal_param_type.num != node->params.num)
-				continue;
-			int pen;
-			bool ok = true;
-			foreachi (auto e, node->params, i)
-				if (!type_match_with_cast(e, false, f->literal_param_type[i], pen, c[i]))
-					ok = false;
-			if (!ok)
-				continue;
-			auto cmd = tree->add_node_constructor(f);
-			return apply_params_with_cast(cmd, node->params, c, f->literal_param_type);
-		}
-		do_error("classify...");
+		auto f = cast.f;
+		foreachi (auto e, node->params, i)
+			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c[i])) { do_error("aaaaa"); }
+		auto cmd = tree->add_node_constructor(f);
+		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type, 1);
 	}
-	if ((tc == TYPE_CAST_MAKE_SHARED) or (tc == TYPE_CAST_MAKE_OWNED)) {
+	if ((cast.cast == TYPE_CAST_MAKE_SHARED) or (cast.cast == TYPE_CAST_MAKE_OWNED)) {
 		auto f = wanted->get_func(IDENTIFIER_FUNC_SHARED_CREATE, wanted, {node->type});
 		if (!f)
-			do_error("make shared... create missing...");
+			do_error("make shared... create() missing...");
 		auto nn = tree->add_node_call(f);
 		nn->set_param(0, node);
 		return nn;
 	}
 	
-	auto c = tree->add_node_call(TypeCasts[tc].f);
-	c->type = TypeCasts[tc].dest;
+	auto c = tree->add_node_call(TypeCasts[cast.cast].f);
+	c->type = TypeCasts[cast.cast].dest;
 	c->set_param(0, node);
 	return c;
 }
@@ -1534,7 +1371,7 @@ shared<Node> Parser::link_special_operator_is(shared<Node> param1, shared<Node> 
 
 shared<Node> Parser::link_special_operator_in(shared<Node> param1, shared<Node> param2) {
 	param2 = force_concrete_type(param2);
-	auto *f = param2->type->get_func("__contains__", TypeBool, {param1->type});
+	auto *f = param2->type->get_member_func("__contains__", TypeBool, {param1->type});
 	if (!f)
 		do_error(format("no 'bool %s.__contains__(%s)' found", param2->type->long_name(), param1->type->long_name()));
 
@@ -1548,9 +1385,9 @@ shared<Node> explicit_cast(Parser *p, shared<Node> node, const Class *wanted) {
 	if (type == wanted)
 		return node;
 
-	int penalty, cast;
-	if (type_match_with_cast(node, false, wanted, penalty, cast)) {
-		if (cast == TYPE_CAST_NONE) {
+	CastingData cast;
+	if (type_match_with_cast(node, false, wanted, cast)) {
+		if (cast.cast == TYPE_CAST_NONE) {
 			auto c = node->shallow_copy();
 			c->type = wanted;
 			return c;
@@ -1561,7 +1398,7 @@ shared<Node> explicit_cast(Parser *p, shared<Node> node, const Class *wanted) {
 	if (wanted == TypeString)
 		return p->add_converter_str(node, false);
 
-	if (type->get_func("__" + wanted->name + "__", wanted, {})) {
+	if (type->get_member_func("__" + wanted->name + "__", wanted, {})) {
 		auto rrr = p->turn_class_into_constructor(wanted, {node});
 		if (rrr.num > 0) {
 			rrr[0]->set_param(0, node);
@@ -1581,10 +1418,10 @@ shared<Node> Parser::link_special_operator_as(shared<Node> param1, shared<Node> 
 }
 
 shared<Node> Parser::link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2) {
-	return link_operator(&PrimitiveOperators[(int)op_no], param1, param2);
+	return link_operator(&abstract_operators[(int)op_no], param1, param2);
 }
 
-shared<Node> Parser::link_operator(PrimitiveOperator *primop, shared<Node> param1, shared<Node> param2) {
+shared<Node> Parser::link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2) {
 	bool left_modifiable = primop->left_modifiable;
 	bool order_inverted = primop->order_inverted;
 	string op_func_name = primop->function_name;
@@ -1617,16 +1454,16 @@ shared<Node> Parser::link_operator(PrimitiveOperator *primop, shared<Node> param
 				auto index = param1->params[1];
 				//msg_write(format("[]=...    void %s.__set__(%s, %s)?", inst->type->long_name(), index->type->long_name(), p2->long_name()));
 				for (auto *ff: weak(inst->type->functions))
-					if (ff->name == IDENTIFIER_FUNC_SET and ff->literal_return_type == TypeVoid and ff->num_params == 2) {
-						if (ff->literal_param_type[0] != index->type)
+					if (ff->name == IDENTIFIER_FUNC_SET and ff->literal_return_type == TypeVoid and ff->num_params == 3) {
+						if (ff->literal_param_type[1] != index->type)
 							continue;
-						int pen, cast;
-						if (!type_match_with_cast(param2, false, ff->literal_param_type[1], pen, cast))
+						CastingData cast;
+						if (!type_match_with_cast(param2, false, ff->literal_param_type[2], cast))
 							continue;
 						//msg_write(ff->signature());
 						auto nn = tree->add_node_member_call(ff, inst);
 						nn->set_param(1, index);
-						nn->set_param(2, apply_type_cast(cast, param2, ff->literal_param_type[1]));
+						nn->set_param(2, apply_type_cast(cast, param2, ff->literal_param_type[2]));
 						return nn;
 					}
 			}
@@ -1635,10 +1472,13 @@ shared<Node> Parser::link_operator(PrimitiveOperator *primop, shared<Node> param
 
 	// exact match as class function?
 	for (auto *f: weak(pp1->functions))
-		if ((f->name == op_func_name) and !f->is_static()) {
+		if ((f->name == op_func_name) and f->is_member()) {
 			// exact match as class function but missing a "&"?
-			auto type1 = f->literal_param_type[0];
-			if (type_match(p2, type1)) {
+			if (f->literal_param_type.num != 2)
+				continue;
+
+			auto type2 = f->literal_param_type[1];
+			if (type_match(p2, type2)) {
 				auto inst = param1;
 				if (p1 == pp1)
 					op = tree->add_node_member_call(f, inst);
@@ -1660,19 +1500,18 @@ shared<Node> Parser::link_operator(PrimitiveOperator *primop, shared<Node> param
 
 
 	// needs type casting?
-	int pen1 = 0, pen2 = 0;
-	int c1 = TYPE_CAST_NONE, c2 = TYPE_CAST_NONE;
-	int c1_best = TYPE_CAST_NONE, c2_best = TYPE_CAST_NONE;
+	CastingData c1 = {TYPE_CAST_NONE, 0};
+	CastingData c2 = {TYPE_CAST_NONE, 0};
+	CastingData c1_best = {TYPE_CAST_NONE, 1000};
+	CastingData c2_best = {TYPE_CAST_NONE, 1000};
 	const Class *t1_best = nullptr, *t2_best = nullptr;
-	int pen_min = 2000;
 	Operator *op_found = nullptr;
 	Function *op_cf_found = nullptr;
 	for (auto *op: tree->operators)
-		if (primop == op->primitive)
-			if (type_match_with_cast(param1, left_modifiable, op->param_type_1, pen1, c1) and type_match_with_cast(param2, false, op->param_type_2, pen2, c2))
-				if (pen1 + pen2 < pen_min) {
+		if (primop == op->abstract)
+			if (type_match_with_cast(param1, left_modifiable, op->param_type_1,  c1) and type_match_with_cast(param2, false, op->param_type_2, c2))
+				if (c1.penalty + c2.penalty < c1_best.penalty + c2_best.penalty) {
 					op_found = op;
-					pen_min = pen1 + pen2;
 					c1_best = c1;
 					c2_best = c2;
 					t1_best = op->param_type_1;
@@ -1680,13 +1519,12 @@ shared<Node> Parser::link_operator(PrimitiveOperator *primop, shared<Node> param
 				}
 	for (auto *cf: weak(p1->functions))
 		if (cf->name == op_func_name)
-			if (type_match_with_cast(param2, false, cf->literal_param_type[0], pen2, c2))
-				if (pen2 < pen_min) {
+			if (type_match_with_cast(param2, false, cf->literal_param_type[1], c2))
+				if (c2.penalty < c2_best.penalty) {
 					op_cf_found = cf;
-					pen_min = pen2;
-					c1_best = -1;
+					c1_best.cast = TYPE_CAST_NONE;
 					c2_best = c2;
-					t2_best = cf->literal_param_type[0];
+					t2_best = cf->literal_param_type[1];
 				}
 	// cast
 	if (op_found or op_cf_found) {
@@ -1708,13 +1546,13 @@ void get_comma_range(shared_array<Node> &_operators, int mio, int &first, int &l
 	first = mio;
 	last = mio+1;
 	for (int i=mio; i>=0; i--) {
-		if (_operators[i]->as_prim_op()->id == OperatorID::COMMA)
+		if (_operators[i]->as_abstract_op()->id == OperatorID::COMMA)
 			first = i;
 		else
 			break;
 	}
 	for (int i=mio; i<_operators.num; i++) {
-		if (_operators[i]->as_prim_op()->id == OperatorID::COMMA)
+		if (_operators[i]->as_abstract_op()->id == OperatorID::COMMA)
 			last = i+1;
 		else
 			break;
@@ -1726,24 +1564,17 @@ shared<Node> Parser::build_function_pipe(const shared<Node> &input, const shared
 	if (func->kind != NodeKind::FUNCTION)
 		do_error("function expected after '|>");
 	auto f = func->as_func();
-	if (f->is_static()) {
-		if (f->num_params != 1)
-			do_error("function after '|>' needs exactly 1 parameter");
-		//if (f->literal_param_type[0] != input->type)
-		//	do_error("pipe type mismatch...");
-	} else {
-		if (f->num_params != 0)
-			do_error("function after '|>' needs exactly 1 parameter (self)");
-		//if (f->name_space != input->type)
-		//	do_error("pipe type mismatch...");
-	}
+	if (f->num_params != 1)
+		do_error("function after '|>' needs exactly 1 parameter (including self)");
+	//if (f->literal_param_type[0] != input->type)
+	//	do_error("pipe type mismatch...");
 
 	auto out = tree->add_node_call(f);
 
 	shared_array<Node> inputs;
 	inputs.add(input);
 
-	Array<int> casts;
+	Array<CastingData> casts;
 	Array<const Class*> wanted;
 	int penalty;
 	if (!param_match_with_cast(out, {input}, casts, wanted, &penalty))
@@ -1754,83 +1585,1172 @@ shared<Node> Parser::build_function_pipe(const shared<Node> &input, const shared
 	//return out;
 }
 
-void Parser::link_most_important_operator(shared_array<Node> &operands, shared_array<Node> &_operators, Array<int> &op_exp) {
-	//force_concrete_types(operands);
 
-// find the most important operator (mio)
-	int mio = 0;
-	for (int i=0;i<_operators.num;i++) {
-		if (_operators[i]->as_prim_op()->level > _operators[mio]->as_prim_op()->level)
-			mio = i;
-	}
+shared<Node> Parser::build_lambda_new(const shared<Node> &param, const shared<Node> &expression) {
+	do_error("abstract lambda not implemented yet", param);
+	return nullptr;
+}
 
-// link it
-	auto param1 = operands[mio];
-	auto param2 = operands[mio + 1];
-	auto op_no = _operators[mio]->as_prim_op();
-
-	if (op_no->id == OperatorID::COMMA) {
-		int first = mio, last = mio;
-		get_comma_range(_operators, mio, first, last);
-		auto n = build_abstract_tuple(operands.sub_ref(first, last + 1));
-		operands[first] = n;
-		for (int i=last-1; i>=first; i--) {
-			_operators.erase(i);
-			op_exp.erase(i);
-			operands.erase(i + 1);
+inline void concretify_all_params(shared<Node> &node, Block *block, const Class *ns, Parser *parser) {
+	for (int p=0; p<node->params.num; p++)
+		if (node->params[p]->type == TypeUnknown) {
+			node->params[p] = parser->concretify_node(node->params[p], block, ns);
 		}
-		return;
-	} else if (op_no->id == OperatorID::FUNCTION_PIPE) {
-		// well... we're abusing that we will always get the FIRST 2 pipe elements!!!
-		_operators[mio] = build_function_pipe(param1, param2);
-	} else {
-		param2 = force_concrete_type_if_function(param2);
-		// regular operator
-		_operators[mio] = link_operator(op_no, param1, param2);
-		if (!_operators[mio])
-			do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), op_exp[mio]);
+};
+
+
+shared<Node> Parser::concretify_call(shared<Node> node, Block *block, const Class *ns) {
+	//concretify_all_params(node, block, ns, this);
+	auto links = concretify_node_multi(node->params[0], block, ns);
+	for (int p=1; p<node->params.num; p++)
+		if (node->params[p]->type == TypeUnknown)
+			node->params[p] = concretify_node(node->params[p], block, ns);
+
+	auto params = node->params.sub_ref(1);
+
+
+	// make links callable
+	foreachi (auto l, weak(links), i) {
+		if (l->kind == NodeKind::FUNCTION) {
+			links[i] = make_func_node_callable(l);
+		} else if (l->kind == NodeKind::CLASS) {
+			auto *t = l->as_class();
+			return try_to_match_apply_params(turn_class_into_constructor(t, params), params);
+#if 0
+		} else if (is_typed_function_pointer(l->type)) {
+			auto c = new Node(NodeKind::POINTER_CALL, 0, get_function_pointer_return_type(l->type));
+			c->set_num_params(1 + get_function_pointer_param_types(l->type).num);
+			c->set_param(0, l);
+			return try_to_match_apply_params({c}, params);
+		/*} else if (l->type == TypeFunctionCodeP) {
+			auto c = new Node(NodeKind::POINTER_CALL, 0, TypeVoid);
+			c->set_num_params(1);
+			c->set_param(0, l);
+			return try_to_match_params({c});*/
+#endif
+		} else if (l->type->is_callable()) {
+			links[i] = make_func_pointer_node_callable(l);
+			//return tree->add_node_member_call(l->type->param[0]->get_call(), l->deref(), params);
+		} else {
+			do_error("can't call " + kind2str(l->kind), l);
+		}
+	}
+	return try_to_match_apply_params(links, params);
+}
+
+shared_array<Node> Parser::concretify_element(shared<Node> node, Block *block, const Class *ns) {
+	auto base = concretify_node(node->params[0], block, ns);
+	auto el = Exp.get_token(node->params[1]->token_id);
+
+	base = force_concrete_type(base);
+	auto links = tree->get_element_of(base, el);
+	if (links.num > 0)
+		return links;
+
+	if (base->kind == NodeKind::CLASS) {
+		auto c = tree->add_node_const(tree->add_constant(TypeClassP));
+		c->as_const()->as_int64() = (int_p)base->as_class();
+
+		auto links = tree->get_element_of(c, el);
+		if (links.num > 0)
+			return links;
 	}
 
-// remove from list
-	operands[mio] = _operators[mio];
-	_operators.erase(mio);
-	op_exp.erase(mio);
-	operands.erase(mio + 1);
+	if (base->kind == NodeKind::FUNCTION) {
+		msg_write("FFF");
+	}
+
+	do_error(format("unknown element of '%s'", get_user_friendly_type(base)->long_name()), node->params[1]);
+	return {};
+}
+
+
+class TemplateManager {
+public:
+	static void add_template(Function *f) {
+		if (config.verbose)
+			msg_write("ADD TEMPLATE");
+		Template t;
+		t.func = f;
+		templates.add(t);
+	}
+
+	static Function *full_copy(Parser *parser, Function *f0) {
+		auto f = f0->create_dummy_clone(f0->name_space);
+		f->block = (Block*)parser->tree->cp_node(f0->block.get()).get();
+		f->needs_overriding = false;
+
+		auto convert = [f](shared<Node> n) {
+			if (n->kind != NodeKind::BLOCK)
+				return n;
+			auto b = n->as_block();
+			foreachi (auto v, b->vars, vi) {
+				int i = weak(b->function->var).find(v);
+				//msg_write(i);
+				b->vars[vi] = f->var[i].get();
+			}
+			b->function = f;
+			return n;
+		};
+
+		convert(f->block.get());
+		parser->tree->transform_block(f->block.get(), convert);
+
+		f->abstract_param_types = f0->abstract_param_types;
+		f->abstract_return_type = f0->abstract_return_type;
+		return f;
+	}
+
+	static Function *instantiate(Parser *parser, Function *f0, const Array<const Class*> &params) {
+		if (config.verbose)
+			msg_write("INSTANTIATE TEMPLATE");
+		auto f = full_copy(parser, f0);
+		//f->block->show();
+
+		/*for (auto pp: weak(f->abstract_param_types))
+			pp->show();
+		msg_write(params[0]->name);*/
+
+		// lazy experiment...
+		//f->literal_param_type[0] = params[0];
+		//f->literal_return_type = params[0];
+		//msg_write("INSTANTIATE 01");
+		//msg_write(f0->abstract_param_types.num);
+		f->abstract_param_types[0] = parser->tree->add_node_class(params[0]);
+		//msg_write("INSTANTIATE 02");
+		f->abstract_return_type = parser->tree->add_node_class(params[0]);
+
+		//msg_write("INSTANTIATE 2");
+
+		parser->concretify_function_header(f);
+		//msg_write("INSTANTIATE 3");
+
+		f->update_parameters_after_parsing();
+
+		//msg_write("INSTANTIATE 4");
+		parser->concretify_function_body(f);
+		//msg_write("INSTANTIATE 41");
+
+		if (config.verbose)
+			f->block->show();
+		//msg_write("INSTANTIATE 42");
+
+		auto ns = const_cast<Class*>(f0->name_space);
+		ns->add_function(parser->tree, f, false, false);
+		parser->tree->functions.add(f);
+
+		//parser->do_error("template instantiate");
+		return f;
+	}
+
+	struct Instance {
+		Function *f;
+		Array<const Class*> params;
+	};
+	struct Template {
+		Function *func;
+		Array<string> params;
+		Array<Instance> instances;
+	};
+	static Array<Template> templates;
+};
+Array<TemplateManager::Template> TemplateManager::templates;
+
+shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Class *ns) {
+	auto operand = concretify_node(node->params[0], block, ns);
+	auto index = concretify_node(node->params[1], block, ns);
+	shared<Node> index2;
+	if (node->params.num >= 3)
+		index2 = concretify_node(node->params[2], block, ns);
+
+	if (operand->kind == NodeKind::CLASS) {
+		// int[3]
+		// find array index
+		index = tree->transform_node(index, [&](shared<Node> n) { return tree->conv_eval_const_func(n); });
+
+		if ((index->kind != NodeKind::CONSTANT) or (index->type != TypeInt))
+			do_error("only constants of type 'int' allowed for size of arrays", index);
+		int array_size = index->as_const()->as_int();
+		auto t = tree->make_class_array(operand->as_class(), array_size);
+		return tree->add_node_class(t);
+
+	}
+
+	if (operand->kind == NodeKind::FUNCTION) {
+		auto links = concretify_node_multi(node->params[0], block, ns);
+		if (index->kind != NodeKind::CLASS)
+			do_error("functions can only be indexed by a type", index);
+		auto t = index->as_class();
+		for (auto l: weak(links)) {
+			auto f = l->as_func();
+			if (f->is_abstract) {
+				auto ff = TemplateManager::instantiate(this, f, {t});
+				if (ff)
+					return tree->add_node_func_name(ff);
+			} else {
+				if (f->num_params >= 1)
+					if (f->literal_param_type[0] == t)
+						return l;
+			}
+		}
+		do_error(format("function has no version [%s]", t->name), index);
+	}
+
+
+
+
+	// subarray() ?
+	if (index2) {
+		auto *cf = operand->type->get_member_func(IDENTIFIER_FUNC_SUBARRAY, operand->type, {index->type, index->type});
+		if (cf) {
+			auto f = tree->add_node_member_call(cf, operand);
+			f->is_const = operand->is_const;
+			f->set_param(1, index);
+			f->set_param(2, index2);
+			return f;
+		} else {
+			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, IDENTIFIER_FUNC_SUBARRAY, operand->type->name), index);
+		}
+	}
+
+	// __get__() ?
+	auto *cf = operand->type->get_get(index->type);
+	if (cf) {
+		auto f = tree->add_node_member_call(cf, operand);
+		f->is_const = operand->is_const;
+		f->set_param(1, index);
+		return f;
+	}
+
+	// allowed?
+	bool allowed = (operand->type->is_array() or operand->type->usable_as_super_array());
+	bool pparray = false;
+	if (!allowed)
+		if (operand->type->is_pointer()) {
+			if (!operand->type->param[0]->is_array() and !operand->type->param[0]->usable_as_super_array())
+				do_error(format("using pointer type '%s' as an array (like in C) is deprecated", operand->type->long_name()), index);
+			allowed = true;
+			pparray = (operand->type->param[0]->usable_as_super_array());
+		}
+	if (!allowed)
+		do_error(format("type '%s' is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()), index);
+
+
+	if (index->type != TypeInt) {
+		Exp.rewind();
+		do_error(format("array index needs to be of type 'int', not '%s'", index->type->long_name()), index);
+	}
+
+	shared<Node> array;
+
+	// pointer?
+	if (pparray) {
+		do_error("test... anscheinend gibt es [] auf * super array"), index;
+		//array = cp_command(this, Operand);
+/*		Operand->kind = KindPointerAsArray;
+		Operand->type = t->type->parent;
+		deref_command_old(this, Operand);
+		array = Operand->param[0];*/
+	} else if (operand->type->usable_as_super_array()) {
+		array = tree->add_node_dyn_array(operand, index);
+	} else if (operand->type->is_pointer()) {
+		array = tree->add_node_parray(operand, index, operand->type->param[0]->param[0]);
+	} else {
+		array = tree->add_node_array(operand, index);
+	}
+	array->is_const = operand->is_const;
+	return array;
+
+}
+
+shared_array<Node> Parser::concretify_node_multi(shared<Node> node, Block *block, const Class *ns) {
+	if (node->type != TypeUnknown)
+		return {node};
+
+	if (node->kind == NodeKind::ABSTRACT_TOKEN) {
+		string token = Exp.get_token(node->token_id);
+
+		// direct operand
+		auto operands = tree->get_existence(token, block, ns);
+		if (operands.num > 0) {
+			// direct operand
+			return operands;
+		} else {
+			auto t = get_constant_type(token);
+			if (t == TypeUnknown) {
+
+				msg_write("----");
+				for (auto vv: weak(block->function->var))
+					msg_write(vv->type->name + " .... " + vv->name);
+				for (auto p: block->function->literal_param_type)
+					msg_write(p->name);
+				//crash();
+				do_error("unknown operand", node);
+			}
+
+			Value v;
+			get_constant_value(token, v);
+
+			if (t == TypeString) {
+				return {try_parse_format_string(block, v)};
+			} else {
+				auto *c = tree->add_constant(t);
+				c->set(v);
+				return {tree->add_node_const(c)};
+			}
+		}
+	} else if (node->kind == NodeKind::ABSTRACT_ELEMENT) {
+		return concretify_element(node, block, ns);
+	} else {
+		return {concretify_node(node, block, ns)};
+	}
+	return {};
+}
+
+
+shared<Node> Parser::concretify_statement_return(shared<Node> node, Block *block, const Class *ns) {
+	concretify_all_params(node, block, ns, this);
+	if (block->function->literal_return_type == TypeVoid) {
+		if (node->params.num > 0)
+			do_error("current function has type 'void', can not return a value", node);
+	} else {
+		if (node->params.num == 0)
+			do_error("return value expected", node);
+		node->params[0] = check_param_link(node->params[0], block->function->literal_return_type, IDENTIFIER_RETURN);
+	}
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_if(shared<Node> node, Block *block, const Class *ns) {
+	// [COND, TRUE-BLOCK, FALSE-BLOCK]
+	concretify_all_params(node, block, ns, this);
+	node->type = TypeVoid;
+	//node->set_param(0, check_param_link(node->params[0], TypeBool, IDENTIFIER_IF));
+	node->params[0] = check_param_link(node->params[0], TypeBool, IDENTIFIER_IF);
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_while(shared<Node> node, Block *block, const Class *ns) {
+	// [COND, BLOCK]
+	concretify_all_params(node, block, ns, this);
+	node->type = TypeVoid;
+	node->params[0] = check_param_link(node->params[0], TypeBool, IDENTIFIER_WHILE);
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_for_range(shared<Node> node, Block *block, const Class *ns) {
+	// [VAR, VALUE0, VALUE1, STEP, BLOCK]
+
+	auto var_name = Exp.get_token(node->params[0]->token_id);
+	auto val0 = force_concrete_type(concretify_node(node->params[1], block, ns));
+	auto val1 = force_concrete_type(concretify_node(node->params[2], block, ns));
+	auto step = node->params[3];
+	if (step)
+		step = force_concrete_type(concretify_node(step, block, ns));
+
+	// type?
+	const Class *t = val0->type;
+	if (val1->type == TypeFloat32)
+		t = val1->type;
+	if (step)
+		if (step->type == TypeFloat32)
+			t = step->type;
+
+	if (!step) {
+		if (t) {
+			step = tree->add_node_const(tree->add_constant_int(1));
+		} else {
+			step = tree->add_node_const(tree->add_constant(TypeFloat32));
+			step->as_const()->as_float() = 1.0f;
+		}
+	}
+
+	val0 = check_param_link(val0, t, "for", 1, 2);
+	val1 = check_param_link(val1, t, "for", 1, 2);
+	if (step)
+		step = check_param_link(step, t, "for", 1, 2);
+
+	node->params[1] = val0;
+	node->params[2] = val1;
+	node->params[3] = step;
+
+	// variable...
+	auto *var = block->add_var(var_name, t);
+	node->set_param(0, tree->add_node_local(var));
+
+	// block
+	node->params[4] = concretify_node(node->params[4], block, ns);
+	post_process_for(node);
+
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_for_array(shared<Node> node, Block *block, const Class *ns) {
+	// [VAR, INDEX, ARRAY, BLOCK]
+
+	auto array = force_concrete_type(concretify_node(node->params[2], block, ns));
+	array = deref_if_pointer(array);
+	if (!array->type->usable_as_super_array() and !array->type->is_array())
+		do_error("array or list expected as second parameter in 'for . in .'", array);
+	node->params[2] = array;
+
+
+	// variable...
+	auto var_name = Exp.get_token(node->params[0]->token_id);
+	auto var_type = array->type->get_array_element();
+	auto var = block->add_var(var_name, var_type);
+	if (array->is_const)
+		flags_set(var->flags, Flags::CONST);
+	node->set_param(0, tree->add_node_local(var));
+
+	string index_name = format("-for_index_%d-", for_index_count ++);
+	if (node->params[1])
+		index_name = Exp.get_token(node->params[1]->token_id);
+	auto index = block->add_var(index_name, TypeInt);
+	node->set_param(1, tree->add_node_local(index));
+
+	// block
+	node->params[3] = concretify_node(node->params[3], block, ns);
+	post_process_for(node);
+
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_str(shared<Node> node, Block *block, const Class *ns) {
+	concretify_all_params(node, block, ns, this);
+	return add_converter_str(node->params[0], false);
+}
+
+shared<Node> Parser::concretify_statement_repr(shared<Node> node, Block *block, const Class *ns) {
+	concretify_all_params(node, block, ns, this);
+	return add_converter_str(node->params[0], true);
+}
+
+shared<Node> Parser::concretify_statement_sizeof(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	sub = force_concrete_type(sub);
+
+	if (sub->kind == NodeKind::CLASS) {
+		return tree->add_node_const(tree->add_constant_int(sub->as_class()->size));
+	} else {
+		return tree->add_node_const(tree->add_constant_int(sub->type->size));
+	}
+}
+
+shared<Node> Parser::concretify_statement_typeof(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	sub = force_concrete_type(sub);
+
+	auto c = tree->add_node_const(tree->add_constant(TypeClassP));
+	if (sub->kind == NodeKind::CLASS) {
+		return tree->add_node_class(sub->as_class());
+	} else {
+		return tree->add_node_class(sub->type);
+	}
+}
+
+shared<Node> Parser::concretify_statement_len(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	sub = force_concrete_type(sub);
+	sub = deref_if_pointer(sub);
+
+	// array?
+	if (sub->type->is_array())
+		return tree->add_node_const(tree->add_constant_int(sub->type->array_length));
+
+	// __length__() function?
+	auto *f = sub->type->get_member_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {});
+	if (f)
+		return tree->add_node_member_call(f, sub);
+
+	// element "int num/length"?
+	for (auto &e: sub->type->elements)
+		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
+			return sub->shift(e.offset, e.type);
+		}
+
+	// length() function?
+	for (auto f: sub->type->functions)
+		if ((f->name == "length") and (f->num_params == 1))
+			return tree->add_node_member_call(f.get(), sub);
+
+
+	do_error(format("don't know how to get the length of an object of class '%s'", sub->type->long_name()));
+	return nullptr;
+}
+
+shared<Node> Parser::concretify_statement_new(shared<Node> node, Block *block, const Class *ns) {
+	auto constr = concretify_node(node->params[0], block, block->name_space());
+	if (constr->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
+		do_error("constructor call expected after 'new'");
+	constr->kind = NodeKind::CALL_FUNCTION;
+	constr->type = TypeVoid;
+	node->params[0] = constr;
+
+	auto ff = constr->as_func();
+	auto tt = ff->name_space;
+	//do_error("NEW " + tt->long_name());
+
+	node->type = tt->get_pointer();
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_delete(shared<Node> node, Block *block, const Class *ns) {
+	auto p = concretify_node(node->params[0], block, block->name_space());
+	if (!p->type->is_pointer())
+		do_error("pointer expected after 'del'");
+
+	// override del operator?
+	auto f = p->type->param[0]->get_func("__del_override__", TypeVoid, {p->type});
+	if (f) {
+		auto cmd = tree->add_node_call(f);
+		cmd->set_instance(p->deref());
+		return cmd;
+	}
+
+	// default delete
+	node->params[0] = p;
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_dyn(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	//sub = force_concrete_type(sub); // TODO
+	return make_dynamical(sub);
+}
+
+shared<Node> Parser::concretify_statement_sorted(shared<Node> node, Block *block, const Class *ns) {
+	concretify_all_params(node, block, ns, this);
+	auto array = force_concrete_type(node->params[0]);
+	auto crit = force_concrete_type(node->params[1]);
+
+	if (!array->type->is_super_array())
+		do_error("sorted(): first parameter must be a list[]");
+	if (crit->type != TypeString)
+		do_error("sorted(): second parameter must be a string");
+
+	Function *f = tree->required_func_global("@sorted");
+
+	auto cmd = tree->add_node_call(f);
+	cmd->set_param(0, array);
+	cmd->set_param(1, tree->add_node_class(array->type));
+	cmd->set_param(2, crit);
+	cmd->type = array->type;
+	return cmd;
+}
+
+shared<Node> Parser::concretify_statement_weak(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+
+	auto t = sub->type;
+	while (true) {
+		if (t->is_pointer_shared() or t->is_pointer_owned()) {
+			auto tt = t->param[0]->get_pointer();
+			return sub->shift(0, tt);
+		} else if (t->is_super_array() and t->get_array_element()->is_pointer_shared()) {
+			auto tt = tree->make_class_super_array(t->param[0]->param[0]->get_pointer());
+			return sub->shift(0, tt);
+		}
+		if (t->parent)
+			t = t->parent;
+		else
+			break;
+	}
+	do_error("weak() expects either a shared pointer, an owned pointer, or a shared pointer array");
+	return nullptr;
+}
+
+shared<Node> Parser::concretify_statement_map(shared<Node> node, Block *block, const Class *ns) {
+	auto func = concretify_node(node->params[0], block, block->name_space());
+	auto array = concretify_node(node->params[1], block, block->name_space());
+	func = force_concrete_type(func);
+	array = force_concrete_type(array);
+
+
+	if (!func->type->is_callable())
+		do_error("map(): first parameter must be callable");
+	if (!array->type->is_super_array())
+		do_error("map(): second parameter must be a list[]");
+
+	auto p = node_call_effective_params(func);
+	auto rt = node_call_return_type(func);
+	if (p.num != 1)
+		do_error("map(): function must have exactly one parameter");
+	if (p[0] != array->type->param[0])
+		do_error("map(): function parameter does not match list type");
+
+	auto *f = tree->required_func_global("@xmap");
+
+	auto cmd = tree->add_node_call(f);
+	cmd->set_param(0, func);
+	cmd->set_param(1, array);
+	cmd->set_param(2, tree->add_node_class(p[0]));
+	cmd->set_param(3, tree->add_node_class(p[1]));
+	cmd->type = tree->make_class_super_array(rt);
+	return cmd;
+}
+
+shared<Node> Parser::concretify_statement_raw_function_pointer(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	if (sub->kind != NodeKind::FUNCTION)
+		do_error("raw_function_pointer() expects a function name");
+	auto func = tree->add_node_const(tree->add_constant(TypeFunctionP));
+	func->as_const()->as_int64() = (int_p)sub->as_func();
+
+	node->type = TypeFunctionCodeP;
+	node->set_param(0, func);
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_try(shared<Node> node, Block *block, const Class *ns) {
+	// [TRY-BLOCK, EX:[TYPE, NAME], EX-BLOCK, ...]
+
+	auto try_block = concretify_node(node->params[0], block, block->name_space());
+	node->params[0] = try_block;
+
+	int num_exceptions = (node->params.num - 1) / 2;
+
+	for (int i=0; i<num_exceptions; i++) {
+
+		auto ex = node->params[1 + 2*i];
+
+		auto ex_block = node->params[2 + 2*i];
+
+		if (ex->params.num > 0) {
+			auto ex_type = ex->params[0];
+			ex_type = concretify_node(ex_type, block, block->name_space());
+			ex_type = digest_type(tree, ex_type);
+			auto var_name = Exp.get_token(ex->params[1]->token_id);
+
+			ex->params.resize(1);
+
+
+			if (ex_type->kind != NodeKind::CLASS)
+				do_error("Exception class expected", ex_type);
+			auto type = ex_type->as_class();
+			if (!type->is_derived_from(TypeException))
+				do_error("Exception class expected", ex_type);
+			ex->type = type;
+
+			auto *v = ex_block->as_block()->add_var(var_name, type->get_pointer());
+			ex->set_param(0, tree->add_node_local(v));
+		} else {
+			ex->type = TypeVoid;
+		}
+
+		// find types AFTER creating the variable
+		ex_block = concretify_node(ex_block, block, block->name_space());
+		node->params[2 + 2*i] = ex_block;
+	}
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Parser::concretify_statement_lambda(shared<Node> node, Block *block, const Class *ns) {
+	auto f = node->params[0]->as_func();
+
+
+	auto *prev_func = cur_func;
+
+	f->block->parent = block; // to allow captured variable lookup
+	if (block->function->is_member())
+		flags_clear(f->flags, Flags::STATIC); // allow finding "self.x" via "x"
+
+	cur_func = f;
+
+	if (f->block->params.num == 1) {
+
+		auto cmd = f->block->params[0];
+		cmd = concretify_node(cmd, f->block.get(), block->name_space());
+
+		f->literal_return_type = cmd->type;
+		f->effective_return_type = cmd->type;
+
+		if (cmd->type == TypeVoid) {
+			f->block->params[0] = cmd;
+		} else {
+			auto ret = tree->add_node_statement(StatementID::RETURN);
+			ret->set_num_params(1);
+			ret->params[0] = cmd;
+			f->block->params[0] = ret;
+		}
+
+	} else {
+		f->block->type = TypeUnknown;
+		f->literal_return_type = TypeVoid;
+		f->effective_return_type = TypeVoid;
+		concretify_node(f->block.get(), f->block.get(), f->name_space);
+	}
+
+	cur_func = prev_func;
+
+
+	f->block->parent = nullptr;
+	flags_set(f->flags, Flags::STATIC);
+
+	tree->base_class->add_function(tree, f, false, false);
+
+	// find captures
+	Set<Variable*> captures;
+	auto find_captures = [block, &captures](shared<Node> n) {
+		if (n->kind == NodeKind::VAR_LOCAL) {
+			auto v = n->as_local();
+			for (auto vv: block->function->var)
+				if (v == vv)
+					captures.add(v);
+		}
+		return n;
+	};
+	tree->transform_block(f->block.get(), find_captures);
+
+	auto param_types = f->literal_param_type;
+
+
+	// no captures?
+	if (captures.num == 0) {
+		f->update_parameters_after_parsing();
+		return tree->add_node_func_name(f);
+	}
+
+
+	if (config.verbose)
+		msg_write("CAPTURES:");
+	/*auto lt = new BindingTemplate;
+	binding_templates.add(lt);
+	lt->outer = block->function;
+	lt->inner = f;
+	lt->captures_local = captures;
+	lt->capture_data.resize(10000); // 10k...*/
+
+	Array<const Class*> capture_types;
+	Array<bool> capture_via_ref;
+
+	auto should_capture_via_ref = [this] (Variable *v) {
+		if (v->name == IDENTIFIER_SELF)
+			return true;
+		if (v->type->can_memcpy() or v->type == TypeString)
+			return false;
+		do_error(format("currently not supported to capture variable '%s' of type '%s'", v->name, v->type->long_name()));
+		return true;
+	};
+
+	// replace captured variables by added parameters
+	for (auto v: captures) {
+		if (config.verbose)
+			msg_write("  * " + v->name);
+
+		bool via_ref = should_capture_via_ref(v);
+		capture_via_ref.add(via_ref);
+		auto cap_type = via_ref ? v->type->get_pointer() : v->type;
+		capture_types.add(cap_type);
+
+
+		auto vvv = f->add_param(v->name, cap_type, Flags::NONE);
+		//if (!flags_has(flags, Flags::OUT))
+		//flags_set(v->flags, Flags::CONST);
+
+
+
+		auto replace_local = [v,vvv,cap_type,via_ref](shared<Node> n) {
+			if (n->kind == NodeKind::VAR_LOCAL)
+				if (n->as_local() == v) {
+					if (via_ref) {
+						n->link_no = (int_p)vvv;
+						n->type = cap_type;
+						return n->deref();
+					} else {
+						n->link_no = (int_p)vvv;
+					}
+				}
+			return n;
+		};
+		tree->transform_block(f->block.get(), replace_local);
+	}
+
+	f->update_parameters_after_parsing();
+
+	auto bind_wrapper_type = tree->make_class_callable_bind(param_types, f->literal_return_type, capture_types);
+
+
+	auto create_inner_lambda = wrap_function_into_callable(f);
+
+
+	// "new bind(f, a, b,...)"
+	for (auto *cf: bind_wrapper_type->get_constructors()) {
+		auto cmd_new = tree->add_node_statement(StatementID::NEW);
+		auto con = tree->add_node_constructor(cf);
+		shared_array<Node> params = {create_inner_lambda.get()};
+		foreachi (auto &c, captures, i) {
+			if (capture_via_ref[i])
+				params.add(tree->add_node_local(c)->ref());
+			else
+				params.add(tree->add_node_local(c));
+		}
+		con = apply_params_direct(con, params, 1);
+		con->kind = NodeKind::CALL_FUNCTION;
+		con->type = TypeVoid;
+
+		cmd_new->type = tree->make_class_callable_fp(param_types, f->literal_return_type);
+		cmd_new->set_param(0, con);
+		return cmd_new;
+	}
+
+
+	do_error("lambda bind failed...");
+	return nullptr;
+}
+
+shared<Node> Parser::concretify_statement(shared<Node> node, Block *block, const Class *ns) {
+
+
+	auto s = node->as_statement();
+	if (s->id == StatementID::RETURN) {
+		return concretify_statement_return(node, block, ns);
+	} else if ((s->id == StatementID::IF) or (s->id == StatementID::IF_ELSE)) {
+		return concretify_statement_if(node, block, ns);
+	} else if (s->id == StatementID::WHILE) {
+		return concretify_statement_while(node, block, ns);
+	} else if (s->id == StatementID::FOR_RANGE) {
+		return concretify_statement_for_range(node, block, ns);
+	} else if (s->id == StatementID::FOR_ARRAY) {
+		return concretify_statement_for_array(node, block, ns);
+	} else if (s->id == StatementID::STR) {
+		return concretify_statement_str(node, block, ns);
+	} else if (s->id == StatementID::REPR) {
+		return concretify_statement_repr(node, block, ns);
+	} else if (s->id == StatementID::SIZEOF) {
+		return concretify_statement_sizeof(node, block, ns);
+	} else if (s->id == StatementID::TYPEOF) {
+		return concretify_statement_typeof(node, block, ns);
+	} else if (s->id == StatementID::LEN) {
+		return concretify_statement_len(node, block, ns);
+	} else if (s->id == StatementID::NEW) {
+		return concretify_statement_new(node, block, ns);
+	} else if (s->id == StatementID::DELETE) {
+		return concretify_statement_delete(node, block, ns);
+	} else if (s->id == StatementID::DYN) {
+		return concretify_statement_dyn(node, block, ns);
+	} else if (s->id == StatementID::RAW_FUNCTION_POINTER) {
+		return concretify_statement_raw_function_pointer(node, block, ns);
+	} else if (s->id == StatementID::WEAK) {
+		return concretify_statement_weak(node, block, ns);
+	} else if (s->id == StatementID::SORTED) {
+		return concretify_statement_sorted(node, block, ns);
+	} else if (s->id == StatementID::MAP) {
+		return concretify_statement_map(node, block, ns);
+	} else if (s->id == StatementID::TRY) {
+		return concretify_statement_try(node, block, ns);
+	} else if (s->id == StatementID::LAMBDA) {
+		return concretify_statement_lambda(node, block, ns);
+	} else {
+		node->show();
+		do_error("INTERNAL: unexpected statement", node);
+	}
+	return nullptr;
+}
+
+shared<Node> Parser::concretify_node(shared<Node> node, Block *block, const Class *ns) {
+	if (node->type != TypeUnknown)
+		return node;
+
+	if (node->kind == NodeKind::ABSTRACT_OPERATOR) {
+		auto op_no = node->as_abstract_op();
+
+		if (op_no->id == OperatorID::FUNCTION_PIPE) {
+			concretify_all_params(node, block, ns, this);
+			// well... we're abusing that we will always get the FIRST 2 pipe elements!!!
+			return build_function_pipe(node->params[0], node->params[1]);
+		} else if (op_no->id == OperatorID::MAPS_TO) {
+			return build_lambda_new(node->params[0], node->params[1]);
+		}
+		concretify_all_params(node, block, ns, this);
+
+		if (node->params.num == 2) {
+			// binary operator A+B
+			auto param1 = node->params[0];
+			auto param2 = force_concrete_type_if_function(node->params[1]);
+			auto op = link_operator(op_no, param1, param2);
+			if (!op)
+				do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), node);
+			return op;
+		} else {
+			return link_unary_operator(op_no, node->params[0], block);
+		}
+	} else if (node->kind == NodeKind::DEREFERENCE) {
+		concretify_all_params(node, block, ns, this);
+		auto sub = node->params[0];
+		if (!sub->type->is_pointer())
+			do_error("only pointers can be dereferenced using '*'", node);
+		node->type = sub->type->param[0];
+	} else if (node->kind == NodeKind::REFERENCE) {
+		concretify_all_params(node, block, ns, this);
+		auto sub = node->params[0];
+		node->type = sub->type->get_pointer();
+	} else if (node->kind == NodeKind::ABSTRACT_CALL) {
+		return concretify_call(node, block, ns);
+	} else if (node->kind == NodeKind::ARRAY) {
+		return concretify_array(node, block, ns);
+	} else if (node->kind == NodeKind::TUPLE) {
+		concretify_all_params(node, block, ns, this);
+		return node;
+	} else if (node->kind == NodeKind::ARRAY_BUILDER) {
+		concretify_all_params(node, block, ns, this);
+		return node;
+	} else if (node->kind == NodeKind::DICT_BUILDER) {
+		concretify_all_params(node, block, ns, this);
+		for (int p=0; p<node->params.num; p+=2)
+			if (node->params[p]->type != TypeString or node->params[p]->kind != NodeKind::CONSTANT)
+				do_error("key needs to be a constant string");
+		return node;
+	} else if (node->kind == NodeKind::FUNCTION) {
+		return node;
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_POINTER) {
+		concretify_all_params(node, block, ns, this);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected before '*'", node->params[0]);
+		const Class *t = node->params[0]->as_class();
+		return tree->add_node_class(t->get_pointer());
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_LIST) {
+		concretify_all_params(node, block, ns, this);
+		auto n = digest_type(tree, node->params[0]);
+		if (n->kind != NodeKind::CLASS)
+			do_error("type expected before '[]'", n);
+		const Class *t = n->as_class();
+		t = tree->make_class_super_array(t);
+		return tree->add_node_class(t);
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_DICT) {
+		concretify_all_params(node, block, ns, this);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected before '{}'", node->params[0]);
+		const Class *t = node->params[0]->as_class();
+		t = tree->make_class_dict(t);
+		return tree->add_node_class(t);
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_CALLABLE) {
+		concretify_all_params(node, block, ns, this);
+		node->params[0] = digest_type(tree, node->params[0]);
+		node->params[1] = digest_type(tree, node->params[1]);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected before '->'", node->params[0]);
+		if (node->params[1]->kind != NodeKind::CLASS)
+			do_error("type expected before '->'", node->params[1]);
+		const Class *t0 = node->params[0]->as_class();
+		const Class *t1 = node->params[1]->as_class();
+		return tree->add_node_class(tree->make_class_callable_fp({t0}, t1));
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_SHARED) {
+		concretify_all_params(node, block, ns, this);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected after 'shared'", node->params[0]);
+		const Class *t = node->params[0]->as_class();
+		t = make_pointer_shared(tree, t);
+		return tree->add_node_class(t);
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_OWNED) {
+		concretify_all_params(node, block, ns, this);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected after 'owned'", node->params[0]);
+		const Class *t = node->params[0]->as_class();
+		t = make_pointer_owned(tree, t);
+		return tree->add_node_class(t);
+
+	} else if ((node->kind == NodeKind::ABSTRACT_TOKEN) or (node->kind == NodeKind::ABSTRACT_ELEMENT)) {
+		auto operands = concretify_node_multi(node, block, ns);
+		if (operands.num > 1)
+			msg_write(format("WARNING: node not unique:  %s  -  line %d", Exp.get_token(node->token_id), Exp.token_physical_line_no(node->token_id) + 1));
+		if (operands.num > 0)
+			return operands[0];
+	} else if (node->kind == NodeKind::STATEMENT) {
+		return concretify_statement(node, block, ns);
+	} else if (node->kind == NodeKind::BLOCK) {
+		for (int i=0; i<node->params.num; i++)
+			node->params[i] = concretify_node(node->params[i], node->as_block(), ns);
+		//concretify_all_params(node, node->as_block(), ns, this);
+		node->type = TypeVoid;
+		for (int i=node->params.num-1; i>=0; i--)
+			if (node->params[i]->kind == NodeKind::ABSTRACT_VAR)
+				node->params.erase(i);
+	} else if (node->kind == NodeKind::ABSTRACT_VAR) {
+		const Class *type = nullptr;
+		if (node->params[0]) {
+			auto t = digest_type(tree, force_concrete_type(concretify_node(node->params[0], block, ns)));
+			if (t->kind != NodeKind::CLASS)
+				do_error("variable declaration requires a type", t);
+			type = t->as_class();
+		} else {
+			//assert(node->params[2]);
+			auto rhs = force_concrete_type(concretify_node(node->params[2]->params[1], block, ns));
+			node->params[2]->params[1] = rhs;
+			type = rhs->type;
+		}
+		if (type->needs_constructor() and !type->get_default_constructor())
+			do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->long_name()));
+		block->add_var(Exp.get_token(node->params[1]->token_id), type);
+
+		if (node->params.num == 3)
+			return concretify_node(node->params[2], block, ns);
+
+	} else if (node->kind == NodeKind::ARRAY_BUILDER_FOR) {
+		// IN:  [FOR, EXP, IF]
+		// OUT: [FOR, VAR]
+
+		auto n_for = node->params[0];
+		auto n_exp = node->params[1];
+		auto n_cmp = node->params[2];
+
+		// first pass: find types in the for loop
+		auto fake_for = tree->cp_node(n_for); //->shallow_copy();
+		fake_for->set_param(fake_for->params.num - 1, tree->cp_node(n_exp)); //->shallow_copy());
+		fake_for = concretify_node(fake_for, block, ns);
+		// TODO: remove new variables!
+
+		// create an array
+		auto type_el = fake_for->params.back()->type;
+		auto type_array = tree->make_class_super_array(type_el);
+		auto *var = block->add_var(block->function->create_slightly_hidden_name(), type_array);
+
+
+
+		// array.add(exp)
+		auto *f_add = type_array->get_member_func("add", TypeVoid, {type_el});
+		if (!f_add)
+			do_error("...add() ???");
+		auto n_add = tree->add_node_member_call(f_add, tree->add_node_local(var));
+		n_add->set_param(1, n_exp);
+		n_add->type = TypeUnknown; // mark abstract so n_exp will be concretified
+
+		// add new code to the loop
+		Block *b;
+		if (n_cmp) {
+			auto b_if = new Block(block->function, block, TypeUnknown);
+			auto b_add = new Block(block->function, b_if, TypeUnknown);
+			b_add->add(n_add);
+
+			auto n_if = tree->add_node_statement(StatementID::IF, TypeUnknown);
+			n_if->set_param(0, n_cmp);
+			n_if->set_param(1, b_add);
+
+			b_if->add(n_if);
+			b = b_if;
+		} else {
+			b = new Block(block->function, block, TypeUnknown);
+			b->add(n_add);
+		}
+
+		n_for->set_param(n_for->params.num - 1, b);
+
+		// NOW we can set the types
+		n_for = concretify_node(n_for, block, ns);
+
+		auto n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, type_array);
+		n->set_num_params(2);
+		n->set_param(0, n_for);
+		n->set_param(1, tree->add_node_local(var));
+		return n;
+
+	} else if (node->kind == NodeKind::NONE) {
+	} else if (node->kind == NodeKind::CALL_FUNCTION) {
+		concretify_all_params(node, block, ns, this);
+		node->type = node->as_func()->literal_return_type;
+	} else {
+		node->show();
+		do_error("INTERNAL ERROR: unexpected node", node);
+	}
+
+	return node;
+}
+
+
+const Class *Parser::concretify_as_type(shared<Node> node, Block *block, const Class *ns) {
+	auto cc = concretify_node(node, block, ns);
+	cc = digest_type(tree, cc);
+	if (cc->kind != NodeKind::CLASS) {
+		cc->show(TypeVoid);
+		do_error("type expected", cc);
+	}
+	return cc->as_class();
+}
+
+// A+B*C  ->  +(A, *(B, C))
+shared<Node> digest_operator_list_to_tree(shared_array<Node> &operands, shared_array<Node> &operators) {
+	while (operators.num > 0) {
+
+		// find the most important operator (mio)
+		int mio = 0;
+		int level_max = -10000;
+		for (int i=0;i<operators.num;i++) {
+			if (operators[i]->as_abstract_op()->level > level_max) {
+				mio = i;
+				level_max = operators[i]->as_abstract_op()->level;
+			}
+		}
+		auto op_no = operators[mio]->as_abstract_op();
+
+		if (op_no->id == OperatorID::COMMA) {
+			int first = mio, last = mio;
+			get_comma_range(operators, mio, first, last);
+			auto n = build_abstract_tuple(operands.sub_ref(first, last + 1));
+			operands[first] = n;
+			for (int i=last-1; i>=first; i--) {
+				operators.erase(i);
+				//op_tokens.erase(i);
+				operands.erase(i + 1);
+			}
+			continue;
+		}
+
+		// link it
+		operators[mio]->set_num_params(2);
+		operators[mio]->set_param(0, operands[mio]);
+		operators[mio]->set_param(1, operands[mio+1]);
+
+		// remove from list
+		operands[mio] = operators[mio];
+		operators.erase(mio);
+		//op_tokens.erase(mio);
+		operands.erase(mio + 1);
+	}
+	return operands[0];
 }
 
 // greedily parse AxBxC...(operand, operator)
 shared<Node> Parser::parse_operand_greedy(Block *block, bool allow_tuples, shared<Node> first_operand) {
+	auto tree = parse_abstract_operand_greedy(block, allow_tuples, first_operand);
+	if (config.verbose)
+		tree->show();
+	return concretify_node(tree, block, block->name_space());
+}
+
+// greedily parse AxBxC...(operand, operator)
+shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tuples, shared<Node> first_operand) {
 	shared_array<Node> operands;
 	shared_array<Node> operators;
-	Array<int> op_exp;
 
 	// find the first operand
 	if (!first_operand)
-		first_operand = parse_operand(block, block->name_space());
+		first_operand = parse_abstract_operand(block);
+	if (config.verbose) {
+		msg_write("---first:");
+		first_operand->show();
+	}
 	operands.add(first_operand);
 
 	// find pairs of operators and operands
 	for (int i=0;true;i++) {
-		op_exp.add(Exp.cur_exp);
 		if (!allow_tuples and Exp.cur == ",")
 			break;
-		auto op = parse_primitive_operator(block);
+		auto op = parse_abstract_operator(3);
 		if (!op)
 			break;
+		op->token_id = Exp.cur_token() - 1;
 		operators.add(op);
-		if (Exp.end_of_line()) {
-			//Exp.rewind();
+		if (Exp.end_of_line())
 			do_error("unexpected end of line after operator");
-		}
-		operands.add(parse_operand(block, block->name_space()));
+		operands.add(parse_abstract_operand(block));
 	}
 
-	// in each step remove/link the most important operator
-	while (operators.num > 0)
-		link_most_important_operator(operands, operators, op_exp);
-
-	// complete command is now collected in operand[0]
-	return operands[0];
+	return digest_operator_list_to_tree(operands, operators);
 }
 
 // greedily parse AxBxC...(operand, operator)
@@ -1845,18 +2765,18 @@ shared<Node> Parser::parse_operand_super_greedy(Block *block) {
 
 // Node structure
 //  p = [VAR, START, STOP, STEP, BLOCK]
-shared<Node> Parser::parse_for_header(Block *block) {
+shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 	// variable name
 	Exp.next(); // for
-	string var_name = Exp.cur;
+	auto var = create_node_token(this);
 	Exp.next();
 
 	// index
-	string index_name = format("-for_index_%d-", for_index_count ++);
+	shared<Node> index;
 	if (Exp.cur == ",") {
 		Exp.next();
-		index_name = Exp.cur;
+		index = create_node_token(this);
 		Exp.next();
 	}
 
@@ -1866,50 +2786,23 @@ shared<Node> Parser::parse_for_header(Block *block) {
 	Exp.next();
 
 	// first value/array
-	auto val0 = parse_operand_super_greedy(block);
-	val0 = force_concrete_type(val0);
-	val0 = deref_if_pointer(val0);
+	auto val0 = parse_abstract_operand_greedy(block);
 
 
 	if (Exp.cur == ":") {
 		// range
 
 		Exp.next(); // :
-		auto val1 = parse_operand_greedy(block);
+		auto val1 = parse_abstract_operand_greedy(block);
 
 		shared<Node> val_step;
 		if (Exp.cur == ":") {
 			Exp.next();
-			val_step = parse_operand_greedy(block);
+			val_step = parse_abstract_operand_greedy(block);
 		}
 
-		// type?
-		const Class *t = val0->type;
-		if (val1->type == TypeFloat32)
-			t = val1->type;
-		if (val_step)
-			if (val_step->type == TypeFloat32)
-				t = val_step->type;
-		val0 = check_param_link(val0, t, "for", 1, 2);
-		val1 = check_param_link(val1, t, "for", 1, 2);
-		if (val_step)
-			val_step = check_param_link(val_step, t, "for", 1, 2);
-
-
-		if (!val_step) {
-			if (val0->type == TypeInt) {
-				val_step = tree->add_node_const(tree->add_constant_int(1));
-			} else {
-				val_step = tree->add_node_const(tree->add_constant(TypeFloat32));
-				val_step->as_const()->as_float() = 1.0f;
-			}
-		}
-
-		// variable
-		auto *var_no = block->add_var(var_name, t);
-
-		auto cmd_for = tree->add_node_statement(StatementID::FOR_RANGE);
-		cmd_for->set_param(0, tree->add_node_local(var_no));
+		auto cmd_for = tree->add_node_statement(StatementID::FOR_RANGE, TypeUnknown);
+		cmd_for->set_param(0, var);
 		cmd_for->set_param(1, val0);
 		cmd_for->set_param(2, val1);
 		cmd_for->set_param(3, val_step);
@@ -1920,28 +2813,15 @@ shared<Node> Parser::parse_for_header(Block *block) {
 	} else {
 		// array
 
-		auto for_array = val0;//parse_operand(block);
-		if ((!for_array->type->usable_as_super_array()) and (!for_array->type->is_array()))
-			do_error("array or list expected as second parameter in 'for . in .'");
-		//Exp.next();
+		auto array = val0;
 
 
-		// variable...
-		const Class *var_type = for_array->type->get_array_element();
-		auto *var = block->add_var(var_name, var_type);
-		if (for_array->is_const)
-			flags_set(var->flags, Flags::CONST);
-
-		// for index
-		auto *index = block->add_var(index_name, TypeInt);
-
-
-		auto cmd_for = tree->add_node_statement(StatementID::FOR_ARRAY);
+		auto cmd_for = tree->add_node_statement(StatementID::FOR_ARRAY, TypeUnknown);
 		// [VAR, INDEX, ARRAY, BLOCK]
 
-		cmd_for->set_param(0, tree->add_node_local(var));
-		cmd_for->set_param(1, tree->add_node_local(index));
-		cmd_for->set_param(2, for_array);
+		cmd_for->set_param(0, var);
+		cmd_for->set_param(1, index);
+		cmd_for->set_param(2, array);
 		//cmd_for->set_uparam(3, loop_block);
 
 		return cmd_for;
@@ -1972,21 +2852,20 @@ void Parser::post_process_for(shared<Node> cmd_for) {
 
 
 // Node structure
-shared<Node> Parser::parse_statement_for(Block *block) {
+shared<Node> Parser::parse_abstract_statement_for(Block *block) {
 
-	auto cmd_for = parse_for_header(block);
+	auto cmd_for = parse_abstract_for_header(block);
 
-	expect_new_line();
 	// ...block
+	expect_new_line_with_indent();
 	Exp.next_line();
-	expect_indent();
 	parser_loop_depth ++;
-	auto loop_block = parse_block(block);
+	auto loop_block = parse_abstract_block(block);
 	parser_loop_depth --;
 
 	cmd_for->set_param(cmd_for->params.num - 1, loop_block);
 
-	post_process_for(cmd_for);
+	//post_process_for(cmd_for);
 
 	return cmd_for;
 }
@@ -1994,32 +2873,31 @@ shared<Node> Parser::parse_statement_for(Block *block) {
 // Node structure
 //  p[0]: test
 //  p[1]: loop block
-shared<Node> Parser::parse_statement_while(Block *block) {
-	Exp.next();
-	auto cmd_cmp = check_param_link(parse_operand_greedy(block), TypeBool, IDENTIFIER_WHILE);
-	expect_new_line();
+shared<Node> Parser::parse_abstract_statement_while(Block *block) {
+	Exp.next(); // while
+	auto cmd_cmp = parse_abstract_operand_greedy(block);
 
-	auto cmd_while = tree->add_node_statement(StatementID::WHILE);
+	auto cmd_while = tree->add_node_statement(StatementID::WHILE, TypeUnknown);
 	cmd_while->set_param(0, cmd_cmp);
 
 	// ...block
+	expect_new_line_with_indent();
 	Exp.next_line();
-	expect_indent();
 	parser_loop_depth ++;
 	cmd_while->set_num_params(2);
-	cmd_while->set_param(1, parse_block(block));
+	cmd_while->set_param(1, parse_abstract_block(block));
 	parser_loop_depth --;
 	return cmd_while;
 }
 
-shared<Node> Parser::parse_statement_break(Block *block) {
+shared<Node> Parser::parse_abstract_statement_break() {
 	if (parser_loop_depth == 0)
 		do_error("'break' only allowed inside a loop");
 	Exp.next();
 	return tree->add_node_statement(StatementID::BREAK);
 }
 
-shared<Node> Parser::parse_statement_continue(Block *block) {
+shared<Node> Parser::parse_abstract_statement_continue() {
 	if (parser_loop_depth == 0)
 		do_error("'continue' only allowed inside a loop");
 	Exp.next();
@@ -2028,24 +2906,21 @@ shared<Node> Parser::parse_statement_continue(Block *block) {
 
 // Node structure
 //  p[0]: value (if not void)
-shared<Node> Parser::parse_statement_return(Block *block) {
+shared<Node> Parser::parse_abstract_statement_return(Block *block) {
 	Exp.next();
-	auto cmd = tree->add_node_statement(StatementID::RETURN);
-	if (block->function->literal_return_type == TypeVoid) {
-		if (!Exp.end_of_line())
-			do_error("current function has type 'void', can not return a value");
+	auto cmd = tree->add_node_statement(StatementID::RETURN, TypeUnknown);
+	if (Exp.end_of_line()) {
 		cmd->set_num_params(0);
 	} else {
-		auto cmd_value = check_param_link(parse_operand_super_greedy(block), block->function->literal_return_type, IDENTIFIER_RETURN);
 		cmd->set_num_params(1);
-		cmd->set_param(0, cmd_value);
+		cmd->set_param(0, parse_abstract_operand_greedy(block, true));
 	}
 	expect_new_line();
 	return cmd;
 }
 
 // IGNORE!!! raise() is a function :P
-shared<Node> Parser::parse_statement_raise(Block *block) {
+shared<Node> Parser::parse_abstract_statement_raise(Block *block) {
 	throw "jhhhh";
 #if 0
 	Exp.next();
@@ -2072,78 +2947,72 @@ shared<Node> Parser::parse_statement_raise(Block *block) {
 //  p[0]: try block
 //  p[1]: statement except (with type of Exception filter...)
 //  p[2]: except block
-shared<Node> Parser::parse_statement_try(Block *block) {
+shared<Node> Parser::parse_abstract_statement_try(Block *block) {
 	int ind = Exp.cur_line->indent;
 	Exp.next();
-	auto cmd_try = tree->add_node_statement(StatementID::TRY);
+	auto cmd_try = tree->add_node_statement(StatementID::TRY, TypeUnknown);
 	cmd_try->set_num_params(3);
-	expect_new_line();
 	// ...block
+	expect_new_line_with_indent();
 	Exp.next_line();
-	expect_indent();
-	cmd_try->set_param(0, parse_block(block));
+	cmd_try->set_param(0, parse_abstract_block(block));
+	int token0 = Exp.cur_token();
 	Exp.next_line();
 
 
 	int num_excepts = 0;
 
-	// else?
+	// except?
 	while (!Exp.end_of_file() and (Exp.cur == IDENTIFIER_EXCEPT) and (Exp.cur_line->indent == ind)) {
 
 
-//	if (Exp.cur != IDENTIFIER_EXCEPT)
-//		do_error("except after try expected");
-//	if (Exp.cur_line->indent != ind)
-//		do_error("wrong indentation for except");
-	Exp.next(); // except
+	//	if (Exp.cur != IDENTIFIER_EXCEPT)
+	//		do_error("except after try expected");
+	//	if (Exp.cur_line->indent != ind)
+	//		do_error("wrong indentation for except");
+		Exp.next(); // except
 
-	auto cmd_ex = tree->add_node_statement(StatementID::EXCEPT);
+		auto cmd_ex = tree->add_node_statement(StatementID::EXCEPT, TypeUnknown);
 
-	Block *except_block = new Block(block->function, block);
+		auto except_block = new Block(block->function, block, TypeUnknown);
 
-	if (!Exp.end_of_line()) {
-		auto *ex_type = parse_type(block->name_space());
-		if (!ex_type)
-			do_error("Exception class expected");
-		if (!ex_type->is_derived_from(TypeException))
-			do_error("Exception class expected");
-		cmd_ex->type = ex_type;
-		ex_type = ex_type->get_pointer();
 		if (!Exp.end_of_line()) {
-			if (Exp.cur != IDENTIFIER_AS)
-				do_error("'as' expected");
-			Exp.next();
-			string ex_name = Exp.cur;
-			auto *v = except_block->add_var(ex_name, ex_type);
-			cmd_ex->params.add(tree->add_node_local(v));
-			Exp.next();
+			auto ex_type = parse_abstract_operand(block, true); // type
+			if (!ex_type)
+				do_error("Exception class expected");
+			cmd_ex->params.add(ex_type);
+			if (!Exp.end_of_line()) {
+				if (Exp.cur != IDENTIFIER_AS)
+					do_error("'as' expected");
+				Exp.next(); // 'as'
+				cmd_ex->params.add(create_node_token(this)); // var name
+				Exp.next();
+			}
 		}
+
+		//int last_indent = Exp.indent_0;
+
+		// ...block
+		expect_new_line_with_indent();
+		Exp.next_line();
+		//ParseCompleteCommand(block);
+		//Exp.next_line();
+
+		//auto n = block->nodes.back();
+		//n->as_block()->
+
+		auto cmd_ex_block = parse_abstract_block(block, except_block);
+
+		num_excepts ++;
+		cmd_try->set_num_params(1 + num_excepts * 2);
+		cmd_try->set_param(num_excepts*2 - 1, cmd_ex);
+		cmd_try->set_param(num_excepts*2, cmd_ex_block);
+
+		token0 = Exp.cur_token();
+		Exp.next_line();
 	}
 
-	//int last_indent = Exp.indent_0;
-
-	expect_new_line();
-	// ...block
-	Exp.next_line();
-	expect_indent();
-	//ParseCompleteCommand(block);
-	//Exp.next_line();
-
-	//auto n = block->nodes.back();
-	//n->as_block()->
-
-	auto cmd_ex_block = parse_block(block, except_block);
-
-	num_excepts ++;
-	cmd_try->set_num_params(1 + num_excepts * 2);
-	cmd_try->set_param(num_excepts*2 - 1, cmd_ex);
-	cmd_try->set_param(num_excepts*2, cmd_ex_block);
-
-	Exp.next_line();
-	}
-
-	int line = Exp.get_line_no() - 1;
-	Exp.set(Exp.line[line].exp.num - 1, line);
+	Exp.jump(token0); // undo next_line()
 
 
 
@@ -2174,50 +3043,45 @@ shared<Node> Parser::parse_statement_try(Block *block) {
 //  p[0]: test
 //  p[1]: true block
 //  p[2]: false block
-shared<Node> Parser::parse_statement_if(Block *block) {
+shared<Node> Parser::parse_abstract_statement_if(Block *block) {
 	int ind = Exp.cur_line->indent;
 	Exp.next();
-	auto cmd_cmp = check_param_link(parse_operand_greedy(block), TypeBool, IDENTIFIER_IF);
-	expect_new_line();
+	auto cmd_cmp = parse_abstract_operand_greedy(block);
 
-	auto cmd_if = tree->add_node_statement(StatementID::IF);
+	auto cmd_if = tree->add_node_statement(StatementID::IF, TypeUnknown);
 	cmd_if->set_param(0, cmd_cmp);
 	// ...block
+	expect_new_line_with_indent();
 	Exp.next_line();
-	expect_indent();
-	//block->nodes.add(ParseBlock(block));
-	cmd_if->set_param(1, parse_block(block));
+	cmd_if->set_param(1, parse_abstract_block(block));
+	int token_id = Exp.cur_token();
 	Exp.next_line();
 
 	// else?
-	if ((!Exp.end_of_file()) and (Exp.cur == IDENTIFIER_ELSE) and (Exp.cur_line->indent >= ind)) {
+	if (!Exp.end_of_file() and (Exp.cur == IDENTIFIER_ELSE) and (Exp.cur_line->indent >= ind)) {
 		cmd_if->link_no = (int64)statement_from_id(StatementID::IF_ELSE);
 		cmd_if->set_num_params(3);
 		Exp.next();
 		// iterative if
 		if (Exp.cur == IDENTIFIER_IF) {
-			//DoError("else if...");
 			// sub-if's in a new block
-			Block *cmd_block = new Block(block->function, block);
+			auto cmd_block = new Block(block->function, block, TypeUnknown);
 			cmd_if->set_param(2, cmd_block);
 			// parse the next if
-			parse_complete_command(cmd_block);
+			parse_abstract_complete_command(cmd_block);
 			return cmd_if;
 		}
-		expect_new_line();
 		// ...block
+		expect_new_line_with_indent();
 		Exp.next_line();
-		expect_indent();
-		cmd_if->set_param(2, parse_block(block));
-		//Exp.next_line();
+		cmd_if->set_param(2, parse_abstract_block(block));
 	} else {
-		int line = Exp.get_line_no() - 1;
-		Exp.set(Exp.line[line].exp.num - 1, line);
+		Exp.jump(token_id);
 	}
 	return cmd_if;
 }
 
-shared<Node> Parser::parse_statement_pass(Block *block) {
+shared<Node> Parser::parse_abstract_statement_pass(Block *block) {
 	Exp.next(); // pass
 	expect_new_line();
 
@@ -2227,143 +3091,54 @@ shared<Node> Parser::parse_statement_pass(Block *block) {
 // Node structure
 //  type: class
 //  p[0]: call to constructor (optional)
-shared<Node> Parser::parse_statement_new(Block *block) {
+shared<Node> Parser::parse_abstract_statement_new(Block *block) {
 	Exp.next(); // new
-
-	auto cmd = tree->add_node_statement(StatementID::NEW);
-
-	if (NEW_NEW_PARSING) {
-		auto constr = parse_operand(block, block->name_space(), false);
-		if (constr->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
-			do_error("constructor call expected after 'new'");
-		constr->kind = NodeKind::CALL_FUNCTION;
-		constr->type = TypeVoid;
-
-		auto ff = constr->as_func();
-		auto tt = ff->name_space;
-		//do_error("NEW " + tt->long_name());
-
-
-		cmd->type = tt->get_pointer();
-		cmd->set_param(0, constr);
-		//cmd->show(TypeVoid);
-		return cmd;
-	}
-
-
-	auto t = parse_type(block->name_space());
-	if (Exp.cur != "(")
-		do_error("'(' expected after 'new Type'");
-	cmd->type = t->get_pointer();
-	/*cmd->set_num_uparams(1);
-	cmd->set_uparam(0, parse_operand_extension_call(, block, false));
-	cmd->uparams[0]->set_instance(new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));*/
-
-	auto cfs = t->get_constructors();
-	shared_array<Node> funcs;
-	if (cfs.num == 0)
-		do_error(format("class '%s' does not have a constructor", t->long_name()));
-	for (auto *cf: cfs) {
-		funcs.add(tree->add_node_func_name(cf));
-		funcs.back()->params.add(new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));
-	}
-	cmd->set_num_params(1);
-	cmd->set_param(0, parse_operand_extension_call(funcs, block));
-	//cmd->show(TypeVoid);
-	//msg_write("...........ok");
+	auto cmd = tree->add_node_statement(StatementID::NEW, TypeUnknown);
+	cmd->set_param(0, parse_abstract_operand(block));
 	return cmd;
 }
 
 // Node structure
 //  p[0]: operand
-shared<Node> Parser::parse_statement_delete(Block *block) {
+shared<Node> Parser::parse_abstract_statement_delete(Block *block) {
 	Exp.next(); // del
-	auto p = parse_operand(block, block->name_space());
-	if (!p->type->is_pointer())
-		do_error("pointer expected after 'del'");
-
-	// override del operator?
-	auto f = p->type->param[0]->get_func("__del_override__", TypeVoid, {});
-	if (f) {
-		auto cmd = tree->add_node_call(f);
-		cmd->set_instance(p->deref());
-		return cmd;
-	}
-
-	// default delete
-	auto cmd = tree->add_node_statement(StatementID::DELETE);
-	cmd->set_param(0, p);
+	auto cmd = tree->add_node_statement(StatementID::DELETE, TypeUnknown);
+	cmd->set_param(0, parse_abstract_operand(block));
 	return cmd;
 }
 
-shared<Node> Parser::parse_single_func_param(Block *block) {
-	string func_name = Exp.cur_line->exp[Exp.cur_exp-1].name;
+shared<Node> Parser::parse_abstract_single_func_param(Block *block) {
+	string func_name = Exp.get_token(Exp.cur_token() - 1);
 	if (Exp.cur != "(")
 		do_error(format("'(' expected after '%s'", func_name));
 	Exp.next(); // "("
-	auto n = parse_operand_greedy(block);
+	auto n = parse_abstract_operand_greedy(block);
 	if (Exp.cur != ")")
 		do_error(format("')' expected after parameter of '%s'", func_name));
 	Exp.next(); // ")"
 	return n;
 }
 
-shared<Node> Parser::parse_statement_sizeof(Block *block) {
+shared<Node> Parser::parse_abstract_statement_sizeof(Block *block) {
 	Exp.next(); // sizeof
-	auto sub = parse_single_func_param(block);
-	sub = force_concrete_type(sub);
-
-	if (sub->kind == NodeKind::CLASS) {
-		return tree->add_node_const(tree->add_constant_int(sub->as_class()->size));
-	} else {
-		return tree->add_node_const(tree->add_constant_int(sub->type->size));
-	}
+	auto node = tree->add_node_statement(StatementID::SIZEOF, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 
 }
 
-shared<Node> Parser::parse_statement_type(Block *block) {
-	Exp.next(); // type
-	auto sub = parse_single_func_param(block);
-	sub = force_concrete_type(sub);
-
-	auto c = tree->add_node_const(tree->add_constant(TypeClassP));
-	if (sub->kind == NodeKind::CLASS) {
-		c->as_const()->as_int64() = (int_p)sub->as_class();
-	} else {
-		c->as_const()->as_int64() = (int_p)sub->type;
-	}
-	return c;
+shared<Node> Parser::parse_abstract_statement_type(Block *block) {
+	Exp.next(); // typeof
+	auto node = tree->add_node_statement(StatementID::TYPEOF, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
-shared<Node> Parser::parse_statement_len(Block *block) {
+shared<Node> Parser::parse_abstract_statement_len(Block *block) {
 	Exp.next(); // len
-	auto sub = parse_single_func_param(block);
-	sub = force_concrete_type(sub);
-	sub = deref_if_pointer(sub);
-
-	// array?
-	if (sub->type->is_array())
-		return tree->add_node_const(tree->add_constant_int(sub->type->array_length));
-
-	// __length__() function?
-	auto *f = sub->type->get_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {});
-	if (f)
-		return tree->add_node_member_call(f, sub);
-
-	// element "int num/length"?
-	for (auto &e: sub->type->elements)
-		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
-			return sub->shift(e.offset, e.type);
-		}
-		
-	// length() function?
-	for (auto f: sub->type->functions)
-		if ((f->name == "length") and (f->num_params == 0))
-			return tree->add_node_member_call(f.get(), sub);
-
-
-	do_error(format("don't know how to get the length of an object of class '%s'", sub->type->long_name()));
-	return nullptr;
+	auto node = tree->add_node_statement(StatementID::LEN, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
 const Class *type_more_abstract(const Class *a, const Class *b) {
@@ -2379,13 +3154,13 @@ const Class *type_more_abstract(const Class *a, const Class *b) {
 shared<Node> Parser::wrap_function_into_callable(Function *f) {
 	auto t = tree->make_class_callable_fp(f);
 
-	for (auto *cf: t->param[0]->get_constructors())
-		if (cf->num_params == 1) {
+	for (auto *cf: t->param[0]->get_constructors()) {
+		if (cf->num_params == 2) {
 			auto cmd = tree->add_node_statement(StatementID::NEW);
 			auto con = tree->add_node_constructor(cf);
 			auto fp = tree->add_constant(TypeFunctionP);
 			fp->as_int64() = (int_p)f;
-			con = apply_params_direct(con, {tree->add_node_const(fp)});
+			con = apply_params_direct(con, {tree->add_node_const(fp)}, 1);
 			con->kind = NodeKind::CALL_FUNCTION;
 			con->type = TypeVoid;
 
@@ -2393,7 +3168,8 @@ shared<Node> Parser::wrap_function_into_callable(Function *f) {
 			cmd->set_param(0, con);
 			return cmd;
 		}
-	do_error("X");
+	}
+	do_error("wrap_function_into_callable() failed? " + f->signature());
 	return nullptr;
 }
 
@@ -2427,9 +3203,9 @@ shared<Node> Parser::force_concrete_type(shared<Node> node) {
 			do_error("inhomogeneous abstract array");
 
 		for (int i=0; i<node->params.num; i++) {
-			int pen, tc;
-			type_match_with_cast(node->params[i].get(), false, t, pen, tc);
-			node->params[i] = apply_type_cast(tc, node->params[i].get(), t);
+			CastingData cast;
+			type_match_with_cast(node->params[i].get(), false, t, cast);
+			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
 
 		node->type = tree->make_class_super_array(t);
@@ -2449,9 +3225,9 @@ shared<Node> Parser::force_concrete_type(shared<Node> node) {
 			do_error("inhomogeneous abstract dict");
 
 		for (int i=1; i<node->params.num; i+=2) {
-			int pen, tc;
-			type_match_with_cast(node->params[i].get(), false, t, pen, tc);
-			node->params[i] = apply_type_cast(tc, node->params[i].get(), t);
+			CastingData cast;
+			type_match_with_cast(node->params[i].get(), false, t, cast);
+			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
 
 		node->type = tree->make_class_dict(t);
@@ -2483,11 +3259,11 @@ shared<Node> Parser::add_converter_str(shared<Node> sub, bool repr) {
 	
 	auto *t = sub->type;
 
-	Function *cf = nullptr;	
+	Function *cf = nullptr;
 	if (repr)
-		cf = t->get_func(IDENTIFIER_FUNC_REPR, TypeString, {});
+		cf = t->get_member_func(IDENTIFIER_FUNC_REPR, TypeString, {});
 	if (!cf)
-		cf = t->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
+		cf = t->get_member_func(IDENTIFIER_FUNC_STR, TypeString, {});
 	if (cf)
 		return tree->add_node_member_call(cf, sub);
 
@@ -2502,38 +3278,24 @@ shared<Node> Parser::add_converter_str(shared<Node> sub, bool repr) {
 	return cmd;
 }
 
-shared<Node> Parser::parse_statement_str(Block *block) {
+shared<Node> Parser::parse_abstract_statement_str(Block *block) {
 	Exp.next(); // str
-	auto sub = parse_single_func_param(block);
-	
-	return add_converter_str(sub, false);
+	auto node = tree->add_node_statement(StatementID::STR, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
-shared<Node> Parser::parse_statement_repr(Block *block) {
+shared<Node> Parser::parse_abstract_statement_repr(Block *block) {
 	Exp.next(); // repr
-	auto sub = parse_single_func_param(block);
-
-	return add_converter_str(sub, true);
+	auto node = tree->add_node_statement(StatementID::REPR, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
 // local (variable) definitions...
-shared<Node> Parser::parse_statement_let(Block *block) {
+shared<Node> Parser::parse_abstract_statement_let(Block *block) {
 	do_error("'let' is deprecated, will change it's meaning soon...");
-	Exp.next(); // "let"
-	string name = Exp.cur;
-	Exp.next();
-
-	if (Exp.cur != "=")
-		do_error("'=' required after 'let' declaration");
-	Exp.next();
-
-	auto rhs = parse_operand_super_greedy(block);
-	rhs = force_concrete_type(rhs);
-	auto *var = block->add_var(name, rhs->type);
-	auto cmd = link_operator_id(OperatorID::ASSIGN, tree->add_node_local(var), rhs);
-	if (!cmd)
-		do_error("let: no assignment operator for type " + rhs->type->long_name());
-	return cmd;
+	return nullptr;
 }
 
 Array<string> parse_comma_sep_list(Parser *p) {
@@ -2550,28 +3312,58 @@ Array<string> parse_comma_sep_list(Parser *p) {
 	return names;
 }
 
-// local (variable) definitions...
-shared<Node> Parser::parse_statement_var(Block *block) {
-	Exp.next(); // "var"
-	const Class *type = nullptr;
+shared_array<Node> parse_comma_sep_token_list(Parser *p) {
+	shared_array<Node> names;
 
-	auto names = parse_comma_sep_list(this);
+	names.add(create_node_token(p));
+	p->Exp.next();
+
+	while (p->Exp.cur == ",") {
+		p->Exp.next(); // ","
+		names.add(create_node_token(p));
+		p->Exp.next();
+	}
+	return names;
+}
+
+// local (variable) definitions...
+shared<Node> Parser::parse_abstract_statement_var(Block *block) {
+	Exp.next(); // "var"
+
+	auto names = parse_comma_sep_token_list(this);
+	shared<Node> type;
 
 	// explicit type?
 	if (Exp.cur == ":") {
 		Exp.next();
-		type = parse_type(block->name_space());
+		type = parse_abstract_operand(block, true);
 	} else if (Exp.cur != "=") {
 		do_error("':' or '=' expected after 'var' declaration");
 	}
 
 	if (Exp.cur == "=") {
-		Exp.next();
 		if (names.num != 1)
 			do_error(format("'var' declaration with '=' only allowed with a single variable name, %d given", names.num));
 
-		auto rhs = parse_operand_super_greedy(block);
-		if (type) {
+		auto assign = parse_abstract_operator(3);
+
+		auto rhs = parse_abstract_operand_greedy(block, true);
+
+		assign->set_num_params(2);
+		assign->set_param(0, names[0]);
+		assign->set_param(1, rhs);
+
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		node->set_num_params(3);
+		node->set_param(0, type); // type
+		node->set_param(1, names[0]->shallow_copy()); // name
+		node->set_param(2, assign);
+		expect_new_line();
+		return node;
+
+
+
+		/*if (type) {
 			rhs = force_concrete_type_if_function(rhs);
 		} else {
 			rhs = force_concrete_type(rhs);
@@ -2581,21 +3373,23 @@ shared<Node> Parser::parse_statement_var(Block *block) {
 		auto cmd = link_operator_id(OperatorID::ASSIGN, tree->add_node_local(var), rhs);
 		if (!cmd)
 			do_error(format("var: no operator '%s' = '%s'", type->long_name(), rhs->type->long_name()));
-		return cmd;
+		return cmd;*/
 	}
 
 	expect_new_line();
 
-	for (auto &n: names)
-		block->add_var(n, type);
+	for (auto &n: names) {
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		node->set_num_params(2);
+		node->set_param(0, type); // type
+		node->set_param(1, n); // name
+		block->add(node);
+	}
 	return tree->add_node_statement(StatementID::PASS);
 }
 
 Array<const Class*> func_effective_params(const Function *f) {
-	auto p = f->literal_param_type;
-	if (!f->is_static())
-		p.insert(f->name_space, 0);
-	return p;
+	return f->literal_param_type;
 }
 
 Array<const Class*> node_call_effective_params(shared<Node> node) {
@@ -2614,52 +3408,27 @@ const Class *node_call_return_type(shared<Node> node) {
 	return get_callable_return_type(node->type);
 }
 
-shared<Node> Parser::parse_statement_map(Block *block) {
+shared<Node> Parser::parse_abstract_statement_map(Block *block) {
 	Exp.next(); // "map"
-	string name = Exp.cur;
 
-	auto params = parse_call_parameters(block);
+	auto params = parse_abstract_call_parameters(block);
 	if (params.num != 2)
 		do_error("map() expects 2 parameters");
-	params[0] = force_concrete_type(params[0]);
-	if (!params[0]->type->is_callable())
-		do_error("map(): first parameter must be callable");
-	params[1] = force_concrete_type(params[1]);
-	if (!params[1]->type->is_super_array())
-		do_error("map(): second parameter must be a list[]");
 
-	auto p = node_call_effective_params(params[0]);
-	auto rt = node_call_return_type(params[0]);
-	if (p.num != 1)
-		do_error("map(): function must have exactly one parameter");
-	if (p[0] != params[1]->type->param[0])
-		do_error("map(): function parameter does not match list type");
-
-	auto *f = tree->required_func_global("@xmap");
-
-	auto cmd = tree->add_node_call(f);
-	cmd->set_param(0, params[0]);
-	cmd->set_param(1, params[1]);
-	cmd->set_param(2, tree->add_node_class(p[0]));
-	cmd->set_param(3, tree->add_node_class(p[1]));
-	cmd->type = tree->make_class_super_array(rt);
-	return cmd;
+	auto node = tree->add_node_statement(StatementID::MAP, TypeUnknown);
+	node->set_param(0, params[0]);
+	node->set_param(1, params[1]);
+	return node;
 }
 
 
-shared<Node> Parser::parse_statement_lambda(Block *block) {
+shared<Node> Parser::parse_abstract_statement_lambda(Block *block) {
 	Exp.next(); // "lambda"
-	auto *prev_func = cur_func;
 
 	static int unique_lambda_counter = 0;
 
 	auto *f = tree->add_function("<lambda-" + i2s(unique_lambda_counter ++) + ">", TypeUnknown, tree->base_class, Flags::STATIC);
-	f->_logical_line_no = Exp.get_line_no();
-	f->_exp_no = Exp.cur_exp;
-
-	f->block->parent = block;
-
-	cur_func = f;
+	f->_token_id = Exp.cur_token();
 
 	Exp.next(); // '('
 
@@ -2689,132 +3458,40 @@ shared<Node> Parser::parse_statement_lambda(Block *block) {
 		}
 	Exp.next(); // ')'
 
-	cur_func = prev_func;
-
 	// lambda body
-	auto cmd = parse_operand_greedy(f->block.get());
-	f->literal_return_type = cmd->type;
-	f->effective_return_type = cmd->type;
+	if (Exp.end_of_line()) {
+		//parse_abstract_block(parent, f->block.get());
 
-	if (cmd->type == TypeVoid) {
+		int indent0 = Exp.cur_line->indent;
+		bool more_to_parse = true;
+
+	// instructions
+		while (more_to_parse) {
+			more_to_parse = parse_abstract_function_command(f, indent0);
+		}
+		Exp.rewind();
+
+	} else {
+		// single expression
+		auto cmd = parse_abstract_operand_greedy(f->block.get());
 		f->block->add(cmd);
-	} else {
-		auto ret = tree->add_node_statement(StatementID::RETURN);
-		ret->set_num_params(1);
-		ret->params[0] = cmd;
-		f->block->add(ret);
 	}
 
-	f->block->parent = nullptr;
-
-	tree->base_class->add_function(tree, f, false, false);
-
-	// find captures
-	Set<Variable*> captures;
-	auto find_captures = [block, &captures](shared<Node> n) {
-		if (n->kind == NodeKind::VAR_LOCAL) {
-			auto v = n->as_local();
-			for (auto vv: block->function->var)
-				if (v == vv)
-					captures.add(v);
-		}
-		return n;
-	};
-	tree->transform_block(f->block.get(), find_captures);
-
-	auto param_types = f->literal_param_type;
-
-	if (captures.num > 0) {
-		if (config.verbose)
-			msg_write("CAPTURES:");
-		/*auto lt = new BindingTemplate;
-		binding_templates.add(lt);
-		lt->outer = block->function;
-		lt->inner = f;
-		lt->captures_local = captures;
-		lt->capture_data.resize(10000); // 10k...*/
-
-		Array<const Class*> capture_types;
-
-		for (auto v: captures) {
-			if (config.verbose)
-				msg_write("  * " + v->name);
-			//f->block->vars.insert()
-			capture_types.add(v->type);
-
-			auto vvv = f->block->insert_var(f->num_params, v->name, v->type);
-			//if (!flags_has(flags, Flags::OUT))
-			//flags_set(v->flags, Flags::CONST);
-			f->literal_param_type.add(v->type);
-			f->num_params ++;
-
-
-			auto replace_local = [v,vvv](shared<Node> n) {
-				if (n->kind == NodeKind::VAR_LOCAL)
-					if (n->as_local() == v)
-						n->link_no = (int_p)vvv;
-				return n;
-			};
-			tree->transform_block(f->block.get(), replace_local);
-		}
-
-		f->update_parameters_after_parsing();
-
-		auto bind_wrapper_type = tree->make_class_callable_bind(param_types, f->literal_return_type, capture_types);
-
-
-		auto create_inner_lambda = wrap_function_into_callable(f);
-
-
-		for (auto *cf: bind_wrapper_type->get_constructors()) {
-			auto cmd = tree->add_node_statement(StatementID::NEW);
-			auto con = tree->add_node_constructor(cf);
-			shared_array<Node> params = {create_inner_lambda.get()};
-			for (auto &c: captures)
-				params.add(tree->add_node_local(c));
-			con = apply_params_direct(con, params);
-			con->kind = NodeKind::CALL_FUNCTION;
-			con->type = TypeVoid;
-
-			cmd->type = tree->make_class_callable_fp(param_types, f->literal_return_type);
-			//cmd->type = bind_wrapper_type->get_pointer();
-			cmd->set_param(0, con);
-			return cmd;
-		}
-
-
-		do_error("lambda bind failed...");
-		return nullptr;
-
-	} else {
-
-		f->update_parameters_after_parsing();
-
-		return tree->add_node_func_name(f);
-	}
+	auto node = tree->add_node_statement(StatementID::LAMBDA, TypeUnknown);
+	node->set_num_params(1);
+	node->set_param(0, tree->add_node_func_name(f));
+	return node;
 }
 
-shared<Node> Parser::parse_statement_sorted(Block *block) {
+shared<Node> Parser::parse_abstract_statement_sorted(Block *block) {
 	Exp.next(); // "sorted"
-	string name = Exp.cur;
-
-	auto params = parse_call_parameters(block);
+	auto params = parse_abstract_call_parameters(block);
 	if (params.num != 2)
-		do_error("sorted() expects 2 parameters");
-	params[0] = force_concrete_type(params[0]);
-	if (!params[0]->type->is_super_array())
-		do_error("sorted(): first parameter must be a list[]");
-	if (params[1]->type != TypeString)
-		do_error("sorted(): second parameter must be a string");
-
-	Function *f = tree->required_func_global("@sorted");
-
-	auto cmd = tree->add_node_call(f);
-	cmd->set_param(0, params[0]);
-	cmd->set_param(1, tree->add_node_class(params[0]->type));
-	cmd->set_param(2, params[1]);
-	cmd->type = params[0]->type;
-	return cmd;
+		do_error("sorted(array, criterion) expects 2 parameters");
+	auto node = tree->add_node_statement(StatementID::SORTED, TypeUnknown);
+	node->set_param(0, params[0]);
+	node->set_param(1, params[1]);
+	return node;
 }
 
 shared<Node> Parser::make_dynamical(shared<Node> node) {
@@ -2843,164 +3520,116 @@ shared<Node> Parser::make_dynamical(shared<Node> node) {
 	return cmd;
 }
 
-shared<Node> Parser::parse_statement_dyn(Block *block) {
+shared<Node> Parser::parse_abstract_statement_dyn(Block *block) {
 	Exp.next(); // dyn
-	auto sub = parse_single_func_param(block);
-	//sub = force_concrete_type(sub); // TODO
-
-	return make_dynamical(sub);
+	auto node = tree->add_node_statement(StatementID::DYN, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
-shared<Node> Parser::parse_statement_raw_function_pointer(Block *block) {
+shared<Node> Parser::parse_abstract_statement_raw_function_pointer(Block *block) {
 	Exp.next(); // "raw_function_pointer"
-
-	auto sub = parse_single_func_param(block);
-	if (sub->kind == NodeKind::FUNCTION) {
-		auto func = tree->add_node_const(tree->add_constant(TypeFunctionP));
-		func->as_const()->as_int64() = (int_p)sub->as_func();
-
-		auto cmd = tree->add_node_statement(StatementID::RAW_FUNCTION_POINTER);
-		cmd->type = TypeFunctionCodeP;
-		cmd->set_param(0, func);
-		return cmd;
-	} else {
-		do_error("raw_function_pointer() expects a function name");
-	}
-
-	return nullptr;
+	auto node = tree->add_node_statement(StatementID::RAW_FUNCTION_POINTER, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
-shared<Node> Parser::parse_statement_weak(Block *block) {
+shared<Node> Parser::parse_abstract_statement_weak(Block *block) {
 	Exp.next(); // "weak"
-	string name = Exp.cur;
-
-	auto params = parse_call_parameters(block);
-	if (params.num != 1)
-		do_error("weak() expects 1 parameter");
-
-	auto t = params[0]->type;
-	while (true) {
-		if (t->is_pointer_shared() or t->is_pointer_owned()) {
-			auto tt = t->param[0]->get_pointer();
-			return params[0]->shift(0, tt);
-		} else if (t->is_super_array() and t->get_array_element()->is_pointer_shared()) {
-			auto tt = tree->make_class_super_array(t->param[0]->param[0]->get_pointer());
-			return params[0]->shift(0, tt);
-		}
-		if (t->parent)
-			t = t->parent;
-		else
-			break;
-	}
-	do_error("weak() expects either a shared pointer, an owned pointer, or a shared pointer array");
-	return nullptr;
+	auto node = tree->add_node_statement(StatementID::WEAK, TypeUnknown);
+	node->set_param(0, parse_abstract_single_func_param(block));
+	return node;
 }
 
-shared<Node> Parser::parse_statement(Block *block) {
+shared<Node> Parser::parse_abstract_statement(Block *block) {
 	if (Exp.cur == IDENTIFIER_FOR) {
-		return parse_statement_for(block);
+		return parse_abstract_statement_for(block);
 	} else if (Exp.cur == IDENTIFIER_WHILE) {
-		return parse_statement_while(block);
+		return parse_abstract_statement_while(block);
  	} else if (Exp.cur == IDENTIFIER_BREAK) {
- 		return parse_statement_break(block);
+ 		return parse_abstract_statement_break();
 	} else if (Exp.cur == IDENTIFIER_CONTINUE) {
-		return parse_statement_continue(block);
+		return parse_abstract_statement_continue();
 	} else if (Exp.cur == IDENTIFIER_RETURN) {
-		return parse_statement_return(block);
+		return parse_abstract_statement_return(block);
 	//} else if (Exp.cur == IDENTIFIER_RAISE) {
 	//	ParseStatementRaise(block);
 	} else if (Exp.cur == IDENTIFIER_TRY) {
-		return parse_statement_try(block);
+		return parse_abstract_statement_try(block);
 	} else if (Exp.cur == IDENTIFIER_IF) {
-		return parse_statement_if(block);
+		return parse_abstract_statement_if(block);
 	} else if (Exp.cur == IDENTIFIER_PASS) {
-		return parse_statement_pass(block);
+		return parse_abstract_statement_pass(block);
 	} else if (Exp.cur == IDENTIFIER_NEW) {
-		return parse_statement_new(block);
+		return parse_abstract_statement_new(block);
 	} else if (Exp.cur == IDENTIFIER_DELETE) {
-		return parse_statement_delete(block);
+		return parse_abstract_statement_delete(block);
 	} else if (Exp.cur == IDENTIFIER_SIZEOF) {
-		return parse_statement_sizeof(block);
-	} else if (Exp.cur == IDENTIFIER_TYPE) {
-		return parse_statement_type(block);
+		return parse_abstract_statement_sizeof(block);
+	} else if (Exp.cur == IDENTIFIER_TYPEOF) {
+		return parse_abstract_statement_type(block);
 	} else if (Exp.cur == IDENTIFIER_STR) {
-		return parse_statement_str(block);
+		return parse_abstract_statement_str(block);
 	} else if (Exp.cur == IDENTIFIER_REPR) {
-		return parse_statement_repr(block);
+		return parse_abstract_statement_repr(block);
 	} else if (Exp.cur == IDENTIFIER_LEN) {
-		return parse_statement_len(block);
+		return parse_abstract_statement_len(block);
 	} else if (Exp.cur == IDENTIFIER_LET) {
-		return parse_statement_let(block);
+		return parse_abstract_statement_let(block);
 	} else if (Exp.cur == IDENTIFIER_VAR) {
-		return parse_statement_var(block);
+		return parse_abstract_statement_var(block);
 	} else if (Exp.cur == IDENTIFIER_MAP) {
-		return parse_statement_map(block);
-	} else if (Exp.cur == IDENTIFIER_LAMBDA) {
-		return parse_statement_lambda(block);
+		return parse_abstract_statement_map(block);
+	} else if (Exp.cur == IDENTIFIER_LAMBDA or Exp.cur == IDENTIFIER_FUNC) {
+		return parse_abstract_statement_lambda(block);
 	} else if (Exp.cur == IDENTIFIER_SORTED) {
-		return parse_statement_sorted(block);
+		return parse_abstract_statement_sorted(block);
 	} else if (Exp.cur == IDENTIFIER_DYN) {
-		return parse_statement_dyn(block);
+		return parse_abstract_statement_dyn(block);
 	} else if (Exp.cur == IDENTIFIER_RAW_FUNCTION_POINTER) {
-		return parse_statement_raw_function_pointer(block);
+		return parse_abstract_statement_raw_function_pointer(block);
 	} else if (Exp.cur == IDENTIFIER_WEAK) {
-		return parse_statement_weak(block);
+		return parse_abstract_statement_weak(block);
 	}
 	do_error("unhandled statement: " + Exp.cur);
 	return nullptr;
 }
 
-shared<Node> Parser::parse_block(Block *parent, Block *block) {
-	int last_indent = Exp.indent_0;
+shared<Node> Parser::parse_abstract_block(Block *parent, Block *block) {
+	int indent0 = Exp.cur_line->indent;
 
-	Exp.indented = false;
-	Exp.set(0); // bad hack...
 	if (!block)
-		block = new Block(parent->function, parent);
+		block = new Block(parent->function, parent, TypeUnknown);
+	block->type = TypeUnknown;
 
-	for (int i=0;true;i++) {
-		if (((i > 0) and (Exp.cur_line->indent < last_indent)) or Exp.end_of_file())
+	while (!Exp.end_of_file()) {
+
+		parse_abstract_complete_command(block);
+
+		if (Exp.next_line_indent() < indent0)
 			break;
-
-
-		parse_complete_command(block);
 		Exp.next_line();
 	}
-	Exp.cur_line --;
-	Exp.indent_0 = Exp.cur_line->indent;
-	Exp.indented = false;
-	Exp.cur_exp = Exp.cur_line->exp.num - 1;
-	Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
 
 	return block;
 }
 
 // local (variable) definitions...
-void Parser::parse_local_definition(Block *block, const Class *type) {
-	auto flags = parse_flags();
-	// type of variable
-	if (!type)
-		type = parse_type(block->name_space());
-
-	if (flags_has(flags, Flags::OWNED))
-		type = make_pointer_owned(tree, type);
-	else if (flags_has(flags, Flags::SHARED))
-		type = make_pointer_shared(tree, type);
-
-
-	if (type->needs_constructor() and !type->get_default_constructor())
-		do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->long_name()));
-
+void Parser::parse_abstract_local_definition_old(Block *block, shared<Node> first) {
 	while (!Exp.end_of_line()) {
-		// name
-		block->add_var(Exp.cur, type);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		node->set_num_params(2);
+		node->set_param(0, first); // type
+		node->set_param(1, create_node_token(this)); // name
+		block->add(node);
 		Exp.next();
 
 		// assignment?
 		if (Exp.cur == "=") {
 			Exp.rewind();
 			// parse assignment
-			block->add(parse_operand_super_greedy(block));
+			node->set_num_params(3);
+			node->set_param(2, parse_abstract_operand_greedy(block, true));
 		}
 		if (Exp.end_of_line())
 			break;
@@ -3011,35 +3640,28 @@ void Parser::parse_local_definition(Block *block, const Class *type) {
 }
 
 // we already are in the line to analyse ...indentation for a new block should compare to the last line
-void Parser::parse_complete_command(Block *block) {
-	// cur_exp = 0!
+void Parser::parse_abstract_complete_command(Block *block) {
+	// beginning of a line!
 
 	//bool is_type = tree->find_root_type_by_name(Exp.cur, block->name_space(), true);
 
-	// block?  <- indent
-	if (Exp.indented) {
-		block->add(parse_block(block));
-
 	// assembler block
-	} else if (Exp.cur == "-asm-") {
+	if (Exp.cur == "-asm-") {
 		Exp.next();
 		block->add(tree->add_node_statement(StatementID::ASM));
 
-	} else if (Exp.cur == IDENTIFIER_SHARED or Exp.cur == IDENTIFIER_OWNED) {
-		//auto t = parse_type(block->name_space());
-		parse_local_definition(block, nullptr);
-
 	} else {
 
-		auto first = parse_operand(block, block->name_space(), true);
+		auto first = parse_abstract_operand(block);
 
-		if ((first->kind == NodeKind::CLASS) and !Exp.end_of_line()) {
-			parse_local_definition(block, first->as_class());
+		if (is_letter(Exp.cur[0])) {
+		//if ((first->kind == NodeKind::CLASS) and !Exp.end_of_line()) {
+			parse_abstract_local_definition_old(block, first);
 
 		} else {
 
 			// commands (the actual code!)
-			block->add(parse_operand_greedy(block, true, first));
+			block->add(parse_abstract_operand_greedy(block, true, first));
 		}
 	}
 
@@ -3153,14 +3775,11 @@ void Parser::parse_import() {
 	} catch (Exception &e) {
 		msg_left();
 
-		int logical_line = Exp.get_line_no();
-		int exp_no = Exp.cur_exp;
-		int physical_line = Exp.line[logical_line].physical_line;
-		int pos = Exp.line[logical_line].exp[exp_no].pos;
-		string expr = Exp.line[logical_line].exp[exp_no].name;
-		e.line = physical_line;
-		e.column = pos;
-		e.text += format("\n...imported from:\nline %d, %s", physical_line, tree->script->filename);
+		int token_id = Exp.cur_token();
+		string expr = Exp.get_token(token_id);
+		e.line = Exp.token_physical_line_no(token_id);
+		e.column = Exp.token_line_offset(token_id);
+		e.text += format("\n...imported from:\nline %d, %s", e.line+1, tree->script->filename);
 		throw e;
 		//msg_write(e.message);
 		//msg_write("...");
@@ -3184,11 +3803,11 @@ void Parser::parse_enum(Class *_namespace) {
 		Exp.next();
 	}
 
-	expect_new_line();
+	expect_new_line_with_indent();
 	Exp.next_line();
-	expect_indent();
+	int indent0 = Exp.cur_line->indent;
 
-	int value = 0;
+	int next_value = 0;
 
 	for (int i=0;!Exp.end_of_file();i++) {
 		for (int j=0;!Exp.end_of_line();j++) {
@@ -3202,9 +3821,9 @@ void Parser::parse_enum(Class *_namespace) {
 				expect_no_new_line();
 
 				auto cv = parse_and_eval_const(tree->root_of_all_evil->block.get(), TypeInt);
-				value = cv->as_const()->as_int();
+				next_value = cv->as_const()->as_int();
 			}
-			c->as_int() = (value ++);
+			c->as_int() = (next_value ++);
 
 			if (Exp.end_of_line())
 				break;
@@ -3213,11 +3832,10 @@ void Parser::parse_enum(Class *_namespace) {
 			Exp.next();
 			expect_no_new_line();
 		}
-		Exp.next_line();
-		if (Exp.unindented)
+		if (Exp.next_line_indent() < indent0)
 			break;
+		Exp.next_line();
 	}
-	Exp.cur_line --;
 }
 
 bool type_needs_alignment(const Class *t) {
@@ -3327,7 +3945,7 @@ bool Parser::parse_class(Class *_namespace) {
 	if (!_class)
 		return false;
 
-	Array<int> sub_class_line_offsets;
+	Array<int> sub_class_token_ids;
 
 	// body
 	while (!Exp.end_of_file()) {
@@ -3337,15 +3955,13 @@ bool Parser::parse_class(Class *_namespace) {
 		if (Exp.end_of_file())
 			break;
 
-		int ie = Exp.cur_exp;
-
 		if (Exp.cur == IDENTIFIER_ENUM) {
 			parse_enum(_class);
 		} else if ((Exp.cur == IDENTIFIER_CLASS) or (Exp.cur == IDENTIFIER_INTERFACE)) {
 			//msg_write("sub....");
-			int cur_line = Exp.get_line_no();
+			int cur_token = Exp.cur_token();
 			if (!parse_class(_class)) {
-				sub_class_line_offsets.add(cur_line);
+				sub_class_token_ids.add(cur_token);
 				skip_parse_class();
 			}
 			//msg_write(">>");
@@ -3368,20 +3984,19 @@ bool Parser::parse_class(Class *_namespace) {
 	post_process_newly_parsed_class(_class, _offset);
 
 
-	int cur_line = Exp.get_line_no();
+	int cur_token = Exp.cur_token();
 
 	//msg_write(ia2s(sub_class_line_offsets));
-	for (int l: sub_class_line_offsets) {
+	for (int id: sub_class_token_ids) {
 		//msg_write("SUB...");
-		Exp.set(0, l);
+		Exp.jump(id);
 		//.add(Exp.get_line_no());
 		if (!parse_class(_class))
 			do_error(format("parent class not fully parsed yet"));
 			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
 	}
 
-	Exp.set(0, cur_line);
-	Exp.cur_line --;
+	Exp.jump(cur_token-1);
 	return true;
 }
 
@@ -3425,11 +4040,11 @@ void Parser::skip_parse_class() {
 
 	// elements
 	while (!Exp.end_of_file()) {
-		Exp.next_line();
-		if (Exp.cur_line->indent <= indent0) //(unindented)
+		if (Exp.next_line_indent() <= indent0)
 			break;
+		Exp.next_line();
 	}
-	Exp.cur_line --;
+	Exp.jump(Exp.cur_line->token_ids.back());
 }
 
 void Parser::expect_no_new_line() {
@@ -3442,20 +4057,22 @@ void Parser::expect_new_line() {
 		do_error("newline expected");
 }
 
-void Parser::expect_indent() {
-	if (!Exp.indented)
+void Parser::expect_new_line_with_indent() {
+	if (!Exp.end_of_line())
+		do_error("newline expected");
+	if (Exp.next_line_indent() <= Exp.cur_line->indent)
 		do_error("additional indent expected");
 }
 
 shared<Node> Parser::parse_and_eval_const(Block *block, const Class *type) {
 
 	// find const value
-	auto cv = parse_operand_super_greedy(block);
+	auto cv = parse_operand_greedy(block, true);
 
 	if (type) {
-		int pen, tc;
-		if (type_match_with_cast(cv, false, type, pen, tc)) {
-			cv = apply_type_cast(tc, cv, type);
+		CastingData cast;
+		if (type_match_with_cast(cv, false, type, cast)) {
+			cv = apply_type_cast(cast, cv, type);
 		} else {
 			do_error(format("constant value of type '%s' expected", type->long_name()));
 		}
@@ -3573,19 +4190,18 @@ void Parser::parse_class_use_statement(const Class *c) {
 
 bool peek_commands_super(ExpressionBuffer &Exp) {
 	ExpressionBuffer::Line *l = Exp.cur_line + 1;
-	if (l->exp.num < 3)
+	if (l->tokens.num < 3)
 		return false;
-	if ((l->exp[0].name == IDENTIFIER_SUPER) and (l->exp[1].name == ".") and (l->exp[2].name == IDENTIFIER_FUNC_INIT))
+	if ((l->tokens[0].name == IDENTIFIER_SUPER) and (l->tokens[1].name == ".") and (l->tokens[2].name == IDENTIFIER_FUNC_INIT))
 		return true;
 	return false;
 }
 
-bool Parser::parse_function_command(Function *f, int indent0) {
+bool Parser::parse_abstract_function_command(Function *f, int indent0) {
 	if (Exp.end_of_file())
 		return false;
 
 	Exp.next_line();
-	Exp.indented = false;
 
 	// end of file
 	if (Exp.end_of_file())
@@ -3596,7 +4212,7 @@ bool Parser::parse_function_command(Function *f, int indent0) {
 		return false;
 
 	// command or local definition
-	parse_complete_command(f->block.get());
+	parse_abstract_complete_command(f->block.get());
 	return true;
 }
 
@@ -3630,31 +4246,47 @@ bool Parser::parse_function_command(Function *f, int indent0) {
 // complicated types like "int[]*[4]" etc
 // greedy
 const Class *Parser::parse_type(const Class *ns) {
-	auto cc = parse_operand(tree->root_of_all_evil->block.get(), ns, true);
-	if (cc->kind != NodeKind::CLASS) {
-		cc->show(TypeVoid);
-		do_error("type expected");
-	}
-	return cc->as_class();
+	auto cc = parse_abstract_operand(tree->root_of_all_evil->block.get(), true);
+	return concretify_as_type(cc, tree->root_of_all_evil->block.get(), ns);
+}
+
+bool node_is_template_type_name(Parser *parser, shared<Node> node) {
+	if (node->kind != NodeKind::ABSTRACT_TOKEN)
+		return false;
+	auto t = parser->Exp.get_token(node->token_id);
+	return (t.num == 1) and (t[0] >= 'A') and (t[0] <= 'Z');
+}
+
+bool func_is_template(Parser *parser, Function *f) {
+	if (f->abstract_return_type)
+		if (node_is_template_type_name(parser, f->abstract_return_type))
+			return true;
+	for (auto p: weak(f->abstract_param_types))
+		if (node_is_template_type_name(parser, p))
+			return true;
+	return false;
 }
 
 Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 	Exp.next(); // "func"
 
+	auto block = tree->root_of_all_evil->block.get();
+
 	flags = parse_flags(flags);
 
 	string name = Exp.cur;
 	if (Exp.cur == "(") {
-		name = "-lambda-";
+		static int lambda_count = 0;
+		name = format("-lambda-%d-", lambda_count ++);
 	} else {
 		Exp.next();
 	}
 
 	Function *f = tree->add_function(name, TypeVoid, name_space, flags);
+	f->is_abstract = true;
 	//if (config.verbose)
 	//	msg_write("PARSE HEAD  " + f->signature());
-	f->_logical_line_no = Exp.get_line_no();
-	f->_exp_no = Exp.cur_exp;
+	f->_token_id = Exp.cur_token();
 	cur_func = f;
 
 	if (Exp.cur != "(")
@@ -3677,17 +4309,15 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 			Exp.next();
 
 			// type of parameter variable
-			auto param_type = parse_type(name_space); // force
-			auto v = f->add_param(param_name, param_type, param_flags);
+			f->abstract_param_types.add(parse_abstract_operand(block, true));
+			auto v = f->add_param(param_name, TypeUnknown, param_flags);
 
 
 			// default parameter?
 			if (Exp.cur == "=") {
 				Exp.next();
 				f->default_parameters.resize(f->num_params - 1);
-				auto dp = parse_operand(tree->root_of_all_evil->block.get(), name_space, false);
-				if (dp->type != param_type)
-					do_error(format("trying to set a default value of type '%s' for a parameter of type '%s'", dp->type->name, param_type->name));
+				auto dp = parse_abstract_operand(block);
 				f->default_parameters.add(dp);
 			}
 
@@ -3703,33 +4333,67 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 	if (Exp.cur == "->") {
 		// return type
 		Exp.next();
-		f->set_return_type(parse_type(name_space));
+		f->abstract_return_type = parse_abstract_operand(tree->root_of_all_evil->block.get());
 	}
 
 	if (!Exp.end_of_line())
 		do_error("newline expected after parameter list");
 
-	f->update_parameters_after_parsing();
+	if (func_is_template(this, f)) {
+		TemplateManager::add_template(f);
+		name_space->add_abstract_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
+	} else {
+		concretify_function_header(f);
+
+		f->update_parameters_after_parsing();
+
+		name_space->add_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
+	}
 
 	cur_func = nullptr;
 
-	name_space->add_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
-
 	return f;
+}
+
+void Parser::concretify_function_header(Function *f) {
+	auto block = tree->root_of_all_evil->block.get();
+
+	if (f->abstract_return_type) {
+		f->set_return_type(concretify_as_type(f->abstract_return_type, block, f->name_space));
+	}
+	f->literal_param_type.resize(f->abstract_param_types.num);
+	foreachi (auto at, weak(f->abstract_param_types), i) {
+		auto t = concretify_as_type(at, block, f->name_space);
+		auto v = f->var[i];
+		v->type = t;
+		f->literal_param_type[i] = t;
+
+		// mandatory_params not yet
+		if ((i < f->default_parameters.num) and f->default_parameters[i]) {
+			f->default_parameters[i] = concretify_node(f->default_parameters[i], block, f->name_space);
+			if (f->default_parameters[i]->type != t)
+				do_error(format("trying to set a default value of type '%s' for a parameter of type '%s'", f->default_parameters[i]->type->name, t->name));
+		}
+	}
+	f->is_abstract = false;
 }
 
 void Parser::skip_parsing_function_body(Function *f) {
 	int indent0 = Exp.cur_line->indent;
 	while (!Exp.end_of_file()) {
-		if (Exp.cur_line[1].indent <= indent0)
+		if (Exp.next_line_indent() <= indent0)
 			break;
 		Exp.next_line();
 	}
+
+	// jump to end of line
+	Exp.jump(Exp.cur_line->token_ids.back());
 	function_needs_parsing.add(f);
 }
 
-void Parser::parse_function_body(Function *f) {
-	Exp.cur_line = &Exp.line[f->_logical_line_no];
+void Parser::parse_abstract_function_body(Function *f) {
+	Exp.jump(f->_token_id);
+	f->block->type = TypeUnknown; // abstract parsing
 
 	int indent0 = Exp.cur_line->indent;
 	bool more_to_parse = true;
@@ -3737,7 +4401,7 @@ void Parser::parse_function_body(Function *f) {
 	// auto implement constructor?
 	if (f->name == IDENTIFIER_FUNC_INIT) {
 		if (peek_commands_super(Exp)) {
-			more_to_parse = parse_function_command(f, indent0);
+			more_to_parse = parse_abstract_function_command(f, indent0);
 
 			auto_implement_regular_constructor(f, f->name_space, false);
 		} else {
@@ -3749,29 +4413,43 @@ void Parser::parse_function_body(Function *f) {
 
 // instructions
 	while (more_to_parse) {
-		more_to_parse = parse_function_command(f, indent0);
+		more_to_parse = parse_abstract_function_command(f, indent0);
 	}
+
+	if (config.verbose) {
+		msg_write("ABSTRACT:");
+		f->block->show();
+	}
+
+	if (f->is_abstract) {
+		//msg_error("ABSTRACT FUNC");
+	} else {
+		concretify_function_body(f);
+	}
+
+	cur_func = nullptr;
+}
+
+void Parser::concretify_function_body(Function *f) {
+	concretify_node(f->block.get(), f->block.get(), f->name_space);
 
 	// auto implement destructor?
 	if (f->name == IDENTIFIER_FUNC_DELETE)
 		auto_implement_regular_destructor(f, f->name_space);
-	cur_func = nullptr;
-
-	Exp.cur_line --;
 }
 
-void Parser::parse_all_class_names(Class *ns, int indent0) {
-	if (indent0 == 0)
-		Exp.reset_parser();
+void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
 	while (!Exp.end_of_file()) {
-		if ((Exp.cur_line->indent == indent0) and (Exp.cur_line->exp.num >= 2)) {
+		if ((Exp.cur_line->indent == indent0) and (Exp.cur_line->tokens.num >= 2)) {
 			if ((Exp.cur == IDENTIFIER_CLASS) or (Exp.cur == IDENTIFIER_INTERFACE)) {
 				Exp.next();
+//				if (Exp.cur.num == 1)
+//					do_error("class names must be at least 2 characters long", Exp.cur_token());
 				Class *t = tree->create_new_class(Exp.cur, Class::Type::OTHER, 0, 0, nullptr, {}, ns);
 				flags_clear(t->flags, Flags::FULLY_PARSED);
 
 				Exp.next_line();
-				parse_all_class_names(t, indent0 + 1);
+				parse_all_class_names_in_block(t, indent0 + 1);
 				continue;
 			}
 		}
@@ -3787,8 +4465,8 @@ void Parser::parse_all_function_bodies() {
 	//for (auto *f: function_needs_parsing)   might add lambda functions...
 	for (int i=0; i<function_needs_parsing.num; i++) {
 		auto f = function_needs_parsing[i];
-		if ((!f->is_extern()) and (f->_logical_line_no >= 0))
-			parse_function_body(f);
+		if (!f->is_extern() and (f->_token_id >= 0))
+			parse_abstract_function_body(f);
 	}
 }
 
@@ -3831,9 +4509,10 @@ void Parser::parse_top_level() {
 
 	// syntax analysis
 
-	parse_all_class_names(tree->base_class, 0);
+	Exp.reset_walker();
+	parse_all_class_names_in_block(tree->base_class, 0);
 
-	Exp.reset_parser();
+	Exp.reset_walker();
 
 	// global definitions (enum, class, variables and functions)
 	while (!Exp.end_of_file()) {
@@ -3873,7 +4552,7 @@ void Parser::parse_top_level() {
 // convert text into script data
 void Parser::parse() {
 	cur_exp_buf = &Exp;
-	Exp.reset_parser();
+	Exp.reset_walker();
 
 	parse_top_level();
 

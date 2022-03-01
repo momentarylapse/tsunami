@@ -354,11 +354,10 @@ void Window::_fly(Callback cb) {
 void Window::_run(Callback cb) {
 	show();
 	int uid = unique_id;
-	string last_id = "";
+	//end_run_callback = cb;
 
 #if GTK_CHECK_VERSION(4,0,0)
 	msg_error("TODO: hui.run() gtk4");
-	end_run_callback = cb;
 	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response), this);
 	gtk_window_present(GTK_WINDOW(window));
 #else
@@ -373,6 +372,8 @@ void Window::_run(Callback cb) {
 		}
 //	}
 #endif
+	cb();
+	delete this;
 }
 
 void fly(Window *win, Callback cb) {

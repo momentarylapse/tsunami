@@ -78,7 +78,7 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	func extern add_metronome_click(pos: int, level: int, volume: float)
 
-class MidiNoteBuffer extends shared MidiNote[]
+class MidiNoteBuffer extends MidiNote shared[]
 	var samples: int
 	func extern override __init__()
 	func extern override __delete__()
@@ -352,7 +352,7 @@ class TrackMarker as shared
 		text = t
 	var range: Range
 	var text: string
-	var fx: shared AudioEffect[]
+	var fx: AudioEffect shared[]
 
 
 #class BarPattern
@@ -391,7 +391,7 @@ class Beat
 		range = Range(_offset, 0)
 		level = _level
 
-class BarCollection extends shared Bar[]
+class BarCollection extends Bar shared[]
 	func extern selfref get_bars(r: Range) -> Bar*[]
 	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
 	func extern const get_next_beat(pos: int) -> int
@@ -402,8 +402,8 @@ class TrackLayer as shared
 	var track: Track*
 	var buffers: AudioBuffer[]
 	var midi: MidiNoteBuffer
-	var samples: shared SampleRef[]
-	var markers: shared TrackMarker[]
+	var samples: SampleRef shared[]
+	var markers: TrackMarker shared[]
 	
 	func extern get_buffers(out buf: AudioBuffer, r: Range)
 	func extern read_buffers(out buf: AudioBuffer, r: Range, allow_ref: bool)
@@ -435,8 +435,8 @@ class Sample as shared # TODO
 	func extern set_value(key: string, value: string)
 
 class SampleRef as shared
-	var origin: shared Sample
-	func extern __init__(sam: shared Sample)
+	var origin: Sample shared
+	func extern __init__(sam: Sample shared)
 	func extern virtual __delete__()
 
 
@@ -455,15 +455,15 @@ class Instrument
 class Track as shared
 	var type: int
 	var name: string
-	var layers: shared TrackLayer[]
+	var layers: TrackLayer shared[]
 
 	var volume, panning: float
 	var muted: bool
 	
-	var fx: shared AudioEffect[]
-	var midi_fx: shared MidiEffect[]
+	var fx: AudioEffect shared[]
+	var midi_fx: MidiEffect shared[]
 	
-	var synth: shared Synthesizer
+	var synth: Synthesizer shared
 	var instrument: Instrument
 
 	# editing
@@ -493,8 +493,8 @@ class Song as shared
 
 	var volume: float
 	
-	var tracks: shared Track[]
-	var samples: shared Sample[]
+	var tracks: Track shared[]
+	var samples: Sample shared[]
 	
 	var bars: BarCollection
 

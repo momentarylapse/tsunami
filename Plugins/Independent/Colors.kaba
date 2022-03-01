@@ -3,7 +3,7 @@ use hui
 
 class XPanel extends ConfigPanel
 	
-	func __init__(m: X)
+	func __init__(m: XX)
 		super.__init__(m)
 		from_source("
 Grid ? '' vertical
@@ -34,7 +34,7 @@ Grid ? '' vertical
 #			p.set_color(c)
 #			p.draw_rect(rect(w/2,w, i*20,i*20 + 20))
 
-class X extends TsunamiPlugin
+class XX extends TsunamiPlugin
 	func override create_panel() -> ConfigPanel*
 		return new XPanel(self)
 		

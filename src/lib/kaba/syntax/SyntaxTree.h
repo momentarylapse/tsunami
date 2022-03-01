@@ -52,7 +52,7 @@ public:
 	void default_import();
 	void add_include_data(shared<Script> s, bool indirect);
 
-	void do_error(const string &msg, int override_exp_no = -1, int override_line = -1);
+	void do_error(const string &msg, int override_token_id = -1);
 	
 	// syntax parsing
 	const Class *which_owned_class(const string &name);
@@ -106,7 +106,7 @@ public:
 	Function *add_function(const string &name, const Class *type, const Class *name_space, Flags flags);
 
 	// nodes
-	shared<Node> add_node_statement(StatementID id);//, const shared_array<Node> &params);
+	shared<Node> add_node_statement(StatementID id, const Class *type = TypeVoid);//, const shared_array<Node> &params);
 	shared<Node> add_node_member_call(Function *f, const shared<Node> inst, const shared_array<Node> &params = {}, bool force_non_virtual = false);
 	shared<Node> add_node_func_name(Function *f);
 	shared<Node> add_node_class(const Class *c);
@@ -124,7 +124,7 @@ public:
 	shared<Node> exlink_add_class_func(Function *f, Function *cf);
 	shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
 	shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
-	shared<Node> add_node_array(shared<Node> array, shared<Node> index);
+	shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
 	shared<Node> add_node_constructor(Function *f);
 	shared<Node> make_fake_constructor(const Class *t, const Class *param_type);
 	//shared<Node> add_node_block(Block *b);
@@ -140,7 +140,7 @@ public:
 	void simplify_ref_deref();
 
 	void add_missing_function_headers_for_class(Class *t);
-	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE);
+	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE, const shared_array<Node> &def_params = {});
 	const Class *find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion);
 
 	void show(const string &stage);

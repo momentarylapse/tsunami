@@ -3,7 +3,7 @@ use helper.tone
 
 
 class SampleConfig extends Module.Config
-	var samples: shared SampleRef[]
+	var samples: SampleRef shared[]
 	func override __delete__()
 		reset()
 	func override reset()
@@ -11,7 +11,7 @@ class SampleConfig extends Module.Config
 
 
 class SampleRenderer extends PitchRenderer
-	var sample: shared SampleRef
+	var sample: SampleRef shared
 	var events: MidiEventBuffer
 	var override synth: SampleSynthesizer*
 	func override on_config()

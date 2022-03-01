@@ -38,7 +38,7 @@ func test()
 
 class Folding extends AudioEffect
 	class Config extends Module.Config
-		var sample: shared SampleRef
+		var sample: SampleRef shared
 		func override reset()
 			sample = nil
 

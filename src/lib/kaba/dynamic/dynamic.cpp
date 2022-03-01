@@ -107,7 +107,7 @@ void kaba_var_init(void *p, const Class *type) {
 }
 
 void kaba_array_clear(void *p, const Class *type) {
-	auto *f = type->get_func("clear", TypeVoid, {});
+	auto *f = type->get_member_func("clear", TypeVoid, {});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not clear an array of type " + type->long_name()));
 	typedef void func_t(void*);
@@ -116,7 +116,7 @@ void kaba_array_clear(void *p, const Class *type) {
 }
 
 void kaba_array_resize(void *p, const Class *type, int num) {
-	auto *f = type->get_func("resize", TypeVoid, {TypeInt});
+	auto *f = type->get_member_func("resize", TypeVoid, {TypeInt});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not resize an array of type " + type->long_name()));
 	typedef void func_t(void*, int);
@@ -131,7 +131,7 @@ void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 	} else if (type == TypeBoolList) {
 		array.append_1_single(*(char*)p);
 	} else {
-		auto *f = type->get_func("add", TypeVoid, {type->param[0]});
+		auto *f = type->get_member_func("add", TypeVoid, {type->param[0]});
 		if (!f)
 			kaba_raise_exception(new KabaException("can not add to array type " + type->long_name()));
 		typedef void func_t(void*, const void*);

@@ -33,7 +33,7 @@ extern const string IDENTIFIER_STATIC;
 extern const string IDENTIFIER_NEW;
 extern const string IDENTIFIER_DELETE;
 extern const string IDENTIFIER_SIZEOF;
-extern const string IDENTIFIER_TYPE;
+extern const string IDENTIFIER_TYPEOF;
 extern const string IDENTIFIER_STR;
 extern const string IDENTIFIER_REPR;
 extern const string IDENTIFIER_LEN;

@@ -14,10 +14,8 @@
 
 namespace kaba {
 
-extern const Class *TypeVoid;
-
-Block::Block(Function *f, Block *_parent) :
-	Node(NodeKind::BLOCK, (int_p)this, TypeVoid)
+Block::Block(Function *f, Block *_parent, const Class *t) :
+	Node(NodeKind::BLOCK, (int_p)this, t)
 {
 	level = 0;
 	function = f;

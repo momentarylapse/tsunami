@@ -1050,7 +1050,9 @@ void Script::compile_functions(char *oc, int &ocs) {
 	// link external functions
 	int func_no = 0;
 	for (Function *f: syntax->functions) {
-		if (f->is_extern()) {
+		if (f->is_abstract) {
+			//msg_write("SKIP COMPILE " + f->signature());
+		} else if (f->is_extern()) {
 			string name = function_link_name(f);
 			f->address = (int_p)get_external_link(name);
 			if (f->address == 0)
@@ -1065,7 +1067,7 @@ void Script::compile_functions(char *oc, int &ocs) {
 	// create assembler
 	foreachi(Function *f, syntax->functions, i) {
 		func_offset.add(list->num);
-		if (!f->is_extern()) {
+		if (!f->is_extern() and !f->is_abstract) {
 			assemble_function(i, f, list);
 		}
 	}
@@ -1094,7 +1096,7 @@ void Script::compile_functions(char *oc, int &ocs) {
 
 	// get function addresses
 	for (auto *f: syntax->functions)
-		if (!f->is_extern())
+		if (!f->is_extern() and !f->is_abstract)
 			function_update_address(f, list);
 
 	if (!config.interpreted)

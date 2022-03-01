@@ -61,10 +61,11 @@ enum class OperatorID {
 	ARRAY,         // [...]
 	FUNCTION_PIPE, // |>
 	AS,            // as
+	MAPS_TO,       // =>
 	_COUNT_
 };
 
-class PrimitiveOperator {
+class AbstractOperator {
 public:
 	string name;
 	OperatorID id;
@@ -74,13 +75,13 @@ public:
 	int param_flags; // 1 = only left, 2 = only right, 3 = both
 	bool order_inverted; // (param, instance) instead of (instance, param)
 };
-extern PrimitiveOperator PrimitiveOperators[];
+extern AbstractOperator abstract_operators[];
 
 
 
 class Operator {
 public:
-	PrimitiveOperator *primitive;
+	AbstractOperator *abstract;
 	const Class *return_type, *param_type_1, *param_type_2;
 
 	SyntaxTree *owner;

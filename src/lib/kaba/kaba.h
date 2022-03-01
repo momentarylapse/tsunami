@@ -63,7 +63,7 @@ public:
 	void link_virtual_functions_into_vtable(const Class *c);
 
 	// error messages
-	void do_error(const string &msg, int override_line = -1);
+	void do_error(const string &msg, int override_token = -1);
 	void do_error_link(const string &msg);
 	void do_error_internal(const string &msg);
 

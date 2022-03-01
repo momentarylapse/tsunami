@@ -4,7 +4,7 @@ use helper.tone
 
 class SampleConfig extends Module.Config
 	class Zone
-		var sample: shared SampleRef
+		var sample: SampleRef shared
 		var pitch_original: int
 		var pitch_min, pitch_max: int
 		var start_loop, end_loop: int

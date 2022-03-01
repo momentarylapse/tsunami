@@ -16,13 +16,7 @@
 #include "../../config.h"
 #include "../../math/complex.h"
 #include "../../any/any.h"
-
-
-
-#ifdef _X_USE_HUI_
-#include "../../hui/hui.h"
-#endif
-
+#include "../../base/callable.h"
 
 
 namespace kaba {
@@ -219,8 +213,74 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	return t;
 }
 
+template<typename Sig>
+class KabaCallable;
+
+template<typename R, typename ...A>
+class KabaCallable<R(A...)> : public Callable<R(A...)> {
+public:
+	typedef R t_func(A...);
+	Function *f;
+
+	KabaCallable(Function *_f) {
+		f = _f;
+	}
+	void __init__(Function *_f) {
+		new(this) KabaCallable<R(A...)>(_f);
+	}
+
+	R operator()(A... args) const override {
+		if (f) {
+			auto fp = (t_func*)f->address;
+			return fp(args...);
+		} else {
+			throw EmptyCallableError();
+		}
+	}
+};
+
+string make_callable_signature(const Array<const Class*> &param, const Class *ret);
+
 const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params) {
-	return cur_package->syntax->make_class_callable_fp(params, ret_type);
+	string name = make_callable_signature(params, ret_type);
+
+	auto params_ret = params;
+	if ((params.num == 1) and (params[0] == TypeVoid))
+		params_ret = {};
+	params_ret.add(ret_type);
+
+	//auto ff = cur_package->syntax->make_class("Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, cur_package->syntax->base_class);
+	Class *ff = new Class("XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->syntax, nullptr, params_ret);
+	ff->type = Class::Type::CALLABLE_FUNCTION_POINTER;
+	__add_class__(ff, cur_package->syntax->base_class);
+
+	auto ptr_param = [] (const Class *p) {
+		return p->is_pointer() or p->uses_call_by_reference();
+	};
+
+	add_class(ff);
+	if (ret_type == TypeVoid) {
+		if (params.num == 0) {
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallable<void()>::__init__);
+				func_add_param("fp", TypePointer);
+			class_add_func_virtual("call", TypeVoid, &KabaCallable<void()>::operator());
+		} else if (params.num == 1 and ptr_param(params[0])) {
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallable<void(void*)>::__init__);
+				func_add_param("fp", TypePointer);
+			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*)>::operator());
+		} else if (params.num == 2 and ptr_param(params[0]) and ptr_param(params[1])) {
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallable<void(void*,void*)>::__init__);
+				func_add_param("fp", TypePointer);
+			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*,void*)>::operator());
+		}
+	}
+	return cur_package->syntax->make_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, cur_package->syntax->base_class);
+
+	/*auto c = cur_package->syntax->make_class_callable_fp(params, ret_type);
+	add_class(c);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &kaba_callable_fp_init);
+			func_add_param("fp", TypePointer);
+	return c;*/
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -233,8 +293,12 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func) {
 	Operator *o = new Operator;
 	o->owner = cur_package->syntax;
-	o->primitive = &PrimitiveOperators[(int)primitive_op];
+	o->abstract = &abstract_operators[(int)primitive_op];
 	o->return_type = return_type;
+	if (!param_type1) {
+		param_type1 = param_type2;
+		param_type2 = nullptr;
+	}
 	o->param_type_1 = param_type1;
 	o->param_type_2 = param_type2;
 	auto c = param_type1;
@@ -245,21 +309,21 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 	}
 
 	Flags flags = Flags::NONE;
-	if (!o->primitive->left_modifiable)
+	if (!o->abstract->left_modifiable)
 		flags = Flags::PURE;
 
 	//if (!c->uses_call_by_reference())
-	if (o->primitive->left_modifiable and !c->uses_call_by_reference())
+	if (o->abstract->left_modifiable and !c->uses_call_by_reference())
 		flags = flags_mix({flags, Flags::STATIC});
 
 	if (!flags_has(flags, Flags::STATIC)) {
 		add_class(c);
-		o->f = class_add_func_x(o->primitive->function_name, return_type, func, flags);
+		o->f = class_add_func_x(o->abstract->function_name, return_type, func, flags);
 		if (p)
 			func_add_param("b", p);
 	} else {
 		add_class(c);
-		o->f = class_add_func_x(o->primitive->function_name, return_type, func, flags);
+		o->f = class_add_func_x(o->abstract->function_name, return_type, func, flags);
 		func_add_param("a", c);
 		if (p)
 			func_add_param("b", p);
@@ -297,18 +361,14 @@ void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable
 		cur_class->vtable = parent->vtable;
 }
 
-int _class_override_num_params = -1;
-
 void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 	Class *c = const_cast<Class*>(ccc);
 	if (flags_has(flag, Flags::OVERRIDE)) {
 		foreachi(Function *ff, weak(c->functions), i)
 			if (ff->name == f->name) {
-				if (_class_override_num_params < 0 or _class_override_num_params == ff->num_params) {
-					//msg_write("OVERRIDE");
-					c->functions[i] = f;
-					return;
-				}
+				//msg_write("OVERRIDE");
+				c->functions[i] = f;
+				return;
 			}
 		msg_error(format("could not override %s.%s", c->name, f->name));
 	} else {
@@ -334,10 +394,12 @@ Function* class_add_func_x(const string &name, const Class *return_type, void *f
 	cur_func = f;
 
 
-	if (f->is_static())
+	if (f->is_static()) {
 		cur_class->functions.add(f);
-	else
+	} else {
+		f->add_self_parameter();
 		_class_add_member_func(cur_class, f, flags);
+	}
 	return f;
 }
 
@@ -487,7 +549,7 @@ void func_add_param(const string &name, const Class *type, Flags flags) {
 	}
 }
 
-void func_add_param_def(const string &name, const Class *type, const void *p, Flags flags) {
+void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags) {
 	if (cur_func) {
 		// FIXME: use call-by-reference type?
 		Variable *v = new Variable(name, type);
@@ -499,7 +561,9 @@ void func_add_param_def(const string &name, const Class *type, const void *p, Fl
 
 		Constant *c = cur_package->syntax->add_constant(type, cur_class);
 		if (type == TypeInt)
-			c->as_int() = (int_p)p;
+			c->as_int() = *(int*)p;
+		if (type == TypeFloat32)
+			c->as_float() = *(float*)p;
 		cur_func->default_parameters.resize(cur_func->num_params - 1);
 		cur_func->default_parameters.add(cur_package->syntax->add_node_const(c));
 	}
@@ -603,12 +667,8 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 			break;
 		}
 	if (!c.f){
-#ifdef _X_USE_HUI_
-		hui::RaiseError("add_type_cast (ScriptInit): " + cmd + " not found");
-#else
 		msg_error("add_type_cast (ScriptInit): " + string(cmd) + " not found");
 		exit(1);
-#endif
 	}
 	c.source = source;
 	c.dest = dest;
@@ -695,7 +755,6 @@ void init(Abi abi, bool allow_std_lib) {
 	add_type_cast(50, TypePointer, TypeAny, "math.@pointer2any");
 	add_package("os");
 	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
-	add_type_cast(10, TypePath, TypeBool, "os.Path.__bool__");
 
 
 	// consistency checks

@@ -35,6 +35,8 @@ public:
 	int num_params;
 	int mandatory_params;
 	shared_array<Node> default_parameters;
+	shared_array<Node> abstract_param_types;
+	shared<Node> abstract_return_type;
 	// block of code
 	shared<Block> block;
 	// local variables
@@ -48,17 +50,18 @@ public:
 	bool is_extern() const;
 	bool is_pure() const;
 	bool is_static() const;
+	bool is_member() const;
 	bool is_const() const;
 	bool is_selfref() const;
 	bool throws_exceptions() const; // for external
 	InlineID inline_no;
 	int virtual_index;
 	bool needs_overriding;
+	bool is_abstract;
 	int num_slightly_hidden_vars;
 	// for compilation...
 	int64 _var_size;
-	int _logical_line_no;
-	int _exp_no;
+	int _token_id;
 	int64 address;
 	void *address_preprocess;
 	int _label;
@@ -67,6 +70,7 @@ public:
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();
 	void update_parameters_after_parsing();
+	void add_self_parameter();
 	string signature(const Class *ns = nullptr) const;
 	Array<Block*> all_blocks();
 	void show(const string &stage = "") const;

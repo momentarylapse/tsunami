@@ -360,20 +360,23 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 				break;
 			}
 	}
-	if (!f->is_static()) {
+
+	// self: already in params!
+	/*if (!f->is_static()) {
 		for (Variable *v: weak(f->var))
 			if (v->name == IDENTIFIER_SELF) {
 				param.add(v);
 				break;
 			}
-	}
+	}*/
+
+	for (int i=0;i<f->num_params;i++)
+		param.add(f->var[i].get());
+
 	// windows: self before return
 	if ((param.num == 2) and (config.abi == Abi::AMD64_WINDOWS) and param[1]->type->is_some_pointer()) {
 		param.swap(0, 1);
 	}
-
-	for (int i=0;i<f->num_params;i++)
-		param.add(f->var[i].get());
 
 	// map params...
 	Array<Variable*> reg_param;

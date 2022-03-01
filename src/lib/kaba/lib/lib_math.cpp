@@ -141,6 +141,10 @@ Array<int> _cdecl int_range(int start, int end, int step) {
 }
 
 Array<float> _cdecl float_range(float start, float end, float step) {
+	if (end == DynamicArray::MAGIC_END_INDEX) {
+		end = start;
+		start = 0;
+	}
 	Array<float> a;
 	for (float f=start; f<end; f+=step)
 		a.add(f);
@@ -1031,12 +1035,12 @@ void SIAddPackageMath() {
 	// lists
 	add_func("range", TypeIntList, (void*)&int_range, Flags::_STATIC__PURE);
 		func_add_param("start", TypeInt);
-		func_add_param_def("end", TypeInt, (const void*)(int_p)DynamicArray::MAGIC_END_INDEX);
-		func_add_param_def("step", TypeInt, (const void*)(int_p)1);
+		func_add_param_def("end", TypeInt, DynamicArray::MAGIC_END_INDEX);
+		func_add_param_def("step", TypeInt, 1);
 	add_func("range", TypeFloatList, (void*)&float_range, Flags::_STATIC__PURE);
 		func_add_param("start", TypeFloat32);
-		func_add_param("end", TypeFloat32);
-		func_add_param("step", TypeFloat32);
+		func_add_param_def("end", TypeFloat32, (float)DynamicArray::MAGIC_END_INDEX);
+		func_add_param_def("step", TypeFloat32, 1.0f);
 	// other types
 	add_func("bary_centric", TypeVec2, (void*)&bary_centric, Flags::_STATIC__PURE);
 		func_add_param("p", TypeVector);

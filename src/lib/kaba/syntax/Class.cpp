@@ -71,8 +71,6 @@ bool type_match(const Class *given, const Class *wanted) {
 	if (given->is_pointer() and wanted->is_pointer()) {
 		if (given->param[0]->is_derived_from(wanted->param[0]))
 			return true;
-		//if (given->param[0]->type == Class::Type::FUNCTION and wanted->param[0]->type == Class::Type::FUNCTION)
-		//	return func_pointer_match(given, wanted);
 	}
 
 	if (given->is_callable() and wanted->is_callable())
@@ -105,7 +103,7 @@ Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *
 	// force_call_by_value = false;
 	// fully_parsed = true;
 	// _amd64_allow_pass_in_xmm = false;
-	_logical_line_no = _exp_no = -1;
+	_token_id = -1;
 	_vtable_location_target_ = nullptr;
 	_vtable_location_compiler_ = nullptr;
 	_vtable_location_external_ = nullptr;
@@ -354,12 +352,30 @@ Function *Class::get_func(const string &_name, const Class *return_type, const A
 	return nullptr;
 }
 
+Function *Class::get_member_func(const string &_name, const Class *return_type, const Array<const Class*> &params) const {
+	for (auto *f: weak(functions))
+		if (f->is_member() and (f->name == _name) and (f->literal_return_type == return_type) and (f->num_params == params.num+1)) {
+			bool match = true;
+			for (int i=0; i<params.num; i++) {
+				if (params[i] and (f->literal_param_type[i+1] != params[i])) {
+					match = false;
+					break;
+				}
+			}
+			if (match)
+				return f;
+		}
+	return nullptr;
+}
+
 Function *Class::get_same_func(const string &_name, Function *ff) const {
-	return get_func(_name, ff->literal_return_type, ff->literal_param_type);
+	auto param = ff->literal_param_type;
+	param[0] = nullptr; // ignore self
+	return get_func(_name, ff->literal_return_type, param);
 }
 
 Function *Class::get_default_constructor() const {
-	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, {});
+	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, {nullptr});
 }
 
 Array<Function*> Class::get_constructors() const {
@@ -371,20 +387,22 @@ Array<Function*> Class::get_constructors() const {
 }
 
 Function *Class::get_destructor() const {
-	return get_func(IDENTIFIER_FUNC_DELETE, TypeVoid, {});
+	return get_func(IDENTIFIER_FUNC_DELETE, TypeVoid, {nullptr});
 }
 
 Function *Class::get_assign() const {
-	return get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {this});
+	return get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {nullptr, this});
 }
 
 Function *Class::get_get(const Class *index) const {
 	for (auto *cf: weak(functions)) {
 		if (cf->name != IDENTIFIER_FUNC_GET)
 			continue;
-		if (cf->num_params != 1)
+		if (cf->is_static())
 			continue;
-		if (cf->literal_param_type[0] != index)
+		if (cf->num_params != 2)
+			continue;
+		if (cf->literal_param_type[1] != index)
 			continue;
 		return cf;
 	}
@@ -463,14 +481,14 @@ void Class::link_external_virtual_table(void *p) {
 }
 
 
-bool class_func_match(Function *a, Function *b) {
+bool member_func_override_match(Function *a, Function *b) {
 	if (a->name != b->name)
 		return false;
 	if (a->literal_return_type != b->literal_return_type)
 		return false;
 	if (a->num_params != b->num_params)
 		return false;
-	for (int i=0; i<a->num_params; i++)
+	for (int i=1; i<a->num_params; i++)
 		if (!type_match(b->literal_param_type[i], a->literal_param_type[i]))
 			return false;
 	return true;
@@ -491,6 +509,19 @@ const Class *Class::get_root() const {
 	while (r->parent)
 		r = r->parent;
 	return r;
+}
+
+void Class::add_abstract_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
+	if (config.verbose)
+		msg_write("CLASS ADD ABSTRACT   " + long_name() + "    " + f->signature());
+	if (f->is_static()) {
+		if (config.verbose)
+			msg_write("   STATIC");
+		functions.add(f);
+	} else {
+		// too lazy for checking...
+		functions.add(f);
+	}
 }
 
 void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
@@ -515,16 +546,16 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 		Function *orig = nullptr;
 		int orig_index = -1;
 		foreachi (auto *ocf, weak(functions), i)
-			if (class_func_match(f, ocf)) {
+			if (member_func_override_match(f, ocf)) {
 				orig = ocf;
 				orig_index = i;
 			}
 		if (override and !orig)
-			s->do_error(format("can not override function %s, no previous definition", f->signature()), f->_exp_no, f->_logical_line_no);
+			s->do_error(format("can not override function %s, no previous definition", f->signature()), f->_token_id);
 		if (!override and orig) {
 			msg_write(f->signature());
 			msg_write(orig->signature());
-			s->do_error(format("function %s is already defined, use '%s'", f->signature(), IDENTIFIER_OVERRIDE), f->_exp_no, f->_logical_line_no);
+			s->do_error(format("function %s is already defined, use '%s'", f->signature(), IDENTIFIER_OVERRIDE), f->_token_id);
 		}
 		if (override) {
 			if (config.verbose)

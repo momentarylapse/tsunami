@@ -68,6 +68,9 @@ namespace kaba {
 	void hui_fly_kaba(hui::Window *win, Callable<void()> &c) {
 		hui::fly(win, [&c]{ if (&c) c(); });
 	}
+	void hui_run_kaba(hui::Window *win, Callable<void()> &c) {
+		hui::run(win, [&c]{ if (&c) c(); });
+	}
 	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
 		hui::file_dialog_open(win, title, dir, params, [c] (const Path &p) { c(p); });
 	}
@@ -537,7 +540,10 @@ void SIAddPackageHui() {
 		func_add_param("id", TypeInt);
 	add_func("fly", TypeVoid, hui_p(&hui_fly_kaba), Flags::STATIC);
 		func_add_param("win", TypeHuiWindow);
-		func_add_param("idle_func", TypeCallback);
+		func_add_param_def("on_finish", TypeCallback, nullptr);
+	add_func("run", TypeVoid, hui_p(&hui_run_kaba), Flags::STATIC);
+		func_add_param("win", TypeHuiWindow);
+		func_add_param_def("on_finish", TypeCallback, nullptr);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);
 		func_add_param("id", TypeString);
 		func_add_param("key_code", TypeInt);

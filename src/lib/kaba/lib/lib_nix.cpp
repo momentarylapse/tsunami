@@ -11,7 +11,7 @@
 namespace kaba {
 
 
-#ifdef _X_USE_NIX_
+#if defined(_X_USE_NIX_) && HAS_LIB_GL
 	#define nix_p(p)		p
 
 

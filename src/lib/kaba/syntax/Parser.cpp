@@ -1845,7 +1845,7 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 
 	// pointer?
 	if (pparray) {
-		do_error("test... anscheinend gibt es [] auf * super array"), index;
+		do_error("test... anscheinend gibt es [] auf * super array", index);
 		//array = cp_command(this, Operand);
 /*		Operand->kind = KindPointerAsArray;
 		Operand->type = t->type->parent;

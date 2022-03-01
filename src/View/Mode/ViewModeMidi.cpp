@@ -680,7 +680,7 @@ inline bool hover_note_linear(const MidiNote &n, HoverData &s, ViewModeMidi *vmm
 
 HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	auto s = ViewModeDefault::get_hover_data(vlayer, m);
-	if (s.type != s.Type::LAYER)
+	if (s.type != HoverData::Type::LAYER)
 		return s;
 	if (!editing(vlayer))
 		return s;
@@ -692,7 +692,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	auto *mp = midi_context(vlayer);
 
 	/*if (creation_mode != CreationMode::SELECT)*/{
-		if ((mode == MidiMode::CLASSICAL)) {
+		if (mode == MidiMode::CLASSICAL) {
 			s.clef_position = mp->screen_to_clef_pos(m.y);
 			int upos = l->track->instrument.get_clef().position_to_uniclef(s.clef_position);
 			s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
@@ -705,7 +705,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
-		} else if ((mode == MidiMode::TAB)) {
+		} else if (mode == MidiMode::TAB) {
 			//s.pitch = cur_track->y2pitch_classical(my, modifier);
 			s.clef_position = mp->screen_to_string(m.y);
 			s.modifier = modifier;

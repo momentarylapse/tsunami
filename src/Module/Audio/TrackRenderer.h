@@ -54,7 +54,7 @@ public:
 
 	static void apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list);
 
-	void reset_state();
+	void reset_state() override;
 
 	void unlink_from_track();
 	void update_layers();

@@ -47,7 +47,7 @@ public:
 				tab->chain->connect(target->module, target->index, port->module, port->index);
 		}
 	}
-	virtual void on_draw_post(Painter *p) {
+	void on_draw_post(Painter *p) override {
 		p->set_color(theme.text);
 		if (target) {
 			p->set_line_width(5);

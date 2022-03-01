@@ -309,6 +309,7 @@ void _set_alpha(AlphaMode mode) {
 		case AlphaMode::NONE:
 			glDisable(GL_BLEND);
 			break;
+		case AlphaMode::COLOR_KEY:
 		case AlphaMode::COLOR_KEY_HARD:
 		case AlphaMode::COLOR_KEY_SMOOTH:
 			glEnable(GL_BLEND);
@@ -322,6 +323,8 @@ void _set_alpha(AlphaMode mode) {
 		case AlphaMode::MATERIAL:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		case AlphaMode::ADD:
 			break;
 	}
 }

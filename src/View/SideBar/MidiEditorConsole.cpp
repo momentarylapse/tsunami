@@ -211,17 +211,17 @@ void MidiEditorConsole::update() {
 	//if (get_track_index_save(view->song, view->cur_track) >= 0)
 		allow = (layer->type == SignalType::MIDI);
 
-	check("mode-select", mode->creation_mode == mode->CreationMode::SELECT);
-	check("mode-note", mode->creation_mode == mode->CreationMode::NOTE);
-	check("mode-interval", mode->creation_mode == mode->CreationMode::INTERVAL);
-	check("mode-chord", mode->creation_mode == mode->CreationMode::CHORD);
+	check("mode-select", mode->creation_mode == ViewModeMidi::CreationMode::SELECT);
+	check("mode-note", mode->creation_mode == ViewModeMidi::CreationMode::NOTE);
+	check("mode-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
+	check("mode-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
 
 	check("mode-classical", view->cur_vlayer()->midi_mode() == MidiMode::CLASSICAL);
 	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::TAB);
 	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::LINEAR);
 
-	reveal("revealer-interval", mode->creation_mode == mode->CreationMode::INTERVAL);
-	reveal("revealer-chord", mode->creation_mode == mode->CreationMode::CHORD);
+	reveal("revealer-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
+	reveal("revealer-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
 
 	check("chord-major", mode->chord_type == ChordType::MAJOR);
 	check("chord-minor", mode->chord_type == ChordType::MINOR);

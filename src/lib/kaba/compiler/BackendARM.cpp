@@ -572,7 +572,7 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 			} else {
 				stack_param.add(p);
 			}
-		} else if ((p.type == TypeFloat32) /*or (p.type == TypeFloat64)*/) {
+		} else if (p.type == TypeFloat32 /*or (p.type == TypeFloat64)*/) {
 			if (float_param.num < 8) {
 				float_param.add(p);
 			} else {

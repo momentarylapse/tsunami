@@ -26,7 +26,7 @@ public:
 	void on_draw(Painter *p) override;
 
 	AudioView *view;
-	HoverData get_hover_data(const vec2 &m);
+	HoverData get_hover_data(const vec2 &m) override;
 };
 
 #endif /* SRC_VIEW_GRAPH_BACKGROUND_H_ */

@@ -57,7 +57,7 @@ void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 	int samples = 0;
 
 	for (auto *a: attachments) {
-		if ((a->type == a->Type::DEPTH) or (a->type == a->Type::RENDERBUFFER))
+		if ((a->type == Texture::Type::DEPTH) or (a->type == Texture::Type::RENDERBUFFER))
 			new_depth_buffer = (DepthBuffer*)a;
 		else
 			new_attachments.add(a);

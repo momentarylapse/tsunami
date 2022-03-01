@@ -336,7 +336,7 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 void add_operator(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index) {
 	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, nullptr);
 }
-void add_operator(OperatorID primitive_op, const Class* return_type, const Class* param_type1, const Class* param_type2, InlineID inline_index, nullptr_t func) {
+void add_operator(OperatorID primitive_op, const Class* return_type, const Class* param_type1, const Class* param_type2, InlineID inline_index, std::nullptr_t func) {
 	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, nullptr);
 }
 
@@ -403,7 +403,7 @@ Function* class_add_func_x(const string &name, const Class *return_type, void *f
 	return f;
 }
 
-Function* class_add_func(const string &name, const Class *return_type, nullptr_t func, Flags flag) {
+Function* class_add_func(const string &name, const Class *return_type, std::nullptr_t func, Flags flag) {
 	return class_add_func_x(name, return_type, nullptr, flag);
 }
 

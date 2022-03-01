@@ -13,8 +13,7 @@
 namespace hui
 {
 
-class ControlTabControl : public Control
-{
+class ControlTabControl : public Control {
 public:
 	ControlTabControl(const string &text, const string &id, Panel *panel);
 	~ControlTabControl() override;
@@ -25,7 +24,7 @@ public:
 	void __add_string(const string &str) override;
 	void __remove_string(int row) override;
 	void __change_string(int row, const string &str) override;
-	void __set_option(const string &op, const string &value);
+	void __set_option(const string &op, const string &value) override;
 
 	void add(Control *child, int x, int y) override;
 	void remove_child(Control *child) override;

@@ -16,8 +16,8 @@ public:
 	BarStreamer(BarCollection &bars);
 	int read(Array<Beat> &beats, int samples) override;
 	void reset() override;
-	void set_pos(int pos);
-	int get_pos();
+	void set_pos(int pos) override;
+	int get_pos() override;
 
 	int beats_per_bar() override;
 	int cur_beat() override;

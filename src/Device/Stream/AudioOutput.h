@@ -37,7 +37,7 @@ public:
 	virtual ~AudioOutput();
 
 	void _cdecl __init__(Session *session);
-	void _cdecl __delete__() override;
+	void __delete__() override;
 	
 	static const int DEFAULT_PREBUFFER_SIZE;
 

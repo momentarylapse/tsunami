@@ -88,7 +88,7 @@ inline bool is_letter(char c) {
 		return true;
 	if ((c >= 'A') and (c <= 'Z'))
 		return true;
-	if ((c == '_'))
+	if (c == '_')
 		return true;
 	// Umlaute
 #ifdef OS_WINDOWS

@@ -334,7 +334,7 @@ void set_texture(Texture *t) {
 		glBindTexture(GL_TEXTURE_2D, t->texture);
 	}*/
 
-	if (t->type == t->Type::CUBE)
+	if (t->type == Texture::Type::CUBE)
 		tex_cube_level = 0;
 	glBindTextureUnit(0, t->texture);
 }
@@ -350,7 +350,7 @@ void set_textures(const Array<Texture*> &textures) {
 		if (!t)
 			t = default_texture;
 
-		if (t->type == t->Type::CUBE)
+		if (t->type == Texture::Type::CUBE)
 			tex_cube_level = i;
 
 		/*glActiveTexture(GL_TEXTURE0+i);

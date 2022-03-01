@@ -65,11 +65,11 @@ namespace kaba {
 			}
 		}
 	};
-	void hui_fly_kaba(hui::Window *win, Callable<void()> &c) {
-		hui::fly(win, [&c]{ if (&c) c(); });
+	void hui_fly_kaba(hui::Window *win, Callable<void()> *c) {
+		hui::fly(win, [c]{ if (c) (*c)(); });
 	}
-	void hui_run_kaba(hui::Window *win, Callable<void()> &c) {
-		hui::run(win, [&c]{ if (&c) c(); });
+	void hui_run_kaba(hui::Window *win, Callable<void()> *c) {
+		hui::run(win, [c]{ if (c) (*c)(); });
 	}
 	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
 		hui::file_dialog_open(win, title, dir, params, [c] (const Path &p) { c(p); });

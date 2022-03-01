@@ -102,8 +102,8 @@ public:
 	AudioView *view;
 	BottomBarExpandButton(AudioView *_view) : Node(50, 50) {
 		align.dz = 200;
-		align.horizontal = align.Mode::LEFT;
-		align.vertical = align.Mode::BOTTOM;
+		align.horizontal = AlignData::Mode::LEFT;
+		align.vertical = AlignData::Mode::BOTTOM;
 		set_perf_name("button");
 		view = _view;
 	}
@@ -519,7 +519,7 @@ void AudioView::set_selection_snap_mode(SelectionSnapMode mode) {
 }
 
 void _update_find_min(int &new_pos, bool &found, float &dmin, int pos, int trial_pos) {
-	float dist = fabs(trial_pos - pos);
+	float dist = fabs((float)trial_pos - (float)pos);
 	if (dist < dmin) {
 		//msg_write(format("barrier:  %d  ->  %d", pos, b));
 		new_pos = trial_pos;

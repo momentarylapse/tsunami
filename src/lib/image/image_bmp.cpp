@@ -161,7 +161,7 @@ void image_load_bmp(const Path &filename, Image &image)
 void image_save_bmp(const Path &filename, const Image &image) {
 	try {
 		File *f = FileCreate(filename);
-		image.set_mode(image.Mode::RGBA);
+		image.set_mode(Image::Mode::RGBA);
 
 		int row_size = 4 * (int)((image.width * 3 + 3) / 4);
 		int data_size = row_size * image.height;

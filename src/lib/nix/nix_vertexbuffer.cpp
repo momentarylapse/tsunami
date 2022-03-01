@@ -66,7 +66,7 @@ void ___post_config_vertex_buffer_old(VertexBuffer *vb) {
 }
 
 int gl_component_size(unsigned int type) {
-	if ((type == GL_DOUBLE))
+	if (type == GL_DOUBLE)
 		return 8;
 	if ((type == GL_INT) or (type == GL_UNSIGNED_INT) or (type == GL_FLOAT))
 		return 4;

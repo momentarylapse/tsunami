@@ -38,7 +38,7 @@ public:
 	virtual ~AudioInput();
 
 	void _cdecl __init__(Session *session);
-	virtual void _cdecl __delete__();
+	void __delete__() override;
 
 	void _cdecl set_device(Device *device);
 	Device* _cdecl get_device();

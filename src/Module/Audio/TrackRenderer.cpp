@@ -264,6 +264,9 @@ static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const R
 
 static void add_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
 	Range r1 = r and cur;
+	if (r1.length <= 0)
+		return;
+
 	AudioBuffer tbuf;
 	tbuf.resize(r1.length);
 	l->read_buffers_fixed(tbuf, r1);
@@ -437,7 +440,7 @@ void unapply_curves(Track *track) {
 int TrackRenderer::read(AudioBuffer &buf) {
 	perf_start();
 
-	if (track->curves.num >= 0) {
+	if (track->curves.num > 0) {
 		for (int d=0; d<buf.length; d+=CURVE_CHUNK) {
 			AudioBuffer tbuf;
 			tbuf.set_as_ref(buf, d, min(buf.length- d, CURVE_CHUNK));

@@ -22,8 +22,7 @@ class XXX extends SongPlugin
 			session.e("song doesn't contain any bars")
 			return
 			
-		TrackLayer*[] source_layers
-		TrackLayer*[] target_layers
+		var source_layers, target_layers: TrackLayer*[]
 		if !clipboard.prepare_layer_map(session.view, source_layers, target_layers)
 			return
 			

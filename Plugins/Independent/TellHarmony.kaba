@@ -46,7 +46,7 @@ func track_harmony(midi: MidiNoteBuffer) -> Harmony[]
 	if len(midi) == 0
 		return r
 	
-	MidiNote*[] active
+	var active: MidiNote*[]
 	int pos = midi[0].range.offset
 	for n in weak(midi)
 		track_harmony_step(pos, n.range.offset, r, active)

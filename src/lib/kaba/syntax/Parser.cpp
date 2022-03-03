@@ -597,7 +597,7 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 		if (Exp.almost_end_of_line())
 			return true;
 		string next = Exp.peek_next();
-		if ((next == ",") or (next == "=") or (next == "[") or (next == "{") or (next == "->") or (next == ")") or (next == "*"))
+		if ((next == ",") or (next == "=") or /*(next == "[") or (next == "{") or*/ (next == "->") or (next == ")") or (next == "*"))
 			return true;
 		return false;
 	};
@@ -2104,7 +2104,7 @@ shared<Node> Parser::concretify_statement_delete(shared<Node> node, Block *block
 		do_error("pointer expected after 'del'");
 
 	// override del operator?
-	auto f = p->type->param[0]->get_func("__del_override__", TypeVoid, {p->type});
+	auto f = p->type->param[0]->get_member_func(IDENTIFIER_FUNC_DELETE_OVERRIDE, TypeVoid, {});
 	if (f) {
 		auto cmd = tree->add_node_call(f);
 		cmd->set_instance(p->deref());
@@ -4333,7 +4333,7 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 	if (Exp.cur == "->") {
 		// return type
 		Exp.next();
-		f->abstract_return_type = parse_abstract_operand(tree->root_of_all_evil->block.get());
+		f->abstract_return_type = parse_abstract_operand(tree->root_of_all_evil->block.get(), true);
 	}
 
 	if (!Exp.end_of_line())

@@ -983,12 +983,12 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
 	} else if (t->is_callable_fp()) {
 		add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {TypePointer}, {"p"});
-		add_func_header(t, "call", get_callable_return_type(t), get_callable_param_types(t), {"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+		add_func_header(t, IDENTIFIER_FUNC_CALL, get_callable_return_type(t), get_callable_param_types(t), {"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 	} else if (t->is_callable_bind()) {
 		auto types = get_callable_capture_types(t);
 		types.insert(TypePointer, 0);
 		add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, types, {"p", "a", "b", "c", "d", "e", "f", "g", "h"});
-		add_func_header(t, "call", get_callable_return_type(t), get_callable_param_types(t), {"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+		add_func_header(t, IDENTIFIER_FUNC_CALL, get_callable_return_type(t), get_callable_param_types(t), {"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 	} else { // regular classes
 		if (t->can_memcpy()) {
 			if (has_user_constructors(t)) {

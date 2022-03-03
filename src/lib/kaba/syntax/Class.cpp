@@ -411,7 +411,7 @@ Function *Class::get_get(const Class *index) const {
 
 Function *Class::get_call() const {
 	for (auto *cf: weak(functions)) {
-		if (cf->name == "call")
+		if (cf->name == IDENTIFIER_FUNC_CALL)
 			return cf;
 	}
 	return nullptr;

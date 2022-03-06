@@ -15,7 +15,7 @@ namespace kaba
 {
 
 class Serializer;
-class Script;
+class Module;
 class SyntaxTree;
 class Function;
 class Node;
@@ -30,12 +30,12 @@ struct LoopData {
 
 class Serializer {
 public:
-	Serializer(Script *script, Asm::InstructionWithParamsList *list);
+	Serializer(Module *m, Asm::InstructionWithParamsList *list);
 	~Serializer();
 
 	CommandList cmd;
 	int num_labels;
-	Script *script;
+	Module *module;
 	SyntaxTree *syntax_tree;
 	Function *cur_func;
 	int cur_func_index;

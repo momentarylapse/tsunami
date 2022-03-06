@@ -18,7 +18,7 @@ namespace kaba {
 class Class;
 class Block;
 class SyntaxTree;
-class Script;
+class Module;
 class Function;
 class Variable;
 class Constant;
@@ -94,7 +94,7 @@ enum class NodeKind {
 class Node : public Sharable<Empty> {
 public:
 	NodeKind kind;
-	int token_id = -1;
+	int token_id;
 	int64 link_no;
 	// parameters
 	shared_array<Node> params;
@@ -103,7 +103,7 @@ public:
 	const Class *type;
 	bool is_const;
 
-	Node(NodeKind kind, int64 link_no, const Class *type, bool is_const = false);
+	Node(NodeKind kind, int64 link_no, const Class *type, bool is_const = false, int token_id = -1);
 	/*Node(const Class *c);
 	Node(const Block *b);
 	Node(const Constant *c);*/

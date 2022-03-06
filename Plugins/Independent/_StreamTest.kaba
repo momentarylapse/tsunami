@@ -14,7 +14,7 @@ class _StreamTest extends TsunamiPlugin
 		_out = chain.add(Module.Type.STREAM, "AudioOutput")
 		chain.connect(source, 0, _out, 0)
 		
-		runner = hui.run_repeated(0.1, self, on_tick)
+		runner = hui.run_repeated(0.1, on_tick)
 		
 		chain.start()
 

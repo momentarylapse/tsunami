@@ -23,30 +23,30 @@
 
 namespace kaba {
 
-string Version = "0.19.16.1";
+string Version = "0.19.18.0";
 
 //#define ScriptDebug
 
 
-Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Script *s) :
+Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Module *s) :
 	Asm::Exception(_message, _expression, _line, _column)
 {
 	text +=  ", " + s->filename.str();
 }
 
-Exception::Exception(const Asm::Exception &e, Script *s, Function *f) :
+Exception::Exception(const Asm::Exception &e, Module *s, Function *f) :
 	Asm::Exception(e)
 {
 	text = format("assembler: %s, %s: %s", message(), f->long_name(), s->filename);
 }
 
 
-shared_array<Script> _public_scripts_;
+shared_array<Module> public_modules;
 
 
 
 
-Path absolute_script_path(const Path &filename) {
+Path absolute_module_path(const Path &filename) {
 	if (filename.is_relative())
 		return (config.directory << filename).absolute().canonical();
 	else
@@ -54,27 +54,27 @@ Path absolute_script_path(const Path &filename) {
 }
 
 
-shared<Script> load(const Path &filename, bool just_analyse) {
+shared<Module> load(const Path &filename, bool just_analyse) {
 	//msg_write("loading " + filename.str());
 
-	auto _filename = absolute_script_path(filename);
+	auto _filename = absolute_module_path(filename);
 
 	// already loaded?
-	for (auto ps: _public_scripts_)
+	for (auto ps: public_modules)
 		if (ps->filename == _filename)
 			return ps;
 	
 	// load
-	shared<Script> s = new Script();
+	shared<Module> s = new Module();
 	s->load(filename, just_analyse);
 
-	// store script in database
-	_public_scripts_.add(s);
+	// store module in database
+	public_modules.add(s);
 	return s;
 }
 
-shared<Script> create_for_source(const string &buffer, bool just_analyse) {
-	shared<Script> s = new Script;
+shared<Module> create_for_source(const string &buffer, bool just_analyse) {
+	shared<Module> s = new Module;
 	s->just_analyse = just_analyse;
 	s->syntax->parser = new Parser(s->syntax);
 	s->syntax->default_import();
@@ -85,27 +85,27 @@ shared<Script> create_for_source(const string &buffer, bool just_analyse) {
 	return s;
 }
 
-void remove_script(Script *s) {
+void remove_module(Module *s) {
 
 	// remove from normal list
-	for (int i=0;i<_public_scripts_.num;i++)
-		if (_public_scripts_[i] == s)
-			_public_scripts_.erase(i);
+	for (int i=0;i<public_modules.num;i++)
+		if (public_modules[i] == s)
+			public_modules.erase(i);
 }
 
-void delete_all_scripts(bool even_immortal, bool force) {
-	_public_scripts_.clear();
+void delete_all_modules(bool even_immortal, bool force) {
+	public_modules.clear();
 
 #if 0
 	// try to erase them...
-	auto to_del = _public_scripts_;
-	foreachb(Script *s, to_del)
+	auto to_del = public_modules;
+	foreachb(Module *s, to_del)
 		if ((!s->syntax->flag_immortal) or even_immortal)
 			Remove(s);
 
 	// undead... really KILL!
 	if (force){
-		foreachb(Script *s, _dead_scripts_)
+		foreachb(Module *s, _dead_scripts_)
 			delete(s);
 		_dead_scripts_.clear();
 	}
@@ -139,7 +139,7 @@ const Class *_dyn_type_in_namespace(const VirtualTable *p, const Class *ns) {
 // TODO...namespace
 const Class *get_dynamic_type(const VirtualBase *p) {
 	auto *pp = get_vtable(p);
-	for (auto s: _public_scripts_) {
+	for (auto s: public_modules) {
 		auto t = _dyn_type_in_namespace(pp, s->syntax->base_class);
 		if (t)
 			return t;
@@ -147,14 +147,14 @@ const Class *get_dynamic_type(const VirtualBase *p) {
 	return nullptr;
 }
 
-Array<shared<Script>> loading_script_stack;
+Array<shared<Module>> loading_module_stack;
 
 
-void Script::load(const Path &_filename, bool _just_analyse) {
-	loading_script_stack.add(this);
+void Module::load(const Path &_filename, bool _just_analyse) {
+	loading_module_stack.add(this);
 	just_analyse = _just_analyse;
 
-	filename = absolute_script_path(_filename);
+	filename = absolute_module_path(_filename);
 
 	syntax->base_class->name = filename.basename().replace(".kaba", "");
 
@@ -171,46 +171,44 @@ void Script::load(const Path &_filename, bool _just_analyse) {
 
 		if (!just_analyse)
 			compile();
-		/*if (pre_script->FlagShow)
-			pre_script->Show();*/
 
 	} catch (FileError &e) {
-		loading_script_stack.pop();
-		do_error("script file not loadable: " + filename.str());
+		loading_module_stack.pop();
+		do_error("module file not loadable: " + filename.str());
 	} catch (Exception &e) {
-		loading_script_stack.pop();
+		loading_module_stack.pop();
 		throw e;
 	}
-	loading_script_stack.pop();
+	loading_module_stack.pop();
 }
 
-void Script::do_error(const string &str, int override_token) {
+void Module::do_error(const string &str, int override_token) {
 #ifdef CPU_ARM
 	msg_error(str);
 #endif
 	syntax->do_error(str, override_token);
 }
 
-void Script::do_error_internal(const string &str) {
+void Module::do_error_internal(const string &str) {
 	do_error("internal compiler error: " + str, 0);
 }
 
-void Script::do_error_link(const string &str) {
+void Module::do_error_link(const string &str) {
 	do_error(str, 0);
 }
 
-void Script::set_variable(const string &name, void *data) {
+void Module::set_variable(const string &name, void *data) {
 	//msg_write(name);
 	for (auto *v: weak(syntax->base_class->static_variables))
 		if (v->name == name) {
 			memcpy(v->memory, data, v->type->size);
 			return;
 		}
-	msg_error("Script.set_variable: variable " + name + " not found");
+	msg_error("Module.set_variable: variable " + name + " not found");
 }
 
-Script::Script() {
-	filename = "-empty script-";
+Module::Module() {
+	filename = "-empty module-";
 	used_by_default = false;
 
 	show_compiler_stats = !config.compile_silently;
@@ -226,7 +224,7 @@ Script::Script() {
 	syntax = new SyntaxTree(this);
 }
 
-Script::~Script() {
+Module::~Module() {
 	int r = 0;
 	if (opcode) {
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
@@ -252,13 +250,13 @@ Script::~Script() {
 
 
 // bad:  should clean up in case of errors!
-void execute_single_script_command(const string &cmd) {
+void execute_single_command(const string &cmd) {
 	if (cmd.num < 1)
 		return;
-	//msg_write("script command: " + cmd);
+	//msg_write("command: " + cmd);
 
-	// empty script
-	shared<Script> s = new Script();
+	// empty module
+	shared<Module> s = new Module();
 	s->filename = "-command line-";
 	auto tree = s->syntax;
 	tree->default_import();
@@ -335,7 +333,7 @@ void execute_single_script_command(const string &cmd) {
 	}
 }
 
-void *Script::match_function(const string &name, const string &return_type, const Array<string> &param_types) {
+void *Module::match_function(const string &name, const string &return_type, const Array<string> &param_types) {
 	auto ns = base_class();
 	// match
 	for (Function *f: syntax->functions)
@@ -357,7 +355,7 @@ void *Script::match_function(const string &name, const string &return_type, cons
 }
 
 // DEPRECATED?
-void *Script::match_class_function(const string &_class, bool allow_derived, const string &name, const string &return_type, const Array<string> &param_types)
+void *Module::match_class_function(const string &_class, bool allow_derived, const string &name, const string &return_type, const Array<string> &param_types)
 {
 	const Class *root_type = syntax->find_root_type_by_name(_class, syntax->base_class, false);
 	if (!root_type)
@@ -392,7 +390,7 @@ void print_var(void *p, const string &name, const Class *t) {
 	msg_write(t->name + " " + name + " = " + var2str(p, t));
 }
 
-void Script::show_vars(bool include_consts) {
+void Module::show_vars(bool include_consts) {
 	for (auto *v: weak(syntax->base_class->static_variables))
 		print_var(v->memory, v->name, v->type);
 	/*if (include_consts)
@@ -400,23 +398,23 @@ void Script::show_vars(bool include_consts) {
 			print_var((void*)g_var[i], c.name, c.type);*/
 }
 
-Array<const Class*> Script::classes() {
+Array<const Class*> Module::classes() {
 	return weak(syntax->base_class->classes);
 }
 
-Array<Function*> Script::functions() {
+Array<Function*> Module::functions() {
 	return syntax->functions;
 }
 
-Array<Variable*> Script::variables() {
+Array<Variable*> Module::variables() {
 	return weak(syntax->base_class->static_variables);
 }
 
-Array<Constant*> Script::constants() {
+Array<Constant*> Module::constants() {
 	return weak(syntax->base_class->constants);
 }
 
-const Class *Script::base_class() {
+const Class *Module::base_class() {
 	return syntax->base_class;
 }
 

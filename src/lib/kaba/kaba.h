@@ -10,7 +10,7 @@
 #define KABA_H__INCLUDED_
 
 namespace kaba {
-	class Script;
+	class Module;
 }
 
 #include "../base/base.h"
@@ -26,8 +26,8 @@ extern string Version;
 
 class Exception : public Asm::Exception {
 public:
-	Exception(const string &message, const string &expression, int line, int column, Script *s);
-	Exception(const Asm::Exception &e, Script *s, Function *f);
+	Exception(const string &message, const string &expression, int line, int column, Module *s);
+	Exception(const Asm::Exception &e, Module *s, Function *f);
 };
 /*struct SyntaxException : Exception{};
 struct LinkerException : Exception{};
@@ -37,11 +37,11 @@ class Interpreter;
 
 
 // executable (compiled) data
-class Script : public Sharable<Empty> {
+class Module : public Sharable<Empty> {
 public:
 	// don't call yourself.... better use LoadScript(...)
-	Script();
-	~Script();
+	Module();
+	~Module();
 
 	void load(const Path &filename, bool just_analyse = false);
 
@@ -103,11 +103,11 @@ public:
 	const Class* base_class();
 };
 
-shared<Script> load(const Path &filename, bool just_analyse = false);
-shared<Script> create_for_source(const string &source, bool just_analyse = false);
-void remove_script(Script *s);
-void delete_all_scripts(bool even_immortal = false, bool force = false);
-void execute_single_script_command(const string &cmd);
+shared<Module> load(const Path &filename, bool just_analyse = false);
+shared<Module> create_for_source(const string &source, bool just_analyse = false);
+void remove_module(Module *s);
+void delete_all_modules(bool even_immortal = false, bool force = false);
+void execute_single_command(const string &cmd);
 
 const Class *get_dynamic_type(const VirtualBase *p);
 string var2str(const void *p, const Class *type);

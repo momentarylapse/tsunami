@@ -418,7 +418,7 @@ uniform float iVolume;
 		nix.init()
 		update_shader()
 		
-		id_runner = hui.run_repeated(0.03, self, on_step)
+		id_runner = hui.run_repeated(0.03, on_step)
 	
 	func on_draw()
 		_time += timer.get()

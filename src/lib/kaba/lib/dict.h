@@ -2,5 +2,5 @@ namespace kaba {
 	class Class;
 	class SyntaxTree;
 	
-	void script_make_dict(Class *t, SyntaxTree *ps);
+	void kaba_make_dict(Class *t, SyntaxTree *ps);
 }

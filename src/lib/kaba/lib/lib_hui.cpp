@@ -38,30 +38,24 @@ namespace kaba {
 	void hui_set_idle_function_kaba(Callable<void()> &c) {
 		hui::set_idle_function([&c]{ c(); });
 	}
-	int hui_run_later_kaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
-		return hui::run_later(dt, [&c,p]{ c(p); });
+	int hui_run_later_kaba(float dt, Callable<void()> &c) {
+		return hui::run_later(dt, [&c]{ c(); });
 	}
-	int hui_run_repeated_kaba(float dt, hui::EventHandler *p, Callable<void(hui::EventHandler*)> &c) {
-		return hui::run_repeated(dt, [&c,p]{ c(p); });
+	int hui_run_repeated_kaba(float dt, Callable<void()> &c) {
+		return hui::run_repeated(dt, [&c]{ c(); });
 	}
 	class KabaPanelWrapper : public hui::Panel {
 	public:
-		void _kaba_event(const string &id, Callable<void(hui::EventHandler*)> &c) {
-			_kaba_event_o(id, this, c);
-		}
-		void _kaba_event_o(const string &id, hui::EventHandler *handler, Callable<void(hui::EventHandler*)> &c) {
-			event(id, [&c,handler]{ c(handler); });
+		void _kaba_event(const string &id, Callable<void()> *c) {
+			event(id, [c]{ (*c)(); });
 		}
 		void _kaba_event_x(const string &id, const string &msg, void *f) {
-			_kaba_event_ox(id, msg, this, f);
-		}
-		void _kaba_event_ox(const string &id, const string &msg, hui::EventHandler *handler, void *f) {
 			if (msg == "hui:draw"){
-				auto &ff = *(Callable<void(hui::EventHandler*, Painter*)>*)f;
-				event_xp(id, msg, [&ff,handler](Painter *p){ ff(handler, p); });
+				auto &ff = *(Callable<void(Painter*)>*)f;
+				event_xp(id, msg, [&ff](Painter *p){ ff(p); });
 			}else{
-				auto &ff = *(Callable<void(hui::EventHandler*)>*)f;
-				event_x(id, msg, [&ff,handler]{ ff(handler); });
+				auto &ff = *(Callable<void()>*)f;
+				event_x(id, msg, [&ff]{ ff(); });
 			}
 		}
 	};
@@ -129,8 +123,7 @@ void SIAddPackageHui() {
 	auto TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
 	auto TypeCallback = add_type_f(TypeVoid, {});
-	auto TypeCallbackObject = add_type_f(TypeVoid, {TypeObject});
-	auto TypeCallbackObjectP = add_type_f(TypeVoid, {TypeObject, TypeHuiPainter});
+	auto TypeCallbackPainter = add_type_f(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_f(TypeVoid, {TypePath});
 	auto TypeCallbackString = add_type_f(TypeVoid, {TypeString});
 
@@ -368,29 +361,15 @@ void SIAddPackageHui() {
 			func_add_param("id", TypeString);
 		class_add_func("event", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event));
 			func_add_param("id", TypeString);
-			func_add_param("func", TypeCallbackObject);
-		class_add_func("event_o", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event_o));
-			func_add_param("id", TypeString);
-			func_add_param("handler", TypeObject);
-			func_add_param("func", TypeCallbackObject);
+			func_add_param("func", TypeCallback);
 		class_add_func("event_x", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event_x));
 			func_add_param("id", TypeString);
 			func_add_param("msg", TypeString);
-			func_add_param("func", TypeCallbackObject);
+			func_add_param("func", TypeCallback);
 		class_add_func("event_x", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event_x));
 			func_add_param("id", TypeString);
 			func_add_param("msg", TypeString);
-			func_add_param("func", TypeCallbackObjectP);
-		class_add_func("event_ox", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event_ox));
-			func_add_param("id", TypeString);
-			func_add_param("msg", TypeString);
-			func_add_param("handler", TypeObject);
-			func_add_param("func", TypeCallbackObject);
-		class_add_func("event_ox", TypeInt, hui_p(&KabaPanelWrapper::_kaba_event_ox));
-			func_add_param("id", TypeString);
-			func_add_param("msg", TypeString);
-			func_add_param("handler", TypeObject);
-			func_add_param("func", TypeCallbackObjectP);
+			func_add_param("func", TypeCallbackPainter);
 		class_add_func("remove_event_handler", TypeVoid, hui_p(&hui::Panel::remove_event_handler));
 			func_add_param("uid", TypeInt);
 #ifdef _X_USE_HUI_
@@ -530,12 +509,10 @@ void SIAddPackageHui() {
 		func_add_param("idle_func", TypeCallback);
 	add_func("run_later", TypeInt, hui_p(&hui_run_later_kaba), Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
-		func_add_param("handler", TypeObject);
-		func_add_param("f", TypeCallbackObject);
+		func_add_param("f", TypeCallback);
 	add_func("run_repeated", TypeInt, hui_p(&hui_run_repeated_kaba), Flags::STATIC);
 		func_add_param("dt", TypeFloat32);
-		func_add_param("handler", TypeObject);
-		func_add_param("f", TypeCallbackObject);
+		func_add_param("f", TypeCallback);
 	add_func("cancel_runner", TypeVoid, hui_p(&hui::cancel_runner), Flags::STATIC);
 		func_add_param("id", TypeInt);
 	add_func("fly", TypeVoid, hui_p(&hui_fly_kaba), Flags::STATIC);

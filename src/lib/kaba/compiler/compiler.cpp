@@ -97,7 +97,7 @@ void* get_nice_random_addr() {
 
 }
 
-void* get_nice_memory(int64 size, bool executable, Script *script) {
+void* get_nice_memory(int64 size, bool executable, Module *module) {
 	if (size == 0)
 		return nullptr;
 	void *mem = nullptr;
@@ -148,7 +148,7 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 #endif
 		}
 	}
-	//script->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
+	//module->do_error(format("och, can't allocate %dkb memory in a usable address range", size/1024));
 
 	// no?...ok, try anywhere
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
@@ -161,7 +161,7 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 
 	// failed...
 	if (!mem) {
-		script->do_error(format("could not allocate executable memory: %s", strerror(errno)));
+		module->do_error(format("could not allocate executable memory: %s", strerror(errno)));
 		mem = new char[size];
 	}
 
@@ -169,7 +169,7 @@ void* get_nice_memory(int64 size, bool executable, Script *script) {
 }
 
 
-void Script::allocate_opcode() {
+void Module::allocate_opcode() {
 	int max_opcode = MAX_OPCODE;
 	if (config.compile_os)
 		max_opcode *= 10;
@@ -209,7 +209,7 @@ int mem_size_needed_total(const Class *c) {
 	return size;
 }
 
-void Script::allocate_memory() {
+void Module::allocate_memory() {
 	memory_size = mem_size_needed_total(syntax->base_class);
 
 	memory = (char*)get_nice_memory(memory_size, false, this);
@@ -227,11 +227,11 @@ void _update_const_locations(const Class *ns) {
 }
 
 // DEPRECATED???
-void Script::update_constant_locations() {
+void Module::update_constant_locations() {
 	_update_const_locations(syntax->base_class);
 }
 
-void Script::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
+void Module::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	for (auto *v: weak(name_space->static_variables)) {
 		if (v->is_extern()) {
 			v->memory = get_external_link(v->cname(name_space, name_space->owner->base_class));
@@ -248,7 +248,7 @@ void Script::_map_global_variables_to_memory(char *mem, int &offset, char *addre
 		_map_global_variables_to_memory(mem, offset, address, cc);
 }
 
-void Script::map_global_variables_to_memory() {
+void Module::map_global_variables_to_memory() {
 	// global variables -> into Memory
 	int override_offset = 0;
 	if (config.override_variables_offset)
@@ -257,7 +257,7 @@ void Script::map_global_variables_to_memory() {
 		_map_global_variables_to_memory(memory, memory_size, memory, syntax->base_class);
 }
 
-void Script::align_opcode() {
+void Module::align_opcode() {
 	int ocs_new = mem_align(opcode_size, config.function_align);
 	for (int i=opcode_size;i<ocs_new;i++)
 		opcode[i] = 0x90;
@@ -265,7 +265,7 @@ void Script::align_opcode() {
 }
 
 static int OCORA;
-void Script::CompileOsEntryPoint() {
+void Module::CompileOsEntryPoint() {
 	if (!base_class()->get_func("main", TypeVoid, {}))
 		if (!syntax->imported_symbols->get_func("main", TypeVoid, {}))
 			do_error("os entry point: no 'void main()' found");
@@ -277,7 +277,7 @@ void Script::CompileOsEntryPoint() {
 	align_opcode();
 }
 
-shared<Node> check_const_used(shared<Node> n, Script *me) {
+shared<Node> check_const_used(shared<Node> n, Module *me) {
 	if (n->kind == NodeKind::CONSTANT) {
 		n->as_const()->used = true;
 		/*if (n->as_const()->owner != me->syntax)
@@ -286,7 +286,7 @@ shared<Node> check_const_used(shared<Node> n, Script *me) {
 	return n;
 }
 
-void remap_virtual_tables(Script *s, char *mem, int &offset, char *address, const Class *ct) {
+void remap_virtual_tables(Module *s, char *mem, int &offset, char *address, const Class *ct) {
 	// vtables -> no data yet...
 	if (ct->vtable.num > 0) {
 		Class *t = const_cast<Class*>(ct);
@@ -306,7 +306,7 @@ void remap_virtual_tables(Script *s, char *mem, int &offset, char *address, cons
 
 void _map_constants_to_memory(char *mem, int &offset, char *address, const Class *ns) {
 
-	// also allow named constants... might be imported by other scripts!
+	// also allow named constants... might be imported by other modules!
 	for (Constant *c: weak(ns->constants))
 		if (c->used or ((c->name[0] != '-') and !config.compile_os)) {
 			c->address = (void*)(address + offset);//ns->owner->asm_meta_info->code_origin + offset);
@@ -332,7 +332,7 @@ void _map_constants_to_memory(char *mem, int &offset, char *address, const Class
 		_map_constants_to_memory(mem, offset, address, c);
 }
 
-void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
+void Module::map_constants_to_memory(char *mem, int &offset, char *address) {
 
 	remap_virtual_tables(this, mem, offset, address, syntax->base_class);
 
@@ -360,12 +360,12 @@ void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
 	//msg_write(format("    compressed:  %d  ->  %d", uncompressed, opcode_size - size0));
 }
 
-void Script::map_constants_to_opcode() {
+void Module::map_constants_to_opcode() {
 	map_constants_to_memory(opcode, opcode_size, (char*)(int_p)syntax->asm_meta_info->code_origin);
 	align_opcode();
 }
 
-void Script::LinkOsEntryPoint() {
+void Module::LinkOsEntryPoint() {
 	auto *f = base_class()->get_func("main", TypeVoid, {});
 	if (!f)
 		f = syntax->imported_symbols->get_func("main", TypeVoid, {});
@@ -402,7 +402,7 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 	source->base_class->constants.clear();
 
 	// don't fully include internal libraries
-	if (source->script->filename.basename().find(".kaba") < 0)
+	if (source->module->filename.basename().find(".kaba") < 0)
 		return;
 
 	dest->base_class->static_variables.append(source->base_class->static_variables);
@@ -418,8 +418,8 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 	}
 }
 
-void find_all_includes_rec(Script *s, Set<Script*> &includes) {
-	for (Script *i: weak(s->syntax->includes)) {
+void find_all_includes_rec(Module *s, Set<Module*> &includes) {
+	for (Module *i: weak(s->syntax->includes)) {
 		//if (i->filename.find(".kaba") < 0)
 		//	continue;
 		includes.add(i);
@@ -428,15 +428,15 @@ void find_all_includes_rec(Script *s, Set<Script*> &includes) {
 }
 
 // only for "os"
-void import_includes(Script *s) {
-	Set<Script*> includes;
+void import_includes(Module *s) {
+	Set<Module*> includes;
 	find_all_includes_rec(s, includes);
 
-	for (Script *i: includes)
+	for (Module *i: includes)
 		import_deep(s->syntax, i->syntax);
 }
 
-void Script::link_functions() {
+void Module::link_functions() {
 	for (Asm::WantedLabel &l: functions_to_link) {
 		string name = l.name.sub(10);
 		bool found = false;
@@ -459,7 +459,7 @@ void Script::link_functions() {
 
 }
 
-void Script::link_virtual_functions_into_vtable(const Class *c) {
+void Module::link_virtual_functions_into_vtable(const Class *c) {
 	Class *t = const_cast<Class*>(c);
 	t->link_virtual_table();
 
@@ -476,7 +476,7 @@ void Script::link_virtual_functions_into_vtable(const Class *c) {
 struct DynamicLibraryImport {
 	string filename;
 	void *handle;
-	void *get_symbol(const string &name, Script *s) {
+	void *get_symbol(const string &name, Module *s) {
 #if HAS_LIB_DL
 		if (!handle)
 			return nullptr;
@@ -490,7 +490,7 @@ struct DynamicLibraryImport {
 	}
 };
 static Array<DynamicLibraryImport*> dynamic_libs;
-DynamicLibraryImport *get_dynamic_lib(const string &filename, Script *s) {
+DynamicLibraryImport *get_dynamic_lib(const string &filename, Module *s) {
 #if HAS_LIB_DL
 	for (auto &d: dynamic_libs)
 		if (d->filename == filename)
@@ -519,10 +519,10 @@ void parse_magic_linker_string(SyntaxTree *s) {
 				if (x[0] == '\t') {
 					if (d and x.find(":")) {
 						auto y = x.sub(1).explode(":");
-						link_external(y[0], d->get_symbol(y[1], s->script));
+						link_external(y[0], d->get_symbol(y[1], s->module));
 					}
 				} else {
-					d = get_dynamic_lib(x, s->script);
+					d = get_dynamic_lib(x, s->module);
 				}
 			}
 		}
@@ -558,7 +558,7 @@ typedef struct _UNWIND_INFO {
 } UNWIND_INFO;
 
 // very experimental
-void register_functions(Script* s) {
+void register_functions(Module* s) {
 	int nf = s->functions().num;
 	RUNTIME_FUNCTION* function_table = new RUNTIME_FUNCTION[nf];
 	UNWIND_INFO* unwind_info = new UNWIND_INFO[nf];
@@ -590,7 +590,7 @@ void register_functions(Script* s) {
 #endif
 
 // generate opcode
-void Script::compile() {
+void Module::compile() {
 	Asm::CurrentMetaInfo = syntax->asm_meta_info.get();
 
 	if (config.compile_os)

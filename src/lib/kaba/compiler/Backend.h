@@ -35,7 +35,7 @@ public:
 	virtual void process(Function *f, int index) = 0;
 	virtual void correct() = 0;
 
-	Script *script;
+	Module *module;
 	CommandList &cmd;
 	Function *cur_func;
 	int cur_func_index;

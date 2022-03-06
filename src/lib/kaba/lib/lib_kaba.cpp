@@ -13,18 +13,18 @@ extern const Class *TypePath;
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
-shared<Script> __load_script__(const string &filename, bool just_analyse) {
+shared<Module> __load_module__(const string &filename, bool just_analyse) {
 	KABA_EXCEPTION_WRAPPER( return load(filename, just_analyse); );
 	return nullptr;
 }
 
-shared<Script> __create_from_source__(const string &source, bool just_analyse) {
+shared<Module> __create_from_source__(const string &source, bool just_analyse) {
 	KABA_EXCEPTION_WRAPPER( return create_for_source(source, just_analyse); );
 	return nullptr;
 }
 
 void __execute_single_command__(const string &cmd) {
-	KABA_EXCEPTION_WRAPPER( execute_single_script_command(cmd); );
+	KABA_EXCEPTION_WRAPPER( execute_single_command(cmd); );
 }
 
 #pragma GCC pop_options
@@ -68,9 +68,9 @@ void SIAddPackageKaba() {
 	auto *TypeStatementPList = add_type_l(TypeStatementP);
 		
 
-	auto *TypeScript = add_type  ("Script", sizeof(Script));
-	auto *TypeScriptP = add_type_p(TypeScript, Flags::SHARED);
-	auto *TypeScriptPList = add_type_l(TypeScriptP);
+	auto *TypeModule = add_type  ("Module", sizeof(Module));
+	auto *TypeModuleP = add_type_p(TypeModule, Flags::SHARED);
+	auto *TypeModulePList = add_type_l(TypeModuleP);
 
 	
 	auto *TypeClassElement = add_type("ClassElement", sizeof(ClassElement));
@@ -155,22 +155,22 @@ void SIAddPackageKaba() {
 		class_add_element("name", TypeString, &Constant::name);
 		class_add_element("type", TypeClassP, &Constant::type);
 
-	add_class(TypeScript);
-		class_add_element("name", TypeString, &Script::filename);
-		class_add_element("used_by_default", TypeBool, &Script::used_by_default);
-		class_add_func("classes", TypeClassPList, &Script::classes, Flags::PURE);
-		class_add_func("functions", TypeFunctionPList, &Script::functions, Flags::PURE);
-		class_add_func("variables", TypeVariablePList, &Script::variables, Flags::PURE);
-		class_add_func("constants", TypeConstantPList, &Script::constants, Flags::PURE);
-		class_add_func("base_class", TypeClassP, &Script::base_class, Flags::PURE);
-		class_add_func("load", TypeScriptP, &__load_script__, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_class(TypeModule);
+		class_add_element("name", TypeString, &Module::filename);
+		class_add_element("used_by_default", TypeBool, &Module::used_by_default);
+		class_add_func("classes", TypeClassPList, &Module::classes, Flags::PURE);
+		class_add_func("functions", TypeFunctionPList, &Module::functions, Flags::PURE);
+		class_add_func("variables", TypeVariablePList, &Module::variables, Flags::PURE);
+		class_add_func("constants", TypeConstantPList, &Module::constants, Flags::PURE);
+		class_add_func("base_class", TypeClassP, &Module::base_class, Flags::PURE);
+		class_add_func("load", TypeModuleP, &__load_module__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("just_analize", TypeBool);
-		class_add_func("create", TypeScriptP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create", TypeModuleP, &__create_from_source__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
 			func_add_param("just_analize", TypeBool);
-		class_add_func("delete", TypeVoid, &remove_script, Flags::STATIC);
-			func_add_param("script", TypeScript);
+		class_add_func("delete", TypeVoid, &remove_module, Flags::STATIC);
+			func_add_param("script", TypeModule);
 		class_add_func("execute_single_command", TypeVoid, &__execute_single_command__, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("cmd", TypeString);
 	
@@ -179,8 +179,8 @@ void SIAddPackageKaba() {
 		class_add_element("id", TypeInt, &Statement::id);
 		class_add_element("num_params", TypeInt, &Statement::num_params);
 		
-	add_class(TypeScriptPList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &shared_array<Script>::__init__);
+	add_class(TypeModulePList);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &shared_array<Module>::__init__);
 
 	add_class(TypeClassElementList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
@@ -195,7 +195,7 @@ void SIAddPackageKaba() {
 	add_func("show_func", TypeVoid, &show_func, Flags::STATIC);
 		func_add_param("f", TypeFunction);
 
-	add_ext_var("packages", TypeScriptPList, (void*)&packages);
+	add_ext_var("packages", TypeModulePList, (void*)&packages);
 	add_ext_var("statements", TypeStatementPList, (void*)&Statements);
 	add_ext_var("kaba_version", TypeString, (void*)&Version);
 }

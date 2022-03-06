@@ -24,7 +24,7 @@ namespace hui {
 	class Menu;
 }
 namespace kaba {
-	class Script;
+	class Module;
 	class Class;
 }
 
@@ -36,7 +36,7 @@ public:
 	Path plugin_dir_static();
 	Path plugin_dir_local();
 
-	void link_app_script_data();
+	void link_app_data();
 	void find_plugins();
 	void add_plugins_to_menu(TsunamiWindow *win);
 
@@ -72,7 +72,7 @@ public:
 	owned<ProfileManager> profiles;
 
 
-	shared<kaba::Script> package;
+	shared<kaba::Module> package;
 	kaba::Class *get_class(const string &name);
 
 private:

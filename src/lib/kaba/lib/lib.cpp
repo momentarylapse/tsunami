@@ -102,8 +102,8 @@ const Class *TypeFunctionCodeP;
 extern const Class *TypePath;
 
 
-shared_array<Script> packages;
-Script *cur_package = nullptr;
+shared_array<Module> packages;
+Module *cur_package = nullptr;
 
 
 static Function *cur_func = nullptr;
@@ -134,7 +134,7 @@ void add_package(const string &name, Flags flags) {
 			cur_package = p.get();
 			return;
 		}
-	shared<Script> s = new Script;
+	shared<Module> s = new Module;
 	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
 	s->syntax->base_class->name = name;
 	s->filename = name;
@@ -197,7 +197,7 @@ const Class *add_type_l(const Class *sub_type, const string &_name) {
 	Class *t = new Class(name, 0, cur_package->syntax, nullptr, {sub_type});
 	t->size = config.super_array_size;
 	t->type = Class::Type::SUPER_ARRAY;
-	script_make_super_array(t);
+	kaba_make_super_array(t);
 	__add_class__(t, sub_type->name_space);
 	return t;
 }
@@ -208,7 +208,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 		name = sub_type->name + "{}";
 	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::DICT;
-	script_make_dict(t);
+	kaba_make_dict(t);
 	__add_class__(t, sub_type->name_space);
 	return t;
 }
@@ -274,7 +274,7 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*,void*)>::operator());
 		}
 	}
-	return cur_package->syntax->make_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, cur_package->syntax->base_class);
+	return cur_package->syntax->make_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, cur_package->syntax->base_class, -1);
 
 	/*auto c = cur_package->syntax->make_class_callable_fp(params, ret_type);
 	add_class(c);
@@ -448,12 +448,12 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 				throw(1);
 			}
 		} catch (...) {
-			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+			msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 			msg_write(p2s(pp));
 			msg_write(Asm::disassemble(func, 16));
 		}
 	} else if (config.native_abi == Abi::AMD64_WINDOWS) {
-		msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
 	} else {
 
@@ -464,7 +464,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 		} else if (!func) {
 			return 0;
 		} else {
-			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+			msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		}
 	}
 	return -1;
@@ -576,7 +576,7 @@ public:
 	}
 };
 
-void script_make_super_array(Class *t, SyntaxTree *ps) {
+void kaba_make_super_array(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
 	t->derive_from(TypeDynamicArray, false);
 	t->param[0] = p;
@@ -667,7 +667,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 			break;
 		}
 	if (!c.f){
-		msg_error("add_type_cast (ScriptInit): " + string(cmd) + " not found");
+		msg_error("add_type_cast: " + string(cmd) + " not found");
 		exit(1);
 	}
 	c.source = source;
@@ -762,7 +762,7 @@ void init(Abi abi, bool allow_std_lib) {
 }
 
 void clean_up() {
-	delete_all_scripts(true, true);
+	delete_all_modules(true, true);
 
 	packages.clear();
 

@@ -28,7 +28,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	flags = _flags;
 	auto_declared = false;
 	_var_size = 0;
-	_token_id = -1;
+	token_id = -1;
 	inline_no = InlineID::NONE;
 	virtual_index = -1;
 	num_slightly_hidden_vars = 0;
@@ -78,7 +78,7 @@ void Function::show(const string &stage) const {
 	if (!config.allow_output(this, stage))
 		return;
 	auto ns = owner()->base_class;
-	msg_write("[function] " + cname(ns) + " -> " + literal_return_type->cname(ns));
+	msg_write("[function] " + signature(ns));
 	block->show(ns);
 }
 

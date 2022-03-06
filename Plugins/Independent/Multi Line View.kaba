@@ -206,7 +206,7 @@ class MyDialog extends hui.Dialog
 			y_offset_t += 0.1
 			if y_offset_t >= 1
 				y_offset_t = -1
-			hui.run_later(0.02, self, force_redraw)
+			hui.run_later(0.02, force_redraw)
 	func force_redraw()
 		redraw("area")
 

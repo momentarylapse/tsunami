@@ -11,7 +11,7 @@
 
 namespace kaba {
 
-class Script;
+class Module;
 class SyntaxTree;
 class Function;
 class Serializer;
@@ -21,12 +21,12 @@ class SerialNodeParam;
 
 class Interpreter {
 public:
-	Interpreter(Script *s);
+	Interpreter(Module *m);
 	~Interpreter();
 
 	void add_function(Function *f, Serializer *ser);
 
-	Script *script;
+	Module *module;
 	//Asm::InstructionWithParamsList *list
 	//string stack;
 	Array<int> stack_pointer;

@@ -119,13 +119,13 @@ class EqualizerGrid extends Grid
 		if menu
 			del menu
 	func init2()
-		panel.event_o("add-peak", self, on_add_peak)
-		panel.event_o("add-low-pass", self, on_add_peak)
-		panel.event_o("add-high-pass", self, on_add_peak)
-		panel.event_o("add-low-shelf", self, on_add_peak)
-		panel.event_o("add-high-shelf", self, on_add_peak)
-		panel.event_o("peak-toggle-enabled", self, on_peak_toggle_enabled)
-		panel.event_o("peak-delete", self, on_peak_delete)
+		panel.event("add-peak", on_add_peak)
+		panel.event("add-low-pass", on_add_peak)
+		panel.event("add-high-pass", on_add_peak)
+		panel.event("add-low-shelf", on_add_peak)
+		panel.event("add-high-shelf", on_add_peak)
+		panel.event("peak-toggle-enabled", on_peak_toggle_enabled)
+		panel.event("peak-delete", on_peak_delete)
 
 	func override on_draw(p: Painter)
 		draw_curve_c(p, spectrum, false)

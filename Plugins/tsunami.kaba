@@ -111,7 +111,7 @@ class Module as shared extends Object
 	func extern virtual command(cmd: int, param: int) -> int
 	func extern plug_in(in_port: int, source: Module, out_port: int)
 	func extern unplug_in(in_port: int)
-	func extern subscribe(handler: Object, f: Object->void, message: string)
+	func extern subscribe(handler: Object, f: void->void, message: string)
 	func extern unsubscribe(handler: Object)
 	func extern const copy() -> Module*
 	
@@ -576,7 +576,7 @@ class AudioView extends Object
 	var signal_chain: SignalChain*
 	var output_stream: AudioOutput*
 	var cam: ViewPort
-	func extern subscribe(handler: Object, f: Object->void, message: string)
+	func extern subscribe(handler: Object, f: void->void, message: string)
 	func extern unsubscribe(handler: Object)
 	func extern prepare_playback(r: Range, allow_loop: bool)
 	func extern play()
@@ -682,7 +682,7 @@ class Session as shared extends Object
 #	Range range
 
 class Slider
-	func extern __init__(panel: Panel, id_slider: string, id_edit: string, v_min: float, v_max: float, factor: float, func: Object->void, value: float)
+	func extern __init__(panel: Panel, id_slider: string, id_edit: string, v_min: float, v_max: float, factor: float, on_update: void->void, value: float)
 	func extern virtual __delete__()
 	func extern get() -> float
 	func extern set(f: float)

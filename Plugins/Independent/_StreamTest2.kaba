@@ -19,7 +19,7 @@ class _StreamTest extends TsunamiPlugin
 		
 		nn = 0
 		acc = false
-		runner = hui.run_repeated(0.1, self, on_tick)
+		runner = hui.run_repeated(0.1, on_tick)
 		
 		chain.start()
 

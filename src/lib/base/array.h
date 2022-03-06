@@ -123,8 +123,9 @@ public:
 	}
 	void _cdecl insert(const T &item, int index) {
 		resize(num + 1);
-		for (int i=num-1; i>index; i--)
-			(*this)[i] = (*this)[i-1];
+		if (index < num-1)
+			for (int i=num-1; i>index; i--)
+				(*this)[i] = (*this)[i-1];
 		(*this)[index] = item;
 	}
 

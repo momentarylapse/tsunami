@@ -219,7 +219,8 @@ struct CPUInstruction {
 	}
 };
 
-Array<CPUInstruction> CPUInstructions;
+static Array<CPUInstruction> all_cpu_instructions;
+static Array<CPUInstruction> cpu_instructions[(int)InstID::NUM_INSTRUCTION_NAMES];
 
 
 bool CPUInstruction::match(InstructionWithParams &iwp) {
@@ -263,7 +264,8 @@ void add_inst(InstID inst, int code, int code_size, int cap, int param1, int par
 	for (int j=0;j<(int)InstID::NUM_INSTRUCTION_NAMES;j++)
 		if (inst == instruction_names[j].inst)
 			i.name = instruction_names[j].name;
-	CPUInstructions.add(i);
+	all_cpu_instructions.add(i);
+	cpu_instructions[(int)inst].add(i);
 }
 
 
@@ -361,7 +363,9 @@ void x86_init() {
 		RegisterByID(registers[i].id) = &registers[i];
 	}
 
-	CPUInstructions.clear();
+	all_cpu_instructions.clear();
+	for (int i=0; i<(int)InstID::NUM_INSTRUCTION_NAMES; i++)
+		cpu_instructions[i].clear();
 	add_inst(InstID::DB		,0x00	,0	,-1	,Ib	,-1);
 	add_inst(InstID::DW		,0x00	,0	,-1	,Iw	,-1);
 	add_inst(InstID::DD		,0x00	,0	,-1	,Id	,-1);
@@ -1375,7 +1379,7 @@ string x86_disassemble(void *_code_, int length, bool allow_comments) {
 
 		// instruction
 		CPUInstruction *inst = nullptr;
-		for (CPUInstruction &ci: CPUInstructions) {
+		for (CPUInstruction &ci: all_cpu_instructions) {
 			if (ci.code_size == 0)
 				continue;
 			if (!ci.has_fixed_param) {
@@ -1679,7 +1683,7 @@ void InstructionWithParamsList::add_instruction(char *oc, int &ocs, int n) {
 	// test if any instruction matches our wishes
 	int ninst = -1;
 	bool has_mod_rm = false;
-	foreachi(CPUInstruction &c, CPUInstructions, i)
+	foreachi(CPUInstruction &c, cpu_instructions[(int)iwp.inst], i)
 		if (!c.ignore and c.match(iwp)) {
 			if ((!c.has_modrm and has_mod_rm) or (ninst < 0)) {
 				has_mod_rm = c.has_modrm;
@@ -1713,20 +1717,19 @@ void InstructionWithParamsList::add_instruction(char *oc, int &ocs, int n) {
 
 
 	if (DebugAsm)
-		CPUInstructions[ninst].print();
+		cpu_instructions[(int)iwp.inst][ninst].print();
 
 	// compile
-	OpcodeAddInstruction(oc, ocs, CPUInstructions[ninst], iwp.p[0], iwp.p[1], *this);
+	OpcodeAddInstruction(oc, ocs, cpu_instructions[(int)iwp.inst][ninst], iwp.p[0], iwp.p[1], *this);
 	iwp.size = ocs - ocs0;
 
 	//msg_write(d2h(&oc[ocs0], ocs - ocs0, false));
 }
 
 bool immediate_allowed(InstID inst) {
-	for (CPUInstruction &i: CPUInstructions)
-		if (i.inst == inst)
-			if ((i.param1.allow_immediate) or (i.param2.allow_immediate))
-				return true;
+	for (CPUInstruction &i: cpu_instructions[(int)inst])
+		if ((i.param1.allow_immediate) or (i.param2.allow_immediate))
+			return true;
 	return false;
 }
 

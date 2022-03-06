@@ -846,7 +846,7 @@ Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p
 		return Asm::param_deref_label(p.p, p.type->size);
 	} else if (p.kind == NodeKind::REGISTER) {
 		if (p.shift > 0)
-			script->do_error_internal("get_param: reg + shift");
+			module->do_error_internal("get_param: reg + shift");
 		return Asm::param_reg(p.as_reg());
 		//param_size = p.type->size;
 	} else if (p.kind == NodeKind::DEREF_REGISTER) {
@@ -858,7 +858,7 @@ Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p
 		int size = p.type->size;
 		// compiler self-test
 		if ((size != 1) and (size != 2) and (size != 4) and (size != 8))
-			script->do_error_internal("get_param: evil global of type " + p.type->name);
+			module->do_error_internal("get_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
 		if (config.instruction_set == Asm::InstructionSet::ARM) {
@@ -880,10 +880,10 @@ Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p
 		}
 	} else if (p.kind == NodeKind::IMMEDIATE) {
 		if (p.shift > 0)
-			script->do_error_internal("get_param: immediate + shift");
+			module->do_error_internal("get_param: immediate + shift");
 		return Asm::param_imm(p.p, p.type->size);
 	} else
-		script->do_error_internal("get_param: unexpected param..." + kind2str(p.kind));
+		module->do_error_internal("get_param: unexpected param..." + kind2str(p.kind));
 	return Asm::param_none;
 }
 
@@ -909,7 +909,7 @@ void Serializer::assemble_cmd_arm(SerialNode &c) {
 	list->add_arm(c.cond, c.inst, p1, p2, p3);
 }
 
-void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s) {
+void AddAsmBlock(Asm::InstructionWithParamsList *list, Module *s) {
 	//msg_write(".------------------------------- asm");
 	SyntaxTree *ps = s->syntax;
 	if (ps->asm_blocks.num == 0)
@@ -921,16 +921,16 @@ void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s) {
 
 
 void Serializer::do_error(const string &msg) {
-	script->do_error_internal(msg);
+	module->do_error_internal(msg);
 }
 
 void Serializer::do_error_link(const string &msg) {
-	script->do_error_link(msg);
+	module->do_error_link(msg);
 }
 
-Serializer::Serializer(Script *s, Asm::InstructionWithParamsList *_list) {
-	script = s;
-	syntax_tree = s->syntax;
+Serializer::Serializer(Module *m, Asm::InstructionWithParamsList *_list) {
+	module = m;
+	syntax_tree = m->syntax;
 	list = _list;
 	max_push_size = 0;
 	stack_max_size = 0;
@@ -982,11 +982,11 @@ Backend *create_backend(Serializer *s) {
 		return new BackendX86(s);
 	if (config.instruction_set == Asm::InstructionSet::ARM)
 		return new BackendARM(s);
-	s->script->do_error("unable to create a backend for the architecture");
+	s->module->do_error("unable to create a backend for the architecture");
 	return nullptr;
 }
 
-void Script::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
+void Module::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
 	if (config.verbose and config.allow_output(f, "asm"))
 		msg_write("serializing " + f->long_name() + " -------------------");
 	f->show("asm");
@@ -1005,9 +1005,9 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 		x->cur_func_index = index;
 		x->serialize_function(f);
 		x->fix_return_by_ref();
-		if (!syntax->script->interpreter)
-			syntax->script->interpreter = new Interpreter(syntax->script);
-		syntax->script->interpreter->add_function(f, x);
+		if (!syntax->module->interpreter)
+			syntax->module->interpreter = new Interpreter(syntax->module);
+		syntax->module->interpreter->add_function(f, x);
 		return;
 	}
 
@@ -1043,7 +1043,7 @@ void function_update_address(Function *f, Asm::InstructionWithParamsList *list) 
 	}
 }
 
-void Script::compile_functions(char *oc, int &ocs) {
+void Module::compile_functions(char *oc, int &ocs) {
 	auto *list = new Asm::InstructionWithParamsList(0);
 	Array<int> func_offset;
 

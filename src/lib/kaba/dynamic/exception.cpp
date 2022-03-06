@@ -50,7 +50,7 @@ struct StackFrameInfo {
 	void *rip;
 	void *rsp;
 	void *rbp;
-	shared<Script> s;
+	shared<Module> s;
 	Function *f;
 	int64 offset;
 	string str() const {
@@ -61,10 +61,10 @@ struct StackFrameInfo {
 };
 
 
-extern shared_array<Script> _public_scripts_;
+extern shared_array<Module> public_modules;
 
-inline void func_from_rip_test_script(StackFrameInfo &r, shared<Script> s, void *rip, bool from_package) {
-	foreachi (Function *f, s->syntax->functions, i) {
+inline void func_from_rip_test_module(StackFrameInfo &r, shared<Module> m, void *rip, bool from_package) {
+	foreachi (Function *f, m->syntax->functions, i) {
 		if (from_package and !f->throws_exceptions())
 			continue;
 		int64 frip = f->address;
@@ -75,7 +75,7 @@ inline void func_from_rip_test_script(StackFrameInfo &r, shared<Script> s, void 
 			continue;
 		if (from_package and offset >= 500)
 			continue;
-		r.s = s;
+		r.s = m;
 		r.f = f;
 		r.offset = offset;
 	}
@@ -88,17 +88,17 @@ StackFrameInfo get_func_from_rip(void *rip) {
 	r.offset = 1000000;
 
 	// compiled functions
-	for (auto s: _public_scripts_) {
+	for (auto s: public_modules) {
 		if ((rip < s->opcode) or (rip > &s->opcode[s->opcode_size]))
 			continue;
-		func_from_rip_test_script(r, s, rip, false);
+		func_from_rip_test_module(r, s, rip, false);
 	}
 	if (r.f)
 		return r;
 
 	// externally linked...
 	for (auto p: packages) {
-		func_from_rip_test_script(r, p, rip, true);
+		func_from_rip_test_module(r, p, rip, true);
 	}
 	return r;
 }
@@ -120,7 +120,7 @@ inline bool ex_type_match(const Class *ex_type, const Class *catch_type) {
 	return ex_type->is_derived_from(catch_type);
 }
 
-ExceptionBlockData get_blocks(shared<Script> s, Function *f, void* rip, const Class *ex_type) {
+ExceptionBlockData get_blocks(shared<Module> s, Function *f, void* rip, const Class *ex_type) {
 	ExceptionBlockData ebd;
 	ebd.except_block = nullptr;
 	ebd.except = nullptr;
@@ -211,10 +211,10 @@ const Class* get_type(void *p) {
 	if (!p)
 		return TypeUnknown;
 	void *vtable = *(void**)p;
-	auto scripts = _public_scripts_;
+	auto modules = public_modules;
 	for (auto p: packages)
-		scripts.add(p);
-	for (auto s: scripts) {
+		modules.add(p);
+	for (auto s: modules) {
 		auto *r = _get_type(p, vtable, s->syntax->base_class);
 		if (r)
 			return r;

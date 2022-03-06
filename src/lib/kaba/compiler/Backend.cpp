@@ -15,7 +15,7 @@ namespace kaba {
 
 Backend::Backend(Serializer *s) : cmd(s->cmd) {
 	serializer = s;
-	script = s->script;
+	module = s->module;
 	list = s->list;
 	cur_func = nullptr;
 	cur_func_index = -1;
@@ -92,13 +92,13 @@ Asm::RegID Backend::get_reg(Asm::RegRoot root, int size) {
 }
 
 void Backend::do_error(const string &e) {
-	script->do_error_internal(e);
+	module->do_error_internal(e);
 }
 
 
 void Backend::add_asm_block() {
 	//msg_write(".------------------------------- asm");
-	SyntaxTree *ps = script->syntax;
+	SyntaxTree *ps = module->syntax;
 	if (ps->asm_blocks.num == 0)
 		do_error("asm block mismatch");
 	ps->asm_meta_info->line_offset = ps->asm_blocks[0].line;

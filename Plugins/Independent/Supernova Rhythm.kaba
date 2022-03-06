@@ -86,7 +86,7 @@ class SupernovaRhythm extends TsunamiPlugin
 		chain.set_buffer_size(4096)
 		chain.start()
 		chain.command(Module.Command.ACCUMULATION_START, 0)
-		runner = hui.run_repeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, on_update)
 		
 	func override on_stop()
 		hui.cancel_runner(runner)

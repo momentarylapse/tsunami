@@ -23,7 +23,7 @@ class ClickCounterPanel extends ConfigPanel
 		event("inc", on_increase)
 		event("dec", on_decrease)
 		
-		id = hui.run_repeated(0.05, self, poll)
+		id = hui.run_repeated(0.05, poll)
 	
 	func override __delete__()
 		hui.cancel_runner(id)
@@ -84,7 +84,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		chain.connect(synth, 0, out, 0)
 		
 		chain.start()
-		runner = hui.run_repeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, on_update)
 		
 	func override on_stop()
 		hui.cancel_runner(runner)

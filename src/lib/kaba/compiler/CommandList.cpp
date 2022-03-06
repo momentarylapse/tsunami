@@ -211,7 +211,7 @@ void CommandList::move_param(SerialNodeParam &p, int from, int to) {
 			}
 		if (!found) {
 			msg_error(format("move_param: no RegChannel...  reg_root=%d  from=%d", (int)r, from));
-			msg_write(ser->script->filename.str() + " : " + ser->cur_func->long_name());
+			msg_write(ser->module->filename.str() + " : " + ser->cur_func->long_name());
 		}
 	}
 }

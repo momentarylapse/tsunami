@@ -86,8 +86,8 @@ class MultiEchoGrid extends Grid
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")
 	func add_events()
-		cp.event_o("reflection-add", self, on_add_reflection)
-		cp.event_o("reflection-delete", self, on_delete_reflection)
+		cp.event("reflection-add", on_add_reflection)
+		cp.event("reflection-delete", on_delete_reflection)
 
 	func draw_hull_curve(c: Painter, r: MultiEcho.Config.Reflector)
 		float v = r.volume

@@ -29,8 +29,8 @@ static bool _class_contains(const Class *c, const string &name) {
 	return false;
 }
 
-// import data from an included script file
-void SyntaxTree::add_include_data(shared<Script> s, bool indirect) {
+// import data from an included module file
+void SyntaxTree::add_include_data(shared<Module> s, bool indirect) {
 	for (auto i: weak(includes))
 		if (i == s)
 			return;
@@ -110,24 +110,24 @@ void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just
 			// special defines?
 			if ((d.source.num > 4) and (d.source.head(2) == "__") and (d.source.tail(2) == "__")) {
 				if (d.source == "__OS__") {
-					do_error("#define __OS__ deprecated");
+					do_error_exp("#define __OS__ deprecated");
 				} else if (d.source == "__STRING_CONST_AS_CSTRING__") {
 					tree->flag_string_const_as_cstring = true;
 				} else if (d.source == "__FUNCTION_POINTER_AS_CODE__") {
 					tree->flag_function_pointer_as_code = true;
 				} else if (d.source == "__NO_FUNCTION_FRAME__") {
-					do_error("#define __NO_FUNCTION_FRAME__ deprecated");
+					do_error_exp("#define __NO_FUNCTION_FRAME__ deprecated");
 				} else if (d.source == "__ADD_ENTRY_POINT__") {
-					do_error("#define __ADD_ENTRY_POINT__ deprecated");
+					do_error_exp("#define __ADD_ENTRY_POINT__ deprecated");
 				} else if (d.source == "__VARIABLE_OFFSET__") {
-					do_error("#define __VARIABLE_OFFSET__ deprecated");
+					do_error_exp("#define __VARIABLE_OFFSET__ deprecated");
 				} else if (d.source == "__CODE_ORIGIN__") {
-					do_error("#define __CODE_ORIGING__ deprecated");
+					do_error_exp("#define __CODE_ORIGING__ deprecated");
 				} else {
-					do_error("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
+					do_error_exp("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
 				}
 			} else {
-				do_error("#define deprecated");
+				do_error_exp("#define deprecated");
 				// normal define
 				tree->defines.add(d);
 			}
@@ -137,7 +137,7 @@ void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just
 			//FlagImmortal=true;
 			break;
 		default:
-			do_error("unknown macro after \"#\"");
+			do_error_exp("unknown macro after \"#\"");
 			break;
 	}
 

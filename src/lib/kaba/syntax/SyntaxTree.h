@@ -23,7 +23,7 @@ namespace Asm {
 
 namespace kaba {
 
-class Script;
+class Module;
 class SyntaxTree;
 class Parser;
 
@@ -46,11 +46,11 @@ struct AsmBlock {
 // data structures (uncompiled)
 class SyntaxTree {
 public:
-	SyntaxTree(Script *_script);
+	SyntaxTree(Module *module);
 	~SyntaxTree();
 
 	void default_import();
-	void add_include_data(shared<Script> s, bool indirect);
+	void add_include_data(shared<Module> s, bool indirect);
 
 	void do_error(const string &msg, int override_token_id = -1);
 	
@@ -59,21 +59,21 @@ public:
 
 	// syntax analysis
 	const Class *add_class(const Class *type);
-	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns);
-	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns);
-	const Class *make_class_super_array(const Class *element_type);
-	const Class *make_class_array(const Class *element_type, int num_elements);
-	const Class *make_class_dict(const Class *element_type);
-	const Class *make_class_callable_fp(Function *f);
-	const Class *make_class_callable_fp(const Array<const Class*> &param, const Class *ret);
-	const Class *make_class_callable_bind(const Array<const Class*> &param, const Class *ret, const Array<const Class*> &binds);
+	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
+	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
+	const Class *make_class_super_array(const Class *element_type, int token_id);
+	const Class *make_class_array(const Class *element_type, int num_elements, int token_id);
+	const Class *make_class_dict(const Class *element_type, int token_id);
+	const Class *make_class_callable_fp(Function *f, int token_id);
+	const Class *make_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
+	const Class *make_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
 	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns);
 	shared_array<Node> get_existence_global(const string &name, const Class *ns);
 	shared_array<Node> get_existence_block(const string &name, Block *block);
 
 	shared_array<Node> get_element_of(shared<Node> n, const string &name);
 
-	Function *required_func_global(const string &name);
+	Function *required_func_global(const string &name, int token_id = -1);
 
 	void create_asm_meta_info();
 
@@ -106,18 +106,18 @@ public:
 	Function *add_function(const string &name, const Class *type, const Class *name_space, Flags flags);
 
 	// nodes
-	shared<Node> add_node_statement(StatementID id, const Class *type = TypeVoid);//, const shared_array<Node> &params);
-	shared<Node> add_node_member_call(Function *f, const shared<Node> inst, const shared_array<Node> &params = {}, bool force_non_virtual = false);
-	shared<Node> add_node_func_name(Function *f);
-	shared<Node> add_node_class(const Class *c);
-	shared<Node> add_node_call(Function *f);
-	shared<Node> add_node_const(Constant *c);
+	shared<Node> add_node_statement(StatementID id, int token_id = -1, const Class *type = TypeVoid);//, const shared_array<Node> &params);
+	shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int token_id = -1, const shared_array<Node> &params = {}, bool force_non_virtual = false);
+	shared<Node> add_node_func_name(Function *f, int token_id = -1);
+	shared<Node> add_node_class(const Class *c, int token_id = -1);
+	shared<Node> add_node_call(Function *f, int token_id = -1);
+	shared<Node> add_node_const(Constant *c, int token_id = -1);
 	//shared<Node> add_node_block(Block *b);
-	shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared<Node> p2, const Class *override_type = nullptr);
-	shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, const Class *override_type = nullptr);
-	shared<Node> add_node_global(Variable *var);
-	shared<Node> add_node_local(Variable *var);
-	shared<Node> add_node_local(Variable *var, const Class *type);
+	shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
+	shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
+	shared<Node> add_node_global(Variable *var, int token_id = -1);
+	shared<Node> add_node_local(Variable *var, int token_id = -1);
+	shared<Node> add_node_local(Variable *var, const Class *type, int token_id = -1);
 	shared<Node> make_constructor_static(shared<Node> n, const string &name);
 	shared<Node> exlink_add_element(Function *f, ClassElement &e);
 	shared<Node> exlink_add_element_indirect(Function *f, ClassElement &e, ClassElement &e2);
@@ -125,8 +125,8 @@ public:
 	shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
 	shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
 	shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
-	shared<Node> add_node_constructor(Function *f);
-	shared<Node> make_fake_constructor(const Class *t, const Class *param_type);
+	shared<Node> add_node_constructor(Function *f, int token_id = -1);
+	shared<Node> make_fake_constructor(const Class *t, const Class *param_type, int token_id = -1);
 	//shared<Node> add_node_block(Block *b);
 	shared<Node> cp_node(shared<Node> c);
 
@@ -156,7 +156,7 @@ public:
 	shared<Class> _base_class;
 	shared<Class> imported_symbols;
 	Array<const Class*> owned_classes;
-	shared_array<Script> includes;
+	shared_array<Module> includes;
 	Array<Define> defines;
 	owned<Asm::MetaInfo> asm_meta_info;
 	Array<AsmBlock> asm_blocks;
@@ -165,7 +165,7 @@ public:
 
 	shared<Function> root_of_all_evil;
 
-	Script *script;
+	Module *module;
 	owned<Parser> parser;
 };
 

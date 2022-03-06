@@ -47,7 +47,7 @@ public:
 	string str() const;
 };
 
-// for any type of constant used in the script
+// for any type of constant used in the module
 class Constant : public Sharable<Value> {
 public:
 	Constant(const Class *type, SyntaxTree *owner);

@@ -193,7 +193,7 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 	int push_size = function_call_pre(params, ret, f->is_static());
 
 	if (f->address != 0) {
-		if (dist_fits_32bit(f->address, script->opcode)) {
+		if (dist_fits_32bit(f->address, module->opcode)) {
 			// 32bit call distance
 			insert_cmd(Asm::InstID::CALL, param_imm(TypeReg32, f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
@@ -203,7 +203,7 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 			insert_cmd(Asm::InstID::CALL, p_rax);
 		}
 	} else if (f->_label >= 0) {
-		if (f->owner() == script->syntax) {
+		if (f->owner() == module->syntax) {
 			// 32bit call distance
 			insert_cmd(Asm::InstID::CALL, param_label(TypeInt, f->_label));
 		} else {

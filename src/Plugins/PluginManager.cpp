@@ -67,7 +67,7 @@
 #include "TsunamiPlugin.h"
 
 namespace kaba {
-	extern shared_array<Script> _public_scripts_;
+	extern shared_array<Module> public_modules;
 };
 
 namespace hui {
@@ -81,14 +81,14 @@ PluginManager::PluginManager() {
 
 	find_plugins();
 
-	package = new kaba::Script;
+	package = new kaba::Module;
 	package->filename = "-tsunami-internal-";
 	package->used_by_default = false;
 	kaba::packages.add(package);
-	kaba::_public_scripts_.add(package.get());
+	kaba::public_modules.add(package.get());
 
-	auto *type_dev = package->syntax->make_class("Device", kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class);
-	package->syntax->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->syntax->base_class);
+	auto *type_dev = package->syntax->make_class("Device", kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class, -1);
+	package->syntax->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->syntax->base_class, -1);
 }
 
 PluginManager::~PluginManager() {
@@ -112,7 +112,7 @@ public:
 };
 
 
-void PluginManager::link_app_script_data() {
+void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
 
 	// api definition
@@ -826,7 +826,7 @@ void PluginManager::link_app_script_data() {
 }
 
 kaba::Class* PluginManager::get_class(const string &name) {
-	return (kaba::Class*)package->syntax->make_class(name, kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class);
+	return (kaba::Class*)package->syntax->make_class(name, kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class, -1);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

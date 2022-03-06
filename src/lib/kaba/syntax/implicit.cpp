@@ -18,8 +18,32 @@ const Class *get_callable_return_type(const Class *fp);
 Array<const Class*> get_callable_capture_types(const Class *fp);
 
 
+void db_add_print_node(Parser *p, shared<Block> block, shared<Node> node) {
+	auto ff = p->tree->required_func_global("print");
+	auto cmd = p->tree->add_node_call(ff);
+	cmd->set_param(0, p->add_converter_str(node, false));
+	block->add(cmd);
+}
+
+void db_add_print_label(Parser *p, shared<Block> block, const string &s) {
+	auto c = p->tree->add_constant(TypeString);
+	c->as_string() = s;
+	db_add_print_node(p, block, p->tree->add_node_const(c));
+}
+
+void db_add_print_label_node(Parser *p, shared<Block> block, const string &s, shared<Node> node) {
+	auto c = p->tree->add_constant(TypeString);
+	c->as_string() = s;
+
+	auto ff = p->tree->required_func_global("print");
+	auto cmd = p->tree->add_node_call(ff);
+	cmd->set_param(0, p->link_operator_id(OperatorID::ADD, p->tree->add_node_const(c), p->add_converter_str(node, false)));
+	block->add(cmd);
+}
+
+
 void Parser::do_error_implicit(Function *f, const string &str) {
-	int token_id = max(f->_token_id, f->name_space->_token_id);
+	int token_id = max(f->token_id, f->name_space->token_id);
 	do_error(format("[auto generating %s] : %s", f->signature(), str), token_id);
 }
 
@@ -130,7 +154,7 @@ void Parser::auto_implement_super_array_constructor(Function *f, const Class *t)
 	auto te = t->get_array_element();
 	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt});
 	f->block->add(tree->add_node_member_call(ff,
-			self,
+			self, -1,
 			{tree->add_node_const(tree->add_constant_int(te->size))}));
 }
 
@@ -161,7 +185,7 @@ void Parser::auto_implement_dict_constructor(Function *f, const Class *t) {
 	auto te = t->get_array_element();
 	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt});
 	f->block->add(tree->add_node_member_call(ff,
-			self,
+			self, -1,
 			{tree->add_node_const(tree->add_constant_int(te->size + TypeString->size))}));
 }
 
@@ -226,7 +250,7 @@ void Parser::auto_implement_regular_destructor(Function *f, const Class *t) {
 		if (t->parent) {
 			Function *ff = t->parent->get_destructor();
 			if (ff)
-				f->block->add(tree->add_node_member_call(ff, self, {}, true));
+				f->block->add(tree->add_node_member_call(ff, self, -1, {}, true));
 			else if (t->parent->needs_destructor())
 				do_error_implicit(f, "parent destructor missing");
 		}
@@ -782,6 +806,8 @@ void Parser::auto_implement_callable_constructor(Function *f, const Class *t) {
 void Parser::auto_implement_callable_fp_call(Function *f, const Class *t) {
 	auto self = tree->add_node_local(f->__get_var(IDENTIFIER_SELF));
 
+	//db_add_print_label(this, f->block, "== callable.call ==");
+
 	// contains a Function* pointer, extract its raw pointer
 	auto raw = tree->add_node_statement(StatementID::RAW_FUNCTION_POINTER);
 	raw->type = TypeFunctionCodeP;
@@ -809,17 +835,41 @@ void Parser::auto_implement_callable_fp_call(Function *f, const Class *t) {
 void Parser::auto_implement_callable_bind_call(Function *f, const Class *t) {
 	auto self = tree->add_node_local(f->__get_var(IDENTIFIER_SELF));
 
+	//db_add_print_label(this, f->block, "== bind.call ==");
+
 	auto fp = get_callable_fp(t, self);
 	auto call = tree->add_node_member_call(fp->type->param[0]->get_call(), fp);
 	int index = 1;
 	//for (int i=0; i<f->num_params; i++)
 	//	call->set_param(i+1, tree->add_node_local(f->var[i].get()));
-	for (auto *v: weak(f->var))
-		if (v->name.num == 1)
-			call->set_param(index ++, tree->add_node_local(v));
-	for (auto &e: t->elements)
-		if (e.name.head(7) == "capture")
-			call->set_param(index ++, self->shift(e.offset, e.type));
+
+	/*int
+	for (int index=0; index<nn; index++) {
+
+	}*/
+
+	shared_array<Node> params;
+
+	for (auto *v: weak(f->var)) {
+		//msg_write("V " + v->name);
+		if (v->name.num == 1) {
+			//db_add_print_label_node(this, f->block, "  param " + v->name + ": ", tree->add_node_local(v));
+			params.add(tree->add_node_local(v));
+			//call->set_param(index ++, tree->add_node_local(v));
+		}
+	}
+	for (auto &e: t->elements) {
+		//msg_write("E " + e.name);
+		if (e.name.head(7) == "capture") {
+			int n = e.name.replace("capture", "").replace("_ref", "")._int();
+			params.insert(self->shift(e.offset, e.type), n);
+			//db_add_print_label_node(this, f->block, "  capture " + e.name + ": ", self->shift(e.offset, e.type));
+			//call->set_param(index ++, self->shift(e.offset, e.type));
+		}
+	}
+
+	foreachi(auto &p, params, i)
+		call->set_param(i+1, p);
 
 	if (f->literal_return_type == TypeVoid) {
 		f->block->add(call);
@@ -836,6 +886,7 @@ void Parser::auto_implement_callable_bind_call(Function *f, const Class *t) {
 Function *SyntaxTree::add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf, Flags flags, const shared_array<Node> &def_params) {
 	Function *f = add_function(name, return_type, t, flags); // always member-function??? no...?
 	f->auto_declared = true;
+	f->token_id = t->token_id;
 	foreachi (auto &p, param_types, i) {
 		f->literal_param_type.add(p);
 		auto v = f->block->add_var(param_names[i], p);
@@ -1055,7 +1106,7 @@ Function* prepare_auto_impl(const Class *t, Function *f) {
 		return f;
 	}
 	return nullptr;
-	t->owner->script->do_error_internal("prepare class func..." + f->signature());
+	t->owner->module->do_error_internal("prepare class func..." + f->signature());
 	return f;
 }
 

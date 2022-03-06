@@ -86,7 +86,7 @@ Grid ? '' vertical
 		event("mode-bounce-walk", on_mode_bounce_walk)
 		#event("fullscreen", on_fullscreen)
 		
-		sr_id = hui.run_repeated(UPDATE_DT, &self, on_update)
+		sr_id = hui.run_repeated(UPDATE_DT, on_update)
 	
 	func override __delete__()
 		hui.cancel_runner(sr_id)

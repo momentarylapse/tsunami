@@ -100,7 +100,7 @@ bool Tsunami::on_startup(const Array<string> &arg) {
 	plugin_manager = new PluginManager;
 	Session::GLOBAL->plugin_manager = plugin_manager.get();
 
-	plugin_manager->link_app_script_data();
+	plugin_manager->link_app_data();
 
 	if (!handle_arguments(arg))
 		return false;

@@ -208,11 +208,12 @@ void Node::show(const Class *ns) const {
 //  edit the tree by shallow copy, relink to old parameters
 //  relinked params count as "new" Node!
 // ...(although, Block are allowed to be edited)
-Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const) {
+Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const, int _token_id) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
 	is_const = _const;
+	token_id = _token_id;
 }
 
 Node::~Node() {
@@ -329,8 +330,7 @@ void Node::set_param(int index, shared<Node> p) {
 }
 
 shared<Node> Node::shallow_copy() const {
-	auto r = new Node(kind, link_no, type, is_const);
-	r->token_id = token_id;
+	auto r = new Node(kind, link_no, type, is_const, token_id);
 	r->params = params;
 	return r;
 }
@@ -338,7 +338,7 @@ shared<Node> Node::shallow_copy() const {
 shared<Node> Node::ref(const Class *override_type) const {
 	const Class *t = override_type ? override_type : type->get_pointer();
 
-	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t);
+	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, false, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -347,21 +347,21 @@ shared<Node> Node::ref(const Class *override_type) const {
 shared<Node> Node::deref(const Class *override_type) const {
 	if (!override_type)
 		override_type = type->param[0];
-	shared<Node> c = new Node(NodeKind::DEREFERENCE, 0, override_type, is_const);
+	shared<Node> c = new Node(NodeKind::DEREFERENCE, 0, override_type, is_const, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::shift(int64 shift, const Class *type) const {
-	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const);
+	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::deref_shift(int64 shift, const Class *type) const {
-	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, is_const);
+	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, is_const, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;

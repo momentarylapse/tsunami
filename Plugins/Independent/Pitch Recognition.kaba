@@ -76,7 +76,7 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		runner = hui.run_repeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, on_update)
 		
 	func override on_stop()
 		hui.cancel_runner(runner)

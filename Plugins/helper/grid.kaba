@@ -63,8 +63,8 @@ class GridAxis extends AxisData
 			del menu
 	
 	func set_events()
-		grid.panel.event_o("{{_id}}-mode-freq-hz", self, on_mode_freq_hz)
-		grid.panel.event_o("{{_id}}-mode-pitch", self, on_mode_pitch)
+		grid.panel.event("{{_id}}-mode-freq-hz", on_mode_freq_hz)
+		grid.panel.event("{{_id}}-mode-pitch", on_mode_pitch)
 	
 	func set(_val_min: float, _val_max: float, _log: bool, _unit: string)
 		val_min = _val_min
@@ -496,14 +496,14 @@ class Grid extends Object
 		data_init()
 		panel = &_panel
 		id = _id
-		panel.event_ox(id, "hui:draw", self, on_draw_all)
-		panel.event_ox(id, "hui:left-button-down", self, on_left_button_down_all)
-		panel.event_ox(id, "hui:left-button-up", self, on_left_button_up_all)
-		panel.event_ox(id, "hui:right-button-down", self, on_right_button_down_all)
-		panel.event_ox(id, "hui:right-button-up", self, on_right_button_up_all)
-		panel.event_ox(id, "hui:mouse-move", self, on_mouse_move_all)
-		panel.event_ox(id, "hui:mouse-wheel", self, on_mouse_wheel_all)
-		panel.event_ox(id, "hui:key-down", self, on_key_down_all)
+		panel.event_x(id, "hui:draw", on_draw_all)
+		panel.event_x(id, "hui:left-button-down", on_left_button_down_all)
+		panel.event_x(id, "hui:left-button-up", on_left_button_up_all)
+		panel.event_x(id, "hui:right-button-down", on_right_button_down_all)
+		panel.event_x(id, "hui:right-button-up", on_right_button_up_all)
+		panel.event_x(id, "hui:mouse-move", on_mouse_move_all)
+		panel.event_x(id, "hui:mouse-wheel", on_mouse_wheel_all)
+		panel.event_x(id, "hui:key-down", on_key_down_all)
 		x_axis.set_events()
 		y_axis.set_events()
 	

@@ -20,7 +20,7 @@ Plugin::Plugin(const Path &_filename, ModuleCategory _type) {
 }
 
 string Plugin::get_error() {
-	return format(_("Error in script file: \"%s\"\n%s"), filename, error_message);
+	return format(_("Error in file: \"%s\"\n%s"), filename, error_message);
 }
 
 bool Plugin::file_changed() {
@@ -37,16 +37,16 @@ bool Plugin::file_changed() {
 }
 
 void Plugin::recompile(Session *session) {
-	session->i(_("compiling script: ") + filename.str());
+	session->i(_("compiling module: ") + filename.str());
 
-	if (s) {
-		kaba::remove_script(s.get());
-		s = nullptr;
+	if (module) {
+		kaba::remove_module(module.get());
+		module = nullptr;
 	}
 
 	// load + compile
 	try {
-		s = kaba::load(filename);
+		module = kaba::load(filename);
 
 	} catch(kaba::Exception &e) {
 		error_message = e.message();
@@ -57,18 +57,18 @@ void Plugin::recompile(Session *session) {
 bool Plugin::usable(Session *session) {
 	if (file_changed())
 		recompile(session);
-	return s.get();
+	return module.get();
 }
 
 void *Plugin::create_instance(Session *session, const string &root_type) {
 	if (!usable(session))
 		return nullptr;
 
-	for (auto *t: weak(s->syntax->base_class->classes)) {
+	for (auto *t: weak(module->syntax->base_class->classes)) {
 		if (t->is_derived_from_s(root_type)) {
 			return t->create_instance();
 		}
 	}
-	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename, root_type));
+	session->e(format(_("Plugin file \"%s\" does not define a class derived from %s"), filename, root_type));
 	return nullptr;
 }

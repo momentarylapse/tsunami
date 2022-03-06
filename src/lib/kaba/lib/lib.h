@@ -25,7 +25,7 @@ namespace kaba {
 #define mem_align(x, n)		((((x) + (n) - 1) / (n) ) * (n))
 
 class SyntaxTree;
-class Script;
+class Module;
 class Class;
 class Value;
 class Function;
@@ -33,8 +33,8 @@ class Variable;
 class Constant;
 
 
-void script_make_super_array(Class *t, SyntaxTree *ps = nullptr);
-void script_make_dict(Class *t, SyntaxTree *ps = nullptr);
+void kaba_make_super_array(Class *t, SyntaxTree *ps = nullptr);
+void kaba_make_dict(Class *t, SyntaxTree *ps = nullptr);
 
 
 
@@ -63,7 +63,7 @@ void clean_up();
 
 
 
-extern shared_array<Script> packages;
+extern shared_array<Module> packages;
 
 
 template<class T>

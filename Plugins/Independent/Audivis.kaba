@@ -48,7 +48,7 @@ class Looper extends TsunamiPlugin
 		song = session.song
 		chain = session.view.signal_chain
 		renderer = session.view.renderer
-		runner = hui.run_repeated(0.05, self, on_update)
+		runner = hui.run_repeated(0.05, on_update)
 		mode = MODE_FORWARD
 		
 		shader_vis = chain.add(Module.Type.AUDIO_VISUALIZER, "Shader")

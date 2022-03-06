@@ -14,15 +14,15 @@
 namespace kaba {
 
 
-Interpreter::Interpreter(Script *s) {
-	script = s;
+Interpreter::Interpreter(Module *m) {
+	module = m;
 }
 
 Interpreter::~Interpreter() {
 }
 
 void Interpreter::do_error(const string &s) {
-	script->do_error_internal("interpreter: " + s);
+	module->do_error_internal("interpreter: " + s);
 }
 
 void Interpreter::add_function(Function *f, Serializer *ser) {

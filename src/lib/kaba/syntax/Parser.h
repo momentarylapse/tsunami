@@ -34,14 +34,15 @@ public:
 	void handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
 
 	void do_error(const string &msg, shared<Node> node);
-	void do_error(const string &msg, int override_token_id = -1);
+	void do_error(const string &msg, int token_id);
+	void do_error_exp(const string &msg, int override_token_id = -1);
 	void do_error_implicit(Function *f, const string &msg);
 	void expect_no_new_line();
 	void expect_new_line();
 	void expect_new_line_with_indent();
 
-	shared<Node> link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2);
-	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2);
+	shared<Node> link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2, int token_id = -1);
+	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2, int token_id = -1);
 
 	Array<const Class*> get_wanted_param_types(shared<Node> link, int &mandatory_params);
 	shared<Node> check_param_link(shared<Node> link, const Class *type, const string &f_name = "", int param_no = -1, int num_params = 1);
@@ -87,17 +88,18 @@ public:
 
 	shared<Node> deref_if_pointer(shared<Node> node);
 	shared<Node> add_converter_str(shared<Node> sub, bool repr);
-	shared<Node> wrap_function_into_callable(Function *f);
+	shared<Node> wrap_function_into_callable(Function *f, int token_id);
+	shared<Node> wrap_node_into_callable(shared<Node> node);
 
-	shared_array<Node> turn_class_into_constructor(const Class *t, const shared_array<Node> &params);
+	shared_array<Node> turn_class_into_constructor(const Class *t, const shared_array<Node> &params, int token_id);
 	shared<Node> make_func_node_callable(const shared<Node> l);
 	shared<Node> make_func_pointer_node_callable(const shared<Node> l);
-	shared<Node> link_unary_operator(AbstractOperator *op, shared<Node> operand, Block *block);
+	shared<Node> link_unary_operator(AbstractOperator *op, shared<Node> operand, Block *block, int token_id);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, shared<Node> cmd);
 
-	shared<Node> link_special_operator_is(shared<Node> param1, shared<Node> param2);
-	shared<Node> link_special_operator_in(shared<Node> param1, shared<Node> param2);
-	shared<Node> link_special_operator_as(shared<Node> param1, shared<Node> param2);
+	shared<Node> link_special_operator_is(shared<Node> param1, shared<Node> param2, int token_id);
+	shared<Node> link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id);
+	shared<Node> link_special_operator_as(shared<Node> param1, shared<Node> param2, int token_id);
 	shared<Node> make_dynamical(shared<Node> node);
 	Array<const Class*> type_list_from_nodes(const shared_array<Node> &nn);
 
@@ -162,7 +164,7 @@ public:
 
 	shared<Node> parse_abstract_operator(int param_flags);
 	shared_array<Node> parse_abstract_call_parameters(Block *block);
-	shared<Node> try_parse_format_string(Block *block, Value &v);
+	shared<Node> try_parse_format_string(Block *block, Value &v, int token_id);
 	shared<Node> apply_format(shared<Node> n, const string &fmt);
 	void post_process_for(shared<Node> n);
 

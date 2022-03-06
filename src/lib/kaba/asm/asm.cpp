@@ -1557,6 +1557,16 @@ void InstructionWithParamsList::compile(void *oc, int &ocs) {
 	}
 	state.set_bits(CurrentMetaInfo->bits_size);
 
+	// label lookup acceleration
+	Array<Label*> label_sorted;
+	label_sorted.resize((num+1)*16);
+	Array<int> label_count;
+	label_count.resize(num+1);
+	for (auto &l: label) {
+		int n = label_count[l.inst_no] ++;
+		label_sorted[l.inst_no * 16 + n] = &l;
+	}
+
 	for (int i=0;i<num+1;i++) {
 		state.line_no = i;
 		// bit change
@@ -1572,11 +1582,13 @@ void InstructionWithParamsList::compile(void *oc, int &ocs) {
 				d.offset = ocs;
 
 		// defining a label?
-		for (int j=0;j<label.num;j++)
-			if (i == label[j].inst_no) {
-				so("defining found: " + label[j].name);
-				label[j].value = CurrentMetaInfo->code_origin + ocs;
-			}
+		/*for (auto &l: label)
+			if (i == l.inst_no) {*/
+		for (int j=0; j<label_count[i]; j++) {
+			auto &l = *label_sorted[i*16+j];
+			so("defining found: " + l.name);
+			l.value = CurrentMetaInfo->code_origin + ocs;
+		}
 		if (i >= num)
 			break;
 

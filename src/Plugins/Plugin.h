@@ -13,7 +13,7 @@
 #include "../lib/file/path.h"
 
 namespace kaba {
-	class Script;
+	class Module;
 	class Class;
 };
 
@@ -28,7 +28,7 @@ public:
 	Path filename;
 	int file_date;
 	int index;
-	shared<kaba::Script> s;
+	shared<kaba::Module> module;
 
 	bool usable(Session *session);
 	ModuleCategory type;

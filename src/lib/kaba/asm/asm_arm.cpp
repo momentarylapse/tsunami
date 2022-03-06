@@ -19,7 +19,7 @@ struct CPUInstructionARM {
 	int code, filter;
 	int p1, p2, p3;
 };
-Array<CPUInstructionARM> cpu_instructions_arm;
+static Array<CPUInstructionARM> cpu_instructions_arm;
 
 
 

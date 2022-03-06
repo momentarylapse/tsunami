@@ -96,7 +96,7 @@ Grid ? '' vertical
 		
 		#reveal("config", true)
 		lr_id = -1
-		sr_id = hui.run_repeated(UPDATE_DT, self, on_update)
+		sr_id = hui.run_repeated(UPDATE_DT, on_update)
 	
 	func on_update()
 		redraw("area")
@@ -217,7 +217,7 @@ Grid ? '' vertical
 	func on_area_mouse_leave()
 		if lr_id >= 0
 			hui.cancel_runner(lr_id)
-		lr_id = hui.run_later(5, self, _later_unreveal)
+		lr_id = hui.run_later(5, _later_unreveal)
 	
 	func _later_unreveal()
 		lr_id = -1

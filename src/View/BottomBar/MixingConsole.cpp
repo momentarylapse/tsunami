@@ -46,8 +46,8 @@ public:
 
 		console = c;
 
-		reveal("revealer-fx", false);
-		reveal("config-revealer", false);
+		expand("revealer-fx", false);
+		expand("config-revealer", false);
 		set_options("grid-volume", format("width=%d", TRACK_MIXER_WIDTH));
 
 		id_separator = "mixing-track-separator";
@@ -239,7 +239,7 @@ public:
 			console->show_fx(nullptr);
 	}
 	void show_fx(bool show) {
-		reveal("revealer-fx", show);
+		expand("revealer-fx", show);
 		check("show-fx", show);
 		fx_editor->select_module(nullptr);
 	}

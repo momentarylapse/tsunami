@@ -14,7 +14,6 @@
 #include "Controls/ControlPaned.h"
 #include "Controls/ControlProgressBar.h"
 #include "Controls/ControlRadioButton.h"
-#include "Controls/ControlRevealer.h"
 #include "Controls/ControlScroller.h"
 #include "Controls/ControlSeparator.h"
 #include "Controls/ControlSlider.h"
@@ -336,10 +335,6 @@ void Panel::add_scroller(const string &title, int x, int y, const string &id) {
 
 void Panel::add_separator(const string &title, int x, int y, const string &id) {
 	_insert_control_(new ControlSeparator(title, id), x, y);
-}
-
-void Panel::add_revealer(const string &title, int x, int y, const string &id) {
-	_insert_control_(new ControlRevealer(title, id), x, y);
 }
 
 void Panel::add_menu_button(const string &title, int x, int y, const string &id) {

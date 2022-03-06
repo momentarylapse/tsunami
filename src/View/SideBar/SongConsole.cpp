@@ -28,7 +28,7 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 	embed_dialog("song_dialog", 0, 0);
 	set_decimals(1);
 
-	expand("ad_t_tags", 0, true);
+	expand_row("ad_t_tags", 0, true);
 
 	add_string("samplerate", "22050");
 	add_string("samplerate", i2s(DEFAULT_SAMPLE_RATE));

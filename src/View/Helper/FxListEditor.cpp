@@ -128,7 +128,7 @@ void FxListEditor::select_module(Module *m) {
 	}
 
 	update_fx_list_selection();
-	panel->reveal("config-revealer", m);
+	panel->expand("config-revealer", m);
 }
 
 void FxListEditor::on_fx_select() {

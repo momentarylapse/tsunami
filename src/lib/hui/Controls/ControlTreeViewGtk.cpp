@@ -210,13 +210,13 @@ void ControlTreeView::__reset() {
 }
 
 void ControlTreeView::expand(int row, bool expand) {
-}
-
-void ControlTreeView::expand_all(bool expand) {
-	if (expand)
-		gtk_tree_view_expand_all(GTK_TREE_VIEW(widget));
-	else
-		gtk_tree_view_collapse_all(GTK_TREE_VIEW(widget));
+	if (row < 0) {
+		// expand all
+		if (expand)
+			gtk_tree_view_expand_all(GTK_TREE_VIEW(widget));
+		else
+			gtk_tree_view_collapse_all(GTK_TREE_VIEW(widget));
+	}
 }
 
 bool ControlTreeView::is_expanded(int row) {

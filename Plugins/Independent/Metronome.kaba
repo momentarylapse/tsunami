@@ -50,6 +50,7 @@ class MetronomePanel extends ConfigPanel
 	var allow_blink_number: bool
 	var mode: int
 	var popup_menu: Menu*
+	var sr_id = -1
 	
 	var dot: BlurredDot
 	
@@ -58,7 +59,7 @@ class MetronomePanel extends ConfigPanel
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
-	Revealer config ''")
+	Expander config 'Beats'")
 
 		#metro = &_metro
 		source = &_source
@@ -84,8 +85,6 @@ Grid ? '' vertical
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:left-button-down", on_area_left_button_down)
 		event_x("area", "hui:right-button-down", on_area_right_button_down)
-		event_x("area", "hui:mouse-enter", on_area_mouse_enter)
-		event_x("area", "hui:mouse-leave", on_area_mouse_leave)
 		
 		event("blink-background", on_blink_background)
 		event("blink-number", on_blink_number)
@@ -94,8 +93,7 @@ Grid ? '' vertical
 		event("mode-bounce-walk", on_mode_bounce_walk)
 		#event("fullscreen", on_fullscreen)
 		
-		#reveal("config", true)
-		lr_id = -1
+		expand("config", true)
 		sr_id = hui.run_repeated(UPDATE_DT, on_update)
 	
 	func on_update()
@@ -103,8 +101,6 @@ Grid ? '' vertical
 	
 	func override __delete__()
 		hui.cancel_runner(sr_id)
-		if lr_id >= 0
-			hui.cancel_runner(lr_id)
 		del popup_menu
 	
 	func on_draw(p: Painter)
@@ -205,23 +201,6 @@ Grid ? '' vertical
 		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
 		popup_menu.popup(&self)
-	
-	var lr_id: int
-	var sr_id: int
-	func on_area_mouse_enter()
-		if lr_id >= 0
-			hui.cancel_runner(lr_id)
-			lr_id = -1
-		reveal("config", true)
-	
-	func on_area_mouse_leave()
-		if lr_id >= 0
-			hui.cancel_runner(lr_id)
-		lr_id = hui.run_later(5, _later_unreveal)
-	
-	func _later_unreveal()
-		lr_id = -1
-		reveal("config", false)
 	
 	func on_blink_background()
 		allow_blink_background = !allow_blink_background

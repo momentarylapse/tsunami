@@ -424,9 +424,6 @@
     <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
       <Filter>src\lib\hui\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
-      <Filter>src\lib\hui\Controls</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
       <Filter>src\lib\hui\Controls</Filter>
     </ClCompile>
@@ -1795,9 +1792,6 @@
       <Filter>src\lib\hui\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\ControlRadioButton.h">
-      <Filter>src\lib\hui\Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\hui\Controls\ControlRevealer.h">
       <Filter>src\lib\hui\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\ControlScroller.h">

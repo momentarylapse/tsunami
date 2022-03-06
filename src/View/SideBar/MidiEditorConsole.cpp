@@ -220,8 +220,8 @@ void MidiEditorConsole::update() {
 	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::TAB);
 	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::LINEAR);
 
-	reveal("revealer-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
-	reveal("revealer-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
+	expand("revealer-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
+	expand("revealer-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
 
 	check("chord-major", mode->chord_type == ChordType::MAJOR);
 	check("chord-minor", mode->chord_type == ChordType::MINOR);

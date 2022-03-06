@@ -93,7 +93,6 @@ public:
 	void _cdecl add_expander(const string &title, int x, int y, const string &id);
 	void _cdecl add_separator(const string &title, int x, int y, const string &id);
 	void _cdecl add_paned(const string &title, int x, int y, const string &id);
-	void _cdecl add_revealer(const string &title, int x, int y, const string &id);
 	void _cdecl add_menu_button(const string &title, int x, int y, const string &id);
 
 	void _cdecl embed_dialog(const string &id, int x, int y);
@@ -122,13 +121,10 @@ public:
 	// color
 	void _cdecl set_color(const string &id, const color &col);
 	color _cdecl get_color(const string &id);
-	// tree
-	void _cdecl expand_all(const string &id, bool expand);
-	void _cdecl expand(const string &id, int row, bool expand);
-	bool _cdecl is_expanded(const string &id, int row);
-	// revealer
-	void _cdecl reveal(const string &id, bool reveal);
-	bool _cdecl is_revealed(const string &id);
+	// tree/expander
+	void _cdecl expand(const string &id, bool expand);
+	void _cdecl expand_row(const string &id, int row, bool expand);
+	bool _cdecl is_expanded(const string &id, int row = -1);
 	// stuff
 	void _cdecl enable(const string &id, bool enabled);
 	bool _cdecl is_enabled(const string &id);

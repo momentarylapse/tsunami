@@ -236,7 +236,6 @@ sources = [
 	'src/lib/hui/Controls/ControlPanedGtk.cpp',
 	'src/lib/hui/Controls/ControlProgressBarGtk.cpp',
 	'src/lib/hui/Controls/ControlRadioButtonGtk.cpp',
-	'src/lib/hui/Controls/ControlRevealerGtk.cpp',
 	'src/lib/hui/Controls/ControlScrollerGtk.cpp',
 	'src/lib/hui/Controls/ControlSeparatorGtk.cpp',
 	'src/lib/hui/Controls/ControlSliderGtk.cpp',

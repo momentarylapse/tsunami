@@ -17,11 +17,15 @@ public:
 	ControlExpander(const string &text, const string &id);
 
 	void expand(int row, bool expand) override;
-	void expand_all(bool expand) override;
 	bool is_expanded(int row) override;
 
 	void add(Control *child, int x, int y) override;
 	void remove_child(Control *child) override;
+
+	void __set_option(const string& op, const string& value);
+
+	GtkWidget *revealer;
+	GtkWidget *expander;
 };
 
 };

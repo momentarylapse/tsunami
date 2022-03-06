@@ -707,7 +707,7 @@ void SIAddPackageBase() {
 			func_add_param("size", TypeInt);
 		class_add_func("find", TypeInt, &string::find, Flags::PURE);
 			func_add_param("str", TypeString);
-			func_add_param_def("start", TypeInt, (const void*)(int_p)0);
+			func_add_param_def("start", TypeInt, 0);
 		class_add_func("compare", TypeInt, &string::compare, Flags::PURE);
 			func_add_param("str", TypeString);
 		class_add_func("icompare", TypeInt, &string::icompare, Flags::PURE);

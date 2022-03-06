@@ -10,11 +10,9 @@
 
 #include "Control.h"
 
-namespace hui
-{
+namespace hui {
 
-class ControlTreeView : public Control
-{
+class ControlTreeView : public Control {
 public:
 	ControlTreeView(const string &title, const string &id, Panel *panel);
 	string get_string() override;
@@ -31,7 +29,6 @@ public:
 	void __set_selection(const Array<int> &sel) override;
 	void __reset() override;
 	void expand(int row, bool expand) override;
-	void expand_all(bool expand) override;
 	bool is_expanded(int row) override;
 	void __set_option(const string &op, const string &value) override;
 

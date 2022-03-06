@@ -24,7 +24,7 @@ TimeTrackAddDialog::TimeTrackAddDialog(Song *_song, hui::Window *_parent):
 	song = _song;
 
 	check("add-bars", true);
-	reveal("metro-revealer", true);
+	expand("metro-revealer", true);
 
 	new_bar = {1000, 4, 1};
 	set_int("num_bars", 32);
@@ -86,5 +86,5 @@ void TimeTrackAddDialog::on_complex() {
 }
 
 void TimeTrackAddDialog::on_add_bars() {
-	reveal("metro-revealer", is_checked(""));
+	expand("metro-revealer", is_checked(""));
 }

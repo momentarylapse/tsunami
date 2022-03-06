@@ -27,7 +27,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	set_parent(parent);
 	set_id("side-bar");
 	session = _session;
-	add_revealer("!slide=left", 0, 0, "revealer");
+	add_expander("!slide=left", 0, 0, "revealer");
 	set_target("revealer");
 	add_grid(format("!noexpandx,width=%d,expandy", CONFIG_PANEL_WIDTH), 0, 0, "root_grid0");
 	set_target("root_grid0");
@@ -68,7 +68,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 
 	event("close", [=]{ on_close(); });
 
-	reveal("revealer", false);
+	expand("revealer", false);
 	visible = false;
 	active_console = -1;
 
@@ -97,7 +97,7 @@ void SideBar::_show() {
 	if (!visible and (active_console >= 0))
 		consoles[active_console]->on_enter();
 
-	reveal("revealer", true);
+	expand("revealer", true);
 	visible = true;
 	notify();
 }
@@ -107,7 +107,7 @@ void SideBar::_hide() {
 	if (visible and (active_console >= 0))
 		consoles[active_console]->on_leave();
 
-	reveal("revealer", false);
+	expand("revealer", false);
 	visible = false;
 	notify();
 }

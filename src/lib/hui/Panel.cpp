@@ -306,7 +306,7 @@ void Panel::add_control(const string &type, const string &title, int x, int y, c
 		add_radio_button(title, x, y, id);
 	else if (type == "ToggleButton")
 		add_toggle_button(title, x, y, id);
-	else if (type == "Expander")
+	else if ((type == "Expander") or (type == "Revealer"))
 		add_expander(title, x, y, id);
 	else if (type == "Scroller")
 		add_scroller(title, x, y, id);
@@ -314,8 +314,6 @@ void Panel::add_control(const string &type, const string &title, int x, int y, c
 		add_paned(title, x, y, id);
 	else if (type == "Separator")
 		add_separator(title, x, y, id);
-	else if (type == "Revealer")
-		add_revealer(title, x, y, id);
 	else if (type == "MenuButton")
 		add_menu_button(title, x, y, id);
 	else
@@ -723,41 +721,25 @@ void Panel::reset(const string &_id) {
 }
 
 // expand a single row
-//    for TreeView
-void Panel::expand(const string &_id, int row, bool expand) {
-	apply_foreach(_id, [row,expand](Control *c) {
-		c->expand(row, expand);
+//    for TreeView, Expander
+void Panel::expand_row(const string &_id, int row, bool expanded) {
+	apply_foreach(_id, [row,expanded](Control *c) {
+		c->expand(row, expanded);
 	});
 }
 
 // expand all rows
-//    for TreeView
-void Panel::expand_all(const string &_id, bool expand) {
-	apply_foreach(_id, [expand](Control *c) {
-		c->expand_all(expand);
-	});
+//    for TreeView, Expander
+void Panel::expand(const string &_id, bool expanded) {
+	expand_row(_id, -1, expanded);
 }
 
 // is column in tree expanded?
 //    for TreeView
 bool Panel::is_expanded(const string &_id, int row) {
 	bool r = false;
-//	apply_foreach(_id, [&](Control *c) { r = c->isExpanded(); });
-	return r;
-}
-
-//    for Revealer
-void Panel::reveal(const string &_id, bool reveal) {
-	apply_foreach(_id, [reveal](Control *c) {
-		c->reveal(reveal);
-	});
-}
-
-//    for Revealer
-bool Panel::is_revealed(const string &_id) {
-	bool r = false;
-	apply_foreach(_id, [&r](Control *c) {
-		r = c->is_revealed();
+	apply_foreach(_id, [&](Control *c) {
+		r = c->is_expanded(row);
 	});
 	return r;
 }

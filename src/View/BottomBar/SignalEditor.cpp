@@ -28,7 +28,7 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 	add_grid("", 0, 0, grid_id);
 	set_target(grid_id);
 	add_tab_control("!left\\aaa", 0, 0, "selector");
-	add_revealer("!slide=left", 1, 0, "revealer");
+	add_expander("!slide=left", 1, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandx", 1, 0, config_grid_id);
 	set_target(config_grid_id);
@@ -113,7 +113,7 @@ void SignalEditor::show_config(Module *m) {
 		set_string("message", _("no module selected"));
 		hide_control("message", false);*/
 	}
-	reveal("revealer", m);
+	expand("revealer", m);
 }
 
 void SignalEditor::remove_tab(SignalEditorTab *t) {

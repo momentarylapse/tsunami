@@ -85,10 +85,7 @@ public:
 	virtual void __set_selection(const Array<int> &sel){}
 	void set_selection(const Array<int> &sel);
 	virtual void expand(int row, bool expand){}
-	virtual void expand_all(bool expand){}
 	virtual bool is_expanded(int row){ return false; }
-	virtual void reveal(bool reveal){}
-	virtual bool is_revealed(){ return false; }
 
 	virtual void enable(bool enabled);
 	virtual bool is_enabled();

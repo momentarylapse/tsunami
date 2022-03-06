@@ -18,7 +18,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	set_parent(parent);
 	set_id("bottom-bar");
 
-	add_revealer("!slide=up", 0, 0, "revealer");
+	add_expander("!slide=up", 0, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
 	set_target("root_grid0");
@@ -45,7 +45,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	event("choose", [=]{ on_choose(); });
 	event("close", [=]{ on_close(); });
 
-	reveal("revealer", false);
+	expand("revealer", false);
 	visible = false;
 	active_console = nullptr;
 
@@ -62,7 +62,7 @@ void BottomBar::on_close() {
 }
 
 void BottomBar::_show() {
-	reveal("revealer", true);
+	expand("revealer", true);
 	visible = true;
 	if (active_console)
 		active_console->show();
@@ -70,7 +70,7 @@ void BottomBar::_show() {
 }
 
 void BottomBar::_hide() {
-	reveal("revealer", false);
+	expand("revealer", false);
 	visible = false;
 	if (active_console)
 		active_console->hide();

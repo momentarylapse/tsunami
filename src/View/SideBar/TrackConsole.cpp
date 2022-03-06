@@ -69,13 +69,13 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 
 void TrackConsole::set_mode(Mode mode) {
 	if (mode == Mode::FX) {
-		expand("g_fx", 0, true);
+		expand("g_fx", true);
 		set_int("tc", 0);
 	} else if (mode == Mode::MIDI_FX) {
-		expand("g_fx", 0, true);
+		expand("g_fx", true);
 		set_int("tc", 1);
 	} else if (mode == Mode::SYNTH) {
-		expand("g_synth", 0, true);
+		expand("g_synth", true);
 	}
 }
 

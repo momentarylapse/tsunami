@@ -77,7 +77,7 @@ class MultiEchoGrid extends Grid
 	var menu_point: Menu*
 	
 	
-	func override __init__()
+	func post_init()
 		menu_bg = new Menu(cp)
 		menu_bg.add("add reflection", "reflection-add")
 		
@@ -85,7 +85,10 @@ class MultiEchoGrid extends Grid
 		menu_point.add("Reflection", "label")
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")
-	func add_events()
+		
+		x_axis.set(0, 1, false, "s")
+		y_axis.set(0, 1, false, "%")
+		
 		cp.event("reflection-add", on_add_reflection)
 		cp.event("reflection-delete", on_delete_reflection)
 
@@ -187,7 +190,7 @@ class MultiEchoGrid extends Grid
 		for r,i in config.refl
 			var z = vec2(r.delay, r.volume)
 			var p = project2(z)
-			if (m.x > p.x - 5) and (m.x < p.x + 5) and (m.y > p.y - 5) and (m.y < p.y + 5)
+			if len(m - p) < 5
 				return i
 		return -1
 
@@ -218,9 +221,7 @@ Grid ? ''
 		grid.config = &c.config
 		grid.cp = &self
 		grid.init(self, "drawing")
-		grid.x_axis.set(0, 1, false, "s")
-		grid.y_axis.set(0, 1, false, "%")
-		grid.add_events()
+		grid.post_init()
 	
 		grid.redraw()
 	

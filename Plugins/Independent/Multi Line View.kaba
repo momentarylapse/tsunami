@@ -10,6 +10,8 @@ class MyDialog extends hui.Dialog
 	mlp: MultiLinePainter*
 	config_visible = false
 	line_height = 80.0
+	line_space = 0.4
+	track_space = 0.2
 	border = 20.0
 	x_scale = 1.0
 	track_mode: bool[]
@@ -34,6 +36,12 @@ class MyDialog extends hui.Dialog
 				Grid ? ''
 					Label l-line-height 'Line height'
 					SpinButton line-height '{{line_height}}' expandx
+					---|
+					Label l-line-space 'Line space'
+					SpinButton line-space '{{line_space}}' range=0:2:0.01
+					---|
+					Label l-track-space 'Trrack space'
+					SpinButton track-space '{{track_space}}' range=0:2:0.01
 					---|
 					Label l-x-scale 'Horizontal scale'
 					SpinButton x-scale '{{x_scale}}' range=0:10:0.01
@@ -61,6 +69,8 @@ class MyDialog extends hui.Dialog
 		#var me = &self
 		event("config", on_config)#lambda(me: MyDialog) me.hide_control("config-grid", false))
 		event("line-height", on_update)
+		event("line-space", on_update)
+		event("track-space", on_update)
 		event("x-scale", on_update)
 		event("play", on_play)
 		event_x("tracks", "hui:change", on_update)
@@ -127,6 +137,8 @@ class MyDialog extends hui.Dialog
 	
 	func on_update()
 		line_height = get_float("line-height")
+		line_space = get_float("line-space")
+		track_space = get_float("track-space")
 		x_scale = get_float("x-scale")
 		for t,i in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
@@ -168,7 +180,12 @@ class MyDialog extends hui.Dialog
 			else if track_mode[i*2+1]
 				conf.add(dyn({"index":i, "tab":true}))
 		mlp.set_context(conf, p.width, 44100*p.width/300 / x_scale)
-		mlp.set(dyn({"border": border, "line-height": line_height, "line-space": line_height * 0.4, "track_space": line_height * 0.2, "antialiasing": true}))
+		mlp.set(dyn({"border": border,
+			"line-height": line_height,
+			"line-space": line_height * line_space,
+			"track-space": line_height * track_space,
+			"antialiasing": true,
+			"collapse-midi": true}))
 		var y0 = 10.0 - y_offset
 		var offset = 0
 		var dy = mlp.get_line_dy()

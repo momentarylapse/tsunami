@@ -83,8 +83,10 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	//p->draw_str(x0, y0, clef.symbol);
 
 	// midi
-	auto midi = t->layers[0]->midi.get_notes(r_inside);
-	mp->draw(p, midi);
+	for (auto l: weak(t->layers)) {
+		auto midi = l->midi.get_notes(r_inside);
+		mp->draw(p, midi);
+	}
 
 	return y0 + line_height;
 }

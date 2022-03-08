@@ -60,7 +60,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		for (int i=0; i<a->num; i++)
 			r.add(var_to_any(tel, (char*)a->simple_element(i)));
 		return r;
-	} else if (c->name == "shared SampleRef") {
+	} else if (c->name == "SampleRef shared") {
 		auto sr = *(SampleRef**)v;
 		if (sr)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
@@ -113,7 +113,7 @@ void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, i
 	} else if (type == kaba::TypeFloat32) {
 		*(float*)v = get_next(s, pos)._float();
 	} else if (type == kaba::TypeBool) {
-		*(bool*)v = (get_next(s, pos) == "true");
+		*(bool*)v = get_next(s, pos)._bool();
 	} else if (type == kaba::TypeString) {
 		*(string*)v = get_next(s, pos);
 	} else if (type->is_array()) {
@@ -192,7 +192,7 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		aa->simple_resize(array.num); // todo...
 		for (int i=0; i<array.num; i++)
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
-	} else if (type->name == "shared SampleRef") {
+	} else if (type->name == "SampleRef shared") {
 		*(shared<SampleRef>*)v = nullptr;
 		if (a.is_string()) {
 			string ss = a.str();
@@ -238,12 +238,12 @@ void ModuleConfiguration::from_string(const string &s, Session *session) {
 	try {
 		from_any(Any::parse(s), session);
 	} catch (Exception &e) {
-		session->e(e.message());
+		session->e(format("invalid configuration for module %s: %s", safe_module_name(), e.message()));
 	}
 }
 
 void ModuleConfiguration::from_string_legacy(const string &s, Session *session) {
-	Session::GLOBAL->w("legacy: " + s);
+	Session::GLOBAL->w(format("legacy configuration for module %s: ", safe_module_name(), s));
 	reset();
 	int pos = 0;
 	try  {
@@ -254,13 +254,24 @@ void ModuleConfiguration::from_string_legacy(const string &s, Session *session) 
 	Session::GLOBAL->i("-> " + to_string());
 }
 
+string ModuleConfiguration::safe_module_name() const {
+	if (_module)
+		return _module->module_name;
+	return "(unknown)";
+}
+
+string string_limit(const string &s, int n) {
+	if (s.num <= n)
+		return s;
+	return s.head(n) + "...";
+}
+
 void ModuleConfiguration::from_any(const Any &a, Session *session) {
 	reset();
 	try {
 		var_from_any(kaba_class, (char*)this, a, session);
 	} catch (Exception &e) {
-		msg_write(a.str());
-		session->e(/*this->_module->module_subtype + ": " +*/ e.message());
+		session->e(format("invalid configuration for module %s: %s:   %s", safe_module_name(), e.message(), string_limit(a.str(), 256)));
 	}
 
 	if (module_config_debug)

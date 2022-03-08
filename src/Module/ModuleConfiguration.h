@@ -36,6 +36,8 @@ public:
 
 	Module *_module;
 	const kaba::Class *kaba_class;
+
+	string safe_module_name() const;
 };
 
 string var_to_string(const kaba::Class *c, char *v);

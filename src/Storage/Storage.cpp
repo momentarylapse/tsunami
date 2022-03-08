@@ -267,10 +267,12 @@ void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, con
 		}
 	Array<string> opts = {"filter=" + filter, "showfilter=" + filter_show};
 	opts.append(opt);
-	if (flags & FormatDescriptor::Flag::WRITE)
+	if (flags & FormatDescriptor::Flag::WRITE) {
+		opts.add("defaultextension=nami");
 		return hui::file_dialog_save(win, title, current_directory, opts, cb);
-	else
+	} else {
 		return hui::file_dialog_open(win, title, current_directory, opts, cb);
+	}
 }
 
 void Storage::ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {

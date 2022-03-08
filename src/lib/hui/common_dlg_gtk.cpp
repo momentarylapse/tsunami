@@ -9,6 +9,7 @@ struct DialogParams {
 	string filter, show_filter;
 	string font;
 	string default_name;
+	string default_extension;
 	bool multiple_files = false;
 
 	static DialogParams parse(const Array<string> &params) {
@@ -29,12 +30,38 @@ struct DialogParams {
 				p.font = value;
 			else if (key == "default")
 				p.default_name = value;
+			else if (key == "defaultextension")
+				p.default_extension = value;
 			else
 				msg_error(format("unknown key '%s'", key));
 		}
 		return p;
 	}
+
+	static DialogParams STATIC_PARAMS;
+
+	Path try_to_ensure_extension(const Path &filename) {
+		if (filename.extension() == "" and default_extension != "")
+			return filename.with("." + default_extension);
+
+		return filename;
+
+		/*if (filter.find(".") < 0)
+			return filename;
+
+		// multiple choices -> ignore
+		if (filter.find(";") >= 0)
+			return filename;
+
+		string filter_ext = filter.lower().replace("*.", ""); // "*.ext"
+
+		// not the wanted extension -> add
+		if (filename.extension() != filter_ext)
+			return Path(filename.str() + "." + filter_ext);
+		return filename;*/
+	}
 };
+DialogParams DialogParams::STATIC_PARAMS;
 
 
 static GtkWindow *get_window_save(Window *win) {
@@ -54,7 +81,7 @@ void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer use
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		auto fn = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(self));
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_callback(g_file_get_path(fn));
+		cur_file_callback(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
 	} else {
 		gtk_window_destroy(GTK_WINDOW(self));
 		cur_file_callback("");
@@ -72,7 +99,7 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 												_("Cancel").c_str(),	GTK_RESPONSE_CANCEL,
 												_("Open").c_str(),		GTK_RESPONSE_ACCEPT,
 												nullptr);
-	if (!dir.is_empty())
+	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), g_file_new_for_path(dir.str().c_str()), nullptr);
 	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
@@ -85,7 +112,7 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												nullptr);
-	if (!dir.is_empty())
+	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.str().c_str());
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT) {
@@ -114,6 +141,7 @@ void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter
 // file selection for opening (filter should look like "*.txt")
 void file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
+	DialogParams::STATIC_PARAMS = p;
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
@@ -125,7 +153,7 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	if (p.multiple_files)
 		gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dlg), true);
-	if (!dir.is_empty()) {
+	if (dir) {
 		auto path = g_file_new_for_path(dir.c_str());
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
 		//g_object_unref(path);
@@ -144,7 +172,7 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												nullptr);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
-	if (!dir.is_empty())
+	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
@@ -152,7 +180,7 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 	if (r == GTK_RESPONSE_ACCEPT) {
 		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
 		gtk_widget_destroy(dlg);
-		cb(Path(fn));
+		cb(p.try_to_ensure_extension(Path(fn)));
 		g_free(fn);
 	} else {
 		gtk_widget_destroy(dlg);
@@ -161,26 +189,11 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 #endif
 }
 
-static Path try_to_ensure_extension(const Path &filename, const string &filter) {
-	if (filter.find(".") < 0)
-		return filename;
-
-	// multiple choices -> ignore
-	if (filter.find(";") >= 0)
-		return filename;
-
-	string filter_ext = filter.lower().replace("*.", ""); // "*.ext"
-
-	// not the wanted extension -> add
-	if (filename.extension() != filter_ext)
-		return Path(filename.str() + "." + filter_ext);
-	return filename;
-}
-
 
 // file selection for saving
 void file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
+	DialogParams::STATIC_PARAMS = p;
 #if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
@@ -192,7 +205,7 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 //	gtk_file_chooser_set_current_name();
-	if (!dir.is_empty()) {
+	if (dir) {
 		auto path = g_file_new_for_path(dir.c_str());
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
 		//g_object_unref(path);
@@ -215,7 +228,7 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 												nullptr);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dlg), TRUE);
-	if (!dir.is_empty())
+	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	if (p.default_name.num > 0)
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(p.default_name));
@@ -225,7 +238,7 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 	if (r == GTK_RESPONSE_ACCEPT) {
 		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
 		gtk_widget_destroy(dlg);
-		cb(Path(fn));
+		cb(p.try_to_ensure_extension(Path(fn)));
 		g_free(fn);
 	} else {
 		gtk_widget_destroy(dlg);

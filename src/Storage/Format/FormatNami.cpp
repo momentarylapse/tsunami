@@ -617,6 +617,8 @@ public:
 	void create() override {
 		if constexpr (std::is_same<Parent, Track>::value)
 				this->me = &this->parent->layers[0]->midi;
+		else if constexpr (std::is_same<Parent, TrackLayer>::value)
+				this->me = &this->parent->midi;
 		else if constexpr (std::is_same<Parent, Sample>::value)
 				this->me = &this->parent->midi;
 	}
@@ -669,6 +671,8 @@ public:
 	void write_subs() override {
 		if constexpr (std::is_same<Parent, Track>::value)
 			this->write_sub_parray("effect", this->parent->midi_fx);
+		else if constexpr (std::is_same<Parent, TrackLayer>::value)
+			this->write_sub_parray("effect", this->parent->track->midi_fx);
 		//else
 		//	this->write_sub_parray("effect", this->me->fx);
 	}
@@ -764,6 +768,7 @@ public:
 		add_child(new FileChunkSampleRef);
 		add_child(new FileChunkFade);
 		add_child(new FileChunkMarker);
+		add_child(new FileChunkMidiData<TrackLayer>); // deprecated
 	}
 	void create() override {}
 	void read(File *f) override {
@@ -785,6 +790,8 @@ public:
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("marker", me->markers);
 		write_sub_array("fade", me->fades);
+		if (me->midi.num > 0)
+			write_sub("midi", &me->midi);
 	}
 };
 
@@ -988,8 +995,8 @@ public:
 		add_child(new FileChunkTrackLayer);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
-		add_child(new FileChunkMidiData<Track>);
 		add_child(new FileChunkCurve);
+		add_child(new FileChunkMidiData<Track>); // deprecated
 		add_child(new FileChunkTrackBar); // deprecated
 		add_child(new FileChunkMarkerOld); // deprecated
 		add_child(new _FileChunkTrackSampleRef); // deprecated
@@ -1033,8 +1040,6 @@ public:
 		if ((me->type == SignalType::BEATS) or (me->type == SignalType::MIDI))
 			if (!me->synth->is_default())
 				write_sub("synth", me->synth.get());
-		if (me->layers[0]->midi.num > 0)
-			write_sub("midi", &me->layers[0]->midi);
 		write_sub_parray("curve", me->curves);
 	}
 };

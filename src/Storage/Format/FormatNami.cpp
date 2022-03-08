@@ -366,21 +366,27 @@ void uncompress_buffer(AudioBuffer &b, bytes &data, FileChunkBasic *p) {
 }
 #endif
 
-class FileChunkBufferBox : public FileChunk<TrackLayer,AudioBuffer> {
+template<class Parent>
+class FileChunkAudioBuffer : public FileChunk<Parent,AudioBuffer> {
 public:
-	FileChunkBufferBox() : FileChunk<TrackLayer,AudioBuffer>("bufbox") {}
+	FileChunkAudioBuffer() : FileChunk<Parent,AudioBuffer>("bufbox") {}
 	void create() override {
-		AudioBuffer dummy;
-		parent->buffers.add(dummy);
-		me = &parent->buffers.back();
+		if constexpr (std::is_same<Parent, TrackLayer>::value) {
+			AudioBuffer dummy;
+			this->parent->buffers.add(dummy);
+			this->me = &this->parent->buffers.back();
+		} else if constexpr (std::is_same<Parent, Sample>::value) {
+			this->me = this->parent->buf;
+		}
 	}
 	void read(File *f) override {
-		me->offset = f->read_int();
+		this->me->offset = f->read_int();
 		int num = f->read_int();
-		me->resize(num);
-		me->channels = f->read_int();
+		int channels = f->read_int(); // channels (2)
 		int bits = f->read_int(); // bit (16)
 
+		this->me->set_channels(channels);
+		this->me->resize(num);
 
 
 		if (bits == 0) {
@@ -388,110 +394,56 @@ public:
 			com->codec = f->read_str();
 			int n = f->read_int();
 			com->data = f->read_buffer(n);
-			cur_op(this)->session->storage->decompress(*me, com->codec, com->data);
-			me->compressed = com;
+			cur_op(this)->session->storage->decompress(*this->me, com->codec, com->data);
+			this->me->compressed = com;
 			return;
 		}
 
 		// TODO get rid of all (old-style) compressed files!
 
-		int num_bytes = context->layers.back().size - 16;
+		int num_bytes = this->context->layers.back().size - 16;
 		bytes data;
-		data.resize(num_bytes);//num * (bits / 8) * channels);
+		data.resize(num_bytes); //num * (bits / 8) * channels);
 
 		// read chunk'ed
 		int offset = 0;
 		for (int n=0; n<data.num / CHUNK_SIZE; n++) {
 			f->read_buffer(&data[offset], CHUNK_SIZE);
-			notify();
+			this->notify();
 			offset += CHUNK_SIZE;
 		}
 		f->read_buffer(&data[offset], data.num % CHUNK_SIZE);
 
 		// insert
 
-		Song *song = (Song*)root->base->get();
+		Song *song = (Song*)this->root->base->get();
 		if (song->compression > 0) {
 			//throw Exception("can't read compressed nami files yet");
-			uncompress_buffer(*me, data, this);
+			uncompress_buffer(*this->me, data, this);
 
-		}else{
-			me->import(data.data, me->channels, format_for_bits(bits, true), num);
+		} else {
+			if (num_bytes > 0)
+				this->me->import(data.data, channels, format_for_bits(bits, true), num);
 		}
 	}
 	void write(File *f) override {
-		Song *song = (Song*)root->base->get();
+		Song *song = (Song*)this->root->base->get();
 
-		f->write_int(me->offset);
-		f->write_int(me->length);
-		f->write_int(me->channels);
-		if (me->has_compressed()) {
+		f->write_int(this->me->offset);
+		f->write_int(this->me->length);
+		f->write_int(this->me->channels);
+		if (this->me->has_compressed()) {
 			f->write_int(0);
-			f->write_str(me->compressed->codec);
-			f->write_int(me->compressed->data.num);
-			f->write_buffer(me->compressed->data);
+			f->write_str(this->me->compressed->codec);
+			f->write_int(this->me->compressed->data.num);
+			f->write_buffer(this->me->compressed->data);
 		} else {
 			f->write_int(format_get_bits(song->default_format));
 			bytes data;
-			if (!me->exports(data, me->channels, song->default_format))
-				warn(_("Amplitude too large, signal distorted."));
+			if (!this->me->exports(data, this->me->channels, song->default_format))
+				this->warn(_("Amplitude too large, signal distorted."));
 			f->write_buffer(data);
 		}
-	}
-};
-
-class FileChunkSampleBufferBox : public FileChunk<Sample,AudioBuffer> {
-public:
-	FileChunkSampleBufferBox() : FileChunk<Sample,AudioBuffer>("bufbox") {}
-	void create() override {
-		me = parent->buf;
-	}
-	void read(File *f) override {
-		me->offset = f->read_int();
-		int num = f->read_int();
-		int channels = f->read_int(); // channels (2)
-		int bits = f->read_int(); // bit (16)
-
-		me->set_channels(channels);
-		me->resize(num);
-
-		string data;
-
-		int bytes = context->layers.back().size - 16;
-		data.resize(bytes);//num * (bits / 8) * channels);
-
-		// read chunk'ed
-		int offset = 0;
-		for (int n=0; n<data.num / CHUNK_SIZE; n++) {
-			f->read_buffer(&data[offset], CHUNK_SIZE);
-			notify();
-			offset += CHUNK_SIZE;
-		}
-		f->read_buffer(&data[offset], data.num % CHUNK_SIZE);
-
-		// insert
-
-		Song *song = (Song*)root->base->get();
-		if (song->compression > 0) {
-			uncompress_buffer(*me, data, this);
-
-		}else{
-			if (bytes > 0)
-				me->import(data.data, channels, format_for_bits(bits, true), num);
-		}
-	}
-	void write(File *f) override {
-		Song *song = (Song*)root->base->get();
-
-		f->write_int(me->offset);
-		f->write_int(me->length);
-		f->write_int(me->channels);
-		f->write_int(format_get_bits(song->default_format));
-
-		string data;
-		if (!me->exports(data, me->channels, song->default_format))
-			warn(_("Amplitude too large, signal distorted."));
-		f->write_buffer(data);
 	}
 };
 
@@ -645,60 +597,6 @@ public:
 	}
 };
 
-class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteBuffer> {
-public:
-	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteBuffer>("midi") {}
-	void define_children() override {
-		add_child(new FileChunkMidiEvent);
-		add_child(new FileChunkMidiNote("note"));
-		//add_child(new FileChunkMidiEffect);
-	}
-	void create() override { me = &parent->midi; }
-	void read(File *f) override {
-		f->read_str();
-		f->read_str();
-		f->read_str();
-		int version = f->read_int();
-		if (version < 1)
-			return;
-		int num = f->read_int();
-		int meta = f->read_int();
-		for (int i=0; i<num; i++) {
-			MidiNote *n = new MidiNote;
-			n->range.offset = f->read_int();
-			n->range.length = f->read_int();
-			n->pitch = f->read_int();
-			n->volume = f->read_float();
-			if (meta & 1)
-				n->stringno = f->read_int();
-			if (meta & 2)
-				n->clef_position = f->read_int();
-			me->add(n);
-		}
-	}
-	void write(File *f) override {
-		f->write_str("");
-		f->write_str("");
-		f->write_str("");
-		f->write_int(1); // version
-
-		f->write_int(me->num);
-		f->write_int(3); // stringno + clef_position
-		for (MidiNote *n: weak(*me)) {
-			f->write_int(n->range.offset);
-			f->write_int(n->range.length);
-			f->write_int(n->pitch);
-			f->write_float(n->volume);
-			f->write_int(n->stringno);
-			f->write_int(n->clef_position);
-		}
-		f->write_int(0); // reserved
-	}
-	void write_subs() override {
-		//write_sub_parray("effect", me->fx);
-	}
-};
-
 static bool note_buffer_has_flags(MidiNoteBuffer &buf) {
 	for (auto *n: weak(buf))
 		if (n->flags > 0)
@@ -706,16 +604,22 @@ static bool note_buffer_has_flags(MidiNoteBuffer &buf) {
 	return false;
 }
 
-class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteBuffer> {
+template <class Parent>
+class FileChunkMidiData : public FileChunk<Parent,MidiNoteBuffer> {
 public:
-	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteBuffer>("midi") {}
+	FileChunkMidiData() : FileChunk<Parent,MidiNoteBuffer>("midi") {}
 	void define_children() override {
-		add_child(new FileChunkMidiEvent);
-		add_child(new FileChunkMidiNote("note"));
-		add_child(new FileChunkMidiNote("midinote")); // deprecated
-		add_child(new FileChunkMidiEffect);
+		this->add_child(new FileChunkMidiEvent);
+		this->add_child(new FileChunkMidiNote("note"));
+		this->add_child(new FileChunkMidiNote("midinote")); // deprecated
+		this->add_child(new FileChunkMidiEffect);
 	}
-	void create() override { me = &parent->layers[0]->midi; }
+	void create() override {
+		if constexpr (std::is_same<Parent, Track>::value)
+				this->me = &this->parent->layers[0]->midi;
+		else if constexpr (std::is_same<Parent, Sample>::value)
+				this->me = &this->parent->midi;
+	}
 	void read(File *f) override {
 		f->read_str();
 		f->read_str();
@@ -737,20 +641,20 @@ public:
 				n->clef_position = f->read_int();
 			if (meta & 4)
 				n->flags = f->read_int();
-			me->add(n);
+			this->me->add(n);
 		}
 		f->read_int(); // reserved
 	}
 	void write(File *f) override {
-		bool has_flags = note_buffer_has_flags(*me);
+		bool has_flags = note_buffer_has_flags(*this->me);
 		f->write_str("");
 		f->write_str("");
 		f->write_str("");
 		f->write_int(1); // version
 
-		f->write_int(me->num);
+		f->write_int(this->me->num);
 		f->write_int(has_flags ? 7 : 3); // stringno + clef_position (+ flags)
-		for (MidiNote *n : weak(*me)) {
+		for (MidiNote *n : weak(*this->me)) {
 			f->write_int(n->range.offset);
 			f->write_int(n->range.length);
 			f->write_int(n->pitch);
@@ -763,7 +667,10 @@ public:
 		f->write_int(0); // reserved
 	}
 	void write_subs() override {
-		write_sub_parray("effect", parent->midi_fx);
+		if constexpr (std::is_same<Parent, Track>::value)
+			this->write_sub_parray("effect", this->parent->midi_fx);
+		//else
+		//	this->write_sub_parray("effect", this->me->fx);
 	}
 };
 
@@ -771,8 +678,8 @@ class FileChunkSample : public FileChunk<Song,Sample> {
 public:
 	FileChunkSample() : FileChunk<Song,Sample>("sample") {}
 	void define_children() override {
-		add_child(new FileChunkSampleBufferBox);
-		add_child(new FileChunkSampleMidiData);
+		add_child(new FileChunkAudioBuffer<Sample>);
+		add_child(new FileChunkMidiData<Sample>);
 	}
 	void create() override {
 		me = new Sample(SignalType::AUDIO);
@@ -853,7 +760,7 @@ class FileChunkTrackLayer : public FileChunk<Track,TrackLayer> {
 public:
 	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level") {}
 	void define_children() override {
-		add_child(new FileChunkBufferBox);
+		add_child(new FileChunkAudioBuffer<TrackLayer>);
 		add_child(new FileChunkSampleRef);
 		add_child(new FileChunkFade);
 		add_child(new FileChunkMarker);
@@ -1005,6 +912,7 @@ public:
 	}
 };
 
+// deprecated
 class FileChunkMarkerOld : public FileChunk<Track,TrackMarker> {
 public:
 	FileChunkMarkerOld() : FileChunk<Track,TrackMarker>("marker") {}
@@ -1030,6 +938,7 @@ public:
 	}
 };
 
+// deprecated
 class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld> {
 public:
 	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade") {}
@@ -1079,7 +988,7 @@ public:
 		add_child(new FileChunkTrackLayer);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
-		add_child(new FileChunkTrackMidiData);
+		add_child(new FileChunkMidiData<Track>);
 		add_child(new FileChunkCurve);
 		add_child(new FileChunkTrackBar); // deprecated
 		add_child(new FileChunkMarkerOld); // deprecated

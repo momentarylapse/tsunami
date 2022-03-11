@@ -45,28 +45,23 @@ public:
 //todo set/unset track...
 
 
-FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, const string &_id_midi, bool hexpand) {
+FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexpand) {
 	panel = p;
-	id_fx_list = _id;
-	id_midi_fx_list = _id_midi;
+	id_list = _id;
 	track = t;
 	module_panel_mode = ModulePanel::Mode::DEFAULT;
 	if (hexpand)
 		module_panel_mode = ModulePanel::Mode::DEFAULT_H;
 	assert(track);
-	event_ids.add(panel->event_x(id_fx_list, "hui:select", [this] { on_fx_select(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:change", [this] { on_fx_edit(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:move", [this] { on_fx_move(); }));
-	event_ids.add(panel->event_x(id_fx_list, "hui:right-button-down", [this] { on_fx_right_click(); }));
-	event_ids.add(panel->event("add-fx", [this] { on_add_fx(); }));
-	event_ids.add(panel->event("fx-add", [this] { on_add_fx(); }));
-	event_ids.add(panel->event("fx-delete", [this] { on_fx_delete(); }));
-	event_ids.add(panel->event("fx-enabled", [this] { on_fx_enabled(); }));
-	event_ids.add(panel->event("fx-copy-from-track", [this] { on_fx_copy_from_track(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:select", [this] { on_midi_fx_select(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:change", [this] { on_midi_fx_edit(); }));
-	event_ids.add(panel->event_x(id_midi_fx_list, "hui:move", [this] { on_midi_fx_move(); }));
-	event_ids.add(panel->event("add-midi-fx", [this] { on_add_midi_fx(); }));
+	event_ids.add(panel->event_x(id_list, "hui:select", [this] { on_select(); }));
+	event_ids.add(panel->event_x(id_list, "hui:change", [this] { on_edit(); }));
+	event_ids.add(panel->event_x(id_list, "hui:move", [this] { on_move(); }));
+	event_ids.add(panel->event_x(id_list, "hui:right-button-down", [this] { on_right_click(); }));
+	event_ids.add(panel->event("add-fx", [this] { on_add(); }));
+	event_ids.add(panel->event("fx-add", [this] { on_add(); }));
+	event_ids.add(panel->event("fx-delete", [this] { on_delete(); }));
+	event_ids.add(panel->event("fx-enabled", [this] { on_enabled(); }));
+	event_ids.add(panel->event("fx-copy-from-track", [this] { on_copy_from_track(); }));
 
 
 	auto *song = track->song;
@@ -127,11 +122,11 @@ void FxListEditor::select_module(Module *m) {
 		}, m->MESSAGE_DELETE);
 	}
 
-	update_fx_list_selection();
+	update_list_selection();
 	panel->expand("config-revealer", m);
 }
 
-void FxListEditor::on_fx_select() {
+void FxListEditor::on_select() {
 	int n = panel->get_int("");
 	if (n >= 0)
 		select_module(track->fx[n].get());
@@ -139,30 +134,30 @@ void FxListEditor::on_fx_select() {
 		select_module(nullptr);
 }
 
-void FxListEditor::on_fx_edit() {
+void FxListEditor::on_edit() {
 	int n = hui::get_event()->row;
 	if (n >= 0)
 		track->enable_effect(track->fx[n].get(), panel->get_cell("", n, hui::get_event()->column)._bool());
 }
 
-void FxListEditor::on_fx_move() {
+void FxListEditor::on_move() {
 	int s = hui::get_event()->row;
 	int t = hui::get_event()->row_target;
 	track->move_effect(s, t);
 }
 
-void FxListEditor::on_fx_right_click() {
-	menu_fx = hui::create_resource_menu("popup-menu-fx-list", panel);
+void FxListEditor::on_right_click() {
+	menu = hui::create_resource_menu("popup-menu-fx-list", panel);
 	int n = hui::get_event()->row;
-	menu_fx->enable("fx-delete", n >= 0);
-	menu_fx->enable("fx-enabled", n >= 0);
+	menu->enable("fx-delete", n >= 0);
+	menu->enable("fx-enabled", n >= 0);
 	if (n >= 0)
-		menu_fx->check("fx-enabled", track->fx[n]->enabled);
-	menu_fx->open_popup(panel);
+		menu->check("fx-enabled", track->fx[n]->enabled);
+	menu->open_popup(panel);
 }
 
-void FxListEditor::on_fx_delete() {
-	int n = panel->get_int(id_fx_list);
+void FxListEditor::on_delete() {
+	int n = panel->get_int(id_list);
 	if (n >= 0) {
 		auto t = track;
 		hui::run_later(0.001f, [t,n] {
@@ -171,13 +166,13 @@ void FxListEditor::on_fx_delete() {
 	}
 }
 
-void FxListEditor::on_fx_enabled() {
-	int n = panel->get_int(id_fx_list);
+void FxListEditor::on_enabled() {
+	int n = panel->get_int(id_list);
 	if (n >= 0)
 		track->enable_effect(track->fx[n].get(), !track->fx[n]->enabled);
 }
 
-void FxListEditor::on_fx_copy_from_track() {
+void FxListEditor::on_copy_from_track() {
 	auto dlg = new TrackSelectionDialog(panel->win, track->song);
 	hui::fly(dlg, [this, dlg] {
 		if (dlg->selected and dlg->selected != track) {
@@ -191,7 +186,7 @@ void FxListEditor::on_fx_copy_from_track() {
 	});
 }
 
-void FxListEditor::on_add_fx() {
+void FxListEditor::on_add() {
 	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT, [this] (const string &name) {
 		if (name == "")
 			return;
@@ -200,39 +195,9 @@ void FxListEditor::on_add_fx() {
 	});
 }
 
-void FxListEditor::on_midi_fx_select() {
-	int n = panel->get_int("");
-	if (n >= 0)
-		select_module(track->midi_fx[n].get());
-	else
-		select_module(nullptr);
-}
-
-void FxListEditor::on_midi_fx_edit() {
-	int n = hui::get_event()->row;
-	if (n >= 0)
-		track->enable_midi_effect(track->midi_fx[n].get(), panel->get_cell("", n, hui::get_event()->column)._bool());
-}
-
-void FxListEditor::on_midi_fx_move() {
-	int s = hui::get_event()->row;
-	int t = hui::get_event()->row_target;
-	track->move_midi_effect(s, t);
-}
-
-void FxListEditor::on_add_midi_fx() {
-	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::MIDI_EFFECT, [this] (const string &name) {
-		if (name == "")
-			return;
-		auto *effect = CreateMidiEffect(session(), name);
-		track->add_midi_effect(effect);
-	});
-}
-
-void FxListEditor::update_fx_list_selection() {
+void FxListEditor::update_list_selection() {
 	if (track) {
-		panel->set_int(id_fx_list, weak(track->fx).find((AudioEffect*)selected_module));
-		panel->set_int(id_midi_fx_list, weak(track->midi_fx).find((MidiEffect*)selected_module));
+		panel->set_int(id_list, weak(track->fx).find((AudioEffect*)selected_module));
 	}
 }
 
@@ -241,15 +206,10 @@ void FxListEditor::update() {
 		return;
 
 	// fx list
-	panel->reset(id_fx_list);
+	panel->reset(id_list);
 	for (auto *fx: weak(track->fx))
-		panel->add_string(id_fx_list, b2s(fx->enabled) + "\\" + fx->module_class);
+		panel->add_string(id_list, b2s(fx->enabled) + "\\" + fx->module_class);
 
-	// midi fx list
-	panel->reset(id_midi_fx_list);
-	for (auto *fx: weak(track->midi_fx))
-		panel->add_string(id_midi_fx_list, b2s(fx->enabled) + "\\" + fx->module_class);
-
-	update_fx_list_selection();
+	update_list_selection();
 }
 

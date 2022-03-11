@@ -248,6 +248,7 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&on_gtk_list_select), this);
 
 
+	// drag'n'drop reordering
 	g_signal_connect(G_OBJECT(store), "row-inserted", G_CALLBACK(&OnGtkListRowInserted), this);
 	g_signal_connect(G_OBJECT(store), "row-deleted", G_CALLBACK(&OnGtkListRowDeleted), this);
 	allow_change_messages = true;

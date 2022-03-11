@@ -15,13 +15,9 @@ Dialog track-mixer2 ""
 					Label ? "" width=5
 			Revealer revealer-fx "" slide=right
 				Grid ? "" expandx margintop=20
-					TabControl tc "audio\\midi" width=140 noframe
-						Grid grid-fx "" expandy vertical
-							ListView fx "enabled\\name" format=Ct reorderable nobar expandy expandx
-							Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx ignorefocus
-						Grid grid-midi-fx "" expandy vertical
-							ListView midi-fx "enabled\\name" format=Ct reorderable nobar expandy expandx
-							Button add-midi-fx "" "tooltip=Add new midi effect" image=hui:add flat expandx ignorefocus
+					Grid grid-fx "" expandy vertical
+						ListView fx "enabled\\name" format=Ct reorderable nobar width=140 expandy expandx
+						Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx ignorefocus
 			Revealer config-revealer "" slide=right
 				Grid grid-config "" width=400 margintop=20
 

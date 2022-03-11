@@ -6753,7 +6753,7 @@ Grid
 vertical
 0
 0
-4
+5
 Group
 g_volume
 
@@ -6850,39 +6850,15 @@ expandx
 0
 0
 2
-TabControl
-tc
-noframe,noexpandy
-0
-0
-2
-Grid
-grid-fx
-expandy,vertical
-0
-0
-1
 ListView
 fx
 format=Ct,reorderable,nobar,noexpandy,expandx,height=100
 0
 0
 0
-Grid
-grid-midi-fx
-expandy,vertical
-1
-0
-1
-ListView
-midi-fx
-format=Ct,reorderable,nobar,noexpandy,expandx
-0
-0
-0
 Revealer
 config-revealer
-slide=right
+slide=down
 0
 1
 1
@@ -6893,9 +6869,39 @@ grid-config
 0
 0
 Expander
+g-fx-midi
+disabled
+3
+0
+1
+Grid
+?
+expandx
+0
+0
+2
+ListView
+midi-fx
+format=Ct,reorderable,nobar,noexpandy,expandx,height=100
+0
+0
+0
+Revealer
+config-revealer-midi
+slide=down
+0
+1
+1
+Grid
+grid-config-midi
+
+0
+0
+0
+Expander
 g_synth
 
-3
+4
 0
 1
 Grid
@@ -7055,12 +7061,6 @@ expandx,margintop=20
 0
 0
 1
-TabControl
-tc
-width=140,noframe
-0
-0
-2
 Grid
 grid-fx
 expandy,vertical
@@ -7069,30 +7069,12 @@ expandy,vertical
 2
 ListView
 fx
-format=Ct,reorderable,nobar,expandy,expandx
+format=Ct,reorderable,nobar,width=140,expandy,expandx
 0
 0
 0
 Button
 add-fx
-image=hui:add,flat,expandx,ignorefocus
-1
-0
-0
-Grid
-grid-midi-fx
-expandy,vertical
-1
-0
-2
-ListView
-midi-fx
-format=Ct,reorderable,nobar,expandy,expandx
-0
-0
-0
-Button
-add-midi-fx
 image=hui:add,flat,expandx,ignorefocus
 1
 0
@@ -7231,7 +7213,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-648
+645
 # Text
 /bars-add
 Add bars...
@@ -9072,13 +9054,7 @@ Stop
 track-mixer2/add-fx
 
 Add new effect
-track-mixer2/add-midi-fx
-
-Add new midi effect
 track-mixer2/fx
-enabled\\name
-
-track-mixer2/midi-fx
 enabled\\name
 
 track-mixer2/mute
@@ -9093,9 +9069,6 @@ Effects
 track-mixer2/solo
 S
 Solo
-track-mixer2/tc
-audio\\midi
-
 track-mixer2/volume
 0
 Volume in dB
@@ -9122,6 +9095,9 @@ tracks
 
 track_dialog/fx
 enabled\\name
+
+track_dialog/g-fx-midi
+Midi effects
 
 track_dialog/g_fx
 Effects
@@ -9152,9 +9128,6 @@ Balance
 
 track_dialog/t_volume
 Volume
-
-track_dialog/tc
-audio\\midi
 
 track_dialog/td_t_edit
 Edit

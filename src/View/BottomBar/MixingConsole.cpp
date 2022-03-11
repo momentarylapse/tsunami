@@ -18,7 +18,6 @@
 #include "../../Data/Track.h"
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/Audio/SongRenderer.h"
-#include "../../Module/Midi/MidiEffect.h"
 #include "../../Module/ConfigPanel.h"
 #include "../../Module/SignalChain.h"
 #include "../../Session.h"
@@ -83,7 +82,7 @@ public:
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
 		vtrack->view->subscribe(this, [=] { redraw(id_name); }, AudioView::MESSAGE_SELECTION_CHANGE);
-		fx_editor = new FxListEditor(track(), this, "fx", "midi-fx", false);
+		fx_editor = new FxListEditor(track(), this, "fx", false);
 		update();
 	}
 	~TrackMixer() {

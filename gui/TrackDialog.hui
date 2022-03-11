@@ -22,14 +22,16 @@ Dialog track_dialog "Spur" width=380 height=516
 							Button edit_tuning "" image=hui:edit flat ignorefocus
 				Expander g_fx "Effects"
 					Grid ? "" expandx
-						TabControl tc "audio\\midi" noframe noexpandy
-							Grid grid-fx "" expandy vertical
-								ListView fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
-							Grid grid-midi-fx "" expandy vertical
-								ListView midi-fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx
+						ListView fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
 						---|
-						Revealer config-revealer "" slide=right
+						Revealer config-revealer "" slide=down
 							Grid grid-config ""
+				Expander g-fx-midi "Midi effects" disabled
+					Grid ? "" expandx
+						ListView midi-fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
+						---|
+						Revealer config-revealer-midi "" slide=down
+							Grid grid-config-midi ""
 				Expander g_synth "Synthesizer"
 					Grid synth ""
 		Group td_t_edit "Edit"

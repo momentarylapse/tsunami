@@ -56,6 +56,7 @@ public:
 		mute_id = "mute";
 		solo_id = "solo";
 		fx_id = "show-fx";
+		id_fx_header = "mixer-fx-header";
 		add_string(pan_slider_id, "-1\\L");
 		add_string(pan_slider_id, "0\\");
 		add_string(pan_slider_id, "1\\R");
@@ -67,21 +68,28 @@ public:
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 		add_string(vol_slider_id, format(u8"%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
-		event_xp(id_name, "hui:draw", [=] (Painter* p) { on_name_draw(p); });
-		event_x(id_name, "hui:left-button-down", [=] { on_name_left_click(); });
-		event_x(id_name, "hui:right-button-down", [=] { on_name_right_click(); });
-		event_x(id_name, "hui:left-double-click", [=] { on_name_double_click(); });
-		event(vol_slider_id, [=]{ on_volume(); });
-		event(pan_slider_id, [=]{ on_panning(); });
-		event(mute_id, [=]{ on_mute(); });
-		event(solo_id, [=]{ on_solo(); });
-		event_xp("peaks", "hui:draw", [=] (Painter* p) { on_peak_draw(p); });
-		event(fx_id, [=]{ on_show_fx(is_checked("")); });
+		event_xp(id_name, "hui:draw", [this] (Painter* p) { on_name_draw(p); });
+		event_x(id_name, "hui:left-button-down", [this] { on_name_left_click(); });
+		event_x(id_name, "hui:right-button-down", [this] { on_name_right_click(); });
+		event_x(id_name, "hui:left-double-click", [this] { on_name_double_click(); });
+		event_xp(id_fx_header, "hui:draw", [this] (Painter* p) { on_fx_header_draw(p); });
+		event_x(id_fx_header, "hui:left-button-down", [this] { on_name_left_click(); });
+		event_x(id_fx_header, "hui:right-button-down", [this] { on_name_right_click(); });
+		event_x(id_fx_header, "hui:left-double-click", [this] { on_name_double_click(); });
+		event(vol_slider_id, [this]{ on_volume(); });
+		event(pan_slider_id, [this]{ on_panning(); });
+		event(mute_id, [this]{ on_mute(); });
+		event(solo_id, [this]{ on_solo(); });
+		event_xp("peaks", "hui:draw", [this] (Painter* p) { on_peak_draw(p); });
+		event(fx_id, [this]{ on_show_fx(is_checked("")); });
 
 		vtrack = t;
-		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
-		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
-		vtrack->view->subscribe(this, [=] { redraw(id_name); }, AudioView::MESSAGE_SELECTION_CHANGE);
+		vtrack->subscribe(this, [this]{ update(); }, vtrack->MESSAGE_CHANGE);
+		vtrack->subscribe(this, [this]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
+		vtrack->view->subscribe(this, [this] {
+			redraw(id_name);
+			redraw(id_fx_header);
+		}, AudioView::MESSAGE_SELECTION_CHANGE);
 		fx_editor = new FxListEditor(track(), this, "fx", false);
 		update();
 	}
@@ -143,6 +151,18 @@ public:
 			shrink_button_x = p->width - 10;
 			p->draw_str(vec2(shrink_button_x, 8), any_shrunk ? ">" : "<");
 		}
+	}
+	void on_fx_header_draw(Painter *p) {
+		auto t = track();
+		if (!t)
+			return;
+
+		auto view = console->view;
+		bool is_playable = view->get_playable_tracks().contains(track());
+
+		p->set_color(vtrack->header->color_bg(false));
+		//p->draw_polygon({{0,0}, {p->width,0}, {0,p->height}});
+		p->draw_rect(p->area());
 	}
 
 	void set_current() {
@@ -296,6 +316,7 @@ public:
 
 	AudioViewTrack *vtrack = nullptr;
 	string id_name;
+	string id_fx_header;
 	string vol_slider_id;
 	string pan_slider_id;
 	string mute_id, solo_id, fx_id;
@@ -326,14 +347,14 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
 
-	event("output-volume", [=]{ on_output_volume(); });
+	event("output-volume", [this]{ on_output_volume(); });
 
-	view->subscribe(this, [=]{ on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, [=]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
-	song->subscribe(this, [=]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
+	view->subscribe(this, [this]{ on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, [this]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
+	song->subscribe(this, [this]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
 
-	//device_manager->subscribe(this, [=]{ on_update_device_manager(); });
-	view->output_stream->subscribe(this, [=]{
+	//device_manager->subscribe(this, [this]{ on_update_device_manager(); });
+	view->output_stream->subscribe(this, [this]{
 		set_float("output-volume", view->output_stream->get_volume());
 
 	}, view->output_stream->MESSAGE_ANY);
@@ -341,7 +362,7 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 
 
 	peak_runner_id = -1;
-	view->signal_chain->subscribe(this, [=]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
+	view->signal_chain->subscribe(this, [this]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
 }
 
 MixingConsole::~MixingConsole() {
@@ -363,7 +384,7 @@ void MixingConsole::on_chain_state_change() {
 		for (auto &m: mixer)
 			m->redraw("peaks");
 	} else if (peak_runner_id == -1 and view->is_playback_active()) {
-		peak_runner_id = hui::run_repeated(0.1f, [=] {
+		peak_runner_id = hui::run_repeated(0.1f, [this] {
 			for (auto *m: mixer)
 				m->redraw("peaks");
 		});

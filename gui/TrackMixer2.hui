@@ -13,11 +13,13 @@ Dialog track-mixer2 ""
 					ToggleButton solo "S" "tooltip=Solo" flat small height=20 expandx padding=1 ignorefocus
 					ToggleButton show-fx "fx" "tooltip=Effects" flat small height=20 expandx padding=1 ignorefocus
 					Label ? "" width=5
-			Revealer revealer-fx "" slide=right
-				Grid ? "" expandx margintop=20
-					Grid grid-fx "" expandy vertical
-						ListView fx "enabled\\name" format=Ct reorderable nobar width=140 expandy expandx
-						Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx ignorefocus
-			Revealer config-revealer "" slide=right
-				Grid grid-config "" width=400 margintop=20
-
+			Expander revealer-fx "" slide=right expandy
+				Grid ? "" expandy
+					DrawingArea mixer-fx-header "" height=8 noexpandy
+					---|
+					Grid ? "" expandx expandy
+						Grid grid-fx "" expandy vertical
+							ListView fx "enabled\\name" format=Ct reorderable nobar width=140 expandy expandx
+							Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx ignorefocus
+						Revealer config-revealer "" slide=right
+							Grid grid-config "" width=400

@@ -23,7 +23,7 @@
 
 namespace kaba {
 
-string Version = "0.19.18.0";
+string Version = "0.19.18.1";
 
 //#define ScriptDebug
 

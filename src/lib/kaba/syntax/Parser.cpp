@@ -1773,8 +1773,8 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 	if (node->params.num >= 3)
 		index2 = concretify_node(node->params[2], block, ns);
 
+	// int[3]
 	if (operand->kind == NodeKind::CLASS) {
-		// int[3]
 		// find array index
 		index = tree->transform_node(index, [&](shared<Node> n) { return tree->conv_eval_const_func(n); });
 
@@ -1786,6 +1786,7 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 
 	}
 
+	// min[float]()
 	if (operand->kind == NodeKind::FUNCTION) {
 		auto links = concretify_node_multi(node->params[0], block, ns);
 		if (index->kind != NodeKind::CLASS)
@@ -1807,6 +1808,12 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 	}
 
 
+	// auto deref?
+	if (operand->type->is_pointer()) {
+		if (!operand->type->param[0]->is_array() and !operand->type->param[0]->usable_as_super_array())
+			do_error(format("using pointer type '%s' as an array (like in C) is deprecated", operand->type->long_name()), index);
+		operand = operand->deref();
+	}
 
 
 	// subarray() ?
@@ -1833,17 +1840,8 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 	}
 
 	// allowed?
-	bool allowed = (operand->type->is_array() or operand->type->usable_as_super_array());
-	bool pparray = false;
-	if (!allowed)
-		if (operand->type->is_pointer()) {
-			if (!operand->type->param[0]->is_array() and !operand->type->param[0]->usable_as_super_array())
-				do_error(format("using pointer type '%s' as an array (like in C) is deprecated", operand->type->long_name()), index);
-			allowed = true;
-			pparray = (operand->type->param[0]->usable_as_super_array());
-		}
-	if (!allowed)
-		do_error(format("type '%s' is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()), index);
+	if (!operand->type->is_array() and !operand->type->usable_as_super_array())
+		do_error(format("type '%s' is neither an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()), index);
 
 
 	if (index->type != TypeInt) {
@@ -1851,25 +1849,18 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 		do_error(format("array index needs to be of type 'int', not '%s'", index->type->long_name()), index);
 	}
 
-	shared<Node> array;
+	shared<Node> array_element;
 
 	// pointer?
-	if (pparray) {
-		do_error("test... anscheinend gibt es [] auf * super array", index);
-		//array = cp_command(this, Operand);
-/*		Operand->kind = KindPointerAsArray;
-		Operand->type = t->type->parent;
-		deref_command_old(this, Operand);
-		array = Operand->param[0];*/
-	} else if (operand->type->usable_as_super_array()) {
-		array = tree->add_node_dyn_array(operand, index);
+	if (operand->type->usable_as_super_array()) {
+		array_element = tree->add_node_dyn_array(operand, index);
 	} else if (operand->type->is_pointer()) {
-		array = tree->add_node_parray(operand, index, operand->type->param[0]->param[0]);
+		array_element = tree->add_node_parray(operand, index, operand->type->param[0]->param[0]);
 	} else {
-		array = tree->add_node_array(operand, index);
+		array_element = tree->add_node_array(operand, index);
 	}
-	array->is_const = operand->is_const;
-	return array;
+	array_element->is_const = operand->is_const;
+	return array_element;
 
 }
 

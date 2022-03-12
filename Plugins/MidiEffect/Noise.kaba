@@ -6,7 +6,7 @@ class Delay extends MidiEffect
 		int length = 1000000#midi.getRange().length
 		int num = length / 20
 		for i in 0:num
-			int start = randi(length)
-			int _length = randi(20000)
+			int start = rand(length)
+			int _length = rand(20000)
 			Range r = Range(start, _length)
-			midi.add(new MidiNote(r, 20+randi(80), 0.1*pow(rand(1), 6)))
+			midi.add(new MidiNote(r, 20+rand(80), 0.1*pow(rand(1.0), 6)))

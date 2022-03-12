@@ -216,7 +216,7 @@ class MultiEchoPanel extends ConfigPanel
 	func override __init__(_h: Module)
 		from_source("
 Grid ? ''
-	DrawingArea drawing '' grabfocus height=250")
+	DrawingArea drawing '' grabfocus expandx expandy")
 	
 		grid.config = &c.config
 		grid.cp = &self

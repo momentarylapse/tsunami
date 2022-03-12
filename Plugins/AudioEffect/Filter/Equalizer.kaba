@@ -280,7 +280,7 @@ class EqualizerPanel extends ConfigPanel
 		super.__init__(_eq)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
-		add_drawing_area("!grabfocus,height=100,expandy", 0, 0, "drawing")
+		add_drawing_area("!grabfocus,expandx,expandy", 0, 0, "drawing")
 	
 		grid.init(self, "drawing")
 		grid.init2()

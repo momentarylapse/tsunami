@@ -112,11 +112,11 @@ func create_stutter(intensity: float) -> float[]
 	stutter.resize(440) # 10ms
 	stutter = 1
 	for i in 0:10
-		int offset = 40 + randi(200)
+		int offset = 40 + rand(200)
 		for j in 0:3
 			stutter[offset + j] = (1 - intensity)
 	for i in 0:10
-		int offset = 240 + randi(200)
+		int offset = 240 + rand(200)
 		for j in 0:3
 			stutter[offset + j] = (1 - intensity)
 	return stutter

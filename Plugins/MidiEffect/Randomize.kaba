@@ -21,6 +21,6 @@ class Randomize extends MidiEffect
 		float delay = session.sample_rate() * config.TimeDelay
 		float variation = session.sample_rate() * config.TimeVariation
 		for n in midi
-			int dt = randi(variation*2) - variation + delay
+			int dt = rand(variation*2) - variation + delay
 			n.range.offset += dt
 			n.volume *= rand(config.Volume) + 1 - config.Volume

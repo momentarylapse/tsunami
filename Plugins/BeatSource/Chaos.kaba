@@ -10,8 +10,8 @@ class ChaosSource extends BeatSource
 		int sample_rate = session.sample_rate()
 	
 		while offset < samples
-			beats.add(Beat(offset, randi(3)))
-			offset += randi(sample_rate / 4)
+			beats.add(Beat(offset, rand(3)))
+			offset += rand(sample_rate / 4)
 		offset -= samples
 			
 		return samples

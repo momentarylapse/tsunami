@@ -27,6 +27,7 @@ string color::str() const {
 }
 
 string color::hex() const {
+	return format("#%02x%02x%02x%02x", (int)(r*255), (int)(g*255), (int)(b*255), (int)(a*255));
 	return format("#02x02x02x02x", (int)(r*255), (int)(g*255), (int)(b*255), (int)(a*255));
 }
 

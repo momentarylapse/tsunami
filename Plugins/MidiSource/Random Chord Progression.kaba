@@ -36,12 +36,12 @@ class Morse extends MidiSource
 		return sorted([SCALE[deg], SCALE[(deg+2) % 7], SCALE[(deg+4) % 7]], "")
 		
 	#int[] random_chord()
-	#	int n = randi(7)
+	#	int n = rand(7)
 	#	return sorted([n, n+2, n+4], "")
 
 	func step_chord()
 		while true
-			int d = randi(7)
+			int d = rand(7)
 			var cc = make_chord(d)
 			if overlap(cc, chord) < 1
 				continue

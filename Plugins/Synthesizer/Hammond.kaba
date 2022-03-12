@@ -129,11 +129,11 @@ class HammondRenderer extends PitchRenderer
 		stutter.resize(440) # 10ms
 		stutter = 1
 		for i in 0:10
-			int offset = 40 + randi(200)
+			int offset = 40 + rand(200)
 			for j in 0:3
 				stutter[offset + j] = (1 - synth.config.key_stutter)
 		for i in 0:10
-			int offset = 240 + randi(200)
+			int offset = 240 + rand(200)
 			for j in 0:3
 				stutter[offset + j] = (1 - synth.config.key_stutter)
 	func override on_config()

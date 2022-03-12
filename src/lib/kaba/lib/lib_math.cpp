@@ -625,6 +625,9 @@ void SIAddPackageMath() {
 		class_add_element("b", TypeFloat32, &color::b);
 		class_add_element("a", TypeFloat32, &color::a);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &color::str, Flags::PURE);
+		class_add_func("hex", TypeString, &color::hex, Flags::PURE);
+		class_add_func("with_alpha", TypeColor, &color::with_alpha, Flags::PURE);
+			func_add_param("a", TypeFloat32);
 		class_add_func("hsb", TypeColor, &color::hsb, Flags::_STATIC__PURE);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
@@ -1048,7 +1051,7 @@ void SIAddPackageMath() {
 		func_add_param("b", TypeVector);
 		func_add_param("c", TypeVector);
 	// random numbers
-	add_func("randi", TypeInt, &randi, Flags::STATIC);
+	add_func("rand", TypeInt, &randi, Flags::STATIC);
 		func_add_param("max", TypeInt);
 	add_func("rand", TypeFloat32, &randf, Flags::STATIC);
 		func_add_param("max", TypeFloat32);

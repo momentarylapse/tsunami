@@ -87,8 +87,8 @@ public:
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		p->add_grid("", 1, i, "grid-" + i2s(i));
 		p->set_target("grid-" + i2s(i));
-		p->add_slider("!width=150,expandx", 0, 0, "slider-" + i2s(i));
-		p->add_spin_button(f2s(*value, 6), 1, 0, "spin-" + i2s(i));
+		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
+		p->add_spin_button("!width=50\\" + f2s(*value, 6), 1, 0, "spin-" + i2s(i));
 		p->set_options("spin-" + i2s(i), format("range=%f:%f:%f", min*factor, max*factor, step));
 		//p->addLabel(unit, 2, 0, "");
 		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), min, max, factor, callback, *value);

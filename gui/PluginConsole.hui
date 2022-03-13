@@ -1,6 +1,6 @@
 Dialog plugin-console "Plugins" width=300 height=200
 	Grid main-grid "" expany
-		Scroller scroller ""
+		Scroller scroller "" hidden
 			Grid panel-grid ""
-		Label no-plugins-label "no plugins yet" angle=90 bold width=60 expandy
-		Button add "" expandy noexpandx image=hui:add "tooltip=add plugin"
+		Button add "" expandy noexpandx image=hui:add "tooltip=add plugin" width=80
+		Label no-plugins-label "no plugins yet" angle=90 italic width=40 expandy

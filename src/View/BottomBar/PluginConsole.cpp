@@ -44,6 +44,7 @@ void PluginConsole::on_add_plugin() {
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
 	hide_control("no-plugins-label", true);
+	hide_control("scroller", false);
 	blink();
 }
 
@@ -55,5 +56,6 @@ void PluginConsole::on_remove_plugin() {
 			break;
 		}
 	hide_control("no-plugins-label", panels.num > 0);
+	hide_control("scroller", panels.num == 0);
 }
 

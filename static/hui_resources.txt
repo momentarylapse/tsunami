@@ -2412,7 +2412,7 @@ Grid
 homogenousx
 0
 0
-4
+6
 Button
 flag-none
 image=hui:delete,expandx,ignorefocus,height=32
@@ -2436,6 +2436,18 @@ flag-tenuto
 image=note-flag-tenuto,expandx,ignorefocus
 3
 0
+0
+Button
+flag-dead
+expandx,ignorefocus
+0
+1
+0
+Button
+flag-hammer-on
+expandx,ignorefocus,disabled
+1
+1
 0
 Group
 grp_operations
@@ -7225,7 +7237,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-645
+647
 # Text
 /bars-add
 Add bars...
@@ -8148,6 +8160,12 @@ Minor major 7th chord
 midi_editor/chord-minor7
 
 Minor 7th chord
+midi_editor/flag-dead
+x
+Set muted flag
+midi_editor/flag-hammer-on
+h
+Set hammer-on flag
 midi_editor/flag-none
 
 Clear all flags

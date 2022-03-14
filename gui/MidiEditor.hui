@@ -61,6 +61,9 @@ Dialog midi_editor "Midi" width=300 height=516
 				Button flag-trill "" image=note-flag-trill expandx "tooltip=Set trill flag" ignorefocus
 				Button flag-staccato "" image=note-flag-staccato expandx "tooltip=Set staccato flag" ignorefocus
 				Button flag-tenuto "" image=note-flag-tenuto expandx "tooltip=Set tenuto flag" ignorefocus
+				---|
+				Button flag-dead "x" expandx "tooltip=Set muted flag" ignorefocus
+				Button flag-hammer-on "h" expandx "tooltip=Set hammer-on flag" ignorefocus disabled
 		Group grp_operations "Operations"
 			Grid ? "" homogenousx
 				Button quantize "" image=midi-quantize big "tooltip=Quantize: align selected notes to grid of sub beats" expandx ignorefocus

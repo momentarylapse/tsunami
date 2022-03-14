@@ -111,6 +111,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	event("flag-trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
 	event("flag-staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
 	event("flag-tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
+	event("flag-dead", [=]{ on_apply_flags(NOTE_FLAG_DEAD); });
 	event("add_key_change", [=]{ on_add_key_change(); });
 	event("edit_song", [=]{
 		session->set_mode(EditMode::DefaultSong);

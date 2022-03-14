@@ -583,7 +583,9 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState s
 
 	if (n->flags > 0) {
 		float x = (x1 + x2) / 2;
-		if (n->is(NOTE_FLAG_TRILL))
+		if (n->is(NOTE_FLAG_DEAD))
+			SymbolRenderer::draw(c, {x, y - rr*4}, rr*1.5f, "x", true, 0);
+		else if (n->is(NOTE_FLAG_TRILL))
 			SymbolRenderer::draw(c, {x, y - rr*4}, rr*1.5f, "tr", true, 0);
 			//c->draw_str(x, y - rr*3, "tr~");
 		if (n->is(NOTE_FLAG_STACCATO))
@@ -707,6 +709,12 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.6f;
+
+	if (n->is(NOTE_FLAG_DEAD)) {
+		c->set_color(col);
+		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, "x", true, 0);
+		return;
+	}
 
 	if (x2 - x1 > quality.tab_text_threshold /*and rr > 5*/) {
 		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);

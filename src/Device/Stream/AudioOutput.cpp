@@ -70,11 +70,13 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 	if (nbytes == 0)
 		return;
 
-	void *data;
+	void *data = nullptr;
+	auto n0 = nbytes;
 	int r = pa_stream_begin_write(p, &data, &nbytes);
-	stream->_pulse_test_error("pa_stream_begin_write");
-	if (r != 0)
+	if (r != 0) {
+		stream->_pulse_test_error("pa_stream_begin_write");
 		return;
+	}
 	//printf("%d  %p  %d\n", r, data, (int)nbytes);
 
 	int frames = nbytes / 8;
@@ -82,8 +84,8 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 
 	bool out_of_data = stream->feed_stream_output(frames, out);
 
-	pa_stream_write(p, data, nbytes, nullptr, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
-	stream->_pulse_test_error("pa_stream_write");
+	if (pa_stream_write(p, data, nbytes, nullptr, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE) != 0)
+		stream->_pulse_test_error("pa_stream_write");
 
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
 		//printf("end of data...\n");
@@ -293,7 +295,8 @@ void AudioOutput::_create_dev() {
 		ss.format = PA_SAMPLE_FLOAT32LE;
 		//ss.format = PA_SAMPLE_S16LE;
 		pulse_stream = pa_stream_new(device_manager->pulse_context, "stream", &ss, nullptr);
-		_pulse_test_error("pa_stream_new");
+		if (!pulse_stream)
+			_pulse_test_error("pa_stream_new");
 
 		pa_stream_set_state_callback(pulse_stream, &pulse_stream_state_callback, this);
 		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
@@ -313,16 +316,16 @@ void AudioOutput::_create_dev() {
 			dev = cur_device->internal_name.c_str();
 		auto flags = (pa_stream_flags_t)(PA_STREAM_START_CORKED|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
 
-		pa_stream_connect_playback(pulse_stream, dev, &attr_out, flags, nullptr, nullptr);
-		_pulse_test_error("pa_stream_connect_playback");
+		if (pa_stream_connect_playback(pulse_stream, dev, &attr_out, flags, nullptr, nullptr) != 0)
+			_pulse_test_error("pa_stream_connect_playback");
 
 
 		if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
 			session->w("retry");
 
 			// retry with default device
-			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, flags, nullptr, nullptr);
-			_pulse_test_error("pa_stream_connect_playback");
+			if (pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, flags, nullptr, nullptr) != 0)
+				_pulse_test_error("pa_stream_connect_playback");
 
 			if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
 				device_manager->unlock();
@@ -375,8 +378,8 @@ void AudioOutput::_kill_dev() {
 		pa_stream_set_write_callback(pulse_stream, nullptr, nullptr);
 		pa_stream_set_underflow_callback(pulse_stream, nullptr, nullptr);
 
-		pa_stream_disconnect(pulse_stream);
-		_pulse_test_error("pa_stream_disconnect");
+		if (pa_stream_disconnect(pulse_stream) != 0)
+			_pulse_test_error("pa_stream_disconnect");
 
 		pa_stream_unref(pulse_stream);
 		_pulse_test_error("pa_stream_unref");

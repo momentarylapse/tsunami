@@ -913,6 +913,7 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 			value = fret + t.tuning[string_no];
 		//msg_write(format("%d/%d -> %d", string_no, fret, value));
 		n->pitch = value;
+		n->stringno = t.tuning.num - string_no - 1;
 	}
 	if ((flags & 0x80) != 0)
 		f->seek(2);

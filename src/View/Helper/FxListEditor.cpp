@@ -99,7 +99,7 @@ void FxListEditor::select_module(Module *m) {
 		config_panel = new ModulePanel(m, panel, (ModulePanel::Mode)module_panel_mode);
 
 		if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
-			AudioEffect *fx = (AudioEffect*)m;
+			auto fx = reinterpret_cast<AudioEffect*>(m);
 			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_effect(fx, enabled);
 			});
@@ -107,7 +107,7 @@ void FxListEditor::select_module(Module *m) {
 				track->delete_effect(fx);
 			});
 		} else { // MIDI_EFFECT
-			MidiEffect *fx = (MidiEffect*)m;
+			auto fx = reinterpret_cast<MidiEffect*>(m);
 			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_midi_effect(fx, enabled);
 			});
@@ -180,7 +180,7 @@ void FxListEditor::on_copy_from_track() {
 			foreachb (auto *fx, weak(track->fx))
 				track->delete_effect(fx);
 			for (auto *fx: weak(dlg->selected->fx))
-				track->add_effect((AudioEffect*)fx->copy());
+				track->add_effect(reinterpret_cast<AudioEffect*>(fx->copy()));
 			track->song->end_action_group();
 		}
 	});
@@ -196,9 +196,8 @@ void FxListEditor::on_add() {
 }
 
 void FxListEditor::update_list_selection() {
-	if (track) {
-		panel->set_int(id_list, weak(track->fx).find((AudioEffect*)selected_module));
-	}
+	if (track)
+		panel->set_int(id_list, weak(track->fx).find(reinterpret_cast<AudioEffect*>(selected_module)));
 }
 
 void FxListEditor::update() {
@@ -207,8 +206,14 @@ void FxListEditor::update() {
 
 	// fx list
 	panel->reset(id_list);
-	for (auto *fx: weak(track->fx))
-		panel->add_string(id_list, b2s(fx->enabled) + "\\" + fx->module_class);
+	for (auto *fx: weak(track->fx)) {
+		string pre, post;
+		if (!fx->enabled) {
+			pre = "<span alpha=\"50%\">";
+			post = "</span>";
+		}
+		panel->add_string(id_list, format("%s\\%s%s\n<small>    %s, %.0f%%</small>%s", b2s(fx->enabled), pre, fx->module_class, (fx->enabled?"active":"disabled"), 100.0f, post));
+	}
 
 	update_list_selection();
 }

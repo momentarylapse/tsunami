@@ -19,7 +19,7 @@ Dialog track-mixer2 ""
 					---|
 					Grid ? "" expandx expandy
 						Grid grid-fx "" expandy vertical
-							ListView fx "enabled\\name" format=Ct reorderable nobar width=140 expandy expandx
+							ListView fx "enabled\\name" format=Cm reorderable nobar width=140 expandy expandx
 							Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx ignorefocus
 						Revealer config-revealer "" slide=right
 							Grid grid-config "" width=400

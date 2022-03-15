@@ -30,39 +30,29 @@ extern ApiDescription api_descriptions[];
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 		hui::Dialog("settings_dialog", _parent) {
 	view = _view;
-	event("language", [=]{ on_language(); });
-	event("color_scheme", [=]{ on_color_scheme(); });
-	event("ogg_bitrate", [=]{ on_ogg_bitrate(); });
-	event("default_artist", [=]{ on_default_artist(); });
-	event("controls:toolbar", [=]{ on_controls(false); });
-	event("controls:headerbar", [=]{ on_controls(true); });
-	event("scroll_speed", [=]{ on_scroll_speed(); });
-	event("cpu_meter", [=]{ on_cpu_meter(); });
-	event("antialiasing", [=]{ on_antialiasing(); });
-	event("high_details", [=]{ on_high_details(); });
-	event("audio_api", [=]{ on_audio_api(); });
-	event("midi_api", [=]{ on_midi_api(); });
-	event("prebuffer_size", [=]{ on_prebuffer(); });
-	event("suck_size", [=]{ on_suck_buffer(); });
-	event("quick_export_dir_find", [=]{ on_qed_find(); });
-	event("hui:close", [=]{ request_destroy(); });
-	event("close", [=]{ request_destroy(); });
+	event("language", [this] { on_language(); });
+	event("color_scheme", [this] { on_color_scheme(); });
+	event("ogg_bitrate", [this] { on_ogg_bitrate(); });
+	event("default_artist", [this] { on_default_artist(); });
+	event("controls:toolbar", [this] { on_controls(false); });
+	event("controls:headerbar", [this] { on_controls(true); });
+	event("scroll_speed", [this] { on_scroll_speed(); });
+	event("cpu_meter", [this] { on_cpu_meter(); });
+	event("antialiasing", [this] { on_antialiasing(); });
+	event("high_details", [this] { on_high_details(); });
+	event("audio_api", [this] { on_audio_api(); });
+	event("midi_api", [this] { on_midi_api(); });
+	event("prebuffer_size", [this] { on_prebuffer(); });
+	event("suck_size", [this] { on_suck_buffer(); });
+	event("quick_export_dir_find", [this] { on_qed_find(); });
+	event("hui:close", [this] { request_destroy(); });
+	event("close", [this] { request_destroy(); });
 
 	set_options("default_artist", "placeholder=" + AppName);
 
 	set_options("quick_export_dir", "placeholder=" + hui::Application::directory.str());
 
-	ogg_quality.add(OggQuality(0.0f, 64));
-	ogg_quality.add(OggQuality(0.1f, 80));
-	ogg_quality.add(OggQuality(0.2f, 96));
-	ogg_quality.add(OggQuality(0.3f, 112));
-	ogg_quality.add(OggQuality(0.4f, 128));
-	ogg_quality.add(OggQuality(0.5f, 160));
-	ogg_quality.add(OggQuality(0.6f, 192));
-	ogg_quality.add(OggQuality(0.7f, 224));
-	ogg_quality.add(OggQuality(0.8f, 256));
-	ogg_quality.add(OggQuality(0.9f, 320));
-	ogg_quality.add(OggQuality(1.0f, 500));
+	ogg_quality = {{0.0f, 64}, {0.1f, 80}, {0.2f, 96}, {0.3f, 112}, {0.4f, 128}, {0.5f, 160}, {0.6f, 192}, {0.7f, 224}, {0.8f, 256}, {0.9f, 320}, {1.0f, 500}};
 
 
 	device_console = new DeviceConsole(view->session, this);

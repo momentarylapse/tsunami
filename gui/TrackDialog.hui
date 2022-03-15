@@ -22,7 +22,7 @@ Dialog track_dialog "Spur" width=380 height=516
 							Button edit_tuning "" image=hui:edit flat ignorefocus
 				Expander g_fx "Effects"
 					Grid ? "" expandx
-						ListView fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
+						ListView fx "enabled\\name" format=Cm reorderable nobar noexpandy expandx height=160
 						---|
 						Revealer config-revealer "" slide=down
 							Grid grid-config ""

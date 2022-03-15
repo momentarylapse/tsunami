@@ -6864,7 +6864,7 @@ expandx
 2
 ListView
 fx
-format=Ct,reorderable,nobar,noexpandy,expandx,height=100
+format=Cm,reorderable,nobar,noexpandy,expandx,height=160
 0
 0
 0
@@ -7093,7 +7093,7 @@ expandy,vertical
 2
 ListView
 fx
-format=Ct,reorderable,nobar,width=140,expandy,expandx
+format=Cm,reorderable,nobar,width=140,expandy,expandx
 0
 0
 0

@@ -406,7 +406,9 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {
 	MidiEventBuffer r;
 	for (MidiNote *n: weak(notes)) {
 		Range rr = n->range;
-		if (n->is(NOTE_FLAG_STACCATO))
+		if (n->is(NOTE_FLAG_DEAD))
+			rr = Range(rr.offset, min(rr.length/4, 2200)); //DEFAULT_SAMPLE_RATE/20)); // FIXME use the current sample rate?
+		else if (n->is(NOTE_FLAG_STACCATO))
 			rr = Range(rr.offset, rr.length/2);
 		/*if (n->is(NOTE_FLAG_TRILL)) {
 			int l = rr.length;

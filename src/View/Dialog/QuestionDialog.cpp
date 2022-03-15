@@ -60,13 +60,13 @@ QuestionDialogIntInt::QuestionDialogIntInt(hui::Window *_parent, const string &q
 	event("value1", [this] { result1 = get_int("value1"); });
 	event("value2", [this] { result2 = get_int("value2"); });
 	event("cancel", [this] {
-		request_destroy();
 		cb(-1,-1);
+		request_destroy();
 	});
 	event("ok", [this] {
 		aborted = false;
-		request_destroy();
 		cb(result1, result2);
+		request_destroy();
 	});
 }
 
@@ -93,8 +93,8 @@ QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, 
 			set_tooltip(id, tips[i]);
 		event(id, [i,this] {
 			result = i;
-			request_destroy();
 			cb(i);
+			request_destroy();
 		});
 	}
 }

@@ -64,6 +64,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	mp->set_line_weight(line_height / 75);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
+	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
 
@@ -231,6 +232,8 @@ void MultiLinePainter::set(const Any &conf) {
 		line_height = conf["line-height"]._float();
 	if (conf.has("antialiasing"))
 		antialiasing = conf["antialiasing"]._bool();
+	if (conf.has("allow-shadows"))
+		allow_shadows = conf["allow-shadows"]._bool();
 	string_dy = line_height / 50.0f * 13;
 	w = page_width - 2 * border;
 	cam->area = rect(border, page_width - border, 0, 2000);

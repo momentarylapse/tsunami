@@ -10,7 +10,7 @@ class MyDialog extends hui.Dialog
 	mlp: MultiLinePainter*
 	config_visible = false
 	line_height = 80.0
-	line_space = 0.4
+	line_space = 0.8
 	track_space = 0.2
 	border = 20.0
 	x_scale = 1.0
@@ -20,6 +20,7 @@ class MyDialog extends hui.Dialog
 	y_offset_start = 0.0
 	y_offset_target = 0.0
 	y_offset_t = -1.0
+	allow_shadows = false
 	mlv: MultiLineView*
 	
 	line_samples: int[]
@@ -45,6 +46,8 @@ class MyDialog extends hui.Dialog
 					---|
 					Label l-x-scale 'Horizontal scale'
 					SpinButton x-scale '{{x_scale}}' range=0:10:0.01
+					---|
+					CheckBox allow-shadows 'Shadows'
 				---|
 				ListView tracks 'Track\\Classical\\TAB' format=tCC")
 		set_target(":header:")
@@ -72,6 +75,7 @@ class MyDialog extends hui.Dialog
 		event("line-space", on_update)
 		event("track-space", on_update)
 		event("x-scale", on_update)
+		event("shadows", on_update)
 		event("play", on_play)
 		event_x("tracks", "hui:change", on_update)
 		event_x("area", "hui:left-button-down", on_click)
@@ -140,6 +144,7 @@ class MyDialog extends hui.Dialog
 		line_space = get_float("line-space")
 		track_space = get_float("track-space")
 		x_scale = get_float("x-scale")
+		allow_shadows = is_checked("allow-shadows")
 		for t,i in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
 			track_mode[i * 2 + 1] = (get_cell("tracks", i, 2) == "true")
@@ -184,6 +189,7 @@ class MyDialog extends hui.Dialog
 			"line-height": line_height,
 			"line-space": line_height * line_space,
 			"track-space": line_height * track_space,
+			"allow-shadows": allow_shadows,
 			"antialiasing": true,
 			"collapse-midi": true}))
 		var y0 = 10.0 - y_offset

@@ -52,6 +52,7 @@ public:
 	float line_height = 50;
 	bool antialiasing = true;
 	float string_dy = 10;
+	bool allow_shadows = false;
 
 	float w = 0;
 	float avg_samples_per_line = 0;

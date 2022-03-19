@@ -356,11 +356,11 @@ void Window::_run(Callback cb) {
 	int uid = unique_id;
 	//end_run_callback = cb;
 
-#if GTK_CHECK_VERSION(4,0,0)
+/*#if GTK_CHECK_VERSION(4,0,0)
 	msg_error("TODO: hui.run() gtk4");
 	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response), this);
 	gtk_window_present(GTK_WINDOW(window));
-#else
+#else*/
 	// hmmmm, gtk_dialog_response() seems to be ignored here...?!?
 	/*if (get_parent()) {
 		msg_write("...dialog");
@@ -371,8 +371,9 @@ void Window::_run(Callback cb) {
 			Sleep(0.005f);
 		}
 //	}
-#endif
-	cb();
+//#endif
+	if (cb)
+		cb();
 	delete this;
 }
 

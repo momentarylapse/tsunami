@@ -69,7 +69,7 @@ Storage::~Storage() {
 	formats.clear();
 }
 
-bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
+bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 	current_directory = filename.absolute().parent();
 	auto *d = get_format(filename.extension(), 0);
 	if (!d)
@@ -78,13 +78,15 @@ bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 	session->i(_("loading ") + filename.str());
 
 	Format *f = d->create();
-	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
+	auto od = StorageOperationData(session, f, filename);
 	od.song = song;
-	od.only_load_metadata = only_metadata;
+	od.only_load_metadata = (flags & Flags::ONLY_METADATA);
 	if (!f->get_parameters(&od, true)) {
 		delete f;
 		return false;
 	}
+
+	od.start_progress(_("loading ") + d->description);
 
 	song->notify(song->MESSAGE_START_LOADING);
 	song->reset();
@@ -110,7 +112,7 @@ bool Storage::load_ex(Song *song, const Path &filename, bool only_metadata) {
 }
 
 bool Storage::load(Song *song, const Path &filename) {
-	return load_ex(song, filename, false);
+	return load_ex(song, filename, Flags::NONE);
 }
 
 bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
@@ -122,13 +124,14 @@ bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 	session->i(_("loading track ") + filename.str());
 
 	Format *f = d->create();
-	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
+	auto od = StorageOperationData(session, f, filename);
 	od.set_layer(layer);
 	od.offset = offset;
 	if (!f->get_parameters(&od, true)) {
 		delete f;
 		return false;
 	}
+	od.start_progress(_("loading ") + d->description);
 
 	od.song->begin_action_group("load track");
 
@@ -178,12 +181,13 @@ bool Storage::save(Song *song, const Path &filename) {
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	auto od = StorageOperationData(session, f, temp_file, _("saving ") + d->description);
+	auto od = StorageOperationData(session, f, temp_file);
 	od.song = song;
 	if (!f->get_parameters(&od, true)) {
 		delete f;
 		return false;
 	}
+	od.start_progress(_("saving ") + d->description);
 
 	song->filename = filename;
 
@@ -213,11 +217,12 @@ bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, 
 	session->i(_("exporting ") + filename.str());
 
 	Format *f = d->create();
-	auto od = StorageOperationData(session, f, filename, _("exporting"));
+	auto od = StorageOperationData(session, f, filename);
 	if (!f->get_parameters(&od, true)) {
 		delete f;
 		return false;
 	}
+	od.start_progress(_("exporting"));
 	od.renderer = r;
 	od.tags = tags;
 	od.num_samples = num_samples;
@@ -333,4 +338,8 @@ void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &
 	load_buffer(&buffer, filename);
 	current_directory = dir0;
 	file_delete(filename);
+}
+
+Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b) {
+	return (Storage::Flags)((int)a | (int)b);
 }

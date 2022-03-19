@@ -151,13 +151,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	string chain_file;
 	string plugin_file;
 	bool allow_window = false;
-	bool force = false;
+	auto flags = Storage::Flags::NONE;
 
 	CLIParser p;
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
 	p.flag("--slow", "", [&]{ ugly_hack_slow = true; });
 	p.flag("--mcd", "", [&]{ module_config_debug = true; });
-	p.flag("--force", "", [&]{ force = true; });
+	p.flag("--force", "", [&]{ flags = flags | Storage::Flags::FORCE; });
 	p.option("--plugin", "FILE", "add a plugin to run", [&](const string &a){ plugin_file = a; });
 	p.option("--chain", "FILE", "add a signal chain", [&](const string &a){ chain_file = a; });
 	p.option("--params", "PARAMS", "set loading parameters", [&](const string &a){ Storage::options_in = a; });
@@ -192,33 +192,40 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		p.show_info();
 	});
 	p.mode("--info", {"FILE1", "..."}, "show information about the file", [&](const Array<string> &a) {
+		session->storage->allow_gui = false;
 		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
+		flags = flags | Storage::Flags::ONLY_METADATA;
 		for (string &filename: a)
-			if (session->storage->load_ex(song, filename, true) or force)
+			if (session->storage->load_ex(song, filename, flags)) {
 				show_song(song);
+			}
 		delete song;
 	});
 	p.mode("--diff", {"FILE1", "FILE2"}, "compare 2 files", [&](const Array<string> &a) {
+		session->storage->allow_gui = false;
 		session->log->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;
-		if (session->storage->load_ex(song1, a[0], true) or force)
-			if (session->storage->load_ex(song2, a[1], true) or force) {
+		flags = flags | Storage::Flags::ONLY_METADATA;
+		if (session->storage->load_ex(song1, a[0], flags)) {
+			if (session->storage->load_ex(song2, a[1], flags)) {
 				auto r = diff_song(song1, song2);
 				if (r.num > 0)
 					msg_error("diffs: " + sa2s(r));
 			}
+		}
 
 		delete song1;
 		delete song2;
 	});
 	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [&](const Array<string> &a) {
+		session->storage->allow_gui = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (session->storage->load(song, a[0]) or force)
+		if (session->storage->load(song, a[0]) or (flags & Storage::Flags::FORCE))
 			session->storage->save(song, a[1]);
 		delete song;
 	});

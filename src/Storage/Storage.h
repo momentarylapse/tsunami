@@ -29,8 +29,14 @@ public:
 	Storage(Session *session);
 	virtual ~Storage();
 
+	enum Flags {
+		NONE = 0,
+		ONLY_METADATA = 1,
+		FORCE = 2
+	};
+
 	bool _cdecl load(Song *song, const Path &filename);
-	bool _cdecl load_ex(Song *song, const Path &filename, bool only_metadata);
+	bool _cdecl load_ex(Song *song, const Path &filename, Flags flags);
 	bool _cdecl load_track(TrackLayer *t, const Path &filename, int offset = 0);
 	bool _cdecl load_buffer(AudioBuffer *buf, const Path &filename);
 	bool _cdecl save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags);
@@ -57,9 +63,12 @@ public:
 	static string options_out;
 
 	Session *session;
+	bool allow_gui = true;
 
 	bytes compress(AudioBuffer &buffer, const string &codec);
 	void decompress(AudioBuffer &buffer, const string &codec, const bytes &data);
 };
+
+Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);
 
 #endif /* STORAGE_H_ */

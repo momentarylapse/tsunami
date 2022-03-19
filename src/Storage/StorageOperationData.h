@@ -31,7 +31,9 @@ enum class SampleFormat;
 
 class StorageOperationData {
 public:
-	StorageOperationData(Session *session, Format *format, const Path &filename, const string &message);
+	StorageOperationData(Session *session, Format *format, const Path &filename);
+
+	void start_progress(const string &message);
 
 	void info(const string &message);
 	void warn(const string &message);

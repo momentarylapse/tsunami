@@ -16,14 +16,14 @@
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Song.h"
 
-StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename, const string &message) {
+StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename) {
 	session = _session;
 	win = session->win.get();
 	storage = session->storage.get();
 	format = _format;
 	song = session->song.get();
 	filename = _filename;
-	progress = new Progress(message, win);
+	progress = nullptr;
 	channels_suggested = 2;
 	allow_channels_change = false;
 	layer = nullptr;
@@ -45,6 +45,10 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 		session->e(::format("options '%s':  %s", Storage::options_in, e.message()));
 	}
 	Storage::options_in = "";
+}
+
+void StorageOperationData::start_progress(const string &message) {
+	progress = new Progress(message, win);
 }
 
 void StorageOperationData::set_layer(TrackLayer *l) {

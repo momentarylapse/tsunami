@@ -1,15 +1,15 @@
 use hui
 use tsunami
 
-class VolumeChecker extends SongPlugin
+class VolumeChecker extends TsunamiPlugin
 
 	var vol_max: float
 	func check() -> bool
-		var renderer = new SongRenderer(song)
+		var renderer = new SongRenderer(session.song)
 		
 		var p = new ProgressX("checking", self.session.win)
 		
-		Range range = song.range()
+		Range range = session.song.range()
 		AudioBuffer buf
 		renderer.set_range(range)
 		
@@ -50,9 +50,12 @@ class VolumeChecker extends SongPlugin
 				for t in session.song.tracks
 					t.set_volume(t.volume / vol_max * 0.999)
 				session.song.end_action_group()
+			stop()
 		hui.question_box(session.win, "Question", q, f, true)
 
-	func override apply()
+	func override on_start()
 		if check()
 			ask()
+		else
+			stop()
 		

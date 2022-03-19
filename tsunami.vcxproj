@@ -436,7 +436,6 @@
     <ClCompile Include="src\Plugins\Plugin.cpp" />
     <ClCompile Include="src\Plugins\PluginManager.cpp" />
     <ClCompile Include="src\Plugins\ProfileManager.cpp" />
-    <ClCompile Include="src\Plugins\SongPlugin.cpp" />
     <ClCompile Include="src\Plugins\TsunamiPlugin.cpp" />
     <ClCompile Include="src\Storage\Dialog\PdfConfigDialog.cpp" />
     <ClCompile Include="src\Storage\Dialog\RawConfigDialog.cpp" />
@@ -864,7 +863,6 @@
     <ClInclude Include="src\Plugins\Plugin.h" />
     <ClInclude Include="src\Plugins\PluginManager.h" />
     <ClInclude Include="src\Plugins\ProfileManager.h" />
-    <ClInclude Include="src\Plugins\SongPlugin.h" />
     <ClInclude Include="src\Plugins\TsunamiPlugin.h" />
     <ClInclude Include="src\Storage\Dialog\PdfConfigDialog.h" />
     <ClInclude Include="src\Storage\Dialog\RawConfigDialog.h" />

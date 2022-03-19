@@ -2,24 +2,26 @@ use tsunami
 use helper.tone
 
 
-class XXX extends SongPlugin
-	func override apply()
-		if len(song.bars) == 0
+class XXX extends TsunamiPlugin
+	func override on_start()
+		if len(session.song.bars) == 0
 			session.e("song doesn't contain any bars")
+			stop()
 			return
 
 		int n = 0
-		song.begin_action_group("guess chords")
-		for l in song.layers()
+		session.song.begin_action_group("guess chords")
+		for l in session.song.layers()
 			if session.view.sel.has_layer(l) and l.type == SignalType.MIDI
 				guess_chords(l, session.view.sel.range())
 				n ++
-		song.end_action_group()
+		session.song.end_action_group()
 		if n == 0
 			session.e("no midi track selected")
+		stop()
 
 	func guess_chords(out l: TrackLayer, r: Range)
-		for b in song.bars.get_bars(r)
+		for b in session.song.bars.get_bars(r)
 			Range rr = b.range()
 			string chord = guess_chord(l.midi.get_notes(rr), rr)
 			l.add_marker(new TrackMarker(b.range(), chord))
@@ -48,7 +50,7 @@ class XXX extends SongPlugin
 		
 		
 	func first_bar(offset: int) -> int
-		for b,i in song.bars
+		for b,i in session.song.bars
 			if b.offset >= offset -100
 				return i
 		return -1

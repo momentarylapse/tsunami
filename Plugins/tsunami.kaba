@@ -696,13 +696,6 @@ class TsunamiPlugin extends Module
 	func extern stop()
 	var args: string[]
 
-class SongPlugin extends Object
-	func extern override __init__()
-	func extern override __delete__()
-	func extern virtual apply()
-	var session: Session*
-	var song: Song*
-
 #class Progress
 #	extern void __init__(string title, Window *parent)
 #	virtual extern void __delete__()

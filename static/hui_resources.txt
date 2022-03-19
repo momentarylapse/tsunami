@@ -1961,7 +1961,7 @@ menu_plugins
 
 7
 0
-24
+23
 Item
 plugin_on_file
 disabled
@@ -2046,64 +2046,58 @@ Separator
 13
 0
 0
-Menu
-menu_plugins_on_all
-
-14
-0
-0
-Separator
-
-
-15
-0
-0
 Item
 plugin_independent
 disabled
-16
+14
 0
 0
 Menu
 menu_plugins_debug
 
-17
+15
+0
+0
+Menu
+menu_plugins_file_edit
+
+16
 0
 0
 Menu
 menu_plugins_file_management
 
-18
+17
 0
 0
 Menu
 menu_plugins_file_visualization
 
-19
+18
 0
 0
 Menu
 menu_plugins_games
 
-20
+19
 0
 0
 Menu
 menu_plugins_practice
 
-21
+20
 0
 0
 Menu
 menu_plugins_live_performance
 
-22
+21
 0
 0
 Menu
 menu_plugins_special
 
-23
+22
 0
 0
 Menu
@@ -8022,6 +8016,9 @@ Dynamics
 menu/menu_plugins_echo
 Echo
 
+menu/menu_plugins_file_edit
+File edit
+
 menu/menu_plugins_file_management
 File management
 
@@ -8042,9 +8039,6 @@ Effects
 
 menu/menu_plugins_midi_source
 From source
-
-menu/menu_plugins_on_all
-On all
 
 menu/menu_plugins_pitch
 Pitch

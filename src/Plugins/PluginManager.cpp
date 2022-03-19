@@ -63,7 +63,6 @@
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "ProfileManager.h"
-#include "SongPlugin.h"
 #include "TsunamiPlugin.h"
 
 namespace kaba {
@@ -783,16 +782,6 @@ void PluginManager::link_app_data() {
 	}
 
 	{
-		SongPlugin song_plugin;
-		kaba::declare_class_size("SongPlugin", sizeof(SongPlugin));
-		kaba::declare_class_element("SongPlugin.session", &SongPlugin::session);
-		kaba::declare_class_element("SongPlugin.song", &SongPlugin::song);
-		kaba::link_external_class_func("SongPlugin.__init__", &SongPlugin::__init__);
-		kaba::link_external_virtual("SongPlugin.__delete__", &SongPlugin::__delete__, &song_plugin);
-		kaba::link_external_virtual("SongPlugin.apply", &SongPlugin::apply, &song_plugin);
-	}
-
-	{
 		TsunamiPlugin tsunami_plugin;
 		kaba::declare_class_size("TsunamiPlugin", sizeof(TsunamiPlugin));
 		//kaba::declare_class_element("TsunamiPlugin.session", &TsunamiPlugin, session);
@@ -905,11 +894,9 @@ void PluginManager::find_plugins() {
 	// "BeatSource"
 	find_plugins_in_dir("PitchDetector", "", ModuleCategory::PITCH_DETECTOR);
 
-	// "All"
-	find_plugins_in_dir("All", "", ModuleCategory::SONG_PLUGIN);
-
 	// rest
 	find_plugins_in_dir("Independent", "Debug", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "File Edit", ModuleCategory::TSUNAMI_PLUGIN);
 	find_plugins_in_dir("Independent", "File Management", ModuleCategory::TSUNAMI_PLUGIN);
 	find_plugins_in_dir("Independent", "File Visualization", ModuleCategory::TSUNAMI_PLUGIN);
 	find_plugins_in_dir("Independent", "Games", ModuleCategory::TSUNAMI_PLUGIN);
@@ -939,11 +926,9 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	add_plugins_in_dir("MidiEffect", m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, [win](const string &name){ win->on_menu_execute_midi_effect(name); });
 	add_plugins_in_dir("MidiSource", m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, [win](const string &name){ win->on_menu_execute_midi_source(name); });
 
-	// "All"
-	add_plugins_in_dir("All", m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, [win](const string &name){ win->on_menu_execute_song_plugin(name); });
-
 	// rest
 	add_plugins_in_dir("Independent/Debug", m->get_sub_menu_by_id("menu_plugins_debug"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/File Edit", m->get_sub_menu_by_id("menu_plugins_file_edit"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("Independent/File Management", m->get_sub_menu_by_id("menu_plugins_file_management"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("Independent/File Visualization", m->get_sub_menu_by_id("menu_plugins_file_visualization"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("Independent/Games", m->get_sub_menu_by_id("menu_plugins_games"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });

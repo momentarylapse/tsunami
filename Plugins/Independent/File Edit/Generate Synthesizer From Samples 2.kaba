@@ -1,24 +1,27 @@
 use tsunami
 use hui
 
-class XXX extends SongPlugin
-	func override apply()
-		if not song.secret_data.has("instruments")
+class XXX extends TsunamiPlugin
+	func override on_start()
+		if not session.song.secret_data.has("instruments")
 			session.e("no sf2 data found")
+			stop()
 			return
 		
 	#	var prog = new ProgressX("generating sound font", session.win)
 		
 
 		print("make")
-		for p in song.secret_data["presets"].as_array()
+		for p in session.song.secret_data["presets"].as_array()
 			import_preset(p)
+		
+		stop()
 		
 	
 	func import_preset(p: any)
 		print("import {{p["name"]}}")
 				
-		var track = song.add_track(SignalType.MIDI, -1)
+		var track = session.song.add_track(SignalType.MIDI, -1)
 		track.set_name(str(p["name"]))
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample Zones")
@@ -45,7 +48,7 @@ class XXX extends SongPlugin
 			#if z.has("vel")
 			#print("P {{z}}")
 				
-			var ii = song.secret_data["instruments"][int(z["instrument"])]
+			var ii = session.song.secret_data["instruments"][int(z["instrument"])]
 			for zz in ii["zones"].as_array()
 				if not zz.has("sample")
 					continue
@@ -54,8 +57,8 @@ class XXX extends SongPlugin
 				int index = int(zz["sample"])
 				int offset = 0
 				for k in 0:index
-					offset += len(song.samples[k].buf)
-				var s = song.samples[index]
+					offset += len(session.song.samples[k].buf)
+				var s = session.song.samples[index]
 				#print("I {{zz}}")
 
 				

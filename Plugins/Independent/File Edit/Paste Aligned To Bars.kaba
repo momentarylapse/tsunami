@@ -6,38 +6,44 @@ func update_bars(out bars: BarCollection)
 		b.offset = offset
 		offset += b.length
 
-class XXX extends SongPlugin
-	func override apply()
+class XXX extends TsunamiPlugin
+	func override on_start()
 		if !clipboard.has_data()
 			session.e("clipboard is empty")
+			stop()
 			return
 		for t in clipboard.temp.tracks
 			if t.type != SignalType.MIDI
 				session.e("can only paste midi")
+				stop()
 				return
 		if len(clipboard.temp.bars) == 0
 			session.e("clipboard doesn't contain any bars")
+			stop()
 			return
-		if len(song.bars) == 0
+		if len(session.song.bars) == 0
 			session.e("song doesn't contain any bars")
+			stop()
 			return
 			
 		var source_layers, target_layers: TrackLayer*[]
 		if !clipboard.prepare_layer_map(session.view, source_layers, target_layers)
+			stop()
 			return
 			
 		update_bars(clipboard.temp.bars)
 
-		song.begin_action_group("paste")
+		session.song.begin_action_group("paste")
 		for ls,i in source_layers
 			paste(session.view.sel.range().offset, ls, target_layers[i])
-		song.end_action_group()
+		session.song.end_action_group()
+		stop()
 	
 	func paste(offset: int, source: TrackLayer, out dest: TrackLayer)
 		int b0 = first_bar(offset)
 		for b,i in clipboard.temp.bars
-			if b0+i < len(song.bars)
-				paste_bar(source, dest, b.range(), song.bars[b0+i].range())
+			if b0+i < len(session.song.bars)
+				paste_bar(source, dest, b.range(), session.song.bars[b0+i].range())
 	
 	func remap(rs: Range, rd: Range, x: int) -> int
 		return rd.offset + float(x - rs.offset) * float(rd.length) / float(rs.length)
@@ -52,7 +58,7 @@ class XXX extends SongPlugin
 		
 		
 	func first_bar(offset: int) -> int
-		for b,i in song.bars
+		for b,i in session.song.bars
 			if b.offset >= offset -100
 				return i
 		return -1

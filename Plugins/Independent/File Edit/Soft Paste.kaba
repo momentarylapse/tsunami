@@ -5,7 +5,7 @@ use tsunami
 func step(t: float) -> float
 	return 1 - 1/(exp((t-0.5)*12) + 1)
 
-class SoftPaste extends SongPlugin
+class SoftPaste extends TsunamiPlugin
 	func soft_paste(source: AudioBuffer, out dest: TrackLayer, r: Range)
 		int l = min(len(source), len(r))
 		AudioBuffer buf
@@ -29,16 +29,18 @@ class SoftPaste extends SongPlugin
 		return true
 		
 	
-	func override apply()
+	func override on_start()
 		if !check_clipboard()
 			session.e("'Soft Paste': needs a single audio track in clipboard!")
+			stop()
 			return
 		if len(session.view.sel.range()) == 0
 			session.e("'Soft Paste': needs some selection!")
+			stop()
 			return
 
 		int n = 0
-		for t in weak(song.tracks)
+		for t in weak(session.song.tracks)
 			if t.type == SignalType.AUDIO
 				for l in weak(t.layers)
 					if session.view.sel.has_layer(l)
@@ -47,4 +49,6 @@ class SoftPaste extends SongPlugin
 
 		if n == 0
 			session.e("'Soft Paste': no selected audio track")
+			stop()
 			return
+		stop()

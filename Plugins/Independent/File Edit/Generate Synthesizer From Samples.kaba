@@ -23,7 +23,7 @@ func get_samples(p: any, i: any) -> int
 
 class PresetDialog extends hui.Dialog
 	var selected: int
-	func __init__(plug: SongPlugin)
+	func __init__(plug: TsunamiPlugin)
 		super.__init__("Presets", 500, 700, plug.session.win, false)
 		set_options("", "headerbar,closebutton=no,resizable")
 		from_source("
@@ -36,8 +36,8 @@ Grid ? ''
 		Button ok 'Ok' default")
 		#for i in plug.song.secret_data["instruments"].as_array()
 		#	dlg.add_string("instrument", "{{i["name"]}}\\{{get_keys(i)}}\\{{get_samples(i)}}")
-		var ii = plug.song.secret_data["instruments"]
-		for p in plug.song.secret_data["presets"].as_array()
+		var ii = plug.session.song.secret_data["instruments"]
+		for p in plug.session.song.secret_data["presets"].as_array()
 			add_string("presets", "{{p["name"]}}\\{{get_instruments(p, ii)}}\\{{get_samples(p, ii)}}")
 		selected = 0
 		set_int("presets", selected)
@@ -52,26 +52,29 @@ Grid ? ''
 		selected = -1
 		destroy()
 
-func choose_preset(plug: SongPlugin, f: int->void)
+func choose_preset(plug: TsunamiPlugin, f: int->void)
 	var dlg = new PresetDialog(plug)
 	var ff = func()
 		f(dlg.selected)
 	hui.fly(dlg, ff)
 
-class XXX extends SongPlugin
-	func override apply()
-		if not song.secret_data.has("instruments")
+class XXX extends TsunamiPlugin
+	func override on_start()
+		if not session.song.secret_data.has("instruments")
 			session.e("no sf2 data found")
+			stop()
 			return
 
 		choose_preset(self, lambda(pre: int) self.set_preset(pre))
+		
+		stop()
 		
 	func set_preset(pre: int)
 		
 	#	var prog = new ProgressX("generating sound font", session.win)
 
 		print("creating track")
-		var track = song.add_track(SignalType.MIDI, 0)
+		var track = session.song.add_track(SignalType.MIDI, 0)
 		print("creating synth")
 		track.synth = CreateSynthesizer(session, "Sample")
 		print("set synth")
@@ -80,10 +83,10 @@ class XXX extends SongPlugin
 		
 
 		print("make")
-		var p = song.secret_data["presets"][pre]
+		var p = session.song.secret_data["presets"][pre]
 		for z in p["zones"].as_array()
 			if z.has("instrument")
-				var ii = song.secret_data["instruments"][int(z["instrument"])]
+				var ii = session.song.secret_data["instruments"][int(z["instrument"])]
 				for zz in ii["zones"].as_array()
 					if not zz.has("sample")
 						continue
@@ -91,7 +94,7 @@ class XXX extends SongPlugin
 						continue
 					int k0 = int(zz["keys"][0])
 					int k1 = int(zz["keys"][1]) + 1
-					var s = song.samples[int(zz["sample"])]
+					var s = session.song.samples[int(zz["sample"])]
 					if zz.has("root-key")
 						s.set_value("pitch", str(zz["root-key"]))
 					if zz.has("start-loop")
@@ -109,7 +112,7 @@ class XXX extends SongPlugin
 							if pitch == root
 								synth.config.samples[pitch] = s.create_ref()
 							else
-								shift(song, synth, weak(s), root, pitch)
+								shift(session.song, synth, weak(s), root, pitch)
 	#							prog.set("pitch shift", 0.2)
 
 	#	prog.set("remove samples", 0.7)

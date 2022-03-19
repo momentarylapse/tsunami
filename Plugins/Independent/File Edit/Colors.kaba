@@ -1,0 +1,40 @@
+use tsunami
+use hui
+
+class XPanel extends ConfigPanel
+	
+	func __init__(m: XX)
+		super.__init__(m)
+		from_source("
+Grid ? '' vertical
+	Button b ''
+	DrawingArea area ''")
+		event_x("area", "hui:draw", on_draw)
+	func on_draw(p: Painter)
+		float w = p.width
+		float h = p.height
+		#color{} cols
+#		print("aaa")
+		(string,color)[] cols
+#		print("aaa2")
+		get_style_colors(self, "b", cols)
+#		print("aaa3")
+#		print(cols.num)
+		#let names = ["base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"]
+		#for k,i in names
+		for c,i in cols
+			p.set_color(c.e1)
+			p.draw_rect(rect(0,w, i*20,i*20 + 20))
+			p.set_color(color.BLACK)
+			p.draw_str([0,i*20], c.e0)
+			p.set_color(color.WHITE)
+			p.draw_str([200,i*20], c.e0)
+#		find_colors(self, "area", cols)
+#		for c,i in cols
+#			p.set_color(c)
+#			p.draw_rect(rect(w/2,w, i*20,i*20 + 20))
+
+class XX extends TsunamiPlugin
+	func override create_panel() -> ConfigPanel*
+		return new XPanel(self)
+		

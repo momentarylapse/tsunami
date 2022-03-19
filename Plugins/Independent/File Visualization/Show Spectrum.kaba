@@ -63,7 +63,7 @@ class SpecGrid extends Grid
 
 class SpectrumDialog extends Dialog
 	var grid: SpecGrid
-	func __init__(plugin: SongPlugin)
+	func __init__(plugin: TsunamiPlugin)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable")
 		from_source("
@@ -90,7 +90,7 @@ Grid ? ''
 	func on_close()
 		destroy()
 
-class ShowSpectrum extends SongPlugin
+class ShowSpectrum extends TsunamiPlugin
 	func show_spec(song: Song)
 		dlg = new SpectrumDialog(self)
 	
@@ -138,10 +138,11 @@ class ShowSpectrum extends SongPlugin
 
 		dlg.on_type()
 
-		hui.fly(dlg, nil)
+		hui.fly(dlg, stop)
 
-	func override apply()
+	func override on_start()
 		if session.view.sel.range().length > 0
-			show_spec(song)
+			show_spec(session.song)
 		else
 			session.e("'Show Spectrum.kaba': Needs some selection!")
+			stop()

@@ -3,12 +3,15 @@ use tsunami
 use os
 
 
-class MAE extends SongPlugin
+class MAE extends TsunamiPlugin
 	
-	func override apply()
+	func override on_start()
+		var song = session.song
 		if len(song.tracks) < 3
+			stop()
 			return
 		if song.tracks[2].type != SignalType.MIDI
+			stop()
 			return
 		float fps = 25
 		float samples_per_frame = song.sample_rate / fps
@@ -16,3 +19,4 @@ class MAE extends SongPlugin
 		for n in song.tracks[2].layers[0].midi
 			f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
 		del f
+		stop()

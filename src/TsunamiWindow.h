@@ -120,7 +120,6 @@ public:
 	void on_menu_execute_audio_source(const string &name);
 	void on_menu_execute_midi_effect(const string &name);
 	void on_menu_execute_midi_source(const string &name);
-	void on_menu_execute_song_plugin(const string &name);
 	void on_menu_execute_tsunami_plugin(const string &name);
 	void on_exit();
 

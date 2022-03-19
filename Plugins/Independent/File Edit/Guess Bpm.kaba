@@ -248,9 +248,9 @@ Grid ? '' vertical
 		grid.redraw()
 
 
-class GuessBpm extends SongPlugin
-	func override apply()
-		for t in weak(song.tracks)
+class GuessBpm extends TsunamiPlugin
+	func override on_start()
+		for t in weak(session.song.tracks)
 			for l in weak(t.layers)
 				for buf in l.buffers
-					hui.fly(new SelfCorrelationDialog(self, buf), nil)
+					hui.fly(new SelfCorrelationDialog(self, buf), stop)

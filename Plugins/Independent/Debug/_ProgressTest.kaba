@@ -2,11 +2,12 @@ use tsunami
 use hui
 use time
 
-class XXX extends SongPlugin
-	func override apply()
+class XXX extends TsunamiPlugin
+	func override on_start()
 		var prog = new ProgressX("generating sound font", session.win)
 		for i in 0:100
 			prog.set("remove samples", i*0.01)
 			sleep(0.2)
 		del prog
+		stop()
 		

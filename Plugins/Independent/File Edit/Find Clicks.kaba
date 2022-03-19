@@ -39,11 +39,12 @@ func unclick(out b: float[], out l: TrackLayer, offset: int)
 		l.add_marker(new TrackMarker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click"))
 		#l.addMarker(clicks[i+1] + offset, "]")
 
-class FindClicks extends SongPlugin
+class FindClicks extends TsunamiPlugin
 
-	func override apply()
-		for t in weak(song.tracks)
+	func override on_start()
+		for t in weak(session.song.tracks)
 			for l in weak(t.layers)
 				for buf in l.buffers
 					for c in buf.c
 						unclick(c, l, buf.offset)
+		stop()

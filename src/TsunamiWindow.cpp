@@ -40,7 +40,6 @@
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
-#include "Plugins/SongPlugin.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
@@ -911,11 +910,6 @@ void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
 	});
-}
-
-void TsunamiWindow::on_menu_execute_song_plugin(const string &name) {
-	auto p = ownify(CreateSongPlugin(session, name));
-	p->apply();
 }
 
 void TsunamiWindow::on_menu_execute_tsunami_plugin(const string &name) {

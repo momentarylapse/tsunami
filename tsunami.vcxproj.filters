@@ -961,9 +961,6 @@
     <ClCompile Include="src\Plugins\ProfileManager.cpp">
       <Filter>src\Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plugins\SongPlugin.cpp">
-      <Filter>src\Plugins</Filter>
-    </ClCompile>
     <ClCompile Include="src\Plugins\TsunamiPlugin.cpp">
       <Filter>src\Plugins</Filter>
     </ClCompile>
@@ -2239,9 +2236,6 @@
       <Filter>src\Plugins</Filter>
     </ClInclude>
     <ClInclude Include="src\Plugins\ProfileManager.h">
-      <Filter>src\Plugins</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Plugins\SongPlugin.h">
       <Filter>src\Plugins</Filter>
     </ClInclude>
     <ClInclude Include="src\Plugins\TsunamiPlugin.h">

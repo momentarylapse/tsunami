@@ -101,10 +101,9 @@ Menu menu ""
 		Menu menu_plugins_midi_effects "Effects"
 		Menu menu_plugins_midi_source "From source"
 		Separator
-		Menu menu_plugins_on_all "On all"
-		Separator
 		Item plugin_independent "Plugins" disabled
 		Menu menu_plugins_debug "Debug"
+		Menu menu_plugins_file_edit "File edit"
 		Menu menu_plugins_file_management "File management"
 		Menu menu_plugins_file_visualization "File visualization"
 		Menu menu_plugins_games "Games"

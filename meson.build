@@ -415,7 +415,6 @@ sources = [
 	'src/Plugins/Plugin.cpp',
 	'src/Plugins/PluginManager.cpp',
 	'src/Plugins/ProfileManager.cpp',
-	'src/Plugins/SongPlugin.cpp',
 	'src/Plugins/TsunamiPlugin.cpp',
 	'src/Storage/Dialog/PdfConfigDialog.cpp',
 	'src/Storage/Dialog/RawConfigDialog.cpp',

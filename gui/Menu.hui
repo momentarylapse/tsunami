@@ -102,7 +102,15 @@ Menu menu ""
 		Menu menu_plugins_midi_source "From source"
 		Separator
 		Menu menu_plugins_on_all "On all"
-		Menu menu_plugins_other "Independent"
+		Separator
+		Item plugin_independent "Plugins" disabled
+		Menu menu_plugins_debug "Debug"
+		Menu menu_plugins_file_management "File management"
+		Menu menu_plugins_file_visualization "File visualization"
+		Menu menu_plugins_games "Games"
+		Menu menu_plugins_practice "Practice"
+		Menu menu_plugins_live_performance "Live performance"
+		Menu menu_plugins_special "Special"
 	Menu menu_help "?"
 		Item help "Help" image=hui:help
 		Item show-log "Messages" image=hui:info

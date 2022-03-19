@@ -1961,7 +1961,7 @@ menu_plugins
 
 7
 0
-16
+24
 Item
 plugin_on_file
 disabled
@@ -2052,10 +2052,58 @@ menu_plugins_on_all
 14
 0
 0
-Menu
-menu_plugins_other
+Separator
+
 
 15
+0
+0
+Item
+plugin_independent
+disabled
+16
+0
+0
+Menu
+menu_plugins_debug
+
+17
+0
+0
+Menu
+menu_plugins_file_management
+
+18
+0
+0
+Menu
+menu_plugins_file_visualization
+
+19
+0
+0
+Menu
+menu_plugins_games
+
+20
+0
+0
+Menu
+menu_plugins_practice
+
+21
+0
+0
+Menu
+menu_plugins_live_performance
+
+22
+0
+0
+Menu
+menu_plugins_special
+
+23
 0
 0
 Menu
@@ -7237,7 +7285,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-647
+654
 # Text
 /bars-add
 Add bars...
@@ -7965,14 +8013,29 @@ From source
 menu/menu_plugins_channels
 Channels
 
+menu/menu_plugins_debug
+Debug
+
 menu/menu_plugins_dynamics
 Dynamics
 
 menu/menu_plugins_echo
 Echo
 
+menu/menu_plugins_file_management
+File management
+
+menu/menu_plugins_file_visualization
+File visualization
+
 menu/menu_plugins_filter
 Filter
+
+menu/menu_plugins_games
+Games
+
+menu/menu_plugins_live_performance
+Live performance
 
 menu/menu_plugins_midi_effects
 Effects
@@ -7983,17 +8046,20 @@ From source
 menu/menu_plugins_on_all
 On all
 
-menu/menu_plugins_other
-Independent
-
 menu/menu_plugins_pitch
 Pitch
+
+menu/menu_plugins_practice
+Practice
 
 menu/menu_plugins_repair
 Repair
 
 menu/menu_plugins_sound
 Sound
+
+menu/menu_plugins_special
+Special
 
 menu/menu_sound
 Sound
@@ -8021,6 +8087,9 @@ Loop
 
 menu/play-toggle
 Play
+
+menu/plugin_independent
+Plugins
 
 menu/plugin_on_file
 On audio buffer

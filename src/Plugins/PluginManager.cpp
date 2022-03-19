@@ -909,7 +909,13 @@ void PluginManager::find_plugins() {
 	find_plugins_in_dir("All", "", ModuleCategory::SONG_PLUGIN);
 
 	// rest
-	find_plugins_in_dir("Independent", "", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "Debug", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "File Management", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "File Visualization", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "Games", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "Live Performance", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "Practice", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("Independent", "Special", ModuleCategory::TSUNAMI_PLUGIN);
 
 	// "Synthesizer"
 	find_plugins_in_dir("Synthesizer", "", ModuleCategory::SYNTHESIZER);
@@ -937,7 +943,13 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	add_plugins_in_dir("All", m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, [win](const string &name){ win->on_menu_execute_song_plugin(name); });
 
 	// rest
-	add_plugins_in_dir("Independent", m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/Debug", m->get_sub_menu_by_id("menu_plugins_debug"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/File Management", m->get_sub_menu_by_id("menu_plugins_file_management"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/File Visualization", m->get_sub_menu_by_id("menu_plugins_file_visualization"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/Games", m->get_sub_menu_by_id("menu_plugins_games"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/Live Performance", m->get_sub_menu_by_id("menu_plugins_live_performance"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/Practice", m->get_sub_menu_by_id("menu_plugins_practice"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("Independent/Special", m->get_sub_menu_by_id("menu_plugins_special"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 }
 
 void PluginManager::apply_profile(Module *c, const string &name, bool notify) {
@@ -1034,7 +1046,7 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 }
 
 Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) {
-	if (type == ModuleCategory::AUDIO_EFFECT) {
+	if ((type == ModuleCategory::AUDIO_EFFECT) or (type == ModuleCategory::TSUNAMI_PLUGIN)) {
 		Array<string> names;
 		for (auto &pf: plugin_files)
 			if (pf.type == type)

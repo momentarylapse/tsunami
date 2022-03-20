@@ -17,6 +17,7 @@
 #include "../AudioView.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
+#include "../../TsunamiWindow.h"
 #include "../../EditModes.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
@@ -25,6 +26,7 @@
 #include "../Dialog/QuestionDialog.h"
 #include "../Graph/AudioViewLayer.h"
 #include "../Graph/AudioViewTrack.h"
+#include "../../Plugins/PluginManager.h"
 
 //int get_track_index_save(Song *song, Track *t);
 
@@ -57,75 +59,77 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	layer = nullptr;
 	enable("track_name", false);
 
-	event("length-whole", [=]{ on_base_length(NoteBaseLength::WHOLE); });
-	event("length-half", [=]{ on_base_length(NoteBaseLength::HALF); });
-	event("length-quarter", [=]{ on_base_length(NoteBaseLength::QUARTER); });
-	event("length-eighth", [=]{ on_base_length(NoteBaseLength::EIGTH); });
-	event("length-sixteenth", [=]{ on_base_length(NoteBaseLength::SIXTEENTH); });
-	event("length-dotted", [=]{ on_length_dotted(); });
-	event("length-triplet", [=]{ on_length_triplet(); });
-	event("length-custom", [=]{ on_length_custom(); });
+	event("length-whole", [this] { on_base_length(NoteBaseLength::WHOLE); });
+	event("length-half", [this] { on_base_length(NoteBaseLength::HALF); });
+	event("length-quarter", [this] { on_base_length(NoteBaseLength::QUARTER); });
+	event("length-eighth", [this] { on_base_length(NoteBaseLength::EIGTH); });
+	event("length-sixteenth", [this] { on_base_length(NoteBaseLength::SIXTEENTH); });
+	event("length-dotted", [this] { on_length_dotted(); });
+	event("length-triplet", [this] { on_length_triplet(); });
+	event("length-custom", [this] { on_length_custom(); });
 
-	event("mode-select", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::SELECT); });
-	event("mode-note", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::NOTE); });
-	event("mode-interval", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL); });
-	event("mode-chord", [=]{ mode->set_creation_mode(ViewModeMidi::CreationMode::CHORD); });
+	event("mode-select", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::SELECT); });
+	event("mode-note", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::NOTE); });
+	event("mode-interval", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL); });
+	event("mode-chord", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::CHORD); });
 
-	event("mode-classical", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::CLASSICAL); });
-	event("mode-tab", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::TAB); });
-	event("mode-linear", [=]{ view->cur_vtrack()->set_midi_mode(MidiMode::LINEAR); });
+	event("mode-classical", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::CLASSICAL); });
+	event("mode-tab", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::TAB); });
+	event("mode-linear", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::LINEAR); });
 
 
-	event("interval", [=]{ on_interval(); });
-	event("chord-major", [=]{ on_chord_type(ChordType::MAJOR); });
-	event("chord-minor", [=]{ on_chord_type(ChordType::MINOR); });
-	event("chord-diminished", [=]{ on_chord_type(ChordType::DIMINISHED); });
-	event("chord-augmented", [=]{ on_chord_type(ChordType::AUGMENTED); });
-	event("chord-major7", [=]{ on_chord_type(ChordType::MAJOR_SEVENTH); });
-	event("chord-minor7", [=]{ on_chord_type(ChordType::MINOR_SEVENTH); });
-	event("chord-minor-major7", [=]{ on_chord_type(ChordType::MINOR_MAJOR_SEVENTH); });
-	event("chord-diminished7", [=]{ on_chord_type(ChordType::DIMINISHED_SEVENTH); });
-	event("chord-dominant7", [=]{ on_chord_type(ChordType::DOMINANT_SEVENTH); });
-	event("chord-diminished7", [=]{ on_chord_type(ChordType::DIMINISHED_SEVENTH); });
-	event("chord-half-diminished7", [=]{ on_chord_type(ChordType::HALF_DIMINISHED_SEVENTH); });
-	event("chord-augmented7", [=]{ on_chord_type(ChordType::AUGMENTED_SEVENTH); });
-	event("chord-augmented-major7", [=]{ on_chord_type(ChordType::AUGMENTED_MAJOR_SEVENTH); });
-	event("chord-inversion-none", [=]{ on_chord_inversion(0); });
-	event("chord-inversion-1", [=]{ on_chord_inversion(1); });
-	event("chord-inversion-2", [=]{ on_chord_inversion(2); });
-	event_x("reference_tracks", "hui:select", [=]{ on_reference_tracks(); });
-	event("modifier-none", [=]{ on_modifier(NoteModifier::NONE); });
-	event("modifier-sharp", [=]{ on_modifier(NoteModifier::SHARP); });
-	event("modifier-flat", [=]{ on_modifier(NoteModifier::FLAT); });
-	event("modifier-natural", [=]{ on_modifier(NoteModifier::NATURAL); });
-	event("input_active", [=]{ on_input_active(); });
-	event("input_capture", [=]{ on_input_capture(); });
-	event("input", [=]{ on_input_source(); });
-	event("input_volume:key", [=]{ on_input_volume(0); });
-	event("input_volume:max", [=]{ on_input_volume(1); });
-	event("quantize", [=]{ on_quantize(); });
-	event("apply_string", [=]{ on_apply_string(); });
-	event("apply_hand_position", [=]{ on_apply_hand_position(); });
-	event("apply_pitch_shift", [=]{ on_apply_pitch_shift(); });
-	event("flag-none", [=]{ on_apply_flags(0); });
-	event("flag-trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
-	event("flag-staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
-	event("flag-tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
-	event("flag-dead", [=]{ on_apply_flags(NOTE_FLAG_DEAD); });
-	event("add_key_change", [=]{ on_add_key_change(); });
-	event("edit_song", [=]{
+	event("interval", [this] { on_interval(); });
+	event("chord-major", [this] { on_chord_type(ChordType::MAJOR); });
+	event("chord-minor", [this] { on_chord_type(ChordType::MINOR); });
+	event("chord-diminished", [this] { on_chord_type(ChordType::DIMINISHED); });
+	event("chord-augmented", [this] { on_chord_type(ChordType::AUGMENTED); });
+	event("chord-major7", [this] { on_chord_type(ChordType::MAJOR_SEVENTH); });
+	event("chord-minor7", [this] { on_chord_type(ChordType::MINOR_SEVENTH); });
+	event("chord-minor-major7", [this] { on_chord_type(ChordType::MINOR_MAJOR_SEVENTH); });
+	event("chord-diminished7", [this] { on_chord_type(ChordType::DIMINISHED_SEVENTH); });
+	event("chord-dominant7", [this] { on_chord_type(ChordType::DOMINANT_SEVENTH); });
+	event("chord-diminished7", [this] { on_chord_type(ChordType::DIMINISHED_SEVENTH); });
+	event("chord-half-diminished7", [this] { on_chord_type(ChordType::HALF_DIMINISHED_SEVENTH); });
+	event("chord-augmented7", [this] { on_chord_type(ChordType::AUGMENTED_SEVENTH); });
+	event("chord-augmented-major7", [this] { on_chord_type(ChordType::AUGMENTED_MAJOR_SEVENTH); });
+	event("chord-inversion-none", [this] { on_chord_inversion(0); });
+	event("chord-inversion-1", [this] { on_chord_inversion(1); });
+	event("chord-inversion-2", [this] { on_chord_inversion(2); });
+	event_x("reference_tracks", "hui:select", [this] { on_reference_tracks(); });
+	event("modifier-none", [this] { on_modifier(NoteModifier::NONE); });
+	event("modifier-sharp", [this] { on_modifier(NoteModifier::SHARP); });
+	event("modifier-flat", [this] { on_modifier(NoteModifier::FLAT); });
+	event("modifier-natural", [this] { on_modifier(NoteModifier::NATURAL); });
+	event("input_active", [this] { on_input_active(); });
+	event("input_capture", [this] { on_input_capture(); });
+	event("input", [this] { on_input_source(); });
+	event("input_volume:key", [this] { on_input_volume(0); });
+	event("input_volume:max", [this] { on_input_volume(1); });
+	event("quantize", [this] { on_quantize(); });
+	event("apply_string", [this] { on_apply_string(); });
+	event("apply_hand_position", [this] { on_apply_hand_position(); });
+	event("apply_pitch_shift", [this] { on_apply_pitch_shift(); });
+	event("action-source", [this] { on_apply_source(); });
+	event("action-effect", [this] { on_apply_effect(); });
+	event("flag-none", [this] { on_apply_flags(0); });
+	event("flag-trill", [this] { on_apply_flags(NOTE_FLAG_TRILL); });
+	event("flag-staccato", [this] { on_apply_flags(NOTE_FLAG_STACCATO); });
+	event("flag-tenuto", [this] { on_apply_flags(NOTE_FLAG_TENUTO); });
+	event("flag-dead", [this] { on_apply_flags(NOTE_FLAG_DEAD); });
+	event("add_key_change", [this] { on_add_key_change(); });
+	event("edit_song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
-	event("edit_track", [=] {
+	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_midi_fx", [=] {
+	event("edit_midi_fx", [session] {
 		session->set_mode(EditMode::DefaultMidiFx);
 	});
-	event("edit_synth", [=] {
+	event("edit_synth", [session] {
 		session->set_mode(EditMode::DefaultTrackSynth);
 	});
-	event("edit_curves", [=] {
+	event("edit_curves", [session] {
 		session->set_mode(EditMode::Curves);
 	});
 }
@@ -473,10 +477,10 @@ void MidiEditorConsole::clear() {
 }
 
 void MidiEditorConsole::on_enter() {
-	session->device_manager->subscribe(this, [=]{ update_input_device_list(); }, session->device_manager->MESSAGE_ANY);
-	view->subscribe(this, [=]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [=]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
-	mode->subscribe(this, [=]{ on_settings_change(); }, mode->MESSAGE_ANY);
+	session->device_manager->subscribe(this, [this] { update_input_device_list(); }, session->device_manager->MESSAGE_ANY);
+	view->subscribe(this, [this] { on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [this] { on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
+	mode->subscribe(this, [this] { on_settings_change(); }, mode->MESSAGE_ANY);
 	set_layer(view->cur_layer());
 }
 
@@ -493,8 +497,8 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 	layer = l;
 	if (layer) {
 
-		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
-		view->cur_vtrack()->subscribe(this, [=]{ update(); }, AudioViewTrack::MESSAGE_ANY);
+		layer->subscribe(this, [this] { on_layer_delete(); }, layer->MESSAGE_DELETE);
+		view->cur_vtrack()->subscribe(this, [this] { update(); }, AudioViewTrack::MESSAGE_ANY);
 
 		/*auto v = view->get_layer(layer);
 		if (v)
@@ -594,6 +598,18 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 
 	}
 	song->end_action_group();
+}
+
+void MidiEditorConsole::on_apply_effect() {
+	PluginManager::choose_module(win, session, ModuleCategory::MIDI_EFFECT, [this] (const string &name) {
+		session->win->on_menu_execute_midi_effect(name);
+	}, "");
+}
+
+void MidiEditorConsole::on_apply_source() {
+	PluginManager::choose_module(win, session, ModuleCategory::MIDI_SOURCE, [this] (const string &name) {
+		session->win->on_menu_execute_midi_source(name);
+	}, "");
 }
 
 void MidiEditorConsole::on_add_key_change() {

@@ -12,6 +12,10 @@ Dialog audio-editor "Audio" width=300 height=516
 				ToggleButton mode-smoothen "" image=audio-mode-smoothen flat big expandx "tooltip=Smoothen out... TODO" ignorefocus
 				ToggleButton mode-clone "" image=audio-mode-clone flat big expandx "tooltip=Copy/paste chunks of audio" ignorefocus
 				ToggleButton mode-rubber "" image=audio-mode-stretch flat big expandx "tooltip=Rubber band stretching" ignorefocus
+		Group group-actions "Operations"
+			Grid ? ""
+				Button action-source "Fill from source..." expandx
+				Button action-effect "Apply effect..." expandx
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

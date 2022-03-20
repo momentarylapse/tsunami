@@ -21,6 +21,8 @@ public:
 	void on_view_cur_layer_change();
 
 	void on_edit_mode(int mode);
+	void on_action_source();
+	void on_action_effect();
 
 	void clear();
 	void set_layer(TrackLayer *t);

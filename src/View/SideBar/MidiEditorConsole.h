@@ -56,6 +56,8 @@ public:
 	void on_apply_flags(int mask);
 	void on_add_key_change();
 	void on_apply_pitch_shift();
+	void on_apply_source();
+	void on_apply_effect();
 
 	void clear();
 	void set_layer(TrackLayer *t);

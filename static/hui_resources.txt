@@ -32,7 +32,7 @@ Grid
 vertical
 0
 0
-4
+5
 Group
 grp-view
 
@@ -105,16 +105,40 @@ image=audio-mode-stretch,flat,big,expandx,ignorefocus
 3
 0
 0
+Group
+group-actions
+
+2
+0
+1
+Grid
+?
+
+0
+0
+2
+Button
+action-source
+expandx
+0
+0
+0
+Button
+action-effect
+expandx
+1
+0
+0
 Label
 ?
 expandy
-2
+3
 0
 0
 Group
 group-edit
 
-3
+4
 0
 1
 Grid
@@ -2491,12 +2515,18 @@ expandx,ignorefocus,disabled
 1
 1
 0
-Group
+Expander
 grp_operations
 
 5
 0
 1
+Grid
+?
+
+0
+0
+2
 Grid
 ?
 homogenousx
@@ -2532,6 +2562,24 @@ add_key_change
 image=midi-set-key,big,ignorefocus
 0
 1
+0
+Grid
+?
+
+0
+1
+2
+Button
+action-source
+expandx
+0
+0
+0
+Button
+action-effect
+expandx
+1
+0
 0
 Expander
 grp_input
@@ -7279,7 +7327,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-654
+659
 # Text
 /bars-add
 Add bars...
@@ -7581,8 +7629,17 @@ Ungroup
 /undo
 Undo
 
+audio-editor/action-effect
+Apply effect...
+
+audio-editor/action-source
+Fill from source...
+
 audio-editor/audio-editor
 Audio
+
+audio-editor/group-actions
+Operations
 
 audio-editor/group-edit
 Edit
@@ -8165,6 +8222,12 @@ Play
 
 menu_fake/stop
 Stop
+
+midi_editor/action-effect
+Apply effect...
+
+midi_editor/action-source
+Fill from source...
 
 midi_editor/add_key_change
 

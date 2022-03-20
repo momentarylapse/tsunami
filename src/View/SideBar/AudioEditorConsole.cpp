@@ -2,6 +2,9 @@
 #include "../Mode/ViewModeEditAudio.h"
 #include "../Graph/AudioViewTrack.h"
 #include "../AudioView.h"
+#include "../../Module/Module.h"
+#include "../../Plugins/PluginManager.h"
+#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 
@@ -12,20 +15,22 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 {
 	from_resource("audio-editor");
 
-	event("mode-peaks", [=]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); update(); });
-	event("mode-spectrum", [=]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); update(); });
+	event("mode-peaks", [this]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); update(); });
+	event("mode-spectrum", [this]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); update(); });
 
-	event("mode-select", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT); });
-	event("mode-smoothen", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN); });
-	event("mode-clone", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE); });
-	event("mode-rubber", [=]{ on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER); });
-	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
-	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
+	event("mode-select", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT); });
+	event("mode-smoothen", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN); });
+	event("mode-clone", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE); });
+	event("mode-rubber", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER); });
+	event("action-source", [this]{ on_action_source(); });
+	event("action-effect", [this]{ on_action_effect(); });
+	event("edit_track", [session]{ session->set_mode(EditMode::DefaultTrack); });
+	event("edit_song", [session]{ session->set_mode(EditMode::DefaultSong); });
 
-	view->mode_edit_audio->subscribe(this, [=] { update(); }, view->mode_edit_audio->MESSAGE_ANY);
+	view->mode_edit_audio->subscribe(this, [this] { update(); }, view->mode_edit_audio->MESSAGE_ANY);
 	update();
 
-	view->subscribe(this, [=]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, [this]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 AudioEditorConsole::~AudioEditorConsole() {
@@ -39,6 +44,18 @@ void AudioEditorConsole::on_view_cur_layer_change() {
 
 void AudioEditorConsole::on_edit_mode(int m) {
 	view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode(m));
+}
+
+void AudioEditorConsole::on_action_source() {
+	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_SOURCE, [this] (const string &name) {
+		session->win->on_menu_execute_audio_source(name);
+	}, "");
+}
+
+void AudioEditorConsole::on_action_effect() {
+	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_EFFECT, [this] (const string &name) {
+		session->win->on_menu_execute_audio_effect(name);
+	}, "");
 }
 
 void AudioEditorConsole::clear() {

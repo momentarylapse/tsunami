@@ -1,0 +1,254 @@
+# Image = hui:media-play
+# Title[Deutsch] = Metronom
+use hui
+use tsunami
+
+enum
+	MODE_CIRCLE
+	MODE_BOUNCE
+	MODE_BOUNCE_WALK
+
+const UPDATE_DT = 1.0 / 50
+const MAX_BACKGROUND_REDNESS = 0.7
+const MOTION_BLUR_COUNT = 20
+
+
+class BlurredDot
+	var pos, pos0: vec2
+	var has_prev = false
+	func move(x: float, y: float)
+		pos0 = pos
+		pos.x = x
+		pos.y = y
+		has_prev = true
+	func jump(x: float, y: float)
+		pos.x = x
+		pos.y = y
+		has_prev = false
+	func draw(p: Painter, c: color, r: float)
+		if has_prev
+			float dt = 1.0 / MOTION_BLUR_COUNT
+			color cc = c
+			cc.a = sqrt(dt)
+			p.set_color(cc)
+			for t in 0.0:1.0:dt
+				float tt = pow(t-0.5, 3)*4+0.5
+				p.draw_circle([pos.x * tt + pos0.x * (1-tt), pos.y * tt + pos0.y * (1-tt)], r)
+		else
+			p.set_color(c)
+			p.draw_circle(pos, r)
+
+class MetronomePanel extends ConfigPanel
+	var override c: Metronome*
+	var source: BeatSource*
+	var chain: SignalChain*
+	#Metronome* metro
+	var fraction_prev: float
+	
+	var fullscreen: bool
+	var allow_blink_background: bool
+	var allow_blink_number: bool
+	var mode: int
+	var popup_menu: Menu*
+	var sr_id = -1
+	
+	var dot: BlurredDot
+	
+	func __init__(session: Session, _source: BeatSource, _chain: SignalChain, _metro: Metronome)
+		super.__init__(_metro)
+		from_source("
+Grid ? '' vertical
+	DrawingArea area ''
+	Expander config 'Beats'")
+
+		#metro = &_metro
+		source = &_source
+		chain = &_chain
+		fraction_prev = 0
+		
+		embed(source.create_panel(), "config", 0, 0)
+		
+		fullscreen = false
+		mode = hui.app_config.get_int("Plugins/Metronome/Mode", MODE_BOUNCE_WALK)
+		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
+		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
+		
+		popup_menu = new Menu(self)
+		popup_menu.add_checkable("Blink background", "blink-background")
+		popup_menu.add_checkable("Blink number", "blink-number")
+		var sub_mode = new Menu(self)
+		sub_mode.add_checkable("Circle", "mode-circle")
+		sub_mode.add_checkable("Bounce", "mode-bounce")
+		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
+		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
+	
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", on_area_left_button_down)
+		event_x("area", "hui:right-button-down", on_area_right_button_down)
+		
+		event("blink-background", on_blink_background)
+		event("blink-number", on_blink_number)
+		event("mode-circle", on_mode_circle)
+		event("mode-bounce", on_mode_bounce)
+		event("mode-bounce-walk", on_mode_bounce_walk)
+		#event("fullscreen", on_fullscreen)
+		
+		expand("config", true)
+		sr_id = hui.run_repeated(UPDATE_DT, on_update)
+	
+	func on_update()
+		redraw("area")
+	
+	func override __delete__()
+		hui.cancel_runner(sr_id)
+		del popup_menu
+	
+	func on_draw(p: Painter)
+		float w = p.width
+		float h = p.height
+		float x0 = w / 2
+		float y0 = h / 2
+		float r = min(x0, y0) * 0.9
+		
+		float beat_fraction = source.beat_fraction()
+		int cur_beat = source.cur_beat()
+		int num_beats = source.beats_per_bar()
+		
+		float closeness = beat_fraction*2-1
+		if beat_fraction < 0.5
+			closeness = 1 - beat_fraction*2
+		float bar_fraction = (cur_beat + beat_fraction) / num_beats
+		
+		# background
+		color bg = colors.background
+		if allow_blink_background
+			bg = color.interpolate(color.RED, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+		p.set_color(bg)
+		p.draw_rect([0, w, 0, h])
+		
+		if mode == MODE_CIRCLE
+			# circle
+			p.set_line_width(r*0.05)
+			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
+			p.set_fill(false)
+			p.draw_circle([x0, y0], r)
+		
+			# top point
+			p.set_fill(true)
+			p.set_color(colors.text_soft3)
+			p.draw_circle([x0, y0 - r], r*0.07)
+		
+			# moving point
+			float t = beat_fraction - 0.5
+			float phi = 2 *pi * (2*t*t*t + t/2)
+			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
+			dot.draw(p, colors.text, r*0.1)
+		else if mode == MODE_BOUNCE
+			float t = beat_fraction
+			dot.move(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r)
+			dot.draw(p, colors.text, r*0.1)
+		else if mode == MODE_BOUNCE_WALK
+			p.set_color(colors.text_soft3)
+			for i in 0:num_beats
+				float tx = loop((i + 0.5)/num_beats, 0, 1)
+				if i == 0
+					p.draw_circle([w * tx, y0 + r], r*0.05)
+				else
+					p.draw_circle([w * tx, y0 + r], r*0.03)
+			
+			float t = beat_fraction
+			float tx = loop(bar_fraction + 0.5/num_beats, 0, 1)
+			if w*tx < dot.pos.x
+				dot.jump(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
+			else
+				dot.move(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
+			dot.draw(p, colors.text, r*0.1)
+		
+		# beat number
+		float fs = r * 0.5
+		if allow_blink_number
+			fs *= (1 + pow(closeness,5) * 0.2)
+		bool paused = false
+		if chain
+			paused = not chain.is_active()
+		if paused
+			p.set_font_size(fs)
+			p.set_color(color.interpolate(colors.grid, colors.background, 0.2))
+			p.draw_str([x0-fs*0.4, y0-fs/2], "⏸")
+		else
+			if cur_beat == 0
+				p.set_color(colors.text)
+			else
+				fs *= 0.8
+				p.set_color(colors.text_soft2)
+			p.set_font_size(fs)
+			p.draw_str([x0-fs*0.4, y0-fs/2], str(cur_beat + 1))
+		
+		fraction_prev = beat_fraction
+	
+	func on_area_left_button_down()
+		if chain
+			if chain.is_active()
+				chain.stop()
+			else
+				chain.start()
+		redraw("area")
+	
+	func on_area_right_button_down()
+		popup_menu.check("blink-background", allow_blink_background)
+		popup_menu.check("blink-number", allow_blink_number)
+		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
+		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
+		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
+		popup_menu.popup(&self)
+	
+	func on_blink_background()
+		allow_blink_background = !allow_blink_background
+		hui.app_config["Plugins/Metronome/AllowBlinkBackground"] = allow_blink_background
+	
+	func on_blink_number()
+		allow_blink_number = !allow_blink_number
+		hui.app_config["Plugins/Metronome/AllowBlinkNumber"] = allow_blink_number
+	
+	func on_mode_circle()
+		mode = MODE_CIRCLE
+		hui.app_config["Plugins/Metronome/Mode"] = mode
+	
+	func on_mode_bounce()
+		mode = MODE_BOUNCE
+		hui.app_config["Plugins/Metronome/Mode"] = mode
+	
+	func on_mode_bounce_walk()
+		mode = MODE_BOUNCE_WALK
+		hui.app_config["Plugins/Metronome/Mode"] = mode
+	
+	#void on_fullscreen()
+#		fullscreen = !fullscreen
+#		set_fullscreen(fullscreen)
+#		#show_control()
+
+class Metronome extends TsunamiPlugin
+	var chain: SignalChain*
+	var source: BeatSource*
+	
+	func override on_start()
+		chain = session.create_signal_chain("metronome")
+		source = chain._add(CreateBeatSource(session, "Complex Metronome"))
+		
+		var beat_midifier = chain.add(Module.Type.PLUMBING, "BeatMidifier")
+		var synth = chain.add(Module.Type.SYNTHESIZER, "")
+		var output = chain.add(Module.Type.STREAM, "AudioOutput")
+		
+		chain.connect(source, 0, beat_midifier, 0)
+		chain.connect(beat_midifier, 0, synth, 0)
+		chain.connect(synth, 0, output, 0)
+		
+		chain.set_buffer_size(1024)
+		#chain.set_update_dt(UPDATE_DT)
+		chain.start()
+
+	func override create_panel() -> ConfigPanel*
+		return new MetronomePanel(session, source, chain, self)
+		
+	func override on_stop()
+		del chain

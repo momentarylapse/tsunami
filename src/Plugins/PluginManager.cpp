@@ -911,22 +911,6 @@ void PluginManager::find_plugins() {
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	hui::Menu *m = win->get_menu();
 
-	// "Buffer"
-	add_plugins_in_dir("AudioEffect/Channels", m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Dynamics", m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Echo", m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Filter", m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Pitch", m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Repair", m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-	add_plugins_in_dir("AudioEffect/Sound", m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, [win](const string &name){ win->on_menu_execute_audio_effect(name); });
-
-	add_plugins_in_dir("AudioSource", m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, [win](const string &name){ win->on_menu_execute_audio_source(name); });
-
-	// "Midi"
-	add_plugins_in_dir("MidiEffect", m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, [win](const string &name){ win->on_menu_execute_midi_effect(name); });
-	add_plugins_in_dir("MidiSource", m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, [win](const string &name){ win->on_menu_execute_midi_source(name); });
-
-	// rest
 	add_plugins_in_dir("Independent/Debug", m->get_sub_menu_by_id("menu_plugins_debug"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("Independent/File Edit", m->get_sub_menu_by_id("menu_plugins_file_edit"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("Independent/File Management", m->get_sub_menu_by_id("menu_plugins_file_management"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });

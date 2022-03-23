@@ -83,18 +83,29 @@ static bool inst_is_arithmetic(Asm::InstID i) {
 }
 
 void BackendX86::correct() {
+	// instead of in-place editing, let's create a backup and a new list from that
+	pre_cmd.ser = cmd.ser;
+	cmd.cmd.exchange(pre_cmd.cmd);
+	// no vregs yet, but temp vars
+	pre_cmd.temp_var = cmd.temp_var;
+	for (auto &t: cmd.temp_var)
+		t.first = t.last = -1;
+
 	cmd.next_cmd_target(0);
 	add_function_intro_params(cur_func);
 
-	correct_parameters_variables_to_memory();
+	correct_parameters_variables_to_memory(cmd);
+	correct_parameters_variables_to_memory(pre_cmd);
 
+	// a bit pointless now (wrong list)
 	serializer->cmd_list_out("x:a", "paramtrafo");
 
 	correct_implement_commands();
+
 	serializer->cmd_list_out("x:b", "post paramtrafo");
 }
 
-void BackendX86::correct_parameters_variables_to_memory() {
+void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 	for (auto &c: cmd.cmd) {
 		for (auto &p: c.p) {
 			if (p.kind == NodeKind::NONE) {
@@ -131,7 +142,6 @@ void BackendX86::correct_parameters_variables_to_memory() {
 
 void BackendX86::implement_return(kaba::SerialNode &c, int i) {
 	auto p = c.p[0];
-	cmd.remove_cmd(i);
 	if (p.kind != NodeKind::NONE) {
 		if (cur_func->effective_return_type->_amd64_allow_pass_in_xmm()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
@@ -192,55 +202,50 @@ void BackendX86::correct_implement_commands() {
 
 	Array<SerialNodeParam> func_params;
 
-	for (int i=0; i<cmd.cmd.num; i++) {
-		auto &c = cmd.cmd[i];
+	for (int _i=0; _i<pre_cmd.cmd.num; _i++) {
+		auto &c = pre_cmd.cmd[_i];
+		cmd.next_cmd_index = cmd.cmd.num;
 		if (c.inst == Asm::InstID::MOV) {
 			int size = c.p[0].type->size;
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
 
 			// mov can only copy these sizes (ignore 2...)
-			if (size != 1 and size != 4 and size != config.pointer_size) {
-				cmd.remove_cmd(i);
+			//if (size != 1 and size != 4 and size != config.pointer_size) {
 				implement_mov_chunk(p1, p2, size);
-				i = cmd.next_cmd_index - 1;
-			}
+			//}
 		} else if (c.inst == Asm::InstID::MOVSX or c.inst == Asm::InstID::MOVZX) {
 			// only  (char <-> int)  or  (int <-> int64)
 			auto inst = c.inst;
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
 //			msg_write("MOVSX " + p1.type->name + " << "+ p2.type->name);
-			cmd.remove_cmd(i);
 			if (p1.type == TypeInt64 and p2.type == TypeInt) {
 				// int64 <- int
-				int reg = find_unused_reg(i, i, p2.type->size);
+				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, p2.type->size);
 				insert_cmd(Asm::InstID::MOV, param_vreg(p2.type, reg), p2);
 				auto preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::InstID::MOVSXD, param_vreg(p1.type, reg, preg_x), param_vreg(p2.type, reg));
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg_x));
 			} else if (p1.type == TypeInt and p2.type == TypeChar) {
 				// int <- char
-				int reg = find_unused_reg(i, i, max(p1.type->size, p2.type->size));
+				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, max(p1.type->size, p2.type->size));
 				auto preg = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(inst, param_vreg(p1.type, reg, preg), p2);
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg));
 			} else {
 				// char <- int
 				// int <- int64
-				int reg = find_unused_reg(i, i, p2.type->size);
+				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, p2.type->size);
 				insert_cmd(Asm::InstID::MOV, param_vreg(p2.type, reg), p2);
 				auto preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg_x));
 			}
-			i = cmd.next_cmd_index - 1;
-
 
 		} else if (c.inst == Asm::InstID::LEA) {
 			auto p0 = c.p[0];
 			auto p1 = c.p[1];
 			if ((p1.kind == NodeKind::LOCAL_MEMORY) or (p1.kind == NodeKind::VAR_TEMP)) {
-				cmd.remove_cmd(i);
 				insert_lea(p0, p1);
 			} else {
 				do_error("illegal reference to " + p1.str(serializer));
@@ -249,7 +254,6 @@ void BackendX86::correct_implement_commands() {
 			auto r = c.p[0];
 			auto p1 = c.p[1];
 			auto p2 = c.p[2];
-			cmd.remove_cmd(i);
 			if (p1.type == TypeInt) {
 				int veax = cmd.add_virtual_reg(Asm::RegID::EAX);
 				int vedx = cmd.add_virtual_reg(Asm::RegID::EDX);
@@ -267,7 +271,6 @@ void BackendX86::correct_implement_commands() {
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt64, vrax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt64, vrdx));
 			}
-			i += 4;
 		} else if (c.inst == Asm::InstID::IDIV) {
 			auto r = c.p[0];
 			auto p1 = c.p[1];
@@ -276,7 +279,6 @@ void BackendX86::correct_implement_commands() {
 				p2 = p1;
 				p1 = r;
 			}
-			cmd.remove_cmd(i);
 			if (p1.type == TypeInt) {
 				int veax = cmd.add_virtual_reg(Asm::RegID::EAX);
 				int vedx = cmd.add_virtual_reg(Asm::RegID::EDX);
@@ -294,53 +296,49 @@ void BackendX86::correct_implement_commands() {
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt64, vrax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt64, vrax));
 			}
-			i += 4;
 		} else if ((c.inst == Asm::InstID::SHL) or (c.inst == Asm::InstID::SHR)) {
 			auto inst = c.inst;
 			auto r = c.p[0];
 			auto p1 = c.p[1];
 			auto p2 = c.p[2];
 			auto type = p1.type;
-			cmd.remove_cmd(i);
 			int vecx;
 			if (type == TypeInt64) {
 				msg_error("shl int64");
 				vecx = cmd.add_virtual_reg(Asm::RegID::RCX);
-			} else
+			} else {
 				vecx = cmd.add_virtual_reg(Asm::RegID::ECX);
+			}
 			insert_cmd(Asm::InstID::MOV, param_vreg(type, vecx), p2);
 			insert_cmd(Asm::InstID::MOV, r, p1);
 			insert_cmd(inst, r, param_vreg(TypeChar, vecx, Asm::RegID::CL));
-			i += 2;
 		} else if (inst_is_arithmetic(c.inst)) {
-			if (c.p[2].kind == NodeKind::NONE)
+			if (c.p[2].kind == NodeKind::NONE) {
+				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 				continue;
+			}
 			auto inst = c.inst;
 			auto r = c.p[0];
 			auto p1 = c.p[1];
 			auto p2 = c.p[2];
 			auto type = p1.type;
-			int reg = find_unused_reg(i, i, type->size);
+			int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, type->size);
 
 			auto t = param_vreg(type, reg);
-			cmd.remove_cmd(i);
 			insert_cmd(Asm::InstID::MOV, t, p1);
 			insert_cmd(inst, t, p2);
 			insert_cmd(Asm::InstID::MOV, r, t);
-			cmd.set_virtual_reg(reg, i, i + 2);
-
-			i += 2;
 		} else if (c.inst == Asm::InstID::CMP) {
 			if (c.p[0].type->size > config.pointer_size and false) {
 				do_error("chunk cmp... currently done by the Serializer!");
 				// chunk cmp
 				auto p1 = c.p[1];
 				auto p2 = c.p[2];
-				cmd.remove_cmd(i);
+				int i0 = cmd.cmd.num;
 
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(serializer->num_labels ++));
 
-				int reg = find_unused_reg(i, i, 1);
+				int reg = find_unused_reg(i0, i0, 1);
 				auto t = param_vreg(TypeBool, reg);
 
 				insert_cmd(Asm::InstID::CMP, param_shift(p1, 0, TypeInt), param_shift(p2, 0, TypeInt));
@@ -350,7 +348,8 @@ void BackendX86::correct_implement_commands() {
 					//insert_cmd(Asm::InstID::SETZ, param_vreg(TypeBool, val));
 					//insert_cmd(Asm::InstID::AND, param_vreg(TypeBool, val));
 				}
-				cmd.set_virtual_reg(reg, i, cmd.next_cmd_index-1);
+			} else {
+				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 			}
 /*			// TODO also check p[0]
 			if (((c.p[1].kind == NodeKind::CONSTANT_BY_ADDRESS) or (c.p[1].kind == NodeKind::IMMEDIATE)) and (c.p[1].type->size == 8)) {
@@ -379,7 +378,6 @@ void BackendX86::correct_implement_commands() {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
 			auto p3 = c.p[2];
-			cmd.remove_cmd(i);
 
 			inst = trafo_inst_float(inst, p1.type);
 			auto inst_mov = (p1.type == TypeFloat64) ? Asm::InstID::MOVSD : Asm::InstID::MOVSS;
@@ -395,60 +393,46 @@ void BackendX86::correct_implement_commands() {
 				insert_cmd(inst, p_xmm0, p3);
 				insert_cmd(inst_mov, p1, p_xmm0);
 			}
-			i += 2;
 		} else if (c.inst == Asm::InstID::UCOMISS) {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			cmd.remove_cmd(i);
 			insert_cmd(Asm::InstID::MOVSS, p_xmm0, p1);
 			insert_cmd(Asm::InstID::UCOMISS, p_xmm0, p2);
-			i ++;
 		} else if (c.inst == Asm::InstID::CVTSI2SS) {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			cmd.remove_cmd(i);
 			insert_cmd(Asm::InstID::CVTSI2SS, p_xmm0, p2);
 			insert_cmd(Asm::InstID::MOVSS, p1, p_xmm0);
-			i ++;
 		} else if (c.inst == Asm::InstID::CVTTSS2SI) {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			cmd.remove_cmd(i);
 			int veax = cmd.add_virtual_reg(Asm::RegID::EAX);
 			insert_cmd(Asm::InstID::MOVSS, p_xmm0, p2);
 			insert_cmd(Asm::InstID::CVTTSS2SI, param_vreg(TypeInt, veax), p_xmm0);
 			insert_cmd(Asm::InstID::MOV, p1, param_vreg(TypeInt, veax));
-			i += 2;
 
 		} else if (c.inst == Asm::InstID::CVTSS2SD) {
 			// f32 -> f64
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			cmd.remove_cmd(i);
 			int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
 			insert_cmd(Asm::InstID::CVTSS2SD, p_xmm0, p2);
 			insert_cmd(Asm::InstID::MOVSD, p1, p_xmm0);
-			i += 1;
 		} else if (c.inst == Asm::InstID::CVTSD2SS) {
 			// f64 -> f32
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			cmd.remove_cmd(i);
 			int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
 			insert_cmd(Asm::InstID::CVTSD2SS, p_xmm0, p2);
 			insert_cmd(Asm::InstID::MOVSS, p1, p_xmm0);
-			i += 1;
 		} else if (c.inst == Asm::InstID::PUSH) {
 			func_params.add(c.p[0]);
-			cmd.remove_cmd(i);
-			i --;
 		} else if ((c.inst == Asm::InstID::CALL) or (c.inst == Asm::InstID::CALL_MEMBER)) {
 
 			if (c.p[1].type == TypeFunctionCodeP) {
 				//do_error("indirect call...");
 				auto fp = c.p[1];
 				auto ret = c.p[0];
-				cmd.remove_cmd(i);
 				add_pointer_call(fp, func_params, ret, (c.inst == Asm::InstID::CALL));
 //			} else if (is_typed_function_pointer(c.p[1].type)) {
 //				do_error("BACKEND: POINTER CALL");
@@ -456,14 +440,13 @@ void BackendX86::correct_implement_commands() {
 				//func_params.add(c.p[0]);
 				auto *f = ((Function*)c.p[1].p);
 				auto ret = c.p[0];
-				cmd.remove_cmd(i);
 				add_function_call(f, func_params, ret);
 			}
 			func_params.clear();
-			i = cmd.next_cmd_index - 1;
 		} else if (c.inst == Asm::InstID::RET) {
-			implement_return(c, i);
-			i = cmd.next_cmd_index - 1;
+			implement_return(c, cmd.cmd.num);
+		} else {
+			insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 		}
 	}
 }
@@ -623,12 +606,10 @@ void BackendX86::insert_lea(const SerialNodeParam &p1, const SerialNodeParam &p2
 		int r = cmd.add_virtual_reg(Asm::RegID::RAX);
 		insert_cmd(Asm::InstID::LEA, param_vreg(TypeReg64, r), p2);
 		insert_cmd(Asm::InstID::MOV, p1, param_vreg(TypeReg64, r));
-		cmd.set_virtual_reg(r, cmd.next_cmd_index-2, cmd.next_cmd_index-1);
 	} else {
 		int r = cmd.add_virtual_reg(Asm::RegID::EAX);
 		insert_cmd(Asm::InstID::LEA, param_vreg(TypeReg32, r), p2);
 		insert_cmd(Asm::InstID::MOV, p1, param_vreg(TypeReg32, r));
-		cmd.set_virtual_reg(r, cmd.next_cmd_index-2, cmd.next_cmd_index-1);
 	}
 }
 

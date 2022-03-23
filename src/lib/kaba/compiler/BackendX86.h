@@ -21,7 +21,7 @@ public:
 	void process(Function *f, int index) override;
 
 	void correct() override;
-	void correct_parameters_variables_to_memory();
+	void correct_parameters_variables_to_memory(CommandList &cmd);
 
 	virtual void correct_implement_commands();
 	virtual void implement_return(kaba::SerialNode &c, int i);
@@ -37,6 +37,9 @@ public:
 	SerialNodeParam p_rax;
 	SerialNodeParam p_ax, p_al, p_al_bool, p_al_char;
 	SerialNodeParam p_xmm0, p_xmm1;
+
+
+	CommandList pre_cmd;
 
 
 	//static int reg_resize(int reg, int size);

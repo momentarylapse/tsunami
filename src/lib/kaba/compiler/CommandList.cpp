@@ -26,9 +26,9 @@ TempVar::TempVar() {
 }
 
 void TempVar::use(int _first, int _last) {
-	if ((first < 0) or ((first >= 0) and (first > _first)))
+	if ((first < 0) or (first > _first))
 		first = _first;
-	if ((last < 0) or ((last >= 0) and (last > _last)))
+	if ((last < 0) or (last < _last))
 		last = _last;
 }
 

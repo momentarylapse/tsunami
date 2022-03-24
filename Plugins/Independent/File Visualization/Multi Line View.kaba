@@ -45,7 +45,7 @@ class MyDialog extends hui.Dialog
 					SpinButton track-space '{{track_space}}' range=0:2:0.01
 					---|
 					Label l-x-scale 'Horizontal scale'
-					SpinButton x-scale '{{x_scale}}' range=0:10:0.01
+					SpinButton x-scale '{{x_scale}}' range=0.01:10:0.01
 					---|
 					CheckBox allow-shadows 'Shadows'
 				---|
@@ -102,11 +102,11 @@ class MyDialog extends hui.Dialog
 		if y_offset_t >= 0
 			return
 		float y0 = sample_to_screen(s).y
-		float dy_max = area.height() * 0.3 + 100
+		float dy = mlp.get_line_dy()
 		if y0 < 0
-			set_scroll_target(y0)
-		else if y0 >= area.y2 - dy_max
-			set_scroll_target(y_offset + (y0 - area.y2 + dy_max))
+			set_scroll_target(y_offset + y0)
+		else if y0 + dy*2 > area.y2
+			set_scroll_target(y_offset + (y0 + min(dy*2 - area.y2, 0.0)))
 		
 	func set_scroll_target(y: float)
 		#y_offset = y
@@ -152,7 +152,8 @@ class MyDialog extends hui.Dialog
 	
 	func on_scroll()
 		var e = hui.get_event()
-		y_offset = clamp(y_offset + e.scroll.y*20, 0.0, 100000)
+		var speed = session.view.mouse_wheel_speed #float(hui.config["View.MouseWheelSpeed"])
+		y_offset = clamp(y_offset + e.scroll.y*20*speed, 0.0, 100000)
 		redraw("area")
 	
 	func on_click()
@@ -161,13 +162,13 @@ class MyDialog extends hui.Dialog
 	
 	func screen_to_sample(pos: vec2) -> int
 		for y0,i in line_y0[:-1]
-			if pos.y > y0 and pos.y < line_y0[i+1]
+			if pos.y >= y0 and pos.y < line_y0[i+1]
 				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area.width() - 2*border)
 		return -1
 	
 	func sample_to_screen(s: int) -> vec2
 		for s0,i in line_samples[:-1]
-			if s > s0 and s < line_samples[i+1]
+			if s >= s0 and s < line_samples[i+1]
 				return [0,line_y0[i]] # X: TODO
 		return [0,0]
 		
@@ -184,7 +185,7 @@ class MyDialog extends hui.Dialog
 				conf.add(dyn({"index":i, "classical":true}))
 			else if track_mode[i*2+1]
 				conf.add(dyn({"index":i, "tab":true}))
-		mlp.set_context(conf, p.width, 44100*p.width/300 / x_scale)
+		mlp.set_context(conf, p.width, 44100*p.width/180 / x_scale)
 		mlp.set(dyn({"border": border,
 			"line-height": line_height,
 			"line-space": line_height * line_space,
@@ -197,7 +198,7 @@ class MyDialog extends hui.Dialog
 		var dy = mlp.get_line_dy()
 		line_samples.clear()
 		line_y0.clear()
-		while offset < session.song.range().end() and y0 < p.height
+		while offset < session.song.range().end()
 			line_samples.add(offset)
 			line_y0.add(y0)
 			var s0 = offset

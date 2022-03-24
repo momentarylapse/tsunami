@@ -576,6 +576,7 @@ class AudioView extends Object
 	var signal_chain: SignalChain*
 	var output_stream: AudioOutput*
 	var cam: ViewPort
+	var mouse_wheel_speed: float
 	func extern subscribe(handler: Object, f: void->void, message: string)
 	func extern unsubscribe(handler: Object)
 	func extern prepare_playback(r: Range, allow_loop: bool)

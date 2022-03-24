@@ -676,6 +676,7 @@ void PluginManager::link_app_data() {
 	kaba::declare_class_size("AudioView", sizeof(AudioView));
 	kaba::declare_class_element("AudioView.cam", &AudioView::cam);
 	kaba::declare_class_element("AudioView.sel", &AudioView::sel);
+	kaba::declare_class_element("AudioView.mouse_wheel_speed", &AudioView::mouse_wheel_speed);
 	kaba::declare_class_element("AudioView.renderer", &AudioView::renderer);
 	kaba::declare_class_element("AudioView.signal_chain", &AudioView::signal_chain);
 	kaba::declare_class_element("AudioView.output_stream", &AudioView::output_stream);

@@ -1009,7 +1009,7 @@ void MidiPainter::set_shift(int _shift) {
 void MidiPainter::set_quality(float q, bool antialiasing) {
 	quality.factor = q;
 	quality.rhythm_zoom_min = 40 / q / song->sample_rate;
-	quality.notes_zoom_min = 20 / q / song->sample_rate;
+	quality.notes_zoom_min = 2 / q / song->sample_rate;
 	quality.shadow_threshold = rr*4.0f / q;
 	quality.note_circle_threshold = 6 / q;
 	quality.tab_text_threshold = rr/4 / q;

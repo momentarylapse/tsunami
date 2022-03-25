@@ -108,7 +108,7 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : hui::P
 
 	pad = new ScrollPad();
 	pad->align.dz = 5;
-	graph = scenegraph::SceneGraph::create_integrated(this, "area", pad, "SignalEditor", [=] (Painter *p) {
+	graph = scenegraph::SceneGraph::create_integrated(this, "area", pad, "SignalEditor", [this] (Painter *p) {
 		p->set_font_size(theme.FONT_SIZE);
 		graph->update_geometry_recursive(p->area());
 		pad->_update_scrolling();
@@ -136,41 +136,46 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : hui::P
 	graph->add_child(new SignalEditorPlayButton(this));
 	graph->add_child(new SignalEditorStopButton(this));
 
-	event_x("area", "hui:key-down", [=]{ on_key_down(); });
+	event_x("area", "hui:key-down", [this] { on_key_down(); });
 
 
-	event("signal_chain_add_audio_source", [=]{ on_add(ModuleCategory::AUDIO_SOURCE); });
-	event("signal_chain_add_audio_effect", [=]{ on_add(ModuleCategory::AUDIO_EFFECT); });
-	event("signal_chain_add_stream", [=]{ on_add(ModuleCategory::STREAM); });
-	event("signal_chain_add_plumbing", [=]{ on_add(ModuleCategory::PLUMBING); });
-	event("signal_chain_add_audio_visualizer", [=]{ on_add(ModuleCategory::AUDIO_VISUALIZER); });
-	event("signal_chain_add_midi_source", [=]{ on_add(ModuleCategory::MIDI_SOURCE); });
-	event("signal_chain_add_midi_effect", [=]{ on_add(ModuleCategory::MIDI_EFFECT); });
-	event("signal_chain_add_synthesizer", [=]{ on_add(ModuleCategory::SYNTHESIZER); });
-	event("signal_chain_add_pitch_detector", [=]{ on_add(ModuleCategory::PITCH_DETECTOR); });
-	event("signal_chain_add_beat_source", [=]{ on_add(ModuleCategory::BEAT_SOURCE); });
-	event("signal_chain_reset", [=]{ on_reset(); });
-	event("signal_chain_activate", [=]{ on_activate(); });
-	event("signal_chain_delete", [=]{ on_delete(); });
-	event("signal_chain_save", [=]{ on_save(); });
-	event("signal_module_delete", [=]{ on_module_delete(); });
-	event("signal_module_configure", [=]{ on_module_configure(); });
+	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
+	event("signal_chain_add_audio_effect", [this] { on_add(ModuleCategory::AUDIO_EFFECT); });
+	event("signal_chain_add_stream", [this] { on_add(ModuleCategory::STREAM); });
+	event("signal_chain_add_plumbing", [this] { on_add(ModuleCategory::PLUMBING); });
+	event("signal_chain_add_audio_visualizer", [this] { on_add(ModuleCategory::AUDIO_VISUALIZER); });
+	event("signal_chain_add_midi_source", [this] { on_add(ModuleCategory::MIDI_SOURCE); });
+	event("signal_chain_add_midi_effect", [this] { on_add(ModuleCategory::MIDI_EFFECT); });
+	event("signal_chain_add_synthesizer", [this] { on_add(ModuleCategory::SYNTHESIZER); });
+	event("signal_chain_add_pitch_detector", [this] { on_add(ModuleCategory::PITCH_DETECTOR); });
+	event("signal_chain_add_beat_source", [this] { on_add(ModuleCategory::BEAT_SOURCE); });
+	event("signal_chain_reset", [this] { on_reset(); });
+	event("signal_chain_activate", [this] { on_activate(); });
+	event("signal_chain_delete", [this] { on_delete(); });
+	event("signal_chain_save", [this] { on_save(); });
+	event("signal_module_delete", [this] { on_module_delete(); });
+	event("signal_module_configure", [this] { on_module_configure(); });
 
-	event("signal_chain_new", [=]{ editor->on_new(); });
-	event("signal_chain_load", [=]{ editor->on_load(); });
+	event("signal_chain_new", [this] { editor->on_new(); });
+	event("signal_chain_load", [this] { editor->on_load(); });
 
-	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_STATE_CHANGE);
-	//chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
-	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_DELETE_CABLE);
-	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_DELETE_MODULE);
-	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_CABLE);
-	chain->subscribe(this, [=]{ on_chain_update(); }, chain->MESSAGE_ADD_MODULE);
-	chain->subscribe(this, [=]{ on_chain_delete(); }, chain->MESSAGE_DELETE);
+	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_STATE_CHANGE);
+	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
+	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_DELETE_CABLE);
+	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_DELETE_MODULE);
+	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_ADD_CABLE);
+	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_ADD_MODULE);
+	chain->subscribe(this, [this] { on_chain_delete(); }, chain->MESSAGE_DELETE);
+
+	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
+	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
 
 	on_chain_update();
 }
 SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
+	delete menu_chain;
+	delete menu_module;
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {
@@ -268,11 +273,11 @@ void SignalEditorTab::on_chain_delete() {
 }
 
 void SignalEditorTab::popup_chain() {
-	editor->menu_chain->open_popup(this);
+	menu_chain->open_popup(this);
 }
 
 void SignalEditorTab::popup_module() {
-	editor->menu_module->open_popup(this);
+	menu_module->open_popup(this);
 }
 
 void SignalEditorTab::on_key_down() {
@@ -290,7 +295,7 @@ void SignalEditorTab::on_delete() {
 		session->e(_("not allowed to delete the main signal chain"));
 		return;
 	}
-	hui::run_later(0.001f, [=](){ chain->unregister(); });
+	hui::run_later(0.001f, [this] { chain->unregister(); });
 }
 
 

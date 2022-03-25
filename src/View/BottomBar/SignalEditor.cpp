@@ -35,9 +35,6 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 	//add_label("!bold,center,big,expandx", 0, 0, "config-label");
 	//add_label("!bold,center,expandx", 0, 1, "message");
 
-	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
-	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
-
 	config_module = nullptr;
 	config_panel = nullptr;
 
@@ -55,8 +52,6 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 SignalEditor::~SignalEditor() {
 	session->unsubscribe(this);
 	show_config(nullptr);
-	delete menu_chain;
-	delete menu_module;
 }
 
 void SignalEditor::add_chain(SignalChain *c) {

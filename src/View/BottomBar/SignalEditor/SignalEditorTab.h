@@ -68,5 +68,6 @@ public:
 	void popup_chain();
 	void popup_module();
 
+	hui::Menu *menu_chain, *menu_module;
 };
 

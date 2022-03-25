@@ -14,9 +14,6 @@
 class Painter;
 class SignalChain;
 class Module;
-namespace hui {
-	class Menu;
-}
 class SignalEditorTab;
 class ModulePanel;
 
@@ -41,8 +38,6 @@ public:
 	ModulePanel *config_panel;
 
 	void show_config(Module *m);
-
-	hui::Menu *menu_chain, *menu_module;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_SIGNALEDITOR_H_ */

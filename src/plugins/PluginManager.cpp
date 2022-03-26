@@ -406,7 +406,8 @@ void PluginManager::link_app_data() {
 	kaba::declare_class_element("Synthesizer.events", &Synthesizer::events);
 	kaba::declare_class_element("Synthesizer.keep_notes", &Synthesizer::keep_notes);
 	kaba::declare_class_element("Synthesizer.active_pitch", &Synthesizer::active_pitch);
-	kaba::_declare_class_element("Synthesizer.freq", _offsetof(Synthesizer, tuning.freq));
+	kaba::declare_class_element("Synthesizer.temperament", &Synthesizer::temperament);
+	kaba::_declare_class_element("Synthesizer.freq", _offsetof(Synthesizer, temperament.freq));
 	kaba::declare_class_element("Synthesizer.delta_phi", &Synthesizer::delta_phi);
 	kaba::declare_class_element("Synthesizer.auto_generate_stereo", &Synthesizer::auto_generate_stereo);
 	kaba::declare_class_element("Synthesizer.render_by_ref", &Synthesizer::render_by_ref);

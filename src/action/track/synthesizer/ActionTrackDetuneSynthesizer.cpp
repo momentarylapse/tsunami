@@ -11,14 +11,13 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <assert.h>
 
-ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, const float _tuning[MAX_PITCH]) {
+ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, const Temperament &_temp) {
 	track = t;
-	memcpy(tuning, _tuning, sizeof(tuning));
+	temperament = _temp;
 }
 
 void *ActionTrackDetuneSynthesizer::execute(Data *d) {
-	for (int i=0; i<MAX_PITCH; i++)
-		std::swap(track->synth->tuning.freq[i], tuning[i]);
+	std::swap(track->synth->temperament, temperament);
 	track->synth->update_delta_phi();
 
 	track->synth->notify();

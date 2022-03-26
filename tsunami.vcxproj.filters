@@ -286,6 +286,9 @@
     <ClCompile Include="src\data\midi\Scale.cpp">
       <Filter>src\data\midi</Filter>
     </ClCompile>
+    <ClCompile Include="src\data\midi\Temperament.cpp">
+      <Filter>src\data\midi</Filter>
+    </ClCompile>
     <ClCompile Include="src\data\rhythm\Bar.cpp">
       <Filter>src\data\rhythm</Filter>
     </ClCompile>
@@ -1638,6 +1641,9 @@
     <ClInclude Include="src\data\midi\Scale.h">
       <Filter>src\data\midi</Filter>
     </ClInclude>
+    <ClInclude Include="src\data\midi\Temperament.h">
+      <Filter>src\data\midi</Filter>
+    </ClInclude>
     <ClInclude Include="src\data\rhythm\Bar.h">
       <Filter>src\data\rhythm</Filter>
     </ClInclude>
@@ -2827,6 +2833,9 @@
     </Filter>
     <Filter Include="src\view\painter">
       <UniqueIdentifier>{106A5BF9-33C0-59E2-56F0-CCB558FE74A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\view\painter\midi">
+      <UniqueIdentifier>{532A59C2-0EE6-C046-010F-20910CCA0EC6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\view\sidebar">
       <UniqueIdentifier>{787FC2F7-36B6-69E1-F134-22AD72BE1C28}</UniqueIdentifier>

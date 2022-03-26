@@ -35,7 +35,7 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 	add_string("preset", "1/3 comma meantone");
 	add_string("preset", "Pythagorean");
 	add_string("preset", "5 limit diatonic major");
-	if (s->tuning.is_default())
+	if (s->temperament.is_default())
 		set_int("preset", 1);
 	else
 		set_int("preset", 0);
@@ -120,9 +120,9 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	p->set_line_width(2.0f);
 	p->set_color(theme.capture_marker);
 	for (int i=0; i<N; i++) {
-		float y = pitch2y(freq_to_pitch(synth->tuning.freq[i]));
+		float y = pitch2y(freq_to_pitch(synth->temperament.freq[i]));
 		if (mode_relative) {
-			y = relpitch2y(freq_to_pitch(synth->tuning.freq[i]), i);
+			y = relpitch2y(freq_to_pitch(synth->temperament.freq[i]), i);
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
@@ -137,7 +137,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 			p->draw_str({20, 17}, rel_pitch_name(pitch_to_rel(hover)));
 		else
 			p->draw_str({20, 17}, pitch_name(hover));
-		p->draw_str({70, 17}, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
+		p->draw_str({70, 17}, format("%+.2f semi tones", freq_to_pitch(synth->temperament.freq[hover]) - hover));
 	}
 }
 
@@ -171,14 +171,14 @@ float DetuneSynthesizerDialog::y2relpitch(float y, float p0) {
 
 void DetuneSynthesizerDialog::on_left_button_down() {
 	if (hover >= 0) {
-		auto tuning = track->synth->tuning;
+		auto tuning = track->synth->temperament;
 		if (mode_relative) {
 			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
 		} else {
 			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::get_event()->m.y));
 		}
 		set_int("preset", 0);
-		track->detune_synthesizer(tuning.freq);
+		track->detune_synthesizer(tuning);
 		redraw("detune_area");
 	}
 }
@@ -203,7 +203,7 @@ void DetuneSynthesizerDialog::on_mouse_wheel() {
 	if (hover >= 0) {
 		auto e = hui::get_event();
 		float speed = mode_relative ? 0.01f : 0.1f;
-		auto tuning = track->synth->tuning;
+		auto tuning = track->synth->temperament;
 		if (e->scroll.y != 0) {
 			float dpitch = speed * e->scroll.y;
 			if (all_octaves) {
@@ -213,7 +213,7 @@ void DetuneSynthesizerDialog::on_mouse_wheel() {
 				tuning.freq[hover] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
 			}
 			set_int("preset", 0);
-			track->detune_synthesizer(tuning.freq);
+			track->detune_synthesizer(tuning);
 		}
 		redraw("detune_area");
 	}
@@ -227,55 +227,14 @@ void DetuneSynthesizerDialog::on_relative() {
 void DetuneSynthesizerDialog::on_all_octaves() {
 	all_octaves = is_checked("all_octaves");
 	if (all_octaves) {
-		auto tuning = track->synth->tuning;
-		if (!tuning.has_equal_octaves()) {
+		auto temperament = track->synth->temperament;
+		if (!temperament.has_equal_octaves()) {
 			for (int i=12; i<MAX_PITCH; i++)
-				tuning.freq[i] = tuning.freq[i % 12] * pow(2.0f, float(i/12));
-			track->detune_synthesizer(tuning.freq);
+				temperament.freq[i] = temperament.freq[i % 12] * pow(2.0f, float(i/12));
+			track->detune_synthesizer(temperament);
 		}
 	}
 	redraw("detune_area");
-}
-
-void apply_temperment(Synthesizer::Tuning &tuning, int n, int pitch_ref, float freq_ref) {
-	if (n == 0) {
-		// 12 TET
-		tuning.set_default();
-	} else if (n == 1) {
-		// 1/4 meantone
-		float x = pow(5.0f, 0.25f); // 5th
-		float y = 5.0f / 4.0f; // 3rd = x^4/4
-		float factor[12] = {1.0f, 8.0f/pow(x,5.0f), x*x/2, 4.0f/pow(x,3.0f), y, 2.0f/x, pow(x,6.0f)/8.0f, x, 2.0f/y, pow(x,3.0f)/2.0f, 4.0f/x/x, pow(x,5.0f)/4.0f};
-		for (int i=0; i<MAX_PITCH; i++) {
-			int rel = loop(i - pitch_ref, 0, 12);
-			tuning.freq[i] = freq_ref * factor[rel] * pow(2.0f, float(i - rel - pitch_ref) / 12.0f);
-		}
-	} else if (n == 2) {
-		// 1/3 meantone  TODO
-		float x = pow(5.0f, 0.25f); // 5th
-		float y = 5.0f / 4.0f; // 3rd = x^4/4
-		float factor[12] = {1.0f, 8.0f/pow(x,5.0f), x*x/2, 4.0f/pow(x,3.0f), y, 2.0f/x, pow(x,6.0f)/8.0f, x, 2.0f/y, pow(x,3.0f)/2.0f, 4.0f/x/x, pow(x,5.0f)/4.0f};
-		for (int i=0; i<MAX_PITCH; i++) {
-			int rel = loop(i - pitch_ref, 0, 12);
-			tuning.freq[i] = freq_ref * factor[rel] * pow(2.0f, float(i - rel - pitch_ref) / 12.0f);
-		}
-	} else if (n == 3) {
-		// pythagoras
-		float x = 1.5f; // 5th
-		float y = pow(x,4.0f) / 4.0f; // 3rd = x^4/4
-		float factor[12] = {1.0f, 8.0f/pow(x,5.0f), x*x/2, 4.0f/pow(x,3.0f), y, 2.0f/x, pow(x,6.0f)/8.0f, x, 2.0f/y, pow(x,3.0f)/2.0f, 4.0f/x/x, pow(x,5.0f)/4.0f};
-		for (int i=0; i<MAX_PITCH; i++) {
-			int rel = loop(i - pitch_ref, 0, 12);
-			tuning.freq[i] = freq_ref * factor[rel] * pow(2.0f, float(i - rel - pitch_ref) / 12.0f);
-		}
-	} else if (n == 4) {
-		// 5 limit
-		float factor[12] = {1.0f, sqrt(9.0f/8.0f), 9.0f/8.0f, sqrt(45.0f/32.0f), 5.0f/4.0f, 4.0f/3.0f, sqrt(2.0f), 3.0f/2.0f, sqrt(15.0f/6.0f), 5.0f/3.0f, sqrt(75.0f/24.0f), 15.0f/8.0f};
-		for (int i=0; i<MAX_PITCH; i++) {
-			int rel = loop(i - pitch_ref, 0, 12);
-			tuning.freq[i] = freq_ref * factor[rel] * pow(2.0f, float(i - rel - pitch_ref) / 12.0f);
-		}
-	}
 }
 
 void DetuneSynthesizerDialog::apply_preset() {
@@ -287,9 +246,8 @@ void DetuneSynthesizerDialog::apply_preset() {
 	int pitch_ref = get_int("reference-pitch");
 	float freq_ref = pitch_to_freq(pitch_ref);
 
-	auto tuning = track->synth->tuning;
-	apply_temperment(tuning, n-1, pitch_ref, freq_ref);
-	track->detune_synthesizer(tuning.freq);
+	auto tuning = Temperament::create((TemperamentType)n, pitch_ref, freq_ref);
+	track->detune_synthesizer(tuning);
 	redraw("detune_area");
 }
 

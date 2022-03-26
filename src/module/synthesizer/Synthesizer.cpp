@@ -86,7 +86,7 @@ Synthesizer::Synthesizer() :
 	auto_generate_stereo = false;
 	render_by_ref = true;
 
-	tuning.set_default();
+	temperament = Temperament::create_default();
 
 	set_sample_rate(DEFAULT_SAMPLE_RATE);
 }
@@ -99,25 +99,6 @@ void Synthesizer::__delete__() {
 	this->Synthesizer::~Synthesizer();
 }
 
-void Synthesizer::Tuning::set_default() {
-	for (int p=0; p<MAX_PITCH; p++)
-		freq[p] = pitch_to_freq((float)p);
-}
-
-bool Synthesizer::Tuning::is_default() const {
-	for (int p=0; p<MAX_PITCH; p++)
-		if (fabs(freq[p] - pitch_to_freq((float)p)) > 0.01f)
-			return false;
-	return true;
-}
-
-bool Synthesizer::Tuning::has_equal_octaves() const {
-	for (int p=12; p<MAX_PITCH; p++)
-		if (fabs(freq[p] - freq[p % 12] * pow(2.0f, float(p/12))) > 0.01f)
-			return false;
-	return true;
-}
-
 void Synthesizer::set_sample_rate(int _sample_rate) {
 	sample_rate = _sample_rate;
 
@@ -127,7 +108,7 @@ void Synthesizer::set_sample_rate(int _sample_rate) {
 
 void Synthesizer::update_delta_phi() {
 	for (int p=0; p<MAX_PITCH; p++)
-		delta_phi[p] = tuning.freq[p] * 2.0f * pi / sample_rate;
+		delta_phi[p] = temperament.freq[p] * 2.0f * pi / sample_rate;
 }
 
 void Synthesizer::set_instrument(Instrument &i) {
@@ -233,7 +214,7 @@ void Synthesizer::reset_state() {
 }
 
 bool Synthesizer::is_default() {
-	return (module_class == "Dummy") and (tuning.is_default());
+	return (module_class == "Dummy") and temperament.is_default();
 }
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name) {

@@ -190,6 +190,7 @@ sources = [
 	'src/data/midi/MidiEvent.cpp',
 	'src/data/midi/MidiNote.cpp',
 	'src/data/midi/Scale.cpp',
+	'src/data/midi/Temperament.cpp',
 	'src/data/rhythm/Bar.cpp',
 	'src/data/rhythm/BarCollection.cpp',
 	'src/data/rhythm/Beat.cpp',

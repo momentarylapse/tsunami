@@ -200,15 +200,15 @@ void Track::add_effect(AudioEffect *effect) {
 
 
 void Track::_register_fx(AudioEffect *fx) {
-	fx->set_func_edit([=]{ edit_effect(fx); });
+	fx->set_func_edit([this, fx] { edit_effect(fx); });
 }
 
 void Track::_register_midi_fx(MidiEffect *fx) {
-	fx->set_func_edit([=]{ edit_midi_effect(fx); });
+	fx->set_func_edit([this, fx] { edit_midi_effect(fx); });
 }
 
 void Track::_register_synth(Synthesizer *s) {
-	s->set_func_edit([=]{ edit_synthesizer(); });
+	s->set_func_edit([this, s] { edit_synthesizer(); });
 }
 
 // execute after editing...
@@ -269,8 +269,8 @@ void Track::edit_synthesizer() {
 	song->execute(new ActionTrackEditSynthesizer(this));
 }
 
-void Track::detune_synthesizer(const float tuning[MAX_PITCH]) {
-	song->execute(new ActionTrackDetuneSynthesizer(this, tuning));
+void Track::detune_synthesizer(const Temperament &temperament) {
+	song->execute(new ActionTrackDetuneSynthesizer(this, temperament));
 }
 
 TrackLayer *Track::add_layer() {

@@ -23,6 +23,7 @@ class Synthesizer;
 class AudioEffect;
 class CrossFadeOld;
 class TrackMarker;
+class Temperament;
 class Curve;
 class CurveTarget;
 enum class CurveType;
@@ -76,7 +77,7 @@ public:
 	void _cdecl move_midi_effect(int source, int target);
 	void _cdecl set_synthesizer(Synthesizer *synth);
 	void _cdecl edit_synthesizer();
-	void _cdecl detune_synthesizer(const float tuning[MAX_PITCH]);
+	void _cdecl detune_synthesizer(const Temperament &temperament);
 	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
 	Curve* _cdecl add_curve(const string &name, CurveTarget &target);
 	void _cdecl delete_curve(Curve *curve);

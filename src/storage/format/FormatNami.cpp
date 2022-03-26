@@ -795,10 +795,10 @@ public:
 	}
 };
 
-class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Synthesizer::Tuning> {
+class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Temperament> {
 public:
-	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Synthesizer::Tuning>("tuning") {}
-	void create() override { me = &parent->tuning; }
+	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Temperament>("tuning") {}
+	void create() override { me = &parent->temperament; }
 	void read(File *f) override {
 		for (int i=0; i<MAX_PITCH; i++)
 			me->freq[i] = f->read_float();
@@ -848,8 +848,8 @@ public:
 		f->write_int(0);// reserved
 	}
 	void write_subs() override {
-		if (!me->tuning.is_default())
-			write_sub("tuning", &me->tuning);
+		if (!me->temperament.is_default())
+			write_sub("tuning", &me->temperament);
 	}
 };
 

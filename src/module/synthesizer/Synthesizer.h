@@ -12,6 +12,7 @@
 #include "../../lib/base/set.h"
 #include "../../data/midi/MidiData.h"
 #include "../../data/midi/Instrument.h"
+#include "../../data/midi/Temperament.h"
 #include "../Module.h"
 #include "../port/Port.h"
 
@@ -107,15 +108,7 @@ protected:
 	void _render_part(AudioBuffer &buf, int pitch, int offset, int end);
 	void _handle_event(const MidiEvent &e);
 
-public:
-	struct Tuning {
-		float freq[MAX_PITCH];
-		void set_default();
-		bool is_default() const;
-		bool has_equal_octaves() const;
-	};
-protected:
-	Tuning tuning;
+	Temperament temperament;
 	float delta_phi[MAX_PITCH];
 };
 

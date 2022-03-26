@@ -8,12 +8,12 @@
 #pragma once
 
 #include "../../Action.h"
-#include "../../../module/synthesizer/Synthesizer.h"
+#include "../../../data/midi/Temperament.h"
 class Track;
 
 class ActionTrackDetuneSynthesizer: public Action {
 public:
-	ActionTrackDetuneSynthesizer(Track *t, const float tuning[MAX_PITCH]);
+	ActionTrackDetuneSynthesizer(Track *t, const Temperament &temperament);
 
 	string name() const override { return ":##:detune synthesizer"; }
 
@@ -22,5 +22,5 @@ public:
 
 private:
 	Track *track;
-	float tuning[MAX_PITCH];
+	Temperament temperament;
 };

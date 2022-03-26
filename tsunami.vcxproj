@@ -211,6 +211,7 @@
     <ClCompile Include="src\data\midi\MidiEvent.cpp" />
     <ClCompile Include="src\data\midi\MidiNote.cpp" />
     <ClCompile Include="src\data\midi\Scale.cpp" />
+    <ClCompile Include="src\data\midi\Temperament.cpp" />
     <ClCompile Include="src\data\rhythm\Bar.cpp" />
     <ClCompile Include="src\data\rhythm\BarCollection.cpp" />
     <ClCompile Include="src\data\rhythm\Beat.cpp" />
@@ -663,6 +664,7 @@
     <ClInclude Include="src\data\midi\MidiEvent.h" />
     <ClInclude Include="src\data\midi\MidiNote.h" />
     <ClInclude Include="src\data\midi\Scale.h" />
+    <ClInclude Include="src\data\midi\Temperament.h" />
     <ClInclude Include="src\data\rhythm\Bar.h" />
     <ClInclude Include="src\data\rhythm\BarCollection.h" />
     <ClInclude Include="src\data\rhythm\Beat.h" />

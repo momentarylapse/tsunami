@@ -8,8 +8,8 @@
 #ifndef SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_
 #define SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_
 
-#include "../Helper/Graph/Node.h"
-#include "../../lib/base/map.h"
+#include "../../Helper/Graph/Node.h"
+#include "../../../lib/base/map.h"
 
 class Track;
 class TrackLayer;

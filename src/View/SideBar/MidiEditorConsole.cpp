@@ -5,6 +5,13 @@
  *      Author: michi
  */
 
+#include "MidiEditorConsole.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
+#include "../AudioView/Graph/AudioViewTrack.h"
+#include "../Dialog/MarkerDialog.h"
+#include "../Dialog/QuestionDialog.h"
+#include "../Mode/ViewModeMidi.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -12,21 +19,14 @@
 #include "../../Data/Rhythm/BarCollection.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/MidiData.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Device/Device.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
-#include "../AudioView.h"
-#include "../Mode/ViewModeMidi.h"
+#include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../TsunamiWindow.h"
 #include "../../EditModes.h"
-#include "../../Device/DeviceManager.h"
-#include "../../Device/Device.h"
-#include "MidiEditorConsole.h"
-#include "../Dialog/MarkerDialog.h"
-#include "../Dialog/QuestionDialog.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../Graph/AudioViewTrack.h"
-#include "../../Plugins/PluginManager.h"
 
 //int get_track_index_save(Song *song, Track *t);
 

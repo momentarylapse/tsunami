@@ -6,7 +6,6 @@
  */
 
 #include "BarEditDialog.h"
-
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 

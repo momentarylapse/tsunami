@@ -5,7 +5,10 @@
  *      Author: michi
  */
 
-#include "../AudioView.h"
+#include "SampleRefConsole.h"
+#include "SampleManagerConsole.h"
+#include "../AudioView/AudioView.h"
+#include "../Helper/Slider.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
@@ -14,9 +17,6 @@
 #include "../../Data/SampleRef.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
-#include "../Helper/Slider.h"
-#include "SampleRefConsole.h"
-#include "SampleManagerConsole.h"
 
 SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar)

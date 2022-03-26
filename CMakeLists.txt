@@ -364,6 +364,17 @@ set(SOURCE
 	src/Test/TestThreads.cpp
 	src/Test/TestTrackVersion.cpp
 	src/Test/UnitTest.cpp
+	src/View/AudioView/Graph/AudioViewLayer.cpp
+	src/View/AudioView/Graph/AudioViewTrack.cpp
+	src/View/AudioView/Graph/Background.cpp
+	src/View/AudioView/Graph/Cursor.cpp
+	src/View/AudioView/Graph/LayerHeader.cpp
+	src/View/AudioView/Graph/TimeScale.cpp
+	src/View/AudioView/Graph/TrackHeader.cpp
+	src/View/AudioView/Graph/ViewMarker.cpp
+	src/View/AudioView/AudioView.cpp
+	src/View/AudioView/TrackHeightManager.cpp
+	src/View/AudioView/ViewPort.cpp
 	src/View/BottomBar/SignalEditor/SignalEditorBackground.cpp
 	src/View/BottomBar/SignalEditor/SignalEditorCable.cpp
 	src/View/BottomBar/SignalEditor/SignalEditorModule.cpp
@@ -394,14 +405,6 @@ set(SOURCE
 	src/View/Dialog/TimeTrackAddDialog.cpp
 	src/View/Dialog/TrackRoutingDialog.cpp
 	src/View/Dialog/TuningDialog.cpp
-	src/View/Graph/AudioViewLayer.cpp
-	src/View/Graph/AudioViewTrack.cpp
-	src/View/Graph/Background.cpp
-	src/View/Graph/Cursor.cpp
-	src/View/Graph/LayerHeader.cpp
-	src/View/Graph/TimeScale.cpp
-	src/View/Graph/TrackHeader.cpp
-	src/View/Graph/ViewMarker.cpp
 	src/View/Helper/Graph/Node.cpp
 	src/View/Helper/Graph/SceneGraph.cpp
 	src/View/Helper/Graph/Scrollable.cpp
@@ -447,12 +450,9 @@ set(SOURCE
 	src/View/SideBar/SideBar.cpp
 	src/View/SideBar/SongConsole.cpp
 	src/View/SideBar/TrackConsole.cpp
-	src/View/AudioView.cpp
 	src/View/ColorScheme.cpp
 	src/View/HoverData.cpp
 	src/View/MouseDelayPlanner.cpp
-	src/View/TrackHeightManager.cpp
-	src/View/ViewPort.cpp
 	src/Session.cpp
 	src/Tsunami.cpp
 	src/TsunamiWindow.cpp

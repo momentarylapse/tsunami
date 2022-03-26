@@ -6,7 +6,6 @@
  */
 
 #include "AudioOutput.h"
-
 #include "../../Session.h"
 #include "../../Data/base.h"
 #include "../../Module/Port/Port.h"

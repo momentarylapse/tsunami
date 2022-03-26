@@ -6,10 +6,9 @@
  */
 
 #include "HoverData.h"
-
+#include "AudioView/Graph/AudioViewLayer.h"
+#include "AudioView/Graph/AudioViewTrack.h"
 #include "../Data/Midi/MidiData.h"
-#include "Graph/AudioViewLayer.h"
-#include "Graph/AudioViewTrack.h"
 
 
 HoverData::HoverData() {

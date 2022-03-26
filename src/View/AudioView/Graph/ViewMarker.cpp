@@ -5,10 +5,9 @@
  *      Author: michi
  */
  
-#include "../Graph/ViewMarker.h"
-
-#include "../Helper/Graph/Node.h"
-#include "../HoverData.h"
+#include "ViewMarker.h"
+#include "../../Helper/Graph/Node.h"
+#include "../../HoverData.h"
 
 ViewMarker::ViewMarker(AudioViewTrack *parent, TrackMarker *_marker) {
 	marker = _marker;

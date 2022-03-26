@@ -8,15 +8,13 @@
 #include "CaptureConsoleModeAudio.h"
 #include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
+#include "../../AudioView/AudioView.h"
+#include "../../Mode/ViewModeCapture.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/base.h"
-#include "../../AudioView.h"
-#include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
 #include "../../../Module/SignalChain.h"
-
-
 #include "../../../Device/Device.h"
 #include "../../../Module/Audio/AudioChannelSelector.h"
 #include "../../../Device/DeviceManager.h"

@@ -5,12 +5,11 @@
  *      Author: michi
  */
 
-#include "../Graph/TimeScale.h"
-
+#include "TimeScale.h"
 #include "../AudioView.h"
-#include "../Painter/GridPainter.h"
-#include "../../Module/Audio/SongRenderer.h"
-#include "../../lib/math/vector.h"
+#include "../../Painter/GridPainter.h"
+#include "../../../Module/Audio/SongRenderer.h"
+#include "../../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);

@@ -11,7 +11,7 @@
 #include "SignalEditorPort.h"
 #include "../../../Module/SignalChain.h"
 #include "../../../Module/Module.h"
-#include "../../AudioView.h"
+#include "../../AudioView/AudioView.h"
 #include "../../../lib/math/vector.h"
 #include "../../../lib/math/interpolation.h"
 

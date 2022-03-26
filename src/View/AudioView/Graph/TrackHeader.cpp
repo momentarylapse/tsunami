@@ -5,21 +5,20 @@
  *      Author: michi
  */
 
-#include "../Graph/TrackHeader.h"
-
-#include "../Helper/Graph/Node.h"
-#include "../Helper/Graph/SceneGraph.h"
-#include "../Helper/Drawing.h"
+#include "TrackHeader.h"
+#include "../../Helper/Graph/Node.h"
+#include "../../Helper/Graph/SceneGraph.h"
+#include "../../Helper/Drawing.h"
 #include "../AudioView.h"
-#include "../MouseDelayPlanner.h"
-#include "../../Data/base.h"
-#include "../../Data/Song.h"
-#include "../../Data/Track.h"
-#include "../../Data/TrackLayer.h"
-#include "../../Session.h"
-#include "../../EditModes.h"
-#include "../Graph/AudioViewTrack.h"
-#include "../../lib/math/vector.h"
+#include "../../MouseDelayPlanner.h"
+#include "../../../Data/base.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
+#include "../../../Session.h"
+#include "../../../EditModes.h"
+#include "AudioViewTrack.h"
+#include "../../../lib/math/vector.h"
 
 
 

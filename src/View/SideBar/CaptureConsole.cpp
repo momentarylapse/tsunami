@@ -5,21 +5,19 @@
  *      Author: michi
  */
 
-#include "../../Data/base.h"
-#include "../../Data/Track.h"
-#include "../../Data/TrackLayer.h"
-#include "../../Module/SignalChain.h"
-#include "../AudioView.h"
-#include "../Mode/ViewModeCapture.h"
+#include "CaptureConsole.h"
 #include "CaptureConsoleModes/CaptureConsoleMode.h"
 #include "CaptureConsoleModes/CaptureConsoleModeAudio.h"
 #include "CaptureConsoleModes/CaptureConsoleModeMidi.h"
 #include "CaptureConsoleModes/CaptureConsoleModeMulti.h"
 #include "CaptureConsoleModes/CaptureTrackData.h"
-
-#include "CaptureConsole.h"
-
+#include "../AudioView/AudioView.h"
+#include "../Mode/ViewModeCapture.h"
+#include "../../Data/base.h"
+#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Device/Stream/AudioOutput.h"
+#include "../../Module/SignalChain.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 

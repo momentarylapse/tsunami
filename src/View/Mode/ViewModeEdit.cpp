@@ -9,10 +9,10 @@
 #include "ViewModeEditDummy.h"
 #include "ViewModeMidi.h"
 #include "ViewModeEditAudio.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
-#include "../Graph/AudioViewLayer.h"
 
 ViewModeEdit::ViewModeEdit(AudioView *view) : ViewModeDefault(view) {
 	mode = view->mode_edit_midi;

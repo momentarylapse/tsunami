@@ -5,18 +5,17 @@
  *      Author: michi
  */
 
-#include "../Graph/LayerHeader.h"
-
-#include "../Helper/Graph/Node.h"
-#include "../Helper/Drawing.h"
+#include "LayerHeader.h"
+#include "AudioViewLayer.h"
+#include "AudioViewTrack.h"
 #include "../AudioView.h"
-#include "../../Data/base.h"
-#include "../../Data/Song.h"
-#include "../../Data/Track.h"
-#include "../../Data/TrackLayer.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../Graph/AudioViewTrack.h"
-#include "../../lib/math/vector.h"
+#include "../../Helper/Graph/Node.h"
+#include "../../Helper/Drawing.h"
+#include "../../../Data/base.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
+#include "../../../lib/math/vector.h"
 
 
 

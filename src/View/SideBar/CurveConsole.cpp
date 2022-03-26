@@ -6,7 +6,7 @@
  */
 
 #include "CurveConsole.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
 #include "../Mode/ViewModeCurve.h"
 #include "../Mode/ViewModeDefault.h"
 #include "../../Data/base.h"

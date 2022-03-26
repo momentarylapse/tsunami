@@ -13,7 +13,7 @@
 #include "../../../lib/math/vector.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../Helper/Graph/SceneGraph.h"
-#include "../../AudioView.h"
+#include "../../AudioView/AudioView.h"
 
 const float R = 10;
 

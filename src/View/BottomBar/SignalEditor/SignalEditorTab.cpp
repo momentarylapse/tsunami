@@ -10,7 +10,7 @@
 #include "SignalEditorModule.h"
 #include "SignalEditorCable.h"
 #include "../SignalEditor.h"
-#include "../../AudioView.h"
+#include "../../AudioView/AudioView.h"
 #include "../../HoverData.h"
 #include "../../../Module/Port/Port.h"
 #include "../../../Module/Module.h"

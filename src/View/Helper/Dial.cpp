@@ -6,11 +6,11 @@
  */
 
 #include "Dial.h"
-#include "../../lib/image/Painter.h"
-#include "../../lib/math/complex.h"
-#include "../AudioView.h"
 #include "Graph/SceneGraph.h"
+#include "../ColorScheme.h"
+#include "../../lib/math/complex.h"
 #include "../../lib/math/vector.h"
+#include "../../lib/hui/hui.h"
 
 
 const float dphi = 2.0f;

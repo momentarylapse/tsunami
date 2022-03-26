@@ -5,13 +5,13 @@
  *      Author: michi
  */
 
-#include "../../Session.h"
-#include "../../EditModes.h"
-#include "../../View/AudioView.h"
+#include "SongConsole.h"
+#include "../AudioView/AudioView.h"
 #include "../BottomBar/BottomBar.h"
 #include "../../Data/Song.h"
 #include "../../Data/base.h"
-#include "SongConsole.h"
+#include "../../Session.h"
+#include "../../EditModes.h"
 
 const int NUM_POSSIBLE_FORMATS = 4;
 const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {

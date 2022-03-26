@@ -5,21 +5,21 @@
  *      Author: michi
  */
 
-#include "../../Data/Track.h"
-#include "../../Data/base.h"
+#include "TrackConsole.h"
+#include "../AudioView/AudioView.h"
 #include "../Helper/Slider.h"
 #include "../Helper/ModulePanel.h"
 #include "../Helper/FxListEditor.h"
-#include "../../Module/Synth/Synthesizer.h"
-#include "../../Module/ConfigPanel.h"
 #include "../Dialog/DetuneSynthesizerDialog.h"
 #include "../Dialog/TuningDialog.h"
 #include "../Dialog/ModuleSelectorDialog.h"
+#include "../../Data/Track.h"
+#include "../../Data/base.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
-#include "../AudioView.h"
-#include "TrackConsole.h"
 
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();

@@ -6,12 +6,11 @@
  */
 
 #include "PeakMeterDisplay.h"
-
+#include "../ColorScheme.h"
 #include "../../Tsunami.h"
-#include "../AudioView.h"
 #include "../../lib/hui/hui.h"
-#include <math.h>
 #include "../../Module/Audio/PeakMeter.h"
+#include <math.h>
 
 
 

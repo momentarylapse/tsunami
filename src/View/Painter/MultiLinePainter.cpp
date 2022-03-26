@@ -6,6 +6,10 @@
  */
 
 #include "MultiLinePainter.h"
+#include "MidiPainter.h"
+#include "../AudioView/ViewPort.h"
+#include "../ColorScheme.h"
+#include "../HoverData.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -18,10 +22,6 @@
 #include "../../lib/image/Painter.h"
 #include "../../lib/math/rect.h"
 #include "../../lib/math/vec2.h"
-#include "../ViewPort.h"
-#include "MidiPainter.h"
-#include "../ColorScheme.h"
-#include "../HoverData.h"
 #include <math.h>
 
 

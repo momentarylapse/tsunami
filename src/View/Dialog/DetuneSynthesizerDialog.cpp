@@ -6,11 +6,11 @@
  */
 
 #include "DetuneSynthesizerDialog.h"
-#include "../../Tsunami.h"
-#include "../../Module/Synth/Synthesizer.h"
+#include "../AudioView/AudioView.h"
 #include "../../Data/Track.h"
-#include "../AudioView.h"
+#include "../../Module/Synth/Synthesizer.h"
 #include "../../lib/math/vector.h"
+#include "../../Tsunami.h"
 #include <math.h>
 
 const int RELATIVE_NUM_PITCHES = 6;

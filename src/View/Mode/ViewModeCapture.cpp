@@ -7,18 +7,18 @@
 
 #include "ViewModeCapture.h"
 #include "../SideBar/CaptureConsoleModes/CaptureTrackData.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
 #include "../Painter/BufferPainter.h"
+#include "../SideBar/SideBar.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Module/SignalChain.h"
-#include "../SideBar/SideBar.h"
-#include "../../Session.h"
 #include "../../Module/Audio/AudioAccumulator.h"
 #include "../../Module/Midi/MidiAccumulator.h"
-#include "../Graph/AudioViewLayer.h"
+#include "../../Session.h"
 
 
 

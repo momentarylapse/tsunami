@@ -6,12 +6,8 @@
  */
 
 #include "AudioInput.h"
-
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
-#include "../../View/AudioView.h"
-
-#include "../../Stuff/BackupManager.h"
 #include "../../Data/base.h"
 #include "../Device.h"
 #include "../DeviceManager.h"

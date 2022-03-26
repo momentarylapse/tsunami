@@ -8,7 +8,6 @@
 #include "SideBar.h"
 #include "TrackConsole.h"
 #include "CurveConsole.h"
-#include "../AudioView.h"
 #include "DummyEditorConsole.h"
 #include "AudioEditorConsole.h"
 #include "MidiEditorConsole.h"
@@ -16,10 +15,11 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
+#include "../AudioView/AudioView.h"
+#include "../BottomBar/BottomBar.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../TsunamiWindow.h"
-#include "../BottomBar/BottomBar.h"
 
 extern const int CONFIG_PANEL_WIDTH;
 

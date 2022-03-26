@@ -6,11 +6,9 @@
  */
 
 #include "SceneGraph.h"
-
 #include "../../HoverData.h"
-#include "../../AudioView.h"
-#include "../../ViewPort.h"
 #include "../../MouseDelayPlanner.h"
+#include "../../../lib/hui/hui.h"
 
 
 namespace scenegraph {

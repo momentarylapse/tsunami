@@ -8,13 +8,13 @@
 #include "CaptureConsoleModeMidi.h"
 #include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
+#include "../../AudioView/AudioView.h"
+#include "../../Mode/ViewModeCapture.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/SignalChain.h"
-#include "../../AudioView.h"
-#include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
 
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :

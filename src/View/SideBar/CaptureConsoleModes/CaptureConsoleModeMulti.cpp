@@ -8,14 +8,14 @@
 #include "CaptureConsoleModeMulti.h"
 #include "CaptureTrackData.h"
 #include "../CaptureConsole.h"
+#include "../../AudioView/AudioView.h"
+#include "../../Mode/ViewModeCapture.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/Song.h"
-#include "../../../Session.h"
-#include "../../AudioView.h"
-#include "../../Mode/ViewModeCapture.h"
 #include "../../../Module/Audio/PeakMeter.h"
 #include "../../../Module/SignalChain.h"
+#include "../../../Session.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)

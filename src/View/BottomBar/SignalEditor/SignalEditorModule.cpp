@@ -10,9 +10,8 @@
 #include "SignalEditorPort.h"
 #include "../../../Module/Module.h"
 #include "../../../Module/Port/Port.h"
-#include "../../AudioView.h"
+#include "../../AudioView/AudioView.h"
 #include "../../MouseDelayPlanner.h"
-
 #include "../../Helper/Drawing.h"
 #include "../../Helper/Graph/SceneGraph.h"
 

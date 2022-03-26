@@ -6,18 +6,18 @@
  */
 
 #include "SettingsDialog.h"
-#include "../../Tsunami.h"
-#include "../../Session.h"
+#include "../BottomBar/DeviceConsole.h"
+#include "../BottomBar/MiniBar.h"
+#include "../Helper/CpuDisplay.h"
+#include "../Helper/Slider.h"
+#include "../AudioView/AudioView.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
-#include "../../TsunamiWindow.h"
-#include "../BottomBar/MiniBar.h"
-#include "../BottomBar/DeviceConsole.h"
-#include "../Helper/CpuDisplay.h"
-#include "../../Stuff/Log.h"
-#include "../Helper/Slider.h"
-#include "../AudioView.h"
 #include "../../Module/SignalChain.h"
+#include "../../Stuff/Log.h"
+#include "../../Session.h"
+#include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 
 struct ApiDescription {
 	string name;

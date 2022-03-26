@@ -6,16 +6,16 @@
  */
 
 #include "ViewModeCurve.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
+#include "../AudioView/Graph/AudioViewTrack.h"
+#include "../SideBar/SideBar.h"
 #include "../../Data/Curve.h"
 #include "../../Data/Track.h"
 #include "../../Device/Stream/AudioOutput.h"
-#include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../TsunamiWindow.h"
 #include "../../lib/math/vector.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../Graph/AudioViewTrack.h"
-#include "../SideBar/SideBar.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)

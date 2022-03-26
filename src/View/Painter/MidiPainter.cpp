@@ -6,8 +6,10 @@
  */
 
 #include "MidiPainter.h"
-#include "../AudioView.h"
-#include "../ViewPort.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h" // argh
+#include "../AudioView/ViewPort.h"
+#include "../Helper/SymbolRenderer.h"
 #include "../ColorScheme.h"
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
@@ -17,10 +19,8 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/SampleRef.h"
 #include "../../Data/Sample.h"
-#include "../Helper/SymbolRenderer.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ModuleConfiguration.h"
-#include "../Graph/AudioViewLayer.h" // argh
 
 
 // rhythm quantization

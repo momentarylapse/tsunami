@@ -5,14 +5,13 @@
  *      Author: michi
  */
 
-#include "BottomBar.h"
-#include "../../Session.h"
-#include "../AudioView.h"
 #include "MiniBar.h"
-
+#include "BottomBar.h"
+#include "../AudioView/AudioView.h"
+#include "../Helper/PeakMeterDisplay.h"
+#include "../../Session.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Stream/AudioOutput.h"
-#include "../Helper/PeakMeterDisplay.h"
 
 MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 	session = _session;

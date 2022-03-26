@@ -16,9 +16,9 @@
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
 #include "../../TsunamiWindow.h"
-#include "../AudioView.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../Graph/AudioViewTrack.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
+#include "../AudioView/Graph/AudioViewTrack.h"
+#include "../ColorScheme.h"
 #include "../Painter/BasicGridPainter.h"
 #include "../../lib/math/vector.h"
 

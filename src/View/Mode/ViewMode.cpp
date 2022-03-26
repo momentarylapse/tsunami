@@ -6,7 +6,7 @@
  */
 
 #include "ViewMode.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
 #include "../SideBar/SideBar.h"
 #include "../../TsunamiWindow.h"
 

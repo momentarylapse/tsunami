@@ -6,7 +6,7 @@
  */
 
 #include "PeakThread.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h" // FIXME: get rid!
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"

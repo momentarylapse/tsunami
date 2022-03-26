@@ -8,7 +8,6 @@
 #include "SignalEditor.h"
 #include "../Helper/ModulePanel.h"
 #include "SignalEditor/SignalEditorTab.h"
-
 #include "../../Module/Port/Port.h"
 #include "../../Module/Module.h"
 #include "../../Module/ConfigPanel.h"

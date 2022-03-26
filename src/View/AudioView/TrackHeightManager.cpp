@@ -8,12 +8,12 @@
 #include "TrackHeightManager.h"
 
 #include "AudioView.h"
-#include "Mode/ViewMode.h"
-#include "../Data/Track.h"
-#include "../Data/TrackLayer.h"
+#include "../Mode/ViewMode.h"
+#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "Graph/AudioViewLayer.h"
 #include "Graph/AudioViewTrack.h"
-#include "Helper/Graph/ScrollBar.h"
+#include "../Helper/Graph/ScrollBar.h"
 
 TrackHeightManager::TrackHeightManager() {
 	animating = false;

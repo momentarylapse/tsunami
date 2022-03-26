@@ -6,7 +6,6 @@
  */
 
 #include "PauseEditDialog.h"
-
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 

@@ -7,7 +7,7 @@
 
 #include "ViewPort.h"
 #include "AudioView.h"
-#include "../lib/math/math.h"
+#include "../../lib/math/math.h"
 
 const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;

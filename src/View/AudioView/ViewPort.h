@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_VIEWPORT_H_
 #define SRC_VIEW_VIEWPORT_H_
 
-#include "../lib/math/rect.h"
+#include "../../lib/math/rect.h"
 
 class AudioView;
 class Range;

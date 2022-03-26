@@ -7,8 +7,6 @@
 
 #include "FxListEditor.h"
 #include "../Helper/ModulePanel.h"
-#include "../AudioView.h"
-#include "../Graph/AudioViewTrack.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"

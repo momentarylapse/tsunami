@@ -6,7 +6,7 @@
  */
 
 #include "Clipboard.h"
-#include "../View/AudioView.h"
+#include "../View/AudioView/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
 #include "../Session.h"
 #include "../Data/base.h"

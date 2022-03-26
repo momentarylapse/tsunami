@@ -6,15 +6,14 @@
  */
 
 #include "GridPainter.h"
-
-#include "../AudioView.h"
+#include "../AudioView/Graph/AudioViewTrack.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/ViewPort.h"
+#include "../Helper/Drawing.h"
 #include "../ColorScheme.h"
-#include "../ViewPort.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
-#include "../Graph/AudioViewTrack.h"
-#include "../Helper/Drawing.h"
 
 
 color col_inter(const color a, const color &b, float t);

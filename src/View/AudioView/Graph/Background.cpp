@@ -5,16 +5,15 @@
  *      Author: michi
  */
 
-#include "../Graph/Background.h"
-
+#include "Background.h"
 #include "../AudioView.h"
-#include "../Mode/ViewMode.h"
-#include "../Painter/GridPainter.h"
-#include "../../Data/Song.h"
-#include "../../Data/Track.h"
-#include "../../Data/TrackLayer.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../../lib/math/vector.h"
+#include "../../Mode/ViewMode.h"
+#include "../../Painter/GridPainter.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
+#include "AudioViewLayer.h"
+#include "../../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);

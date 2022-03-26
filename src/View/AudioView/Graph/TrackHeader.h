@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_GRAPH_TRACKHEADER_H_
 #define SRC_VIEW_GRAPH_TRACKHEADER_H_
 
-#include "../Helper/Graph/Node.h"
+#include "../../Helper/Graph/Node.h"
 
 class AudioViewTrack;
 class AudioView;

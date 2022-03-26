@@ -5,16 +5,15 @@
  *      Author: michi
  */
 
-#include "../Graph/Cursor.h"
-
+#include "Cursor.h"
 #include "../AudioView.h"
-#include "../../Data/base.h"
-#include "../../Data/Song.h"
-#include "../../Data/TrackLayer.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../../lib/math/vector.h"
-#include "../../Session.h"
-#include "../../TsunamiWindow.h"
+#include "../../../Data/base.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/TrackLayer.h"
+#include "AudioViewLayer.h"
+#include "../../../lib/math/vector.h"
+#include "../../../Session.h"
+#include "../../../TsunamiWindow.h"
 
 bool view_has_focus(AudioView *view);
 

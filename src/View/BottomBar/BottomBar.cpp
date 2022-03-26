@@ -10,7 +10,7 @@
 #include "LogConsole.h"
 #include "SignalEditor.h"
 #include "PluginConsole.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
 #include "MiniBar.h"
 #include "../../Session.h"
 

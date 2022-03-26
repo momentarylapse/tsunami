@@ -7,8 +7,8 @@
 
 #include "ScrollBar.h"
 #include "SceneGraph.h"
-
-#include "../../AudioView.h"
+#include "../../ColorScheme.h"
+#include "../../../lib/image/Painter.h"
 
 // TODO who owns the view_offset? -> callback needed/not?
 

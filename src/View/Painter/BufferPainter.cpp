@@ -6,13 +6,12 @@
  */
 
 #include "BufferPainter.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewTrack.h" // AudioViewMode...
 #include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
 #include "../../Data/Range.h"
 #include "../../Data/Audio/AudioBuffer.h"
-
-#include "../Graph/AudioViewTrack.h" // AudioViewMode...
 #include "../../lib/math/complex.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Session.h"

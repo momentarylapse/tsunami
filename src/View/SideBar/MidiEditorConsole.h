@@ -12,10 +12,11 @@
 
 class TrackLayer;
 class Device;
+class ViewModeMidi;
 enum class MidiMode;
 enum class NoteBaseLength;
 enum class ChordType;
-class ViewModeMidi;
+enum class NoteModifier;
 
 class MidiEditorConsole : public SideBarConsole {
 public:

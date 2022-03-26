@@ -15,7 +15,7 @@
 #include "Data/Song.h"
 #include "lib/hui/hui.h"
 #include "Module/SignalChain.h"
-#include "View/AudioView.h"
+#include "View/AudioView/AudioView.h"
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeCapture.h"
 #include "View/Mode/ViewModeCurve.h"

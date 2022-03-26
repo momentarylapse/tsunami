@@ -5,29 +5,27 @@
  *      Author: michi
  */
 
-#include "../../Storage/Storage.h"
-#include "../AudioView.h"
+#include "SampleManagerConsole.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
 #include "../Painter/MidiPainter.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
-#include "../../Session.h"
-#include "../../EditModes.h"
-#include <math.h>
-
 #include "../../Action/ActionManager.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Sample.h"
-#include "../../lib/math/math.h"
-#include "SampleManagerConsole.h"
-
 #include "../../Device/Stream/AudioOutput.h"
 #include "../../Module/SignalChain.h"
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/Midi/MidiEventStreamer.h"
-#include "../Graph/AudioViewLayer.h"
+#include "../../Storage/Storage.h"
+#include "../../lib/math/math.h"
+#include "../../Session.h"
+#include "../../EditModes.h"
+#include <math.h>
 
 
 // TODO: use BufferPainter / MidiPainter

@@ -7,6 +7,14 @@
 
 #include "ViewModeMidi.h"
 #include "ViewModeEdit.h"
+#include "../AudioView/AudioView.h"
+#include "../AudioView/Graph/AudioViewLayer.h"
+#include "../Helper/Graph/ScrollBar.h"
+#include "../MouseDelayPlanner.h"
+#include "../Helper/MidiPreview.h"
+#include "../Painter/GridPainter.h"
+#include "../Painter/MidiPainter.h"
+#include "../SideBar/SideBar.h"
 #include "../../Module/SignalChain.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Data/base.h"
@@ -23,14 +31,6 @@
 #include "../../Module/Midi/MidiAccumulator.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
-#include "../AudioView.h"
-#include "../Graph/AudioViewLayer.h"
-#include "../Helper/Graph/ScrollBar.h"
-#include "../MouseDelayPlanner.h"
-#include "../Helper/MidiPreview.h"
-#include "../Painter/GridPainter.h"
-#include "../Painter/MidiPainter.h"
-#include "../SideBar/SideBar.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 

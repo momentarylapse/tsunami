@@ -7,7 +7,7 @@
 
 #include "SignalEditorBackground.h"
 #include "SignalEditorTab.h"
-#include "../../AudioView.h"
+#include "../../AudioView/AudioView.h"
 
 
 const float MODULE_GRID = 23;

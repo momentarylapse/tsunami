@@ -8,15 +8,15 @@
 #ifndef AUDIOVIEW_H_
 #define AUDIOVIEW_H_
 
-#include "../lib/base/pointer.h"
-#include "../Data/SongSelection.h"
-#include "../Data/Midi/Scale.h"
-#include "../Stuff/Observable.h"
+#include "../../lib/base/pointer.h"
+#include "../../Data/SongSelection.h"
+#include "../../Data/Midi/Scale.h"
+#include "../../Stuff/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
-#include "ColorScheme.h"
+#include "../ColorScheme.h"
+#include "../HoverData.h"
 #include <atomic>
-#include "HoverData.h"
 
 namespace hui{
 	class Menu;

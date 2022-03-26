@@ -8,8 +8,8 @@
 #ifndef SRC_VIEW_GRAPH_CURSOR_H_
 #define SRC_VIEW_GRAPH_CURSOR_H_
 
-#include "../Helper/Graph/Node.h"
-#include "../../Data/Range.h"
+#include "../../Helper/Graph/Node.h"
+#include "../../../Data/Range.h"
 
 class AudioView;
 class color;

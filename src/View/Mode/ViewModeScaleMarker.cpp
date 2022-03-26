@@ -6,7 +6,7 @@
  */
 
 #include "ViewModeScaleMarker.h"
-#include "../AudioView.h"
+#include "../AudioView/AudioView.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../Data/TrackMarker.h"

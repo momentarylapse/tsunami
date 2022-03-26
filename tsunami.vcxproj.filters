@@ -1075,6 +1075,39 @@
     <ClCompile Include="src\Test\UnitTest.cpp">
       <Filter>src\Test</Filter>
     </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\AudioViewLayer.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\AudioViewTrack.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\Background.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\Cursor.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\LayerHeader.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\TimeScale.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\TrackHeader.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\Graph\ViewMarker.cpp">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\AudioView.cpp">
+      <Filter>src\View\AudioView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\TrackHeightManager.cpp">
+      <Filter>src\View\AudioView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView\ViewPort.cpp">
+      <Filter>src\View\AudioView</Filter>
+    </ClCompile>
     <ClCompile Include="src\View\BottomBar\SignalEditor\SignalEditorBackground.cpp">
       <Filter>src\View\BottomBar\SignalEditor</Filter>
     </ClCompile>
@@ -1164,30 +1197,6 @@
     </ClCompile>
     <ClCompile Include="src\View\Dialog\TuningDialog.cpp">
       <Filter>src\View\Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\AudioViewLayer.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\AudioViewTrack.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\Background.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\Cursor.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\LayerHeader.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\TimeScale.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\TrackHeader.cpp">
-      <Filter>src\View\Graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Graph\ViewMarker.cpp">
-      <Filter>src\View\Graph</Filter>
     </ClCompile>
     <ClCompile Include="src\View\Helper\Graph\Node.cpp">
       <Filter>src\View\Helper\Graph</Filter>
@@ -1324,9 +1333,6 @@
     <ClCompile Include="src\View\SideBar\TrackConsole.cpp">
       <Filter>src\View\SideBar</Filter>
     </ClCompile>
-    <ClCompile Include="src\View\AudioView.cpp">
-      <Filter>src\View</Filter>
-    </ClCompile>
     <ClCompile Include="src\View\ColorScheme.cpp">
       <Filter>src\View</Filter>
     </ClCompile>
@@ -1334,12 +1340,6 @@
       <Filter>src\View</Filter>
     </ClCompile>
     <ClCompile Include="src\View\MouseDelayPlanner.cpp">
-      <Filter>src\View</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\TrackHeightManager.cpp">
-      <Filter>src\View</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\ViewPort.cpp">
       <Filter>src\View</Filter>
     </ClCompile>
     <ClCompile Include="src\Session.cpp">
@@ -2355,6 +2355,39 @@
     <ClInclude Include="src\Test\UnitTest.h">
       <Filter>src\Test</Filter>
     </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\AudioViewLayer.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\AudioViewTrack.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\Background.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\Cursor.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\LayerHeader.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\TimeScale.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\TrackHeader.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\Graph\ViewMarker.h">
+      <Filter>src\View\AudioView\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\AudioView.h">
+      <Filter>src\View\AudioView</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\TrackHeightManager.h">
+      <Filter>src\View\AudioView</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\AudioView\ViewPort.h">
+      <Filter>src\View\AudioView</Filter>
+    </ClInclude>
     <ClInclude Include="src\View\BottomBar\SignalEditor\SignalEditorBackground.h">
       <Filter>src\View\BottomBar\SignalEditor</Filter>
     </ClInclude>
@@ -2444,30 +2477,6 @@
     </ClInclude>
     <ClInclude Include="src\View\Dialog\TuningDialog.h">
       <Filter>src\View\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\AudioViewLayer.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\AudioViewTrack.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\Background.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\Cursor.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\LayerHeader.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\TimeScale.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\TrackHeader.h">
-      <Filter>src\View\Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\Graph\ViewMarker.h">
-      <Filter>src\View\Graph</Filter>
     </ClInclude>
     <ClInclude Include="src\View\Helper\Graph\Node.h">
       <Filter>src\View\Helper\Graph</Filter>
@@ -2604,9 +2613,6 @@
     <ClInclude Include="src\View\SideBar\TrackConsole.h">
       <Filter>src\View\SideBar</Filter>
     </ClInclude>
-    <ClInclude Include="src\View\AudioView.h">
-      <Filter>src\View</Filter>
-    </ClInclude>
     <ClInclude Include="src\View\ColorScheme.h">
       <Filter>src\View</Filter>
     </ClInclude>
@@ -2614,12 +2620,6 @@
       <Filter>src\View</Filter>
     </ClInclude>
     <ClInclude Include="src\View\MouseDelayPlanner.h">
-      <Filter>src\View</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\TrackHeightManager.h">
-      <Filter>src\View</Filter>
-    </ClInclude>
-    <ClInclude Include="src\View\ViewPort.h">
       <Filter>src\View</Filter>
     </ClInclude>
     <ClInclude Include="src\EditModes.h">
@@ -2801,6 +2801,12 @@
     <Filter Include="src\View">
       <UniqueIdentifier>{9E6FC711-F112-6D10-3812-84B4C34CFA29}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\View\AudioView">
+      <UniqueIdentifier>{247CCD61-9E2B-89A9-24E1-2F5FFD18D550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\View\AudioView\Graph">
+      <UniqueIdentifier>{4DBA2D67-C621-CD91-1327-6703DE1AE933}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\View\BottomBar">
       <UniqueIdentifier>{8E75FA18-77E4-97DF-6FF7-9084E274FE18}</UniqueIdentifier>
     </Filter>
@@ -2809,9 +2815,6 @@
     </Filter>
     <Filter Include="src\View\Dialog">
       <UniqueIdentifier>{66DADB57-76D3-2881-6AFD-EF16FE28B682}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\View\Graph">
-      <UniqueIdentifier>{B562A5EA-1EB6-9C9C-44E7-FFA54022266E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\View\Helper">
       <UniqueIdentifier>{97F7E000-4864-EB68-3697-48B795E8A7B3}</UniqueIdentifier>

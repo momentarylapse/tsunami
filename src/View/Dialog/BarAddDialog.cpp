@@ -6,11 +6,10 @@
  */
 
 #include "BarAddDialog.h"
-
+#include "../AudioView/AudioView.h"
+#include "../../Data/base.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
-#include "../../Data/base.h"
-#include "../AudioView.h"
 
 bool bar_dialog_move_data = true;
 

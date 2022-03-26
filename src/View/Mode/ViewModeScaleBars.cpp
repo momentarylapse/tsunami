@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#include "../AudioView.h"
+#include "ViewModeScaleBars.h"
+#include "../AudioView/AudioView.h"
 #include "../../lib/hui/hui.h"
 #include "../../lib/math/math.h"
-#include "ViewModeScaleBars.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Session.h"

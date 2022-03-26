@@ -8,7 +8,6 @@
 #include "TsunamiWindow.h"
 #include "Session.h"
 #include "EditModes.h"
-
 #include "Module/Audio/SongRenderer.h"
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
@@ -37,7 +36,7 @@
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/ModulePanel.h"
-#include "View/AudioView.h"
+#include "View/AudioView/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Storage/Storage.h"
@@ -63,8 +62,8 @@
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
 #include "Device/DeviceManager.h"
-#include "View/Graph/AudioViewLayer.h"
-#include "View/Graph/AudioViewTrack.h"
+#include "View/AudioView/Graph/AudioViewLayer.h"
+#include "View/AudioView/Graph/AudioViewTrack.h"
 
 #include "lib/hui/Controls/MenuItemSubmenu.h"
 

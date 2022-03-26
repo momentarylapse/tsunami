@@ -492,8 +492,6 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
-	if (cam->pixels_per_sample < quality.rhythm_zoom_min)
-		return;
 
 	c->set_antialiasing(quality.antialiasing);
 
@@ -623,7 +621,10 @@ void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState 
 }
 
 void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
-	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return pitch2y_linear(n->pitch); });
+	if (quality._highest_details)
+		draw_rhythm(c, notes, cur_range, [this] (MidiNote *n) {
+			return pitch2y_linear(n->pitch);
+		});
 	//c->setLineWidth(3.0f);
 
 	// draw notes
@@ -748,7 +749,10 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 }
 
 void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
-	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return string_to_screen(n->stringno); });
+	if (quality._highest_details)
+		draw_rhythm(c, notes, cur_range, [this] (MidiNote *n) {
+			return string_to_screen(n->stringno);
+		});
 
 	c->set_antialiasing(quality.antialiasing);
 	for (auto *n: weak(notes))
@@ -787,7 +791,7 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 
 	draw_complex_note(c, n, state, x1, x2, y);
 
-	if ((n->modifier != NoteModifier::NONE) and (rr >= 3)) {
+	if ((n->modifier != NoteModifier::NONE) and quality._highest_details) {
 		c->set_color(local_theme.text);
 		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
 		SymbolRenderer::draw(c, {x - modifier_font_size*1.0f, y - modifier_font_size*0.5f}, modifier_font_size, modifier_symbol(n->modifier));
@@ -849,7 +853,10 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 
 
 void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &notes) {
-	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
+	if (quality._highest_details)
+		draw_rhythm(c, notes, cur_range, [this] (MidiNote *n) {
+			return clef_pos_to_screen(n->clef_position);
+		});
 
 	c->set_antialiasing(quality.antialiasing);
 	for (auto *n: weak(notes))
@@ -1015,6 +1022,8 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 	quality.tab_text_threshold = rr/4 / q;
 	quality.antialiasing = antialiasing;
 	quality.note_count_threshold = area.width() * 0.4f * q;
+
+	quality._highest_details = (cam->pixels_per_sample >= quality.rhythm_zoom_min);
 }
 void MidiPainter::set_force_shadows(bool force) {
 	force_shadows = force;

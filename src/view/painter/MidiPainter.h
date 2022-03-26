@@ -114,6 +114,7 @@ public:
 	void set_key_changes(const Array<MidiKeyChange> &changes);
 
 	struct {
+		// configuration
 		bool antialiasing;
 		float rhythm_zoom_min;
 		float notes_zoom_min;
@@ -122,6 +123,9 @@ public:
 		float tab_text_threshold;
 		int note_count_threshold;
 		float factor;
+
+		// current state
+		bool _highest_details;
 	} quality;
 
 	float clef_dy;

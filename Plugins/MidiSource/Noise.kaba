@@ -1,0 +1,14 @@
+use tsunami
+
+class Delay extends MidiSource
+	
+	func override read(out midi: MidiEventBuffer) -> int
+		int length = midi.samples
+		int num = length / 2000
+		for i in 0:num
+			int start = rand(length)
+			int _length = rand(20000)
+			int pitch = 20+rand(80)
+			midi.add(MidiEvent(start, pitch, 0.1*pow(rand(1.0), 6)))
+			midi.add(MidiEvent(start + _length, pitch, 0))
+		return midi.samples

@@ -111,7 +111,8 @@ public:
 	struct Tuning {
 		float freq[MAX_PITCH];
 		void set_default();
-		bool is_default();
+		bool is_default() const;
+		bool has_equal_octaves() const;
 	};
 protected:
 	Tuning tuning;

@@ -790,7 +790,7 @@ track_list
 # Resource
 Dialog
 detune_synthesizer_dialog
-width=800,height=500,resizable,headerbar
+width=800,height=500,resizable,headerbar,closebutton=no
 0
 0
 1
@@ -800,10 +800,52 @@ vertical
 0
 0
 2
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+
+0
+0
+5
+ComboBox
+preset
+expandx
+0
+0
+0
+Label
+l-reference
+
+1
+0
+0
+ComboBox
+reference-pitch
+
+2
+0
+0
+SpinButton
+reference-freq
+range=100:1000:0.1
+3
+0
+0
+Label
+hz
+
+4
+0
+0
 DrawingArea
 detune_area
 expandx,expandy
-0
+1
 0
 0
 Grid
@@ -811,18 +853,30 @@ Grid
 buttonbar
 1
 0
-2
+4
+Button
+cancel
+
+0
+0
+0
 CheckBox
 relative
 
-0
+1
 0
 0
 CheckBox
 all_octaves
 
-1
+2
 0
+0
+Button
+ok
+default
+0
+1
 0
 # Resource
 Dialog
@@ -7237,7 +7291,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-646
+648
 # Text
 /bars-add
 Add bars...
@@ -7747,7 +7801,13 @@ detune_synthesizer_dialog/all_octaves
 All octaves
 
 detune_synthesizer_dialog/detune_synthesizer_dialog
-Verstimmung
+Temperament
+
+detune_synthesizer_dialog/hz
+Hz
+
+detune_synthesizer_dialog/l-reference
+  Reference:
 
 detune_synthesizer_dialog/relative
 Relative

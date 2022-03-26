@@ -1,6 +1,16 @@
-Dialog detune_synthesizer_dialog "Verstimmung" width=800 height=500 resizable headerbar
+Dialog detune_synthesizer_dialog "Temperament" width=800 height=500 resizable headerbar closebutton=no
 	Grid ? "" vertical
-		DrawingArea detune_area "" expandx expandy
+		Grid ? "" vertical
+			Grid ? ""
+				ComboBox preset "" expandx
+				Label l-reference "  Reference:"
+				ComboBox reference-pitch ""
+				SpinButton reference-freq "" range=100:1000:0.1
+				Label hz "Hz"
+			DrawingArea detune_area "" expandx expandy
 		Grid ? "" buttonbar
+			Button /cancel "Cancel"
 			CheckBox relative "Relative" "tooltip=Only show detuning relative to the original pitch"
 			CheckBox all_octaves "All octaves"
+			---|
+			Button /ok "Ok" default

@@ -26,7 +26,14 @@ public:
 
 
 	void on_close();
+	void on_ok();
 	void on_relative();
+	void on_all_octaves();
+	void on_preset();
+	void on_reference_pitch();
+	void on_reference_freq();
+
+	void apply_preset();
 
 	float pitch2x(float p);
 	float pitch2y(float p);
@@ -41,6 +48,7 @@ public:
 	float width, height;
 
 	bool mode_relative;
+	bool all_octaves;
 
 	int hover;
 };

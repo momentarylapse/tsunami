@@ -104,9 +104,16 @@ void Synthesizer::Tuning::set_default() {
 		freq[p] = pitch_to_freq((float)p);
 }
 
-bool Synthesizer::Tuning::is_default() {
+bool Synthesizer::Tuning::is_default() const {
 	for (int p=0; p<MAX_PITCH; p++)
 		if (fabs(freq[p] - pitch_to_freq((float)p)) > 0.01f)
+			return false;
+	return true;
+}
+
+bool Synthesizer::Tuning::has_equal_octaves() const {
+	for (int p=12; p<MAX_PITCH; p++)
+		if (fabs(freq[p] - freq[p % 12] * pow(2.0f, float(p/12))) > 0.01f)
 			return false;
 	return true;
 }

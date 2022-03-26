@@ -9,14 +9,14 @@
 #define SRC_VIEW_DIALOG_DETUNESYNTHESIZERDIALOG_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../data/midi/Temperament.h"
 
-class Synthesizer;
 class Track;
 class AudioView;
 
 class DetuneSynthesizerDialog : public hui::Dialog {
 public:
-	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, hui::Window *parent);
+	DetuneSynthesizerDialog(Track *t, AudioView *view, hui::Window *parent);
 
 	void _cdecl on_draw(Painter *p) override;
 	void _cdecl on_left_button_down() override;
@@ -42,13 +42,14 @@ public:
 	float y2pitch(float y);
 	float y2relpitch(float y, float p0);
 
-	Synthesizer *synth;
 	Track *track;
 	AudioView *view;
 	float width, height;
 
 	bool mode_relative;
 	bool all_octaves;
+
+	Temperament temperament;
 
 	int hover;
 };

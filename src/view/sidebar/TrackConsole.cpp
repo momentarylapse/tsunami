@@ -37,7 +37,7 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 		}, track->synth->module_class);
 	});
 	p->set_func_detune([parent, track, session]{
-		hui::fly(new DetuneSynthesizerDialog(track->synth.get(), track, session->view, parent->win));
+		hui::fly(new DetuneSynthesizerDialog(track, session->view, parent->win));
 	});
 	return p;
 }

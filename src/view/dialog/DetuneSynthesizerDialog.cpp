@@ -16,11 +16,11 @@
 const int RELATIVE_NUM_PITCHES = 2;
 const int MIDDLE_C = 60;
 
-DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, hui::Window *parent) :
+DetuneSynthesizerDialog::DetuneSynthesizerDialog(Track *t, AudioView *v, hui::Window *parent) :
 	hui::Dialog("detune_synthesizer_dialog", parent)
 {
 	track = t;
-	synth = s;
+	temperament = track->synth->temperament;
 	view = v;
 	width = 1;
 	height = 1;
@@ -35,7 +35,7 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 	add_string("preset", "1/3 comma meantone");
 	add_string("preset", "Pythagorean");
 	add_string("preset", "5 limit diatonic major");
-	if (s->temperament.is_default())
+	if (temperament.is_default())
 		set_int("preset", 1);
 	else
 		set_int("preset", 0);
@@ -51,7 +51,7 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 
 	event("cancel", [this] { on_close(); });
 	event("hui:close", [this] { on_close(); });
-	event("ok", [this] { on_close(); }); // TODO
+	event("ok", [this] { on_ok(); });
 	event("relative", [this] { on_relative(); });
 	event("all_octaves", [this] { on_all_octaves(); });
 	event("preset", [this] { on_preset(); });
@@ -120,9 +120,9 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	p->set_line_width(2.0f);
 	p->set_color(theme.capture_marker);
 	for (int i=0; i<N; i++) {
-		float y = pitch2y(freq_to_pitch(synth->temperament.freq[i]));
+		float y = pitch2y(freq_to_pitch(temperament.freq[i]));
 		if (mode_relative) {
-			y = relpitch2y(freq_to_pitch(synth->temperament.freq[i]), i);
+			y = relpitch2y(freq_to_pitch(temperament.freq[i]), i);
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
@@ -137,7 +137,7 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 			p->draw_str({20, 17}, rel_pitch_name(pitch_to_rel(hover)));
 		else
 			p->draw_str({20, 17}, pitch_name(hover));
-		p->draw_str({70, 17}, format("%+.2f semi tones", freq_to_pitch(synth->temperament.freq[hover]) - hover));
+		p->draw_str({70, 17}, format("%+.2f semi tones", freq_to_pitch(temperament.freq[hover]) - hover));
 	}
 }
 
@@ -171,14 +171,12 @@ float DetuneSynthesizerDialog::y2relpitch(float y, float p0) {
 
 void DetuneSynthesizerDialog::on_left_button_down() {
 	if (hover >= 0) {
-		auto tuning = track->synth->temperament;
 		if (mode_relative) {
-			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
+			temperament.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
 		} else {
-			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::get_event()->m.y));
+			temperament.freq[hover] = pitch_to_freq(y2pitch(hui::get_event()->m.y));
 		}
 		set_int("preset", 0);
-		track->detune_synthesizer(tuning);
 		redraw("detune_area");
 	}
 }
@@ -203,17 +201,15 @@ void DetuneSynthesizerDialog::on_mouse_wheel() {
 	if (hover >= 0) {
 		auto e = hui::get_event();
 		float speed = mode_relative ? 0.01f : 0.1f;
-		auto tuning = track->synth->temperament;
 		if (e->scroll.y != 0) {
 			float dpitch = speed * e->scroll.y;
 			if (all_octaves) {
 				for (int i=(hover % 12); i<MAX_PITCH; i+=12)
-					tuning.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
+					temperament.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
 			} else {
-				tuning.freq[hover] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
+				temperament.freq[hover] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
 			}
 			set_int("preset", 0);
-			track->detune_synthesizer(tuning);
 		}
 		redraw("detune_area");
 	}
@@ -227,7 +223,6 @@ void DetuneSynthesizerDialog::on_relative() {
 void DetuneSynthesizerDialog::on_all_octaves() {
 	all_octaves = is_checked("all_octaves");
 	if (all_octaves) {
-		auto temperament = track->synth->temperament;
 		if (!temperament.has_equal_octaves()) {
 			for (int i=12; i<MAX_PITCH; i++)
 				temperament.freq[i] = temperament.freq[i % 12] * pow(2.0f, float(i/12));
@@ -246,8 +241,7 @@ void DetuneSynthesizerDialog::apply_preset() {
 	int pitch_ref = get_int("reference-pitch");
 	float freq_ref = pitch_to_freq(pitch_ref);
 
-	auto tuning = Temperament::create((TemperamentType)n, pitch_ref, freq_ref);
-	track->detune_synthesizer(tuning);
+	temperament = Temperament::create((TemperamentType)n, pitch_ref, freq_ref);
 	redraw("detune_area");
 }
 
@@ -267,5 +261,10 @@ void DetuneSynthesizerDialog::on_preset() {
 }
 
 void DetuneSynthesizerDialog::on_close() {
+	request_destroy();
+}
+
+void DetuneSynthesizerDialog::on_ok() {
+	track->detune_synthesizer(temperament);
 	request_destroy();
 }

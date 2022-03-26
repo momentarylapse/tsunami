@@ -10,7 +10,7 @@
 
 #include "lib/base/base.h"
 #include "lib/base/pointer.h"
-#include "Stuff/Observable.h"
+#include "stuff/Observable.h"
 
 class TsunamiWindow;
 class Log;

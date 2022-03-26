@@ -41,9 +41,6 @@ public:
 	Range range;
 	int y0;
 	int y1;
-	int pitch;
-	int clef_position;
-	NoteModifier modifier;
 	int index;
 
 	enum class Type {

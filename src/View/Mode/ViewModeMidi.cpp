@@ -214,7 +214,7 @@ void ViewModeMidi::set_input_capture(bool capture) {
 
 void ViewModeMidi::_start_input() {
 	preview->_start_input();
-	preview->chain->subscribe(this, [=]{ on_midi_input(); }, Module::MESSAGE_TICK);
+	preview->chain->subscribe(this, [this] { on_midi_input(); }, Module::MESSAGE_TICK);
 }
 
 void ViewModeMidi::_stop_input() {
@@ -242,7 +242,7 @@ void ViewModeMidi::on_start() {
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;
 	sb->hidden = false;
-	sb->set_callback([=] (float offset) {
+	sb->set_callback([this] (float offset) {
 		float _pitch_max = 128 - offset;
 		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 	});
@@ -266,10 +266,12 @@ public:
 	AudioView *view;
 	Array<int> pitch;
 	int pos0;
-	MouseDelayAddMidi(AudioViewLayer *l, const Array<int> &_pitch) {
+	int clef_pos;
+	MouseDelayAddMidi(AudioViewLayer *l, const Array<int> &_pitch, int _clef_pos) {
 		vlayer = l;
 		view = vlayer->view;
 		pitch = _pitch;
+		clef_pos = _clef_pos;
 		pos0 = vlayer->view->hover().pos;
 	}
 	void on_start(const vec2 &m) override {
@@ -313,13 +315,46 @@ public:
 			return notes;
 		for (int p: pitch)
 			notes.add(new MidiNote(r and allowed, p, 1));
-		if (notes.num > 0){
-			notes[0]->clef_position = view->hover().clef_position;
-			notes[0]->modifier = view->hover().modifier;
+		if (notes.num > 0) {
+			auto mode = vlayer->midi_mode();
+			if (mode == MidiMode::CLASSICAL) {
+				//s.clef_position = mp->screen_to_clef_pos(m.y);
+				notes[0]->clef_position = clef_pos;
+				int upos = vlayer->track()->instrument.get_clef().position_to_uniclef(clef_pos);
+				notes[0]->modifier = combine_note_modifiers(view->mode_edit_midi->modifier, view->mode_edit_midi->cur_scale().get_modifier(upos));
+			}
 		}
 		return notes;
 	}
 };
+
+struct MidiHoverMetadata {
+	int string_no = -1;
+	int clef_pos = -1;
+	NoteModifier mod = NoteModifier::NONE;
+	int pitch = -1;
+};
+
+MidiHoverMetadata get_midi_hover_meta(ViewModeMidi *m) {
+	MidiHoverMetadata r;
+
+	auto l = m->view->cur_vlayer();
+	auto mode = l->midi_mode();
+
+	if (m->hover().type == HoverData::Type::CLEF_POSITION) {
+		if (mode == MidiMode::TAB)
+			r.string_no = clamp(m->hover().index, 0, m->view->cur_track()->instrument.string_pitch.num - 1);
+		if (mode == MidiMode::CLASSICAL) {
+			r.clef_pos = m->hover().index;
+			int upos = l->track()->instrument.get_clef().position_to_uniclef(r.clef_pos);
+			r.mod = combine_note_modifiers(m->modifier, m->cur_scale().get_modifier(upos));
+			r.pitch = uniclef_to_pitch(upos, r.mod);
+		}
+	} else if (m->hover().type == HoverData::Type::MIDI_PITCH) {
+		r.pitch = m->hover().index;
+	}
+	return r;
+}
 
 // note clicking already handled by ViewModeDefault!
 void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
@@ -331,12 +366,12 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 	auto mode = cur_vlayer()->midi_mode();
 
-	if (hover().type == HoverData::Type::CLEF_POSITION) {
-		if (mode == MidiMode::TAB)
-			string_no = clamp(hover().clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
-	}else if (hover().type == HoverData::Type::MIDI_PITCH){
-		if (mode == MidiMode::CLASSICAL)
-			octave = pitch_get_octave(hover().pitch);
+	auto hmi = get_midi_hover_meta(this);
+
+	if (mode == MidiMode::TAB) {
+		string_no = hmi.string_no;
+	} else if (mode == MidiMode::CLASSICAL) {
+		octave = pitch_get_octave(hmi.pitch);
 	}
 
 	if (creation_mode == CreationMode::SELECT ) {
@@ -345,11 +380,15 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 		start_selection_rect(SelectionMode::RECT);
 
 	} else /* note / chord */ {
-		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
+		if (mode == MidiMode::CLASSICAL) {
+			if (hover().type == HoverData::Type::CLEF_POSITION) {
+				auto pitch = get_creation_pitch(hmi.pitch);
+				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos));
+			}
+		} else if (mode == MidiMode::LINEAR) {
 			if (hover().type == HoverData::Type::MIDI_PITCH) {
-
-				auto pitch = get_creation_pitch(hover().pitch);
-				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch));
+				auto pitch = get_creation_pitch(hmi.pitch);
+				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos));
 			}
 		} else /* TAB */ {
 			view->set_cursor_pos(hover().pos_snap);
@@ -421,7 +460,7 @@ void ViewModeMidi::jump_octave(int delta) {
 void ViewModeMidi::set_rep_key(int k) {
 	if (rep_key_runner >= 0)
 		hui::cancel_runner(rep_key_runner);
-	rep_key_runner = hui::run_later(0.8f, [=] {
+	rep_key_runner = hui::run_later(0.8f, [this] {
 		rep_key_runner = -1;
 		rep_key_num = -1;
 		rep_key = -1;
@@ -606,14 +645,22 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 	int end = max(pos0, sel->pos);
 	Range r = RangeTo(start, end);
 
+	auto *l = cur_vlayer();
+	if (!l)
+		return MidiNoteBuffer();
+	auto mode = l->midi_mode();
+
 	// align to beats
 	if (song->bars.num > 0)
 		align_to_beats(song, r, sub_beat_partition);
 
-	Array<int> pitch = get_creation_pitch(sel->pitch);
+	auto hmi = get_midi_hover_meta(this);
+
+	Array<int> pitch = get_creation_pitch(hmi.pitch);
+	auto vlayer = view->cur_vlayer();
 
 	// collision?
-	Range allowed = get_allowed_midi_range(view->cur_layer(), pitch, pos0);
+	Range allowed = get_allowed_midi_range(vlayer->layer, pitch, pos0);
 
 	// create notes
 	MidiNoteBuffer notes;
@@ -622,8 +669,9 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 	for (int p: pitch)
 		notes.add(new MidiNote(r and allowed, p, 1));
 	if (notes.num > 0) {
-		notes[0]->clef_position = sel->clef_position;
-		notes[0]->modifier = sel->modifier;
+		// FIXME: clef/modifier for root in inversions...
+		notes[0]->clef_position = hmi.clef_pos;
+		notes[0]->modifier = hmi.mod;
 	}
 	return notes;
 }
@@ -660,22 +708,22 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	}
 }
 
-inline bool hover_note_classical(const MidiNote &n, HoverData &s, ViewModeMidi *vmm) {
-	if (n.clef_position != s.clef_position)
+inline bool hover_note_classical(const MidiNote &n, int clef_position, int pos) {
+	if (n.clef_position != clef_position)
 		return false;
-	return n.range.is_inside(s.pos);
+	return n.range.is_inside(pos);
 }
 
-inline bool hover_note_tab(const MidiNote &n, HoverData &s, ViewModeMidi *vmm) {
-	if (n.stringno != s.clef_position)
+inline bool hover_note_tab(const MidiNote &n, int string_no, int pos) {
+	if (n.stringno != string_no)
 		return false;
-	return n.range.is_inside(s.pos);
+	return n.range.is_inside(pos);
 }
 
-inline bool hover_note_linear(const MidiNote &n, HoverData &s, ViewModeMidi *vmm) {
-	if (n.pitch != s.pitch)
+inline bool hover_note_linear(const MidiNote &n, int pitch, int pos) {
+	if (n.pitch != pitch)
 		return false;
-	return n.range.is_inside(s.pos);
+	return n.range.is_inside(pos);
 }
 
 HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
@@ -693,37 +741,31 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 
 	/*if (creation_mode != CreationMode::SELECT)*/{
 		if (mode == MidiMode::CLASSICAL) {
-			s.clef_position = mp->screen_to_clef_pos(m.y);
-			int upos = l->track->instrument.get_clef().position_to_uniclef(s.clef_position);
-			s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
-			s.pitch = uniclef_to_pitch(upos, s.modifier);
-			s.type = HoverData::Type::MIDI_PITCH;
+			s.index = mp->screen_to_clef_pos(m.y);
+			s.type = HoverData::Type::CLEF_POSITION;
 
 			for (auto *n: weak(l->midi))
-				if (hover_note_classical(*n, s, this)) {
+				if (hover_note_classical(*n, s.index, s.pos)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
 		} else if (mode == MidiMode::TAB) {
-			//s.pitch = cur_track->y2pitch_classical(my, modifier);
-			s.clef_position = mp->screen_to_string(m.y);
-			s.modifier = modifier;
+			s.index = mp->screen_to_string(m.y);
 			s.type = HoverData::Type::CLEF_POSITION;
 
 			for (auto *n: weak(l->midi))
-				if (hover_note_tab(*n, s, this)) {
+				if (hover_note_tab(*n, s.index, s.pos)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
 		} else if (mode == MidiMode::LINEAR) {
-			s.pitch = mp->y2pitch_linear(m.y);
-			s.clef_position = mp->y2clef_linear(m.y, s.modifier);
+			s.index = mp->y2pitch_linear(m.y);
 			s.type = HoverData::Type::MIDI_PITCH;
 
 			for (auto *n: weak(l->midi))
-				if (hover_note_linear(*n, s, this)) {
+				if (hover_note_linear(*n, s.index, s.pos)) {
 					s.note = n;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
@@ -750,10 +792,14 @@ void ViewModeMidi::draw_post(Painter *c) {
 	auto *mp = midi_context(l);
 	mp->set_force_shadows(true);
 
-	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
-
-		// creation preview
-		if ((!hui::get_event()->lbut) and (hover().type == HoverData::Type::MIDI_PITCH)) {
+	// creation preview
+	if (mode == MidiMode::CLASSICAL) {
+		if (!hui::get_event()->lbut and (hover().type == HoverData::Type::CLEF_POSITION)) {
+			auto notes = get_creation_notes(&hover(), hover().pos);
+			mp->draw(c, notes);
+		}
+	} else if (mode == MidiMode::LINEAR) {
+		if (!hui::get_event()->lbut and (hover().type == HoverData::Type::MIDI_PITCH)) {
 			auto notes = get_creation_notes(&hover(), hover().pos);
 			mp->draw(c, notes);
 		}

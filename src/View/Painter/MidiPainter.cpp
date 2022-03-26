@@ -564,7 +564,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
 	float dy = ((pitch2y_linear(0) - pitch2y_linear(1)) - c->font_size) / 2;
 	for (int i=pitch_min; i<pitch_max; i++) {
 		c->set_color(cc);
-		if (((hover->type == HoverData::Type::MIDI_PITCH) or (hover->type == HoverData::Type::MIDI_NOTE)) and (i == hover->pitch))
+		if (((hover->type == HoverData::Type::MIDI_PITCH) and (i == hover->index))) // or ((hover->type == HoverData::Type::MIDI_NOTE) and (i == hover->pitch)))
 			c->set_color(local_theme.text);
 
 		string name = pitch_name(i);

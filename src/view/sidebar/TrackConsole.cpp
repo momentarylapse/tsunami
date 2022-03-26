@@ -10,7 +10,7 @@
 #include "../helper/Slider.h"
 #include "../helper/ModulePanel.h"
 #include "../helper/FxListEditor.h"
-#include "../dialog/DetuneSynthesizerDialog.h"
+#include "../dialog/TemperamentDialog.h"
 #include "../dialog/TuningDialog.h"
 #include "../dialog/ModuleSelectorDialog.h"
 #include "../../data/Track.h"
@@ -37,7 +37,7 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 		}, track->synth->module_class);
 	});
 	p->set_func_detune([parent, track, session]{
-		hui::fly(new DetuneSynthesizerDialog(track, session->view, parent->win));
+		hui::fly(new TemperamentDialog(track, session->view, parent->win));
 	});
 	return p;
 }

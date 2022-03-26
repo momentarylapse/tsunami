@@ -1162,9 +1162,6 @@
     <ClCompile Include="src\view\dialog\ChannelMapperDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\dialog\DetuneSynthesizerDialog.cpp">
-      <Filter>src\view\dialog</Filter>
-    </ClCompile>
     <ClCompile Include="src\view\dialog\HelpDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -1190,6 +1187,9 @@
       <Filter>src\view\dialog</Filter>
     </ClCompile>
     <ClCompile Include="src\view\dialog\SettingsDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\dialog\TemperamentDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
     <ClCompile Include="src\view\dialog\TimeTrackAddDialog.cpp">
@@ -2445,9 +2445,6 @@
     <ClInclude Include="src\view\dialog\ChannelMapperDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
-    <ClInclude Include="src\view\dialog\DetuneSynthesizerDialog.h">
-      <Filter>src\view\dialog</Filter>
-    </ClInclude>
     <ClInclude Include="src\view\dialog\HelpDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
@@ -2473,6 +2470,9 @@
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\SettingsDialog.h">
+      <Filter>src\view\dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\TemperamentDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\TimeTrackAddDialog.h">

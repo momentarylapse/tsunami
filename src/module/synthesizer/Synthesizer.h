@@ -19,7 +19,7 @@
 class Range;
 class AudioBuffer;
 class PluginManager;
-class DetuneSynthesizerDialog;
+class TemperamentDialog;
 class ActionTrackDetuneSynthesizer;
 class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
@@ -49,7 +49,7 @@ public:
 
 class Synthesizer : public Module {
 	friend class PluginManager;
-	friend class DetuneSynthesizerDialog;
+	friend class TemperamentDialog;
 	friend class ActionTrackDetuneSynthesizer;
 	friend class FileChunkSynthesizer;
 	friend class FileChunkSynthesizerTuning;

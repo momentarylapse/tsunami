@@ -393,7 +393,6 @@ set(SOURCE
 	src/view/dialog/BarEditDialog.cpp
 	src/view/dialog/BufferCompressionDialog.cpp
 	src/view/dialog/ChannelMapperDialog.cpp
-	src/view/dialog/DetuneSynthesizerDialog.cpp
 	src/view/dialog/HelpDialog.cpp
 	src/view/dialog/MarkerDialog.cpp
 	src/view/dialog/ModuleSelectorDialog.cpp
@@ -403,6 +402,7 @@ set(SOURCE
 	src/view/dialog/QuestionDialog.cpp
 	src/view/dialog/SampleScaleDialog.cpp
 	src/view/dialog/SettingsDialog.cpp
+	src/view/dialog/TemperamentDialog.cpp
 	src/view/dialog/TimeTrackAddDialog.cpp
 	src/view/dialog/TrackRoutingDialog.cpp
 	src/view/dialog/TuningDialog.cpp

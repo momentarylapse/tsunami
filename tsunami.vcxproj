@@ -503,7 +503,6 @@
     <ClCompile Include="src\view\dialog\BarEditDialog.cpp" />
     <ClCompile Include="src\view\dialog\BufferCompressionDialog.cpp" />
     <ClCompile Include="src\view\dialog\ChannelMapperDialog.cpp" />
-    <ClCompile Include="src\view\dialog\DetuneSynthesizerDialog.cpp" />
     <ClCompile Include="src\view\dialog\HelpDialog.cpp" />
     <ClCompile Include="src\view\dialog\MarkerDialog.cpp" />
     <ClCompile Include="src\view\dialog\ModuleSelectorDialog.cpp" />
@@ -513,6 +512,7 @@
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp" />
     <ClCompile Include="src\view\dialog\SampleScaleDialog.cpp" />
     <ClCompile Include="src\view\dialog\SettingsDialog.cpp" />
+    <ClCompile Include="src\view\dialog\TemperamentDialog.cpp" />
     <ClCompile Include="src\view\dialog\TimeTrackAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\TrackRoutingDialog.cpp" />
     <ClCompile Include="src\view\dialog\TuningDialog.cpp" />
@@ -932,7 +932,6 @@
     <ClInclude Include="src\view\dialog\BarEditDialog.h" />
     <ClInclude Include="src\view\dialog\BufferCompressionDialog.h" />
     <ClInclude Include="src\view\dialog\ChannelMapperDialog.h" />
-    <ClInclude Include="src\view\dialog\DetuneSynthesizerDialog.h" />
     <ClInclude Include="src\view\dialog\HelpDialog.h" />
     <ClInclude Include="src\view\dialog\MarkerDialog.h" />
     <ClInclude Include="src\view\dialog\ModuleSelectorDialog.h" />
@@ -942,6 +941,7 @@
     <ClInclude Include="src\view\dialog\QuestionDialog.h" />
     <ClInclude Include="src\view\dialog\SampleScaleDialog.h" />
     <ClInclude Include="src\view\dialog\SettingsDialog.h" />
+    <ClInclude Include="src\view\dialog\TemperamentDialog.h" />
     <ClInclude Include="src\view\dialog\TimeTrackAddDialog.h" />
     <ClInclude Include="src\view\dialog\TrackRoutingDialog.h" />
     <ClInclude Include="src\view\dialog\TuningDialog.h" />

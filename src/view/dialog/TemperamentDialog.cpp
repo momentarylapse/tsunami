@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#include "DetuneSynthesizerDialog.h"
+#include "TemperamentDialog.h"
 #include "../audioview/AudioView.h"
 #include "../../data/Track.h"
 #include "../../module/synthesizer/Synthesizer.h"
@@ -16,7 +16,7 @@
 const int RELATIVE_NUM_PITCHES = 2;
 const int MIDDLE_C = 60;
 
-DetuneSynthesizerDialog::DetuneSynthesizerDialog(Track *t, AudioView *v, hui::Window *parent) :
+TemperamentDialog::TemperamentDialog(Track *t, AudioView *v, hui::Window *parent) :
 	hui::Dialog("detune_synthesizer_dialog", parent)
 {
 	track = t;
@@ -59,7 +59,7 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Track *t, AudioView *v, hui::Wi
 	event("reference-freq", [this] { on_reference_freq(); });
 }
 
-void DetuneSynthesizerDialog::on_draw(Painter *p) {
+void TemperamentDialog::on_draw(Painter *p) {
 	p->set_line_width(0.8f);
 	p->set_font_size(12);
 	float w = p->width;
@@ -141,35 +141,35 @@ void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	}
 }
 
-float DetuneSynthesizerDialog::pitch2x(float p) {
+float TemperamentDialog::pitch2x(float p) {
 	if (all_octaves)
 		return width * p / 12;
 	return width * p / MAX_PITCH;
 }
 
-float DetuneSynthesizerDialog::pitch2y(float p) {
+float TemperamentDialog::pitch2y(float p) {
 	return height * (1 - (p + 5) / (MAX_PITCH + 10));
 }
 
-float DetuneSynthesizerDialog::relpitch2y(float p, float p0) {
+float TemperamentDialog::relpitch2y(float p, float p0) {
 	return height/2 * (1 - (p - p0)/RELATIVE_NUM_PITCHES);
 }
 
-float DetuneSynthesizerDialog::x2pitch(float x) {
+float TemperamentDialog::x2pitch(float x) {
 	if (all_octaves)
 		return x / width * 12;
 	return x / width * MAX_PITCH;
 }
 
-float DetuneSynthesizerDialog::y2pitch(float y) {
+float TemperamentDialog::y2pitch(float y) {
 	return (1 - y / height) * (MAX_PITCH + 10) - 5;
 }
 
-float DetuneSynthesizerDialog::y2relpitch(float y, float p0) {
+float TemperamentDialog::y2relpitch(float y, float p0) {
 	return p0 + (1 - y*2/height) * RELATIVE_NUM_PITCHES;
 }
 
-void DetuneSynthesizerDialog::on_left_button_down() {
+void TemperamentDialog::on_left_button_down() {
 	if (hover >= 0) {
 		if (mode_relative) {
 			temperament.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
@@ -181,10 +181,10 @@ void DetuneSynthesizerDialog::on_left_button_down() {
 	}
 }
 
-void DetuneSynthesizerDialog::on_left_button_up() {
+void TemperamentDialog::on_left_button_up() {
 }
 
-void DetuneSynthesizerDialog::on_mouse_move() {
+void TemperamentDialog::on_mouse_move() {
 	hover = -1;
 	auto e = hui::get_event();
 	if ((e->m.x >= 0) and (e->m.x < width)) {
@@ -197,7 +197,7 @@ void DetuneSynthesizerDialog::on_mouse_move() {
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::on_mouse_wheel() {
+void TemperamentDialog::on_mouse_wheel() {
 	if (hover >= 0) {
 		auto e = hui::get_event();
 		float speed = mode_relative ? 0.01f : 0.1f;
@@ -215,12 +215,12 @@ void DetuneSynthesizerDialog::on_mouse_wheel() {
 	}
 }
 
-void DetuneSynthesizerDialog::on_relative() {
+void TemperamentDialog::on_relative() {
 	mode_relative = is_checked("relative");
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::on_all_octaves() {
+void TemperamentDialog::on_all_octaves() {
 	all_octaves = is_checked("all_octaves");
 	if (all_octaves) {
 		if (!temperament.has_equal_octaves()) {
@@ -232,7 +232,7 @@ void DetuneSynthesizerDialog::on_all_octaves() {
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::apply_preset() {
+void TemperamentDialog::apply_preset() {
 	check("all_octaves", true);
 
 	int n = get_int("preset");
@@ -245,26 +245,26 @@ void DetuneSynthesizerDialog::apply_preset() {
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::on_reference_pitch() {
+void TemperamentDialog::on_reference_pitch() {
 	int pitch_ref = get_int("reference-pitch");
 	set_float("reference-freq", pitch_to_freq(MIDDLE_C + pitch_ref));
 	apply_preset();
 }
 
-void DetuneSynthesizerDialog::on_reference_freq() {
+void TemperamentDialog::on_reference_freq() {
 	apply_preset();
 }
 
-void DetuneSynthesizerDialog::on_preset() {
+void TemperamentDialog::on_preset() {
 	check("all_octaves", true);
 	apply_preset();
 }
 
-void DetuneSynthesizerDialog::on_close() {
+void TemperamentDialog::on_close() {
 	request_destroy();
 }
 
-void DetuneSynthesizerDialog::on_ok() {
+void TemperamentDialog::on_ok() {
 	track->detune_synthesizer(temperament);
 	request_destroy();
 }

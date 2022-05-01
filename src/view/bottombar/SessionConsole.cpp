@@ -10,7 +10,7 @@
 #include "../../stuff/SessionManager.h"
 
 SessionConsole::SessionConsole(Session *s, BottomBar *bar) :
-	BottomBar::Console(_("Session"), "session-console", s, bar)
+	BottomBar::Console(_("Sessions"), "session-console", s, bar)
 {
 	from_resource("session-console");
 	id_list = "sessions";

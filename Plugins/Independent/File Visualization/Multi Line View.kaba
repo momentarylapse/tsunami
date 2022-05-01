@@ -9,19 +9,15 @@ func smooth(t: float) -> float
 class MyDialog extends hui.Dialog
 	mlp: MultiLinePainter*
 	config_visible = false
-	line_height = 80.0
-	line_space = 0.8
-	track_space = 0.2
-	border = 20.0
-	x_scale = 1.0
-	track_mode: bool[]
 	session: Session*
-	y_offset = 0.0
+	
+	mlv: MultiLineView*
+	config: MultiLineView.Config*
+	use config
+	
 	y_offset_start = 0.0
 	y_offset_target = 0.0
 	y_offset_t = -1.0
-	allow_shadows = false
-	mlv: MultiLineView*
 	
 	line_samples: int[]
 	line_y0: float[]
@@ -29,6 +25,11 @@ class MyDialog extends hui.Dialog
 
 	func __init__(parent: hui.Window, _mlv: MultiLineView)
 		super.__init__("Multi Line View", 800, 600, parent, true)
+		
+		mlv = &_mlv
+		config = &mlv.config
+		session = mlv.session
+		
 		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar
 	Grid ? '' vertical
 		Grid ? ''
@@ -55,9 +56,6 @@ class MyDialog extends hui.Dialog
 		set_image("play", "hui:media-play")
 		add_button("", 0, 1, "config")
 		set_image("config", "hui:properties")
-		
-		mlv = &_mlv
-		session = mlv.session
 		
 		for t,i in weak(session.song.tracks)
 			if t.type == SignalType.MIDI
@@ -96,7 +94,6 @@ class MyDialog extends hui.Dialog
 	func on_preview_tick()
 		if session.view.is_playback_active()
 			make_sure_sample_on_screen(session.view.playback_pos())
-			redraw("area")
 	
 	func make_sure_sample_on_screen(s: int)
 		if y_offset_t >= 0
@@ -113,7 +110,7 @@ class MyDialog extends hui.Dialog
 		y_offset_start = y_offset
 		y_offset_target = y
 		y_offset_t = 0
-		redraw("area")
+		mlv.changed()
 	
 	func on_close()
 		mlv.stop()
@@ -148,13 +145,16 @@ class MyDialog extends hui.Dialog
 		for t,i in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
 			track_mode[i * 2 + 1] = (get_cell("tracks", i, 2) == "true")
+		mlv.changed()
+	
+	func on_config_changed()
 		redraw("area")
 	
 	func on_scroll()
 		var e = hui.get_event()
 		var speed = session.view.mouse_wheel_speed #float(hui.config["View.MouseWheelSpeed"])
-		y_offset = clamp(y_offset + e.scroll.y*20*speed, 0.0, 100000)
-		redraw("area")
+		config.y_offset = clamp(y_offset + e.scroll.y*20*speed, 0.0, 100000)
+		mlv.changed()
 	
 	func on_click()
 		var e = hui.get_event()
@@ -236,6 +236,26 @@ class MyDialog extends hui.Dialog
 
 class MultiLineView extends TsunamiPlugin
 	dlg: MyDialog*
+	
+	class Config extends Module.Config
+		line_height = 80.0
+		line_space = 0.8
+		track_space = 0.2
+		border = 20.0
+		x_scale = 1.0
+		track_mode: bool[]
+		y_offset = 0.0
+		allow_shadows = false
+		func override reset()
+			line_height = 80.0
+			line_space = 0.8
+			track_space = 0.2
+			border = 20.0
+			x_scale = 1.0
+			track_mode.clear()
+			y_offset = 0.0
+			allow_shadows = false
+	var config: Config
 
 	func override on_start()
 		dlg = new MyDialog(session.win, self)
@@ -243,3 +263,7 @@ class MultiLineView extends TsunamiPlugin
 		
 	func override on_stop()
 		del dlg
+	
+	func override on_config()
+		if dlg
+			dlg.on_config_changed()

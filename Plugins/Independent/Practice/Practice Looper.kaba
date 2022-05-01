@@ -18,6 +18,7 @@ class PLPanel extends ConfigPanel
 	
 	func __init__(l: PracticeLooper)
 		super.__init__(l)
+		looper = &l
 		from_source("
 Grid ? '' vertical
 	Label ? 'Do not edit the file (even adjusting volumes)!' bold italic
@@ -26,13 +27,16 @@ Grid ? '' vertical
 		Button pause 'Pause' expandx expandy
 	Grid ? ''
 		Label ? 'Speed'
-		SpinButton speed '1.0' range=0:1:0.01
+		SpinButton speed '{{looper.config.speed}}' range=0:2:0.01
 		Button set 'Set'")
-		looper = &l
 
 		event("play", on_play)
 		event("pause", on_pause)
 		event("set", on_set_speed)
+
+	func override update()
+		print("UPDATE PANEL")
+		set_float("speed", looper.config.speed)
 	
 	func on_play()
 		looper.play()
@@ -52,8 +56,14 @@ class PracticeLooper extends TsunamiPlugin
 	var renderer: SongRenderer*
 	var song: Song*
 	var altered_speed = false
-	var current_speed = 1.
+	var current_speed = 1.0
 #	var old_sel: Range
+
+	class Config extends Module.Config
+		var speed: float
+		func override reset()
+			speed = 1.0
+	var config: Config
 	
 	func override on_start()
 		song = session.song
@@ -88,22 +98,29 @@ class PracticeLooper extends TsunamiPlugin
 		session.view.cam.set_range(scale_range(session.view.cam.range(), current_speed))
 		song.undo()
 		altered_speed = false
-		current_speed = 1
+		current_speed = 1.0
 	
 	func set_speed(speed: float)
+		config.speed = speed
+		changed()
+	
+	func override on_config()
+		print("on conf {{config.speed}}")
 		if altered_speed
 			reset()
-		song.begin_action_group("set speed")
-		for b,i in song.bars
-			Bar bb
-			bb.beats = b.beats
-			bb.divisor = b.divisor
-			bb.length = b.length / speed
-			song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
-		song.end_action_group()
-#		old_sel = session.view.sel.range_raw
-		session.view.cam.set_range(scale_range(session.view.cam.range(), 1. / speed))
-#		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, 1. / speed)
-#		session.view.update_selection()
-		altered_speed = true
-		current_speed = speed
+		if config.speed != current_speed
+			print("CHANGE->")
+			song.begin_action_group("set speed")
+			for b,i in song.bars
+				Bar bb
+				bb.beats = b.beats
+				bb.divisor = b.divisor
+				bb.length = b.length / config.speed
+				song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
+			song.end_action_group()
+	#		old_sel = session.view.sel.range_raw
+			session.view.cam.set_range(scale_range(session.view.cam.range(), 1. / config.speed))
+	#		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, 1. / config.speed)
+	#		session.view.update_selection()
+			altered_speed = true
+			current_speed = config.speed

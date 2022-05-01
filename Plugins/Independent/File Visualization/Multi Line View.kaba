@@ -94,6 +94,7 @@ class MyDialog extends hui.Dialog
 	func on_preview_tick()
 		if session.view.is_playback_active()
 			make_sure_sample_on_screen(session.view.playback_pos())
+			force_redraw()
 	
 	func make_sure_sample_on_screen(s: int)
 		if y_offset_t >= 0
@@ -148,7 +149,7 @@ class MyDialog extends hui.Dialog
 		mlv.changed()
 	
 	func on_config_changed()
-		redraw("area")
+		force_redraw()
 	
 	func on_scroll()
 		var e = hui.get_event()

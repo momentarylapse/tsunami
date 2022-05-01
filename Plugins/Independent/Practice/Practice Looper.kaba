@@ -35,7 +35,6 @@ Grid ? '' vertical
 		event("set", on_set_speed)
 
 	func override update()
-		print("UPDATE PANEL")
 		set_float("speed", looper.config.speed)
 	
 	func on_play()
@@ -105,11 +104,9 @@ class PracticeLooper extends TsunamiPlugin
 		changed()
 	
 	func override on_config()
-		print("on conf {{config.speed}}")
 		if altered_speed
 			reset()
 		if config.speed != current_speed
-			print("CHANGE->")
 			song.begin_action_group("set speed")
 			for b,i in song.bars
 				Bar bb

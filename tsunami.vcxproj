@@ -497,6 +497,7 @@
     <ClCompile Include="src\view\bottombar\MiniBar.cpp" />
     <ClCompile Include="src\view\bottombar\MixingConsole.cpp" />
     <ClCompile Include="src\view\bottombar\PluginConsole.cpp" />
+    <ClCompile Include="src\view\bottombar\SessionConsole.cpp" />
     <ClCompile Include="src\view\bottombar\SignalEditor.cpp" />
     <ClCompile Include="src\view\dialog\BarAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\BarDeleteDialog.cpp" />
@@ -926,6 +927,7 @@
     <ClInclude Include="src\view\bottombar\MiniBar.h" />
     <ClInclude Include="src\view\bottombar\MixingConsole.h" />
     <ClInclude Include="src\view\bottombar\PluginConsole.h" />
+    <ClInclude Include="src\view\bottombar\SessionConsole.h" />
     <ClInclude Include="src\view\bottombar\SignalEditor.h" />
     <ClInclude Include="src\view\dialog\BarAddDialog.h" />
     <ClInclude Include="src\view\dialog\BarDeleteDialog.h" />

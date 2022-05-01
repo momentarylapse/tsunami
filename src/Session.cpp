@@ -115,19 +115,22 @@ void Session::q(const string &message, const Array<string> &responses) {
 	log->question(this, message, responses);
 }
 
-void Session::execute_tsunami_plugin(const string& name, const Array<string> &args) {
+TsunamiPlugin *Session::execute_tsunami_plugin(const string &name, const Array<string> &args) {
 	auto *p = CreateTsunamiPlugin(this, name);
 	if (!p)
-		return;
+		return nullptr;
 
 	plugins.add(p);
-	p->subscribe3(this, [=](VirtualBase *o){ on_plugin_stop_request((TsunamiPlugin*)o); }, p->MESSAGE_STOP_REQUEST);
+	p->subscribe3(this, [this] (VirtualBase *o) {
+		on_plugin_stop_request((TsunamiPlugin*)o);
+	}, p->MESSAGE_STOP_REQUEST);
 
 	p->args = args;
 	p->on_start();
 
 	last_plugin = p;
 	notify(MESSAGE_ADD_PLUGIN);
+	return p;
 }
 
 

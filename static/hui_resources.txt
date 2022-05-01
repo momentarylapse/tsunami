@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-73
+74
 # Resource
 Menu
 menu_fake
@@ -6035,6 +6035,37 @@ default
 0
 # Resource
 Dialog
+session-console
+
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+ListView
+sessions
+nobar,expandy
+0
+0
+0
+Grid
+?
+
+1
+0
+1
+Button
+save
+
+0
+0
+0
+# Resource
+Dialog
 settings_dialog
 width=800,height=600,headerbar,resizable,borderwidth=0
 0
@@ -7291,7 +7322,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-648
+651
 # Text
 /bars-add
 Add bars...
@@ -8930,6 +8961,15 @@ Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
+
+session-console/save
+Save...
+
+session-console/session-console
+Sessions
+
+session-console/sessions
+name
 
 settings_dialog/antialiasing
 Antialiasing

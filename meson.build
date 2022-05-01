@@ -476,6 +476,7 @@ sources = [
 	'src/view/bottombar/MiniBar.cpp',
 	'src/view/bottombar/MixingConsole.cpp',
 	'src/view/bottombar/PluginConsole.cpp',
+	'src/view/bottombar/SessionConsole.cpp',
 	'src/view/bottombar/SignalEditor.cpp',
 	'src/view/dialog/BarAddDialog.cpp',
 	'src/view/dialog/BarDeleteDialog.cpp',

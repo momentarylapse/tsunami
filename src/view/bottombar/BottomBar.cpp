@@ -10,6 +10,7 @@
 #include "LogConsole.h"
 #include "SignalEditor.h"
 #include "PluginConsole.h"
+#include "SessionConsole.h"
 #include "../audioview/AudioView.h"
 #include "MiniBar.h"
 #include "../../Session.h"
@@ -36,10 +37,12 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	mixing_console = new MixingConsole(session, this);
 	signal_editor = new SignalEditor(session, this);
 	plugin_console = new PluginConsole(session, this);
+	session_console = new SessionConsole(session, this);
 	log_console = new LogConsole(session, this);
 	add_console(mixing_console, "");
 	add_console(signal_editor, "");
 	add_console(plugin_console, "");
+	add_console(session_console, "");
 	add_console(log_console, "");
 
 	event("choose", [=]{ on_choose(); });

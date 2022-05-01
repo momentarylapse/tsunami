@@ -1144,6 +1144,9 @@
     <ClCompile Include="src\view\bottombar\PluginConsole.cpp">
       <Filter>src\view\bottombar</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\bottombar\SessionConsole.cpp">
+      <Filter>src\view\bottombar</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\bottombar\SignalEditor.cpp">
       <Filter>src\view\bottombar</Filter>
     </ClCompile>
@@ -2427,6 +2430,9 @@
     <ClInclude Include="src\view\bottombar\PluginConsole.h">
       <Filter>src\view\bottombar</Filter>
     </ClInclude>
+    <ClInclude Include="src\view\bottombar\SessionConsole.h">
+      <Filter>src\view\bottombar</Filter>
+    </ClInclude>
     <ClInclude Include="src\view\bottombar\SignalEditor.h">
       <Filter>src\view\bottombar</Filter>
     </ClInclude>
@@ -2833,9 +2839,6 @@
     </Filter>
     <Filter Include="src\view\painter">
       <UniqueIdentifier>{106A5BF9-33C0-59E2-56F0-CCB558FE74A8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\view\painter\midi">
-      <UniqueIdentifier>{532A59C2-0EE6-C046-010F-20910CCA0EC6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\view\sidebar">
       <UniqueIdentifier>{787FC2F7-36B6-69E1-F134-22AD72BE1C28}</UniqueIdentifier>

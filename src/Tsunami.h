@@ -39,7 +39,6 @@ public:
 	bool handle_arguments(const Array<string> &arg);
 	void load_key_codes();
 
-	Session* create_session();
 	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
 
 	shared_array<Session> sessions;

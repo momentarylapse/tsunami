@@ -10,6 +10,7 @@
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../action/ActionManager.h"
+#include "../../stuff/SessionManager.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
@@ -50,7 +51,7 @@ NewDialog::NewDialog(hui::Window *_parent):
 
 void NewDialog::on_ok() {
 	int sample_rate = get_string("sample_rate")._int();
-	Session *session = tsunami->create_session();
+	Session *session = SessionManager::create_session();
 	Song *song = session->song.get();
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);

@@ -180,7 +180,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 		device_manager->init();
-		session = create_session();
+		session = SessionManager::create_session();
 
 		session->win->show();
 		if (a.num > 0) {
@@ -243,13 +243,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 	p.mode("--execute", {"PLUGIN", "..."}, "just run a plugin", [this, &session] (const Array<string> &a) {
 		device_manager->init();
-		session = create_session();
+		session = SessionManager::create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 	});
 	p.mode("--session", {"SESSION", "..."}, "restore a saved session", [this, &session] (const Array<string> &a) {
-		SessionManager::load(SessionManager::directory() << (a[0] + ".session"));
+		SessionManager::load_session(SessionManager::directory() << (a[0] + ".session"));
 	});
 #ifndef NDEBUG
 	p.mode("--list-tests", {}, "debug: list internal unit tests", [] (const Array<string> &) {
@@ -259,7 +259,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		UnitTest::run_all(a[0]);
 	});
 	p.mode("--preview-gui", {"TYPE", "NAME"}, "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
-		session = create_session();
+		session = SessionManager::create_session();
 		session->win->hide();
 		Module *m = nullptr;
 		if (a[0] == "fx") {
@@ -302,18 +302,6 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 
 
 	return allow_window;
-}
-
-Session* Tsunami::create_session() {
-	Session *session = new Session(log.get(), device_manager.get(), plugin_manager.get(), perf_mon.get());
-
-	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
-
-	session->set_win(new TsunamiWindow(session));
-	session->win->show();
-
-	sessions.add(session);
-	return session;
 }
 
 void Tsunami::load_key_codes() {

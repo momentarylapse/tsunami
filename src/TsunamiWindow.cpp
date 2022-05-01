@@ -43,6 +43,7 @@
 #include "stuff/Log.h"
 #include "stuff/Clipboard.h"
 #include "stuff/BackupManager.h"
+#include "stuff/SessionManager.h"
 #include "data/base.h"
 #include "data/Track.h"
 #include "data/TrackLayer.h"
@@ -449,7 +450,7 @@ void TsunamiWindow::on_import_backup() {
 		session->storage->load(song, filename);
 		//BackupManager::set_save_state(session);
 	} else {
-		Session *s = tsunami->create_session();
+		Session *s = SessionManager::create_session();
 		s->win->show();
 		s->storage->load(s->song.get(), filename);
 	}
@@ -1182,7 +1183,7 @@ void TsunamiWindow::on_open() {
 			if (session->storage->load(song, filename))
 				BackupManager::set_save_state(session);
 		} else {
-			auto *s = tsunami->create_session();
+			auto *s = SessionManager::create_session();
 			s->win->show();
 			s->storage->load(s->song.get(), filename);
 		}

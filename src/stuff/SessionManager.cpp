@@ -10,6 +10,7 @@
 #include "../lib/file/file_op.h"
 #include "../lib/xfile/xml.h"
 #include "../data/Song.h"
+#include "../data/base.h"
 #include "../plugins/TsunamiPlugin.h"
 #include "../storage/Storage.h"
 #include "../Tsunami.h"
@@ -17,7 +18,7 @@
 #include "../Session.h"
 
 
-/*Session *SessionManager::create(Tsunami *tsunami) {
+Session *SessionManager::create_session() {
 	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), tsunami->perf_mon.get());
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -25,11 +26,11 @@
 	session->set_win(new TsunamiWindow(session));
 	session->win->show();
 
-	sessions.add(session);
+	tsunami->sessions.add(session);
 	return session;
-}*/
+}
 
-void SessionManager::save(Session *s, const Path &filename) {
+void SessionManager::save_session(Session *s, const Path &filename) {
 	xml::Parser parser;
 
 	auto e = xml::Element("session");
@@ -49,13 +50,13 @@ void SessionManager::save(Session *s, const Path &filename) {
 	parser.save(filename);
 }
 
-Session *SessionManager::load(const Path &filename) {
+Session *SessionManager::load_session(const Path &filename) {
 	xml::Parser parser;
 	parser.load(filename);
 	auto &e = parser.elements[0];
 
 
-	auto *s = tsunami->create_session();
+	auto *s = create_session();
 	s->win->show();
 
 	auto ef = e.find("file");

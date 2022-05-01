@@ -10,13 +10,12 @@
 
 class Session;
 class Path;
-class Tsunami;
 
 class SessionManager {
 public:
-	//static Session *create(Tsunami *tsunami);
-	static void save(Session *s, const Path &filename);
-	static Session *load(const Path &filename);
+	static Session *create_session();
+	static void save_session(Session *s, const Path &filename);
+	static Session *load_session(const Path &filename);
 
 	static Path directory();
 };

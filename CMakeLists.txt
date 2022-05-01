@@ -352,6 +352,7 @@ set(SOURCE
 	src/stuff/Log.cpp
 	src/stuff/Observable.cpp
 	src/stuff/PerformanceMonitor.cpp
+	src/stuff/SessionManager.cpp
 	src/test/TestAudioBuffer.cpp
 	src/test/TestInterpolator.cpp
 	src/test/TestMidiPreview.cpp

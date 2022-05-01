@@ -1039,6 +1039,9 @@
     <ClCompile Include="src\stuff\PerformanceMonitor.cpp">
       <Filter>src\stuff</Filter>
     </ClCompile>
+    <ClCompile Include="src\stuff\SessionManager.cpp">
+      <Filter>src\stuff</Filter>
+    </ClCompile>
     <ClCompile Include="src\test\TestAudioBuffer.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
@@ -2323,6 +2326,9 @@
       <Filter>src\stuff</Filter>
     </ClInclude>
     <ClInclude Include="src\stuff\PerformanceMonitor.h">
+      <Filter>src\stuff</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stuff\SessionManager.h">
       <Filter>src\stuff</Filter>
     </ClInclude>
     <ClInclude Include="src\test\TestAudioBuffer.h">

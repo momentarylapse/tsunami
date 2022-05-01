@@ -462,6 +462,7 @@
     <ClCompile Include="src\stuff\Log.cpp" />
     <ClCompile Include="src\stuff\Observable.cpp" />
     <ClCompile Include="src\stuff\PerformanceMonitor.cpp" />
+    <ClCompile Include="src\stuff\SessionManager.cpp" />
     <ClCompile Include="src\test\TestAudioBuffer.cpp" />
     <ClCompile Include="src\test\TestInterpolator.cpp" />
     <ClCompile Include="src\test\TestMidiPreview.cpp" />
@@ -892,6 +893,7 @@
     <ClInclude Include="src\stuff\Log.h" />
     <ClInclude Include="src\stuff\Observable.h" />
     <ClInclude Include="src\stuff\PerformanceMonitor.h" />
+    <ClInclude Include="src\stuff\SessionManager.h" />
     <ClInclude Include="src\test\TestAudioBuffer.h" />
     <ClInclude Include="src\test\TestInterpolator.h" />
     <ClInclude Include="src\test\TestMidiPreview.h" />

@@ -49,8 +49,8 @@ class LowPassFilter extends AudioEffect
 			float x = sqr(cos(phase))
 			f1[i] = exp(log(config.f_min) + (log(config.f_max) - log(config.f_min)) * x)
 			f2[i] = f1[i] * 1.4
-		filter1.create(FILTER_ALL_PASS, f1, q, gain, session.sample_rate())
-		filter2.create(FILTER_ALL_PASS, f2, q, gain, session.sample_rate())
+		filter1.create(FilterType.ALL_PASS, f1, q, gain, session.sample_rate())
+		filter2.create(FilterType.ALL_PASS, f2, q, gain, session.sample_rate())
 		AudioBuffer bb = buf
 		filter1.apply(bb)
 		filter2.apply(bb)

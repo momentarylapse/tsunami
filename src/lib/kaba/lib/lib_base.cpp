@@ -35,6 +35,8 @@ extern const Class *TypeFloatDict;
 extern const Class *TypeStringDict;
 extern const Class *TypeAny;
 
+int enum_parse(const string &label, const Class *type);
+
 
 static string kaba_print_postfix = "\n";
 void _cdecl kaba_print(const string &str) {
@@ -66,6 +68,8 @@ template<>
 bool _cdecl kaba_cast(void* s) {
 	return (s != nullptr);
 }
+
+int kaba_int_passthrough(int i) { return i; }
 
 
 static void kaba_ping() {
@@ -110,6 +114,7 @@ MAKE_OP_FOR(double)
 int op_int_mod(int a, int b) { return a % b; }
 int op_int_shr(int a, int b) { return a >> b; }
 int op_int_shl(int a, int b) { return a << b; }
+int op_int_passthrough(int i) { return i; }
 int64 op_int64_mod(int64 a, int64 b) { return a % b; }
 int64 op_int64_shr(int64 a, int64 b) { return a >> b; }
 int64 op_int64_shl(int64 a, int64 b) { return a << b; }
@@ -383,6 +388,13 @@ public:
 	}
 };
 
+Array<int> enum_all(const Class *e) {
+	Array<int> r;
+	for (auto c: weak(e->constants))
+		if (c->type == e)
+			r.add(c->as_int());
+	return r;
+}
 
 void SIAddXCommands() {
 
@@ -429,15 +441,15 @@ void SIAddPackageBase() {
 	add_package("base", Flags::AUTO_IMPORT);
 
 	// internal
-	TypeUnknown			= add_type  ("-unknown-", 0); // should not appear anywhere....or else we're screwed up!
-	TypeReg128			= add_type  ("-reg128-", 16, Flags::CALL_BY_VALUE);
-	TypeReg64			= add_type  ("-reg64-", 8, Flags::CALL_BY_VALUE);
-	TypeReg32			= add_type  ("-reg32-", 4, Flags::CALL_BY_VALUE);
-	TypeReg16			= add_type  ("-reg16-", 2, Flags::CALL_BY_VALUE);
-	TypeReg8			= add_type  ("-reg8-", 1, Flags::CALL_BY_VALUE);
+	TypeUnknown			= add_type  ("@unknown", 0); // should not appear anywhere....or else we're screwed up!
+	TypeReg128			= add_type  ("@reg128", 16, Flags::CALL_BY_VALUE);
+	TypeReg64			= add_type  ("@reg64", 8, Flags::CALL_BY_VALUE);
+	TypeReg32			= add_type  ("@reg32", 4, Flags::CALL_BY_VALUE);
+	TypeReg16			= add_type  ("@reg16", 2, Flags::CALL_BY_VALUE);
+	TypeReg8			= add_type  ("@reg8", 1, Flags::CALL_BY_VALUE);
 	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
 	TypeObjectP			= add_type_p(TypeObject);
-	TypeDynamic			= add_type  ("-dynamic-", 0);
+	TypeDynamic			= add_type  ("@dynamic", 0);
 
 	// "real"
 	TypeVoid			= add_type  ("void", 0, Flags::CALL_BY_VALUE);
@@ -607,7 +619,6 @@ void SIAddPackageBase() {
 		add_operator(OperatorID::NEGATIVE, TypeInt64, nullptr, TypeInt64, InlineID::INT64_NEGATE, &op_int64_neg);
 		add_operator(OperatorID::INCREASE, TypeVoid, TypeInt64, nullptr, InlineID::INT64_INCREASE);
 		add_operator(OperatorID::DECREASE, TypeVoid, TypeInt64, nullptr, InlineID::INT64_DECREASE);
-
 
 	add_class(TypeFloat32);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &kaba_float2str, Flags::PURE);

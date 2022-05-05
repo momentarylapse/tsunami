@@ -19,7 +19,7 @@ public:
 	BackendAmd64(Serializer *serializer);
 	~BackendAmd64() override;
 
-	void implement_return(kaba::SerialNode &c, int i) override;
+	void implement_return(const SerialNodeParam &p) override;
 	void implement_mov_chunk(const SerialNodeParam &p1, const SerialNodeParam &p2, int size) override;
 
 	int function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) override;

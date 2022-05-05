@@ -68,105 +68,88 @@ func pitch_name(pitch: int) -> string
 	return name_rel + name_oct
 
 
-func chord_type_name(t: int) -> string
-	if t == Chord.MAJOR
-		return "maj"
-	if t == Chord.MINOR
-		return "min"
-	if t == Chord.DIMINISHED
-		return "dim"
-	if t == Chord.AUGMENTED
-		return "aug"
-	if t == Chord.DOMINANT_SEVENTH
-		return "dom7"
-	if t == Chord.MINOR_SEVENTH
-		return "min7"
-	if t == Chord.MAJOR_SEVENTH
-		return "maj7"
-	if t == Chord.MINOR_MAJOR_SEVENTH
-		return "minmaj7"
-	if t == Chord.DIMINISHED_SEVENTH
-		return "dim7"
-	if t == Chord.HALF_DIMINISHED_SEVENTH
-		return "halfdim7"
-	if t == Chord.AUGMENTED_SEVENTH
-		return "aug7"
-	if t == Chord.AUGMENTED_MAJOR_SEVENTH
-		return "augmaj7"
-	if t == Chord.SINGLE_TONE
-		return ""
-	if t > Chord.SINGLE_TONE and t < Chord.SINGLE_TONE + 7
-		return " +{{t - Chord.SINGLE_TONE}}"
-	return "???"
-
 class Chord
-	enum
+	enum Type
 		# 3 tones
-		MAJOR
-		MINOR
-		DIMINISHED
-		AUGMENTED
+		MAJOR as "maj"
+		MINOR as "min"
+		DIMINISHED as "dim"
+		AUGMENTED as "aug"
 		# 4 tones
-		MINOR_SEVENTH
-		MAJOR_SEVENTH
-		MINOR_MAJOR_SEVENTH
-		DIMINISHED_SEVENTH
-		HALF_DIMINISHED_SEVENTH
-		DOMINANT_SEVENTH
-		AUGMENTED_SEVENTH
-		AUGMENTED_MAJOR_SEVENTH
+		MINOR_SEVENTH as "min7"
+		MAJOR_SEVENTH as "maj7"
+		MINOR_MAJOR_SEVENTH as "minmaj7"
+		DIMINISHED_SEVENTH as "dim7"
+		HALF_DIMINISHED_SEVENTH as "halfdim7"
+		DOMINANT_SEVENTH as "dom7"
+		AUGMENTED_SEVENTH as "aug7"
+		AUGMENTED_MAJOR_SEVENTH as "augmaj7"
 		# 1 tone
-		SINGLE_TONE
+		SINGLE_TONE as ""
 		# 2 tones (intervals > prime)
-		NUM_TYPES = 19 # SINGLE_TONE + 12
+		INTERVAL0 as "0"
+		INTERVAL1 as "1"
+		INTERVAL2 as "2"
+		INTERVAL3 as "3"
+		INTERVAL4 as "4"
+		INTERVAL5 as "5"
+		INTERVAL6 as "6"
+		INTERVAL7 as "7"
+		INTERVAL8 as "8"
+		INTERVAL9 as "9"
+		INTERVAL10 as "10"
+		INTERVAL11 as "11"
+		
+		UNKNOWN = -1
+
 	var base_tone: int
-	var type: int
+	var type: Type
 	func const pitch() -> int[]
-		if type == MAJOR
+		if type == Type.MAJOR
 			return [base_tone, base_tone + 4, base_tone + 7]
-		if type == MINOR
+		if type == Type.MINOR
 			return [base_tone, base_tone + 3, base_tone + 7]
-		if type == DIMINISHED
+		if type == Type.DIMINISHED
 			return [base_tone, base_tone + 3, base_tone + 6]
-		if type == AUGMENTED
+		if type == Type.AUGMENTED
 			return [base_tone, base_tone + 4, base_tone + 8]
 			
-		if type == DOMINANT_SEVENTH
+		if type == Type.DOMINANT_SEVENTH
 			return [base_tone, base_tone + 4, base_tone + 7, base_tone + 10]
-		if type == MAJOR_SEVENTH
+		if type == Type.MAJOR_SEVENTH
 			return [base_tone, base_tone + 4, base_tone + 7, base_tone + 11]
-		if type == MINOR_SEVENTH
+		if type == Type.MINOR_SEVENTH
 			return [base_tone, base_tone + 3, base_tone + 7, base_tone + 10]
-		if type == MINOR_MAJOR_SEVENTH
+		if type == Type.MINOR_MAJOR_SEVENTH
 			return [base_tone, base_tone + 3, base_tone + 7, base_tone + 11]
-		if type == DIMINISHED_SEVENTH
+		if type == Type.DIMINISHED_SEVENTH
 			return [base_tone, base_tone + 3, base_tone + 6, base_tone + 9]
-		if type == HALF_DIMINISHED_SEVENTH
+		if type == Type.HALF_DIMINISHED_SEVENTH
 			return [base_tone, base_tone + 3, base_tone + 6, base_tone + 10]
-		if type == AUGMENTED_SEVENTH
+		if type == Type.AUGMENTED_SEVENTH
 			return [base_tone, base_tone + 4, base_tone + 8, base_tone + 10]
-		if type == AUGMENTED_MAJOR_SEVENTH
+		if type == Type.AUGMENTED_MAJOR_SEVENTH
 			return [base_tone, base_tone + 4, base_tone + 8, base_tone + 11]
 			
-		if type == SINGLE_TONE
+		if type == Type.SINGLE_TONE
 			return [base_tone]
-		if type > SINGLE_TONE
-			return [base_tone, base_tone + (type - SINGLE_TONE)]
+		if int(type) > int(Type.SINGLE_TONE)
+			return [base_tone, base_tone + (int(type) - int(Type.SINGLE_TONE))]
 		return []
 	func name() -> string
-		if type < 0
+		if int(type) < 0
 			return "???"
-		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + chord_type_name(type)
+		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + str(type)
 
 	func static parse(s: string) -> Chord[]
 		Chord[] chords
 		for a,i in s
 			Chord c
 			if a >= 'a' and a <= 'h'
-				c.type = MINOR
+				c.type = Type.MINOR
 				c.base_tone = char_to_rel_pitch(a) + 48
 			else if a >= 'A' and a <= 'H'
-				c.type = MAJOR
+				c.type = Type.MAJOR
 				c.base_tone = char_to_rel_pitch(a + 32) + 48
 			else
 				continue
@@ -194,14 +177,15 @@ class Chord
 		int sig = pitch_signature(pitches)
 		Chord c
 		for b in 0:12
-			for t in 0:NUM_TYPES
+			for t in Type.all()
 				c.base_tone = b
 				c.type = t
 				int s = pitch_signature(c.pitch())
 				if s == sig #c.match_pitch(pitches)
 					return c
-		c.type = -1
+		c.type = Chord.Type.from_int(-1)
 		return c
+
 
 func pitch_signature(pitches: int[]) -> int
 	int s = 0

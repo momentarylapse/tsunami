@@ -97,18 +97,42 @@ class ConfigPanel extends Panel
 	var c: Module*
 
 class Module as shared extends Object
+
+	enum Command
+		START
+		STOP
+		PREPARE_START
+		ACCUMULATION_START
+		ACCUMULATION_STOP
+		ACCUMULATION_CLEAR
+		ACCUMULATION_GET_SIZE
+		SUCK
+
+	enum Type
+		AUDIO_SOURCE
+		AUDIO_EFFECT
+		MIDI_SOURCE
+		MIDI_EFFECT
+		SYNTHESIZER
+		BEAT_SOURCE
+		AUDIO_VISUALIZER
+		STREAM
+		PITCH_DETECTOR
+		PLUMBING
+		SIGNAL_CHAIN
+
 	var name: string
 	var session: Session*
 	#var port_out: owned Port[]
 	var port_out: Port*[]
-	func extern __init__(type: int, sub_type: string)
+	func extern __init__(type: Type, sub_type: string)
 	func extern override __delete__()
 	func __assign__(o: Module)
 		pass
 	func extern reset_config()
 	func extern virtual reset_state()
 	func extern changed()
-	func extern virtual command(cmd: int, param: int) -> int
+	func extern virtual command(cmd: Command, param: int) -> int
 	func extern plug_in(in_port: int, source: Module, out_port: int)
 	func extern unplug_in(in_port: int)
 	func extern subscribe(handler: Object, f: void->void, message: string)
@@ -140,29 +164,6 @@ class Module as shared extends Object
 
 	const VERSION_LATEST = -1
 	const VERSION_LEGACY = -2
-
-	enum Command
-		START
-		STOP
-		PREPARE_START
-		ACCUMULATION_START
-		ACCUMULATION_STOP
-		ACCUMULATION_CLEAR
-		ACCUMULATION_GET_SIZE
-		SUCK
-
-	enum Type
-		AUDIO_SOURCE
-		AUDIO_EFFECT
-		MIDI_SOURCE
-		MIDI_EFFECT
-		SYNTHESIZER
-		BEAT_SOURCE
-		AUDIO_VISUALIZER
-		STREAM
-		PITCH_DETECTOR
-		PLUMBING
-		SIGNAL_CHAIN
 
 class AudioEffect extends Module
 	var apply_to_whole_buffer: bool
@@ -222,22 +223,23 @@ class AudioBuffer
 func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
 
 class RingBuffer
+	enum PeekMode
+		FORWARD_REF
+		FORWARD_COPY_WRAP
+		BACKWARD_REF
+		BACKWARD_COPY_WRAP
+
 	func extern __init__(size: int)
 	func extern const available() -> int
 	func extern read(out b: AudioBuffer)
 	func extern write(b: AudioBuffer)
 	func extern read_ref(out b: AudioBuffer, size: int)
 	func extern read_ref_done(b: AudioBuffer)
-	func extern peek(out b: AudioBuffer, size: int, mode: int)
+	func extern peek(out b: AudioBuffer, size: int, mode: PeekMode)
 	func extern write_ref(b: AudioBuffer, size: int)
 	func extern write_ref_done(b: AudioBuffer)
 	func extern clear()
 	func __assign__(o: RingBuffer)
-	enum PeekMode
-		FORWARD_REF
-		FORWARD_COPY_WRAP
-		BACKWARD_REF
-		BACKWARD_COPY_WRAP
 
 
 # general "interface"
@@ -397,8 +399,16 @@ class BarCollection extends Bar shared[]
 	func extern const get_next_beat(pos: int) -> int
 	func extern const get_prev_beat(pos: int) -> int
 
+enum SignalType
+	AUDIO
+	TIME
+	MIDI
+	AUDIO_MONO
+	AUDIO_STEREO
+	GROUP
+
 class TrackLayer as shared
-	var type: int
+	var type: SignalType
 	var track: Track*
 	var buffers: AudioBuffer[]
 	var midi: MidiNoteBuffer
@@ -440,20 +450,13 @@ class SampleRef as shared
 	func extern virtual __delete__()
 
 
-enum SignalType
-	AUDIO
-	TIME
-	MIDI
-	AUDIO_MONO
-	AUDIO_STEREO
-	GROUP
 
 class Instrument
 	var type: int
 	var string_pitch: int[]
 
 class Track as shared
-	var type: int
+	var type: SignalType
 	var name: string
 	var layers: TrackLayer shared[]
 
@@ -507,11 +510,11 @@ class Song as shared
 	func extern selfref time_track() -> Track*
 	func extern selfref layers() -> TrackLayer*[]
 	
-	func extern add_track(type: int, index: int) -> Track*
+	func extern add_track(type: SignalType, index: int) -> Track*
 	func extern delete_track(index: int)
-	func extern add_bar(index: int, b: Bar, mode: int)
-	func extern add_pause(index: int, length: int, mode: int)
-	func extern edit_bar(index: int, b: Bar, mode: int)
+	func extern add_bar(index: int, b: Bar, mode: Bar.EditMode)
+	func extern add_pause(index: int, length: int, mode: Bar.EditMode)
+	func extern edit_bar(index: int, b: Bar, mode: Bar.EditMode)
 	func extern delete_bar(index: int, affect_midi: bool)
 	func extern add_sample(s: Sample)
 	func extern delete_sample(s: Sample)
@@ -638,9 +641,9 @@ class SignalChain extends Module
 	func extern __init__(session: Session, name: string)
 	func extern override __delete__()
 	func extern __del_override__()
-	func extern override command(cmd: int, param: int) -> int
+	func extern override command(cmd: Module.Command, param: int) -> int
 	func extern override reset_state()
-	func extern add(type: int, name: string) -> Module*
+	func extern add(type: Module.Type, name: string) -> Module*
 	func extern _add(m: Module) -> Module*
 	func extern delete(m: Module)
 	func extern connect(source: Module, source_port: int, target: Module, target_port: int)
@@ -727,7 +730,7 @@ class HoverData
 class MidiPainter
 	#extern void __init__(AudioView* view)
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
-	func extern set_context(area: rect, i: Instrument, playable: bool, mode: int)
+	func extern set_context(area: rect, i: Instrument, playable: bool, mode: MidiMode)
 	func extern draw(p: Painter, midi: MidiNoteBuffer)
 	func extern draw_background(c: Painter)
 	var cam: AudioView.ViewPort*
@@ -768,7 +771,7 @@ func extern fft_c2c(in: complex[], out _out: complex[], inverse: bool)
 func extern fft_r2c(in: float[], out _out: complex[])
 func extern fft_c2r_inv(in: complex[], out _out: float[])
 
-func extern CreateModule(session: Session, type: int, name: string) -> Module*
+func extern CreateModule(session: Session, type: Module.Type, name: string) -> Module*
 func extern CreateSynthesizer(session: Session, name: string) -> Synthesizer*
 func extern CreateAudioSource(session: Session, name: string) -> AudioSource*
 func extern CreateAudioEffect(session: Session, name: string) -> AudioEffect*
@@ -779,7 +782,7 @@ func extern CreateBeatSource(session: Session, name: string) -> BeatSource*
 func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> Sample*
 #extern void SetTempBackupFilename(Path filename)
 
-func extern ChooseModule(parent: Panel, session: Session, type: int, old_name: string) -> string
+func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, old_name: string) -> string
 
 func extern draw_boxed_str(c: Painter, p: vec2, str: string, col_text: color, col_bg: color)
 

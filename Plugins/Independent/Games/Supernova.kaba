@@ -41,10 +41,10 @@ var Score: float
 var ScoreFactor: float
 var TotalScore: float
 
-var Mode: int
-enum
-	ModeConfig
-	ModeLesson
+enum Mode
+	CONFIG
+	LESSON
+var mode: Mode
 var LessonName: string[]
 
 var error: float

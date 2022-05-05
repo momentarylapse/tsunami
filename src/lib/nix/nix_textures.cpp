@@ -451,7 +451,7 @@ RenderBuffer::RenderBuffer(int w, int h, int _samples, const string &format) {
 	glGenRenderbuffers(1, &texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, texture);
 	if (samples > 0)
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, internal_format, width, height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
 	else
 		glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
 }

@@ -8,35 +8,37 @@ class Node
 	func __init__(p: complex)
 		pos = p
 
-enum
-	TYPE_CABLE
-	TYPE_SOURCE
-	TYPE_RESISTOR
-	TYPE_CAPACITOR
-	TYPE_INDUCTOR
-	TYPE_DIODE
-	NUM_TYPES
+enum EdgeType
+	CABLE
+	SOURCE
+	RESISTOR
+	CAPACITOR
+	INDUCTOR
+	DIODE
+	NUM
 
-func edge_name(t: int) -> string
-	if t == TYPE_CABLE
+func edge_name(t: EdgeType) -> string
+	if t == EdgeType.CABLE
 		return "Cable"
-	if t == TYPE_SOURCE
+	if t == EdgeType.SOURCE
 		return "Source"
-	if t == TYPE_RESISTOR
+	if t == EdgeType.RESISTOR
 		return "Resistor"
-	if t == TYPE_CAPACITOR
+	if t == EdgeType.CAPACITOR
 		return "Capacitor"
-	if t == TYPE_INDUCTOR
+	if t == EdgeType.INDUCTOR
 		return "Inductor"
-	if t == TYPE_DIODE
+	if t == EdgeType.DIODE
 		return "Diode"
 	return "???"
 
-func edge_type(s: string) -> int
-	for i in 0:NUM_TYPES
-		if s == edge_name(i)
-			return i
-	return -1
+func edge_type(s: string) -> EdgeType
+	for i in 0:int(EdgeType.NUM)
+		var t: EdgeType = EdgeType.from_int(i)
+		if s == edge_name(t)
+			return t
+	var t: EdgeType = EdgeType.from_int(-1)
+	return t
 	
 
 # ARGH
@@ -45,11 +47,11 @@ func empty() -> float[]
 	return r
 
 class Edge
-	var type: int
+	var type: EdgeType
 	var a, b: int
 	var I, U: float
 	var param: float[4]
-	func __init__(_type: int, n: int[], p: float[])
+	func __init__(_type: EdgeType, n: int[], p: float[])
 		type = _type
 		a = n[0]
 		b = n[1]
@@ -73,7 +75,7 @@ class Edge
 
 class Cable extends Edge
 	func __init__(n: int[])
-		super.__init__(TYPE_CABLE, n, empty())
+		super.__init__(EdgeType.CABLE, n, empty())
 	func override g(dt: float) -> float
 		return 1000
 	func override update(nodes: Node[], dt: float)
@@ -82,7 +84,7 @@ class Cable extends Edge
 
 class Source extends Edge
 	func __init__(n: int[], i: float)
-		super.__init__(TYPE_SOURCE, n, [i, 10000.0])
+		super.__init__(EdgeType.SOURCE, n, [i, 10000.0])
 	func override g(dt: float) -> float
 		return 1 / param[1]
 	func override I_off(dt: float) -> float
@@ -95,7 +97,7 @@ class Source extends Edge
 
 class Resistor extends Edge
 	func __init__(n: int[], R: float)
-		super.__init__(TYPE_RESISTOR, n, [R])
+		super.__init__(EdgeType.RESISTOR, n, [R])
 	func override g(dt: float) -> float
 		return 1 / param[0]
 	func override update(nodes: Node[], dt: float)
@@ -107,7 +109,7 @@ class Resistor extends Edge
 class Capacitor extends Edge
 	var U_prev = 0.0
 	func __init__(n: int[], C: float)
-		super.__init__(TYPE_CAPACITOR, n, [C])
+		super.__init__(EdgeType.CAPACITOR, n, [C])
 	func override g(dt: float) -> float
 		return param[0] / dt
 	func override I_off(dt: float) -> float
@@ -125,7 +127,7 @@ class Capacitor extends Edge
 class Inductor extends Edge
 	var I_prev = 0.0
 	func __init__(n: int[], L: float)
-		super.__init__(TYPE_INDUCTOR, n, [L])
+		super.__init__(EdgeType.INDUCTOR, n, [L])
 	func override g(dt: float) -> float
 		return dt / param[0]
 	func override I_off(dt: float) -> float
@@ -149,7 +151,7 @@ class Diode extends Edge
 	var i_low, i_high: float
 	var g_low, g_high: float
 	func __init__(n: int[])
-		super.__init__(TYPE_DIODE, n, DIODE_DEFAULT_PARAMS)
+		super.__init__(EdgeType.DIODE, n, DIODE_DEFAULT_PARAMS)
 		U = param[0]
 		u_low = -0.5
 		u_high = 1
@@ -343,25 +345,25 @@ class Circuit
 			else if x[0] == "Out"
 				_out = int(x[1])
 			else
-				int t = edge_type(x[0])
+				var t = edge_type(x[0])
 				int[] n = [int(x[1]), int(x[2])]
 				var e: Edge* = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
 	
-	func add_default(n: int[], t: int) -> Edge*
+	func add_default(n: int[], t: EdgeType) -> Edge*
 		var e: Edge* = nil
-		if t == TYPE_CABLE
+		if t == EdgeType.CABLE
 			e = new Cable(n)
-		else if t == TYPE_SOURCE
+		else if t == EdgeType.SOURCE
 			e = new Source(n, 1)
-		else if t == TYPE_RESISTOR
+		else if t == EdgeType.RESISTOR
 			e = new Resistor(n, 10)
-		else if t == TYPE_CAPACITOR
+		else if t == EdgeType.CAPACITOR
 			e = new Capacitor(n, 1)
-		else if t == TYPE_INDUCTOR
+		else if t == EdgeType.INDUCTOR
 			e = new Inductor(n, 1)
-		else if t == TYPE_DIODE
+		else if t == EdgeType.DIODE
 			e = new Diode(n)
 		else
 			raise(new Exception("unknown type: {{t}}"))

@@ -648,7 +648,7 @@ void Parser::auto_implement_shared_clear(Function *f, const Class *t) {
 	shared<Node> count;
 	for (auto &e: tt->elements)
 		if (e.name == IDENTIFIER_SHARED_COUNT and e.type == TypeInt)
-			count = self_p->deref_shift(e.offset, e.type);
+			count = self_p->deref_shift(e.offset, e.type, -1);
 	if (!count)
 		do_error_implicit(f, format("class '%s' is not a shared class (declare with '%s class' or add an element 'int %s')", tt->long_name(), IDENTIFIER_SHARED, IDENTIFIER_SHARED_COUNT));
 

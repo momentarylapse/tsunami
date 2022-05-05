@@ -355,6 +355,7 @@
     <ClCompile Include="src\lib\kaba\syntax\Function.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Identifier.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\implicit.cpp" />
+    <ClCompile Include="src\lib\kaba\syntax\import.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\lexical.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\macros.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp" />

@@ -1,9 +1,9 @@
 use hui
 use tsunami
 
-enum
-	MODE_FORWARD
-	MODE_LOOP
+enum Mode
+	FORWARD
+	LOOP
 
 func get_part(s: Song, offset: int) -> TrackMarker*
 	var t = s.time_track()
@@ -34,7 +34,7 @@ Button forward 'Forward' expandx expandy")
 
 class Looper extends TsunamiPlugin
 	var runner: int
-	var mode: int
+	var mode: Mode
 	var chain: SignalChain*
 	var renderer: SongRenderer*
 	var song: Song*
@@ -46,7 +46,7 @@ class Looper extends TsunamiPlugin
 		chain = session.view.signal_chain
 		renderer = session.view.renderer
 		runner = hui.run_repeated(0.05, on_update)
-		mode = MODE_FORWARD
+		mode = Mode.FORWARD
 		
 	func override on_stop()
 		hui.cancel_runner(runner)
@@ -61,11 +61,11 @@ class Looper extends TsunamiPlugin
 		print("entering " + cur_part.text)
 		renderer.set_range(cur_part.range)
 		renderer.set_loop(true)
-		mode = MODE_LOOP
+		mode = Mode.LOOP
 	func go_forward()
 		renderer.set_range(song.range())
 		renderer.set_loop(false)
-		mode = MODE_FORWARD
+		mode = Mode.FORWARD
 	
 	func on_update()
 		int pos = renderer.get_pos(0)

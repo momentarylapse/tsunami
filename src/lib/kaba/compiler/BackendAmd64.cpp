@@ -70,9 +70,7 @@ static bool inst_is_arithmetic(Asm::InstID i) {
 }
 
 
-void BackendAmd64::implement_return(kaba::SerialNode &c, int i) {
-	auto p = c.p[0];
-	cmd.remove_cmd(i);
+void BackendAmd64::implement_return(const SerialNodeParam &p) {
 	if (p.kind != NodeKind::NONE) {
 		if (cur_func->effective_return_type->_amd64_allow_pass_in_xmm()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
@@ -232,6 +230,10 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 	function_call_post(push_size, params, ret);
 }
 
+bool amd64_type_uses_int_register(const Class *t) {
+	return (t == TypeInt) or (t == TypeInt64) or (t == TypeChar) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+}
+
 int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
 	const Class *type = ret.get_type_save();
 
@@ -263,7 +265,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 	int reg_param_counter = 0;
 	int xmm_param_counter = 0;
 	for (auto &p: params) {
-		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_some_pointer()) {
+		if (amd64_type_uses_int_register(p.type)) {
 			if (reg_param_counter < param_regs_root.num) {
 				reg_param.add(p);
 				reg_param_root.add(param_regs_root[reg_param_counter ++]);
@@ -387,7 +389,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	int reg_param_counter = 0;
 	int xmm_param_counter = 0;
 	for (Variable *p: param) {
-		if ((p->type == TypeInt) or (p->type == TypeInt64) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_some_pointer()) {
+		if (amd64_type_uses_int_register(p->type)) {
 			if (reg_param_counter < param_regs_root.num) {
 				reg_param.add(p);
 				reg_param_root.add(param_regs_root[reg_param_counter ++]);

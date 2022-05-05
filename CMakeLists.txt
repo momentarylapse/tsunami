@@ -245,6 +245,7 @@ set(SOURCE
 	src/lib/kaba/syntax/Function.cpp
 	src/lib/kaba/syntax/Identifier.cpp
 	src/lib/kaba/syntax/implicit.cpp
+	src/lib/kaba/syntax/import.cpp
 	src/lib/kaba/syntax/lexical.cpp
 	src/lib/kaba/syntax/macros.cpp
 	src/lib/kaba/syntax/Node.cpp

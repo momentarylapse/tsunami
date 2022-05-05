@@ -5,6 +5,8 @@
 
 namespace kaba {
 
+void remove_enum_labels(const Class *type);
+
 ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;
@@ -110,6 +112,7 @@ Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *
 };
 
 Class::~Class() {
+	remove_enum_labels(this);
 }
 
 bool Class::force_call_by_value() const {
@@ -176,6 +179,9 @@ bool Class::is_pointer_shared() const
 
 bool Class::is_pointer_owned() const
 { return type == Type::POINTER_OWNED; }
+
+bool Class::is_enum() const
+{ return type == Type::ENUM; }
 
 bool Class::is_interface() const
 { return type == Type::INTERFACE; }
@@ -283,10 +289,10 @@ bool Class::needs_constructor() const {
 }
 
 bool Class::is_size_known() const {
+	if (is_super_array() or is_dict() or is_some_pointer() or is_enum())
+		return true;
 	if (!fully_parsed())
 		return false;
-	if (is_super_array() or is_dict() or is_some_pointer())
-		return true;
 	for (ClassElement &e: elements)
 		if (!e.type->is_size_known())
 			return false;
@@ -428,7 +434,7 @@ void Class::link_virtual_table() {
 	if (vtable.num == 0)
 		return;
 
-	//msg_write("link vtable " + name);
+	//msg_write("link vtable " + long_name());
 	// derive from parent
 	if (parent)
 		for (int i=0; i<parent->vtable.num; i++)

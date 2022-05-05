@@ -154,7 +154,7 @@ class HammondRenderer extends PitchRenderer
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
-		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
+		filter.create(FilterType.LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
 	func override on_config()
 		stutter = create_stutter(synth.config.key_stutter)
 		env.set(synth.config.attack, DECAY, SUSTAIN, synth.config.release, synth.sample_rate)

@@ -21,7 +21,7 @@ class AllPassFilter extends AudioEffect
 		filter.reset()
 
 	func override on_config()
-		filter.create(FILTER_ALL_PASS, config.z, config.phi, 0, session.sample_rate())
+		filter.create(FilterType.ALL_PASS, config.z, config.phi, 0, session.sample_rate())
 		
 	func override process(out buf: AudioBuffer)
 		filter.apply(buf)

@@ -16,61 +16,6 @@ void SetImmortal(SyntaxTree *ps) {
 		SetImmortal(i->syntax);
 }
 
-static bool _class_contains(const Class *c, const string &name) {
-	for (auto *cc: weak(c->classes))
-		if (cc->name == name)
-			return true;
-	for (auto *f: weak(c->functions))
-		if (f->name == name)
-			return true;
-	for (auto *cc: weak(c->constants))
-		if (cc->name == name)
-			return true;
-	return false;
-}
-
-// import data from an included module file
-void SyntaxTree::add_include_data(shared<Module> s, bool indirect) {
-	for (auto i: weak(includes))
-		if (i == s)
-			return;
-
-	SyntaxTree *ps = s->syntax;
-	if (flag_immortal)
-		SetImmortal(ps);
-
-	flag_string_const_as_cstring |= ps->flag_string_const_as_cstring;
-
-	// defines
-	defines.append(ps->defines);
-
-
-	/*if (FlagCompileOS) {
-		import_deep(this, ps);
-	} else {*/
-	if (indirect) {
-		imported_symbols->classes.add(ps->base_class);
-	} else {
-		for (auto *c: weak(ps->base_class->classes))
-			imported_symbols->classes.add(c);
-		for (auto *f: weak(ps->base_class->functions))
-			imported_symbols->functions.add(f);
-		for (auto *v: weak(ps->base_class->static_variables))
-			imported_symbols->static_variables.add(v);
-		for (auto *c: weak(ps->base_class->constants))
-			imported_symbols->constants.add(c);
-		if (s->filename.basename().find(".kaba") < 0)
-			if (!_class_contains(imported_symbols.get(), ps->base_class->name)) {
-				imported_symbols->classes.add(ps->base_class);
-			}
-	}
-	includes.add(s);
-	//}
-
-	for (Operator *op: ps->operators)
-		if (op->owner == ps)
-			operators.add(op);
-}
 
 enum {
 	MacroDefine,
@@ -86,7 +31,7 @@ string MacroName[NumMacroNames] =
 
 void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse) {
 	string filename;
-	Define d;
+	string source;
 
 
 	int macro_no = -1;
@@ -98,38 +43,37 @@ void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just
 		case MacroDefine:
 			// source
 			Exp.next();
-			d.source = Exp.cur;
+			source = Exp.cur;
 			// dests
 			while (true) {
 				Exp.next();
 				if (Exp.end_of_line())
 					break;
-				d.dest.add(Exp.cur);
+				//d.dest.add(Exp.cur);
 			}
 
 			// special defines?
-			if ((d.source.num > 4) and (d.source.head(2) == "__") and (d.source.tail(2) == "__")) {
-				if (d.source == "__OS__") {
+			if ((source.num > 4) and (source.head(2) == "__") and (source.tail(2) == "__")) {
+				if (source == "__OS__") {
 					do_error_exp("#define __OS__ deprecated");
-				} else if (d.source == "__STRING_CONST_AS_CSTRING__") {
+				} else if (source == "__STRING_CONST_AS_CSTRING__") {
 					tree->flag_string_const_as_cstring = true;
-				} else if (d.source == "__FUNCTION_POINTER_AS_CODE__") {
+				} else if (source == "__FUNCTION_POINTER_AS_CODE__") {
 					tree->flag_function_pointer_as_code = true;
-				} else if (d.source == "__NO_FUNCTION_FRAME__") {
+				} else if (source == "__NO_FUNCTION_FRAME__") {
 					do_error_exp("#define __NO_FUNCTION_FRAME__ deprecated");
-				} else if (d.source == "__ADD_ENTRY_POINT__") {
+				} else if (source == "__ADD_ENTRY_POINT__") {
 					do_error_exp("#define __ADD_ENTRY_POINT__ deprecated");
-				} else if (d.source == "__VARIABLE_OFFSET__") {
+				} else if (source == "__VARIABLE_OFFSET__") {
 					do_error_exp("#define __VARIABLE_OFFSET__ deprecated");
-				} else if (d.source == "__CODE_ORIGIN__") {
+				} else if (source == "__CODE_ORIGIN__") {
 					do_error_exp("#define __CODE_ORIGING__ deprecated");
 				} else {
-					do_error_exp("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
+					do_error_exp("unknown compiler flag (define starting and ending with \"__\"): " + source);
 				}
 			} else {
 				do_error_exp("#define deprecated");
 				// normal define
-				tree->defines.add(d);
 			}
 			break;
 		case MacroImmortal:

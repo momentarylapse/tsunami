@@ -234,7 +234,9 @@ void Module::update_constant_locations() {
 void Module::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	for (auto *v: weak(name_space->static_variables)) {
 		if (v->is_extern()) {
-			v->memory = get_external_link(v->cname(name_space, name_space->owner->base_class));
+			auto m = get_external_link(v->cname(name_space, name_space->owner->base_class));
+			if (!v->memory or m)
+				v->memory = m;
 			if (!v->memory)
 				do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));
 		} else if (!v->memory) {
@@ -461,7 +463,8 @@ void Module::link_functions() {
 
 void Module::link_virtual_functions_into_vtable(const Class *c) {
 	Class *t = const_cast<Class*>(c);
-	t->link_virtual_table();
+	if (t->owner == syntax)
+		t->link_virtual_table();
 
 	/*if (config.compile_os)*/{
 		for (int i=0; i<t->vtable.num; i++) {

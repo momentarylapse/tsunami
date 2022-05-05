@@ -9,16 +9,16 @@ const LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 
-enum
-	TYPE_SINE
-	TYPE_SQUARE
-	TYPE_SAW
+enum SynthType
+	SINE
+	SQUARE
+	SAW
 
 class UnisonConfig extends Module.Config
 	var amplitude: float
 	var initial, peak, sustain: float
 	var attack, decay, release: float
-	var type: int
+	var type: SynthType
 	var num_voices: int
 	var detune, blend: float
 	
@@ -33,7 +33,7 @@ class UnisonConfig extends Module.Config
 		attack = 0.01
 		decay = 0.4
 		release = 0.4
-		type = TYPE_SINE
+		type = SynthType.SINE
 
 class UnisonPanel extends ConfigPanel
 	var fc: UnisonConfig*
@@ -203,7 +203,7 @@ Grid ? ''
 
 	func on_spin_button()
 		var o = fc
-		o.type = get_int("type")
+		o.type = SynthType.from_int(get_int("type"))
 		o.num_voices = get_int("voices")
 		o.detune = get_float("detune")
 		o.blend = get_float("blend")
@@ -212,7 +212,7 @@ Grid ? ''
 	
 	func override update()
 		var o = fc
-		set_int("type", o.type)
+		set_int("type", int(o.type))
 		set_int("voices", o.num_voices)
 		set_float("detune", o.detune)
 		set_float("blend", o.blend)
@@ -262,14 +262,14 @@ class UnisonRenderer extends PitchRenderer
 			for k in 0:c.num_voices
 				float v = osc.volume * vv[k]
 				float phi = osc.phi[k] + delta_phi * (1 + c.detune * k * 0.001)
-				if c.type == TYPE_SINE
+				if c.type == SynthType.SINE
 					output += sin(phi) * v
-				else if c.type == TYPE_SQUARE
+				else if c.type == SynthType.SQUARE
 					if sin(phi) > 0
 						output += v
 					else
 						output -= v
-				else if c.type == TYPE_SAW
+				else if c.type == SynthType.SAW
 					output += (loop(phi, 0, 2*pi) / pi - 1) * v
 				if phi > 16*pi
 					phi = loop(phi, 0, 2*pi)

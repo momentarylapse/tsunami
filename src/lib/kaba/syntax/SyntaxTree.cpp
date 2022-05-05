@@ -188,8 +188,10 @@ shared<Node> SyntaxTree::add_node_operator(Operator *op, const shared<Node> p1, 
 	return cmd;
 }
 
+extern Array<Operator*> global_operators;
+
 shared<Node> SyntaxTree::add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
-	for (auto *op: operators)
+	for (auto *op: global_operators)
 		if (op->f->inline_no == inline_index)
 			return add_node_operator(op, p1, p2, token_id, override_type);
 
@@ -259,7 +261,7 @@ SyntaxTree::SyntaxTree(Module *_module) {
 void SyntaxTree::default_import() {
 	for (auto p: packages)
 		if (p->used_by_default)
-			add_include_data(p, false);
+			import_data(p, false, "");
 }
 
 
@@ -441,31 +443,7 @@ Statement *Parser::which_statement(const string &name) {
 	return nullptr;
 }
 
-shared<Node> SyntaxTree::exlink_add_element(Function *f, ClassElement &e) {
-	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-	return self->shift(e.offset, e.type);
-}
-
-shared<Node> SyntaxTree::exlink_add_element_indirect(Function *f, ClassElement &e, ClassElement &e2) {
-	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-	if (e.type->is_some_pointer())
-		return self->shift(e.offset, e.type)->deref_shift(e2.offset, e2.type);
-	else
-		return self->shift(e.offset + e2.offset, e2.type);
-}
-
-// functions of our "self" class
-shared<Node> SyntaxTree::exlink_add_class_func(Function *f, Function *cf) {
-	auto link = add_node_func_name(cf);
-	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-	if (!f->is_static()) {
-		link->set_num_params(1);
-		link->set_instance(self);
-	}
-	return link;
-}
-
-shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns) {
+shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns, int token_id) {
 	shared_array<Node> links;
 
 
@@ -475,23 +453,23 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 		// named constants
 		for (auto *c: weak(ns->constants))
 			if (name == c->name)
-				return {add_node_const(c)};
+				return {add_node_const(c, token_id)};
 
 		for (auto *v: weak(ns->static_variables))
 			if (v->name == name)
-				return {add_node_global(v)};
+				return {add_node_global(v, token_id)};
 
 		// then the (real) functions
 		for (auto *f: weak(ns->functions))
 			if (f->name == name and f->is_static())
-				links.add(add_node_func_name(f));
+				links.add(add_node_func_name(f, token_id));
 		if (links.num > 0)
 			return links;
 
 		// types
 		for (auto *c: weak(ns->classes))
 			if (c->name == name)
-				return {add_node_class(c)};
+				return {add_node_class(c, token_id)};
 
 		// prefer class...
 		if (links.num > 0)
@@ -504,24 +482,7 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 	return {};
 }
 
-// indirect ("use")
-shared_array<Node> get_existence_element_indirect(SyntaxTree *tree, const string &name, Function *f, const Class *c, ClassElement &e) {
-	auto et = e.type;
-	if (et->is_some_pointer())
-		et = et->param[0];
-	for (auto &ee: et->elements)
-		if (ee.name == name)
-			return {tree->exlink_add_element_indirect(f, e, ee)};
-
-	// functions... TODO
-	/*shared_array<Node> op;
-	for (auto *cf: weak(f->name_space->functions))
-		if (cf->name == name)
-			op.add(exlink_add_class_func(f, cf));*/
-	return {};
-}
-
-shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name) {
+shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name, int token_id) {
 	//operand = force_concrete_type(operand);
 	const Class *type = operand->type;
 	bool deref = false;
@@ -539,6 +500,7 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 
 	// super
 	if (type->parent and (name == IDENTIFIER_SUPER)) {
+		operand->token_id = token_id;
 		if (deref) {
 			operand->type = type->parent->get_pointer();
 			return {operand};
@@ -553,13 +515,13 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 			if (name == e.name) {
 				// direct
 				if (deref)
-					return {operand->deref_shift(e.offset, e.type)};
+					return {operand->deref_shift(e.offset, e.type, token_id)};
 				else
-					return {operand->shift(e.offset, e.type)};
+					return {operand->shift(e.offset, e.type, token_id)};
 			} else if (e.allow_indirect_use) {
 
-				auto v = deref ? operand->deref_shift(e.offset, e.type) : operand->shift(e.offset, e.type);
-				auto links = get_element_of(v, name);
+				auto v = deref ? operand->deref_shift(e.offset, e.type, token_id) : operand->shift(e.offset, e.type, token_id);
+				auto links = get_element_of(v, name, token_id);
 				if (links.num > 0)
 					return links;
 
@@ -584,17 +546,17 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 	}
 	for (auto *c: weak(type->constants))
 		if (name == c->name) {
-			return {add_node_const(c)};
+			return {add_node_const(c, token_id)};
 		}
 	for (auto *v: weak(type->static_variables))
 		if (name == v->name) {
-			return {add_node_global(v)};
+			return {add_node_global(v, token_id)};
 		}
 
 	// sub-class
 	for (auto *c: weak(type->classes))
 		if (name == c->name) {
-			return {add_node_class(c)};
+			return {add_node_class(c, token_id)};
 		}
 
 
@@ -605,25 +567,25 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 	shared_array<Node> links;
 	for (auto *cf: weak(type->functions))
 		if (name == cf->name) {
-			links.add(add_node_func_name(cf));
+			links.add(add_node_func_name(cf, token_id));
 			if (!cf->is_static() and !only_static)
 				links.back()->params.add(cp_node(operand));
 		}
 	return links;
 }
 
-shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *block) {
+shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *block, int token_id) {
 	Function *f = block->function;
 
 	// first test local variables
 	auto *v = block->get_var(name);
 	if (v)
-		return {add_node_local(v)};
+		return {add_node_local(v, token_id)};
 
 	// self.x?
 	if (!f->is_static()) {
-		auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
-		auto links = get_element_of(self, name);
+		auto self = add_node_local(f->__get_var(IDENTIFIER_SELF), token_id);
+		auto links = get_element_of(self, name, token_id);
 		if (links.num > 0)
 			return links;
 	}
@@ -634,15 +596,15 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	return {};
 }
 
-shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, const Class *ns) {
+shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, const Class *ns, int token_id) {
 	if (block) {
-		auto n = get_existence_block(name, block);
+		auto n = get_existence_block(name, block, token_id);
 		if (n.num > 0)
 			return n;
 	}
 
 	// shared stuff (global variables, functions)
-	auto links = get_existence_global(name, ns);
+	auto links = get_existence_global(name, ns, token_id);
 	if (links.num > 0)
 		return links;
 
@@ -658,10 +620,10 @@ shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, c
 	// operators
 	auto w = parser->which_abstract_operator(name, 2); // negate/not...
 	if (w)
-		return {new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown)};
+		return {new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown, token_id)};
 
 	// in include files (only global)...
-	links.append(get_existence_global(name, imported_symbols.get()));
+	links.append(get_existence_global(name, imported_symbols.get(), token_id));
 
 
 	// ...unknown
@@ -669,7 +631,7 @@ shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, c
 }
 
 Function *SyntaxTree::required_func_global(const string &name, int token_id) {
-	auto links = get_existence(name, nullptr, base_class);
+	auto links = get_existence(name, nullptr, base_class, token_id);
 	if (links.num == 0)
 		do_error(format("internal error: '%s()' not found????", name), token_id);
 	return links[0]->as_func();
@@ -1280,7 +1242,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		shared<Node> val1;
 		if (array->type->usable_as_super_array()) {
 			// array.num
-			val1 = array->shift(config.pointer_size, TypeInt);
+			val1 = array->shift(config.pointer_size, TypeInt, array->token_id);
 		} else {
 			// array.size
 			val1 = add_node_const(add_constant_int(array->type->array_length));

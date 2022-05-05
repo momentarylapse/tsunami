@@ -3,10 +3,10 @@
 use hui
 use tsunami
 
-enum
-	MODE_CIRCLE
-	MODE_BOUNCE
-	MODE_BOUNCE_WALK
+enum AnimationMode
+	CIRCLE
+	BOUNCE
+	BOUNCE_WALK
 
 const UPDATE_DT = 1.0 / 50
 const MAX_BACKGROUND_REDNESS = 0.7
@@ -48,7 +48,7 @@ class MetronomePanel extends ConfigPanel
 	var fullscreen: bool
 	var allow_blink_background: bool
 	var allow_blink_number: bool
-	var mode: int
+	var mode: AnimationMode
 	var popup_menu: Menu*
 	var sr_id = -1
 	
@@ -69,7 +69,7 @@ Grid ? '' vertical
 		embed(source.create_panel(), "config", 0, 0)
 		
 		fullscreen = false
-		mode = hui.app_config.get_int("Plugins/Metronome/Mode", MODE_BOUNCE_WALK)
+		mode = AnimationMode.from_int(hui.app_config.get_int("Plugins/Metronome/Mode", int(AnimationMode.BOUNCE_WALK)))
 		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
@@ -126,7 +126,7 @@ Grid ? '' vertical
 		p.set_color(bg)
 		p.draw_rect([0, w, 0, h])
 		
-		if mode == MODE_CIRCLE
+		if mode == AnimationMode.CIRCLE
 			# circle
 			p.set_line_width(r*0.05)
 			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
@@ -143,11 +143,11 @@ Grid ? '' vertical
 			float phi = 2 *pi * (2*t*t*t + t/2)
 			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
 			dot.draw(p, colors.text, r*0.1)
-		else if mode == MODE_BOUNCE
+		else if mode == AnimationMode.BOUNCE
 			float t = beat_fraction
 			dot.move(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r)
 			dot.draw(p, colors.text, r*0.1)
-		else if mode == MODE_BOUNCE_WALK
+		else if mode == AnimationMode.BOUNCE_WALK
 			p.set_color(colors.text_soft3)
 			for i in 0:num_beats
 				float tx = loop((i + 0.5)/num_beats, 0, 1)
@@ -197,9 +197,9 @@ Grid ? '' vertical
 	func on_area_right_button_down()
 		popup_menu.check("blink-background", allow_blink_background)
 		popup_menu.check("blink-number", allow_blink_number)
-		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
-		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
-		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
+		popup_menu.check("mode-circle", mode == AnimationMode.CIRCLE)
+		popup_menu.check("mode-bounce", mode == AnimationMode.BOUNCE)
+		popup_menu.check("mode-bounce-walk", mode == AnimationMode.BOUNCE_WALK)
 		popup_menu.popup(&self)
 	
 	func on_blink_background()
@@ -211,16 +211,16 @@ Grid ? '' vertical
 		hui.app_config["Plugins/Metronome/AllowBlinkNumber"] = allow_blink_number
 	
 	func on_mode_circle()
-		mode = MODE_CIRCLE
-		hui.app_config["Plugins/Metronome/Mode"] = mode
+		mode = AnimationMode.CIRCLE
+		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	
 	func on_mode_bounce()
-		mode = MODE_BOUNCE
-		hui.app_config["Plugins/Metronome/Mode"] = mode
+		mode = AnimationMode.BOUNCE
+		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	
 	func on_mode_bounce_walk()
-		mode = MODE_BOUNCE_WALK
-		hui.app_config["Plugins/Metronome/Mode"] = mode
+		mode = AnimationMode.BOUNCE_WALK
+		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	
 	#void on_fullscreen()
 #		fullscreen = !fullscreen

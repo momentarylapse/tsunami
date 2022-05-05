@@ -12,9 +12,9 @@ const MAX_VOL = 0.0
 
 var dlg: SpectrumDialog*
 
-enum
-	TYPE_LINEAR
-	TYPE_LOG
+enum SpectrumType
+	LINEAR
+	LOG
 
 #float[] x, yr, yl
 var ffr, ffl: float[]
@@ -29,7 +29,7 @@ func todb(v: float) -> float
 var peak_max: float
 
 class SpecGrid extends Grid
-	var type: int
+	var type: SpectrumType
 	var pr, pl: vec2[]
 
 	func create_lines()
@@ -39,19 +39,19 @@ class SpecGrid extends Grid
 			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
-			if type == TYPE_LINEAR
+			if type == SpectrumType.LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
-			else #if type == TypeLogarithm
+			else #if type == SpectrumType.LOG
 				float vol_max = todb(peak_max)
 				float vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
-	func set_type(t: int)
+	func set_type(t: SpectrumType)
 		type = t
-		if type == TYPE_LINEAR
+		if type == SpectrumType.LINEAR
 			y_axis.set(0, peak_max, false, "")
-		else #if type == TypeLogarithm
+		else #if type == SpectrumType.LOG
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
@@ -81,10 +81,11 @@ Grid ? ''
 		event("hui:close", on_close)
 		event("close", on_close)
 	
-		set_int("type", TYPE_LOG)
+		set_int("type", int(SpectrumType.LOG))
 
 	func on_type()
-		grid.set_type(get_int("type"))
+		SpectrumType t = SpectrumType.from_int(get_int("type")) # ...
+		grid.set_type(t)
 		grid.redraw()
 
 	func on_close()

@@ -53,6 +53,7 @@ public:
 		POINTER,
 		POINTER_SHARED,
 		POINTER_OWNED,
+		ENUM,
 		FUNCTION,
 		DICT,
 		PRODUCT, // (a,b) in (A x B)
@@ -70,6 +71,7 @@ public:
 	bool is_some_pointer() const;
 	bool is_pointer_shared() const;
 	bool is_pointer_owned() const;
+	bool is_enum() const;
 	bool is_interface() const;
 	bool is_product() const;
 	bool is_callable() const;

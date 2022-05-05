@@ -23,7 +23,7 @@
 
 namespace kaba {
 
-string Version = "0.19.18.2";
+string Version = "0.19.18.4";
 
 //#define ScriptDebug
 
@@ -274,7 +274,7 @@ void execute_single_command(const string &cmd) {
 	
 	for (auto p: packages)
 		if (!p->used_by_default)
-			tree->add_include_data(p, true);
+			tree->import_data(p, true, "");
 
 // analyse syntax
 

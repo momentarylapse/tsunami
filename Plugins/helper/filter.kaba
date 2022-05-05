@@ -7,29 +7,29 @@ func factor_to_db(f: float) -> float
 	return log(f) / log(10) * 20
 
 
-enum
-	FILTER_PEAK
-	#FILTER_NOTCH
-	FILTER_LOW_PASS
-	FILTER_HIGH_PASS
-	FILTER_LOW_SHELF
-	FILTER_HIGH_SHELF
-	FILTER_LOW_PASS_LINEAR
-	FILTER_HIGH_PASS_LINEAR
-	FILTER_ALL_PASS
+enum FilterType
+	PEAK as "peak"
+	#NOTCH as "notch"
+	LOW_PASS as "low pass"
+	HIGH_PASS as "high pass"
+	LOW_SHELF as "low shelf"
+	HIGH_SHELF as "high shelf"
+	LOW_PASS_LINEAR
+	HIGH_PASS_LINEAR
+	ALL_PASS as "all pass"
 
-func filter_name(t: int) -> string
-	if t == FILTER_PEAK
-		return "Peak"
-	if t == FILTER_LOW_PASS
-		return "Low pass"
-	if t == FILTER_HIGH_PASS
-		return "High pass"
-	if t == FILTER_LOW_SHELF
-		return "Low shelf"
-	if t == FILTER_HIGH_SHELF
-		return "High shelf"
-	return "???"
+#func filter_name(t: FilterType) -> string
+#	if t == FilterType.PEAK
+#		return "Peak"
+#	if t == FilterType.LOW_PASS
+#		return "Low pass"
+#	if t == FilterType.HIGH_PASS
+#		return "High pass"
+#	if t == FilterType.LOW_SHELF
+#		return "Low shelf"
+#	if t == FilterType.HIGH_SHELF
+#		return "High shelf"
+#	return "???"
 
 
 class BiquadFilter
@@ -82,24 +82,24 @@ class BiquadFilter
 			var zz = H * y.bar()
 			return atan2(zz.y, zz.x) * 10
 	
-		func create(mode: int, freq: float, q: float, gain: float, sample_rate: float)
-			if mode == FILTER_LOW_PASS
+		func create(mode: FilterType, freq: float, q: float, gain: float, sample_rate: float)
+			if mode == FilterType.LOW_PASS
 				create_low_pass(freq, q, sample_rate)
-			else if mode == FILTER_HIGH_PASS
+			else if mode == FilterType.HIGH_PASS
 				create_high_pass(freq, q, sample_rate)
-			else if mode == FILTER_PEAK
+			else if mode == FilterType.PEAK
 				create_peak(freq, q, gain, sample_rate)
-			#else if mode == FILTER_NOTCH
+			#else if mode == FilterType.NOTCH
 #				create_notch(freq, q, gain, sample_rate)
-			else if mode == FILTER_LOW_SHELF
+			else if mode == FilterType.LOW_SHELF
 				create_low_shelf(freq, q, gain, sample_rate)
-			else if mode == FILTER_HIGH_SHELF
+			else if mode == FilterType.HIGH_SHELF
 				create_high_shelf(freq, q, gain, sample_rate)
-			else if mode == FILTER_LOW_PASS_LINEAR
+			else if mode == FilterType.LOW_PASS_LINEAR
 				create_low_pass_linear(freq, sample_rate)
-			else if mode == FILTER_HIGH_PASS_LINEAR
+			else if mode == FilterType.HIGH_PASS_LINEAR
 				create_high_pass_linear(freq, sample_rate)
-			else if mode == FILTER_ALL_PASS
+			else if mode == FilterType.ALL_PASS
 				create_all_pass(freq, q, sample_rate)
 
 		func create_peak(f_res: float, Q: float, gain: float, sample_rate: float)
@@ -254,7 +254,7 @@ class BiquadFilter
 	func reset()
 		for s in state
 			s.reset()
-	func create(mode: int, freq: float, q: float, gain: float, _sample_rate: float)
+	func create(mode: FilterType, freq: float, q: float, gain: float, _sample_rate: float)
 		params.create(mode, freq, q, gain, _sample_rate)
 	func apply(out buf: AudioBuffer)
 		state.resize(buf.channels)
@@ -273,7 +273,7 @@ class BiquadMultiFilter
 	func reset()
 		for ff in f
 			ff.reset()
-	func create(mode: int, freq: float[], q: float[], gain: float[], _sample_rate: float)
+	func create(mode: FilterType, freq: float[], q: float[], gain: float[], _sample_rate: float)
 		f.resize(len(freq))
 		for i in 0:len(freq)
 			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)

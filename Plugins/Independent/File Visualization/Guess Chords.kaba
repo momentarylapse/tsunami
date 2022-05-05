@@ -41,7 +41,7 @@ class XXX extends TsunamiPlugin
 			for t in 0:3
 				Chord c
 				c.base_tone = 60 + p
-				c.type = t
+				c.type = Chord.Type.from_int(t)
 				int score = score_overlap(midi, c.pitch(), r)
 				if score > best_score
 					best_score = score

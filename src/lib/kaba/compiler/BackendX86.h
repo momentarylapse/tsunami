@@ -24,7 +24,7 @@ public:
 	void correct_parameters_variables_to_memory(CommandList &cmd);
 
 	virtual void correct_implement_commands();
-	virtual void implement_return(kaba::SerialNode &c, int i);
+	virtual void implement_return(const SerialNodeParam &p);
 	virtual void implement_mov_chunk(const SerialNodeParam &p1, const SerialNodeParam &p2, int size);
 
 	virtual int function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static);

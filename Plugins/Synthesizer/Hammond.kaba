@@ -124,7 +124,7 @@ class HammondRenderer extends PitchRenderer
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
-		filter.create(FILTER_LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
+		filter.create(FilterType.LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
 	func create_stutter()
 		stutter.resize(440) # 10ms
 		stutter = 1

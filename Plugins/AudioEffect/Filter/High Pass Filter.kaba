@@ -19,8 +19,8 @@ class LowPassFilter extends AudioEffect
 		filter.reset()
 
 	func override on_config()
-		#filter.create(FILTER_HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
-		filter.create(FILTER_HIGH_PASS, config.frequency, 1, 0, session.sample_rate())
+		#filter.create(FilterType.HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
+		filter.create(FilterType.HIGH_PASS, config.frequency, 1, 0, session.sample_rate())
 		
 	func override process(out buf: AudioBuffer)
 		filter.apply(buf)

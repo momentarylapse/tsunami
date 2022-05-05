@@ -54,9 +54,9 @@ class Loudness extends TsunamiPlugin
 		
 		# EQ
 		BiquadFilter f
-		f.create(FILTER_HIGH_SHELF, 1666, 0, 4, session.sample_rate())
+		f.create(FilterType.HIGH_SHELF, 1666, 0, 4, session.sample_rate())
 		f.apply(buf)
-		f.create(FILTER_HIGH_PASS, 50, 0, 0, session.sample_rate())
+		f.create(FilterType.HIGH_PASS, 50, 0, 0, session.sample_rate())
 		f.apply(buf)
 		
 		# 400 ms

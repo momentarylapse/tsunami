@@ -353,14 +353,14 @@ shared<Node> Node::deref(const Class *override_type) const {
 	return c;
 }
 
-shared<Node> Node::shift(int64 shift, const Class *type) const {
+shared<Node> Node::shift(int64 shift, const Class *type, int token_id) const {
 	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
-shared<Node> Node::deref_shift(int64 shift, const Class *type) const {
+shared<Node> Node::deref_shift(int64 shift, const Class *type, int token_id) const {
 	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, is_const, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));

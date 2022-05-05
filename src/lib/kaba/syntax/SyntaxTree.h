@@ -28,13 +28,6 @@ class SyntaxTree;
 class Parser;
 
 
-// macros
-struct Define {
-	string source;
-	Array<string> dest;
-};
-
-
 
 struct AsmBlock {
 	string block;
@@ -50,7 +43,7 @@ public:
 	~SyntaxTree();
 
 	void default_import();
-	void add_include_data(shared<Module> s, bool indirect);
+	void import_data(shared<Module> s, bool indirect, const string &as_name);
 
 	void do_error(const string &msg, int override_token_id = -1);
 	
@@ -67,11 +60,11 @@ public:
 	const Class *make_class_callable_fp(Function *f, int token_id);
 	const Class *make_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
 	const Class *make_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
-	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns);
-	shared_array<Node> get_existence_global(const string &name, const Class *ns);
-	shared_array<Node> get_existence_block(const string &name, Block *block);
+	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns, int token_id);
+	shared_array<Node> get_existence_global(const string &name, const Class *ns, int token_id);
+	shared_array<Node> get_existence_block(const string &name, Block *block, int token_id);
 
-	shared_array<Node> get_element_of(shared<Node> n, const string &name);
+	shared_array<Node> get_element_of(shared<Node> n, const string &name, int token_id);
 
 	Function *required_func_global(const string &name, int token_id = -1);
 
@@ -119,9 +112,6 @@ public:
 	shared<Node> add_node_local(Variable *var, int token_id = -1);
 	shared<Node> add_node_local(Variable *var, const Class *type, int token_id = -1);
 	shared<Node> make_constructor_static(shared<Node> n, const string &name);
-	shared<Node> exlink_add_element(Function *f, ClassElement &e);
-	shared<Node> exlink_add_element_indirect(Function *f, ClassElement &e, ClassElement &e2);
-	shared<Node> exlink_add_class_func(Function *f, Function *cf);
 	shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
 	shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
 	shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
@@ -157,10 +147,8 @@ public:
 	shared<Class> imported_symbols;
 	Array<const Class*> owned_classes;
 	shared_array<Module> includes;
-	Array<Define> defines;
 	owned<Asm::MetaInfo> asm_meta_info;
 	Array<AsmBlock> asm_blocks;
-	Array<Operator*> operators;
 	Array<Function*> functions;
 
 	shared<Function> root_of_all_evil;

@@ -358,6 +358,9 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNZ, ret);
 			break;
+		case InlineID::PASSTHROUGH:
+			cmd.add_cmd(Asm::InstID::MOV, ret, param[0]);
+			break;
 // int
 		case InlineID::INT_ADD_ASSIGN:
 		case InlineID::INT64_ADD_ASSIGN:

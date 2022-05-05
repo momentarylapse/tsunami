@@ -17,11 +17,11 @@ const MAX_VOL = 35
 
 class Peak
 	var enabled: bool
-	var mode: int
+	var mode: FilterType
 	var pitch: float
 	var gain: float
 	var q: float
-	func __init__(_mode: int, _pitch: float, _gain: float, _q: float)
+	func __init__(_mode: FilterType, _pitch: float, _gain: float, _q: float)
 		enabled = true
 		mode = _mode
 		pitch = _pitch
@@ -67,8 +67,8 @@ class Equalizer extends AudioEffect
 		func override reset()
 			gain = 0
 			peaks.clear()
-			peaks.add(Peak(FILTER_HIGH_PASS, 30, -10, 2))
-			peaks.add(Peak(FILTER_LOW_PASS, 100, -10, 2))
+			peaks.add(Peak(FilterType.HIGH_PASS, 30, -10, 2))
+			peaks.add(Peak(FilterType.LOW_PASS, 100, -10, 2))
 
 	var grid: EqualizerGrid* = nil
 
@@ -161,7 +161,7 @@ class EqualizerGrid extends Grid
 			if i == hover
 				p.set_font_size(8)
 				p.set_color(col_hover)
-				p.draw_str([pp.x - 20, pp.y - 65], filter_name(pk.mode))
+				p.draw_str([pp.x - 20, pp.y - 65], str(pk.mode))
 				p.draw_str([pp.x - 20, pp.y - 50], "{{pitch_to_freq(pk.pitch)|.1}} Hz")
 				p.draw_str([pp.x - 20, pp.y - 35], "{{pk.gain|.1}} dB")
 				p.draw_str([pp.x - 20, pp.y - 20], "Q {{pk.q|.1}}")
@@ -214,15 +214,15 @@ class EqualizerGrid extends Grid
 	# hui events
 	func on_add_peak()
 		string id = hui.get_event().id
-		int t = FILTER_PEAK
+		var t = FilterType.PEAK
 		if id == "add-low-pass"
-			t = FILTER_LOW_PASS
+			t = FilterType.LOW_PASS
 		if id == "add-high-pass"
-			t = FILTER_HIGH_PASS
+			t = FilterType.HIGH_PASS
 		if id == "add-low-shelf"
-			t = FILTER_LOW_SHELF
+			t = FilterType.LOW_SHELF
 		if id == "add-high-shelf"
-			t = FILTER_HIGH_SHELF
+			t = FilterType.HIGH_SHELF
 		vector m = right_click_mouse_pos
 		c.peaks.add(Peak(t, freq_to_pitch(m.x), m.y - c.gain, 2))
 		selected = len(c.peaks) - 1

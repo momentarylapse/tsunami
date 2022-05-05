@@ -718,6 +718,9 @@
     <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\import.cpp">
+      <Filter>src\lib\kaba\syntax</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
@@ -2845,6 +2848,9 @@
     </Filter>
     <Filter Include="src\view\painter">
       <UniqueIdentifier>{106A5BF9-33C0-59E2-56F0-CCB558FE74A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\view\painter\midi">
+      <UniqueIdentifier>{532A59C2-0EE6-C046-010F-20910CCA0EC6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\view\sidebar">
       <UniqueIdentifier>{787FC2F7-36B6-69E1-F134-22AD72BE1C28}</UniqueIdentifier>

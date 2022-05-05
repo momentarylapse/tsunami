@@ -140,8 +140,7 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 	}
 }
 
-void BackendX86::implement_return(kaba::SerialNode &c, int i) {
-	auto p = c.p[0];
+void BackendX86::implement_return(const SerialNodeParam &p) {
 	if (p.kind != NodeKind::NONE) {
 		if (cur_func->effective_return_type->_amd64_allow_pass_in_xmm()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
@@ -444,7 +443,7 @@ void BackendX86::correct_implement_commands() {
 			}
 			func_params.clear();
 		} else if (c.inst == Asm::InstID::RET) {
-			implement_return(c, cmd.cmd.num);
+			implement_return(c.p[0]);
 		} else {
 			insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 		}

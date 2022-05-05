@@ -136,13 +136,21 @@ void bind_frame_buffer(FrameBuffer *fb) {
 	cur_framebuffer = fb;
 
 	set_viewport(fb->area());
+
+	if (fb->multi_samples > 0)
+		glEnable(GL_MULTISAMPLE);
+	//else
+	//	glDisable(GL_MULTISAMPLE);
 }
 
 void resolve_multisampling(FrameBuffer *target, FrameBuffer *source) {
-	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target->frame_buffer);
-	//glBindFramebuffer(GL_READ_FRAMEBUFFER, source->frame_buffer);
-	//glBlitFramebuffer(0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	glBlitNamedFramebuffer(source->frame_buffer, target->frame_buffer, 0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	if (false) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, source->frame_buffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target->frame_buffer);
+		glBlitFramebuffer(0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	} else {
+		glBlitNamedFramebuffer(source->frame_buffer, target->frame_buffer, 0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	}
 }
 
 }

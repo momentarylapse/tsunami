@@ -178,7 +178,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		} else if (return_type == TypeInt) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt or ptype[0]->is_enum()) {
 				call1<int,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeChar) {

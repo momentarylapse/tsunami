@@ -9,9 +9,9 @@ const MIN_FREQ = 20.0
 const MAX_FREQ = 20000.0
 const N = 512
 
-enum
-	TYPE_LINEAR
-	TYPE_LOGARITHM
+enum SpectrumType
+	LINEAR
+	LOGARITHM
 
 func todb(v: float) -> float
 	if v <= 0.000000001
@@ -19,12 +19,12 @@ func todb(v: float) -> float
 	return log(v) / log(10) * 10
 
 class SpecGrid extends Grid
-	var type: int
+	var type: SpectrumType
 	var pr, pl: vec2[]
 	var ffr, ffl: float[]
 	
 	func override __init__()
-		set_type(TYPE_LOGARITHM)
+		set_type(SpectrumType.LOGARITHM)
 	
 	func set(_ffl: float[], _ffr: float[])
 		ffl = _ffl
@@ -41,17 +41,17 @@ class SpecGrid extends Grid
 			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
-			if type == TYPE_LINEAR
+			if type == SpectrumType.LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
-			else #if type == TypeLogarithm
+			else #if type == SpectrumType.Logarithm
 				#float db_max = todb(peak_max)
 				#float db_min = db_max - 80
 				pr[i].y = todb(ffr[i])#clamp(todb(ffr[i]), db_min, db_max)
 				pl[i].y = todb(ffl[i])#clamp(todb(ffl[i]), db_min, db_max)
-	func set_type(t: int)
+	func set_type(t: SpectrumType)
 		type = t
-		if type == TYPE_LINEAR
+		if type == SpectrumType.LINEAR
 			y_axis.set(0, 1, false, "")
 		else #if type == TypeLogarithm
 			float db_max = 0#todb(peak_max)

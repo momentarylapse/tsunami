@@ -11,9 +11,9 @@ const LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 enum OsciType
-	SINE
-	SQUARE
-	SAW
+	SINE as "sine"
+	SQUARE as "square"
+	SAW as "saw"
 
 class OscillatorConfig
 	var factor: float

@@ -275,6 +275,9 @@ int enum_parse(const string &label, const Class *type) {
 		if (c->type == type and c->name == label)
 			return c->as_int();
 
+	if (str_is_integer(label))
+		return s2i(label);
+
 	// not found
 	return -1;
 }
@@ -338,6 +341,8 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		return string((char*)p).repr();
 	} else if (type == TypePath) {
 		return ((Path*)p)->str().repr();
+	} else if (type->is_enum()) {
+		return find_enum_label(type, *(int*)p);
 	} else if (type->is_super_array()) {
 		string s;
 		auto *da = reinterpret_cast<const DynamicArray*>(p);
@@ -396,7 +401,7 @@ string _cdecl var2str(const void *p, const Class *type) {
 }
 
 Any _cdecl kaba_dyn(const void *var, const Class *type) {
-	if (type == TypeInt)
+	if (type == TypeInt or type->is_enum())
 		return Any(*(int*)var);
 	if (type == TypeFloat32)
 		return Any(*(float*)var);

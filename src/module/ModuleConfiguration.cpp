@@ -16,6 +16,11 @@
 #include "../data/Song.h"
 #include "../Session.h"
 
+namespace kaba {
+	string find_enum_label(const Class *type, int value);
+	int enum_parse(const string &label, const Class *type);
+}
+
 bool module_config_debug = false;
 
 
@@ -60,9 +65,13 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		for (int i=0; i<a->num; i++)
 			r.add(var_to_any(tel, (char*)a->simple_element(i)));
 		return r;
+	} else if (c->is_enum()) {
+		/*auto l = kaba::find_enum_label(c, *(const int*)v);
+		if (!str_is_integer(l))
+			return Any(l);*/
+		return Any(*(const int*)v);
 	} else if (c->name == "SampleRef shared") {
-		auto sr = *(SampleRef**)v;
-		if (sr)
+		if (auto sr = *(SampleRef**)v)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
 	} else if (c == kaba::TypeComplex or c == kaba::TypeVector or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
@@ -139,6 +148,8 @@ void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, i
 			var_from_string_legacy(tel, &(((char*)a->data)[(a->num - 1) * tel->size]), s, pos, session);
 		}
 		pos ++; // ']'
+	} else if (type->is_enum()) {
+		*(int*)v = get_next(s, pos)._int();
 	} else if (type->name == "shared SampleRef") {
 		string ss = get_next(s, pos);
 		*(shared<SampleRef>*)v = nullptr;
@@ -192,14 +203,15 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		aa->simple_resize(array.num); // todo...
 		for (int i=0; i<array.num; i++)
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
+	} else if (type->is_enum()) {
+		*(int*)v = kaba::enum_parse(a.str(), type);
 	} else if (type->name == "SampleRef shared") {
 		*(shared<SampleRef>*)v = nullptr;
 		if (a.is_string()) {
 			string ss = a.str();
 			if ((ss.head(7) == "sample:") and session->song) {
 				int uid = h2i(ss.sub(7));
-				auto s = session->song->get_sample_by_uid(uid);
-				if (s)
+				if (auto s = session->song->get_sample_by_uid(uid))
 					*(shared<SampleRef>*)v = s->create_ref();
 				else
 					session->e(format("sample invalid: %s  %d  %8x", ss, uid, uid));

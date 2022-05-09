@@ -249,7 +249,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	} else if (com->kind == NodeKind::CONSTANT) {
 		// sometimes "nil" is used as pass etc...
 	} else {
-		//DoError("type of command is unimplemented: " + Kind2Str(com->kind));
+		do_error("type of command is unimplemented: " + kind2str(com->kind));
 	}
 
 	return ret;

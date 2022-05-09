@@ -189,6 +189,9 @@ bool _cdecl s2b(const string &s);
 float _cdecl s2f(const string &s);
 double _cdecl s2f64(const string &s);
 
+bool str_is_integer(const string &s);
+bool str_is_float(const string &s);
+
 string _cdecl d2h(const void *data, int bytes);
 string _cdecl i2h(int64, int bytes);
 string _cdecl h2d(const string &hex_str, int bytes);

@@ -983,6 +983,22 @@ bool string::_bool() const
 bool s2b(const string &s)
 {	return s._bool();	}
 
+
+
+bool str_is_integer(const string &s) {
+	for (char c: s)
+		if ((c < '0' or c > '9') and (c != '-'))
+			return false;
+	return true;
+}
+
+bool str_is_float(const string &s) {
+	for (char c: s)
+		if ((c < '0' or c > '9') and (c != '-') and (c != '.'))
+			return false;
+	return true;
+}
+
 bool is_whitespace_x(char c) {
 	return ((c == ' ') or (c == '\t') or (c == '\n') or (c == '\r') or (c == '\0'));
 }

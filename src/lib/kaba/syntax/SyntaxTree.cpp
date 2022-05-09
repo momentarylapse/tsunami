@@ -1274,6 +1274,36 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		_transform_insert_before_.add(n->params[0]);
 		return n->params[1];
+	} else if (n->kind == NodeKind::TUPLE_EXTRACTION) {
+
+		// temp var
+		auto *f = b->function;
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->params[0]->type);
+		auto temp = add_node_local(vv);
+
+		Block *bb = new Block(f, b);
+
+		// tuple assign -> temp
+		Function *cf = n->params[0]->type->get_assign();
+		if (!cf)
+			do_error(format("tuple-extract: don't know how to assign tuple of type '%s'", n->params[0]->type->long_name()), n->token_id);
+		auto assign = add_node_member_call(cf, temp, n->token_id, {n->params[0]});
+		bb->add(assign);
+
+		for (int i=1; i<n->params.num; i++) {
+			// element assign
+
+			Function *ecf = n->params[i]->type->get_assign();
+			if (!ecf)
+				do_error(format("tuple-extract: don't know how to assign tuple element %d of type '%s'", i, n->params[i]->type->long_name()), n->token_id);
+			auto &e = n->params[0]->type->elements[i-1];
+			auto assign = add_node_member_call(ecf, n->params[i], n->token_id, {temp->shift(e.offset, e.type, n->token_id)});
+			bb->add(assign);
+		}
+
+		//bb->show();
+		return bb;
+
 	}
 
 	// TODO experimental dynamic type insertion

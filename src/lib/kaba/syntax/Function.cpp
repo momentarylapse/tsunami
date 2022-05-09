@@ -83,7 +83,7 @@ void Function::show(const string &stage) const {
 }
 
 string Function::create_slightly_hidden_name() {
-	return format("-temp-%d-", ++ num_slightly_hidden_vars);
+	return format(":temp-%d:", ++ num_slightly_hidden_vars);
 }
 
 Variable *Function::__get_var(const string &name) const {

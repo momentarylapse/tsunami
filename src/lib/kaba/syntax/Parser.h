@@ -59,6 +59,9 @@ public:
 	const Class *concretify_as_type(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_array(shared<Node> node, Block *block, const Class *ns);
 	shared_array<Node> concretify_element(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_var_declaration(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_array_builder_for(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_operator(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_call(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_return(shared<Node> node, Block *block, const Class *ns);
@@ -100,6 +103,7 @@ public:
 	shared<Node> link_special_operator_is(shared<Node> param1, shared<Node> param2, int token_id);
 	shared<Node> link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id);
 	shared<Node> link_special_operator_as(shared<Node> param1, shared<Node> param2, int token_id);
+	shared<Node> link_special_operator_tuple_extract(shared<Node> param1, shared<Node> param2, int token_id);
 	shared<Node> make_dynamical(shared<Node> node);
 	Array<const Class*> type_list_from_nodes(const shared_array<Node> &nn);
 

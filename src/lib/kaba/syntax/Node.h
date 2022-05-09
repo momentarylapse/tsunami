@@ -64,6 +64,7 @@ enum class NodeKind {
 	ARRAY_BUILDER_FOR_IF,
 	DICT_BUILDER,		// = {"x":y, ...}
 	TUPLE,				// = (X,Y,...)
+	TUPLE_EXTRACTION,	// (X,Y,...) = ...
 	CONSTRUCTOR_AS_FUNCTION,
 	// abstract syntax tree
 	ABSTRACT_TOKEN,

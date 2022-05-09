@@ -86,6 +86,8 @@ string kind2str(NodeKind kind) {
 		return "dict builder";
 	if (kind == NodeKind::TUPLE)
 		return "tuple";
+	if (kind == NodeKind::TUPLE_EXTRACTION)
+		return "tuple extract";
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return "constructor function";
 	if (kind == NodeKind::VAR_TEMP)

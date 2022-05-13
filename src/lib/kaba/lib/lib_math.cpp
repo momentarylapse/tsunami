@@ -419,7 +419,7 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY_ASSIGN, (decltype(&complex::operator+=)) &complex::operator*=);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_DIVIDE_ASSIGN, (decltype(&complex::operator+=)) &complex::operator/=);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeComplex, TypeComplex, InlineID::CHUNK_EQUAL, &complex::operator==);
-		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::VEC2_NEGATE, &KabaVector<complex>::negate);
+		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::VEC2_NEGATIVE, &KabaVector<complex>::negate);
 
 	add_class(TypeComplexList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &VectorList<complex>::__init__);
@@ -479,7 +479,7 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec2, TypeVec2, InlineID::VEC2_SUBTARCT_ASSIGN, &vec2::operator-=);
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec2, TypeFloat32, InlineID::COMPLEX_MULTIPLY_ASSIGN, &vec2::operator*=);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec2, TypeFloat32, InlineID::COMPLEX_DIVIDE_ASSIGN, &vec2::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVec2, nullptr, TypeVec2, InlineID::VEC2_NEGATE, &KabaVector<vec2>::negate);
+		add_operator(OperatorID::NEGATIVE, TypeVec2, nullptr, TypeVec2, InlineID::VEC2_NEGATIVE, &KabaVector<vec2>::negate);
 
 	add_class(TypeVec2List);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<vec2>::__init__);
@@ -546,7 +546,7 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVector, TypeVector, InlineID::VECTOR_SUBTARCT_ASSIGN, &vector::operator-=);
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVector, TypeFloat32, InlineID::VECTOR_MULTIPLY_ASSIGN, &vector::operator*=);
 		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVector, TypeFloat32, InlineID::VECTOR_DIVIDE_ASSIGN, &vector::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVector, nullptr, TypeVector, InlineID::VECTOR_NEGATE, &KabaVector<vector>::negate);
+		add_operator(OperatorID::NEGATIVE, TypeVector, nullptr, TypeVector, InlineID::VECTOR_NEGATIVE, &KabaVector<vector>::negate);
 	
 	add_class(TypeVectorList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<vector>::__init__);

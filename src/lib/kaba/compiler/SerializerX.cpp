@@ -451,8 +451,8 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::INT64_SHIFT_LEFT:
 			cmd.add_cmd(Asm::InstID::SHL, ret, param[0], param[1]);
 			break;
-		case InlineID::INT_NEGATE:
-		case InlineID::INT64_NEGATE:
+		case InlineID::INT_NEGATIVE:
+		case InlineID::INT64_NEGATIVE:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param_imm(TypeInt, 0x0), param[0]);
 			break;
 		case InlineID::INT_INCREASE:
@@ -535,7 +535,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::SETNB, ret);
 			break;
 
-		case InlineID::FLOAT_NEGATE:
+		case InlineID::FLOAT_NEGATIVE:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt, 0x80000000));
 			break;
 // bool/char
@@ -588,7 +588,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::BOOL_NEGATE:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeBool, 0x1));
 			break;
-		case InlineID::CHAR_NEGATE:
+		case InlineID::CHAR_NEGATIVE:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param[0], param_imm(TypeChar, 0x0));
 			break;
 // vec2
@@ -682,7 +682,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VECTOR_NEGATE:
+		case InlineID::VECTOR_NEGATIVE:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt, 0x80000000));
 			break;

@@ -248,6 +248,8 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 		serialize_block(com->as_block());
 	} else if (com->kind == NodeKind::CONSTANT) {
 		// sometimes "nil" is used as pass etc...
+	} else if (com->kind == NodeKind::MEMORY) {
+		// when ignoring a string variable just "lying around"
 	} else {
 		do_error("type of command is unimplemented: " + kind2str(com->kind));
 	}

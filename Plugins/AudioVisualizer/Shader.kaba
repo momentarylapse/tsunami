@@ -1,5 +1,5 @@
 use hui
-use nix
+use gl
 use time
 use tsunami
 
@@ -415,7 +415,7 @@ uniform float iVolume;
 ")
 	
 	func on_realize()
-		nix.init()
+		gl.init()
 		update_shader()
 		
 		id_runner = hui.run_repeated(0.03, on_step)
@@ -426,16 +426,16 @@ uniform float iVolume;
 		float volume = c.buffer[c.current_reading].c[0].max()
 		c.unlock()
 		
-		#nix.start()
-		nix.reset_to_color(color.RED)
-		nix.set_cull(0)
-		nix.set_z(false, false)
-		nix.set_shader(shader)
+		#gl.start()
+		gl.reset_to_color(color.RED)
+		gl.set_cull(0)
+		gl.set_z(false, false)
+		gl.set_shader(shader)
 		shader.set_float("iTime", _time)
 		shader.set_float("iVolume", volume)
-		nix.vb_temp.create_quad(rect.ID_SYM, rect.ID)
-		nix.draw_triangles(vb_temp)
-		#NixEnd()
+		gl.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+		gl.draw_triangles(vb_temp)
+		#gl.end()
 
 class ShaderVis extends AudioVisualizer
 	var buffer: AudioBuffer[2]

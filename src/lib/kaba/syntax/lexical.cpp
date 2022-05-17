@@ -44,6 +44,12 @@ int ExpressionBuffer::cur_token() const {
 	return -1;
 }
 
+int ExpressionBuffer::consume_token() {
+	int token = cur_token();
+	next();
+	return token;
+}
+
 string ExpressionBuffer::get_token(int id) const {
 	int i0 = 0;
 	for (auto &l: lines) {
@@ -97,6 +103,12 @@ int ExpressionBuffer::token_index_in_line(int id) const {
 void ExpressionBuffer::next() {
 	_cur_exp ++;
 	cur = cur_line->tokens[_cur_exp].name;
+}
+
+string ExpressionBuffer::consume() {
+	auto s = cur;
+	next();
+	return s;
 }
 
 void ExpressionBuffer::rewind() {

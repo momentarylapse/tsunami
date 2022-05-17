@@ -37,9 +37,11 @@ public:
 	void do_error(const string &msg, int token_id);
 	void do_error_exp(const string &msg, int override_token_id = -1);
 	void do_error_implicit(Function *f, const string &msg);
-	void expect_no_new_line();
-	void expect_new_line();
+	void expect_no_new_line(const string &error_msg = "");
+	void expect_new_line(const string &error_msg = "");
 	void expect_new_line_with_indent();
+	void expect_identifier(const string &identifier, const string &error_msg, bool consume = true);
+	bool try_consume(const string &identifier);
 
 	shared<Node> link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2, int token_id = -1);
 	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2, int token_id = -1);
@@ -165,6 +167,7 @@ public:
 	shared<Node> parse_abstract_operand_greedy(Block *block, bool allow_tuples = false, shared<Node> first_operand = nullptr);
 	shared<Node> parse_operand_super_greedy(Block *block);
 	shared<Node> parse_abstract_set_builder(Block *block);
+	shared<Node> parse_abstract_token();
 
 	shared<Node> parse_abstract_operator(int param_flags);
 	shared_array<Node> parse_abstract_call_parameters(Block *block);

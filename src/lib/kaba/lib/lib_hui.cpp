@@ -115,7 +115,7 @@ void SIAddPackageHui() {
 	auto TypeHuiPanelP = add_type_p(TypeHuiPanel);
 	auto TypeHuiWindow = add_type("Window", sizeof(hui::Window));
 	TypeHuiWindowP = add_type_p(TypeHuiWindow);
-	auto TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
+	auto TypeHuiGlWindow = add_type("GlWindow", sizeof(hui::Window));
 	auto TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
 	auto TypeHuiEvent = add_type("Event", sizeof(hui::Event));
 	auto TypeHuiEventP = add_type_p(TypeHuiEvent);
@@ -440,7 +440,7 @@ void SIAddPackageHui() {
 		class_set_vtable(hui::Window);
 #endif
 
-	add_class(TypeHuiNixWindow);
+	add_class(TypeHuiGlWindow);
 		class_derive_from(TypeHuiWindow, false, true);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::NixWindow::__init_ext__), Flags::OVERRIDE);
 			func_add_param("title", TypeString);

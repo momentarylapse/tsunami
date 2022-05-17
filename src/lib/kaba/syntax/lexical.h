@@ -66,7 +66,9 @@ public:
 	int next_line_indent() const;
 
 	int cur_token() const;
+	int consume_token();
 	void next();
+	string consume();
 	void rewind();
 	bool end_of_line() const;
 	bool almost_end_of_line() const;

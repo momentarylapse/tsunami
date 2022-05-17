@@ -654,6 +654,15 @@ const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class 
 	return nullptr;
 }
 
+
+int kaba_int_passthrough(int i);
+int op_int_add(int a, int b);
+bool op_int_eq(int a, int b);
+bool op_int_neq(int a, int b);
+int enum_parse(const string&, const Class*);
+Array<int> enum_all(const Class*);
+
+
 Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id) {
 	if (find_root_type_by_name(name, ns, false))
 		do_error("class already exists", token_id);
@@ -700,6 +709,45 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 		//add_missing_function_headers_for_class(t); // later... depending on the bind variables
 	//} else if (t->type == Class::Type::PRODUCT) {
 	//	add_missing_function_headers_for_class(t);
+	} else if (t->is_enum()) {
+		t->flags = Flags::FORCE_CALL_BY_VALUE; // FORCE_CALL_BY_VALUE
+
+		kaba::add_class(t);
+		class_add_func("from_int", t, &kaba_int_passthrough, Flags::_STATIC__PURE);
+			func_set_inline(InlineID::PASSTHROUGH);
+			func_add_param("i", TypeInt);
+		//class_add_func(IDENTIFIER_FUNC_STR, TypeString, &i2s, Flags::PURE);
+		class_add_func("__int__", TypeInt, &kaba_int_passthrough, Flags::PURE);
+			func_set_inline(InlineID::PASSTHROUGH);
+		class_add_func("parse", t, &enum_parse, Flags::_STATIC__PURE);
+			func_add_param("label", TypeString);
+			func_add_param("type", TypeClassP);
+		class_add_func("all", TypeDynamicArray, &enum_all, Flags::_STATIC__PURE);
+			func_add_param("type", TypeClassP);
+		add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT_ASSIGN);
+		add_operator(OperatorID::ADD, t, t, t, InlineID::INT_ADD, &op_int_add);
+		add_operator(OperatorID::ADDS, TypeVoid, t, t, InlineID::INT_ADD_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, t, t, InlineID::INT_EQUAL, &op_int_eq);
+		add_operator(OperatorID::NOTEQUAL, TypeBool, t, t, InlineID::INT_NOT_EQUAL, &op_int_neq);
+		add_operator(OperatorID::BIT_AND, t, t, t, InlineID::INT_AND);
+		add_operator(OperatorID::BIT_OR, t, t, t, InlineID::INT_OR);
+
+		for (auto f: weak(t->functions)) {
+			if (f->name == "parse") {
+				f->default_parameters.resize(2);
+				auto c = add_constant(TypeClassP, t);
+				c->as_int64() = (int_p)t;
+				f->mandatory_params = 1;
+				f->default_parameters[1] = add_node_const(c, t->token_id);
+			} else if (f->name == "all") {
+				f->literal_return_type = make_class_super_array(t, t->token_id);
+				f->default_parameters.resize(1);
+				auto c = add_constant(TypeClassP, t);
+				c->as_int64() = (int_p)t;
+				f->mandatory_params = 0;
+				f->default_parameters[0] = add_node_const(c, t->token_id);
+			}
+		}
 	}
 	return t;
 }

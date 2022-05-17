@@ -339,12 +339,12 @@
     <ClCompile Include="src\lib\kaba\lib\lib.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_base.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_doc.cpp" />
+    <ClCompile Include="src\lib\kaba\lib\lib_gl.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_hui.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_image.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_kaba.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_math.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_net.cpp" />
-    <ClCompile Include="src\lib\kaba\lib\lib_nix.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_os.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_threads.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib_time.cpp" />

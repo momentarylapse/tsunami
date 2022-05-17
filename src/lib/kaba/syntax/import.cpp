@@ -112,7 +112,7 @@ Path find_import(Module *s, const string &_name) {
 	return Path::EMPTY;
 }
 
-shared<Module> get_import(Parser *parser, const string &name) {
+shared<Module> get_import(Parser *parser, const string &name, int token) {
 
 	// internal packages?
 	for (auto p: packages)
@@ -121,11 +121,11 @@ shared<Module> get_import(Parser *parser, const string &name) {
 
 	Path filename = find_import(parser->tree->module, name);
 	if (!filename)
-		parser->do_error_exp(format("can not find import '%s'", name));
+		parser->do_error(format("can not find import '%s'", name), token);
 
 	for (auto ss: weak(loading_module_stack))
 		if (ss->filename == filename)
-			parser->do_error_exp("recursive import");
+			parser->do_error("recursive import", token);
 
 	msg_right();
 	shared<Module> include;
@@ -145,7 +145,7 @@ shared<Module> get_import(Parser *parser, const string &name) {
 		//msg_write("...");
 		string msg = e.message() + "\nimported file:";
 		//string msg = "in imported file:\n\"" + e.message + "\"";
-		parser->do_error_exp(msg);
+		parser->do_error(msg, token);
 	}
 	cur_exp_buf = &parser->Exp;
 
@@ -181,6 +181,7 @@ void namespace_import_contents(Class *parent, const Class *child) {
 Class *get_namespace_for_import(SyntaxTree *tree, const string &name) {
 	auto xx = name.explode(".");
 	Class *ns = tree->base_class;
+	flags_set(ns->flags, Flags::EXTERN); // "don't delete contents..."
 
 	auto get_next = [tree] (Class *ns, const string &name) {
 		for (auto c: weak(ns->classes))

@@ -7,7 +7,7 @@ class ZeroRenderer extends PitchRenderer
 	var fade_out = false
 	
 	# use += ... otherwise would overwrite previous notes...!!!!
-	func override render(out buf: AudioBuffer) -> bool
+	func override mut render(out buf: AudioBuffer) -> bool
 		#print(buf.length)
 		
 #		float freq = pitch_to_freq(pitch)
@@ -29,11 +29,11 @@ class ZeroRenderer extends PitchRenderer
 		# keep alive?
 		return volume > 0.001
 		
-	func override on_start(_volume: float)
+	func override mut on_start(_volume: float)
 		print("MIDI START {{_volume}}")
 		volume = _volume * 0.3
 		fade_out = false
-	func override on_end()
+	func override mut on_end()
 		print("MIDI END")
 		fade_out = true
 

@@ -32,7 +32,7 @@ class SpecGrid extends Grid
 	var type: SpectrumType
 	var pr, pl: vec2[]
 
-	func create_lines()
+	func mut create_lines()
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
@@ -47,7 +47,7 @@ class SpecGrid extends Grid
 				float vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
-	func set_type(t: SpectrumType)
+	func mut set_type(t: SpectrumType)
 		type = t
 		if type == SpectrumType.LINEAR
 			y_axis.set(0, peak_max, false, "")
@@ -83,16 +83,16 @@ Grid ? ''
 	
 		set_int("type", int(SpectrumType.LOG))
 
-	func on_type()
+	func mut on_type()
 		SpectrumType t = SpectrumType.from_int(get_int("type")) # ...
 		grid.set_type(t)
 		grid.redraw()
 
-	func on_close()
+	func mut on_close()
 		destroy()
 
 class ShowSpectrum extends TsunamiPlugin
-	func show_spec(song: Song)
+	func mut show_spec(song: Song)
 		dlg = new SpectrumDialog(self)
 	
 		AudioBuffer buf

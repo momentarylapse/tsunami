@@ -21,7 +21,7 @@ class Metronome extends AudioSource
 	var synth: Synthesizer* = nil
 	var source: MetronomeSource* = nil
 	
-	func create_stuff()
+	func mut create_stuff()
 		synth = CreateSynthesizer(session, "")
 		source = CreateMidiSource(session, "Metronome")
 		synth.plug_in(0, source, 0)
@@ -80,15 +80,15 @@ class MetronomePanel extends ConfigPanel
 		set_float("volume", c.config.volume * 100)
 		#SliderSet(self, "volume", c.config.volume)
 
-	func on_bpm()
+	func mut on_bpm()
 		c.config.beats_per_minute = get_float("")
 		changed()
 
-	func on_beats()
+	func mut on_beats()
 		c.config.beats_per_measure = get_int("")
 		changed()
 
-	func on_volume()
+	func mut on_volume()
 		c.config.volume = get_float("") / 100
 		#m.config.volume = SliderGet(self, "volume")
 		changed()

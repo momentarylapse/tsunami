@@ -16,8 +16,6 @@ extern const Class *TypeCallableBase;
 extern const Class *TypeMatrix;
 extern const Class *TypeVec2;
 
-extern ExpressionBuffer *cur_exp_buf;
-
 bool is_func(shared<Node> n);
 
 string class_name_might_need_parantheses(const Class *t);
@@ -111,7 +109,7 @@ const Class *SyntaxTree::make_class_callable_bind(const Array<const Class*> &par
 
 	static int unique_bind_counter = 0;
 
-	auto t = (Class*)make_class("<bind-" + i2s(unique_bind_counter++) + ">", Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, outer_params_ret, base_class, token_id);
+	auto t = (Class*)make_class(format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, outer_params_ret, base_class, token_id);
 	int offset = t->size;
 	foreachi (auto b, captures, i) {
 		if (!b)
@@ -925,6 +923,8 @@ void SyntaxTree::convert_call_by_reference() {
 		msg_write("ConvertCallByReference");
 	// convert functions
 	for (Function *f: functions) {
+		if (f->literal_return_type == TypeUnknown)
+			continue;
 
 		// parameter: array/class as reference
 		for (auto v: weak(f->var).sub_ref(0, f->num_params))
@@ -938,7 +938,7 @@ void SyntaxTree::convert_call_by_reference() {
 
 	// convert return...
 	for (Function *f: functions)
-		if (f->literal_return_type->uses_return_by_memory())
+		if (f->literal_return_type->uses_return_by_memory() and (f->literal_return_type != TypeUnknown))
 			//convert_return_by_memory(this, f->block, f);
 			transform_block(f->block.get(), [&](shared<Node> n){ return conv_return_by_memory(n, f); });
 
@@ -1128,16 +1128,18 @@ void SyntaxTree::transformb_block(Block *block, std::function<shared<Node>(share
 
 // split arrays and address shifts into simpler commands...
 void SyntaxTree::transform(std::function<shared<Node>(shared<Node>)> F) {
-	for (Function *f: functions) {
-		parser->cur_func = f;
-		transform_block(f->block.get(), F);
-	}
+	for (Function *f: functions)
+		if (!f->is_template()) {
+			parser->cur_func = f;
+			transform_block(f->block.get(), F);
+		}
 }
 void SyntaxTree::transformb(std::function<shared<Node>(shared<Node>, Block*)> F) {
-	for (Function *f: functions) {
-		parser->cur_func = f;
-		transformb_block(f->block.get(), F);
-	}
+	for (Function *f: functions)
+		if (!f->is_template()) {
+			parser->cur_func = f;
+			transformb_block(f->block.get(), F);
+		}
 }
 
 bool node_is_executable(shared<Node> n) {
@@ -1183,8 +1185,13 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 	} else if (n->kind == NodeKind::ARRAY_BUILDER) {
 		auto *t_el = n->type->get_array_element();
 		Function *cf = n->type->get_member_func("add", TypeVoid, {t_el});
-		if (!cf)
+		if (!cf) {
+			msg_error("AAA");
+			n->show();
+			msg_write(p2s(n->type));
+			msg_write(n->type->name);
 			do_error(format("[..]: can not find '%s.add(%s)' function???", n->type->long_name(), t_el->long_name()));
+		}
 
 		// temp var
 		auto *f = b->function;

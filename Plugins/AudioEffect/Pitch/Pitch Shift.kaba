@@ -54,7 +54,7 @@ class PitchShift extends AudioEffect
 		fft_c2r_inv(buf2, b)
 		b /= N
 
-	func process_chunk(out buf: AudioBuffer)
+	func mut process_chunk(out buf: AudioBuffer)
 		for c in buf.c
 			shift_buf(c, config.factor)
 			

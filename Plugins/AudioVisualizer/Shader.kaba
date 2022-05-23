@@ -375,10 +375,10 @@ Grid ? '' vertical
 		#del s
 		#NixKill()
 	
-	func on_step()
+	func mut on_step()
 		redraw("area")
 	
-	func on_type()
+	func mut on_type()
 		type = get_int("")
 		update_shader()
 		
@@ -388,7 +388,7 @@ Grid ? '' vertical
 		#del s
 		#NixKill()
 		
-	func update_shader()
+	func mut update_shader()
 		string frag = SOURCE[type]
 		
 		shader = Shader.create("
@@ -414,13 +414,13 @@ uniform float iVolume;
 </FragmentShader>
 ")
 	
-	func on_realize()
+	func mut on_realize()
 		gl.init()
 		update_shader()
 		
 		id_runner = hui.run_repeated(0.03, on_step)
 	
-	func on_draw()
+	func mut on_draw()
 		_time += timer.get()
 		c.lock()
 		float volume = c.buffer[c.current_reading].c[0].max()

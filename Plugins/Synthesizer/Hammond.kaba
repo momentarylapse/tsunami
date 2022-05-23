@@ -95,7 +95,7 @@ Grid ? '' vertical
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	func on_change()
+	func mut on_change()
 		hc.key_stutter = get_float("stutter") / 100
 		hc.attack = get_float("attack") / 1000
 		hc.release = get_float("release") / 1000
@@ -125,7 +125,7 @@ class HammondRenderer extends PitchRenderer
 			
 		#print(str(A))
 		filter.create(FilterType.LOW_PASS_LINEAR, 2500, -10, 2, synth.sample_rate)
-	func create_stutter()
+	func mut create_stutter()
 		stutter.resize(440) # 10ms
 		stutter = 1
 		for i in 0:10

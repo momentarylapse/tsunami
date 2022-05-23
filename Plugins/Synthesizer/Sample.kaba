@@ -60,7 +60,7 @@ class SamplePanel extends ConfigPanel
 					name = sc.samples[i].origin.name
 			set_string("list", pitch_name(i) + "\\" + name)
 		
-	func on_select()
+	func mut on_select()
 		int n = get_int("")
 		if n < 0
 			return

@@ -142,6 +142,9 @@ public:
 	bool flag_string_const_as_cstring;
 	bool flag_function_pointer_as_code;
 
+
+	ExpressionBuffer expressions;
+
 	Class *base_class;
 	shared<Class> _base_class;
 	shared<Class> imported_symbols;

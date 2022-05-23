@@ -10,5 +10,5 @@ class ClickSource extends MidiSource
 			midi.add(MidiEvent(1, 80, 0))
 			emit_click = false
 		return midi.samples
-	func click()
+	func mut click()
 		emit_click = true

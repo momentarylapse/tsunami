@@ -9,7 +9,6 @@
 namespace kaba {
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message);
-shared<Node> create_node_token(Parser *p);
 
 Array<const Class*> func_effective_params(const Function *f);
 Array<const Class*> node_call_effective_params(shared<Node> node);
@@ -18,8 +17,6 @@ const Class *node_call_return_type(shared<Node> node);
 shared<Module> get_import(Parser *parser, const string &name, int token);
 
 void add_enum_label(const Class *type, int value, const string &label);
-
-ExpressionBuffer *cur_exp_buf = nullptr;
 
 void crash() {
 	int *p = nullptr;
@@ -115,7 +112,9 @@ int64 s2i2(const string &str) {
 		return	str.i64();
 }
 
-Parser::Parser(SyntaxTree *t) {
+Parser::Parser(SyntaxTree *t) :
+	Exp(t->expressions)
+{
 	tree = t;
 	cur_func = nullptr;
 	for_index_count = 0;
@@ -131,8 +130,6 @@ void Parser::parse_buffer(const string &buffer, bool just_analyse) {
 	parse_macros(just_analyse);
 
 	parse();
-
-	Exp.clear();
 
 	if (config.verbose)
 		tree->show("parse:a");
@@ -636,8 +633,7 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 		}
 		// unary operator? (++,--)
 
-		auto op = parse_abstract_operator(1);
-		if (op) {
+		if (auto op = parse_abstract_operator(1)) {
 			op->set_num_params(1);
 			op->set_param(0, operand);
 			return parse_abstract_operand_extension(op, block, prefer_class);
@@ -1056,7 +1052,7 @@ shared<Node> digest_type(SyntaxTree *tree, shared<Node> n) {
 }
 
 shared<Node> Parser::parse_abstract_token() {
-	return new Node(NodeKind::ABSTRACT_TOKEN, (int_p)&Exp, TypeUnknown, false, Exp.consume_token());
+	return new Node(NodeKind::ABSTRACT_TOKEN, (int_p)tree, TypeUnknown, false, Exp.consume_token());
 }
 
 // minimal operand
@@ -1681,23 +1677,49 @@ shared_array<Node> Parser::concretify_element(shared<Node> node, Block *block, c
 	return {};
 }
 
+void analyse_func(Function *f) {
+	msg_write("----------------------------");
+	msg_write(f->signature());
+	msg_write(f->num_params);
+	msg_write(b2s(f->is_member()));
+	for (auto p: f->literal_param_type)
+		msg_write("  LPT: " + p->long_name());
+	for (auto p: f->abstract_param_types)
+		if (p)
+			msg_write("  APT: " + p->str());
+		else
+			msg_write("  APT: <nil>");
+}
 
 class TemplateManager {
 public:
-	static void add_template(Function *f) {
+
+	struct Instance {
+		Function *f;
+		Array<const Class*> params;
+	};
+	struct Template {
+		Function *func;
+		Array<string> params;
+		Array<Instance> instances;
+	};
+	static Array<Template> templates;
+
+	static void add_template(Function *f, const Array<string> &param_names) {
 		if (config.verbose)
 			msg_write("ADD TEMPLATE");
 		Template t;
 		t.func = f;
+		t.params = param_names;
 		templates.add(t);
 	}
 
 	static Function *full_copy(Parser *parser, Function *f0) {
 		auto f = f0->create_dummy_clone(f0->name_space);
-		f->block = (Block*)parser->tree->cp_node(f0->block.get()).get();
-		f->needs_overriding = false;
+		f->block = parser->tree->cp_node(f0->block.get())->as_block();
+		flags_clear(f->flags, Flags::NEEDS_OVERRIDE);
 
-		auto convert = [f](shared<Node> n) {
+		auto convert = [f,parser](shared<Node> n) {
 			if (n->kind != NodeKind::BLOCK)
 				return n;
 			auto b = n->as_block();
@@ -1710,66 +1732,87 @@ public:
 			return n;
 		};
 
-		convert(f->block.get());
+		convert(f->block.get())->as_block();
 		parser->tree->transform_block(f->block.get(), convert);
 
-		f->abstract_param_types = f0->abstract_param_types;
-		f->abstract_return_type = f0->abstract_return_type;
 		return f;
 	}
 
-	static Function *instantiate(Parser *parser, Function *f0, const Array<const Class*> &params) {
+	static Function *get_instantiated(Parser *parser, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+		for (auto &t: templates)
+			if (t.func == f0) {
+				// already instanciated?
+				for (auto &i: t.instances)
+					if (i.params == params)
+						return i.f;
+				// new
+				Instance ii;
+				ii.f = instantiate(parser, t, params, block, ns, token_id);
+				ii.params = params;
+				t.instances.add(ii);
+				return ii.f;
+			}
+		parser->do_error("INTERNAL: can not find template...", -1);
+		return nullptr;
+	}
+
+	/*static const Class *concretify_type(shared<Node> n, Parser *parser, Block *block, const Class *ns) {
+		return parser->concretify_as_type(n, block, ns);
+	}*/
+
+	static shared<Node> node_replace(Parser *parser, shared<Node> n, const Array<string> &names, const Array<const Class*> &params) {
+		//return parser->concretify_as_type(n, block, ns);
+		return parser->tree->transform_node(n, [parser, &names, &params](shared<Node> nn) {
+			if (nn->kind == NodeKind::ABSTRACT_TOKEN) {
+				string token = nn->as_token();
+				for (int i=0; i<names.num; i++)
+					if (token == names[i])
+						return parser->tree->add_node_class(params[i], nn->token_id);
+			}
+			return nn;
+		});
+	}
+
+	static Function *instantiate(Parser *parser, Template &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
 		if (config.verbose)
 			msg_write("INSTANTIATE TEMPLATE");
+		Function *f0 = t.func;
 		auto f = full_copy(parser, f0);
-		//f->block->show();
+		f->name += format("[%s]", params[0]->long_name());
 
-		/*for (auto pp: weak(f->abstract_param_types))
-			pp->show();
-		msg_write(params[0]->name);*/
+		// replace in parameters/return type
+		for (int i=0; i<f->num_params; i++)
+			f->abstract_param_types[i] = node_replace(parser, f->abstract_param_types[i], t.params, params);
+		if (f->abstract_return_type)
+			f->abstract_return_type = node_replace(parser, f->abstract_return_type, t.params, params);
 
-		// lazy experiment...
-		//f->literal_param_type[0] = params[0];
-		//f->literal_return_type = params[0];
-		//msg_write("INSTANTIATE 01");
-		//msg_write(f0->abstract_param_types.num);
-		f->abstract_param_types[0] = parser->tree->add_node_class(params[0]);
-		//msg_write("INSTANTIATE 02");
-		f->abstract_return_type = parser->tree->add_node_class(params[0]);
+		// replace in body
+		for (int i=0; i<f->block->params.num; i++)
+			f->block->params[i] = node_replace(parser, f->block->params[i], t.params, params);
 
-		//msg_write("INSTANTIATE 2");
+		// concretify
+		try {
 
-		parser->concretify_function_header(f);
-		//msg_write("INSTANTIATE 3");
+			parser->concretify_function_header(f);
 
-		f->update_parameters_after_parsing();
+			f->update_parameters_after_parsing();
 
-		//msg_write("INSTANTIATE 4");
-		parser->concretify_function_body(f);
-		//msg_write("INSTANTIATE 41");
+			parser->concretify_function_body(f);
 
-		if (config.verbose)
-			f->block->show();
-		//msg_write("INSTANTIATE 42");
+			if (config.verbose)
+				f->block->show();
 
-		auto ns = const_cast<Class*>(f0->name_space);
-		ns->add_function(parser->tree, f, false, false);
-		parser->tree->functions.add(f);
+			auto __ns = const_cast<Class*>(f0->name_space);
+			__ns->add_function(parser->tree, f, false, false);
 
-		//parser->do_error("template instantiate");
+			parser->tree->functions.add(f);
+
+		} catch (kaba::Exception &e) {
+			parser->do_error(format("failed to instantiate template %s: %s", f->name, e.message()), token_id);
+		}
+
 		return f;
 	}
-
-	struct Instance {
-		Function *f;
-		Array<const Class*> params;
-	};
-	struct Template {
-		Function *func;
-		Array<string> params;
-		Array<Instance> instances;
-	};
-	static Array<Template> templates;
 };
 Array<TemplateManager::Template> TemplateManager::templates;
 
@@ -1801,14 +1844,11 @@ shared<Node> Parser::concretify_array(shared<Node> node, Block *block, const Cla
 		auto t = index->as_class();
 		for (auto l: weak(links)) {
 			auto f = l->as_func();
-			if (f->is_abstract) {
-				auto ff = TemplateManager::instantiate(this, f, {t});
-				if (ff)
-					return tree->add_node_func_name(ff);
-			} else {
-				if (f->num_params >= 1)
-					if (f->literal_param_type[0] == t)
-						return l;
+			auto ff = TemplateManager::get_instantiated(this, f, {t}, block, ns, node->token_id);
+			if (ff) {
+				auto tf = tree->add_node_func_name(ff);
+				tf->params = l->params; // in case we have a member instance
+				return tf;
 			}
 		}
 		do_error(format("function has no version [%s]", t->name), index);
@@ -1876,7 +1916,7 @@ shared_array<Node> Parser::concretify_node_multi(shared<Node> node, Block *block
 		return {node};
 
 	if (node->kind == NodeKind::ABSTRACT_TOKEN) {
-		string token = Exp.get_token(node->token_id);
+		string token = node->as_token();
 
 		// direct operand
 		auto operands = tree->get_existence(token, block, ns, node->token_id);
@@ -1887,13 +1927,16 @@ shared_array<Node> Parser::concretify_node_multi(shared<Node> node, Block *block
 			auto t = get_constant_type(token);
 			if (t == TypeUnknown) {
 
-				msg_write("----");
+				msg_write("--------");
+				msg_write(block->function->signature());
+				msg_write("local vars:");
 				for (auto vv: weak(block->function->var))
-					msg_write(vv->type->name + " .... " + vv->name);
+					msg_write(format("    %s: %s", vv->name, vv->type->name));
+				msg_write("params:");
 				for (auto p: block->function->literal_param_type)
-					msg_write(p->name);
+					msg_write("    " + p->name);
 				//crash();
-				do_error("unknown operand", node);
+				do_error(format("unknown operand \"%s\"", token), node);
 			}
 
 			Value v;
@@ -2070,8 +2113,7 @@ shared<Node> Parser::concretify_statement_len(shared<Node> node, Block *block, c
 		return tree->add_node_const(tree->add_constant_int(sub->type->array_length), node->token_id);
 
 	// __length__() function?
-	auto *f = sub->type->get_member_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {});
-	if (f)
+	if (auto *f = sub->type->get_member_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {}))
 		return tree->add_node_member_call(f, sub, node->token_id);
 
 	// element "int num/length"?
@@ -2112,8 +2154,7 @@ shared<Node> Parser::concretify_statement_delete(shared<Node> node, Block *block
 		do_error("pointer expected after 'del'", node->params[0]);
 
 	// override del operator?
-	auto f = p->type->param[0]->get_member_func(IDENTIFIER_FUNC_DELETE_OVERRIDE, TypeVoid, {});
-	if (f) {
+	if (auto f = p->type->param[0]->get_member_func(IDENTIFIER_FUNC_DELETE_OVERRIDE, TypeVoid, {})) {
 		auto cmd = tree->add_node_call(f, node->token_id);
 		cmd->set_instance(p->deref());
 		return cmd;
@@ -2502,7 +2543,7 @@ shared<Node> Parser::concretify_operator(shared<Node> node, Block *block, const 
 		// binary operator A+B
 		auto param1 = node->params[0];
 		auto param2 = force_concrete_type_if_function(node->params[1]);
-		auto op = link_operator(op_no, param1, param2);
+		auto op = link_operator(op_no, param1, param2, node->token_id);
 		if (!op)
 			do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), node);
 		return op;
@@ -2531,12 +2572,12 @@ shared<Node> Parser::concretify_var_declaration(shared<Node> node, Block *block,
 		foreachi (auto t, etypes, i) {
 			if (t->needs_constructor() and !t->get_default_constructor())
 				do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", t->long_name()), node);
-			block->add_var(Exp.get_token(node->params[1]->params[i]->token_id), t);
+			block->add_var(node->params[1]->params[i]->as_token(), t);
 		}
 	} else {
 		if (type->needs_constructor() and !type->get_default_constructor())
 			do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->long_name()), node);
-		block->add_var(Exp.get_token(node->params[1]->token_id), type);
+		block->add_var(node->params[1]->as_token(), type);
 	}
 
 	if (node->params.num == 3)
@@ -2685,8 +2726,11 @@ shared<Node> Parser::concretify_node(shared<Node> node, Block *block, const Clas
 		return tree->add_node_class(t);
 	} else if ((node->kind == NodeKind::ABSTRACT_TOKEN) or (node->kind == NodeKind::ABSTRACT_ELEMENT)) {
 		auto operands = concretify_node_multi(node, block, ns);
-		if (operands.num > 1)
-			msg_write(format("WARNING: node not unique:  %s  -  line %d", Exp.get_token(node->token_id), Exp.token_physical_line_no(node->token_id) + 1));
+		if (operands.num > 1) {
+			for (auto o: weak(operands))
+				o->show();
+			msg_write(format("WARNING: node not unique:  %s  -  line %d", node->as_token(), reinterpret_cast<SyntaxTree*>(node->link_no)->expressions.token_physical_line_no(node->token_id) + 1));
+		}
 		if (operands.num > 0)
 			return operands[0];
 	} else if (node->kind == NodeKind::STATEMENT) {
@@ -2791,16 +2835,16 @@ shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tupl
 	operands.add(first_operand);
 
 	// find pairs of operators and operands
-	for (int i=0;true;i++) {
+	while (true) {
 		if (!allow_tuples and Exp.cur == ",")
 			break;
-		auto op = parse_abstract_operator(3);
-		if (!op)
+		if (auto op = parse_abstract_operator(3)) {
+			operators.add(op);
+			expect_no_new_line("unexpected end of line after operator");
+			operands.add(parse_abstract_operand(block));
+		} else {
 			break;
-		op->token_id = Exp.cur_token() - 1;
-		operators.add(op);
-		expect_no_new_line("unexpected end of line after operator");
-		operands.add(parse_abstract_operand(block));
+		}
 	}
 
 	return digest_operator_list_to_tree(operands, operators);
@@ -3925,7 +3969,10 @@ bool Parser::parse_class(Class *_namespace) {
 			}
 			//msg_write(">>");
 		} else if (Exp.cur == IDENTIFIER_FUNC) {
-			auto f = parse_function_header(_class, _class->is_interface() ? Flags::VIRTUAL : Flags::NONE);
+			auto flags = Flags::CONST;
+			if (_class->is_interface())
+				flags_set(flags, Flags::VIRTUAL);
+			auto f = parse_function_header(_class, flags);
 			skip_parsing_function_body(f);
 		} else if (Exp.cur == IDENTIFIER_CONST) {
 			parse_named_const(_class, tree->root_of_all_evil->block.get());
@@ -4216,23 +4263,6 @@ const Class *Parser::parse_type(const Class *ns) {
 	return concretify_as_type(cc, tree->root_of_all_evil->block.get(), ns);
 }
 
-bool node_is_template_type_name(Parser *parser, shared<Node> node) {
-	if (node->kind != NodeKind::ABSTRACT_TOKEN)
-		return false;
-	auto t = parser->Exp.get_token(node->token_id);
-	return (t.num == 1) and (t[0] >= 'A') and (t[0] <= 'Z');
-}
-
-bool func_is_template(Parser *parser, Function *f) {
-	if (f->abstract_return_type)
-		if (node_is_template_type_name(parser, f->abstract_return_type))
-			return true;
-	for (auto p: weak(f->abstract_param_types))
-		if (node_is_template_type_name(parser, p))
-			return true;
-	return false;
-}
-
 Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 	Exp.next(); // "func"
 
@@ -4247,16 +4277,26 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 		name = format(":lambda-%d:", lambda_count ++);
 	} else {
 		name = Exp.consume();
+		if ((name == IDENTIFIER_FUNC_INIT) or (name == IDENTIFIER_FUNC_DELETE) or (name == IDENTIFIER_FUNC_ASSIGN))
+			flags_clear(flags, Flags::CONST);
 	}
 
-	expect_identifier("(", "'(' expected after function name");
-
 	Function *f = tree->add_function(name, TypeVoid, name_space, flags);
-	f->is_abstract = true;
+
+	// template?
+	Array<string> template_param_names;
+	if (try_consume("[")) {
+		template_param_names.add(Exp.consume());
+		expect_identifier("]", "']' expected after template parameter");
+		flags_set(f->flags, Flags::TEMPLATE);
+	}
+
 	//if (config.verbose)
 	//	msg_write("PARSE HEAD  " + f->signature());
 	f->token_id = token;
 	cur_func = f;
+
+	expect_identifier("(", "'(' expected after function name");
 
 // parameter list
 
@@ -4296,9 +4336,9 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 
 	expect_new_line("newline expected after parameter list");
 
-	if (func_is_template(this, f)) {
-		TemplateManager::add_template(f);
-		name_space->add_abstract_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
+	if (f->is_template()) {
+		TemplateManager::add_template(f, template_param_names);
+		name_space->add_template_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
 	} else {
 		concretify_function_header(f);
 
@@ -4315,6 +4355,7 @@ Function *Parser::parse_function_header(Class *name_space, Flags flags) {
 void Parser::concretify_function_header(Function *f) {
 	auto block = tree->root_of_all_evil->block.get();
 
+	f->set_return_type(TypeVoid);
 	if (f->abstract_return_type) {
 		f->set_return_type(concretify_as_type(f->abstract_return_type, block, f->name_space));
 	}
@@ -4332,7 +4373,7 @@ void Parser::concretify_function_header(Function *f) {
 				do_error(format("trying to set a default value of type '%s' for a parameter of type '%s'", f->default_parameters[i]->type->name, t->name), f->default_parameters[i]);
 		}
 	}
-	f->is_abstract = false;
+	flags_clear(f->flags, Flags::TEMPLATE);
 }
 
 void Parser::skip_parsing_function_body(Function *f) {
@@ -4378,11 +4419,8 @@ void Parser::parse_abstract_function_body(Function *f) {
 		f->block->show();
 	}
 
-	if (f->is_abstract) {
-		//msg_error("ABSTRACT FUNC");
-	} else {
+	if (!f->is_template())
 		concretify_function_body(f);
-	}
 
 	cur_func = nullptr;
 }
@@ -4432,27 +4470,31 @@ Flags Parser::parse_flags(Flags initial) {
 
 	while (true) {
 		if (Exp.cur == IDENTIFIER_STATIC) {
-			flags = flags_mix({flags, Flags::STATIC});
+			flags_set(flags, Flags::STATIC);
 		} else if (Exp.cur == IDENTIFIER_EXTERN) {
-			flags = flags_mix({flags, Flags::EXTERN});
+			flags_set(flags, Flags::EXTERN);
 		} else if (Exp.cur == IDENTIFIER_CONST) {
-			flags = flags_mix({flags, Flags::CONST});
+			flags_set(flags, Flags::CONST);
+		} else if (Exp.cur == IDENTIFIER_MUTABLE) {
+			flags_clear(flags, Flags::CONST);
+		} else if (Exp.cur == IDENTIFIER_CONST) {
+			flags_set(flags, Flags::CONST);
 		} else if (Exp.cur == IDENTIFIER_VIRTUAL) {
-			flags = flags_mix({flags, Flags::VIRTUAL});
+			flags_set(flags, Flags::VIRTUAL);
 		} else if (Exp.cur == IDENTIFIER_OVERRIDE) {
-			flags = flags_mix({flags, Flags::OVERRIDE});
+			flags_set(flags, Flags::OVERRIDE);
 		} else if (Exp.cur == IDENTIFIER_SELFREF) {
-			flags = flags_mix({flags, Flags::SELFREF});
+			flags_set(flags, Flags::SELFREF);
 		//} else if (Exp.cur == IDENTIFIER_SHARED) {
 		//	flags = flags_mix({flags, Flags::SHARED});
 		//} else if (Exp.cur == IDENTIFIER_OWNED) {
 		//	flags = flags_mix({flags, Flags::OWNED});
 		} else if (Exp.cur == IDENTIFIER_OUT) {
-			flags = flags_mix({flags, Flags::OUT});
+			flags_set(flags, Flags::OUT);
 		} else if (Exp.cur == IDENTIFIER_THROWS) {
-			flags = flags_mix({flags, Flags::RAISES_EXCEPTIONS});
+			flags_set(flags, Flags::RAISES_EXCEPTIONS);
 		} else if (Exp.cur == IDENTIFIER_PURE) {
-			flags = flags_mix({flags, Flags::PURE});
+			flags_set(flags, Flags::PURE);
 		} else {
 			break;
 		}
@@ -4507,7 +4549,6 @@ void Parser::parse_top_level() {
 
 // convert text into script data
 void Parser::parse() {
-	cur_exp_buf = &Exp;
 	Exp.reset_walker();
 
 	parse_top_level();

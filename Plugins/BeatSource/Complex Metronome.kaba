@@ -83,11 +83,11 @@ class MetronomeSource extends BeatSource
 			return config.sub_beats - 1
 		return next_sub_beat - 1
 	
-	func set_bpm(bpm: float)
+	func mut set_bpm(bpm: float)
 		config.bpm = bpm
 		changed()
 	
-	func set_beats(beats: string, sub_beats: int)
+	func mut set_beats(beats: string, sub_beats: int)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()

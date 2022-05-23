@@ -26,7 +26,7 @@ class SpecGrid extends Grid
 	func override __init__()
 		set_type(SpectrumType.LOGARITHM)
 	
-	func set(_ffl: float[], _ffr: float[])
+	func mut set(_ffl: float[], _ffr: float[])
 		ffl = _ffl
 		ffr = _ffr
 		
@@ -34,7 +34,7 @@ class SpecGrid extends Grid
 		#print(str(pr))
 		
 
-	func create_lines()
+	func mut create_lines()
 		pr.resize(len(ffr))
 		pl.resize(len(ffl))
 		for i in 0:len(ffr)
@@ -49,7 +49,7 @@ class SpecGrid extends Grid
 				#float db_min = db_max - 80
 				pr[i].y = todb(ffr[i])#clamp(todb(ffr[i]), db_min, db_max)
 				pl[i].y = todb(ffl[i])#clamp(todb(ffl[i]), db_min, db_max)
-	func set_type(t: SpectrumType)
+	func mut set_type(t: SpectrumType)
 		type = t
 		if type == SpectrumType.LINEAR
 			y_axis.set(0, 1, false, "")
@@ -79,7 +79,7 @@ DrawingArea area '' height=200 expandy")
 	func override __delete__()
 		c.unsubscribe(self)
 	
-	func on_update()
+	func mut on_update()
 		c.lock()
 		grid.set(c.ffl[c.current_reading], c.ffr[c.current_reading])
 		c.unlock()
@@ -94,7 +94,7 @@ class Spectrum extends AudioVisualizer
 		set_chunk_size(NUM_SAMPLES)
 		
 	
-	func do(buf: AudioBuffer)
+	func mut do(buf: AudioBuffer)
 		complex[] fl, fr
 		buf.get_spectrum(fl, fr, 4096)
 		float[] tffl, tffr

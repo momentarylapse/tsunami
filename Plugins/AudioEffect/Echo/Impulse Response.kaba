@@ -70,7 +70,7 @@ class Folding extends AudioEffect
 		buf_overlap.clear()
 		HH.clear()
 	
-	func do(out buf: float[], out overlap: float[])
+	func mut do(out buf: float[], out overlap: float[])
 		float[] y
 		int N = len(buf)
 		int K = len(h)

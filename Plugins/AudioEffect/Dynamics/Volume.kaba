@@ -62,13 +62,13 @@ class Volume extends AudioEffect
 			enable("volume", !c.config.maximize)
 			enable("volume_slider", !c.config.maximize)
 
-		func on_max()
+		func mut on_max()
 			c.config.maximize = is_checked("max")
 			enable("volume", !c.config.maximize)
 			enable("volume_slider", !c.config.maximize)
 			changed()
 
-		func on_volume()
+		func mut on_volume()
 			c.config.volume = slider.get()
 			changed()
 

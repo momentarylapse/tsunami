@@ -14,7 +14,7 @@ class MLPPanel extends ConfigPanel
 		synth_panel = nil
 		
 	
-	func on_select_synth()
+	func mut on_select_synth()
 		if synth_panel
 			del synth_panel
 		string name = ChooseModule(self, session, Module.Type.SYNTHESIZER, c.synth.name)
@@ -40,7 +40,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.connect(synth, 0, m_out, 0)
 		chain.start()
 	
-	func set_synth(name: string)
+	func mut set_synth(name: string)
 		chain.stop()
 		chain.reset_state()
 		chain.delete(synth)

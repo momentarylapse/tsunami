@@ -27,7 +27,7 @@ Button forward 'Forward' expandx expandy")
 
 		event("forward", on_forward)
 	
-	func on_forward()
+	func mut on_forward()
 		print("forward")
 		looper.go_forward()
 		
@@ -57,17 +57,17 @@ class Looper extends TsunamiPlugin
 	func on_leave_part()
 		print("leaving " + cur_part.text)
 		#go_forward
-	func on_enter_part()
+	func mut on_enter_part()
 		print("entering " + cur_part.text)
 		renderer.set_range(cur_part.range)
 		renderer.set_loop(true)
 		mode = Mode.LOOP
-	func go_forward()
+	func mut go_forward()
 		renderer.set_range(song.range())
 		renderer.set_loop(false)
 		mode = Mode.FORWARD
 	
-	func on_update()
+	func mut on_update()
 		int pos = renderer.get_pos(0)
 		var p = get_part(song, pos)
 		if p != cur_part

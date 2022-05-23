@@ -64,7 +64,7 @@ class BiquadFilter
 			b[0] = 1
 			b[1] = 0
 			b[2] = 0
-		func const gain(f: float, sample_rate: float) -> float
+		func gain(f: float, sample_rate: float) -> float
 			complex z
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
@@ -73,7 +73,7 @@ class BiquadFilter
 		
 			float fac = H.abs() / y.abs()
 			return factor_to_db(fac)
-		func const phase_shift(f: float, sample_rate: float) -> float
+		func phase_shift(f: float, sample_rate: float) -> float
 			complex z
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
@@ -82,7 +82,7 @@ class BiquadFilter
 			var zz = H * y.bar()
 			return atan2(zz.y, zz.x) * 10
 	
-		func create(mode: FilterType, freq: float, q: float, gain: float, sample_rate: float)
+		func mut create(mode: FilterType, freq: float, q: float, gain: float, sample_rate: float)
 			if mode == FilterType.LOW_PASS
 				create_low_pass(freq, q, sample_rate)
 			else if mode == FilterType.HIGH_PASS
@@ -102,7 +102,7 @@ class BiquadFilter
 			else if mode == FilterType.ALL_PASS
 				create_all_pass(freq, q, sample_rate)
 
-		func create_peak(f_res: float, Q: float, gain: float, sample_rate: float)
+		func mut create_peak(f_res: float, Q: float, gain: float, sample_rate: float)
 			var g = db_to_factor(gain)
 			var c = 1 / tan(pi * f_res / sample_rate)
 			var B = 1 / Q
@@ -113,7 +113,7 @@ class BiquadFilter
 			a[2] = (c*c - B*c + 1) / a0
 			b[2] = (c*c - B*g*c + 1) / a0
 
-		func create_notch(f_res: float, Q: float, sample_rate: float)
+		func mut create_notch(f_res: float, Q: float, sample_rate: float)
 			var c = tan(pi * f_res / sample_rate)
 			var a0 = 1 + c/Q + c*c
 			b[0] = (1 + c*c) / a0
@@ -122,7 +122,7 @@ class BiquadFilter
 			a[1] = b[1]
 			a[2] = (1 - c/Q + c*c) / a0
 
-		func create_low_pass(f_res: float, _q: float, sample_rate: float)
+		func mut create_low_pass(f_res: float, _q: float, sample_rate: float)
 			#b[0] = 1 / (1 + sample_rate/f_res/2/pi)
 #			b[1] = 0
 #			b[2] = 0
@@ -137,7 +137,7 @@ class BiquadFilter
 			a[1] = 2 * (c*c - 1) / a0
 			a[2] = (1 - c*q + c*c) / a0
 
-		func create_high_pass(f_res: float, _q: float, sample_rate: float)
+		func mut create_high_pass(f_res: float, _q: float, sample_rate: float)
 			#b[0] = 1 / (1 + f_res*2*pi / sample_rate)
 #			b[1] = -b[0]
 #			b[2] = 0
@@ -152,7 +152,7 @@ class BiquadFilter
 			a[1] = 2 * (c*c - 1) / a0
 			a[2] = (1 - c*q + c*c) / a0
 
-		func create_low_shelf(f_res: float, q: float, gain: float, sample_rate: float)
+		func mut create_low_shelf(f_res: float, q: float, gain: float, sample_rate: float)
 			var V = db_to_factor(abs(gain))
 			var c = tan(pi * f_res / sample_rate)
 		
@@ -181,7 +181,7 @@ class BiquadFilter
 #			a[1] = (w-c) / a0
 #			a[2] = 0
 
-		func create_high_shelf(f_res: float, q: float, gain: float, sample_rate: float)
+		func mut create_high_shelf(f_res: float, q: float, gain: float, sample_rate: float)
 			var V = db_to_factor(abs(gain))
 			var c = tan(pi * f_res / sample_rate)
 		
@@ -202,7 +202,7 @@ class BiquadFilter
 		
 		
 		# y[i] := α * (y[i-1] + x[i] - x[i-1])
-		func create_high_pass_linear(f_res: float, sample_rate: float)
+		func mut create_high_pass_linear(f_res: float, sample_rate: float)
 			var RC = 1 / (2 * pi * f_res)
 			var dt = 1.0 / sample_rate
 			var α = RC / (RC + dt)
@@ -213,7 +213,7 @@ class BiquadFilter
 			a[2] = 0
 
 		# y[i] := α * x[i] + (1-α) * y[i-1]
-		func create_low_pass_linear(f_res: float, sample_rate: float)
+		func mut create_low_pass_linear(f_res: float, sample_rate: float)
 			var RC = 1 / (2 * pi * f_res)
 			var dt = 1.0 / sample_rate
 			var α = dt / (RC + dt)
@@ -223,12 +223,12 @@ class BiquadFilter
 			a[1] = α - 1
 			a[2] = 0
 	
-		func create_all_pass(freq: float, q: float, sample_rate: float)
+		func mut create_all_pass(freq: float, q: float, sample_rate: float)
 			var phi = 2 * pi * freq / sample_rate
 			var l = 1 - phi / q
 			create_all_pass_z(l * complex(cos(phi), sin(phi)))
 
-		func create_all_pass_z(z: complex)
+		func mut create_all_pass_z(z: complex)
 			var l = z.abs()
 			b[0] = l*l
 			b[1] = - 2 * z.x
@@ -241,7 +241,7 @@ class BiquadFilter
 		var prev_x, prev_y: float[2]
 		func __init__()
 			reset()
-		func reset()
+		func mut reset()
 			for i in 0:2
 				prev_x[i] = 0
 				prev_y[i] = 0
@@ -251,12 +251,12 @@ class BiquadFilter
 
 	func __init__()
 		reset()
-	func reset()
+	func mut reset()
 		for s in state
 			s.reset()
-	func create(mode: FilterType, freq: float, q: float, gain: float, _sample_rate: float)
+	func mut create(mode: FilterType, freq: float, q: float, gain: float, _sample_rate: float)
 		params.create(mode, freq, q, gain, _sample_rate)
-	func apply(out buf: AudioBuffer)
+	func mut apply(out buf: AudioBuffer)
 		state.resize(buf.channels)
 		for c,i in buf.c
 			var input = buf.c[i]
@@ -270,13 +270,13 @@ class BiquadMultiFilter
 
 	func __init__()
 		reset()
-	func reset()
+	func mut reset()
 		for ff in f
 			ff.reset()
-	func create(mode: FilterType, freq: float[], q: float[], gain: float[], _sample_rate: float)
+	func mut create(mode: FilterType, freq: float[], q: float[], gain: float[], _sample_rate: float)
 		f.resize(len(freq))
 		for i in 0:len(freq)
 			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)
-	func apply(out buf: AudioBuffer)
+	func mut apply(out buf: AudioBuffer)
 		for ff in f
 			ff.apply(buf)

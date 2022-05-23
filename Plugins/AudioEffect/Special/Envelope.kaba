@@ -21,7 +21,7 @@ class Envelope extends AudioEffect
 			value[i] = 0
 			dvalue[i] = 0
 
-	func do(out buf: float[], c: int)
+	func mut do(out buf: float[], c: int)
 		
 		float v = value[c]
 		float dv = dvalue[c]

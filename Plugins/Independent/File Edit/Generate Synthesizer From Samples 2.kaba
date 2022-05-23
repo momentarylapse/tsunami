@@ -18,7 +18,7 @@ class XXX extends TsunamiPlugin
 		stop()
 		
 	
-	func import_preset(p: any)
+	func mut import_preset(p: any)
 		print("import {{p["name"]}}")
 				
 		var track = session.song.add_track(SignalType.MIDI, -1)

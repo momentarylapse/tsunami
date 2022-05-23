@@ -905,7 +905,7 @@ Function *SyntaxTree::add_func_header(Class *t, const string &name, const Class 
 bool needs_new(Function *f) {
 	if (!f)
 		return true;
-	return f->needs_overriding;
+	return f->needs_overriding();
 }
 
 Array<string> class_func_param_names(Function *cf) {
@@ -918,14 +918,14 @@ Array<string> class_func_param_names(Function *cf) {
 
 bool has_user_constructors(const Class *t) {
 	for (auto *cc: t->get_constructors())
-		if (!cc->needs_overriding)
+		if (!cc->needs_overriding())
 			return true;
 	return false;
 }
 
 void remove_inherited_constructors(Class *t) {
 	for (int i=t->functions.num-1; i>=0; i--)
-		if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding)
+		if (t->functions[i]->name == IDENTIFIER_FUNC_INIT and t->functions[i]->needs_overriding())
 			t->functions.erase(i);
 }
 
@@ -1088,7 +1088,7 @@ Function* class_get_member_func(const Class *t, const string &name, const Class 
 	Function *cf = t->get_member_func(name, return_type, params);
 	if (cf) {
 		Function *f = cf;
-		f->needs_overriding = false; // we're about to implement....
+		flags_clear(f->flags, Flags::NEEDS_OVERRIDE); // we're about to implement....
 		if (f->auto_declared) {
 			return f;
 		}
@@ -1102,7 +1102,7 @@ Function* prepare_auto_impl(const Class *t, Function *f) {
 	if (!f)
 		return nullptr;
 	if (f->auto_declared) {
-		f->needs_overriding = false; // we're about to implement....
+		flags_clear(f->flags, Flags::NEEDS_OVERRIDE); // we're about to implement....
 		return f;
 	}
 	return nullptr;

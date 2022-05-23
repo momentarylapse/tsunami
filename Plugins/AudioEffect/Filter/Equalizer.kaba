@@ -43,7 +43,7 @@ class EqCurve extends Curve
 	var gain: float
 	var peaks: Peak[]
 	var sample_rate: float
-	func set(c: Equalizer.Config, _sample_rate: float)
+	func mut set(c: Equalizer.Config, _sample_rate: float)
 		gain = c.gain
 		peaks = c.peaks
 		sample_rate = _sample_rate
@@ -118,7 +118,7 @@ class EqualizerGrid extends Grid
 	func override __delete__()
 		if menu
 			del menu
-	func init2()
+	func mut init2()
 		panel.event("add-peak", on_add_peak)
 		panel.event("add-low-pass", on_add_peak)
 		panel.event("add-high-pass", on_add_peak)
@@ -212,7 +212,7 @@ class EqualizerGrid extends Grid
 		menu.popup(panel)
 	
 	# hui events
-	func on_add_peak()
+	func mut on_add_peak()
 		string id = hui.get_event().id
 		var t = FilterType.PEAK
 		if id == "add-low-pass"
@@ -230,12 +230,12 @@ class EqualizerGrid extends Grid
 		cp.changed()
 		redraw()
 	
-	func on_peak_toggle_enabled()
+	func mut on_peak_toggle_enabled()
 		if selected >= 0
 			c.peaks[selected].enabled = not c.peaks[selected].enabled
 			cp.changed()
 			redraw()
-	func on_peak_delete()
+	func mut on_peak_delete()
 		if selected >= 0
 			c.peaks.remove(selected)
 			cp.changed()
@@ -268,7 +268,7 @@ class EqualizerGrid extends Grid
 		if hui.get_event().key == KEY_DELETE
 			on_peak_delete()
 
-	func set_buffer(buf: AudioBuffer)
+	func mut set_buffer(buf: AudioBuffer)
 		spectrum.set(buf, sample_rate)
 		redraw()
 

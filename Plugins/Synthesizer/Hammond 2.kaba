@@ -95,7 +95,7 @@ Grid ? '' vertical
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	func on_change()
+	func mut on_change()
 		hc.key_stutter = get_float("stutter") / 100
 		hc.attack = get_float("attack") / 1000
 		hc.release = get_float("release") / 1000
@@ -124,9 +124,9 @@ func create_stutter(intensity: float) -> float[]
 class SineGenerator
 	var phi = 0.
 	var delta_phi = 0.
-	func set_omega(omega: float)
+	func mut set_omega(omega: float)
 		delta_phi = omega
-	func read(n: int) -> float[]
+	func mut read(n: int) -> float[]
 		float[] f
 		f.resize(n)
 		for i in 0:n

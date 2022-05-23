@@ -455,7 +455,7 @@ void Class::link_virtual_table() {
 				msg_write("VIRTUAL   " + i2s(cf->virtual_index) + "   " + cf->signature());
 			vtable[cf->virtual_index] = (void*)cf->address;
 		}
-		if (cf->needs_overriding) {
+		if (cf->needs_overriding()) {
 			msg_error("needs overriding: " + cf->signature());
 		}
 	}
@@ -517,9 +517,9 @@ const Class *Class::get_root() const {
 	return r;
 }
 
-void Class::add_abstract_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
+void Class::add_template_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
 	if (config.verbose)
-		msg_write("CLASS ADD ABSTRACT   " + long_name() + "    " + f->signature());
+		msg_write("CLASS ADD TEMPLATE   " + long_name() + "    " + f->signature());
 	if (f->is_static()) {
 		if (config.verbose)
 			msg_write("   STATIC");
@@ -570,13 +570,19 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			//f->flags = orig->flags;
 			// don't copy __INIT_FILL_ALL_PARAMS etc...
 			// better copy one-by-one for now
-			if (flags_has(orig->flags, Flags::CONST)) {
-				if (auto self = f->__get_var(IDENTIFIER_SELF))
-					flags_set(self->flags, Flags::CONST);
+			if (flags_has(orig->flags, Flags::CONST))
 				flags_set(f->flags, Flags::CONST);
-			}
+			else
+				flags_clear(f->flags, Flags::CONST);
 			if (flags_has(orig->flags, Flags::SELFREF))
 				flags_set(f->flags, Flags::SELFREF);
+
+			if (auto self = f->__get_var(IDENTIFIER_SELF)) {
+				if (flags_has(f->flags, Flags::CONST))
+					flags_set(self->flags, Flags::CONST);
+				else
+					flags_clear(self->flags, Flags::CONST);
+			}
 			functions[orig_index] = f;
 		} else {
 			functions.add(f);

@@ -11,12 +11,12 @@ class Matrix
 		for i in 0:n
 			for j in 0:m
 				e[i*m + j] = el[i][j]
-	func clear(_n: int, _m: int)
+	func mut clear(_n: int, _m: int)
 		n = _n
 		m = _m
 		e.clear()
 		e.resize(n*m)
-	func add(i: int, j: int, f: float)
+	func mut add(i: int, j: int, f: float)
 		e[i * m + j] += f
 	func get(i: int, j: int) -> float
 		return e[i * m + j]
@@ -25,7 +25,7 @@ class Matrix
 		for i in 0:n
 			s.add(str(e[i*m:(i+1)*m]))
 		return s.join("\n")
-	func diagonalize(out b: float[])
+	func mut diagonalize(out b: float[])
 		for i in 0:n
 			float f = get(i,i)
 			if f == 0

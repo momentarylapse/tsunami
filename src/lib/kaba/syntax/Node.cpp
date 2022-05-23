@@ -150,7 +150,7 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::OPERATOR)
 		return as_op()->sig(ns);
 	if (kind == NodeKind::ABSTRACT_TOKEN)
-		return "<" + ((ExpressionBuffer*)(int_p)link_no)->get_token(token_id) + ">";
+		return "<" + as_token() + ">";
 	if (kind == NodeKind::ABSTRACT_OPERATOR)
 		return "<" + as_abstract_op()->name + ">";
 	if (kind == NodeKind::BLOCK)
@@ -285,6 +285,10 @@ Statement *Node::as_statement() const {
 
 AbstractOperator *Node::as_abstract_op() const {
 	return (AbstractOperator*)link_no;
+}
+
+string Node::as_token() const {
+	return reinterpret_cast<SyntaxTree*>((int_p)link_no)->expressions.get_token(token_id);
 }
 
 void Node::set_instance(shared<Node> p) {

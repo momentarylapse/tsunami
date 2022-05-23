@@ -4,7 +4,7 @@ use tsunami
 class VolumeChecker extends TsunamiPlugin
 
 	var vol_max: float
-	func check() -> bool
+	func mut check() -> bool
 		var renderer = new SongRenderer(session.song)
 		
 		var p = new ProgressX("checking", self.session.win)
@@ -34,7 +34,7 @@ class VolumeChecker extends TsunamiPlugin
 		del renderer
 		return !cancelled
 		
-	func ask()
+	func mut ask()
 		string q = "Song reaches a peak volume of {{vol_max * 100.0|.1}}% ({{amp2db(vol_max)|.1}}dB)\n"
 		if vol_max > 0.95 and vol_max < 1.0
 			hui.info_box(session.win, "Info", "{{q}} seems fine...")

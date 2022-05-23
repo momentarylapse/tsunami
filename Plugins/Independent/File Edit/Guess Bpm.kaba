@@ -187,10 +187,10 @@ Grid ? '' vertical
 		
 		create_curve(BPM_MIN, BPM_MAX)
 		
-	func on_cancel()
+	func mut on_cancel()
 		destroy()
 	
-	func on_ok()
+	func mut on_ok()
 		var song = fb.session.song
 		song.begin_action_group("guess bpm")
 		if not song.time_track()
@@ -202,11 +202,11 @@ Grid ? '' vertical
 		song.end_action_group()
 		destroy()
 	
-	func on_beats()
+	func mut on_beats()
 		beats_per_bar = get_int("")
 		create_curve(BPM_MIN, BPM_MAX)
 	
-	func on_discrete()
+	func mut on_discrete()
 		discrete = is_checked("")
 		create_curve(BPM_MIN, BPM_MAX)
 	
@@ -218,7 +218,7 @@ Grid ? '' vertical
 		var sample_rate = fb.session.sample_rate()
 		return sample_rate * beats_per_bar / FRAME_STEP * (60. / bpm)
 	
-	func create_curve(peak_bpm_min: float, peak_bpm_max: float)
+	func mut create_curve(peak_bpm_min: float, peak_bpm_max: float)
 		grid.curve.clear()
 		var sample_rate = fb.session.sample_rate()
 		#find_beats(buf, song.sample_rate)

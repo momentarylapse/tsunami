@@ -45,10 +45,10 @@ Grid ? ''
 		event("ok", on_ok)
 		event("presets", on_ok)
 		event("cancel", on_cancel)
-	func on_ok()
+	func mut on_ok()
 		selected = get_int("presets")
 		destroy()
-	func on_cancel()
+	func mut on_cancel()
 		selected = -1
 		destroy()
 
@@ -69,7 +69,7 @@ class XXX extends TsunamiPlugin
 		
 		stop()
 		
-	func set_preset(pre: int)
+	func mut set_preset(pre: int)
 		
 	#	var prog = new ProgressX("generating sound font", session.win)
 

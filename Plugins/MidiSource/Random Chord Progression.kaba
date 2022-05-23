@@ -39,7 +39,7 @@ class Morse extends MidiSource
 	#	int n = rand(7)
 	#	return sorted([n, n+2, n+4], "")
 
-	func step_chord()
+	func mut step_chord()
 		while true
 			int d = rand(7)
 			var cc = make_chord(d)

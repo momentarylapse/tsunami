@@ -37,11 +37,11 @@ Grid ? '' vertical
 	func override update()
 		set_float("speed", looper.config.speed)
 	
-	func on_play()
+	func mut on_play()
 		looper.play()
-	func on_pause()
+	func mut on_pause()
 		looper.pause()
-	func on_set_speed()
+	func mut on_set_speed()
 		looper.set_speed(get_float("speed"))
 
 
@@ -77,7 +77,7 @@ class PracticeLooper extends TsunamiPlugin
 	func override create_panel() -> ConfigPanel*
 		return new PLPanel(self)
 	
-	func play()
+	func mut play()
 		session.view.play()
 		return
 		print(session.view.sel.range())
@@ -87,10 +87,10 @@ class PracticeLooper extends TsunamiPlugin
 		#chain.command(Module.Command.PREPARE_START, 0)
 		chain.start()
 	
-	func pause()
+	func mut pause()
 		chain.stop()
 	
-	func reset()
+	func mut reset()
 		if not altered_speed
 			return
 #		session.view.sel.range_raw = scale_range(session.view.sel.range_raw, current_speed)
@@ -99,7 +99,7 @@ class PracticeLooper extends TsunamiPlugin
 		altered_speed = false
 		current_speed = 1.0
 	
-	func set_speed(speed: float)
+	func mut set_speed(speed: float)
 		config.speed = speed
 		changed()
 	

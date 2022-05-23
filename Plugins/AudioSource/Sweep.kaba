@@ -28,7 +28,7 @@ class SweepSource extends AudioSource
 		#freq = config.freq_min
 		t = 0
 
-	func create_sweep(out buf: float[])
+	func mut create_sweep(out buf: float[])
 		float B = log(config.freq_max / config.freq_min) / config.period
 		
 		for i in 0:len(buf)

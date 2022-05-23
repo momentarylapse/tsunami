@@ -32,11 +32,11 @@ Grid ? ''
 		event("button", on_button)
 		c.panel = &self
 	
-	func _update()
+	func mut _update()
 		set_string("rec-time", c.session.song.get_time_str_long(len(c.recorder.buffer)))
 			
 	
-	func on_button()
+	func mut on_button()
 		c.tab()
 
 class Looper extends TsunamiPlugin
@@ -72,19 +72,19 @@ class Looper extends TsunamiPlugin
 		#chain.unsubscribe(&self)
 		del chain
 	
-	func on_update()
+	func mut on_update()
 		if panel
 			panel._update()
-	func tab()
+	func mut tab()
 		if mode == 0
 			rec_start()
 		else if mode == 1
 			rec_stop()
 	
-	func rec_start()
+	func mut rec_start()
 		recorder.command(Module.Command.ACCUMULATION_START, 0)
 		mode = 1
-	func rec_stop()
+	func mut rec_stop()
 		recorder.command(Module.Command.ACCUMULATION_STOP, 0)
 		
 		length = len(recorder.buffer)

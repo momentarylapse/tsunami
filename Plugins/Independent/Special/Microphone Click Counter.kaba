@@ -90,7 +90,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		hui.cancel_runner(runner)
 		del chain
 	
-	func on_update()
+	func mut on_update()
 		if click_counter.emit
 			source.click()
 			click_counter.emit = false

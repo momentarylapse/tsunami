@@ -7,6 +7,7 @@ class SNRPanel extends ConfigPanel
 	var mp: MidiPainter*
 	var gp: GridPainter*
 	var cam: AudioView.ViewPort*
+	var runner: int
 	
 	func override __init__(_c: Module)
 		from_source("
@@ -14,7 +15,6 @@ Grid ? ''
 	DrawingArea area '' expandx
 	---|
 	Button button 'X'")
-		c.panel = &self
 	
 		cam = new AudioView.ViewPort(nil)
 		mp = new MidiPainter(c.session.song, cam, nil, nil, colors)
@@ -23,10 +23,17 @@ Grid ? ''
 		activate("button")
 		event("button", on_button)
 		event_x("area", "hui:draw", on_draw)
+		runner = hui.run_repeated(0.05, on_update)
+		
+	func override __delete__()
+		hui.cancel_runner(runner)
+	
+	func on_update()
+		redraw("area")
 	
 	func on_button()
 	
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		rect r = rect(0, p.width, 0, p.height)
 		cam.area = r
 		int pos = c.recorder.buffer.samples
@@ -57,16 +64,13 @@ Grid ? ''
 			p.draw_line([x, 0], [x, pp/13])
 
 class SupernovaRhythm extends TsunamiPlugin
-	var panel: SNRPanel*
 	var midi: MidiNoteBuffer
 	var chain: SignalChain*
 #	PitchDetector
 	var pitch_detector: TestDetector*
 	var recorder: MidiAccumulator*
-	var runner: int
 
 	func override on_start()
-		panel = nil
 		
 		int dt = 4400 # 100 ms
 		midi.add(new MidiNote(RangeTo(dt, dt*3), 60, 1.0))
@@ -86,18 +90,11 @@ class SupernovaRhythm extends TsunamiPlugin
 		chain.set_buffer_size(4096)
 		chain.start()
 		chain.command(Module.Command.ACCUMULATION_START, 0)
-		runner = hui.run_repeated(0.05, on_update)
 		
 	func override on_stop()
-		hui.cancel_runner(runner)
 		del chain
-	
-	func on_update()
-		if panel
-			panel.redraw("area")
 	
 
 	func override create_panel() -> ConfigPanel*
-		panel = new SNRPanel(self)
-		return panel
+		return new SNRPanel(self)
 

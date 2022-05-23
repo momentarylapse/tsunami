@@ -7,8 +7,8 @@ class Curve
 	func __init__()
 		col = colors.text_soft1
 		col_below = color(0.3, 0.3, 1, 0.3)
-	func virtual const get(x: float) -> float
-	func virtual const get_list(xx: float[]) -> float[]
+	func virtual get(x: float) -> float
+	func virtual get_list(xx: float[]) -> float[]
 		float[] r
 		r.resize(len(xx))
 		for x,i in xx
@@ -62,11 +62,11 @@ class GridAxis extends AxisData
 		if menu
 			del menu
 	
-	func set_events()
+	func mut set_events()
 		grid.panel.event("{{_id}}-mode-freq-hz", on_mode_freq_hz)
 		grid.panel.event("{{_id}}-mode-pitch", on_mode_pitch)
 	
-	func set(_val_min: float, _val_max: float, _log: bool, _unit: string)
+	func mut set(_val_min: float, _val_max: float, _log: bool, _unit: string)
 		val_min = _val_min
 		val_max = _val_max
 		val_min_min = _val_min
@@ -89,7 +89,7 @@ class GridAxis extends AxisData
 			return log2lin((__v - offset) / size, val_min, val_max)
 		return (__v - offset) / size * (val_max - val_min) + val_min
 	
-	func zoom(p: float, dz: float)
+	func mut zoom(p: float, dz: float)
 		float m = unproject(p)
 		if log_scale
 			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
@@ -99,10 +99,10 @@ class GridAxis extends AxisData
 			val_max = clamp(m + (val_max - m) * pow(0.9, dz), val_min_min, val_max_max)
 		grid.redraw()
 		
-	func on_left_button_down()
+	func mut on_left_button_down()
 		pass
 		
-	func on_right_button_down()
+	func mut on_right_button_down()
 		if menu
 			del menu
 		menu = new Menu(grid.panel)
@@ -115,14 +115,14 @@ class GridAxis extends AxisData
 			menu.add("unit: {{unit}}", "-dummy-")
 		menu.popup(grid.panel)
 	
-	func on_mode_freq_hz()
+	func mut on_mode_freq_hz()
 		freq_as_pitch = false
 		grid.redraw()
-	func on_mode_pitch()
+	func mut on_mode_pitch()
 		freq_as_pitch = true
 		grid.redraw()
 	
-	func on_mouse_wheel(mm: float)
+	func mut on_mouse_wheel(mm: float)
 		if grid.panel.win.get_key(KEY_CONTROL)
 			zoom(mm, hui.get_event().scroll.y)
 
@@ -235,7 +235,7 @@ class Grid extends Object
 	var col_sel: color
 
 	
-	func data_init()
+	func mut data_init()
 		col_grid = colors.grid
 		col_text = colors.text
 		col_line = colors.text_soft1
@@ -288,7 +288,7 @@ class Grid extends Object
 	func get_plot_region(_x0: float, _y0: float, _w: float, _h: float) -> rect
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
 
-	func draw_background(c: Painter, _x0: float, __y0: float, _w: float, _h: float)
+	func mut draw_background(c: Painter, _x0: float, __y0: float, _w: float, _h: float)
 		float _y0 = __y0
 	
 		x0 = _x0
@@ -433,7 +433,7 @@ class Grid extends Object
 		
 
 	
-	func on_draw_all(c: Painter)
+	func mut on_draw_all(c: Painter)
 		float w = c.width
 		float h = c.height
 
@@ -444,10 +444,10 @@ class Grid extends Object
 	func redraw()
 		panel.redraw(id)
 	
-	func update_mouse()
+	func mut update_mouse()
 		m = hui.get_event().mouse
 	
-	func on_left_button_down_all()
+	func mut on_left_button_down_all()
 		update_mouse()
 		if plot_area.inside(m)
 			on_left_button_down()
@@ -456,12 +456,12 @@ class Grid extends Object
 		if y_axis.area.inside(m)
 			y_axis.on_left_button_down()
 	
-	func on_left_button_up_all()
+	func mut on_left_button_up_all()
 		update_mouse()
 		if plot_area.inside(m)
 			on_left_button_up()
 	
-	func on_right_button_down_all()
+	func mut on_right_button_down_all()
 		update_mouse()
 		if plot_area.inside(m)
 			on_right_button_down()
@@ -470,17 +470,17 @@ class Grid extends Object
 		if y_axis.area.inside(m)
 			y_axis.on_right_button_down()
 	
-	func on_right_button_up_all()
+	func mut on_right_button_up_all()
 		update_mouse()
 		if plot_area.inside(m)
 			on_right_button_up()
 	
-	func on_mouse_move_all()
+	func mut on_mouse_move_all()
 		update_mouse()
 		#if plot_rect.inside(mx, my)
 		on_mouse_move()
 	
-	func on_mouse_wheel_all()
+	func mut on_mouse_wheel_all()
 		update_mouse()
 		if plot_area.inside(m)
 			on_mouse_wheel()
@@ -489,10 +489,10 @@ class Grid extends Object
 		if y_axis.area.inside(m)
 			y_axis.on_mouse_wheel(m.y)
 	
-	func on_key_down_all()
+	func mut on_key_down_all()
 		on_key_down()
 
-	func init(_panel: Panel, _id: string)
+	func mut init(_panel: Panel, _id: string)
 		data_init()
 		panel = &_panel
 		id = _id
@@ -507,11 +507,11 @@ class Grid extends Object
 		x_axis.set_events()
 		y_axis.set_events()
 	
-	func virtual on_draw(c: Painter)
-	func virtual on_left_button_down()
-	func virtual on_left_button_up()
-	func virtual on_right_button_down()
-	func virtual on_right_button_up()
-	func virtual on_mouse_move()
-	func virtual on_mouse_wheel()
-	func virtual on_key_down()
+	func virtual mut on_draw(c: Painter)
+	func virtual mut on_left_button_down()
+	func virtual mut on_left_button_up()
+	func virtual mut on_right_button_down()
+	func virtual mut on_right_button_up()
+	func virtual mut on_mouse_move()
+	func virtual mut on_mouse_wheel()
+	func virtual mut on_key_down()

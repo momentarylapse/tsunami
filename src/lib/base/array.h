@@ -258,14 +258,6 @@ public:
 		return ((T*)data)[num - 1];
 	}
 
-	Array<T> filter(std::function<bool(const T&)> f) const {
-		Array<T> r;
-		for (T &e: *this)
-			if (f(e))
-				r.add(e);
-		return r;
-	}
-
 	// reference arrays
 	void _cdecl set_ref(const Array<T> &a) {
 		if (this != &a) {

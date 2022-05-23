@@ -147,7 +147,6 @@ shared<Module> get_import(Parser *parser, const string &name, int token) {
 		//string msg = "in imported file:\n\"" + e.message + "\"";
 		parser->do_error(msg, token);
 	}
-	cur_exp_buf = &parser->Exp;
 
 	msg_left();
 	return include;

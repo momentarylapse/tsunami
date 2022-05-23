@@ -77,16 +77,16 @@ class MetronomeSource extends MidiSource
 		
 		return midi.samples
 	
-	func set_bpm(bpm: float)
+	func mut set_bpm(bpm: float)
 		config.bpm = bpm
 		changed()
 	
-	func set_beats(beats: int, sub_beats: int)
+	func mut set_beats(beats: int, sub_beats: int)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()
 	
-	func set_pause(_pause: bool)
+	func mut set_pause(_pause: bool)
 		pause = _pause
 		changed()
 	

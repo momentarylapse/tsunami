@@ -43,7 +43,7 @@ public:
 	void expect_identifier(const string &identifier, const string &error_msg, bool consume = true);
 	bool try_consume(const string &identifier);
 
-	shared<Node> link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2, int token_id = -1);
+	shared<Node> link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2, int token_id);
 	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2, int token_id = -1);
 
 	Array<const Class*> get_wanted_param_types(shared<Node> link, int &mandatory_params);
@@ -233,7 +233,7 @@ public:
 	
 	SyntaxTree *tree;
 	Function *cur_func;
-	ExpressionBuffer Exp;
+	ExpressionBuffer &Exp;
 
 	int for_index_count;
 	int parser_loop_depth;

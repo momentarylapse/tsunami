@@ -150,7 +150,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -174,14 +174,14 @@ Grid ? ''
 				return -13
 		return -1
 	
-	func on_left_button_down()
+	func mut on_left_button_down()
 		hover = get_hover()
 		moving = -1
 		if hover < -5
 			moving = hover
-	func on_left_button_up()
+	func mut on_left_button_up()
 		moving = -1
-	func on_mouse_move()
+	func mut on_mouse_move()
 		var e = hui.get_event()
 		float mx = e.mouse.x
 		float my = e.mouse.y
@@ -201,7 +201,7 @@ Grid ? ''
 			hover = get_hover()
 		redraw("area")
 
-	func on_spin_button()
+	func mut on_spin_button()
 		var o = fc
 		o.type = SynthType.from_int(get_int("type"))
 		o.num_voices = get_int("voices")

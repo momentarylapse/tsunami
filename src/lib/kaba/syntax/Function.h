@@ -54,10 +54,10 @@ public:
 	bool is_const() const;
 	bool is_selfref() const;
 	bool throws_exceptions() const; // for external
+	bool is_template() const;
+	bool needs_overriding() const;
 	InlineID inline_no;
 	int virtual_index;
-	bool needs_overriding;
-	bool is_abstract;
 	int num_slightly_hidden_vars;
 	// for compilation...
 	int64 _var_size;

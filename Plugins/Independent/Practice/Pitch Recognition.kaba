@@ -7,18 +7,27 @@ use helper.tone
 
 class PitchRecognitionPanel extends ConfigPanel
 	var override c: PitchRecognition*
-	var note_error: float
+	#var note_error: float
+	var runner: int
 	
 	func override __init__(_p: Module)
 		add_drawing_area("", 5, 5, "drawing")
 	
 		event_x("drawing", "hui:draw", on_draw)
+		
+		runner = hui.run_repeated(0.05, on_update)
+	
+	func override __delete__()
+		hui.cancel_runner(runner)
+		
+	func on_update()
+		redraw("drawing")
 
-	func get_note(f: float) -> string
+	func get_note(f: float) -> (string, float)
 		float pitch = log(f / 440.0) / log(2.0) * 12 + 69
 		int rel = int(pitch + 0.5) % 12
-		note_error = loop(pitch, -0.5, 0.5)
-		return rel_pitch_name(rel)
+		var note_error = loop(pitch, -0.5, 0.5)
+		return (rel_pitch_name(rel), note_error)
 		#loopf(fl, 0, 1)
 		#note = i2s(n)
 
@@ -51,11 +60,12 @@ class PitchRecognitionPanel extends ConfigPanel
 	
 		p.set_color(colors.text)
 		if c.pitch_detector.loud_enough
-			p.draw_str([x - 8, y - r2 - 22], get_note(c.pitch_detector.frequency))
+			var (note, error) = get_note(c.pitch_detector.frequency)
+			p.draw_str([x - 8, y - r2 - 22], note)
 			p.draw_str([x + r2 * 0.7 + 6, y - r2 * 0.7 - 22], "#")
 			p.draw_str([x - r2 * 0.7 - 10, y - r2 * 0.7 - 22], "b")
 			p.draw_str([5, 5], "{{c.pitch_detector.frequency|.1}} Hz")
-			p.draw_line([x, y], [x + r * sin(note_error * pi), y - r * cos(note_error * pi)])
+			p.draw_line([x, y], [x + r * sin(error * pi), y - r * cos(error * pi)])
 		else
 			p.draw_str([x - 30, y - 20], "too quiet")
 
@@ -63,11 +73,9 @@ class PitchRecognition extends TsunamiPlugin
 	
 	var chain: SignalChain*
 	var pitch_detector: PitchDetector*
-	var panel: PitchRecognitionPanel*
-	var runner: int
+	#var panel: PitchRecognitionPanel*
 	
 	func override on_start()
-		panel = nil
 		chain = session.create_signal_chain("pitch-recognition")
 		var input = chain.add(Module.Type.STREAM, "AudioInput")
 		pitch_detector = chain.add(Module.Type.PITCH_DETECTOR, "")
@@ -76,17 +84,10 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		runner = hui.run_repeated(0.05, on_update)
 		
 	func override on_stop()
-		hui.cancel_runner(runner)
 		del chain
 	
-	func on_update()
-		if panel
-			panel.redraw("drawing")
-	
-	func override create_panel() -> ConfigPanel*
-		panel = new PitchRecognitionPanel(self)
-		return panel
+	func override mut create_panel() -> ConfigPanel*
+		return new PitchRecognitionPanel(self)
 	

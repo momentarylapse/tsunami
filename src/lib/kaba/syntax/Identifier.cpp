@@ -47,6 +47,7 @@ const string IDENTIFIER_VTABLE_VAR = "-vtable-";
 const string IDENTIFIER_SHARED_COUNT = "_shared_ref_count";
 const string IDENTIFIER_ENUM = "enum";
 const string IDENTIFIER_CONST = "const";
+const string IDENTIFIER_MUTABLE = "mut";
 const string IDENTIFIER_OUT = "out";
 const string IDENTIFIER_OVERRIDE = "override";
 const string IDENTIFIER_VIRTUAL = "virtual";

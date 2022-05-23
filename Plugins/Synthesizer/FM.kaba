@@ -25,7 +25,7 @@ class OscillatorConfig
 	var target_out: bool
 	func __init__()
 		reset()
-	func reset()
+	func mut reset()
 		factor = 1
 		amplitude = 0.1
 		initial = 0.01
@@ -59,7 +59,7 @@ class FMConfig extends Module.Config
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		osc[0].target_out = true
-	func clear_links()
+	func mut clear_links()
 		for o in osc
 			for t in o.target
 				t = false
@@ -77,7 +77,7 @@ class FMPanel extends ConfigPanel
 	
 	var moving, hover: int
 	
-	func add_top(label: string, id: string)
+	func mut add_top(label: string, id: string)
 		event("top-{{id}}", on_topology)
 		menu_top.add(label, "top-{{id}}")
 	
@@ -132,7 +132,7 @@ Grid ? ''
 		event("type-square", on_type_square)
 		event("type-saw", on_type_saw)
 	
-	func update_osci_pos()
+	func mut update_osci_pos()
 		# initial
 		p_out = vec2(40, 60)
 		for p,i in p_osci
@@ -152,7 +152,7 @@ Grid ? ''
 		float d = len(b - a)
 		vec2 dir = (b - a) * (1/d)
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
-	func iterate_osci_pos()
+	func mut iterate_osci_pos()
 		vec2[NUM_OSCILLATORS] f
 		for o,i in fc.osc
 			f[i] = vec2(0,0)
@@ -293,7 +293,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -337,16 +337,16 @@ Grid ? ''
 				return -13
 		return -1
 	
-	func on_left_button_down()
+	func mut on_left_button_down()
 		hover = get_hover()
 		moving = -1
 		if hover >= 0
 			set_chosen(hover)
 		else if hover < -5
 			moving = hover
-	func on_left_button_up()
+	func mut on_left_button_up()
 		moving = -1
-	func on_mouse_move()
+	func mut on_mouse_move()
 		var e = hui.get_event()
 		float mx = e.mouse.x
 		float my = e.mouse.y
@@ -367,7 +367,7 @@ Grid ? ''
 		redraw("area")
 				
 		
-	func on_right_button_down()
+	func mut on_right_button_down()
 		hover = get_hover()
 		if hover >= 0
 			set_chosen(hover)
@@ -375,12 +375,12 @@ Grid ? ''
 		else
 			menu_top.popup(self)
 	
-	func set_chosen(i: int)
+	func mut set_chosen(i: int)
 		chosen = i
 		redraw("area")
 		update()
 	
-	func on_topology()
+	func mut on_topology()
 		var code = hui.get_event().id[4:]
 		fc.clear_links()
 		for i in 0:len(code)
@@ -393,22 +393,22 @@ Grid ? ''
 		redraw("area")
 		changed()
 	
-	func on_type_sine()
+	func mut on_type_sine()
 		fc.osc[chosen].type = OsciType.SINE
 		redraw("area")
 		changed()
 	
-	func on_type_square()
+	func mut on_type_square()
 		fc.osc[chosen].type = OsciType.SQUARE
 		redraw("area")
 		changed()
 		
-	func on_type_saw()
+	func mut on_type_saw()
 		fc.osc[chosen].type = OsciType.SAW
 		redraw("area")
 		changed()
 
-	func on_spin_button()
+	func mut on_spin_button()
 		if chosen < 0
 			return
 		var o = &fc.osc[chosen]

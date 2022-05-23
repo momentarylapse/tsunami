@@ -18,7 +18,7 @@ class Noise extends AudioSource
 	
 	func __assign__(n: Noise)
 	
-	func do(out buf: float[])
+	func mut do(out buf: float[])
 		if config.type == "uniform"
 			for b in buf
 				b = r.uniform(-1,1) * config.volume

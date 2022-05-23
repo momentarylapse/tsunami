@@ -16,7 +16,7 @@ class FlipFlopSource extends AudioSource
 	func override reset_state()
 		t = 0
 
-	func create_flip(out buf: float[])
+	func mut create_flip(out buf: float[])
 		for i in 0:len(buf)
 			buf[i] = 1
 			if t > config.period

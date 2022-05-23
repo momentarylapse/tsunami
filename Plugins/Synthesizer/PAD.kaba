@@ -38,7 +38,7 @@ class PADRenderer extends PitchRenderer
 	var env: EnvelopeADSR
 	var override synth: PADSynthesizer*
 		
-	func create()
+	func mut create()
 		float freq = pitch_to_freq(pitch)
 	
 		complex[] c
@@ -167,7 +167,7 @@ Grid ? ''
 		grid.x_axis.set(0.5, 8.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	func on_change()
+	func mut on_change()
 		pc.bw = get_float("bw")
 		pc.bwscale = get_float("bwscale")
 		pc.detune = get_float("detune")

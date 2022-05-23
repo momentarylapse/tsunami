@@ -26,14 +26,16 @@ class Biquad extends AudioEffect
 			b1 = 0
 			b2 = 0
 
-		func const create_filter(out p: BiquadFilter.Parameters)
+		func create_filter() -> BiquadFilter.Parameters
+			var p: BiquadFilter.Parameters
 			p.a[1] = a1
 			p.a[2] = a2
 			p.b[0] = b0
 			p.b[1] = b1
 			p.b[2] = b2
+			return p
 
-		func from_filter(p: BiquadFilter.Parameters)
+		func mut from_filter(p: BiquadFilter.Parameters)
 			a1 = p.a[1]
 			a2 = p.a[2]
 			b0 = p.b[0]
@@ -48,7 +50,7 @@ class Biquad extends AudioEffect
 	var filter: BiquadFilter
 	
 	func override on_config()
-		config.create_filter(filter.params)
+		filter.params = config.create_filter()
 	
 	func override reset_state()
 		filter.reset()
@@ -75,18 +77,18 @@ class BiquadGrid extends Grid
 	
 		# curve + area below
 		BiquadGainCurve gain
-		c.create_filter(gain.filter.params)
+		gain.filter.params = c.create_filter()
 		gain.sample_rate = sample_rate
 		draw_curve_c(p, gain, true)
 	
 		# curve + area below
 		BiquadPhaseShiftCurve phase
-		c.create_filter(phase.filter.params)
+		phase.filter.params = c.create_filter()
 		phase.sample_rate = sample_rate
 		draw_curve_c(p, phase, false)
 
 
-	func set_buffer(buf: AudioBuffer)
+	func mut set_buffer(buf: AudioBuffer)
 		spectrum.set(buf, sample_rate)
 		redraw()
 
@@ -137,7 +139,7 @@ Grid ? '' vertical
 		set_float("b2", c.config.b2)
 		grid.redraw()
 	
-	func on_change()
+	func mut on_change()
 		c.config.a1 = get_float("a1")
 		c.config.a2 = get_float("a2")
 		c.config.b0 = get_float("b0")
@@ -170,7 +172,8 @@ Grid ? '' vertical
 		Button apply 'Apply'
 ")
 		event("apply", on_apply)
-	func on_apply()
+
+	func mut on_apply()
 		BiquadFilter.Parameters p
 		float sample_rate = bp.c.session.sample_rate()
 		int t = get_int("type")

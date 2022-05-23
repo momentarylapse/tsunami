@@ -185,7 +185,7 @@ class CompressorPanel extends ConfigPanel
 		set_float("attack", grid.config.attack * 1000)
 		set_float("release", grid.config.release * 1000)
 
-	func on_edit()
+	func mut on_edit()
 		grid.config.attack = get_float("attack") / 1000.0
 		grid.config.release = get_float("release") / 1000.0
 		changed()

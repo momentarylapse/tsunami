@@ -22,7 +22,7 @@ DrawingArea area '' height=200 expandy")
 	func on_update()
 		redraw("area")
 	
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		

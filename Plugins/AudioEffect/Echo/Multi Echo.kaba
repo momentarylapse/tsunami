@@ -77,7 +77,7 @@ class MultiEchoGrid extends Grid
 	var menu_point: Menu*
 	
 	
-	func post_init()
+	func mut post_init()
 		menu_bg = new Menu(cp)
 		menu_bg.add("add reflection", "reflection-add")
 		
@@ -161,7 +161,7 @@ class MultiEchoGrid extends Grid
 		if hui.get_event().key == KEY_DELETE
 			on_delete_reflection()
 
-	func on_delete_reflection()
+	func mut on_delete_reflection()
 		if selected >= 0
 			config.refl.remove(selected)
 			cp.changed()
@@ -176,7 +176,7 @@ class MultiEchoGrid extends Grid
 		else
 			menu_bg.popup(panel)
 	
-	func on_add_reflection()
+	func mut on_add_reflection()
 		MultiEcho.Config.Reflector r
 		r.delay = max(get_mouse2().x, 0.001)
 		r.volume = get_mouse2().y

@@ -72,7 +72,7 @@ class HarmonicPanel extends ConfigPanel
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	func on_change()
+	func mut on_change()
 		hc.release = get_float("release") / 1000
 		changed()
 	

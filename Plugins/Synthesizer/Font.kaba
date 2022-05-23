@@ -12,7 +12,7 @@ class MidiFont
 	func __init__(_name: string)
 		name = _name
 	
-	func load(session: Session)
+	func mut load(session: Session)
 		if song
 			return
 		sub = session.create_child()
@@ -20,7 +20,7 @@ class MidiFont
 		sub.song = song
 		sub.storage.load(song, hui.app_directory_static << "Midi Fonts/{{name}}.nami")
 	
-	func instruments(session: Session) -> string[]
+	func mut instruments(session: Session) -> string[]
 		load(session)
 		string[] ii
 		for t in song.tracks
@@ -28,7 +28,7 @@ class MidiFont
 				ii.add(t.name)
 		return ii
 	
-	func get_synth(session: Session, name: string) -> Synthesizer*
+	func mut get_synth(session: Session, name: string) -> Synthesizer*
 		load(session)
 		if not song
 			return nil
@@ -61,14 +61,14 @@ class FontList
 			list.add(s.name)
 		return list
 		
-	func instruments(session: Session, name: string) -> string[]
+	func mut instruments(session: Session, name: string) -> string[]
 		for f in fonts
 			if f.name == name
 				return f.instruments(session)
 		return []
 
 	#string[] find_drumsets()
-	func update()
+	func mut update()
 		var list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
 		for e in list
 			string name = str(e)[:-5]
@@ -76,7 +76,7 @@ class FontList
 				continue
 			fonts.add(new MidiFont(name))
 	
-	func get(session: Session, name: string) -> MidiFont*
+	func mut get(session: Session, name: string) -> MidiFont*
 		update()
 		int n = find(name)
 		if n < 0
@@ -88,7 +88,7 @@ class FontList
 		#f.load(session)
 		#return f.song
 	
-	func get_synth(session: Session, name: string, instrument: string) -> Synthesizer*
+	func mut get_synth(session: Session, name: string, instrument: string) -> Synthesizer*
 		var font = get(session, name)
 		if not font
 			return nil
@@ -176,7 +176,7 @@ class FontPanel extends ConfigPanel
 			set_int("instruments", 0)
 		
 		
-	func on_select()
+	func mut on_select()
 		int n = get_int("")-1
 		sc.name = ""
 		if n >= 0 and n < len(font_list.fonts)
@@ -184,7 +184,7 @@ class FontPanel extends ConfigPanel
 		changed()
 		update()
 	
-	func on_instruments()
+	func mut on_instruments()
 		int n = get_int("")
 		sc.instrument = ""
 		var instruments = font_list.instruments(c.session, sc.name)

@@ -55,16 +55,23 @@ MetaInfo DummyMetaInfo(SIZE_32);
 int arm_encode_8l4(unsigned int value);
 
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column) {
-	if (_expression.num > 0)
-		text += "\"" + _expression + "\": ";
+	expression = _expression;
 	text += _message;
 	line = _line;
 	column = _column;
-	if (line >= 0)
-		text += "\nline " + i2s(line);
 }
 
 Exception::~Exception() {}
+
+string Exception::message() const {
+	string m;
+	if (expression != "")
+		m += "\"" + expression + "\": ";
+	m += text;
+	if (line >= 0)
+		m += "\nline " + i2s(line);
+	return m;
+}
 
 void Exception::print() const {
 	msg_error(message());

@@ -21,7 +21,7 @@ class CueSplitter extends TsunamiPlugin
 				load_cue(p)
 		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"], f)
 	
-	func load_cue(filename: Path)
+	func mut load_cue(filename: Path)
 		var dir = filename.parent()
 		string fn
 		string year, album, artist

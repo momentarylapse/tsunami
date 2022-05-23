@@ -28,7 +28,7 @@ class SpectrumCurve extends Curve
 		col = colors.text_soft2
 	func override __delete__()
 		del ring
-	func set(buf: AudioBuffer, _sample_rate: float)
+	func mut set(buf: AudioBuffer, _sample_rate: float)
 		sample_rate = _sample_rate
 		ring.write(buf)
 	

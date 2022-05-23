@@ -531,8 +531,10 @@ class Exception : public ::Exception {
 public:
 	Exception(const string &message, const string &expression, int line, int column);
 	~Exception() override;
+	string message() const override;
 	void print() const;
 	int line, column;
+	string expression;
 };
 
 void add_instruction(char *oc, int &ocs, Asm::InstID inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);

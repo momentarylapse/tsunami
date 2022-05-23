@@ -125,6 +125,7 @@ public:
 	void *as_global_p() const;
 	Variable *as_global() const;
 	Variable *as_local() const;
+	string as_token() const;
 	void set_num_params(int n);
 	void set_param(int index, shared<Node> p);
 	void set_instance(shared<Node> p);

@@ -63,7 +63,7 @@ Grid ? ''
 	
 		event("close", on_close)
 
-	func on_close()
+	func mut on_close()
 		destroy()
 
 func f2col(_f: float) -> color
@@ -79,7 +79,7 @@ class ShowSpectrogram extends TsunamiPlugin
 	var dlg: SpectrumDialog*
 	var sg: float[NF][NT]
 
-	func show_spec(song: Song*)
+	func mut show_spec(song: Song*)
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf

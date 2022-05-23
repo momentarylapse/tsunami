@@ -33,18 +33,18 @@ Grid ? '' vertical
 		set_float("threshold", c.config.threshold)
 		set_float("blocking", c.config.blocking * 1000)
 	
-	func on_update()
+	func mut on_update()
 		redraw("area")
 	
-	func on_threshold()
+	func mut on_threshold()
 		c.config.threshold = get_float("threshold")
 		changed()
 	
-	func on_blocking()
+	func mut on_blocking()
 		c.config.blocking = get_float("blocking") / 1000
 		changed()
 	
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		

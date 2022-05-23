@@ -27,7 +27,7 @@ class _StreamTest extends TsunamiPlugin
 		hui.cancel_runner(runner)
 		del chain
 	
-	func on_tick()
+	func mut on_tick()
 		print("{{input.samples_recorded()}}\t{{recorder.samples_skipped}}")
 		nn ++
 		if nn > 100

@@ -9,7 +9,7 @@ class PitchShift extends TsunamiPlugin
 	var buf2: complex[]
 	
 	
-	func shift_buf_bad(b: float[], out _out: float[], factor: float)
+	func mut shift_buf_bad(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		float f = 1.0 / len(b)
 		int N = len(b)
@@ -28,7 +28,7 @@ class PitchShift extends TsunamiPlugin
 		_out.resize(N)
 		fft_c2r_inv(buf2, _out)
 
-	func shift_buf(b: float[], out _out: float[], factor: float)
+	func mut shift_buf(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
@@ -57,7 +57,7 @@ class PitchShift extends TsunamiPlugin
 		fft_c2r_inv(buf2, _out)
 		_out /= N
 		
-	func shift_buf_fast(b: float[], out _out: float[], factor: float)
+	func mut shift_buf_fast(b: float[], out _out: float[], factor: float)
 		fft_r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)

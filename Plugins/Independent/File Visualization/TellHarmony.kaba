@@ -16,7 +16,7 @@ class Harmony
 	var range: Range
 	var chord: Chord
 	var pp: int[]
-	func calc()
+	func mut calc()
 		pp = [for n in notes int(n.pitch) % 12]
 		chord = Chord.guess(pp)
 

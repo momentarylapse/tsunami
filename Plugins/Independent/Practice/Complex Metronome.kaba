@@ -16,16 +16,16 @@ const MOTION_BLUR_COUNT = 20
 class BlurredDot
 	var pos, pos0: vec2
 	var has_prev = false
-	func move(x: float, y: float)
+	func mut move(x: float, y: float)
 		pos0 = pos
 		pos.x = x
 		pos.y = y
 		has_prev = true
-	func jump(x: float, y: float)
+	func mut jump(x: float, y: float)
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	func draw(p: Painter, c: color, r: float)
+	func mut draw(p: Painter, c: color, r: float)
 		if has_prev
 			float dt = 1.0 / MOTION_BLUR_COUNT
 			color cc = c
@@ -103,7 +103,7 @@ Grid ? '' vertical
 		hui.cancel_runner(sr_id)
 		del popup_menu
 	
-	func on_draw(p: Painter)
+	func mut on_draw(p: Painter)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -186,7 +186,7 @@ Grid ? '' vertical
 		
 		fraction_prev = beat_fraction
 	
-	func on_area_left_button_down()
+	func mut on_area_left_button_down()
 		if chain
 			if chain.is_active()
 				chain.stop()
@@ -194,7 +194,7 @@ Grid ? '' vertical
 				chain.start()
 		redraw("area")
 	
-	func on_area_right_button_down()
+	func mut on_area_right_button_down()
 		popup_menu.check("blink-background", allow_blink_background)
 		popup_menu.check("blink-number", allow_blink_number)
 		popup_menu.check("mode-circle", mode == AnimationMode.CIRCLE)
@@ -202,23 +202,23 @@ Grid ? '' vertical
 		popup_menu.check("mode-bounce-walk", mode == AnimationMode.BOUNCE_WALK)
 		popup_menu.popup(&self)
 	
-	func on_blink_background()
-		allow_blink_background = !allow_blink_background
+	func mut on_blink_background()
+		allow_blink_background = not allow_blink_background
 		hui.app_config["Plugins/Metronome/AllowBlinkBackground"] = allow_blink_background
 	
-	func on_blink_number()
-		allow_blink_number = !allow_blink_number
+	func mut on_blink_number()
+		allow_blink_number = not allow_blink_number
 		hui.app_config["Plugins/Metronome/AllowBlinkNumber"] = allow_blink_number
 	
-	func on_mode_circle()
+	func mut on_mode_circle()
 		mode = AnimationMode.CIRCLE
 		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	
-	func on_mode_bounce()
+	func mut on_mode_bounce()
 		mode = AnimationMode.BOUNCE
 		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	
-	func on_mode_bounce_walk()
+	func mut on_mode_bounce_walk()
 		mode = AnimationMode.BOUNCE_WALK
 		hui.app_config["Plugins/Metronome/Mode"] = int(mode)
 	

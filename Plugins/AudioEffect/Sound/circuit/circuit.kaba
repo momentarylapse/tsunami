@@ -60,17 +60,17 @@ class Edge
 		#print(str(self))
 	func __assign__(o: Edge)
 		pass
-	func virtual const g(dt: float) -> float
+	func virtual g(dt: float) -> float
 		return 0.0
-	func virtual const I_off(dt: float) -> float
+	func virtual I_off(dt: float) -> float
 		return 0.0
-	func virtual update(nodes: Node[], dt: float)
+	func virtual mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	func virtual iterate(dt: float)
+	func virtual mut iterate(dt: float)
 		pass
-	func virtual reset_state()
-	func virtual const param_names() -> string[]
+	func virtual mut reset_state()
+	func virtual param_names() -> string[]
 		return []
 
 class Cable extends Edge
@@ -189,7 +189,7 @@ class Diode extends Edge
 class SimResult
 	var U, I: float[][]
 	var phi: float[][]
-	func clear()
+	func mut clear()
 		U.clear()
 		I.clear()
 		phi.clear()
@@ -202,19 +202,19 @@ class Circuit
 	func __init__()
 		reset_default()
 		
-	func clear()
+	func mut clear()
 		nodes.clear()
 		_out = 1
 		for e in edges
 			del e
 		edges.clear()
 	
-	func reset_default()
+	func mut reset_default()
 		clear()
 		nodes.add(Node(complex(0.2, 0.3)))
 		nodes.add(Node(complex(0.2, 0.7)))
 	
-	func reset_state()
+	func mut reset_state()
 		for e in edges
 			e.reset_state()
 	
@@ -252,7 +252,7 @@ class Circuit
 			if b >= 0
 				I[b] -= I_off
 
-	func optimizer_step(I_in: float, dt: float)
+	func mut optimizer_step(I_in: float, dt: float)
 		int n = len(nodes)-1
 		Matrix G
 		create_G(G, dt)
@@ -276,7 +276,7 @@ class Circuit
 		for e in edges
 			e.update(nodes, dt)
 	
-	func time_step(I_in: float, dt: float)
+	func mut time_step(I_in: float, dt: float)
 		
 		#print("-----")
 		for i in 0:15
@@ -293,7 +293,7 @@ class Circuit
 		#print(factor)
 		return factor
 	
-	func simulate(t_max: float, dt: float, amp: float, omega: float, type: int, out res: SimResult)
+	func mut simulate(t_max: float, dt: float, amp: float, omega: float, type: int, out res: SimResult)
 		for t in 0:t_max:dt
 		
 			# input
@@ -333,7 +333,7 @@ class Circuit
 		s += "Out:{{_out}}\n"
 		return s
 	
-	func import(s: string)
+	func mut import(s: string)
 		clear()
 		string[] lines = s.explode("\n")
 		for l in lines
@@ -351,7 +351,7 @@ class Circuit
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
 	
-	func add_default(n: int[], t: EdgeType) -> Edge*
+	func mut add_default(n: int[], t: EdgeType) -> Edge*
 		var e: Edge* = nil
 		if t == EdgeType.CABLE
 			e = new Cable(n)

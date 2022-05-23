@@ -128,10 +128,10 @@ Grid ? ''
 		event("export", on_export)
 	func override __delete__()
 
-	func on_close()
+	func mut on_close()
 		destroy()
 		
-	func on_export()
+	func mut on_export()
 		int n = get_int("target")
 		if n < 0
 			return
@@ -154,7 +154,7 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 	var midi: MidiNoteBuffer
 	var sg: float[NF][NT]
 
-	func show_spec(song: Song)
+	func mut show_spec(song: Song)
 		dlg = new SpectrumDialog(self, song)
 	
 		AudioBuffer buf

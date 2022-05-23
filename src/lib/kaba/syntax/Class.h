@@ -111,7 +111,7 @@ public:
 	const Class *get_pointer() const;
 	const Class *get_root() const;
 	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
-	void add_abstract_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
+	void add_template_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
 	Function *get_func(const string &name, const Class *return_type, const Array<const Class*> &params) const;
 	Function *get_member_func(const string &name, const Class *return_type, const Array<const Class*> &params) const;
 	Function *get_same_func(const string &name, Function *f) const;

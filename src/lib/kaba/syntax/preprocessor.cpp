@@ -58,7 +58,7 @@ shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 	temp.init(f->literal_return_type);
 	if (!call_function(f, temp.p(), p))
 		return c;
-	auto r = tree->add_node_const(tree->add_constant(f->literal_return_type));
+	auto r = add_node_const(tree->add_constant(f->literal_return_type));
 	r->as_const()->set(temp);
 	db_out(">>>  " + r->str(tree->base_class));
 	return r;
@@ -150,7 +150,7 @@ shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Functio
 	p[0] = temp.p();
 	if (!call_function(f, nullptr, p))
 		return c;
-	auto r = tree->add_node_const(tree->add_constant(t));
+	auto r = add_node_const(tree->add_constant(t));
 	r->as_const()->set(temp);
 	db_out(">>>  " + r->str(tree->base_class));
 	return r;

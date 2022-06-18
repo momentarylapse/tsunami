@@ -2,7 +2,7 @@
 #include "../../file/file.h"
 #include "lexical.h"
 #include <stdio.h>
-#include "SyntaxTree.h"
+#include "../syntax/SyntaxTree.h"
 
 namespace kaba {
 

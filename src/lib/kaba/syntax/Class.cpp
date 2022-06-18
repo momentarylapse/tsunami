@@ -530,6 +530,7 @@ void Class::add_template_function(SyntaxTree *s, Function *f, bool as_virtual, b
 	}
 }
 
+// TODO: split!
 void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool override) {
 	if (config.verbose)
 		msg_write("CLASS ADD   " + long_name() + "    " + f->signature());

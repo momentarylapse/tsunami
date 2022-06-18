@@ -8,7 +8,8 @@
 \*----------------------------------------------------------------------------*/
 #include "../file/file.h"
 #include "kaba.h"
-#include "syntax/Parser.h"
+#include "parser/Parser.h"
+#include "parser/Concretifier.h"
 #include "Interpreter.h"
 #include <cassert>
 
@@ -296,20 +297,20 @@ void execute_single_command(const string &cmd) {
 		msg_write("ABSTRACT SINGLE:");
 		func->block->show();
 	}
-	parser->concretify_node(func->block.get(), func->block.get(), func->name_space);
+	parser->con.concretify_node(func->block.get(), func->block.get(), func->name_space);
 	
 	// implicit print(...)?
 	if (func->block->params.num > 0 and func->block->params[0]->type != TypeVoid) {
-		auto n = parser->add_converter_str(func->block->params[0], true);
+		auto n = parser->con.add_converter_str(func->block->params[0], true);
 		
 		auto f = tree->required_func_global("print");
 
-		auto cmd = tree->add_node_call(f);
+		auto cmd = add_node_call(f);
 		cmd->set_param(0, n);
 		func->block->params[0] = cmd;
 	}
 	for (auto *c: tree->owned_classes)
-		parser->auto_implement_functions(c);
+		parser->auto_implementer.auto_implement_functions(c);
 	//ps->show("aaaa");
 
 

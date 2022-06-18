@@ -7,6 +7,7 @@
 
 #include "Operator.h"
 #include "Identifier.h"
+#include "Class.h"
 
 namespace kaba {
 
@@ -50,5 +51,14 @@ AbstractOperator abstract_operators[(int)OperatorID::_COUNT_] = {
 	{IDENTIFIER_AS, OperatorID::AS,   false, 15,  "-none-", 3, false},
 	{"=>",  OperatorID::MAPS_TO,      false,  1,  "__mapsto__", 3, false}
 };
+
+
+string Operator::sig(const Class *ns) const {
+	if (param_type_1 and param_type_2)
+		return format("(%s) %s (%s)", param_type_1->cname(ns), abstract->name, param_type_2->cname(ns));
+	if (param_type_1)
+		return format("(%s) %s", param_type_1->cname(ns), abstract->name);
+	return format("%s (%s)", abstract->name, param_type_2->cname(ns));
+}
 
 }

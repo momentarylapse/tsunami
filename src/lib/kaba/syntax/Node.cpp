@@ -374,5 +374,190 @@ shared<Node> Node::deref_shift(int64 shift, const Class *type, int token_id) con
 }
 
 
+// recursive
+shared<Node> cp_node(shared<Node> c) {
+	shared<Node> cmd;
+	if (c->kind == NodeKind::BLOCK) {
+		cmd = new Block(c->as_block()->function, c->as_block()->parent, c->type);
+		cmd->as_block()->vars = c->as_block()->vars;
+	} else {
+		cmd = new Node(c->kind, c->link_no, c->type, c->is_const);
+	}
+	cmd->token_id = c->token_id;
+	cmd->set_num_params(c->params.num);
+	for (int i=0;i<c->params.num;i++)
+		if (c->params[i])
+			cmd->set_param(i, cp_node(c->params[i]));
+	return cmd;
+}
+
+
+
+shared<Node> add_node_constructor(Function *f, int token_id) {
+	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space, false);
+	auto n = add_node_member_call(f, dummy, token_id); // temp var added later...
+	n->kind = NodeKind::CONSTRUCTOR_AS_FUNCTION;
+	n->type = f->name_space;
+	return n;
+}
+
+shared<Node> add_node_const(Constant *c, int token_id) {
+	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), true, token_id);
+}
+
+/*shared<Node> add_node_block(Block *b) {
+	return new Node(NodeKind::BLOCK, (int_p)b, TypeVoid);
+}*/
+
+shared<Node> add_node_statement(StatementID id, int token_id, const Class *type) {
+	auto *s = statement_from_id(id);
+	auto c = new Node(NodeKind::STATEMENT, (int64)s, type, false, token_id);
+	c->set_num_params(s->num_params);
+	return c;
+}
+
+// virtual call, if func is virtual
+shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
+	shared<Node> c;
+	if ((f->virtual_index >= 0) and !force_non_virtual) {
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, true, token_id);
+	} else {
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true, token_id);
+	}
+	c->set_num_params(f->num_params);
+	c->set_instance(inst);
+	foreachi (auto p, params, i)
+		c->set_param(i + 1, p);
+	return c;
+}
+
+// non-member!
+shared<Node> add_node_call(Function *f, int token_id) {
+	// FIXME: literal_return_type???
+	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true, token_id);
+		c->set_num_params(f->num_params);
+	return c;
+}
+
+shared<Node> add_node_func_name(Function *f, int token_id) {
+	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, true, token_id);
+}
+
+shared<Node> add_node_class(const Class *c, int token_id) {
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP, true, token_id);
+}
+
+
+shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
+	if (!override_type)
+		override_type = op->return_type;
+	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, true, token_id);
+	if (op->abstract->param_flags == 3) {
+		cmd->set_num_params(2); // binary
+		cmd->set_param(0, p1);
+		cmd->set_param(1, p2);
+	} else {
+		cmd->set_num_params(1); // unary
+		cmd->set_param(0, p1);
+	}
+	return cmd;
+}
+
+
+shared<Node> add_node_local(Variable *v, const Class *type, int token_id) {
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->is_const(), token_id);
+}
+
+shared<Node> add_node_local(Variable *v, int token_id) {
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->is_const(), token_id);
+}
+
+shared<Node> add_node_global(Variable *v, int token_id) {
+	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->is_const(), token_id);
+}
+
+shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type) {
+	shared<Node> cmd_el = new Node(NodeKind::POINTER_AS_ARRAY, 0, type, false, index->token_id);
+	cmd_el->set_num_params(2);
+	cmd_el->set_param(0, p);
+	cmd_el->set_param(1, index);
+	return cmd_el;
+}
+
+shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
+	shared<Node> cmd_el = new Node(NodeKind::DYNAMIC_ARRAY, 0, array->type->get_array_element(), false, index->token_id);
+	cmd_el->set_num_params(2);
+	cmd_el->set_param(0, array);
+	cmd_el->set_param(1, index);
+	return cmd_el;
+}
+
+shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *type) {
+	if (!type)
+		type = array->type->param[0];
+	auto *el = new Node(NodeKind::ARRAY, 0, type, false, index->token_id);
+	el->set_num_params(2);
+	el->set_param(0, array);
+	el->set_param(1, index);
+	return el;
+}
+
+shared<Node> make_constructor_static(shared<Node> n, const string &name) {
+	for (auto *f: weak(n->type->functions))
+		if (f->name == name) {
+			auto nn = add_node_call(f, n->token_id);
+			for (int i=0; i<n->params.num-1; i++)
+				nn->set_param(i, n->params[i+1]);
+			//nn->params = n->params.sub(1,-1);
+			return nn;
+		}
+	return n;
+}
+
+extern Array<Operator*> global_operators;
+
+shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
+	for (auto *op: global_operators)
+		if (op->f->inline_no == inline_index)
+			return add_node_operator(op, p1, p2, token_id, override_type);
+
+	throw Exception(format("INTERNAL ERROR: operator inline index not found: %d", (int)inline_index), "", -1, -1, nullptr);
+	return nullptr;
+}
+
+
+
+Array<const Class*> node_extract_param_types(const shared<Node> n) {
+	Array<const Class*> classes;
+	for (auto p: weak(n->params))
+		classes.add(p->type);
+	return classes;
+}
+
+bool node_is_member_function_with_instance(shared<Node> n) {
+	if (!n->is_function())
+		return false;
+	auto *f = n->as_func();
+	if (f->is_static())
+		return false;
+	return n->params.num == 0 or n->params[0];
+}
+
+bool is_type_tuple(const shared<Node> n) {
+	if (n->kind != NodeKind::TUPLE)
+		return false;
+	for (auto p: weak(n->params))
+		if (p->kind != NodeKind::CLASS)
+			return false;
+	return true;
+}
+
+Array<const Class*> class_tuple_extract_classes(const shared<Node> n) {
+	Array<const Class*> classes;
+	for (auto p: weak(n->params))
+		classes.add(p->as_class());
+	return classes;
+}
+
 }
 

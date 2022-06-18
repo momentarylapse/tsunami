@@ -10,6 +10,7 @@
 #pragma once
 
 class Image;
+class vec2;
 
 namespace nix {
 
@@ -18,10 +19,10 @@ class DepthBuffer;
 
 
 void _cdecl set_projection_perspective();
-void _cdecl set_projection_perspective_ext(float center_x, float center_y, float width_1, float height_1, float z_min, float z_max);
+void _cdecl set_projection_perspective_ext(const vec2 &center, const vec2 &size_1, float z_min, float z_max);
 void _cdecl set_projection_ortho_relative();
 void _cdecl set_projection_ortho_pixel();
-void _cdecl set_projection_ortho_ext(float center_x, float center_y, float map_width, float map_height, float z_min, float z_max);
+void _cdecl set_projection_ortho_ext(const vec2 &center, const vec2 &map_size, float z_min, float z_max);
 void _cdecl set_projection_matrix(const matrix &mat);
 
 void _cdecl set_model_matrix(const matrix &mat);

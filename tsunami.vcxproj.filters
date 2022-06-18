@@ -700,6 +700,30 @@
     <ClCompile Include="src\lib\kaba\lib\lib_vulkan.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\abstract.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\Concretifier.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\implicit.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\import.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\lexical.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\macros.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\Parser.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\template.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Block.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
@@ -715,25 +739,10 @@
     <ClCompile Include="src\lib\kaba\syntax\Identifier.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\import.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\macros.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Operator.cpp">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\Parser.cpp">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">
@@ -1716,6 +1725,9 @@
     <ClInclude Include="src\lib\any\any.h">
       <Filter>src\lib\any</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\base\algo.h">
+      <Filter>src\lib\base</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\base\array.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
@@ -1983,6 +1995,24 @@
     <ClInclude Include="src\lib\kaba\lib\lib.h">
       <Filter>src\lib\kaba\lib</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\abstract.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\Concretifier.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\implicit.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\lexical.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\Parser.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\template.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Block.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
@@ -2004,16 +2034,10 @@
     <ClInclude Include="src\lib\kaba\syntax\Inline.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\kaba\syntax\lexical.h">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Node.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Operator.h">
-      <Filter>src\lib\kaba\syntax</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\kaba\syntax\Parser.h">
       <Filter>src\lib\kaba\syntax</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Statement.h">
@@ -2761,6 +2785,9 @@
     </Filter>
     <Filter Include="src\lib\kaba\lib">
       <UniqueIdentifier>{AEA39F5A-0E05-8B32-D482-BF3D1D6108BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\kaba\parser">
+      <UniqueIdentifier>{2D8437E9-6291-928F-6DC4-E4F66D846B88}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\kaba\syntax">
       <UniqueIdentifier>{0B82F8E6-4772-9B6E-BB6D-E1D33F81BFBC}</UniqueIdentifier>

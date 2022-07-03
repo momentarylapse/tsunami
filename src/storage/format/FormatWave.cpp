@@ -55,7 +55,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	int samples_read;
 	while ((samples_read = r->read_audio(buf)) > 0) {
 		buf.resize(samples_read);
-		string data;
+		bytes data;
 		if (!buf.exports(data, channels, format))
 			od->warn(_("Amplitude too large, signal distorted."));
 
@@ -165,18 +165,15 @@ void FormatWave::load_track(StorageOperationData *od) {
 			od->set(0.1f);
 
 			int read = 0;
-			int nn = 0;
 			int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 			while (read < chunk_size) {
 				int toread = clamp(nice_buffer_size, 0, chunk_size - read);
 				int r = f->read_buffer(data, toread);
-				nn ++;
-				if (nn > 16) {
-					float perc_read = 0.1f;
-					float dperc_read = 0.9f;
-					od->set(perc_read + dperc_read * (float)read / (float)chunk_size);
-					nn = 0;
-				}
+
+				float perc_read = 0.1f;
+				float dperc_read = 0.9f;
+				od->set(perc_read + dperc_read * (float)read / (float)chunk_size);
+
 				if (r > 0){
 					int dsamples = r / byte_per_sample;
 					int _offset = read / byte_per_sample + od->offset;

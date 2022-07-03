@@ -16,6 +16,8 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/Song.h"
 
+static const float PROGRESS_UPDATE_DT = 0.1f;
+
 StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename) {
 	session = _session;
 	win = session->win.get();
@@ -29,6 +31,7 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	layer = nullptr;
 	track = nullptr;
 	buf = nullptr;
+	timer = new hui::Timer;
 
 	offset = 0;
 	renderer = nullptr;
@@ -45,6 +48,10 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 		session->e(::format("options '%s':  %s", Storage::options_in, e.message()));
 	}
 	Storage::options_in = "";
+}
+
+StorageOperationData::~StorageOperationData() {
+	delete timer;
 }
 
 void StorageOperationData::start_progress(const string &message) {
@@ -72,6 +79,9 @@ void StorageOperationData::error(const string& message) {
 }
 
 void StorageOperationData::set(float t) {
+	if (timer->peek() < PROGRESS_UPDATE_DT)
+		return;
+	timer->get();
 	progress->set(t);
 }
 

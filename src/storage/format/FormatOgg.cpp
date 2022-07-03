@@ -128,7 +128,6 @@ void FormatOgg::save_via_renderer(StorageOperationData *od) {
 	int written = 0;
 	int samples = od->num_samples;
 	const int READSIZE = 1<<12;
-	int nn = 0;
 
 	AudioBuffer buf(READSIZE, channels);
 
@@ -152,11 +151,7 @@ void FormatOgg::save_via_renderer(StorageOperationData *od) {
 		}
 
 
-		nn ++;
-		if (nn > 8) {
-			od->set(float(written) / (float)samples);
-			nn = 0;
-		}
+		od->set(float(written) / (float)samples);
 
 		while (vorbis_analysis_blockout(&vd, &vb) == 1) {
 
@@ -231,17 +226,17 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		return;
 	}
 
-	char *data = new char[CHUNK_SIZE];
+	bytes data;
+	data.resize(CHUNK_SIZE);
 	int current_section;
 	int read = 0;
-	int nn = 0;
 
 	while (true) {
 
 		int chunk_read = 0;
 		while (true) {
 			int toread = CHUNK_SIZE - chunk_read;
-			int r = ov_read(&vf, &data[chunk_read], toread, 0, 2, 1, &current_section); // 0,2,1 = little endian, 16bit, signed
+			int r = ov_read(&vf, (char*)&data[chunk_read], toread, 0, 2, 1, &current_section); // 0,2,1 = little endian, 16bit, signed
 			//msg_write(r);
 
 			if (r == 0) {
@@ -261,15 +256,10 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		int bytes_per_sample = 2 * channels;
 		int dsamples = chunk_read / bytes_per_sample;
 		int _offset = read / bytes_per_sample + od->offset;
-		import_data(od->layer, data, channels, SampleFormat::SAMPLE_FORMAT_16, dsamples, _offset);
+		import_data(od->layer, data.data, channels, SampleFormat::SAMPLE_FORMAT_16, dsamples, _offset);
 		read += chunk_read;
-		nn ++;
-		if (nn > 8) {
-			od->set((float)read / (float)(samples * 4));
-			nn = 0;
-		}
+		od->set((float)read / (float)(samples * 4));
 	}
-	delete[](data);
 	ov_clear(&vf);
 }
 

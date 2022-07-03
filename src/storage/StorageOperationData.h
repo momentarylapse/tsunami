@@ -17,6 +17,7 @@ class Song;
 class Progress;
 namespace hui {
 	class Window;
+	class Timer;
 }
 class AudioBuffer;
 class Track;
@@ -32,6 +33,7 @@ enum class SampleFormat;
 class StorageOperationData {
 public:
 	StorageOperationData(Session *session, Format *format, const Path &filename);
+	~StorageOperationData();
 
 	void start_progress(const string &message);
 
@@ -59,6 +61,7 @@ public:
 	Session *session;
 	Song *song;
 	owned<Progress> progress;
+	hui::Timer *timer;
 	Path filename;
 	AudioBuffer *buf;
 	int channels_suggested;

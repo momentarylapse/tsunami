@@ -81,7 +81,6 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	int sample_rate = od->parameters["samplerate"]._int();
 	auto format = format_from_code(od->parameters["format"].str());
 
-	//char *data = new char[CHUNK_SIZE];
 	bytes data;
 	File *f = nullptr;
 
@@ -99,16 +98,11 @@ void FormatRaw::load_track(StorageOperationData *od) {
 			f->read_buffer(offset);
 
 		long long read = 0;
-		int nn = 0;
-		int nice_buffer_size = 10000;//CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
+		int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size) {
 			int toread = (int)min((int64)nice_buffer_size, size - read);
 			data = f->read_buffer(toread);
-			nn ++;
-			if (nn > 16) {
-				od->set((float)read / (float)size);
-				nn = 0;
-			}
+			od->set((float)read / (float)size);
 			if (data.num > 0) {
 				int dsamples = data.num / byte_per_sample;
 				int _offset = read / byte_per_sample + od->offset;

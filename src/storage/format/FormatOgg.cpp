@@ -258,7 +258,7 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		int _offset = read / bytes_per_sample + od->offset;
 		import_data(od->layer, data.data, channels, SampleFormat::SAMPLE_FORMAT_16, dsamples, _offset);
 		read += chunk_read;
-		od->set((float)read / (float)(samples * 4));
+		od->set((float)read / (float)(samples * bytes_per_sample));
 	}
 	ov_clear(&vf);
 }

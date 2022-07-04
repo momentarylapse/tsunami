@@ -35,6 +35,9 @@ namespace kaba {
 	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
 	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
 	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
+
+	// capturing all function pointers as pointers or references!!!
+
 	void hui_set_idle_function_kaba(Callable<void()> &c) {
 		hui::set_idle_function([&c]{ c(); });
 	}
@@ -46,8 +49,8 @@ namespace kaba {
 	}
 	class KabaPanelWrapper : public hui::Panel {
 	public:
-		void _kaba_event(const string &id, Callable<void()> *c) {
-			event(id, [c]{ (*c)(); });
+		void _kaba_event(const string &id, Callable<void()> &c) {
+			event(id, [&c]{ c(); });
 		}
 		void _kaba_event_x(const string &id, const string &msg, void *f) {
 			if (msg == "hui:draw"){
@@ -66,16 +69,16 @@ namespace kaba {
 		hui::run(win, [c]{ if (c) (*c)(); });
 	}
 	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_open(win, title, dir, params, [c] (const Path &p) { c(p); });
+		hui::file_dialog_open(win, title, dir, params, [&c] (const Path &p) { c(p); });
 	}
 	void hui_file_dialog_save_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_save(win, title, dir, params, [c] (const Path &p) { c(p); });
+		hui::file_dialog_save(win, title, dir, params, [&c] (const Path &p) { c(p); });
 	}
 	void hui_file_dialog_dir_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_dir(win, title, dir, params, [c] (const Path &p) { c(p); });
+		hui::file_dialog_dir(win, title, dir, params, [&c] (const Path &p) { c(p); });
 	}
 	void hui_question_box_kaba(hui::Window *win, const string &title, const string &text, Callable<void(const string &)> &c, bool allow_cancel) {
-		hui::question_box(win, title, text, [c] (const string &p) { c(p); }, allow_cancel);
+		hui::question_box(win, title, text, [&c] (const string &p) { c(p); }, allow_cancel);
 	}
 #else
 	#define GetDAWindow(x)		0

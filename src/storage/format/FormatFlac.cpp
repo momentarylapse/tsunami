@@ -40,7 +40,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	int freq = frame->header.sample_rate;
 
 	if (flac_tells_samples)
-		od->set((float)(flac_read_samples / channels) / (float)(flac_samples));
+		od->set((float)flac_read_samples / (float)flac_samples);
 	else // estimate... via increasingly compressed size
 		od->set(( 1 - exp(- (float)(flac_read_samples * channels * (bits / 8)) / (float)flac_file_size ) ));
 

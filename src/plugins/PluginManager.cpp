@@ -822,7 +822,7 @@ kaba::Class* PluginManager::get_class(const string &name) {
 void get_plugin_file_data(PluginManager::PluginFile &pf) {
 	pf.image = "";
 	try {
-		string content = FileRead(pf.filename);
+		string content = file_read_text(pf.filename);
 		int p = content.find("// Image = hui:");
 		if (p >= 0)
 			pf.image = content.sub(p + 11, content.find("\n"));

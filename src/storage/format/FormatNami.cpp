@@ -49,11 +49,11 @@ public:
 		parent->tags.add(Tag());
 		me = &parent->tags.back();
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->key = f->read_str();
 		me->value = f->read_str();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->key);
 		f->write_str(me->value);
 	}
@@ -63,7 +63,7 @@ class FileChunkLayerName : public FileChunk<Song,Song> {
 public:
 	FileChunkLayerName() : FileChunk<Song,Song>("lvlname") {}
 	void create() override { me = parent; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		int num = f->read_int();
 		for (int i=0;i<num;i++)
 			f->read_str();
@@ -71,7 +71,7 @@ public:
 		for (int i=0;i<num;i++)
 			me->layers.add(new Song::Layer(f->read_str()));*/
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		/*f->write_int(me->layers.num);
 		for (auto l: me->layers)
 			f->write_str(l->name);*/
@@ -82,7 +82,7 @@ class FileChunkFormat : public FileChunk<Song,Song> {
 public:
 	FileChunkFormat() : FileChunk<Song,Song>("format") {}
 	void create() override { me = parent; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->sample_rate = f->read_int();
 		me->default_format = (SampleFormat)f->read_int();
 		f->read_int(); // channels
@@ -95,7 +95,7 @@ public:
 		if (me->compression > 0)
 			cur_op(this)->session->w("whole-file compression deprecated");
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->sample_rate);
 		f->write_int((int)me->default_format);
 		f->write_int(2); // channels
@@ -111,7 +111,7 @@ class FileChunkSend : public FileChunk<Song,Song> {
 public:
 	FileChunkSend() : FileChunk<Song,Song>("send") {}
 	void create() override { me = parent; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		f->read_int();
 		for (Track *t: weak(me->tracks)) {
 			int i = f->read_int();
@@ -119,7 +119,7 @@ public:
 				t->send_target = me->tracks[i].get();
 		}
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(0);
 		for (Track *t: weak(me->tracks))
 			f->write_int(get_track_index(t->send_target));
@@ -130,7 +130,7 @@ class FileChunkEffect : public FileChunk<Track,AudioEffect> {
 public:
 	FileChunkEffect() : FileChunk<Track,AudioEffect>("effect") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		int _chunk_version = f->read_int();
@@ -148,7 +148,7 @@ public:
 		me->_config_latest_history = params;
 		parent->add_effect(me);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(1); // chunk version
@@ -164,7 +164,7 @@ class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect> {
 public:
 	FileChunkGlobalEffect() : FileChunk<Song,AudioEffect>("effect") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
@@ -176,7 +176,7 @@ public:
 			me->enabled = false;
 		parent->__fx.add(me);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(0);
@@ -193,7 +193,7 @@ public:
 	void create() override {
 		me = new Curve;
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		Track *track = nullptr;
 
 		f->read_int();
@@ -227,7 +227,7 @@ public:
 		if (track)
 			track->notify(track->MESSAGE_ADD_CURVE);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 	}
 };
 
@@ -238,7 +238,7 @@ public:
 		me = new Curve;
 		parent->curves.add(me);
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		f->read_int();
 		me->name = f->read_str();
 		me->target.from_id(f->read_str(), parent);
@@ -254,7 +254,7 @@ public:
 		}
 		parent->notify(parent->MESSAGE_ADD_CURVE);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(0); // version
 		f->write_str(me->name);
 		f->write_str(me->target.id);
@@ -379,7 +379,7 @@ public:
 			this->me = this->parent->buf;
 		}
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		this->me->offset = f->read_int();
 		int num = f->read_int();
 		int channels = f->read_int(); // channels (2)
@@ -393,7 +393,7 @@ public:
 			auto com = new AudioBuffer::Compressed;
 			com->codec = f->read_str();
 			int n = f->read_int();
-			com->data = f->read_buffer(n);
+			com->data = f->read(n);
 			cur_op(this)->session->storage->decompress(*this->me, com->codec, com->data);
 			this->me->compressed = com;
 			return;
@@ -408,11 +408,11 @@ public:
 		// read chunk'ed
 		int offset = 0;
 		for (int n=0; n<data.num / CHUNK_SIZE; n++) {
-			f->read_buffer(&data[offset], CHUNK_SIZE);
+			f->read(&data[offset], CHUNK_SIZE);
 			this->notify();
 			offset += CHUNK_SIZE;
 		}
-		f->read_buffer(&data[offset], data.num % CHUNK_SIZE);
+		f->read(&data[offset], data.num % CHUNK_SIZE);
 
 		// insert
 
@@ -426,7 +426,7 @@ public:
 				this->me->import(data.data, channels, format_for_bits(bits, true), num);
 		}
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		Song *song = (Song*)this->root->base->get();
 
 		f->write_int(this->me->offset);
@@ -436,13 +436,13 @@ public:
 			f->write_int(0);
 			f->write_str(this->me->compressed->codec);
 			f->write_int(this->me->compressed->data.num);
-			f->write_buffer(this->me->compressed->data);
+			f->write(this->me->compressed->data);
 		} else {
 			f->write_int(format_get_bits(song->default_format));
 			bytes data;
 			if (!this->me->exports(data, this->me->channels, song->default_format))
 				this->warn(_("Amplitude too large, signal distorted."));
-			f->write_buffer(data);
+			f->write(data);
 		}
 	}
 };
@@ -451,7 +451,7 @@ class FileChunkSampleRef : public FileChunk<TrackLayer,SampleRef> {
 public:
 	FileChunkSampleRef() : FileChunk<TrackLayer,SampleRef>("samref") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
@@ -468,7 +468,7 @@ public:
 		f->read_int(); // reserved
 		f->read_int();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->origin->name);
 		f->write_int(me->pos);
 		f->write_int(me->origin->get_index());
@@ -486,7 +486,7 @@ class _FileChunkTrackSampleRef : public FileChunk<Track,SampleRef> {
 public:
 	_FileChunkTrackSampleRef() : FileChunk<Track,SampleRef>("samref") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
@@ -498,7 +498,7 @@ public:
 		f->read_int(); // reserved
 		f->read_int();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 	}
 };
 
@@ -510,7 +510,7 @@ public:
 		//parent->add(MidiEvent());
 		//me = &parent->back();
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		MidiEvent e;
 		e.pos = f->read_int();
 		e.pitch = f->read_int();
@@ -532,7 +532,7 @@ public:
 			error("nami/midi: no note to end");
 		}
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->pos);
 		f->write_int(me->pitch);
 		f->write_float(me->volume);
@@ -544,7 +544,7 @@ class FileChunkMidiEffect : public FileChunk<MidiNoteBuffer,MidiEffect> {
 public:
 	FileChunkMidiEffect() : FileChunk<MidiNoteBuffer,MidiEffect>("effect") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		string name = f->read_str();
 		f->read_bool();
 		f->read_int(); // reserved
@@ -564,7 +564,7 @@ public:
 		Song *song = (Song*)root->base->get();
 		song->tracks.back()->midi_fx.add(me);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->module_class);
 		f->write_bool(false);
 		f->write_int(0); // reserved
@@ -579,7 +579,7 @@ class FileChunkMidiNote : public FileChunk<MidiNoteBuffer,MidiNote> {
 public:
 	FileChunkMidiNote(const string &name) : FileChunk<MidiNoteBuffer,MidiNote>(name) {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		MidiNote *n = new MidiNote;
 		n->range.offset = f->read_int();
 		n->range.length = f->read_int();
@@ -588,7 +588,7 @@ public:
 		f->read_int(); // reserved
 		parent->add(n);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
 		f->write_int(me->pitch);
@@ -622,7 +622,7 @@ public:
 		else if constexpr (std::is_same<Parent, Sample>::value)
 				this->me = &this->parent->midi;
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		f->read_str();
 		f->read_str();
 		f->read_str();
@@ -647,7 +647,7 @@ public:
 		}
 		f->read_int(); // reserved
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		bool has_flags = note_buffer_has_flags(*this->me);
 		f->write_str("");
 		f->write_str("");
@@ -690,7 +690,7 @@ public:
 		me->set_owner(parent);
 		parent->samples.add(me);
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->name = f->read_str();
 		me->volume = f->read_float();
 		me->offset = f->read_int();
@@ -699,7 +699,7 @@ public:
 		if (uid != 0)
 			me->uid = uid;
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_int(me->offset);
@@ -718,7 +718,7 @@ class FileChunkFade: public FileChunk<TrackLayer,CrossFade> {
 public:
 	FileChunkFade() : FileChunk<TrackLayer,CrossFade>("fade") {}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		CrossFade ff;
 		ff.position = f->read_int();
 		ff.mode = (CrossFade::Mode)f->read_int();
@@ -727,7 +727,7 @@ public:
 		f->read_int();
 		parent->fades.add(ff);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->position);
 		f->write_int((int)me->mode);
 		f->write_int(me->samples);
@@ -744,14 +744,14 @@ public:
 		me = new TrackMarker();
 		parent->markers.add(me);
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
 		me->text = f->read_str();
 		int nfx = f->read_int();
 		int version = f->read_int();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
 		f->write_str(me->text);
@@ -771,14 +771,14 @@ public:
 		add_child(new FileChunkMidiData<TrackLayer>); // deprecated
 	}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		int n = f->read_int();
 		if (n > 0) {
 			parent->layers.add(new TrackLayer(parent));
 		}
 		me = parent->layers.back().get();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		int n = 0;
 		foreachi(TrackLayer *l, weak(parent->layers), i)
 			if (l == me)
@@ -799,12 +799,12 @@ class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Temperament> {
 public:
 	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Temperament>("tuning") {}
 	void create() override { me = &parent->temperament; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		for (int i=0; i<MAX_PITCH; i++)
 			me->freq[i] = f->read_float();
 		parent->update_delta_phi();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		for (int i=0; i<MAX_PITCH; i++)
 			f->write_float(me->freq[i]);
 	}
@@ -817,7 +817,7 @@ public:
 		add_child(new FileChunkSynthesizerTuning);
 	}
 	void create() override {}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		Session *session = cur_op(this)->session;
 		string name = f->read_str();
 		string param = f->read_str();
@@ -839,7 +839,7 @@ public:
 
 		parent->set_synthesizer(me);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->module_class);
 		f->write_str(me->config_to_string());
 		f->write_str("");
@@ -857,7 +857,7 @@ class FileChunkBar : public FileChunk<Song,Bar> {
 public:
 	FileChunkBar() : FileChunk<Song,Bar>("bar") {}
 	void create() override { me = nullptr; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
@@ -879,7 +879,7 @@ public:
 		for (int i=0; i<count; i++)
 			parent->bars.add(new Bar(b));
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		if (me->is_pause())
 			f->write_int(BarPattern::Type::PAUSE);
 		else if (me->is_uniform())
@@ -901,7 +901,7 @@ class FileChunkTrackBar : public FileChunk<Track,Bar> {
 public:
 	FileChunkTrackBar() : FileChunk<Track,Bar>("bar") {}
 	void create() override { me = NULL; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
@@ -914,7 +914,7 @@ public:
 		for (int i=0; i<count; i++)
 			parent->song->bars.add(new Bar(length, num_beats, sub_beats));
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		root->on_error("deprecated... TrackBar.write");
 	}
 };
@@ -927,7 +927,7 @@ public:
 		me = new TrackMarker();
 		parent->_markers_old.add(me);
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->range.offset = f->read_int();
 		me->text = f->read_str();
 		int version = f->read_int();
@@ -936,7 +936,7 @@ public:
 			int nfx = f->read_int();
 		}
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->range.offset);
 		f->write_str(me->text);
 		f->write_int(1);
@@ -951,7 +951,7 @@ public:
 	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade") {}
 	void create() override {
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		CrossFadeOld ff;
 		ff.position = f->read_int();
 		ff.target = f->read_int();
@@ -960,7 +960,7 @@ public:
 		f->read_int();
 		parent->_fades_old.add(ff);
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->position);
 		f->write_int(me->target);
 		f->write_int(me->samples);
@@ -975,12 +975,12 @@ public:
 	void create() override {
 		me = &parent->instrument;
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->string_pitch.resize(f->read_int());
 		for (int i=0; i<me->string_pitch.num; i++)
 			me->string_pitch[i] = f->read_int();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->string_pitch.num);
 		for (int i=0; i<me->string_pitch.num; i++)
 			f->write_int(me->string_pitch[i]);
@@ -1006,7 +1006,7 @@ public:
 	void create() override {
 		//me = parent->addTrack(SignalType::AUDIO);
 	}
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		string name = f->read_str();
 		float volume = f->read_float();
 		float muted = f->read_bool();
@@ -1021,7 +1021,7 @@ public:
 
 		notify();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_bool(me->muted);
@@ -1048,10 +1048,10 @@ class FileChunkSecret : public FileChunk<Song,Any> {
 public:
 	FileChunkSecret() : FileChunk<Song,Any>("secret") {}
 	void create() override { me = &parent->secret_data; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		*me = Any::parse(f->read_str());
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_str(me->str());
 	}
 };
@@ -1072,10 +1072,10 @@ public:
 		add_child(new FileChunkSecret);
 	}
 	void create() override { me = parent; }
-	void read(File *f) override {
+	void read(BinaryFormatter *f) override {
 		me->sample_rate = f->read_int();
 	}
-	void write(File *f) override {
+	void write(BinaryFormatter *f) override {
 		f->write_int(me->sample_rate);
 	}
 	void write_subs() override {

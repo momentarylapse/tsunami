@@ -56,27 +56,27 @@ public:
 	};
 
 
-	static int readUS(File *f) {
+	static int readUS(FileStream *f) {
 		BEUShort t;
-		f->read_buffer(&t, 2);
+		f->read(&t, 2);
 		return t._int();
 	}
 
-	static int readSS(File *f) {
+	static int readSS(FileStream *f) {
 		BESShort t;
-		f->read_buffer(&t, 2);
+		f->read(&t, 2);
 		return t._int();
 	}
 
-	static int readUB(File *f) {
+	static int readUB(FileStream *f) {
 		int t = 0;
-		f->read_buffer(&t, 1);
+		f->read(&t, 1);
 		return t;
 	}
 
-	static int readL(File *f) {
+	static int readL(FileStream *f) {
 		BELong t;
-		f->read_buffer(&t, 4);
+		f->read(&t, 4);
 		return t._int();
 	}
 
@@ -169,21 +169,21 @@ public:
 		return nullptr;
 	}
 
-	void read_table_directory(File *f) {
-		f->read_buffer(&td, 12);
+	void read_table_directory(FileStream *f) {
+		f->read(&td, 12);
 		int n = td.num_tables._int();
 		if (n > 1000)
 			throw Exception("argh");
 		for (int i=0; i<n; i++) {
 			TableDirectoryEntry e;
-			f->read_buffer(&e, 16);
+			f->read(&e, 16);
 			tdentries.add(e);
 		}
 
 		//for (auto &ee: tdentries)
 		//	msg_write(format("%s  %d", ee.name(), ee.offset._int()));
 	}
-	bool read_head(File *f) {
+	bool read_head(FileStream *f) {
 		auto te = get_table("head");
 		if (!te) {
 			msg_error("no head table");
@@ -192,14 +192,14 @@ public:
 		f->set_pos(te->offset._int());
 		//msg_write("head-----------------------------");
 
-		f->read_buffer(&head, 32);
+		f->read(&head, 32);
 		//msg_write(head.units_per_em._int());
 		return true;
 	}
 
 
 
-	bool try_read_hhead(File *f) {
+	bool try_read_hhead(FileStream *f) {
 		auto te = get_table("hhea");
 		if (!te)
 			return false;
@@ -214,7 +214,7 @@ public:
 		return true;
 	}
 
-	bool try_read_hmetrix(File *f) {
+	bool try_read_hmetrix(FileStream *f) {
 		auto te = get_table("hmtx");
 		if (!te)
 			return false;
@@ -229,7 +229,7 @@ public:
 	}
 
 
-	bool read_mapping(File *f) {
+	bool read_mapping(FileStream *f) {
 		auto te = get_table("cmap");
 		if (!te) {
 			msg_error("no cmap table");
@@ -237,7 +237,7 @@ public:
 		}
 		f->set_pos(te->offset._int());
 
-		f->read_buffer(&mh, 4);
+		f->read(&mh, 4);
 		int n = mh.num_tables._int();
 		//msg_write("map-----------------------------");
 		//msg_write(i2h(f->get_pos(), 4));
@@ -383,7 +383,7 @@ public:
 	}
 
 
-	bool read_glyphs(File *f) {
+	bool read_glyphs(FileStream *f) {
 		auto te = get_table("glyf");
 		if (!te) {
 			msg_error("no glyf table");
@@ -427,7 +427,7 @@ public:
 	}
 
 	void load(const Path &filename) {
-		auto f = FileOpen(filename);
+		auto f = file_open(filename, "rb");
 
 		read_table_directory(f);
 		read_head(f);
@@ -748,7 +748,7 @@ FontData *Parser::font_get(const string &name) {
 		auto ff = find_ttf(fd.name);
 		if (!ff.is_empty()) {
 			fd.true_type = true;
-			fd.file_contents = FileRead(ff);
+			fd.file_contents = file_read_binary(ff);
 			//load_ttf(name);
 			fd.ttf = new TTF;
 			fd.ttf->load(ff);
@@ -762,7 +762,7 @@ FontData *Parser::font_get(const string &name) {
 }
 
 void Parser::save(const Path &filename) {
-	auto f = FileCreate(filename);
+	auto f = file_open(filename, "wb");
 	Array<int> pos;
 	int next_id = 1;
 	auto mk_id = [&] {
@@ -786,9 +786,9 @@ void Parser::save(const Path &filename) {
 	foreachi(auto &fd, font_data, i) {
 		if (fd.true_type) {
 			auto ff = find_ttf(fd.name);
-			if (!ff.is_empty()) {
+			if (ff) {
 				fd.id_file = mk_id();
-				fd.file_contents = FileRead(ff);
+				fd.file_contents = file_read_binary(ff);
 			}
 			fd.id_descr = mk_id();
 			fd.id_widths = mk_id();
@@ -800,11 +800,11 @@ void Parser::save(const Path &filename) {
 
 	pos.resize(id_xref);
 
-	auto write_obj = [&](File *f, int id, const string &contents) {
+	auto write_obj = [&](FileStream *f, int id, const string &contents) {
 		pos[id] = f->get_pos();
-		f->write_buffer(format("%d 0 obj\n", id));
-		f->write_buffer(contents + "\n");
-		f->write_buffer("endobj\n");
+		f->write(format("%d 0 obj\n", id));
+		f->write(contents + "\n");
+		f->write("endobj\n");
 	};
 
 	auto mk_dict = [](const Array<string> &lines) {
@@ -818,7 +818,7 @@ void Parser::save(const Path &filename) {
 		page_ref.add(format("%d 0 R", page_id[i]));
 
 
-	f->write_buffer("%PDF-1.4\n");
+	f->write("%PDF-1.4\n");
 	write_obj(f, id_catalog, mk_dict({
 		"/Type /Catalog",
 		format("/Outlines %d 0 R", id_outlines),
@@ -898,19 +898,19 @@ void Parser::save(const Path &filename) {
 	}
 
 	int xref_pos = f->get_pos();
-	f->write_buffer("xref\n");
-	f->write_buffer(format("0 %d\n", id_xref));
-	f->write_buffer("0000000000 65535 f\n");
+	f->write("xref\n");
+	f->write(format("0 %d\n", id_xref));
+	f->write("0000000000 65535 f\n");
 	for (int p: pos)
-		f->write_buffer(format("%010d 00000 n\n", p));
-	f->write_buffer("trailer\n");
-	f->write_buffer(mk_dict({
+		f->write(format("%010d 00000 n\n", p));
+	f->write("trailer\n");
+	f->write(mk_dict({
 		format("/Size %d", id_xref),
 		format("/Root %d 0 R", id_catalog)}) + "\n");
-	f->write_buffer("startxref\n");
-	f->write_buffer(format("%d\n", xref_pos));
+	f->write("startxref\n");
+	f->write(format("%d\n", xref_pos));
 
-	f->write_buffer("%%EOF\n");
+	f->write("%%EOF\n");
 	delete f;
 }
 

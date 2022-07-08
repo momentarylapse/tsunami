@@ -35,11 +35,11 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
-	File *f = FileCreate(od->filename);
+	auto f = new BinaryFormatter(file_open(od->filename, "wb"));
 
-	f->write_buffer("RIFF", 4);
+	f->write("RIFF", 4);
 	f->write_int(samples * bytes_per_sample + 44);
-	f->write_buffer("WAVEfmt ",8);
+	f->write("WAVEfmt ",8);
 	f->write_int(16); // chunk size (fmt)
 	f->write_word((format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) ? 3 : 1); // format PCM/IEEE FLOAT
 	f->write_word(channels); // channels
@@ -47,7 +47,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	f->write_int(od->session->sample_rate() * bytes_per_sample); // bytes per sec
 	f->write_word(bytes_per_sample); // block align
 	f->write_word(bit_depth);
-	f->write_buffer("data", 4);
+	f->write("data", 4);
 	f->write_int(samples * bytes_per_sample);
 
 	AudioBuffer buf(CHUNK_SIZE, channels);
@@ -60,19 +60,16 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);
-		f->write_buffer(data);
+		f->write(data);
 
 		done += buf.length;
 	}
 
-	FileClose(f);
+	delete f;
 }
 
-static string read_chunk_name(File *f) {
-	string s;
-	s.resize(4);
-	*(int*)s.data = f->read_int();
-	return s;
+static string read_chunk_name(BinaryFormatter *f) {
+	return f->read(4);
 }
 
 static string tag_from_wave(const string &key) {
@@ -101,10 +98,10 @@ void FormatWave::load_track(StorageOperationData *od) {
 	Track *t = od->track;
 
 	char *data = new char[CHUNK_SIZE];
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 
 	try {
-		f = FileOpen(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "rb"));
 
 	if (read_chunk_name(f) != "RIFF")
 		throw Exception("wave file does not start with \"RIFF\"");
@@ -130,7 +127,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 			if ((chunk_size != 16) and (chunk_size != 18) and (chunk_size != 40))
 				throw Exception(::format("wave file gives header size %d (16, 18 or 40 expected)", chunk_size));
 			char header[16];
-			f->read_buffer(header, 16);
+			f->read(header, 16);
 			for (int i=0;i<chunk_size-16;i++)
 				f->read_byte();
 
@@ -168,7 +165,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 			int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 			while (read < chunk_size) {
 				int toread = clamp(nice_buffer_size, 0, chunk_size - read);
-				int r = f->read_buffer(data, toread);
+				int r = f->read(data, toread);
 
 				float perc_read = 0.1f;
 				float dperc_read = 0.9f;
@@ -187,9 +184,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 		} else if (chunk_name == "LIST") {
 
 			// tags...
-			string buf;
-			buf.resize(chunk_size);
-			f->read_buffer(buf.data, buf.num);
+			string buf = f->read(chunk_size);
 			//msg_write(buf.hex());
 
 			if (buf.head(4) == "INFO") {
@@ -226,7 +221,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 	delete[](data);
 
 	if (f)
-		FileClose(f);
+		delete f;
 }
 
 

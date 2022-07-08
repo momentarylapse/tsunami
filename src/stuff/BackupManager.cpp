@@ -58,14 +58,14 @@ void BackupManager::check_old_files(Session *session) {
 	}
 }
 
-File *BackupManager::create_file(const string &extension, Session *session) {
+FileStream *BackupManager::create_file(const string &extension, Session *session) {
 	BackupFile bf;
 	bf.uuid = -1;//next_uuid ++;
 	bf.session = session;
 	bf.filename = get_filename(extension);
 	session->i(_("creating backup: ") + bf.filename.str());
 	try {
-		bf.f = FileCreate(bf.filename);
+		bf.f = file_open(bf.filename, "wb");
 		files.add(bf);
 		return bf.f;
 	} catch(FileError &e) {
@@ -74,12 +74,12 @@ File *BackupManager::create_file(const string &extension, Session *session) {
 	return nullptr;
 }
 
-void BackupManager::abort(File *f) {
+void BackupManager::abort(FileStream *f) {
 	//delete f;
 	done(f);
 }
 
-void BackupManager::done(File *f) {
+void BackupManager::done(FileStream *f) {
 	delete f;
 	auto bf = _find_by_file(f);
 	if (bf) {
@@ -88,7 +88,7 @@ void BackupManager::done(File *f) {
 	}
 }
 
-BackupManager::BackupFile* BackupManager::_find_by_file(File *f) {
+BackupManager::BackupFile* BackupManager::_find_by_file(FileStream *f) {
 	if (!f)
 		return nullptr;
 	for (auto &bf: files)

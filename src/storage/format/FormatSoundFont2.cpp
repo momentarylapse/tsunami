@@ -111,14 +111,14 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	od = _od;
 	song = od->song;
 
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 
 	sample_offset = -1;
 
 	song->add_track(SignalType::AUDIO);
 
 	try {
-		f = FileOpen(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "rb"));
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);
@@ -167,8 +167,8 @@ void FormatSoundFont2::sfSample::print() {
 	msg_write(sample_type);
 }
 
-string read_str(File *f, int l) {
-	string s = f->read_buffer(l);
+string read_str(BinaryFormatter *f, int l) {
+	string s = f->read(l);
 	int p0 = s.find(string("\0", 1), 0);
 	if (p0 >= 0)
 		return s.head(p0);
@@ -205,7 +205,7 @@ string FormatSoundFont2::sfGenerator::str() const {
 	return s;
 }
 
-void FormatSoundFont2::read_chunk(File *f) {
+void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 	string name = read_str(f, 4).upper();
 	int l = f->read_int();
 	int after_pos = f->get_pos() + l;
@@ -322,14 +322,14 @@ void FormatSoundFont2::read_chunk(File *f) {
 			instrument_generators.add(g);
 		}
 	} else {
-		bytes t = f->read_buffer(l);
+		bytes t = f->read(l);
 		od->session->debug("sf2", t.hex());
 	}
 
 	f->set_pos(after_pos);
 }
 
-void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s) {
+void FormatSoundFont2::read_sample_header(BinaryFormatter *f, FormatSoundFont2::sfSample &s) {
 	s.name = read_str(f, 20);
 	s.start = f->read_int();
 	s.end = f->read_int();
@@ -342,7 +342,7 @@ void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s
 	s.sample_type = f->read_word();
 }
 
-void FormatSoundFont2::read_samples(File *f) {
+void FormatSoundFont2::read_samples(BinaryFormatter *f) {
 	int samples_all = 0;
 	int samples_read = 0;
 	for (auto &s : samples)
@@ -364,7 +364,7 @@ void FormatSoundFont2::read_samples(File *f) {
 		if (num_samples < 0)
 			throw Exception(format("negative sample size: %d - %d", s.start, s.end));
 		char *data = new char[num_samples*2];
-		f->read_buffer(data, num_samples*2);
+		f->read(data, num_samples*2);
 		buf.resize(num_samples);
 		buf.import(data, 1, SampleFormat::SAMPLE_FORMAT_16, num_samples);// / 2);
 		Sample *sample = song->create_sample_audio(s.name, buf);

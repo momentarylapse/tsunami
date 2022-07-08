@@ -18,12 +18,10 @@ int endian_big_to_little(int i) {
 	return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >> 8) | ((i & 0xff000000) >> 24);
 }
 
-int read_int_big_endian(File *f) {
-	int a = f->read_byte();
-	int b = f->read_byte();
-	int c = f->read_byte();
-	int d = f->read_byte();
-	return d + (c << 8) + (b << 16) + (a << 24);
+int read_int_big_endian(FileStream *f) {
+	unsigned char c[4];
+	f->read(c, 4);
+	return c[3] + (c[2] << 8) + (c[1] << 16) + (c[0] << 24);
 }
 
 
@@ -63,31 +61,30 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 }
 
 void image_load_png(const Path &filename, Image &image) {
-	char buf[8];
-	File *f = nullptr;
+	FileStream *f = nullptr;
 	try {
-	f = FileOpen(filename);
+	f = file_open(filename, "rb");
 
 	// intro
-	f->read_buffer(buf, 8);
+	bytes buf = f->read(8);
 
-	string data;
+	bytes data;
 
 	int bytes_per_pixel = 1;
 
-	while (!f->end()) {
+	while (!f->is_end()) {
 		// read chunk
 		int size = read_int_big_endian(f);//endian_big_to_little(f->ReadInt());
-		f->read_buffer(buf, 4);
-		string name = string(buf, 4);
+		string name = f->read(4);
 		//msg_write(size);
 		//msg_write("chunk: " + name);
 		if (name == "IHDR") {
 			int w = read_int_big_endian(f);
 			int h = read_int_big_endian(f);
 			image.create(w, h, Black);
-			int bits_per_channel = f->read_byte();
-			int type = f->read_byte();
+			buf = f->read(2);
+			int bits_per_channel = (unsigned char)buf[0];
+			int type = (unsigned char)buf[1];
 			// 0 = gray, 2 = rgb, 6 = rgba
 			if (bits_per_channel != 8)
 				throw string("unhandled bits per channel: " + i2s(bits_per_channel));
@@ -104,16 +101,16 @@ void image_load_png(const Path &filename, Image &image) {
 		} else if (name == "IDAT") {
 			int size0 = data.num;
 			data.resize(size0 + size);
-			f->read_buffer(&data[size0], size);
+			f->read(&data[size0], size);
 		} else if (name == "IEND") {
 			break;
 		} else {
 			f->seek(size);
 		}
-		f->read_int(); // crc
+		f->read(4); // crc
 	}
 
-	string dest;
+	bytes dest;
 	dest.resize(image.height * (image.width * bytes_per_pixel + 2) + 1024);
 	unsigned long len = dest.num;
 	int r = uncompress((unsigned char*)&dest[0], &len, (unsigned char*)&data[0], data.num);
@@ -146,13 +143,16 @@ void image_load_png(const Path &filename, Image &image) {
 			image.set_pixel(x, image.height - y - 1, color(a, r, g, b));
 		}
 	}
-	FileClose(f);
+	delete f;
 
 	} catch(FileError &e) {
+		msg_error("png: " + e.message());
+		if (f)
+			delete f;
 	} catch(string &s) {
 		msg_error("png: " + s);
 		if (f)
-			FileClose(f);
+			delete f;
 	}
 }
 

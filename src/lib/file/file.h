@@ -32,8 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 	
-
-#include "../base/base.h"
+#include "formatter.h"
 #include "msg.h"
 #include "file_op.h"
 #include "path.h"
@@ -59,93 +58,46 @@ public:
 
 class FileError : public Exception {
 public:
-	explicit FileError(const string &msg):Exception(msg){}
+	explicit FileError(const string &msg) : Exception(msg) {}
 };
 
 
 //--------------------------------------------------------------
 // file operation class
 
-typedef bool t_file_try_again_func(const string &filename);
-
-extern t_file_try_again_func *FileTryAgainFunc;
-
-class File {
+class FileStream : public Stream {
 public:
-	File();
-	virtual ~File();
-
-	// opening
-	virtual void open(const Path &filename);
-	virtual void create(const Path &filename);
-	virtual void append(const Path &filename);
-	void close();
-
-	bool _cdecl end();
+	FileStream(int handle);
+	~FileStream();
 
 	// meta
-	void _cdecl set_pos(int pos);
-	void _cdecl seek(int delta);
-	int _cdecl get_size32();
-	int64 _cdecl get_size();
-	int _cdecl get_pos();
-	Date _cdecl ctime();
-	Date _cdecl mtime();
-	Date _cdecl atime();
+	void set_pos(int pos) override;
+	void seek(int delta) override;
+	int get_size32() override;
+	int64 get_size() override;
+	int get_pos() override;
+	Date ctime();
+	Date mtime();
+	Date atime();
 
-	// file format version
-	int ReadFileFormatVersion();
-	void WriteFileFormatVersion(bool binary, int fvv);
+	bool is_end() override;
+	void close();
 
-	// really low level
-	int _cdecl read_buffer(void *buffer, int size);
-	int _cdecl write_buffer(const void *buffer, int size);
-	bytes _cdecl read_buffer(int size);
-	int _cdecl write_buffer(const bytes &data);
-	bytes read_complete();
-
-	// medium level
-	virtual char read_char();
-	virtual unsigned char read_byte();
-	virtual unsigned int read_word();
-	virtual unsigned int read_word_reversed(); // for antique versions!!
-	virtual int read_int();
-	virtual float read_float();
-	virtual bool read_bool();
-	virtual string read_str();
-	virtual string read_str_nt();
-	virtual string read_str_rw(); // for antique versions!!
-	virtual void read_vector(void *v);
-
-	virtual void write_char(char c);
-	virtual void write_byte(unsigned char c);
-	virtual void write_word(unsigned int);
-	virtual void write_int(int);
-	virtual void write_float(float f);
-	virtual void write_bool(bool b);
-	virtual void write_str(const string &str);
-	virtual void write_vector(const void *v);
-
-	virtual void read_comment();
-	virtual void write_comment(const string &str);
-
-	int float_decimals;
+	int read_basic(void *buffer, int size) override;
+	int write_basic(const void *buffer, int size) override;
 
 //private:
 	Path filename;
-	int handle;
+	int handle = -1;
 };
 
-extern File *FileOpen(const Path &filename);
-extern File *FileOpenText(const Path &filename);
-extern File *FileCreate(const Path &filename);
-extern File *FileCreateText(const Path &filename);
-extern File *FileAppend(const Path &filename);
-extern void FileClose(File *f);
-extern bytes FileRead(const Path &filename);
-extern string FileReadText(const Path &filename);
-extern void FileWrite(const Path &filename, const bytes &data);
-extern void FileWriteText(const Path &filename, const string &str);
+
+extern FileStream *file_open(const Path &filename, const string &mode);
+
+extern bytes file_read_binary(const Path &filename);
+extern string file_read_text(const Path &filename);
+extern void file_write_binary(const Path &filename, const bytes &data);
+extern void file_write_text(const Path &filename, const string &str);
 
 
 

@@ -446,7 +446,7 @@ void about_box(Window *win) {
 	// load license
 	if (Application::get_property("license") == "")
 		if (file_exists(Application::directory_static << "license_small.txt"))
-			Application::set_property("license", FileRead(Application::directory_static << "license_small.txt"));
+			Application::set_property("license", file_read_text(Application::directory_static << "license_small.txt"));
 
 	// author list
 	auto authors = sa2ca_nt(Application::get_property("author").explode(";"));

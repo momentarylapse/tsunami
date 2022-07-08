@@ -489,7 +489,7 @@ void SIAddPackageMath() {
 		class_add_element("x", TypeFloat32, &vector::x);
 		class_add_element("y", TypeFloat32, &vector::y);
 		class_add_element("z", TypeFloat32, &vector::z);
-		class_add_element("_e", TypeFloatArray3, 0);
+		class_add_element("_e", TypeFloatArray3, &vector::x);
 		class_add_element("_xy", TypeVec2, &vector::x);
 		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeFloat32, type_p(&vector::length), Flags::PURE);
 		class_add_func("length", TypeFloat32, type_p(&vector::length), Flags::PURE);

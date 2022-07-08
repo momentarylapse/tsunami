@@ -164,7 +164,7 @@ const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) 
 	string name = _name;
 	if (name == "") {
 		if (flags_has(flag, Flags::SHARED))
-			name = "shared " + sub_type->name;
+			name = sub_type->name + " shared";
 		else
 			name = sub_type->name + "*";
 	}

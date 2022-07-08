@@ -367,6 +367,9 @@
     <ClCompile Include="src\lib\file\file_op.cpp">
       <Filter>src\lib\file</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\file\formatter.cpp">
+      <Filter>src\lib\file</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\file\msg.cpp">
       <Filter>src\lib\file</Filter>
     </ClCompile>
@@ -841,6 +844,9 @@
     <ClCompile Include="src\lib\nix\nix_view.cpp">
       <Filter>src\lib\nix</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\terminal\CommandLineParser.cpp">
+      <Filter>src\lib\terminal</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\threads\Mutex.cpp">
       <Filter>src\lib\threads</Filter>
     </ClCompile>
@@ -1028,9 +1034,6 @@
       <Filter>src\storage</Filter>
     </ClCompile>
     <ClCompile Include="src\stuff\BackupManager.cpp">
-      <Filter>src\stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stuff\CLIParser.cpp">
       <Filter>src\stuff</Filter>
     </ClCompile>
     <ClCompile Include="src\stuff\Clipboard.cpp">
@@ -1758,6 +1761,9 @@
     <ClInclude Include="src\lib\file\file_op.h">
       <Filter>src\lib\file</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\file\formatter.h">
+      <Filter>src\lib\file</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\file\msg.h">
       <Filter>src\lib\file</Filter>
     </ClInclude>
@@ -2139,6 +2145,9 @@
     <ClInclude Include="src\lib\nix\nix_view.h">
       <Filter>src\lib\nix</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\terminal\CommandLineParser.h">
+      <Filter>src\lib\terminal</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\threads\Mutex.h">
       <Filter>src\lib\threads</Filter>
     </ClInclude>
@@ -2332,9 +2341,6 @@
       <Filter>src\storage</Filter>
     </ClInclude>
     <ClInclude Include="src\stuff\BackupManager.h">
-      <Filter>src\stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="src\stuff\CLIParser.h">
       <Filter>src\stuff</Filter>
     </ClInclude>
     <ClInclude Include="src\stuff\Clipboard.h">
@@ -2800,6 +2806,9 @@
     </Filter>
     <Filter Include="src\lib\nix">
       <UniqueIdentifier>{F2B28380-C7CD-DA9A-3F74-DD2903EC2A01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\terminal">
+      <UniqueIdentifier>{13CE28EE-DE8E-D217-B858-442FB59C1812}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\threads">
       <UniqueIdentifier>{00B3DEB1-3DBC-9488-47E6-BB73557F0D00}</UniqueIdentifier>

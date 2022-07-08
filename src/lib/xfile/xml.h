@@ -10,7 +10,7 @@
 
 #include "../base/base.h"
 
-class File;
+class Stream;
 class Path;
 
 namespace xml{
@@ -48,11 +48,11 @@ class Parser {
 public:
 	void _cdecl load(const Path &filename);
 
-	Element read_element(File *f);
-	Element read_tag(File *f);
+	Element read_element(Stream *f);
+	Element read_tag(Stream *f);
 
 	void _cdecl save(const Path &filename);
-	void write_element(File *f, Element &e, int indent);
+	void write_element(Stream *f, Element &e, int indent);
 
 	Array<Element> elements;
 

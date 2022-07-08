@@ -238,6 +238,7 @@
     <ClCompile Include="src\lib\base\strings.cpp" />
     <ClCompile Include="src\lib\file\file.cpp" />
     <ClCompile Include="src\lib\file\file_op.cpp" />
+    <ClCompile Include="src\lib\file\formatter.cpp" />
     <ClCompile Include="src\lib\file\msg.cpp" />
     <ClCompile Include="src\lib\file\path.cpp" />
     <ClCompile Include="src\lib\hui\Controls\Control.cpp" />
@@ -396,6 +397,7 @@
     <ClCompile Include="src\lib\nix\nix_textures.cpp" />
     <ClCompile Include="src\lib\nix\nix_vertexbuffer.cpp" />
     <ClCompile Include="src\lib\nix\nix_view.cpp" />
+    <ClCompile Include="src\lib\terminal\CommandLineParser.cpp" />
     <ClCompile Include="src\lib\threads\Mutex.cpp" />
     <ClCompile Include="src\lib\threads\Thread.cpp" />
     <ClCompile Include="src\lib\threads\ThreadedWork.cpp" />
@@ -459,7 +461,6 @@
     <ClCompile Include="src\storage\Storage.cpp" />
     <ClCompile Include="src\storage\StorageOperationData.cpp" />
     <ClCompile Include="src\stuff\BackupManager.cpp" />
-    <ClCompile Include="src\stuff\CLIParser.cpp" />
     <ClCompile Include="src\stuff\Clipboard.cpp" />
     <ClCompile Include="src\stuff\Diff.cpp" />
     <ClCompile Include="src\stuff\ErrorHandler.cpp" />
@@ -703,6 +704,7 @@
     <ClInclude Include="src\lib\base\strings.h" />
     <ClInclude Include="src\lib\file\file.h" />
     <ClInclude Include="src\lib\file\file_op.h" />
+    <ClInclude Include="src\lib\file\formatter.h" />
     <ClInclude Include="src\lib\file\msg.h" />
     <ClInclude Include="src\lib\file\path.h" />
     <ClInclude Include="src\lib\hui\Controls\Control.h" />
@@ -830,6 +832,7 @@
     <ClInclude Include="src\lib\nix\nix_textures.h" />
     <ClInclude Include="src\lib\nix\nix_vertexbuffer.h" />
     <ClInclude Include="src\lib\nix\nix_view.h" />
+    <ClInclude Include="src\lib\terminal\CommandLineParser.h" />
     <ClInclude Include="src\lib\threads\Mutex.h" />
     <ClInclude Include="src\lib\threads\Thread.h" />
     <ClInclude Include="src\lib\threads\ThreadedWork.h" />
@@ -895,7 +898,6 @@
     <ClInclude Include="src\storage\Storage.h" />
     <ClInclude Include="src\storage\StorageOperationData.h" />
     <ClInclude Include="src\stuff\BackupManager.h" />
-    <ClInclude Include="src\stuff\CLIParser.h" />
     <ClInclude Include="src\stuff\Clipboard.h" />
     <ClInclude Include="src\stuff\Diff.h" />
     <ClInclude Include="src\stuff\ErrorHandler.h" />

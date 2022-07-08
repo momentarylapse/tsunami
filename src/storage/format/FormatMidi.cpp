@@ -26,17 +26,17 @@ FormatDescriptorMidi::FormatDescriptorMidi() :
 {
 }
 
-static string read_chunk_name(File *f) {
+static string read_chunk_name(BinaryFormatter *f) {
 	string s;
 	s.resize(4);
 	*(int*)s.data = f->read_int();
 	return s;
 }
 
-static void write_chunk_name(File *f, const string &name) {
+static void write_chunk_name(BinaryFormatter *f, const string &name) {
 	string s = name;
 	s.resize(4);
-	f->write_buffer(s);
+	f->write(s);
 }
 
 static int int_reverse(int i) {
@@ -47,17 +47,16 @@ static int int16_reverse(int i) {
 	return ((i & 255) << 8) + ((i >> 8) & 255);
 }
 
-static int read_int(File *f)
-{
+static int read_int(BinaryFormatter *f) {
 	int i = f->read_int();
 	return int_reverse(i);
 }
 
-static void write_int(File *f, int i) {
+static void write_int(BinaryFormatter *f, int i) {
 	f->write_int(int_reverse(i));
 }
 
-static int read_var(File *f) {
+static int read_var(BinaryFormatter *f) {
 	unsigned char c0;
 	int i = 0;
 	do {
@@ -67,7 +66,7 @@ static int read_var(File *f) {
 	return i;
 }
 
-static void write_var(File *f, int i) {
+static void write_var(BinaryFormatter *f, int i) {
 	string s;
 	s.add(i & 0x7f);
 	i >>= 7;
@@ -79,7 +78,7 @@ static void write_var(File *f, int i) {
 		s.add((i & 0x7f) | 0x80);
 		i >>= 7;
 	}
-	f->write_buffer(s.reverse());
+	f->write(s.reverse());
 }
 
 static string ascii2utf8(const string &s) {
@@ -95,9 +94,9 @@ static string ascii2utf8(const string &s) {
 }
 
 void FormatMidi::load_song(StorageOperationData *od) {
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 	try {
-		f = FileOpen(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "rb"));
 
 		string hn = read_chunk_name(f);
 		int hsize = read_int(f);
@@ -190,7 +189,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 					} else {
 						string t;
 						t.resize(l);
-						f->read_buffer(t.data, l);
+						f->read(t);
 						dbo(format("str... %d  %d  '%s'", type, l, ascii2utf8(t).hex()));
 						if (type == 0x03) {
 							track_name = ascii2utf8(t);
@@ -258,18 +257,18 @@ void FormatMidi::load_song(StorageOperationData *od) {
 			}
 		}
 
-		FileClose(f);
+		delete f;
 	} catch(Exception &e) {
 		if (f)
-			FileClose(f);
+			delete f;
 		od->error(e.message());
 	}
 }
 
 void FormatMidi::save_song(StorageOperationData* od) {
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 	try {
-		f = FileCreate(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "wb"));
 
 		int num_tracks = 0;
 		for (Track *t: weak(od->song->tracks))
@@ -301,7 +300,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 				f->write_byte(0xff);
 				f->write_byte(0x03);
 				write_var(f, t->name.num);
-				f->write_buffer(t->name);
+				f->write(t->name);
 			}
 			int channel = 0;
 
@@ -366,10 +365,10 @@ void FormatMidi::save_song(StorageOperationData* od) {
 
 			first_track = false;
 		}
-		FileClose(f);
+		delete f;
 	} catch(Exception &e) {
 		if (f)
-			FileClose(f);
+			delete f;
 
 		od->error(e.message());
 	}

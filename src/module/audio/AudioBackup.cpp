@@ -80,9 +80,9 @@ void AudioBackup::set_backup_mode(BackupMode mode) {
 void AudioBackup::save_chunk(const AudioBuffer &buf) {
 	if (backup_file and accumulating) {
 		// write to file
-		string data;
+		bytes data;
 		buf.exports(data, config.channels, config.format);
-		backup_file->write_buffer(data);
+		backup_file->write(data);
 	}
 }
 

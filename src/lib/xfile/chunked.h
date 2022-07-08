@@ -48,7 +48,7 @@ public:
 		int end();
 		string str();
 
-		File *f;
+		BinaryFormatter *f;
 		Array<Layer> layers;
 	};
 	Context context;
@@ -60,8 +60,8 @@ public:
 	FileChunkBasic(const string &_name);
 	virtual ~FileChunkBasic();
 	virtual void define_children() {};
-	virtual void read(File *f) = 0;
-	virtual void write(File *f) = 0;
+	virtual void read(BinaryFormatter *f) = 0;
+	virtual void write(BinaryFormatter *f) = 0;
 	virtual void write_subs() {}
 	virtual void create();
 	string name;
@@ -87,8 +87,8 @@ public:
 	void write_sub(const string &name, void *p);
 	void write_sub_parray(const string &name, const DynamicArray &a);
 	void write_sub_array(const string &name, const DynamicArray &a);
-	void write_begin_chunk(File *f);
-	void write_end_chunk(File *f);
+	void write_begin_chunk(BinaryFormatter *f);
+	void write_end_chunk(BinaryFormatter *f);
 	void write_complete();
 	void write_contents();
 	string read_header();

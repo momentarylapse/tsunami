@@ -204,6 +204,7 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 		if (type_match(given->param[0], wanted->param[0])) {
 			cd.penalty = 10;
 			cd.cast = TYPE_CAST_MAKE_SHARED;
+			cd.f = wanted->get_func(IDENTIFIER_FUNC_SHARED_CREATE, wanted, {wanted->param[0]->get_pointer()});
 			return true;
 		}
 	}
@@ -328,10 +329,9 @@ shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node>
 		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type, 1);
 	}
 	if ((cast.cast == TYPE_CAST_MAKE_SHARED) or (cast.cast == TYPE_CAST_MAKE_OWNED)) {
-		auto f = wanted->get_func(IDENTIFIER_FUNC_SHARED_CREATE, wanted, {node->type});
-		if (!f)
-			do_error("make shared... create() missing...", node);
-		auto nn = add_node_call(f, node->token_id);
+		if (!cast.f)
+			do_error(format("internal: make shared... %s._create() missing...", wanted->name), node);
+		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;
 	}

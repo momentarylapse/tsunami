@@ -18,9 +18,10 @@ SyntaxError::SyntaxError() : Exception("xml syntax error") {}
 
 class EndOfFile {};
 
-void skip_until_char(File *f, char c) {
-	while (!f->end()) {
-		char cc = f->read_char();
+void skip_until_char(Stream *f, char c) {
+	while (!f->is_end()) {
+		char cc;
+		f->read(&cc, 1);
 		if (cc == c)
 			return;
 	}
@@ -31,9 +32,10 @@ bool is_whitespace(char c) {
 	return (c == ' ' or c == '\t' or c == '\n' or c == '\r');
 }
 
-char skip_whitespace(File *f, bool back = true) {
-	while (!f->end()) {
-		char c = f->read_char();
+char skip_whitespace(Stream *f, bool back = true) {
+	while (!f->is_end()) {
+		char c;
+		f->read(&c, 1);
 		if (is_whitespace(c))
 			continue;
 		if (back)
@@ -44,11 +46,11 @@ char skip_whitespace(File *f, bool back = true) {
 	return ' ';
 }
 
-char next_non_whitespace(File *f) {
+char next_non_whitespace(Stream *f) {
 	return skip_whitespace(f, false);
 }
 
-string read_next_exp(File *f) {
+string read_next_exp(Stream *f) {
 	string e;
 	char c0 = next_non_whitespace(f);
 	if (c0 == '=')
@@ -63,8 +65,9 @@ string read_next_exp(File *f) {
 		return "?";
 	bool in_string = (c0 == '\"') or (c0 == '\'');
 	if (in_string) {
-		while (!f->end()) {
-			char c = f->read_char();
+		while (!f->is_end()) {
+			char c;
+			f->read(&c, 1);
 			if (c == c0)
 				return e;
 			e.add(c);
@@ -74,8 +77,9 @@ string read_next_exp(File *f) {
 	}
 
 	e.add(c0);
-	while (!f->end()) {
-		char c = f->read_char();
+	while (!f->is_end()) {
+		char c;
+		f->read(&c, 1);
 		if (is_whitespace(c) or (c == '=') or (c == '>') or (c == '<')) {
 			f->seek(-1);
 			return e;
@@ -132,7 +136,7 @@ string Element::value(const string &key, const string &def) {
 }
 
 void Parser::load(const Path &filename) {
-	File *f = FileOpen(filename);
+	auto *f = file_open(filename, "rb");
 
 	while(true) {
 		try{
@@ -149,33 +153,33 @@ void Parser::load(const Path &filename) {
 	}
 }
 
-void Parser::write_element(File *f, Element &e, int indent) {
+void Parser::write_element(Stream *f, Element &e, int indent) {
 	for (int i=0; i<indent; i++)
-		f->write_char('\t');
+		f->write("\t");
 
-	f->write_buffer("<" + e.tag);
+	f->write("<" + e.tag);
 	for (auto &a: e.attributes)
-		f->write_buffer(" " + a.key + "=\"" + a.value + "\"");
+		f->write(" " + a.key + "=\"" + a.value + "\"");
 
 	if (e.text.num + e.elements.num == 0) {
-		f->write_buffer(" />\n");
-	}else if (e.elements.num > 0) {
-		f->write_buffer(">\n");
+		f->write(" />\n");
+	} else if (e.elements.num > 0) {
+		f->write(">\n");
 
 		for (Element &child: e.elements)
 			write_element(f, child, indent + 1);
 
 		for (int i=0; i<indent; i++)
-			f->write_char('\t');
-		f->write_buffer("</" + e.tag + ">\n");
-	}else if (e.elements.num == 0) {
-		f->write_buffer(">" + e.text + "</" + e.tag + ">\n");
+			f->write("\t");
+		f->write("</" + e.tag + ">\n");
+	} else if (e.elements.num == 0) {
+		f->write(">" + e.text + "</" + e.tag + ">\n");
 	}
 }
 
 void Parser::save(const Path &filename) {
-	File *f = FileCreate(filename);
-	f->write_buffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	auto *f = file_open(filename, "wb");
+	f->write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
 	// should be exactly one root!
 	for (Element &e: elements)
@@ -201,10 +205,11 @@ void Parser::show_element(Element &e, const string &pre) {
 		show_element(c, pre + "    ");
 }
 
-void skip_recursive(File *f) {
+void skip_recursive(Stream *f) {
 	int level = 0;
-	while(!f->end()) {
-		char c = f->read_char();
+	while(!f->is_end()) {
+		char c;
+		f->read(&c, 1);
 		if (c == '<') {
 			level += 1;
 			//msg_write("<<");
@@ -219,7 +224,7 @@ void skip_recursive(File *f) {
 	throw EndOfFile();
 }
 
-Element Parser::read_element(File *f) {
+Element Parser::read_element(Stream *f) {
 	//msg_write("<< element");
 	Element e;
 	e = read_tag(f);
@@ -231,8 +236,9 @@ Element Parser::read_element(File *f) {
 	if (nn > NMAX)
 		return e;
 	//msg_write("content....");
-	while (!f->end()) {
-		char c = f->read_char();
+	while (!f->is_end()) {
+		char c;
+		f->read(&c, 1);
 		if (c == '<') {
 			f->seek(-1);
 			break;
@@ -240,7 +246,7 @@ Element Parser::read_element(File *f) {
 		e.text.add(c);
 	}
 	e.text = e.text.trim();
-	while (!f->end()) {
+	while (!f->is_end()) {
 		Element ee = read_element(f);
 		if (ee.closing and (ee.tag == e.tag)) {
 			//msg_write(">> element (with closing)");
@@ -256,7 +262,7 @@ Element Parser::read_element(File *f) {
 	return e;
 }
 
-Element Parser::read_tag(File *f) {
+Element Parser::read_tag(Stream *f) {
 	nn ++;
 	//msg_write("--tag");
 	Element e;
@@ -288,7 +294,7 @@ Element Parser::read_tag(File *f) {
 	//msg_write("aaa");
 
 	// attributes
-	while (!f->end()) {
+	while (!f->is_end()) {
 		string s = read_next_exp(f);
 		//msg_write(s);
 		if (s == "?")

@@ -324,7 +324,7 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 		return {};
 	current_directory = dir0;
 
-	auto data = FileRead(filename);
+	auto data = file_read_binary(filename);
 	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 2 * buffer.channels)));
 	file_delete(filename);
 	return data;
@@ -332,7 +332,7 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 
 void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
 	Path filename = temp_saving_file(codec);
-	FileWrite(filename, data);
+	file_write_binary(filename, data);
 
 	auto dir0 = this->current_directory;
 	load_buffer(&buffer, filename);

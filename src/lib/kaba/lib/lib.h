@@ -13,6 +13,7 @@
 #include "extern.h"
 #include "../../base/pointer.h"
 #include <cstddef>
+#include <type_traits>
 
 namespace kaba {
 
@@ -66,9 +67,12 @@ void clean_up();
 extern shared_array<Module> packages;
 
 
-template<class T>
-int element_offset(T p) {
-	return *(int*)(void*)&p;
+template<class C, class M>
+int element_offset(M C::* p) {
+	extern char _el_off_data[];
+	auto *c = reinterpret_cast<C*>(&_el_off_data[0]);
+	return (int_p)((char*)&(c->*p) - (char*)c);
+	//return *(int*)(void*)&p;
 }
 
 void add_package(const string &name, Flags = Flags::NONE);
@@ -99,7 +103,12 @@ void class_add_element_x(const string &name, const Class *type, int offset, Flag
 template<class T>
 void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
 	// allows &Class::element
-	class_add_element_x(name, type, element_offset(p), flag);
+	if constexpr (std::is_integral<T>::value)
+		class_add_element_x(name, type, p, flag);
+	else if constexpr (std::is_same<T, std::nullptr_t>::value)
+		class_add_element_x(name, type, 0, flag);
+	else
+		class_add_element_x(name, type, element_offset(p), flag);
 }
 
 

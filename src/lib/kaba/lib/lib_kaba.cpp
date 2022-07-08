@@ -101,6 +101,7 @@ void SIAddPackageKaba() {
 		class_add_element("classes", TypeClassPList, &Class::classes);
 		class_add_element("constants", TypeConstantPList, &Class::constants);
 		class_add_element("static_variables", TypeVariablePList, &Class::static_variables);
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, &Class::_pointer_ref_counter);
 		class_add_func("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
 			func_add_param("c", TypeClass);
 		class_add_func("is_pointer", TypeBool, &Class::is_pointer, Flags::PURE);
@@ -137,7 +138,7 @@ void SIAddPackageKaba() {
 		class_add_func("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
 		class_add_func("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
 		class_add_func("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
-		class_add_element("needs_overriding", TypeBool, &Function::needs_overriding);
+		class_add_func("needs_overriding", TypeBool, &Function::needs_overriding, Flags::PURE);
 		class_add_element("virtual_index", TypeInt, &Function::virtual_index);
 		class_add_element("inline_index", TypeInt, &Function::inline_no);
 		class_add_element("code", TypeFunctionCodeP, &Function::address);
@@ -158,6 +159,7 @@ void SIAddPackageKaba() {
 	add_class(TypeModule);
 		class_add_element("name", TypeString, &Module::filename);
 		class_add_element("used_by_default", TypeBool, &Module::used_by_default);
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, &Module::_pointer_ref_counter);
 		class_add_func("classes", TypeClassPList, &Module::classes, Flags::PURE);
 		class_add_func("functions", TypeFunctionPList, &Module::functions, Flags::PURE);
 		class_add_func("variables", TypeVariablePList, &Module::variables, Flags::PURE);

@@ -285,7 +285,7 @@ Shader *Shader::load(const Path &filename) {
 
 	msg_write("loading shader: " + filename.str());
 
-	string source = FileRead(filename);
+	string source = file_read_text(filename);
 	Shader *shader = Shader::create(source);
 	if (shader)
 		shader->filename = filename;

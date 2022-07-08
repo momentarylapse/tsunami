@@ -97,21 +97,17 @@ void Date::__assign__(const Date &d) {
 	*this = d;
 }
 
-t_file_try_again_func *FileTryAgainFunc;
 
-
-
-File::File() {
-	handle = -1;
-	float_decimals = 6;
+FileStream::FileStream(int h) {
+	handle = h;
 }
 
-File::~File() {
-	if (handle>=0)
+FileStream::~FileStream() {
+	if (handle >= 0)
 		close();
 }
 
-bool File::end() {
+bool FileStream::is_end() {
 #ifdef OS_WINDOWS
 	return _eof(handle);
 #endif
@@ -123,183 +119,85 @@ bool File::end() {
 #endif
 }
 
-class TextFile : public File {
-public:
-	TextFile();
-	virtual ~TextFile();
-
-	virtual char read_char();
-	virtual unsigned char read_byte();
-	virtual unsigned int read_word();
-	virtual int read_int();
-	virtual float read_float();
-	virtual bool read_bool();
-	virtual string read_str();
-
-	virtual void write_char(char c);
-	virtual void write_byte(unsigned char c);
-	virtual void write_word(unsigned int);
-	virtual void write_int(int);
-	virtual void write_float(float f);
-	virtual void write_bool(bool b);
-	virtual void write_str(const string &str);
-
-	virtual void read_comment();
-	virtual void write_comment(const string &str);
-};
-
-TextFile::TextFile() {
-	float_decimals = 6;
-}
-
-TextFile::~TextFile() {
-}
-
-File *FileOpen(const Path &filename) {
-	File *f = new File();
-	try {
-		f->open(filename);
-	} catch(FileError &e) {
-		delete f;
-		throw e;
-	}
-	return f;
-}
-
-File *FileOpenText(const Path &filename) {
-	File *f = new TextFile();
-	try {
-		f->open(filename);
-	} catch(FileError &e) {
-		delete f;
-		throw e;
-	}
-	return f;
-}
-
-File *FileCreate(const Path &filename) {
-	File *f = new File();
-	try {
-		f->create(filename);
-	} catch(FileError &e) {
-		delete f;
-		throw e;
-	}
-	return f;
-}
-
-File *FileCreateText(const Path &filename) {
-	File *f = new TextFile();
-	try {
-		f->create(filename);
-	} catch(FileError &e) {
-		delete f;
-		throw e;
-	}
-	return f;
-}
-
-File *FileAppend(const Path &filename) {
-	File *f = new File();
-	try {
-		f->append(filename);
-	} catch(FileError &e) {
-		delete f;
-		throw e;
-	}
-	return f;
-}
-
-void FileClose(File *f) {
-	if (f) {
-		f->close();
-		delete(f);
-	}
-}
-
-bytes FileRead(const Path &filename) {
-	File *f = FileOpen(filename);
-	bytes r = f->read_complete();
-	FileClose(f);
-	return r;
-}
-
-string FileReadText(const Path &filename) {
-	File *f = FileOpenText(filename);
-	string r = f->read_complete();
-	FileClose(f);
-	return r;
-}
-
-void FileWrite(const Path &filename, const bytes &buf) {
-	File *f = FileCreate(filename);
-	f->write_buffer(buf);
-	FileClose(f);
-}
-
-void FileWriteText(const Path &filename, const string &str) {
-	File *f = FileCreateText(filename);
-	f->write_buffer(str);
-	FileClose(f);
-}
-
-void set_mode(File *f) {
+void set_mode_bin(int handle) {
 #ifdef OS_WINDOWS
-	if (dynamic_cast<TextFile*>(f))
-		_setmode(f->handle,_O_TEXT);
-	else
-		_setmode(f->handle,_O_BINARY);
+	_setmode(f->handle,_O_BINARY);
 #endif
 }
 
-// open a file
-void File::open(const Path &_filename) {
-	filename = _filename;
-	handle = _open(filename.str().c_str(), O_RDONLY);
+void set_mode_text(int handle) {
+#ifdef OS_WINDOWS
+	_setmode(f->handle,_O_TEXT);
+#endif
+}
+
+// open a file stream
+FileStream *file_open(const Path &filename, const string &mode) {
+	int handle = -1;
+
+	if (mode.find("r") >= 0) {
+		// reading
+		handle = _open(filename.c_str(), O_RDONLY);
+	} else if (mode.find("w") >= 0) {
+#ifdef OS_WINDOWS
+		handle = _creat(filename.c_str(), _S_IREAD | _S_IWRITE);
+#endif
+#if defined(OS_LINUX) or defined(OS_MINGW)
+		handle = ::creat(filename.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+#endif
+	} else if (mode.find("a") >= 0) {
+#ifdef OS_WINDOWS
+		handle = _open(filename.c_str(), O_WRONLY | O_APPEND | O_CREAT, _S_IREAD | _S_IWRITE);
+#endif
+#if defined(OS_LINUX) or defined(OS_MINGW)
+		handle = ::open(filename.c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+#endif
+	} else {
+		throw FileError(format("mode unhandled: '%s'", mode));
+	}
+
 	if (handle <= 0)
 		throw FileError(format("failed opening file '%s'", filename));
 
-	/*if (FileTryAgainFunc){
-		if (FileTryAgainFunc(filename)){
-			handle = _open(filename.sys_filename().c_str(), O_RDONLY);
-			return;
-		}
-	}*/
-	set_mode(this);
+
+	// text mode?
+	if (mode.find("t") >= 0)
+		set_mode_text(handle);
+	else
+		set_mode_bin(handle);
+
+	return new FileStream(handle);
 }
 
-// create a new file or reset an existing one
-void File::create(const Path &_filename) {
-	filename = _filename;
-#ifdef OS_WINDOWS
-	handle = _creat(filename.str().c_str(), _S_IREAD | _S_IWRITE);
-#endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::creat(filename.str().c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-#endif
-	if (handle <= 0)
-		throw FileError(format("failed creating file '%s'", filename));
-
-	set_mode(this);
+bytes file_read_binary(const Path &filename) {
+	auto *f = file_open(filename, "rb");
+	bytes r = f->read_complete();
+	delete f;
+	return r;
 }
 
-// create a new file or append data to an existing one
-void File::append(const Path &_filename) {
-	filename = _filename;
-#ifdef OS_WINDOWS
-	handle = _open(filename.str().c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
-#endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
-	handle = ::open(filename.str().c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-#endif
-	if (handle <= 0)
-		throw FileError(format("failed appending file '%s'", filename));
-
-	set_mode(this);
+string file_read_text(const Path &filename) {
+	auto *f = file_open(filename, "rt");
+	string r = f->read_complete();
+	delete f;
+	return r;
 }
+
+void file_write_binary(const Path &filename, const bytes &buf) {
+	auto *f = file_open(filename, "wb");
+	f->Stream::write(buf);
+	delete f;
+}
+
+void file_write_text(const Path &filename, const string &str) {
+	auto f = file_open(filename, "wt");
+	f->write(str);
+	delete f;
+}
+
 
 // close the file
-void File::close() {
+void FileStream::close() {
 	//flush(handle);
 	if (handle >= 0)
 		_close(handle);
@@ -307,91 +205,68 @@ void File::close() {
 }
 
 // jump to an position in the file or to a position relative to the current
-void File::set_pos(int pos) {
+void FileStream::set_pos(int pos) {
 	_lseek(handle, pos, SEEK_SET);
 }
 
-void File::seek(int delta) {
+void FileStream::seek(int delta) {
 	_lseek(handle, delta, SEEK_CUR);
 }
 
 // retrieve the size of the opened(!) file
-int File::get_size32() {
+int FileStream::get_size32() {
 	struct stat _stat;
 	fstat(handle, &_stat);
 	return _stat.st_size;
 }
 
 // retrieve the size of the opened(!) file
-int64 File::get_size() {
+int64 FileStream::get_size() {
 	struct stat s;
 	fstat(handle, &s);
 	return s.st_size;
 }
 
-Date File::ctime() {
+Date FileStream::ctime() {
 	struct stat s;
 	fstat(handle, &s);
 	return time2date(s.st_ctime);
 }
 
-Date File::mtime() {
+Date FileStream::mtime() {
 	struct stat s;
 	fstat(handle, &s);
 	return time2date(s.st_mtime);
 }
 
-Date File::atime() {
+Date FileStream::atime() {
 	struct stat s;
 	fstat(handle, &s);
 	return time2date(s.st_atime);
 }
 
 // where is the current reading position in the file?
-int File::get_pos() {
+int FileStream::get_pos() {
 	return _lseek(handle, 0, SEEK_CUR);
 }
 
-// read a single character followed by the file-format-version-number
-int File::ReadFileFormatVersion()
-{
-	unsigned char a=0;
-	if (_read(handle,&a,1)<=0){
-		return -1;
-	}
-	if (a=='t'){
-		//SetBinaryMode(false);
-	}else if (a=='b'){
-		//SetBinaryMode(true);
-	}else{
-		throw FileError("File Format Version must begin ether with 't' or 'b'!!!");
-	}
-	return read_word();
-}
-
-// write a single character followed by the file-format-version-number
-void File::WriteFileFormatVersion(bool binary,int fvv)
-{
-	char a = binary ? 'b' : 't';
-	int r = _write(handle, &a, 1);
-	//SetBinaryMode(binary);
-	write_word(fvv);
-}
-
-#define CHUNK_SIZE		2048
-
 // read the complete file into the buffer
-bytes File::read_complete() {
+bytes Stream::read_complete() {
+	static const int CHUNK_SIZE = 2048;
 	bytes buf, chunk;
-	do {
-		chunk = read_buffer(CHUNK_SIZE);
-		buf += chunk;
-	} while (chunk.num > 0);
+	chunk.resize(CHUNK_SIZE);
+	int r = 0;
+	while (true) {
+		int r = read(chunk);
+		if (r <= 0)
+			return buf;
+		buf += chunk.sub_ref(0, r);
+	};
 	return buf;
 }
 
 // read a part of the file into the buffer
-int File::read_buffer(void *buffer, int size) {
+int FileStream::read_basic(void *buffer, int size) {
 	int r = _read(handle, buffer, size);
 	if (r < 0)
 		throw FileError(format("failed reading file '%s'", filename));
@@ -399,7 +274,7 @@ int File::read_buffer(void *buffer, int size) {
 }
 
 // insert the buffer into the file
-int File::write_buffer(const void *buffer, int size) {
+int FileStream::write_basic(const void *buffer, int size) {
 	if (size == 0)
 		return 0;
 	int r = _write(handle,buffer,size);
@@ -408,264 +283,26 @@ int File::write_buffer(const void *buffer, int size) {
 	return r;
 }
 
-bytes File::read_buffer(int size) {
+int Stream::read(void *data, int size) {
+	return read_basic(data, size);
+}
+
+int Stream::write(const void *data, int size) {
+	return write_basic(data, size);
+}
+
+int Stream::read(bytes &data) {
+	return read_basic(data.data, data.num);
+}
+
+bytes Stream::read(int size) {
 	bytes data;
 	data.resize(size);
-	int len = read_buffer(data.data, data.num);
-	if (len < 0)
-		return bytes();
-	data.resize(len);
+	int r = read(data);
+	data.resize(max(r, 0));
 	return data;
 }
 
-int File::write_buffer(const bytes &data) {
-	return write_buffer(data.data, data.num);
+int Stream::write(const bytes &data) {
+	return write_basic(data.data, data.num);
 }
-
-static void read_buffer_asserted(File *f, void *buf, int size) {
-	int r = f->read_buffer(buf, size);
-	if (r < size)
-		throw FileError(format("end of file '%s'", f->filename));
-}
-
-// read a single character (1 byte)
-char File::read_char() {
-	char c;
-	read_buffer_asserted(this, &c, 1);
-	return c;
-}
-char TextFile::read_char() {
-	char c = 0x0d;
-	while (c == 0x0d)
-		read_buffer_asserted(this, &c, 1);
-	return c;
-}
-
-// read a single character (1 byte)
-unsigned char File::read_byte() {
-	return read_char();
-}
-
-unsigned char TextFile::read_byte() {
-	return read_str()._int();
-}
-
-// read the rest of the line (only text mode)
-void File::read_comment()
-{}
-
-void TextFile::read_comment() {
-#ifdef FILE_COMMENTS_DEBUG
-	msg_write("comment: " + read_str());
-#else
-	read_str();
-#endif
-
-}
-
-// read a word (2 bytes in binary mode)
-unsigned int File::read_word() {
-	unsigned int i = 0;
-	read_buffer_asserted(this, &i, 2);
-	return i;
-}
-
-unsigned int TextFile::read_word() {
-	return read_str()._int();
-}
-
-// read a word (2 bytes in binary mode)
-unsigned int File::read_word_reversed() {
-	unsigned int a = read_byte();
-	unsigned int b = read_byte();
-	return (a << 8) + b;
-}
-
-// read an integer (4 bytes in binary mode)
-int File::read_int() {
-	int i;
-	read_buffer_asserted(this, &i, 4);
-	return i;
-}
-
-int TextFile::read_int() {
-	return read_str()._int();
-}
-
-// read a float (4 bytes in binary mode)
-float File::read_float() {
-	float f;
-	read_buffer_asserted(this, &f, 4);
-	return f;
-}
-
-float TextFile::read_float() {
-	return read_str()._float();
-}
-
-// read a boolean (1 byte in binary mode)
-bool File::read_bool() {
-	char bb = 0;
-	read_buffer_asserted(this, &bb, 1);
-	return (bb == '1') or (bb == 0x01); // sigh, old style booleans
-}
-
-bool TextFile::read_bool() {
-	string s = read_str();
-	return (s == "1");
-}
-
-// read a string
-//   text mode:   complete rest of this line
-//   binary mode: length word, then string
-string File::read_str() {
-	// binary: read length as a word then read so many bytes
-	int l = read_word();
-	if (l >= 0xc000) {
-		l = (read_word() << 14) + (l & 0x3fff);
-	}
-
-	string str;
-	str.resize(l + 16); // prevents "uninitialized" bytes in syscall parameter... (valgrind)
-	read_buffer_asserted(this, str.data, l);
-	str.resize(l);
-	return str;
-}
-
-string TextFile::read_str() {
-	// read one byte at a time until we reach a \n character
-	string str;
-	while(true) {
-		char c = read_char();
-
-		#ifdef OS_LINUX
-			// windows read-function does this on its own... (O_O)
-			if (c == '\r')
-				continue;
-		#endif
-
-		if (c == '\n')
-			break;
-		str.add(c);
-	}
-	return str;
-}
-
-// read a null-terminated string
-string File::read_str_nt() {
-	string str;
-	while(true) {
-		char c = read_char();
-		if (c == 0)
-			break;
-		str.add(c);
-	}
-	return str;
-}
-
-// read a string having reversed byte as length in binary mode
-string File::read_str_rw() {
-	int l = read_word_reversed();
-	string str;
-	str.resize(l);
-	read_buffer_asserted(this, str.data, l);
-	return str;
-}
-
-void File::read_vector(void *v) {
-	((float*)v)[0] = read_float();
-	((float*)v)[1] = read_float();
-	((float*)v)[2] = read_float();
-}
-
-// write a single character (1 byte)
-void File::write_char(char c) {
-	write_buffer(&c, 1);
-}
-
-void TextFile::write_char(char c) {
-	write_str(string(&c, 1));
-	//write_str(i2s(c));
-}
-
-// write a single character (1 byte)
-void File::write_byte(unsigned char c) {
-	write_buffer(&c, 1);
-}
-
-void TextFile::write_byte(unsigned char c) {
-	write_str(i2s(c));
-}
-
-// write a word (2 bytes)
-void File::write_word(unsigned int w) {
-	write_buffer(&w, 2);
-}
-
-void TextFile::write_word(unsigned int w) {
-	write_str(i2s(w));
-}
-
-// write an integer (4 bytes)
-void File::write_int(int i) {
-	write_buffer(&i, 4);
-}
-
-void TextFile::write_int(int i) {
-	write_str(i2s(i));
-}
-
-// write a float (4 bytes)
-void File::write_float(float f) {
-	write_buffer(&f, 4);
-}
-
-void TextFile::write_float(float f) {
-	write_str(f2s(f, float_decimals));
-}
-
-// write a boolean (1 byte)
-void File::write_bool(bool b) {
-	write_buffer(&b, 1);
-}
-
-void TextFile::write_bool(bool b) {
-	write_str(b ? "1" : "0");
-}
-
-// write a string
-//   text mode:   complete rest of this line
-//   binary mode: length word, then string
-void File::write_str(const string &str) {
-	int num = min(str.num, 0x1fffffff); // ~ 1gb...
-	if (num >= 0xc000) {
-		write_word((num & 0x3fff) | 0xc000);
-		write_word(num >> 14);
-		write_buffer(str.data, num);
-	} else {
-		write_word(num);
-		write_buffer(str.data, num);
-	}
-}
-void TextFile::write_str(const string &str) {
-	write_buffer(str);
-	write_buffer("\n");
-}
-
-// write a comment line
-void File::write_comment(const string &str) {
-}
-
-void TextFile::write_comment(const string &str) {
-#ifdef FILE_COMMENTS_DEBUG
-	msg_write("comment: " + str);
-#endif
-	write_str(str);
-}
-
-void File::write_vector(const void *v) {
-	write_float(((float*)v)[0]);
-	write_float(((float*)v)[1]);
-	write_float(((float*)v)[2]);
-}
-

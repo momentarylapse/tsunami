@@ -47,7 +47,7 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 void FormatRaw::save_via_renderer(StorageOperationData *od) {
 	Port *r = od->renderer;
 
-	File *f = FileCreate(od->filename);
+	auto f = new BinaryFormatter(file_open(od->filename, "wb"));
 	
 	int offset = od->parameters["offset"]._int();
 	int channels = od->parameters["channels"]._int();
@@ -68,11 +68,11 @@ void FormatRaw::save_via_renderer(StorageOperationData *od) {
 		if (!buf.exports(data, channels, format))
 			od->warn(_("Amplitude too large, signal distorted."));
 		od->set(float(done) / (float)samples);
-		f->write_buffer(data);
+		f->write(data);
 		done += buf.length;
 	}
 
-	FileClose(f);
+	delete f;
 }
 
 void FormatRaw::load_track(StorageOperationData *od) {
@@ -82,26 +82,26 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	auto format = format_from_code(od->parameters["format"].str());
 
 	bytes data;
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 
 	od->suggest_samplerate(sample_rate);
 	od->suggest_channels(channels);
 
 	try {
-		f = FileOpen(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "rb"));
 
 		int byte_per_sample = (format_get_bits(format) / 8) * channels;
 		int64 size = f->get_size() - offset;
 		//int samples = size / byte_per_sample;
 
 		if (offset > 0)
-			f->read_buffer(offset);
+			f->read(offset);
 
 		long long read = 0;
 		int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size) {
 			int toread = (int)min((int64)nice_buffer_size, size - read);
-			data = f->read_buffer(toread);
+			data = f->read(toread);
 			od->set((float)read / (float)size);
 			if (data.num > 0) {
 				int dsamples = data.num / byte_per_sample;
@@ -118,7 +118,7 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	}
 
 	if (f)
-		FileClose(f);
+		delete f;
 }
 
 

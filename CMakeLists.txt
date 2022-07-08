@@ -1,7 +1,7 @@
 # created by xmake
 
 project(tsunami)
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
@@ -128,6 +128,7 @@ set(SOURCE
 	src/lib/base/strings.cpp
 	src/lib/file/file.cpp
 	src/lib/file/file_op.cpp
+	src/lib/file/formatter.cpp
 	src/lib/file/msg.cpp
 	src/lib/file/path.cpp
 	src/lib/hui/Controls/Control.cpp
@@ -286,6 +287,7 @@ set(SOURCE
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/terminal/CommandLineParser.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -349,7 +351,6 @@ set(SOURCE
 	src/storage/Storage.cpp
 	src/storage/StorageOperationData.cpp
 	src/stuff/BackupManager.cpp
-	src/stuff/CLIParser.cpp
 	src/stuff/Clipboard.cpp
 	src/stuff/Diff.cpp
 	src/stuff/ErrorHandler.cpp

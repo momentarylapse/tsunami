@@ -24,7 +24,7 @@
 
 namespace kaba {
 
-string Version = "0.19.19.0";
+string Version = "0.19.20.0";
 
 //#define ScriptDebug
 
@@ -171,7 +171,7 @@ void Module::load(const Path &_filename, bool _just_analyse) {
 		syntax->default_import();
 
 	// read file
-		string buffer = FileReadText(filename);
+		string buffer = file_read_text(filename);
 		parser->parse_buffer(buffer, just_analyse);
 
 

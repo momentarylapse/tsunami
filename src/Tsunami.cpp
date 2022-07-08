@@ -7,6 +7,7 @@
 
 #include "Tsunami.h"
 #include "lib/base/pointer.h"
+#include "lib/terminal/CommandLineParser.h"
 #include "data/base.h"
 #include "data/Song.h"
 #include "data/Track.h"
@@ -23,7 +24,6 @@
 #include "storage/Storage.h"
 #include "stuff/Log.h"
 #include "stuff/Clipboard.h"
-#include "stuff/CLIParser.h"
 #include "stuff/PerformanceMonitor.h"
 #include "stuff/BackupManager.h"
 #include "stuff/SessionManager.h"
@@ -153,15 +153,15 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	bool allow_window = false;
 	auto flags = Storage::Flags::NONE;
 
-	CLIParser p;
-	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
-	p.flag("--slow", "", [] {
-			ugly_hack_slow = true;
+	CommandLineParser p;
+	p.info(AppName + " - the ultimate audio editor", "tsunami");//AppName + " " + AppVersion);
+	p.option("--slow", "", [] {
+		ugly_hack_slow = true;
 	});
-	p.flag("--mcd", "", [] {
-			module_config_debug = true;
+	p.option("--mcd", "", [] {
+		module_config_debug = true;
 	});
-	p.flag("--force", "", [&flags] {
+	p.option("--force", "", [&flags] {
 		flags = flags | Storage::Flags::FORCE;
 	});
 	p.option("--plugin", "FILE", "add a plugin to run", [&plugin_file] (const string &a) {
@@ -175,7 +175,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 
 
-	p.mode("", {"[FILE]"}, "open a window and (optionally) load a file", [this, &session, &allow_window] (const Array<string> &a) {
+	p.cmd("", "[FILE]", "open a window and (optionally) load a file", [this, &session, &allow_window] (const Array<string> &a) {
 		Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
@@ -200,10 +200,10 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		BackupManager::check_old_files(Session::GLOBAL);
 		allow_window = true;
 	});
-	p.mode("--help", {}, "show this info", [&p] (const Array<string> &) {
-		p.show_info();
+	p.cmd("--help", "", "show this info", [&p] (const Array<string> &) {
+		p.show();
 	});
-	p.mode("--info", {"FILE1", "..."}, "show information about the file", [session, &flags] (const Array<string> &a) {
+	p.cmd("--info", "<FILE1> ...", "show information about the file", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -215,7 +215,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			}
 		delete song;
 	});
-	p.mode("--diff", {"FILE1", "FILE2"}, "compare 2 files", [session, &flags] (const Array<string> &a) {
+	p.cmd("--diff", "<FILE1> <FILE2>", "compare 2 files", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		session->log->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -233,7 +233,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		delete song1;
 		delete song2;
 	});
-	p.mode("--export", {"FILE_IN", "FILE_OUT"}, "convert a file", [session, &flags] (const Array<string> &a) {
+	p.cmd("--export", "<FILE_IN> <FILE_OUT>", "convert a file", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
@@ -241,24 +241,24 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			session->storage->save(song, a[1]);
 		delete song;
 	});
-	p.mode("--execute", {"PLUGIN", "..."}, "just run a plugin", [this, &session] (const Array<string> &a) {
+	p.cmd("--execute", "<PLUGIN> ...", "just run a plugin", [this, &session] (const Array<string> &a) {
 		device_manager->init();
 		session = SessionManager::create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 	});
-	p.mode("--session", {"SESSION", "..."}, "restore a saved session", [this, &session] (const Array<string> &a) {
+	p.cmd("--session", "<SESSION> ...", "restore a saved session", [this, &session] (const Array<string> &a) {
 		SessionManager::load_session(SessionManager::directory() << (a[0] + ".session"));
 	});
 #ifndef NDEBUG
-	p.mode("--list-tests", {}, "debug: list internal unit tests", [] (const Array<string> &) {
+	p.cmd("--list-tests", "", "debug: list internal unit tests", [] (const Array<string> &) {
 		UnitTest::print_all_names();
 	});
-	p.mode("--run-tests", {"FILTER"}, "debug: run internal unit tests", [] (const Array<string> &a) {
+	p.cmd("--run-tests", "<FILTER>", "debug: run internal unit tests", [] (const Array<string> &a) {
 		UnitTest::run_all(a[0]);
 	});
-	p.mode("--preview-gui", {"TYPE", "NAME"}, "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
+	p.cmd("--preview-gui", "<TYPE> <NAME>", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
 		session = SessionManager::create_session();
 		session->win->hide();
 		Module *m = nullptr;

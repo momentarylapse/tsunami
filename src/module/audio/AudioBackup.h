@@ -12,7 +12,7 @@
 #include "../Module.h"
 #include "../ModuleConfiguration.h"
 
-class File;
+class FileStream;
 
 enum class BackupMode;
 enum class SampleFormat;
@@ -31,7 +31,7 @@ public:
 	Port *source;
 
 	void _cdecl set_backup_mode(BackupMode mode);
-	File *backup_file;
+	FileStream *backup_file;
 	bool accumulating;
 
 	void save_chunk(const AudioBuffer &buf);

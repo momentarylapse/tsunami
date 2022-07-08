@@ -101,6 +101,8 @@ extern const Class *TypeBasePainter;
 extern const Class *TypePath;
 extern const Class *TypeVec2;
 //extern const Class *TypeTimer;
+extern const Class* TypeCallback;
+extern const Class* TypeCallbackString;
 const Class *TypeHuiWindowP;
 
 string _hui_config_get(hui::Configuration &c, const string &key) {
@@ -125,10 +127,8 @@ void SIAddPackageHui() {
 	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 	auto TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
-	auto TypeCallback = add_type_f(TypeVoid, {});
 	auto TypeCallbackPainter = add_type_f(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_f(TypeVoid, {TypePath});
-	auto TypeCallbackString = add_type_f(TypeVoid, {TypeString});
 
 
 	add_class(TypeHuiMenu);

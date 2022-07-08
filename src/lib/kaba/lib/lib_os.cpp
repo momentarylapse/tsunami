@@ -3,6 +3,12 @@
 #include "../../config.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
+#include "../../base/callable.h"
+
+#if __has_include("../../terminal/CommandLineParser.h")
+#define HAS_TERMINAL 1
+#include "../../terminal/CommandLineParser.h"
+#endif
 
 class vector;
 
@@ -11,11 +17,17 @@ namespace kaba {
 
 
 extern const Class *TypeDate;
+extern const Class *TypeStringList;
 const Class *TypePath;
 const Class *TypePathList;
+const Class *TypeStreamP;
+//const Class *TypeStreamSP;
+
+const Class* TypeCallback;
+const Class* TypeCallbackString;
 
 
-static File *_kaba_stdin = nullptr;
+static FileStream *_kaba_stdin = nullptr;
 
 
 #pragma GCC push_options
@@ -34,40 +46,98 @@ public:
 	}
 };
 
-class KabaFile : public File {
+class KabaFileStream : public FileStream {
 public:
 	void _cdecl __delete__() {
-		this->~KabaFile();
+		this->~KabaFileStream();
 	}
-	int _cdecl _write_buffer(const string &s) {
-		return write_buffer(s);
+	int _cdecl _write(const string &s) {
+		return write(s);
 	}
-	bytes _cdecl _read_buffer(int size) {
-		return read_buffer(size);
+	bytes _cdecl _read_size(int size) {
+		bytes data;
+		data.resize(size);
+		int r = read(data);
+		if (r < 0)
+			return bytes();
+		data.resize(r);
+		return data;
+	}
+	int _cdecl _read_bytes(bytes &data) {
+		return read(data);
+	}
+};
+
+template<class F>
+class KabaFormatter : public F {
+public:
+	/*void __init__(shared<Stream> stream) {
+		msg_write("KabaFormatter init " + p2s(this));
+		msg_write("  stream " + p2s(stream.get()));
+		msg_write("  stream.count " + i2s(stream->_pointer_ref_counter));
+		msg_write(stream->get_pos());
+		new(this) F(stream);
+	}*/
+	void __init__(Stream* stream) {
+		new(this) F(stream);
+	}
+	void __delete__() {
+		this->F::~F();
 	}
 	void _cdecl _read_int(int &i) {
-		KABA_EXCEPTION_WRAPPER(i = read_int());
+		KABA_EXCEPTION_WRAPPER(i = F::read_int());
 	}
 	void _cdecl _read_float(float &f) {
-		 KABA_EXCEPTION_WRAPPER(f = read_float());
+		 KABA_EXCEPTION_WRAPPER(f = F::read_float());
 	}
 	void _cdecl _read_bool(bool &b) {
-		KABA_EXCEPTION_WRAPPER(b = read_bool());
+		KABA_EXCEPTION_WRAPPER(b = F::read_bool());
 	}
 	void _cdecl _read_vector(vector &v) {
-		KABA_EXCEPTION_WRAPPER(read_vector(&v));
+		KABA_EXCEPTION_WRAPPER(F::read_vector(&v));
 	}
 	void _cdecl _read_str(string &s) {
-		KABA_EXCEPTION_WRAPPER(s = read_str());
+		KABA_EXCEPTION_WRAPPER(s = F::read_str());
 	}
 	void _cdecl _write_vector(const vector &v) {
-		KABA_EXCEPTION_WRAPPER(write_vector(&v));
+		KABA_EXCEPTION_WRAPPER(F::write_vector(&v));
 	}
 
-	void _write_int(int i) { write_int(i); }
-	void _write_float(float f) { write_float(f); }
-	void _write_bool(bool b) { write_bool(b); }
-	void _write_str(const string &s) { write_str(s); }
+	void _write_int(int i) { F::write_int(i); }
+	void _write_float(float f) { F::write_float(f); }
+	void _write_bool(bool b) { F::write_bool(b); }
+	void _write_str(const string &s) { F::write_str(s); }
+
+	static void declare(const Class *c) {
+		using KF = KabaFormatter<F>;
+		add_class(c);
+			//class_add_element("stream", TypeStreamSP, &KF::stream);
+		class_add_element("stream", TypeStreamP, &KF::stream);
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KF::__init__);
+				//func_add_param("stream", TypeStreamSP);
+				func_add_param("stream", TypeStreamP);
+			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KF::__delete__);
+			class_add_func("__lshift__", TypeVoid, &KF::_write_bool, Flags::RAISES_EXCEPTIONS);
+				func_add_param("b", TypeBool);
+			class_add_func("__lshift__", TypeVoid, &KF::_write_int, Flags::RAISES_EXCEPTIONS);
+				func_add_param("i", TypeInt);
+			class_add_func("__lshift__", TypeVoid, &KF::_write_float, Flags::RAISES_EXCEPTIONS);
+				func_add_param("x", TypeFloat32);
+			class_add_func("__lshift__", TypeVoid, &KF::_write_vector, Flags::RAISES_EXCEPTIONS);
+				func_add_param("v", TypeVector);
+			class_add_func("__lshift__", TypeVoid, &KF::_write_str, Flags::RAISES_EXCEPTIONS);
+				func_add_param("s", TypeString, Flags::OUT);
+			class_add_func("__rshift__", TypeVoid, &KF::_read_bool, Flags::RAISES_EXCEPTIONS);
+				func_add_param("b", TypeBool, Flags::OUT);
+			class_add_func("__rshift__", TypeVoid, &KF::_read_int, Flags::RAISES_EXCEPTIONS);
+				func_add_param("i", TypeInt, Flags::OUT);
+			class_add_func("__rshift__", TypeVoid, &KF::_read_float, Flags::RAISES_EXCEPTIONS);
+				func_add_param("x", TypeFloat32, Flags::OUT);
+			class_add_func("__rshift__", TypeVoid, &KF::_read_vector, Flags::RAISES_EXCEPTIONS);
+				func_add_param("v", TypeVector, Flags::OUT);
+			class_add_func("__rshift__", TypeVoid, &KF::_read_str, Flags::RAISES_EXCEPTIONS);
+				func_add_param("s", TypeString, Flags::OUT);
+	}
 };
 
 /*class KabaFileNotFoundError : public KabaFileError
@@ -78,42 +148,27 @@ class KabaFileNotWritableError : public KabaFileError
 
 
 
-File* kaba_file_open(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileOpen(filename), KabaFileError);
-	return nullptr;
-}
-
-File* kaba_file_open_text(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileOpenText(filename), KabaFileError);
-	return nullptr;
-}
-
-File* kaba_file_create(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileCreate(filename), KabaFileError);
-	return nullptr;
-}
-
-File* kaba_file_create_text(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileCreateText(filename), KabaFileError);
+FileStream* kaba_file_open(const Path &filename, const string &mode) {
+	KABA_EXCEPTION_WRAPPER2(return file_open(filename, mode), KabaFileError);
 	return nullptr;
 }
 
 string kaba_file_read(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileRead(filename), KabaFileError);
+	KABA_EXCEPTION_WRAPPER2(return file_read_binary(filename), KabaFileError);
 	return "";
 }
 
 string kaba_file_read_text(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return FileReadText(filename), KabaFileError);
+	KABA_EXCEPTION_WRAPPER2(return file_read_text(filename), KabaFileError);
 	return "";
 }
 
 void kaba_file_write(const Path &filename, const string &buffer) {
-	KABA_EXCEPTION_WRAPPER2(FileWrite(filename, buffer), KabaFileError);
+	KABA_EXCEPTION_WRAPPER2(file_write_binary(filename, buffer), KabaFileError);
 }
 
 void kaba_file_write_text(const Path &filename, const string &buffer) {
-	KABA_EXCEPTION_WRAPPER2(FileWriteText(filename, buffer), KabaFileError);
+	KABA_EXCEPTION_WRAPPER2(file_write_text(filename, buffer), KabaFileError);
 }
 
 string kaba_file_hash(const Path &filename, const string &type) {
@@ -245,56 +300,144 @@ void SIAddPackageOSPath() {
 		add_operator(OperatorID::IN, TypeBool, TypePathList, TypePath, InlineID::NONE, &PathList::__contains__);
 		add_operator(OperatorID::ADD, TypePathList, TypePathList, TypePathList, InlineID::NONE, &PathList::__add__);
 		add_operator(OperatorID::ADDS, TypeVoid, TypePathList, TypePathList, InlineID::NONE, &PathList::__adds__);
-
-
 }
+
+
+char _el_off_data[1024];
+#define evil_member_offset(C, M)	((int_p)((char*)&(reinterpret_cast<C*>(&_el_off_data[0])->M) - &_el_off_data[0]))
+
+template<class C>
+class KabaSharedPointer : public shared<C> {
+public:
+	void __init__() {
+		msg_write("new Shared Pointer");
+		new(this) shared<C>;
+	}
+	void __delete__() {
+		msg_write("del Shared Pointer");
+		this->shared<C>::~shared<C>();
+	}
+	void assign(shared<C> o) {
+		msg_write("Shared Pointer ass1");
+		*(shared<C>*)this = o;
+	}
+	void assign_p(C *o) {
+		msg_write("Shared Pointer ass2");
+		*(shared<C>*)this = o;
+	}
+	shared<C> create(C *p) {
+		msg_write("Shared Pointer create");
+		msg_write("  p: " + p2s(p));
+		msg_write("  p.count: " + i2s(p->_pointer_ref_counter));
+		shared<C> sp;
+		sp = p;
+		msg_write(p2s(sp.get()));
+		msg_write(p->_pointer_ref_counter);
+		return sp;//shared<C>(p);
+	}
+
+	static void declare(const Class *c) {
+		using SP = KabaSharedPointer<C>;
+		add_class(c);
+			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &SP::__init__);
+			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &SP::__delete__);
+			class_add_func(IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, &shared<C>::release);
+			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign);
+				func_add_param("other", c);
+			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign_p);
+				func_add_param("other", c->param[0]->get_pointer());
+			class_add_func(IDENTIFIER_FUNC_SHARED_CREATE, c, &SP::create, Flags::STATIC);
+				func_add_param("other", c->param[0]->get_pointer());
+	}
+};
+
+#ifdef HAS_TERMINAL
+class KabaCommandLineParser : CommandLineParser {
+public:
+	void __init__() {
+		new(this) CommandLineParser;
+	}
+	void __delete__() {
+		CommandLineParser::~CommandLineParser();
+	}
+	void option1(const string &name, const string &comment, Callable<void()> &cb) {
+		option(name, comment, [&cb] { cb(); });
+	}
+	void option2(const string &name, const string &p, const string &comment, Callable<void(const string&)> &cb) {
+		option(name, p, comment, [&cb] (const string &s) { cb(s); });
+	}
+	void cmd1(const string &name, const string &p, const string &comment, Callable<void(const Array<string>&)> &cb) {
+		cmd(name, p, comment, [&cb] (const Array<string> &s) { cb(s); });
+	}
+	void parse1(const Array<string> &arg) {
+		Array<string> a = {"?"};
+		parse(a + arg);
+	}
+};
+#define term_p(p) (p)
+#else
+struct CommandLineParser{};
+#define term_p(p) nullptr
+#endif
 
 void SIAddPackageOS() {
 	add_package("os");
 
-	const Class *TypeFile = add_type("File", 0);
-	const Class *TypeFileP = add_type_p(TypeFile);
-	const Class *TypeFilesystem = add_type("Filesystem", 0);
+	const Class *TypeStream = add_type("Stream", sizeof(Stream));
+	TypeStreamP = add_type_p(TypeStream);
+	//TypeStreamSP = add_type_p(TypeStream, Flags::SHARED);
+	const Class *TypeFileStream = add_type("FileStream", sizeof(FileStream));
+	const Class *TypeFileStreamP = add_type_p(TypeFileStream);
+	const Class *TypeBinaryFormatter = add_type("BinaryFormatter", sizeof(BinaryFormatter));
+	const Class *TypeTextLinesFormatter = add_type("TextLinesFormatter", sizeof(TextLinesFormatter));
+	const Class *TypeFilesystem = add_type("fs", 0);
 	const Class *TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
+	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
 
-	add_class(TypeFile);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFile::__delete__);
+	TypeCallback = add_type_f(TypeVoid, {});
+	TypeCallbackString = add_type_f(TypeVoid, {TypeString});
+	auto TypeCallbackStringList = add_type_f(TypeVoid, {TypeStringList});
+
+	add_class(TypeStream);
+		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, evil_member_offset(FileStream, _pointer_ref_counter));
+		// FIXME &FileStream::_pointer_ref_counter does not work here
+		// we get a base-class-pointer... \(O_O)/
+		//class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, &Stream::__delete__);
+		//class_add_func_virtual("write", TypeVoid, Stream::write);
+		//class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, &Stream::_pointer_ref_counter);
+		//const_cast<Class*>(TypeStream)->elements.back().offset = offsetof(Stream, _pointer_ref_counter);
+
+
+	//KabaSharedPointer<FileStream>::declare(TypeStreamSP);
+
+	add_class(TypeFileStream);
+		class_derive_from(TypeStream, false, false);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFileStream::__delete__);
 		//class_add_func("getCDate", TypeDate, &File::GetDateCreation);
-		class_add_func("mtime", TypeDate, &File::mtime);
-		//class_add_func("getADate", TypeDate, &File::GetDateAccess);
-		class_add_func("get_size", TypeInt, &File::get_size32);
-		class_add_func("get_pos", TypeInt, &File::get_pos);
-		class_add_func("set_pos", TypeVoid, &File::set_pos, Flags::RAISES_EXCEPTIONS);
+		class_add_func("mtime", TypeDate, &FileStream::mtime);
+		//class_add_func("getADate", TypeDate, &FileStream::GetDateAccess);
+		class_add_func("get_size", TypeInt, &FileStream::get_size32);
+		class_add_func("get_pos", TypeInt, &FileStream::get_pos);
+		class_add_func("set_pos", TypeVoid, &FileStream::set_pos, Flags::RAISES_EXCEPTIONS);
 			func_add_param("pos", TypeInt);
-		class_add_func("seek", TypeVoid, &File::seek, Flags::RAISES_EXCEPTIONS);
+		class_add_func("seek", TypeVoid, &FileStream::seek, Flags::RAISES_EXCEPTIONS);
 			func_add_param("delta", TypeInt);
-		class_add_func("read", TypeString, &KabaFile::_read_buffer, Flags::RAISES_EXCEPTIONS);
+		class_add_func("read", TypeString, &KabaFileStream::_read_size, Flags::RAISES_EXCEPTIONS);
 			func_add_param("size", TypeInt);
-		class_add_func("write", TypeInt, &KabaFile::_write_buffer, Flags::RAISES_EXCEPTIONS);
+		class_add_func("read", TypeInt, &KabaFileStream::_read_bytes, Flags::RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
-		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_bool, Flags::RAISES_EXCEPTIONS);
-			func_add_param("b", TypeBool);
-		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_int, Flags::RAISES_EXCEPTIONS);
-			func_add_param("i", TypeInt);
-		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_float, Flags::RAISES_EXCEPTIONS);
-			func_add_param("x", TypeFloat32);
-		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_vector, Flags::RAISES_EXCEPTIONS);
-			func_add_param("v", TypeVector);
-		class_add_func("__lshift__", TypeVoid, &KabaFile::_write_str, Flags::RAISES_EXCEPTIONS);
-			func_add_param("s", TypeString, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_bool, Flags::RAISES_EXCEPTIONS);
-			func_add_param("b", TypeBool, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_int, Flags::RAISES_EXCEPTIONS);
-			func_add_param("i", TypeInt, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_float, Flags::RAISES_EXCEPTIONS);
-			func_add_param("x", TypeFloat32, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_vector, Flags::RAISES_EXCEPTIONS);
-			func_add_param("v", TypeVector, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, &KabaFile::_read_str, Flags::RAISES_EXCEPTIONS);
-			func_add_param("s", TypeString, Flags::OUT);
-		class_add_func("end", TypeBool, &KabaFile::end);
+		class_add_func("write", TypeInt, &KabaFileStream::_write, Flags::RAISES_EXCEPTIONS);
+		//class_add_func_virtual("write", TypeInt, &FileStream::write);
+			func_add_param("s", TypeString);
+		class_add_func("is_end", TypeBool, &KabaFileStream::is_end);
+		//class_set_vtable(FileStream);
+
+
+	KabaFormatter<BinaryFormatter>::declare(TypeBinaryFormatter);
+	KabaFormatter<TextLinesFormatter>::declare(TypeTextLinesFormatter);
+
 
 	add_class(TypeFileError);
 		class_derive_from(TypeException, false, false);
@@ -303,16 +446,35 @@ void SIAddPackageOS() {
 		class_set_vtable(KabaFileError);
 
 
+	add_class(TypeCommandLineParser);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, term_p(&KabaCommandLineParser::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, term_p(&KabaCommandLineParser::__delete__));
+		class_add_func("info", TypeVoid, term_p(&CommandLineParser::info));
+			func_add_param("i", TypeString);
+		class_add_func("show", TypeVoid, term_p(&CommandLineParser::show));
+		class_add_func("parse", TypeVoid, term_p(&KabaCommandLineParser::parse1));
+			func_add_param("arg", TypeStringList);
+		class_add_func("option", TypeVoid, term_p(&KabaCommandLineParser::option1));
+			func_add_param("name", TypeString);
+			func_add_param("comment", TypeString);
+			func_add_param("f", TypeCallback);
+		class_add_func("option", TypeVoid, term_p(&KabaCommandLineParser::option2));
+			func_add_param("name", TypeString);
+			func_add_param("p", TypeString);
+			func_add_param("comment", TypeString);
+			func_add_param("f", TypeCallbackString);
+		class_add_func("cmd", TypeVoid, term_p(&KabaCommandLineParser::cmd1));
+			func_add_param("name", TypeString);
+			func_add_param("p", TypeString);
+			func_add_param("comment", TypeString);
+			func_add_param("f", TypeCallbackStringList);
+
+
 	// file access
 	add_class(TypeFilesystem);
-		class_add_func("open", TypeFileP, &kaba_file_open, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("open", TypeFileStreamP, &kaba_file_open, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_func("open_text", TypeFileP, &kaba_file_open_text, Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypePath);
-		class_add_func("create", TypeFileP, &kaba_file_create, Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypePath);
-		class_add_func("create_text", TypeFileP, &kaba_file_create_text, Flags::_STATIC__RAISES_EXCEPTIONS);
-			func_add_param("filename", TypePath);
+			func_add_param("mode", TypeString);
 		class_add_func("read", TypeString, &kaba_file_read, Flags::_STATIC__RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 		class_add_func("read_text", TypeString, &kaba_file_read_text, Flags::_STATIC__RAISES_EXCEPTIONS);
@@ -352,9 +514,8 @@ void SIAddPackageOS() {
 			func_add_param("dir", TypePath);
 		class_add_func("current_directory", TypePath, &get_current_dir, Flags::STATIC);
 		
-		_kaba_stdin = new File();
-		_kaba_stdin->handle = 0;
-		add_ext_var("stdin", TypeFileP, &_kaba_stdin);
+		_kaba_stdin = new FileStream(0);
+		add_ext_var("stdin", TypeFileStreamP, &_kaba_stdin);
 
 	// system
 	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);

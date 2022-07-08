@@ -22,16 +22,16 @@ FormatDescriptorMp3::FormatDescriptorMp3() :
 }
 
 // (-_-) 4*7bit big endian
-static int read_mp3_28bit(File *f) {
+static int read_mp3_28bit(BinaryFormatter *f) {
 	unsigned char d[4];
-	f->read_buffer(d, 4);
+	f->read(d, 4);
 
 	return (d[3] & 0x7f) | ((d[2] & 0x7f) << 7) | ((d[1] & 0x7f) << 14) | ((d[0] & 0x7f) << 21);
 }
 
-static int read_32bit_be(File *f) {
+static int read_32bit_be(BinaryFormatter *f) {
 	unsigned char d[4];
-	f->read_buffer(d, 4);
+	f->read(d, 4);
 
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
@@ -57,15 +57,15 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 	//unsigned char *data = new unsigned char[4096];
 	bytes data;
-	File *f = nullptr;
+	BinaryFormatter *f = nullptr;
 
 	try {
-		f = FileOpen(od->filename);
+		f = new BinaryFormatter(file_open(od->filename, "rb"));
 
 
 		while(true) {
 			int pos0 = f->get_pos();
-			data = f->read_buffer(4);
+			data = f->read(4);
 			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)) {
 				msg_write("== mp3-header ==");
 				const int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
@@ -107,18 +107,18 @@ void FormatMp3::load_track(StorageOperationData *od) {
 						string key = data;
 						//if (key[0] != 0)
 						//	msg_write(key);
-						data = f->read_buffer(3);
+						data = f->read(3);
 						unsigned int _size = data[2] + (data[1] << 8) + (data[0] << 16);
 						//msg_write(_size);
 						r += 6 + _size;
 						if (_size < 1024) {
-							data = f->read_buffer(_size);
+							data = f->read(_size);
 						} else {
 							f->seek(_size);
 						}
 
 					} else if ((version == 3) or (version == 4)) {
-						string key = f->read_buffer(4);
+						string key = f->read(4);
 						//if (key[0] != 0)
 						//	msg_write(key);
 						int _size;
@@ -130,7 +130,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 						//msg_write(_size);
 						r += 12 + _size;
 						if ((_size < 1024) and (_size > 0)) {
-							data = f->read_buffer(_size);
+							data = f->read(_size);
 							string val = string(&data[1], _size-1);
 							int type = data[0];
 							if (key == "COMM")
@@ -177,7 +177,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 		int bytes_offset = 0;
 		while (true) {
 			if (data.num < 4096*4) {
-				bytes temp = f->read_buffer(4096*5 - data.num);
+				bytes temp = f->read(4096*5 - data.num);
 				//msg_write(format("R  %d", size));
 				data += temp;
 				od->set((float)f->get_pos() / (float)f->get_size());
@@ -213,11 +213,11 @@ void FormatMp3::load_track(StorageOperationData *od) {
 			od->error("need external program 'avconv' to decode");*/
 
 
-	} catch(Exception &e) {
+	} catch (Exception &e) {
 		od->error(e.message());
 	}
 
 	if (f)
-		FileClose(f);
+		delete f;
 }
 

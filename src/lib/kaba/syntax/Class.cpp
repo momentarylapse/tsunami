@@ -75,6 +75,12 @@ bool type_match(const Class *given, const Class *wanted) {
 			return true;
 	}
 
+	// compatible shared pointers (of same or derived class)
+	if (given->is_pointer_shared() and wanted->is_pointer_shared()) {
+		if (given->param[0]->is_derived_from(wanted->param[0]))
+			return true;
+	}
+
 	if (given->is_callable() and wanted->is_callable())
 		return func_pointer_match(given, wanted);
 

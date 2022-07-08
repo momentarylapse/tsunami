@@ -89,7 +89,7 @@ static string _parse_value(const string &s) {
 
 bool Configuration::load(const Path &filename) {
 	try {
-		File *f = FileOpenText(filename);
+		auto f = new TextLinesFormatter(file_open(filename, "rt"));
 		map.clear();
 
 		string t = f->read_str();
@@ -104,8 +104,8 @@ bool Configuration::load(const Path &filename) {
 			}
 		} else if (t.head(3) == "// ") {
 			// semi old format
-			f->set_pos(0);
-			while (!f->end()) {
+			f->stream->set_pos(0);
+			while (!f->stream->is_end()) {
 				string temp = f->read_str();
 				if (temp == "#")
 					break;
@@ -115,9 +115,9 @@ bool Configuration::load(const Path &filename) {
 			}
 		} else {
 			// new format
-			f->set_pos(0);
+			f->stream->set_pos(0);
 			string _namespace;
-			while (!f->end()) {
+			while (!f->stream->is_end()) {
 				string s = f->read_str();
 				if (s.num == 0)
 					continue;
@@ -140,7 +140,7 @@ bool Configuration::load(const Path &filename) {
 		}
 //		for (auto &k: map.keys())
 //			msg_write("config:  " + k + " := " + map[k]);
-		FileClose(f);
+		delete f;
 		loaded = true;
 		changed = false;
 		return true;
@@ -191,7 +191,7 @@ string config_get_base(const string &key) {
 void Configuration::save(const Path &filename) {
 	dir_create(filename.parent());
 	try {
-		File *f = FileCreateText(filename);
+		auto f = new TextLinesFormatter(file_open(filename, "wt"));
 		Set<string> namespaces;
 		for (auto &e: map)
 			namespaces.add(config_get_namespace(e.key));
@@ -210,7 +210,7 @@ void Configuration::save(const Path &filename) {
 			f->write_str("");
 		for (auto &s: comments)
 			f->write_str(s);
-		FileClose(f);
+		delete f;
 		loaded = true;
 		changed = false;
 	} catch(Exception &e) {

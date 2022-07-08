@@ -171,7 +171,7 @@ void file_delete(const Path &filename) {
 
 string file_hash(const Path &filename, const string &type) {
 	if (type == "md5") {
-		return FileRead(filename).md5();
+		return file_read_binary(filename).md5();
 	}
 	return "";
 }

@@ -28,7 +28,7 @@ class CueSplitter extends TsunamiPlugin
 		var parts: Part*[]
 		var cur: Part* = nil
 		try
-			var f = Filesystem.open_text(filename)
+			var f = new TextLinesFormatter(fs.open(filename, "rt"))
 			while true
 				string s
 				f >> s

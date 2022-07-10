@@ -450,6 +450,7 @@ void SIAddPackageOS() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, term_p(&KabaCommandLineParser::__init__));
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, term_p(&KabaCommandLineParser::__delete__));
 		class_add_func("info", TypeVoid, term_p(&CommandLineParser::info));
+			func_add_param("cmd", TypeString);
 			func_add_param("i", TypeString);
 		class_add_func("show", TypeVoid, term_p(&CommandLineParser::show));
 		class_add_func("parse", TypeVoid, term_p(&KabaCommandLineParser::parse1));

@@ -69,7 +69,7 @@ class FontList
 
 	#string[] find_drumsets()
 	func mut update()
-		var list = Filesystem.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
+		var list = fs.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
 		for e in list
 			string name = str(e)[:-5]
 			if find(name) >= 0

@@ -65,7 +65,7 @@ Tsunami::Tsunami() :
 	set_property("version", AppVersion + " \"" + AppNickname + "\"");
 	set_property("comment", _("Editor for audio files"));
 	set_property("website", "http://michi.is-a-geek.org/software");
-	set_property("copyright", "© 2007-2021 by Michael Ankele");
+	set_property("copyright", "© 2007-2022 by Michael Ankele");
 	set_property("author", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
 	//set_property("designer", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
 	set_property("documenter", "no one :P");
@@ -154,7 +154,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	auto flags = Storage::Flags::NONE;
 
 	CommandLineParser p;
-	p.info(AppName + " - the ultimate audio editor", "tsunami");//AppName + " " + AppVersion);
+	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
 	p.option("--slow", "", [] {
 		ugly_hack_slow = true;
 	});
@@ -200,10 +200,10 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		BackupManager::check_old_files(Session::GLOBAL);
 		allow_window = true;
 	});
-	p.cmd("--help", "", "show this info", [&p] (const Array<string> &) {
+	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {
 		p.show();
 	});
-	p.cmd("--info", "<FILE1> ...", "show information about the file", [session, &flags] (const Array<string> &a) {
+	p.cmd("info", "FILE1 ...", "show information about the file", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -215,7 +215,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			}
 		delete song;
 	});
-	p.cmd("--diff", "<FILE1> <FILE2>", "compare 2 files", [session, &flags] (const Array<string> &a) {
+	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		session->log->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -233,7 +233,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		delete song1;
 		delete song2;
 	});
-	p.cmd("--export", "<FILE_IN> <FILE_OUT>", "convert a file", [session, &flags] (const Array<string> &a) {
+	p.cmd("export", "FILE_IN FILE_OUT", "convert a file", [session, &flags] (const Array<string> &a) {
 		session->storage->allow_gui = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
@@ -241,24 +241,24 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			session->storage->save(song, a[1]);
 		delete song;
 	});
-	p.cmd("--execute", "<PLUGIN> ...", "just run a plugin", [this, &session] (const Array<string> &a) {
+	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {
 		device_manager->init();
 		session = SessionManager::create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 	});
-	p.cmd("--session", "<SESSION> ...", "restore a saved session", [this, &session] (const Array<string> &a) {
+	p.cmd("session", "SESSION ...", "restore a saved session", [this, &session] (const Array<string> &a) {
 		SessionManager::load_session(SessionManager::directory() << (a[0] + ".session"));
 	});
 #ifndef NDEBUG
-	p.cmd("--list-tests", "", "debug: list internal unit tests", [] (const Array<string> &) {
+	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
 		UnitTest::print_all_names();
 	});
-	p.cmd("--run-tests", "<FILTER>", "debug: run internal unit tests", [] (const Array<string> &a) {
+	p.cmd("test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
 		UnitTest::run_all(a[0]);
 	});
-	p.cmd("--preview-gui", "<TYPE> <NAME>", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
+	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
 		session = SessionManager::create_session();
 		session->win->hide();
 		Module *m = nullptr;

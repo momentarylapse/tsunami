@@ -18,7 +18,7 @@ class ImportNKI extends TsunamiPlugin
 		var dir = Path(str(filename)[:-4] + " Samples")
 		print(dir)
 		
-		var list = Filesystem.search(dir, "*.wav", "f")
+		var list = fs.search(dir, "*.wav", "f")
 		for e in list
 		
 			AudioBuffer buf

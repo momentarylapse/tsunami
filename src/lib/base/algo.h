@@ -100,4 +100,19 @@ Array<T> reverse(const Array<T> &array) {
 	return r;
 }
 
+template<class T, class F>
+void sort(Array<T> &array, F f) {
+	for (int i=0; i<array.num; i++)
+		for (int j=i+1; j<array.num; j++)
+			if (!f(array[i], array[j]))
+				array.swap(i, j);
+}
+
+template<class T, class F>
+Array<T> sorted(const Array<T> &array, F f) {
+	auto r = array;
+	sort(r, f);
+	return r;
+}
+
 #endif /* SRC_LIB_BASE_ALGO_H_ */

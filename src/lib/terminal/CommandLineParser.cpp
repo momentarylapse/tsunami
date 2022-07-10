@@ -6,6 +6,7 @@
  */
 
 #include "CommandLineParser.h"
+#include "../base/algo.h"
 #include "../file/msg.h"
 
 
@@ -25,29 +26,49 @@ void CommandLineParser::cmd(const string &name, const string &params, const stri
 	if (names.num == 0)
 		names.add({});
 	commands.add({names, params.explode(" "), comment, cb});
-
-	// make sure short commands are last
-	for (int i=0; i<commands.num; i++)
-		for (int j=i+1; j<commands.num; j++)
-			if (commands[i].names[0].num < commands[j].names[0].num)
-				commands.swap(i, j);
 }
 
-void CommandLineParser::info(const string &i, const string &p) {
-	_info = i;
+void CommandLineParser::info(const string &p, const string &i) {
 	_program = p;
+	_info = i;
+}
+
+static string format_title_with_block(const string &title, const string block, int n = 28) {
+	string s = "  " + title;
+	if (s.num + 2 <= n)
+		s += string(" ").repeat(n - s.num);
+	else
+		s += "\n" + string(" ").repeat(n);
+	return s + block;
 }
 
 void CommandLineParser::show() {
+	int non_default_commands = count_if(commands, [] (const Command &c) { return !c.is_default(); });
+	bool has_default_command = find_if(commands, [] (const Command &c) { return c.is_default(); });
+
+	if (has_default_command) {
+		for (auto &c: commands)
+			if (c.is_default())
+				msg_write(format("usage:    %s%s", _program, c.sig()));
+		if (non_default_commands > 0)
+			msg_write(format("          %s  [COMMANDS]", _program));
+	} else {
+		msg_write(format("usage:    %s  [COMMANDS]", _program));
+	}
 	msg_write(_info);
-	msg_write("");
-	msg_write("commands:");
-	for (auto &c: commands)
-		msg_write(format("  %-30s # %s", c.sig(), c.comment));
-	msg_write("");
-	msg_write("options:");
-	for (auto &o: options)
-		msg_write(format("  %-30s # %s", o.sig(), o.comment));
+
+	if (non_default_commands > 0) {
+		msg_write("\ncommands:");
+		for (auto &c: commands)
+			if (!c.is_default())
+				msg_write(format_title_with_block(c.sig(), c.comment));
+	}
+
+	if (options.num > 0) {
+		msg_write("\noptions:");
+		for (auto &o: options)
+			msg_write(format_title_with_block(o.sig(), o.comment));
+	}
 }
 
 
@@ -88,7 +109,8 @@ int CommandLineParser::do_option(const string &name, const Array<string> &arg_re
 
 bool CommandLineParser::parse_commands(const Array<string> &arg) {
 	//msg_write("ARG: " + sa2s(arg));
-	for (auto &c: commands) {
+	auto sorted_commands = sorted(commands, [] (const Command &a, const Command &b) { return a.names[0].num > b.names[0].num; });
+	for (auto &c: sorted_commands) {
 		int offset;
 		if (c.match(arg, offset)) {
 			//msg_write(" -->> " + c.sig() + format("   %d %d %d", offset, arg.num, c.min_params()));
@@ -166,7 +188,8 @@ bool CommandLineParser::Command::match(const Array<string> &arg, int &offset) co
 		bool ok = true;
 		for (int i=0; i<nn.num; i++)
 			if (arg[i] != nn[i])
-				ok = false;
+				if (i == 0 and arg[i] != "--" + nn[i])
+					ok = false;
 		//msg_write(ok);
 		if (ok) {
 			offset = nn.num;
@@ -191,4 +214,8 @@ string CommandLineParser::Command::sig() const {
 	for (auto &nn: names)
 		s.add(implode(nn, " "));
 	return implode(s, ", ") + "  " + implode(params, "  ");
+}
+
+bool CommandLineParser::Command::is_default() const {
+	return (names.num == 1) and (names[0].num == 0);
 }

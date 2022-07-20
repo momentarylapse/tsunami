@@ -192,7 +192,7 @@ public:
 		return -1;
 	}
 	template<class O>
-	const O _cdecl sub_ref_as(int start, int end = MAGIC_END_INDEX) const {
+	O _cdecl sub_ref_as(int start, int end = MAGIC_END_INDEX) const {
 		//return reinterpret_cast<Array<T>>(DynamicArray::ref_subarray(start, end));
 		O s;
 		if (start < 0)
@@ -209,6 +209,9 @@ public:
 		return s;
 	}
 	const Array<T> _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const {
+		return sub_ref_as<Array<T>>(start, end);
+	}
+	Array<T> _cdecl sub_ref_nc(int start, int end = MAGIC_END_INDEX) {
 		return sub_ref_as<Array<T>>(start, end);
 	}
 

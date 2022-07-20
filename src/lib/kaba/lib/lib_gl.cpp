@@ -1,17 +1,16 @@
-#include "../../file/file.h"
 #include "../kaba.h"
-#include "../../config.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
 
-#ifdef _X_USE_NIX_
+#if __has_include("../../nix/nix.h") && HAS_LIB_GL
+	#define KABA_EXPORT_GL
 	#include "../../nix/nix.h"
 #endif
 
 namespace kaba {
 
 
-#if defined(_X_USE_NIX_) && HAS_LIB_GL
+#ifdef KABA_EXPORT_GL
 	#define gl_p(p)		p
 
 

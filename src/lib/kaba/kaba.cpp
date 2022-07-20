@@ -6,14 +6,13 @@
 |                                                                              |
 | last updated: 2010.07.07 (c) by MichiSoft TM                                 |
 \*----------------------------------------------------------------------------*/
-#include "../file/file.h"
+#include "../os/file.h"
+#include "../os/msg.h"
 #include "kaba.h"
 #include "parser/Parser.h"
 #include "parser/Concretifier.h"
 #include "Interpreter.h"
 #include <cassert>
-
-#include "../config.h"
 
 #ifdef OS_LINUX
 	#include <sys/mman.h>

@@ -8,6 +8,7 @@
 |                                                                              |
 | last updated: 2010.07.14 (c) by MichiSoft TM                                 |
 \*----------------------------------------------------------------------------*/
+#include "msg.h"
 #include "file.h"
 #include <stdio.h>
 #include <stdarg.h>

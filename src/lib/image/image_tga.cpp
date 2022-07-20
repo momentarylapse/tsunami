@@ -1,6 +1,7 @@
 #include "image.h"
 #include <stdio.h>
-#include "../file/file.h"
+#include "../os/file.h"
+#include "../os/msg.h"
 
 //--------------------------------------------------------------------------------------------------
 // tga files

@@ -1,7 +1,7 @@
 #include "image.h"
 #include <stdio.h>
-#include "../file/file.h"
-//#include "../hui/hui.h"
+#include "../os/file.h"
+#include "../os/msg.h"
 
 /*static const char *sys_str_f(const string &s)
 {

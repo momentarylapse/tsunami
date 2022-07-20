@@ -1,4 +1,4 @@
-#include "../../file/file.h"
+#include "../../os/msg.h"
 #include "../../math/math.h"
 #include "../../math/vec2.h"
 #include "../../math/vector.h"
@@ -17,17 +17,17 @@
 #include "lib.h"
 #include "../dynamic/exception.h"
 
-#ifdef _X_USE_ALGEBRA_
+#if __has_include("../../algebra/algebra.h")
 	#include "../../algebra/algebra.h"
 #else
-		typedef int vli;
-		typedef int Crypto;
+	typedef int vli;
+	typedef int Crypto;
 #endif
 
-#ifdef _X_USE_ANY_
+#if __has_include("../../any/any.h")
 	#include "../../any/any.h"
 #else
-		typedef int Any;
+	typedef int Any;
 #endif
 
 namespace kaba {

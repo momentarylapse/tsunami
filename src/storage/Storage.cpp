@@ -25,6 +25,7 @@
 #include "../TsunamiWindow.h"
 #include "../Session.h"
 #include "../lib/hui/hui.h"
+#include "../lib/os/filesystem.h"
 #include "../view/helper/Progress.h"
 #include "../stuff/Log.h"
 #include "../data/base.h"

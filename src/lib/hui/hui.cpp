@@ -11,7 +11,7 @@
 
 
 #include "hui.h"
-#include "../file/file.h"
+#include "../os/file.h"
 
 
 #include <stdio.h>
@@ -72,6 +72,7 @@ string ComboBoxSeparator;
 Array<HuiImage> _all_images_;
 
 
+Configuration config;
 
 Array<string> make_args(int num_args, char *args[]) {
 	Array<string> a;

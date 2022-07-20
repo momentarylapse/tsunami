@@ -23,8 +23,8 @@
 #include "../../module/audio/AudioEffect.h"
 #include "../../module/midi/MidiEffect.h"
 #include "../../module/synthesizer/Synthesizer.h"
-#include "../../lib/file/file.h"
-#include "../../lib/xfile/chunked.h"
+#include "../../lib/os/file.h"
+#include "../../lib/doc/chunked.h"
 #include "../../lib/hui/language.h"
 #if HAS_LIB_FLAC
 #include <FLAC/all.h>

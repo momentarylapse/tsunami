@@ -9,7 +9,7 @@
 #include "Parser.h"
 #include "Concretifier.h"
 #include "template.h"
-#include "../../file/msg.h"
+#include "../../os/msg.h"
 
 namespace kaba {
 

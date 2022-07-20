@@ -31,7 +31,6 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	layer = nullptr;
 	track = nullptr;
 	buf = nullptr;
-	timer = new hui::Timer;
 
 	offset = 0;
 	renderer = nullptr;
@@ -51,7 +50,6 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 }
 
 StorageOperationData::~StorageOperationData() {
-	delete timer;
 }
 
 void StorageOperationData::start_progress(const string &message) {
@@ -79,9 +77,9 @@ void StorageOperationData::error(const string& message) {
 }
 
 void StorageOperationData::set(float t) {
-	if (timer->peek() < PROGRESS_UPDATE_DT)
+	if (timer.peek() < PROGRESS_UPDATE_DT)
 		return;
-	timer->get();
+	timer.get();
 	progress->set(t);
 }
 

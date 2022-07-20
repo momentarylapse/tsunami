@@ -9,7 +9,6 @@
 #define _IMAGE_EXISTS_
 
 
-#include "../config.h"
 #include "../base/base.h"
 #include "color.h"
 

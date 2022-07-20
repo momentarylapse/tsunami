@@ -7,7 +7,7 @@
 
 #include "CommandLineParser.h"
 #include "../base/algo.h"
-#include "../file/msg.h"
+#include "../os/msg.h"
 
 
 void CommandLineParser::option(const string &name, const string &comment, Callback cb) {
@@ -42,22 +42,27 @@ static string format_title_with_block(const string &title, const string block, i
 	return s + block;
 }
 
-void CommandLineParser::show() {
-	int non_default_commands = count_if(commands, [] (const Command &c) { return !c.is_default(); });
-	bool has_default_command = find_if(commands, [] (const Command &c) { return c.is_default(); });
+int CommandLineParser::non_default_commands() const {
+	return count_if(commands, [] (const Command &c) { return !c.is_default(); });
+}
 
-	if (has_default_command) {
+CommandLineParser::Command *CommandLineParser::default_command() const {
+	return find_if(commands, [] (const Command &c) { return c.is_default(); });
+}
+
+void CommandLineParser::show() {
+	if (default_command()) {
 		for (auto &c: commands)
 			if (c.is_default())
 				msg_write(format("usage:    %s%s", _program, c.sig()));
-		if (non_default_commands > 0)
+		if (non_default_commands() > 0)
 			msg_write(format("          %s  [COMMANDS]", _program));
 	} else {
 		msg_write(format("usage:    %s  [COMMANDS]", _program));
 	}
 	msg_write(_info);
 
-	if (non_default_commands > 0) {
+	if (non_default_commands() > 0) {
 		msg_write("\ncommands:");
 		for (auto &c: commands)
 			if (!c.is_default())
@@ -82,10 +87,16 @@ Array<string> CommandLineParser::parse_options(const Array<string> &arg) {
 				if (_offset > 0)
 					is_command = true;
 
-		if (!is_command and arg[i].head(1) == "-")
+		if (!is_command and arg[i].head(1) == "-") {
 			i += do_option(arg[i], arg.sub_ref(i+1));
-		else
+		} else if (auto d = default_command()) {
+			// FIXME (just a hack for now)
+			if (d->params.back() == "...")
+				return arg.sub_ref(i);
 			arg2.add(arg[i]);
+		} else {
+			arg2.add(arg[i]);
+		}
 	}
 	return arg2;
 }
@@ -109,7 +120,7 @@ int CommandLineParser::do_option(const string &name, const Array<string> &arg_re
 
 bool CommandLineParser::parse_commands(const Array<string> &arg) {
 	//msg_write("ARG: " + sa2s(arg));
-	auto sorted_commands = sorted(commands, [] (const Command &a, const Command &b) { return a.names[0].num > b.names[0].num; });
+	auto sorted_commands = sorted(commands, [] (const Command &a, const Command &b) { return a.names[0].num >= b.names[0].num; });
 	for (auto &c: sorted_commands) {
 		int offset;
 		if (c.match(arg, offset)) {
@@ -202,7 +213,7 @@ bool CommandLineParser::Command::match(const Array<string> &arg, int &offset) co
 int CommandLineParser::Command::min_params() const {
 	int m = 0;
 	for (auto &p: params) {
-		if (p == "..." or p.head(1) == "[")
+		if (p == "..." or p == "...!" or p.head(1) == "[")
 			continue;
 		m ++;
 	}

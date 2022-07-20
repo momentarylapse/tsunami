@@ -11,13 +11,13 @@
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
 #include "../lib/any/any.h"
-#include "../lib/file/path.h"
+#include "../lib/os/path.h"
+#include "../lib/os/time.h"
 
 class Song;
 class Progress;
 namespace hui {
 	class Window;
-	class Timer;
 }
 class AudioBuffer;
 class Track;
@@ -61,7 +61,7 @@ public:
 	Session *session;
 	Song *song;
 	owned<Progress> progress;
-	hui::Timer *timer;
+	os::Timer timer;
 	Path filename;
 	AudioBuffer *buf;
 	int channels_suggested;

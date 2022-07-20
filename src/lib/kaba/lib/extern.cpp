@@ -11,7 +11,7 @@
 #include "../syntax/Function.h"
 #include "../syntax/SyntaxTree.h"
 #include "../../base/base.h"
-#include "../../file/msg.h"
+#include "../../os/msg.h"
 
 namespace kaba {
 

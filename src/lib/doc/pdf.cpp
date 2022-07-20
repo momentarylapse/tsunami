@@ -10,7 +10,9 @@
 #include "../image/Painter.h"
 #include "../math/rect.h"
 #include "../math/vec2.h"
-#include "../file/file.h"
+#include "../os/file.h"
+#include "../os/filesystem.h"
+#include "../os/msg.h"
 
 namespace pdf {
 

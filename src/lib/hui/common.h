@@ -11,7 +11,6 @@
 #define _HUI_COMMON_EXISTS_
 
 
-#include "../config.h"
 #include "../base/base.h"
 #include <functional>
 
@@ -48,7 +47,7 @@
 #endif
 
 
-#include "../file/file.h"
+#include "../os/msg.h"
 
 
 typedef struct _XDisplay Display; // Xorg

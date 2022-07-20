@@ -8,7 +8,7 @@
 \*----------------------------------------------------------------------------*/
 
 #include "net.h"
-#include "../file/msg.h"
+#include "../os/msg.h"
 
 static bool NetInitialized = false;
 

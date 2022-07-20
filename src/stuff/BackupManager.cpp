@@ -9,6 +9,9 @@
 #include "../data/Track.h"
 #include "../Tsunami.h"
 #include "../Session.h"
+#include "../lib/os/date.h"
+#include "../lib/os/file.h"
+#include "../lib/os/filesystem.h"
 
 Array<BackupManager::BackupFile> BackupManager::files;
 int BackupManager::next_uuid;

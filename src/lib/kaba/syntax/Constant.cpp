@@ -7,7 +7,6 @@
 #include "../kaba.h"
 #include "../dynamic/dynamic.h"
 #include "../asm/asm.h"
-#include "../../file/file.h"
 #include <stdio.h>
 
 namespace kaba {

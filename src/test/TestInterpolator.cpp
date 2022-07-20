@@ -51,7 +51,7 @@ void TestInterpolator::test_linear()
 	assert_equal(out, {1, 1.5, 2, 1, 0, 2, 4});
 }
 
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 
 void TestInterpolator::test_cubic()
 {

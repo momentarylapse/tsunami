@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
-#include "../lib/file/path.h"
+#include "../lib/os/path.h"
 
 namespace kaba {
 	class Module;

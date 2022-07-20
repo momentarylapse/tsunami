@@ -11,6 +11,8 @@
 #if !defined(MSG_H)
 #define MSG_H
 
+#include "../base/base.h"
+
 class Path;
 
 

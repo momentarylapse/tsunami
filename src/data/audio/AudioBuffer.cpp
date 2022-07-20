@@ -8,7 +8,7 @@
 #include "AudioBuffer.h"
 #include "../base.h"
 #include "../../lib/math/math.h"
-#include "../../lib/file/msg.h"
+#include "../../lib/os/msg.h"
 //#include <math.h>
 #include <assert.h>
 

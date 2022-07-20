@@ -24,7 +24,7 @@ Progress::Progress(const string &str, hui::Window *parent) : Progress() {
 Progress::Progress() {
 	cancelled = false;
 	allow_next = 0;
-	timer = new hui::Timer;
+	timer = new os::Timer;
 }
 
 

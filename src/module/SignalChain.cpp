@@ -16,8 +16,9 @@
 #include "beats/BeatSource.h"
 #include "../Session.h"
 #include "../plugins/PluginManager.h"
-#include "../lib/file/file.h"
-#include "../lib/xfile/xml.h"
+#include "../lib/os/file.h"
+#include "../lib/os/time.h"
+#include "../lib/doc/xml.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../stuff/PerformanceMonitor.h"
@@ -53,11 +54,11 @@ public:
 				if (r == Port::END_OF_STREAM)
 					break;
 				if (r == Port::NOT_ENOUGH_DATA) {
-					hui::Sleep(chain->no_data_wait);
+					os::sleep(chain->no_data_wait);
 					continue;
 				}
 			} else {
-				hui::Sleep(0.200f);
+				os::sleep(0.200f);
 			}
 			Thread::cancelation_point();
 		}

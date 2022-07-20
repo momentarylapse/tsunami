@@ -16,8 +16,7 @@
 class Device;
 class DeviceManager;
 class Session;
-
-namespace hui {
+namespace os {
 	class Timer;
 }
 
@@ -98,7 +97,7 @@ private:
 
 	int npfd;
 	struct pollfd *pfd;
-	hui::Timer *timer;
+	os::Timer *timer;
 	double offset;
 
 public:

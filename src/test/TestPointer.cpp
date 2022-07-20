@@ -9,7 +9,7 @@
 #include "TestPointer.h"
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 
 
 

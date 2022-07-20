@@ -17,6 +17,7 @@
 #include "../../math/complex.h"
 #include "../../any/any.h"
 #include "../../base/callable.h"
+#include "../../os/msg.h"
 
 
 namespace kaba {
@@ -727,11 +728,11 @@ void init(Abi abi, bool allow_std_lib) {
 	SIAddPackageTime();
 	SIAddPackageOS();
 	SIAddPackageImage();
-	SIAddPackageHui();
+	SIAddPackageDoc();
+	SIAddPackageHui(); // depends on doc
 	SIAddPackageGl();
 	SIAddPackageNet();
 	SIAddPackageThread();
-	SIAddPackageDoc();
 	SIAddPackageVulkan();
 
 	add_package("base");

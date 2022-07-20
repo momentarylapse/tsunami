@@ -9,6 +9,7 @@
 
 #include "hui.h"
 #include "internal.h"
+#include "../os/filesystem.h"
 
 #ifdef OS_WINDOWS
 #include <windows.h>

@@ -10,6 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../lib/math/rect.h"
+#include "../../lib/os/time.h"
 
 class Song;
 class AudioView;
@@ -24,7 +25,7 @@ public:
 	void set_dirty();
 	bool animating;
 	rect render_area;
-	hui::Timer timer;
+	os::Timer timer;
 
 	bool check(Song *s);
 	bool update(AudioView *v, Song *s, const rect &r);

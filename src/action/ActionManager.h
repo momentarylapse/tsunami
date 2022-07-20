@@ -16,7 +16,7 @@ class Data;
 class Action;
 class ActionGroup;
 //class Mutex;
-namespace hui {
+namespace os {
 	class Timer;
 }
 
@@ -75,6 +75,6 @@ private:
 	Action *prev_action = nullptr;
 
 	// for merging
-	owned<hui::Timer> timer;
+	owned<os::Timer> timer;
 };
 

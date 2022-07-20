@@ -35,7 +35,9 @@ namespace kaba {
 
 static const int DEFAULT_CHUNK_SIZE = 512;
 
-extern void require_main_thread(const string&);
+namespace os {
+	extern void require_main_thread(const string&);
+}
 
 #if HAS_LIB_PULSEAUDIO
 extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
@@ -307,7 +309,7 @@ void AudioInput::_kill_dev() {
 }
 
 void AudioInput::stop() {
-	require_main_thread("in.stop");
+	os::require_main_thread("in.stop");
 	session->i(_("capture audio stop"));
 	_pause();
 }
@@ -445,7 +447,7 @@ void AudioInput::_unpause() {
 }
 
 bool AudioInput::start() {
-	require_main_thread("in.start");
+	os::require_main_thread("in.start");
 	session->i(_("capture audio start"));
 	if (state == State::NO_DEVICE)
 		_create_dev();

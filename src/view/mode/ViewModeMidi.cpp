@@ -17,6 +17,7 @@
 #include "../sidebar/SideBar.h"
 #include "../../module/SignalChain.h"
 #include "../../module/synthesizer/Synthesizer.h"
+#include "../../lib/os/time.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
@@ -152,7 +153,7 @@ void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
 	preview->start(pitch, view->cur_track()->volume, ttl);
 }
 
-static hui::Timer ri_timer;
+static os::Timer ri_timer;
 static MidiEventBuffer ri_keys;
 
 void ViewModeMidi::ri_insert() {

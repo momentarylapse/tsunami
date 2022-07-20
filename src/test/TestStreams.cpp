@@ -8,7 +8,7 @@
 #ifndef NDEBUG
 
 #include "TestStreams.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 #include "../lib/math/math.h"
 #include "../data/base.h"
 #include "../module/audio/AudioSource.h"

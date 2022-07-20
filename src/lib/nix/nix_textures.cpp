@@ -11,7 +11,8 @@
 #include "nix.h"
 #include "nix_common.h"
 #include "../image/image.h"
-#include "../file/file.h"
+#include "../os/msg.h"
+#include "../os/filesystem.h"
 
 // management:
 //  Texture.load()

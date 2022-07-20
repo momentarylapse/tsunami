@@ -1,14 +1,12 @@
-#include "../../file/file.h"
+#include "../../os/file.h"
+#include "../../os/filesystem.h"
+#include "../../os/msg.h"
+#include "../../os/CommandLineParser.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
 #include "../../base/callable.h"
-
-#if __has_include("../../terminal/CommandLineParser.h")
-#define HAS_TERMINAL 1
-#include "../../terminal/CommandLineParser.h"
-#endif
 
 class vector;
 
@@ -351,7 +349,6 @@ public:
 	}
 };
 
-#ifdef HAS_TERMINAL
 class KabaCommandLineParser : CommandLineParser {
 public:
 	void __init__() {
@@ -374,11 +371,6 @@ public:
 		parse(a + arg);
 	}
 };
-#define term_p(p) (p)
-#else
-struct CommandLineParser{};
-#define term_p(p) nullptr
-#endif
 
 void SIAddPackageOS() {
 	add_package("os");
@@ -447,24 +439,24 @@ void SIAddPackageOS() {
 
 
 	add_class(TypeCommandLineParser);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, term_p(&KabaCommandLineParser::__init__));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, term_p(&KabaCommandLineParser::__delete__));
-		class_add_func("info", TypeVoid, term_p(&CommandLineParser::info));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCommandLineParser::__init__);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaCommandLineParser::__delete__);
+		class_add_func("info", TypeVoid, &CommandLineParser::info);
 			func_add_param("cmd", TypeString);
 			func_add_param("i", TypeString);
-		class_add_func("show", TypeVoid, term_p(&CommandLineParser::show));
-		class_add_func("parse", TypeVoid, term_p(&KabaCommandLineParser::parse1));
+		class_add_func("show", TypeVoid, &CommandLineParser::show);
+		class_add_func("parse", TypeVoid, &KabaCommandLineParser::parse1);
 			func_add_param("arg", TypeStringList);
-		class_add_func("option", TypeVoid, term_p(&KabaCommandLineParser::option1));
+		class_add_func("option", TypeVoid, &KabaCommandLineParser::option1);
 			func_add_param("name", TypeString);
 			func_add_param("comment", TypeString);
 			func_add_param("f", TypeCallback);
-		class_add_func("option", TypeVoid, term_p(&KabaCommandLineParser::option2));
+		class_add_func("option", TypeVoid, &KabaCommandLineParser::option2);
 			func_add_param("name", TypeString);
 			func_add_param("p", TypeString);
 			func_add_param("comment", TypeString);
 			func_add_param("f", TypeCallbackString);
-		class_add_func("cmd", TypeVoid, term_p(&KabaCommandLineParser::cmd1));
+		class_add_func("cmd", TypeVoid, &KabaCommandLineParser::cmd1);
 			func_add_param("name", TypeString);
 			func_add_param("p", TypeString);
 			func_add_param("comment", TypeString);

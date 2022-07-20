@@ -13,6 +13,7 @@
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
+#include "../../lib/os/time.h"
 #include "../../plugins/PluginManager.h"
 
 namespace kaba {
@@ -93,7 +94,7 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 	}
 	config.kaba_class = _class;
 
-	timer = new hui::Timer;
+	timer = new os::Timer;
 	offset = 0;
 	pfd = nullptr;
 	npfd = 0;

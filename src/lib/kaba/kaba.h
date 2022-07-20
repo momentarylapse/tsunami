@@ -15,7 +15,7 @@ namespace kaba {
 
 #include "../base/base.h"
 #include "../base/pointer.h"
-#include "../file/path.h"
+#include "../os/path.h"
 #include "asm/asm.h"
 #include "lib/lib.h"
 #include "syntax/SyntaxTree.h"

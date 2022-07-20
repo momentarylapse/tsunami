@@ -6,7 +6,7 @@
  */
 
 #include "../base/base.h"
-#include "../file/file.h"
+#include "../os/file.h"
 #include "chunked.h"
 
 void strip(string &s) {

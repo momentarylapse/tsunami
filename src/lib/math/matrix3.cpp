@@ -1,7 +1,7 @@
 #include "matrix3.h"
 #include "vector.h"
 #include "quaternion.h"
-#include "../file/msg.h"
+#include "../os/msg.h"
 
 //------------------------------------------------------------------------------------------------//
 //                                          3x3-matrices                                          //

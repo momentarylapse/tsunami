@@ -1,17 +1,16 @@
-#include "../../file/file.h"
 #include "../kaba.h"
-#include "../../config.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
 
 
-#ifdef _X_USE_NET_
+#if __has_include("../../net/net.h")
 	#include "../../net/net.h"
+	#define KABA_EXPORT_NET
 #endif
 
 namespace kaba {
 
-#ifdef _X_USE_NET_
+#ifdef KABA_EXPORT_NET
 	#define net_p(p)		p
 	static NetAddress *_addr;
 	#define GetDAAddress(x)			int_p(&_addr->x)-int_p(_addr)
@@ -21,11 +20,6 @@ namespace kaba {
 	typedef int NetAddress;
 	#define net_p(p)		NULL
 	#define GetDAAddress(x)			0
-#endif
-#ifdef _X_ALLOW_X_
-	#define x_p(p)		p
-#else
-	#define x_p(p)		nullptr
 #endif
 
 const Class *TypeNetAddress;

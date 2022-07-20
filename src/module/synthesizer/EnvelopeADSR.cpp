@@ -6,7 +6,7 @@
  */
 
 #include "EnvelopeADSR.h"
-#include "../../lib/file/file.h"
+#include "../../lib/os/file.h"
 #include "../../lib/math/math.h"
 
 EnvelopeADSR::EnvelopeADSR() {

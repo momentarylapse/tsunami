@@ -7,6 +7,7 @@
 
 #include "PerformanceMonitor.h"
 #include "../lib/hui/hui.h"
+#include "../lib/os/time.h"
 #include "../module/Module.h"
 #include <mutex>
 
@@ -14,7 +15,10 @@
 
 static const float UPDATE_DT = 2.0f;
 
-void require_main_thread(const string &);
+
+namespace os {
+	extern void require_main_thread(const string &msg);
+}
 
 // on a slow computer, a group of
 //   start_busy()
@@ -25,7 +29,7 @@ void require_main_thread(const string &);
 static PerformanceMonitor *pm_instance;
 static Array<PerfChannelInfo> pm_info;
 static std::mutex pm_mutex;
-static hui::Timer pm_timer;
+static os::Timer pm_timer;
 
 #if ALLOW_PERF_MON
 struct Channel {
@@ -192,7 +196,7 @@ void PerformanceMonitor::update() {
 }
 
 Array<PerfChannelInfo> PerformanceMonitor::get_info() {
-	require_main_thread("PerfMon.info");
+	os::require_main_thread("PerfMon.info");
 	
 	//std::lock_guard<std::mutex> lock(pm_mutex);
 	return pm_info;

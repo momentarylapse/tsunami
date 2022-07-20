@@ -14,6 +14,7 @@
 #include "../module/midi/MidiEffect.h"
 #include "../module/synthesizer/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
+#include "../lib/os/msg.h"
 #include <math.h>
 
 string i2s_small(int); // MidiData.cpp ?

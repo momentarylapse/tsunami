@@ -13,6 +13,7 @@
 #include "../../data/Sample.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../stuff/PerformanceMonitor.h"
+#include "../../lib/os/time.h"
 
 
 PeakThread::PeakThread(AudioView *_view) {
@@ -39,7 +40,7 @@ void PeakThread::on_run() {
 				//msg_write(":(    " + e.message());
 			}
 		}
-		hui::Sleep(0.05f);
+		os::sleep(0.05f);
 		Thread::cancelation_point();
 	}
 }
@@ -80,7 +81,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		if (buf._peaks_chunk_needs_update(i)) {
 			while (!song->try_lock()) {
 				Thread::cancelation_point();
-				hui::Sleep(0.01f);
+				os::sleep(0.01f);
 				if (!updating)
 					throw Exception("aaa");
 			}

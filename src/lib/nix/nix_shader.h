@@ -10,7 +10,7 @@
 #pragma once
 
 #include "../base/pointer.h"
-#include "../file/path.h"
+#include "../os/path.h"
 
 namespace nix {
 

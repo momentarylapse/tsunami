@@ -9,11 +9,11 @@
 #define PROGRESS_H_
 
 #include "../../lib/base/pointer.h"
+#include "../../lib/os/time.h"
 #include "../../stuff/Observable.h"
 
 namespace hui {
 	class Window;
-	class Timer;
 }
 
 class Progress : public Observable<VirtualBase> {
@@ -37,7 +37,7 @@ public:
 protected:
 	Progress();
 	owned<hui::Window> dlg;
-	owned<hui::Timer> timer;
+	owned<os::Timer> timer;
 	float allow_next;
 	bool cancelled;
 };

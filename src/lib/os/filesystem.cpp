@@ -1,3 +1,6 @@
+#include "filesystem.h"
+#include "../base/algo.h"
+#include "date.h"
 #include "file.h"
 
 #include <sys/stat.h>
@@ -206,18 +209,8 @@ string shell_execute(const string &cmd) {
 #endif
 }
 
-
-void sa_sort_i(Array<string> &a) {
-	for (int i=0; i<a.num-1; i++)
-		for (int j=i+1; j<a.num; j++)
-			if (a[i].icompare(a[j]) > 0)
-				a.swap(i, j);
-}
-
-
-
 // search a directory for files matching a filter
-void dir_search_single(const Path &dir, const string &filter, Array<string> &dir_list, Array<string> &file_list) {
+void dir_search_single(const Path &dir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
 	string filter2 = filter.sub(1);
 
 #ifdef OS_WINDOWS
@@ -266,24 +259,24 @@ void dir_search_single(const Path &dir, const string &filter, Array<string> &dir
 #endif
 
 	// sorting...
-	sa_sort_i(dir_list);
-	sa_sort_i(file_list);
+	inplace_sort(dir_list, [](const Path &a, const Path &b) { return a <= b; });
+	inplace_sort(file_list, [](const Path &a, const Path &b) { return a <= b; });
 }
 
-void dir_search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<string> &dir_list, Array<string> &file_list) {
-	Array<string> sub_dir_list, sub_file_list;
+void dir_search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
+	Array<Path> sub_dir_list, sub_file_list;
 	dir_search_single(dir0 << subdir, filter, sub_dir_list, sub_file_list);
 	for (auto &x: sub_dir_list) {
-		dir_list.add((subdir << x).str());
+		dir_list.add(subdir << x);
 		dir_search_single_rec(dir0, subdir << x, filter, dir_list, file_list);
 	}
 	for (auto &x: sub_file_list)
-		file_list.add((subdir << x).str());
+		file_list.add(subdir << x);
 }
 
 // search a directory for files matching a filter
 Array<Path> dir_search(const Path &dir, const string &filter, const string &options) {
-	Array<string> dir_list, file_list;
+	Array<Path> dir_list, file_list;
 
 	bool show_files = options.find("f") >= 0;
 	bool show_dirs = options.find("d") >= 0;
@@ -300,11 +293,9 @@ Array<Path> dir_search(const Path &dir, const string &filter, const string &opti
 	
 	Array<Path> r;
 	if (show_dirs)
-		for (auto &x: dir_list)
-			r.add(x);
+		r.append(dir_list);
 	if (show_files)
-		for (auto &x: file_list)
-			r.add(x);
+		r.append(file_list);
 	return r;
 }
 

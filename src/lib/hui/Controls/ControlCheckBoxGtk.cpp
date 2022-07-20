@@ -6,8 +6,8 @@
  */
 
 #include "ControlCheckBox.h"
-#include "../Config.h"
 #include "../Event.h"
+#include "../hui.h"
 
 #ifdef HUI_API_GTK
 

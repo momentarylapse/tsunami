@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_LIB_FILE_PATH_H_
-#define SRC_LIB_FILE_PATH_H_
+#ifndef SRC_LIB_OS_PATH_H_
+#define SRC_LIB_OS_PATH_H_
 
 #include "../base/base.h"
 
@@ -29,6 +29,8 @@ public:
 	bool operator!=(const Path &p) const;
 	bool operator<(const Path &p) const;
 	bool operator>(const Path &p) const;
+	bool operator<=(const Path &p) const;
+	bool operator>=(const Path &p) const;
 	explicit operator bool() const;
 	int compare(const Path &p) const;
 
@@ -61,4 +63,4 @@ private:
 };
 
 
-#endif /* SRC_LIB_FILE_PATH_H_ */
+#endif /* SRC_LIB_OS_PATH_H_ */

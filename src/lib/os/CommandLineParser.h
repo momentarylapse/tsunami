@@ -58,6 +58,9 @@ private:
 	bool parse_commands(const Array<string> &arg);
 	Array<string> parse_options(const Array<string> &arg);
 	int do_option(const string &name, const Array<string> &args);
+
+	int non_default_commands() const;
+	Command *default_command() const;
 };
 
 

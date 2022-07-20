@@ -33,27 +33,10 @@
 #include <stdlib.h>
 	
 #include "formatter.h"
-#include "msg.h"
-#include "file_op.h"
 #include "path.h"
 
 
-
-//--------------------------------------------------------------
-// time/date
-
-class Date {
-public:
-	int64 time;
-	int milli_second;
-	int dummy[7];
-	string _cdecl format(const string &f) const;
-	string _cdecl str() const;
-	void __assign__(const Date &d);
-
-	static Date _cdecl now();
-};
-
+class Date;
 
 
 class FileError : public Exception {

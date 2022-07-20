@@ -63,6 +63,7 @@
 #include "../view/painter/MidiPainter.h"
 #include "../view/painter/MultiLinePainter.h"
 #include "../lib/base/callable.h"
+#include "../lib/os/filesystem.h"
 
 namespace kaba {
 	extern shared_array<Module> public_modules;

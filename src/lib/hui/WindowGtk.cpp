@@ -4,6 +4,7 @@
 #include "internal.h"
 #include "Toolbar.h"
 #include "../base/pointer.h"
+#include "../os/time.h"
 #ifdef HUI_API_GTK
 
 
@@ -368,7 +369,7 @@ void Window::_run(Callback cb) {
 	} else {*/
 		while (!requested_destroy) {
 			Application::do_single_main_loop();
-			Sleep(0.005f);
+			os::sleep(0.005f);
 		}
 //	}
 //#endif

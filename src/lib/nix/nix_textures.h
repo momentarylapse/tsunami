@@ -12,7 +12,7 @@
 #define _NIX_TEXTURES_EXISTS_
 
 #include "../base/pointer.h"
-#include "../file/path.h"
+#include "../os/path.h"
 
 namespace nix{
 

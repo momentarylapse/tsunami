@@ -62,6 +62,8 @@
 #include "plugins/FastFourierTransform.h"
 #include "view/helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
+#include "lib/os/date.h"
+#include "lib/os/filesystem.h"
 #include "device/DeviceManager.h"
 #include "view/audioview/graph/AudioViewLayer.h"
 #include "view/audioview/graph/AudioViewTrack.h"

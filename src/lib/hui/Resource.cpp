@@ -1,4 +1,6 @@
 #include "hui.h"
+#include "../os/file.h"
+#include "../os/filesystem.h"
 #include "../math/math.h"
 #include "Controls/Control.h"
 #include "internal.h"

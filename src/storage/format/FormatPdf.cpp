@@ -6,13 +6,13 @@
  */
 
 #include "FormatPdf.h"
+#include "../dialog/PdfConfigDialog.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
 #include "../../data/SongSelection.h"
-#include "../../lib/xfile/pdf.h"
+#include "../../lib/doc/pdf.h"
 #include "../../lib/math/rect.h"
-#include "../dialog/PdfConfigDialog.h"
 #include "../../view/ColorScheme.h"
 #include "../../view/helper/SymbolRenderer.h"
 #include "../../view/HoverData.h"

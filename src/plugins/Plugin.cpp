@@ -9,6 +9,8 @@
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/hui/hui.h"
+#include "../lib/os/filesystem.h"
+#include "../lib/os/date.h"
 
 
 Plugin::Plugin(const Path &_filename, ModuleCategory _type) {

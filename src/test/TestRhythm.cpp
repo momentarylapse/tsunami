@@ -10,7 +10,7 @@
 #include "TestRhythm.h"
 #include "../data/rhythm/Bar.h"
 #include "../data/rhythm/Beat.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 
 TestRhythm::TestRhythm() : UnitTest("rhythm") {
 }

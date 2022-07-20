@@ -8,7 +8,8 @@
 #ifndef NDEBUG
 
 #include "TestMidiPreview.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
+#include "../lib/os/time.h"
 #include "../view/helper/MidiPreview.h"
 #include "../module/synthesizer/Synthesizer.h"
 #include "../module/midi/MidiPreviewSource.h"

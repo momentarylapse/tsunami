@@ -11,6 +11,7 @@
 #include "Module.h"
 #include "../lib/kaba/syntax/Class.h"
 #include "../lib/kaba/syntax/SyntaxTree.h"
+#include "../lib/os/msg.h"
 #include "../data/SampleRef.h"
 #include "../data/Sample.h"
 #include "../data/Song.h"

@@ -2,7 +2,7 @@
 #include "vector.h"
 #include "plane.h"
 #include "quaternion.h"
-#include "../file/msg.h"
+#include "../os/msg.h"
 
 // ZXY -> object transformation
 // der Vektor nach vorne (0,0,1) wird

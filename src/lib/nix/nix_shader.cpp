@@ -9,7 +9,8 @@
 
 #include "nix.h"
 #include "nix_common.h"
-#include "../file/file.h"
+#include "../os/file.h"
+#include "../os/msg.h"
 
 namespace nix {
 

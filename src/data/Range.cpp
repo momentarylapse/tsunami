@@ -6,7 +6,7 @@
  */
 
 #include "Range.h"
-#include "../lib/file/file.h"
+#include "../lib/os/file.h"
 
 const int Range::BEGIN = -1000000000; // just less than 0x4000.0000, so that also length < 0x8000.000 (staying positive)
 const int Range::END = 1000000000;

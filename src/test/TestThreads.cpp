@@ -8,7 +8,7 @@
 #ifndef NDEBUG
 
 #include "TestThreads.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Thread.h"
 
@@ -25,7 +25,7 @@ void TestThreads::test_thread_safety() {
 	class DebugThread : public Thread {
 		void on_run() override {
 			for (int i=0; i<10; i++) {
-				hui::Sleep(0.1f);
+				sleep(0.1f);
 			}
 		}
 

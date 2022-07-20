@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../base/base.h"
-#include "../file/path.h"
+#include "../os/path.h"
 
 namespace Asm {
 	enum class InstructionSet;

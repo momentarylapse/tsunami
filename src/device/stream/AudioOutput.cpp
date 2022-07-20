@@ -31,7 +31,9 @@ static const bool STREAM_WARNINGS = false;
 const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 
 
-extern void require_main_thread(const string &msg); // hui
+namespace os {
+	extern void require_main_thread(const string &msg);
+}
 
 #if HAS_LIB_PULSEAUDIO
 
@@ -402,7 +404,7 @@ void AudioOutput::_kill_dev() {
 
 
 void AudioOutput::stop() {
-	require_main_thread("out.stop");
+	os::require_main_thread("out.stop");
 	_pause();
 }
 
@@ -502,7 +504,7 @@ void AudioOutput::set_device(Device *d) {
 }
 
 void AudioOutput::start() {
-	require_main_thread("out.start");
+	os::require_main_thread("out.start");
 	if (state == State::NO_DEVICE)
 		_create_dev();
 
@@ -629,7 +631,7 @@ void AudioOutput::reset_state() {
 		return;
 	if (state == State::PLAYING)
 		_pause();
-	require_main_thread("out.reset");
+	os::require_main_thread("out.reset");
 	if (state == State::PAUSED) {
 		device_manager->lock();
 #if HAS_LIB_PULSEAUDIO

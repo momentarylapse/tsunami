@@ -8,7 +8,7 @@
 
 #include "net.h"
 #include "Socket.h"
-#include "../file/msg.h"
+#include "../os/msg.h"
 
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
 //#if defined(OS_WINDOWS)

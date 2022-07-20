@@ -11,7 +11,7 @@
 #include "CommandList.h"
 #include "SerialNode.h"
 #include "../asm/asm.h"
-#include "../../file/msg.h"
+#include "../../os/msg.h"
 
 
 namespace Asm{

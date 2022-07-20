@@ -7,8 +7,8 @@
 
 #include "SessionManager.h"
 #include "../lib/base/base.h"
-#include "../lib/file/file_op.h"
-#include "../lib/xfile/xml.h"
+#include "../lib/os/filesystem.h"
+#include "../lib/doc/xml.h"
 #include "../data/base.h"
 #include "../data/Song.h"
 #include "../data/SongSelection.h"

@@ -8,7 +8,7 @@
 
 #include "ErrorHandler.h"
 #include "../lib/base/base.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/hui/error.h"
 

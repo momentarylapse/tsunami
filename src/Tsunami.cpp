@@ -7,7 +7,7 @@
 
 #include "Tsunami.h"
 #include "lib/base/pointer.h"
-#include "lib/terminal/CommandLineParser.h"
+#include "lib/os/CommandLineParser.h"
 #include "data/base.h"
 #include "data/Song.h"
 #include "data/Track.h"

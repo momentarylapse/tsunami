@@ -9,8 +9,8 @@
 #include "Action.h"
 #include "ActionMergable.h"
 #include "ActionGroup.h"
-#include "../lib/file/msg.h"
-#include "../lib/hui/Timer.h"
+#include "../lib/os/msg.h"
+#include "../lib/os/time.h"
 #include "../data/Data.h"
 #include <assert.h>
 
@@ -35,7 +35,7 @@ ActionManager::ActionManager(Data *_data) {
 	data = _data;
 	cur_group = nullptr;
 	lock_level = 0;
-	timer = new hui::Timer;
+	timer = new os::Timer;
 	reset();
 }
 

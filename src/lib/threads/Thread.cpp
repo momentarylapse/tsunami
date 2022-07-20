@@ -1,6 +1,6 @@
 #include "Thread.h"
 
-#include "../file/file.h"
+#include "../os/msg.h"
 
 
 #ifdef OS_WINDOWS

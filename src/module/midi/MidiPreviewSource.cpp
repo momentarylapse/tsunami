@@ -9,7 +9,7 @@
 #include "MidiPreviewSource.h"
 #include "../../data/midi/MidiData.h"
 #include "../../Session.h"
-#include "../../lib/file/msg.h"
+#include "../../lib/os/msg.h"
 
 
 MidiPreviewSource::MidiPreviewSource() {

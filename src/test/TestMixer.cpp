@@ -15,7 +15,7 @@
 #include "../data/TrackLayer.h"
 #include "../data/audio/AudioBuffer.h"
 #include "../module/audio/SongRenderer.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
 #include <math.h>
 
 const float sqrt2 = (float)sqrt(2.0);

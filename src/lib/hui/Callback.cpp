@@ -6,6 +6,7 @@
  */
 
 #include "hui.h"
+#include "../os/time.h"
 #include <mutex>
 
 namespace hui {
@@ -71,7 +72,7 @@ static std::mutex runner_mutex;
 		if (_idle_function_)
 			_idle_function_();
 		else
-			Sleep(0.010f);
+			os::sleep(0.010f);
 		return TRUE;
 	}
 

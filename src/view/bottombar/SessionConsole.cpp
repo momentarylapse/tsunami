@@ -6,7 +6,7 @@
  */
 
 #include "SessionConsole.h"
-#include "../../lib/file/file_op.h"
+#include "../../lib/os/filesystem.h"
 #include "../../stuff/SessionManager.h"
 
 SessionConsole::SessionConsole(Session *s, BottomBar *bar) :

@@ -1,22 +1,18 @@
-#include "../../file/file.h"
 #include "../kaba.h"
-#include "../../config.h"
 #include "../../math/matrix.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
 
-#ifdef _X_USE_VULKAN_
+#if __has_include("../../vulkan/vulkan.h") && HAS_LIB_VULKAN
 	#include "../../vulkan/vulkan.h"
-
-#if HAS_LIB_VULKAN
-#endif
+	#define KABA_EXPORT_VULKAN
 #endif
 
 namespace kaba {
 
 
 
-#if defined(_X_USE_VULKAN_) && HAS_LIB_VULKAN
+#ifdef KABA_EXPORT_VULKAN
 	#define vul_p(p)		p
 
 
@@ -299,14 +295,14 @@ void SIAddPackageVulkan() {
 			func_add_param("w", TypeBool);
 		class_add_func("set_line_width", TypeVoid, vul_p(&vulkan::Pipeline::set_line_width));
 			func_add_param("w", TypeFloat32);
-#if defined(_X_USE_VULKAN_) && HAS_LIB_VULKAN
+#ifdef KABA_EXPORT_VULKAN
 		void (vulkan::Pipeline::*mpf)(float) = &vulkan::Pipeline::set_blend;
 		class_add_func("set_blend", TypeVoid, vul_p(mpf));
 #else
 		class_add_func("set_blend", TypeVoid, nullptr);
 #endif
 			func_add_param("alpha", TypeFloat32);
-#if defined(_X_USE_VULKAN_) && HAS_LIB_VULKAN
+#ifdef KABA_EXPORT_VULKAN
 		void (vulkan::Pipeline::*mpf2)(vulkan::Alpha, vulkan::Alpha) = &vulkan::Pipeline::set_blend;
 		class_add_func("set_blend", TypeVoid, vul_p(mpf2));
 #else

@@ -361,20 +361,17 @@
     <ClCompile Include="src\lib\base\strings.cpp">
       <Filter>src\lib\base</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\file\file.cpp">
-      <Filter>src\lib\file</Filter>
+    <ClCompile Include="src\lib\doc\chunked.cpp">
+      <Filter>src\lib\doc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\file\file_op.cpp">
-      <Filter>src\lib\file</Filter>
+    <ClCompile Include="src\lib\doc\config.cpp">
+      <Filter>src\lib\doc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\file\formatter.cpp">
-      <Filter>src\lib\file</Filter>
+    <ClCompile Include="src\lib\doc\pdf.cpp">
+      <Filter>src\lib\doc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\file\msg.cpp">
-      <Filter>src\lib\file</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\file\path.cpp">
-      <Filter>src\lib\file</Filter>
+    <ClCompile Include="src\lib\doc\xml.cpp">
+      <Filter>src\lib\doc</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\Control.cpp">
       <Filter>src\lib\hui\Controls</Filter>
@@ -517,9 +514,6 @@
     <ClCompile Include="src\lib\hui\common_dlg_win.cpp">
       <Filter>src\lib\hui</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\hui\Config.cpp">
-      <Filter>src\lib\hui</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\hui\error.cpp">
       <Filter>src\lib\hui</Filter>
     </ClCompile>
@@ -554,9 +548,6 @@
       <Filter>src\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Resource.cpp">
-      <Filter>src\lib\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Timer.cpp">
       <Filter>src\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Toolbar.cpp">
@@ -844,8 +835,29 @@
     <ClCompile Include="src\lib\nix\nix_view.cpp">
       <Filter>src\lib\nix</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\terminal\CommandLineParser.cpp">
-      <Filter>src\lib\terminal</Filter>
+    <ClCompile Include="src\lib\os\CommandLineParser.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\date.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\file.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\filesystem.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\formatter.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\msg.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\path.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\os\time.cpp">
+      <Filter>src\lib\os</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\threads\Mutex.cpp">
       <Filter>src\lib\threads</Filter>
@@ -855,15 +867,6 @@
     </ClCompile>
     <ClCompile Include="src\lib\threads\ThreadedWork.cpp">
       <Filter>src\lib\threads</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\xfile\chunked.cpp">
-      <Filter>src\lib\xfile</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\xfile\pdf.cpp">
-      <Filter>src\lib\xfile</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\xfile\xml.cpp">
-      <Filter>src\lib\xfile</Filter>
     </ClCompile>
     <ClCompile Include="src\module\audio\AudioAccumulator.cpp">
       <Filter>src\module\audio</Filter>
@@ -1755,20 +1758,17 @@
     <ClInclude Include="src\lib\base\strings.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\file\file.h">
-      <Filter>src\lib\file</Filter>
+    <ClInclude Include="src\lib\doc\chunked.h">
+      <Filter>src\lib\doc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\file\file_op.h">
-      <Filter>src\lib\file</Filter>
+    <ClInclude Include="src\lib\doc\config.h">
+      <Filter>src\lib\doc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\file\formatter.h">
-      <Filter>src\lib\file</Filter>
+    <ClInclude Include="src\lib\doc\pdf.h">
+      <Filter>src\lib\doc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\file\msg.h">
-      <Filter>src\lib\file</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\file\path.h">
-      <Filter>src\lib\file</Filter>
+    <ClInclude Include="src\lib\doc\xml.h">
+      <Filter>src\lib\doc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\Control.h">
       <Filter>src\lib\hui\Controls</Filter>
@@ -1884,9 +1884,6 @@
     <ClInclude Include="src\lib\hui\common_dlg.h">
       <Filter>src\lib\hui</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\hui\Config.h">
-      <Filter>src\lib\hui</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\hui\error.h">
       <Filter>src\lib\hui</Filter>
     </ClInclude>
@@ -1915,9 +1912,6 @@
       <Filter>src\lib\hui</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Resource.h">
-      <Filter>src\lib\hui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\hui\Timer.h">
       <Filter>src\lib\hui</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\hui\Toolbar.h">
@@ -2145,8 +2139,29 @@
     <ClInclude Include="src\lib\nix\nix_view.h">
       <Filter>src\lib\nix</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\terminal\CommandLineParser.h">
-      <Filter>src\lib\terminal</Filter>
+    <ClInclude Include="src\lib\os\CommandLineParser.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\date.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\file.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\filesystem.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\formatter.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\msg.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\path.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\time.h">
+      <Filter>src\lib\os</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\threads\Mutex.h">
       <Filter>src\lib\threads</Filter>
@@ -2156,15 +2171,6 @@
     </ClInclude>
     <ClInclude Include="src\lib\threads\ThreadedWork.h">
       <Filter>src\lib\threads</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\xfile\chunked.h">
-      <Filter>src\lib\xfile</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\xfile\pdf.h">
-      <Filter>src\lib\xfile</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\xfile\xml.h">
-      <Filter>src\lib\xfile</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\config.h">
       <Filter>src\lib</Filter>
@@ -2765,8 +2771,8 @@
     <Filter Include="src\lib\base">
       <UniqueIdentifier>{3195EB06-4A31-4984-003C-A18F0D580394}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\lib\file">
-      <UniqueIdentifier>{596C5346-3ACF-8974-B6F3-FC96F58AE493}</UniqueIdentifier>
+    <Filter Include="src\lib\doc">
+      <UniqueIdentifier>{71410E6E-87C0-EE20-BAEF-9044CC4AD485}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\hui">
       <UniqueIdentifier>{FDD61BAD-BC45-3E2C-366F-FF481FD83243}</UniqueIdentifier>
@@ -2807,14 +2813,11 @@
     <Filter Include="src\lib\nix">
       <UniqueIdentifier>{F2B28380-C7CD-DA9A-3F74-DD2903EC2A01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\lib\terminal">
-      <UniqueIdentifier>{13CE28EE-DE8E-D217-B858-442FB59C1812}</UniqueIdentifier>
+    <Filter Include="src\lib\os">
+      <UniqueIdentifier>{71C98AAD-A0D7-45A4-DD42-1D9B63491998}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\threads">
       <UniqueIdentifier>{00B3DEB1-3DBC-9488-47E6-BB73557F0D00}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\lib\xfile">
-      <UniqueIdentifier>{87F43273-B0B1-C1EC-F4A8-E622B9C0AE32}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\module">
       <UniqueIdentifier>{CEA39408-D15A-9D4B-8623-93CFDC83C5D8}</UniqueIdentifier>

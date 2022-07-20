@@ -13,7 +13,7 @@
 #define _HUI_EXISTS_
 
 #include "common.h"
-#ifdef _X_USE_IMAGE_
+#if __has_include("../image/image.h")
 	#include "../image/image.h"
 #else
 	typedef int Image;
@@ -62,14 +62,18 @@ extern string ComboBoxSeparator;
 #include "Window.h"
 #include "common_dlg.h"
 #include "language.h"
-#include "Config.h"
 #include "Resource.h"
 #include "utility.h"
 #include "Painter.h"
-#include "Timer.h"
 #include "Toolbar.h"
 #include "error.h"
 #include "Clipboard.h"
+
+
+#include "../doc/config.h"
+namespace hui {
+extern Configuration config;
+}
 
 
 #endif

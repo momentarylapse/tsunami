@@ -1,15 +1,7 @@
-#include "../../file/file.h"
+#include "../../os/date.h"
+#include "../../os/time.h"
 #include "../kaba.h"
-#include "../../config.h"
 #include "lib.h"
-
-#ifdef _X_USE_HUI_
-	#include "../../hui/hui.h"
-#elif defined(_X_USE_HUI_MINIMAL_)
-	#include "../../hui_minimal/hui.h"
-#else
-	we are re screwed.... TODO: test for _X_USE_HUI_
-#endif
 
 
 namespace kaba {
@@ -22,7 +14,7 @@ void SIAddPackageTime() {
 	add_package("time");
 
 	TypeDate = add_type("Date", sizeof(Date));
-	TypeTimer = add_type("Timer", sizeof(hui::Timer));
+	TypeTimer = add_type("Timer", sizeof(os::Timer));
 
 
 	add_class(TypeDate);
@@ -36,14 +28,14 @@ void SIAddPackageTime() {
 
 
 	add_class(TypeTimer);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &hui::Timer::reset);
-		class_add_func("get", TypeFloat32, &hui::Timer::get);
-		class_add_func("reset", TypeVoid, &hui::Timer::reset);
-		class_add_func("peek", TypeFloat32, &hui::Timer::peek);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &os::Timer::reset);
+		class_add_func("get", TypeFloat32, &os::Timer::get);
+		class_add_func("reset", TypeVoid, &os::Timer::reset);
+		class_add_func("peek", TypeFloat32, &os::Timer::peek);
 
 
 
-	add_func("sleep", TypeVoid, &hui::Sleep, Flags::STATIC);
+	add_func("sleep", TypeVoid, &os::sleep, Flags::STATIC);
 		func_add_param("duration", TypeFloat32);
 }
 

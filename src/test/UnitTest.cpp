@@ -8,7 +8,8 @@
 #ifndef NDEBUG
 
 #include "UnitTest.h"
-#include "../lib/file/msg.h"
+#include "../lib/os/msg.h"
+#include "../lib/os/time.h"
 #include "../lib/hui/hui.h"
 #include "../data/audio/AudioBuffer.h"
 #include <math.h>
@@ -75,10 +76,10 @@ bool UnitTest::filter_match_group(const string &filter) {
 }
 
 void UnitTest::sleep(float t) {
-	hui::Timer timer;
+	os::Timer timer;
 	while (timer.peek() < t) {
 		hui::Application::do_single_main_loop();
-		hui::Sleep(0.001f);
+		os::sleep(0.001f);
 	}
 }
 

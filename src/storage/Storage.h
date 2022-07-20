@@ -8,7 +8,7 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include "../lib/file/file.h"
+#include "../lib/os/file.h"
 #include "../lib/hui/hui.h"
 
 class Range;

@@ -8,6 +8,8 @@
 #include "FormatM4a.h"
 #include "../Storage.h"
 #include "../../lib/math/math.h"
+#include "../../lib/os/filesystem.h"
+#include "../../lib/os/msg.h"
 
 FormatDescriptorM4a::FormatDescriptorM4a() :
 	FormatDescriptor("Apple lossless audio", "m4a", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)

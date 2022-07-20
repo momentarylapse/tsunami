@@ -16,6 +16,8 @@
 #include "../../data/Song.h"
 #include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
+#include "../../lib/os/file.h"
+#include "../../lib/os/msg.h"
 #if HAS_LIB_FLAC
 #include <FLAC/all.h>
 

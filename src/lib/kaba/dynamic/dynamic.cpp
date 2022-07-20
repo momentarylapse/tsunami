@@ -4,6 +4,8 @@
 #include "call.h"
 #include "../../any/any.h"
 #include "../../base/callable.h"
+#include "../../base/algo.h"
+#include <algorithm>
 
 namespace kaba {
 	
@@ -22,36 +24,72 @@ extern const Class *TypePath;
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
+
+template<class F>
+void kaba_inplace_quick_sort(DynamicArray &array, int first, int last, F f) {
+	if (first < 0 or last < 0 or first >= last)
+		return;
+	auto partition = [first, last] (DynamicArray &array, F f) {
+		int ipivot = (first + last) / 2;
+		int left = first-1;
+		int right = last+1;
+		while (true) {
+			void *pivot = array.simple_element(ipivot);
+			if (left != ipivot)
+				left ++;
+			if (right != ipivot)
+				right --;
+			while (!f(pivot, array.simple_element(left))) // A < P  <=>  !(P <= A)
+				left ++;
+			while (!f(array.simple_element(right), pivot)) // A > P  <=>  !(A <= P)
+				right --;
+			if (left >= right)
+				return right;
+			array.simple_swap(left, right);
+			if (left == ipivot)
+				ipivot = right;
+			else if (right == ipivot)
+				ipivot = left;
+		}
+		return 0;
+	};
+	int p = partition(array, f);
+	kaba_inplace_quick_sort(array, first, p-1, f);
+	kaba_inplace_quick_sort(array, p+1, last, f);
+}
+
 template<class T>
 void _kaba_array_sort(DynamicArray &array, int offset_by, bool reverse) {
-	T *p = (T*)((char*)array.data + offset_by);
-	for (int i=0; i<array.num; i++) {
-		T *q = (T*)((char*)p + array.element_size);
-		for (int j=i+1; j<array.num; j++) {
-			if ((*p > *q) xor reverse)
-				array.simple_swap(i, j);
-			q = (T*)((char*)q + array.element_size);
+	if (false and offset_by == 0 and sizeof(T) == array.element_size) {
+		auto f = [] (const T &a, const T &b) {
+			return a <= b;
+		};
+		try{
+			inplace_sort(*(Array<T>*)&array, f);
+		}catch(Exception &e){
+			msg_error(e.message());
 		}
-		p = (T*)((char*)p + array.element_size);
+	} else {
+		auto f = [offset_by] (const void *a, const void *b) {
+			return *(T*)((const char*)a + offset_by) <= *(T*)((const char*)b + offset_by);
+		};
+		kaba_inplace_quick_sort(array, 0, array.num-1, f);
 	}
+
+	if (reverse)
+		inplace_reverse(*(Array<void*>*)&array);
 }
 
 template<class T>
 void _kaba_array_sort_p(DynamicArray &array, int offset_by, bool reverse) {
-	char **p = (char**)array.data;
-	for (int i=0; i<array.num; i++) {
-		T *pp = (T*)(*p + offset_by);
-		char **q = p + 1;
-		for (int j=i+1; j<array.num; j++) {
-			T *qq = (T*)(*q + offset_by);
-			if ((*pp > *qq) xor reverse) {
-				array.simple_swap(i, j);
-				pp = (T*)(*p + offset_by);
-			}
-			q ++;
-		}
-		p ++;
-	}
+	auto f = [offset_by] (const void *a, const void *b) {
+		auto *aa = (const T*) ((const char*)a + offset_by);
+		auto *bb = (const T*) ((const char*)b + offset_by);
+		return (*aa <= *bb);
+	};
+	inplace_sort(*(Array<void*>*)&array, f);
+	if (reverse)
+		inplace_reverse(*(Array<void*>*)&array);
 }
 
 template<class T>
@@ -203,7 +241,6 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 			_kaba_array_sort_pf<bool>(rr, sfunc, reverse);
 		else
 			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
-
 	} else if (el->is_pointer()) {
 		if (by_type == TypeString)
 			_kaba_array_sort_p<string>(rr, offset, reverse);

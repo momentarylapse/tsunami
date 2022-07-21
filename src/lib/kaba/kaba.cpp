@@ -268,8 +268,6 @@ void execute_single_command(const string &cmd) {
 	auto parser = new Parser(tree);
 	tree->parser = parser;
 
-	try {
-
 // find expressions
 	parser->Exp.analyse(tree, cmd);
 	if (parser->Exp.empty()) {
@@ -331,10 +329,6 @@ void execute_single_command(const string &cmd) {
 		void_func *f = (void_func*)func->address;
 		if (f)
 			f();
-	}
-
-	} catch(const Exception &e) {
-		e.print();
 	}
 }
 

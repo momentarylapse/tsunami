@@ -4,7 +4,8 @@
 #include "call.h"
 #include "../../any/any.h"
 #include "../../base/callable.h"
-#include "../../base/algo.h"
+#include "../../base/sort.h"
+#include "../../os/msg.h"
 #include <algorithm>
 
 namespace kaba {

@@ -1758,6 +1758,9 @@
     <ClInclude Include="src\lib\base\set.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\base\sort.h">
+      <Filter>src\lib\base</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\base\strings.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>

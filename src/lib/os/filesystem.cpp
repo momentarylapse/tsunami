@@ -48,6 +48,8 @@
 
 Date time2date(time_t t);
 
+namespace os::fs {
+
 bool func_did_not_throw(std::function<void()> f) {
 	try {
 		f();
@@ -59,7 +61,7 @@ bool func_did_not_throw(std::function<void()> f) {
 
 
 // just test the existence of a file
-bool file_exists(const Path &filename) {
+bool exists(const Path &filename) {
 	struct stat s;
 	if (stat(filename.str().c_str(), &s) == 0) {
 		//if (s.st_mode & S_IFREG)
@@ -68,21 +70,21 @@ bool file_exists(const Path &filename) {
 	return false;
 }
 
-int64 file_size(const Path &path) {
+int64 size(const Path &path) {
 	struct stat s;
 	if (stat(path.str().c_str(), &s) != 0)
 		throw FileError(format("unable to stat '%s'", path));
 	return s.st_size;
 }
 
-Date file_mtime(const Path &path) {
+Date mtime(const Path &path) {
 	struct stat s;
 	if (stat(path.str().c_str(), &s) != 0)
 		throw FileError(format("unable to stat '%s'", path));
 	return time2date(s.st_mtime);
 }
 
-bool file_is_directory(const Path &path) {
+bool is_directory(const Path &path) {
 	struct stat s;
 	if (stat(path.str().c_str(), &s) != 0)
 		return false; //throw FileError("unable to stat '" + path + "'");
@@ -90,10 +92,10 @@ bool file_is_directory(const Path &path) {
 }
 
 
-void dir_create(const Path &dir) {
+void create_directory(const Path &dir) {
 	if (dir.is_empty())
 		return;
-	if (file_is_directory(dir))
+	if (is_directory(dir))
 		return;
 #if defined(OS_WINDOWS)
 	if (_mkdir(dir.str().c_str()) != 0)
@@ -105,12 +107,12 @@ void dir_create(const Path &dir) {
 		throw FileError(format("can not create directory '%s'", dir));
 }
 
-void dir_delete(const Path &dir) {
+void delete_directory(const Path &dir) {
 	if (_rmdir(dir.str().c_str()) != 0)
 		throw FileError(format("can not delete directory '%s'", dir));
 }
 
-Path get_current_dir() {
+Path current_directory() {
 	string str;
 	char tmp[256];
 #ifdef OS_WINDOWS
@@ -125,31 +127,31 @@ Path get_current_dir() {
 	return Path(str);
 }
 
-void file_rename(const Path &source, const Path &target) {
+void rename(const Path &source, const Path &target) {
 	for (auto &p: target.all_parents())
-		dir_create(p);
+		create_directory(p);
 
 	// linux automatically overwrites, windows will fail rename()
-	if (file_exists(target))
-		file_delete(target);
+	if (exists(target))
+		_delete(target);
 
-	if (rename(source.str().c_str(), target.str().c_str()) != 0)
+	if (::rename(source.str().c_str(), target.str().c_str()) != 0)
 		throw FileError(format("can not rename file '%s' -> '%s'", source, target));
 }
 
-void file_copy(const Path &source, const Path &target) {
+void copy(const Path &source, const Path &target) {
 	for (auto &p: target.all_parents())
-		dir_create(p);
+		create_directory(p);
 
-	int hs=_open(source.str().c_str(),O_RDONLY);
-	if (hs<0)
+	int hs = ::_open(source.str().c_str(),O_RDONLY);
+	if (hs < 0)
 		throw FileError(format("copy: can not open source file '%s'", source));
 #ifdef OS_WINDOWS
-	int ht=_creat(target.str().c_str(),_S_IREAD | _S_IWRITE);
+	int ht = ::_creat(target.str().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	int ht = creat(target.str().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int ht = ::creat(target.str().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht < 0){
 		_close(hs);
@@ -158,8 +160,8 @@ void file_copy(const Path &source, const Path &target) {
 	char buf[10240];
 	int r = 10;
 	while(r > 0){
-		r = _read(hs,buf,sizeof(buf));
-		int rr = _write(ht,buf,r);
+		r = ::_read(hs,buf,sizeof(buf));
+		int rr = ::_write(ht,buf,r);
 		if (rr < r)
 			throw FileError(format("can not copy file '%s' -> '%s' (write failed)", source, target));
 	}
@@ -167,50 +169,22 @@ void file_copy(const Path &source, const Path &target) {
 	_close(ht);
 }
 
-void file_delete(const Path &filename) {
+void _delete(const Path &filename) {
 	if (_unlink(filename.str().c_str()) != 0)
 		throw FileError(format("can not delete file '%s'", filename));
 }
 
-string file_hash(const Path &filename, const string &type) {
+string hash(const Path &filename, const string &type) {
 	if (type == "md5") {
-		return file_read_binary(filename).md5();
+		return read_binary(filename).md5();
 	}
 	return "";
 }
 
 
-
-string shell_execute(const string &cmd) {
-#ifdef OS_LINUX
-	// thread safe...
-	char *s = new char[cmd.num + 1];
-	memcpy(s, cmd.data, cmd.num);
-	s[cmd.num] = 0;
-	FILE *f = popen(s, "r");
-	delete[] s;
-	//FILE *f = popen(cmd.c_str(), "r");
-	string buffer;
-
-	while (true) {
-		int c = fgetc(f);
-		if (c == EOF)
-			break;
-		buffer.add(c);
-	}
-
-	int r = pclose(f);
-//	int r = system(cmd.c_str());
-	if (r != 0)
-		throw Exception("failed to run shell command");
-	return buffer;
-#else
-	return "";
-#endif
-}
 
 // search a directory for files matching a filter
-void dir_search_single(const Path &dir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
+void search_single(const Path &dir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
 	string filter2 = filter.sub(1);
 
 #ifdef OS_WINDOWS
@@ -263,19 +237,19 @@ void dir_search_single(const Path &dir, const string &filter, Array<Path> &dir_l
 	inplace_sort(file_list, [](const Path &a, const Path &b) { return a <= b; });
 }
 
-void dir_search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
+void search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
 	Array<Path> sub_dir_list, sub_file_list;
-	dir_search_single(dir0 << subdir, filter, sub_dir_list, sub_file_list);
+	search_single(dir0 << subdir, filter, sub_dir_list, sub_file_list);
 	for (auto &x: sub_dir_list) {
 		dir_list.add(subdir << x);
-		dir_search_single_rec(dir0, subdir << x, filter, dir_list, file_list);
+		search_single_rec(dir0, subdir << x, filter, dir_list, file_list);
 	}
 	for (auto &x: sub_file_list)
 		file_list.add(subdir << x);
 }
 
 // search a directory for files matching a filter
-Array<Path> dir_search(const Path &dir, const string &filter, const string &options) {
+Array<Path> search(const Path &dir, const string &filter, const string &options) {
 	Array<Path> dir_list, file_list;
 
 	bool show_files = options.find("f") >= 0;
@@ -284,9 +258,9 @@ Array<Path> dir_search(const Path &dir, const string &filter, const string &opti
 	bool show_self = options.find("0") >= 0;
 
 	if (show_recursive) {
-		dir_search_single_rec(dir, "", filter, dir_list, file_list);
+		search_single_rec(dir, "", filter, dir_list, file_list);
 	} else {
-		dir_search_single(dir, filter, dir_list, file_list);
+		search_single(dir, filter, dir_list, file_list);
 	}
 	if (show_self)
 		dir_list.insert("", 0);
@@ -299,5 +273,36 @@ Array<Path> dir_search(const Path &dir, const string &filter, const string &opti
 	return r;
 }
 
+}
+
+
+
+string shell_execute(const string &cmd) {
+#ifdef OS_LINUX
+	// thread safe...
+	char *s = new char[cmd.num + 1];
+	memcpy(s, cmd.data, cmd.num);
+	s[cmd.num] = 0;
+	FILE *f = popen(s, "r");
+	delete[] s;
+	//FILE *f = popen(cmd.c_str(), "r");
+	string buffer;
+
+	while (true) {
+		int c = fgetc(f);
+		if (c == EOF)
+			break;
+		buffer.add(c);
+	}
+
+	int r = pclose(f);
+//	int r = system(cmd.c_str());
+	if (r != 0)
+		throw Exception("failed to run shell command");
+	return buffer;
+#else
+	return "";
+#endif
+}
 
 

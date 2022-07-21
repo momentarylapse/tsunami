@@ -19,7 +19,7 @@ int endian_big_to_little(int i) {
 	return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >> 8) | ((i & 0xff000000) >> 24);
 }
 
-int read_int_big_endian(FileStream *f) {
+int read_int_big_endian(Stream *f) {
 	unsigned char c[4];
 	f->read(c, 4);
 	return c[3] + (c[2] << 8) + (c[1] << 16) + (c[0] << 24);
@@ -62,9 +62,9 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 }
 
 void image_load_png(const Path &filename, Image &image) {
-	FileStream *f = nullptr;
+	Stream *f = nullptr;
 	try {
-	f = file_open(filename, "rb");
+	f = os::fs::open(filename, "rb");
 
 	// intro
 	bytes buf = f->read(8);
@@ -146,7 +146,7 @@ void image_load_png(const Path &filename, Image &image) {
 	}
 	delete f;
 
-	} catch(FileError &e) {
+	} catch(os::fs::FileError &e) {
 		msg_error("png: " + e.message());
 		if (f)
 			delete f;

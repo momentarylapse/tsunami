@@ -119,7 +119,7 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	song->add_track(SignalType::AUDIO);
 
 	try {
-		f = new BinaryFormatter(file_open(od->filename, "rb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);

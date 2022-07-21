@@ -183,7 +183,7 @@ string Path::dirname() const {
 
 Path Path::absolute() const {
 	if (is_relative())
-		return get_current_dir() << *this;
+		return os::fs::current_directory() << *this;
 	return *this;
 }
 

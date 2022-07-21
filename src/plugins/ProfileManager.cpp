@@ -21,7 +21,7 @@ ProfileManager::ProfileManager() {
 }
 
 void ProfileManager::load_from_file(const Path &filename, bool read_only, Session *session) {
-	if (!file_exists(filename))
+	if (!os::fs::exists(filename))
 		return;
 	try {
 		xml::Parser p;

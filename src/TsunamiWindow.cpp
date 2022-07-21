@@ -1228,7 +1228,7 @@ string _suggest_filename(Song *s, const Path &dir) {
 	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
-		if (!file_exists(dir << name))
+		if (!os::fs::exists(dir << name))
 			return name;
 	}
 	return "";

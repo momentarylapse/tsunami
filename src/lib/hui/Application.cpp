@@ -55,7 +55,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	if ((flags & FLAG_NO_ERROR_HANDLER) == 0)
 		SetDefaultErrorHandler(nullptr);
 
-	if (file_exists(directory << "config.txt"))
+	if (os::fs::exists(directory << "config.txt"))
 		config.load(directory << "config.txt");
 
 
@@ -67,13 +67,13 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 #ifdef OS_LINUX
-	if (file_exists(directory_static << "icon.svg"))
+	if (os::fs::exists(directory_static << "icon.svg"))
 		set_property("logo", (directory_static << "icon.svg").str());
 	else
 #endif
-	if (file_exists(directory_static << "icon.png"))
+	if (os::fs::exists(directory_static << "icon.png"))
 		set_property("logo", (directory_static << "icon.png").str());
-	else if (file_exists(directory_static << "icon.ico"))
+	else if (os::fs::exists(directory_static << "icon.ico"))
 		set_property("logo", (directory_static << "icon.ico").str());
 
 
@@ -119,7 +119,7 @@ Path strip_dev_dirs(const Path &p) {
 //   initial_working_directory -> working dir before running this program
 void Application::guess_directories(const Array<string> &arg, const string &app_name) {
 
-	initial_working_directory = get_current_dir();
+	initial_working_directory = os::fs::current_directory();
 	installed = false;
 
 
@@ -156,7 +156,7 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 
 		if (installed) {
 			directory = format("%s/.%s/", getenv("HOME"), app_name);
-			dir_create(directory);
+			os::fs::create_directory(directory);
 		}
 	#endif
 }

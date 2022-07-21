@@ -60,7 +60,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 	BinaryFormatter *f = nullptr;
 
 	try {
-		f = new BinaryFormatter(file_open(od->filename, "rb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
 
 
 		while(true) {

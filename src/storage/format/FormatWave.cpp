@@ -35,7 +35,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
-	auto f = new BinaryFormatter(file_open(od->filename, "wb"));
+	auto f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
 
 	f->write("RIFF", 4);
 	f->write_int(samples * bytes_per_sample + 44);
@@ -101,7 +101,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 	BinaryFormatter *f = nullptr;
 
 	try {
-		f = new BinaryFormatter(file_open(od->filename, "rb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
 
 	if (read_chunk_name(f) != "RIFF")
 		throw Exception("wave file does not start with \"RIFF\"");

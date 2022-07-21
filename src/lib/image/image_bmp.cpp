@@ -160,7 +160,7 @@ void image_load_bmp(const Path &filename, Image &image)
 
 void image_save_bmp(const Path &filename, const Image &image) {
 	try {
-		auto f = file_open(filename, "wb");
+		auto f = os::fs::open(filename, "wb");
 		image.set_mode(Image::Mode::RGBA);
 
 		int row_size = 4 * (int)((image.width * 3 + 3) / 4);

@@ -38,6 +38,8 @@
 
 class Date;
 
+namespace os::fs {
+
 
 class FileError : public Exception {
 public:
@@ -74,14 +76,14 @@ public:
 	int handle = -1;
 };
 
+extern FileStream *open(const Path &filename, const string &mode);
 
-extern FileStream *file_open(const Path &filename, const string &mode);
+extern bytes read_binary(const Path &filename);
+extern string read_text(const Path &filename);
+extern void write_binary(const Path &filename, const bytes &data);
+extern void write_text(const Path &filename, const string &str);
 
-extern bytes file_read_binary(const Path &filename);
-extern string file_read_text(const Path &filename);
-extern void file_write_binary(const Path &filename, const bytes &data);
-extern void file_write_text(const Path &filename, const string &str);
-
+}
 
 
 

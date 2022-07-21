@@ -62,6 +62,9 @@
 Date time2date(time_t t);
 
 
+namespace os::fs {
+
+
 FileStream::FileStream(int h) {
 	handle = h;
 }
@@ -96,7 +99,7 @@ void set_mode_text(int handle) {
 }
 
 // open a file stream
-FileStream *file_open(const Path &filename, const string &mode) {
+FileStream *open(const Path &filename, const string &mode) {
 	int handle = -1;
 
 	if (mode.find("r") >= 0) {
@@ -133,28 +136,30 @@ FileStream *file_open(const Path &filename, const string &mode) {
 	return new FileStream(handle);
 }
 
-bytes file_read_binary(const Path &filename) {
-	auto *f = file_open(filename, "rb");
+
+
+bytes read_binary(const Path &filename) {
+	auto *f = open(filename, "rb");
 	bytes r = f->read_complete();
 	delete f;
 	return r;
 }
 
-string file_read_text(const Path &filename) {
-	auto *f = file_open(filename, "rt");
+string read_text(const Path &filename) {
+	auto *f = open(filename, "rt");
 	string r = f->read_complete();
 	delete f;
 	return r;
 }
 
-void file_write_binary(const Path &filename, const bytes &buf) {
-	auto *f = file_open(filename, "wb");
+void write_binary(const Path &filename, const bytes &buf) {
+	auto *f = open(filename, "wb");
 	f->Stream::write(buf);
 	delete f;
 }
 
-void file_write_text(const Path &filename, const string &str) {
-	auto f = file_open(filename, "wt");
+void write_text(const Path &filename, const string &str) {
+	auto f = open(filename, "wt");
 	f->write(str);
 	delete f;
 }
@@ -214,21 +219,6 @@ int FileStream::get_pos() {
 	return _lseek(handle, 0, SEEK_CUR);
 }
 
-// read the complete file into the buffer
-bytes Stream::read_complete() {
-	static const int CHUNK_SIZE = 2048;
-	bytes buf, chunk;
-	chunk.resize(CHUNK_SIZE);
-	int r = 0;
-	while (true) {
-		int r = read(chunk);
-		if (r <= 0)
-			return buf;
-		buf += chunk.sub_ref(0, r);
-	};
-	return buf;
-}
-
 // read a part of the file into the buffer
 int FileStream::read_basic(void *buffer, int size) {
 	int r = _read(handle, buffer, size);
@@ -247,26 +237,4 @@ int FileStream::write_basic(const void *buffer, int size) {
 	return r;
 }
 
-int Stream::read(void *data, int size) {
-	return read_basic(data, size);
-}
-
-int Stream::write(const void *data, int size) {
-	return write_basic(data, size);
-}
-
-int Stream::read(bytes &data) {
-	return read_basic(data.data, data.num);
-}
-
-bytes Stream::read(int size) {
-	bytes data;
-	data.resize(size);
-	int r = read(data);
-	data.resize(max(r, 0));
-	return data;
-}
-
-int Stream::write(const bytes &data) {
-	return write_basic(data.data, data.num);
 }

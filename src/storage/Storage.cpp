@@ -162,7 +162,7 @@ bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
 Path Storage::temp_saving_file(const string &ext) {
 	for (int i = 0; i < 1000; i++) {
 		Path p = (tsunami->directory << format("-temp-saving-%03d-.", i)).with(ext);
-		if (!file_exists(p))
+		if (!os::fs::exists(p))
 			return p;
 	}
 	return (tsunami->directory << "-temp-saving-.").with(ext);
@@ -200,7 +200,7 @@ bool Storage::save(Song *song, const Path &filename) {
 
 	if (!od.errors_encountered) {
 		try {
-			file_rename(temp_file, filename);
+			os::fs::rename(temp_file, filename);
 		} catch (Exception &e) {
 			od.error("failed to move temp file to target: " + e.message());
 		}
@@ -325,20 +325,20 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 		return {};
 	current_directory = dir0;
 
-	auto data = file_read_binary(filename);
+	auto data = os::fs::read_binary(filename);
 	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 2 * buffer.channels)));
-	file_delete(filename);
+	os::fs::_delete(filename);
 	return data;
 }
 
 void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
 	Path filename = temp_saving_file(codec);
-	file_write_binary(filename, data);
+	os::fs::write_binary(filename, data);
 
 	auto dir0 = this->current_directory;
 	load_buffer(&buffer, filename);
 	current_directory = dir0;
-	file_delete(filename);
+	os::fs::_delete(filename);
 }
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b) {

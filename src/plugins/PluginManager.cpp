@@ -823,7 +823,7 @@ kaba::Class* PluginManager::get_class(const string &name) {
 void get_plugin_file_data(PluginManager::PluginFile &pf) {
 	pf.image = "";
 	try {
-		string content = file_read_text(pf.filename);
+		string content = os::fs::read_text(pf.filename);
 		int p = content.find("// Image = hui:");
 		if (p >= 0)
 			pf.image = content.sub(p + 11, content.find("\n"));
@@ -834,7 +834,7 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 	Path dir = _dir;
 	if (group.num > 0)
 		dir <<= group;
-	auto list = dir_search(dir, "*.kaba", "f");
+	auto list = os::fs::search(dir, "*.kaba", "f");
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;

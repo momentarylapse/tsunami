@@ -33,7 +33,7 @@ string canonical_import_name(const string &s) {
 }
 
 string dir_has(const Path &dir, const string &name) {
-	auto list = dir_search(dir, "*", "fd");
+	auto list = os::fs::search(dir, "*", "fd");
 	for (auto &e: list)
 		if (canonical_import_name(e.str()) == name)
 			return e.str();
@@ -64,17 +64,17 @@ Path import_dir_match(const Path &dir0, const string &name) {
 		if (e == "")
 			return Path::EMPTY;
 		filename <<= e;
-		if (file_exists(filename << "__main__.kaba"))
+		if (os::fs::exists(filename << "__main__.kaba"))
 			return filename << "__main__.kaba";
-		if (file_exists(filename << (xx.back() + ".kaba")))
+		if (os::fs::exists(filename << (xx.back() + ".kaba")))
 			return filename << (xx.back() + ".kaba");
-		if (file_exists(filename << "main.kaba"))
+		if (os::fs::exists(filename << "main.kaba"))
 			return filename << "main.kaba";
 		return Path::EMPTY;
 	}
 	return filename;
 
-	if (file_exists(dir0 << name))
+	if (os::fs::exists(dir0 << name))
 		return dir0 << name;
 	return Path::EMPTY;
 }
@@ -86,7 +86,7 @@ Path find_installed_lib_import(const string &name) {
 	Path kaba_dir_static = hui::Application::directory_static.parent() << "kaba";
 	for (auto &dir: Array<Path>({kaba_dir, kaba_dir_static})) {
 		auto path = (dir << "lib" << name).canonical();
-		if (file_exists(path))
+		if (os::fs::exists(path))
 			return path;
 	}
 	return Path::EMPTY;

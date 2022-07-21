@@ -17,7 +17,9 @@ enum class BackupMode {
 	KEEP
 };
 
-class FileStream;
+namespace os::fs {
+	class FileStream;
+}
 class Session;
 
 class BackupManager {
@@ -28,12 +30,12 @@ public:
 	struct BackupFile {
 		Session *session;
 		Path filename;
-		FileStream *f;
+		os::fs::FileStream *f;
 		int uuid;
 	};
 	static Array<BackupFile> files;
 	static int next_uuid;
-	static BackupFile* _find_by_file(FileStream *f);
+	static BackupFile* _find_by_file(os::fs::FileStream *f);
 	static BackupFile* _find_by_uuid(int uuid);
 	static void _clear_old();
 
@@ -41,9 +43,9 @@ public:
 	static void check_old_files(Session *session);
 
 	static Path get_filename(const string &extension);
-	static FileStream *create_file(const string &extension, Session *session);
-	static void abort(FileStream *f);
-	static void done(FileStream *f);
+	static os::fs::FileStream *create_file(const string &extension, Session *session);
+	static void abort(os::fs::FileStream *f);
+	static void done(os::fs::FileStream *f);
 	static void delete_old(int uuid);
 
 	static Path get_filename_for_uuid(int uuid);

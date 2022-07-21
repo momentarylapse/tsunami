@@ -233,7 +233,7 @@ void FileChunkBasic::_clamp_name_rec(int length) {
 }
 
 bool ChunkedFileParser::read(const Path &filename, void *p) {
-	auto f = new BinaryFormatter(file_open(filename, "rb"));
+	auto f = new BinaryFormatter(os::fs::open(filename, "rb"));
 	context.f = f;
 	//context.push(Context::Layer(name, 0, f->GetSize()));
 
@@ -250,7 +250,7 @@ bool ChunkedFileParser::read(const Path &filename, void *p) {
 }
 
 bool ChunkedFileParser::write(const Path &filename, void *p) {
-	auto *f = new BinaryFormatter(file_open(filename, "wb"));
+	auto *f = new BinaryFormatter(os::fs::open(filename, "wb"));
 	context.f = f;
 	//context->push(Context::Layer(name, 0, 0));
 

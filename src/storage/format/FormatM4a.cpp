@@ -16,21 +16,21 @@ FormatDescriptorM4a::FormatDescriptorM4a() :
 {
 }
 
-void FormatM4a::load_track(StorageOperationData *od)
-{
-	if (system("which avconv") == 0){
+void FormatM4a::load_track(StorageOperationData *od) {
+	if (system("which avconv") == 0) {
 		string tmp = "/tmp/tsunami_m4a_out.wav";
 		system(format("yes | avconv -i \"%s\" \"%s\"", od->filename, tmp).c_str());
 		od->storage->load_track(od->layer, tmp, od->offset);
 		od->storage->current_directory = od->filename.parent();
-		file_delete(tmp);
-	}else if (system("which ffmpeg") == 0){
+		os::fs::_delete(tmp);
+	} else if (system("which ffmpeg") == 0) {
 		string tmp = "/tmp/tsunami_m4a_out.wav";
 		system(format("yes | ffmpeg -i \"%s\" \"%s\"", od->filename, tmp).c_str());
 		od->storage->load_track(od->layer, tmp, od->offset);
 		od->storage->current_directory = od->filename.parent();
-		file_delete(tmp);
-	}else
+		os::fs::_delete(tmp);
+	} else {
 		od->error("need external program 'avconv' or 'ffmpeg' to decode");
+	}
 }
 

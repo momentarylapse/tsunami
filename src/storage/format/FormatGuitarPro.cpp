@@ -80,7 +80,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	song = od->song;
 	char data[16];
 
-	f = new BinaryFormatter(file_open(od->filename, "wb"));
+	f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
 	string ext = od->filename.extension();
 	if (ext == "gp3")
 		version = 300;
@@ -171,7 +171,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 	measures.clear();
 
 	try{
-		f = new BinaryFormatter(file_open(od->filename, "rb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
 
 		string s = read_str1c(f, 30);
 		msg_write("version: " + s);

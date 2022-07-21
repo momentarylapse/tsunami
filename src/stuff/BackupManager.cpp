@@ -22,7 +22,7 @@ Path BackupManager::get_filename(const string &extension) {
 	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
-		if (!file_exists(tsunami->directory << fn))
+		if (!os::fs::exists(tsunami->directory << fn))
 			return tsunami->directory << fn;
 	}
 	return "";
@@ -33,7 +33,7 @@ void BackupManager::set_save_state(Session *session) {
 	for (auto &bf: files) {
 		if (bf.session == session) {
 			session->i(_("deleting backup: ") + bf.filename.str());
-			file_delete(bf.filename);
+			os::fs::_delete(bf.filename);
 			bf.session = nullptr; // auto remove
 		}
 	}
@@ -44,7 +44,7 @@ void BackupManager::check_old_files(Session *session) {
 	_clear_old();
 
 	// update list
-	auto _files = dir_search(tsunami->directory, "backup-*", "f");
+	auto _files = os::fs::search(tsunami->directory, "backup-*", "f");
 	for (auto &f: _files) {
 		BackupFile bf;
 		bf.uuid = next_uuid ++;
@@ -61,28 +61,28 @@ void BackupManager::check_old_files(Session *session) {
 	}
 }
 
-FileStream *BackupManager::create_file(const string &extension, Session *session) {
+os::fs::FileStream *BackupManager::create_file(const string &extension, Session *session) {
 	BackupFile bf;
 	bf.uuid = -1;//next_uuid ++;
 	bf.session = session;
 	bf.filename = get_filename(extension);
 	session->i(_("creating backup: ") + bf.filename.str());
 	try {
-		bf.f = file_open(bf.filename, "wb");
+		bf.f = os::fs::open(bf.filename, "wb");
 		files.add(bf);
 		return bf.f;
-	} catch(FileError &e) {
+	} catch(os::fs::FileError &e) {
 		session->e(e.message());
 	}
 	return nullptr;
 }
 
-void BackupManager::abort(FileStream *f) {
+void BackupManager::abort(os::fs::FileStream *f) {
 	//delete f;
 	done(f);
 }
 
-void BackupManager::done(FileStream *f) {
+void BackupManager::done(os::fs::FileStream *f) {
 	delete f;
 	auto bf = _find_by_file(f);
 	if (bf) {
@@ -91,7 +91,7 @@ void BackupManager::done(FileStream *f) {
 	}
 }
 
-BackupManager::BackupFile* BackupManager::_find_by_file(FileStream *f) {
+BackupManager::BackupFile* BackupManager::_find_by_file(os::fs::FileStream *f) {
 	if (!f)
 		return nullptr;
 	for (auto &bf: files)
@@ -118,7 +118,7 @@ void BackupManager::delete_old(int uuid) {
 	auto *bf = _find_by_uuid(uuid);
 	if (bf) {
 		Session::GLOBAL->i(_("deleting backup: ") + bf->filename.str());
-		file_delete(bf->filename);
+		os::fs::_delete(bf->filename);
 		bf->session = nullptr;
 	}
 }

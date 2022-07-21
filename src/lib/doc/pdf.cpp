@@ -14,6 +14,8 @@
 #include "../os/filesystem.h"
 #include "../os/msg.h"
 
+using namespace os::fs;
+
 namespace pdf {
 
 Array<Path> font_paths = {"./"};
@@ -429,7 +431,7 @@ public:
 	}
 
 	void load(const Path &filename) {
-		auto f = file_open(filename, "rb");
+		auto f = os::fs::open(filename, "rb");
 
 		read_table_directory(f);
 		read_head(f);
@@ -484,7 +486,7 @@ public:
 Path find_ttf(const string &name) {
 	string fname = name + ".ttf";
 	for (auto &dir: font_paths)
-		if (file_exists(dir << fname)) {
+		if (os::fs::exists(dir << fname)) {
 			return dir << fname;
 		}
 	return "";
@@ -750,7 +752,7 @@ FontData *Parser::font_get(const string &name) {
 		auto ff = find_ttf(fd.name);
 		if (!ff.is_empty()) {
 			fd.true_type = true;
-			fd.file_contents = file_read_binary(ff);
+			fd.file_contents = os::fs::read_binary(ff);
 			//load_ttf(name);
 			fd.ttf = new TTF;
 			fd.ttf->load(ff);
@@ -764,7 +766,7 @@ FontData *Parser::font_get(const string &name) {
 }
 
 void Parser::save(const Path &filename) {
-	auto f = file_open(filename, "wb");
+	auto f = os::fs::open(filename, "wb");
 	Array<int> pos;
 	int next_id = 1;
 	auto mk_id = [&] {
@@ -790,7 +792,7 @@ void Parser::save(const Path &filename) {
 			auto ff = find_ttf(fd.name);
 			if (ff) {
 				fd.id_file = mk_id();
-				fd.file_contents = file_read_binary(ff);
+				fd.file_contents = os::fs::read_binary(ff);
 			}
 			fd.id_descr = mk_id();
 			fd.id_widths = mk_id();

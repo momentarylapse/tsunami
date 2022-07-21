@@ -137,7 +137,7 @@ string Element::value(const string &key, const string &def) {
 }
 
 void Parser::load(const Path &filename) {
-	auto *f = file_open(filename, "rb");
+	auto *f = os::fs::open(filename, "rb");
 
 	while(true) {
 		try{
@@ -179,7 +179,7 @@ void Parser::write_element(Stream *f, Element &e, int indent) {
 }
 
 void Parser::save(const Path &filename) {
-	auto *f = file_open(filename, "wb");
+	auto *f = os::fs::open(filename, "wb");
 	f->write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
 	// should be exactly one root!

@@ -42,7 +42,7 @@ static Array<string> TodoStr;
 
 bool msg_inited = true;
 
-static FileStream *file = nullptr;
+static os::fs::FileStream *file = nullptr;
 static Path msg_file_name = "message.txt";
 static int Shift;
 
@@ -61,7 +61,7 @@ void msg_init(const Path &force_filename, bool verbose) {
 	if (!verbose)
 		return;
 	try {
-		file = file_open(msg_file_name, "wt");
+		file = os::fs::open(msg_file_name, "wt");
 	} catch(...) {}
 #ifdef MSG_LOG_TIMIGS
 	file->write_str("[hh:mm:ss, ms]");
@@ -77,7 +77,7 @@ void msg_set_verbose(bool verbose) {
 		return;
 	if (verbose) {
 		try {
-			file = file_open(msg_file_name, "wt");
+			file = os::fs::open(msg_file_name, "wt");
 		} catch(...) {}
 		Shift = 0;
 	}else{

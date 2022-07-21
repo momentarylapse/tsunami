@@ -46,7 +46,7 @@ void Image::_load_flipped(const Path &filename) {
 	data.clear();
 
 	// file ok?
-	if (!file_exists(filename)) {
+	if (!os::fs::exists(filename)) {
 		msg_error("Image.load: file does not exist: " + filename.str());
 		return;
 	}

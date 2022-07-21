@@ -96,7 +96,7 @@ static string ascii2utf8(const string &s) {
 void FormatMidi::load_song(StorageOperationData *od) {
 	BinaryFormatter *f = nullptr;
 	try {
-		f = new BinaryFormatter(file_open(od->filename, "rb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
 
 		string hn = read_chunk_name(f);
 		int hsize = read_int(f);
@@ -268,7 +268,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 void FormatMidi::save_song(StorageOperationData* od) {
 	BinaryFormatter *f = nullptr;
 	try {
-		f = new BinaryFormatter(file_open(od->filename, "wb"));
+		f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
 
 		int num_tracks = 0;
 		for (Track *t: weak(od->song->tracks))

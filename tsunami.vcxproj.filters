@@ -856,6 +856,9 @@
     <ClCompile Include="src\lib\os\path.cpp">
       <Filter>src\lib\os</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\os\stream.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\os\time.cpp">
       <Filter>src\lib\os</Filter>
     </ClCompile>
@@ -2158,6 +2161,9 @@
       <Filter>src\lib\os</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\os\path.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\os\stream.h">
       <Filter>src\lib\os</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\os\time.h">

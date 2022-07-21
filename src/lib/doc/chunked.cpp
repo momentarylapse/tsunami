@@ -7,6 +7,7 @@
 
 #include "../base/base.h"
 #include "../os/file.h"
+#include "../os/formatter.h"
 #include "chunked.h"
 
 void strip(string &s) {

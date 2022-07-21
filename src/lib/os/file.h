@@ -15,24 +15,11 @@
 |                                                                              |
 | last update: 2010.07.01 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
-#if !defined(FILE_H)
-#define FILE_H
-
-
-
-// ANSI:
-//#include <stdarg.h>
-// UNIX:
-//#include <varargs.h>
-
+#ifndef SRC_LIB_OS_FILE_H_
+#define SRC_LIB_OS_FILE_H_
 
 #include "../base/base.h"
-
-
-#include <string.h>
-#include <stdlib.h>
-	
-#include "formatter.h"
+#include "stream.h"
 #include "path.h"
 
 

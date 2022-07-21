@@ -1,5 +1,6 @@
 #include "../../os/file.h"
 #include "../../os/filesystem.h"
+#include "../../os/formatter.h"
 #include "../../os/msg.h"
 #include "../../os/CommandLineParser.h"
 #include "../kaba.h"

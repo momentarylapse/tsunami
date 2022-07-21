@@ -8,6 +8,7 @@
 #include "FormatMidi.h"
 
 #include "../../lib/os/file.h"
+#include "../../lib/os/formatter.h"
 #include "../../lib/base/map.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"

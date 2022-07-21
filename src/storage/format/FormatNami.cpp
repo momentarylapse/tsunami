@@ -24,6 +24,7 @@
 #include "../../module/midi/MidiEffect.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../lib/os/file.h"
+#include "../../lib/os/formatter.h"
 #include "../../lib/doc/chunked.h"
 #include "../../lib/hui/language.h"
 #if HAS_LIB_FLAC

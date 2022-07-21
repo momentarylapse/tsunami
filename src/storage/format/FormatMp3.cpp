@@ -9,6 +9,7 @@
 #include "../Storage.h"
 #include "../../lib/math/math.h"
 #include "../../lib/os/file.h"
+#include "../../lib/os/formatter.h"
 #include "../../data/Track.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"

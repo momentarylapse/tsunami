@@ -14,6 +14,7 @@
 #include "../../data/Song.h"
 #include "../../data/base.h"
 #include "../../lib/os/file.h"
+#include "../../lib/os/formatter.h"
 #include "../../lib/os/msg.h"
 
 const int BEAT_PARTITION = 12;

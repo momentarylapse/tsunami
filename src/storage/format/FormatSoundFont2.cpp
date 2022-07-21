@@ -7,6 +7,7 @@
 
 #include "FormatSoundFont2.h"
 #include "../../lib/os/file.h"
+#include "../../lib/os/formatter.h"
 #include "../../lib/os/msg.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"

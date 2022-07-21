@@ -8,6 +8,7 @@
 #include "config.h"
 #include "../os/file.h"
 #include "../os/filesystem.h"
+#include "../os/formatter.h"
 #include "../os/msg.h"
 #include "../any/any.h"
 

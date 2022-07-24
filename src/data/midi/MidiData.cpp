@@ -8,16 +8,17 @@
 #include "MidiData.h"
 #include "Instrument.h"
 #include "../SongSelection.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/language.h"
 #include <math.h>
 
+const float MIDDLE_A_DEFAULT_FREQ = 440.0f;
 
 float pitch_to_freq(float pitch) {
-	return 440.0f * pow(2, (pitch - 69.0f) / 12.0f);
+	return MIDDLE_A_DEFAULT_FREQ * pow(2, (pitch - (float)MIDDLE_A) / 12.0f);
 }
 
 float freq_to_pitch(float freq) {
-	return log2(freq / 440.0f) * 12.0f + 69.0f;
+	return log2(freq / MIDDLE_A_DEFAULT_FREQ) * 12.0f + (float)MIDDLE_A;
 }
 
 
@@ -35,8 +36,8 @@ int pitch_to_rel(int pitch) {
 	return pitch % 12;
 }
 
-static string REL_PITCH_NAME[12] = {"C", u8"C\u266F", "D", u8"D\u266F", "E", "F", u8"F\u266F", "G", u8"G\u266F", "A", u8"A\u266F", "B"};
-static string REL_PITCH_NAME_CANONICAL[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+static const string REL_PITCH_NAME[12] = {"C", u8"C\u266F", "D", u8"D\u266F", "E", "F", u8"F\u266F", "G", u8"G\u266F", "A", u8"A\u266F", "B"};
+static const string REL_PITCH_NAME_CANONICAL[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
 
 string rel_pitch_name(int pitch_rel) {
 	if (pitch_rel < 0 or pitch_rel >= 12)

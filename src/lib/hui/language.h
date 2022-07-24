@@ -11,6 +11,8 @@
 #ifndef _LANG_EXISTS_
 #define _LANG_EXISTS_
 
+class Path;
+
 //----------------------------------------------------------------------------------
 // string conversion
 

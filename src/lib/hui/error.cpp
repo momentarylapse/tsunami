@@ -119,7 +119,7 @@ public:
 		}
 		add_button(_("Bug report"), 1, 0, "send-report");
 		set_tooltip("send-report", _("send a bug report to Michi"));
-		add_button(_("Ok"), 0, 1, "ok");
+		add_button(_("Ok"), 0, 0, "ok");
 		set_image("ok", "hui:ok");
 		set_options("ok", "danger,default");
 		set_tooltip("ok", _("will close the program"));
@@ -158,7 +158,7 @@ public:
 };
 
 void show_crash_window() {
-	hui::fly(new ErrorDialog);
+	hui::run(new ErrorDialog);
 }
 
 void hui_default_error_handler() {

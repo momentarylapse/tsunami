@@ -30,6 +30,13 @@ public:
 
 	static Temperament create_default();
 	static Temperament create(TemperamentType type, int ref_pitch, float ref_freq);
+
+	bool guess_parameters(TemperamentType &type, int &ref_pitch, float &ref_freq) const;
+
+private:
+	static Temperament create_from_factor(int pitch_ref, float freq_ref, float factor[12]);
+	static Temperament create_meantone(int pitch_ref, float freq_ref, float x);
+	static Temperament create_equal12(int pitch_ref, float freq_ref);
 };
 
 #endif /* SRC_DATA_MIDI_TEMPERAMENT_H_ */

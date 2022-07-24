@@ -7,6 +7,7 @@
 
 #include "file.h"
 #include "formatter.h"
+#include "msg.h"
 
 
 
@@ -40,18 +41,18 @@ char TextLinesFormatter::read_char() {
 	return c;
 }
 
-// read a single character (1 byte)
 unsigned char TextLinesFormatter::read_byte() {
-	return read_char();
-}
-
-unsigned char BinaryFormatter::read_byte() {
 	return read_str()._int();
 }
 
+// read a single character (1 byte)
+unsigned char BinaryFormatter::read_byte() {
+	return read_char();
+}
+
 // read the rest of the line (only text mode)
-void BinaryFormatter::read_comment()
-{}
+void BinaryFormatter::read_comment() {
+}
 
 void TextLinesFormatter::read_comment() {
 #ifdef FILE_COMMENTS_DEBUG

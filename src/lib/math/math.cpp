@@ -7,14 +7,14 @@
 //------------------------------------------------------------------------------------------------//
 
 
-// force <i> within a boundary by modulo-ing
+// force <i> within a boundary [min, max) by modulo-ing
 template<>
 int loop<int>(int i, int min, int max) {
 	if (max <= min)
 		return min;
 	int d = max - min;
 	if (i < min){
-		int n = (int)((min-i) / d) + 1;
+		int n = (int)((min-i-1) / d) + 1;
 		return i + d * n;
 	}
 	if (i >= max){

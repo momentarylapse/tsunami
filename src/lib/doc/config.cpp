@@ -53,6 +53,13 @@ void Configuration::set_str(const string& name, const string& val) {
 	set(name, Any(val));
 }
 
+void Configuration::set_str_array(const string &name, const Array<string> &val) {
+	Any a = Any::EmptyArray;
+	for (auto &s: val)
+		a.add(Any(s));
+	set(name, a);
+}
+
 Any Configuration::get(const string& name, const Any& default_val) const {
 	if (has(name))
 		return map[name];
@@ -73,7 +80,26 @@ bool Configuration::get_bool(const string& name, bool default_val) const {
 }
 
 string Configuration::get_str(const string& name, const string& default_val) const {
-	return get(name, Any(default_val)).str();
+	auto a = get(name, Any(default_val));
+	if (a.is_empty())
+		return "";
+	return a.str();
+}
+
+Array<string> Configuration::get_str_array(const string &name, const Array<string> &default_val) const {
+	auto a = get(name, Any::EmptyArray);
+	if (a.is_empty())
+		return {};
+	if (a.is_string())
+		return {a.str()};
+	Array<string> r;
+	for (auto &s: a.as_array()) {
+		if (s.is_empty())
+			r.add("");
+		else
+			r.add(s.str());
+	}
+	return r;
 }
 
 bool Configuration::has(const string& name) const {

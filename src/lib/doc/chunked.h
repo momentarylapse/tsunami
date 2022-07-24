@@ -8,6 +8,7 @@
 #ifndef SRC_LIB_XFILE_CHUNKED_H_
 #define SRC_LIB_XFILE_CHUNKED_H_
 
+#include "../os/formatter.h"
 
 class Path;
 

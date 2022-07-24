@@ -360,6 +360,11 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 		a.create_type(Any::TYPE_ARRAY);
 		pos ++;
 		while (tokens[pos] != "]") {
+			if (tokens[pos] == ",") {
+				a.add(Any());
+				pos ++;
+				continue;
+			}
 			a.as_array().resize(a.as_array().num + 1);
 			any_parse_part(a.as_array().back(), tokens, pos);
 			if (tokens[pos] == "]")
@@ -566,7 +571,7 @@ void Any::append(const Any &a) {
 	}
 }
 
-int Any::length() {
+int Any::length() const {
 	if (is_array())
 		return as_array().num;
 	if (is_map())

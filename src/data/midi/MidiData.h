@@ -14,7 +14,9 @@
 #include "MidiNote.h"
 #include "MidiEvent.h"
 
-#define MAX_PITCH		128
+const int MAX_PITCH = 128;
+const int MIDDLE_C = 60;
+const int MIDDLE_A = 69;
 
 class MidiEffect;
 class Instrument;

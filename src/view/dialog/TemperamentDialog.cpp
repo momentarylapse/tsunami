@@ -14,7 +14,6 @@
 #include <math.h>
 
 const int RELATIVE_NUM_PITCHES = 2;
-const int MIDDLE_C = 60;
 
 TemperamentDialog::TemperamentDialog(Track *t, AudioView *v, hui::Window *parent) :
 	hui::Dialog("detune_synthesizer_dialog", parent)
@@ -35,16 +34,23 @@ TemperamentDialog::TemperamentDialog(Track *t, AudioView *v, hui::Window *parent
 	add_string("preset", "1/3 comma meantone");
 	add_string("preset", "Pythagorean");
 	add_string("preset", "5 limit diatonic major");
-	if (temperament.is_default())
-		set_int("preset", 1);
-	else
-		set_int("preset", 0);
 
 	for (int i=0; i<12; i++)
 		add_string("reference-pitch", pitch_name(MIDDLE_C + i));
-	set_int("reference-pitch", 0);
 
-	set_float("reference-freq", pitch_to_freq(MIDDLE_C));
+	TemperamentType type;
+	int ref_pitch;
+	float ref_freq;
+
+	if (temperament.guess_parameters(type, ref_pitch, ref_freq)) {
+		set_int("preset", (int)type);
+		set_int("reference-pitch", pitch_to_rel(ref_pitch));
+		set_float("reference-freq", ref_freq);
+	} else {
+		set_int("preset", 0);
+		set_int("reference-pitch", 0);
+		set_float("reference-freq", temperament.freq[MIDDLE_C]);
+	}
 
 	check("all_octaves", all_octaves);
 	check("relative", mode_relative);
@@ -233,21 +239,25 @@ void TemperamentDialog::on_all_octaves() {
 }
 
 void TemperamentDialog::apply_preset() {
-	check("all_octaves", true);
-
 	int n = get_int("preset");
 	if (n < 0)
 		return;
-	int pitch_ref = get_int("reference-pitch");
-	float freq_ref = pitch_to_freq(pitch_ref);
+	int pitch_ref = MIDDLE_C + get_int("reference-pitch");
+	float freq_ref = get_float("reference-freq");
 
 	temperament = Temperament::create((TemperamentType)n, pitch_ref, freq_ref);
+
+	/*all_octaves = true;
+	mode_relative = true;
+	check("all_octaves", all_octaves);
+	check("relative", mode_relative);*/
+
 	redraw("detune_area");
 }
 
 void TemperamentDialog::on_reference_pitch() {
-	int pitch_ref = get_int("reference-pitch");
-	set_float("reference-freq", pitch_to_freq(MIDDLE_C + pitch_ref));
+	int pitch_ref = MIDDLE_C + get_int("reference-pitch");
+	set_float("reference-freq", pitch_to_freq(pitch_ref));
 	apply_preset();
 }
 
@@ -256,7 +266,6 @@ void TemperamentDialog::on_reference_freq() {
 }
 
 void TemperamentDialog::on_preset() {
-	check("all_octaves", true);
 	apply_preset();
 }
 

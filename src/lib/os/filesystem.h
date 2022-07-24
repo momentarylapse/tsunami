@@ -23,7 +23,7 @@ string hash(const Path &filename, const string &type);
 
 bool func_did_not_throw(std::function<void()> f);
 #define FILE_OP_OK(OP) \
-	func_did_not_throw([=]{ OP; })
+	os::fs::func_did_not_throw([=]{ OP; })
 
 
 

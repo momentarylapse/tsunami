@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_LIB_XFILE_PDF_H_
-#define SRC_LIB_XFILE_PDF_H_
+#ifndef SRC_LIB_DOC_PDF_H_
+#define SRC_LIB_DOC_PDF_H_
 
 #include "../base/base.h"
 #include "../base/pointer.h"
@@ -18,7 +18,6 @@ class Image;
 class color;
 class rect;
 class vec2;
-class File;
 
 namespace pdf {
 
@@ -114,4 +113,4 @@ void add_font_directory(const Path &dir);
 
 
 
-#endif /* SRC_LIB_XFILE_PDF_H_ */
+#endif /* SRC_LIB_DOC_PDF_H_ */

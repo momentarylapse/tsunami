@@ -68,7 +68,7 @@ public:
 	const Any &operator[] (int index) const;
 	Any &operator[] (int index);
 	Any &_cdecl back();
-	int length();
+	int length() const;
 	
 	int& as_int() const;
 	float& as_float() const;

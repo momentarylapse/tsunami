@@ -10,10 +10,11 @@
 
 #include "nix.h"
 #include "nix_common.h"
-#ifdef _X_USE_HUI_
+#include "../math/vec2.h"
+#if __has_include("../hui/hui.h")
 #include "../hui/hui.h"
 #endif
-#ifdef _X_USE_IMAGE_
+#if __has_include("../image/image.h")
 #include "../image/image.h"
 #endif
 

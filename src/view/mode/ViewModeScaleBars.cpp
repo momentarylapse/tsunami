@@ -33,7 +33,7 @@ void ViewModeScaleBars::draw_post(Painter *c) {
 }
 
 string ViewModeScaleBars::get_tip() {
-	return _("move right selection handle to scale   cancel (Esc)   done (Return)");
+	return _("move right selection handle to scale   cancel [Esc]   apply [Return]");
 }
 
 

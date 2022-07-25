@@ -15,19 +15,49 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 {
 	from_resource("audio-editor");
 
-	event("mode-peaks", [this]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); update(); });
-	event("mode-spectrum", [this]{ view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); update(); });
+	event("mode-peaks", [this] {
+		view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS);
+		update();
+	});
+	event("mode-spectrum", [this] {
+		view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM);
+		update();
+	});
 
-	event("mode-select", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT); });
-	event("mode-smoothen", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN); });
-	event("mode-clone", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE); });
-	event("mode-rubber", [this]{ on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER); });
-	event("action-source", [this]{ on_action_source(); });
-	event("action-effect", [this]{ on_action_effect(); });
-	event("edit_track", [session]{ session->set_mode(EditMode::DefaultTrack); });
-	event("edit_song", [session]{ session->set_mode(EditMode::DefaultSong); });
+	event("mode-select", [this] {
+		on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT);
+	});
+	event("mode-smoothen", [this] {
+		on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN);
+	});
+	event("mode-clone", [this] {
+		on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE);
+	});
+	event("mode-rubber", [this] {
+		on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER);
+	});
+	event("stretch-apply", [this] {
+		view->mode_edit_audio->apply_stretch();
+	});
+	event("compensate-pitch", [this] {
+		view->mode_edit_audio->flag_pitch_compensate = is_checked("");
+	});
+	event("action-source", [this] {
+		on_action_source();
+	});
+	event("action-effect", [this] {
+		on_action_effect();
+	});
+	event("edit_track", [session] {
+		session->set_mode(EditMode::DefaultTrack);
+	});
+	event("edit_song", [session] {
+		session->set_mode(EditMode::DefaultSong);
+	});
 
-	view->mode_edit_audio->subscribe(this, [this] { update(); }, view->mode_edit_audio->MESSAGE_ANY);
+	view->mode_edit_audio->subscribe(this, [this] {
+		update();
+	}, view->mode_edit_audio->MESSAGE_ANY);
 	update();
 
 	view->subscribe(this, [this]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
@@ -43,7 +73,10 @@ void AudioEditorConsole::on_view_cur_layer_change() {
 }
 
 void AudioEditorConsole::on_edit_mode(int m) {
-	view->mode_edit_audio->set_edit_mode(ViewModeEditAudio::EditMode(m));
+	auto mode = (ViewModeEditAudio::EditMode)m;
+	expand("revealer-clone", mode == ViewModeEditAudio::EditMode::CLONE);
+	expand("revealer-stretch", mode == ViewModeEditAudio::EditMode::RUBBER);
+	view->mode_edit_audio->set_edit_mode(mode);
 }
 
 void AudioEditorConsole::on_action_source() {

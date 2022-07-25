@@ -46,10 +46,13 @@ public:
 	TrackLayer *cur_layer();
 	bool editing(AudioViewLayer *l);
 
-	void apply_rubber(bool pitch_correct);
+	void apply_stretch();
+
+	bool flag_pitch_compensate = false;
 
 
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void on_mouse_move() override;
 	string get_tip() override;
 };
 

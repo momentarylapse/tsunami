@@ -77,6 +77,12 @@ group-mode
 1
 Grid
 ?
+vertical
+0
+0
+3
+Grid
+?
 homogenousx
 0
 0
@@ -89,7 +95,7 @@ image=select,flat,big,expandx,ignorefocus,height=50
 0
 ToggleButton
 mode-smoothen
-image=audio-mode-smoothen,flat,big,expandx,ignorefocus
+image=audio-mode-smoothen,flat,big,expandx,ignorefocus,disabled
 1
 0
 0
@@ -104,6 +110,60 @@ mode-rubber
 image=audio-mode-stretch,flat,big,expandx,ignorefocus
 3
 0
+0
+Revealer
+revealer-clone
+
+1
+0
+1
+Grid
+grid-clone
+
+0
+0
+2
+Label
+l-clone-radius
+
+0
+0
+0
+SpinButton
+clone-radius
+expandx
+1
+0
+0
+Revealer
+revealer-stretch
+
+2
+0
+1
+Grid
+grid-stretch
+
+0
+0
+3
+CheckBox
+compensate-pitch
+expandx,ignorefocus
+0
+0
+0
+Button
+stretch-clear
+ignorefocus
+0
+1
+0
+Button
+stretch-apply
+ignorefocus,danger
+1
+1
 0
 Group
 group-actions
@@ -7322,7 +7382,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-651
+655
 # Text
 /bars-add
 Add bars...
@@ -7633,6 +7693,9 @@ Fill from source...
 audio-editor/audio-editor
 Audio
 
+audio-editor/compensate-pitch
+Compensate pitch changes
+
 audio-editor/group-actions
 Operations
 
@@ -7644,6 +7707,9 @@ Edit mode
 
 audio-editor/grp-view
 View
+
+audio-editor/l-clone-radius
+Radius
 
 audio-editor/mode-clone
 
@@ -7659,10 +7725,16 @@ audio-editor/mode-select
 Select
 audio-editor/mode-smoothen
 
-Smoothen out... TODO
+Smoothen out... NOT IMPLEMENTED YET
 audio-editor/mode-spectrum
 
 Show spectrum
+audio-editor/stretch-apply
+Apply
+
+audio-editor/stretch-clear
+Clear
+
 bar_add_dialog/bad_t_beats
 Beats
 

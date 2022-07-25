@@ -847,21 +847,21 @@ void ViewModeMidi::draw_post(Painter *c) {
 
 string ViewModeMidi::get_tip() {
 	if (input_mode == InputMode::NOTE_LENGTH)
-		return _("enter note length (1-9, A-F)    cancel (Esc)");
+		return _("enter note length [1-9], [A-F]    cancel [Esc]");
 	if (input_mode == InputMode::BEAT_PARTITION)
-		return _("enter beat partition (1-9, A-F)    cancel (Esc)");
-	string message = _("cursor (←,→)");
-	string message2 = _("    track ALT+(↑,↓)    delete (⟵)    note length,partition (L,P)");
-	message2 += u8"    \U0001d15f  ,\U0001d160  ,\U0001d161  ,\U0001d160/₃    (Q,W,S,T)";
+		return _("enter beat partition [1-9], [A-F]    cancel [Esc]");
+	string message = _("cursor [←,→]");
+	string message2 = _("    track [Alt+↑,↓]    delete [⟵]    note length,partition [L,P]");
+	message2 += u8"    \U0001d15f  ,\U0001d160  ,\U0001d161  ,\U0001d160/₃  [Q,W,S,T]";
 	if (!cur_vlayer())
 		return message + message2;
 	auto mode = cur_vlayer()->midi_mode();
 	if (mode == MidiMode::TAB) {
-		message += _("    string (↑,↓)");
-		message2 += _("    add note (0-9, A-F)");
+		message += _("    string [↑,↓]");
+		message2 += _("    add note [0-9], [A-F]");
 	} else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
-		message += _("    octave (↑,↓)");
-		message2 += _("    modifiers (1-4)    add note (A-G)");
+		message += _("    octave [↑,↓]");
+		message2 += _("    modifiers [1-4]    add note [A-G]");
 	}
 	return message + message2;
 }

@@ -570,6 +570,8 @@ void AudioView::on_mouse_move() {
 
 	scene_graph->on_mouse_move(m);
 
+	mode->on_mouse_move();
+
 	force_redraw();
 }
 

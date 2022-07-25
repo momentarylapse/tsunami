@@ -30,6 +30,14 @@ void ViewModeEdit::on_end() {
 	mode->on_end();
 }
 
+void ViewModeEdit::on_mouse_move() {
+	mode->on_mouse_move();
+}
+
+void ViewModeEdit::on_mouse_wheel() {
+	mode->on_mouse_wheel();
+}
+
 void ViewModeEdit::on_key_down(int k) {
 
 	if (k == hui::KEY_UP + hui::KEY_ALT)

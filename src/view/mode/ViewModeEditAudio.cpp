@@ -1,5 +1,6 @@
 #include "ViewModeEditAudio.h"
 #include "../sidebar/AudioEditorConsole.h"
+#include "../sidebar/SideBar.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../MouseDelayPlanner.h"
@@ -9,19 +10,24 @@
 #include "../../data/audio/BufferInterpolator.h"
 #include "../../plugins/FastFourierTransform.h"
 #include "../../lib/math/complex.h"
+#include "../../TsunamiWindow.h"
 
 struct RubberPoint {
 	int source, target;
 };
 
+enum RubberHoverType {
+	SOURCE,
+	TARGET,
+	NONE = -1
+};
+
 struct RubberData {
-	//Range range;
 	Array<RubberPoint> points;
-	int hover, selected;
-	RubberData() {
-		hover = -1;
-		selected = -1;
-	}
+	int hover = -1;
+	RubberHoverType hover_type = RubberHoverType::NONE;
+	int selected = -1;
+	RubberHoverType selected_type = RubberHoverType::NONE;
 };
 static RubberData rubber;
 
@@ -46,17 +52,25 @@ class MouseDelayRubberPoint : public MouseDelayAction {
 public:
 	AudioView *view;
 	RubberPoint *p;
-	MouseDelayRubberPoint(AudioView *v, RubberPoint *_p) {
+	RubberHoverType type;
+	MouseDelayRubberPoint(AudioView *v, RubberPoint *_p, RubberHoverType _type) {
 		view = v;
 		p = _p;
+		type = _type;
 	}
 	void on_start(const vec2 &m) override {
 	}
 	void on_update(const vec2 &m) override {
-		p->target = view->cam.screen2sample(m.x);
+		if (type == RubberHoverType::TARGET) {
+			p->target = view->cam.screen2sample(m.x);
+		} else {
+			int d = view->cam.screen2sample(m.x) - p->source;
+			p->source += d;
+			p->target += d;
+		}
 	}
 	void on_draw_post(Painter *c) override {
-		c->draw_str({100, 100}, "MOVING");
+		//c->draw_str({100, 100}, "MOVING");
 	}
 	void on_clean_up() override {
 	}
@@ -76,6 +90,7 @@ ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 void ViewModeEditAudio::on_start() {
 	set_side_bar(SideBar::AUDIO_EDITOR_CONSOLE);
 }
+
 void ViewModeEditAudio::on_end() {
 }
 
@@ -93,12 +108,10 @@ void ViewModeEditAudio::on_key_down(int k) {
 		}
 		if (k == hui::KEY_X + hui::KEY_SHIFT) {
 			rubber.points.clear();
-			rubber.selected = rubber.hover = -1;;
+			rubber.selected = rubber.hover = -1;
 		}
 		if (k == hui::KEY_RETURN)
-			apply_rubber(false);
-		if (k == hui::KEY_RETURN + hui::KEY_SHIFT)
-			apply_rubber(true);
+			apply_stretch();
 	}
 	view->force_redraw();
 }
@@ -110,6 +123,8 @@ float ViewModeEditAudio::layer_suggested_height(AudioViewLayer *l) {
 }
 
 Range ViewModeEditAudio::range_source() {
+	if (!view->sel.range().is_empty())
+		return view->sel.range();
 	int r = cam->dscreen2sample(edit_radius);
 	return RangeTo(view->sel.range().start()-r, view->sel.range().start()+r);
 }
@@ -152,14 +167,30 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 
 	if (edit_mode == EditMode::RUBBER) {
 		foreachi (auto &q, rubber.points, i) {
-			p->set_line_width((i == rubber.selected) ? 4 : 2);
-			p->set_color(Red);
+			// source
+			color c = theme.red.with_alpha(0.7f);
+			p->set_line_width(2);
+			if ((rubber.hover_type == RubberHoverType::SOURCE) and (rubber.hover == i))
+				c.a = 1; //theme.hoverify(c);
+			if ((rubber.selected_type == RubberHoverType::SOURCE) and (rubber.selected == i))
+				p->set_line_width(4);
+			p->set_color(c);
 			x1 = view->cam.sample2screen(q.source);
 			p->draw_line({x1, y1}, {x1, y2});
-			p->set_color(Green);
+
+			// target
+			c = theme.green.with_alpha(0.7f);
+			p->set_line_width(2);
+			if ((rubber.hover_type == RubberHoverType::TARGET) and (rubber.hover == i))
+				c.a = 1; //theme.hoverify(c);
+			if ((rubber.selected_type == RubberHoverType::TARGET) and (rubber.selected == i))
+				p->set_line_width(4);
+			p->set_color(c);
 			x2 = view->cam.sample2screen(q.target);
 			p->draw_line({x2, y1}, {x2, y2});
-			p->set_color(White);
+
+			p->set_line_width(2);
+			p->set_color(theme.text);
 			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.25f), vec2(x2, y1 + (y2-y1)*0.25f));
 			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.75f), vec2(x2, y1 + (y2-y1)*0.75f));
 			p->set_line_width(1);
@@ -188,6 +219,33 @@ bool ViewModeEditAudio::editing(AudioViewLayer *l) {
 
 float step(float t) {
 	return 1 - 1/(exp((t-0.5)*12) + 1);
+}
+
+
+void ViewModeEditAudio::on_mouse_move() {
+	float mx = view->m.x;
+	int smx = view->cam.screen2sample(mx);
+	rubber.hover = -1;
+	rubber.hover_type = RubberHoverType::NONE;
+
+	if (!cur_vlayer()->is_cur_hover())
+		return;
+
+	if (edit_mode == EditMode::RUBBER) {
+		foreachi(auto &q, rubber.points, i) {
+			float sx = view->cam.sample2screen(q.source);
+			float tx = view->cam.sample2screen(q.target);
+			if (fabs(tx - mx) < 10) {
+				rubber.hover = i;
+				rubber.hover_type = RubberHoverType::TARGET;
+			} else if (fabs(sx - mx) < 10) {
+				rubber.hover = i;
+				rubber.hover_type = RubberHoverType::SOURCE;
+			}
+		}
+	}
+
+	//view->force_redraw();
 }
 
 void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
@@ -220,24 +278,22 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 		vlayer->layer->edit_buffers_finish(a);
 	} else if (edit_mode == EditMode::RUBBER) {
 		float mx = view->m.x;
-
-		rubber.hover = -1;
-		foreachi(auto &q, rubber.points, i) {
-			float x = view->cam.sample2screen(q.target);
-			if (fabs(x - mx) < 10) {
-				rubber.hover = i;
-				view->mdp_run(new MouseDelayRubberPoint(view, &q));
-			}
-		}
-
-		if (rubber.hover < 0) {
-			RubberPoint q;
-			q.source = q.target = view->cam.screen2sample(mx);
-			rubber.points.add(q);
-			rubber.hover = rubber.points.num - 1;
-		}
+		int smx = view->cam.screen2sample(mx);
 
 		rubber.selected = rubber.hover;
+		rubber.selected_type = rubber.hover_type;
+
+		if (rubber.hover >= 0) {
+			view->mdp_run(new MouseDelayRubberPoint(view, &rubber.points[rubber.hover], rubber.hover_type));
+		} else if (!view->sel.range().is_inside(smx)) {
+			ViewModeDefault::left_click_handle_void(vlayer);
+			return;
+		} else if (rubber.hover < 0) {
+			rubber.points.add({smx, smx});
+			rubber.hover = rubber.points.num - 1;
+			rubber.hover_type = RubberHoverType::TARGET;
+		}
+
 	} else { // SELECT
 		ViewModeDefault::left_click_handle_void(vlayer);
 	}
@@ -296,7 +352,7 @@ void pitch_shift(AudioBuffer &buf, float factor) {
 		pitch_shift_channel(buf.c[i], factor);
 }
 
-void ViewModeEditAudio::apply_rubber(bool pitch_correct) {
+void ViewModeEditAudio::apply_stretch() {
 
 	AudioBuffer buf;
 
@@ -335,7 +391,7 @@ void ViewModeEditAudio::apply_rubber(bool pitch_correct) {
 
 		BufferInterpolator::interpolate(bs, bt, BufferInterpolator::Method::CUBIC);
 
-		if (pitch_correct)
+		if (flag_pitch_compensate)
 			pitch_shift(bt, (float)rt.length / (float)rs.length);
 		out.set(bt, rt.offset);
 
@@ -347,8 +403,11 @@ void ViewModeEditAudio::apply_rubber(bool pitch_correct) {
 }
 
 string ViewModeEditAudio::get_tip() {
-	if (edit_mode == EditMode::RUBBER)
-		return "...click -> drag/add point ....    X -> delete point   SHIFT+X -> clear   RETURN -> apply on selected range  RETURN+SHIFT -> apply with pitch...";
-	return "AAAAAAAAAAA  audio editing!!!!!!    W,S -> radius    track ALT+(↑,↓)";
+	if (edit_mode == EditMode::RUBBER) {
+		if (view->sel.range().is_empty())
+			return "select range for stretching";
+		return "EXPERIMENTAL    click in selection to add point    drag to move point    delete point [X]    clear [Shift+X]    apply [Return]    track [Alt+↑,↓]";
+	}
+	return "EXPERIMENTAL    radius [W,S]    track [Alt+↑,↓]";
 }
 

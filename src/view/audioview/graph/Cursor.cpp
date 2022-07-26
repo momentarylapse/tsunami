@@ -47,17 +47,15 @@ void Cursor::on_draw(Painter* c) {
 	view->draw_time_line(c, pos(), col, is_cur_hover(), false);
 
 
-	if (view->selecting_or()) {
-		float x = view->cam.sample2screen(pos());
-		if ((x >= view->song_area().x1) and (x <= view->song_area().x2)) {
-			color cc = col;
-			if (is_cur_hover())
-				cc = theme.selection_boundary_hover;
-			for (auto *v: view->vlayers)
-				if (view->sel.has(v->layer)) {
-					c->draw_circle({x, v->area.my()}, 6);
-				}
-		}
+	float x = view->cam.sample2screen(pos());
+	if ((x >= view->song_area().x1) and (x <= view->song_area().x2)) {
+		color cc = col;
+		if (is_cur_hover())
+			cc = theme.selection_boundary_hover;
+		for (auto *v: view->vlayers)
+			if (view->sel.has(v->layer)) {
+				c->draw_circle({x, v->area.my()}, 6);
+			}
 	}
 }
 
@@ -69,9 +67,6 @@ int Cursor::pos() const {
 }
 
 bool Cursor::hover(const vec2 &m) const {
-	if (!view->selecting_or())
-		return false;
-
 	float x = view->cam.sample2screen(pos());
 	for (auto *v: view->vlayers)
 		if (view->sel.has(v->layer)) {
@@ -79,10 +74,6 @@ bool Cursor::hover(const vec2 &m) const {
 				return true;
 		}
 	return false;
-
-	/*if (m.y < view->song_area().y2 - 20)
-		return false;
-	return (fabs(x - m.x) < 10);*/
 }
 
 string Cursor::get_tip() const {
@@ -91,10 +82,8 @@ string Cursor::get_tip() const {
 
 bool Cursor::on_left_button_down(const vec2 &m) {
 	drag_range = view->sel.range_raw;
-	/*if (!is_end)
-		drag_range.invert();*/
 
-	view->mdp_prepare([=]{
+	view->mdp_prepare([this] {
 		if (is_end)
 			drag_range.set_end(view->get_mouse_pos_snap());
 		else
@@ -142,7 +131,7 @@ void SelectionMarker::on_draw(Painter* p) {
 			for (AudioViewLayer *l: vlayer)
 				if (sel.has(l->layer))
 					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
-		}else if (view->selection_mode == SelectionMode::RECT) {
+		} else if (view->selection_mode == SelectionMode::RECT) {
 			float x1, x2;
 			view->cam.range2screen_clip(sel.range(), view->clip, x1, x2);
 			p->set_color(theme.selection_internal);

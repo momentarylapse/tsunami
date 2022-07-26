@@ -185,7 +185,9 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 
 	if (view->sel.has(layer)) {
 		// selection
-		view->buffer_painter->set_color(theme.selection_boundary, background_selection_color());
+		//view->buffer_painter->set_color(theme.selection_boundary, background_selection_color());
+		//view->buffer_painter->set_color(theme.text_soft1, background_selection_color());
+		view->buffer_painter->set_color(theme.text_soft1, theme.selection_boundary);//, background_selection_color());
 		view->buffer_painter->set_clip(view->cursor_range());
 		for (AudioBuffer &b: layer->buffers)
 			view->buffer_painter->draw_buffer_selection(c, b, b.offset);

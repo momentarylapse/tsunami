@@ -348,9 +348,9 @@ void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
 }
 
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset) {
-	std::swap(col2, col2sel);
+	std::swap(col2, col1);
 	draw_buffer(c, b, offset);
-	std::swap(col2, col2sel);
+	std::swap(col2, col1);
 	return;
 
 	double view_pos_rel = view->cam.screen2sample(0);
@@ -417,7 +417,7 @@ void BufferPainter::set_context(const rect &_area, AudioViewMode _mode) {
 void BufferPainter::set_color(const color &fg, const color &bg) {
 	col1 = fg;
 	col2 = color::interpolate(fg, bg, 0.8f);
-	col2sel = color::interpolate(fg, bg, 0.3f);
+	col2sel = col2;//color::interpolate(fg, bg, 0.3f);
 }
 
 void BufferPainter::set_clip(const Range &r) {

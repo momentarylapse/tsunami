@@ -425,6 +425,8 @@ Any Any::parse(const string &s) {
 
 	Any r;
 	any_parse_part(r, tokens, pos);
+	if ((r.is_string() or r.is_int() or r.is_bool() or r.is_float()) and tokens.num > 1 and s[0] != '\"')
+		return Any(s.trim());
 	return r;
 }
 

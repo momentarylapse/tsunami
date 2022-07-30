@@ -168,6 +168,7 @@ bool Window::get_mouse(int &x, int &y, int button) {
 NixWindow::NixWindow(const string& title, int width, int height) :
 	Window(title, width, height)
 {
+	set_border_width(0);
 	add_drawing_area("!opengl,grabfocus", 0, 0, "nix-area");
 }
 

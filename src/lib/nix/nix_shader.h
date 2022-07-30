@@ -23,14 +23,14 @@ public:
 	void _cdecl set_float_l(int location, float f);
 	void _cdecl set_int_l(int location, int i);
 	void _cdecl set_floats_l(int location, const float *data, int num);
-	void _cdecl set_matrix_l(int location, const matrix &m);
+	void _cdecl set_matrix_l(int location, const mat4 &m);
 	void _cdecl set_color_l(int location, const color &c);
 	int _cdecl get_location(const string &name);
 
 	void _cdecl set_float(const string &name, float f);
 	void _cdecl set_int(const string &name, int i);
 	void _cdecl set_floats(const string &name, const float *data, int num);
-	void _cdecl set_matrix(const string &name, const matrix &m);
+	void _cdecl set_matrix(const string &name, const mat4 &m);
 	void _cdecl set_color(const string &name, const color &c);
 
 	bool _cdecl link_uniform_block(const string &name, int binding);

@@ -1,6 +1,8 @@
 
-#include "../kaba.h"
+#include "dict.h"
 #include "lib.h"
+#include "list.h"
+#include "../kaba.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 #include "../../base/map.h"
@@ -65,7 +67,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 	}
 
 	if (p == TypeInt) {
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,int>::__init__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XDict<int>::__init__);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &IntDict::set_int);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
@@ -73,7 +75,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 			func_add_param("key", TypeString);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &IntDict::str, Flags::PURE);
 	} else if (p == TypeFloat32) {
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,float>::__init__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XDict<float>::__init__);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &FloatDict::set_float);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
@@ -81,7 +83,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 			func_add_param("key", TypeString);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &FloatDict::str, Flags::PURE);
 	} else if (p == TypeString) {
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Map<string,string>::__init__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XDict<string>::__init__);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Map<string,string>::set);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);

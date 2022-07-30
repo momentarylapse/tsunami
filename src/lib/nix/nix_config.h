@@ -46,9 +46,9 @@
 #include <math.h>
 #include "../base/base.h"
 
-class vector;
+class vec3;
 class rect;
-class matrix;
+class mat4;
 class color;
 
 

@@ -1,5 +1,5 @@
 #include "../kaba.h"
-#include "../../math/matrix.h"
+#include "../../math/mat4.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
 

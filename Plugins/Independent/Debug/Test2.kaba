@@ -42,6 +42,6 @@ class Test extends TsunamiPlugin
 		print("________")
 		print(dmax)
 		print(step_max)
-		print(buf.c[1].max())
+		print(max(buf.c[1]))
 		
 		stop()

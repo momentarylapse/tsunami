@@ -75,7 +75,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		if (auto sr = *(SampleRef**)v)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
-	} else if (c == kaba::TypeComplex or c == kaba::TypeVector or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
+	} else if (c == kaba::TypeComplex or c == kaba::TypeVec3 or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
 		// rect ...nope
 		Any r = Any::EmptyArray;
 		for (auto &e: c->elements)

@@ -28,7 +28,6 @@
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
 #include "../../lib/hui/Controls/Control.h"
-#include "../../lib/math/vector.h"
 #include "../../action/song/ActionSongMoveSelection.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"

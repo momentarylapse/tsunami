@@ -1318,11 +1318,16 @@ shared<Node> Parser::parse_abstract_statement_sorted(Block *block) {
 	int token0 = Exp.consume_token(); // "sorted"
 
 	auto params = parse_abstract_call_parameters(block);
-	if (params.num != 2)
-		do_error_exp("sorted(array, criterion) expects 2 parameters");
+	if (params.num < 0 or params.num > 2)
+		do_error_exp("sorted(array, criterion=\"\") expects 1 or 2 parameters");
 	auto node = add_node_statement(StatementID::SORTED, token0, TypeUnknown);
 	node->set_param(0, params[0]);
-	node->set_param(1, params[1]);
+	if (params.num >= 2) {
+		node->set_param(1, params[1]);
+	} else {
+		// empty string
+		node->set_param(1, add_node_const(tree->add_constant(TypeString)));
+	}
 	return node;
 }
 

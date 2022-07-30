@@ -251,14 +251,14 @@ class Grid extends Object
 	func project2(z: vec2) -> vec2
 		return vec2(x_axis.project(z.x), y_axis.project(z.y))
 
-	func project3(z: vector) -> vector
-		return vector(x_axis.project(z.x), y_axis.project(z.y), z.z)
+	func project3(z: vec3) -> vec3
+		return vec3(x_axis.project(z.x), y_axis.project(z.y), z.z)
 
 	func unproject2(z: vec2) -> vec2
 		return vec2(x_axis.unproject(z.x), y_axis.unproject(z.y))
 
-	func unproject3(z: vector) -> vector
-		return vector(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
+	func unproject3(z: vec3) -> vec3
+		return vec3(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
 	
 	
 	func draw_axis_y(c: Painter, part: GridPartition)
@@ -392,8 +392,8 @@ class Grid extends Object
 			radius = 4
 		c.draw_circle(pp, radius)
 	
-	func draw_point3(c: Painter, p: vector, selected: bool, hover: bool)
-		vector pp = project3(p)
+	func draw_point3(c: Painter, p: vec3, selected: bool, hover: bool)
+		var pp = project3(p)
 		c.set_color(point_color(selected, hover))
 		float radius = 3
 		if hover
@@ -416,10 +416,10 @@ class Grid extends Object
 	func get_mouse2() -> vec2
 		return unproject2(hui.get_event().mouse)
 	
-	func get_mouse3(z: float) -> vector
+	func get_mouse3(z: float) -> vec3
 		float mx = hui.get_event().mouse.x
 		float my = hui.get_event().mouse.y
-		return unproject3(vector(mx, my, z))
+		return unproject3(vec3(mx, my, z))
 		
 	func mouse_over_point2(q: vec2) -> bool
 		float mx = hui.get_event().mouse.x
@@ -427,7 +427,7 @@ class Grid extends Object
 		var p = project2(q)
 		return (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 		
-	func mouse_over_point3(q: vector) -> bool
+	func mouse_over_point3(q: vec3) -> bool
 		return mouse_over_point2(q._xy)
 
 		

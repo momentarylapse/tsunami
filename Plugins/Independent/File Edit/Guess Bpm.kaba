@@ -233,7 +233,7 @@ Grid ? '' vertical
 			if c > _cmax and bpm >= peak_bpm_min and bpm <= peak_bpm_max
 				_cmax = c
 				i_opt = d - dmin
-		var cmax = [for c in grid.curve c.y].max()
+		var cmax = max([for c in grid.curve c.y])
 		grid.curve = [for c in grid.curve vec2(c.x, c.y/cmax*100)]
 		grid.bpm_opt = d_to_bpm(dmin + i_opt)
 		grid.i_opt = i_opt

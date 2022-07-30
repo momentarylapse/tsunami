@@ -125,7 +125,7 @@ class Spectrum extends AudioVisualizer
 		if mmax > 0
 			tffl /= mmax
 			tffr /= mmax
-		peak_max = max(tffr.max(), tffl.max())
+		peak_max = max(max(tffr), max(tffl))
 		peak_max = 0.01
 		ffl[next_writing] = tffl
 		ffr[next_writing] = tffr

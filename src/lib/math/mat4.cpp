@@ -1,5 +1,5 @@
-#include "matrix.h"
-#include "vector.h"
+#include "mat4.h"
+#include "vec3.h"
 #include "plane.h"
 #include "quaternion.h"
 #include "../os/msg.h"
@@ -24,92 +24,92 @@
 
 
 const float f_m_id[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
-const matrix matrix::ID = matrix(f_m_id);
+const mat4 mat4::ID = mat4(f_m_id);
 
 
-matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
+mat4 MatrixMultiply2(const mat4 &m2, const mat4 &m1);
 
-matrix::matrix(const float f[16]) {
+mat4::mat4(const float f[16]) {
 	for (int i=0;i<16;i++)
 		e[i]=f[i];
 }
 
-matrix::matrix(const vector &a, const vector &b, const vector &c) {
+mat4::mat4(const vec3 &a, const vec3 &b, const vec3 &c) {
 	_00 = a.x;	_01 = b.x;	_02 = c.x;	_03 = 0;
 	_10 = a.y;	_11 = b.y;	_12 = c.y;	_13 = 0;
 	_20 = a.z;	_21 = b.z;	_22 = c.z;	_23 = 0;
 	_30 = 0;	_31 = 0;	_32 = 0;	_33 = 1;
 }
 
-matrix matrix::operator + (const matrix &m) const {
-	matrix r;
+mat4 mat4::operator + (const mat4 &m) const {
+	mat4 r;
 	for (int i=0;i<16;i++)
 		r.e[i]=e[i]+m.e[i];
 	return r;
 }
 
-matrix matrix::operator - (const matrix &m) const {
-	matrix r;
+mat4 mat4::operator - (const mat4 &m) const {
+	mat4 r;
 	for (int i=0;i<16;i++)
 		r.e[i]=e[i]-m.e[i];
 	return r;
 }
 
-matrix matrix::operator * (const matrix &m) const {
+mat4 mat4::operator * (const mat4 &m) const {
 	return MatrixMultiply2(*this, m);
 }
 
-matrix matrix::operator *= (const matrix &m) {
-	matrix r = (*this * m);
+mat4 mat4::operator *= (const mat4 &m) {
+	mat4 r = (*this * m);
 	*this = r;
 	return *this;
 }
 
-vector matrix::operator * (const vector &v) const {
-	return vector(v.x*_00 + v.y*_01 + v.z*_02 + _03,
+vec3 mat4::operator * (const vec3 &v) const {
+	return vec3(v.x*_00 + v.y*_01 + v.z*_02 + _03,
 	              v.x*_10 + v.y*_11 + v.z*_12 + _13,
 	              v.x*_20 + v.y*_21 + v.z*_22 + _23);
 }
 
-matrix matrix::operator * (float f) const {
-	matrix r;
+mat4 mat4::operator * (float f) const {
+	mat4 r;
 	for (int i=0;i<16;i++)
 		r.e[i] = e[i] * f;
 	return r;
 }
 
-vector matrix::transform(const vector &v) const {
+vec3 mat4::transform(const vec3 &v) const {
 	return *this * v;
 }
-vector matrix::transform_normal(const vector &v) const {
-	return vector(v.x*_00 + v.y*_01 + v.z*_02,
+vec3 mat4::transform_normal(const vec3 &v) const {
+	return vec3(v.x*_00 + v.y*_01 + v.z*_02,
 	              v.x*_10 + v.y*_11 + v.z*_12,
 	              v.x*_20 + v.y*_21 + v.z*_22);
 }
-vector matrix::untransform(const vector &v) const {
+vec3 mat4::untransform(const vec3 &v) const {
 	return inverse() * v;
 }
 
-vector matrix::project(const vector &v) const {
+vec3 mat4::project(const vec3 &v) const {
 	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);
 }
 
-vector matrix::unproject(const vector &v) const {
+vec3 mat4::unproject(const vec3 &v) const {
 	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);
 }
 
-string matrix::str() const {
+string mat4::str() const {
 	//return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
 	return format("(%f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
 }
 
 // kaba
-void matrix::imul(const matrix &m)
+void mat4::imul(const mat4 &m)
 {	*this *= m;	}
-matrix matrix::mul(const matrix &m) const
+mat4 mat4::mul(const mat4 &m) const
 {	return *this * m;	}
 
-vector matrix::mul_v(const vector &v) const
+vec3 mat4::mul_v(const vec3 &v) const
 {	return *this * v;	}
 
 
@@ -117,10 +117,10 @@ vector matrix::mul_v(const vector &v) const
 
 
 // combining two transformation matrices (first do m1, then m2:   m = m2 * m1 )
-matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
+mat4 MatrixMultiply2(const mat4 &m2, const mat4 &m1)
 {
 	// m_ij = (sum k) m2_ik * m1_kj
-	matrix m;
+	mat4 m;
 	for (int i=0; i<4; i++)
 		for (int j=0; j<4; j++)
 			m.__e[j][i] = m2.__e[0][i]*m1.__e[j][0] + m2.__e[1][i]*m1.__e[j][1] + m2.__e[2][i]*m1.__e[j][2] + m2.__e[3][i]*m1.__e[j][3];
@@ -131,7 +131,7 @@ matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 	return m;
 }
 
-float matrix::determinant() const {
+float mat4::determinant() const {
 	return
 		_30*_21*_12*_03-
 		_20*_31*_12*_03-
@@ -160,8 +160,8 @@ float matrix::determinant() const {
 }
 
 // inverting the transformation
-matrix matrix::inverse() const {
-	matrix mo;
+mat4 mat4::inverse() const {
+	mat4 mo;
 	float x = determinant();
 
 	/*msg_write("Matrix Inverse");
@@ -193,8 +193,8 @@ matrix matrix::inverse() const {
 }
 
 // transposes a matrix
-matrix matrix::transpose() const {
-	matrix _m;
+mat4 mat4::transpose() const {
+	mat4 _m;
 	_m._00=_00;	_m._01=_10;	_m._02=_20;	_m._03=_30;
 	_m._10=_01;	_m._11=_11;	_m._12=_21;	_m._13=_31;
 	_m._20=_02;	_m._21=_12;	_m._22=_22;	_m._23=_32;
@@ -203,8 +203,8 @@ matrix matrix::transpose() const {
 }
 
 // translation by a vector ( m * v = v + t )
-matrix matrix::translation(const vector &t) {
-	matrix m;
+mat4 mat4::translation(const vec3 &t) {
+	mat4 m;
 	m._00=1;	m._01=0;	m._02=0;	m._03=t.x;
 	m._10=0;	m._11=1;	m._12=0;	m._13=t.y;
 	m._20=0;	m._21=0;	m._22=1;	m._23=t.z;
@@ -213,8 +213,8 @@ matrix matrix::translation(const vector &t) {
 }
 
 // rotation around the X axis (down)
-matrix matrix::rotation_x(float w) {
-	matrix m;
+mat4 mat4::rotation_x(float w) {
+	mat4 m;
 	float sw=sinf(w);
 	float cw=cosf(w);
 	m._00=1;	m._01=0;	m._02=0;	m._03=0;
@@ -225,8 +225,8 @@ matrix matrix::rotation_x(float w) {
 }
 
 // rotation around the Y axis (to the right)
-matrix matrix::rotation_y(float w) {
-	matrix m;
+mat4 mat4::rotation_y(float w) {
+	mat4 m;
 	float sw=sinf(w);
 	float cw=cosf(w);
 	m._00=cw;	m._01=0;	m._02=sw;	m._03=0;
@@ -237,8 +237,8 @@ matrix matrix::rotation_y(float w) {
 }
 
 // rotation around the Z axis (counter clockwise)
-matrix matrix::rotation_z(float w) {
-	matrix m;
+mat4 mat4::rotation_z(float w) {
+	mat4 m;
 	float sw=sinf(w);
 	float cw=cosf(w);
 	m._00=cw;	m._01=-sw;	m._02=0;	m._03=0;
@@ -249,8 +249,8 @@ matrix matrix::rotation_z(float w) {
 }
 
 // ZXY -> for objects
-matrix matrix::rotation_v(const vector &ang) {
-	matrix m;
+mat4 mat4::rotation_v(const vec3 &ang) {
+	mat4 m;
 	/*matrix x,y,z;
 	MatrixRotationX(x,ang.x);
 	MatrixRotationY(y,ang.y);
@@ -272,8 +272,8 @@ matrix matrix::rotation_v(const vector &ang) {
 }
 
 // rotation matrix from quaterion
-matrix matrix::rotation_q(const quaternion &q) {
-	matrix m;
+mat4 mat4::rotation_q(const quaternion &q) {
+	mat4 m;
 	m._00 = 1 - 2*q.y*q.y - 2*q.z*q.z; m._01 =     2*q.x*q.y - 2*q.w*q.z; m._02 =     2*q.x*q.z + 2*q.w*q.y; m._03 = 0;
 	m._10 =     2*q.x*q.y + 2*q.w*q.z; m._11 = 1 - 2*q.x*q.x - 2*q.z*q.z; m._12 =     2*q.y*q.z - 2*q.w*q.x; m._13 = 0;
 	m._20 =     2*q.x*q.z - 2*q.w*q.y; m._21 =     2*q.y*q.z + 2*q.w*q.x; m._22 = 1 - 2*q.x*q.x - 2*q.y*q.y; m._23 = 0;
@@ -285,8 +285,8 @@ matrix matrix::rotation_q(const quaternion &q) {
 }
 
 // scale orthogonally in 3 dimensions
-matrix matrix::scale(float fx, float fy, float fz) {
-	matrix m;
+mat4 mat4::scale(float fx, float fy, float fz) {
+	mat4 m;
 	m._00 = fx; m._01 = 0;  m._02 = 0;  m._03 = 0;
 	m._10 = 0;  m._11 = fy; m._12 = 0;  m._13 = 0;
 	m._20 = 0;  m._21 = 0;  m._22 = fz; m._23 = 0;
@@ -295,10 +295,10 @@ matrix matrix::scale(float fx, float fy, float fz) {
 }
 
 // create a transformation that reflects at a <plane pl>
-matrix matrix::reflection(const plane &pl) {
-	matrix m;
-	vector n = pl.n;
-	vector p = -n * pl.d;
+mat4 mat4::reflection(const plane &pl) {
+	mat4 m;
+	vec3 n = pl.n;
+	vec3 p = -n * pl.d;
 	// mirror: matrix s from transforming the basis vectors:
 	//    e_i' = e_i - 2 < n, e_i >
 	//     or thinking of it as a tensor product (projection): s = id - 2n (x) n
@@ -315,8 +315,8 @@ matrix matrix::reflection(const plane &pl) {
 // z_sym=true:   P (x,y,z0) = (.,.,-1)   P (x,y,z1) = (.,.,+1)
 // z_sym=false:  P (x,y,z0) = (.,., 0)   P (x,y,z1) = (.,.,+1)
 // maps the POSITIVE z-half-space
-matrix matrix::perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym) {
-	matrix m;
+mat4 mat4::perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym) {
+	mat4 m;
 	float f = 1 / tan(fovy / 2);
 	float ndz = z_far - z_near;
 	if (z_sym) {

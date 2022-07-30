@@ -423,7 +423,7 @@ uniform float iVolume;
 	func mut on_draw()
 		_time += timer.get()
 		c.lock()
-		float volume = c.buffer[c.current_reading].c[0].max()
+		float volume = max(c.buffer[c.current_reading].c[0])
 		c.unlock()
 		
 		#gl.start()

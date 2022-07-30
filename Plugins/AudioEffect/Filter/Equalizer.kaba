@@ -186,7 +186,7 @@ class EqualizerGrid extends Grid
 			cp.changed()
 			redraw()
 	
-	var right_click_mouse_pos: vector
+	var right_click_mouse_pos: vec3
 
 	# right button down -> new point
 	func override on_right_button_down()
@@ -223,7 +223,7 @@ class EqualizerGrid extends Grid
 			t = FilterType.LOW_SHELF
 		if id == "add-high-shelf"
 			t = FilterType.HIGH_SHELF
-		vector m = right_click_mouse_pos
+		var m = right_click_mouse_pos
 		c.peaks.add(Peak(t, freq_to_pitch(m.x), m.y - c.gain, 2))
 		selected = len(c.peaks) - 1
 		hover = selected

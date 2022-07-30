@@ -78,7 +78,11 @@ string vec2::str() const {
 
 // real length of the vec2
 float vec2::length() const {
-	return sqrtf( x*x + y*y );
+	return sqrtf(x*x + y*y);
+}
+
+float vec2::length_sqr() const {
+	return x*x + y*y;
 }
 
 // scale to length 1

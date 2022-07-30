@@ -130,7 +130,7 @@ class ShowSpectrum extends TsunamiPlugin
 			ffr.add(bmaxr)
 			ffl.add(bmaxl)
 
-		peak_max = max(ffr.max(), ffl.max())
+		peak_max = max(max(ffr), max(ffl))
 		float mmax = sqr(buf.length) / 4
 		if mmax > 0
 			ffr /= mmax

@@ -694,6 +694,9 @@
     <ClCompile Include="src\lib\kaba\lib\lib_vulkan.cpp">
       <Filter>src\lib\kaba\lib</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\list.cpp">
+      <Filter>src\lib\kaba\lib</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\parser\abstract.cpp">
       <Filter>src\lib\kaba\parser</Filter>
     </ClCompile>
@@ -766,13 +769,13 @@
     <ClCompile Include="src\lib\math\interpolation.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\math\mat3.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\mat4.cpp">
+      <Filter>src\lib\math</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\math\math.cpp">
-      <Filter>src\lib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\matrix.cpp">
-      <Filter>src\lib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\matrix3.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\math\plane.cpp">
@@ -793,10 +796,10 @@
     <ClCompile Include="src\lib\math\vec2.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\math\vec4.cpp">
+    <ClCompile Include="src\lib\math\vec3.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\math\vector.cpp">
+    <ClCompile Include="src\lib\math\vec4.cpp">
       <Filter>src\lib\math</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\net\BinaryBuffer.cpp">
@@ -2001,6 +2004,12 @@
     <ClInclude Include="src\lib\kaba\lib\lib.h">
       <Filter>src\lib\kaba\lib</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\lib\list.h">
+      <Filter>src\lib\kaba\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\lib\operators.h">
+      <Filter>src\lib\kaba\lib</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\parser\abstract.h">
       <Filter>src\lib\kaba\parser</Filter>
     </ClInclude>
@@ -2070,13 +2079,13 @@
     <ClInclude Include="src\lib\math\interpolation.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\math\mat3.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\math\mat4.h">
+      <Filter>src\lib\math</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\math\math.h">
-      <Filter>src\lib\math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\math\matrix.h">
-      <Filter>src\lib\math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\math\matrix3.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\math\plane.h">
@@ -2097,10 +2106,10 @@
     <ClInclude Include="src\lib\math\vec2.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\math\vec4.h">
+    <ClInclude Include="src\lib\math\vec3.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\math\vector.h">
+    <ClInclude Include="src\lib\math\vec4.h">
       <Filter>src\lib\math</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\net\BinaryBuffer.h">

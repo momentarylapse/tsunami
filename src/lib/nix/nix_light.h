@@ -10,8 +10,8 @@
 #pragma once
 
 
-#include "../math/matrix.h"
-#include "../math/vector.h"
+#include "../math/mat4.h"
+#include "../math/vec3.h"
 #include "../image/color.h"
 
 
@@ -30,9 +30,9 @@ extern Material material;
 
 // compatible with default_shader_3d (binding=1)
 struct BasicLight {
-	alignas(16) matrix proj;
-	alignas(16) vector pos;
-	alignas(16) vector dir;
+	alignas(16) mat4 proj;
+	alignas(16) vec3 pos;
+	alignas(16) vec3 dir;
 	alignas(16) color col;
 	alignas(16) float radius;
 	float theta, harshness;

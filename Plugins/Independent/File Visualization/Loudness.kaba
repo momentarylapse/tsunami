@@ -80,7 +80,7 @@ class Loudness extends TsunamiPlugin
 			loudness.add(l)
 		#print(str(loudness))
 		
-		max_loudness = loudness.max()
+		max_loudness = max(loudness)
 		
 		#gated_loudness = 0
 		float gamma = lkfs_gated(-70) - 10

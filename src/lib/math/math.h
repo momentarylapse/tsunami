@@ -15,11 +15,11 @@
 #include <cmath>
 
 class color;
-class vector;
+class vec3;
 class plane;
 class complex;
-class matrix;
-class matrix3;
+class mat4;
+class mat3;
 class quaternion;
 class Ray;
 

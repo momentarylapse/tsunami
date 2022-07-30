@@ -1,5 +1,5 @@
 #include "random.h"
-#include "vector.h"
+#include "vec3.h"
 #include "../os/date.h"
 
 #define PHI 0x9e3779b9
@@ -82,19 +82,19 @@ float Random::normal(float mean, float stddev) {
 	return mean + a * stddev;
 }
 
-vector Random::in_ball(float r) {
+vec3 Random::in_ball(float r) {
 	while(true) {
-		vector v = vector(uniform(-1, 1), uniform(-1, 1), uniform(-1, 1));
+		vec3 v = vec3(uniform(-1, 1), uniform(-1, 1), uniform(-1, 1));
 		if (v.length_sqr() < 1)
 			return v * r;
 	}
 	return v_0;
 }
 
-vector Random::dir() {
-	vector v = in_ball(1);
+vec3 Random::dir() {
+	vec3 v = in_ball(1);
 	float l = v.length();
 	if (l != 0)
 		return v / l;
-	return vector::EZ;
+	return vec3::EZ;
 }

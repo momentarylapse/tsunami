@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <cerrno>
 
 #ifdef OS_WINDOWS
 	#include <io.h>
@@ -137,6 +138,23 @@ void rename(const Path &source, const Path &target) {
 
 	if (::rename(source.str().c_str(), target.str().c_str()) != 0)
 		throw FileError(format("can not rename file '%s' -> '%s'", source, target));
+}
+
+void move(const Path &source, const Path &target) {
+	for (auto &p: target.all_parents())
+		create_directory(p);
+
+	// linux automatically overwrites, windows will fail rename()
+	if (exists(target))
+		_delete(target);
+
+	int r = ::rename(source.str().c_str(), target.str().c_str());
+	if ((r != 0) and (errno == EXDEV)) {
+		copy(source, target);
+		_delete(source);
+	} else if (r != 0) {
+		throw FileError(format("can not move file '%s' -> '%s' (%s)", source, target, strerror(r)));
+	}
 }
 
 void copy(const Path &source, const Path &target) {

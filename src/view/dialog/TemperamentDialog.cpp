@@ -9,7 +9,6 @@
 #include "../audioview/AudioView.h"
 #include "../../data/Track.h"
 #include "../../module/synthesizer/Synthesizer.h"
-#include "../../lib/math/vector.h"
 #include "../../Tsunami.h"
 #include <math.h>
 

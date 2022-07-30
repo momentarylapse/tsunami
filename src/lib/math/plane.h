@@ -3,29 +3,29 @@
 
 
 #include "math.h"
-#include "vector.h"
+#include "vec3.h"
 
-class vector;
-class matrix;
+class vec3;
+class mat4;
 class vec2;
 
 class plane {
 public:
-	vector n;
+	vec3 n;
 	float d;
 
 	plane(){}
-	plane(const vector &n, float d);
+	plane(const vec3 &n, float d);
 	string _cdecl str() const;
 
-	bool _cdecl intersect_line(const vector &l1, const vector &l2, vector &i) const;
-	float _cdecl distance(const vector &p) const;
+	bool _cdecl intersect_line(const vec3 &l1, const vec3 &l2, vec3 &i) const;
+	float _cdecl distance(const vec3 &p) const;
 	plane _cdecl inverse() const;
-	plane _cdecl transform(const matrix &m) const;
+	plane _cdecl transform(const mat4 &m) const;
 	
 	// creation
-	static plane _cdecl from_points(const vector &a, const vector &b, const vector &c);
-	static plane _cdecl from_point_normal(const vector &p, const vector &n);
+	static plane _cdecl from_points(const vec3 &a, const vec3 &b, const vec3 &c);
+	static plane _cdecl from_point_normal(const vec3 &p, const vec3 &n);
 };
 
 
@@ -33,8 +33,8 @@ bool inf_pl(plane p);
 
 
 // planes
-vec2 _cdecl bary_centric(const vector &P, const vector &A, const vector &B, const vector &C);
-vec2 bary_centric2(const plane &pl, const vector &P, const vector &A, const vector &B, const vector &C);
+vec2 _cdecl bary_centric(const vec3 &P, const vec3 &A, const vec3 &B, const vec3 &C);
+vec2 bary_centric2(const plane &pl, const vec3 &P, const vec3 &A, const vec3 &B, const vec3 &C);
 extern vec2 line_intersects_triangle_fg;
-bool _cdecl line_intersects_triangle(const vector &t1, const vector &t2, const vector &t3, const vector &l1, const vector &l2, vector &col);
-bool _cdecl line_intersects_triangle2(const plane &pl, const vector &t1, const vector &t2, const vector &t3, const vector &l1, const vector &l2, vector &col);
+bool _cdecl line_intersects_triangle(const vec3 &t1, const vec3 &t2, const vec3 &t3, const vec3 &l1, const vec3 &l2, vec3 &col);
+bool _cdecl line_intersects_triangle2(const plane &pl, const vec3 &t1, const vec3 &t2, const vec3 &t3, const vec3 &l1, const vec3 &l2, vec3 &col);

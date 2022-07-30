@@ -11,7 +11,7 @@
 
 #include "../base/base.h"
 
-class vector;
+class vec3;
 
 
 class BinaryBuffer {
@@ -42,7 +42,7 @@ public:
 	void operator>>(bool &b);
 	void operator>>(char &c);
 	void operator>>(string &s);
-	void operator>>(vector &v);
+	void operator>>(vec3 &v);
 
 	// write
 	void operator<<(int i);
@@ -50,7 +50,7 @@ public:
 	void operator<<(bool b);
 	void operator<<(char c);
 	void operator<<(const string &s);
-	void operator<<(const vector &v);
+	void operator<<(const vec3 &v);
 };
 
 

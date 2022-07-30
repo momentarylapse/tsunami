@@ -15,7 +15,6 @@
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../TsunamiWindow.h"
-#include "../../lib/math/vector.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)

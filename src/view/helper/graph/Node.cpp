@@ -10,7 +10,6 @@
 #include "../../../stuff/PerformanceMonitor.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/image/color.h"
-#include "../../../lib/math/vector.h"
 
 namespace scenegraph {
 

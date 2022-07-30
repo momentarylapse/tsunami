@@ -218,7 +218,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call1<float,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeVector) {
+		} else if (return_type == TypeVec3) {
 			if (ptype[0]->uses_call_by_reference()) {
 				call1<vec3,CBR>(ff, ret, param);
 				return true;
@@ -293,7 +293,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			}
 		}
 	} else if (ptype.num == 3) {
-		if (return_type == TypeVector) {
+		if (return_type == TypeVec3) {
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32)) {
 				call3<vec3,float,float,float>(ff, ret, param);
 				return true;
@@ -307,7 +307,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 		}*/
 	} else if (ptype.num == 4) {
 		if (return_type == TypeVoid) {
-			if ((ptype[0] == TypeVector) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+			if ((ptype[0] == TypeVec3) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
 				((void(*)(void*, float, float, float))ff)(param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;
 			}

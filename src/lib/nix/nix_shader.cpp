@@ -380,7 +380,7 @@ void Shader::set_color_l(int location, const color &c) {
 	glProgramUniform4fv(program, location, 1, (float*)&c);
 }
 
-void Shader::set_matrix_l(int location, const matrix &m) {
+void Shader::set_matrix_l(int location, const mat4 &m) {
 	if (location < 0)
 		return;
 	glProgramUniformMatrix4fv(program, location, 1, GL_FALSE, (float*)&m);
@@ -398,7 +398,7 @@ void Shader::set_color(const string &name, const color &c) {
 	set_color_l(get_location(name), c);
 }
 
-void Shader::set_matrix(const string &name, const matrix &m) {
+void Shader::set_matrix(const string &name, const mat4 &m) {
 	set_matrix_l(get_location(name), m);
 }
 
@@ -437,7 +437,7 @@ R"foodelim(
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
-/*layout(binding = 0)*/ uniform Matrix matrix;
+/*layout(binding = 0)*/ uniform Matrix mat4;
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -448,10 +448,10 @@ layout(location = 1) out vec2 out_uv;
 layout(location = 2) out vec4 out_pos; // camera space
 
 void main() {
-	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
-	out_normal = (matrix.view * matrix.model * vec4(in_normal, 0)).xyz;
+	gl_Position = mat4.project * mat4.view * mat4.model * vec4(in_position, 1);
+	out_normal = (mat4.view * mat4.model * vec4(in_normal, 0)).xyz;
 	out_uv = in_uv;
-	out_pos = matrix.view * matrix.model * vec4(in_position, 1);
+	out_pos = mat4.view * mat4.model * vec4(in_position, 1);
 }
 )foodelim"});
 
@@ -469,7 +469,7 @@ R"foodelim(
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
-/*layout(binding = 0)*/ uniform Matrix matrix;
+/*layout(binding = 0)*/ uniform Matrix mat4;
 struct Material { vec4 albedo, emission; float roughness, metal; };
 /*layout(binding = 2)*/ uniform Material material;
 struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };
@@ -484,8 +484,8 @@ out vec4 out_color;
 
 vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {
 	float attenuation = 1.0;
-	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;
-	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;
+	vec3 LD = (mat4.view * vec4(l.dir.xyz, 0)).xyz;
+	vec3 LP = (mat4.view * vec4(l.pos.xyz, 1)).xyz;
 	if (l.radius > 0) {
 		LD = normalize(in_pos.xyz - LP);
 		attenuation = min(l.radius / length(in_pos.xyz - LP), 1);
@@ -525,7 +525,7 @@ R"foodelim(<Layout>
 #extension GL_ARB_separate_shader_objects : enable
 
 struct Matrix { mat4 model, view, project; };
-/*layout(binding = 0)*/ uniform Matrix matrix;
+/*layout(binding = 0)*/ uniform Matrix mat4;
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec4 in_color;
@@ -535,7 +535,7 @@ layout(location = 0) out vec2 out_uv;
 layout(location = 1) out vec4 out_color;
 
 void main() {
-	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
+	gl_Position = mat4.project * mat4.view * mat4.model * vec4(in_position, 1);
 	out_uv = in_uv;
 	out_color = in_color;
 }

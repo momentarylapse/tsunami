@@ -40,7 +40,6 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include "../../../module/audio/SongRenderer.h"
 #include "../../../stuff/PerformanceMonitor.h"
-#include "../../../lib/math/vector.h"
 
 
 

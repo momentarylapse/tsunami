@@ -29,8 +29,8 @@ namespace nix {
 extern int current_program;
 
 
-extern matrix view_matrix, projection_matrix;
-extern matrix model_matrix, model_view_projection_matrix;
+extern mat4 view_matrix, projection_matrix;
+extern mat4 model_matrix, model_view_projection_matrix;
 
 
 

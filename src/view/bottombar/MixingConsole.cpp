@@ -25,7 +25,6 @@
 #include "../../plugins/PluginManager.h"
 #include "../../device/DeviceManager.h"
 #include "../../device/stream/AudioOutput.h"
-#include "../../lib/math/vector.h"
 #include <math.h>
 
 

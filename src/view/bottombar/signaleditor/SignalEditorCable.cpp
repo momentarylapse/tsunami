@@ -9,10 +9,9 @@
 #include "SignalEditorTab.h"
 #include "SignalEditorModule.h"
 #include "SignalEditorPort.h"
+#include "../../audioview/AudioView.h"
 #include "../../../module/SignalChain.h"
 #include "../../../module/Module.h"
-#include "../../audioview/AudioView.h"
-#include "../../../lib/math/vector.h"
 #include "../../../lib/math/interpolation.h"
 
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {

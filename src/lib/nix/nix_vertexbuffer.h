@@ -19,7 +19,7 @@ namespace nix {
 
 
 struct Vertex1 {
-	vector p, n;
+	vec3 p, n;
 	float u, v;
 };
 
@@ -61,6 +61,7 @@ public:
 	bool is_indexed() const;
 
 	void create_quad(const rect &dest, const rect &source = rect::ID);
+	void create_cube(const vec3 &a, const vec3 &b);
 };
 
 void init_vertex_buffers();

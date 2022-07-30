@@ -15,7 +15,6 @@
 #include "../../../data/Song.h"
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
-#include "../../../lib/math/vector.h"
 
 
 

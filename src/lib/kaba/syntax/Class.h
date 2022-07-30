@@ -145,7 +145,7 @@ extern const Class *TypeCString;
 extern const Class *TypeString;
 
 extern const Class *TypeComplex;
-extern const Class *TypeVector;
+extern const Class *TypeVec3;
 extern const Class *TypeRect;
 extern const Class *TypeColor;
 extern const Class *TypeQuaternion;

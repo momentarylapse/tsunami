@@ -8,8 +8,6 @@
 #include "Dial.h"
 #include "graph/SceneGraph.h"
 #include "../ColorScheme.h"
-#include "../../lib/math/complex.h"
-#include "../../lib/math/vector.h"
 #include "../../lib/hui/hui.h"
 
 

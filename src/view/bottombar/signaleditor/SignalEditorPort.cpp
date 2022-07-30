@@ -8,12 +8,11 @@
 
 #include "SignalEditorPort.h"
 #include "SignalEditorTab.h"
-#include "../../../data/base.h"
-#include "../../../module/SignalChain.h"
-#include "../../../lib/math/vector.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../helper/graph/SceneGraph.h"
 #include "../../audioview/AudioView.h"
+#include "../../../data/base.h"
+#include "../../../module/SignalChain.h"
 
 const float R = 10;
 

@@ -1286,7 +1286,7 @@ Array<string> str_parse_tokens(const string &line, const string &splitters) {
 			for (int j=i+1; j<line.num; j++) {
 				if (line[j] == '\\') {
 					j ++;
-				} else if ((line[j] == '\"') or (line[j] == '\'')) {
+				} else if (line[j] == line[start]) {
 					i = j;
 					if (keep_quotes)
 						tokens.add(line.sub(start, i+1));

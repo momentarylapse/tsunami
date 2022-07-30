@@ -6,19 +6,18 @@
  */
 
 #include "TrackHeader.h"
+#include "AudioViewTrack.h"
+#include "../AudioView.h"
+#include "../../MouseDelayPlanner.h"
 #include "../../helper/graph/Node.h"
 #include "../../helper/graph/SceneGraph.h"
 #include "../../helper/Drawing.h"
-#include "../AudioView.h"
-#include "../../MouseDelayPlanner.h"
 #include "../../../data/base.h"
 #include "../../../data/Song.h"
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 #include "../../../Session.h"
 #include "../../../EditModes.h"
-#include "AudioViewTrack.h"
-#include "../../../lib/math/vector.h"
 
 
 
@@ -56,8 +55,9 @@ public:
 		auto *track = vtrack->track;
 
 		c->set_color(get_color());
-		//c->drawStr(area.x1, area.y1-2, "\U0001f50a");
-		c->draw_mask_image({area.x1, area.y1}, view->images.speaker.get());
+		//c->draw_str({area.x1, area.y1-2}, "\U0001f50a");
+		//c->draw_mask_image({area.x1, area.y1}, view->images.speaker.get());
+		c->draw_image({area.x1, area.y1}, view->images.speaker.get());
 		if (track->muted) {
 			c->set_color(color(1, 0.7f, 0, 0));
 			c->draw_mask_image({area.x1, area.y1}, view->images.x.get());

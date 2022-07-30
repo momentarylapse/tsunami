@@ -47,7 +47,7 @@ class Compressor extends AudioEffect
 		
 			# in level (filtered)
 			squares[i % len(squares)] = b[i]*b[i]
-			float rms = sqrt(squares.sum() / len(squares) * 2)
+			float rms = sqrt(sum(squares) / len(squares) * 2)
 			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
 			float in_level = MIN_DB

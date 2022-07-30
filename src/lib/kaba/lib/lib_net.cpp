@@ -108,8 +108,8 @@ void SIAddPackageNet() {
 			func_add_param("c", TypeChar, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(string&))&BinaryBuffer::operator>>));
 			func_add_param("s", TypeString, Flags::OUT);
-		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(vector&))&BinaryBuffer::operator>>));
-			func_add_param("v", TypeVector, Flags::OUT);
+		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(vec3&))&BinaryBuffer::operator>>));
+			func_add_param("v", TypeVec3, Flags::OUT);
 		class_add_func("clear", TypeVoid, net_p(&BinaryBuffer::clear));
 		class_add_func("start_block", TypeVoid, net_p(&BinaryBuffer::start_block));
 		class_add_func("end_block", TypeVoid, net_p(&BinaryBuffer::end_block));
@@ -126,8 +126,8 @@ void SIAddPackageNet() {
 			func_add_param("c", TypeChar);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const string &))&BinaryBuffer::operator<<));
 			func_add_param("s", TypeString);
-		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const vector &))&BinaryBuffer::operator<<));
-			func_add_param("v", TypeVector);
+		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const vec3 &))&BinaryBuffer::operator<<));
+			func_add_param("v", TypeVec3);
 }
 
 };

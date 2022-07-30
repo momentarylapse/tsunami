@@ -1,6 +1,6 @@
 #include "quaternion.h"
-#include "vector.h"
-#include "matrix.h"
+#include "vec3.h"
+#include "mat4.h"
 #include "math.h"
 #include <math.h>
 #include "../os/msg.h"
@@ -12,7 +12,7 @@
 
 const quaternion quaternion::ID = quaternion(1, v_0);
 
-quaternion::quaternion(const float w, const vector &v) {
+quaternion::quaternion(const float w, const vec3 &v) {
 	this->w = w;
 	this->x = v.x;
 	this->y = v.y;
@@ -81,11 +81,11 @@ quaternion quaternion::operator * (const quaternion &q) const {
 	return r;
 }
 
-vector quaternion::operator * (const vector &v) const {
-	vector r = v * (w*w - x*x - y*y - z*z);
-	vector *vv = (vector*)&x;
-	r += 2 * w * vector::cross(*vv, v);
-	r += 2 * vector::dot(*vv, v) * (*vv);
+vec3 quaternion::operator * (const vec3 &v) const {
+	vec3 r = v * (w*w - x*x - y*y - z*z);
+	vec3 *vv = (vec3*)&x;
+	r += 2 * w * vec3::cross(*vv, v);
+	r += 2 * vec3::dot(*vv, v) * (*vv);
 	return r;
 }
 
@@ -102,14 +102,14 @@ quaternion quaternion::mul(const quaternion &q) const
 {	return (*this) * q;	}
 
 // rotation with an <angle w> and an <axis axis>
-quaternion quaternion::rotation_a(const vector &axis, float w) {
+quaternion quaternion::rotation_a(const vec3 &axis, float w) {
 	float w_half=w*0.5f;
 	float s=sinf(w_half);
 	return quaternion(cosf(w_half), axis * s);
 }
 
 // ZXY -> everything IN the game (world transformation)
-quaternion quaternion::rotation_v(const vector &ang) {
+quaternion quaternion::rotation_v(const vec3 &ang) {
 	quaternion q;
 	float wx_2=ang.x*0.5f;
 	float wy_2=ang.y*0.5f;
@@ -136,7 +136,7 @@ quaternion quaternion::rotation_v(const vector &ang) {
 }
 
 // create a quaternion from a (rotation-) matrix
-quaternion quaternion::rotation_m(const matrix &m) {
+quaternion quaternion::rotation_m(const mat4 &m) {
 	float tr = m._00 + m._11 + m._22;
 	float w = acosf((tr - 1) / 2);
 	
@@ -144,7 +144,7 @@ quaternion quaternion::rotation_m(const matrix &m) {
 		return ID;
 		
 	float s = 0.5f / sinf(w);
-	vector n;
+	vec3 n;
 	n.x = (m._21 - m._12) * s;
 	n.y = (m._02 - m._20) * s;
 	n.z = (m._10 - m._01) * s;
@@ -154,11 +154,11 @@ quaternion quaternion::rotation_m(const matrix &m) {
 
 // invert a quaternion rotation
 quaternion quaternion::inverse() const {
-	return quaternion(w, vector(-x, -y, -z));
+	return quaternion(w, vec3(-x, -y, -z));
 }
 
 quaternion quaternion::bar() const {
-	return quaternion(w, vector(-x, -y, -z));
+	return quaternion(w, vec3(-x, -y, -z));
 }
 
 // unite 2 rotations (first rotate by q1, then by q2: q = q2*q1)
@@ -218,8 +218,8 @@ quaternion quaternion::interpolate(const quaternion &q1,const quaternion &q2,con
 }
 
 // convert a quaternion into 3 angles (ZXY)
-vector quaternion::get_angles() const {
-	vector ang;
+vec3 quaternion::get_angles() const {
+	vec3 ang;
 	ang.x = asin(2*(w*x - z*y));
 	ang.y = atan2(2*(w*y+x*z), 1-2*(y*y+x*x));
 	ang.z = atan2(2*(w*z+x*y), 1-2*(z*z+x*x));
@@ -265,8 +265,8 @@ void quaternion::normalize() {
 }
 
 // the axis of our quaternion rotation
-vector quaternion::get_axis() const {
-	return vector(x, y, z).normalized();
+vec3 quaternion::get_axis() const {
+	return vec3(x, y, z).normalized();
 }
 
 // angle value of the quaternion
@@ -274,20 +274,20 @@ float quaternion::get_angle() const {
 	return acos(w)*2;
 }
 
-quaternion quaternion::drag(const vector &up, const vector &dang, bool reset_z) {
+quaternion quaternion::drag(const vec3 &up, const vec3 &dang, bool reset_z) {
 	quaternion T, TT, q;
 	bool is_not_z = (up.x != 0) or (up.y != 0) or (up.z < 0);
 	if (is_not_z) {
-		vector ax = vector::cross(vector::EZ, up);
+		vec3 ax = vec3::cross(vec3::EZ, up);
 		ax.normalize();
-		vector up2 = up;
+		vec3 up2 = up;
 		up2.normalize();
 		T = rotation_a(ax, acos(up2.z));
 		TT = T.bar();
 		q = T * q * TT;
 	}
 
-	vector ang = q.get_angles();
+	vec3 ang = q.get_angles();
 	ang.x = clamp(ang.x + dang.x, -pi/2+0.01f, pi/2-0.01f);
 	ang.y += dang.y;
 	ang.z += dang.z;

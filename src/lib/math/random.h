@@ -17,8 +17,8 @@ public:
 	float _cdecl uniform(float min, float max);
 	float _cdecl normal(float mean, float stddev);
 
-	vector _cdecl in_ball(float r);
-	vector _cdecl dir();
+	vec3 _cdecl in_ball(float r);
+	vec3 _cdecl dir();
 
 private:
 	int Q[4096];

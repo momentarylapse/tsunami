@@ -13,7 +13,6 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 #include "AudioViewLayer.h"
-#include "../../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);

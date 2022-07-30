@@ -9,7 +9,6 @@
 #include "../AudioView.h"
 #include "../../painter/GridPainter.h"
 #include "../../../module/audio/SongRenderer.h"
-#include "../../../lib/math/vector.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);

@@ -127,8 +127,8 @@ class PitchShift extends TsunamiPlugin
 		
 		print("----------- shift bad ------------")
 		shift_buf_bad(buf, output, factor)
-		print("diff:  {{(output-buf_off).sum2()}}")
-		print("diff spec:  {{(z2-buf2).sum2()}}")
+		print("diff:  {{sum_sqr(output-buf_off)}}")
+		print("diff spec:  {{sum_sqr(z2-buf2)}}")
 		if show_val
 			print(str(output))
 		if show_fft
@@ -137,8 +137,8 @@ class PitchShift extends TsunamiPlugin
 		
 		print("----------- shift good ------------")
 		shift_buf(buf, output, factor)
-		print("diff:  {{(output-buf_off).sum2()}}")
-		print("diff spec:  {{(z2-buf2).sum2()}}")
+		print("diff:  {{sum_sqr(output-buf_off)}}")
+		print("diff spec:  {{sum_sqr(z2-buf2)}}")
 		if show_val
 			print(str(output))
 		if show_fft
@@ -147,8 +147,8 @@ class PitchShift extends TsunamiPlugin
 		
 		print("----------- shift fast ------------")
 		shift_buf_fast(buf, output, factor)
-		print("diff:  {{(output-buf_off).sum2()}}")
-		print("diff spec:  {{(z2-buf2).sum2()}}")
+		print("diff:  {{sum_sqr(output-buf_off)}}")
+		print("diff spec:  {{sum_sqr(z2-buf2)}}")
 		if show_val
 			print(str(output))
 		if show_fft

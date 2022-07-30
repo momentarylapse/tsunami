@@ -9,10 +9,9 @@
 #include "../../lib/image/image.h"
 #include "../../lib/image/Painter.h"
 #include "../../lib/hui/hui.h"
-#include "../../lib/math/vector.h"
 #include <math.h>
 
-#define ENABLED 1
+#define ENABLED 0
 
 namespace SymbolRenderer
 {

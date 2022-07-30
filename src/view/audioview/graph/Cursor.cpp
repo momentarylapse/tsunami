@@ -6,12 +6,11 @@
  */
 
 #include "Cursor.h"
+#include "AudioViewLayer.h"
 #include "../AudioView.h"
 #include "../../../data/base.h"
 #include "../../../data/Song.h"
 #include "../../../data/TrackLayer.h"
-#include "AudioViewLayer.h"
-#include "../../../lib/math/vector.h"
 #include "../../../Session.h"
 #include "../../../TsunamiWindow.h"
 

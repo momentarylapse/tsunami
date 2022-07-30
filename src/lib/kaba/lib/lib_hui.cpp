@@ -551,6 +551,8 @@ void SIAddPackageHui() {
 		class_add_element("id", TypeString, GetDAEvent(id));
 		class_add_element("message", TypeString, GetDAEvent(message));
 		class_add_element("mouse", TypeVec2, GetDAEvent(m));
+		class_add_element("dmouse", TypeVec2, GetDAEvent(d));
+		class_add_element("pressure", TypeFloat32, GetDAEvent(pressure));
 		class_add_element("scroll", TypeVec2, GetDAEvent(scroll));
 		class_add_element("key", TypeInt, GetDAEvent(key_code));
 		class_add_element("width", TypeInt, GetDAEvent(width));

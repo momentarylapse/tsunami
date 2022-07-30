@@ -8,6 +8,10 @@
 #include "CpuDisplay.h"
 #include "graph/SceneGraph.h"
 #include "../MouseDelayPlanner.h"
+#include "../audioview/graph/AudioViewLayer.h"
+#include "../audioview/graph/AudioViewTrack.h"
+#include "../ColorScheme.h"
+#include "../painter/BasicGridPainter.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
@@ -16,11 +20,6 @@
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 #include "../../TsunamiWindow.h"
-#include "../audioview/graph/AudioViewLayer.h"
-#include "../audioview/graph/AudioViewTrack.h"
-#include "../ColorScheme.h"
-#include "../painter/BasicGridPainter.h"
-#include "../../lib/math/vector.h"
 
 static const float UPDATE_DT = 2.0f;
 

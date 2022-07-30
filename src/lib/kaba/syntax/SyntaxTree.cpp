@@ -13,7 +13,7 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
 extern const Class *TypeSharedPointer;
 extern const Class *TypeCallableBase;
-extern const Class *TypeMatrix;
+extern const Class *TypeMat4;
 extern const Class *TypeVec2;
 
 bool is_func(shared<Node> n);
@@ -138,15 +138,15 @@ void SyntaxTree::digest() {
 	transform([&](shared<Node> n){
 		if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
 			return n;
-		if ((n->type == TypeVector) or (n->type == TypeVec2) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
+		if ((n->type == TypeVec3) or (n->type == TypeVec2) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
 			return make_constructor_static(n, "_create");
 		}
 		if (n->type == TypeQuaternion) {
-			if (n->params.num == 2 and n->params[1]->type == TypeVector)
+			if (n->params.num == 2 and n->params[1]->type == TypeVec3)
 				return make_constructor_static(n, "_rotation_v");
-			if (n->params.num == 3 and n->params[1]->type == TypeVector)
+			if (n->params.num == 3 and n->params[1]->type == TypeVec3)
 				return make_constructor_static(n, "_rotation_a");
-			if (n->params.num == 2 and n->params[1]->type == TypeMatrix)
+			if (n->params.num == 2 and n->params[1]->type == TypeMat4)
 				return make_constructor_static(n, "_rotation_m");
 		}
 		return n;

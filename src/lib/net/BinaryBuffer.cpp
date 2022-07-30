@@ -7,7 +7,7 @@
 
 
 #include "BinaryBuffer.h"
-#include "../math/vector.h"
+#include "../math/vec3.h"
 
 
 BinaryBuffer::BinaryBuffer() {
@@ -68,7 +68,7 @@ void BinaryBuffer::operator>>(string &s) {
 	read(s.data, n);
 }
 
-void BinaryBuffer::operator>>(vector &v) {
+void BinaryBuffer::operator>>(vec3 &v) {
 	read(&v, sizeof(v));
 }
 
@@ -98,7 +98,7 @@ void BinaryBuffer::operator<<(const string &s) {
 	data += bytes((char*)&s.num, sizeof(int));
 	data += s;
 }
-void BinaryBuffer::operator<<(const vector &v) {
+void BinaryBuffer::operator<<(const vec3 &v) {
 	data += bytes((char*)&v, sizeof(v));
 }
 

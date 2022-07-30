@@ -23,10 +23,10 @@ void _cdecl set_projection_perspective_ext(const vec2 &center, const vec2 &size_
 void _cdecl set_projection_ortho_relative();
 void _cdecl set_projection_ortho_pixel();
 void _cdecl set_projection_ortho_ext(const vec2 &center, const vec2 &map_size, float z_min, float z_max);
-void _cdecl set_projection_matrix(const matrix &mat);
+void _cdecl set_projection_matrix(const mat4 &mat);
 
-void _cdecl set_model_matrix(const matrix &mat);
-void _cdecl set_view_matrix(const matrix &view_mat);
+void _cdecl set_model_matrix(const mat4 &mat);
+void _cdecl set_view_matrix(const mat4 &view_mat);
 
 void _cdecl set_viewport(const rect &area);
 

@@ -22,7 +22,7 @@
 
 namespace nix{
 
-string version = "0.13.10.0";
+string version = "0.13.10.1";
 // currently, requiring OpenGL 4.5
 
 
@@ -65,7 +65,7 @@ Array<string> extensions;
 
 
 
-void MatrixOut(matrix &m) {
+void MatrixOut(mat4 &m) {
 	msg_write("MatrixOut");
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._00,m._01,m._02,m._03));
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._10,m._11,m._12,m._13));
@@ -73,7 +73,7 @@ void MatrixOut(matrix &m) {
 	msg_write(format("	%f:2	%f:2	%f:2	%f:2",m._30,m._31,m._32,m._33));
 }
 
-void mout(matrix &m) {
+void mout(mat4 &m) {
 	msg_write(format("		%f	%f	%f	%f",m._00,m._01,m._02,m._03));
 	msg_write(format("		%f	%f	%f	%f",m._10,m._11,m._12,m._13));
 	msg_write(format("		%f	%f	%f	%f",m._20,m._21,m._22,m._23));
@@ -150,9 +150,9 @@ void init() {
 
 
 	// default values of the engine
-	model_matrix = matrix::ID;
-	view_matrix = matrix::ID;
-	projection_matrix = matrix::ID;
+	model_matrix = mat4::ID;
+	view_matrix = mat4::ID;
+	projection_matrix = mat4::ID;
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

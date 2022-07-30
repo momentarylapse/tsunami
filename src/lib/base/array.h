@@ -79,11 +79,6 @@ public:
 
 	}
 
-	// kaba
-	void _cdecl __init__() {
-		init(sizeof(T));
-	}
-
 	~Array() {
 		clear();
 	}

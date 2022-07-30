@@ -13,7 +13,7 @@
 #include "../../data/Range.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
-#include "../../plugins/FastFourierTransform.h"
+#include "../../lib/fft/fft.h"
 #include "../../Session.h"
 
 BufferPainter::BufferPainter(AudioView *_view) {
@@ -245,7 +245,7 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	bytes spectrum;
 	Array<complex> z;
 	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
-		FastFourierTransform::fft_r2c(b.c[0].sub_ref(i * SPECTRUM_CHUNK, i * SPECTRUM_CHUNK + SPECTRUM_FFT_INPUT), z);
+		fft::r2c(b.c[0].sub_ref(i * SPECTRUM_CHUNK, i * SPECTRUM_CHUNK + SPECTRUM_FFT_INPUT), z);
 		for (int k=0; k<SPECTRUM_N; k++) {
 			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * k);
 			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * (k + 1));

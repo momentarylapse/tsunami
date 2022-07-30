@@ -7,7 +7,7 @@
 
 #include "BufferInterpolator.h"
 #include "AudioBuffer.h"
-#include "../../plugins/FastFourierTransform.h"
+#include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 
 
@@ -59,11 +59,11 @@ void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float
 void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
 	Array<complex> z;
 
-	FastFourierTransform::fft_r2c(in, z);
+	fft::r2c(in, z);
 	z.resize(out.num / 2 + 1);
 
 	int size = out.num;
-	FastFourierTransform::fft_c2r_inv(z, out);
+	fft::c2r_inv(z, out);
 	out.resize(size);
 }
 

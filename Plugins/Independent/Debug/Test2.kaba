@@ -18,14 +18,14 @@ class Test extends TsunamiPlugin
 			float[] b, b2
 			for i in 0:CHUNK_SIZE
 				b.add(buf.c[0][i + j*CHUNK_SIZE])
-			fft_r2c(b, c)
+			fft.r2c(b, c)
 			for i in 20:25
 				c[i].x = 0
 				c[i].y = 0
 			for z in c
 				print(z.abs())
 			b2.resize(CHUNK_SIZE)
-			fft_c2r_inv(c, b2)
+			fft.c2r_inv(c, b2)
 			b2 /= CHUNK_SIZE
 			for i in 0:CHUNK_SIZE
 				buf.c[1][i + j*CHUNK_SIZE] = b2[i]

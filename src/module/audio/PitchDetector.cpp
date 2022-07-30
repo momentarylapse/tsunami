@@ -10,7 +10,7 @@
 #include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/midi/MidiData.h"
-#include "../../plugins/FastFourierTransform.h"
+#include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 
 
@@ -73,7 +73,7 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 
 	// fft
 	Array<complex> bufc;
-	FastFourierTransform::fft_r2c(temp, bufc);
+	fft::r2c(temp, bufc);
 
 	int i0 = freq_to_index(F_MIN);
 	int i1 = freq_to_index(F_MAX);

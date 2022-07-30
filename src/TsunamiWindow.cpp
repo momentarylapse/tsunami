@@ -59,7 +59,6 @@
 #include "module/midi/MidiSource.h"
 #include "module/ConfigPanel.h"
 #include "module/SignalChain.h"
-#include "plugins/FastFourierTransform.h"
 #include "view/helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
 #include "lib/os/date.h"

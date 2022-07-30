@@ -21,6 +21,7 @@
 
 #if __has_include("../../algebra/algebra.h")
 	#include "../../algebra/algebra.h"
+	#define HAS_ALGEBRA
 #else
 	typedef int vli;
 	typedef int Crypto;
@@ -28,22 +29,36 @@
 
 #if __has_include("../../any/any.h")
 	#include "../../any/any.h"
+	#define HAS_ANY
 #else
 	typedef int Any;
+	#error("no any.h ... we're screwed")
+#endif
+
+#if __has_include("../../fft/fft.h")
+	#include "../../fft/fft.h"
+	#define HAS_FFT
+#else
 #endif
 
 namespace kaba {
 
-#ifdef _X_USE_ALGEBRA_
+#ifdef HAS_ALGEBRA
 	#define algebra_p(p)		p
 #else
 	#define algebra_p(p)		nullptr
 #endif
 
-#ifdef _X_USE_ANY_
+#ifdef HAS_ANY
 	#define any_p(p)		p
 #else
 	#define any_p(p)		nullptr
+#endif
+
+#ifdef HAS_FFT
+	#define fft_p(p)		p
+#else
+	#define fft_p(p)		nullptr
 #endif
 
 // we're always using math types
@@ -368,6 +383,7 @@ void SIAddPackageMath() {
 	auto TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
 	auto TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vec3>));
 	auto TypeRandom = add_type("Random", sizeof(Random));
+	auto TypeFFT = add_type("fft", 0);
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
@@ -970,6 +986,19 @@ void SIAddPackageMath() {
 			func_add_param("t", TypeFloat32);
 		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::getList, Flags::PURE);
 			func_add_param("t", TypeFloatList);
+
+	add_class(TypeFFT);
+		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::_STATIC__PURE);
+			func_add_param("in", TypeComplexList);
+			func_add_param("out", TypeComplexList, Flags::OUT);
+			func_add_param("invers", TypeBool);
+		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::_STATIC__PURE);
+			func_add_param("in", TypeFloatList);
+			func_add_param("out", TypeComplexList, Flags::OUT);
+		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::_STATIC__PURE);
+			func_add_param("in", TypeComplexList);
+			func_add_param("out", TypeFloatList, Flags::OUT);
+
 
 	// int
 	add_func("clamp", TypeInt, &clamp<int>, Flags::_STATIC__PURE);

@@ -10,7 +10,7 @@ class PitchShift extends TsunamiPlugin
 	
 	
 	func mut shift_buf_bad(b: float[], out _out: float[], factor: float)
-		fft_r2c(b, buf1)
+		fft.r2c(b, buf1)
 		float f = 1.0 / len(b)
 		int N = len(b)
 		int NN = len(buf1)
@@ -26,10 +26,10 @@ class PitchShift extends TsunamiPlugin
 				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
 
 		_out.resize(N)
-		fft_c2r_inv(buf2, _out)
+		fft.c2r_inv(buf2, _out)
 
 	func mut shift_buf(b: float[], out _out: float[], factor: float)
-		fft_r2c(b, buf1)
+		fft.r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
 		buf2.resize(NN)
@@ -54,11 +54,11 @@ class PitchShift extends TsunamiPlugin
 
 
 		_out.resize(N)
-		fft_c2r_inv(buf2, _out)
+		fft.c2r_inv(buf2, _out)
 		_out /= N
 		
 	func mut shift_buf_fast(b: float[], out _out: float[], factor: float)
-		fft_r2c(b, buf1)
+		fft.r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
 		buf2.resize(NN)
@@ -82,7 +82,7 @@ class PitchShift extends TsunamiPlugin
 					buf2[j] += M * buf1[i]
 
 		_out.resize(N)
-		fft_c2r_inv(buf2, _out)
+		fft.c2r_inv(buf2, _out)
 		_out /= N
 
 	func override on_start()
@@ -98,7 +98,7 @@ class PitchShift extends TsunamiPlugin
 #		print("fft:")
 		
 		complex[] z, z2
-		fft_r2c(buf, z)
+		fft.r2c(buf, z)
 #		print(str(map(complex.abs, z)))
 		
 		
@@ -109,7 +109,7 @@ class PitchShift extends TsunamiPlugin
 		if show_val
 			print(buf_off)
 		
-		fft_r2c(buf_off, z2)
+		fft.r2c(buf_off, z2)
 		#print(str(map(complex.abs, z2)))
 		if show_fft
 			print(str(z2))

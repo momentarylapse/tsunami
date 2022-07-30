@@ -130,6 +130,7 @@ set(SOURCE
 	src/lib/doc/config.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/xml.cpp
+	src/lib/fft/fft.cpp
 	src/lib/hui/Controls/Control.cpp
 	src/lib/hui/Controls/ControlButtonGtk.cpp
 	src/lib/hui/Controls/ControlCheckBoxGtk.cpp
@@ -332,7 +333,6 @@ set(SOURCE
 	src/module/ModuleFactory.cpp
 	src/module/SignalChain.cpp
 	src/plugins/ExtendedAudioBuffer.cpp
-	src/plugins/FastFourierTransform.cpp
 	src/plugins/Plugin.cpp
 	src/plugins/PluginManager.cpp
 	src/plugins/ProfileManager.cpp

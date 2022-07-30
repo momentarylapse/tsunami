@@ -767,10 +767,6 @@ func extern db2amp(db: float) -> float
 func extern amp2db(amp: float) -> float
 
 
-func extern fft_c2c(in: complex[], out _out: complex[], inverse: bool)
-func extern fft_r2c(in: float[], out _out: complex[])
-func extern fft_c2r_inv(in: complex[], out _out: float[])
-
 func extern CreateModule(session: Session, type: Module.Type, name: string) -> Module*
 func extern CreateSynthesizer(session: Session, name: string) -> Synthesizer*
 func extern CreateAudioSource(session: Session, name: string) -> AudioSource*

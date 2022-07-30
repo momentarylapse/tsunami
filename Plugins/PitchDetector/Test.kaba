@@ -11,7 +11,7 @@ class TestDetector extends PitchDetector
 	func override process(midi: MidiEventBuffer, buf: AudioBuffer)
 		#print(len(buf))
 		complex[] z
-		fft_r2c(buf.c[0], z)
+		fft.r2c(buf.c[0], z)
 		
 		int N = len(buf)
 		print(N)

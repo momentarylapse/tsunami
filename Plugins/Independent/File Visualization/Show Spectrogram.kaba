@@ -101,7 +101,7 @@ class ShowSpectrogram extends TsunamiPlugin
 		
 			for j in 0:N
 				sub[j] = buf.c[0][offset + j]
-			fft_r2c(sub, f)
+			fft.r2c(sub, f)
 			float ww = float(N) / song.sample_rate
 			for i in 0:NF
 				# frequency slice

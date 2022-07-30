@@ -240,6 +240,7 @@
     <ClCompile Include="src\lib\doc\config.cpp" />
     <ClCompile Include="src\lib\doc\pdf.cpp" />
     <ClCompile Include="src\lib\doc\xml.cpp" />
+    <ClCompile Include="src\lib\fft\fft.cpp" />
     <ClCompile Include="src\lib\hui\Controls\Control.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp" />
     <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp" />
@@ -442,7 +443,6 @@
     <ClCompile Include="src\module\ModuleFactory.cpp" />
     <ClCompile Include="src\module\SignalChain.cpp" />
     <ClCompile Include="src\plugins\ExtendedAudioBuffer.cpp" />
-    <ClCompile Include="src\plugins\FastFourierTransform.cpp" />
     <ClCompile Include="src\plugins\Plugin.cpp" />
     <ClCompile Include="src\plugins\PluginManager.cpp" />
     <ClCompile Include="src\plugins\ProfileManager.cpp" />
@@ -710,6 +710,7 @@
     <ClInclude Include="src\lib\doc\config.h" />
     <ClInclude Include="src\lib\doc\pdf.h" />
     <ClInclude Include="src\lib\doc\xml.h" />
+    <ClInclude Include="src\lib\fft\fft.h" />
     <ClInclude Include="src\lib\hui\Controls\Control.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlButton.h" />
     <ClInclude Include="src\lib\hui\Controls\ControlCheckBox.h" />
@@ -883,7 +884,6 @@
     <ClInclude Include="src\module\ModuleFactory.h" />
     <ClInclude Include="src\module\SignalChain.h" />
     <ClInclude Include="src\plugins\ExtendedAudioBuffer.h" />
-    <ClInclude Include="src\plugins\FastFourierTransform.h" />
     <ClInclude Include="src\plugins\Plugin.h" />
     <ClInclude Include="src\plugins\PluginManager.h" />
     <ClInclude Include="src\plugins\ProfileManager.h" />

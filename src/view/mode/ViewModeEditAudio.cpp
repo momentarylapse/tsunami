@@ -8,7 +8,7 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/audio/BufferInterpolator.h"
-#include "../../plugins/FastFourierTransform.h"
+#include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 #include "../../TsunamiWindow.h"
 
@@ -316,7 +316,7 @@ void ca_join(Array<complex> &z, Array<float> &x, Array<float> &y) {
 
 void pitch_shift_channel(Array<float> &buf, float factor) {
 	Array<complex> z, zz;
-	FastFourierTransform::fft_r2c(buf, z);
+	fft::r2c(buf, z);
 
 	Array<float> x, y;
 	ca_split(z, x, y);
@@ -344,7 +344,7 @@ void pitch_shift_channel(Array<float> &buf, float factor) {
 		zz[j] += z[i] / z.num / 2;
 	}*/
 
-	FastFourierTransform::fft_c2r_inv(zz, buf);
+	fft::c2r_inv(zz, buf);
 }
 
 void pitch_shift(AudioBuffer &buf, float factor) {

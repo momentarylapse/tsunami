@@ -62,7 +62,7 @@ class PADRenderer extends PitchRenderer
 			c[i] = complex(cos(phi), sin(phi)) * amp[i]
 		
 		prebuf.resize(N)
-		fft_c2r_inv(c, prebuf)
+		fft.c2r_inv(c, prebuf)
 	
 		float m = 0
 		for b in prebuf

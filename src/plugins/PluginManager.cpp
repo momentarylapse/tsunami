@@ -6,7 +6,6 @@
  */
 
 #include "PluginManager.h"
-#include "FastFourierTransform.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
 #include "ProfileManager.h"
@@ -121,9 +120,9 @@ void PluginManager::link_app_data() {
 	//kaba::link_external("view_input", &export_view_input);
 	kaba::link_external("db2amp", (void*)&db2amplitude);
 	kaba::link_external("amp2db", (void*)&amplitude2db);
-	kaba::link_external("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
+	/*kaba::link_external("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	kaba::link_external("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
-	kaba::link_external("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
+	kaba::link_external("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);*/
 	kaba::link_external("CreateModule", (void*)&ModuleFactory::create);
 	kaba::link_external("CreateSynthesizer", (void*)&CreateSynthesizer);
 	kaba::link_external("CreateAudioEffect", (void*)&CreateAudioEffect);

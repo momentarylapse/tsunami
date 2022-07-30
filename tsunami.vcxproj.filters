@@ -373,6 +373,9 @@
     <ClCompile Include="src\lib\doc\xml.cpp">
       <Filter>src\lib\doc</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\fft\fft.cpp">
+      <Filter>src\lib\fft</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\Control.cpp">
       <Filter>src\lib\hui\Controls</Filter>
     </ClCompile>
@@ -977,9 +980,6 @@
       <Filter>src\module</Filter>
     </ClCompile>
     <ClCompile Include="src\plugins\ExtendedAudioBuffer.cpp">
-      <Filter>src\plugins</Filter>
-    </ClCompile>
-    <ClCompile Include="src\plugins\FastFourierTransform.cpp">
       <Filter>src\plugins</Filter>
     </ClCompile>
     <ClCompile Include="src\plugins\Plugin.cpp">
@@ -1779,6 +1779,9 @@
     <ClInclude Include="src\lib\doc\xml.h">
       <Filter>src\lib\doc</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\fft\fft.h">
+      <Filter>src\lib\fft</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\hui\Controls\Control.h">
       <Filter>src\lib\hui\Controls</Filter>
     </ClInclude>
@@ -2298,9 +2301,6 @@
     <ClInclude Include="src\plugins\ExtendedAudioBuffer.h">
       <Filter>src\plugins</Filter>
     </ClInclude>
-    <ClInclude Include="src\plugins\FastFourierTransform.h">
-      <Filter>src\plugins</Filter>
-    </ClInclude>
     <ClInclude Include="src\plugins\Plugin.h">
       <Filter>src\plugins</Filter>
     </ClInclude>
@@ -2791,6 +2791,9 @@
     </Filter>
     <Filter Include="src\lib\doc">
       <UniqueIdentifier>{71410E6E-87C0-EE20-BAEF-9044CC4AD485}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\fft">
+      <UniqueIdentifier>{E7559A58-BF41-808F-3F10-62C8B9F73A51}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\hui">
       <UniqueIdentifier>{FDD61BAD-BC45-3E2C-366F-FF481FD83243}</UniqueIdentifier>

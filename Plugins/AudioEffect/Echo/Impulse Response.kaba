@@ -10,19 +10,19 @@ func fold(x: float[], h: float[], out HH: complex[], out result: float[])
 	float[] xx = x
 	xx.resize(N + K)
 	complex[] XX
-	fft_r2c(xx, XX)
+	fft.r2c(xx, XX)
 	
 	# fft of kernel
 	if len(HH) != (N+K)/2+1
 		#print("recalc HH")
 		float[] hh = h
 		hh.resize(N + K)
-		fft_r2c(hh, HH)
+		fft.r2c(hh, HH)
 	
 	# convolution
 	XX *= HH
 	result.resize(N + K)
-	fft_c2r_inv(XX, result)
+	fft.c2r_inv(XX, result)
 	result /= N + K
 	
 

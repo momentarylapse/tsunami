@@ -28,7 +28,7 @@ class PitchShift extends AudioEffect
 		
 	func shift_buf(out b: float[], factor: float)
 		complex[] buf1, buf2
-		fft_r2c(b, buf1)
+		fft.r2c(b, buf1)
 		int N = len(b)
 		int NN = len(buf1)
 		buf2.resize(NN)
@@ -51,7 +51,7 @@ class PitchShift extends AudioEffect
 					complex M = M0 * (1/x)
 					buf2[j] += M * buf1[i]
 
-		fft_c2r_inv(buf2, b)
+		fft.c2r_inv(buf2, b)
 		b /= N
 
 	func mut process_chunk(out buf: AudioBuffer)

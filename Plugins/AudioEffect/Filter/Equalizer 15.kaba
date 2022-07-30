@@ -41,7 +41,7 @@ class Equalizer15 extends AudioEffect
 		# transform
 		int len2 = len(b) / 2 + 1
 		f.resize(len2)
-		fft_r2c(b, f)
+		fft.r2c(b, f)
 
 		# equalize
 		float w = float(len(b)) / sample_rate
@@ -53,7 +53,7 @@ class Equalizer15 extends AudioEffect
 				f[j] = f[j] * ff
 		
 		# transform back
-		fft_c2r_inv(f, b)
+		fft.c2r_inv(f, b)
 
 	func override process(out buf: AudioBuffer)
 		for c in buf.c

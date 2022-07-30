@@ -9,7 +9,7 @@
 
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/audio/RingBuffer.h"
-#include "../../plugins/FastFourierTransform.h"
+#include "../../lib/fft/fft.h"
 #include "../../Session.h"
 #include "../../lib/math/complex.h"
 #include "../ConfigPanel.h"
@@ -95,7 +95,7 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 		auto &c = channels[next_writing][i];
 
 		Array<complex> zz;
-		FastFourierTransform::fft_r2c(buf.c[i], zz);
+		fft::r2c(buf.c[i], zz);
 		c.spec.resize(SPECTRUM_SIZE);
 		float sample_rate = (float)session->sample_rate();
 		for (int i=0;i<SPECTRUM_SIZE;i++) {

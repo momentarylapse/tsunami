@@ -273,16 +273,27 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 Window::~Window() {
 	DBDEL_START("window", id, this);
 
-	if (window) {
-		_clean_up_();
-#if GTK_CHECK_VERSION(4,0,0)
+	for (int i=0; i<4; i++)
+		toolbar[i] = nullptr;
 
+	header_bar = nullptr;
+
+	//_ClearPanel_();
+	input.reset();
+
+	// unregister window
+	for (int i=0; i<_all_windows_.num; i++)
+		if (_all_windows_[i] == this)
+			_all_windows_.erase(i);
+
+	if (window) {
 		DBDEL_X("win destroy");
+#if GTK_CHECK_VERSION(4,0,0)
 		gtk_window_destroy(GTK_WINDOW(window));
-		DBDEL_X("/win destroy");
 #else
 		gtk_widget_destroy(window);
 #endif
+		DBDEL_X("/win destroy");
 	}
 	DBDEL_DONE();
 
@@ -433,7 +444,7 @@ void Window::set_menu(Menu *_menu) {
 		gtk_num_menus = menu->items.num;
 		for (int i=0;i<menu->items.num;i++) {
 			// move items from <Menu> to <menu_bar>
-			Control *it = menu->items[i];
+			Control *it = menu->items[i].get();
 			gtk_menu.add(it->widget);
 			gtk_widget_show(gtk_menu[i]);
 			g_object_ref(it->widget);

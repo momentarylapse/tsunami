@@ -14,9 +14,13 @@ class vec2;
 class rect;
 class color;
 
+typedef struct _cairo_surface cairo_surface_t;
+typedef struct _cairo cairo_t;
+
 namespace hui {
 
 class Window;
+class Panel;
 
 class Painter : public ::Painter {
 	public:
@@ -34,7 +38,7 @@ class Painter : public ::Painter {
 	bool mode_fill;
 	float corner_radius;
 
-	Painter();
+	Painter(cairo_surface_t *surf, cairo_t *cr, int width, int height);
 	Painter(Panel *panel, const string &id);
 	~Painter() override;
 
@@ -61,9 +65,6 @@ class Painter : public ::Painter {
 	void _cdecl set_option(const string &key, const string &value) override;
 	rect _cdecl clip() const override;
 };
-
-Painter *start_image_paint(Image *im);
-void end_image_paint(Image *im, ::Painter *p);
 
 };
 

@@ -12,9 +12,6 @@
 
 namespace hui {
 
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
-
 const int FRAME_INDENT = 0; //20;
 
 ControlGroup::ControlGroup(const string &title, const string &id) :
@@ -28,12 +25,13 @@ ControlGroup::ControlGroup(const string &title, const string &id) :
 #else
 	gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
 #endif
+	take_gtk_ownership();
 
 	GtkWidget *label = gtk_frame_get_label_widget(GTK_FRAME(widget));
 	gtk_label_set_markup(GTK_LABEL(label), sys_str("<b>" + parts[0] + "</b>"));
 }
 
-void ControlGroup::add(Control *child, int x, int y) {
+void ControlGroup::add_child(shared<Control> child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	int ind = child->indent;
 	if (ind < 0)

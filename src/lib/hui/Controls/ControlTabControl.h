@@ -26,9 +26,9 @@ public:
 	void __change_string(int row, const string &str) override;
 	void __set_option(const string &op, const string &value) override;
 
-	void add(Control *child, int x, int y) override;
+	void add_child(shared<Control> child, int x, int y) override;
 	void remove_child(Control *child) override;
-	void addPage(const string &str);
+	void add_page(const string &str);
 
 	int cur_page;
 

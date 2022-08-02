@@ -12,15 +12,22 @@
 
 namespace hui {
 
-class MenuItem : public Control {
+class BasicMenuItem : public Control {
+public:
+	BasicMenuItem(int type, const string &id);
+	virtual ~BasicMenuItem();
+
+	void take_gtk_ownership();
+#if GTK_CHECK_VERSION(4,0,0)
+	GMenuItem *item = nullptr;
+#endif
+};
+
+class MenuItem : public BasicMenuItem {
 public:
 	MenuItem(const string &title, const string &id, Panel *panel);
 
 	void set_image(const string &image) override;
-
-#if GTK_CHECK_VERSION(4,0,0)
-	GMenuItem *item;
-#endif
 };
 
 };

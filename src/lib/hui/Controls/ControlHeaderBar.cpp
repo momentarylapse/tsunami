@@ -12,9 +12,6 @@
 
 namespace hui {
 
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
-
 ControlHeaderBar::ControlHeaderBar(const string &title, const string &id, Panel *_panel) :
 	Control(CONTROL_HEADER_BAR, id)
 {
@@ -27,9 +24,10 @@ ControlHeaderBar::ControlHeaderBar(const string &title, const string &id, Panel 
 	gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(widget), true);
 	gtk_widget_show(widget);
 #endif
+	take_gtk_ownership();
 }
 
-void ControlHeaderBar::add(Control *child, int x, int y) {
+void ControlHeaderBar::add_child(shared<Control> child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 
 	if (y == 1)

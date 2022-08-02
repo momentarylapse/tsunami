@@ -96,15 +96,10 @@ void Menu::open_popup(Panel *panel) {
 #endif
 }
 
-void Menu::_add(Control *c) {
+void Menu::_add(shared<Control> c) {
 #if GTK_CHECK_VERSION(4,0,0)
-	if (c->type == MENU_ITEM_BUTTON) {
-		g_menu_append_item(gmenu, dynamic_cast<MenuItem*>(c)->item);
-	} else if (c->type == MENU_ITEM_TOGGLE) {
-		g_menu_append_item(gmenu, dynamic_cast<MenuItemToggle*>(c)->item);
-	} else if (c->type == MENU_ITEM_SUBMENU) {
-		g_menu_append_item(gmenu, dynamic_cast<MenuItemSubmenu*>(c)->item);
-	}
+	if ((c->type == MENU_ITEM_BUTTON) or (c->type == MENU_ITEM_TOGGLE) or (c->type == MENU_ITEM_SUBMENU))
+		g_menu_append_item(gmenu, dynamic_cast<BasicMenuItem*>(c.get())->item);
 	items.add(c);
 	//c->panel = panel;
 #else

@@ -30,6 +30,7 @@ void InputData::reset() {
 	key_buffer.clear();
 	key_code = 0;
 	just_focused = false;
+	inside = inside_smart = false;
 }
 
 Window::Window() : Panel() {
@@ -80,23 +81,6 @@ void Window::_init_generic_(Window *_parent, bool _allow_root, int _mode) {
 }
 
 void Window::_clean_up_() {
-	DBDEL_X("win clean up");
-	for (int i=0; i<4; i++)
-		delete toolbar[i];
-
-	if (header_bar)
-		delete header_bar;
-
-	_ClearPanel_();
-	input.reset();
-	
-	// unregister window
-	for (int i=0;i<_all_windows_.num;i++)
-		if (_all_windows_[i] == this) {
-			_all_windows_.erase(i);
-			break;
-		}
-	DBDEL_X("/win clean up");
 }
 
 // default handler when trying to close the windows

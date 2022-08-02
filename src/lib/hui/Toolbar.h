@@ -9,18 +9,19 @@
 #define HUITOOLBAR_H_
 
 #include "hui.h"
+#include "../base/pointer.h"
 
 namespace hui
 {
 
 class Window;
 
-class Toolbar {
+class Toolbar : public Sharable<Empty> {
 public:
 	Toolbar(Window *win, bool vertical = false);
 	virtual ~Toolbar();
 	Window *win;
-	Array<Control*> item;
+	shared_array<Control> items;
 	string id;
 	bool enabled;
 	bool text_enabled;
@@ -45,7 +46,7 @@ public:
 	void _cdecl from_resource(Resource *r);
 	void _cdecl set_options(const string &options);
 
-	void _add(Control *c);
+	void _add(shared<Control> c);
 
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 };

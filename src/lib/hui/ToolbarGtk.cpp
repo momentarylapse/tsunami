@@ -60,9 +60,9 @@ void Toolbar::configure(bool _text_enabled, bool _large_icons) {
 #endif
 }
 
-void Toolbar::_add(Control *c) {
+void Toolbar::_add(shared<Control> c) {
 	c->panel = win;
-	item.add(c);
+	items.add(c);
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(c->widget), true);
 
 #if GTK_CHECK_VERSION(4,0,0)

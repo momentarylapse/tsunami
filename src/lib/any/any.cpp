@@ -324,6 +324,8 @@ string Any::repr() const {
 }
 
 string Any::str() const {
+	if (is_empty())
+		return "";
 	if (is_string())
 		return as_string();
 	return repr();

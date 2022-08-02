@@ -9,8 +9,7 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
 
 ControlPaned::ControlPaned(const string &title, const string &id) :
 	Control(CONTROL_PANED, id)
@@ -19,10 +18,11 @@ ControlPaned::ControlPaned(const string &title, const string &id) :
 		widget = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 	else
 		widget = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	take_gtk_ownership();
 	set_options(get_option_from_title(title));
 }
 
-void ControlPaned::add(Control *child, int x, int y) {
+void ControlPaned::add_child(shared<Control> child, int x, int y) {
 #if GTK_CHECK_VERSION(4,0,0)
 	if (x == 0 and y == 0)
 		gtk_paned_set_start_child(GTK_PANED(widget), child->get_frame());
@@ -34,6 +34,7 @@ void ControlPaned::add(Control *child, int x, int y) {
 	else
 		gtk_paned_add2(GTK_PANED(widget), child->get_frame());
 #endif
+	control_link(this, child);
 }
 
 void ControlPaned::remove_child(Control *child) {

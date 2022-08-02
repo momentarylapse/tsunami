@@ -12,10 +12,6 @@
 
 namespace hui {
 
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
-void control_delete_rec(Control *c);
-
 void on_gtk_tab_control_switch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data) {
 	auto c = reinterpret_cast<ControlTabControl*>(data);
 	c->cur_page = page_num;
@@ -32,9 +28,10 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 
 	if (parts.num > 1 or parts[0] != "")
 		for (int i=0;i<parts.num;i++)
-			addPage(parts[i]);
+			add_page(parts[i]);
 
 	cur_page = 0;
+	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "switch-page", G_CALLBACK(&on_gtk_tab_control_switch), this);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
 	set_options(get_option_from_title(title));
@@ -63,15 +60,15 @@ int ControlTabControl::get_int() {
 }
 
 void ControlTabControl::__add_string(const string &str) {
-	addPage(str);
+	add_page(str);
 }
 
 void ControlTabControl::__remove_string(int row) {
 	if (row >= 0 and row < pages.num){
-		control_delete_rec(pages[row]);
+		remove_child(pages[row]);
+		gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 		pages.erase(row);
 		boxes.erase(row);
-		gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 	}
 }
 
@@ -80,7 +77,7 @@ void ControlTabControl::__change_string(int row, const string& str) {
 	gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(widget), child, str.c_str());
 }
 
-void ControlTabControl::addPage(const string &str) {
+void ControlTabControl::add_page(const string &str) {
 	GtkWidget *inside;
 #if !GTK_CHECK_VERSION(3,0,0)
 	ksdfkjsdhf
@@ -94,14 +91,14 @@ void ControlTabControl::addPage(const string &str) {
 	gtk_notebook_append_page(GTK_NOTEBOOK(widget), inside, label);
 }
 
-void ControlTabControl::add(Control *child, int x, int y) {
+void ControlTabControl::add_child(shared<Control> child, int x, int y) {
 	if (x < 0 or x >= pages.num) {
 		msg_error("TabControl.add: invalid page number");
 		return;
 	}
 	if (pages[x])
 		msg_error("overwriting existing tab page... in " + id);
-	pages[x] = child;
+	pages[x] = child.get();
 
 	GtkWidget *child_widget = child->get_frame();
 #if GTK_CHECK_VERSION(4,0,0)

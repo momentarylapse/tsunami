@@ -13,55 +13,46 @@
 namespace hui
 {
 
+// Ownership:
+// * Controls can be owned by 2 owners:
+//   * direct parent Control (or Panel if no parent)
+//   * both, if Panel is embedded
+// * auto-delete when no owners left
+// * keeps a reference to gtk widget
+
+// add_child()
+// - connect gtk widgets
+// - link into children (ownership)
+// remove_child()
+// - disconnect gtk widgets (not deleting, since we keep a reference)
+// - un-own child
+
 
 void DBDEL_START(const string &type, const string &id, void *p);
 void DBDEL_X(const string &);
 void DBDEL_DONE();
 
+#if GTK_CHECK_VERSION(4,0,0)
 GAction *panel_get_action(Panel *panel, const string &id);
+#endif
 
-void control_link(Control *parent, Control *child) {
-	//DBDEL_X("link: " + parent->id + " << " + child->id);
+void control_link(Control *parent, shared<Control> child) {
+	DBDEL_X("link: " + parent->id + " << " + child->id);
 	parent->children.add(child);
 	child->parent = parent;
 }
 
 void control_unlink(Control *parent, Control *child) {
+	if (child->parent != parent)
+		msg_error("control_unlink(): child.parent != parent");
+
 	DBDEL_X("unlink: " + parent->id + " << " + child->id);
+	child->parent = nullptr;
 	for (int i=0; i<parent->children.num; i++)
 		if (parent->children[i] == child)
 			parent->children.erase(i);
-	child->parent = nullptr;
-}
-
-// safety feature... in case we delete the control while it notifies us
-struct _HuiNotifyStackElement {
-	Control *c;
-	bool deleted;
-};
-
-static Array<_HuiNotifyStackElement> _notify_stack_;
-
-inline void notify_push(Control *c) {
-	_HuiNotifyStackElement e;
-	e.c = c;
-	e.deleted = false;
-	_notify_stack_.add(e);
-}
-
-inline void notify_pop() {
-	_notify_stack_.pop();
-}
-inline void notify_set_del(Control *c) {
-	for (_HuiNotifyStackElement &e : _notify_stack_)
-		if (e.c == c)
-			e.deleted = true;
-}
-inline bool notify_is_deleted(Control *c) {
-	for (_HuiNotifyStackElement &e : _notify_stack_)
-		if (e.c == c)
-			return e.deleted;
-	return false;
+	// child might be deleted now!
+	// if still alive -> owned by child->panel
 }
 
 Control::Control(int _type, const string &_id) {
@@ -83,16 +74,25 @@ Control::Control(int _type, const string &_id) {
 	min_height = -1;
 }
 
+void Control::take_gtk_ownership() {
+	if (auto f = get_frame())
+		g_object_ref(f);
+}
+
 void unset_widgets_rec(Control *c) {
-	for (auto *cc: c->children)
+	for (auto *cc: weak(c->children))
 		unset_widgets_rec(cc);
 	c->widget = nullptr;
 }
 
 
+// unlink from parent and panel
 void control_delete_rec(Control *c) {
+
+
+
+#if 0
 	DBDEL_START(i2s(c->type), c->id, c);
-	notify_set_del(c);
 
 	static int control_delete_level = 0;
 
@@ -102,7 +102,7 @@ void control_delete_rec(Control *c) {
 	DBDEL_X("children");
 	auto _children = c->children;
 	control_delete_level ++;
-	for (auto child: _children)
+	for (auto child: weak(_children))
 		control_delete_rec(child);
 	control_delete_level --;
 
@@ -120,9 +120,22 @@ void control_delete_rec(Control *c) {
 
 	//delete c;
 	DBDEL_DONE();
+#endif
 }
 
 Control::~Control() {
+	DBDEL_START(i2s(type), id, this);
+	if (auto f = get_frame())
+		g_object_unref(f);
+
+	auto _children = weak(children);
+
+	for (auto *c: _children)
+		remove_child(c);
+		// -> calls control_unlink(this, c);
+
+	DBDEL_DONE();
+
 #if 0
 	DBDEL_START(i2s(type), id, this);
 	notify_set_del(this);
@@ -229,6 +242,10 @@ void Control::focus() {
 
 bool Control::has_focus() {
 	return gtk_widget_has_focus(widget);
+}
+
+color Control::get_color() {
+	return Black;
 }
 
 
@@ -512,16 +529,14 @@ void Control::notify(const string &message, bool is_default) {
 	panel->_set_cur_id_(id);
 	if (id.num == 0)
 		return;
-	notify_push(this);
+
+	// prevent deleting while handling events
+	shared<Control> temp_owner = this;
+
 	Event e = Event(id, message);
 	//_SendGlobalCommand_(&e);
 	e.is_default = is_default;
 	panel->_send_event_(&e);
-
-	if (notify_is_deleted(this)) {
-		notify_pop();
-		return;
-	}
 
 	Window *win = panel->win;
 	if (this == win->main_input_control) {
@@ -560,7 +575,6 @@ void Control::notify(const string &message, bool is_default) {
 				win->_try_send_by_key_code_(get_event()->key_code);
 		}
 	}
-	notify_pop();
 }
 
 

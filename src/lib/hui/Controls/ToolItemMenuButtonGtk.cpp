@@ -60,6 +60,7 @@ ToolItemMenuButton::ToolItemMenuButton(const string &title, Menu *menu, const st
 	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_tool_button_click), this);
 #endif
+	take_gtk_ownership();
 }
 
 void ToolItemMenuButton::__set_option(const string &op, const string &value) {

@@ -8,10 +8,16 @@
 #include "ImagePainter.h"
 #include "image.h"
 #include "../math/vec2.h"
+#if __has_include("../hui/Painter.h") && (HAS_LIB_GTK3 || HAS_LIB_GTK4)
+#include "../hui/Painter.h"
+#include <cairo/cairo.h>
+#include <gtk/gtk.h>
+#define HAS_HUI_PAINTER 1
+#endif
+#include "../os/msg.h"
 #include <math.h>
 
-#if HAS_LIB_GTK3
-	#include <gtk/gtk.h>
+#ifdef HAS_HUI_PAINTER
 #endif
 
 ImagePainter::ImagePainter() {
@@ -98,11 +104,11 @@ void ImagePainter::draw_line(const vec2 &p0, const vec2 &p1) {
 
 	color cc = _color;
 
-	for (int x=_x0; x<_x1; x++)
-		for (int y=_y0; y<_y1; y++) {
-			float d2 = (x - p0.x) * dir.x + (y - p0.y) * dir.y;
-			float alpha2 = min(d2, length - d2);
-			float d1 = (x - p0.x) * e.x + (y - p0.y) * e.y;
+	for (int x=_x0; x<=_x1; x++)
+		for (int y=_y0; y<=_y1; y++) {
+			float d2 = vec2::dot(vec2(x,y)-p0, dir);  //(x - p0.x) * dir.x + (y - p0.y) * dir.y;
+			float alpha2 = min(d2, length - d2) + 0.5f;
+			float d1 = vec2::dot(vec2(x,y)-p0, e); //(x - p0.x) * e.x + (y - p0.y) * e.y;
 			float alpha1 = line_width/2 + 0.5f - (float)fabs(d1);
 			float alpha = min(alpha1, alpha2);
 			if (anti_aliasing) {
@@ -173,14 +179,12 @@ void ImagePainter::draw_circle(const vec2 &c, float radius) {
 }
 
 void ImagePainter::draw_str(const vec2 &p, const string& str) {
+#if 1
 #if HAS_LIB_GTK3
 
-	bool failed = false;
-	cairo_surface_t *surface;
-	cairo_t *cr;
 
-	surface = cairo_image_surface_create_for_data((unsigned char*)image->data.data, CAIRO_FORMAT_ARGB32, width, height, width * 4);
-	cr = cairo_create(surface);
+	cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char*)image->data.data, CAIRO_FORMAT_ARGB32, width, height, width * 4);
+	cairo_t *cr = cairo_create(surface);
 
 	cairo_set_source_rgba(cr, _color.r, _color.g, _color.b, _color.a);
 
@@ -194,6 +198,9 @@ void ImagePainter::draw_str(const vec2 &p, const string& str) {
 	//int w_used, h_used;
 	//pango_layout_get_pixel_size(layout, &w_used, &h_used);
 
+	float dy = (float)pango_layout_get_baseline(layout) / 1000.0f;
+	cairo_move_to(cr, p.x, p.y - dy + font_size);
+
 	pango_cairo_show_layout(cr, layout);
 	g_object_unref(layout);
 
@@ -201,6 +208,7 @@ void ImagePainter::draw_str(const vec2 &p, const string& str) {
 
 	cairo_destroy(cr);
 	cairo_surface_destroy(surface);
+#endif
 #endif
 }
 
@@ -223,6 +231,17 @@ void ImagePainter::draw_mask_image(const vec2 &d, const Image *image) {
 }
 
 
-ImagePainter *Image::start_draw() {
+Painter *Image::start_draw() {
+#if 0
+#ifdef HAS_HUI_PAINTER
+	//set_mode(Mode::BGRA);
+
+	cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char*)data.data, CAIRO_FORMAT_ARGB32, width, height, width * 4);
+
+	cairo_t *cr = cairo_create(surface);
+	//auto surf = cairo_image_surface_create_for_data((unsigned char*)data.data, CAIRO_FORMAT_ARGB32, width, height, width*4);
+	return new hui::Painter(surface, cr, width, height);
+#endif
+#endif
 	return new ImagePainter(this);
 }

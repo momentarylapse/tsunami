@@ -322,7 +322,7 @@ void SIAddPackageHui() {
 		class_add_func("hide_control", TypeVoid, hui_p(&hui::Panel::hide_control));
 			func_add_param("id", TypeString);
 			func_add_param("hide", TypeBool);
-		class_add_func("delete_control", TypeVoid, hui_p(&hui::Panel::delete_control));
+		class_add_func("delete_control", TypeVoid, hui_p(&hui::Panel::remove_control));
 			func_add_param("id", TypeString);
 		class_add_func("get_int", TypeInt, hui_p(&hui::Panel::get_int), Flags::CONST);
 			func_add_param("id", TypeString);

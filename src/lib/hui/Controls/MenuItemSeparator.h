@@ -8,17 +8,15 @@
 #ifndef MENUITEMSEPARATOR_H_
 #define MENUITEMSEPARATOR_H_
 
-#include "Control.h"
+#include "MenuItem.h"
 
-namespace hui
-{
+namespace hui {
 
-class MenuItemSeparator : public Control
-{
+class MenuItemSeparator : public BasicMenuItem {
 public:
 	MenuItemSeparator();
 };
 
-};
+}
 
 #endif /* MENUITEMSEPARATOR_H_ */

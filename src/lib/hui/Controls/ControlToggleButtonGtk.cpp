@@ -23,6 +23,7 @@ ControlToggleButton::ControlToggleButton(const string &title, const string &id) 
 {
 	auto parts = split_title(title);
 	widget = gtk_toggle_button_new_with_label(sys_str(parts[0]));
+	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&on_gtk_toggle_button_toggle), this);
 	image_size = IconSize::REGULAR;
 	set_options(get_option_from_title(title));

@@ -815,6 +815,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	set_options(get_option_from_title(title));
+	take_gtk_ownership();
 
 	cur_cairo = nullptr;
 }

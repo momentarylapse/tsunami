@@ -28,8 +28,6 @@ void Menu::__delete__() {
 
 void Menu::clear() {
 	DBDEL_START("menu", "", this);
-	for (Control *c: items)
-		delete(c);
 	items.clear();
 	DBDEL_DONE();
 }
@@ -65,7 +63,7 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *p);
 
 void Menu::set_panel(Panel *_panel) {
 	panel = _panel;
-	for (Control *c: items) {
+	for (Control *c: weak(items)) {
 		c->panel = panel;
 #if GTK_CHECK_VERSION(4,0,0)
 		if (auto b = dynamic_cast<MenuItem*>(c)) {
@@ -89,12 +87,11 @@ void Menu::set_id(const string &id) {
 }
 
 Menu *Menu::get_sub_menu_by_id(const string &id) {
-	for (Control *c: items) {
+	for (Control *c: weak(items)) {
 		if (auto s = dynamic_cast<MenuItemSubmenu*>(c)) {
 			if (s->id == id)
 				return s->sub_menu;
-			Menu *m = s->sub_menu->get_sub_menu_by_id(id);
-			if (m)
+			if (Menu *m = s->sub_menu->get_sub_menu_by_id(id))
 				return m;
 		}
 	}
@@ -129,8 +126,8 @@ void Menu::__update_language() {
 }
 
 Array<Control*> Menu::get_all_controls() {
-	Array<Control*> list = items;
-	for (Control *c: items) {
+	Array<Control*> list = weak(items);
+	for (Control *c: weak(items)) {
 		if (c->type == MENU_ITEM_SUBMENU) {
 			if (auto s = dynamic_cast<MenuItemSubmenu*>(c))
 				list.append(s->sub_menu->get_all_controls());
@@ -141,7 +138,7 @@ Array<Control*> Menu::get_all_controls() {
 
 
 void Menu::enable(const string &id, bool enabled) {
-	for (Control *c: items) {
+	for (Control *c: weak(items)) {
 		if (c->id == id)
 			c->enable(enabled);
 		if (c->type == MENU_ITEM_SUBMENU)

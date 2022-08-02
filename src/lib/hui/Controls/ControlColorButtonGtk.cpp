@@ -7,13 +7,12 @@
 
 #include "ControlColorButton.h"
 #include "../Event.h"
+#include "../../image/color.h"
 
 #ifdef HUI_API_GTK
 
 namespace hui
 {
-
-void on_gtk_button_press(GtkWidget *widget, gpointer data);
 
 
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
@@ -24,15 +23,18 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 {
 	auto parts = split_title(title);
 	widget = gtk_color_button_new();
+	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
 }
 
-int col_f_to_i16(float f)
-{	return (int)(f * 65535.0f);	}
+int col_f_to_i16(float f) {
+	return (int)(f * 65535.0f);
+}
 
-float col_i16_to_f(int i)
-{	return (float)i / 65535.0f;	}
+float col_i16_to_f(int i) {
+	return (float)i / 65535.0f;
+}
 
 
 GdkRGBA color_to_gdk(const color &c) {

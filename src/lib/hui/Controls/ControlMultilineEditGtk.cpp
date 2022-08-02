@@ -54,6 +54,7 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	}
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
+	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&on_gtk_multiline_edit_change), this);
 	handle_keys = false;
 	set_options(get_option_from_title(title));

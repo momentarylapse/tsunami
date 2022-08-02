@@ -35,6 +35,7 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id, Pane
 #else
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
 #endif
+	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkMenuButtonPress), this);
 
 //	SetImageById(this, id);

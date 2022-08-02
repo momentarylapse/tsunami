@@ -33,12 +33,12 @@ struct Symbol {
 
 	void render() {
 		// render symbol into image
-		Painter *p = hui::start_image_paint(&im);
+		Painter *p = im.start_draw();
 		p->set_color(White);
 		p->set_font_size(size);
 		p->set_font("Sans", size, bold, false);
 		p->draw_str({0, 0}, text);
-		hui::end_image_paint(&im, p);
+		delete p;
 	}
 
 	void compress() {

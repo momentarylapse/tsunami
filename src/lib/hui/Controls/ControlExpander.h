@@ -19,7 +19,7 @@ public:
 	void expand(int row, bool expand) override;
 	bool is_expanded(int row) override;
 
-	void add(Control *child, int x, int y) override;
+	void add_child(shared<Control> child, int x, int y) override;
 	void remove_child(Control *child) override;
 
 	void __set_option(const string& op, const string& value);

@@ -17,6 +17,7 @@ ControlSeparator::ControlSeparator(const string &title, const string &_id) :
 		widget = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	else
 		widget = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+	take_gtk_ownership();
 	set_options(get_option_from_title(title));
 }
 

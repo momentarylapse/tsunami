@@ -30,6 +30,7 @@ ControlEdit::ControlEdit(const string &title, const string &id) :
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(parts[0]));
 #endif
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
+	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&on_gtk_edit_changed), this);
 }
 

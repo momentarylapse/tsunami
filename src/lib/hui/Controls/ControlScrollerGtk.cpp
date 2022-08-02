@@ -9,10 +9,7 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
+namespace hui {
 
 ControlScroller::ControlScroller(const string &title, const string &id) :
 	Control(CONTROL_SCROLLER, id)
@@ -30,10 +27,11 @@ ControlScroller::ControlScroller(const string &title, const string &id) :
 	gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(widget), true);
 	gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(widget), true);
 #endif
+	take_gtk_ownership();
 	set_options(get_option_from_title(title));
 }
 
-void ControlScroller::add(Control *child, int x, int y) {
+void ControlScroller::add_child(shared<Control> child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_container_add(GTK_CONTAINER(viewport), child_widget);
 #if GTK_CHECK_VERSION(4,0,0)

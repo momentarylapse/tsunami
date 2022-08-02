@@ -10,6 +10,7 @@
 #define _HUI_MENU_EXISTS_
 
 #include "common.h"
+#include "../base/pointer.h"
 
 namespace hui
 {
@@ -37,7 +38,7 @@ public:
 	void _cdecl set_id(const string &id);
 	Menu *get_sub_menu_by_id(const string &id);
 
-	void _add(Control *c);
+	void _add(shared<Control> c);
 	Array<Control*> get_all_controls();
 
 	void __update_language();
@@ -53,7 +54,7 @@ public:
 #endif
 #endif
 
-	Array<Control*> items;
+	shared_array<Control> items;
 	Panel *panel;
 
 	void apply_foreach(const string &id, std::function<void(Control*)> f);

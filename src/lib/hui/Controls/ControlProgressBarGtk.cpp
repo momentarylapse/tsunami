@@ -19,6 +19,7 @@ ControlProgressBar::ControlProgressBar(const string &title, const string &id) :
 	auto parts = split_title(title);
 	widget = gtk_progress_bar_new();
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget), sys_str(parts[0]));
+	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	set_options(get_option_from_title(title));
 }

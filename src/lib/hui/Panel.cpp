@@ -22,53 +22,6 @@ const int DEFAULT_WINDOW_BORDER = 8;
 
 string get_gtk_action_name(const string &id, Panel *scope);
 
-Panel::Panel(const string &_id, Panel *_parent) : Panel() {
-	set_parent(_parent);
-	set_id(_id);
-}
-
-Panel::Panel() {
-	win = nullptr;
-	parent = nullptr;
-	border_width = DEFAULT_WINDOW_BORDER;
-	spacing = DEFAULT_SPACING;
-	id = p2s(this);
-	num_float_decimals = 3;
-	root_control = nullptr;
-	plugable = nullptr;
-	current_event_listener_uid = 0;
-
-	unique_id = current_uid ++;
-
-#if GTK_CHECK_VERSION(4,0,0)
-	action_group = g_simple_action_group_new();
-#endif
-
-	set_target("");
-
-}
-
-Panel::~Panel() {
-	_ClearPanel_();
-}
-
-void Panel::__init__() {
-	new(this) Panel();
-}
-
-void Panel::__delete__() {
-	this->Panel::~Panel();
-}
-
-void Panel::set_id(const string &_id) {
-	id = _id;
-}
-
-void Panel::set_parent(Panel *_parent) {
-	parent = _parent;
-	if (parent)
-		_set_win(parent->win);
-}
 
 #define DEBUG_CONTROLS 0
 
@@ -93,40 +46,83 @@ void DBDEL_DONE() {
 }
 
 
-void control_delete_rec(Control *c);
+Panel::Panel(const string &_id, Panel *_parent) : Panel() {
+	set_parent(_parent);
+	set_id(_id);
+}
 
-// might be executed repeatedly
-void Panel::_ClearPanel_() {
+Panel::Panel() {
+	win = nullptr;
+	parent = nullptr;
+	border_width = DEFAULT_WINDOW_BORDER;
+	spacing = DEFAULT_SPACING;
+	id = p2s(this);
+	num_float_decimals = 3;
+	root_control = nullptr;
+	plugable = nullptr;
+	current_event_listener_uid = 0;
+
+	unique_id = current_uid ++;
+
+#if GTK_CHECK_VERSION(4,0,0)
+	action_group = g_simple_action_group_new();
+#endif
+
+	set_target("");
+}
+
+Panel::~Panel() {
 	DBDEL_START("Panel", id, this);
 	event_listeners.clear();
 	if (parent) {
-		// disconnect
-		for (int i=0; i<parent->children.num; i++)
+		// disconnect from parent panel -> no owners here!
+		/*for (int i=0; i<parent->children.num; i++)
 			if (parent->children[i] == this) {
 				parent->children.erase(i);
-			}
+			}*/
 		parent = nullptr;
 	}
 	DBDEL_X("children");
 	msg_right();
 	// make sure to remove child-panels first (otherwise their widgets would get deleted recursively)
 	// Controls are sometimes doubly-owned...
-	while (children.num > 0) {
-		Panel *p = children.pop();
-		delete(p);
-	}
+	/*while (children.num > 0) {
+		children.pop();
+	}*/
 	msg_left();
 	DBDEL_X("root");
 
-	if (root_control)
-		control_delete_rec(root_control);
+	//if (root_control)
+	//	control_delete_rec(root_control.get());
 
 	DBDEL_X("x");
 	root_control = nullptr;
 
-	id.clear();
-	cur_id.clear();
 	DBDEL_DONE();
+}
+
+void Panel::__init__() {
+	new(this) Panel();
+}
+
+void Panel::__delete__() {
+	this->Panel::~Panel();
+}
+
+void Panel::set_id(const string &_id) {
+	id = _id;
+}
+
+void Panel::set_parent(Panel *_parent) {
+	parent = _parent;
+	if (parent)
+		_set_win(parent->win);
+}
+
+void control_delete_rec(Control *c);
+
+// might be executed repeatedly
+void Panel::_ClearPanel_() {
 }
 
 void Panel::set_border_width(int width) {
@@ -444,7 +440,7 @@ void Panel::embed_source(const string &buffer, const string &parent_id, int x, i
 	embed_resource(res, parent_id, x, y);
 }
 
-void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
+void Panel::embed(shared<Panel> panel, const string &parent_id, int x, int y) {
 	if (!panel)
 		return;
 	if (!panel->root_control) {
@@ -462,17 +458,32 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	if (parent_id.num > 0 and !_get_control_(parent_id))
 		msg_error(parent_id + " not found...embed");
 	_insert_control_(panel->root_control, x, y);
-	panel->root_control->panel = panel;
+	panel->root_control->panel = panel.get();
 
 #if GTK_CHECK_VERSION(4,0,0)
-	//msg_error("ATTACH ACTION GROUP  " + p2s(panel));
-	gtk_widget_insert_action_group(win->window, p2s(panel).c_str(), G_ACTION_GROUP(panel->action_group));
+	//msg_error("ATTACH ACTION GROUP  " + p2s(panel.get()));
+	gtk_widget_insert_action_group(win->window, p2s(panel.get()).c_str(), G_ACTION_GROUP(panel->action_group));
 #endif
+}
+
+void Panel::unembed(Panel *p) {
+	if (p->parent != this)
+		msg_error("Panel.unembed(): p.parent != this");
+
+	// unlink embedded control
+	p->root_control->parent->remove_child(p->root_control.get());
+
+	// unlink from this
+	p->parent = nullptr;
+	for (int i=0; i<children.num; i++)
+		if (children[i] == p)
+			children.erase(i);
+	// p might be deleted now
 }
 
 void Panel::_set_win(Window *_win) {
 	win = _win;
-	for (Panel *p: children)
+	for (Panel *p: weak(children))
 		p->_set_win(win);
 }
 
@@ -738,16 +749,10 @@ void Panel::expand(const string &_id, bool expanded) {
 //    for TreeView
 bool Panel::is_expanded(const string &_id, int row) {
 	bool r = false;
-	apply_foreach(_id, [&](Control *c) {
+	apply_foreach(_id, [&r, row](Control *c) {
 		r = c->is_expanded(row);
 	});
 	return r;
-}
-
-void Panel::delete_control(const string &_id) {
-	apply_foreach(_id, [](Control *c) {
-		control_delete_rec(c);
-	});
 }
 
 void Panel::set_options(const string &_id, const string &options) {

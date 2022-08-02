@@ -47,17 +47,16 @@ void Toolbar::add_separator() {
 
 // remove all items from the toolbar
 void Toolbar::reset() {
-	auto _items = item;
+	auto _items = weak(items);
 	for (auto i: _items) {
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_box_remove(GTK_BOX(widget), i->get_frame());
 #else
 		gtk_container_remove(GTK_CONTAINER(widget), i->widget);
 #endif
-		delete i;
 		//control_delete_rec(i);
 	}
-	item.clear();
+	items.clear();
 }
 
 // create and apply a toolbar bar resource id
@@ -85,7 +84,7 @@ void Toolbar::from_resource(Resource *res) {
 				add_checkable(title, cmd.image(), cmd.id);
 			else
 				add(title, cmd.image(), cmd.id);
-			item.back()->set_tooltip(tooltip);
+			items.back()->set_tooltip(tooltip);
 		} else if (cmd.type == "Separator") {
 			add_separator();
 		} else if (cmd.type == "Menu") {
@@ -93,16 +92,16 @@ void Toolbar::from_resource(Resource *res) {
 			for (string &o: cmd.options)
 				if (o.find("menu=") == 0) {
 					add_menu_by_id(title, cmd.image(), o.sub(5), cmd.id);
-					item.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
+					items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
 					ok = true;
 				}
 			if ((!ok) and (cmd.children.num > 0)) {
 				add_menu(title, cmd.image(), _create_res_menu_(id, &cmd, win), cmd.id);
-				item.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
+				items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
 			}
 		}
 		for (auto &o: cmd.options)
-			item.back()->set_options(o);
+			items.back()->set_options(o);
 	}
 	enable(true);
 }
@@ -114,7 +113,7 @@ void Toolbar::from_source(const string &source) {
 
 
 void Toolbar::apply_foreach(const string &id, std::function<void(Control*)> f) {
-	for (Control *c: item)
+	for (Control *c: weak(items))
 		c->apply_foreach(id, f);
 
 }

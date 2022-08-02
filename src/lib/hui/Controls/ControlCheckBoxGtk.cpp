@@ -47,6 +47,7 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_checkbox_clicked), this);
 #endif
 	}
+	take_gtk_ownership();
 }
 
 string ControlCheckBox::get_string() {

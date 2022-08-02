@@ -83,11 +83,11 @@ extern string OptionString, HuiFormatString;
 	}
 #endif
 
-void Panel::_insert_control_(Control *c, int x, int y) {
+void Panel::_insert_control_(shared<Control> c, int x, int y) {
 	GtkWidget *frame = c->get_frame();
 	c->panel = this;
 	if (target_control) {
-		target_control->add(c, x, y);
+		target_control->add_child(c, x, y);
 	} else {
 		root_control = c;
 		// directly into the window...
@@ -128,7 +128,9 @@ Control *Panel ::_get_control_(const string &id) {
 	//   will always set their own text
 
 	Control *r = nullptr;
-	apply_foreach(id, [&](Control *c) { r = c; });
+	apply_foreach(id, [&r] (Control *c) {
+		r = c;
+	});
 	if (r)
 		return r;
 
@@ -141,13 +143,19 @@ Control *Panel ::_get_control_(const string &id) {
 
 Control *Panel::_get_control_by_widget_(GtkWidget *widget) {
 	Control *r = nullptr;
-	apply_foreach("*", [&](Control *c) { if (c->widget == widget) r = c; });
+	apply_foreach("*", [&r, widget] (Control *c) {
+		if (c->widget == widget)
+			r = c;
+	});
 	return r;
 }
 
 string Panel::_get_id_by_widget_(GtkWidget *widget) {
 	string r = "";
-	apply_foreach("*", [&](Control *c) { if (c->widget == widget) r = c->id; });
+	apply_foreach("*", [&r, widget](Control *c) {
+		if (c->widget == widget)
+			r = c->id;
+	});
 	return r;
 }
 
@@ -368,7 +376,7 @@ void hui_rm_event(Array<EventListener> &event, Control *c) {
 			event.erase(i);
 			i --;
 		}
-	for (Control *cc : c->children)
+	for (Control *cc : weak(c->children))
 		hui_rm_event(event, cc);
 }
 
@@ -376,12 +384,13 @@ void hui_rm_event(Array<EventListener> &event, Control *c) {
 void control_delete_rec(Control *c);
 
 void Panel::remove_control(const string &id) {
-	Control *c = _get_control_(id);
-	if (c) {
+	if (!_get_control_(id))
+		msg_error("REMOVE CONTROL - NOT FOUND: " + id);
+
+	apply_foreach(id, [this] (Control *c) {
 		hui_rm_event(event_listeners, c);
-		//delete(c);
 		control_delete_rec(c);
-	}
+	});
 }
 
 

@@ -15,9 +15,6 @@ namespace hui {
 const int FRAME_MARGIN = 8;
 
 
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
-
 void DBDEL_X(const string &m);
 
 /*void on_gtk_destroy(GtkWidget *w, void *p) {
@@ -34,12 +31,13 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->spacing);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->spacing);
+	take_gtk_ownership();
 	set_options(get_option_from_title(title));
 
 	//g_signal_connect(G_OBJECT(widget), "destroy", G_CALLBACK(&on_gtk_destroy), this);
 }
 
-void ControlGrid::add(Control *child, int x, int y) {
+void ControlGrid::add_child(shared<Control> child, int x, int y) {
 	if (vertical) {
 		int t = x;
 		x = y;

@@ -140,8 +140,8 @@ public:
 	int mouse_offset_x, mouse_offset_y;
 	Control *main_input_control;
 
-	Toolbar *toolbar[4];
-	Toolbar *_cdecl get_toolbar(int index){ return toolbar[index]; }
+	shared<Toolbar> toolbar[4];
+	Toolbar *_cdecl get_toolbar(int index){ return toolbar[index].get(); }
 
 private:
 
@@ -160,7 +160,7 @@ public:
 private:
 public:
 	GtkWidget *vbox, *hbox, *menubar, *statusbar;
-	Control *header_bar;
+	shared<Control> header_bar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	struct InfoBar {

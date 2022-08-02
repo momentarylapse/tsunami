@@ -8,20 +8,18 @@
 #ifndef MENUITEMSUBMENU_H_
 #define MENUITEMSUBMENU_H_
 
-#include "Control.h"
+#include "MenuItem.h"
 
-namespace hui
-{
+namespace hui {
 
 class Menu;
 
-class MenuItemSubmenu : public Control {
+class MenuItemSubmenu : public BasicMenuItem {
 public:
 	MenuItemSubmenu(const string &title, Menu *menu, const string &id);
 	virtual ~MenuItemSubmenu();
 
 	Menu *sub_menu;
-	GMenuItem *item;
 };
 
 };

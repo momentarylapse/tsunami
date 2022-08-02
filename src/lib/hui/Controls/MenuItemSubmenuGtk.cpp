@@ -14,7 +14,7 @@ namespace hui
 {
 
 MenuItemSubmenu::MenuItemSubmenu(const string &title, Menu *menu, const string &id) :
-	Control(MENU_ITEM_SUBMENU, id)
+	BasicMenuItem(MENU_ITEM_SUBMENU, id)
 {
 #if GTK_CHECK_VERSION(4,0,0)
 	item = g_menu_item_new(get_lang_sys(id, title), nullptr);
@@ -22,9 +22,9 @@ MenuItemSubmenu::MenuItemSubmenu(const string &title, Menu *menu, const string &
 #else
 	widget = gtk_menu_item_new_with_label(get_lang_sys(id, title));
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget), menu->widget);
-	item = nullptr;
 #endif
 	sub_menu = menu;
+	take_gtk_ownership();
 }
 
 MenuItemSubmenu::~MenuItemSubmenu() {

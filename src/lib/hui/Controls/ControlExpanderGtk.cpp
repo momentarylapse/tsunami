@@ -12,9 +12,6 @@
 
 namespace hui {
 
-void control_link(Control *parent, Control *child);
-void control_unlink(Control *parent, Control *child);
-
 const int FRAME_INDENT = 0; //20;
 
 void on_gtk_expander_expand(GObject* object, GParamSpec *param_spec, gpointer user_data) {
@@ -75,6 +72,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 		//	gtk_widget_set_vexpand(widget, false);
 	}
 	gtk_revealer_set_reveal_child(GTK_REVEALER(revealer), false);
+	take_gtk_ownership();
 
 	//set_style_for_widget(widget, id, ".expander:active{transition: 300ms linear;}");
 
@@ -85,7 +83,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 	set_options(get_option_from_title(title));
 }
 
-void ControlExpander::add(Control *child, int x, int y) {
+void ControlExpander::add_child(shared<Control> child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_revealer_set_child(GTK_REVEALER(revealer), child_widget);
@@ -96,7 +94,7 @@ void ControlExpander::add(Control *child, int x, int y) {
 }
 
 # if 0
-void ControlExpander::add(Control *child, int x, int y) {
+void ControlExpander::add_child(Control *child, int x, int y) {
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_widget_set_vexpand(child_widget, true);
 	//gtk_widget_set_hexpand(child_widget, true);

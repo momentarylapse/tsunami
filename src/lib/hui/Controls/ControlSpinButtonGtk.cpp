@@ -31,6 +31,7 @@ ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 #else
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 #endif
+	take_gtk_ownership();
 	set_options(get_option_from_title(title));
 
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(parts[0]));

@@ -273,6 +273,7 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 #endif
 
 	widget = view;
+	take_gtk_ownership();
 
 	configure_tree_view_columns(this, view, fmt, parts);
 	gtk_widget_set_hexpand(widget, true);

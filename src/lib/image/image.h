@@ -12,7 +12,7 @@
 #include "../base/base.h"
 #include "color.h"
 
-class ImagePainter;
+class Painter;
 class Path;
 
 class Image {
@@ -55,7 +55,7 @@ public:
 	color _cdecl get_pixel(int x, int y) const;
 	color _cdecl get_pixel_interpolated(float x, float y) const;
 
-	ImagePainter *start_draw();
+	Painter *start_draw();
 };
 
 

@@ -25,6 +25,7 @@ ControlLabel::ControlLabel(const string &title, const string &id) :
 #else
 	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
 #endif
+	take_gtk_ownership();
 	flag_bold = flag_italic = false;
 	flag_underline = flag_strikeout = false;
 	set_options(get_option_from_title(title));

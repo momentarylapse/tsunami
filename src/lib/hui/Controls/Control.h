@@ -8,10 +8,10 @@
 #ifndef HUI_CONTROL_H_
 #define HUI_CONTROL_H_
 
-#include "../../image/image.h"
 #include "../common.h"
 #include "../Event.h"
 #include "../language.h"
+#include "../../base/pointer.h"
 #include <functional>
 
 namespace hui
@@ -30,7 +30,7 @@ string option_value(const string &options, const string &key);
 bool val_is_positive(const string &val, bool def = false);
 Array<std::pair<string, string>> parse_options(const string &options);
 
-class Control : public EventHandler {
+class Control : public Sharable<EventHandler> {
 public:
 	Control(int _type, const string &_id);
 	virtual ~Control();
@@ -46,63 +46,64 @@ public:
     GtkWidget *widget;
     GtkWidget *frame;
     GtkWidget *get_frame();
+    void take_gtk_ownership();
 #endif
 	bool enabled;
 	bool grab_focus;
 	int indent;
 	Panel *panel;
 	Control *parent;
-	Array<Control*> children;
+	shared_array<Control> children;
 
-	virtual void __reset(){}
+	virtual void __reset() {}
 	void reset();
-	virtual string get_string(){ return ""; }
-	virtual int get_int(){ return get_string()._int(); }
-	virtual float get_float(){ return get_string()._float(); }
-	virtual color get_color(){ return Black; }
-	virtual void __set_string(const string &str){}
+	virtual string get_string() { return ""; }
+	virtual int get_int() { return get_string()._int(); }
+	virtual float get_float() { return get_string()._float(); }
+	virtual color get_color();
+	virtual void __set_string(const string &str) {}
 	void set_string(const string &str);
-	virtual void __add_string(const string &str){}
+	virtual void __add_string(const string &str) {}
 	void add_string(const string &str);
-	virtual void __set_int(int i){ __set_string(i2s(i)); }
+	virtual void __set_int(int i) { __set_string(i2s(i)); }
 	void set_int(int i);
-	virtual void __set_float(float f){ __set_string(f2s(f, 3)); }
+	virtual void __set_float(float f) { __set_string(f2s(f, 3)); }
 	void set_float(float f);
-	virtual void __set_color(const color &c){}
+	virtual void __set_color(const color &c) {}
 	void set_color(const color &c);
-	virtual void set_image(const string &str){}
+	virtual void set_image(const string &str) {}
 
-	virtual void __add_child_string(int parent_row, const string &str){}
+	virtual void __add_child_string(int parent_row, const string &str) {}
 	void add_child_string(int parent_row, const string &str);
-	virtual void __change_string(int row, const string &str){}
+	virtual void __change_string(int row, const string &str) {}
 	void change_string(int row, const string &str);
-	virtual void __remove_string(int row){}
+	virtual void __remove_string(int row) {}
 	void remove_string(int row);
-	virtual string get_cell(int row, int column){ return ""; }
-	virtual void __set_cell(int row, int column, const string &str){}
+	virtual string get_cell(int row, int column) { return ""; }
+	virtual void __set_cell(int row, int column, const string &str) {}
 	void set_cell(int row, int column, const string &str);
-	virtual Array<int> get_selection(){ Array<int> r; return r; }
-	virtual void __set_selection(const Array<int> &sel){}
+	virtual Array<int> get_selection() { return Array<int>(); }
+	virtual void __set_selection(const Array<int> &sel) {}
 	void set_selection(const Array<int> &sel);
-	virtual void expand(int row, bool expand){}
-	virtual bool is_expanded(int row){ return false; }
+	virtual void expand(int row, bool expand) {}
+	virtual bool is_expanded(int row) { return false; }
 
 	virtual void enable(bool enabled);
 	virtual bool is_enabled();
 	virtual void hide(bool hidden);
-	virtual void __check(bool checked){}
+	virtual void __check(bool checked) {}
 	virtual void check(bool checked);
-	virtual bool is_checked(){ return false; }
+	virtual bool is_checked() { return false; }
 	virtual void set_tooltip(const string &str);
 	virtual void focus();
 	virtual bool has_focus();
-	virtual void completion_add(const string &text){}
-	virtual void completion_clear(){}
+	virtual void completion_add(const string &text) {}
+	virtual void completion_clear() {}
 
-	virtual void add(Control *child, int x, int y){}
+	virtual void add_child(shared<Control> child, int x, int y) {}
 	virtual void remove_child(Control *child) {}
 	void set_options(const string &options);
-	virtual void __set_option(const string &op, const string &value){}
+	virtual void __set_option(const string &op, const string &value) {}
 	void get_size(int &w, int &h);
 
 	void notify(const string &message = "", bool is_default = true);
@@ -115,7 +116,10 @@ private:
 	int min_width, min_height;
 };
 
+void control_link(Control *parent, shared<Control> child);
+void control_unlink(Control *parent, Control *child);
+void control_delete_rec(Control *c);
 
-};
+}
 
 #endif /* HUI_CONTROL_H_ */

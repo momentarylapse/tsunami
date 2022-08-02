@@ -100,7 +100,7 @@ void TrackConsole::load_data() {
 	enable("instrument", track);
 	hide_control("td_t_edit", !track);
 	if (panel)
-		delete panel;
+		unembed(panel);
 	panel = nullptr;
 
 	if (track) {

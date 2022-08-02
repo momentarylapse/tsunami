@@ -47,6 +47,7 @@ ControlRadioButton::ControlRadioButton(const string &title, const string &id, Pa
 #else
 	widget = gtk_radio_button_new_with_label(group, sys_str(parts[0]));
 #endif
+	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&on_gtk_radio_button_toggle), this);
 	set_options(get_option_from_title(title));
 }

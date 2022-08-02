@@ -35,114 +35,114 @@ public:
 	Panel(const string &id, Panel *parent);
 	Panel();
 	virtual ~Panel();
-	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void __init__();
+	virtual void __delete__();
 	void _ClearPanel_();
 
-	void _cdecl activate(const string &control_id);
-	bool _cdecl is_active(const string &control_id);
-	void _cdecl from_resource(const string &id);
+	void activate(const string &control_id);
+	bool is_active(const string &control_id);
+	void from_resource(const string &id);
 	void set_from_resource(Resource *res);
-	void _cdecl from_source(const string &source);
+	void from_source(const string &source);
 
-	void _cdecl show();
-	void _cdecl hide();
+	void show();
+	void hide();
 
-	virtual void _cdecl on_show(){}
-	virtual void _cdecl on_hide(){}
+	virtual void on_show(){}
+	virtual void on_hide(){}
 
 	void set_id(const string &id);
 	void set_parent(Panel *parent);
 	void _set_win(Window *win);
 
 	// events
-	int _cdecl event(const string &id, const Callback &function);
-	int _cdecl event_x(const string &id, const string &msg, const Callback &function);
-	int _cdecl event_xp(const string &id, const string &msg, const CallbackP &function);
-	void _cdecl remove_event_handler(int event_handler_id);
+	int event(const string &id, const Callback &function);
+	int event_x(const string &id, const string &msg, const Callback &function);
+	int event_xp(const string &id, const string &msg, const CallbackP &function);
+	void remove_event_handler(int event_handler_id);
 	bool _send_event_(Event *e, bool force_if_not_allowed = false);
 
 	// creating controls
 
-	void _cdecl add_control(const string &type, const string &title, int x, int y, const string &id);
-	void _cdecl _add_control(const string &ns, Resource &cmd, const string &parent_id);
-	void _cdecl add_button(const string &title, int x, int y,const string &id);
-	void _cdecl add_def_button(const string &title, int x, int y, const string &id);
-	void _cdecl add_color_button(const string &title, int x, int y, const string &id);
-	void _cdecl add_toggle_button(const string &title, int x, int y, const string &id);
-	void _cdecl add_check_box(const string &title, int x, int y, const string &id);
-	void _cdecl add_radio_button(const string &title, int x, int y, const string &id);
-	void _cdecl add_label(const string &title, int x, int y, const string &id);
-	void _cdecl add_edit(const string &title, int x, int y, const string &id);
-	void _cdecl add_multiline_edit(const string &title, int x, int y, const string &id);
-	void _cdecl add_group(const string &title, int x, int y, const string &id);
-	void _cdecl add_combo_box(const string &title, int x, int y, const string &id);
-	void _cdecl add_tab_control(const string &title, int x, int y, const string &id);
-	void _cdecl set_target(const string &id);
-	void _cdecl add_list_view(const string &title, int x, int y, const string &id);
-	void _cdecl add_tree_view(const string &title, int x, int y, const string &id);
-	void _cdecl add_icon_view(const string &title, int x, int y, const string &id);
-	void _cdecl add_list_view__test(const string &title, int x, int y, const string &id);
-	void _cdecl add_progress_bar(const string &title, int x, int y, const string &id);
-	void _cdecl add_slider(const string &title, int x, int y, const string &id);
-	void _cdecl add_image(const string &title, int x, int y, const string &id);
-	void _cdecl add_drawing_area(const string &title, int x, int y, const string &id);
-	void _cdecl add_grid(const string &title, int x, int y, const string &id);
-	void _cdecl add_spin_button(const string &title, int x, int y, const string &id);
-	void _cdecl add_scroller(const string &title, int x, int y, const string &id);
-	void _cdecl add_expander(const string &title, int x, int y, const string &id);
-	void _cdecl add_separator(const string &title, int x, int y, const string &id);
-	void _cdecl add_paned(const string &title, int x, int y, const string &id);
-	void _cdecl add_menu_button(const string &title, int x, int y, const string &id);
+	void add_control(const string &type, const string &title, int x, int y, const string &id);
+	void _add_control(const string &ns, Resource &cmd, const string &parent_id);
+	void add_button(const string &title, int x, int y,const string &id);
+	void add_def_button(const string &title, int x, int y, const string &id);
+	void add_color_button(const string &title, int x, int y, const string &id);
+	void add_toggle_button(const string &title, int x, int y, const string &id);
+	void add_check_box(const string &title, int x, int y, const string &id);
+	void add_radio_button(const string &title, int x, int y, const string &id);
+	void add_label(const string &title, int x, int y, const string &id);
+	void add_edit(const string &title, int x, int y, const string &id);
+	void add_multiline_edit(const string &title, int x, int y, const string &id);
+	void add_group(const string &title, int x, int y, const string &id);
+	void add_combo_box(const string &title, int x, int y, const string &id);
+	void add_tab_control(const string &title, int x, int y, const string &id);
+	void set_target(const string &id);
+	void add_list_view(const string &title, int x, int y, const string &id);
+	void add_tree_view(const string &title, int x, int y, const string &id);
+	void add_icon_view(const string &title, int x, int y, const string &id);
+	void add_list_view__test(const string &title, int x, int y, const string &id);
+	void add_progress_bar(const string &title, int x, int y, const string &id);
+	void add_slider(const string &title, int x, int y, const string &id);
+	void add_image(const string &title, int x, int y, const string &id);
+	void add_drawing_area(const string &title, int x, int y, const string &id);
+	void add_grid(const string &title, int x, int y, const string &id);
+	void add_spin_button(const string &title, int x, int y, const string &id);
+	void add_scroller(const string &title, int x, int y, const string &id);
+	void add_expander(const string &title, int x, int y, const string &id);
+	void add_separator(const string &title, int x, int y, const string &id);
+	void add_paned(const string &title, int x, int y, const string &id);
+	void add_menu_button(const string &title, int x, int y, const string &id);
 
-	void _cdecl embed_dialog(const string &id, int x, int y);
-	void _cdecl embed_source(const string &source, const string &parent_id, int x, int y);
+	void embed_dialog(const string &id, int x, int y);
+	void embed_source(const string &source, const string &parent_id, int x, int y);
 	void embed_resource(Resource &c, const string &parent_id, int x, int y);
 	void _embed_resource(const string &ns, Resource &c, const string &parent_id, int x, int y);
-	void _cdecl embed(hui::Panel *panel, const string &parent_id, int x, int y);
+	void embed(shared<Panel> panel, const string &parent_id, int x, int y);
+	void unembed(Panel *p);
 
 // using controls
 	// string
-	void _cdecl set_string(const string &id, const string &str);
-	void _cdecl add_string(const string &id, const string &str);
-	void _cdecl add_child_string(const string &id, int parent_row, const string &str);
-	void _cdecl change_string(const string &id, int row, const string &str);
-	void _cdecl remove_string(const string &id, int row);
-	string _cdecl get_string(const string &id);
-	string _cdecl get_cell(const string &id, int row, int column);
-	void _cdecl set_cell(const string &id, int row, int column, const string &str);
+	void set_string(const string &id, const string &str);
+	void add_string(const string &id, const string &str);
+	void add_child_string(const string &id, int parent_row, const string &str);
+	void change_string(const string &id, int row, const string &str);
+	void remove_string(const string &id, int row);
+	string get_string(const string &id);
+	string get_cell(const string &id, int row, int column);
+	void set_cell(const string &id, int row, int column, const string &str);
 	// int
-	void _cdecl set_int(const string &id, int i);
-	int _cdecl get_int(const string &id);
+	void set_int(const string &id, int i);
+	int get_int(const string &id);
 	// float
-	void _cdecl set_decimals(int decimals);
-	void _cdecl set_float(const string &id, float f);
-	float _cdecl get_float(const string &id);
+	void set_decimals(int decimals);
+	void set_float(const string &id, float f);
+	float get_float(const string &id);
 	// color
-	void _cdecl set_color(const string &id, const color &col);
-	color _cdecl get_color(const string &id);
+	void set_color(const string &id, const color &col);
+	color get_color(const string &id);
 	// tree/expander
-	void _cdecl expand(const string &id, bool expand);
-	void _cdecl expand_row(const string &id, int row, bool expand);
-	bool _cdecl is_expanded(const string &id, int row = -1);
+	void expand(const string &id, bool expand);
+	void expand_row(const string &id, int row, bool expand);
+	bool is_expanded(const string &id, int row = -1);
 	// stuff
-	void _cdecl enable(const string &id, bool enabled);
-	bool _cdecl is_enabled(const string &id);
-	void _cdecl hide_control(const string &id, bool hide);
-	void _cdecl delete_control(const string &id);
-	void _cdecl check(const string &id, bool checked);
-	bool _cdecl is_checked(const string &id);
-	void _cdecl set_image(const string &id, const string &image);
-	void _cdecl set_tooltip(const string &id, const string &tip);
-	Array<int> _cdecl get_selection(const string &id);
-	void _cdecl set_selection(const string &id, const Array<int> &sel);
-	void _cdecl reset(const string &id);
-	void _cdecl remove_control(const string &id);
-	void _cdecl set_options(const string &id, const string &options);
+	void enable(const string &id, bool enabled);
+	bool is_enabled(const string &id);
+	void hide_control(const string &id, bool hide);
+	void remove_control(const string &id);
+	void check(const string &id, bool checked);
+	bool is_checked(const string &id);
+	void set_image(const string &id, const string &image);
+	void set_tooltip(const string &id, const string &tip);
+	Array<int> get_selection(const string &id);
+	void set_selection(const string &id, const Array<int> &sel);
+	void reset(const string &id);
+	void set_options(const string &id, const string &options);
 
 	// drawing
-	void _cdecl redraw(const string &id);
-	void _cdecl redraw_rect(const string &_id, const rect &r);
+	void redraw(const string &id);
+	void redraw_rect(const string &_id, const rect &r);
 	Control *_get_control_(const string &id);
 #ifdef HUI_API_GTK
 	Control *_get_control_by_widget_(GtkWidget *widget);
@@ -150,8 +150,8 @@ public:
 #endif
 	string _get_cur_id_();
 	void _set_cur_id_(const string &id);
-	void _cdecl set_border_width(int width);
-	void _cdecl set_spacing(int width);
+	void set_border_width(int width);
+	void set_spacing(int width);
 
 
 	void _connect_menu_to_panel(Menu *menu);
@@ -171,12 +171,12 @@ public:
 	};
 	Array<SizeGroup> size_groups;
 //protected:
-	void _insert_control_(Control *c, int x, int y);
+	void _insert_control_(shared<Control> c, int x, int y);
 	int desired_width, desired_height;
 #endif
 
 	Control *target_control;
-	Control *root_control;
+	shared<Control> root_control;
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 public:
 	Array<EventListener> event_listeners;
@@ -194,7 +194,7 @@ public:
 	int spacing;
 	Window *win;
 	Panel *parent;
-	Array<Panel*> children;
+	shared_array<Panel> children;
 
 
 #if GTK_CHECK_VERSION(4,0,0)

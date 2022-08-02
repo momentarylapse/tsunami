@@ -330,7 +330,7 @@ shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node>
 	}
 	if ((cast.cast == TYPE_CAST_MAKE_SHARED) or (cast.cast == TYPE_CAST_MAKE_OWNED)) {
 		if (!cast.f)
-			do_error(format("internal: make shared... %s._create() missing...", wanted->name), node);
+			do_error(format("internal: make shared... %s.() missing...", wanted->name, IDENTIFIER_FUNC_SHARED_CREATE), node);
 		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;
@@ -368,9 +368,9 @@ shared<Node> Concretifier::link_special_operator_is(shared<Node> param1, shared<
 
 shared<Node> Concretifier::link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id) {
 	param2 = force_concrete_type(param2);
-	auto *f = param2->type->get_member_func("__contains__", TypeBool, {param1->type});
+	auto *f = param2->type->get_member_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, {param1->type});
 	if (!f)
-		do_error(format("no 'bool %s.__contains__(%s)' found", param2->type->long_name(), param1->type->long_name()), token_id);
+		do_error(format("no 'bool %s.%s(%s)' found", param2->type->long_name(), IDENTIFIER_FUNC_CONTAINS, param1->type->long_name()), token_id);
 
 	auto n = add_node_member_call(f, param2, token_id);
 	n->set_param(1, param1);
@@ -706,7 +706,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// allowed?
 	if (!operand->type->is_array() and !operand->type->usable_as_super_array())
-		do_error(format("type '%s' is neither an array nor does it have a function __get__(%s)", operand->type->long_name(), index->type->long_name()), index);
+		do_error(format("type '%s' is neither an array nor does it have a function %s(%s)", operand->type->long_name(), IDENTIFIER_FUNC_GET, index->type->long_name()), index);
 
 
 	if (index->type != TypeInt)
@@ -1876,14 +1876,18 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 	if ((n->kind == NodeKind::CALL_FUNCTION) or (n->kind == NodeKind::CALL_VIRTUAL)) {
 		auto f = n->as_func();
 		int offset = 0;
+
+		// "ref" parameter -> return mut/const depends on param!
+		if (f->num_params >= 1)
+			if (flags_has(f->var[0]->flags, Flags::REF))
+				n->is_const = n->params[0]->is_const;
+
+		// const check
 		if (f->is_member()) {
 			offset = 1;
 			if (f->is_selfref()) {
-				// const(return) = const(instance)
-				n->is_const = n->params[0]->is_const;
 			} else if (n->params[0]->is_const and !f->is_const()) {
-				//n->show();
-				tree->do_error(f->long_name() + ": member function expects a mutable instance, because it is declared without 'const'", n->token_id);
+				tree->do_error(f->long_name() + ": member function expects a mutable instance, because it is declared 'mut'", n->token_id);
 			}
 		}
 		for (int i=offset; i<f->num_params; i++)

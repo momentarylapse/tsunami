@@ -581,8 +581,8 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 				flags_set(f->flags, Flags::CONST);
 			else
 				flags_clear(f->flags, Flags::CONST);
-			if (flags_has(orig->flags, Flags::SELFREF))
-				flags_set(f->flags, Flags::SELFREF);
+			if (flags_has(orig->flags, Flags::REF))
+				flags_set(f->flags, Flags::REF);
 
 			if (auto self = f->__get_var(IDENTIFIER_SELF)) {
 				if (flags_has(f->flags, Flags::CONST))

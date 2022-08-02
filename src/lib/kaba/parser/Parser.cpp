@@ -431,9 +431,9 @@ shared<Node> Parser::parse_abstract_set_builder(Block *block) {
 
 
 shared<Node> Parser::apply_format(shared<Node> n, const string &fmt) {
-	auto f = n->type->get_member_func("format", TypeString, {TypeString});
+	auto f = n->type->get_member_func(IDENTIFIER_FUNC_FORMAT, TypeString, {TypeString});
 	if (!f)
-		do_error(format("format string: no '%s.format(string)' function found", n->type->long_name()), n);
+		do_error(format("format string: no '%s.%s(string)' function found", n->type->long_name(), IDENTIFIER_FUNC_FORMAT), n);
 	auto *c = tree->add_constant(TypeString);
 	c->as_string() = fmt;
 	auto nf = add_node_call(f, n->token_id);
@@ -1174,7 +1174,7 @@ shared_array<Node> parse_comma_sep_token_list(Parser *p) {
 
 // local (variable) definitions...
 shared<Node> Parser::parse_abstract_statement_var(Block *block) {
-	Exp.next(); // "var"
+	Exp.next(); // "var"/"let"
 
 	// tuple "var (x,y) = ..."
 	if (try_consume("(")) {
@@ -1385,9 +1385,7 @@ shared<Node> Parser::parse_abstract_statement(Block *block) {
 		return parse_abstract_statement_repr(block);
 	} else if (Exp.cur == IDENTIFIER_LEN) {
 		return parse_abstract_statement_len(block);
-	} else if (Exp.cur == IDENTIFIER_LET) {
-		return parse_abstract_statement_let(block);
-	} else if (Exp.cur == IDENTIFIER_VAR) {
+	} else if (Exp.cur == IDENTIFIER_LET or Exp.cur == IDENTIFIER_VAR) {
 		return parse_abstract_statement_var(block);
 	} else if (Exp.cur == IDENTIFIER_MAP) {
 		return parse_abstract_statement_map(block);
@@ -2169,8 +2167,8 @@ Flags Parser::parse_flags(Flags initial) {
 			flags_set(flags, Flags::VIRTUAL);
 		} else if (Exp.cur == IDENTIFIER_OVERRIDE) {
 			flags_set(flags, Flags::OVERRIDE);
-		} else if (Exp.cur == IDENTIFIER_SELFREF) {
-			flags_set(flags, Flags::SELFREF);
+		} else if (Exp.cur == IDENTIFIER_SELFREF or Exp.cur == IDENTIFIER_REF) {
+			flags_set(flags, Flags::REF);
 		//} else if (Exp.cur == IDENTIFIER_SHARED) {
 		//	flags = flags_mix({flags, Flags::SHARED});
 		//} else if (Exp.cur == IDENTIFIER_OWNED) {

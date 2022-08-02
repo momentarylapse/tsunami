@@ -181,10 +181,10 @@ void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 
 DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, const string &_by) {
 	if (!type->is_super_array())
-		kaba_raise_exception(new KabaException("type '" + type->name + "' is not an array"));
+		kaba_raise_exception(new KabaException(format("type '%s' is not an array", type->name)));
 	const Class *el = type->param[0];
 	if (array.element_size != el->size)
-		kaba_raise_exception(new KabaException("element type size mismatch..."));
+		kaba_raise_exception(new KabaException(format("element type size mismatch... type=%s: %d  vs  array: %d", el->name, el->size, array.element_size)));
 
 	DynamicArray rr;
 	kaba_var_init(&rr, type);

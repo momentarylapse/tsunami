@@ -165,8 +165,10 @@ void Function::update_parameters_after_parsing() {
 	if (is_member()) {
 		if (!__get_var(IDENTIFIER_SELF))
 			add_self_parameter();
-		if (!is_const())
+		if (flags_has(flags, Flags::CONST))
 			flags_clear(__get_var(IDENTIFIER_SELF)->flags, Flags::CONST);
+		if (flags_has(flags, Flags::REF))
+			flags_clear(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);
 	}
 }
 
@@ -227,10 +229,17 @@ bool Function::is_member() const {
 
 bool Function::is_const() const {
 	return flags_has(flags, Flags::CONST);
+
+	// hmmm, might be better, to use self:
+	if (is_static())
+		return false;
+	return __get_var(IDENTIFIER_SELF)->is_const();
 }
 
 bool Function::is_selfref() const {
-	return flags_has(flags, Flags::SELFREF);
+	if (is_static())
+		return false;
+	return flags_has(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);
 }
 
 bool Function::throws_exceptions() const {

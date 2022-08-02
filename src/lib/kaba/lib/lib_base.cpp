@@ -48,8 +48,12 @@ void _cdecl kaba_cstringout(char *str) {
 	kaba_print(str);
 }
 
-bytes _cdecl kaba_binary(const char *p, int length) {
-	return bytes(p, length);
+bytes _cdecl kaba_binary(char *p, int length) {
+	//return bytes(p, length);
+	bytes b;
+	b.num = length;
+	b.data = p;
+	return b;
 }
 
 #if 0
@@ -321,7 +325,7 @@ void SIAddPackageBase() {
 		class_add_func("swap", TypeVoid, &DynamicArray::simple_swap);
 			func_add_param("i1", TypeInt);
 			func_add_param("i2", TypeInt);
-		class_add_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, &DynamicArray::ref_subarray, Flags::SELFREF);
+		class_add_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, &DynamicArray::ref_subarray, Flags::REF);
 			func_add_param("start", TypeInt);
 			func_add_param("end", TypeInt);
 		// low level operations
@@ -395,7 +399,7 @@ void SIAddPackageBase() {
 
 	add_class(TypeInt);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &i2s, Flags::PURE);
-		class_add_func("format", TypeString, &kaba_int_format, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_FORMAT, TypeString, &kaba_int_format, Flags::PURE);
 			func_add_param("fmt", TypeString);
 		class_add_func("__float__", TypeFloat32, &kaba_cast<int,float>, Flags::PURE);
 			func_set_inline(InlineID::INT_TO_FLOAT);
@@ -462,7 +466,7 @@ void SIAddPackageBase() {
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &kaba_float2str, Flags::PURE);
 		class_add_func("str2", TypeString, &f2s, Flags::PURE);
 			func_add_param("decimals", TypeInt);
-		class_add_func("format", TypeString, &kaba_float_format, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_FORMAT, TypeString, &kaba_float_format, Flags::PURE);
 			func_add_param("fmt", TypeString);
 		class_add_func("__int__", TypeInt, &kaba_cast<float,int>, Flags::PURE);
 			func_set_inline(InlineID::FLOAT_TO_INT);    // sometimes causes floating point exceptions...
@@ -589,11 +593,11 @@ void SIAddPackageBase() {
 		class_add_func("utf8_to_utf32", TypeIntList, &string::utf8_to_utf32, Flags::PURE);
 		class_add_func("utf8_length", TypeInt, &string::utf8len, Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_REPR, TypeString, &string::repr, Flags::PURE);
-		class_add_func("format", TypeString, &KabaString::format, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_FORMAT, TypeString, &KabaString::format, Flags::PURE);
 			func_add_param("fmt", TypeString);
-		class_add_func("__contains__", TypeBool, &KabaString::contains_s, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, &KabaString::contains_s, Flags::PURE);
 			func_add_param("s", TypeString);
-		class_add_func("__contains__", TypeBool, &KabaString::contains_c, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, &KabaString::contains_c, Flags::PURE);
 			func_add_param("c", TypeChar);
 
 
@@ -643,7 +647,7 @@ void SIAddPackageBase() {
 		add_operator(OperatorID::GREATER_EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::ge_values_scalar);
 		add_operator(OperatorID::EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::eq_values_scalar);
 		add_operator(OperatorID::NOTEQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::ne_values_scalar);
-		class_add_func("__contains__", TypeBool, &XList<int>::__contains__, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, &XList<int>::__contains__, Flags::PURE);
 			func_add_param("i", TypeInt);
 
 	add_class(TypeFloatList);
@@ -727,7 +731,7 @@ void SIAddPackageBase() {
 		add_operator(OperatorID::NOTEQUAL, TypeBool, TypeStringList, TypeStringList, InlineID::NONE, &StringList::__neq__);
 		add_operator(OperatorID::ADD, TypeStringList, TypeStringList, TypeStringList, InlineID::NONE, &StringList::__add__);
 		add_operator(OperatorID::ADDS, TypeVoid, TypeStringList, TypeStringList, InlineID::NONE, &StringList::__adds__);
-		class_add_func("__contains__", TypeBool, &StringList::__contains__, Flags::PURE);
+		class_add_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, &StringList::__contains__, Flags::PURE);
 			func_add_param("s", TypeString);
 
 
@@ -762,8 +766,8 @@ void SIAddPackageBase() {
 	add_func("print", TypeVoid, &kaba_print, Flags::STATIC);
 		func_add_param("str", TypeStringAutoCast);//, (Flags)((int)Flags::CONST | (int)Flags::AUTO_CAST));
 	add_ext_var("_print_postfix", TypeString, &kaba_print_postfix);
-	add_func("binary", TypeString, &kaba_binary, Flags::STATIC);
-		func_add_param("p", TypePointer);
+	add_func("as_binary", TypeString, &kaba_binary, Flags::STATIC);
+		func_add_param("p", TypePointer, Flags::REF);
 		func_add_param("length", TypeInt);
 	// memory
 	add_func("@malloc", TypePointer, &kaba_malloc, Flags::STATIC);

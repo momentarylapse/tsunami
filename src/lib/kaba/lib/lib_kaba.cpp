@@ -1,5 +1,6 @@
 #include "../kaba.h"
 #include "lib.h"
+#include "list.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 
@@ -193,7 +194,7 @@ void SIAddPackageKaba() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XSharedArray<Module>::__init__);
 
 	add_class(TypeClassElementList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XSharedArray<ClassElement>::__init__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XList<ClassElement>::__init__);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<ClassElement>::clear);
 
 	add_func("get_dynamic_type", TypeClassP, &get_dynamic_type, Flags::_STATIC__PURE);

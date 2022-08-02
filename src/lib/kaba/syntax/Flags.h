@@ -36,7 +36,7 @@ enum class Flags {
 	EXTERN = 1<<8,
 	OUT = 1<<9,
 	VIRTUAL = 1<<10,
-	SELFREF = 1<<11,
+	REF = 1<<11,
 	SHARED = 1<<12,
 	OWNED = 1<<13,
 	AUTO_CAST = 1<<14,
@@ -52,7 +52,7 @@ enum class Flags {
 
 	_STATIC__RAISES_EXCEPTIONS = STATIC | RAISES_EXCEPTIONS,
 	_STATIC__PURE = STATIC | PURE,
-	_SELFREF__RAISES_EXCEPTIONS = SELFREF | RAISES_EXCEPTIONS
+	_REF__RAISES_EXCEPTIONS = REF | RAISES_EXCEPTIONS
 };
 bool flags_has(Flags flags, Flags t);
 void flags_set(Flags &flags, Flags t);

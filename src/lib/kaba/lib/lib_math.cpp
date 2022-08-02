@@ -770,7 +770,7 @@ void SIAddPackageMath() {
 			func_add_param("z_near", TypeFloat32);
 			func_add_param("z_far", TypeFloat32);
 			func_add_param("z_sym", TypeBool);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat4, TypeMat4, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat4, TypeMat4, InlineID::CHUNK_ASSIGN, &KabaVector<mat4>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMat4, TypeMat4, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::MULTIPLY, TypeMat4, TypeMat4, TypeMat4, InlineID::NONE, &mat4::mul);
 		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeMat4, TypeVec3, InlineID::NONE, &mat4::mul_v);
@@ -792,7 +792,7 @@ void SIAddPackageMath() {
 		class_add_const("0", TypeMat3, &mat3::ZERO);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &mat3::str, Flags::PURE);
 		class_add_func("inverse", TypeMat3, &mat3::inverse, Flags::PURE);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat3, TypeMat3, InlineID::CHUNK_ASSIGN);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat3, TypeMat3, InlineID::CHUNK_ASSIGN, &KabaVector<mat3>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMat3, TypeMat3, InlineID::CHUNK_EQUAL);
 		add_operator(OperatorID::MULTIPLY, TypeMat3, TypeMat3, TypeMat3, InlineID::NONE, &mat3::mul);
 		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeMat3, TypeVec3, InlineID::NONE, &mat3::mul_v);
@@ -846,12 +846,12 @@ void SIAddPackageMath() {
 			func_add_param("a", TypeAny);
 		class_add_func("clear", TypeVoid, &Any::clear);
 		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeInt, &Any::length, Flags::PURE);
-		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_map_get, Flags::_SELFREF__RAISES_EXCEPTIONS);
+		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_map_get, Flags::_REF__RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_map_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_array_get, Flags::_SELFREF__RAISES_EXCEPTIONS);
+		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_array_get, Flags::_REF__RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_array_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
@@ -1191,8 +1191,8 @@ void SIAddPackageMath() {
 
 
 	add_class(TypeAny);
-		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::_SELFREF__RAISES_EXCEPTIONS);
-		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::_SELFREF__RAISES_EXCEPTIONS);
+		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::_REF__RAISES_EXCEPTIONS);
+		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::_REF__RAISES_EXCEPTIONS);
 }
 
 };

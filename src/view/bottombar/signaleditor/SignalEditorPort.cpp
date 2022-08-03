@@ -50,10 +50,10 @@ public:
 		p->set_color(theme.text);
 		if (target) {
 			p->set_line_width(5);
-			p->draw_line(port->area.m(), target->area.m());
+			p->draw_line(port->area.center(), target->area.center());
 			p->set_line_width(1);
 		} else {
-			p->draw_line(port->area.m(), hui::get_event()->m);
+			p->draw_line(port->area.center(), hui::get_event()->m);
 		}
 	}
 };
@@ -76,7 +76,7 @@ void SignalEditorModulePort::on_draw(Painter *p) {
 	bool hovering = is_cur_hover();
 	p->set_color(tab->signal_color(type, hovering));
 	float r = hovering ? 6 : 4;
-	p->draw_circle(area.m(), r);
+	p->draw_circle(area.center(), r);
 }
 
 bool SignalEditorModulePort::on_left_button_down(const vec2 &m) {

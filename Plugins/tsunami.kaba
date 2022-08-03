@@ -424,8 +424,8 @@ class TrackLayer as shared
 	#extern void add_midi_notes(MidiNoteBuffer midi)
 	func extern mut delete_midi_note(n: MidiNote*)
 	func extern mut add_sample_ref(pos: int, sample: Sample*) -> SampleRef*
-	func extern mut delete_sample_ref(ref: SampleRef*)
-	func extern mut edit_sample_ref(ref: SampleRef*, volume: float, mute: bool)
+	func extern mut delete_sample_ref(s: SampleRef*)
+	func extern mut edit_sample_ref(s: SampleRef*, volume: float, mute: bool)
 	func extern mut add_marker(m: TrackMarker) -> TrackMarker*
 	func extern mut delete_marker(marker: TrackMarker*)
 	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)

@@ -24,16 +24,12 @@ float rect::height() const {
 	return y2 - y1;
 }
 
-float rect::mx() const {
-	return (x1 + x2) / 2;
+vec2 rect::center() const {
+	return {(x1 + x2) / 2, (y1 + y2) / 2};
 }
 
-float rect::my() const {
-	return (y1 + y2) / 2;
-}
-
-vec2 rect::m() const {
-	return {mx(), my()};
+vec2 rect::size() const {
+	return {width(), height()};
 }
 
 float rect::area() const {
@@ -63,11 +59,11 @@ bool rect::overlaps(const rect &r) const {
 	return false;
 }
 
-bool rect::operator ==(const rect &r) const {
+bool rect::operator==(const rect &r) const {
 	return (x1 == r.x1) and (y1 == r.y1) and (x2 == r.x2) and (y2 == r.y2);
 }
 
-bool rect::operator !=(const rect &r) const {
+bool rect::operator!=(const rect &r) const {
 	return !(*this == r);
 }
 
@@ -79,7 +75,7 @@ void range_intersect(float a1, float a2, float b1, float b2, float &o1, float &o
 }
 
 // intersection
-rect rect::operator &&(const rect &r) const {
+rect rect::operator&&(const rect &r) const {
 	rect o = r;
 	range_intersect(x1, x2, r.x1, r.x2, o.x1, o.x2);
 	range_intersect(y1, y2, r.y1, r.y2, o.y1, o.y2);
@@ -87,7 +83,7 @@ rect rect::operator &&(const rect &r) const {
 }
 
 // hull
-rect rect::operator ||(const rect &r) const {
+rect rect::operator||(const rect &r) const {
 	rect o;
 	o.x1 = min(x1, r.x1);
 	o.y1 = min(y1, r.y1);

@@ -53,7 +53,7 @@ void Cursor::on_draw(Painter* c) {
 			cc = theme.selection_boundary_hover;
 		for (auto *v: view->vlayers)
 			if (view->sel.has(v->layer)) {
-				c->draw_circle({x, v->area.my()}, 6);
+				c->draw_circle({x, v->area.center().y}, 6);
 			}
 	}
 }
@@ -69,7 +69,7 @@ bool Cursor::hover(const vec2 &m) const {
 	float x = view->cam.sample2screen(pos());
 	for (auto *v: view->vlayers)
 		if (view->sel.has(v->layer)) {
-			if ((m - vec2(x, v->area.my())).length() < 10)
+			if ((m - vec2(x, v->area.center().y)).length() < 10)
 				return true;
 		}
 	return false;

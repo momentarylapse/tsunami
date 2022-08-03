@@ -30,8 +30,8 @@ void SignalEditorCable::on_draw(Painter *p) {
 	auto ps = ms->out[source_port];
 	auto pt = mt->in[target_port];
 
-	vec2 p0 = ps->area.m();
-	vec2 p1 = pt->area.m();
+	vec2 p0 = ps->area.center();
+	vec2 p1 = pt->area.center();
 
 	float length = (p1 - p0).length();
 	Interpolator<vec2> inter(Interpolator<vec2>::TYPE_CUBIC_SPLINE);

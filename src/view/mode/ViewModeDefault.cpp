@@ -59,7 +59,7 @@ public:
 	void on_start(const vec2 &m) override {
 		range = RangeTo(start_pos, view->get_mouse_pos_snap());
 		if (keep_start)
-			view->hover().y0 = view->cur_vlayer()->area.my();
+			view->hover().y0 = view->cur_vlayer()->area.center().y;
 		else
 			view->hover().y0 = view->mdp()->y0;
 		view->hover().y1 = m.y;
@@ -200,7 +200,7 @@ void ViewModeDefault::start_selection_rect(SelectionMode mode, bool keep_start) 
 void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
 	auto range = RangeTo(view->sel.range_raw.start(), view->get_mouse_pos_snap());
 
-	view->hover().y0 = view->cur_vlayer()->area.my();
+	view->hover().y0 = view->cur_vlayer()->area.center().y;
 	view->hover().y1 = view->m.y;
 	view->selection_mode = SelectionMode::TRACK_RECT;
 	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
@@ -324,7 +324,7 @@ void expand_layer_selection(AudioView *view, bool up) {
 	float y0 = min(vlayer->area.y1, first_layer->area.y1);
 	float y1 = max(vlayer->area.y2, first_layer->area.y2);
 	for (auto *l: view->vlayers)
-		view->sel.set(l->layer, l->area.my() > y0 and l->area.my() < y1);
+		view->sel.set(l->layer, l->area.center().y > y0 and l->area.center().y < y1);
 
 	view->set_current(vlayer->get_hover_data({0,0}));
 	//exclusively_select_layer(vlayer);

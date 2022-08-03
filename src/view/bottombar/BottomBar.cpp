@@ -45,8 +45,8 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_console(session_console, "");
 	add_console(log_console, "");
 
-	event("choose", [=]{ on_choose(); });
-	event("close", [=]{ on_close(); });
+	event("choose", [this]{ on_choose(); });
+	event("close", [this]{ on_close(); });
 
 	expand("revealer", false);
 	visible = false;
@@ -55,7 +55,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	choose(mixing_console);
 
 
-	for (auto c: consoles)
+	for (auto c: weak(consoles))
 		if (c->notify)
 			open(c);
 }
@@ -88,7 +88,7 @@ void BottomBar::add_console(BottomBar::Console *c, const string &list_name) {
 }
 
 int BottomBar::index(BottomBar::Console *console) {
-	foreachi (auto c, consoles, i)
+	foreachi (auto c, weak(consoles), i)
 		if (console == c)
 			return i;
 	return -1;
@@ -97,7 +97,7 @@ int BottomBar::index(BottomBar::Console *console) {
 void BottomBar::on_choose() {
 	int n = get_int("");
 	if (n >= 0)
-		open(consoles[n]);
+		open(weak(consoles)[n]);
 }
 
 void BottomBar::choose(BottomBar::Console *console) {
@@ -122,7 +122,7 @@ void BottomBar::open(BottomBar::Console *console) {
 }
 
 void BottomBar::open(int console_index) {
-	open(consoles[console_index]);
+	open(weak(consoles)[console_index]);
 }
 
 void BottomBar::toggle(int console_index) {

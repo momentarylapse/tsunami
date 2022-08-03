@@ -28,14 +28,14 @@ public:
 	void on_load();
 	void remove_tab(SignalEditorTab *t);
 
-	Array<SignalEditorTab*> tabs;
+	shared_array<SignalEditorTab> tabs;
 
 	void on_chain_switch();
 
 	string grid_id;
 	string config_grid_id;
 	Module *config_module;
-	ModulePanel *config_panel;
+	shared<ModulePanel> config_panel;
 
 	void show_config(Module *m);
 };

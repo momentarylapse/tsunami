@@ -68,7 +68,7 @@ public:
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;
 
-	owned_array<SideBarConsole> consoles;
+	shared_array<SideBarConsole> consoles;
 	void add_console(SideBarConsole *c);
 
 	Session *session;

@@ -125,6 +125,8 @@ void control_delete_rec(Control *c) {
 
 Control::~Control() {
 	DBDEL_START(i2s(type), id, this);
+	if (widget)
+		g_signal_handlers_disconnect_by_data(widget, this);
 	if (auto f = get_frame())
 		g_object_unref(f);
 

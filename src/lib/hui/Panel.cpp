@@ -74,6 +74,8 @@ Panel::Panel() {
 Panel::~Panel() {
 	DBDEL_START("Panel", id, this);
 	event_listeners.clear();
+	if (_pointer_ref_counter > 0)
+		msg_error("hui.Panel deleted while still owned: " + id);
 	if (parent) {
 		// disconnect from parent panel -> no owners here!
 		/*for (int i=0; i<parent->children.num; i++)
@@ -440,7 +442,8 @@ void Panel::embed_source(const string &buffer, const string &parent_id, int x, i
 	embed_resource(res, parent_id, x, y);
 }
 
-void Panel::embed(shared<Panel> panel, const string &parent_id, int x, int y) {
+// TODO shared<> auto-cast...
+void Panel::embed(/*shared<Panel>*/ Panel *panel, const string &parent_id, int x, int y) {
 	if (!panel)
 		return;
 	if (!panel->root_control) {
@@ -458,17 +461,17 @@ void Panel::embed(shared<Panel> panel, const string &parent_id, int x, int y) {
 	if (parent_id.num > 0 and !_get_control_(parent_id))
 		msg_error(parent_id + " not found...embed");
 	_insert_control_(panel->root_control, x, y);
-	panel->root_control->panel = panel.get();
+	panel->root_control->panel = panel;//.get();
 
 #if GTK_CHECK_VERSION(4,0,0)
 	//msg_error("ATTACH ACTION GROUP  " + p2s(panel.get()));
-	gtk_widget_insert_action_group(win->window, p2s(panel.get()).c_str(), G_ACTION_GROUP(panel->action_group));
+	gtk_widget_insert_action_group(win->window, p2s(panel/*.get()*/).c_str(), G_ACTION_GROUP(panel->action_group));
 #endif
 }
 
 void Panel::unembed(Panel *p) {
 	if (p->parent != this)
-		msg_error("Panel.unembed(): p.parent != this");
+		msg_error("Panel.unembed(): p.parent != this: " + p->id);
 
 	// unlink embedded control
 	p->root_control->parent->remove_child(p->root_control.get());

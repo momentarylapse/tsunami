@@ -50,7 +50,7 @@ void Dial::draw_arc(Painter *p, float v0, float v1, float R) {
 
 vec2 Dial::rel_to_pos(float rel, float R) {
 	float phi = -dphi + dphi * 2 * rel;
-	return vec2(area.mx() + sin(phi) * R, area.my() - cos(phi) * R);
+	return area.center() + vec2(sin(phi), - cos(phi)) * R;
 }
 
 void Dial::on_draw(Painter *p) {
@@ -59,7 +59,7 @@ void Dial::on_draw(Painter *p) {
 	// label
 	p->set_color(theme.text_soft1);
 	float w = p->get_str_width(label);
-	p->draw_str({area.mx() - w/2, area.y2 - 10}, label);
+	p->draw_str({area.center().x - w/2, area.y2 - 10}, label);
 
 
 	// value
@@ -69,7 +69,7 @@ void Dial::on_draw(Painter *p) {
 	if (unit.num > 0)
 		vv += " " + unit;
 	w = p->get_str_width(vv);
-	p->draw_str({area.mx() - w/2, area.my() - p->font_size/2}, vv);
+	p->draw_str(area.center() - vec2(w/2, p->font_size/2), vv);
 	p->set_font_size(theme.FONT_SIZE);
 
 

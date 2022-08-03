@@ -138,10 +138,10 @@ public:
 
 	Session *session;
 
-	SideBar *side_bar;
-	BottomBar *bottom_bar;
+	shared<SideBar> side_bar;
+	shared<BottomBar> bottom_bar;
 	
-	owned<ModulePanel> big_module_panel;
+	shared<ModulePanel> big_module_panel;
 	void set_big_panel(ModulePanel *p);
 
 	Tsunami *app;

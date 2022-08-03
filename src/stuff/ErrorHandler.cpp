@@ -42,10 +42,28 @@ namespace kaba {
 	string _cdecl var_repr(const void *p, const Class *type);
 }
 
+#ifdef COMPILER_GCC
+namespace abi {
+	extern "C" char* __cxa_demangle(const char* mangled_name, char* buf, size_t* n, int* status);
+}
+#endif
+
 // _ZN13PluginManager15handle_draw_preEv
 string unmangle(const string &name) {
 	if (name.head(2) != "_Z")
 		return name;
+#ifdef COMPILER_GCC
+	{
+		size_t nn = 0;
+		int status;
+		auto cc = abi::__cxa_demangle(name.c_str(), nullptr, &nn, &status);
+		if (status == 0) {
+			string rr = cc;
+			free(cc);
+			return rr;
+		}
+	}
+#endif
 	string r;
 	int i = 2;
 
@@ -57,7 +75,7 @@ string unmangle(const string &name) {
 			break;
 
 		bool is_namespace = false;
-		if (name[i] == 'N') {
+		if (name[i] == 'N') { // nested
 			is_namespace = true;
 			i ++;
 			if (name[i] == 'K') {
@@ -84,8 +102,6 @@ string unmangle(const string &name) {
 		i += n;
 		//if (is_namespace)
 		//	r += "::";
-
-
 	}
 
 	if (r.num > 0)
@@ -142,9 +158,10 @@ void ErrorHandler::show_backtrace() {
 		int n = unw_get_proc_name(&cursor, _name, sizeof(_name), &offp);
 		if (n == 0) {
 			string name = unmangle(_name);
-			if (name.match("*signal_handler*") or name == "killpg")
-				continue;
-			lines.add(">>  " + name + "()");
+			if (name.match("*signal_handler*") or name.match("*sigaction*") or name == "killpg")
+				lines.add(">>    <<  ERROR  >>");
+			else
+				lines.add(">>  " + name);// + "()");
 			if (name == "main")
 				break;
 		} else {

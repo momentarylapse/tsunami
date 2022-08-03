@@ -64,7 +64,7 @@ public:
 	Session *session;
 	Module *module;
 	string old_param;
-	ConfigPanel *p;
+	shared<ConfigPanel> p;
 	hui::Panel *outer;
 	hui::Menu *menu;
 };

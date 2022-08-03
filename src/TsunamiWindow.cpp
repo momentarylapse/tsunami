@@ -345,11 +345,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// side bar
 	side_bar = new SideBar(session, this);
-	embed(side_bar, "root-grid", 2, 0);
+	embed(side_bar.get(), "root-grid", 2, 0);
 
 	// bottom bar
 	bottom_bar = new BottomBar(session, this);
-	embed(bottom_bar, "main-grid", 0, 1);
+	embed(bottom_bar.get(), "main-grid", 0, 1);
 	//mini_bar = new MiniBar(bottom_bar, session);
 	//embed(mini_bar.get(), "main-grid", 0, 2);
 
@@ -411,8 +411,10 @@ TsunamiWindow::~TsunamiWindow() {
 	bottom_bar->unsubscribe(this);
 	side_bar->unsubscribe(this);
 
-	delete side_bar;
-	delete bottom_bar;
+	unembed(side_bar.get());
+	side_bar = nullptr;
+	unembed(bottom_bar.get());
+	bottom_bar = nullptr;
 	delete view;
 
 	auto _session = session;

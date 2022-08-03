@@ -41,7 +41,7 @@ public:
 	owned<PeakMeterDisplay> spectrum_meter;
 
 	string id_inner;
-	owned_array<TrackMixer> mixer;
+	shared_array<TrackMixer> mixer;
 
 	int peak_runner_id;
 	

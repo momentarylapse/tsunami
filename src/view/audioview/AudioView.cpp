@@ -112,10 +112,10 @@ public:
 		if (is_cur_hover())
 			c = theme.hoverify(c);
 		p->set_color(c);
-		p->draw_circle(area.m(), 40);
+		p->draw_circle(area.center(), 40);
 		p->set_color(theme.text_soft3);
 		p->set_font_size(17);
-		p->draw_str(area.m() - vec2(10,10),  "▲");
+		p->draw_str(area.center() - vec2(10,10),  "▲");
 		p->set_font_size(theme.FONT_SIZE);
 	}
 	bool on_left_button_down(const vec2 &m) override {
@@ -1163,7 +1163,7 @@ void AudioView::draw_message(Painter *c, Message &m) {
 	color c1 = theme.high_contrast_a.with_alpha(a);
 	color c2 = theme.high_contrast_b.with_alpha(a);
 	c->set_font_size(theme.FONT_SIZE * 1.3f * m.size * a);
-	draw_boxed_str(c, area.m(), m.text, c1, c2, TextAlign::CENTER);
+	draw_boxed_str(c, area.center(), m.text, c1, c2, TextAlign::CENTER);
 	c->set_font_size(theme.FONT_SIZE);
 }
 
@@ -1177,7 +1177,7 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 		c->set_line_width(2.0f);
 		c->draw_line({x, area.y1}, {x, area.y2});
 		if (show_time)
-			draw_boxed_str(c,  {x, song_area().my()}, song->get_time_str_long(pos), cc, theme.background);
+			draw_boxed_str(c,  {x, song_area().center().y}, song->get_time_str_long(pos), cc, theme.background);
 		c->set_line_width(1.0f);
 	}
 }
@@ -1224,7 +1224,7 @@ void AudioView::draw_song(Painter *c) {
 
 	tip = mode->get_tip();
 	if (tip.num > 0)
-		draw_boxed_str(c, {song_area().mx(), area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
+		draw_boxed_str(c, {song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 
 	if (message.ttl > 0) {
 		draw_message(c, message);

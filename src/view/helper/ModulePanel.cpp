@@ -40,7 +40,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 	ConfigPanel::_hidden_parent_ = this;
 	p = module->create_panel();
 	if (p) {
-		embed(p, "content", 0, 0);
+		embed(p.get(), "content", 0, 0);
 		p->update();
 	} else {
 		set_target("content");
@@ -87,7 +87,8 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 	module->subscribe(this, [this] {
 		module->unsubscribe(this);
 		module = nullptr;
-		delete p;
+		unembed(p.get());
+		p = nullptr;
 	}, module->MESSAGE_DELETE);
 }
 

@@ -15,9 +15,8 @@ public:
 	float _cdecl width() const;
 	float _cdecl height() const;
 	float _cdecl area() const;
-	float _cdecl mx() const;
-	float _cdecl my() const;
-	vec2 _cdecl m() const;
+	vec2 _cdecl center() const;
+	vec2 _cdecl size() const;
 	bool _cdecl inside(const vec2 &p) const;
 	bool _cdecl covers(const rect &r) const;
 	bool _cdecl overlaps(const rect &r) const;

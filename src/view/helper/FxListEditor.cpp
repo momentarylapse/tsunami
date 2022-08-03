@@ -86,7 +86,8 @@ Session *FxListEditor::session() const {
 void FxListEditor::select_module(Module *m) {
 	if (selected_module)
 		selected_module->unsubscribe(this);
-
+	if (config_panel)
+		panel->unembed(config_panel.get());
 	config_panel = nullptr;
 
 	selected_module = m;

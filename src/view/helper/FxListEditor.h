@@ -29,7 +29,7 @@ public:
 	string id_list;
 	Track *track;
 	Module *selected_module = nullptr;
-	owned<ModulePanel> config_panel;
+	shared<ModulePanel> config_panel;
 	Array<int> event_ids;
 	int module_panel_mode;
 

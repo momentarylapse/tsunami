@@ -66,13 +66,13 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	add_console(sample_ref_console);
 	add_console(capture_console);
 
-	event("close", [=]{ on_close(); });
+	event("close", [this]{ on_close(); });
 
 	expand("revealer", false);
 	visible = false;
 	active_console = -1;
 
-	subscribe(session->view, [=]{ session->view->on_update(); }, MESSAGE_ANY); // EVIL HACK?!?
+	subscribe(session->view, [this]{ session->view->on_update(); }, MESSAGE_ANY); // EVIL HACK?!?
 }
 
 SideBar::~SideBar() {

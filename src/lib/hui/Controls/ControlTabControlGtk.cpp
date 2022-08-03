@@ -49,8 +49,7 @@ string ControlTabControl::get_string() {
 void ControlTabControl::__set_string(const string& str) {
 }
 
-void ControlTabControl::__set_int(int i)
-{
+void ControlTabControl::__set_int(int i) {
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(widget), i);
 	cur_page = i;
 }
@@ -64,7 +63,7 @@ void ControlTabControl::__add_string(const string &str) {
 }
 
 void ControlTabControl::__remove_string(int row) {
-	if (row >= 0 and row < pages.num){
+	if (row >= 0 and row < pages.num) {
 		remove_child(pages[row]);
 		gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 		pages.erase(row);
@@ -115,6 +114,7 @@ void ControlTabControl::add_child(shared<Control> child, int x, int y) {
 }
 
 void ControlTabControl::remove_child(Control *child) {
+	msg_write("TC remove child");
 	int index = pages.find(child);
 	if (index < 0) {
 		msg_error("TabControl:.remove child: child not found");
@@ -131,6 +131,7 @@ void ControlTabControl::remove_child(Control *child) {
 	pages[index] = nullptr;
 	boxes[index] = nullptr;
 	control_unlink(this, child);
+	msg_write("/TC remove child");
 }
 
 void ControlTabControl::__set_option(const string &op, const string &value) {

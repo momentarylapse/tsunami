@@ -74,7 +74,7 @@ public:
 
 	int index(Console *console);
 
-	owned_array<Console> consoles;
+	shared_array<Console> consoles;
 	void add_console(Console *c, const string &list_name);
 };
 

@@ -56,7 +56,7 @@ SignalEditor::~SignalEditor() {
 void SignalEditor::add_chain(SignalChain *c) {
 	auto *tab = new SignalEditorTab(this, c);
 	int index = tabs.num;
-	string grid_id = "grid-" + i2s(index);
+	string grid_id = format("grid-%d", index);
 	if (index > 0)
 		add_string("selector", c->name);
 	else
@@ -75,7 +75,7 @@ void SignalEditor::on_new() {
 
 void SignalEditor::on_load() {
 	hui::file_dialog_open(win, _("Load a signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}, [this] (const Path &filename) {
-		if (!filename.is_empty()) {
+		if (filename) {
 			session->storage->current_chain_directory = filename.parent();
 			session->load_signal_chain(filename);
 		}
@@ -90,7 +90,7 @@ void SignalEditor::show_config(Module *m) {
 	if (m and (m == config_module))
 		return;
 	if (config_panel)
-		delete config_panel;
+		unembed(config_panel.get());
 	config_panel = nullptr;
 	config_module = m;
 	if (m) {
@@ -101,7 +101,7 @@ void SignalEditor::show_config(Module *m) {
 					if (m == _m)
 						chain->delete_module(m);
 		});
-		embed(config_panel, config_grid_id, 0, 0);
+		embed(config_panel.get(), config_grid_id, 0, 0);
 	} else {
 		/*set_string("config-label", "");
 		set_string("message", _("no module selected"));
@@ -111,9 +111,9 @@ void SignalEditor::show_config(Module *m) {
 }
 
 void SignalEditor::remove_tab(SignalEditorTab *t) {
-	foreachi(auto *tt, tabs, i)
+	foreachi(auto *tt, weak(tabs), i)
 		if (tt == t) {
-			delete t;
+			unembed(t);
 			tabs.erase(i);
 			remove_string("selector", i);
 			set_int("selector", 0);

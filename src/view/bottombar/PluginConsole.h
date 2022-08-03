@@ -26,7 +26,7 @@ public:
 
 	void load_data();
 
-	Array<ModulePanel*> panels;
+	shared_array<ModulePanel> panels;
 	int next_x;
 	//ConfigPanel *big_panel;
 };

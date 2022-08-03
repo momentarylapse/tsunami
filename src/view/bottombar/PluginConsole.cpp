@@ -26,8 +26,10 @@ PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
 
 PluginConsole::~PluginConsole() {
 	session->unsubscribe(this);
-	for (auto *p: panels)
-		delete p;
+
+	// necessary?
+	for (auto *p: weak(panels))
+		unembed(p);
 }
 
 void PluginConsole::on_add_button() {
@@ -49,9 +51,9 @@ void PluginConsole::on_add_plugin() {
 }
 
 void PluginConsole::on_remove_plugin() {
-	foreachi (auto *p, panels, i)
+	foreachi (auto *p, weak(panels), i)
 		if (p->module == session->last_plugin) {
-			delete p;
+			unembed(p);
 			panels.erase(i);
 			break;
 		}

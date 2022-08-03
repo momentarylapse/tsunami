@@ -617,7 +617,8 @@ void SIAddPackageMath() {
 		class_add_func("width", TypeFloat32, &rect::width, Flags::PURE);
 		class_add_func("height", TypeFloat32, &rect::height, Flags::PURE);
 		class_add_func("area", TypeFloat32, &rect::area, Flags::PURE);
-		class_add_func("m", TypeVec2, &rect::m, Flags::PURE);
+		class_add_func("center", TypeVec2, &rect::center, Flags::PURE);
+		class_add_func("size", TypeVec2, &rect::size, Flags::PURE);
 		class_add_func("inside", TypeBool, &rect::inside, Flags::PURE);
 			func_add_param("p", TypeVec2);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &rect::str, Flags::PURE);

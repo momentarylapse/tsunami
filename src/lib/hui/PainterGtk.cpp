@@ -11,6 +11,10 @@
 #include "Controls/Control.h"
 #include "Controls/ControlDrawingArea.h"
 #include "Painter.h"
+#if __has_include("../image/image.h")
+#include "../image/image.h"
+#define HAS_IMAGE
+#endif
 
 namespace hui {
 
@@ -242,7 +246,7 @@ void Painter::draw_circle(const vec2 &c, float radius) {
 }
 
 void Painter::draw_image(const vec2 &d, const Image *image) {
-#ifdef _X_USE_IMAGE_
+#ifdef HAS_IMAGE
 	if (!cr)
 		return;
 	image->set_mode(Image::Mode::BGRA);
@@ -263,7 +267,7 @@ void Painter::draw_image(const vec2 &d, const Image *image) {
 }
 
 void Painter::draw_mask_image(const vec2 &d, const Image *image) {
-#ifdef _X_USE_IMAGE_
+#ifdef HAS_IMAGE
 	if (!cr)
 		return;
 	image->set_mode(Image::Mode::BGRA);

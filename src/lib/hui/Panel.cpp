@@ -103,14 +103,6 @@ Panel::~Panel() {
 	DBDEL_DONE();
 }
 
-void Panel::__init__() {
-	new(this) Panel();
-}
-
-void Panel::__delete__() {
-	this->Panel::~Panel();
-}
-
 void Panel::set_id(const string &_id) {
 	id = _id;
 }

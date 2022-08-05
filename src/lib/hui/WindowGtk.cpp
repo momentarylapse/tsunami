@@ -270,16 +270,25 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 	}
 }
 
+void rec_disable_events(Control *c) {
+	if (c->widget)
+		g_signal_handlers_disconnect_by_data(c->widget, c);
+	for (auto cc: weak(c->children))
+		rec_disable_events(cc);
+}
+
 Window::~Window() {
 	DBDEL_START("window", id, this);
+
+	// opengl area might get a render request when deleting the window first
+	if (root_control)
+		rec_disable_events(root_control.get());
+	input.reset();
 
 	for (int i=0; i<4; i++)
 		toolbar[i] = nullptr;
 
 	header_bar = nullptr;
-
-	//_ClearPanel_();
-	input.reset();
 
 	// unregister window
 	for (int i=0; i<_all_windows_.num; i++)

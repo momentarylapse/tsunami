@@ -35,8 +35,6 @@ public:
 	Panel(const string &id, Panel *parent);
 	Panel();
 	virtual ~Panel();
-	void __init__();
-	virtual void __delete__();
 	void _ClearPanel_();
 
 	void activate(const string &control_id);

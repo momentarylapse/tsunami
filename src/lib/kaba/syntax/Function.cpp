@@ -239,6 +239,7 @@ bool Function::is_const() const {
 bool Function::is_selfref() const {
 	if (is_static())
 		return false;
+	return flags_has(flags, Flags::REF);
 	return flags_has(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);
 }
 

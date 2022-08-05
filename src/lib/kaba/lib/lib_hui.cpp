@@ -90,6 +90,16 @@ namespace kaba {
 
 #ifdef KABA_EXPORT_HUI
 	#define hui_p(p)		p
+	class KabaHuiPanel : public hui::Panel {
+	public:
+		KabaHuiPanel(const string &id, hui::Panel *parent) : hui::Panel(id, parent) {}
+		void __init__(const string &id, hui::Panel *parent) {
+			new(this) KabaHuiPanel(id, parent);
+		}
+		virtual void __delete__() {
+			this->KabaHuiPanel::~KabaHuiPanel();
+		}
+	};
 #else
 	#define hui_p(p)		nullptr
 #endif
@@ -166,9 +176,10 @@ void SIAddPackageHui() {
 	add_class(TypeHuiPanel);
 		class_derive_from(TypeObject, false, true);
 		class_add_element("win", TypeHuiWindowP, GetDAPanel(win));
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::Panel::__init__), Flags::OVERRIDE);
-		//	func_add_param("parent", TypeHuiPanelP);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Panel::__delete__), Flags::OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaHuiPanel::__init__), Flags::OVERRIDE);
+			func_add_param("parent", TypeHuiPanelP);
+			func_add_param("id", TypeString);
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&KabaHuiPanel::__delete__), Flags::OVERRIDE);
 		class_add_func("set_border_width", TypeVoid, hui_p(&hui::Panel::set_border_width));
 			func_add_param("width", TypeInt);
 		class_add_func("set_decimals", TypeVoid, hui_p(&hui::Panel::set_decimals));
@@ -296,6 +307,8 @@ void SIAddPackageHui() {
 			func_add_param("id", TypeString);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
+		class_add_func("unembed", TypeVoid, hui_p(&hui::Panel::unembed));
+			func_add_param("panel", TypeHuiPanel);
 		class_add_func("set_string", TypeVoid, hui_p(&hui::Panel::set_string));
 			func_add_param("id", TypeString);
 			func_add_param("s", TypeString);
@@ -324,25 +337,33 @@ void SIAddPackageHui() {
 			func_add_param("hide", TypeBool);
 		class_add_func("delete_control", TypeVoid, hui_p(&hui::Panel::remove_control));
 			func_add_param("id", TypeString);
-		class_add_func("get_int", TypeInt, hui_p(&hui::Panel::get_int), Flags::CONST);
-			func_add_param("id", TypeString);
-		class_add_func("get_selection", TypeIntList, hui_p(&hui::Panel::get_selection), Flags::CONST);
-			func_add_param("id", TypeString);
 		class_add_func("set_int", TypeVoid, hui_p(&hui::Panel::set_int));
 			func_add_param("id", TypeString);
 			func_add_param("i", TypeInt);
+		class_add_func("get_int", TypeInt, hui_p(&hui::Panel::get_int), Flags::CONST);
+			func_add_param("id", TypeString);
+		class_add_func("set_color", TypeVoid, hui_p(&hui::Panel::set_color));
+			func_add_param("id", TypeString);
+			func_add_param("c", TypeColor);
+		class_add_func("get_color", TypeColor, hui_p(&hui::Panel::get_color), Flags::CONST);
+			func_add_param("id", TypeString);
+		class_add_func("set_selection", TypeVoid, hui_p(&hui::Panel::set_selection));
+			func_add_param("id", TypeString);
+			func_add_param("sel", TypeIntList);
+		class_add_func("get_selection", TypeIntList, hui_p(&hui::Panel::get_selection), Flags::CONST);
+			func_add_param("id", TypeString);
 		class_add_func("set_image", TypeVoid, hui_p(&hui::Panel::set_image));
 			func_add_param("id", TypeString);
 			func_add_param("image", TypeString);
-		class_add_func("get_cell", TypeString, hui_p(&hui::Panel::get_cell), Flags::CONST);
-			func_add_param("id", TypeString);
-			func_add_param("row", TypeInt);
-			func_add_param("column", TypeInt);
 		class_add_func("set_cell", TypeVoid, hui_p(&hui::Panel::set_cell));
 			func_add_param("id", TypeString);
 			func_add_param("row", TypeInt);
 			func_add_param("column", TypeInt);
 			func_add_param("s", TypeString);
+		class_add_func("get_cell", TypeString, hui_p(&hui::Panel::get_cell), Flags::CONST);
+			func_add_param("id", TypeString);
+			func_add_param("row", TypeInt);
+			func_add_param("column", TypeInt);
 		class_add_func("set_options", TypeVoid, hui_p(&hui::Panel::set_options));
 			func_add_param("id", TypeString);
 			func_add_param("options", TypeString);

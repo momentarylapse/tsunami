@@ -28,18 +28,19 @@ static const float UPDATE_DT = 2.0f;
 class CpuDisplayDialog : public hui::Dialog {
 public:
 	CpuDisplayDialog(Session *session) : hui::Dialog("cpu-display-dialog", session->win.get()->win) {
-		auto cpu_display = new CpuDisplay(session, [&]{ redraw("area"); });
+		// will be owned by graph
+		auto cpu_display = new CpuDisplay(session, [this] { redraw("area"); });
 		graph = scenegraph::SceneGraph::create_integrated(this, "area", cpu_display, "cpu");
 		check("show-sleeping", cpu_display->show_sleeping);
 		check("show-total", cpu_display->show_total);
-		event("hui:close", [=] {
+		event("hui:close", [this] {
 			hide();
 		});
-		event("show-sleeping", [=] {
+		event("show-sleeping", [this, cpu_display] {
 			cpu_display->show_sleeping = is_checked("");
 			cpu_display->update();
 		});
-		event("show-total", [=] {
+		event("show-total", [this, cpu_display] {
 			cpu_display->show_total = is_checked("");
 			cpu_display->update();
 		});
@@ -88,7 +89,9 @@ void CpuDisplay::enable(bool active) {
 	request_redraw();
 
 	if (active)
-		perf_mon->subscribe(this, [=]{ update(); }, perf_mon->MESSAGE_ANY);
+		perf_mon->subscribe(this, [this] {
+			update();
+		}, perf_mon->MESSAGE_ANY);
 }
 
 color type_color(const string &t) {

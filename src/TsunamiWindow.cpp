@@ -833,7 +833,7 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
 
-	configure_module_autodel(this, fx, [this, fx] {
+	configure_module(this, fx, [this, fx] {
 		int n_layers = 0;
 		song->begin_action_group(_("apply audio fx"));
 		for (Track *t: weak(song->tracks))
@@ -850,10 +850,9 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 }
 
 void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
-
 	auto s = CreateAudioSource(session, name);
 
-	configure_module_autodel(this, s, [s, this] {
+	configure_module(this, s, [s, this] {
 		int n_layers = 0;
 		song->begin_action_group(_("audio source"));
 		for (Track *t: weak(song->tracks))
@@ -872,7 +871,7 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
-	configure_module_autodel(this, fx, [fx, this] {
+	configure_module(this, fx, [fx, this] {
 		int n_layers = 0;
 
 		song->begin_action_group(_("apply midi fx"));
@@ -893,7 +892,7 @@ void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
-	configure_module_autodel(this, s, [s, this] {
+	configure_module(this, s, [s, this] {
 		int n_layers = 0;
 
 		song->begin_action_group(_("midi source"));

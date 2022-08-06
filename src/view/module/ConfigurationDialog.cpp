@@ -16,16 +16,15 @@
 extern const int CONFIG_PANEL_WIDTH;
 extern const int CONFIG_PANEL_HEIGHT;
 
-void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel, bool autodel);
 
 
 class ConfigurationDialog : public hui::Dialog {
 public:
 	ConfigPanelSocket socket;
 
-	ConfigurationDialog(Module *m, hui::Window *parent) :
+	ConfigurationDialog(shared<Module> m, hui::Window *parent) :
 		hui::Dialog("configurable_dialog", parent),
-		socket(m, ConfigPanelMode::PROFILES)
+		socket(m.get(), ConfigPanelMode::PROFILES)
 	{
 		module = m;
 		set_title(module->module_class);
@@ -100,38 +99,25 @@ public:
 		tsunami->win->view->renderer->preview_effect = NULL;*/
 	}
 
-	Module *module;
+	shared<Module> module;
 	owned<Progress> progress;
 	bool ok;
 };
 
-void configure_module(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel) {
-	configure_module_x(win, m, cb, cb_cancel, false);
-}
-
-void configure_module_autodel(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel) {
-	configure_module_x(win, m, cb, cb_cancel, true);
-}
-
-void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel, bool autodel) {
+void configure_module(hui::Window *win, shared<Module> m, hui::Callback cb, hui::Callback cb_cancel) {
 	auto *config = m->get_config();
 	if (!config) {
 		cb();
-		if (autodel)
-			hui::run_later(2.1f, [m] { delete m; });
 		return;
 	}
 
 	auto *dlg = new ConfigurationDialog(m, win);
 
-	hui::fly(dlg, [dlg, cb, cb_cancel, autodel, m] {
+	hui::fly(dlg, [dlg, cb, cb_cancel, m] {
 		if (dlg->ok)
 			cb();
 		else if (cb_cancel)
 			cb_cancel();
-		if (autodel)
-			hui::run_later(2.1f, [m] { delete m; });
-		// should happen after the config dialog was destroyed.... (same thread, should not interrupt the module)
 	});
 }
 

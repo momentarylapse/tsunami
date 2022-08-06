@@ -118,6 +118,7 @@ void _extract_subtype_and_config(ModuleCategory type, const string &s, string &s
 }
 
 // can be pre-configured with sub_type="ModuleName:config..."
+// TODO return shared<Module>
 Module* ModuleFactory::create(Session* session, ModuleCategory type, const string& _sub_type) {
 	string sub_type, config;
 	_extract_subtype_and_config(type, _sub_type, sub_type, config);

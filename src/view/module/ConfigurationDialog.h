@@ -9,14 +9,14 @@
 #define SRC_VIEW_MODULE_CONFIGURATIONDIALOG_H_
 
 #include "../../lib/hui/Callback.h"
+#include "../../lib/base/pointer.h"
 
 namespace hui {
 	class Window;
 }
 class Module;
 
-void configure_module(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel = nullptr);
-void configure_module_autodel(hui::Window *win, Module *m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
+void configure_module(hui::Window *win, shared<Module> m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
 
 
 

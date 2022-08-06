@@ -6,7 +6,7 @@
  */
 
 #include "AudioChannelSelector.h"
-#include "../ConfigPanel.h"
+#include "../../view/module/ConfigPanel.h"
 #include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../stuff/BackupManager.h"

@@ -364,9 +364,6 @@
     <ClCompile Include="src\lib\doc\chunked.cpp">
       <Filter>src\lib\doc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\doc\config.cpp">
-      <Filter>src\lib\doc</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\doc\pdf.cpp">
       <Filter>src\lib\doc</Filter>
     </ClCompile>
@@ -844,6 +841,9 @@
     <ClCompile Include="src\lib\os\CommandLineParser.cpp">
       <Filter>src\lib\os</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\os\config.cpp">
+      <Filter>src\lib\os</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\os\date.cpp">
       <Filter>src\lib\os</Filter>
     </ClCompile>
@@ -960,12 +960,6 @@
     </ClCompile>
     <ClCompile Include="src\module\synthesizer\Synthesizer.cpp">
       <Filter>src\module\synthesizer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\module\AutoConfigPanel.cpp">
-      <Filter>src\module</Filter>
-    </ClCompile>
-    <ClCompile Include="src\module\ConfigPanel.cpp">
-      <Filter>src\module</Filter>
     </ClCompile>
     <ClCompile Include="src\module\Module.cpp">
       <Filter>src\module</Filter>
@@ -1258,9 +1252,6 @@
     <ClCompile Include="src\view\helper\MidiPreview.cpp">
       <Filter>src\view\helper</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\helper\ModulePanel.cpp">
-      <Filter>src\view\helper</Filter>
-    </ClCompile>
     <ClCompile Include="src\view\helper\PeakMeterDisplay.cpp">
       <Filter>src\view\helper</Filter>
     </ClCompile>
@@ -1305,6 +1296,15 @@
     </ClCompile>
     <ClCompile Include="src\view\mode\ViewModeScaleMarker.cpp">
       <Filter>src\view\mode</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\module\AutoConfigPanel.cpp">
+      <Filter>src\view\module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\module\ConfigPanel.cpp">
+      <Filter>src\view\module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\module\ModulePanel.cpp">
+      <Filter>src\view\module</Filter>
     </ClCompile>
     <ClCompile Include="src\view\painter\BasicGridPainter.cpp">
       <Filter>src\view\painter</Filter>
@@ -1755,6 +1755,9 @@
     <ClInclude Include="src\lib\base\map.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\base\optional.h">
+      <Filter>src\lib\base</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\base\pointer.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
@@ -1767,10 +1770,10 @@
     <ClInclude Include="src\lib\base\strings.h">
       <Filter>src\lib\base</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\doc\chunked.h">
-      <Filter>src\lib\doc</Filter>
+    <ClInclude Include="src\lib\base\tuple.h">
+      <Filter>src\lib\base</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\doc\config.h">
+    <ClInclude Include="src\lib\doc\chunked.h">
       <Filter>src\lib\doc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\doc\pdf.h">
@@ -2160,6 +2163,9 @@
     <ClInclude Include="src\lib\os\CommandLineParser.h">
       <Filter>src\lib\os</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\os\config.h">
+      <Filter>src\lib\os</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\os\date.h">
       <Filter>src\lib\os</Filter>
     </ClInclude>
@@ -2279,12 +2285,6 @@
     </ClInclude>
     <ClInclude Include="src\module\synthesizer\Synthesizer.h">
       <Filter>src\module\synthesizer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module\AutoConfigPanel.h">
-      <Filter>src\module</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module\ConfigPanel.h">
-      <Filter>src\module</Filter>
     </ClInclude>
     <ClInclude Include="src\module\Module.h">
       <Filter>src\module</Filter>
@@ -2580,9 +2580,6 @@
     <ClInclude Include="src\view\helper\MidiPreview.h">
       <Filter>src\view\helper</Filter>
     </ClInclude>
-    <ClInclude Include="src\view\helper\ModulePanel.h">
-      <Filter>src\view\helper</Filter>
-    </ClInclude>
     <ClInclude Include="src\view\helper\PeakMeterDisplay.h">
       <Filter>src\view\helper</Filter>
     </ClInclude>
@@ -2627,6 +2624,15 @@
     </ClInclude>
     <ClInclude Include="src\view\mode\ViewModeScaleMarker.h">
       <Filter>src\view\mode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\module\AutoConfigPanel.h">
+      <Filter>src\view\module</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\module\ConfigPanel.h">
+      <Filter>src\view\module</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\module\ModulePanel.h">
+      <Filter>src\view\module</Filter>
     </ClInclude>
     <ClInclude Include="src\view\painter\BasicGridPainter.h">
       <Filter>src\view\painter</Filter>
@@ -2906,11 +2912,11 @@
     <Filter Include="src\view\mode">
       <UniqueIdentifier>{36BB8D6F-95B5-B360-3D25-9BCD9AC5D260}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\view\module">
+      <UniqueIdentifier>{021FA376-F59B-CB84-ACCB-EC6285DB3243}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\view\painter">
       <UniqueIdentifier>{106A5BF9-33C0-59E2-56F0-CCB558FE74A8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\view\painter\midi">
-      <UniqueIdentifier>{532A59C2-0EE6-C046-010F-20910CCA0EC6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\view\sidebar">
       <UniqueIdentifier>{787FC2F7-36B6-69E1-F134-22AD72BE1C28}</UniqueIdentifier>

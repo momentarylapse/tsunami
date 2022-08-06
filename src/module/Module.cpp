@@ -7,8 +7,6 @@
 
 
 #include "Module.h"
-#include "ConfigPanel.h"
-#include "AutoConfigPanel.h"
 #include "ModuleConfiguration.h"
 #include "ModuleFactory.h"
 #include "port/Port.h"
@@ -19,6 +17,8 @@
 #include "../plugins/PluginManager.h"
 #include "../plugins/Plugin.h"
 #include "../stuff/PerformanceMonitor.h"
+#include "../view/module/ConfigPanel.h"
+#include "../view/module/AutoConfigPanel.h"
 
 const string Module::MESSAGE_STATE_CHANGE = "StateChange";
 const string Module::MESSAGE_TICK = "Tick";

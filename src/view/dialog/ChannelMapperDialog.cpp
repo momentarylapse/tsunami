@@ -6,8 +6,8 @@
  */
 
 #include "ChannelMapperDialog.h"
+#include "../module/ConfigPanel.h"
 #include "../../module/audio/AudioChannelSelector.h"
-#include "../../module/ConfigPanel.h"
 
 
 ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *sel) :

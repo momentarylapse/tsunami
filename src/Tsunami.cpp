@@ -36,7 +36,7 @@
 #include "test/TestRingBuffer.h"
 #ifndef NDEBUG
 #include "module/ModuleFactory.h"
-#include "module/ConfigPanel.h"
+#include "view/module/ConfigPanel.h"
 #endif
 
 

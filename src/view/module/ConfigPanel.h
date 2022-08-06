@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_MODULE_CONFIGPANEL_H_
-#define SRC_MODULE_CONFIGPANEL_H_
+#ifndef SRC_VIEW_MODULE_CONFIGPANEL_H_
+#define SRC_VIEW_MODULE_CONFIGPANEL_H_
 
-#include "../lib/hui/hui.h"
+#include "../../lib/hui/hui.h"
 
 class Module;
 
@@ -35,4 +35,4 @@ void configure_module(hui::Window *win, Module *m, hui::Callback cb = nullptr, h
 void configure_module_autodel(hui::Window *win, Module *m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
 void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel, bool autodel);
 
-#endif /* SRC_MODULE_CONFIGPANEL_H_ */
+#endif /* SRC_VIEW_MODULE_CONFIGPANEL_H_ */

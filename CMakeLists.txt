@@ -127,7 +127,6 @@ set(SOURCE
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
 	src/lib/doc/chunked.cpp
-	src/lib/doc/config.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/xml.cpp
 	src/lib/fft/fft.cpp
@@ -287,6 +286,7 @@ set(SOURCE
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
 	src/lib/os/CommandLineParser.cpp
+	src/lib/os/config.cpp
 	src/lib/os/date.cpp
 	src/lib/os/file.cpp
 	src/lib/os/filesystem.cpp
@@ -326,8 +326,6 @@ set(SOURCE
 	src/module/synthesizer/DummySynthesizer.cpp
 	src/module/synthesizer/EnvelopeADSR.cpp
 	src/module/synthesizer/Synthesizer.cpp
-	src/module/AutoConfigPanel.cpp
-	src/module/ConfigPanel.cpp
 	src/module/Module.cpp
 	src/module/ModuleConfiguration.cpp
 	src/module/ModuleFactory.cpp
@@ -425,7 +423,6 @@ set(SOURCE
 	src/view/helper/Drawing.cpp
 	src/view/helper/FxListEditor.cpp
 	src/view/helper/MidiPreview.cpp
-	src/view/helper/ModulePanel.cpp
 	src/view/helper/PeakMeterDisplay.cpp
 	src/view/helper/PeakThread.cpp
 	src/view/helper/Progress.cpp
@@ -441,6 +438,9 @@ set(SOURCE
 	src/view/mode/ViewModeMidi.cpp
 	src/view/mode/ViewModeScaleBars.cpp
 	src/view/mode/ViewModeScaleMarker.cpp
+	src/view/module/AutoConfigPanel.cpp
+	src/view/module/ConfigPanel.cpp
+	src/view/module/ModulePanel.cpp
 	src/view/painter/BasicGridPainter.cpp
 	src/view/painter/BufferPainter.cpp
 	src/view/painter/GridPainter.cpp

@@ -237,7 +237,6 @@
     <ClCompile Include="src\lib\base\pointer.cpp" />
     <ClCompile Include="src\lib\base\strings.cpp" />
     <ClCompile Include="src\lib\doc\chunked.cpp" />
-    <ClCompile Include="src\lib\doc\config.cpp" />
     <ClCompile Include="src\lib\doc\pdf.cpp" />
     <ClCompile Include="src\lib\doc\xml.cpp" />
     <ClCompile Include="src\lib\fft\fft.cpp" />
@@ -397,6 +396,7 @@
     <ClCompile Include="src\lib\nix\nix_vertexbuffer.cpp" />
     <ClCompile Include="src\lib\nix\nix_view.cpp" />
     <ClCompile Include="src\lib\os\CommandLineParser.cpp" />
+    <ClCompile Include="src\lib\os\config.cpp" />
     <ClCompile Include="src\lib\os\date.cpp" />
     <ClCompile Include="src\lib\os\file.cpp" />
     <ClCompile Include="src\lib\os\filesystem.cpp" />
@@ -436,8 +436,6 @@
     <ClCompile Include="src\module\synthesizer\DummySynthesizer.cpp" />
     <ClCompile Include="src\module\synthesizer\EnvelopeADSR.cpp" />
     <ClCompile Include="src\module\synthesizer\Synthesizer.cpp" />
-    <ClCompile Include="src\module\AutoConfigPanel.cpp" />
-    <ClCompile Include="src\module\ConfigPanel.cpp" />
     <ClCompile Include="src\module\Module.cpp" />
     <ClCompile Include="src\module\ModuleConfiguration.cpp" />
     <ClCompile Include="src\module\ModuleFactory.cpp" />
@@ -535,7 +533,6 @@
     <ClCompile Include="src\view\helper\Drawing.cpp" />
     <ClCompile Include="src\view\helper\FxListEditor.cpp" />
     <ClCompile Include="src\view\helper\MidiPreview.cpp" />
-    <ClCompile Include="src\view\helper\ModulePanel.cpp" />
     <ClCompile Include="src\view\helper\PeakMeterDisplay.cpp" />
     <ClCompile Include="src\view\helper\PeakThread.cpp" />
     <ClCompile Include="src\view\helper\Progress.cpp" />
@@ -551,6 +548,9 @@
     <ClCompile Include="src\view\mode\ViewModeMidi.cpp" />
     <ClCompile Include="src\view\mode\ViewModeScaleBars.cpp" />
     <ClCompile Include="src\view\mode\ViewModeScaleMarker.cpp" />
+    <ClCompile Include="src\view\module\AutoConfigPanel.cpp" />
+    <ClCompile Include="src\view\module\ConfigPanel.cpp" />
+    <ClCompile Include="src\view\module\ModulePanel.cpp" />
     <ClCompile Include="src\view\painter\BasicGridPainter.cpp" />
     <ClCompile Include="src\view\painter\BufferPainter.cpp" />
     <ClCompile Include="src\view\painter\GridPainter.cpp" />
@@ -702,12 +702,13 @@
     <ClInclude Include="src\lib\base\callable.h" />
     <ClInclude Include="src\lib\base\macros.h" />
     <ClInclude Include="src\lib\base\map.h" />
+    <ClInclude Include="src\lib\base\optional.h" />
     <ClInclude Include="src\lib\base\pointer.h" />
     <ClInclude Include="src\lib\base\set.h" />
     <ClInclude Include="src\lib\base\sort.h" />
     <ClInclude Include="src\lib\base\strings.h" />
+    <ClInclude Include="src\lib\base\tuple.h" />
     <ClInclude Include="src\lib\doc\chunked.h" />
-    <ClInclude Include="src\lib\doc\config.h" />
     <ClInclude Include="src\lib\doc\pdf.h" />
     <ClInclude Include="src\lib\doc\xml.h" />
     <ClInclude Include="src\lib\fft\fft.h" />
@@ -837,6 +838,7 @@
     <ClInclude Include="src\lib\nix\nix_vertexbuffer.h" />
     <ClInclude Include="src\lib\nix\nix_view.h" />
     <ClInclude Include="src\lib\os\CommandLineParser.h" />
+    <ClInclude Include="src\lib\os\config.h" />
     <ClInclude Include="src\lib\os\date.h" />
     <ClInclude Include="src\lib\os\file.h" />
     <ClInclude Include="src\lib\os\filesystem.h" />
@@ -877,8 +879,6 @@
     <ClInclude Include="src\module\synthesizer\DummySynthesizer.h" />
     <ClInclude Include="src\module\synthesizer\EnvelopeADSR.h" />
     <ClInclude Include="src\module\synthesizer\Synthesizer.h" />
-    <ClInclude Include="src\module\AutoConfigPanel.h" />
-    <ClInclude Include="src\module\ConfigPanel.h" />
     <ClInclude Include="src\module\Module.h" />
     <ClInclude Include="src\module\ModuleConfiguration.h" />
     <ClInclude Include="src\module\ModuleFactory.h" />
@@ -977,7 +977,6 @@
     <ClInclude Include="src\view\helper\Drawing.h" />
     <ClInclude Include="src\view\helper\FxListEditor.h" />
     <ClInclude Include="src\view\helper\MidiPreview.h" />
-    <ClInclude Include="src\view\helper\ModulePanel.h" />
     <ClInclude Include="src\view\helper\PeakMeterDisplay.h" />
     <ClInclude Include="src\view\helper\PeakThread.h" />
     <ClInclude Include="src\view\helper\Progress.h" />
@@ -993,6 +992,9 @@
     <ClInclude Include="src\view\mode\ViewModeMidi.h" />
     <ClInclude Include="src\view\mode\ViewModeScaleBars.h" />
     <ClInclude Include="src\view\mode\ViewModeScaleMarker.h" />
+    <ClInclude Include="src\view\module\AutoConfigPanel.h" />
+    <ClInclude Include="src\view\module\ConfigPanel.h" />
+    <ClInclude Include="src\view\module\ModulePanel.h" />
     <ClInclude Include="src\view\painter\BasicGridPainter.h" />
     <ClInclude Include="src\view\painter\BufferPainter.h" />
     <ClInclude Include="src\view\painter\GridPainter.h" />

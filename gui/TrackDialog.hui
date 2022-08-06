@@ -1,4 +1,4 @@
-Dialog track_dialog "Spur" width=380 height=516
+Dialog track_dialog "Track" width=380 height=516
 	Grid ? "" vertical
 		Group g_name "Name"
 			Edit name "" expandx

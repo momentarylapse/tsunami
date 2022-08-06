@@ -7,7 +7,8 @@
 
 #include "MixingConsole.h"
 #include "../helper/PeakMeterDisplay.h"
-#include "../helper/ModulePanel.h"
+#include "../module/ModulePanel.h"
+#include "../module/ConfigPanel.h"
 #include "../helper/FxListEditor.h"
 #include "../helper/Drawing.h"
 #include "../audioview/AudioView.h"
@@ -18,7 +19,6 @@
 #include "../../data/Track.h"
 #include "../../module/audio/AudioEffect.h"
 #include "../../module/audio/SongRenderer.h"
-#include "../../module/ConfigPanel.h"
 #include "../../module/SignalChain.h"
 #include "../../Session.h"
 #include "../../EditModes.h"

@@ -6,10 +6,10 @@
  */
 
 #include "PluginConsole.h"
+#include "../module/ModulePanel.h"
 #include "../../Session.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../plugins/PluginManager.h"
-#include "../helper/ModulePanel.h"
 
 
 PluginConsole::PluginConsole(Session *s, BottomBar *bar) :

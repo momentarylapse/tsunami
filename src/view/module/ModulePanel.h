@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_HELPER_MODULEPANEL_H_
-#define SRC_VIEW_HELPER_MODULEPANEL_H_
+#ifndef SRC_VIEW_MODULE_MODULEPANEL_H_
+#define SRC_VIEW_MODULE_MODULEPANEL_H_
 
 #include "../../lib/hui/hui.h"
 #include "../../stuff/Observable.h"
@@ -79,4 +79,4 @@ public:
 };
 
 
-#endif /* SRC_VIEW_HELPER_MODULEPANEL_H_ */
+#endif /* SRC_VIEW_MODULE_MODULEPANEL_H_ */

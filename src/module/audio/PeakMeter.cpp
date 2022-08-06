@@ -6,13 +6,12 @@
  */
 
 #include "PeakMeter.h"
-
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/audio/RingBuffer.h"
 #include "../../lib/fft/fft.h"
 #include "../../Session.h"
 #include "../../lib/math/complex.h"
-#include "../ConfigPanel.h"
+#include "../../view/module/ConfigPanel.h"
 #include "../../view/helper/PeakMeterDisplay.h"
 
 

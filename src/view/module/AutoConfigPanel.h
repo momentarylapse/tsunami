@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_MODULE_AUTOCONFIGPANEL_H_
-#define SRC_MODULE_AUTOCONFIGPANEL_H_
+#ifndef SRC_VIEW_MODULE_AUTOCONFIGPANEL_H_
+#define SRC_VIEW_MODULE_AUTOCONFIGPANEL_H_
 
 #include "ConfigPanel.h"
 
@@ -25,4 +25,4 @@ public:
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session);
 
 
-#endif /* SRC_MODULE_AUTOCONFIGPANEL_H_ */
+#endif /* SRC_VIEW_MODULE_AUTOCONFIGPANEL_H_ */

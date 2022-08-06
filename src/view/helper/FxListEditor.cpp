@@ -6,13 +6,13 @@
  */
 
 #include "FxListEditor.h"
-#include "../helper/ModulePanel.h"
+#include "../module/ModulePanel.h"
+#include "../module/ConfigPanel.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
 #include "../../module/audio/AudioEffect.h"
 #include "../../module/midi/MidiEffect.h"
-#include "../../module/ConfigPanel.h"
 #include "../../Session.h"
 #include "../../plugins/PluginManager.h"
 #include "../../lib/hui/hui.h"

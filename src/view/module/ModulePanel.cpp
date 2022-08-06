@@ -6,8 +6,8 @@
  */
 
 #include "ModulePanel.h"
+#include "ConfigPanel.h"
 #include "../../module/Module.h"
-#include "../../module/ConfigPanel.h"
 #include "../../plugins/PluginManager.h"
 #include "../../data/Song.h"
 #include "../../Session.h"
@@ -27,7 +27,7 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 	outer = _parent;
 	bool own_header = (mode & Mode::HEADER);
 
-	from_resource("fx_panel");
+	from_resource("module-panel");
 	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
 	if (own_header) {

@@ -7,18 +7,18 @@
 
 
 #include "AutoConfigPanel.h"
-#include "Module.h"
-#include "ModuleConfiguration.h"
-#include "../view/helper/Slider.h"
-#include "../view/sidebar/SampleManagerConsole.h"
-#include "../data/Song.h"
-#include "../data/Sample.h"
-#include "../data/SampleRef.h"
-#include "../data/midi/MidiData.h"
-#include "../lib/kaba/kaba.h"
-#include "../Session.h"
-#include "../device/Device.h"
-#include "../device/DeviceManager.h"
+#include "../helper/Slider.h"
+#include "../sidebar/SampleManagerConsole.h"
+#include "../../module/Module.h"
+#include "../../module/ModuleConfiguration.h"
+#include "../../data/Song.h"
+#include "../../data/Sample.h"
+#include "../../data/SampleRef.h"
+#include "../../data/midi/MidiData.h"
+#include "../../lib/kaba/kaba.h"
+#include "../../device/Device.h"
+#include "../../device/DeviceManager.h"
+#include "../../Session.h"
 
 
 string to_camel_case(const string &s) {

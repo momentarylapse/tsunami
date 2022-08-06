@@ -6,11 +6,11 @@
  */
 
 #include "ConfigPanel.h"
-#include "Module.h"
-#include "../view/helper/Progress.h"
-#include "../view/helper/ModulePanel.h"
-#include "../plugins/PluginManager.h"
-#include "../Session.h"
+#include "ModulePanel.h"
+#include "../helper/Progress.h"
+#include "../../plugins/PluginManager.h"
+#include "../../Session.h"
+#include "../../module/Module.h"
 
 extern const int CONFIG_PANEL_WIDTH;
 extern const int CONFIG_PANEL_HEIGHT;

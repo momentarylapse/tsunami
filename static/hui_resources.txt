@@ -3007,7 +3007,7 @@ switch
 0
 # Resource
 Dialog
-fx_panel
+module-panel
 width=200,height=200
 0
 0
@@ -7960,9 +7960,6 @@ Edit
 fx_editor/fx_editor
 Effects
 
-fx_panel/enabled
-
-active?
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help
 
@@ -8491,6 +8488,9 @@ active?
 module-external-dialog/module-external-dialog
 Module
 
+module-panel/enabled
+
+active?
 module_console/no_config
 this module is not configurable
 
@@ -9332,7 +9332,7 @@ track_dialog/td_t_edit
 Edit
 
 track_dialog/track_dialog
-Spur
+Track
 
 track_dialog/volume
 0

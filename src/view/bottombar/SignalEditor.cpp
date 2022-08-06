@@ -6,15 +6,15 @@
  */
 
 #include "SignalEditor.h"
-#include "../helper/ModulePanel.h"
 #include "signaleditor/SignalEditorTab.h"
+#include "../module/ModulePanel.h"
+#include "../module/ConfigPanel.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
-#include "../../module/ConfigPanel.h"
 #include "../../module/SignalChain.h"
-#include "../../Session.h"
 #include "../../storage/Storage.h"
 #include "../../data/base.h"
+#include "../../Session.h"
 #include "../../TsunamiWindow.h"
 
 

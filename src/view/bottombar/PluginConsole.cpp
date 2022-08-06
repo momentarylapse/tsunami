@@ -52,7 +52,7 @@ void PluginConsole::on_add_plugin() {
 
 void PluginConsole::on_remove_plugin() {
 	foreachi (auto *p, weak(panels), i)
-		if (p->module == session->last_plugin) {
+		if (p->socket.module == session->last_plugin) {
 			unembed(p);
 			panels.erase(i);
 			break;

@@ -34,31 +34,11 @@ inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a & (int)b );
 }
 
-class ModulePanel : public Observable<hui::Panel> {
+class ConfigPanelSocket : public VirtualBase {
 public:
+	ConfigPanelSocket(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
+	~ConfigPanelSocket() override;
 
-	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
-	~ModulePanel() override;
-	void on_load();
-	void on_save();
-	void on_enabled();
-	void on_delete();
-	void on_large();
-	void on_external();
-	void on_replace();
-	void on_detune();
-	void on_change();
-	
-	void set_width(int width);
-	
-	void copy_into(ModulePanel *dest);
-	
-	void set_func_enable(std::function<void(bool)> f);
-	void set_func_delete(std::function<void()> f);
-	void set_func_close(std::function<void()> f);
-	void set_func_replace(std::function<void()> f);
-	void set_func_detune(std::function<void()> f);
-	
 	std::function<void(bool)> func_enable;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
@@ -70,6 +50,40 @@ public:
 	shared<ConfigPanel> p;
 	hui::Panel *outer;
 	hui::Menu *menu;
+
+	void on_load();
+	void on_save();
+	void on_enabled();
+	void on_delete();
+	void on_large();
+	void on_external();
+	void on_replace();
+	void on_detune();
+	void on_change();
+
+
+	void set_func_enable(std::function<void(bool)> f);
+	void set_func_delete(std::function<void()> f);
+	void set_func_close(std::function<void()> f);
+	void set_func_replace(std::function<void()> f);
+	void set_func_detune(std::function<void()> f);
+	void copy_into(ConfigPanelSocket *dest);
+};
+
+class ModulePanel : public Observable<hui::Panel> {
+public:
+	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
+	~ModulePanel() override;
+
+	ConfigPanelSocket socket;
+	
+	void set_width(int width);
+
+	void set_func_enable(std::function<void(bool)> f) { socket.set_func_enable(f); }
+	void set_func_delete(std::function<void()> f) { socket.set_func_delete(f); }
+	void set_func_close(std::function<void()> f) { socket.set_func_close(f); }
+	void set_func_replace(std::function<void()> f) { socket.set_func_replace(f); }
+	void set_func_detune(std::function<void()> f) { socket.set_func_detune(f); }
 };
 
 

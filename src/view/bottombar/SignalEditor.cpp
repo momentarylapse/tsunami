@@ -94,7 +94,7 @@ void SignalEditor::show_config(Module *m) {
 	config_panel = nullptr;
 	config_module = m;
 	if (m) {
-		config_panel = new ModulePanel(config_module, this);
+		config_panel = new ModulePanel(config_module, this, ConfigPanelMode::DEFAULT_FIXED_WIDTH);
 		config_panel->set_func_delete([this, m] {
 			for (auto *chain: weak(session->all_signal_chains))
 				for (auto *_m: weak(chain->modules))

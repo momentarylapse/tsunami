@@ -2983,7 +2983,7 @@ expandx,noexpandy,vertical
 2
 Grid
 content
-expandx
+expandx,expandy
 0
 0
 0

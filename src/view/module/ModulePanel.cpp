@@ -19,19 +19,61 @@ extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
 
-ConfigPanelSocket::ConfigPanelSocket(Module *_m, hui::Panel *_parent, ConfigPanelMode mode) {
+ConfigPanelSocket::ConfigPanelSocket(Module *_m, ConfigPanelMode _mode) {
 	module = _m;
 	session = module->session;
 	menu = nullptr;
+	mode = _mode;
 
-	outer = _parent;
+	panel = nullptr;
 }
 
 ConfigPanelSocket::~ConfigPanelSocket() {
 }
 
+void ConfigPanelSocket::integrate(hui::Panel *_panel) {
+	panel = _panel;
+
+	ConfigPanel::_hidden_parent_ = panel;
+	config_panel = module->create_panel();
+
+	if (config_panel) {
+		panel->embed(config_panel.get(), "content", 0, 0);
+		config_panel->update();
+	} else {
+		panel->set_target("content");
+		panel->add_label("!center,expandx,disabled\\<i>" + _("not configurable") + "</i>", 0, 1, "");
+		panel->hide_control("load_favorite", true);
+		panel->hide_control("save_favorite", true);
+	}
+
+	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE));
+
+	panel->event("enabled", [this] { on_enabled(); });
+	panel->event("delete", [this] { on_delete(); });
+	panel->event("load_favorite", [this] { on_load(); });
+	panel->event("save_favorite", [this] { on_save(); });
+	panel->event("show_large", [this] { on_large(); });
+	panel->event("show_external", [this] { on_external(); });
+	panel->event("replace", [this] { on_replace(); });
+	panel->event("detune", [this] { on_detune(); });
+
+	panel->check("enabled", module->enabled);
+
+	auto *mb = (hui::ControlMenuButton*)panel->_get_control_("menu");
+	if (mb and mb->menu) {
+		menu = mb->menu;
+		menu->enable("delete", (int)(mode & ConfigPanelMode::DELETE));
+		menu->enable("replace", (int)(mode & ConfigPanelMode::REPLACE));
+	}
+
+	module->subscribe(panel, [this] {
+		panel->check("enabled", module->enabled);
+	}, Module::MESSAGE_CHANGE);
+}
+
 void ConfigPanelSocket::on_load() {
-	session->plugin_manager->select_profile_name(outer->win, module, false, [this] (const string &name) {
+	session->plugin_manager->select_profile_name(panel->win, module, false, [this] (const string &name) {
 		if (name.num == 0)
 			return;
 		session->plugin_manager->apply_profile(module, name, false);
@@ -43,7 +85,7 @@ void ConfigPanelSocket::on_load() {
 }
 
 void ConfigPanelSocket::on_save() {
-	session->plugin_manager->select_profile_name(outer->win, module, true, [this] (const string &name) {
+	session->plugin_manager->select_profile_name(panel->win, module, true, [this] (const string &name) {
 		if (name.num == 0)
 			return;
 		session->plugin_manager->save_profile(module, name);
@@ -52,7 +94,7 @@ void ConfigPanelSocket::on_save() {
 
 void ConfigPanelSocket::on_enabled() {
 	if (func_enable)
-		func_enable(outer->is_checked("enabled"));
+		func_enable(panel->is_checked("enabled"));
 }
 
 void ConfigPanelSocket::on_delete() {
@@ -61,39 +103,38 @@ void ConfigPanelSocket::on_delete() {
 }
 
 void ConfigPanelSocket::on_large() {
-	auto *c = new ModulePanel(module, session->win.get());
+	auto *c = new ModulePanel(module, session->win.get(), mode);
 	copy_into(&c->socket);
 	session->win->set_big_panel(c);
 }
 
 void ConfigPanelSocket::on_external() {
-	auto *dlg = new ModuleExternalDialog(module, session->win.get());
-	copy_into(&dlg->module_panel->socket);
-	dlg->show();
+	auto *dlg = new ModuleExternalDialog(module, session->win.get(), mode);
+	copy_into(&dlg->socket);
+	hui::fly(dlg);
 	// "self-deleting"
 }
 
 void ConfigPanelSocket::on_change() {
-	outer->check("enabled", module->enabled);
+	panel->check("enabled", module->enabled);
 }
 
 void ConfigPanelSocket::on_replace() {
-	hui::run_later(0.001f, func_replace);
+	if (func_replace)
+		hui::run_later(0.001f, func_replace);
 }
 
 void ConfigPanelSocket::on_detune() {
-	func_detune();
+	if (func_detune)
+		func_detune();
 }
 
 void ConfigPanelSocket::set_func_enable(std::function<void(bool)> f) {
 	func_enable = f;
-	outer->hide_control("enabled", f == nullptr);
 }
 
 void ConfigPanelSocket::set_func_delete(std::function<void()> f) {
 	func_delete = f;
-	if (menu)
-		menu->enable("delete", f != nullptr);
 }
 
 void ConfigPanelSocket::set_func_close(std::function<void()> f) {
@@ -123,33 +164,20 @@ void ConfigPanelSocket::copy_into(ConfigPanelSocket *c) {
 }
 
 
-ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, ConfigPanelMode mode) :
-	socket(_m, _parent, mode)
+ModulePanel::ModulePanel(Module *module, hui::Panel *_parent, ConfigPanelMode mode) :
+	socket(module, mode)
 {
 	set_parent(_parent);
-	bool own_header = int(mode & ConfigPanelMode::HEADER);
+	//bool own_header = int(mode & ConfigPanelMode::HEADER);
 
 	from_resource("module-panel");
 	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
-	if (own_header) {
-		socket.outer = this;
-		set_string("name", socket.module->module_class);
-	} else {
-		remove_control("header");
-	}
+	set_string("name", socket.module->module_class);
 
-	ConfigPanel::_hidden_parent_ = this;
-	socket.p = socket.module->create_panel();
-	if (socket.p) {
-		embed(socket.p.get(), "content", 0, 0);
-		socket.p->update();
-	} else {
-		set_target("content");
-		add_label("!center,expandx,disabled\\<i>" + _("not configurable") + "</i>", 0, 1, "");
-		socket.outer->hide_control("load_favorite", true);
-		socket.outer->hide_control("save_favorite", true);
-	}
+	socket.integrate(this);
+
+
 	if (int(mode & ConfigPanelMode::FIXED_WIDTH)) {
 		set_options("grid", "noexpandx");
 		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
@@ -165,34 +193,15 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, ConfigPanelMode mode) 
 		//set_options("grid", format("height=%d,expandy", CONFIG_PANEL_MIN_HEIGHT));
 	}
 
-	socket.outer->event("enabled", [this] { socket.on_enabled(); });
-	socket.outer->event("delete", [this] { socket.on_delete(); });
-	socket.outer->event("load_favorite", [this] { socket.on_load(); });
-	socket.outer->event("save_favorite", [this] { socket.on_save(); });
-	socket.outer->event("show_large", [this] { socket.on_large(); });
-	socket.outer->event("show_external", [this] { socket.on_external(); });
-	socket.outer->event("replace", [this] { socket.on_replace(); });
-	socket.outer->event("detune", [this] { socket.on_detune(); });
-
-	socket.outer->hide_control("enabled", true);
-	socket.outer->check("enabled", socket.module->enabled);
 	
-	auto *mb = (hui::ControlMenuButton*)socket.outer->_get_control_("menu");
-	if (mb and mb->menu) {
-		socket.menu = mb->menu;
-		socket.menu->enable("delete", false);
-		socket.menu->enable("replace", false);
-	}
 
-	socket.old_param = socket.module->config_to_string();
-	socket.module->subscribe(this, [this] {
-		socket.on_change();
-	}, Module::MESSAGE_CHANGE);
-	socket.module->subscribe(this, [this] {
-		socket.module->unsubscribe(this);
+	socket.old_param = module->config_to_string();
+	module->subscribe(this, [this, module] {
+		module->unsubscribe(this);
 		socket.module = nullptr;
-		unembed(socket.p.get());
-		socket.p = nullptr;
+		if (socket.config_panel)
+			unembed(socket.config_panel.get());
+		socket.config_panel = nullptr;
 	}, Module::MESSAGE_DELETE);
 }
 
@@ -210,27 +219,32 @@ void ModulePanel::set_width(int width) {
 
 
 
-ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
-	module = _module;
-	module_panel = new ModulePanel(module, this, ConfigPanelMode::DEFAULT_S);
+ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, ConfigPanelMode mode) :
+		hui::Dialog("module-external-dialog", parent),
+		socket(module, mode)
+{
 	set_title(module->module_class);
 	set_size(CONFIG_PANEL_WIDTH, 300);
 	//m->set_options("grid", "expandx");
-	embed(module_panel, "content", 0, 0);
+
+	socket.integrate(this);
+
+
+	//set_options("grid", "noexpandx");
+	//set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
+	//set_options("content", format("height=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
+	set_options("content", format("minheight=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
+	//set_options("grid", "noexpandy");
+
 	module->subscribe(this, [this] {
-		module = nullptr;
 		request_destroy();
 	}, module->MESSAGE_DELETE);
 	event("hui:close",[this] {
-		msg_write("deleting external dialog...soon");
-		hui::run_later(0.01f, [this] {
-			msg_error("deleting external dialog...");
-			delete this;
-		});
+		request_destroy();
 	});
 }
 
 ModuleExternalDialog::~ModuleExternalDialog() {
-	if (module)
-		module->unsubscribe(this);
+	if (socket.module)
+		socket.module->unsubscribe(this);
 }

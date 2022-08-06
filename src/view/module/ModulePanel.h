@@ -23,21 +23,27 @@ enum class ConfigPanelMode {
 	ENABLE = 4,
 	DELETE = 8,
 	CLOSE = 16,
+	REPLACE = 32,
 	FIXED_WIDTH = 256,
 	FIXED_HEIGHT = 512,
-	DEFAULT = HEADER | PROFILES | ENABLE | FIXED_WIDTH,
-	DEFAULT_H = HEADER | PROFILES | ENABLE | FIXED_HEIGHT,
-	DEFAULT_S = HEADER | PROFILES | ENABLE,
+	DEFAULT_FIXED_WIDTH = HEADER | PROFILES | ENABLE | FIXED_WIDTH,
+	DEFAULT_FIXED_HEIGHT = HEADER | PROFILES | ENABLE | FIXED_HEIGHT,
+	DEFAULT_FREE = HEADER | PROFILES | ENABLE,// | REPLACE,
 	CONFIG_PANEL = PROFILES
 };
 inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a & (int)b );
 }
+inline ConfigPanelMode operator||(ConfigPanelMode a, ConfigPanelMode b) {
+	return (ConfigPanelMode)( (int)a || (int)b );
+}
 
 class ConfigPanelSocket : public VirtualBase {
 public:
-	ConfigPanelSocket(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
+	ConfigPanelSocket(Module *m, ConfigPanelMode mode);
 	~ConfigPanelSocket() override;
+
+	void integrate(hui::Panel *panel);
 
 	std::function<void(bool)> func_enable;
 	std::function<void()> func_delete;
@@ -47,9 +53,10 @@ public:
 	Session *session;
 	Module *module;
 	string old_param;
-	shared<ConfigPanel> p;
-	hui::Panel *outer;
+	shared<ConfigPanel> config_panel;
+	hui::Panel *panel;
 	hui::Menu *menu;
+	ConfigPanelMode mode;
 
 	void on_load();
 	void on_save();
@@ -72,7 +79,7 @@ public:
 
 class ModulePanel : public Observable<hui::Panel> {
 public:
-	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
+	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode);
 	~ModulePanel() override;
 
 	ConfigPanelSocket socket;
@@ -89,10 +96,10 @@ public:
 
 class ModuleExternalDialog : public hui::Dialog {
 public:
-	Module *module;
-	ModulePanel *module_panel;
-	ModuleExternalDialog(Module *_module, hui::Window *parent);
+	ModuleExternalDialog(Module *_module, hui::Window *parent, ConfigPanelMode mode);
 	~ModuleExternalDialog() override;
+
+	ConfigPanelSocket socket;
 };
 
 

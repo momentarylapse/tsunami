@@ -63,6 +63,7 @@
 #include "view/helper/PeakMeterDisplay.h"
 #include "view/module/ModulePanel.h"
 #include "view/module/ConfigPanel.h"
+#include "view/module/ConfigurationDialog.h"
 #include "lib/hui/hui.h"
 #include "lib/os/date.h"
 #include "lib/os/filesystem.h"

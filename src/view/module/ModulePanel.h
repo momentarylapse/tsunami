@@ -16,25 +16,28 @@ class ConfigPanel;
 class Session;
 
 
+enum class ConfigPanelMode {
+	NONE = 0,
+	HEADER = 1,
+	PROFILES = 2,
+	ENABLE = 4,
+	DELETE = 8,
+	CLOSE = 16,
+	FIXED_WIDTH = 256,
+	FIXED_HEIGHT = 512,
+	DEFAULT = HEADER | PROFILES | ENABLE | FIXED_WIDTH,
+	DEFAULT_H = HEADER | PROFILES | ENABLE | FIXED_HEIGHT,
+	DEFAULT_S = HEADER | PROFILES | ENABLE,
+	CONFIG_PANEL = PROFILES
+};
+inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
+	return (ConfigPanelMode)( (int)a & (int)b );
+}
+
 class ModulePanel : public Observable<hui::Panel> {
 public:
-	
-	enum Mode {
-		NONE = 0,
-		HEADER = 1,
-		PROFILES = 2,
-		ENABLE = 4,
-		DELETE = 8,
-		CLOSE = 16,
-		FIXED_WIDTH = 256,
-		FIXED_HEIGHT = 512,
-		DEFAULT = HEADER | PROFILES | ENABLE | FIXED_WIDTH,
-		DEFAULT_H = HEADER | PROFILES | ENABLE | FIXED_HEIGHT,
-		DEFAULT_S = HEADER | PROFILES | ENABLE,
-		CONFIG_PANEL = PROFILES
-	};
 
-	ModulePanel(Module *m, hui::Panel *parent, Mode mode = Mode::DEFAULT);
+	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode = ConfigPanelMode::DEFAULT);
 	~ModulePanel() override;
 	void on_load();
 	void on_save();

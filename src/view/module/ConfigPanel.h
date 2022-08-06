@@ -31,8 +31,4 @@ public:
 };
 
 
-void configure_module(hui::Window *win, Module *m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
-void configure_module_autodel(hui::Window *win, Module *m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
-void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Callback cb_cancel, bool autodel);
-
 #endif /* SRC_VIEW_MODULE_CONFIGPANEL_H_ */

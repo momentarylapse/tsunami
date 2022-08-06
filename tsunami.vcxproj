@@ -550,6 +550,7 @@
     <ClCompile Include="src\view\mode\ViewModeScaleMarker.cpp" />
     <ClCompile Include="src\view\module\AutoConfigPanel.cpp" />
     <ClCompile Include="src\view\module\ConfigPanel.cpp" />
+    <ClCompile Include="src\view\module\ConfigurationDialog.cpp" />
     <ClCompile Include="src\view\module\ModulePanel.cpp" />
     <ClCompile Include="src\view\painter\BasicGridPainter.cpp" />
     <ClCompile Include="src\view\painter\BufferPainter.cpp" />
@@ -994,6 +995,7 @@
     <ClInclude Include="src\view\mode\ViewModeScaleMarker.h" />
     <ClInclude Include="src\view\module\AutoConfigPanel.h" />
     <ClInclude Include="src\view\module\ConfigPanel.h" />
+    <ClInclude Include="src\view\module\ConfigurationDialog.h" />
     <ClInclude Include="src\view\module\ModulePanel.h" />
     <ClInclude Include="src\view\painter\BasicGridPainter.h" />
     <ClInclude Include="src\view\painter\BufferPainter.h" />

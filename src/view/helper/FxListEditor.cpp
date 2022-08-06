@@ -47,9 +47,9 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 	panel = p;
 	id_list = _id;
 	track = t;
-	module_panel_mode = ModulePanel::Mode::DEFAULT;
+	module_panel_mode = ConfigPanelMode::DEFAULT;
 	if (hexpand)
-		module_panel_mode = ModulePanel::Mode::DEFAULT_H;
+		module_panel_mode = ConfigPanelMode::DEFAULT_H;
 	assert(track);
 	event_ids.add(panel->event_x(id_list, "hui:select", [this] { on_select(); }));
 	event_ids.add(panel->event_x(id_list, "hui:change", [this] { on_edit(); }));
@@ -95,7 +95,7 @@ void FxListEditor::select_module(Module *m) {
 	string config_grid_id = "grid-config";
 
 	if (selected_module) {
-		config_panel = new ModulePanel(m, panel, (ModulePanel::Mode)module_panel_mode);
+		config_panel = new ModulePanel(m, panel, module_panel_mode);
 
 		if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
 			auto fx = reinterpret_cast<AudioEffect*>(m);

@@ -14,6 +14,7 @@ class Session;
 class Track;
 class Module;
 class ModulePanel;
+enum class ConfigPanelMode;
 namespace hui {
 	class Panel;
 	class Menu;
@@ -31,7 +32,7 @@ public:
 	Module *selected_module = nullptr;
 	shared<ModulePanel> config_panel;
 	Array<int> event_ids;
-	int module_panel_mode;
+	ConfigPanelMode module_panel_mode;
 
 	Session *session() const;
 	void select_module(Module *m);

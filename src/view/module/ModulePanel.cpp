@@ -18,14 +18,14 @@ extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
-ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
+ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, ConfigPanelMode mode) {
 	set_parent(_parent);
 	module = _m;
 	session = module->session;
 	menu = nullptr;
 
 	outer = _parent;
-	bool own_header = (mode & Mode::HEADER);
+	bool own_header = int(mode & ConfigPanelMode::HEADER);
 
 	from_resource("module-panel");
 	//set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
@@ -48,14 +48,14 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 		outer->hide_control("load_favorite", true);
 		outer->hide_control("save_favorite", true);
 	}
-	if (mode & Mode::FIXED_WIDTH) {
+	if (int(mode & ConfigPanelMode::FIXED_WIDTH)) {
 		set_options("grid", "noexpandx");
 		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
 	} else {
 		set_options("grid", "expandx");
 		//set_options("content", format("expandx", CONFIG_PANEL_WIDTH));
 	}
-	if (mode & Mode::FIXED_HEIGHT) {
+	if (int(mode & ConfigPanelMode::FIXED_HEIGHT)) {
 		set_options("content", format("height=%d", CONFIG_PANEL_HEIGHT));
 		set_options("grid", "noexpandy");
 	} else {
@@ -83,7 +83,9 @@ ModulePanel::ModulePanel(Module *_m, hui::Panel *_parent, Mode mode) {
 	}
 
 	old_param = module->config_to_string();
-	module->subscribe(this, [this] { on_change(); }, module->MESSAGE_CHANGE);
+	module->subscribe(this, [this] {
+		on_change();
+	}, module->MESSAGE_CHANGE);
 	module->subscribe(this, [this] {
 		module->unsubscribe(this);
 		module = nullptr;
@@ -200,7 +202,7 @@ void ModulePanel::on_detune() {
 
 ModuleExternalDialog::ModuleExternalDialog(Module *_module, hui::Window *parent) : hui::Dialog("module-external-dialog", parent) {
 	module = _module;
-	module_panel = new ModulePanel(module, this, ModulePanel::Mode::DEFAULT_S);
+	module_panel = new ModulePanel(module, this, ConfigPanelMode::DEFAULT_S);
 	set_title(module->module_class);
 	set_size(CONFIG_PANEL_WIDTH, 300);
 	//m->set_options("grid", "expandx");

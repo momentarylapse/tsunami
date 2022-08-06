@@ -529,6 +529,7 @@ sources = [
 	'src/view/mode/ViewModeScaleMarker.cpp',
 	'src/view/module/AutoConfigPanel.cpp',
 	'src/view/module/ConfigPanel.cpp',
+	'src/view/module/ConfigurationDialog.cpp',
 	'src/view/module/ModulePanel.cpp',
 	'src/view/painter/BasicGridPainter.cpp',
 	'src/view/painter/BufferPainter.cpp',

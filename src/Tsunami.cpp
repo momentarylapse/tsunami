@@ -37,6 +37,7 @@
 #ifndef NDEBUG
 #include "module/ModuleFactory.h"
 #include "view/module/ConfigPanel.h"
+#include "view/module/ConfigurationDialog.h"
 #endif
 
 

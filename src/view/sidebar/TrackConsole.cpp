@@ -28,7 +28,7 @@ hui::Panel *create_dummy_synth_panel() {
 }
 
 hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *parent) {
-	auto *p = new ModulePanel(track->synth.get(), parent, ModulePanel::Mode::DEFAULT_H);
+	auto *p = new ModulePanel(track->synth.get(), parent, ConfigPanelMode::DEFAULT_H);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, track, session]{
 		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [track, session] (const string &name) {

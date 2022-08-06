@@ -1303,6 +1303,9 @@
     <ClCompile Include="src\view\module\ConfigPanel.cpp">
       <Filter>src\view\module</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\module\ConfigurationDialog.cpp">
+      <Filter>src\view\module</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\module\ModulePanel.cpp">
       <Filter>src\view\module</Filter>
     </ClCompile>
@@ -2629,6 +2632,9 @@
       <Filter>src\view\module</Filter>
     </ClInclude>
     <ClInclude Include="src\view\module\ConfigPanel.h">
+      <Filter>src\view\module</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\module\ConfigurationDialog.h">
       <Filter>src\view\module</Filter>
     </ClInclude>
     <ClInclude Include="src\view\module\ModulePanel.h">

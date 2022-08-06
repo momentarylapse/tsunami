@@ -3,6 +3,7 @@
 #include "../../os/formatter.h"
 #include "../../os/msg.h"
 #include "../../os/CommandLineParser.h"
+#include "../../os/config.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
@@ -25,6 +26,15 @@ const Class *TypeStreamP;
 
 const Class* TypeCallback;
 const Class* TypeCallbackString;
+
+extern const Class *TypeStringList;
+extern const Class *TypeAny;
+const Class *TypeOsConfiguration;
+
+
+Any _os_config_get(Configuration &c, const string &key) {
+	return c.get(key, Any());
+}
 
 
 static Stream *_kaba_stdin = nullptr;
@@ -393,6 +403,7 @@ void SIAddPackageOS() {
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
+	TypeOsConfiguration = add_type("Configuration", sizeof(Configuration));
 
 	TypeCallback = add_type_f(TypeVoid, {});
 	TypeCallbackString = add_type_f(TypeVoid, {TypeString});
@@ -467,6 +478,45 @@ void SIAddPackageOS() {
 			func_add_param("p", TypeString);
 			func_add_param("comment", TypeString);
 			func_add_param("f", TypeCallbackStringList);
+
+
+	add_class(TypeOsConfiguration);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Configuration::__init__);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Configuration::__del__);
+		class_add_func("load", TypeBool, &Configuration::load);
+			func_add_param("path", TypePath);
+		class_add_func("save", TypeVoid, &Configuration::save, Flags::CONST);
+			func_add_param("path", TypePath);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_int);
+			func_add_param("name", TypeString);
+			func_add_param("value", TypeInt);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_float); // FIXME: operator preference...
+			func_add_param("name", TypeString);
+			func_add_param("value", TypeFloat32);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_bool);
+			func_add_param("name", TypeString);
+			func_add_param("value", TypeBool);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_str);
+			func_add_param("name", TypeString);
+			func_add_param("value", TypeString);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set);
+			func_add_param("name", TypeString);
+			func_add_param("value", TypeAny);
+		class_add_func("get_int", TypeInt, &Configuration::get_int, Flags::CONST);
+			func_add_param("name", TypeString);
+			func_add_param("default", TypeInt);
+		class_add_func("get_float", TypeFloat32, &Configuration::get_float, Flags::CONST);
+			func_add_param("name", TypeString);
+			func_add_param("default", TypeFloat32);
+		class_add_func("get_bool", TypeBool, &Configuration::get_bool, Flags::CONST);
+			func_add_param("name", TypeString);
+			func_add_param("default", TypeBool);
+		class_add_func("get_str", TypeString, &Configuration::get_str, Flags::CONST);
+			func_add_param("name", TypeString);
+			func_add_param("default", TypeString);
+		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &_os_config_get, Flags::CONST);
+			func_add_param("name", TypeString);
+		class_add_func("keys", TypeStringList, &Configuration::keys, Flags::CONST);
 
 
 	// file access

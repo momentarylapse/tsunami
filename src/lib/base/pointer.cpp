@@ -7,6 +7,9 @@
 
 #include "pointer.h"
 
+// abused for optional<>
+Empty None;
+
 
 #if POINTER_DEBUG
 

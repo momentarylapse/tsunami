@@ -165,15 +165,20 @@ void Function::update_parameters_after_parsing() {
 	if (is_member()) {
 		if (!__get_var(IDENTIFIER_SELF))
 			add_self_parameter();
-		if (flags_has(flags, Flags::CONST))
-			flags_clear(__get_var(IDENTIFIER_SELF)->flags, Flags::CONST);
+		/*if (flags_has(flags, Flags::CONST))
+			flags_set(__get_var(IDENTIFIER_SELF)->flags, Flags::CONST);
 		if (flags_has(flags, Flags::REF))
-			flags_clear(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);
+			flags_set(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);*/
 	}
 }
 
 void Function::add_self_parameter() {
-	block->insert_var(0, IDENTIFIER_SELF, name_space, is_const() ? Flags::CONST : Flags::NONE);
+	auto _flags = Flags::NONE;
+	if (flags_has(flags, Flags::CONST))
+		flags_set(_flags, Flags::CONST);
+	if (flags_has(flags, Flags::REF))
+		flags_set(_flags, Flags::REF);
+	block->insert_var(0, IDENTIFIER_SELF, name_space, _flags);
 	literal_param_type.insert(name_space, 0);
 	abstract_param_types.insert(nullptr, 0);
 	num_params ++;

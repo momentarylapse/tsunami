@@ -70,7 +70,7 @@ extern string ComboBoxSeparator;
 #include "Clipboard.h"
 
 
-#include "../doc/config.h"
+#include "../os/config.h"
 namespace hui {
 extern Configuration config;
 }

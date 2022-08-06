@@ -21,14 +21,16 @@ void configure_module_x(hui::Window *win, Module *m, hui::Callback cb, hui::Call
 
 class ConfigurationDialog : public hui::Dialog {
 public:
+	ConfigPanelSocket socket;
+
 	ConfigurationDialog(Module *m, hui::Window *parent) :
-		hui::Dialog("configurable_dialog", parent)
+		hui::Dialog("configurable_dialog", parent),
+		socket(m, ConfigPanelMode::PROFILES)
 	{
 		module = m;
-		module_panel = new ModulePanel(module, this, ConfigPanelMode::CONFIG_PANEL);
 		set_title(module->module_class);
 		set_size(CONFIG_PANEL_WIDTH, 300);
-		embed(module_panel, "content", 0, 0);
+		socket.integrate(this);
 		module->subscribe(this, [this] {
 			module = nullptr;
 			request_destroy();
@@ -99,7 +101,6 @@ public:
 	}
 
 	Module *module;
-	ModulePanel *module_panel;
 	owned<Progress> progress;
 	bool ok;
 };

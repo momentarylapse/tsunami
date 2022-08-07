@@ -178,7 +178,7 @@ void SIAddPackageHui() {
 		class_derive_from(TypeObject, false, true);
 		class_add_element("win", TypeHuiWindowP, GetDAPanel(win));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init0__), Flags::OVERRIDE);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init2__), Flags::OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init2__));
 			func_add_param("parent", TypeHuiPanelP);
 			func_add_param("id", TypeString);
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&KabaPanelWrapper::__delete__), Flags::OVERRIDE);

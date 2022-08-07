@@ -38,8 +38,9 @@ class BiquadFilter
 	class Parameters
 		var a, b: float[3]
 	
-		# requires &x != &y...
-		func apply(x: float[], out y: float[], out prev_x: float[2], out prev_y: float[2])
+		func apply(out x: float[], out prev_x: float[2], out prev_y: float[2])
+			var y: float[]
+			y.resize(len(x))
 			if len(x) >= 2
 				# overlap
 				y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
@@ -57,6 +58,8 @@ class BiquadFilter
 				prev_x[1] = x[0]
 				prev_y[0] = prev_y[1]
 				prev_y[1] = y[0]
+			x = y
+			
 		func __init__()
 			a[0] = 0 # ignored
 			a[1] = 0
@@ -259,8 +262,11 @@ class BiquadFilter
 	func mut apply(out buf: AudioBuffer)
 		state.resize(buf.channels)
 		for c,i in buf.c
-			var input = buf.c[i]
-			params.apply(input, c, state[i].prev_x, state[i].prev_y)
+			# FIXME: maybe we should have len(buf.c)==buf.channels ?!?
+			#   why do we have that, anyways?
+			if i >= buf.channels
+				break
+			params.apply(c, state[i].prev_x, state[i].prev_y)
 
 
 

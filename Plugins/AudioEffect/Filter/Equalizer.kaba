@@ -70,6 +70,7 @@ class Equalizer extends AudioEffect
 			peaks.add(Peak(FilterType.HIGH_PASS, 30, -10, 2))
 			peaks.add(Peak(FilterType.LOW_PASS, 100, -10, 2))
 
+	# FIXME find a better way!
 	var grid: EqualizerGrid* = nil
 
 	var config: Config

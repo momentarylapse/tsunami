@@ -3,8 +3,7 @@
 use hui
 use tsunami
 use helper.grid
-
-
+use helper.draw
 
 
 class MultiEcho extends AudioEffect
@@ -92,36 +91,51 @@ class MultiEchoGrid extends Grid
 		cp.event("reflection-add", on_add_reflection)
 		cp.event("reflection-delete", on_delete_reflection)
 
-	func draw_hull_curve(c: Painter, r: MultiEcho.Config.Reflector)
-		float v = r.volume
-		float t = r.delay
-		c.set_line_width(2)
-		float dt = 0.05
-		float dv = pow(r.feedback, dt/r.delay)
-		int n = min(100, x_axis.val_max/dt + 1)
-		vec2[] cc
+	func draw_hull_curve(p: Painter, r: MultiEcho.Config.Reflector, index: int)
+		let col = cool_color(index)
+		#if hover
+		#	col2 = colors.hoverify(col2)
+			
+		let v = r.volume
+		let t = r.delay
+		p.set_line_width(2)
+		let dt = 0.02
+		let dv = pow(r.feedback, dt/r.delay)
+		let n = min(100, int(x_axis.val_max/dt + 1))
+		let cc: vec2[]
 		for i in 0:n
 			cc.add(project2(vec2(t, v)))
 			v *= dv
 			t += dt
-		c.set_color(color.interpolate(color.RED, colors.text_soft2, 0.3))
-		c.set_line_dash([5.0, 2.0])
-		c.draw_lines(cc)
-		c.set_line_dash([5.0, 0.0])
+		p.set_color(col)
+		p.set_line_dash([5.0, 2.0])
+		p.draw_lines(cc)
+		p.set_line_dash([5.0, 0.0])
+		
+		cc.add([p.width,p.height])
+		cc.add([cc[0].x,p.height])
+		p.set_color(col.with_alpha(0.2))
+		p.draw_polygon(cc)
 	
-	func draw_peaks(c: Painter, r: MultiEcho.Config.Reflector)
-		float v = r.volume
-		float t = r.delay
-		int n = min(100, x_axis.val_max/r.delay)
+	func draw_peaks(c: Painter, r: MultiEcho.Config.Reflector, index: int)
+		let col = cool_color(index)
+		let v = r.volume
+		let t = r.delay
+		let n = min(100, int(x_axis.val_max/r.delay))
 		c.set_line_width(1.5)
 		for i in 0:n
+			c.set_color(col)
 			vec2 p = project2(vec2(t, v))
 			if i == 0
-				c.set_color(colors.text_soft1)
+				if index == hover
+					c.set_color(colors.hoverify(col))
+				c.draw_circle(p, 4.0)
+				c.set_line_width(2.0)
 			else
-				draw_point2(c, vec2(t,v), false, false)
-				c.set_color(colors.text_soft2)
-			c.draw_line([p.x, c.height], [p.x, p.y])
+				c.draw_circle(p, 3.0)
+				c.set_color(col.with_alpha(0.3))
+				c.set_line_width(1.5)
+			c.draw_line([p.x, c.height], p)
 			v *= r.feedback
 			t += r.delay
 		c.set_line_width(1)
@@ -129,14 +143,14 @@ class MultiEchoGrid extends Grid
 	func override on_draw(c: Painter)
 	
 		c.set_line_width(1)
-		for r in config.refl
-			draw_hull_curve(c, r)
-			draw_peaks(c, r)
+		for r,i in config.refl
+			draw_hull_curve(c, r, i)
+			draw_peaks(c, r, i)
 	
 		# points
-		for r,i in config.refl
-			var z = vec2(r.delay, r.volume)
-			draw_point2(c, z, i == selected, i == hover)
+		#for r,i in config.refl
+		#	let z = vec2(r.delay, r.volume)
+		#	draw_point2(c, z, i == selected, i == hover)
 	
 		if hover >= 0
 			draw_details(c, config.refl[hover])

@@ -137,7 +137,7 @@ Grid ? ''
 		p_out = vec2(40, 60)
 		for p,i in p_osci
 			p = vec2(100+15*i, i*20)#vec2((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
-			bool has_links = fc.osc[i].target_out
+			let has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
 				has_links = has_links or t
 			if !has_links
@@ -145,12 +145,12 @@ Grid ? ''
 		for i in 0:2000
 			iterate_osci_pos()
 	func _f_link(a: vec2, b: vec2) -> vec2
-		float d = len(b - a)
-		vec2 dir = (b - a) * (1/d)
+		let d = len(b - a)
+		let dir = (b - a) * (1/d)
 		return dir * (d - LINK_LENGTH) * 0.1 + vec2(0, (b.y-a.y) * 0.05)
 	func _f_free(a: vec2, b: vec2) -> vec2
-		float d = len(b - a)
-		vec2 dir = (b - a) * (1/d)
+		let d = len(b - a)
+		let dir = (b - a) * (1/d)
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
 	func mut iterate_osci_pos()
 		vec2[NUM_OSCILLATORS] f
@@ -176,11 +176,11 @@ Grid ? ''
 		return p_osci[index]
 
 	func draw_type(p: Painter, z: vec2, type: OsciType, _dx: float, amp: float)
-		var dx = _dx / pi
-		float v0 = 0
-		float t0 = -pi
+		let dx = _dx / pi
+		let v0 = 0.0
+		let t0 = -pi
 		for t in -pi:pi+0.1:0.1
-			float v = sin(t)
+			let v = sin(t)
 			if type == OsciType.SQUARE
 				if v > 0
 					v = 1
@@ -208,7 +208,7 @@ Grid ? ''
 		var o = fc.osc[index]
 		p.set_color(col)
 		draw_type(p, z - vec2(0,2), o.type, 9, 5.5)
-		int f = o.factor + 0.5
+		let f = int(o.factor + 0.5)
 		p.set_font_size(7)
 		#p.set_color(colors.text_soft1)
 		p.draw_str([z.x-4, z.y+6], "x{{f}}")
@@ -228,60 +228,57 @@ Grid ? ''
 	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
 	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		float e = log(v1/v0)
-		vec2[] cc
+		let e = log(v1/v0)
+		let cc: vec2[]
 		for a in 0:1.01:0.05
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
-			cc.add(vec2(t2x(t), v2y(v)))
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
-		p.set_color(col2)
+			cc.add([t2x(t), v2y(v)])
+		p.set_color(col)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(vec2(t2x(t1), v2y(0)))
-		cc.add(vec2(t2x(t0), v2y(0)))
-		col2.a = 0.2
-		p.set_color(col2)
+		cc.add([t2x(t1), v2y(0)])
+		cc.add([t2x(t0), v2y(0)])
+		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
 	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		vec2[] cc
-		cc.add(vec2(t2x(t0), v2y(v0)))
-		cc.add(vec2(t2x(t1), v2y(v1)))
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
-		p.set_color(col2)
+		let cc: vec2[]
+		cc.add([t2x(t0), v2y(v0)])
+		cc.add([t2x(t1), v2y(v1)])
+		p.set_color(col)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
 		p.set_line_dash([2.0,0.0])
-		cc.add(vec2(t2x(t1), v2y(0)))
-		cc.add(vec2(t2x(t0), v2y(0)))
-		col2.a = 0.2
-		p.set_color(col2)
+		cc.add([t2x(t1), v2y(0)])
+		cc.add([t2x(t0), v2y(0)])
+		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
 	
 	func draw_grabber(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = col
+		p.set_line_width(2.0)
 		if hover
 			col2 = colors.hoverify(col2)
+			p.set_line_width(3.0)
 		p.set_color(col2)
-		p.set_line_width(2.0)
 		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
 		p.set_line_width(1)
 	
 	func draw_envelope(p: Painter, o: OscillatorConfig)
-		float t0 = 0
-		float t1 = t0 + o.attack
-		float t2 = t1 + o.decay
-		float t3 = t2 + o.release
-		draw_curve_lin(p, t0, o.initial, t1, o.peak, color.RED)
-		draw_curve_lin(p, t1, o.peak, t2, o.sustain, color.ORANGE)
-		draw_curve_exp(p, t2, o.sustain, t3, 0.01, color.GREEN)
+		let t0 = 0.0
+		let t1 = t0 + o.attack
+		let t2 = t1 + o.decay
+		let t3 = t2 + o.release
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, cool_color(0))
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, cool_color(1))
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, cool_color(3))
 		
 		
-		draw_grabber(p, t1, 0, t1, 1, color.RED, hover == -10)
-		draw_grabber(p, t2, 0, t2, 1, color.ORANGE, hover == -11)
-		draw_grabber(p, t3, 0, t3, 1, color.GREEN, hover == -12)
-		draw_grabber(p, t1, o.sustain, t3, o.sustain, color.YELLOW, hover == -13)
+		draw_grabber(p, t1, 0, t1, 1, cool_color(0), hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, cool_color(1), hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, cool_color(3), hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, cool_color(2), hover == -13)
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
@@ -318,9 +315,9 @@ Grid ? ''
 		draw_envelope(p, fc.osc[chosen])
 	
 	func get_hover() -> int
-		var e = hui.get_event()
-		float mx = e.mouse.x
-		float my = e.mouse.y
+		let e = hui.get_event()
+		let mx = e.mouse.x
+		let my = e.mouse.y
 		for i in 0:NUM_OSCILLATORS
 			var z = osci_pos(i)
 			if abs(mx - z.x) + abs(my - z.y) < 20
@@ -347,9 +344,9 @@ Grid ? ''
 	func mut on_left_button_up()
 		moving = -1
 	func mut on_mouse_move()
-		var e = hui.get_event()
-		float mx = e.mouse.x
-		float my = e.mouse.y
+		let e = hui.get_event()
+		let mx = e.mouse.x
+		let my = e.mouse.y
 		if moving < -5 and chosen >= 0
 			var o = &fc.osc[chosen]
 			if moving == -10
@@ -381,13 +378,13 @@ Grid ? ''
 		update()
 	
 	func mut on_topology()
-		var code = hui.get_event().id[4:]
+		let code = hui.get_event().id[4:]
 		fc.clear_links()
 		for i in 0:len(code)
 			if code[i] == 'x'
 				fc.osc[i].target_out = true
 			else
-				int t = int(code[i:i+1])
+				let t = int(code[i:i+1])
 				fc.osc[i].target[t] = true
 		update_osci_pos()
 		redraw("area")
@@ -451,7 +448,7 @@ class FMRenderer extends PitchRenderer
 			o.env.start(_volume * o.conf.amplitude)
 
 	func override on_config()
-		int n = 0
+		let n = 0
 		for c in synth.config.osc
 			if !c.active()
 				continue

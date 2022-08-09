@@ -1,4 +1,5 @@
 use hui
+use tsunami
 
 # c(t) = A*t³ + B*t² + C*t + D
 # c(0) = p0
@@ -12,3 +13,9 @@ func draw_spline(p: Painter, p0: vec2, t0: vec2, p1: vec2, t1: vec2)
 	for t in 0:1:0.05
 		cc.add(p0 + t0*t + B*t^2 + A*t^3)
 	p.draw_lines(cc)
+
+const COLORS = [color.RED, color.ORANGE, color.YELLOW, color.GREEN, color.BLUE]
+
+func cool_color(index: int) -> color
+	let col = COLORS[loop(index, 0, len(COLORS))]
+	return color.interpolate(col, colors.text_soft2, 0.3)

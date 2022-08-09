@@ -156,7 +156,7 @@ class EqualizerGrid extends Grid
 			p.draw_line([pp.x, 0], [pp.x, p.height])
 			
 			p.set_font_size(12)
-			draw_boxed_str(p, [pp.x-5, 10], str(i+1), col_text, colors.text_soft3)
+			draw_boxed_str(p, [pp.x, 10], str(i+1), col_text, colors.text_soft3, Align.CENTER)
 			
 			draw_point2(p, pk.z(c.gain), i == selected, i == hover)
 			if i == hover

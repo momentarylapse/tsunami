@@ -2977,7 +2977,7 @@ width=200,height=200,headerbar,resizable,allowparent
 1
 Grid
 grid
-expandx,noexpandy,vertical
+expandx,expandy,vertical
 0
 0
 2

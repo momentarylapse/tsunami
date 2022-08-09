@@ -279,7 +279,7 @@ class EqualizerPanel extends ConfigPanel
 	var override c: Equalizer*
 	func override __init__(_eq: Module)
 		super.__init__(_eq)
-		add_grid("!expandy", 0, 0, "grid")
+		add_grid("!expandy,expandx", 0, 0, "grid")
 		set_target("grid")
 		add_drawing_area("!grabfocus,expandx,expandy", 0, 0, "drawing")
 	

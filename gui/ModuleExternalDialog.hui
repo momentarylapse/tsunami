@@ -1,5 +1,5 @@
 Dialog module-external-dialog "Module" width=200 height=200 headerbar resizable allowparent
-	Grid grid "" expandx noexpandy vertical
+	Grid grid "" expandx expandy vertical
 		Grid content "" expandx expandy
 		Grid ? "" buttonbar
 			MenuButton menu "" image=hui:properties flat menu=popup_fx_menu

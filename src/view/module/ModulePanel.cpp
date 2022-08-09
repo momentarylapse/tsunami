@@ -47,7 +47,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 		panel->hide_control("save_favorite", true);
 	}
 
-	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE));
+	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE) == 0);
 
 	panel->event("enabled", [this] { on_enabled(); });
 	panel->event("delete", [this] { on_delete(); });
@@ -234,6 +234,7 @@ ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, 
 	//set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
 	//set_options("content", format("height=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
 	set_options("content", format("minheight=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
+	//set_options("content", "expandx,expandy");
 	//set_options("grid", "noexpandy");
 
 	module->subscribe(this, [this] {

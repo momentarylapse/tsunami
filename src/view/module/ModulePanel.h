@@ -34,8 +34,8 @@ enum class ConfigPanelMode {
 inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a & (int)b );
 }
-inline ConfigPanelMode operator||(ConfigPanelMode a, ConfigPanelMode b) {
-	return (ConfigPanelMode)( (int)a || (int)b );
+inline ConfigPanelMode operator|(ConfigPanelMode a, ConfigPanelMode b) {
+	return (ConfigPanelMode)( (int)a | (int)b );
 }
 
 class ConfigPanelSocket : public VirtualBase {

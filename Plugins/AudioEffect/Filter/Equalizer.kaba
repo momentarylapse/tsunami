@@ -103,15 +103,19 @@ class Equalizer extends AudioEffect
 		return new EqualizerPanel(self)
 
 
-const HOVER_NONE = -1
-const HOVER_GAIN = -2
+#const HOVER_NONE = -1
+#const HOVER_GAIN = -2
+enum HoverType
+	NONE
+	PEAK
+	PEAK_LABEL
+	GAIN
 
 class EqualizerGrid extends Grid
 	var c: Equalizer.Config*
 	var cp: EqualizerPanel*
 	var sample_rate: float
-	var hover = HOVER_NONE
-	var selected = HOVER_NONE
+	var hover, selected: (HoverType, int)
 	var spectrum: SpectrumCurve
 	
 	var menu: Menu* = nil
@@ -127,6 +131,8 @@ class EqualizerGrid extends Grid
 		panel.event("add-high-shelf", on_add_peak)
 		panel.event("peak-toggle-enabled", on_peak_toggle_enabled)
 		panel.event("peak-delete", on_peak_delete)
+		hover = (HoverType.NONE, -1)
+		selected = hover
 
 	func override on_draw(p: Painter)
 		draw_curve_c(p, spectrum, false)
@@ -149,24 +155,26 @@ class EqualizerGrid extends Grid
 			var pp = project2(pk.z(c.gain))
 			
 			p.set_line_width(2)
-			color col = point_color(i == selected, i == hover)
+			color col = point_color(i == selected.e1, i == hover.e1)
 			color col2 = col
 			col2.a = 0.6
 			p.set_color(col2)
 			p.draw_line([pp.x, 0], [pp.x, p.height])
 			
-			p.set_font_size(12)
+			#p.set_font_size(12)
+			p.set_font("", 12, i == hover.e1, false)
 			draw_boxed_str(p, [pp.x, 10], str(i+1), col_text, colors.text_soft3, Align.CENTER)
+			p.set_font("", 12, false, false)
 			
-			draw_point2(p, pk.z(c.gain), i == selected, i == hover)
-			if i == hover
+			draw_point2(p, pk.z(c.gain), i == selected.e1, i == hover.e1)
+			if i == hover.e1
 				p.set_font_size(8)
 				p.set_color(col_hover)
 				p.draw_str([pp.x - 20, pp.y - 65], str(pk.mode))
 				p.draw_str([pp.x - 20, pp.y - 50], "{{pitch_to_freq(pk.pitch)|.1}} Hz")
 				p.draw_str([pp.x - 20, pp.y - 35], "{{pk.gain|.1}} dB")
 				p.draw_str([pp.x - 20, pp.y - 20], "Q {{pk.q|.1}}")
-		if hover == HOVER_GAIN
+		if hover.e0 == HoverType.GAIN
 			p.set_font_size(8)
 			p.set_color(col_hover)
 			p.draw_str([m.x - 20, y_axis.project(c.gain) - 20], "Gain {{c.gain|.1}} dB")
@@ -179,11 +187,11 @@ class EqualizerGrid extends Grid
 
 	func override on_mouse_wheel()
 		float dy = hui.get_event().scroll.y
-		if hover >= 0
+		if hover.e1 >= 0
 			if dy > 0
-				c.peaks[hover].q *= 1.04
+				c.peaks[hover.e1].q *= 1.04
 			else
-				c.peaks[hover].q /= 1.04
+				c.peaks[hover.e1].q /= 1.04
 			cp.changed()
 			redraw()
 	
@@ -198,8 +206,8 @@ class EqualizerGrid extends Grid
 		selected = hover
 		
 		menu = new Menu(cp)
-		if selected >= 0
-			if c.peaks[selected].enabled
+		if selected.e0 == HoverType.PEAK or selected.e0 == HoverType.PEAK_LABEL
+			if c.peaks[selected.e1].enabled
 				menu.add("disable", "peak-toggle-enabled")
 			else
 				menu.add("enable", "peak-toggle-enabled")
@@ -226,42 +234,53 @@ class EqualizerGrid extends Grid
 			t = FilterType.HIGH_SHELF
 		var m = right_click_mouse_pos
 		c.peaks.add(Peak(t, freq_to_pitch(m.x), m.y - c.gain, 2))
-		selected = len(c.peaks) - 1
+		selected = (HoverType.PEAK, len(c.peaks) - 1)
 		hover = selected
 		cp.changed()
 		redraw()
 	
 	func mut on_peak_toggle_enabled()
-		if selected >= 0
-			c.peaks[selected].enabled = not c.peaks[selected].enabled
+		if selected.e1 >= 0
+			c.peaks[selected.e1].enabled = not c.peaks[selected.e1].enabled
 			cp.changed()
 			redraw()
 	func mut on_peak_delete()
-		if selected >= 0
-			c.peaks.remove(selected)
+		if selected.e1 >= 0
+			c.peaks.remove(selected.e1)
 			cp.changed()
-			hover = HOVER_NONE
+			hover = (HoverType.NONE, -1)
 			selected = hover
 			redraw()
+	
+	func get_hover(m: vec2) -> (HoverType, int)
+		if abs(m.y - y_axis.project(c.gain)) < 10
+			return (HoverType.GAIN, -1)
+		for p,i in c.peaks
+			if mouse_over_point2(p.z(c.gain))
+				return (HoverType.PEAK, i)
+		for p,i in c.peaks
+			var pp = project2(p.z(c.gain))
+			if abs(pp.x - m.x) < 15 and m.y < 30
+				return (HoverType.PEAK_LABEL, i)
+		return (HoverType.NONE, -1)
 
 	func override on_mouse_move()
 		if hui.get_event().button_l
 			# move
-			if selected >= 0
-				c.peaks[selected].pitch = freq_to_pitch(get_mouse2().x)
-				c.peaks[selected].gain = get_mouse2().y - c.gain
+			if selected.e1 >= 0
+				c.peaks[selected.e1].pitch = freq_to_pitch(get_mouse2().x)
+				if selected.e0 == HoverType.PEAK
+					c.peaks[selected.e1].gain = get_mouse2().y - c.gain
 				cp.changed()
-			else if selected == HOVER_GAIN
+			else if selected.e0 == HoverType.GAIN
 				c.gain = get_mouse2().y
 				cp.changed()
 		else
-			# mouse hover?
-			hover = -1
-			if abs(m.y - y_axis.project(c.gain)) < 10
-				hover = HOVER_GAIN
-			for i in 0:len(c.peaks)
-				if mouse_over_point2(c.peaks[i].z(c.gain))
-					hover = i
+			hover = get_hover(m)
+		redraw()
+	
+	func override on_mouse_leave()
+		hover = (HoverType.NONE, -1)
 		redraw()
 
 	# [Delete] -> remove point

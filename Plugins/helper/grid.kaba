@@ -489,6 +489,11 @@ class Grid extends Object
 		if y_axis.area.inside(m)
 			y_axis.on_mouse_wheel(m.y)
 	
+	func mut on_mouse_leave_all()
+		update_mouse()
+		on_mouse_leave()
+		# TODO...keep track
+	
 	func mut on_key_down_all()
 		on_key_down()
 
@@ -503,6 +508,8 @@ class Grid extends Object
 		panel.event_x(id, "hui:right-button-up", on_right_button_up_all)
 		panel.event_x(id, "hui:mouse-move", on_mouse_move_all)
 		panel.event_x(id, "hui:mouse-wheel", on_mouse_wheel_all)
+		#panel.event_x(id, "hui:mouse-enter", on_mouse_enter_all)
+		panel.event_x(id, "hui:mouse-leave", on_mouse_leave_all)
 		panel.event_x(id, "hui:key-down", on_key_down_all)
 		x_axis.set_events()
 		y_axis.set_events()
@@ -515,3 +522,5 @@ class Grid extends Object
 	func virtual mut on_mouse_move()
 	func virtual mut on_mouse_wheel()
 	func virtual mut on_key_down()
+	#func virtual mut on_mouse_enter()
+	func virtual mut on_mouse_leave()

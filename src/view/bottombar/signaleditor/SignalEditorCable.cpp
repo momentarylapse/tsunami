@@ -41,13 +41,16 @@ void SignalEditorCable::on_draw(Painter *p) {
 	color base_color = tab->signal_color(type, false);
 
 	// curve
-	p->set_color(base_color);
-	//p->set_color(color::interpolate(base_color, view->colors.background, 0.1f));
-	p->set_line_width(2.0f);
-	p->set_line_dash({5, 2}, 0);
 	Array<vec2> cc;
 	for (float t=0; t<=1.0f; t+=0.025f)
 		cc.add(inter.get(t));
+	//p->set_color(color::interpolate(base_color, view->colors.background, 0.1f));
+	p->set_line_width(8.0f);
+	p->set_color(base_color.with_alpha(0.3f));
+	p->draw_lines(cc);
+	p->set_color(base_color);
+	p->set_line_width(2.0f);
+	p->set_line_dash({5, 2}, 0);
 	p->draw_lines(cc);
 	p->set_line_dash({}, 0);
 	p->set_line_width(1);

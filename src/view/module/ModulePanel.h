@@ -25,10 +25,6 @@ enum class ConfigPanelMode {
 	REPLACE = 32,
 	FIXED_WIDTH = 256,
 	FIXED_HEIGHT = 512,
-	DEFAULT_FIXED_WIDTH = PROFILES | ENABLE | FIXED_WIDTH,
-	DEFAULT_FIXED_HEIGHT = PROFILES | ENABLE | FIXED_HEIGHT,
-	DEFAULT_FREE = PROFILES | ENABLE,// | REPLACE,
-	CONFIG_PANEL = PROFILES
 };
 inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a & (int)b );

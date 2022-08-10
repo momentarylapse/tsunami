@@ -233,8 +233,8 @@ ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, 
 	//set_options("grid", "noexpandx");
 	//set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
 	//set_options("content", format("height=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
-	set_options("content", format("minheight=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
-	//set_options("content", "expandx,expandy");
+	//set_options("content", format("minheight=%d,expandx,expandy", CONFIG_PANEL_HEIGHT));
+	set_options("content", "expandx,expandy");
 	//set_options("grid", "noexpandy");
 
 	module->subscribe(this, [this] {

@@ -47,10 +47,10 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 	panel = p;
 	id_list = _id;
 	track = t;
-	module_panel_mode = ConfigPanelMode::DEFAULT_FIXED_WIDTH;
+	module_panel_mode = ConfigPanelMode::FIXED_WIDTH;
 	if (hexpand)
-		module_panel_mode = ConfigPanelMode::DEFAULT_FIXED_HEIGHT;
-	module_panel_mode = module_panel_mode | ConfigPanelMode::ENABLE | ConfigPanelMode::DELETE;
+		module_panel_mode = ConfigPanelMode::FIXED_HEIGHT;
+	module_panel_mode = module_panel_mode | ConfigPanelMode::PROFILES | ConfigPanelMode::ENABLE | ConfigPanelMode::DELETE;
 	assert(track);
 	event_ids.add(panel->event_x(id_list, "hui:select", [this] { on_select(); }));
 	event_ids.add(panel->event_x(id_list, "hui:change", [this] { on_edit(); }));

@@ -41,7 +41,7 @@ void PluginConsole::on_add_button() {
 
 void PluginConsole::on_add_plugin() {
 	auto *plugin = session->last_plugin;
-	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::DEFAULT_FIXED_WIDTH);
+	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FIXED_WIDTH | ConfigPanelMode::DELETE | ConfigPanelMode::PROFILES);
 	p->set_func_delete([this, plugin] { plugin->stop_request(); });
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);

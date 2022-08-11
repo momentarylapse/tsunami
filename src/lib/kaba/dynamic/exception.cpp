@@ -8,6 +8,7 @@
 #include "exception.h"
 #include "../kaba.h"
 #include "../../os/msg.h"
+#include "../../base/iter.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -64,7 +65,7 @@ struct StackFrameInfo {
 extern shared_array<Module> public_modules;
 
 inline void func_from_rip_test_module(StackFrameInfo &r, shared<Module> m, void *rip, bool from_package) {
-	foreachi (Function *f, m->syntax->functions, i) {
+	for (auto&& [i,f]: enumerate(m->syntax->functions)) {
 		if (from_package and !f->throws_exceptions())
 			continue;
 		int64 frip = f->address;
@@ -141,7 +142,7 @@ ExceptionBlockData get_blocks(shared<Module> s, Function *f, void* rip, const Cl
 
 	// walk through the blocks from inside to outside
 	Array<int> node_index;
-	foreachi (Block *b, ebd.blocks, bi) {
+	for (auto&& [bi,b]: enumerate(ebd.blocks)) {
 		ebd.needs_killing.add(b);
 
 		if (!b->parent)

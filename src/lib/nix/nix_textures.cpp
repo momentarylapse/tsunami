@@ -144,7 +144,7 @@ VolumeTexture::VolumeTexture(int w, int h, int _nz, const string &_format) : Tex
 
 Texture::~Texture() {
 	unload();
-	/*foreachi(auto t, textures, i)
+	/*for (auto [i, t]: textures)
 		if (t == this) {
 			textures.erase(i);
 			break;

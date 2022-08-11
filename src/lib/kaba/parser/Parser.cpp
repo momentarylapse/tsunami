@@ -3,6 +3,7 @@
 #include "../../os/msg.h"
 #include "../../base/set.h"
 #include "../../base/algo.h"
+#include "../../base/iter.h"
 #include "Parser.h"
 #include "template.h"
 
@@ -254,7 +255,7 @@ shared<Node> Parser::parse_abstract_operand_extension_call(shared<Node> link, Bl
 	auto node = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown);
 	node->set_num_params(params.num + 1);
 	node->set_param(0, link);
-	foreachi (auto p, params, i)
+	for (auto&& [i,p]: enumerate(params))
 		node->set_param(i + 1, p);
 
 	return node;
@@ -572,7 +573,7 @@ const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const C
 	auto c = const_cast<Class*>(tree->make_class("("+name+")", Class::Type::PRODUCT, size, -1, nullptr, classes, tree->_base_class.get(), token_id));
 	if (c->elements.num == 0) {
 		int offset = 0;
-		foreachi (auto &cc, classes, i) {
+		for (auto&& [i,cc]: enumerate(classes)) {
 			c->elements.add(ClassElement("e" + i2s(i), cc, offset));
 			offset += cc->size;
 		}
@@ -1720,7 +1721,7 @@ void Parser::post_process_newly_parsed_class(Class *_class, int size) {
 
 	// virtual functions?     (derived -> _class->num_virtual)
 //	_class->vtable = cur_virtual_index;
-	//foreach(ClassFunction &cf, _class->function)
+	//for (ClassFunction &cf, _class->function)
 	//	_class->num_virtual = max(_class->num_virtual, cf.virtual_index);
 	if (_class->vtable.num > 0) {
 		if (_class->parent) {
@@ -1815,13 +1816,13 @@ shared<Node> Parser::parse_and_eval_const(Block *block, const Class *type) {
 		type = cv->type;
 	}
 
-	cv = tree->transform_node(cv, [&] (shared<Node> n) {
-		return tree->conv_eval_const_func(n);
+	cv = tree->transform_node(cv, [this] (shared<Node> n) {
+		return tree->conv_eval_const_func(tree->conv_fake_constructors(n));
 	});
 
 	if (cv->kind != NodeKind::CONSTANT) {
 		//cv->show(TypeVoid);
-		do_error("constant value expected", cv);
+		do_error("constant value expected, but expression can not be evaluated at compile time", cv);
 	}
 	return cv;
 }

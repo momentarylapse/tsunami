@@ -6,6 +6,7 @@
  */
 
 #include "pdf.h"
+#include "../base/iter.h"
 #include "../image/image.h"
 #include "../image/Painter.h"
 #include "../math/rect.h"
@@ -348,7 +349,7 @@ public:
 		for (auto &m: map_tables) {
 			if (m.format == 6) {
 				//msg_write("----------------------- 666");
-				foreachi(auto &n, m.glyph_id_array, i)
+				for (auto&& [i,n]: enumerate(m.glyph_id_array))
 					map_code(n, m.first_code + i);
 			} else if (m.format == 4) {
 				//msg_write("----------------------- 444");
@@ -417,7 +418,7 @@ public:
 	void update_size() {
 		float scale = 1.0 / head.units_per_em._int();
 		float w = 0;
-		foreachi(auto &g, glyphs, i) {
+		for (auto&& [i,g]: enumerate(glyphs)) {
 			g.lsb = 0;
 			g.width = g.xmax - g.xmin;
 			if (i < lsb.num) {
@@ -787,7 +788,7 @@ void Parser::save(const Path &filename) {
 	int id_proc = mk_id();
 
 	// preparing fonts
-	foreachi(auto &fd, font_data, i) {
+	for (auto&&  [i,fd]: enumerate(font_data)) {
 		if (fd.true_type) {
 			auto ff = find_ttf(fd.name);
 			if (ff) {
@@ -836,7 +837,7 @@ void Parser::save(const Path &filename) {
 
 
 	// pages
-	foreachi(auto p, pages, i) {
+	for (auto&& [i,p]: enumerate(pages)) {
 		Array<string> font_refs;
 		for (auto &fd: font_data)
 			font_refs.add(format("%s %d 0 R", fd.internal_name, fd.id));
@@ -849,7 +850,7 @@ void Parser::save(const Path &filename) {
 	}
 
 	// streams
-	foreachi(auto p, pages, i) {
+	for (auto&& [i,p]: enumerate(pages)) {
 		write_obj(f, stream_id[i], mk_dict({format("/Length %d", p->content.num)}) + format("\nstream\n  BT\n%s  ET\nendstream", p->content));
 	}
 

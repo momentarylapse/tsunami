@@ -1,4 +1,5 @@
 #include "../../base/base.h"
+#include "../../base/iter.h"
 #include "../kaba.h"
 #include "../../os/msg.h"
 #include "Class.h"
@@ -558,7 +559,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 		// override?
 		Function *orig = nullptr;
 		int orig_index = -1;
-		foreachi (auto *ocf, weak(functions), i)
+		for (auto&& [i,ocf]: enumerate(weak(functions)))
 			if (member_func_override_match(f, ocf)) {
 				orig = ocf;
 				orig_index = i;

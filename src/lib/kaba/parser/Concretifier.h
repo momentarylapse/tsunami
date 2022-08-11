@@ -72,6 +72,7 @@ public:
 
 	shared_array<Node> turn_class_into_constructor(const Class *t, const shared_array<Node> &params, int token_id);
 	shared<Node> make_func_node_callable(const shared<Node> l);
+	shared<Node> match_template_params(const shared<Node> l, const shared_array<Node> &params, Block *block, const Class *ns);
 	shared<Node> make_func_pointer_node_callable(const shared<Node> l);
 	shared<Node> link_unary_operator(AbstractOperator *op, shared<Node> operand, Block *block, int token_id);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, shared<Node> cmd);

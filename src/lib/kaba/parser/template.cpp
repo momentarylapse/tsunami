@@ -10,6 +10,7 @@
 #include "Concretifier.h"
 #include "template.h"
 #include "../../os/msg.h"
+#include "../../base/iter.h"
 
 namespace kaba {
 
@@ -34,7 +35,7 @@ Function *TemplateManager::full_copy(Parser *parser, Function *f0) {
 		if (n->kind != NodeKind::BLOCK)
 			return n;
 		auto b = n->as_block();
-		foreachi (auto v, b->vars, vi) {
+		for (auto&& [vi,v]: enumerate(b->vars)) {
 			int i = weak(b->function->var).find(v);
 			//msg_write(i);
 			b->vars[vi] = f->var[i].get();
@@ -50,21 +51,62 @@ Function *TemplateManager::full_copy(Parser *parser, Function *f0) {
 }
 
 Function *TemplateManager::get_instantiated(Parser *parser, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
-	for (auto &t: templates)
-		if (t.func == f0) {
-			// already instanciated?
-			for (auto &i: t.instances)
-				if (i.params == params)
-					return i.f;
-			// new
-			Instance ii;
-			ii.f = instantiate(parser, t, params, block, ns, token_id);
-			ii.params = params;
-			t.instances.add(ii);
-			return ii.f;
+	auto &t = get_template(parser, f0, token_id);
+	
+	// already instanciated?
+	for (auto &i: t.instances)
+		if (i.params == params)
+			return i.f;
+	
+	// new
+	Instance ii;
+	ii.f = instantiate(parser, t, params, block, ns, token_id);
+	ii.params = params;
+	t.instances.add(ii);
+	return ii.f;
+}
+
+Function *TemplateManager::get_instantiated_matching(Parser *parser, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id) {
+	auto &t = get_template(parser, f0, token_id);
+
+	Array<const Class*> arg_types;
+	arg_types.resize(t.params.num);
+
+	auto set_match_type = [&arg_types, &t, parser, token_id] (const string &token, const Class *type) {
+		for (int j=0; j<t.params.num; j++)
+			if (token == t.params[j]) {
+				if (arg_types[j])
+					if (arg_types[j] != type)
+						parser->do_error(format("inconsistent template parameter: %s = %s  vs  %s", token, arg_types[j]->long_name(), type->long_name()), token_id);
+				arg_types[j] = type;
+				if (config.verbose)
+					msg_error("FOUND: " + token + " = " + arg_types[j]->name);
+			}
+	};
+
+	for (auto&& [i,p]: enumerate(weak(params))) {
+		//f0->abstract_param_types[i]->show();
+		if (f0->abstract_param_types[i]->kind == NodeKind::ABSTRACT_TOKEN) {
+			string token = f0->abstract_param_types[i]->as_token();
+			set_match_type(token, params[i]->type);
 		}
-	parser->do_error("INTERNAL: can not find template...", -1);
-	return nullptr;
+	}
+
+	for (auto t: arg_types)
+		if (!t)
+			parser->do_error("not able to match all template parameters", token_id);
+
+
+	return get_instantiated(parser, f0, arg_types, block, ns, token_id);
+}
+
+TemplateManager::Template &TemplateManager::get_template(Parser *parser, Function *f0, int token_id) {
+	for (auto &t: templates)
+		if (t.func == f0)
+			return t;
+
+	parser->do_error("INTERNAL: can not find template...", token_id);
+	return templates[0];
 }
 
 /*static const Class *concretify_type(shared<Node> n, Parser *parser, Block *block, const Class *ns) {

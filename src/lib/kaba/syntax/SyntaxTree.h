@@ -74,6 +74,7 @@ public:
 	void digest();
 	void convert_call_by_reference();
 	void map_local_variables_to_stack();
+	shared<Node> conv_fake_constructors(shared<Node> n);
 	shared<Node> conv_class_and_func_to_const(shared<Node> n);
 	shared<Node> conv_break_down_high_level(shared<Node> n, Block *b);
 	shared<Node> conv_break_down_low_level(shared<Node> c);

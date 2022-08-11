@@ -767,7 +767,7 @@ void BackendX86::add_stack_var(TempVar &v, SerialNodeParam &p) {
 
 	int s = mem_align(v.type->size, 4);
 //	msg_write(format("add stack var  %s %d   %d-%d       vs=%d", v.type->name.c_str(), v.type->size, v.first, v.last, cur_func->_var_size));
-//	foreachi(TempVar &t, temp_var, i)
+//	for (auto&& [i, t]: temp_var)
 //		if (&t == &v)
 //			msg_write("#" + i2s(i));
 
@@ -989,7 +989,7 @@ void BackendX86::resolve_deref_temp_and_local() {
 
 void BackendX86::scan_temp_var_usage() {
 	/*msg_write("ScanTempVarUsage");
-	foreachi(TempVar &v, temp_var, i) {
+	for (auto&& [i, v]: temp_var) {
 		v.first = -1;
 		v.last = -1;
 		v.usage_count = 0;

@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "serializer.h"
 #include "../../os/msg.h"
+#include "../../base/iter.h"
 
 #include "BackendAmd64.h"
 #include "BackendX86.h"
@@ -64,7 +65,7 @@ void Serializer::cmd_list_out(const string &stage, const string &comment, bool f
 		vr_list_out();
 	if (true) {
 		msg_write("-----------");
-		foreachi(TempVar &v, cmd.temp_var, i)
+		for (auto &&[i,v]: enumerate(cmd.temp_var))
 			msg_write(format("  %d   %d -> %d    %s   %s", i, v.first, v.last, v.type->name, v.referenced ? "-referenced-" : ""));
 		msg_write("--------------------------------");
 	}
@@ -358,7 +359,7 @@ int Serializer::temp_in_cmd(int c, int v) {
 
 void Serializer::scan_temp_var_usage() {
 	/*msg_write("ScanTempVarUsage");
-	foreachi(TempVar &v, temp_var, i) {
+	for (auto &&[i,v]: enumerate(temp_var)) {
 		v.first = -1;
 		v.last = -1;
 		v.usage_count = 0;
@@ -693,7 +694,7 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 	int s = mem_align(v.type->size, 4);
 	StackOccupation so;
 //	msg_write(format("add stack var  %s %d   %d-%d       vs=%d", v.type->name.c_str(), v.type->size, v.first, v.last, cur_func->_var_size));
-//	foreachi(TempVar &t, temp_var, i)
+//	for (auto&& [i,t]: temp_var)
 //		if (&t == &v)
 //			msg_write("#" + i2s(i));
 	so.create(this, (config.instruction_set != Asm::InstructionSet::ARM), cur_func->_var_size, v.first, v.last);
@@ -1067,7 +1068,7 @@ void Module::compile_functions(char *oc, int &ocs) {
 	}
 
 	// create assembler
-	foreachi(Function *f, syntax->functions, i) {
+	for (auto&& [i,f]: enumerate(syntax->functions)) {
 		func_offset.add(list->num);
 		if (!f->is_extern() and !f->is_template()) {
 			assemble_function(i, f, list);

@@ -2,6 +2,7 @@
 #include "../parser/Parser.h"
 #include "../asm/asm.h"
 #include "../../os/msg.h"
+#include "../../base/iter.h"
 #include <stdio.h>
 
 namespace kaba {
@@ -87,15 +88,16 @@ const Class *SyntaxTree::make_class_callable_bind(const Array<const Class*> &par
 
 	auto t = (Class*)make_class(format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, outer_params_ret, base_class, token_id);
 	int offset = t->size;
-	foreachi (auto b, captures, i) {
+	for (auto [i,b]: enumerate(captures)) {
 		if (!b)
 			continue;
+		auto c = b;
 		if (capture_via_ref[i])
-			b = b->get_pointer();
+			c = c->get_pointer();
 		if (type_needs_alignment(b))
 			offset = mem_align(offset, 4);
-		auto el = ClassElement(format("capture%d%s", i, capture_via_ref[i] ? "_ref" : ""), b, offset);
-		offset += b->size;
+		auto el = ClassElement(format("capture%d%s", i, capture_via_ref[i] ? "_ref" : ""), c, offset);
+		offset += c->size;
 		t->elements.add(el);
 	}
 	t->size = offset;
@@ -135,35 +137,31 @@ void SyntaxTree::digest() {
 
 	// turn vector(x,y,z) into vector._create(x,y,z)
 	// TODO make more universal! maybe general __create__() function as fake constructor?
-	transform([&](shared<Node> n){
-		if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
-			return n;
-		if ((n->type == TypeVec3) or (n->type == TypeVec2) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
-			return make_constructor_static(n, "_create");
-		}
-		if (n->type == TypeQuaternion) {
-			if (n->params.num == 2 and n->params[1]->type == TypeVec3)
-				return make_constructor_static(n, "_rotation_v");
-			if (n->params.num == 3 and n->params[1]->type == TypeVec3)
-				return make_constructor_static(n, "_rotation_a");
-			if (n->params.num == 2 and n->params[1]->type == TypeMat4)
-				return make_constructor_static(n, "_rotation_m");
-		}
-		return n;
+	transform([this] (shared<Node> n) {
+		return conv_fake_constructors(n);
 	});
 
-	transform([&](shared<Node> n){ return conv_class_and_func_to_const(n); });
+	transform([this] (shared<Node> n) {
+		return conv_class_and_func_to_const(n);
+	});
 
 	if (config.allow_simplify_consts)
 		eval_const_expressions(true);
 
-	transformb([&](shared<Node> n, Block* b){ return conv_break_down_high_level(n, b); });
+	transformb([this] (shared<Node> n, Block* b) {
+		return conv_break_down_high_level(n, b);
+	});
+	
 	if (config.verbose)
 		show("digest:break-high");
 
 
-	transform([&](shared<Node> n){ return conv_break_down_med_level(this, n); });
-	transform([&](shared<Node> n){ return conv_break_down_low_level(n); });
+	transform([this] (shared<Node> n) {
+		return conv_break_down_med_level(this, n);
+	});
+	transform([this] (shared<Node> n) {
+		return conv_break_down_low_level(n);
+	});
 	if (config.verbose)
 		show("digest:break-low");
 
@@ -176,7 +174,9 @@ void SyntaxTree::digest() {
 	if (config.verbose)
 		show("digest:pre-proc");
 
-	transform([&](shared<Node> n){ return conv_func_inline(n); });
+	transform([this] (shared<Node> n) {
+		return conv_func_inline(n);
+	});
 	if (config.verbose)
 		show("digest:inline");
 
@@ -955,7 +955,6 @@ void handle_insert_before(Block *block, int &i) {
 
 void SyntaxTree::transform_block(Block *block, std::function<shared<Node>(shared<Node>)> F) {
 	PUSH_BLOCK_INSERT;
-	//foreachi (shared<Node> n, block->nodes, i){
 	for (int i=0; i<block->params.num; i++) {
 		block->params[i] = transform_node(block->params[i], F);
 		handle_insert_before(block, i);
@@ -994,6 +993,23 @@ bool node_is_executable(shared<Node> n) {
 	if ((n->kind == NodeKind::ADDRESS_SHIFT) or (n->kind == NodeKind::ARRAY) or (n->kind == NodeKind::DYNAMIC_ARRAY) or (n->kind == NodeKind::REFERENCE) or (n->kind == NodeKind::DEREFERENCE) or (n->kind == NodeKind::DEREF_ADDRESS_SHIFT))
 		return node_is_executable(n->params[0]);
 	return true;
+}
+
+shared<Node> SyntaxTree::conv_fake_constructors(shared<Node> n) {
+	if (n->kind != NodeKind::CONSTRUCTOR_AS_FUNCTION)
+		return n;
+	if ((n->type == TypeVec3) or (n->type == TypeVec2) or (n->type == TypeColor) or (n->type == TypeRect) or (n->type == TypeComplex)) {
+		return make_constructor_static(n, "_create");
+	}
+	if (n->type == TypeQuaternion) {
+		if (n->params.num == 2 and n->params[1]->type == TypeVec3)
+			return make_constructor_static(n, "_rotation_v");
+		if (n->params.num == 3 and n->params[1]->type == TypeVec3)
+			return make_constructor_static(n, "_rotation_a");
+		if (n->params.num == 2 and n->params[1]->type == TypeMat4)
+			return make_constructor_static(n, "_rotation_m");
+	}
+	return n;
 }
 
 shared<Node> SyntaxTree::conv_class_and_func_to_const(shared<Node> n) {
@@ -1247,7 +1263,7 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 
 
 void MapLVSX86Return(Function *f, int64 &stack_offset) {
-	foreachi (auto v, f->var, i)
+	for (auto &v: f->var)
 		if (v->name == IDENTIFIER_RETURN_VAR) {
 			v->_offset = stack_offset;
 			stack_offset += config.pointer_size;
@@ -1255,7 +1271,7 @@ void MapLVSX86Return(Function *f, int64 &stack_offset) {
 }
 
 void MapLVSX86Self(Function *f, int64 &stack_offset) {
-	foreachi (auto v, f->var, i)
+	for (auto &v: f->var)
 		if (v->name == IDENTIFIER_SELF) {
 			v->_offset = stack_offset;
 			stack_offset += config.pointer_size;
@@ -1288,7 +1304,7 @@ void SyntaxTree::map_local_variables_to_stack() {
 					MapLVSX86Self(f, stack_offset);
 			}
 
-			foreachi (auto v, f->var, i) {
+			for (auto&& [i,v]: enumerate(weak(f->var))) {
 				if (!f->is_static() and (v->name == IDENTIFIER_SELF))
 					continue;
 				if (v->name == IDENTIFIER_RETURN_VAR)
@@ -1319,7 +1335,7 @@ void SyntaxTree::map_local_variables_to_stack() {
 				if (f->literal_return_type->uses_return_by_memory())
 					MapLVSX86Return(f, stack_offset);
 
-				foreachi(auto v, f->var, i) {
+				for (auto&& [i,v]: enumerate(weak(f->var))) {
 					if (!f->is_static() and (v->name == IDENTIFIER_SELF))
 						continue;
 					if (v->name == IDENTIFIER_RETURN_VAR)
@@ -1338,7 +1354,7 @@ void SyntaxTree::map_local_variables_to_stack() {
 				}
 			} else {
 				// TODO map push parameters...
-				foreachi (auto v, f->var, i) {
+				for (auto v: weak(f->var)) {
 					int64 s = mem_align(v->type->size, 4);
 					f->_var_size += s;
 					v->_offset = -f->_var_size;
@@ -1347,7 +1363,7 @@ void SyntaxTree::map_local_variables_to_stack() {
 		} else if (config.instruction_set == Asm::InstructionSet::ARM) {
 			f->_var_size = 0;
 
-			foreachi (auto v, f->var, i) {
+			for (auto v: weak(f->var)) {
 				int s = mem_align(v->type->size, 4);
 				v->_offset = f->_var_size;// + s;
 				f->_var_size += s;

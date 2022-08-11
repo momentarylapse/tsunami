@@ -6,6 +6,7 @@
  */
 
 #include "../../base/base.h"
+#include "../../base/iter.h"
 #include "../../os/msg.h"
 #include "asm.h"
 #include "internal.h"
@@ -1683,7 +1684,7 @@ void InstructionWithParamsList::add_instruction(char *oc, int &ocs, int n) {
 	// test if any instruction matches our wishes
 	int ninst = -1;
 	bool has_mod_rm = false;
-	foreachi(CPUInstruction &c, cpu_instructions[(int)iwp.inst], i)
+	for (auto&& [i,c]: enumerate(cpu_instructions[(int)iwp.inst]))
 		if (!c.ignore and c.match(iwp)) {
 			if ((!c.has_modrm and has_mod_rm) or (ninst < 0)) {
 				has_mod_rm = c.has_modrm;

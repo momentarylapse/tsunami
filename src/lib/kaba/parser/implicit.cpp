@@ -5,6 +5,7 @@
 #include "../syntax/SyntaxTree.h"
 #include <stdio.h>
 #include "../../os/msg.h"
+#include "../../base/iter.h"
 
 namespace kaba {
 
@@ -65,7 +66,7 @@ void AutoImplementer::auto_implement_add_child_constructors(shared<Node> n_self,
 	int i0 = t->parent ? t->parent->elements.num : 0;
 	if (allow_elements_from_parent)
 		i0 = 0;
-	foreachi(ClassElement &e, t->elements, i) {
+	for (auto&& [i,e]: enumerate(t->elements)) {
 		if (i < i0)
 			continue;
 		Function *ff = e.type->get_default_constructor();
@@ -114,7 +115,7 @@ void AutoImplementer::auto_implement_regular_constructor(Function *f, const Clas
 		auto_implement_add_child_constructors(self, f, t, true);
 
 		// element[] = param[]
-		foreachi(ClassElement &e, t->elements, i)
+		for (auto&& [i,e]: enumerate(t->elements))
 			if (!e.hidden()) {
 				auto param = add_node_local(f->__get_var(e.name));
 				auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, self->shift(e.offset, e.type), param);
@@ -238,7 +239,7 @@ void AutoImplementer::auto_implement_regular_destructor(Function *f, const Class
 
 		// call child destructors
 		int i0 = t->parent ? t->parent->elements.num : 0;
-		foreachi(ClassElement &e, t->elements, i) {
+		for (auto&& [i,e]: enumerate(t->elements)) {
 			if (i < i0)
 				continue;
 			Function *ff = e.type->get_destructor();
@@ -313,7 +314,7 @@ void AutoImplementer::auto_implement_regular_assign(Function *f, const Class *t)
 
 	// call child assignment
 	int i0 = t->parent ? t->parent->elements.num : 0;
-	foreachi(ClassElement &e, t->elements, i) {
+	for (auto&& [i,e]: enumerate(t->elements)) {
 		if (i < i0)
 			continue;
 		auto p = n_self->shift(e.offset, e.type);
@@ -873,7 +874,7 @@ void AutoImplementer::auto_implement_callable_bind_call(Function *f, const Class
 		}
 	}
 
-	foreachi(auto &p, params, i)
+	for (auto&& [i,p]: enumerate(params))
 		call->set_param(i+1, p);
 
 	if (f->literal_return_type == TypeVoid) {
@@ -892,7 +893,7 @@ Function *SyntaxTree::add_func_header(Class *t, const string &name, const Class 
 	Function *f = add_function(name, return_type, t, flags); // always member-function??? no...?
 	f->auto_declared = true;
 	f->token_id = t->token_id;
-	foreachi (auto &p, param_types, i) {
+	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
 		auto v = f->block->add_var(param_names[i], p);
 		flags_set(v->flags, Flags::CONST);

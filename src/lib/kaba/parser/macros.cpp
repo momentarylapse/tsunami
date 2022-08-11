@@ -107,7 +107,7 @@ void Parser::parse_macros(bool just_analyse) {
 			// replace by definition?
 			int num_defs_inserted = 0;
 			while (!Exp.end_of_line()) {
-				foreachi(Define &d, tree->defines, j) {
+				for ([auto&& [j,d]: enumerate(tree->defines)) {
 					if (Exp.cur == d.source) {
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						Exp.remove(Exp.cur_exp);

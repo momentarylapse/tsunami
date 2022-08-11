@@ -11,6 +11,7 @@
 #include "../syntax/Function.h"
 #include "../syntax/SyntaxTree.h"
 #include "../../base/base.h"
+#include "../../base/iter.h"
 #include "../../os/msg.h"
 
 namespace kaba {
@@ -76,7 +77,7 @@ void link_external(const string &name, void *pointer) {
 	auto names = name.explode(":");
 	string sname = decode_symbol_name(names[0]);
 	for (auto p: packages)
-		foreachi(Function *f, p->syntax->functions, i)
+		for (auto&& [i,f]: enumerate(p->syntax->functions))
 			if (f->cname(p->base_class()) == sname) {
 				if (names.num > 1)
 					if (name != function_link_name(f))

@@ -11,6 +11,7 @@
 #include "vec2.h"
 #include "quaternion.h"
 #include "../os/msg.h"
+#include "../base/iter.h"
 
 
 
@@ -238,7 +239,7 @@ template<class T>
 int Interpolator<T>::canonize(float &t)
 {
 	t = clamp(t, 0.0f, t_sum * 0.99999f);
-	foreachi(Part &p, part, i)
+	for (auto&& [i,p]: enumerate(part))
 		if ((t >= p.t0) && (t <= p.t0 + p.dt)){
 			t = (t - p.t0) / p.dt;
 			return i;
@@ -299,7 +300,7 @@ Array<T> Interpolator<T>::getList(Array<float> &t)
 	//print();
 	Array<T> r;
 	r.resize(t.num);
-	foreachi( float tt, t, i)
+	for (auto&& [i,tt]: enumerate(t))
 		r[i] = get(tt);
 	return r;
 }

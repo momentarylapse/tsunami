@@ -10,6 +10,7 @@
 
 #include "nix.h"
 #include "nix_common.h"
+#include "../base/iter.h"
 #include "../os/msg.h"
 
 
@@ -91,7 +92,7 @@ void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
 		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cube_face;
 	if (samples > 0)
 		target = GL_TEXTURE_2D_MULTISAMPLE;
-	foreachi (auto *t, weak(color_attachments), i) {
+	for (auto [i, t]: enumerate(weak(color_attachments))) {
 		//glNamedFramebufferTexture(frame_buffer, GL_COLOR_ATTACHMENT0 + i, t->texture, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, t->texture, 0);
 		draw_buffers.add(GL_COLOR_ATTACHMENT0 + (unsigned)i);

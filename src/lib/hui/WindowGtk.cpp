@@ -4,6 +4,7 @@
 #include "internal.h"
 #include "Toolbar.h"
 #include "../base/pointer.h"
+#include "../base/iter.h"
 #include "../os/time.h"
 #ifdef HUI_API_GTK
 
@@ -662,7 +663,7 @@ void Window::set_status_text(const string &str) {
 
 static Array<string> __info_bar_responses;
 static int make_info_bar_response(const string &id) {
-	foreachi (string &_id, __info_bar_responses, i)
+	for (auto&& [i,_id]: enumerate(__info_bar_responses))
 		if (_id == id)
 			return i + 1234;
 	__info_bar_responses.add(id);

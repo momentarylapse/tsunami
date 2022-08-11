@@ -6,6 +6,7 @@
  */
 #include "../kaba.h"
 #include "../asm/asm.h"
+#include "../../base/iter.h"
 #include "../../os/msg.h"
 #include <stdio.h>
 
@@ -426,7 +427,7 @@ shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int toke
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(inst);
-	foreachi (auto p, params, i)
+	for (auto&& [i,p]: enumerate(params))
 		c->set_param(i + 1, p);
 	return c;
 }

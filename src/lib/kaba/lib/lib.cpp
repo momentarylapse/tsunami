@@ -17,6 +17,7 @@
 #include "../../math/complex.h"
 #include "../../any/any.h"
 #include "../../base/callable.h"
+#include "../../base/iter.h"
 #include "../../os/msg.h"
 
 
@@ -368,7 +369,7 @@ void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable
 void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 	Class *c = const_cast<Class*>(ccc);
 	if (flags_has(flag, Flags::OVERRIDE)) {
-		foreachi(Function *ff, weak(c->functions), i)
+		for (auto&& [i, ff]: enumerate(weak(c->functions)))
 			if (ff->name == f->name) {
 				//msg_write("OVERRIDE");
 				c->functions[i] = f;
@@ -377,7 +378,7 @@ void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 		msg_error(format("could not override %s.%s", c->name, f->name));
 	} else {
 		// name alone is not enough for matching...
-		/*foreachi(ClassFunction &ff, c->functions, i)
+		/*for (auto&& [i,ff]: enumerate(c->functions))
 			if (ff.name == f.name) {
 				if (_class_override_num_params < 0 or _class_override_num_params == ff.param_types.num) {
 					msg_error("missing override " + c->name + "." + f.name);

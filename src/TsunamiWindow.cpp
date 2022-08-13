@@ -296,6 +296,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		add_button("!ignorefocus\\Open", 1, 0, "open");
 		add_button("!ignorefocus", 1, 0, "save");
 		set_image("save", "hui:save");
+		add_button("!ignorefocus", 1, 0, "undo");
+		set_image("undo", "hui:undo");
+		add_button("!ignorefocus", 1, 0, "redo");
+		set_image("redo", "hui:redo");
 
 		add_button("!ignorefocus", 4, 1, "mode-edit-check");
 		set_image("mode-edit-check", "hui:edit");

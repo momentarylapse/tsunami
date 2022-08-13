@@ -380,16 +380,13 @@ void hui_rm_event(Array<EventListener> &event, Control *c) {
 		hui_rm_event(event, cc);
 }
 
-
-void control_delete_rec(Control *c);
-
 void Panel::remove_control(const string &id) {
 	if (!_get_control_(id))
 		msg_error("REMOVE CONTROL - NOT FOUND: " + id);
 
 	apply_foreach(id, [this] (Control *c) {
 		hui_rm_event(event_listeners, c);
-		control_delete_rec(c);
+		c->parent->remove_child(c);
 	});
 }
 

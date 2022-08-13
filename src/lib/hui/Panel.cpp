@@ -78,26 +78,9 @@ Panel::~Panel() {
 		msg_error("hui.Panel deleted while still owned: " + id);
 	if (parent) {
 		// disconnect from parent panel -> no owners here!
-		/*for (int i=0; i<parent->children.num; i++)
-			if (parent->children[i] == this) {
-				parent->children.erase(i);
-			}*/
 		parent = nullptr;
 	}
-	DBDEL_X("children");
-	msg_right();
-	// make sure to remove child-panels first (otherwise their widgets would get deleted recursively)
-	// Controls are sometimes doubly-owned...
-	/*while (children.num > 0) {
-		children.pop();
-	}*/
-	msg_left();
 	DBDEL_X("root");
-
-	//if (root_control)
-	//	control_delete_rec(root_control.get());
-
-	DBDEL_X("x");
 	root_control = nullptr;
 
 	DBDEL_DONE();
@@ -112,8 +95,6 @@ void Panel::set_parent(Panel *_parent) {
 	if (parent)
 		_set_win(parent->win);
 }
-
-void control_delete_rec(Control *c);
 
 // might be executed repeatedly
 void Panel::_ClearPanel_() {

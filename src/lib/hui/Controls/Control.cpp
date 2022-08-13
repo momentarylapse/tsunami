@@ -86,43 +86,6 @@ void unset_widgets_rec(Control *c) {
 }
 
 
-// unlink from parent and panel
-void control_delete_rec(Control *c) {
-
-
-
-#if 0
-	DBDEL_START(i2s(c->type), c->id, c);
-
-	static int control_delete_level = 0;
-
-//	if (c->widget)
-//		g_signal_handlers_disconnect_by_data(c->widget, c);
-
-	DBDEL_X("children");
-	auto _children = c->children;
-	control_delete_level ++;
-	for (auto child: weak(_children))
-		control_delete_rec(child);
-	control_delete_level --;
-
-
-	if (c->parent and (control_delete_level == 0)) {
-		DBDEL_X("parent " + c->parent->id + " " + i2s(c->parent->type));
-		c->parent->remove_child(c);
-	}
-
-
-	c->widget = nullptr;
-	c->frame = nullptr;
-
-	DBDEL_X("rm");
-
-	//delete c;
-	DBDEL_DONE();
-#endif
-}
-
 Control::~Control() {
 	DBDEL_START(i2s(type), id, this);
 	if (widget)
@@ -137,71 +100,6 @@ Control::~Control() {
 		// -> calls control_unlink(this, c);
 
 	DBDEL_DONE();
-
-#if 0
-	DBDEL_START(i2s(type), id, this);
-	notify_set_del(this);
-
-#ifdef HUI_API_GTK
-	if (widget)
-		g_signal_handlers_disconnect_by_data(widget, this);
-	//if (widget)
-	//	gtk_widget_destroy(widget);
-	//unset_widgets_rec(this);
-#endif
-	DBDEL_X("children");
-	auto _children = children;
-	for (auto c: _children)
-		delete c;
-/*#if GTK_CHECK_VERSION(4,0,0)
-	if (parent) {
-		for (int i=0;i<parent->children.num;i++)
-			if (parent->children[i] == this)
-				parent->children.erase(i);
-	}
-#endif*/
-	//DBDEL_X("remove");
-
-
-
-	if (parent) {
-		DBDEL_X("parent " + parent->id + " " + i2s(parent->type));
-		if (parent->type == CONTROL_GRID)
-			((ControlGrid*)parent)->ControlGrid::remove_child(this);
-		else
-			parent->remove_child(this);
-	}
-
-
-	widget = nullptr;
-	frame = nullptr;
-
-#if 0
-
-	//msg_write("widget: " + p2s(widget));
-#ifdef HUI_API_GTK
-	if (widget and (type != CONTROL_CHECKBOX)) // switch bug.... not sure why...
-#if GTK_CHECK_VERSION(4,0,0)
-		//g_object_unref(widget);
-		//gtk_widget_unparent(get_frame());
-
-		if (parent) {
-			parent->remove_child(this);
-			for (int i=0;i<parent->children.num;i++)
-				if (parent->children[i] == this)
-					parent->children.erase(i);
-		}
-		// FIXME: probably still exists...
-#else
-		gtk_widget_destroy(widget);
-#endif
-
-	widget = nullptr;
-	//unset_widgets_rec(this);
-#endif
-#endif
-	DBDEL_DONE();
-#endif
 }
 
 #ifdef HUI_API_GTK

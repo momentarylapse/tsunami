@@ -46,4 +46,16 @@ public:
 	void save(Module *c, const string &name);
 
 	void select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
+
+
+
+	void set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite);
+	bool is_favorite(Session *session, ModuleCategory type, const string &name);
+
+	struct Favorite {
+		ModuleCategory type;
+		string name;
+		bool operator==(const Favorite&) const;
+	};
+	Array<Favorite> favorites;
 };

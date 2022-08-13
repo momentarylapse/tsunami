@@ -38,29 +38,35 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory 
 	for (string &g: ugroups)
 		set_string("list", g);
 
-	foreachi (Label &l, labels, i){
+	foreachi (Label &l, labels, i) {
 		int n = i;
+		auto ll = format("%s\\%s", l.name, session->plugin_manager->is_favorite(session, type, l.name) ? "\u2764" : "");
 		if (ugroups.num > 0) {
 			int r = ugroups.find(l.group);
-			add_child_string("list", r, l.name);
+			add_child_string("list", r, ll);
 		} else {
-			set_string("list", l.name);
+			set_string("list", ll);
 		}
 		if (l.name == old_name)
 			set_int("list", n);
 	}
+	expand("list", true);
 
-	event("hui:close", [=]{ request_destroy(); });
-	event_x("list", "hui:select", [=]{ on_list_select(); });
-	event("list", [=]{ on_select(); });
-	event("cancel", [=]{ request_destroy(); });
-	event("ok", [=]{ on_select(); });
+	event("hui:close", [this] { request_destroy(); });
+	event_x("list", "hui:select", [this] { on_list_select(); });
+	event("list", [this] { on_select(); });
+	event("toggle-favorite", [this] { on_toggle_favorite(); });
+	event("cancel", [this] { request_destroy(); });
+	event("ok", [this] { on_select(); });
 	enable("ok", false);
 }
 
 void ModuleSelectorDialog::on_list_select() {
 	int n = get_int("list") - ugroups.num;
 	enable("ok", n >= 0);
+	enable("toggle-favorite", n >= 0);
+	if (n >= 0)
+		check("toggle-favorite", session->plugin_manager->is_favorite(session, type, labels[n].name));
 }
 
 void ModuleSelectorDialog::on_select() {
@@ -69,4 +75,14 @@ void ModuleSelectorDialog::on_select() {
 		return;
 	_return = labels[n].name;
 	request_destroy();
+}
+
+void ModuleSelectorDialog::on_toggle_favorite() {
+	int n = get_int("list") - ugroups.num;
+	if (n < 0)
+		return;
+	auto &l = labels[n];
+	session->plugin_manager->set_favorite(session, type, l.name, is_checked("toggle-favorite"));
+
+	set_cell("list", ugroups.num + n, 1, session->plugin_manager->is_favorite(session, type, l.name) ? "\u2764" : "");
 }

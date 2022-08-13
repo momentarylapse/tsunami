@@ -1043,4 +1043,12 @@ void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCa
 	});
 }
 
+void PluginManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {
+	profiles->set_favorite(session, type, name, favorite);
+}
+
+bool PluginManager::is_favorite(Session *session, ModuleCategory type, const string &name) {
+	return profiles->is_favorite(session, type, name);
+}
+
 

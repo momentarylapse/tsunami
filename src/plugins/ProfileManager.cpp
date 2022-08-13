@@ -7,6 +7,7 @@
 
 #include "../module/Module.h"
 #include "../lib/base/pointer.h"
+#include "../lib/base/algo.h"
 #include "../lib/hui/hui.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/doc/xml.h"
@@ -41,6 +42,12 @@ void ProfileManager::load_from_file(const Path &filename, bool read_only, Sessio
 			ff.read_only = read_only;
 			set(ff);
 		}
+		auto *favs = root.find("favorites");
+		if (!favs)
+			return;
+		for (auto &e: favs->elements) {
+			favorites.add({Module::category_from_str(e.value("category")), e.value("name")});
+		}
 	} catch (Exception &e) {
 		session->e("loading profile: " + e.message());
 	}
@@ -57,9 +64,13 @@ void ProfileManager::save(Session *session) {
 	try {
 		xml::Parser p;
 		xml::Element root("profiles");
+
+		// head
 		xml::Element hh("head");
 		hh.add_attribute("version", "1.0");
 		root.add(hh);
+
+		// profiles
 		xml::Element mm("list");
 		for (auto &ff: profiles)
 			if (!ff.read_only) {
@@ -72,6 +83,17 @@ void ProfileManager::save(Session *session) {
 				mm.add(e);
 			}
 		root.add(mm);
+
+		// favorites
+		xml::Element favs("favorites");
+		for (auto &ff: favorites) {
+				xml::Element e("favorite");
+				e.add_attribute("category", Module::category_to_str(ff.type));
+				e.add_attribute("name", ff.name);
+				favs.add(e);
+			}
+		root.add(favs);
+
 		p.elements.add(root);
 		p.save(tsunami->directory << "profiles.xml");
 	} catch (Exception &e) {
@@ -185,4 +207,30 @@ void ProfileManager::select_name(hui::Window *win, Module *c, bool save, std::fu
 	hui::fly(dlg, [dlg, cb] {
 		cb(dlg->selection);
 	});
+}
+
+bool ProfileManager::Favorite::operator==(const Favorite &o) const {
+	return (type == o.type) and (name == o.name);
+}
+
+void ProfileManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {
+	if (!loaded)
+		load(session);
+	Favorite x = {type, name};
+	int index = find_index(favorites, x);
+	if (favorite) {
+		if (index < 0)
+			favorites.add(x);
+	} else {
+		if (index >= 0)
+			favorites.erase(index);
+	}
+	save(session);
+}
+
+bool ProfileManager::is_favorite(Session *session, ModuleCategory type, const string &name) {
+	if (!loaded)
+		load(session);
+	Favorite x = {type, name};
+	return find_index(favorites, x) >= 0;
 }

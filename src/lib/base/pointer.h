@@ -65,7 +65,13 @@ public:
 	T &operator *() {
 		return *_p;
 	}
+	const T &operator *() const {
+		return *_p;
+	}
 	T *operator ->() {
+		return _p;
+	}
+	const T *operator ->() const {
 		return _p;
 	}
 	void operator=(T *o) {
@@ -273,26 +279,6 @@ public:
 template <class T>
 using shared_array = Array<shared<T>>;
 
-template <class T>
-class shared_arraywwww : public Array<shared<T>> {
-public:
-	/*shared_array() : Array<shared<T>>::Array() {}
-	shared_array(const shared_array &a) : Array<shared<T>>::Array(a) {}
-	shared_array(shared_array &&a) : Array<shared<T>>::Array(a) {}
-	shared_array(std::initializer_list<shared<T>> il) : shared_array() {
-		this->resize(il.size());
-		auto it = il.begin();
-		for (int i=0; i<this->num; i++)
-			(*this)[i] = *(it++);
-
-	}*/
-	const Array<T*> &weak() const {
-		return *(Array<T*>*)this;
-	}
-	const Array<T*> &weak() {
-		return *(Array<T*>*)this;
-	}
-};
 
 template <class T>
 const Array<T*> &weak(const shared_array<T> &a) {
@@ -304,113 +290,6 @@ Array<T*> &weak(shared_array<T> &a) {
 	return *(Array<T*>*)&a;
 }
 
-#if 0
-template <class T>
-class shared_array : public Array<T*> {
-public:
-	shared_array() {
-	}
-	shared_array(const shared_array<T> &o) {
-		pdb("+shared[] s[]");
-		append(o);
-	}
-	shared_array(std::initializer_list<T*> il) {
-		pdb("+shared[] {}");
-		Array<T*>::init(sizeof(T));
-		Array<T*>::resize(il.size());
-		auto it = il.begin();
-		for (int i=0; i<Array<T*>::num; i++) {
-			(*it)->_pointer_ref();
-			(*this)[i] = *(it++);
-		}
-
-	}
-	~shared_array() {
-		pdb("-shared[]");
-		clear();
-	}
-	void clear() {
-		pdb("shared[] clear");
-		for (T *p: *this) {
-			p->_pointer_unref();
-			if (!p->_has_pointer_refs())
-				delete p;
-		}
-		Array<T*>::clear();
-	}
-	void resize(int size) {
-		for (int i=size; i<this->num; i++) {
-			auto p = (*this)[i];
-			p->_pointer_unref();
-			if (!p->_has_pointer_refs())
-				delete p;
-		}
-		Array<T*>::resize(size);
-	}
-	void add(T *p) {
-		pdb("shared[] add");
-		p->_pointer_ref();
-		Array<T*>::add(p);
-	}
-	void insert(T *p, int index) {
-		pdb("shared[] insert");
-		p->_pointer_ref();
-		Array<T*>::insert(p, index);
-	}
-	void add(const shared<T> p) {
-		pdb("shared[] adds");
-		add(p.get());
-	}
-	void insert(const shared<T> p, int index) {
-		pdb("shared[] inserts");
-		insert(p.get(), index);
-	}
-	/*void append(const shared_array<T> &o) {
-		pdb("shared[] append shared");
-		for (T *p: o)
-			p->_pointer_ref();
-		Array<T*>::append(o);
-	}*/
-	void append(const Array<T*> &o) {
-		pdb("shared[] append");
-		for (T *p: o)
-			p->_pointer_ref();
-		Array<T*>::append(o);
-	}
-	void erase(int index) {
-		pdb("shared[] erase");
-		auto p = (*this)[index].get();
-		p->_pointer_unref();
-		if (!p->_has_pointer_refs())
-			delete p;
-		Array<T*>::erase(index);
-	}
-	shared<T> pop() {
-		pdb("shared[] pop");
-		shared<T> p;
-		p.set(Array<T*>::pop());
-		p->_pointer_unref();
-		return p;
-	}
-	void operator = (const Array<T*> &a) {
-		pdb("shared[] = []");
-		clear();
-		append(a);
-	}
-	void operator = (const shared_array<T> &a) {
-		pdb("shared[] = shared[]");
-		clear();
-		append(a);
-	}
-	shared<T> &operator[] (int index) const {
-		return ((shared<T>*)this->data)[index];
-	}
-	shared<T> &back() {
-		return ((shared<T>*)this->data)[this->num - 1];
-	}
-};
-
-#endif
 
 
 #endif /* SRC_LIB_BASE_POINTER_H_ */

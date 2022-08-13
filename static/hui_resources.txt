@@ -3063,7 +3063,7 @@ Grid
 2
 TreeView
 list
-nobar
+format=tt,nobar
 0
 0
 0
@@ -3072,7 +3072,7 @@ Grid
 buttonbar
 0
 1
-2
+3
 Button
 cancel
 
@@ -3083,6 +3083,12 @@ Button
 ok
 default
 0
+1
+0
+ToggleButton
+toggle-favorite
+
+1
 1
 0
 # Resource
@@ -7382,7 +7388,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-655
+656
 # Text
 /bars-add
 Add bars...
@@ -7856,11 +7862,14 @@ configurable-selection-dialog/configurable-selection-dialog
 Module
 
 configurable-selection-dialog/list
-Name
+Name\\Favorite
 
 configurable-selection-dialog/ok
 Select
 
+configurable-selection-dialog/toggle-favorite
+❤
+Add to favorites or remove
 configurable_dialog/load_favorite
 
 load parameter

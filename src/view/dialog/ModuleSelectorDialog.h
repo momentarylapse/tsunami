@@ -18,6 +18,7 @@ public:
 	ModuleSelectorDialog(hui::Window *_parent, ModuleCategory type, Session *session, const string &old_name = "");
 
 	void on_list_select();
+	void on_toggle_favorite();
 	void on_select();
 
 	ModuleCategory type;

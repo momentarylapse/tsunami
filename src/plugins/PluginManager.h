@@ -75,6 +75,9 @@ public:
 	shared<kaba::Module> package;
 	kaba::Class *get_class(const string &name);
 
+	void set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite);
+	bool is_favorite(Session *session, ModuleCategory type, const string &name);
+
 private:
 	void find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleCategory type);
 	void find_plugins_in_dir(const Path &rel, const string &group, ModuleCategory type);

@@ -2,5 +2,11 @@ Dialog plugin-console "Plugins" width=300 height=200
 	Grid main-grid "" expany
 		Scroller scroller "" hidden
 			Grid panel-grid ""
+		Label no-plugins-label "no plugins active" angle=90 italic width=40 expandy
 		Button add "" expandy noexpandx image=hui:add "tooltip=add plugin" width=80
-		Label no-plugins-label "no plugins yet" angle=90 italic width=40 expandy
+		Grid ? "" expandx
+		Grid favorite-grid ""
+			Label ? "" expandy
+			---|
+			Label favorite-label "❤" center width=40 height=40 disabled
+

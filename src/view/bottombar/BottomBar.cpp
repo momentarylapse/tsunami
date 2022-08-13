@@ -65,6 +65,8 @@ void BottomBar::on_close() {
 }
 
 void BottomBar::_show() {
+	if (!visible and active_console)
+		active_console->on_enter();
 	expand("revealer", true);
 	visible = true;
 	if (active_console)
@@ -75,8 +77,10 @@ void BottomBar::_show() {
 void BottomBar::_hide() {
 	expand("revealer", false);
 	visible = false;
-	if (active_console)
+	if (active_console) {
 		active_console->hide();
+		active_console->on_leave();
+	}
 	notify();
 }
 
@@ -101,13 +105,18 @@ void BottomBar::on_choose() {
 }
 
 void BottomBar::choose(BottomBar::Console *console) {
-	if (active_console)
+	if (active_console) {
+		if (visible)
+			active_console->on_leave();
 		active_console->hide();
+	}
 
 	active_console = console;
 
-	if (visible)
+	if (visible) {
 		active_console->show();
+		active_console->on_enter();
+	}
 	set_int("choose", index(active_console));
 
 	notify();

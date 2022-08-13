@@ -48,6 +48,8 @@ public:
 		BottomBar *bar(){ return dynamic_cast<BottomBar*>(parent); }
 
 
+		virtual void on_enter() {}
+		virtual void on_leave() {}
 		void blink();
 		bool notify;
 	};

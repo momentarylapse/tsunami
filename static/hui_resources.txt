@@ -3412,7 +3412,7 @@ main-grid
 expany
 0
 0
-3
+5
 Scroller
 scroller
 hidden
@@ -3425,17 +3425,41 @@ panel-grid
 0
 0
 0
-Button
-add
-expandy,noexpandx,image=hui:add,width=80
-1
-0
-0
 Label
 no-plugins-label
 angle=90,italic,width=40,expandy
+1
+0
+0
+Button
+add
+expandy,noexpandx,image=hui:add,width=80
 2
 0
+0
+Grid
+?
+expandx
+3
+0
+0
+Grid
+favorite-grid
+
+4
+0
+2
+Label
+?
+expandy
+0
+0
+0
+Label
+favorite-label
+center,width=40,height=40,disabled
+0
+1
 0
 # Resource
 Menu
@@ -7394,7 +7418,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-657
+658
 # Text
 /bars-add
 Add bars...
@@ -8611,8 +8635,11 @@ Duration
 plugin-console/add
 
 add plugin
+plugin-console/favorite-label
+❤
+
 plugin-console/no-plugins-label
-no plugins yet
+no plugins active
 
 plugin-console/plugin-console
 Plugins

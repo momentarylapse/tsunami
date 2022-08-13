@@ -10,6 +10,7 @@
 #include "../../Session.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../plugins/PluginManager.h"
+#include "../../lib/base/algo.h"
 
 
 PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
@@ -32,10 +33,17 @@ PluginConsole::~PluginConsole() {
 		unembed(p);
 }
 
+void PluginConsole::on_enter() {
+	update_favotites();
+}
+
 void PluginConsole::on_add_button() {
 	session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, [this] (const string &name) {
 		if (name != "")
 			session->execute_tsunami_plugin(name);
+		
+		// TODO: have PluginManager send notifications...?
+		update_favotites();
 	});
 }
 
@@ -51,13 +59,36 @@ void PluginConsole::on_add_plugin() {
 }
 
 void PluginConsole::on_remove_plugin() {
-	foreachi (auto *p, weak(panels), i)
-		if (p->socket.module == session->last_plugin) {
-			unembed(p);
-			panels.erase(i);
-			break;
-		}
+	int index = find_index_if(weak(panels), [this] (ModulePanel* p) { return p->socket.module == session->last_plugin; });
+	if (index >= 0) {
+		unembed(weak(panels)[index]);
+		panels.erase(index);
+	}
 	hide_control("no-plugins-label", panels.num > 0);
 	hide_control("scroller", panels.num == 0);
 }
 
+void PluginConsole::update_favotites() {
+	// remove old ones
+	for (auto&& [id, h]: favorite_buttons) {
+		remove_event_handler(h);
+		remove_control(id);
+	}
+	favorite_buttons.clear();
+
+	// add new
+	auto list = session->plugin_manager->find_module_sub_types(ModuleCategory::TSUNAMI_PLUGIN);
+	set_target("favorite-grid");
+	int index = 0;
+	for (auto &p: list)
+		if (session->plugin_manager->is_favorite(session, ModuleCategory::TSUNAMI_PLUGIN, p)) {
+			string name = p;
+			string id = format("favorite-button-%d", index);
+			add_button("!flat,height=40,big\\" + p.head(1), 0, index+2, id);
+			set_tooltip(id, format("Favorite: %s", name));
+			int h = event(id, [this,name] { session->execute_tsunami_plugin(name); });
+			favorite_buttons.add({id, h});
+			index ++;
+		}
+	hide_control("favorite-grid", favorite_buttons.num == 0);
+}

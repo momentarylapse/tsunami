@@ -19,16 +19,23 @@ public:
 	PluginConsole(Session *session, BottomBar *bar);
 	~PluginConsole() override;
 
+	void on_enter() override;
+
 	void on_add_button();
 
 	void on_add_plugin();
 	void on_remove_plugin();
 
-	void load_data();
+	void update_favotites();
 
 	shared_array<ModulePanel> panels;
 	int next_x;
-	//ConfigPanel *big_panel;
+
+	struct FavoriteButtonData {
+		string id;
+		int handler;
+	};
+	Array<FavoriteButtonData> favorite_buttons;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_PLUGINCONSOLE_H_ */

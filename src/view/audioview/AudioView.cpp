@@ -959,7 +959,7 @@ void AudioView::update_onscreen_displays() {
 	bottom_bar_expand_button->hidden = true;
 
 	if (session->win->bottom_bar)
-		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
+		if (!session->win->bottom_bar->visible) {
 			peak_meter_display->hidden = !is_playback_active();
 			output_volume_dial->hidden = !is_playback_active();
 			bottom_bar_expand_button->hidden = false;

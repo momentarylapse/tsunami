@@ -62,6 +62,7 @@ Menu menu ""
 			Item view-midi-classical "Classical" checkable
 		Item /show-mixing-console "Mixing" checkable
 		Item show-signal-chain "Signal chain" checkable
+		Item show-plugin-console "Plugins" checkable
 		Item show-fx-console "Effects"
 		Separator
 		Menu /menu-view-zoom "Zoom"

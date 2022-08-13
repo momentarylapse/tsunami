@@ -210,6 +210,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	add_action_checkable("show-mixing-console");
 	event("show-mixing-console", [this]{ on_mixing_console(); });
 	set_key_code("show-mixing-console", hui::KEY_CONTROL + hui::KEY_M);
+	add_action_checkable("show-plugin-console");
+	event("show-plugin-console", [this]{ on_plugin_console(); });
+	set_key_code("show-plugin-console", hui::KEY_CONTROL + hui::KEY_P);
 	event("show-devices", [this]{ on_settings(); });
 	add_action_checkable("show-signal-chain");
 	event("show-signal-chain", [this]{ session->set_mode(EditMode::XSignalEditor); });
@@ -946,6 +949,10 @@ void TsunamiWindow::on_mixing_console() {
 	bottom_bar->toggle(BottomBar::MIXING_CONSOLE);
 }
 
+void TsunamiWindow::on_plugin_console() {
+	bottom_bar->toggle(BottomBar::PLUGIN_CONSOLE);
+}
+
 void TsunamiWindow::on_fx_console() {
 	session->set_mode(EditMode::DefaultFx);
 }
@@ -1140,6 +1147,7 @@ void TsunamiWindow::update_menu() {
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
 	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_EDITOR));
+	check("show-plugin-console", bottom_bar->is_active(BottomBar::PLUGIN_CONSOLE));
 	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
 
 	string title = title_filename(song->filename) + " - " + AppName;

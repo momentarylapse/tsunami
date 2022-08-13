@@ -6,6 +6,7 @@
  */
 
 #include "FormatSoundFont2.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/os/file.h"
 #include "../../lib/os/formatter.h"
 #include "../../lib/os/msg.h"
@@ -45,7 +46,7 @@ int sec_to_samples(Session *s, float t) {
 
 void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zone_start, int zone_end, const Array<FormatSoundFont2::sfGenerator> &generators) {
 	Any azs;
-	foreachi (auto &z, zones, ii) {
+	for (auto&& [ii,z]: enumerate(zones)) {
 		if (ii >= zone_start and ii < zone_end) {
 			int start = 0;
 			int end = 0;

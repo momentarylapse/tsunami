@@ -141,7 +141,7 @@ Range BarCollection::range() const {
 
 void BarCollection::_update_offsets() {
 	int pos = 0;
-	foreachi(Bar *b, weak(*this), i) {
+	for (Bar *b: weak(*this)) {
 		b->offset = pos;
 		pos += b->length;
 	}

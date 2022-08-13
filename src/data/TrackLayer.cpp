@@ -30,6 +30,8 @@
 #include "../action/track/marker/ActionTrackEditMarker.h"
 //#include "../Plugins/PluginManager.h"
 //#include "../Tsunami.h"
+#include "../lib/base/iter.h"
+#include "../lib/base/algo.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
 
@@ -73,10 +75,7 @@ Song *TrackLayer::song() const {
 int TrackLayer::version_number() const {
 	if (!track)
 		return 0;
-	foreachi (TrackLayer *l, weak(track->layers), i)
-		if (l == this)
-			return i;
-	return 0;
+	return find_index(weak(track->layers), const_cast<TrackLayer*>(this));
 }
 
 Array<Range> TrackLayer::active_version_ranges() const {
@@ -218,7 +217,7 @@ void TrackLayer::midi_note_set_flags(MidiNote *note, int flags) {
 }
 
 void TrackLayer::delete_midi_note(const MidiNote *note) {
-	foreachi(MidiNote *n, weak(midi), index)
+	for (auto&& [index,n]: enumerate(weak(midi)))
 		if (n == note)
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
@@ -229,7 +228,7 @@ const TrackMarker *TrackLayer::add_marker(const TrackMarker *marker) {
 }
 
 void TrackLayer::delete_marker(const TrackMarker *marker) {
-	foreachi(const TrackMarker *m, weak(markers), index)
+	for (auto&& [index,m]: enumerate(weak(markers)))
 		if (m == marker)
 			track->song->execute(new ActionTrackDeleteMarker(this, index));
 }

@@ -900,7 +900,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 shared<Node> SyntaxTree::transform_node(shared<Node> n, std::function<shared<Node>(shared<Node>)> F) {
 	if (n->kind == NodeKind::BLOCK) {
 		transform_block(n->as_block(), F);
-		return n;
+		return F(n);
 	} else {
 		shared<Node> r = n;
 		for (int i=0; i<n->params.num; i++) {

@@ -9,7 +9,6 @@
 #define SRC_DATA_SAMPLE_H_
 
 #include "midi/MidiData.h"
-#include "../lib/math/rect.h"
 #include "../lib/base/pointer.h"
 #include "../stuff/Observable.h"
 #include "audio/AudioBuffer.h"

@@ -9,6 +9,7 @@
 #include "Instrument.h"
 #include "../SongSelection.h"
 #include "../../lib/hui/language.h"
+#include "../../lib/base/iter.h"
 #include <math.h>
 
 const float MIDDLE_A_DEFAULT_FREQ = 440.0f;
@@ -257,7 +258,7 @@ void MidiEventBuffer::sanify(const Range &r) {
 	sort();
 
 	// analyze
-	foreachi(MidiEvent &e, *this, i) {
+	for (auto&& [i,e]: enumerate(*this)) {
 		int p = e.pitch;
 
 		// out of range
@@ -442,7 +443,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 			if (!exists)
 				start_events.add(e);
 		} else {
-			foreachi(MidiEvent &bb, start_events, i)
+			for (auto&& [i,bb]: enumerate(start_events))
 				if ((int)bb.pitch == (int)e.pitch) {
 					MidiNote *n = new MidiNote(RangeTo(bb.pos, e.pos), bb.pitch, bb.volume);
 					n->flags = bb.flags;

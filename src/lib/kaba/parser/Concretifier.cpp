@@ -1500,9 +1500,11 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		return concretify_array(node, block, ns);
 	} else if (node->kind == NodeKind::TUPLE) {
 		concretify_all_params(node, block, ns);
+		// NOT specifying the type
 		return node;
 	} else if (node->kind == NodeKind::ARRAY_BUILDER) {
 		concretify_all_params(node, block, ns);
+		// NOT specifying the type
 		return node;
 	} else if (node->kind == NodeKind::DICT_BUILDER) {
 		concretify_all_params(node, block, ns);
@@ -1512,6 +1514,7 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 			if (node->params[p]->kind != NodeKind::CONSTANT)
 				do_error("key needs to be a compile-time constant", node->params[p]);
 		}
+		// NOT specifying the type
 		return node;
 	} else if (node->kind == NodeKind::FUNCTION) {
 		return node;
@@ -1860,7 +1863,7 @@ void Concretifier::concretify_function_header(Function *f) {
 	f->literal_param_type.resize(f->abstract_param_types.num);
 	for (auto&& [i,at]: enumerate(weak(f->abstract_param_types))) {
 		auto t = concretify_as_type(at, block, f->name_space);
-		auto v = f->var[i];
+		auto v = f->var[i].get();
 		v->type = t;
 		f->literal_param_type[i] = t;
 

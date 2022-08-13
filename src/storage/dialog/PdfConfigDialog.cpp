@@ -10,6 +10,7 @@
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
+#include "../../lib/base/iter.h"
 
 PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent) :
 	hui::Dialog("pdf export config", 200, 100, parent, false)
@@ -31,7 +32,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	add_spin_button("!expandx", 1, 0, "scale");
 	add_label("%", 2, 0, "");
 	set_target("tracks");
-	foreachi(Track *t, weak(song->tracks), i){
+	for (auto&& [i,t]: enumerate(weak(song->tracks))){
 		if (t->type != SignalType::MIDI)
 			continue;
 		add_label(t->nice_name(), 0, i, "");
@@ -56,7 +57,7 @@ void PdfConfigDialog::on_close() {
 void PdfConfigDialog::on_ok() {
 	ok = true;
 	Any ats;
-	foreachi(Track *t, weak(song->tracks), i){
+	for (auto&& [i,t]: enumerate(weak(song->tracks))){
 		if (t->type != SignalType::MIDI)
 			continue;
 		Any at;

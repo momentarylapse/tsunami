@@ -147,7 +147,7 @@ public:
 void clear_nodes(Array<Node*> &nodes);
 void clear_nodes(Array<Node*> &nodes, Node *keep);
 
-shared<Node> cp_node(shared<Node> c);
+shared<Node> cp_node(shared<Node> c, Block *parent_block = nullptr);
 
 Array<const Class*> node_extract_param_types(const shared<Node> n);
 bool node_is_member_function_with_instance(shared<Node> n);

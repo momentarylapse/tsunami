@@ -39,6 +39,8 @@ private:
 	static Function *full_copy(Parser *parser, Function *f0);
 	static shared<Node> node_replace(Parser *parser, shared<Node> n, const Array<string> &names, const Array<const Class*> &params);
 	static Function *instantiate(Parser *parser, Template &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
+
+	static void match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f);
 };
 
 }

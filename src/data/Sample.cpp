@@ -8,7 +8,7 @@
 #include "Sample.h"
 #include "SampleRef.h"
 #include "base.h"
-#include "../lib/math/math.h"
+#include "../lib/base/algo.h"
 #include "Song.h"
 #include <assert.h>
 
@@ -61,10 +61,7 @@ void Sample::__init__(const string &_name, const AudioBuffer &_buf) {
 int Sample::get_index() const {
 	if (!owner)
 		return -1;
-	foreachi(auto s, owner->samples, i)
-		if (this == s)
-			return i;
-	return -1;
+	return find_index(weak(owner->samples), const_cast<Sample*>(this));
 }
 
 Range Sample::range() const {

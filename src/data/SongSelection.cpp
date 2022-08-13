@@ -14,6 +14,7 @@
 #include "TrackLayer.h"
 #include "TrackMarker.h"
 #include "SampleRef.h"
+#include "../lib/base/iter.h"
 
 SongSelection::SongSelection() {
 	song = nullptr;
@@ -123,7 +124,7 @@ void SongSelection::_update_bars(Song* s) {
 		return;
 
 	int pos = 0;
-	foreachi(Bar *b, weak(s->bars), i) {
+	for (Bar *b: weak(s->bars)) {
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
 		if (r.overlaps(range()))
@@ -188,7 +189,7 @@ bool SongSelection::is_empty() const {
 
 Array<int> SongSelection::bar_indices(Song *song) const {
 	Array<int> indices;
-	foreachi(Bar *b, weak(song->bars), i)
+	for (auto&& [i,b]: enumerate(weak(song->bars)))
 		if (has(b))
 			indices.add(i);
 	return indices;

@@ -24,6 +24,7 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Session.h"
+#include "../lib/base/iter.h"
 #include "../lib/hui/hui.h"
 #include "../lib/os/filesystem.h"
 #include "../view/helper/Progress.h"
@@ -261,7 +262,7 @@ void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, con
 		if ((f->flags & flags) == flags){
 			filter += "|";
 			filter_show += "|" + f->description + " (";
-			foreachi(string &e, f->extensions, i) {
+			for (auto&& [i,e]: enumerate(f->extensions)) {
 				if (i > 0) {
 					filter += ";";
 					filter_show += ", ";

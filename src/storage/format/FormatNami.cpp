@@ -23,6 +23,7 @@
 #include "../../module/audio/AudioEffect.h"
 #include "../../module/midi/MidiEffect.h"
 #include "../../module/synthesizer/Synthesizer.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/os/file.h"
 #include "../../lib/os/formatter.h"
 #include "../../lib/doc/chunked.h"
@@ -519,7 +520,7 @@ public:
 		f->read_int(); // reserved
 
 		int unended = -1;
-		foreachi(MidiNote *n, weak(*parent), i)
+		for (auto&& [i,n]: enumerate(weak(*parent)))
 			if ((n->pitch == e.pitch) and (n->range.length == -1))
 				unended = i;
 
@@ -781,7 +782,7 @@ public:
 	}
 	void write(BinaryFormatter *f) override {
 		int n = 0;
-		foreachi(TrackLayer *l, weak(parent->layers), i)
+		for (auto&& [i,l]: enumerate(weak(parent->layers)))
 			if (l == me)
 				n = i;
 		f->write_int(n);
@@ -1147,7 +1148,7 @@ void FormatNami::save_song(StorageOperationData *od) {
 
 
 void check_empty_subs(Song *a) {
-	/*foreach(Track *t, a->track)
+	/*for (t: a->track)
 		foreachib(Track *s, t->sub, i)
 			if (s->length <= 0) {
 				tsunami->log->Error("empty sub: " + s->name);

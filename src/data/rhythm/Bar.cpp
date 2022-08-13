@@ -7,6 +7,7 @@
 
 #include "Bar.h"
 #include "Beat.h"
+#include "../../lib/base/iter.h"
 
 // MidiData.cpp
 string i2s_small(int i);
@@ -109,7 +110,7 @@ Array<Beat> Bar::get_beats(int offset, bool include_sub_beats, int sub_beat_part
 	int sub_beat_length = length / (total_sub_beats * sub_beat_partition);
 	int level = 0;
 	int pos_beat = offset;
-	foreachi (int bb, beats, beat_index) {
+	for (auto&& [beat_index, bb]: enumerate(beats)) {
 		int sub_beats = bb * sub_beat_partition;
 		int beat_length = sub_beat_length * sub_beats;
 

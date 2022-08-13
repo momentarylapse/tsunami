@@ -49,7 +49,9 @@
 #include "../module/audio/AudioEffect.h"
 #include "../plugins/PluginManager.h"
 //#include "../Tsunami.h"
-#include "../lib/hui/hui.h"
+#include "../lib/base/iter.h"
+#include "../lib/base/algo.h"
+#include "../lib/hui/language.h"
 #include "../lib/threads/Mutex.h"
 
 
@@ -107,7 +109,7 @@ int get_same_type_index(const Track *t) {
 	if (!t->song)
 		return -1;
 	int n = 0;
-	foreachi(Track *tt, weak(t->song->tracks), i)
+	for (auto&& [i,tt]: enumerate(weak(t->song->tracks)))
 		if (tt->type == t->type) {
 			if (tt == t)
 				return n;
@@ -222,10 +224,9 @@ void Track::enable_effect(AudioEffect *effect, bool enabled) {
 }
 
 void Track::delete_effect(AudioEffect *effect) {
-	foreachi(AudioEffect *f, weak(fx), index) {
-		if (f == effect)
-			song->execute(new ActionTrackDeleteEffect(this, index));
-	}
+	int index = find_index(weak(fx), effect);
+	if (index >= 0)
+		song->execute(new ActionTrackDeleteEffect(this, index));
 }
 
 void Track::move_effect(int source, int target) {
@@ -249,9 +250,9 @@ void Track::enable_midi_effect(MidiEffect *effect, bool enabled) {
 }
 
 void Track::delete_midi_effect(MidiEffect *effect) {
-	foreachi(MidiEffect *f, weak(midi_fx), index)
-		if (f == effect)
-			song->execute(new ActionTrackDeleteMidiEffect(this, index));
+	int index = find_index(weak(midi_fx), effect);
+	if (index >= 0)
+		song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }
 
 void Track::move_midi_effect(int source, int target) {
@@ -299,9 +300,9 @@ Curve *Track::add_curve(const string &name, CurveTarget &target) {
 	return c;
 }
 void Track::delete_curve(Curve *curve) {
-	foreachi(auto c, curves, i)
-		if (c == curve)
-			song->execute(new ActionTrackDeleteCurve(this, i));
+	int index = find_index(weak(curves), curve);
+	if (index >= 0)
+		song->execute(new ActionTrackDeleteCurve(this, index));
 }
 
 void Track::edit_curve(Curve *curve, const string &name, float min, float max, CurveType type) {

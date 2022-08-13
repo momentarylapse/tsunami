@@ -13,6 +13,7 @@
 #include "../../data/TrackMarker.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/os/file.h"
 #include "../../lib/os/formatter.h"
 #include "../../lib/os/msg.h"
@@ -151,7 +152,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	f->write_int(tracks.num);
 	for (Bar *b : bars)
 		write_measure_header(b);
-	foreachi(GpTrack &t, tracks, i)
+	for (auto&& [i,t]: enumerate(tracks))
 		write_track(&t, i);
 
 	if (version >= 500)
@@ -737,7 +738,7 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar *b)
 
 	// beats
 	f->write_int(gnotes.num);
-	foreachi(GuitarNote &n, gnotes, i)
+	for (auto&& [i,n]: enumerate(gnotes))
 		write_beat(t, n.pitch, n.string, n.length, update_tempo and (i == 0));
 
 	if (version >= 500) // second voice

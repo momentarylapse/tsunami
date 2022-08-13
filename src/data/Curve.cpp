@@ -15,6 +15,7 @@
 #include "../module/synthesizer/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/os/msg.h"
+#include "../lib/base/iter.h"
 #include <math.h>
 
 string i2s_small(int); // MidiData.cpp ?
@@ -59,9 +60,9 @@ Array<CurveTarget> CurveTarget::enumerate_track(Track *t) {
 	list.add(CurveTarget(&t->volume, "volume", "volume"));
 	list.add(CurveTarget(&t->panning, "panning", "panning"));
 
-	foreachi(auto *fx, weak(t->fx), i)
+	for (auto&& [i,fx]: enumerate(weak(t->fx)))
 		list.append(enumerate_module(fx, format("fx:%d", i), "fx" + i2s_small(i)));
-	foreachi(auto *fx, weak(t->midi_fx), i)
+	for (auto&& [i,fx]: enumerate(weak(t->midi_fx)))
 		list.append(enumerate_module(fx, format("mfx:%d", i), "mfx" + i2s_small(i)));
 	list.append(enumerate_module(t->synth.get(), "s", "synth"));
 	return list;

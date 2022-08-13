@@ -782,9 +782,14 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 	auto var = parse_abstract_token();
 
 	// index
-	shared<Node> index;
-	if (try_consume(","))
-		index = parse_abstract_token();
+	shared<Node> key;
+	if (try_consume("=>")) {
+		// key => value
+		key = var;
+		var = parse_abstract_token();
+	} else if (try_consume(",")) {
+		key = parse_abstract_token();
+	}
 
 
 	expect_identifier(IDENTIFIER_IN, "'in' expected after variable in 'for ...'");
@@ -795,6 +800,9 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 	if (try_consume(":")) {
 		// range
+
+		if (key)
+			do_error("no key=>value allowed in START:END for loop", key);
 
 		auto val1 = parse_abstract_operand_greedy(block);
 
@@ -818,10 +826,10 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 
 		auto cmd_for = add_node_statement(StatementID::FOR_ARRAY, token0, TypeUnknown);
-		// [VAR, INDEX, ARRAY, BLOCK]
+		// [VAR, KEY, ARRAY, BLOCK]
 
 		cmd_for->set_param(0, var);
-		cmd_for->set_param(1, index);
+		cmd_for->set_param(1, key);
 		cmd_for->set_param(2, array);
 		//cmd_for->set_uparam(3, loop_block);
 

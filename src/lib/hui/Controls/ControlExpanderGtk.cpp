@@ -56,6 +56,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 		gtk_expander_set_use_markup(GTK_EXPANDER(expander), true);
 		gtk_grid_attach(GTK_GRID(frame), expander, 0, 0, 1, 1);
 		g_signal_connect(expander, "notify::expanded", G_CALLBACK(on_gtk_expander_expand), this);
+		gtk_widget_set_margin_bottom(expander, 8);
 
 		revealer = gtk_revealer_new();
 		gtk_grid_attach(GTK_GRID(frame), revealer, 0, 1, 1, 1);

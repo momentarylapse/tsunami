@@ -59,11 +59,6 @@ void ControlGrid::add_child(shared<Control> child, int x, int y) {
 		child->set_options("padding=6");
 	} else if (action_bar) {
 		child->set_options("min-width=25,min-height=25,padding=3");
-	} else {
-		if (((child->type == CONTROL_GROUP) or (child->type == CONTROL_EXPANDER)) and (y > 0)) {
-			gtk_widget_set_margin_top(child->widget, FRAME_MARGIN);
-		}
-
 	}
 }
 

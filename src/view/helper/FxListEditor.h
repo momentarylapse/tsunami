@@ -34,6 +34,8 @@ public:
 	Array<int> event_ids;
 	ConfigPanelMode module_panel_mode;
 
+	shared<Module> dummy_module;
+
 	Session *session() const;
 	void select_module(Module *m);
 	void on_select();

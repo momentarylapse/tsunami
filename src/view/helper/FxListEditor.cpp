@@ -62,6 +62,8 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 	event_ids.add(panel->event("fx-enabled", [this] { on_enabled(); }));
 	event_ids.add(panel->event("fx-copy-from-track", [this] { on_copy_from_track(); }));
 
+	dummy_module = CreateAudioEffect(session(), "");
+
 
 	auto *song = track->song;
 	song->subscribe(this, [this] { update(); }, song->MESSAGE_ENABLE_FX);
@@ -120,6 +122,10 @@ void FxListEditor::select_module(Module *m) {
 		m->subscribe(this, [this] {
 			select_module(nullptr);
 		}, m->MESSAGE_DELETE);
+	} else {
+		// dummy panel to keep the size allocation for the animation
+		config_panel = new ModulePanel(dummy_module.get(), panel, module_panel_mode);
+		panel->embed(config_panel.get(), config_grid_id, 0, 0);
 	}
 
 	update_list_selection();

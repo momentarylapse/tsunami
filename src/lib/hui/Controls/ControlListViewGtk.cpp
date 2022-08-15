@@ -300,6 +300,8 @@ void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const str
 		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(str);
 		if (p)
 			gtk_list_store_set(store, &iter, column, p, -1);
+		else if (str != "")
+			msg_error("no image: " + str);
 	}
 }
 

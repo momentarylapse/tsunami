@@ -285,7 +285,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 
 	set_menu(hui::create_resource_menu("menu", this));
-
 	app->plugin_manager->add_plugins_to_menu(this);
 
 	if (hui::config.get_bool("Window.HeaderBar", false)) {
@@ -294,13 +293,16 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		add_button("!ignorefocus", 0, 0, "new");
 		set_image("new", "hui:new");
 		add_button("!ignorefocus\\Open", 1, 0, "open");
-		add_button("!ignorefocus", 1, 0, "save");
+		add_button("!ignorefocus", 2, 0, "save");
 		set_image("save", "hui:save");
-		add_button("!ignorefocus", 1, 0, "undo");
+		add_button("!ignorefocus", 3, 0, "undo");
 		set_image("undo", "hui:undo");
-		add_button("!ignorefocus", 1, 0, "redo");
+		add_button("!ignorefocus", 4, 0, "redo");
 		set_image("redo", "hui:redo");
 
+
+		add_menu_button("!menu=header-menu,arrow=no", 5, 1, "menu-x");
+		set_image("menu-x", "hui:open-menu");
 		add_button("!ignorefocus", 4, 1, "mode-edit-check");
 		set_image("mode-edit-check", "hui:edit");
 		add_button("!ignorefocus", 3, 1, "record");
@@ -317,6 +319,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		if (hui::config.get_bool("Window.HideMenu", false))
 			gtk_widget_hide(menubar);
 		gtk_widget_hide(toolbar[0]->widget);
+
+		set_menu(nullptr);
 	} else {
 		toolbar[0]->set_by_id("toolbar");
 	}

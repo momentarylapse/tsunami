@@ -83,6 +83,10 @@ void ControlMenuButton::__set_option(const string &op, const string &value) {
 	} else if (op == "menusource") {
 		auto res = parse_resource(value, panel);
 		set_menu(_create_res_menu_("source", &res, panel));
+	} else if (op == "arrow") {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_menu_button_set_always_show_arrow(GTK_MENU_BUTTON(widget), value._bool());
+#endif
 	}
 }
 

@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-74
+75
 # Resource
 Menu
 menu_fake
@@ -1132,6 +1132,61 @@ Button
 edit_song
 link
 0
+0
+0
+# Resource
+Menu
+header-menu
+
+0
+0
+8
+Item
+save_as
+image=hui:save-as
+0
+0
+0
+Item
+render_export_selection
+image=hui:save-as
+1
+0
+0
+Item
+export_selection
+image=hui:save-as
+2
+0
+0
+Item
+quick_export
+image=hui:save-as
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
+settings
+image=hui:preferences
+5
+0
+0
+Separator
+
+
+6
+0
+0
+Item
+about
+image=hui:about
+7
 0
 0
 # Resource
@@ -7418,7 +7473,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-658
+662
 # Text
 /bars-add
 Add bars...
@@ -7998,6 +8053,18 @@ Edit
 
 fx_editor/fx_editor
 Effects
+
+header-menu/about
+About
+
+header-menu/export_selection
+Save selection...
+
+header-menu/quick_export
+Quick export
+
+header-menu/render_export_selection
+Render selection...
 
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help

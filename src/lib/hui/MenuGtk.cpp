@@ -196,6 +196,8 @@ const char *get_gtk_icon_name_base(const string image) {
 	if (image=="hui:spell-check")	return "tools-check-spelling";
 	if (image=="hui:convert")	return "gtk-convert";//GTK_STOCK_CONVERT;
 
+	if (image.head(4) == "hui:")
+		return image.sub_ref(4).c_str();
 	return "";
 }
 

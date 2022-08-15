@@ -1,0 +1,9 @@
+Menu header-menu ""
+	Item /save_as "Save as..." image=hui:save-as
+	Item render_export_selection "Render selection..." image=hui:save-as
+	Item export_selection "Save selection..." image=hui:save-as
+	Item quick_export "Quick export" image=hui:save-as
+	Separator
+	Item /settings "Settings..." image=hui:preferences
+	Separator
+	Item about "About" image=hui:about

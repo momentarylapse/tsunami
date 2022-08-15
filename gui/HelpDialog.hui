@@ -1,57 +1,120 @@
-Dialog help-dialog "Help" width=400 height=300
+Dialog help-dialog "Help" width=700 height=300 spacing=10
 	Grid ? "" vertical
-		TabControl tab "Basics\\Recording" expandx expandy
+		Grid ? ""
+			Label ? "" expandx
+			ToggleButton show-page-0 "Basics" circular flat padding=8
+			ToggleButton show-page-1 "Editing" circular flat padding=8
+			ToggleButton show-page-2 "Recording" circular flat padding=8
+			ToggleButton show-page-3 "Midi" circular flat padding=8
+			Label ? "" expandx
+		TabControl tab "Basics\\Editing\\Recording\\Midi" expandx expandy noframe nobar
 			Grid ? ""
+				Label ? "" expandx
 				Grid ? "" vertical
-					Group g_navigation "Navigation"
-						Grid ? ""
-							Label mouse-move "Shift+scroll" hgroup=a
-							Label l-move "Move"
+					Group g-navigation "Navigation" margintop=10
+						Grid ? "" margintop=10
+							Label mouse-move "Shift+scroll" hgroup=a disabled
+							Label l-move "Move view"
 							---|
-							Label key-move "← / →" hgroup=a
-							Label l-move "Move"
+							Label key-move-fast "Pg-up / down" disabled
+							Label l-move-fast "Move view fast"
 							---|
-							Label key-move-fast "Pg-up / down" hgroup=a
-							Label l-move-fast "Move fast"
-							---|
-							Label mouse-zoom "scroll" hgroup=a
+							Label mouse-zoom "scroll" disabled
 							Label l-zoom "Zoom"
 							---|
-							Label key-zoom "+ / -" hgroup=a
+							Label key-zoom "+ / -" disabled
 							Label l-zoom "Zoom"
+					Group g-cursor "Cursor" margintop=15
+						Grid ? "" margintop=10
+							Label key-cursor-move "← / →" hgroup=a disabled
+							Label l-cursor-move "Move"
 							---|
-							Label key-start "Home / End" hgroup=a
-							Label l-start "Jump to start / end"
-					Group g_sound "Sound"
-						Grid ? ""
-							Label key-play "Space" hgroup=a
+							Label key-cursor-start "Home / End" disabled
+							Label l-cursor-start "Jump to start / end"
+							---|
+							Label key-cursor-track "↑ / ↓" hgroup=a disabled
+							Label l-cursor-track "Previous / next track"
+				Label ? "" expandx
+				Grid ? "" vertical
+					Group g-file "File" margintop=10
+						Grid ? "" margintop=10
+							Label key-open "Ctrl+O" hgroup=a disabled
+							Label l-open "Open"
+							---|
+							Label key-save "Ctrl+S" hgroup=a disabled
+							Label l-save "Save"
+							---|
+							Label key-save-as "Ctrl+Shift+S" hgroup=a disabled
+							Label l-save-as "Save as"
+							---|
+							Label key-quick-export "Ctrl+Shift+X" hgroup=a disabled
+							Label l-quick-export "Quick export"
+					Group g-sound "Sound" margintop=15
+						Grid ? "" margintop=10
+							Label key-play "Space" hgroup=a disabled
 							Label l-play "Play / Pause"
 							---|
-							Label key-loop "Ctrl+L" hgroup=a
+							Label key-loop "Ctrl+L" disabled
 							Label l-loop "Loop"
 							---|
-							Label key-record "Ctrl+R" hgroup=a
+							Label key-record "Ctrl+R" disabled
 							Label l-record "Record"
+					Label ? "" height=4
+				Label ? "" expandx
+			Grid ? ""
+				Label ? "" expandx
 				Grid ? "" vertical
-					Group g_editing "Editing"
-						Grid ? ""
-							Label key-open "Ctrl+O / S" hgroup=a
-							Label l-open "Open / Save"
+					Group g-edit-mode "Mode" margintop=10
+						Grid ? "" margintop=10
+							Label key-mixer "Ctrl+M" disabled
+							Label l-mixer "Toggle mixer"
 							---|
-							Label key-copy "Ctrl+C / V"
-							Label l-copy "Copy / Paste"
+							Label key-plugins "Ctrl+P" disabled
+							Label l-plugins "Toggle plugin panel"
 							---|
-							Label key-undo "Ctrl+Z / Y"
-							Label l-undo "Undo / Redo"
-							---|
-							Label key-delete "Delete"
-							Label l-delete "Delete selection"
-							---|
-							Label key-mixer "Ctrl+M"
-							Label l-mixer "Mixer"
-							---|
-							Label key-edit "Alt+E"
+							Label key-edit "Alt+E" disabled
 							Label l-edit "Edit mode"
-		Grid ? "" buttonbar
+							---|
+							Label key-record "Ctrl+R" disabled
+							Label l-record "Start recording"
+					Group g-editing "Editing" margintop=15
+						Grid ? "" margintop=10
+							Label key-copy "Ctrl+C" disabled
+							Label l-copy "Copy"
+							---|
+							Label key-paste "Ctrl+V" disabled
+							Label l-paste "Paste"
+							---|
+							Label key-undo "Ctrl+Z" disabled
+							Label l-undo "Undo"
+							---|
+							Label key-redo "Ctrl+Y" disabled
+							Label l-redo "Redo"
+							---|
+							Label key-delete "Delete" disabled
+							Label l-delete "Delete selection"
+				Label ? "" expandx
+				Grid ? "" vertical
+					Group g-track "Tracks" margintop=10
+						Grid ? "" margintop=10
+							Label key-mute "Alt+M" disabled
+							Label l-mixer "Toggle mute"
+							---|
+							Label key-solo "Alt+S" disabled
+							Label l-solo "Toggle solo"
+					Group g-layer "Version" margintop=15
+						Grid ? "" margintop=10
+							Label key-layer-mute "Shift+Alt+M" disabled
+							Label l-layer-mixer "Toggle mute"
+							---|
+							Label key-layer-solo "Shift+Alt+S" disabled
+							Label l-layer-solo "Toggle solo"
+							---|
+							Label key-layer-delete "Ctrl+Delete" disabled
+							Label l-layer-delete "Delete"
+							---|
+							Label key-layer-dominant "Alt+D" disabled
+							Label l-layer-dominant "Mark selection as dominant"
+				Label ? "" expandx
+		Grid ? ""
 			Label first-time-message "This dialog can be found in the menu ?/Help" hidden
-			Button /close "Close"

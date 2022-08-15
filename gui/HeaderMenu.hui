@@ -6,4 +6,5 @@ Menu header-menu ""
 	Separator
 	Item /settings "Settings..." image=hui:preferences
 	Separator
+	Item help "Help" image=hui:help
 	Item about "About" image=hui:about

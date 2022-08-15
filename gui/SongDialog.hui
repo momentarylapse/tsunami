@@ -23,7 +23,7 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 						Label ad_t_format "Format" right disabled
 						ComboBox format "" expandx "tooltip=When saving. EXPERIMENTAL! (probably don\'t change!)" expandx
 				Group ad_t_tags "Tags"
-					ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre" noexpandy height=200
+					ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre" noexpandy height=200 nobar
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "Song" link ignorefocus disabled

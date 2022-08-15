@@ -105,7 +105,10 @@ public:
 		string e;
 		if (s->auto_delete)
 			e = " *";
-		return format("%s\\%s\\%s%s\\%d times", icon, s->owner->get_time_str_long(s->range().length), s->name, e, s->ref_count);
+		string usage = format("%dx used", s->ref_count);
+		if (s->ref_count == 0)
+			usage = "unused";
+		return format("%s\\%s\\%s%s\\<span alpha=\"50%%\"><i>%s</i></span>", s->name, icon, s->owner->get_time_str_long(s->range().length), e, usage);
 	}
 	string icon;
 	Sample *s;

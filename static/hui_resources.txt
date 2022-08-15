@@ -6183,7 +6183,7 @@ vertical
 2
 ListView
 sample-list
-format=itTt,select-multi
+format=Titm,select-multi,nobar
 0
 0
 0
@@ -6921,7 +6921,7 @@ ad_t_tags
 1
 ListView
 tags
-format=TT,noexpandy,height=200
+format=TT,noexpandy,height=200,nobar
 0
 0
 0

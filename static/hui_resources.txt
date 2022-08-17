@@ -1866,7 +1866,7 @@ Grid
 1
 ListView
 log_list
-format=it,nobar
+format=m,nobar
 0
 0
 0
@@ -8625,7 +8625,7 @@ log_console/log_console
 Nachrichten
 
 log_console/log_list
-type\\msg
+msg
 
 log_toolbar/log_clear
 Clear

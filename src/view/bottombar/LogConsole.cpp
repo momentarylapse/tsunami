@@ -11,6 +11,9 @@
 #include "../../data/Song.h"
 #include "LogConsole.h"
 
+string title_filename(const Path &filename);
+
+
 LogConsole::LogConsole(Session *session, BottomBar *bar) :
 	BottomBar::Console(_("Messages"), "log-console", session, bar)
 {
@@ -20,7 +23,7 @@ LogConsole::LogConsole(Session *session, BottomBar *bar) :
 	from_resource("log_console");
 
 	// only start after this->win is set
-	hui::run_later(0.01f, [=]{ reload(); });
+	hui::run_later(0.01f, [this]{ reload(); });
 }
 
 LogConsole::~LogConsole() {
@@ -30,28 +33,33 @@ LogConsole::~LogConsole() {
 void console_add_message(LogConsole *lc, Log::Message &m) {
 	hui::ComboBoxSeparator = "§§";
 	string text = m.text;
+	string source;
 	if (m.session == Session::GLOBAL)
-		text = "[global] " + text;
+		source = "global";
 	else
-		text = "[" + m.session->song->filename.basename() + "]: " + text;
-	if (m.type == Log::Type::DEBUG)
-		text = "[debug] " + text;
+		source = title_filename(m.session->song->filename);
+
+	auto wrap_source = [] (const string &s) {
+		return "<span alpha=\"50%%\">[" + s + "]</span>";
+	};
 
 	if (m.type == Log::Type::ERROR) {
-		lc->add_string("log_list", "hui:error§§" + text);
+		lc->add_string("log_list", format("%s  <span foreground=\"red\">َ<b>Error: %s</b></span>", wrap_source(source), text));
 		//lc->blink();
 		lc->win->set_info_text(m.text, {"error", "allow-close", "id=error"});
 	} else if (m.type == Log::Type::WARNING) {
-		lc->add_string("log_list", "hui:warning§§" + text);
+		lc->add_string("log_list", format("%s  <span foreground=\"orange\">َ<b>Warning:</b> %s</span>", wrap_source(source), text));
 		lc->win->set_info_text(m.text, {"warning", "allow-close", "id=warning"});
 	} else if (m.type == Log::Type::QUESTION) {
-		lc->add_string("log_list", "hui:question§§" + text);
+		lc->add_string("log_list", format("%s  <b>Question:</b> %s", wrap_source(source), text));
 		Array<string> options = {"warning", "allow-close", "id=question-" + i2s(rand())};
 		for (auto &o: m.responses)
 			options.add("button:" + o);
 		lc->win->set_info_text(m.text, options);
+	} else if (m.type == Log::Type::DEBUG) {
+		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
 	} else {
-		lc->add_string("log_list", "§§" + text);
+		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}
 	hui::ComboBoxSeparator = "\\";
 }
@@ -65,7 +73,7 @@ void LogConsole::reload() {
 		console_add_message(this, m);
 	messages_loaded = messages.num;
 
-	log->subscribe(this, [=]{ on_log_add(); }, Log::MESSAGE_ADD);
+	log->subscribe(this, [this]{ on_log_add(); }, Log::MESSAGE_ADD);
 }
 
 void LogConsole::on_log_add() {

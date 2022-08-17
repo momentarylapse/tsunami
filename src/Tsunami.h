@@ -26,6 +26,7 @@ class Storage;
 class Clipboard;
 class TsunamiWindow;
 class Session;
+class SessionManager;
 class PerformanceMonitor;
 
 class Tsunami : public hui::Application {
@@ -41,10 +42,8 @@ public:
 
 	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
 
-	shared_array<Session> sessions;
-
 	owned<Log> log;
-
+	owned<SessionManager> session_manager;
 	owned<DeviceManager> device_manager;
 	owned<PluginManager> plugin_manager;
 	owned<Clipboard> clipboard;

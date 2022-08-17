@@ -78,13 +78,15 @@ Tsunami::~Tsunami() {
 
 void Tsunami::on_end() {
 	//msg_write("Tsunami on end");
-	sessions.clear();
+	session_manager = nullptr;
 }
 
 bool Tsunami::on_startup(const Array<string> &arg) {
 	tsunami = this;
 
 	ErrorHandler::init();
+
+	session_manager = new SessionManager;
 
 	perf_mon = new PerformanceMonitor;
 
@@ -181,7 +183,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 		device_manager->init();
-		session = SessionManager::create_session();
+		session = session_manager->create_session();
 
 		session->win->show();
 		if (a.num > 0) {
@@ -244,13 +246,13 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {
 		device_manager->init();
-		session = SessionManager::create_session();
+		session = session_manager->create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 	});
 	p.cmd("session", "SESSION ...", "restore a saved session", [this, &session] (const Array<string> &a) {
-		SessionManager::load_session(SessionManager::directory() << (a[0] + ".session"));
+		session_manager->load_session(session_manager->directory() << (a[0] + ".session"));
 	});
 #ifndef NDEBUG
 	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
@@ -260,7 +262,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		UnitTest::run_all(a[0]);
 	});
 	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
-		session = SessionManager::create_session();
+		session = session_manager->create_session();
 		session->win->hide();
 		Module *m = nullptr;
 		if (a[0] == "fx") {
@@ -312,7 +314,7 @@ void Tsunami::load_key_codes() {
 void Tsunami::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
 	bool allowed = true;
 
-	for (auto *s: weak(sessions)) {
+	for (auto *s: weak(session_manager->sessions)) {
 		s->win->test_allow_termination([] {}, [&allowed] { allowed = false; });
 		if (!allowed)
 			break;

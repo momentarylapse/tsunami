@@ -72,7 +72,7 @@ static Array<Channel> channels;
 PerformanceMonitor::PerformanceMonitor() {
 	pm_instance = this;
 #if ALLOW_PERF_MON
-	runner_id = hui::run_repeated(UPDATE_DT, [=]{ update(); });
+	runner_id = hui::run_repeated(UPDATE_DT, [this]{ update(); });
 #else
 	runner_id = -1;
 #endif

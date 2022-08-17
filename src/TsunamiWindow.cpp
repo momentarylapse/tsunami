@@ -396,15 +396,15 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 }
 
 void tsunami_clean_up(Session *session) {
-	auto sessions = weak(tsunami->sessions);
+	auto sessions = weak(tsunami->session_manager->sessions);
 	foreachi(Session *s, sessions, i)
 		if (s == session and s->auto_delete) {
 			//msg_write("--------Tsunami erase...");
-			tsunami->sessions.erase(i);
+			tsunami->session_manager->sessions.erase(i);
 		}
 
 	//msg_write(tsunami->sessions.num);
-	if (tsunami->sessions.num == 0)
+	if (tsunami->session_manager->sessions.num == 0)
 		tsunami->end();
 }
 
@@ -465,7 +465,7 @@ void TsunamiWindow::on_import_backup() {
 		session->storage->load(song, filename);
 		//BackupManager::set_save_state(session);
 	} else {
-		Session *s = SessionManager::create_session();
+		Session *s = tsunami->session_manager->create_session();
 		s->win->show();
 		s->storage->load(s->song.get(), filename);
 	}
@@ -1202,7 +1202,7 @@ void TsunamiWindow::on_open() {
 			if (session->storage->load(song, filename))
 				BackupManager::set_save_state(session);
 		} else {
-			auto *s = SessionManager::create_session();
+			auto *s = tsunami->session_manager->create_session();
 			s->win->show();
 			s->storage->load(s->song.get(), filename);
 		}

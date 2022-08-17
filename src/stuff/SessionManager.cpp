@@ -28,7 +28,8 @@ Session *SessionManager::create_session() {
 	session->set_win(new TsunamiWindow(session));
 	session->win->show();
 
-	tsunami->sessions.add(session);
+	sessions.add(session);
+	hui::run_later(0.5f, [this] { notify(); });
 	return session;
 }
 
@@ -67,13 +68,15 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 
 	parser.elements.add(e);
 	parser.save(filename);
+
+
+	notify();
 }
 
 Session *SessionManager::load_session(const Path &filename) {
 	xml::Parser parser;
 	parser.load(filename);
 	auto &e = parser.elements[0];
-
 
 	auto *s = create_session();
 	s->win->show();

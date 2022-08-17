@@ -11,14 +11,19 @@
 
 #include "BottomBar.h"
 
-class Path;
-
 class SessionConsole: public BottomBar::Console {
 public:
 	SessionConsole(Session *session, BottomBar *bar);
 	~SessionConsole() override;
 
 	string id_list;
+
+	struct SessionLabel {
+		string name;
+		Session *session;
+	};
+	Array<SessionLabel> session_labels;
+	void find_sessions();
 
 	void on_save();
 	void on_list_double_click();

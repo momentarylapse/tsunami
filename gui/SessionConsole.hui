@@ -1,5 +1,5 @@
 Dialog session-console "Sessions"
 	Grid ? "" vertical
-		ListView sessions "name" nobar expandy
+		ListView sessions "name" format=m nobar expandy
 		Grid ? ""
 			Button save "Save..."

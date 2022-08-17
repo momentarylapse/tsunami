@@ -6529,7 +6529,7 @@ vertical
 2
 ListView
 sessions
-nobar,expandy
+format=m,nobar,expandy
 0
 0
 0

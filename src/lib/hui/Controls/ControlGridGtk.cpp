@@ -38,11 +38,8 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 }
 
 void ControlGrid::add_child(shared<Control> child, int x, int y) {
-	if (vertical) {
-		int t = x;
-		x = y;
-		y = t;
-	}
+	if (vertical)
+		std::swap(x, y);
 	GtkWidget *child_widget = child->get_frame();
 	gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
 	control_link(this, child);

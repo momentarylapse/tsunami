@@ -32,7 +32,7 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 	if (option_has(get_option_from_title(title), "link")) {
 		widget = gtk_link_button_new_with_label(sys_str(parts[0]), sys_str(parts[0]));
 		g_signal_connect(G_OBJECT(widget), "activate-link", G_CALLBACK(&on_gtk_link_button_activate), this);
-		set_options("padding=4");
+		//set_options("padding=2");
 	} else {
 		widget = gtk_button_new_with_label(sys_str(parts[0]));
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_button_press), this);

@@ -54,6 +54,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/threads/Mutex.h"
 #include "../../stuff/PerformanceMonitor.h"
+#include "../../stuff/BackupManager.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../Tsunami.h"
@@ -126,6 +127,63 @@ public:
 		return _("show control panel");
 	}
 };
+
+class TemporaryMessageBox : public scenegraph::Node {
+public:
+	string header, message;
+	float ttl = -1;
+	hui::Callback f_click;
+	TemporaryMessageBox() : Node(400, 100) {
+		align.dz = 300;
+		align.dx = 50;
+		align.dy = -50;
+		align.horizontal = AlignData::Mode::LEFT;
+		align.vertical = AlignData::Mode::BOTTOM;
+		hidden = true;
+		set_perf_name("message");
+	}
+	void set_message(const string &_header, const string &_message, hui::Callback f) {
+		header = _header;
+		message = _message;
+		hidden = false;
+		ttl = 10;
+		align.w = parent->area.width() / 2;
+		f_click = f;
+	}
+	void progress(float dt) {
+		ttl -= dt;
+		if (ttl < 0)
+			hidden = true;
+		align.w = parent->area.width() / 2;
+	}
+	void on_draw(Painter *p) override {
+		float alpha = clamp(ttl / 2.0f, 0.0f, 1.0f);
+		color c = theme.background_overlay;
+		c = color::interpolate(theme.background, Orange, 0.3f);
+		if (is_cur_hover() and f_click)
+			c = theme.hoverify(c);
+		p->set_color(c.with_alpha(alpha));
+		p->set_roundness(10);
+		p->draw_rect(area);
+		p->set_roundness(0);
+		p->set_color(theme.text.with_alpha(alpha));
+		p->set_font_size(17);
+		p->draw_str(area.center() - vec2(p->get_str_width(header) / 2, 25),  header);
+		p->set_font_size(13);
+		p->draw_str(area.center() - vec2(p->get_str_width(message) / 2, -10),  message);
+		p->set_font_size(theme.FONT_SIZE);
+	}
+	bool on_left_button_down(const vec2 &m) override {
+		if (f_click)
+			f_click();
+		return true;
+	}
+};
+
+void view_set_message(AudioView *view, const string &header, const string &message, hui::Callback f = nullptr) {
+	view->temporary_message_box->set_message(header, message, f);
+	view->force_redraw();
+}
 
 AudioView::AudioView(Session *_session, const string &_id) :
 	cam(this)
@@ -292,11 +350,21 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	bottom_bar_expand_button = new BottomBarExpandButton(this);
 	scene_graph->add_child(bottom_bar_expand_button);
 
+	temporary_message_box = new TemporaryMessageBox();
+	scene_graph->add_child(temporary_message_box);
+
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
 	m = {0,0};
 
 	message.ttl = -1;
+
+	hui::run_later(0.5f, [this] {
+		if (BackupManager::files.num > 0)
+			view_set_message(this, "old recording backup found", "to load or delete, open the session manager in the bottom bar", [this] {
+				session->win->bottom_bar->open(BottomBar::SESSION_CONSOLE);
+			});
+	});
 
 
 	// events
@@ -1229,6 +1297,10 @@ void AudioView::draw_song(Painter *c) {
 	if (message.ttl > 0) {
 		draw_message(c, message);
 		message.ttl -= 0.03f;
+		animating = true;
+	}
+	if (temporary_message_box->ttl > 0) {
+		temporary_message_box->progress(0.03f);
 		animating = true;
 	}
 

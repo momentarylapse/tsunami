@@ -65,6 +65,7 @@ class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
 class BottomBarExpandButton;
+class TemporaryMessageBox;
 enum class MidiMode;
 
 
@@ -290,6 +291,7 @@ public:
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
 	BottomBarExpandButton *bottom_bar_expand_button;
+	TemporaryMessageBox *temporary_message_box;
 	scenegraph::Node *onscreen_display;
 	void update_onscreen_displays();
 

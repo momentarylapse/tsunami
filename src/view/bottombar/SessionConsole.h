@@ -18,7 +18,14 @@ public:
 
 	string id_list;
 
+	enum class Type {
+		ACTIVE,
+		SAVED,
+		BACKUP
+	};
+
 	struct SessionLabel {
+		Type type;
 		string name;
 		Session *session;
 	};

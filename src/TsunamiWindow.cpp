@@ -453,25 +453,13 @@ void TsunamiWindow::on_add_time_track() {
 	hui::fly(new TimeTrackAddDialog(song, this));
 }
 
+void load_backup(Session *session, const Path &filename);
+
 void TsunamiWindow::on_import_backup() {
 	string id = hui::get_event()->id;
 	int uuid = id.explode(":").back()._int();
-	auto filename = BackupManager::get_filename_for_uuid(uuid);
-	if (filename.is_empty())
-		return;
 
-	Storage::options_in = "format:f32,channels:2,samplerate:44100";
-	if (song->is_empty()) {
-		session->storage->load(song, filename);
-		//BackupManager::set_save_state(session);
-	} else {
-		Session *s = tsunami->session_manager->create_session();
-		s->win->show();
-		s->storage->load(s->song.get(), filename);
-	}
-	Storage::options_in = "";
-
-	//BackupManager::del
+	load_backup(session, BackupManager::get_filename_for_uuid(uuid));
 }
 
 void TsunamiWindow::on_delete_backup() {

@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-75
+76
 # Resource
 Menu
 menu_fake
@@ -5277,6 +5277,31 @@ create-from-selection
 0
 # Resource
 Menu
+popup-menu-session-manager
+
+0
+0
+3
+Item
+session-load
+
+0
+0
+0
+Item
+session-save
+
+1
+0
+0
+Item
+session-delete
+
+2
+0
+0
+# Resource
+Menu
 popup_signal_chain_menu
 
 0
@@ -6526,22 +6551,10 @@ Grid
 vertical
 0
 0
-2
+1
 ListView
 sessions
 format=m,nobar,expandy
-0
-0
-0
-Grid
-?
-
-1
-0
-1
-Button
-save
-
 0
 0
 0
@@ -7803,7 +7816,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-697
+699
 # Text
 /bars-add
 Add bars...
@@ -9224,6 +9237,15 @@ Scale...
 popup-menu-sample/header
 Sample
 
+popup-menu-session-manager/session-delete
+Delete
+
+popup-menu-session-manager/session-load
+Load
+
+popup-menu-session-manager/session-save
+Save...
+
 popup-menu-song/header
 File
 
@@ -9580,9 +9602,6 @@ Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
-
-session-console/save
-Save...
 
 session-console/session-console
 Sessions

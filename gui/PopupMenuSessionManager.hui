@@ -1,0 +1,4 @@
+Menu popup-menu-session-manager ""
+	Item session-load "Load"
+	Item session-save "Save..."
+	Item session-delete "Delete"

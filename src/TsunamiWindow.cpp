@@ -344,11 +344,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// events
 	event("hui:close", [this]{ on_exit(); });
 
-	for (int i=0; i<256; i++) {
-		event("import-backup-" + i2s(i), [this]{ on_import_backup(); });
-		event("delete-backup-" + i2s(i), [this]{ on_delete_backup(); });
-	}
-
 	view = new AudioView(session, "area");
 	session->view = view;
 	hui::run_later(0.01f, [this] {
@@ -451,21 +446,6 @@ void TsunamiWindow::on_add_audio_track_stereo() {
 
 void TsunamiWindow::on_add_time_track() {
 	hui::fly(new TimeTrackAddDialog(song, this));
-}
-
-void load_backup(Session *session, const Path &filename);
-
-void TsunamiWindow::on_import_backup() {
-	string id = hui::get_event()->id;
-	int uuid = id.explode(":").back()._int();
-
-	load_backup(session, BackupManager::get_filename_for_uuid(uuid));
-}
-
-void TsunamiWindow::on_delete_backup() {
-	string id = hui::get_event()->id;
-	int uuid = id.explode(":").back()._int();
-	BackupManager::delete_old(uuid);
 }
 
 void TsunamiWindow::on_add_midi_track() {

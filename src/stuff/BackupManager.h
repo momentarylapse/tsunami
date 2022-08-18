@@ -37,10 +37,11 @@ public:
 	static int next_uuid;
 	static BackupFile* _find_by_file(os::fs::FileStream *f);
 	static BackupFile* _find_by_uuid(int uuid);
+	static BackupFile* _find_by_filename(const Path &filename);
 	static void _clear_old();
 
 	static void set_save_state(Session *sessoin);
-	static void check_old_files(Session *session);
+	static void check_old_files();
 
 	static Path get_filename(const string &extension);
 	static os::fs::FileStream *create_file(const string &extension, Session *session);
@@ -49,6 +50,7 @@ public:
 	static void delete_old(int uuid);
 
 	static Path get_filename_for_uuid(int uuid);
+	static int get_uuid_for_filename(const Path &filename);
 };
 
 #endif /* SRC_STUFF_BACKUPMANAGER_H_ */

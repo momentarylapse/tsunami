@@ -115,8 +115,6 @@ public:
 	void on_select_all();
 	void on_select_expand();
 	void on_show_log();
-	void on_import_backup();
-	void on_delete_backup();
 	void on_menu_execute_audio_effect(const string &name);
 	void on_menu_execute_audio_source(const string &name);
 	void on_menu_execute_midi_effect(const string &name);

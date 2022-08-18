@@ -200,7 +200,6 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 
 			session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
 		}
-		BackupManager::check_old_files(Session::GLOBAL);
 		allow_window = true;
 	});
 	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {

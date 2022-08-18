@@ -111,6 +111,11 @@ Session *SessionManager::load_session(const Path &filename) {
 	return s;
 }
 
+void SessionManager::delete_saved_session(const Path &filename) {
+	os::fs::_delete(filename);
+	notify();
+}
+
 Path SessionManager::directory() {
 	return tsunami->directory << "sessions";
 }

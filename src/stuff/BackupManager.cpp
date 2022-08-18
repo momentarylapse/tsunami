@@ -40,7 +40,7 @@ void BackupManager::set_save_state(Session *session) {
 	_clear_old();
 }
 
-void BackupManager::check_old_files(Session *session) {
+void BackupManager::check_old_files() {
 	_clear_old();
 
 	// update list
@@ -52,12 +52,6 @@ void BackupManager::check_old_files(Session *session) {
 		bf.f = nullptr;
 		bf.filename = tsunami->directory << f;
 		files.add(bf);
-	}
-
-	// check
-	for (auto &bf: files) {
-		if (!bf.session)
-			session->q(_("recording backup found: ") + bf.filename.str(), {format("import-backup-%d:", bf.uuid) + _("import"), format("delete-backup-%d:", bf.uuid) + _("delete")});
 	}
 }
 
@@ -107,11 +101,25 @@ BackupManager::BackupFile* BackupManager::_find_by_uuid(int uuid) {
 	return nullptr;
 }
 
+BackupManager::BackupFile* BackupManager::_find_by_filename(const Path &filename) {
+	for (auto &bf: files)
+		if (bf.filename == filename)
+			return &bf;
+	return nullptr;
+}
+
 Path BackupManager::get_filename_for_uuid(int uuid) {
 	auto *bf = _find_by_uuid(uuid);
 	if (bf)
 		return bf->filename;
 	return "";
+}
+
+int BackupManager::get_uuid_for_filename(const Path &filename) {
+	auto *bf = _find_by_filename(filename);
+	if (bf)
+		return bf->uuid;
+	return -1;
 }
 
 void BackupManager::delete_old(int uuid) {

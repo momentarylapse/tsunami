@@ -19,6 +19,7 @@ public:
 	Session *create_session();
 	void save_session(Session *s, const Path &filename);
 	Session *load_session(const Path &filename);
+	void delete_saved_session(const Path &filename);
 
 	Path directory();
 

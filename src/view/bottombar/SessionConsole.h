@@ -11,6 +11,7 @@
 
 #include "BottomBar.h"
 
+
 class SessionConsole: public BottomBar::Console {
 public:
 	SessionConsole(Session *session, BottomBar *bar);
@@ -28,14 +29,20 @@ public:
 		Type type;
 		string name;
 		Session *session;
+		int uuid;
 	};
 	Array<SessionLabel> session_labels;
 	void find_sessions();
 
+	void on_load();
 	void on_save();
+	void on_delete();
 	void on_list_double_click();
+	void on_right_click();
 
 	void load_data();
+
+	owned<hui::Menu> popup_menu;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_SESSIONCONSOLE_H_ */

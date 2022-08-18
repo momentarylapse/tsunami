@@ -41,10 +41,15 @@ SessionConsole::SessionConsole(Session *s, BottomBar *bar) :
 	from_resource("session-console");
 	id_list = "sessions";
 
+	popup_menu = hui::create_resource_menu("popup-menu-session-manager", this);
+
 	load_data();
 
-	event("save", [this] { on_save(); });
+	event("session-load", [this] { on_load(); });
+	event("session-save", [this] { on_save(); });
+	event("session-delete", [this] { on_delete(); });
 	event(id_list, [this] { on_list_double_click(); });
+	event_x(id_list, "hui:right-button-down", [this] { on_right_click(); });
 
 	tsunami->session_manager->subscribe(this, [this] { load_data(); }, SessionManager::MESSAGE_ANY);
 }
@@ -58,28 +63,21 @@ void SessionConsole::find_sessions() {
 
 	// active
 	for (auto s: weak(tsunami->session_manager->sessions))
-		session_labels.add({Type::ACTIVE, title_filename(s->song->filename), s});
+		session_labels.add({Type::ACTIVE, title_filename(s->song->filename), s, -1});
 
 	// backups
+	BackupManager::check_old_files();
 	for (auto &f: BackupManager::files)
-		session_labels.add({Type::BACKUP, f.filename.str()});
+		session_labels.add({Type::BACKUP, f.filename.str(), nullptr, f.uuid});
 
 	// saved sessions
 	auto list = os::fs::search(tsunami->session_manager->directory(), "*.session", "f");
 	for (auto &e: list)
-		session_labels.add({Type::SAVED, e.no_ext().str(), nullptr});
+		session_labels.add({Type::SAVED, e.no_ext().str(), nullptr, -1});
 }
 
-void SessionConsole::on_save() {
-	os::fs::create_directory(tsunami->session_manager->directory());
-	hui::file_dialog_save(win, "", tsunami->session_manager->directory(), {"filter=*.session", "showfilter=*.session"}, [this] (const Path &filename) {
-		if (filename)
-			tsunami->session_manager->save_session(session, filename);
-	});
-}
-
-void SessionConsole::on_list_double_click() {
-	int n = get_int("");
+void SessionConsole::on_load() {
+	int n = get_int(id_list);
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
@@ -87,6 +85,54 @@ void SessionConsole::on_list_double_click() {
 		tsunami->session_manager->load_session(tsunami->session_manager->directory() << (l.name + ".session"));
 	else if (l.type == Type::BACKUP)
 		load_backup(session, l.name);
+}
+
+void SessionConsole::on_save() {
+	int n = get_int(id_list);
+	if (n < 0)
+		return;
+	auto &l = session_labels[n];
+	if (l.type != Type::BACKUP)
+		return;
+	os::fs::create_directory(tsunami->session_manager->directory());
+	hui::file_dialog_save(win, "", tsunami->session_manager->directory(), {"filter=*.session", "showfilter=*.session"}, [this, &l] (const Path &filename) {
+		if (filename)
+			tsunami->session_manager->save_session(l.session, filename);
+	});
+}
+
+void SessionConsole::on_delete() {
+	int n = get_int(id_list);
+	if (n < 0)
+		return;
+	auto &l = session_labels[n];
+	if (l.type == Type::BACKUP) {
+		BackupManager::delete_old(l.uuid);
+
+		// TODO: make BackupManager observable :P
+		tsunami->session_manager->notify();
+	} else if (l.type == Type::SAVED) {
+		tsunami->session_manager->delete_saved_session(tsunami->session_manager->directory() << (l.name + ".session"));
+	}
+}
+
+void SessionConsole::on_list_double_click() {
+	on_load();
+}
+
+void SessionConsole::on_right_click() {
+	int n = hui::get_event()->row;
+	if (n >= 0) {
+		auto &l = session_labels[n];
+		popup_menu->enable("session-load", l.type == Type::BACKUP or l.type == Type::SAVED);
+		popup_menu->enable("session-delete", l.type == Type::BACKUP or l.type == Type::SAVED);
+		popup_menu->enable("session-save", l.type == Type::ACTIVE);
+	} else {
+		popup_menu->enable("session-load", false);
+		popup_menu->enable("session-delete", false);
+		popup_menu->enable("session-save", false);
+	}
+	popup_menu->open_popup(this);
 }
 
 void SessionConsole::load_data() {

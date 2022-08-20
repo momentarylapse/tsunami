@@ -14,6 +14,7 @@ class Track;
 class Slider;
 class ModulePanel;
 class FxListEditor;
+class Instrument;
 
 class TrackConsole: public SideBarConsole {
 public:
@@ -40,6 +41,7 @@ public:
 	hui::Panel *panel;
 	bool editing;
 	owned<FxListEditor> fx_editor;
+	Array<Instrument> instrument_list;
 
 	enum class Mode {
 		FX,

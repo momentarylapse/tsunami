@@ -18,6 +18,8 @@
 #include "../../data/base.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../plugins/PluginManager.h"
+#include "../../lib/base/sort.h"
+#include "../../lib/base/iter.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 
@@ -52,8 +54,8 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	set_decimals(1);
 	set_mode(Mode::FX);
 
-	auto instruments = Instrument::enumerate();
-	for (auto &i: instruments)
+	instrument_list = sorted(Instrument::enumerate(), [] (const Instrument &a, const Instrument &b) { return a.name() <= b.name(); });
+	for (auto &i: instrument_list)
 		set_string("instrument", i.name());
 
 	event("name", [this]{ on_name(); });
@@ -114,10 +116,9 @@ void TrackConsole::load_data() {
 		enable("edit_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
 		enable("select_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
 
-		auto instruments = Instrument::enumerate();
-		foreachi(auto &ii, instruments, i) {
-			if (track->instrument == ii)
-				set_int("instrument", i);
+		for (auto&& [ii,i]: enumerate(instrument_list)) {
+			if (track->instrument.type == i.type)
+				set_int("instrument", ii);
 		}
 
 		update_strings();
@@ -185,8 +186,7 @@ void TrackConsole::on_panning() {
 void TrackConsole::on_instrument() {
 	editing = true;
 	int n = get_int("");
-	auto instruments = Instrument::enumerate();
-	track->set_instrument(instruments[n]);
+	track->set_instrument(instrument_list[n]);
 	update_strings();
 	editing = false;
 }

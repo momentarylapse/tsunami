@@ -30,6 +30,8 @@ Array<int> Instrument::default_tuning() const {
 		return {36,43,50,57};
 	if (type == Type::VIOLIN)
 		return {55,62,69,76};
+	if (type == Type::LUTE)
+		return {36,38,40,45,50,55,59,64};
 	return {};
 }
 
@@ -74,6 +76,8 @@ string Instrument::name() const {
 		return _("Saxophone");
 	if (type == Type::CLARINET)
 		return _("Clarinet");
+	if (type == Type::LUTE)
+		return _("Lute");
 	return "???";
 }
 
@@ -169,7 +173,7 @@ Array<Instrument> Instrument::enumerate() {
 const Clef& Instrument::get_clef() const {
 	if (type == Type::DRUMS)
 		return Clef::_DRUMS;
-	if ((type == Type::ELECTRIC_GUITAR) or (type == Type::GUITAR))
+	if ((type == Type::ELECTRIC_GUITAR) or (type == Type::GUITAR) or (type == Type::LUTE))
 		return Clef::_TREBLE_8;
 	if (type == Type::CELLO)
 		return Clef::_BASS;

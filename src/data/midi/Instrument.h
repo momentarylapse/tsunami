@@ -35,6 +35,7 @@ public:
 		HORN,
 		SAXOPHONE,
 		CLARINET,
+		LUTE,
 		NUM_TYPES,
 	};
 

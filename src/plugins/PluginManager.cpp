@@ -172,6 +172,13 @@ void PluginManager::link_app_data() {
 	kaba::link_external_class_func("BarCollection.get_next_beat", &BarCollection::get_next_beat);
 	kaba::link_external_class_func("BarCollection.get_prev_beat", &BarCollection::get_prev_beat);
 
+
+	kaba::declare_class_size("Instrument", sizeof(Instrument));
+	kaba::declare_class_element("Instrument.type", &Instrument::type);
+	kaba::declare_class_element("Instrument.string_pitch", &Instrument::string_pitch);
+	kaba::link_external_class_func("Instrument.name", &Instrument::name);
+	kaba::link_external_class_func("Instrument.enumerate", &Instrument::enumerate);
+
 	kaba::declare_class_size("Session", sizeof(Session));
 	kaba::declare_class_element("Session.id", &Session::id);
 	kaba::declare_class_element("Session.storage", &Session::storage);

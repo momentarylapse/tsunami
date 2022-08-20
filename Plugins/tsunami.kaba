@@ -454,6 +454,8 @@ class SampleRef as shared
 class Instrument
 	var type: int
 	var string_pitch: int[]
+	func extern name() -> string
+	func extern static enumerate() -> Instrument[]
 
 class Track as shared
 	var type: SignalType

@@ -1,13 +1,13 @@
 * fx dry/wet
 * clef symbol rendering (own ttf file?)
 * smaller midi notes when zoomed out (limited by time duration)
-* more icons (midi editor, audio editor)
-* audio editor...
+J more icons (midi editor, audio editor)
+J audio editor...
 
 * dialog for "locking" tracks/data
-* cursor handles on layers (shift key)
-* shift + click extends selection
-* shift + home/end extends selection
+J cursor handles on layers (shift key)
+J shift + click extends selection
+J shift + home/end extends selection
 
 
 
@@ -54,7 +54,7 @@ J	nami
 groups
 J	colors
 	keep next to each other
-~	drag and drop group/ungroup
+J	drag and drop group/ungroup
 	popup -> group selected
 J	delete master -> ungroup
 
@@ -78,7 +78,7 @@ J	solo over mute
 
 	record, then select track?
 X	double click on faders -> reset
-	nicer routing....groups...
+J	nicer routing....groups...
 	mark track mixers to stay in view while scrolling
 	indent grouped TrackHeaders
 
@@ -91,5 +91,5 @@ X	double click on faders -> reset
 
 == bugs ==
 
-* pulseaudio playback "out of data" ...argh
-* Equalizer plugin illegal memory access
+~ pulseaudio playback "out of data" ...argh
+J Equalizer plugin illegal memory access

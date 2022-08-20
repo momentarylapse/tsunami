@@ -33,17 +33,17 @@ DeviceConsole::DeviceConsole(Session *_session, hui::Panel *parent) :
 	from_resource("device-manager");
 
 	for (auto t: LIST_TYPE) {
-		event_x(list_id(t), "hui:move", [=]{ on_move_device(t); });
-		event_x(list_id(t), "hui:right-button-down", [=]{ on_right_click_device(t); });
+		event_x(list_id(t), "hui:move", [this, t] { on_move_device(t); });
+		event_x(list_id(t), "hui:right-button-down", [this, t] { on_right_click_device(t); });
 	}
-	event("device-delete", [=]{ on_erase(); });
-	event("device-hide", [=]{ on_device_hide(); });
+	event("device-delete", [this] { on_erase(); });
+	event("device-hide", [this] { on_device_hide(); });
 
 	popup = hui::create_resource_menu("popup-menu-device", this);
 
-	device_manager->subscribe(this, [=]{ on_add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
-	device_manager->subscribe(this, [=]{ update_full(); }, device_manager->MESSAGE_REMOVE_DEVICE);
-	device_manager->subscribe(this, [=]{ change_data(); }, device_manager->MESSAGE_CHANGE);
+	device_manager->subscribe(this, [this] { on_add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
+	device_manager->subscribe(this, [this] { update_full(); }, device_manager->MESSAGE_REMOVE_DEVICE);
+	device_manager->subscribe(this, [this] { change_data(); }, device_manager->MESSAGE_CHANGE);
 
 	update_full();
 }
@@ -78,7 +78,7 @@ string DeviceConsole::to_format(const Device *d) {
 	if (!d->visible)
 		index = "";
 	index = pre + index + post;
-	string name = pre + shorten(d->get_name(), 64) + post;
+	string name = pre + d->get_name() + post;
 	Array<string> infos;
 	if (d == session->device_manager->choose_device(d->type))
 		infos.add("preferred");

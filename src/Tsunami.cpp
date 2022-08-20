@@ -242,6 +242,31 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
 		}
 	});
+	p.cmd("listview", "", "bla", [] (const Array<string> &a) {
+		auto dlg = new hui::Window("ListView", 800, 600);
+		dlg->from_source("ListView list 'a'");
+		dlg->add_string("list", "0");
+		dlg->add_string("list", "1");
+		dlg->add_string("list", "2");
+		if (a == Array<string>({"long"}))
+			for (int i=3; i<1000; i++)
+				dlg->add_string("list", i2s(i));
+		hui::run(dlg);
+	});
+	p.cmd("columnview", "", "bla", [] (const Array<string> &) {
+		auto dlg = new hui::Window("ColumnView", 800, 600);
+		dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
+		dlg->add_string("list", "true\\<b>test</b>\\x");
+		dlg->add_string("list", "false\\<i>more test</i>\\y");
+		dlg->event_x("list", "hui:change", [dlg] {
+			auto e = hui::get_event();
+			msg_write(format("edit: %d %d  %s", e->row, e->column, dlg->get_cell("list", e->row, e->column)));
+		});
+		dlg->event("button", [dlg] {
+			dlg->change_string("list", 0, "false\\bla\\z");
+		});
+		hui::run(dlg);
+	});
 #endif
 	p.parse(args);
 

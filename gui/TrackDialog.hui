@@ -22,13 +22,13 @@ Dialog track_dialog "Track" width=380 height=516
 							Button edit_tuning "" image=hui:edit flat ignorefocus
 				Expander g_fx "Effects"
 					Grid ? "" expandx
-						ListView fx "enabled\\name" format=Cm reorderable nobar noexpandy expandx height=160
+						ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160
 						---|
 						Revealer config-revealer "" slide=down
 							Grid grid-config ""
 				Expander g-fx-midi "Midi effects" disabled
 					Grid ? "" expandx
-						ListView midi-fx "enabled\\name" format=Ct reorderable nobar noexpandy expandx height=100
+						ListView midi-fx "\\name" format=Ct reorderable nobar noexpandy expandx height=100
 						---|
 						Revealer config-revealer-midi "" slide=down
 							Grid grid-config-midi ""

@@ -28,6 +28,9 @@
 #include <math.h>
 
 
+static const int SAMPLE_PREVIEW_WIDTH = 120;
+static const int SAMPLE_PREVIEW_HEIGHT = 36;
+
 // TODO: use BufferPainter / MidiPainter
 void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 	int w = im.width;
@@ -58,7 +61,7 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 
 string render_sample(Sample *s, AudioView *view) {
 	Image im;
-	im.create(120, 36, color(0, 0, 0, 0));
+	im.create(SAMPLE_PREVIEW_WIDTH, SAMPLE_PREVIEW_HEIGHT, color(0, 0, 0, 0));
 	if (s->type == SignalType::AUDIO)
 		render_bufbox(im, *s->buf, view);
 	else if (s->type == SignalType::MIDI)

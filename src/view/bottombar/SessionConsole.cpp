@@ -122,6 +122,7 @@ void SessionConsole::on_list_double_click() {
 
 void SessionConsole::on_right_click() {
 	int n = hui::get_event()->row;
+	msg_write(n);
 	if (n >= 0) {
 		auto &l = session_labels[n];
 		popup_menu->enable("session-load", l.type == Type::BACKUP or l.type == Type::SAVED);

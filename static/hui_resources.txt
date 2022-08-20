@@ -7033,7 +7033,7 @@ vertical
 1
 ListView
 sessions
-format=m,nobar,expandy
+format=m,nobar,grid,expandy
 0
 0
 0
@@ -10098,7 +10098,7 @@ sample-manager-dialog/group-edit
 Edit
 
 sample-manager-dialog/sample-list
-Preview\\Duration\\Name\\Usage
+Name\\Preview\\Duration\\Usage
 
 sample-manager-dialog/sample-manager-dialog
 Sample Manager
@@ -10446,7 +10446,7 @@ track-selector/tracks
 tracks
 
 track_dialog/fx
-enabled\\name
+\\name
 
 track_dialog/g-fx-midi
 Midi effects
@@ -10467,7 +10467,7 @@ track_dialog/g_volume
 Volume
 
 track_dialog/midi-fx
-enabled\\name
+\\name
 
 track_dialog/panning
 0

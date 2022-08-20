@@ -292,6 +292,16 @@ Array<T*> &weak(shared_array<T> &a) {
 	return *(Array<T*>*)&a;
 }
 
+template <class T>
+const Array<T*> &weak(const owned_array<T> &a) {
+	return *(const Array<T*>*)&a;
+}
+
+template <class T>
+Array<T*> &weak(owned_array<T> &a) {
+	return *(Array<T*>*)&a;
+}
+
 
 
 #endif /* SRC_LIB_BASE_POINTER_H_ */

@@ -1,6 +1,6 @@
 Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 	Grid ? "" vertical
-		ListView sample-list "Preview\\Duration\\Name\\Usage" format=Titm select-multi nobar
+		ListView sample-list "Name\\Preview\\Duration\\Usage" format=Titm select-multi nobar
 		Group group-edit "Edit"
 			Grid ? ""
 				Button /edit-song "File" link ignorefocus

@@ -180,6 +180,17 @@ void SIAddPackageGl() {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, gl_p(&nix::FrameBuffer::__init__));
 			func_add_param("attachments", TypeTexturePList);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, gl_p(&nix::FrameBuffer::__delete__));
+		class_add_func("area", TypeRect, gl_p(&nix::FrameBuffer::area));
+		class_add_func("clear_color", TypeVoid, gl_p(&nix::FrameBuffer::clear_color));
+			func_add_param("index", TypeInt);
+			func_add_param("c", TypeColor);
+		class_add_func("clear_depth", TypeVoid, gl_p(&nix::FrameBuffer::clear_depth));
+			func_add_param("z", TypeFloat32);
+		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update));
+			func_add_param("attachments", TypeTexturePList);
+		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update_x));
+			func_add_param("attachments", TypeTexturePList);
+			func_add_param("face", TypeInt);
 		class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
 		class_add_element("width", TypeInt, gl_p(&nix::FrameBuffer::width));
 		class_add_element("height", TypeInt, gl_p(&nix::FrameBuffer::height));
@@ -279,7 +290,11 @@ void SIAddPackageGl() {
 		func_add_param("fb", TypeFrameBuffer);
 	add_func("set_viewport", TypeVoid, gl_p(&nix::set_viewport), Flags::STATIC);
 		func_add_param("r", TypeRect);
-	add_func("reset_to_color", TypeVoid, gl_p(&nix::clear_color), Flags::STATIC);
+	add_func("clear_color", TypeVoid, gl_p(&nix::clear_color), Flags::STATIC);
+		func_add_param("c", TypeColor);
+	add_func("clear_z", TypeVoid, gl_p(&nix::clear_z), Flags::STATIC);
+		func_add_param("z", TypeFloat32);
+	add_func("clear", TypeVoid, gl_p(&nix::clear), Flags::STATIC);
 		func_add_param("c", TypeColor);
 	add_func("set_model_matrix", TypeVoid, gl_p(&nix::set_model_matrix), Flags::STATIC);
 		func_add_param("m", TypeMat4);
@@ -370,7 +385,10 @@ void SIAddPackageGl() {
 	add_enum("FOG_LINEAR", TypeInt, gl_p(nix::FogMode::LINEAR));
 	add_enum("FOG_EXP",    TypeInt, gl_p(nix::FogMode::EXP));
 	add_enum("FOG_EXP2",   TypeInt, gl_p(nix::FogMode::EXP2));
-
+	// culling
+	add_enum("CULL_NONE", TypeInt, gl_p(nix::CullMode::NONE));
+	add_enum("CULL_CW",    TypeInt, gl_p(nix::CullMode::CW));
+	add_enum("CULL_CCW",   TypeInt, gl_p(nix::CullMode::CCW));
 
 	add_ext_var("vb_temp", TypeVertexBufferP, gl_p(&nix::vb_temp));
 }

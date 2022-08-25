@@ -359,12 +359,16 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	message.ttl = -1;
 
-	hui::run_later(0.5f, [this] {
-		if (BackupManager::files.num > 0)
-			view_set_message(this, "old recording backup found", "to load or delete, open the session manager in the bottom bar", [this] {
-				session->win->bottom_bar->open(BottomBar::SESSION_CONSOLE);
-			});
-	});
+
+	static bool first_window = true;
+	if (first_window)
+		hui::run_later(0.5f, [this] {
+			if (BackupManager::files.num > 0)
+				view_set_message(this, "old recording backup found", "to load or delete, open the session manager in the bottom bar", [this] {
+					session->win->bottom_bar->open(BottomBar::SESSION_CONSOLE);
+				});
+		});
+	first_window = false;
 
 
 	// events

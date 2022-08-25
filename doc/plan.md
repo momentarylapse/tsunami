@@ -88,6 +88,20 @@ J	nicer routing....groups...
 		compressor
 
 
+midi editor
+	drag'n'drop pitch
+	prettier selected notes
+	paint mode vs select mode
+	interval/chord also for key presses
+	select clef
+	edit instrument?
+	modifiers for whole bar but only 1 pitch
+	auto neutral sign
+
+bottom bar
+	always overlay button (no X button)
+	devices
+
 
 == bugs ==
 

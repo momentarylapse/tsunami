@@ -38,9 +38,6 @@ void align_to_beats(Song *s, Range &r, int beat_partition);
 const float EDIT_PITCH_SHOW_COUNT = 30.0f;
 
 
-MidiPainter* midi_context(AudioViewLayer *l);
-
-
 
 Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start) {
 	Range allowed = Range::ALL;
@@ -292,7 +289,7 @@ public:
 		view->mode_edit_midi->preview->end();
 	}
 	void on_draw_post(Painter *c) override {
-		auto *mp = midi_context(vlayer);
+		auto *mp = vlayer->midi_context();
 		mp->set_force_shadows(true);
 
 		// current creation
@@ -692,7 +689,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 		view->grid_painter->draw_whatever(c, sub_beat_partition);
 
 		if (l->layer->type == SignalType::MIDI) {
-			auto *mp = midi_context(l);
+			auto *mp = l->midi_context();
 			mp->set_force_shadows(true);
 			auto mode = l->midi_mode();
 			if (mode == MidiMode::LINEAR)
@@ -738,7 +735,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	// midi
 	auto mode = vlayer->midi_mode();
 
-	auto *mp = midi_context(vlayer);
+	auto *mp = vlayer->midi_context();
 
 	/*if (creation_mode != CreationMode::SELECT)*/{
 		if (mode == MidiMode::CLASSICAL) {
@@ -790,7 +787,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	float x1, x2;
 	view->cam.range2screen(r, x1, x2);
 
-	auto *mp = midi_context(l);
+	auto *mp = l->midi_context();
 	mp->set_force_shadows(true);
 
 	// creation preview

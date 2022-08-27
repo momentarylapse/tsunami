@@ -32,6 +32,7 @@ class MidiKeyChange;
 class LayerHeader;
 class ScrollBar;
 class AudioViewTrack;
+class MidiPainter;
 
 
 class AudioViewLayer : public scenegraph::NodeFree {
@@ -106,6 +107,10 @@ public:
 	void update_header();
 
 	ScrollBar *scroll_bar;
+
+
+	MidiPainter *midi_context();
+	owned<MidiPainter> _midi_painter;
 };
 
 #endif /* SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_ */

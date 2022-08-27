@@ -30,7 +30,6 @@
 #include "../mode/ViewModeScaleMarker.h"
 #include "../painter/BufferPainter.h"
 #include "../painter/GridPainter.h"
-#include "../painter/MidiPainter.h"
 #include "../sidebar/SideBar.h"
 #include "../bottombar/BottomBar.h"
 #include "../../data/base.h"
@@ -282,7 +281,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
-	midi_painter = new MidiPainter(song, &cam, &sel, &hover(), theme);
 
 	preview_sleep_time = hui::config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 20;

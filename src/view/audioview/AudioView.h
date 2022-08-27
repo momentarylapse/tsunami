@@ -49,7 +49,6 @@ class ViewModeCapture;
 class ViewModeScaleMarker;
 class ScrollBar;
 class Session;
-class MidiPainter;
 class BufferPainter;
 class GridPainter;
 namespace scenegraph {
@@ -295,8 +294,6 @@ public:
 	scenegraph::Node *onscreen_display;
 	void update_onscreen_displays();
 
-
-	owned<MidiPainter> midi_painter;
 	owned<BufferPainter> buffer_painter;
 	owned<GridPainter> grid_painter;
 

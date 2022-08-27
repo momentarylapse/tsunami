@@ -246,7 +246,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 
 
 void AudioViewLayer::draw_midi(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift) {
-	auto mp = view->midi_painter.get();
+	auto mp = midi_context();//view->midi_painter.get();
 	mp->set_context(area, layer->track->instrument, is_playable(), midi_mode());
 	mp->set_key_changes(midi_key_changes);
 	mp->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
@@ -690,4 +690,14 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	}
 
 	return s;
+}
+
+MidiPainter* AudioViewLayer::midi_context() {
+	if (!_midi_painter)
+		_midi_painter = new MidiPainter(track()->song, &view->cam, &view->sel, &view->hover(), theme);
+	auto *mp = _midi_painter.get();
+	mp->set_context(area, layer->track->instrument, is_playable(), midi_mode());
+	mp->set_key_changes(midi_key_changes);
+	mp->set_linear_range(edit_pitch_min, edit_pitch_max);
+	return mp;
 }

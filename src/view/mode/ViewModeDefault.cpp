@@ -440,14 +440,6 @@ int ViewModeDefault::suggest_move_cursor(const Range &cursor, bool forward) {
 	return pos + d;
 }
 
-MidiPainter* midi_context(AudioViewLayer *l) {
-	auto *mp = l->view->midi_painter.get();
-	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode());
-	mp->set_key_changes(l->midi_key_changes);
-	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
-	return mp;
-}
-
 void ViewModeDefault::draw_selected_layer_highlight(Painter *p, const rect &area) {
 	float d = 12;
 	p->set_color(theme.text.with_alpha(0.1f));
@@ -471,7 +463,7 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 
 
 	if (l->layer->type == SignalType::MIDI) {
-		auto *mp = midi_context(l);
+		auto *mp = l->midi_context();
 		mp->draw_background(c);
 	}
 
@@ -531,7 +523,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, i
 
 		// midi
 
-		auto *mp = midi_context(vl);
+		auto *mp = vl->midi_context();
 		float d = mp->rr;
 		for (MidiNote *n: weak(l->midi))
 			if ((n->y + d >= y0) and (n->y - d <= y1))

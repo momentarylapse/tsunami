@@ -74,29 +74,6 @@ const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
 
 
 
-// make shadows thicker
-Image *ExpandImageMask(Image *im, float d) {
-	Image *r = new Image(im->width, im->height, Black);
-	for (int x=0; x<r->width; x++)
-		for (int y=0; y<r->height; y++) {
-			float a = 0;
-			for (int i=0; i<r->width; i++)
-				for (int j=0; j<r->height; j++) {
-					float dd = sqrt(pow(i-x, 2) + pow(j-y, 2));
-					if (dd > d+0.5f)
-						continue;
-					float aa = im->get_pixel(i, j).a;
-					if (dd > d-0.5f)
-						aa *= (d + 0.5f - dd);
-					if (aa > a)
-						a = aa;
-				}
-			r->set_pixel(x, y, color(a, 0, 0, 0));
-		}
-	return r;
-}
-
-
 class BottomBarExpandButton : public scenegraph::Node {
 public:
 	AudioView *view;
@@ -107,6 +84,9 @@ public:
 		set_perf_name("button");
 		view = _view;
 	}
+	BottomBar *bottom_bar() const {
+		return view->session->win->bottom_bar.get();
+	}
 	void on_draw(Painter *p) override {
 		color c = theme.background_overlay;
 		if (is_cur_hover())
@@ -115,15 +95,24 @@ public:
 		p->draw_circle(area.center(), 40);
 		p->set_color(theme.text_soft3);
 		p->set_font_size(17);
-		p->draw_str(area.center() - vec2(10,10),  "▲");
+		if (bottom_bar()->visible)
+			p->draw_str(area.center() - vec2(10,10),  "\u25bc");
+		else
+			p->draw_str(area.center() - vec2(10,10),  "\u25b2");
 		p->set_font_size(theme.FONT_SIZE);
 	}
 	bool on_left_button_down(const vec2 &m) override {
-		view->session->win->bottom_bar->_show();
+		if (bottom_bar()->visible)
+			bottom_bar()->_hide();
+		else
+			bottom_bar()->_show();
 		return true;
 	}
 	string get_tip() const override {
-		return _("show control panel");
+		if (bottom_bar()->visible)
+			return _("hide control panel");
+		else
+			return _("show control panel");
 	}
 };
 
@@ -1024,15 +1013,14 @@ void AudioView::on_stream_tick() {
 
 
 void AudioView::update_onscreen_displays() {
+	bottom_bar_expand_button->hidden = false;
 	peak_meter_display->hidden = true;
 	output_volume_dial->hidden = true;
-	bottom_bar_expand_button->hidden = true;
 
 	if (session->win->bottom_bar)
-		if (!session->win->bottom_bar->visible) {
+		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
 			peak_meter_display->hidden = !is_playback_active();
 			output_volume_dial->hidden = !is_playback_active();
-			bottom_bar_expand_button->hidden = false;
 		}
 	force_redraw();
 }

@@ -64,7 +64,10 @@ public:
 	static mat4 _cdecl rotation_q(const quaternion &q);
 	static mat4 _cdecl rotation(const vec3 &ang) { return rotation_v(ang); }
 	static mat4 _cdecl rotation(const quaternion &q) { return rotation_q(q); }
-	static mat4 _cdecl scale(float fx,float fy,float fz);
+	static mat4 _cdecl scale_f(float fx,float fy,float fz);
+	static mat4 _cdecl scale_v(const vec3 &v);
+	static mat4 _cdecl scale(float fx,float fy,float fz) { return scale_f(fx, fy, fz); }
+	static mat4 _cdecl scale(const vec3 &v) { return scale_v(v); }
 	static mat4 _cdecl reflection(const plane &pl);
 	static mat4 _cdecl perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym);
 };

@@ -114,7 +114,7 @@ void ControlTabControl::add_child(shared<Control> child, int x, int y) {
 }
 
 void ControlTabControl::remove_child(Control *child) {
-	msg_write("TC remove child");
+	//msg_write("TC remove child");
 	int index = pages.find(child);
 	if (index < 0) {
 		msg_error("TabControl:.remove child: child not found");

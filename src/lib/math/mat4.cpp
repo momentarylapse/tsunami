@@ -285,13 +285,17 @@ mat4 mat4::rotation_q(const quaternion &q) {
 }
 
 // scale orthogonally in 3 dimensions
-mat4 mat4::scale(float fx, float fy, float fz) {
+mat4 mat4::scale_f(float fx, float fy, float fz) {
 	mat4 m;
 	m._00 = fx; m._01 = 0;  m._02 = 0;  m._03 = 0;
 	m._10 = 0;  m._11 = fy; m._12 = 0;  m._13 = 0;
 	m._20 = 0;  m._21 = 0;  m._22 = fz; m._23 = 0;
 	m._30 = 0;  m._31 = 0;  m._32 = 0;  m._33 = 1;
 	return m;
+}
+
+mat4 mat4::scale_v(const vec3 &v) {
+	return scale_f(v.x, v.y, v.z);
 }
 
 // create a transformation that reflects at a <plane pl>

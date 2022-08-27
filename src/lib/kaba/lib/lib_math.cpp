@@ -761,10 +761,12 @@ void SIAddPackageMath() {
 			func_add_param("ang", TypeFloat32);
 		class_add_func("rotation", TypeMat4, &mat4::rotation_q, Flags::_STATIC__PURE);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMat4, &mat4::scale, Flags::_STATIC__PURE);
+		class_add_func("scale", TypeMat4, &mat4::scale_f, Flags::_STATIC__PURE);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
+		class_add_func("scale", TypeMat4, &mat4::scale_v, Flags::_STATIC__PURE);
+			func_add_param("s", TypeVec3);
 		class_add_func("perspective", TypeMat4, &mat4::perspective, Flags::_STATIC__PURE);
 			func_add_param("fovy", TypeFloat32);
 			func_add_param("aspect", TypeFloat32);

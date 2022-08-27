@@ -197,7 +197,7 @@ void SIAddPackageHui() {
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
 			func_add_param("id", TypeString);
-		class_add_func("add_def_button", TypeVoid, hui_p(&hui::Panel::add_def_button));
+		class_add_func("add_toggle_button", TypeVoid, hui_p(&hui::Panel::add_toggle_button));
 			func_add_param("title", TypeString);
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);

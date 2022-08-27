@@ -37,8 +37,8 @@ Dialog settings_dialog "Settings" width=800 height=600 headerbar resizable borde
 					Label t_suck_size "Suck buffer" right disabled
 					SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
 				---|
-				Group g-device-list "Order of preference"
-					Grid device-console ""
+				Group g-device-list "Order of preference" expandx
+					Label t_moved_to_bottombar "moved to bottombar" italic center expandx
 			Grid ? ""
 				Label pdt_defaultartist "Default artist" right disabled
 				Edit default_artist "" "tooltip=will create an artist=... tag in new files"

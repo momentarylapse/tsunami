@@ -9,6 +9,7 @@
 #include "MixingConsole.h"
 #include "LogConsole.h"
 #include "SignalEditor.h"
+#include "DeviceConsole.h"
 #include "PluginConsole.h"
 #include "SessionConsole.h"
 #include "../audioview/AudioView.h"
@@ -26,27 +27,26 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_separator("!horizontal,expandx", 0, 0, "");
 	add_grid("!expandx", 0, 1, "root_grid");
 	set_target("root_grid");
-	add_grid("!noexpandx", 0, 0, "button_grid");
+	add_tab_control("!left,noexpandx,expandy", 0, 0, "choose");
 	add_separator("!vertical", 1, 0, "");
 	add_grid("", 2, 0, "console_grid");
 	set_target("button_grid");
-	add_button("!noexpandy,flat", 0, 0, "close");
-	set_image("close", "hui:close");
-	add_tab_control("!left,expandx,expandy", 0, 1, "choose");
 
 	mixing_console = new MixingConsole(session, this);
 	signal_editor = new SignalEditor(session, this);
 	plugin_console = new PluginConsole(session, this);
+	device_console = new DeviceConsole(session, this);
 	session_console = new SessionConsole(session, this);
 	log_console = new LogConsole(session, this);
 	add_console(mixing_console, "");
 	add_console(signal_editor, "");
 	add_console(plugin_console, "");
+	add_console(device_console, "");
 	add_console(session_console, "");
 	add_console(log_console, "");
 
-	event("choose", [this]{ on_choose(); });
-	event("close", [this]{ on_close(); });
+	event("choose", [this] { on_choose(); });
+	event("close", [this] { on_close(); });
 
 	expand("revealer", false);
 	visible = false;

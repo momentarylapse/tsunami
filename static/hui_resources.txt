@@ -947,25 +947,25 @@ width=400,height=200
 1
 TabControl
 dev-tab
-
+left
 0
 0
 3
 ListView
 output-list
-format=mmm,reorderable
+format=mmm,reorderable,nobar
 0
 0
 0
 ListView
 input-list
-format=mmm,reorderable
+format=mmm,reorderable,nobar
 1
 0
 0
 ListView
 midi-input-list
-format=mmm,reorderable
+format=mmm,reorderable,nobar
 2
 0
 0
@@ -6747,13 +6747,13 @@ suck_size
 0
 Group
 g-device-list
-
+expandx
 0
 1
 1
-Grid
-device-console
-
+Label
+t_moved_to_bottombar
+italic,center,expandx
 0
 0
 0
@@ -7822,7 +7822,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-699
+700
 # Text
 /bars-add
 Add bars...
@@ -9677,6 +9677,9 @@ Debug
 
 settings_dialog/t_midi_api
 Midi library
+
+settings_dialog/t_moved_to_bottombar
+moved to bottombar
 
 settings_dialog/t_prebuffer_size
 Prebuffer

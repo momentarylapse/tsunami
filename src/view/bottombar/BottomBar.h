@@ -23,6 +23,7 @@ class Session;
 class BottomBarConsole;
 class PluginConsole;
 class SessionConsole;
+class DeviceConsole;
 
 class BottomBar : public Observable<hui::Panel> {
 public:
@@ -33,6 +34,7 @@ public:
 		MIXING_CONSOLE,
 		SIGNAL_EDITOR,
 		PLUGIN_CONSOLE,
+		DEVICE_CONSOLE,
 		SESSION_CONSOLE,
 		LOG_CONSOLE
 	};
@@ -71,6 +73,7 @@ public:
 	MixingConsole *mixing_console;
 	SignalEditor *signal_editor;
 	PluginConsole *plugin_console;
+	DeviceConsole *device_console;
 	SessionConsole *session_console;
 	LogConsole *log_console;
 

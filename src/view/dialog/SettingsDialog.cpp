@@ -6,8 +6,7 @@
  */
 
 #include "SettingsDialog.h"
-#include "../bottombar/DeviceConsole.h"
-#include "../bottombar/MiniBar.h"
+//#include "../bottombar/DeviceConsole.h"
 #include "../helper/CpuDisplay.h"
 #include "../helper/Slider.h"
 #include "../audioview/AudioView.h"
@@ -55,8 +54,8 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 	ogg_quality = {{0.0f, 64}, {0.1f, 80}, {0.2f, 96}, {0.3f, 112}, {0.4f, 128}, {0.5f, 160}, {0.6f, 192}, {0.7f, 224}, {0.8f, 256}, {0.9f, 320}, {1.0f, 500}};
 
 
-	device_console = new DeviceConsole(view->session, this);
-	embed(device_console, "device-console", 0, 0);
+	//device_console = new DeviceConsole(view->session, this);
+	//embed(device_console, "device-console", 0, 0);
 
 	load_data();
 

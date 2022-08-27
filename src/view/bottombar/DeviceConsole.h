@@ -14,9 +14,9 @@ class DeviceManager;
 class Device;
 enum class DeviceType;
 
-class DeviceConsole: public hui::Panel {
+class DeviceConsole: public BottomBar::Console {
 public:
-	DeviceConsole(Session *session, hui::Panel *parent);
+	DeviceConsole(Session *session, BottomBar *bar);
 	virtual ~DeviceConsole();
 
 	void update_full();
@@ -37,7 +37,6 @@ public:
 
 	hui::Menu *popup;
 	Device *popup_device;
-	Session *session;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_DEVICECONSOLE_H_ */

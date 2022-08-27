@@ -813,6 +813,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	c->set_clip(l->area and view->song_area());
 	c->set_color(theme.text_soft1);
 	c->set_fill(false);
+	c->set_line_dash({5,5},0);
 	if (mode == MidiMode::TAB) {
 		int y = mp->string_to_screen(string_no);
 		int y1 = y - mp->clef_dy/2;
@@ -832,6 +833,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 		c->draw_rect(rect(x1, x2, y1, y2));
 	}
 	c->set_clip(xxx);
+	c->set_line_dash({},0);
 	c->set_fill(true);
 }
 

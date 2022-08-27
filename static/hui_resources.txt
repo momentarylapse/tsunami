@@ -3207,7 +3207,7 @@ Grid
 
 0
 0
-4
+5
 Grid
 ?
 vertical
@@ -3244,21 +3244,9 @@ width=18,noexpandx,noexpandy
 1
 0
 0
-Grid
-?
-vertical
-1
-0
-2
-Label
-?
-expandy
-0
-0
-0
-ToggleButton
-link-volumes
-flat,ignorefocus
+Separator
+
+
 1
 0
 0
@@ -3278,6 +3266,24 @@ Grid
 inner-grid
 
 0
+0
+0
+Grid
+?
+vertical
+4
+0
+2
+Label
+?
+expandy
+0
+0
+0
+ToggleButton
+link-volumes
+flat,ignorefocus
+1
 0
 0
 # Resource
@@ -7365,7 +7371,7 @@ right,disabled
 0
 SpinButton
 volume
-range=-10000:10:0.1,expandx
+range=-10000:24:0.1,expandx
 1
 0
 0
@@ -7672,7 +7678,7 @@ expandy,vertical
 2
 ListView
 fx
-format=Cm,reorderable,nobar,width=140,expandy,expandx
+format=Cm,reorderable,nobar,width=170,expandy,expandx
 0
 0
 0

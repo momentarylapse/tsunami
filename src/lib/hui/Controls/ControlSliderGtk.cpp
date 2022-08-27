@@ -54,7 +54,7 @@ void ControlSlider::__add_string(const string &s) {
 	auto p = s.explode("\\");//HuiComboBoxSeparator);
 	if (p.num != 2)
 		return;
-	gtk_scale_add_mark(GTK_SCALE(widget), p[0]._float(), vertical ? GTK_POS_LEFT : GTK_POS_TOP, ("<small>" + p[1] + "</small>").c_str());
+	gtk_scale_add_mark(GTK_SCALE(widget), p[0]._float(), vertical ? GTK_POS_LEFT : GTK_POS_TOP, p[1].c_str());
 }
 
 void parse_range(const string &str, float &vmin, float &vmax, float &step) {

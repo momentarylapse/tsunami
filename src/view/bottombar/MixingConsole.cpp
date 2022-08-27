@@ -56,16 +56,16 @@ public:
 		solo_id = "solo";
 		fx_id = "show-fx";
 		id_fx_header = "mixer-fx-header";
-		add_string(pan_slider_id, "-1\\L");
+		add_string(pan_slider_id, "-1\\<span size='x-small'>L</span>");
 		add_string(pan_slider_id, "0\\");
-		add_string(pan_slider_id, "1\\R");
-		add_string(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
-		add_string(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
-		add_string(vol_slider_id, format("%f\\%d", db2slider(0), 0));
-		add_string(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
-		add_string(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
-		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
-		add_string(vol_slider_id, format(u8"%f\\-\u221e", db2slider(DB_MIN))); // \u221e
+		add_string(pan_slider_id, "1\\<span size='x-small'>R</span>");
+		add_string(vol_slider_id, format("%f\\<span size='x-small'>%+d</span>", db2slider(DB_MAX), (int)DB_MAX));
+		add_string(vol_slider_id, format("%f\\", db2slider(6), 6));
+		add_string(vol_slider_id, format("%f\\<span size='x-small'>%d</span>", db2slider(0), 0));
+		add_string(vol_slider_id, format("%f\\", db2slider(-6), -6));
+		add_string(vol_slider_id, format("%f\\<span size='x-small'>%d</span>", db2slider(-12), -12));
+		add_string(vol_slider_id, format("%f\\<span size='x-small'>%d</span>", db2slider(-24), -24));
+		add_string(vol_slider_id, format(u8"%f\\<span size='x-small'>-\u221e</span>", db2slider(DB_MIN))); // \u221e
 
 		event_xp(id_name, "hui:draw", [this] (Painter* p) { on_name_draw(p); });
 		event_x(id_name, "hui:left-button-down", [this] { on_name_left_click(); });
@@ -291,8 +291,8 @@ public:
 
 
 	static constexpr float DB_MIN = -1000000;
-	static constexpr float DB_MAX = 10;
-	static constexpr float TAN_SCALE = 10.0f;
+	static constexpr float DB_MAX = 12;
+	static constexpr float TAN_SCALE = 13.0f;
 
 	static float db2slider(float db) {
 		return (atan(db / TAN_SCALE) - atan(DB_MIN / TAN_SCALE)) / (atan(DB_MAX / TAN_SCALE) - atan(DB_MIN / TAN_SCALE));

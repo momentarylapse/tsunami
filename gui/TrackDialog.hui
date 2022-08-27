@@ -7,7 +7,7 @@ Dialog track_dialog "Track" width=380 height=516
 				Group g_volume "Volume"
 					Grid ? "" noexpandx
 						Label t_volume "Volume" right disabled
-						SpinButton volume "0" range=-10000:10:0.1 expandx
+						SpinButton volume "0" range=-10000:24:0.1 expandx
 						Label /db "dB"
 						---|
 						Label t_panning "Balance" right disabled

@@ -6,9 +6,10 @@ Dialog mixing-console "" width=300 height=200
 			Grid ? ""
 				Slider output-volume "" vertical width=50 expandy "tooltip=Output volume" ignorefocus
 				DrawingArea output-peaks "" width=18 noexpandx noexpandy "tooltip=Output level"
-		Grid ? "" vertical
-			Label ? "" expandy
-			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat ignorefocus
+		Separator ? "" vertical
 		Separator ? "" vertical
 		Scroller ? "" expandx scrolly=no
 			Grid inner-grid ""
+		Grid ? "" vertical
+			Label ? "" expandy
+			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat ignorefocus

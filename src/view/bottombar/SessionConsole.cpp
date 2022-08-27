@@ -141,13 +141,13 @@ void SessionConsole::load_data() {
 	for (auto &l: session_labels) {
 		if (l.type == Type::ACTIVE) {
 			if (l.session == session)
-				add_string(id_list, format("<b><big>%s</big>\n      <small>this window's session</small></b>", l.name));
+				add_string(id_list, format("<b>%s\n      <small>this window's session</small></b>", l.name));
 			else
-				add_string(id_list, format("<big>%s</big>\n      <small>other window's session</small>", l.name));
+				add_string(id_list, format("%s\n      <small>other window's session</small>", l.name));
 		} else if (l.type == Type::SAVED) {
-			add_string(id_list, format("<span alpha=\"50%%\"><big>%s</big></span>\n      <span alpha=\"50%%\"><small>saved session</small></span>", l.name));
+			add_string(id_list, format("<span alpha=\"50%%\">%s</span>\n      <span alpha=\"50%%\"><small>saved session</small></span>", l.name));
 		} else if (l.type == Type::BACKUP) {
-			add_string(id_list, format("<span color=\"orange\"><big>%s</big></span>\n      <span color=\"orange\"><small>recording backup</small></span>", l.name));
+			add_string(id_list, format("<span color=\"orange\">%s</span>\n      <span color=\"orange\"><small>recording backup</small></span>", l.name));
 		}
 	}
 }

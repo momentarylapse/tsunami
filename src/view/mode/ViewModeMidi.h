@@ -129,6 +129,7 @@ public:
 	int rep_key_num;
 
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_object(AudioViewLayer *vlayer) override;
 	string get_tip() override;
 };
 

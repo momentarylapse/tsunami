@@ -18,6 +18,7 @@
 #include "../../module/SignalChain.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../lib/os/time.h"
+#include "../../action/Action.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
@@ -67,6 +68,140 @@ MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, f
 	n->clef_position = clef_pos;
 	return n;
 }
+
+class ActionTrackMoveNotes: public Action {
+public:
+	ActionTrackMoveNotes(TrackLayer *l, const SongSelection &sel) {
+		layer = l;
+		for (auto n: weak(l->midi))
+			if (sel.has(n))
+				notes.add({n, n->range.offset, n->pitch, n->stringno});
+	}
+
+	string name() const override { return ":##:move notes"; }
+
+	void *execute(Data *d) override {
+		for (auto &d: notes) {
+			d.note->range.offset = d.pos_old + doffset;
+			d.note->pitch = d.pitch_old + dpitch;
+			d.note->stringno = d.string_old;
+			if (dstring != 0 and layer->track->instrument.has_strings())
+				d.note->stringno = clamp(d.string_old + dstring, 0, layer->track->instrument.string_pitch.num - 1);
+			d.note->reset_clef();
+		}
+		layer->track->notify();
+		return nullptr;
+	}
+	void undo(Data *d) override{
+		for (auto &d: notes) {
+			d.note->range.offset = d.pos_old;
+			d.note->pitch = d.pitch_old;
+			d.note->stringno = d.string_old;
+			d.note->reset_clef();
+		}
+		layer->track->notify();
+	}
+
+	// continuous editing
+	void abort(Data *d) {
+		undo(d);
+	}
+	void abort_and_notify(Data *d) {
+		abort(d);
+		d->notify();
+	}
+	void set_param_and_notify(Data *d, int _doffset, float _dpitch, int _dstring) {
+		doffset = _doffset;
+		dpitch = _dpitch;
+		dstring = _dstring;
+		execute(d);
+		d->notify();
+	}
+
+	bool is_trivial() override {
+		return (doffset == 0) and (dpitch == 0);
+	}
+
+private:
+	struct NoteSaveData {
+		MidiNote *note;
+		int pos_old;
+		float pitch_old;
+		int string_old;
+	};
+	Array<NoteSaveData> notes;
+	TrackLayer *layer;
+	int doffset;
+	float dpitch;
+	int dstring;
+};
+
+class MouseDelayNotesDnD : public MouseDelayAction {
+public:
+	AudioViewLayer *layer;
+	AudioView *view;
+	SongSelection sel;
+	ViewModeMidi *mode_midi;
+	ActionTrackMoveNotes *action = nullptr;
+	int mouse_pos0;
+	int ref_pos;
+	int pitch0;
+	int string0;
+	MouseDelayNotesDnD(AudioViewLayer *l, const SongSelection &s) {
+		layer = l;
+		view = layer->view;
+		mode_midi = view->mode_edit_midi;
+		sel = s;
+		mouse_pos0 = view->hover().pos;
+		ref_pos = hover_reference_pos(view->hover());
+		pitch0 = mouse_to_pitch(view->hover().y0);
+		string0 = mouse_to_string(view->hover().y0);
+	}
+	int mouse_to_pitch(float y) {
+		// relative to arbitrary point!
+		auto mp = layer->midi_context();
+		if (layer->midi_mode() == MidiMode::LINEAR)
+			return mp->y2pitch_linear(y);
+		if (layer->midi_mode() == MidiMode::CLASSICAL)
+			return mp->y2pitch_classical(y, NoteModifier::NONE);
+		if (layer->midi_mode() == MidiMode::TAB)
+			return layer->track()->instrument.string_pitch[mouse_to_string(y)];
+		return 0;
+	}
+	int mouse_to_string(float y) {
+		auto mp = layer->midi_context();
+		if (layer->midi_mode() == MidiMode::TAB)
+			return mp->screen_to_string(y);
+		return 0;
+	}
+	void on_start(const vec2 &m) override {
+		action = new ActionTrackMoveNotes(layer->layer, sel);
+	}
+	void on_update(const vec2 &m) override {
+		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+		int pitch = mouse_to_pitch(m.y);
+		int stringno = mouse_to_string(m.y);
+
+		view->snap_to_grid(p);
+		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
+		int dpitch = pitch - pitch0;
+		int dstring = stringno - string0;
+		action->set_param_and_notify(view->song, dpos, dpitch, dstring);
+	}
+	void on_finish(const vec2 &m) override {
+		view->song->execute(action);
+	}
+	void on_cancel() override {
+		action->undo(view->song);
+		delete action;
+	}
+
+	int hover_reference_pos(HoverData &s) {
+		if (s.note)
+			return s.note->range.offset;
+		return s.pos;
+	}
+};
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
@@ -393,6 +528,20 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 		}
 	}
 	view->exclusively_select_layer(vlayer);
+}
+
+void ViewModeMidi::left_click_handle_object(AudioViewLayer *vlayer) {
+
+	view->exclusively_select_layer(vlayer);
+	if (!view->hover_selected_object())
+		view->exclusively_select_object();
+
+	// start drag'n'drop?
+	if (hover().note) {
+		view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MIDI_NOTES)));
+	} else {
+		ViewModeDefault::left_click_handle_object(vlayer);
+	}
 }
 
 void ViewModeMidi::edit_add_pause() {

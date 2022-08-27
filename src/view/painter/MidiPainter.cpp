@@ -177,7 +177,7 @@ float MidiPainter::string_to_screen(int string_no) {
 }
 
 int MidiPainter::screen_to_string(float y) {
-	return (int)floor((string_y0 - y) / string_dy + 0.5f);
+	return clamp((int)floor((string_y0 - y) / string_dy + 0.5f), 0, instrument->string_pitch.num-1);
 }
 
 // this is the "center" of the note!

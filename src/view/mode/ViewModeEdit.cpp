@@ -121,6 +121,10 @@ void ViewModeEdit::left_click_handle_void(AudioViewLayer *vlayer) {
 	view->exclusively_select_layer(vlayer);
 }
 
+void ViewModeEdit::left_click_handle_object(AudioViewLayer *vlayer) {
+	mode->left_click_handle_object(vlayer);
+}
+
 string ViewModeEdit::get_tip() {
 	return mode->get_tip();
 }

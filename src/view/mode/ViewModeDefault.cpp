@@ -162,7 +162,6 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 }
 
 void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
-
 	if (view->selecting_xor()) {
 
 		// differential selection

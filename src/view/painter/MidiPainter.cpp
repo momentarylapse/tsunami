@@ -142,7 +142,7 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 	if (state & MidiPainter::STATE_REFERENCE)
 		col = color::interpolate(col, colors.background_track, 0.65f);
 	if (state & MidiPainter::STATE_SELECTED)
-		col = color::interpolate(col, colors.selection, 0.5f);
+		col = colors.text;//::interpolate(col, colors.selection, 0.5f);
 	if (state & MidiPainter::STATE_HOVER)
 		col = color::interpolate(col, colors.hover, 0.5f);
 
@@ -596,16 +596,46 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState s
 
 }
 
+// "shadow" to indicate length
+void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col) {
+	//x1 += r;
+	c->set_color(col);
+	c->draw_rect(rect(x1, x2 + rx, y - rr*0.7f - rx, y + rr*0.7f + rx));
+}
+
+void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col) {
+	c->set_color(col);
+	c->set_line_width(3 * clef_line_width);
+	float x = (x1 + x2) / 2;
+	c->draw_line({x1, y}, {x - dx, y});
+	c->draw_line({x + dx, y}, {x2, y});
+}
+
 void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
-	if (state & MidiPainter::STATE_SELECTED) {
-		color col1 = local_theme.selection;
-		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
-	}
 
 	color col, col_shadow;
 	get_col(col, col_shadow, n, state, is_playable, local_theme);
 
-	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
+	if (state & MidiPainter::STATE_SELECTED) {
+		color col1 = local_theme.pitch_text[(int)n->pitch % 12];//selection;
+
+		// "shadow" to indicate length
+		if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
+			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 1.6f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 0.7f, col_shadow);
+		}
+
+		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
+		draw_simple_note(c, x1, x2, y, -2, col, col_shadow, false);
+	} else {
+		// "shadow" to indicate length
+		if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
+			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
+
+		draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
+	}
 
 	draw_note_flags(c, n, state, x1, x2, y);
 }
@@ -638,27 +668,7 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 }
 
 
-// "shadow" to indicate length
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col) {
-	//x1 += r;
-	c->set_color(col);
-	c->draw_rect(rect(x1, x2 + rx, y - rr*0.7f - rx, y + rr*0.7f + rx));
-}
-
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col) {
-	c->set_color(col);
-	c->set_line_width(3 * clef_line_width);
-	float x = (x1 + x2) / 2;
-	c->draw_line({x1, y}, {x - dx, y});
-	c->draw_line({x + dx, y}, {x2, y});
-}
-
 void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle) {
-	//x1 += r;
-	// "shadow" to indicate length
-	if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
-		//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-		draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
 
 	// the note circle
 	c->set_color(col);

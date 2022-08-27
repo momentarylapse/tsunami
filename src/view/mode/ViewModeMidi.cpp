@@ -691,15 +691,8 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 		if (l->layer->type == SignalType::MIDI) {
 			auto *mp = l->midi_context();
 			mp->set_force_shadows(true);
-			auto mode = l->midi_mode();
-			if (mode == MidiMode::LINEAR)
-				mp->draw_pitch_grid(c, l->layer->track->synth.get());
-
-			if (mode == MidiMode::CLASSICAL) {
-				mp->draw_clef_classical(c);
-			} else if (mode == MidiMode::TAB) {
-				mp->draw_clef_tab(c);
-			}
+			mp->set_synthesizer(l->layer->track->synth.get());
+			mp->draw_background(c, true);
 		}
 	} else {
 		ViewModeDefault::draw_layer_background(c, l);

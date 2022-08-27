@@ -537,7 +537,11 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 
 
-void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth) {
+void MidiPainter::set_synthesizer(Synthesizer *s) {
+	synth = s;
+}
+
+void MidiPainter::draw_pitch_grid(Painter *c) {
 	// pitch grid
 	c->set_color(color(0.25f, 0, 0, 0));
 	for (int i=pitch_min; i<pitch_max; i++) {
@@ -952,11 +956,14 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	c->set_clip(xxx);
 }
 
-void MidiPainter::draw_background(Painter *c) {
+void MidiPainter::draw_background(Painter *c, bool force) {
 	if (mode == MidiMode::CLASSICAL) {
 		draw_clef_classical(c);
 	} else if (mode == MidiMode::TAB) {
 		draw_clef_tab(c);
+	} else if (mode == MidiMode::LINEAR) {
+		if (force)
+			draw_pitch_grid(c);
 	}
 }
 

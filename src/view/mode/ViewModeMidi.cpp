@@ -163,7 +163,7 @@ public:
 		if (layer->midi_mode() == MidiMode::LINEAR)
 			return mp->y2pitch_linear(y);
 		if (layer->midi_mode() == MidiMode::CLASSICAL)
-			return mp->y2pitch_classical(y, NoteModifier::NONE);
+			return mp->screen_to_clef_pos(y * 12.0f / 7.0f); // quick'n'dirty chromatic hack :D
 		if (layer->midi_mode() == MidiMode::TAB)
 			return layer->track()->instrument.string_pitch[mouse_to_string(y)];
 		return 0;

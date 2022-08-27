@@ -92,7 +92,7 @@ public:
 	void _cdecl add_tag(const string &key, const string &value);
 	void _cdecl edit_tag(int index, const string &key, const string &value);
 	void _cdecl delete_tag(int index);
-	void _cdecl change_all_track_volumes(Track *t, float volume);
+	void _cdecl change_track_volumes(Track *t_ref, const Array<const Track*> &tracks, float volume);
 	void _cdecl set_sample_rate(int sample_rate);
 	void _cdecl set_default_format(SampleFormat format);
 	void _cdecl set_compression(int compression);

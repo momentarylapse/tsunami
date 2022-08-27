@@ -12,4 +12,4 @@ Dialog mixing-console "" width=300 height=200
 			Grid inner-grid ""
 		Grid ? "" vertical
 			Label ? "" expandy
-			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat ignorefocus
+			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all selected tracks simultaneously" flat ignorefocus

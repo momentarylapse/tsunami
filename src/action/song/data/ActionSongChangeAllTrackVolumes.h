@@ -14,7 +14,7 @@ class Track;
 
 class ActionSongChangeAllTrackVolumes : public ActionMergable<float> {
 public:
-	ActionSongChangeAllTrackVolumes(Song *s, Track *t, float volume);
+	ActionSongChangeAllTrackVolumes(Song *s, Track *t_ref, const Array<const Track*> &tracks, float volume);
 
 	string name() const override { return ":##:set volume"; }
 
@@ -24,6 +24,11 @@ public:
 	bool mergable(Action *a) override;
 
 	int track_no;
-	Array<float> old_volumes;
+
+	struct TrackVolume {
+		Track *track;
+		float old_volume;
+	};
+	Array<TrackVolume> track_volumes;
 };
 

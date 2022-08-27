@@ -8,13 +8,15 @@
 #include "ActionSongChangeAllTrackVolumes.h"
 #include "../../../data/Song.h"
 #include "../../../data/Track.h"
+#include "../../../lib/base/iter.h"
 
-ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t, float _volume) {
-	track_no = t->get_index();
+ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t_ref, const Array<const Track*> &_tracks, float _volume) {
+	track_no = t_ref->get_index();
 	new_value = _volume;
-	old_value = t->volume;
-	for (auto tt: t->song->tracks)
-		old_volumes.add(tt->volume);
+	old_value = t_ref->volume;
+	for (auto t: weak(t_ref->song->tracks))
+		if (_tracks.find(t) >= 0)
+			track_volumes.add({t, t->volume});
 }
 
 void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
@@ -22,9 +24,9 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 
 	float factor = new_value / old_value;
 
-	foreachi(auto tt, s->tracks, i) {
-		tt->volume = old_volumes[i] * factor;
-		tt->notify(tt->MESSAGE_CHANGE);
+	for (auto &tv: track_volumes) {
+		tv.track->volume = tv.old_volume * factor;
+		tv.track->notify(tv.track->MESSAGE_CHANGE);
 	}
 
 	return nullptr;
@@ -33,9 +35,9 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 void ActionSongChangeAllTrackVolumes::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
-	foreachi(auto tt, s->tracks, i) {
-		tt->volume = old_volumes[i];
-		tt->notify(tt->MESSAGE_CHANGE);
+	for (auto &tv: track_volumes) {
+		tv.track->volume = tv.old_volume;
+		tv.track->notify(tv.track->MESSAGE_CHANGE);
 	}
 }
 

@@ -219,7 +219,7 @@ public:
 		editing = true;
 		if (track()) {
 			if (parent->is_checked("link-volumes"))
-				track()->song->change_all_track_volumes(track(), slider2vol(get_float("")));
+				track()->song->change_track_volumes(track(), vtrack->view->sel.tracks(), slider2vol(get_float("")));
 			else
 				vtrack->set_volume(slider2vol(get_float("")));
 		}

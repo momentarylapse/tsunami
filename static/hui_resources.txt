@@ -9032,7 +9032,7 @@ mini_bar/volume
 Output volume
 mixing-console/link-volumes
 🔗
-link and change the sliders of all tracks simultaneously
+link and change the sliders of all selected tracks simultaneously
 mixing-console/output-peaks
 
 Output level

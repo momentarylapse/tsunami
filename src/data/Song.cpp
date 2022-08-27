@@ -110,8 +110,8 @@ void Song::delete_tag(int index) {
 	execute(new ActionTagDelete(index));
 }
 
-void Song::change_all_track_volumes(Track *t, float volume) {
-	execute(new ActionSongChangeAllTrackVolumes(this, t, volume));
+void Song::change_track_volumes(Track *t_ref, const Array<const Track*> &tracks, float volume) {
+	execute(new ActionSongChangeAllTrackVolumes(this, t_ref, tracks, volume));
 }
 
 void Song::set_sample_rate(int _sample_rate) {

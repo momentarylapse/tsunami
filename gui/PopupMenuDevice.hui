@@ -1,5 +1,10 @@
 Menu popup-menu-device ""
 	Item header "Device" disabled
 	Separator
-	Item /device-delete "Remove (missing)"
+	Item /device-delete "Remove (if missing)"
 	Item /device-hide "Ignore" checkable
+	Menu device-sort-menu "Sort"
+		Item device-sort-top "Top"
+		Item device-sort-up "Up"
+		Item device-sort-down "Down"
+		Item device-sort-bottom "Bottom"

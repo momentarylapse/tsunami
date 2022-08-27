@@ -35,8 +35,12 @@ DeviceConsole::DeviceConsole(Session *session, BottomBar *bar) :
 		event_x(list_id(t), "hui:move", [this, t] { on_move_device(t); });
 		event_x(list_id(t), "hui:right-button-down", [this, t] { on_right_click_device(t); });
 	}
-	event("device-delete", [this] { on_erase(); });
+	event("device-delete", [this] { on_device_erase(); });
 	event("device-hide", [this] { on_device_hide(); });
+	event("device-sort-up", [this] { on_device_sort(SortMode::UP); });
+	event("device-sort-down", [this] { on_device_sort(SortMode::DOWN); });
+	event("device-sort-top", [this] { on_device_sort(SortMode::TOP); });
+	event("device-sort-bottom", [this] { on_device_sort(SortMode::BOTTOM); });
 
 	popup = hui::create_resource_menu("popup-menu-device", this);
 
@@ -142,7 +146,6 @@ void DeviceConsole::on_add_device() {
 	add_string(list_id(type), to_format(d));
 }
 
-
 void DeviceConsole::on_move_device(DeviceType type) {
 	auto e = hui::get_event();
 	int source = e->row;
@@ -152,7 +155,29 @@ void DeviceConsole::on_move_device(DeviceType type) {
 	set_int(list_id(type), target);
 }
 
-void DeviceConsole::on_erase() {
+void DeviceConsole::on_device_sort(SortMode mode) {
+	int t = get_int("dev-tab");
+	auto type = LIST_TYPE[t];
+	int n = get_int(list_id(type));
+	if (n < 0)
+		return;
+
+	auto& list = device_manager->device_list(type);
+	int target = n;
+	if (mode == SortMode::UP)
+		target = max(n - 1, 0);
+	if (mode == SortMode::DOWN)
+		target = min(n + 1, list.num - 1);
+	if (mode == SortMode::TOP)
+		target = 0;
+	if (mode == SortMode::BOTTOM)
+		target = list.num - 1;
+	device_manager->move_device_priority(list[n], target);
+
+	set_int(list_id(type), target);
+}
+
+void DeviceConsole::on_device_erase() {
 	int t = get_int("dev-tab");
 	auto type = LIST_TYPE[t];
 	int n = get_int(list_id(type));

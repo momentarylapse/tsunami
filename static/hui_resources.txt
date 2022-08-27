@@ -4619,7 +4619,7 @@ popup-menu-device
 
 0
 0
-4
+5
 Item
 header
 disabled
@@ -4641,6 +4641,36 @@ device-delete
 Item
 device-hide
 checkable
+3
+0
+0
+Menu
+device-sort-menu
+
+4
+0
+4
+Item
+device-sort-top
+
+0
+0
+0
+Item
+device-sort-up
+
+1
+0
+0
+Item
+device-sort-down
+
+2
+0
+0
+Item
+device-sort-bottom
+
 3
 0
 0
@@ -7822,7 +7852,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-700
+705
 # Text
 /bars-add
 Add bars...
@@ -7879,7 +7909,7 @@ does not move anything - leaves a gap instead
 Delete and shift
 no gap - moves everyting afterwards
 /device-delete
-Remove (missing)
+Remove (if missing)
 
 /device-hide
 Ignore
@@ -9182,6 +9212,21 @@ Linear
 
 popup-menu-curve/header
 Curve
+
+popup-menu-device/device-sort-bottom
+Bottom
+
+popup-menu-device/device-sort-down
+Down
+
+popup-menu-device/device-sort-menu
+Sort
+
+popup-menu-device/device-sort-top
+Top
+
+popup-menu-device/device-sort-up
+Up
 
 popup-menu-device/header
 Device

@@ -25,9 +25,16 @@ public:
 
 	void on_move_device(DeviceType type);
 	void on_right_click_device(DeviceType type);
-	void on_erase();
 
+	void on_device_erase();
 	void on_device_hide();
+	enum class SortMode {
+		UP,
+		DOWN,
+		TOP,
+		BOTTOM
+	};
+	void on_device_sort(SortMode mode);
 
 	string to_format(const Device *d);
 

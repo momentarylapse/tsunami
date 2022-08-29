@@ -136,6 +136,73 @@ private:
 	int dstring;
 };
 
+Range selected_midi_range(TrackLayer *l, const SongSelection &sel) {
+	bool first = true;
+	Range r = Range(0,0);
+	for (auto n: weak(l->midi))
+		if (sel.has(n)) {
+			if (first)
+				r = n->range;
+			else
+				r = r or n->range;
+		}
+	return r;
+}
+
+class ActionTrackScaleNotes: public Action {
+public:
+	ActionTrackScaleNotes(TrackLayer *l, const SongSelection &sel) {
+		layer = l;
+		range0 = selected_midi_range(l, sel);
+		for (auto n: weak(l->midi))
+			if (sel.has(n))
+				notes.add({n, n->range});
+	}
+
+	string name() const override { return ":##:move notes"; }
+
+	void *execute(Data *d) override {
+		for (auto &d: notes) {
+			d.note->range = range;//.offset = d.pos_old + doffset;
+		}
+		layer->track->notify();
+		return nullptr;
+	}
+	void undo(Data *d) override{
+		for (auto &d: notes)
+			d.note->range = d.range_old;
+		layer->track->notify();
+	}
+
+	// continuous editing
+	void abort(Data *d) {
+		undo(d);
+	}
+	void abort_and_notify(Data *d) {
+		abort(d);
+		d->notify();
+	}
+	void set_param_and_notify(Data *d, const Range &r) {
+		range = r;
+		execute(d);
+		d->notify();
+	}
+
+	bool is_trivial() override {
+		return range == range0;
+	}
+
+private:
+	struct NoteSaveData {
+		MidiNote *note;
+		Range range_old;
+	};
+	Array<NoteSaveData> notes;
+	TrackLayer *layer;
+	Range range0;
+	Range range;
+};
+
 class MouseDelayNotesDnD : public MouseDelayAction {
 public:
 	AudioViewLayer *layer;
@@ -196,6 +263,50 @@ public:
 		delete action;
 	}
 
+	int hover_reference_pos(HoverData &s) {
+		if (s.note)
+			return s.note->range.offset;
+		return s.pos;
+	}
+};
+
+class MouseDelayNotesScaleDnD : public MouseDelayAction {
+public:
+	AudioViewLayer *layer;
+	AudioView *view;
+	SongSelection sel;
+	ViewModeMidi *mode_midi;
+	ActionTrackScaleNotes *action = nullptr;
+	int mouse_pos0;
+	int ref_pos;
+	Range range0;
+	MouseDelayNotesScaleDnD(AudioViewLayer *l, const SongSelection &s) {
+		layer = l;
+		view = layer->view;
+		mode_midi = view->mode_edit_midi;
+		sel = s;
+		mouse_pos0 = view->hover().pos;
+		ref_pos = hover_reference_pos(view->hover()) + view->hover().note->range.length;
+		range0 = selected_midi_range(layer->layer, sel);
+	}
+	void on_start(const vec2 &m) override {
+		action = new ActionTrackScaleNotes(layer->layer, sel);
+	}
+	void on_update(const vec2 &m) override {
+		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+
+		view->snap_to_grid(p);
+		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
+		range0.set_end(p);
+		action->set_param_and_notify(view->song, range0);
+	}
+	void on_finish(const vec2 &m) override {
+		view->song->execute(action);
+	}
+	void on_cancel() override {
+		action->undo(view->song);
+		delete action;
+	}
 	int hover_reference_pos(HoverData &s) {
 		if (s.note)
 			return s.note->range.offset;
@@ -530,6 +641,10 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 	view->exclusively_select_layer(vlayer);
 }
 
+bool hover_end_of_note(HoverData &h, MidiNote *n) {
+	return h.pos >= n->range.end() - n->range.length*0.1f;
+}
+
 void ViewModeMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 
 	view->exclusively_select_layer(vlayer);
@@ -537,8 +652,11 @@ void ViewModeMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 		view->exclusively_select_object();
 
 	// start drag'n'drop?
-	if (hover().note) {
-		view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MIDI_NOTES)));
+	if (auto n = hover().note) {
+		if (hover_end_of_note(hover(), n))
+			view->mdp_prepare(new MouseDelayNotesScaleDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MIDI_NOTES)));
+		else
+			view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MIDI_NOTES)));
 	} else {
 		ViewModeDefault::left_click_handle_object(vlayer);
 	}

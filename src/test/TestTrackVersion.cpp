@@ -43,28 +43,28 @@ shared<Song> create_layer_example_data(bool with_fades) {
 
 void TestTrackVersion::test_active_version_ranges_base() {
 	auto s = create_layer_example_data(true);
-	assert_equal(s->tracks[0]->layers[0]->active_version_ranges(), {RangeTo(Range::BEGIN,7), RangeTo(10,17), RangeTo(20,Range::END)});
+	assert_equal(s->tracks[0]->layers[0]->active_version_ranges(), {Range::to(Range::BEGIN,7), Range::to(10,17), Range::to(20,Range::END)});
 }
 
 void TestTrackVersion::test_inactive_version_ranges_base() {
 	auto s = create_layer_example_data(true);
-	assert_equal(s->tracks[0]->layers[0]->inactive_version_ranges(), {RangeTo(7,10), RangeTo(17,20)});
+	assert_equal(s->tracks[0]->layers[0]->inactive_version_ranges(), {Range::to(7,10), Range::to(17,20)});
 }
 
 void TestTrackVersion::test_active_version_ranges_second() {
 	auto s = create_layer_example_data(true);
-	assert_equal(s->tracks[0]->layers[1]->active_version_ranges(), {RangeTo(Range::BEGIN,2), RangeTo(5,12), RangeTo(15,22), RangeTo(25, Range::END)});
+	assert_equal(s->tracks[0]->layers[1]->active_version_ranges(), {Range::to(Range::BEGIN,2), Range::to(5,12), Range::to(15,22), Range::to(25, Range::END)});
 }
 
 void TestTrackVersion::test_inactive_version_ranges_second() {
 	auto s = create_layer_example_data(true);
-	assert_equal(s->tracks[0]->layers[1]->inactive_version_ranges(), {RangeTo(2,5), RangeTo(12,15), RangeTo(22,25)});
+	assert_equal(s->tracks[0]->layers[1]->inactive_version_ranges(), {Range::to(2,5), Range::to(12,15), Range::to(22,25)});
 }
 
 void TestTrackVersion::test_dominant() {
 	auto s = create_layer_example_data(false);
 	Track *t = s->tracks[0].get();
-	Range r = RangeTo(0, 100000);
+	Range r = Range::to(0, 100000);
 	t->mark_dominant({t->layers[0].get()}, r);
 	assert_equal(t->layers[0]->fades.num, 0);
 	assert_equal(t->layers[1]->fades.num, 2);

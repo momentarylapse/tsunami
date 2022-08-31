@@ -117,10 +117,10 @@ Range BarCollection::get_sub_beats(int pos, int sub_beat_partition, int num_sub_
 			a = get_prev_sub_beat(a, sub_beat_partition);
 	}
 	if (b > a and a >= 0)
-		return RangeTo(a, b);
+		return Range::to(a, b);
 
 	// out of bars...
-	return RangeTo(pos, pos);
+	return Range::to(pos, pos);
 }
 
 

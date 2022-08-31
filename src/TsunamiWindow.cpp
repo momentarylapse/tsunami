@@ -460,7 +460,7 @@ void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nu
 		if (prog)
 			prog->set((float) offset / len);
 
-		Range r = RangeTo(offset, min(offset + chunk_size, len));
+		Range r = Range::to(offset, min(offset + chunk_size, len));
 
 		AudioBuffer tbuf;
 		tbuf.set_as_ref(buf, offset, r.length);
@@ -908,7 +908,7 @@ void TsunamiWindow::on_delete_shift() {
 		return;
 	song->begin_action_group(_("delete shift"));
 	song->delete_selection(view->sel);
-	auto sel = SongSelection::from_range(song, RangeTo(view->cursor_range().end(), 2000000000)).filter(view->sel.layers());
+	auto sel = SongSelection::from_range(song, Range::to(view->cursor_range().end(), 2000000000)).filter(view->sel.layers());
 	auto a = new ActionSongMoveSelection(song, sel, true);
 	a->set_param_and_notify(song, -view->sel.range().length);
 	song->execute(a);

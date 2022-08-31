@@ -60,7 +60,7 @@ void ActionBarEdit::build(Data *d) {
 							int stretch_offset = stretch_zone.offset - b.offset;
 							b_stretch_in.set_as_ref(b, stretch_offset, stretch_zone.length);
 
-							Range rr = RangeTo(stretch_zone.start(), b.range().end());
+							Range rr = Range::to(stretch_zone.start(), b.range().end());
 							auto *a = new ActionTrackEditBuffer(l, rr);
 
 							// stretch and insert

@@ -56,8 +56,9 @@ public:
 	
 	bool operator==(const Range &r) const;
 	bool operator!=(const Range &r) const;
-};
 
-Range RangeTo(int start, int end);
+	static Range to(int start, int end);
+	Range scale_rel(const Range &from, const Range &to) const;
+};
 
 #endif /* RANGE_H_ */

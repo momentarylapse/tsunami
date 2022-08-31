@@ -296,7 +296,7 @@ void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers
 }
 
 void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover) {
-	Range group_range = RangeTo(markers[0]->range.start(), markers.back()->range.end());
+	Range group_range = Range::to(markers[0]->range.start(), markers.back()->range.end());
 	foreachi(auto *m, markers, i)
 		draw_marker(c, m, (hover.type == HoverData::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
 }
@@ -659,7 +659,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	if (layer->track->type == SignalType::BEATS) {
 
 		// bars
-		auto bars = view->song->bars.get_bars(RangeTo(s.pos, Range::END));
+		auto bars = view->song->bars.get_bars(Range::to(s.pos, Range::END));
 		for (auto *b: bars) {
 			float x = view->cam.sample2screen(b->range().offset);
 			// test for label area...

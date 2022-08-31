@@ -84,14 +84,14 @@ Array<Range> TrackLayer::active_version_ranges() const {
 	int active_since = Range::BEGIN;
 	for (auto &f: fades) {
 		if (active and (f.mode == f.OUTWARD)) {
-			r.add(RangeTo(active_since, f.range().end()));
+			r.add(Range::to(active_since, f.range().end()));
 		} else if (!active and (f.mode == f.INWARD)) {
 			active_since = f.position;
 		}
 		active = (f.mode == f.INWARD);
 	}
 	if (active)
-		r.add(RangeTo(active_since, Range::END));
+		r.add(Range::to(active_since, Range::END));
 	return r;
 }
 
@@ -103,12 +103,12 @@ Array<Range> TrackLayer::inactive_version_ranges() const {
 		if (active and (f.mode == f.OUTWARD)) {
 			active_since = f.range().end();
 		} else if (!active and (f.mode == f.INWARD)) {
-			r.add(RangeTo(active_since, f.range().start()));
+			r.add(Range::to(active_since, f.range().start()));
 		}
 		active = (f.mode == f.INWARD);
 	}
 	if (!active)
-		r.add(RangeTo(active_since, Range::END));
+		r.add(Range::to(active_since, Range::END));
 	return r;
 }
 

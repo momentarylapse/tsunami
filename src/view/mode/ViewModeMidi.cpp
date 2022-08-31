@@ -145,6 +145,7 @@ Range selected_midi_range(TrackLayer *l, const SongSelection &sel) {
 				r = n->range;
 			else
 				r = r or n->range;
+			first = false;
 		}
 	return r;
 }
@@ -159,11 +160,11 @@ public:
 				notes.add({n, n->range});
 	}
 
-	string name() const override { return ":##:move notes"; }
+	string name() const override { return ":##:scale notes"; }
 
 	void *execute(Data *d) override {
 		for (auto &d: notes) {
-			d.note->range = range;//.offset = d.pos_old + doffset;
+			d.note->range = d.range_old.scale_rel(range0, range);
 		}
 		layer->track->notify();
 		return nullptr;
@@ -543,7 +544,7 @@ public:
 		mp->draw(c, notes);
 	}
 	MidiNoteBuffer get_creation_notes() {
-		Range r = RangeTo(pos0, view->get_mouse_pos());
+		Range r = Range::to(pos0, view->get_mouse_pos());
 		r = r.canonical();
 
 		// align to beats
@@ -908,7 +909,7 @@ Array<int> ViewModeMidi::get_creation_pitch(int base_pitch) {
 MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 	int start = min(pos0, sel->pos);
 	int end = max(pos0, sel->pos);
-	Range r = RangeTo(start, end);
+	Range r = Range::to(start, end);
 
 	auto *l = cur_vlayer();
 	if (!l)
@@ -1154,7 +1155,7 @@ Range ViewModeMidi::get_edit_range() {
 		return view->sel.range();
 
 	int pos = view->cursor_pos();
-	return RangeTo(pos, suggest_move_cursor(Range(pos, 0), true));
+	return Range::to(pos, suggest_move_cursor(Range(pos, 0), true));
 }
 
 
@@ -1164,7 +1165,7 @@ Range ViewModeMidi::get_backwards_range() {
 		return view->sel.range();
 
 	int pos = view->cursor_pos();
-	return RangeTo(suggest_move_cursor(view->sel.range(), false), pos);
+	return Range::to(suggest_move_cursor(view->sel.range(), false), pos);
 }
 
 SongSelection ViewModeMidi::get_select_in_edit_cursor() {

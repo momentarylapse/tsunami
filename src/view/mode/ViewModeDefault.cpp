@@ -57,7 +57,7 @@ public:
 		}
 	}
 	void on_start(const vec2 &m) override {
-		range = RangeTo(start_pos, view->get_mouse_pos_snap());
+		range = Range::to(start_pos, view->get_mouse_pos_snap());
 		if (keep_start)
 			view->hover().y0 = view->cur_vlayer()->area.center().y;
 		else
@@ -197,7 +197,7 @@ void ViewModeDefault::start_selection_rect(SelectionMode mode, bool keep_start) 
 }
 
 void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
-	auto range = RangeTo(view->sel.range_raw.start(), view->get_mouse_pos_snap());
+	auto range = Range::to(view->sel.range_raw.start(), view->get_mouse_pos_snap());
 
 	view->hover().y0 = view->cur_vlayer()->area.center().y;
 	view->hover().y1 = view->m.y;
@@ -473,7 +473,7 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	c->set_line_width(2.0f);
 	for (auto &g: groups) {
 		float gx0, gx1;
-		view->cam.range2screen(RangeTo(g[0]->range.start(), g.back()->range.end()), gx0, gx1);
+		view->cam.range2screen(Range::to(g[0]->range.start(), g.back()->range.end()), gx0, gx1);
 		for (auto *m: g) {
 			color col = l->marker_color(m);
 			col.a = 0.75f;

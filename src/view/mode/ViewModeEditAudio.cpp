@@ -126,12 +126,12 @@ Range ViewModeEditAudio::range_source() {
 	if (!view->sel.range().is_empty())
 		return view->sel.range();
 	int r = cam->dscreen2sample(edit_radius);
-	return RangeTo(view->sel.range().start()-r, view->sel.range().start()+r);
+	return Range::to(view->sel.range().start()-r, view->sel.range().start()+r);
 }
 
 Range ViewModeEditAudio::range_target() {
 	int r = cam->dscreen2sample(edit_radius);
-	return RangeTo(view->hover().pos-r, view->hover().pos+r);
+	return Range::to(view->hover().pos-r, view->hover().pos+r);
 }
 
 void draw_arrow(Painter *p, const vec2 &a, const vec2 &b) {
@@ -378,8 +378,8 @@ void ViewModeEditAudio::apply_stretch() {
 			next_t = points[i].target - r.offset;
 		}
 
-		Range rs = RangeTo(offset_s, next_s);
-		Range rt = RangeTo(offset_t, next_t);
+		Range rs = Range::to(offset_s, next_s);
+		Range rt = Range::to(offset_t, next_t);
 		//msg_write(rs.str() + " -> " + rt.str());
 
 		AudioBuffer bs;

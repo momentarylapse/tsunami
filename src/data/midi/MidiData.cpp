@@ -390,7 +390,7 @@ Range MidiNoteBuffer::range(int elongation) const {
 		return Range::NONE;
 	int i0 = (*this)[0]->range.offset;
 	int i1 = back()->range.end(); // FIXME...
-	return RangeTo(i0, i1 + elongation);
+	return Range::to(i0, i1 + elongation);
 }
 
 void MidiNoteBuffer::sort() {
@@ -445,7 +445,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 		} else {
 			for (auto&& [i,bb]: enumerate(start_events))
 				if ((int)bb.pitch == (int)e.pitch) {
-					MidiNote *n = new MidiNote(RangeTo(bb.pos, e.pos), bb.pitch, bb.volume);
+					MidiNote *n = new MidiNote(Range::to(bb.pos, e.pos), bb.pitch, bb.volume);
 					n->flags = bb.flags;
 					n->stringno = bb.stringno;
 					n->clef_position = bb.clef_position;

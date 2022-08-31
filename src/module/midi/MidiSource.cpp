@@ -105,7 +105,7 @@ void MidiSource::note_x(float pitch, float volume, int beats, int sub_beats, int
 	if (!bh_midi)
 		return;
 	int end_pos = skip_beats(produce_pos, session->song.get(), beats, sub_beats, beat_partition);
-	bh_midi->add_note(RangeTo(produce_pos, end_pos), pitch, volume);
+	bh_midi->add_note(Range::to(produce_pos, end_pos), pitch, volume);
 }
 
 void MidiSource::skip_x(int beats, int sub_beats, int beat_partition) {

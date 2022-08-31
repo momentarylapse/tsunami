@@ -87,10 +87,10 @@ Session *SessionManager::load_session(const Path &filename) {
 	auto ev = e.find("view");
 	if (ev) {
 		auto es = ev->find("selection");
-		s->view->sel = SongSelection::from_range(s->song.get(), RangeTo(es->value("start")._int(), es->value("end")._int()));
+		s->view->sel = SongSelection::from_range(s->song.get(), Range::to(es->value("start")._int(), es->value("end")._int()));
 		s->view->update_selection();
 		auto ec = ev->find("viewport");
-		s->view->cam.set_range(RangeTo(ec->value("start")._int(), ec->value("end")._int()));
+		s->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
 	}
 
 	auto epp = e.find("plugins");

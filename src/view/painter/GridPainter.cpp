@@ -124,7 +124,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
 
-	auto bars = song->bars.get_bars(RangeTo(s0, s1));
+	auto bars = song->bars.get_bars(Range::to(s0, s1));
 	for (Bar *b: bars) {
 		if (b->is_pause())
 			continue;
@@ -187,7 +187,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	float prev_bpm = 0;
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
-	auto bars = song->bars.get_bars(RangeTo(s0, s1));
+	auto bars = song->bars.get_bars(Range::to(s0, s1));
 
 	c->set_font("", local_theme.FONT_SIZE, true, false);
 	float change_block_until = -1;

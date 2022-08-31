@@ -322,7 +322,7 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 
 			// before
 			if (prev_active and (prev_end < cur.end()))
-				add_direct(l, RangeTo(prev_end, r.start()), buf, cur);
+				add_direct(l, Range::to(prev_end, r.start()), buf, cur);
 
 			// fade
 			if (r.overlaps(cur)) {
@@ -338,7 +338,7 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 		
 		// after
 		if (prev_active and (prev_end < cur.end()))
-			add_direct(l, RangeTo(prev_end, cur.end()), buf, cur);
+			add_direct(l, Range::to(prev_end, cur.end()), buf, cur);
 	}
 }
 

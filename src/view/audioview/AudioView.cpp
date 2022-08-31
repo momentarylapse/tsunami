@@ -972,7 +972,7 @@ void AudioView::explode_track(Track *t) {
 void AudioView::on_song_new() {
 	__set_cur_layer(nullptr);
 	update_tracks();
-	sel.range_raw = RangeTo(0, 0);
+	sel.range_raw = Range::to(0, 0);
 	sel.clear();
 	for (Track *t: weak(song->tracks))
 		for (TrackLayer *l: weak(t->layers))

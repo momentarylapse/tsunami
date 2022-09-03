@@ -138,3 +138,21 @@ void BackupManager::_clear_old() {
 			i --;
 		}
 }
+
+bool BackupManager::should_notify_found_backups() {
+	if (files.num == 0)
+		return false;
+	auto ln = hui::config.get_str("Backup.LastNotified");
+	if (ln == "")
+		return true;
+	for (auto &f: files)
+		if (f.filename.basename_no_ext() > Path(ln).basename_no_ext())
+			return true;
+	return false;
+}
+
+void BackupManager::notify_found_backups_done() {
+	if (files.num == 0)
+		return;
+	hui::config.set_str("Backup.LastNotified", files.back().filename.basename());
+}

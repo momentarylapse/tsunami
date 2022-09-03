@@ -51,6 +51,9 @@ public:
 
 	static Path get_filename_for_uuid(int uuid);
 	static int get_uuid_for_filename(const Path &filename);
+
+	static bool should_notify_found_backups();
+	static void notify_found_backups_done();
 };
 
 #endif /* SRC_STUFF_BACKUPMANAGER_H_ */

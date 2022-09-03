@@ -482,37 +482,42 @@ void TsunamiWindow::on_track_render() {
 		return;
 	}
 
-	if (view->get_playable_layers() != view->sel.layers()) {
+	auto do_render_track = [this, range] (const Set<const TrackLayer*> &layers) {
+		SongRenderer renderer(song);
+		renderer.set_range(range);
+		renderer.allow_layers(layers);
+
+		auto p = ownify(new ProgressCancelable(_(""), this));
+
+		AudioBuffer buf;
+		buf.resize(range.length);
+
+		write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
+
+		song->begin_action_group(_("render track"));
+		Track *t = song->add_track(SignalType::AUDIO_STEREO);
+		AudioBuffer buf_track;
+		auto *a = t->layers[0]->edit_buffers(buf_track, range);
+		buf_track.set(buf, 0, 1);
+
+		t->layers[0]->edit_buffers_finish(a);
+		song->end_action_group();
+	};
+
+	if (view->get_playable_layers() == view->sel.layers()) {
+		do_render_track(view->sel.layers());
+	} else {
 		QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
 				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
-				[this, range] (int answer) {
+				[this, do_render_track] (int answer) {
 					if (answer < 0)
 						return;
 
-					SongRenderer renderer(song);
-					renderer.set_range(range);
-
 					if (answer == 1)
-						renderer.allow_layers(view->sel.layers());
-
-					renderer.allow_layers(view->get_playable_layers());
-
-					auto p = ownify(new ProgressCancelable(_(""), this));
-
-					AudioBuffer buf;
-					buf.resize(range.length);
-
-					write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
-
-					song->begin_action_group(_("render track"));
-					Track *t = song->add_track(SignalType::AUDIO_STEREO);
-					AudioBuffer buf_track;
-					auto *a = t->layers[0]->edit_buffers(buf_track, range);
-					buf_track.set(buf, 0, 1);
-
-					t->layers[0]->edit_buffers_finish(a);
-					song->end_action_group();
+						do_render_track(view->sel.layers());
+					else
+						do_render_track(view->get_playable_layers());
 		});
 	}
 

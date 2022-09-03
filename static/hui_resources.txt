@@ -4527,7 +4527,7 @@ menu-track-new
 
 0
 0
-5
+8
 Item
 track-add-audio-mono
 image=hui:add
@@ -4556,6 +4556,24 @@ Item
 track-add-group
 image=hui:add
 4
+0
+0
+Separator
+
+
+5
+0
+0
+Item
+track_import
+image=hui:open
+6
+0
+0
+Item
+track_render
+
+7
 0
 0
 Item
@@ -4933,7 +4951,7 @@ menu-track-new
 
 0
 0
-5
+8
 Item
 track-add-audio-mono
 image=hui:add
@@ -4962,6 +4980,24 @@ Item
 track-add-group
 image=hui:add
 4
+0
+0
+Separator
+
+
+5
+0
+0
+Item
+track_import
+image=hui:open
+6
+0
+0
+Item
+track_render
+
+7
 0
 0
 Item
@@ -5506,7 +5542,7 @@ menu-track-new
 
 2
 0
-5
+8
 Item
 track-add-audio-mono
 image=hui:add
@@ -5535,6 +5571,24 @@ Item
 track-add-group
 image=hui:add
 4
+0
+0
+Separator
+
+
+5
+0
+0
+Item
+track_import
+image=hui:open
+6
+0
+0
+Item
+track_render
+
+7
 0
 0
 Item
@@ -5808,7 +5862,7 @@ menu-track-new
 
 0
 0
-5
+8
 Item
 track-add-audio-mono
 image=hui:add
@@ -5837,6 +5891,24 @@ Item
 track-add-group
 image=hui:add
 4
+0
+0
+Separator
+
+
+5
+0
+0
+Item
+track_import
+image=hui:open
+6
+0
+0
+Item
+track_render
+
+7
 0
 0
 Item
@@ -7852,7 +7924,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-705
+713
 # Text
 /bars-add
 Add bars...
@@ -9204,6 +9276,12 @@ Bar
 popup-menu-buffer/header
 Audio buffer
 
+popup-menu-buffer/track_import
+Import from file...
+
+popup-menu-buffer/track_render
+Render from selection
+
 popup-menu-curve/curve-exponential
 Exponential
 
@@ -9248,6 +9326,12 @@ Effect
 
 popup-menu-layer/header
 Version
+
+popup-menu-layer/track_import
+Import from file...
+
+popup-menu-layer/track_render
+Render from selection
 
 popup-menu-marker/header
 Marker
@@ -9300,6 +9384,12 @@ Save...
 popup-menu-song/header
 File
 
+popup-menu-song/track_import
+Import from file...
+
+popup-menu-song/track_render
+Render from selection
+
 popup-menu-tag/header
 Tag
 
@@ -9311,6 +9401,12 @@ Delete
 
 popup-menu-track/header
 Track
+
+popup-menu-track/track_import
+Import from file...
+
+popup-menu-track/track_render
+Render from selection
 
 popup_all_menu/add_audio_track_mono
 Audio (mono)

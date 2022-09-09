@@ -103,15 +103,6 @@ string mat4::str() const {
 	return format("(%f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
 }
 
-// kaba
-void mat4::imul(const mat4 &m)
-{	*this *= m;	}
-mat4 mat4::mul(const mat4 &m) const
-{	return *this * m;	}
-
-vec3 mat4::mul_v(const vec3 &v) const
-{	return *this * v;	}
-
 
 //#define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
 
@@ -249,7 +240,7 @@ mat4 mat4::rotation_z(float w) {
 }
 
 // ZXY -> for objects
-mat4 mat4::rotation_v(const vec3 &ang) {
+mat4 mat4::rotation(const vec3 &ang) {
 	mat4 m;
 	/*matrix x,y,z;
 	MatrixRotationX(x,ang.x);
@@ -272,7 +263,7 @@ mat4 mat4::rotation_v(const vec3 &ang) {
 }
 
 // rotation matrix from quaterion
-mat4 mat4::rotation_q(const quaternion &q) {
+mat4 mat4::rotation(const quaternion &q) {
 	mat4 m;
 	m._00 = 1 - 2*q.y*q.y - 2*q.z*q.z; m._01 =     2*q.x*q.y - 2*q.w*q.z; m._02 =     2*q.x*q.z + 2*q.w*q.y; m._03 = 0;
 	m._10 =     2*q.x*q.y + 2*q.w*q.z; m._11 = 1 - 2*q.x*q.x - 2*q.z*q.z; m._12 =     2*q.y*q.z - 2*q.w*q.x; m._13 = 0;
@@ -285,7 +276,7 @@ mat4 mat4::rotation_q(const quaternion &q) {
 }
 
 // scale orthogonally in 3 dimensions
-mat4 mat4::scale_f(float fx, float fy, float fz) {
+mat4 mat4::scale(float fx, float fy, float fz) {
 	mat4 m;
 	m._00 = fx; m._01 = 0;  m._02 = 0;  m._03 = 0;
 	m._10 = 0;  m._11 = fy; m._12 = 0;  m._13 = 0;
@@ -294,8 +285,8 @@ mat4 mat4::scale_f(float fx, float fy, float fz) {
 	return m;
 }
 
-mat4 mat4::scale_v(const vec3 &v) {
-	return scale_f(v.x, v.y, v.z);
+mat4 mat4::scale(const vec3 &v) {
+	return scale(v.x, v.y, v.z);
 }
 
 // create a transformation that reflects at a <plane pl>

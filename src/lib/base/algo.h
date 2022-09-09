@@ -55,6 +55,39 @@ int count(const Array<T> &array, const T &t) {
 	return count_if(array, [&t] (const T &v) { return v == t; });
 }
 
+template<class T>
+void fill(Array<T> &array, const T &t) {
+	for (T &e: array)
+		e = t;
+}
+
+template<class F>
+struct filter {
+	const F &f;
+	filter(const F& _f) : f(_f) {}
+	template<class T>
+	friend Array<T> operator>>(const Array<T> &array, const filter<F> &t) {
+		Array<T> r;
+		for (T &e: array)
+			if (t.f(e))
+				r.add(e);
+		return r;
+	}
+};
+
+template<class F>
+struct transform {
+	const F &f;
+	transform(const F& _f) : f(_f) {}
+	template<class T>
+	friend auto operator>>(const Array<T> &array, const transform<F> &t) -> Array<decltype(t.f(T()))> {
+		Array<decltype(t.f(T()))> r;
+		for (T &e: array)
+			r.add(t.f(e));
+		return r;
+	}
+};
+
 template<class T, class F>
 void replace_if(Array<T> &array, F f, const T &by) {
 	for (T &e: array)
@@ -65,29 +98,6 @@ void replace_if(Array<T> &array, F f, const T &by) {
 template<class T>
 void replace(Array<T> &array, const T &t, const T &by) {
 	replace_if(array, [&t] (const T &v) { return v == t; }, by);
-}
-
-template<class T>
-void fill(Array<T> &array, const T &t) {
-	for (T &e: array)
-		e = t;
-}
-
-template<class T, class F>
-Array<T> filter(const Array<T> &array, F f) {
-	Array<T> r;
-	for (T &e: array)
-		if (f(e))
-			r.add(e);
-	return r;
-}
-
-template<class T, class F, class U>
-Array<U> transform(const Array<T> &array, F f) {
-	Array<U> r;
-	for (T &e: array)
-		r.add(f(e));
-	return r;
 }
 
 #endif /* SRC_LIB_BASE_ALGO_H_ */

@@ -37,11 +37,6 @@ public:
 	{	return m*v;	}*/
 	string _cdecl str() const;
 
-	// kaba
-	void _cdecl imul(const mat3 &m);
-	mat3 _cdecl mul(const mat3 &m) const;
-	vec3 _cdecl mul_v(const vec3 &v) const;
-
 
 	static const mat3 ID;
 	static const mat3 ZERO;
@@ -50,7 +45,9 @@ public:
 	mat3 _cdecl inverse() const;
 	mat3 _cdecl transpose() const;
 	static mat3 _cdecl rotation(const vec3 &ang);
-	static mat3 _cdecl rotation_q(const quaternion &q);
+	static mat3 _cdecl rotation(const quaternion &q);
+	static mat3 scale(float x, float y, float z);
+	static mat3 scale(const vec3& v);
 };
 
 

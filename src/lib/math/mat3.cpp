@@ -86,15 +86,6 @@ string mat3::str() const {
 	return format("(%f, %f, %f; %f, %f, %f; %f, %f, %f)", _00, _01, _02, _10, _11, _12, _20, _21, _22);
 }
 
-// kaba
-void mat3::imul(const mat3 &m)
-{	*this *= m;	}
-mat3 mat3::mul(const mat3 &m) const
-{	return *this * m;	}
-
-vec3 mat3::mul_v(const vec3 &v) const
-{	return *this * v;	}
-
 void Matrix3Identity(mat3 &m) {
 	m._00=1;	m._01=0;	m._02=0;
 	m._10=0;	m._11=1;	m._12=0;
@@ -150,10 +141,22 @@ mat3 mat3::rotation(const vec3 &ang) {
 	return m;
 }
 
-mat3 mat3::rotation_q(const quaternion &q) {
+mat3 mat3::rotation(const quaternion &q) {
 	mat3 m;
 	m._00=1-2*q.y*q.y-2*q.z*q.z;	m._01=  2*q.x*q.y-2*q.w*q.z;	m._02=  2*q.x*q.z+2*q.w*q.y;
 	m._10=  2*q.x*q.y+2*q.w*q.z;	m._11=1-2*q.x*q.x-2*q.z*q.z;	m._12=  2*q.y*q.z-2*q.w*q.x;
 	m._20=  2*q.x*q.z-2*q.w*q.y;	m._21=  2*q.y*q.z+2*q.w*q.x;	m._22=1-2*q.x*q.x-2*q.y*q.y;
 	return m;
+}
+
+mat3 mat3::scale(float fx, float fy, float fz) {
+	mat3 m;
+	m._00 = fx; m._01 = 0;  m._02 = 0;
+	m._10 = 0;  m._11 = fy; m._12 = 0;
+	m._20 = 0;  m._21 = 0;  m._22 = fz;
+	return m;
+}
+
+mat3 mat3::scale(const vec3 &v) {
+	return scale(v.x, v.y, v.z);
 }

@@ -218,8 +218,16 @@ void ExpressionBuffer::update_meta_data() {
 
 void ExpressionBuffer::merge_logical_lines() {
 	// glue together lines ending with a "\" or ","
-	for (int i=0;i<(int)lines.num-1;i++) {
-		if ((lines[i].tokens.back().name == "\\") or (lines[i].tokens.back().name == ",")) {
+	auto should_glue = [] (const Line &cur, const Line& next) {
+		if ((cur.tokens.back().name == "\\") or (cur.tokens.back().name == ","))
+			return true;
+		if (next.tokens[0].name == "|>")
+			return true;
+		return false;
+	};
+
+	for (int i=0; i<(int)lines.num-1; i++) {
+		if (should_glue(lines[i], lines[i+1])) {
 			// glue... (without \\ but with ,)
 			if (lines[i].tokens.back().name == "\\")
 				lines[i].tokens.pop();
@@ -256,11 +264,11 @@ void ExpressionBuffer::analyse(SyntaxTree *ps, const string &_source) {
 	temp_line.tokens.clear();
 	temp_line.indent = 0;
 	lines.add(temp_line);
-	for (int i=0;i<lines.num;i++) {
+	for (auto &l: lines) {
 		Token e;
 		e.name = str_eol;
-		e.pos = lines[i].length;
-		lines[i].tokens.add(e);
+		e.pos = l.length;
+		l.tokens.add(e);
 	}
 
 	update_meta_data();

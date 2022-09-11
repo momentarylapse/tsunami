@@ -1183,6 +1183,7 @@ shared_array<Node> parse_comma_sep_token_list(Parser *p) {
 
 // local (variable) definitions...
 shared<Node> Parser::parse_abstract_statement_var(Block *block) {
+	bool is_let = (Exp.cur == IDENTIFIER_LET);
 	Exp.next(); // "var"/"let"
 
 	// tuple "var (x,y) = ..."
@@ -1202,7 +1203,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 		assign->set_param(0, tuple);
 		assign->set_param(1, rhs);
 
-		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
 		node->set_num_params(3);
 		//node->set_param(0, type); // no type
 		node->set_param(1, cp_node(tuple));
@@ -1233,7 +1234,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 		assign->set_param(0, names[0]);
 		assign->set_param(1, rhs);
 
-		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
 		node->set_num_params(3);
 		node->set_param(0, type); // type
 		node->set_param(1, names[0]->shallow_copy()); // name
@@ -1245,7 +1246,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 	expect_new_line();
 
 	for (auto &n: names) {
-		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
 		node->set_num_params(2);
 		node->set_param(0, type); // type
 		node->set_param(1, n); // name
@@ -1326,11 +1327,17 @@ shared<Node> Parser::parse_abstract_statement_lambda(Block *block) {
 shared<Node> Parser::parse_abstract_statement_sorted(Block *block) {
 	int token0 = Exp.consume_token(); // "sorted"
 
+	auto node = add_node_statement(StatementID::SORTED, token0, TypeUnknown);
+
+	if (Exp.cur != "(") {
+		node->set_num_params(0);
+		return node;
+	}
+
 	auto params = parse_abstract_call_parameters(block);
+	node->set_param(0, params[0]);
 	if (params.num < 0 or params.num > 2)
 		do_error_exp("sorted(array, criterion=\"\") expects 1 or 2 parameters");
-	auto node = add_node_statement(StatementID::SORTED, token0, TypeUnknown);
-	node->set_param(0, params[0]);
 	if (params.num >= 2) {
 		node->set_param(1, params[1]);
 	} else {

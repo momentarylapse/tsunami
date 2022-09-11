@@ -12,7 +12,6 @@
 #include "parser/Parser.h"
 #include "parser/Concretifier.h"
 #include "Interpreter.h"
-#include <cassert>
 
 #ifdef OS_LINUX
 	#include <sys/mman.h>
@@ -23,7 +22,7 @@
 
 namespace kaba {
 
-string Version = "0.19.22.6";
+string Version = "0.19.22.8";
 
 //#define ScriptDebug
 

@@ -16,13 +16,13 @@ enum OsciType
 	SAW as "saw"
 
 class OscillatorConfig
-	var factor: float
-	var amplitude: float
-	var initial, peak, sustain: float
-	var attack, decay, release: float
-	var type: OsciType
-	var target: bool[NUM_OSCILLATORS]
-	var target_out: bool
+	factor: float
+	amplitude: float
+	initial, peak, sustain: float
+	attack, decay, release: float
+	type: OsciType
+	target: bool[NUM_OSCILLATORS]
+	target_out: bool
 	func __init__()
 		reset()
 	func mut reset()
@@ -47,11 +47,11 @@ class OscillatorConfig
 		return false
 
 class OscillatorLink
-	var source, dest: int
+	source, dest: int
 
 class FMConfig extends Module.Config
-	var osc: OscillatorConfig[NUM_OSCILLATORS]
-	#OscillatorLink[] link
+	osc: OscillatorConfig[NUM_OSCILLATORS]
+	#link: OscillatorLink[]
 	func override reset()
 		#link.clear()
 		for o in osc
@@ -66,22 +66,22 @@ class FMConfig extends Module.Config
 			o.target_out = false
 
 class FMPanel extends ConfigPanel
-	var fc: FMConfig*
-	var chosen: int
-	var menu_top: Menu*
-	var menu_osci: Menu*
+	override c: FMSynthesizer*
+	fc: FMConfig*
+	chosen: int
+	menu_top: Menu*
+	menu_osci: Menu*
 	
-	var width, height: float
-	var p_osci: vec2[NUM_OSCILLATORS]
-	var p_out: vec2
+	width, height: float
+	p_osci: vec2[NUM_OSCILLATORS]
+	p_out: vec2
 	
-	var moving, hover: int
+	moving, hover: int
 	
 	func mut add_top(label: string, id: string)
 		event("top-{{id}}", on_topology)
 		menu_top.add(label, "top-{{id}}")
 	
-	var override c: FMSynthesizer*
 	func override __init__(_s: Module)
 		fc = &c.config
 		
@@ -137,10 +137,10 @@ Grid ? ''
 		p_out = vec2(40, 60)
 		for p,i in p_osci
 			p = vec2(100+15*i, i*20)#vec2((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
-			let has_links = fc.osc[i].target_out
+			var has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
 				has_links = has_links or t
-			if !has_links
+			if not has_links
 				p += vec2(1000,1000)
 		for i in 0:2000
 			iterate_osci_pos()
@@ -153,7 +153,7 @@ Grid ? ''
 		let dir = (b - a) * (1/d)
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
 	func mut iterate_osci_pos()
-		vec2[NUM_OSCILLATORS] f
+		var f: vec2[NUM_OSCILLATORS]
 		for o,i in fc.osc
 			f[i] = vec2(0,0)
 			for o2,j in fc.osc
@@ -177,10 +177,10 @@ Grid ? ''
 
 	func draw_type(p: Painter, z: vec2, type: OsciType, _dx: float, amp: float)
 		let dx = _dx / pi
-		let v0 = 0.0
-		let t0 = -pi
+		var v0 = 0.0
+		var t0 = -pi
 		for t in -pi:pi+0.1:0.1
-			let v = sin(t)
+			var v = sin(t)
 			if type == OsciType.SQUARE
 				if v > 0
 					v = 1
@@ -194,7 +194,7 @@ Grid ? ''
 			v0 = v
 	
 	func draw_osci(p: Painter, index: int)
-		var z = osci_pos(index)
+		let z = osci_pos(index)
 		var bg = colors.blob_bg
 		var col = colors.text_soft1
 		if index == chosen
@@ -205,7 +205,7 @@ Grid ? ''
 		p.set_color(bg)
 		p.draw_circle([z.x, z.y], 15)
 	
-		var o = fc.osc[index]
+		let o = fc.osc[index]
 		p.set_color(col)
 		draw_type(p, z - vec2(0,2), o.type, 9, 5.5)
 		let f = int(o.factor + 0.5)
@@ -215,8 +215,8 @@ Grid ? ''
 	
 	func draw_link(p: Painter, a: int, b: int)
 		p.set_color(colors.text_soft1)
-		var z1 = osci_pos(a)
-		var z2 = osci_pos(b)
+		let z1 = osci_pos(a)
+		let z2 = osci_pos(b)
 		draw_spline(p, [z2.x + 18, z2.y], [50,0], [z1.x - 18, z1.y], [50,0])
 	
 	func t2x(t: float) -> float
@@ -229,10 +229,10 @@ Grid ? ''
 		return max((height - y), 0) / 100
 	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		let e = log(v1/v0)
-		let cc: vec2[]
+		var cc: vec2[]
 		for a in 0:1.01:0.05
-			float t = t0+a*(t1-t0)
-			float v = v0 * exp(a * e)
+			let t = t0+a*(t1-t0)
+			let v = v0 * exp(a * e)
 			cc.add([t2x(t), v2y(v)])
 		p.set_color(col)
 		p.set_line_dash([5.0,2.0])
@@ -243,7 +243,7 @@ Grid ? ''
 		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
 	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		let cc: vec2[]
+		var cc: vec2[]
 		cc.add([t2x(t0), v2y(v0)])
 		cc.add([t2x(t1), v2y(v1)])
 		p.set_color(col)
@@ -423,19 +423,19 @@ Grid ? ''
 
 
 class OscillatorState
-	var input = 0.
-	var output = 0.
-	var volume = 0.
-	var phi = 0.
-	var env: EnvelopeADSR
-	var conf: OscillatorConfig
+	input = 0.
+	output = 0.
+	volume = 0.
+	phi = 0.
+	env: EnvelopeADSR
+	conf: OscillatorConfig
 	func __init__()
 		env.reset()
 
 class FMRenderer extends PitchRenderer
-	var osc: OscillatorState[]
-	var num_osc_active = 0
-	var override synth: FMSynthesizer*
+	osc: OscillatorState[]
+	num_osc_active = 0
+	override synth: FMSynthesizer*
 
 	func override on_end()
 		for o,oi in osc
@@ -496,7 +496,7 @@ class FMRenderer extends PitchRenderer
 		return true
 
 class FMSynthesizer extends Synthesizer
-	var config: FMConfig
+	config: FMConfig
 
 	func override create_panel() -> ConfigPanel*
 		return new FMPanel(self)

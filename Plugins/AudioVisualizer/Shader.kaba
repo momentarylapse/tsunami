@@ -427,7 +427,7 @@ uniform float iVolume;
 		c.unlock()
 		
 		#gl.start()
-		gl.reset_to_color(color.RED)
+		gl.clear_color(color.RED)
 		gl.set_cull(0)
 		gl.set_z(false, false)
 		gl.set_shader(shader)

@@ -27,11 +27,11 @@ class MultiEcho extends AudioEffect
 
 
 	func do_delay(out b: float[], out d: float[], rs: ReflectorState, r: Config.Reflector)
-		int p = rs.offset % len(d)
+		var p = rs.offset % len(d)
 		for bb in b
 	
 			# old value
-			float b0 = bb
+			let b0 = bb
 		
 			# add echo
 			bb = bb + d[p] * r.volume
@@ -46,10 +46,10 @@ class MultiEcho extends AudioEffect
 
 	func override process(out buf: AudioBuffer)
 
-		int n = len(config.refl)
+		let n = len(config.refl)
 		refl.resize(n)
 		for r,i in refl
-			int delay_samples = session.sample_rate() * config.refl[i].delay
+			let delay_samples = session.sample_rate() * config.refl[i].delay
 			r.buf.set_channels(buf.channels)
 			r.buf.resize(delay_samples)
 	
@@ -96,13 +96,13 @@ class MultiEchoGrid extends Grid
 		#if hover
 		#	col2 = colors.hoverify(col2)
 			
-		let v = r.volume
-		let t = r.delay
+		var v = r.volume
+		var t = r.delay
 		p.set_line_width(2)
 		let dt = 0.02
 		let dv = pow(r.feedback, dt/r.delay)
 		let n = min(100, int(x_axis.val_max/dt + 1))
-		let cc: vec2[]
+		var cc: vec2[]
 		for i in 0:n
 			cc.add(project2(vec2(t, v)))
 			v *= dv
@@ -119,13 +119,13 @@ class MultiEchoGrid extends Grid
 	
 	func draw_peaks(c: Painter, r: MultiEcho.Config.Reflector, index: int)
 		let col = cool_color(index)
-		let v = r.volume
-		let t = r.delay
+		var v = r.volume
+		var t = r.delay
 		let n = min(100, int(x_axis.val_max/r.delay))
 		c.set_line_width(1.5)
 		for i in 0:n
 			c.set_color(col)
-			vec2 p = project2(vec2(t, v))
+			let p = project2(vec2(t, v))
 			if i == 0
 				if index == hover
 					c.set_color(colors.hoverify(col))
@@ -158,8 +158,8 @@ class MultiEchoGrid extends Grid
 	func draw_details(p: Painter, r: MultiEcho.Config.Reflector)
 		p.set_font_size(8)
 		p.set_color(colors.text_soft2)
-		float x = x_axis.project(r.delay)
-		float y = y_axis.project(r.volume)
+		let x = x_axis.project(r.delay)
+		let y = y_axis.project(r.volume)
 		
 		p.draw_str([x - 20, y - 50], "delay: {{r.delay * 1000|.0}} ms")
 		p.draw_str([x - 20, y - 35], "volume: {{r.volume * 100.0|.0}} %")
@@ -191,7 +191,7 @@ class MultiEchoGrid extends Grid
 			menu_bg.popup(panel)
 	
 	func mut on_add_reflection()
-		MultiEcho.Config.Reflector r
+		var r: MultiEcho.Config.Reflector
 		r.delay = max(get_mouse2().x, 0.001)
 		r.volume = get_mouse2().y
 		r.feedback = 0.5
@@ -202,8 +202,8 @@ class MultiEchoGrid extends Grid
 
 	func get_hover() -> int
 		for r,i in config.refl
-			var z = vec2(r.delay, r.volume)
-			var p = project2(z)
+			let z = vec2(r.delay, r.volume)
+			let p = project2(z)
 			if len(m - p) < 5
 				return i
 		return -1

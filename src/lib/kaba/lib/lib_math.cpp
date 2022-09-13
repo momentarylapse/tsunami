@@ -216,26 +216,26 @@ public:
 template<class T>
 class KabaMatrix : public T {
 public:
-	void imul(const T &m) {
+	void _cdecl imul(const T &m) {
 		*(T*)this *= m;
 	}
-	T mul(const T &m) {
+	T _cdecl mul(const T &m) {
 		return *(T*)this * m;
 	}
 	template<class V>
-	V mul_v(const V &v) {
+	V _cdecl mul_v(const V &v) {
 		return *(T*)this * v;
 	}
-	T rotation_v(const vec3& v) {
+	static T _cdecl rotation_v(const vec3& v) {
 		return T::rotation(v);
 	}
-	T rotation_q(const quaternion& q) {
+	static T _cdecl rotation_q(const quaternion& q) {
 		return T::rotation(q);
 	}
-	T scale_f(float x, float y, float z) {
+	static T _cdecl scale_f(float x, float y, float z) {
 		return T::scale(x, y, z);
 	}
-	T scale_v(const vec3& v) {
+	static T _cdecl scale_v(const vec3& v) {
 		return T::scale(v);
 	}
 };
@@ -805,7 +805,7 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::MULTIPLY, TypeMat4, TypeMat4, TypeMat4, InlineID::NONE, &KabaMatrix<mat4>::mul);
 		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeMat4, TypeVec3, InlineID::NONE, &KabaMatrix<mat4>::mul_v<vec3>);
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeMat4, TypeMat4, InlineID::NONE, &KabaMatrix<mat4>::imul);
-	
+
 	add_class(TypeMat3);
 		class_add_element("_11", TypeFloat32, 0);
 		class_add_element("_21", TypeFloat32, 4);

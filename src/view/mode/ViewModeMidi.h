@@ -62,7 +62,7 @@ public:
 
 	void edit_add_pause();
 	void edit_add_note_on_string(int hand_pos);
-	void edit_add_note_by_urelative(int relative);
+	void edit_add_note_by_urelative(int relative, bool modify);
 	void edit_backspace();
 	void jump_string(int delta);
 	void jump_octave(int delta);

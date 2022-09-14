@@ -679,12 +679,25 @@ Scale ViewModeMidi::cur_scale() {
 	return scale;
 }
 
-void ViewModeMidi::edit_add_note_by_urelative(int urelative) {
+void ViewModeMidi::edit_add_note_by_urelative(int urelative, bool shift) {
 	Range r = get_edit_range();
 	int upos = octave * 7 + urelative;
 	const Clef& clef = view->cur_track()->instrument.get_clef();
 	int clef_pos = upos - clef.offset;
-	NoteModifier mod = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
+
+	auto scale_modifier = cur_scale().get_modifier(upos);
+	NoteModifier mod = combine_note_modifiers(modifier, scale_modifier);
+	if (modifier == NoteModifier::NONE and shift) {
+		static const NoteModifier qnd_mod[7] = {NoteModifier::SHARP,
+		NoteModifier::SHARP,NoteModifier::FLAT,
+		NoteModifier::SHARP,NoteModifier::SHARP,
+		NoteModifier::FLAT,NoteModifier::FLAT};
+		if (scale_modifier == NoteModifier::NONE)
+		 	mod = qnd_mod[urelative];
+		else
+			mod = NoteModifier::NONE;
+	}
+
 	int pitch = uniclef_to_pitch(upos);
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
@@ -762,6 +775,9 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 }
 
 void ViewModeMidi::on_key_down(int k) {
+	bool shift = (k & hui::KEY_SHIFT);
+	int pure_key = k & 0xff;
+
 	set_rep_key(k);
 	auto mode = cur_vlayer()->midi_mode();
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
@@ -777,10 +793,10 @@ void ViewModeMidi::on_key_down(int k) {
 			}
 
 			// add note
-			if ((k >= hui::KEY_A) and (k <= hui::KEY_G)) {
-				int number = (k - hui::KEY_A);
-				int urel[7] = {5,6,0,1,2,3,4};
-				edit_add_note_by_urelative(urel[number]);
+			if ((pure_key >= hui::KEY_A) and (pure_key <= hui::KEY_G)) {
+				int number = (pure_key - hui::KEY_A);
+				static const int urel[7] = {5,6,0,1,2,3,4};
+				edit_add_note_by_urelative(urel[number], shift);
 			}
 		}
 

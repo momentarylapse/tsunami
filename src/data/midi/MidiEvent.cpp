@@ -10,18 +10,16 @@
 
 
 
-MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
-{
+MidiEvent::MidiEvent(int _pos, float _pitch, float _volume) {
 	pos = _pos;
 	pitch = _pitch;
 	volume = _volume;
 	flags = 0;
-	stringno = -1;
-	clef_position = -1;
+	stringno = MidiNote::UNDEFINED_STRING;
+	clef_position = MidiNote::UNDEFINED_CLEF;
 }
 
-MidiEvent::MidiEvent(const MidiNote *n)
-{
+MidiEvent::MidiEvent(const MidiNote *n) {
 	pos = n->range.offset;
 	pitch = n->pitch;
 	volume = n->volume;

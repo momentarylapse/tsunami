@@ -782,7 +782,7 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	float x = (x1 + x2) / 2;
 
 	// checked before...
-//	if (n.clef_position < 0)
+//	if (n.clef_position <= UNDEFINED_CLEF)
 //		n.update_meta(track->instrument, midi_scale, 0);
 
 	int p = n->clef_position;

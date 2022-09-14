@@ -48,6 +48,10 @@ public:
 
 	void reset_clef();
 	void update_clef_pos(const Clef &clef, const Instrument &instrument, const Scale &s) const;
+
+
+	static const int UNDEFINED_CLEF;
+	static const int UNDEFINED_STRING;
 };
 
 

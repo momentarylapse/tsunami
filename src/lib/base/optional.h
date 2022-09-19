@@ -10,6 +10,8 @@
 
 #include "base.h"
 
+namespace base {
+
 //class E {};
 class Empty;
 extern Empty None;
@@ -21,12 +23,27 @@ public:
 	optional() {
 		_is_set = false;
 	}
+	optional(const Empty&) : optional() {
+	}
+	optional(const T &o) : optional() {
+		*this = o;
+	}
 	~optional() {
 		clear();
 	}
 
 	bool has_value() const {
 		return _is_set;
+	}
+
+	operator bool() const {
+		return has_value();
+	}
+	T &operator*() const {
+		return value();
+	}
+	T &operator*() {
+		return value();
 	}
 
 	void operator=(const T &o) {
@@ -73,6 +90,6 @@ private:
 	}
 };
 
-
+}
 
 #endif /* SRC_LIB_BASE_OPTIONAL_H_ */

@@ -15,7 +15,7 @@ class AudioEffect;
 class Scale;
 
 
-class TrackMarker : public Sharable<Empty>{
+class TrackMarker : public Sharable<base::Empty>{
 public:
 	TrackMarker();
 	TrackMarker(const Range &r, const string &t);

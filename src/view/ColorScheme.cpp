@@ -11,7 +11,7 @@
 
 namespace hui {
 	class Panel;
-	void get_style_colors(Panel *p, const string &id, Map<string,color> &colors);
+	void get_style_colors(Panel *p, const string &id, base::map<string,color> &colors);
 }
 
 
@@ -166,7 +166,7 @@ ColorSchemeDark::ColorSchemeDark() {
 
 ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
 	//{"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"};
-	Map<string,color> colors;
+	base::map<string,color> colors;
 	hui::get_style_colors(p, id, colors);
 	//background = colors["bg_color"];
 	background = colors["base_color"];

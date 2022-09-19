@@ -508,6 +508,7 @@ Array<int> enum_all(const Class*);
 
 
 Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id) {
+	//msg_write("CREATE " + name);
 	if (find_root_type_by_name(name, ns, false))
 		do_error("class already exists", token_id);
 
@@ -597,7 +598,7 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 }
 
 const Class *SyntaxTree::make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id) {
-	//msg_write("make class " + name + " ns=" + ns->long_name() + " param=" + param->long_name());
+	//msg_write("make class " + name + " ns=" + ns->long_name());// + " params=" + param->long_name());
 
 	// check if it already exists
 	auto *tt = find_root_type_by_name(name, ns, false);

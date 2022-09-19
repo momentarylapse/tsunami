@@ -44,7 +44,7 @@ public:
 	void __init__();
 };
 
-void bind_buffer(Buffer *buf, int binding);
+void bind_buffer(int binding, Buffer *buf);
 
 };
 

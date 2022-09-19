@@ -9,10 +9,10 @@ namespace kaba {
 
 
 	template<class T>
-	class XDict : public Map<string, T> {
+	class XDict : public base::map<string, T> {
 	public:
 		void __init__() {
-			new(this) Map<string, T>();
+			new(this) base::map<string, T>();
 		}
 	};
 

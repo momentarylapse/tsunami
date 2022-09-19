@@ -140,15 +140,15 @@ bool SongSelection::has(const Track *t) const {
 	return false;
 }
 
-Set<const Track*> SongSelection::tracks() const {
-	Set<const Track*> tracks;
+base::set<const Track*> SongSelection::tracks() const {
+	base::set<const Track*> tracks;
 	for (auto *l: layers())
 		tracks.add(l->track);
 	return tracks;
 }
 
-Set<const TrackLayer*> SongSelection::layers() const {
-	Set<const TrackLayer*> layers;
+base::set<const TrackLayer*> SongSelection::layers() const {
+	base::set<const TrackLayer*> layers;
 	for (auto *l: _layers)
 		if (layer_legal(song, l))
 			layers.add(l);

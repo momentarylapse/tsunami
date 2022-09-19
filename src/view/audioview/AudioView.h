@@ -247,9 +247,9 @@ public:
 	int _playback_sync_counter = 0;
 	int64 _playback_stream_offset = 0;
 	void set_playback_pos(int pos);
-	Set<const Track*> get_playable_tracks();
+	base::set<const Track*> get_playable_tracks();
 	bool has_any_solo_track();
-	Set<const TrackLayer*> get_playable_layers();
+	base::set<const TrackLayer*> get_playable_layers();
 	bool has_any_solo_layer(Track *t);
 
 	void __set_cur_sample(SampleRef *s);

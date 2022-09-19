@@ -28,7 +28,7 @@ public:
 		string name, group;
 	};
 	Array<Label> labels;
-	Set<string> ugroups;
+	base::set<string> ugroups;
 
 	static Label split_label(const string &s);
 

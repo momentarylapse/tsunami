@@ -30,7 +30,7 @@ public:
 	Any(const void *p);
 	Any(const Array<Any> &a);
 	Any(const Array<int> &a);
-	Any(const AnyMap&m);
+	Any(const AnyMap &m);
 	//Any(const void *p);
 	~Any();
 	void _cdecl clear();

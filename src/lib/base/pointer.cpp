@@ -8,7 +8,9 @@
 #include "pointer.h"
 
 // abused for optional<>
-Empty None;
+namespace base {
+	Empty None;
+}
 
 
 #if POINTER_DEBUG

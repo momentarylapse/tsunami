@@ -146,7 +146,9 @@ public:
 	}
 };
 
-class Empty {};
+namespace base {
+	class Empty {};
+}
 
 template <class T>
 class Sharable : public T {

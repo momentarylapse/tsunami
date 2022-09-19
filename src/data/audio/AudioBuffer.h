@@ -84,7 +84,7 @@ public:
 	void _truncate_peaks(int length);
 
 
-	struct Compressed : Sharable<Empty> {
+	struct Compressed : Sharable<base::Empty> {
 		bytes data;
 		string codec;
 	};

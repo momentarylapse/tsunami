@@ -41,7 +41,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 #include "SyntaxTree.h"
 
 void test_node_recursion(shared<Node> root, const Class *ns, const string &message) {
-	/*Set<Node*> nodes;
+	/*base::set<Node*> nodes;
 	SyntaxTree::transform_node(root, [&](shared<Node> n) {
 		if (nodes.contains(n.get())) {
 			msg_error("node double..." + message);

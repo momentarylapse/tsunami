@@ -16,7 +16,7 @@ namespace hui
 
 class Window;
 
-class Toolbar : public Sharable<Empty> {
+class Toolbar : public Sharable<base::Empty> {
 public:
 	Toolbar(Window *win, bool vertical = false);
 	virtual ~Toolbar();

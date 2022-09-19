@@ -32,7 +32,7 @@ const void *_get_class(int t) {
 
 string f2s_clean(float f, int dez);
 
-class AnyMap : public Map<string, Any> {};
+class AnyMap : public base::map<string, Any> {};
 
 AnyMap _empty_dummy_map_;
 static DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};

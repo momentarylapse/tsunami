@@ -21,7 +21,7 @@ enum class InlineID;
 enum class Flags;
 
 
-class Function : public Sharable<Empty> {
+class Function : public Sharable<base::Empty> {
 public:
 	Function(const string &name, const Class *return_type, const Class *name_space, Flags flags = Flags(0));
 	~Function();

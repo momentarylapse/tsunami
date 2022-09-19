@@ -40,7 +40,7 @@ public:
 	SignalEditorBackground *background;
 	Array<SignalEditorModule*> modules;
 	Array<SignalEditorCable*> cables;
-	Set<Module*> sel_modules;
+	base::set<Module*> sel_modules;
 
 	SignalEditorModule *get_module(Module *m);
 

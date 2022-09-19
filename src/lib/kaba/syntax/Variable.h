@@ -16,7 +16,7 @@ class Class;
 enum class Flags;
 
 
-class Variable : public Sharable<Empty> {
+class Variable : public Sharable<base::Empty> {
 public:
 	Variable(const string &name, const Class *type);
 	~Variable();

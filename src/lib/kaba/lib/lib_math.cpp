@@ -139,7 +139,7 @@ public:
 	}
 };
 
-class AnyDict : public Map<string,Any> {
+class AnyDict : public base::map<string,Any> {
 public:
 	void __delete__() {
 		this->~AnyDict();

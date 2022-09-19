@@ -117,9 +117,10 @@ const int TYPE_CAST_DEREFERENCE = -2;
 const int TYPE_CAST_REFERENCE = -3;
 const int TYPE_CAST_OWN_STRING = -10;
 const int TYPE_CAST_ABSTRACT_LIST = -20;
-const int TYPE_CAST_ABSTRACT_TUPLE = -30;
-const int TYPE_CAST_TUPLE_AS_CONSTRUCTOR = -31;
-const int TYPE_CAST_FUNCTION_AS_CALLABLE = -32;
+const int TYPE_CAST_ABSTRACT_TUPLE = -21;
+const int TYPE_CAST_ABSTRACT_DICT = -22;
+const int TYPE_CAST_TUPLE_AS_CONSTRUCTOR = -23;
+const int TYPE_CAST_FUNCTION_AS_CALLABLE = -30;
 const int TYPE_CAST_MAKE_SHARED = -40;
 const int TYPE_CAST_MAKE_OWNED = -41;
 
@@ -263,6 +264,21 @@ bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wa
 		cd.cast = TYPE_CAST_ABSTRACT_TUPLE;
 		return true;
 	}
+	if (node->kind == NodeKind::DICT_BUILDER and given == TypeUnknown) {
+		if (wanted->is_dict()) {
+			auto t = wanted->get_array_element();
+			CastingData cast;
+			for (auto&& [i,e]: enumerate(node->params)) {
+				if ((i % 2) == 1) {
+					if (!type_match_with_cast(e, false, t, cast))
+						return false;
+					cd.penalty += cast.penalty;
+				}
+			}
+			cd.cast = TYPE_CAST_ABSTRACT_DICT;
+			return true;
+		}
+	}
 	if (wanted->is_callable() and (given == TypeUnknown)) {
 		if (node->kind == NodeKind::FUNCTION) {
 			auto ft = make_effective_class_callable(node);
@@ -313,6 +329,21 @@ shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node>
 	}
 	if (cast.cast == TYPE_CAST_ABSTRACT_TUPLE) {
 		msg_error("AUTO TUPLE");
+		node->type = wanted;
+		return node;
+	}
+	if (cast.cast == TYPE_CAST_ABSTRACT_DICT) {
+		//if (wanted == TypeDict)
+		//	return force_concrete_type(node);
+		CastingData cd2;
+		for (auto&& [i,e]: enumerate(node->params)) {
+			if ((i % 2) == 1) {
+				if (!type_match_with_cast(e, false, wanted->get_array_element(), cd2)) {
+					do_error("nope????", node);
+				}
+				node->params[i] = apply_type_cast(cd2, e, wanted->get_array_element());
+			}
+		}
 		node->type = wanted;
 		return node;
 	}
@@ -1235,7 +1266,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 	tree->base_class->add_function(tree, f, false, false);
 
 	// find captures
-	Set<Variable*> captures;
+	base::set<Variable*> captures;
 	auto find_captures = [block, &captures](shared<Node> n) {
 		if (n->kind == NodeKind::VAR_LOCAL) {
 			auto v = n->as_local();
@@ -1509,6 +1540,12 @@ const Class *make_pointer_owned(SyntaxTree *tree, const Class *parent, int token
 	return tree->make_class(parent->name + " " + IDENTIFIER_OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, parent->name_space, token_id);
 }
 
+// concretify as far as possible
+// will leave FLEXIBLE:
+//  * list [...]
+//  * dict {...}
+//  * tuple (...)
+//  * function name
 shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, const Class *ns) {
 	if (node->type != TypeUnknown)
 		return node;
@@ -1642,7 +1679,7 @@ const Class *Concretifier::concretify_as_type(shared<Node> node, Block *block, c
 }
 
 
-const Class *type_more_abstract(const Class *a, const Class *b) {
+const Class *type_more_dominant(const Class *a, const Class *b) {
 	if (a == b)
 		return a;
 	if (a == TypeInt and b == TypeFloat32)
@@ -1720,7 +1757,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 
 		auto t = node->params[0]->type;
 		for (int i=1; i<node->params.num; i++)
-			t = type_more_abstract(t, node->params[i]->type);
+			t = type_more_dominant(t, node->params[i]->type);
 		if (!t)
 			do_error("inhomogeneous abstract array", node);
 
@@ -1742,7 +1779,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 
 		auto t = node->params[1]->type;
 		for (int i=3; i<node->params.num; i+=2)
-			t = type_more_abstract(t, node->params[i]->type);
+			t = type_more_dominant(t, node->params[i]->type);
 		if (!t)
 			do_error("inhomogeneous abstract dict", node);
 
@@ -1962,13 +1999,12 @@ string type_list_to_str(const Array<const Class*> &tt) {
 }
 
 shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &_params) {
-
 	//force_concrete_types(params);
-	auto params = _params;
-	if (node_is_member_function_with_instance(links[0])) {
-		params.insert(links[0]->params[0], 0);
+	// no, keep params FLEXIBLE
 
-	}
+	auto params = _params;
+	if (node_is_member_function_with_instance(links[0]))
+		params.insert(links[0]->params[0], 0);
 
 	// direct match...
 	for (shared<Node> operand: links) {

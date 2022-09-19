@@ -23,7 +23,7 @@ void reincarnate_textures();
 
 
 
-class Texture : public Sharable<Empty> {
+class Texture : public Sharable<base::Empty> {
 public:
 	enum class Type {
 		NONE,
@@ -50,10 +50,10 @@ public:
 	void _cdecl __init__(int width, int height, const string &format);
 	void _cdecl __delete__();
 
-	void _cdecl override(const Image &image);
-	void _cdecl read(Image &image);
-	void _cdecl read_float(Array<float> &data);
-	void _cdecl write_float(Array<float> &data);
+	void _cdecl write(const Image &image);
+	void _cdecl read(Image &image) const;
+	void _cdecl read_float(Array<float> &data) const;
+	void _cdecl write_float(const Array<float> &data);
 	void _cdecl reload();
 	void _cdecl unload();
 
@@ -62,7 +62,7 @@ public:
 
 protected:
 	void _release();
-	void _create_2d(int width, int height, const string &format);
+	void _create_2d(int width, int height, unsigned int format);
 public:
 
 	void _cdecl set_options(const string &op) const;
@@ -106,15 +106,15 @@ public:
 	CubeMap(int size, const string &format);
 	void _cdecl __init__(int size, const string &format);
 
-	void _cdecl override_side(int side, const Image &image);
+	void _cdecl write_side(int side, const Image &image);
 	void _cdecl fill_side(int side, Texture *source);
 };
 
 
 void _cdecl set_texture(Texture *texture);
 void _cdecl set_textures(const Array<Texture*> &textures);
+void bind_image(int binding, Texture *t, int level, int layer, bool writable);
 
-//extern Array<Texture*> textures;
 extern int tex_cube_level;
 
 

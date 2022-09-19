@@ -45,7 +45,7 @@ public:
 	static void _cdecl set_property(const string &name, const string &value);
 	static string get_property(const string &name);
 
-	static Map<string, string> _properties_;
+	static base::map<string, string> _properties_;
 
 	static Path filename;
 	static Path directory;			// dir of changeable files (ie. ~/.app/)

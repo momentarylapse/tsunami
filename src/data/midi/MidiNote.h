@@ -27,7 +27,7 @@ enum {
 };
 
 
-class MidiNote : public Sharable<Empty> {
+class MidiNote : public Sharable<base::Empty> {
 public:
 	MidiNote();
 	MidiNote(const Range &range, float pitch, float volume);

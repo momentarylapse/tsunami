@@ -40,7 +40,7 @@ class Interpreter;
 
 
 // executable (compiled) data
-class Module : public Sharable<Empty> {
+class Module : public Sharable<base::Empty> {
 public:
 	// don't call yourself.... better use LoadScript(...)
 	Module();

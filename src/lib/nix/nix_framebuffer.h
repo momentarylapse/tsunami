@@ -15,7 +15,7 @@ namespace nix{
 class Texture;
 class DepthBuffer;
 
-class FrameBuffer : public Sharable<Empty> {
+class FrameBuffer : public Sharable<base::Empty> {
 public:
 	FrameBuffer();
 	FrameBuffer(const Array<Texture*> &attachments);

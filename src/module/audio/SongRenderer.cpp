@@ -168,7 +168,7 @@ void SongRenderer::set_loop(bool l) {
 	needs_rebuild = true;
 }
 
-void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers) {
+void SongRenderer::allow_layers(const base::set<const TrackLayer*> &_allowed_layers) {
 	allowed_layers_requested = _allowed_layers;
 	needs_rebuild = true;
 }

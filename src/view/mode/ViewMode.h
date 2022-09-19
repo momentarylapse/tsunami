@@ -63,7 +63,7 @@ public:
 	virtual SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1);
 	virtual void start_selection() {}
 
-	virtual Set<Track*> prevent_playback(){ return {}; }
+	virtual base::set<Track*> prevent_playback(){ return {}; }
 
 	virtual int suggest_move_cursor(const Range &cursor, bool forward) = 0;
 

@@ -32,8 +32,14 @@ vulkan::Shader* __vulkan_load_shader(const Path &filename) {
 	return nullptr;
 }
 
-void __vulkan_init(GLFWwindow* window, const Array<string> &op) {
-	KABA_EXCEPTION_WRAPPER(vulkan::init(window, op));
+void* __vulkan_init(const Array<string> &op) {
+	KABA_EXCEPTION_WRAPPER(return vulkan::init(op));
+	return nullptr;
+}
+
+void* __vulkan_device_create_simple(vulkan::Instance *instance, GLFWwindow* window, const Array<string> &op) {
+	KABA_EXCEPTION_WRAPPER(return vulkan::Device::create_simple(instance, window, op));
+	return nullptr;
 }
 
 #pragma GCC pop_options
@@ -151,6 +157,9 @@ void SIAddPackageVulkan() {
 	auto TypeSemaphorePList	= add_type_l(TypeSemaphoreP);
 	auto TypeAccelerationStructure = add_type  ("AccelerationStructure", sizeof(vulkan::AccelerationStructure));
 	auto TypeAccelerationStructureP = add_type_p(TypeAccelerationStructure);
+	auto TypeImageLayout    = add_type_e("ImageLayout");
+	auto TypeAccessFlags    = add_type_e("AccessFlags");
+	auto TypePipelineBindPoint = add_type_e("BindPoint", TypePipeline);
 
 
 	add_class(TypeInstance);
@@ -161,6 +170,10 @@ void SIAddPackageVulkan() {
 		class_add_element("graphics_queue", TypeQueue, vul_p(&vulkan::Device::graphics_queue));
 		class_add_element("present_queue", TypeQueue, vul_p(&vulkan::Device::present_queue));
 		class_add_func("wait_idle", TypeVoid, vul_p(&vulkan::Device::wait_idle));
+		class_add_func("create_simple", TypeDeviceP, vul_p(&__vulkan_device_create_simple), Flags::_STATIC__RAISES_EXCEPTIONS);
+			func_add_param("instance", TypeInstanceP);
+			func_add_param("win", TypePointer);
+			func_add_param("op", TypeStringList);
 
 
 	add_class(TypeVertexBuffer);
@@ -191,9 +204,9 @@ void SIAddPackageVulkan() {
 			func_add_param("h", TypeInt);
 			func_add_param("format", TypeString);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::Texture::__delete__));
-		class_add_func("override", TypeVoid, vul_p(&vulkan::Texture::override));
+		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::write));
 			func_add_param("image", TypeImage);
-		class_add_func("override", TypeVoid, vul_p(&vulkan::Texture::overridex));
+		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::writex));
 			func_add_param("data", TypePointer);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
@@ -351,6 +364,7 @@ void SIAddPackageVulkan() {
 		class_add_element("format", TypeInt, vul_p(&vulkan::SwapChain::image_format));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, vul_p(&vulkan::SwapChain::__init__));
 			func_add_param("win", TypePointer);
+			func_add_param("device", TypeDeviceP);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, vul_p(&vulkan::SwapChain::__delete__));
 		class_add_func("create_depth_buffer", TypeDepthBufferP, vul_p(&vulkan::SwapChain::create_depth_buffer));
 		class_add_func("create_render_pass", TypeRenderPassP, vul_p(&vulkan::SwapChain::create_render_pass));
@@ -386,7 +400,7 @@ void SIAddPackageVulkan() {
 		class_add_func("begin", TypeVoid, vul_p(&vulkan::CommandBuffer::begin));
 		class_add_func("end", TypeVoid, vul_p(&vulkan::CommandBuffer::end));
 		class_add_func("set_bind_point", TypeVoid, vul_p(&vulkan::CommandBuffer::set_bind_point));
-			func_add_param("p", TypeString);
+			func_add_param("bp", TypePipelineBindPoint);
 		class_add_func("bind_pipeline", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_pipeline));
 			func_add_param("p", TypePipeline);
 		class_add_func("draw", TypeVoid, vul_p(&vulkan::CommandBuffer::draw));
@@ -416,7 +430,10 @@ void SIAddPackageVulkan() {
 			func_add_param("mode", TypeInt);
 		class_add_func("image_barrier", TypeVoid, vul_p(&vulkan::CommandBuffer::image_barrier));
 			func_add_param("t", TypeTexture);
-			func_add_param("flags", TypeIntList);
+			func_add_param("src_access", TypeAccessFlags);
+			func_add_param("dst_access", TypeAccessFlags);
+			func_add_param("old_layout", TypeImageLayout);
+			func_add_param("new_layout", TypeImageLayout);
 		class_add_func("copy_image", TypeVoid, vul_p(&vulkan::CommandBuffer::copy_image));
 			func_add_param("src", TypeTexture);
 			func_add_param("dst", TypeTexture);
@@ -453,12 +470,29 @@ void SIAddPackageVulkan() {
 		func_add_param("w", TypePointer);
 
 	add_func("init", TypeInstanceP, vul_p(&__vulkan_init), Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("win", TypePointer);
 		func_add_param("op", TypeStringList);
 
 
 	add_ext_var("default_device", TypeDeviceP, vul_p(&vulkan::default_device));
 
+
+	add_class(TypeAccessFlags);
+		class_add_enum("NONE", TypeAccessFlags, vul_p(vulkan::AccessFlags::NONE));
+		class_add_enum("SHADER_WRITE_BIT", TypeAccessFlags, vul_p(vulkan::AccessFlags::SHADER_WRITE_BIT));
+		class_add_enum("TRANSFER_READ_BIT", TypeAccessFlags, vul_p(vulkan::AccessFlags::TRANSFER_READ_BIT));
+		class_add_enum("TRANSFER_WRITE_BIT", TypeAccessFlags, vul_p(vulkan::AccessFlags::TRANSFER_WRITE_BIT));
+
+	add_class(TypeImageLayout);
+		class_add_enum("UNDEFINED", TypeImageLayout, vul_p(vulkan::ImageLayout::UNDEFINED));
+		class_add_enum("GENERAL", TypeImageLayout, vul_p(vulkan::ImageLayout::GENERAL));
+		class_add_enum("TRANSFER_SRC_OPTIMAL", TypeImageLayout, vul_p(vulkan::ImageLayout::TRANSFER_SRC_OPTIMAL));
+		class_add_enum("TRANSFER_DST_OPTIMAL", TypeImageLayout, vul_p(vulkan::ImageLayout::TRANSFER_DST_OPTIMAL));
+		class_add_enum("PRESENT_SRC", TypeImageLayout, vul_p(vulkan::ImageLayout::PRESENT_SRC));
+
+	add_class(TypePipelineBindPoint);
+		class_add_enum("GRAPHICS", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::GRAPHICS));
+		class_add_enum("RAY_TRACING", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::RAY_TRACING));
+		class_add_enum("COMPUTE", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::COMPUTE));
 }
 
 };

@@ -64,12 +64,12 @@ void ShaderStorageBuffer::__init__() {
 }
 
 
-void bind_buffer(Buffer *buf, int index) {
-	//glUniformBlockBinding(program, index, 0);
+void bind_buffer(int binding, Buffer *buf) {
+	//glUniformBlockBinding(program, binding, 0);
 	if (buf->type == Buffer::Type::UNIFORM)
-		glBindBufferBase(GL_UNIFORM_BUFFER, index, buf->buffer);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, buf->buffer);
 	else if (buf->type == Buffer::Type::SSBO)
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buf->buffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, buf->buffer);
 }
 
 }

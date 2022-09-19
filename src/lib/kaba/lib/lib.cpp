@@ -183,8 +183,7 @@ const Class *add_type_a(const Class *sub_type, int array_length, const string &_
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[" + i2s(array_length) + "]";
-	Class *t = new Class(name, 0, cur_package->syntax, nullptr, {sub_type});
-	t->size = sub_type->size * array_length;
+	Class *t = new Class(name, sub_type->size * array_length, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::ARRAY;
 	t->array_length = array_length;
 	__add_class__(t, sub_type->name_space);
@@ -196,14 +195,14 @@ const Class *add_type_l(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[]";
-	Class *t = new Class(name, 0, cur_package->syntax, nullptr, {sub_type});
-	t->size = config.super_array_size;
+	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
 	t->type = Class::Type::SUPER_ARRAY;
 	kaba_make_super_array(t);
 	__add_class__(t, sub_type->name_space);
 	return t;
 }
 
+// dict
 const Class *add_type_d(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
@@ -212,6 +211,15 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	t->type = Class::Type::DICT;
 	kaba_make_dict(t);
 	__add_class__(t, sub_type->name_space);
+	return t;
+}
+
+// enum
+const Class *add_type_e(const string &name, const Class *_namespace) {
+	Class *t = new Class(name, sizeof(int), cur_package->syntax);
+	t->type = Class::Type::ENUM;
+	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	__add_class__(t, _namespace);
 	return t;
 }
 
@@ -503,7 +511,7 @@ void class_add_const(const string &name, const Class *type, const void *value) {
 	c->name = name;
 
 	// enums can't be referenced...
-	if (type == TypeInt)
+	if (type == TypeInt or type->is_enum())
 		*(const void**)c->p() = value;
 	else if (value)
 		memcpy(c->p(), value, type->size);

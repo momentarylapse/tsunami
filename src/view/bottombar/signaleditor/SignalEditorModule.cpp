@@ -48,7 +48,7 @@ static float module_port_out_y(Module *m, int index) {
 
 class MouseDelayModuleDnD : public MouseDelayAction {
 public:
-	Set<Module*> sel;
+	base::set<Module*> sel;
 	SignalEditorTab *tab;
 	Array<float> px0, py0;
 	vec2 m0;

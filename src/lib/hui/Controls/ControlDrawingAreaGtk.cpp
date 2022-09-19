@@ -30,11 +30,11 @@ namespace hui
 static ControlDrawingArea *NixGlArea = nullptr;
 GdkGLContext *gtk_gl_context = nullptr;
 
-static Set<ControlDrawingArea*> _recently_deleted_areas;
+static base::set<ControlDrawingArea*> _recently_deleted_areas;
 
 color color_from_gdk(const GdkRGBA &gcol);
 
-void get_style_colors(Panel *p, const string &id, Map<string,color> &colors) {
+void get_style_colors(Panel *p, const string &id, base::map<string,color> &colors) {
 	auto c = p->_get_control_(id);
 	if (!c)
 		return;

@@ -1635,7 +1635,7 @@ bool AudioView::has_any_solo_track() {
 	return false;
 }
 
-bool allow_track_playback(AudioViewTrack *t, const Set<Track*> &prevented, bool any_solo) {
+bool allow_track_playback(AudioViewTrack *t, const base::set<Track*> &prevented, bool any_solo) {
 	if (prevented.contains(t->track))
 		return false;
 	if (t->solo)
@@ -1643,8 +1643,8 @@ bool allow_track_playback(AudioViewTrack *t, const Set<Track*> &prevented, bool 
 	return !t->track->muted and !any_solo;
 }
 
-Set<const Track*> AudioView::get_playable_tracks() {
-	Set<const Track*> tracks;
+base::set<const Track*> AudioView::get_playable_tracks() {
+	base::set<const Track*> tracks;
 	auto prevented = mode->prevent_playback(); // capturing?
 	bool any_solo = has_any_solo_track();
 	for (auto *t: vtracks)
@@ -1666,10 +1666,10 @@ bool allow_layer_playback(AudioViewLayer *l, bool any_solo) {
 	return !l->layer->muted and !any_solo;
 }
 
-Set<const TrackLayer*> AudioView::get_playable_layers() {
+base::set<const TrackLayer*> AudioView::get_playable_layers() {
 	auto tracks = get_playable_tracks();
 
-	Set<const TrackLayer*> layers;
+	base::set<const TrackLayer*> layers;
 	for (Track* t: weak(song->tracks)) {
 		if (!tracks.contains(t))
 			continue;

@@ -14,7 +14,7 @@
 
 
 
-class Stream : public Sharable<Empty> {
+class Stream : public Sharable<base::Empty> {
 public:
 	virtual ~Stream() {}
 

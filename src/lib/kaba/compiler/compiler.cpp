@@ -421,7 +421,7 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 	}
 }
 
-void find_all_includes_rec(Module *s, Set<Module*> &includes) {
+void find_all_includes_rec(Module *s, base::set<Module*> &includes) {
 	for (Module *i: weak(s->syntax->includes)) {
 		//if (i->filename.find(".kaba") < 0)
 		//	continue;
@@ -432,7 +432,7 @@ void find_all_includes_rec(Module *s, Set<Module*> &includes) {
 
 // only for "os"
 void import_includes(Module *s) {
-	Set<Module*> includes;
+	base::set<Module*> includes;
 	find_all_includes_rec(s, includes);
 
 	for (Module *i: includes)

@@ -22,7 +22,7 @@ namespace pdf {
 Array<Path> font_paths = {"./"};
 
 
-class TTF : public Sharable<Empty> {
+class TTF : public Sharable<base::Empty> {
 public:
 
 

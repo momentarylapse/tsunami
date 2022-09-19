@@ -261,8 +261,8 @@ void TrackLayer::insert_midi_data(int offset, const MidiNoteBuffer& midi) {
 }
 
 
-Set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers) {
-	Set<const TrackLayer*> lset;
+base::set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers) {
+	base::set<const TrackLayer*> lset;
 	for (auto l: layers)
 		lset.add(l);
 	return lset;

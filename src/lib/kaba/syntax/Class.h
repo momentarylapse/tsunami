@@ -35,7 +35,7 @@ public:
 
 typedef void *VirtualTable;
 
-class Class : public Sharable<Empty> {
+class Class : public Sharable<base::Empty> {
 public:
 	//Class();
 	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});

@@ -19,7 +19,7 @@ extern const Class *TypeStringDict;
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
-class IntDict : public Map<string,int> {
+class IntDict : public base::map<string,int> {
 public:
 	void set_int(const string &k, int v)
 	{ set(k, v); }
@@ -31,7 +31,7 @@ public:
 	{ return var2str(this, TypeIntDict); }
 };
 
-class FloatDict : public Map<string,float> {
+class FloatDict : public base::map<string,float> {
 public:
 	void set_float(const string &k, float v)
 	{ set(k, v); }
@@ -41,7 +41,7 @@ public:
 	{ return var2str(this, TypeFloatDict); }
 };
 
-class StringDict : public Map<string,string> {
+class StringDict : public base::map<string,string> {
 public:
 	string get_string(const string &k)
 	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return ""; }
@@ -60,8 +60,8 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 
 	if (p->can_memcpy()) {
 		// elements don't need a destructor
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,int>::clear);
-		class_add_func("clear", TypeVoid, &Map<string,int>::clear);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &base::map<string,int>::clear);
+		class_add_func("clear", TypeVoid, &base::map<string,int>::clear);
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &IntDict::assign);
 			func_add_param("other", t);
 	}
@@ -84,13 +84,13 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &FloatDict::str, Flags::PURE);
 	} else if (p == TypeString) {
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XDict<string>::__init__);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Map<string,string>::set);
+		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &base::map<string,string>::set);
 			func_add_param("key", TypeString);
 			func_add_param("x", p);
 		class_add_func(IDENTIFIER_FUNC_GET, p, &StringDict::get_string, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Map<string,string>::clear);
-		class_add_func("clear", TypeVoid, &Map<string,string>::clear);
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &base::map<string,string>::clear);
+		class_add_func("clear", TypeVoid, &base::map<string,string>::clear);
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &StringDict::assign);
 			func_add_param("other", t);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &StringDict::str, Flags::PURE);

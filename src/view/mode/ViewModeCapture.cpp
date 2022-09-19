@@ -66,8 +66,8 @@ void ViewModeCapture::draw_post(Painter *c) {
 	view->draw_time_line(c, offset + l, theme.capture_marker, false, true);
 }
 
-Set<Track*> ViewModeCapture::prevent_playback() {
-	Set<Track*> prev;
+base::set<Track*> ViewModeCapture::prevent_playback() {
+	base::set<Track*> prev;
 	for (auto &d: data)
 		if (d.enabled)
 			prev.add(d.track);

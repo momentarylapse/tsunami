@@ -21,7 +21,7 @@ public:
 };
 
 
-class Socket : public Sharable<Empty> {
+class Socket : public Sharable<base::Empty> {
 public:
 	enum class Type {
 		DUMMY,

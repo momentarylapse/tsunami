@@ -4,15 +4,18 @@
 
 #include "set.h"
 
+namespace base {
 
 template<class T1, class T2>
 struct MapEntry {
 	T1 key;
 	T2 value;
-	bool operator == (const MapEntry<T1, T2> &e) const
-	{	return key == e.key;	}
-	bool operator > (const MapEntry<T1, T2> &e) const
-	{	return key > e.key;	}
+	bool operator == (const MapEntry<T1, T2> &e) const {
+		return key == e.key;
+	}
+	bool operator > (const MapEntry<T1, T2> &e) const {
+		return key > e.key;
+	}
 };
 
 class MapKeyError : public Exception {
@@ -21,25 +24,22 @@ public:
 };
 
 template<class T1, class T2>
-class Map : public Set<MapEntry<T1, T2> > {
+class map : public set<MapEntry<T1, T2>> {
 public:
-	typedef MapEntry<T1, T2> Entry;
+	using Entry = MapEntry<T1, T2>;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	void _cdecl set(const T1 &key, const T2 &value) {
+	void set(const T1 &key, const T2 &value) {
 		int n = find(key);
-		if (n >= 0) {
+		if (n >= 0)
 			((Entry*)data)[n].value = value;
-		} else {
-			MapEntry<T1, T2> e = {key, value};
-			Set<MapEntry<T1, T2> >::add(e);
-		}
+		else
+			::base::set<MapEntry<T1, T2>>::add({key, value});
 	}
-	int _cdecl find(const T1 &key) const {
-		Entry e = {key, T2()};
-		return Set<Entry>::find(e);
+	int find(const T1 &key) const {
+		return ::base::set<Entry>::find({key, T2()});
 	}
-	bool _cdecl contains(const T1 &key) const {
+	bool contains(const T1 &key) const {
 		return find(key) >= 0;
 	}
 	const T2 &operator[] (const T1 &key) const {
@@ -70,31 +70,29 @@ public:
 };
 
 template<class T1, class T2>
-struct HashMapEntry
-{
+struct HashMapEntry {
 	T1 key;
 	int hash;
 	T2 value;
-	bool operator == (const HashMapEntry<T1, T2> &e) const
-	{	return hash == e.hash;	}
-	bool operator > (const HashMapEntry<T1, T2> &e) const
-	{	return hash > e.hash;	}
+	bool operator == (const HashMapEntry<T1, T2> &e) const {
+		return hash == e.hash;
+	}
+	bool operator > (const HashMapEntry<T1, T2> &e) const {
+		return hash > e.hash;
+	}
 };
 
 template<class T1, class T2>
-class HashMap : public Set<HashMapEntry<T1, T2> >
-{
+class hash_map : public set<HashMapEntry<T1, T2>> {
 public:
 	typedef HashMapEntry<T1, T2> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int _cdecl add(const T1 &key, const T2 &value)
-	{
+	int _cdecl add(const T1 &key, const T2 &value) {
 		HashMapEntry<T1, T2> e = {key, key.hash(), value};
-		return Set<HashMapEntry<T1, T2> >::add(e);
+		return ::base::set<HashMapEntry<T1, T2>>::add(e);
 	}
-	const T2 &operator[] (const T1 &key) const
-	{
+	const T2 &operator[] (const T1 &key) const {
 		//msg_write("const[]");
 		int hash = key.hash();
 		for (int i=0;i<num;i++)
@@ -103,8 +101,7 @@ public:
 		throw MapKeyError();
 		//return T2();
 	}
-	T2 &operator[] (const T1 &key)
-	{
+	T2 &operator[] (const T1 &key) {
 		int hash = key.hash();
 		/*HashEntry e = {"", hash, EmptyVar};
 		int n = find(e);
@@ -120,5 +117,7 @@ public:
 		//return T2();
 	}
 };
+
+}
 
 #endif

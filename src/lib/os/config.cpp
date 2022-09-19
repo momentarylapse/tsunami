@@ -220,7 +220,7 @@ void Configuration::save(const Path &filename) {
 	os::fs::create_directory(filename.parent());
 	try {
 		auto f = new TextLinesFormatter(os::fs::open(filename, "wt"));
-		Set<string> namespaces;
+		base::set<string> namespaces;
 		for (auto &e: map)
 			namespaces.add(config_get_namespace(e.key));
 		for (auto &e: map)

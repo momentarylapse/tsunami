@@ -83,8 +83,8 @@ public:
 	MidiMode midi_mode();
 	rect area_last, area_target;
 	int height;
-	Map<const TrackMarker*, rect> marker_areas;
-	Map<const TrackMarker*, rect> marker_label_areas;
+	base::map<const TrackMarker*, rect> marker_areas;
+	base::map<const TrackMarker*, rect> marker_label_areas;
 
 
 	static color marker_color(const TrackMarker *m);

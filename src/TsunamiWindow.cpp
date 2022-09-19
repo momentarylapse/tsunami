@@ -482,7 +482,7 @@ void TsunamiWindow::on_track_render() {
 		return;
 	}
 
-	auto do_render_track = [this, range] (const Set<const TrackLayer*> &layers) {
+	auto do_render_track = [this, range] (const base::set<const TrackLayer*> &layers) {
 		SongRenderer renderer(song);
 		renderer.set_range(range);
 		renderer.allow_layers(layers);

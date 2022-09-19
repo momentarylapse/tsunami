@@ -171,7 +171,7 @@ void Synthesizer::_handle_event(const MidiEvent &e) {
 }
 
 void Synthesizer::render(AudioBuffer& buf) {
-	Set<int> pitch_involved = active_pitch;
+	base::set<int> pitch_involved = active_pitch;
 	for (MidiEvent &e: events)
 		pitch_involved.add((int)e.pitch);
 

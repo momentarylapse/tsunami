@@ -10,6 +10,9 @@
 #include <cstdio>
 
 
+#include "../../base/map.h"
+
+
 namespace kaba {
 
 extern const Class *TypeDynamicArray;

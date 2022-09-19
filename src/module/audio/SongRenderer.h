@@ -43,7 +43,7 @@ public:
 	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
-	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
+	void _cdecl allow_layers(const base::set<const TrackLayer*> &allowed_layers);
 
 	void _cdecl set_range(const Range &r);
 	void _cdecl change_range(const Range &r);
@@ -71,9 +71,9 @@ private:
 	Range range_cur;
 	int pos;
 	int _previous_pos_delta;
-	Set<const Track*> allowed_tracks;
-	Set<const TrackLayer*> allowed_layers;
-	Set<const TrackLayer*> allowed_layers_requested;
+	base::set<const Track*> allowed_tracks;
+	base::set<const TrackLayer*> allowed_layers;
+	base::set<const TrackLayer*> allowed_layers_requested;
 	bool direct_mode;
 	bool needs_rebuild;
 	bool needs_synth_reset;

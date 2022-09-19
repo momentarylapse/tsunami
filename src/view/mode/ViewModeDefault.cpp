@@ -538,7 +538,7 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 		y0 = y1;
 		y1 = t;
 	}
-	Set<const TrackLayer*> _layers;
+	base::set<const TrackLayer*> _layers;
 	for (auto vt: view->vlayers) {
 		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
 			_layers.add(vt->layer);

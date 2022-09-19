@@ -506,8 +506,8 @@ vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {
 
 void main() {
 	vec3 n = normalize(in_normal);
-	out_color = material.emission;
 	vec4 tex_col = texture(tex0, in_uv);
+	out_color = material.emission * tex_col;
 	for (int i=0; i<num_lights; i++)
 		out_color += basic_lighting(light[i], n, tex_col);
 	out_color.a = material.albedo.a * tex_col.a;

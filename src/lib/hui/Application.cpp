@@ -28,7 +28,7 @@ extern Callback _idle_function_;
 GtkApplication *Application::application = nullptr;
 
 
-Map<string, string> Application::_properties_;
+base::map<string, string> Application::_properties_;
 
 Path Application::filename;
 Path Application::directory;

@@ -76,12 +76,13 @@ int element_offset(M C::* p) {
 }
 
 void add_package(const string &name, Flags = Flags::NONE);
-const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *parent = nullptr);
+const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *_namespace = nullptr);
 const Class *add_type_p(const Class *sub_type, Flags = Flags::NONE, const string &name = "");
 const Class *add_type_a(const Class *sub_type, int array_length, const string &name = "");
 const Class *add_type_l(const Class *sub_type, const string &name = "");
 const Class *add_type_d(const Class *sub_type, const string &name = "");
 const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params);
+const Class *add_type_e(const string &name, const Class *_namespace = nullptr);
 
 
 Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
@@ -151,6 +152,11 @@ template<class T>
 void add_enum(const string &name, const Class *type, T e) {
 	// for enums and nullptr!
 	add_const(name, type, (const void*)(int_p)e);
+}
+template<class T>
+void class_add_enum(const string &name, const Class *type, T e) {
+	// for enums and nullptr!
+	class_add_const(name, type, (const void*)(int_p)e);
 }
 
 

@@ -140,7 +140,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 				throw Exception("midi track header is not \"MTrk\": " + tn);
 			dbo("----------------------- track");
 
-			Map<int, MidiEventBuffer> events;
+			base::map<int, MidiEventBuffer> events;
 			string track_name;
 			int last_status = 0;
 

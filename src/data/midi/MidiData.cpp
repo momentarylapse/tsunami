@@ -252,7 +252,7 @@ void MidiEventBuffer::sort() {
 
 void MidiEventBuffer::sanify(const Range &r) {
 	//int max_pos = 0;
-	Set<int> active;
+	base::set<int> active;
 	Array<int> del_me;
 
 	sort();

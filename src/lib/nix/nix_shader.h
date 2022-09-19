@@ -14,7 +14,7 @@
 
 namespace nix {
 
-class Shader : public Sharable<Empty> {
+class Shader : public Sharable<base::Empty> {
 public:
 	Path filename;
 	int program;

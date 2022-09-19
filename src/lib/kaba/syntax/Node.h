@@ -95,7 +95,7 @@ enum class NodeKind {
 };
 
 // single operand/command
-class Node : public Sharable<Empty> {
+class Node : public Sharable<base::Empty> {
 public:
 	NodeKind kind;
 	int token_id;

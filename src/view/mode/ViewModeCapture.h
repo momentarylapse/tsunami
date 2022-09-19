@@ -26,7 +26,7 @@ public:
 	void draw_post(Painter *c) override;
 
 
-	virtual Set<Track*> prevent_playback() override;
+	virtual base::set<Track*> prevent_playback() override;
 
 	Array<CaptureTrackData> data;
 	SignalChain *chain;

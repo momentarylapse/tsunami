@@ -44,7 +44,7 @@ public:
 
 	bool loaded, changed;
 	Array<string> comments;
-	Map<string, Any> map;
+	base::map<string, Any> map;
 };
 
 

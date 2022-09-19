@@ -45,14 +45,14 @@ public:
 	Range range() const;
 
 	// data, might contain illegal pointers!
-	Set<const TrackLayer*> _layers;
-	Set<const SampleRef*> _samples;
-	Set<const TrackMarker*> _markers;
-	Set<const MidiNote*> _notes;
-	Set<const Bar*> _bars;
+	base::set<const TrackLayer*> _layers;
+	base::set<const SampleRef*> _samples;
+	base::set<const TrackMarker*> _markers;
+	base::set<const MidiNote*> _notes;
+	base::set<const Bar*> _bars;
 
-	Set<const Track*> tracks() const;
-	Set<const TrackLayer*> layers() const;
+	base::set<const Track*> tracks() const;
+	base::set<const TrackLayer*> layers() const;
 
 	bool has(const Track *t) const;
 

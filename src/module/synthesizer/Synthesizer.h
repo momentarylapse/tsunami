@@ -104,7 +104,7 @@ protected:
 	Array<PitchRenderer*> pitch_renderer;
 	PitchRenderer *get_pitch_renderer(int pitch);
 	virtual PitchRenderer *create_pitch_renderer(int pitch);
-	Set<int> active_pitch; // delayed end
+	base::set<int> active_pitch; // delayed end
 	void _render_part(AudioBuffer &buf, int pitch, int offset, int end);
 	void _handle_event(const MidiEvent &e);
 

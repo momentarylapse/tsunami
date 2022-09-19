@@ -40,7 +40,7 @@ void init_textures() {
 	default_texture = new Texture(16, 16, "rgba:i8");
 	Image image;
 	image.create(16, 16, White);
-	default_texture->override(image);
+	default_texture->write(image);
 
 	tex_text = new Texture;
 }
@@ -105,11 +105,11 @@ int mip_levels(int width, int height) {
 }
 
 
-void Texture::_create_2d(int w, int h, const string &_format) {
+void Texture::_create_2d(int w, int h, unsigned int _format) {
 	width = w;
 	height = h;
 	type = Type::DEFAULT;
-	internal_format = parse_format(_format);
+	internal_format = _format;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 	glTextureStorage2D(texture, mip_levels(width, height), internal_format, width, height);
@@ -122,7 +122,7 @@ void Texture::_create_2d(int w, int h, const string &_format) {
 
 Texture::Texture(int w, int h, const string &_format) : Texture() {
 	msg_write(format("creating texture [%d x %d: %s] ", w, h, _format));
-	_create_2d(w, h, _format);
+	_create_2d(w, h, parse_format(_format));
 }
 
 VolumeTexture::VolumeTexture(int w, int h, int _nz, const string &_format) : Texture() {
@@ -198,7 +198,7 @@ void Texture::reload() {
 
 	string extension = filename.extension();
 	auto image = Image::load(filename);
-	override(*image);
+	this->write(*image);
 	delete image;
 }
 
@@ -236,17 +236,17 @@ void Texture::set_options(const string &options) const {
 	}
 }
 
-void Texture::override(const Image &image) {
+void Texture::write(const Image &image) {
 	if (image.error)
 		return;
 
 	if (type == Type::NONE)
-		_create_2d(image.width, image.height, "rgba:i8");
+		_create_2d(image.width, image.height, GL_RGBA8);
 
 	if (width != image.width or height != image.height) {
 		//msg_write("texture resize..." + filename.str());
 		glDeleteTextures(1, &texture);
-		_create_2d(image.width, image.height, "rgba:i8");//image.alpha_used ? "rgba:i8" : "rgb:i8");
+		_create_2d(image.width, image.height, internal_format);//image.alpha_used ? "rgba:i8" : "rgb:i8");
 	}
 
 	image.set_mode(Image::Mode::RGBA);
@@ -257,7 +257,7 @@ void Texture::override(const Image &image) {
 		glGenerateTextureMipmap(texture);
 }
 
-void Texture::read(Image &image) {
+void Texture::read(Image &image) const {
 	image.create(width, height, Black);
 	glGetTextureSubImage(texture, 0, 0, 0, 0, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image.data.num * sizeof(float), image.data.data);
 }
@@ -272,7 +272,7 @@ unsigned int _gl_channels_(int channels) {
 	return GL_RGBA;
 }
 
-void Texture::read_float(Array<float> &data) {
+void Texture::read_float(Array<float> &data) const {
 	int ch = channels();
 	data.resize(width * height * ch);
 	int format = _gl_channels_(ch);
@@ -288,7 +288,7 @@ int Texture::channels() const {
 	return 4;
 }
 
-void Texture::write_float(Array<float> &data) {
+void Texture::write_float(const Array<float> &data) {
 	int ch = channels();
 	int length_expected = width * height * ch;
 	if (type == Type::VOLUME)
@@ -311,6 +311,10 @@ void Texture::unload() {
 		msg_write("unloading texture: " + filename.str());
 		glDeleteTextures(1, &texture);
 	}
+}
+
+void bind_image(int binding, Texture *t, int level, int layer, bool writable) {
+	glBindImageTexture(binding, t->texture, level, GL_FALSE, layer, writable ? GL_READ_WRITE : GL_READ_ONLY, t->internal_format);
 }
 
 void set_texture(Texture *t) {
@@ -478,7 +482,7 @@ CubeMap::CubeMap(int size, const string &_format) {
 		Image im;
 		im.create(size, size, Red);
 		for (int i=0; i<6; i++)
-			override_side(i, im);
+			write_side(i, im);
 	}
 }
 
@@ -493,10 +497,10 @@ void CubeMap::fill_side(int side, Texture *source) {
 		return;
 	Image image;
 	image.load(source->filename);
-	override_side(side, image);
+	write_side(side, image);
 }
 
-void CubeMap::override_side(int side, const Image &image) {
+void CubeMap::write_side(int side, const Image &image) {
 	//_override(GL_TEXTURE_CUBE_MAP, NixCubeMapTarget[side], image);
 	if (image.error)
 		return;

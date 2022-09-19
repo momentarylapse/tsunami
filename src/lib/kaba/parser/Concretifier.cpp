@@ -179,8 +179,8 @@ bool type_match_tuple_as_contructor(shared<Node> node, Function *f_constructor, 
 const Class *make_effective_class_callable(shared<Node> node) {
 	auto f = node->as_func();
 	if (f->is_member() and node->params.num > 0 and node->params[0])
-		return f->owner()->make_class_callable_fp(f->literal_param_type.sub_ref(1), f->literal_return_type, node->token_id);
-	return f->owner()->make_class_callable_fp(f, node->token_id);
+		return f->owner()->request_implicit_class_callable_fp(f->literal_param_type.sub_ref(1), f->literal_return_type, node->token_id);
+	return f->owner()->request_implicit_class_callable_fp(f, node->token_id);
 }
 
 bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd) {
@@ -686,7 +686,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		if (index->kind != NodeKind::CONSTANT)
 			do_error("array size must be compile-time constant", index);
 		int array_size = index->as_const()->as_int();
-		auto t = tree->make_class_array(operand->as_class(), array_size, operand->token_id);
+		auto t = tree->request_implicit_class_array(operand->as_class(), array_size, operand->token_id);
 		return add_node_class(t);
 
 	}
@@ -739,6 +739,17 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		f->is_const = operand->is_const;
 		f->set_param(1, index);
 		return f;
+	}
+
+	// tuple
+	if (operand->type->is_product()) {
+		if (index->type != TypeInt or index->kind != NodeKind::CONSTANT)
+			do_error("tuple indices must be constant ints", index);
+		int i = index->as_const()->as_int();
+		if (i < 0 or i >= operand->type->param.num)
+			do_error("tuple index out of range", index);
+		auto &e = operand->type->elements[i];
+		return operand->shift(e.offset, e.type, operand->token_id);
 	}
 
 	// allowed?
@@ -1057,7 +1068,7 @@ shared<Node> Concretifier::concretify_statement_weak(shared<Node> node, Block *b
 			auto tt = t->param[0]->get_pointer();
 			return sub->shift(0, tt, node->token_id);
 		} else if (t->is_super_array() and t->get_array_element()->is_pointer_shared()) {
-			auto tt = tree->make_class_super_array(t->param[0]->param[0]->get_pointer(), node->token_id);
+			auto tt = tree->request_implicit_class_super_array(t->param[0]->param[0]->get_pointer(), node->token_id);
 			return sub->shift(0, tt, node->token_id);
 		}
 		if (t->parent)
@@ -1080,7 +1091,7 @@ shared<Node> create_map_call(SyntaxTree *tree, shared<Node> func, shared<Node> a
 	cmd->set_param(1, array);
 	cmd->set_param(2, add_node_class(p[0]));
 	cmd->set_param(3, add_node_class(rt));
-	cmd->type = tree->make_class_super_array(rt, token_id);
+	cmd->type = tree->request_implicit_class_super_array(rt, token_id);
 	return cmd;
 }
 
@@ -1193,7 +1204,7 @@ shared<Node> create_bind(Concretifier *concretifier, shared<Node> inner_callable
 		if (!captures[i])
 			outer_call_types.add(param_types[i]);
 
-	auto bind_wrapper_type = tree->make_class_callable_bind(param_types, return_type, capture_types, capture_via_ref, token_id);
+	auto bind_wrapper_type = tree->request_implicit_class_callable_bind(param_types, return_type, capture_types, capture_via_ref, token_id);
 
 	// "new bind(f, x0, x1, ...)"
 	for (auto *cf: bind_wrapper_type->get_constructors()) {
@@ -1207,7 +1218,7 @@ shared<Node> create_bind(Concretifier *concretifier, shared<Node> inner_callable
 		con->kind = NodeKind::CALL_FUNCTION;
 		con->type = TypeVoid;
 
-		cmd_new->type = tree->make_class_callable_fp(outer_call_types, return_type, token_id);
+		cmd_new->type = tree->request_implicit_class_callable_fp(outer_call_types, return_type, token_id);
 		cmd_new->set_param(0, con);
 		cmd_new->token_id = inner_callable->token_id;
 		return cmd_new;
@@ -1485,7 +1496,7 @@ shared<Node> Concretifier::concretify_array_builder_for(shared<Node> node, Block
 
 	// create an array
 	auto type_el = fake_for->params.back()->type;
-	auto type_array = tree->make_class_super_array(type_el, node->token_id);
+	auto type_array = tree->request_implicit_class_super_array(type_el, node->token_id);
 	auto *var = block->add_var(block->function->create_slightly_hidden_name(), type_array);
 
 
@@ -1531,13 +1542,13 @@ shared<Node> Concretifier::concretify_array_builder_for(shared<Node> node, Block
 const Class *make_pointer_shared(SyntaxTree *tree, const Class *parent, int token_id) {
 	if (!parent->name_space)
 		tree->do_error("shared not allowed for: " + parent->long_name(), token_id); // TODO
-	return tree->make_class(parent->name + " " + IDENTIFIER_SHARED, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, parent->name_space, token_id);
+	return tree->request_implicit_class(parent->name + " " + IDENTIFIER_SHARED, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, parent->name_space, token_id);
 }
 
 const Class *make_pointer_owned(SyntaxTree *tree, const Class *parent, int token_id) {
 	if (!parent->name_space)
 		tree->do_error("owned not allowed for: " + parent->long_name(), token_id);
-	return tree->make_class(parent->name + " " + IDENTIFIER_OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, parent->name_space, token_id);
+	return tree->request_implicit_class(parent->name + " " + IDENTIFIER_OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, parent->name_space, token_id);
 }
 
 // concretify as far as possible
@@ -1598,14 +1609,14 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		if (n->kind != NodeKind::CLASS)
 			do_error("type expected before '[]'", n);
 		const Class *t = n->as_class();
-		t = tree->make_class_super_array(t, node->token_id);
+		t = tree->request_implicit_class_super_array(t, node->token_id);
 		return add_node_class(t);
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_DICT) {
 		concretify_all_params(node, block, ns);
 		if (node->params[0]->kind != NodeKind::CLASS)
 			do_error("type expected before '{}'", node->params[0]);
 		const Class *t = node->params[0]->as_class();
-		t = tree->make_class_dict(t, node->token_id);
+		t = tree->request_implicit_class_dict(t, node->token_id);
 		return add_node_class(t);
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_CALLABLE) {
 		concretify_all_params(node, block, ns);
@@ -1617,7 +1628,7 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 			do_error("type expected before '->'", node->params[1]);
 		const Class *t0 = node->params[0]->as_class();
 		const Class *t1 = node->params[1]->as_class();
-		return add_node_class(tree->make_class_callable_fp({t0}, t1, node->token_id));
+		return add_node_class(tree->request_implicit_class_callable_fp({t0}, t1, node->token_id));
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_SHARED) {
 		concretify_all_params(node, block, ns);
 		if (node->params[0]->kind != NodeKind::CLASS)
@@ -1711,7 +1722,7 @@ shared<Node> Concretifier::wrap_node_into_callable(shared<Node> node) {
 
 // f : (A,B,...)->R  =>  new Callable[](f) : (A,B,...)->R
 shared<Node> Concretifier::wrap_function_into_callable(Function *f, int token_id) {
-	auto t = tree->make_class_callable_fp(f, token_id);
+	auto t = tree->request_implicit_class_callable_fp(f, token_id);
 
 	for (auto *cf: t->param[0]->get_constructors()) {
 		if (cf->num_params == 2) {
@@ -1767,7 +1778,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
 
-		node->type = tree->make_class_super_array(t, node->token_id);
+		node->type = tree->request_implicit_class_super_array(t, node->token_id);
 		return node;
 	} else if (node->kind == NodeKind::DICT_BUILDER) {
 		if (node->params.num == 0) {
@@ -1789,7 +1800,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
 
-		node->type = tree->make_class_dict(t, node->token_id);
+		node->type = tree->request_implicit_class_dict(t, node->token_id);
 		return node;
 	} else if (node->kind == NodeKind::TUPLE) {
 		auto type = merge_type_tuple_into_product(tree, node_extract_param_types(node), node->token_id);

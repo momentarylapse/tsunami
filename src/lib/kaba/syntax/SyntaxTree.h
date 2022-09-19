@@ -53,13 +53,13 @@ public:
 	// syntax analysis
 	const Class *add_class(const Class *type);
 	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
-	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
-	const Class *make_class_super_array(const Class *element_type, int token_id);
-	const Class *make_class_array(const Class *element_type, int num_elements, int token_id);
-	const Class *make_class_dict(const Class *element_type, int token_id);
-	const Class *make_class_callable_fp(Function *f, int token_id);
-	const Class *make_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
-	const Class *make_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
+	const Class *request_implicit_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
+	const Class *request_implicit_class_super_array(const Class *element_type, int token_id);
+	const Class *request_implicit_class_array(const Class *element_type, int num_elements, int token_id);
+	const Class *request_implicit_class_dict(const Class *element_type, int token_id);
+	const Class *request_implicit_class_callable_fp(Function *f, int token_id);
+	const Class *request_implicit_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
+	const Class *request_implicit_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
 	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns, int token_id);
 	shared_array<Node> get_existence_global(const string &name, const Class *ns, int token_id);
 	shared_array<Node> get_existence_block(const string &name, Block *block, int token_id);

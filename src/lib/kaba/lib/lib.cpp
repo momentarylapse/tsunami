@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "../kaba.h"
+#include "../parser/template.h"
 #include "lib.h"
 #include "dict.h"
 #include "../dynamic/exception.h"
@@ -175,6 +176,7 @@ const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) 
 	if (flags_has(flag, Flags::SHARED))
 		t->type = Class::Type::POINTER_SHARED;
 	__add_class__(t, sub_type->name_space);
+	implicit_class_registry::add(t);
 	return t;
 }
 
@@ -187,6 +189,7 @@ const Class *add_type_a(const Class *sub_type, int array_length, const string &_
 	t->type = Class::Type::ARRAY;
 	t->array_length = array_length;
 	__add_class__(t, sub_type->name_space);
+	implicit_class_registry::add(t);
 	return t;
 }
 
@@ -199,6 +202,7 @@ const Class *add_type_l(const Class *sub_type, const string &_name) {
 	t->type = Class::Type::SUPER_ARRAY;
 	kaba_make_super_array(t);
 	__add_class__(t, sub_type->name_space);
+	implicit_class_registry::add(t);
 	return t;
 }
 
@@ -211,6 +215,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	t->type = Class::Type::DICT;
 	kaba_make_dict(t);
 	__add_class__(t, sub_type->name_space);
+	implicit_class_registry::add(t);
 	return t;
 }
 
@@ -263,6 +268,7 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 	Class *ff = new Class("XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->syntax, nullptr, params_ret);
 	ff->type = Class::Type::CALLABLE_FUNCTION_POINTER;
 	__add_class__(ff, cur_package->syntax->base_class);
+	implicit_class_registry::add(ff);
 
 	auto ptr_param = [] (const Class *p) {
 		return p->is_pointer() or p->uses_call_by_reference();
@@ -278,13 +284,16 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallable<void(void*)>::__init__);
 				func_add_param("fp", TypePointer);
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*)>::operator());
+				func_add_param("a", params[0]);
 		} else if (params.num == 2 and ptr_param(params[0]) and ptr_param(params[1])) {
 			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCallable<void(void*,void*)>::__init__);
 				func_add_param("fp", TypePointer);
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*,void*)>::operator());
+				func_add_param("a", params[0]);
+				func_add_param("b", params[1]);
 		}
 	}
-	return cur_package->syntax->make_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, cur_package->syntax->base_class, -1);
+	return cur_package->syntax->request_implicit_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, cur_package->syntax->base_class, -1);
 
 	/*auto c = cur_package->syntax->make_class_callable_fp(params, ret_type);
 	add_class(c);

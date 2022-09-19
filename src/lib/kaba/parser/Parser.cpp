@@ -537,7 +537,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v, int token_i
 shared<Node> Parser::parse_abstract_list(Block *block) {
 	shared_array<Node> el;
 	if (!try_consume("]"))
-		while(true) {
+		while (true) {
 			el.add(parse_abstract_operand_greedy(block));
 			if (try_consume("]"))
 				break;
@@ -550,7 +550,7 @@ shared<Node> Parser::parse_abstract_dict(Block *block) {
 	Exp.next(); // {
 	shared_array<Node> el;
 	if (!try_consume("}"))
-		while(true) {
+		while (true) {
 			el.add(parse_abstract_operand_greedy(block)); // key
 			expect_identifier(":", "':' after key expected");
 			el.add(parse_abstract_operand_greedy(block)); // value
@@ -570,17 +570,7 @@ const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const C
 			name += ",";
 		name += c->name;
 	}
-	auto c = const_cast<Class*>(tree->make_class("("+name+")", Class::Type::PRODUCT, size, -1, nullptr, classes, tree->_base_class.get(), token_id));
-	if (c->elements.num == 0) {
-		int offset = 0;
-		for (auto&& [i,cc]: enumerate(classes)) {
-			c->elements.add(ClassElement("e" + i2s(i), cc, offset));
-			offset += cc->size;
-		}
-		tree->add_missing_function_headers_for_class(c);
-	}
-	return c;
-
+	return tree->request_implicit_class("("+name+")", Class::Type::PRODUCT, size, -1, nullptr, classes, tree->_base_class.get(), token_id);
 }
 
 shared<Node> Parser::parse_abstract_token() {

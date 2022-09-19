@@ -215,5 +215,37 @@ Function *TemplateManager::instantiate(Parser *parser, Template &t, const Array<
 }
 
 
+
+namespace implicit_class_registry {
+	Array<const Class*> classes;
+
+	const Class *find(const string &name, Class::Type type, int array_size, const Array<const Class*> &params) {
+		for (auto t: classes) {
+			if (t->type != type)
+				continue;
+			if (t->param != params)
+				continue;
+			if (type == Class::Type::ARRAY)
+				if (t->array_length != array_size)
+					continue;
+			//if (t->name != name)
+			//	continue;
+			return t;
+		}
+		return nullptr;
+	}
+	void add(const Class* t) {
+		classes.add(t);
+	}
+
+	// TODO track which module requests what
+	// TODO implement as templates INSIDE base module
+	void remove_module(Module *m) {
+
+	}
+}
+
+
+
 }
 

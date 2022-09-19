@@ -55,7 +55,7 @@ public:
 void kaba_make_dict(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
 	t->derive_from(TypeDictBase, false);
-	t->param[0] = p;
+	t->param = {p};
 	add_class(t);
 
 	if (p->can_memcpy()) {

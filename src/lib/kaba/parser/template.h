@@ -43,6 +43,14 @@ private:
 	static void match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f);
 };
 
+
+namespace implicit_class_registry {
+	const Class *find(const string &name, Class::Type type, int array_size, const Array<const Class*> &params);
+	void add(const Class* t);
+	void remove_module(Module *m);
+}
+
+
 }
 
 #endif /* SRC_LIB_KABA_PARSER_TEMPLATE_H_ */

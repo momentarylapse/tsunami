@@ -37,17 +37,9 @@ typedef void *VirtualTable;
 
 class Class : public Sharable<base::Empty> {
 public:
-	//Class();
-	Class(const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
-	~Class();
-	string name;
-	string long_name() const;
-	string cname(const Class *ns = nullptr) const;
-	int64 size; // complete size of type
-	int array_length;
 
 	enum class Type {
-		OTHER,
+		REGULAR,
 		ARRAY,
 		SUPER_ARRAY,
 		POINTER,
@@ -57,13 +49,24 @@ public:
 		FUNCTION,
 		DICT,
 		PRODUCT, // (a,b) in (A x B)
+		OPTIONAL,
 		INTERFACE,
 		CALLABLE_FUNCTION_POINTER,
 		CALLABLE_BIND,
 	};
+	
+	//Class();
+	Class(Type type, const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
+	~Class();
+	string name;
+	string long_name() const;
+	string cname(const Class *ns = nullptr) const;
+	int64 size; // complete size of type
+	int array_length;
 	Type type;
 	Flags flags;
 
+	bool is_regular() const;
 	bool is_array() const;
 	bool is_super_array() const;
 	bool is_dict() const;
@@ -74,6 +77,7 @@ public:
 	bool is_enum() const;
 	bool is_interface() const;
 	bool is_product() const;
+	bool is_optional() const;
 	bool is_callable() const;
 	bool is_callable_fp() const;
 	bool is_callable_bind() const;

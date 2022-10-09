@@ -156,7 +156,7 @@ void __add_class__(Class *t, const Class *name_space) {
 }
 
 const Class *add_type(const string &name, int size, Flags flag, const Class *name_space) {
-	Class *t = new Class(name, size, cur_package->syntax);
+	Class *t = new Class(Class::Type::REGULAR, name, size, cur_package->syntax);
 	if (flags_has(flag, Flags::CALL_BY_VALUE))
 		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, name_space);
@@ -171,8 +171,7 @@ const Class *add_type_p(const Class *sub_type, Flags flag, const string &_name) 
 		else
 			name = sub_type->name + "*";
 	}
-	Class *t = new Class(name, config.pointer_size, cur_package->syntax, nullptr, {sub_type});
-	t->type = Class::Type::POINTER;
+	Class *t = new Class(Class::Type::POINTER, name, config.pointer_size, cur_package->syntax, nullptr, {sub_type});
 	if (flags_has(flag, Flags::SHARED))
 		t->type = Class::Type::POINTER_SHARED;
 	__add_class__(t, sub_type->name_space);
@@ -185,8 +184,7 @@ const Class *add_type_a(const Class *sub_type, int array_length, const string &_
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[" + i2s(array_length) + "]";
-	Class *t = new Class(name, sub_type->size * array_length, cur_package->syntax, nullptr, {sub_type});
-	t->type = Class::Type::ARRAY;
+	Class *t = new Class(Class::Type::ARRAY, name, sub_type->size * array_length, cur_package->syntax, nullptr, {sub_type});
 	t->array_length = array_length;
 	__add_class__(t, sub_type->name_space);
 	implicit_class_registry::add(t);
@@ -198,8 +196,7 @@ const Class *add_type_l(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "[]";
-	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
-	t->type = Class::Type::SUPER_ARRAY;
+	Class *t = new Class(Class::Type::SUPER_ARRAY, name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
 	kaba_make_super_array(t);
 	__add_class__(t, sub_type->name_space);
 	implicit_class_registry::add(t);
@@ -211,8 +208,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 	string name = _name;
 	if (name == "")
 		name = sub_type->name + "{}";
-	Class *t = new Class(name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
-	t->type = Class::Type::DICT;
+	Class *t = new Class(Class::Type::DICT, name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
 	kaba_make_dict(t);
 	__add_class__(t, sub_type->name_space);
 	implicit_class_registry::add(t);
@@ -221,8 +217,7 @@ const Class *add_type_d(const Class *sub_type, const string &_name) {
 
 // enum
 const Class *add_type_e(const string &name, const Class *_namespace) {
-	Class *t = new Class(name, sizeof(int), cur_package->syntax);
-	t->type = Class::Type::ENUM;
+	Class *t = new Class(Class::Type::ENUM, name, sizeof(int), cur_package->syntax);
 	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, _namespace);
 	return t;
@@ -265,8 +260,7 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 	params_ret.add(ret_type);
 
 	//auto ff = cur_package->syntax->make_class("Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, cur_package->syntax->base_class);
-	Class *ff = new Class("XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->syntax, nullptr, params_ret);
-	ff->type = Class::Type::CALLABLE_FUNCTION_POINTER;
+	Class *ff = new Class(Class::Type::CALLABLE_FUNCTION_POINTER, "XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->syntax, nullptr, params_ret);
 	__add_class__(ff, cur_package->syntax->base_class);
 	implicit_class_registry::add(ff);
 

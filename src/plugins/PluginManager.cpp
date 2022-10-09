@@ -85,7 +85,7 @@ PluginManager::PluginManager() {
 	kaba::packages.add(package);
 	kaba::public_modules.add(package.get());
 
-	auto *type_dev = package->syntax->create_new_class("Device", kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class, -1);
+	auto *type_dev = package->syntax->create_new_class("Device", kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->syntax->base_class, -1);
 	type_dev->get_pointer();
 	//package->syntax->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->syntax->base_class, -1);
 }
@@ -827,7 +827,7 @@ kaba::Class* PluginManager::get_class(const string &name) {
 	for (auto c: weak(package->syntax->base_class->classes))
 		if (c->name == name)
 			return (kaba::Class*)c;
-	return (kaba::Class*)package->syntax->create_new_class(name, kaba::Class::Type::OTHER, 0, 0, nullptr, {}, package->syntax->base_class, -1);
+	return (kaba::Class*)package->syntax->create_new_class(name, kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->syntax->base_class, -1);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

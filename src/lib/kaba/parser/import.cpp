@@ -186,7 +186,7 @@ Class *get_namespace_for_import(SyntaxTree *tree, const string &name) {
 		for (auto c: weak(ns->classes))
 			if (c->name == name)
 				return const_cast<Class*>(c);
-		return tree->create_new_class(name, Class::Type::OTHER, 0, 0, nullptr, {}, ns, -1);
+		return tree->create_new_class(name, Class::Type::REGULAR, 0, 0, nullptr, {}, ns, -1);
 	};
 
 	for (auto &x: xx)

@@ -72,7 +72,6 @@ public:
 
 	// execution
 	void *match_function(const string &name, const string &return_type, const Array<string> &param_types);
-	void *match_class_function(const string &_class, bool allow_derived, const string &name, const string &return_type, const Array<string> &param_types);
 	void set_variable(const string &name, void *data);
 
 	//debug displaying

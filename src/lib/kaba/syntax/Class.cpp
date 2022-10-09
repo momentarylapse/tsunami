@@ -99,12 +99,12 @@ bool type_match(const Class *given, const Class *wanted) {
 }
 
 
-Class::Class(const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
+Class::Class(Type _type, const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
 	flags = Flags::FULLY_PARSED;
 	name = _name;
 	owner = _owner;
 	size = _size;
-	type = Type::OTHER;
+	type = _type;
 	array_length = 0;
 	parent = _parent;
 	param = _param;
@@ -169,35 +169,53 @@ string Class::cname(const Class *ns) const {
 	return namespacify_rel(name, name_space, ns);
 }
 
-bool Class::is_array() const
-{ return type == Type::ARRAY; }
+bool Class::is_regular() const {
+	return type == Type::REGULAR;
+}
 
-bool Class::is_super_array() const
-{ return type == Type::SUPER_ARRAY; }
+bool Class::is_array() const {
+	return type == Type::ARRAY;
+}
 
-bool Class::is_pointer() const
-{ return type == Type::POINTER /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */; }
+bool Class::is_super_array() const {
+	return type == Type::SUPER_ARRAY;
+}
 
-bool Class::is_some_pointer() const
-{ return type == Type::POINTER  or type == Type::POINTER_SHARED or type == Type::POINTER_OWNED; }
+bool Class::is_pointer() const {
+	return type == Type::POINTER /* or type == Type::POINTER_SHARED or type == Type::POINTER_UNIQUE */;
+}
 
-bool Class::is_pointer_shared() const
-{ return type == Type::POINTER_SHARED; }
+bool Class::is_some_pointer() const {
+	return type == Type::POINTER  or type == Type::POINTER_SHARED or type == Type::POINTER_OWNED;
+}
 
-bool Class::is_pointer_owned() const
-{ return type == Type::POINTER_OWNED; }
+bool Class::is_pointer_shared() const {
+	return type == Type::POINTER_SHARED;
+}
 
-bool Class::is_enum() const
-{ return type == Type::ENUM; }
+bool Class::is_pointer_owned() const {
+	return type == Type::POINTER_OWNED;
+}
 
-bool Class::is_interface() const
-{ return type == Type::INTERFACE; }
+bool Class::is_enum() const {
+	return type == Type::ENUM;
+}
 
-bool Class::is_dict() const
-{ return type == Type::DICT; }
+bool Class::is_interface() const {
+	return type == Type::INTERFACE;
+}
 
-bool Class::is_product() const
-{ return type == Type::PRODUCT; }
+bool Class::is_dict() const {
+	return type == Type::DICT;
+}
+
+bool Class::is_product() const {
+	return type == Type::PRODUCT;
+}
+
+bool Class::is_optional() const {
+	return type == Type::OPTIONAL;
+}
 
 bool Class::is_callable() const {
 	if (is_pointer())
@@ -205,20 +223,22 @@ bool Class::is_callable() const {
 	return false;
 }
 
-bool Class::is_callable_fp() const
-{ return type == Type::CALLABLE_FUNCTION_POINTER; }
+bool Class::is_callable_fp() const {
+	return type == Type::CALLABLE_FUNCTION_POINTER;
+}
 
-bool Class::is_callable_bind() const
-{ return type == Type::CALLABLE_BIND; }
+bool Class::is_callable_bind() const {
+	return type == Type::CALLABLE_BIND;
+}
 
 bool Class::uses_call_by_reference() const {
-	return (!force_call_by_value() and !is_pointer()) or is_array();
+	return (!force_call_by_value() and !is_pointer()) or is_array() or is_optional();
 }
 
 bool Class::uses_return_by_memory() const {
 	if (_amd64_allow_pass_in_xmm())
 		return false;
-	return (!force_call_by_value() and !is_pointer()) or is_array();
+	return (!force_call_by_value() and !is_pointer()) or is_array() or is_optional();
 }
 
 
@@ -227,7 +247,7 @@ bool Class::uses_return_by_memory() const {
 bool Class::can_memcpy() const {
 	if (!uses_call_by_reference())
 		return true;
-	if (is_array())
+	if (is_array() or is_optional())
 		return param[0]->can_memcpy();
 	if (is_super_array())
 		return false;
@@ -274,7 +294,7 @@ const Class *Class::get_array_element() const {
 bool Class::needs_constructor() const {
 	if (!uses_call_by_reference()) // int/float/pointer etc
 		return false;
-	if (is_super_array() or is_dict())
+	if (is_super_array() or is_dict() or is_optional())
 		return true;
 	if (initializers.num > 0)
 		return true;
@@ -300,6 +320,8 @@ bool Class::is_size_known() const {
 		return true;
 	if (!fully_parsed())
 		return false;
+	if (is_optional())
+		return param[0]->is_size_known();
 	for (ClassElement &e: elements)
 		if (!e.type->is_size_known())
 			return false;
@@ -309,7 +331,7 @@ bool Class::is_size_known() const {
 bool Class::needs_destructor() const {
 	if (!uses_call_by_reference())
 		return false;
-	if (is_super_array() or is_dict())
+	if (is_super_array() or is_dict() or is_optional())
 		return true;
 	if (is_array())
 		return param[0]->get_destructor();

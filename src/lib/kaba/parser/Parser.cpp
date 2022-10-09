@@ -191,6 +191,16 @@ shared<Node> Parser::parse_abstract_operand_extension_dict(shared<Node> operand)
 	return node;
 }
 
+shared<Node> Parser::parse_abstract_operand_extension_optional(shared<Node> operand) {
+	Exp.next(); // "?"
+
+	auto node = new Node(NodeKind::ABSTRACT_TYPE_OPTIONAL, 0, TypeUnknown);
+	node->token_id = Exp.cur_token();
+	node->set_num_params(1);
+	node->set_param(0, operand);
+	return node;
+}
+
 shared<Node> Parser::parse_abstract_operand_extension_callable(shared<Node> operand, Block *block) {
 	Exp.next(); // "->"
 
@@ -332,6 +342,9 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 	} else if (Exp.cur == "->") {
 		// A->B?
 		return parse_abstract_operand_extension(parse_abstract_operand_extension_callable(operand, block), block, true);
+	} else if (Exp.cur == "?") {
+		// optional?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_optional(operand), block, true);
 	} else if (Exp.cur == IDENTIFIER_SHARED or Exp.cur == IDENTIFIER_OWNED) {
 		auto sub = operand;
 		if (Exp.cur == IDENTIFIER_SHARED) {
@@ -2130,7 +2143,7 @@ void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
 				Exp.next();
 //				if (Exp.cur.num == 1)
 //					do_error("class names must be at least 2 characters long", Exp.cur_token());
-				Class *t = tree->create_new_class(Exp.cur, Class::Type::OTHER, 0, 0, nullptr, {}, ns, Exp.cur_token());
+				Class *t = tree->create_new_class(Exp.cur, Class::Type::REGULAR, 0, 0, nullptr, {}, ns, Exp.cur_token());
 				flags_clear(t->flags, Flags::FULLY_PARSED);
 
 				Exp.next_line();
@@ -2240,6 +2253,9 @@ void Parser::parse_top_level() {
 // convert text into script data
 void Parser::parse() {
 	Exp.reset_walker();
+	Exp.do_error_endl = [this] {
+		do_error_exp("unexpected newline");
+	};
 
 	parse_top_level();
 

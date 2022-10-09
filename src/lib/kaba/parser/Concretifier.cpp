@@ -1618,6 +1618,12 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		const Class *t = node->params[0]->as_class();
 		t = tree->request_implicit_class_dict(t, node->token_id);
 		return add_node_class(t);
+	} else if (node->kind == NodeKind::ABSTRACT_TYPE_OPTIONAL) {
+		concretify_all_params(node, block, ns);
+		if (node->params[0]->kind != NodeKind::CLASS)
+			do_error("type expected before '?'", node->params[0]);
+		const Class *t = node->params[0]->as_class();
+		return add_node_class(tree->request_implicit_class_optional(t, node->token_id));
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_CALLABLE) {
 		concretify_all_params(node, block, ns);
 		node->params[0] = digest_type(tree, node->params[0]);

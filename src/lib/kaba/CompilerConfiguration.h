@@ -73,6 +73,7 @@ public:
 
 	int function_address_offset;
 
+	Path default_filename; // for create_for_source()
 };
 
 extern CompilerConfiguration config;

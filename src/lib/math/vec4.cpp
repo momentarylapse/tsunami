@@ -7,6 +7,7 @@
 
 
 #include "vec4.h"
+#include "vec3.h"
 #include <math.h>
 
 
@@ -24,6 +25,8 @@ vec4::vec4(float x, float y, float z, float w) {
 	this->z = z;
 	this->w = w;
 }
+
+vec4::vec4(const vec3 &v, float w) : vec4(v.x, v.y, v.z, w) {}
 
 // assignment operators
 void vec4::operator += (const vec4& v) {

@@ -45,6 +45,8 @@ int ExpressionBuffer::cur_token() const {
 }
 
 int ExpressionBuffer::consume_token() {
+	if (end_of_line())
+		do_error_endl();
 	int token = cur_token();
 	next();
 	return token;
@@ -106,6 +108,8 @@ void ExpressionBuffer::next() {
 }
 
 string ExpressionBuffer::consume() {
+	if (end_of_line())
+		do_error_endl();
 	auto s = cur;
 	next();
 	return s;

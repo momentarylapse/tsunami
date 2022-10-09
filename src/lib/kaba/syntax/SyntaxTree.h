@@ -57,6 +57,7 @@ public:
 	const Class *request_implicit_class_super_array(const Class *element_type, int token_id);
 	const Class *request_implicit_class_array(const Class *element_type, int num_elements, int token_id);
 	const Class *request_implicit_class_dict(const Class *element_type, int token_id);
+	const Class *request_implicit_class_optional(const Class *param, int token_id);
 	const Class *request_implicit_class_callable_fp(Function *f, int token_id);
 	const Class *request_implicit_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
 	const Class *request_implicit_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);

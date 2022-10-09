@@ -78,6 +78,8 @@ public:
 	void next_line();
 	bool end_of_file() const;
 	void jump(int token_id);
+
+	std::function<void()> do_error_endl;
 };
 
 

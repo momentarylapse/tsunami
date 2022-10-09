@@ -80,6 +80,7 @@ shared<Module> load(const Path &filename, bool just_analyse) {
 shared<Module> create_for_source(const string &buffer, bool just_analyse) {
 	shared<Module> s = new Module;
 	s->just_analyse = just_analyse;
+	s->filename = config.default_filename;
 	s->syntax->parser = new Parser(s->syntax);
 	s->syntax->default_import();
 	s->syntax->parser->parse_buffer(buffer, just_analyse);
@@ -348,38 +349,6 @@ void *Module::match_function(const string &name, const string &return_type, cons
 					return (void*)(int_p)f->address;
 			}
 		}
-
-	return nullptr;
-}
-
-// DEPRECATED?
-void *Module::match_class_function(const string &_class, bool allow_derived, const string &name, const string &return_type, const Array<string> &param_types)
-{
-	const Class *root_type = syntax->find_root_type_by_name(_class, syntax->base_class, false);
-	if (!root_type)
-		return nullptr;
-
-	// match
-	for (auto *f: syntax->functions){
-		if (!f->name_space)
-			continue;
-		if (!f->name_space->is_derived_from(root_type))
-			continue;
-		if ((f->name == name) and (f->literal_return_type->name == return_type) and (param_types.num == f->num_params)){
-
-			bool params_ok = true;
-			for (int j=0;j<param_types.num;j++)
-				//if ((*f)->Var[j].Type->name != param_type[j])
-				if (f->literal_param_type[j]->name != param_types[j])
-					params_ok = false;
-			if (params_ok){
-				if (just_analyse)
-					return (void*)(int_p)0xdeadbeaf;
-				else
-					return (void*)(int_p)f->address;
-			}
-		}
-	}
 
 	return nullptr;
 }

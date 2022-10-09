@@ -16,8 +16,9 @@
 class vec4 {
 public:
 	float x, y, z, w;
-	vec4(){};
+	vec4() {}
 	vec4(float x, float y, float z, float w);
+	vec4(const vec3& v, float w);
 	// assignment operators
 	void _cdecl operator += (const vec4& v);
 	void _cdecl operator -= (const vec4& v);

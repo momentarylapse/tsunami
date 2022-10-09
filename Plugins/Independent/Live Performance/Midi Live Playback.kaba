@@ -17,15 +17,17 @@ class MLPPanel extends ConfigPanel
 	func mut on_select_synth()
 		if synth_panel
 			del synth_panel
-		string name = ChooseModule(self, session, Module.Type.SYNTHESIZER, c.synth.name)
-		c.set_synth(name)
-		set_string("select-synth", name)
+
+		let f = func(name: string)
+			c.set_synth(name)
+			set_string("select-synth", name)
 		
-		synth_panel = c.synth.create_panel()
-		if synth_panel
-			embed(synth_panel, "grid", 0, 1)
-			synth_panel.update()
+			synth_panel = c.synth.create_panel()
+			if synth_panel
+				embed(synth_panel, "grid", 0, 1)
+				synth_panel.update()
 		
+		ChooseModule(self, session, Module.Type.SYNTHESIZER, f, c.synth.name)
 
 class MidiLivePlayback extends TsunamiPlugin
 	var m_in, m_out: Module*

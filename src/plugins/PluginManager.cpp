@@ -111,6 +111,19 @@ public:
 };
 
 
+ void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const string&)> &cb, const string &old_name) {
+	PluginManager::choose_module(parent, session, type, [&cb] (const string &name) {
+		cb(name);
+	}, old_name);
+ }
+
+ void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
+	SampleManagerConsole::select(session, parent, old, [&cb] (Sample *s) {
+		cb(s);
+	});
+ }
+
+
 void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
 
@@ -132,8 +145,8 @@ void PluginManager::link_app_data() {
 	kaba::link_external("CreateMidiSource", (void*)&CreateMidiSource);
 	kaba::link_external("CreateBeatSource", (void*)&CreateBeatSource);
 	kaba::link_external("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
-	kaba::link_external("SelectSample", (void*)&SampleManagerConsole::select);
-	kaba::link_external("ChooseModule", (void*)&choose_module);
+	kaba::link_external("SelectSample", (void*)&wrapper_select_sample);
+	kaba::link_external("ChooseModule", (void*)&wrapper_choose_module);
 	kaba::link_external("draw_boxed_str", (void*)&draw_boxed_str);
 	kaba::link_external("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	kaba::link_external("get_style_colors", (void*)&hui::get_style_colors);

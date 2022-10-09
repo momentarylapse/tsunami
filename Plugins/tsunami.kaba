@@ -778,10 +778,10 @@ func extern CreateMidiSource(session: Session, name: string) -> MidiSource*
 func extern CreateMidiEffect(session: Session, name: string) -> MidiEffect*
 func extern CreateBeatMidifier(session: Session) -> BeatMidifier*
 func extern CreateBeatSource(session: Session, name: string) -> BeatSource*
-func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> Sample*
+func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: Sample*->void)
 #extern void SetTempBackupFilename(Path filename)
 
-func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, old_name: string) -> string
+func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string->void, old_name: string)
 
 enum Align
 	LEFT = -1

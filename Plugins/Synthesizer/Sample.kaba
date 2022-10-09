@@ -69,10 +69,12 @@ class SamplePanel extends ConfigPanel
 		var old: Sample* = nil
 		if weak(sc.samples[n])
 			old = weak(sc.samples[n].origin)
-		var s = SelectSample(c.session, self, old)
-		if s != old
-			sc.samples[n] = nil
-			if s
-				sc.samples[n] = s.create_ref()
-			changed()
-			update()
+		let f = func(ss: Sample*)
+			var s = ss
+			if s != old
+				sc.samples[n] = nil
+				if s
+					sc.samples[n] = s.create_ref()
+				changed()
+				update()
+		SelectSample(c.session, self, old, f)

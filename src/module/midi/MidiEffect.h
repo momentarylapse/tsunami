@@ -18,7 +18,7 @@ class Plugin;
 class Track;
 class TrackLayer;
 class AudioBuffer;
-class MidiNoteBuffer;
+class MidiEventBuffer;
 class SongSelection;
 
 class MidiEffect : public Module {
@@ -30,7 +30,7 @@ public:
 
 	Port *source;
 
-	virtual void _cdecl process(MidiNoteBuffer *midi) {};
+	virtual void _cdecl process(MidiEventBuffer &midi) {};
 
 	void process_layer(TrackLayer *l, SongSelection &sel);
 

@@ -11,7 +11,7 @@ class Config extends Module.Config
 class Delay extends MidiEffect
 	var config: Config
 	
-	func override process(out midi: MidiNoteBuffer)
-		int dt = session.sample_rate() * config.delay
-		for n in midi
-			n.range.offset += dt
+	func override process(out midi: MidiEventBuffer)
+		let dt: int = session.sample_rate() * config.delay
+		for e in midi
+			e.pos += dt

@@ -10,6 +10,7 @@
 
 #include "../../Session.h"
 #include "../../lib/math/math.h"
+#include "../../lib/os/msg.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/TrackLayer.h"
@@ -22,7 +23,9 @@ MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::MIDI, "out") {
 int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
 	if (!fx->source)
 		return NO_SOURCE;
-	return fx->source->read_midi(buf);
+	int r = fx->source->read_midi(buf);
+	fx->process(buf);
+	return r;
 }
 
 MidiEffect::MidiEffect() :
@@ -43,7 +46,8 @@ void MidiEffect::__delete__() {
 
 
 void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
-	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
+	msg_error("TODO: MidiEffect.process_layer()");
+	/*MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
 	l->song()->begin_action_group("midi fx process layer");
 
@@ -61,7 +65,7 @@ void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 	// select new notes
 	for (auto *n: weak(l->midi))
 		if (!ref.has(n))
-			sel.set(n, true);
+			sel.set(n, true);*/
 }
 
 

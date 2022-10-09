@@ -17,10 +17,11 @@ class Config extends Module.Config
 class Randomize extends MidiEffect
 	var config: Config
 	
-	func override process(out midi: MidiNoteBuffer)
+	func override process(out midi: MidiEventBuffer)
 		float delay = session.sample_rate() * config.TimeDelay
 		float variation = session.sample_rate() * config.TimeVariation
-		for n in midi
-			int dt = rand(variation*2) - variation + delay
-			n.range.offset += dt
-			n.volume *= rand(config.Volume) + 1 - config.Volume
+		for e in midi
+			if e.volume > 0
+				let dt: int = rand(variation*2) - variation + delay
+				e.pos += dt
+				e.volume *= rand(config.Volume) + 1 - config.Volume

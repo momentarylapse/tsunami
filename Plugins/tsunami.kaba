@@ -176,7 +176,7 @@ class AudioEffect extends Module
 class MidiEffect extends Module
 	func extern __init__()
 	func extern override __delete__()
-	func extern virtual mut process(out midi: MidiNoteBuffer)
+	func extern virtual mut process(out midi: MidiEventBuffer)
 
 class AudioVisualizer extends Module
 	var chunk_size: int

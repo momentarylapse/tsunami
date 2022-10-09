@@ -178,13 +178,14 @@ void TrackRenderer::fill_midi_streamer() {
 		for (auto c: weak(l->samples))
 			if (c->type() == SignalType::MIDI)
 			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
+
+	MidiEventBuffer events = midi_notes_to_events(_midi);
+
 	for (auto *fx: weak(track->midi_fx)) {
 		fx->reset_state();
-		fx->process(&_midi);
+		fx->process(events);
 	}
-
-	MidiEventBuffer raw = midi_notes_to_events(_midi);
-	midi_streamer->set_data(raw);
+	midi_streamer->set_data(events);
 	midi_streamer->ignore_end = true;
 	synth->reset_state();
 

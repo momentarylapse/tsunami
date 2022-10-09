@@ -95,10 +95,10 @@ void TestPlugins::test_audio_source(const string &name) {
 void TestPlugins::test_midi_effect(const string &name) {
 	auto *fx = CreateMidiEffect(Session::GLOBAL, name);
 
-	MidiNoteBuffer buf;
+	MidiEventBuffer buf;
 	buf.samples = 1 << 20;
 
-	fx->process(&buf);
+	fx->process(buf);
 
 	delete fx;
 }

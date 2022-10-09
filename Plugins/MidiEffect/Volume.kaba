@@ -11,6 +11,7 @@ class Config extends Module.Config
 class PitchShift extends MidiEffect
 	var config: Config
 	
-	func override process(out midi: MidiNoteBuffer)
-		for n in midi
-			n.volume = config.volume
+	func override process(out midi: MidiEventBuffer)
+		for e in midi
+			if e.volume > 0
+				e.volume = config.volume

@@ -11,6 +11,20 @@ class Config extends Module.Config
 class ScaleLength extends MidiEffect
 	var config: Config
 	
-	func override process(out midi: MidiNoteBuffer)
-		for n in midi
-			n.range.length = n.range.length * config.scale
+	var offsets: int[128]
+	
+	func override reset_state()
+		for o in offsets
+			o = -1
+	
+	func override process(out midi: MidiEventBuffer)
+		for e in midi
+			if e.volume > 0
+				offsets[int(e.pitch)] = e.pos
+			else
+				let o = offsets[int(e.pitch)]
+				e.pos = o + (o - e.pos) * config.scale
+				offsets[int(e.pitch)] = -1
+		for o in offsets
+			if o >= 0
+				o += midi.samples

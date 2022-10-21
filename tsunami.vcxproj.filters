@@ -1285,6 +1285,9 @@
     <ClCompile Include="src\view\mode\ViewModeEditAudio.cpp">
       <Filter>src\view\mode</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\mode\ViewModeEditBars.cpp">
+      <Filter>src\view\mode</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\mode\ViewModeEditDummy.cpp">
       <Filter>src\view\mode</Filter>
     </ClCompile>
@@ -1340,6 +1343,9 @@
       <Filter>src\view\sidebar\captureconsolemodes</Filter>
     </ClCompile>
     <ClCompile Include="src\view\sidebar\AudioEditorConsole.cpp">
+      <Filter>src\view\sidebar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\sidebar\BarsEditorConsole.cpp">
       <Filter>src\view\sidebar</Filter>
     </ClCompile>
     <ClCompile Include="src\view\sidebar\CaptureConsole.cpp">
@@ -2619,6 +2625,9 @@
     <ClInclude Include="src\view\mode\ViewModeEditAudio.h">
       <Filter>src\view\mode</Filter>
     </ClInclude>
+    <ClInclude Include="src\view\mode\ViewModeEditBars.h">
+      <Filter>src\view\mode</Filter>
+    </ClInclude>
     <ClInclude Include="src\view\mode\ViewModeEditDummy.h">
       <Filter>src\view\mode</Filter>
     </ClInclude>
@@ -2674,6 +2683,9 @@
       <Filter>src\view\sidebar\captureconsolemodes</Filter>
     </ClInclude>
     <ClInclude Include="src\view\sidebar\AudioEditorConsole.h">
+      <Filter>src\view\sidebar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\sidebar\BarsEditorConsole.h">
       <Filter>src\view\sidebar</Filter>
     </ClInclude>
     <ClInclude Include="src\view\sidebar\CaptureConsole.h">

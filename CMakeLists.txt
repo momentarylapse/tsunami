@@ -434,6 +434,7 @@ set(SOURCE
 	src/view/mode/ViewModeDefault.cpp
 	src/view/mode/ViewModeEdit.cpp
 	src/view/mode/ViewModeEditAudio.cpp
+	src/view/mode/ViewModeEditBars.cpp
 	src/view/mode/ViewModeEditDummy.cpp
 	src/view/mode/ViewModeMidi.cpp
 	src/view/mode/ViewModeScaleBars.cpp
@@ -453,6 +454,7 @@ set(SOURCE
 	src/view/sidebar/captureconsolemodes/CaptureConsoleModeMulti.cpp
 	src/view/sidebar/captureconsolemodes/CaptureTrackData.cpp
 	src/view/sidebar/AudioEditorConsole.cpp
+	src/view/sidebar/BarsEditorConsole.cpp
 	src/view/sidebar/CaptureConsole.cpp
 	src/view/sidebar/CurveConsole.cpp
 	src/view/sidebar/DummyEditorConsole.cpp

@@ -544,6 +544,7 @@
     <ClCompile Include="src\view\mode\ViewModeDefault.cpp" />
     <ClCompile Include="src\view\mode\ViewModeEdit.cpp" />
     <ClCompile Include="src\view\mode\ViewModeEditAudio.cpp" />
+    <ClCompile Include="src\view\mode\ViewModeEditBars.cpp" />
     <ClCompile Include="src\view\mode\ViewModeEditDummy.cpp" />
     <ClCompile Include="src\view\mode\ViewModeMidi.cpp" />
     <ClCompile Include="src\view\mode\ViewModeScaleBars.cpp" />
@@ -563,6 +564,7 @@
     <ClCompile Include="src\view\sidebar\captureconsolemodes\CaptureConsoleModeMulti.cpp" />
     <ClCompile Include="src\view\sidebar\captureconsolemodes\CaptureTrackData.cpp" />
     <ClCompile Include="src\view\sidebar\AudioEditorConsole.cpp" />
+    <ClCompile Include="src\view\sidebar\BarsEditorConsole.cpp" />
     <ClCompile Include="src\view\sidebar\CaptureConsole.cpp" />
     <ClCompile Include="src\view\sidebar\CurveConsole.cpp" />
     <ClCompile Include="src\view\sidebar\DummyEditorConsole.cpp" />
@@ -990,6 +992,7 @@
     <ClInclude Include="src\view\mode\ViewModeDefault.h" />
     <ClInclude Include="src\view\mode\ViewModeEdit.h" />
     <ClInclude Include="src\view\mode\ViewModeEditAudio.h" />
+    <ClInclude Include="src\view\mode\ViewModeEditBars.h" />
     <ClInclude Include="src\view\mode\ViewModeEditDummy.h" />
     <ClInclude Include="src\view\mode\ViewModeMidi.h" />
     <ClInclude Include="src\view\mode\ViewModeScaleBars.h" />
@@ -1009,6 +1012,7 @@
     <ClInclude Include="src\view\sidebar\captureconsolemodes\CaptureConsoleModeMulti.h" />
     <ClInclude Include="src\view\sidebar\captureconsolemodes\CaptureTrackData.h" />
     <ClInclude Include="src\view\sidebar\AudioEditorConsole.h" />
+    <ClInclude Include="src\view\sidebar\BarsEditorConsole.h" />
     <ClInclude Include="src\view\sidebar\CaptureConsole.h" />
     <ClInclude Include="src\view\sidebar\CurveConsole.h" />
     <ClInclude Include="src\view\sidebar\DummyEditorConsole.h" />

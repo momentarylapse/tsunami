@@ -18,6 +18,7 @@ class TrackConsole;
 class DummyEditorConsole;
 class AudioEditorConsole;
 class MidiEditorConsole;
+class BarsEditorConsole;
 class SampleRefConsole;
 class SampleManagerConsole;
 class CurveConsole;
@@ -44,6 +45,7 @@ public:
 		DUMMY_EDITOR_CONSOLE,
 		AUDIO_EDITOR_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
+		BARS_EDITOR_CONSOLE,
 		CURVE_CONSOLE,
 		SAMPLEREF_CONSOLE,
 		CAPTURE_CONSOLE,
@@ -63,6 +65,7 @@ public:
 	DummyEditorConsole *dummy_editor_console;
 	AudioEditorConsole *audio_editor_console;
 	MidiEditorConsole *midi_editor_console;
+	BarsEditorConsole *bars_editor_console;
 	CurveConsole *curve_console;
 	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;

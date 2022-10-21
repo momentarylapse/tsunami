@@ -11,6 +11,7 @@
 #include "DummyEditorConsole.h"
 #include "AudioEditorConsole.h"
 #include "MidiEditorConsole.h"
+#include "BarsEditorConsole.h"
 #include "SampleManagerConsole.h"
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
@@ -52,6 +53,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	dummy_editor_console = new DummyEditorConsole(session, this);
 	audio_editor_console = new AudioEditorConsole(session, this);
 	midi_editor_console = new MidiEditorConsole(session, this);
+	bars_editor_console = new BarsEditorConsole(session, this);
 	curve_console = new CurveConsole(session, this);
 	sample_ref_console = new SampleRefConsole(session, this);
 	capture_console = new CaptureConsole(session, this);
@@ -62,6 +64,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	add_console(dummy_editor_console);
 	add_console(audio_editor_console);
 	add_console(midi_editor_console);
+	add_console(bars_editor_console);
 	add_console(curve_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);

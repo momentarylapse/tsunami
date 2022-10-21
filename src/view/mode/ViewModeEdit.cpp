@@ -9,6 +9,7 @@
 #include "ViewModeEditDummy.h"
 #include "ViewModeMidi.h"
 #include "ViewModeEditAudio.h"
+#include "ViewModeEditBars.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../../data/base.h"
@@ -78,6 +79,8 @@ ViewMode *ViewModeEdit::suggest_mode() {
 		return view->mode_edit_midi;
 	if (view->cur_track()->type == SignalType::AUDIO)
 		return view->mode_edit_audio;
+	if (view->cur_track()->type == SignalType::BEATS)
+		return view->mode_edit_bars;
 	return view->mode_edit_dummy;
 }
 

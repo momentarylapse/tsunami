@@ -658,10 +658,10 @@ void SIAddPackageVulkan() {
 
 
 	add_class(TypeAccelerationStructure);
-		//class_add_func("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top), Flags::STATIC);
-		class_add_func("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top_simple), Flags::STATIC);
+		class_add_func("create_top", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_top), Flags::STATIC);
 			func_add_param("device", TypeDevice);
 			func_add_param("instances", TypeDynamicArray);
+			func_add_param("matrices", TypeDynamicArray);
 		class_add_func("create_bottom", TypeAccelerationStructureP, vul_p(&vulkan::AccelerationStructure::create_bottom), Flags::STATIC);
 			func_add_param("device", TypeDevice);
 			func_add_param("vb", TypeVertexBuffer);

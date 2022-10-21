@@ -228,7 +228,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			if (session->storage->load_ex(song2, a[1], flags)) {
 				auto r = diff_song(song1, song2);
 				if (r.num > 0)
-					msg_error("diffs: " + sa2s(r));
+					msg_error("diffs: " + str(r));
 			}
 		}
 

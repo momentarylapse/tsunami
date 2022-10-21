@@ -362,10 +362,8 @@ bool res_load_rec(Array<string> &lines, int &cur_line, Resource &c, bool literal
 }
 
 void Resource::show(int indent) {
-	string nn;
-	for (int i=0;i<indent;i++)
-		nn += "    ";
-	msg_write(nn + type + " - " + id + format(" - %d %d - ", x, y) + sa2s(options));
+	string nn = string("    ").repeat(indent);
+	msg_write(nn + format("%s - %s - %d %d - %s", type, id, x, y, str(options)));
 	for (Resource &child: children)
 		child.show(indent + 1);
 }

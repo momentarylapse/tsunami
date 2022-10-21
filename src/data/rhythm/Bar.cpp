@@ -40,7 +40,7 @@ void BarPattern::update_total() {
 }
 
 string BarPattern::pat_str() const {
-	return ia2s(beats).sub(1, -1).replace(" ", "");
+	return str(beats).sub(1, -1).replace(" ", "");
 }
 
 bool BarPattern::is_uniform() const {

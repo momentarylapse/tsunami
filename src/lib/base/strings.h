@@ -179,11 +179,31 @@ string _cdecl f2sf(float f);
 string _cdecl f642sf(double f);
 string _cdecl b2s(bool b);
 string _cdecl p2s(const void *p);
-string _cdecl ia2s(const Array<int> &a);
-string _cdecl fa2s(const Array<float> &a);
-string _cdecl f64a2s(const Array<double> &a);
-string _cdecl ba2s(const Array<bool> &a);
-string _cdecl sa2s(const Array<string> &a);
+
+template<class T>
+string str(const T &t) {
+	return t.str();
+}
+template<> string str(const int& i);
+template<> string str(const unsigned int& i);
+template<> string str(const int64& i);
+template<> string str(const float& f);
+template<> string str(const double& d);
+template<> string str(const bool& b);
+
+template<class T>
+string str(const Array<T> &a) {
+	string r;
+	for (int i=0; i<a.num; i++) {
+		if (i > 0)
+			r += ", ";
+		r += str(a[i]);
+	}
+	return "[" + r + "]";
+}
+template<> string str(const Array<string> &a);
+
+
 int _cdecl s2i(const string &s);
 bool _cdecl s2b(const string &s);
 float _cdecl s2f(const string &s);

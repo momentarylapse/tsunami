@@ -716,6 +716,29 @@ MAKE_ARRAY_STR(ba2s, bool, b2s);
 MAKE_ARRAY_STR(sa2s, string, str_quote);
 
 
+template<> string str(const int& i) {
+	return i2s(i);
+}
+template<> string str(const unsigned int& i) {
+	return i2s(i);
+}
+template<> string str(const int64& i) {
+	return i642s(i);
+}
+template<> string str(const float& f) {
+	return f2sf(f);
+}
+template<> string str(const double& d) {
+	return f642sf(d);
+}
+template<> string str(const bool& b) {
+	return b2s(b);
+}
+template<> string str(const Array<string> &a) {
+	return sa2s(a);
+}
+
+
 struct xf_format_data {
 	bool sign, left_justify, fill_zeros, sharp;
 	int width;

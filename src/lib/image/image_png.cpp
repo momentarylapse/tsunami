@@ -57,7 +57,7 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 		for (int i=stride; i<num; i++)
 			cur[i] = cur[i] + png_paeth(cur[i - stride], prev[i], prev[i - stride]);
 	} else {
-		msg_error("png: unhandled filter type: " + i2s(type));
+		msg_error(format("png: unhandled filter type: %d", type));
 	}
 }
 
@@ -88,14 +88,14 @@ void image_load_png(const Path &filename, Image &image) {
 			int type = (unsigned char)buf[1];
 			// 0 = gray, 2 = rgb, 6 = rgba
 			if (bits_per_channel != 8)
-				throw string("unhandled bits per channel: " + i2s(bits_per_channel));
+				throw format("unhandled bits per channel: %d", bits_per_channel);
 			if (type == 2) {
 				bytes_per_pixel = 3;
 			} else if (type == 6) {
 				bytes_per_pixel = 4;
 				image.alpha_used = true;
 			} else {
-				throw string("unhandled color type: " + i2s(type));
+				throw format("unhandled color type: %d", type);
 			}
 
 			f->seek(size - 10);

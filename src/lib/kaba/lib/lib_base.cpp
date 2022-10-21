@@ -5,12 +5,10 @@
 #include "../dynamic/dynamic.h"
 #include "../../os/msg.h"
 #include "../../base/callable.h"
+#include "../../base/map.h"
 #include <algorithm>
 #include <math.h>
 #include <cstdio>
-
-
-#include "../../base/map.h"
 
 
 namespace kaba {
@@ -243,7 +241,7 @@ Array<int> enum_all(const Class *e) {
 
 void SIAddXCommands() {
 
-	add_func("@sorted", TypeDynamicArray, &kaba_array_sort, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@sorted", TypeDynamicArray, &array_sort, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("list", TypePointer);
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
@@ -256,10 +254,10 @@ void SIAddXCommands() {
 //	add_func("@map", TypeDynamicArray, &kaba_map, Flags::_STATIC__RAISES_EXCEPTIONS);
 //		func_add_param("func", TypeFunctionP);
 //		func_add_param("array", TypePointer);
-	add_func("@dyn", TypeAny, &kaba_dyn, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@dyn", TypeAny, &dynify, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("@xmap", TypeDynamicArray, &kaba_xmap, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@xmap", TypeDynamicArray, &array_map, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("f", TypeCallableBase);
 		func_add_param("array", TypeDynamic);
 		func_add_param("t1", TypeClassP);

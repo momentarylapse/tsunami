@@ -18,6 +18,7 @@
 #include "list.h"
 #include "dict.h"
 #include "../dynamic/exception.h"
+#include "../dynamic/dynamic.h"
 
 #if __has_include("../../algebra/algebra.h")
 	#include "../../algebra/algebra.h"
@@ -260,8 +261,6 @@ public:
 #pragma GCC optimize("0")
 
 
-void kaba_array_resize(void *p, const Class *type, int num);
-
 
 class KabaAny : public Any {
 public:
@@ -307,7 +306,7 @@ public:
 			auto *a = (DynamicArray*)var;
 			auto &b = aa.as_array();
 			int n = b.num;
-			kaba_array_resize(var, type, n);
+			array_resize(var, type, n);
 			for (int i=0; i<n; i++)
 				unwrap(aa[i], (char*)a->data + i * t_el->size, t_el);
 		} else if (type->is_array() and (aa.type == TYPE_ARRAY)) {
@@ -331,19 +330,19 @@ public:
 	{ KABA_EXCEPTION_WRAPPER(return Any::parse(s)); return Any(); }
 };
 
-Any kaba_int2any(int i) {
+Any int2any(int i) {
 	return Any(i);
 }
-Any kaba_float2any(float f) {
+Any float2any(float f) {
 	return Any(f);
 }
-Any kaba_bool2any(bool b) {
+Any bool2any(bool b) {
 	return Any(b);
 }
-Any kaba_str2any(const string &str) {
+Any str2any(const string &str) {
 	return Any(str);
 }
-Any kaba_pointer2any(const void *p) {
+Any pointer2any(const void *p) {
 	return Any(p);
 }
 
@@ -917,15 +916,15 @@ void SIAddPackageMath() {
 		add_operator(OperatorID::ADDS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_add);// operator+=);
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_sub);// operator-);
 
-	add_func("@int2any", TypeAny, &kaba_int2any, Flags::STATIC);
+	add_func("@int2any", TypeAny, &int2any, Flags::STATIC);
 		func_add_param("i", TypeInt);
-	add_func("@float2any", TypeAny, &kaba_float2any, Flags::STATIC);
+	add_func("@float2any", TypeAny, &float2any, Flags::STATIC);
 		func_add_param("i", TypeFloat32);
-	add_func("@bool2any", TypeAny, &kaba_bool2any, Flags::STATIC);
+	add_func("@bool2any", TypeAny, &bool2any, Flags::STATIC);
 		func_add_param("i", TypeBool);
-	add_func("@str2any", TypeAny, &kaba_str2any, Flags::STATIC);
+	add_func("@str2any", TypeAny, &str2any, Flags::STATIC);
 		func_add_param("s", TypeString);
-	add_func("@pointer2any", TypeAny, &kaba_pointer2any, Flags::STATIC);
+	add_func("@pointer2any", TypeAny, &pointer2any, Flags::STATIC);
 		func_add_param("p", TypePointer);
 
 

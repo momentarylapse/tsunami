@@ -103,7 +103,7 @@ void UnitTest::assert_equal(const Array<int> &a, const Array<int> &b) {
 		throw Failure(format("a.num (%d) != b.num (%d)", a.num, b.num));
 	for (int i=0; i<a.num; i++)
 		if (a[i] != b[i])
-			throw Failure("a!=b\na: " + ia2s(a) + "\nb: " + ia2s(b));
+			throw Failure("a!=b\na: " + str(a) + "\nb: " + str(b));
 }
 
 void UnitTest::assert_equal(const Array<float> &a, const Array<float> &b, float epsilon) {
@@ -111,7 +111,7 @@ void UnitTest::assert_equal(const Array<float> &a, const Array<float> &b, float 
 		throw Failure(format("a.num (%d) != b.num (%d)", a.num, b.num));
 	for (int i=0; i<a.num; i++)
 		if (fabs(a[i] - b[i]) > epsilon)
-			throw Failure("a!=b\na: " + fa2s(a) + "\nb: " + fa2s(b));
+			throw Failure("a!=b\na: " + str(a) + "\nb: " + str(b));
 }
 
 void UnitTest::assert_equal(const AudioBuffer &a, const AudioBuffer &b, float epsilon) {
@@ -122,7 +122,7 @@ void UnitTest::assert_equal(const AudioBuffer &a, const AudioBuffer &b, float ep
 	for (int ci=0; ci<a.channels; ci++)
 		for (int i=0; i<a.length; i++)
 			if (fabs(a.c[ci][i] - b.c[ci][i]) > epsilon)
-				throw Failure(format("a!=b (channel %d\na: %s\nb: %s", ci, fa2s(a.c[ci]), fa2s(b.c[ci])));
+				throw Failure(format("a!=b (channel %d\na: %s\nb: %s", ci, str(a.c[ci]), str(b.c[ci])));
 }
 
 string UnitTest::ra2s(const Array<Range> &a) {
@@ -154,7 +154,7 @@ void UnitTest::event(const string &e) {
 
 void UnitTest::assert_protocoll(const Array<string> &p) {
 	if (p != event_protocoll)
-		throw Failure("Events: " + sa2s(p) + "  expected: " + sa2s(event_protocoll));
+		throw Failure("Events: " + str(p) + "  expected: " + str(event_protocoll));
 }
 
 Array<UnitTest*> UnitTest::all() {

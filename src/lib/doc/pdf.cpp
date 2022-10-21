@@ -882,7 +882,7 @@ void Parser::save(const Path &filename) {
 			write_obj(f, fd.id_descr, mk_dict(dict));
 		}
 		if (fd.id_widths > 0)
-			write_obj(f, fd.id_widths, ia2s(fd.widths).replace(",", ""));
+			write_obj(f, fd.id_widths, str(fd.widths).replace(",", ""));
 
 		Array<string> dict = {"/Type /Font"};
 		if (fd.true_type) {

@@ -92,7 +92,7 @@ Array<string> CommandLineParser::parse_options(const Array<string> &arg) {
 			i += do_option(arg[i], arg.sub_ref(i+1));
 		} else if (auto d = default_command()) {
 			// FIXME (just a hack for now)
-			if (d->params.back() == "...")
+			if ((d->params.num > 0) and (d->params.back() == "..."))
 				return arg.sub_ref(i);
 			arg2.add(arg[i]);
 		} else {

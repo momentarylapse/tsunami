@@ -605,8 +605,8 @@ struct GuitarNote
 			}
 			if (!found){
 				msg_error("could not detune:");
-				msg_write(ia2s(p0));
-				msg_write(ia2s(tuning));
+				msg_write(str(p0));
+				msg_write(str(tuning));
 				pitch.erase(n);
 				string.erase(n);
 			}

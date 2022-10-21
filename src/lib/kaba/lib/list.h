@@ -97,18 +97,7 @@ public:
 	}
 
 	string str() const {
-		if constexpr (std::is_same<T, int>::value)
-			return ia2s(*this);
-		else if constexpr (std::is_same<T, float>::value)
-			return fa2s(*this);
-		else if constexpr (std::is_same<T, double>::value)
-			return f64a2s(*this);
-		else if constexpr (std::is_same<T, bool>::value)
-				return ba2s(*this);
-		else if constexpr (std::is_same<T, string>::value)
-				return sa2s(*this);
-		else
-			return "[???]";
+		return ::str(*(Array<T>*)this);
 	}
 
 // component-wise operations:

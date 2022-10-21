@@ -26,8 +26,19 @@ extern const Class *TypePath;
 #pragma GCC optimize("0")
 
 
+void array_inplace_reverse(DynamicArray &array) {
+	if (array.element_size == 4)
+		inplace_reverse(*reinterpret_cast<Array<int>*>(&array));
+	else if (array.element_size == 1)
+		inplace_reverse(*reinterpret_cast<Array<char>*>(&array));
+	else if (array.element_size == 8)
+		inplace_reverse(*reinterpret_cast<Array<int64>*>(&array));
+	else
+		array.reverse();
+}
+
 template<class F>
-void kaba_inplace_quick_sort(DynamicArray &array, int first, int last, F f) {
+void array_inplace_quick_sort(DynamicArray &array, int first, int last, F f) {
 	if (first < 0 or last < 0 or first >= last)
 		return;
 	auto partition = [first, last] (DynamicArray &array, F f) {
@@ -55,68 +66,40 @@ void kaba_inplace_quick_sort(DynamicArray &array, int first, int last, F f) {
 		return 0;
 	};
 	int p = partition(array, f);
-	kaba_inplace_quick_sort(array, first, p-1, f);
-	kaba_inplace_quick_sort(array, p+1, last, f);
+	array_inplace_quick_sort(array, first, p-1, f);
+	array_inplace_quick_sort(array, p+1, last, f);
 }
 
 template<class T>
-void _kaba_array_sort(DynamicArray &array, int offset_by, bool reverse) {
-	if (false and offset_by == 0 and sizeof(T) == array.element_size) {
-		auto f = [] (const T &a, const T &b) {
-			return a <= b;
-		};
-		try{
-			inplace_sort(*(Array<T>*)&array, f);
-		}catch(Exception &e){
-			msg_error(e.message());
-		}
-	} else {
-		auto f = [offset_by] (const void *a, const void *b) {
-			return *(T*)((const char*)a + offset_by) <= *(T*)((const char*)b + offset_by);
-		};
-		kaba_inplace_quick_sort(array, 0, array.num-1, f);
-	}
-
-	if (reverse)
-		inplace_reverse(*(Array<void*>*)&array);
+void _array_sort(DynamicArray &array, int offset_by) {
+	auto f = [offset_by] (const void *a, const void *b) {
+		return *(T*)((const char*)a + offset_by) <= *(T*)((const char*)b + offset_by);
+	};
+	array_inplace_quick_sort(array, 0, array.num-1, f);
 }
 
 template<class T>
-void _kaba_array_sort_p(DynamicArray &array, int offset_by, bool reverse) {
+void _array_sort_p(DynamicArray &array, int offset_by) {
 	auto f = [offset_by] (const void *a, const void *b) {
 		auto *aa = (const T*) ((const char*)a + offset_by);
 		auto *bb = (const T*) ((const char*)b + offset_by);
 		return (*aa <= *bb);
 	};
 	inplace_sort(*(Array<void*>*)&array, f);
-	if (reverse)
-		inplace_reverse(*(Array<void*>*)&array);
 }
 
 template<class T>
-void _kaba_array_sort_pf(DynamicArray &array, Function *f, bool reverse) {
-	char **p = (char**)array.data;
-	T r1, r2;
-	for (int i=0; i<array.num; i++) {
-		if (!call_function(f, &r1, {*p}))
-			kaba_raise_exception(new KabaException("call failed " + f->long_name()));
-
-		//T *pp = (T*)(*p + offset_by);
-		char **q = p + 1;
-		for (int j=i+1; j<array.num; j++) {
-			if (!call_function(f, &r2, {*q}))
-				kaba_raise_exception(new KabaException("call failed"));
-			if ((r1 > r2) xor reverse) {
-				array.simple_swap(i, j);
-				std::swap(r1, r2);
-			}
-			q ++;
-		}
-		p ++;
-	}
+void _array_sort_pf(DynamicArray &array, Function *func) {
+	auto f = [func] (void **a, void **b) {
+		T r1, r2;
+		if (!call_function(func, &r1, {*a}) or !call_function(func, &r2, {*b}))
+			kaba_raise_exception(new KabaException("call failed " + func->long_name()));
+		return (r1 <= r2);
+	};
+	inplace_sort(*(Array<void**>*)&array, f);
 }
 
-void kaba_var_assign(void *pa, const void *pb, const Class *type) {
+void var_assign(void *pa, const void *pb, const Class *type) {
 	if ((type == TypeInt) or (type == TypeFloat32)) {
 		*(int*)pa = *(int*)pb;
 	} else if ((type == TypeBool) or (type == TypeChar)) {
@@ -133,7 +116,7 @@ void kaba_var_assign(void *pa, const void *pb, const Class *type) {
 	}
 }
 
-void kaba_var_init(void *p, const Class *type) {
+void var_init(void *p, const Class *type) {
 	//msg_write("init " + type->long_name());
 	if (!type->needs_constructor())
 		return;
@@ -145,7 +128,7 @@ void kaba_var_init(void *p, const Class *type) {
 	ff(p);
 }
 
-void kaba_array_clear(void *p, const Class *type) {
+void array_clear(void *p, const Class *type) {
 	auto *f = type->get_member_func("clear", TypeVoid, {});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not clear an array of type " + type->long_name()));
@@ -154,7 +137,7 @@ void kaba_array_clear(void *p, const Class *type) {
 	ff(p);
 }
 
-void kaba_array_resize(void *p, const Class *type, int num) {
+void array_resize(void *p, const Class *type, int num) {
 	auto *f = type->get_member_func("resize", TypeVoid, {TypeInt});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not resize an array of type " + type->long_name()));
@@ -163,7 +146,7 @@ void kaba_array_resize(void *p, const Class *type, int num) {
 	ff(p, num);
 }
 
-void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
+void array_add(DynamicArray &array, void *p, const Class *type) {
 	//msg_write("array add " + type->long_name());
 	if ((type == TypeIntList) or (type == TypeFloatList)) {
 		array.append_4_single(*(int*)p);
@@ -179,7 +162,7 @@ void kaba_array_add(DynamicArray &array, void *p, const Class *type) {
 	}
 }
 
-DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, const string &_by) {
+DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const string &_by) {
 	if (!type->is_super_array())
 		kaba_raise_exception(new KabaException(format("type '%s' is not an array", type->name)));
 	const Class *el = type->param[0];
@@ -187,8 +170,8 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 		kaba_raise_exception(new KabaException(format("element type size mismatch... type=%s: %d  vs  array: %d", el->name, el->size, array.element_size)));
 
 	DynamicArray rr;
-	kaba_var_init(&rr, type);
-	kaba_var_assign(&rr, &array, type);
+	var_init(&rr, type);
+	var_assign(&rr, &array, type);
 
 	const Class *rel = el;
 
@@ -231,44 +214,46 @@ DynamicArray _cdecl kaba_array_sort(DynamicArray &array, const Class *type, cons
 		if (!el->is_pointer())
 			kaba_raise_exception(new KabaException("function sorting only for pointers"));
 		if (by_type == TypeString)
-			_kaba_array_sort_pf<string>(rr, sfunc, reverse);
+			_array_sort_pf<string>(rr, sfunc);
 		else if (by_type == TypePath)
-			_kaba_array_sort_pf<Path>(rr, sfunc, reverse);
+			_array_sort_pf<Path>(rr, sfunc);
 		else if (by_type == TypeInt)
-			_kaba_array_sort_pf<int>(rr, sfunc, reverse);
+			_array_sort_pf<int>(rr, sfunc);
 		else if (by_type == TypeFloat32)
-			_kaba_array_sort_pf<float>(rr, sfunc, reverse);
+			_array_sort_pf<float>(rr, sfunc);
 		else if (by_type == TypeBool)
-			_kaba_array_sort_pf<bool>(rr, sfunc, reverse);
+			_array_sort_pf<bool>(rr, sfunc);
 		else
 			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
 	} else if (el->is_pointer()) {
 		if (by_type == TypeString)
-			_kaba_array_sort_p<string>(rr, offset, reverse);
+			_array_sort_p<string>(rr, offset);
 		else if (by_type == TypePath)
-			_kaba_array_sort_p<Path>(rr, offset, reverse);
+			_array_sort_p<Path>(rr, offset);
 		else if (by_type == TypeInt)
-			_kaba_array_sort_p<int>(rr, offset, reverse);
+			_array_sort_p<int>(rr, offset);
 		else if (by_type == TypeFloat32)
-			_kaba_array_sort_p<float>(rr, offset, reverse);
+			_array_sort_p<float>(rr, offset);
 		else if (by_type == TypeBool)
-			_kaba_array_sort_p<bool>(rr, offset, reverse);
+			_array_sort_p<bool>(rr, offset);
 		else
 			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
 	} else {
 		if (by_type == TypeString)
-			_kaba_array_sort<string>(rr, offset, reverse);
+			_array_sort<string>(rr, offset);
 		else if (by_type == TypePath)
-			_kaba_array_sort<Path>(rr, offset, reverse);
+			_array_sort<Path>(rr, offset);
 		else if (by_type == TypeInt)
-			_kaba_array_sort<int>(rr, offset, reverse);
+			_array_sort<int>(rr, offset);
 		else if (by_type == TypeFloat32)
-			_kaba_array_sort<float>(rr, offset, reverse);
+			_array_sort<float>(rr, offset);
 		else if (by_type == TypeBool)
-			_kaba_array_sort<bool>(rr, offset, reverse);
+			_array_sort<bool>(rr, offset);
 		else
 			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
 	}
+	if (reverse)
+		array_inplace_reverse(rr);
 	return rr;
 }
 
@@ -438,7 +423,7 @@ string _cdecl var2str(const void *p, const Class *type) {
 	return var_repr(p, type);
 }
 
-Any _cdecl kaba_dyn(const void *var, const Class *type) {
+Any _cdecl dynify(const void *var, const Class *type) {
 	if (type == TypeInt or type->is_enum())
 		return Any(*(int*)var);
 	if (type == TypeFloat32)
@@ -455,7 +440,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		Any a = Any::EmptyArray;
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<type->array_length; i++)
-			a.add(kaba_dyn((char*)var + t_el->size * i, t_el));
+			a.add(dynify((char*)var + t_el->size * i, t_el));
 		return a;
 	}
 	if (type->is_super_array()) {
@@ -463,7 +448,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		auto *ar = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<ar->num; i++)
-			a.add(kaba_dyn((char*)ar->data + ar->element_size * i, t_el));
+			a.add(dynify((char*)ar->data + ar->element_size * i, t_el));
 		return a;
 	}
 	if (type->is_dict()) {
@@ -472,7 +457,7 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<da->num; i++) {
 			string key = *(string*)(((char*)da->data) + i * da->element_size);
-			a.map_set(key, kaba_dyn(((char*)da->data) + i * da->element_size + sizeof(string), type->param[0]));
+			a.map_set(key, dynify(((char*)da->data) + i * da->element_size + sizeof(string), type->param[0]));
 		}
 		return a;
 	}
@@ -481,15 +466,15 @@ Any _cdecl kaba_dyn(const void *var, const Class *type) {
 	Any a;
 	for (auto &e: type->elements) {
 		if (!e.hidden())
-			a.map_set(e.name, kaba_dyn((char*)var + e.offset, e.type));
+			a.map_set(e.name, dynify((char*)var + e.offset, e.type));
 	}
 	return a;
 }
 
 Array<const Class*> func_effective_params(const Function *f);
 
-DynamicArray kaba_xmap(void *fff, DynamicArray *a, const Class *ti, const Class *to) {
-	//msg_write("xmap " + ti->long_name() + " -> " + to->long_name());
+DynamicArray array_map(void *fff, DynamicArray *a, const Class *ti, const Class *to) {
+	//msg_write("map " + ti->long_name() + " -> " + to->long_name());
 
 	DynamicArray r;
 	r.init(to->size);

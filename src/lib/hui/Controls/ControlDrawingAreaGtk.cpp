@@ -709,13 +709,14 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(on_gtk_area_draw), this);
 #endif
 	}
+	widget = da;
 
 
 
 	// mouse motion
 #if GTK_CHECK_VERSION(4,0,0)
 	auto handler_motion = gtk_event_controller_motion_new();
-	gtk_widget_add_controller(da, handler_motion);
+	__gtk_add_controller(handler_motion);
 	g_signal_connect(G_OBJECT(handler_motion), "motion", G_CALLBACK(&on_gtk_gesture_motion), this);
 	// somehow getting ignored?
 	g_signal_connect(G_OBJECT(handler_motion), "enter", G_CALLBACK(&on_gtk_motion_enter), this);
@@ -738,7 +739,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 #if GTK_CHECK_VERSION(4,0,0)
 	auto gesture_click = gtk_gesture_click_new();
 	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture_click), 0);
-	gtk_widget_add_controller(da, GTK_EVENT_CONTROLLER(gesture_click));
+	__gtk_add_controller(GTK_EVENT_CONTROLLER(gesture_click));
 	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_gesture_click_pressed), this);
 	g_signal_connect(G_OBJECT(gesture_click), "released", G_CALLBACK(&on_gtk_gesture_click_released), this);
 #else
@@ -750,7 +751,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	// scroll
 #if GTK_CHECK_VERSION(4,0,0)
 	auto handler_scroll = gtk_event_controller_scroll_new(GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
-	gtk_widget_add_controller(da, handler_scroll);
+	__gtk_add_controller(handler_scroll);
 	g_signal_connect(G_OBJECT(handler_scroll), "scroll", G_CALLBACK(&on_gtk_gesture_scroll), this);
 /*#elif GTK_CHECK_VERSION(3,24,0)
 	auto handler_scroll = gtk_event_controller_scroll_new(da, GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES);
@@ -764,7 +765,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	// keys
 #if GTK_CHECK_VERSION(4,0,0)
 	auto handler_key = gtk_event_controller_key_new();
-	gtk_widget_add_controller(da, handler_key);
+	__gtk_add_controller(handler_key);
 	g_signal_connect(G_OBJECT(handler_key), "key-pressed", G_CALLBACK(&on_gtk_key_pressed), this);
 	g_signal_connect(G_OBJECT(handler_key), "key-released", G_CALLBACK(&on_gtk_key_released), this);
 #elif GTK_CHECK_VERSION(3,24,0)
@@ -782,7 +783,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 #if GTK_CHECK_VERSION(4,0,0)
 #if 0
 	auto handler_focus = gtk_event_controller_focus_new();
-	gtk_widget_add_controller(da, handler_focus);
+	__gtk_add_controller(handler_focus);
 	g_signal_connect(G_OBJECT(handler_focus), "enter", G_CALLBACK(&on_gtk_focus_enter), this);
 #endif
 #else
@@ -811,7 +812,6 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 ///	auto handler_drag = gtk_gesture_drag_new(da);
 ///	g_signal_connect(G_OBJECT(handler_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
 
-	widget = da;
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	set_options(get_option_from_title(title));
@@ -835,6 +835,19 @@ void ControlDrawingArea::make_current() {
 	if (is_opengl)
 		gtk_gl_area_make_current(GTK_GL_AREA(widget));
 }
+
+#if GTK_CHECK_VERSION(4,0,0)
+void ControlDrawingArea::disable_event_handlers_rec() {
+	for (auto c: __controllers)
+		gtk_widget_remove_controller(widget, c);
+	Control::disable_event_handlers_rec();
+}
+
+void ControlDrawingArea::__gtk_add_controller(GtkEventController* controller) {
+	gtk_widget_add_controller(widget, controller);
+	__controllers.add(controller);
+}
+#endif
 
 void on_gtk_gesture_zoom(GtkGestureZoom *controller, gdouble scale, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
@@ -860,7 +873,7 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 		if (value == "zoom") {
 #if GTK_CHECK_VERSION(4,0,0)
 			auto gesture_zoom = gtk_gesture_zoom_new();
-			gtk_widget_add_controller(widget, GTK_EVENT_CONTROLLER(gesture_zoom));
+			__gtk_add_controller(GTK_EVENT_CONTROLLER(gesture_zoom));
 #else
 			auto gesture_zoom = gtk_gesture_zoom_new(widget);
 #endif

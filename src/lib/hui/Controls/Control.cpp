@@ -79,6 +79,13 @@ void Control::take_gtk_ownership() {
 		g_object_ref(f);
 }
 
+void Control::disable_event_handlers_rec() {
+	if (widget)
+		g_signal_handlers_disconnect_by_data(widget, this);
+	for (auto cc: weak(children))
+		cc->disable_event_handlers_rec();
+}
+
 void unset_widgets_rec(Control *c) {
 	for (auto *cc: weak(c->children))
 		unset_widgets_rec(cc);

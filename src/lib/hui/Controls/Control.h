@@ -47,6 +47,7 @@ public:
     GtkWidget *frame;
     GtkWidget *get_frame();
     void take_gtk_ownership();
+	virtual void disable_event_handlers_rec();
 #endif
 	bool enabled;
 	bool grab_focus;

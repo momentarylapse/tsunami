@@ -775,6 +775,8 @@ void set_note_lengthx(ViewModeEditMidi *m, int l, int p, int n, const string &te
 }
 
 void ViewModeEditMidi::on_key_down(int k) {
+	if ((k & hui::KEY_CONTROL) or (k & hui::KEY_ALT))
+		return;
 	bool shift = (k & hui::KEY_SHIFT);
 	int pure_key = k & 0xff;
 

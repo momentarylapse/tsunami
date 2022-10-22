@@ -24,12 +24,10 @@ public:
 
 	void draw_post(Painter *c) override;
 
+	void add_bar_at_cursor();
 
 	enum class EditMode {
 		SELECT,
-		REMOVE_CLICKS,
-		SMOOTHEN,
-		CLONE,
 		RUBBER,
 	};
 	void set_edit_mode(EditMode mode);

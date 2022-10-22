@@ -62,6 +62,18 @@ Array<Bar*> BarCollection::get_bars(const Range &r) const {
 	return bars;
 }
 
+int BarCollection::get_bar_no(int pos) const {
+	if (pos < 0)
+		return -1;
+	int pos0 = 0;
+	for (int i=0; i<num; i++) {
+		pos0 += (weak(*this)[i])->length;
+		if (pos < pos0)
+			return i;
+	}
+	return -1;
+}
+
 int BarCollection::get_next_beat(int pos) const {
 	auto beats = get_beats(Range::ALL, true, false);
 	for (Beat &b: beats)

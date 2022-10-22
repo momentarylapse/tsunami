@@ -540,7 +540,7 @@ Grid
 vertical
 0
 0
-4
+3
 Group
 group-mode
 
@@ -552,7 +552,7 @@ Grid
 vertical
 0
 0
-3
+1
 Grid
 ?
 homogenousx
@@ -566,111 +566,33 @@ image=select,flat,big,expandx,ignorefocus,height=50
 0
 0
 ToggleButton
-mode-smoothen
-image=audio-mode-smoothen,flat,big,expandx,ignorefocus,disabled
-1
-0
-0
-ToggleButton
-mode-clone
-image=audio-mode-clone,flat,big,expandx,ignorefocus
-2
-0
-0
-ToggleButton
 mode-rubber
 image=audio-mode-stretch,flat,big,expandx,ignorefocus
-3
-0
-0
-Revealer
-revealer-clone
-
 1
 0
-1
-Grid
-grid-clone
-
 0
-0
-2
 Label
-l-clone-radius
-
-0
-0
-0
-SpinButton
-clone-radius
+dummy
 expandx
-1
-0
-0
-Revealer
-revealer-stretch
-
 2
 0
-1
-Grid
-grid-stretch
-
 0
-0
+Label
+dummy
+expandx
 3
-CheckBox
-compensate-pitch
-expandx,ignorefocus
-0
-0
-0
-Button
-stretch-clear
-ignorefocus
-0
-1
-0
-Button
-stretch-apply
-ignorefocus,danger
-1
-1
-0
-Group
-group-actions
-
-1
-0
-1
-Grid
-?
-
-0
-0
-2
-Button
-action-source
-expandx
-0
-0
-0
-Button
-action-effect
-expandx
-1
 0
 0
 Label
 ?
 expandy
-2
+1
 0
 0
 Group
 group-edit
 
-3
+2
 0
 1
 Grid
@@ -8093,7 +8015,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-727
+718
 # Text
 /bars-add
 Add bars...
@@ -8539,20 +8461,8 @@ Number
 bar_edit_dialog/t_result_bpm
 => Bpm
 
-bars-editor/action-effect
-Apply effect...
-
-bars-editor/action-source
-Fill from source...
-
 bars-editor/bars-editor
 Bars
-
-bars-editor/compensate-pitch
-Compensate pitch changes
-
-bars-editor/group-actions
-Operations
 
 bars-editor/group-edit
 Edit
@@ -8560,27 +8470,12 @@ Edit
 bars-editor/group-mode
 Edit mode
 
-bars-editor/l-clone-radius
-Radius
-
-bars-editor/mode-clone
-
-Copy/paste chunks of audio
 bars-editor/mode-rubber
 
 Rubber band stretching
 bars-editor/mode-select
 
 Select
-bars-editor/mode-smoothen
-
-Smoothen out... NOT IMPLEMENTED YET
-bars-editor/stretch-apply
-Apply
-
-bars-editor/stretch-clear
-Clear
-
 buffer-compression-dialog/buffer-compression-dialog
 Compression
 

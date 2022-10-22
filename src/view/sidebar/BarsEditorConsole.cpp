@@ -18,12 +18,6 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	event("mode-select", [this] {
 		on_edit_mode((int)ViewModeEditBars::EditMode::SELECT);
 	});
-	event("mode-smoothen", [this] {
-		on_edit_mode((int)ViewModeEditBars::EditMode::SMOOTHEN);
-	});
-	event("mode-clone", [this] {
-		on_edit_mode((int)ViewModeEditBars::EditMode::CLONE);
-	});
 	event("mode-rubber", [this] {
 		on_edit_mode((int)ViewModeEditBars::EditMode::RUBBER);
 	});
@@ -65,8 +59,7 @@ void BarsEditorConsole::on_view_cur_layer_change() {
 
 void BarsEditorConsole::on_edit_mode(int m) {
 	auto mode = (ViewModeEditBars::EditMode)m;
-	expand("revealer-clone", mode == ViewModeEditBars::EditMode::CLONE);
-	expand("revealer-stretch", mode == ViewModeEditBars::EditMode::RUBBER);
+	//expand("revealer-stretch", mode == ViewModeEditBars::EditMode::RUBBER);
 	view->mode_edit_bars->set_edit_mode(mode);
 }
 
@@ -77,8 +70,6 @@ void BarsEditorConsole::set_layer(TrackLayer *t) {
 
 void BarsEditorConsole::update() {
 	check("mode-select", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::SELECT);
-	check("mode-smoothen", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::SMOOTHEN);
-	check("mode-clone", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::CLONE);
 	check("mode-rubber", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::RUBBER);
 }
 

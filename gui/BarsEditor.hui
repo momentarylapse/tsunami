@@ -4,23 +4,9 @@ Dialog bars-editor "Bars" width=300 height=516
 			Grid ? "" vertical
 				Grid ? "" homogenousx
 					ToggleButton mode-select "" image=select flat big expandx "tooltip=Select" ignorefocus height=50
-					ToggleButton mode-smoothen "" image=audio-mode-smoothen flat big expandx "tooltip=Smoothen out... NOT IMPLEMENTED YET" ignorefocus disabled
-					ToggleButton mode-clone "" image=audio-mode-clone flat big expandx "tooltip=Copy/paste chunks of audio" ignorefocus
 					ToggleButton mode-rubber "" image=audio-mode-stretch flat big expandx "tooltip=Rubber band stretching" ignorefocus
-				Revealer revealer-clone ""
-					Grid grid-clone ""
-						Label l-clone-radius "Radius"
-						SpinButton clone-radius "" expandx
-				Revealer revealer-stretch ""
-					Grid grid-stretch ""
-						CheckBox compensate-pitch "Compensate pitch changes" expandx ignorefocus
-						---|
-						Button stretch-clear "Clear" ignorefocus
-						Button stretch-apply "Apply" ignorefocus danger
-		Group group-actions "Operations"
-			Grid ? ""
-				Button action-source "Fill from source..." expandx
-				Button action-effect "Apply effect..." expandx
+					Label dummy "" expandx
+					Label dummy "" expandx
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

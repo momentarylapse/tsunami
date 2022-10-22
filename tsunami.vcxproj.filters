@@ -1297,9 +1297,6 @@
     <ClCompile Include="src\view\mode\ViewModeEditMidi.cpp">
       <Filter>src\view\mode</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\mode\ViewModeScaleBars.cpp">
-      <Filter>src\view\mode</Filter>
-    </ClCompile>
     <ClCompile Include="src\view\mode\ViewModeScaleMarker.cpp">
       <Filter>src\view\mode</Filter>
     </ClCompile>
@@ -2638,9 +2635,6 @@
       <Filter>src\view\mode</Filter>
     </ClInclude>
     <ClInclude Include="src\view\mode\ViewModeEditMidi.h">
-      <Filter>src\view\mode</Filter>
-    </ClInclude>
-    <ClInclude Include="src\view\mode\ViewModeScaleBars.h">
       <Filter>src\view\mode</Filter>
     </ClInclude>
     <ClInclude Include="src\view\mode\ViewModeScaleMarker.h">

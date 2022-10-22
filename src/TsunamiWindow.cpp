@@ -58,7 +58,6 @@
 #include "view/mode/ViewModeEditMidi.h"
 #include "view/mode/ViewModeEdit.h"
 #include "view/mode/ViewModeCapture.h"
-#include "view/mode/ViewModeScaleBars.h"
 #include "view/helper/Slider.h"
 #include "view/helper/Progress.h"
 #include "view/helper/PeakMeterDisplay.h"

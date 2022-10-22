@@ -108,6 +108,7 @@ void ViewModeEditBars::on_start() {
 	view->subscribe(this, [this] {
 		rubber_end_target = selected_bar_range().end();
 	}, AudioView::MESSAGE_SELECTION_CHANGE);
+	rubber_end_target = selected_bar_range().end();
 }
 
 void ViewModeEditBars::on_end() {

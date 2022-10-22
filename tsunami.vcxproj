@@ -548,7 +548,6 @@
     <ClCompile Include="src\view\mode\ViewModeEditBars.cpp" />
     <ClCompile Include="src\view\mode\ViewModeEditDummy.cpp" />
     <ClCompile Include="src\view\mode\ViewModeEditMidi.cpp" />
-    <ClCompile Include="src\view\mode\ViewModeScaleBars.cpp" />
     <ClCompile Include="src\view\mode\ViewModeScaleMarker.cpp" />
     <ClCompile Include="src\view\module\AutoConfigPanel.cpp" />
     <ClCompile Include="src\view\module\ConfigPanel.cpp" />
@@ -997,7 +996,6 @@
     <ClInclude Include="src\view\mode\ViewModeEditBars.h" />
     <ClInclude Include="src\view\mode\ViewModeEditDummy.h" />
     <ClInclude Include="src\view\mode\ViewModeEditMidi.h" />
-    <ClInclude Include="src\view\mode\ViewModeScaleBars.h" />
     <ClInclude Include="src\view\mode\ViewModeScaleMarker.h" />
     <ClInclude Include="src\view\module\AutoConfigPanel.h" />
     <ClInclude Include="src\view\module\ConfigPanel.h" />

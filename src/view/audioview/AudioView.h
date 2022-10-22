@@ -44,7 +44,6 @@ class ViewModeEditDummy;
 class ViewModeEditAudio;
 class ViewModeEditBars;
 class ViewModeEditMidi;
-class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
 class ViewModeScaleMarker;
@@ -221,7 +220,6 @@ public:
 	ViewModeEditAudio *mode_edit_audio;
 	ViewModeEditBars *mode_edit_bars;
 	ViewModeEditMidi *mode_edit_midi;
-	ViewModeScaleBars *mode_scale_bars;
 	ViewModeCurve *mode_curve;
 	ViewModeCapture *mode_capture;
 	ViewModeScaleMarker *mode_scale_marker;

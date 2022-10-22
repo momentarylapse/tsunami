@@ -22,7 +22,7 @@
 #include "view/mode/ViewModeEdit.h"
 #include "view/mode/ViewModeEditAudio.h"
 #include "view/mode/ViewModeEditMidi.h"
-#include "view/mode/ViewModeScaleBars.h"
+#include "view/mode/ViewModeEditBars.h"
 #include "view/mode/ViewModeScaleMarker.h"
 #include "view/sidebar/SideBar.h"
 #include "view/sidebar/TrackConsole.h"
@@ -161,7 +161,8 @@ void Session::set_mode(const string &mode) {
 	} else if (mode == EditMode::EditTrack) {
 		view->set_mode(view->mode_edit);
 	} else if (mode == EditMode::ScaleBars) {
-		view->set_mode(view->mode_scale_bars);
+		view->set_mode(view->mode_edit_bars);
+		view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::RUBBER);
 	} else if (mode == EditMode::ScaleMarker) {
 		view->set_mode(view->mode_scale_marker);
 	} else if (mode == EditMode::Curves) {

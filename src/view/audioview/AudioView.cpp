@@ -27,7 +27,6 @@
 #include "../mode/ViewModeEditMidi.h"
 #include "../mode/ViewModeCurve.h"
 #include "../mode/ViewModeCapture.h"
-#include "../mode/ViewModeScaleBars.h"
 #include "../mode/ViewModeScaleMarker.h"
 #include "../painter/BufferPainter.h"
 #include "../painter/GridPainter.h"
@@ -207,11 +206,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_edit_bars = new ViewModeEditBars(this);
 	mode_edit_dummy = new ViewModeEditDummy(this);
 	mode_edit = new ViewModeEdit(this);
-	mode_scale_bars = new ViewModeScaleBars(this);
 	mode_scale_marker = new ViewModeScaleMarker(this);
 	mode_curve = new ViewModeCurve(this);
 	mode_capture = new ViewModeCapture(this);
-	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_dummy, mode_edit, mode_scale_bars, mode_scale_marker, mode_curve, mode_capture};
+	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_bars, mode_edit_dummy, mode_edit, mode_scale_marker, mode_curve, mode_capture};
 	set_mode(mode_default);
 
 	scene_graph = new scenegraph::SceneGraph();

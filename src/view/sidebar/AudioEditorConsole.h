@@ -15,7 +15,8 @@ class TrackLayer;
 class AudioEditorConsole : public SideBarConsole {
 public:
 	AudioEditorConsole(Session *session, SideBar *bar);
-	virtual ~AudioEditorConsole();
+	void on_enter() override;
+	void on_leave() override;
 
 	void on_layer_delete();
 	void on_view_cur_layer_change();

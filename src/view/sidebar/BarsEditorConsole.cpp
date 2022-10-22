@@ -39,17 +39,21 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	event("edit_song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
+}
 
+void BarsEditorConsole::on_enter() {
 	view->mode_edit_bars->subscribe(this, [this] {
 		update();
 	}, view->mode_edit_bars->MESSAGE_ANY);
+	view->subscribe(this, [this] {
+		update();
+	}, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
-
-	view->subscribe(this, [this]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
-BarsEditorConsole::~BarsEditorConsole() {
+void BarsEditorConsole::on_leave() {
 	view->mode_edit_bars->unsubscribe(this);
+	view->unsubscribe(this);
 }
 
 void BarsEditorConsole::on_layer_delete() {

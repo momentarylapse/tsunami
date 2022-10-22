@@ -26,25 +26,27 @@ SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	sample = nullptr;
 	editing = false;
 
-	event("volume", [=]{ on_volume(); });
-	event("mute", [=]{ on_mute(); });
-	event("track", [=]{ on_track(); });
+	event("volume", [this] { on_volume(); });
+	event("mute", [this] { on_mute(); });
+	event("track", [this] { on_track(); });
 
-	event("edit_song", [=] {
+	event("edit_song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
-	event("edit_track", [=] {
+	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_samples", [=] {
+	event("edit_samples", [this, session] {
 		bar()->sample_manager->set_selection({sample->origin.get()});
 		session->set_mode(EditMode::DefaultSamples);
 	});
-
-	view->subscribe(this, [=]{ on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
-SampleRefConsole::~SampleRefConsole() {
+void SampleRefConsole::on_enter() {
+	view->subscribe(this, [this] { on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
+}
+
+void SampleRefConsole::on_leave() {
 	if (sample)
 		sample->unsubscribe(this);
 	view->unsubscribe(this);
@@ -105,11 +107,11 @@ void SampleRefConsole::on_view_cur_sample_change() {
 	layer = view->cur_layer();
 	sample = view->cur_sample();
 	if (sample) {
-		sample->subscribe(this, [=] {
+		sample->subscribe(this, [this] {
 			sample->unsubscribe(this);
 			sample = nullptr;
 		}, sample->MESSAGE_DELETE);
-		sample->subscribe(this, [=] { on_update(); }, sample->MESSAGE_ANY);
+		sample->subscribe(this, [this] { on_update(); }, sample->MESSAGE_ANY);
 	}
 	load_data();
 }

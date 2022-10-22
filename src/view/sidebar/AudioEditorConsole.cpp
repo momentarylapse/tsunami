@@ -54,21 +54,26 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	event("edit_song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
+}
 
+void AudioEditorConsole::on_enter() {
 	view->mode_edit_audio->subscribe(this, [this] {
 		update();
 	}, view->mode_edit_audio->MESSAGE_ANY);
+	view->subscribe(this, [this] {
+		update();
+	}, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
-
-	view->subscribe(this, [this]{ update(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
-AudioEditorConsole::~AudioEditorConsole() {
+void AudioEditorConsole::on_leave() {
 	view->mode_edit_audio->unsubscribe(this);
+	view->unsubscribe(this);
 }
 
 void AudioEditorConsole::on_layer_delete() {
 }
+
 void AudioEditorConsole::on_view_cur_layer_change() {
 }
 

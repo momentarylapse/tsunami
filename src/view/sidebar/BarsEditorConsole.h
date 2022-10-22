@@ -15,7 +15,9 @@ class TrackLayer;
 class BarsEditorConsole : public SideBarConsole {
 public:
 	BarsEditorConsole(Session *session, SideBar *bar);
-	virtual ~BarsEditorConsole();
+
+	void on_enter() override;
+	void on_leave() override;
 
 	void on_layer_delete();
 	void on_view_cur_layer_change();

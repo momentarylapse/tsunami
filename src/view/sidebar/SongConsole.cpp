@@ -42,12 +42,12 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 
 	menu_tags = hui::create_resource_menu("popup-menu-tag", this);
 
-	event("samplerate", [this]{ on_samplerate(); });
-	event("format", [this]{ on_format(); });
-	event_x("tags", "hui:change", [this]{ on_tags_edit(); });
-	event_x("tags", "hui:right-button-down", [this]{ on_tags_right_click(); });
-	event("tag-add", [this]{ on_tag_add(); });
-	event("tag-delete", [this]{ on_tag_delete(); });
+	event("samplerate", [this] { on_samplerate(); });
+	event("format", [this] { on_format(); });
+	event_x("tags", "hui:change", [this] { on_tags_edit(); });
+	event_x("tags", "hui:right-button-down", [this] { on_tags_right_click(); });
+	event("tag-add", [this] { on_tag_add(); });
+	event("tag-delete", [this] { on_tag_delete(); });
 
 	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
@@ -55,13 +55,14 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 	event("edit_samples", [session] {
 		session->set_mode(EditMode::DefaultSamples);
 	});
-
-	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_ANY);
 }
 
-SongConsole::~SongConsole() {
+void SongConsole::on_enter() {
+	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_ANY);
+}
+
+void SongConsole::on_leave() {
 	song->unsubscribe(this);
-	delete menu_tags;
 }
 
 void SongConsole::load_data() {

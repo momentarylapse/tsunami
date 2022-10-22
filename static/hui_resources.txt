@@ -206,7 +206,7 @@ Grid
 
 0
 0
-3
+5
 Button
 edit_song
 link,ignorefocus
@@ -223,6 +223,18 @@ Button
 edit_track
 link,ignorefocus
 2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
+Button
+edit_audio
+link,ignorefocus,disabled
+4
 0
 0
 # Resource
@@ -649,7 +661,7 @@ Grid
 
 0
 0
-3
+5
 Button
 edit_song
 link,ignorefocus
@@ -666,6 +678,18 @@ Button
 edit_track
 link,ignorefocus
 2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
+Button
+edit_bars
+link,ignorefocus,disabled
+4
 0
 0
 # Resource
@@ -8070,7 +8094,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-724
+726
 # Text
 /bars-add
 Add bars...
@@ -8140,6 +8164,12 @@ Ignore
 
 /edit-separator
 ›
+
+/edit_audio
+Audio
+
+/edit_bars
+Bars
 
 /edit_curves
 Curves

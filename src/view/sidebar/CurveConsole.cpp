@@ -44,12 +44,6 @@ CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 
 }
 
-CurveConsole::~CurveConsole() {
-	song->unsubscribe(this);
-	view->unsubscribe(this);
-}
-
-
 void CurveConsole::on_update() {
 	update_list();
 }
@@ -64,10 +58,10 @@ void CurveConsole::on_enter() {
 	auto t = track();
 	enable("edit_synth", t->type == SignalType::MIDI);
 	enable("edit_midi", t->type == SignalType::MIDI);
-	song->subscribe(this, [this]{ on_update(); }, song->MESSAGE_NEW);
-	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_ADD_CURVE);
-	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_DELETE_CURVE);
-	t->subscribe(this, [this]{ on_update(); }, t->MESSAGE_EDIT_CURVE);
+	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_NEW);
+	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_ADD_CURVE);
+	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_DELETE_CURVE);
+	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_EDIT_CURVE);
 	view->subscribe(this, [this] {
 		view->mode_curve->set_curve_target("");
 		update_list();

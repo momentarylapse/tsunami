@@ -14,7 +14,8 @@ class Song;
 class SongConsole: public SideBarConsole {
 public:
 	SongConsole(Session *session, SideBar *bar);
-	virtual ~SongConsole();
+	void on_enter() override;
+	void on_leave() override;
 
 	void load_data();
 	void apply_data();
@@ -29,7 +30,7 @@ public:
 
 	void on_update();
 	
-	hui::Menu *menu_tags;
+	owned<hui::Menu> menu_tags;
 };
 
 #endif /* SONGCONSOLE_H_ */

@@ -81,6 +81,7 @@ public:
 class SideBarConsole : public hui::Panel {
 public:
 	SideBarConsole(const string &_title, const string &id, Session *_session, SideBar *bar);
+	~SideBarConsole() override;
 	string title;
 	Session *session;
 	Song *song;
@@ -89,7 +90,6 @@ public:
 
 	virtual void on_enter() {}
 	virtual void on_leave() {}
-	virtual void on_set_large(bool large) {}
 	virtual void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) { cb_yes(); }
 };
 

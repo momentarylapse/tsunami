@@ -15,6 +15,6 @@ DummyEditorConsole::DummyEditorConsole(Session *session, SideBar *bar) :
 {
 	from_resource("dummy-editor");
 
-	event("edit_track", [=]{ session->set_mode(EditMode::DefaultTrack); });
-	event("edit_song", [=]{ session->set_mode(EditMode::DefaultSong); });
+	event("edit_track", [session] { session->set_mode(EditMode::DefaultTrack); });
+	event("edit_song", [session] { session->set_mode(EditMode::DefaultSong); });
 }

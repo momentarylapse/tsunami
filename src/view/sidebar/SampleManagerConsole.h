@@ -23,7 +23,8 @@ class SignalChain;
 class SampleManagerConsole : public SideBarConsole {
 public:
 	SampleManagerConsole(Session *session, SideBar *bar);
-	virtual ~SampleManagerConsole();
+	void on_enter() override;
+	void on_leave() override;
 
 	void update_list();
 

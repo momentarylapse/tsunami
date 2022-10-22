@@ -161,3 +161,7 @@ SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session 
 	view = session->view;
 }
 
+SideBarConsole::~SideBarConsole() {
+	on_leave();
+}
+

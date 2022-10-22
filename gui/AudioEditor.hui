@@ -33,3 +33,5 @@ Dialog audio-editor "Audio" width=300 height=516
 				Button /edit_song "File" link ignorefocus
 				Label /edit-separator "›" disabled
 				Button /edit_track "Track" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit_audio "Audio" link ignorefocus disabled

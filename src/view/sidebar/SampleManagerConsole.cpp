@@ -74,16 +74,16 @@ public:
 		s = _s;
 		view = _view;
 		icon = render_sample(s, view);
-		s->subscribe(this, [this]{ on_delete(); }, s->MESSAGE_DELETE);
-		s->subscribe(this, [this]{ on_update(); }, s->MESSAGE_CHANGE_BY_ACTION);
-		s->subscribe(this, [this]{ on_update(); }, s->MESSAGE_REFERENCE);
-		s->subscribe(this, [this]{ on_update(); }, s->MESSAGE_UNREFERENCE);
+		s->subscribe(this, [this] { on_delete(); }, s->MESSAGE_DELETE);
+		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_CHANGE_BY_ACTION);
+		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_REFERENCE);
+		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_UNREFERENCE);
 	}
 	virtual ~SampleManagerItem() {
 		zombify();
 	}
 	void on_delete() {
-		hui::run_later(0.001f, [this]{ manager->remove(this); });
+		hui::run_later(0.001f, [this] { manager->remove(this); });
 	}
 	void on_update() {
 		int n = manager->get_index(s);
@@ -124,30 +124,32 @@ SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
 	menu_samples = hui::create_resource_menu("popup-menu-sample-manager", this);
 
 	id_list = "sample-list";
-	event("import-from-file", [this]{ on_import(); });
-	event("create-from-selection", [this]{ on_create_from_selection(); });
-	event("sample-delete", [this]{ on_delete(); });
-	event("sample-scale", [this]{ on_scale(); });
-	event("sample-auto-delete", [this]{ on_auto_delete(); });
-	event("sample-export", [this]{ on_export(); });
-	event("sample-preview", [this]{ on_preview(); });
-	event("sample-paste", [this]{ on_insert(); });
-	event_x(id_list, "hui:change", [this]{ on_list_edit(); });
-	event_x(id_list, "hui:right-button-down", [this]{ on_list_right_click(); });
-	event("sample-list", [this]{ on_preview(); });
+	event("import-from-file", [this] { on_import(); });
+	event("create-from-selection", [this] { on_create_from_selection(); });
+	event("sample-delete", [this] { on_delete(); });
+	event("sample-scale", [this] { on_scale(); });
+	event("sample-auto-delete", [this] { on_auto_delete(); });
+	event("sample-export", [this] { on_export(); });
+	event("sample-preview", [this] { on_preview(); });
+	event("sample-paste", [this] { on_insert(); });
+	event_x(id_list, "hui:change", [this] { on_list_edit(); });
+	event_x(id_list, "hui:right-button-down", [this] { on_list_right_click(); });
+	event("sample-list", [this] { on_preview(); });
 
-	event("edit_song", [session]{ session->set_mode(EditMode::DefaultSong); });
+	event("edit_song", [session] { session->set_mode(EditMode::DefaultSong); });
 
 	progress = nullptr;
-
-	update_list();
-
-	song->subscribe(this, [this]{ on_song_update(); }, song->MESSAGE_ADD_SAMPLE);
-	song->subscribe(this, [this]{ on_song_update(); }, song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe(this, [this]{ on_song_update(); }, song->MESSAGE_NEW);
 }
 
-SampleManagerConsole::~SampleManagerConsole() {
+void SampleManagerConsole::on_enter() {
+	update_list();
+
+	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_ADD_SAMPLE);
+	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_NEW);
+}
+
+void SampleManagerConsole::on_leave() {
 	song->unsubscribe(this);
 }
 
@@ -328,7 +330,7 @@ void SampleManagerConsole::on_preview_tick() {
 }
 
 void SampleManagerConsole::on_preview_stream_end() {
-	hui::run_later(0.1f, [this]{ end_preview(); });
+	hui::run_later(0.1f, [this] { end_preview(); });
 }
 
 void SampleManagerConsole::on_preview() {
@@ -352,9 +354,9 @@ void SampleManagerConsole::on_preview() {
 	}
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this, [this]{ on_progress_cancel(); }, progress->MESSAGE_ANY);
-	preview.chain->subscribe(this, [this]{ on_preview_tick(); }, preview.chain->MESSAGE_ANY);
-	preview.chain->subscribe(this, [this]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	progress->subscribe(this, [this] { on_progress_cancel(); }, progress->MESSAGE_ANY);
+	preview.chain->subscribe(this, [this] { on_preview_tick(); }, preview.chain->MESSAGE_ANY);
+	preview.chain->subscribe(this, [this] { on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	preview.chain->start();
 }
 
@@ -388,12 +390,12 @@ public:
 
 		fill_list();
 
-		event("import", [this]{ on_import(); });
-		event("ok", [this]{ on_ok(); });
-		event("cancel", [this]{ on_cancel(); });
-		event("hui:close", [this]{ on_cancel(); });
-		event_x(list_id, "hui:select", [this]{ on_select(); });
-		event(list_id, [this]{ on_list(); });
+		event("import", [this] { on_import(); });
+		event("ok", [this] { on_ok(); });
+		event("cancel", [this] { on_cancel(); });
+		event("hui:close", [this] { on_cancel(); });
+		event_x(list_id, "hui:select", [this] { on_select(); });
+		event(list_id, [this] { on_list(); });
 	}
 	virtual ~SampleSelector() {
 		for (string &name: icon_names)

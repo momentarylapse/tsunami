@@ -811,10 +811,12 @@ void ViewModeEditMidi::on_key_down(int k) {
 		if (input_mode == InputMode::DEFAULT) {
 
 			// add note
-			if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))) {
-				int number = (k - hui::KEY_0);
-				if (k >= hui::KEY_A)
-					number = 10 + (k - hui::KEY_A);
+			if (((pure_key >= hui::KEY_0) and (pure_key <= hui::KEY_9)) or ((pure_key >= hui::KEY_A) and (pure_key <= hui::KEY_F))) {
+				int number = (pure_key - hui::KEY_0);
+				if (pure_key >= hui::KEY_A)
+					number = 10 + (pure_key - hui::KEY_A);
+				if (shift)
+					number += 10;
 				edit_add_note_on_string(number);
 			}
 		}

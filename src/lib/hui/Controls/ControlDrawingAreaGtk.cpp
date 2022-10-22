@@ -229,8 +229,30 @@ int decode_gtk_keyval(int keyval) {
 	return -1;
 }
 
-void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
+int decode_gtk_keycode(int keycode) {
+	int basic_keyval = -1;
+	guint *rkeys = nullptr;
+	int nkeys = -1;
+#if GTK_CHECK_VERSION(4,0,0)
+	if (gdk_display_map_keycode(gdk_display_get_default(), keycode, nullptr, &rkeys, &nkeys)) {
+#else
+	auto map = gdk_keymap_get_for_display(gdk_display_get_default());
+	if (gdk_keymap_get_entries_for_keycode(map, keycode, nullptr, &rkeys, &nkeys)) {
+#endif
+		if (nkeys > 0)
+			basic_keyval = rkeys[0];
+		g_free(rkeys);
+	}
+	if (basic_keyval < 0)
+		return -1;
 
+	for (int i=0; i<NUM_KEYS; i++)
+		if (HuiKeyID[i] == basic_keyval)
+			return i;
+	return -1;
+}
+
+int _get_hui_key_id_2(guint keyval, guint keycode, int mod) {
 
 	Event::_text = utf32_to_utf8({(int)gdk_keyval_to_unicode(keyval)});
 
@@ -238,10 +260,12 @@ void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
 
 	//msg_write(format("%d  %d", (int)event->keyval, (int)event->hardware_keycode));
 	// convert GDK keyvalue into HUI key id
-	key = decode_gtk_keyval(keyval);
-	key_code = key;
-	if (key < 0)
-		return;
+
+	int key_code = decode_gtk_keycode(keycode);
+	if (key_code < 0)
+		key_code = decode_gtk_keyval(keyval);
+	if (key_code < 0)
+		return -1;
 
 
 	// key code?
@@ -256,6 +280,7 @@ void _get_hui_key_id_2(int keyval, int mod, int &key, int &key_code) {
 	if (((mod & GDK_MOD1_MASK) > 0) /*or ((event->state & GDK_MOD2_MASK) > 0) or ((event->state & GDK_MOD5_MASK) > 0)*/)
 		key_code += KEY_ALT;
 #endif
+	return key_code;
 }
 
 #if !GTK_CHECK_VERSION(4,0,0)
@@ -551,11 +576,11 @@ gboolean on_gtk_area_mouse_wheel(GtkWidget *widget, GdkEventScroll *event, gpoin
 gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 
-	int key, key_code;
-	_get_hui_key_id_2(keyval, state, key, key_code);
-	if (key < 0)
+	int key_code = _get_hui_key_id_2(keyval, keycode, state);
+	if (key_code < 0)
 		return false;
 
+	int key = (key_code & 0xff);
 	c->panel->win->input.key[key] = true;
 	c->panel->win->input.key_code = key_code;
 #if GTK_CHECK_VERSION(4,0,0)
@@ -571,11 +596,11 @@ gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, gui
 void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 
-	int key, key_code;
-	_get_hui_key_id_2(keyval, state, key, key_code);
-	if (key < 0)
+	int key_code = _get_hui_key_id_2(keyval, keycode, state);
+	if (key_code < 0)
 		return;
 
+	int key = (key_code & 0xff);
 	c->panel->win->input.key[key] = false;
 	c->panel->win->input.key_code = key_code;
 #if GTK_CHECK_VERSION(4,0,0)

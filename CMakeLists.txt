@@ -398,7 +398,8 @@ set(SOURCE
 	src/view/bottombar/SignalEditor.cpp
 	src/view/dialog/BarAddDialog.cpp
 	src/view/dialog/BarDeleteDialog.cpp
-	src/view/dialog/BarEditDialog.cpp
+	src/view/dialog/BarEditSpeedDialog.cpp
+	src/view/dialog/BarReplaceDialog.cpp
 	src/view/dialog/BufferCompressionDialog.cpp
 	src/view/dialog/ChannelMapperDialog.cpp
 	src/view/dialog/HelpDialog.cpp

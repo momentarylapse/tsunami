@@ -1,7 +1,8 @@
 Menu popup-menu-bar ""
 	Item header "Bar" disabled
 	Separator
-	Item /bars-edit "Edit..."
+	Item /bars-edit-speed "Edit speed..."
+	Item /bars-replace "Replace..."
 	Item /bars-scale "Scale" image=hui:zoom-in
 	Item /bars-add "Add bars..." flat image=hui:add
 	Item /bars-add-pause "Add pause..." image=hui:add

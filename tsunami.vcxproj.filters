@@ -1177,7 +1177,10 @@
     <ClCompile Include="src\view\dialog\BarDeleteDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\dialog\BarEditDialog.cpp">
+    <ClCompile Include="src\view\dialog\BarEditSpeedDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\view\dialog\BarReplaceDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
     <ClCompile Include="src\view\dialog\BufferCompressionDialog.cpp">
@@ -2517,7 +2520,10 @@
     <ClInclude Include="src\view\dialog\BarDeleteDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
-    <ClInclude Include="src\view\dialog\BarEditDialog.h">
+    <ClInclude Include="src\view\dialog\BarEditSpeedDialog.h">
+      <Filter>src\view\dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\BarReplaceDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\BufferCompressionDialog.h">

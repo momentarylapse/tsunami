@@ -508,7 +508,8 @@
     <ClCompile Include="src\view\bottombar\SignalEditor.cpp" />
     <ClCompile Include="src\view\dialog\BarAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\BarDeleteDialog.cpp" />
-    <ClCompile Include="src\view\dialog\BarEditDialog.cpp" />
+    <ClCompile Include="src\view\dialog\BarEditSpeedDialog.cpp" />
+    <ClCompile Include="src\view\dialog\BarReplaceDialog.cpp" />
     <ClCompile Include="src\view\dialog\BufferCompressionDialog.cpp" />
     <ClCompile Include="src\view\dialog\ChannelMapperDialog.cpp" />
     <ClCompile Include="src\view\dialog\HelpDialog.cpp" />
@@ -956,7 +957,8 @@
     <ClInclude Include="src\view\bottombar\SignalEditor.h" />
     <ClInclude Include="src\view\dialog\BarAddDialog.h" />
     <ClInclude Include="src\view\dialog\BarDeleteDialog.h" />
-    <ClInclude Include="src\view\dialog\BarEditDialog.h" />
+    <ClInclude Include="src\view\dialog\BarEditSpeedDialog.h" />
+    <ClInclude Include="src\view\dialog\BarReplaceDialog.h" />
     <ClInclude Include="src\view\dialog\BufferCompressionDialog.h" />
     <ClInclude Include="src\view\dialog\ChannelMapperDialog.h" />
     <ClInclude Include="src\view\dialog\HelpDialog.h" />

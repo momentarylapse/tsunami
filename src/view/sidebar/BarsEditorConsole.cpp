@@ -26,13 +26,13 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	});
 	event("compensate-pitch", [this] {
 		view->mode_edit_bars->flag_pitch_compensate = is_checked("");
-	});
-	event("action-source", [this] {
-		on_action_source();
-	});
-	event("action-effect", [this] {
-		on_action_effect();
 	});*/
+	event("action-edit-speed", [this] {
+		on_action_edit_speed();
+	});
+	event("action-replace", [this] {
+		on_action_replace();
+	});
 	event("edit_track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
@@ -61,6 +61,14 @@ void BarsEditorConsole::on_edit_mode(int m) {
 	auto mode = (ViewModeEditBars::EditMode)m;
 	//expand("revealer-stretch", mode == ViewModeEditBars::EditMode::RUBBER);
 	view->mode_edit_bars->set_edit_mode(mode);
+}
+
+void BarsEditorConsole::on_action_edit_speed() {
+	view->session->win->on_edit_bars_speed();
+}
+
+void BarsEditorConsole::on_action_replace() {
+	view->session->win->on_replace_bars();
 }
 
 void BarsEditorConsole::clear() {

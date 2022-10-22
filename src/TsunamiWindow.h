@@ -103,7 +103,8 @@ public:
 	void on_delete_bars();
 	void on_insert_time_interval();
 	void on_delete_time_interval();
-	void on_edit_bars();
+	void on_edit_bars_speed();
+	void on_replace_bars();
 	void on_scale_bars();
 	void on_view_midi_default();
 	void on_view_midi_tab();

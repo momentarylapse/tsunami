@@ -1,0 +1,13 @@
+Dialog bar-edit-speed-dialog "Edit speed" width=350 height=80 headerbar closebutton=no
+	Grid ? "" vertical
+		Grid ? "" vertical
+			Grid ? ""
+				SpinButton bpm "0" range=0:1000:0.1 expandx
+				Label t_bpm "Bpm"
+			Grid ? "" vertical
+				CheckBox shift-data "Move data accordingly" expandx
+				CheckBox scale-audio "Scale audio" margin-left=30
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button ok "Edit" default image=hui:ok

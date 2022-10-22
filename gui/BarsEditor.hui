@@ -7,6 +7,10 @@ Dialog bars-editor "Bars" width=300 height=516
 					ToggleButton mode-rubber "" image=audio-mode-stretch flat big expandx "tooltip=Rubber band stretching" ignorefocus
 					Label dummy "" expandx
 					Label dummy "" expandx
+		Group group-actions "Operations"
+			Grid ? ""
+				Button action-edit-speed "Edit speed..." expandx "tooltip=Change speed of selected bars"
+				Button action-replace "Replace..." expandx "tooltip=Change number or beats of selected bars while keeping the overall duration"
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

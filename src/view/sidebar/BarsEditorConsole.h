@@ -22,6 +22,9 @@ public:
 
 	void on_edit_mode(int mode);
 
+	void on_action_edit_speed();
+	void on_action_replace();
+
 	void clear();
 	void set_layer(TrackLayer *t);
 

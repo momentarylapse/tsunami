@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-77
+78
 # Resource
 Menu
 menu_fake
@@ -373,20 +373,14 @@ default,danger,image=hui:ok
 0
 # Resource
 Dialog
-bar_edit_dialog
-width=350,height=80,headerbar,closebutton=no,borderwidth=0
+bar-edit-speed-dialog
+width=350,height=80,headerbar,closebutton=no
 0
 0
 1
 Grid
 ?
 vertical
-0
-0
-2
-TabControl
-mode
-
 0
 0
 2
@@ -434,8 +428,39 @@ margin-left=30
 0
 Grid
 ?
-vertical
+buttonbar
 1
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
+# Resource
+Dialog
+bar-replace-dialog
+width=350,height=80,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+vertical
+0
 0
 2
 Label
@@ -540,7 +565,7 @@ Grid
 vertical
 0
 0
-3
+4
 Group
 group-mode
 
@@ -583,16 +608,40 @@ expandx
 3
 0
 0
+Group
+group-actions
+
+1
+0
+1
+Grid
+?
+
+0
+0
+2
+Button
+action-edit-speed
+expandx
+0
+0
+0
+Button
+action-replace
+expandx
+1
+0
+0
 Label
 ?
 expandy
-1
+2
 0
 0
 Group
 group-edit
 
-2
+3
 0
 1
 Grid
@@ -4190,7 +4239,7 @@ popup-menu-bar
 
 0
 0
-11
+12
 Item
 header
 disabled
@@ -4204,51 +4253,57 @@ Separator
 0
 0
 Item
-bars-edit
+bars-edit-speed
 
 2
 0
 0
 Item
+bars-replace
+
+3
+0
+0
+Item
 bars-scale
 image=hui:zoom-in
-3
+4
 0
 0
 Item
 bars-add
 flat,image=hui:add
-4
+5
 0
 0
 Item
 bars-add-pause
 image=hui:add
-5
+6
 0
 0
 Item
 bars-delete
 
-6
+7
 0
 0
 Separator
 
 
-7
+8
 0
 0
 Item
 track-add-marker
 
-8
+9
 0
 0
 Menu
 menu-track
 
-9
+10
 0
 4
 Menu
@@ -4308,7 +4363,7 @@ track-properties
 Menu
 menu-song
 
-10
+11
 0
 4
 Menu
@@ -8015,7 +8070,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-718
+724
 # Text
 /bars-add
 Add bars...
@@ -8028,6 +8083,12 @@ Delete
 
 /bars-edit
 Edit...
+
+/bars-edit-speed
+Edit speed...
+
+/bars-replace
+Replace...
 
 /bars-scale
 Scale
@@ -8365,6 +8426,57 @@ Apply
 audio-editor/stretch-clear
 Clear
 
+bar-edit-speed-dialog/bar-edit-speed-dialog
+Edit speed
+
+bar-edit-speed-dialog/bpm
+0
+
+bar-edit-speed-dialog/ok
+Edit
+
+bar-edit-speed-dialog/scale-audio
+Scale audio
+
+bar-edit-speed-dialog/shift-data
+Move data accordingly
+
+bar-edit-speed-dialog/t_bpm
+Bpm
+
+bar-replace-dialog/bar-replace-dialog
+Replace bars
+
+bar-replace-dialog/beats
+1
+beats per bar
+bar-replace-dialog/complex
+
+complex beat pattern
+bar-replace-dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+bar-replace-dialog/number
+1
+
+bar-replace-dialog/ok
+Edit
+
+bar-replace-dialog/pattern
+
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
+bar-replace-dialog/t_beats
+Beats
+
+bar-replace-dialog/t_info
+Keeping the overall duration
+
+bar-replace-dialog/t_number
+Number
+
+bar-replace-dialog/t_result_bpm
+=> Bpm
+
 bar_add_dialog/bad_t_beats
 Beats
 
@@ -8413,56 +8525,17 @@ Replace by pause
 bar_delete_dialog/shift-data
 Move data accordingly
 
-bar_edit_dialog/bar_edit_dialog
-Edit bars
-
-bar_edit_dialog/beats
-1
-beats per bar
-bar_edit_dialog/bpm
-0
-
-bar_edit_dialog/complex
-
-complex beat pattern
-bar_edit_dialog/divisor
-𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
-basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
-bar_edit_dialog/mode
-Speed\\Replace
-
-bar_edit_dialog/number
-1
-
-bar_edit_dialog/ok
-Edit
-
-bar_edit_dialog/pattern
-
-example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
-bar_edit_dialog/scale-audio
-Scale audio
-
-bar_edit_dialog/shift-data
-Move data accordingly
-
-bar_edit_dialog/t_beats
-Beats
-
-bar_edit_dialog/t_bpm
-Bpm
-
-bar_edit_dialog/t_info
-Keeping the overall duration
-
-bar_edit_dialog/t_number
-Number
-
-bar_edit_dialog/t_result_bpm
-=> Bpm
-
+bars-editor/action-edit-speed
+Edit speed...
+Change speed of selected bars
+bars-editor/action-replace
+Replace...
+Change number or beats of selected bars while keeping the overall duration
 bars-editor/bars-editor
 Bars
+
+bars-editor/group-actions
+Operations
 
 bars-editor/group-edit
 Edit

@@ -595,7 +595,7 @@ Grid
 homogenousx
 0
 0
-4
+5
 ToggleButton
 mode-select
 image=select,flat,big,expandx,ignorefocus,height=50
@@ -603,14 +603,14 @@ image=select,flat,big,expandx,ignorefocus,height=50
 0
 0
 ToggleButton
-mode-rubber
-image=audio-mode-stretch,flat,big,expandx,ignorefocus
+mode-add-and-split
+image=bars-mode-add-and-split,flat,big,expandx,ignorefocus
 1
 0
 0
-Label
-dummy
-expandx
+ToggleButton
+mode-rubber
+image=audio-mode-stretch,flat,big,expandx,ignorefocus
 2
 0
 0
@@ -618,6 +618,12 @@ Label
 dummy
 expandx
 3
+0
+0
+Label
+dummy
+expandx
+4
 0
 0
 Group
@@ -8094,7 +8100,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-726
+727
 # Text
 /bars-add
 Add bars...
@@ -8573,12 +8579,15 @@ Edit
 bars-editor/group-mode
 Edit mode
 
+bars-editor/mode-add-and-split
+
+Add, split or move bars
 bars-editor/mode-rubber
 
 Rubber band stretching
 bars-editor/mode-select
 
-Add, split or move bars
+Select
 buffer-compression-dialog/buffer-compression-dialog
 Compression
 

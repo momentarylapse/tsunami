@@ -200,6 +200,14 @@ void ViewModeEditBars::draw_post(Painter *p) {
 		p->set_color(theme.green.with_alpha(0.8f));
 		draw_arrow(p, {x2, y1 + (y2-y1)*0.2f}, {x3, y1 + (y2-y1)*0.2f});
 		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f});
+	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
+		auto h = view->hover();
+		if (h.type == HoverData::Type::BAR_GAP) {
+		} else if (cur_vlayer()->is_cur_hover() and (h.pos > 0)) {
+			p->set_line_width(2);
+			p->set_color(theme.green);
+			p->draw_line({view->m.x, y1}, {view->m.x, y2});
+		}
 	}
 }
 
@@ -253,7 +261,7 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
 			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target));
 		else
 			ViewModeDefault::left_click_handle_void(vlayer);
-	} else { // SELECT
+	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BAR_GAP) {
 			if (h.index > 0)
@@ -261,14 +269,17 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
 		} else {
 			add_bar_at_cursor();
 		}
+	} else { // SELECT
+		ViewModeDefault::left_click_handle_void(vlayer);
 	}
 }
 
 string ViewModeEditBars::get_tip() {
 	if (edit_mode == EditMode::RUBBER)
 		return "1. select bars    2. move handle on the right    3. scale [Return]    track [Alt+↑,↓]";
-	if (edit_mode == EditMode::SELECT)
+	if (edit_mode == EditMode::ADD_AND_SPLIT)
 		return "split/insert bar [click]    move gap [drag'n'drop]    track [Alt+↑,↓]";
+	//if (edit_mode == EditMode::SELECT)
 	return "track [Alt+↑,↓]";
 }
 

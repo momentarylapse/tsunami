@@ -18,15 +18,12 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	event("mode-select", [this] {
 		on_edit_mode((int)ViewModeEditBars::EditMode::SELECT);
 	});
+	event("mode-add-and-split", [this] {
+		on_edit_mode((int)ViewModeEditBars::EditMode::ADD_AND_SPLIT);
+	});
 	event("mode-rubber", [this] {
 		on_edit_mode((int)ViewModeEditBars::EditMode::RUBBER);
 	});
-	/*event("stretch-apply", [this] {
-		view->mode_edit_bars->apply_stretch();
-	});
-	event("compensate-pitch", [this] {
-		view->mode_edit_bars->flag_pitch_compensate = is_checked("");
-	});*/
 	event("action-edit-speed", [this] {
 		on_action_edit_speed();
 	});
@@ -82,6 +79,7 @@ void BarsEditorConsole::set_layer(TrackLayer *t) {
 
 void BarsEditorConsole::update() {
 	check("mode-select", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::SELECT);
+	check("mode-add-and-split", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::ADD_AND_SPLIT);
 	check("mode-rubber", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::RUBBER);
 }
 

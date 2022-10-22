@@ -28,6 +28,7 @@ public:
 
 	enum class EditMode {
 		SELECT,
+		ADD_AND_SPLIT,
 		RUBBER,
 	};
 	void set_edit_mode(EditMode mode);

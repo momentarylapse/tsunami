@@ -40,6 +40,10 @@ public:
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
 	void on_mouse_move() override;
 	string get_tip() override;
+
+	Range selected_bar_range() const;
+	int rubber_end_target = 0;
+	bool rubber_hover = false;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDITBARS_H_ */

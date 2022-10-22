@@ -140,10 +140,9 @@ void draw_arrow(Painter *p, const vec2 &a, const vec2 &b) {
 		return;
 	vec2 dir = (b-a) / l;
 	vec2 e = vec2(dir.y, -dir.x);
-	float r = min(l, 15.0f);
+	float r = min(l, 18.0f);
 	p->draw_line(a, b);
-	p->draw_line(b, b - r * (dir + e));
-	p->draw_line(b, b - r * (dir - e));
+	p->draw_polygon({b, b - r * (dir + e*0.4f), b - r * (dir - e*0.4f)});
 }
 
 void ViewModeEditAudio::draw_post(Painter *p) {

@@ -11,6 +11,8 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../TsunamiWindow.h"
 
+void draw_arrow(Painter *p, const vec2 &a, const vec2 &b);
+
 class ActionSongMoveBarGap : public Action {
 	public:
 	ActionSongMoveBarGap(Song *s, int i) {
@@ -80,6 +82,20 @@ public:
 	}
 };
 
+
+class MouseDelayDragRubberEndPoint : public MouseDelayAction {
+public:
+	AudioView *view;
+	int *end;
+	MouseDelayDragRubberEndPoint(AudioView *v, int *_end) {
+		view = v;
+		end = _end;
+	}
+	void on_update(const vec2 &m) override {
+		*end = view->cam.screen2sample(m.x);
+	}
+};
+
 ViewModeEditBars::ViewModeEditBars(AudioView *view) :
 	ViewModeDefault(view)
 {
@@ -89,18 +105,34 @@ ViewModeEditBars::ViewModeEditBars(AudioView *view) :
 
 void ViewModeEditBars::on_start() {
 	set_side_bar(SideBar::BARS_EDITOR_CONSOLE);
-	set_edit_mode(EditMode::RUBBER);
+	view->subscribe(this, [this] {
+		rubber_end_target = selected_bar_range().end();
+	}, AudioView::MESSAGE_SELECTION_CHANGE);
 }
 
 void ViewModeEditBars::on_end() {
+	unsubscribe(view);
 }
 
 void ViewModeEditBars::on_key_down(int k) {
 	view->force_redraw();
 
 	if (edit_mode == EditMode::RUBBER) {
-		if (k == hui::KEY_RETURN)
-			add_bar_at_cursor();
+		if (k == hui::KEY_RETURN) {
+			auto scaling_range_orig = selected_bar_range();
+			auto target_range = Range::to(scaling_range_orig.offset, rubber_end_target);
+
+			float factor = (float)target_range.length / (float)scaling_range_orig.length;
+
+			song->begin_action_group("scale bars");
+			auto indices = view->sel.bar_indices(song);
+			foreachb(int i, indices) {
+				BarPattern bb = *song->bars[i];
+				bb.length = (int)((float)bb.length * factor);
+				song->edit_bar(i, bb, Bar::EditMode::STRETCH);
+			}
+			song->end_action_group();
+		}
 	}
 }
 
@@ -126,6 +158,12 @@ void ViewModeEditBars::add_bar_at_cursor() {
 		song->add_bar(song->bars.num, bp, Bar::EditMode::IGNORE);
 	}
 }
+Range ViewModeEditBars::selected_bar_range() const {
+		auto id = view->sel.bar_indices(song);
+		if (id.num == 0)
+			return Range::NONE;
+		return Range::to(song->bars[id[0]]->offset, song->bars[id.back()]->range().end());
+}
 
 float ViewModeEditBars::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l))
@@ -136,53 +174,33 @@ float ViewModeEditBars::layer_suggested_height(AudioViewLayer *l) {
 void ViewModeEditBars::draw_post(Painter *p) {
 	float y1 = view->cur_vlayer()->area.y1;
 	float y2 = view->cur_vlayer()->area.y2;
-	float x1, x2;
-	/*
-	if (edit_mode == EditMode::CLONE) {
-		// input
-		view->cam.range2screen(range_source(), x1, x2);
-		p->set_color(color(0.2f, 0, 1, 0));
-		p->draw_rect(rect(x1, x2, y1, y2));
-	}
-	
-	if ((edit_mode == EditMode::CLONE) or (edit_mode == EditMode::SMOOTHEN)) {
-		// output
-		view->cam.range2screen(range_target(), x1, x2);
-		p->set_color(color(0.2f, 1, 0, 0));
-		p->draw_rect(rect(x1, x2, y1, y2));
-	}
 
 	if (edit_mode == EditMode::RUBBER) {
-		foreachi (auto &q, rubber.points, i) {
-			// source
-			color c = theme.red.with_alpha(0.7f);
-			p->set_line_width(2);
-			if ((rubber.hover_type == RubberHoverType::SOURCE) and (rubber.hover == i))
-				c.a = 1; //theme.hoverify(c);
-			if ((rubber.selected_type == RubberHoverType::SOURCE) and (rubber.selected == i))
-				p->set_line_width(4);
-			p->set_color(c);
-			x1 = view->cam.sample2screen(q.source);
-			p->draw_line({x1, y1}, {x1, y2});
+		auto r = selected_bar_range();
+		if (r.is_empty())
+			return;
+		float x1, x2;
+		view->cam.range2screen(r, x1, x2);
+		p->set_color(theme.green.with_alpha(0.2f));
+		p->draw_rect(rect(x1, x2, y1, y2));
+		p->set_line_width(2);
+		p->set_color(theme.green);
+		p->draw_line({x1, y1}, {x1, y2});
+		p->set_line_dash({5,8}, 0);
+		p->draw_line({x2, y1}, {x2, y2});
+		p->draw_line({x1, (y1+y2)/2 + 7}, {x2, (y1+y2)/2 + 7});
 
-			// target
-			c = theme.green.with_alpha(0.7f);
-			p->set_line_width(2);
-			if ((rubber.hover_type == RubberHoverType::TARGET) and (rubber.hover == i))
-				c.a = 1; //theme.hoverify(c);
-			if ((rubber.selected_type == RubberHoverType::TARGET) and (rubber.selected == i))
-				p->set_line_width(4);
-			p->set_color(c);
-			x2 = view->cam.sample2screen(q.target);
-			p->draw_line({x2, y1}, {x2, y2});
-
-			p->set_line_width(2);
-			p->set_color(theme.text);
-			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.25f), vec2(x2, y1 + (y2-y1)*0.25f));
-			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.75f), vec2(x2, y1 + (y2-y1)*0.75f));
-			p->set_line_width(1);
-		}
-	}*/
+		p->set_line_dash({}, 0);
+		if (rubber_hover)
+			p->set_line_width(4);
+		float x3 = view->cam.sample2screen_f(rubber_end_target);
+		p->draw_line({x3, y1}, {x3, y2});
+		p->set_line_width(2);
+		p->draw_line({x1, (y1+y2)/2}, {x3, (y1+y2)/2});
+		p->set_color(theme.green.with_alpha(0.8f));
+		draw_arrow(p, {x2, y1 + (y2-y1)*0.2f}, {x3, y1 + (y2-y1)*0.2f});
+		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f});
+	}
 }
 
 void ViewModeEditBars::set_edit_mode(EditMode mode) {
@@ -211,17 +229,11 @@ void ViewModeEditBars::on_mouse_move() {
 		return;
 
 	if (edit_mode == EditMode::RUBBER) {
-		/*foreachi(auto &q, rubber.points, i) {
-			float sx = view->cam.sample2screen(q.source);
-			float tx = view->cam.sample2screen(q.target);
-			if (fabs(tx - mx) < 10) {
-				rubber.hover = i;
-				rubber.hover_type = RubberHoverType::TARGET;
-			} else if (fabs(sx - mx) < 10) {
-				rubber.hover = i;
-				rubber.hover_type = RubberHoverType::SOURCE;
-			}
-		}*/
+		rubber_hover = false;
+		if (view->sel.bar_indices(song).num > 0) {
+			float sx = view->cam.sample2screen(rubber_end_target);
+			rubber_hover = (fabs(sx - mx) < 10);
+		}
 	}
 
 	//view->force_redraw();
@@ -237,6 +249,11 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
 	}
 	
 	if (edit_mode == EditMode::RUBBER) {
+		if (rubber_hover)
+			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target));
+		else
+			ViewModeDefault::left_click_handle_void(vlayer);
+	} else { // SELECT
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BAR_GAP) {
 			if (h.index > 0)
@@ -244,15 +261,14 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
 		} else {
 			add_bar_at_cursor();
 		}
-	} else { // SELECT
-		ViewModeDefault::left_click_handle_void(vlayer);
 	}
 }
 
 string ViewModeEditBars::get_tip() {
-	if (edit_mode == EditMode::RUBBER) {
-		return "EXPERIMENTAL    insert bar [Return]    track [Alt+↑,↓]";
-	}
-	return "EXPERIMENTAL    track [Alt+↑,↓]";
+	if (edit_mode == EditMode::RUBBER)
+		return "1. select bars    2. move handle on the right    3. scale [Return]    track [Alt+↑,↓]";
+	if (edit_mode == EditMode::SELECT)
+		return "split/insert bar [click]    move gap [drag'n'drop]    track [Alt+↑,↓]";
+	return "track [Alt+↑,↓]";
 }
 

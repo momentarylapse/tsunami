@@ -8548,7 +8548,7 @@ bars-editor/mode-rubber
 Rubber band stretching
 bars-editor/mode-select
 
-Select
+Add, split or move bars
 buffer-compression-dialog/buffer-compression-dialog
 Compression
 

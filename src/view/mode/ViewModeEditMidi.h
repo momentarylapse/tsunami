@@ -1,12 +1,12 @@
 /*
- * ViewModeMidi.h
+ * ViewModeEditMidi.h
  *
  *  Created on: 12.11.2015
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_MODE_VIEWMODEMIDI_H_
-#define SRC_VIEW_MODE_VIEWMODEMIDI_H_
+#ifndef SRC_VIEW_MODE_VIEWMODEEDITMIDI_H_
+#define SRC_VIEW_MODE_VIEWMODEEDITMIDI_H_
 
 #include "ViewModeDefault.h"
 #include "../../lib/base/pointer.h"
@@ -28,9 +28,9 @@ class ViewModeEdit;
 enum class NoteModifier;
 enum class ChordType;
 
-class ViewModeMidi : public ViewModeDefault {
+class ViewModeEditMidi : public ViewModeDefault {
 public:
-	ViewModeMidi(AudioView *view);
+	ViewModeEditMidi(AudioView *view);
 
 	void on_start() override;
 	void on_end() override;
@@ -133,4 +133,4 @@ public:
 	string get_tip() override;
 };
 
-#endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */
+#endif /* SRC_VIEW_MODE_VIEWMODEEDITMIDI_H_ */

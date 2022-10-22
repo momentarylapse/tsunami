@@ -1,11 +1,11 @@
 /*
- * ViewModeMidi.cpp
+ * ViewModeEditMidi.cpp
  *
  *  Created on: 12.11.2015
  *      Author: michi
  */
 
-#include "ViewModeMidi.h"
+#include "ViewModeEditMidi.h"
 #include "ViewModeEdit.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
@@ -209,7 +209,7 @@ public:
 	AudioViewLayer *layer;
 	AudioView *view;
 	SongSelection sel;
-	ViewModeMidi *mode_midi;
+	ViewModeEditMidi *mode_midi;
 	ActionTrackMoveNotes *action = nullptr;
 	int mouse_pos0;
 	int ref_pos;
@@ -276,7 +276,7 @@ public:
 	AudioViewLayer *layer;
 	AudioView *view;
 	SongSelection sel;
-	ViewModeMidi *mode_midi;
+	ViewModeEditMidi *mode_midi;
 	ActionTrackScaleNotes *action = nullptr;
 	int mouse_pos0;
 	int ref_pos;
@@ -315,7 +315,7 @@ public:
 	}
 };
 
-ViewModeMidi::ViewModeMidi(AudioView *view) :
+ViewModeEditMidi::ViewModeEditMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
 	sub_beat_partition = 1;
@@ -348,7 +348,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 }
 
 
-void ViewModeMidi::set_modifier(NoteModifier mod) {
+void ViewModeEditMidi::set_modifier(NoteModifier mod) {
 	if (mod == modifier) {
 		modifier = NoteModifier::NONE;
 	} else {
@@ -361,46 +361,46 @@ void ViewModeMidi::set_modifier(NoteModifier mod) {
 	notify();
 }
 
-void ViewModeMidi::set_mode(MidiMode _mode) {
+void ViewModeEditMidi::set_mode(MidiMode _mode) {
 	mode_wanted = _mode;
 	view->thm.set_dirty();
 	view->force_redraw();
 	notify();
 }
 
-void ViewModeMidi::set_creation_mode(CreationMode _mode) {
+void ViewModeEditMidi::set_creation_mode(CreationMode _mode) {
 	creation_mode = _mode;
 	view->force_redraw();
 	notify();
 }
 
-void ViewModeMidi::set_input_mode(InputMode _mode) {
+void ViewModeEditMidi::set_input_mode(InputMode _mode) {
 	input_mode = _mode;
 	view->force_redraw();
 	notify();
 }
 
-bool ViewModeMidi::editing(AudioViewLayer *l) {
+bool ViewModeEditMidi::editing(AudioViewLayer *l) {
 	return view->mode_edit->editing(l);
 }
 
-TrackLayer* ViewModeMidi::cur_layer() {
+TrackLayer* ViewModeEditMidi::cur_layer() {
 	return view->cur_layer();
 }
 
-AudioViewLayer* ViewModeMidi::cur_vlayer() {
+AudioViewLayer* ViewModeEditMidi::cur_vlayer() {
 	return view->cur_vlayer();
 }
 
 
-void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
+void ViewModeEditMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
 	preview->start(pitch, view->cur_track()->volume, ttl);
 }
 
 static os::Timer ri_timer;
 static MidiEventBuffer ri_keys;
 
-void ViewModeMidi::ri_insert() {
+void ViewModeEditMidi::ri_insert() {
 	if (ri_keys.num == 0)
 		return;
 	Range r = get_edit_range();
@@ -418,7 +418,7 @@ void ViewModeMidi::ri_insert() {
 }
 
 
-void ViewModeMidi::on_midi_input() {
+void ViewModeEditMidi::on_midi_input() {
 	auto rec = (MidiAccumulator*)preview->accumulator;
 
 	if (input_capture) {
@@ -439,11 +439,11 @@ void ViewModeMidi::on_midi_input() {
 	preview->chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 }
 
-bool ViewModeMidi::is_input_active() {
+bool ViewModeEditMidi::is_input_active() {
 	return input_wanted_active;
 }
 
-void ViewModeMidi::activate_input(bool active) {
+void ViewModeEditMidi::activate_input(bool active) {
 	input_wanted_active = active;
 	if (active and !preview->input) {
 		_start_input();
@@ -452,34 +452,34 @@ void ViewModeMidi::activate_input(bool active) {
 	}
 }
 
-void ViewModeMidi::set_input_capture(bool capture) {
+void ViewModeEditMidi::set_input_capture(bool capture) {
 	input_capture = capture;
 	notify();
 }
 
-void ViewModeMidi::_start_input() {
+void ViewModeEditMidi::_start_input() {
 	preview->_start_input();
 	preview->chain->subscribe(this, [this] { on_midi_input(); }, Module::MESSAGE_TICK);
 }
 
-void ViewModeMidi::_stop_input() {
+void ViewModeEditMidi::_stop_input() {
 	preview->chain->unsubscribe(this);
 	preview->_stop_input();
 }
 
-void ViewModeMidi::set_input_device(Device *d) {
+void ViewModeEditMidi::set_input_device(Device *d) {
 	input_wanted_device = d;
 	preview->set_input_device(d);
 }
 
-Device *ViewModeMidi::input_device() {
+Device *ViewModeEditMidi::input_device() {
 	if (preview)
 		if (preview->input)
 			return preview->input->get_device();
 	return input_wanted_device;
 }
 
-void ViewModeMidi::on_start() {
+void ViewModeEditMidi::on_start() {
 	set_side_bar(SideBar::MIDI_EDITOR_CONSOLE);
 	preview = new MidiPreview(view->session, (Synthesizer*)cur_vlayer()->layer->track->synth->copy());
 	preview->set_input_device(input_wanted_device);
@@ -498,7 +498,7 @@ void ViewModeMidi::on_start() {
 		session->q(_("Midi editing is far easier with a metronome track. Do you want to add one?"), {"track-add-beats:" + _("yes")});
 }
 
-void ViewModeMidi::on_end() {
+void ViewModeEditMidi::on_end() {
 	preview = nullptr;
 
 	for (auto *v: view->vlayers)
@@ -580,7 +580,7 @@ struct MidiHoverMetadata {
 	int pitch = -1;
 };
 
-MidiHoverMetadata get_midi_hover_meta(ViewModeMidi *m) {
+MidiHoverMetadata get_midi_hover_meta(ViewModeEditMidi *m) {
 	MidiHoverMetadata r;
 
 	auto l = m->view->cur_vlayer();
@@ -602,7 +602,7 @@ MidiHoverMetadata get_midi_hover_meta(ViewModeMidi *m) {
 }
 
 // note clicking already handled by ViewModeDefault!
-void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeEditMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);
@@ -646,7 +646,7 @@ bool hover_end_of_note(HoverData &h, MidiNote *n) {
 	return h.pos >= n->range.end() - n->range.length*0.1f;
 }
 
-void ViewModeMidi::left_click_handle_object(AudioViewLayer *vlayer) {
+void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 
 	view->exclusively_select_layer(vlayer);
 	if (!view->hover_selected_object())
@@ -663,7 +663,7 @@ void ViewModeMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 	}
 }
 
-void ViewModeMidi::edit_add_pause() {
+void ViewModeEditMidi::edit_add_pause() {
 	Range r = get_edit_range();
 	view->set_cursor_pos(r.end());
 	select_in_edit_cursor();
@@ -671,7 +671,7 @@ void ViewModeMidi::edit_add_pause() {
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
 
-Scale ViewModeMidi::cur_scale() {
+Scale ViewModeEditMidi::cur_scale() {
 	Scale scale = Scale::C_MAJOR;
 	for (auto &kc: get_key_changes(view->cur_layer()))
 		if (kc.pos < get_edit_range().offset)
@@ -679,7 +679,7 @@ Scale ViewModeMidi::cur_scale() {
 	return scale;
 }
 
-void ViewModeMidi::edit_add_note_by_urelative(int urelative, bool shift) {
+void ViewModeEditMidi::edit_add_note_by_urelative(int urelative, bool shift) {
 	Range r = get_edit_range();
 	int upos = octave * 7 + urelative;
 	const Clef& clef = view->cur_track()->instrument.get_clef();
@@ -706,7 +706,7 @@ void ViewModeMidi::edit_add_note_by_urelative(int urelative, bool shift) {
 	start_midi_preview({pitch}, 0.1f);
 }
 
-void ViewModeMidi::edit_add_note_on_string(int hand_pos) {
+void ViewModeEditMidi::edit_add_note_on_string(int hand_pos) {
 	Range r = get_edit_range();
 	int pitch = cur_layer()->track->instrument.string_pitch[string_no] + hand_pos;
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
@@ -717,26 +717,26 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos) {
 	start_midi_preview({pitch}, 0.1f);
 }
 
-void ViewModeMidi::edit_backspace() {
+void ViewModeEditMidi::edit_backspace() {
 	Range r = get_backwards_range();
 	view->set_cursor_pos(r.offset);
 	auto s = get_select_in_edit_cursor();
 	view->song->delete_selection(s);
 }
 
-void ViewModeMidi::jump_string(int delta) {
+void ViewModeEditMidi::jump_string(int delta) {
 	string_no = max(min(string_no + delta, cur_layer()->track->instrument.string_pitch.num - 1), 0);
 	select_in_edit_cursor();
 	view->force_redraw();
 }
 
-void ViewModeMidi::jump_octave(int delta) {
+void ViewModeEditMidi::jump_octave(int delta) {
 	octave = max(min(octave + delta, 7), 0);
 	select_in_edit_cursor();
 	view->force_redraw();
 }
 
-void ViewModeMidi::set_rep_key(int k) {
+void ViewModeEditMidi::set_rep_key(int k) {
 	if (rep_key_runner >= 0)
 		hui::cancel_runner(rep_key_runner);
 	rep_key_runner = hui::run_later(0.8f, [this] {
@@ -754,7 +754,7 @@ void ViewModeMidi::set_rep_key(int k) {
 
 int song_bar_divisor(Song *s, int pos);
 
-void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) {
+void set_note_lengthx(ViewModeEditMidi *m, int l, int p, int n, const string &text) {
 	int div = song_bar_divisor(m->view->song, m->view->cursor_pos());
 	//l *= div;
 
@@ -774,7 +774,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 	m->view->set_message(t, 2);
 }
 
-void ViewModeMidi::on_key_down(int k) {
+void ViewModeEditMidi::on_key_down(int k) {
 	bool shift = (k & hui::KEY_SHIFT);
 	int pure_key = k & 0xff;
 
@@ -874,7 +874,7 @@ void ViewModeMidi::on_key_down(int k) {
 	ViewModeDefault::on_key_down(k);
 }
 
-void ViewModeMidi::on_command(const string &id) {
+void ViewModeEditMidi::on_command(const string &id) {
 
 	// cursor
 	if (id == "cursor-move-left") {
@@ -891,7 +891,7 @@ void ViewModeMidi::on_command(const string &id) {
 	ViewModeDefault::on_command(id);
 }
 
-float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
+float ViewModeEditMidi::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l)) {
 		auto mode = l->midi_mode();
 		if (mode == MidiMode::LINEAR)
@@ -905,12 +905,12 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 	return ViewModeDefault::layer_suggested_height(l);
 }
 
-void ViewModeMidi::on_cur_layer_change() {
+void ViewModeEditMidi::on_cur_layer_change() {
 	view->thm.set_dirty();
 }
 
 
-Array<int> ViewModeMidi::get_creation_pitch(int base_pitch) {
+Array<int> ViewModeEditMidi::get_creation_pitch(int base_pitch) {
 	if (creation_mode == CreationMode::INTERVAL) {
 		if (midi_interval != 0)
 			return {base_pitch, base_pitch + midi_interval};
@@ -922,7 +922,7 @@ Array<int> ViewModeMidi::get_creation_pitch(int base_pitch) {
 	return {};
 }
 
-MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
+MidiNoteBuffer ViewModeEditMidi::get_creation_notes(HoverData *sel, int pos0) {
 	int start = min(pos0, sel->pos);
 	int end = max(pos0, sel->pos);
 	Range r = Range::to(start, end);
@@ -958,7 +958,7 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(HoverData *sel, int pos0) {
 	return notes;
 }
 
-void ViewModeMidi::set_note_length_and_partition(int length, int partition) {
+void ViewModeEditMidi::set_note_length_and_partition(int length, int partition) {
 	note_length = max(length, 1);
 	sub_beat_partition = max(partition, 1);
 	select_in_edit_cursor();
@@ -966,7 +966,7 @@ void ViewModeMidi::set_note_length_and_partition(int length, int partition) {
 	notify();
 }
 
-void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
+void ViewModeEditMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	if (editing(l)) {
 		view->grid_painter->set_context(l->area, l->grid_colors());
 		view->grid_painter->draw_empty_background(c);
@@ -1001,7 +1001,7 @@ inline bool hover_note_linear(const MidiNote &n, int pitch, int pos) {
 	return n.range.is_inside(pos);
 }
 
-HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
+HoverData ViewModeEditMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	auto s = ViewModeDefault::get_hover_data(vlayer, m);
 	if (s.type != HoverData::Type::LAYER)
 		return s;
@@ -1053,7 +1053,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 
 
 
-void ViewModeMidi::draw_post(Painter *c) {
+void ViewModeEditMidi::draw_post(Painter *c) {
 	ViewModeDefault::draw_post(c);
 
 	auto *l = cur_vlayer();
@@ -1121,7 +1121,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	c->set_fill(true);
 }
 
-string ViewModeMidi::get_tip() {
+string ViewModeEditMidi::get_tip() {
 	if (input_mode == InputMode::NOTE_LENGTH)
 		return _("enter note length [1-9], [A-F]    cancel [Esc]");
 	if (input_mode == InputMode::BEAT_PARTITION)
@@ -1142,7 +1142,7 @@ string ViewModeMidi::get_tip() {
 	return message + message2;
 }
 
-int ViewModeMidi::suggest_move_cursor(const Range &cursor, bool forward) {
+int ViewModeEditMidi::suggest_move_cursor(const Range &cursor, bool forward) {
 	int pos = cursor.start();
 	if (forward)
 		pos = cursor.end();
@@ -1165,7 +1165,7 @@ int ViewModeMidi::suggest_move_cursor(const Range &cursor, bool forward) {
 }
 
 // seems fine
-Range ViewModeMidi::get_edit_range() {
+Range ViewModeEditMidi::get_edit_range() {
 	// manual selection has priority
 	if (view->sel.range().length > 0)
 		return view->sel.range();
@@ -1175,7 +1175,7 @@ Range ViewModeMidi::get_edit_range() {
 }
 
 
-Range ViewModeMidi::get_backwards_range() {
+Range ViewModeEditMidi::get_backwards_range() {
 	// manual selection has priority
 	if (view->sel.range().length > 0)
 		return view->sel.range();
@@ -1184,7 +1184,7 @@ Range ViewModeMidi::get_backwards_range() {
 	return Range::to(suggest_move_cursor(view->sel.range(), false), pos);
 }
 
-SongSelection ViewModeMidi::get_select_in_edit_cursor() {
+SongSelection ViewModeEditMidi::get_select_in_edit_cursor() {
 	Range r = get_edit_range();
 	auto s = SongSelection::from_range(view->song, r).filter({view->cur_layer()}).filter(SongSelection::Mask::MIDI_NOTES);
 	auto mode = cur_vlayer()->midi_mode();
@@ -1202,15 +1202,15 @@ SongSelection ViewModeMidi::get_select_in_edit_cursor() {
 	return s;
 }
 
-void ViewModeMidi::select_in_edit_cursor() {
+void ViewModeEditMidi::select_in_edit_cursor() {
 	view->sel._notes = get_select_in_edit_cursor()._notes;
 	view->update_selection();
 }
 
-SongSelection ViewModeMidi::get_selection_for_rect(const Range &r, int y0, int y1) {
+SongSelection ViewModeEditMidi::get_selection_for_rect(const Range &r, int y0, int y1) {
 	return ViewModeDefault::get_selection_for_rect(r, y0, y1).filter(SongSelection::Mask::MIDI_NOTES);
 }
 
-SongSelection ViewModeMidi::get_selection_for_range(const Range &r) {
+SongSelection ViewModeEditMidi::get_selection_for_range(const Range &r) {
 	return ViewModeDefault::get_selection_for_range(r).filter(SongSelection::Mask::MIDI_NOTES);
 }

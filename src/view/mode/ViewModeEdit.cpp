@@ -7,7 +7,7 @@
 
 #include "ViewModeEdit.h"
 #include "ViewModeEditDummy.h"
-#include "ViewModeMidi.h"
+#include "ViewModeEditMidi.h"
 #include "ViewModeEditAudio.h"
 #include "ViewModeEditBars.h"
 #include "../audioview/AudioView.h"

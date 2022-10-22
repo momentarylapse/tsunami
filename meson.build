@@ -525,7 +525,7 @@ sources = [
 	'src/view/mode/ViewModeEditAudio.cpp',
 	'src/view/mode/ViewModeEditBars.cpp',
 	'src/view/mode/ViewModeEditDummy.cpp',
-	'src/view/mode/ViewModeMidi.cpp',
+	'src/view/mode/ViewModeEditMidi.cpp',
 	'src/view/mode/ViewModeScaleBars.cpp',
 	'src/view/mode/ViewModeScaleMarker.cpp',
 	'src/view/module/AutoConfigPanel.cpp',

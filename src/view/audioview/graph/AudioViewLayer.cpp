@@ -11,7 +11,7 @@
 #include "../AudioView.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../mode/ViewMode.h"
-#include "../../mode/ViewModeMidi.h"
+#include "../../mode/ViewModeEditMidi.h"
 #include "../../mode/ViewModeCurve.h"
 #include "../../mode/ViewModeEdit.h"
 #include "../../painter/BufferPainter.h"
@@ -533,7 +533,7 @@ bool AudioViewLayer::allow_handle_click_when_gaining_focus() const {
 	if (view->mode == view->mode_edit)
 		if (view->mode_edit->mode == view->mode_edit_midi)
 			if (view->hover().type == HoverData::Type::MIDI_PITCH)
-				if (view->mode_edit_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
+				if (view->mode_edit_midi->creation_mode != ViewModeEditMidi::CreationMode::SELECT)
 					return true;
 	if (view->mode == view->mode_curve)
 		if (this == view->cur_vlayer())

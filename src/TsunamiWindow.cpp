@@ -54,7 +54,7 @@
 #include "view/sidebar/SideBar.h"
 #include "view/sidebar/CaptureConsole.h"
 #include "view/mode/ViewModeDefault.h"
-#include "view/mode/ViewModeMidi.h"
+#include "view/mode/ViewModeEditMidi.h"
 #include "view/mode/ViewModeEdit.h"
 #include "view/mode/ViewModeCapture.h"
 #include "view/mode/ViewModeScaleBars.h"

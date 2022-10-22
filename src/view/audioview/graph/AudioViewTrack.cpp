@@ -8,7 +8,6 @@
 #include "AudioViewTrack.h"
 #include "../AudioView.h"
 #include "../../mode/ViewMode.h"
-#include "../../mode/ViewModeMidi.h"
 #include "../../../Session.h"
 #include "../../../EditModes.h"
 #include "../../../data/base.h"

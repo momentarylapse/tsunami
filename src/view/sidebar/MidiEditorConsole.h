@@ -12,7 +12,7 @@
 
 class TrackLayer;
 class Device;
-class ViewModeMidi;
+class ViewModeEditMidi;
 enum class MidiMode;
 enum class NoteBaseLength;
 enum class ChordType;
@@ -64,7 +64,7 @@ public:
 	void set_layer(TrackLayer *t);
 
 	TrackLayer *layer;
-	ViewModeMidi *mode;
+	ViewModeEditMidi *mode;
 };
 
 #endif /* MIDIEDITORCONSOLE_H_ */

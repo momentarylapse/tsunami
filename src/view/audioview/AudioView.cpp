@@ -24,7 +24,7 @@
 #include "../mode/ViewModeEditDummy.h"
 #include "../mode/ViewModeEditAudio.h"
 #include "../mode/ViewModeEditBars.h"
-#include "../mode/ViewModeMidi.h"
+#include "../mode/ViewModeEditMidi.h"
 #include "../mode/ViewModeCurve.h"
 #include "../mode/ViewModeCapture.h"
 #include "../mode/ViewModeScaleBars.h"
@@ -203,7 +203,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
 	mode_edit_audio = new ViewModeEditAudio(this);
-	mode_edit_midi = new ViewModeMidi(this);
+	mode_edit_midi = new ViewModeEditMidi(this);
 	mode_edit_bars = new ViewModeEditBars(this);
 	mode_edit_dummy = new ViewModeEditDummy(this);
 	mode_edit = new ViewModeEdit(this);

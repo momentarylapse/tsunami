@@ -11,7 +11,7 @@
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../dialog/MarkerDialog.h"
 #include "../dialog/QuestionDialog.h"
-#include "../mode/ViewModeMidi.h"
+#include "../mode/ViewModeEditMidi.h"
 #include "../module/ConfigPanel.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
@@ -68,10 +68,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	event("length-triplet", [this] { on_length_triplet(); });
 	event("length-custom", [this] { on_length_custom(); });
 
-	event("mode-select", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::SELECT); });
-	event("mode-note", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::NOTE); });
-	event("mode-interval", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL); });
-	event("mode-chord", [this] { mode->set_creation_mode(ViewModeMidi::CreationMode::CHORD); });
+	event("mode-select", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::SELECT); });
+	event("mode-note", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::NOTE); });
+	event("mode-interval", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::INTERVAL); });
+	event("mode-chord", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::CHORD); });
 
 	event("mode-classical", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::CLASSICAL); });
 	event("mode-tab", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::TAB); });
@@ -216,17 +216,17 @@ void MidiEditorConsole::update() {
 	//if (get_track_index_save(view->song, view->cur_track) >= 0)
 		allow = (layer->type == SignalType::MIDI);
 
-	check("mode-select", mode->creation_mode == ViewModeMidi::CreationMode::SELECT);
-	check("mode-note", mode->creation_mode == ViewModeMidi::CreationMode::NOTE);
-	check("mode-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
-	check("mode-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
+	check("mode-select", mode->creation_mode == ViewModeEditMidi::CreationMode::SELECT);
+	check("mode-note", mode->creation_mode == ViewModeEditMidi::CreationMode::NOTE);
+	check("mode-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::INTERVAL);
+	check("mode-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::CHORD);
 
 	check("mode-classical", view->cur_vlayer()->midi_mode() == MidiMode::CLASSICAL);
 	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::TAB);
 	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::LINEAR);
 
-	expand("revealer-interval", mode->creation_mode == ViewModeMidi::CreationMode::INTERVAL);
-	expand("revealer-chord", mode->creation_mode == ViewModeMidi::CreationMode::CHORD);
+	expand("revealer-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::INTERVAL);
+	expand("revealer-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::CHORD);
 
 	check("chord-major", mode->chord_type == ChordType::MAJOR);
 	check("chord-minor", mode->chord_type == ChordType::MINOR);
@@ -406,13 +406,13 @@ void MidiEditorConsole::on_settings_change() {
 void MidiEditorConsole::on_creation_mode() {
 	int n = get_int("midi_edit_mode");
 	if (n == 0) {
-		mode->set_creation_mode(ViewModeMidi::CreationMode::SELECT);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::SELECT);
 	} else if (n == 1) {
-		mode->set_creation_mode(ViewModeMidi::CreationMode::NOTE);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::NOTE);
 	} else if (n == 2) {
-		mode->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::INTERVAL);
 	} else if (n == 3) {
-		mode->set_creation_mode(ViewModeMidi::CreationMode::CHORD);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::CHORD);
 	}
 }
 

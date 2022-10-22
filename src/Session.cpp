@@ -21,7 +21,7 @@
 #include "view/mode/ViewModeCurve.h"
 #include "view/mode/ViewModeEdit.h"
 #include "view/mode/ViewModeEditAudio.h"
-#include "view/mode/ViewModeMidi.h"
+#include "view/mode/ViewModeEditMidi.h"
 #include "view/mode/ViewModeScaleBars.h"
 #include "view/mode/ViewModeScaleMarker.h"
 #include "view/sidebar/SideBar.h"

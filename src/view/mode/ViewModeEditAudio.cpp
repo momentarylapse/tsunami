@@ -8,8 +8,8 @@
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
-#include "../../data/audio/BufferInterpolator.h"
-#include "../../data/audio/BufferPitchShift.h"
+#include "../../command/audio/BufferInterpolator.h"
+#include "../../command/audio/BufferPitchShift.h"
 #include "../../TsunamiWindow.h"
 
 struct RubberPoint {

@@ -11,7 +11,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
-#include "../../data/audio/BufferInterpolator.h"
+#include "../../command/audio/BufferInterpolator.h"
 #include "Action__ScaleData.h"
 #include "ActionBar__Edit.h"
 #include "../track/buffer/ActionTrackEditBuffer.h"

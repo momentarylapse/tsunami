@@ -6,16 +6,16 @@
  */
 
 #include "Diff.h"
-#include "../data/Song.h"
-#include "../data/Track.h"
-#include "../data/TrackLayer.h"
-#include "../data/Sample.h"
-#include "../data/CrossFade.h"
-#include "../data/audio/AudioBuffer.h"
-#include "../data/rhythm/Bar.h"
-#include "../module/audio/AudioEffect.h"
-#include "../module/midi/MidiEffect.h"
-#include "../module/synthesizer/Synthesizer.h"
+#include "../../data/Song.h"
+#include "../../data/Track.h"
+#include "../../data/TrackLayer.h"
+#include "../../data/Sample.h"
+#include "../../data/CrossFade.h"
+#include "../../data/audio/AudioBuffer.h"
+#include "../../data/rhythm/Bar.h"
+#include "../../module/audio/AudioEffect.h"
+#include "../../module/midi/MidiEffect.h"
+#include "../../module/synthesizer/Synthesizer.h"
 
 
 Array<string> diff_module(Module *a, Module *b, const string &ee) {

@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_STUFF_DIFF_H_
-#define SRC_STUFF_DIFF_H_
+#ifndef SRC_COMMAND_SONG_DIFF_H_
+#define SRC_COMMAND_SONG_DIFF_H_
 
-#include "../lib/base/base.h"
+#include "../../lib/base/base.h"
 
 class Song;
 class Track;
 
 Array<string> diff_song(Song *a, Song *b);
 
-#endif /* SRC_STUFF_DIFF_H_ */
+#endif /* SRC_COMMAND_SONG_DIFF_H_ */

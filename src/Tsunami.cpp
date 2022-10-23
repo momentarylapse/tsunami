@@ -27,12 +27,12 @@
 #include "stuff/PerformanceMonitor.h"
 #include "stuff/BackupManager.h"
 #include "stuff/SessionManager.h"
-#include "stuff/Diff.h"
 #include "stuff/ErrorHandler.h"
 #include "plugins/PluginManager.h"
 #include "plugins/TsunamiPlugin.h"
 #include "device/DeviceManager.h"
 #include "device/stream/AudioOutput.h"
+#include "command/song/Diff.h"
 #include "test/TestRingBuffer.h"
 #ifndef NDEBUG
 #include "module/ModuleFactory.h"

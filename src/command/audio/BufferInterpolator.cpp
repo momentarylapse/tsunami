@@ -6,7 +6,7 @@
  */
 
 #include "BufferInterpolator.h"
-#include "AudioBuffer.h"
+#include "../../data/audio/AudioBuffer.h"
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 

@@ -202,9 +202,10 @@
     <ClCompile Include="src\action\ActionGroup.cpp" />
     <ClCompile Include="src\action\ActionManager.cpp" />
     <ClCompile Include="src\action\ActionMergable.cpp" />
+    <ClCompile Include="src\command\audio\BufferInterpolator.cpp" />
+    <ClCompile Include="src\command\audio\BufferPitchShift.cpp" />
+    <ClCompile Include="src\command\song\Diff.cpp" />
     <ClCompile Include="src\data\audio\AudioBuffer.cpp" />
-    <ClCompile Include="src\data\audio\BufferInterpolator.cpp" />
-    <ClCompile Include="src\data\audio\BufferPitchShift.cpp" />
     <ClCompile Include="src\data\audio\RingBuffer.cpp" />
     <ClCompile Include="src\data\midi\Clef.cpp" />
     <ClCompile Include="src\data\midi\Instrument.cpp" />
@@ -464,7 +465,6 @@
     <ClCompile Include="src\storage\StorageOperationData.cpp" />
     <ClCompile Include="src\stuff\BackupManager.cpp" />
     <ClCompile Include="src\stuff\Clipboard.cpp" />
-    <ClCompile Include="src\stuff\Diff.cpp" />
     <ClCompile Include="src\stuff\ErrorHandler.cpp" />
     <ClCompile Include="src\stuff\Log.cpp" />
     <ClCompile Include="src\stuff\Observable.cpp" />
@@ -669,9 +669,10 @@
     <ClInclude Include="src\action\ActionGroup.h" />
     <ClInclude Include="src\action\ActionManager.h" />
     <ClInclude Include="src\action\ActionMergable.h" />
+    <ClInclude Include="src\command\audio\BufferInterpolator.h" />
+    <ClInclude Include="src\command\audio\BufferPitchShift.h" />
+    <ClInclude Include="src\command\song\Diff.h" />
     <ClInclude Include="src\data\audio\AudioBuffer.h" />
-    <ClInclude Include="src\data\audio\BufferInterpolator.h" />
-    <ClInclude Include="src\data\audio\BufferPitchShift.h" />
     <ClInclude Include="src\data\audio\RingBuffer.h" />
     <ClInclude Include="src\data\midi\Clef.h" />
     <ClInclude Include="src\data\midi\Instrument.h" />
@@ -913,7 +914,6 @@
     <ClInclude Include="src\storage\StorageOperationData.h" />
     <ClInclude Include="src\stuff\BackupManager.h" />
     <ClInclude Include="src\stuff\Clipboard.h" />
-    <ClInclude Include="src\stuff\Diff.h" />
     <ClInclude Include="src\stuff\ErrorHandler.h" />
     <ClInclude Include="src\stuff\Log.h" />
     <ClInclude Include="src\stuff\Observable.h" />

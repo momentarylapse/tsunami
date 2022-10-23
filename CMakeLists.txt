@@ -92,9 +92,10 @@ set(SOURCE
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMergable.cpp
+	src/command/audio/BufferInterpolator.cpp
+	src/command/audio/BufferPitchShift.cpp
+	src/command/song/Diff.cpp
 	src/data/audio/AudioBuffer.cpp
-	src/data/audio/BufferInterpolator.cpp
-	src/data/audio/BufferPitchShift.cpp
 	src/data/audio/RingBuffer.cpp
 	src/data/midi/Clef.cpp
 	src/data/midi/Instrument.cpp
@@ -354,7 +355,6 @@ set(SOURCE
 	src/storage/StorageOperationData.cpp
 	src/stuff/BackupManager.cpp
 	src/stuff/Clipboard.cpp
-	src/stuff/Diff.cpp
 	src/stuff/ErrorHandler.cpp
 	src/stuff/Log.cpp
 	src/stuff/Observable.cpp

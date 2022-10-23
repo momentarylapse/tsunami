@@ -8,7 +8,7 @@
 #ifndef NDEBUG
 
 #include "TestInterpolator.h"
-#include "../data/audio/BufferInterpolator.h"
+#include "../command/audio/BufferInterpolator.h"
 //#include "../Data/Audio/AudioBuffer.h"
 
 TestInterpolator::TestInterpolator() : UnitTest("interpolator")
@@ -50,8 +50,6 @@ void TestInterpolator::test_linear()
 	BufferInterpolator::interpolate_channel_linear(in, out);
 	assert_equal(out, {1, 1.5, 2, 1, 0, 2, 4});
 }
-
-#include "../lib/os/msg.h"
 
 void TestInterpolator::test_cubic()
 {

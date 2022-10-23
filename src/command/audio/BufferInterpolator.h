@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_DATA_AUDIO_BUFFERINTERPOLATOR_H_
-#define SRC_DATA_AUDIO_BUFFERINTERPOLATOR_H_
+#ifndef SRC_COMMAND_AUDIO_BUFFERINTERPOLATOR_H_
+#define SRC_COMMAND_AUDIO_BUFFERINTERPOLATOR_H_
 
 #include "../../lib/base/base.h"
 class AudioBuffer;
@@ -31,4 +31,4 @@ void interpolate(AudioBuffer &in, AudioBuffer &out, Method method);
 
 }
 
-#endif /* SRC_DATA_AUDIO_BUFFERINTERPOLATOR_H_ */
+#endif /* SRC_COMMAND_AUDIO_BUFFERINTERPOLATOR_H_ */

@@ -125,13 +125,13 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		f->perf_set_parent(this);
 		
 
-	track->subscribe(this, [=]{ on_track_replace_synth(); }, track->MESSAGE_REPLACE_SYNTHESIZER);
-	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
-	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
-	track->subscribe(this, [=]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
-	track->subscribe(this, [=]{ on_track_delete(); }, track->MESSAGE_DELETE);
-	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_ADD_LAYER);
-	track->song->subscribe(this, [=]{ update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
+	track->subscribe(this, [this] { on_track_replace_synth(); }, track->MESSAGE_REPLACE_SYNTHESIZER);
+	track->subscribe(this, [this] { on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
+	track->subscribe(this, [this] { on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
+	track->subscribe(this, [this] { on_track_change_data(); }, track->MESSAGE_CHANGE);
+	track->subscribe(this, [this] { on_track_delete(); }, track->MESSAGE_DELETE);
+	track->song->subscribe(this, [this] { update_layers(); }, track->song->MESSAGE_ADD_LAYER);
+	track->song->subscribe(this, [this] { update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
 
 	update_layers();
 }
@@ -242,8 +242,8 @@ void TrackRenderer::update_layers() {
 	//msg_write("-----TR update done");
 
 	for (auto *l: weak(layers)) {
-		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
-		//l->subscribe(this, [=]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
+		l->subscribe(this, [this] { on_track_change_data(); }, l->MESSAGE_CHANGE);
+		//l->subscribe(this, [this] { on_track_delete_layer(); }, l->MESSAGE_DELETE);
 	}
 }
 

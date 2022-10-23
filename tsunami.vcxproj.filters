@@ -259,13 +259,16 @@
     <ClCompile Include="src\action\ActionMergable.cpp">
       <Filter>src\action</Filter>
     </ClCompile>
+    <ClCompile Include="src\command\audio\BufferInterpolator.cpp">
+      <Filter>src\command\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\command\audio\BufferPitchShift.cpp">
+      <Filter>src\command\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\command\song\Diff.cpp">
+      <Filter>src\command\song</Filter>
+    </ClCompile>
     <ClCompile Include="src\data\audio\AudioBuffer.cpp">
-      <Filter>src\data\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="src\data\audio\BufferInterpolator.cpp">
-      <Filter>src\data\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="src\data\audio\BufferPitchShift.cpp">
       <Filter>src\data\audio</Filter>
     </ClCompile>
     <ClCompile Include="src\data\audio\RingBuffer.cpp">
@@ -1045,9 +1048,6 @@
     <ClCompile Include="src\stuff\Clipboard.cpp">
       <Filter>src\stuff</Filter>
     </ClCompile>
-    <ClCompile Include="src\stuff\Diff.cpp">
-      <Filter>src\stuff</Filter>
-    </ClCompile>
     <ClCompile Include="src\stuff\ErrorHandler.cpp">
       <Filter>src\stuff</Filter>
     </ClCompile>
@@ -1656,13 +1656,16 @@
     <ClInclude Include="src\action\ActionMergable.h">
       <Filter>src\action</Filter>
     </ClInclude>
+    <ClInclude Include="src\command\audio\BufferInterpolator.h">
+      <Filter>src\command\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\command\audio\BufferPitchShift.h">
+      <Filter>src\command\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\command\song\Diff.h">
+      <Filter>src\command\song</Filter>
+    </ClInclude>
     <ClInclude Include="src\data\audio\AudioBuffer.h">
-      <Filter>src\data\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="src\data\audio\BufferInterpolator.h">
-      <Filter>src\data\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="src\data\audio\BufferPitchShift.h">
       <Filter>src\data\audio</Filter>
     </ClInclude>
     <ClInclude Include="src\data\audio\RingBuffer.h">
@@ -2388,9 +2391,6 @@
     <ClInclude Include="src\stuff\Clipboard.h">
       <Filter>src\stuff</Filter>
     </ClInclude>
-    <ClInclude Include="src\stuff\Diff.h">
-      <Filter>src\stuff</Filter>
-    </ClInclude>
     <ClInclude Include="src\stuff\ErrorHandler.h">
       <Filter>src\stuff</Filter>
     </ClInclude>
@@ -2794,6 +2794,15 @@
     </Filter>
     <Filter Include="src\action\track\synthesizer">
       <UniqueIdentifier>{238D1E6D-DB4F-1B9E-E390-F714808E8E7B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\command">
+      <UniqueIdentifier>{6212A62B-F556-8DB8-3504-462415CF2708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\command\audio">
+      <UniqueIdentifier>{4347F7AB-367E-9C98-611F-F69CC4B968AA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\command\song">
+      <UniqueIdentifier>{8EF056B0-9714-8EA0-1A7E-A4742798144A}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\data">
       <UniqueIdentifier>{2630DC8F-BD02-9230-C38E-3F90A09795EC}</UniqueIdentifier>

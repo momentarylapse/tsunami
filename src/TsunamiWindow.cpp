@@ -1259,12 +1259,12 @@ void TsunamiWindow::on_render_export_selection() {
 	});
 }
 
-Song *copy_song_from_selection(Song *song, const SongSelection &sel);
+shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel);
 
 void TsunamiWindow::on_export_selection() {
 	session->storage->ask_save(this, [this] (const Path &filename) {
 		if (filename) {
-			auto s = ownify(copy_song_from_selection(song, view->sel));
+			auto s = copy_song_from_selection(song, view->sel);
 			if (session->storage->save(s.get(), filename))
 				view->set_message(_("file exported"));
 		}

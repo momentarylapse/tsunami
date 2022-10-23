@@ -32,13 +32,13 @@ CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 	event_x(id_list, "hui:select", [this]{ on_list_select(); });
 	event_x(id_list, "hui:change", [this]{ on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [this]{ on_list_right_click(); });
-	event("edit_song", [session] {
+	event("edit-song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
-	event("edit_track", [session] {
+	event("edit-track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_midi", [session] {
+	event("edit-track-data", [session] {
 		session->set_mode(EditMode::EditTrack);
 	});
 

@@ -30,11 +30,14 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	event("action-replace", [this] {
 		on_action_replace();
 	});
-	event("edit_track", [session] {
+	event("edit-song", [session] {
+		session->set_mode(EditMode::DefaultSong);
+	});
+	event("edit-track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_song", [session] {
-		session->set_mode(EditMode::DefaultSong);
+	event("edit-track-curves", [session] {
+		session->set_mode(EditMode::Curves);
 	});
 }
 

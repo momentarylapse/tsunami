@@ -3,6 +3,6 @@ Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 		ListView sample-list "Preview\\Duration\\Name\\Usage" format=Titm select-multi nobar
 		Group group-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link ignorefocus
+				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_samples "Samples" link ignorefocus disabled
+				Button /edit-samples "Samples" link ignorefocus disabled

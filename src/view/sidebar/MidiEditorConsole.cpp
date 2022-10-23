@@ -117,19 +117,19 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	event("flag-tenuto", [this] { on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("flag-dead", [this] { on_apply_flags(NOTE_FLAG_DEAD); });
 	event("add_key_change", [this] { on_add_key_change(); });
-	event("edit_song", [session] {
+	event("edit-song", [session] {
 		session->set_mode(EditMode::DefaultSong);
 	});
-	event("edit_track", [session] {
+	event("edit-track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_midi_fx", [session] {
+	/*event("edit-midi-fx", [session] {
 		session->set_mode(EditMode::DefaultMidiFx);
 	});
-	event("edit_synth", [session] {
+	event("edit-synth", [session] {
 		session->set_mode(EditMode::DefaultTrackSynth);
-	});
-	event("edit_curves", [session] {
+	});*/
+	event("edit-track-curves", [session] {
 		session->set_mode(EditMode::Curves);
 	});
 }

@@ -49,10 +49,10 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 	event("tag-add", [this] { on_tag_add(); });
 	event("tag-delete", [this] { on_tag_delete(); });
 
-	event("edit_track", [session] {
+	event("edit-track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
-	event("edit_samples", [session] {
+	event("edit-samples", [session] {
 		session->set_mode(EditMode::DefaultSamples);
 	});
 }

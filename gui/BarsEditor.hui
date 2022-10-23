@@ -15,8 +15,9 @@ Dialog bars-editor "Bars" width=300 height=516
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link ignorefocus
+				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_track "Track" link ignorefocus
+				Button /edit-track "Track" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_bars "Bars" link ignorefocus disabled
+				Button /edit-track-data "Bars" link ignorefocus disabled
+				Button /edit-track-curves "Curves" link ignorefocus

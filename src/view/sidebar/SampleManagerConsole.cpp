@@ -136,7 +136,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
 	event_x(id_list, "hui:right-button-down", [this] { on_list_right_click(); });
 	event("sample-list", [this] { on_preview(); });
 
-	event("edit_song", [session] { session->set_mode(EditMode::DefaultSong); });
+	event("edit-song", [session] { session->set_mode(EditMode::DefaultSong); });
 
 	progress = nullptr;
 }

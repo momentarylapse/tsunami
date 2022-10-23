@@ -206,9 +206,9 @@ Grid
 
 0
 0
-5
+6
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -220,7 +220,7 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
 0
@@ -232,9 +232,15 @@ disabled
 0
 0
 Button
-edit_audio
+edit-track-data
 link,ignorefocus,disabled
 4
+0
+0
+Button
+edit-track-curves
+link,ignorefocus
+5
 0
 0
 # Resource
@@ -667,9 +673,9 @@ Grid
 
 0
 0
-5
+6
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -681,7 +687,7 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
 0
@@ -693,9 +699,15 @@ disabled
 0
 0
 Button
-edit_bars
+edit-track-data
 link,ignorefocus,disabled
 4
+0
+0
+Button
+edit-track-curves
+link,ignorefocus
+5
 0
 0
 # Resource
@@ -932,7 +944,7 @@ Grid
 0
 6
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -944,7 +956,7 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
 0
@@ -956,13 +968,13 @@ disabled
 0
 0
 Button
-edit_midi
+edit-track-data
 link,ignorefocus
 4
 0
 0
 Button
-edit_curves
+edit-track-curves
 link,ignorefocus,disabled
 5
 0
@@ -3263,7 +3275,7 @@ Grid
 0
 6
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -3275,7 +3287,7 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
 0
@@ -3287,13 +3299,13 @@ disabled
 0
 0
 Button
-edit_midi
+edit-track-data
 link,ignorefocus,disabled
 4
 0
 0
 Button
-edit_curves
+edit-track-curves
 link,ignorefocus
 5
 0
@@ -6509,7 +6521,7 @@ Grid
 0
 3
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -6521,7 +6533,7 @@ disabled
 0
 0
 Button
-edit_samples
+edit-samples
 link,ignorefocus,disabled
 2
 0
@@ -7235,7 +7247,7 @@ Grid
 0
 4
 Button
-edit_song
+edit-song
 link,ignorefocus,disabled
 0
 0
@@ -7247,13 +7259,13 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
 0
 0
 Button
-edit_samples
+edit-samples
 link,ignorefocus
 3
 0
@@ -7798,7 +7810,7 @@ Grid
 0
 6
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -7810,7 +7822,7 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus,disabled
 2
 0
@@ -7822,13 +7834,13 @@ disabled
 0
 0
 Button
-edit_midi
+edit-track-data
 link,ignorefocus
 4
 0
 0
 Button
-edit_curves
+edit-track-curves
 link,ignorefocus
 5
 0
@@ -8168,26 +8180,26 @@ Remove (if missing)
 /device-hide
 Ignore
 
+/edit-samples
+Samples
+
 /edit-separator
 ›
 
-/edit_audio
-Audio
+/edit-song
+File
 
-/edit_bars
-Bars
+/edit-track
+Track
 
-/edit_curves
+/edit-track-curves
 Curves
 
-/edit_midi
-Midi
+/edit-track-data
+Data
 
 /edit_sample
 Sample
-
-/edit_samples
-Samples
 
 /edit_song
 File

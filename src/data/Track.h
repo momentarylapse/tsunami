@@ -33,7 +33,7 @@ enum class SignalType;
 
 class Track : public Sharable<Observable<VirtualBase>> {
 public:
-	Track(SignalType type, Synthesizer *synth);
+	Track(Song *song, SignalType type, Synthesizer *synth);
 	virtual ~Track();
 
 	Range _cdecl range() const;

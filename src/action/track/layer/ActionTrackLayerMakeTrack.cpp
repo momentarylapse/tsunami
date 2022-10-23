@@ -52,7 +52,7 @@ ActionTrackLayerMakeTrack::ActionTrackLayerMakeTrack(TrackLayer *_layer) {
 
 void ActionTrackLayerMakeTrack::build(Data *d) {
 	Track *orig = layer->track;
-	Track *t = new Track(effective_type(layer->track), (Synthesizer*)orig->synth->copy());
+	Track *t = new Track(orig->song, effective_type(layer->track), (Synthesizer*)orig->synth->copy());
 	t->layers.add(new TrackLayer(t));
 	t->instrument = orig->instrument;
 	t->volume = orig->volume;

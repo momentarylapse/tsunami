@@ -25,6 +25,9 @@
 #include "../../lib/math/math.h"
 #include "../../Session.h"
 
+#include "../../lib/os/msg.h"
+
+
 const int CURVE_CHUNK = 512;
 
 

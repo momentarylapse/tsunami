@@ -64,9 +64,10 @@ const string Track::MESSAGE_ADD_CURVE = "AddCurve";
 const string Track::MESSAGE_DELETE_CURVE = "DeleteCurve";
 const string Track::MESSAGE_EDIT_CURVE = "EditCurve";
 
-Track::Track(SignalType _type, Synthesizer *_synth) {
+Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 	//msg_write("  new Track " + p2s(this));
 	type = _type;
+	song = _song;
 	channels = 1;
 	if (type == SignalType::AUDIO_MONO) {
 		type = SignalType::AUDIO;
@@ -81,7 +82,6 @@ Track::Track(SignalType _type, Synthesizer *_synth) {
 	volume = 1;
 	panning = 0;
 	send_target = nullptr;
-	song = nullptr;
 
 	volume = 1;
 	muted = false;

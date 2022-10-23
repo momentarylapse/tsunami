@@ -263,11 +263,8 @@ Track *Song::add_track(SignalType type, int index) {
 	}
 	if (index < 0)
 		index = tracks.num;
-	//msg_write("--------new track");
-	Track *t = new Track(type, CreateSynthesizer(session, ""));
-	//msg_write("--------layer add");
+	Track *t = new Track(this, type, CreateSynthesizer(session, ""));
 	t->layers.add(new TrackLayer(t));
-	//msg_write("--------execute");
 	return (Track*)execute(new ActionTrackAdd(t, index));
 }
 
@@ -452,7 +449,7 @@ Song *copy_song_from_selection(Song *song, const SongSelection &sel) {
 	for (Track *t: weak(song->tracks)) {
 		if (!sel.has(t))
 			continue;
-		Track *tt = new Track(t->type, (Synthesizer*)t->synth->copy());
+		Track *tt = new Track(ss, t->type, (Synthesizer*)t->synth->copy());
 		ss->tracks.add(tt);
 		tt->name = t->name;
 		tt->volume = t->volume;

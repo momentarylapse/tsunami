@@ -5,11 +5,11 @@
  *      Author: michi
  */
 
-#ifndef TSUNAMIWINDOW_H_
-#define TSUNAMIWINDOW_H_
+#ifndef SRC_VIEW_TSUNAMIWINDOW_H_
+#define SRC_VIEW_TSUNAMIWINDOW_H_
 
-#include "lib/base/pointer.h"
-#include "lib/hui/hui.h"
+#include "../lib/base/pointer.h"
+#include "../lib/hui/hui.h"
 
 class Song;
 class AudioView;
@@ -147,4 +147,4 @@ public:
 	Tsunami *app;
 };
 
-#endif /* TSUNAMIWINDOW_H_ */
+#endif /* SRC_VIEW_TSUNAMIWINDOW_H_ */

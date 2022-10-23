@@ -14,7 +14,7 @@
 #include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../Session.h"
-#include "../../TsunamiWindow.h"
+#include "../../view/TsunamiWindow.h"
 
 
 FormatDescriptorRaw::FormatDescriptorRaw() :

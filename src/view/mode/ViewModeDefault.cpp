@@ -15,6 +15,7 @@
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../helper/graph/ScrollBar.h"
 #include "../MouseDelayPlanner.h"
+#include "../TsunamiWindow.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/SignalChain.h"
 #include "../../data/base.h"
@@ -30,7 +31,6 @@
 #include "../../lib/hui/Controls/Control.h"
 #include "../../action/song/ActionSongMoveSelection.h"
 #include "../../device/stream/AudioOutput.h"
-#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include <math.h>
 

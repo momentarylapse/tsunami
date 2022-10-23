@@ -4,12 +4,12 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../MouseDelayPlanner.h"
+#include "../TsunamiWindow.h"
 #include "../../action/Action.h"
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
-#include "../../TsunamiWindow.h"
 
 void draw_arrow(Painter *p, const vec2 &a, const vec2 &b);
 

@@ -7,11 +7,11 @@
 
 #include "ModulePanel.h"
 #include "ConfigPanel.h"
+#include "../TsunamiWindow.h"
 #include "../../module/Module.h"
 #include "../../plugins/PluginManager.h"
 #include "../../data/Song.h"
 #include "../../Session.h"
-#include "../../TsunamiWindow.h"
 #include "../../lib/hui/Controls/ControlMenuButton.h"
 
 extern const int CONFIG_PANEL_WIDTH = 400;

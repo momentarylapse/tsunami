@@ -9,13 +9,13 @@
 #include "signaleditor/SignalEditorTab.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
+#include "../TsunamiWindow.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
 #include "../../storage/Storage.h"
 #include "../../data/base.h"
 #include "../../Session.h"
-#include "../../TsunamiWindow.h"
 
 
 

@@ -6,17 +6,16 @@
  */
 
 #include "SettingsDialog.h"
-//#include "../bottombar/DeviceConsole.h"
 #include "../helper/CpuDisplay.h"
 #include "../helper/Slider.h"
 #include "../audioview/AudioView.h"
+#include "../TsunamiWindow.h"
 #include "../../device/DeviceManager.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../stuff/Log.h"
 #include "../../Session.h"
 #include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
 
 struct ApiDescription {
 	string name;

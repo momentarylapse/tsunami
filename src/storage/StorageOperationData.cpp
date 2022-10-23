@@ -7,10 +7,9 @@
 
 #include "StorageOperationData.h"
 #include "Storage.h"
-
 #include "../view/helper/Progress.h"
+#include "../view/TsunamiWindow.h"
 #include "../Session.h"
-#include "../TsunamiWindow.h"
 #include "../data/Track.h"
 #include "../data/TrackLayer.h"
 #include "../data/audio/AudioBuffer.h"

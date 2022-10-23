@@ -15,8 +15,8 @@
 #include "../plugins/TsunamiPlugin.h"
 #include "../storage/Storage.h"
 #include "../view/audioview/AudioView.h"
+#include "../view/TsunamiWindow.h"
 #include "../Tsunami.h"
-#include "../TsunamiWindow.h"
 #include "../Session.h"
 
 

@@ -2,9 +2,9 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../mode/ViewModeEditAudio.h"
+#include "../TsunamiWindow.h"
 #include "../../module/Module.h"
 #include "../../plugins/PluginManager.h"
-#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 

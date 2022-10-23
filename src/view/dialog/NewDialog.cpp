@@ -6,13 +6,13 @@
  */
 
 #include "NewDialog.h"
+#include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../action/ActionManager.h"
 #include "../../stuff/SessionManager.h"
 #include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 
 void set_bar_pattern(BarPattern &b, const string &pat);

@@ -5,12 +5,12 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../MouseDelayPlanner.h"
+#include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../command/audio/BufferInterpolator.h"
 #include "../../command/audio/BufferPitchShift.h"
-#include "../../TsunamiWindow.h"
 
 struct RubberPoint {
 	int source, target;

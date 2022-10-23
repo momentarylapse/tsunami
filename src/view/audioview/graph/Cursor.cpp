@@ -8,11 +8,11 @@
 #include "Cursor.h"
 #include "AudioViewLayer.h"
 #include "../AudioView.h"
+#include "../../TsunamiWindow.h"
 #include "../../../data/base.h"
 #include "../../../data/Song.h"
 #include "../../../data/TrackLayer.h"
 #include "../../../Session.h"
-#include "../../../TsunamiWindow.h"
 
 bool view_has_focus(AudioView *view);
 

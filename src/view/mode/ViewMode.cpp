@@ -8,7 +8,7 @@
 #include "ViewMode.h"
 #include "../audioview/AudioView.h"
 #include "../sidebar/SideBar.h"
-#include "../../TsunamiWindow.h"
+#include "../TsunamiWindow.h"
 
 ViewMode::ViewMode(AudioView *_view) {
 	view = _view;

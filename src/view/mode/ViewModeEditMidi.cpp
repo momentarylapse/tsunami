@@ -15,6 +15,7 @@
 #include "../painter/GridPainter.h"
 #include "../painter/MidiPainter.h"
 #include "../sidebar/SideBar.h"
+#include "../TsunamiWindow.h"
 #include "../../module/SignalChain.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../lib/os/time.h"
@@ -31,7 +32,6 @@
 #include "../../device/DeviceManager.h"
 #include "../../device/stream/MidiInput.h"
 #include "../../module/midi/MidiAccumulator.h"
-#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);

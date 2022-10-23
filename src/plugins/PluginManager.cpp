@@ -11,7 +11,6 @@
 #include "ProfileManager.h"
 #include "TsunamiPlugin.h"
 #include "../Tsunami.h"
-#include "../TsunamiWindow.h"
 #include "../Session.h"
 #include "../view/helper/Slider.h"
 #include "../view/helper/Drawing.h"
@@ -61,6 +60,7 @@
 #include "../view/painter/GridPainter.h"
 #include "../view/painter/MidiPainter.h"
 #include "../view/painter/MultiLinePainter.h"
+#include "../view/TsunamiWindow.h"
 #include "../lib/base/callable.h"
 #include "../lib/os/filesystem.h"
 

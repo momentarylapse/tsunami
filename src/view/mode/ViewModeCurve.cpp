@@ -10,11 +10,11 @@
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../sidebar/SideBar.h"
+#include "../TsunamiWindow.h"
 #include "../../data/Curve.h"
 #include "../../data/Track.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
-#include "../../TsunamiWindow.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)

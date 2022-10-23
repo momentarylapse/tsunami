@@ -559,9 +559,9 @@ sources = [
 	'src/view/ColorScheme.cpp',
 	'src/view/HoverData.cpp',
 	'src/view/MouseDelayPlanner.cpp',
+	'src/view/TsunamiWindow.cpp',
 	'src/Session.cpp',
-	'src/Tsunami.cpp',
-	'src/TsunamiWindow.cpp'
+	'src/Tsunami.cpp'
 ]
 
 

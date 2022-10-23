@@ -13,6 +13,7 @@
 #include "../dialog/QuestionDialog.h"
 #include "../mode/ViewModeEditMidi.h"
 #include "../module/ConfigPanel.h"
+#include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
@@ -25,7 +26,6 @@
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../plugins/PluginManager.h"
 #include "../../Session.h"
-#include "../../TsunamiWindow.h"
 #include "../../EditModes.h"
 
 //int get_track_index_save(Song *song, Track *t);

@@ -1393,13 +1393,13 @@
     <ClCompile Include="src\view\MouseDelayPlanner.cpp">
       <Filter>src\view</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\TsunamiWindow.cpp">
+      <Filter>src\view</Filter>
+    </ClCompile>
     <ClCompile Include="src\Session.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Tsunami.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TsunamiWindow.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2742,6 +2742,9 @@
     <ClInclude Include="src\view\MouseDelayPlanner.h">
       <Filter>src\view</Filter>
     </ClInclude>
+    <ClInclude Include="src\view\TsunamiWindow.h">
+      <Filter>src\view</Filter>
+    </ClInclude>
     <ClInclude Include="src\EditModes.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -2749,9 +2752,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Tsunami.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TsunamiWindow.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

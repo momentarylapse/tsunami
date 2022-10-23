@@ -580,9 +580,9 @@
     <ClCompile Include="src\view\ColorScheme.cpp" />
     <ClCompile Include="src\view\HoverData.cpp" />
     <ClCompile Include="src\view\MouseDelayPlanner.cpp" />
+    <ClCompile Include="src\view\TsunamiWindow.cpp" />
     <ClCompile Include="src\Session.cpp" />
     <ClCompile Include="src\Tsunami.cpp" />
-    <ClCompile Include="src\TsunamiWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\action\bar\Action__ScaleData.h" />
@@ -1031,10 +1031,10 @@
     <ClInclude Include="src\view\ColorScheme.h" />
     <ClInclude Include="src\view\HoverData.h" />
     <ClInclude Include="src\view\MouseDelayPlanner.h" />
+    <ClInclude Include="src\view\TsunamiWindow.h" />
     <ClInclude Include="src\EditModes.h" />
     <ClInclude Include="src\Session.h" />
     <ClInclude Include="src\Tsunami.h" />
-    <ClInclude Include="src\TsunamiWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

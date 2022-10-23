@@ -32,6 +32,7 @@
 #include "../painter/GridPainter.h"
 #include "../sidebar/SideBar.h"
 #include "../bottombar/BottomBar.h"
+#include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
@@ -57,7 +58,6 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
 
 
 const int AudioView::SNAPPING_DIST = 8;

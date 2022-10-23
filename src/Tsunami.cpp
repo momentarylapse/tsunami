@@ -18,7 +18,7 @@
 #include "module/audio/PeakMeter.h"
 #include "module/midi/MidiEffect.h"
 #include "module/synthesizer/Synthesizer.h"
-#include "TsunamiWindow.h"
+#include "view/TsunamiWindow.h"
 #include "Session.h"
 #include "EditModes.h"
 #include "storage/Storage.h"

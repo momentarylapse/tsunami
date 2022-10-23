@@ -6,12 +6,12 @@
  */
 
 #include "TimeTrackAddDialog.h"
+#include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../action/ActionManager.h"
 #include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
 #include "../../Session.h"
 
 

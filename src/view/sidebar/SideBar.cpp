@@ -18,9 +18,9 @@
 #include "CaptureConsole.h"
 #include "../audioview/AudioView.h"
 #include "../bottombar/BottomBar.h"
+#include "../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
-#include "../../TsunamiWindow.h"
 
 extern const int CONFIG_PANEL_WIDTH;
 

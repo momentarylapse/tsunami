@@ -7,7 +7,6 @@
 
 #include "Session.h"
 #include "EditModes.h"
-#include "TsunamiWindow.h"
 #include "stuff/Log.h"
 #include "storage/Storage.h"
 #include "plugins/TsunamiPlugin.h"
@@ -28,6 +27,7 @@
 #include "view/sidebar/TrackConsole.h"
 #include "view/bottombar/BottomBar.h"
 #include "view/bottombar/MixingConsole.h"
+#include "view/TsunamiWindow.h"
 
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;

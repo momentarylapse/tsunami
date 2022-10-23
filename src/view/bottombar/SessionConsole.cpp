@@ -6,12 +6,12 @@
  */
 
 #include "SessionConsole.h"
+#include "../TsunamiWindow.h"
 #include "../../lib/os/filesystem.h"
 #include "../../stuff/SessionManager.h"
 #include "../../stuff/BackupManager.h"
 #include "../../storage/Storage.h"
 #include "../../data/Song.h"
-#include "../../TsunamiWindow.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 

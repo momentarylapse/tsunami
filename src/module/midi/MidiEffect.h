@@ -32,7 +32,7 @@ public:
 
 	virtual void _cdecl process(MidiEventBuffer &midi) {};
 
-	void process_layer(TrackLayer *l, SongSelection &sel);
+	void process_layer(TrackLayer *l, const SongSelection &sel);
 
 	class Output : public Port {
 	public:

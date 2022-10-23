@@ -8,18 +8,17 @@
 #include "TsunamiWindow.h"
 #include "Session.h"
 #include "EditModes.h"
-#include "module/audio/SongRenderer.h"
 #include "Tsunami.h"
 #include "data/base.h"
 #include "data/Track.h"
 #include "data/TrackLayer.h"
 #include "data/Song.h"
 #include "data/SongSelection.h"
+#include "data/audio/AudioBuffer.h"
 #include "data/rhythm/Bar.h"
 #include "action/ActionManager.h"
-#include "action/track/buffer/ActionTrackEditBuffer.h"
-#include "action/song/ActionSongMoveSelection.h"
-#include "device/DeviceManager.h"
+#include "command/song/Export.h"
+#include "command/Unsorted.h"
 #include "module/audio/AudioEffect.h"
 #include "module/audio/AudioSource.h"
 #include "module/midi/MidiEffect.h"
@@ -33,7 +32,6 @@
 #include "stuff/BackupManager.h"
 #include "stuff/SessionManager.h"
 #include "view/audioview/AudioView.h"
-#include "view/audioview/graph/AudioViewLayer.h"
 #include "view/audioview/graph/AudioViewTrack.h"
 #include "view/dialog/NewDialog.h"
 #include "view/dialog/HelpDialog.h"
@@ -50,12 +48,9 @@
 #include "view/dialog/QuestionDialog.h"
 #include "view/dialog/BufferCompressionDialog.h"
 #include "view/bottombar/BottomBar.h"
-#include "view/bottombar/MiniBar.h"
-//#include "View/BottomBar/DeviceConsole.h"
 #include "view/sidebar/SideBar.h"
 #include "view/sidebar/CaptureConsole.h"
 #include "view/mode/ViewModeDefault.h"
-#include "view/mode/ViewModeEditMidi.h"
 #include "view/mode/ViewModeEdit.h"
 #include "view/mode/ViewModeCapture.h"
 #include "view/helper/Slider.h"
@@ -141,19 +136,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		auto dlg = new BufferCompressionDialog(this);
 		hui::fly(dlg, [dlg, this] {
 			if (dlg->codec == "")
-				return;
-			for (auto l: song->layers())
-				if (view->sel.has(l))
-					for (auto &buf: l->buffers)
-						if (buf.range().overlaps(view->sel.range())) {
-							shared<AudioBuffer::Compressed> comp = new AudioBuffer::Compressed;
-							comp->codec = dlg->codec;
-							comp->data = session->storage->compress(buf, comp->codec);
-							if (comp->data.num > 0) {
-								buf.compressed = comp;
-								l->notify();
-							}
-						}
+				song_compress_buffers(song, view->sel, dlg->codec);
 		});
 	});
 
@@ -453,28 +436,6 @@ void TsunamiWindow::on_add_midi_track() {
 	song->add_track(SignalType::MIDI);
 }
 
-void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nullptr) {
-	const int chunk_size = 1 << 12;
-	int offset = 0;
-
-	while (offset < len) {
-		if (prog)
-			prog->set((float) offset / len);
-
-		Range r = Range::to(offset, min(offset + chunk_size, len));
-
-		AudioBuffer tbuf;
-		tbuf.set_as_ref(buf, offset, r.length);
-
-		out->read_audio(tbuf);
-
-		offset += chunk_size;
-		if (prog)
-			if (prog->is_cancelled())
-				break;
-	}
-}
-
 
 void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range();
@@ -483,42 +444,20 @@ void TsunamiWindow::on_track_render() {
 		return;
 	}
 
-	auto do_render_track = [this, range] (const base::set<const TrackLayer*> &layers) {
-		SongRenderer renderer(song);
-		renderer.set_range(range);
-		renderer.allow_layers(layers);
-
-		auto p = ownify(new ProgressCancelable(_(""), this));
-
-		AudioBuffer buf;
-		buf.resize(range.length);
-
-		write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
-
-		song->begin_action_group(_("render track"));
-		Track *t = song->add_track(SignalType::AUDIO_STEREO);
-		AudioBuffer buf_track;
-		auto *a = t->layers[0]->edit_buffers(buf_track, range);
-		buf_track.set(buf, 0, 1);
-
-		t->layers[0]->edit_buffers_finish(a);
-		song->end_action_group();
-	};
-
 	if (view->get_playable_layers() == view->sel.layers()) {
-		do_render_track(view->sel.layers());
+		song_render_track(song, range, view->sel.layers(), this);
 	} else {
 		QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
 				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
-				[this, do_render_track] (int answer) {
+				[this, range] (int answer) {
 					if (answer < 0)
 						return;
 
 					if (answer == 1)
-						do_render_track(view->sel.layers());
+						song_render_track(song, range, view->sel.layers(), this);
 					else
-						do_render_track(view->get_playable_layers());
+						song_render_track(song, range, view->get_playable_layers(), this);
 		});
 	}
 
@@ -527,80 +466,20 @@ void TsunamiWindow::on_track_render() {
 void TsunamiWindow::on_track_delete() {
 	auto tracks = view->sel.tracks();
 	if (tracks.num > 0) {
-		song->begin_action_group(_("delete tracks"));
-		for (auto t: tracks) {
-			try {
-				song->delete_track(const_cast<Track*>(t));
-			} catch (Exception &e) {
-				session->e(e.message());
-			}
-		}
-		song->end_action_group();
+		song_delete_tracks(song, tracks);
 	} else {
 		session->e(_("No track selected"));
 	}
 }
 
-Array<Track*> selected_tracks_sorted(AudioView *view);
-
 void TsunamiWindow::on_track_group() {
 	auto tracks = selected_tracks_sorted(view);
-	if (tracks.num > 0) {
-		song->begin_action_group(_("group tracks"));
-		int first_index = tracks[0]->get_index();
-		auto group = song->add_track(SignalType::GROUP, first_index);
-		// add to group
-		for (auto t: tracks)
-			t->set_send_target(group);
-		// move into connected group
-		foreachi (auto t, tracks, i)
-			t->move(first_index + i + 1);
-		song->end_action_group();
-	}
-}
-
-
-Track *track_top_group(Track *t) {
-	if (t->send_target)
-		return track_top_group(t->send_target);
-	if (t->type == SignalType::GROUP)
-		return t;
-	return nullptr;
-}
-
-bool track_is_in_group(Track *t, Track *group) {
-	if (t == group)
-		return true;
-	if (t->send_target == group)
-		return true;
-	if (t->send_target)
-		return track_is_in_group(t->send_target, group);
-	return false;
-}
-
-Array<Track*> track_group_members(Track *group, bool with_self) {
-	Array<Track*> tracks;
-	for (auto t: weak(group->song->tracks))
-		if ((t != group) or with_self)
-			if (track_is_in_group(t, group))
-				tracks.add(t);
-	return tracks;
+	song_group_tracks(song, tracks);
 }
 
 void TsunamiWindow::on_track_ungroup() {
 	auto tracks = selected_tracks_sorted(view);
-	if (tracks.num > 0) {
-		song->begin_action_group(_("ungroup tracks"));
-		foreachb (auto t, tracks) {
-			auto group = track_top_group(t);
-			if (group and (group != t)) {
-				auto members = track_group_members(group, true);
-				t->set_send_target(nullptr);
-				t->move(members.back()->get_index());
-			}
-		}
-		song->end_action_group();
-	}
+	song_ungroup_tracks(song, tracks);
 }
 
 void TsunamiWindow::on_track_edit() {
@@ -642,19 +521,7 @@ void TsunamiWindow::on_buffer_delete() {
 }
 
 void TsunamiWindow::on_buffer_make_movable() {
-	song->begin_action_group("make movable");
-	for (auto l: song->layers())
-		if (view->sel.has(l)) {
-			Array<Range> ranges;
-			for (auto &buf: l->buffers)
-				if (buf.range().overlaps(view->sel.range()))
-					ranges.add(buf.range());
-			for (auto &r: ranges) {
-				auto s = SongSelection::from_range(song, r).filter({l}).filter(0);
-				song->create_samples_from_selection(s, true);
-			}
-		}
-	song->end_action_group();
+	song_make_buffers_movable(song, view->sel);
 }
 
 void TsunamiWindow::on_layer_midi_mode_linear() {
@@ -769,66 +636,11 @@ void TsunamiWindow::on_paste_time() {
 	view->set_message(_("pasted (time)"));
 }
 
-void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win) {
-	auto p = ownify(new Progress(_("applying effect"), win));
-	fx->reset_state();
-
-	AudioBuffer buf;
-	auto *a = l->edit_buffers(buf, r);
-
-	if (fx->apply_to_whole_buffer) {
-		fx->process(buf);
-	} else {
-
-		int chunk_size = 2048;
-		int done = 0;
-		while (done < r.length) {
-			p->set((float) done / (float) r.length);
-
-			auto ref = buf.ref(done, min(done + chunk_size, r.length));
-			fx->process(ref);
-			done += chunk_size;
-		}
-	}
-
-	l->edit_buffers_finish(a);
-}
-
-void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::Window *win) {
-	auto p = ownify(new Progress(_("applying source"), win));
-	fx->reset_state();
-	
-	AudioBuffer buf;
-	auto *a = l->edit_buffers(buf, r);
-	buf.set_zero();
-
-	int chunk_size = 2048;
-	int done = 0;
-	while (done < r.length) {
-		p->set((float) done / (float) r.length);
-
-		auto ref = buf.ref(done, min(done + chunk_size, r.length));
-		fx->read(ref);
-		done += chunk_size;
-	}
-
-	l->edit_buffers_finish(a);
-}
-
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
 
 	configure_module(this, fx, [this, fx] {
-		int n_layers = 0;
-		song->begin_action_group(_("apply audio fx"));
-		for (Track *t: weak(song->tracks))
-			for (auto *l: weak(t->layers))
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-					fx_process_layer(l, view->sel.range(), fx, this);
-					n_layers ++;
-				}
-		song->end_action_group();
-
+		int n_layers = song_apply_audio_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
 	});
@@ -838,16 +650,7 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 	auto s = CreateAudioSource(session, name);
 
 	configure_module(this, s, [s, this] {
-		int n_layers = 0;
-		song->begin_action_group(_("audio source"));
-		for (Track *t: weak(song->tracks))
-			for (auto *l: weak(t->layers))
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-					source_process_layer(l, view->sel.range(), s, this);
-					n_layers ++;
-				}
-		song->end_action_group();
-
+		int n_layers = song_apply_audio_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
 	});
@@ -857,18 +660,7 @@ void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
 	configure_module(this, fx, [fx, this] {
-		int n_layers = 0;
-
-		song->begin_action_group(_("apply midi fx"));
-		for (Track *t: weak(song->tracks))
-			for (auto *l: weak(t->layers))
-				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-					fx->reset_state();
-					fx->process_layer(l, view->sel);
-					n_layers ++;
-				}
-		song->end_action_group();
-
+		int n_layers = song_apply_midi_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
 	});
@@ -878,21 +670,7 @@ void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
 	configure_module(this, s, [s, this] {
-		int n_layers = 0;
-
-		song->begin_action_group(_("midi source"));
-		for (Track *t: weak(song->tracks))
-			for (auto *l: weak(t->layers))
-				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-					s->reset_state();
-					MidiEventBuffer buf;
-					buf.samples = view->sel.range().length;
-					s->read(buf);
-					l->insert_midi_data(view->sel.range().offset, midi_events_to_notes(buf));
-					n_layers ++;
-				}
-		song->end_action_group();
-
+		int n_layers = song_apply_midi_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
 	});
@@ -912,15 +690,8 @@ void TsunamiWindow::on_delete() {
 void TsunamiWindow::on_delete_shift() {
 	if (view->sel.is_empty())
 		return;
-	song->begin_action_group(_("delete shift"));
-	song->delete_selection(view->sel);
-	auto sel = SongSelection::from_range(song, Range::to(view->cursor_range().end(), 2000000000)).filter(view->sel.layers());
-	auto a = new ActionSongMoveSelection(song, sel, true);
-	a->set_param_and_notify(song, -view->sel.range().length);
-	song->execute(a);
-	song->end_action_group();
-
-	view->set_cursor_pos(view->cursor_range().start());
+	song_delete_shift(song, view->sel);
+	view->set_cursor_pos(view->sel.range().start());
 }
 
 void TsunamiWindow::on_sample_manager() {
@@ -1259,13 +1030,10 @@ void TsunamiWindow::on_render_export_selection() {
 	});
 }
 
-shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel);
-
 void TsunamiWindow::on_export_selection() {
 	session->storage->ask_save(this, [this] (const Path &filename) {
 		if (filename) {
-			auto s = copy_song_from_selection(song, view->sel);
-			if (session->storage->save(s.get(), filename))
+			if (export_selection(song, view->sel, filename))
 				view->set_message(_("file exported"));
 		}
 	});

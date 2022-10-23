@@ -95,6 +95,8 @@ set(SOURCE
 	src/command/audio/BufferInterpolator.cpp
 	src/command/audio/BufferPitchShift.cpp
 	src/command/song/Diff.cpp
+	src/command/song/Export.cpp
+	src/command/Unsorted.cpp
 	src/data/audio/AudioBuffer.cpp
 	src/data/audio/RingBuffer.cpp
 	src/data/midi/Clef.cpp

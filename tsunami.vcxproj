@@ -205,6 +205,8 @@
     <ClCompile Include="src\command\audio\BufferInterpolator.cpp" />
     <ClCompile Include="src\command\audio\BufferPitchShift.cpp" />
     <ClCompile Include="src\command\song\Diff.cpp" />
+    <ClCompile Include="src\command\song\Export.cpp" />
+    <ClCompile Include="src\command\Unsorted.cpp" />
     <ClCompile Include="src\data\audio\AudioBuffer.cpp" />
     <ClCompile Include="src\data\audio\RingBuffer.cpp" />
     <ClCompile Include="src\data\midi\Clef.cpp" />
@@ -672,6 +674,8 @@
     <ClInclude Include="src\command\audio\BufferInterpolator.h" />
     <ClInclude Include="src\command\audio\BufferPitchShift.h" />
     <ClInclude Include="src\command\song\Diff.h" />
+    <ClInclude Include="src\command\song\Export.h" />
+    <ClInclude Include="src\command\Unsorted.h" />
     <ClInclude Include="src\data\audio\AudioBuffer.h" />
     <ClInclude Include="src\data\audio\RingBuffer.h" />
     <ClInclude Include="src\data\midi\Clef.h" />

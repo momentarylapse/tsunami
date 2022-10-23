@@ -10,9 +10,7 @@
 #include "Track.h"
 #include "TrackLayer.h"
 #include "Sample.h"
-#include "CrossFade.h"
 #include "SongSelection.h"
-#include "TrackMarker.h"
 #include "rhythm/Bar.h"
 #include "../action/ActionManager.h"
 #include "../action/bar/ActionBarAdd.h"
@@ -293,32 +291,6 @@ void Song::delete_selected_samples(const SongSelection &sel) {
 	action_manager->group_end();
 }
 
-/*Song::Layer *Song::addLayer(const string &name, int index) {
-	return (Song::Layer*)execute(new ActionLayerAdd(name, index));
-}
-
-void Song::deleteLayer(int index) {
-	if (layers.num < 2)
-		throw Error(_("At least one layer has to exist."));
-	execute(new ActionLayerDelete(index));
-}
-
-void Song::mergeLayers(int source, int target) {
-	if (layers.num < 2)
-		throw Error(_("At least one layer has to exist."));
-	if (source == target)
-		throw Error(_("Can't merge a layer with itself."));
-	execute(new ActionLayerMerge(source, target));
-}
-
-void Song::moveLayer(int source, int target) {
-	execute(new ActionLayerMove(source, target));
-}
-
-void Song::renameLayer(int index, const string &name) {
-	execute(new ActionLayerRename(index, name));
-}*/
-
 void Song::delete_track(Track *track) {
 	if (tracks.num <= 1)
 		throw Error(_("At least one track has to exist."));
@@ -434,56 +406,3 @@ Array<TrackLayer*> Song::layers() const {
 	return layers;
 }
 
-
-
-shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel) {
-	Song *ss = new Song(song->session, song->sample_rate);
-	ss->tags = song->tags;
-	for (Bar *b: weak(song->bars))
-		if (sel.range().covers(b->range())) {
-			int before = b->range().offset - sel.range().offset;
-			if (ss->bars.num == 0 and before > 0)
-				ss->bars.add(new Bar(before, 0, 0)); // pause
-			ss->bars.add(b->copy());
-		}
-	for (Track *t: weak(song->tracks)) {
-		if (!sel.has(t))
-			continue;
-		Track *tt = new Track(ss, t->type, (Synthesizer*)t->synth->copy());
-		ss->tracks.add(tt);
-		tt->name = t->name;
-		tt->volume = t->volume;
-		tt->panning = t->panning;
-		tt->muted = t->muted;
-		for (auto *f: weak(t->fx))
-			tt->fx.add((AudioEffect*)f->copy());
-		for (auto *f: weak(t->midi_fx))
-			tt->midi_fx.add((MidiEffect*)f->copy());
-		tt->synth = (Synthesizer*)t->synth->copy();
-		tt->instrument = t->instrument;
-		tt->channels = t->channels;
-		for (TrackLayer *l: weak(t->layers)) {
-			if (!sel.has(l))
-				continue;
-			auto *ll = new TrackLayer(tt);
-			tt->layers.add(ll);
-			for (auto *n: weak(l->midi))
-				if (sel.has(n))
-					ll->midi.add(n->copy(-sel.range().offset));
-			for (auto &b: l->buffers) {
-				if (b.range().overlaps(sel.range())) {
-					Range ri = b.range() and sel.range();
-					AudioBuffer bb;
-					l->read_buffers(bb, ri, true);
-					ll->buffers.add(bb);
-					ll->buffers.back().offset = ri.offset - sel.range().offset;
-				}
-			}
-			for (auto *m: weak(l->markers))
-				if (sel.has(m))
-					ll->markers.add(m->copy(- sel.range().offset));
-			ll->fades = l->fades; // TODO...
-		}
-	}
-	return ss;
-}

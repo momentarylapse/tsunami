@@ -45,7 +45,7 @@ void MidiEffect::__delete__() {
 }
 
 
-void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
+void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel) {
 	msg_error("TODO: MidiEffect.process_layer()");
 	/*MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 

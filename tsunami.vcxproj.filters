@@ -265,6 +265,9 @@
     <ClCompile Include="src\data\audio\BufferInterpolator.cpp">
       <Filter>src\data\audio</Filter>
     </ClCompile>
+    <ClCompile Include="src\data\audio\BufferPitchShift.cpp">
+      <Filter>src\data\audio</Filter>
+    </ClCompile>
     <ClCompile Include="src\data\audio\RingBuffer.cpp">
       <Filter>src\data\audio</Filter>
     </ClCompile>
@@ -1657,6 +1660,9 @@
       <Filter>src\data\audio</Filter>
     </ClInclude>
     <ClInclude Include="src\data\audio\BufferInterpolator.h">
+      <Filter>src\data\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\data\audio\BufferPitchShift.h">
       <Filter>src\data\audio</Filter>
     </ClInclude>
     <ClInclude Include="src\data\audio\RingBuffer.h">

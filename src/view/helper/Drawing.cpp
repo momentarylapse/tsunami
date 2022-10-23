@@ -82,4 +82,15 @@ void draw_cursor_hover(Painter *c, const string &msg, const vec2 &m, const rect 
 	//c->set_font("", -1, false, false);
 }
 
+void draw_arrow(Painter *p, const vec2 &a, const vec2 &b) {
+	float l = (b-a).length();
+	if (l < 0.0001f)
+		return;
+	vec2 dir = (b-a) / l;
+	vec2 e = vec2(dir.y, -dir.x);
+	float r = min(l, 18.0f);
+	p->draw_line(a, b);
+	p->draw_polygon({b, b - r * (dir + e*0.4f), b - r * (dir - e*0.4f)});
+}
+
 

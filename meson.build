@@ -183,6 +183,7 @@ sources = [
 	'src/action/ActionMergable.cpp',
 	'src/data/audio/AudioBuffer.cpp',
 	'src/data/audio/BufferInterpolator.cpp',
+	'src/data/audio/BufferPitchShift.cpp',
 	'src/data/audio/RingBuffer.cpp',
 	'src/data/midi/Clef.cpp',
 	'src/data/midi/Instrument.cpp',

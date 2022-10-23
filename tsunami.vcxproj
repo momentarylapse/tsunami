@@ -204,6 +204,7 @@
     <ClCompile Include="src\action\ActionMergable.cpp" />
     <ClCompile Include="src\data\audio\AudioBuffer.cpp" />
     <ClCompile Include="src\data\audio\BufferInterpolator.cpp" />
+    <ClCompile Include="src\data\audio\BufferPitchShift.cpp" />
     <ClCompile Include="src\data\audio\RingBuffer.cpp" />
     <ClCompile Include="src\data\midi\Clef.cpp" />
     <ClCompile Include="src\data\midi\Instrument.cpp" />
@@ -670,6 +671,7 @@
     <ClInclude Include="src\action\ActionMergable.h" />
     <ClInclude Include="src\data\audio\AudioBuffer.h" />
     <ClInclude Include="src\data\audio\BufferInterpolator.h" />
+    <ClInclude Include="src\data\audio\BufferPitchShift.h" />
     <ClInclude Include="src\data\audio\RingBuffer.h" />
     <ClInclude Include="src\data\midi\Clef.h" />
     <ClInclude Include="src\data\midi\Instrument.h" />

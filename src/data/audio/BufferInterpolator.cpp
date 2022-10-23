@@ -10,8 +10,9 @@
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 
+namespace BufferInterpolator {
 
-void BufferInterpolator::interpolate_channel_linear(Array<float> &in, Array<float> &out) {
+void interpolate_channel_linear(Array<float> &in, Array<float> &out) {
 	out[0] = in[0];
 	out.back() = in.back();
 
@@ -26,14 +27,14 @@ void BufferInterpolator::interpolate_channel_linear(Array<float> &in, Array<floa
 	}
 }
 
-double BufferInterpolator::cubic_inter(double A, double B, double C, double D, float t) {
+double cubic_inter(double A, double B, double C, double D, float t) {
 	double a = D/2 - C*3.0/2 + B*3.0/2 - A/2;
 	double b = A - B*5.0/2 + C*2 - D/2;
 	double c = (C-A)/2;
 	return a*t*t*t + b*t*t + c*t + B;
 }
 
-void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float> &out) {
+void interpolate_channel_cubic(Array<float> &in, Array<float> &out) {
 	if (in.num < 3) {
 		interpolate_channel_linear(in, out);
 		return;
@@ -56,7 +57,7 @@ void BufferInterpolator::interpolate_channel_cubic(Array<float> &in, Array<float
 }
 
 
-void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
+void interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
 	Array<complex> z;
 
 	fft::r2c(in, z);
@@ -67,7 +68,7 @@ void BufferInterpolator::interpolate_channel_fourier(Array<float> &in, Array<flo
 	out.resize(size);
 }
 
-void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out, Method method) {
+void interpolate_channel(Array<float> &in, Array<float> &out, Method method) {
 	if (method == Method::LINEAR) {
 		interpolate_channel_linear(in, out);
 	} else if (method == Method::CUBIC) {
@@ -79,9 +80,11 @@ void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out
 	}
 }
 
-void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, Method method) {
+void interpolate(AudioBuffer &in, AudioBuffer &out, Method method) {
 	out.set_channels(in.channels);
 	out.offset = in.offset;
 	for (int i=0; i<in.channels; i++)
 		interpolate_channel(in.c[i], out.c[i], method);
+}
+
 }

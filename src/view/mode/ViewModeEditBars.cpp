@@ -134,6 +134,27 @@ void ViewModeEditBars::on_key_down(int k) {
 			}
 			song->end_action_group();
 		}
+	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
+		if (k == hui::KEY_DELETE) {
+			auto h = view->hover();
+			if (h.type != HoverData::Type::BAR_GAP)
+				return;
+			int index = h.index;
+			if (index < 1)
+				return;
+
+			if (index == song->bars.num) {
+				// last one
+				song->delete_bar(index - 1, false);
+			} else {
+				song->begin_action_group("delete bar");
+				auto bp = *(BarPattern*)(weak(song->bars)[index - 1]);
+				bp.length += song->bars[index]->length;
+				song->delete_bar(index, false);
+				song->edit_bar(index - 1, bp, Bar::EditMode::IGNORE);
+				song->end_action_group();
+			}
+		}
 	}
 }
 
@@ -279,7 +300,7 @@ string ViewModeEditBars::get_tip() {
 	if (edit_mode == EditMode::RUBBER)
 		return "1. select bars    2. move handle on the right    3. scale [Return]    track [Alt+↑,↓]";
 	if (edit_mode == EditMode::ADD_AND_SPLIT)
-		return "split/insert bar [click]    move gap [drag'n'drop]    track [Alt+↑,↓]";
+		return "split/insert bar [click]    move gap [drag'n'drop]    delete/merge [delete]    track [Alt+↑,↓]";
 	//if (edit_mode == EditMode::SELECT)
 	return "track [Alt+↑,↓]";
 }

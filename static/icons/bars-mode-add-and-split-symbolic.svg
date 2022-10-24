@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14, custom)"
-   sodipodi:docname="audio-mode-add-and-split-symbolic.svg"
+   sodipodi:docname="bars-mode-add-and-split-symbolic.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,13 +24,13 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="17.598686"
-     inkscape:cx="13.239625"
+     inkscape:cx="4.0628033"
      inkscape:cy="14.77383"
-     inkscape:window-width="1920"
+     inkscape:window-width="1454"
      inkscape:window-height="1011"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-x="20"
+     inkscape:window-y="20"
+     inkscape:window-maximized="0"
      inkscape:current-layer="text2168"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -50,7 +50,28 @@
        originy="0" />
   </sodipodi:namedview>
   <defs
-     id="defs2" />
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="marker1954"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow2"
+       markerWidth="4.5"
+       markerHeight="3"
+       viewBox="0 0 7.7 5.6"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid"
+       markerUnits="strokeWidth">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1952" />
+    </marker>
+  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -61,21 +82,22 @@
        id="text2168"
        style="font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583">
       <path
-         style="color:#000000;fill:#000000;-inkscape-stroke:none"
-         d="m 41.761719,43.910156 v 3.705078 h 0.529297 v -3.705078 z"
-         id="path10659" />
+         id="path10659"
+         style="color:#000000;fill:#000000;stroke-width:0.256411;opacity:0.36128621"
+         d="M 41.756162 44.444099 L 41.756162 47.92399 L 42.285328 47.92399 L 42.285328 46.304451 L 48.105645 46.288948 L 48.105645 47.85216 L 48.634811 47.85216 L 48.634811 44.458052 L 48.105645 44.458052 L 48.105645 45.759265 L 42.285328 45.774768 L 42.285328 44.444099 L 41.756162 44.444099 z " />
       <path
-         style="color:#000000;font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;fill:#000000;stroke-width:0.212154;-inkscape-stroke:none"
-         d="m 44.937238,44.54278 v 2.38218 h 0.529297 v -2.38218 z"
-         id="path10659-3" />
+         style="color:#000000;font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000000;stroke-width:0.22252;-inkscape-stroke:none"
+         d="m 44.914804,44.745947 v 2.620673 h 0.529297 v -2.620673 z"
+         id="path10659-36" />
       <path
-         style="color:#000000;font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;fill:#000000;stroke-width:0.212154;-inkscape-stroke:none"
-         d="m 46.39665,45.426648 -2.38218,2.25e-4 5.1e-5,0.529297 2.38218,-2.25e-4 z"
-         id="path10659-3-6" />
+         id="path10659-3"
+         style="color:#000000;font-size:10.5833px;line-height:1.25;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000000;stroke-width:0.200436"
+         d="m 44.946664,41.806702 v 0.778247 h -0.835091 v 0.529167 h 0.835091 v 0.818555 h 0.529684 v -0.818555 h 0.797367 v -0.529167 h -0.797367 v -0.778247 z" />
       <path
-         style="color:#000000;fill:#000000;-inkscape-stroke:none"
-         d="m 48.111328,43.910156 v 3.705078 h 0.529297 v -3.705078 z"
-         id="path10659-6" />
+         style="opacity:1;fill:none;stroke:#000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker1954);marker-end:url(#marker1954)"
+         d="m 44.068325,48.937108 2.223193,-0.01839"
+         id="path1203"
+         sodipodi:nodetypes="cc" />
     </g>
   </g>
 </svg>

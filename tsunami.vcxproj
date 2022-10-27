@@ -408,6 +408,7 @@
     <ClCompile Include="src\lib\os\msg.cpp" />
     <ClCompile Include="src\lib\os\path.cpp" />
     <ClCompile Include="src\lib\os\stream.cpp" />
+    <ClCompile Include="src\lib\os\terminal.cpp" />
     <ClCompile Include="src\lib\os\time.cpp" />
     <ClCompile Include="src\lib\pattern\Observable.cpp" />
     <ClCompile Include="src\lib\threads\Mutex.cpp" />
@@ -857,6 +858,7 @@
     <ClInclude Include="src\lib\os\msg.h" />
     <ClInclude Include="src\lib\os\path.h" />
     <ClInclude Include="src\lib\os\stream.h" />
+    <ClInclude Include="src\lib\os\terminal.h" />
     <ClInclude Include="src\lib\os\time.h" />
     <ClInclude Include="src\lib\pattern\Observable.h" />
     <ClInclude Include="src\lib\threads\Mutex.h" />

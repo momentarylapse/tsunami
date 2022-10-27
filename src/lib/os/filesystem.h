@@ -32,7 +32,4 @@ Array<Path> search(const Path &dir, const string &filter, const string &options)
 
 }
 
-
-string shell_execute(const string &cmd);
-
 #endif

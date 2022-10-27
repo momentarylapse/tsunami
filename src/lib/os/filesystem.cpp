@@ -294,33 +294,3 @@ Array<Path> search(const Path &dir, const string &filter, const string &options)
 }
 
 
-
-string shell_execute(const string &cmd) {
-#ifdef OS_LINUX
-	// thread safe...
-	char *s = new char[cmd.num + 1];
-	memcpy(s, cmd.data, cmd.num);
-	s[cmd.num] = 0;
-	FILE *f = popen(s, "r");
-	delete[] s;
-	//FILE *f = popen(cmd.c_str(), "r");
-	string buffer;
-
-	while (true) {
-		int c = fgetc(f);
-		if (c == EOF)
-			break;
-		buffer.add(c);
-	}
-
-	int r = pclose(f);
-//	int r = system(cmd.c_str());
-	if (r != 0)
-		throw Exception("failed to run shell command");
-	return buffer;
-#else
-	return "";
-#endif
-}
-
-

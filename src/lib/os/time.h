@@ -1,5 +1,5 @@
 /*
- * HuiTimer.h
+ * time.h
  *
  *  Created on: 25.06.2013
  *      Author: michi
@@ -29,4 +29,4 @@ void sleep(float duration);
 
 }
 
-#endif /* HUITIMER_H_ */
+#endif /* SRC_LIB_OS_TIME_H_ */

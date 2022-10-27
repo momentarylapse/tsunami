@@ -10,6 +10,7 @@
 #include "UnitTest.h"
 #include "../lib/os/msg.h"
 #include "../lib/os/time.h"
+#include "../lib/os/terminal.h"
 #include "../lib/hui/hui.h"
 #include "../data/audio/AudioBuffer.h"
 #include <math.h>
@@ -37,7 +38,7 @@ UnitTest::~UnitTest() {
 }
 
 void UnitTest::run(const string &filter, TestProtocoll &protocoll) {
-	printf("\x1b[1m==  %s  ==\x1b[0m\n", name.c_str());
+	msg_write(format("%s==  %s  ==%s", os::terminal::BOLD, name, os::terminal::END));
 	for (auto &t: tests()) {
 		if (!filter_match(filter, t.name))
 			continue;
@@ -46,12 +47,12 @@ void UnitTest::run(const string &filter, TestProtocoll &protocoll) {
 		try {
 			t.f();
 			//msg_write("  ok");
-			printf("  \x1b[0;32m ok \x1b[0m\n");
+			msg_write(os::terminal::GREEN + "   ok " + os::terminal::END);
 		} catch(Failure &e) {
-			printf("\x1b[0;31m");
+			printf(os::terminal::RED.c_str());
 			msg_error(e.message());
 			protocoll.num_failed ++;
-			printf("\x1b[0m");
+			printf(os::terminal::END.c_str());
 		}
 		protocoll.num_tests_run ++;
 	}
@@ -190,15 +191,15 @@ void UnitTest::run_all(const string &filter) {
 	msg_write("\n");
 	if (protocoll.num_failed > 0) {
 
-		printf("\x1b[1;31m");
+		printf(os::terminal::RED.c_str());
 		msg_error(format("%d out of %d tests failed", protocoll.num_failed, protocoll.num_tests_run));
-		printf("\x1b[0m");
+		printf(os::terminal::END.c_str());
 	} else {
-		printf("\x1b[1;32m");
+		printf(os::terminal::GREEN.c_str());
 		msg_write("-----------------------------");
 		msg_write(format("all %d tests succeeded", protocoll.num_tests_run));
 		msg_write("-----------------------------");
-		printf("\x1b[0m");
+		printf(os::terminal::END.c_str());
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "../../os/msg.h"
 #include "../../os/CommandLineParser.h"
 #include "../../os/config.h"
+#include "../../os/terminal.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
@@ -213,7 +214,7 @@ void kaba_dir_delete(const Path &f) {
 
 string _cdecl kaba_shell_execute(const string &cmd) {
 	try {
-		return shell_execute(cmd);
+		return os::terminal::shell_execute(cmd);
 	} catch(::Exception &e) {
 		kaba_raise_exception(new KabaException(e.message()));
 	}

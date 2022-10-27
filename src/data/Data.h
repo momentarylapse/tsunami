@@ -10,7 +10,7 @@
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
 #include "../lib/os/path.h"
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 #include <shared_mutex>
 
 class ActionManager;

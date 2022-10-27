@@ -10,7 +10,7 @@
 
 #include "midi/MidiData.h"
 #include "../lib/base/pointer.h"
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 #include "audio/AudioBuffer.h"
 
 class Song;

@@ -9,7 +9,7 @@
 #define SRC_DATA_CURVE_H_
 
 #include "../lib/base/pointer.h"
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 
 class Song;
 class Track;

@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_MODE_VIEWMODE_H_
 #define SRC_VIEW_MODE_VIEWMODE_H_
 
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 #include "../../lib/base/set.h"
 
 class vec2;

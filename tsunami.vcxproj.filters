@@ -880,6 +880,9 @@
     <ClCompile Include="src\lib\os\time.cpp">
       <Filter>src\lib\os</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\pattern\Observable.cpp">
+      <Filter>src\lib\pattern</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\threads\Mutex.cpp">
       <Filter>src\lib\threads</Filter>
     </ClCompile>
@@ -1058,9 +1061,6 @@
       <Filter>src\stuff</Filter>
     </ClCompile>
     <ClCompile Include="src\stuff\Log.cpp">
-      <Filter>src\stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stuff\Observable.cpp">
       <Filter>src\stuff</Filter>
     </ClCompile>
     <ClCompile Include="src\stuff\PerformanceMonitor.cpp">
@@ -2223,6 +2223,9 @@
     <ClInclude Include="src\lib\os\time.h">
       <Filter>src\lib\os</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\pattern\Observable.h">
+      <Filter>src\lib\pattern</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\threads\Mutex.h">
       <Filter>src\lib\threads</Filter>
     </ClInclude>
@@ -2407,9 +2410,6 @@
       <Filter>src\stuff</Filter>
     </ClInclude>
     <ClInclude Include="src\stuff\Log.h">
-      <Filter>src\stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="src\stuff\Observable.h">
       <Filter>src\stuff</Filter>
     </ClInclude>
     <ClInclude Include="src\stuff\PerformanceMonitor.h">
@@ -2890,6 +2890,9 @@
     </Filter>
     <Filter Include="src\lib\os">
       <UniqueIdentifier>{71C98AAD-A0D7-45A4-DD42-1D9B63491998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\pattern">
+      <UniqueIdentifier>{17D8B691-D873-B504-9323-722AD85B2FA4}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\threads">
       <UniqueIdentifier>{00B3DEB1-3DBC-9488-47E6-BB73557F0D00}</UniqueIdentifier>

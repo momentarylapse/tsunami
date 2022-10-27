@@ -12,7 +12,7 @@
 #include "../../../lib/base/pointer.h"
 #include "../../../lib/math/rect.h"
 #include "../../../lib/math/vec2.h"
-#include "../../../stuff/Observable.h"
+#include "../../../lib/pattern/Observable.h"
 
 class Painter;
 class HoverData;

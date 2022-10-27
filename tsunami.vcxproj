@@ -409,6 +409,7 @@
     <ClCompile Include="src\lib\os\path.cpp" />
     <ClCompile Include="src\lib\os\stream.cpp" />
     <ClCompile Include="src\lib\os\time.cpp" />
+    <ClCompile Include="src\lib\pattern\Observable.cpp" />
     <ClCompile Include="src\lib\threads\Mutex.cpp" />
     <ClCompile Include="src\lib\threads\Thread.cpp" />
     <ClCompile Include="src\lib\threads\ThreadedWork.cpp" />
@@ -469,7 +470,6 @@
     <ClCompile Include="src\stuff\Clipboard.cpp" />
     <ClCompile Include="src\stuff\ErrorHandler.cpp" />
     <ClCompile Include="src\stuff\Log.cpp" />
-    <ClCompile Include="src\stuff\Observable.cpp" />
     <ClCompile Include="src\stuff\PerformanceMonitor.cpp" />
     <ClCompile Include="src\stuff\SessionManager.cpp" />
     <ClCompile Include="src\test\TestAudioBuffer.cpp" />
@@ -858,6 +858,7 @@
     <ClInclude Include="src\lib\os\path.h" />
     <ClInclude Include="src\lib\os\stream.h" />
     <ClInclude Include="src\lib\os\time.h" />
+    <ClInclude Include="src\lib\pattern\Observable.h" />
     <ClInclude Include="src\lib\threads\Mutex.h" />
     <ClInclude Include="src\lib\threads\Thread.h" />
     <ClInclude Include="src\lib\threads\ThreadedWork.h" />
@@ -920,7 +921,6 @@
     <ClInclude Include="src\stuff\Clipboard.h" />
     <ClInclude Include="src\stuff\ErrorHandler.h" />
     <ClInclude Include="src\stuff\Log.h" />
-    <ClInclude Include="src\stuff\Observable.h" />
     <ClInclude Include="src\stuff\PerformanceMonitor.h" />
     <ClInclude Include="src\stuff\SessionManager.h" />
     <ClInclude Include="src\test\TestAudioBuffer.h" />

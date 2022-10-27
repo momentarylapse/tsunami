@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef OBSERVABLE_H_
-#define OBSERVABLE_H_
+#ifndef SRC_LIB_PATTERN_OBSERVABLE_H_
+#define SRC_LIB_PATTERN_OBSERVABLE_H_
 
-#include "../lib/base/base.h"
+#include "../base/base.h"
 #include <functional>
 
 class ObservableData {
@@ -82,4 +82,4 @@ const string Observable<T>::MESSAGE_DELETE = "Delete";
 template<class T>
 const string Observable<T>::MESSAGE_ANY = "";
 
-#endif /* OBSERVABLE_H_ */
+#endif /* SRC_LIB_PATTERN_OBSERVABLE_H_ */

@@ -8,7 +8,7 @@
 #ifndef SRC_STUFF_SESSIONMANAGER_H_
 #define SRC_STUFF_SESSIONMANAGER_H_
 
-#include "Observable.h"
+#include "../lib/pattern/Observable.h"
 #include "../lib/base/pointer.h"
 
 class Session;

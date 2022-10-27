@@ -8,12 +8,12 @@
 #ifndef SRC_DATA_TRACKLAYER_H_
 #define SRC_DATA_TRACKLAYER_H_
 
-#include "../lib/base/pointer.h"
-#include "../lib/base/set.h"
 #include "Range.h"
 #include "midi/MidiData.h"
 #include "midi/Instrument.h"
-#include "../stuff/Observable.h"
+#include "../lib/base/pointer.h"
+#include "../lib/base/set.h"
+#include "../lib/pattern/Observable.h"
 
 
 

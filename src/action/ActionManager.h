@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../lib/base/base.h"
 #include "Action.h"
+#include "../lib/base/base.h"
+#include "../lib/pattern/Observable.h"
 #include "../data/Data.h"
-#include "../stuff/Observable.h"
 
 class Data;
 class Action;

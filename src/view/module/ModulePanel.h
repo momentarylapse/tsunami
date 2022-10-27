@@ -9,7 +9,7 @@
 #define SRC_VIEW_MODULE_MODULEPANEL_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 
 class Module;
 class ConfigPanel;

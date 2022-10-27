@@ -9,7 +9,7 @@
 #define SRC_STUFF_CLIPBOARD_H_
 
 #include "../lib/base/pointer.h"
-#include "Observable.h"
+#include "../lib/pattern/Observable.h"
 class Song;
 class Track;
 class TrackLayer;

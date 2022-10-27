@@ -8,7 +8,7 @@
 #ifndef SRC_DATA_SAMPLEREF_H_
 #define SRC_DATA_SAMPLEREF_H_
 
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 #include "../lib/base/pointer.h"
 #include "../lib/math/rect.h"
 

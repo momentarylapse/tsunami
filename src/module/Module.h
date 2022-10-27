@@ -11,7 +11,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 
 namespace kaba {
 	class Script;

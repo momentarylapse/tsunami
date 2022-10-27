@@ -8,7 +8,7 @@
 #ifndef SRC_DEVICE_DEVICEMANAGER_H_
 #define SRC_DEVICE_DEVICEMANAGER_H_
 
-#include "../stuff/Observable.h"
+#include "../lib/pattern/Observable.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 

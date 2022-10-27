@@ -10,7 +10,7 @@
 
 #include "../../lib/base/pointer.h"
 #include "../../lib/hui/hui.h"
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 
 class Song;
 class SongConsole;

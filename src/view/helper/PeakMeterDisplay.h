@@ -8,7 +8,7 @@
 #ifndef PEAKMETERDISPLAY_H_
 #define PEAKMETERDISPLAY_H_
 
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 #include "graph/Node.h"
 
 class PeakMeter;

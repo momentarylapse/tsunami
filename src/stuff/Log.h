@@ -5,11 +5,11 @@
  *      Author: michi
  */
 
-#ifndef LOG_H_
-#define LOG_H_
+#ifndef SRC_STUFF_LOG_H_
+#define SRC_STUFF_LOG_H_
 
 #include "../lib/base/base.h"
-#include "Observable.h"
+#include "../lib/pattern/Observable.h"
 
 #ifdef ERROR
 #undef ERROR
@@ -56,4 +56,4 @@ private:
 	Array<Message> blocked;
 };
 
-#endif /* LOG_H_ */
+#endif /* SRC_STUFF_LOG_H_ */

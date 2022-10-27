@@ -299,6 +299,7 @@ set(SOURCE
 	src/lib/os/path.cpp
 	src/lib/os/stream.cpp
 	src/lib/os/time.cpp
+	src/lib/pattern/Observable.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -359,7 +360,6 @@ set(SOURCE
 	src/stuff/Clipboard.cpp
 	src/stuff/ErrorHandler.cpp
 	src/stuff/Log.cpp
-	src/stuff/Observable.cpp
 	src/stuff/PerformanceMonitor.cpp
 	src/stuff/SessionManager.cpp
 	src/test/TestAudioBuffer.cpp

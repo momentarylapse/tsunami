@@ -11,7 +11,7 @@
 #include "../../lib/base/pointer.h"
 #include "../../data/SongSelection.h"
 #include "../../data/midi/Scale.h"
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
 #include "../ColorScheme.h"

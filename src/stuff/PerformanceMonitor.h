@@ -9,7 +9,7 @@
 #define SRC_STUFF_PERFORMANCEMONITOR_H_
 
 #include "../lib/base/base.h"
-#include "Observable.h"
+#include "../lib/pattern/Observable.h"
 
 
 struct PerfChannelStat {

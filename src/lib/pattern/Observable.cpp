@@ -8,8 +8,8 @@
 #include "Observable.h"
 #include <functional>
 //#include <typeinfo>
-#include "../lib/kaba/kaba.h"
-#include "../lib/os/msg.h"
+#include "../kaba/kaba.h"
+#include "../os/msg.h"
 
 
 // notify()

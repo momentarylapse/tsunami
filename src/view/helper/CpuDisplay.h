@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_HELPER_CPUDISPLAY_H_
 #define SRC_VIEW_HELPER_CPUDISPLAY_H_
 
-#include "../../stuff/Observable.h"
+#include "../../lib/pattern/Observable.h"
 #include "graph/Node.h"
 
 namespace hui {

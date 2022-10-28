@@ -92,7 +92,7 @@ void SessionConsole::on_save() {
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
-	if (l.type != Type::BACKUP)
+	if (l.type != Type::ACTIVE)
 		return;
 	os::fs::create_directory(tsunami->session_manager->directory());
 	hui::file_dialog_save(win, "", tsunami->session_manager->directory(), {"filter=*.session", "showfilter=*.session"}, [this, &l] (const Path &filename) {

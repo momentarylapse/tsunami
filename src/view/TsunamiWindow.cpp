@@ -135,7 +135,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("buffer-compress", [this] {
 		auto dlg = new BufferCompressionDialog(this);
 		hui::fly(dlg, [dlg, this] {
-			if (dlg->codec == "")
+			if (dlg->codec != "")
 				song_compress_buffers(song, view->sel, dlg->codec);
 		});
 	});

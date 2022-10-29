@@ -31,9 +31,11 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id, Pane
 	auto parts = split_title(title);
 	widget = gtk_menu_button_new();
 #if GTK_CHECK_VERSION(4,0,0)
-	gtk_menu_button_set_label(GTK_MENU_BUTTON(widget), sys_str(parts[0]));
+	if (parts[0].num > 0)
+		gtk_menu_button_set_label(GTK_MENU_BUTTON(widget), sys_str(parts[0]));
 #else
-	gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
+	if (parts[0].num > 0)
+		gtk_button_set_label(GTK_BUTTON(widget), sys_str(parts[0]));
 #endif
 	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkMenuButtonPress), this);
@@ -65,7 +67,7 @@ void ControlMenuButton::set_image(const string& str) {
 #else
 	gtk_button_set_image(GTK_BUTTON(widget), im);
 #if GTK_CHECK_VERSION(3,6,0)
-	if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)
+	if (!gtk_button_get_label(GTK_BUTTON(widget)) || strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)
 		gtk_button_set_always_show_image(GTK_BUTTON(widget), true);
 #endif
 #endif

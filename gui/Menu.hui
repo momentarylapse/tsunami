@@ -23,7 +23,7 @@ Menu menu ""
 		Separator
 		Item /copy "Copy" image=hui:copy
 		Item /paste "Paste" image=hui:paste
-		Item /paste_as_samples "Paste as samples" image=hui:paste
+		Item /paste-as-samples "Paste as samples" image=hui:paste
 		Item /delete "Delete" image=hui:delete "tooltip=does not move anything - leaves a gap instead"
 		Item /delete-shift "Delete and shift" image=hui:delete "tooltip=no gap - moves everyting afterwards"
 		Separator

@@ -88,9 +88,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("copy", hui::KEY_C + hui::KEY_CONTROL);
 	event("paste", [this] { on_paste(); });
 	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL);
-	event("paste_as_samples", [this] { on_paste_as_samples(); });
-	set_key_code("paste_as_samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	event("paste-as-samples", [this] { on_paste_as_samples(); });
+	set_key_code("paste-as-samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
 	event("paste_time", [this] { on_paste_time(); });
+	event("paste-insert-time", [this] { on_paste_time(); });
 	event("delete", [this] { on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
 	event("delete-shift", [this] { on_delete_shift(); });
@@ -282,14 +283,24 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		add_button("!ignorefocus", 0, 0, "save");
 		set_image("save", "hui:save");
 		add_menu_button("!ignorefocus,width=10", 1, 0, "save-menu");
-		set_options("save-menu", "menu=save-menu");
+		set_options("save-menu", "menu=header-save-menu");
 		set_target(":header:");
-		add_button("!ignorefocus", 3, 0, "undo");
+		add_grid("!box,linked", 2, 0, "undo-redo-box");
+		set_target("undo-redo-box");
+		add_button("!ignorefocus", 0, 0, "undo");
 		set_image("undo", "hui:undo");
-		add_button("!ignorefocus", 4, 0, "redo");
+		add_button("!ignorefocus", 1, 0, "redo");
 		set_image("redo", "hui:redo");
-		add_button("!ignorefocus", 5, 0, "copy");
+		set_target(":header:");
+		add_grid("!box,linked", 3, 0, "copy-paste-box");
+		set_target("copy-paste-box");
+		add_button("!ignorefocus", 0, 0, "copy");
 		set_image("copy", "hui:copy");
+		add_button("!ignorefocus", 1, 0, "paste");
+		set_image("paste", "hui:paste");
+		add_menu_button("!ignorefocus,width=10", 2, 0, "paste-menu");
+		set_options("paste-menu", "menu=header-paste-menu");
+		set_target(":header:");
 
 
 		add_menu_button("!menu=header-menu,arrow=no", 5, 1, "menu-x");
@@ -881,6 +892,11 @@ void TsunamiWindow::update_menu() {
 	enable("redo", song->action_manager->redoable());
 	enable("copy", app->clipboard->can_copy(view));
 	enable("paste", app->clipboard->has_data());
+	enable("paste-menu", app->clipboard->has_data());
+	enable("paste-as-samples", app->clipboard->has_data());
+	enable("paste-aligned-to-beats", app->clipboard->has_data());
+	enable("paste-insert-time", app->clipboard->has_data());
+	enable("paste_time", app->clipboard->has_data());
 	enable("delete", !view->sel.is_empty());
 	enable("delete-shift", !view->sel.is_empty());
 

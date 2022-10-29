@@ -1,0 +1,5 @@
+Menu header-paste-menu ""
+	Item /paste "Paste" image=hui:paste
+	Item /paste-as-samples "Paste as samples" image=hui:paste
+	Item paste-aligned-to-beats "Paste aligned to beats" image=hui:paste
+	Item paste-insert-time "Insert and add time" image=hui:paste

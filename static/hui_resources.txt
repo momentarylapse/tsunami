@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-79
+80
 # Resource
 Menu
 menu_fake
@@ -1322,59 +1322,97 @@ header-menu
 
 0
 0
-9
-Item
-save_as
-image=hui:save-as
-0
-0
-0
-Item
-render_export_selection
-image=hui:save-as
-1
-0
-0
-Item
-export_selection
-image=hui:save-as
-2
-0
-0
-Item
-quick_export
-image=hui:save-as
-3
-0
-0
-Separator
-
-
 4
-0
-0
 Item
 settings
 image=hui:preferences
-5
+0
 0
 0
 Separator
 
 
-6
+1
 0
 0
 Item
 help
 image=hui:help
-7
+2
 0
 0
 Item
 about
 image=hui:about
-8
+3
+0
+0
+# Resource
+Menu
+header-paste-menu
+
+0
+0
+4
+Item
+paste
+image=hui:paste
+0
+0
+0
+Item
+paste-as-samples
+image=hui:paste
+1
+0
+0
+Item
+paste-aligned-to-beats
+image=hui:paste
+2
+0
+0
+Item
+paste-insert-time
+image=hui:paste
+3
+0
+0
+# Resource
+Menu
+header-save-menu
+
+0
+0
+5
+Item
+save
+image=hui:save
+0
+0
+0
+Item
+save_as
+image=hui:save-as
+1
+0
+0
+Item
+render_export_selection
+image=hui:save-as
+2
+0
+0
+Item
+export_selection
+image=hui:save-as
+3
+0
+0
+Item
+quick_export
+image=hui:save-as
+4
 0
 0
 # Resource
@@ -2284,7 +2322,7 @@ image=hui:paste
 0
 0
 Item
-paste_as_samples
+paste-as-samples
 image=hui:paste
 9
 0
@@ -6836,43 +6874,6 @@ default
 1
 0
 # Resource
-Menu
-save-menu
-
-0
-0
-5
-Item
-save
-image=hui:save
-0
-0
-0
-Item
-save_as
-image=hui:save-as
-1
-0
-0
-Item
-render_export_selection
-image=hui:save-as
-2
-0
-0
-Item
-export_selection
-image=hui:save-as
-3
-0
-0
-Item
-quick_export
-image=hui:save-as
-4
-0
-0
-# Resource
 Dialog
 session-console
 
@@ -8149,7 +8150,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-730
+729
 # Text
 /bars-add
 Add bars...
@@ -8334,7 +8335,7 @@ Open...
 /paste
 Paste
 
-/paste_as_samples
+/paste-as-samples
 Paste as samples
 
 /per_minute
@@ -8772,16 +8773,22 @@ Effects
 header-menu/about
 About
 
-header-menu/export_selection
-Save selection...
-
 header-menu/help
 Help
 
-header-menu/quick_export
+header-paste-menu/paste-aligned-to-beats
+Paste aligned to beats
+
+header-paste-menu/paste-insert-time
+Insert and add time
+
+header-save-menu/export_selection
+Save selection...
+
+header-save-menu/quick_export
 Quick export
 
-header-menu/render_export_selection
+header-save-menu/render_export_selection
 Render selection...
 
 help-dialog/first-time-message
@@ -10016,15 +10023,6 @@ Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
-
-save-menu/export_selection
-Save selection...
-
-save-menu/quick_export
-Quick export
-
-save-menu/render_export_selection
-Render selection...
 
 session-console/session-console
 Sessions

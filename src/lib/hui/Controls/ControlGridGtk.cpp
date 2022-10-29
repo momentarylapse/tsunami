@@ -51,7 +51,7 @@ void ControlGrid::add_child(shared<Control> child, int x, int y) {
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_box_append(GTK_BOX(widget), child_widget);
 #else
-		gtk_box_pack_end(GTK_BOX(widget), child_widget, true, true, panel->spacing);
+		gtk_box_pack_start(GTK_BOX(widget), child_widget, true, true, 0);
 #endif
 	} else {
 		gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);

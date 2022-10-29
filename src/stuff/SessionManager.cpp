@@ -73,7 +73,13 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 	notify();
 }
 
-Session *SessionManager::load_session(const Path &filename) {
+Session *SessionManager::load_session(const Path &_filename) {
+	Path filename = _filename;
+
+	// just a name?
+	if (str(filename).tail(8) != ".session")
+		filename = directory() << filename.with(".session");
+
 	xml::Parser parser;
 	parser.load(filename);
 	auto &e = parser.elements[0];

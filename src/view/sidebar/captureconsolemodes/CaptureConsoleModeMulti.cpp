@@ -63,7 +63,7 @@ void CaptureConsoleModeMulti::enter() {
 
 		items().add(c);
 
-		event_ids.add(cc->event(c.id_source, [=] {
+		event_ids.add(cc->event(c.id_source, [this] {
 			on_source();
 		}));
 	}

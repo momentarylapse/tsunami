@@ -209,7 +209,7 @@ void Session::set_mode(const string &mode) {
 		e("unknown mode: " + mode);
 		return;
 	}
-	hui::run_later(0.1f, [=]{ win->update_menu(); });
+	hui::run_later(0.1f, [this] { win->update_menu(); });
 	this->mode = mode;
 }
 
@@ -220,7 +220,7 @@ bool Session::in_mode(const string &m) {
 void Session::add_signal_chain(SignalChain *chain) {
 	all_signal_chains.add(chain);
 	notify(MESSAGE_ADD_SIGNAL_CHAIN);
-	/*chain->subscribe(this, [=]{
+	/*chain->subscribe(this, [this] {
 		_remove_signal_chain(chain);
 	}, chain->MESSAGE_DELETE);*/
 }

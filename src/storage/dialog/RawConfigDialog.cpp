@@ -29,10 +29,10 @@ RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	set_int("sample_rate", od->parameters["samplerate"]._int());
 	set_int("offset", od->parameters["offset"]._int());
 
-	event("hui:close", [=]{ on_close(); });
-	event("close", [=]{ on_close(); });
-	event("cancel", [=]{ on_close(); });
-	event("ok", [=]{ on_ok(); });
+	event("hui:close", [this] { on_close(); });
+	event("close", [this] { on_close(); });
+	event("cancel", [this] { on_close(); });
+	event("ok", [this] { on_ok(); });
 }
 
 void RawConfigDialog::on_close() {

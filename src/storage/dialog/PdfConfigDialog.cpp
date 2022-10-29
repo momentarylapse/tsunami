@@ -45,9 +45,9 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	}
 	set_float("scale", od->parameters["horizontal-scale"]._float() * 100);
 
-	event("hui:close", [=]{ on_close(); });
-	event("cancel", [=]{ on_close(); });
-	event("ok", [=]{ on_ok(); });
+	event("hui:close", [this] { on_close(); });
+	event("cancel", [this] { on_close(); });
+	event("ok", [this] { on_ok(); });
 }
 
 void PdfConfigDialog::on_close() {

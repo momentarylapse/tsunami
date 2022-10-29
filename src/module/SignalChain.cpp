@@ -113,7 +113,7 @@ Module *SignalChain::_add(Module *m) {
 	modules.add(m);
 	PerformanceMonitor::set_parent(m->perf_channel, perf_channel);
 	notify(MESSAGE_ADD_MODULE);
-	m->subscribe(this, [=]{ on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	m->subscribe(this, [this] { on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	return m;
 }
 
@@ -387,7 +387,7 @@ void SignalChain::start() {
 
 	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
-	hui_runner = hui::run_repeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
+	hui_runner = hui::run_repeated(tick_dt, [this] { notify(MESSAGE_TICK); });
 }
 
 void SignalChain::stop() {

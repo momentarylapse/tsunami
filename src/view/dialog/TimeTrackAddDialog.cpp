@@ -32,14 +32,14 @@ TimeTrackAddDialog::TimeTrackAddDialog(Song *_song, hui::Window *_parent):
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
 
-	event("cancel", [=]{ request_destroy(); });
-	event("hui:close", [=]{ request_destroy(); });
-	event("ok", [=]{ on_ok(); });
-	event("beats", [=]{ on_beats(); });
-	event("divisor", [=]{ on_divisor(); });
-	event("pattern", [=]{ on_pattern(); });
-	event("complex", [=]{ on_complex(); });
-	event("add-bars", [=]{ on_add_bars(); });
+	event("cancel", [this] { request_destroy(); });
+	event("hui:close", [this] { request_destroy(); });
+	event("ok", [this] { on_ok(); });
+	event("beats", [this] { on_beats(); });
+	event("divisor", [this] { on_divisor(); });
+	event("pattern", [this] { on_pattern(); });
+	event("complex", [this] { on_complex(); });
+	event("add-bars", [this] { on_add_bars(); });
 }
 
 

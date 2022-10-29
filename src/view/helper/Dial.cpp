@@ -105,7 +105,7 @@ void Dial::on_draw(Painter *p) {
 
 bool Dial::on_left_button_down(const vec2 &m) {
 	if (auto g = graph()) {
-		g->mdp_prepare([=] {
+		g->mdp_prepare([this, g] {
 			//drag_update(g->mx, g->my);
 			auto e = hui::get_event();
 			if (e->key_code & hui::KEY_SHIFT)

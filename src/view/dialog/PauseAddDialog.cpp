@@ -22,9 +22,9 @@ PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
 	set_float("duration", 1.0f);
 	check("shift-data", bar_dialog_move_data);
 
-	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ on_close(); });
-	event("hui:close", [=]{ on_close(); });
+	event("ok", [this] { on_ok(); });
+	event("cancel", [this] { on_close(); });
+	event("hui:close", [this] { on_close(); });
 }
 
 void PauseAddDialog::on_ok() {

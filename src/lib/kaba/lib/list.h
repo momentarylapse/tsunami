@@ -31,13 +31,13 @@ public:
 	}
 
 	static T sum(const Array<T> &list) {
-		T r = 0;
+		T r{};
 		for (int i=0; i<list.num; i++)
 			r += list[i];
 		return r;
 	}
 	static T sum_sqr(const Array<T> &list) {
-		T r = 0;
+		T r{};
 		for (int i=0;i<list.num;i++)
 			r += list[i] * list[i];
 		return r;
@@ -59,7 +59,7 @@ public:
 		return r;
 	}
 	bool __contains__(T v) const {
-		for (int i=0;i<this->num;i++)
+		for (int i=0; i<this->num; i++)
 			if ((*this)[i] == v)
 				return true;
 		return false;

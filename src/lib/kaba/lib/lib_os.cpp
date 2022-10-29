@@ -405,6 +405,7 @@ void SIAddPackageOS() {
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
 	TypeOsConfiguration = add_type("Configuration", sizeof(Configuration));
+	const Class *TypeTerminal = add_type("terminal", 0);
 
 	TypeCallback = add_type_f(TypeVoid, {});
 	TypeCallbackString = add_type_f(TypeVoid, {TypeString});
@@ -570,6 +571,19 @@ void SIAddPackageOS() {
 		if (!_kaba_stdin)
 			_kaba_stdin = new os::fs::FileStream(0);
 		add_ext_var("stdin", TypeFileStreamP, &_kaba_stdin);
+	
+	add_class(TypeTerminal);
+		class_add_const("RED", TypeString, &os::terminal::RED);
+		class_add_const("GREEN", TypeString, &os::terminal::GREEN);
+		class_add_const("BLUE", TypeString, &os::terminal::BLUE);
+		class_add_const("YELLOW", TypeString, &os::terminal::YELLOW);
+		class_add_const("ORANGE", TypeString, &os::terminal::ORANGE);
+		class_add_const("CYAN", TypeString, &os::terminal::CYAN);
+		class_add_const("MAGENTA", TypeString, &os::terminal::MAGENTA);
+		class_add_const("GRAY", TypeString, &os::terminal::GRAY);
+		class_add_const("DARK_GRAY", TypeString, &os::terminal::DARK_GRAY);
+		class_add_const("BOLD", TypeString, &os::terminal::BOLD);
+		class_add_const("END", TypeString, &os::terminal::END);
 
 	// system
 	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);

@@ -17,8 +17,8 @@ TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
 	num_tracks = 0;
 
 	load();
-	event("close", [=]{ request_destroy(); });
-	event("add-group", [=]{ on_add_group(); });
+	event("close", [this] { request_destroy(); });
+	event("add-group", [this] { on_add_group(); });
 }
 
 void TrackRoutingDialog::load() {
@@ -37,7 +37,7 @@ void TrackRoutingDialog::load() {
 			else
 				add_label(t->nice_name(), 0, i+1, "");
 			add_combo_box("!expandx", 1, i+1, id);
-			event(id, [=]{ on_target(i); });
+			event(id, [this, i] { on_target(i); });
 			num_tracks ++;
 		}
 		reset(id);

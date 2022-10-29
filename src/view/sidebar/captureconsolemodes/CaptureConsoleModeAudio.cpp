@@ -59,7 +59,7 @@ void CaptureConsoleModeAudio::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(cc->event("source", [=]{ on_source(); }));
+	event_ids.add(cc->event("source", [this] { on_source(); }));
 
 
 	auto &c = items()[0];

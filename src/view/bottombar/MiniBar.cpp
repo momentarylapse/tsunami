@@ -26,15 +26,15 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 
 	on_selection_snap_mode(view->selection_snap_mode);
 
-	event("show_bottom_bar", [=]{ on_show_bottom_bar(); });
-	event("volume", [=]{ on_volume(); });
-	event("select-snap-mode-free", [=]{ on_selection_snap_mode(SelectionSnapMode::NONE); });
-	event("select-snap-mode-bars", [=]{ on_selection_snap_mode(SelectionSnapMode::BAR); });
-	event("select-snap-mode-parts", [=]{ on_selection_snap_mode(SelectionSnapMode::PART); });
+	event("show_bottom_bar", [this] { on_show_bottom_bar(); });
+	event("volume", [this] { on_volume(); });
+	event("select-snap-mode-free", [this] { on_selection_snap_mode(SelectionSnapMode::NONE); });
+	event("select-snap-mode-bars", [this] { on_selection_snap_mode(SelectionSnapMode::BAR); });
+	event("select-snap-mode-parts", [this] { on_selection_snap_mode(SelectionSnapMode::PART); });
 
-	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
-	dev_manager->subscribe(this, [=]{ on_volume_change(); }, dev_manager->MESSAGE_ANY);
-	view->subscribe(this, [=]{ on_view_settings_change(); }, view->MESSAGE_SETTINGS_CHANGE);
+	bottom_bar->subscribe(this, [this] { on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
+	dev_manager->subscribe(this, [this] { on_volume_change(); }, dev_manager->MESSAGE_ANY);
+	view->subscribe(this, [this] { on_view_settings_change(); }, view->MESSAGE_SETTINGS_CHANGE);
 }
 
 MiniBar::~MiniBar() {

@@ -92,6 +92,6 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 	}
 
 	// make sure messages are handled in the gui thread...
-	hui::run_later(0.01f, [=]{ notify(MESSAGE_ADD); });
+	hui::run_later(0.01f, [this] { notify(MESSAGE_ADD); });
 	//notify(MESSAGE_ADD);
 }

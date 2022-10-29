@@ -169,11 +169,11 @@ public:
 		if (!save)
 			names.insert(":def:", 0);
 		hide_control("name", !save);
-		event("list", [=]{ on_list(); });
-		event_x("list", "hui:select", [=]{ on_list_select(); });
-		event("name", [=]{ on_name(); });
-		event("ok", [=]{ on_ok(); });
-		event("cancel", [=]{ request_destroy(); });
+		event("list", [this] { on_list(); });
+		event_x("list", "hui:select", [this] { on_list_select(); });
+		event("name", [this] { on_name(); });
+		event("ok", [this] { on_ok(); });
+		event("cancel", [this] { request_destroy(); });
 	}
 	void on_list() {
 		int n = get_int("list");

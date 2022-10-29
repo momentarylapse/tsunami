@@ -44,11 +44,11 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	panel = _panel;
 	id = _id;
 
-	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){
+	handler_id_draw = panel->event_xp(id, "hui:draw", [this] (Painter *p){
 		area = p->area();
 		draw_recursive(p);
 	});
-	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{
+	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [this] {
 		on_left_button_down(hui::get_event()->m);
 	});
 }
@@ -101,7 +101,7 @@ void PeakMeterDisplay::set_visible(bool vis) {
 }
 
 void PeakMeterDisplay::connect() {
-	source->subscribe(this, [=]{ on_update(); }, source->MESSAGE_ANY);
+	source->subscribe(this, [this] { on_update(); }, source->MESSAGE_ANY);
 	if (mode == Mode::SPECTRUM)
 		source->request_spectrum();
 }

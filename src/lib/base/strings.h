@@ -134,6 +134,10 @@ class string : public bytes {
 	{	string r = *this;	r += s;	return r;	}
 	friend string _cdecl operator + (const char *s1, const string &s2)
 	{	return string(s1) + s2;	}
+#if __cplusplus >= 202002L
+	friend string _cdecl operator + (const char8_t *s1, const string &s2)
+	{	return string(s1) + s2;	}
+#endif
 	bool _cdecl operator == (const string &s) const;
 	bool _cdecl operator != (const string &s) const
 	{	return !(*this == s);	}

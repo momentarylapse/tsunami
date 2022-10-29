@@ -53,13 +53,13 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->subscribe(this, [=]{ update_device_list(); }, session->device_manager->MESSAGE_ANY);
+	session->device_manager->subscribe(this, [this] { update_device_list(); }, session->device_manager->MESSAGE_ANY);
 
 
 	for (auto &c: items()) {
 		cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
 
-		c.input->subscribe(this, [=] {
+		c.input->subscribe(this, [this] {
 			update_device_list();
 		}, c.input->MESSAGE_ANY);
 

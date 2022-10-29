@@ -484,7 +484,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 	if (size == source->END_OF_STREAM) {
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		hui::run_later(0.001f,  [=]{ on_read_end_of_stream(); });
+		hui::run_later(0.001f,  [this] { on_read_end_of_stream(); });
 		ring_buf.write_ref_cancel(b);
 		return size;
 	}

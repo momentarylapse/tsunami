@@ -197,9 +197,9 @@ public:
 		on_mode();
 		p->set_int(id, (int)*value);
 		p->set_float(id_freq, pitch_to_freq(*value));
-		p->event(id, [=]{ on_pitch(); });
-		p->event(id_freq, [=]{ on_freq(); });
-		p->event(id_mode, [=]{ on_mode(); });
+		p->event(id, [this] { on_pitch(); });
+		p->event(id_freq, [this] { on_freq(); });
+		p->event(id_mode, [this] { on_mode(); });
 	}
 	void value_from_gui() override {
 		bool m = panel->is_checked(id_mode);
@@ -294,7 +294,7 @@ public:
 		panel = p;
 		p->add_button("!expandx", 1, i, id);
 		value_to_gui();
-		p->event(id, [=]{ on_button(); });
+		p->event(id, [this] { on_button(); });
 		callback = _callback;
 	}
 	void on_button() {

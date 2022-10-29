@@ -18,10 +18,10 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 
 	update();
 
-	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ request_destroy(); });
-	event("hui:close", [=]{ request_destroy(); });
-	event("add_first", [=]{ on_add_first(); });
+	event("ok", [this] { on_ok(); });
+	event("cancel", [this] { request_destroy(); });
+	event("hui:close", [this] { request_destroy(); });
+	event("add_first", [this] { on_add_first(); });
 }
 
 void TuningDialog::update() {
@@ -44,9 +44,9 @@ void TuningDialog::update() {
 			set_image("delete_" + id, "hui:delete");
 			add_button("", 3, 100 - i, "add_" + id);
 			set_image("add_" + id, "hui:add");
-			event(id, [=]{ on_edit(); });
-			event("delete_" + id, [=]{ on_delete(); });
-			event("add_" + id, [=]{ on_add(); });
+			event(id, [this] { on_edit(); });
+			event("delete_" + id, [this] { on_delete(); });
+			event("add_" + id, [this] { on_add(); });
 
 			// reverse order list... nicer gui
 			for (int p=MAX_PITCH-1; p>=0; p--)
@@ -81,7 +81,7 @@ void TuningDialog::on_delete() {
 	int n = id.sub(7+6)._int();
 	tuning.erase(n);
 
-	hui::run_later(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [this] { update(); });
 }
 
 void TuningDialog::on_add() {
@@ -89,12 +89,12 @@ void TuningDialog::on_add() {
 	int n = id.sub(4+6)._int();
 	tuning.insert(tuning[n], n);
 
-	hui::run_later(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [this] { update(); });
 }
 
 void TuningDialog::on_add_first() {
 	tuning.add(69);
 
-	hui::run_later(0.001f, [=]{ update(); });
+	hui::run_later(0.001f, [this] { update(); });
 }
 

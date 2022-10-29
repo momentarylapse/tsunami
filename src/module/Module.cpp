@@ -48,7 +48,7 @@ Module::Module(ModuleCategory category, const string &_class) {
 	allow_config_in_chain = false;
 	kaba_class = nullptr;
 	belongs_to_system = false;
-	func_edit = [=] { notify(); };
+	func_edit = [this] { notify(); };
 	perf_channel = PerformanceMonitor::create_channel("module", this);
 }
 

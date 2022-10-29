@@ -515,7 +515,10 @@ void class_add_const(const string &name, const Class *type, const void *value) {
 
 	// enums can't be referenced...
 	if (type == TypeInt or type->is_enum())
-		*(const void**)c->p() = value;
+		c->as_int64() = (int_p)value;
+		//*(const void**)c->p() = value;
+	else if (type == TypeString)
+		c->as_string() = *(const string*)value;
 	else if (value)
 		memcpy(c->p(), value, type->size);
 }

@@ -25,10 +25,10 @@ BarDeleteDialog::BarDeleteDialog(hui::Window *parent, Song *s, const Array<int> 
 	enable("shift-data", !bar_dialog_replace_by_pause);
 	//enable("replace-by-pause", !bar_dialog_move_data);
 
-	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ request_destroy(); });
-	event("hui:close", [=]{ request_destroy(); });
-	event("replace-by-pause", [=]{ on_replace_by_pause(); });
+	event("ok", [this] { on_ok(); });
+	event("cancel", [this] { request_destroy(); });
+	event("hui:close", [this] { request_destroy(); });
+	event("replace-by-pause", [this] { on_replace_by_pause(); });
 }
 
 void BarDeleteDialog::on_replace_by_pause() {

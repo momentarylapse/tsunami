@@ -42,12 +42,12 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::No
 	if (track) {
 		header = new TrackHeader(this);
 		add_child(header);
-		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_CHANGE);
-		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_ADD_EFFECT);
-		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_DELETE_EFFECT);
-		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
-		track->subscribe(this, [=]{ track = NULL; }, track->MESSAGE_DELETE);
+		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_CHANGE);
+		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, [this] { track = NULL; }, track->MESSAGE_DELETE);
 	} else {
 		hidden = true;
 		header = nullptr;

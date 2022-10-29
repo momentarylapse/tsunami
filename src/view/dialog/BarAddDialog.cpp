@@ -41,13 +41,13 @@ BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 	set_float("bpm", new_bar.bpm(song->sample_rate));
 	check("shift-data", bar_dialog_move_data);
 
-	event("beats", [=]{ on_beats(); });
-	event("complex", [=]{ on_complex(); });
-	event("pattern", [=]{ on_pattern(); });
-	event("divisor", [=]{ on_divisor(); });
-	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ on_close(); });
-	event("hui:close", [=]{ on_close(); });
+	event("beats", [this] { on_beats(); });
+	event("complex", [this] { on_complex(); });
+	event("pattern", [this] { on_pattern(); });
+	event("divisor", [this] { on_divisor(); });
+	event("ok", [this] { on_ok(); });
+	event("cancel", [this] { on_close(); });
+	event("hui:close", [this] { on_close(); });
 }
 
 void set_bar_pattern(BarPattern &b, const string &pat) {

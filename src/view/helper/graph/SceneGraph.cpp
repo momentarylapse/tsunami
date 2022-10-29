@@ -236,7 +236,7 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 	set_callback_redraw([=] {
 		panel->redraw(id);
 	});
-	panel->event_xp(id, "hui:draw", [=](Painter* p) {
+	panel->event_xp(id, "hui:draw", [this, custom_draw] (Painter* p) {
 		if (custom_draw) {
 			custom_draw(p);
 		} else {
@@ -244,35 +244,35 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 			draw(p);
 		}
 	});
-	panel->event_x(id, "hui:left-button-down", [=] {
+	panel->event_x(id, "hui:left-button-down", [this] {
 		on_left_button_down(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:left-button-up", [=] {
+	panel->event_x(id, "hui:left-button-up", [this] {
 		on_left_button_up(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:left-double-click", [=] {
+	panel->event_x(id, "hui:left-double-click", [this] {
 		on_left_double_click(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:right-button-down", [=] {
+	panel->event_x(id, "hui:right-button-down", [this] {
 		on_right_button_down(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:right-button-up", [=] {
+	panel->event_x(id, "hui:right-button-up", [this] {
 		on_right_button_up(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:mouse-wheel", [=] {
+	panel->event_x(id, "hui:mouse-wheel", [this] {
 		on_mouse_wheel(hui::get_event()->scroll);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:mouse-move", [=] {
+	panel->event_x(id, "hui:mouse-move", [this] {
 		on_mouse_move(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:key-down", [=] {
+	panel->event_x(id, "hui:key-down", [this] {
 		on_key(hui::get_event()->key_code);
 		request_redraw();
 	});

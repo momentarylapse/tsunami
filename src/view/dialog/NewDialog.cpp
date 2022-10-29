@@ -36,17 +36,17 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
 
-	event("cancel", [=]{ request_destroy(); });
-	event("hui:close", [=]{ request_destroy(); });
-	event("ok", [=]{ on_ok(); });
-	event("metronome", [=]{ on_metronome(); });
-	event("type-audio-mono", [=]{ on_type(SignalType::AUDIO_MONO); });
-	event("type-audio-stereo", [=]{ on_type(SignalType::AUDIO_STEREO); });
-	event("type-midi", [=]{ on_type(SignalType::MIDI); });
-	event("beats", [=]{ on_beats(); });
-	event("divisor", [=]{ on_divisor(); });
-	event("pattern", [=]{ on_pattern(); });
-	event("complex", [=]{ on_complex(); });
+	event("cancel", [this] { request_destroy(); });
+	event("hui:close", [this] { request_destroy(); });
+	event("ok", [this] { on_ok(); });
+	event("metronome", [this] { on_metronome(); });
+	event("type-audio-mono", [this] { on_type(SignalType::AUDIO_MONO); });
+	event("type-audio-stereo", [this] { on_type(SignalType::AUDIO_STEREO); });
+	event("type-midi", [this] { on_type(SignalType::MIDI); });
+	event("beats", [this] { on_beats(); });
+	event("divisor", [this] { on_divisor(); });
+	event("pattern", [this] { on_pattern(); });
+	event("complex", [this] { on_complex(); });
 }
 
 void NewDialog::on_ok() {

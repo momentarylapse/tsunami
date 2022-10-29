@@ -21,9 +21,9 @@ PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 	set_float("duration", (float)b->length / (float)song->sample_rate);
 	check("shift-data", bar_dialog_move_data);
 
-	event("ok", [=]{ on_ok(); });
-	event("cancel", [=]{ request_destroy(); });
-	event("hui:close", [=]{ request_destroy(); });
+	event("ok", [this] { on_ok(); });
+	event("cancel", [this] { request_destroy(); });
+	event("hui:close", [this] { request_destroy(); });
 }
 
 void PauseEditDialog::on_ok() {

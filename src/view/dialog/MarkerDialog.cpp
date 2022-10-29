@@ -39,10 +39,10 @@ MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const Range &_r
 	hide_control("grid_text", mode != Mode::TEXT);
 	hide_control("grid_key", mode != Mode::KEY);
 
-	event("text", [=]{ on_edit(); });
-	event("cancel", [=]{ on_close(); });
-	event("hui:close", [=]{ on_close(); });
-	event("ok", [=]{ on_ok(); });
+	event("text", [this] { on_edit(); });
+	event("cancel", [this] { on_close(); });
+	event("hui:close", [this] { on_close(); });
+	event("ok", [this] { on_ok(); });
 }
 
 MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const Range &_range, const string &_text):

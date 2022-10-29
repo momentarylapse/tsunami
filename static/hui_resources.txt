@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-78
+79
 # Resource
 Menu
 menu_fake
@@ -6836,6 +6836,43 @@ default
 1
 0
 # Resource
+Menu
+save-menu
+
+0
+0
+5
+Item
+save
+image=hui:save
+0
+0
+0
+Item
+save_as
+image=hui:save-as
+1
+0
+0
+Item
+render_export_selection
+image=hui:save-as
+2
+0
+0
+Item
+export_selection
+image=hui:save-as
+3
+0
+0
+Item
+quick_export
+image=hui:save-as
+4
+0
+0
+# Resource
 Dialog
 session-console
 
@@ -8112,7 +8149,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-727
+730
 # Text
 /bars-add
 Add bars...
@@ -9979,6 +10016,15 @@ Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
+
+save-menu/export_selection
+Save selection...
+
+save-menu/quick_export
+Quick export
+
+save-menu/render_export_selection
+Render selection...
 
 session-console/session-console
 Sessions

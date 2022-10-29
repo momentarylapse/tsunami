@@ -277,12 +277,19 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		add_button("!ignorefocus", 0, 0, "new");
 		set_image("new", "hui:new");
 		add_button("!ignorefocus\\Open", 1, 0, "open");
-		add_button("!ignorefocus", 2, 0, "save");
+		add_grid("!box,linked", 2, 0, "save-box");
+		set_target("save-box");
+		add_button("!ignorefocus", 0, 0, "save");
 		set_image("save", "hui:save");
+		add_menu_button("!ignorefocus,width=10", 1, 0, "save-menu");
+		set_options("save-menu", "menu=save-menu");
+		set_target(":header:");
 		add_button("!ignorefocus", 3, 0, "undo");
 		set_image("undo", "hui:undo");
 		add_button("!ignorefocus", 4, 0, "redo");
 		set_image("redo", "hui:redo");
+		add_button("!ignorefocus", 5, 0, "copy");
+		set_image("copy", "hui:copy");
 
 
 		add_menu_button("!menu=header-menu,arrow=no", 5, 1, "menu-x");

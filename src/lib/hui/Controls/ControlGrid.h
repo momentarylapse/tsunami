@@ -20,9 +20,10 @@ public:
 
 	void __set_option(const string &op, const string &value) override;
 
-	bool button_bar;
-	bool action_bar;
-	bool vertical;
+	bool is_button_bar;
+	bool is_action_bar;
+	bool is_vertical;
+	bool is_box;
 };
 
 };

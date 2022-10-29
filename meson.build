@@ -185,6 +185,7 @@ sources = [
 	'src/command/audio/BufferPitchShift.cpp',
 	'src/command/song/Diff.cpp',
 	'src/command/song/Export.cpp',
+	'src/command/song/Show.cpp',
 	'src/command/Unsorted.cpp',
 	'src/data/audio/AudioBuffer.cpp',
 	'src/data/audio/RingBuffer.cpp',

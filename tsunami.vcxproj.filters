@@ -271,6 +271,9 @@
     <ClCompile Include="src\command\song\Export.cpp">
       <Filter>src\command\song</Filter>
     </ClCompile>
+    <ClCompile Include="src\command\song\Show.cpp">
+      <Filter>src\command\song</Filter>
+    </ClCompile>
     <ClCompile Include="src\command\Unsorted.cpp">
       <Filter>src\command</Filter>
     </ClCompile>
@@ -1675,6 +1678,9 @@
       <Filter>src\command\song</Filter>
     </ClInclude>
     <ClInclude Include="src\command\song\Export.h">
+      <Filter>src\command\song</Filter>
+    </ClInclude>
+    <ClInclude Include="src\command\song\Show.h">
       <Filter>src\command\song</Filter>
     </ClInclude>
     <ClInclude Include="src\command\Unsorted.h">

@@ -10,8 +10,6 @@
 #include "lib/os/CommandLineParser.h"
 #include "data/base.h"
 #include "data/Song.h"
-#include "data/Track.h"
-#include "data/TrackLayer.h"
 #include "module/SignalChain.h"
 #include "module/audio/AudioEffect.h"
 #include "module/audio/SongRenderer.h"
@@ -31,18 +29,14 @@
 #include "plugins/PluginManager.h"
 #include "plugins/TsunamiPlugin.h"
 #include "device/DeviceManager.h"
-#include "device/stream/AudioOutput.h"
 #include "command/song/Diff.h"
+#include "command/song/Show.h"
 #include "test/TestRingBuffer.h"
 #ifndef NDEBUG
 #include "module/ModuleFactory.h"
 #include "view/module/ConfigPanel.h"
 #include "view/module/ConfigurationDialog.h"
 #endif
-
-
-#include "data/Sample.h"
-#include "data/SampleRef.h"
 
 const string AppName = "Tsunami";
 const string AppVersion = "0.7.110.0";
@@ -111,41 +105,6 @@ bool Tsunami::on_startup(const Array<string> &arg) {
 	return true;
 }
 
-void show_song(Song *song) {
-	msg_write(format("  sample-rate: %d", song->sample_rate));
-	msg_write(format("  samples: %d", song->range().length));
-	msg_write("  length: " + song->get_time_str(song->range().length));
-	msg_write(format("  bars: %d", song->bars.num));
-	msg_write(format("  tracks: %d", song->tracks.num));
-	int n = 0;
-	for (Track *t: weak(song->tracks)) {
-		msg_write(format("  track '%s'", t->nice_name()));
-		msg_write("    type: " + signal_type_name(t->type));
-		if (t->type == SignalType::MIDI) {
-			msg_write(format("    synth: %s v%d", t->synth->module_class, t->synth->version()));
-		}
-		for (TrackLayer *l: weak(t->layers)) {
-			msg_write("    layer");
-			if (l->buffers.num > 0)
-				msg_write(format("      buffers: %d", l->buffers.num));
-			if (l->midi.num > 0)
-				msg_write(format("      notes: %d", l->midi.num));
-			if (l->samples.num > 0)
-				msg_write(format("      sample-refs: %d", l->samples.num));
-			if (l->markers.num > 0)
-				msg_write(format("      markers: %d", l->markers.num));
-			n += l->samples.num;
-		}
-		for (auto *fx: weak(t->fx))
-			msg_write(format("    fx: %s v%d", fx->module_class, fx->version()));
-		for (auto *fx: weak(t->midi_fx))
-			msg_write(format("    midifx: %s v%d", fx->module_class, fx->version()));
-	}
-	msg_write(format("  refs: %d / %d", n, song->samples.num));
-	for (Tag &t: song->tags)
-		msg_write(format("  tag: %s = '%s'", t.key, t.value));
-}
-
 extern bool module_config_debug;
 
 bool Tsunami::handle_arguments(const Array<string> &args) {
@@ -212,9 +171,8 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->song = song;
 		flags = flags | Storage::Flags::ONLY_METADATA;
 		for (string &filename: a)
-			if (session->storage->load_ex(song, filename, flags)) {
+			if (session->storage->load_ex(song, filename, flags))
 				show_song(song);
-			}
 		delete song;
 	});
 	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [session, &flags] (const Array<string> &a) {
@@ -231,7 +189,6 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 					msg_error("diffs: " + str(r));
 			}
 		}
-
 		delete song1;
 		delete song2;
 	});

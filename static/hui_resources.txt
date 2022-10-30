@@ -2266,7 +2266,7 @@ menu_edit
 
 1
 0
-14
+16
 Item
 undo
 image=hui:undo
@@ -2328,27 +2328,39 @@ image=hui:paste
 0
 0
 Item
+paste-aligned-to-beats
+image=hui:paste
+10
+0
+0
+Item
+paste-insert-time
+image=hui:paste
+11
+0
+0
+Item
 delete
 image=hui:delete
-10
+12
 0
 0
 Item
 delete-shift
 image=hui:delete
-11
+13
 0
 0
 Separator
 
 
-12
+14
 0
 0
 Item
 settings
 image=hui:preferences
-13
+15
 0
 0
 Menu
@@ -2416,7 +2428,7 @@ menu_time
 
 3
 0
-11
+9
 Item
 delete_time
 image=hui:delete
@@ -2436,51 +2448,39 @@ Separator
 0
 0
 Item
-paste_time
-image=hui:paste
-3
-0
-0
-Separator
-
-
-4
-0
-0
-Item
 bars_label
 disabled
-5
+3
 0
 0
 Item
 bars-add
 flat,image=hui:add
-6
+4
 0
 0
 Item
 bars-add-pause
 image=hui:add
-7
+5
 0
 0
 Item
 bars-edit
 image=hui:edit
-8
+6
 0
 0
 Item
 bars-scale
 image=hui:zoom-in
-9
+7
 0
 0
 Item
 bars-delete
 flat,image=hui:delete
-10
+8
 0
 0
 Menu
@@ -8150,7 +8150,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-729
+728
 # Text
 /bars-add
 Add bars...
@@ -8335,8 +8335,14 @@ Open...
 /paste
 Paste
 
+/paste-aligned-to-beats
+Paste aligned to beats
+
 /paste-as-samples
 Paste as samples
+
+/paste-insert-time
+Paste and insert time
 
 /per_minute
 /min
@@ -8776,12 +8782,6 @@ About
 header-menu/help
 Help
 
-header-paste-menu/paste-aligned-to-beats
-Paste aligned to beats
-
-header-paste-menu/paste-insert-time
-Insert and add time
-
 header-save-menu/export_selection
 Save selection...
 
@@ -9102,9 +9102,6 @@ View
 
 menu/menu_view_midi
 Midi
-
-menu/paste_time
-Paste
 
 menu/pause
 Pause

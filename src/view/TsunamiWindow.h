@@ -43,7 +43,8 @@ public:
 	void on_copy();
 	void on_paste();
 	void on_paste_as_samples();
-	void on_paste_time();
+	void on_paste_insert_time();
+	void on_paste_aligned_to_beats();
 	void on_delete();
 	void on_delete_shift();
 	void on_render_export_selection();
@@ -66,6 +67,7 @@ public:
 	void on_track_ungroup();
 	void on_buffer_delete();
 	void on_buffer_make_movable();
+	void on_buffer_compress();
 	void on_layer_midi_mode_linear();
 	void on_layer_midi_mode_tab();
 	void on_layer_midi_mode_classical();
@@ -92,6 +94,7 @@ public:
 	void on_marker_resize();
 	void on_delete_marker();
 	void on_settings();
+	void on_mode_edit_checked();
 	void on_play();
 	void on_play_toggle();
 	void on_play_loop();

@@ -65,6 +65,7 @@
 
 extern const string AppName;
 
+
 TsunamiWindow::TsunamiWindow(Session *_session) :
 		hui::Window(AppName, 800, 600) {
 	session = _session;
@@ -90,8 +91,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL);
 	event("paste-as-samples", [this] { on_paste_as_samples(); });
 	set_key_code("paste-as-samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	event("paste_time", [this] { on_paste_time(); });
-	event("paste-insert-time", [this] { on_paste_time(); });
+	event("paste-insert-time", [this] { on_paste_insert_time(); });
+	event("paste-aligned-to-beats", [this] { on_paste_aligned_to_beats(); });
 	event("delete", [this] { on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
 	event("delete-shift", [this] { on_delete_shift(); });
@@ -114,12 +115,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-delete", [this] { on_track_delete(); });
 	event("track-create-group", [this] { on_track_group(); });
 	event("track-ungroup", [this] { on_track_ungroup(); });
-	event("mode-edit-check", [this] {
-		if (view->mode == view->mode_edit)
-			session->set_mode(EditMode::Default);
-		else
-			session->set_mode(EditMode::EditTrack);
-	});
+	event("mode-edit-check", [this] { on_mode_edit_checked(); });
 	event("layer-edit", [this] { on_track_edit(); });
 	set_key_code("layer-edit", hui::KEY_ALT + hui::KEY_E);
 	event("edit_curves", [this] { session->set_mode(EditMode::Curves); });
@@ -133,13 +129,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-convert-stereo", [this] { on_track_convert_stereo(); });
 	event("buffer-delete", [this] { on_buffer_delete(); });
 	event("buffer-make-movable", [this] { on_buffer_make_movable(); });
-	event("buffer-compress", [this] {
-		auto dlg = new BufferCompressionDialog(this);
-		hui::fly(dlg, [dlg, this] {
-			if (dlg->codec != "")
-				song_compress_buffers(song, view->sel, dlg->codec);
-		});
-	});
+	event("buffer-compress", [this] { on_buffer_compress(); });
 
 	event("edit-track-groups", [this] {
 		hui::fly(new TrackRoutingDialog(this, song));
@@ -543,6 +533,21 @@ void TsunamiWindow::on_buffer_make_movable() {
 	song_make_buffers_movable(song, view->sel);
 }
 
+void TsunamiWindow::on_buffer_compress() {
+	auto dlg = new BufferCompressionDialog(this);
+	hui::fly(dlg, [dlg, this] {
+		if (dlg->codec != "")
+			song_compress_buffers(song, view->sel, dlg->codec);
+	});
+}
+
+void TsunamiWindow::on_mode_edit_checked() {
+	if (view->mode == view->mode_edit)
+		session->set_mode(EditMode::Default);
+	else
+		session->set_mode(EditMode::EditTrack);
+}
+
 void TsunamiWindow::on_layer_midi_mode_linear() {
 	view->cur_vtrack()->set_midi_mode(MidiMode::LINEAR);
 }
@@ -647,12 +652,16 @@ void TsunamiWindow::on_paste() {
 void TsunamiWindow::on_paste_as_samples() {
 	app->clipboard->paste_as_samples(view);
 	view->set_message(_("pasted (sample)"));
-
 }
 
-void TsunamiWindow::on_paste_time() {
-	app->clipboard->paste_with_time(view);
-	view->set_message(_("pasted (time)"));
+void TsunamiWindow::on_paste_insert_time() {
+	app->clipboard->paste_insert_time(view);
+	view->set_message(_("pasted (insert time)"));
+}
+
+void TsunamiWindow::on_paste_aligned_to_beats() {
+	app->clipboard->paste_aligned_to_beats(view);
+	view->set_message(_("pasted (aligned)"));
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
@@ -897,7 +906,6 @@ void TsunamiWindow::update_menu() {
 	enable("paste-as-samples", app->clipboard->has_data());
 	enable("paste-aligned-to-beats", app->clipboard->has_data());
 	enable("paste-insert-time", app->clipboard->has_data());
-	enable("paste_time", app->clipboard->has_data());
 	enable("delete", !view->sel.is_empty());
 	enable("delete-shift", !view->sel.is_empty());
 

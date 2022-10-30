@@ -24,7 +24,8 @@ public:
 	void copy(AudioView *view);
 	void paste(AudioView *view);
 	void paste_as_samples(AudioView *view);
-	void paste_with_time(AudioView *view);
+	void paste_insert_time(AudioView *view);
+	void paste_aligned_to_beats(AudioView *view);
 
 	bool prepare_layer_map(AudioView *view, Array<TrackLayer*> &source, Array<TrackLayer*> &target);
 

@@ -203,11 +203,11 @@ void Clipboard::paste_as_samples(AudioView *view) {
 	s->end_action_group();
 }
 
-void Clipboard::paste_with_time(AudioView *view) {
+void Clipboard::paste_insert_time(AudioView *view) {
 	if (!has_data())
 		return;
 	Song *s = view->song;
-	s->begin_action_group("paste with time");
+	s->begin_action_group("paste insert time");
 
 	int offset = view->cursor_pos();
 	int index = 0;
@@ -222,6 +222,31 @@ void Clipboard::paste_with_time(AudioView *view) {
 		s->add_bar(index ++, *b, Bar::EditMode::INSERT_SILENCE);
 
 	paste(view);
+
+	s->end_action_group();
+}
+
+void Clipboard::paste_aligned_to_beats(AudioView *view) {
+	if (!has_data())
+		return;
+	Song *s = view->song;
+	s->begin_action_group("paste aligned to beats");
+
+#if 0
+	int offset = view->cursor_pos();
+	int index = 0;
+	foreachi (Bar *b, weak(s->bars), i)
+		if (b->offset >= offset) {
+			index = i;
+			break;
+		}
+
+	//if (temp->bars.num )
+	for (Bar *b: weak(temp->bars))
+		s->add_bar(index ++, *b, Bar::EditMode::INSERT_SILENCE);
+
+	paste(view);
+#endif
 
 	s->end_action_group();
 }

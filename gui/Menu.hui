@@ -24,6 +24,8 @@ Menu menu ""
 		Item /copy "Copy" image=hui:copy
 		Item /paste "Paste" image=hui:paste
 		Item /paste-as-samples "Paste as samples" image=hui:paste
+		Item /paste-aligned-to-beats "Paste aligned to beats" image=hui:paste
+		Item /paste-insert-time "Paste and insert time" image=hui:paste
 		Item /delete "Delete" image=hui:delete "tooltip=does not move anything - leaves a gap instead"
 		Item /delete-shift "Delete and shift" image=hui:delete "tooltip=no gap - moves everyting afterwards"
 		Separator
@@ -41,8 +43,6 @@ Menu menu ""
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add
-		Separator
-		Item paste_time "Paste" image=hui:paste
 		Separator
 		Item bars_label "Bars" disabled
 		Item /bars-add "Add bars..." flat image=hui:add

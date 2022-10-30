@@ -30,7 +30,7 @@ public:
 	bool prepare_layer_map(AudioView *view, Array<TrackLayer*> &source, Array<TrackLayer*> &target);
 
 	void clear();
-	void append_track(TrackLayer *l, AudioView *view, int offset);
+	void _copy_append_track(TrackLayer *l, AudioView *view, int offset);
 	void paste_track(TrackLayer *source, TrackLayer *target, int offset);
 	void paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, int offset);
 	bool has_data();
@@ -38,6 +38,7 @@ public:
 
 private:
 	shared<Song> temp;
+	int temp_offset = 0;
 	Array<int> ref_uid;
 };
 

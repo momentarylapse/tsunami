@@ -32,7 +32,7 @@ void Clipboard::clear() {
 	ref_uid.clear();
 }
 
-void Clipboard::append_track(TrackLayer *source, AudioView *view, int offset) {
+void Clipboard::_copy_append_track(TrackLayer *source, AudioView *view, int offset) {
 	if (source->type == SignalType::BEATS)
 		return;
 
@@ -54,26 +54,47 @@ void Clipboard::append_track(TrackLayer *source, AudioView *view, int offset) {
 	ref_uid.add(-1);
 }
 
-static int find_offset(AudioView *view) {
+static Range find_selection_range(AudioView *view) {
 	if (!view->sel.range().is_empty())
-		return view->sel.range().offset;
+		return view->sel.range();
 
-	// offset to first selected item
-	int offset = view->song->range().end();
+	// no range selected -> selected items
+	int start = view->song->range().end();
+	int end = view->song->range().start();
 	for (auto *t: weak(view->song->tracks))
 		for (auto *l: weak(t->layers))
 			if (view->sel.has(l)) {
 				for (MidiNote *n: weak(l->midi))
-					if (view->sel.has(n))
-						offset = min(offset, n->range.offset);
+					if (view->sel.has(n)) {
+						start = min(start, n->range.offset);
+						end = min(end, n->range.end());
+					}
 				for (auto m: weak(l->markers))
-					if (view->sel.has(m))
-						offset = min(offset, m->range.offset);
+					if (view->sel.has(m)) {
+						start = min(start, m->range.offset);
+						end = min(end, m->range.end());
+					}
 			}
-
-	return offset;
+	return Range::to(start, end);
 }
 
+static void copy_bars(AudioView *view, Song *d, const Range &r) {
+	auto s = view->song;
+	for (Bar *b: weak(s->bars))
+		//if (view->sel.has(b)) {
+		// TODO: partial bars (only some beats)
+		if (r.covers(b->range())) {
+			// fill gap before bar with pause
+			if (d->bars.range().end() < b->range().start() - r.start())
+				d->bars.add(new Bar(b->range().start() - r.start() - d->bars.range().end(), 0, 0));
+			// the actual bar
+			d->bars.add(b->copy());
+		}
+	// fill with pause at end
+	if (d->bars.range().end() < r.length)
+		d->bars.add(new Bar(r.length - d->bars.range().end(), 0, 0));
+	d->bars._update_offsets();
+}
 
 void Clipboard::copy(AudioView *view) {
 	if (!can_copy(view))
@@ -84,25 +105,19 @@ void Clipboard::copy(AudioView *view) {
 
 	temp->sample_rate = s->sample_rate;
 
-	int offset = find_offset(view);
-
-	for (Bar *b: weak(s->bars))
-		if (view->sel.has(b)) {
-			if (temp->bars.num == 0 and b->offset > offset)
-				temp->bars.add(new Bar(b->offset - offset, 0, 0));
-			temp->bars.add(b->copy());
-	temp->bars._update_offsets();
-		}
+	Range sel_range = find_selection_range(view);
+	copy_bars(view, temp.get(), sel_range);
 
 	for (Track *t: weak(s->tracks))
 		for (TrackLayer *l: weak(t->layers))
 			if (view->sel.has(l))
-				append_track(l, view, offset);
+				_copy_append_track(l, view, sel_range.offset);
 
 	notify();
 }
 
 void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, int offset) {
+	offset -= temp_offset;
 	if (target->type == SignalType::AUDIO) {
 		Range r = Range(offset, source->buffers[0].length);
 		AudioBuffer buf;
@@ -180,7 +195,7 @@ void Clipboard::paste(AudioView *view) {
 	s->begin_action_group("paste");
 
 	int offset = view->sel.range().start();
-	foreachi(auto *ls, source_list, i)
+	for (auto&& [i,ls]: enumerate(source_list))
 		paste_track(ls, target_list[i], offset);
 
 	s->end_action_group();
@@ -199,7 +214,7 @@ void Clipboard::paste_as_samples(AudioView *view) {
 	s->begin_action_group("paste as samples");
 
 	int offset = view->sel.range().start();
-	foreachi(auto *ls, source_list, i)
+	for (auto&& [i,ls]: enumerate(source_list))
 		paste_track_as_samples(ls, i, target_list[i], offset);
 
 	s->end_action_group();

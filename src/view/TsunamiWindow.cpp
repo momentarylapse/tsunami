@@ -90,9 +90,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("paste", [this] { on_paste(); });
 	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL);
 	event("paste-as-samples", [this] { on_paste_as_samples(); });
-	set_key_code("paste-as-samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
 	event("paste-insert-time", [this] { on_paste_insert_time(); });
+	set_key_code("paste-insert-time", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
 	event("paste-aligned-to-beats", [this] { on_paste_aligned_to_beats(); });
+	set_key_code("paste-aligned-to-beats", hui::KEY_B + hui::KEY_CONTROL);
 	event("delete", [this] { on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
 	event("delete-shift", [this] { on_delete_shift(); });
@@ -656,12 +657,12 @@ void TsunamiWindow::on_paste_as_samples() {
 
 void TsunamiWindow::on_paste_insert_time() {
 	app->clipboard->paste_insert_time(view);
-	view->set_message(_("pasted (insert time)"));
+	view->set_message(_("pasted (insert time)  EXPERIMENTAL!"));
 }
 
 void TsunamiWindow::on_paste_aligned_to_beats() {
 	app->clipboard->paste_aligned_to_beats(view);
-	view->set_message(_("pasted (aligned)"));
+	view->set_message(_("pasted (aligned)  EXPERIMENTAL!"));
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {

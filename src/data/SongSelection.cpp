@@ -76,6 +76,7 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 	SongSelection s;
 	s.song = song;
 	s.range_raw = range_raw;
+	s._bars = _bars;
 
 	for (auto *l: _layers) {
 
@@ -94,8 +95,8 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 			if (has(sr))
 				s.add(sr);
 
-		if (l->type == SignalType::BEATS)
-			s._bars = _bars;
+		//if (l->type == SignalType::BEATS)
+		//	s._bars = _bars;
 	}
 
 	return s;

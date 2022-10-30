@@ -17,6 +17,7 @@
 #include "../data/Sample.h"
 #include "../data/SongSelection.h"
 #include "../data/rhythm/Bar.h"
+#include "../lib/base/iter.h"
 #include <assert.h>
 
 Clipboard::Clipboard() {
@@ -90,6 +91,7 @@ void Clipboard::copy(AudioView *view) {
 			if (temp->bars.num == 0 and b->offset > offset)
 				temp->bars.add(new Bar(b->offset - offset, 0, 0));
 			temp->bars.add(b->copy());
+	temp->bars._update_offsets();
 		}
 
 	for (Track *t: weak(s->tracks))
@@ -230,23 +232,47 @@ void Clipboard::paste_aligned_to_beats(AudioView *view) {
 	if (!has_data())
 		return;
 	Song *s = view->song;
+
+	Array<TrackLayer*> source_list, target_list;
+	if (!prepare_layer_map(view, source_list, target_list))
+		return;
+	temp->bars._update_offsets();
+
+
 	s->begin_action_group("paste aligned to beats");
 
-#if 0
-	int offset = view->cursor_pos();
-	int index = 0;
-	foreachi (Bar *b, weak(s->bars), i)
-		if (b->offset >= offset) {
-			index = i;
-			break;
+	auto first_bar = [] (Song *s, int offset) {
+		for (auto&& [i,b]: enumerate(weak(s->bars)))
+			if (b->offset >= offset - 100)
+				return i;
+		return -1;
+	};
+
+	auto remap = [] (const Range &rs, const Range &rd, int x) {
+		return rd.offset + (int)( (double)(x - rs.offset) * (double)(rd.length) / (double)(rs.length) );
+	};
+
+	auto paste_bar = [remap] (TrackLayer *source, TrackLayer *dest, const Range &rs, const Range &rd) {
+		//msg_write("paste bar ..." + str(rs) + " -> " + str(rd));
+		auto midi = source->midi.get_notes(rs);
+		for (auto n: midi) {
+			auto c = n->copy();
+			c->range = Range::to(remap(rs, rd, n->range.offset), remap(rs, rd, n->range.end()));
+			dest->add_midi_note(c);
 		}
+	};
 
-	//if (temp->bars.num )
-	for (Bar *b: weak(temp->bars))
-		s->add_bar(index ++, *b, Bar::EditMode::INSERT_SILENCE);
+	auto paste_layer = [this, paste_bar, first_bar] (int offset, TrackLayer *source, TrackLayer *dest) {
+		int b0 = first_bar(dest->song(), offset);
+		//msg_write("paste layer..." + str(b0));
+		for (auto&& [i,b]: enumerate(weak(temp->bars)))
+			if ((b0 + i) < dest->song()->bars.num)
+				paste_bar(source, dest, b->range(), dest->song()->bars[b0 + i]->range());
+	};
 
-	paste(view);
-#endif
+	int offset = view->sel.range().start();
+	for (auto&& [i,source]: enumerate(source_list))
+		paste_layer(offset, source, target_list[i]);
 
 	s->end_action_group();
 }

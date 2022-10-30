@@ -18,8 +18,11 @@ BufferCompressionDialog::BufferCompressionDialog(hui::Window *parent) : hui::Dia
 	event("codec", [=] {
 		//enable("quality", get_int("codec") == 0);
 	});
-	event("ok", [&] {
+	event("ok", [this] {
 		codec = COMPRESSION_CODECS[get_int("codec")];
+		request_destroy();
+	});
+	event("cancel", [this] {
 		request_destroy();
 	});
 }

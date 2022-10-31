@@ -14,6 +14,7 @@
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/rhythm/Beat.h"
+#include "../../lib/base/iter.h"
 
 
 color col_inter(const color a, const color &b, float t);
@@ -124,8 +125,14 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
 
+	auto is_last_bar = [this] (Bar *b, int i) {
+		if (b == song->bars.back())
+			return true;
+		return (song->bars[i+1]->is_pause());
+	};
+
 	auto bars = song->bars.get_bars(Range::to(s0, s1));
-	for (Bar *b: bars) {
+	for (auto&& [i,b]: enumerate(bars)) {
 		if (b->is_pause())
 			continue;
 		float xx = cam->sample2screen(b->range().offset);
@@ -149,7 +156,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 
 
 			// end of last bar
-			if (b == bars.back()) {
+			if (is_last_bar(b, i)) {
 				if (sel->range().is_inside(b->range().end()))
 					c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
 				else

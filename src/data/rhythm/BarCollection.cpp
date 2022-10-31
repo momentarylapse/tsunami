@@ -22,17 +22,17 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 	int bar_no = 0;
 
 	for (Bar *b: weak(*this)) {
-		if (!b->is_pause()) {
+		if (b->is_pause()) {
+			if (include_hidden)
+				beats.add(Beat(Range(pos_bar, b->length), 0, 0, bar_index, -1));
+			pos_bar += b->length;
+		} else {
 			auto _beats = b->get_beats(pos_bar, include_sub_beats, sub_beat_partition);
 			for (Beat &bb: _beats)
 				if (r.is_inside(bb.range.offset))
 					beats.add(bb);
 			pos_bar += b->length;
 			bar_no ++;
-		} else {
-			if (include_hidden)
-				beats.add(Beat(Range(pos_bar, b->length), 0, 0, bar_index, -1));
-			pos_bar += b->length;
 		}
 		bar_index ++;
 	}

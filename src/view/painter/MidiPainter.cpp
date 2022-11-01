@@ -615,13 +615,18 @@ void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_
 	c->draw_line({x + dx, y}, {x2, y});
 }
 
-void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
+
+void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state) {
+	float x1, x2;
+	cam->range2screen(n.range, x1, x2);
+	float y = pitch2y_linear(n.pitch);
+	n.y = y;
 
 	color col, col_shadow;
-	get_col(col, col_shadow, n, state, is_playable, local_theme);
+	get_col(col, col_shadow, &n, state, is_playable, local_theme);
 
 	if (state & MidiPainter::STATE_SELECTED) {
-		color col1 = local_theme.pitch_text[(int)n->pitch % 12];//selection;
+		color col1 = local_theme.pitch_text[(int)n.pitch % 12];//selection;
 
 		// "shadow" to indicate length
 		if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
@@ -641,17 +646,7 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 		draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}
 
-	draw_note_flags(c, n, state, x1, x2, y);
-}
-
-
-void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state) {
-	float x1, x2;
-	cam->range2screen(n.range, x1, x2);
-	float y = pitch2y_linear(n.pitch);
-	n.y = y;
-
-	draw_complex_note(c, &n, state, x1, x2, y);
+	draw_note_flags(c, &n, state, x1, x2, y);
 }
 
 void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
@@ -720,7 +715,6 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 	color col, col_shadow;
 	get_col(col, col_shadow, n, state, is_playable, local_theme);
-	//draw_complex_note(c, n, state, x1, x2, y);
 
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.6f;
@@ -803,7 +797,31 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 		c->draw_line({x - clef_dy, y}, {x + clef_dy, y});
 	}
 
-	draw_complex_note(c, n, state, x1, x2, y);
+	color col, col_shadow;
+	get_col(col, col_shadow, n, state, is_playable, local_theme);
+
+	if (state & MidiPainter::STATE_SELECTED) {
+		color col1 = local_theme.pitch_text[(int)n->pitch % 12];//selection;
+
+		// "shadow" to indicate length
+		if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
+			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 1.6f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 0.7f, col_shadow);
+		}
+
+		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
+		draw_simple_note(c, x1, x2, y, -2, col, col_shadow, false);
+	} else {
+		// "shadow" to indicate length
+		if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
+			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
+			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
+
+		draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
+	}
+
+	draw_note_flags(c, n, state, x1, x2, y);
 
 	if ((n->modifier != NoteModifier::NONE) and quality._highest_details) {
 		c->set_color(local_theme.text);

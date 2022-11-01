@@ -44,6 +44,21 @@ public:
 	Scale key;
 };
 
+
+enum class MidiNoteState {
+	DEFAULT = 0,
+	HOVER = 1,
+	SELECTED = 2,
+	REFERENCE = 4,
+};
+inline bool operator&(MidiNoteState a, MidiNoteState b) {
+	return (int)a & (int)b;
+}
+inline MidiNoteState operator|(MidiNoteState a, MidiNoteState b) {
+	return (MidiNoteState)((int)a | (int)b);
+}
+
+
 class MidiPainter {
 	friend class PluginManager;
 	friend class MidiPainterModeClassical;
@@ -54,13 +69,6 @@ public:
 
 	static const int PITCH_MIN_DEFAULT = 25;
 	static const int PITCH_MAX_DEFAULT = 105;
-
-	enum MidiNoteState {
-		STATE_DEFAULT = 0,
-		STATE_HOVER = 1,
-		STATE_SELECTED = 2,
-		STATE_REFERENCE = 4,
-	};
 
 	static color pitch_color(int pitch);
 
@@ -81,8 +89,6 @@ private:
 	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
 	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
 	void draw_tab(Painter *c, const MidiNoteBuffer &midi);
-	void draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_classical(Painter *c, const MidiNoteBuffer &midi);
 
 	void draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &midi);
 	void draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &midi);

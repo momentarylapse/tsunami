@@ -16,6 +16,7 @@ class HoverData;
 class Painter;
 class MidiNoteBuffer;
 class MidiPainter;
+enum class MidiNoteState;
 
 class MidiPainterMode {
 public:
@@ -23,7 +24,7 @@ public:
         mp(mp), song(song), cam(cam), sel(sel), hover(hover), local_theme(colors)
     {}
 
-	virtual void draw(Painter *c, const MidiNoteBuffer &midi) {}//= 0;
+	virtual void draw_notes(Painter *c, const MidiNoteBuffer &midi) {}//= 0;
 	virtual void draw_background(Painter *c, bool force = false) {}//= 0;
 
 

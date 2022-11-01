@@ -5,8 +5,8 @@
 #include "../../audioview/ViewPort.h"
 
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, bool playable, ColorScheme &colors);
-MidiPainter::MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, ColorScheme &colors);
+MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
 
 
 QuantizedNote::QuantizedNote(){ n = nullptr; }

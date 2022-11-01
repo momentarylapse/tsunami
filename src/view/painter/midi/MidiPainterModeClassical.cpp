@@ -9,14 +9,96 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, ColorScheme &colors);
+MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
+void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col);
+void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col);
+
+
 MidiPainterModeClassical::MidiPainterModeClassical(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors) :
     MidiPainterMode(mp, song, cam, sel, hover, colors)
 {
 }
 
-void MidiPainterModeClassical::draw(Painter *c, const MidiNoteBuffer &midi) {
+void MidiPainterModeClassical::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
+	if (mp->quality._highest_details)
+		mp->draw_rhythm(c, midi, mp->cur_range, [this] (MidiNote *n) {
+			return clef_pos_to_screen(n->clef_position);
+		});
 
+	c->set_antialiasing(mp->quality.antialiasing);
+	for (auto *n: weak(midi))
+		draw_note(c, n, note_state(n, mp->as_reference, sel, hover));
+	c->set_antialiasing(false);
+
+	c->set_font_size(local_theme.FONT_SIZE);
 }
+
+
+
+void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNoteState state) {
+	float x1, x2;
+	cam->range2screen(n->range + mp->shift, x1, x2);
+	float x = (x1 + x2) / 2;
+
+
+	float rr = mp->rr;
+
+	// checked before...
+//	if (n.clef_position <= UNDEFINED_CLEF)
+//		n.update_meta(track->instrument, midi_scale, 0);
+
+	int p = n->clef_position;
+	float y = clef_pos_to_screen(p);
+	n->y = y;
+
+	// auxiliary lines
+	for (int i=10; i<=p; i+=2) {
+		c->set_line_width(mp->clef_line_width);
+		c->set_color(local_theme.text_soft2);
+		float y = clef_pos_to_screen(i);
+		c->draw_line({x - mp->clef_dy, y}, {x + mp->clef_dy, y});
+	}
+	for (int i=-2; i>=p; i-=2) {
+		c->set_line_width(mp->clef_line_width);
+		c->set_color(local_theme.text_soft2);
+		float y = clef_pos_to_screen(i);
+		c->draw_line({x - mp->clef_dy, y}, {x + mp->clef_dy, y});
+	}
+
+	color col, col_shadow;
+	get_col(col, col_shadow, n, state, mp->is_playable, local_theme);
+
+	if (state & MidiNoteState::SELECTED) {
+		color col1 = local_theme.pitch_text[(int)n->pitch % 12];//selection;
+
+		// "shadow" to indicate length
+		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
+			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 1.6f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 0.7f, col_shadow);
+		}
+
+		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
+		mp->draw_simple_note(c, x1, x2, y, -2, col, col_shadow, false);
+	} else {
+		// "shadow" to indicate length
+		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold))
+			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
+			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
+
+		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
+	}
+
+	mp->draw_note_flags(c, n, state, x1, x2, y);
+
+	if ((n->modifier != NoteModifier::NONE) and mp->quality._highest_details) {
+		c->set_color(local_theme.text);
+		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
+		SymbolRenderer::draw(c, {x - mp->modifier_font_size*1.0f, y - mp->modifier_font_size*0.5f}, mp->modifier_font_size, modifier_symbol(n->modifier));
+	}
+}
+
 
 void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
 	// clef lines

@@ -11,6 +11,7 @@
 #include <functional>
 #include "midi/MidiPainterModeClassical.h"
 #include "midi/MidiPainterModeTab.h"
+#include "midi/MidiPainterModeLinear.h"
 #include "../../lib/base/base.h"
 #include "../../lib/math/rect.h"
 #include "../../data/Range.h"
@@ -64,6 +65,7 @@ class MidiPainter {
 	friend class PluginManager;
 	friend class MidiPainterModeClassical;
 	friend class MidiPainterModeTab;
+	friend class MidiPainterModeLinear;
 public:
 	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
@@ -85,9 +87,6 @@ private:
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
 
 	void draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
-
-	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
-	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
 
 	void draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &midi);
 	void draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &midi);
@@ -153,6 +152,7 @@ private:
 	MidiMode mode;
 	MidiPainterModeClassical mode_classical;
 	MidiPainterModeTab mode_tab;
+	MidiPainterModeLinear mode_linear;
 	MidiPainterMode mode_dummy;
 	MidiPainterMode *mmode = nullptr;
 	float rr;

@@ -36,6 +36,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	local_theme(_colors),
 	mode_classical(this, _song, _cam, _sel, _hover, _colors),
 	mode_tab(this, _song, _cam, _sel, _hover, _colors),
+	mode_linear(this, _song, _cam, _sel, _hover, _colors),
 	mode_dummy(this, _song, _cam, _sel, _hover, _colors)
 {
 	song = _song;
@@ -130,17 +131,18 @@ int MidiPainter::screen_to_string(float y) {
 // this is the "center" of the note!
 // it reaches below and above this y
 float MidiPainter::pitch2y_linear(float pitch) {
-	return area.y2 - area.height() * (pitch - (float)pitch_min) / (pitch_max - pitch_min);
+	return mode_linear.pitch2y(pitch);
 }
 
 float MidiPainter::pitch2y_classical(int pitch) {
+	//return mode_classical.pitch2y(pitch);
 	NoteModifier mod;
 	int p = clef->pitch_to_position(pitch, midi_scale, mod);
 	return clef_pos_to_screen(p);
 }
 
 int MidiPainter::y2pitch_linear(float y) {
-	return pitch_min + ((area.y2 - y) * (pitch_max - pitch_min) / area.height()) + 0.5f;
+	return mode_linear.y2pitch(y);
 }
 
 int MidiPainter::y2pitch_classical(float y, NoteModifier modifier) {
@@ -154,10 +156,7 @@ int MidiPainter::y2clef_classical(float y, NoteModifier &mod) {
 }
 
 int MidiPainter::y2clef_linear(float y, NoteModifier &mod) {
-	mod = NoteModifier::UNKNOWN;//modifier;
-
-	int pitch = y2pitch_linear(y);
-	return clef->pitch_to_position(pitch, midi_scale, mod);
+	return mode_linear.y2clef(y, mod);
 }
 
 void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset) {
@@ -311,46 +310,6 @@ void MidiPainter::set_synthesizer(Synthesizer *s) {
 	synth = s;
 }
 
-void MidiPainter::draw_pitch_grid(Painter *c) {
-	// pitch grid
-	c->set_color(color(0.25f, 0, 0, 0));
-	for (int i=pitch_min; i<pitch_max; i++) {
-		float y0 = pitch2y_linear(i + 0.5f);
-		float y1 = pitch2y_linear(i - 0.5f);
-		if (!midi_scale.contains(i)) {
-			c->set_color(color(0.2f, 0, 0, 0));
-			c->draw_rect(rect(area.x1, area.x2, y0, y1));
-		}
-	}
-
-
-	// pitch names
-	color cc = local_theme.text;
-	cc.a = 0.4f;
-	Array<SampleRef*> *p = nullptr;
-	if (synth and (synth->module_class == "Sample")) {
-		auto *c = synth->get_config();
-		p = (Array<SampleRef*> *)&c[1];
-	}
-	bool is_drum = (instrument->type == Instrument::Type::DRUMS);
-	float dy = ((pitch2y_linear(0) - pitch2y_linear(1)) - c->font_size) / 2;
-	for (int i=pitch_min; i<pitch_max; i++) {
-		c->set_color(cc);
-		if (((hover->type == HoverData::Type::MIDI_PITCH) and (i == hover->index))) // or ((hover->type == HoverData::Type::MIDI_NOTE) and (i == hover->pitch)))
-			c->set_color(local_theme.text);
-
-		string name = pitch_name(i);
-		if (is_drum) {
-			name = drum_pitch_name(i);
-		} else if (p) {
-			if (i < p->num)
-				if ((*p)[i])
-					name = (*p)[i]->origin->name;
-		}
-		c->draw_str({20, pitch2y_linear(i+0.5f)+dy}, name);
-	}
-}
-
 void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
 
 	if (n->flags > 0) {
@@ -383,57 +342,6 @@ void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_
 	float x = (x1 + x2) / 2;
 	c->draw_line({x1, y}, {x - dx, y});
 	c->draw_line({x + dx, y}, {x2, y});
-}
-
-
-void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state) {
-	float x1, x2;
-	cam->range2screen(n.range, x1, x2);
-	float y = pitch2y_linear(n.pitch);
-	n.y = y;
-
-	color col, col_shadow;
-	get_col(col, col_shadow, &n, state, is_playable, local_theme);
-
-	if (state & MidiNoteState::SELECTED) {
-		color col1 = local_theme.pitch_text[(int)n.pitch % 12];//selection;
-
-		// "shadow" to indicate length
-		if (allow_shadows and (x2 - x1 > quality.shadow_threshold)) {
-			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 1.6f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 0.7f, col_shadow);
-		}
-
-		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
-		draw_simple_note(c, x1, x2, y, -2, col, col_shadow, false);
-	} else {
-		// "shadow" to indicate length
-		if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
-			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
-			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
-
-		draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
-	}
-
-	draw_note_flags(c, &n, state, x1, x2, y);
-}
-
-void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
-	if (quality._highest_details)
-		draw_rhythm(c, notes, cur_range, [this] (MidiNote *n) {
-			return pitch2y_linear(n->pitch);
-		});
-	//c->setLineWidth(3.0f);
-
-	// draw notes
-	c->set_antialiasing(quality.antialiasing);
-	for (auto *n: weak(notes)) {
-		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
-			continue;
-		draw_note_linear(c, *n, note_state(n, as_reference, sel, hover));
-	}
-	c->set_antialiasing(false);
 }
 
 
@@ -498,14 +406,6 @@ Range extend_range_to_bars(const Range &r, const BarCollection &bars) {
 }
 
 void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
-
-	if (mode == MidiMode::LINEAR)
-		draw_linear(p, notes);
-	//else if (mode == MidiMode::TAB)
-	//	draw_tab(p, notes);
-	//else // if (mode == MidiMode::CLASSICAL)
-	//	draw_classical(p, notes);
-
 	mmode->draw_notes(p, notes);
 }
 
@@ -526,14 +426,6 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 }
 
 void MidiPainter::draw_background(Painter *c, bool force) {
-	if (mode == MidiMode::CLASSICAL) {
-		//draw_clef_classical(c);
-	} else if (mode == MidiMode::TAB) {
-		//draw_clef_tab(c);
-	} else if (mode == MidiMode::LINEAR) {
-		if (force)
-			draw_pitch_grid(c);
-	}
 	mmode->draw_background(c, force);
 }
 
@@ -559,6 +451,8 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 		mmode = &mode_classical;
 	else if (mode == MidiMode::TAB)
 		mmode = &mode_tab;
+	else if (mode == MidiMode::LINEAR)
+		mmode = &mode_linear;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;

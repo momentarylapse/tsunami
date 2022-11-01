@@ -558,6 +558,7 @@
     <ClCompile Include="src\view\module\ConfigPanel.cpp" />
     <ClCompile Include="src\view\module\ConfigurationDialog.cpp" />
     <ClCompile Include="src\view\module\ModulePanel.cpp" />
+    <ClCompile Include="src\view\painter\midi\rhythm.cpp" />
     <ClCompile Include="src\view\painter\BasicGridPainter.cpp" />
     <ClCompile Include="src\view\painter\BufferPainter.cpp" />
     <ClCompile Include="src\view\painter\GridPainter.cpp" />
@@ -1011,6 +1012,7 @@
     <ClInclude Include="src\view\module\ConfigPanel.h" />
     <ClInclude Include="src\view\module\ConfigurationDialog.h" />
     <ClInclude Include="src\view\module\ModulePanel.h" />
+    <ClInclude Include="src\view\painter\midi\rhythm.h" />
     <ClInclude Include="src\view\painter\BasicGridPainter.h" />
     <ClInclude Include="src\view\painter\BufferPainter.h" />
     <ClInclude Include="src\view\painter\GridPainter.h" />

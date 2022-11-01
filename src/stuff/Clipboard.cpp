@@ -82,13 +82,17 @@ static void copy_bars(AudioView *view, Song *d, const Range &r) {
 	auto s = view->song;
 	for (Bar *b: weak(s->bars))
 		//if (view->sel.has(b)) {
-		// TODO: partial bars (only some beats)
 		if (r.covers(b->range())) {
 			// fill gap before bar with pause
 			if (d->bars.range().end() < b->range().start() - r.start())
 				d->bars.add(new Bar(b->range().start() - r.start() - d->bars.range().end(), 0, 0));
 			// the actual bar
 			d->bars.add(b->copy());
+		} else if (r.overlaps(b->range())) {
+			auto rr = r.intersect(b->range());
+			// TODO split bar more accurately!
+			int beats = (int)((double)b->beats.num * (double)rr.length / (double)b->length + 0.4);
+			d->bars.add(new Bar(rr.length, beats, b->divisor));
 		}
 	// fill with pause at end
 	if (d->bars.range().end() < r.length)

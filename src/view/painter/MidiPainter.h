@@ -10,6 +10,7 @@
 
 #include <functional>
 #include "midi/MidiPainterModeClassical.h"
+#include "midi/MidiPainterModeTab.h"
 #include "../../lib/base/base.h"
 #include "../../lib/math/rect.h"
 #include "../../data/Range.h"
@@ -62,6 +63,7 @@ inline MidiNoteState operator|(MidiNoteState a, MidiNoteState b) {
 class MidiPainter {
 	friend class PluginManager;
 	friend class MidiPainterModeClassical;
+	friend class MidiPainterModeTab;
 public:
 	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
@@ -77,7 +79,6 @@ public:
 
 private:
 	void draw_pitch_grid(Painter *c);
-	void draw_clef_tab(Painter *c);
 
 	void draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func);
 
@@ -87,8 +88,6 @@ private:
 
 	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
 	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
-	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_tab(Painter *c, const MidiNoteBuffer &midi);
 
 	void draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &midi);
 	void draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &midi);
@@ -153,6 +152,7 @@ private:
 	float clef_line_width;
 	MidiMode mode;
 	MidiPainterModeClassical mode_classical;
+	MidiPainterModeTab mode_tab;
 	MidiPainterMode mode_dummy;
 	MidiPainterMode *mmode = nullptr;
 	float rr;

@@ -35,6 +35,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	midi_scale(Scale::C_MAJOR),
 	local_theme(_colors),
 	mode_classical(this, _song, _cam, _sel, _hover, _colors),
+	mode_tab(this, _song, _cam, _sel, _hover, _colors),
 	mode_dummy(this, _song, _cam, _sel, _hover, _colors)
 {
 	song = _song;
@@ -446,99 +447,6 @@ void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, floa
 		c->draw_rect(rect(x1 - rr*0.8f - rx, x1 + rr*0.8f + rx, y - rr*0.8f - rx, y + rr*0.8f + rx));
 }
 
-void MidiPainter::draw_clef_tab(Painter *c) {
-	if (is_playable)
-		c->set_color(local_theme.text_soft1);
-	else
-		c->set_color(local_theme.text_soft3);
-	c->set_line_width(clef_line_width);
-	c->set_antialiasing(true);
-
-	// clef lines
-	float h = string_dy * instrument->string_pitch.num;
-	for (int i=0; i<instrument->string_pitch.num; i++) {
-		float y = string_to_screen(i);
-		c->draw_line({area.x1, y}, {area.x2, y});
-	}
-	c->set_antialiasing(false);
-
-
-	if (is_playable)
-		c->set_color(local_theme.text_soft1);
-	else
-		c->set_color(local_theme.text_soft3);
-
-	c->set_font_size(h / 6);
-	c->draw_str({10, area.y1 + area.height() / 2 - h * 0.37f}, "T\nA\nB");
-	c->set_font_size(local_theme.FONT_SIZE);
-}
-
-void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state) {
-	float x1, x2;
-	cam->range2screen(n->range + shift, x1, x2);
-
-
-	int p = n->stringno;
-	float y = string_to_screen(p);
-	n->y = y;
-
-	color col, col_shadow;
-	get_col(col, col_shadow, n, state, is_playable, local_theme);
-
-	float x = (x1 + x2) / 2;
-	float font_size = rr * 1.6f;
-
-	if (n->is(NOTE_FLAG_DEAD)) {
-		c->set_color(col);
-		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, "x", true, 0);
-		return;
-	}
-
-	if (x2 - x1 > quality.tab_text_threshold /*and rr > 5*/) {
-		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
-		float dx = rr * 0.8f * tt.num;
-
-		// "shadow" to indicate length
-		if (allow_shadows and (x2 - x1 > quality.shadow_threshold*1.5f)) {
-			//draw_shadow(c, x1, x2, y, 2, rr, col, col_shadow);
-			dx += rr * 1.0f;
-			draw_shadow2(c, x1, x2, y, dx, clef_line_width, col_shadow);
-		}
-
-		// hide the string line to make the number more readable
-		color cc = local_theme.background_track;
-		cc.a = 0.5f;
-
-		c->set_color(cc);
-		c->draw_rect(rect(x - dx, x + dx, y - 2, y + 2));
-
-		// fret number as symbol
-		c->set_color(col);
-		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
-
-		draw_note_flags(c, n, state, x1, x2, y);
-	} else {
-		string tt = i2s(n->pitch - instrument->string_pitch[n->stringno]);
-		c->set_color(col);
-		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
-		draw_note_flags(c, n, state, x1, x2, y);
-	}
-}
-
-void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
-	if (quality._highest_details)
-		draw_rhythm(c, notes, cur_range, [this] (MidiNote *n) {
-			return string_to_screen(n->stringno);
-		});
-
-	c->set_antialiasing(quality.antialiasing);
-	for (auto *n: weak(notes))
-		draw_note_tab(c,  n,  note_state(n, as_reference, sel, hover));
-	c->set_antialiasing(false);
-
-	c->set_font_size(local_theme.FONT_SIZE);
-}
-
 void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &notes) {
 	auto bars = song->bars.get_bars(cur_range);
 
@@ -593,8 +501,8 @@ void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
 
 	if (mode == MidiMode::LINEAR)
 		draw_linear(p, notes);
-	else if (mode == MidiMode::TAB)
-		draw_tab(p, notes);
+	//else if (mode == MidiMode::TAB)
+	//	draw_tab(p, notes);
 	//else // if (mode == MidiMode::CLASSICAL)
 	//	draw_classical(p, notes);
 
@@ -621,7 +529,7 @@ void MidiPainter::draw_background(Painter *c, bool force) {
 	if (mode == MidiMode::CLASSICAL) {
 		//draw_clef_classical(c);
 	} else if (mode == MidiMode::TAB) {
-		draw_clef_tab(c);
+		//draw_clef_tab(c);
 	} else if (mode == MidiMode::LINEAR) {
 		if (force)
 			draw_pitch_grid(c);
@@ -649,6 +557,8 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	mmode = &mode_dummy;
 	if (mode == MidiMode::CLASSICAL)
 		mmode = &mode_classical;
+	else if (mode == MidiMode::TAB)
+		mmode = &mode_tab;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;

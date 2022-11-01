@@ -449,6 +449,7 @@ set(SOURCE
 	src/view/module/ConfigurationDialog.cpp
 	src/view/module/ModulePanel.cpp
 	src/view/painter/midi/MidiPainterModeClassical.cpp
+	src/view/painter/midi/MidiPainterModeTab.cpp
 	src/view/painter/midi/rhythm.cpp
 	src/view/painter/BasicGridPainter.cpp
 	src/view/painter/BufferPainter.cpp

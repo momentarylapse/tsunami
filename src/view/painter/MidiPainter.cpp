@@ -146,7 +146,7 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 	if (state & MidiPainter::STATE_HOVER)
 		col = color::interpolate(col, colors.hover, 0.5f);
 
-	col_shadow = color::interpolate(col, colors.background_track, 0.3f);
+	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
 	//col_shadow = col;
 	//col_shadow.a = 0.5f;
 }
@@ -635,8 +635,8 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 	} else {
 		// "shadow" to indicate length
 		if (allow_shadows and (x2 - x1 > quality.shadow_threshold))
-			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
+			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
+			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width, col_shadow);
 
 		draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}

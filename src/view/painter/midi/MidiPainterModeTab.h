@@ -16,6 +16,9 @@ class MidiPainterModeTab : public MidiPainterMode {
 public:
 	MidiPainterModeTab(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 
+	void reset() override;
+	void update() override;
+
 	void draw_notes(Painter *c, const MidiNoteBuffer &midi) override;
 	void draw_background(Painter *c, bool force = false) override;
 
@@ -24,6 +27,11 @@ public:
 
     float string_to_screen(int string_no) const;
     int screen_to_string(float y) const;
+
+
+	float string_dy = 0;
+	float string_y0 = 0;
+    float clef_line_width = 0;
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODETAB_H_ */

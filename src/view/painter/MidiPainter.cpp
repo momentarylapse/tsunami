@@ -36,8 +36,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	local_theme(_colors),
 	mode_classical(this, _song, _cam, _sel, _hover, _colors),
 	mode_tab(this, _song, _cam, _sel, _hover, _colors),
-	mode_linear(this, _song, _cam, _sel, _hover, _colors),
-	mode_dummy(this, _song, _cam, _sel, _hover, _colors)
+	mode_linear(this, _song, _cam, _sel, _hover, _colors)
 {
 	song = _song;
 	cam = _cam;
@@ -53,15 +52,9 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	as_reference = false;
 	allow_shadows = true;
 	force_shadows = false;
-	pitch_min = PITCH_MIN_DEFAULT;
-	pitch_max = PITCH_MAX_DEFAULT;
 	shift = 0;
-	clef_dy = 0;
-	clef_y0 = 0;
-	string_dy = 0;
-	string_y0 = 0;
 	mode = MidiMode::LINEAR;
-	mmode = &mode_dummy;
+	mmode = &mode_linear;
 	rr = 5;
 	set_quality(1.0f, true);
 }
@@ -112,51 +105,54 @@ MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, Hov
 }
 
 
-float MidiPainter::clef_pos_to_screen(int pos) {
-	return area.y2 - area.height() / 2 - (pos - 4) * clef_dy / 2.0f;
+float MidiPainter::clef_pos_to_screen(int pos) const {
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.clef_pos_to_screen(pos);
+	return 0;
 }
 
-int MidiPainter::screen_to_clef_pos(float y) {
-	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
+int MidiPainter::screen_to_clef_pos(float y) const {
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.screen_to_clef_pos(y);
+	return 0;
 }
 
-float MidiPainter::string_to_screen(int string_no) {
-	return string_y0 - string_no * string_dy;
+float MidiPainter::string_to_screen(int string_no) const {
+	if (mode == MidiMode::TAB)
+		return mode_tab.string_to_screen(string_no);
+	return 0;
 }
 
-int MidiPainter::screen_to_string(float y) {
-	return clamp((int)floor((string_y0 - y) / string_dy + 0.5f), 0, instrument->string_pitch.num-1);
+int MidiPainter::screen_to_string(float y) const {
+	if (mode == MidiMode::TAB)
+		return mode_tab.screen_to_string(y);
+	return 0;
 }
 
 // this is the "center" of the note!
 // it reaches below and above this y
-float MidiPainter::pitch2y_linear(float pitch) {
-	return mode_linear.pitch2y(pitch);
+float MidiPainter::pitch2y(int pitch) const {
+	if (mode == MidiMode::LINEAR)
+		return mode_linear.pitch2y(pitch);
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.pitch2y(pitch);
+	return 0;
 }
 
-float MidiPainter::pitch2y_classical(int pitch) {
-	//return mode_classical.pitch2y(pitch);
-	NoteModifier mod;
-	int p = clef->pitch_to_position(pitch, midi_scale, mod);
-	return clef_pos_to_screen(p);
+int MidiPainter::y2pitch(float y, NoteModifier modifier) const {
+	if (mode == MidiMode::LINEAR)
+		return mode_linear.y2pitch(y);
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.y2pitch(y, modifier);
+	return 0;
 }
 
-int MidiPainter::y2pitch_linear(float y) {
-	return mode_linear.y2pitch(y);
-}
-
-int MidiPainter::y2pitch_classical(float y, NoteModifier modifier) {
-	int pos = screen_to_clef_pos(y);
-	return clef->position_to_pitch(pos, midi_scale, modifier);
-}
-
-int MidiPainter::y2clef_classical(float y, NoteModifier &mod) {
-	mod = NoteModifier::UNKNOWN;//modifier;
-	return screen_to_clef_pos(y);
-}
-
-int MidiPainter::y2clef_linear(float y, NoteModifier &mod) {
-	return mode_linear.y2clef(y, mod);
+int MidiPainter::y2clef(float y, NoteModifier &mod) const {
+	if (mode == MidiMode::LINEAR)
+		return mode_linear.y2clef(y, mod);
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.y2clef(y, mod);
+	return 0;
 }
 
 void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset) {
@@ -434,46 +430,34 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	instrument = &i;
 	clef = &i.get_clef();
 
-	// TAB
-	string_dy = min((area.height() * 0.7f) / max(6, instrument->string_pitch.num), 40.0f);
-	float h = string_dy * instrument->string_pitch.num;
-	string_y0 = area.y2 - (area.height() - h) / 2 - string_dy/2;
-
-	// classical clef
-	clef_dy = min(area.height() / 13, 30.0f);
-	clef_y0 = area.y2 - area.height() / 2 + 2 * clef_dy;
-
-	clef_line_width = area.height() / 150;
-
 	mode = _mode;
-	mmode = &mode_dummy;
+	mmode = &mode_linear;
 	if (mode == MidiMode::CLASSICAL)
 		mmode = &mode_classical;
 	else if (mode == MidiMode::TAB)
 		mmode = &mode_tab;
 	else if (mode == MidiMode::LINEAR)
 		mmode = &mode_linear;
+	mmode->reset();
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;
 	allow_shadows = true;//(mode == MidiMode::LINEAR);
 	force_shadows = false;
 
-	pitch_min = PITCH_MIN_DEFAULT;
-	pitch_max = PITCH_MAX_DEFAULT;
-
 	set_line_weight(1.0f);
+	mmode->update();
 }
 
 void MidiPainter::set_line_weight(float s) {
 	scale = s;
 
 	if (mode == MidiMode::CLASSICAL)
-		rr = min(clef_dy * 0.42f, 10.0f);
+		rr = min(mode_classical.clef_dy * 0.42f, 10.0f);
 	if (mode == MidiMode::LINEAR)
-		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 1.3f, 2.0f);
+		rr = max((mode_linear.pitch2y(0) - mode_linear.pitch2y(1)) / 1.3f, 2.0f);
 	if (mode == MidiMode::TAB)
-		rr = min(string_dy/2, 13.0f);
+		rr = min(mode_tab.string_dy/2, 13.0f);
 
 	modifier_font_size = rr * 2.8f;
 
@@ -484,15 +468,15 @@ void MidiPainter::set_line_weight(float s) {
 	bar_width = NOTE_BAR_WIDTH * scale;
 	flag_dx = NOTE_FLAG_DX * scale;
 	flag_dy = NOTE_FLAG_DY * scale;
+	mmode->update();
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {
-	key_changes = changes;
+	mode_classical.set_key_changes(changes);
 }
 
 void MidiPainter::set_linear_range(float _pitch_min, float _pitch_max) {
-	pitch_min = _pitch_min - 0.5f;
-	pitch_max = _pitch_max - 0.5f;
+	mode_linear.set_linear_range(_pitch_min, _pitch_max);
 }
 
 void MidiPainter::set_shift(int _shift) {
@@ -521,5 +505,9 @@ float MidiPainter::note_r() const {
 }
 
 float MidiPainter::get_clef_dy() const {
-	return clef_dy;
+	if (mode == MidiMode::CLASSICAL)
+		return mode_classical.clef_dy;
+	if (mode == MidiMode::TAB)
+		return mode_tab.string_dy;
+	return 1;
 }

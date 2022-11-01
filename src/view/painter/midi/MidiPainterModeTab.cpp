@@ -21,6 +21,18 @@ MidiPainterModeTab::MidiPainterModeTab(MidiPainter *mp, Song *song, ViewPort *ca
 {
 }
 
+void MidiPainterModeTab::reset() {
+}
+
+void MidiPainterModeTab::update() {
+	// TAB
+	string_dy = min((mp->area.height() * 0.7f) / max(6, mp->instrument->string_pitch.num), 40.0f);
+	float h = string_dy * mp->instrument->string_pitch.num;
+	string_y0 = mp->area.y2 - (mp->area.height() - h) / 2 - string_dy/2;
+
+	clef_line_width = mp->area.height() / 150;
+}
+
 void MidiPainterModeTab::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
 	if (mp->quality._highest_details)
 		mp->draw_rhythm(c, midi, mp->cur_range, [this] (MidiNote *n) {
@@ -66,7 +78,7 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold*1.5f)) {
 			//draw_shadow(c, x1, x2, y, 2, rr, col, col_shadow);
 			dx += rr * 1.0f;
-			draw_shadow2(c, x1, x2, y, dx, mp->clef_line_width, col_shadow);
+			draw_shadow2(c, x1, x2, y, dx, clef_line_width, col_shadow);
 		}
 
 		// hide the string line to make the number more readable
@@ -94,11 +106,11 @@ void MidiPainterModeTab::draw_background(Painter *c, bool force) {
 		c->set_color(local_theme.text_soft1);
 	else
 		c->set_color(local_theme.text_soft3);
-	c->set_line_width(mp->clef_line_width);
+	c->set_line_width(clef_line_width);
 	c->set_antialiasing(true);
 
 	// clef lines
-	float h = mp->string_dy * mp->instrument->string_pitch.num;
+	float h = string_dy * mp->instrument->string_pitch.num;
 	for (int i=0; i<mp->instrument->string_pitch.num; i++) {
 		float y = string_to_screen(i);
 		c->draw_line({mp->area.x1, y}, {mp->area.x2, y});
@@ -118,9 +130,9 @@ void MidiPainterModeTab::draw_background(Painter *c, bool force) {
 
 
 float MidiPainterModeTab::string_to_screen(int string_no) const {
-	return mp->string_y0 - string_no * mp->string_dy;
+	return string_y0 - string_no * string_dy;
 }
 
 int MidiPainterModeTab::screen_to_string(float y) const {
-	return clamp((int)floor((mp->string_y0 - y) / mp->string_dy + 0.5f), 0, mp->instrument->string_pitch.num-1);
+	return clamp((int)floor((string_y0 - y) / string_dy + 0.5f), 0, mp->instrument->string_pitch.num-1);
 }

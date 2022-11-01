@@ -71,9 +71,6 @@ public:
 	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 
 
-	static const int PITCH_MIN_DEFAULT = 25;
-	static const int PITCH_MAX_DEFAULT = 105;
-
 	static color pitch_color(int pitch);
 
 	void set_synthesizer(Synthesizer *synth);
@@ -123,9 +120,7 @@ public:
 private:
 	const Instrument *instrument;
 	const Clef *clef;
-	float pitch_min, pitch_max;
 	bool force_shadows;
-	Array<MidiKeyChange> key_changes;
 
 private:
 	struct {
@@ -143,17 +138,10 @@ private:
 		bool _highest_details;
 	} quality;
 
-	float clef_dy;
-	float clef_y0;
-
-	float string_dy;
-	float string_y0;
-	float clef_line_width;
 	MidiMode mode;
 	MidiPainterModeClassical mode_classical;
 	MidiPainterModeTab mode_tab;
 	MidiPainterModeLinear mode_linear;
-	MidiPainterMode mode_dummy;
 	MidiPainterMode *mmode = nullptr;
 	float rr;
 	float modifier_font_size;
@@ -161,17 +149,14 @@ private:
 
 
 public:
-	float clef_pos_to_screen(int pos);
-	int screen_to_clef_pos(float y);
-	float string_to_screen(int string);
-	int screen_to_string(float y);
+	float clef_pos_to_screen(int pos) const;
+	int screen_to_clef_pos(float y) const;
+	float string_to_screen(int string) const;
+	int screen_to_string(float y) const;
 
-	float pitch2y_classical(int pitch);
-	float pitch2y_linear(float pitch);
-	int y2pitch_classical(float y, NoteModifier modifier);
-	int y2pitch_linear(float y);
-	int y2clef_classical(float y, NoteModifier &mod);
-	int y2clef_linear(float y, NoteModifier &mod);
+	float pitch2y(int pitch) const;
+	int y2pitch(float y, NoteModifier modifier) const;
+	int y2clef(float y, NoteModifier &mod) const;
 
 	float note_r() const;
 	float get_clef_dy() const;

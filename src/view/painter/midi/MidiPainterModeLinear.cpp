@@ -25,6 +25,15 @@ MidiPainterModeLinear::MidiPainterModeLinear(MidiPainter *mp, Song *song, ViewPo
 {
 }
 
+void MidiPainterModeLinear::reset() {
+	pitch_min = PITCH_MIN_DEFAULT;
+	pitch_max = PITCH_MAX_DEFAULT;
+}
+
+void MidiPainterModeLinear::update() {
+	clef_line_width = mp->area.height() / 150;
+}
+
 void MidiPainterModeLinear::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
 	if (mp->quality._highest_details)
 		mp->draw_rhythm(c, midi, mp->cur_range, [this] (MidiNote *n) {
@@ -35,7 +44,7 @@ void MidiPainterModeLinear::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
 	// draw notes
 	c->set_antialiasing(mp->quality.antialiasing);
 	for (auto *n: weak(midi)) {
-		if ((n->pitch < mp->pitch_min) or (n->pitch >= mp->pitch_max))
+		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		draw_note(c, *n, note_state(n, mp->as_reference, sel, hover));
 	}
@@ -60,8 +69,8 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
 			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 1.6f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 0.7f, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 1.6f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 0.7f, col_shadow);
 		}
 
 		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
@@ -86,7 +95,7 @@ void MidiPainterModeLinear::draw_background(Painter *c, bool force) {
 void MidiPainterModeLinear::draw_pitch_grid(Painter *c) {
 	// pitch grid
 	c->set_color(color(0.25f, 0, 0, 0));
-	for (int i=mp->pitch_min; i<mp->pitch_max; i++) {
+	for (int i=pitch_min; i<pitch_max; i++) {
 		float y0 = pitch2y(i + 0.5f);
 		float y1 = pitch2y(i - 0.5f);
 		if (!mp->midi_scale.contains(i)) {
@@ -106,7 +115,7 @@ void MidiPainterModeLinear::draw_pitch_grid(Painter *c) {
 	}
 	bool is_drum = (mp->instrument->type == Instrument::Type::DRUMS);
 	float dy = ((pitch2y(0) - pitch2y(1)) - c->font_size) / 2;
-	for (int i=mp->pitch_min; i<mp->pitch_max; i++) {
+	for (int i=pitch_min; i<pitch_max; i++) {
 		c->set_color(cc);
 		if (((hover->type == HoverData::Type::MIDI_PITCH) and (i == hover->index))) // or ((hover->type == HoverData::Type::MIDI_NOTE) and (i == hover->pitch)))
 			c->set_color(local_theme.text);
@@ -126,11 +135,11 @@ void MidiPainterModeLinear::draw_pitch_grid(Painter *c) {
 // this is the "center" of the note!
 // it reaches below and above this y
 float MidiPainterModeLinear::pitch2y(float pitch) const {
-	return mp->area.y2 - mp->area.height() * (pitch - (float)mp->pitch_min) / (mp->pitch_max - mp->pitch_min);
+	return mp->area.y2 - mp->area.height() * (pitch - (float)pitch_min) / (pitch_max - pitch_min);
 }
 
 int MidiPainterModeLinear::y2pitch(float y) const {
-	return mp->pitch_min + ((mp->area.y2 - y) * (mp->pitch_max - mp->pitch_min) / mp->area.height()) + 0.5f;
+	return pitch_min + ((mp->area.y2 - y) * (pitch_max - pitch_min) / mp->area.height()) + 0.5f;
 }
 
 int MidiPainterModeLinear::y2clef(float y, NoteModifier &mod) const {
@@ -138,4 +147,9 @@ int MidiPainterModeLinear::y2clef(float y, NoteModifier &mod) const {
 
 	int pitch = y2pitch(y);
 	return mp->clef->pitch_to_position(pitch, mp->midi_scale, mod);
+}
+
+void MidiPainterModeLinear::set_linear_range(float _pitch_min, float _pitch_max) {
+    pitch_min = _pitch_min;
+    pitch_max = _pitch_max;
 }

@@ -229,7 +229,7 @@ public:
 		// relative to arbitrary point!
 		auto mp = layer->midi_context();
 		if (layer->midi_mode() == MidiMode::LINEAR)
-			return mp->y2pitch_linear(y);
+			return mp->y2pitch(y, NoteModifier::NONE);
 		if (layer->midi_mode() == MidiMode::CLASSICAL)
 			return mp->screen_to_clef_pos(y * 12.0f / 7.0f); // quick'n'dirty chromatic hack :D
 		if (layer->midi_mode() == MidiMode::TAB)
@@ -1040,7 +1040,7 @@ HoverData ViewModeEditMidi::get_hover_data(AudioViewLayer *vlayer, const vec2 &m
 					return s;
 				}
 		} else if (mode == MidiMode::LINEAR) {
-			s.index = mp->y2pitch_linear(m.y);
+			s.index = mp->y2pitch(m.y, NoteModifier::NONE);
 			s.type = HoverData::Type::MIDI_PITCH;
 
 			for (auto *n: weak(l->midi))
@@ -1110,14 +1110,14 @@ void ViewModeEditMidi::draw_post(Painter *c) {
 	} else if (mode == MidiMode::CLASSICAL) {
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = mp->pitch2y_classical(p2);
-		int y2 = mp->pitch2y_classical(p1);
+		int y1 = mp->pitch2y(p2);
+		int y2 = mp->pitch2y(p1);
 		c->draw_rect(rect(x1, x2, y1, y2));
 	} else if (mode == MidiMode::LINEAR) {
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = mp->pitch2y_linear(p2);
-		int y2 = mp->pitch2y_linear(p1);
+		int y1 = mp->pitch2y(p2);
+		int y2 = mp->pitch2y(p1);
 		c->draw_rect(rect(x1, x2, y1, y2));
 	}
 	c->set_clip(xxx);

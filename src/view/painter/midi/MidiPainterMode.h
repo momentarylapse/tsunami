@@ -8,6 +8,8 @@
 #ifndef SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_
 #define SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_
 
+#include "../../../lib/base/base.h"
+
 class ViewPort;
 class Song;
 class ColorScheme;
@@ -26,6 +28,9 @@ public:
 
 	virtual void draw_notes(Painter *c, const MidiNoteBuffer &midi) {}//= 0;
 	virtual void draw_background(Painter *c, bool force = false) {}//= 0;
+
+	virtual void reset() {};
+	virtual void update() {};
 
 
     MidiPainter *mp;

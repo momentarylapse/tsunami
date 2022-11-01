@@ -20,6 +20,18 @@ MidiPainterModeClassical::MidiPainterModeClassical(MidiPainter *mp, Song *song, 
 {
 }
 
+void MidiPainterModeClassical::reset() {
+	update();
+}
+
+void MidiPainterModeClassical::update() {
+	// classical clef
+	clef_dy = min(mp->area.height() / 13, 30.0f);
+	clef_y0 = mp->area.center().y + 2 * clef_dy;
+
+	clef_line_width = mp->area.height() / 150;
+}
+
 void MidiPainterModeClassical::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
 	if (mp->quality._highest_details)
 		mp->draw_rhythm(c, midi, mp->cur_range, [this] (MidiNote *n) {
@@ -54,16 +66,16 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2) {
-		c->set_line_width(mp->clef_line_width);
+		c->set_line_width(clef_line_width);
 		c->set_color(local_theme.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->draw_line({x - mp->clef_dy, y}, {x + mp->clef_dy, y});
+		c->draw_line({x - clef_dy, y}, {x + clef_dy, y});
 	}
 	for (int i=-2; i>=p; i-=2) {
-		c->set_line_width(mp->clef_line_width);
+		c->set_line_width(clef_line_width);
 		c->set_color(local_theme.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->draw_line({x - mp->clef_dy, y}, {x + mp->clef_dy, y});
+		c->draw_line({x - clef_dy, y}, {x + clef_dy, y});
 	}
 
 	color col, col_shadow;
@@ -75,8 +87,8 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
 			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 1.6f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, mp->clef_line_width * 0.7f, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 1.6f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 0.7f, col_shadow);
 		}
 
 		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
@@ -107,7 +119,7 @@ void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
 		c->set_color(local_theme.text_soft1);
 	else
 		c->set_color(local_theme.text_soft3);
-	c->set_line_width(mp->clef_line_width);
+	c->set_line_width(clef_line_width);
 	c->set_antialiasing(true);
 
 	for (int i=0; i<10; i+=2) {
@@ -124,12 +136,12 @@ void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
 	// clef symbol
 
 	Scale key_prev = Scale::C_MAJOR;
-	for (auto &kc: mp->key_changes)
+	for (auto &kc: key_changes)
 		if (kc.pos < cam->range().offset)
 			key_prev = kc.key;
 	draw_key_symbol(c, MidiKeyChange(cam->pos, key_prev));
 
-	for (auto &kc: mp->key_changes)
+	for (auto &kc: key_changes)
 		draw_key_symbol(c, kc);
 
 	c->set_font_size(local_theme.FONT_SIZE);
@@ -138,7 +150,7 @@ void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
 void MidiPainterModeClassical::draw_key_symbol(Painter *c, const MidiKeyChange &kc) {
 	float x = cam->sample2screen(kc.pos);
 
-	c->set_font_size(mp->clef_dy*4);
+	c->set_font_size(clef_dy*4);
 	c->draw_str({x + 10, clef_pos_to_screen(8)}, mp->clef->symbol);
 
 
@@ -154,9 +166,29 @@ void MidiPainterModeClassical::draw_key_symbol(Painter *c, const MidiKeyChange &
 
 
 float MidiPainterModeClassical::clef_pos_to_screen(int pos) const {
-	return mp->area.center().y - (pos - 4) * mp->clef_dy / 2.0f;
+	return mp->area.center().y - (pos - 4) * clef_dy / 2.0f;
 }
 
 int MidiPainterModeClassical::screen_to_clef_pos(float y) const {
-	return (int)floor((mp->area.center().y - y) * 2.0f / mp->clef_dy + 0.5f) + 4;
+	return (int)floor((mp->area.center().y - y) * 2.0f / clef_dy + 0.5f) + 4;
+}
+
+float MidiPainterModeClassical::pitch2y(int pitch) const {
+	NoteModifier mod;
+	int p = mp->clef->pitch_to_position(pitch, mp->midi_scale, mod);
+	return clef_pos_to_screen(p);
+}
+
+int MidiPainterModeClassical::y2pitch(float y, NoteModifier modifier) const {
+	int pos = screen_to_clef_pos(y);
+	return mp->clef->position_to_pitch(pos, mp->midi_scale, modifier);
+}
+
+int MidiPainterModeClassical::y2clef(float y, NoteModifier &mod) const {
+	mod = NoteModifier::UNKNOWN;//modifier;
+	return screen_to_clef_pos(y);
+}
+
+void MidiPainterModeClassical::set_key_changes(const Array<MidiKeyChange> &changes) {
+	key_changes = changes;
 }

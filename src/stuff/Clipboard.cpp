@@ -17,6 +17,7 @@
 #include "../data/Sample.h"
 #include "../data/SongSelection.h"
 #include "../data/rhythm/Bar.h"
+#include "../data/rhythm/Beat.h"
 #include "../lib/base/iter.h"
 #include <assert.h>
 
@@ -260,36 +261,49 @@ void Clipboard::paste_aligned_to_beats(AudioView *view) {
 
 	s->begin_action_group("paste aligned to beats");
 
-	auto first_bar = [] (Song *s, int offset) {
-		for (auto&& [i,b]: enumerate(weak(s->bars)))
-			if (b->offset >= offset - 100)
-				return i;
-		return -1;
+	int offset = view->sel.range().start();
+
+	auto source_beats = temp->bars.get_beats(Range::ALL);
+	auto dest_beats = view->song->bars.get_beats(Range::ALL);
+
+	int dest_first_beat = -1;
+	int dest_offset = offset;
+	for (auto&& [i,b]: enumerate(dest_beats))
+		if (b.range.start() <= offset) {
+			dest_first_beat = i;
+			dest_offset = offset - b.range.start();
+		}
+
+	auto remap = [&] (int x) {
+		// nothing to match
+		if (source_beats.num == 0 or dest_first_beat < 0)
+			return x + offset;
+		// squeeze to fit before first beat-match
+		if (x <= 0)
+			return x + offset;
+		if (x < source_beats[0].range.start())
+			return offset + (int)( (double)x * (double)dest_offset / (double) source_beats[0].range.start() ); // FIXME
+
+		for (auto&& [i,bs]: enumerate(source_beats))
+			if (bs.range.is_inside(x) and (dest_first_beat + i > 0) and (dest_first_beat + i < dest_beats.num)) {
+				auto &bd = dest_beats[dest_first_beat + i];
+				return bd.range.offset + (int)( (double)(x - bs.range.offset) * (double)(bd.range.length) / (double)(bs.range.length) );
+			}
+		int overlap_beats = min(source_beats.num, dest_beats.num - dest_first_beat);
+		return (x - source_beats[overlap_beats - 1].range.end()) + dest_beats[dest_first_beat + overlap_beats - 1].range.end();
 	};
 
-	auto remap = [] (const Range &rs, const Range &rd, int x) {
-		return rd.offset + (int)( (double)(x - rs.offset) * (double)(rd.length) / (double)(rs.length) );
-	};
+	auto paste_layer = [this, remap] (int offset, TrackLayer *source, TrackLayer *dest) {
+		if (dest->type != SignalType::MIDI)
+			return;
 
-	auto paste_bar = [remap] (TrackLayer *source, TrackLayer *dest, const Range &rs, const Range &rd) {
-		//msg_write("paste bar ..." + str(rs) + " -> " + str(rd));
-		auto midi = source->midi.get_notes(rs);
-		for (auto n: midi) {
+		for (auto n: source->midi) {
 			auto c = n->copy();
-			c->range = Range::to(remap(rs, rd, n->range.offset), remap(rs, rd, n->range.end()));
+			c->range = Range::to(remap(n->range.offset), remap(n->range.end()));
 			dest->add_midi_note(c);
 		}
 	};
 
-	auto paste_layer = [this, paste_bar, first_bar] (int offset, TrackLayer *source, TrackLayer *dest) {
-		int b0 = first_bar(dest->song(), offset);
-		//msg_write("paste layer..." + str(b0));
-		for (auto&& [i,b]: enumerate(weak(temp->bars)))
-			if ((b0 + i) < dest->song()->bars.num)
-				paste_bar(source, dest, b->range(), dest->song()->bars[b0 + i]->range());
-	};
-
-	int offset = view->sel.range().start();
 	for (auto&& [i,source]: enumerate(source_list))
 		paste_layer(offset, source, target_list[i]);
 

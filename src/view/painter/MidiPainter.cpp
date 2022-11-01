@@ -33,7 +33,9 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
-	local_theme(_colors)
+	local_theme(_colors),
+	mode_classical(this, _song, _cam, _sel, _hover, _colors),
+	mode_dummy(this, _song, _cam, _sel, _hover, _colors)
 {
 	song = _song;
 	cam = _cam;
@@ -57,6 +59,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	string_dy = 0;
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
+	mmode = &mode_dummy;
 	rr = 5;
 	set_quality(1.0f, true);
 }
@@ -596,58 +599,6 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	}
 }
 
-void MidiPainter::draw_key_symbol(Painter *c, const MidiKeyChange &kc) {
-	float x = cam->sample2screen(kc.pos);
-
-	c->set_font_size(clef_dy*4);
-	c->draw_str({x + 10, clef_pos_to_screen(8)}, clef->symbol);
-
-
-	//SymbolRenderer::draw(c, x - size*1.0f, y - size*0.5f , size, modifier_symbol(n->modifier));
-	//c->set_font_size(clef_dy);
-
-	for (int i=0; i<7; i++) {
-		if (kc.key.modifiers[i] != NoteModifier::NONE)
-			SymbolRenderer::draw(c, {x + 18 + modifier_font_size*3.0f + modifier_font_size*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - modifier_font_size/2}, modifier_font_size, modifier_symbol(kc.key.modifiers[i]));
-	}
-	c->set_font_size(local_theme.FONT_SIZE);
-}
-
-void MidiPainter::draw_clef_classical(Painter *c) {
-	// clef lines
-
-	if (is_playable)
-		c->set_color(local_theme.text_soft1);
-	else
-		c->set_color(local_theme.text_soft3);
-	c->set_line_width(clef_line_width);
-	c->set_antialiasing(true);
-
-	for (int i=0; i<10; i+=2) {
-		float y = clef_pos_to_screen(i);
-		c->draw_line({area.x1, y}, {area.x2, y});
-	}
-	c->set_antialiasing(false);
-	
-	if (is_playable)
-		c->set_color(local_theme.text_soft1);
-	else
-		c->set_color(local_theme.text_soft3);
-
-	// clef symbol
-
-	Scale key_prev = Scale::C_MAJOR;
-	for (auto &kc: key_changes)
-		if (kc.pos < cam->range().offset)
-			key_prev = kc.key;
-	draw_key_symbol(c, MidiKeyChange(cam->pos, key_prev));
-
-	for (auto &kc: key_changes)
-		draw_key_symbol(c, kc);
-
-	c->set_font_size(local_theme.FONT_SIZE);
-}
-
 
 
 void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &notes) {
@@ -742,13 +693,14 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 
 void MidiPainter::draw_background(Painter *c, bool force) {
 	if (mode == MidiMode::CLASSICAL) {
-		draw_clef_classical(c);
+		//draw_clef_classical(c);
 	} else if (mode == MidiMode::TAB) {
 		draw_clef_tab(c);
 	} else if (mode == MidiMode::LINEAR) {
 		if (force)
 			draw_pitch_grid(c);
 	}
+	mmode->draw_background(c, force);
 }
 
 void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_playable, MidiMode _mode) {
@@ -768,6 +720,9 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	clef_line_width = area.height() / 150;
 
 	mode = _mode;
+	mmode = &mode_dummy;
+	if (mode == MidiMode::CLASSICAL)
+		mmode = &mode_classical;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;
@@ -829,4 +784,12 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 void MidiPainter::set_force_shadows(bool force) {
 	force_shadows = force;
 	allow_shadows = force;// or (mode == MidiMode::LINEAR);
+}
+
+float MidiPainter::note_r() const {
+	return rr;
+}
+
+float MidiPainter::get_clef_dy() const {
+	return clef_dy;
 }

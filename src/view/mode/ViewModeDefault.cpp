@@ -523,7 +523,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, i
 		// midi
 
 		auto *mp = vl->midi_context();
-		float d = mp->rr;
+		float d = mp->note_r();
 		for (MidiNote *n: weak(l->midi))
 			if ((n->y + d >= y0) and (n->y - d <= y1))
 				//s.set(n, s.range.is_inside(n->range.center()));

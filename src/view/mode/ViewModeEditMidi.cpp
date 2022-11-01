@@ -1104,8 +1104,8 @@ void ViewModeEditMidi::draw_post(Painter *c) {
 	c->set_line_dash({5,5},0);
 	if (mode == MidiMode::TAB) {
 		int y = mp->string_to_screen(string_no);
-		int y1 = y - mp->clef_dy/2;
-		int y2 = y + mp->clef_dy/2;
+		int y1 = y - mp->get_clef_dy() / 2;
+		int y2 = y + mp->get_clef_dy() / 2;
 		c->draw_rect(rect(x1, x2, y1, y2));
 	} else if (mode == MidiMode::CLASSICAL) {
 		int p1 = pitch_from_octave_and_rel(0, octave);

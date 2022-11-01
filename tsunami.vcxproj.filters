@@ -1327,6 +1327,9 @@
     <ClCompile Include="src\view\module\ModulePanel.cpp">
       <Filter>src\view\module</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\painter\midi\MidiPainterModeClassical.cpp">
+      <Filter>src\view\painter\midi</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\painter\midi\rhythm.cpp">
       <Filter>src\view\painter\midi</Filter>
     </ClCompile>
@@ -2684,6 +2687,12 @@
     </ClInclude>
     <ClInclude Include="src\view\module\ModulePanel.h">
       <Filter>src\view\module</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\painter\midi\MidiPainterMode.h">
+      <Filter>src\view\painter\midi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\painter\midi\MidiPainterModeClassical.h">
+      <Filter>src\view\painter\midi</Filter>
     </ClInclude>
     <ClInclude Include="src\view\painter\midi\rhythm.h">
       <Filter>src\view\painter\midi</Filter>

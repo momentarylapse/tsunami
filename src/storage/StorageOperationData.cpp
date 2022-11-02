@@ -24,7 +24,6 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	format = _format;
 	song = session->song.get();
 	filename = _filename;
-	progress = nullptr;
 	channels_suggested = 2;
 	allow_channels_change = false;
 	layer = nullptr;
@@ -52,7 +51,8 @@ StorageOperationData::~StorageOperationData() {
 }
 
 void StorageOperationData::start_progress(const string &message) {
-	progress = new Progress(message, win);
+	if (session->storage->allow_gui)
+		progress = new Progress(message, win);
 }
 
 void StorageOperationData::set_layer(TrackLayer *l) {
@@ -79,11 +79,13 @@ void StorageOperationData::set(float t) {
 	if (timer.peek() < PROGRESS_UPDATE_DT)
 		return;
 	timer.get();
-	progress->set(t);
+	if (progress)
+		progress->set(t);
 }
 
 void StorageOperationData::set(const string &str, float t) {
-	progress->set(str, t);
+	if (progress)
+		progress->set(str, t);
 }
 
 int StorageOperationData::get_num_samples() {

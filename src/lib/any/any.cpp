@@ -614,6 +614,8 @@ Any &Any::operator[] (const string &key) {
 		create_type(TYPE_MAP);
 	if (!is_map())
 		msg_error("only allowed for maps: " + type_name(type));
+	if (!as_map().contains(key))
+		as_map().set(key, Any());
 	return as_map()[key];
 }
 

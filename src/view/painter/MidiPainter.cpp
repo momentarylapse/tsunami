@@ -181,9 +181,9 @@ void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offs
 	}
 
 	if (d.punctured)
-		c->draw_circle({d.x + rr, y + rr}, 2);
+		c->draw_circle({d.x + rr, y + rr}, rr * 0.4f);
 	if (d.triplet)
-		c->draw_str({d.x, y + e*neck_length_single + e * 9 - 4}, "3");
+		c->draw_str({d.x, y + e*neck_length_single + e * rr * 1.9f - rr * 0.8f}, "3");
 }
 
 void MidiPainter::draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool neck_offset) {
@@ -239,7 +239,7 @@ void MidiPainter::draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool
 			if (d.notes[i].length <= SIXTEENTH)
 				c->draw_line({x0 + dx*t0, y0 + dy*t0 - e*bar_distance}, {x0 + dx*t1, y0 + dy*t1 - e*bar_distance});
 			if (d.notes[i].punctured)
-				c->draw_circle({d.notes[i].x + rr, d.notes[i].y_min + rr}, 2);
+				c->draw_circle({d.notes[i].x + rr, d.notes[i].y_min + rr}, rr * 0.4f);
 		}
 		t0 = t1;
 	}
@@ -264,6 +264,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);*/
+	c->set_font_size(this->modifier_font_size);
 
 
 	bool neck_offset = (mode == MidiMode::TAB);
@@ -453,16 +454,16 @@ void MidiPainter::set_line_weight(float s) {
 	scale = s;
 
 	if (mode == MidiMode::CLASSICAL)
-		rr = min(mode_classical.clef_dy * 0.42f, 10.0f);
+		rr = min(mode_classical.clef_dy * 0.42f, 10.0f * scale);
 	if (mode == MidiMode::LINEAR)
-		rr = max((mode_linear.pitch2y(0) - mode_linear.pitch2y(1)) / 1.3f, 2.0f);
+		rr = max((mode_linear.pitch2y(0) - mode_linear.pitch2y(1)) / 1.0f, 2.0f * scale);
 	if (mode == MidiMode::TAB)
-		rr = min(mode_tab.string_dy/2, 13.0f);
+		rr = min(mode_tab.string_dy/2, 13.0f * scale);
 
 	modifier_font_size = rr * 2.8f;
 
-	neck_length_single = max(NOTE_NECK_LENGTH, rr*7);
-	neck_length_group = max(NOTE_NECK_LENGTH, rr*6);
+	neck_length_single = max(NOTE_NECK_LENGTH * scale, rr*7.5f);
+	neck_length_group = max(NOTE_NECK_LENGTH * scale, rr*7);
 	neck_width = max(NOTE_NECK_WIDTH * scale, rr/3);
 	bar_distance = NOTE_BAR_DISTANCE * scale;
 	bar_width = NOTE_BAR_WIDTH * scale;

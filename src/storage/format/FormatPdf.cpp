@@ -78,6 +78,7 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	mlp.set_context(od->parameters["tracks"], page_width, avg_samples_per_line);
 	Any conf;
 	conf["border"] = border;
+	conf["line-height"] = 20;
 	mlp.set(conf);
 
 	pdf::Parser parser;

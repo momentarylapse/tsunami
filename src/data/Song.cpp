@@ -158,7 +158,7 @@ bool Song::is_empty() {
 	return action_manager->is_save();
 }
 
-Range Song::range() {
+Range Song::range_no_bars() {
 	Range r = Range::NONE;
 
 	for (Track *t: weak(tracks))
@@ -167,8 +167,8 @@ Range Song::range() {
 	return r;
 }
 
-Range Song::range_with_time() {
-	Range r = range();
+Range Song::range() {
+	Range r = range_no_bars();
 
 	if (bars.num > 0)
 		r = r or bars.range();

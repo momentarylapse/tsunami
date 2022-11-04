@@ -88,7 +88,7 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	SymbolRenderer::enable(false);
 
 
-	int samples = od->song->range_with_time().end();
+	int samples = od->song->range().end();
 	//int num_lines =  / samples_per_line + 1;
 	float y0 = 70;
 	mlp.line_space = 25;

@@ -47,7 +47,7 @@ public:
 	void _cdecl __delete__() override;
 
 	Range _cdecl range();
-	Range _cdecl range_with_time();
+	Range _cdecl range_no_bars();
 
 	static const string MESSAGE_NEW;
 	static const string MESSAGE_ADD_TRACK;

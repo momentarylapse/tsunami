@@ -563,7 +563,7 @@ Range AudioView::get_playback_selection(bool for_recording) {
 	if (sel.range().is_empty()) {
 		if (for_recording)
 			return Range(sel.range().start(), 0x70000000);
-		int num = song->range_with_time().end() - sel.range().start();
+		int num = song->range().end() - sel.range().start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
 		return Range(sel.range().start(), num);
@@ -1185,12 +1185,12 @@ bool need_metro_overlay(Song *song, AudioView *view) {
 
 bool AudioView::update_scene_graph() {
 
-	bool scroll_bar_w_needed = !cam.range().covers(song->range_with_time());
+	bool scroll_bar_w_needed = !cam.range().covers(song->range());
 	bool animating = thm.update(this, song, song_area());
 
 	scroll_bar_time->hidden = !scroll_bar_w_needed;
 	scroll_bar_time->set_view_size(cam.range().length);
-	scroll_bar_time->set_content(song->range_with_time());
+	scroll_bar_time->set_content(song->range());
 
 	for (auto *v: vlayers) {
 		v->update_header();
@@ -1322,7 +1322,7 @@ void AudioView::perform_optimize_view() {
 	if (area.x2 <= 0)
 		area.x2 = 1024;
 
-	Range r = song->range_with_time();
+	Range r = song->range();
 
 	if (r.length == 0)
 		r.length = 10 * song->sample_rate;
@@ -1817,7 +1817,7 @@ HoverData AudioView::hover_time(const vec2 &m) {
 void AudioView::cam_changed() {
 	notify(MESSAGE_VIEW_CHANGE);
 	scroll_bar_time->set_view(cam.range());
-	scroll_bar_time->set_content(song->range_with_time());
+	scroll_bar_time->set_content(song->range());
 	force_redraw();
 }
 

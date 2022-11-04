@@ -360,13 +360,13 @@ void ViewModeDefault::on_command(const string &id) {
 		if (id == "cursor-expand-left")
 			expand_sel_range(view, suggest_move_cursor(Range(view->sel.range_raw.end(), 0), false));
 		if (id == "cursor-jump-start")
-			view->set_cursor_pos(song->range_with_time().start());
+			view->set_cursor_pos(song->range().start());
 		if (id == "cursor-jump-end")
-			view->set_cursor_pos(song->range_with_time().end());
+			view->set_cursor_pos(song->range().end());
 		if (id == "cursor-expand-start")
-			expand_sel_range(view, song->range_with_time().start());
+			expand_sel_range(view, song->range().start());
 		if (id == "cursor-expand-end")
-			expand_sel_range(view, song->range_with_time().end());
+			expand_sel_range(view, song->range().end());
 	}
 
 	if (id == "hui:gesture-zoom-begin") {

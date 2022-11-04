@@ -38,8 +38,6 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		add_string("format", format_name(POSSIBLE_FORMATS[i]));
 
-	load_data();
-
 	menu_tags = hui::create_resource_menu("popup-menu-tag", this);
 
 	event("samplerate", [this] { on_samplerate(); });
@@ -59,6 +57,7 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 
 void SongConsole::on_enter() {
 	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_ANY);
+	load_data();
 }
 
 void SongConsole::on_leave() {

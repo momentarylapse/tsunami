@@ -72,9 +72,10 @@ void SongConsole::load_data() {
 	enable("delete_tag", false);
 
 	// data
-	int samples = song->range().length;
-	set_string("start", song->get_time_str_long(song->range().start()));
-	set_string("end", song->get_time_str_long(song->range().end()));
+	auto r = song->range();
+	int samples = r.length;
+	set_string("start", song->get_time_str_long(r.start()));
+	set_string("end", song->get_time_str_long(r.end()));
 	set_string("length", song->get_time_str_long(samples));
 	set_string("samples", i2s(samples));
 

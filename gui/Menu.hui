@@ -6,6 +6,7 @@ Menu menu ""
 		Item /save "Save" image=hui:save
 		Item /save_as "Save as..." image=hui:save-as
 		Menu menu_export "Export"
+			Item /export "Export..." image=hui:save-as
 			Item render_export_selection "Render selection..." image=hui:save-as
 			Item export_selection "Save selection..." image=hui:save-as
 			Item quick_export "Quick export" image=hui:save-as

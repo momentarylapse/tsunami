@@ -170,7 +170,7 @@ Path Storage::temp_saving_file(const string &ext) {
 }
 
 // safety: first write to temp file, then (if successful) move
-bool Storage::save(Song *song, const Path &filename) {
+bool Storage::save_ex(Song *song, const Path &filename, bool exporting) {
 	current_directory = filename.absolute().parent();
 
 	auto d = get_format(filename.extension(), 0);
@@ -179,7 +179,7 @@ bool Storage::save(Song *song, const Path &filename) {
 
 	auto temp_file = temp_saving_file(filename.extension());
 
-	if (!d->test_compatibility(song))
+	if (!d->test_compatibility(song) and !exporting)
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
@@ -191,7 +191,8 @@ bool Storage::save(Song *song, const Path &filename) {
 	}
 	od.start_progress(_("saving ") + d->description);
 
-	song->filename = filename;
+	if (!exporting)
+		song->filename = filename;
 
 	f->save_song(&od);
 
@@ -209,6 +210,14 @@ bool Storage::save(Song *song, const Path &filename) {
 
 	delete f;
 	return !od.errors_encountered;
+}
+
+bool Storage::save(Song *song, const Path &filename) {
+	return save_ex(song, filename, false);
+}
+
+bool Storage::_export(Song *song, const Path &filename) {
+	return save_ex(song, filename, true);
 }
 
 bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {

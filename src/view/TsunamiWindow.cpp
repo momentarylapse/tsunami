@@ -98,8 +98,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("delete", hui::KEY_DELETE);
 	event("delete-shift", [this] { on_delete_shift(); });
 	set_key_code("delete-shift", hui::KEY_SHIFT + hui::KEY_DELETE);
+	event("export", [this] { on_export(); });
+	set_key_code("export", hui::KEY_CONTROL + hui::KEY_E);
 	event("render_export_selection", [this] { on_render_export_selection(); });
-	set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL);
+	//set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL);
 	event("export_selection", [this] { on_export_selection(); });
 	event("quick_export", [this] { on_quick_export(); });
 	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT);
@@ -1038,6 +1040,18 @@ void TsunamiWindow::on_save_as() {
 		if (filename)
 			if (session->storage->save(song, filename))
 				view->set_message(_("file saved"));
+	}, {"default=" + def});
+}
+
+void TsunamiWindow::on_export() {
+	string def;
+	if (song->filename == "")
+		def = _suggest_filename(song, session->storage->current_directory);
+
+	session->storage->ask_save(this, [this] (const Path &filename) {
+		if (filename)
+			if (session->storage->_export(song, filename))
+				view->set_message(_("file exported"));
 	}, {"default=" + def});
 }
 

@@ -1384,7 +1384,7 @@ header-save-menu
 
 0
 0
-5
+6
 Item
 save
 image=hui:save
@@ -1398,21 +1398,27 @@ image=hui:save-as
 0
 0
 Item
-render_export_selection
+export
 image=hui:save-as
 2
 0
 0
 Item
-export_selection
+render_export_selection
 image=hui:save-as
 3
 0
 0
 Item
-quick_export
+export_selection
 image=hui:save-as
 4
+0
+0
+Item
+quick_export
+image=hui:save-as
+5
 0
 0
 # Resource
@@ -2218,23 +2224,29 @@ menu_export
 
 5
 0
-3
+4
 Item
-render_export_selection
+export
 image=hui:save-as
 0
 0
 0
 Item
-export_selection
+render_export_selection
 image=hui:save-as
 1
 0
 0
 Item
-quick_export
+export_selection
 image=hui:save-as
 2
+0
+0
+Item
+quick_export
+image=hui:save-as
+3
 0
 0
 Separator
@@ -8150,7 +8162,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-728
+729
 # Text
 /bars-add
 Add bars...
@@ -8247,6 +8259,9 @@ Track
 
 /exit
 Exit
+
+/export
+Export...
 
 /layer-add
 Add version

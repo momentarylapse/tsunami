@@ -41,7 +41,9 @@ public:
 	bool _cdecl load_buffer(AudioBuffer *buf, const Path &filename);
 	bool _cdecl save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags);
 	bool _cdecl render_export_selection(Song *song, const SongSelection &sel, const Path &filename);
+	bool _cdecl save_ex(Song *song, const Path &filename, bool exporting);
 	bool _cdecl save(Song *song, const Path &filename);
+	bool _cdecl _export(Song *song, const Path &filename);
 
 	void _cdecl ask_by_flags(hui::Window *win, const string &title, int flags, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
 

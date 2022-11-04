@@ -197,7 +197,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (session->storage->load(song, a[0]) or (flags & Storage::Flags::FORCE))
-			session->storage->save(song, a[1]);
+			session->storage->_export(song, a[1]);
 		delete song;
 	});
 	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {

@@ -59,6 +59,7 @@ public:
 	SongSelection *sel;
 	HoverData *hover;
 	const ColorScheme &local_theme;
+	bool direct_size_mode = false;
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_ */

@@ -100,6 +100,7 @@ public:
 	void set_quality(float quality, bool antialiasing);
 	void set_force_shadows(bool force);
 	void set_key_changes(const Array<MidiKeyChange> &changes);
+	void set_direct_size_mode(bool dsm);
 
 
 

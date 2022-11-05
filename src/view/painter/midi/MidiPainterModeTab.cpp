@@ -20,8 +20,12 @@ void MidiPainterModeTab::reset() {
 }
 
 void MidiPainterModeTab::update() {
-	//string_dy = min((mp->area.height() * 0.7f) / max(6, mp->instrument->string_pitch.num), 40.0f);
-	string_dy = mp->area.height() / (max(mp->instrument->string_pitch.num, 6) + 2);
+	if (direct_size_mode)
+		// no padding
+		string_dy = mp->area.height() / mp->instrument->string_pitch.num;
+	else
+		// with padding
+		string_dy = mp->area.height() / (max(mp->instrument->string_pitch.num, 6) + 2);
 	float h = string_dy * mp->instrument->string_pitch.num;
 	string_y0 = mp->area.center().y + (h - string_dy) / 2;
 

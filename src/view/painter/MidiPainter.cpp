@@ -34,16 +34,16 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
 	local_theme(_colors),
+	song(_song),
+	sel(_sel),
+	hover(_hover),
+	cam(_cam),
 	mode_classical(this),
 	mode_tab(this),
 	mode_linear(this)
 {
-	song = _song;
-	cam = _cam;
-	sel = _sel;
 	if (!sel)
 		sel = new SongSelection; // TODO... delete later...
-	hover = _hover;
 	if (!hover)
 		hover = new HoverData;
 	instrument = nullptr;
@@ -460,6 +460,11 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 void MidiPainter::set_force_shadows(bool force) {
 	force_shadows = force;
 	allow_shadows = force;// or (mode == MidiMode::LINEAR);
+}
+
+void MidiPainter::set_direct_size_mode(bool dsm) {
+	mmode->direct_size_mode = dsm;
+	mmode->update();
 }
 
 float MidiPainter::note_r() const {

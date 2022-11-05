@@ -51,6 +51,8 @@ public:
 	float line_space = 25;
 	float track_space = 10;
 	float line_height = 50;
+	float padding_y_classical = 10;
+	float padding_y_tab = 5;
 	bool antialiasing = true;
 	float string_dy = 10;
 	bool allow_shadows = false;

@@ -20,8 +20,10 @@ void MidiPainterModeClassical::reset() {
 }
 
 void MidiPainterModeClassical::update() {
-	// classical clef
-	clef_dy = min(mp->area.height() / 13, 30.0f);
+	if (direct_size_mode)
+		clef_dy = mp->area.height() / 4;
+	else
+		clef_dy = min(mp->area.height() / 13, 30.0f);
 	clef_y0 = mp->area.center().y + 2 * clef_dy;
 
 	clef_line_width = mp->area.height() / 150;

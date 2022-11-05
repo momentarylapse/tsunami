@@ -62,10 +62,13 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	int slack = song->sample_rate / 15;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	mp->set_context(rect(x0, x0+w, y0-line_height/2, y0+line_height * 1.8f), t->instrument, true, MidiMode::CLASSICAL);
+	y0 += padding_y_classical;
+
+	mp->set_context(rect(x0, x0+w, y0, y0+line_height), t->instrument, true, MidiMode::CLASSICAL);
 	mp->set_line_weight(line_height / 75);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
+	mp->set_direct_size_mode(true);
 	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
@@ -91,6 +94,8 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 		mp->draw(p, midi);
 	}
 
+	y0 += padding_y_classical;
+
 	return y0 + line_height;
 }
 
@@ -101,12 +106,13 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 
 	int n = t->instrument.string_pitch.num;
 
+	y0 += padding_y_tab;
+
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
 	mp->set_line_weight(line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
-	/*mp->rr *= 1.3f;
-	mp->neck_width *= 0.7f;*/
+	mp->set_direct_size_mode(true);
 
 	p->set_antialiasing(antialiasing);
 
@@ -127,6 +133,8 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	// midi
 	auto midi = t->layers[0]->midi.get_notes(r_inside);
 	mp->draw(p, midi);
+
+	y0 += padding_y_tab;
 
 	return y0 + string_dy * n;
 }
@@ -224,12 +232,18 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _av
 void MultiLinePainter::set(const Any &conf) {
 	if (conf.has("border"))
 		border = conf["border"]._float();
+	if (conf.has("line-height"))
+		line_height = conf["line-height"]._float();
 	if (conf.has("line-space"))
 		line_space = conf["line-space"]._float();
 	if (conf.has("track-space"))
 		track_space = conf["track-space"]._float();
-	if (conf.has("line-height"))
-		line_height = conf["line-height"]._float();
+	padding_y_classical = line_height * 0.25f;
+	padding_y_tab = line_height * 0.15f;
+	if (conf.has("padding-y-classical"))
+		padding_y_classical = conf["padding-y-classical"]._float();
+	if (conf.has("padding-y-tab"))
+		padding_y_tab = conf["padding-y-tab"]._float();
 	if (conf.has("antialiasing"))
 		antialiasing = conf["antialiasing"]._bool();
 	if (conf.has("allow-shadows"))

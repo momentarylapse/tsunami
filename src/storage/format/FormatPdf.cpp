@@ -39,7 +39,7 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	if (!od->parameters.has("line-space"))
 		od->parameters.map_set("line-space", 0.8f * 20);
 	if (!od->parameters.has("track-space"))
-		od->parameters.map_set("track-space", 0.2f * 20);
+		od->parameters.map_set("track-space", 0.4f * 20);
 	if (!od->parameters.has("allow-shadows"))
 		od->parameters.map_set("allow-shadows", true);
 

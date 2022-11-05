@@ -42,7 +42,7 @@ class MyDialog extends hui.Dialog
 					Label l-line-space 'Line space'
 					SpinButton line-space '{{line_space}}' range=0:2:0.01
 					---|
-					Label l-track-space 'Trrack space'
+					Label l-track-space 'Tack space'
 					SpinButton track-space '{{track_space}}' range=0:2:0.01
 					---|
 					Label l-x-scale 'Horizontal scale'
@@ -239,18 +239,18 @@ class MultiLineView extends TsunamiPlugin
 	dlg: MyDialog*
 	
 	class Config extends Module.Config
-		line_height = 80.0
+		line_height = 50.0
 		line_space = 0.8
-		track_space = 0.2
+		track_space = 0.4
 		border = 20.0
 		x_scale = 1.0
 		track_mode: bool[]
 		y_offset = 0.0
 		allow_shadows = false
 		func override reset()
-			line_height = 80.0
+			line_height = 50.0
 			line_space = 0.8
-			track_space = 0.2
+			track_space = 0.4
 			border = 20.0
 			x_scale = 1.0
 			track_mode.clear()

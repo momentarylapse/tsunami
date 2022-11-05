@@ -4,12 +4,23 @@ Dialog pdf-export-config-dialog "Pdf Export" width=700 height=800 headerbar resi
 			DrawingArea area "" expandx expandy
 			Grid ? "" vertical width=120
 				Grid ? ""
-					Label t-color "Theme"
+					Label l-color "Theme"
 					ComboBox theme ""
 					---|
-					Label t-scale "Scale"
-					SpinButton scale ""
+					Label l-line-height 'Line height'
+					SpinButton line-height ""
+					---|
+					Label l-line-space 'Line space'
+					SpinButton line-space "" range=0:2:0.01
+					---|
+					Label l-track-space 'Track space'
+					SpinButton track-space "" range=0:2:0.01
+					---|
+					Label l-horizontal-scale 'Horizontal scale'
+					SpinButton horizontal-scale "" range=1:500:1
 					Label /percent "%"
+					---|
+					CheckBox allow-shadows 'Shadows'
 				Grid tracks ""
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel

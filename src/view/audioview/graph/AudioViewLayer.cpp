@@ -482,12 +482,17 @@ void AudioViewLayer::on_draw(Painter *c) {
 	}
 
 
+	auto clip_prev = c->clip();
+	c->set_clip(area and c->area());
+
 	// midi
 	if (layer->type == SignalType::MIDI)
 		draw_midi(c, layer->midi, false, 0);
 
 	// audio buffer
 	draw_track_buffers(c);
+
+	c->set_clip(clip_prev);
 
 	// samples
 	for (auto *s: weak(layer->samples))

@@ -407,8 +407,6 @@ void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
 }
 
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
-	auto xxx = c->clip();
-	c->set_clip(area and c->area());
 	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
 	auto notes = midi.get_notes(cur_range);
@@ -419,7 +417,6 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 		_draw_notes(c, notes);
 	}
 	c->set_line_width(1);
-	c->set_clip(xxx);
 }
 
 void MidiPainter::draw_background(Painter *c, bool force) {

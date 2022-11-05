@@ -21,12 +21,14 @@ public:
 	void on_ok();
 
 	void on_draw(Painter *p);
+	void on_mouse_wheel();
 
 	void update_params();
 
 	StorageOperationData *od;
 	Song *song;
 	bool ok;
+	float preview_offset_y = 0;
 };
 
 #endif /* SRC_STORAGE_DIALOG_PDFCONFIGDIALOG_H_ */

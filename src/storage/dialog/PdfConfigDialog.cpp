@@ -51,12 +51,23 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 		event(id_classic, [this] { update_params(); });
 		event(id_tab, [this] { update_params(); });
 	}
-	set_float("scale", od->parameters["horizontal-scale"]._float() * 100);
+	set_float("line-height", od->parameters["line-height"]._float());
+	set_float("line-space", od->parameters["line-space"]._float() / od->parameters["line-height"]._float());
+	set_float("track-space", od->parameters["track-space"]._float() / od->parameters["line-height"]._float());
+	set_float("border", od->parameters["border"]._float());
+	set_float("horizontal-scale", od->parameters["horizontal-scale"]._float() * 100);
+	check("allow-shadows", od->parameters["allow-shadows"]._bool());
 
 	update_params();
 
-	event_xp("area", "hui:draw", [this] (Painter *p) { on_draw(p); });
-	event("scale", [this] { update_params(); });
+	//event_xp("area", "hui:draw", [this] (Painter *p) { on_draw(p); });
+	event_x("area", "hui:mouse-wheel", [this] () { on_mouse_wheel(); });
+	event("line-height", [this] { update_params(); });
+	event("line-space", [this] { update_params(); });
+	event("track-space", [this] { update_params(); });
+	event("track-height", [this] { update_params(); });
+	event("horizontal-scale", [this] { update_params(); });
+	event("allow-shadows", [this] { update_params(); });
 	event("hui:close", [this] { on_close(); });
 	event("cancel", [this] { on_close(); });
 	event("ok", [this] { on_ok(); });
@@ -87,10 +98,21 @@ void PdfConfigDialog::update_params() {
 		ats.add(at);
 	}
 	od->parameters.map_set("tracks", ats);
-	od->parameters.map_set("horizontal-scale", get_float("scale") / 100);
+	od->parameters.map_set("line-height", get_float("line-height"));
+	od->parameters.map_set("line-space", get_float("line-space") * get_float("line-height"));
+	od->parameters.map_set("track-space", get_float("track-space") * get_float("line-height"));
+	//od->parameters.map_set("border", get_float("border"));
+	od->parameters.map_set("horizontal-scale", get_float("horizontal-scale") / 100);
+	od->parameters.map_set("allow-shadows", is_checked("allow-shadows"));
 
 	od->parameters.map_set("theme", get_int("theme"));
+	msg_write(str(od->parameters));
 
+	redraw("area");
+}
+
+void PdfConfigDialog::on_mouse_wheel() {
+	preview_offset_y = max(preview_offset_y + hui::get_event()->scroll.y, 0.0f);
 	redraw("area");
 }
 
@@ -107,10 +129,12 @@ void PdfConfigDialog::on_draw(Painter *p) {
 
 	p->set_color(_colors.background);
 	//p->draw_rect(p->area());
-	p->draw_rect(rect(0, p->width, 0, p->width / page_width * page_height));
+	float scale = p->width / page_width;
+	//p->draw_rect(rect(0, p->width, 0, scale * page_height));
 
-	float scale[4] = {p->width / page_width, 0, 0, p->width / page_width};
-	p->set_transform(scale, {0,0});
+	float mat[4] = {scale, 0, 0, scale};
+	p->set_transform(mat, {0, -preview_offset_y * scale});
+	p->draw_rect(rect(0, page_width, 0, page_height));
 
 	int samples = song->range().end();
 
@@ -118,6 +142,7 @@ void PdfConfigDialog::on_draw(Painter *p) {
 	p->set_font("Helvetica", 8, false, false);
 
 	int offset = 0;
+	int page_no = 0;
 	while (offset < samples) {
 		float y_prev = y0;
 		y0 = mlp->draw_next_line(p, offset, {0, y0});
@@ -125,11 +150,16 @@ void PdfConfigDialog::on_draw(Painter *p) {
 		// new page?
 		float dy = y0 - y_prev;
 		if (y0 + dy > page_height and offset < samples) {
-			break;
-			/*p = parser.add_page();
-			y0 = 50;*/
+			//break;
+			page_no ++;
+			y0 = 50;
+			p->set_transform(mat, {0, (page_no * (page_height + 40) - preview_offset_y) * scale});
+			p->set_color(_colors.background);
+			p->draw_rect(rect(0, page_width, 0, page_height));
 		}
 	}
 
+	float m_id[4] = {1, 0, 0, 1};
+	p->set_transform(mat, {0, 0});
 }
 

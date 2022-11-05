@@ -4059,9 +4059,9 @@ Grid
 
 0
 0
-5
+12
 Label
-t-color
+l-color
 
 0
 0
@@ -4073,22 +4073,64 @@ theme
 0
 0
 Label
-t-scale
+l-line-height
 
 0
 1
 0
 SpinButton
-scale
+line-height
 
 1
 1
 0
 Label
+l-line-space
+
+0
+2
+0
+SpinButton
+line-space
+range=0:2:0.01
+1
+2
+0
+Label
+l-track-space
+
+0
+3
+0
+SpinButton
+track-space
+range=0:2:0.01
+1
+3
+0
+Label
+l-horizontal-scale
+
+0
+4
+0
+SpinButton
+horizontal-scale
+range=1:500:1
+1
+4
+0
+Label
 percent
 
 2
-1
+4
+0
+CheckBox
+allow-shadows
+
+0
+5
 0
 Grid
 tracks
@@ -8253,7 +8295,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-733
+737
 # Text
 /bars-add
 Add bars...
@@ -9632,17 +9674,29 @@ Move data accordingly
 pause_edit_dialog/t_duration
 Duration
 
+pdf-export-config-dialog/allow-shadows
+Shadows
+
+pdf-export-config-dialog/l-color
+Theme
+
+pdf-export-config-dialog/l-horizontal-scale
+Horizontal scale
+
+pdf-export-config-dialog/l-line-height
+Line height
+
+pdf-export-config-dialog/l-line-space
+Line space
+
+pdf-export-config-dialog/l-track-space
+Track space
+
 pdf-export-config-dialog/ok
 Export
 
 pdf-export-config-dialog/pdf-export-config-dialog
 Pdf Export
-
-pdf-export-config-dialog/t-color
-Theme
-
-pdf-export-config-dialog/t-scale
-Scale
 
 plugin-console/add
 

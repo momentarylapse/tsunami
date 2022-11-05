@@ -32,6 +32,16 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	// optional defaults
 	if (!od->parameters.has("horizontal-scale"))
 		od->parameters.map_set("horizontal-scale", 1.0f);
+	if (!od->parameters.has("border"))
+		od->parameters.map_set("border", 25);
+	if (!od->parameters.has("line-height"))
+		od->parameters.map_set("line-height", 20);
+	if (!od->parameters.has("line-space"))
+		od->parameters.map_set("line-space", 0.8f * 20);
+	if (!od->parameters.has("track-space"))
+		od->parameters.map_set("track-space", 0.2f * 20);
+	if (!od->parameters.has("allow-shadows"))
+		od->parameters.map_set("allow-shadows", true);
 
 	if (od->parameters.has("tracks"))
 		return true;
@@ -74,15 +84,9 @@ MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_co
 
 	auto mlp = new MultiLinePainter(song, _colors);
 	mlp->set_context(params["tracks"], page_width, avg_samples_per_line);
-	Any conf;
-	conf["border"] = border;
-	conf["line-height"] = 20;
-	mlp->set(conf);
+	mlp->set(params);
 
 	SymbolRenderer::enable(false);
-
-	int samples = song->range().end();
-	mlp->line_space = 25;
 	return mlp;
 }
 

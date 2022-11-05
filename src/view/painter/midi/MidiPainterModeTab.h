@@ -14,7 +14,7 @@ class MidiNote;
 
 class MidiPainterModeTab : public MidiPainterMode {
 public:
-	MidiPainterModeTab(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors);
+	MidiPainterModeTab(MidiPainter *mp);
 
 	void reset() override;
 	void update() override;

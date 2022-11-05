@@ -47,20 +47,6 @@ public:
 };
 
 
-enum class MidiNoteState {
-	DEFAULT = 0,
-	HOVER = 1,
-	SELECTED = 2,
-	REFERENCE = 4,
-};
-inline bool operator&(MidiNoteState a, MidiNoteState b) {
-	return (int)a & (int)b;
-}
-inline MidiNoteState operator|(MidiNoteState a, MidiNoteState b) {
-	return (MidiNoteState)((int)a | (int)b);
-}
-
-
 class MidiPainter {
 	friend class PluginManager;
 	friend class MidiPainterModeClassical;
@@ -171,6 +157,7 @@ private:
 	float flag_dx, flag_dy;
 	void draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset);
 	void draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool neck_offset);
+	void draw_eigth_note_flag(Painter *c, const vec2 &p, float e);
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDIPAINTER_H_ */

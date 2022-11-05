@@ -37,6 +37,7 @@ public:
 	Array<TrackData> track_data;
 	void set_context(const Any &conf, float page_width, float avg_samples_per_line);
 	void set(const Any &conf);
+	void update_scales();
 
 
 	MidiPainter *mp;

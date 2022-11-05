@@ -14,14 +14,9 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors);
-MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col);
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col);
 
-
-MidiPainterModeLinear::MidiPainterModeLinear(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors) :
-    MidiPainterMode(mp, song, cam, sel, hover, colors)
+MidiPainterModeLinear::MidiPainterModeLinear(MidiPainter *mp) :
+    MidiPainterMode(mp)
 {
 }
 

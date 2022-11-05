@@ -448,6 +448,7 @@ set(SOURCE
 	src/view/module/ConfigPanel.cpp
 	src/view/module/ConfigurationDialog.cpp
 	src/view/module/ModulePanel.cpp
+	src/view/painter/midi/MidiPainterMode.cpp
 	src/view/painter/midi/MidiPainterModeClassical.cpp
 	src/view/painter/midi/MidiPainterModeLinear.cpp
 	src/view/painter/midi/MidiPainterModeTab.cpp

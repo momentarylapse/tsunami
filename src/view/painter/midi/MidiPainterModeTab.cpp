@@ -10,14 +10,9 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors);
-MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col);
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col);
 
-
-MidiPainterModeTab::MidiPainterModeTab(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors) :
-    MidiPainterMode(mp, song, cam, sel, hover, colors)
+MidiPainterModeTab::MidiPainterModeTab(MidiPainter *mp) :
+    MidiPainterMode(mp)
 {
 }
 
@@ -25,10 +20,10 @@ void MidiPainterModeTab::reset() {
 }
 
 void MidiPainterModeTab::update() {
-	// TAB
-	string_dy = min((mp->area.height() * 0.7f) / max(6, mp->instrument->string_pitch.num), 40.0f);
+	//string_dy = min((mp->area.height() * 0.7f) / max(6, mp->instrument->string_pitch.num), 40.0f);
+	string_dy = mp->area.height() / (max(mp->instrument->string_pitch.num, 6) + 2);
 	float h = string_dy * mp->instrument->string_pitch.num;
-	string_y0 = mp->area.y2 - (mp->area.height() - h) / 2 - string_dy/2;
+	string_y0 = mp->area.center().y + (h - string_dy) / 2;
 
 	clef_line_width = mp->area.height() / 150;
 }

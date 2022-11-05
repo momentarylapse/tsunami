@@ -558,6 +558,7 @@
     <ClCompile Include="src\view\module\ConfigPanel.cpp" />
     <ClCompile Include="src\view\module\ConfigurationDialog.cpp" />
     <ClCompile Include="src\view\module\ModulePanel.cpp" />
+    <ClCompile Include="src\view\painter\midi\MidiPainterMode.cpp" />
     <ClCompile Include="src\view\painter\midi\MidiPainterModeClassical.cpp" />
     <ClCompile Include="src\view\painter\midi\MidiPainterModeLinear.cpp" />
     <ClCompile Include="src\view\painter\midi\MidiPainterModeTab.cpp" />

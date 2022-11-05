@@ -34,9 +34,9 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
 	local_theme(_colors),
-	mode_classical(this, _song, _cam, _sel, _hover, _colors),
-	mode_tab(this, _song, _cam, _sel, _hover, _colors),
-	mode_linear(this, _song, _cam, _sel, _hover, _colors)
+	mode_classical(this),
+	mode_tab(this),
+	mode_linear(this)
 {
 	song = _song;
 	cam = _cam;
@@ -71,37 +71,6 @@ color hash_color(int h) {
 color MidiPainter::pitch_color(int pitch) {
 	return PITCH_COLORS[pitch % 12];
 	//return color::hsb((float)(pitch % 12) / 12.0f, 0.6f, 1, 1);
-}
-
-
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors) {
-	if (playable)
-		col = colors.pitch_text[(int)n->pitch % 12];
-	else
-		col = colors.text_soft3;
-
-	if (state & MidiNoteState::REFERENCE)
-		col = color::interpolate(col, colors.background_track, 0.65f);
-	if (state & MidiNoteState::SELECTED)
-		col = colors.text;//::interpolate(col, colors.selection, 0.5f);
-	if (state & MidiNoteState::HOVER)
-		col = color::interpolate(col, colors.hover, 0.5f);
-
-	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
-	//col_shadow = col;
-	//col_shadow.a = 0.5f;
-}
-
-
-MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover) {
-	MidiNoteState s = MidiNoteState::DEFAULT;
-	if (sel->has(n))
-		s = MidiNoteState::SELECTED;
-	if (as_reference)
-		return MidiNoteState::REFERENCE | s;
-	if ((hover->type == HoverData::Type::MIDI_NOTE) and (n == hover->note))
-		return MidiNoteState::HOVER | s;
-	return s;
 }
 
 
@@ -155,6 +124,16 @@ int MidiPainter::y2clef(float y, NoteModifier &mod) const {
 	return 0;
 }
 
+void MidiPainter::draw_eigth_note_flag(Painter *c, const vec2 &p, float e) {
+
+		//c->draw_line(p, p + vec2(flag_dx, - e * flag_dy));
+		c->draw_lines({p,
+			p + vec2(flag_dx*0.5f, - e * flag_dy*0.8f),
+			p + vec2(flag_dx*0.9f, - e * flag_dy*1.1f),
+			p + vec2(flag_dx*1.0f, - e * flag_dy*1.65f),
+			p + vec2(flag_dx*0.7f, - e * flag_dy*1.85f)});
+}
+
 void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offset) {
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
@@ -167,14 +146,14 @@ void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offs
 	if (d.base_length == SIXTEENTH) {
 		c->set_line_width(neck_width);
 		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
-		c->set_line_width(bar_width);
-		c->draw_line({d.x, y + e * neck_length_single}, {d.x + flag_dx, y + e * (neck_length_single - flag_dy)});
-		c->draw_line({d.x, y + e * (neck_length_single - bar_distance)}, {d.x + flag_dx, y + e * (neck_length_single - bar_distance - flag_dy)});
+		c->set_line_width(bar_width*0.7f);
+		draw_eigth_note_flag(c, {d.x, y + e * neck_length_single}, e);
+		draw_eigth_note_flag(c, {d.x, y + e * (neck_length_single - bar_distance)}, e);
 	} else if (d.base_length == EIGHTH) {
 		c->set_line_width(neck_width);
 		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
-		c->set_line_width(bar_width);
-		c->draw_line({d.x, y + e * neck_length_single}, {d.x + flag_dx, y + e * (neck_length_single - flag_dy)});
+		c->set_line_width(bar_width * 0.8f);
+		draw_eigth_note_flag(c, {d.x, y + e * neck_length_single}, e);
 	} else if (d.base_length == QUARTER) {
 		c->set_line_width(neck_width);
 		c->draw_line({d.x, y + neck_dy0}, {d.x, y + e * neck_length_single});
@@ -324,21 +303,6 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState s
 		}
 	}
 
-}
-
-// "shadow" to indicate length
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col) {
-	//x1 += r;
-	c->set_color(col);
-	c->draw_rect(rect(x1, x2 + rx, y - rr*0.7f - rx, y + rr*0.7f + rx));
-}
-
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col) {
-	c->set_color(col);
-	c->set_line_width(3 * clef_line_width);
-	float x = (x1 + x2) / 2;
-	c->draw_line({x1, y}, {x - dx, y});
-	c->draw_line({x + dx, y}, {x2, y});
 }
 
 

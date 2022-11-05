@@ -22,6 +22,7 @@
 #include "../../lib/image/Painter.h"
 #include "../../lib/math/rect.h"
 #include "../../lib/math/vec2.h"
+#include "../../lib/os/msg.h"
 #include <math.h>
 
 
@@ -177,7 +178,7 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 			p->set_color(colors.text_soft2);
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
-			p->set_font_size(line_height / 12.5f);
+			p->set_font_size(line_height / 8.5f);
 			float dx = d*4;
 			if (b == bars[0])
 				dx += d*6;
@@ -199,10 +200,8 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 
 void MultiLinePainter::set_context(const Any &conf, float _page_width, float _avg_samples_per_line) {
 	page_width = _page_width;
-	w = page_width - 2 * border;
 	avg_samples_per_line = _avg_samples_per_line;
-	cam->area = rect(border, page_width - border, 0, 2000);
-	string_dy = line_height / 50.0f * 13;
+	update_scales();
 
 	track_data.clear();
 
@@ -235,6 +234,10 @@ void MultiLinePainter::set(const Any &conf) {
 		antialiasing = conf["antialiasing"]._bool();
 	if (conf.has("allow-shadows"))
 		allow_shadows = conf["allow-shadows"]._bool();
+	update_scales();
+}
+
+void MultiLinePainter::update_scales() {
 	string_dy = line_height / 50.0f * 13;
 	w = page_width - 2 * border;
 	cam->area = rect(border, page_width - border, 0, 2000);

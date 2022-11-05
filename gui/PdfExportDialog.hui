@@ -4,6 +4,9 @@ Dialog pdf-export-config-dialog "Pdf Export" width=700 height=800 headerbar resi
 			DrawingArea area "" expandx expandy
 			Grid ? "" vertical width=120
 				Grid ? ""
+					Label t-color "Theme"
+					ComboBox theme ""
+					---|
 					Label t-scale "Scale"
 					SpinButton scale ""
 					Label /percent "%"

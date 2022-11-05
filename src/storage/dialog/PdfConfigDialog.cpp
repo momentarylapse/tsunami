@@ -29,6 +29,11 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 
 	from_resource("pdf-export-config-dialog");
 
+	add_string("theme", "default");
+	add_string("theme", "dark");
+	set_int("theme", 0);
+	event("theme", [this] { update_params(); });
+
 	set_target("tracks");
 	for (auto&& [i,t]: enumerate(weak(song->tracks))){
 		if (t->type != SignalType::MIDI)
@@ -84,6 +89,8 @@ void PdfConfigDialog::update_params() {
 	od->parameters.map_set("tracks", ats);
 	od->parameters.map_set("horizontal-scale", get_float("scale") / 100);
 
+	od->parameters.map_set("theme", get_int("theme"));
+
 	redraw("area");
 }
 
@@ -93,6 +100,8 @@ void PdfConfigDialog::on_draw(Painter *p) {
 	float page_height = 841.89f;
 
 	auto _colors = create_pdf_color_scheme();
+	if (od->parameters["theme"]._int() == 1)
+		_colors = ColorSchemeDark();
 	auto mlp = prepare_pdf_multi_line_view(song, _colors, od->parameters);
 
 

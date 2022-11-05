@@ -4059,24 +4059,36 @@ Grid
 
 0
 0
-3
+5
 Label
-t-scale
+t-color
 
 0
 0
 0
-SpinButton
-scale
+ComboBox
+theme
 
 1
 0
 0
 Label
+t-scale
+
+0
+1
+0
+SpinButton
+scale
+
+1
+1
+0
+Label
 percent
 
 2
-0
+1
 0
 Grid
 tracks
@@ -8241,7 +8253,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-732
+733
 # Text
 /bars-add
 Add bars...
@@ -9625,6 +9637,9 @@ Export
 
 pdf-export-config-dialog/pdf-export-config-dialog
 Pdf Export
+
+pdf-export-config-dialog/t-color
+Theme
 
 pdf-export-config-dialog/t-scale
 Scale

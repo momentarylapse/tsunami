@@ -30,7 +30,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	from_resource("pdf-export-config-dialog");
 
 	add_string("theme", "default");
-	add_string("theme", "dark");
+	add_string("theme", "dark (preview only)");
 	set_int("theme", 0);
 	event("theme", [this] { update_params(); });
 
@@ -106,7 +106,6 @@ void PdfConfigDialog::update_params() {
 	od->parameters.map_set("allow-shadows", is_checked("allow-shadows"));
 
 	od->parameters.map_set("theme", get_int("theme"));
-	msg_write(str(od->parameters));
 
 	redraw("area");
 }
@@ -153,7 +152,7 @@ void PdfConfigDialog::on_draw(Painter *p) {
 			//break;
 			page_no ++;
 			y0 = 50;
-			p->set_transform(mat, {0, (page_no * (page_height + 40) - preview_offset_y) * scale});
+			p->set_transform(mat, {0, (page_no * (page_height + 16) - preview_offset_y) * scale});
 			p->set_color(_colors.background);
 			p->draw_rect(rect(0, page_width, 0, page_height));
 		}

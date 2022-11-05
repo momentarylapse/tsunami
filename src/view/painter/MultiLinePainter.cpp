@@ -248,6 +248,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 
 	const float d = line_height / 20;
 
+	// first bar number
 	auto bars = song->bars.get_bars(r + 1000);
 	if (bars.num > 0) {
 		p->set_color(colors.text_soft1);
@@ -259,6 +260,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 
 	draw_bar_markers(p, x0, w, y0, line_height, r);
 
+	// notes
 	for (auto &tt: track_data) {
 		if (tt.allow_classical)
 			y0 = draw_track_classical(p, x0, w, y0, r, tt.track, scale) + track_space;
@@ -272,10 +274,8 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 	p->set_color(colors.text_soft1);
 	float sy0 = line_data[0].y0;
 	float sy1 = line_data.back().y1;
-	p->draw_line({x0 - d, sy0}, {x0 - d, sy1});
-	p->draw_line({x0, sy0 - d*2}, {x0 - d, sy0});
-	p->draw_line({x0, sy1 + d*2}, {x0 - d, sy1});
-	p->draw_line({x0 + w + d, sy0}, {x0 + w + d, sy1});
+	p->draw_lines({{x0, sy0 - d*3}, {x0 - d*1.5f, sy0-d}, {x0 - d*1.5f, sy1+d}, {x0, sy1 + d*3}});
+	p->draw_line({x0 + w + d*1.5f, sy0}, {x0 + w + d*1.5f, sy1});
 	p->set_line_width(line_height / 100);
 
 	return y0;

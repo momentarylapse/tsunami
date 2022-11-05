@@ -20,6 +20,10 @@ public:
 	void on_close();
 	void on_ok();
 
+	void on_draw(Painter *p);
+
+	void update_params();
+
 	StorageOperationData *od;
 	Song *song;
 	bool ok;

@@ -21,6 +21,8 @@
 
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
 static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
+static const float PAGE_WIDTH_A4 = 595.276f; // pts
+static const float PAGE_HEIGHT_A4 = 841.89f;
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
 	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE) {}
@@ -57,66 +59,77 @@ ColorScheme create_pdf_color_scheme() {
 	bright.auto_generate();
 	return bright;
 }
+
+MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_colors, const Any &params) {
+
+	// A4
+	float page_width = PAGE_WIDTH_A4;
+	float page_height = PAGE_HEIGHT_A4;
+
+	float border = 25;
+
+	float horizontal_scale = params["horizontal-scale"]._float();
+	float avg_scale = 65.0f / song->sample_rate * horizontal_scale;
+	float avg_samples_per_line = (page_width - 2*border) / avg_scale;
+
+	auto mlp = new MultiLinePainter(song, _colors);
+	mlp->set_context(params["tracks"], page_width, avg_samples_per_line);
+	Any conf;
+	conf["border"] = border;
+	conf["line-height"] = 20;
+	mlp->set(conf);
+
+	SymbolRenderer::enable(false);
+
+	int samples = song->range().end();
+	mlp->line_space = 25;
+	return mlp;
+}
+
+float draw_pdf_header(Painter *p, Song *song, float page_width, const ColorScheme &_colors) {
+	p->set_color(_colors.text);
+	p->set_font("Times", 18, false, false);
+	//p->set_font("Helvetica", 25, false, false);
+	p->draw_str(vec2(100, 25), song->get_tag("title"));
+	if (song->get_tag("artist").num > 0) {
+		p->set_font("Courier", 12, false, false);
+		p->set_font_size(12);
+		p->set_color(_colors.text_soft2);
+		p->draw_str(vec2(page_width - 150, 25), "by " + song->get_tag("artist"));
+	}
+
+	// y0 offset
+	return 70;
+}
+
 void FormatPdf::save_song(StorageOperationData* _od) {
 	od = _od;
 	song = od->song;
 
-	float page_width = 1200;
-	float page_height = 2000;
 	// A4
-	page_width = 595.276f;
-	page_height = 841.89f;
-
-	float border = 25;
+	float page_width = PAGE_WIDTH_A4;
+	float page_height = PAGE_HEIGHT_A4;
 
 	ColorScheme _colors = create_pdf_color_scheme();
 
-	float avg_scale = 65.0f / od->song->sample_rate * od->parameters["horizontal-scale"]._float();
-	float avg_samples_per_line = (page_width - 2*border) / avg_scale;
-
-	MultiLinePainter mlp(song, _colors);
-	mlp.set_context(od->parameters["tracks"], page_width, avg_samples_per_line);
-	Any conf;
-	conf["border"] = border;
-	conf["line-height"] = 20;
-	mlp.set(conf);
+	auto mlp = prepare_pdf_multi_line_view(song, _colors, od->parameters);
 
 	pdf::Parser parser;
 	parser.set_page_size(page_width, page_height);
 
-
 	SymbolRenderer::enable(false);
 
-
-	int samples = od->song->range().end();
-	//int num_lines =  / samples_per_line + 1;
-	float y0 = 70;
-	mlp.line_space = 25;
-
-	bool first_page = true;
-
+	int samples = song->range().end();
 
 	auto p = parser.add_page();
 
-	if (first_page) {
-		p->set_color(_colors.text);
-		p->set_font("Times", 26, false, false);
-		//p->set_font("Helvetica", 25, false, false);
-		p->draw_str(vec2(100, 25), od->song->get_tag("title"));
-		if (od->song->get_tag("artist").num > 0) {
-			p->set_font("Courier", 15, false, false);
-			p->set_font_size(15);
-			p->set_color(_colors.text_soft2);
-			p->draw_str(vec2(p->width - 150, 25), "by " + od->song->get_tag("artist"));
-		}
-		first_page = false;
-	}
+	float y0 = draw_pdf_header(p, song, page_width, _colors);
 	p->set_font("Helvetica", 8, false, false);
 
 	int offset = 0;
 	while (offset < samples) {
 		float y_prev = y0;
-		y0 = mlp.draw_next_line(p, offset, {0, y0});
+		y0 = mlp->draw_next_line(p, offset, {0, y0});
 
 		// new page?
 		float dy = y0 - y_prev;
@@ -125,6 +138,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 			y0 = 50;
 		}
 	}
+
+	delete mlp;
 
 	parser.save(od->filename);
 }

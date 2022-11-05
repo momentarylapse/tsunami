@@ -1,0 +1,14 @@
+Dialog pdf-export-config-dialog "Pdf Export" width=700 height=800 headerbar resizable closebutton=no
+	Grid ? ""
+		Grid ? ""
+			DrawingArea area "" expandx expandy
+			Grid ? "" vertical width=120
+				Grid ? ""
+					Label t-scale "Scale"
+					SpinButton scale ""
+					Label /percent "%"
+				Grid tracks ""
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button ok "Export" default image=hui:ok

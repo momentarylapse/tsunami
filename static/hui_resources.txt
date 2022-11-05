@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-80
+81
 # Resource
 Menu
 menu_fake
@@ -4009,6 +4009,85 @@ Grid
 ?
 buttonbar
 2
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
+# Resource
+Dialog
+pdf-export-config-dialog
+width=700,height=800,headerbar,resizable,closebutton=no
+0
+0
+1
+Grid
+?
+
+0
+0
+2
+Grid
+?
+
+0
+0
+2
+DrawingArea
+area
+expandx,expandy
+0
+0
+0
+Grid
+?
+vertical,width=120
+1
+0
+2
+Grid
+?
+
+0
+0
+3
+Label
+t-scale
+
+0
+0
+0
+SpinButton
+scale
+
+1
+0
+0
+Label
+percent
+
+2
+0
+0
+Grid
+tracks
+
+1
+0
+0
+Grid
+?
+buttonbar
+1
 0
 2
 Button
@@ -8162,7 +8241,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-729
+732
 # Text
 /bars-add
 Add bars...
@@ -9540,6 +9619,15 @@ Move data accordingly
 
 pause_edit_dialog/t_duration
 Duration
+
+pdf-export-config-dialog/ok
+Export
+
+pdf-export-config-dialog/pdf-export-config-dialog
+Pdf Export
+
+pdf-export-config-dialog/t-scale
+Scale
 
 plugin-console/add
 

@@ -22,7 +22,7 @@ enum class MidiNoteState;
 
 class MidiPainterMode {
 public:
-	MidiPainterMode(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors) :
+	MidiPainterMode(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors) :
         mp(mp), song(song), cam(cam), sel(sel), hover(hover), local_theme(colors)
     {}
 
@@ -38,7 +38,7 @@ public:
 	Song *song;
 	SongSelection *sel;
 	HoverData *hover;
-	ColorScheme &local_theme;
+	const ColorScheme &local_theme;
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_ */

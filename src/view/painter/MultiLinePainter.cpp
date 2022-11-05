@@ -27,13 +27,14 @@
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
 
-MultiLinePainter::MultiLinePainter(Song *s, ColorScheme &c) {
+MultiLinePainter::MultiLinePainter(Song *s, const ColorScheme &c) :
+	colors(c)
+{
 	song = s;
 
 
 	cam = new ViewPort(nullptr);
 	cam->area = rect(border, page_width - border, 0, 2000);
-	colors = &c;
 	sel = new SongSelection;
 	hover = new HoverData;
 	mp = new MidiPainter(song, cam, sel, hover, c);
@@ -47,7 +48,7 @@ MultiLinePainter::~MultiLinePainter() {
 }
 
 
-void MultiLinePainter::__init__(Song *s, ColorScheme &c) {
+void MultiLinePainter::__init__(Song *s, const ColorScheme &c) {
 	new (this) MultiLinePainter(s, c);
 }
 
@@ -76,7 +77,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	auto clef = t->instrument.get_clef();
 
 	// clef lines
-	p->set_color(colors->text_soft1);
+	p->set_color(colors.text_soft1);
 	for (int i=0; i<10; i+=2) {
 		float y = mp->clef_pos_to_screen(i);
 		p->draw_line(vec2(x0, y), vec2(x0 + w, y));
@@ -115,7 +116,7 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	draw_beats(p, x0, w, sy0, sy1 - sy0, r);
 
 	// string lines
-	p->set_color(colors->text_soft1);
+	p->set_color(colors.text_soft1);
 	p->set_line_width(line_height / 100);
 	for (int i=0; i<t->instrument.string_pitch.num; i++) {
 		float y = mp->string_to_screen(i);
@@ -144,10 +145,10 @@ void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float 
 	for (auto b: beats) {
 		float x = cam->sample2screen(b.range.offset);
 		if (b.level == 0) {
-			p->set_color(colors->text_soft1);
+			p->set_color(colors.text_soft1);
 			p->set_line_width(line_height / 50);
 		} else {
-			p->set_color(colors->text_soft3);
+			p->set_color(colors.text_soft3);
 			p->set_line_width(line_height / 100);
 		}
 		p->draw_line({x, y}, {x, y + h});
@@ -173,7 +174,7 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 		}
 
 		if (s != "") {
-			p->set_color(colors->text_soft2);
+			p->set_color(colors.text_soft2);
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
 			p->set_font_size(line_height / 12.5f);
@@ -186,7 +187,7 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 		// part?
 		auto *m = get_bar_part(song, b->offset);
 		if (m) {
-			p->set_color(colors->text);
+			p->set_color(colors.text);
 			p->draw_line({x - d*4, y - d*13}, {x - d*4, y - d*7});
 			p->draw_line({x - d*4, y - d*13}, {x + d*4, y - d*13});
 			p->draw_line({x - d*4, y - d*7},  {x + d*4, y - d*7});
@@ -249,7 +250,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 
 	auto bars = song->bars.get_bars(r + 1000);
 	if (bars.num > 0) {
-		p->set_color(colors->text_soft1);
+		p->set_color(colors.text_soft1);
 		p->set_font_size(line_height / 5);
 		p->draw_str({x0 + d, y0 - d*3}, i2s(bars[0]->index_text + 1));
 	}
@@ -268,7 +269,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 
 	// line connector
 	p->set_line_width(line_height / 33);
-	p->set_color(colors->text_soft1);
+	p->set_color(colors.text_soft1);
 	float sy0 = line_data[0].y0;
 	float sy1 = line_data.back().y1;
 	p->draw_line({x0 - d, sy0}, {x0 - d, sy1});

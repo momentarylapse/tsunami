@@ -24,10 +24,10 @@ class vec2;
 
 class MultiLinePainter {
 public:
-	MultiLinePainter(Song *s, ColorScheme &c);
+	MultiLinePainter(Song *s, const ColorScheme &c);
 	virtual ~MultiLinePainter();
 
-	void __init__(Song *s, ColorScheme &c);
+	void __init__(Song *s, const ColorScheme &c);
 	void __delete__();
 
 	struct TrackData {
@@ -41,7 +41,7 @@ public:
 
 	MidiPainter *mp;
 	ViewPort *cam;
-	ColorScheme *colors;
+	const ColorScheme &colors;
 	SongSelection *sel;
 	HoverData *hover;
 

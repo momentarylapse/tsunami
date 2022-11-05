@@ -31,7 +31,7 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
 
 
-MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) :
+MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
 	local_theme(_colors),
 	mode_classical(this, _song, _cam, _sel, _hover, _colors),
@@ -60,7 +60,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 }
 
 
-void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) {
+void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) {
 	new(this) MidiPainter(_song, _cam, _sel, _hover, _colors);
 }
 
@@ -74,7 +74,7 @@ color MidiPainter::pitch_color(int pitch) {
 }
 
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, ColorScheme &colors) {
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors) {
 	if (playable)
 		col = colors.pitch_text[(int)n->pitch % 12];
 	else

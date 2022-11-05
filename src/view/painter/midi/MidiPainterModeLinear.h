@@ -15,7 +15,7 @@ enum class NoteModifier;
 
 class MidiPainterModeLinear : public MidiPainterMode {
 public:
-	MidiPainterModeLinear(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
+	MidiPainterModeLinear(MidiPainter *mp, Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors);
 
     void reset() override;
     void update() override;

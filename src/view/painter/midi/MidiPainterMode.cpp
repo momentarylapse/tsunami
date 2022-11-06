@@ -46,9 +46,9 @@ void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, co
 	c->draw_rect(rect(x1, x2 + rx, y - rr*0.7f - rx, y + rr*0.7f + rx));
 }
 
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float clef_line_width, const color &col) {
+void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float shadow_width, const color &col) {
 	c->set_color(col);
-	c->set_line_width(3 * clef_line_width);
+	c->set_line_width(shadow_width);
 	float x = (x1 + x2) / 2;
 	c->draw_line({x1, y}, {x - dx, y});
 	c->draw_line({x + dx, y}, {x2, y});

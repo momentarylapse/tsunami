@@ -58,7 +58,7 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	return ok;
 }
 
-ColorScheme create_pdf_color_scheme() {
+ColorScheme create_pdf_default_color_scheme() {
 	ColorScheme bright;
 	bright.background = White;
 	bright.text = Black;//color(1, 0.3f, 0.3f, 0.1f);
@@ -68,6 +68,12 @@ ColorScheme create_pdf_color_scheme() {
 	bright.name = "pdf";
 	bright.auto_generate();
 	return bright;
+}
+
+ColorScheme get_pdf_color_scheme(const Any &params) {
+	if (params["theme"]._int() == 1)
+		return ColorSchemeDark();
+	return create_pdf_default_color_scheme();
 }
 
 MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_colors, const Any &params) {
@@ -90,11 +96,24 @@ MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_co
 	return mlp;
 }
 
+string get_pretty_title(Song *song) {
+	string title = song->get_tag("title");
+	if (title == "")
+		title = song->filename.basename_no_ext();
+	if (title == "")
+		title = "No title";
+	return title;
+}
+
 float draw_pdf_header(Painter *p, Song *song, float page_width, const ColorScheme &_colors) {
+
+	// title
 	p->set_color(_colors.text);
 	p->set_font("Times", 18, false, false);
 	//p->set_font("Helvetica", 25, false, false);
-	p->draw_str(vec2(100, 25), song->get_tag("title"));
+	//p->draw_str(vec2(100, 25), get_pretty_title(song));
+	p->draw_str(vec2(25, 25), get_pretty_title(song));
+
 	if (song->get_tag("artist").num > 0) {
 		p->set_font("Courier", 12, false, false);
 		p->set_font_size(12);
@@ -114,7 +133,7 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	float page_width = PAGE_WIDTH_A4;
 	float page_height = PAGE_HEIGHT_A4;
 
-	ColorScheme _colors = create_pdf_color_scheme();
+	ColorScheme _colors = get_pdf_color_scheme(od->parameters);
 
 	auto mlp = prepare_pdf_multi_line_view(song, _colors, od->parameters);
 
@@ -126,6 +145,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	int samples = song->range().end();
 
 	auto p = parser.add_page();
+	p->set_color(_colors.background);
+	p->draw_rect(rect(0, page_width, 0, page_height));
 
 	float y0 = draw_pdf_header(p, song, page_width, _colors);
 	p->set_font("Helvetica", 8, false, false);
@@ -139,6 +160,8 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 		float dy = y0 - y_prev;
 		if (y0 + dy > page_height and offset < samples) {
 			p = parser.add_page();
+			p->set_color(_colors.background);
+			p->draw_rect(rect(0, page_width, 0, page_height));
 			y0 = 50;
 		}
 	}

@@ -23,6 +23,8 @@ public:
 	void auto_generate(bool keep_soft_text = false);
 	ColorScheme disabled() const;
 
+	bool is_dark() const;
+
 
 	static const float FONT_SIZE;
 	static const float FONT_SIZE_SMALL;

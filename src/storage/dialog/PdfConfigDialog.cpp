@@ -16,7 +16,7 @@
 #include "../../view/helper/SymbolRenderer.h"
 #include "../../view/ColorScheme.h"
 
-ColorScheme create_pdf_color_scheme();
+ColorScheme get_pdf_color_scheme(const Any &params);
 MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_colors, const Any &params);
 float draw_pdf_header(Painter *p, Song *song, float page_width, const ColorScheme &_colors);
 
@@ -28,7 +28,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	ok = false;
 
 	add_string("theme", "default");
-	add_string("theme", "dark (preview only)");
+	add_string("theme", "dark");
 	set_int("theme", 0);
 	event("theme", [this] { update_params(); });
 
@@ -109,18 +109,18 @@ void PdfConfigDialog::update_params() {
 }
 
 void PdfConfigDialog::on_mouse_wheel() {
-	preview_offset_y = max(preview_offset_y + hui::get_event()->scroll.y, 0.0f);
+	float dy = hui::get_event()->scroll.y * hui::config.get_float("View.MouseWheelSpeed", 1.0f) * (5000.0f / area_width);
+	preview_offset_y = max(preview_offset_y + dy, 0.0f);
 	redraw("area");
 }
 
 void PdfConfigDialog::on_draw(Painter *p) {
+	area_width = p->width;
 
 	float page_width = 595.276f;
 	float page_height = 841.89f;
 
-	auto _colors = create_pdf_color_scheme();
-	if (od->parameters["theme"]._int() == 1)
-		_colors = ColorSchemeDark();
+	auto _colors = get_pdf_color_scheme(od->parameters);
 	auto mlp = prepare_pdf_multi_line_view(song, _colors, od->parameters);
 
 

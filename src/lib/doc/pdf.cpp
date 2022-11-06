@@ -27,7 +27,7 @@ PagePainter::PagePainter(Parser* _parser, Page *_page) {
 	page = _page;
 	width = page->width;
 	height = page->height;
-	col = new color(1,0,0,0);
+	current_color = Black;
 	line_width = 1;
 	font_size = 12;
 	font_name = "Helvetica";
@@ -37,15 +37,20 @@ PagePainter::PagePainter(Parser* _parser, Page *_page) {
 }
 
 PagePainter::~PagePainter() {
-	delete col;
 }
 
 void PagePainter::set_color(const color& c) {
-	*col = c;
 	page->content += format("     %.2f %.2f %.2f RG\n", c.r, c.g, c.b);
 	page->content += format("     %.2f %.2f %.2f rg\n", c.r, c.g, c.b);
-	//page->content += format("     %.2f CA\n", c.a);
-	//page->content += format("     %.2f ca\n", c.a);
+#if 0
+	if (c.a != current_color.a) {
+		page->content += format("     %.2f CA\n", c.a);
+		page->content += format("     %.2f ca\n", c.a);
+		page->content += "false AIS\n";
+		//page->content += "Overlay BM\n";
+	}
+#endif
+	current_color = c;
 }
 
 void PagePainter::set_font(const string& font, float size, bool bold, bool italic) {

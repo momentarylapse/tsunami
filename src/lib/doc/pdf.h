@@ -11,6 +11,7 @@
 #include "../base/base.h"
 #include "../base/pointer.h"
 #include "../image/Painter.h"
+#include "../image/color.h"
 
 class Path;
 class Painter;
@@ -73,7 +74,7 @@ public:
 	Parser *parser;
 	Page *page;
 
-	color *col;
+	color current_color;
 	float font_size;
 	string font_name;
 	float line_width;

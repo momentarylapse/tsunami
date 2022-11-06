@@ -111,6 +111,7 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	mp->set_size_data(true, line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
+	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
 

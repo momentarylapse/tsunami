@@ -48,6 +48,10 @@ const color PITCH_COLORS[12] = {
 	color(1, 1.000000, 0.400000, 0.700000)  // B
 };
 
+float color_brightness(const color &c) {
+	return (c.r + c.g + c.b) / 3;
+}
+
 color col_inter(const color a, const color &b, float t) {
 	float e = 0.7f;
 	color c;
@@ -65,6 +69,10 @@ ColorScheme ColorScheme::disabled() const {
 	c.hover = color::interpolate(hover, background, 0.3f);
 	c.auto_generate();
 	return c;
+}
+
+bool ColorScheme::is_dark() const {
+	return color_brightness(background) < color_brightness(text);
 }
 
 void ColorScheme::auto_generate(bool keep_soft_text) {

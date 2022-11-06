@@ -29,6 +29,7 @@ public:
 	Song *song;
 	bool ok;
 	float preview_offset_y = 0;
+	float area_width = 0;
 };
 
 #endif /* SRC_STORAGE_DIALOG_PDFCONFIGDIALOG_H_ */

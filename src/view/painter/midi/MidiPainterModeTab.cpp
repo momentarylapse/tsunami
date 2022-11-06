@@ -31,6 +31,10 @@ void MidiPainterModeTab::update() {
 
 	clef_line_width = mp->area.height() / 150;
 
+	shadow_width = clef_line_width * 5;
+	if (local_theme.is_dark())
+		shadow_width = clef_line_width * 4;
+
 	rr = string_dy * 0.4f;
 }
 
@@ -77,7 +81,7 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold*1.5f)) {
 			//draw_shadow(c, x1, x2, y, 2, rr, col, col_shadow);
 			dx += rr * 1.0f;
-			draw_shadow2(c, x1, x2, y, dx, clef_line_width, col_shadow);
+			draw_shadow2(c, x1, x2, y, dx, shadow_width, col_shadow);
 		}
 
 		// hide the string line to make the number more readable

@@ -7,12 +7,18 @@
 
 #if __has_include("../../doc/pdf.h")
 	#include "../../doc/pdf.h"
-	#define pdf_p(p)		p
+	#define pdf_p(p) p
 #else
 	namespace pdf {
 		typedef int Parser;
 	}
-#define pdf_p(p)		nullptr
+	#define pdf_p(p) nullptr
+#endif
+#if __has_include("../../doc/ttf.h")
+	#include "../../doc/ttf.h"
+	#define ttf_p(p) p
+#else
+	#define ttf_p(p) nullptr
 #endif
 
 
@@ -40,7 +46,7 @@ void SIAddPackageDoc() {
 			func_add_param("filename", TypePath);
 
 	add_class(TypePdf);
-		class_add_func("add_font_directory", TypeVoid, pdf_p(&pdf::add_font_directory), Flags::STATIC);
+		class_add_func("add_font_directory", TypeVoid, ttf_p(&ttf::add_font_directory), Flags::STATIC);
 			func_add_param("dir", TypePath);
 
 }

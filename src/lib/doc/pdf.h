@@ -19,6 +19,10 @@ class color;
 class rect;
 class vec2;
 
+namespace ttf {
+	class TTF;
+}
+
 namespace pdf {
 
 class Parser;
@@ -30,15 +34,13 @@ struct Page {
 };
 
 
-class TTF;
-
 struct FontData {
 	bool true_type;
 	string name, internal_name;
 	int id, id_widths, id_descr, id_file;
 	Array<int> widths;
 	string file_contents;
-	shared<TTF> ttf;
+	shared<ttf::TTF> ttf;
 };
 
 class PagePainter : public ::Painter {
@@ -105,8 +107,6 @@ private:
 	//int font_id(const string &name);
 	FontData *font_get(const string &name);
 };
-
-void add_font_directory(const Path &dir);
 
 }
 

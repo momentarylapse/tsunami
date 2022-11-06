@@ -243,6 +243,7 @@
     <ClCompile Include="src\lib\base\strings.cpp" />
     <ClCompile Include="src\lib\doc\chunked.cpp" />
     <ClCompile Include="src\lib\doc\pdf.cpp" />
+    <ClCompile Include="src\lib\doc\ttf.cpp" />
     <ClCompile Include="src\lib\doc\xml.cpp" />
     <ClCompile Include="src\lib\fft\fft.cpp" />
     <ClCompile Include="src\lib\hui\Controls\Control.cpp" />
@@ -729,6 +730,7 @@
     <ClInclude Include="src\lib\base\tuple.h" />
     <ClInclude Include="src\lib\doc\chunked.h" />
     <ClInclude Include="src\lib\doc\pdf.h" />
+    <ClInclude Include="src\lib\doc\ttf.h" />
     <ClInclude Include="src\lib\doc\xml.h" />
     <ClInclude Include="src\lib\fft\fft.h" />
     <ClInclude Include="src\lib\hui\Controls\Control.h" />

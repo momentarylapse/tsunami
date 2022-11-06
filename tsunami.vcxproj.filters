@@ -382,6 +382,9 @@
     <ClCompile Include="src\lib\doc\pdf.cpp">
       <Filter>src\lib\doc</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\doc\ttf.cpp">
+      <Filter>src\lib\doc</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\doc\xml.cpp">
       <Filter>src\lib\doc</Filter>
     </ClCompile>
@@ -1834,6 +1837,9 @@
       <Filter>src\lib\doc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\doc\pdf.h">
+      <Filter>src\lib\doc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\doc\ttf.h">
       <Filter>src\lib\doc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\doc\xml.h">

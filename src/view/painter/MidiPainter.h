@@ -94,13 +94,12 @@ public:
 
 public:
 	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
-	void set_line_weight(float s);
+	void set_size_data(bool direct_size_mode, float s);
 	void set_shift(int shift);
 	void set_linear_range(float pitch_min, float pitch_max);
 	void set_quality(float quality, bool antialiasing);
 	void set_force_shadows(bool force);
 	void set_key_changes(const Array<MidiKeyChange> &changes);
-	void set_direct_size_mode(bool dsm);
 
 
 

@@ -27,6 +27,9 @@ void MidiPainterModeLinear::reset() {
 
 void MidiPainterModeLinear::update() {
 	clef_line_width = mp->area.height() / 150;
+
+	// absolute pixel value (3.5) allowed, since we only use this on screen :P
+	rr = max((pitch2y(0) - pitch2y(1)) / 1.0f, 3.5f);
 }
 
 void MidiPainterModeLinear::draw_notes(Painter *c, const MidiNoteBuffer &midi) {

@@ -4026,7 +4026,7 @@ default,image=hui:ok
 # Resource
 Dialog
 pdf-export-config-dialog
-width=700,height=800,headerbar,resizable,closebutton=no
+width=1200,height=800,headerbar,resizable,closebutton=no
 0
 0
 1

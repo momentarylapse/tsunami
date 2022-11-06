@@ -27,6 +27,8 @@ void MidiPainterModeClassical::update() {
 	clef_y0 = mp->area.center().y + 2 * clef_dy;
 
 	clef_line_width = mp->area.height() / 150;
+
+	rr = clef_dy * 0.42f;
 }
 
 void MidiPainterModeClassical::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -49,9 +51,6 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 	float x1, x2;
 	cam->range2screen(n->range + mp->shift, x1, x2);
 	float x = (x1 + x2) / 2;
-
-
-	float rr = mp->rr;
 
 	// checked before...
 //	if (n.clef_position <= UNDEFINED_CLEF)

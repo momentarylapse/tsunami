@@ -65,10 +65,9 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	y0 += padding_y_classical;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+line_height), t->instrument, true, MidiMode::CLASSICAL);
-	mp->set_line_weight(line_height / 75);
+	mp->set_size_data(true, line_height / 75);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
-	mp->set_direct_size_mode(true);
 	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
@@ -109,10 +108,9 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	y0 += padding_y_tab;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
-	mp->set_line_weight(line_height / 75);//0.66f);
+	mp->set_size_data(true, line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
-	mp->set_direct_size_mode(true);
 
 	p->set_antialiasing(antialiasing);
 
@@ -285,6 +283,9 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 			y0 = draw_track_tab(p, x0, w, y0, r, tt.track, scale) + track_space;
 		y0 += track_space;
 	}
+
+	if (line_data.num == 0)
+		return y0;
 
 	// line connector
 	p->set_line_width(line_height / 33);

@@ -25,11 +25,13 @@ void MidiPainterModeTab::update() {
 		string_dy = mp->area.height() / mp->instrument->string_pitch.num;
 	else
 		// with padding
-		string_dy = mp->area.height() / (max(mp->instrument->string_pitch.num, 6) + 2);
+		string_dy = mp->area.height() / (max(mp->instrument->string_pitch.num, 7) + 2);
 	float h = string_dy * mp->instrument->string_pitch.num;
 	string_y0 = mp->area.center().y + (h - string_dy) / 2;
 
 	clef_line_width = mp->area.height() / 150;
+
+	rr = string_dy * 0.4f;
 }
 
 void MidiPainterModeTab::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -49,8 +51,6 @@ void MidiPainterModeTab::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
 void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState state) {
 	float x1, x2;
 	cam->range2screen(n->range + mp->shift, x1, x2);
-
-    float rr = mp->rr;
 
 
 	int p = n->stringno;

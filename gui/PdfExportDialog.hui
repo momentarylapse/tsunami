@@ -1,4 +1,4 @@
-Dialog pdf-export-config-dialog "Pdf Export" width=700 height=800 headerbar resizable closebutton=no
+Dialog pdf-export-config-dialog "Pdf Export" width=1200 height=800 headerbar resizable closebutton=no
 	Grid ? ""
 		Grid ? ""
 			DrawingArea area "" expandx expandy

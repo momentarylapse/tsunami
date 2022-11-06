@@ -901,9 +901,9 @@ float ViewModeEditMidi::layer_suggested_height(AudioViewLayer *l) {
 		if (mode == MidiMode::LINEAR)
 			return theme.MAX_TRACK_CHANNEL_HEIGHT * 8;
 		else if (mode == MidiMode::CLASSICAL)
-			return theme.MAX_TRACK_CHANNEL_HEIGHT * 4;
+			return theme.MAX_TRACK_CHANNEL_HEIGHT * 3;
 		else // TAB
-			return theme.MAX_TRACK_CHANNEL_HEIGHT * 4;
+			return theme.MAX_TRACK_CHANNEL_HEIGHT * 3;
 	}
 
 	return ViewModeDefault::layer_suggested_height(l);

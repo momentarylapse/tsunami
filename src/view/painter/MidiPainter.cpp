@@ -401,25 +401,21 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	else if (mode == MidiMode::LINEAR)
 		mmode = &mode_linear;
 	mmode->reset();
+	mmode->direct_size_mode = false;
 	is_playable = _is_playable;
 	as_reference = false;
 	shift = 0;
 	allow_shadows = true;//(mode == MidiMode::LINEAR);
 	force_shadows = false;
 
-	set_line_weight(1.0f);
-	mmode->update();
+	set_size_data(false, 1.0f);
 }
 
-void MidiPainter::set_line_weight(float s) {
+void MidiPainter::set_size_data(bool direct_size_mode, float s) {
+	mmode->direct_size_mode = direct_size_mode;
 	scale = s;
-
-	if (mode == MidiMode::CLASSICAL)
-		rr = min(mode_classical.clef_dy * 0.42f, 10.0f * scale);
-	if (mode == MidiMode::LINEAR)
-		rr = max((mode_linear.pitch2y(0) - mode_linear.pitch2y(1)) / 1.0f, 2.0f * scale);
-	if (mode == MidiMode::TAB)
-		rr = min(mode_tab.string_dy/2, 13.0f * scale);
+	mmode->update();
+	rr = mmode->rr;
 
 	modifier_font_size = rr * 2.8f;
 
@@ -430,7 +426,6 @@ void MidiPainter::set_line_weight(float s) {
 	bar_width = NOTE_BAR_WIDTH * scale;
 	flag_dx = NOTE_FLAG_DX * scale;
 	flag_dy = NOTE_FLAG_DY * scale;
-	mmode->update();
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {
@@ -460,11 +455,6 @@ void MidiPainter::set_quality(float q, bool antialiasing) {
 void MidiPainter::set_force_shadows(bool force) {
 	force_shadows = force;
 	allow_shadows = force;// or (mode == MidiMode::LINEAR);
-}
-
-void MidiPainter::set_direct_size_mode(bool dsm) {
-	mmode->direct_size_mode = dsm;
-	mmode->update();
 }
 
 float MidiPainter::note_r() const {

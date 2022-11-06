@@ -21,13 +21,11 @@ MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_co
 float draw_pdf_header(Painter *p, Song *song, float page_width, const ColorScheme &_colors);
 
 PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent) :
-	hui::Dialog("pdf export config", 200, 100, parent, false)
+	hui::Dialog("pdf-export-config-dialog", parent)
 {
 	od = _od;
 	song = od->song;
 	ok = false;
-
-	from_resource("pdf-export-config-dialog");
 
 	add_string("theme", "default");
 	add_string("theme", "dark (preview only)");

@@ -124,6 +124,12 @@ rect FrameBuffer::area() const {
 	return rect(0, width, 0, height);
 }
 
+bool FrameBuffer::is_srgb() const {
+	GLint p;
+	glGetNamedFramebufferAttachmentParameteriv(frame_buffer, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &p);
+	return p == GL_SRGB;
+}
+
 void FrameBuffer::clear_color(int index, const color &c) {
 	glClearNamedFramebufferfv(frame_buffer, GL_COLOR, index, (float*)&c);
 }
@@ -152,6 +158,17 @@ void resolve_multisampling(FrameBuffer *target, FrameBuffer *source) {
 	} else {
 		glBlitNamedFramebuffer(source->frame_buffer, target->frame_buffer, 0, 0, source->width, source->height, 0, 0, target->width, target->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
+}
+
+bool get_srgb() {
+	return (bool)glIsEnabled(GL_FRAMEBUFFER_SRGB);
+}
+
+void set_srgb(bool enabled) {
+	if (enabled)
+		glEnable(GL_FRAMEBUFFER_SRGB);
+	else
+		glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
 }

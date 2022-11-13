@@ -67,12 +67,9 @@ const Class *TypePointerList;
 const Class *TypeBoolList;
 const Class *TypeIntP;
 const Class *TypeIntList;
-const Class *TypeIntArray;
 const Class *TypeIntDict;
 const Class *TypeFloatP;
 const Class *TypeFloatList;
-const Class *TypeFloatArray;
-const Class *TypeFloatArrayP;
 const Class *TypeFloatDict;
 const Class *TypeFloat64List;
 const Class *TypeComplex;
@@ -81,8 +78,6 @@ const Class *TypeStringList;
 const Class *TypeStringDict;
 const Class *TypeVec2;
 const Class *TypeVec2List;
-const Class *TypeVec3Array;
-const Class *TypeVec3ArrayP;
 const Class *TypeVec3List;
 const Class *TypeMat4;
 const Class *TypePlane;
@@ -666,29 +661,6 @@ void init(Abi abi, bool allow_std_lib) {
 
 	add_package("base");
 	SIAddXCommands();
-
-
-
-
-	add_type_cast(10, TypeInt, TypeFloat32, "int.__float__");
-	add_type_cast(10, TypeInt, TypeFloat64, "int.__float64__");
-	add_type_cast(10, TypeInt, TypeInt64, "int.__int64__");
-	add_type_cast(15, TypeInt64, TypeInt, "int64.__int__");
-	add_type_cast(10, TypeFloat32, TypeFloat64,"float.__float64__");
-	add_type_cast(20, TypeFloat32, TypeInt, "float.__int__");
-	add_type_cast(10, TypeInt, TypeChar, "int.__char__");
-	add_type_cast(20, TypeChar, TypeInt, "char.__int__");
-	add_type_cast(30, TypeBoolList, TypeBool, "bool[].__bool__");
-	add_type_cast(50, TypePointer, TypeBool, "p2b");
-	add_type_cast(50, TypePointer, TypeString, "p2s");
-	add_package("math");
-	add_type_cast(50, TypeInt, TypeAny, "math.@int2any");
-	add_type_cast(50, TypeFloat32, TypeAny, "math.@float2any");
-	add_type_cast(50, TypeBool, TypeAny, "math.@bool2any");
-	add_type_cast(50, TypeString, TypeAny, "math.@str2any");
-	add_type_cast(50, TypePointer, TypeAny, "math.@pointer2any");
-	add_package("os");
-	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
 
 
 	// consistency checks

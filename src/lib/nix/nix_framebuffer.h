@@ -30,6 +30,7 @@ public:
 	int width, height;
 	int multi_samples;
 	rect area() const;
+	bool is_srgb() const;
 
 	void clear_color(int index, const color &c);
 	void clear_depth(float depth);
@@ -40,6 +41,9 @@ public:
 };
 
 void bind_frame_buffer(FrameBuffer *fb);
+
+bool get_srgb();
+void set_srgb(bool enabled);
 
 
 };

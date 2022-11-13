@@ -288,32 +288,30 @@ void select_font(Window *win, const string &title, const Array<string> &params, 
 }
 
 
+// -> ColorButton
+color color_gtk_to_user(const color &c);
+color color_user_to_gtk(const color &c);
+GdkRGBA color_to_gdk(const color &c);
+color color_from_gdk(const GdkRGBA &gcol);
+
 static ColorDialogCallback cur_color_callback;
 void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		GdkRGBA gcol;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(self), &gcol);
-		color c;
-		c.r = (float)gcol.red;
-		c.g = (float)gcol.green;
-		c.b = (float)gcol.blue;
-		c.a = (float)gcol.alpha;
-		cur_color_callback(c);
+		cur_color_callback(color_gtk_to_user(color_from_gdk(gcol)));
 	}
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 
+
 void select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb) {
+	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
 #if GTK_CHECK_VERSION(4,0,0)
 
 	GtkWindow *w = get_window_save(win);
 	auto dlg = gtk_color_chooser_dialog_new("Color", w);
 
-	GdkRGBA gcol;
-	gcol.red = c.r;
-	gcol.green = c.g;
-	gcol.blue = c.b;
-	gcol.alpha = c.a;
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
 
 	cur_color_callback = cb;
@@ -323,23 +321,13 @@ void select_color(Window *win, const string &title, const color &c, const ColorD
 	GtkWindow *w = get_window_save(win);
 	auto dlg = gtk_color_chooser_dialog_new("Color", w);
 
-	GdkRGBA gcol;
-	gcol.red = c.r;
-	gcol.green = c.g;
-	gcol.blue = c.b;
-	gcol.alpha = c.a;
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
 
 	gtk_widget_show_all(dlg);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_OK) {
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-		color Color;
-		Color.r = (float)gcol.red;
-		Color.g = (float)gcol.green;
-		Color.b = (float)gcol.blue;
-		Color.a = (float)gcol.alpha;
-		cb(Color);
+		cb(color_gtk_to_user(color_from_gdk(gcol)));
 	}
 	gtk_widget_destroy(dlg);
 #endif

@@ -159,8 +159,6 @@ void init() {
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 	glDebugMessageCallback(message_callback, nullptr);
 
-
-
 	init_textures();
 	init_shaders();
 	init_vertex_buffers();

@@ -588,6 +588,9 @@ void SIAddPackageOS() {
 	// system
 	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("cmd", TypeString);
+
+
+	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
 }
 
 };

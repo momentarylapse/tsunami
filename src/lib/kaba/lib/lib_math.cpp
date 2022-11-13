@@ -1232,6 +1232,13 @@ void SIAddPackageMath() {
 	add_class(TypeAny);
 		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::_REF__RAISES_EXCEPTIONS);
 		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::_REF__RAISES_EXCEPTIONS);
+
+
+	add_type_cast(50, TypeInt, TypeAny, "math.@int2any");
+	add_type_cast(50, TypeFloat32, TypeAny, "math.@float2any");
+	add_type_cast(50, TypeBool, TypeAny, "math.@bool2any");
+	add_type_cast(50, TypeString, TypeAny, "math.@str2any");
+	add_type_cast(50, TypePointer, TypeAny, "math.@pointer2any");
 }
 
 };

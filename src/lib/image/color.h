@@ -38,6 +38,9 @@ public:
 	string _cdecl str() const;
 	string _cdecl hex() const;
 
+	color lin_to_srgb() const;
+	color srgb_to_lin() const;
+
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
 

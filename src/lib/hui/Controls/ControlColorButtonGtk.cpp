@@ -13,6 +13,9 @@
 
 namespace hui
 {
+	// perform gamma corrections?
+	// (gtk uses sRGB internally)
+	bool color_button_linear = false;
 
 
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
@@ -26,16 +29,21 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
+
+	_last_set = Black;
 }
 
-int col_f_to_i16(float f) {
-	return (int)(f * 65535.0f);
+color color_gtk_to_user(const color &c) {
+	if (color_button_linear)
+		return c.srgb_to_lin();
+	return c;
 }
 
-float col_i16_to_f(int i) {
-	return (float)i / 65535.0f;
+color color_user_to_gtk(const color &c) {
+	if (color_button_linear)
+		return c.lin_to_srgb();
+	return c;
 }
-
 
 GdkRGBA color_to_gdk(const color &c) {
 	GdkRGBA gcol;
@@ -56,14 +64,20 @@ color color_from_gdk(const GdkRGBA &gcol) {
 }
 
 void ControlColorButton::__set_color(const color& c) {
-	GdkRGBA gcol = color_to_gdk(c);
+	_last_set = c;
+	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
+	_last_set_gdk = gcol;
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
 }
 
 color ControlColorButton::get_color() {
 	GdkRGBA gcol;
 	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
-	return color_from_gdk(gcol);
+
+	// make sure, we get EXACTLY the same value, when nothing changed!
+	if (memcmp(&gcol, &_last_set_gdk, sizeof(GdkRGBA)) == 0)
+		return _last_set;
+	return color_gtk_to_user(color_from_gdk(gcol));
 }
 
 void ControlColorButton::__set_option(const string &op, const string &value) {

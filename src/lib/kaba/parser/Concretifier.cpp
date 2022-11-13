@@ -1699,10 +1699,17 @@ const Class *Concretifier::concretify_as_type(shared<Node> node, Block *block, c
 const Class *type_more_dominant(const Class *a, const Class *b) {
 	if (a == b)
 		return a;
-	if (a == TypeInt and b == TypeFloat32)
+	auto is_x = [a, b] (const Class *t1, const Class *t2) {
+		return ((a == t1 and b == t2) or (a == t2 and b == t1));
+	};
+	if (is_x(TypeInt, TypeFloat32))
 		return TypeFloat32;
-	if (a == TypeFloat32 and b == TypeInt)
-		return TypeFloat32;
+	if (is_x(TypeInt, TypeFloat64))
+		return TypeFloat64;
+	if (is_x(TypeInt, TypeInt64))
+		return TypeInt64;
+	if (is_x(TypeInt64, TypeFloat64))
+		return TypeFloat64;
 	return nullptr;
 }
 

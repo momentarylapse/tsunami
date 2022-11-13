@@ -62,4 +62,9 @@ class set : public Array<T> {
 
 }
 
+template<class T>
+string str(const base::set<T>& s) {
+	return str(*(const Array<T>*) &s);
+}
+
 #endif

@@ -128,6 +128,24 @@ void color::get_int_argb(int *i) const {
 	i[3] = int(b * 255.0f);
 }
 
+color color::lin_to_srgb() const {
+	auto l2s = [] (float x) {
+		if (x <= 0.0031308f)
+			return x * 12.92f;
+		return 1.055f * (float)pow(x, 1.0f / 2.4f) - 0.055f;
+	};
+	return color(a, l2s(r), l2s(g), l2s(b));
+}
+
+color color::srgb_to_lin() const {
+	auto s2l = [] (float x) {
+		if (x <= 0.04045f)
+			return x / 12.92f;
+		return (float)pow((x + 0.055f) / 1.055f, 2.4f);
+	};
+	return color(a, s2l(r), s2l(g), s2l(b));
+}
+
 bool color::operator ==(const color &c) const {
 	return (r == c.r) and (g == c.g) and (b == c.b) and (a == c.a);
 }

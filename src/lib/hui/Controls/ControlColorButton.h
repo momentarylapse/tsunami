@@ -9,10 +9,10 @@
 #define CONTROLCOLORBUTTON_H_
 
 #include "Control.h"
+#include "../../image/color.h"
 
 namespace hui
 {
-
 
 class ControlColorButton : public Control
 {
@@ -22,6 +22,10 @@ public:
 	void __set_option(const string &op, const string &value) override;
 	void __set_color(const color &c) override;
 	color get_color() override;
+
+private:
+	color _last_set;
+	GdkRGBA _last_set_gdk;
 };
 
 };

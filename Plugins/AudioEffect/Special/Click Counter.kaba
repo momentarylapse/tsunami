@@ -25,7 +25,7 @@ class ClickCounter extends AudioEffect
 		float[] temp
 		temp = buf.c[0] #+ buf.c[1]
 	
-		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
+		let recover_samples = int(DEFAULT_SAMPLE_RATE * RECOVER_TIME)
 	
 		volume = 0
 		for f,i in temp

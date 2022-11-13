@@ -35,20 +35,19 @@ class Equalizer15 extends AudioEffect
 		FreqMax[NUM_BANDS - 1] = 1000000
 
 	func mut equalize(out b: float[])
-		int _STACK_ALIGNMENT_
-		float sample_rate = session.sample_rate()
+		let sample_rate = session.sample_rate()
 	
 		# transform
-		int len2 = len(b) / 2 + 1
+		let len2 = len(b) / 2 + 1
 		f.resize(len2)
 		fft.r2c(b, f)
 
 		# equalize
-		float w = float(len(b)) / sample_rate
+		let w = float(len(b)) / sample_rate
 		for i in 0:NUM_BANDS
-			int j0 = clamp(FreqMin[i] * w, 0, len2)
-			int j1 = clamp(FreqMax[i] * w, 0, len2)
-			float ff = config.factor[i] / len(b)
+			let j0 = int(clamp(FreqMin[i] * w, 0, len2))
+			let j1 = int(clamp(FreqMax[i] * w, 0, len2))
+			let ff = config.factor[i] / len(b)
 			for j in j0:j1
 				f[j] = f[j] * ff
 		
@@ -86,7 +85,7 @@ class Equalizer15Panel extends ConfigPanel
 		update()
 
 	func mut on_event()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_{{i}}")
 				c.config.factor[i] = get_float("") * 2

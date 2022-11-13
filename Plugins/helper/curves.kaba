@@ -32,18 +32,18 @@ class SpectrumCurve extends Curve
 		sample_rate = _sample_rate
 		ring.write(buf)
 	
-		AudioBuffer b
+		var b: AudioBuffer
 		while ring.available() >= N
 			ring.read_ref(b, N)
-			complex[] zr, zl
+			var zr, zl: complex[]
 			N = buf.length
 			b.get_spectrum(zr, zl, N)
 			spec.resize(len(zr))
-			for z,i in zr
-				spec[i] = log(z.abs())
+			for i=>z in zr
+				spec[i] = log(abs(z))
 			ring.read_ref_done(b)
 	func override get(freq: float) -> float
-		int i = freq * N / sample_rate
+		let i = int(freq * N / sample_rate)
 		if i >= len(spec)-2
 			return 0
 		return spec[i]*10

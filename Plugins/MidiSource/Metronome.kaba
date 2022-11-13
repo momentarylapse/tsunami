@@ -72,7 +72,7 @@ class MetronomeSource extends MidiSource
 
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= midi.samples
-		float fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
+		let fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
 		fraction_beat = (float(cur_sub_beat) + fraction_sub_beat) / float(config.sub_beats)
 		
 		return midi.samples
@@ -91,16 +91,16 @@ class MetronomeSource extends MidiSource
 		changed()
 	
 	func override on_config()
-		float sample_rate = session.sample_rate()
-		float dt_b = 60.0 / config.bpm
-		float dt_s = dt_b / config.sub_beats
-		samples_beat = dt_b * sample_rate
-		samples_sub_beat = dt_s * sample_rate
+		let sample_rate = session.sample_rate()
+		let dt_b = 60.0 / config.bpm
+		let dt_s = dt_b / config.sub_beats
+		samples_beat = int(dt_b * sample_rate)
+		samples_sub_beat = int(dt_s * sample_rate)
 		
 		#if cur_beat >
 		
-		cur_sub_beat = config.sub_beats * fraction_beat
-		offset_sub_beat = (1 + cur_sub_beat - fraction_beat * config.sub_beats) * samples_sub_beat
+		cur_sub_beat = int(config.sub_beats * fraction_beat)
+		offset_sub_beat = int((1 + cur_sub_beat - fraction_beat * config.sub_beats) * samples_sub_beat)
 
 
 

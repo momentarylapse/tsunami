@@ -23,7 +23,7 @@ class ScaleLength extends MidiEffect
 				offsets[int(e.pitch)] = e.pos
 			else
 				let o = offsets[int(e.pitch)]
-				e.pos = o + (o - e.pos) * config.scale
+				e.pos = o + int((o - e.pos) * config.scale)
 				offsets[int(e.pitch)] = -1
 		for o in offsets
 			if o >= 0

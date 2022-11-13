@@ -20,18 +20,18 @@ var im0: Image
 
 class SpecGrid extends Grid
 	func override on_draw(c: Painter)
-		rect r = plot_area
-		int w = r.width()
-		int h = r.height()
+		let r = plot_area
+		let w = r.width()
+		let h = r.height()
 		
-		float fy = im0.height / r.height()
-		float ya = (log(y_axis.val_max) - log(y_axis.val_min)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * fy
-		float yb = (log(y_axis.val_max_max) - log(y_axis.val_max)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * im0.height
-		float fx = im0.width / r.width()
-		float xa = (x_axis.val_max - x_axis.val_min) / (x_axis.val_max_max - x_axis.val_min_min) * fx
-		float xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
+		let fy = im0.height / r.height()
+		let ya = (log(y_axis.val_max) - log(y_axis.val_min)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * fy
+		let yb = (log(y_axis.val_max_max) - log(y_axis.val_max)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * im0.height
+		let fx = im0.width / r.width()
+		let xa = (x_axis.val_max - x_axis.val_min) / (x_axis.val_max_max - x_axis.val_min_min) * fx
+		let xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
 		
-		Image im
+		var im: Image
 		im.create(w, h, color.BLACK)
 		for x in 0:w
 			for y in 0:h

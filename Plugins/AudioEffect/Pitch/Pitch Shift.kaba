@@ -27,28 +27,28 @@ class PitchShift extends AudioEffect
 		prev_no = 0
 		
 	func shift_buf(out b: float[], factor: float)
-		complex[] buf1, buf2
+		var buf1, buf2: complex[]
 		fft.r2c(b, buf1)
-		int N = len(b)
-		int NN = len(buf1)
+		let N = len(b)
+		let NN = len(buf1)
 		buf2.resize(NN)
 		for i in 0:NN
 			buf2[i] = complex(0, 0)
 
-		int D = max(100, sqrt(N)*2)
+		let D = int(max(100, sqrt(N)*2))
 		for i in 0:NN
-			float kk = factor * i
-			float x0 = pi * kk
-			int j0 = max(kk - D, 0)
-			int j1 = min(kk + D, NN)
-			complex M0 = complex(cos(x0), sin(x0)) * sin(x0)
+			let kk = int(factor * i)
+			let x0 = pi * kk
+			let j0 = max(kk - D, 0)
+			let j1 = min(kk + D, NN)
+			let M0 = complex(cos(x0), sin(x0)) * sin(x0)
 			for j in j0:j1
-				float dk = kk - j
-				float x = pi * dk
+				let dk = float(kk - j)
+				let x = pi * dk
 				if x == 0
 					buf2[j] += buf1[i]
 				else
-					complex M = M0 * (1/x)
+					let M = M0 * (1/x)
 					buf2[j] += M * buf1[i]
 
 		fft.c2r_inv(buf2, b)
@@ -58,14 +58,14 @@ class PitchShift extends AudioEffect
 		for c in buf.c
 			shift_buf(c, config.factor)
 			
-		int other = 1 - prev_no
+		let other = 1 - prev_no
 			
 		prev_chunk[prev_no] = buf
-		int n = min(OVERLAP, len(prev_chunk[other]))
+		let n = min(OVERLAP, len(prev_chunk[other]))
 		print("{{len(buf)}}  {{n}}")
 		for i in 0:n
-			float t = float(i) / n
-			for c,k in buf.c
+			let t = float(i) / n
+			for k=>c in buf.c
 				buf.c[k][i] = t * buf.c[k][i] + (1-t) * prev_chunk[other].c[k][i]
 		
 		prev_no = other
@@ -73,6 +73,6 @@ class PitchShift extends AudioEffect
 
 	func override process(out buf: AudioBuffer)
 		for offset in 0:len(buf):CHUNK_SIZE
-			int end = min(offset + CHUNK_SIZE, len(buf))
+			let end = min(offset + CHUNK_SIZE, len(buf))
 			process_chunk(buf[offset:end])
 

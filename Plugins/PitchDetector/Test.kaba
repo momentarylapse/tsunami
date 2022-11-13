@@ -10,26 +10,26 @@ class TestDetector extends PitchDetector
 	var pitch_power2: float[]
 	func override process(midi: MidiEventBuffer, buf: AudioBuffer)
 		#print(len(buf))
-		complex[] z
+		var z: complex[]
 		fft.r2c(buf.c[0], z)
 		
-		int N = len(buf)
+		let N = len(buf)
 		print(N)
 		
 		pitch_power.resize(MAX_SCAN_PITCH)
 		pitch_power = 0
 		
-		float f_min = pitch_to_freq(MIN_DETECT_PITCH)
-		float f_max = pitch_to_freq(MAX_SCAN_PITCH)
+		let f_min = pitch_to_freq(MIN_DETECT_PITCH)
+		let f_max = pitch_to_freq(MAX_SCAN_PITCH)
 		print("{{f_min}} : {{f_max}}")
-		int i_min = (f_min * N) / DEFAULT_SAMPLE_RATE + 1
-		int i_max = min((f_max * N) / DEFAULT_SAMPLE_RATE, N/2-2)
+		let i_min = int((f_min * N) / DEFAULT_SAMPLE_RATE + 1)
+		let i_max = int(min((f_max * N) / DEFAULT_SAMPLE_RATE, N/2-2))
 		print("{{i_min}} : {{i_max}}")
 		
 		for i in i_min:i_max
-			float p = z[i].abs()
-			float f = (float(i) * DEFAULT_SAMPLE_RATE) / N
-			int _pitch = freq_to_pitch(f)+0.5
+			let p = abs(z[i])
+			let f = (float(i) * DEFAULT_SAMPLE_RATE) / N
+			let _pitch = int(freq_to_pitch(f)+0.5)
 			#print(_pitch)
 			pitch_power[_pitch] += p
 		

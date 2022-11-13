@@ -28,22 +28,22 @@ class Flanger extends AudioEffect
 		offset = 0
 
 	func do_flanger(out b: float[], out temp: float[])
-		int p = offset % len(temp)
-		float sample_rate = session.sample_rate()
+		var p = offset % len(temp)
+		let sample_rate = session.sample_rate()
 	
-		float f_a = (1 - 0.5 * config.depth) * config.delay
-		float f_b = 0.5 * config.depth * config.delay
-		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
+		let f_a = (1 - 0.5 * config.depth) * config.delay
+		let f_b = 0.5 * config.depth * config.delay
+		let f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
-		for bb,i in b
+		for i=>bb in b
 	
 			# old value
 			temp[p] = bb
 		
 			# shift
-			float dt = f_a - cos((i + offset) * f_c) * f_b
-			int dp = dt * sample_rate
-			int p2 = p - dp
+			let dt = f_a - cos((i + offset) * f_c) * f_b
+			let dp = int(dt * sample_rate)
+			var p2 = p - dp
 			if p2 < 0
 				p2 += len(temp)
 		
@@ -56,11 +56,12 @@ class Flanger extends AudioEffect
 
 	
 	func override process(out buf: AudioBuffer)
-		int delay_samples = session.sample_rate() * config.delay + 1
+		let delay_samples = int(session.sample_rate() * config.delay + 1)
 		buf_temp.set_channels(buf.channels)
 		buf_temp.resize(delay_samples)
 	
-		for c, i in buf.c
+		for i=>c in buf.c
 			do_flanger(buf.c[i], buf_temp.c[i])
 	
 		offset += len(buf)
+

@@ -46,7 +46,7 @@ Grid ? '' vertical
 
 
 func scale_range(r: Range, s: float) -> Range
-	return RangeTo(r.start() * s, r.end() * s)
+	return RangeTo(int(r.start() * s), int(r.end() * s))
 
 
 class PracticeLooper extends TsunamiPlugin
@@ -112,7 +112,7 @@ class PracticeLooper extends TsunamiPlugin
 				Bar bb
 				bb.beats = b.beats
 				bb.divisor = b.divisor
-				bb.length = b.length / config.speed
+				bb.length = int(b.length / config.speed)
 				song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
 			song.end_action_group()
 	#		old_sel = session.view.sel.range_raw

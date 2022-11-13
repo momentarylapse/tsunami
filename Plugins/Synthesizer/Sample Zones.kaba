@@ -35,10 +35,10 @@ class SampleRenderer extends PitchRenderer
 				if true#z.vel_max > 0.95 #volume >= z.volume_min and volume <= z.volume_max
 					zone = &z
 				#	print(str(z))
-					float factor = pow(2, float(z.pitch_original - pitch) / 12)
-					data.resize(z.sample.origin.buf.length * factor)
-					start_loop = zone.start_loop * factor
-					end_loop = zone.end_loop * factor
+					let factor = pow(2, float(z.pitch_original - pitch) / 12)
+					data.resize(int(z.sample.origin.buf.length * factor))
+					start_loop = int(zone.start_loop * factor)
+					end_loop = int(zone.end_loop * factor)
 					allow_loop = true
 					interpolate_buffer(z.sample.origin.buf, data, 0)
 					env.set(z.attack, 1, z.sustain, z.release, synth.session.sample_rate())
@@ -61,11 +61,11 @@ class SampleRenderer extends PitchRenderer
 	func override render(out buf: AudioBuffer) -> bool
 		if not zone
 			return false
-		int done = 0
-		int todo = len(buf)
+		var done = 0
+		var todo = len(buf)
 		while todo > 0
-			int avail = end_loop - offset
-			int chunk = min(avail, todo)
+			let avail = end_loop - offset
+			let chunk = min(avail, todo)
 			buf[done:].set(data[offset:end_loop], 0, 1)
 			
 			done += chunk

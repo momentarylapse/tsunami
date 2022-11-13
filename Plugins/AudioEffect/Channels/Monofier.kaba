@@ -31,24 +31,24 @@ class Monofier extends AudioEffect
 		if buf.channels == 1
 			return
 
-		int n = (session.sample_rate() * abs(config.distance) / SPEED_OF_SOUND)
+		let n = int(session.sample_rate() * abs(config.distance) / SPEED_OF_SOUND)
 		temp.resize(n)
 
-		float sl = (1 + config.panning) / 2
-		float sr = (1 - config.panning) / 2
+		var sl = (1 + config.panning) / 2
+		let sr = (1 - config.panning) / 2
 		if config.invert
 			sl = -sl
 		
 		if config.distance == 0
 			# pure mix
 			for i in 0:len(buf)
-				float x = sl * buf.c[0][i] + sr * buf.c[1][i]
+				let x = sl * buf.c[0][i] + sr * buf.c[1][i]
 				buf.c[0][i] = x
 				buf.c[1][i] = x
 		else if config.distance > 0
 			# delay right channel
 			for i in 0:len(buf)
-				float x = sl * buf.c[0][i] + sr * temp[offset]
+				let x = sl * buf.c[0][i] + sr * temp[offset]
 				temp[offset] = buf.c[1][i]
 				offset ++
 				if offset >= n
@@ -58,10 +58,11 @@ class Monofier extends AudioEffect
 		else if config.distance < 0
 			# delay left channel
 			for i in 0:len(buf)
-				float x = sl * temp[offset] + sr * buf.c[1][i]
+				let x = sl * temp[offset] + sr * buf.c[1][i]
 				temp[offset] = buf.c[0][i]
 				offset ++
 				if offset >= n
 					offset = 0
 				buf.c[0][i] = x
 				buf.c[1][i] = x
+

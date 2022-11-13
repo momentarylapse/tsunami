@@ -49,11 +49,11 @@ class MultiEcho extends AudioEffect
 		let n = len(config.refl)
 		refl.resize(n)
 		for r,i in refl
-			let delay_samples = session.sample_rate() * config.refl[i].delay
+			let delay_samples = int(session.sample_rate() * config.refl[i].delay)
 			r.buf.set_channels(buf.channels)
 			r.buf.resize(delay_samples)
 	
-			for c,k in buf.c
+			for k=>c in buf.c
 				do_delay(c, r.buf.c[k], r, config.refl[i])
 	
 			r.offset += len(buf)

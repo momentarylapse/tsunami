@@ -27,11 +27,11 @@ class Echo extends AudioEffect
 
 
 	func do_delay(out b: float[], out d: float[])
-		int p = offset % len(d)
+		var p = offset % len(d)
 		for bb in b
 	
 			# old value
-			float b0 = bb
+			let b0 = bb
 		
 			# add echo
 			bb = bb + d[p] * config.volume
@@ -47,11 +47,11 @@ class Echo extends AudioEffect
 
 	func override process(out buf: AudioBuffer)
 
-		int delay_samples = session.sample_rate() * config.delay
+		let delay_samples = int(session.sample_rate() * config.delay)
 		buf_temp.set_channels(buf.channels)
 		buf_temp.resize(delay_samples)
 	
-		for c,i in buf.c
+		for i=>c in buf.c
 			do_delay(c, buf_temp.c[i])
 	
 		offset += len(buf)
@@ -60,3 +60,4 @@ class Echo extends AudioEffect
 		buf_temp.clear()
 		offset = 0
 		on_config()
+

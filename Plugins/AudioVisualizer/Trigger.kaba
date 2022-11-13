@@ -97,7 +97,7 @@ class Trigger extends AudioVisualizer
 			if blocked < 0
 				if abs(b) > config.threshold
 					# start trigger
-					blocked = config.blocking * session.sample_rate()
+					blocked = int(config.blocking * session.sample_rate())
 					curve_before = buf.c[0][:i]
 					curve_after = buf.c[0][i:]
 			else

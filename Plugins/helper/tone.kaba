@@ -143,14 +143,14 @@ class Chord
 
 	func static parse(s: string) -> Chord[]
 		Chord[] chords
-		for a,i in s
+		for i=>a in s
 			Chord c
 			if a >= 'a' and a <= 'h'
 				c.type = Type.MINOR
 				c.base_tone = char_to_rel_pitch(a) + 48
 			else if a >= 'A' and a <= 'H'
 				c.type = Type.MAJOR
-				c.base_tone = char_to_rel_pitch(a + 32) + 48
+				c.base_tone = char_to_rel_pitch(a + char(32)) + 48
 			else
 				continue
 			if i < len(s) - 1

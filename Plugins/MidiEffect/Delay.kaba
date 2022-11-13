@@ -12,6 +12,6 @@ class Delay extends MidiEffect
 	var config: Config
 	
 	func override process(out midi: MidiEventBuffer)
-		let dt: int = session.sample_rate() * config.delay
+		let dt = int(session.sample_rate() * config.delay)
 		for e in midi
 			e.pos += dt

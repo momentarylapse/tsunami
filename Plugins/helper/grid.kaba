@@ -150,11 +150,11 @@ class GridAxis extends AxisData
 		return r
 		
 	func get_log_partition() -> GridPartition
-		float pixel_per_decade = abs(size / log(val_max / val_min)) * log(10)
-		float size_param = pixel_per_decade / min_label_dist
+		let pixel_per_decade = abs(size / log(val_max / val_min)) * log(10)
+		let size_param = pixel_per_decade / min_label_dist
 		GridPartition r
-		int e_min = log(abs(abs(val_min))) / log(10)
-		int e_max = log(abs(abs(val_max))) / log(10) + 1
+		let e_min = int(log(abs(abs(val_min))) / log(10))
+		let e_max = int(log(abs(abs(val_max))) / log(10)) + 1
 		for e in e_min:e_max
 			float vv0 = pow(10, e)
 			for i in 1:10

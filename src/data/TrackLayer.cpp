@@ -75,7 +75,7 @@ Song *TrackLayer::song() const {
 int TrackLayer::version_number() const {
 	if (!track)
 		return 0;
-	return find_index(weak(track->layers), const_cast<TrackLayer*>(this));
+	return base::find_index(weak(track->layers), const_cast<TrackLayer*>(this));
 }
 
 Array<Range> TrackLayer::active_version_ranges() const {

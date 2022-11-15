@@ -217,7 +217,7 @@ void ProfileManager::set_favorite(Session *session, ModuleCategory type, const s
 	if (!loaded)
 		load(session);
 	Favorite x = {type, name};
-	int index = find_index(favorites, x);
+	int index = base::find_index(favorites, x);
 	if (favorite) {
 		if (index < 0)
 			favorites.add(x);
@@ -232,5 +232,5 @@ bool ProfileManager::is_favorite(Session *session, ModuleCategory type, const st
 	if (!loaded)
 		load(session);
 	Favorite x = {type, name};
-	return find_index(favorites, x) >= 0;
+	return base::find_index(favorites, x) >= 0;
 }

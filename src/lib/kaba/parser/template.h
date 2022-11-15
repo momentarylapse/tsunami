@@ -22,6 +22,8 @@ public:
 	static Function *get_instantiated(Parser *parser, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
 	static Function *get_instantiated_matching(Parser *parser, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id);
 
+	static void clear_from_module(Module *m);
+
 private:
 	struct Instance {
 		Function *f;
@@ -47,7 +49,7 @@ private:
 namespace implicit_class_registry {
 	const Class *find(const string &name, Class::Type type, int array_size, const Array<const Class*> &params);
 	void add(const Class* t);
-	void remove_module(Module *m);
+	void clear_from_module(Module *m);
 }
 
 

@@ -10,6 +10,8 @@
 
 #include "array.h"
 
+namespace base {
+
 template<class T, class F>
 T *find_if(const Array<T> &array, F f) {
 	for (auto &e: array)
@@ -98,6 +100,17 @@ void replace_if(Array<T> &array, F f, const T &by) {
 template<class T>
 void replace(Array<T> &array, const T &t, const T &by) {
 	replace_if(array, [&t] (const T &v) { return v == t; }, by);
+}
+
+template<class T, class F>
+void remove_if(Array<T> &array, F f) {
+	for (int i=0; i<array.num; i++)
+		if (f(array[i])) {
+			array.erase(i);
+			i --;
+		}
+}
+
 }
 
 #endif /* SRC_LIB_BASE_ALGO_H_ */

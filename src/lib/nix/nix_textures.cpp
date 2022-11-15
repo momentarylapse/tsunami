@@ -245,7 +245,7 @@ void Texture::write(const Image &image) {
 		return;
 
 	if (type == Type::NONE)
-		_create_2d(image.width, image.height, GL_SRGB8_ALPHA8);
+		_create_2d(image.width, image.height, GL_RGBA8);//GL_SRGB8_ALPHA8);
 
 	if (width != image.width or height != image.height) {
 		//msg_write("texture resize..." + filename.str());

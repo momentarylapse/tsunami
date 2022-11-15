@@ -59,7 +59,9 @@ void PluginConsole::on_add_plugin() {
 }
 
 void PluginConsole::on_remove_plugin() {
-	int index = find_index_if(weak(panels), [this] (ModulePanel* p) { return p->socket.module == session->last_plugin; });
+	int index = base::find_index_if(weak(panels), [this] (ModulePanel* p) {
+		return p->socket.module == session->last_plugin;
+	});
 	if (index >= 0) {
 		unembed(weak(panels)[index]);
 		panels.erase(index);

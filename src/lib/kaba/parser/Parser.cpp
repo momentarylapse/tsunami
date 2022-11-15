@@ -1586,7 +1586,7 @@ bool type_needs_alignment(const Class *t) {
 void parser_class_add_element(Parser *p, Class *_class, const string &name, const Class *type, Flags flags, int &_offset, int token_id) {
 
 	// override?
-	ClassElement *orig = find_by_element(_class->elements, &ClassElement::name, name);
+	ClassElement *orig = base::find_by_element(_class->elements, &ClassElement::name, name);
 
 	bool override = flags_has(flags, Flags::OVERRIDE);
 	if (override and ! orig)
@@ -1704,7 +1704,7 @@ bool Parser::parse_class(Class *_namespace) {
 				flags_set(flags, Flags::VIRTUAL);
 			auto f = parse_function_header(_class, flags);
 			skip_parsing_function_body(f);
-		} else if (Exp.cur == IDENTIFIER_CONST) {
+		} else if ((Exp.cur == IDENTIFIER_CONST) or (Exp.cur == IDENTIFIER_LET)) {
 			parse_named_const(_class, tree->root_of_all_evil->block.get());
 		} else if (try_consume(IDENTIFIER_VAR)) {
 			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
@@ -1846,7 +1846,7 @@ shared<Node> Parser::parse_and_eval_const(Block *block, const Class *type) {
 }
 
 void Parser::parse_named_const(Class *name_space, Block *block) {
-	Exp.next(); // 'const'
+	Exp.next(); // 'const' / 'let'
 	string name = Exp.consume();
 
 	const Class *type = nullptr;
@@ -2235,7 +2235,7 @@ void Parser::parse_top_level() {
 			auto f = parse_function_header(tree->base_class, Flags::STATIC);
 			skip_parsing_function_body(f);
 
-		} else if (Exp.cur == IDENTIFIER_CONST) {
+		} else if ((Exp.cur == IDENTIFIER_CONST) or (Exp.cur == IDENTIFIER_LET)) {
 			parse_named_const(tree->base_class, tree->root_of_all_evil->block.get());
 
 		} else if (try_consume(IDENTIFIER_VAR)) {

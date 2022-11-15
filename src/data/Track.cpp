@@ -224,7 +224,7 @@ void Track::enable_effect(AudioEffect *effect, bool enabled) {
 }
 
 void Track::delete_effect(AudioEffect *effect) {
-	int index = find_index(weak(fx), effect);
+	int index = base::find_index(weak(fx), effect);
 	if (index >= 0)
 		song->execute(new ActionTrackDeleteEffect(this, index));
 }
@@ -250,7 +250,7 @@ void Track::enable_midi_effect(MidiEffect *effect, bool enabled) {
 }
 
 void Track::delete_midi_effect(MidiEffect *effect) {
-	int index = find_index(weak(midi_fx), effect);
+	int index = base::find_index(weak(midi_fx), effect);
 	if (index >= 0)
 		song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }
@@ -300,7 +300,7 @@ Curve *Track::add_curve(const string &name, CurveTarget &target) {
 	return c;
 }
 void Track::delete_curve(Curve *curve) {
-	int index = find_index(weak(curves), curve);
+	int index = base::find_index(weak(curves), curve);
 	if (index >= 0)
 		song->execute(new ActionTrackDeleteCurve(this, index));
 }

@@ -61,7 +61,7 @@ void Sample::__init__(const string &_name, const AudioBuffer &_buf) {
 int Sample::get_index() const {
 	if (!owner)
 		return -1;
-	return find_index(weak(owner->samples), const_cast<Sample*>(this));
+	return base::find_index(weak(owner->samples), const_cast<Sample*>(this));
 }
 
 Range Sample::range() const {

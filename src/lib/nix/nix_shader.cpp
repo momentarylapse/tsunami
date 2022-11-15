@@ -443,9 +443,9 @@ layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_uv;
 
-layout(location = 0) out vec3 out_normal;
-layout(location = 1) out vec2 out_uv;
-layout(location = 2) out vec4 out_pos; // camera space
+layout(location = 0) out vec4 out_pos; // camera space
+layout(location = 1) out vec3 out_normal;
+layout(location = 2) out vec2 out_uv;
 
 void main() {
 	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_position, 1);
@@ -476,9 +476,9 @@ struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; 
 uniform int num_lights = 0;
 /*layout(binding = 1)*/ uniform LightData { Light light[32]; };
 
-layout(location = 0) in vec3 in_normal;
-layout(location = 1) in vec2 in_uv;
-layout(location = 2) in vec4 in_pos;
+layout(location = 0) in vec4 in_pos;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
 uniform sampler2D tex0;
 out vec4 out_color;
 

@@ -44,11 +44,11 @@ static string format_title_with_block(const string &title, const string block, i
 }
 
 int CommandLineParser::non_default_commands() const {
-	return count_if(commands, [] (const Command &c) { return !c.is_default(); });
+	return base::count_if(commands, [] (const Command &c) { return !c.is_default(); });
 }
 
 CommandLineParser::Command *CommandLineParser::default_command() const {
-	return find_if(commands, [] (const Command &c) { return c.is_default(); });
+	return base::find_if(commands, [] (const Command &c) { return c.is_default(); });
 }
 
 void CommandLineParser::show() {

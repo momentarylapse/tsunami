@@ -1388,6 +1388,9 @@ void SyntaxTree::map_local_variables_to_stack() {
 // no included modules may be deleted before us!!!
 SyntaxTree::~SyntaxTree() {
 	// delete all classes, functions etc created by this module
+
+	TemplateManager::clear_from_module(module);
+	implicit_class_registry::clear_from_module(module);
 }
 
 void SyntaxTree::show(const string &stage) {

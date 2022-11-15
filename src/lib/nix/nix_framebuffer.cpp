@@ -30,7 +30,7 @@ FrameBuffer::FrameBuffer() {
 	multi_samples = 0;
 }
 
-FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) {
+FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) : FrameBuffer() {
 	glCreateFramebuffers(1, &frame_buffer);
 	update(attachments);
 }

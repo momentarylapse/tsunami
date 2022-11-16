@@ -77,12 +77,12 @@ void Module::set_session_etc(Session *_session, const string &_class) {
 	auto *c = get_config();
 	if (c) {
 		c->_module = this;
-		c->kaba_class = kaba::get_dynamic_type(c);
+		c->kaba_class = kaba::default_context->get_dynamic_type(c);
 		/*msg_write("config class: " + p2s(c->_class) + "  " + sub_type);
 		if (c->_class)
 			msg_write(c->_class->name);*/
 	}
-	kaba_class = kaba::get_dynamic_type(this);
+	kaba_class = kaba::default_context->get_dynamic_type(this);
 
 	reset_config();
 	reset_state();

@@ -149,7 +149,7 @@ bool ns_needed(const Class *ns, const Class *observer_ns) {
 		return false;
 	if (observer_ns and reachable_from(ns, observer_ns))
 		return false;
-	if (ns == packages[0]->base_class()) // always ignore "base"
+	if (ns == ns->owner->module->context->packages[0]->base_class()) // always ignore "base"
 		if (ns == ns->owner->base_class)
 			return false;
 	return true;
@@ -529,14 +529,12 @@ bool member_func_override_match(Function *a, Function *b) {
 	return true;
 }
 
+// only used to create "implicit" types
+// TODO: find a better system
 string class_name_might_need_parantheses(const Class *t) {
 	if (t->is_callable() /*or t->is_product()*/)
-		return "(" + t->name + ")";
-	return t->name;
-}
-
-const Class *Class::get_pointer() const {
-	return owner->request_implicit_class(class_name_might_need_parantheses(this) + "*", Class::Type::POINTER, config.pointer_size, 0, nullptr, {this}, name_space, token_id);
+		return "(" + t->long_name() + ")";
+	return t->long_name();
 }
 
 const Class *Class::get_root() const {
@@ -573,7 +571,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 		if (as_virtual and (f->virtual_index < 0)) {
 			if (config.verbose)
 				msg_write("VVVVV +");
-			f->virtual_index = process_class_offset(cname(owner->base_class), f->name, max(vtable.num, 2));
+			f->virtual_index = s->module->context->external->process_class_offset(cname(owner->base_class), f->name, max(vtable.num, 2));
 			if ((f->name == IDENTIFIER_FUNC_DELETE) and (config.abi == Abi::AMD64_WINDOWS or config.abi == Abi::X86_WINDOWS))
 				f->virtual_index = 1;
 		}

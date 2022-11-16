@@ -379,8 +379,8 @@ public:
 };
 
 
-void SIAddPackageMath() {
-	add_package("math", Flags::AUTO_IMPORT);
+void SIAddPackageMath(Context *c) {
+	add_package(c, "math", Flags::AUTO_IMPORT);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));

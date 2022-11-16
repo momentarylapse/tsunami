@@ -3,10 +3,10 @@ use tsunami
 use helper.tone
 use helper.draw
 
-const NUM_OSCILLATORS = 6
+let NUM_OSCILLATORS = 6
 
-const OSCI_RADIUS = 15.0
-const LINK_LENGTH = OSCI_RADIUS * 5.0
+let OSCI_RADIUS = 15.0
+let LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 

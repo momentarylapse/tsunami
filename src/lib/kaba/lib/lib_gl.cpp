@@ -92,8 +92,8 @@ const Class *TypeBuffer;
 const Class *TypeUniformBuffer;
 const Class *TypeShaderStorageBuffer;
 
-void SIAddPackageGl() {
-	add_package("gl");
+void SIAddPackageGl(Context *c) {
+	add_package(c, "gl");
 	
 	TypeVertexBuffer	= add_type  ("VertexBuffer", sizeof(nix::VertexBuffer));
 	TypeVertexBufferP	= add_type_p(TypeVertexBuffer);

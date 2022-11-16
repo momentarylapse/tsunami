@@ -42,14 +42,17 @@ void Plugin::recompile(Session *session) {
 	session->i(_("compiling module: ") + filename.str());
 
 	if (module) {
-		kaba::remove_module(module.get());
+		session->w(_("recompiling modules currently not supported"));
+		return;
+		#if 0
+		kaba::default_context->remove_module(module.get());
 		module = nullptr;
+		#endif
 	}
 
 	// load + compile
 	try {
-		module = kaba::load(filename);
-
+		module = kaba::default_context->load_module(filename);
 	} catch(kaba::Exception &e) {
 		error_message = e.message();
 		session->e(get_error());

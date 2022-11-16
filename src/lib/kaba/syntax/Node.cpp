@@ -344,13 +344,15 @@ shared<Node> Node::shallow_copy() const {
 	return r;
 }
 
-shared<Node> Node::ref(const Class *override_type) const {
-	const Class *t = override_type ? override_type : type->get_pointer();
-
+shared<Node> Node::ref(const Class *t) const {
 	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, false, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
+}
+
+shared<Node> Node::ref(SyntaxTree *tree) const {
+	return ref(tree->get_pointer(type));
 }
 
 shared<Node> Node::deref(const Class *override_type) const {

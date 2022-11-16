@@ -11,6 +11,8 @@
 
 namespace kaba {
 
+class Context;
+
 
 template<typename T>
 void* mf(T tmf) {
@@ -29,31 +31,56 @@ void* mf(T tmf) {
 	return (void*)(pp.a | (pp.b & 1));
 }
 
+class ExternalLinkData {
+public:
 
+	Context *context;
+	struct ExternalLink {
+		string name;
+		void *pointer;
+	};
+	Array<ExternalLink> external_links;
 
+	struct ClassOffsetData {
+		string class_name, element;
+		int offset;
+		bool is_virtual;
+	};
+	Array<ClassOffsetData> class_offsets;
 
-void reset_external_data();
-void link_external(const string &name, void *pointer);
-template<typename T>
-void link_external_class_func(const string &name, T pointer) {
-	link_external(name, mf(pointer));
-}
-void declare_class_size(const string &class_name, int offset);
-void _declare_class_element(const string &name, int offset);
-template<class T>
-void declare_class_element(const string &name, T pointer) {
-	_declare_class_element(name, *(int*)(void*)&pointer);
-}
-void _link_external_virtual(const string &name, void *p, void *instance);
-template<class T>
-void link_external_virtual(const string &name, T pointer, void *instance) {
-	_link_external_virtual(name, mf(pointer), instance);
-}
+	struct ClassSizeData {
+		string class_name;
+		int size;
+	};
+	Array<ClassSizeData> class_sizes;
 
-void *get_external_link(const string &name);
-int process_class_offset(const string &class_name, const string &element, int offset);
-int process_class_size(const string &class_name, int size);
-int process_class_num_virtuals(const string &class_name, int num_virtual);
+	ExternalLinkData(Context *c);
+
+	void reset();
+	void link(const string &name, void *pointer);
+	template<typename T>
+	void link_class_func(const string &name, T pointer) {
+		link(name, mf(pointer));
+	}
+	void declare_class_size(const string &class_name, int offset);
+	void _declare_class_element(const string &name, int offset);
+	template<class T>
+	void declare_class_element(const string &name, T pointer) {
+		_declare_class_element(name, *(int*)(void*)&pointer);
+	}
+	void _link_virtual(const string &name, void *p, void *instance);
+	template<class T>
+	void link_virtual(const string &name, T pointer, void *instance) {
+		_link_virtual(name, mf(pointer), instance);
+	}
+
+	void *get_link(const string &name);
+	int process_class_offset(const string &class_name, const string &element, int offset);
+	int process_class_size(const string &class_name, int size);
+	int process_class_num_virtuals(const string &class_name, int num_virtual);
+
+};
+
 
 
 }

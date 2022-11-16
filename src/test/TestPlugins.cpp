@@ -57,7 +57,8 @@ Array<UnitTest::Test> TestPlugins::tests() {
 void TestPlugins::test_compile(ModuleCategory type, const Path &filename) {
 
 	try {
-		auto s = kaba::load(filename);
+		//auto context = ownify(kaba::Context::create());
+		auto s = kaba::default_context->load_module(filename);
 	} catch (kaba::Exception &e) {
 		throw Failure(e.message());
 	}

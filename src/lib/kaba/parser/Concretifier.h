@@ -21,6 +21,7 @@ class Statement;
 enum class Flags;
 class Parser;
 class AutoImplementer;
+class Context;
 
 struct CastingData {
 	int cast;
@@ -30,7 +31,7 @@ struct CastingData {
 
 class Concretifier {
 public:
-	Concretifier(Parser *parser, SyntaxTree *tree);
+	Concretifier(Context *c, Parser *parser, SyntaxTree *tree);
 
 	void concretify_all_params(shared<Node> &node, Block *block, const Class *ns);
 
@@ -76,9 +77,13 @@ public:
 	shared<Node> make_func_pointer_node_callable(const shared<Node> l);
 	shared<Node> link_unary_operator(AbstractOperator *op, shared<Node> operand, Block *block, int token_id);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, shared<Node> cmd);
+	const Class *make_effective_class_callable(shared<Node> node);
 
 	shared<Node> wrap_function_into_callable(Function *f, int token_id);
 	shared<Node> wrap_node_into_callable(shared<Node> node);
+
+	bool type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd);
+	bool type_match_tuple_as_contructor(shared<Node> node, Function *f_constructor, int &penalty);
 
 	shared<Node> apply_type_cast(const CastingData &cast, shared<Node> param, const Class *wanted);
 	shared<Node> apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<CastingData> &casts, const Array<const Class*> &wanted, int offset = 0);
@@ -117,6 +122,7 @@ public:
 	void do_error(const string &msg, int token_id);
 
 
+	Context *context;
 	SyntaxTree *tree;
 	Parser *parser;
 	AutoImplementer *auto_implementer;

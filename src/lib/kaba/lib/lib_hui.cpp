@@ -119,8 +119,8 @@ extern const Class* TypeCallbackString;
 extern const Class* TypeOsConfiguration;
 const Class *TypeHuiWindowP;
 
-void SIAddPackageHui() {
-	add_package("hui");
+void SIAddPackageHui(Context *c) {
+	add_package(c, "hui");
 	
 	auto TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
 	auto TypeHuiMenuP = add_type_p(TypeHuiMenu);

@@ -19,33 +19,15 @@ namespace kaba {
 int get_virtual_index(void *func, const string &tname, const string &name);
 
 
-
-struct ExternalLinkData {
-	string name;
-	void *pointer;
-};
-Array<ExternalLinkData> ExternalLinks;
-
-struct ClassOffsetData {
-	string class_name, element;
-	int offset;
-	bool is_virtual;
-};
-Array<ClassOffsetData> ClassOffsets;
-
-struct ClassSizeData {
-	string class_name;
-	int size;
-};
-Array<ClassSizeData> ClassSizes;
+ExternalLinkData::ExternalLinkData(Context *c) {
+	context = c;
+}
 
 
-
-
-void reset_external_data() {
-	ExternalLinks.clear();
-	ClassOffsets.clear();
-	ClassSizes.clear();
+void ExternalLinkData::reset() {
+	external_links.clear();
+	class_offsets.clear();
+	class_sizes.clear();
 }
 
 extern const Class *TypeStringAutoCast;
@@ -65,18 +47,18 @@ string function_link_name(Function *f) {
 }
 
 // program variables - specific to the surrounding program, can't always be there...
-void link_external(const string &name, void *pointer) {
-	ExternalLinkData l;
+void ExternalLinkData::link(const string &name, void *pointer) {
+	ExternalLink l;
 	l.name = name;
 	l.pointer = pointer;
 	if (abs((int_p)pointer) < 1000)
 		msg_error("probably a virtual function: " + name);
-	ExternalLinks.add(l);
+	external_links.add(l);
 
 
 	auto names = name.explode(":");
 	string sname = decode_symbol_name(names[0]);
-	for (auto p: packages)
+	for (auto p: context->packages)
 		for (auto&& [i,f]: enumerate(p->syntax->functions))
 			if (f->cname(p->base_class()) == sname) {
 				if (names.num > 1)
@@ -86,18 +68,18 @@ void link_external(const string &name, void *pointer) {
 			}
 }
 
-void *get_external_link(const string &name) {
-	for (ExternalLinkData &l: ExternalLinks)
+void *ExternalLinkData::get_link(const string &name) {
+	for (auto &l: external_links)
 		if (l.name == name)
 			return l.pointer;
 	return nullptr;
 }
 
-void declare_class_size(const string &class_name, int size) {
+void ExternalLinkData::declare_class_size(const string &class_name, int size) {
 	ClassSizeData d;
 	d.class_name = class_name;
 	d.size = size;
-	ClassSizes.add(d);
+	class_sizes.add(d);
 }
 
 void split_namespace(const string &name, string &class_name, string &element) {
@@ -106,15 +88,15 @@ void split_namespace(const string &name, string &class_name, string &element) {
 	element = name.tail(name.num - p - 1);
 }
 
-void _declare_class_element(const string &name, int offset) {
+void ExternalLinkData::_declare_class_element(const string &name, int offset) {
 	ClassOffsetData d;
 	split_namespace(name, d.class_name, d.element);
 	d.offset = offset;
 	d.is_virtual = false;
-	ClassOffsets.add(d);
+	class_offsets.add(d);
 }
 
-void _link_external_virtual(const string &name, void *p, void *instance) {
+void ExternalLinkData::_link_virtual(const string &name, void *p, void *instance) {
 	VirtualTable *v = *(VirtualTable**)instance;
 
 
@@ -122,27 +104,27 @@ void _link_external_virtual(const string &name, void *p, void *instance) {
 	split_namespace(name, d.class_name, d.element);
 	d.offset = get_virtual_index(p, d.class_name, d.element);
 	d.is_virtual = true;
-	ClassOffsets.add(d);
+	class_offsets.add(d);
 
-	link_external(name, v[d.offset]);
+	link(name, v[d.offset]);
 }
 
-int process_class_offset(const string &class_name, const string &element, int offset) {
-	for (auto &d: ClassOffsets)
+int ExternalLinkData::process_class_offset(const string &class_name, const string &element, int offset) {
+	for (auto &d: class_offsets)
 		if ((d.class_name == class_name) and (d.element == element))
 			return d.offset;
 	return offset;
 }
 
-int process_class_size(const string &class_name, int size) {
-	for (auto &d: ClassSizes)
+int ExternalLinkData::process_class_size(const string &class_name, int size) {
+	for (auto &d: class_sizes)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
 }
 
-int process_class_num_virtuals(const string &class_name, int num_virtual) {
-	for (auto &d: ClassOffsets)
+int ExternalLinkData::process_class_num_virtuals(const string &class_name, int num_virtual) {
+	for (auto &d: class_offsets)
 		if ((d.class_name == class_name) and (d.is_virtual))
 			num_virtual = max(num_virtual, d.offset + 1);
 	return num_virtual;

@@ -296,8 +296,8 @@ extern const Class *TypeDynamicArray;
 
 
 
-void SIAddPackageVulkan() {
-	add_package("vulkan");
+void SIAddPackageVulkan(Context *c) {
+	add_package(c, "vulkan");
 
 	auto TypeInstance		= add_type  ("Instance", sizeof(vulkan::Instance));
 	auto TypeInstanceP		= add_type_p(TypeInstance);

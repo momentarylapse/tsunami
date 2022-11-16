@@ -264,8 +264,10 @@ set(SOURCE
 	src/lib/kaba/syntax/SyntaxTree.cpp
 	src/lib/kaba/syntax/Variable.cpp
 	src/lib/kaba/CompilerConfiguration.cpp
+	src/lib/kaba/Context.cpp
 	src/lib/kaba/Interpreter.cpp
 	src/lib/kaba/kaba.cpp
+	src/lib/kaba/Module.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
 	src/lib/math/mat3.cpp

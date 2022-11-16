@@ -233,9 +233,10 @@ void Module::update_constant_locations() {
 }
 
 void Module::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
+	auto external = context->external.get();
 	for (auto *v: weak(name_space->static_variables)) {
 		if (v->is_extern()) {
-			auto m = get_external_link(v->cname(name_space, name_space->owner->base_class));
+			auto m = external->get_link(v->cname(name_space, name_space->owner->base_class));
 			if (!v->memory or m)
 				v->memory = m;
 			if (!v->memory)
@@ -513,6 +514,7 @@ DynamicLibraryImport *get_dynamic_lib(const string &filename, Module *s) {
 }
 
 void parse_magic_linker_string(SyntaxTree *s) {
+	auto external = s->module->context->external.get();
 	for (auto *c: weak(s->base_class->constants))
 		if (c->name == "KABA_LINK" and c->type == TypeString) {
 			DynamicLibraryImport *d = nullptr;
@@ -523,7 +525,7 @@ void parse_magic_linker_string(SyntaxTree *s) {
 				if (x[0] == '\t') {
 					if (d and x.find(":")) {
 						auto y = x.sub(1).explode(":");
-						link_external(y[0], d->get_symbol(y[1], s->module));
+						external->link(y[0], d->get_symbol(y[1], s->module));
 					}
 				} else {
 					d = get_dynamic_lib(x, s->module);
@@ -640,6 +642,7 @@ void Module::compile() {
 // link functions
 	link_functions();
 	link_virtual_functions_into_vtable(syntax->base_class);
+	link_virtual_functions_into_vtable(syntax->implicit_symbols.get());
 	if (config.compile_os)
 		link_virtual_functions_into_vtable(syntax->imported_symbols.get());
 

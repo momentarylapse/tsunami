@@ -775,10 +775,16 @@
     <ClCompile Include="src\lib\kaba\CompilerConfiguration.cpp">
       <Filter>src\lib\kaba</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\kaba\Context.cpp">
+      <Filter>src\lib\kaba</Filter>
+    </ClCompile>
     <ClCompile Include="src\lib\kaba\Interpreter.cpp">
       <Filter>src\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\kaba.cpp">
+      <Filter>src\lib\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\Module.cpp">
       <Filter>src\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\math\complex.cpp">
@@ -2136,10 +2142,16 @@
     <ClInclude Include="src\lib\kaba\CompilerConfiguration.h">
       <Filter>src\lib\kaba</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\Context.h">
+      <Filter>src\lib\kaba</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\Interpreter.h">
       <Filter>src\lib\kaba</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\kaba.h">
+      <Filter>src\lib\kaba</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\Module.h">
       <Filter>src\lib\kaba</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\math\complex.h">

@@ -28,8 +28,8 @@ namespace kaba {
 extern const Class *TypeBasePainterP;
 extern const Class *TypePath;
 
-void SIAddPackageDoc() {
-	add_package("doc");
+void SIAddPackageDoc(Context *c) {
+	add_package(c, "doc");
 
 	const Class *TypePdf = add_type("pdf", 0);
 	const Class *TypePdfParser = add_type("Parser", sizeof(pdf::Parser), Flags::NONE, TypePdf);

@@ -111,6 +111,15 @@ void remove_if(Array<T> &array, F f) {
 		}
 }
 
+template<class T>
+void remove(Array<T> &array, const T &x) {
+	for (int i=0; i<array.num; i++)
+		if (array[i] == x) {
+			array.erase(i);
+			i --;
+		}
+}
+
 }
 
 #endif /* SRC_LIB_BASE_ALGO_H_ */

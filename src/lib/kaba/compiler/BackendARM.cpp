@@ -503,7 +503,7 @@ void BackendARM::correct_implement_commands() {
 
 int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class *type) {
 	if (!type)
-		type = p.type->get_pointer();
+		type = module->syntax->get_pointer(p.type, -1);
 
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4);
 

@@ -23,6 +23,7 @@ class Statement;
 class AbstractOperator;
 enum class Flags;
 struct CastingData;
+class Context;
 
 class Parser {
 public:
@@ -132,6 +133,7 @@ public:
 	shared<Node> parse_abstract_statement_weak(Block *block);
 
 
+	Context *context;
 	SyntaxTree *tree;
 	Function *cur_func;
 	ExpressionBuffer &Exp;

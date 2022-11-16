@@ -574,7 +574,7 @@ void BackendX86::extend_reg_usage_to_call(int index) {
 SerialNodeParam BackendX86::insert_reference(const SerialNodeParam &param, const Class *type) {
 	SerialNodeParam ret;
 	if (!type)
-		type = param.type->get_pointer();
+		type = module->syntax->get_pointer(param.type, -1);
 	ret.type = type;
 	ret.shift = 0;
 	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {

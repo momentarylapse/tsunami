@@ -259,8 +259,8 @@ public:
 	}
 };
 
-void SIAddPackageOSPath() {
-	add_package("os");
+void SIAddPackageOSPath(Context *c) {
+	add_package(c, "os");
 
 	TypePath = add_type("Path", config.super_array_size);
 
@@ -360,9 +360,9 @@ public:
 			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign);
 				func_add_param("other", c);
 			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign_p);
-				func_add_param("other", c->param[0]->get_pointer());
+				func_add_param("other", c->owner->get_pointer(c->param[0], -1));
 			class_add_func(IDENTIFIER_FUNC_SHARED_CREATE, c, &SP::create, Flags::STATIC);
-				func_add_param("other", c->param[0]->get_pointer());
+				func_add_param("other", c->owner->get_pointer(c->param[0], -1));
 	}
 };
 
@@ -389,8 +389,8 @@ public:
 	}
 };
 
-void SIAddPackageOS() {
-	add_package("os");
+void SIAddPackageOS(Context *c) {
+	add_package(c, "os");
 
 	const Class *TypeStream = add_type("Stream", sizeof(Stream));
 	TypeStreamP = add_type_p(TypeStream);

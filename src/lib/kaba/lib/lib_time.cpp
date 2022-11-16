@@ -10,8 +10,8 @@ namespace kaba {
 extern const Class *TypeDate;
 const Class *TypeTimer;
 
-void SIAddPackageTime() {
-	add_package("time");
+void SIAddPackageTime(Context *c) {
+	add_package(c, "time");
 
 	TypeDate = add_type("Date", sizeof(Date));
 	TypeTimer = add_type("Timer", sizeof(os::Timer));

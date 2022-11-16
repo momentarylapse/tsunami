@@ -15,7 +15,12 @@
 
 namespace kaba {
 
-Array<TemplateManager::Template> TemplateManager::templates;
+TemplateManager::TemplateManager(Context *c) {
+	context = c;
+}
+
+void TemplateManager::copy_from(TemplateManager *t) {
+}
 
 
 void TemplateManager::add_template(Function *f, const Array<string> &param_names) {
@@ -219,40 +224,52 @@ Function *TemplateManager::instantiate(Parser *parser, Template &t, const Array<
 	return f;
 }
 
+ImplicitClassRegistry::ImplicitClassRegistry(Context *c) {
+	context = c;
+}
 
+void ImplicitClassRegistry::copy_from(ImplicitClassRegistry *i) {
+	classes = i->classes;
+}
 
-namespace implicit_class_registry {
-	Array<const Class*> classes;
+void ImplicitClassRegistry::init() {
+	module = new Module(context, "<implicit-class-owner>");
+}
 
-	const Class *find(const string &name, Class::Type type, int array_size, const Array<const Class*> &params) {
-		for (auto t: classes) {
-			if (t->type != type)
+const Class *ImplicitClassRegistry::find(const string &name, Class::Type type, int array_size, const Array<const Class*> &params) {
+	for (auto t: classes) {
+		if (t->type != type)
+			continue;
+		if (t->param != params)
+			continue;
+		if (type == Class::Type::ARRAY)
+			if (t->array_length != array_size)
 				continue;
-			if (t->param != params)
-				continue;
-			if (type == Class::Type::ARRAY)
-				if (t->array_length != array_size)
-					continue;
-			//if (t->name != name)
-			//	continue;
-			return t;
-		}
-		return nullptr;
+		//if (t->name != name)
+		//	continue;
+		return t;
 	}
-	void add(const Class* t) {
-		classes.add(t);
-	}
+	return nullptr;
+}
 
-	// TODO track which module requests what
-	// TODO implement as templates INSIDE base module
-	void clear_from_module(Module *m) {
-		/*msg_write("CLEAR..." + str(m->filename));
-		remove_if(classes, [m] (const Class *c) {
-			if (c->owner->module == m)
-				msg_write("  " + c->long_name());
-			return c->owner->module == m;
-		});*/
-	}
+void ImplicitClassRegistry::add(const Class* t) {
+	//msg_write("ADD  " + p2s(this) + "  " + t->long_name());
+	//if (!module)
+	//	init();
+	//module->syntax->owned_classes.add(t);
+	classes.add(t);
+}
+
+// TODO track which module requests what
+// TODO implement as templates INSIDE base module
+void ImplicitClassRegistry::clear_from_module(Module *m) {
+	return;
+	msg_write("CLEAR..." + str(m->filename));
+	remove_if(classes, [m] (const Class *c) {
+		if (c->owner->module == m)
+			msg_write("  " + c->name);
+		return c->owner->module == m;
+	});
 }
 
 

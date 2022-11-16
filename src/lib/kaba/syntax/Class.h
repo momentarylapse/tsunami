@@ -112,7 +112,6 @@ public:
 	bool is_derived_from(const Class *root) const;
 	bool is_derived_from_s(const string &root) const;
 	void derive_from(const Class *root, bool increase_size);
-	const Class *get_pointer() const;
 	const Class *get_root() const;
 	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
 	void add_template_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);

@@ -102,13 +102,6 @@ static void kaba_xxx(int a, int b, int c, int d, int e, int f, int g, int h) {
 
 static int extern_variable1 = 13;
 
-static void xxx_delete(VirtualBase* v) {
-	msg_write("...xxx_delete");// +p2s(v));
-	delete v;
-	//v->__delete_external__();
-	//v->__delete__();
-}
-
 
 MAKE_OP_FOR(int)
 MAKE_OP_FOR(float)
@@ -232,7 +225,7 @@ Array<int> enum_all(const Class *e) {
 	return r;
 }
 
-void SIAddXCommands() {
+void SIAddXCommands(Context *c) {
 
 	add_func("@sorted", TypeDynamicArray, &array_sort, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("list", TypePointer);
@@ -273,8 +266,8 @@ void SIAddXCommands() {
 }
 
 
-void SIAddPackageBase() {
-	add_package("base", Flags::AUTO_IMPORT);
+void SIAddPackageBase(Context *c) {
+	add_package(c, "base", Flags::AUTO_IMPORT);
 
 	// internal
 	TypeUnknown			= add_type  ("@unknown", 0); // should not appear anywhere....or else we're screwed up!
@@ -355,8 +348,10 @@ void SIAddPackageBase() {
 	TypeFloatP      = add_type_p(TypeFloat);
 	TypeFloatList   = add_type_l(TypeFloat);
 	TypeFloat64List = add_type_l(TypeFloat64);
-	TypeCString     = add_type_a(TypeChar, 256, "cstring");	// cstring := char[256]
-	TypeString      = add_type_l(TypeChar, "string");	// string := char[]
+	TypeCString     = add_type_a(TypeChar, 256);
+	capture_implicit_type(TypeCString, "cstring"); // cstring := char[256]
+	TypeString      = add_type_l(TypeChar);
+	capture_implicit_type(TypeString, "string"); // string := char[]
 	TypeStringAutoCast = add_type("<string-auto-cast>", config.super_array_size);	// string := char[]
 	TypeStringList  = add_type_l(TypeString);
 
@@ -785,8 +780,6 @@ void SIAddPackageBase() {
 		func_add_param("g", TypeInt);
 		func_add_param("h", TypeInt);
 	add_ext_var("_extern_variable", TypeInt, &extern_variable1);
-
-	link_external("xxx_delete", (void*)&xxx_delete);
 
 
 	add_type_cast(10, TypeInt, TypeFloat32, "int.__float__");

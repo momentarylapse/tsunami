@@ -62,8 +62,6 @@ struct StackFrameInfo {
 };
 
 
-extern shared_array<Module> public_modules;
-
 inline void func_from_rip_test_module(StackFrameInfo &r, shared<Module> m, void *rip, bool from_package) {
 	for (auto&& [i,f]: enumerate(m->syntax->functions)) {
 		if (from_package and !f->throws_exceptions())
@@ -89,7 +87,7 @@ StackFrameInfo get_func_from_rip(void *rip) {
 	r.offset = 1000000;
 
 	// compiled functions
-	for (auto s: public_modules) {
+	for (auto s: default_context->public_modules) {
 		if ((rip < s->opcode) or (rip > &s->opcode[s->opcode_size]))
 			continue;
 		func_from_rip_test_module(r, s, rip, false);
@@ -98,7 +96,7 @@ StackFrameInfo get_func_from_rip(void *rip) {
 		return r;
 
 	// externally linked...
-	for (auto p: packages) {
+	for (auto p: default_context->packages) {
 		func_from_rip_test_module(r, p, rip, true);
 	}
 	return r;
@@ -212,8 +210,8 @@ const Class* get_type(void *p) {
 	if (!p)
 		return TypeUnknown;
 	void *vtable = *(void**)p;
-	auto modules = public_modules;
-	for (auto p: packages)
+	auto modules = default_context->public_modules;
+	for (auto p: default_context->packages)
 		modules.add(p);
 	for (auto s: modules) {
 		auto *r = _get_type(p, vtable, s->syntax->base_class);

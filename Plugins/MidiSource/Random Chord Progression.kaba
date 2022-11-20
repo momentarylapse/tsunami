@@ -1,13 +1,13 @@
 use tsunami
 
-#const AUTO_CONFIG_PITCH = "0:127:1:1:"
+#let AUTO_CONFIG_PITCH = "0:127:1:1:"
 
 
 #class Config extends Module.Config
 #	override void reset()
 
 # C major scale
-const SCALE = [60, 62, 64, 65, 67, 69, 71]
+let SCALE = [60, 62, 64, 65, 67, 69, 71]
 
 class Morse extends MidiSource
 	#Config config
@@ -26,14 +26,14 @@ class Morse extends MidiSource
 		return true
 	
 	func overlap(a: int[], b: int[]) -> int
-		int n = 0
+		var n = 0
 		for p in SCALE
 			if (p in a) and (p in b)
 				n ++
 		return n
 		
 	func make_chord(deg: int) -> int[]
-		return sorted([SCALE[deg], SCALE[(deg+2) % 7], SCALE[(deg+4) % 7]], "")
+		return sort([SCALE[deg], SCALE[(deg+2) % 7], SCALE[(deg+4) % 7]], "")
 		
 	#int[] random_chord()
 	#	int n = rand(7)
@@ -41,12 +41,12 @@ class Morse extends MidiSource
 
 	func mut step_chord()
 		while true
-			int d = rand(7)
-			var cc = make_chord(d)
+			let d = rand(7)
+			let cc = make_chord(d)
 			if overlap(cc, chord) < 1
 				continue
 			if overlap(cc, chord) == 3
 				continue
-			chord = sorted(cc, "")
+			chord = sort(cc)
 			degree = d
 			return

@@ -37,11 +37,13 @@ public:
 
 	shared<Node> concretify_node(shared<Node> node, Block *block, const Class *ns);
 	shared_array<Node> concretify_node_multi(shared<Node> node, Block *block, const Class *ns);
+	shared_array<Node> concretify_token(shared<Node> node, Block *block, const Class *ns);
 	const Class *concretify_as_type(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_array(shared<Node> node, Block *block, const Class *ns);
 	shared_array<Node> concretify_element(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_var_declaration(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_array_builder_for(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_array_builder_for_inner(shared<Node> n_for, shared<Node> n_exp, shared<Node> n_cmp, const Class *type_el, Block *block, const Class *ns, int token_id);
 	shared<Node> concretify_operator(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_call(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement(shared<Node> node, Block *block, const Class *ns);
@@ -50,20 +52,21 @@ public:
 	shared<Node> concretify_statement_while(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_range(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_array(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_str(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_repr(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_sizeof(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_typeof(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_len(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_new(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_delete(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_dyn(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_sorted(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_weak(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_map(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_raw_function_pointer(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_try(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_lambda(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_call(shared<Node> node, SpecialFunction *s, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_str(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_repr(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_sizeof(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_typeof(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_len(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_dyn(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_sort(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_filter(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_special_function_weak(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> force_concrete_type(shared<Node> node);
 	shared<Node> force_concrete_type_if_function(shared<Node> node);
 	void force_concrete_types(shared_array<Node> &nodes);
@@ -114,7 +117,10 @@ public:
 	shared<Node> try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &params);
 
 	shared<Node> build_function_pipe(const shared<Node> &input, const shared<Node> &func, Block *block, const Class *ns, int token_id);
-	shared<Node> build_lambda_new(const shared<Node> &param, const shared<Node> &expression);
+	shared<Node> build_pipe_sort(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
+	shared<Node> build_pipe_filter(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
+	shared<Node> build_pipe_map(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
+	shared<Node> build_lambda_new(const shared<Node> &param, const shared<Node> &expression, Block *block, const Class *ns, int token_id);
 
 
 

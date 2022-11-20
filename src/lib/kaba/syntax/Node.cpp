@@ -35,6 +35,10 @@ string kind2str(NodeKind kind) {
 		return "virtual call";
 	if (kind == NodeKind::STATEMENT)
 		return "statement";
+	if (kind == NodeKind::CALL_SPECIAL_FUNCTION)
+		return "special function call";
+	if (kind == NodeKind::SPECIAL_FUNCTION_NAME)
+		return "special function name";
 	if (kind == NodeKind::OPERATOR)
 		return "operator";
 	if (kind == NodeKind::ABSTRACT_TOKEN)
@@ -127,21 +131,21 @@ string kind2str(NodeKind kind) {
 
 string Node::signature(const Class *ns) const {
 	//string t = (kind == NodeKind::ABSTRACT_TOKEN) ? " " : type->cname(ns) + " ";
-	string t = type->cname(ns) + " ";
+	string t = ": " + type->cname(ns);
 	if (kind == NodeKind::PLACEHOLDER)
 		return "";
 	if (kind == NodeKind::VAR_LOCAL)
-		return t + as_local()->name;
+		return as_local()->name + t;
 	if (kind == NodeKind::VAR_GLOBAL)
-		return t + as_global()->name;
+		return as_global()->name + t;
 	if (kind == NodeKind::FUNCTION)
-		return t + as_func()->cname(ns);
+		return as_func()->cname(ns) + t;
 	if (kind == NodeKind::CONSTANT)
-		return t + as_const()->str();
+		return as_const()->str() + t;
 	if (kind == NodeKind::CALL_FUNCTION)
 		return as_func()->signature(ns);
 	if (kind == NodeKind::CALL_RAW_POINTER)
-		return t + "(...)";
+		return "(...)" + t;
 	if (kind == NodeKind::CALL_INLINE)
 		return as_func()->signature(ns);
 	if (kind == NodeKind::CALL_VIRTUAL)
@@ -149,17 +153,21 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return as_func()->signature(ns);
 	if (kind == NodeKind::STATEMENT)
-		return t + as_statement()->name;
+		return as_statement()->name + t;
+	if (kind == NodeKind::CALL_SPECIAL_FUNCTION)
+		return as_special_function()->name + t;
+	if (kind == NodeKind::SPECIAL_FUNCTION_NAME)
+		return as_special_function()->name + t;
 	if (kind == NodeKind::OPERATOR)
 		return as_op()->sig(ns);
 	if (kind == NodeKind::ABSTRACT_TOKEN)
-		return "<" + as_token() + ">";
+		return as_token();
 	if (kind == NodeKind::ABSTRACT_OPERATOR)
-		return "<" + as_abstract_op()->name + ">";
+		return as_abstract_op()->name;
 	if (kind == NodeKind::BLOCK)
 		return "";//p2s(as_block());
 	if (kind == NodeKind::ADDRESS_SHIFT)
-		return t + i2s(link_no);
+		return i2s(link_no) + t;
 	if (kind == NodeKind::ARRAY)
 		return t;
 	if (kind == NodeKind::DYNAMIC_ARRAY)
@@ -171,20 +179,20 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::DEREFERENCE)
 		return t;
 	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
-		return t + i2s(link_no);
+		return i2s(link_no) + t;
 	if (kind == NodeKind::CLASS)
 		return as_class()->cname(ns);
 	if (kind == NodeKind::REGISTER)
-		return t + Asm::get_reg_name((Asm::RegID)link_no);
+		return Asm::get_reg_name((Asm::RegID)link_no) + t;
 	if (kind == NodeKind::ADDRESS)
-		return t + i2h(link_no, config.pointer_size);
+		return i2h(link_no, config.pointer_size) + t;
 	if (kind == NodeKind::MEMORY)
-		return t + i2h(link_no, config.pointer_size);
+		return i2h(link_no, config.pointer_size) + t;
 	if (kind == NodeKind::LOCAL_ADDRESS)
-		return t + i2h(link_no, config.pointer_size);
+		return i2h(link_no, config.pointer_size) + t;
 	if (kind == NodeKind::LOCAL_MEMORY)
-		return t + i2h(link_no, config.pointer_size);
-	return t + i2s(link_no);
+		return i2h(link_no, config.pointer_size) + t;
+	return i2s(link_no) + t;
 }
 
 string Node::str(const Class *ns) const {
@@ -284,6 +292,10 @@ Variable *Node::as_local() const {
 
 Statement *Node::as_statement() const {
 	return (Statement*)link_no;
+}
+
+SpecialFunction *Node::as_special_function() const {
+	return (SpecialFunction*)link_no;
 }
 
 AbstractOperator *Node::as_abstract_op() const {
@@ -419,8 +431,21 @@ shared<Node> add_node_const(Constant *c, int token_id) {
 
 shared<Node> add_node_statement(StatementID id, int token_id, const Class *type) {
 	auto *s = statement_from_id(id);
-	auto c = new Node(NodeKind::STATEMENT, (int64)s, type, false, token_id);
+	auto c = new Node(NodeKind::STATEMENT, (int_p)s, type, false, token_id);
 	c->set_num_params(s->num_params);
+	return c;
+}
+
+shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id, const Class *type) {
+	auto *s = special_function_from_id(id);
+	auto c = new Node(NodeKind::CALL_SPECIAL_FUNCTION, (int_p)s, type, false, token_id);
+	c->set_num_params(s->max_params);
+	return c;
+}
+
+shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, const Class *type) {
+	auto *s = special_function_from_id(id);
+	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, false, token_id);
 	return c;
 }
 

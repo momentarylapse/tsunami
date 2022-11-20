@@ -3,6 +3,7 @@
 #include "list.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
+#include "../dynamic/sorting.h"
 #include "../../os/msg.h"
 #include "../../os/terminal.h"
 #include "../../base/callable.h"
@@ -237,32 +238,9 @@ void SIAddXCommands(Context *c) {
 	add_func("@var_repr", TypeString, &var_repr, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-//	add_func("@map", TypeDynamicArray, &kaba_map, Flags::_STATIC__RAISES_EXCEPTIONS);
-//		func_add_param("func", TypeFunctionP);
-//		func_add_param("array", TypePointer);
 	add_func("@dyn", TypeAny, &dynify, Flags::_STATIC__RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("@xmap", TypeDynamicArray, &array_map, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("f", TypeCallableBase);
-		func_add_param("array", TypeDynamic);
-		func_add_param("t1", TypeClassP);
-		func_add_param("t2", TypeClassP);
-
-	add_func("@call0", TypeVoid, &kaba_call0, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("f", TypeFunctionP);
-	add_func("@call1", TypeVoid, &kaba_call1, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("f", TypeFunctionP);
-		func_add_param("p1", TypePointer);
-	add_func("@call2", TypeVoid, &kaba_call2, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("f", TypeFunctionP);
-		func_add_param("p1", TypePointer);
-		func_add_param("p2", TypePointer);
-	add_func("@call3", TypeVoid, &kaba_call3, Flags::_STATIC__RAISES_EXCEPTIONS);
-		func_add_param("f", TypeFunctionP);
-		func_add_param("p1", TypePointer);
-		func_add_param("p2", TypePointer);
-		func_add_param("p3", TypePointer);
 }
 
 
@@ -595,6 +573,7 @@ void SIAddPackageBase(Context *c) {
 		//class_add_func("__bool__", TypeBool, &BoolList::all, Flags::PURE);
 		add_operator(OperatorID::AND, TypeBoolList, TypeBoolList, TypeBoolList, InlineID::NONE, &BoolList::and_values);
 		add_operator(OperatorID::OR, TypeBoolList, TypeBoolList, TypeBoolList, InlineID::NONE, &BoolList::or_values);
+		// maybe bool[] == bool[] -> bool  ???
 		add_operator(OperatorID::EQUAL, TypeBoolList, TypeBoolList, TypeBoolList, InlineID::NONE, &BoolList::eq_values);
 		add_operator(OperatorID::NOTEQUAL, TypeBoolList, TypeBoolList, TypeBoolList, InlineID::NONE, &BoolList::ne_values);
 		add_operator(OperatorID::AND, TypeBoolList, TypeBoolList, TypeBool, InlineID::NONE, &BoolList::and_values_scalar);
@@ -625,6 +604,7 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::SMALLER_EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::le_values);
 		add_operator(OperatorID::GREATER, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::gt_values);
 		add_operator(OperatorID::GREATER_EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::ge_values);
+		// don't we prefer  int[] == int[] -> bool ???
 		add_operator(OperatorID::EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::eq_values);
 		add_operator(OperatorID::NOTEQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::ne_values);
 		add_operator(OperatorID::SMALLER, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::lt_values_scalar);

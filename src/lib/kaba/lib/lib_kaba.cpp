@@ -76,6 +76,10 @@ void SIAddPackageKaba(Context *c) {
 	auto TypeFunctionPList = add_type_l(TypeFunctionP);
 	TypeFunctionCode = add_type  ("code", 32); // whatever
 	TypeFunctionCodeP = add_type_p(TypeFunctionCode);
+	TypeSpecialFunction = add_type  ("SpecialFunction", sizeof(SpecialFunction));
+	TypeSpecialFunctionP = add_type_p(TypeSpecialFunction);
+	auto TypeSpecialFunctionP = add_type_p(TypeSpecialFunction);
+	auto TypeSpecialFunctionPList = add_type_l(TypeSpecialFunctionP);
 	auto TypeStatement = add_type  ("Statement", sizeof(Statement));
 	auto TypeStatementP = add_type_p(TypeStatement);
 	auto TypeStatementPList = add_type_l(TypeStatementP);
@@ -188,6 +192,12 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("name", TypeString, &Statement::name);
 		class_add_element("id", TypeInt, &Statement::id);
 		class_add_element("num_params", TypeInt, &Statement::num_params);
+	
+	add_class(TypeSpecialFunction);
+		class_add_element("name", TypeString, &SpecialFunction::name);
+		class_add_element("id", TypeInt, &SpecialFunction::id);
+		class_add_element("min_params", TypeInt, &SpecialFunction::min_params);
+		class_add_element("max_params", TypeInt, &SpecialFunction::max_params);
 		
 	add_class(TypeModulePList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XSharedArray<Module>::__init__);
@@ -220,6 +230,7 @@ void SIAddPackageKaba(Context *c) {
 
 	add_ext_var("default_context", TypeContextP, (void*)&default_context);
 	add_ext_var("statements", TypeStatementPList, (void*)&Statements);
+	add_ext_var("special_functions", TypeSpecialFunctionPList, (void*)&special_functions);
 	add_ext_var("kaba_version", TypeString, (void*)&Version);
 }
 

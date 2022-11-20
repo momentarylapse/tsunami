@@ -29,6 +29,26 @@ int add_statement(const string &name, StatementID id, int num_params) {
 }
 
 
+
+Array<SpecialFunction*> special_functions;
+
+SpecialFunction *special_function_from_id(SpecialFunctionID id) {
+	for (auto *s: special_functions)
+		if (s->id == id)
+			return s;
+	return nullptr;
+}
+
+int add_special_function(const string &name, SpecialFunctionID id, int min_params, int max_params) {
+	auto s = new SpecialFunction;
+	s->name = name;
+	s->id = id;
+	s->min_params = min_params;
+	s->max_params = max_params;
+	special_functions.add(s);
+	return 0;
+}
+
 void SIAddStatements() {
 	// statements
 	add_statement(IDENTIFIER_RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
@@ -42,11 +62,6 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_CONTINUE, StatementID::CONTINUE);
 	add_statement(IDENTIFIER_NEW, StatementID::NEW, 1);
 	add_statement(IDENTIFIER_DELETE, StatementID::DELETE, 1);
-	add_statement(IDENTIFIER_SIZEOF, StatementID::SIZEOF, 1);
-	add_statement(IDENTIFIER_TYPEOF, StatementID::TYPEOF, 1);
-	add_statement(IDENTIFIER_STR, StatementID::STR, 1);
-	add_statement(IDENTIFIER_REPR, StatementID::REPR, 1);
-	add_statement(IDENTIFIER_LEN, StatementID::LEN, 1);
 	add_statement(IDENTIFIER_LET, StatementID::LET);
 	add_statement(IDENTIFIER_VAR, StatementID::VAR);
 	add_statement(IDENTIFIER_ASM, StatementID::ASM);
@@ -54,13 +69,19 @@ void SIAddStatements() {
 	add_statement(IDENTIFIER_TRY, StatementID::TRY); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_EXCEPT, StatementID::EXCEPT); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_PASS, StatementID::PASS);
-	add_statement(IDENTIFIER_MAP, StatementID::MAP, 2);
 	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
 	add_statement(IDENTIFIER_FUNC, StatementID::FUNC);
-	add_statement(IDENTIFIER_SORTED, StatementID::SORTED, 2);
-	add_statement(IDENTIFIER_DYN, StatementID::DYN, 1);
-	add_statement(IDENTIFIER_WEAK, StatementID::WEAK, 1);
 	add_statement(IDENTIFIER_RAW_FUNCTION_POINTER, StatementID::RAW_FUNCTION_POINTER, 1);
+
+	add_special_function(IDENTIFIER_SIZEOF, SpecialFunctionID::SIZEOF, 1, 1);
+	add_special_function(IDENTIFIER_TYPEOF, SpecialFunctionID::TYPEOF, 1, 1);
+	add_special_function(IDENTIFIER_STR, SpecialFunctionID::STR, 1, 1);
+	add_special_function(IDENTIFIER_REPR, SpecialFunctionID::REPR, 1, 1);
+	add_special_function(IDENTIFIER_LEN, SpecialFunctionID::LEN, 1, 1);
+	add_special_function(IDENTIFIER_SORT, SpecialFunctionID::SORT, 1, 2);
+	add_special_function(IDENTIFIER_FILTER, SpecialFunctionID::FILTER, 1, 1);
+	add_special_function(IDENTIFIER_DYN, SpecialFunctionID::DYN, 1, 1);
+	add_special_function(IDENTIFIER_WEAK, SpecialFunctionID::WEAK, 1, 1);
 }
 
 

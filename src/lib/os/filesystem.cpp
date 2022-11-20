@@ -251,8 +251,8 @@ void search_single(const Path &dir, const string &filter, Array<Path> &dir_list,
 #endif
 
 	// sorting...
-	inplace_sort(dir_list, [](const Path &a, const Path &b) { return a <= b; });
-	inplace_sort(file_list, [](const Path &a, const Path &b) { return a <= b; });
+	base::inplace_sort(dir_list, [](const Path &a, const Path &b) { return a <= b; });
+	base::inplace_sort(file_list, [](const Path &a, const Path &b) { return a <= b; });
 }
 
 void search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {

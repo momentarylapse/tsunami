@@ -287,6 +287,13 @@ Statement *Parser::which_statement(const string &name) {
 	return nullptr;
 }
 
+SpecialFunction *Parser::which_special_function(const string &name) {
+	for (auto *s: special_functions)
+		if (name == s->name)
+			return s;
+	return nullptr;
+}
+
 shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns, int token_id) {
 	shared_array<Node> links;
 
@@ -1035,6 +1042,9 @@ shared<Node> SyntaxTree::conv_fake_constructors(shared<Node> n) {
 shared<Node> SyntaxTree::conv_class_and_func_to_const(shared<Node> n) {
 	if (n->kind == NodeKind::CLASS) {
 		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
+	}
+	if (n->kind == NodeKind::SPECIAL_FUNCTION_NAME) {
+		return add_node_const(add_constant_pointer(TypeSpecialFunctionP, n->as_special_function()));
 	}
 	return n;
 }

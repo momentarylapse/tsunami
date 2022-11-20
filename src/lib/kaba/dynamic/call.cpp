@@ -12,7 +12,7 @@
 
 
 #if 0
-//#include "../../file/msg.h"
+#include "../../os/msg.h"
 void db_out(const string &s) {
 	msg_write(s);
 }
@@ -133,7 +133,6 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 //	if ((config.abi == Abi::AMD64_WINDOWS) and !f->is_static() and f->name_space->uses_call_by_reference() and f->literal_return_type->uses_return_by_memory())
 //		return false;
 
-
 	if (ptype.num == 0) {
 		if (return_type == TypeVoid) {
 			call0_void(ff, ret, param);
@@ -253,6 +252,14 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call2<int,CBR,int>(ff, ret, param);
 				return true;
 			}
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+				call2<int,CBR,float>(ff, ret, param);
+				return true;
+			}
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1]->uses_call_by_reference())) {
+				call2<int,CBR,CBR>(ff, ret, param);
+				return true;
+			}
 		} else if (return_type == TypeFloat32) {
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
 				call2<float,float,float>(ff, ret, param);
@@ -286,6 +293,12 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			} else if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
 				call2<CBR,float,float>(ff, ret, param);
+				return true;
+			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt)) {
+				call2<CBR,CBR,int>(ff, ret, param);
+				return true;
+			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+				call2<CBR,CBR,float>(ff, ret, param);
 				return true;
 			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1]->uses_call_by_reference())) {
 				call2<CBR,CBR,CBR>(ff, ret, param);

@@ -20,6 +20,7 @@ class Function;
 class Block;
 class SyntaxTree;
 class Statement;
+class SpecialFunction;
 class AbstractOperator;
 enum class Flags;
 struct CastingData;
@@ -60,7 +61,8 @@ public:
 	Class *parse_class_header(Class *_namespace, int &offset0);
 	void post_process_newly_parsed_class(Class *c, int size);
 	void skip_parse_class();
-	Function *parse_function_header(Class *name_space, Flags flags0);
+	Function *parse_function_header(const Class *default_type, Class *name_space, Flags flags0);
+	void post_process_function_header(Function *f, const Array<string> &template_param_names, Class *name_space, Flags flags);
 	void skip_parsing_function_body(Function *f);
 	void parse_abstract_function_body(Function *f);
 	bool parse_abstract_function_command(Function *f, int indent0);
@@ -72,6 +74,7 @@ public:
 	shared<Node> parse_and_eval_const(Block *block, const Class *type);
 	static AbstractOperator *which_abstract_operator(const string &name, int param_flags = 3);
 	static Statement *which_statement(const string &name);
+	static SpecialFunction *which_special_function(const string &name);
 
 
 	shared<Node> parse_abstract_operand_extension(shared<Node> operands, Block *block, bool prefer_class);
@@ -118,19 +121,13 @@ public:
 	shared<Node> parse_abstract_statement_pass(Block *block);
 	shared<Node> parse_abstract_statement_new(Block *block);
 	shared<Node> parse_abstract_statement_delete(Block *block);
-	shared<Node> parse_abstract_statement_sizeof(Block *block);
-	shared<Node> parse_abstract_statement_type(Block *block);
-	shared<Node> parse_abstract_statement_str(Block *block);
-	shared<Node> parse_abstract_statement_repr(Block *block);
-	shared<Node> parse_abstract_statement_len(Block *block);
 	shared<Node> parse_abstract_statement_let(Block *block);
 	shared<Node> parse_abstract_statement_var(Block *block);
-	shared<Node> parse_abstract_statement_map(Block *block);
 	shared<Node> parse_abstract_statement_lambda(Block *block);
-	shared<Node> parse_abstract_statement_sorted(Block *block);
-	shared<Node> parse_abstract_statement_dyn(Block *block);
 	shared<Node> parse_abstract_statement_raw_function_pointer(Block *block);
-	shared<Node> parse_abstract_statement_weak(Block *block);
+
+
+	shared<Node> parse_abstract_special_function(Block *block, SpecialFunction *s);
 
 
 	Context *context;

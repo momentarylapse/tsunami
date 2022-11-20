@@ -121,7 +121,9 @@ int CommandLineParser::do_option(const string &name, const Array<string> &arg_re
 
 bool CommandLineParser::parse_commands(const Array<string> &arg) {
 	//msg_write("ARG: " + sa2s(arg));
-	auto sorted_commands = sorted(commands, [] (const Command &a, const Command &b) { return a.names[0].num >= b.names[0].num; });
+	auto sorted_commands = base::sorted(commands, [] (const Command &a, const Command &b) {
+		return a.names[0].num >= b.names[0].num;
+	});
 	for (auto &c: sorted_commands) {
 		int offset;
 		if (c.match(arg, offset)) {

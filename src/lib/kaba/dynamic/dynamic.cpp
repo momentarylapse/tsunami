@@ -4,9 +4,7 @@
 #include "call.h"
 #include "../../any/any.h"
 #include "../../base/callable.h"
-#include "../../base/sort.h"
 #include "../../os/msg.h"
-#include <algorithm>
 
 namespace kaba {
 	
@@ -25,79 +23,6 @@ extern const Class *TypePath;
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
-
-void array_inplace_reverse(DynamicArray &array) {
-	if (array.element_size == 4)
-		inplace_reverse(*reinterpret_cast<Array<int>*>(&array));
-	else if (array.element_size == 1)
-		inplace_reverse(*reinterpret_cast<Array<char>*>(&array));
-	else if (array.element_size == 8)
-		inplace_reverse(*reinterpret_cast<Array<int64>*>(&array));
-	else
-		array.reverse();
-}
-
-template<class F>
-void array_inplace_quick_sort(DynamicArray &array, int first, int last, F f) {
-	if (first < 0 or last < 0 or first >= last)
-		return;
-	auto partition = [first, last] (DynamicArray &array, F f) {
-		int ipivot = (first + last) / 2;
-		int left = first-1;
-		int right = last+1;
-		while (true) {
-			void *pivot = array.simple_element(ipivot);
-			if (left != ipivot)
-				left ++;
-			if (right != ipivot)
-				right --;
-			while (!f(pivot, array.simple_element(left))) // A < P  <=>  !(P <= A)
-				left ++;
-			while (!f(array.simple_element(right), pivot)) // A > P  <=>  !(A <= P)
-				right --;
-			if (left >= right)
-				return right;
-			array.simple_swap(left, right);
-			if (left == ipivot)
-				ipivot = right;
-			else if (right == ipivot)
-				ipivot = left;
-		}
-		return 0;
-	};
-	int p = partition(array, f);
-	array_inplace_quick_sort(array, first, p-1, f);
-	array_inplace_quick_sort(array, p+1, last, f);
-}
-
-template<class T>
-void _array_sort(DynamicArray &array, int offset_by) {
-	auto f = [offset_by] (const void *a, const void *b) {
-		return *(T*)((const char*)a + offset_by) <= *(T*)((const char*)b + offset_by);
-	};
-	array_inplace_quick_sort(array, 0, array.num-1, f);
-}
-
-template<class T>
-void _array_sort_p(DynamicArray &array, int offset_by) {
-	auto f = [offset_by] (const void *a, const void *b) {
-		auto *aa = (const T*) ((const char*)a + offset_by);
-		auto *bb = (const T*) ((const char*)b + offset_by);
-		return (*aa <= *bb);
-	};
-	inplace_sort(*(Array<void*>*)&array, f);
-}
-
-template<class T>
-void _array_sort_pf(DynamicArray &array, Function *func) {
-	auto f = [func] (void **a, void **b) {
-		T r1, r2;
-		if (!call_function(func, &r1, {*a}) or !call_function(func, &r2, {*b}))
-			kaba_raise_exception(new KabaException("call failed " + func->long_name()));
-		return (r1 <= r2);
-	};
-	inplace_sort(*(Array<void**>*)&array, f);
-}
 
 void var_assign(void *pa, const void *pb, const Class *type) {
 	if ((type == TypeInt) or (type == TypeFloat32)) {
@@ -160,101 +85,6 @@ void array_add(DynamicArray &array, void *p, const Class *type) {
 		auto *ff = (func_t*)f->address;
 		ff(&array, p);
 	}
-}
-
-DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const string &_by) {
-	if (!type->is_super_array())
-		kaba_raise_exception(new KabaException(format("type '%s' is not an array", type->name)));
-	const Class *el = type->param[0];
-	if (array.element_size != el->size)
-		kaba_raise_exception(new KabaException(format("element type size mismatch... type=%s: %d  vs  array: %d", el->name, el->size, array.element_size)));
-
-	DynamicArray rr;
-	var_init(&rr, type);
-	var_assign(&rr, &array, type);
-
-	const Class *rel = el;
-
-	if (el->is_pointer())
-		rel = el->param[0];
-
-	string by = _by;
-	bool reverse = false;
-	if (_by.head(1) == "-") {
-		by = by.sub(1);
-		reverse = true;
-	}
-
-	int offset = -1;
-	const Class *by_type = nullptr;
-	Function *sfunc = nullptr;
-	if (by == "") {
-		offset = 0;
-		by_type = rel;
-	} else {
-		for (auto &e: rel->elements)
-			if (e.name == by) {
-				by_type = e.type;
-				offset = e.offset;
-			}
-		if (!by_type) {
-			for (auto *f: weak(rel->functions))
-				if (f->name == by) {
-					if (f->num_params != 1)
-						kaba_raise_exception(new KabaException("can only sort by a member function without parameters"));
-					by_type = f->literal_return_type;
-					sfunc = f;
-				}
-			if (!sfunc)
-				kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
-		}
-	}
-
-	if (sfunc) {
-		if (!el->is_pointer())
-			kaba_raise_exception(new KabaException("function sorting only for pointers"));
-		if (by_type == TypeString)
-			_array_sort_pf<string>(rr, sfunc);
-		else if (by_type == TypePath)
-			_array_sort_pf<Path>(rr, sfunc);
-		else if (by_type == TypeInt)
-			_array_sort_pf<int>(rr, sfunc);
-		else if (by_type == TypeFloat32)
-			_array_sort_pf<float>(rr, sfunc);
-		else if (by_type == TypeBool)
-			_array_sort_pf<bool>(rr, sfunc);
-		else
-			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
-	} else if (el->is_pointer()) {
-		if (by_type == TypeString)
-			_array_sort_p<string>(rr, offset);
-		else if (by_type == TypePath)
-			_array_sort_p<Path>(rr, offset);
-		else if (by_type == TypeInt)
-			_array_sort_p<int>(rr, offset);
-		else if (by_type == TypeFloat32)
-			_array_sort_p<float>(rr, offset);
-		else if (by_type == TypeBool)
-			_array_sort_p<bool>(rr, offset);
-		else
-			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
-	} else {
-		if (by_type == TypeString)
-			_array_sort<string>(rr, offset);
-		else if (by_type == TypePath)
-			_array_sort<Path>(rr, offset);
-		else if (by_type == TypeInt)
-			_array_sort<int>(rr, offset);
-		else if (by_type == TypeFloat32)
-			_array_sort<float>(rr, offset);
-		else if (by_type == TypeBool)
-			_array_sort<bool>(rr, offset);
-		else
-			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
-	}
-	if (reverse)
-		array_inplace_reverse(rr);
-	return rr;
 }
 
 
@@ -350,6 +180,8 @@ string _cdecl var_repr(const void *p, const Class *type) {
 	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
 		// probably not...
 		return func_repr((Function*)p);
+	} else if (type == TypeSpecialFunctionP) {
+		return format("<special function %s>", (*(SpecialFunction**)p)->name);
 	} else if (type == TypeAny) {
 		return ((Any*)p)->repr();
 	} else if (type->is_some_pointer()) {
@@ -473,6 +305,7 @@ Any _cdecl dynify(const void *var, const Class *type) {
 
 Array<const Class*> func_effective_params(const Function *f);
 
+// deprecated, but who knows...
 DynamicArray array_map(void *fff, DynamicArray *a, const Class *ti, const Class *to) {
 	//msg_write("map " + ti->long_name() + " -> " + to->long_name());
 
@@ -495,46 +328,6 @@ DynamicArray array_map(void *fff, DynamicArray *a, const Class *ti, const Class 
 			kaba_raise_exception(new KabaException(format("map(): failed to dynamically call %s -> %s", ti->long_name(), to->long_name())));
 	}
 	return r;
-}
-
-void assert_num_params(Function *f, int n) {
-	auto p = func_effective_params(f);
-	if (p.num != n)
-		kaba_raise_exception(new KabaException("call(): " + i2s(p.num) + " parameters expected, " + i2s(n) + " given"));
-}
-
-void assert_return_type(Function *f, const Class *ret) {
-	msg_write("TODO check type");
-	if (f->literal_return_type != ret)
-		kaba_raise_exception(new KabaException("call(): function returns " + f->literal_return_type->long_name() + ", " + ret->long_name() + " required"));
-}
-
-void kaba_call0(Function *func) {
-	assert_num_params(func, 0);
-	assert_return_type(func, TypeVoid);
-	if (!call_function(func, nullptr, {}))
-		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
-}
-
-void kaba_call1(Function *func, void *p1) {
-	assert_num_params(func, 1);
-	assert_return_type(func, TypeVoid);
-	if (!call_function(func, nullptr, {p1}))
-		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
-}
-
-void kaba_call2(Function *func, void *p1, void *p2) {
-	assert_num_params(func, 2);
-	assert_return_type(func, TypeVoid);
-	if (!call_function(func, nullptr, {p1, p2}))
-		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
-}
-
-void kaba_call3(Function *func, void *p1, void *p2, void *p3) {
-	assert_num_params(func, 3);
-	assert_return_type(func, TypeVoid);
-	if (!call_function(func, nullptr, {p1, p2, p3}))
-		kaba_raise_exception(new KabaException("call(): failed to dynamically call " + func->signature()));
 }
 
 #pragma GCC pop_options

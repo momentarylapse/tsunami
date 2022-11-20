@@ -30,24 +30,15 @@ enum class StatementID {
 	CONTINUE,
 	NEW,
 	DELETE,
-	SIZEOF,
-	TYPEOF,
 	ASM,
 	//RAISE,
 	TRY,
 	EXCEPT,
 	PASS,
-	STR,
-	REPR,
-	LEN,
 	LET,
 	VAR,
-	MAP,
 	LAMBDA,
 	FUNC,
-	SORTED,
-	DYN,
-	WEAK,
 	RAW_FUNCTION_POINTER
 };
 
@@ -61,6 +52,32 @@ extern Array<Statement*> Statements;
 
 Statement *statement_from_id(StatementID id);
 int add_statement(const string &name, StatementID id, int num_params = 0);
+
+
+// special functions
+enum class SpecialFunctionID {
+	SIZEOF,
+	TYPEOF,
+	STR,
+	REPR,
+	LEN,
+	SORT,
+	FILTER,
+	DYN,
+	WEAK
+};
+
+class SpecialFunction {
+public:
+	string name;
+	int min_params;
+	int max_params;
+	SpecialFunctionID id;
+};
+extern Array<SpecialFunction*> special_functions;
+
+SpecialFunction *special_function_from_id(SpecialFunctionID id);
+int add_special_function(const string &name, SpecialFunctionID id, int min_params, int max_params);
 
 }
 

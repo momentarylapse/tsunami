@@ -338,6 +338,7 @@
     <ClCompile Include="src\lib\kaba\dynamic\call.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\dynamic.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\exception.cpp" />
+    <ClCompile Include="src\lib\kaba\dynamic\sorting.cpp" />
     <ClCompile Include="src\lib\kaba\lib\dict.cpp" />
     <ClCompile Include="src\lib\kaba\lib\extern.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib.cpp" />
@@ -807,6 +808,7 @@
     <ClInclude Include="src\lib\kaba\dynamic\call.h" />
     <ClInclude Include="src\lib\kaba\dynamic\dynamic.h" />
     <ClInclude Include="src\lib\kaba\dynamic\exception.h" />
+    <ClInclude Include="src\lib\kaba\dynamic\sorting.h" />
     <ClInclude Include="src\lib\kaba\lib\dict.h" />
     <ClInclude Include="src\lib\kaba\lib\extern.h" />
     <ClInclude Include="src\lib\kaba\lib\lib.h" />

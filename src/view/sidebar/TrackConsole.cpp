@@ -54,7 +54,7 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	set_decimals(1);
 	set_mode(Mode::FX);
 
-	instrument_list = sorted(Instrument::enumerate(), [] (const Instrument &a, const Instrument &b) { return a.name() <= b.name(); });
+	instrument_list = base::sorted(Instrument::enumerate(), [] (const Instrument &a, const Instrument &b) { return a.name() <= b.name(); });
 	for (auto &i: instrument_list)
 		set_string("instrument", i.name());
 

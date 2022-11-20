@@ -317,6 +317,7 @@ sources = [
 	'src/lib/kaba/dynamic/call.cpp',
 	'src/lib/kaba/dynamic/dynamic.cpp',
 	'src/lib/kaba/dynamic/exception.cpp',
+	'src/lib/kaba/dynamic/sorting.cpp',
 	'src/lib/kaba/lib/dict.cpp',
 	'src/lib/kaba/lib/extern.cpp',
 	'src/lib/kaba/lib/lib.cpp',

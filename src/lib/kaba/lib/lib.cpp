@@ -96,6 +96,8 @@ const Class *TypeFunction;
 const Class *TypeFunctionP;
 const Class *TypeFunctionCode;
 const Class *TypeFunctionCodeP;
+const Class *TypeSpecialFunction;
+const Class *TypeSpecialFunctionP;
 
 extern const Class *TypePath;
 

@@ -17,6 +17,6 @@ class SongSelection;
 class Path;
 
 shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel);
-bool export_selection(Song *song, const SongSelection& sel, const Path& filename);
+bool export_selection(Song *song, const SongSelection& sel, const Path& filename, bool force_unmute = false);
 
 #endif /* SRC_COMMAND_SONG_EXPORT_H_ */

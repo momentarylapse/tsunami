@@ -65,8 +65,18 @@ shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel) {
 	return ss;
 }
 
-bool export_selection(Song *song, const SongSelection& sel, const Path& filename) {
+void unmute_all(Song *s) {
+	for (auto t: weak(s->tracks)) {
+		t->set_muted(false);
+		for (auto l: weak(t->layers))
+			l->set_muted(false);
+	}
+}
+
+bool export_selection(Song *song, const SongSelection& sel, const Path& filename, bool force_unmute) {
 	auto s = copy_song_from_selection(song, sel);
+	if (force_unmute)
+		unmute_all(s.get());
 	return song->session->storage->save(s.get(), filename);
 }
 

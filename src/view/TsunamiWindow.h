@@ -48,7 +48,6 @@ public:
 	void on_delete();
 	void on_delete_shift();
 	void on_export();
-	void on_render_export_selection();
 	void on_export_selection();
 	void on_quick_export();
 	void on_undo();

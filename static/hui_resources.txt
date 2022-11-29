@@ -1384,7 +1384,7 @@ header-save-menu
 
 0
 0
-6
+5
 Item
 save
 image=hui:save
@@ -1404,21 +1404,15 @@ image=hui:save-as
 0
 0
 Item
-render_export_selection
+export-selection
 image=hui:save-as
 3
 0
 0
 Item
-export_selection
-image=hui:save-as
+quick-export
+image=hui:save
 4
-0
-0
-Item
-quick_export
-image=hui:save-as
-5
 0
 0
 # Resource
@@ -2224,7 +2218,7 @@ menu_export
 
 5
 0
-4
+3
 Item
 export
 image=hui:save-as
@@ -2232,21 +2226,15 @@ image=hui:save-as
 0
 0
 Item
-render_export_selection
+export-selection
 image=hui:save-as
 1
 0
 0
 Item
-export_selection
-image=hui:save-as
+quick-export
+image=hui:save
 2
-0
-0
-Item
-quick_export
-image=hui:save-as
-3
 0
 0
 Separator
@@ -8295,7 +8283,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-737
+733
 # Text
 /bars-add
 Add bars...
@@ -8395,6 +8383,9 @@ Exit
 
 /export
 Export...
+
+/export-selection
+Export selection...
 
 /layer-add
 Add version
@@ -8509,6 +8500,9 @@ Loop
 
 /playback-range-lock
 Lock
+
+/quick-export
+Quick export
 
 /record
 Record
@@ -8930,15 +8924,6 @@ About
 header-menu/help
 Help
 
-header-save-menu/export_selection
-Save selection...
-
-header-save-menu/quick_export
-Quick export
-
-header-save-menu/render_export_selection
-Render selection...
-
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help
 
@@ -9191,9 +9176,6 @@ Bars
 menu/delete_time
 Delete selected interval
 
-menu/export_selection
-Save selection...
-
 menu/help
 Help
 
@@ -9260,14 +9242,8 @@ Loop
 menu/play-toggle
 Play
 
-menu/quick_export
-Quick export
-
 menu/record
 Record
-
-menu/render_export_selection
-Render selection...
 
 menu/sample_from_selection
 Cut out from selection

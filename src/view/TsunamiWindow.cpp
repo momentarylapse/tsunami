@@ -100,11 +100,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("delete-shift", hui::KEY_SHIFT + hui::KEY_DELETE);
 	event("export", [this] { on_export(); });
 	set_key_code("export", hui::KEY_CONTROL + hui::KEY_E);
-	event("render_export_selection", [this] { on_render_export_selection(); });
-	//set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL);
-	event("export_selection", [this] { on_export_selection(); });
-	event("quick_export", [this] { on_quick_export(); });
-	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	event("export-selection", [this] { on_export_selection(); });
+	set_key_code("export-selection", hui::KEY_E + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	event("quick-export", [this] { on_quick_export(); });
+	set_key_code("quick-export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT);
 	event("undo", [this] { on_undo(); });
 	set_key_code("undo", hui::KEY_Z + hui::KEY_CONTROL);
 	event("redo", [this] { on_redo(); });
@@ -1055,33 +1054,30 @@ void TsunamiWindow::on_export() {
 	}, {"default=" + def});
 }
 
-void TsunamiWindow::on_render_export_selection() {
-	session->storage->ask_save_render_export(this, [this] (const Path &filename) {
+void TsunamiWindow::on_export_selection() {
+	session->storage->ask_save(this, [this] (const Path &filename) {
 		if (!filename)
 			return;
 
-		if (view->get_playable_layers() != view->sel.layers()) {
-			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
+		if (view->get_playable_layers() == view->sel.layers()) {
+			if (export_selection(song, view->sel, filename))
+				view->set_message(_("file exported"));
+		} else {
+			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
 					{_("All non-muted"), _("From selection")},
 					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
 					[this, filename] (int answer) {
 						auto sel = view->sel;
-						if (answer == 0)
+						bool force_unmute = false;
+						if (answer == 0) {
 							sel = SongSelection::from_range(song, view->sel.range()).filter(view->get_playable_layers());
-						else if (answer < 0)
+							force_unmute = true;
+						} else if (answer < 0) {
 							return;
-						if (session->storage->render_export_selection(song, sel, filename))
+						}
+						if (export_selection(song, sel, filename, force_unmute))
 							view->set_message(_("file exported"));
 					});
-		}
-	});
-}
-
-void TsunamiWindow::on_export_selection() {
-	session->storage->ask_save(this, [this] (const Path &filename) {
-		if (filename) {
-			if (export_selection(song, view->sel, filename))
-				view->set_message(_("file exported"));
 		}
 	});
 }

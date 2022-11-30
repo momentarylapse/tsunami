@@ -44,6 +44,7 @@ shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel) {
 				continue;
 			auto *ll = new TrackLayer(tt);
 			tt->layers.add(ll);
+			ll->muted = l->muted;
 			for (auto *n: weak(l->midi))
 				if (sel.has(n))
 					ll->midi.add(n->copy(-sel.range().offset));

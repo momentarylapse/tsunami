@@ -1064,21 +1064,28 @@ void TsunamiWindow::on_export_selection() {
 				view->set_message(_("file exported"));
 		} else {
 			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
-					{_("All non-muted"), _("From selection")},
-					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
+					{_("All non-muted"), _("All selected"), _("Only non-muted selected")},
+					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute"), _("only include if selected AND not muted")}, true,
 					[this, filename] (int answer) {
 						auto sel = view->sel;
 						bool force_unmute = false;
 						if (answer == 0) {
+							// all non-muted
 							sel = SongSelection::from_range(song, view->sel.range()).filter(view->get_playable_layers());
+							force_unmute = false;
+						} else if (answer == 1) {
+							// selection
+							sel = view->sel;
 							force_unmute = true;
-						} else if (answer < 0) {
+						} else if (answer == 2) {
+							// non-muted & selected
+							sel = view->sel.filter(view->get_playable_layers());
+							force_unmute = false;
+						} else { // answer < 0
 							return;
 						}
-						for (auto l: sel.layers()) {
-							msg_write(l->track->nice_name() + "  v" + str(l->version_number()));
-						}
-						msg_write(b2s(force_unmute));
+						//for (auto l: sel.layers())
+						//	msg_write(l->track->nice_name() + "  v" + str(l->version_number()));
 						if (export_selection(song, sel, filename, force_unmute))
 							view->set_message(_("file exported"));
 					});

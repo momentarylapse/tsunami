@@ -59,7 +59,8 @@ shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel) {
 			for (auto *m: weak(l->markers))
 				if (sel.has(m))
 					ll->markers.add(m->copy(- sel.range().offset));
-			ll->fades = l->fades; // TODO...
+			for (auto f: l->fades)
+				ll->fades.add({f.position - sel.range().offset, f.mode, f.samples});
 		}
 	}
 	return ss;

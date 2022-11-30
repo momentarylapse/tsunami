@@ -1075,6 +1075,10 @@ void TsunamiWindow::on_export_selection() {
 						} else if (answer < 0) {
 							return;
 						}
+						for (auto l: sel.layers()) {
+							msg_write(l->track->nice_name() + "  v" + str(l->version_number()));
+						}
+						msg_write(b2s(force_unmute));
 						if (export_selection(song, sel, filename, force_unmute))
 							view->set_message(_("file exported"));
 					});

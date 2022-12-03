@@ -56,6 +56,7 @@ public:
 	bool antialiasing = true;
 	float string_dy = 10;
 	bool allow_shadows = false;
+	float min_font_size = 10;
 
 	float w = 0;
 	float avg_samples_per_line = 0;

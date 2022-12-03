@@ -95,6 +95,7 @@ public:
 public:
 	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
 	void set_size_data(bool direct_size_mode, float s);
+	void set_min_font_size(float min_size);
 	void set_shift(int shift);
 	void set_linear_range(float pitch_min, float pitch_max);
 	void set_quality(float quality, bool antialiasing);
@@ -131,6 +132,8 @@ private:
 	MidiPainterMode *mmode = nullptr;
 	float rr;
 	float modifier_font_size;
+	float multiplet_font_size;
+	float min_font_size;
 	Range cur_range;
 
 

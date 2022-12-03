@@ -42,6 +42,8 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 		od->parameters.map_set("track-space", 0.4f * 20);
 	if (!od->parameters.has("allow-shadows"))
 		od->parameters.map_set("allow-shadows", true);
+	if (!od->parameters.has("min-font-size"))
+		od->parameters.map_set("min-font-size", 6.0f);
 
 	if (od->parameters.has("tracks"))
 		return true;

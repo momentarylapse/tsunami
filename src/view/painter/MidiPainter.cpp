@@ -243,7 +243,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);*/
-	c->set_font_size(this->modifier_font_size);
+	c->set_font_size(multiplet_font_size);
 
 
 	bool neck_offset = (mode == MidiMode::TAB);
@@ -407,6 +407,7 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 	shift = 0;
 	allow_shadows = true;//(mode == MidiMode::LINEAR);
 	force_shadows = false;
+	min_font_size = 0;
 
 	set_size_data(false, 1.0f);
 }
@@ -418,6 +419,7 @@ void MidiPainter::set_size_data(bool direct_size_mode, float s) {
 	rr = mmode->rr;
 
 	modifier_font_size = rr * 2.8f;
+	multiplet_font_size = rr * 1.8f;
 
 	neck_length_single = max(NOTE_NECK_LENGTH * scale, rr*7.5f);
 	neck_length_group = max(NOTE_NECK_LENGTH * scale, rr*7);
@@ -426,6 +428,12 @@ void MidiPainter::set_size_data(bool direct_size_mode, float s) {
 	bar_width = NOTE_BAR_WIDTH * scale;
 	flag_dx = NOTE_FLAG_DX * scale;
 	flag_dy = NOTE_FLAG_DY * scale;
+}
+
+void MidiPainter::set_min_font_size(float min_size) {
+	min_font_size = min_size;
+	modifier_font_size = max(modifier_font_size, min_font_size);
+	multiplet_font_size = max(multiplet_font_size, min_font_size);
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {

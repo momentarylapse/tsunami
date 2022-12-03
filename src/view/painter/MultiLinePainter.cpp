@@ -66,6 +66,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 
 	mp->set_context(rect(x0, x0+w, y0, y0+line_height), t->instrument, true, MidiMode::CLASSICAL);
 	mp->set_size_data(true, line_height / 75);
+	mp->set_min_font_size(min_font_size);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
 	mp->allow_shadows = allow_shadows;
@@ -247,6 +248,8 @@ void MultiLinePainter::set(const Any &conf) {
 		antialiasing = conf["antialiasing"]._bool();
 	if (conf.has("allow-shadows"))
 		allow_shadows = conf["allow-shadows"]._bool();
+	if (conf.has("min-font-size"))
+		min_font_size = conf["min-font-size"]._float();
 	update_scales();
 }
 

@@ -64,6 +64,8 @@ Dialog midi_editor "Midi" width=300 height=516
 				---|
 				Button flag-dead "x" expandx "tooltip=Set muted flag" ignorefocus
 				Button flag-hammer-on "h" expandx "tooltip=Set hammer-on flag" ignorefocus disabled
+				Button flag-bend-half "⟋ +1" expandx "tooltip=Set bend-half-tone-up flag" ignorefocus
+				Button flag-bend-full "⟋ +2" expandx "tooltip=Set bend-full-tone-up flag" ignorefocus
 		Expander grp_operations "Operations"
 			Grid ? ""
 				Grid ? "" homogenousx

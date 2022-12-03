@@ -3113,7 +3113,7 @@ Grid
 homogenousx
 0
 0
-6
+8
 Button
 flag-none
 image=hui:delete,expandx,ignorefocus,height=32
@@ -3148,6 +3148,18 @@ Button
 flag-hammer-on
 expandx,ignorefocus,disabled
 1
+1
+0
+Button
+flag-bend-half
+expandx,ignorefocus
+2
+1
+0
+Button
+flag-bend-full
+expandx,ignorefocus
+3
 1
 0
 Expander
@@ -8283,7 +8295,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-733
+735
 # Text
 /bars-add
 Add bars...
@@ -9377,6 +9389,12 @@ Minor major 7th chord
 midi_editor/chord-minor7
 
 Minor 7th chord
+midi_editor/flag-bend-full
+⟋ +2
+Set bend-full-tone-up flag
+midi_editor/flag-bend-half
+⟋ +1
+Set bend-half-tone-up flag
 midi_editor/flag-dead
 x
 Set muted flag

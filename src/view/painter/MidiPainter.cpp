@@ -297,7 +297,14 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState _
 			SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "x", true, 0);
 	} else if (n->is(NOTE_FLAG_TRILL)) {
 		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "tr", true, 0);
-		//c->draw_str(x, y - rr*3, "tr~");
+	} else if (n->is(NOTE_FLAG_BEND_HALF)) {
+		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, u8"\u27cb +1", true, 0);
+	} else if (n->is(NOTE_FLAG_BEND_FULL)) {
+		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, u8"\u27cb +2", true, 0);
+	} else if (n->is(NOTE_FLAG_HAMMER_ON)) {
+		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "h", true, 0);
+	} else if (n->is(NOTE_FLAG_PULL_OFF)) {
+		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "p", true, 0);
 	}
 	if (n->is(NOTE_FLAG_STACCATO))
 		c->draw_circle({x, y + dir * rr*2}, rr * 0.3f);

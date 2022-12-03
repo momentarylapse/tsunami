@@ -116,6 +116,8 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	event("flag-staccato", [this] { on_apply_flags(NOTE_FLAG_STACCATO); });
 	event("flag-tenuto", [this] { on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("flag-dead", [this] { on_apply_flags(NOTE_FLAG_DEAD); });
+	event("flag-bend-half", [this] { on_apply_flags(NOTE_FLAG_BEND_HALF); });
+	event("flag-bend-full", [this] { on_apply_flags(NOTE_FLAG_BEND_FULL); });
 	event("add_key_change", [this] { on_add_key_change(); });
 	event("edit-song", [session] {
 		session->set_mode(EditMode::DefaultSong);

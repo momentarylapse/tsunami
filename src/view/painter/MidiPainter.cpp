@@ -161,6 +161,7 @@ void MidiPainter::draw_single_ndata(Painter *c, QuantizedNote &d, bool neck_offs
 
 	if (d.punctured)
 		c->draw_circle({d.x + rr, y + rr}, rr * 0.4f);
+	draw_note_flags(c, d.n, MidiNoteState::DEFAULT, d.x, d.y_min, -e);
 	if (d.triplet)
 		c->draw_str({d.x, y + e*neck_length_single + e * rr * 1.9f - rr * 0.8f}, "3");
 }
@@ -212,7 +213,7 @@ void MidiPainter::draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool
 		if (xx == x1 and (i+1 < d.notes.num))
 			xx = (x1*4 + d.notes[1-1].x) / 5;
 		float t1 = (xx - x0) / dx;
-		if (d.notes[i].n){
+		if (d.notes[i].n) {
 			c->set_color(d.notes[i].col);
 			c->draw_line({x0 + dx*t0, y0 + dy*t0}, {x0 + dx*t1, y0 + dy*t1});
 			if (d.notes[i].length <= SIXTEENTH)
@@ -222,15 +223,17 @@ void MidiPainter::draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool
 		}
 		t0 = t1;
 	}
+	for (auto &dn: d.notes)
+		if (dn.n and dn.n->flags != 0) {
+			c->set_color(dn.col);
+			draw_note_flags(c, dn.n, MidiNoteState::DEFAULT, dn.x, dn.y_min, -e);
+		}
 
 	int div = d.special_divisor;
 	if (div < 0 and d.notes[0].triplet)
 		div = d.notes[0].length == TRIPLET_SIXTEENTH ? 6 : 3;
 	if (div > 0)
 		c->draw_str({x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f)}, i2s(div));
-	//else if (d.notes[0].triplet)
-		//c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 4 + e*9, "3");
-	//	c->draw_str({x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f)}, "3");
 }
 
 
@@ -286,23 +289,22 @@ void MidiPainter::set_synthesizer(Synthesizer *s) {
 	synth = s;
 }
 
-void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y) {
-
-	if (n->flags > 0) {
-		float x = (x1 + x2) / 2;
-		if (n->is(NOTE_FLAG_DEAD))
-			SymbolRenderer::draw(c, {x, y - rr*4}, rr*1.5f, "x", true, 0);
-		else if (n->is(NOTE_FLAG_TRILL))
-			SymbolRenderer::draw(c, {x, y - rr*4}, rr*1.5f, "tr", true, 0);
-			//c->draw_str(x, y - rr*3, "tr~");
-		if (n->is(NOTE_FLAG_STACCATO))
-			c->draw_circle({x + rr, y + rr*2}, 2);
-		if (n->is(NOTE_FLAG_TENUTO)) {
-			c->set_line_width(3);
-			c->draw_line({x, y + rr*2}, {x1+20, y + rr*2});
-		}
+void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState __state, float x, float y, float dir) {
+	if (n->flags == 0)
+		return;
+	if (n->is(NOTE_FLAG_DEAD)) {
+		if (mode != MidiMode::TAB)
+			SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "x", true, 0);
+	} else if (n->is(NOTE_FLAG_TRILL)) {
+		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "tr", true, 0);
+		//c->draw_str(x, y - rr*3, "tr~");
 	}
-
+	if (n->is(NOTE_FLAG_STACCATO))
+		c->draw_circle({x, y + dir * rr*2}, rr * 0.3f);
+	if (n->is(NOTE_FLAG_TENUTO)) {
+		c->set_line_width(rr*0.4f);
+		c->draw_line({x - rr*1.5f, y + dir * rr*2}, {x + rr*1.5f, y + dir * rr*2});
+	}
 }
 
 
@@ -420,6 +422,7 @@ void MidiPainter::set_size_data(bool direct_size_mode, float s) {
 
 	modifier_font_size = rr * 2.8f;
 	multiplet_font_size = rr * 1.8f;
+	flags_font_size = rr * 1.5f;
 
 	neck_length_single = max(NOTE_NECK_LENGTH * scale, rr*7.5f);
 	neck_length_group = max(NOTE_NECK_LENGTH * scale, rr*7);
@@ -434,6 +437,7 @@ void MidiPainter::set_min_font_size(float min_size) {
 	min_font_size = min_size;
 	modifier_font_size = max(modifier_font_size, min_font_size);
 	multiplet_font_size = max(multiplet_font_size, min_font_size);
+	flags_font_size = max(flags_font_size, min_font_size * 0.8f);
 }
 
 void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes) {

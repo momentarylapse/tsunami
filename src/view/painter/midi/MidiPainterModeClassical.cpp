@@ -99,8 +99,6 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}
 
-	mp->draw_note_flags(c, n, state, x1, x2, y);
-
 	if ((n->modifier != NoteModifier::NONE) and mp->quality._highest_details) {
 		c->set_color(local_theme.text);
 		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));

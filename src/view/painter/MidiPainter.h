@@ -69,7 +69,7 @@ private:
 
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
 
-	void draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
+	void draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState state, float x, float y, float dir);
 
 	void draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &midi);
 	void draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &midi);
@@ -133,7 +133,8 @@ private:
 	float rr;
 	float modifier_font_size;
 	float multiplet_font_size;
-	float min_font_size;
+	float flags_font_size;
+	float min_font_size; // "comfortably readable"
 	Range cur_range;
 
 

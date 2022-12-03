@@ -83,8 +83,6 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}
-
-	mp->draw_note_flags(c, &n, state, x1, x2, y);
 }
 
 void MidiPainterModeLinear::draw_background(Painter *c, bool force) {

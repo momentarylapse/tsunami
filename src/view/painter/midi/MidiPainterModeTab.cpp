@@ -94,13 +94,10 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 		// fret number as symbol
 		c->set_color(col);
 		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
-
-		mp->draw_note_flags(c, n, state, x1, x2, y);
 	} else {
 		string tt = i2s(n->pitch - mp->instrument->string_pitch[n->stringno]);
 		c->set_color(col);
 		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, tt, true, 0);
-		mp->draw_note_flags(c, n, state, x1, x2, y);
 	}
 }
 

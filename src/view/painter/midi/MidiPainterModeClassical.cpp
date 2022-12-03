@@ -26,9 +26,10 @@ void MidiPainterModeClassical::update() {
 		clef_dy = min(mp->area.height() / 13, 30.0f);
 	clef_y0 = mp->area.center().y + 2 * clef_dy;
 
-	clef_line_width = mp->area.height() / 150;
+	clef_line_width = mp->area.height() / 200;
 
 	rr = clef_dy * 0.42f;
+	shadow_width = rr * 1.05f;
 }
 
 void MidiPainterModeClassical::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -83,8 +84,8 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
 			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3 * 1.6f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3 * 0.7f, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 1.2f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 0.8f, col_shadow);
 		}
 
 		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
@@ -92,7 +93,7 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 	} else {
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold))
-			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
+			draw_shadow(c, x1, x2, y, shadow_width, col_shadow);
 			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3, col_shadow);
 
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
@@ -109,10 +110,10 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 
 
 void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
-	// clef lines
 
+	// clef lines
 	if (mp->is_playable)
-		c->set_color(local_theme.text_soft1);
+		c->set_color(local_theme.text_soft2);
 	else
 		c->set_color(local_theme.text_soft3);
 	c->set_line_width(clef_line_width);
@@ -123,13 +124,12 @@ void MidiPainterModeClassical::draw_background(Painter *c, bool force) {
 		c->draw_line({mp->area.x1, y}, {mp->area.x2, y});
 	}
 	c->set_antialiasing(false);
-	
+
+	// clef symbol
 	if (mp->is_playable)
 		c->set_color(local_theme.text_soft1);
 	else
 		c->set_color(local_theme.text_soft3);
-
-	// clef symbol
 
 	Scale key_prev = Scale::C_MAJOR;
 	for (auto &kc: key_changes)

@@ -30,6 +30,8 @@ void MidiPainterModeLinear::update() {
 
 	// absolute pixel value (3.5) allowed, since we only use this on screen :P
 	rr = max((pitch2y(0) - pitch2y(1)) / 1.0f, 3.5f);
+
+	shadow_width = rr*1.1f;
 }
 
 void MidiPainterModeLinear::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -67,8 +69,8 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
 			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3 * 1.6f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3 * 0.7f, col_shadow);
+			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 1.2f, col1);
+			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 0.8f, col_shadow);
 		}
 
 		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
@@ -76,7 +78,7 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 	} else {
 		// "shadow" to indicate length
 		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold))
-			draw_shadow(c, x1, x2, y, 0, rr, col_shadow);
+			draw_shadow(c, x1, x2, y, shadow_width, col_shadow);
 			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3, col_shadow);
 
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);

@@ -38,7 +38,7 @@ inline MidiNoteState operator|(MidiNoteState a, MidiNoteState b) {
 
 void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors);
 MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col);
+void draw_shadow(Painter *c, float x1, float x2, float y, float rr, const color &col);
 void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float shadow_width, const color &col);
 
 
@@ -61,6 +61,7 @@ public:
 	const ColorScheme &local_theme;
 	bool direct_size_mode = false;
 	float rr = 0;
+	float shadow_width = 0;
 };
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_ */

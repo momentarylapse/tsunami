@@ -40,10 +40,10 @@ MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, Hov
 }
 
 // "shadow" to indicate length
-void draw_shadow(Painter *c, float x1, float x2, float y, float rx, float rr, const color &col) {
+void draw_shadow(Painter *c, float x1, float x2, float y, float shadow_width, const color &col) {
 	//x1 += r;
 	c->set_color(col);
-	c->draw_rect(rect(x1, x2 + rx, y - rr*0.7f - rx, y + rr*0.7f + rx));
+	c->draw_rect(rect(x1, x2, y - shadow_width/2, y + shadow_width/2));
 }
 
 void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float shadow_width, const color &col) {

@@ -29,11 +29,11 @@ void MidiPainterModeTab::update() {
 	float h = string_dy * mp->instrument->string_pitch.num;
 	string_y0 = mp->area.center().y + (h - string_dy) / 2;
 
-	clef_line_width = mp->area.height() / 150;
+	clef_line_width = mp->area.height() / 200;
 
-	shadow_width = clef_line_width * 5;
+	shadow_width = clef_line_width * 9.0f;
 	if (local_theme.is_dark())
-		shadow_width = clef_line_width * 4;
+		shadow_width = clef_line_width * 8.0f;
 
 	rr = string_dy * 0.4f;
 }
@@ -105,14 +105,15 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 }
 
 void MidiPainterModeTab::draw_background(Painter *c, bool force) {
+
+	// clef lines
 	if (mp->is_playable)
-		c->set_color(local_theme.text_soft1);
+		c->set_color(local_theme.text_soft2);
 	else
 		c->set_color(local_theme.text_soft3);
 	c->set_line_width(clef_line_width);
 	c->set_antialiasing(true);
 
-	// clef lines
 	float h = string_dy * mp->instrument->string_pitch.num;
 	for (int i=0; i<mp->instrument->string_pitch.num; i++) {
 		float y = string_to_screen(i);

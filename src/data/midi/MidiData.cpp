@@ -412,15 +412,26 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {
 			rr = Range(rr.offset, min(rr.length/4, 2200)); //DEFAULT_SAMPLE_RATE/20)); // FIXME use the current sample rate?
 		else if (n->is(NOTE_FLAG_STACCATO))
 			rr = Range(rr.offset, rr.length/2);
-		/*if (n->is(NOTE_FLAG_TRILL)) {
-			int l = rr.length;
-			r.add(MidiEvent(n));
-			r.add(MidiEvent(rr.offset + l/4, n->pitch, 0));
-			r.add(MidiEvent(rr.offset + l/4, n->pitch+1, n->volume));
-			r.add(MidiEvent(rr.offset + l/2, n->pitch+1, 0));
-			r.add(MidiEvent(rr.offset + l/2, n->pitch, n->volume));
-			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
-		} else*/ {
+        const int l = rr.length;
+        const int lx = min(l/4, 10000);
+        if (n->is(NOTE_FLAG_TRILL)) {
+            r.add(MidiEvent(n));
+            r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
+            r.add(MidiEvent(rr.offset + lx, n->pitch+1, n->volume));
+            r.add(MidiEvent(rr.offset + lx*2, n->pitch+1, 0));
+            r.add(MidiEvent(rr.offset + lx*2, n->pitch, n->volume));
+            r.add(MidiEvent(rr.end()-1, n->pitch, 0));
+        } else if (n->is(NOTE_FLAG_BEND_HALF)) {
+            r.add(MidiEvent(n));
+            r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
+            r.add(MidiEvent(rr.offset + lx, n->pitch+1, n->volume));
+            r.add(MidiEvent(rr.end()-1, n->pitch+1, 0));
+        } else if (n->is(NOTE_FLAG_BEND_FULL)) {
+            r.add(MidiEvent(n));
+            r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
+            r.add(MidiEvent(rr.offset + lx, n->pitch+2, n->volume));
+            r.add(MidiEvent(rr.end()-1, n->pitch+2, 0));
+        } else {
 			r.add(MidiEvent(n));
 			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
 		}

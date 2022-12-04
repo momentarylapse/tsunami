@@ -289,23 +289,28 @@ void MidiPainter::set_synthesizer(Synthesizer *s) {
 	synth = s;
 }
 
+string note_flag_text(const MidiNote *n, bool allow_dead) {
+    if (n->is(NOTE_FLAG_DEAD) and allow_dead)
+        return "x";
+    if (n->is(NOTE_FLAG_TRILL))
+        return "tr";
+    if (n->is(NOTE_FLAG_BEND_HALF))
+        return u8"\u27cb +1";
+    if (n->is(NOTE_FLAG_BEND_FULL))
+        return u8"\u27cb +2";
+    if (n->is(NOTE_FLAG_HAMMER_ON))
+        return "h";
+    if (n->is(NOTE_FLAG_PULL_OFF))
+        return "p";
+    return "";
+}
+
 void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState __state, float x, float y, float dir) {
 	if (n->flags == 0)
 		return;
-	if (n->is(NOTE_FLAG_DEAD)) {
-		if (mode != MidiMode::TAB)
-			SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "x", true, 0);
-	} else if (n->is(NOTE_FLAG_TRILL)) {
-		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "tr", true, 0);
-	} else if (n->is(NOTE_FLAG_BEND_HALF)) {
-		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, u8"\u27cb +1", true, 0);
-	} else if (n->is(NOTE_FLAG_BEND_FULL)) {
-		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, u8"\u27cb +2", true, 0);
-	} else if (n->is(NOTE_FLAG_HAMMER_ON)) {
-		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "h", true, 0);
-	} else if (n->is(NOTE_FLAG_PULL_OFF)) {
-		SymbolRenderer::draw(c, {x, y + dir * rr * 4 - flags_font_size / 2}, flags_font_size, "p", true, 0);
-	}
+    string t = note_flag_text(n, mode != MidiMode::TAB);
+    if (t.num > 0)
+        SymbolRenderer::draw(c, {x, y + dir * (rr + flags_font_size*1.33f) - flags_font_size / 2}, flags_font_size, t, true, 0);
 	if (n->is(NOTE_FLAG_STACCATO))
 		c->draw_circle({x, y + dir * rr*2}, rr * 0.3f);
 	if (n->is(NOTE_FLAG_TENUTO)) {

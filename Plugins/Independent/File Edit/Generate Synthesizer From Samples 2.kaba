@@ -29,7 +29,7 @@ class XXX extends TsunamiPlugin
 		var synth = track.synth
 		track.set_synthesizer(weak(synth))
 			
-		any a
+		var a: any
 		a["zones"] = []
 		
 		track.layers[0].midi.add(new MidiNote(Range(0, 100000), 64, 1.0))
@@ -54,15 +54,15 @@ class XXX extends TsunamiPlugin
 					continue
 				if not zz.has("keys")
 					continue
-				int index = int(zz["sample"])
-				int offset = 0
+				var index = int(zz["sample"])
+				var offset = 0
 				for k in 0:index
 					offset += len(session.song.samples[k].buf)
 				var s = session.song.samples[index]
 				#print("I {{zz}}")
 
 				
-				any az
+				var az: any
 				az["sample"] = "sample:{{s.uid|08x}}"
 				az["pitch_min"] = int(zz["keys"][0])
 				az["pitch_max"] = int(zz["keys"][1])

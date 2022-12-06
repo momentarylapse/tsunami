@@ -21,13 +21,13 @@ class Matrix
 	func get(i: int, j: int) -> float
 		return e[i * m + j]
 	func __str__() -> string
-		string[] s
+		var s: string[]
 		for i in 0:n
 			s.add(str(e[i*m:(i+1)*m]))
 		return s.join("\n")
 	func mut diagonalize(out b: float[])
 		for i in 0:n
-			float f = get(i,i)
+			var f = get(i,i)
 			if f == 0
 				f = 0.0000001
 			#print f
@@ -36,25 +36,25 @@ class Matrix
 			b[i] /= f
 			
 			for ii in i+1:n
-				float g = get(ii, i)
+				var g = get(ii, i)
 				for j in i:m
 					e[ii * m + j] -= e[i * m + j] * g
 				b[ii] -= b[i] * g
 	func solve(b: float[]) -> float[]
 		if n != m or len(b) != n
 			raise(new Exception("size mismatch"))
-		Matrix mm = self
-		float[] x
+		var mm = self
+		var x: float[]
 		x.resize(m)
-		float[] bb = b
+		var bb = b
 		mm.diagonalize(bb)
 		
-		int i = n-1
+		var i = n-1
 		while i >= 0
-			float s = 0
+			var s = 0.0
 			for j in i+1:n
 				s += mm.get(i, j) * x[j]
-			float f = mm.get(i, i)
+			var f = mm.get(i, i)
 			if abs(f) > 0.00001
 				x[i] = (bb[i] - s) # / f
 			else
@@ -66,9 +66,9 @@ class Matrix
 
 # ok
 func _test_solve()
-	Matrix mm = Matrix([[2.,1.],[-1.,2.]])
+	let mm = Matrix([[2.,1.],[-1.,2.]])
 	print(mm)
-	float[] x = mm.solve([1.0,1.0])
+	let x = mm.solve([1.0,1.0])
 	print("-------")
 	print(x)
 

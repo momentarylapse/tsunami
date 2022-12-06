@@ -7,7 +7,7 @@ class ChaosSource extends BeatSource
 		offset = 0
 		
 	func override read(out beats: Beat[], samples: int) -> int
-		int sample_rate = session.sample_rate()
+		var sample_rate = session.sample_rate()
 	
 		while offset < samples
 			beats.add(Beat(offset, rand(3)))

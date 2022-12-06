@@ -453,7 +453,7 @@ class FMRenderer extends PitchRenderer
 			if !c.active()
 				continue
 			if len(osc) <= n
-				OscillatorState o
+				var o: OscillatorState
 				osc.add(o)
 			osc[n].conf = c
 			osc[n].env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)

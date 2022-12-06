@@ -9,33 +9,33 @@ class VolumeChecker extends TsunamiPlugin
 		
 		var p = new ProgressX("checking", self.session.win)
 		
-		Range range = session.song.range()
-		AudioBuffer buf
+		var range = session.song.range()
+		var buf: AudioBuffer
 		renderer.set_range(range)
 		
 		buf.resize(1024*16)
 		
 		vol_max = 0
-		int done = 0
+		var done = 0
 		while not p.is_cancelled()
-			int n = renderer.read(buf)
+			var n = renderer.read(buf)
 			if n < 0
 				break
 			
-			float _max = max(max(buf.c[0]), max(buf.c[1]))
-			float _min = min(min(buf.c[0]), min(buf.c[1]))
+			var _max = max(max(buf.c[0]), max(buf.c[1]))
+			var _min = min(min(buf.c[0]), min(buf.c[1]))
 			vol_max = max(vol_max, max(abs(_max), abs(_min)))
 			done += n
 			p.set("checking", float(done) / float(range.length))
 
-		bool cancelled = p.is_cancelled()
+		var cancelled = p.is_cancelled()
 
 		del p
 		del renderer
 		return !cancelled
 		
 	func mut ask()
-		string q = "Song reaches a peak volume of {{vol_max * 100.0|.1}}% ({{amp2db(vol_max)|.1}}dB)\n"
+		var q = "Song reaches a peak volume of {{vol_max * 100.0|.1}}% ({{amp2db(vol_max)|.1}}dB)\n"
 		if vol_max > 0.95 and vol_max < 1.0
 			hui.info_box(session.win, "Info", "{{q}} seems fine...")
 			return

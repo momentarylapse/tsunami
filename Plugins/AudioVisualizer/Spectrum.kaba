@@ -38,7 +38,7 @@ class SpecGrid extends Grid
 		pr.resize(len(ffr))
 		pl.resize(len(ffl))
 		for i in 0:len(ffr)
-			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
+			var x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
 			if type == SpectrumType.LINEAR
@@ -54,8 +54,8 @@ class SpecGrid extends Grid
 		if type == SpectrumType.LINEAR
 			y_axis.set(0, 1, false, "")
 		else #if type == TypeLogarithm
-			float db_max = 0#todb(peak_max)
-			float db_min = db_max - 80
+			var db_max: float = 0#todb(peak_max)
+			var db_min = db_max - 80
 			y_axis.set(db_min, db_max, false, "db")
 		create_lines()
 
@@ -95,9 +95,9 @@ class Spectrum extends AudioVisualizer
 		
 	
 	func mut do(buf: AudioBuffer)
-		complex[] fl, fr
+		var fl, fr: complex[]
 		buf.get_spectrum(fl, fr, 4096)
-		float[] tffl, tffr
+		var tffl, tffr: float[]
 		tffl.clear()
 		tffr.clear()
 	

@@ -85,11 +85,11 @@ Grid ? ''
 	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
 	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		float e = log(v1/v0)
-		vec2[] cc
+		var e = log(v1/v0)
+		var cc: vec2[]
 		for a in 0:1.01:0.05
-			float t = t0+a*(t1-t0)
-			float v = v0 * exp(a * e)
+			var t = t0+a*(t1-t0)
+			var v = v0 * exp(a * e)
 			cc.add(vec2(t2x(t), v2y(v)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
@@ -102,7 +102,7 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
-		vec2[] cc
+		var cc: vec2[]
 		cc.add(vec2(t2x(t0), v2y(v0)))
 		cc.add(vec2(t2x(t1), v2y(v1)))
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
@@ -126,10 +126,10 @@ Grid ? ''
 		p.set_line_width(1)
 	
 	func draw_envelope(p: Painter, o: UnisonConfig)
-		float t0 = 0
-		float t1 = t0 + o.attack
-		float t2 = t1 + o.decay
-		float t3 = t2 + o.release
+		var t0: float = 0
+		var t1 = t0 + o.attack
+		var t2 = t1 + o.decay
+		var t3 = t2 + o.release
 		draw_curve_lin(p, t0, o.initial, t1, o.peak, color.RED)
 		draw_curve_lin(p, t1, o.peak, t2, o.sustain, color.ORANGE)
 		draw_curve_exp(p, t2, o.sustain, t3, 0.01, color.GREEN)
@@ -160,8 +160,8 @@ Grid ? ''
 	
 	func get_hover() -> int
 		var e = hui.get_event()
-		float mx = e.mouse.x
-		float my = e.mouse.y
+		var mx = e.mouse.x
+		var my = e.mouse.y
 		if my > v2y(1.1)
 			var o = fc
 			if abs(mx - t2x(o.attack)) < 10
@@ -183,8 +183,8 @@ Grid ? ''
 		moving = -1
 	func mut on_mouse_move()
 		var e = hui.get_event()
-		float mx = e.mouse.x
-		float my = e.mouse.y
+		var mx = e.mouse.x
+		var my = e.mouse.y
 		if moving < -5
 			var o = fc
 			if moving == -10
@@ -258,10 +258,10 @@ class UnisonRenderer extends PitchRenderer
 			if osc.env.just_killed
 				return false
 			
-			float output = 0
+			var output: float = 0
 			for k in 0:c.num_voices
-				float v = osc.volume * vv[k]
-				float phi = osc.phi[k] + delta_phi * (1 + c.detune * k * 0.001)
+				var v = osc.volume * vv[k]
+				var phi = osc.phi[k] + delta_phi * (1 + c.detune * k * 0.001)
 				if c.type == SynthType.SINE
 					output += sin(phi) * v
 				else if c.type == SynthType.SQUARE

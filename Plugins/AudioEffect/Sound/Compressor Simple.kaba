@@ -47,20 +47,20 @@ class Compressor extends AudioEffect
 	var dgain_attack, dgain_release: float
 
 	func compress(out b: float[], out squares: float[], out gain: float*)
-		float bmin = pow(10, MIN_DB/20)
+		var bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
 			# in level (filtered)
 			squares[i % len(squares)] = b[i]*b[i]
-			float rms = sqrt(sum(squares) / len(squares) * 2)
+			var rms = sqrt(sum(squares) / len(squares) * 2)
 			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
-			float in_level = MIN_DB
+			var in_level = MIN_DB
 			if rms > bmin
 				in_level = log(rms) / log(10) * 20
 		
 			# out level
-			float out_level = in_level
+			var out_level = in_level
 			if config.upward
 				if in_level > config.threshold
 					out_level = 1 - (1 - in_level) / config.ratio
@@ -71,7 +71,7 @@ class Compressor extends AudioEffect
 					out_level = config.threshold + (in_level - config.threshold) / config.ratio
 			
 			# slow gain changes
-			float cur_gain = out_level - in_level
+			var cur_gain = out_level - in_level
 			if cur_gain > *gain
 				if config.release < 0.00005
 					*gain = cur_gain

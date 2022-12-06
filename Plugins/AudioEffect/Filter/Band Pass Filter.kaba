@@ -26,13 +26,13 @@ class LowPassFilter extends AudioEffect
 	# z[i] := α * x[i] + (1-α) * z[i-1]
 	
 	func mut do(out buf: float[], c: int)
-		float RC = 1 / (2 * pi * config.frequency)
-		float dt = 1.0 / session.sample_rate()
-		float aa = dt / (RC + dt)
-		float bb = 1 - aa
-		float prev_in = 0
+		var RC = 1 / (2 * pi * config.frequency)
+		var dt = 1.0 / session.sample_rate()
+		var aa = dt / (RC + dt)
+		var bb = 1 - aa
+		var prev_in: float = 0
 		if used[c]
-			float t = buf[0]
+			var t = buf[0]
 			buf[0] = bb * (buf[0] + _out[c] - _in[c])
 			prev_in = t
 			#buf.r[0] = aa * buf.r[0] + bb * state.out_r
@@ -41,7 +41,7 @@ class LowPassFilter extends AudioEffect
 		# z[i] := α * y[i] + b * z[i-1]
 	
 		for i in 1:len(buf)
-			float t = buf[i]
+			var t = buf[i]
 			buf[i] = bb * (buf[i] + buf[i-1] - prev_in)
 			prev_in = t
 			#buf[i] = aa * buf[i] + bb * buf[i-1]

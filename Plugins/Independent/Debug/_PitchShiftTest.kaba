@@ -11,17 +11,17 @@ class PitchShift extends TsunamiPlugin
 	
 	func mut shift_buf_bad(b: float[], out _out: float[], factor: float)
 		fft.r2c(b, buf1)
-		float f = 1.0 / len(b)
-		int N = len(b)
-		int NN = len(buf1)
+		var f = 1.0 / len(b)
+		var N = len(b)
+		var NN = len(buf1)
 		buf2.resize(NN)
 		for i in 0:NN
 			buf2[i] = complex(0, 0)
 			
 		for i in 0:NN
-			float i_s = float(i) / factor
-			int ii_s = int(i_s)
-			float di_s = i_s - float(ii_s)
+			var i_s = float(i) / factor
+			var ii_s = int(i_s)
+			var di_s = i_s - float(ii_s)
 			if ii_s < N
 				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
 
@@ -30,26 +30,26 @@ class PitchShift extends TsunamiPlugin
 
 	func mut shift_buf(b: float[], out _out: float[], factor: float)
 		fft.r2c(b, buf1)
-		int N = len(b)
-		int NN = len(buf1)
+		var N = len(b)
+		var NN = len(buf1)
 		buf2.resize(NN)
 		for i in 0:NN
 			buf2[i] = complex(0, 0)
 
 		#print("-----")
 		for i in 0:NN
-			float kk = factor * i
+			var kk = factor * i
 			#float x0 = pi * (N * kk)
-			int j0 = 0#max(kk - 100, 0)
-			int j1 = NN#min(kk + 100, NN)
+			var j0 = 0#max(kk - 100, 0)
+			var j1 = NN#min(kk + 100, NN)
 			#complex M0 = complex(cos(x0), sin(x0)) * sin(x0)
 			for j in j0:j1
-				float dk = kk - j
-				float x = pi * dk
+				var dk: float = kk - j
+				var x = pi * dk
 				if x == 0
 					buf2[j] += buf1[i]
 				else
-					complex M = complex(cos(x), sin(x)) * (sin(x) / x)
+					var M = complex(cos(x), sin(x)) * (sin(x) / x)
 					buf2[j] += M * buf1[i]
 
 
@@ -59,26 +59,26 @@ class PitchShift extends TsunamiPlugin
 		
 	func mut shift_buf_fast(b: float[], out _out: float[], factor: float)
 		fft.r2c(b, buf1)
-		int N = len(b)
-		int NN = len(buf1)
+		var N = len(b)
+		var NN = len(buf1)
 		buf2.resize(NN)
 		for i in 0:NN
 			buf2[i] = complex(0, 0)
 
-		int D = max(100, sqrt(N)*2)
+		var D = max(100, sqrt(N)*2)
 		for i in 0:NN
-			float kk = factor * i
-			float x0 = pi * kk
-			int j0 = max(kk - D, 0)
-			int j1 = min(kk + D, NN)
-			complex M0 = complex(cos(x0), sin(x0)) * sin(x0)
+			var kk = factor * i
+			var x0 = pi * kk
+			var j0 = int(max(kk - D, 0))
+			var j1 = int(min(kk + D, NN))
+			var M0 = complex(cos(x0), sin(x0)) * sin(x0)
 			for j in j0:j1
-				float dk = kk - j
-				float x = pi * dk
+				var dk = kk - j
+				var x = pi * dk
 				if x == 0
 					buf2[j] += buf1[i]
 				else
-					complex M = M0 * (1/x)
+					var M = M0 * (1/x)
 					buf2[j] += M * buf1[i]
 
 		_out.resize(N)
@@ -86,24 +86,24 @@ class PitchShift extends TsunamiPlugin
 		_out /= N
 
 	func override on_start()
-		bool show_val = false
-		bool show_fft = false
+		var show_val = false
+		var show_fft = false
 		
-		int N = 256*32
-		float k = 100
+		var N = 256*32
+		var k: float = 100
 		print("----------- orig ------------")
 		print("k={{k}}")
 		var buf = [for i in 0:N sin(2*pi*k*i / float(N))]
 #		print(buf)
 #		print("fft:")
 		
-		complex[] z, z2
+		var z, z2: complex[]
 		fft.r2c(buf, z)
 #		print(str(map(complex.abs, z)))
 		
 		
 		print("----------- off-grid ------------")
-		float k2 = k + 0.42341
+		var k2 = k + 0.42341
 		print("k={{k2}}")
 		var buf_off = [for i in 0:N sin(2*pi*k2*i / float(N))]
 		if show_val
@@ -120,9 +120,9 @@ class PitchShift extends TsunamiPlugin
 	#	print(c)
 	#	print(str([for zz,i in z2 zz.abs() * (1/c[i])]))
 		
-		float factor = k2 / k
+		var factor: float = k2 / k
 		print("factor {{factor}}")
-		float[] output
+		var output: float[]
 		
 		
 		print("----------- shift bad ------------")

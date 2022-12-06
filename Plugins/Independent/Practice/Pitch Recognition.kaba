@@ -24,8 +24,8 @@ class PitchRecognitionPanel extends ConfigPanel
 		redraw("drawing")
 
 	func get_note(f: float) -> (string, float)
-		float pitch = log(f / 440.0) / log(2.0) * 12 + 69
-		int rel = int(pitch + 0.5) % 12
+		var pitch = log(f / 440.0) / log(2.0) * 12 + 69
+		var rel = int(pitch + 0.5) % 12
 		var note_error = loop(pitch, -0.5, 0.5)
 		return (rel_pitch_name(rel), note_error)
 		#loopf(fl, 0, 1)
@@ -33,9 +33,9 @@ class PitchRecognitionPanel extends ConfigPanel
 
 	func draw_volume(p: Painter)
 		p.set_color(color(0.8, 0.8, 0.8, 1))
-		float y0 = 30
-		float y1 = p.height - 5
-		float h = y1 - y0
+		let y0 = 30.0
+		let y1 = float(p.height) - 5
+		let h = y1 - y0
 		p.draw_rect([5, 10, y0 + h * (1 - c.pitch_detector.volume), y0 + h * (2 - c.pitch_detector.volume)])
 		p.set_color(color(0.6, 0.6, 0.6, 1))
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
@@ -47,20 +47,20 @@ class PitchRecognitionPanel extends ConfigPanel
 	
 		draw_volume(p)
 	
-		float r = min(p.width / 2 - 40, p.height - 40)
-		float r1 = r - 5
-		float r2 = r + 5
-		float x = p.width / 2
-		float y = p.height - 10
+		let r = min(p.width / 2 - 40.0, p.height - 40.0)
+		let r1 = r - 5
+		let r2 = r + 5
+		let x = float(p.width) / 2
+		let y = float(p.height) - 10
 	
 		p.set_color(colors.text_soft1)
 		for i in 0:9
-			float w = i * 0.125 * pi - pi / 2
+			var w = i * 0.125 * pi - pi / 2
 			p.draw_line([x + r1 * sin(w), y - r1 * cos(w)], [x + r2 * sin(w), y - r2 * cos(w)])
 	
 		p.set_color(colors.text)
 		if c.pitch_detector.loud_enough
-			var (note, error) = get_note(c.pitch_detector.frequency)
+			let (note, error) = get_note(c.pitch_detector.frequency)
 			p.draw_str([x - 8, y - r2 - 22], note)
 			p.draw_str([x + r2 * 0.7 + 6, y - r2 * 0.7 - 22], "#")
 			p.draw_str([x - r2 * 0.7 - 10, y - r2 * 0.7 - 22], "b")

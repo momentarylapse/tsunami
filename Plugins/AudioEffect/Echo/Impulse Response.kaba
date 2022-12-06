@@ -3,19 +3,19 @@ use tsunami
 const AUTO_CONFIG_SAMPLE = ""
 
 func fold(x: float[], h: float[], out HH: complex[], out result: float[])
-	int N = len(x)
-	int K = len(h)
+	var N = len(x)
+	var K = len(h)
 	
 	# fft of input
-	float[] xx = x
+	var xx = x
 	xx.resize(N + K)
-	complex[] XX
+	var XX: complex[]
 	fft.r2c(xx, XX)
 	
 	# fft of kernel
 	if len(HH) != (N+K)/2+1
 		#print("recalc HH")
-		float[] hh = h
+		var hh = h
 		hh.resize(N + K)
 		fft.r2c(hh, HH)
 	
@@ -28,10 +28,10 @@ func fold(x: float[], h: float[], out HH: complex[], out result: float[])
 
 func test()
 	print("--------test")
-	float[] x = [1.0, 1.0, 0.0, 1.0]
-	float[] h = [0.5, 0.5, 0.0, 0.0]
-	float[] result
-	complex[] HH
+	var x = [1.0, 1.0, 0.0, 1.0]
+	var h = [0.5, 0.5, 0.0, 0.0]
+	var result: float[]
+	var HH: complex[]
 	fold(x, h, HH, result)
 	print(result)
 
@@ -71,11 +71,11 @@ class Folding extends AudioEffect
 		HH.clear()
 	
 	func mut do(out buf: float[], out overlap: float[])
-		float[] y
-		int N = len(buf)
-		int K = len(h)
+		var y: float[]
+		var N = len(buf)
+		var K = len(h)
 		
-		float[] ttt
+		var ttt: float[]
 		fold(buf, h, HH, ttt)
 		
 		if len(overlap) < N

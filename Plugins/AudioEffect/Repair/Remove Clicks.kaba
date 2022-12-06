@@ -13,11 +13,11 @@ func click_end(last: float, cur: float) -> bool
 	return abs(cur) < CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
 
 func find_clicks(b: float[]) -> int[]
-	int[] clicks
+	var clicks: int[]
 	for i in 1:len(b)-1
 		if click_start(b[i-1], b[i])
 			clicks.add(i)
-			int j1 = min(len(b), i + MAX_CLICK_SAMPLES)
+			var j1 = min(len(b), i + MAX_CLICK_SAMPLES)
 			for j in i:j1
 				if click_end(b[j-1], b[j])
 					i = j
@@ -34,17 +34,17 @@ func find_clicks(b: float[]) -> int[]
 
 class RemoveClicks extends AudioEffect
 	func unclick(out b: float[], start: int, end: int)
-		int i0 = start - 1
-		int i1 = end + 1
-		float v0 = b[i0]
-		float v1 = b[i1]
-		float m = (v1 - v0) / (i1 - i0)
+		var i0 = start - 1
+		var i1 = end + 1
+		var v0 = b[i0]
+		var v1 = b[i1]
+		var m = (v1 - v0) / (i1 - i0)
 		for i in i0:i1
 			b[i] = v0 + m * (i - i0)
 		
 	
 	func repair(out b: float[])
-		int[] clicks = find_clicks(b)
+		var clicks = find_clicks(b)
 		for i in 0:len(clicks):2
 			unclick(b, clicks[i], clicks[i+1])
 

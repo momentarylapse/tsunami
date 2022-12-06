@@ -103,7 +103,7 @@ class SamplePanel extends ConfigPanel
 	func override update()
 		reset("list")
 		for z in sc.zones
-			string name = ""
+			var name = ""
 			if weak(z.sample)
 				name = z.sample.origin.name
 			set_string("list", pitch_name(z.pitch_min) + " - " + pitch_name(z.pitch_max) + "\\" + name)

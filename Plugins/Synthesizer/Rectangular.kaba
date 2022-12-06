@@ -14,7 +14,7 @@ class RectangleRenderer extends PitchRenderer
 
 	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
-			float d = sin(phase)
+			var d = sin(phase)
 			if d > 0
 				buf.c[0][i] += volume
 			else

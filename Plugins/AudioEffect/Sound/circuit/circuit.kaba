@@ -3,47 +3,23 @@ use linalg
 
 class Node
 	var phi = 0.0
-	var pos: complex
+	var pos: vec2
 	func __init__()
-	func __init__(p: complex)
+	func __init__(p: vec2)
 		pos = p
 
 enum EdgeType
-	CABLE
-	SOURCE
-	RESISTOR
-	CAPACITOR
-	INDUCTOR
-	DIODE
-	NUM
+	CABLE as "Cable"
+	SOURCE as "Source"
+	RESISTOR as "Resistor"
+	CAPACITOR as "Capacitor"
+	INDUCTOR as "Inductor"
+	DIODE as "Diode"
 
-func edge_name(t: EdgeType) -> string
-	if t == EdgeType.CABLE
-		return "Cable"
-	if t == EdgeType.SOURCE
-		return "Source"
-	if t == EdgeType.RESISTOR
-		return "Resistor"
-	if t == EdgeType.CAPACITOR
-		return "Capacitor"
-	if t == EdgeType.INDUCTOR
-		return "Inductor"
-	if t == EdgeType.DIODE
-		return "Diode"
-	return "???"
-
-func edge_type(s: string) -> EdgeType
-	for i in 0:int(EdgeType.NUM)
-		var t: EdgeType = EdgeType.from_int(i)
-		if s == edge_name(t)
-			return t
-	var t: EdgeType = EdgeType.from_int(-1)
-	return t
-	
 
 # ARGH
 func empty() -> float[]
-	float[] r
+	var r: float[]
 	return r
 
 class Edge
@@ -78,7 +54,7 @@ class Cable extends Edge
 		super.__init__(EdgeType.CABLE, n, empty())
 	func override g(dt: float) -> float
 		return 1000
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 
@@ -89,7 +65,7 @@ class Source extends Edge
 		return 1 / param[1]
 	func override I_off(dt: float) -> float
 		return -param[0]
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt) + param[0]
 	func override param_names() -> string[]
@@ -100,7 +76,7 @@ class Resistor extends Edge
 		super.__init__(EdgeType.RESISTOR, n, [R])
 	func override g(dt: float) -> float
 		return 1 / param[0]
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 	func override param_names() -> string[]
@@ -114,14 +90,14 @@ class Capacitor extends Edge
 		return param[0] / dt
 	func override I_off(dt: float) -> float
 		return U_prev * param[0] / dt
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = (U - U_prev) * g(dt)
-	func override iterate(dt: float)
+	func override mut iterate(dt: float)
 		U_prev = U
 	func override param_names() -> string[]
 		return ["C"]
-	func override reset_state()
+	func override mut reset_state()
 		U_prev = 0
 
 class Inductor extends Edge
@@ -132,14 +108,14 @@ class Inductor extends Edge
 		return dt / param[0]
 	func override I_off(dt: float) -> float
 		return -I_prev
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_prev + U * g(dt)
-	func override iterate(dt: float)
+	func override mut iterate(dt: float)
 		I_prev = I
 	func override param_names() -> string[]
 		return ["L"]
-	func override reset_state()
+	func override mut reset_state()
 		I_prev = 0
 
 #const float DIODE_DEFAULT_VT = 0.02585
@@ -182,7 +158,7 @@ class Diode extends Edge
 		if U < u_low
 			return -i_low
 		return g(dt) * U - I_id(U)
-	func override update(nodes: Node[], dt: float)
+	func override mut update(nodes: Node[], dt: float)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_id(U)
 
@@ -211,26 +187,26 @@ class Circuit
 	
 	func mut reset_default()
 		clear()
-		nodes.add(Node(complex(0.2, 0.3)))
-		nodes.add(Node(complex(0.2, 0.7)))
+		nodes.add(Node((0.2, 0.3)))
+		nodes.add(Node((0.2, 0.7)))
 	
 	func mut reset_state()
 		for e in edges
 			e.reset_state()
 	
 	func quick_out()
-		string s
+		var s: string
 		for e in edges
 			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
 	func create_G(out G: Matrix, dt: float)
-		int n = len(nodes)-1
+		var n = len(nodes)-1
 		G.clear(n,n)
 		for e in edges
-			int a = e.a-1
-			int b = e.b-1
-			float g = e.g(dt)
+			var a = e.a-1
+			var b = e.b-1
+			var g = e.g(dt)
 			if a >= 0 and b >= 0
 				G.add(a, b, -g)
 				G.add(b, a, -g)
@@ -240,33 +216,33 @@ class Circuit
 				G.add(b, b, g)
 	
 	func create_I(out I: float[], I_in: float, dt: float)
-		int n = len(nodes)-1
+		var n = len(nodes)-1
 		I = [I_in]
 		I.resize(n)
 		for e in edges
-			int a = e.a-1
-			int b = e.b-1
-			float I_off = e.I_off(dt)
+			var a = e.a-1
+			var b = e.b-1
+			var I_off = e.I_off(dt)
 			if a >= 0
 				I[a] += I_off
 			if b >= 0
 				I[b] -= I_off
 
 	func mut optimizer_step(I_in: float, dt: float)
-		int n = len(nodes)-1
-		Matrix G
+		var n = len(nodes)-1
+		var G: Matrix
 		create_G(G, dt)
 		#print("G")
 		#print(G)
 		
 		
-		float[] I
+		var I: float[]
 		create_I(I, I_in, dt)
 		#print("I " + I)
 	
 		# U = R * I
 		# I = G * U
-		float[] u = G.solve(I)
+		var u = G.solve(I)
 		#print("u " + u)
 		
 		# update potentials
@@ -287,9 +263,9 @@ class Circuit
 			e.iterate(dt)
 	
 	func get_xxxx() -> float
-		float Uin = nodes[1].phi
-		float Uout = nodes[_out].phi
-		float factor = Uout / Uin
+		var Uin = nodes[1].phi
+		var Uout = nodes[_out].phi
+		var factor = Uout / Uin
 		#print(factor)
 		return factor
 	
@@ -297,7 +273,7 @@ class Circuit
 		for t in 0:t_max:dt
 		
 			# input
-			float input = amp
+			var input = amp
 			if type == 1
 				input = amp * sin(t * omega)
 			else if type == 2
@@ -310,7 +286,7 @@ class Circuit
 			time_step(input, dt)
 			
 			# result
-			float[] I, U, phi
+			var I, U, phi: float[]
 			for e in edges
 				I.add(e.I)
 				U.add(e.U)
@@ -321,12 +297,12 @@ class Circuit
 			res.phi.add(phi)
 	
 	func export() -> string
-		string s
+		var s: string
 		for n in nodes
 			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
 		for e in edges
-			s += edge_name(e.type) + ":{{e.a}:{{e.b}}"
-			int n = len(e.param_names())
+			s += str(e.type) + ":{{e.a}:{{e.b}}"
+			var n = len(e.param_names())
 			for i in 0:n
 				s += ":{{e.param[i]}}"
 			s += "\n"
@@ -335,18 +311,18 @@ class Circuit
 	
 	func mut import(s: string)
 		clear()
-		string[] lines = s.explode("\n")
+		var lines = s.explode("\n")
 		for l in lines
-			string[] x = l.explode(":")
+			var x = l.explode(":")
 			if len(x) == 0
 				continue
 			if x[0] == "Node"
-				nodes.add(Node(complex(float(x[1]), float(x[2]))))
+				nodes.add(Node((float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
 				_out = int(x[1])
 			else
-				var t = edge_type(x[0])
-				int[] n = [int(x[1]), int(x[2])]
+				var t = EdgeType.parse(x[0])
+				var n = [int(x[1]), int(x[2])]
 				var e: Edge* = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
@@ -371,14 +347,14 @@ class Circuit
 		return e
 
 func _main()
-	Circuit c
+	var c: Circuit
 	#c.edges.add(new Resistor([0,1], 1))
-	#c.nodes.add(Node(complex(0,0)))
+	#c.nodes.add(Node((0,0)))
 	#c.edges.add(new Diode([0, 2]))
 	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
 	print(str(c))
-	SimResult res
+	var res: SimResult
 	c.simulate(1, 1, 0.1, 1, 0, res)
 	print(str(c))
 

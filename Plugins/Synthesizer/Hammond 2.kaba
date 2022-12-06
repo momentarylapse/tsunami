@@ -108,15 +108,15 @@ Grid ? '' vertical
 		set_float("release", hc.release * 1000)
 
 func create_stutter(intensity: float) -> float[]
-	float[] stutter
+	var stutter: float[]
 	stutter.resize(440) # 10ms
 	stutter = 1
 	for i in 0:10
-		int offset = 40 + rand(200)
+		var offset = 40 + rand(200)
 		for j in 0:3
 			stutter[offset + j] = (1 - intensity)
 	for i in 0:10
-		int offset = 240 + rand(200)
+		var offset = 240 + rand(200)
 		for j in 0:3
 			stutter[offset + j] = (1 - intensity)
 	return stutter
@@ -127,7 +127,7 @@ class SineGenerator
 	func mut set_omega(omega: float)
 		delta_phi = omega
 	func mut read(n: int) -> float[]
-		float[] f
+		var f: float[]
 		f.resize(n)
 		for i in 0:n
 			f[i] = sin(phi)
@@ -167,9 +167,9 @@ class HammondRenderer extends PitchRenderer
 		#filter.reset()
 
 	func override render(out buf: AudioBuffer) -> bool
-		int n = len(buf)
+		var n = len(buf)
 		
-		float[] b = osci[0].read(n) * (synth.config.intensity[0] * A[0])
+		var b = osci[0].read(n) * (synth.config.intensity[0] * A[0])
 		for i in 1:NUM_HARMONICS
 			b += osci[i].read(n) * (synth.config.intensity[i] * A[i])
 

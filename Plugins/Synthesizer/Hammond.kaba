@@ -129,11 +129,11 @@ class HammondRenderer extends PitchRenderer
 		stutter.resize(440) # 10ms
 		stutter = 1
 		for i in 0:10
-			int offset = 40 + rand(200)
+			var offset = 40 + rand(200)
 			for j in 0:3
 				stutter[offset + j] = (1 - synth.config.key_stutter)
 		for i in 0:10
-			int offset = 240 + rand(200)
+			var offset = 240 + rand(200)
 			for j in 0:3
 				stutter[offset + j] = (1 - synth.config.key_stutter)
 	func override on_config()
@@ -151,7 +151,7 @@ class HammondRenderer extends PitchRenderer
 		for i in 0:len(buf)
 			volume = env.get()
 
-			float d = 0
+			var d: float = 0
 			for x,j in phi
 				d += sin(x * HARMONIC_FREQS[j]) * synth.config.intensity[j] * A[j]
 				

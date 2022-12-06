@@ -21,7 +21,7 @@ class ImportNKI extends TsunamiPlugin
 		var list = fs.search(dir, "*.wav", "f")
 		for e in list
 		
-			AudioBuffer buf
+			var buf: AudioBuffer
 			session.storage.load_buffer(buf, dir << e)
 			var s = new Sample(e, buf)
 			session.song.add_sample(s)

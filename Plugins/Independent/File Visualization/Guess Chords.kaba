@@ -9,7 +9,7 @@ class XXX extends TsunamiPlugin
 			stop()
 			return
 
-		int n = 0
+		var n = 0
 		session.song.begin_action_group("guess chords")
 		for l in session.song.layers()
 			if session.view.sel.has_layer(l) and l.type == SignalType.MIDI
@@ -22,12 +22,12 @@ class XXX extends TsunamiPlugin
 
 	func guess_chords(out l: TrackLayer, r: Range)
 		for b in session.song.bars.get_bars(r)
-			Range rr = b.range()
-			string chord = guess_chord(l.midi.get_notes(rr), rr)
+			var rr = b.range()
+			var chord = guess_chord(l.midi.get_notes(rr), rr)
 			l.add_marker(new TrackMarker(b.range(), chord))
 	
 	func score_overlap(midi: MidiNote*[], pitch: int[], r: Range) -> int
-		int score = 0
+		var score = 0
 		for n in midi
 			for p in pitch
 				if (int(n.pitch + 0.1) - p + 120) % 12 == 0
@@ -35,14 +35,14 @@ class XXX extends TsunamiPlugin
 		return score
 	
 	func guess_chord(midi: MidiNote*[], r: Range) -> string
-		Chord best
-		int best_score = 0
+		var best: Chord
+		var best_score = 0
 		for p in 0:12
 			for t in 0:3
-				Chord c
+				var c: Chord
 				c.base_tone = 60 + p
 				c.type = Chord.Type.from_int(t)
-				int score = score_overlap(midi, c.pitch(), r)
+				var score = score_overlap(midi, c.pitch(), r)
 				if score > best_score
 					best_score = score
 					best = c

@@ -6,16 +6,16 @@ const NUM_CHUNKS = 4
 
 class Test extends TsunamiPlugin
 	func override on_start()
-		AudioBuffer buf
+		var buf: AudioBuffer
 		buf.resize(CHUNK_SIZE * NUM_CHUNKS)
-		float omega = 0.13
+		var omega = 0.13
 		for i in 0:len(buf)
 			buf.c[0][i] = sin(omega * i)
 		
 		for j in 0:NUM_CHUNKS
 			print("-----")
-			complex[] c
-			float[] b, b2
+			var c: complex[]
+			var b, b2: float[]
 			for i in 0:CHUNK_SIZE
 				b.add(buf.c[0][i + j*CHUNK_SIZE])
 			fft.r2c(b, c)
@@ -30,8 +30,8 @@ class Test extends TsunamiPlugin
 			for i in 0:CHUNK_SIZE
 				buf.c[1][i + j*CHUNK_SIZE] = b2[i]
 		
-		float dmax = 0
-		float step_max = 0
+		var dmax = 0.0
+		var step_max = 0.0
 		for i in 1:buf.length
 			dmax = max(dmax, abs(buf.c[1][i] - buf.c[0][i]))
 			step_max = max(step_max, abs(buf.c[1][i] - buf.c[1][i-1]))

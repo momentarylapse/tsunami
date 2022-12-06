@@ -23,14 +23,14 @@ class CueSplitter extends TsunamiPlugin
 	
 	func mut load_cue(filename: Path)
 		var dir = filename.parent()
-		string fn
-		string year, album, artist
+		var fn: string
+		var year, album, artist: string
 		var parts: Part*[]
 		var cur: Part* = nil
 		try
 			var f = new TextLinesFormatter(fs.open(filename, "rt"))
 			while true
-				string s
+				var s: string
 				f >> s
 				#print(s)
 				
@@ -66,7 +66,7 @@ class CueSplitter extends TsunamiPlugin
 		
 		for p,i in parts
 			print("-----")
-			Tag[] tags
+			var tags: Tag[]
 			if artist != ""
 				tags.add(Tag("artist", artist))
 			if album != ""
@@ -75,13 +75,13 @@ class CueSplitter extends TsunamiPlugin
 				tags.add(Tag("year", year))
 			tags.add(Tag("title", p.title))
 			tags.add(Tag("tracknumber", str(i+1)))
-			int offset = p.foffset * session.song.sample_rate
-			int end = session.song.range().length
+			var offset = p.foffset * session.song.sample_rate
+			var end = session.song.range().length
 			if i < len(parts)-1
 				print(parts[i+1].foffset)
-				float fsr = session.song.sample_rate
+				var fsr: float = session.song.sample_rate
 				print(fsr)
-				float fend = parts[i+1].foffset * fsr
+				var fend = parts[i+1].foffset * fsr
 				print(fend)
 				end = fend
 				print(end)

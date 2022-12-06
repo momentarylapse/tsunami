@@ -76,13 +76,13 @@ class BiquadGrid extends Grid
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
-		BiquadGainCurve gain
+		var gain: BiquadGainCurve
 		gain.filter.params = c.create_filter()
 		gain.sample_rate = sample_rate
 		draw_curve_c(p, gain, true)
 	
 		# curve + area below
-		BiquadPhaseShiftCurve phase
+		var phase: BiquadPhaseShiftCurve
 		phase.filter.params = c.create_filter()
 		phase.sample_rate = sample_rate
 		draw_curve_c(p, phase, false)
@@ -174,12 +174,12 @@ Grid ? '' vertical
 		event("apply", on_apply)
 
 	func mut on_apply()
-		BiquadFilter.Parameters p
-		float sample_rate = bp.c.session.sample_rate()
-		int t = get_int("type")
-		float freq = get_float("frequency")
-		float q = get_float("q")
-		float gain = get_float("gain")
+		var p: BiquadFilter.Parameters
+		var sample_rate: float = bp.c.session.sample_rate()
+		var t = get_int("type")
+		var freq = get_float("frequency")
+		var q = get_float("q")
+		var gain = get_float("gain")
 		if t == 0
 			p.create_low_pass(freq, q, sample_rate)
 		else if t == 1

@@ -5,7 +5,7 @@ use tsunami
 
 
 func abs_max(buf: float[]) -> float
-	float m = 0.0
+	var m = 0.0
 	for b in buf
 		m = max(m, abs(b))
 	return m
@@ -26,9 +26,9 @@ class Volume extends AudioEffect
 		return new Volume.Panel(self)
 
 	func override process(out buf: AudioBuffer)
-		float factor = config.volume
+		var factor = config.volume
 		if config.maximize
-			float _max = 0
+			var _max: float = 0
 			for cc in buf.c
 				_max = max(_max, abs_max(cc))
 			factor = 1 / _max

@@ -6,7 +6,7 @@ class HeavySynthesizer extends Synthesizer
 	func override render(out buf: AudioBuffer)
 		sub.set_sample_rate(sample_rate)
 		for e in events
-			MidiEvent ee = e
+			var ee = e
 			ee.volume = e.volume * 0.3
 			sub.events.add(ee)
 			ee.pitch = e.pitch + 12

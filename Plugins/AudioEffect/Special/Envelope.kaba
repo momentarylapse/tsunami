@@ -23,10 +23,10 @@ class Envelope extends AudioEffect
 
 	func mut do(out buf: float[], c: int)
 		
-		float v = value[c]
-		float dv = dvalue[c]
+		var v = value[c]
+		var dv = dvalue[c]
 		for i in 0:len(buf)
-			float x = abs(buf[i])
+			var x = abs(buf[i])
 			
 			if x > v
 				# go up

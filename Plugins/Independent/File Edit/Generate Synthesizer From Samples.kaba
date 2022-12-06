@@ -4,7 +4,7 @@ use AudioEffect.Pitch.PitchShift
 use hui
 
 func get_instruments(p: any, i: any) -> int
-	int ins = 0
+	var ins = 0
 	for z in p["zones"].as_array()
 		if z.has("instrument")
 			ins ++
@@ -12,7 +12,7 @@ func get_instruments(p: any, i: any) -> int
 	return ins
 
 func get_samples(p: any, i: any) -> int
-	int samples = 0
+	var samples = 0
 	for z in p["zones"].as_array()
 		if z.has("instrument")
 			var ii = i[int(z["instrument"])]
@@ -92,8 +92,8 @@ class XXX extends TsunamiPlugin
 						continue
 					if not zz.has("keys")
 						continue
-					int k0 = int(zz["keys"][0])
-					int k1 = int(zz["keys"][1]) + 1
+					var k0 = int(zz["keys"][0])
+					var k1 = int(zz["keys"][1]) + 1
 					var s = session.song.samples[int(zz["sample"])]
 					if zz.has("root-key")
 						s.set_value("pitch", str(zz["root-key"]))
@@ -103,7 +103,7 @@ class XXX extends TsunamiPlugin
 						s.set_value("end-loop", str(zz["end-loop"]))
 					if s.get_value("pitch") == ""
 						continue
-					int root = int(s.get_value("pitch"))
+					var root = int(s.get_value("pitch"))
 					for pitch in k0:k1
 						if pitch >= len(synth.config.samples)
 							synth.config.samples.resize(pitch+1)
@@ -128,7 +128,7 @@ class XXX extends TsunamiPlugin
 		print("shift {{from}} -> {{to}}")
 		#let buf = *source.origin.buf
 		
-		AudioBuffer buf
+		var buf: AudioBuffer
 		buf.resize(len(source.buf) * pow(2, (from - to)/12.0))
 		print("   {{len(source.buf)}} {{len(buf)}}")
 	#	PitchShift* ps = CreateAudioEffect(session, "Pitch Shift")

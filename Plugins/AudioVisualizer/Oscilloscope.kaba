@@ -23,17 +23,17 @@ DrawingArea area '' height=200 expandy")
 		redraw("area")
 	
 	func mut on_draw(p: Painter)
-		float w = p.width
-		float h = p.height
+		var w = p.width
+		var h = p.height
 		
 		p.set_color(colors.background)
 		p.draw_rect([0, w, 0, h])
 		
-		AudioBuffer buf
+		var buf: AudioBuffer
 		c.ring_buffer.peek(buf, NUM_SAMPLES, RingBuffer.PeekMode.BACKWARD_COPY_WRAP)
 		p.set_color(color(0,1,0, 0.2))
 		#p.set_line_width(0.5)
-		float x0, y0, x1, y1
+		var x0, y0, x1, y1: float
 		for i in 0:len(buf)
 			x1 = w * (buf.c[0][i] / 2 + 0.5)
 			y1 = h * (buf.c[1][i] / 2 + 0.5)

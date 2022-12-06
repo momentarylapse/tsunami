@@ -20,9 +20,9 @@ class Chunksize extends AudioEffect
 			return -1
 		
 		while ring_buffer.available() < len(buf)
-			AudioBuffer temp
+			var temp: AudioBuffer
 			temp.resize(config.size)
-			int r = source.read_audio(temp)
+			var r = source.read_audio(temp)
 			if r < 0
 				return 0
 			ring_buffer.write(temp)

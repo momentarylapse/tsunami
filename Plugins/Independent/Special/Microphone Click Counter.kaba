@@ -35,9 +35,9 @@ class ClickCounterPanel extends ConfigPanel
 
 	func draw_volume(p: Painter)
 		p.set_color(colors.text_soft3)
-		float y0 = 30
-		float y1 = p.height - 5
-		float h = y1 - y0
+		var y0: float = 30
+		var y1: float = p.height - 5
+		var h = y1 - y0
 		p.draw_rect([5, 10, y0 + h * (1 - c.click_counter.volume), y0 + h * (2 - c.click_counter.volume)])
 		p.set_color(colors.text_soft2)
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])

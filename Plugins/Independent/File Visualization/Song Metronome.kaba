@@ -29,12 +29,12 @@ class BlurredDot
 		has_prev = false
 	func mut draw(p: Painter, c: color, r: float)
 		if has_prev
-			float dt = 1.0 / MOTION_BLUR_COUNT
-			color cc = c
+			var dt = 1.0 / MOTION_BLUR_COUNT
+			var cc = c
 			cc.a = sqrt(dt)
 			p.set_color(cc)
 			for t in 0.0:1.0:dt
-				float tt = pow(t-0.5, 3)*4+0.5
+				var tt = pow(t-0.5, 3)*4+0.5
 				p.draw_circle([pos.x * tt + pos0.x * (1-tt), pos.y * tt + pos0.y * (1-tt)], r)
 		else
 			p.set_color(c)
@@ -96,28 +96,28 @@ Grid ? '' vertical
 		redraw("area")
 	
 	func mut on_draw(p: Painter)
-		float w = p.width
-		float h = p.height
-		float x0 = w / 2
-		float y0 = h / 2
-		float r = min(x0, y0) * 0.9
+		var w: float = p.width
+		var h: float = p.height
+		var x0 = w / 2
+		var y0 = h / 2
+		var r = min(x0, y0) * 0.9
 		
 		var source = metro.session.view.renderer.get_beat_source()
 		if !source
 			return
 		
-		int cur_bar = source.cur_bar()
-		float beat_fraction = source.beat_fraction()
-		int cur_beat = source.cur_beat()
-		int num_beats = source.beats_per_bar()
+		var cur_bar = source.cur_bar()
+		var beat_fraction = source.beat_fraction()
+		var cur_beat = source.cur_beat()
+		var num_beats = source.beats_per_bar()
 		
-		float closeness = beat_fraction*2-1
+		var closeness = beat_fraction*2-1
 		if beat_fraction < 0.5
 			closeness = 1 - beat_fraction*2
-		float bar_fraction = (cur_beat + beat_fraction) / num_beats
+		var bar_fraction = (cur_beat + beat_fraction) / num_beats
 		
 		# background
-		color bg = colors.background
+		var bg = colors.background
 		if allow_blink_background
 			bg = color.interpolate(color.RED, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
@@ -136,25 +136,25 @@ Grid ? '' vertical
 			p.draw_circle([x0, y0 - r], r*0.07)
 		
 			# moving point
-			float t = beat_fraction - 0.5
-			float phi = 2 *pi * (2*t*t*t + t/2)
+			var t = beat_fraction - 0.5
+			var phi = 2 *pi * (2*t*t*t + t/2)
 			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
 			dot.draw(p, colors.text, r*0.1)
 		else if mode == AnimationMode.BOUNCE
-			float t = beat_fraction
+			var t = beat_fraction
 			dot.move(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r)
 			dot.draw(p, colors.text, r*0.1)
 		else if mode == AnimationMode.BOUNCE_WALK
 			p.set_color(colors.text_soft3)
 			for i in 0:num_beats
-				float tx = loop((i + 0.5)/num_beats, 0, 1)
+				var tx = loop((i + 0.5)/num_beats, 0, 1)
 				if i == 0
 					p.draw_circle([w * tx, y0 + r], r*0.05)
 				else
 					p.draw_circle([w * tx, y0 + r], r*0.03)
 			
-			float t = beat_fraction
-			float tx = loop(bar_fraction + 0.5/num_beats, 0, 1)
+			var t = beat_fraction
+			var tx = loop(bar_fraction + 0.5/num_beats, 0, 1)
 			if w*tx < dot.pos.x
 				dot.jump(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
 			else
@@ -162,7 +162,7 @@ Grid ? '' vertical
 			dot.draw(p, colors.text, r*0.1)
 		
 		# beat number
-		float fs = r * 0.5
+		var fs = r * 0.5
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
 		if cur_beat == 0
@@ -178,8 +178,8 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	func draw_part_info(p: Painter, cur_bar_index: int)
-		float w = p.width
-		float h = p.height
+		var w: float = p.width
+		var h: float = p.height
 		
 		var song = metro.session.song
 		var t = song.time_track()
@@ -191,25 +191,25 @@ Grid ? '' vertical
 		if cur_bar_index + 1 < len(song.bars)
 			next_bar = weak(song.bars[cur_bar_index + 1])
 		
-		int offset = cur_bar.offset
+		var offset = cur_bar.offset
 		var cur_part = get_part(t, offset + DELTA)
 		var next_part = get_part(t, offset + cur_bar.length + DELTA)
 		p.set_color(colors.text_soft2)
-		float fs = h * 0.08
+		var fs = h * 0.08
 		p.set_font_size(fs)
 		if cur_part
 			p.draw_str([10, 5], cur_part.text)
-			int first_bar = bar_index(song, cur_part.range.offset + DELTA)
+			var first_bar = bar_index(song, cur_part.range.offset + DELTA)
 			p.draw_str([w - 5 - fs*3, 5], str((cur_bar.index - first_bar) + 2))
 	
-		string change
+		var change: string
 		if next_part and next_part != cur_part
 			change = next_part.text
 		if next_bar
 			if len(next_bar.beats) != len(cur_bar.beats)
 				change += "  {{len(next_bar.beats)}}/₄"
-			float cur_bpm = cur_bar.bpm(song.sample_rate)
-			float next_bpm = next_bar.bpm(song.sample_rate)
+			var cur_bpm = cur_bar.bpm(song.sample_rate)
+			var next_bpm = next_bar.bpm(song.sample_rate)
 			if abs(cur_bpm - next_bpm) > 2
 				change += "  {{next_bpm|.0}} bpm"
 		if len(change) > 0

@@ -99,8 +99,8 @@ class MyDialog extends hui.Dialog
 	func mut make_sure_sample_on_screen(s: int)
 		if y_offset_t >= 0
 			return
-		float y0 = sample_to_screen(s).y
-		float dy = mlp.get_line_dy()
+		var y0 = sample_to_screen(s).y
+		var dy = mlp.get_line_dy()
 		if y0 < 0
 			set_scroll_target(y_offset + y0)
 		else if y0 + dy*2 > area.y2
@@ -176,7 +176,7 @@ class MyDialog extends hui.Dialog
 
 	func override on_draw(p: Painter)
 		area = [0,p.width, 0,p.height]
-		any conf = dyn([])
+		var conf = dyn([])
 		for t,i in weak(session.song.tracks)
 			if t.type != SignalType.MIDI
 				continue

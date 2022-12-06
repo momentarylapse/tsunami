@@ -89,7 +89,7 @@ class Looper extends TsunamiPlugin
 		
 		length = len(recorder.buffer)
 		var t = song.add_track(SignalType.AUDIO, 0)
-		AudioBuffer tbuf
+		var tbuf: AudioBuffer
 		var a = t.layers[0].edit_buffers(tbuf, Range(0, length))
 		tbuf.set(recorder.buffer, 0, 1.0)
 		t.layers[0].edit_buffers_finish(a)

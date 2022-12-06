@@ -23,7 +23,7 @@ class SampleRenderer extends PitchRenderer
 	func override render(out buf: AudioBuffer) -> bool
 		if not weak(sample) or (len(events) == 0)
 			return false
-		int[] to_del
+		var to_del: int[]
 		for e,i in events
 			buf.add(*sample.origin.buf, e.pos, e.volume)
 			e.pos -= buf.length
@@ -54,14 +54,14 @@ class SamplePanel extends ConfigPanel
 	func override update()
 		reset("list")
 		for i in 0:MAX_PITCH
-			string name = ""
+			var name = ""
 			if i < len(sc.samples)
 				if weak(sc.samples[i])
 					name = sc.samples[i].origin.name
 			set_string("list", pitch_name(i) + "\\" + name)
 		
 	func mut on_select()
-		int n = get_int("")
+		var n = get_int("")
 		if n < 0
 			return
 		if n >= len(sc.samples)

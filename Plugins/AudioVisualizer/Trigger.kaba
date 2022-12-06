@@ -45,13 +45,13 @@ Grid ? '' vertical
 		changed()
 	
 	func mut on_draw(p: Painter)
-		float w = p.width
-		float h = p.height
+		var w = p.width
+		var h = p.height
 		
 		p.set_color(colors.background)
 		p.draw_rect([0, w, 0, h])
 		
-		float[] curve_before, curve_after
+		var curve_before, curve_after: float[]
 		c.lock()
 		curve_before = c.curve_before
 		curve_after = c.curve_after
@@ -64,7 +64,7 @@ Grid ? '' vertical
 		
 		p.set_color(color(0,1,0, 1))
 		p.set_line_width(1.5)
-		vec2[] z
+		var z: vec2[]
 		for v,i in curve_before
 			z.add(vec2(w/2 - len(curve_before) + i, h/2 - h * v / 2))
 		for v,i in curve_after

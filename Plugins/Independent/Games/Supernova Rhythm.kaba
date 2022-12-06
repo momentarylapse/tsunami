@@ -34,12 +34,12 @@ Grid ? ''
 	func on_button()
 	
 	func mut on_draw(p: Painter)
-		rect r = rect(0, p.width, 0, p.height)
+		var r = rect(0, p.width, 0, p.height)
 		cam.area = r
-		int pos = c.recorder.buffer.samples
+		var pos = c.recorder.buffer.samples
 		cam.set_range(Range(pos-44100*3, 44100*5))
 		
-		GridColors gc
+		var gc: GridColors
 		gc.fg = colors.grid
 		gc.bg = colors.background
 		gp.set_context(r, gc)
@@ -49,7 +49,7 @@ Grid ? ''
 		
 		var midi = c.recorder.buffer.get_notes(cam.range())
 		
-		Instrument ii
+		var ii: Instrument
 		ii.type = 6#1
 		mp.set_context(r, ii, true, MidiMode.CLASSICAL)
 		mp.draw_background(p)
@@ -60,7 +60,7 @@ Grid ? ''
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 		
 		for pp,i in c.pitch_detector.pitch_power2
-			float x = (i-20) * 4
+			var x: float = (i-20) * 4
 			p.draw_line([x, 0], [x, pp/13])
 
 class SupernovaRhythm extends TsunamiPlugin
@@ -72,7 +72,7 @@ class SupernovaRhythm extends TsunamiPlugin
 
 	func override on_start()
 		
-		int dt = 4400 # 100 ms
+		var dt = 4400 # 100 ms
 		midi.add(new MidiNote(RangeTo(dt, dt*3), 60, 1.0))
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
 		

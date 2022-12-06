@@ -13,16 +13,16 @@ class CircuitEffect extends AudioEffect
 	
 	func override reset_state()
 		c.nodes.clear()
-		c.nodes.add(Node(complex(0,0)))
-		c.nodes.add(Node(complex(0,0)))
+		c.nodes.add(Node([0,0]))
+		c.nodes.add(Node([0,0]))
 		c.edges.add(new Resistor([0,1], 100))
 		c.edges.add(new Diode([0,1]))
 		c.edges.add(new Diode([1,0]))
 	
 	func override process(out buf: AudioBuffer)
-		float dt = 1.0 / session.sample_rate()
+		var dt = 1.0 / session.sample_rate()
 		for f in buf.c[0]
-			float I_in = f / 40
+			var I_in = f / 40
 			c.time_step(I_in, dt)
 			f = c.nodes[1].phi / 2
 		buf.auto_generate_channels()

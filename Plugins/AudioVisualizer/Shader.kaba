@@ -389,7 +389,7 @@ Grid ? '' vertical
 		#NixKill()
 		
 	func mut update_shader()
-		string frag = SOURCE[type]
+		var frag = SOURCE[type]
 		
 		shader = Shader.create("
 <Layout>
@@ -423,7 +423,7 @@ uniform float iVolume;
 	func mut on_draw()
 		_time += timer.get()
 		c.lock()
-		float volume = max(c.buffer[c.current_reading].c[0])
+		var volume = max(c.buffer[c.current_reading].c[0])
 		c.unlock()
 		
 		#gl.start()

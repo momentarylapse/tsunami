@@ -32,13 +32,13 @@ class HullCurve extends AudioEffect
 
 	func hull(out b: float[])
 	
-		FloatInterpolator fi
+		var fi: FloatInterpolator
 		config.fill_inter(fi)
 	
 		# hull curve
 		for i in 1:len(b)
-			float param = float(i) / len(b)
-			float db = fi.get(param)
+			var param = float(i) / len(b)
+			var db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
 	func override process(out buf: AudioBuffer)
@@ -56,7 +56,7 @@ class HullGrid extends Grid
 	func override on_draw(c: Painter)
 	
 		# curve + area below
-		FloatInterpolator fi
+		var fi: FloatInterpolator
 		config.fill_inter(fi)
 		draw_curve(c, fi, true)
 	
@@ -95,8 +95,8 @@ class HullGrid extends Grid
 		# move
 		if hui.get_event().button_l and (selected >= 0)
 			config.curve[selected] = get_mouse2()
-			float xmin = 0
-			float xmax = 1
+			var xmin: float = 0
+			var xmax: float = 1
 			if selected > 0
 				xmin = config.curve[selected - 1].x
 			if selected < len(config.curve) - 1

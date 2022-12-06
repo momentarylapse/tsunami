@@ -22,7 +22,7 @@ class MidiFont
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)
-		string[] ii
+		var ii: string[]
 		for t in song.tracks
 			if t.type == SignalType.MIDI
 				ii.add(t.name)
@@ -56,7 +56,7 @@ class FontList
 		return -1
 		
 	func get_names() -> string[]
-		string[] list
+		var list: string[]
 		for s in fonts
 			list.add(s.name)
 		return list
@@ -71,14 +71,14 @@ class FontList
 	func mut update()
 		var list = fs.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
 		for e in list
-			string name = str(e)[:-5]
+			var name = str(e)[:-5]
 			if find(name) >= 0
 				continue
 			fonts.add(new MidiFont(name))
 	
 	func mut get(session: Session, name: string) -> MidiFont*
 		update()
-		int n = find(name)
+		var n = find(name)
 		if n < 0
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
@@ -166,7 +166,7 @@ class FontPanel extends ConfigPanel
 
 		reset("instruments")
 		var instruments = font_list.instruments(c.session, sc.name)
-		bool match = false
+		var match = false
 		for ins,i in instruments
 			add_string("instruments", ins)
 			if ins == sc.instrument
@@ -177,7 +177,7 @@ class FontPanel extends ConfigPanel
 		
 		
 	func mut on_select()
-		int n = get_int("")-1
+		var n = get_int("")-1
 		sc.name = ""
 		if n >= 0 and n < len(font_list.fonts)
 			sc.name = font_list.fonts[n].name
@@ -185,7 +185,7 @@ class FontPanel extends ConfigPanel
 		update()
 	
 	func mut on_instruments()
-		int n = get_int("")
+		var n = get_int("")
 		sc.instrument = ""
 		var instruments = font_list.instruments(c.session, sc.name)
 		if n >= 0 and n < len(instruments)

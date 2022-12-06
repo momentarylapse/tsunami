@@ -26,8 +26,8 @@ var LoudEnough: bool
 
 var error: float
 func get_note(f: float) -> string
-	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
-	int rel = int(pitch + 0.5) % 12
+	var pitch = log(f / 440.0) / log(2.0) * 12 + 69
+	var rel = int(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
 	return rel_pitch_name(rel)
 	#loopf(fl, 0, 1)
@@ -35,9 +35,9 @@ func get_note(f: float) -> string
 
 func DrawVolume(c: Painter)
 	c.set_color(color(0.8, 0.8, 0.8, 1))
-	float y0 = 30
-	float y1 = c.height - 5
-	float h = y1 - y0
+	var y0 = 30.0
+	var y1 = float(c.height) - 5
+	var h = y1 - y0
 	c.draw_rect([5, 10, y0 + h * (1 - Volume), y0 + h * (2 - Volume)])
 	c.set_color(color(0.6, 0.6, 0.6, 1))
 	c.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
@@ -45,8 +45,8 @@ func DrawVolume(c: Painter)
 func Draw(c: Painter)
 	c.set_color(color.WHITE)
 	c.set_font_size(12)
-	int w = c.width
-	int h = c.height
+	var w = c.width
+	var h = c.height
 	c.draw_rect([0, w, 0, h])
 	
 	DrawVolume(c)
@@ -54,11 +54,11 @@ func Draw(c: Painter)
 	c.set_color(color.BLACK)
 	c.draw_str([20, 20], "{{Frequency|.1}} Hz")
 	c.draw_str([20, 40], "{{Volume|.3}}")
-	for p,i in played
+	for i=>p in played
 		if p < 0
 			continue
-		float x = i
-		float y = h - h * (p - 40.0) / 60.0
+		let x = float(i)
+		let y = h - h * (p - 40.0) / 60.0
 		c.draw_line([x, y], [x + 2, y])
 	
 	c.set_color(color.BLACK)
@@ -89,15 +89,16 @@ func UpdateInput()
 #		float tt = i * w_f
 #		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
-	complex[] bufc
+	var bufc: complex[]
 	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(buf, bufc)
-	float max = 0
-	float fmax = 0, fmax2 = 0
+	var max = 0.0
+	var fmax = 0.0
+	var fmax2 = 0.0
 	for b,i in bufc
-		float f = get_freq(i)
+		var f = get_freq(i)
 		if f > f_min and f < f_max
-			float amp = (b.x*b.x + b.y*b.y) / f
+			var amp = (b.x*b.x + b.y*b.y) / f
 			#floatout f
 			#if (amp > max * 2.5) or (amp > max and f < fmax2)
 #				max = amp

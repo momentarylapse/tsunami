@@ -35,7 +35,7 @@ class Peak
 	#	return pow(2, width/12) - 1
 	
 	func const create_filter(out f: BiquadFilter, sample_rate: float)
-		float freq = pitch_to_freq(pitch)
+		var freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
 
@@ -49,10 +49,10 @@ class EqCurve extends Curve
 		sample_rate = _sample_rate
 	func override get(freq: float) -> float
 		#float pitch = freq_to_pitch(f)
-		float r = gain
+		var r = gain
 		for p in peaks
 			if p.enabled
-				BiquadFilter f
+				var f: BiquadFilter
 				p.create_filter(f, sample_rate)
 				r += f.params.gain(freq, sample_rate)#p.dgain(pitch)
 		return r
@@ -138,12 +138,12 @@ class EqualizerGrid extends Grid
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
-		EqCurve curve
+		var curve: EqCurve
 		curve.set(*c, sample_rate)
 		draw_curve_c(p, curve, true)
 		
 		# gain base-line
-		float y = y_axis.project(c.gain)
+		var y = y_axis.project(c.gain)
 		p.set_line_width(2)
 		p.set_color(colors.text_soft2)
 		p.set_line_dash([8.0,5.0])
@@ -155,8 +155,8 @@ class EqualizerGrid extends Grid
 			var pp = project2(pk.z(c.gain))
 			
 			p.set_line_width(2)
-			color col = point_color(i == selected.e1, i == hover.e1)
-			color col2 = col
+			var col = point_color(i == selected.e1, i == hover.e1)
+			var col2 = col
 			col2.a = 0.6
 			p.set_color(col2)
 			p.draw_line([pp.x, 0], [pp.x, p.height])
@@ -186,7 +186,7 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	func override on_mouse_wheel()
-		float dy = hui.get_event().scroll.y
+		var dy = hui.get_event().scroll.y
 		if hover.e1 >= 0
 			if dy > 0
 				c.peaks[hover.e1].q *= 1.04
@@ -222,7 +222,7 @@ class EqualizerGrid extends Grid
 	
 	# hui events
 	func mut on_add_peak()
-		string id = hui.get_event().id
+		var id = hui.get_event().id
 		var t = FilterType.PEAK
 		if id == "add-low-pass"
 			t = FilterType.LOW_PASS

@@ -42,27 +42,27 @@ class Compressor extends AudioEffect
 	var dgain_attack, dgain_release: float
 
 	func compress(out b: float[], out squares: float[], out gain: float*)
-		float bmin = pow(10, MIN_DB/20)
+		var bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
 			# in level (filtered)
 			squares[i % len(squares)] = b[i]*b[i]
-			float rms = sqrt(sum(squares) / len(squares) * 2)
+			var rms = sqrt(sum(squares) / len(squares) * 2)
 			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
-			float in_level = MIN_DB
+			var in_level = MIN_DB
 			if rms > bmin
 				in_level = log(rms) / log(10) * 20
 		
 			# out level
-			float out_level = in_level
+			var out_level = in_level
 			for j in 1:len(config.curve)
 				if (in_level >= config.curve[j - 1].x) and (in_level <= config.curve[j].x)
 					out_level = config.curve[j - 1].y + (config.curve[j].y - config.curve[j - 1].y) * (in_level - config.curve[j - 1].x) / (config.curve[j].x - config.curve[j - 1].x)
 					break
 			
 			# slow gain changes
-			float cur_gain = out_level - in_level
+			var cur_gain = out_level - in_level
 			if cur_gain > *gain
 				if config.release < 0.00005
 					*gain = cur_gain
@@ -96,7 +96,7 @@ class CompressorGrid extends Grid
 	var cp: ConfigPanel*
 
 	func override on_draw(p: Painter)
-		FloatInterpolator fi
+		var fi: FloatInterpolator
 		config.fill_inter(fi)
 	
 		# curve
@@ -111,10 +111,10 @@ class CompressorGrid extends Grid
 
 	# right button down -> new point
 	func override on_right_button_down()
-		var m = get_mouse2()
+		let m = get_mouse2()
 		for i in 1:len(config.curve)
-			var q = config.curve[i - 1]
-			var p = config.curve[i]
+			let q = config.curve[i - 1]
+			let p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
 				cp.changed()
@@ -126,8 +126,8 @@ class CompressorGrid extends Grid
 		# move
 		if hui.get_event().button_l and (selected > 0)
 			config.curve[selected] = get_mouse2()
-			float xmin = config.curve[selected - 1].x
-			float xmax = 0
+			let xmin = config.curve[selected - 1].x
+			var xmax = 0.0
 			if selected < len(config.curve) - 1
 				xmax = config.curve[selected + 1].x
 			config.curve[selected].x = clamp(config.curve[selected].x, xmin, xmax)
@@ -143,7 +143,7 @@ class CompressorGrid extends Grid
 		redraw()
 
 	func override on_key_down()
-		int k = hui.get_event().key
+		let k = hui.get_event().key
 
 		# [Delete] -> remove point
 		if (k == KEY_DELETE) and (selected > 0) and (selected < len(config.curve) - 1)

@@ -63,8 +63,8 @@ func rel_pitch_name(pitch_rel: int) -> string
 	return "???"
 
 func pitch_name(pitch: int) -> string
-	string name_rel = rel_pitch_name(pitch_to_rel(pitch))
-	string name_oct = str(pitch_get_octave(pitch))
+	var name_rel = rel_pitch_name(pitch_to_rel(pitch))
+	var name_oct = str(pitch_get_octave(pitch))
 	return name_rel + name_oct
 
 
@@ -142,9 +142,9 @@ class Chord
 		return rel_pitch_name(pitch_to_rel(base_tone)) + " " + str(type)
 
 	func static parse(s: string) -> Chord[]
-		Chord[] chords
+		var chords: Chord[]
 		for i=>a in s
-			Chord c
+			var c: Chord
 			if a >= 'a' and a <= 'h'
 				c.type = Type.MINOR
 				c.base_tone = char_to_rel_pitch(a) + 48
@@ -163,7 +163,7 @@ class Chord
 	func const match_pitch(_pitches: int[]) -> bool
 		var pp = pitch()
 		for _p in _pitches
-			bool found = false
+			var found = false
 			for p in pp
 				if (p - _p) % 12 == 0
 					found = true
@@ -174,13 +174,13 @@ class Chord
 
 
 	func static guess(pitches: int[]) -> Chord
-		int sig = pitch_signature(pitches)
-		Chord c
+		var sig = pitch_signature(pitches)
+		var c: Chord
 		for b in 0:12
 			for t in Type.all()
 				c.base_tone = b
 				c.type = t
-				int s = pitch_signature(c.pitch())
+				var s = pitch_signature(c.pitch())
 				if s == sig #c.match_pitch(pitches)
 					return c
 		c.type = Chord.Type.from_int(-1)
@@ -188,7 +188,7 @@ class Chord
 
 
 func pitch_signature(pitches: int[]) -> int
-	int s = 0
+	var s = 0
 	for p in pitches
 		s = s | (1 << (p % 12))
 	return s

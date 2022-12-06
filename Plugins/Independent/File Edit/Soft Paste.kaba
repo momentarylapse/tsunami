@@ -7,12 +7,12 @@ func step(t: float) -> float
 
 class SoftPaste extends TsunamiPlugin
 	func soft_paste(source: AudioBuffer, out dest: TrackLayer, r: Range)
-		int l = min(len(source), len(r))
-		AudioBuffer buf
+		var l = min(len(source), len(r))
+		var buf: AudioBuffer
 		var a = dest.edit_buffers(buf, Range(r.offset, l))
-		int ll = min(2000, l/4)
+		var ll = min(2000, l/4)
 		for i in 0:l
-			float x = 1
+			var x: float = 1
 			if i < ll
 				x = step(float(i) / ll)
 			if i > l - ll
@@ -39,7 +39,7 @@ class SoftPaste extends TsunamiPlugin
 			stop()
 			return
 
-		int n = 0
+		var n = 0
 		for t in weak(session.song.tracks)
 			if t.type == SignalType.AUDIO
 				for l in weak(t.layers)

@@ -19,16 +19,16 @@ class PADConfig extends Module.Config
 	
 	func fill_curve(out c: vec2[], n0: int)
 		c.clear()
-		float n = n0 + 1
-		float nn = n + 0.03 * n * n
-		float _bw = (pow(2, bw / 12.0) - 1.0) * pow(nn, bwscale)
+		var n: float = n0 + 1
+		var nn = n + 0.03 * n * n
+		var _bw = (pow(2, bw / 12.0) - 1.0) * pow(nn, bwscale)
 		for x in 0.5 : 8.5 : 0.01
-			float dx = x - n
-			float y = exp(-dx*dx/_bw/_bw) * A[n0]
+			var dx = x - n
+			var y = exp(-dx*dx/_bw/_bw) * A[n0]
 			c.add(vec2(x, y))
 
 func gauss(f: float, bw: float) -> float
-	float x = f / bw
+	var x = f / bw
 	return exp(- x*x) / bw
 
 
@@ -39,32 +39,32 @@ class PADRenderer extends PitchRenderer
 	var override synth: PADSynthesizer*
 		
 	func mut create()
-		float freq = pitch_to_freq(pitch)
+		var freq = pitch_to_freq(pitch)
 	
-		complex[] c
-		float[] amp
+		var c: complex[]
+		var amp: float[]
 		c.resize(N / 2 + 1)
 		amp.resize(N / 2 + 1)
 		
-		float sample_rate = synth.sample_rate
+		var sample_rate: float = synth.sample_rate
 	
 		for a,n0 in synth.config.A
-			int n = n0 + 1
-			float nn = n + synth.config.detune * n0 * n0
-			float bwHz = (pow(2, synth.config.bw / 12.0) - 1.0) * freq * pow(nn, synth.config.bwscale)
-			float bwi = bwHz / (2.0 * sample_rate)
-			float fi = freq * n / sample_rate
+			var n = n0 + 1
+			var nn: float = n + synth.config.detune * n0 * n0
+			var bwHz = (pow(2, synth.config.bw / 12.0) - 1.0) * freq * pow(nn, synth.config.bwscale)
+			var bwi = bwHz / (2.0 * sample_rate)
+			var fi = freq * n / sample_rate
 			for i in 0:len(amp)
 				amp[i] += gauss((float(i) / N) - fi, bwi) * a
 		
 		for i in 0:len(c)
-			float phi = rand(2 * pi)
+			var phi = rand(2 * pi)
 			c[i] = complex(cos(phi), sin(phi)) * amp[i]
 		
 		prebuf.resize(N)
 		fft.c2r_inv(c, prebuf)
 	
-		float m = 0
+		var m: float = 0
 		for b in prebuf
 			m = max(b, m)
 		prebuf /= (m * 1.2)
@@ -80,7 +80,7 @@ class PADRenderer extends PitchRenderer
 
 	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
-			float d = prebuf[pos]
+			var d = prebuf[pos]
 				
 			buf.c[0][i] += d
 			pos ++
@@ -110,7 +110,7 @@ class PADGrid extends Grid
 		pc.A.resize(8)
 	
 		# curve + area below
-		vec2[] curve
+		var curve: vec2[]
 		for a,i in pc.A
 			pc.fill_curve(curve, i)
 			draw_curve_b(c, curve, false, color.RED)

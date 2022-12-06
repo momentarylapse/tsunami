@@ -1,7 +1,7 @@
 use tsunami
 
 func update_bars(out bars: BarCollection)
-	int offset = 0
+	var offset = 0
 	for b in bars
 		b.offset = offset
 		offset += b.length
@@ -40,7 +40,7 @@ class XXX extends TsunamiPlugin
 		stop()
 	
 	func paste(offset: int, source: TrackLayer, out dest: TrackLayer)
-		int b0 = first_bar(offset)
+		var b0 = first_bar(offset)
 		for b,i in clipboard.temp.bars
 			if b0+i < len(session.song.bars)
 				paste_bar(source, dest, b.range(), session.song.bars[b0+i].range())

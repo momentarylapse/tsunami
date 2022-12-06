@@ -49,8 +49,8 @@ var LessonName: string[]
 
 var error: float
 func get_note(f: float) -> string
-	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
-	int rel = f2i(pitch + 0.5) % 12
+	var pitch = log(f / 440.0) / log(2.0) * 12 + 69
+	var rel = f2i(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
 	return rel_pitch_name(rel)
 	#loopf(fl, 0, 1)
@@ -92,9 +92,9 @@ class SuperNovaWindow extends Window
 
 	func drawVolume()
 		c.setColor(color(1, 0.8, 0.8, 0.8))
-		float y0 = 30
-		float y1 = c.height - 5
-		float h = y1 - y0
+		var y0: float = 30
+		var y1: float = c.height - 5
+		var h = y1 - y0
 		c.drawRect(5, y0 + h * (1 - Volume), 5, h)
 		c.setColor(color(1, 0.6, 0.6, 0.6))
 		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
@@ -105,18 +105,18 @@ class SuperNovaWindow extends Window
 	func drawSheet(y0: float)
 		c.setColor(color(1, 0.6, 0.6, 0.6))
 		for i in 0:6
-			float ly = h - (i + 1) * 30
+			var ly = h - (i + 1) * 30
 			c.drawLine(0, ly, w, ly)
 		c.setColor(color.BLACK)
 		c.setFontSize(18)
-		MidiNote[] notes = MidiTrack.midi.getNotes(song.getRange())
+		var notes = MidiTrack.midi.getNotes(song.getRange())
 		for n in notes
-			int s, f
+			var s, f: int
 			for i in 0:6
 				if n.pitch >= StringPitch[i] + HandPosition
 					s = i
 					f = n.pitch - StringPitch[i]
-			float ly = h - (s + 1) * 30
+			var ly = h - (s + 1) * 30
 			c.setColor(ColorSetHSB(0.3, (n.pitch % 12) / 12.0, 1, 1))
 			c.drawRect(sample2x(n.range.offset), ly - 12, n.range.length / 700.0, 24)
 			c.setColor(color.BLACK)
@@ -142,8 +142,8 @@ class SuperNovaWindow extends Window
 				c.setColor(color.BLUE)
 			else
 				c.setColor(color.RED)
-			float x = sample2x(p.offset)
-			float y = h - h * (p.note - 40.0) / 60.0
+			var x = sample2x(p.offset)
+			var y = h - h * (p.note - 40.0) / 60.0
 			c.drawLine(x, y, x + 2, y)
 		
 		c.setColor(color(1, 1, 0.5, 0.5))
@@ -186,8 +186,8 @@ class SuperNovaWindow extends Window
 		if Mode != ModeConfig
 			return
 		hover = -1
-		float mx = Huihui.get_event().mouse_x
-		float my = Huihui.get_event().mouse_y
+		var mx = Huihui.get_event().mouse_x
+		var my = Huihui.get_event().mouse_y
 		for l,i in LessonName
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
@@ -199,13 +199,13 @@ class SuperNovaWindow extends Window
 			StartLesson(LessonName[hover])
 
 func UpdateInput()
-	int available = input.current_buffer.available()
+	var available = input.current_buffer.available()
 	
 	if available > BUFFER_SIZE
 		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
 		Offset += available - BUFFER_SIZE#len(input.cur_buf)
 	
-	int num = clampi(available, 0, BUFFER_SIZE)
+	var num = clampi(available, 0, BUFFER_SIZE)
 	input.current_buffer.peekRef(buf, num)
 	
 	#float w_f = 1.0 / freq * 440.0 * 2.0 * pi
@@ -213,17 +213,17 @@ func UpdateInput()
 #		float tt = i * w_f
 #		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
-	float[] temp = buf.r + buf.l
+	var temp = buf.r + buf.l
 	
-	complex[] bufc
+	var bufc: complex[]
 	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(temp, bufc)
-	float max = 0
-	float fmax = 0, fmax2 = 0
+	var max: float = 0
+	var fmax: float = 0, fmax2 = 0
 	for b,i in bufc
-		float f = get_freq(i)
+		var f = get_freq(i)
 		if f > f_min and f < f_max
-			float amp = (b.x*b.x + b.y*b.y) / f
+			var amp = (b.x*b.x + b.y*b.y) / f
 			#floatout f
 			#if (amp > max * 2.5) or (amp > max and f < fmax2)
 #				max = amp
@@ -236,7 +236,7 @@ func UpdateInput()
 	max /= sqrt(len(buf)) * 2 * pi
 	Volume = clamp(max / threshold / 2, 0, 1)
 	if max > threshold
-		PlayedData p
+		var p: PlayedData
 		p.offset = Offset
 		p.length = len(buf)
 		p.correct = false
@@ -246,7 +246,7 @@ func UpdateInput()
 		#Frequency = fmax
 		Error = error
 	
-		MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+		var notes = MidiTrack.midi.getNotes(audio.getRange())
 		for n in notes
 			if n.range.offset <= Offset and n.range.offset + n.range.length > Offset
 				if n.pitch == p.note
@@ -273,8 +273,8 @@ func StartLesson(name: string)
 		if t.type == TRACK_TYPE_MIDI
 			MidiTrack = t
 			
-	float num_samples = 0
-	MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+	var num_samples: float = 0
+	var notes = MidiTrack.midi.getNotes(audio.getRange())
 	for n in notes
 		num_samples += n.range.length
 	ScoreFactor = 100 / num_samples
@@ -284,7 +284,7 @@ func StartLesson(name: string)
 		if t.key == "score"
 			ScoreFactor = t.value.float() / num_samples * 1.2
 	
-	int speed = win.getInt("speed")
+	var speed = win.getInt("speed")
 	if speed == 0
 		audio.sample_rate = audio.sample_rate * 0.7
 		ScoreFactor *= 0.6
@@ -332,7 +332,7 @@ func main()
 	HandPosition = 5
 	
 	LessonName.clear()
-	DirEntry[] list = DirSearch(hui.app_directory_static + "Lessons/", "*.nami", false)
+	var list = DirSearch(hui.app_directory_static + "Lessons/", "*.nami", false)
 	for e in list
 		if e.name[0] != '0'
 			LessonName.add(e.name.substr(0, -6))
@@ -342,5 +342,5 @@ func main()
 	
 	MainWin.hide()
 	win.run()
-	delete win
+	var win: delete
 	MainWin.show()

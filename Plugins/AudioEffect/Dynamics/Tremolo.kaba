@@ -18,12 +18,12 @@ class Tremolo extends AudioEffect
 	var config: Config
 
 	func apply(out b: float[])
-		float sample_rate = session.sample_rate()
+		var sample_rate: float = session.sample_rate()
 	
-		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
+		var f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
 		for bb,i in b
-			float f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5
+			var f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5
 	
 			# old value
 			bb *= f

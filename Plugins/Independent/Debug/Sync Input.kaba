@@ -19,15 +19,15 @@ func fill(out buf: AudioBuffer)
 		synth.read(buf)
 
 func sync()
-	bool found = false
+	var found = false
 	for i in 0:len(input.cur_buf)
 		if abs(input.cur_buf.r[i]) > 0.1
 			offset_in += i
-			print offset_in
+			var offset_in: print
 			found = true
 			break
 	if found
-		delete dlg
+		var dlg: delete
 	else
 		offset_in += len(input.cur_buf)
 

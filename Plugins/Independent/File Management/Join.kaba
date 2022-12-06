@@ -6,16 +6,16 @@ class Join extends TsunamiPlugin
 		if len(args) < 2
 			print("need more args!!!")
 			return
-		int offset = 0
+		var offset = 0
 		var song = new Song(session, 44100)
 		var t = song.add_track(SignalType.AUDIO_STEREO, 0)
 		var layer = t.layers[0]
 		for f in args[1:]
 			print(f)
-			AudioBuffer part
+			var part: AudioBuffer
 			session.storage.load_buffer(part, f)
 			
-			AudioBuffer buf
+			var buf: AudioBuffer
 			var a = layer.edit_buffers(buf, Range(offset, len(part)))
 			buf.set(part, 0, 1.0)
 			layer.edit_buffers_finish(a)

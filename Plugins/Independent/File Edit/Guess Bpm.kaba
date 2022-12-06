@@ -21,17 +21,17 @@ const NN = 4
 #   optimize
 
 func rms(b: float[]) -> float
-	float r = 0
+	var r = 0.0
 	for bb in b
 		r += bb^2
 	return sqrt(r / len(b))
 
 func calc_novelty(buf: AudioBuffer) -> float[]
-	float[] novelty
-	float prev = 0
+	var novelty: float[]
+	var prev = 0.0
 	for i in 0:len(buf):FRAME_STEP
-		float r = rms(buf[i:i+FRAME_SIZE].c[0])
-		float d = r - prev
+		var r = rms(buf[i:i+FRAME_SIZE].c[0])
+		var d = r - prev
 		if d < 0
 			d = 0
 		
@@ -42,17 +42,17 @@ func calc_novelty(buf: AudioBuffer) -> float[]
 	return novelty
 
 func self_correlation(novelty: float[], d: int) -> float
-	float corr = 0
+	var corr = 0.0
 	for i in d:len(novelty)
 		corr += novelty[i-d] * novelty[i]
 	return corr / (len(novelty) - d)
 
 func find_beats(buf: AudioBuffer, sample_rate: int)
-	var novelty = calc_novelty(buf)
-	int dmin = sample_rate / float(FRAME_STEP) * (60./BPM_MAX)
-	int dmax = sample_rate / float(FRAME_STEP) * (60.0/BPM_MIN)
+	let novelty = calc_novelty(buf)
+	let dmin = int(sample_rate / float(FRAME_STEP) * (60./BPM_MAX))
+	let dmax = int(sample_rate / float(FRAME_STEP) * (60.0/BPM_MIN))
 	for d in dmin:dmax
-		var c = self_correlation(novelty, d)
+		let c = self_correlation(novelty, d)
 		print("{{float(sample_rate)/(d*FRAME_STEP)*60|.1}}   {{c}}")
 
 class CorrelationGrid extends Grid
@@ -66,20 +66,20 @@ class CorrelationGrid extends Grid
 	
 	func mouse_index() -> int
 		var q = [for c in curve project2(c)]
-		int index = 0
-		float dmin = m.x
-		for c,i in q
-			var d = abs(m.x - c.x)
+		var index = 0
+		var dmin = m.x
+		for i=>c in q
+			let d = abs(m.x - c.x)
 			if d < dmin
 				dmin = d
 				index = i
 		return index
 	
 	func peak_around_mouse() -> int
-		int index = mouse_index()
-		int imax = index
-		float ymax = 0
-		for c,i in curve[index-10:index+10]
+		var index = mouse_index()
+		var imax = index
+		var ymax: float = 0
+		for i=>c in curve[index-10:index+10]
 			if c.y > ymax
 				ymax = c.y
 				imax = index-10+i
@@ -89,8 +89,8 @@ class CorrelationGrid extends Grid
 	func override on_draw(p: Painter)
 		if hover_peak >= 0
 			p.set_color([1,1,1, 0.1])
-			float x0 = x_axis.project(curve[max(hover_peak-10, 0)].x)
-			float x1 = x_axis.project(curve[min(hover_peak+10, len(curve)-1)].x)
+			var x0 = x_axis.project(curve[max(hover_peak-10, 0)].x)
+			var x1 = x_axis.project(curve[min(hover_peak+10, len(curve)-1)].x)
 			p.draw_rect(rect(x0,x1, 0,p.height))
 	
 		var q = [for c in curve project2(c)]
@@ -99,15 +99,15 @@ class CorrelationGrid extends Grid
 		p.draw_lines(q)
 		
 		p.set_color(colors.selection)
-		var x = x_axis.project(bpm_opt)
+		let x = x_axis.project(bpm_opt)
 		p.draw_line([x, 0], [x, p.height])
 		p.set_font_size(8)
 		p.draw_str([x+3, plot_area.y2-20], "{{bpm_opt|.1}} bpm")
 		
 		
-		for c,i in curve[i_opt-NN:i_opt+NN+1]
-			float y = (para[1] - para[2] * (i-para[0])^2)
-			var pp = project2(vec2(curve[i_opt-NN+i].x, y))
+		for i=>c in curve[i_opt-NN:i_opt+NN+1]
+			let y = (para[1] - para[2] * (i-para[0])^2)
+			let pp = project2(vec2(curve[i_opt-NN+i].x, y))
 			p.draw_circle([pp.x, pp.y], 3)
 	
 	func override on_mouse_move()
@@ -115,22 +115,22 @@ class CorrelationGrid extends Grid
 		redraw()
 	func override on_left_button_down()
 		hover_peak = peak_around_mouse()
-		float bpm1 = curve[max(hover_peak-10, 0)].x
-		float bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
+		var bpm1 = curve[max(hover_peak-10, 0)].x
+		var bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
 		dlg.create_curve(bpm0, bpm1)
 
 func weight_parable(p: float[], yy: float[]) -> float
-	float w = 0
-	for y,i in yy
+	var w = 0.0
+	for i=>y in yy
 		w += (y - (p[1] - p[2] * (i-p[0])^2))^2
 	return w
 
 func optimize_parable(p0: float[], yy: float[]) -> float[]
 	var p = p0
-	float epsilon = 0.002
+	var epsilon = 0.002
 	for i in 0:10000
-		int d = i % 3
-		float w = weight_parable(p, yy)
+		var d = i % 3
+		var w = weight_parable(p, yy)
 		#print("{{p}}   {{w}}")
 		var pnext = p
 		pnext[d] += epsilon
@@ -195,8 +195,8 @@ Grid ? '' vertical
 		song.begin_action_group("guess bpm")
 		if not song.time_track()
 			song.add_track(SignalType.TIME, 0)
-		int length = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt
-		Bar bar = Bar(length, beats_per_bar, 1)
+		var length: int = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt
+		var bar = Bar(length, beats_per_bar, 1)
 		for i in 0:buf_len / length
 			song.add_bar(i, bar, Bar.EditMode.IGNORE)
 		song.end_action_group()
@@ -222,18 +222,18 @@ Grid ? '' vertical
 		grid.curve.clear()
 		var sample_rate = fb.session.sample_rate()
 		#find_beats(buf, song.sample_rate)
-		int dmin = bpm_to_d(BPM_MAX)
-		int dmax = bpm_to_d(BPM_MIN)
-		float _cmax = 0
-		int i_opt = -1
+		var dmin = int(bpm_to_d(BPM_MAX))
+		var dmax = int(bpm_to_d(BPM_MIN))
+		var _cmax = 0.0
+		var i_opt = -1
 		for d in dmin:dmax
-			var c = self_correlation(novelty, d)
-			var bpm = d_to_bpm(d)
+			let c = self_correlation(novelty, d)
+			let bpm = d_to_bpm(d)
 			grid.curve.add([bpm, c])
 			if c > _cmax and bpm >= peak_bpm_min and bpm <= peak_bpm_max
 				_cmax = c
 				i_opt = d - dmin
-		var cmax = max([for c in grid.curve c.y])
+		let cmax = max([for c in grid.curve c.y])
 		grid.curve = [for c in grid.curve vec2(c.x, c.y/cmax*100)]
 		grid.bpm_opt = d_to_bpm(dmin + i_opt)
 		grid.i_opt = i_opt

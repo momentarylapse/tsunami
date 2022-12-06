@@ -29,12 +29,12 @@ class SweepSource extends AudioSource
 		t = 0
 
 	func mut create_sweep(out buf: float[])
-		float B = log(config.freq_max / config.freq_min) / config.period
+		var B = log(config.freq_max / config.freq_min) / config.period
 		
 		for i in 0:len(buf)
 			buf[i] = sin(phase) * config.volume
-			float freq = config.freq_min * exp(B * t)
-			float w = freq * 2.0 * pi
+			var freq = config.freq_min * exp(B * t)
+			var w = freq * 2.0 * pi
 			phase += w / float(DEFAULT_SAMPLE_RATE)
 			t += 1.0 / float(DEFAULT_SAMPLE_RATE)
 			if t > config.period

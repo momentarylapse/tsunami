@@ -82,40 +82,40 @@ class ShowSpectrogram extends TsunamiPlugin
 	func mut show_spec(song: Song*)
 		dlg = new SpectrumDialog(self, song)
 	
-		AudioBuffer buf
+		var buf: AudioBuffer
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 		del renderer
 	
-		complex[] f
-		float[] sub
+		var f: complex[]
+		var sub: float[]
 		sub.resize(N)
 	
-		float _max = 0
+		var _max: float = 0
 	
-		float log_max_min = log(MAX_FREQ / MIN_FREQ)
+		var log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
 		for t in 0:NT
 			# time slice
-			int offset = (buf.length - N) * t / NT
+			var offset: int = (buf.length - N) * t / NT
 		
 			for j in 0:N
 				sub[j] = buf.c[0][offset + j]
 			fft.r2c(sub, f)
-			float ww = float(N) / song.sample_rate
+			var ww = float(N) / song.sample_rate
 			for i in 0:NF
 				# frequency slice
-				float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
-				float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
-				int j0 = fmin * ww
-				int j1 = fmax * ww + 1
+				var fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
+				var fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
+				var j0: int = fmin * ww
+				var j1: int = fmax * ww + 1
 				j0 = clamp(j0, 0, len(f))
 				j1 = clamp(j1, 0, len(f))
 				
 				# find maximum amplitude in that frequency interval
-				float bmaxr = 0
+				var bmaxr: float = 0
 				for j in j0:j1
-					float amp = f[j].x * f[j].x + f[j].y * f[j].y
+					var amp = f[j].x * f[j].x + f[j].y * f[j].y
 					if bmaxr < amp
 						bmaxr = amp
 				_max = max(_max, bmaxr)
@@ -124,7 +124,7 @@ class ShowSpectrogram extends TsunamiPlugin
 		im0.create(NT, NF, color.BLACK)
 		for t in 0:NT
 			for i in 0:NF
-				float ff = sg[t][i] / _max
+				var ff = sg[t][i] / _max
 				im0.set_pixel(t, NF - i - 1, f2col(ff))
 	
 

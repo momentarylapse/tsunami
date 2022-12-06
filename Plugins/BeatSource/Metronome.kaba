@@ -44,7 +44,7 @@ class MetronomeSource extends BeatSource
 		while offset_sub_beat < samples
 			
 			# render
-			int level = 2
+			var level = 2
 			if next_sub_beat == 0
 				if next_beat == 0
 					level = 0
@@ -62,7 +62,7 @@ class MetronomeSource extends BeatSource
 
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= samples
-		float fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
+		var fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
 		fraction_beat = (float(cur_sub_beat()) + fraction_sub_beat) / float(config.sub_beats)
 		
 		return samples
@@ -93,15 +93,15 @@ class MetronomeSource extends BeatSource
 		changed()
 	
 	func override on_config()
-		float sample_rate = session.sample_rate()
-		float dt_b = 60.0 / config.bpm
-		float dt_s = dt_b / config.sub_beats
+		var sample_rate = session.sample_rate()
+		var dt_b = 60.0 / config.bpm
+		var dt_s = dt_b / config.sub_beats
 		samples_beat = dt_b * sample_rate
 		samples_sub_beat = dt_s * sample_rate
 		
 		#if cur_beat >
 		
-		int _cur_sub_beat = config.sub_beats * fraction_beat
+		var _cur_sub_beat = config.sub_beats * fraction_beat
 		next_sub_beat = _cur_sub_beat + 1
 		if next_sub_beat >= config.sub_beats
 			next_sub_beat = 0

@@ -68,16 +68,16 @@ class BiquadFilter
 			b[1] = 0
 			b[2] = 0
 		func gain(f: float, sample_rate: float) -> float
-			complex z
+			var z: complex
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
 			var H = complex(b[0], 0) + b[1]*z + b[2]*z*z
 			var y = complex(1,0) + a[1]*z + a[2]*z*z
 		
-			float fac = H.abs() / y.abs()
+			var fac = H.abs() / y.abs()
 			return factor_to_db(fac)
 		func phase_shift(f: float, sample_rate: float) -> float
-			complex z
+			var z: complex
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
 			var H = complex(b[0], 0) + b[1]*z + b[2]*z*z
@@ -160,14 +160,14 @@ class BiquadFilter
 			var c = tan(pi * f_res / sample_rate)
 		
 			if gain > 0
-				float a0 = 1 + sqrt(2)*c + c*c
+				var a0 = 1 + sqrt(2)*c + c*c
 				b[0] = (1 + sqrt(2*V)*c + V*c*c) / a0
 				b[1] = 2*(V*c*c - 1) / a0
 				b[2] = (1-sqrt(2*V)*c + V*c*c) / a0
 				a[1] = 2*(c*c - 1) / a0
 				a[2] = (1-sqrt(2)*c + c*c) / a0
 			else
-				float a0 = 1 + sqrt(2*V)*c + V*c*c
+				var a0 = 1 + sqrt(2*V)*c + V*c*c
 				b[0] = (1 + sqrt(2)*c + c*c) / a0
 				b[1] = 2*(c*c - 1) / a0
 				b[2] = (1 - sqrt(2)*c + c*c) / a0
@@ -189,14 +189,14 @@ class BiquadFilter
 			var c = tan(pi * f_res / sample_rate)
 		
 			if gain > 0
-				float a0 = 1 + sqrt(2)*c + c*c
+				var a0 = 1 + sqrt(2)*c + c*c
 				b[0] = (V + sqrt(2*V)*c + c*c) / a0
 				b[1] = 2*(c*c - V) / a0
 				b[2] = (V - sqrt(2*V)*c + c*c) / a0
 				a[1] = 2*(c*c - 1) / a0
 				a[2] = (1 - sqrt(2)*c + c*c) / a0
 			else
-				float a0 = V + sqrt(2*V)*c + c*c
+				var a0 = V + sqrt(2*V)*c + c*c
 				b[0] = (1 + sqrt(2)*c + c*c) / a0
 				b[1] = 2*(c*c - 1) / a0
 				b[2] = (1 - sqrt(2)*c + c*c) / a0

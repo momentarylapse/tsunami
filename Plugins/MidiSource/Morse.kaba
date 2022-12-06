@@ -9,7 +9,7 @@ func append(out a: int[], b: int[])
 		a.add(x)
 
 func morse(s: string) -> int[]
-	int[] l
+	var l: int[]
 	for c in s
 		if c == 'a'
 			append(l, [1, 2])

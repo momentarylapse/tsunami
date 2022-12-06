@@ -22,7 +22,7 @@ class ClickCounter extends AudioEffect
 	
 	func override process(out buf: AudioBuffer)
 	
-		float[] temp
+		var temp: float[]
 		temp = buf.c[0] #+ buf.c[1]
 	
 		let recover_samples = int(DEFAULT_SAMPLE_RATE * RECOVER_TIME)

@@ -36,15 +36,15 @@ class SpecGrid extends Grid
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
-			float x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
+			var x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
 			if type == SpectrumType.LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
 			else #if type == SpectrumType.LOG
-				float vol_max = todb(peak_max)
-				float vol_min = vol_max - 60
+				var vol_max = todb(peak_max)
+				var vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
 	func mut set_type(t: SpectrumType)
@@ -52,8 +52,8 @@ class SpecGrid extends Grid
 		if type == SpectrumType.LINEAR
 			y_axis.set(0, peak_max, false, "")
 		else #if type == SpectrumType.LOG
-			float vol_max = todb(peak_max)
-			float vol_min = vol_max - 60
+			var vol_max = todb(peak_max)
+			var vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
 		create_lines()
 
@@ -84,7 +84,7 @@ Grid ? ''
 		set_int("type", int(SpectrumType.LOG))
 
 	func mut on_type()
-		SpectrumType t = SpectrumType.from_int(get_int("type")) # ...
+		var t = SpectrumType.from_int(get_int("type")) # ...
 		grid.set_type(t)
 		grid.redraw()
 
@@ -95,7 +95,7 @@ class ShowSpectrum extends TsunamiPlugin
 	func mut show_spec(song: Song)
 		dlg = new SpectrumDialog(self)
 	
-		AudioBuffer buf
+		var buf: AudioBuffer
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 		del renderer

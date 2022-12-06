@@ -37,10 +37,10 @@ class TransientDesigner extends AudioEffect
 		
 		for i in 0:len(buf)
 			# gain?
-			float gain = 0
-			float hf = h_fast[i]
-			float ha = h_att[i]
-			float hs = h_sus[i]
+			var gain: float = 0
+			var hf = h_fast[i]
+			var ha = h_att[i]
+			var hs = h_sus[i]
 			if hf > ha
 				# attack
 				gain += config.attack * (hf - ha)

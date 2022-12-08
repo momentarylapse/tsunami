@@ -159,7 +159,7 @@ class SuperNovaWindow extends Window
 	
 	func drawConfig()
 		c.setFontSize(20)
-		for l,i in LessonName
+		for i=>l in LessonName
 			if i == hover
 				c.setColor(color(1, 0.8, 0.8, 1))
 				c.drawRect(100, 35 + i * 40, 300, 35)
@@ -188,7 +188,7 @@ class SuperNovaWindow extends Window
 		hover = -1
 		var mx = Huihui.get_event().mouse_x
 		var my = Huihui.get_event().mouse_y
-		for l,i in LessonName
+		for i=>l in LessonName
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
 		redraw("drawing")
@@ -220,7 +220,7 @@ func UpdateInput()
 	fft_r2c(temp, bufc)
 	var max: float = 0
 	var fmax: float = 0, fmax2 = 0
-	for b,i in bufc
+	for i=>b in bufc
 		var f = get_freq(i)
 		if f > f_min and f < f_max
 			var amp = (b.x*b.x + b.y*b.y) / f

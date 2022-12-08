@@ -108,7 +108,7 @@ class PracticeLooper extends TsunamiPlugin
 			reset()
 		if config.speed != current_speed
 			song.begin_action_group("set speed")
-			for b,i in song.bars
+			for i=>b in song.bars
 				var bb: Bar
 				bb.beats = b.beats
 				bb.divisor = b.divisor

@@ -45,6 +45,8 @@ void inplace_bubble_sort(Array<T> &array, F f) {
 	}
 }
 
+namespace aux {
+
 template<class T, class F>
 void _inplace_quick_sort_step(Array<T> &array, int first, int last, F f) {
 	if (first < 0 or last < 0 or first >= last)
@@ -125,11 +127,12 @@ void _inplace_quick_sort_step(Array<T> &array, int first, int last, F f) {
 	msg_left();
 #endif
 }
+}
 
 
 template<class T, class F>
 void inplace_quick_sort(Array<T> &array, F f) {
-	_inplace_quick_sort_step(array, 0, array.num - 1, f);
+	aux::_inplace_quick_sort_step(array, 0, array.num - 1, f);
 }
 
 template<class T, class F>

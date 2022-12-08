@@ -59,7 +59,7 @@ Grid ? ''
 		p.set_color(color.RED)
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 		
-		for pp,i in c.pitch_detector.pitch_power2
+		for i=>pp in c.pitch_detector.pitch_power2
 			var x: float = (i-20) * 4
 			p.draw_line([x, 0], [x, pp/13])
 

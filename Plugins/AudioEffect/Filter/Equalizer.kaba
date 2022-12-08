@@ -80,7 +80,7 @@ class Equalizer extends AudioEffect
 	func override on_config()
 		filter.clear()
 		filter.resize(len(config.peaks))
-		for p,stage in config.peaks
+		for stage=>p in config.peaks
 			p.create_filter(filter[stage], session.sample_rate())
 	
 	func override reset_state()
@@ -151,7 +151,7 @@ class EqualizerGrid extends Grid
 		p.set_line_dash([8.0,0.0])
 	
 		# points
-		for pk,i in c.peaks
+		for i=>pk in c.peaks
 			var pp = project2(pk.z(c.gain))
 			
 			p.set_line_width(2)
@@ -255,10 +255,10 @@ class EqualizerGrid extends Grid
 	func get_hover(m: vec2) -> (HoverType, int)
 		if abs(m.y - y_axis.project(c.gain)) < 10
 			return (HoverType.GAIN, -1)
-		for p,i in c.peaks
+		for i=>p in c.peaks
 			if mouse_over_point2(p.z(c.gain))
 				return (HoverType.PEAK, i)
-		for p,i in c.peaks
+		for i=>p in c.peaks
 			var pp = project2(p.z(c.gain))
 			if abs(pp.x - m.x) < 15 and m.y < 30
 				return (HoverType.PEAK_LABEL, i)

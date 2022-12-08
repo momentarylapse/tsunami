@@ -34,14 +34,14 @@ class XXX extends TsunamiPlugin
 		update_bars(clipboard.temp.bars)
 
 		session.song.begin_action_group("paste")
-		for ls,i in source_layers
+		for i=>ls in source_layers
 			paste(session.view.sel.range().offset, ls, target_layers[i])
 		session.song.end_action_group()
 		stop()
 	
 	func paste(offset: int, source: TrackLayer, out dest: TrackLayer)
 		var b0 = first_bar(offset)
-		for b,i in clipboard.temp.bars
+		for i=>b in clipboard.temp.bars
 			if b0+i < len(session.song.bars)
 				paste_bar(source, dest, b.range(), session.song.bars[b0+i].range())
 	
@@ -58,7 +58,7 @@ class XXX extends TsunamiPlugin
 		
 		
 	func first_bar(offset: int) -> int
-		for b,i in session.song.bars
+		for i=>b in session.song.bars
 			if b.offset >= offset -100
 				return i
 		return -1

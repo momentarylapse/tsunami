@@ -5,7 +5,7 @@ use hui
 func next_ending(notes: MidiNote*[]) -> int
 	var e = notes[0].range.end()
 	var next = 0
-	for n,i in notes
+	for i=>n in notes
 		if n.range.end() < e
 			next = i
 			e = n.range.end()
@@ -64,7 +64,7 @@ class TellHarmony extends TsunamiPlugin
 		
 #		p.set_color(color.RED)
 		var harm = track_harmony(v.layer.midi)#midi)
-		for h,i in harm
+		for i=>h in harm
 			h.calc()
 			var c = colors.pitch_color(h.chord.base_tone)
 			c.a = 0.15

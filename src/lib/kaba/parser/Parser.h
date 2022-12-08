@@ -93,7 +93,6 @@ public:
 
 	shared<Node> parse_abstract_single_func_param(Block *block);
 	void parse_abstract_complete_command(Block *block);
-	void parse_abstract_local_definition_old(Block *block, shared<Node> first);
 	shared<Node> parse_abstract_block(Block *parent, Block *block = nullptr);
 	shared<Node> parse_abstract_operand(Block *block, bool prefer_class = false);
 	shared<Node> parse_operand_greedy(Block *block, bool allow_tuples = false, shared<Node> first_operand = nullptr);

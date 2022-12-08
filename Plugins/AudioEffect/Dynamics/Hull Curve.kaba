@@ -111,7 +111,7 @@ class HullGrid extends Grid
 		else
 		# mouse over?
 			hover = -1
-			for c,i in config.curve
+			for i=>c in config.curve
 				var p = project2(c)
 				if len(m - p) < 5
 					hover = i

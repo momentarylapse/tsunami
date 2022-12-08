@@ -57,7 +57,7 @@ class MyDialog extends hui.Dialog
 		add_button("", 0, 1, "config")
 		set_image("config", "hui:properties")
 		
-		for t,i in weak(session.song.tracks)
+		for i=>t in weak(session.song.tracks)
 			if t.type == SignalType.MIDI
 				track_mode.add(true)
 				track_mode.add(true)
@@ -143,7 +143,7 @@ class MyDialog extends hui.Dialog
 		track_space = get_float("track-space")
 		x_scale = get_float("x-scale")
 		allow_shadows = is_checked("allow-shadows")
-		for t,i in weak(session.song.tracks)
+		for i=>t in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
 			track_mode[i * 2 + 1] = (get_cell("tracks", i, 2) == "true")
 		mlv.changed()
@@ -162,13 +162,13 @@ class MyDialog extends hui.Dialog
 		session.view.set_playback_pos(screen_to_sample(e.mouse))
 	
 	func screen_to_sample(pos: vec2) -> int
-		for y0,i in line_y0[:-1]
+		for i=>y0 in line_y0[:-1]
 			if pos.y >= y0 and pos.y < line_y0[i+1]
 				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area.width() - 2*border)
 		return -1
 	
 	func sample_to_screen(s: int) -> vec2
-		for s0,i in line_samples[:-1]
+		for i=>s0 in line_samples[:-1]
 			if s >= s0 and s < line_samples[i+1]
 				return [0,line_y0[i]] # X: TODO
 		return [0,0]
@@ -177,7 +177,7 @@ class MyDialog extends hui.Dialog
 	func override on_draw(p: Painter)
 		area = [0,p.width, 0,p.height]
 		var conf = dyn([])
-		for t,i in weak(session.song.tracks)
+		for i=>t in weak(session.song.tracks)
 			if t.type != SignalType.MIDI
 				continue
 			if track_mode[i*2] and track_mode[i*2+1]

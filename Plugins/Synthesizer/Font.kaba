@@ -50,7 +50,7 @@ class FontList
 	var fonts: MidiFont*[]
 	
 	func find(name: string) -> int
-		for f,i in fonts
+		for i=>f in fonts
 			if f.name == name
 				return i
 		return -1
@@ -155,7 +155,7 @@ class FontPanel extends ConfigPanel
 			enable("sets", true)
 			set_string("sets", "  - none -")
 			set_int("sets", 0)
-			for s,i in sets
+			for i=>s in sets
 				set_string("sets", s)
 				if s == sc.name
 					set_int("sets", i+1)
@@ -167,7 +167,7 @@ class FontPanel extends ConfigPanel
 		reset("instruments")
 		var instruments = font_list.instruments(c.session, sc.name)
 		var match = false
-		for ins,i in instruments
+		for i=>ins in instruments
 			add_string("instruments", ins)
 			if ins == sc.instrument
 				set_int("instruments", i)

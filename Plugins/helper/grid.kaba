@@ -11,7 +11,7 @@ class Curve
 	func virtual get_list(xx: float[]) -> float[]
 		var r: float[]
 		r.resize(len(xx))
-		for x,i in xx
+		for i=>x in xx
 			r[i] = get(x)
 		return r
 

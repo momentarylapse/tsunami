@@ -95,7 +95,7 @@ func UpdateInput()
 	var max = 0.0
 	var fmax = 0.0
 	var fmax2 = 0.0
-	for b,i in bufc
+	for i=>b in bufc
 		var f = get_freq(i)
 		if f > f_min and f < f_max
 			var amp = (b.x*b.x + b.y*b.y) / f

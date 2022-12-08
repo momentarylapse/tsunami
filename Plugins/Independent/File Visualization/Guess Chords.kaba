@@ -50,7 +50,7 @@ class XXX extends TsunamiPlugin
 		
 		
 	func first_bar(offset: int) -> int
-		for b,i in session.song.bars
+		for i=>b in session.song.bars
 			if b.offset >= offset -100
 				return i
 		return -1

@@ -252,7 +252,7 @@ Grid ? '' vertical
 
 
 func bar_index(song: Song*, offset: int) -> int
-	for b,i in song.bars
+	for i=>b in song.bars
 		if b.offset >= offset
 			return i
 	return 0

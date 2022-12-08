@@ -38,7 +38,7 @@ class HammondGrid extends Grid
 	func override on_draw(c: Painter)
 	
 		# points
-		for i,n in hc.intensity
+		for n=>i in hc.intensity
 			var z0 = vec2(n+1, 0)
 			var z1 = vec2(n+1, i)
 			c.set_line_width(2)
@@ -58,7 +58,7 @@ class HammondGrid extends Grid
 		else
 		# hover?
 			hover = -1
-			for i,n in hc.intensity
+			for n=>i in hc.intensity
 				var p = project2(vec2(n+1, i))
 				if (m.x > p.x - 10) and (m.x < p.x + 10)
 					hover = n
@@ -120,7 +120,7 @@ class HammondRenderer extends PitchRenderer
 	func override __init__(s: Synthesizer, pitch: int)
 		for x in phi
 			x = 0
-		for a,i in A
+		for i=>a in A
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
@@ -152,7 +152,7 @@ class HammondRenderer extends PitchRenderer
 			volume = env.get()
 
 			var d: float = 0
-			for x,j in phi
+			for j=>x in phi
 				d += sin(x * HARMONIC_FREQS[j]) * synth.config.intensity[j] * A[j]
 				
 				x += delta_phi

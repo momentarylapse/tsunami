@@ -24,7 +24,7 @@ class HarmonicGrid extends Grid
 	func override on_draw(c: Painter)
 	
 		# points
-		for i,n in hc.intensity
+		for n=>i in hc.intensity
 			var z0 = vec2(n+1, 0)
 			var z1 = vec2(n+1, i)
 			c.set_line_width(2)
@@ -44,7 +44,7 @@ class HarmonicGrid extends Grid
 		else
 		# hover?
 			Hover = -1
-			for i,n in hc.intensity
+			for n=>i in hc.intensity
 				var p = project2(vec2(n+1, i))
 				if (m.x > p.x - 10) and (m.x < p.x + 10)
 					Hover = n

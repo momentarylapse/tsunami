@@ -24,7 +24,7 @@ class SampleRenderer extends PitchRenderer
 		if not weak(sample) or (len(events) == 0)
 			return false
 		var to_del: int[]
-		for e,i in events
+		for i=>e in events
 			buf.add(*sample.origin.buf, e.pos, e.volume)
 			e.pos -= buf.length
 			if e.pos + len(*sample.origin.buf) < 0

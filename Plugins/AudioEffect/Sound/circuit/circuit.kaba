@@ -31,7 +31,7 @@ class Edge
 		type = _type
 		a = n[0]
 		b = n[1]
-		for pp,i in p
+		for i=>pp in p
 			param[i] = pp
 		#print(str(self))
 	func __assign__(o: Edge)

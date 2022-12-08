@@ -261,7 +261,7 @@ class BiquadFilter
 		params.create(mode, freq, q, gain, _sample_rate)
 	func mut apply(out buf: AudioBuffer)
 		state.resize(buf.channels)
-		for c,i in buf.c
+		for i=>c in buf.c
 			# FIXME: maybe we should have len(buf.c)==buf.channels ?!?
 			#   why do we have that, anyways?
 			if i >= buf.channels

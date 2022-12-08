@@ -28,7 +28,7 @@ class ClickCounter extends AudioEffect
 		let recover_samples = int(DEFAULT_SAMPLE_RATE * RECOVER_TIME)
 	
 		volume = 0
-		for f,i in temp
+		for i=>f in temp
 			if f > volume
 				volume = f
 			if f > THRESHOLD1

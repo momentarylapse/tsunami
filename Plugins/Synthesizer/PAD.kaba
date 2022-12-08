@@ -48,7 +48,7 @@ class PADRenderer extends PitchRenderer
 		
 		var sample_rate: float = synth.sample_rate
 	
-		for a,n0 in synth.config.A
+		for n0=>a in synth.config.A
 			var n = n0 + 1
 			var nn: float = n + synth.config.detune * n0 * n0
 			var bwHz = (pow(2, synth.config.bw / 12.0) - 1.0) * freq * pow(nn, synth.config.bwscale)
@@ -111,12 +111,12 @@ class PADGrid extends Grid
 	
 		# curve + area below
 		var curve: vec2[]
-		for a,i in pc.A
+		for i=>a in pc.A
 			pc.fill_curve(curve, i)
 			draw_curve_b(c, curve, false, color.RED)
 	
 		# points
-		for a,i in pc.A
+		for i=>a in pc.A
 			draw_point2(c, vec2(i+1, a), i == selected, i == hover)
 			
 	# left button down -> select
@@ -132,7 +132,7 @@ class PADGrid extends Grid
 		else
 		# hover?
 			hover = -1
-			for a,i in pc.A
+			for i=>a in pc.A
 				var p = project2(vec2(i+1, a))
 				if (m.x > p.x - 10) and (m.x < p.x + 10)
 					hover = i

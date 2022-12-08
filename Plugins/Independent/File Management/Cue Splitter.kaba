@@ -64,7 +64,7 @@ class CueSplitter extends TsunamiPlugin
 		session.storage.load(session.song, dir << fn)
 		var r = new SongRenderer(session.song)
 		
-		for p,i in parts
+		for i=>p in parts
 			print("-----")
 			var tags: Tag[]
 			if artist != ""

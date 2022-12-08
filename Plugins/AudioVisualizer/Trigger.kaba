@@ -65,9 +65,9 @@ Grid ? '' vertical
 		p.set_color(color(0,1,0, 1))
 		p.set_line_width(1.5)
 		var z: vec2[]
-		for v,i in curve_before
+		for i=>v in curve_before
 			z.add(vec2(w/2 - len(curve_before) + i, h/2 - h * v / 2))
-		for v,i in curve_after
+		for i=>v in curve_after
 			z.add(vec2(w/2 + i, h/2 - h * v / 2))
 		p.draw_lines(z)
 
@@ -93,7 +93,7 @@ class Trigger extends AudioVisualizer
 	
 	func override process(buf: AudioBuffer)
 
-		for b,i in buf.c[0]
+		for i=>b in buf.c[0]
 			if blocked < 0
 				if abs(b) > config.threshold
 					# start trigger

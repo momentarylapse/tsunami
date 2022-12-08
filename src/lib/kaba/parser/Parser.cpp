@@ -781,8 +781,6 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 		// key => value
 		key = var;
 		var = parse_abstract_token();
-	} else if (try_consume(",")) {
-		key = parse_abstract_token();
 	}
 
 
@@ -1330,28 +1328,6 @@ shared<Node> Parser::parse_abstract_block(Block *parent, Block *block) {
 	return block;
 }
 
-// local (variable) definitions...
-void Parser::parse_abstract_local_definition_old(Block *block, shared<Node> first) {
-	while (!Exp.end_of_line()) {
-		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown);
-		node->set_num_params(2);
-		node->set_param(0, first); // type
-		node->set_param(1, parse_abstract_token()); // name
-		block->add(node);
-
-		// assignment?
-		if (Exp.cur == "=") {
-			Exp.rewind();
-			// parse assignment
-			node->set_num_params(3);
-			node->set_param(2, parse_abstract_operand_greedy(block, true));
-		}
-		if (Exp.end_of_line())
-			break;
-		expect_identifier(",", "',', '=' or newline expected after declaration of local variable");
-	}
-}
-
 // we already are in the line to analyse ...indentation for a new block should compare to the last line
 void Parser::parse_abstract_complete_command(Block *block) {
 	// beginning of a line!
@@ -1366,15 +1342,8 @@ void Parser::parse_abstract_complete_command(Block *block) {
 
 		auto first = parse_abstract_operand(block);
 
-		if (is_letter(Exp.cur[0])) {
-		//if ((first->kind == NodeKind::CLASS) and !Exp.end_of_line()) {
-			parse_abstract_local_definition_old(block, first);
-
-		} else {
-
-			// commands (the actual code!)
-			block->add(parse_abstract_operand_greedy(block, true, first));
-		}
+		// commands (the actual code!)
+		block->add(parse_abstract_operand_greedy(block, true, first));
 	}
 
 	expect_new_line();

@@ -135,7 +135,7 @@ Grid ? ''
 	func mut update_osci_pos()
 		# initial
 		p_out = vec2(40, 60)
-		for p,i in p_osci
+		for i=>p in p_osci
 			p = vec2(100+15*i, i*20)#vec2((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
 			var has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
@@ -154,9 +154,9 @@ Grid ? ''
 		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
 	func mut iterate_osci_pos()
 		var f: vec2[NUM_OSCILLATORS]
-		for o,i in fc.osc
+		for i=>o in fc.osc
 			f[i] = vec2(0,0)
-			for o2,j in fc.osc
+			for j=>o2 in fc.osc
 				if i == j
 					continue
 				if linked(i,j)
@@ -165,7 +165,7 @@ Grid ? ''
 					f[i] += _f_free(p_osci[i], p_osci[j])
 			if o.target_out
 				f[i] += _f_link(p_osci[i], p_out)
-		for o,i in fc.osc
+		for i=>o in fc.osc
 			p_osci[i] += f[i]
 	func linked(i: int, j: int) -> bool
 		return fc.osc[i].target[j] or fc.osc[j].target[i]
@@ -305,7 +305,7 @@ Grid ? ''
 		
 		for j in 0:NUM_OSCILLATORS
 			draw_osci(p, j)
-		for o,j in fc.osc
+		for j=>o in fc.osc
 			for k in 0:NUM_OSCILLATORS
 				if o.target[k]
 					draw_link(p, j, k)
@@ -438,7 +438,7 @@ class FMRenderer extends PitchRenderer
 	override synth: FMSynthesizer*
 
 	func override on_end()
-		for o,oi in osc
+		for oi=>o in osc
 			o.env.end()
 
 	func override on_start(_volume: float)
@@ -489,7 +489,7 @@ class FMRenderer extends PitchRenderer
 			for o in osc
 				if o.conf.target_out
 					buf.c[0][i] += o.output
-				for t,j in o.conf.target
+				for j=>t in o.conf.target
 					if t
 						osc[j].input += o.output
 		buf.auto_generate_channels()

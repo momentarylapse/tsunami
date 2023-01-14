@@ -1601,8 +1601,11 @@ int AudioView::playback_pos() {
 // crappy syncing....
 void AudioView::_sync_playback_pos() {
 	int spos = output_stream->samples_played();
-	int xpos = renderer->get_pos( - output_stream->get_available() - output_stream->get_latency());
-	_playback_stream_offset = xpos - spos;
+    auto lat = output_stream->get_latency();
+    if (lat.has_value()) {
+        int xpos = renderer->get_pos(-output_stream->get_available() - lat.value());
+        _playback_stream_offset = xpos - spos;
+    }
 	_playback_sync_counter = 0;
 }
 

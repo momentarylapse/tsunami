@@ -679,8 +679,9 @@ bool AudioOutput::is_playing() {
 	return (state == State::PLAYING) or (state == State::PAUSED);
 }
 
-int AudioOutput::get_latency() {
-	return latency;
+base::optional<int> AudioOutput::get_latency() {
+	return base::None;
+	//return latency;
 }
 
 int64 AudioOutput::samples_played() {

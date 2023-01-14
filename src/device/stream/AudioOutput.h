@@ -11,6 +11,7 @@
 
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/optional.h"
 #include "../../data/audio/RingBuffer.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
@@ -68,7 +69,7 @@ public:
 
 	int64 samples_played();
 
-	int get_latency();
+	base::optional<int> get_latency();
 
 private:
 	int _read_stream(int buffer_size);

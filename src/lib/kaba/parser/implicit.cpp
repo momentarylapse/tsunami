@@ -13,6 +13,7 @@ namespace kaba {
 const int FULL_CONSTRUCTOR_MAX_PARAMS = 4;
 
 extern const Class *TypeCallableBase;
+extern const Class *TypeDynamicArray;
 
 
 Array<const Class*> get_callable_param_types(const Class *fp);
@@ -296,6 +297,7 @@ void AutoImplementer::auto_implement_shared_destructor(Function *f, const Class 
 void AutoImplementer::auto_implement_regular_assign(Function *f, const Class *t) {
 	if (!f)
 		return;
+
 	auto te = t->get_array_element();
 	auto n_other = add_node_local(f->__get_var("other"));
 	auto n_self = add_node_local(f->__get_var(IDENTIFIER_SELF));
@@ -322,7 +324,7 @@ void AutoImplementer::auto_implement_regular_assign(Function *f, const Class *t)
 
 		auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, p, o);
 		if (!n_assign)
-			do_error_implicit(f, format("no operator %s = %s for element \"%s\"", e.type->long_name(), e.type->long_name(), e.name));
+			do_error_implicit(f, format("no operator '%s = %s' for element '%s'", e.type->long_name(), e.type->long_name(), e.name));
 		f->block->add(n_assign);
 	}
 }
@@ -341,6 +343,9 @@ void AutoImplementer::auto_implement_super_array_destructor(Function *f, const C
 
 
 void AutoImplementer::auto_implement_array_assign(Function *f, const Class *t) {
+	if (!f)
+		return;
+
 	auto te = t->get_array_element();
 	auto n_other = add_node_local(f->__get_var("other"));
 	auto n_self = add_node_local(f->__get_var(IDENTIFIER_SELF));
@@ -975,17 +980,19 @@ bool can_fully_construct(const Class *t) {
 	return num_el > 0;
 }
 
-bool class_should_assign(const Class *t) {
-	if (t->parent)
-		if (!class_should_assign(t->parent))
-			return false;
-	for (auto &e: t->elements) {
-		if (!class_should_assign(e.type))
-			return false;
-		if (e.type->is_pointer_owned())
-			return false;
-	}
-	return true;
+int kaba_int_passthrough(int i);
+int op_int_add(int a, int b);
+bool op_int_eq(int a, int b);
+bool op_int_neq(int a, int b);
+int enum_parse(const string&, const Class*);
+Array<int> enum_all(const Class*);
+
+bool class_can_assign(const Class *t) {
+	if (t->is_pointer())
+		return true;
+	if (t->get_assign())
+		return true;
+	return false;
 }
 
 void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
@@ -1007,7 +1014,8 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 			add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		if (t->needs_destructor())
 			add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
-		add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
+		if (class_can_assign(t->param[0]))
+			add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	} else if (t->is_dict()) {
 		add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
@@ -1032,9 +1040,11 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 	} else if (t->is_product()) {
 		if (t->needs_constructor())
 			add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
+		// TODO check if possible:
 		add_full_constructor(t, this);
 		if (!t->can_memcpy()) // needs destructor...
 			add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
+		// TODO check if possible:
 		add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 		if (t->get_assign() and t->can_memcpy())
 			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
@@ -1046,14 +1056,55 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		types.insert(TypePointer, 0);
 		add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, types, {"p", "a", "b", "c", "d", "e", "f", "g", "h"});
 		add_func_header(t, IDENTIFIER_FUNC_CALL, get_callable_return_type(t), get_callable_param_types(t), {"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+	} else if (t->is_enum()) {
+
+
+		class_add_func("from_int", t, &kaba_int_passthrough, Flags::_STATIC__PURE);
+			func_set_inline(InlineID::PASSTHROUGH);
+			func_add_param("i", TypeInt);
+		//class_add_func(IDENTIFIER_FUNC_STR, TypeString, &i2s, Flags::PURE);
+		class_add_func("__int__", TypeInt, &kaba_int_passthrough, Flags::PURE);
+			func_set_inline(InlineID::PASSTHROUGH);
+        if (!flags_has(t->flags, Flags::NOAUTO)) {
+            class_add_func("parse", t, &enum_parse, Flags::_STATIC__PURE);
+                func_add_param("label", TypeString);
+                func_add_param("type", TypeClassP);
+            class_add_func("all", TypeDynamicArray, &enum_all, Flags::_STATIC__PURE);
+                func_add_param("type", TypeClassP);
+        }
+		add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT_ASSIGN);
+		add_operator(OperatorID::ADD, t, t, t, InlineID::INT_ADD, &op_int_add);
+		add_operator(OperatorID::ADDS, TypeVoid, t, t, InlineID::INT_ADD_ASSIGN);
+		add_operator(OperatorID::EQUAL, TypeBool, t, t, InlineID::INT_EQUAL, &op_int_eq);
+		add_operator(OperatorID::NOTEQUAL, TypeBool, t, t, InlineID::INT_NOT_EQUAL, &op_int_neq);
+		add_operator(OperatorID::BIT_AND, t, t, t, InlineID::INT_AND);
+		add_operator(OperatorID::BIT_OR, t, t, t, InlineID::INT_OR);
+
+		for (auto f: weak(t->functions)) {
+			if (f->name == "parse") {
+				f->default_parameters.resize(2);
+				auto c = add_constant(TypeClassP, t);
+				c->as_int64() = (int_p)t;
+				f->mandatory_params = 1;
+				f->default_parameters[1] = add_node_const(c, t->token_id);
+			} else if (f->name == "all") {
+				f->literal_return_type = request_implicit_class_super_array(t, t->token_id);
+				f->default_parameters.resize(1);
+				auto c = add_constant(TypeClassP, t);
+				c->as_int64() = (int_p)t;
+				f->mandatory_params = 0;
+				f->default_parameters[0] = add_node_const(c, t->token_id);
+			}
+		}
 	} else { // regular classes
 		if (t->can_memcpy()) {
 			if (has_user_constructors(t)) {
 			} else {
 				if (t->needs_constructor())
 					add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
-				if (can_fully_construct(t))
-					add_full_constructor(t, this);
+				if (!flags_has(t->flags, Flags::NOAUTO))
+					if (can_fully_construct(t))
+						add_full_constructor(t, this);
 			}
 		} else {
 			if (t->parent) {
@@ -1068,17 +1119,18 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 			if (t->get_constructors().num == 0) {
 				if (t->needs_constructor())
 					add_func_header(t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
-				if (can_fully_construct(t))
-					add_full_constructor(t, this);
+				if (!flags_has(t->flags, Flags::NOAUTO))
+					if (can_fully_construct(t))
+						add_full_constructor(t, this);
 			}
 			if (needs_new(t->get_destructor()))
 				add_func_header(t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		}
-		if (class_should_assign(t) and needs_new(t->get_assign())) {
+		if (!flags_has(t->flags, Flags::NOAUTO) and needs_new(t->get_assign())) {
 			//add_func_header(t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
 			// implement only if parent has also done so
 			if (t->parent) {
-				if (t->parent->get_assign())
+				if (class_can_assign(t->parent))
 					add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			} else {
 				add_func_header(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());

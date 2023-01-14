@@ -61,6 +61,7 @@ const string IDENTIFIER_WEAK = "weak";
 const string IDENTIFIER_SHARED = "shared";
 const string IDENTIFIER_OWNED = "owned";
 const string IDENTIFIER_PURE = "pure";
+const string IDENTIFIER_NOAUTO = "@noauto";
 const string IDENTIFIER_THROWS = "throws";
 const string IDENTIFIER_USE = "use";
 const string IDENTIFIER_IMPORT = "import";

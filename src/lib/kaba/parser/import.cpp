@@ -179,7 +179,7 @@ void namespace_import_contents(Class *parent, const Class *child) {
 
 Class *get_namespace_for_import(SyntaxTree *tree, const string &name) {
 	auto xx = name.explode(".");
-	Class *ns = tree->base_class;
+	Class *ns = tree->imported_symbols.get();
 	flags_set(ns->flags, Flags::EXTERN); // "don't delete contents..."
 
 	auto get_next = [tree] (Class *ns, const string &name) {

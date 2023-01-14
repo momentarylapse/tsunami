@@ -60,6 +60,7 @@ extern const string IDENTIFIER_WEAK;
 extern const string IDENTIFIER_SHARED;
 extern const string IDENTIFIER_OWNED;
 extern const string IDENTIFIER_PURE;
+extern const string IDENTIFIER_NOAUTO;
 extern const string IDENTIFIER_THROWS;
 extern const string IDENTIFIER_USE;
 extern const string IDENTIFIER_IMPORT;

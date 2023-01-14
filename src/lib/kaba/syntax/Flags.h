@@ -42,6 +42,7 @@ enum class Flags {
 	AUTO_CAST = 1<<14,
 	TEMPLATE = 1<<15,
 	NEEDS_OVERRIDE = 1<<16,
+	NOAUTO = 1 << 17,
 
 	AUTO_IMPORT = 1<<24,
 	FULLY_PARSED = 1<<25,

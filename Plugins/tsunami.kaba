@@ -13,11 +13,11 @@ use hui
 use kaba
 use os
 
-const NUM_PEAK_LEVELS = 24
+let NUM_PEAK_LEVELS = 24
 
-const DEFAULT_SAMPLE_RATE = 44100
+let DEFAULT_SAMPLE_RATE = 44100
 
-const MAX_PITCH = 128
+let MAX_PITCH = 128
 
 class Range
 	var offset, length: int
@@ -31,7 +31,7 @@ class Range
 	func extern __str__() -> string
 	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
-func const RangeTo(start: int, end: int) -> Range
+func RangeTo(start: int, end: int) -> Range
 	return Range(start, end - start)
 
 
@@ -96,7 +96,7 @@ class ConfigPanel extends Panel
 	func extern changed()
 	var c: Module*
 
-class Module as shared extends Object
+class Module extends Object as shared
 
 	enum Command
 		START
@@ -127,8 +127,6 @@ class Module as shared extends Object
 	var port_out: Port*[]
 	func extern __init__(type: Type, sub_type: string)
 	func extern override __delete__()
-	func __assign__(o: Module)
-		pass
 	func extern mut reset_config()
 	func extern virtual mut reset_state()
 	func extern mut changed()
@@ -222,7 +220,7 @@ class AudioBuffer
 
 func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
 
-class RingBuffer
+class RingBuffer as @noauto
 	enum PeekMode
 		FORWARD_REF
 		FORWARD_COPY_WRAP
@@ -239,7 +237,6 @@ class RingBuffer
 	func extern mut write_ref(b: AudioBuffer, size: int)
 	func extern mut write_ref_done(b: AudioBuffer)
 	func extern mut clear()
-	func mut __assign__(o: RingBuffer)
 
 
 # general "interface"
@@ -274,11 +271,9 @@ class PitchDetector extends MidiSource
 	func extern override mut read(out midi: MidiEventBuffer) -> int
 	func extern virtual mut process(out midi: MidiEventBuffer, buf: AudioBuffer)
 
-class PitchRenderer
+class PitchRenderer as @noauto
 	func extern __init__(synth: Synthesizer, pitch: int)
 	func extern virtual __delete__()
-	func mut __assign__(o: PitchRenderer)
-		pass
 	func extern virtual mut render(out buf: AudioBuffer) -> bool
 	#extern virtual void on_event(MidiEvent e)
 	func extern virtual mut on_start(volume: float)
@@ -407,7 +402,7 @@ enum SignalType
 	AUDIO_STEREO
 	GROUP
 
-class TrackLayer as shared
+class TrackLayer extends Object as shared
 	var type: SignalType
 	var track: Track*
 	var buffers: AudioBuffer[]
@@ -430,7 +425,7 @@ class TrackLayer as shared
 	func extern mut delete_marker(marker: TrackMarker*)
 	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)
 
-class Sample as shared # TODO
+class Sample extends Object as shared # TODO
 	var name: string
 	var type: int
 	var buf: AudioBuffer*
@@ -492,7 +487,7 @@ class Track as shared
 class Tag
 	var key, value: string
 
-class Song as shared
+class Song extends Object as shared
 	var filename: Path
 	var tags: Tag[]
 	var sample_rate: int
@@ -507,7 +502,7 @@ class Song as shared
 	var secret_data: any
 	
 	func extern __init__(session: Session, sample_rate: int)
-	func extern virtual __delete__()
+	func extern override __delete__()
 	
 	func extern range() -> Range
 	func extern selfref time_track() -> Track*
@@ -658,7 +653,7 @@ class SignalChain extends Module
 	func extern mut set_update_dt(dt: float)
 	func extern mut set_buffer_size(size: int)
 
-class Session as shared extends Object
+class Session extends Object as shared
 	var id: int
 	#var win: TsunamiWindow*
 	var win: Window*

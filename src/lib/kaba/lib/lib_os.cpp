@@ -77,6 +77,18 @@ public:
 	int _cdecl _read_bytes(bytes &data) {
 		return read(data);
 	}
+	int _get_pos() {
+		return get_pos();
+	}
+	void _set_pos(int pos) {
+		set_pos(pos);
+	}
+	void _seek(int delta) {
+		seek(delta);
+	}
+	int _get_size32() {
+		return get_size32();
+	}
 };
 
 template<class F>
@@ -429,11 +441,11 @@ void SIAddPackageOS(Context *c) {
 		//class_add_func("getCDate", TypeDate, &File::GetDateCreation);
 		class_add_func("mtime", TypeDate, &os::fs::FileStream::mtime);
 		//class_add_func("getADate", TypeDate, &FileStream::GetDateAccess);
-		class_add_func("get_size", TypeInt, &os::fs::FileStream::get_size32);
-		class_add_func("get_pos", TypeInt, &os::fs::FileStream::get_pos);
-		class_add_func("set_pos", TypeVoid, &os::fs::FileStream::set_pos, Flags::RAISES_EXCEPTIONS);
+		class_add_func("get_size", TypeInt, &KabaFileStream::_get_size32);
+		class_add_func("get_pos", TypeInt, &KabaFileStream::_get_pos);//os::fs::FileStream::get_pos);
+		class_add_func("set_pos", TypeVoid, &KabaFileStream::_set_pos, Flags::RAISES_EXCEPTIONS);
 			func_add_param("pos", TypeInt);
-		class_add_func("seek", TypeVoid, &os::fs::FileStream::seek, Flags::RAISES_EXCEPTIONS);
+		class_add_func("seek", TypeVoid, &KabaFileStream::_seek, Flags::RAISES_EXCEPTIONS);
 			func_add_param("delta", TypeInt);
 		class_add_func("read", TypeString, &KabaFileStream::_read_size, Flags::RAISES_EXCEPTIONS);
 			func_add_param("size", TypeInt);

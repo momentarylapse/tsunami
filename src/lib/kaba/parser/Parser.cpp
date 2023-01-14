@@ -1393,6 +1393,12 @@ void Parser::parse_enum(Class *_namespace) {
 	int token0 = Exp.cur_token();
 	auto _class = tree->create_new_class(Exp.consume(), Class::Type::ENUM, sizeof(int), -1, nullptr, {}, _namespace, token0);
 
+	// as shared|@noauto
+	if (try_consume(IDENTIFIER_AS))
+		_class->flags = parse_flags(_class->flags);
+
+	tree->add_missing_function_headers_for_class(_class);
+
 	expect_new_line_with_indent();
 	Exp.next_line();
 	int indent0 = Exp.cur_line->indent;
@@ -1493,13 +1499,6 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 	if (as_interface)
 		_class->type = Class::Type::INTERFACE;
 
-	if (try_consume(IDENTIFIER_AS)) {
-		if (try_consume(IDENTIFIER_SHARED))
-			flags_set(_class->flags, Flags::SHARED);
-		else
-			do_error_exp("'shared' extected after 'as'");
-	}
-
 	// parent class
 	if (try_consume(IDENTIFIER_EXTENDS)) {
 		auto parent = parse_type(_namespace); // force
@@ -1507,6 +1506,7 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 			return nullptr;
 			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
 		_class->derive_from(parent, true);
+		_class->flags = parent->flags;
 		offset0 = parent->size;
 	}
 
@@ -1517,13 +1517,20 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 		_class->derive_from(parent, true);
 		offset0 = parent->size;
 	}
+
+	// as shared|@noauto
+	Flags explicit_flags = Flags::NONE;
+	if (try_consume(IDENTIFIER_AS)) {
+		explicit_flags = parse_flags(explicit_flags);
+		flags_set(_class->flags, explicit_flags);
+	}
+
 	expect_new_line();
 
-	if (flags_has(_class->flags, Flags::SHARED)) {
+	if (flags_has(explicit_flags, Flags::SHARED)) {
 		parser_class_add_element(this, _class, IDENTIFIER_SHARED_COUNT, TypeInt, Flags::NONE, offset0, _class->token_id);
 	}
 
-	//msg_write("parse " + _class->long_name());
 	return _class;
 }
 
@@ -1548,13 +1555,11 @@ bool Parser::parse_class(Class *_namespace) {
 		if (Exp.cur == IDENTIFIER_ENUM) {
 			parse_enum(_class);
 		} else if ((Exp.cur == IDENTIFIER_CLASS) or (Exp.cur == IDENTIFIER_INTERFACE)) {
-			//msg_write("sub....");
 			int cur_token = Exp.cur_token();
 			if (!parse_class(_class)) {
 				sub_class_token_ids.add(cur_token);
 				skip_parse_class();
 			}
-			//msg_write(">>");
 		} else if (Exp.cur == IDENTIFIER_FUNC) {
 			auto flags = Flags::CONST;
 			if (_class->is_interface())
@@ -1570,7 +1575,6 @@ bool Parser::parse_class(Class *_namespace) {
 			parse_class_use_statement(_class);
 		} else {
 			parse_class_variable_declaration(_class, tree->root_of_all_evil->block.get(), _offset);
-			//do_error("unknown definition inside a class");
 		}
 	}
 
@@ -1579,14 +1583,10 @@ bool Parser::parse_class(Class *_namespace) {
 
 	int cur_token = Exp.cur_token();
 
-	//msg_write(ia2s(sub_class_line_offsets));
 	for (int id: sub_class_token_ids) {
-		//msg_write("SUB...");
 		Exp.jump(id);
-		//.add(Exp.get_line_no());
 		if (!parse_class(_class))
 			do_error(format("parent class not fully parsed yet"), id);
-			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
 	}
 
 	Exp.jump(cur_token-1);
@@ -2044,16 +2044,18 @@ Flags Parser::parse_flags(Flags initial) {
 			flags_set(flags, Flags::OVERRIDE);
 		} else if (Exp.cur == IDENTIFIER_SELFREF or Exp.cur == IDENTIFIER_REF) {
 			flags_set(flags, Flags::REF);
-		//} else if (Exp.cur == IDENTIFIER_SHARED) {
-		//	flags = flags_mix({flags, Flags::SHARED});
-		//} else if (Exp.cur == IDENTIFIER_OWNED) {
-		//	flags = flags_mix({flags, Flags::OWNED});
+		} else if (Exp.cur == IDENTIFIER_SHARED) {
+			flags_set(flags, Flags::SHARED);
+		} else if (Exp.cur == IDENTIFIER_OWNED) {
+			flags_set(flags, Flags::OWNED);
 		} else if (Exp.cur == IDENTIFIER_OUT) {
 			flags_set(flags, Flags::OUT);
 		} else if (Exp.cur == IDENTIFIER_THROWS) {
 			flags_set(flags, Flags::RAISES_EXCEPTIONS);
 		} else if (Exp.cur == IDENTIFIER_PURE) {
 			flags_set(flags, Flags::PURE);
+		} else if (Exp.cur == IDENTIFIER_NOAUTO) {
+			flags_set(flags, Flags::NOAUTO);
 		} else {
 			break;
 		}

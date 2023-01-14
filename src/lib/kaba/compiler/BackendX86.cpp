@@ -303,7 +303,6 @@ void BackendX86::correct_implement_commands() {
 			auto type = p1.type;
 			int vecx;
 			if (type == TypeInt64) {
-				msg_error("shl int64");
 				vecx = cmd.add_virtual_reg(Asm::RegID::RCX);
 			} else {
 				vecx = cmd.add_virtual_reg(Asm::RegID::ECX);

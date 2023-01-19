@@ -126,8 +126,8 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 					p.kind = NodeKind::LABEL;
 					p.p = fp->_label;
 				} else {
-					p.p = (int_p)cc->address; // FIXME ....need a cleaner approach for compiling os...
-					if (config.compile_os)
+					p.p = (int_p)cc->address_runtime; // FIXME ....need a cleaner approach for compiling os...
+					if (config.compile_os or (p.type == TypeFunctionCodeP)) // from raw_function_pointer
 						p.kind = NodeKind::MEMORY;
 					else
 						p.kind = NodeKind::CONSTANT_BY_ADDRESS;
@@ -1090,8 +1090,7 @@ void BackendX86::assemble() {
 	stack_max_size = mem_align(stack_max_size, config.stack_frame_align);
 
 	list->insert_location_label(cur_func->_label);
-
-	if (!config.no_function_frame)
+	if (!flags_has(cur_func->flags, Flags::NOFRAME))
 		add_function_intro_frame(stack_max_size); // param intro later...
 
 	for (auto &c: cmd.cmd) {

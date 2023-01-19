@@ -2056,6 +2056,8 @@ Flags Parser::parse_flags(Flags initial) {
 			flags_set(flags, Flags::PURE);
 		} else if (Exp.cur == IDENTIFIER_NOAUTO) {
 			flags_set(flags, Flags::NOAUTO);
+		} else if (Exp.cur == IDENTIFIER_NOFRAME) {
+			flags_set(flags, Flags::NOFRAME);
 		} else {
 			break;
 		}

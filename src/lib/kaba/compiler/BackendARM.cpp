@@ -891,7 +891,7 @@ void BackendARM::assemble() {
 
 	list->insert_location_label(cur_func->_label);
 
-	if (!config.no_function_frame)
+	if (!flags_has(cur_func->flags, Flags::NOFRAME))
 		add_function_intro_frame(stack_max_size);
 
 //	do_error("new ARM assemble() not yet implemented");

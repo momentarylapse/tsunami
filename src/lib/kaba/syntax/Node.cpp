@@ -275,7 +275,7 @@ void *Node::as_func_p() const {
 
 // will be the address at runtime...(not the current location...)
 void *Node::as_const_p() const {
-	return as_const()->address;
+	return as_const()->address_runtime;
 }
 
 void *Node::as_global_p() const {

@@ -1207,6 +1207,13 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		//bb->show();
 		return bb;
 
+	} else if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::RAW_FUNCTION_POINTER)) {
+		// only extract explicit raw_function_pointer()
+		// skip implicit from callable...
+		if (n->params[0]->kind == NodeKind::CONSTANT) {
+			n->params[0]->as_const()->type = TypeFunctionCodeP;
+			return n->params[0];
+		}
 	}
 
 	// TODO experimental dynamic type insertion

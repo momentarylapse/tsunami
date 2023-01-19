@@ -269,8 +269,9 @@ void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Bloc
 		case StatementID::PASS:
 			break;
 		case StatementID::RAW_FUNCTION_POINTER: {
+			// only from callable can reach here!
 			if (config.compile_os)
-				do_error("raw_function_pointer() for os not implemented yet");
+				do_error("implicit raw_function_pointer() for os not implemented yet (i.e. don't use callables/function pointers)");
 			auto func = serialize_parameter(com->params[0].get(), block, index);
 			auto t1 = add_temp(TypePointer);
 			cmd.add_cmd(Asm::InstID::ADD, t1, func, param_imm(TypeInt, config.function_address_offset)); // Function* pointer

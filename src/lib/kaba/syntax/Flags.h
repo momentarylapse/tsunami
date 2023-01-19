@@ -43,6 +43,7 @@ enum class Flags {
 	TEMPLATE = 1<<15,
 	NEEDS_OVERRIDE = 1<<16,
 	NOAUTO = 1 << 17,
+	NOFRAME = 1 << 18,
 
 	AUTO_IMPORT = 1<<24,
 	FULLY_PARSED = 1<<25,

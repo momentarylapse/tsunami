@@ -70,7 +70,7 @@ int& Value::as_int() const {
 	return *(int*)value.data;
 }
 
-long long& Value::as_int64() const {
+int64& Value::as_int64() const {
 	return *(long long*)value.data;
 }
 
@@ -169,17 +169,17 @@ Constant::Constant(const Class *_type, SyntaxTree *_owner) {
 	name = "-none-";
 	owner = _owner;
 	used = false;
-	address = p();
+	address_compiler = address_runtime = p();
 }
 
 void Constant::init(const Class *_type) {
 	Value::init(_type);
-	address = p();
+	address_compiler = address_runtime = p();
 }
 
 void Constant::set(const Value &v) {
 	Value::set(v);
-	address = p();
+	address_compiler = address_runtime = p();
 }
 
 string Constant::str() const {

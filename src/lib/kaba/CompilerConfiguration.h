@@ -60,7 +60,6 @@ public:
 
 	bool compile_os;
 	bool remove_unused;
-	bool no_function_frame;
 	bool add_entry_point;
 	bool override_variables_offset;
 	int64 variables_offset;

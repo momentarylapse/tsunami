@@ -53,7 +53,8 @@ public:
 	Constant(const Class *type, SyntaxTree *owner);
 	string name;
 	string str() const;
-	void *address; // either p() or overriden for OS
+	void *address_compiler;
+	void *address_runtime;
 	bool used;
 	SyntaxTree *owner;
 	

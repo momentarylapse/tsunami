@@ -36,6 +36,8 @@ void MidiPainterModeTab::update() {
 		shadow_width = clef_line_width * 8.0f;
 
 	rr = string_dy * 0.4f;
+	shadow_offset = rr / 4;
+	//shadow_hole = 0;
 }
 
 void MidiPainterModeTab::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -73,15 +75,17 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 		return;
 	}
 
-	if (x2 - x1 > mp->quality.tab_text_threshold /*and rr > 5*/) {
+	float shadow_len = (x2 - x1) - shadow_offset*2 - shadow_hole;
+
+	if (shadow_len > mp->quality.tab_text_threshold /*and rr > 5*/) {
 		string tt = i2s(n->pitch - mp->instrument->string_pitch[n->stringno]);
-		float dx = rr * 0.8f * tt.num;
+		float hole = rr * 0.8f * tt.num;
 
 		// "shadow" to indicate length
-		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold*1.5f)) {
+		if (mp->allow_shadows and (shadow_len > mp->quality.shadow_threshold*1.5f)) {
 			//draw_shadow(c, x1, x2, y, 2, rr, col, col_shadow);
-			dx += rr * 1.0f;
-			draw_shadow2(c, x1, x2, y, dx, shadow_width, col_shadow);
+			hole += rr * 2.0f;
+			draw_shadow2(c, x1, x2, y, hole, 1, col_shadow);
 		}
 
 		// hide the string line to make the number more readable
@@ -89,7 +93,7 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 		cc.a = 0.5f;
 
 		c->set_color(cc);
-		c->draw_rect(rect(x - dx, x + dx, y - 2, y + 2));
+		c->draw_rect(rect(x - hole/2, x + hole/2, y - 2, y + 2));
 
 		// fret number as symbol
 		c->set_color(col);

@@ -46,12 +46,12 @@ void draw_shadow(Painter *c, float x1, float x2, float y, float shadow_width, co
 	c->draw_rect(rect(x1, x2, y - shadow_width/2, y + shadow_width/2));
 }
 
-void draw_shadow2(Painter *c, float x1, float x2, float y, float dx, float shadow_width, const color &col) {
+void MidiPainterMode::draw_shadow2(Painter *c, float x1, float x2, float y, float hole, float scale, const color &col) {
 	c->set_color(col);
-	c->set_line_width(shadow_width);
+	c->set_line_width(shadow_width * scale);
 	float x = (x1 + x2) / 2;
-	c->draw_line({x1, y}, {x - dx, y});
-	c->draw_line({x + dx, y}, {x2, y});
+	c->draw_line({x1 + shadow_offset, y}, {x - hole/2, y});
+	c->draw_line({x + hole/2, y}, {x2 - shadow_offset, y});
 }
 
 MidiPainterMode::MidiPainterMode(MidiPainter *mp) :

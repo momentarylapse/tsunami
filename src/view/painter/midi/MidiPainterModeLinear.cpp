@@ -32,6 +32,8 @@ void MidiPainterModeLinear::update() {
 	rr = max((pitch2y(0) - pitch2y(1)) / 1.0f, 3.5f);
 
 	shadow_width = rr*1.1f;
+	shadow_hole = rr * 3;
+	shadow_offset = rr / 4;
 }
 
 void MidiPainterModeLinear::draw_notes(Painter *c, const MidiNoteBuffer &midi) {
@@ -63,23 +65,25 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 	color col, col_shadow;
 	get_col(col, col_shadow, &n, state, mp->is_playable, local_theme);
 
+	float shadow_len = (x2 - x1) - shadow_offset*2 - shadow_hole;
+
 	if (state & MidiNoteState::SELECTED) {
 		color col1 = local_theme.pitch_text[(int)n.pitch % 12];//selection;
 
 		// "shadow" to indicate length
-		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold)) {
+		if (mp->allow_shadows and (shadow_len > mp->quality.shadow_threshold)) {
 			//draw_shadow(c, x1, x2, y, rx, rr, col_shadow);
-			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 1.2f, col1);
-			draw_shadow2(c, x1, x2, y, rr * 2, shadow_width * 0.8f, col_shadow);
+			draw_shadow2(c, x1, x2, y, shadow_hole, 1.2f, col1);
+			draw_shadow2(c, x1, x2, y, shadow_hole, 0.8f, col_shadow);
 		}
 
 		mp->draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
 		mp->draw_simple_note(c, x1, x2, y, -2, col, col_shadow, false);
 	} else {
 		// "shadow" to indicate length
-		if (mp->allow_shadows and (x2 - x1 > mp->quality.shadow_threshold))
-			draw_shadow(c, x1, x2, y, shadow_width, col_shadow);
-			//draw_shadow2(c, x1, x2, y, rr * 2, clef_line_width * 3, col_shadow);
+		if (mp->allow_shadows and (shadow_len > mp->quality.shadow_threshold))
+			//draw_shadow(c, x1, x2, y, shadow_width, col_shadow);
+			draw_shadow2(c, x1, x2, y, shadow_hole, 1, col_shadow);
 
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}

@@ -100,7 +100,7 @@ void draw(Painter *p, const vec2 &pos, float size, const string &s, bool bold, i
 		//p->drawImage(x + dx, y, sym->im);
 		p->draw_mask_image(pos + d, &sym->im);
 	} else {
-		p->set_font_size(size);
+		p->set_font("", size, bold, false);
 		if (align == 0)
 			d.x = - p->get_str_width(s) / 2;
 		if (align == -1)

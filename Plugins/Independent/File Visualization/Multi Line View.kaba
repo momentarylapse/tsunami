@@ -99,8 +99,8 @@ class MyDialog extends hui.Dialog
 	func mut make_sure_sample_on_screen(s: int)
 		if y_offset_t >= 0
 			return
-		var y0 = sample_to_screen(s).y
-		var dy = mlp.get_line_dy()
+		let y0 = sample_to_screen(s).y
+		let dy = mlp.get_line_dy()
 		if y0 < 0
 			set_scroll_target(y_offset + y0)
 		else if y0 + dy*2 > area.y2
@@ -126,7 +126,7 @@ class MyDialog extends hui.Dialog
 			session.view.play()
 	
 	func mut on_key()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		if e.key == hui.KEY_SPACE
 			on_play()
 	
@@ -152,13 +152,13 @@ class MyDialog extends hui.Dialog
 		force_redraw()
 	
 	func mut on_scroll()
-		var e = hui.get_event()
-		var speed = session.view.mouse_wheel_speed #float(hui.config["View.MouseWheelSpeed"])
+		let e = hui.get_event()
+		let speed = session.view.mouse_wheel_speed #float(hui.config["View.MouseWheelSpeed"])
 		config.y_offset = clamp(y_offset + e.scroll.y*20*speed, 0.0, 100000)
 		mlv.changed()
 	
 	func mut on_click()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		session.view.set_playback_pos(screen_to_sample(e.mouse))
 	
 	func screen_to_sample(pos: vec2) -> int
@@ -196,16 +196,16 @@ class MyDialog extends hui.Dialog
 			"collapse-midi": true}))
 		var y0 = 10.0 - y_offset
 		var offset = 0
-		var dy = mlp.get_line_dy()
+		let dy = mlp.get_line_dy()
 		line_samples.clear()
 		line_y0.clear()
 		while offset < session.song.range().end()
 			line_samples.add(offset)
 			line_y0.add(y0)
 			var s0 = offset
-			var y00 = y0
+			let y00 = y0
 			
-			var line_samples = mlp.next_line_samples(offset)
+			let line_samples = mlp.next_line_samples(offset)
 			if y0+dy > 0 and y0 < p.height
 				# on screen
 				y0 = mlp.draw_next_line(p, offset, [0, y0])
@@ -216,10 +216,10 @@ class MyDialog extends hui.Dialog
 			#line_samples.add(offset - s0)
 			
 			if session.view.is_playback_active()
-				var pos = session.view.playback_pos()
+				let pos = session.view.playback_pos()
 				if pos >= s0 and pos < offset
-					var w = p.width - border*2
-					var x = border + float(pos - s0) * w / float(offset - s0)
+					let w = p.width - border*2
+					let x = border + float(pos - s0) * w / float(offset - s0)
 					p.set_color([0.2, 0.8, 0.2, 1]) #colors.
 					p.set_line_width(3)
 					p.draw_line([x, y00], [x, y0])

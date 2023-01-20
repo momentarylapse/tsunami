@@ -44,6 +44,8 @@ public:
 
 	Session *create_child();
 
+	void prepare_end();
+
 	int id;
 	owned<TsunamiWindow> win;
 	hui::Window *_kaba_win;

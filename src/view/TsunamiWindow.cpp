@@ -388,17 +388,16 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 void tsunami_clean_up(Session *session) {
 	auto sessions = weak(tsunami->session_manager->sessions);
 	foreachi(Session *s, sessions, i)
-		if (s == session and s->auto_delete) {
-			//msg_write("--------Tsunami erase...");
+		if (s == session and s->auto_delete)
 			tsunami->session_manager->sessions.erase(i);
-		}
 
-	//msg_write(tsunami->sessions.num);
 	if (tsunami->session_manager->sessions.num == 0)
 		tsunami->end();
 }
 
 TsunamiWindow::~TsunamiWindow() {
+	session->prepare_end();
+
 	int w, h;
 	get_size_desired(w, h);
 	hui::config.set_int("Window.Width", w);

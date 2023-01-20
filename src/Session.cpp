@@ -75,7 +75,12 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 }
 
 Session::~Session() {
-	//msg_write("~Session");
+}
+
+void Session::prepare_end() {
+	for (auto p: weak(plugins))
+		p->on_stop();
+	plugins.clear();
 }
 
 int Session::sample_rate() {

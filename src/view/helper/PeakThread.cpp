@@ -6,19 +6,51 @@
  */
 
 #include "PeakThread.h"
-#include "../audioview/AudioView.h" // FIXME: get rid!
 #include "../../data/Song.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Sample.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../stuff/PerformanceMonitor.h"
+#include "../../lib/hui/hui.h"
 #include "../../lib/os/time.h"
 
 
-PeakThread::PeakThread(AudioView *_view) {
-	view = _view;
-	song = view->song;
+InterThreadMessager::~InterThreadMessager() {
+	flush();
+}
+
+void InterThreadMessager::unsubscribe(VirtualBase *o) {
+	flush();
+	Observable::unsubscribe(o);
+}
+
+void InterThreadMessager::flush() {
+	if (flushing.load())
+		return;
+	flushing = true;
+	while (counter.load() > 0)
+		hui::Application::do_single_main_loop();
+		//os::sleep(0.01f);
+}
+
+// call from any thread, will notify in main/GUI thread
+void InterThreadMessager::notify_x() {
+	if (flushing.load())
+		return;
+	counter.fetch_add(1);
+	hui::run_later(0.001f, [this] {
+		if (!flushing.load())
+			this->notify();
+		counter.fetch_sub(1);
+	});
+}
+
+
+
+
+PeakThread::PeakThread(Song *s) {
+	song = s;
 	allow_running = true;
 	updating = false;
 	perf_channel = PerformanceMonitor::create_channel("peakthread", this);
@@ -113,6 +145,7 @@ void PeakThread::update_song() {
 }
 
 void PeakThread::notify() {
-	hui::run_later(0.01f, [this] { view->force_redraw(); });
+	messanger.notify_x();
+	//hui::run_later(0.01f, [this] { view->force_redraw(); });
 }
 

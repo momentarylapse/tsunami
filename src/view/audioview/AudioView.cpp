@@ -265,7 +265,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(metronome_overlay_vlayer);
 
 
-	cpu_display = new CpuDisplay(session, [&]{ force_redraw(); });
+	cpu_display = new CpuDisplay(session, [this] {
+		force_redraw();
+	});
 	scene_graph->add_child(cpu_display);
 
 	buffer_painter = new BufferPainter(this);
@@ -289,7 +291,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = Image::load(tsunami->directory_static << "icons/track-midi.png");
 	images.track_group = Image::load(tsunami->directory_static << "icons/track-group.png");
 
-	peak_thread = new PeakThread(this);
+	peak_thread = new PeakThread(song);
+	peak_thread->messanger.subscribe(this, [this] {
+		force_redraw();
+	}, InterThreadMessager::MESSAGE_ANY);
 	peak_thread->run();
 	draw_runner_id = -1;
 
@@ -303,8 +308,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	signal_chain->connect(peak_meter, 0, output_stream, 0);
 	signal_chain->mark_all_modules_as_system();
 
-	signal_chain->subscribe(this, [this]{ on_stream_tick(); }, Module::MESSAGE_TICK);
-	signal_chain->subscribe(this, [this]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+	signal_chain->subscribe(this, [this] {
+		on_stream_tick();
+	}, Module::MESSAGE_TICK);
+	signal_chain->subscribe(this, [this] {
+		on_stream_state_change();
+	}, Module::MESSAGE_STATE_CHANGE);
 
 
 	peak_meter_display = new PeakMeterDisplay(peak_meter, PeakMeterDisplay::Mode::BOTH);
@@ -325,10 +334,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	//output_volume_dial->reference_value = 50;
 	output_volume_dial->unit = "%";
 	output_volume_dial->set_value(output_stream->get_volume() * 100);
-	output_volume_dial->set_callback([&] (float v) {
+	output_volume_dial->set_callback([this] (float v) {
 		output_stream->set_volume(v / 100.0f);
 	});
-	output_stream->subscribe(this, [&] {
+	output_stream->subscribe(this, [this] {
 		output_volume_dial->set_value(output_stream->get_volume() * 100);
 	}, output_stream->MESSAGE_CHANGE);
 	output_volume_dial->hidden = true;
@@ -419,7 +428,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	song->subscribe(this, [this] {
 		peak_thread->stop_update();
 	}, song->MESSAGE_BEFORE_CHANGE);
-	song->subscribe(this, [this] { on_song_change(); }, song->MESSAGE_AFTER_CHANGE);
+	song->subscribe(this, [this] {
+		on_song_change();
+	}, song->MESSAGE_AFTER_CHANGE);
 	song->subscribe(this, [this] {
 		force_redraw();
 		update_menu();
@@ -431,16 +442,18 @@ AudioView::AudioView(Session *_session, const string &_id) :
 }
 
 AudioView::~AudioView() {
+	enabled = false;
 	if (draw_runner_id >= 0)
 		hui::cancel_runner(draw_runner_id);
-	PerformanceMonitor::delete_channel(perf_channel);
 
 	hui::config.set_float("Output.Volume", output_stream->get_volume());
+	peak_thread->messanger.unsubscribe(this);
 	output_stream->unsubscribe(this);
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
 	peak_thread->hard_stop();
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioView::set_antialiasing(bool set) {

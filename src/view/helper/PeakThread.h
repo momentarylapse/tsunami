@@ -9,20 +9,30 @@
 #define SRC_VIEW_HELPER_PEAKTHREAD_H_
 
 #include "../../lib/threads/Thread.h"
+#include "../../lib/pattern/Observable.h"
 
 
-class AudioView;
 class Song;
 class Track;
 class AudioBuffer;
 
+class InterThreadMessager : public Observable<VirtualBase> {
+public:
+	~InterThreadMessager();
+	void notify_x();
+	void flush();
+	std::atomic<int> counter{0};
+	std::atomic<bool> flushing{false};
+	void unsubscribe(VirtualBase *observer);
+};
+
+
 class PeakThread : public Thread {
 public:
-	AudioView *view;
 	Song *song;
 	int perf_channel;
 	std::atomic<bool> allow_running;
-	PeakThread(AudioView *view);
+	PeakThread(Song *s);
 	~PeakThread();
 	void on_run() override;
 
@@ -30,6 +40,8 @@ public:
 	void start_update();
 	void stop_update();
 	void hard_stop();
+
+	InterThreadMessager messanger;
 
 private:
 	std::atomic<bool> updating;

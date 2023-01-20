@@ -1001,7 +1001,7 @@ void AudioView::on_song_change() {
 	session->debug("view", "song.after-change");
 	if (song->history_enabled()) {
 		session->debug("view", "+++");
-		hui::run_later(0.01f, [this]{ update_peaks(); });
+		update_peaks();
 	}
 }
 

@@ -10,11 +10,13 @@
 #include "../../lib/os/file.h"
 #include "../../lib/os/formatter.h"
 #include "../../lib/base/map.h"
+#include "../../lib/base/iter.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"
 #include "../../data/rhythm/Bar.h"
+#include "../../lib/os/msg.h"
 
 static void dbo(const string &s) {
 	//msg_write(s);
@@ -102,13 +104,19 @@ void FormatMidi::load_song(StorageOperationData *od) {
 		string hn = read_chunk_name(f);
 		int hsize = read_int(f);
 		if (hn != "MThd")
-			throw Exception("midi header is not \"MTHd\": " + hn);
+			throw Exception(format("invalid midi header found: '%s' (expected: 'MTHd'')" + hn));
 		//msg_write(hn + " " + i2s(hsize));
+
 		int format_type = int16_reverse(f->read_word());
+		dbo(format("type: %d", format_type));
+		if (format_type < 0 or format_type > 2)
+			throw Exception(format("invalid format type found: %d (expected 0,1,2)", format_type));
+		// 0 = single track
+		// 1 = multi track - 1st track only time info
+		// 2 = multi track - all tracks with separate time info
+
 		int num_tracks = int16_reverse(f->read_word());
 		int time_division = int16_reverse(f->read_word());
-		if (format_type > 2)
-			throw Exception(format("only format type 1 allowed: %d", format_type));
 		dbo(format("tracks: %d", num_tracks));
 		dbo(format("time division: %d", time_division));
 
@@ -117,48 +125,100 @@ void FormatMidi::load_song(StorageOperationData *od) {
 
 		int ticks_per_beat = 4;
 
-		if ((time_division & 0x8000) > 0) {
-
-		} else {
+		if ((time_division & 0x8000) == 0)
+			// "pulses per quarter note"
 			ticks_per_beat = time_division;
-		}
+		else
+			// "frames per second"
+			throw Exception("time division is in 'frames per second'... not implemented");
 
-		// beat = quarter note
-		int mpqn = 500000; // micro s/beat = 120 beats/min;
+		struct TempoMarker {
+			int tick_pos;
+			int tick_end;
+			int usec_per_beat;
+			int length() const {
+				return tick_end - tick_pos;
+			}
+		};
+		Array<TempoMarker> tempo_markers = {{0, 0x7fffffff, 500000}}; // default
 
-		int numerator = 4;
-		int denominator = 4;
-		int last_bar = 0;
+		struct Signature {
+			int tick_pos;
+			int numerator;
+			int denominator;
+		};
+		Array<Signature> signatures = {{0, 4, 4}};
+
+		auto ticks2samples = [od, &tempo_markers, &ticks_per_beat] (int ticks) {
+			double t_sec = 0;
+			int ticks_rest = ticks;
+			for (auto &m: tempo_markers) {
+				int dticks = min(ticks_rest, m.length());
+				ticks_rest -= dticks;
+				t_sec += (double)dticks * (double)m.usec_per_beat / 1000000.0 / (double)ticks_per_beat;
+				if (ticks_rest <= 0)
+					break;
+			}
+			return (int)(t_sec * (double)od->song->sample_rate);
+		};
+
+		auto create_bar_structure = [od, &signatures, &ticks_per_beat, ticks2samples] (int ticks) {
+			auto find_signature_at = [&signatures] (int tick_pos) {
+				Signature r;
+				for (auto &s: signatures) {
+					if (s.tick_pos >= tick_pos)
+						break;
+					r = s;
+				}
+				return r;
+			};
+
+			int cur_tick = 0;
+			while (cur_tick < ticks) {
+				auto s = find_signature_at(cur_tick + 50);
+				int bar_ticks = (ticks_per_beat * s.numerator * 4) / s.denominator;
+				// cheat for alignment problems...
+//				if (abs(cur_tick + bar_ticks - midi_clock_offset) < 20)
+//					bar_ticks = midi_clock_offset - cur_tick;
+
+				int next_bar_end_sample = ticks2samples(cur_tick + bar_ticks);
+				int bar_samples = next_bar_end_sample - od->song->bars.range().end();
+
+				auto b = BarPattern(bar_samples, s.numerator, max(s.denominator / 4, 1));
+				od->song->add_bar(-1, b, false);
+				dbo("--add bar " + od->song->bars.back()->range().str());
+				cur_tick += bar_ticks;
+			}
+		};
+
 
 		od->song->add_track(SignalType::BEATS);
+
+		int max_ticks = 0;
 
 		for (int i=0; i<num_tracks; i++) {
 			string tn = read_chunk_name(f);
 			int tsize = read_int(f);
 			int pos0 = f->get_pos();
 			if (tn != "MTrk")
-				throw Exception("midi track header is not \"MTrk\": " + tn);
+				throw Exception(format("invalid midi track header found: '%s' (expected 'MTrk')", tn));
 			dbo("----------------------- track");
 
 			base::map<int, MidiEventBuffer> events;
 			string track_name;
 			int last_status = 0;
 
-			int moffset = 0;
+			int midi_clock_offset = 0;
 			while (f->get_pos() < pos0 + tsize) {
-				int v = read_var(f);
-				dbo(format("offset=%d", v));
-				moffset += v;
-				int length = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
-				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
-//				int offset = 0;
-				//throw Exception("ahhhhhhhhhhh");
-				while (offset > last_bar) {
-					int bar_length = (double)numerator * (double)mpqn / 1000000.0 * (double)od->song->sample_rate;
-					auto b = BarPattern(bar_length, numerator, max(denominator / 4, 1));
-					od->song->add_bar(-1, b, false);
-					last_bar = od->song->bars.range().end();
-				}
+				int midi_dticks = read_var(f);
+				midi_clock_offset += midi_dticks;
+				//dbo(format("  <offset=%d", midi_dticks) + "   " + Range(midi_clock_offset - midi_dticks, midi_dticks).str());
+				dbo(format("  <offset=%d  ->  %d", midi_dticks, midi_clock_offset));
+
+				// samples
+				int sample_pos = ticks2samples(midi_clock_offset);
+				dbo(format("  <%d", sample_pos));
+
 				int c0 = f->read_byte();
 				if ((c0 & 128) == 0) { // "running status"
 					dbo("running status");
@@ -176,17 +236,18 @@ void FormatMidi::load_song(StorageOperationData *od) {
 						int a0 = f->read_byte();
 						int a1 = f->read_byte();
 						int a2 = f->read_byte();
-						mpqn = (a0 << 16) + (a1 << 8) + a2;
-						dbo(format("%.1f bpm", 60000000.0f / (float)mpqn));
+						int usec_per_beat = (a0 << 16) + (a1 << 8) + a2;
+						dbo(format("set tempo %.1f bpm   (%d)", 60000000.0f / (float)usec_per_beat, usec_per_beat));
+						tempo_markers.back().tick_end = midi_clock_offset;
+						tempo_markers.add({midi_clock_offset, 0x7fffffff, usec_per_beat});
 					} else if (type == 0x58) {
 						// time signature
-						int a0 = f->read_byte();
-						int a1 = f->read_byte();
-						int a2 = f->read_byte();
-						int a3 = f->read_byte();
-						numerator = a0;
-						denominator = 1<<a1;
-						dbo(format("time %d %d %d %d", a0, 1<<a1, a2, a3));
+						int numerator = f->read_byte();
+						int denominator = 1 << f->read_byte();
+						int a2 = f->read_byte(); // midi clicks until metronome click
+						int a3 = f->read_byte(); // 32nd notes ber beat = 8!
+						dbo(format("time signature %d %d %d %d", numerator, denominator, a2, a3));
+						signatures.add({midi_clock_offset, numerator, denominator});
 					} else {
 						string t;
 						t.resize(l);
@@ -216,15 +277,15 @@ void FormatMidi::load_song(StorageOperationData *od) {
 						int c2 = f->read_byte() & 0x7f;
 						if (!events.contains(channel))
 							events.set(channel, {});
-						events[channel].add(MidiEvent(offset, c1, (float)c2 / 127.0f));
-						dbo(format("ON  o=%d  p=0x%02x  v=%2x   ch=%d", offset, c1, c2, channel));
+						events[channel].add(MidiEvent(sample_pos, c1, (float)c2 / 127.0f));
+						dbo(format("ON  o=%d  p=0x%02x  v=%2x   ch=%d", sample_pos, c1, c2, channel));
 					} else if (type == 0x8) { // off
 						int c1 = f->read_byte() & 0x7f;
 						int c2 = f->read_byte() & 0x7f;
 						if (!events.contains(channel))
 							events.set(channel, {});
-						events[channel].add(MidiEvent(offset, c1, 0));
-						dbo(format("OFF  o=%d  p=0x%02x  ch=%d", offset, c1, channel));
+						events[channel].add(MidiEvent(sample_pos, c1, 0));
+						dbo(format("OFF  o=%d  p=0x%02x  ch=%d", sample_pos, c1, channel));
 					} else if (type == 0x0a) { // note after touch
 						f->read_byte();
 						f->read_byte();
@@ -237,7 +298,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 						dbo(format("set instrument 0x%02x", instrument));
 					} else if (type == 0x0d) { // channel after touch
 						f->read_byte();
-					} else if (type == 0x0d) { // pitch bend
+					} else if (type == 0x0e) { // pitch bend
 						f->read_byte();
 						f->read_byte();
 					} else {
@@ -245,6 +306,8 @@ void FormatMidi::load_song(StorageOperationData *od) {
 					}
 				}
 			}
+
+			max_ticks = max(max_ticks, midi_clock_offset);
 
 			f->set_pos(pos0 + tsize);
 
@@ -257,6 +320,8 @@ void FormatMidi::load_song(StorageOperationData *od) {
 				}
 			}
 		}
+
+		create_bar_structure(max_ticks);
 
 		delete f;
 	} catch(Exception &e) {
@@ -275,7 +340,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 		for (Track *t: weak(od->song->tracks))
 			if (t->type == SignalType::MIDI)
 				num_tracks ++;
-		int ticks_per_beat = 96;
+		int ticks_per_beat = 960;
 		// heaer
 		write_chunk_name(f, "MThd");
 		write_int(f, 6); // size
@@ -283,7 +348,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 		f->write_word(int16_reverse(num_tracks));
 		f->write_word(int16_reverse(ticks_per_beat));
 		// beat = quarter note
-		int mpqn = 500000; // micro s/beat = 120 beats/min;
+		int usec_per_beat = 500000; // micro s/beat = 120 beats/min;
 		int numerator = 4;
 		int denominator = 4;
 		int last_bar = 0;
@@ -313,14 +378,14 @@ void FormatMidi::save_song(StorageOperationData* od) {
 			if (od->song->bars.num > 0 and first_track) {
 				auto *b = od->song->bars[0].get();
 				float bpm = b->bpm(od->song->sample_rate);
-				mpqn = 60000000.0f / bpm;
+				usec_per_beat = 60000000.0f / bpm;
 				write_var(f, 0);
 				f->write_byte(0xff);
 				f->write_byte(0x51);
 				write_var(f, 3);
-				f->write_byte(mpqn >> 16);
-				f->write_byte(mpqn >> 8);
-				f->write_byte(mpqn >> 0);
+				f->write_byte(usec_per_beat >> 16);
+				f->write_byte(usec_per_beat >> 8);
+				f->write_byte(usec_per_beat >> 0);
 
 				write_var(f, 0);
 				f->write_byte(0xff);
@@ -335,7 +400,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 			events.sort();
 			int moffset = 0;
 			for (MidiEvent& e: events) {
-				int v = (int) (((double) (e.pos) / (double) (mpqn) * 1000000.0
+				int v = (int) (((double) (e.pos) / (double) (usec_per_beat) * 1000000.0
 						/ (double) (od->song->sample_rate)
 						* (double) (ticks_per_beat)));
 				write_var(f, v - moffset);

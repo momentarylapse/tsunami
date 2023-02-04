@@ -202,7 +202,7 @@ bool Storage::save_ex(Song *song, const Path &filename, bool exporting) {
 
 	if (!od.errors_encountered) {
 		try {
-			os::fs::rename(temp_file, filename);
+			os::fs::move(temp_file, filename);
 		} catch (Exception &e) {
 			od.error("failed to move temp file to target: " + e.message());
 		}

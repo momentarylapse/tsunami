@@ -405,50 +405,50 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 
 	for (int i=0;i<samples;i++) {
 		if (_channels == 2) {
-			if (format == SampleFormat::SAMPLE_FORMAT_8) {
+			if (format == SampleFormat::INT_8) {
 				c[0][i] = (float)cb[i*2    ] / 128.0f;
 				if (channels > 1)
 					c[1][i] = (float)cb[i*2 + 1] / 128.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_16) {
+			} else if (format == SampleFormat::INT_16) {
 				c[0][i] = (float)sb[i*2    ] / 32768.0f;
 				if (channels > 1)
 					c[1][i] = (float)sb[i*2 + 1] / 32768.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN) {
+			} else if (format == SampleFormat::INT_16_BIGENDIAN) {
 				c[0][i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
 				if (channels > 1)
 					c[1][i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
+			} else if (format == SampleFormat::INT_24) {
 				c[0][i] = import_24(*(int*)&cb[i*6    ]);
 				if (channels > 1)
 					c[1][i] = import_24(*(int*)&cb[i*6 + 3]);
-			} else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN) {
+			} else if (format == SampleFormat::INT_24_BIGENDIAN) {
 				c[0][i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
 				if (channels > 1)
 					c[1][i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
+			} else if (format == SampleFormat::INT_32) {
 				c[0][i] = (float)ib[i*2  ] / 2147483648.0f;
 				if (channels > 1)
 					c[1][i] = (float)ib[i*2+1] / 2147483648.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
+			} else if (format == SampleFormat::FLOAT_32) {
 				c[0][i] = fb[i*2];
 				if (channels > 1)
 					c[1][i] = fb[i*2+1];
 			} else
 				throw string("BufferBox.import: unhandled format");
 		} else {
-			if (format == SampleFormat::SAMPLE_FORMAT_8) {
+			if (format == SampleFormat::INT_8) {
 				c[0][i] = (float)cb[i] / 128.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_16) {
+			} else if (format == SampleFormat::INT_16) {
 				c[0][i] = (float)sb[i] / 32768.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN) {
+			} else if (format == SampleFormat::INT_16_BIGENDIAN) {
 				c[0][i] = (float)invert_16(sb[i]) / 32768.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
+			} else if (format == SampleFormat::INT_24) {
 				c[0][i] = import_24(*(int*)&cb[i*3]);
-			} else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN) {
+			} else if (format == SampleFormat::INT_24_BIGENDIAN) {
 				c[0][i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 8388608.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
+			} else if (format == SampleFormat::INT_32) {
 				c[0][i] = (float)ib[i] / 2147483648.0f;
-			} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
+			} else if (format == SampleFormat::FLOAT_32) {
 				c[0][i] = fb[i];
 			} else
 				throw string("BufferBox.import: unhandled format");
@@ -501,7 +501,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 	for (int ci=0; ci<_channels; ci++)
 		source[ci] = &c[min(ci, channels-1)][0];
 
-	if (format == SampleFormat::SAMPLE_FORMAT_16) {
+	if (format == SampleFormat::INT_16) {
 		short *sb = (short*)data;
 		int d = align32 ? 2 : 1;
 		for (int i=0;i<length;i++) {
@@ -510,7 +510,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 				sb += d;
 			}
 		}
-	} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
+	} else if (format == SampleFormat::INT_24) {
 		char *sc = (char*)data;
 		int d = align32 ? 4 : 3;
 		for (int i=0;i<length;i++) {
@@ -519,7 +519,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 				sc += d;
 			}
 		}
-	} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
+	} else if (format == SampleFormat::INT_32) {
 		int *sc = (int*)data;
 		for (int i=0;i<length;i++) {
 			for (int ci=0; ci<_channels; ci++) {
@@ -527,7 +527,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 				sc ++;
 			}
 		}
-	} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
+	} else if (format == SampleFormat::FLOAT_32) {
 		float *fc = (float*)data;
 		for (int i=0;i<length;i++) {
 			for (int ci=0; ci<_channels; ci++) {

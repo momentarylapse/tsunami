@@ -369,7 +369,7 @@ void FormatSoundFont2::read_samples(BinaryFormatter *f) {
 		char *data = new char[num_samples*2];
 		f->read(data, num_samples*2);
 		buf.resize(num_samples);
-		buf.import(data, 1, SampleFormat::SAMPLE_FORMAT_16, num_samples);// / 2);
+		buf.import(data, 1, SampleFormat::INT_16, num_samples);// / 2);
 		Sample *sample = song->create_sample_audio(s.name, buf);
 		delete[] data;
 

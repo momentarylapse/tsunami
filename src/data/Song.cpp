@@ -54,7 +54,7 @@ Song::Song(Session *session, int _sample_rate) :
 {
 	//msg_write("  new Song " + p2s(this));
 	sample_rate = _sample_rate;
-	default_format = SampleFormat::SAMPLE_FORMAT_16;
+	default_format = SampleFormat::INT_16;
 	compression = 0;
 }
 
@@ -132,7 +132,7 @@ void Song::reset() {
 	filename = "";
 	tags.clear();
 	bars.clear();
-	default_format = SampleFormat::SAMPLE_FORMAT_16;
+	default_format = SampleFormat::INT_16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 

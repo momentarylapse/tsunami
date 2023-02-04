@@ -355,7 +355,7 @@ void AudioInput::_create_dev() {
 		pa_sample_spec ss;
 		ss.rate = _sample_rate;
 		ss.channels = num_channels;
-		ss.format = PA_SAMPLE_FLOAT32LE;
+		ss.format = PA_SAMPLE_FLOAT32NE;
 		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
 		_pulse_test_error("pa_stream_new");
 

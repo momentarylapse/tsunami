@@ -172,7 +172,7 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 		FLAC__StreamMetadata_VorbisComment_Entry entry;
 
 		int channels = od->channels_suggested;
-		SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
+		SampleFormat format = SampleFormat::INT_16;
 		if (od->song)
 			format = od->song->default_format;
 		int bits = format_get_bits(format);

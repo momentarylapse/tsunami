@@ -28,7 +28,7 @@ FormatDescriptorWave::FormatDescriptorWave() :
 void FormatWave::save_via_renderer(StorageOperationData *od) {
 	Port *r = od->renderer;
 
-	SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
+	SampleFormat format = SampleFormat::INT_16;
 	if (od->song)
 		format = od->song->default_format;
 	int bit_depth = format_get_bits(format);
@@ -42,7 +42,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	f->write_int(samples * bytes_per_sample + 44);
 	f->write("WAVEfmt ",8);
 	f->write_int(16); // chunk size (fmt)
-	f->write_word((format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) ? 3 : 1); // format PCM/IEEE FLOAT
+	f->write_word((format == SampleFormat::FLOAT_32) ? 3 : 1); // format PCM/IEEE FLOAT
 	f->write_word(channels); // channels
 	f->write_int(od->session->sample_rate());
 	f->write_int(od->session->sample_rate() * bytes_per_sample); // bytes per sec
@@ -117,7 +117,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 
 	int format_code, channels = 2, freq, block_align = 0, bits = 16, byte_per_sample = 4;
 	bool fmt_chunk_read = false;
-	auto format = SampleFormat::SAMPLE_FORMAT_16;
+	auto format = SampleFormat::INT_16;
 
 	// read chunks
 	while (f->get_pos() < real_file_size - 8) {

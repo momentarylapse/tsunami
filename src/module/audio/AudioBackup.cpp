@@ -22,7 +22,7 @@ namespace kaba {
 
 void AudioBackup::Config::reset() {
 	channels = 2;
-	format = SampleFormat::SAMPLE_FORMAT_32_FLOAT;
+	format = SampleFormat::FLOAT_32;
 	backup_mode = BackupMode::TEMP;
 }
 

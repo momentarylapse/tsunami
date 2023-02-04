@@ -293,8 +293,8 @@ void AudioOutput::_create_dev() {
 		pa_sample_spec ss;
 		ss.rate = dev_sample_rate;
 		ss.channels = 2;
-		ss.format = PA_SAMPLE_FLOAT32LE;
-		//ss.format = PA_SAMPLE_S16LE;
+		ss.format = PA_SAMPLE_FLOAT32NE;
+		//ss.format = PA_SAMPLE_S16NE;
 		pulse_stream = pa_stream_new(device_manager->pulse_context, "stream", &ss, nullptr);
 		if (!pulse_stream)
 			_pulse_test_error("pa_stream_new");

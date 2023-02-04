@@ -15,10 +15,10 @@
 
 const int NUM_POSSIBLE_FORMATS = 4;
 const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
-	SampleFormat::SAMPLE_FORMAT_16,
-	SampleFormat::SAMPLE_FORMAT_24,
-	SampleFormat::SAMPLE_FORMAT_32,
-	SampleFormat::SAMPLE_FORMAT_32_FLOAT
+	SampleFormat::INT_16,
+	SampleFormat::INT_24,
+	SampleFormat::INT_32,
+	SampleFormat::FLOAT_32
 };
 
 SongConsole::SongConsole(Session *session, SideBar *bar) :

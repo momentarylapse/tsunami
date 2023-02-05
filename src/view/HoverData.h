@@ -30,7 +30,7 @@ public:
 	scenegraph::Node *node;
 	AudioViewLayer *vlayer;
 	TrackLayer *layer() const;
-	AudioViewTrack *vtrack;
+	AudioViewTrack *vtrack() const;
 	Track *track() const;
 	SampleRef *sample;
 	MidiNote *note;

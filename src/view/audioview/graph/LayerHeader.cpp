@@ -238,7 +238,6 @@ bool LayerHeader::on_right_button_down(const vec2 &m) {
 HoverData LayerHeader::get_hover_data(const vec2 &m) {
 	auto *view = vlayer->view;
 	auto h = Node::get_hover_data(m);
-	h.vtrack = view->get_track(vlayer->layer->track);
 	h.vlayer = vlayer;
 	return h;
 }

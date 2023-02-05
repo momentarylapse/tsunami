@@ -349,6 +349,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	side_bar = new SideBar(session, this);
 	embed(side_bar.get(), "root-grid", 2, 0);
 
+
+	side_bar->subscribe(view, [this] {
+		view->on_update_sidebar();
+	}, SideBar::MESSAGE_ANY);
+
 	// bottom bar
 	bottom_bar = new BottomBar(session, this);
 	embed(bottom_bar.get(), "main-grid", 0, 1);
@@ -359,18 +364,30 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_SELECTION_CHANGE);
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
-	view->signal_chain->subscribe(this, [this] { on_update(); }, view->signal_chain->MESSAGE_ANY);
-	song->action_manager->subscribe(this, [this] { on_update(); }, song->action_manager->MESSAGE_ANY);
+	view->signal_chain->subscribe(this, [this] {
+		on_update();
+	}, view->signal_chain->MESSAGE_ANY);
+	song->action_manager->subscribe(this, [this] {
+		on_update();
+	}, song->action_manager->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this] {
 		view->set_message(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [this] {
 		view->set_message(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
-	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_AFTER_CHANGE);
-	app->clipboard->subscribe(this, [this] { on_update(); }, app->clipboard->MESSAGE_ANY);
-	bottom_bar->subscribe(this, [this] { on_bottom_bar_update(); }, bottom_bar->MESSAGE_ANY);
-	side_bar->subscribe(this, [this] { on_side_bar_update(); }, side_bar->MESSAGE_ANY);
+	song->subscribe(this, [this] {
+		on_update();
+	}, song->MESSAGE_AFTER_CHANGE);
+	app->clipboard->subscribe(this, [this] {
+		on_update();
+	}, app->clipboard->MESSAGE_ANY);
+	bottom_bar->subscribe(this, [this] {
+		on_bottom_bar_update();
+	}, bottom_bar->MESSAGE_ANY);
+	side_bar->subscribe(this, [this] {
+		on_side_bar_update();
+	}, side_bar->MESSAGE_ANY);
 	
 	event("*", [this] { view->on_command(hui::get_event()->id); });
 
@@ -405,6 +422,7 @@ TsunamiWindow::~TsunamiWindow() {
 	hui::config.set_bool("Window.Maximized", is_maximized());
 
 	view->signal_chain->stop_hard();
+	view->unsubscribe(side_bar.get());
 	view->unsubscribe(this);
 	view->signal_chain->unsubscribe(this);
 	song->action_manager->unsubscribe(this);
@@ -419,7 +437,9 @@ TsunamiWindow::~TsunamiWindow() {
 	delete view;
 
 	auto _session = session;
-	hui::run_later(0.010f, [_session]{ tsunami_clean_up(_session); });
+	hui::run_later(0.010f, [_session] {
+		tsunami_clean_up(_session);
+	});
 }
 
 void TsunamiWindow::on_about() {

@@ -299,7 +299,7 @@ public:
 	}
 	Track *get_target_group() {
 		int target = get_track_move_target(true);
-		auto v = view->hover().vtrack;
+		auto v = view->hover().vtrack();
 		if (!v)
 			return nullptr;
 		if (v->track->type == SignalType::GROUP) {
@@ -345,7 +345,6 @@ bool TrackHeader::on_right_button_down(const vec2 &m) {
 
 HoverData TrackHeader::get_hover_data(const vec2 &m) {
 	auto h = Node::get_hover_data(m);
-	h.vtrack = vtrack;
 	h.vlayer = vtrack->first_layer();
 	return h;
 }

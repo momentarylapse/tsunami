@@ -112,7 +112,7 @@ public:
 	void on_song_tracks_change();
 	void on_stream_tick();
 	void on_stream_state_change();
-	void on_update();
+	void on_update_sidebar();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
 	static const string MESSAGE_CUR_LAYER_CHANGE;
@@ -256,6 +256,7 @@ public:
 	void __set_cur_layer(AudioViewLayer *l);
 	HoverData cur_selection;
 	HoverData _prev_selection;
+	AudioViewTrack *_prev_track = nullptr;
 	void set_current(const HoverData &h);
 	AudioViewLayer *cur_vlayer();
 	AudioViewTrack *cur_vtrack();

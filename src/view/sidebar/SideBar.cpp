@@ -74,8 +74,6 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	expand("revealer", false);
 	visible = false;
 	active_console = -1;
-
-	subscribe(session->view, [this]{ session->view->on_update(); }, MESSAGE_ANY); // EVIL HACK?!?
 }
 
 SideBar::~SideBar() {

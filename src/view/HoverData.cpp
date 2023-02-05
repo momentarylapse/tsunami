@@ -20,8 +20,14 @@ bool HoverData::allow_auto_scroll() const {
 }
 
 Track *HoverData::track() const {
-	if (vtrack)
-		return vtrack->track;
+	if (vlayer)
+		return vlayer->track();
+	return nullptr;
+}
+
+AudioViewTrack *HoverData::vtrack() const {
+	if (vlayer)
+		return vlayer->vtrack();
 	return nullptr;
 }
 
@@ -34,7 +40,6 @@ TrackLayer *HoverData::layer() const {
 void HoverData::clear() {
 	type = Type::NONE;
 	node = nullptr;
-	vtrack = nullptr;
 	vlayer = nullptr;
 	sample = nullptr;
 	note = nullptr;

@@ -636,7 +636,6 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	auto s = view->hover_time(m);
 	s.vlayer = this;
 	s.node = this;
-	s.vtrack = view->get_track(layer->track);
 	s.type = HoverData::Type::LAYER;
 
 	// markers

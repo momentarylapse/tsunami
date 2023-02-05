@@ -168,7 +168,6 @@ public:
 	void set_current() {
 		auto view = console->view;
 		HoverData h;
-		h.vtrack = vtrack;
 		h.vlayer = vtrack->first_layer();
 		view->set_current(h);
 	}

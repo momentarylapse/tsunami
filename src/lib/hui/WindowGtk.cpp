@@ -415,7 +415,8 @@ void Window::set_menu(Menu *_menu) {
 		gtk_widget_show(menubar);
 	} else {
 		menu = _menu;
-		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), nullptr);
+		auto dummy = g_menu_new();
+		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(dummy));
 		gtk_widget_hide(menubar);
 	}
 	// only one group allowed!

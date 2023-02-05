@@ -49,8 +49,8 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 	auto input = static_cast<AudioInput*>(userdata);
 
 	const void *data;
-	pa_stream_peek(p, &data, &nbytes);
-	input->_pulse_test_error("pa_stream_peek");
+	if (pa_stream_peek(p, &data, &nbytes) < 0)
+		input->_pulse_test_error("pa_stream_peek");
 
 	// empty buffer
 	if (nbytes == 0)
@@ -76,12 +76,12 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 			}
 		}
 
-		pa_stream_drop(p);
-		input->_pulse_test_error("pa_stream_drop");
+		if (pa_stream_drop(p) != 0)
+			input->_pulse_test_error("pa_stream_drop");
 	} else if (nbytes > 0) {
 		// holes
-		pa_stream_drop(p);
-		input->_pulse_test_error("pa_stream_drop");
+		if (pa_stream_drop(p) != 0)
+			input->_pulse_test_error("pa_stream_drop");
 	}
 	//msg_write(">");
 	//pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
@@ -280,8 +280,8 @@ void AudioInput::_kill_dev() {
 		pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
 		pa_stream_set_read_callback(pulse_stream, nullptr, nullptr);
 
-		pa_stream_disconnect(pulse_stream);
-		_pulse_test_error("pa_stream_disconnect");
+		if (pa_stream_disconnect(pulse_stream) != 0)
+			_pulse_test_error("pa_stream_disconnect");
 
 /*		// FIXME really necessary?!?!?!?
 		for (int i=0; i<1000; i++) {
@@ -292,7 +292,7 @@ void AudioInput::_kill_dev() {
 		}*/
 
 		pa_stream_unref(pulse_stream);
-		_pulse_test_error("pa_stream_unref");
+		//_pulse_test_error("pa_stream_unref");
 	}
 #endif
 
@@ -324,7 +324,8 @@ void AudioInput::_pause() {
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
 		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		_pulse_test_error("pa_stream_cork");
+		if (op)
+			_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
 #endif
@@ -357,7 +358,8 @@ void AudioInput::_create_dev() {
 		ss.channels = num_channels;
 		ss.format = PA_SAMPLE_FLOAT32NE;
 		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
-		_pulse_test_error("pa_stream_new");
+		if (!pulse_stream)
+			_pulse_test_error("pa_stream_new");
 
 
 		pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
@@ -374,9 +376,9 @@ void AudioInput::_create_dev() {
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
 		auto flags = (pa_stream_flags_t)(PA_STREAM_ADJUST_LATENCY|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
-		pa_stream_connect_record(pulse_stream, dev, &attr_in, flags);
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
-		_pulse_test_error("pa_stream_connect_record");
+		if (pa_stream_connect_record(pulse_stream, dev, &attr_in, flags) != 0)
+			_pulse_test_error("pa_stream_connect_record");
 
 		if (!pulse_wait_stream_ready(pulse_stream, dev_man)) {
 			dev_man->unlock();
@@ -428,7 +430,8 @@ void AudioInput::_unpause() {
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		if (pulse_stream) {
 			pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-			_pulse_test_error("pa_stream_cork");
+			if (!op)
+				_pulse_test_error("pa_stream_cork");
 			pulse_wait_op(session, op);
 		}
 	}

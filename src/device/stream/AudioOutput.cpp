@@ -303,13 +303,11 @@ void AudioOutput::_create_dev() {
 		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
 		pa_stream_set_underflow_callback(pulse_stream, &pulse_stream_underflow_callback, this);
 
-
-
 		pa_buffer_attr attr_out;
-		attr_out.fragsize = 1024;//-1;//512;
-		attr_out.maxlength = 4096;
-		attr_out.minreq = -1;
-		attr_out.tlength = -1;
+		attr_out.fragsize = -1; // recording only
+		attr_out.maxlength = hui::config.get_int("Output.Pulseaudio.maxlength", 1024);
+		attr_out.minreq = hui::config.get_int("Output.Pulseaudio.minreq", -1);
+		attr_out.tlength = hui::config.get_int("Output.Pulseaudio.tlength", -1);
 		attr_out.prebuf = -1;
 
 		const char *dev = nullptr;
@@ -344,7 +342,7 @@ void AudioOutput::_create_dev() {
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
 
-		int chunk_size = hui::config.get_int("portaudio.chunk-size", 256);
+		int chunk_size = hui::config.get_int("Output.Portaudio.chunk-size", 256);
 		//256*4; // paFramesPerBufferUnspecified
 		if (cur_device->is_default()) {
 			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, chunk_size,
@@ -383,7 +381,7 @@ void AudioOutput::_kill_dev() {
 			_pulse_test_error("pa_stream_disconnect");
 
 		pa_stream_unref(pulse_stream);
-		_pulse_test_error("pa_stream_unref");
+		//_pulse_test_error("pa_stream_unref");
 		pulse_stream = nullptr;
 	}
 #endif
@@ -417,7 +415,8 @@ void AudioOutput::_pause() {
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
 		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		_pulse_test_error("pa_stream_cork");
+		if (!op)
+			_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
 #endif
@@ -446,7 +445,8 @@ void AudioOutput::_unpause() {
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
 		pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-		_pulse_test_error("pa_stream_cork");
+		if (!op)
+			_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
 #endif
@@ -532,7 +532,8 @@ void AudioOutput::_fill_prebuffer() {
 		}
 
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
-		_pulse_test_error("pa_stream_prebuf");
+		if (!op)
+			_pulse_test_error("pa_stream_prebuf");
 		pulse_wait_op(session, op);
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
@@ -639,7 +640,8 @@ void AudioOutput::reset_state() {
 			session->debug("out", "flush");
 			if (pulse_stream) {
 				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
-				_pulse_test_error("pa_stream_flush");
+				if (op)
+					_pulse_test_error("pa_stream_flush");
 				pulse_wait_op(session, op);
 			}
 		}

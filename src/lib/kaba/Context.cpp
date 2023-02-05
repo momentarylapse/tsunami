@@ -35,7 +35,7 @@ string Exception::message() const {
 
 Path absolute_module_path(const Path &filename) {
 	if (filename.is_relative())
-		return (config.directory << filename).absolute().canonical();
+		return (config.directory | filename).absolute().canonical();
 	else
 		return filename.absolute().canonical();
 }

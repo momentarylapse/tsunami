@@ -239,10 +239,10 @@ string _cdecl kaba_shell_execute(const string &cmd) {
 class KabaPath : public Path {
 public:
 	Path lshift_p(const Path &p) const {
-		return *this << p;
+		return *this | p;
 	}
 	Path lshift_s(const string &p) const {
-		return *this << p;
+		return *this | p;
 	}
 	bool __contains__(const Path &p) const {
 		return p.is_in(*this);
@@ -308,6 +308,8 @@ void SIAddPackageOSPath(Context *c) {
 		add_operator(OperatorID::GREATER, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator >);
 		add_operator(OperatorID::SHIFT_LEFT, TypePath, TypePath, TypePath, InlineID::NONE, &KabaPath::lshift_p);
 		add_operator(OperatorID::SHIFT_LEFT, TypePath, TypePath, TypeString, InlineID::NONE, &KabaPath::lshift_s);
+		add_operator(OperatorID::BIT_OR, TypePath, TypePath, TypePath, InlineID::NONE, &KabaPath::lshift_p);
+		add_operator(OperatorID::BIT_OR, TypePath, TypePath, TypeString, InlineID::NONE, &KabaPath::lshift_s);
 		add_operator(OperatorID::IN, TypeBool, TypePath, TypePath, InlineID::NONE, &KabaPath::__contains__);
 
 

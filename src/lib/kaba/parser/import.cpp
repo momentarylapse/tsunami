@@ -64,28 +64,28 @@ Path import_dir_match(const Path &dir0, const string &name) {
 		if (e == "")
 			return Path::EMPTY;
 		filename <<= e;
-		if (os::fs::exists(filename << "__main__.kaba"))
-			return filename << "__main__.kaba";
-		if (os::fs::exists(filename << (xx.back() + ".kaba")))
-			return filename << (xx.back() + ".kaba");
-		if (os::fs::exists(filename << "main.kaba"))
-			return filename << "main.kaba";
+		if (os::fs::exists(filename | "__main__.kaba"))
+			return filename | "__main__.kaba";
+		if (os::fs::exists(filename | (xx.back() + ".kaba")))
+			return filename | (xx.back() + ".kaba");
+		if (os::fs::exists(filename | "main.kaba"))
+			return filename | "main.kaba";
 		return Path::EMPTY;
 	}
 	return filename;
 
-	if (os::fs::exists(dir0 << name))
-		return dir0 << name;
+	if (os::fs::exists(dir0 | name))
+		return dir0 | name;
 	return Path::EMPTY;
 }
 
 Path find_installed_lib_import(const string &name) {
-	Path kaba_dir = hui::Application::directory.parent() << "kaba";
+	Path kaba_dir = hui::Application::directory.parent() | "kaba";
 	if (hui::Application::directory.basename()[0] == '.')
-		kaba_dir = hui::Application::directory.parent() << ".kaba";
-	Path kaba_dir_static = hui::Application::directory_static.parent() << "kaba";
+		kaba_dir = hui::Application::directory.parent() | ".kaba";
+	Path kaba_dir_static = hui::Application::directory_static.parent() | "kaba";
 	for (auto &dir: Array<Path>({kaba_dir, kaba_dir_static})) {
-		auto path = (dir << "lib" << name).canonical();
+		auto path = (dir | "lib" | name).canonical();
 		if (os::fs::exists(path))
 			return path;
 	}
@@ -101,7 +101,7 @@ Path find_import(Module *s, const string &_name) {
 		return find_installed_lib_import(name.sub(2));
 
 	for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
-		Path filename = import_dir_match((s->filename.parent() << string("../").repeat(i)).canonical(), name);
+		Path filename = import_dir_match((s->filename.parent() | string("../").repeat(i)).canonical(), name);
 		if (filename)
 			return filename;
 	}

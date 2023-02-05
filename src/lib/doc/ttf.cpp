@@ -400,8 +400,8 @@ Array<int> TTF::get_widths() {
 Path find_ttf(const string &name) {
 	string fname = name + ".ttf";
 	for (auto &dir: font_paths)
-		if (os::fs::exists(dir << fname)) {
-			return dir << fname;
+		if (os::fs::exists(dir | fname)) {
+			return dir | fname;
 		}
 	return "";
 }

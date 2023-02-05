@@ -234,7 +234,7 @@ void search_single(const Path &dir, const string &filter, Array<Path> &dir_list,
 		//if ((strcmp(dn->d_name,".")!=0)and(strcmp(dn->d_name,"..")!=0)and(!strstr(dn->d_name,"~"))){
 		string name = dn->d_name;
 		if ((name != ".") and (name != "..") and (name.back() != '~')) {
-			Path ffn = dir << name;
+			Path ffn = dir | name;
 			stat(ffn.str().c_str(), &s);
 			bool is_reg = (s.st_mode & S_IFREG) > 0;
 			bool is_dir = (s.st_mode & S_IFDIR) > 0;
@@ -257,13 +257,13 @@ void search_single(const Path &dir, const string &filter, Array<Path> &dir_list,
 
 void search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
 	Array<Path> sub_dir_list, sub_file_list;
-	search_single(dir0 << subdir, filter, sub_dir_list, sub_file_list);
+	search_single(dir0 | subdir, filter, sub_dir_list, sub_file_list);
 	for (auto &x: sub_dir_list) {
-		dir_list.add(subdir << x);
-		search_single_rec(dir0, subdir << x, filter, dir_list, file_list);
+		dir_list.add(subdir | x);
+		search_single_rec(dir0, subdir | x, filter, dir_list, file_list);
 	}
 	for (auto &x: sub_file_list)
-		file_list.add(subdir << x);
+		file_list.add(subdir | x);
 }
 
 // search a directory for files matching a filter

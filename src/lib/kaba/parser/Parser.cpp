@@ -719,21 +719,20 @@ shared<Node> digest_operator_list_to_tree(shared_array<Node> &operands, shared_a
 }
 
 // greedily parse AxBxC...(operand, operator)
-shared<Node> Parser::parse_operand_greedy(Block *block, bool allow_tuples, shared<Node> first_operand) {
-	auto tree = parse_abstract_operand_greedy(block, allow_tuples, first_operand);
+shared<Node> Parser::parse_operand_greedy(Block *block, bool allow_tuples) {
+	auto tree = parse_abstract_operand_greedy(block, allow_tuples);
 	if (config.verbose)
 		tree->show();
 	return con.concretify_node(tree, block, block->name_space());
 }
 
 // greedily parse AxBxC...(operand, operator)
-shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tuples, shared<Node> first_operand) {
+shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tuples) {
 	shared_array<Node> operands;
 	shared_array<Node> operators;
 
 	// find the first operand
-	if (!first_operand)
-		first_operand = parse_abstract_operand(block);
+	auto first_operand = parse_abstract_operand(block);
 	if (config.verbose) {
 		msg_write("---first:");
 		first_operand->show();
@@ -1340,10 +1339,8 @@ void Parser::parse_abstract_complete_command(Block *block) {
 
 	} else {
 
-		auto first = parse_abstract_operand(block);
-
 		// commands (the actual code!)
-		block->add(parse_abstract_operand_greedy(block, true, first));
+		block->add(parse_abstract_operand_greedy(block, true));
 	}
 
 	expect_new_line();

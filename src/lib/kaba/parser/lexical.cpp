@@ -8,12 +8,12 @@ namespace kaba {
 
 //#define ScriptDebug
 
-#define MAX_STRING_CONST_LENGTH	65536
+static const int MAX_STRING_CONST_LENGTH = 65536;
 static char Temp[MAX_STRING_CONST_LENGTH];
 
-char str_eol[] = "-eol-";
+static const char str_eol[] = "<eol>";
 
-#define SCRIPT_MAX_NAME	256
+static const int SCRIPT_MAX_NAME = 256;
 
 // type of expression (syntax)
 enum class ExpKind {
@@ -104,7 +104,11 @@ int ExpressionBuffer::token_index_in_line(int id) const {
 
 void ExpressionBuffer::next() {
 	_cur_exp ++;
-	cur = cur_line->tokens[_cur_exp].name;
+
+	if (_cur_exp < cur_line->tokens.num)
+		cur = cur_line->tokens[_cur_exp].name;
+	//else
+	//	cur = "<eol>";
 }
 
 string ExpressionBuffer::consume() {
@@ -120,7 +124,7 @@ void ExpressionBuffer::rewind() {
 }
 
 bool ExpressionBuffer::end_of_line() const {
-	return (_cur_exp >= cur_line->tokens.num - 1); // the last entry is "-eol-"#
+	return (_cur_exp >= cur_line->tokens.num - 1); // the last entry is "<eol>"
 }
 
 bool ExpressionBuffer::almost_end_of_line() const {

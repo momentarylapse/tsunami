@@ -82,7 +82,7 @@ class string : public bytes {
 	string(string &&s);
 	string(const char *str);
 	string(const void *str, int l);
-#if __cplusplus >= 202002L
+#if __cpp_char8_t
 	string(const char8_t *str);
 #endif
 
@@ -134,7 +134,7 @@ class string : public bytes {
 	{	string r = *this;	r += s;	return r;	}
 	friend string _cdecl operator + (const char *s1, const string &s2)
 	{	return string(s1) + s2;	}
-#if __cplusplus >= 202002L
+#if __cpp_char8_t
 	friend string _cdecl operator + (const char8_t *s1, const string &s2)
 	{	return string(s1) + s2;	}
 #endif

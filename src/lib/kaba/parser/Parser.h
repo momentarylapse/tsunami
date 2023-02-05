@@ -95,8 +95,8 @@ public:
 	void parse_abstract_complete_command(Block *block);
 	shared<Node> parse_abstract_block(Block *parent, Block *block = nullptr);
 	shared<Node> parse_abstract_operand(Block *block, bool prefer_class = false);
-	shared<Node> parse_operand_greedy(Block *block, bool allow_tuples = false, shared<Node> first_operand = nullptr);
-	shared<Node> parse_abstract_operand_greedy(Block *block, bool allow_tuples = false, shared<Node> first_operand = nullptr);
+	shared<Node> parse_operand_greedy(Block *block, bool allow_tuples = false);
+	shared<Node> parse_abstract_operand_greedy(Block *block, bool allow_tuples = false);
 	shared<Node> parse_operand_super_greedy(Block *block);
 	shared<Node> parse_abstract_set_builder(Block *block);
 	shared<Node> parse_abstract_token();

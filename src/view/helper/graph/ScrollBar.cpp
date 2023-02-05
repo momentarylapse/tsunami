@@ -11,6 +11,7 @@
 #include "../../../lib/image/Painter.h"
 
 // TODO who owns the view_offset? -> callback needed/not?
+// => WE (ScrollBar) own the offset!
 
 ScrollBar::ScrollBar() {
 	align.vertical = AlignData::Mode::FILL;
@@ -86,13 +87,13 @@ void ScrollBar::set_view_offset(float offset) {
 	if (offset != view_offset) {
 		view_offset = offset;
 		request_redraw();
+		if (cb_update_view)
+			cb_update_view(view_offset);
 	}
 }
 
 void ScrollBar::move_view(float d) {
 	set_view_offset(view_offset + d);
-	if (cb_update_view)
-		cb_update_view(view_offset);
 }
 
 void ScrollBar::set_view_size(float size) {

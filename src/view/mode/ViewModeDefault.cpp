@@ -247,7 +247,6 @@ void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
 void scroll_y(AudioView *view, float dy) {
 	view->scroll_bar_y->move_view(dy);
 	//if (view->scroll_bar_y->drag_update())
-	view->force_redraw();
 }
 
 

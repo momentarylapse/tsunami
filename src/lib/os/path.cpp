@@ -46,14 +46,6 @@ void Path::operator =(const Path &p) {
 	s = p.s;
 }
 
-void Path::operator <<=(const Path &p) {
-	*this |= p;
-}
-
-Path Path::operator <<(const Path &p) const {
-	return *this | p;
-}
-
 void Path::operator |=(const Path &p) {
 	if (is_empty())
 		s = p.s;
@@ -65,7 +57,7 @@ void Path::operator |=(const Path &p) {
 
 Path Path::operator |(const Path &p) const {
 	Path temp = *this;
-	temp <<= p;
+	temp |= p;
 	return temp;
 }
 

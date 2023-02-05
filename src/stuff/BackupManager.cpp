@@ -22,8 +22,8 @@ Path BackupManager::get_filename(const string &extension) {
 	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
-		if (!os::fs::exists(tsunami->directory << fn))
-			return tsunami->directory << fn;
+		if (!os::fs::exists(tsunami->directory | fn))
+			return tsunami->directory | fn;
 	}
 	return "";
 }
@@ -50,7 +50,7 @@ void BackupManager::check_old_files() {
 		bf.uuid = next_uuid ++;
 		bf.session = nullptr;
 		bf.f = nullptr;
-		bf.filename = tsunami->directory << f;
+		bf.filename = tsunami->directory | f;
 		files.add(bf);
 	}
 }

@@ -18,7 +18,7 @@ class MidiFont
 		sub = session.create_child()
 		song = new Song(sub, DEFAULT_SAMPLE_RATE)
 		sub.song = song
-		sub.storage.load(song, hui.app_directory_static << "Midi Fonts/{{name}}.nami")
+		sub.storage.load(song, hui.app_directory_static | "Midi Fonts/{{name}}.nami")
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)
@@ -69,7 +69,7 @@ class FontList
 
 	#string[] find_drumsets()
 	func mut update()
-		var list = fs.search(hui.app_directory_static << "Midi Fonts", "*.nami", "f")
+		var list = fs.search(hui.app_directory_static | "Midi Fonts", "*.nami", "f")
 		for e in list
 			var name = str(e)[:-5]
 			if find(name) >= 0

@@ -23,8 +23,6 @@ public:
 	void __delete__();
 
 	void operator=(const Path &p);
-	void operator<<=(const Path &p);
-	Path operator<<(const Path &p) const;
 	void operator|=(const Path &p);
 	Path operator|(const Path &p) const;
 	bool operator==(const Path &p) const;

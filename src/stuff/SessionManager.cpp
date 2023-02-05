@@ -78,7 +78,7 @@ Session *SessionManager::load_session(const Path &_filename) {
 
 	// just a name?
 	if (str(filename).tail(8) != ".session")
-		filename = directory() << filename.with(".session");
+		filename = directory() | filename.with(".session");
 
 	xml::Parser parser;
 	parser.load(filename);
@@ -123,5 +123,5 @@ void SessionManager::delete_saved_session(const Path &filename) {
 }
 
 Path SessionManager::directory() {
-	return tsunami->directory << "sessions";
+	return tsunami->directory | "sessions";
 }

@@ -854,13 +854,13 @@ void get_plugin_file_data(PluginManager::PluginFile &pf) {
 void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string &group, ModuleCategory type) {
 	Path dir = _dir;
 	if (group.num > 0)
-		dir <<= group;
+		dir |= group;
 	auto list = os::fs::search(dir, "*.kaba", "f");
 	for (auto &e: list) {
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.no_ext().str();
-		pf.filename = dir << e;
+		pf.filename = dir | e;
 		pf.group = group;
 		get_plugin_file_data(pf);
 		plugin_files.add(pf);
@@ -868,15 +868,15 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 }
 
 void PluginManager::find_plugins_in_dir(const Path &rel, const string &group, ModuleCategory type) {
-	find_plugins_in_dir_absolute(plugin_dir_static() << rel, group, type);
+	find_plugins_in_dir_absolute(plugin_dir_static() | rel, group, type);
 	if (plugin_dir_local() != plugin_dir_static())
-		find_plugins_in_dir_absolute(plugin_dir_local() << rel, group, type);
+		find_plugins_in_dir_absolute(plugin_dir_local() | rel, group, type);
 }
 
 void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, PluginCallback cb) {
 	for (auto &f: plugin_files) {
-		if (f.filename.is_in(plugin_dir_static() << dir) or f.filename.is_in(plugin_dir_local() << dir)) {
-			string id = "execute-" + name_space + "--" + f.name;
+		if (f.filename.is_in(plugin_dir_static() | dir) or f.filename.is_in(plugin_dir_local() | dir)) {
+			string id = format("execute-%s--%s", name_space, f.name);
 			m->add_with_image(f.name, f.image, id);
 			win->event(id, [cb,f]{ cb(f.name); });
 		}
@@ -988,13 +988,13 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleCategory type, const s
 
 Path PluginManager::plugin_dir_static() {
 	if (tsunami->installed)
-		return tsunami->directory_static << "Plugins";
+		return tsunami->directory_static | "Plugins";
 	return "Plugins";
 }
 
 Path PluginManager::plugin_dir_local() {
 	if (tsunami->installed)
-		return tsunami->directory << "Plugins";
+		return tsunami->directory | "Plugins";
 	return "Plugins";
 }
 

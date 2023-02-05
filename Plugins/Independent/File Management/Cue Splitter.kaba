@@ -61,7 +61,7 @@ class CueSplitter extends TsunamiPlugin
 		if fn == ""
 			return
 		
-		session.storage.load(session.song, dir << fn)
+		session.storage.load(session.song, dir | fn)
 		var r = new SongRenderer(session.song)
 		
 		for i=>p in parts
@@ -88,7 +88,7 @@ class CueSplitter extends TsunamiPlugin
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
 			var _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
-			session.storage.save_via_renderer(r.port_out[0], dir << _fn, end - offset, tags)
+			session.storage.save_via_renderer(r.port_out[0], dir | _fn, end - offset, tags)
 		print("-----------------done")
 		stop()
 		

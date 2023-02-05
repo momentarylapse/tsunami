@@ -49,13 +49,13 @@ Path import_dir_match(const Path &dir0, const string &name) {
 		string e = dir_has(filename, canonical_import_name(xx[i]));
 		if (e == "")
 			return Path::EMPTY;
-		filename <<= e;
+		filename |= e;
 	}
 	{
 		// direct file  zzz.kaba?
 		string e = dir_has(filename, canonical_import_name(xx.back() + ".kaba"));
 		if (e != "") {
-			filename <<= e;
+			filename |= e;
 			return filename;
 		}
 
@@ -63,7 +63,7 @@ Path import_dir_match(const Path &dir0, const string &name) {
 		e = dir_has(filename, canonical_import_name(xx.back()));
 		if (e == "")
 			return Path::EMPTY;
-		filename <<= e;
+		filename |= e;
 		if (os::fs::exists(filename | "__main__.kaba"))
 			return filename | "__main__.kaba";
 		if (os::fs::exists(filename | (xx.back() + ".kaba")))

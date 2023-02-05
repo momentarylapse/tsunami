@@ -1023,7 +1023,7 @@ string _suggest_filename(Song *s, const Path &dir) {
 	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
-		if (!os::fs::exists(dir << name))
+		if (!os::fs::exists(dir | name))
 			return name;
 	}
 	return "";
@@ -1094,7 +1094,7 @@ void TsunamiWindow::on_export_selection() {
 
 void TsunamiWindow::on_quick_export() {
 	auto dir = Path(hui::config.get_str("QuickExportDir", hui::Application::directory.str()));
-	if (session->storage->save(song, dir << _suggest_filename(song, dir)))
+	if (session->storage->save(song, dir | _suggest_filename(song, dir)))
 		view->set_message(_("file saved"));
 }
 

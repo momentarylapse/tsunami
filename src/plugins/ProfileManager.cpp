@@ -54,8 +54,8 @@ void ProfileManager::load_from_file(const Path &filename, bool read_only, Sessio
 }
 
 void ProfileManager::load(Session *session) {
-	load_from_file(tsunami->directory_static << "profiles-demo.xml", true, session);
-	load_from_file(tsunami->directory << "profiles.xml", false, session);
+	load_from_file(tsunami->directory_static | "profiles-demo.xml", true, session);
+	load_from_file(tsunami->directory | "profiles.xml", false, session);
 	save(session);
 	loaded = true;
 }
@@ -95,7 +95,7 @@ void ProfileManager::save(Session *session) {
 		root.add(favs);
 
 		p.elements.add(root);
-		p.save(tsunami->directory << "profiles.xml");
+		p.save(tsunami->directory | "profiles.xml");
 	} catch (Exception &e) {
 		session->e(e.message());
 	}

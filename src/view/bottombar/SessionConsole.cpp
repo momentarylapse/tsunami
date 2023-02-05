@@ -82,7 +82,7 @@ void SessionConsole::on_load() {
 		return;
 	auto &l = session_labels[n];
 	if (l.type == Type::SAVED)
-		tsunami->session_manager->load_session(tsunami->session_manager->directory() << (l.name + ".session"));
+		tsunami->session_manager->load_session(tsunami->session_manager->directory() | (l.name + ".session"));
 	else if (l.type == Type::BACKUP)
 		load_backup(session, l.name);
 }
@@ -112,7 +112,7 @@ void SessionConsole::on_delete() {
 		// TODO: make BackupManager observable :P
 		tsunami->session_manager->notify();
 	} else if (l.type == Type::SAVED) {
-		tsunami->session_manager->delete_saved_session(tsunami->session_manager->directory() << (l.name + ".session"));
+		tsunami->session_manager->delete_saved_session(tsunami->session_manager->directory() | (l.name + ".session"));
 	}
 }
 

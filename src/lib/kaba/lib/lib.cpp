@@ -99,13 +99,15 @@ const Class *TypeFunctionCodeP;
 const Class *TypeSpecialFunction;
 const Class *TypeSpecialFunctionP;
 
-extern const Class *TypePath;
-
 Module *cur_package = nullptr;
 
 
 static Function *cur_func = nullptr;
 static Class *cur_class;
+
+Flags operator|(Flags a, Flags b) {
+	return (Flags)((int)a | (int)b);
+}
 
 bool flags_has(Flags flags, Flags t) {
 	return ((int(flags) & int(t)) == int(t));

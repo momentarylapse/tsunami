@@ -85,13 +85,13 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("can_write", TypeBool, net_p(&Socket::can_write));
 		class_add_func("is_connected", TypeBool, net_p(&Socket::is_connected));
 
-		class_add_func("listen", TypeSocketP, net_p(&__socket_listen__), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("listen", TypeSocketP, net_p(&__socket_listen__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("port", TypeInt);
 			func_add_param("block", TypeBool);
-		class_add_func("connect", TypeSocketP, net_p(&__socket_connect__), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("connect", TypeSocketP, net_p(&__socket_connect__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("addr", TypeString);
 			func_add_param("port", TypeInt);
-		class_add_func("create_udp", TypeSocketP, net_p(&__socket_create_udp__), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create_udp", TypeSocketP, net_p(&__socket_create_udp__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("port", TypeInt);
 
 	add_class(TypeBinaryBuffer);

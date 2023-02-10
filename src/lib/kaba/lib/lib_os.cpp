@@ -279,7 +279,7 @@ void SIAddPackageOSPath(Context *c) {
 	add_class(TypePath);
 		class_add_element_x("_s", TypeString, 0);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Path::__init__);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Path::__init_ext__);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Path::__init_ext__, Flags::AUTO_CAST);
 			func_add_param("p", TypeString);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Path::__delete__);
 		class_add_func("absolute", TypePath, &Path::absolute, Flags::CONST);
@@ -299,7 +299,7 @@ void SIAddPackageOSPath(Context *c) {
 		class_add_func("relative_to", TypePath, &Path::relative_to, Flags::PURE);
 			func_add_param("p", TypePath);
 		class_add_const("EMPTY", TypePath, &Path::EMPTY);
-		class_add_func("@from_str", TypePath, &KabaPath::from_str, Flags::_STATIC__PURE);
+		class_add_func("@from_str", TypePath, &KabaPath::from_str, Flags::STATIC | Flags::PURE);
 			func_add_param("p", TypeString);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypePath, TypePath, InlineID::NONE, &Path::operator =);
 		add_operator(OperatorID::EQUAL, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator ==);
@@ -537,17 +537,17 @@ void SIAddPackageOS(Context *c) {
 
 	// file access
 	add_class(TypeFilesystem);
-		class_add_func("open", TypeFileStreamP, &kaba_file_open, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("open", TypeFileStreamP, &kaba_file_open, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("mode", TypeString);
-		class_add_func("read", TypeString, &kaba_file_read, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("read", TypeString, &kaba_file_read, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_func("read_text", TypeString, &kaba_file_read_text, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("read_text", TypeString, &kaba_file_read_text, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_func("write", TypeVoid, &kaba_file_write, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("write", TypeVoid, &kaba_file_write, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("buffer", TypeString);
-		class_add_func("write_text", TypeVoid, &kaba_file_write_text, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("write_text", TypeVoid, &kaba_file_write_text, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("buffer", TypeString);
 		class_add_func("exists", TypeBool, &os::fs::exists, Flags::STATIC);
@@ -558,27 +558,27 @@ void SIAddPackageOS(Context *c) {
 			func_add_param("filename", TypePath);
 		class_add_func("is_directory", TypeBool, &os::fs::is_directory, Flags::STATIC);
 			func_add_param("filename", TypePath);
-		class_add_func("hash", TypeString, &kaba_file_hash, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("hash", TypeString, &kaba_file_hash, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 			func_add_param("type", TypeString);
-		class_add_func("move", TypeVoid, &kaba_file_move, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("move", TypeVoid, &kaba_file_move, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("source", TypePath);
 			func_add_param("dest", TypePath);
-		class_add_func("rename", TypeVoid, &kaba_file_rename, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("rename", TypeVoid, &kaba_file_rename, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("source", TypePath);
 			func_add_param("dest", TypePath);
-		class_add_func("copy", TypeVoid, &kaba_file_copy, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("copy", TypeVoid, &kaba_file_copy, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("source", TypePath);
 			func_add_param("dest", TypePath);
-		class_add_func("delete", TypeVoid, &kaba_file_delete, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("delete", TypeVoid, &kaba_file_delete, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 		class_add_func("search", TypePathList, &os::fs::search, Flags::STATIC);
 			func_add_param("dir", TypePath);
 			func_add_param("filter", TypeString);
 			func_add_param("options", TypeString);
-		class_add_func("create_directory", TypeVoid, &kaba_dir_create, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create_directory", TypeVoid, &kaba_dir_create, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("dir", TypePath);
-		class_add_func("delete_directory", TypeVoid, &kaba_dir_delete, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("delete_directory", TypeVoid, &kaba_dir_delete, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("dir", TypePath);
 		class_add_func("current_directory", TypePath, &os::fs::current_directory, Flags::STATIC);
 		
@@ -600,7 +600,7 @@ void SIAddPackageOS(Context *c) {
 		class_add_const("END", TypeString, &os::terminal::END);
 
 	// system
-	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("cmd", TypeString);
 
 

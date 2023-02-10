@@ -957,14 +957,14 @@ void SyntaxTree::transformb_block(Block *block, std::function<shared<Node>(share
 // split arrays and address shifts into simpler commands...
 void SyntaxTree::transform(std::function<shared<Node>(shared<Node>)> F) {
 	for (Function *f: functions)
-		if (!f->is_template()) {
+		if (!f->is_template() and !f->is_macro()) {
 			parser->cur_func = f;
 			transform_block(f->block.get(), F);
 		}
 }
 void SyntaxTree::transformb(std::function<shared<Node>(shared<Node>, Block*)> F) {
 	for (Function *f: functions)
-		if (!f->is_template()) {
+		if (!f->is_template() and !f->is_macro()) {
 			parser->cur_func = f;
 			transformb_block(f->block.get(), F);
 		}

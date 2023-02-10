@@ -111,7 +111,6 @@ extern const Class *TypeAnyDict;
 extern const Class *TypeDynamicArray;
 extern const Class *TypeIntDict;
 extern const Class *TypeStringAutoCast;
-extern const Class *TypePath;
 
 const int TYPE_CAST_NONE = -1;
 const int TYPE_CAST_DEREFERENCE = -2;
@@ -121,9 +120,12 @@ const int TYPE_CAST_ABSTRACT_LIST = -20;
 const int TYPE_CAST_ABSTRACT_TUPLE = -21;
 const int TYPE_CAST_ABSTRACT_DICT = -22;
 const int TYPE_CAST_TUPLE_AS_CONSTRUCTOR = -23;
+const int TYPE_CAST_AUTO_CONSTRUCTOR = -24;
 const int TYPE_CAST_FUNCTION_AS_CALLABLE = -30;
-const int TYPE_CAST_MAKE_SHARED = -40;
+const int TYPE_CAST_MAKE_SHARED = -40; // TODO use auto constructor instead
 const int TYPE_CAST_MAKE_OWNED = -41;
+const int TYPE_CAST_OPTIONAL_HAS_VALUE = -50;
+const int TYPE_CAST_OPTIONAL_VALUE = -51;
 
 
 shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted) {
@@ -168,9 +170,9 @@ bool Concretifier::type_match_tuple_as_contructor(shared<Node> node, Function *f
 		return false;
 
 	penalty = 20;
-	for (auto&& [i,e]: enumerate(weak(node->params).sub_ref(1))) {
+	for (auto&& [i,e]: enumerate(weak(node->params))) {
 		CastingData cast;
-		if (!type_match_with_cast(e, false, f_constructor->literal_param_type[i], cast))
+		if (!type_match_with_cast(e, false, f_constructor->literal_param_type[i+1], cast))
 			return false;
 		penalty += cast.penalty;
 	}
@@ -191,8 +193,6 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	if (type_match(given, wanted))
 		return true;
 	if (wanted == TypeStringAutoCast and given == TypeString)
-		return true;
-	if (wanted == TypeString and given == TypePath)
 		return true;
 	if (is_modifiable) // is a variable getting assigned.... better not cast
 		return false;
@@ -254,16 +254,16 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 
 		// FIXME this probably doesn't make sense... we should already know the wanted type!
-		if (!wanted->is_product())
-			return false;
-		if (wanted->param.num != node->params.num)
-			return false;
-		for (int i=0; i<node->params.num; i++)
-			if (!type_match(node->params[i]->type, wanted->param[i]))
+		if (wanted->is_product()) {
+			if (wanted->param.num != node->params.num)
 				return false;
-		msg_error("product");
-		cd.cast = TYPE_CAST_ABSTRACT_TUPLE;
-		return true;
+			for (int i=0; i<node->params.num; i++)
+				if (!type_match(node->params[i]->type, wanted->param[i]))
+					return false;
+			msg_error("product");
+			cd.cast = TYPE_CAST_ABSTRACT_TUPLE;
+			return true;
+		}
 	}
 	if (node->kind == NodeKind::DICT_BUILDER and given == TypeUnknown) {
 		if (wanted->is_dict()) {
@@ -289,6 +289,12 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			}
 		}
 	}
+	if (given->is_optional() and given->param[0] == wanted) {
+		cd.cast == TYPE_CAST_OPTIONAL_VALUE;
+		cd.penalty = 20;
+		cd.f = given->get_call();
+		return true;
+	}
 	if (wanted == TypeStringAutoCast) {
 		//Function *cf = given->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
 		//if (cf) {
@@ -297,6 +303,18 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		//}
 	}
+
+	// single parameter auto-constructor?
+	for (auto *f: wanted->get_constructors())
+		if (f->num_params == 2 and flags_has(f->flags, Flags::AUTO_CAST)) {
+			CastingData c;
+			if (type_match_with_cast(node, false, f->literal_param_type[1], c)) {
+				cd.cast = TYPE_CAST_AUTO_CONSTRUCTOR;
+				cd.f = f;
+				return true;
+			}
+		}
+
 	for (auto&& [i,c]: enumerate(context->type_casts))
 		if (type_match(given, c.source) and type_match(c.dest, wanted)) {
 			cd.penalty = c.penalty;
@@ -356,14 +374,33 @@ shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node>
 		Array<CastingData> c;
 		c.resize(node->params.num);
 		auto f = cast.f;
+
 		for (auto&& [i,e]: enumerate(node->params))
-			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c[i])) { do_error("aaaaa", e); }
+			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c[i])) {
+				do_error("tuple as constructor...mismatch", e);
+			}
 		auto cmd = add_node_constructor(f);
 		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type, 1);
 	}
+	if (cast.cast == TYPE_CAST_AUTO_CONSTRUCTOR) {
+		auto f = cast.f;
+		CastingData c;
+		if (!type_match_with_cast(node, false, f->literal_param_type[1], c)) {
+			do_error("auto constructor...mismatch", node);
+		}
+		auto cmd = add_node_constructor(f);
+		return apply_params_with_cast(cmd, {node}, {c}, f->literal_param_type, 1);
+	}
 	if ((cast.cast == TYPE_CAST_MAKE_SHARED) or (cast.cast == TYPE_CAST_MAKE_OWNED)) {
 		if (!cast.f)
-			do_error(format("internal: make shared... %s.() missing...", wanted->name, IDENTIFIER_FUNC_SHARED_CREATE), node);
+			do_error(format("internal: make shared... %s.%s() missing...", wanted->name, IDENTIFIER_FUNC_SHARED_CREATE), node);
+		auto nn = add_node_call(cast.f, node->token_id);
+		nn->set_param(0, node);
+		return nn;
+	}
+	if (cast.cast == TYPE_CAST_OPTIONAL_VALUE) {
+		if (!cast.f)
+			do_error(format("internal: optional cast... %s.%s() missing...", wanted->name, IDENTIFIER_FUNC_CALL), node);
 		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;
@@ -599,6 +636,22 @@ void Concretifier::concretify_all_params(shared<Node> &node, Block *block, const
 };
 
 
+shared<Node> check_macro(Concretifier *con, shared<Node> node, Block *block, const Class *ns) {
+	if (node->is_function()) {
+		auto f = node->as_func();
+		if (f->is_macro()) {
+			if (f->num_params > 0)
+				con->do_error("macro with parameters not allowed yet", node);
+			if (f->literal_return_type != TypeVoid)
+				con->do_error("macro with return value not allowed yet", node);
+
+			return (Node*)f->block.get();
+		}
+	}
+	return node;
+}
+
+
 shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, const Class *ns) {
 
 	// special function
@@ -641,11 +694,13 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 		} else if (l->type->is_callable()) {
 			links[i] = make_func_pointer_node_callable(l);
 			//return add_node_member_call(l->type->param[0]->get_call(), l->deref(), params);
+		} else if (auto c = l->type->get_call()) {
+			return add_node_member_call(l->type->get_call(), l, {});
 		} else {
-			do_error("can't call " + kind2str(l->kind), l);
+			do_error(format("this %s does not seem callable", kind2str(l->kind)), l);
 		}
 	}
-	return try_to_match_apply_params(links, params);
+	return check_macro(this, try_to_match_apply_params(links, params), block, ns);
 }
 
 shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *block, const Class *ns) {
@@ -1602,9 +1657,10 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		return node;
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_POINTER) {
 		concretify_all_params(node, block, ns);
-		if (node->params[0]->kind != NodeKind::CLASS)
+		auto n = digest_type(tree, node->params[0]);
+		if (n->kind != NodeKind::CLASS)
 			do_error("type expected before '*'", node->params[0]);
-		const Class *t = node->params[0]->as_class();
+		const Class *t = n->as_class();
 		return add_node_class(tree->get_pointer(t, -1));
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_LIST) {
 		concretify_all_params(node, block, ns);
@@ -1616,16 +1672,18 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		return add_node_class(t);
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_DICT) {
 		concretify_all_params(node, block, ns);
-		if (node->params[0]->kind != NodeKind::CLASS)
+		auto n = digest_type(tree, node->params[0]);
+		if (n->kind != NodeKind::CLASS)
 			do_error("type expected before '{}'", node->params[0]);
-		const Class *t = node->params[0]->as_class();
+		const Class *t = n->as_class();
 		t = tree->request_implicit_class_dict(t, node->token_id);
 		return add_node_class(t);
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_OPTIONAL) {
 		concretify_all_params(node, block, ns);
-		if (node->params[0]->kind != NodeKind::CLASS)
+		auto n = digest_type(tree, node->params[0]);
+		if (n->kind != NodeKind::CLASS)
 			do_error("type expected before '?'", node->params[0]);
-		const Class *t = node->params[0]->as_class();
+		const Class *t = n->as_class();
 		return add_node_class(tree->request_implicit_class_optional(t, node->token_id));
 	} else if (node->kind == NodeKind::ABSTRACT_TYPE_CALLABLE) {
 		concretify_all_params(node, block, ns);

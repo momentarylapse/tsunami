@@ -70,10 +70,10 @@ class MultiEcho extends AudioEffect
 class MultiEchoGrid extends Grid
 	var config: MultiEcho.Config*
 	var cp: ConfigPanel*
-	var hover = -1
-	var selected = -1
-	var menu_bg: Menu*
-	var menu_point: Menu*
+	var hover: int?
+	var selected: int?
+	var menu_bg: Menu owned
+	var menu_point: Menu owned
 	
 	
 	func mut post_init()
@@ -127,8 +127,9 @@ class MultiEchoGrid extends Grid
 			c.set_color(col)
 			let p = project2(vec2(t, v))
 			if i == 0
-				if index == hover
-					c.set_color(colors.hoverify(col))
+				if bool(hover)
+					if index == hover()
+						c.set_color(colors.hoverify(col))
 				c.draw_circle(p, 4.0)
 				c.set_line_width(2.0)
 			else
@@ -152,8 +153,8 @@ class MultiEchoGrid extends Grid
 		#	let z = vec2(r.delay, r.volume)
 		#	draw_point2(c, z, i == selected, i == hover)
 	
-		if hover >= 0
-			draw_details(c, config.refl[hover])
+		if bool(hover)
+			draw_details(c, config.refl[hover()])
 			
 	func draw_details(p: Painter, r: MultiEcho.Config.Reflector)
 		p.set_font_size(8)
@@ -176,16 +177,16 @@ class MultiEchoGrid extends Grid
 			on_delete_reflection()
 
 	func mut on_delete_reflection()
-		if selected >= 0
-			config.refl.remove(selected)
+		if bool(selected)
+			config.refl.remove(selected())
 			cp.changed()
-			selected = -1
-			hover = -1
+			selected = nil
+			hover = nil
 			redraw()
 
 	func override on_right_button_down()
 		hover = get_hover()
-		if hover >= 0
+		if bool(hover)
 			menu_point.popup(panel)
 		else
 			menu_bg.popup(panel)
@@ -200,27 +201,27 @@ class MultiEchoGrid extends Grid
 		selected = len(config.refl) - 1
 		redraw()
 
-	func get_hover() -> int
+	func get_hover() -> int?
 		for i=>r in config.refl
 			let z = vec2(r.delay, r.volume)
 			let p = project2(z)
 			if len(m - p) < 5
 				return i
-		return -1
+		return nil
 
 	func override on_mouse_move()
 		# move
-		if hui.get_event().button_l and (selected >= 0)
-			config.refl[selected].delay = max(get_mouse2().x, 0.001)
-			config.refl[selected].volume = max(get_mouse2().y, 0)
+		if hui.get_event().button_l and bool(selected)
+			config.refl[selected()].delay = max(get_mouse2().x, 0.001)
+			config.refl[selected()].volume = max(get_mouse2().y, 0)
 			cp.changed()
 		else
 			hover = get_hover()
 		redraw()
 	
 	func override on_mouse_wheel()
-		if hover >= 0
-			config.refl[hover].feedback *= exp(hui.get_event().scroll.y * 0.02)
+		if bool(hover)
+			config.refl[hover()].feedback *= exp(hui.get_event().scroll.y * 0.02)
 			redraw()
 			cp.changed()
 

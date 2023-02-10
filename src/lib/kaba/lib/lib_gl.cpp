@@ -150,7 +150,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("data", TypeFloatList);
 		class_add_func("write_float", TypeVoid, gl_p(&nix::Texture::write_float));
 			func_add_param("data", TypeFloatList);
-		class_add_func("load", TypeTextureP, gl_p(&__LoadTexture), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("load", TypeTextureP, gl_p(&__LoadTexture), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
 		class_add_element("width", TypeInt, gl_p(&nix::Texture::width));
 		class_add_element("height", TypeInt, gl_p(&nix::Texture::height));
@@ -253,9 +253,9 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
-		class_add_func("load", TypeShaderP, gl_p(&__LoadShader), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("load", TypeShaderP, gl_p(&__LoadShader), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_func("create", TypeShaderP, gl_p(&__CreateShader), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create", TypeShaderP, gl_p(&__CreateShader), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("source", TypeString);
 		class_add_func("get_default_3d", TypeShaderP, gl_p(&__LoadShaderDefault3d), Flags::STATIC);
 		class_add_func("get_default_2d", TypeShaderP, gl_p(&__LoadShaderDefault2d), Flags::STATIC);

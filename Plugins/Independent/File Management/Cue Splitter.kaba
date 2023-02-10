@@ -5,8 +5,12 @@ use tsunami
 
 class Part
 	var title: string
-	var foffset: float
-#	void __init__()
+	var foffset = 0.0
+
+class CueData
+	var parts: Part[]
+	var year, album, artist: string?
+	var fn: Path?
 
 func sanitize(s: string) -> string
 	var t = s.replace("/", " - ")
@@ -18,14 +22,14 @@ class CueSplitter extends TsunamiPlugin
 	func override on_start()
 		var f = func(p: Path)
 			if bool(p)
-				load_cue(p)
+				export_cue(p)
 		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"], f)
 	
-	func mut load_cue(filename: Path)
-		var dir = filename.parent()
-		var fn: string
-		var year, album, artist: string
-		var parts: Part*[]
+	
+	
+	func load_cue_file(filename: Path) -> CueData?
+		let dir = filename.parent()
+		var data: CueData
 		var cur: Part* = nil
 		try
 			var f = new TextLinesFormatter(fs.open(filename, "rt"))
@@ -35,60 +39,71 @@ class CueSplitter extends TsunamiPlugin
 				#print(s)
 				
 				if s.head(6) == "FILE \""
-					fn = s[6:-6]
+					data.fn = s[6:-6]
 				if s.head(11) == "PERFORMER \""
-					artist = s[11:-1]
+					data.artist = s[11:-1]
 				if s.head(7) == "TITLE \""
-					album = s[7:-1]
+					data.album = s[7:-1]
 				if s.head(6) == "YEAR \""
-					year = s[6:-1]
+					data.year = s[6:-1]
 				if s.head(8) == "  TRACK "
-					cur = new Part()
-					cur.foffset = 0
-					parts.add(cur)
+					data.parts.add(Part())
+					cur = &data.parts[len(data.parts)-1]
 				if s.head(11) == "    TITLE \""
 					cur.title = s[11:-1]
 					print(cur.title)
 				if s.head(10) == "    INDEX "
-					var soff = s[13:]
+					let soff = s[13:]
 					print(soff)
-					var xx = soff.explode(":")
+					let xx = soff.explode(":")
 					cur.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
 					print(cur.foffset)
+			return data
 		except
-			pass
-
-		if fn == ""
-			return
-		
-		session.storage.load(session.song, dir | fn)
+			return nil
+	
+	func mut export_parts_as_flacs(data: CueData, dir: Path)
 		var r = new SongRenderer(session.song)
 		
-		for i=>p in parts
+		for i=>p in data.parts
 			print("-----")
 			var tags: Tag[]
-			if artist != ""
-				tags.add(Tag("artist", artist))
-			if album != ""
-				tags.add(Tag("album", album))
-			if year != ""
-				tags.add(Tag("year", year))
+			if bool(data.artist)
+				tags.add(Tag("artist", data.artist()))
+			if bool(data.album)
+				tags.add(Tag("album", data.album()))
+			if bool(data.year)
+				tags.add(Tag("year", data.year()))
 			tags.add(Tag("title", p.title))
 			tags.add(Tag("tracknumber", str(i+1)))
-			var offset = p.foffset * session.song.sample_rate
+			let offset = p.foffset * session.song.sample_rate
 			var end = session.song.range().length
-			if i < len(parts)-1
-				print(parts[i+1].foffset)
-				var fsr: float = session.song.sample_rate
+			if i < len(data.parts)-1
+				print(data.parts[i+1].foffset)
+				let fsr: float = session.song.sample_rate
 				print(fsr)
-				var fend = parts[i+1].foffset * fsr
+				let fend = data.parts[i+1].foffset * fsr
 				print(fend)
 				end = fend
 				print(end)
 			print("  {{offset}} : {{end}}")
 			r.set_range(RangeTo(offset, end))
-			var _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
+			let _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
 			session.storage.save_via_renderer(r.port_out[0], dir | _fn, end - offset, tags)
+	
+	func mut export_cue(filename: Path)
+		let dir = filename.parent()
+		
+		let data = load_cue_file(filename)
+		if not bool(data)
+			return
+
+		if bool(data().fn)
+			return
+		
+		session.storage.load(session.song, dir | data().fn)
+		export_parts_as_flacs(data, dir)
+		
 		print("-----------------done")
 		stop()
 		

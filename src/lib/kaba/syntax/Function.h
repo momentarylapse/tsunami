@@ -55,6 +55,7 @@ public:
 	bool is_selfref() const;
 	bool throws_exceptions() const; // for external
 	bool is_template() const;
+	bool is_macro() const;
 	bool needs_overriding() const;
 	InlineID inline_no;
 	int virtual_index;

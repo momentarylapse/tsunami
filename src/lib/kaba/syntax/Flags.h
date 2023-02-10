@@ -44,6 +44,7 @@ enum class Flags {
 	NEEDS_OVERRIDE = 1<<16,
 	NOAUTO = 1 << 17,
 	NOFRAME = 1 << 18,
+	MACRO = 1 << 19,
 
 	AUTO_IMPORT = 1<<24,
 	FULLY_PARSED = 1<<25,
@@ -51,11 +52,8 @@ enum class Flags {
 	AMD64_ALLOW_PASS_IN_XMM = 1<<27,
 
 	__INIT_FILL_ALL_PARAMS = 1<<28,
-
-	_STATIC__RAISES_EXCEPTIONS = STATIC | RAISES_EXCEPTIONS,
-	_STATIC__PURE = STATIC | PURE,
-	_REF__RAISES_EXCEPTIONS = REF | RAISES_EXCEPTIONS
 };
+Flags operator|(Flags a, Flags b);
 bool flags_has(Flags flags, Flags t);
 void flags_set(Flags &flags, Flags t);
 void flags_clear(Flags &flags, Flags t);

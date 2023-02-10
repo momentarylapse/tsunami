@@ -444,7 +444,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("bar", TypeComplex, &complex::bar, Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &complex::str, Flags::PURE);
 		class_add_const("I", TypeComplex, &complex::I);
-		class_add_func("_create", TypeComplex, &KabaVector<complex>::set2, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeComplex, &KabaVector<complex>::set2, Flags::STATIC | Flags::PURE);
 			func_set_inline(InlineID::COMPLEX_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -494,10 +494,10 @@ void SIAddPackageMath(Context *c) {
 		//class_add_func("length_fuzzy", TypeFloat32, type_p(&vec2::length_fuzzy), Flags::PURE);
 		class_add_func("normalized", TypeVec3, &vec2::normalized, Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &vec2::str, Flags::PURE);
-		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::_STATIC__PURE);
+		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::STATIC | Flags::PURE);
 			func_add_param("v1", TypeVec2);
 			func_add_param("v2", TypeVec2);
-		class_add_func("_create", TypeVec2, &KabaVector<vec2>::set2, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeVec2, &KabaVector<vec2>::set2, Flags::STATIC | Flags::PURE);
 			func_set_inline(InlineID::COMPLEX_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -548,13 +548,13 @@ void SIAddPackageMath(Context *c) {
 //			func_add_param("m", TypeMatrix);
 		class_add_func("ortho", TypeVec3, &vec3::ortho, Flags::PURE);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &vec3::str, Flags::PURE);
-		class_add_func("dot", TypeFloat32, &vec3::dot, Flags::_STATIC__PURE);
+		class_add_func("dot", TypeFloat32, &vec3::dot, Flags::STATIC | Flags::PURE);
 			func_add_param("v1", TypeVec3);
 			func_add_param("v2", TypeVec3);
-		class_add_func("cross", TypeVec3, &vec3::cross, Flags::_STATIC__PURE);
+		class_add_func("cross", TypeVec3, &vec3::cross, Flags::STATIC | Flags::PURE);
 			func_add_param("v1", TypeVec3);
 			func_add_param("v2", TypeVec3);
-		class_add_func("_create", TypeVec3, &KabaVector<vec3>::set3, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeVec3, &KabaVector<vec3>::set3, Flags::STATIC | Flags::PURE);
 			func_set_inline(InlineID::VECTOR_SET);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -564,10 +564,10 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
-/*		class_add_func("ang_add", TypeVector, &VecAngAdd, Flags::_STATIC__PURE);
+/*		class_add_func("ang_add", TypeVector, &VecAngAdd, Flags::STATIC | Flags::PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
-		class_add_func("ang_interpolate", TypeVector, &VecAngInterpolate, Flags::_STATIC__PURE);
+		class_add_func("ang_interpolate", TypeVector, &VecAngInterpolate, Flags::STATIC | Flags::PURE);
 			func_add_param("ang1", TypeVector);
 			func_add_param("ang2", TypeVector);
 			func_add_param("t", TypeFloat32);*/
@@ -610,18 +610,18 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("angle", TypeFloat32);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nullptr);
 			func_add_param("m", TypeMat4);
-		class_add_func("_rotation_v", TypeQuaternion, &quaternion::rotation_v, Flags::_STATIC__PURE);
+		class_add_func("_rotation_v", TypeQuaternion, &quaternion::rotation_v, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeVec3);
-		class_add_func("_rotation_a", TypeQuaternion, &quaternion::rotation_a, Flags::_STATIC__PURE);
+		class_add_func("_rotation_a", TypeQuaternion, &quaternion::rotation_a, Flags::STATIC | Flags::PURE);
 			func_add_param("axis", TypeVec3);
 			func_add_param("angle", TypeFloat32);
-		class_add_func("_rotation_m", TypeQuaternion, &quaternion::rotation_m, Flags::_STATIC__PURE);
+		class_add_func("_rotation_m", TypeQuaternion, &quaternion::rotation_m, Flags::STATIC | Flags::PURE);
 			func_add_param("m", TypeMat4);
-		class_add_func("interpolate", TypeQuaternion, (quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, Flags::_STATIC__PURE);
+		class_add_func("interpolate", TypeQuaternion, (quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, Flags::STATIC | Flags::PURE);
 			func_add_param("q0", TypeQuaternion);
 			func_add_param("q1", TypeQuaternion);
 			func_add_param("t", TypeFloat32);
-		class_add_func("drag", TypeQuaternion, &quaternion::drag, Flags::_STATIC__PURE);
+		class_add_func("drag", TypeQuaternion, &quaternion::drag, Flags::STATIC | Flags::PURE);
 			func_add_param("up", TypeVec3);
 			func_add_param("dang", TypeVec3);
 			func_add_param("reset_z", TypeBool);
@@ -648,7 +648,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("inside", TypeBool, &rect::inside, Flags::PURE);
 			func_add_param("p", TypeVec2);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &rect::str, Flags::PURE);
-		class_add_func("_create", TypeRect, &KabaRect::set, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeRect, &KabaRect::set, Flags::STATIC | Flags::PURE);
 			func_set_inline(InlineID::RECT_SET);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
@@ -671,16 +671,16 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("hex", TypeString, &color::hex, Flags::PURE);
 		class_add_func("with_alpha", TypeColor, &color::with_alpha, Flags::PURE);
 			func_add_param("a", TypeFloat32);
-		class_add_func("hsb", TypeColor, &color::hsb, Flags::_STATIC__PURE);
+		class_add_func("hsb", TypeColor, &color::hsb, Flags::STATIC | Flags::PURE);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
 			func_add_param("b", TypeFloat32);
 			func_add_param("a", TypeFloat32);
-		class_add_func("interpolate", TypeColor, &color::interpolate, Flags::_STATIC__PURE);
+		class_add_func("interpolate", TypeColor, &color::interpolate, Flags::STATIC | Flags::PURE);
 			func_add_param("c1", TypeColor);
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
-		class_add_func("_create", TypeColor, &KabaColor::set, Flags::_STATIC__PURE);
+		class_add_func("_create", TypeColor, &KabaColor::set, Flags::STATIC | Flags::PURE);
 			func_set_inline(InlineID::COLOR_SET);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
@@ -729,11 +729,11 @@ void SIAddPackageMath(Context *c) {
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &plane::str, Flags::PURE);
 		class_add_func("transform", TypePlane, &plane::transform, Flags::PURE);
 			func_add_param("m", TypeMat4);
-		class_add_func("from_points", TypePlane, &plane::from_points, Flags::_STATIC__PURE);
+		class_add_func("from_points", TypePlane, &plane::from_points, Flags::STATIC | Flags::PURE);
 			func_add_param("a", TypeVec3);
 			func_add_param("b", TypeVec3);
 			func_add_param("c", TypeVec3);
-		class_add_func("from_point_normal", TypePlane, &plane::from_point_normal, Flags::_STATIC__PURE);
+		class_add_func("from_point_normal", TypePlane, &plane::from_point_normal, Flags::STATIC | Flags::PURE);
 			func_add_param("p", TypeVec3);
 			func_add_param("n", TypeVec3);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypePlane, TypePlane, InlineID::CHUNK_ASSIGN);
@@ -775,25 +775,25 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("v", TypeVec3);
 		class_add_func("inverse", TypeMat4, &mat4::inverse, Flags::PURE);
 		class_add_func("transpose", TypeMat4, &mat4::transpose, Flags::PURE);
-		class_add_func("translation", TypeMat4, &mat4::translation, Flags::_STATIC__PURE);
+		class_add_func("translation", TypeMat4, &mat4::translation, Flags::STATIC | Flags::PURE);
 			func_add_param("trans", TypeVec3);
-		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_v, Flags::_STATIC__PURE);
+		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_v, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeVec3);
-		class_add_func("rotation_x", TypeMat4, &mat4::rotation_x, Flags::_STATIC__PURE);
+		class_add_func("rotation_x", TypeMat4, &mat4::rotation_x, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_y", TypeMat4, &mat4::rotation_y, Flags::_STATIC__PURE);
+		class_add_func("rotation_y", TypeMat4, &mat4::rotation_y, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_z", TypeMat4, &mat4::rotation_z, Flags::_STATIC__PURE);
+		class_add_func("rotation_z", TypeMat4, &mat4::rotation_z, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_q, Flags::_STATIC__PURE);
+		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_q, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_f, Flags::_STATIC__PURE);
+		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_f, Flags::STATIC | Flags::PURE);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
-		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_v, Flags::_STATIC__PURE);
+		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_v, Flags::STATIC | Flags::PURE);
 			func_add_param("s", TypeVec3);
-		class_add_func("perspective", TypeMat4, &mat4::perspective, Flags::_STATIC__PURE);
+		class_add_func("perspective", TypeMat4, &mat4::perspective, Flags::STATIC | Flags::PURE);
 			func_add_param("fovy", TypeFloat32);
 			func_add_param("aspect", TypeFloat32);
 			func_add_param("z_near", TypeFloat32);
@@ -821,15 +821,15 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("0", TypeMat3, &mat3::ZERO);
 		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &mat3::str, Flags::PURE);
 		class_add_func("inverse", TypeMat3, &mat3::inverse, Flags::PURE);
-		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_v, Flags::_STATIC__PURE);
+		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_v, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeVec3);
-		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_q, Flags::_STATIC__PURE);
+		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_q, Flags::STATIC | Flags::PURE);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_f, Flags::_STATIC__PURE);
+		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_f, Flags::STATIC | Flags::PURE);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
-		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_v, Flags::_STATIC__PURE);
+		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_v, Flags::STATIC | Flags::PURE);
 			func_add_param("s", TypeVec3);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat3, TypeMat3, InlineID::CHUNK_ASSIGN, &KabaVector<mat3>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeMat3, TypeMat3, InlineID::CHUNK_EQUAL);
@@ -885,12 +885,12 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("a", TypeAny);
 		class_add_func("clear", TypeVoid, &Any::clear);
 		class_add_func(IDENTIFIER_FUNC_LENGTH, TypeInt, &Any::length, Flags::PURE);
-		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_map_get, Flags::_REF__RAISES_EXCEPTIONS);
+		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_map_get, Flags::REF | Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_map_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_array_get, Flags::_REF__RAISES_EXCEPTIONS);
+		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &KabaAny::_array_get, Flags::REF | Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
 		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &KabaAny::_array_set, Flags::RAISES_EXCEPTIONS);
 			func_add_param("index", TypeInt);
@@ -911,7 +911,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
 			func_add_param("var", TypePointer);
 			func_add_param("type", TypeClassP);
-		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
 		add_operator(OperatorID::ADDS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_add);// operator+=);
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_sub);// operator-);
@@ -1027,164 +1027,164 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("t", TypeFloatList);
 
 	add_class(TypeFFT);
-		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::_STATIC__PURE);
+		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::STATIC | Flags::PURE);
 			func_add_param("in", TypeComplexList);
 			func_add_param("out", TypeComplexList, Flags::OUT);
 			func_add_param("invers", TypeBool);
-		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::_STATIC__PURE);
+		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::STATIC | Flags::PURE);
 			func_add_param("in", TypeFloatList);
 			func_add_param("out", TypeComplexList, Flags::OUT);
-		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::_STATIC__PURE);
+		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::STATIC | Flags::PURE);
 			func_add_param("in", TypeComplexList);
 			func_add_param("out", TypeFloatList, Flags::OUT);
 
 
 	// int
-	add_func("clamp", TypeInt, &clamp<int>, Flags::_STATIC__PURE);
+	add_func("clamp", TypeInt, &clamp<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("loop", TypeInt, &loop<int>, Flags::_STATIC__PURE);
+	add_func("loop", TypeInt, &loop<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("abs", TypeInt, &abs<int>, Flags::_STATIC__PURE);
+	add_func("abs", TypeInt, &abs<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("i", TypeInt);
-	add_func("sign", TypeInt, &sign<int>, Flags::_STATIC__PURE);
+	add_func("sign", TypeInt, &sign<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("i", TypeInt);
-	add_func("min", TypeInt, &min<int>, Flags::_STATIC__PURE);
+	add_func("min", TypeInt, &min<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
-	add_func("max", TypeInt, &max<int>, Flags::_STATIC__PURE);
+	add_func("max", TypeInt, &max<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
 
 	// float
-	add_func("sin", TypeFloat32, &sinf, Flags::_STATIC__PURE);
+	add_func("sin", TypeFloat32, &sinf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("cos", TypeFloat32, &cosf, Flags::_STATIC__PURE);
+	add_func("cos", TypeFloat32, &cosf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("tan", TypeFloat32, &tanf, Flags::_STATIC__PURE);
+	add_func("tan", TypeFloat32, &tanf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("asin", TypeFloat32, &asinf, Flags::_STATIC__PURE);
+	add_func("asin", TypeFloat32, &asinf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("acos", TypeFloat32, &acosf, Flags::_STATIC__PURE);
+	add_func("acos", TypeFloat32, &acosf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan", TypeFloat32, &atanf, Flags::_STATIC__PURE);
+	add_func("atan", TypeFloat32, &atanf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("atan2", TypeFloat32, &atan2f, Flags::_STATIC__PURE);
+	add_func("atan2", TypeFloat32, &atan2f, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("y", TypeFloat32);
-	add_func("sqrt", TypeFloat32, &sqrtf, Flags::_STATIC__PURE);
+	add_func("sqrt", TypeFloat32, &sqrtf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, &f_sqr, Flags::_STATIC__PURE);
+	add_func("sqr", TypeFloat32, &f_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("exp", TypeFloat32, &expf, Flags::_STATIC__PURE);
+	add_func("exp", TypeFloat32, &expf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("log", TypeFloat32, &logf, Flags::_STATIC__PURE);
+	add_func("log", TypeFloat32, &logf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
-	add_func("pow", TypeFloat32, &powf, Flags::_STATIC__PURE);
+	add_func("pow", TypeFloat32, &powf, Flags::STATIC | Flags::PURE);
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
-	add_func("clamp", TypeFloat32, &clamp<float>, Flags::_STATIC__PURE);
+	add_func("clamp", TypeFloat32, &clamp<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("loop", TypeFloat32, &loop<float>, Flags::_STATIC__PURE);
+	add_func("loop", TypeFloat32, &loop<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("abs", TypeFloat32, &abs<float>, Flags::_STATIC__PURE);
+	add_func("abs", TypeFloat32, &abs<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("f", TypeFloat32);
-	add_func("sign", TypeFloat32, &sign<float>, Flags::_STATIC__PURE);
+	add_func("sign", TypeFloat32, &sign<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, &min<float>, Flags::_STATIC__PURE);
+	add_func("min", TypeFloat32, &min<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, &max<float>, Flags::_STATIC__PURE);
+	add_func("max", TypeFloat32, &max<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
 
 	// complex
-	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::_STATIC__PURE);
+	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::STATIC | Flags::PURE);
 		func_add_param("z", TypeComplex);
 
 	// int[]
-	add_func("sum", TypeInt, &XList<int>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeInt, &XList<int>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("sum_sqr", TypeInt, &XList<int>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeInt, &XList<int>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("min", TypeInt, &XList<int>::min, Flags::_STATIC__PURE);
+	add_func("min", TypeInt, &XList<int>::min, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("max", TypeInt, &XList<int>::max, Flags::_STATIC__PURE);
+	add_func("max", TypeInt, &XList<int>::max, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("argmin", TypeInt, &XList<int>::argmin, Flags::_STATIC__PURE);
+	add_func("argmin", TypeInt, &XList<int>::argmin, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("argmax", TypeInt, &XList<int>::argmax, Flags::_STATIC__PURE);
+	add_func("argmax", TypeInt, &XList<int>::argmax, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("unique", TypeIntList, &XList<int>::unique, Flags::_STATIC__PURE);
+	add_func("unique", TypeIntList, &XList<int>::unique, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeIntList);
-	add_func("range", TypeIntList, (void*)&kaba_range<int>, Flags::_STATIC__PURE);
+	add_func("range", TypeIntList, (void*)&kaba_range<int>, Flags::STATIC | Flags::PURE);
 		func_add_param("start", TypeInt);
 		func_add_param_def("end", TypeInt, DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeInt, 1);
 
 	// float[]
-	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("min", TypeFloat32, &XList<float>::min, Flags::_STATIC__PURE);
+	add_func("min", TypeFloat32, &XList<float>::min, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("max", TypeFloat32, &XList<float>::max, Flags::_STATIC__PURE);
+	add_func("max", TypeFloat32, &XList<float>::max, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("argmin", TypeInt, &XList<float>::argmin, Flags::_STATIC__PURE);
+	add_func("argmin", TypeInt, &XList<float>::argmin, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("argmax", TypeInt, &XList<float>::argmax, Flags::_STATIC__PURE);
+	add_func("argmax", TypeInt, &XList<float>::argmax, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloatList);
-	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::_STATIC__PURE);
+	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::STATIC | Flags::PURE);
 		func_add_param("start", TypeFloat32);
 		func_add_param_def("end", TypeFloat32, (float)DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeFloat32, 1.0f);
 
 	// float64[]
-	add_func("sum", TypeFloat64, &XList<double>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeFloat64, &XList<double>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
-	add_func("sum_sqr", TypeFloat64, &XList<double>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeFloat64, &XList<double>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
-	add_func("min", TypeFloat64, &XList<double>::min, Flags::_STATIC__PURE);
+	add_func("min", TypeFloat64, &XList<double>::min, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
-	add_func("max", TypeFloat64, &XList<double>::max, Flags::_STATIC__PURE);
+	add_func("max", TypeFloat64, &XList<double>::max, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
-	add_func("argmin", TypeInt, &XList<double>::argmin, Flags::_STATIC__PURE);
+	add_func("argmin", TypeInt, &XList<double>::argmin, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
-	add_func("argmax", TypeInt, &XList<double>::argmax, Flags::_STATIC__PURE);
+	add_func("argmax", TypeInt, &XList<double>::argmax, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeFloat64List);
 
 	// vec2[]
-	add_func("sum", TypeVec2, &VectorList<vec2>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeVec2, &VectorList<vec2>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeVec2List);
-	add_func("sum_sqr", TypeFloat32, &VectorList<vec2>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<vec2>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeVec2List);
 
 	// vec3[]
-	add_func("sum", TypeVec3, &VectorList<vec3>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeVec3, &VectorList<vec3>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeVec3List);
-	add_func("sum_sqr", TypeFloat32, &VectorList<vec3>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<vec3>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeVec3List);
 
 	// complex[]
-	add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeComplexList);
-	add_func("sum_sqr", TypeFloat32, &VectorList<complex>::sum_sqr, Flags::_STATIC__PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<complex>::sum_sqr, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeComplexList);
 
 	// string[]
-	add_func("sum", TypeString, &XList<string>::sum, Flags::_STATIC__PURE);
+	add_func("sum", TypeString, &XList<string>::sum, Flags::STATIC | Flags::PURE);
 		func_add_param("list", TypeStringList);
 
 	// other types
-	add_func("bary_centric", TypeVec2, (void*)&bary_centric, Flags::_STATIC__PURE);
+	add_func("bary_centric", TypeVec2, (void*)&bary_centric, Flags::STATIC | Flags::PURE);
 		func_add_param("p", TypeVec3);
 		func_add_param("a", TypeVec3);
 		func_add_param("b", TypeVec3);
@@ -1230,8 +1230,8 @@ void SIAddPackageMath(Context *c) {
 
 
 	add_class(TypeAny);
-		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::_REF__RAISES_EXCEPTIONS);
-		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::_REF__RAISES_EXCEPTIONS);
+		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::REF | Flags::RAISES_EXCEPTIONS);
+		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::REF | Flags::RAISES_EXCEPTIONS);
 
 
 	add_type_cast(50, TypeInt, TypeAny, "math.@int2any");

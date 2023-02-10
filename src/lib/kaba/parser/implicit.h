@@ -50,6 +50,14 @@ public:
 	void auto_implement_callable_constructor(Function *f, const Class *t);
 	void auto_implement_callable_fp_call(Function *f, const Class *t);
 	void auto_implement_callable_bind_call(Function *f, const Class *t);
+	void auto_implement_optional_constructor(Function *f, const Class *t);
+	void auto_implement_optional_constructor_wrap(Function *f, const Class *t);
+	void auto_implement_optional_destructor(Function *f, const Class *t);
+	void auto_implement_optional_assign(Function *f, const Class *t);
+	void auto_implement_optional_assign_raw(Function *f, const Class *t);
+	void auto_implement_optional_assign_null(Function *f, const Class *t);
+	void auto_implement_optional_has_value(Function *f, const Class *t);
+	void auto_implement_optional_value(Function *f, const Class *t);
 	void auto_implement_functions(const Class *t);
 
 	SyntaxTree *tree;

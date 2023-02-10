@@ -198,6 +198,10 @@ string _cdecl var_repr(const void *p, const Class *type) {
 		return ((Path*)p)->str().repr();
 	} else if (type->is_enum()) {
 		return find_enum_label(type, *(int*)p);
+	} else if (type->is_optional()) {
+		if (*(bool*)((int_p)p + type->size - 1))
+			return var_repr(p, type->param[0]);
+		return "nil";
 	} else if (type->is_super_array()) {
 		string s;
 		auto *da = reinterpret_cast<const DynamicArray*>(p);

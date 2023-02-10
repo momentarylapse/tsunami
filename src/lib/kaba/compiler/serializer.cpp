@@ -1055,7 +1055,7 @@ void Module::compile_functions(char *oc, int &ocs) {
 	// link external functions
 	int func_no = 0;
 	for (Function *f: syntax->functions) {
-		if (f->is_template()) {
+		if (f->is_template() or  f->is_macro()) {
 			//msg_write("SKIP COMPILE " + f->signature());
 		} else if (f->is_extern()) {
 			string name = function_link_name(f);
@@ -1072,7 +1072,7 @@ void Module::compile_functions(char *oc, int &ocs) {
 	// create assembler
 	for (auto&& [i,f]: enumerate(syntax->functions)) {
 		func_offset.add(list->num);
-		if (!f->is_extern() and !f->is_template()) {
+		if (!f->is_extern() and !f->is_template() and !f->is_macro()) {
 			assemble_function(i, f, list);
 		}
 	}
@@ -1101,7 +1101,7 @@ void Module::compile_functions(char *oc, int &ocs) {
 
 	// get function addresses
 	for (auto *f: syntax->functions)
-		if (!f->is_extern() and !f->is_template())
+		if (!f->is_extern() and !f->is_template() and !f->is_macro())
 			function_update_address(f, list);
 
 	if (!config.interpreted)

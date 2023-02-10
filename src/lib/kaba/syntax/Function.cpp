@@ -256,6 +256,10 @@ bool Function::is_template() const {
 	return flags_has(flags, Flags::TEMPLATE);
 }
 
+bool Function::is_macro() const {
+	return flags_has(flags, Flags::MACRO);
+}
+
 bool Function::needs_overriding() const {
 	return flags_has(flags, Flags::NEEDS_OVERRIDE);
 }

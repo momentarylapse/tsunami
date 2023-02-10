@@ -23,7 +23,7 @@ class ImportNKI extends TsunamiPlugin
 		
 			var buf: AudioBuffer
 			session.storage.load_buffer(buf, dir | e)
-			var s = new Sample(e, buf)
+			var s = new Sample(str(e), buf)
 			session.song.add_sample(s)
 			if str(e)[-5:] != "r.wav"
 				print(int(str(e)[:2]))

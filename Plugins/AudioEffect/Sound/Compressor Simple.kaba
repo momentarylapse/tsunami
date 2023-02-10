@@ -46,7 +46,7 @@ class Compressor extends AudioEffect
 
 	var dgain_attack, dgain_release: float
 
-	func compress(out b: float[], out squares: float[], out gain: float*)
+	func compress(out b: float[], out squares: float[], out gain: float)
 		var bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
@@ -72,19 +72,19 @@ class Compressor extends AudioEffect
 			
 			# slow gain changes
 			var cur_gain = out_level - in_level
-			if cur_gain > *gain
+			if cur_gain > gain
 				if config.release < 0.00005
-					*gain = cur_gain
+					gain = cur_gain
 				else
-					*gain += dgain_release
-			else if cur_gain < *gain
+					gain += dgain_release
+			else if cur_gain < gain
 				if config.attack < 0.00005
-					*gain = cur_gain
+					gain = cur_gain
 				else
-					*gain -= dgain_attack
+					gain -= dgain_attack
 			
 			# apply gain
-			b[i] *= pow(10, *gain / 20)
+			b[i] *= pow(10, gain / 20)
 
 	func override process(out buf: AudioBuffer)
 		dgain_attack = 10 / (config.attack * session.sample_rate())
@@ -92,6 +92,6 @@ class Compressor extends AudioEffect
 		
 		compress(buf.c[0], squares_l, &gain_l)
 		if buf.channels > 1
-			compress(buf.c[1], squares_r, &gain_r)
+			compress(buf.c[1], squares_r, gain_r)
 		if buf.channels > 2
 			session.e("CompressorSimple: channels>2")

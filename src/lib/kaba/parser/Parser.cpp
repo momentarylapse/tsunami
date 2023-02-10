@@ -2093,6 +2093,12 @@ void Parser::parse_top_level() {
 			expect_new_line("newline expected after parameter list");
 			skip_parsing_function_body(f);
 
+		// macro
+		} else if (Exp.cur == IDENTIFIER_MACRO) {
+			auto f = parse_function_header(TypeVoid, tree->base_class, Flags::STATIC | Flags::MACRO);
+			expect_new_line("newline expected after parameter list");
+			skip_parsing_function_body(f);
+
 		} else if ((Exp.cur == IDENTIFIER_CONST) or (Exp.cur == IDENTIFIER_LET)) {
 			parse_named_const(tree->base_class, tree->root_of_all_evil->block.get());
 

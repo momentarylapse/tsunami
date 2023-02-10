@@ -228,17 +228,17 @@ Array<int> enum_all(const Class *e) {
 
 void SIAddXCommands(Context *c) {
 
-	add_func("@sorted", TypeDynamicArray, &array_sort, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@sorted", TypeDynamicArray, &array_sort, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("list", TypePointer);
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
-	add_func("@var2str", TypeString, &var2str, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@var2str", TypeString, &var2str, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("@var_repr", TypeString, &var_repr, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@var_repr", TypeString, &var_repr, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
-	add_func("@dyn", TypeAny, &dynify, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("@dyn", TypeAny, &dynify, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
 }
@@ -348,7 +348,7 @@ void SIAddPackageBase(Context *c) {
 	
 
 
-	add_func("p2b", TypeBool, &kaba_cast<void*,bool>, Flags::_STATIC__PURE);
+	add_func("p2b", TypeBool, &kaba_cast<void*,bool>, Flags::STATIC | Flags::PURE);
 		func_set_inline(InlineID::POINTER_TO_BOOL);
 		func_add_param("p", TypePointer);
 	
@@ -719,12 +719,12 @@ void SIAddPackageBase(Context *c) {
 		class_add_element("_text", TypeString, config.pointer_size);
 		class_set_vtable(KabaException);
 
-	add_func(IDENTIFIER_RAISE, TypeVoid, &kaba_raise_exception, Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func(IDENTIFIER_RAISE, TypeVoid, &kaba_raise_exception, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("e", TypeExceptionP);
 		
 		
 	// type casting
-	add_func("p2s", TypeString, &p2s, Flags::_STATIC__PURE);
+	add_func("p2s", TypeString, &p2s, Flags::STATIC | Flags::PURE);
 		func_add_param("p", TypePointer);
 	// debug output
 	/*add_func("cprint", TypeVoid, &_cstringout, Flags::STATIC);

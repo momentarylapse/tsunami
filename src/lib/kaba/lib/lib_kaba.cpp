@@ -221,7 +221,7 @@ void SIAddPackageKaba(Context *c) {
 			func_add_param("p", TypePointer);
 		class_add_func("create", TypeContextP, &Context::create, Flags::STATIC);
 
-	add_func("disassemble", TypeString, &Asm::disassemble, Flags::_STATIC__PURE);
+	add_func("disassemble", TypeString, &Asm::disassemble, Flags::STATIC | Flags::PURE);
 		func_add_param("p", TypePointer);
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);

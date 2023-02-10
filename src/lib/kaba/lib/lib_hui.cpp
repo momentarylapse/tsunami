@@ -556,9 +556,9 @@ void SIAddPackageHui(Context *c) {
 	add_func("create_menu_from_source", TypeHuiMenuP, hui_p(&hui::create_menu_from_source), Flags::STATIC);
 		func_add_param("source", TypeString);
 		func_add_param("panel", TypeHuiPanel);
-	add_func("get_key_name", TypeString, hui_p(&hui::get_key_code_name), Flags::_STATIC__PURE);
+	add_func("get_key_name", TypeString, hui_p(&hui::get_key_code_name), Flags::STATIC | Flags::PURE);
 		func_add_param("id", TypeInt);
-//	add_func("get_key_char", TypeString, hui_p(&hui::GetKeyChar), Flags::_STATIC__PURE);
+//	add_func("get_key_char", TypeString, hui_p(&hui::GetKeyChar), Flags::STATIC | Flags::PURE);
 //		func_add_param("id", TypeInt);
 
 	// clipboard

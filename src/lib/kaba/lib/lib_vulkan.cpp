@@ -360,7 +360,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("compute_queue", TypeQueue, vul_p(&vulkan::Device::compute_queue));
 		class_add_element("command_pool", TypeCommandPoolP, vul_p(&vulkan::Device::command_pool));
 		class_add_func("wait_idle", TypeVoid, vul_p(&vulkan::Device::wait_idle));
-		class_add_func("create_simple", TypeDeviceP, vul_p(&__vulkan_device_create_simple), Flags::_STATIC__RAISES_EXCEPTIONS);
+		class_add_func("create_simple", TypeDeviceP, vul_p(&__vulkan_device_create_simple), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("instance", TypeInstanceP);
 			func_add_param("win", TypePointer);
 			func_add_param("op", TypeStringList);
@@ -684,7 +684,7 @@ void SIAddPackageVulkan(Context *c) {
 	add_func("window_close", TypeVoid, vul_p(&vulkan::window_close), Flags::STATIC);
 		func_add_param("w", TypePointer);
 
-	add_func("init", TypeInstanceP, vul_p(&__vulkan_init), Flags::_STATIC__RAISES_EXCEPTIONS);
+	add_func("init", TypeInstanceP, vul_p(&__vulkan_init), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("op", TypeStringList);
 
 

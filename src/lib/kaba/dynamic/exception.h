@@ -13,8 +13,7 @@
 namespace kaba
 {
 
-class KabaException
-{
+class KabaException {
 public:
 	string text;
 	KabaException(){}
@@ -23,6 +22,12 @@ public:
 	void _cdecl __init__(const string &message);
 	virtual _cdecl void __delete__();
 	virtual _cdecl string message();
+};
+
+class KabaNoValueError : public KabaException {
+public:
+	KabaNoValueError();
+	void _cdecl __init__();
 };
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception);

@@ -89,6 +89,7 @@ const Class *TypeImage;
 
 const Class *TypeException;
 const Class *TypeExceptionP;
+const Class *TypeNoValueError;
 
 const Class *TypeClass;
 const Class *TypeClassP;

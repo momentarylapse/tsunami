@@ -58,6 +58,8 @@ public:
 	void auto_implement_optional_assign_null(Function *f, const Class *t);
 	void auto_implement_optional_has_value(Function *f, const Class *t);
 	void auto_implement_optional_value(Function *f, const Class *t);
+	void auto_implement_optional_equal(Function *f, const Class *t);
+	void auto_implement_optional_equal_raw(Function *f, const Class *t);
 	void auto_implement_functions(const Class *t);
 
 	SyntaxTree *tree;

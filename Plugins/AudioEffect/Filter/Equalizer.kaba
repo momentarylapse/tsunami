@@ -28,13 +28,13 @@ class Peak
 		gain = _gain
 		q = _q
 	
-	func const z(g0: float) -> vec2
+	func z(g0: float) -> vec2
 		return [pitch_to_freq(pitch), gain + g0]
 	#float q()
 		# ~ (f1 - f0) / f0 = f1/f0 - 1
 	#	return pow(2, width/12) - 1
 	
-	func const create_filter(out f: BiquadFilter, sample_rate: float)
+	func create_filter(out f: BiquadFilter, sample_rate: float)
 		var freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
@@ -103,8 +103,6 @@ class Equalizer extends AudioEffect
 		return new EqualizerPanel(self)
 
 
-#const HOVER_NONE = -1
-#const HOVER_GAIN = -2
 enum HoverType
 	NONE
 	PEAK

@@ -389,7 +389,7 @@ class Grid extends Object
 		c.set_color(point_color(selected, hover))
 		var radius = 3.0
 		if hover
-			radius = 4.0
+			radius = 5.0
 		c.draw_circle(pp, radius)
 	
 	func draw_point3(c: Painter, p: vec3, selected: bool, hover: bool)
@@ -398,7 +398,7 @@ class Grid extends Object
 		var radius = 3.0
 		if hover
 			c.draw_str([pp.x, pp.y - 20], "{{pp.z|.1}}")
-			radius = 4.0
+			radius = 5.0
 		c.draw_circle(pp._xy, radius)
 	
 	func draw_line2(c: Painter, p0: vec2, p1: vec2, selected: bool, hover: bool)
@@ -423,7 +423,7 @@ class Grid extends Object
 		
 	func mouse_over_point2(q: vec2) -> bool
 		let p = project2(q)
-		return len(hui.get_event().mouse - p) <= 5
+		return len(hui.get_event().mouse - p) <= 7
 		
 	func mouse_over_point3(q: vec3) -> bool
 		return mouse_over_point2(q._xy)
@@ -449,6 +449,8 @@ class Grid extends Object
 		update_mouse()
 		if plot_area.inside(m)
 			on_left_button_down()
+		else
+			on_left_button_down_outside()
 		if x_axis.area.inside(m)
 			x_axis.on_left_button_down()
 		if y_axis.area.inside(m)
@@ -514,6 +516,7 @@ class Grid extends Object
 	
 	func virtual mut on_draw(c: Painter)
 	func virtual mut on_left_button_down()
+	func virtual mut on_left_button_down_outside()
 	func virtual mut on_left_button_up()
 	func virtual mut on_right_button_down()
 	func virtual mut on_right_button_up()

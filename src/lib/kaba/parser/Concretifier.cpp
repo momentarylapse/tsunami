@@ -290,7 +290,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 	}
 	if (given->is_optional() and given->param[0] == wanted) {
-		cd.cast == TYPE_CAST_OPTIONAL_VALUE;
+		cd.cast = TYPE_CAST_OPTIONAL_VALUE;
 		cd.penalty = 20;
 		cd.f = given->get_call();
 		return true;
@@ -448,6 +448,7 @@ shared<Node> Concretifier::link_special_operator_in(shared<Node> param1, shared<
 }
 
 shared<Node> Concretifier::link_special_operator_as(shared<Node> param1, shared<Node> param2, int token_id) {
+	param2 = digest_type(tree, param2);
 	if (param2->kind != NodeKind::CLASS)
 		do_error("class name expected after 'as'", param2);
 	auto wanted = param2->as_class();
@@ -523,6 +524,7 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 	if (primop->id == OperatorID::AS)
 		return link_special_operator_as(param1, param2, token_id);
 
+	param1 = force_concrete_type(param1);
 
 	auto *p1 = param1->type;
 	auto *p2 = param2->type;
@@ -1481,7 +1483,7 @@ shared<Node> Concretifier::concretify_operator(shared<Node> node, Block *block, 
 		auto param2 = force_concrete_type_if_function(node->params[1]);
 		auto op = link_operator(op_no, param1, param2, node->token_id);
 		if (!op)
-			do_error(format("no operator found: '%s %s %s'", param1->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), node);
+			do_error(format("no operator found: '%s %s %s'", force_concrete_type(param1)->type->long_name(), op_no->name, give_useful_type(this, param2)->long_name()), node);
 		return op;
 	} else {
 		return link_unary_operator(op_no, node->params[0], block, node->token_id);

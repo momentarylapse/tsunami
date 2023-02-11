@@ -4,7 +4,8 @@ use hui
 use tsunami
 use helper.grid
 
-const MIN_DB = -60.0
+let MIN_DB = -60.0
+let MAX_DB = 0.0
 
 
 class Compressor extends AudioEffect
@@ -12,7 +13,7 @@ class Compressor extends AudioEffect
 		var curve: vec2[]
 		var attack, release: float
 
-		func const fill_inter(out fi: FloatInterpolator)
+		func fill_inter(out fi: FloatInterpolator)
 			fi.set_type("lerp")
 			fi.add(curve[0].y, 0)
 			for i in 1:len(curve)
@@ -20,9 +21,7 @@ class Compressor extends AudioEffect
 			fi.normalize()
 
 		func override reset()
-			curve.clear()
-			curve.add(vec2(MIN_DB, MIN_DB))
-			curve.add(vec2(0, 0))
+			curve = [[MIN_DB, MIN_DB], [MAX_DB, MAX_DB]]
 			attack = 0.01
 			release = 0.1
 	var config: Config
@@ -41,7 +40,7 @@ class Compressor extends AudioEffect
 
 	var dgain_attack, dgain_release: float
 
-	func compress(out b: float[], out squares: float[], out gain: float*)
+	func compress(out b: float[], out squares: float[], out gain: float)
 		var bmin = pow(10, MIN_DB/20)
 		for i in 0:len(b)
 		
@@ -63,19 +62,19 @@ class Compressor extends AudioEffect
 			
 			# slow gain changes
 			var cur_gain = out_level - in_level
-			if cur_gain > *gain
+			if cur_gain > gain
 				if config.release < 0.00005
-					*gain = cur_gain
+					gain = cur_gain
 				else
-					*gain += dgain_release
-			else if cur_gain < *gain
+					gain += dgain_release
+			else if cur_gain < gain
 				if config.attack < 0.00005
-					*gain = cur_gain
+					gain = cur_gain
 				else
-					*gain -= dgain_attack
+					gain -= dgain_attack
 			
 			# apply gain
-			b[i] *= pow(10, *gain / 20)
+			b[i] *= pow(10, gain / 20)
 
 	func override create_panel() -> ConfigPanel*
 		return new CompressorPanel(self)
@@ -84,14 +83,14 @@ class Compressor extends AudioEffect
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		
-		compress(buf.c[0], squares_l, &gain_l)
-		if buf.channels > 1
-			compress(buf.c[1], squares_r, &gain_r)
+		compress(buf.c[0], squares_l, gain_l)
+		if buf.channels >= 2
+			compress(buf.c[1], squares_r, gain_r)
 		if buf.channels > 2
 			session.e("Compressor: channels>2")
 
 class CompressorGrid extends Grid
-	var hover, selected: int
+	var hover, selected: int?
 	var config: Compressor.Config*
 	var cp: ConfigPanel*
 
@@ -101,11 +100,15 @@ class CompressorGrid extends Grid
 	
 		# curve
 		draw_curve(p, fi, true)
-		for i in 1:len(config.curve)
-			draw_point2(p, config.curve[i], i == selected, i == hover)
+		for i=>cc in config.curve
+			draw_point2(p, cc, selected == i, hover == i)
+			
+	func override on_left_button_down_outside()
+		selected = nil
 
 	# left button down -> select
 	func override on_left_button_down()
+		hover = get_hover()
 		selected = hover
 		redraw()
 
@@ -121,36 +124,46 @@ class CompressorGrid extends Grid
 				selected = i
 				redraw()
 				break
+	
+	func point_x_constraint(i: int) -> (float,float)
+		if i == 0
+			return (MIN_DB, MIN_DB)
+		if i == len(config.curve) - 1
+			return (MAX_DB, MAX_DB)
+		return (config.curve[i - 1].x, config.curve[i + 1].x)
 
 	func override on_mouse_move()
 		# move
-		if hui.get_event().button_l and (selected > 0)
-			config.curve[selected] = get_mouse2()
-			let xmin = config.curve[selected - 1].x
-			var xmax = 0.0
-			if selected < len(config.curve) - 1
-				xmax = config.curve[selected + 1].x
-			config.curve[selected].x = clamp(config.curve[selected].x, xmin, xmax)
-			if selected == len(config.curve) - 1
-				config.curve[selected].x = 0
+		if hui.get_event().button_l and bool(selected)
+			let s = selected()
+			config.curve[s] = get_mouse2()
+			let (xmin, xmax) = point_x_constraint(s)
+			config.curve[s].x = clamp(config.curve[s].x, xmin, xmax)
+			config.curve[s].y = clamp(config.curve[s].y, MIN_DB, MAX_DB)
 			cp.changed()
 		else
 		# mouse over?
-			hover = -1
-			for i in 1:len(config.curve)
-				if mouse_over_point2(config.curve[i])
-					hover = i
+			hover = get_hover()
 		redraw()
+	
+	func get_hover() -> int?
+		for i=>cp in config.curve
+			if mouse_over_point2(cp)
+				return i
+		return nil
 
 	func override on_key_down()
 		let k = hui.get_event().key
 
 		# [Delete] -> remove point
-		if (k == KEY_DELETE) and (selected > 0) and (selected < len(config.curve) - 1)
-			config.curve.remove(selected)
-			cp.changed()
-			selected = -1
-			redraw()
+		if (k == KEY_DELETE) and bool(selected)
+			let s = selected()
+			if (s > 0) and (s < len(config.curve) - 1)
+				config.curve.remove(s)
+				cp.changed()
+				hover = nil
+				selected = nil
+				redraw()
 
 class CompressorPanel extends ConfigPanel
 	var override c: Compressor*

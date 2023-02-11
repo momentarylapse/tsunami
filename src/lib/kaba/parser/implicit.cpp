@@ -14,6 +14,7 @@ const int FULL_CONSTRUCTOR_MAX_PARAMS = 4;
 
 extern const Class *TypeCallableBase;
 extern const Class *TypeDynamicArray;
+extern const Class *TypeNoValueError;
 
 
 Array<const Class*> get_callable_param_types(const Class *fp);
@@ -207,15 +208,40 @@ void AutoImplementer::auto_implement_shared_constructor(Function *f, const Class
 			add_node_const(tree->add_constant_pointer(tree->get_pointer(te), nullptr))));
 }
 
+
+
+
+//===================================================================================
+// optional
+
+
+shared<Node> node_false(AutoImplementer *a) {
+	auto c_false = a->tree->add_constant(TypeBool);
+	c_false->as_int() = 0;
+	return add_node_const(c_false);
+}
+
+shared<Node> node_true(AutoImplementer *a) {
+	auto c_false = a->tree->add_constant(TypeBool);
+	c_false->as_int() = 1;
+	return add_node_const(c_false);
+}
+
+shared<Node> op_has_value(shared<Node> node) {
+	return node->shift(node->type->size - 1, TypeBool);
+}
+
+shared<Node> op_data(shared<Node> node) {
+	return node->shift(0, node->type->param[0]);
+}
+
 void AutoImplementer::auto_implement_optional_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
 	// self.has_value = false
-	auto c_false = tree->add_constant(TypeBool);
-	c_false->as_int() = 0;
 	f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-			self->shift(t->size - 1, TypeBool),
-			add_node_const(c_false)));
+			op_has_value(self),
+			node_false(this)));
 }
 
 void AutoImplementer::auto_implement_optional_constructor_wrap(Function *f, const Class *t) {
@@ -225,13 +251,13 @@ void AutoImplementer::auto_implement_optional_constructor_wrap(Function *f, cons
 	if (auto f_con = t->param[0]->get_default_constructor()) {
 		// self.data.__init__()
 		f->block->add(add_node_member_call(f_con,
-				self->shift(0, t->param[0])));
+				op_data(self)));
 	}
 
 	{
 		// self.data = value
 		auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				self->shift(0, t->param[0]),
+				op_data(self),
 				value);
 		if (!assign)
 			do_error_implicit(f, format("(auto init) no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
@@ -240,11 +266,9 @@ void AutoImplementer::auto_implement_optional_constructor_wrap(Function *f, cons
 
 	{
 		// self.has_value = true
-		auto c_true = tree->add_constant(TypeBool);
-		c_true->as_int() = 1;
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				self->shift(t->size - 1, TypeBool),
-				add_node_const(c_true)));
+				op_has_value(self),
+				node_true(this)));
 	}
 }
 
@@ -261,13 +285,13 @@ void AutoImplementer::auto_implement_optional_destructor(Function *f, const Clas
 		// if self.has_value
 		//     self.value.__delete()
 		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, self->shift(t->size - 1, TypeBool));
+		cmd_if->set_param(0, op_has_value(self));
 
 		auto b = new Block(f, f->block.get());
 
 		// self.data.__delete__()
 		b->add(add_node_member_call(f_des,
-				self->shift(0, t->param[0])));
+				op_data(self)));
 
 		cmd_if->set_param(1, b);
 		f->block->add(cmd_if);
@@ -282,13 +306,13 @@ void AutoImplementer::auto_implement_optional_assign(Function *f, const Class *t
 		// if self.has_value
 		//     self.value.__delete()
 		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, self->shift(t->size - 1, TypeBool));
+		cmd_if->set_param(0, op_has_value(self));
 
 		auto b = new Block(f, f->block.get());
 
 		// self.data.__delete__()
 		b->add(add_node_member_call(f_des,
-				self->shift(0, t->param[0])));
+				op_data(self)));
 
 		cmd_if->set_param(1, b);
 		f->block->add(cmd_if);
@@ -297,22 +321,21 @@ void AutoImplementer::auto_implement_optional_assign(Function *f, const Class *t
 
 	{
 		// if other.has_value
-		//     self.value.__init__()
-		//     self = other.value
+		//     self.data.__init__()
+		//     self.data = other.data
 		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, other->shift(t->size - 1, TypeBool));
+		cmd_if->set_param(0, op_has_value(other));
 
 		auto b = new Block(f, f->block.get());
 
 		if (auto f_con = t->param[0]->get_default_constructor()) {
 			// self.data.__init__()
 			b->add(add_node_member_call(f_con,
-					self->shift(0, t->param[0])));
+					op_data(self)));
 		}
 
 		auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				self->shift(0, t->param[0]),
-				other->shift(0, t->param[0]));
+				op_data(self), op_data(other));
 		if (!assign)
 			do_error_implicit(f, format("(auto init) no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
 		b->add(assign);
@@ -324,8 +347,8 @@ void AutoImplementer::auto_implement_optional_assign(Function *f, const Class *t
 	{
 		// self.has_value = other.has_value
 		auto assign = add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				self->shift(t->size-1, TypeBool),
-				other->shift(t->size-1, TypeBool));
+				op_has_value(self),
+				op_has_value(other));
 		f->block->add(assign);
 	}
 }
@@ -338,23 +361,23 @@ void AutoImplementer::auto_implement_optional_assign_raw(Function *f, const Clas
 		// if not self.has_value
 		//     self.value.__init__()
 		auto cmd_if = add_node_statement(StatementID::IF);
-		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NEGATE, self->shift(t->size - 1, TypeBool), nullptr);
+		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NEGATE, op_has_value(self), nullptr);
 		cmd_if->set_param(0, cmd_not);
 
 		auto b = new Block(f, f->block.get());
 
 		// self.data.__init__()
 		b->add(add_node_member_call(f_con,
-				self->shift(0, t->param[0])));
+				op_data(self)));
 
 		cmd_if->set_param(1, b);
 		f->block->add(cmd_if);
 	}
 
 	{
-		// self.value = other
+		// self.data = other
 		auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				self->shift(0, t->param[0]),
+				op_data(self),
 				other);
 		if (!assign)
 			do_error_implicit(f, format("(auto init) no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
@@ -363,11 +386,9 @@ void AutoImplementer::auto_implement_optional_assign_raw(Function *f, const Clas
 
 	{
 		// self.has_value = true
-		auto c_true = tree->add_constant(TypeBool);
-		c_true->as_int() = 1;
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				self->shift(t->size - 1, TypeBool),
-				add_node_const(c_true)));
+				op_has_value(self),
+				node_true(this)));
 	}
 }
 
@@ -376,15 +397,15 @@ void AutoImplementer::auto_implement_optional_assign_null(Function *f, const Cla
 
 	if (auto f_des = t->param[0]->get_destructor()) {
 		// if self.has_value
-		//     self.value.__delete()
+		//     self.data.__delete()
 		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, self->shift(t->size - 1, TypeBool));
+		cmd_if->set_param(0, op_has_value(self));
 
 		auto b = new Block(f, f->block.get());
 
 		// self.data.__delete__()
 		b->add(add_node_member_call(f_des,
-				self->shift(0, t->param[0])));
+				op_data(self)));
 
 		cmd_if->set_param(1, b);
 		f->block->add(cmd_if);
@@ -392,11 +413,9 @@ void AutoImplementer::auto_implement_optional_assign_null(Function *f, const Cla
 
 	{
 		// self.has_value = false
-		auto c_false = tree->add_constant(TypeBool);
-		c_false->as_int() = 0;
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				self->shift(t->size - 1, TypeBool),
-				add_node_const(c_false)));
+				op_has_value(self),
+				node_false(this)));
 	}
 }
 
@@ -406,19 +425,133 @@ void AutoImplementer::auto_implement_optional_has_value(Function *f, const Class
 	// return self.has_value
 	auto ret = add_node_statement(StatementID::RETURN, -1);
 	ret->set_num_params(1);
-	ret->set_param(0, self->shift(t->size - 1, TypeBool));
+	ret->set_param(0, op_has_value(self));
 	f->block->add(ret);
 }
 
 void AutoImplementer::auto_implement_optional_value(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
-	// return self.has_value
-	auto ret = add_node_statement(StatementID::RETURN, -1);
-	ret->set_num_params(1);
-	ret->set_param(0, self->shift(0, t->param[0]));
-	f->block->add(ret);
+	{
+		// if not self.has_value
+		//     raise(new NoValueError())
+		auto cmd_if = add_node_statement(StatementID::IF);
+		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NEGATE, op_has_value(self), nullptr);
+		cmd_if->set_param(0, cmd_not);
+
+		auto b = new Block(f, f->block.get());
+
+		auto f_ex = TypeNoValueError->get_default_constructor();
+		auto cmd_call_ex = add_node_call(f_ex, -1);
+		cmd_call_ex->set_num_params(1);
+		cmd_call_ex->set_param(0, new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));
+
+		auto cmd_new = add_node_statement(StatementID::NEW);
+		cmd_new->set_num_params(1);
+		cmd_new->set_param(0, cmd_call_ex);
+		cmd_new->type = TypeExceptionP;
+
+		auto cmd_raise = add_node_call(tree->required_func_global("raise"));
+		cmd_raise->set_param(0, cmd_new);
+		b->add(cmd_raise);
+
+		cmd_if->set_param(1, b);
+		f->block->add(cmd_if);
+	}
+
+
+	{
+		// return self.data
+		auto ret = add_node_statement(StatementID::RETURN, -1);
+		ret->set_num_params(1);
+		ret->set_param(0, op_data(self));
+		f->block->add(ret);
+	}
 }
+
+void AutoImplementer::auto_implement_optional_equal_raw(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
+	auto other = add_node_local(f->__get_var("other"));
+
+	{
+		// if not self.has_value
+		//     return false
+		auto cmd_if = add_node_statement(StatementID::IF);
+		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NEGATE, op_has_value(self), nullptr);
+		cmd_if->set_param(0, cmd_not);
+
+		auto b = new Block(f, f->block.get());
+
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, node_false(this));
+		b->add(cmd_ret);
+
+		cmd_if->set_param(1, b);
+		f->block->add(cmd_if);
+	}
+
+	{
+		// return self.data == other
+
+		auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, op_data(self), other);
+		if (!n_eq)
+			do_error_implicit(f, format("missing %s == %s", t->param[0]->long_name(), t->param[0]->long_name()));
+
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, n_eq);
+		f->block->add(cmd_ret);
+	}
+}
+
+void AutoImplementer::auto_implement_optional_equal(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
+	auto other = add_node_local(f->__get_var("other"));
+
+	{
+		// if self.has_value and other.has_value
+		//     return self.data == other.data
+		auto cmd_if = add_node_statement(StatementID::IF);
+		auto cmd_and = add_node_operator_by_inline(InlineID::BOOL_AND, op_has_value(self), op_has_value(other));
+		cmd_if->set_param(0, cmd_and);
+
+		auto b = new Block(f, f->block.get());
+
+		auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, op_data(self), op_data(other));
+		if (!n_eq)
+			do_error_implicit(f, format("missing %s == %s", t->param[0]->long_name(), t->param[0]->long_name()));
+
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, n_eq);
+		b->add(cmd_ret);
+
+		cmd_if->set_param(1, b);
+		f->block->add(cmd_if);
+	}
+
+	{
+		// return self.has_value == other.has_value
+
+		auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, op_has_value(self), op_has_value(other));
+		if (!n_eq)
+			do_error_implicit(f, format("missing %s == %s", "bool", "bool"));
+
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, n_eq);
+		f->block->add(cmd_ret);
+	}
+}
+
+
+
+
 
 void AutoImplementer::auto_implement_regular_destructor(Function *f, const Class *t) {
 	if (!f)
@@ -426,54 +559,28 @@ void AutoImplementer::auto_implement_regular_destructor(Function *f, const Class
 	auto te = t->get_array_element();
 	auto self = add_node_local(f->__get_var(IDENTIFIER_SELF));
 
-	if (t->is_super_array() or t->is_dict()) {
-		Function *f_clear = t->get_member_func("clear", TypeVoid, {});
-		if (!f_clear)
-			do_error_implicit(f, "clear() missing");
-		f->block->add(add_node_member_call(f_clear, self));
-	} else if (t->is_array()) {
-		auto *f_el_del = te->get_destructor();
-		if (f_el_del) {
-			for (int i=0; i<t->array_length; i++) {
-				// self[i].__delete__()
-				f->block->add(add_node_member_call(f_el_del,
-						self->shift(te->size * i, te)));
-			}
-		} else if (te->needs_destructor()) {
-			do_error_implicit(f, "element destructor missing");
-		}
-	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
-		// call clear()
-		auto f_clear = t->get_member_func(IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, {});
-		if (!f_clear)
-			do_error_implicit(f, IDENTIFIER_FUNC_SHARED_CLEAR + "() missing");
-		f->block->add(add_node_member_call(f_clear,
-				self));
-	} else {
+	// call child destructors
+	int i0 = t->parent ? t->parent->elements.num : 0;
+	for (auto&& [i,e]: enumerate(t->elements)) {
+		if (i < i0)
+			continue;
+		Function *ff = e.type->get_destructor();
+		if (!ff and e.type->needs_destructor())
+			do_error_implicit(f, format("missing destructor for element %s", e.name));
+		if (!ff)
+			continue;
+		// self.el.__delete__()
+		f->block->add(add_node_member_call(ff,
+				self->shift(e.offset, e.type)));
+	}
 
-		// call child destructors
-		int i0 = t->parent ? t->parent->elements.num : 0;
-		for (auto&& [i,e]: enumerate(t->elements)) {
-			if (i < i0)
-				continue;
-			Function *ff = e.type->get_destructor();
-			if (!ff and e.type->needs_destructor())
-				do_error_implicit(f, format("missing destructor for element %s", e.name));
-			if (!ff)
-				continue;
-			// self.el.__delete__()
-			f->block->add(add_node_member_call(ff,
-					self->shift(e.offset, e.type)));
-		}
-
-		// parent destructor
-		if (t->parent) {
-			Function *ff = t->parent->get_destructor();
-			if (ff)
-				f->block->add(add_node_member_call(ff, self, -1, {}, true));
-			else if (t->parent->needs_destructor())
-				do_error_implicit(f, "parent destructor missing");
-		}
+	// parent destructor
+	if (t->parent) {
+		Function *ff = t->parent->get_destructor();
+		if (ff)
+			f->block->add(add_node_member_call(ff, self, -1, {}, true));
+		else if (t->parent->needs_destructor())
+			do_error_implicit(f, "parent destructor missing");
 	}
 }
 
@@ -1319,6 +1426,10 @@ void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
 		add_func_header(t, IDENTIFIER_FUNC_OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
 		add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
 		add_func_header(t, IDENTIFIER_FUNC_CALL, t->param[0], {}, {}, nullptr, Flags::REF);
+		if (t->param[0]->get_member_func("__eq__", TypeBool, {t->param[0]})) {
+			add_func_header(t, "__eq__", TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
+			add_func_header(t, "__eq__", TypeBool, {t->param[0]}, {"other"}, nullptr, Flags::PURE);
+		}
 	} else { // regular classes
 		if (t->can_memcpy()) {
 			if (has_user_constructors(t)) {
@@ -1414,6 +1525,7 @@ void AutoImplementer::auto_implement_functions(const Class *t) {
 		auto_implement_array_assign(prepare_auto_impl(t, t->get_assign()), t);
 	} else if (t->is_dict()) {
 		auto_implement_super_array_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
+		auto_implement_super_array_destructor(prepare_auto_impl(t, t->get_destructor()), t);
 	} else if (t->is_pointer_shared()) {
 		auto_implement_shared_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
 		auto_implement_shared_destructor(prepare_auto_impl(t, t->get_destructor()), t);
@@ -1447,6 +1559,8 @@ void AutoImplementer::auto_implement_functions(const Class *t) {
 		auto_implement_optional_has_value(prepare_auto_impl(t, t->get_member_func(IDENTIFIER_FUNC_OPTIONAL_HAS_VALUE, TypeBool, {})), t);
 		auto_implement_optional_has_value(prepare_auto_impl(t, t->get_member_func("__bool__", TypeBool, {})), t);
 		auto_implement_optional_value(prepare_auto_impl(t, t->get_member_func(IDENTIFIER_FUNC_CALL, t->param[0], {})), t);
+		auto_implement_optional_equal(prepare_auto_impl(t, t->get_member_func("__eq__", TypeBool, {t})), t);
+		auto_implement_optional_equal_raw(prepare_auto_impl(t, t->get_member_func("__eq__", TypeBool, {t->param[0]})), t);
 	} else {
 		for (auto *cf: t->get_constructors())
 			auto_implement_regular_constructor(prepare_auto_impl(t, cf), t, true);

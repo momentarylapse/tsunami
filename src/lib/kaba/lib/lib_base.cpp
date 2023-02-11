@@ -35,6 +35,7 @@ extern const Class *TypeIntDict;
 extern const Class *TypeFloatDict;
 extern const Class *TypeStringDict;
 extern const Class *TypeAny;
+extern const Class *TypeNoValueError;
 
 int enum_parse(const string &label, const Class *type);
 
@@ -273,6 +274,7 @@ void SIAddPackageBase(Context *c) {
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
 	TypeExceptionP		= add_type_p(TypeException);
+	TypeNoValueError    = add_type  ("NoValueError", sizeof(KabaException));
 
 
 	// select default float type
@@ -718,6 +720,11 @@ void SIAddPackageBase(Context *c) {
 		class_add_func_virtual(IDENTIFIER_FUNC_STR, TypeString, &KabaException::message);
 		class_add_element("_text", TypeString, config.pointer_size);
 		class_set_vtable(KabaException);
+
+	add_class(TypeNoValueError);
+		class_derive_from(TypeException, false, true);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaNoValueError::__init__);
+		class_set_vtable(KabaNoValueError);
 
 	add_func(IDENTIFIER_RAISE, TypeVoid, &kaba_raise_exception, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("e", TypeExceptionP);

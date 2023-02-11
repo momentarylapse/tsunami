@@ -44,6 +44,13 @@ string KabaException::message() {
 }
 
 
+KabaNoValueError::KabaNoValueError() : KabaException("no value") {
+}
+
+void KabaNoValueError::__init__() {
+	new(this) KabaNoValueError();
+}
+
 
 
 

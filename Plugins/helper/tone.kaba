@@ -104,7 +104,7 @@ class Chord
 
 	var base_tone: int
 	var type: Type
-	func const pitch() -> int[]
+	func pitch() -> int[]
 		if type == Type.MAJOR
 			return [base_tone, base_tone + 4, base_tone + 7]
 		if type == Type.MINOR
@@ -160,7 +160,7 @@ class Chord
 			chords.add(c)
 		return chords
 	
-	func const match_pitch(_pitches: int[]) -> bool
+	func match_pitch(_pitches: int[]) -> bool
 		var pp = pitch()
 		for _p in _pitches
 			var found = false

@@ -349,7 +349,7 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 	}
 
 	// super
-	if (type->parent and (name == IDENTIFIER_SUPER)) {
+	if (type->parent and (name == Identifier::SUPER)) {
 		operand->token_id = token_id;
 		if (deref) {
 			operand->type = get_pointer(type->parent, token_id);
@@ -431,7 +431,7 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 
 	// self.x?
 	if (f->is_member()) {
-		auto self = add_node_local(f->__get_var(IDENTIFIER_SELF), token_id);
+		auto self = add_node_local(f->__get_var(Identifier::SELF), token_id);
 		auto links = get_element_of(self, name, token_id);
 		if (links.num > 0)
 			return links;
@@ -480,6 +480,12 @@ Function *SyntaxTree::required_func_global(const string &name, int token_id) {
 	if (links.num == 0)
 		do_error(format("internal error: '%s()' not found????", name), token_id);
 	return links[0]->as_func();
+}
+
+
+void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
+	AutoImplementer a(nullptr, this);
+	a.add_missing_function_headers_for_class(t);
 }
 
 // expression naming a type
@@ -553,10 +559,10 @@ Class *SyntaxTree::create_new_class_no_check(const string &name, Class::Type typ
 		t->functions.clear(); // don't inherit call() with specific types!
 		t->param = params;
 		//add_missing_function_headers_for_class(t); // later... depending on the bind variables
-	} else if (t->type == Class::Type::PRODUCT) {
+	} else if (t->is_product()) {
 		int offset = 0;
 		for (auto&& [i,cc]: enumerate(params)) {
-			t->elements.add(ClassElement("e" + i2s(i), cc, offset));
+			t->elements.add(ClassElement(format("e%d", i), cc, offset));
 			offset += cc->size;
 		}
 		add_missing_function_headers_for_class(t);
@@ -729,7 +735,7 @@ shared<Node> SyntaxTree::conv_return_by_memory(shared<Node> n, Function *f) {
 	// convert into   *-return- = param
 	shared<Node> p_ret;
 	for (Variable *v: weak(f->var))
-		if (v->name == IDENTIFIER_RETURN_VAR) {
+		if (v->name == Identifier::RETURN_VAR) {
 			p_ret = add_node_local(v);
 		}
 	if (!p_ret)
@@ -1257,7 +1263,7 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 
 void MapLVSX86Return(Function *f, int64 &stack_offset) {
 	for (auto &v: f->var)
-		if (v->name == IDENTIFIER_RETURN_VAR) {
+		if (v->name == Identifier::RETURN_VAR) {
 			v->_offset = stack_offset;
 			stack_offset += config.pointer_size;
 		}
@@ -1265,7 +1271,7 @@ void MapLVSX86Return(Function *f, int64 &stack_offset) {
 
 void MapLVSX86Self(Function *f, int64 &stack_offset) {
 	for (auto &v: f->var)
-		if (v->name == IDENTIFIER_SELF) {
+		if (v->name == Identifier::SELF) {
 			v->_offset = stack_offset;
 			stack_offset += config.pointer_size;
 		}
@@ -1298,9 +1304,9 @@ void SyntaxTree::map_local_variables_to_stack() {
 			}
 
 			for (auto&& [i,v]: enumerate(weak(f->var))) {
-				if (f->is_member() and (v->name == IDENTIFIER_SELF))
+				if (f->is_member() and (v->name == Identifier::SELF))
 					continue;
-				if (v->name == IDENTIFIER_RETURN_VAR)
+				if (v->name == Identifier::RETURN_VAR)
 					continue;
 				int s = mem_align(v->type->size, 4);
 				if (i < f->num_params) {
@@ -1329,9 +1335,9 @@ void SyntaxTree::map_local_variables_to_stack() {
 					MapLVSX86Return(f, stack_offset);
 
 				for (auto&& [i,v]: enumerate(weak(f->var))) {
-					if (f->is_member() and (v->name == IDENTIFIER_SELF))
+					if (f->is_member() and (v->name == Identifier::SELF))
 						continue;
-					if (v->name == IDENTIFIER_RETURN_VAR)
+					if (v->name == Identifier::RETURN_VAR)
 						continue;
 					if (i < f->num_params) {
 						// parameters

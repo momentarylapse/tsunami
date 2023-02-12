@@ -36,8 +36,8 @@ void SIAddPackageDoc(Context *c) {
 
 
 	add_class(TypePdfParser);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, pdf_p(&pdf::Parser::__init__));
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, pdf_p(&pdf::Parser::__delete__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, pdf_p(&pdf::Parser::__init__));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, pdf_p(&pdf::Parser::__delete__));
 		class_add_func("set_page_size", TypeVoid, pdf_p(&pdf::Parser::add_page));
 			func_add_param("width", TypeFloat32);
 			func_add_param("height", TypeFloat32);

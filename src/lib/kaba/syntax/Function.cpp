@@ -158,17 +158,17 @@ void Function::update_parameters_after_parsing() {
 
 	// return by memory
 	if (literal_return_type->uses_return_by_memory())
-		//if (!__get_var(IDENTIFIER_RETURN_VAR))
-			block->add_var(IDENTIFIER_RETURN_VAR, owner()->get_pointer(literal_return_type));
+		//if (!__get_var(Identifier::RETURN_VAR))
+			block->add_var(Identifier::RETURN_VAR, owner()->get_pointer(literal_return_type));
 
 	// class function
 	if (is_member()) {
-		if (!__get_var(IDENTIFIER_SELF))
+		if (!__get_var(Identifier::SELF))
 			add_self_parameter();
 		/*if (flags_has(flags, Flags::CONST))
-			flags_set(__get_var(IDENTIFIER_SELF)->flags, Flags::CONST);
+			flags_set(__get_var(Identifier::SELF)->flags, Flags::CONST);
 		if (flags_has(flags, Flags::REF))
-			flags_set(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);*/
+			flags_set(__get_var(Identifier::SELF)->flags, Flags::REF);*/
 	}
 }
 
@@ -178,7 +178,7 @@ void Function::add_self_parameter() {
 		flags_set(_flags, Flags::CONST);
 	if (flags_has(flags, Flags::REF))
 		flags_set(_flags, Flags::REF);
-	block->insert_var(0, IDENTIFIER_SELF, name_space, _flags);
+	block->insert_var(0, Identifier::SELF, name_space, _flags);
 	literal_param_type.insert(name_space, 0);
 	abstract_param_types.insert(nullptr, 0);
 	num_params ++;
@@ -238,14 +238,14 @@ bool Function::is_const() const {
 	// hmmm, might be better, to use self:
 	if (is_static())
 		return false;
-	return __get_var(IDENTIFIER_SELF)->is_const();
+	return __get_var(Identifier::SELF)->is_const();
 }
 
 bool Function::is_selfref() const {
 	if (is_static())
 		return false;
 	return flags_has(flags, Flags::REF);
-	return flags_has(__get_var(IDENTIFIER_SELF)->flags, Flags::REF);
+	return flags_has(__get_var(Identifier::SELF)->flags, Flags::REF);
 }
 
 bool Function::throws_exceptions() const {

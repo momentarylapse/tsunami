@@ -136,10 +136,10 @@ public:
 		add_class(c);
 			//class_add_element("stream", TypeStreamSP, &KF::stream);
 		class_add_element("stream", TypeStreamP, &KF::stream);
-			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KF::__init__);
+			class_add_func(Identifier::Func::INIT, TypeVoid, &KF::__init__);
 				//func_add_param("stream", TypeStreamSP);
 				func_add_param("stream", TypeStreamP);
-			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KF::__delete__);
+			class_add_func(Identifier::Func::DELETE, TypeVoid, &KF::__delete__);
 			class_add_func("__lshift__", TypeVoid, &KF::_write_bool, Flags::RAISES_EXCEPTIONS);
 				func_add_param("b", TypeBool);
 			class_add_func("__lshift__", TypeVoid, &KF::_write_int, Flags::RAISES_EXCEPTIONS);
@@ -278,17 +278,17 @@ void SIAddPackageOSPath(Context *c) {
 
 	add_class(TypePath);
 		class_add_element_x("_s", TypeString, 0);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Path::__init__);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Path::__init_ext__, Flags::AUTO_CAST);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &Path::__init__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &Path::__init_ext__, Flags::AUTO_CAST);
 			func_add_param("p", TypeString);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Path::__delete__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &Path::__delete__);
 		class_add_func("absolute", TypePath, &Path::absolute, Flags::CONST);
 		class_add_func("dirname", TypeString, &Path::dirname, Flags::PURE);
 		class_add_func("basename", TypeString, &Path::basename, Flags::PURE);
 		class_add_func("basename_no_ext", TypeString, &Path::basename_no_ext, Flags::PURE);
 		class_add_func("extension", TypeString, &Path::extension, Flags::PURE);
 		class_add_func("canonical", TypePath, &Path::canonical, Flags::PURE);
-		class_add_func(IDENTIFIER_FUNC_STR, TypeString, &Path::str, Flags::PURE);
+		class_add_func(Identifier::Func::STR, TypeString, &Path::str, Flags::PURE);
 		class_add_func("is_empty", TypeBool, &Path::is_empty, Flags::PURE);
 		class_add_func("is_relative", TypeBool, &Path::is_relative, Flags::PURE);
 		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::PURE);
@@ -303,7 +303,7 @@ void SIAddPackageOSPath(Context *c) {
 			func_add_param("p", TypeString);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypePath, TypePath, InlineID::NONE, &Path::operator =);
 		add_operator(OperatorID::EQUAL, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator ==);
-		add_operator(OperatorID::NOTEQUAL, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator !=);
+		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator !=);
 		add_operator(OperatorID::SMALLER, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator <);
 		add_operator(OperatorID::GREATER, TypeBool, TypePath, TypePath, InlineID::NONE, &Path::operator >);
 		add_operator(OperatorID::SHIFT_LEFT, TypePath, TypePath, TypePath, InlineID::NONE, &KabaPath::lshift_p);
@@ -320,8 +320,8 @@ void SIAddPackageOSPath(Context *c) {
 		class_add_func("all_parents", TypePathList, &Path::all_parents, Flags::PURE);
 
 	add_class(TypePathList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &XList<Path>::__init__);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Array<Path>::clear);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<Path>::__init__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &Array<Path>::clear);
 		class_add_func("clear", TypeVoid, &Array<Path>::clear);
 		class_add_func("add", TypeVoid, &Array<Path>::add);
 			func_add_param("p", TypePath);
@@ -368,14 +368,14 @@ public:
 	static void declare(const Class *c) {
 		using SP = KabaSharedPointer<C>;
 		add_class(c);
-			class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &SP::__init__);
-			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &SP::__delete__);
-			class_add_func(IDENTIFIER_FUNC_SHARED_CLEAR, TypeVoid, &shared<C>::release);
-			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign);
+			class_add_func(Identifier::Func::INIT, TypeVoid, &SP::__init__);
+			class_add_func(Identifier::Func::DELETE, TypeVoid, &SP::__delete__);
+			class_add_func(Identifier::Func::SHARED_CLEAR, TypeVoid, &shared<C>::release);
+			class_add_func(Identifier::Func::ASSIGN, TypeVoid, &SP::assign);
 				func_add_param("other", c);
-			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &SP::assign_p);
+			class_add_func(Identifier::Func::ASSIGN, TypeVoid, &SP::assign_p);
 				func_add_param("other", c->owner->get_pointer(c->param[0], -1));
-			class_add_func(IDENTIFIER_FUNC_SHARED_CREATE, c, &SP::create, Flags::STATIC);
+			class_add_func(Identifier::Func::SHARED_CREATE, c, &SP::create, Flags::STATIC);
 				func_add_param("other", c->owner->get_pointer(c->param[0], -1));
 	}
 };
@@ -426,12 +426,12 @@ void SIAddPackageOS(Context *c) {
 	auto TypeCallbackStringList = add_type_f(TypeVoid, {TypeStringList});
 
 	add_class(TypeStream);
-		class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
+		class_add_element(Identifier::SHARED_COUNT, TypeInt, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
 		// FIXME &FileStream::_pointer_ref_counter does not work here
 		// we get a base-class-pointer... \(O_O)/
-		//class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, &Stream::__delete__);
+		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &Stream::__delete__);
 		//class_add_func_virtual("write", TypeVoid, Stream::write);
-		//class_add_element(IDENTIFIER_SHARED_COUNT, TypeInt, &Stream::_pointer_ref_counter);
+		//class_add_element(Identifier::SHARED_COUNT, TypeInt, &Stream::_pointer_ref_counter);
 		//const_cast<Class*>(TypeStream)->elements.back().offset = offsetof(Stream, _pointer_ref_counter);
 
 
@@ -439,7 +439,7 @@ void SIAddPackageOS(Context *c) {
 
 	add_class(TypeFileStream);
 		class_derive_from(TypeStream, false, false);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFileStream::__delete__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaFileStream::__delete__);
 		//class_add_func("getCDate", TypeDate, &File::GetDateCreation);
 		class_add_func("mtime", TypeDate, &os::fs::FileStream::mtime);
 		//class_add_func("getADate", TypeDate, &FileStream::GetDateAccess);
@@ -466,14 +466,14 @@ void SIAddPackageOS(Context *c) {
 
 	add_class(TypeFileError);
 		class_derive_from(TypeException, false, false);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaFileError::__init__, Flags::OVERRIDE);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFileError::__delete__, Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaFileError::__init__, Flags::OVERRIDE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaFileError::__delete__, Flags::OVERRIDE);
 		class_set_vtable(KabaFileError);
 
 
 	add_class(TypeCommandLineParser);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaCommandLineParser::__init__);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaCommandLineParser::__delete__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaCommandLineParser::__init__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaCommandLineParser::__delete__);
 		class_add_func("info", TypeVoid, &CommandLineParser::info);
 			func_add_param("cmd", TypeString);
 			func_add_param("i", TypeString);
@@ -497,25 +497,25 @@ void SIAddPackageOS(Context *c) {
 
 
 	add_class(TypeOsConfiguration);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Configuration::__init__);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Configuration::__del__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &Configuration::__init__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &Configuration::__del__);
 		class_add_func("load", TypeBool, &Configuration::load);
 			func_add_param("path", TypePath);
 		class_add_func("save", TypeVoid, &Configuration::save, Flags::CONST);
 			func_add_param("path", TypePath);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_int);
+		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_int);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeInt);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_float); // FIXME: operator preference...
+		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_float); // FIXME: operator preference...
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeFloat32);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_bool);
+		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_bool);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeBool);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set_str);
+		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_str);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeString);
-		class_add_func(IDENTIFIER_FUNC_SET, TypeVoid, &Configuration::set);
+		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeAny);
 		class_add_func("get_int", TypeInt, &Configuration::get_int, Flags::CONST);
@@ -530,7 +530,7 @@ void SIAddPackageOS(Context *c) {
 		class_add_func("get_str", TypeString, &Configuration::get_str, Flags::CONST);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeString);
-		class_add_func(IDENTIFIER_FUNC_GET, TypeAny, &_os_config_get, Flags::CONST);
+		class_add_func(Identifier::Func::GET, TypeAny, &_os_config_get, Flags::CONST);
 			func_add_param("name", TypeString);
 		class_add_func("keys", TypeStringList, &Configuration::keys, Flags::CONST);
 

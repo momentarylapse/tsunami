@@ -207,7 +207,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		if (type_match(given->param[0], wanted->param[0])) {
 			cd.penalty = 10;
 			cd.cast = TYPE_CAST_MAKE_SHARED;
-			cd.f = wanted->get_func(IDENTIFIER_FUNC_SHARED_CREATE, wanted, {tree->get_pointer(wanted->param[0], -1)});
+			cd.f = wanted->get_func(Identifier::Func::SHARED_CREATE, wanted, {tree->get_pointer(wanted->param[0], -1)});
 			return true;
 		}
 	}
@@ -296,7 +296,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		return true;
 	}
 	if (wanted == TypeStringAutoCast) {
-		//Function *cf = given->get_func(IDENTIFIER_FUNC_STR, TypeString, {});
+		//Function *cf = given->get_func(Identifier::Func::STR, TypeString, {});
 		//if (cf) {
 			cd.penalty = 50;
 			cd.cast = TYPE_CAST_OWN_STRING;
@@ -393,14 +393,14 @@ shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node>
 	}
 	if ((cast.cast == TYPE_CAST_MAKE_SHARED) or (cast.cast == TYPE_CAST_MAKE_OWNED)) {
 		if (!cast.f)
-			do_error(format("internal: make shared... %s.%s() missing...", wanted->name, IDENTIFIER_FUNC_SHARED_CREATE), node);
+			do_error(format("internal: make shared... %s.%s() missing...", wanted->name, Identifier::Func::SHARED_CREATE), node);
 		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;
 	}
 	if (cast.cast == TYPE_CAST_OPTIONAL_VALUE) {
 		if (!cast.f)
-			do_error(format("internal: optional cast... %s.%s() missing...", wanted->name, IDENTIFIER_FUNC_CALL), node);
+			do_error(format("internal: optional cast... %s.%s() missing...", wanted->name, Identifier::Func::CALL), node);
 		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;
@@ -438,9 +438,9 @@ shared<Node> Concretifier::link_special_operator_is(shared<Node> param1, shared<
 
 shared<Node> Concretifier::link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id) {
 	param2 = force_concrete_type(param2);
-	auto *f = param2->type->get_member_func(IDENTIFIER_FUNC_CONTAINS, TypeBool, {param1->type});
+	auto *f = param2->type->get_member_func(Identifier::Func::CONTAINS, TypeBool, {param1->type});
 	if (!f)
-		do_error(format("no 'bool %s.%s(%s)' found", param2->type->long_name(), IDENTIFIER_FUNC_CONTAINS, param1->type->long_name()), token_id);
+		do_error(format("no 'bool %s.%s(%s)' found", param2->type->long_name(), Identifier::Func::CONTAINS, param1->type->long_name()), token_id);
 
 	auto n = add_node_member_call(f, param2, token_id);
 	n->set_param(1, param1);
@@ -537,12 +537,12 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 		//param1->show();
 		if (param1->kind == NodeKind::CALL_FUNCTION) {
 			auto f = param1->as_func();
-			if (f->name == IDENTIFIER_FUNC_GET) {
+			if (f->name == Identifier::Func::GET) {
 				auto inst = param1->params[0];
 				auto index = param1->params[1];
 				//msg_write(format("[]=...    void %s.__set__(%s, %s)?", inst->type->long_name(), index->type->long_name(), p2->long_name()));
 				for (auto *ff: weak(inst->type->functions))
-					if (ff->name == IDENTIFIER_FUNC_SET and ff->literal_return_type == TypeVoid and ff->num_params == 3) {
+					if (ff->name == Identifier::Func::SET and ff->literal_return_type == TypeVoid and ff->num_params == 3) {
 						if (ff->literal_param_type[1] != index->type)
 							continue;
 						CastingData cast;
@@ -741,7 +741,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// int[3]
 	if (operand->kind == NodeKind::CLASS) {
-		// find array index
+		// find array size
 		index = tree->transform_node(index, [this] (shared<Node> n) {
 			return tree->conv_eval_const_func(n);
 		});
@@ -774,6 +774,8 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		do_error(format("function has no version [%s]", t->name), index);
 	}
 
+	operand = force_concrete_type(operand);
+
 
 	// auto deref?
 	if (operand->type->is_pointer()) {
@@ -785,7 +787,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// __subarray__() ?
 	if (index2) {
-		auto *cf = operand->type->get_member_func(IDENTIFIER_FUNC_SUBARRAY, operand->type, {index->type, index->type});
+		auto *cf = operand->type->get_member_func(Identifier::Func::SUBARRAY, operand->type, {index->type, index->type});
 		if (cf) {
 			auto f = add_node_member_call(cf, operand, operand->token_id);
 			f->is_const = operand->is_const;
@@ -793,7 +795,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 			f->set_param(2, index2);
 			return f;
 		} else {
-			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, IDENTIFIER_FUNC_SUBARRAY, operand->type->name), index);
+			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, Identifier::Func::SUBARRAY, operand->type->name), index);
 		}
 	}
 
@@ -808,8 +810,13 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// tuple
 	if (operand->type->is_product()) {
-		if (index->type != TypeInt or index->kind != NodeKind::CONSTANT)
-			do_error("tuple indices must be constant ints", index);
+		index = tree->transform_node(index, [this] (shared<Node> n) {
+			return tree->conv_eval_const_func(n);
+		});
+		if (index->type != TypeInt)
+			do_error("tuple index must be of type 'int'", index);
+		if (index->kind != NodeKind::CONSTANT)
+			do_error("tuple index must be compile-time constant", index);
 		int i = index->as_const()->as_int();
 		if (i < 0 or i >= operand->type->param.num)
 			do_error("tuple index out of range", index);
@@ -819,7 +826,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// allowed?
 	if (!operand->type->is_array() and !operand->type->usable_as_super_array())
-		do_error(format("type '%s' is neither an array nor does it have a function %s(%s)", operand->type->long_name(), IDENTIFIER_FUNC_GET, index->type->long_name()), index);
+		do_error(format("type '%s' is neither an array nor does it have a function %s(%s)", operand->type->long_name(), Identifier::Func::GET, index->type->long_name()), index);
 
 
 	if (index->type != TypeInt)
@@ -910,7 +917,7 @@ shared<Node> Concretifier::concretify_statement_return(shared<Node> node, Block 
 	} else {
 		if (node->params.num == 0)
 			do_error("return value expected", node);
-		node->params[0] = check_param_link(node->params[0], block->function->literal_return_type, IDENTIFIER_RETURN);
+		node->params[0] = check_param_link(node->params[0], block->function->literal_return_type, Identifier::RETURN);
 	}
 	node->type = TypeVoid;
 	return node;
@@ -920,8 +927,8 @@ shared<Node> Concretifier::concretify_statement_if(shared<Node> node, Block *blo
 	// [COND, TRUE-BLOCK, FALSE-BLOCK]
 	concretify_all_params(node, block, ns);
 	node->type = TypeVoid;
-	//node->set_param(0, check_param_link(node->params[0], TypeBool, IDENTIFIER_IF));
-	node->params[0] = check_param_link(node->params[0], TypeBool, IDENTIFIER_IF);
+	//node->set_param(0, check_param_link(node->params[0], TypeBool, Identifier::IF));
+	node->params[0] = check_param_link(node->params[0], TypeBool, Identifier::IF);
 	return node;
 }
 
@@ -929,7 +936,7 @@ shared<Node> Concretifier::concretify_statement_while(shared<Node> node, Block *
 	// [COND, BLOCK]
 	concretify_all_params(node, block, ns);
 	node->type = TypeVoid;
-	node->params[0] = check_param_link(node->params[0], TypeBool, IDENTIFIER_WHILE);
+	node->params[0] = check_param_link(node->params[0], TypeBool, Identifier::WHILE);
 	return node;
 }
 
@@ -1056,7 +1063,7 @@ shared<Node> Concretifier::concretify_special_function_len(shared<Node> node, Bl
 		return add_node_const(tree->add_constant_int(sub->type->array_length), node->token_id);
 
 	// __length__() function?
-	if (auto *f = sub->type->get_member_func(IDENTIFIER_FUNC_LENGTH, TypeInt, {}))
+	if (auto *f = sub->type->get_member_func(Identifier::Func::LENGTH, TypeInt, {}))
 		return add_node_member_call(f, sub, node->token_id);
 
 	// element "int num/length"?
@@ -1097,7 +1104,7 @@ shared<Node> Concretifier::concretify_statement_delete(shared<Node> node, Block 
 		do_error("pointer expected after 'del'", node->params[0]);
 
 	// override del operator?
-	if (auto f = p->type->param[0]->get_member_func(IDENTIFIER_FUNC_DELETE_OVERRIDE, TypeVoid, {})) {
+	if (auto f = p->type->param[0]->get_member_func(Identifier::Func::DELETE_OVERRIDE, TypeVoid, {})) {
 		auto cmd = add_node_call(f, node->token_id);
 		cmd->set_instance(p->deref());
 		return cmd;
@@ -1129,9 +1136,9 @@ shared<Node> Concretifier::concretify_special_function_sort(shared<Node> node, B
 	auto crit = force_concrete_type(node->params[1]);
 
 	if (!array->type->is_super_array())
-		do_error(format("%s(): first parameter must be a list[]", IDENTIFIER_SORT), array);
+		do_error(format("%s(): first parameter must be a list[]", Identifier::SORT), array);
 	if (crit->type != TypeString or !crit->is_const)
-		do_error(format("%s(): second parameter must be a string literal", IDENTIFIER_SORT), crit);
+		do_error(format("%s(): second parameter must be a string literal", Identifier::SORT), crit);
 
 	Function *f = tree->required_func_global("@sorted", node->token_id);
 
@@ -1342,7 +1349,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 	Array<bool> capture_via_ref;
 
 	auto should_capture_via_ref = [this, node] (Variable *v) {
-		if (v->name == IDENTIFIER_SELF)
+		if (v->name == Identifier::SELF)
 			return true;
 		if (v->type->can_memcpy() or v->type == TypeString)
 			return false;
@@ -1497,7 +1504,8 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 	const Class *type = nullptr;
 	if (node->params[0]) {
 		// explicit type
-		auto t = digest_type(tree, force_concrete_type(concretify_node(node->params[0], block, ns)));
+		auto t = digest_type(tree, concretify_node(node->params[0], block, ns));
+		//auto t = digest_type(tree, force_concrete_type(concretify_node(node->params[0], block, ns)));
 		if (t->kind != NodeKind::CLASS)
 			do_error("variable declaration requires a type", t);
 		type = t->as_class();
@@ -1602,13 +1610,13 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 const Class *make_pointer_shared(SyntaxTree *tree, const Class *parent, int token_id) {
 	if (!parent->name_space)
 		tree->do_error("shared not allowed for: " + parent->long_name(), token_id); // TODO
-	return tree->request_implicit_class(parent->name + " " + IDENTIFIER_SHARED, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, token_id);
+	return tree->request_implicit_class(parent->name + " " + Identifier::SHARED, Class::Type::POINTER_SHARED, config.pointer_size, 0, nullptr, {parent}, token_id);
 }
 
 const Class *make_pointer_owned(SyntaxTree *tree, const Class *parent, int token_id) {
 	if (!parent->name_space)
 		tree->do_error("owned not allowed for: " + parent->long_name(), token_id);
-	return tree->request_implicit_class(parent->name + " " + IDENTIFIER_OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, token_id);
+	return tree->request_implicit_class(parent->name + " " + Identifier::OWNED, Class::Type::POINTER_OWNED, config.pointer_size, 0, nullptr, {parent}, token_id);
 }
 
 // concretify as far as possible
@@ -2039,8 +2047,8 @@ void Concretifier::concretify_function_body(Function *f) {
 	concretify_node(f->block.get(), f->block.get(), f->name_space);
 
 	// auto implement destructor?
-	if (f->name == IDENTIFIER_FUNC_DELETE)
-		auto_implementer->auto_implement_regular_destructor(f, f->name_space);
+	if (f->name == Identifier::Func::DELETE)
+		auto_implementer->implement_regular_destructor(f, f->name_space);
 }
 
 Array<const Class*> Concretifier::type_list_from_nodes(const shared_array<Node> &nn) {
@@ -2151,7 +2159,7 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 
 shared<Node> Concretifier::build_pipe_sort(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id) {
 	if (!input->type->is_super_array())
-		do_error(format("'|> %s' only allowed for lists", IDENTIFIER_SORT), input);
+		do_error(format("'|> %s' only allowed for lists", Identifier::SORT), input);
 	Function *f = tree->required_func_global("@sorted", token_id);
 
 	shared_array<Node> params;
@@ -2164,7 +2172,7 @@ shared<Node> Concretifier::build_pipe_sort(const shared<Node> &input, const shar
 	if (params.num >= 1) {
 		auto crit = concretify_node(params[0], block, ns);
 		if (crit->type != TypeString or crit->kind != NodeKind::CONSTANT)
-			do_error(format("%s() expects a string literal when used in a pipe", IDENTIFIER_SORT), token_id);
+			do_error(format("%s() expects a string literal when used in a pipe", Identifier::SORT), token_id);
 		cmd->set_param(2, crit);
 	} else {
 		auto crit = tree->add_constant(TypeString);
@@ -2471,9 +2479,9 @@ shared<Node> Concretifier::add_converter_str(shared<Node> sub, bool repr) {
 
 	Function *cf = nullptr;
 	if (repr)
-		cf = t->get_member_func(IDENTIFIER_FUNC_REPR, TypeString, {});
+		cf = t->get_member_func(Identifier::Func::REPR, TypeString, {});
 	if (!cf)
-		cf = t->get_member_func(IDENTIFIER_FUNC_STR, TypeString, {});
+		cf = t->get_member_func(Identifier::Func::STR, TypeString, {});
 	if (cf)
 		return add_node_member_call(cf, sub, sub->token_id);
 

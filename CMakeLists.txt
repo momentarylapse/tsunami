@@ -229,6 +229,16 @@ set(SOURCE
 	src/lib/kaba/dynamic/dynamic.cpp
 	src/lib/kaba/dynamic/exception.cpp
 	src/lib/kaba/dynamic/sorting.cpp
+	src/lib/kaba/implicit/implicit.cpp
+	src/lib/kaba/implicit/implicit_array.cpp
+	src/lib/kaba/implicit/implicit_callable.cpp
+	src/lib/kaba/implicit/implicit_dict.cpp
+	src/lib/kaba/implicit/implicit_enum.cpp
+	src/lib/kaba/implicit/implicit_optional.cpp
+	src/lib/kaba/implicit/implicit_product.cpp
+	src/lib/kaba/implicit/implicit_regular.cpp
+	src/lib/kaba/implicit/implicit_shared.cpp
+	src/lib/kaba/implicit/implicit_super_array.cpp
 	src/lib/kaba/lib/dict.cpp
 	src/lib/kaba/lib/extern.cpp
 	src/lib/kaba/lib/lib.cpp
@@ -247,7 +257,6 @@ set(SOURCE
 	src/lib/kaba/lib/list.cpp
 	src/lib/kaba/parser/abstract.cpp
 	src/lib/kaba/parser/Concretifier.cpp
-	src/lib/kaba/parser/implicit.cpp
 	src/lib/kaba/parser/import.cpp
 	src/lib/kaba/parser/lexical.cpp
 	src/lib/kaba/parser/macros.cpp

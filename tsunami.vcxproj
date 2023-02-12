@@ -339,6 +339,16 @@
     <ClCompile Include="src\lib\kaba\dynamic\dynamic.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\exception.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\sorting.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_array.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_callable.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_dict.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_enum.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_optional.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_product.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_regular.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_shared.cpp" />
+    <ClCompile Include="src\lib\kaba\implicit\implicit_super_array.cpp" />
     <ClCompile Include="src\lib\kaba\lib\dict.cpp" />
     <ClCompile Include="src\lib\kaba\lib\extern.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib.cpp" />
@@ -357,7 +367,6 @@
     <ClCompile Include="src\lib\kaba\lib\list.cpp" />
     <ClCompile Include="src\lib\kaba\parser\abstract.cpp" />
     <ClCompile Include="src\lib\kaba\parser\Concretifier.cpp" />
-    <ClCompile Include="src\lib\kaba\parser\implicit.cpp" />
     <ClCompile Include="src\lib\kaba\parser\import.cpp" />
     <ClCompile Include="src\lib\kaba\parser\lexical.cpp" />
     <ClCompile Include="src\lib\kaba\parser\macros.cpp" />
@@ -809,6 +818,7 @@
     <ClInclude Include="src\lib\kaba\dynamic\dynamic.h" />
     <ClInclude Include="src\lib\kaba\dynamic\exception.h" />
     <ClInclude Include="src\lib\kaba\dynamic\sorting.h" />
+    <ClInclude Include="src\lib\kaba\implicit\implicit.h" />
     <ClInclude Include="src\lib\kaba\lib\dict.h" />
     <ClInclude Include="src\lib\kaba\lib\extern.h" />
     <ClInclude Include="src\lib\kaba\lib\lib.h" />
@@ -816,7 +826,6 @@
     <ClInclude Include="src\lib\kaba\lib\operators.h" />
     <ClInclude Include="src\lib\kaba\parser\abstract.h" />
     <ClInclude Include="src\lib\kaba\parser\Concretifier.h" />
-    <ClInclude Include="src\lib\kaba\parser\implicit.h" />
     <ClInclude Include="src\lib\kaba\parser\lexical.h" />
     <ClInclude Include="src\lib\kaba\parser\Parser.h" />
     <ClInclude Include="src\lib\kaba\parser\template.h" />

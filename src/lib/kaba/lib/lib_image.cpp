@@ -40,12 +40,12 @@ void SIAddPackageImage(Context *c) {
 		class_add_element("data", TypeIntList, &Image::data);
 		class_add_element("error", TypeBool, &Image::error);
 		class_add_element("alpha_used", TypeBool, &Image::alpha_used);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Image::__init_ext__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &Image::__init_ext__);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("c", TypeColor);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, &Image::__init__);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, &Image::__delete__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &Image::__init__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &Image::__delete__);
 		class_add_func("create", TypeVoid, &Image::create);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
@@ -68,7 +68,7 @@ void SIAddPackageImage(Context *c) {
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 		class_add_func("clear", TypeVoid, &Image::clear);
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &Image::__assign__);
+		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &Image::__assign__);
 			func_add_param("other", TypeImage);
 		class_add_func("start_draw", TypeBasePainterP, &Image::start_draw);
 
@@ -77,7 +77,7 @@ void SIAddPackageImage(Context *c) {
 		class_derive_from(TypeObject, false, true);
 		class_add_element("width", TypeInt, &Painter::width);
 		class_add_element("height", TypeInt, &Painter::height);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, &ImagePainter::__delete__);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &ImagePainter::__delete__);
 		//class_add_func_virtual("end", TypeVoid, &HuiPainter::end));
 		class_add_func_virtual("set_color", TypeVoid, &Painter::set_color, Flags::CONST);
 			func_add_param("c", TypeColor);

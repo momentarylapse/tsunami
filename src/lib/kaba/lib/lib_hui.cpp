@@ -141,7 +141,7 @@ void SIAddPackageHui(Context *c) {
 
 
 	add_class(TypeHuiMenu);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::Menu::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Menu::__init__));
 			func_add_param("p", TypeHuiPanel);
 		class_add_func("popup", TypeVoid, hui_p(&hui::Menu::open_popup), Flags::CONST);
 			func_add_param("p", TypeHuiPanel);
@@ -177,11 +177,11 @@ void SIAddPackageHui(Context *c) {
 	add_class(TypeHuiPanel);
 		class_derive_from(TypeObject, false, true);
 		class_add_element("win", TypeHuiWindowP, GetDAPanel(win));
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init0__), Flags::OVERRIDE);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init2__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init0__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&KabaPanelWrapper::__init2__));
 			func_add_param("parent", TypeHuiPanelP);
 			func_add_param("id", TypeString);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&KabaPanelWrapper::__delete__), Flags::OVERRIDE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaPanelWrapper::__delete__), Flags::OVERRIDE);
 		class_add_func("set_border_width", TypeVoid, hui_p(&hui::Panel::set_border_width));
 			func_add_param("width", TypeInt);
 		class_add_func("set_decimals", TypeVoid, hui_p(&hui::Panel::set_decimals));
@@ -403,11 +403,11 @@ void SIAddPackageHui(Context *c) {
 
 	add_class(TypeHuiWindow);
 		class_derive_from(TypeHuiPanel, false, true);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::Window::__init_ext__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Window::__init_ext__), Flags::OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
 		//class_add_func("run", TypeVoid, hui_p(&hui::Window::run));
 		class_add_func("destroy", TypeVoid, hui_p(&hui::Window::request_destroy));
 		class_add_func("show", TypeVoid, hui_p(&hui::Window::show));
@@ -466,24 +466,24 @@ void SIAddPackageHui(Context *c) {
 
 	add_class(TypeHuiGlWindow);
 		class_derive_from(TypeHuiWindow, false, true);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::NixWindow::__init_ext__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::NixWindow::__init_ext__), Flags::OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
 #ifdef KABA_EXPORT_HUI
 		class_set_vtable(hui::Window);
 #endif
 
 	add_class(TypeHuiDialog);
 		class_derive_from(TypeHuiWindow, false, true);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, hui_p(&hui::Dialog::__init_ext__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Dialog::__init_ext__), Flags::OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("parent", TypeHuiWindow);
 			func_add_param("allow_parent",TypeBool);
-		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, hui_p(&hui::Window::__delete__), Flags::OVERRIDE);
 #ifdef KABA_EXPORT_HUI
 		class_set_vtable(hui::Window);
 #endif

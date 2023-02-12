@@ -586,7 +586,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::CHAR_OR:
 			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
 			break;
-		case InlineID::BOOL_NEGATE:
+		case InlineID::BOOL_NOT:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeBool, 0x1));
 			break;
 		case InlineID::CHAR_NEGATIVE:

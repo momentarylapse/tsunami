@@ -36,7 +36,7 @@ enum class OperatorID {
 	MULTIPLYS,     // *=
 	DIVIDES,       // /=
 	EQUAL,         // ==
-	NOTEQUAL,      // !=
+	NOT_EQUAL,     // !=
 	NEGATE,        //  not
 	SMALLER,       //  <
 	GREATER,       //  >

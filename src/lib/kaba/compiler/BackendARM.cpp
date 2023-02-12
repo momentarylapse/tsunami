@@ -702,14 +702,14 @@ void BackendARM::add_function_intro_params(Function *f) {
 	Array<Variable*> param;
 	if (f->effective_return_type->uses_return_by_memory()) {
 		for (Variable *v: weak(f->var))
-			if (v->name == IDENTIFIER_RETURN_VAR) {
+			if (v->name == Identifier::RETURN_VAR) {
 				param.add(v);
 				break;
 			}
 	}
 	if (!f->is_static()) {
 		for (Variable *v: weak(f->var))
-			if (v->name == IDENTIFIER_SELF) {
+			if (v->name == Identifier::SELF) {
 				param.add(v);
 				break;
 			}

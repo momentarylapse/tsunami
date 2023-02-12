@@ -51,37 +51,37 @@ int add_special_function(const string &name, SpecialFunctionID id, int min_param
 
 void SIAddStatements() {
 	// statements
-	add_statement(IDENTIFIER_RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_IF, StatementID::IF, 2); // [CMP, BLOCK]
+	add_statement(Identifier::RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
+	add_statement(Identifier::IF, StatementID::IF, 2); // [CMP, BLOCK]
 	add_statement("-if/else-", StatementID::IF_ELSE, 3); // [CMP, BLOCK, ELSE-BLOCK]
-	add_statement(IDENTIFIER_WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
+	add_statement(Identifier::WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
 	add_statement("-for-array-", StatementID::FOR_ARRAY, 4); // [VAR, INDEX, ARRAY, BLOCK]
 	add_statement("-for-range-", StatementID::FOR_RANGE, 5); // [VAR, START, STOP, STEP, BLOCK]
-	add_statement(IDENTIFIER_FOR, StatementID::FOR_DIGEST, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
-	add_statement(IDENTIFIER_BREAK, StatementID::BREAK);
-	add_statement(IDENTIFIER_CONTINUE, StatementID::CONTINUE);
-	add_statement(IDENTIFIER_NEW, StatementID::NEW, 1);
-	add_statement(IDENTIFIER_DELETE, StatementID::DELETE, 1);
-	add_statement(IDENTIFIER_LET, StatementID::LET);
-	add_statement(IDENTIFIER_VAR, StatementID::VAR);
-	add_statement(IDENTIFIER_ASM, StatementID::ASM);
-	//add_statement(IDENTIFIER_RAISE, StatementID::RAISE); NOPE, now it's a function!
-	add_statement(IDENTIFIER_TRY, StatementID::TRY); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_EXCEPT, StatementID::EXCEPT); // return: ParamType will be defined by the parser!
-	add_statement(IDENTIFIER_PASS, StatementID::PASS);
-	add_statement(IDENTIFIER_LAMBDA, StatementID::LAMBDA);
-	add_statement(IDENTIFIER_FUNC, StatementID::FUNC);
-	add_statement(IDENTIFIER_RAW_FUNCTION_POINTER, StatementID::RAW_FUNCTION_POINTER, 1);
+	add_statement(Identifier::FOR, StatementID::FOR_DIGEST, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
+	add_statement(Identifier::BREAK, StatementID::BREAK);
+	add_statement(Identifier::CONTINUE, StatementID::CONTINUE);
+	add_statement(Identifier::NEW, StatementID::NEW, 1);
+	add_statement(Identifier::DELETE, StatementID::DELETE, 1);
+	add_statement(Identifier::LET, StatementID::LET);
+	add_statement(Identifier::VAR, StatementID::VAR);
+	add_statement(Identifier::ASM, StatementID::ASM);
+	//add_statement(Identifier::RAISE, StatementID::RAISE); NOPE, now it's a function!
+	add_statement(Identifier::TRY, StatementID::TRY); // return: ParamType will be defined by the parser!
+	add_statement(Identifier::EXCEPT, StatementID::EXCEPT); // return: ParamType will be defined by the parser!
+	add_statement(Identifier::PASS, StatementID::PASS);
+	add_statement(Identifier::LAMBDA, StatementID::LAMBDA);
+	add_statement(Identifier::FUNC, StatementID::FUNC);
+	add_statement(Identifier::RAW_FUNCTION_POINTER, StatementID::RAW_FUNCTION_POINTER, 1);
 
-	add_special_function(IDENTIFIER_SIZEOF, SpecialFunctionID::SIZEOF, 1, 1);
-	add_special_function(IDENTIFIER_TYPEOF, SpecialFunctionID::TYPEOF, 1, 1);
-	add_special_function(IDENTIFIER_STR, SpecialFunctionID::STR, 1, 1);
-	add_special_function(IDENTIFIER_REPR, SpecialFunctionID::REPR, 1, 1);
-	add_special_function(IDENTIFIER_LEN, SpecialFunctionID::LEN, 1, 1);
-	add_special_function(IDENTIFIER_SORT, SpecialFunctionID::SORT, 1, 2);
-	add_special_function(IDENTIFIER_FILTER, SpecialFunctionID::FILTER, 1, 1);
-	add_special_function(IDENTIFIER_DYN, SpecialFunctionID::DYN, 1, 1);
-	add_special_function(IDENTIFIER_WEAK, SpecialFunctionID::WEAK, 1, 1);
+	add_special_function(Identifier::SIZEOF, SpecialFunctionID::SIZEOF, 1, 1);
+	add_special_function(Identifier::TYPEOF, SpecialFunctionID::TYPEOF, 1, 1);
+	add_special_function(Identifier::STR, SpecialFunctionID::STR, 1, 1);
+	add_special_function(Identifier::REPR, SpecialFunctionID::REPR, 1, 1);
+	add_special_function(Identifier::LEN, SpecialFunctionID::LEN, 1, 1);
+	add_special_function(Identifier::SORT, SpecialFunctionID::SORT, 1, 2);
+	add_special_function(Identifier::FILTER, SpecialFunctionID::FILTER, 1, 1);
+	add_special_function(Identifier::DYN, SpecialFunctionID::DYN, 1, 1);
+	add_special_function(Identifier::WEAK, SpecialFunctionID::WEAK, 1, 1);
 }
 
 

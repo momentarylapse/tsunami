@@ -328,7 +328,7 @@ void Serializer::insert_constructors_block(Block *b) {
 	for (auto *v: b->vars) {
 		if (!v->explicitly_constructed) {
 			SerialNodeParam param = param_local(v->type, v->_offset);
-			add_cmd_constructor(param, (v->name == IDENTIFIER_RETURN_VAR) ? NodeKind::NONE : NodeKind::VAR_LOCAL);
+			add_cmd_constructor(param, (v->name == Identifier::RETURN_VAR) ? NodeKind::NONE : NodeKind::VAR_LOCAL);
 		}
 	}
 }
@@ -972,7 +972,7 @@ int check_needed(SyntaxTree *tree, Function *f) {
 	if (f->virtual_index >= 0)
 		ref_count ++;
 	// well, for now, only allow these functions:
-	if (f->name != IDENTIFIER_FUNC_ASSIGN and f->name != IDENTIFIER_FUNC_DELETE and f->name != IDENTIFIER_FUNC_INIT)
+	if (f->name != Identifier::Func::ASSIGN and f->name != Identifier::Func::DELETE and f->name != Identifier::Func::INIT)
 		ref_count ++;
 
 	return ref_count;

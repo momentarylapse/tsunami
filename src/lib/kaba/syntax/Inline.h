@@ -49,7 +49,7 @@ enum class InlineID {
 	BOOL_NOT_EQUAL,
 	BOOL_AND,
 	BOOL_OR,
-	BOOL_NEGATE,
+	BOOL_NOT,
 
 	INT_ASSIGN,
 	INT_ADD,

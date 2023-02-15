@@ -90,7 +90,7 @@ void count_digits(float f, int &left, int &right) {
 int count_digits_range(float vmin, float vmax, float step) {
 	int l, r;
 	count_digits(max(abs(vmin), abs(vmax)), l, r);
-	int a = max(count_digits_left(vmax), count_digits_left(vmin));
+	[[maybe_unused]] int a = max(count_digits_left(vmax), count_digits_left(vmin));
 	if (step > 0 and step < 1) {
 		int l2, r2;
 		count_digits(step, l2, r2);

@@ -212,7 +212,6 @@ float step(float t) {
 
 void ViewModeEditAudio::on_mouse_move() {
 	float mx = view->m.x;
-	int smx = view->cam.screen2sample(mx);
 	rubber.hover = -1;
 	rubber.hover_type = RubberHoverType::NONE;
 

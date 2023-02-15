@@ -79,7 +79,8 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 	int i1 = freq_to_index(F_MAX);
 
 	float max = 0;
-	int imax = 0, imax2 = 0;
+	int imax = 0;
+	[[maybe_unused]]  int imax2 = 0;
 	for (int i=0; i<bufc.num; i++)
 		if ((i > i0) and (i < i1)) {
 			float amp = abs(bufc[i].x) * (1.0 - (float)i / bufc.num);

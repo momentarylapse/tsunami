@@ -37,7 +37,6 @@ bytes Stream::read_complete() {
 	static const int CHUNK_SIZE = 2048;
 	bytes buf, chunk;
 	chunk.resize(CHUNK_SIZE);
-	int r = 0;
 	while (true) {
 		int r = read(chunk);
 		if (r <= 0)

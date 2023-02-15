@@ -77,7 +77,7 @@ float Random::normal(float mean, float stddev) {
 	}
 
 	float a = xx * cos(y);
-	float b = xx * sin(y);
+	//float b = xx * sin(y);
 
 	return mean + a * stddev;
 }

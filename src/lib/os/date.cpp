@@ -14,7 +14,7 @@
 Date time2date(time_t t) {
 	Date d;
 	d.time = (int64)t;
-	tm *tm = localtime(&t);
+	[[maybe_unused]] tm *tm = localtime(&t);
 	d.milli_second = 0;
 	return d;
 }

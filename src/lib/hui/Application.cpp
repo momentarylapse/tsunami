@@ -177,7 +177,7 @@ int Application::run() {
 }
 
 
-static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
+[[maybe_unused]] static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
 	auto app = reinterpret_cast<Application*>(user_data);
 	app->on_startup(app->_args);
 }

@@ -164,7 +164,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 		return;
 	float w = area.width();
 	float h = area.height();
-	float boundary = 0;
+	[[maybe_unused]] float boundary = 0;
 
 	color bg = (parent ? theme.background_overlay : theme.background);
 

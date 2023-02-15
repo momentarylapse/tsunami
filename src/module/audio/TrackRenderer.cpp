@@ -259,7 +259,7 @@ void TrackRenderer::set_pos(int pos) {
 		song_renderer->bar_streamer->set_pos(pos);
 }
 
-static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
+[[maybe_unused]] static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
 	Range r1 = r and cur;
 	AudioBuffer tbuf;
 	tbuf.set_as_ref(buf, r1.start() - cur.start(), r1.length);

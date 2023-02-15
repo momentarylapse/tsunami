@@ -419,12 +419,14 @@ static Array<char*> sa2ca_nt(const Array<string> &a) {
 	return _a_;
 }
 
+#if !GTK_CHECK_VERSION(4,0,0)
 static void ca_free(Array<char*> &a) {
 	for (char *aa: a)
 		if (aa)
 			delete[] aa;
 	a.clear();
 }
+#endif
 
 
 

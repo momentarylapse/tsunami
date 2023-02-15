@@ -253,7 +253,6 @@ bool ViewModeEditBars::editing(AudioViewLayer *l) {
 
 void ViewModeEditBars::on_mouse_move() {
 	float mx = view->m.x;
-	int smx = view->cam.screen2sample(mx);
 
 	if (!cur_vlayer()->is_cur_hover())
 		return;

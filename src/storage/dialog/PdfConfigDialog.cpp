@@ -157,6 +157,6 @@ void PdfConfigDialog::on_draw(Painter *p) {
 	}
 
 	float m_id[4] = {1, 0, 0, 1};
-	p->set_transform(mat, {0, 0});
+	p->set_transform(m_id, {0, 0});
 }
 

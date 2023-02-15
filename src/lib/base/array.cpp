@@ -207,8 +207,8 @@ void DynamicArray::simple_clear() {
 }
 
 void DynamicArray::delete_single(int index) {
-	int n = (num - 1) * element_size;
 #if 0
+	int n = (num - 1) * element_size;
 	for (int i=index*element_size;i<n;i++)
 	    ((char*)data)[i] = ((char*)data)[i + element_size];
 #else

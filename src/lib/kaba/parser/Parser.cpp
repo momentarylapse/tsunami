@@ -306,14 +306,14 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 			return true;
 		return false;
 	};
-	auto might_declare_pointer_variable = [this] {
+	/*auto might_declare_pointer_variable = [this] {
 		// a line of "int *p = ..."
 		if (Exp._cur_exp != 1)
 			return false;
 		if (is_number(Exp.cur_line->tokens[0].name[0]))
 			return false;
 		return true;
-	};
+	};*/
 
 	if (Exp.cur == ".") {
 		// element?
@@ -603,7 +603,7 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 		}
 	} else if (Exp.cur == "{") {
 		operand = parse_abstract_dict(block);
-	} else if (auto s = which_statement(Exp.cur)) {
+	} else if ([[maybe_unused]] auto s = which_statement(Exp.cur)) {
 		operand = parse_abstract_statement(block);
 	//} else if (auto s = which_special_function(Exp.cur)) {
 	//	operand = parse_abstract_special_function(block, s);
@@ -1901,7 +1901,7 @@ Function *Parser::parse_function_header(const Class *default_type, Class *name_s
 
 			// type of parameter variable
 			f->abstract_param_types.add(parse_abstract_operand(block, true));
-			auto v = f->add_param(param_name, TypeUnknown, param_flags);
+			[[maybe_unused]] auto v = f->add_param(param_name, TypeUnknown, param_flags);
 
 			// default parameter?
 			if (try_consume("=")) {

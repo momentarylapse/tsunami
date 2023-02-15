@@ -117,11 +117,11 @@ Path current_directory() {
 	string str;
 	char tmp[256];
 #ifdef OS_WINDOWS
-	char *r = _getcwd(tmp, sizeof(tmp));
+	static_cast<void>(_getcwd(tmp, sizeof(tmp)));
 	str = tmp;
 	str += "\\";
 #else // defined(OS_LINUX) || defined(OS_MINGW)
-	char *r = getcwd(tmp, sizeof(tmp));
+	static_cast<void>(getcwd(tmp, sizeof(tmp)));
 	str = tmp;
 	str += "/";
 #endif

@@ -191,7 +191,6 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 	if (!f)
 		return;
 
-	auto te = t->get_array_element();
 	auto n_other = add_node_local(f->__get_var("other"));
 	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
 

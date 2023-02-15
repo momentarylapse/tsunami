@@ -154,7 +154,6 @@ color LayerHeader::color_text() const {
 
 void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	auto *view = vlayer->view;
-	auto *layer = vlayer->layer;
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
 
@@ -175,11 +174,9 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 }
 
 void LayerHeader::on_draw(Painter *c) {
-	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
 	bool _hover = is_cur_hover();
 
-	float h = area.height();
 	c->set_antialiasing(true);
 	draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
 	c->set_antialiasing(false);
@@ -236,7 +233,6 @@ bool LayerHeader::on_right_button_down(const vec2 &m) {
 	return true;
 }
 HoverData LayerHeader::get_hover_data(const vec2 &m) {
-	auto *view = vlayer->view;
 	auto h = Node::get_hover_data(m);
 	h.vlayer = vlayer;
 	return h;

@@ -334,7 +334,7 @@ void BackendX86::correct_implement_commands() {
 				auto p2 = c.p[2];
 				int i0 = cmd.cmd.num;
 
-				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(serializer->num_labels ++));
+				[[maybe_unused]] int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(serializer->num_labels ++));
 
 				int reg = find_unused_reg(i0, i0, 1);
 				auto t = param_vreg(TypeBool, reg);
@@ -413,14 +413,14 @@ void BackendX86::correct_implement_commands() {
 			// f32 -> f64
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
+			[[maybe_unused]] int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
 			insert_cmd(Asm::InstID::CVTSS2SD, p_xmm0, p2);
 			insert_cmd(Asm::InstID::MOVSD, p1, p_xmm0);
 		} else if (c.inst == Asm::InstID::CVTSD2SS) {
 			// f64 -> f32
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
+			[[maybe_unused]] int veax = cmd.add_virtual_reg(Asm::RegID::XMM0);
 			insert_cmd(Asm::InstID::CVTSD2SS, p_xmm0, p2);
 			insert_cmd(Asm::InstID::MOVSS, p1, p_xmm0);
 		} else if (c.inst == Asm::InstID::PUSH) {

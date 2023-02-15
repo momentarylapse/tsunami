@@ -55,5 +55,5 @@ void MidiPainterMode::draw_shadow2(Painter *c, float x1, float x2, float y, floa
 }
 
 MidiPainterMode::MidiPainterMode(MidiPainter *mp) :
-    mp(mp), song(mp->song), cam(mp->cam), sel(mp->sel), hover(mp->hover), local_theme(mp->local_theme)
+    mp(mp), cam(mp->cam), song(mp->song), sel(mp->sel), hover(mp->hover), local_theme(mp->local_theme)
 {}

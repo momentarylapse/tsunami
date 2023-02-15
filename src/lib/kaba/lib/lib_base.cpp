@@ -113,7 +113,7 @@ MAKE_OP_FOR(double)
 static int op_int_mod(int a, int b) { return a % b; }
 static int op_int_shr(int a, int b) { return a >> b; }
 static int op_int_shl(int a, int b) { return a << b; }
-static int op_int_passthrough(int i) { return i; }
+//static int op_int_passthrough(int i) { return i; }
 static int64 op_int64_mod(int64 a, int64 b) { return a % b; }
 static int64 op_int64_shr(int64 a, int64 b) { return a >> b; }
 static int64 op_int64_shl(int64 a, int64 b) { return a << b; }

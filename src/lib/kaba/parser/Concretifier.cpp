@@ -33,8 +33,6 @@ shared<Node> digest_type(SyntaxTree *tree, shared<Node> n) {
 
 const Class *get_user_friendly_type(shared<Node> operand) {
 	const Class *type = operand->type;
-	bool deref = false;
-	bool only_static = false;
 
 	if (operand->kind == NodeKind::CLASS) {
 		// referencing class functions
@@ -506,7 +504,7 @@ shared<Node> Concretifier::link_special_operator_tuple_extract(shared<Node> para
 
 shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> param1, shared<Node> param2, int token_id) {
 	bool left_modifiable = primop->left_modifiable;
-	bool order_inverted = primop->order_inverted;
+	//bool order_inverted = primop->order_inverted;
 	string op_func_name = primop->function_name;
 	shared<Node> op;
 
@@ -697,7 +695,7 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 			links[i] = make_func_pointer_node_callable(l);
 			//return add_node_member_call(l->type->param[0]->get_call(), l->deref(), params);
 		} else if (auto c = l->type->get_call()) {
-			return add_node_member_call(l->type->get_call(), l, {});
+			return add_node_member_call(c, l, {});
 		} else {
 			do_error(format("this %s does not seem callable", kind2str(l->kind)), l);
 		}
@@ -1400,7 +1398,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		else
 			capture_nodes.add(add_node_local(c));
 	}
-	for (auto e: explicit_param_types) {
+	for ([[maybe_unused]] auto e: explicit_param_types) {
 		capture_nodes.insert(nullptr, 0);
 		capture_via_ref.insert(false, 0);
 	}
@@ -2326,7 +2324,7 @@ shared<Node> Concretifier::build_lambda_new(const shared<Node> &param, const sha
 	Function *f = tree->add_function(name, TypeUnknown, tree->base_class, Flags::STATIC);
 
 	//f->abstract_param_types.add();
-	auto v = f->add_param(param->as_token(), TypeInt, Flags::NONE);
+	[[maybe_unused]] auto v = f->add_param(param->as_token(), TypeInt, Flags::NONE);
 	parser->post_process_function_header(f, {}, tree->base_class, Flags::STATIC);
 
 	// body
@@ -2414,7 +2412,6 @@ bool Concretifier::param_match_with_cast(const shared<Node> operand, const share
 	casts.resize(params.num);
 	*max_penalty = 0;
 	for (int p=0; p<params.num; p++) {
-		int penalty;
 		if (!type_match_with_cast(params[p], false, wanted[p], casts[p]))
 			return false;
 		*max_penalty = max(*max_penalty, casts[p].penalty);

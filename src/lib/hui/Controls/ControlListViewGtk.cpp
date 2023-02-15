@@ -73,13 +73,13 @@ void ControlListView::on_right_click(double x, double y) {
 	dbo("LIST ON RIGHT CLICK");
 	panel->win->input.column = -1;
 	panel->win->input.row = -1;
-	int cell_x = 0, cell_y = 0;
 	panel->win->input.x = x;
 	panel->win->input.y = y;
 #if GTK_CHECK_VERSION(4,0,0)
 	msg_write(hover);
 	panel->win->input.row = hover;
 #else
+	int cell_x = 0, cell_y = 0;
 	int tx = x, ty = y;
 	GtkTreePath *path = nullptr;
 	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(widget), tx, ty, &path, nullptr, &cell_x, &cell_y)) {
@@ -145,14 +145,6 @@ static void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, 
 static void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
 	h->list_view->hover = -1;
 	dbo("L");
-}
-
-static ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkWidget *w) {
-	//base::find(list_view->_item_map_, child))
-	for (auto i: weak(lv->_item_map_))
-		if (i->widget == w)
-			return i;
-	return nullptr;
 }
 
 static ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkListItem *list_item) {
@@ -607,7 +599,7 @@ Array<int> ControlListView::get_selection() {
 	Array<int> selected;
 #if GTK_CHECK_VERSION(4,0,0)
 	auto bs = gtk_selection_model_get_selection(selection_model);
-	for (int i=0; i<gtk_bitset_get_size(bs); i++)
+	for (guint64 i=0; i<gtk_bitset_get_size(bs); i++)
 		selected.add(gtk_bitset_get_nth(bs, i));
 #else
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));

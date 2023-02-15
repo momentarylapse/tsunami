@@ -316,7 +316,7 @@ public:
 			for (int i=0; i<n; i++)
 				unwrap(b[i], (char*)var + i*t_el->size, t_el);
 		} else if (aa.type == TYPE_MAP) {
-			auto &map = aa.as_map();
+			[[maybe_unused]] auto &map = aa.as_map();
 			auto keys = aa.keys();
 			for (auto &e: type->elements)
 				for (string &k: keys)

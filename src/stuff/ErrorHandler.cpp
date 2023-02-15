@@ -74,7 +74,7 @@ string unmangle(const string &name) {
 		if (name[i] == 'R')
 			break;
 
-		bool is_namespace = false;
+		[[maybe_unused]] bool is_namespace = false;
 		if (name[i] == 'N') { // nested
 			is_namespace = true;
 			i ++;

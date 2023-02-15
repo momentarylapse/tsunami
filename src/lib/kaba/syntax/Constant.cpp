@@ -120,7 +120,6 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 
 		auto *el = type->get_array_element();
 
-		int direct_size = config.super_array_size;
 		int indirect_size = el->size * ar->num; // target!
 		char *ar_target = locked;
 		locked += indirect_size;

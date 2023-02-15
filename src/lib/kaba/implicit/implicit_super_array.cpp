@@ -42,7 +42,6 @@ void AutoImplementer::implement_super_array_constructor(Function *f, const Class
 }
 
 void AutoImplementer::implement_super_array_destructor(Function *f, const Class *t) {
-	auto te = t->get_array_element();
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	if (auto f_clear = t->get_member_func("clear", TypeVoid, {}))

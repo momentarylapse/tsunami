@@ -49,10 +49,10 @@ void UnitTest::run(const string &filter, TestProtocoll &protocoll) {
 			//msg_write("  ok");
 			msg_write(os::terminal::GREEN + "   ok " + os::terminal::END);
 		} catch(Failure &e) {
-			printf(os::terminal::RED.c_str());
+			puts(os::terminal::RED.c_str());
 			msg_error(e.message());
 			protocoll.num_failed ++;
-			printf(os::terminal::END.c_str());
+			puts(os::terminal::END.c_str());
 		}
 		protocoll.num_tests_run ++;
 	}
@@ -191,15 +191,15 @@ void UnitTest::run_all(const string &filter) {
 	msg_write("\n");
 	if (protocoll.num_failed > 0) {
 
-		printf(os::terminal::RED.c_str());
+		puts(os::terminal::RED.c_str());
 		msg_error(format("%d out of %d tests failed", protocoll.num_failed, protocoll.num_tests_run));
-		printf(os::terminal::END.c_str());
+		puts(os::terminal::END.c_str());
 	} else {
-		printf(os::terminal::GREEN.c_str());
+		puts(os::terminal::GREEN.c_str());
 		msg_write("-----------------------------");
 		msg_write(format("all %d tests succeeded", protocoll.num_tests_run));
 		msg_write("-----------------------------");
-		printf(os::terminal::END.c_str());
+		puts(os::terminal::END.c_str());
 	}
 }
 

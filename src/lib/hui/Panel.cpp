@@ -815,7 +815,7 @@ string decode_gtk_action(const string &name) {
 #if GTK_CHECK_VERSION(4,0,0)
 void Panel::_on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data) {
 	auto panel = static_cast<Panel*>(user_data);
-	auto win = panel->win;
+	//auto win = panel->win;
 	//string id = g_variant_get_string(parameter, nullptr);
 
 	GValue value = {0,};

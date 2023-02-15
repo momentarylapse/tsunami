@@ -27,7 +27,7 @@ bool Temperament::is_default() const {
 bool Temperament::has_equal_octaves() const {
 	const float EPSILON = 0.01f;
 	for (int p=12; p<MAX_PITCH; p++)
-		if (fabs(freq[p] - freq[p % 12] * pow(2.0f, float(p/12))) > 0.01f)
+		if (fabs(freq[p] - freq[p % 12] * pow(2.0f, float(p/12))) > EPSILON)
 			return false;
 	return true;
 }

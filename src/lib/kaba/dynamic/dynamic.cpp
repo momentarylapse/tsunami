@@ -293,7 +293,7 @@ Any _cdecl dynify(const void *var, const Class *type) {
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<da->num; i++) {
 			string key = *(string*)(((char*)da->data) + i * da->element_size);
-			a.map_set(key, dynify(((char*)da->data) + i * da->element_size + sizeof(string), type->param[0]));
+			a.map_set(key, dynify(((char*)da->data) + i * da->element_size + sizeof(string), t_el));
 		}
 		return a;
 	}

@@ -750,8 +750,8 @@ public:
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
 		me->text = f->read_str();
-		int nfx = f->read_int();
-		int version = f->read_int();
+		[[maybe_unused]] int nfx = f->read_int();
+		[[maybe_unused]] int version = f->read_int();
 	}
 	void write(BinaryFormatter *f) override {
 		f->write_int(me->range.offset);
@@ -935,7 +935,7 @@ public:
 		int version = f->read_int();
 		if (version > 0) {
 			me->range.length = f->read_int();
-			int nfx = f->read_int();
+			[[maybe_unused]] int nfx = f->read_int();
 		}
 	}
 	void write(BinaryFormatter *f) override {

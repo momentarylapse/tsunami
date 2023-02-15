@@ -115,7 +115,6 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 
 	auto fp = get_callable_fp(t, self);
 	auto call = add_node_member_call(fp->type->param[0]->get_call(), fp);
-	int index = 1;
 	//for (int i=0; i<f->num_params; i++)
 	//	call->set_param(i+1, add_node_local(f->var[i].get()));
 

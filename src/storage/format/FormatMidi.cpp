@@ -281,7 +281,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 						dbo(format("ON  o=%d  p=0x%02x  v=%2x   ch=%d", sample_pos, c1, c2, channel));
 					} else if (type == 0x8) { // off
 						int c1 = f->read_byte() & 0x7f;
-						int c2 = f->read_byte() & 0x7f;
+						[[maybe_unused]] int c2 = f->read_byte() & 0x7f;
 						if (!events.contains(channel))
 							events.set(channel, {});
 						events[channel].add(MidiEvent(sample_pos, c1, 0));
@@ -349,9 +349,6 @@ void FormatMidi::save_song(StorageOperationData* od) {
 		f->write_word(int16_reverse(ticks_per_beat));
 		// beat = quarter note
 		int usec_per_beat = 500000; // micro s/beat = 120 beats/min;
-		int numerator = 4;
-		int denominator = 4;
-		int last_bar = 0;
 		bool first_track = true;
 		for (Track* t : weak(od->song->tracks)) {
 			if (t->type != SignalType::MIDI)

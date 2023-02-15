@@ -20,8 +20,6 @@ ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track 
 }
 
 void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
-	Song *s = dynamic_cast<Song*>(d);
-
 	float factor = new_value / old_value;
 
 	for (auto &tv: track_volumes) {
@@ -33,8 +31,6 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 }
 
 void ActionSongChangeAllTrackVolumes::undo(Data *d) {
-	Song *s = dynamic_cast<Song*>(d);
-
 	for (auto &tv: track_volumes) {
 		tv.track->volume = tv.old_volume;
 		tv.track->notify(tv.track->MESSAGE_CHANGE);

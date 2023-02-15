@@ -96,7 +96,7 @@ static void so(const string &str) {
 		printf("%s\n",str.c_str());
 }
 
-static void so(int i) {
+[[maybe_unused]] static void so(int i) {
 	if (DebugAsm)
 		printf("%d\n",i);
 }

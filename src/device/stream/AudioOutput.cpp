@@ -72,7 +72,6 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 		return;
 
 	void *data = nullptr;
-	auto n0 = nbytes;
 	int r = pa_stream_begin_write(p, &data, &nbytes);
 	if (r != 0) {
 		stream->_pulse_test_error("pa_stream_begin_write");
@@ -109,7 +108,7 @@ void AudioOutput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
 }
 
 void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) {
-	auto stream = static_cast<AudioOutput*>(userdata);
+	//auto stream = static_cast<AudioOutput*>(userdata);
 	//stream->session->w("pulse: underflow\n");
 	if (STREAM_WARNINGS)
 		printf("pulse: underflow\n");

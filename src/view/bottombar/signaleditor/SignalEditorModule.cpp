@@ -93,8 +93,6 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 }
 
 void SignalEditorModule::on_draw(Painter *p) {
-	auto view = tab->view;
-
 	color bg = theme.blob_bg;
 	if (tab->sel_modules.contains(module))
 		bg = theme.blob_bg_selected;

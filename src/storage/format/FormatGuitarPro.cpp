@@ -67,7 +67,7 @@ static string read_str4(BinaryFormatter *f) {
 }
 
 static string read_str41(BinaryFormatter *f) {
-	int l = f->read_int();
+	[[maybe_unused]] int l = f->read_int();
 	/*msg_write(l);
 	string s;
 	s.resize(l);
@@ -192,7 +192,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 		read_info();
 
 		if (version < 500)
-			int tripplet_feel = f->read_byte();
+			[[maybe_unused]] int tripplet_feel = f->read_byte();
 
 		if (version >= 400)
 			read_lyrics();
@@ -304,7 +304,7 @@ void FormatGuitarPro::write_info()
 
 void FormatGuitarPro::read_lyrics()
 {
-	int lyrics_track = f->read_int();
+	[[maybe_unused]] int lyrics_track = f->read_int();
 	//msg_write(lyrics_track);
 
 	f->read_int();
@@ -491,7 +491,7 @@ void FormatGuitarPro::read_track()
 	tracks.add(tt);
 	int port = f->read_int();
 	int channel = f->read_int();
-	int channel_fx = f->read_int();
+	[[maybe_unused]] int channel_fx = f->read_int();
 	Instrument instrument = Instrument(Instrument::Type::DRUMS);
 	if (channel != 10)
 		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
@@ -872,7 +872,7 @@ void FormatGuitarPro::read_chord()
 		int first_fret = f->read_int();
 		if (first_fret != 0){
 			for (int i=0; i<6; i++) {
-				int fret = f->read_int();
+				[[maybe_unused]] int fret = f->read_int();
 				/*if(i < chord.countStrings()){
 					chord.addFretValue(i,fret);
 				}*/
@@ -883,9 +883,9 @@ void FormatGuitarPro::read_chord()
 		string name = read_str1c(f, 21);
 		msg_write("chord: " + name);
 		f->stream->seek(4);
-		int first_fret = f->read_int();
+		[[maybe_unused]] int first_fret = f->read_int();
 		for (int i=0; i<7; i++){
-			int fret = f->read_int();
+			[[maybe_unused]] int fret = f->read_int();
 			/*if(i < chord.countStrings()){
 				chord.addFretValue(i,fret);
 			}*/
@@ -899,7 +899,7 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 	MidiNote *n = new MidiNote(Range(start, length), -1, 1);
 	int flags = f->read_byte();
 	if ((flags & 0x20) != 0) {
-		int noteType = f->read_byte();
+		[[maybe_unused]] int noteType = f->read_byte();
 	}
 	if (((flags & 0x01) != 0) and (version < 500))
 		f->stream->seek(2);
@@ -941,17 +941,17 @@ void FormatGuitarPro::read_note_fx()
 		f->stream->seek(5);
 		int points = f->read_int();
 		for (int i=0; i<points; i++){
-			int position = f->read_int();
-			int value = f->read_int();
+			[[maybe_unused]] int position = f->read_int();
+			[[maybe_unused]] int value = f->read_int();
 			f->read_byte();
 		}
 	}
 	if ((flags1 & 0x10) != 0) {
 		// grace
-		int fret = f->read_byte();
-		int volume = f->read_byte();
-		int transition = f->read_byte();
-		int duration = f->read_byte();
+		[[maybe_unused]] int fret = f->read_byte();
+		[[maybe_unused]] int volume = f->read_byte();
+		[[maybe_unused]] int transition = f->read_byte();
+		[[maybe_unused]] int duration = f->read_byte();
 		if (version >= 500)
 			f->read_byte();
 	}
@@ -962,11 +962,11 @@ void FormatGuitarPro::read_note_fx()
 	if ((flags2 & 0x08) != 0)
 		f->read_byte(); // slide
 	if ((flags2 & 0x10) != 0)
-		int type = f->read_byte(); // harmonic
+		[[maybe_unused]] int type = f->read_byte(); // harmonic
 	if ((flags2 & 0x20) != 0) {
 		// trill
-		int fret = f->read_byte();
-		int period = f->read_byte();
+		[[maybe_unused]] int fret = f->read_byte();
+		[[maybe_unused]] int period = f->read_byte();
 	}
 }
 
@@ -1094,7 +1094,7 @@ void FormatGuitarPro::read_beat_fx()
 	if (version >= 400)
 		flags2 = f->read_byte();
 	if ((flags1 & 0x20) != 0) {
-		int effect = f->read_byte();
+		[[maybe_unused]] int effect = f->read_byte();
 		if (version < 400)
 			f->read_int();
 	}
@@ -1104,14 +1104,14 @@ void FormatGuitarPro::read_beat_fx()
 		int points = f->read_int();
 		//msg_write(points);
 		for (int i=0; i<points; i++){
-			int position = f->read_int();
-			int value = f->read_int();
+			[[maybe_unused]] int position = f->read_int();
+			[[maybe_unused]] int value = f->read_int();
 			f->read_byte();
 		}
 	}
 	if ((flags1 & 0x40) != 0) {
-		int strokeDown = f->read_byte();
-		int strokeUp = f->read_byte();
+		[[maybe_unused]] int strokeDown = f->read_byte();
+		[[maybe_unused]] int strokeUp = f->read_byte();
 	}
 	if ((flags2 & 0x02) != 0)
 		f->read_byte();

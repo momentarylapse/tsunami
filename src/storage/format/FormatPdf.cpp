@@ -82,7 +82,7 @@ MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_co
 
 	// A4
 	float page_width = PAGE_WIDTH_A4;
-	float page_height = PAGE_HEIGHT_A4;
+	[[maybe_unused]] float page_height = PAGE_HEIGHT_A4;
 
 	float border = 25;
 

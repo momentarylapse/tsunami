@@ -184,39 +184,39 @@ bool TTF::read_mapping(FileStream *f) {
         m.format = readUS(f);
 
         if (m.format == 0) {
-            int length = readUS(f);
+        	[[maybe_unused]] int length = readUS(f);
             //msg_write("l {{length}}");
-            int version = readUS(f);
+        	[[maybe_unused]] int version = readUS(f);
             for (int i=0; i<256; i++)
                 m.glyph_id_array.add(readUB(f));
             //msg_write m.glyph_id_array;
         } else if (m.format == 4) {
             int length = readUS(f);
             //msg_write("l {{length}}");
-            int version = readUS(f);
+            [[maybe_unused]] int version = readUS(f);
             int seg_count = readUS(f) / 2;
             //msg_write("s {{seg_count}}");
-            int search_range = readUS(f);
-            int entry_selector = readUS(f);
-            int range_shift = readUS(f);
+            [[maybe_unused]] int search_range = readUS(f);
+            [[maybe_unused]] int entry_selector = readUS(f);
+            [[maybe_unused]] int range_shift = readUS(f);
             for (int i=0; i<seg_count; i++)
                 m.end_code.add(readUS(f));
-            readUS(f);
+            [[maybe_unused]] int rr = readUS(f);
             for (int i=0; i<seg_count; i++)
                 m.start_code.add(readUS(f));
             for (int i=0; i<seg_count; i++)
                 m.id_delta.add(readUS(f));
             for (int i=0; i<seg_count; i++)
                 m.id_range_offset.add(readUS(f));
-            int rs = seg_count * 8 + 16;
+            [[maybe_unused]] int rs = seg_count * 8 + 16;
             //msg_write("r: {{length - rs}}");
             int na = (length - rs) / 2;
             for (int i=0; i<na; i++)
                 m.glyph_id_array.add(readUS(f));
         } else if (m.format == 6) {
-            int length = readUS(f);
+        	[[maybe_unused]] int length = readUS(f);
             //msg_write("l {{length}}");
-            int version = readUS(f);
+        	[[maybe_unused]] int version = readUS(f);
             m.first_code = readUS(f);
             int entry_count = readUS(f);
             for (int i=0; i<entry_count; i++)
@@ -225,9 +225,9 @@ bool TTF::read_mapping(FileStream *f) {
 
         } else if (m.format == 12) {
             readUS(f); // "padding"
-            int length = readL(f);
+            [[maybe_unused]] int length = readL(f);
             //msg_write("l {{length}}");
-            int version = readL(f);
+            [[maybe_unused]] int version = readL(f);
 
             int group_count = readL(f) / 2;
             //msg_write("s {{group_count}}");
@@ -330,7 +330,7 @@ bool TTF::read_glyphs(FileStream *f) {
 }
 
 void TTF::update_size() {
-    float scale = 1.0 / head.units_per_em._int();
+	[[maybe_unused]] float scale = 1.0 / head.units_per_em._int();
     float w = 0;
     for (auto&& [i,g]: enumerate(glyphs)) {
         g.lsb = 0;

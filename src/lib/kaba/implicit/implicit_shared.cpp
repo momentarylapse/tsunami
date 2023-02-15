@@ -40,7 +40,6 @@ void AutoImplementer::implement_shared_constructor(Function *f, const Class *t) 
 }
 
 void AutoImplementer::implement_shared_destructor(Function *f, const Class *t) {
-	auto te = t->get_array_element();
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	// call clear()
@@ -205,8 +204,6 @@ void AutoImplementer::implement_owned_assign(Function *f, const Class *t) {
 void AutoImplementer::implement_owned_clear(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 	auto self_p = self->shift(0, tree->get_pointer(t->param[0]));
-
-	auto tt = t->param[0];
 
 	// if self.p
 	//     del self.p

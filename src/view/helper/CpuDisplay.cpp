@@ -200,10 +200,10 @@ void CpuDisplay::draw_table(Painter* p) {
 		p->draw_str({xoff[1], 10}, " ms");
 		p->draw_str({xoff[2], 10}, " Hz");
 		
-		int t = 0;
+		[[maybe_unused]] int t = 0;
 		Array<int> indent;
 		color col0;
-		int skip_until_indent = -1;
+		[[maybe_unused]] int skip_until_indent = -1;
 
 		float max_avg = 0;
 		float max_cpu = 0;

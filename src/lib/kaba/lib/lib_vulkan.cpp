@@ -304,7 +304,6 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypeDevice			= add_type  ("Device", sizeof(vulkan::Device));
 	auto TypeDeviceP		= add_type_p(TypeDevice);
 	auto TypeQueue			= add_type  ("Queue", sizeof(vulkan::Queue));
-	auto TypeQueueP			= add_type_p(TypeQueue);
 	auto TypeVertexBuffer	= add_type  ("VertexBuffer", sizeof(vulkan::VertexBuffer));
 	//auto TypeVertexBufferP	= add_type_p(TypeVertexBuffer);
 	auto TypeTexture		= add_type  ("Texture", sizeof(vulkan::Texture));
@@ -333,8 +332,6 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypeRenderPassP	= add_type_p(TypeRenderPass);
 	auto TypeBuffer			= add_type  ("Buffer", sizeof(vulkan::Buffer));
 	auto TypeUniformBuffer	= add_type  ("UniformBuffer", sizeof(vulkan::UniformBuffer));
-	auto TypeUniformBufferP	= add_type_p(TypeUniformBuffer);
-	auto TypeUniformBufferPList= add_type_l(TypeUniformBufferP);
 	auto TypeDescriptorPool	= add_type  ("DescriptorPool", sizeof(vulkan::DescriptorPool));
 	auto TypeDescriptorSet	= add_type  ("DescriptorSet", sizeof(vulkan::DescriptorSet));
 	auto TypeDescriptorSetP	= add_type_p(TypeDescriptorSet);

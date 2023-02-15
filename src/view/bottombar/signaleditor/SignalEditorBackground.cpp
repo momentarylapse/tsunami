@@ -21,9 +21,6 @@ SignalEditorBackground::SignalEditorBackground(SignalEditorTab *t) {
 
 
 void SignalEditorBackground::on_draw(Painter *p) {
-	int w = area.width();
-	int h = area.height();
-	auto view = tab->view;
 	p->set_color(theme.background);
 	p->draw_rect(area);
 	p->set_line_width(0.7f);

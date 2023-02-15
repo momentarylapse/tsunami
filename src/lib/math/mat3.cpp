@@ -96,9 +96,7 @@ mat3 mat3::inverse() const {
 	float det=   _00*_11*_22 + _01*_12*_20 + _02*_10*_21
 				-_02*_11*_20 - _00*_12*_21 - _01*_10*_22;
 
-	float *m=(float*)this;
-
-	if (det==0){
+	if (det == 0) {
 		msg_write("Matrix3Inverse:  matrix not invertible");
 		return ID;
 	}

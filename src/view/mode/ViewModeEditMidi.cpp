@@ -297,7 +297,7 @@ public:
 		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
 
 		view->snap_to_grid(p);
-		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
+		[[maybe_unused]] int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
 		range0.set_end(p);
 		action->set_param_and_notify(view->song, range0);
 	}
@@ -755,7 +755,7 @@ void ViewModeEditMidi::set_rep_key(int k) {
 int song_bar_divisor(Song *s, int pos);
 
 void set_note_lengthx(ViewModeEditMidi *m, int l, int p, int n, const string &text) {
-	int div = song_bar_divisor(m->view->song, m->view->cursor_pos());
+	[[maybe_unused]] int div = song_bar_divisor(m->view->song, m->view->cursor_pos());
 	//l *= div;
 
 	if ((m->sub_beat_partition % p) == 0) {
@@ -934,7 +934,7 @@ MidiNoteBuffer ViewModeEditMidi::get_creation_notes(HoverData *sel, int pos0) {
 	auto *l = cur_vlayer();
 	if (!l)
 		return MidiNoteBuffer();
-	auto mode = l->midi_mode();
+	[[maybe_unused]] auto mode = l->midi_mode();
 
 	// align to beats
 	if (song->bars.num > 0)

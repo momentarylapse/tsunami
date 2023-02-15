@@ -27,7 +27,7 @@ void SetDirectory(const Path &dir) {
 	_chdir(dir.str().c_str());
 #endif
 #ifdef OS_LINUX
-	int r = chdir(dir.str().c_str());
+	static_cast<void>(chdir(dir.str().c_str()));
 #endif
 }
 
@@ -49,7 +49,7 @@ void OpenDocument(const Path &filename) {
 	ShellExecute(NULL, _T(""), hui_tchar_str(filename.str()), _T(""), _T(""), SW_SHOW);
 #endif
 #ifdef OS_LINUX
-	int r = system(format("gnome-open '%s'", filename).c_str());
+	static_cast<void>(system(format("gnome-open '%s'", filename).c_str()));
 #endif
 }
 

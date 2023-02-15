@@ -115,7 +115,12 @@ void FormatWave::load_track(StorageOperationData *od) {
 		throw Exception("\"WAVE\" expected in wave file");
 
 
-	int format_code, channels = 2, freq, block_align = 0, bits = 16, byte_per_sample = 4;
+	int format_code;
+	int channels = 2;
+	int freq;
+	[[maybe_unused]] int block_align = 0;
+	int bits = 16;
+	int byte_per_sample = 4;
 	bool fmt_chunk_read = false;
 	auto format = SampleFormat::INT_16;
 

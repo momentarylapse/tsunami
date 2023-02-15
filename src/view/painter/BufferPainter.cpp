@@ -302,7 +302,6 @@ Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
 		im->create(b.length/SPECTRUM_CHUNK, SPECTRUM_N, Black);
 
 		for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
-			float x1, x2;
 			for (int k=0; k<SPECTRUM_N; k++) {
 				float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
 				//f = 1-exp(-f*2);

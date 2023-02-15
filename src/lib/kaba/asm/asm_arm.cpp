@@ -245,7 +245,7 @@ InstructionParam param_xxx(int code, bool bb) {
 
 	int Rn = (code >> 16) & 0xf;
 	bool imm = ((code >> 25) & 1);
-	bool pre = ((code >> 24) & 1);
+	[[maybe_unused]] bool pre = ((code >> 24) & 1);
 	bool up = ((code >> 23) & 1);
 	bool ww = ((code >> 21) & 1);
 	if (imm) {
@@ -340,7 +340,7 @@ string arm_disassemble(void *_code_,int length,bool allow_comments) {
 	for (int ni=0; ni<length/4; ni++) {
 		int cur = code[ni];
 
-		int x = (cur >> 25) & 0x7;
+		[[maybe_unused]] int x = (cur >> 25) & 0x7;
 
 		buf += i2h(cur, 4);
 		buf += "    ";

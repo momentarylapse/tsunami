@@ -92,11 +92,11 @@ static gboolean on_gtk_window_focus(GtkWidget *widget, GdkEventFocus *event, gpo
 }
 #endif
 
-static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data) {
+/*static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data) {
 	Window *win = (Window *)user_data;
 	Event e = Event("", EventID::RESIZE);
 	win->_send_event_(&e);
-}
+}*/
 
 
 
@@ -368,7 +368,7 @@ void Window::_fly(Callback cb) {
 
 void Window::_run(Callback cb) {
 	show();
-	int uid = unique_id;
+	//int uid = unique_id;
 	//end_run_callback = cb;
 
 /*#if GTK_CHECK_VERSION(4,0,0)
@@ -734,7 +734,6 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 
 	GtkMessageType type = GTK_MESSAGE_INFO;
 	bool allow_close = false;
-	int num_buttons = 0;
 	for (auto &o: options) {
 		if (o == "error")
 			type = GTK_MESSAGE_ERROR;

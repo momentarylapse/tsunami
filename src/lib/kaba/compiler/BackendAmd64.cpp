@@ -38,7 +38,7 @@ BackendAmd64::BackendAmd64(Serializer *s) : BackendX86(s) {
 BackendAmd64::~BackendAmd64() {
 }
 
-static Asm::InstID trafo_inst_float(Asm::InstID inst, const Class *t) {
+[[maybe_unused]] static Asm::InstID trafo_inst_float(Asm::InstID inst, const Class *t) {
 	if (t == TypeFloat64) {
 		if (inst == Asm::InstID::FADD)
 			return Asm::InstID::ADDSD;
@@ -61,7 +61,7 @@ static Asm::InstID trafo_inst_float(Asm::InstID inst, const Class *t) {
 	return Asm::InstID::INVALID;
 }
 
-static bool inst_is_arithmetic(Asm::InstID i) {
+[[maybe_unused]] static bool inst_is_arithmetic(Asm::InstID i) {
 	if ((i == Asm::InstID::IMUL) /*or (i == Asm::InstID::IDIV)*/ or (i == Asm::InstID::ADD) or (i == Asm::InstID::SUB))
 		return true;
 	if ((i == Asm::InstID::AND) or (i == Asm::InstID::OR) or (i == Asm::InstID::XOR))
@@ -442,7 +442,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	}
 
 	// get parameters from stack
-	foreachb(Variable *p, stack_param) {
+	foreachb([[maybe_unused]] Variable *p, stack_param) {
 		// variables are already where expect them ([rbp+...])
 		if (config.abi != Abi::AMD64_WINDOWS)
 			do_error("func with stack...");

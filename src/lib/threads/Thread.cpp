@@ -149,7 +149,7 @@ Thread *Thread::get_self()
 
 #else //OS_LINUX/MINGW
 
-static void __thread_cleanup_func(void *p)
+[[maybe_unused]] static void __thread_cleanup_func(void *p)
 {
 	Thread *t = (Thread*)p;
 	t->on_cancel();

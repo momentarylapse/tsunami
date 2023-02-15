@@ -91,7 +91,7 @@ void image_load_tga(const Path &filename, Image &image)
 	int x;
 	unsigned char *data=nullptr,*pal=nullptr;
 	FILE* f=fopen(filename.str().c_str(),"rb");
-	int r=fread(&Header, 18, 1, f);
+	static_cast<void>(fread(&Header, 18, 1, f));
 	int offset=get_int_from_buffer(Header,0,1)+18;
 	int tga_type=get_int_from_buffer(Header,2,1);
 	//msg_write(tga_type);
@@ -120,7 +120,7 @@ void image_load_tga(const Path &filename, Image &image)
 
 	if (depth<16){
 		pal=new unsigned char[3*256];
-		r=fread(pal,3,256,f);
+		static_cast<void>(fread(pal,3,256,f));
 	}
 
 	if (compressed){
@@ -133,19 +133,19 @@ void image_load_tga(const Path &filename, Image &image)
 			case 8:
 				do{
 					unsigned char chunkheader = 0;
-					r=fread(&chunkheader, 1, 1, f);
+					static_cast<void>(fread(&chunkheader, 1, 1, f));
 					if ((chunkheader & 0x80) != 0x80){
 						chunkheader++;
 						//msg_write(string("raw ",i2s(chunkheader)));
 						while (chunkheader-- > 0){
-							r=fread(colorbuffer, 1, bpp, f);
+							static_cast<void>(fread(colorbuffer, 1, bpp, f));
 							__fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
 							currentpixel++;
 						}
 					}else{
 						chunkheader = (unsigned char)((chunkheader & 0x7F) + 1);
 						//msg_write(string("rle ",i2s(chunkheader)));
-						r=fread(colorbuffer, 1, bpp, f);
+						static_cast<void>(fread(colorbuffer, 1, bpp, f));
 						while(chunkheader-- > 0){
 							__fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
 							currentpixel++;
@@ -165,7 +165,7 @@ void image_load_tga(const Path &filename, Image &image)
 			case 16:
 			case 8:
 				data=new unsigned char[bpp*size];
-				r=fread(data,bpp,size,f);
+				static_cast<void>(fread(data,bpp,size,f));
 				for (x=0;x<image.width*image.height;x++)
 					__fill_image_color(image, (sImageColor*)&image.data[x], data + x * bpp, pal, depth, alpha_bits, true);
 				break;
@@ -218,12 +218,15 @@ void image_save_tga(const Path &filename, const Image &image)
 	Header[15] = image.height/256;
 	Header[16] = bits;
 	Header[17] = alpha_bits;
-	int rw=fwrite(&Header, 18, 1, f);
-	unsigned int color,last_color=0;
+	static_cast<void>(fwrite(&Header, 18, 1, f));
+	unsigned int color;
+	[[maybe_unused]] unsigned int last_color = 0;
 	unsigned char *_data=(unsigned char*)image.data.data;
 	int a,r,g,b;
+#ifdef SAVE_TGA_RLE
 	bool rle_even=false;
 	int rle_num=-1;
+#endif
 	for (int y=image.height-1;y>=0;y--)
 		for (int x=0;x<image.width;x++){
 			int offset=(x+y*image.width)*4;
@@ -277,7 +280,7 @@ void image_save_tga(const Path &filename, const Image &image)
 						color =int(b/8)  + int(g/8)*32  + int(r/8)*1024 + int(a/128)*32768;
 					break;
 			}
-			rw=fwrite(&color, bits/8, 1, f);
+			static_cast<void>(fwrite(&color, bits/8, 1, f));
 			//msg_write(color);
 		}
     fclose(f);

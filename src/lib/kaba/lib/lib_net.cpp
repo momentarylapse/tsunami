@@ -12,7 +12,7 @@ namespace kaba {
 
 #ifdef KABA_EXPORT_NET
 	#define net_p(p)		p
-	static NetAddress *_addr;
+	[[maybe_unused]] static NetAddress *_addr;
 	#define GetDAAddress(x)			int_p(&_addr->x)-int_p(_addr)
 #else
 	typedef int Socket;

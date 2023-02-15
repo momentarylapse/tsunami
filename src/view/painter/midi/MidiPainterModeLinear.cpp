@@ -60,7 +60,7 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
 	float y = pitch2y(n.pitch);
 	n.y = y;
 
-    float rr = mp->rr;
+    [[maybe_unused]] float rr = mp->rr;
 
 	color col, col_shadow;
 	get_col(col, col_shadow, &n, state, mp->is_playable, local_theme);

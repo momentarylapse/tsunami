@@ -39,7 +39,6 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	int channels = frame->header.channels;
 	int bits = frame->header.bits_per_sample;
-	int freq = frame->header.sample_rate;
 
 	if (flac_tells_samples)
 		od->set((float)flac_read_samples / (float)flac_samples);

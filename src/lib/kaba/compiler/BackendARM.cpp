@@ -754,7 +754,7 @@ void BackendARM::add_function_intro_params(Function *f) {
 	}
 
 	// get parameters from stack
-	foreachb(Variable *p, stack_param) {
+	foreachb([[maybe_unused]] Variable *p, stack_param) {
 		do_error("func with stack...");
 		/*int s = 8;
 		cmd.add_cmd(Asm::inst_push, p);

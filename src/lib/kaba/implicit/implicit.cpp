@@ -119,7 +119,7 @@ void AutoImplementer::redefine_inherited_constructors(Class *t) {
 	for (auto *pcc: t->parent->get_constructors()) {
 		auto c = t->get_same_func(Identifier::Func::INIT, pcc);
 		if (needs_new(c)) {
-			auto ff = add_func_header(t, Identifier::Func::INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::NONE, pcc->default_parameters);
+			add_func_header(t, Identifier::Func::INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::NONE, pcc->default_parameters);
 		}
 	}
 }

@@ -66,10 +66,10 @@ void Menu::set_panel(Panel *_panel) {
 	for (Control *c: weak(items)) {
 		c->panel = panel;
 #if GTK_CHECK_VERSION(4,0,0)
-		if (auto b = dynamic_cast<MenuItem*>(c)) {
+		/*if (auto b = dynamic_cast<MenuItem*>(c)) {
 			//msg_write("UP  " + get_gtk_action_name(b->id, panel) + "    " + b->id);
 			//g_menu_item_set_detailed_action(b->item, get_gtk_action_name(b->id, panel).c_str());
-		}
+		}*/
 #else
 		if (panel)
 			try_add_accel(c->widget, c->id, panel);

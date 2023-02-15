@@ -32,15 +32,15 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) :
-	midi_scale(Scale::C_MAJOR),
-	local_theme(_colors),
-	song(_song),
-	sel(_sel),
-	hover(_hover),
-	cam(_cam),
-	mode_classical(this),
-	mode_tab(this),
-	mode_linear(this)
+		cam(_cam),
+		midi_scale(Scale::C_MAJOR),
+		sel(_sel),
+		hover(_hover),
+		song(_song),
+		local_theme(_colors),
+		mode_classical(this),
+		mode_tab(this),
+		mode_linear(this)
 {
 	if (!sel)
 		sel = new SongSelection; // TODO... delete later...
@@ -308,9 +308,9 @@ string note_flag_text(const MidiNote *n, bool allow_dead) {
 void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState __state, float x, float y, float dir) {
 	if (n->flags == 0)
 		return;
-    string t = note_flag_text(n, mode != MidiMode::TAB);
-    if (t.num > 0)
-        SymbolRenderer::draw(c, {x, y + dir * (rr + flags_font_size*1.33f) - flags_font_size / 2}, flags_font_size, t, true, 0);
+	string t = note_flag_text(n, mode != MidiMode::TAB);
+	if (t.num > 0)
+		SymbolRenderer::draw(c, {x, y + dir * (rr + flags_font_size*1.33f) - flags_font_size / 2}, flags_font_size, t, true, 0);
 	if (n->is(NOTE_FLAG_STACCATO))
 		c->draw_circle({x, y + dir * rr*2}, rr * 0.3f);
 	if (n->is(NOTE_FLAG_TENUTO)) {

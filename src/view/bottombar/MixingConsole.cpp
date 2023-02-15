@@ -157,8 +157,8 @@ public:
 		if (!t)
 			return;
 
-		auto view = console->view;
-		bool is_playable = view->get_playable_tracks().contains(track());
+		//auto view = console->view;
+		//bool is_playable = view->get_playable_tracks().contains(track());
 
 		p->set_color(vtrack->header->color_bg(false));
 		//p->draw_polygon({{0,0}, {p->width,0}, {0,p->height}});

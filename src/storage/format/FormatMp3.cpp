@@ -54,7 +54,7 @@ static string tag_from_mp3(const string &key) {
 }
 
 void FormatMp3::load_track(StorageOperationData *od) {
-	Track *t = od->track;
+	[[maybe_unused]] Track *t = od->track;
 
 	//unsigned char *data = new unsigned char[4096];
 	bytes data;
@@ -80,7 +80,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 				//t->song->sample_rate = FREQS[freq_index];
 				msg_write(format("bitrate: %d", bit_rate));
 				msg_write(format("samplerate: %d", FREQS[freq_index]));
-				bool padding = ((data[2] & 0x02) > 0);
+				[[maybe_unused]] bool padding = ((data[2] & 0x02) > 0);
 				int mode = ((data[3] & 0xc0) >> 6);
 				msg_write(format("mode: %d", mode));
 
@@ -98,7 +98,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 				int version = data[3];
 				int v_min = f->read_byte();
 				msg_write(format("v 2.%d.%d", version, v_min));
-				int flags = f->read_byte();
+				[[maybe_unused]] int flags = f->read_byte();
 				int size = read_mp3_28bit(f);
 				//msg_write(size);
 				int r = 0;

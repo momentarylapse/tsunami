@@ -1,4 +1,13 @@
+/*
+ * Compiler.cpp
+ *
+ *  Created on: 27 Feb 2023
+ *      Author: michi
+ */
+
 #include "../kaba.h"
+#include "Compiler.h"
+#include "../asm/asm.h"
 #include "../../base/set.h"
 #include "../../os/msg.h"
 #include <stdio.h>
@@ -22,6 +31,14 @@
 
 namespace kaba {
 
+Compiler::Compiler(Module *m) {
+	module = m;
+	tree = m->tree.get();
+	context = m->context;
+}
+
+Compiler::~Compiler() {
+}
 
 int LocalOffset,LocalOffsetMax;
 
@@ -170,27 +187,27 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 }
 
 
-void Module::allocate_opcode() {
+void Compiler::allocate_opcode() {
 	int max_opcode = MAX_OPCODE;
 	if (config.compile_os)
 		max_opcode *= 10;
 
-	opcode = (char*)get_nice_memory(max_opcode, true, this);
+	module->opcode = (char*)get_nice_memory(max_opcode, true, module);
 	if (config.verbose)
-		msg_write("opcode:  " + p2s(opcode));
+		msg_write("opcode:  " + p2s(module->opcode));
 
 	if (config.override_code_origin)
-		syntax->asm_meta_info->code_origin = config.code_origin;
+		tree->asm_meta_info->code_origin = config.code_origin;
 	else
-		syntax->asm_meta_info->code_origin = (int_p)opcode;
-	opcode_size = 0;
+		tree->asm_meta_info->code_origin = (int_p)module->opcode;
+	module->opcode_size = 0;
 }
 
 
 int mem_size_needed(const Class *c) {
 	int memory_size = 0;
 	if (c->vtable.num > 0)
-		memory_size += config.pointer_size * c->vtable.num;
+		memory_size += config.target.pointer_size * c->vtable.num;
 	for (auto *v: weak(c->static_variables))
 		memory_size += mem_align(v->type->size, 4);
 	for (auto *cc: weak(c->constants))
@@ -210,16 +227,16 @@ int mem_size_needed_total(const Class *c) {
 	return size;
 }
 
-void Module::allocate_memory() {
-	memory_size = mem_size_needed_total(syntax->base_class);
+void Compiler::allocate_memory() {
+	module->memory_size = mem_size_needed_total(tree->base_class);
 
-	memory = (char*)get_nice_memory(memory_size, false, this);
+	module->memory = (char*)get_nice_memory(module->memory_size, false, module);
 	if (config.verbose)
-		msg_write("memory:  " + p2s(memory));
-	memory_size = 0;
+		msg_write("memory:  " + p2s(module->memory));
+	module->memory_size = 0;
 }
 
-void Module::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
+void Compiler::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
 	auto external = context->external.get();
 	for (auto *v: weak(name_space->static_variables)) {
 		if (v->is_extern()) {
@@ -227,7 +244,7 @@ void Module::_map_global_variables_to_memory(char *mem, int &offset, char *addre
 			if (!v->memory or m)
 				v->memory = m;
 			if (!v->memory)
-				do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));
+				module->do_error_link(format("external variable '%s' was not linked", v->cname(name_space, name_space->owner->base_class)));
 		} else if (!v->memory) {
 			int size_aligned = mem_align(v->type->size, 4);
 			v->memory = &address[offset];
@@ -239,31 +256,31 @@ void Module::_map_global_variables_to_memory(char *mem, int &offset, char *addre
 		_map_global_variables_to_memory(mem, offset, address, cc);
 }
 
-void Module::map_global_variables_to_memory() {
+void Compiler::map_global_variables_to_memory() {
 	// global variables -> into Memory
 	int override_offset = 0;
 	if (config.override_variables_offset)
-		_map_global_variables_to_memory(memory, override_offset, (char*)config.variables_offset, syntax->base_class);
+		_map_global_variables_to_memory(module->memory, override_offset, (char*)config.variables_offset, tree->base_class);
 	else
-		_map_global_variables_to_memory(memory, memory_size, memory, syntax->base_class);
+		_map_global_variables_to_memory(module->memory, module->memory_size, module->memory, tree->base_class);
 }
 
-void Module::align_opcode() {
-	int ocs_new = mem_align(opcode_size, config.function_align);
-	for (int i=opcode_size;i<ocs_new;i++)
-		opcode[i] = 0x90;
-	opcode_size = ocs_new;
+void Compiler::align_opcode() {
+	int ocs_new = mem_align(module->opcode_size, config.target.function_align);
+	for (int i=module->opcode_size;i<ocs_new;i++)
+		module->opcode[i] = 0x90;
+	module->opcode_size = ocs_new;
 }
 
 static int OCORA;
-void Module::CompileOsEntryPoint() {
-	if (!base_class()->get_func("main", TypeVoid, {}))
-		if (!syntax->imported_symbols->get_func("main", TypeVoid, {}))
-			do_error("os entry point: no 'void main()' found");
+void Compiler::CompileOsEntryPoint() {
+	if (!module->base_class()->get_func("main", TypeVoid, {}))
+		if (!tree->imported_symbols->get_func("main", TypeVoid, {}))
+			module->do_error("os entry point: no 'void main()' found");
 
 	// call
-	Asm::add_instruction(opcode, opcode_size, Asm::InstID::CALL, Asm::param_imm(0, 4));
-	TaskReturnOffset = opcode_size;
+	Asm::add_instruction(module->opcode, module->opcode_size, Asm::InstID::CALL, Asm::param_imm(0, 4));
+	TaskReturnOffset = module->opcode_size;
 	OCORA = Asm::OCParam;
 	align_opcode();
 }
@@ -283,8 +300,8 @@ void remap_virtual_tables(Module *s, char *mem, int &offset, char *address, cons
 		Class *t = const_cast<Class*>(ct);
 		t->_vtable_location_compiler_ = &mem[offset];
 		t->_vtable_location_target_ = &address[offset];
-		offset += config.pointer_size * t->vtable.num;
-		for (Constant *c: weak(s->syntax->base_class->constants))
+		offset += config.target.pointer_size * t->vtable.num;
+		for (Constant *c: weak(s->tree->base_class->constants))
 			if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data))
 				c->as_int64() = (int_p)t->_vtable_location_target_;
 	}
@@ -322,12 +339,14 @@ void _map_constants_to_memory(char *mem, int &offset, char *address, const Class
 		_map_constants_to_memory(mem, offset, address, c);
 }
 
-void Module::map_constants_to_memory(char *mem, int &offset, char *address) {
+void Compiler::map_constants_to_memory(char *mem, int &offset, char *address) {
 
-	remap_virtual_tables(this, mem, offset, address, syntax->base_class);
+	remap_virtual_tables(module, mem, offset, address, tree->base_class);
 
 
-	syntax->transform([&](shared<Node> n) { return check_const_used(n, this); });
+	tree->transform([this] (shared<Node> n) {
+		return check_const_used(n, module);
+	});
 
 	/*int n = 0;
 	for (bool b: used)
@@ -345,30 +364,30 @@ void Module::map_constants_to_memory(char *mem, int &offset, char *address) {
 	opcode_size = size0;*/
 
 
-	_map_constants_to_memory(mem, offset, address, syntax->base_class);
+	_map_constants_to_memory(mem, offset, address, tree->base_class);
 
 	//msg_write(format("    compressed:  %d  ->  %d", uncompressed, opcode_size - size0));
 }
 
-void Module::map_constants_to_opcode() {
+void Compiler::map_constants_to_opcode() {
     //remap_virtual_tables(this, opcode, opcode_size, (char*)(int_p)syntax->asm_meta_info->code_origin, syntax->base_class);
 
-	map_constants_to_memory(opcode, opcode_size, (char*)(int_p)syntax->asm_meta_info->code_origin);
+	map_constants_to_memory(module->opcode, module->opcode_size, (char*)(int_p)tree->asm_meta_info->code_origin);
 	align_opcode();
 }
 
-void Module::LinkOsEntryPoint() {
-	auto *f = base_class()->get_func("main", TypeVoid, {});
+void Compiler::LinkOsEntryPoint() {
+	auto *f = module->base_class()->get_func("main", TypeVoid, {});
 	if (!f)
-		f = syntax->imported_symbols->get_func("main", TypeVoid, {});
+		f = tree->imported_symbols->get_func("main", TypeVoid, {});
 	if (!f)
-		do_error_internal("os entry point missing...");
+		module->do_error_internal("os entry point missing...");
 
-	int64 lll = f->address - syntax->asm_meta_info->code_origin - TaskReturnOffset;
+	int64 lll = f->address - tree->asm_meta_info->code_origin - TaskReturnOffset;
 	//printf("insert   %d  an %d\n", lll, OCORA);
 	//msg_write(lll);
 	//msg_write(i2h(lll,4));
-	*(int*)&opcode[OCORA] = (int)lll;
+	*(int*)&module->opcode[OCORA] = (int)lll;
 }
 
 bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert) {
@@ -411,7 +430,7 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 }
 
 void find_all_includes_rec(Module *s, base::set<Module*> &includes) {
-	for (Module *i: weak(s->syntax->includes)) {
+	for (Module *i: weak(s->tree->includes)) {
 		//if (i->filename.find(".kaba") < 0)
 		//	continue;
 		includes.add(i);
@@ -425,7 +444,7 @@ void import_includes(Module *s) {
 	find_all_includes_rec(s, includes);
 
 	for (Module *i: includes)
-		import_deep(s->syntax, i->syntax);
+		import_deep(s->tree.get(), i->tree.get());
 }
 
 void link_raw_function_pointers(Module *m) {
@@ -435,43 +454,43 @@ void link_raw_function_pointers(Module *m) {
 			c->as_int64() = f->address;
 
 			// remap
-			memcpy(c->address_compiler, &c->as_int64(), config.pointer_size);
+			memcpy(c->address_compiler, &c->as_int64(), config.target.pointer_size);
 		}
 }
 
-void Module::link_functions() {
-	for (Asm::WantedLabel &l: functions_to_link) {
+void Compiler::link_functions() {
+	for (Asm::WantedLabel &l: module->functions_to_link) {
 		string name = l.name.sub(10);
 		bool found = false;
-		for (Function *f: syntax->functions)
+		for (Function *f: tree->functions)
 			if (f->name == name) {
-				*(int*)&opcode[l.pos] = (int)(f->address - (syntax->asm_meta_info->code_origin + l.pos + 4));
+				*(int*)&module->opcode[l.pos] = (int)(f->address - (tree->asm_meta_info->code_origin + l.pos + 4));
 				found = true;
 				break;
 			}
 		if (!found)
-			do_error_link("could not link function: " + name);
+			module->do_error_link("could not link function: " + name);
 	}
 
-	link_raw_function_pointers(this);
+	link_raw_function_pointers(module);
 
 	// unused?
-	for (int n: function_vars_to_link) {
+	for (int n: module->function_vars_to_link) {
 		int64 p = (n + 0xefef0000);
-		int64 q = syntax->functions[n]->address;
-		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
-			do_error_link("could not link function as variable: " + syntax->functions[n]->signature());
+		int64 q = tree->functions[n]->address;
+		if (!find_and_replace(module->opcode, module->opcode_size, (char*)&p, config.target.pointer_size, (char*)&q))
+			module->do_error_link("could not link function as variable: " + tree->functions[n]->signature());
 	}
 
 
 }
 
-void Module::link_virtual_functions_into_vtable(const Class *c) {
+void Compiler::link_virtual_functions_into_vtable(const Class *c) {
 	Class *t = const_cast<Class*>(c);
 	t->link_virtual_table();
 
 	for (int i=0; i<t->vtable.num; i++)
-		memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
+		memcpy((char*)t->_vtable_location_compiler_ + i*config.target.pointer_size, &t->vtable[i], config.target.pointer_size);
 
 	for (auto *cc: weak(c->classes))
 		link_virtual_functions_into_vtable(cc);
@@ -594,23 +613,28 @@ void register_functions(Module* s) {
 }
 #endif
 
+void Compiler::compile(Module *m) {
+	Compiler c(m);
+	c._compile();
+}
+
 // generate opcode
-void Module::compile() {
-	Asm::CurrentMetaInfo = syntax->asm_meta_info.get();
+void Compiler::_compile() {
+	Asm::CurrentMetaInfo = tree->asm_meta_info.get();
 
 	if (config.compile_os)
-		import_includes(this);
+		import_includes(module);
 
-	parse_magic_linker_string(syntax);
-	
-	syntax->digest();
+	parse_magic_linker_string(tree);
+
+	tree->digest();
 
 	allocate_memory();
 	map_global_variables_to_memory();
 
 	// useful because some constants might have ended up outside of RIP-relative addressing!
 	if (!config.compile_os)
-		map_constants_to_memory(memory, memory_size, memory);
+		map_constants_to_memory(module->memory, module->memory_size, module->memory);
 
 	allocate_opcode();
 
@@ -627,23 +651,23 @@ void Module::compile() {
 
 
 	if (config.verbose)
-		syntax->show("compile:b");
+		tree->show("compile:b");
 
-	syntax->pre_processor_addresses();
+	tree->pre_processor_addresses();
 
 	if (config.verbose)
-		syntax->show("compile:eval-addr");
+		tree->show("compile:eval-addr");
 
 
 // compile functions into Opcode
-	compile_functions(opcode, opcode_size);
+	compile_functions(module->opcode, module->opcode_size);
 
 // link functions
 	link_functions();
-	link_virtual_functions_into_vtable(syntax->base_class);
-	link_virtual_functions_into_vtable(syntax->implicit_symbols.get());
+	link_virtual_functions_into_vtable(tree->base_class);
+	link_virtual_functions_into_vtable(tree->implicit_symbols.get());
 	if (config.compile_os)
-		link_virtual_functions_into_vtable(syntax->imported_symbols.get());
+		link_virtual_functions_into_vtable(tree->imported_symbols.get());
 
 
 
@@ -655,16 +679,16 @@ void Module::compile() {
 
 	// initialize global objects
 	if (!config.compile_os)
-		init_all_global_objects(syntax, syntax->base_class);
+		init_all_global_objects(tree, tree->base_class);
 
 	//_expand(Opcode,OpcodeSize);
 
-	if (show_compiler_stats) {
+	if (module->show_compiler_stats) {
 		msg_write("--------------------------------");
-		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size));
+		msg_write(format("Opcode: %db, Memory: %db", module->opcode_size, module->memory_size));
 	}
 	if (config.allow_output_stage("dasm"))
-		msg_write(Asm::disassemble(opcode, opcode_size));
+		msg_write(Asm::disassemble(module->opcode, module->opcode_size));
 
 
 #ifdef OS_WINDOWS
@@ -673,6 +697,5 @@ void Module::compile() {
 }
 
 };
-
 
 

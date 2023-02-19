@@ -1,12 +1,12 @@
 use tsunami
 
 class MLPPanel extends ConfigPanel
-	var override c: MidiLivePlayback*
-	var session: Session*
-	var synth_panel: ConfigPanel*
+	var override c: MidiLivePlayback&
+	var session: Session&
+	var synth_panel: shared[ConfigPanel]
 	func __init__(_session: Session, _mlp: MidiLivePlayback)
 		super.__init__(_mlp)
-		session = &_session
+		session := &!_session
 		from_source("Grid grid ''
 	Button select-synth 'select synthesizer...' expandx image=hui:open")
 		event("select-synth", on_select_synth)
@@ -15,29 +15,28 @@ class MLPPanel extends ConfigPanel
 		
 	
 	func mut on_select_synth()
-		if synth_panel
-			del synth_panel
+		del synth_panel
 
 		let f = func(name: string)
 			c.set_synth(name)
 			set_string("select-synth", name)
 		
 			synth_panel = c.synth.create_panel()
-			if synth_panel
-				embed(synth_panel, "grid", 0, 1)
-				synth_panel.update()
+			embed(synth_panel, "grid", 0, 1)
+			for p in synth_panel
+				p.update()
 		
 		ChooseModule(self, session, Module.Type.SYNTHESIZER, f, c.synth.name)
 
 class MidiLivePlayback extends TsunamiPlugin
-	var m_in, m_out: Module*
-	var synth: Synthesizer*
-	var chain: SignalChain*
+	var m_in, m_out: shared![Module]
+	var synth: shared![Synthesizer]
+	var chain: shared![SignalChain]
 	func override on_start()
 		chain = session.create_signal_chain("midi-live")
-		m_in = chain.add(Module.Type.STREAM, "MidiInput")
-		m_out = chain.add(Module.Type.STREAM, "AudioOutput")
-		synth = chain.add(Module.Type.SYNTHESIZER, "")
+		m_in = chain.add_basic(Module.Type.STREAM, "MidiInput")
+		m_out = chain.add_basic(Module.Type.STREAM, "AudioOutput")
+		synth = chain.add_basic_as_syn(Module.Type.SYNTHESIZER, "")
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		chain.start()
@@ -47,14 +46,14 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.reset_state()
 		chain.delete(synth)
 		
-		synth = chain.add(Module.Type.SYNTHESIZER, name)
+		synth = chain.add_basic_as[Synthesizer](Module.Type.SYNTHESIZER, name)
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		
 		chain.start()
-		
+
 	func override on_stop()
-		del chain
+		chain = nil
 	
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new MLPPanel(session, self)

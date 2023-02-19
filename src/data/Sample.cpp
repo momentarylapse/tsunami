@@ -80,7 +80,7 @@ void Sample::unref() {
 	notify(MESSAGE_UNREFERENCE);
 }
 
-SampleRef *Sample::create_ref() {
+xfer<SampleRef> Sample::create_ref() {
 	return new SampleRef(this);
 }
 

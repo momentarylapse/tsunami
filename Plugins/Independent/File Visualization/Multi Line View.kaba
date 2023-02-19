@@ -7,12 +7,12 @@ func smooth(t: float) -> float
 	return 1 - 2*(1-t)^2
 
 class MyDialog extends hui.Dialog
-	mlp: MultiLinePainter*
+	mlp: owned![MultiLinePainter]
 	config_visible = false
-	session: Session*
+	session: Session&
 	
-	mlv: MultiLineView*
-	config: MultiLineView.Config*
+	mlv: MultiLineView&
+	config: MultiLineView.Config&
 	use config
 	
 	y_offset_start = 0.0
@@ -23,12 +23,12 @@ class MyDialog extends hui.Dialog
 	line_y0: float[]
 	area: rect
 
-	func __init__(parent: hui.Window, _mlv: MultiLineView)
+	func __init__(parent: hui.Window*, _mlv: MultiLineView)
 		super.__init__("Multi Line View", 800, 600, parent, true)
 		
-		mlv = &_mlv
-		config = &mlv.config
-		session = mlv.session
+		mlv := &!_mlv
+		config := &!mlv.config
+		session := mlv.session
 		
 		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar
 	Grid ? '' vertical
@@ -57,7 +57,7 @@ class MyDialog extends hui.Dialog
 		add_button("", 0, 1, "config")
 		set_image("config", "hui:properties")
 		
-		for i=>t in weak(session.song.tracks)
+		for i=>t in session.song.tracks
 			if t.type == SignalType.MIDI
 				track_mode.add(true)
 				track_mode.add(true)
@@ -88,7 +88,6 @@ class MyDialog extends hui.Dialog
 	
 	func override __delete__()
 		session.view.signal_chain.unsubscribe(self)
-		del mlp
 	
 	func mut on_preview_change()
 	func mut on_preview_tick()
@@ -177,7 +176,7 @@ class MyDialog extends hui.Dialog
 	func override on_draw(p: Painter)
 		area = [0,p.width, 0,p.height]
 		var conf = dyn([])
-		for i=>t in weak(session.song.tracks)
+		for i=>t in session.song.tracks
 			if t.type != SignalType.MIDI
 				continue
 			if track_mode[i*2] and track_mode[i*2+1]
@@ -236,7 +235,7 @@ class MyDialog extends hui.Dialog
 		redraw("area")
 
 class MultiLineView extends TsunamiPlugin
-	dlg: MyDialog*
+	dlg: owned[MyDialog]
 	
 	class Config extends Module.Config
 		line_height = 50.0
@@ -260,11 +259,13 @@ class MultiLineView extends TsunamiPlugin
 
 	func override on_start()
 		dlg = new MyDialog(session.win, self)
-		dlg.show()
+		for d in dlg
+			d.show()
 		
 	func override on_stop()
-		del dlg
+		for d in dlg
+			d.destroy()
 	
 	func override on_config()
-		if dlg
-			dlg.on_config_changed()
+		for d in dlg
+			d.on_config_changed()

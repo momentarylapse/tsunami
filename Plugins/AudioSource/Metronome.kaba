@@ -5,6 +5,9 @@ use tsunami
 use MidiSource.Metronome
 
 
+func CreateMidiSourceX[T](session: Session, name: string) -> xfer[T]
+	return CreateMidiSource(session, name) as xfer[T]
+
 
 
 class Metronome extends AudioSource
@@ -18,44 +21,55 @@ class Metronome extends AudioSource
 			beats_per_measure = 4
 
 	var config: Config
-	var synth: Synthesizer* = nil
-	var source: MetronomeSource* = nil
+	var synth: shared[Synthesizer]
+	var source: shared[MetronomeSource]
 	
 	func mut create_stuff()
+		print("M create")
 		synth = CreateSynthesizer(session, "")
-		source = CreateMidiSource(session, "Metronome")
-		synth.plug_in(0, source, 0)
-	
-	func override __delete__()
-		if source
-			del source
-			del synth
+		print(p2s(weak(synth)))
+		source = CreateMidiSourceX[MetronomeSource](session, "Metronome") #weak(CreateMidiSource(session, "Metronome")) as MetronomeSource*
+		print(p2s(weak(source)))
+		for s in synth
+			print("SYNTH PLUG")
+			s.plug_in(0, source, 0)
+			print("ok")
 
 	func override read(out buf: AudioBuffer) -> int
-		return synth.port_out[0].read_audio(buf)
+		for s in synth
+			return s.port_out[0].read_audio(buf)
+		return 0
 		
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		#return source.create_panel()
 		# how to deal with configuration/string exports...
 		
 		return new MetronomePanel(self)
 	
 	func override on_config()
-		if !source
+		print("M on config")
+		if not weak(source)
 			create_stuff()
-		source.config.volume = config.volume
-		source.set_beats(config.beats_per_measure, 1)
-		source.set_bpm(config.beats_per_minute)
+		print("AAA")
+		print(p2s(weak(source)))
+		for s in source
+			print("BBB")
+			s.config.volume = config.volume
+			s.set_beats(config.beats_per_measure, 1)
+			s.set_bpm(config.beats_per_minute)
+			print("/BBB")
 	
 	func override reset_state()
-		if not source
+		if not weak(source)
 			create_stuff()
-		synth.reset_state()
-		source.reset_state()
+		for s in synth
+			s.reset_state()
+		for s in source
+			s.reset_state()
 
 	
 class MetronomePanel extends ConfigPanel
-	var override c: Metronome*
+	var override c: Metronome&
 	func override __init__(_m: Module)
 		add_grid("", 0, 0, "table2")
 		set_target("table2")

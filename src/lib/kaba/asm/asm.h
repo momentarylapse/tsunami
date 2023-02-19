@@ -10,7 +10,8 @@ enum class InstructionSet {
 	NATIVE = -1,
 	X86,
 	AMD64,
-	ARM
+	ARM32,
+	ARM64,
 };
 
 struct InstructionSetData {

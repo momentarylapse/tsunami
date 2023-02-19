@@ -30,12 +30,12 @@ CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_cc) {
 
 void CaptureConsoleMode::start_sync_before() {
 	for (auto &d: view->mode_capture->data)
-		d.start_sync_before(view->output_stream);
+		d.start_sync_before(view->output_stream.get());
 }
 
 void CaptureConsoleMode::sync() {
 	for (auto &d: view->mode_capture->data)
-		d.sync(view->output_stream);
+		d.sync(view->output_stream.get());
 }
 
 

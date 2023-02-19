@@ -60,7 +60,7 @@ public:
 
     const Class *get_dynamic_type(const VirtualBase *p) const;
 
-    static Context *create();
+    static xfer<Context> create();
 };
 
 extern Context *default_context;

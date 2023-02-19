@@ -30,8 +30,6 @@ class VolumeChecker extends TsunamiPlugin
 
 		var cancelled = p.is_cancelled()
 
-		del p
-		del renderer
 		return !cancelled
 		
 	func mut ask()

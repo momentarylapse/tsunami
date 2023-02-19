@@ -38,7 +38,7 @@ func test()
 
 class Folding extends AudioEffect
 	class Config extends Module.Config
-		var sample: SampleRef shared
+		var sample: shared[SampleRef]
 		func override reset()
 			sample = nil
 
@@ -50,8 +50,8 @@ class Folding extends AudioEffect
 	var buf_overlap: AudioBuffer
 	
 	func override on_config()
-		if weak(config.sample)
-			h = config.sample.origin.buf.c[0]
+		for s in config.sample
+			h = s.origin.buf.c[0]
 		else
 			h = [1.0]
 		reset_state()

@@ -180,13 +180,13 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 			device = chain->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 
 		// create modules
-		input = (AudioInput*)chain->add(ModuleCategory::STREAM, "AudioInput");
+		input = chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioInput").get();
 		//c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-		channel_selector = (AudioChannelSelector*)chain->add(ModuleCategory::PLUMBING, "AudioChannelSelector");
+		channel_selector = chain->addx<AudioChannelSelector>(ModuleCategory::PLUMBING, "AudioChannelSelector").get();
 		peak_meter = channel_selector->peak_meter.get();
-		accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator");
-		backup = chain->add(ModuleCategory::PLUMBING, "AudioBackup");
-		auto *sucker = (AudioSucker*)chain->add(ModuleCategory::PLUMBING, "AudioSucker");
+		accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator").get();
+		backup = chain->add(ModuleCategory::PLUMBING, "AudioBackup").get();
+		auto sucker = chain->addx<AudioSucker>(ModuleCategory::PLUMBING, "AudioSucker").get();
 
 		// configure
 		audio_input()->set_device(device);
@@ -211,13 +211,13 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 			device = chain->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 
 		// create modules
-		input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-		accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
+		input = (MidiInput*)chain->addx<MidiInput>(ModuleCategory::STREAM, "MidiInput").get();
+		accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator").get();
 		//backup = chain->add(ModuleCategory::PLUMBING, "MidiBackup");
-		synth = (Synthesizer*)chain->_add(t->synth->copy());
-		peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+		synth = (Synthesizer*)chain->_add(t->synth->copy()).get();
+		peak_meter = chain->addx<PeakMeter>(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter").get();
 		//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
-		auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput");
+		auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput").get();
 
 		// configure
 		midi_input()->set_device(device);

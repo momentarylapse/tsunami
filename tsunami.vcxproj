@@ -330,7 +330,7 @@
     <ClCompile Include="src\lib\kaba\compiler\BackendARM.cpp" />
     <ClCompile Include="src\lib\kaba\compiler\BackendX86.cpp" />
     <ClCompile Include="src\lib\kaba\compiler\CommandList.cpp" />
-    <ClCompile Include="src\lib\kaba\compiler\compiler.cpp" />
+    <ClCompile Include="src\lib\kaba\compiler\Compiler.cpp" />
     <ClCompile Include="src\lib\kaba\compiler\mapper.cpp" />
     <ClCompile Include="src\lib\kaba\compiler\serializer.cpp" />
     <ClCompile Include="src\lib\kaba\compiler\SerializerX.cpp" />
@@ -372,6 +372,8 @@
     <ClCompile Include="src\lib\kaba\parser\macros.cpp" />
     <ClCompile Include="src\lib\kaba\parser\Parser.cpp" />
     <ClCompile Include="src\lib\kaba\parser\template.cpp" />
+    <ClCompile Include="src\lib\kaba\parser\Transformer.cpp" />
+    <ClCompile Include="src\lib\kaba\parser\type_matching.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Block.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Class.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Constant.cpp" />
@@ -811,6 +813,7 @@
     <ClInclude Include="src\lib\kaba\compiler\BackendARM.h" />
     <ClInclude Include="src\lib\kaba\compiler\BackendX86.h" />
     <ClInclude Include="src\lib\kaba\compiler\CommandList.h" />
+    <ClInclude Include="src\lib\kaba\compiler\Compiler.h" />
     <ClInclude Include="src\lib\kaba\compiler\serializer.h" />
     <ClInclude Include="src\lib\kaba\compiler\SerializerX.h" />
     <ClInclude Include="src\lib\kaba\compiler\SerialNode.h" />
@@ -824,11 +827,14 @@
     <ClInclude Include="src\lib\kaba\lib\lib.h" />
     <ClInclude Include="src\lib\kaba\lib\list.h" />
     <ClInclude Include="src\lib\kaba\lib\operators.h" />
+    <ClInclude Include="src\lib\kaba\lib\optional.h" />
+    <ClInclude Include="src\lib\kaba\lib\shared.h" />
     <ClInclude Include="src\lib\kaba\parser\abstract.h" />
     <ClInclude Include="src\lib\kaba\parser\Concretifier.h" />
     <ClInclude Include="src\lib\kaba\parser\lexical.h" />
     <ClInclude Include="src\lib\kaba\parser\Parser.h" />
     <ClInclude Include="src\lib\kaba\parser\template.h" />
+    <ClInclude Include="src\lib\kaba\parser\Transformer.h" />
     <ClInclude Include="src\lib\kaba\syntax\Block.h" />
     <ClInclude Include="src\lib\kaba\syntax\Class.h" />
     <ClInclude Include="src\lib\kaba\syntax\Constant.h" />

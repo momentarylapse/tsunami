@@ -36,15 +36,15 @@ class UnisonConfig extends Module.Config
 		type = SynthType.SINE
 
 class UnisonPanel extends ConfigPanel
-	var fc: UnisonConfig*
+	var fc: UnisonConfig&
 	
 	var width, height: float
 	
 	var moving, hover: int
 	
-	var override c: UnisonSynthesizer*
+	var override c: UnisonSynthesizer&
 	func override __init__(_s: Module)
-		fc = &c.config
+		fc := &!c.config
 		
 		from_source("
 Grid ? ''
@@ -232,7 +232,7 @@ class OscillatorState
 
 class UnisonRenderer extends PitchRenderer
 	var osc: OscillatorState
-	var override synth: UnisonSynthesizer*
+	var override synth: UnisonSynthesizer&
 
 	func override on_end()
 		osc.env.end()
@@ -242,13 +242,13 @@ class UnisonRenderer extends PitchRenderer
 		var c = &synth.config
 
 	func override on_config()
-		var c = &synth.config
+		var c = &!synth.config
 		osc.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
 		osc.env.set2(c.initial, c.peak)
 
 	func override render(out buf: AudioBuffer) -> bool
 	
-		var c = &synth.config
+		var c = &!synth.config
 		var vv = [for k in 0:c.num_voices c.blend]
 		vv[c.num_voices/2] = 1.0
 		
@@ -283,10 +283,10 @@ class UnisonRenderer extends PitchRenderer
 class UnisonSynthesizer extends Synthesizer
 	var config: UnisonConfig
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new UnisonPanel(self)
 
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new UnisonRenderer(self, pitch)
 
 			

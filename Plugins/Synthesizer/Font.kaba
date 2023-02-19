@@ -4,11 +4,12 @@ use tsunami
 use helper.tone
 
 # a single file
-class MidiFont
+struct MidiFont
 	var name: string
 	var song: Song* = nil
-	var sub: Session*
+	var sub: shared[Session]
 	
+	func __init__()
 	func __init__(_name: string)
 		name = _name
 	
@@ -16,38 +17,43 @@ class MidiFont
 		if song
 			return
 		sub = session.create_child()
-		song = new Song(sub, DEFAULT_SAMPLE_RATE)
-		sub.song = song
-		sub.storage.load(song, hui.app_directory_static | "Midi Fonts/{{name}}.nami")
+		for s in sub
+			s.song = new Song(s, DEFAULT_SAMPLE_RATE)
+			song = weak(s.song)
+			s.storage.load(song, hui.app_directory_static | "Midi Fonts/{{name}}.nami")
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)
 		var ii: string[]
-		for t in song.tracks
-			if t.type == SignalType.MIDI
-				ii.add(t.name)
+		for s in song
+			for _t in s.tracks
+				for t in _t
+					if t.type == SignalType.MIDI
+						ii.add(t.name)
 		return ii
 	
-	func mut get_synth(session: Session, name: string) -> Synthesizer*
+	func mut get_synth(session: Session, name: string) -> xfer[Synthesizer]
 		load(session)
-		if not song
-			return nil
-		# match by name
-		for t in song.tracks
-			if t.type == SignalType.MIDI and t.name == name
-				var m = t.synth.copy()
-				var s: Synthesizer* = m
-				return s #m as Synthesizer*
-		# fist midi track...
-		for t in song.tracks
-			if t.type == SignalType.MIDI
-				var m = t.synth.copy()
-				var s: Synthesizer* = m
-				return s #m as Synthesizer*
-		return nil
+#		for _s in song
+#			# match by name
+#			for _t in _s.tracks
+#				for t in _t
+#					if t.type == SignalType.MIDI and t.name == name
+#						var m = t.synth.copy()
+#						var s: Synthesizer* = m
+#						return s #m as Synthesizer*
+#			# fist midi track...
+#			for _t in _s.tracks
+#				for t in _t
+#					if t.type == SignalType.MIDI
+#						var m = t.synth.copy()
+#						var s: Synthesizer* = m
+#						return s #m as Synthesizer*
+		return new Synthesizer()
 
-class FontList
-	var fonts: MidiFont*[]
+class FontList as @noauto
+	var fonts: MidiFont[]
+	var dummy: MidiFont
 	
 	func find(name: string) -> int
 		for i=>f in fonts
@@ -74,24 +80,19 @@ class FontList
 			var name = str(e)[:-5]
 			if find(name) >= 0
 				continue
-			fonts.add(new MidiFont(name))
+			fonts.add(MidiFont(name))
 	
-	func mut get(session: Session, name: string) -> MidiFont*
+	func mut get(session: Session, name: string) -> MidiFont&
 		update()
 		var n = find(name)
 		if n < 0
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
-			return nil
-		var f = fonts[n]
-		return f
-		#f.load(session)
-		#return f.song
+			return &!dummy
+		return &!fonts[n]
 	
-	func mut get_synth(session: Session, name: string, instrument: string) -> Synthesizer*
+	func mut get_synth(session: Session, name: string, instrument: string) -> xfer[Synthesizer]
 		var font = get(session, name)
-		if not font
-			return nil
 		return font.get_synth(session, instrument)
 
 var font_list: FontList
@@ -106,38 +107,30 @@ class FontConfig extends Module.Config
 
 class FontSynthesizer extends Synthesizer
 	var config: FontConfig
-	var synth: Synthesizer* = nil
-	func override __delete__()
-		if synth
-			del synth
+	var synth: owned[Synthesizer]
 	func override on_config()
-		if synth
-			del synth
-			synth = nil
-
 		synth = font_list.get_synth(session, config.name, config.instrument)
-		if synth
-			synth.set_sample_rate(sample_rate)
-			synth.on_config()
+		for s in synth
+			s.set_sample_rate(sample_rate)
+			s.on_config()
 	func override render(out buf: AudioBuffer)
-		if !synth
-			return
-		synth.events = events
-		synth.render(buf)
+		for s in synth
+			s.events = events
+			s.render(buf)
 	
 	func override reset_state()
-		if synth
-			synth.reset_state()
+		for s in synth
+			s.reset_state()
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new FontPanel(self)
 
 class FontPanel extends ConfigPanel
-	var sc: FontConfig*
-	var override c: FontSynthesizer*
+	var sc: FontConfig&
+	var override c: FontSynthesizer&
 	func override __init__(_s: Module)
 		#super.__init__(_s)
-		sc = &c.config
+		sc := &!c.config
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
 		add_label("Set", 0 ,0, "")

@@ -58,13 +58,13 @@ class Biquad extends AudioEffect
 	func override process(out buf: AudioBuffer)
 		filter.apply(buf)
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new BiquadPanel(self)
 
 
 class BiquadGrid extends Grid
-	var c: Biquad.Config*
-	var cp: BiquadPanel*
+	var c: Biquad.Config&
+	var cp: BiquadPanel&
 	var sample_rate: float
 	var spectrum: SpectrumCurve
 	
@@ -97,7 +97,7 @@ class BiquadGrid extends Grid
 
 class BiquadPanel extends ConfigPanel
 	var grid: BiquadGrid
-	var override c: Biquad*
+	var override c: Biquad&
 	func override __init__(_biquad: Module)
 		super.__init__(_biquad)
 		from_source("
@@ -118,8 +118,8 @@ Grid ? '' vertical
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
-		grid.cp = &self
-		grid.c = &c.config
+		grid.cp := &!self
+		grid.c := &!c.config
 		grid.sample_rate = c.session.sample_rate()
 		
 		c.grid = &grid
@@ -148,10 +148,10 @@ Grid ? '' vertical
 		c.changed()
 
 class PresetDialog extends Dialog
-	var bp: BiquadPanel*
+	var bp: BiquadPanel&
 	func __init__(_p: BiquadPanel)
 		super.__init__("preset", 400, 100, _p.win, false)
-		bp = &_p
+		bp := &!_p
 		from_source("
 Grid ? '' vertical
 	Grid ? ''

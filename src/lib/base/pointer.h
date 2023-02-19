@@ -22,6 +22,10 @@
 #endif
 
 
+template<class T>
+using xfer = T*;
+
+
 template <class T>
 class owned {
 	T *_p = nullptr;
@@ -37,24 +41,24 @@ public:
 		o._p = nullptr;
 	}
 	~owned() {
-		release();
+		clear();
 	}
 
 	T *get() const {
 		return _p;
 	}
-	void set(T *p) {
+	void set(xfer<T> p) {
 		if (p == _p)
 			return;
-		release();
+		clear();
 		_p = p;
 	}
-	void release() {
+	void clear() {
 		if (_p)
 			delete _p;
 		forget();
 	}
-	T *check_out() {
+	xfer<T> give() {
 		T *r = _p;
 		forget();
 		return r;
@@ -74,7 +78,7 @@ public:
 	const T *operator ->() const {
 		return _p;
 	}
-	void operator=(T *o) {
+	void operator=(xfer<T> o) {
 		set(o);
 	}
 	void operator=(owned<T> &&o) {
@@ -82,7 +86,7 @@ public:
 		o.forget();
 	}
 	void operator=(std::nullptr_t o) {
-		release();
+		clear();
 	}
 	bool operator==(const T *o) const {
 		return _p == o;
@@ -198,7 +202,7 @@ public:
 	}
 	~shared() {
 		pdb(format("-shared %s", p2s(_p)));
-		release();
+		clear();
 	}
 
 	T *get() const {
@@ -211,13 +215,13 @@ public:
 		if (p) {
 			// keep p, even if we are a parent to p!
 			auto p_next = (T*)p->_pointer_ref();
-			release();
+			clear();
 			_p = p_next;
 		} else {
-			release();
+			clear();
 		}
 	}
-	void release() {
+	void clear() {
 		if (_p) {
 			_p->_pointer_unref();
 			if (!_p->_has_pointer_refs()) {
@@ -226,6 +230,10 @@ public:
 			}
 		}
 		_p = nullptr;
+	}
+	template<class X>
+	shared<X> to() const {
+		return (X*)_p;
 	}
 
 
@@ -248,11 +256,6 @@ public:
 	void operator=(T *o) {
 		pdb(format("shared/p = %s", p2s(o)));
 		set(o);
-	}
-	void operator=(owned<T> &&o) {
-		pdb(format("shared/o = %s", p2s(o._p)));
-		set(o._p);
-		o.forget();
 	}
 	/*bool operator==(const shared<T> o) const {
 		return _p == o._p;

@@ -16,10 +16,10 @@ class Menu;
 
 class MenuItemSubmenu : public BasicMenuItem {
 public:
-	MenuItemSubmenu(const string &title, Menu *menu, const string &id);
+	MenuItemSubmenu(const string &title, xfer<Menu> menu, const string &id);
 	virtual ~MenuItemSubmenu();
 
-	Menu *sub_menu;
+	owned<Menu> sub_menu;
 };
 
 };

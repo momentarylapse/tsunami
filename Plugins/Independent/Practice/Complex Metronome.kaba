@@ -39,9 +39,9 @@ class BlurredDot
 			p.draw_circle(pos, r)
 
 class MetronomePanel extends ConfigPanel
-	var override c: Metronome*
-	var source: BeatSource*
-	var chain: SignalChain*
+	var override c: Metronome&
+	var source: shared![BeatSource]
+	var chain: shared![SignalChain]
 	#Metronome* metro
 	var fraction_prev: float
 	
@@ -49,12 +49,12 @@ class MetronomePanel extends ConfigPanel
 	var allow_blink_background: bool
 	var allow_blink_number: bool
 	var mode: AnimationMode
-	var popup_menu: Menu*
+	var popup_menu: owned![Menu]
 	var sr_id = -1
 	
 	var dot: BlurredDot
 	
-	func __init__(session: Session, _source: BeatSource, _chain: SignalChain, _metro: Metronome)
+	func __init__(session: Session, _source: shared![BeatSource], _chain: shared![SignalChain], _metro: Metronome)
 		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
@@ -62,8 +62,8 @@ Grid ? '' vertical
 	Expander config 'Beats'")
 
 		#metro = &_metro
-		source = &_source
-		chain = &_chain
+		source = _source
+		chain = _chain
 		fraction_prev = 0
 		
 		embed(source.create_panel(), "config", 0, 0)
@@ -73,14 +73,14 @@ Grid ? '' vertical
 		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
-		popup_menu = new Menu(self)
+		popup_menu = new Menu(&self)
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		var sub_mode = new Menu(self)
+		var sub_mode = new Menu(&self)
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
-		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
+		popup_menu.add_sub_menu("Animation", "sub-menu-mode", give(sub_mode))
 	
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:left-button-down", on_area_left_button_down)
@@ -101,7 +101,6 @@ Grid ? '' vertical
 	
 	func override __delete__()
 		hui.cancel_runner(sr_id)
-		del popup_menu
 	
 	func mut on_draw(p: Painter)
 		var w: float = p.width
@@ -169,7 +168,7 @@ Grid ? '' vertical
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
 		var paused = false
-		if chain
+		if weak(chain)
 			paused = not chain.is_active()
 		if paused
 			p.set_font_size(fs)
@@ -187,7 +186,7 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	func mut on_area_left_button_down()
-		if chain
+		if weak(chain)
 			if chain.is_active()
 				chain.stop()
 			else
@@ -228,16 +227,16 @@ Grid ? '' vertical
 #		#show_control()
 
 class Metronome extends TsunamiPlugin
-	var chain: SignalChain*
-	var source: BeatSource*
+	var chain: shared![SignalChain]
+	var source: shared![BeatSource]
 	
 	func override on_start()
 		chain = session.create_signal_chain("metronome")
-		source = chain._add(CreateBeatSource(session, "Complex Metronome"))
+		source = chain.add_basic_as[BeatSource](Module.Type.BEAT_SOURCE, "Complex Metronome")
 		
-		var beat_midifier = chain.add(Module.Type.PLUMBING, "BeatMidifier")
-		var synth = chain.add(Module.Type.SYNTHESIZER, "")
-		var output = chain.add(Module.Type.STREAM, "AudioOutput")
+		var beat_midifier = chain.add_basic(Module.Type.PLUMBING, "BeatMidifier")
+		var synth = chain.add_basic(Module.Type.SYNTHESIZER, "")
+		var output = chain.add_basic(Module.Type.STREAM, "AudioOutput")
 		
 		chain.connect(source, 0, beat_midifier, 0)
 		chain.connect(beat_midifier, 0, synth, 0)
@@ -247,8 +246,8 @@ class Metronome extends TsunamiPlugin
 		#chain.set_update_dt(UPDATE_DT)
 		chain.start()
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new MetronomePanel(session, source, chain, self)
 		
 	func override on_stop()
-		del chain
+		chain = nil

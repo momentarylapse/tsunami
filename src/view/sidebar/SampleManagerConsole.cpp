@@ -16,6 +16,7 @@
 #include "../../data/Song.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Sample.h"
+#include "../../data/SampleRef.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../module/audio/BufferStreamer.h"
@@ -345,13 +346,13 @@ void SampleManagerConsole::on_preview() {
 	if (preview.sample->type == SignalType::AUDIO) {
 		preview.renderer = new BufferStreamer(preview.sample->buf);
 		preview.chain->_add(preview.renderer);
-		preview.stream = (AudioOutput*)preview.chain->add(ModuleCategory::STREAM, "AudioOutput");
+		preview.stream = preview.chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput").get();
 		preview.chain->connect(preview.renderer, 0, preview.stream, 0);
 	} else { // MIDI
 		preview.midi_streamer = new MidiEventStreamer(midi_notes_to_events(preview.sample->midi));
 		preview.chain->_add(preview.midi_streamer);
-		auto *synth = preview.chain->add(ModuleCategory::SYNTHESIZER, "");
-		preview.stream = (AudioOutput*)preview.chain->add(ModuleCategory::STREAM, "AudioOutput");
+		auto synth = preview.chain->add(ModuleCategory::SYNTHESIZER, "").get();
+		preview.stream = preview.chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput").get();
 		preview.chain->connect(preview.midi_streamer, 0, synth, 0);
 		preview.chain->connect(synth, 0, preview.stream, 0);
 	}

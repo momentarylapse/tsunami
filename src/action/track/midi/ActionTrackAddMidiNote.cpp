@@ -10,7 +10,7 @@
 #include "../../../data/Track.h"
 
 
-ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n) {
+ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, shared<MidiNote> n) {
 	layer = l;
 	note = n;
 

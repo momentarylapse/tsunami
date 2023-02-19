@@ -51,10 +51,18 @@ string kind2str(NodeKind kind) {
 		return "abstract call";
 	if (kind == NodeKind::ABSTRACT_TYPE_SHARED)
 		return "shared";
+	if (kind == NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL)
+		return "shared!";
 	if (kind == NodeKind::ABSTRACT_TYPE_OWNED)
 		return "owned";
+	if (kind == NodeKind::ABSTRACT_TYPE_OWNED_NOT_NULL)
+		return "owned!";
 	if (kind == NodeKind::ABSTRACT_TYPE_POINTER)
 		return "pointer";
+	if (kind == NodeKind::ABSTRACT_TYPE_XFER)
+		return "xfer";
+	if (kind == NodeKind::ABSTRACT_TYPE_REFERENCE)
+		return "reference";
 	if (kind == NodeKind::ABSTRACT_TYPE_LIST)
 		return "list";
 	if (kind == NodeKind::ABSTRACT_TYPE_DICT)
@@ -75,8 +83,10 @@ string kind2str(NodeKind kind) {
 		return "dynamic array element";
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return "pointer as array element";
-	if (kind == NodeKind::REFERENCE)
-		return "address operator";
+	if (kind == NodeKind::REFERENCE_RAW)
+		return "raw address operator";
+	if (kind == NodeKind::REFERENCE_NEW)
+		return "reference operator";
 	if (kind == NodeKind::DEREFERENCE)
 		return "dereferencing";
 	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
@@ -174,7 +184,9 @@ string Node::signature(const Class *ns) const {
 		return t;
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return t;
-	if (kind == NodeKind::REFERENCE)
+	if (kind == NodeKind::REFERENCE_RAW)
+		return t;
+	if (kind == NodeKind::REFERENCE_NEW)
 		return t;
 	if (kind == NodeKind::DEREFERENCE)
 		return t;
@@ -185,13 +197,13 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::REGISTER)
 		return Asm::get_reg_name((Asm::RegID)link_no) + t;
 	if (kind == NodeKind::ADDRESS)
-		return i2h(link_no, config.pointer_size) + t;
+		return i2h(link_no, config.target.pointer_size) + t;
 	if (kind == NodeKind::MEMORY)
-		return i2h(link_no, config.pointer_size) + t;
+		return i2h(link_no, config.target.pointer_size) + t;
 	if (kind == NodeKind::LOCAL_ADDRESS)
-		return i2h(link_no, config.pointer_size) + t;
+		return i2h(link_no, config.target.pointer_size) + t;
 	if (kind == NodeKind::LOCAL_MEMORY)
-		return i2h(link_no, config.pointer_size) + t;
+		return i2h(link_no, config.target.pointer_size) + t;
 	return i2s(link_no) + t;
 }
 
@@ -356,15 +368,26 @@ shared<Node> Node::shallow_copy() const {
 	return r;
 }
 
-shared<Node> Node::ref(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, false, token_id);
+shared<Node> Node::ref_new(const Class *t) const {
+	shared<Node> c = new Node(NodeKind::REFERENCE_NEW, 0, t, false, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
-shared<Node> Node::ref(SyntaxTree *tree) const {
-	return ref(tree->get_pointer(type));
+shared<Node> Node::ref_new(SyntaxTree *tree) const {
+	return ref_raw(tree->request_implicit_class_reference(type, token_id));
+}
+
+shared<Node> Node::ref_raw(const Class *t) const {
+	shared<Node> c = new Node(NodeKind::REFERENCE_RAW, 0, t, false, token_id);
+	c->set_num_params(1);
+	c->set_param(0, const_cast<Node*>(this));
+	return c;
+}
+
+shared<Node> Node::ref_raw(SyntaxTree *tree) const {
+	return ref_new(tree->get_pointer(type, token_id));
 }
 
 shared<Node> Node::deref(const Class *override_type) const {
@@ -377,7 +400,7 @@ shared<Node> Node::deref(const Class *override_type) const {
 }
 
 shared<Node> Node::shift(int64 shift, const Class *type, int token_id) const {
-	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const, token_id);
+	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const, token_id >= 0 ? token_id : this->token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -388,6 +411,14 @@ shared<Node> Node::deref_shift(int64 shift, const Class *type, int token_id) con
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
+}
+
+shared<Node> Node::change_type(const Class *type, int token_id) const {
+	return shift(0, type, token_id);
+	// FIXME: simply changing the type causes bugs (due to temp vars/constructors etc missing)
+	/*auto c = shallow_copy();
+	c->type = type;
+	return c;*/
 }
 
 
@@ -485,7 +516,7 @@ shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared
 	if (!override_type)
 		override_type = op->return_type;
 	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, true, token_id);
-	if (op->abstract->param_flags == 3) {
+	if (op->abstract->is_binary()) {
 		cmd->set_num_params(2); // binary
 		cmd->set_param(0, p1);
 		cmd->set_param(1, p2);

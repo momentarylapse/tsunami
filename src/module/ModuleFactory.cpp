@@ -32,6 +32,7 @@
 #include "../plugins/PluginManager.h"
 #include "../Session.h"
 
+#include "../lib/os/msg.h"
 
 Module* ModuleFactory::_create_special(Session* session, ModuleCategory category, const string& _class) {
 	if (category == ModuleCategory::PLUMBING) {
@@ -85,7 +86,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 	return nullptr;
 }
 
-Module* ModuleFactory::_create_dummy(ModuleCategory type) {
+xfer<Module> ModuleFactory::_create_dummy(ModuleCategory type) {
 	if (type == ModuleCategory::SYNTHESIZER)
 		return new DummySynthesizer;
 	if (type == ModuleCategory::AUDIO_SOURCE)
@@ -98,7 +99,7 @@ Module* ModuleFactory::_create_dummy(ModuleCategory type) {
 		return new AudioEffect;
 	if (type == ModuleCategory::MIDI_EFFECT)
 		return new MidiEffect;
-	return nullptr;
+	return new Module(type, "<dummy>");
 }
 
 string ModuleFactory::base_class(ModuleCategory type) {
@@ -119,7 +120,7 @@ void _extract_subtype_and_config(ModuleCategory type, const string &s, string &s
 
 // can be pre-configured with sub_type="ModuleName:config..."
 // TODO return shared<Module>
-Module* ModuleFactory::create(Session* session, ModuleCategory type, const string& _sub_type) {
+xfer<Module> ModuleFactory::create(Session* session, ModuleCategory type, const string& _sub_type) {
 	string sub_type, config;
 	_extract_subtype_and_config(type, _sub_type, sub_type, config);
 
@@ -140,15 +141,32 @@ Module* ModuleFactory::create(Session* session, ModuleCategory type, const strin
 	if (!m)
 		m = _create_dummy(type);
 
-	if (m)
-		m->set_session_etc(session, sub_type);
+	m->set_session_etc(session, sub_type);
 
 	// type specific initialization
-	if (m and type == ModuleCategory::SYNTHESIZER)
+	if (type == ModuleCategory::SYNTHESIZER)
 		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 	
 	if (config != "")
 		m->config_from_string(Module::VERSION_LATEST, config);
+
+	return m;
+}
+
+xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class *type) {
+	msg_error("CREATE MODULE");
+	msg_write(type->long_name());
+	msg_write(type->owner->module->filename.basename_no_ext());
+
+	auto m = reinterpret_cast<Module*>(type->create_instance());
+	if (!m)
+		m = new Module(ModuleCategory::OTHER, "");
+
+	m->set_session_etc(session, type->owner->module->filename.basename_no_ext());
+
+	// type specific initialization
+	if (m->module_category == ModuleCategory::SYNTHESIZER)
+		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 
 	return m;
 }

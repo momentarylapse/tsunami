@@ -503,7 +503,7 @@ void BackendARM::correct_implement_commands() {
 
 int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class *type) {
 	if (!type)
-		type = module->syntax->get_pointer(p.type, -1);
+		type = module->tree->get_pointer(p.type, -1);
 
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4);
 
@@ -661,7 +661,7 @@ void BackendARM::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 	serializer->call_used = true;
 	int push_size = fc_begin(params, ret, f->is_static());
 
-	if ((f->owner() == module->syntax) and (!f->is_extern())) {
+	if ((f->owner() == module->tree) and (!f->is_extern())) {
 		insert_cmd(Asm::InstID::CALL, param_label(TypePointer, f->_label));
 	} else {
 		if (f->address == 0)
@@ -776,7 +776,7 @@ int BackendARM::add_global_ref(void *p) {
 void BackendARM::do_mapping() {
 
 	map_remaining_temp_vars_to_stack();
-	stack_max_size = mem_align(stack_max_size, config.stack_frame_align);
+	stack_max_size = mem_align(stack_max_size, config.target.stack_frame_align);
 
 	serializer->cmd_list_out("map:e", "post var reg");
 }
@@ -829,17 +829,13 @@ Asm::InstructionParam BackendARM::prepare_param(Asm::InstID inst, SerialNodePara
 			do_error("prepare_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
-			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
-		} else {
-			return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
-		}
+		return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
 		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
 		//	param_size = -1; // lea doesn't need size...
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
-		if ((imm_allowed) and (p.type->is_pointer())) {
+		if ((imm_allowed) and (p.type->is_pointer_raw())) {
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
 		} else if ((p.type->size <= 4) and (imm_allowed)) {
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);

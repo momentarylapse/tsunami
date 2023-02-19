@@ -6,7 +6,7 @@ use tsunami
 const NUM_SAMPLES = 4096
 
 class TriggerPanel extends ConfigPanel
-	var override c: Trigger*
+	var override c: Trigger&
 	
 	func override __init__(_osci: Module)
 		from_source("
@@ -103,6 +103,6 @@ class Trigger extends AudioVisualizer
 			else
 				blocked --
 		
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new TriggerPanel(self)
 

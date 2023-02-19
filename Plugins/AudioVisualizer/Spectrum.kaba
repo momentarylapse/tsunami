@@ -64,7 +64,7 @@ class SpecGrid extends Grid
 		draw_curve_b(c, pl, true, color.BLUE)
 
 class SpectrumPanel extends ConfigPanel
-	var override c: Spectrum*
+	var override c: Spectrum&
 	var grid: SpecGrid
 	
 	func override __init__(_sp: Module)
@@ -132,7 +132,7 @@ class Spectrum extends AudioVisualizer
 		do(buf)
 		flip()
 		
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new SpectrumPanel(self)
 
 

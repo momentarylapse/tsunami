@@ -43,8 +43,6 @@ enum class StencilOp;
 void avi_close(int texture);
 
 void _cdecl init();
-void kill_device_objects();
-void reincarnate_device_objects();
 void kill();
 void flush();
 

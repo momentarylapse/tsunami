@@ -42,7 +42,7 @@ public:
 
 	void set_win(TsunamiWindow *win);
 
-	Session *create_child();
+	xfer<Session> create_child();
 
 	void prepare_end();
 
@@ -55,10 +55,10 @@ public:
 	bool auto_delete;
 
 	shared_array<SignalChain> all_signal_chains;
-	void add_signal_chain(SignalChain *chain);
-	SignalChain* create_signal_chain(const string &name);
-	SignalChain* create_signal_chain_system(const string &name);
-	SignalChain* load_signal_chain(const Path &filename);
+	void add_signal_chain(xfer<SignalChain> chain);
+	shared<SignalChain> create_signal_chain(const string &name);
+	shared<SignalChain> create_signal_chain_system(const string &name);
+	shared<SignalChain> load_signal_chain(const Path &filename);
 	void remove_signal_chain(SignalChain *chain);
 
 	shared_array<TsunamiPlugin> plugins;
@@ -66,7 +66,7 @@ public:
 	bool die_on_plugin_stop;
 
 
-	TsunamiPlugin *execute_tsunami_plugin(const string &name, const Array<string> &args = {});
+	shared<TsunamiPlugin> execute_tsunami_plugin(const string &name, const Array<string> &args = {});
 	void on_plugin_stop_request(TsunamiPlugin *p);
 
 	int sample_rate();

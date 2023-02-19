@@ -45,10 +45,10 @@ public:
 };
 
 void TestStreams::test_output_stream() {
-	auto *chain = new SignalChain(Session::GLOBAL, "test");
-	auto *source = chain->_add(new DebugAudioSource);
-	auto *stream = chain->add(ModuleCategory::STREAM, "AudioOutput");
-	chain->connect(source, 0, stream, 0);
+	auto chain = ownify(new SignalChain(Session::GLOBAL, "test"));
+	auto source = chain->_add(new DebugAudioSource);
+	auto stream = chain->add(ModuleCategory::STREAM, "AudioOutput");
+	chain->connect(source.get(), 0, stream.get(), 0);
 
 	event("play");
 	chain->start();
@@ -61,22 +61,20 @@ void TestStreams::test_output_stream() {
 	sleep(1);
 	event("stop");
 	chain->stop();
-	delete chain;
 
 }
 
 void TestStreams::test_input_stream() {
-	auto *chain = new SignalChain(Session::GLOBAL, "test");
-	auto *a = chain->add(ModuleCategory::STREAM, "AudioInput");
-	auto *b = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
-	chain->connect(a, 0, b, 0);
+	auto chain = ownify(new SignalChain(Session::GLOBAL, "test"));
+	auto a = chain->add(ModuleCategory::STREAM, "AudioInput");
+	auto b = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
+	chain->connect(a.get(), 0, b.get(), 0);
 
 	event("capture");
 	chain->start();
 	sleep(2);
 	event("stop");
 	chain->stop();
-	delete chain;
 
 }
 

@@ -334,7 +334,7 @@ void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_dat
 
 namespace WindowFlightManager {
 	static shared_array<Window> windows;
-	void add(Window *win) {
+	void add(shared<Window> win) {
 		windows.add(win);
 	}
 	void remove(Window *win) {
@@ -351,23 +351,33 @@ void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user
 	run_later(0.01f, [win] { WindowFlightManager::remove(win); });
 }
 
-void Window::_fly(Callback cb) {
-	show();
+void fly(shared<Window> win, Callback cb) {
+	if (!win->is_dialog())
+		msg_error("hui.fly() only allowed for Dialog!");
+
+	win->show();
 
 	WindowFlightManager::add(win);
 
-	end_run_callback = cb;
+	win->end_run_callback = cb;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response_fly), this);
-	gtk_window_present(GTK_WINDOW(window));
+	g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
+	gtk_window_present(GTK_WINDOW(win->window));
 #else
-	g_signal_connect(window, "response", G_CALLBACK(on_gtk_window_response_fly), this);
+	g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
 #endif
 }
 
-void Window::_run(Callback cb) {
-	show();
+void Window::_wait_till_closed() {
+	while (!win->requested_destroy) {
+		Application::do_single_main_loop();
+		os::sleep(0.005f);
+	}
+}
+
+void run(shared<Window> win, Callback cb) {
+	win->show();
 	//int uid = unique_id;
 	//end_run_callback = cb;
 
@@ -381,35 +391,21 @@ void Window::_run(Callback cb) {
 		msg_write("...dialog");
 		gtk_dialog_run(GTK_DIALOG(window));
 	} else {*/
-		while (!requested_destroy) {
-			Application::do_single_main_loop();
-			os::sleep(0.005f);
-		}
+		win->_wait_till_closed();
 //	}
 //#endif
 	if (cb)
 		cb();
-	delete this;
 }
 
-void fly(Window *win, Callback cb) {
-	if (!win->is_dialog())
-		msg_error("hui.fly() only allowed for Dialog!");
-	win->_fly(cb);
-}
-
-void run(Window *win, Callback cb) {
-	win->_run(cb);
-}
-
-void Window::set_menu(Menu *_menu) {
+void Window::set_menu(xfer<Menu> _menu) {
 #if GTK_CHECK_VERSION(4,0,0)
 	//action_group = g_simple_action_group_new();
 
 	if (_menu) {
 		menu = _menu;
 
-		_connect_menu_to_panel(menu);
+		_connect_menu_to_panel(menu.get());
 
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
 		gtk_widget_show(menubar);
@@ -436,7 +432,7 @@ void Window::set_menu(Menu *_menu) {
 		gtk_menu.clear();
 		/*menu->set_win(NULL);
 		}*/
-		delete(menu);
+		menu = nullptr;
 	}
 
 	

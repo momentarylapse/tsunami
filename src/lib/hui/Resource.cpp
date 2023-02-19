@@ -205,7 +205,7 @@ Window *create_resource_dialog(const string &id, Window *root) {
 	return d;*/
 }
 
-Menu *_create_res_menu_(const string &ns, Resource *res, Panel *panel) {
+xfer<Menu> _create_res_menu_(const string &ns, Resource *res, Panel *panel) {
 	Menu *menu = new Menu(panel);
 
 	for (Resource &c: res->children) {
@@ -229,7 +229,7 @@ Menu *_create_res_menu_(const string &ns, Resource *res, Panel *panel) {
 	return menu;
 }
 
-Menu *create_resource_menu(const string &id, Panel *panel) {
+xfer<Menu> create_resource_menu(const string &id, Panel *panel) {
 	Resource *res = get_resource(id);
 	if (!res) {
 		msg_error(format("CreateResourceMenu  (id=%s)  m(-_-)m", id));
@@ -240,7 +240,7 @@ Menu *create_resource_menu(const string &id, Panel *panel) {
 	return _create_res_menu_(id, res, panel);
 }
 
-Menu *create_menu_from_source(const string &source, Panel *panel) {
+xfer<Menu> create_menu_from_source(const string &source, Panel *panel) {
 	Resource res = parse_resource(source);
 
 	return _create_res_menu_(res.id, &res, panel);

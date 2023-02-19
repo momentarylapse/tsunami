@@ -5,7 +5,7 @@ namespace kaba {
 	class Class;
 	class SyntaxTree;
 	
-	void kaba_make_dict(Class *t, SyntaxTree *ps);
+	void lib_make_dict(Class *t, SyntaxTree *ps);
 
 
 	template<class T>

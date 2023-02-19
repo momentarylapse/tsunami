@@ -346,8 +346,8 @@ void main() {
 
 
 class ShaderPanel extends ConfigPanel
-	var override c: ShaderVis*
-	var shader: Shader*
+	var override c: ShaderVis&
+	var shader: owned[Shader]
 	var _time: float
 	var timer: Timer
 	var id_runner: int
@@ -431,8 +431,9 @@ uniform float iVolume;
 		gl.set_cull(gl.CullMode.NONE)
 		gl.set_z(false, false)
 		gl.set_shader(shader)
-		shader.set_float("iTime", _time)
-		shader.set_float("iVolume", volume)
+		for s in shader
+			s.set_float("iTime", _time)
+			s.set_float("iVolume", volume)
 		gl.vb_temp.create_quad(rect.ID_SYM, rect.ID)
 		gl.draw_triangles(vb_temp)
 		#gl.end()
@@ -444,6 +445,6 @@ class ShaderVis extends AudioVisualizer
 		buffer[next_writing] = buf
 		flip()
 		
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new ShaderPanel(self)
 

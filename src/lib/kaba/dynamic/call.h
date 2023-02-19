@@ -13,6 +13,7 @@ class Function;
 
 //bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param);
 bool call_function(Function *f, void *ret, const Array<void*> &param);
+bool call_member_function(Function *f, void *instance, void *ret, const Array<void*> &param, bool allow_virtual = true);
 bool call_callable(void *c, void *ret, const Array<void*> &_param, const Class *return_type, const Array<const Class*> &_ptype);
 
 }

@@ -229,10 +229,10 @@ public:
 
 	Song *song;
 
-	SignalChain *signal_chain;
-	SongRenderer *renderer;
-	PeakMeter *peak_meter;
-	AudioOutput *output_stream;
+	shared<SignalChain> signal_chain;
+	shared<SongRenderer> renderer;
+	shared<PeakMeter> peak_meter;
+	shared<AudioOutput> output_stream;
 	void set_playback_loop(bool loop);
 	void play();
 	void stop();

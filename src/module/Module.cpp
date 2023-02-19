@@ -53,6 +53,7 @@ Module::Module(ModuleCategory category, const string &_class) {
 }
 
 Module::~Module() {
+	//msg_write("del Module " + p2s(this));
 	// unlink sources
 	for (auto &pd: port_in)
 		*pd.port = nullptr;
@@ -182,7 +183,7 @@ void Module::reset_config() {
 
 // default version
 //   try to create an AutoConfigPanel
-ConfigPanel *Module::create_panel() {
+xfer<ConfigPanel> Module::create_panel() {
 	auto *config = get_config();
 	if (!config)
 		return nullptr;
@@ -202,7 +203,7 @@ void Module::changed() {
 
 
 // don't copy the func_edit
-Module *Module::copy() const {
+xfer<Module> Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_category, module_class);
 	string param = config_to_string();
 	clone->config_from_string(Module::VERSION_LATEST, param);

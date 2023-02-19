@@ -136,7 +136,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 
 	const Class *rel = el;
 
-	if (el->is_pointer())
+	if (el->is_some_pointer())
 		rel = el->param[0];
 
 	string by = _by;
@@ -174,7 +174,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 	}
 
 	if (sfunc) {
-		if (!el->is_pointer())
+		if (!el->is_some_pointer())
 			kaba_raise_exception(new KabaException("function sorting only for pointers"));
 		if (by_type == TypeString)
 			_array_sort_pf<string>(rr, sfunc, stable);
@@ -188,7 +188,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 			_array_sort_pf<bool>(rr, sfunc, stable);
 		else
 			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
-	} else if (el->is_pointer()) {
+	} else if (el->is_some_pointer()) {
 		if (by_type == TypeString)
 			_array_sort_p<string>(rr, offset, stable);
 		else if (by_type == TypePath)

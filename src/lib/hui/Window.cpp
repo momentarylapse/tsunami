@@ -115,7 +115,7 @@ void Window::set_position_special(Window *win,int mode) {
 }
 
 Menu *Window::get_menu() {
-	return menu;
+	return menu.get();
 }
 
 Window *Window::get_parent() {

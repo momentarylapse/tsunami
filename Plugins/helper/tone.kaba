@@ -68,7 +68,7 @@ func pitch_name(pitch: int) -> string
 	return name_rel + name_oct
 
 
-class Chord
+struct Chord
 	enum Type
 		# 3 tones
 		MAJOR as "maj"

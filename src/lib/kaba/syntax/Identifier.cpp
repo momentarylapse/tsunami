@@ -45,8 +45,10 @@ namespace Identifier {
 	const string SELFREF = "selfref";
 	const string REF = "ref";
 	const string WEAK = "weak";
+	const string GIVE = "give";
 	const string SHARED = "shared";
 	const string OWNED = "owned";
+	const string XFER = "xfer";
 	const string PURE = "pure";
 	const string NOAUTO = "@noauto";
 	const string NOFRAME = "@noframe";
@@ -118,6 +120,7 @@ namespace Identifier {
 		const string CALL = "call";
 		const string SHARED_CLEAR = "_clear";
 		const string SHARED_CREATE = "_create";
+		const string OWNED_GIVE = "_give";
 		const string CONTAINS = "__contains__";
 		const string FORMAT = "format";
 		const string OPTIONAL_HAS_VALUE = "has_value";

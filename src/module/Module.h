@@ -91,7 +91,7 @@ public:
 	float module_x, module_y;
 	const kaba::Class *kaba_class;
 
-	Module *copy() const;
+	xfer<Module> copy() const;
 
 	bool enabled;
 	bool belongs_to_system;
@@ -106,7 +106,7 @@ public:
 	// config data
 	bool allow_config_in_chain;
 	void _cdecl reset_config();
-	virtual ConfigPanel *_cdecl create_panel();
+	virtual xfer<ConfigPanel> create_panel();
 	void _cdecl changed();
 	virtual void _cdecl on_config(){}
 

@@ -57,7 +57,7 @@ public:
 	void _cdecl ref();
 	void _cdecl unref();
 
-	SampleRef *_cdecl create_ref();
+	xfer<SampleRef> _cdecl create_ref();
 
 	static int create_uid();
 };

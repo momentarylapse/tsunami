@@ -2,7 +2,7 @@ use tsunami
 
 
 class Chunksize extends AudioEffect
-	var ring_buffer: RingBuffer*
+	var ring_buffer: owned![RingBuffer]
 	
 	class Config extends Module.Config
 		var size: int
@@ -12,8 +12,6 @@ class Chunksize extends AudioEffect
 	
 	func override __init__()
 		ring_buffer = new RingBuffer(1<<20)
-	func override __delete__()
-		del ring_buffer
 	
 	func override read(out buf: AudioBuffer) -> int
 		if !source

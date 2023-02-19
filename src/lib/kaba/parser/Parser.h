@@ -72,7 +72,7 @@ public:
 	void parse_class_use_statement(const Class *c);
 	void parse_named_const(Class *name_space, Block *block);
 	shared<Node> parse_and_eval_const(Block *block, const Class *type);
-	static AbstractOperator *which_abstract_operator(const string &name, int param_flags = 3);
+	static AbstractOperator *which_abstract_operator(const string &name, OperatorFlags param_flags = OperatorFlags::BINARY);
 	static Statement *which_statement(const string &name);
 	static SpecialFunction *which_special_function(const string &name);
 
@@ -81,6 +81,7 @@ public:
 	shared<Node> parse_abstract_operand_extension_element(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_array(shared<Node> operand, Block *block);
 	shared<Node> parse_abstract_operand_extension_pointer(shared<Node> operand);
+	shared<Node> parse_abstract_operand_extension_reference(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_dict(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_optional(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_callable(shared<Node> operand, Block *block);
@@ -101,7 +102,7 @@ public:
 	shared<Node> parse_abstract_set_builder(Block *block);
 	shared<Node> parse_abstract_token();
 
-	shared<Node> parse_abstract_operator(int param_flags);
+	shared<Node> parse_abstract_operator(OperatorFlags param_flags);
 	shared_array<Node> parse_abstract_call_parameters(Block *block);
 	shared<Node> try_parse_format_string(Block *block, Value &v, int token_id);
 	shared<Node> apply_format(shared<Node> n, const string &fmt);
@@ -117,6 +118,7 @@ public:
 	shared<Node> parse_abstract_statement_raise(Block *block);
 	shared<Node> parse_abstract_statement_try(Block *block);
 	shared<Node> parse_abstract_statement_if(Block *block);
+	shared<Node> parse_abstract_statement_if_unwrap(Block *block);
 	shared<Node> parse_abstract_statement_pass(Block *block);
 	shared<Node> parse_abstract_statement_new(Block *block);
 	shared<Node> parse_abstract_statement_delete(Block *block);

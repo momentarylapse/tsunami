@@ -37,6 +37,8 @@ const Class *TypeReg16;
 const Class *TypeReg8;
 const Class *TypeVoid;
 const Class *TypePointer;
+const Class *TypeReference;
+const Class *TypeNone; // nil
 const Class *TypeObject;
 const Class *TypeObjectP;
 const Class *TypeBool;
@@ -88,7 +90,7 @@ const Class *TypeDate;
 const Class *TypeImage;
 
 const Class *TypeException;
-const Class *TypeExceptionP;
+const Class *TypeExceptionXfer;
 const Class *TypeNoValueError;
 
 const Class *TypeClass;
@@ -98,7 +100,7 @@ const Class *TypeFunctionP;
 const Class *TypeFunctionCode;
 const Class *TypeFunctionCodeP;
 const Class *TypeSpecialFunction;
-const Class *TypeSpecialFunctionP;
+const Class *TypeSpecialFunctionRef;
 
 Module *cur_package = nullptr;
 
@@ -129,6 +131,7 @@ Flags flags_mix(const Array<Flags> &f) {
 	return r;
 }
 
+
 void add_package(Context *c, const string &name, Flags flags) {
 	for (auto &p: c->packages)
 		if (p->filename.str() == name) {
@@ -137,7 +140,7 @@ void add_package(Context *c, const string &name, Flags flags) {
 		}
 	auto s = c->create_empty_module(name);
 	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
-	s->syntax->base_class->name = name;
+	s->tree->base_class->name = name;
 	c->packages.add(s);
 	cur_package = s.get();
 }
@@ -147,37 +150,73 @@ void __add_class__(Class *t, const Class *name_space) {
 		const_cast<Class*>(name_space)->classes.add(t);
 		t->name_space = name_space;
 	} else {
-		cur_package->syntax->base_class->classes.add(t);
-		t->name_space = cur_package->syntax->base_class;
+		cur_package->tree->base_class->classes.add(t);
+		t->name_space = cur_package->tree->base_class;
 	}
 }
 
-const Class *add_type(const string &name, int size, Flags flag, const Class *name_space) {
-	Class *t = new Class(Class::Type::REGULAR, name, size, cur_package->syntax);
-	if (flags_has(flag, Flags::CALL_BY_VALUE))
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+const Class *add_type(const string &name, int size, Flags flags, const Class *name_space) {
+	Class *t = new Class(Class::Type::REGULAR, name, size, cur_package->tree.get());
+	flags_set(t->flags, flags);
 	__add_class__(t, name_space);
 	return t;
 }
 
-const Class *add_type_p(const Class *sub_type, Flags flag) {
-	string name;
-	if (flags_has(flag, Flags::SHARED))
-		name = sub_type->name + " shared";
-	else
-		name = sub_type->name + "*";
-	Class *t = new Class(Class::Type::POINTER, name, config.pointer_size, cur_package->syntax, nullptr, {sub_type});
-	if (flags_has(flag, Flags::SHARED))
-		t->type = Class::Type::POINTER_SHARED;
+const Class *add_type_p_raw(const Class *sub_type) {
+	string name = sub_type->name + "*";
+	Class *t = new Class(Class::Type::POINTER_RAW, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
+	return t;
+}
+
+const Class *add_type_ref(const Class *sub_type) {
+	string name = sub_type->name + "&";
+	Class *t = new Class(Class::Type::REFERENCE, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
+	return t;
+}
+
+const Class *add_type_p_owned(const Class *sub_type) {
+	string name = format("%s[%s]", Identifier::OWNED, sub_type->name);
+	Class *t = new Class(Class::Type::POINTER_OWNED, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
+	return t;
+}
+
+const Class *add_type_p_shared(const Class *sub_type) {
+	string name = format("%s[%s]", Identifier::SHARED, sub_type->name);
+	Class *t = new Class(Class::Type::POINTER_SHARED, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
+	return t;
+}
+
+const Class *add_type_p_shared_not_null(const Class *sub_type) {
+	string name = format("%s![%s]", Identifier::SHARED, sub_type->name);
+	Class *t = new Class(Class::Type::POINTER_SHARED_NOT_NULL, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
+	return t;
+}
+
+const Class *add_type_p_xfer(const Class *sub_type) {
+	string name = format("%s[%s]", Identifier::XFER, sub_type->name);
+	Class *t = new Class(Class::Type::POINTER_XFER, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->implicit_class_registry->add(t);
 	return t;
 }
 
 // fixed array
-const Class *add_type_a(const Class *sub_type, int array_length) {
+const Class *add_type_array(const Class *sub_type, int array_length) {
 	string name = sub_type->name + "[" + i2s(array_length) + "]";
-	Class *t = new Class(Class::Type::ARRAY, name, sub_type->size * array_length, cur_package->syntax, nullptr, {sub_type});
+	Class *t = new Class(Class::Type::ARRAY, name, sub_type->size * array_length, cur_package->tree.get(), nullptr, {sub_type});
 	t->array_length = array_length;
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->implicit_class_registry->add(t);
@@ -185,20 +224,20 @@ const Class *add_type_a(const Class *sub_type, int array_length) {
 }
 
 // super array
-const Class *add_type_l(const Class *sub_type) {
+const Class *add_type_list(const Class *sub_type) {
 	string name = sub_type->name + "[]";
-	Class *t = new Class(Class::Type::SUPER_ARRAY, name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
-	kaba_make_super_array(t);
+	Class *t = new Class(Class::Type::SUPER_ARRAY, name, config.target.super_array_size, cur_package->tree.get(), nullptr, {sub_type});
+	lib_make_list(t);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->implicit_class_registry->add(t);
 	return t;
 }
 
 // dict
-const Class *add_type_d(const Class *sub_type) {
+const Class *add_type_dict(const Class *sub_type) {
 	string name = sub_type->name + "{}";
-	Class *t = new Class(Class::Type::DICT, name, config.super_array_size, cur_package->syntax, nullptr, {sub_type});
-	kaba_make_dict(t);
+	Class *t = new Class(Class::Type::DICT, name, config.target.super_array_size, cur_package->tree.get(), nullptr, {sub_type});
+	lib_make_dict(t);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->implicit_class_registry->add(t);
 	return t;
@@ -211,10 +250,18 @@ void capture_implicit_type(const Class *_t, const string &name) {
 }
 
 // enum
-const Class *add_type_e(const string &name, const Class *_namespace) {
-	Class *t = new Class(Class::Type::ENUM, name, sizeof(int), cur_package->syntax);
+const Class *add_type_enum(const string &name, const Class *_namespace) {
+	Class *t = new Class(Class::Type::ENUM, name, sizeof(int), cur_package->tree.get());
 	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, _namespace);
+	return t;
+}
+
+const Class *add_type_optional(const Class *sub_type) {
+	string name = sub_type->name + "?";
+	Class *t = new Class(Class::Type::OPTIONAL, name, sub_type->size + 1, cur_package->tree.get(), nullptr, {sub_type});
+	__add_class__(t, sub_type->name_space);
+	cur_package->context->implicit_class_registry->add(t);
 	return t;
 }
 
@@ -246,7 +293,7 @@ public:
 
 string make_callable_signature(const Array<const Class*> &param, const Class *ret);
 
-const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params) {
+const Class *add_type_func(const Class *ret_type, const Array<const Class*> &params) {
 	string name = make_callable_signature(params, ret_type);
 
 	auto params_ret = params;
@@ -255,12 +302,12 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 	params_ret.add(ret_type);
 
 	//auto ff = cur_package->syntax->make_class("Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, cur_package->syntax->base_class);
-	Class *ff = new Class(Class::Type::CALLABLE_FUNCTION_POINTER, "XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->syntax, nullptr, params_ret);
-	__add_class__(ff, cur_package->syntax->base_class);
+	Class *ff = new Class(Class::Type::CALLABLE_FUNCTION_POINTER, "XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), cur_package->tree.get(), nullptr, params_ret);
+	__add_class__(ff, cur_package->tree->base_class);
 	cur_package->context->implicit_class_registry->add(ff);
 
 	auto ptr_param = [] (const Class *p) {
-		return p->is_pointer() or p->uses_call_by_reference();
+		return p->is_pointer_raw() or p->uses_call_by_reference();
 	};
 
 	add_class(ff);
@@ -282,7 +329,7 @@ const Class *add_type_f(const Class *ret_type, const Array<const Class*> &params
 				func_add_param("b", params[1]);
 		}
 	}
-	return cur_package->syntax->request_implicit_class(name, Class::Type::POINTER, config.pointer_size, 0, nullptr, {ff}, -1);
+	return cur_package->tree->request_implicit_class(name, Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {ff}, -1);
 
 	/*auto c = cur_package->syntax->make_class_callable_fp(params, ret_type);
 	add_class(c);
@@ -302,7 +349,7 @@ Array<Operator*> global_operators;
 
 void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func) {
 	Operator *o = new Operator;
-	o->owner = cur_package->syntax;
+	o->owner = cur_package->tree.get();
 	o->abstract = &abstract_operators[(int)primitive_op];
 	o->return_type = return_type;
 	if (!param_type1) {
@@ -319,11 +366,11 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 	}
 
 	Flags flags = Flags::NONE;
-	if (!o->abstract->left_modifiable)
+	if (!(o->abstract->flags & OperatorFlags::LEFT_IS_MODIFIABLE))
 		flags = Flags::PURE;
 
 	//if (!c->uses_call_by_reference())
-	if (o->abstract->left_modifiable and !c->uses_call_by_reference())
+	if ((o->abstract->flags & OperatorFlags::LEFT_IS_MODIFIABLE) and !c->uses_call_by_reference())
 		flags_set(flags, Flags::STATIC);
 
 	if (!flags_has(flags, Flags::STATIC)) {
@@ -366,10 +413,8 @@ void class_add_element_x(const string &name, const Class *type, int offset, Flag
 	cur_class->elements.add(ClassElement(name, type, offset));
 }
 
-void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable) {
-	cur_class->derive_from(parent, increase_size);
-	if (copy_vtable)
-		cur_class->vtable = parent->vtable;
+void class_derive_from(const Class *parent, DeriveFlags flags) {
+	cur_class->derive_from(parent, flags);
 }
 
 void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
@@ -398,7 +443,7 @@ void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 
 Function* class_add_func_x(const string &name, const Class *return_type, void *func, Flags flags) {
 	Function *f = new Function(name, return_type, cur_class, flags);
-	cur_package->syntax->functions.add(f);
+	cur_package->tree->functions.add(f);
 	f->address_preprocess = func;
 	if (config.allow_std_lib)
 		f->address = (int_p)func;
@@ -419,7 +464,7 @@ Function* class_add_func(const string &name, const Class *return_type, std::null
 }
 
 int get_virtual_index(void *func, const string &tname, const string &name) {
-	if ((config.native_abi == Abi::X86_WINDOWS) or (config.native_abi == Abi::AMD64_WINDOWS)) {
+	if ((config.native_target.abi == Abi::X86_WINDOWS) or (config.native_target.abi == Abi::AMD64_WINDOWS)) {
 		if (!func)
 			return 0;
 		unsigned char* pp = (unsigned char*)func;
@@ -463,7 +508,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 			msg_write(p2s(pp));
 			msg_write(Asm::disassemble(func, 16));
 		}
-	} else if (config.native_abi == Abi::AMD64_WINDOWS) {
+	} else if (config.native_target.abi == Abi::AMD64_WINDOWS) {
 		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
 	} else {
@@ -505,7 +550,7 @@ void class_link_vtable(void *p) {
 //------------------------------------------------------------------------------------------------//
 
 void class_add_const(const string &name, const Class *type, const void *value) {
-	Constant *c = cur_package->syntax->add_constant(type, cur_class);
+	Constant *c = cur_package->tree->add_constant(type, cur_class);
 	c->name = name;
 
 	// enums can't be referenced...
@@ -519,7 +564,7 @@ void class_add_const(const string &name, const Class *type, const void *value) {
 }
 
 void add_const(const string &name, const Class *type, const void *value) {
-	cur_class = cur_package->syntax->base_class;
+	cur_class = cur_package->tree->base_class;
 	class_add_const(name, type, value);
 }
 
@@ -531,7 +576,7 @@ void add_const(const string &name, const Class *type, const void *value) {
 void add_ext_var(const string &name, const Class *type, void *var) {
 	auto *v = new Variable(name, type);
 	flags_set(v->flags, Flags::EXTERN); // prevent initialization when importing
-	cur_package->syntax->base_class->static_variables.add(v);
+	cur_package->tree->base_class->static_variables.add(v);
 	if (config.allow_std_lib)
 		v->memory = var;
 };
@@ -574,7 +619,7 @@ void func_add_param_def_x(const string &name, const Class *type, const void *p, 
 		cur_func->num_params ++;
 		//cur_func->mandatory_params = cur_func->num_params;
 
-		Constant *c = cur_package->syntax->add_constant(type, cur_class);
+		Constant *c = cur_package->tree->add_constant(type, cur_class);
 		if (type == TypeInt)
 			c->as_int() = *(int*)p;
 		if (type == TypeFloat32)
@@ -589,7 +634,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	TypeCast c;
 	c.penalty = penalty;
 	c.f = nullptr;
-	for (auto *f: cur_package->syntax->functions)
+	for (auto *f: cur_package->tree->functions)
 		if (f->long_name() == cmd){
 			c.f = f;
 			break;
@@ -651,22 +696,14 @@ void init_lib(Context *c) {
 Context *_secret_lib_context_ = nullptr;
 
 void init(Abi abi, bool allow_std_lib) {
+	config.native_target = CompilerConfiguration::Target::get_native();
 	if (abi == Abi::NATIVE) {
-		config.abi = config.native_abi;
+		config.target = config.native_target;
 	} else {
-		config.abi = abi;
+		config.target = CompilerConfiguration::Target::get_for_abi(abi);
 	}
-	config.instruction_set = extract_instruction_set(config.abi);
-	Asm::init(config.instruction_set);
+	Asm::init(config.target.instruction_set);
 	config.allow_std_lib = allow_std_lib;
-	config.pointer_size = Asm::instruction_set.pointer_size;
-	if (abi == Abi::NATIVE)
-		config.super_array_size = sizeof(DynamicArray);
-	else
-		config.super_array_size = mem_align(config.pointer_size + 3 * sizeof(int), config.pointer_size);
-
-	config.function_align = 2 * config.pointer_size;
-	config.stack_frame_align = 2 * config.pointer_size;
 
 	SIAddStatements();
 

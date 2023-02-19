@@ -22,7 +22,7 @@ class Volume extends AudioEffect
 
 	var config: Config
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new Volume.Panel(self)
 
 	func override process(out buf: AudioBuffer)
@@ -37,8 +37,8 @@ class Volume extends AudioEffect
 				b = clamp(b * factor, -1, 1)
 	
 	class Panel extends ConfigPanel
-		var override c: Volume*
-		var slider: Slider*
+		var override c: Volume&
+		var slider: owned![Slider]
 		func override __init__(_v: Module)
 			add_grid("!width=400", 0, 0, "table1")
 			set_target("table1")
@@ -53,9 +53,6 @@ class Volume extends AudioEffect
 	
 			event("max", on_max)
 	
-		func override __delete__()
-			del slider
-
 		func override update()
 			slider.set(c.config.volume)
 			check("max", c.config.maximize)

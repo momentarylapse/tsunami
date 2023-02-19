@@ -10,6 +10,7 @@
 
 
 #include "../base/base.h"
+#include "../base/pointer.h"
 #include "color.h"
 
 class Painter;
@@ -40,14 +41,14 @@ public:
 
 	bool _cdecl is_empty(){	return (data.num == 0);	}
 
-	static Image *load(const Path &filename);
+	static xfer<Image> load(const Path &filename);
 	void _cdecl _load(const Path &filename);
 	void _cdecl _load_flipped(const Path &filename);
 	void _cdecl create(int width, int height, const color &c);
 	void _cdecl save(const Path &filename) const;
 	void _cdecl clear();
 
-	Image* _cdecl scale(int width, int height) const;
+	xfer<Image> _cdecl scale(int width, int height) const;
 	void _cdecl flip_v();
 	void _cdecl set_mode(Mode mode) const;
 	void _cdecl set_pixel(int x, int y, const color &c);
@@ -55,7 +56,7 @@ public:
 	color _cdecl get_pixel(int x, int y) const;
 	color _cdecl get_pixel_interpolated(float x, float y) const;
 
-	Painter *start_draw();
+	xfer<Painter> start_draw();
 };
 
 

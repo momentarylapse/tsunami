@@ -3,10 +3,10 @@ use PitchDetector.Test
 use hui
 
 class SNRPanel extends ConfigPanel
-	var override c: SupernovaRhythm*
-	var mp: MidiPainter*
-	var gp: GridPainter*
-	var cam: AudioView.ViewPort*
+	var override c: SupernovaRhythm&
+	var mp: owned![MidiPainter]
+	var gp: owned![GridPainter]
+	var cam: owned![AudioView.ViewPort]
 	var runner: int
 	
 	func override __init__(_c: Module)
@@ -65,10 +65,10 @@ Grid ? ''
 
 class SupernovaRhythm extends TsunamiPlugin
 	var midi: MidiNoteBuffer
-	var chain: SignalChain*
+	var chain: shared![SignalChain]
 #	PitchDetector
-	var pitch_detector: TestDetector*
-	var recorder: MidiAccumulator*
+	var pitch_detector: shared![TestDetector]
+	var recorder: shared![MidiAccumulator]
 
 	func override on_start()
 		
@@ -77,24 +77,22 @@ class SupernovaRhythm extends TsunamiPlugin
 		midi.add(new MidiNote(RangeTo(dt*4, dt*6), 62, 1.0))
 		
 		chain = session.create_signal_chain("supernova.recorder")
-		var i = chain.add(Module.Type.STREAM, "AudioInput")
-		var p = chain.add(Module.Type.PITCH_DETECTOR, "Test")
-		#let x = chain.add(Module.Type.AUDIO_EFFECT, "Chunksize")
-		var r = chain.add(Module.Type.PLUMBING, "MidiAccumulator")
-		var s = chain.add(Module.Type.PLUMBING, "MidiSucker")
-		chain.connect(i, 0, p, 0)
-		chain.connect(p, 0, r, 0)
-		chain.connect(r, 0, s, 0)
-		recorder = r
-		pitch_detector = p
+		var i = chain.add_basic(Module.Type.STREAM, "AudioInput")
+		pitch_detector = chain.add[TestDetector]()
+		#let x = chain.add_basic(Module.Type.AUDIO_EFFECT, "Chunksize")
+		recorder = chain.add[MidiAccumulator]()
+		var s = chain.add_basic(Module.Type.PLUMBING, "MidiSucker")
+		chain.connect(i, 0, pitch_detector, 0)
+		chain.connect(pitch_detector, 0, recorder, 0)
+		chain.connect(recorder, 0, s, 0)
 		chain.set_buffer_size(4096)
 		chain.start()
 		chain.command(Module.Command.ACCUMULATION_START, 0)
 		
 	func override on_stop()
-		del chain
+		chain = nil
 	
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new SNRPanel(self)
 

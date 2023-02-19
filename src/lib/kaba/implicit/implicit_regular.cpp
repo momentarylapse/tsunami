@@ -13,47 +13,81 @@
 namespace kaba {
 
 void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
-	if (t->can_memcpy()) {
-		if (has_user_constructors(t)) {
-		} else {
-			if (t->needs_constructor())
-				add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
-			if (!flags_has(t->flags, Flags::NOAUTO))
-				if (can_fully_construct(t))
+	if (t->is_struct()) {
+		// force to have:
+		if (!flags_has(t->flags, Flags::NOAUTO)) {
+			if (t->parent) {
+				if (has_user_constructors(t)) {
+					// don't inherit constructors!
+					remove_inherited_constructors(t);
+				} else {
+					// only auto-implement matching constructors
+					redefine_inherited_constructors(t);
+				}
+			}
+			if (t->get_constructors().num == 0) {
+				if (t->needs_constructor())
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+				if (class_can_fully_construct(t))
 					add_full_constructor(t);
+			}
+			if (needs_new(t->get_destructor()))
+				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor());
+			if (needs_new(t->get_assign()))
+				add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
+
 		}
+		if (t->get_assign() and t->can_memcpy()) {
+			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
+		}
+
 	} else {
-		if (t->parent) {
+		// class X
+
+		// TODO rethink
+		if (t->can_memcpy()) {
 			if (has_user_constructors(t)) {
-				// don't inherit constructors!
-				remove_inherited_constructors(t);
 			} else {
-				// only auto-implement matching constructors
-				redefine_inherited_constructors(t);
+				if (t->needs_constructor())
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+				/*if (!flags_has(t->flags, Flags::NOAUTO))
+					if (can_fully_construct(t))
+						add_full_constructor(t);*/
+			}
+		} else {
+			if (t->parent) {
+				if (has_user_constructors(t)) {
+					// don't inherit constructors!
+					remove_inherited_constructors(t);
+				} else {
+					// only auto-implement matching constructors
+					redefine_inherited_constructors(t);
+				}
+			}
+			if (t->get_constructors().num == 0) {
+				if (t->needs_constructor())
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+				/*if (!flags_has(t->flags, Flags::NOAUTO))
+					if (can_fully_construct(t))
+						add_full_constructor(t);*/
+			}
+			if (needs_new(t->get_destructor()))
+				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor());
+		}
+
+		/*if (!flags_has(t->flags, Flags::NOAUTO) and needs_new(t->get_assign())) {
+			if (t->parent) {
+				// implement only if parent has also done so
+				if (class_can_assign(t->parent))
+					add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
+			} else {
+				if (class_can_elements_assign(t))
+					add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}
 		}
-		if (t->get_constructors().num == 0) {
-			if (t->needs_constructor())
-				add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
-			if (!flags_has(t->flags, Flags::NOAUTO))
-				if (can_fully_construct(t))
-					add_full_constructor(t);
-		}
-		if (needs_new(t->get_destructor()))
-			add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor());
-	}
-	if (!flags_has(t->flags, Flags::NOAUTO) and needs_new(t->get_assign())) {
-		//add_func_header(t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
-		// implement only if parent has also done so
-		if (t->parent) {
-			if (class_can_assign(t->parent))
-				add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
-		} else {
-			add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
-		}
-	}
-	if (t->get_assign() and t->can_memcpy()) {
-		t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
+		if (t->get_assign() and t->can_memcpy()) {
+			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
+		}*/
 	}
 }
 
@@ -61,7 +95,7 @@ void AutoImplementer::implement_add_virtual_table(shared<Node> self, Function *f
 	if (t->vtable.num > 0) {
 		auto *c = tree->add_constant_pointer(TypePointer, t->_vtable_location_target_);
 		f->block->add(add_node_operator_by_inline(InlineID::POINTER_ASSIGN,
-				self->shift(0, TypePointer),
+				self->change_type(TypePointer),
 				add_node_const(c)));
 	}
 }
@@ -109,12 +143,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 		return;
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
-	if (t->is_super_array()) {
-	} else if (t->is_dict()) {
-	} else if (t->is_array()) {
-	} else if (t->is_pointer_shared() or t->is_pointer_owned()) {
-	} else if (t->is_callable_fp()) {
-	} else if (flags_has(f->flags, Flags::__INIT_FILL_ALL_PARAMS)) {
+	if (flags_has(f->flags, Flags::__INIT_FILL_ALL_PARAMS)) {
 		// init
 		implement_add_child_constructors(self, f, t, true);
 
@@ -197,8 +226,8 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 
 	// parent assignment
 	if (t->parent) {
-		auto p = n_self->shift(0, t->parent);
-		auto o = n_other->shift(0, t->parent);
+		auto p = n_self->change_type(t->parent);
+		auto o = n_other->change_type(t->parent);
 
 		auto cmd_assign = parser->con.link_operator_id(OperatorID::ASSIGN, p, o);
 		if (!cmd_assign)

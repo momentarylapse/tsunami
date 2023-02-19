@@ -6,7 +6,7 @@ use helper.tone
 
 
 class PitchRecognitionPanel extends ConfigPanel
-	var override c: PitchRecognition*
+	var override c: PitchRecognition&
 	#var note_error: float
 	var runner: int
 	
@@ -71,23 +71,23 @@ class PitchRecognitionPanel extends ConfigPanel
 
 class PitchRecognition extends TsunamiPlugin
 	
-	var chain: SignalChain*
-	var pitch_detector: PitchDetector*
+	var chain: shared![SignalChain]
+	var pitch_detector: shared![PitchDetector]
 	#var panel: PitchRecognitionPanel*
 	
 	func override on_start()
 		chain = session.create_signal_chain("pitch-recognition")
-		var input = chain.add(Module.Type.STREAM, "AudioInput")
-		pitch_detector = chain.add(Module.Type.PITCH_DETECTOR, "")
-		var out = chain.add(Module.Type.PLUMBING, "MidiSucker")
+		var input = chain.add_basic(Module.Type.STREAM, "AudioInput")
+		pitch_detector = chain.add[PitchDetector]()
+		var out = chain.add_basic(Module.Type.PLUMBING, "MidiSucker")
 		chain.connect(input, 0, pitch_detector, 0)
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
 		
 	func override on_stop()
-		del chain
+		chain = nil
 	
-	func override mut create_panel() -> ConfigPanel*
+	func override mut create_panel() -> xfer[ConfigPanel]
 		return new PitchRecognitionPanel(self)
 	

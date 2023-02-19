@@ -53,9 +53,11 @@ Grid ? ''
 		destroy()
 
 func choose_preset(plug: TsunamiPlugin, f: int->void)
-	var dlg = new PresetDialog(plug)
+	var dlg: shared![PresetDialog] = new PresetDialog(plug)
+	var _dlg = weak(dlg)
 	var ff = func()
-		f(dlg.selected)
+		for d in _dlg
+			f(d.selected)
 	hui.fly(dlg, ff)
 
 class XXX extends TsunamiPlugin
@@ -76,9 +78,9 @@ class XXX extends TsunamiPlugin
 		print("creating track")
 		var track = session.song.add_track(SignalType.MIDI, 0)
 		print("creating synth")
-		track.synth = CreateSynthesizer(session, "Sample")
+		#track.synth = CreateSynthesizer(session, "Sample")
+		var synth: shared![SampleSynthesizer] = CreateModule[SampleSynthesizer](session)
 		print("set synth")
-		var synth: SampleSynthesizer* = weak(track.synth)
 		track.set_synthesizer(synth)
 		
 
@@ -112,13 +114,14 @@ class XXX extends TsunamiPlugin
 							if pitch == root
 								synth.config.samples[pitch] = s.create_ref()
 							else
-								shift(session.song, synth, weak(s), root, pitch)
+								shift(session.song, synth, s, root, pitch)
 	#							prog.set("pitch shift", 0.2)
 
 	#	prog.set("remove samples", 0.7)
-		var to_del = [for s in weak(session.song.samples) s if s.ref_count == 0]
-		for s in to_del
-			session.song.delete_sample(s)
+		var to_del = [for s in session.song.samples weak(s) if s.ref_count == 0]
+		for _s in to_del
+			for s in _s
+				session.song.delete_sample(s)
 	#	del prog
 		
 		
@@ -134,7 +137,7 @@ class XXX extends TsunamiPlugin
 	#	PitchShift* ps = CreateAudioEffect(session, "Pitch Shift")
 	#	ps.config.factor = pow(2, (to - from)/12.0)
 	#	ps.process(buf)
-		interpolate_buffer(*source.buf, buf, 0)
+		interpolate_buffer(source.buf, buf, 0)
 		
 		var t = new Sample("new", buf)
 		song.add_sample(t)

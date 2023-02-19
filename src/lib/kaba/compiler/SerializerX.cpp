@@ -43,14 +43,24 @@ void Serializer::add_virtual_function_call(Function *f, const Array<SerialNodePa
 	auto t2 = add_temp(TypePointer);
 	auto t3 = add_temp(TypeFunctionCodeP);
 	cmd.add_cmd(Asm::InstID::MOV, t1, params[0]); // self
-	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt, config.pointer_size * f->virtual_index)); // vtable + n
+	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt, config.target.pointer_size * f->virtual_index)); // vtable + n
 	cmd.add_cmd(Asm::InstID::MOV, t3, deref_temp(t2, TypeFunctionCodeP)); // vtable[n]
 	cmd.add_cmd(Asm::InstID::CALL_MEMBER, ret, t3); // the actual call
 }
 
+inline SerialNodeParam auto_weakify(Serializer *ser, Function *f, const SerialNodeParam& p) {
+	if (p.type->is_pointer_owned() or p.type->is_pointer_shared()) {
+		//msg_write("AUTO WEAK  " + f->signature());
+		auto pp = p;
+		pp.type = ser->module->tree->get_pointer(p.type->param[0]);
+		return pp;
+	}
+	return p;
+}
+
 int Serializer::function_call_push_params(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	for (SerialNodeParam &p: params)
-		cmd.add_cmd(Asm::InstID::PUSH, p);
+		cmd.add_cmd(Asm::InstID::PUSH, auto_weakify(this, f, p));
 	return 0;
 }
 
@@ -108,7 +118,7 @@ SerialNodeParam Serializer::serialize_parameter(Node *link, Block *block, int in
 		}*/
 	} else if ((link->kind == NodeKind::OPERATOR) or (link->kind == NodeKind::CALL_FUNCTION) or (link->kind == NodeKind::CALL_INLINE) or (link->kind == NodeKind::CALL_VIRTUAL) or (link->kind == NodeKind::CALL_RAW_POINTER) or (link->kind == NodeKind::STATEMENT)) {
 		p = serialize_node(link, block, index);
-	} else if (link->kind == NodeKind::REFERENCE) {
+	} else if ((link->kind == NodeKind::REFERENCE_RAW) or (link->kind == NodeKind::REFERENCE_NEW)) {
 		auto param = serialize_parameter(link->params[0].get(), block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
 		return add_reference(param, link->type);
@@ -133,28 +143,29 @@ SerialNodeParam Serializer::serialize_parameter(Node *link, Block *block, int in
 void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Block *block, int index) {
 	auto statement = com->as_statement();
 	switch(statement->id){
-		case StatementID::IF:{
-			int label_after_true = list->create_label("_IF_AFTER_" + i2s(num_labels ++));
-			auto cond = serialize_parameter(com->params[0].get(), block, index);
-			// cmp;  jz m;  -block-  m;
-			cmd.add_cmd(Asm::InstID::CMP, cond, param_imm(TypeBool, 0x0));
-			cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true));
-			serialize_block(com->params[1]->as_block());
-			cmd.add_label(label_after_true);
-			}break;
-		case StatementID::IF_ELSE:{
-			int label_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_labels ++));
-			int label_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_labels ++));
-			auto cond = serialize_parameter(com->params[0].get(), block, index);
-			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
-			cmd.add_cmd(Asm::InstID::CMP, cond, param_imm(TypeBool, 0x0));
-			cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true)); // jz ...
-			serialize_block(com->params[1]->as_block());
-			cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after_false));
-			cmd.add_label(label_after_true);
-			serialize_block(com->params[2]->as_block());
-			cmd.add_label(label_after_false);
-			}break;
+		case StatementID::IF:
+			if (com->params.num == 2) {
+				int label_after_true = list->create_label("_IF_AFTER_" + i2s(num_labels ++));
+				auto cond = serialize_parameter(com->params[0].get(), block, index);
+				// cmp;  jz m;  -block-  m;
+				cmd.add_cmd(Asm::InstID::CMP, cond, param_imm(TypeBool, 0x0));
+				cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true));
+				serialize_block(com->params[1]->as_block());
+				cmd.add_label(label_after_true);
+			} else {
+				int label_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_labels ++));
+				int label_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_labels ++));
+				auto cond = serialize_parameter(com->params[0].get(), block, index);
+				// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
+				cmd.add_cmd(Asm::InstID::CMP, cond, param_imm(TypeBool, 0x0));
+				cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true)); // jz ...
+				serialize_block(com->params[1]->as_block());
+				cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after_false));
+				cmd.add_label(label_after_true);
+				serialize_block(com->params[2]->as_block());
+				cmd.add_label(label_after_false);
+			}
+			break;
 		case StatementID::WHILE:{
 			int label_before_while = list->create_label("_WHILE_BEFORE_" + i2s(num_labels ++));
 			int label_after_while = list->create_label("_WHILE_AFTER_" + i2s(num_labels ++));
@@ -340,7 +351,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
 		case InlineID::CHUNK_EQUAL:
-			if (param[0].type->size > config.pointer_size) {
+			if (param[0].type->size > config.target.pointer_size) {
 				// chunk cmp
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
 				for (int k=0; k<param[0].type->size/4; k++) {

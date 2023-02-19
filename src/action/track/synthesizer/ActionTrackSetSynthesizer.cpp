@@ -10,7 +10,7 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <assert.h>
 
-ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth) {
+ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, shared<Synthesizer> _synth) {
 	track = t;
 	synth = _synth;
 }

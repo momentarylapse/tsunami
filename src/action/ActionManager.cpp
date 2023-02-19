@@ -186,7 +186,7 @@ void ActionManager::group_end() {
 	assert(cur_group_level >= 0);
 
 	if (cur_group_level == 0) {
-		_add_to_history(cur_group.check_out());
+		_add_to_history(cur_group.give());
 		_edit_end();
 	}
 }

@@ -120,7 +120,7 @@ void Session::q(const string &message, const Array<string> &responses) {
 	log->question(this, message, responses);
 }
 
-TsunamiPlugin *Session::execute_tsunami_plugin(const string &name, const Array<string> &args) {
+shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const Array<string> &args) {
 	auto *p = CreateTsunamiPlugin(this, name);
 	if (!p)
 		return nullptr;
@@ -222,7 +222,7 @@ bool Session::in_mode(const string &m) {
 	return mode == m;
 }
 
-void Session::add_signal_chain(SignalChain *chain) {
+void Session::add_signal_chain(xfer<SignalChain> chain) {
 	all_signal_chains.add(chain);
 	notify(MESSAGE_ADD_SIGNAL_CHAIN);
 	/*chain->subscribe(this, [this] {
@@ -230,20 +230,20 @@ void Session::add_signal_chain(SignalChain *chain) {
 	}, chain->MESSAGE_DELETE);*/
 }
 
-SignalChain* Session::create_signal_chain(const string &name) {
-	auto *chain = new SignalChain(this, name);
+shared<SignalChain> Session::create_signal_chain(const string &name) {
+	auto chain = new SignalChain(this, name);
 	add_signal_chain(chain);
 	return chain;
 }
 
-SignalChain* Session::create_signal_chain_system(const string &name) {
+shared<SignalChain> Session::create_signal_chain_system(const string &name) {
 	auto *chain = new SignalChain(this, name);
 	chain->belongs_to_system = true;
 	add_signal_chain(chain);
 	return chain;
 }
 
-SignalChain* Session::load_signal_chain(const Path &filename) {
+shared<SignalChain> Session::load_signal_chain(const Path &filename) {
 	auto *chain = SignalChain::load(this, filename);
 	add_signal_chain(chain);
 	return chain;

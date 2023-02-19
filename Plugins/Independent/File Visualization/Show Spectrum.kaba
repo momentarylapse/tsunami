@@ -4,13 +4,11 @@ use hui
 use tsunami
 use helper.grid
 
-const N = 512
-const MIN_FREQ = 20.0
-const MAX_FREQ = 20000.0
-const MIN_VOL = -60.0
-const MAX_VOL = 0.0
-
-var dlg: SpectrumDialog*
+let N = 512
+let MIN_FREQ = 20.0
+let MAX_FREQ = 20000.0
+let MIN_VOL = -60.0
+let MAX_VOL = 0.0
 
 enum SpectrumType
 	LINEAR
@@ -92,13 +90,13 @@ Grid ? ''
 		destroy()
 
 class ShowSpectrum extends TsunamiPlugin
+	var dlg: shared![SpectrumDialog]
 	func mut show_spec(song: Song)
 		dlg = new SpectrumDialog(self)
 	
 		var buf: AudioBuffer
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
-		del renderer
 	
 		var fr, fl: complex[]
 	

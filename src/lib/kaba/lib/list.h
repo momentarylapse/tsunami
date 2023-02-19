@@ -19,7 +19,7 @@ extern const Class *TypeAny;
 extern const Class *TypeDynamicArray;
 extern const Class *TypePath;
 
-void kaba_make_super_array(Class *t, SyntaxTree *ps);
+void lib_make_list(Class *t, SyntaxTree *ps);
 
 
 

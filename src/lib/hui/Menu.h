@@ -32,7 +32,7 @@ public:
 	void _cdecl add_with_image(const string &name, const string &image, const string &id);
 	void _cdecl add_checkable(const string &name, const string &id);
 	void _cdecl add_separator();
-	void _cdecl add_sub_menu(const string &name, const string &id, Menu *menu);
+	void _cdecl add_sub_menu(const string &name, const string &id, xfer<Menu> menu);
 	void _cdecl enable(const string &id, bool enabled);
 	void _cdecl check(const string &id, bool checked);
 	void _cdecl set_id(const string &id);

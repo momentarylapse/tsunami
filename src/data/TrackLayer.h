@@ -46,18 +46,18 @@ public:
 	void _cdecl edit_buffers_finish(Action *a);
 
 	void _cdecl insert_midi_data(int offset, const MidiNoteBuffer &midi);
-	void _cdecl add_midi_note(MidiNote *n);
+	void _cdecl add_midi_note(shared<MidiNote> n);
 	void _cdecl add_midi_notes(const MidiNoteBuffer &notes);
 	void _cdecl edit_midi_note(MidiNote *n, const Range &range, float pitch, float volume);
 	void _cdecl midi_note_set_string(MidiNote *n, int stringno);
 	void _cdecl midi_note_set_flags(MidiNote *n, int flags);
 	void _cdecl delete_midi_note(const MidiNote *note);
 
-	SampleRef *_cdecl add_sample_ref(int pos, Sample* sample);
+	shared<SampleRef> _cdecl add_sample_ref(int pos, Sample* sample);
 	void _cdecl delete_sample_ref(SampleRef *ref);
 	void _cdecl edit_sample_ref(SampleRef *ref, float volume, bool mute);
 	
-	const TrackMarker* _cdecl add_marker(const TrackMarker *marker);
+	const shared<TrackMarker> _cdecl add_marker(const shared<TrackMarker> marker);
 	void _cdecl delete_marker(const TrackMarker *marker);
 	void _cdecl edit_marker(const TrackMarker *marker, const Range &range, const string &text);
 

@@ -2,30 +2,27 @@ use tsunami
 use hui
 
 class _StreamTest extends TsunamiPlugin
-	var chain: SignalChain*
-	var input: AudioInput*
-	var recorder: AudioAccumulator*
-	var runner: int
-	var nn: int
-	var acc: bool
+	var chain: shared![SignalChain]
+	var input: shared![AudioInput]
+	var recorder: shared![AudioAccumulator]
+	var runner = -1
+	var nn = 0
+	var acc = false
 	func override on_start()
-	
 		chain = session.create_signal_chain("test")
-		input = chain.add(Module.Type.STREAM, "AudioInput")
-		recorder = chain.add(Module.Type.PLUMBING, "AudioAccumulator")
-		var sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
+		input = chain.add[AudioInput]()
+		recorder = chain.add[AudioAccumulator]()
+		var sucker = chain.add_basic(Module.Type.PLUMBING, "AudioSucker")
 		chain.connect(input, 0, recorder, 0)
 		chain.connect(recorder, 0, sucker, 0)
-		
-		nn = 0
-		acc = false
+	
 		runner = hui.run_repeated(0.1, on_tick)
-		
+	
 		chain.start()
 
 	func override on_stop()
 		hui.cancel_runner(runner)
-		del chain
+		chain = nil
 	
 	func mut on_tick()
 		print("{{input.samples_recorded()}}\t{{recorder.samples_skipped}}")

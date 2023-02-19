@@ -24,7 +24,6 @@ const int MAX_IMPORT_DIRECTORY_PARENTS = 5;
 
 namespace kaba {
 
-extern ExpressionBuffer *cur_exp_buf;
 extern Array<shared<Module>> loading_module_stack;
 void SetImmortal(SyntaxTree *ps);
 
@@ -200,7 +199,7 @@ void SyntaxTree::import_data(shared<Module> s, bool indirect, const string &as_n
 		if (i == s)
 			return;
 
-	SyntaxTree *ps = s->syntax;
+	SyntaxTree *ps = s->tree.get();
 	if (flag_immortal)
 		SetImmortal(ps);
 

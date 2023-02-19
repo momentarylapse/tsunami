@@ -113,7 +113,7 @@ void TemplateManager::match_parameter_type(shared<Node> p, const Class *t, std::
 		if (t->is_super_array())
 			match_parameter_type(p->params[0], t->get_array_element(), f);
 	} else if (p->kind == NodeKind::ABSTRACT_TYPE_POINTER) {
-		if (t->is_pointer())
+		if (t->is_pointer_raw())
 			match_parameter_type(p->params[0], t->param[0], f);
 	}
 }
@@ -137,6 +137,10 @@ Function *TemplateManager::get_instantiated_matching(Parser *parser, Function *f
 					msg_error("FOUND: " + token + " = " + arg_types[j]->name);
 			}
 	};
+
+	if (params.num != f0->abstract_param_types.num)
+		parser->do_error(format("not able to match all template parameters: %d parameters given, %d expected", params.num, f0->abstract_param_types.num), token_id);
+
 
 	for (auto&& [i,p]: enumerate(weak(params))) {
 		if (p->type == TypeUnknown)
@@ -218,6 +222,7 @@ Function *TemplateManager::instantiate(Parser *parser, Template &t, const Array<
 		parser->tree->functions.add(f);
 
 	} catch (kaba::Exception &e) {
+		//msg_write(e.message());
 		parser->do_error(format("failed to instantiate template %s: %s", f->name, e.message()), token_id);
 	}
 

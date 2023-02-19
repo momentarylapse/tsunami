@@ -120,7 +120,7 @@ bool Synthesizer::has_run_out_of_data() {
 	return (active_pitch.num == 0) and source_run_out;
 }
 
-PitchRenderer *Synthesizer::create_pitch_renderer(int pitch) {
+xfer<PitchRenderer> Synthesizer::create_pitch_renderer(int pitch) {
 	return nullptr;
 }
 
@@ -201,8 +201,6 @@ void Synthesizer::on_config() {
 }
 
 void Synthesizer::reset_default() {
-	for (auto *p: pitch_renderer)
-		delete p;
 	events.clear();
 	pitch_renderer.clear();
 	active_pitch.clear();

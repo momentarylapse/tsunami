@@ -5,7 +5,7 @@ use helper.tone
 class RectangleRenderer extends PitchRenderer
 	var volume = 0.
 	var phase = 0.
-	var override synth: RectangularSynthesizer*
+	var override synth: RectangularSynthesizer&
 
 	func override on_start(v: float)
 		volume = v
@@ -27,6 +27,6 @@ class RectangleRenderer extends PitchRenderer
 
 class RectangularSynthesizer extends Synthesizer
 
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new RectangleRenderer(self, pitch)
 

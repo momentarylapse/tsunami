@@ -21,7 +21,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 
 	from_resource("mini_bar");
 
-	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter);
+	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter.get());
 	set_float("volume", dev_manager->get_output_volume());
 
 	on_selection_snap_mode(view->selection_snap_mode);

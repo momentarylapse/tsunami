@@ -27,8 +27,8 @@ public:
 	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return 0; }
 	void assign(const IntDict &o)
 	{ *this = o; }
-	string str()
-	{ return var2str(this, TypeIntDict); }
+//	string str()
+//	{ return var2str(this, TypeIntDict); }
 };
 
 class FloatDict : public base::map<string,float> {
@@ -37,8 +37,8 @@ public:
 	{ set(k, v); }
 	float get_float(const string &k)
 	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return 0.0f; }
-	string str()
-	{ return var2str(this, TypeFloatDict); }
+//	string str()
+//	{ return var2str(this, TypeFloatDict); }
 };
 
 class StringDict : public base::map<string,string> {
@@ -47,14 +47,14 @@ public:
 	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return ""; }
 	void assign(const StringDict &o)
 	{ *this = o; }
-	string str()
-	{ return var2str(this, TypeStringDict); }
+//	string str()
+//	{ return var2str(this, TypeStringDict); }
 };
 #pragma GCC pop_options
 
-void kaba_make_dict(Class *t, SyntaxTree *ps) {
+void lib_make_dict(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
-	t->derive_from(TypeDictBase, false);
+	t->derive_from(TypeDictBase, DeriveFlags::SET_SIZE);
 	t->param = {p};
 	add_class(t);
 
@@ -73,7 +73,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 			func_add_param("x", p);
 		class_add_func(Identifier::Func::GET, p, &IntDict::get_int, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func(Identifier::Func::STR, TypeString, &IntDict::str, Flags::PURE);
+//		class_add_func(Identifier::Func::STR, TypeString, &IntDict::str, Flags::PURE);
 	} else if (p == TypeFloat32) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<float>::__init__);
 		class_add_func(Identifier::Func::SET, TypeVoid, &FloatDict::set_float);
@@ -81,7 +81,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 			func_add_param("x", p);
 		class_add_func(Identifier::Func::GET, p, &FloatDict::get_float, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
-		class_add_func(Identifier::Func::STR, TypeString, &FloatDict::str, Flags::PURE);
+//		class_add_func(Identifier::Func::STR, TypeString, &FloatDict::str, Flags::PURE);
 	} else if (p == TypeString) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<string>::__init__);
 		class_add_func(Identifier::Func::SET, TypeVoid, &base::map<string,string>::set);
@@ -93,7 +93,7 @@ void kaba_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_func("clear", TypeVoid, &base::map<string,string>::clear);
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &StringDict::assign);
 			func_add_param("other", t);
-		class_add_func(Identifier::Func::STR, TypeString, &StringDict::str, Flags::PURE);
+//		class_add_func(Identifier::Func::STR, TypeString, &StringDict::str, Flags::PURE);
 	}
 }
 

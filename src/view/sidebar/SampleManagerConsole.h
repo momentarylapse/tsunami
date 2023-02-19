@@ -56,7 +56,7 @@ public:
 	void set_selection(const Array<Sample*> &samples);
 
 	struct Preview {
-		SignalChain *chain = nullptr;
+		shared<SignalChain> chain;
 		AudioOutput *stream = nullptr;
 		BufferStreamer *renderer = nullptr;
 		MidiEventStreamer *midi_streamer = nullptr;

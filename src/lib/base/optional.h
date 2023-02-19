@@ -61,6 +61,12 @@ public:
 		clear();
 	}
 
+	bool operator==(const optional<T> &o) const {
+		if (_is_set && o._is_set)
+			return *(T*)&_value == *(T*)&o._value;
+		return _is_set == o._is_set;
+	}
+
 	T &value() const {
 		if (!_is_set)
 			throw Exception("no value");

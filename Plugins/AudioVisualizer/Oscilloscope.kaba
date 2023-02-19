@@ -6,7 +6,7 @@ use tsunami
 const NUM_SAMPLES = 4096
 
 class OscilloscopePanel extends ConfigPanel
-	var override c: Oscilloscope*
+	var override c: Oscilloscope&
 	
 	func override __init__(_osci: Module)
 		from_source("
@@ -52,6 +52,6 @@ class Oscilloscope extends AudioVisualizer
 	func override process(buf: AudioBuffer)
 		#buffer = buf
 		
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new OscilloscopePanel(self)
 

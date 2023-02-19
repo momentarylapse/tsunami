@@ -419,7 +419,7 @@ void ViewModeEditMidi::ri_insert() {
 
 
 void ViewModeEditMidi::on_midi_input() {
-	auto rec = (MidiAccumulator*)preview->accumulator;
+	auto rec = (MidiAccumulator*)preview->accumulator.get();
 
 	if (input_capture) {
 

@@ -13,7 +13,7 @@
 namespace hui
 {
 
-MenuItemSubmenu::MenuItemSubmenu(const string &title, Menu *menu, const string &id) :
+MenuItemSubmenu::MenuItemSubmenu(const string &title, xfer<Menu> menu, const string &id) :
 	BasicMenuItem(MENU_ITEM_SUBMENU, id)
 {
 #if GTK_CHECK_VERSION(4,0,0)
@@ -29,7 +29,7 @@ MenuItemSubmenu::MenuItemSubmenu(const string &title, Menu *menu, const string &
 
 MenuItemSubmenu::~MenuItemSubmenu() {
 #if !GTK_CHECK_VERSION(4,0,0)
-	delete(sub_menu);
+	//delete(sub_menu);
 #endif
 }
 

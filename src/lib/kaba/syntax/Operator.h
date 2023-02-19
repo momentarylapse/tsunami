@@ -62,18 +62,31 @@ enum class OperatorID {
 	FUNCTION_PIPE, // |>
 	AS,            // as
 	MAPS_TO,       // =>
+	REF_ASSIGN,    // :=
 	_COUNT_
 };
+
+enum class OperatorFlags {
+	NONE = 0,
+	UNARY_LEFT = 1,
+	UNARY_RIGHT = 2,
+	BINARY = 3,
+	LEFT_IS_MODIFIABLE = 4,
+	ORDER_INVERTED = 8 // (param, instance) instead of (instance, param)
+};
+
+OperatorFlags operator|(OperatorFlags a, OperatorFlags b);
+int operator&(OperatorFlags a, OperatorFlags b);
 
 class AbstractOperator {
 public:
 	string name;
 	OperatorID id;
-	bool left_modifiable;
 	unsigned char level; // order of operators ("Punkt vor Strich")
 	string function_name;
-	int param_flags; // 1 = only left, 2 = only right, 3 = both
-	bool order_inverted; // (param, instance) instead of (instance, param)
+	OperatorFlags flags = OperatorFlags::NONE;
+
+	bool is_binary() const;
 };
 extern AbstractOperator abstract_operators[];
 

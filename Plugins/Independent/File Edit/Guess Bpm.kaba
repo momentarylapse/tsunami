@@ -115,9 +115,10 @@ class CorrelationGrid extends Grid
 		redraw()
 	func override on_left_button_down()
 		hover_peak = peak_around_mouse()
-		var bpm1 = curve[max(hover_peak-10, 0)].x
-		var bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
-		dlg.create_curve(bpm0, bpm1)
+		let bpm1 = curve[max(hover_peak-10, 0)].x
+		let bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
+		for d in dlg
+			d.create_curve(bpm0, bpm1)
 
 func weight_parable(p: float[], yy: float[]) -> float
 	var w = 0.0
@@ -142,10 +143,10 @@ func optimize_parable(p0: float[], yy: float[]) -> float[]
 	return p
 
 class SelfCorrelationDialog extends Dialog
-	var grid: CorrelationGrid*
+	var grid: owned![CorrelationGrid]
 	var beats_per_bar = 4
 	var discrete = true
-	var fb: GuessBpm*
+	var fb: GuessBpm&
 	var novelty: float[]
 	var buf_len: int
 	
@@ -168,7 +169,7 @@ Grid ? '' vertical
 		Button ok Create default")
 		set_int("beats", beats_per_bar)
 		check("discrete", discrete)
-		fb = &_fb
+		fb := &!_fb
 		buf_len = len(buf)
 		novelty = calc_novelty(buf)
 	
@@ -193,7 +194,7 @@ Grid ? '' vertical
 	func mut on_ok()
 		var song = fb.session.song
 		song.begin_action_group("guess bpm")
-		if not song.time_track()
+		if not weak(song.time_track())
 			song.add_track(SignalType.TIME, 0)
 		var length: int = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt
 		var bar = Bar(length, beats_per_bar, 1)
@@ -250,7 +251,7 @@ Grid ? '' vertical
 
 class GuessBpm extends TsunamiPlugin
 	func override on_start()
-		for t in weak(session.song.tracks)
-			for l in weak(t.layers)
+		for t in session.song.tracks
+			for l in t.layers
 				for buf in l.buffers
 					hui.fly(new SelfCorrelationDialog(self, buf), stop)

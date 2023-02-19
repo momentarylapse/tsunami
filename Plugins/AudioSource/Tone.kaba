@@ -18,21 +18,20 @@ class SineSource extends AudioSource
 
 	var config: Config
 	var offset: int
-	var synth: Synthesizer* = nil
-	var source: MidiSource* = nil
-	func override __delete__()
-		if synth
-			del synth
-			del source
+	var synth: shared[Synthesizer]
+	var source: shared[MidiSource]
+	
 	func override reset_state()
 		offset = 0
-		if synth
-			del synth
-			del source
 		source = CreateMidiSource(session, "Tone")
 		synth = CreateSynthesizer(session, "")
 		#dyn({"pitch":config.pitch, "volume":config.volume})
-		source.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
-		synth.plug_in(0, source, 0)
+		for s in source
+			s.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
+		for s in synth
+			s.plug_in(0, weak(source), 0)
+
 	func override read(out buf: AudioBuffer) -> int
-		return synth.port_out[0].read_audio(buf)
+		for s in synth
+			return s.port_out[0].read_audio(buf)
+		return 0

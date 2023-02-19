@@ -9,17 +9,22 @@
 #define SRC_MODULE_MODULEFACTORY_H_
 
 #include "../lib/base/base.h"
+#include "../lib/base/pointer.h"
 
 class Module;
 class Session;
 enum class ModuleCategory;
 
-class ModuleFactory
-{
+namespace kaba {
+	class Class;
+}
+
+class ModuleFactory {
 public:
-	static Module *create(Session *session, ModuleCategory type, const string &sub_type);
-	static Module *_create_dummy(ModuleCategory type);
-	static Module *_create_special(Session *session, ModuleCategory type, const string &sub_type);
+	static xfer<Module> create(Session *session, ModuleCategory type, const string &sub_type);
+	static xfer<Module> create_by_class(Session *session, const kaba::Class* type);
+	static xfer<Module> _create_dummy(ModuleCategory type);
+	static xfer<Module> _create_special(Session *session, ModuleCategory type, const string &sub_type);
 	static string base_class(ModuleCategory);
 };
 

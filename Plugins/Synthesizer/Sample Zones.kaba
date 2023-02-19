@@ -3,8 +3,8 @@ use helper.tone
 
 
 class SampleConfig extends Module.Config
-	class Zone
-		var sample: SampleRef shared
+	struct Zone
+		var sample: shared[SampleRef]
 		var pitch_original: int
 		var pitch_min, pitch_max: int
 		var start_loop, end_loop: int
@@ -25,7 +25,7 @@ class SampleRenderer extends PitchRenderer
 	var start_loop, end_loop: int
 	var allow_loop: bool
 	
-	var override synth: SampleSynthesizer*
+	var override synth: SampleSynthesizer&
 	func override on_config()
 		synth.render_by_ref = false
 		zone = nil
@@ -35,23 +35,24 @@ class SampleRenderer extends PitchRenderer
 				if true#z.vel_max > 0.95 #volume >= z.volume_min and volume <= z.volume_max
 					zone = &z
 				#	print(str(z))
-					let factor = pow(2, float(z.pitch_original - pitch) / 12)
-					data.resize(int(z.sample.origin.buf.length * factor))
-					start_loop = int(zone.start_loop * factor)
-					end_loop = int(zone.end_loop * factor)
-					allow_loop = true
-					interpolate_buffer(z.sample.origin.buf, data, 0)
-					env.set(z.attack, 1, z.sustain, z.release, synth.session.sample_rate())
-#					print("++++++   {{start_loop}}:{{end_loop}}  ({{len(data)}})   {{pitch}}")
-					if end_loop < start_loop + 8 or end_loop < 8
-						allow_loop = false
-						end_loop = len(data)
-					else
-						start_loop = clamp(start_loop, 0, len(data))
-						end_loop = clamp(end_loop, start_loop + 1, len(data))
-#					print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
-#					print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
-					break
+					for zs in z.sample
+						let factor = pow(2, float(z.pitch_original - pitch) / 12)
+						data.resize(int(zs.origin.buf.length * factor))
+						start_loop = int(z.start_loop * factor)
+						end_loop = int(z.end_loop * factor)
+						allow_loop = true
+						interpolate_buffer(zs.origin.buf, data, 0)
+						env.set(z.attack, 1, z.sustain, z.release, synth.session.sample_rate())
+#						print("++++++   {{start_loop}}:{{end_loop}}  ({{len(data)}})   {{pitch}}")
+						if end_loop < start_loop + 8 or end_loop < 8
+							allow_loop = false
+							end_loop = len(data)
+						else
+							start_loop = clamp(start_loop, 0, len(data))
+								end_loop = clamp(end_loop, start_loop + 1, len(data))
+#						print("   {{allow_loop}}   {{start_loop}}:{{end_loop}}")
+#						print("   {{z.attack}}  {{z.sustain}}  {{z.release}}")
+						break
 				
 	func override on_start(volume: float)
 		env.start(volume)
@@ -86,17 +87,17 @@ class SampleRenderer extends PitchRenderer
 class SampleSynthesizer extends Synthesizer
 	var config: SampleConfig
 	
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new SampleRenderer(self, pitch)
 	
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel
-	var sc: SampleConfig*
-	var override c: SampleSynthesizer*
+	var sc: SampleConfig&
+	var override c: SampleSynthesizer&
 	func override __init__(_s: Module)
-		sc = &c.config
+		sc := &!c.config
 		add_list_view("!expandx\\Note range\\Sample", 0, 0, "list")
 		#event("list", on_select)
 
@@ -104,6 +105,6 @@ class SamplePanel extends ConfigPanel
 		reset("list")
 		for z in sc.zones
 			var name = ""
-			if weak(z.sample)
-				name = z.sample.origin.name
+			for s in z.sample
+				name = s.origin.name
 			set_string("list", pitch_name(z.pitch_min) + " - " + pitch_name(z.pitch_max) + "\\" + name)

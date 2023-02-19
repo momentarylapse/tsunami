@@ -1,5 +1,5 @@
 
-class Matrix
+struct Matrix
 	var e: float[]
 	var n = 0
 	var m = 0

@@ -231,7 +231,7 @@ void ImagePainter::draw_mask_image(const vec2 &d, const Image *image) {
 }
 
 
-Painter *Image::start_draw() {
+xfer<Painter> Image::start_draw() {
 #if 0
 #ifdef HAS_HUI_PAINTER
 	//set_mode(Mode::BGRA);

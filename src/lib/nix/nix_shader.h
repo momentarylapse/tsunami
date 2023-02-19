@@ -57,20 +57,19 @@ public:
 	int location[NUM_LOCATIONS];
 
 
-	static Shader* _cdecl load(const Path &filename);
-	static Shader* _cdecl create(const string &source);
+	static xfer<Shader> _cdecl load(const Path &filename);
+	static xfer<Shader> _cdecl create(const string &source);
 	void _cdecl update(const string &source);
 
 
-	static Shader *default_2d;
-	static Shader *default_3d;
-	static Shader *default_load;
+	static shared<Shader> default_2d;
+	static shared<Shader> default_3d;
+	static shared<Shader> default_load;
 	static Shader *_current_;
 };
 
 
 void init_shaders();
-void _cdecl delete_all_shaders();
 void _cdecl set_shader(Shader *s);
 
 

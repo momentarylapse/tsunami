@@ -25,11 +25,11 @@ class SpecGrid extends Grid
 		let h = r.height()
 		
 		let fy = im0.height / r.height()
-		let ya = (log(y_axis.val_max) - log(y_axis.val_min)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * fy
-		let yb = (log(y_axis.val_max_max) - log(y_axis.val_max)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * im0.height
+		let ya = (log(y_axis.data.val_max) - log(y_axis.data.val_min)) / (log(y_axis.data.val_max_max) - log(y_axis.data.val_min_min)) * fy
+		let yb = (log(y_axis.data.val_max_max) - log(y_axis.data.val_max)) / (log(y_axis.data.val_max_max) - log(y_axis.data.val_min_min)) * im0.height
 		let fx = im0.width / r.width()
-		let xa = (x_axis.val_max - x_axis.val_min) / (x_axis.val_max_max - x_axis.val_min_min) * fx
-		let xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
+		let xa = (x_axis.data.val_max - x_axis.data.val_min) / (x_axis.data.val_max_max - x_axis.data.val_min_min) * fx
+		let xb = (x_axis.data.val_min - x_axis.data.val_min_min) / (x_axis.data.val_max_max - x_axis.data.val_min_min) * im0.width
 		
 		var im: Image
 		im.create(w, h, color.BLACK)
@@ -76,16 +76,15 @@ func f2col(_f: float) -> color
 
 class ShowSpectrogram extends TsunamiPlugin
 
-	var dlg: SpectrumDialog*
+	var dlg: shared![SpectrumDialog]
 	var sg: float[NF][NT]
 
-	func mut show_spec(song: Song*)
+	func mut show_spec(song: shared![Song])
 		dlg = new SpectrumDialog(self, song)
 	
 		var buf: AudioBuffer
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
-		del renderer
 	
 		var f: complex[]
 		var sub: float[]

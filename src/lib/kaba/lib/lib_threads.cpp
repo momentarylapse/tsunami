@@ -24,10 +24,10 @@ namespace kaba {
 void SIAddPackageThread(Context *c) {
 	add_package(c, "thread");
 
-	const Class *TypeThread       = add_type  ("Thread", sizeof(Thread));
-	const Class *TypeThreadP      = add_type_p(TypeThread);
-	const Class *TypeMutex        = add_type  ("Mutex", sizeof(Mutex));
-	const Class *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
+	const Class *TypeThread       = add_type("Thread", sizeof(Thread));
+	const Class *TypeThreadP      = add_type_p_raw(TypeThread);
+	const Class *TypeMutex        = add_type("Mutex", sizeof(Mutex));
+	const Class *TypeThreadedWork = add_type("ThreadedWork", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
 		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&Thread::__init__));

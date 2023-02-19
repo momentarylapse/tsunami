@@ -461,9 +461,9 @@ public:
 		bool muted = f->read_bool();
 		int uid = f->read_int();
 		if (uid != 0)
-			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get());
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get()).get();
 		else
-			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get());
+			me = parent->add_sample_ref(pos, parent->track->song->samples[index].get()).get();
 		me->volume = volume;
 		me->muted = muted;
 		f->read_int();
@@ -492,7 +492,7 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->layers[0]->add_sample_ref(pos, parent->song->samples[index].get());
+		me = parent->layers[0]->add_sample_ref(pos, parent->song->samples[index].get()).get();
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		f->read_int();

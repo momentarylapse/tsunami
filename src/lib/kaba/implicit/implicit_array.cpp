@@ -12,12 +12,14 @@
 namespace kaba {
 
 void AutoImplementer::_add_missing_function_headers_for_array(Class *t) {
-	if (t->needs_constructor())
+	if (t->param[0]->needs_constructor() and class_can_default_construct(t->param[0]))
 		add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	if (t->needs_destructor())
+	if (t->param[0]->needs_destructor() and class_can_destruct(t->param[0]))
 		add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
 	if (class_can_assign(t->param[0]))
 		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+	if (class_can_equal(t->param[0]) and false) // TODO
+		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
 }
 
 void AutoImplementer::implement_array_constructor(Function *f, const Class *t) {
@@ -80,7 +82,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 		do_error_implicit(f, format("no operator %s = %s found", te->long_name(), te->long_name()));
 	b->add(n_assign);
 
-	auto n_for = add_node_statement(StatementID::FOR_ARRAY);
+	auto n_for = add_node_statement(StatementID::FOR_CONTAINER);
 	// [VAR, INDEX, ARRAY, BLOCK]
 	n_for->set_param(0, add_node_local(v_el));
 	n_for->set_param(1, add_node_local(v_i));

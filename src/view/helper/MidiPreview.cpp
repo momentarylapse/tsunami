@@ -17,7 +17,7 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	session = s;
 	source = new MidiPreviewSource;
 	chain = session->create_signal_chain_system("midi-preview");
-	chain->_add(source);
+	chain->_add(source.get());
 	joiner = chain->add(ModuleCategory::PLUMBING, "MidiJoiner");
 	accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator");
 //	synth->setInstrument(view->cur_track->instrument);
@@ -27,10 +27,10 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	input = nullptr;
 	input_device = nullptr;
 
-	chain->connect(source, 0, joiner, 0);
-	chain->connect(joiner, 0, synth, 0);
-	chain->connect(synth, 0, out, 0);
-	chain->connect(accumulator, 0, joiner, 1);
+	chain->connect(source.get(), 0, joiner.get(), 0);
+	chain->connect(joiner.get(), 0, synth.get(), 0);
+	chain->connect(synth.get(), 0, out.get(), 0);
+	chain->connect(accumulator.get(), 0, joiner.get(), 1);
 
 	chain->mark_all_modules_as_system();
 }
@@ -51,8 +51,8 @@ void MidiPreview::end() {
 }
 
 void MidiPreview::_start_input() {
-	input = (MidiInput*)chain->add(ModuleCategory::STREAM, "MidiInput");
-	chain->connect(input, 0, accumulator, 0);
+	input = chain->addx<MidiInput>(ModuleCategory::STREAM, "MidiInput");
+	chain->connect(input.get(), 0, accumulator.get(), 0);
 	//chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	chain->start();
 	chain->command(ModuleCommand::ACCUMULATION_START, 0);
@@ -62,7 +62,7 @@ void MidiPreview::_stop_input() {
 	//chain->unsubscribe(this);
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	chain->stop();
-	chain->delete_module(input);
+	chain->delete_module(input.get());
 	input = nullptr;
 }
 

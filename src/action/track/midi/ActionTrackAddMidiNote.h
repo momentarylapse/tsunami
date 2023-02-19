@@ -14,7 +14,7 @@ class MidiNote;
 
 class ActionTrackAddMidiNote : public Action {
 public:
-	ActionTrackAddMidiNote(TrackLayer *l, MidiNote *n);
+	ActionTrackAddMidiNote(TrackLayer *l, shared<MidiNote> n);
 
 	string name() const override { return ":##:add midi"; }
 

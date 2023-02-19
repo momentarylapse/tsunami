@@ -299,7 +299,7 @@ public:
 			*(bool*)var = aa.as_bool();
 		} else if (type == TypeString) {
 			*(string*)var = aa.as_string();
-		} else if (type->is_pointer()) {
+		} else if (type->is_pointer_raw()) {
 			*(const void**)var = aa.as_pointer();
 		} else if (type->is_super_array() and (aa.type == TYPE_ARRAY)) {
 			auto *t_el = type->get_array_element();
@@ -384,25 +384,25 @@ void SIAddPackageMath(Context *c) {
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));
-	TypeComplexList = add_type_l(TypeComplex);
+	TypeComplexList = add_type_list(TypeComplex);
 	TypeVec2 = add_type("vec2", sizeof(vec2));
-	TypeVec2List = add_type_l(TypeVec2);
+	TypeVec2List = add_type_list(TypeVec2);
 	TypeVec3 = add_type("vec3", sizeof(vec3));
-	TypeVec3List = add_type_l(TypeVec3);
+	TypeVec3List = add_type_list(TypeVec3);
 	TypeRect = add_type("rect", sizeof(rect));
 	TypeMat4 = add_type("mat4", sizeof(mat4));
 	TypeQuaternion = add_type("quaternion", sizeof(quaternion));
 	TypePlane = add_type("plane", sizeof(plane));
-	TypePlaneList = add_type_l(TypePlane);
+	TypePlaneList = add_type_list(TypePlane);
 	TypeColor = add_type("color", sizeof(color));
-	TypeColorList = add_type_l(TypeColor);
+	TypeColorList = add_type_list(TypeColor);
 	TypeMat3 = add_type("mat3", sizeof(mat3));
-	auto TypeFloatArray3 = add_type_a(TypeFloat32, 3);
-	auto TypeFloatArray4 = add_type_a(TypeFloat32, 4);
-	auto TypeFloatArray4x4 = add_type_a(TypeFloatArray4, 4);
-	auto TypeFloatArray16 = add_type_a(TypeFloat32, 16);
-	auto TypeFloatArray3x3 = add_type_a(TypeFloatArray3, 3);
-	auto TypeFloatArray9 = add_type_a(TypeFloat32, 9);
+	auto TypeFloatArray3 = add_type_array(TypeFloat32, 3);
+	auto TypeFloatArray4 = add_type_array(TypeFloat32, 4);
+	auto TypeFloatArray4x4 = add_type_array(TypeFloatArray4, 4);
+	auto TypeFloatArray16 = add_type_array(TypeFloat32, 16);
+	auto TypeFloatArray3x3 = add_type_array(TypeFloatArray3, 3);
+	auto TypeFloatArray9 = add_type_array(TypeFloat32, 9);
 	auto TypeVli = add_type("vli", sizeof(vli));
 	auto TypeCrypto = add_type("Crypto", sizeof(Crypto));
 	TypeAny = add_type("any", sizeof(Any));
@@ -415,7 +415,7 @@ void SIAddPackageMath(Context *c) {
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
 		flags_set(((Class*)TypeFloat32)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 		flags_set(((Class*)TypeFloat64)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-		if (config.abi == Abi::AMD64_GNU) {
+		if (config.target.abi == Abi::AMD64_GNU) {
 			// not on windows!
 			flags_set(((Class*)TypeComplex)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
 			flags_set(((Class*)TypeVec2)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
@@ -1205,7 +1205,7 @@ void SIAddPackageMath(Context *c) {
 
 
 	// needs to be defined after any
-	TypeAnyList = add_type_l(TypeAny);
+	TypeAnyList = add_type_list(TypeAny);
 	add_class(TypeAnyList);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<Any>::__init__);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &AnyList::__delete__);
@@ -1214,7 +1214,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &AnyList::assign);
 			func_add_param("other", TypeAnyList);
 
-	TypeAnyDict = add_type_d(TypeAny);
+	TypeAnyDict = add_type_dict(TypeAny);
 	add_class(TypeAnyDict);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<Any>::__init__);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &AnyDict::__delete__);

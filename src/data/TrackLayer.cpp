@@ -180,7 +180,7 @@ void TrackLayer::edit_buffers_finish(Action *a) {
 		track->song->execute(a);
 }
 
-SampleRef *TrackLayer::add_sample_ref(int pos, Sample* sample) {
+shared<SampleRef> TrackLayer::add_sample_ref(int pos, Sample *sample) {
 	return (SampleRef*)track->song->execute(new ActionTrackAddSample(this, pos, sample));
 }
 
@@ -193,7 +193,7 @@ void TrackLayer::edit_sample_ref(SampleRef *ref, float volume, bool mute) {
 }
 
 // will take ownership of this instance!
-void TrackLayer::add_midi_note(MidiNote *n) {
+void TrackLayer::add_midi_note(shared<MidiNote> n) {
 	track->song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
@@ -222,7 +222,7 @@ void TrackLayer::delete_midi_note(const MidiNote *note) {
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
 
-const TrackMarker *TrackLayer::add_marker(const TrackMarker *marker) {
+const shared<TrackMarker> TrackLayer::add_marker(const shared<TrackMarker> marker) {
 	track->song->execute(new ActionTrackAddMarker(this, marker));
 	return marker;
 }

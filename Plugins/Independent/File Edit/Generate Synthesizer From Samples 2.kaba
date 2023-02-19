@@ -27,7 +27,7 @@ class XXX extends TsunamiPlugin
 		track.synth = CreateSynthesizer(session, "Sample Zones")
 		print("set synth")
 		var synth = track.synth
-		track.set_synthesizer(weak(synth))
+		track.set_synthesizer(synth)
 			
 		var a: any
 		a["zones"] = []

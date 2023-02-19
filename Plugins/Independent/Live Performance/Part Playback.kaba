@@ -6,24 +6,22 @@ enum Mode
 	LOOP
 
 func get_part(s: Song, offset: int) -> TrackMarker*
-	var t = s.time_track()
-	if !t
-		return nil
-	for m in weak(t.layers[0].markers)
-		if m.range.inside(offset)
-			return m
+	for t in s.time_track()
+		for m in t.layers[0].markers
+			if m.range.inside(offset)
+				return weak(m)
 	return nil
 
 
 
 class PPPanel extends ConfigPanel
-	var looper: Looper*
+	var looper: Looper&
 	
 	func __init__(l: Looper)
 		super.__init__(l)
 		from_source("
 Button forward 'Forward' expandx expandy")
-		looper = &l
+		looper := &!l
 
 		event("forward", on_forward)
 	
@@ -35,9 +33,9 @@ Button forward 'Forward' expandx expandy")
 class Looper extends TsunamiPlugin
 	var runner: int
 	var mode: Mode
-	var chain: SignalChain*
-	var renderer: SongRenderer*
-	var song: Song*
+	var chain: shared![SignalChain]
+	var renderer: shared![SongRenderer]
+	var song: shared![Song]
 	var cur_part: TrackMarker*
 	
 	func override on_start()
@@ -51,15 +49,15 @@ class Looper extends TsunamiPlugin
 	func override on_stop()
 		hui.cancel_runner(runner)
 			
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new PPPanel(self)
 	
-	func on_leave_part()
-		print("leaving " + cur_part.text)
+	func on_leave_part(p: TrackMarker)
+		print("leaving " + p.text)
 		#go_forward
-	func mut on_enter_part()
-		print("entering " + cur_part.text)
-		renderer.set_range(cur_part.range)
+	func mut on_enter_part(p: TrackMarker)
+		print("entering " + p.text)
+		renderer.set_range(p.range)
 		renderer.set_loop(true)
 		mode = Mode.LOOP
 	func mut go_forward()
@@ -71,8 +69,8 @@ class Looper extends TsunamiPlugin
 		var pos = renderer.get_pos(0)
 		var p = get_part(song, pos)
 		if p != cur_part
-			if cur_part
-				on_leave_part()
+			for cp in cur_part
+				on_leave_part(cp)
 			cur_part = p
-			if cur_part
-				on_enter_part()
+			for cp in cur_part
+				on_enter_part(cp)

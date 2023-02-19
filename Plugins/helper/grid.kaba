@@ -2,7 +2,7 @@ use hui
 use tsunami
 use tone
 
-class Curve
+struct Curve
 	var col, col_below: color
 	func __init__()
 		col = colors.text_soft1
@@ -21,11 +21,11 @@ func log2lin(f: float, f_min: float, f_max: float) -> float
 func lin2log(f: float, f_min: float, f_max: float) -> float
 	return log(f / f_min) / log(f_max / f_min)
 
-class GridTick
+struct GridTick
 	var value, weight: float
 	var label: string
 
-class GridPartition
+struct GridPartition
 	var tick: GridTick[]
 
 #enum
@@ -36,20 +36,21 @@ class GridPartition
 #	UNIT_DB
 #	UNIT_PERCENT
 
-class AxisData extends Object
+struct AxisData #extends Object
 	var val_min, val_max: float
 	var val_min_min, val_max_max: float
 	var log_scale: bool
 	var unit: string
 	
 
-class GridAxis extends AxisData
+class GridAxis extends Object #AxisData
+	var data: AxisData
 	var offset, size: float
 	var area: rect
 	var min_label_dist: float
 	var freq_as_pitch: bool
-	var grid: Grid*
-	var menu: Menu* = nil
+	var grid: Grid&
+	var menu: owned[Menu]
 	var _id: string
 	
 	#override void __init__()
@@ -57,63 +58,58 @@ class GridAxis extends AxisData
 		_id = p2s(&self)
 		freq_as_pitch = false
 		set(0, 1, false, "")
-		menu = nil
-	func override __delete__()
-		if menu
-			del menu
 	
 	func mut set_events()
 		grid.panel.event("{{_id}}-mode-freq-hz", on_mode_freq_hz)
 		grid.panel.event("{{_id}}-mode-pitch", on_mode_pitch)
 	
 	func mut set(_val_min: float, _val_max: float, _log: bool, _unit: string)
-		val_min = _val_min
-		val_max = _val_max
-		val_min_min = _val_min
-		val_max_max = _val_max
-		log_scale = _log
-		unit = _unit
+		#data = (_val_min, _val_max, _val_min, _val_max, _log, _unit)
+		data.val_min = _val_min
+		data.val_max = _val_max
+		data.val_min_min = _val_min
+		data.val_max_max = _val_max
+		data.log_scale = _log
+		data.unit = _unit
 	
 	func rel2val(__v: float) -> float
-		if log_scale
-			return log2lin(__v, val_min_min, val_max_max)
-		return __v * (val_max_max - val_min_min) + val_min_min
+		if data.log_scale
+			return log2lin(__v, data.val_min_min, data.val_max_max)
+		return __v * (data.val_max_max - data.val_min_min) + data.val_min_min
 		
 	func project(__v: float) -> float
-		if log_scale
-			return lin2log(__v, val_min, val_max) * size + offset
-		return ((__v - val_min) / (val_max - val_min)) * size + offset
+		if data.log_scale
+			return lin2log(__v, data.val_min, data.val_max) * size + offset
+		return ((__v - data.val_min) / (data.val_max - data.val_min)) * size + offset
 
 	func unproject(__v: float) -> float
-		if log_scale
-			return log2lin((__v - offset) / size, val_min, val_max)
-		return (__v - offset) / size * (val_max - val_min) + val_min
+		if data.log_scale
+			return log2lin((__v - offset) / size, data.val_min, data.val_max)
+		return (__v - offset) / size * (data.val_max - data.val_min) + data.val_min
 	
 	func mut zoom(p: float, dz: float)
 		var m = unproject(p)
-		if log_scale
-			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
-			val_max = clamp(exp(log(m) + (log(val_max) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
+		if data.log_scale
+			data.val_min = clamp(exp(log(m) + (log(data.val_min) - log(m)) * pow(0.9, dz)), data.val_min_min, data.val_max_max)
+			data.val_max = clamp(exp(log(m) + (log(data.val_max) - log(m)) * pow(0.9, dz)), data.val_min_min, data.val_max_max)
 		else
-			val_min = clamp(m + (val_min - m) * pow(0.9, dz), val_min_min, val_max_max)
-			val_max = clamp(m + (val_max - m) * pow(0.9, dz), val_min_min, val_max_max)
+			data.val_min = clamp(m + (data.val_min - m) * pow(0.9, dz), data.val_min_min, data.val_max_max)
+			data.val_max = clamp(m + (data.val_max - m) * pow(0.9, dz), data.val_min_min, data.val_max_max)
 		grid.redraw()
 		
 	func mut on_left_button_down()
 		pass
 		
 	func mut on_right_button_down()
-		if menu
-			del menu
-		menu = new Menu(grid.panel)
-		if unit == "Hz"
-			menu.add("Frequency (Hz)", "{{_id}}-mode-freq-hz")
-			menu.add("Pitch", "{{_id}}-mode-pitch")
-		else if unit == ""
-			menu.add("no unit", "-dummy-")
+		var m = new Menu(grid.panel)
+		if data.unit == "Hz"
+			m.add("Frequency (Hz)", "{{_id}}-mode-freq-hz")
+			m.add("Pitch", "{{_id}}-mode-pitch")
+		else if data.unit == ""
+			m.add("no unit", "-dummy-")
 		else
-			menu.add("unit: {{unit}}", "-dummy-")
-		menu.popup(grid.panel)
+			m.add("unit: {{data.unit}}", "-dummy-")
+		m.popup(grid.panel)
 	
 	func mut on_mode_freq_hz()
 		freq_as_pitch = false
@@ -123,11 +119,12 @@ class GridAxis extends AxisData
 		grid.redraw()
 	
 	func mut on_mouse_wheel(mm: float)
-		if grid.panel.win.get_key(KEY_CONTROL)
-			zoom(mm, hui.get_event().scroll.y)
+		for w in grid.panel.win
+			if w.get_key(KEY_CONTROL)
+				zoom(mm, hui.get_event().scroll.y)
 
 	func get_lin_partition() -> GridPartition
-		var d = (val_max - val_min) / size * 150
+		var d = (data.val_max - data.val_min) / size * 150
 		var r: GridPartition
 		var step: float = 1
 		var e = log(abs(abs(d))) / log(10)
@@ -137,12 +134,12 @@ class GridAxis extends AxisData
 		step = pow(10, e_floor)
 		var factor = d / step
 		var decimals = int(max(-e_floor, 0))
-		var min = float(int(val_min / step)) * step
-		var max = val_max
+		var min = float(int(data.val_min / step)) * step
+		var max = data.val_max
 		
 		var vv = min
 		while vv <= max and step > 0
-			r.tick.add([vv, 0.5, "{{vv.str2(decimals)}} {{unit}}"])
+			r.tick.add([vv, 0.5, "{{vv.str2(decimals)}} {{data.unit}}"])
 			if factor < 3
 				r.tick.add([vv + step / 2, 0.2, ""])
 			vv += step
@@ -150,16 +147,16 @@ class GridAxis extends AxisData
 		return r
 		
 	func get_log_partition() -> GridPartition
-		let pixel_per_decade = abs(size / log(val_max / val_min)) * log(10)
+		let pixel_per_decade = abs(size / log(data.val_max / data.val_min)) * log(10)
 		let size_param = pixel_per_decade / min_label_dist
 		var r: GridPartition
-		let e_min = int(log(abs(abs(val_min))) / log(10))
-		let e_max = int(log(abs(abs(val_max))) / log(10)) + 1
+		let e_min = int(log(abs(abs(data.val_min))) / log(10))
+		let e_max = int(log(abs(abs(data.val_max))) / log(10)) + 1
 		for e in e_min:e_max
 			var vv0 = pow(10, e)
 			for i in 1:10
 				var vv = vv0 * i
-				if (vv >= val_min) and (vv <= val_max)
+				if (vv >= data.val_min) and (vv <= data.val_max)
 					var label: string
 					var show = false
 					if (i == 1)
@@ -169,17 +166,17 @@ class GridAxis extends AxisData
 					if ((i == 2) or (i == 5)) and (size_param > 4)
 						show = true
 					if show
-						label = "{{vv|.0}} {{unit}}"
+						label = "{{vv|.0}} {{data.unit}}"
 					r.tick.add([vv, exp(-(i+1)*0.07), label])
 				vv = vv0 * 1.5
-				if (i == 1) and (vv >= val_min) and (vv <= val_max)
+				if (i == 1) and (vv >= data.val_min) and (vv <= data.val_max)
 					r.tick.add([vv, 0.2, ""])
 		return r
 		
 	func get_pitch_partition() -> GridPartition
 		var r: GridPartition
-		var pitch_min = freq_to_pitch(val_min)
-		var pitch_max = freq_to_pitch(val_max)
+		var pitch_min = freq_to_pitch(data.val_min)
+		var pitch_max = freq_to_pitch(data.val_max)
 		var density = (pitch_max - pitch_min) / area.width()
 		#print(density)
 		
@@ -209,7 +206,7 @@ class GridAxis extends AxisData
 		return r
 		
 	func get_partition() -> GridPartition
-		if log_scale
+		if data.log_scale
 			if freq_as_pitch
 				return get_pitch_partition()
 			return get_log_partition()
@@ -221,7 +218,7 @@ class Grid extends Object
 	var plot_area: rect
 	#var x, y, w, h: float
 	
-	var panel: Panel*
+	var panel: Panel&
 	var id: string
 	var m: vec2
 	
@@ -243,8 +240,8 @@ class Grid extends Object
 		col_hover = colors.hover
 		col_sel = colors.selection
 		allow_bg = true
-		x_axis.grid = &self
-		y_axis.grid = &self
+		x_axis.grid := &!self
+		y_axis.grid := &!self
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
 
@@ -499,7 +496,7 @@ class Grid extends Object
 
 	func mut init(_panel: Panel, _id: string)
 		data_init()
-		panel = &_panel
+		panel := &!_panel
 		id = _id
 		panel.event_x(id, "hui:draw", on_draw_all)
 		panel.event_x(id, "hui:left-button-down", on_left_button_down_all)

@@ -1,7 +1,7 @@
 use linalg
 
 
-class Node
+struct Node
 	var phi = 0.0
 	var pos: vec2
 	func __init__()
@@ -22,7 +22,7 @@ func empty() -> float[]
 	var r: float[]
 	return r
 
-class Edge
+struct Edge
 	var type: EdgeType
 	var a, b: int
 	var I, U: float
@@ -170,9 +170,9 @@ class SimResult
 		I.clear()
 		phi.clear()
 
-class Circuit
+class Circuit as @noauto
 	var nodes: Node[]
-	var edges: Edge*[]
+	var edges: owned![Edge][]
 	var _out: int
 	
 	func __init__()
@@ -181,8 +181,6 @@ class Circuit
 	func mut clear()
 		nodes.clear()
 		_out = 1
-		for e in edges
-			del e
 		edges.clear()
 	
 	func mut reset_default()
@@ -323,28 +321,29 @@ class Circuit
 			else
 				var t = EdgeType.parse(x[0])
 				var n = [int(x[1]), int(x[2])]
-				var e: Edge* = add_default(n, t)
+				var e = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
 	
-	func mut add_default(n: int[], t: EdgeType) -> Edge*
-		var e: Edge* = nil
+	func mut _create_default(n: int[], t: EdgeType) -> xfer[Edge]
 		if t == EdgeType.CABLE
-			e = new Cable(n)
+			return new Cable(n)
 		else if t == EdgeType.SOURCE
-			e = new Source(n, 1)
+			return new Source(n, 1)
 		else if t == EdgeType.RESISTOR
-			e = new Resistor(n, 10)
+			return new Resistor(n, 10)
 		else if t == EdgeType.CAPACITOR
-			e = new Capacitor(n, 1)
+			return new Capacitor(n, 1)
 		else if t == EdgeType.INDUCTOR
-			e = new Inductor(n, 1)
+			return new Inductor(n, 1)
 		else if t == EdgeType.DIODE
-			e = new Diode(n)
+			return new Diode(n)
 		else
 			raise(new Exception("unknown type: {{t}}"))
-		edges.add(e)
-		return e
+			
+	func mut add_default(n: int[], t: EdgeType) -> Edge&
+		edges.add(_create_default(n, t))
+		return &!(edges[len(edges)-1])
 
 func _main()
 	var c: Circuit

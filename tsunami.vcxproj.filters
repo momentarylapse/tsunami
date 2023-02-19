@@ -643,7 +643,7 @@
     <ClCompile Include="src\lib\kaba\compiler\CommandList.cpp">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\compiler.cpp">
+    <ClCompile Include="src\lib\kaba\compiler\Compiler.cpp">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\mapper.cpp">
@@ -767,6 +767,12 @@
       <Filter>src\lib\kaba\parser</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\parser\template.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\Transformer.cpp">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\parser\type_matching.cpp">
       <Filter>src\lib\kaba\parser</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Block.cpp">
@@ -2082,6 +2088,9 @@
     <ClInclude Include="src\lib\kaba\compiler\CommandList.h">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\compiler\Compiler.h">
+      <Filter>src\lib\kaba\compiler</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\compiler\serializer.h">
       <Filter>src\lib\kaba\compiler</Filter>
     </ClInclude>
@@ -2121,6 +2130,12 @@
     <ClInclude Include="src\lib\kaba\lib\operators.h">
       <Filter>src\lib\kaba\lib</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\kaba\lib\optional.h">
+      <Filter>src\lib\kaba\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\lib\shared.h">
+      <Filter>src\lib\kaba\lib</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\kaba\parser\abstract.h">
       <Filter>src\lib\kaba\parser</Filter>
     </ClInclude>
@@ -2134,6 +2149,9 @@
       <Filter>src\lib\kaba\parser</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\parser\template.h">
+      <Filter>src\lib\kaba\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\kaba\parser\Transformer.h">
       <Filter>src\lib\kaba\parser</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\kaba\syntax\Block.h">

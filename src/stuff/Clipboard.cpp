@@ -15,6 +15,7 @@
 #include "../data/TrackLayer.h"
 #include "../data/TrackMarker.h"
 #include "../data/Sample.h"
+#include "../data/SampleRef.h"
 #include "../data/SongSelection.h"
 #include "../data/rhythm/Bar.h"
 #include "../data/rhythm/Beat.h"

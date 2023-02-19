@@ -36,7 +36,7 @@ class PADRenderer extends PitchRenderer
 	var pos = 0
 	var prebuf: float[]
 	var env: EnvelopeADSR
-	var override synth: PADSynthesizer*
+	var override synth: PADSynthesizer&
 		
 	func mut create()
 		var freq = pitch_to_freq(pitch)
@@ -94,15 +94,15 @@ class PADRenderer extends PitchRenderer
 class PADSynthesizer extends Synthesizer
 	var config: PADConfig
 	
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new PADPanel(self)
 
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new PADRenderer(self, pitch)
 
 class PADGrid extends Grid
-	var pc: PADConfig*
-	var p: ConfigPanel*
+	var pc: PADConfig&
+	var p: ConfigPanel&
 	var selected = -1
 	var hover = -1
 
@@ -139,11 +139,11 @@ class PADGrid extends Grid
 		redraw()
 
 class PADPanel extends ConfigPanel
-	var pc: PADConfig*
+	var pc: PADConfig&
 	var grid: PADGrid
-	var override c: PADSynthesizer*
+	var override c: PADSynthesizer&
 	func override __init__(_s: Module)
-		pc = &c.config
+		pc := &!c.config
 		from_source("
 Grid ? ''
 	Grid ? ''
@@ -161,8 +161,8 @@ Grid ? ''
 		event("bwscale", on_change)
 		event("detune", on_change)
 		
-		grid.pc = pc
-		grid.p = &self
+		grid.pc := pc
+		grid.p := &!self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, 8.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")

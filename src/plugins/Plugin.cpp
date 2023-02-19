@@ -69,7 +69,7 @@ void *Plugin::create_instance(Session *session, const string &root_type) {
 	if (!usable(session))
 		return nullptr;
 
-	for (auto *t: weak(module->syntax->base_class->classes)) {
+	for (auto *t: weak(module->tree->base_class->classes)) {
 		if (t->is_derived_from_s(root_type)) {
 			return t->create_instance();
 		}

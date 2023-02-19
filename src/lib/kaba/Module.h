@@ -32,22 +32,6 @@ public:
 
 	void load(const Path &filename, bool just_analyse = false);
 
-	// building operational code
-	void compile();
-	void map_constants_to_opcode();
-	void _map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space);
-	void map_global_variables_to_memory();
-	void map_constants_to_memory(char *mem, int &offset, char *address);
-	void allocate_opcode();
-	void align_opcode();
-	void allocate_memory();
-	void assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list);
-	void compile_functions(char *oc, int &ocs);
-	void CompileOsEntryPoint();
-	void LinkOsEntryPoint();
-	void link_functions();
-	void link_virtual_functions_into_vtable(const Class *c);
-
 	// error messages
 	void do_error(const string &msg, int override_token = -1);
 	void do_error_link(const string &msg);
@@ -63,7 +47,7 @@ public:
 // data
 
 	Path filename;
-	SyntaxTree *syntax;
+	owned<SyntaxTree> tree;
     Context *context;
 
 	char *opcode; // executable code

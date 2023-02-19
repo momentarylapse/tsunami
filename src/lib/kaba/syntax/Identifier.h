@@ -45,8 +45,10 @@ namespace Identifier {
 	extern const string SELFREF;
 	extern const string REF;
 	extern const string WEAK;
+	extern const string GIVE;
 	extern const string SHARED;
 	extern const string OWNED;
+	extern const string XFER;
 	extern const string PURE;
 	extern const string NOAUTO;
 	extern const string NOFRAME;
@@ -118,6 +120,7 @@ namespace Identifier {
 		extern const string CALL;
 		extern const string SHARED_CLEAR;
 		extern const string SHARED_CREATE;
+		extern const string OWNED_GIVE;
 		extern const string CONTAINS;
 		extern const string FORMAT;
 		extern const string OPTIONAL_HAS_VALUE;

@@ -195,9 +195,9 @@ void Track::set_channels(int _channels) {
 		song->execute(new ActionTrackSetChannels(this, _channels));
 }
 
-void Track::add_effect(AudioEffect *effect) {
+void Track::add_effect(shared<AudioEffect> effect) {
 	song->execute(new ActionTrackAddEffect(this, effect));
-	_register_fx(effect);
+	_register_fx(effect.get());
 }
 
 
@@ -234,9 +234,9 @@ void Track::move_effect(int source, int target) {
 		song->execute(new ActionTrackMoveAudioEffect(this, source, target));
 }
 
-void Track::add_midi_effect(MidiEffect *effect) {
+void Track::add_midi_effect(shared<MidiEffect> effect) {
 	song->execute(new ActionTrackAddMidiEffect(this, effect));
-	_register_midi_fx(effect);
+	_register_midi_fx(effect.get());
 }
 
 // execute after editing...
@@ -260,9 +260,9 @@ void Track::move_midi_effect(int source, int target) {
 		song->execute(new ActionTrackMoveMidiEffect(this, source, target));
 }
 
-void Track::set_synthesizer(Synthesizer *_synth) {
+void Track::set_synthesizer(shared<Synthesizer> _synth) {
 	song->execute(new ActionTrackSetSynthesizer(this, _synth));
-	_register_synth(_synth);
+	_register_synth(_synth.get());
 }
 
 // execute after editing...

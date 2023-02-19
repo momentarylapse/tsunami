@@ -13,7 +13,7 @@ namespace kaba {
 void SetImmortal(SyntaxTree *ps) {
 	ps->flag_immortal = true;
 	for (auto i: ps->includes)
-		SetImmortal(i->syntax);
+		SetImmortal(i->tree.get());
 }
 
 

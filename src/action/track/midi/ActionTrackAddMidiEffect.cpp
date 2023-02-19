@@ -10,7 +10,7 @@
 #include "../../../module/midi/MidiEffect.h"
 #include <cassert>
 
-ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, MidiEffect *_effect) {
+ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, shared<MidiEffect> _effect) {
 	track = t;
 	effect = _effect;
 }

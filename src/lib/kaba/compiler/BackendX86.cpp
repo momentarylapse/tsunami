@@ -14,6 +14,9 @@
 namespace kaba {
 
 
+// FIXME why are there ::ARM checks?!?
+
+
 
 //bool is_typed_function_pointer(const Class *c);
 
@@ -121,7 +124,7 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 				p.kind = NodeKind::MEMORY;
 			} else if (p.kind == NodeKind::CONSTANT) {
 				auto cc = (Constant*)p.p;
-				if (module->syntax->flag_function_pointer_as_code and (p.type == TypeFunctionP)) {
+				if (module->tree->flag_function_pointer_as_code and (p.type == TypeFunctionP)) {
 					auto *fp = (Function*)(int_p)cc->as_int64();
 					p.kind = NodeKind::LABEL;
 					p.p = fp->_label;
@@ -327,7 +330,7 @@ void BackendX86::correct_implement_commands() {
 			insert_cmd(inst, t, p2);
 			insert_cmd(Asm::InstID::MOV, r, t);
 		} else if (c.inst == Asm::InstID::CMP) {
-			if (c.p[0].type->size > config.pointer_size and false) {
+			if (c.p[0].type->size > config.target.pointer_size and false) {
 				do_error("chunk cmp... currently done by the Serializer!");
 				// chunk cmp
 				auto p1 = c.p[1];
@@ -537,7 +540,7 @@ int BackendX86::function_call_pre(const Array<SerialNodeParam> &_params, const S
 		}
 	}
 
-	if (config.abi == Abi::X86_WINDOWS) {
+	if (config.target.abi == Abi::X86_WINDOWS) {
 		// more than 4 byte have to be returned -> give return address as very last parameter!
 		if (type->uses_return_by_memory())
 			insert_cmd(Asm::InstID::PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
@@ -546,10 +549,10 @@ int BackendX86::function_call_pre(const Array<SerialNodeParam> &_params, const S
 	// _cdecl: push class instance as first parameter
 	if (!is_static) {
 		insert_cmd(Asm::InstID::PUSH, params[0]);
-		push_size += config.pointer_size;
+		push_size += config.target.pointer_size;
 	}
 
-	if (config.abi == Abi::X86_GNU) {
+	if (config.target.abi == Abi::X86_GNU) {
 		// more than 4 byte have to be returned -> give return address as very first parameter!
 		if (type->uses_return_by_memory())
 			insert_cmd(Asm::InstID::PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
@@ -573,7 +576,7 @@ void BackendX86::extend_reg_usage_to_call(int index) {
 SerialNodeParam BackendX86::insert_reference(const SerialNodeParam &param, const Class *type) {
 	SerialNodeParam ret;
 	if (!type)
-		type = module->syntax->get_pointer(param.type, -1);
+		type = module->tree->get_pointer(param.type, -1);
 	ret.type = type;
 	ret.shift = 0;
 	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {
@@ -600,7 +603,7 @@ SerialNodeParam BackendX86::insert_reference(const SerialNodeParam &param, const
 
 void BackendX86::insert_lea(const SerialNodeParam &p1, const SerialNodeParam &p2) {
 
-	if (config.instruction_set == Asm::InstructionSet::AMD64) {
+	if (config.target.instruction_set == Asm::InstructionSet::AMD64) {
 		int r = cmd.add_virtual_reg(Asm::RegID::RAX);
 		insert_cmd(Asm::InstID::LEA, param_vreg(TypeReg64, r), p2);
 		insert_cmd(Asm::InstID::MOV, p1, param_vreg(TypeReg64, r));
@@ -642,7 +645,7 @@ void BackendX86::correct_far_mem_access() {
 				if (imm_allowed and (c.p[1].type->size <= 4))
 					continue;
 
-				int reg = find_unused_reg(i, i, config.pointer_size);
+				int reg = find_unused_reg(i, i, config.target.pointer_size);
 
 				cmd.next_cmd_target(i);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypePointer, reg), param_imm(TypePointer, p1.p + p1.shift)); // prepare input into register
@@ -689,7 +692,7 @@ void BackendX86::do_mapping() {
 	for (int i=0; i<cmd.cmd.num; i++)
 		correct_unallowed_param_combis2(cmd.cmd[i]);
 
-	if (config.instruction_set == Asm::InstructionSet::AMD64)
+	if (config.target.instruction_set == Asm::InstructionSet::AMD64)
 		correct_far_mem_access();
 
 	serializer->cmd_list_out("map:z", "end");
@@ -772,7 +775,7 @@ void BackendX86::add_stack_var(TempVar &v, SerialNodeParam &p) {
 
 	if (true) {
 		// TODO super important!!!!!!
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
 			v.stack_offset = stack_offset;
 			stack_offset += s;
 
@@ -782,9 +785,9 @@ void BackendX86::add_stack_var(TempVar &v, SerialNodeParam &p) {
 		}
 	} else {
 		StackOccupationX so;
-		so.create(serializer, (config.instruction_set != Asm::InstructionSet::ARM), cur_func->_var_size, v.first, v.last);
+		so.create(serializer, (config.target.instruction_set != Asm::InstructionSet::ARM32), cur_func->_var_size, v.first, v.last);
 		v.stack_offset = so.find_free(v.type->size);
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
 			stack_offset = v.stack_offset + s;
 		} else {
 			stack_offset = - v.stack_offset;
@@ -876,7 +879,7 @@ void BackendX86::solve_deref_temp_local(int c, int np, bool is_local) {
 	p.shift = 0;
 	p.type = type_pointer;
 
-	int reg = find_unused_reg(c, c, config.pointer_size);
+	int reg = find_unused_reg(c, c, config.target.pointer_size);
 	if (reg < 0)
 		module->do_error_internal("solve_deref_temp_local... no registers available");
 	SerialNodeParam p_reg = param_vreg(type_pointer, reg);
@@ -927,7 +930,7 @@ void BackendX86::resolve_deref_temp_and_local() {
 
 			SerialNodeParam p_reg = param_vreg(type_data, reg);
 
-			int reg2 = find_unused_reg(i, i, config.pointer_size, cmd.virtual_reg[reg].reg_root);
+			int reg2 = find_unused_reg(i, i, config.target.pointer_size, cmd.virtual_reg[reg].reg_root);
 			if (reg2 < 0)
 				do_error("deref temp/local... both sides... .no registers available");
 			SerialNodeParam p_reg2 = param_vreg(type_pointer, reg2);
@@ -1032,7 +1035,7 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 			do_error("prepare_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
 			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
 		} else {
 			return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
@@ -1042,7 +1045,7 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
-		if (imm_allowed and p.type->is_pointer()) {
+		if (imm_allowed and p.type->is_pointer_raw()) {
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
 		} else if (imm_allowed and (p.type->size <= 4)) {
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
@@ -1087,7 +1090,7 @@ void BackendX86::add_function_intro_frame(int stack_alloc_size) {
 void BackendX86::assemble() {
 	// intro + allocate stack memory
 	stack_max_size += max_push_size;
-	stack_max_size = mem_align(stack_max_size, config.stack_frame_align);
+	stack_max_size = mem_align(stack_max_size, config.target.stack_frame_align);
 
 	list->insert_location_label(cur_func->_label);
 	if (!flags_has(cur_func->flags, Flags::NOFRAME))

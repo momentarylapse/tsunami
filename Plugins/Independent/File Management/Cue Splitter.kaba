@@ -3,11 +3,11 @@ use os
 use hui
 use tsunami
 
-class Part
+struct Part
 	var title: string
 	var foffset = 0.0
 
-class CueData
+struct CueData
 	var parts: Part[]
 	var year, album, artist: string?
 	var fn: Path?
@@ -50,14 +50,16 @@ class CueSplitter extends TsunamiPlugin
 					data.parts.add(Part())
 					cur = &data.parts[len(data.parts)-1]
 				if s.head(11) == "    TITLE \""
-					cur.title = s[11:-1]
-					print(cur.title)
+					for c in cur
+						c.title = s[11:-1]
+						print(c.title)
 				if s.head(10) == "    INDEX "
 					let soff = s[13:]
 					print(soff)
 					let xx = soff.explode(":")
-					cur.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
-					print(cur.foffset)
+					for c in cur
+						c.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
+						print(c.foffset)
 			return data
 		except
 			return nil
@@ -68,12 +70,12 @@ class CueSplitter extends TsunamiPlugin
 		for i=>p in data.parts
 			print("-----")
 			var tags: Tag[]
-			if bool(data.artist)
-				tags.add(Tag("artist", data.artist()))
-			if bool(data.album)
-				tags.add(Tag("album", data.album()))
-			if bool(data.year)
-				tags.add(Tag("year", data.year()))
+			for a in data.artist
+				tags.add(Tag("artist", a))
+			for a in data.album
+				tags.add(Tag("album", a))
+			for y in data.year
+				tags.add(Tag("year", y))
 			tags.add(Tag("title", p.title))
 			tags.add(Tag("tracknumber", str(i+1)))
 			let offset = p.foffset * session.song.sample_rate
@@ -95,14 +97,10 @@ class CueSplitter extends TsunamiPlugin
 		let dir = filename.parent()
 		
 		let data = load_cue_file(filename)
-		if not bool(data)
-			return
-
-		if bool(data().fn)
-			return
-		
-		session.storage.load(session.song, dir | data().fn)
-		export_parts_as_flacs(data, dir)
+		for d in data
+			for fn in d.fn
+				session.storage.load(session.song, dir | fn)
+				export_parts_as_flacs(d, dir)
 		
 		print("-----------------done")
 		stop()

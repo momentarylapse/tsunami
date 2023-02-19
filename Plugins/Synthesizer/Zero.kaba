@@ -40,5 +40,5 @@ class ZeroRenderer extends PitchRenderer
 class Zero extends Synthesizer
 
 	# messy :P
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new ZeroRenderer(self, pitch)

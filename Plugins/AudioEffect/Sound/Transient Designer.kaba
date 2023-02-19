@@ -21,11 +21,11 @@ class TransientDesigner extends AudioEffect
 	var env_fast, env_att, env_sus: Envelope
 	
 	func override on_config()
-		env_fast.session = session
+		env_fast.session := session
 		env_fast.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.0001)")
-		env_att.session = session
+		env_att.session := session
 		env_att.config_from_string(Module.VERSION_LEGACY, "(0.02 0 0.0001)")
-		env_sus.session = session
+		env_sus.session := session
 		env_sus.config_from_string(Module.VERSION_LEGACY, "(0.2 0 0.00000002)") # ~100ms release
 	
 	func override reset_state()

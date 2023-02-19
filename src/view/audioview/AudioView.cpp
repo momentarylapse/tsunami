@@ -300,12 +300,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	signal_chain = session->create_signal_chain_system("playback");
-	renderer = (SongRenderer*)signal_chain->add(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
-	peak_meter = (PeakMeter*)signal_chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	output_stream = (AudioOutput*)signal_chain->add(ModuleCategory::STREAM, "AudioOutput");
+	renderer = signal_chain->addx<SongRenderer>(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
+	peak_meter = signal_chain->addx<PeakMeter>(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
+	output_stream = signal_chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput");
 	output_stream->set_volume(hui::config.get_float("Output.Volume", 1.0f));
-	signal_chain->connect(renderer, 0, peak_meter, 0);
-	signal_chain->connect(peak_meter, 0, output_stream, 0);
+	signal_chain->connect(renderer.get(), 0, peak_meter.get(), 0);
+	signal_chain->connect(peak_meter.get(), 0, output_stream.get(), 0);
 	signal_chain->mark_all_modules_as_system();
 
 	signal_chain->subscribe(this, [this] {
@@ -316,7 +316,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	}, Module::MESSAGE_STATE_CHANGE);
 
 
-	peak_meter_display = new PeakMeterDisplay(peak_meter, PeakMeterDisplay::Mode::BOTH);
+	peak_meter_display = new PeakMeterDisplay(peak_meter.get(), PeakMeterDisplay::Mode::BOTH);
 	peak_meter_display->align.dx = 90;
 	peak_meter_display->align.dy = -20;
 	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;

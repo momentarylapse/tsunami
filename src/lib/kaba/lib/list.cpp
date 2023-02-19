@@ -18,9 +18,9 @@ public:
 	}
 };
 
-void kaba_make_super_array(Class *t, SyntaxTree *ps) {
+void lib_make_list(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
-	t->derive_from(TypeDynamicArray, false);
+	t->derive_from(TypeDynamicArray, DeriveFlags::SET_SIZE);
 	t->param = {p};
 	add_class(t);
 

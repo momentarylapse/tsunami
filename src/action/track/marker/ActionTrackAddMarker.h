@@ -15,7 +15,7 @@ class Range;
 
 class ActionTrackAddMarker: public Action {
 public:
-	ActionTrackAddMarker(TrackLayer *l, const TrackMarker *marker);
+	ActionTrackAddMarker(TrackLayer *l, const shared<TrackMarker> marker);
 
 	string name() const override { return ":##:add marker"; }
 

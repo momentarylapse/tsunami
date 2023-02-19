@@ -113,6 +113,10 @@ string Path::str() const {
 #endif
 }
 
+string Path::repr() const {
+	return str().repr();
+}
+
 const char *Path::c_str() const {
 	return str().c_str();
 }

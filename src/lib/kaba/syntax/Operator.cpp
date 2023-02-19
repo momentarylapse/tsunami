@@ -13,44 +13,57 @@ namespace kaba {
 
 //   without type information ("abstract")
 AbstractOperator abstract_operators[(int)OperatorID::_COUNT_] = {
-	{"=",  OperatorID::ASSIGN,        true,   0, Identifier::Func::ASSIGN, 3, false},
-	{"+",  OperatorID::ADD,           false, 11, Identifier::Func::ADD, 3, false},
-	{"-",  OperatorID::SUBTRACT,      false, 11, Identifier::Func::SUBTRACT, 3, false},
-	{"*",  OperatorID::MULTIPLY,      false, 12, Identifier::Func::MULTIPLY, 3, false},
-	{"/",  OperatorID::DIVIDE,        false, 12, Identifier::Func::DIVIDE, 3, false},
-	{"-",  OperatorID::NEGATIVE,      false, 13, Identifier::Func::NEGATIVE, 2, false}, // -1 etc
-	{"+=", OperatorID::ADDS,          true,   0,  Identifier::Func::ADD_ASSIGN, 3, false},
-	{"-=", OperatorID::SUBTRACTS,     true,   0,  Identifier::Func::SUBTRACT_ASSIGN, 3, false},
-	{"*=", OperatorID::MULTIPLYS,     true,   0,  Identifier::Func::MULTIPLY_ASSIGN, 3, false},
-	{"/=", OperatorID::DIVIDES,       true,   0,  Identifier::Func::DIVIDE_ASSIGN, 3, false},
-	{"==", OperatorID::EQUAL,         false,  8,  Identifier::Func::EQUAL, 3, false},
-	{"!=", OperatorID::NOT_EQUAL,      false,  8,  Identifier::Func::NOT_EQUAL, 3, false},
-	{Identifier::NOT,OperatorID::NEGATE,false, 2,  Identifier::Func::NOT, 2, false},
-	{"<",  OperatorID::SMALLER,       false,  9,  Identifier::Func::SMALLER, 3, false},
-	{">",  OperatorID::GREATER,       false,  9,  Identifier::Func::GREATER, 3, false},
-	{"<=", OperatorID::SMALLER_EQUAL, false,  9,  Identifier::Func::SMALLER_EQUAL, 3, false},
-	{">=", OperatorID::GREATER_EQUAL, false,  9,  Identifier::Func::GREATER_EQUAL, 3, false},
-	{Identifier::AND, OperatorID::AND,false,  4,  Identifier::Func::AND, 3, false},
-	{Identifier::OR,  OperatorID::OR, false,  3,  Identifier::Func::OR, 3, false},
-	{"%",  OperatorID::MODULO,        false, 12, Identifier::Func::MODULO, 3, false},
-	{"&",  OperatorID::BIT_AND,       false,  7, Identifier::Func::BIT_AND, 3, false},
-	{"|",  OperatorID::BIT_OR,        false,  5, Identifier::Func::BIT_OR, 3, false},
-	{"<<", OperatorID::SHIFT_LEFT,    false, 10, Identifier::Func::SHIFT_LEFT, 3, false},
-	{">>", OperatorID::SHIFT_RIGHT,   false, 10, Identifier::Func::SHIFT_RIGHT, 3, false},
-	{"++", OperatorID::INCREASE,      true,   2, Identifier::Func::INCREASE, 1, false},
-	{"--", OperatorID::DECREASE,      true,   2, Identifier::Func::DECREASE, 1, false},
-	{Identifier::IS, OperatorID::IS,  false,  2,  "-none-", 3, false},
-	{Identifier::IN, OperatorID::IN,  false, 12, Identifier::Func::CONTAINS, 3, true}, // INVERTED
-	{Identifier::EXTENDS, OperatorID::EXTENDS, false, 2,  "-none-", 3, false},
-	{"^",  OperatorID::EXPONENT,      false, 14,  Identifier::Func::EXPONENT, 3, false},
-	{",",  OperatorID::COMMA,         false,  0,  "-none-", 3, false},
-	{"*",  OperatorID::DEREFERENCE,   false, 15,  Identifier::Func::GET, 2, false},
-	{"&",  OperatorID::REFERENCE,     false, 15,  "-none-", 2, false},
-	{"[...]",  OperatorID::ARRAY,     false, 16,  "-none-", 3, false},
-	{"|>",  OperatorID::FUNCTION_PIPE,false,  1,  "-none-", 3, false},
-	{Identifier::AS, OperatorID::AS,  false, 15,  "-none-", 3, false},
-	{"=>",  OperatorID::MAPS_TO,      false,  1,  Identifier::Func::MAPS_TO, 3, false}
+	{"=",  OperatorID::ASSIGN,        0, Identifier::Func::ASSIGN, OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"+",  OperatorID::ADD,           11, Identifier::Func::ADD, OperatorFlags::BINARY},
+	{"-",  OperatorID::SUBTRACT,      11, Identifier::Func::SUBTRACT, OperatorFlags::BINARY},
+	{"*",  OperatorID::MULTIPLY,      12, Identifier::Func::MULTIPLY, OperatorFlags::BINARY},
+	{"/",  OperatorID::DIVIDE,        12, Identifier::Func::DIVIDE, OperatorFlags::BINARY},
+	{"-",  OperatorID::NEGATIVE,      13, Identifier::Func::NEGATIVE, OperatorFlags::UNARY_RIGHT}, // -1 etc
+	{"+=", OperatorID::ADDS,          0,  Identifier::Func::ADD_ASSIGN, OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"-=", OperatorID::SUBTRACTS,     0,  Identifier::Func::SUBTRACT_ASSIGN, OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"*=", OperatorID::MULTIPLYS,     0,  Identifier::Func::MULTIPLY_ASSIGN, OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"/=", OperatorID::DIVIDES,       0,  Identifier::Func::DIVIDE_ASSIGN, OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"==", OperatorID::EQUAL,         8,  Identifier::Func::EQUAL, OperatorFlags::BINARY},
+	{"!=", OperatorID::NOT_EQUAL,     8,  Identifier::Func::NOT_EQUAL, OperatorFlags::BINARY},
+	{Identifier::NOT,OperatorID::NEGATE,2,  Identifier::Func::NOT, OperatorFlags::UNARY_RIGHT},
+	{"<",  OperatorID::SMALLER,       9,  Identifier::Func::SMALLER, OperatorFlags::BINARY},
+	{">",  OperatorID::GREATER,       9,  Identifier::Func::GREATER, OperatorFlags::BINARY},
+	{"<=", OperatorID::SMALLER_EQUAL, 9,  Identifier::Func::SMALLER_EQUAL, OperatorFlags::BINARY},
+	{">=", OperatorID::GREATER_EQUAL, 9,  Identifier::Func::GREATER_EQUAL, OperatorFlags::BINARY},
+	{Identifier::AND, OperatorID::AND,4,  Identifier::Func::AND, OperatorFlags::BINARY},
+	{Identifier::OR,  OperatorID::OR, 3,  Identifier::Func::OR, OperatorFlags::BINARY},
+	{"%",  OperatorID::MODULO,        12, Identifier::Func::MODULO, OperatorFlags::BINARY},
+	{"&",  OperatorID::BIT_AND,       7, Identifier::Func::BIT_AND, OperatorFlags::BINARY},
+	{"|",  OperatorID::BIT_OR,        5, Identifier::Func::BIT_OR, OperatorFlags::BINARY},
+	{"<<", OperatorID::SHIFT_LEFT,    10, Identifier::Func::SHIFT_LEFT, OperatorFlags::BINARY},
+	{">>", OperatorID::SHIFT_RIGHT,   10, Identifier::Func::SHIFT_RIGHT, OperatorFlags::BINARY},
+	{"++", OperatorID::INCREASE,      2, Identifier::Func::INCREASE, OperatorFlags::UNARY_LEFT | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{"--", OperatorID::DECREASE,      2, Identifier::Func::DECREASE, OperatorFlags::UNARY_LEFT | OperatorFlags::LEFT_IS_MODIFIABLE},
+	{Identifier::IS, OperatorID::IS,  2,  "-none-", OperatorFlags::BINARY},
+	{Identifier::IN, OperatorID::IN,  12, Identifier::Func::CONTAINS, OperatorFlags::BINARY | OperatorFlags::ORDER_INVERTED}, // INVERTED
+	{Identifier::EXTENDS, OperatorID::EXTENDS, 2,  "-none-", OperatorFlags::BINARY},
+	{"^",  OperatorID::EXPONENT,      14,  Identifier::Func::EXPONENT, OperatorFlags::BINARY},
+	{",",  OperatorID::COMMA,         0,  "-none-", OperatorFlags::BINARY},
+	{"*",  OperatorID::DEREFERENCE,   15,  Identifier::Func::GET, OperatorFlags::UNARY_RIGHT},
+	{"&",  OperatorID::REFERENCE,     15,  "-none-", OperatorFlags::UNARY_RIGHT},
+	{"[...]",  OperatorID::ARRAY,     16,  "-none-", OperatorFlags::BINARY},
+	{"|>",  OperatorID::FUNCTION_PIPE,1,  "-none-", OperatorFlags::BINARY},
+	{Identifier::AS, OperatorID::AS,  15,  "-none-", OperatorFlags::BINARY},
+	{"=>",  OperatorID::MAPS_TO,      1,  Identifier::Func::MAPS_TO, OperatorFlags::BINARY},
+	{":=",  OperatorID::REF_ASSIGN,   0, "-none-", OperatorFlags::BINARY | OperatorFlags::LEFT_IS_MODIFIABLE}
 };
+
+OperatorFlags operator|(OperatorFlags a, OperatorFlags b) {
+	return (OperatorFlags)((int)a | (int)b);
+}
+
+int operator&(OperatorFlags a, OperatorFlags b) {
+	return (int)a & (int)b;
+}
+
+bool AbstractOperator::is_binary() const {
+	return (flags & OperatorFlags::BINARY) == (int)OperatorFlags::BINARY;
+}
 
 
 string Operator::sig(const Class *ns) const {

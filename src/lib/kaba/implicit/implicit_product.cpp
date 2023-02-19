@@ -16,7 +16,7 @@ namespace kaba {
 void AutoImplementer::_add_missing_function_headers_for_product(Class *t) {
 	if (t->needs_constructor())
 		add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	if (can_fully_construct(t))
+	if (class_can_fully_construct(t))
 		add_full_constructor(t);
 	if (t->needs_destructor())
 		add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
@@ -24,9 +24,9 @@ void AutoImplementer::_add_missing_function_headers_for_product(Class *t) {
 	bool allow_assign = true;
 	bool allow_equal = true;
 	for (const auto p: t->param) {
-		if (!p->get_assign())
+		if (!class_can_assign(p))
 			allow_assign = false;
-		if (!p->get_member_func(Identifier::Func::EQUAL, TypeBool, {p}))
+		if (!class_can_equal(p))
 			allow_equal = false;
 	}
 

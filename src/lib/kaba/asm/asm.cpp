@@ -733,7 +733,7 @@ InstructionSet guess_native_instruction_set() {
 #ifdef CPU_X86
 	return InstructionSet::X86;
 #endif
-#ifdef CPU_ARM
+#ifdef CPU_ARM32
 	return InstructionSet::ARM;
 #endif
 	msg_error("Asm: unknown instruction set");
@@ -748,7 +748,7 @@ void init(InstructionSet set) {
 
 	instruction_set.set = set;
 	instruction_set.pointer_size = 4;
-	if (set == InstructionSet::AMD64)
+	if ((set == InstructionSet::AMD64) || (set == InstructionSet::ARM64))
 		instruction_set.pointer_size = 8;
 
 	for (int i=0;i<(int)RegRoot::COUNT;i++)
@@ -761,7 +761,7 @@ void init(InstructionSet set) {
 		if (instruction_names[i].inst != (InstID)i)
 			msg_error(string(instruction_names[i].name) + "  " + i2s((int)instruction_names[i].inst) + "  !=   " + i2s(i));
 
-	if (set == InstructionSet::ARM)
+	if ((set == InstructionSet::ARM32) || (set == InstructionSet::ARM64))
 		arm_init();
 	else
 		x86_init();
@@ -890,7 +890,7 @@ string show_reg(int r) {
 
 // convert some opcode into (human readable) assembler language
 string disassemble(void *code, int length, bool allow_comments) {
-	if (instruction_set.set == InstructionSet::ARM)
+	if ((instruction_set.set == InstructionSet::ARM32) or (instruction_set.set == InstructionSet::ARM64))
 		return arm_disassemble(code, length, allow_comments);
 	return x86_disassemble(code, length, allow_comments);
 }
@@ -1202,7 +1202,7 @@ void InstructionWithParamsList::link_wanted_labels(void *oc) {
 				size = 1;
 
 			// TODO first byte after command
-			if (instruction_set.set == InstructionSet::ARM) {
+			if (instruction_set.set == InstructionSet::ARM32) { // ARM64?!?
 				value -= CurrentMetaInfo->code_origin + w.pos + size + 4;
 				InstID inst = (*this)[w.inst_no].inst;
 				if ((inst == InstID::BL) or (inst == InstID::B) or (inst == InstID::CALL) or (inst == InstID::JMP)) {
@@ -1551,7 +1551,7 @@ void InstructionWithParamsList::shrink_jumps(void *oc, int ocs) {
 }
 
 void InstructionWithParamsList::optimize(void *oc, int ocs) {
-	if (instruction_set.set != InstructionSet::ARM)
+	if ((instruction_set.set == InstructionSet::X86) or (instruction_set.set == InstructionSet::AMD64))
 		shrink_jumps(oc, ocs);
 }
 
@@ -1600,7 +1600,7 @@ void InstructionWithParamsList::compile(void *oc, int &ocs) {
 			break;
 
 		// opcode
-		if (instruction_set.set == InstructionSet::ARM)
+		if ((instruction_set.set == InstructionSet::ARM32) or (instruction_set.set == InstructionSet::ARM64))
 			add_instruction_arm((char*)oc, ocs, i);
 		else
 			add_instruction((char*)oc, ocs, i);

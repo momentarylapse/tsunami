@@ -1,5 +1,6 @@
 #include "../kaba.h"
 #include "serializer.h"
+#include "Compiler.h"
 #include "../../os/msg.h"
 #include "../../base/iter.h"
 
@@ -151,7 +152,7 @@ SerialNodeParam Serializer::add_dereference(const SerialNodeParam &param, const 
 		ret.type = type;// ? type : get_subtype(param.type);
 		ret.shift = 0;
 	} else {
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.is_arm()) {
 			if (param.kind == NodeKind::LOCAL_ADDRESS) {
 				ret = param;
 				ret.kind = NodeKind::DEREF_LOCAL_MEMORY;
@@ -697,11 +698,11 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 //	for (auto&& [i,t]: temp_var)
 //		if (&t == &v)
 //			msg_write("#" + i2s(i));
-	so.create(this, (config.instruction_set != Asm::InstructionSet::ARM), cur_func->_var_size, v.first, v.last);
+	so.create(this, !config.target.is_arm(), cur_func->_var_size, v.first, v.last);
 
 	if (true) {
 	// TODO super important!!!!!!
-	if (config.instruction_set == Asm::InstructionSet::ARM) {
+	if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
 		v.stack_offset = stack_offset;
 		stack_offset += s;
 
@@ -711,7 +712,7 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 	}
 	} else {
 		v.stack_offset = so.find_free(v.type->size);
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
 			stack_offset = v.stack_offset + s;
 		} else {
 			stack_offset = - v.stack_offset;
@@ -864,7 +865,7 @@ Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p
 			module->do_error_internal("get_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		if (config.instruction_set == Asm::InstructionSet::ARM) {
+		if (config.target.is_arm()) {
 			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
 		} else {
 			return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
@@ -874,7 +875,7 @@ Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
-		if ((imm_allowed) and (p.type->is_pointer())) {
+		if ((imm_allowed) and (p.type->is_pointer_raw())) {
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
 		} else if ((p.type->size <= 4) and (imm_allowed)) {
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
@@ -914,7 +915,7 @@ void Serializer::assemble_cmd_arm(SerialNode &c) {
 
 void AddAsmBlock(Asm::InstructionWithParamsList *list, Module *s) {
 	//msg_write(".------------------------------- asm");
-	SyntaxTree *ps = s->syntax;
+	SyntaxTree *ps = s->tree.get();
 	if (ps->asm_blocks.num == 0)
 		s->do_error("asm block mismatch");
 	ps->asm_meta_info->line_offset = ps->asm_blocks[0].line;
@@ -933,7 +934,7 @@ void Serializer::do_error_link(const string &msg) {
 
 Serializer::Serializer(Module *m, Asm::InstructionWithParamsList *_list) {
 	module = m;
-	syntax_tree = m->syntax;
+	syntax_tree = m->tree.get();
 	list = _list;
 	max_push_size = 0;
 	stack_max_size = 0;
@@ -965,7 +966,11 @@ bool is_func(shared<Node> n) {
 
 int check_needed(SyntaxTree *tree, Function *f) {
 	int ref_count = 0;
-	tree->transform([&](shared<Node> n){ if (is_func(n) and n->as_func() == f) ref_count ++; return n; });
+	tree->transform([&ref_count, f](shared<Node> n) {
+		if (is_func(n) and n->as_func() == f)
+			ref_count ++;
+		return n;
+	});
 
 	if (f->is_static() and f->name == "main")
 		ref_count ++;
@@ -979,17 +984,17 @@ int check_needed(SyntaxTree *tree, Function *f) {
 }
 
 Backend *create_backend(Serializer *s) {
-	if (config.instruction_set == Asm::InstructionSet::AMD64)
+	if (config.target.instruction_set == Asm::InstructionSet::AMD64)
 		return new BackendAmd64(s);
-	if (config.instruction_set == Asm::InstructionSet::X86)
+	if (config.target.instruction_set == Asm::InstructionSet::X86)
 		return new BackendX86(s);
-	if (config.instruction_set == Asm::InstructionSet::ARM)
+	if (config.target.is_arm())
 		return new BackendARM(s);
 	s->module->do_error("unable to create a backend for the architecture");
 	return nullptr;
 }
 
-void Module::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
+void Compiler::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
 	if (config.verbose and config.allow_output(f, "asm"))
 		msg_write("serializing " + f->long_name() + " -------------------");
 	f->show("asm");
@@ -997,25 +1002,25 @@ void Module::assemble_function(int index, Function *f, Asm::InstructionWithParam
 
 	// skip unused functions?
 	if (config.remove_unused)
-		if (check_needed(syntax, f) == 0)
+		if (check_needed(tree, f) == 0)
 			return;
 
 	if (config.verbose and config.allow_output(f, "ser:0"))
 		f->block->show(TypeVoid);
 
-	if (config.interpreted) {
-		auto x = new Serializer(this, list);
+	if (config.target.interpreted) {
+		auto x = new Serializer(module, list);
 		x->cur_func_index = index;
 		x->serialize_function(f);
 		x->fix_return_by_ref();
-		if (!syntax->module->interpreter)
-			syntax->module->interpreter = new Interpreter(syntax->module);
-		syntax->module->interpreter->add_function(f, x);
+		if (!module->interpreter)
+			module->interpreter = new Interpreter(module);
+		module->interpreter->add_function(f, x);
 		return;
 	}
 
 
-	auto x = new Serializer(this, list);
+	auto x = new Serializer(module, list);
 	x->cur_func_index = index;
 	x->serialize_function(f);
 	x->fix_return_by_ref();
@@ -1027,9 +1032,9 @@ void Module::assemble_function(int index, Function *f, Asm::InstructionWithParam
 	} catch (Exception &e) {
 		throw e;
 	} catch (Asm::Exception &e) {
-		throw Exception(e, this, f);
+		throw Exception(e, module, f);
 	}
-	functions_to_link.append(be->list->wanted_label);
+	module->functions_to_link.append(be->list->wanted_label);
 	delete be;
 	delete x;
 
@@ -1046,7 +1051,7 @@ void function_update_address(Function *f, Asm::InstructionWithParamsList *list) 
 	}
 }
 
-void Module::compile_functions(char *oc, int &ocs) {
+void Compiler::compile_functions(char *oc, int &ocs) {
 	auto *list = new Asm::InstructionWithParamsList(0);
 	Array<int> func_offset;
 
@@ -1054,7 +1059,7 @@ void Module::compile_functions(char *oc, int &ocs) {
 
 	// link external functions
 	int func_no = 0;
-	for (Function *f: syntax->functions) {
+	for (Function *f: tree->functions) {
 		if (f->is_template() or  f->is_macro()) {
 			//msg_write("SKIP COMPILE " + f->signature());
 		} else if (f->is_extern()) {
@@ -1063,14 +1068,14 @@ void Module::compile_functions(char *oc, int &ocs) {
 			if (f->address == 0)
 				f->address = (int_p)external->get_link(f->cname(f->owner()->base_class));
 			if (f->address == 0)
-				do_error_link(format("external function '%s' not linkable", name));
+				module->do_error_link(format("external function '%s' not linkable", name));
 		} else {
 			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
 		}
 	}
 
 	// create assembler
-	for (auto&& [i,f]: enumerate(syntax->functions)) {
+	for (auto&& [i,f]: enumerate(tree->functions)) {
 		func_offset.add(list->num);
 		if (!f->is_extern() and !f->is_template() and !f->is_macro()) {
 			assemble_function(i, f, list);
@@ -1091,20 +1096,20 @@ void Module::compile_functions(char *oc, int &ocs) {
 		Function *f = nullptr;
 		for (int i=0; i<func_offset.num; i++)
 			if (e.line >= func_offset[i] and e.line < func_offset[i+1]) {
-				f = syntax->functions[i];
+				f = tree->functions[i];
 				break;
 			}
 		msg_write(f->long_name());
-		throw Exception(e, this, f);
+		throw Exception(e, module, f);
 	}
 
 
 	// get function addresses
-	for (auto *f: syntax->functions)
+	for (auto *f: tree->functions)
 		if (!f->is_extern() and !f->is_template() and !f->is_macro())
 			function_update_address(f, list);
 
-	if (!config.interpreted)
+	if (!config.target.interpreted)
 		delete list;
 }
 

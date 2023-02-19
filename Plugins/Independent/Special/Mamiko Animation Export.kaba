@@ -6,17 +6,18 @@ use os
 class MAE extends TsunamiPlugin
 	
 	func override on_start()
-		var song = session.song
-		if len(song.tracks) < 3
+		if len(session.song.tracks) < 3
 			stop()
 			return
-		if song.tracks[2].type != SignalType.MIDI
+		var t = session.song.tracks[2]
+		if t.type != SignalType.MIDI
 			stop()
 			return
 		var fps: float = 25
-		var samples_per_frame = song.sample_rate / fps
+		var samples_per_frame = session.song.sample_rate / fps
 		var f = new TextLinesFormatter(fs.open("notes", "wt"))
-		for n in song.tracks[2].layers[0].midi
-			f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
-		del f
+		var l = t.layers[0]
+		for _n in l.midi
+			for n in _n
+				f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
 		stop()

@@ -104,7 +104,7 @@ void SignalChain::set_tick_dt(float dt) {
 	tick_dt = dt;
 }
 
-Module *SignalChain::_add(Module *m) {
+shared<Module> SignalChain::_add(shared<Module> m) {
 	int i = modules.num;
 	m->module_x = 50 + (i % 5) * 230;
 	m->module_y = 50 + (i % 2) * 30 + 150*(i / 5);
@@ -262,7 +262,7 @@ void SignalChain::save(const Path& filename) {
 	p.save(filename);
 }
 
-SignalChain *SignalChain::load(Session *session, const Path &filename) {
+xfer<SignalChain> SignalChain::load(Session *session, const Path &filename) {
 	auto *chain = new SignalChain(session, "new");
 
 	try {
@@ -284,7 +284,7 @@ SignalChain *SignalChain::load(Session *session, const Path &filename) {
 			string name = e.value("name");
 			string sys = e.value("system");
 			int version = e.value("version", i2s(Module::VERSION_LEGACY))._int();
-			Module *m = nullptr;
+			shared<Module> m;
 			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
 			} else*/ {
@@ -344,7 +344,7 @@ void SignalChain::reset(bool hard) {
 	//connect(modules[1].get(), 0, modules[2].get(), 0);
 }
 
-Module* SignalChain::add(ModuleCategory type, const string &sub_type) {
+shared<Module> SignalChain::add(ModuleCategory type, const string &sub_type) {
 	return _add(ModuleFactory::create(session, type, sub_type));
 }
 

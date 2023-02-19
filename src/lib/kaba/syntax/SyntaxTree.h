@@ -51,10 +51,16 @@ public:
 	const Class *which_owned_class(const string &name);
 
 	// syntax analysis
-	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
-	Class *create_new_class_no_check(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, const Class *ns, int token_id);
+	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
+	Class *create_new_class_no_check(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
 	const Class *request_implicit_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, int token_id);
 	const Class *get_pointer(const Class *base, int token_id = -1);
+	const Class *request_implicit_class_shared(const Class *parent, int token_id);
+	const Class *request_implicit_class_shared_not_null(const Class *parent, int token_id);
+	const Class *request_implicit_class_owned(const Class *parent, int token_id);
+	const Class *request_implicit_class_owned_not_null(const Class *parent, int token_id);
+	const Class *request_implicit_class_xfer(const Class *parent, int token_id);
+	const Class *request_implicit_class_reference(const Class *base, int token_id);
 	const Class *request_implicit_class_super_array(const Class *element_type, int token_id);
 	const Class *request_implicit_class_array(const Class *element_type, int num_elements, int token_id);
 	const Class *request_implicit_class_dict(const Class *element_type, int token_id);

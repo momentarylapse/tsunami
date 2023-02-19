@@ -8,7 +8,7 @@ use helper.draw
 
 class MultiEcho extends AudioEffect
 	class Config extends Module.Config
-		class Reflector
+		struct Reflector
 			var delay: float
 			var volume: float
 			var feedback: float
@@ -20,7 +20,7 @@ class MultiEcho extends AudioEffect
 
 	var config: Config
 	
-	class ReflectorState
+	struct ReflectorState
 		var buf: AudioBuffer
 		var offset: int
 	var refl: ReflectorState[]
@@ -64,16 +64,16 @@ class MultiEcho extends AudioEffect
 
 
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new MultiEchoPanel(self)
 
 class MultiEchoGrid extends Grid
-	var config: MultiEcho.Config*
-	var cp: ConfigPanel*
+	var config: MultiEcho.Config&
+	var cp: ConfigPanel&
 	var hover: int?
 	var selected: int?
-	var menu_bg: Menu owned
-	var menu_point: Menu owned
+	var menu_bg: owned![Menu]
+	var menu_point: owned![Menu]
 	
 	
 	func mut post_init()
@@ -101,7 +101,7 @@ class MultiEchoGrid extends Grid
 		p.set_line_width(2)
 		let dt = 0.02
 		let dv = pow(r.feedback, dt/r.delay)
-		let n = min(100, int(x_axis.val_max/dt + 1))
+		let n = min(100, int(x_axis.data.val_max/dt + 1))
 		var cc: vec2[]
 		for i in 0:n
 			cc.add(project2(vec2(t, v)))
@@ -121,14 +121,14 @@ class MultiEchoGrid extends Grid
 		let col = cool_color(index)
 		var v = r.volume
 		var t = r.delay
-		let n = min(100, int(x_axis.val_max/r.delay))
+		let n = min(100, int(x_axis.data.val_max/r.delay))
 		c.set_line_width(1.5)
 		for i in 0:n
 			c.set_color(col)
 			let p = project2(vec2(t, v))
 			if i == 0
-				if bool(hover)
-					if index == hover()
+				for h in hover
+					if index == h
 						c.set_color(colors.hoverify(col))
 				c.draw_circle(p, 4.0)
 				c.set_line_width(2.0)
@@ -153,8 +153,8 @@ class MultiEchoGrid extends Grid
 		#	let z = vec2(r.delay, r.volume)
 		#	draw_point2(c, z, i == selected, i == hover)
 	
-		if bool(hover)
-			draw_details(c, config.refl[hover()])
+		for h in hover
+			draw_details(c, config.refl[h])
 			
 	func draw_details(p: Painter, r: MultiEcho.Config.Reflector)
 		p.set_font_size(8)
@@ -177,8 +177,8 @@ class MultiEchoGrid extends Grid
 			on_delete_reflection()
 
 	func mut on_delete_reflection()
-		if bool(selected)
-			config.refl.remove(selected())
+		for s in selected
+			config.refl.remove(s)
 			cp.changed()
 			selected = nil
 			hover = nil
@@ -186,7 +186,7 @@ class MultiEchoGrid extends Grid
 
 	func override on_right_button_down()
 		hover = get_hover()
-		if bool(hover)
+		for h in hover
 			menu_point.popup(panel)
 		else
 			menu_bg.popup(panel)
@@ -211,30 +211,33 @@ class MultiEchoGrid extends Grid
 
 	func override on_mouse_move()
 		# move
-		if hui.get_event().button_l and bool(selected)
-			config.refl[selected()].delay = max(get_mouse2().x, 0.001)
-			config.refl[selected()].volume = max(get_mouse2().y, 0)
-			cp.changed()
+		if hui.get_event().button_l
+			for s in selected
+				config.refl[s].delay = max(get_mouse2().x, 0.001)
+				config.refl[s].volume = max(get_mouse2().y, 0)
+				cp.changed()
+			else
+				hover = get_hover()
 		else
 			hover = get_hover()
 		redraw()
 	
 	func override on_mouse_wheel()
-		if bool(hover)
-			config.refl[hover()].feedback *= exp(hui.get_event().scroll.y * 0.02)
+		for h in hover
+			config.refl[h].feedback *= exp(hui.get_event().scroll.y * 0.02)
 			redraw()
 			cp.changed()
 
 class MultiEchoPanel extends ConfigPanel
-	var override c: MultiEcho*
+	var override c: MultiEcho&
 	var grid: MultiEchoGrid
 	func override __init__(_h: Module)
 		from_source("
 Grid ? ''
 	DrawingArea drawing '' grabfocus expandx expandy")
 	
-		grid.config = &c.config
-		grid.cp = &self
+		grid.config := &!c.config
+		grid.cp := &!self
 		grid.init(self, "drawing")
 		grid.post_init()
 	

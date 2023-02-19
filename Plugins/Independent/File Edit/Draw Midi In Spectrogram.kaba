@@ -20,7 +20,7 @@ const MAX_VOL = 0.0
 var im0: Image
 
 class SpecGrid extends Grid
-	var plugin: DrawMidiInSpectrogram*
+	var plugin: DrawMidiInSpectrogram&
 	var x_offset, x_scale: float
 	func x_to_sample(x: float) -> int
 		return x_scale * x
@@ -34,11 +34,11 @@ class SpecGrid extends Grid
 		var h = int(r.height())
 		
 		var fy = im0.height / r.height()
-		var ya = (log(y_axis.val_max) - log(y_axis.val_min)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * fy
-		var yb = (log(y_axis.val_max_max) - log(y_axis.val_max)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * im0.height
+		var ya = (log(y_axis.data.val_max) - log(y_axis.data.val_min)) / (log(y_axis.data.val_max_max) - log(y_axis.data.val_min_min)) * fy
+		var yb = (log(y_axis.data.val_max_max) - log(y_axis.data.val_max)) / (log(y_axis.data.val_max_max) - log(y_axis.data.val_min_min)) * im0.height
 		var fx = im0.width / r.width()
-		var xa = (x_axis.val_max - x_axis.val_min) / (x_axis.val_max_max - x_axis.val_min_min) * fx
-		var xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
+		var xa = (x_axis.data.val_max - x_axis.data.val_min) / (x_axis.data.val_max_max - x_axis.data.val_min_min) * fx
+		var xb = (x_axis.data.val_min - x_axis.data.val_min_min) / (x_axis.data.val_max_max - x_axis.data.val_min_min) * im0.width
 		
 		var im: Image
 		im.create(w, h, color.BLACK)
@@ -54,9 +54,10 @@ class SpecGrid extends Grid
 		c.set_line_width(3)
 		var z = get_mouse2()
 		var mouse_pitch: int = freq_to_pitch(z.y+0.5)
-		for n in plugin.midi
-			var y = pitch_to_freq(n.pitch)
-			draw_line2(c, vec2(sample_to_x(n.range.offset), y), vec2(sample_to_x(n.range.end()), y), false, false)
+		for _n in plugin.midi
+			for n in _n
+				var y = pitch_to_freq(n.pitch)
+				draw_line2(c, vec2(sample_to_x(n.range.offset), y), vec2(sample_to_x(n.range.end()), y), false, false)
 		if create_pitch >= 0
 			var y = pitch_to_freq(create_pitch)
 			draw_line2(c, vec2(create_x, y), vec2(z.x, y), false, true)
@@ -89,9 +90,9 @@ class SpecGrid extends Grid
 
 class SpectrumDialog extends Dialog
 	var grid: SpecGrid
-	var song: Song*
-	var tracks: Track shared[]
-	var dmis: DrawMidiInSpectrogram*
+	var song: shared![Song]
+	var tracks: shared![Track][]
+	var dmis: DrawMidiInSpectrogram&
 	func __init__(plugin: TsunamiPlugin, _song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable,closebutton=no")
@@ -106,14 +107,14 @@ Grid ? ''
 		Button export 'Export' image=hui:save")
 		
 		var view = plugin.session.view
-		dmis = &plugin
+		dmis := &!plugin
 		song = plugin.session.song
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range().offset / float(song.sample_rate), view.sel.range().end() / float(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		#grid.allow_bg = false
-		grid.plugin = &plugin
+		grid.plugin := &!plugin
 		grid.create_pitch = -1
 		grid.x_offset = view.sel.range().offset
 		grid.x_scale = song.sample_rate
@@ -135,8 +136,7 @@ Grid ? ''
 		let n = get_int("target")
 		if n < 0
 			return
-		var t = tracks[n]
-		t.layers[0].insert_midi_data(0, dmis.midi)
+		tracks[n].layers[0].insert_midi_data(0, dmis.midi)
 		
 		destroy()
 
@@ -150,7 +150,7 @@ func f2col(_f: float) -> color
 
 class DrawMidiInSpectrogram extends TsunamiPlugin
 
-	var dlg: SpectrumDialog*
+	var dlg: shared[SpectrumDialog]
 	var midi: MidiNoteBuffer
 	var sg: float[NF][NT]
 
@@ -160,7 +160,6 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 		var buf: AudioBuffer
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
-		del renderer
 	
 		var f: complex[]
 		var sub: float[]
@@ -203,7 +202,8 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 				im0.set_pixel(t, NF - i - 1, f2col(ff))
 	
 
-		dlg.redraw("drawing_area")
+		for d in dlg
+			d.redraw("drawing_area")
 
 		hui.fly(dlg, stop)
 

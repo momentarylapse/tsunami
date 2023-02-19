@@ -19,15 +19,13 @@ class BiquadPhaseShiftCurve extends Curve
 class SpectrumCurve extends Curve
 	var spec: float[]
 	var sample_rate: float
-	var ring: RingBuffer*
+	var ring: owned![RingBuffer]
 	var N: int
 	func override __init__()
 		ring = new RingBuffer(65536)
 		N = 4096*2
 		sample_rate = DEFAULT_SAMPLE_RATE
 		col = colors.text_soft2
-	func override __delete__()
-		del ring
 	func mut set(buf: AudioBuffer, _sample_rate: float)
 		sample_rate = _sample_rate
 		ring.write(buf)

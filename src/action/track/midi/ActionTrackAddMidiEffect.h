@@ -13,7 +13,7 @@ class MidiEffect;
 
 class ActionTrackAddMidiEffect: public Action {
 public:
-	ActionTrackAddMidiEffect(Track *t, MidiEffect *effect);
+	ActionTrackAddMidiEffect(Track *t, shared<MidiEffect> effect);
 
 	string name() const override { return ":##:add midi fx"; }
 

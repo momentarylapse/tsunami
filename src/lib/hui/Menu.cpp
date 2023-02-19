@@ -51,7 +51,7 @@ void Menu::add_separator() {
 	_add(new MenuItemSeparator());
 }
 
-void Menu::add_sub_menu(const string &name, const string &id, Menu *menu) {
+void Menu::add_sub_menu(const string &name, const string &id, xfer<Menu> menu) {
 	if (menu)
 		_add(new MenuItemSubmenu(name, menu, id));
 }
@@ -90,7 +90,7 @@ Menu *Menu::get_sub_menu_by_id(const string &id) {
 	for (Control *c: weak(items)) {
 		if (auto s = dynamic_cast<MenuItemSubmenu*>(c)) {
 			if (s->id == id)
-				return s->sub_menu;
+				return s->sub_menu.get();
 			if (Menu *m = s->sub_menu->get_sub_menu_by_id(id))
 				return m;
 		}

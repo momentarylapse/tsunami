@@ -22,6 +22,7 @@ void crash() {
 }
 
 extern const Class *TypeStringAutoCast;
+extern const Class *TypeSpecialFunctionRef;
 
 
 
@@ -221,6 +222,14 @@ shared<Node> Parser::parse_abstract_operand_extension_pointer(shared<Node> opera
 	return node;
 }
 
+shared<Node> Parser::parse_abstract_operand_extension_reference(shared<Node> operand) {
+	auto node = new Node(NodeKind::ABSTRACT_TYPE_REFERENCE, 0, TypeUnknown);
+	node->token_id = Exp.consume_token(); // "&"
+	node->set_num_params(1);
+	node->set_param(0, operand);
+	return node;
+}
+
 shared<Node> Parser::parse_abstract_operand_extension_array(shared<Node> operand, Block *block) {
 	int token0 = Exp.consume_token();
 	// array index...
@@ -333,7 +342,7 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 	} else if (Exp.cur == "?") {
 		// optional?
 		return parse_abstract_operand_extension(parse_abstract_operand_extension_optional(operand), block, true);
-	} else if (Exp.cur == Identifier::SHARED or Exp.cur == Identifier::OWNED) {
+	/*} else if (Exp.cur == Identifier::SHARED or Exp.cur == Identifier::OWNED) {
 		auto sub = operand;
 		if (Exp.cur == Identifier::SHARED) {
 			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED, 0, TypeUnknown);
@@ -343,16 +352,20 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 		operand->token_id = Exp.consume_token();
 		operand->set_num_params(1);
 		operand->set_param(0, sub);
-		return parse_abstract_operand_extension(operand, block, true);
+		return parse_abstract_operand_extension(operand, block, true);*/
 	} else {
 
+		// TODO ptr[X]
 		if ((Exp.cur == "*" and (prefer_class or no_identifier_after())) or Exp.cur == "ptr") {
 			// FIXME: false positives for "{{pi * 10}}"
 			return parse_abstract_operand_extension(parse_abstract_operand_extension_pointer(operand), block, true);
 		}
+		if ((Exp.cur == "&" and (prefer_class or no_identifier_after())) or Exp.cur == "ref") {
+			return parse_abstract_operand_extension(parse_abstract_operand_extension_reference(operand), block, true);
+		}
 		// unary operator? (++,--)
 
-		if (auto op = parse_abstract_operator(1)) {
+		if (auto op = parse_abstract_operator(OperatorFlags::UNARY_LEFT)) {
 			op->set_num_params(1);
 			op->set_param(0, operand);
 			return parse_abstract_operand_extension(op, block, prefer_class);
@@ -493,7 +506,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v, int token_i
 		
 		try {
 			auto n = parse_operand_greedy(block, false);
-			n = con.deref_if_pointer(n);
+			n = con.deref_if_reference(n);
 
 			if (fmt != "") {
 				n = apply_format(n, fmt);
@@ -587,9 +600,13 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 	if (try_consume("(")) {
 		operand = parse_abstract_operand_greedy(block, true);
 		expect_identifier(")", "')' expected");
-	} else if (try_consume("&")) { // & -> address operator
+	} else if (try_consume("&!")) { // &! -> new address operator
 		int token = Exp.cur_token();
-		operand = parse_abstract_operand(block)->ref(TypeUnknown);
+		operand = parse_abstract_operand(block)->ref_new(TypeUnknown);
+		operand->token_id = token;
+	} else if (try_consume("&")) { // & -> legacy address operator
+		int token = Exp.cur_token();
+		operand = parse_abstract_operand(block)->ref_raw(TypeUnknown);
 		operand->token_id = token;
 	} else if (try_consume("*")) { // * -> dereference
 		int token = Exp.cur_token();
@@ -607,11 +624,23 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 		operand = parse_abstract_statement(block);
 	//} else if (auto s = which_special_function(Exp.cur)) {
 	//	operand = parse_abstract_special_function(block, s);
-	} else if (auto w = which_abstract_operator(Exp.cur, 2)) { // negate/not...
-		operand = new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown);
+	} else if (auto w = which_abstract_operator(Exp.cur, OperatorFlags::UNARY_RIGHT)) { // negate/not...
+		operand = new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown, false, Exp.cur_token());
 		Exp.next();
 		operand->set_num_params(1);
 		operand->set_param(0, parse_abstract_operand(block));
+	} else if (try_consume(Identifier::SHARED)) {
+		if (try_consume("!"))
+			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL, 0, TypeUnknown, false, Exp.cur_token()-1);
+		else
+			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED, 0, TypeUnknown, false, Exp.cur_token());
+	} else if (try_consume(Identifier::OWNED)) {
+		if (try_consume("!"))
+			operand = new Node(NodeKind::ABSTRACT_TYPE_OWNED_NOT_NULL, 0, TypeUnknown, false, Exp.cur_token()-1);
+		else
+			operand = new Node(NodeKind::ABSTRACT_TYPE_OWNED, 0, TypeUnknown, false, Exp.cur_token());
+	} else if (try_consume(Identifier::XFER)) {
+		operand = new Node(NodeKind::ABSTRACT_TYPE_XFER, 0, TypeUnknown, false, Exp.cur_token());
 	} else {
 		operand = parse_abstract_token();
 	}
@@ -625,7 +654,7 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 }
 
 // no type information
-shared<Node> Parser::parse_abstract_operator(int param_flags) {
+shared<Node> Parser::parse_abstract_operator(OperatorFlags param_flags) {
 	auto op = which_abstract_operator(Exp.cur, param_flags);
 	if (!op)
 		return nullptr;
@@ -743,7 +772,7 @@ shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tupl
 	while (true) {
 		if (!allow_tuples and Exp.cur == ",")
 			break;
-		if (auto op = parse_abstract_operator(3)) {
+		if (auto op = parse_abstract_operator(OperatorFlags::BINARY)) {
 			operators.add(op);
 			expect_no_new_line("unexpected end of line after operator");
 			operands.add(parse_abstract_operand(block));
@@ -816,7 +845,7 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 		auto array = val0;
 
 
-		auto cmd_for = add_node_statement(StatementID::FOR_ARRAY, token0, TypeUnknown);
+		auto cmd_for = add_node_statement(StatementID::FOR_CONTAINER, token0, TypeUnknown);
 		// [VAR, KEY, ARRAY, BLOCK]
 
 		cmd_for->set_param(0, var);
@@ -832,7 +861,7 @@ void Parser::post_process_for(shared<Node> cmd_for) {
 	auto *n_var = cmd_for->params[0].get();
 	auto *var = n_var->as_local();
 
-	if (cmd_for->as_statement()->id == StatementID::FOR_ARRAY) {
+	/*if (cmd_for->as_statement()->id == StatementID::FOR_CONTAINER) {
 		auto *loop_block = cmd_for->params[3].get();
 
 	// ref.
@@ -841,11 +870,11 @@ void Parser::post_process_for(shared<Node> cmd_for) {
 		tree->transform_node(loop_block, [this, var] (shared<Node> n) {
 			return tree->conv_cbr(n, var);
 		});
-	}
+	}*/
 
 	// force for_var out of scope...
 	var->name = ":" + var->name;
-	if (cmd_for->as_statement()->id == StatementID::FOR_ARRAY) {
+	if (cmd_for->as_statement()->id == StatementID::FOR_CONTAINER) {
 		auto *index = cmd_for->params[1]->as_local();
 		index->name = ":" + index->name;
 	}
@@ -855,6 +884,7 @@ void Parser::post_process_for(shared<Node> cmd_for) {
 
 // Node structure
 shared<Node> Parser::parse_abstract_statement_for(Block *block) {
+	int ind0 = Exp.cur_line->indent;
 
 	auto cmd_for = parse_abstract_for_header(block);
 
@@ -866,6 +896,19 @@ shared<Node> Parser::parse_abstract_statement_for(Block *block) {
 	parser_loop_depth --;
 
 	cmd_for->set_param(cmd_for->params.num - 1, loop_block);
+
+	// else?
+	int token_id = Exp.cur_token();
+	Exp.next_line();
+	if (!Exp.end_of_file() and (Exp.cur == Identifier::ELSE) and (Exp.cur_line->indent >= ind0)) {
+		Exp.next();
+		// ...block
+		expect_new_line_with_indent();
+		Exp.next_line();
+		cmd_for->params.add(parse_abstract_block(block));
+	} else {
+		Exp.jump(token_id);
+	}
 
 	//post_process_for(cmd_for);
 
@@ -1032,12 +1075,9 @@ shared<Node> Parser::parse_abstract_statement_try(Block *block) {
 // Node structure (IF):
 //  p[0]: test
 //  p[1]: true block
-// Node structure (IF_ELSE):
-//  p[0]: test
-//  p[1]: true block
-//  p[2]: false block
+// [p[2]: false block]
 shared<Node> Parser::parse_abstract_statement_if(Block *block) {
-	int ind = Exp.cur_line->indent;
+	int ind0 = Exp.cur_line->indent;
 	int token0 = Exp.consume_token(); // "if"
 	auto cmd_cmp = parse_abstract_operand_greedy(block);
 
@@ -1047,12 +1087,11 @@ shared<Node> Parser::parse_abstract_statement_if(Block *block) {
 	expect_new_line_with_indent();
 	Exp.next_line();
 	cmd_if->set_param(1, parse_abstract_block(block));
-	int token_id = Exp.cur_token();
-	Exp.next_line();
 
 	// else?
-	if (!Exp.end_of_file() and (Exp.cur == Identifier::ELSE) and (Exp.cur_line->indent >= ind)) {
-		cmd_if->link_no = (int64)statement_from_id(StatementID::IF_ELSE);
+	int token_id = Exp.cur_token();
+	Exp.next_line();
+	if (!Exp.end_of_file() and (Exp.cur == Identifier::ELSE) and (Exp.cur_line->indent >= ind0)) {
 		cmd_if->set_num_params(3);
 		Exp.next();
 		// iterative if
@@ -1068,6 +1107,45 @@ shared<Node> Parser::parse_abstract_statement_if(Block *block) {
 		expect_new_line_with_indent();
 		Exp.next_line();
 		cmd_if->set_param(2, parse_abstract_block(block));
+	} else {
+		Exp.jump(token_id);
+	}
+	return cmd_if;
+}
+
+// Node structure (IF_UNWRAP):
+//  p[0]: expression
+//  p[1]: out var
+//  p[2]: true block
+// [p[3]: false block]
+shared<Node> Parser::parse_abstract_statement_if_unwrap(Block *block) {
+	int ind = Exp.cur_line->indent;
+	int token0 = Exp.consume_token(); // "if"
+
+	[[maybe_unused]] bool is_var = (Exp.consume() == Identifier::VAR);
+
+	auto out_var = parse_abstract_token();
+	expect_identifier(Identifier::IN, "'in' expected after unwrapped variable");
+	auto expression = parse_abstract_operand_greedy(block);
+
+	auto cmd_if = add_node_statement(StatementID::IF_UNWRAP, token0, TypeUnknown);
+	cmd_if->set_param(0, expression);
+	cmd_if->set_param(1, out_var);
+	// ...block
+	expect_new_line_with_indent();
+	Exp.next_line();
+	cmd_if->set_param(2, parse_abstract_block(block));
+	int token_id = Exp.cur_token();
+	Exp.next_line();
+
+	// else?
+	if (!Exp.end_of_file() and (Exp.cur == Identifier::ELSE) and (Exp.cur_line->indent >= ind)) {
+		cmd_if->set_num_params(4);
+		Exp.next();
+		// ...block
+		expect_new_line_with_indent();
+		Exp.next_line();
+		cmd_if->set_param(3, parse_abstract_block(block));
 	} else {
 		Exp.jump(token_id);
 	}
@@ -1150,7 +1228,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 
 		auto tuple = build_abstract_tuple(names);
 
-		auto assign = parse_abstract_operator(3);
+		auto assign = parse_abstract_operator(OperatorFlags::BINARY);
 
 		auto rhs = parse_abstract_operand_greedy(block, true);
 
@@ -1181,7 +1259,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 		if (names.num != 1)
 			do_error_exp(format("'var' declaration with '=' only allowed with a single variable name, %d given", names.num));
 
-		auto assign = parse_abstract_operator(3);
+		auto assign = parse_abstract_operator(OperatorFlags::BINARY);
 
 		auto rhs = parse_abstract_operand_greedy(block, true);
 
@@ -1261,7 +1339,10 @@ shared<Node> Parser::parse_abstract_statement(Block *block) {
 	} else if (Exp.cur == Identifier::TRY) {
 		return parse_abstract_statement_try(block);
 	} else if (Exp.cur == Identifier::IF) {
-		return parse_abstract_statement_if(block);
+		if (Exp.peek_next() == Identifier::VAR or Exp.peek_next() == Identifier::LET)
+			return parse_abstract_statement_if_unwrap(block);
+		else
+			return parse_abstract_statement_if(block);
 	} else if (Exp.cur == Identifier::PASS) {
 		return parse_abstract_statement_pass(block);
 	} else if (Exp.cur == Identifier::NEW) {
@@ -1284,7 +1365,7 @@ shared<Node> Parser::parse_abstract_special_function(Block *block, SpecialFuncti
 
 	// no call, just the name
 	if (Exp.cur != "(") {
-		auto node = add_node_special_function_name(s->id, token0, TypeSpecialFunctionP);
+		auto node = add_node_special_function_name(s->id, token0, TypeSpecialFunctionRef);
 		node->set_num_params(0);
 		return node;
 	}
@@ -1443,6 +1524,8 @@ bool type_needs_alignment(const Class *t) {
 	return (t->size >= 4);
 }
 
+bool is_same_kind_of_pointer(const Class *a, const Class *b);
+
 void parser_class_add_element(Parser *p, Class *_class, const string &name, const Class *type, Flags flags, int &_offset, int token_id) {
 
 	// override?
@@ -1454,7 +1537,7 @@ void parser_class_add_element(Parser *p, Class *_class, const string &name, cons
 	if (!override and orig)
 		p->do_error(format("element '%s' is already defined, use '%s' to override", name, Identifier::OVERRIDE), token_id);
 	if (override) {
-		if (orig->type->is_pointer() and type->is_pointer())
+		if (is_same_kind_of_pointer(orig->type, type))
 			orig->type = type;
 		else
 			p->do_error("can only override pointer elements with other pointer type", token_id);
@@ -1481,9 +1564,17 @@ void parser_class_add_element(Parser *p, Class *_class, const string &name, cons
 	}
 }
 
+Class::Type parse_class_type(const string& e) {
+	if (e == Identifier::INTERFACE)
+		return Class::Type::INTERFACE;
+	if (e == Identifier::STRUCT)
+		return Class::Type::STRUCT;
+	return Class::Type::REGULAR;
+}
+
 Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 	offset0 = 0;
-	bool as_interface = (Exp.consume() == Identifier::INTERFACE); // class/struct/interface
+	auto class_type = parse_class_type(Exp.consume()); // class/struct/interface
 	string name = Exp.cur;
 	int token_id = Exp.consume_token();
 
@@ -1493,8 +1584,7 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 	if (!_class)
 		tree->module->do_error_internal("class declaration ...not found " + name);
 	_class->token_id = token_id;
-	if (as_interface)
-		_class->type = Class::Type::INTERFACE;
+	_class->type = class_type;
 
 	// parent class
 	if (try_consume(Identifier::EXTENDS)) {
@@ -1502,17 +1592,17 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 		if (!parent->fully_parsed())
 			return nullptr;
 			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
-		_class->derive_from(parent, true);
+		_class->derive_from(parent, DeriveFlags::SET_SIZE | DeriveFlags::KEEP_CONSTRUCTORS | DeriveFlags::COPY_VTABLE);
 		_class->flags = parent->flags;
-		offset0 = parent->size;
+		offset0 = _class->size;
 	}
 
 	if (try_consume(Identifier::IMPLEMENTS)) {
 		auto parent = parse_type(_namespace); // force
 		if (!parent->fully_parsed())
 			return nullptr;
-		_class->derive_from(parent, true);
-		offset0 = parent->size;
+		_class->derive_from(parent, DeriveFlags::SET_SIZE | DeriveFlags::KEEP_CONSTRUCTORS | DeriveFlags::COPY_VTABLE);
+		offset0 = _class->size;
 	}
 
 	// as shared|@noauto
@@ -1551,7 +1641,7 @@ bool Parser::parse_class(Class *_namespace) {
 
 		if (Exp.cur == Identifier::ENUM) {
 			parse_enum(_class);
-		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::INTERFACE)) {
+		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE)) {
 			int cur_token = Exp.cur_token();
 			if (!parse_class(_class)) {
 				sub_class_token_ids.add(cur_token);
@@ -1604,11 +1694,11 @@ void Parser::post_process_newly_parsed_class(Class *_class, int size) {
 			// element "-vtable-" being derived
 		} else {
 			for (ClassElement &e: _class->elements)
-				e.offset = external->process_class_offset(_class->cname(tree->base_class), e.name, e.offset + config.pointer_size);
+				e.offset = external->process_class_offset(_class->cname(tree->base_class), e.name, e.offset + config.target.pointer_size);
 
 			auto el = ClassElement(Identifier::VTABLE_VAR, TypePointer, 0);
 			_class->elements.insert(el, 0);
-			size += config.pointer_size;
+			size += config.target.pointer_size;
 
 			for (auto &i: _class->initializers)
 				i.element ++;

@@ -176,6 +176,8 @@ void Function::add_self_parameter() {
 	auto _flags = Flags::NONE;
 	if (flags_has(flags, Flags::CONST))
 		flags_set(_flags, Flags::CONST);
+	else
+		flags_set(_flags, Flags::OUT);
 	if (flags_has(flags, Flags::REF))
 		flags_set(_flags, Flags::REF);
 	block->insert_var(0, Identifier::SELF, name_space, _flags);

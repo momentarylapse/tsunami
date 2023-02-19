@@ -16,11 +16,7 @@
 
 namespace nix{
 
-// textures
 void init_textures();
-void release_textures();
-void reincarnate_textures();
-
 
 
 class Texture : public Sharable<base::Empty> {
@@ -67,7 +63,7 @@ public:
 
 	void _cdecl set_options(const string &op) const;
 
-	static Texture* _cdecl load(const Path &filename);
+	static xfer<Texture> _cdecl load(const Path &filename);
 };
 
 
@@ -113,6 +109,7 @@ public:
 
 void _cdecl set_texture(Texture *texture);
 void _cdecl set_textures(const Array<Texture*> &textures);
+void bind_texture(int binding, Texture *t);
 void bind_image(int binding, Texture *t, int level, int layer, bool writable);
 
 extern int tex_cube_level;

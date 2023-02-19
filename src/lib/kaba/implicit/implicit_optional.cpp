@@ -12,27 +12,29 @@
 namespace kaba {
 
 extern const Class *TypeNoValueError;
+extern const Class *TypeNone;
 
 static shared<Node> op_has_value(shared<Node> node) {
 	return node->shift(node->type->size - 1, TypeBool);
 }
 
 static shared<Node> op_data(shared<Node> node) {
-	return node->shift(0, node->type->param[0]);
+	return node->change_type(node->type->param[0]);
 }
 
 void AutoImplementer::_add_missing_function_headers_for_optional(Class *t) {
 	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
 	add_func_header(t, Identifier::Func::INIT, TypeVoid, {t->param[0]}, {"value"}, nullptr, Flags::AUTO_CAST);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypePointer}, {"value"}, nullptr, Flags::AUTO_CAST);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypeNone}, {"value"}, nullptr, Flags::AUTO_CAST);
 	//if (t->param[0]->get_destructor())
 	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t->param[0]}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypePointer}, {"other"});
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"});
 	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
 	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
-	add_func_header(t, Identifier::Func::CALL, t->param[0], {}, {}, nullptr, Flags::REF);
+//	add_func_header(t, Identifier::Func::CALL, t->param[0], {}, {}, nullptr, Flags::REF);
+	//add_func_header(t, "_get_p", t->param[0], {}, {}, nullptr, Flags::REF);
 	if (t->param[0]->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})) {
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t->param[0]}, {"other"}, nullptr, Flags::PURE);
@@ -233,6 +235,7 @@ void AutoImplementer::implement_optional_has_value(Function *f, const Class *t) 
 	f->block->add(ret);
 }
 
+// deprecated!
 void AutoImplementer::implement_optional_value(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
@@ -253,7 +256,7 @@ void AutoImplementer::implement_optional_value(Function *f, const Class *t) {
 		auto cmd_new = add_node_statement(StatementID::NEW);
 		cmd_new->set_num_params(1);
 		cmd_new->set_param(0, cmd_call_ex);
-		cmd_new->type = TypeExceptionP;
+		cmd_new->type = TypeExceptionXfer;
 
 		auto cmd_raise = add_node_call(tree->required_func_global("raise"));
 		cmd_raise->set_param(0, cmd_new);
@@ -349,15 +352,15 @@ void AutoImplementer::implement_optional_equal(Function *f, const Class *t) {
 
 void AutoImplementer::_implement_functions_for_optional(const Class *t) {
 	implement_optional_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
-	implement_optional_constructor(prepare_auto_impl(t, t->get_member_func(Identifier::Func::INIT, TypeVoid, {TypePointer})), t);
+	implement_optional_constructor(prepare_auto_impl(t, t->get_member_func(Identifier::Func::INIT, TypeVoid, {TypeNone})), t);
 	implement_optional_constructor_wrap(prepare_auto_impl(t, t->get_member_func(Identifier::Func::INIT, TypeVoid, {t->param[0]})), t);
 	implement_optional_destructor(prepare_auto_impl(t, t->get_destructor()), t);
 	implement_optional_assign(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {t})), t);
 	implement_optional_assign_raw(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {t->param[0]})), t);
-	implement_optional_assign_null(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {TypePointer})), t);
+	implement_optional_assign_null(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {TypeNone})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func("__bool__", TypeBool, {})), t);
-	implement_optional_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::CALL, t->param[0], {})), t);
+//	implement_optional_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::CALL, t->param[0], {})), t);
 	implement_optional_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t);
 	implement_optional_equal_raw(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})), t);
 }

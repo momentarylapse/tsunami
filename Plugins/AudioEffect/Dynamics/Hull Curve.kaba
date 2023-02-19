@@ -45,12 +45,12 @@ class HullCurve extends AudioEffect
 		for c in buf.c
 			hull(c)
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new HullCurvePanel(self)
 
 class HullGrid extends Grid
-	var config: HullCurve.Config*
-	var cp: ConfigPanel*
+	var config: HullCurve.Config&
+	var cp: ConfigPanel&
 	var hover, selected: int
 
 	func override on_draw(c: Painter)
@@ -119,7 +119,7 @@ class HullGrid extends Grid
 
 class HullCurvePanel extends ConfigPanel
 	var grid: HullGrid
-	var override c: HullCurve*
+	var override c: HullCurve&
 	func override __init__(_h: Module)
 		from_source("
 Grid ? '' vertical
@@ -130,8 +130,8 @@ Grid ? '' vertical
 	
 		#EventMX("drawing", "hui:draw", self, &OnDraw)
 	
-		grid.config = &c.config
-		grid.cp = &self
+		grid.config := &!c.config
+		grid.cp := &!self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")

@@ -31,8 +31,8 @@ class HammondConfig extends Module.Config
 		key_stutter = 0.5
 
 class HammondGrid extends Grid
-	var hc: HammondConfig*
-	var p: HammondPanel*
+	var hc: HammondConfig&
+	var p: HammondPanel&
 	var selected, hover: int
 
 	func override on_draw(c: Painter)
@@ -65,8 +65,8 @@ class HammondGrid extends Grid
 		redraw()
 
 class HammondPanel extends ConfigPanel
-	var override c: HammondSynthesizer*
-	var hc: HammondConfig*
+	var override c: HammondSynthesizer&
+	var hc: HammondConfig&
 	var grid: HammondGrid
 	func override __init__(_s: Module)
 		from_source("
@@ -87,10 +87,10 @@ Grid ? '' vertical
 		event("attack", on_change)
 		event("release", on_change)
 		event("stutter", on_change)
-		hc = &c.config
+		hc := &!c.config
 		
-		grid.hc = hc
-		grid.p = &self
+		grid.hc := hc
+		grid.p := &!self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
@@ -116,7 +116,7 @@ class HammondRenderer extends PitchRenderer
 	var stutter_offset: int
 	var env: EnvelopeADSR
 	var filter: BiquadFilter
-	var override synth: HammondSynthesizer*
+	var override synth: HammondSynthesizer&
 	func override __init__(s: Synthesizer, pitch: int)
 		for x in phi
 			x = 0
@@ -172,8 +172,8 @@ class HammondSynthesizer extends Synthesizer
 	var config: HammondConfig
 
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new HammondPanel(self)
 	
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new HammondRenderer(self, pitch)

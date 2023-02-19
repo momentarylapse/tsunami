@@ -28,14 +28,14 @@ public:
 	~MidiPreview() override;
 
 	shared<SignalChain> chain;
-	Module *synth;
-	Module *joiner;
-	Module *out;
-	MidiPreviewSource *source;
-	Module *accumulator;
+	shared<Module> synth;
+	shared<Module> joiner;
+	shared<Module> out;
+	shared<MidiPreviewSource> source;
+	shared<Module> accumulator;
 	Session *session;
 
-	MidiInput *input;
+	shared<MidiInput> input;
 
 
 	void _start_input();

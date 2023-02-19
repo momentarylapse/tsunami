@@ -18,7 +18,7 @@ namespace hui
 
 void *get_gtk_image(const string &image, IconSize size); // -> hui_menu_gtk.cpp
 
-Menu *_create_res_menu_(const string &ns, Resource *res, Panel *p); // -> Resource.cpp
+xfer<Menu> _create_res_menu_(const string &ns, Resource *res, Panel *p); // -> Resource.cpp
 
 //void OnGtkMenuButtonPress(GtkWidget *widget, gpointer data)
 //{	reinterpret_cast<Control*>(data)->notify("hui:click");	}

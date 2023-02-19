@@ -169,7 +169,7 @@ void init() {
 	set_material(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
 	set_projection_perspective();
 	set_z(true, true);
-	set_shader(Shader::default_3d);
+	set_shader(Shader::default_3d.get());
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
@@ -185,18 +185,6 @@ void init() {
 
 void kill() {
 	msg_write("nix.kill");
-	kill_device_objects();
-}
-
-// erlaubt dem Device einen Neustart
-void kill_device_objects() {
-	// textures
-	release_textures();
-}
-
-void reincarnate_device_objects() {
-	// textures
-	reincarnate_textures();
 }
 
 void flush() {

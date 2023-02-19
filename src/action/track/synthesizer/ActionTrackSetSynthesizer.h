@@ -14,7 +14,7 @@ class Synthesizer;
 
 class ActionTrackSetSynthesizer : public Action {
 public:
-	ActionTrackSetSynthesizer(Track *t, Synthesizer *synth);
+	ActionTrackSetSynthesizer(Track *t, shared<Synthesizer> synth);
 
 	string name() const override { return ":##:set synthesizer"; }
 

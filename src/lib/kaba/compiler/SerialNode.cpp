@@ -45,7 +45,7 @@ string signed_hex(int64 i) {
 string guess_constant(int64 c, Serializer *ser) {
 	if (c != 0) {
 		for (auto s: ser->syntax_tree->includes)
-			for (auto *f: s->syntax->functions)
+			for (auto *f: s->tree->functions)
 				if (c == f->address)
 					return "FUNC:" + f->long_name();
 	}
@@ -89,7 +89,7 @@ string SerialNodeParam::str(Serializer *ser) const {
 		else if (kind == NodeKind::LOCAL_MEMORY)
 			n = guess_local_mem(p + shift, ser);
 		else if (kind == NodeKind::MEMORY)
-			n = "0x" + i2h(p + shift, config.pointer_size);
+			n = "0x" + i2h(p + shift, config.target.pointer_size);
 		else if (kind == NodeKind::IMMEDIATE)
 			n = guess_constant(p + shift, ser);
 		else if (kind == NodeKind::VAR_LOCAL)

@@ -3,22 +3,20 @@ use tsunami
 
 
 func get_part(s: Song, offset: int) -> TrackMarker*
-	var t = s.time_track()
-	if !t
-		return nil
-	for m in weak(t.layers[0].markers)
-		if m.range.inside(offset)
-			return m
+	for t in s.time_track()
+		for m in t.layers[0].markers
+			if m.range.inside(offset)
+				return weak(m)
 	return nil
 
 
 
 class PLPanel extends ConfigPanel
-	var looper: PracticeLooper*
+	var looper: PracticeLooper&
 	
 	func __init__(l: PracticeLooper)
 		super.__init__(l)
-		looper = &l
+		looper := &!l
 		from_source("
 Grid ? '' vertical
 	Label ? 'Do not edit the file (even adjusting volumes)!' bold italic
@@ -51,9 +49,9 @@ func scale_range(r: Range, s: float) -> Range
 
 class PracticeLooper extends TsunamiPlugin
 	var runner: int
-	var chain: SignalChain*
-	var renderer: SongRenderer*
-	var song: Song*
+	var chain: shared![SignalChain]
+	var renderer: shared![SongRenderer]
+	var song: shared![Song]
 	var altered_speed = false
 	var current_speed = 1.0
 #	var old_sel: Range
@@ -74,7 +72,7 @@ class PracticeLooper extends TsunamiPlugin
 #		hui.cancel_runner(runner)
 		reset()
 			
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new PLPanel(self)
 	
 	func mut play()
@@ -108,12 +106,13 @@ class PracticeLooper extends TsunamiPlugin
 			reset()
 		if config.speed != current_speed
 			song.begin_action_group("set speed")
-			for i=>b in song.bars
-				var bb: Bar
-				bb.beats = b.beats
-				bb.divisor = b.divisor
-				bb.length = int(b.length / config.speed)
-				song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
+			for i=>_b in song.bars
+				for b in _b
+					var bb: Bar
+					bb.beats = b.beats
+					bb.divisor = b.divisor
+					bb.length = int(b.length / config.speed)
+					song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
 			song.end_action_group()
 	#		old_sel = session.view.sel.range_raw
 			session.view.cam.set_range(scale_range(session.view.cam.range(), 1. / config.speed))

@@ -13,7 +13,7 @@ extern const Class *TypeFloatList;
 extern const Class *TypeBoolList;
 extern const Class *TypeAny;
 extern const Class *TypePath;
-
+extern const Class *TypeSpecialFunction;
 
 	
 	
@@ -29,7 +29,7 @@ void var_assign(void *pa, const void *pb, const Class *type) {
 		*(int*)pa = *(int*)pb;
 	} else if ((type == TypeBool) or (type == TypeChar)) {
 		*(char*)pa = *(char*)pb;
-	} else if (type->is_pointer()) {
+	} else if (type->is_pointer_raw()) {
 		*(void**)pa = *(void**)pb;
 	} else {
 		auto *f = type->get_assign();
@@ -164,9 +164,11 @@ string callable_repr(const void *p, const Class *type) {
 	return "<callable " + callable_signature(type) + ">";
 }
 
-string _cdecl var_repr(const void *p, const Class *type) {
+string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
+
+	// fixed
 	if (type == TypeInt) {
-		return i2s(*(int*)p);
+		return str(*(int*)p);
 	} else if (type == TypeFloat32) {
 		return f2s(*(float*)p, 6);
 	} else if (type == TypeFloat64) {
@@ -180,27 +182,39 @@ string _cdecl var_repr(const void *p, const Class *type) {
 	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
 		// probably not...
 		return func_repr((Function*)p);
-	} else if (type == TypeSpecialFunctionP) {
-		return format("<special function %s>", (*(SpecialFunction**)p)->name);
+	} else if (type == TypeSpecialFunction) {
+		return format("<special function %s>", ((SpecialFunction*)p)->name);
 	} else if (type == TypeAny) {
-		return ((Any*)p)->repr();
+		if (as_repr)
+			return ((Any*)p)->repr();
+		else
+			return reinterpret_cast<const Any*>(p)->str();
 	} else if (type->is_some_pointer()) {
 		auto *pp = *(void**)p;
 		// auto deref?
 		if (pp and (type->param[0] != TypeVoid))
-			return var_repr(pp, type->param[0]);
+			return var_repr_str(pp, type->param[0], as_repr);
 		return p2s(pp);
-	} else if (type == TypeString) {
-		return ((string*)p)->repr();
+	} else if (type == TypeString) { // covered by user code...
+		if (as_repr)
+			return ((string*)p)->repr();
+		else
+			return *(string*)p;
 	} else if (type == TypeCString) {
-		return string((char*)p).repr();
-	} else if (type == TypePath) {
-		return ((Path*)p)->str().repr();
+		if (as_repr)
+			return string((char*)p).repr();
+		else
+			return string((char*)p);
+	} else if (type == TypePath) { // covered by user code...
+		if (as_repr)
+			return ((Path*)p)->str().repr();
+		else
+			return ((Path*)p)->str();
 	} else if (type->is_enum()) {
 		return find_enum_label(type, *(int*)p);
 	} else if (type->is_optional()) {
 		if (*(bool*)((int_p)p + type->size - 1))
-			return var_repr(p, type->param[0]);
+			return var_repr_str(p, type->param[0], as_repr);
 		return "nil";
 	} else if (type->is_super_array()) {
 		string s;
@@ -222,17 +236,6 @@ string _cdecl var_repr(const void *p, const Class *type) {
 			s += var_repr(((char*)da->data) + i * da->element_size + sizeof(string), type->param[0]);
 		}
 		return "{" + s + "}";
-	} else if (type->elements.num > 0) {
-		string s;
-		for (auto &e: type->elements) {
-			if (e.hidden())
-				continue;
-			if (s.num > 0)
-				s += ", ";
-			s += var_repr(((char*)p) + e.offset, e.type);
-		}
-		return "(" + s + ")";
-
 	} else if (type->is_array()) {
 		string s;
 		for (int i=0; i<type->array_length; i++) {
@@ -244,19 +247,42 @@ string _cdecl var_repr(const void *p, const Class *type) {
 	} else if (type->is_enum()) {
 		return find_enum_label(type, *(int*)p);
 	}
+
+
+	// try user code
+	auto f_str = type->get_member_func(Identifier::Func::STR, TypeString, {});
+	auto f_repr = type->get_member_func(Identifier::Func::REPR, TypeString, {});
+	auto f = f_str;
+	if ((as_repr and f_repr) or !f_str)
+		f = f_repr;
+	if (f) {
+		string r;
+		if (call_member_function(f, const_cast<void*>(p), &r, {}, true))
+			return r;
+	}
+
+	// basic "universal" representations
+	if (type->elements.num > 0) {
+		string s;
+		for (auto &e: type->elements) {
+			if (e.hidden())
+				continue;
+			if (s.num > 0)
+				s += ", ";
+			s += var_repr(((char*)p) + e.offset, e.type);
+		}
+		return "(" + s + ")";
+	}
 	return d2h(p, type->size);
 }
 
+
+string _cdecl var_repr(const void *p, const Class *type) {
+	return var_repr_str(p, type, true);
+}
+
 string _cdecl var2str(const void *p, const Class *type) {
-	if (type == TypeString)
-		return *(string*)p;
-	if (type == TypeCString)
-		return string((char*)p);
-	if (type == TypePath)
-		return ((Path*)p)->str();
-	if (type == TypeAny)
-		return reinterpret_cast<const Any*>(p)->str();
-	return var_repr(p, type);
+	return var_repr_str(p, type, false);
 }
 
 Any _cdecl dynify(const void *var, const Class *type) {

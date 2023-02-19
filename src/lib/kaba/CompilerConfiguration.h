@@ -31,19 +31,39 @@ enum class Abi {
 };
 
 Asm::InstructionSet extract_instruction_set(Abi abi);
+Abi guess_native_abi();
+string abi_name(Abi abi);
+
+
+inline int mem_align(int x, int n) {
+	return ((x + n - 1) / n) * n;
+}
 
 class CompilerConfiguration {
 public:
 	CompilerConfiguration();
-	Asm::InstructionSet instruction_set;
-	Abi abi;
-	Abi native_abi;
-	bool interpreted;
+
+	struct Target {
+		static Target get_native();
+		static Target get_for_abi(Abi abi);
+
+		Asm::InstructionSet instruction_set;
+		Abi abi;
+		bool interpreted;
+		bool is_native;
+
+		int64 pointer_size;
+		int super_array_size;
+
+		int stack_mem_align;
+		int function_align;
+		int stack_frame_align;
+
+		bool is_arm() const;
+		bool is_x86() const; // 32 or 64 bit
+	} target, native_target;
+
 	bool allow_std_lib;
-
-	int64 pointer_size;
-	int super_array_size;
-
 	bool allow_simplification;
 	bool allow_registers;
 	bool allow_simplify_consts;
@@ -65,10 +85,6 @@ public:
 	int64 variables_offset;
 	bool override_code_origin;
 	int64 code_origin;
-
-	int stack_mem_align;
-	int function_align;
-	int stack_frame_align;
 
 	int function_address_offset;
 

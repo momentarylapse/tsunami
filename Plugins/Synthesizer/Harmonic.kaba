@@ -17,8 +17,8 @@ class HarmonicConfig extends Module.Config
 		release = 0.02
 
 class HarmonicGrid extends Grid
-	var hc: HarmonicConfig*
-	var p: HarmonicPanel*
+	var hc: HarmonicConfig&
+	var p: HarmonicPanel&
 	var Selected, Hover: int
 
 	func override on_draw(c: Painter)
@@ -51,8 +51,8 @@ class HarmonicGrid extends Grid
 		redraw()
 
 class HarmonicPanel extends ConfigPanel
-	var override c: HarmonicSynthesizer*
-	var hc: HarmonicConfig*
+	var override c: HarmonicSynthesizer&
+	var hc: HarmonicConfig&
 	var grid: HarmonicGrid
 	func override __init__(_s: Module)
 		add_grid("", 0, 0, "main_table")
@@ -64,10 +64,10 @@ class HarmonicPanel extends ConfigPanel
 		add_spin_button("!range=0:500:0.1,expandx\\0", 1, 0, "release")
 		add_label("ms", 2, 0, "")
 		event("release", on_change)
-		hc = &c.config
+		hc := &!c.config
 		
-		grid.hc = hc
-		grid.p = &self
+		grid.hc := hc
+		grid.p := &!self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
@@ -85,7 +85,7 @@ class HarmonicRenderer extends PitchRenderer
 	var volume = 0.
 	var phi = 0.
 	var env: EnvelopeADSR
-	var override synth: HarmonicSynthesizer*
+	var override synth: HarmonicSynthesizer&
 	func override on_config()
 		env.set(0.01, 0.01, 0.7, synth.config.release, synth.sample_rate)
 
@@ -117,8 +117,8 @@ class HarmonicSynthesizer extends Synthesizer
 	var config: HarmonicConfig
 
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new HarmonicPanel(self)
 	
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new HarmonicRenderer(self, pitch)

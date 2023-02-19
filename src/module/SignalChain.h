@@ -43,13 +43,17 @@ public:
 
 	void reset(bool hard);
 	void save(const Path &filename);
-	static SignalChain *load(Session *session, const Path &filename);
+	static xfer<SignalChain> load(Session *session, const Path &filename);
 
 	string name;
 
 	shared_array<Module> modules;
-	Module* _add(Module *m);
-	Module* add(ModuleCategory type, const string &sub_type = "");
+	shared<Module> _add(shared<Module> m);
+	shared<Module> add(ModuleCategory type, const string &sub_type = "");
+	template<class M = Module>
+	shared<M> addx(ModuleCategory type, const string &sub_type = "") {
+		return (M*)add(type, sub_type).get();
+	}
 	void delete_module(Module *m);
 	int module_index(Module *m);
 

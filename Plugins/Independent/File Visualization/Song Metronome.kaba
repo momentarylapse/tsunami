@@ -8,14 +8,14 @@ enum AnimationMode
 	BOUNCE
 	BOUNCE_WALK
 
-const UPDATE_DT = 1.0 / 50
-const MAX_BACKGROUND_REDNESS = 0.7
-const MOTION_BLUR_COUNT = 20
+let UPDATE_DT = 1.0 / 50
+let MAX_BACKGROUND_REDNESS = 0.7
+let MOTION_BLUR_COUNT = 20
 
 # part uncertainty...
-const DELTA = 400
+let DELTA = 400
 
-class BlurredDot
+struct BlurredDot
 	var pos, pos0: vec2
 	var has_prev = false
 	func mut move(x: float, y: float)
@@ -41,25 +41,25 @@ class BlurredDot
 			p.draw_circle(pos, r)
 
 class MetronomePanel extends ConfigPanel
-	var metro: Metronome*
+	var metro: Metronome&
 	var fraction_prev: float
 	
 	var fullscreen: bool
 	var allow_blink_background: bool
 	var allow_blink_number: bool
 	var mode: AnimationMode
-	var popup_menu: Menu*
+	var popup_menu: owned![Menu]
 	
 	var dot: BlurredDot
 	var sr_id: int
 	
-	func __init__(_metro: Metronome*)
+	func __init__(_metro: Metronome&)
 		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''")
 
-		metro = _metro
+		metro := _metro
 		fraction_prev = 0
 		
 		fullscreen = false
@@ -67,14 +67,14 @@ Grid ? '' vertical
 		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
-		popup_menu = new Menu(self)
+		popup_menu = new Menu(&self)
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		var sub_mode = new Menu(self)
+		var sub_mode = new Menu(&self)
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
-		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
+		popup_menu.add_sub_menu("Animation", "sub-menu-mode", give(sub_mode))
 	
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:right-button-down", on_area_right_button_down)
@@ -90,21 +90,22 @@ Grid ? '' vertical
 	
 	func override __delete__()
 		hui.cancel_runner(sr_id)
-		del popup_menu
 	
 	func on_update()
 		redraw("area")
 	
 	func mut on_draw(p: Painter)
+		var source = metro.session.view.renderer.get_beat_source()
+		for s in source
+			draw(p, s)
+	
+	func mut draw(p: Painter, source: BeatSource)
 		var w: float = p.width
 		var h: float = p.height
 		var x0 = w / 2
 		var y0 = h / 2
 		var r = min(x0, y0) * 0.9
 		
-		var source = metro.session.view.renderer.get_beat_source()
-		if !source
-			return
 		
 		var cur_bar = source.cur_bar()
 		var beat_fraction = source.beat_fraction()
@@ -178,43 +179,47 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	func draw_part_info(p: Painter, cur_bar_index: int)
-		var w: float = p.width
-		var h: float = p.height
 		
 		var song = metro.session.song
-		var t = song.time_track()
-		if !t
-			return
+		for t in song.time_track()
+			draw_part_info_x(p, cur_bar_index, t)
+			
+	func draw_part_info_x(p: Painter, cur_bar_index: int, t: Track)
+		var w: float = p.width
+		var h: float = p.height
+		var song = metro.session.song
 		
 		var cur_bar = weak(song.bars[cur_bar_index])
 		var next_bar: Bar* = nil
 		if cur_bar_index + 1 < len(song.bars)
 			next_bar = weak(song.bars[cur_bar_index + 1])
 		
-		var offset = cur_bar.offset
-		var cur_part = get_part(t, offset + DELTA)
-		var next_part = get_part(t, offset + cur_bar.length + DELTA)
-		p.set_color(colors.text_soft2)
-		var fs = h * 0.08
-		p.set_font_size(fs)
-		if cur_part
-			p.draw_str([10, 5], cur_part.text)
-			var first_bar = bar_index(song, cur_part.range.offset + DELTA)
-			p.draw_str([w - 5 - fs*3, 5], str((cur_bar.index - first_bar) + 2))
+		for b in cur_bar
+			var offset = b.offset
+			var cur_part = get_part(t, offset + DELTA)
+			var next_part = get_part(t, offset + b.length + DELTA)
+			p.set_color(colors.text_soft2)
+			var fs = h * 0.08
+			p.set_font_size(fs)
+			for cp in cur_part
+				p.draw_str([10, 5], cp.text)
+				var first_bar = bar_index(song, cp.range.offset + DELTA)
+				p.draw_str([w - 5 - fs*3, 5], str((b.index - first_bar) + 2))
 	
-		var change: string
-		if next_part and next_part != cur_part
-			change = next_part.text
-		if next_bar
-			if len(next_bar.beats) != len(cur_bar.beats)
-				change += "  {{len(next_bar.beats)}}/₄"
-			var cur_bpm = cur_bar.bpm(song.sample_rate)
-			var next_bpm = next_bar.bpm(song.sample_rate)
-			if abs(cur_bpm - next_bpm) > 2
-				change += "  {{next_bpm|.0}} bpm"
-		if len(change) > 0
-			p.set_color(colors.text)
-			p.draw_str([20, 5 + fs*1.2 + 5], "> {{change}}")
+			var change: string
+			for np in next_part
+				if next_part != cur_part
+					change = np.text
+			for nb in next_bar
+				if len(nb.beats) != len(b.beats)
+					change += "  {{len(nb.beats)}}/₄"
+				var cur_bpm = b.bpm(song.sample_rate)
+				var next_bpm = nb.bpm(song.sample_rate)
+				if abs(cur_bpm - next_bpm) > 2
+					change += "  {{next_bpm|.0}} bpm"
+			if len(change) > 0
+				p.set_color(colors.text)
+				p.draw_str([20, 5 + fs*1.2 + 5], "> {{change}}")
 				
 	
 	func mut on_area_right_button_down()
@@ -251,7 +256,7 @@ Grid ? '' vertical
 #		#show_control()
 
 
-func bar_index(song: Song*, offset: int) -> int
+func bar_index(song: Song, offset: int) -> int
 	for i=>b in song.bars
 		if b.offset >= offset
 			return i
@@ -259,9 +264,9 @@ func bar_index(song: Song*, offset: int) -> int
 
 
 func get_part(t: Track, offset: int) -> TrackMarker*
-	for m in weak(t.layers[0].markers)
+	for m in t.layers[0].markers
 		if m.range.inside(offset)
-			return m
+			return weak(m)
 	return nil
 
 class Metronome extends TsunamiPlugin
@@ -271,8 +276,8 @@ class Metronome extends TsunamiPlugin
 		session.view.signal_chain.set_update_dt(UPDATE_DT)
 		session.view.signal_chain.set_buffer_size(1024)
 			
-	func override create_panel() -> ConfigPanel*
-		return new MetronomePanel(&self)
+	func override create_panel() -> xfer[ConfigPanel]
+		return new MetronomePanel(&!self)
 		
 	func override on_stop()
 		pass

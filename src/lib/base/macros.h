@@ -34,8 +34,10 @@
 
 // which cpu?
 
-#if defined(__ARM_ARCH_6__) || defined(__arm__) || defined(__ARM_EABI__) || defined(_M_ARM)
-	#define CPU_ARM
+#if defined(__aarch64__) || defined(_M_ARM64)
+	#define CPU_ARM64
+#elif defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_7__) || defined(__arm__) || defined(__ARM_EABI__) || defined(_M_ARM)
+	#define CPU_ARM32
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)
 	#define CPU_AMD64
 #else // _M_IX86
@@ -53,12 +55,16 @@
 typedef int int32;
 typedef long long int64;
 
-#ifdef CPU_AMD64
+#if defined(CPU_AMD64) || defined(CPU_ARM64)
 typedef int64 int_p;
 #else
-typedef int int_p;
+typedef int32 int_p;
 #endif
 
+// did cpu detection work correctly?
+static_assert(sizeof(int32) == 4);
+static_assert(sizeof(int64) == 8);
+static_assert(sizeof(int_p) == sizeof(void*));
 
 
 

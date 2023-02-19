@@ -26,7 +26,7 @@ class XXX extends TsunamiPlugin
 			var chord = guess_chord(l.midi.get_notes(rr), rr)
 			l.add_marker(new TrackMarker(b.range(), chord))
 	
-	func score_overlap(midi: MidiNote*[], pitch: int[], r: Range) -> int
+	func score_overlap(midi: MidiNote&[], pitch: int[], r: Range) -> int
 		var score = 0
 		for n in midi
 			for p in pitch
@@ -34,7 +34,7 @@ class XXX extends TsunamiPlugin
 					score += (n.range and r).length
 		return score
 	
-	func guess_chord(midi: MidiNote*[], r: Range) -> string
+	func guess_chord(midi: MidiNote&[], r: Range) -> string
 		var best: Chord
 		var best_score = 0
 		for p in 0:12

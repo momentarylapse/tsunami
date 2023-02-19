@@ -3,17 +3,15 @@ use helper.tone
 
 
 class SampleConfig extends Module.Config
-	var samples: SampleRef shared[]
-	func override __delete__()
-		reset()
+	var samples: shared[SampleRef][]
 	func override reset()
 		samples.clear()
 
 
 class SampleRenderer extends PitchRenderer
-	var sample: SampleRef shared
+	var sample: shared[SampleRef]
 	var events: MidiEventBuffer
-	var override synth: SampleSynthesizer*
+	var override synth: SampleSynthesizer&
 	func override on_config()
 		sample = nil
 		if pitch < len(synth.config.samples)
@@ -21,33 +19,33 @@ class SampleRenderer extends PitchRenderer
 	func override on_start(volume: float)
 		events.add(MidiEvent(0, 0, volume))
 	func override render(out buf: AudioBuffer) -> bool
-		if not weak(sample) or (len(events) == 0)
-			return false
-		var to_del: int[]
-		for i=>e in events
-			buf.add(*sample.origin.buf, e.pos, e.volume)
-			e.pos -= buf.length
-			if e.pos + len(*sample.origin.buf) < 0
-				to_del.add(i)
-		for i in 0:len(to_del)
-			events.remove(to_del[len(to_del)-1-i])
-		return len(events) > 0
+		for s in sample
+			var to_del: int[]
+			for i=>e in events
+				buf.add(s.origin.buf, e.pos, e.volume)
+				e.pos -= buf.length
+				if e.pos + len(s.origin.buf) < 0
+					to_del.add(i)
+			for i in 0:len(to_del)
+				events.remove(to_del[len(to_del)-1-i])
+			return len(events) > 0
+		return false
 	
 
 class SampleSynthesizer extends Synthesizer
 	var config: SampleConfig
 	
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new SampleRenderer(self, pitch)
 	
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel
-	var sc: SampleConfig*
-	var override c: SampleSynthesizer*
+	var sc: SampleConfig&
+	var override c: SampleSynthesizer&
 	func override __init__(_s: Module)
-		sc = &c.config
+		sc := &!c.config
 		add_list_view("!expandx\\Note\\Sample", 0, 0, "list")
 		event("list", on_select)
 
@@ -56,8 +54,8 @@ class SamplePanel extends ConfigPanel
 		for i in 0:MAX_PITCH
 			var name = ""
 			if i < len(sc.samples)
-				if weak(sc.samples[i])
-					name = sc.samples[i].origin.name
+				for s in sc.samples[i]
+					name = s.origin.name
 			set_string("list", pitch_name(i) + "\\" + name)
 		
 	func mut on_select()
@@ -67,14 +65,14 @@ class SamplePanel extends ConfigPanel
 		if n >= len(sc.samples)
 			sc.samples.resize(n + 1)
 		var old: Sample* = nil
-		if weak(sc.samples[n])
-			old = weak(sc.samples[n].origin)
-		let f = func(ss: Sample*)
+		for s in sc.samples[n]
+			old = &s.origin
+		let f = func(ss: shared[Sample])
 			var s = ss
-			if s != old
+			if weak(s) != old
 				sc.samples[n] = nil
-				if s
-					sc.samples[n] = s.create_ref()
+				for _s in s
+					sc.samples[n] = _s.create_ref()
 				changed()
 				update()
 		SelectSample(c.session, self, old, f)

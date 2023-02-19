@@ -63,6 +63,7 @@
 #include "../view/TsunamiWindow.h"
 #include "../lib/base/callable.h"
 #include "../lib/os/filesystem.h"
+#include "../lib/kaba/dynamic/exception.h"
 
 
 namespace hui {
@@ -81,9 +82,9 @@ PluginManager::PluginManager() {
 	kaba::default_context->packages.add(package);
 	kaba::default_context->public_modules.add(package.get());
 
-	auto *type_dev = package->syntax->create_new_class("Device", kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->syntax->base_class, -1);
-	package->syntax->get_pointer(type_dev);
-	//package->syntax->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->syntax->base_class, -1);
+	auto *type_dev = package->tree->create_new_class("Device", kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->tree->base_class, -1);
+	package->tree->get_pointer(type_dev);
+	//package->tree->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->tree->base_class, -1);
 }
 
 PluginManager::~PluginManager() {
@@ -92,9 +93,32 @@ PluginManager::~PluginManager() {
 }
 
 
-Module *_CreateBeatMidifier(Session *s) {
+xfer<Module> _CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
 }
+
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
+
+class XSignalChain : public SignalChain {
+public:
+	shared<Module> x_add_existing(shared<Module> m) {
+		return _add(m);
+	}
+	shared<Module> x_add_basic(ModuleCategory type, const string& sub_type) {
+		return add(type, sub_type);
+	}
+	shared<Module> x_add(const kaba::Class *type) {
+		return _add(ModuleFactory::create_by_class(session, type));
+	}
+	void x_connect(Module *source, int source_port, Module *target, int target_port) {
+		KABA_EXCEPTION_WRAPPER(connect(source,  source_port,  target, target_port));
+	}
+};
+
+#pragma GCC pop_options
 
 template<class T>
 class ObservableKabaWrapper : public T {
@@ -135,7 +159,8 @@ void PluginManager::link_app_data() {
 	/*ext->link("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	ext->link("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	ext->link("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);*/
-	ext->link("CreateModule", (void*)&ModuleFactory::create);
+	ext->link("CreateModuleBasic", (void*)&ModuleFactory::create);
+	ext->link("CreateModuleX", (void*)&ModuleFactory::create_by_class);
 	ext->link("CreateSynthesizer", (void*)&CreateSynthesizer);
 	ext->link("CreateAudioEffect", (void*)&CreateAudioEffect);
 	ext->link("CreateAudioSource", (void*)&CreateAudioSource);
@@ -205,6 +230,7 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("Session.add_signal_chain", &Session::add_signal_chain);
 	ext->link_class_func("Session.create_signal_chain", &Session::create_signal_chain);
 	ext->link_class_func("Session.load_signal_chain", &Session::load_signal_chain);
+	ext->link_class_func("Session.remove_signal_chain", &Session::remove_signal_chain);
 	ext->link_class_func("Session.create_child", &Session::create_child);
 
 
@@ -681,10 +707,11 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("SignalChain.__del_override__", &SignalChain::unregister);
 		ext->link_class_func("SignalChain.start", &SignalChain::start);
 		ext->link_class_func("SignalChain.stop", &SignalChain::stop);
-		ext->link_class_func("SignalChain.add", &SignalChain::add);
-		ext->link_class_func("SignalChain._add", &SignalChain::_add);
+		ext->link_class_func("SignalChain._add", &XSignalChain::x_add);
+		ext->link_class_func("SignalChain.add_basic", &XSignalChain::x_add_basic);
+		ext->link_class_func("SignalChain.add_existing", &XSignalChain::x_add_existing);
 		ext->link_class_func("SignalChain.delete", &SignalChain::delete_module);
-		ext->link_class_func("SignalChain.connect", &SignalChain::connect);
+		ext->link_class_func("SignalChain.connect", &XSignalChain::x_connect);
 		ext->link_class_func("SignalChain.disconnect", &SignalChain::disconnect);
 		ext->link_class_func("SignalChain.set_update_dt", &SignalChain::set_tick_dt);
 		ext->link_class_func("SignalChain.set_buffer_size", &SignalChain::set_buffer_size);
@@ -835,10 +862,10 @@ void PluginManager::link_app_data() {
 }
 
 kaba::Class* PluginManager::get_class(const string &name) {
-	for (auto c: weak(package->syntax->base_class->classes))
+	for (auto c: weak(package->tree->base_class->classes))
 		if (c->name == name)
 			return (kaba::Class*)c;
-	return (kaba::Class*)package->syntax->create_new_class(name, kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->syntax->base_class, -1);
+	return (kaba::Class*)package->tree->create_new_class(name, kaba::Class::Type::REGULAR, 0, 0, nullptr, {}, package->tree->base_class, -1);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

@@ -8,7 +8,7 @@ use AudioEffect.Special.ClickCounter
 
 
 class ClickCounterPanel extends ConfigPanel
-	var override c: MicrophoneClickCounter*
+	var override c: MicrophoneClickCounter&
 	func override __init__(_c: Module)
 		#super.__init__("Click Counter", 300, 175, _counter.session.win, false)
 		add_grid("", 0, 0, "grid")
@@ -62,22 +62,22 @@ class ClickCounterPanel extends ConfigPanel
 
 class MicrophoneClickCounter extends TsunamiPlugin
 	
-	var chain: SignalChain*
-	var source: ClickSource*
-	var click_counter: ClickCounter*
-	var panel: ClickCounterPanel*
+	var chain: shared![SignalChain]
+	var source: shared![ClickSource]
+	var click_counter: shared![ClickCounter]
+	var panel: shared[ClickCounterPanel]
 	
 	var runner: int
 	
 	func override on_start()
 		panel = nil
 		chain = session.create_signal_chain("click-counter")
-		var input = chain.add(Module.Type.STREAM, "AudioInput")
-		click_counter = chain.add(Module.Type.AUDIO_EFFECT, "ClickCounter")
-		var sucker = chain.add(Module.Type.PLUMBING, "AudioSucker")
-		source = chain.add(Module.Type.MIDI_SOURCE, "Click")
-		var synth = chain.add(Module.Type.SYNTHESIZER, "")
-		var out = chain.add(Module.Type.STREAM, "AudioOutput")
+		var input = chain.add_basic(Module.Type.STREAM, "AudioInput")
+		click_counter = chain.add[ClickCounter]()
+		var sucker = chain.add_basic(Module.Type.PLUMBING, "AudioSucker")
+		source = chain.add[ClickSource]()
+		var synth = chain.add_basic(Module.Type.SYNTHESIZER, "")
+		var out = chain.add_basic(Module.Type.STREAM, "AudioOutput")
 		chain.connect(input, 0, click_counter, 0)
 		chain.connect(click_counter, 0, sucker, 0)
 		chain.connect(source, 0, synth, 0)
@@ -88,15 +88,15 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		
 	func override on_stop()
 		hui.cancel_runner(runner)
-		del chain
+		chain = nil
 	
 	func mut on_update()
 		if click_counter.emit
 			source.click()
 			click_counter.emit = false
-		if panel
-			panel.redraw("drawing")
+		for p in panel
+			p.redraw("drawing")
 
 	
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new ClickCounterPanel(self)

@@ -304,14 +304,14 @@ void SignalEditorTab::on_add(ModuleCategory type) {
 	if (names.num > 1) {
 		session->plugin_manager->choose_module(win, session, type, [this, type] (const string &name) {
 			if (name.num > 0) {
-				auto *m = chain->add(type, name);
+				auto m = chain->add(type, name);
 				m->module_x = graph->m.x;
 				m->module_y = graph->m.y;
 			}
 			update_module_positions();
 		});
 	} else {
-		auto *m = chain->add(type);
+		auto m = chain->add(type);
 		m->module_x = graph->m.x;
 		m->module_y = graph->m.y;
 		update_module_positions();

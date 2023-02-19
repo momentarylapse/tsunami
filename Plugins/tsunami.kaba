@@ -19,7 +19,7 @@ let DEFAULT_SAMPLE_RATE = 44100
 
 let MAX_PITCH = 128
 
-class Range
+struct Range
 	var offset, length: int
 	func extern start() -> int
 	func extern end() -> int
@@ -35,7 +35,7 @@ func RangeTo(start: int, end: int) -> Range
 	return Range(start, end - start)
 
 
-class MidiNote as shared
+struct MidiNote as shared
 	var range: Range
 	var pitch: float
 	var volume: float
@@ -50,9 +50,9 @@ class MidiNote as shared
 		volume = _volume
 	func extern mut set(mask: int)
 	func extern is(mask: int) -> bool
-	func extern copy(offset: int) -> MidiNote*
+	func extern copy(offset: int) -> xfer[MidiNote]
 
-class MidiEvent
+struct MidiEvent
 	var pos: int
 	var pitch: float
 	var volume: float
@@ -67,7 +67,7 @@ class MidiEvent
 	func __str__() -> string
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
-class MidiEventBuffer extends MidiEvent[]
+struct MidiEventBuffer extends MidiEvent[]
 	var samples: int
 	func extern override __init__()
 	func extern get_notes(r: Range) -> MidiNoteBuffer
@@ -78,12 +78,12 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	func extern mut add_metronome_click(pos: int, level: int, volume: float)
 
-class MidiNoteBuffer extends MidiNote shared[]
+struct MidiNoteBuffer extends shared![MidiNote][]
 	var samples: int
 	func extern override __init__()
 	func extern override __delete__()
 	#extern selfref MidiNoteBuffer get_notes(Range r)
-	func extern selfref get_notes(r: Range) -> MidiNote*[]
+	func extern selfref get_notes(r: Range) -> MidiNote&[]
 	func extern selfref get_events(r: Range) -> MidiEvent[]
 	func extern get_range() -> Range
 
@@ -94,7 +94,7 @@ class ConfigPanel extends Panel
 	func extern virtual mut update()
 	func extern virtual mut set_large(large: bool)
 	func extern changed()
-	var c: Module*
+	var c: Module&
 
 class Module extends Object as shared
 
@@ -122,20 +122,19 @@ class Module extends Object as shared
 		SIGNAL_CHAIN
 
 	var name: string
-	var session: Session*
-	#var port_out: owned Port[]
-	var port_out: Port*[]
+	var session: Session&
+	var port_out: owned![Port][]
 	func extern __init__(type: Type, sub_type: string)
 	func extern override __delete__()
 	func extern mut reset_config()
 	func extern virtual mut reset_state()
 	func extern mut changed()
 	func extern virtual mut command(cmd: Command, param: int) -> int
-	func extern mut plug_in(in_port: int, source: Module, out_port: int)
+	func extern mut plug_in(in_port: int, source: Module*, out_port: int)
 	func extern mut unplug_in(in_port: int)
 	func extern mut subscribe(handler: Object, f: void->void, message: string)
 	func extern mut unsubscribe(handler: Object)
-	func extern copy() -> Module*
+	func extern copy() -> xfer[Module]
 	
 	class Port
 		func extern __init__()
@@ -152,7 +151,7 @@ class Module extends Object as shared
 		func extern mut from_string(s: string, session: Session)
 		func extern virtual auto_conf(name: string) -> string
 
-	func extern virtual create_panel() -> ConfigPanel*
+	func extern virtual create_panel() -> xfer[ConfigPanel]
 	func extern virtual mut on_config()
 	func extern virtual get_config() -> Module.Config*
 	func extern config_to_string() -> string
@@ -165,7 +164,7 @@ class Module extends Object as shared
 
 class AudioEffect extends Module
 	var apply_to_whole_buffer: bool
-	var source: Module.Port*
+	var source: Module.Port&
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
@@ -178,7 +177,7 @@ class MidiEffect extends Module
 
 class AudioVisualizer extends Module
 	var chunk_size: int
-	var ring_buffer: RingBuffer*
+	var ring_buffer: RingBuffer&
 	var next_writing: int
 	var current_reading: int
 	func extern __init__()
@@ -189,7 +188,7 @@ class AudioVisualizer extends Module
 	func extern mut unlock()
 	func extern mut flip()
 
-class AudioBuffer
+struct AudioBuffer
 	var offset, length: int
 	var channels: int
 	#var l, r: float[]
@@ -220,7 +219,7 @@ class AudioBuffer
 
 func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
 
-class RingBuffer as @noauto
+struct RingBuffer as @noauto
 	enum PeekMode
 		FORWARD_REF
 		FORWARD_COPY_WRAP
@@ -246,7 +245,7 @@ class AudioSource extends Module
 	func extern override __delete__()
 	func extern virtual mut read(out buf: AudioBuffer) -> int
 
-class MidiProduceData
+struct MidiProduceData
 	var bar: Bar*
 	var beat_no: int
 
@@ -281,7 +280,7 @@ class PitchRenderer as @noauto
 	func extern virtual mut on_config()
 	var pitch: int
 	var delta_phi: float
-	var synth: Synthesizer*
+	var synth: Synthesizer&
 
 class Synthesizer extends Module
 	var sample_rate: int
@@ -297,16 +296,16 @@ class Synthesizer extends Module
 	func extern virtual mut render(out buf: AudioBuffer)
 	func extern override mut on_config()
 	func extern override mut reset_state()
-	func extern virtual mut create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 	func extern mut set_sample_rate(sample_rate: int)
 
 class DummySynthesizer extends Synthesizer
 	func extern override __init__()
 	#extern overwrite void __delete__()
 	func extern override mut render(out buf: AudioBuffer)
-	func extern override mut create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func extern override mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 
-class EnvelopeADSR
+struct EnvelopeADSR
 	func extern __init__()
 	func extern mut set(t_attack: float, t_decay: float, sustain: float, t_release: float, sample_rate: int)
 	func extern mut set2(initial: float, peak: float)
@@ -340,24 +339,24 @@ class AudioAccumulator extends Module
 class MidiAccumulator extends Module
 	var buffer: MidiEventBuffer
 
-class TrackRenderBuffer
+struct TrackRenderBuffer
 	var dummy: int
 
-class TrackMarker as shared
+struct TrackMarker as shared
 	func __init__(r: Range, t: string)
 		range = r
 		text = t
 	var range: Range
 	var text: string
-	var fx: AudioEffect shared[]
+	var fx: shared![AudioEffect][]
 
 
-#class BarPattern
+#struct BarPattern
 #	int length
 #	int divisor
 #	int[] beats
 
-class Bar as shared
+struct Bar as shared
 	var beats: int[]
 	var divisor: int
 	var total_sub_beats: int
@@ -376,7 +375,7 @@ class Bar as shared
 		STRETCH_AND_SCALE_AUDIO
 
 
-class Beat
+struct Beat
 	var range: Range
 	var bar_index: int
 	var bar_no = 0
@@ -388,8 +387,8 @@ class Beat
 		range = Range(_offset, 0)
 		level = _level
 
-class BarCollection extends Bar shared[]
-	func extern selfref get_bars(r: Range) -> Bar*[]
+struct BarCollection extends shared![Bar][]
+	func extern selfref get_bars(r: Range) -> Bar&[]
 	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
 	func extern get_next_beat(pos: int) -> int
 	func extern get_prev_beat(pos: int) -> int
@@ -404,49 +403,49 @@ enum SignalType
 
 class TrackLayer extends Object as shared
 	var type: SignalType
-	var track: Track*
+	var track: Track&
 	var buffers: AudioBuffer[]
 	var midi: MidiNoteBuffer
-	var samples: SampleRef shared[]
-	var markers: TrackMarker shared[]
+	var samples: shared![SampleRef][]
+	var markers: shared![TrackMarker][]
 	
 	func extern mut get_buffers(out buf: AudioBuffer, r: Range)
 	func extern mut read_buffers(out buf: AudioBuffer, r: Range, allow_ref: bool)
 	func extern mut edit_buffers(out buf: AudioBuffer, r: Range) -> void*
 	func extern mut edit_buffers_finish(a: void*)
 	func extern mut insert_midi_data(offset: int, midi: MidiNoteBuffer)
-	func extern mut add_midi_note(n: MidiNote*)
+	func extern mut add_midi_note(n: shared![MidiNote])
 	#extern void add_midi_notes(MidiNoteBuffer midi)
 	func extern mut delete_midi_note(n: MidiNote*)
-	func extern mut add_sample_ref(pos: int, sample: Sample*) -> SampleRef*
+	func extern mut add_sample_ref(pos: int, sample: Sample*) -> shared![SampleRef]
 	func extern mut delete_sample_ref(s: SampleRef*)
 	func extern mut edit_sample_ref(s: SampleRef*, volume: float, mute: bool)
-	func extern mut add_marker(m: TrackMarker) -> TrackMarker*
+	func extern mut add_marker(m: shared![TrackMarker]) -> shared![TrackMarker]
 	func extern mut delete_marker(marker: TrackMarker*)
 	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)
 
 class Sample extends Object as shared # TODO
 	var name: string
 	var type: int
-	var buf: AudioBuffer*
+	var buf: owned![AudioBuffer]
 	var midi: MidiNoteBuffer
 	var volume: float
 	var uid: int
 	var ref_count: int
 	var tags: Tag[]
 	func extern __init__(name: string, buf: AudioBuffer)
-	func extern mut create_ref() -> SampleRef*
+	func extern mut create_ref() -> xfer[SampleRef]
 	func extern get_value(key: string) -> string
 	func extern mut set_value(key: string, value: string)
 
 class SampleRef as shared
-	var origin: Sample shared
-	func extern __init__(sam: Sample shared)
+	var origin: Sample&
+	func extern __init__(sam: Sample&)
 	func extern virtual __delete__()
 
 
 
-class Instrument
+struct Instrument
 	var type: int
 	var string_pitch: int[]
 	func __init__()
@@ -456,19 +455,19 @@ class Instrument
 class Track as shared
 	var type: SignalType
 	var name: string
-	var layers: TrackLayer shared[]
+	var layers: shared![TrackLayer][]
 
 	var volume, panning: float
 	var muted: bool
 	
-	var fx: AudioEffect shared[]
-	var midi_fx: MidiEffect shared[]
+	var fx: shared![AudioEffect][]
+	var midi_fx: shared![MidiEffect][]
 	
-	var synth: Synthesizer shared
+	var synth: shared![Synthesizer]
 	var instrument: Instrument
 
 	# editing
-	var song: Song*
+	var song: Song&
 	
 	func extern nice_name() -> string
 
@@ -478,13 +477,13 @@ class Track as shared
 	func extern mut set_muted(muted: bool)
 	func extern mut set_volume(volume: float)
 	func extern mut set_panning(panning: float)
-	func extern mut add_effect(effect: AudioEffect)
+	func extern mut add_effect(effect: shared![AudioEffect])
 	func extern mut delete_effect(index: int)
 	func extern mut edit_effect(index: int)
 	func extern mut enable_effect(index: int, enabled: bool)
-	func extern mut set_synthesizer(synth: Synthesizer)
+	func extern mut set_synthesizer(synth: shared![Synthesizer])
 
-class Tag
+struct Tag
 	var key, value: string
 
 class Song extends Object as shared
@@ -494,8 +493,8 @@ class Song extends Object as shared
 
 	var volume: float
 	
-	var tracks: Track shared[]
-	var samples: Sample shared[]
+	var tracks: shared![Track][]
+	var samples: shared![Sample][]
 	
 	var bars: BarCollection
 
@@ -505,10 +504,10 @@ class Song extends Object as shared
 	func extern override __delete__()
 	
 	func extern range() -> Range
-	func extern selfref time_track() -> Track*
-	func extern selfref layers() -> TrackLayer*[]
+	func extern selfref time_track() -> shared[Track]
+	func extern selfref layers() -> TrackLayer&[]
 	
-	func extern mut add_track(type: SignalType, index: int) -> Track*
+	func extern mut add_track(type: SignalType, index: int) -> shared![Track]
 	func extern mut delete_track(index: int)
 	func extern mut add_bar(index: int, b: Bar, mode: Bar.EditMode)
 	func extern mut add_pause(index: int, length: int, mode: Bar.EditMode)
@@ -527,7 +526,7 @@ class Song extends Object as shared
 	func extern get_time_str_fuzzy(t: int, dt: float) -> string
 	func extern get_time_str_long(t: int) -> string
 
-class SongSelection
+struct SongSelection
 	var range_raw: Range
 	func extern range() -> Range
 	func extern has_track(t: Track) -> bool
@@ -536,7 +535,7 @@ class SongSelection
 	func extern has_note(n: MidiNote) -> bool
 	func extern has_bar(b: Bar) -> bool
 
-class ColorScheme
+struct ColorScheme as @noauto
 	var background: color
 	var background_track: color
 	var background_track_selected: color
@@ -570,12 +569,12 @@ class AudioView extends Object
 		var area: rect
 	
 	class Layer extends SceneGraph.Node
-		var layer: TrackLayer*
+		var layer: TrackLayer&
 		
 	var sel: SongSelection
-	var renderer: SongRenderer*
-	var signal_chain: SignalChain*
-	var output_stream: AudioOutput*
+	var renderer: shared![SongRenderer]
+	var signal_chain: shared![SignalChain]
+	var output_stream: shared![AudioOutput]
 	var cam: ViewPort
 	var mouse_wheel_speed: float
 	func extern mut subscribe(handler: Object, f: void->void, message: string)
@@ -588,7 +587,7 @@ class AudioView extends Object
 	func extern mut set_playback_pos(pos: int)
 	func extern mut set_playback_loop(loop: bool)
 	func extern mut optimize_view()
-	func extern cur_vlayer() -> Layer*
+	func extern cur_vlayer() -> Layer&
 	func extern cur_vtrack() -> void*
 	func extern mut update_selection()
 
@@ -628,8 +627,8 @@ class AudioInput extends Module
 	func extern samples_recorded() -> int
 
 class Storage
-	func extern load(out s: Song, filename: Path) -> bool
-	func extern save(s: Song, filename: Path) -> bool
+	func extern load(out s: Song*, filename: Path) -> bool
+	func extern save(s: Song*, filename: Path) -> bool
 	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> bool
 	func extern load_buffer(out buf: AudioBuffer, filename: Path) -> bool
 	var current_directory: Path
@@ -641,11 +640,18 @@ class SignalChain extends Module
 	func extern mut __del_override__()
 	func extern override mut command(cmd: Module.Command, param: int) -> int
 	func extern override mut reset_state()
-	func extern mut add(type: Module.Type, name: string) -> Module*
-	func extern mut _add(m: Module) -> Module*
-	func extern mut delete(m: Module)
-	func extern mut connect(source: Module, source_port: int, target: Module, target_port: int)
-	func extern mut disconnect(source: Module, source_port: int, target: Module, target_port: int)
+	func extern mut add_basic(type: Module.Type, name: string) -> shared![Module]
+	func mut add_basic_as[M](type: Module.Type, name: string) -> shared![M]
+		return weak(add_basic(type, name)) as xfer[M]
+	func mut add_basic_as_syn(type: Module.Type, name: string) -> shared![Synthesizer]
+		return weak(add_basic(type, name)) as xfer[Synthesizer]
+	func extern mut _add(type: kaba.Class*) -> shared![Module]
+	func mut add[M]() -> shared![M]
+		return weak(_add(M)) as xfer[M]
+	func extern mut add_existing(m: shared![Module]) -> shared![Module]
+	func extern mut delete(m: Module*)
+	func extern mut connect(source: Module*, source_port: int, target: Module*, target_port: int)
+	func extern mut disconnect(source: Module*, source_port: int, target: Module*, target_port: int)
 	func extern mut start()
 	func extern mut stop()
 	func extern is_prepared() -> bool
@@ -656,19 +662,20 @@ class SignalChain extends Module
 class Session extends Object as shared
 	var id: int
 	#var win: TsunamiWindow*
-	var win: Window*
-	var song: Song*
-	var view: AudioView*
-	var storage: Storage*
+	var win: Window&
+	var song: shared![Song]
+	var view: AudioView&
+	var storage: Storage&
 	
 	func extern sample_rate() -> int
 	
 	#DeviceManager* device_manager
 	#PluginManager* plugin_manager
 	
-	func extern create_child() -> Session*
-	func extern mut create_signal_chain(name: string) -> SignalChain*
-	func extern mut load_signal_chain(filename: Path) -> SignalChain*
+	func extern create_child() -> shared![Session]
+	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
+	func extern mut load_signal_chain(filename: Path) -> shared[SignalChain]
+	func extern mut remove_signal_chain(chain: SignalChain*)
 
 	# logging
 	func extern i(msg: string)
@@ -710,9 +717,9 @@ class ProgressX
 	func extern is_cancelled() -> bool
 
 class Clipboard
-	var temp: Song*
+	var temp: Song&
 	func extern has_data() -> bool
-	func extern mut prepare_layer_map(view: AudioView, out sources: TrackLayer*[], out targets: TrackLayer*[]) -> bool
+	func extern mut prepare_layer_map(view: AudioView, out sources: TrackLayer&[], out targets: TrackLayer&[]) -> bool
 
 
 enum MidiMode
@@ -722,7 +729,7 @@ enum MidiMode
 	DRUM
 	DONT_CARE
 
-class HoverData
+struct HoverData
 	
 
 class MidiPainter
@@ -731,7 +738,7 @@ class MidiPainter
 	func extern mut set_context(area: rect, i: Instrument, playable: bool, mode: MidiMode)
 	func extern mut draw(p: Painter, midi: MidiNoteBuffer)
 	func extern mut draw_background(c: Painter)
-	var cam: AudioView.ViewPort*
+	var cam: AudioView.ViewPort&
 
 class GridColors
 	var bg, bg_sel: color
@@ -759,21 +766,24 @@ class MultiLinePainter
 #extern PluginContext plugin_context
 var extern colors: ColorScheme
 
-var extern clipboard: Clipboard*
+var extern clipboard: Clipboard&
 
 func extern db2amp(db: float) -> float
 func extern amp2db(amp: float) -> float
 
 
-func extern CreateModule(session: Session, type: Module.Type, name: string) -> Module*
-func extern CreateSynthesizer(session: Session, name: string) -> Synthesizer*
-func extern CreateAudioSource(session: Session, name: string) -> AudioSource*
-func extern CreateAudioEffect(session: Session, name: string) -> AudioEffect*
-func extern CreateMidiSource(session: Session, name: string) -> MidiSource*
-func extern CreateMidiEffect(session: Session, name: string) -> MidiEffect*
-func extern CreateBeatMidifier(session: Session) -> BeatMidifier*
-func extern CreateBeatSource(session: Session, name: string) -> BeatSource*
-func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: Sample*->void)
+func extern CreateModuleBasic(session: Session, type: Module.Type, name: string) -> xfer[Module]
+func extern CreateModuleX(session: Session, type: kaba.Class*) -> xfer[Module]
+func CreateModule[T](session: Session) -> xfer[T]
+	return CreateModuleX(session, T) as xfer[T]
+func extern CreateSynthesizer(session: Session, name: string) -> xfer[Synthesizer]
+func extern CreateAudioSource(session: Session, name: string) -> xfer[AudioSource]
+func extern CreateAudioEffect(session: Session, name: string) -> xfer[AudioEffect]
+func extern CreateMidiSource(session: Session, name: string) -> xfer[MidiSource]
+func extern CreateMidiEffect(session: Session, name: string) -> xfer[MidiEffect]
+func extern CreateBeatMidifier(session: Session) -> xfer[BeatMidifier]
+func extern CreateBeatSource(session: Session, name: string) -> xfer[BeatSource]
+func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: shared[Sample]->void)
 #extern void SetTempBackupFilename(Path filename)
 
 func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string->void, old_name: string)

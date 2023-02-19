@@ -35,16 +35,30 @@ public:
 
 typedef void *VirtualTable;
 
+
+enum class DeriveFlags {
+	NONE = 0,
+	SET_SIZE = 1,
+	COPY_VTABLE = 2,
+	KEEP_CONSTRUCTORS = 4,
+};
+DeriveFlags operator|(DeriveFlags a, DeriveFlags b);
+
 class Class : public Sharable<base::Empty> {
 public:
 
 	enum class Type {
-		REGULAR,
+		REGULAR, // COMMON/BASIC
+		STRUCT,
 		ARRAY,
 		SUPER_ARRAY,
-		POINTER,
+		POINTER_RAW,
 		POINTER_SHARED,
+		POINTER_SHARED_NOT_NULL,
 		POINTER_OWNED,
+		POINTER_OWNED_NOT_NULL,
+		POINTER_XFER,
+		REFERENCE,
 		ENUM,
 		FUNCTION,
 		DICT,
@@ -67,13 +81,18 @@ public:
 	Flags flags;
 
 	bool is_regular() const;
+	bool is_struct() const;
 	bool is_array() const;
 	bool is_super_array() const;
 	bool is_dict() const;
-	bool is_pointer() const;
 	bool is_some_pointer() const;
+	bool is_pointer_raw() const;
 	bool is_pointer_shared() const;
+	bool is_pointer_shared_not_null() const;
 	bool is_pointer_owned() const;
+	bool is_pointer_owned_not_null() const;
+	bool is_pointer_xfer() const;
+	bool is_reference() const;
 	bool is_enum() const;
 	bool is_interface() const;
 	bool is_product() const;
@@ -111,7 +130,7 @@ public:
 	bool needs_destructor() const;
 	bool is_derived_from(const Class *root) const;
 	bool is_derived_from_s(const string &root) const;
-	void derive_from(const Class *root, bool increase_size);
+	void derive_from(const Class *root, DeriveFlags flags = DeriveFlags::NONE);
 	const Class *get_root() const;
 	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
 	void add_template_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
@@ -138,6 +157,7 @@ extern const Class *TypeReg8; // dummy for compilation
 extern const Class *TypeDynamic;
 extern const Class *TypeVoid;
 extern const Class *TypePointer;
+extern const Class *TypeReference;
 extern const Class *TypeBool;
 extern const Class *TypeInt;
 extern const Class *TypeInt64;
@@ -154,7 +174,7 @@ extern const Class *TypeColor;
 extern const Class *TypeQuaternion;
 
 extern const Class *TypeException;
-extern const Class *TypeExceptionP;
+extern const Class *TypeExceptionXfer;
 
 extern const Class *TypeClass;
 extern const Class *TypeClassP;
@@ -162,8 +182,6 @@ extern const Class *TypeFunction;
 extern const Class *TypeFunctionP;
 extern const Class *TypeFunctionCode;
 extern const Class *TypeFunctionCodeP;
-extern const Class *TypeSpecialFunction;
-extern const Class *TypeSpecialFunctionP;
 
 };
 

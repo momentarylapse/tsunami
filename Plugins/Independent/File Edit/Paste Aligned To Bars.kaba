@@ -26,7 +26,7 @@ class XXX extends TsunamiPlugin
 			stop()
 			return
 			
-		var source_layers, target_layers: TrackLayer*[]
+		var source_layers, target_layers: TrackLayer&[]
 		if !clipboard.prepare_layer_map(session.view, source_layers, target_layers)
 			stop()
 			return
@@ -52,7 +52,7 @@ class XXX extends TsunamiPlugin
 		print("paste bar... {{rs}} -> {{rd}}")
 		var midi = source.midi.get_notes(rs)
 		for n in midi
-			var c = n.copy(0)
+			var c: shared![MidiNote] = n.copy(0)
 			c.range = RangeTo(remap(rs, rd, n.range.offset), remap(rs, rd, n.range.end()))
 			dest.add_midi_note(c)
 		

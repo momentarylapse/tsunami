@@ -76,7 +76,7 @@ class Compressor extends AudioEffect
 			# apply gain
 			b[i] *= pow(10, gain / 20)
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new CompressorPanel(self)
 
 	func override process(out buf: AudioBuffer)
@@ -91,8 +91,8 @@ class Compressor extends AudioEffect
 
 class CompressorGrid extends Grid
 	var hover, selected: int?
-	var config: Compressor.Config*
-	var cp: ConfigPanel*
+	var config: Compressor.Config&
+	var cp: ConfigPanel&
 
 	func override on_draw(p: Painter)
 		var fi: FloatInterpolator
@@ -135,12 +135,12 @@ class CompressorGrid extends Grid
 	func override on_mouse_move()
 		# move
 		if hui.get_event().button_l and bool(selected)
-			let s = selected()
-			config.curve[s] = get_mouse2()
-			let (xmin, xmax) = point_x_constraint(s)
-			config.curve[s].x = clamp(config.curve[s].x, xmin, xmax)
-			config.curve[s].y = clamp(config.curve[s].y, MIN_DB, MAX_DB)
-			cp.changed()
+			for s in selected
+				config.curve[s] = get_mouse2()
+				let (xmin, xmax) = point_x_constraint(s)
+				config.curve[s].x = clamp(config.curve[s].x, xmin, xmax)
+				config.curve[s].y = clamp(config.curve[s].y, MIN_DB, MAX_DB)
+				cp.changed()
 		else
 		# mouse over?
 			hover = get_hover()
@@ -157,16 +157,16 @@ class CompressorGrid extends Grid
 
 		# [Delete] -> remove point
 		if (k == KEY_DELETE) and bool(selected)
-			let s = selected()
-			if (s > 0) and (s < len(config.curve) - 1)
-				config.curve.remove(s)
-				cp.changed()
-				hover = nil
-				selected = nil
-				redraw()
+			for s in selected
+				if (s > 0) and (s < len(config.curve) - 1)
+					config.curve.remove(s)
+					cp.changed()
+					hover = nil
+					selected = nil
+					redraw()
 
 class CompressorPanel extends ConfigPanel
-	var override c: Compressor*
+	var override c: Compressor&
 	var grid: CompressorGrid
 	func override __init__(_fx: Module)
 		add_grid("", 0, 0, "table1")
@@ -181,8 +181,8 @@ class CompressorPanel extends ConfigPanel
 		add_spin_button("!range=0:1000:0.1\\", 4, 0, "release")
 		add_label("ms", 5, 0, "")
 		
-		grid.config = &c.config
-		grid.cp = &self
+		grid.config := &!c.config
+		grid.cp := &!self
 		
 		event("attack", on_edit)
 		event("release", on_edit)

@@ -5,7 +5,7 @@ use helper.tone
 class SinusRenderer extends PitchRenderer
 	var volume = 0.
 	var phase = 0.
-	var override synth: SinusSynthesizer*
+	var override synth: SinusSynthesizer&
 
 	func override on_start(v: float)
 		volume = v
@@ -23,5 +23,5 @@ class SinusRenderer extends PitchRenderer
 
 class SinusSynthesizer extends Synthesizer
 
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new SinusRenderer(self, pitch)

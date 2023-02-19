@@ -7,10 +7,9 @@ use tsunami
 class ImportNKI extends TsunamiPlugin
 	
 	func override on_start()
-		var me = &self
 		var f = func(p: Path)
 			if bool(p)
-				me.load_nki(p)
+				load_nki(p)
 			stop()
 		hui.file_dialog_open(session.win, "", "", ["filter=*.nki", "showfilter=*.nki"], f)
 	func mut load_nki(filename: Path)

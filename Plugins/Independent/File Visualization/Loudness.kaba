@@ -50,7 +50,6 @@ class Loudness extends TsunamiPlugin
 		var buf: AudioBuffer
 		var renderer = new SongRenderer(session.song)
 		renderer.render(session.song.range(), buf)
-		del renderer
 		
 		# EQ
 		var f: BiquadFilter
@@ -107,6 +106,6 @@ class Loudness extends TsunamiPlugin
 			p.set_color(lufs_to_color(l))
 			p.draw_rect(rect(x0,x1, v.area.y1,v.area.y2))
 
-	func override create_panel() -> ConfigPanel*
+	func override create_panel() -> xfer[ConfigPanel]
 		return new XPanel(self)
 		

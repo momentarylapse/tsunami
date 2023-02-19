@@ -9,9 +9,9 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/TrackMarker.h"
 
-ActionTrackAddMarker::ActionTrackAddMarker(TrackLayer *l, const TrackMarker *m) {
+ActionTrackAddMarker::ActionTrackAddMarker(TrackLayer *l, const shared<TrackMarker> m) {
 	layer = l;
-	marker = const_cast<TrackMarker*>(m);
+	marker = const_cast<TrackMarker*>(m.get());
 }
 
 void *ActionTrackAddMarker::execute(Data *d) {

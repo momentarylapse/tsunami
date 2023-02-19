@@ -115,7 +115,7 @@ void show_kaba_local_vars(const kaba::Function *f, void *bp) {
 		auto pp = (char*)bp + v->_offset;
 		//msg_write(format("   %-30s                  @ %s  %d", (v->type->cname(f->owner()->base_class) + " " + v->name), p2s(pp), v->_offset));
 		string s = format("  %20s %-14s  = ", v->type->cname(f->owner()->base_class), v->name);
-		if (v->type->is_pointer()) {
+		if (v->type->is_some_pointer()) {
 			s += p2s(*(void**)pp);
 //			if (*(void**)pp)
 //				s += "   ->  " + kaba::var_repr(pp, v->type);

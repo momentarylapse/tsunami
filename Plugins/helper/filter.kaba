@@ -32,10 +32,10 @@ enum FilterType
 #	return "???"
 
 
-class BiquadFilter
+struct BiquadFilter
 
 	# mostly config parameters
-	class Parameters
+	struct Parameters
 		var a, b: float[3]
 	
 		func apply(out x: float[], out prev_x: float[2], out prev_y: float[2])
@@ -240,7 +240,7 @@ class BiquadFilter
 			a[2] = l*l
 
 
-	class ChannelState
+	struct ChannelState
 		var prev_x, prev_y: float[2]
 		func __init__()
 			reset()

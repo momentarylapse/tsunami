@@ -70,7 +70,7 @@ struct StackFrameInfo {
 
 
 inline void func_from_rip_test_module(StackFrameInfo &r, shared<Module> m, void *rip, bool from_package) {
-	for (auto&& [i,f]: enumerate(m->syntax->functions)) {
+	for (auto&& [i,f]: enumerate(m->tree->functions)) {
 		if (from_package and !f->throws_exceptions())
 			continue;
 		int64 frip = f->address;
@@ -221,7 +221,7 @@ const Class* get_type(void *p) {
 	for (auto p: default_context->packages)
 		modules.add(p);
 	for (auto s: modules) {
-		auto *r = _get_type(p, vtable, s->syntax->base_class);
+		auto *r = _get_type(p, vtable, s->tree->base_class);
 		if (r)
 			return r;
 	}

@@ -338,8 +338,8 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 	set_spacing(2);
 	from_resource("mixing-console");
 
-	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, PeakMeterDisplay::Mode::PEAKS);
-	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter, PeakMeterDisplay::Mode::SPECTRUM);
+	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter.get(), PeakMeterDisplay::Mode::PEAKS);
+	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter.get(), PeakMeterDisplay::Mode::SPECTRUM);
 	//set_float("output-volume", device_manager->get_output_volume());
 	set_float("output-volume", view->output_stream->get_volume());
 	

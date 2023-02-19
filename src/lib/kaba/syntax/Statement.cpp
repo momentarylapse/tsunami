@@ -52,10 +52,10 @@ int add_special_function(const string &name, SpecialFunctionID id, int min_param
 void SIAddStatements() {
 	// statements
 	add_statement(Identifier::RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
-	add_statement(Identifier::IF, StatementID::IF, 2); // [CMP, BLOCK]
-	add_statement("-if/else-", StatementID::IF_ELSE, 3); // [CMP, BLOCK, ELSE-BLOCK]
+	add_statement(Identifier::IF, StatementID::IF, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
+	add_statement("-if/unwrap-", StatementID::IF_UNWRAP, 3); // [EXPR, OUT_VAR, BLOCK, [ELSE-BLOCK]]
 	add_statement(Identifier::WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
-	add_statement("-for-array-", StatementID::FOR_ARRAY, 4); // [VAR, INDEX, ARRAY, BLOCK]
+	add_statement("-for-con-", StatementID::FOR_CONTAINER, 4); // [VAR, INDEX, ARRAY, BLOCK]
 	add_statement("-for-range-", StatementID::FOR_RANGE, 5); // [VAR, START, STOP, STEP, BLOCK]
 	add_statement(Identifier::FOR, StatementID::FOR_DIGEST, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
 	add_statement(Identifier::BREAK, StatementID::BREAK);
@@ -82,6 +82,7 @@ void SIAddStatements() {
 	add_special_function(Identifier::FILTER, SpecialFunctionID::FILTER, 1, 1);
 	add_special_function(Identifier::DYN, SpecialFunctionID::DYN, 1, 1);
 	add_special_function(Identifier::WEAK, SpecialFunctionID::WEAK, 1, 1);
+	add_special_function(Identifier::GIVE, SpecialFunctionID::GIVE, 1, 1);
 }
 
 

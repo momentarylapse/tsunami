@@ -40,9 +40,9 @@ class SoftPaste extends TsunamiPlugin
 			return
 
 		var n = 0
-		for t in weak(session.song.tracks)
+		for t in session.song.tracks
 			if t.type == SignalType.AUDIO
-				for l in weak(t.layers)
+				for l in t.layers
 					if session.view.sel.has_layer(l)
 						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
 						n ++

@@ -116,18 +116,16 @@ void TestPlugins::test_midi_source(const string &name) {
 }
 
 void TestPlugins::test_synthesizer(const string &name) {
-	auto *chain = new SignalChain(Session::GLOBAL, "chain");
-	auto *source = chain->add(ModuleCategory::MIDI_SOURCE, "Metronome");
-	auto *synth = chain->add(ModuleCategory::SYNTHESIZER, name);
-	chain->connect(source, 0, synth, 0);
+	auto chain = ownify(new SignalChain(Session::GLOBAL, "chain"));
+	auto source = chain->add(ModuleCategory::MIDI_SOURCE, "Metronome");
+	auto synth = chain->add(ModuleCategory::SYNTHESIZER, name);
+	chain->connect(source.get(), 0, synth.get(), 0);
 
 	AudioBuffer buf;
 	buf.resize(1 << 12);
 
 	for (int i=0; i<16; i++)
 		synth->port_out[0]->read_audio(buf);
-
-	delete chain;
 }
 
 void TestPlugins::test_tsunami_plugin(const string &name) {

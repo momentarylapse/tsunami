@@ -98,7 +98,7 @@ int map_size_complex(void *p, const Class *type) {
 	if (type == TypeCString)
 		return strlen((char*)p) + 1;
 	if (type->is_super_array()) {
-		int size = config.super_array_size;
+		int size = config.target.super_array_size;
 		auto *ar = (DynamicArray*)p;
 		for (int i=0; i<ar->num; i++)
 			size += map_size_complex((char*)ar->data + i * ar->element_size, type->get_array_element());
@@ -125,9 +125,9 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 		locked += indirect_size;
 
 		*(void**)&memory[0] = ar_target + addr_off; // .data
-		*(int*)&memory[config.pointer_size    ] = ar->num;
-		*(int*)&memory[config.pointer_size + 4] = 0; // .reserved
-		*(int*)&memory[config.pointer_size + 8] = el->size; // target size!
+		*(int*)&memory[config.target.pointer_size    ] = ar->num;
+		*(int*)&memory[config.target.pointer_size + 4] = 0; // .reserved
+		*(int*)&memory[config.target.pointer_size + 8] = el->size; // target size!
 
 		if (type->param[0]->is_super_array()) {
 			for (int i=0; i<ar->num; i++) {

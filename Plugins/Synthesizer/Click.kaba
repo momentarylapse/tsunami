@@ -6,7 +6,6 @@ class ClickRenderer extends PitchRenderer
 	var volume = 0.
 	var phase = 0.
 	var scale = 0.9995
-	var override synth: ClickSynthesizer*
 
 	func override on_start(v: float)
 		volume = max(v, volume)
@@ -23,5 +22,5 @@ class ClickRenderer extends PitchRenderer
 
 class ClickSynthesizer extends Synthesizer
 
-	func override create_pitch_renderer(pitch: int) -> PitchRenderer*
+	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 		return new ClickRenderer(self, pitch)

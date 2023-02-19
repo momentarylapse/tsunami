@@ -2,7 +2,7 @@ use tsunami
 use helper.tone
 use hui
 
-func next_ending(notes: MidiNote*[]) -> int
+func next_ending(notes: shared![MidiNote][]) -> int
 	var e = notes[0].range.end()
 	var next = 0
 	for i=>n in notes
@@ -11,8 +11,8 @@ func next_ending(notes: MidiNote*[]) -> int
 			e = n.range.end()
 	return next
 
-class Harmony
-	var notes: MidiNote*[]
+struct Harmony
+	var notes: shared![MidiNote][]
 	var range: Range
 	var chord: Chord
 	var pp: int[]
@@ -22,7 +22,7 @@ class Harmony
 
 		
 
-func track_harmony_step(pos0: int, pos1: int, out r: Harmony[], out active: MidiNote*[])
+func track_harmony_step(pos0: int, pos1: int, out r: Harmony[], out active: shared![MidiNote][])
 	if pos1 < pos0 + 200
 		return
 	var p = pos0
@@ -46,9 +46,9 @@ func track_harmony(midi: MidiNoteBuffer) -> Harmony[]
 	if len(midi) == 0
 		return r
 	
-	var active: MidiNote*[]
+	var active: shared![MidiNote][]
 	var pos = midi[0].range.offset
-	for n in weak(midi)
+	for n in midi
 		track_harmony_step(pos, n.range.offset, r, active)
 		active.add(n)
 		pos = n.range.offset

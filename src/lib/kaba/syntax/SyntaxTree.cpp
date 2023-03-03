@@ -1,6 +1,6 @@
 #include "../kaba.h"
 #include "../parser/Parser.h"
-#include "../parser/template.h"
+#include "../template/template.h"
 #include "../asm/asm.h"
 #include "../../os/msg.h"
 #include "../../base/iter.h"
@@ -333,8 +333,6 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 	return {};
 }
 
-bool is_pointer_not_null(const Class *t);
-
 shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name, int token_id) {
 	//operand = force_concrete_type(operand);
 	const Class *type = operand->type;
@@ -346,7 +344,7 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 		type = operand->as_class();
 		allow_member = false;
 	//} else if (type->is_some_pointer()) {
-	} else if (is_pointer_not_null(type)) {
+	} else if (type->is_some_pointer_not_null()) {
 		// pointer -> dereference
 		type = type->param[0];
 		deref = true;
@@ -549,46 +547,60 @@ const Class *SyntaxTree::request_implicit_class(const string &name, Class::Type 
 }
 
 const Class *SyntaxTree::get_pointer(const Class *base, int token_id) {
+//	return request_implicit_class(class_name_might_need_parantheses(base) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return request_implicit_class_pointer(base, token_id);
+}
+
+const Class *SyntaxTree::request_implicit_class_pointer(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("ptr[..] not allowed for: " + base->long_name(), token_id); // TODO
 	return request_implicit_class(class_name_might_need_parantheses(base) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
+//	return request_implicit_class(format("%s[%s]", Identifier::RAW_POINTER, base->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_shared(const Class *parent, int token_id) {
-	if (!parent->name_space)
-		do_error("shared[..] not allowed for: " + parent->long_name(), token_id); // TODO
-	return request_implicit_class(format("%s[%s]", Identifier::SHARED, parent->name), Class::Type::POINTER_SHARED, config.target.pointer_size, 0, nullptr, {parent}, token_id);
+const Class *SyntaxTree::request_implicit_class_pointer_not_null(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("ptr![..] not allowed for: " + base->long_name(), token_id); // TODO
+	return request_implicit_class(format("%s![%s]", Identifier::RAW_POINTER, base->name), Class::Type::POINTER_RAW_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_shared_not_null(const Class *parent, int token_id) {
-	if (!parent->name_space)
-		do_error("shared![..] not allowed for: " + parent->long_name(), token_id); // TODO
-	return request_implicit_class(format("%s![%s]", Identifier::SHARED, parent->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, 0, nullptr, {parent}, token_id);
+const Class *SyntaxTree::request_implicit_class_shared(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("shared[..] not allowed for: " + base->long_name(), token_id); // TODO
+	return request_implicit_class(format("%s[%s]", Identifier::SHARED, base->name), Class::Type::POINTER_SHARED, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_owned(const Class *parent, int token_id) {
-	if (!parent->name_space)
-		do_error("owned[..] not allowed for: " + parent->long_name(), token_id);
-	return request_implicit_class(format("%s[%s]", Identifier::OWNED, parent->name), Class::Type::POINTER_OWNED, config.target.pointer_size, 0, nullptr, {parent}, token_id);
+const Class *SyntaxTree::request_implicit_class_shared_not_null(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("shared![..] not allowed for: " + base->long_name(), token_id); // TODO
+	return request_implicit_class(format("%s![%s]", Identifier::SHARED, base->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_owned_not_null(const Class *parent, int token_id) {
-	if (!parent->name_space)
-		do_error("owned![..] not allowed for: " + parent->long_name(), token_id);
-	return request_implicit_class(format("%s![%s]", Identifier::OWNED, parent->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, 0, nullptr, {parent}, token_id);
+const Class *SyntaxTree::request_implicit_class_owned(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("owned[..] not allowed for: " + base->long_name(), token_id);
+	return request_implicit_class(format("%s[%s]", Identifier::OWNED, base->name), Class::Type::POINTER_OWNED, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_xfer(const Class *parent, int token_id) {
-	if (!parent->name_space)
-		do_error("xfer[..] not allowed for: " + parent->long_name(), token_id);
-	return request_implicit_class(format("%s[%s]", Identifier::XFER, parent->name), Class::Type::POINTER_XFER, config.target.pointer_size, 0, nullptr, {parent}, token_id);
+const Class *SyntaxTree::request_implicit_class_owned_not_null(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("owned![..] not allowed for: " + base->long_name(), token_id);
+	return request_implicit_class(format("%s![%s]", Identifier::OWNED, base->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
+}
+
+const Class *SyntaxTree::request_implicit_class_xfer(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("xfer[..] not allowed for: " + base->long_name(), token_id);
+	return request_implicit_class(format("%s[%s]", Identifier::XFER, base->name), Class::Type::POINTER_XFER, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_reference(const Class *base, int token_id) {
 	return request_implicit_class(class_name_might_need_parantheses(base) + "&", Class::Type::REFERENCE, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_super_array(const Class *element_type, int token_id) {
+const Class *SyntaxTree::request_implicit_class_list(const Class *element_type, int token_id) {
 	string name = class_name_might_need_parantheses(element_type) + "[]";
-	return request_implicit_class(name, Class::Type::SUPER_ARRAY, config.target.super_array_size, -1, TypeDynamicArray, {element_type}, token_id);
+	return request_implicit_class(name, Class::Type::LIST, config.target.dynamic_array_size, -1, TypeDynamicArray, {element_type}, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_array(const Class *element_type, int num_elements, int token_id) {
@@ -598,7 +610,7 @@ const Class *SyntaxTree::request_implicit_class_array(const Class *element_type,
 
 const Class *SyntaxTree::request_implicit_class_dict(const Class *element_type, int token_id) {
 	string name = class_name_might_need_parantheses(element_type) + "{}";
-	return request_implicit_class(name, Class::Type::DICT, config.target.super_array_size, 0, TypeDictBase, {element_type}, token_id);
+	return request_implicit_class(name, Class::Type::DICT, config.target.dynamic_array_size, 0, TypeDictBase, {element_type}, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_optional(const Class *param, int token_id) {
@@ -817,7 +829,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 //             -> index
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
-				c->params[0]->ref_raw(this), // array
+				c->params[0]->ref_new(this), // array
 				add_node_operator_by_inline(InlineID::INT_MULTIPLY,
 						c->params[1], // ref
 						add_node_const(add_constant_int(el_type->size))),
@@ -1152,7 +1164,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		nn->set_param(0, add_node_operator_by_inline(InlineID::INT_ASSIGN, index, val0));
 
 		shared<Node> val1;
-		if (array->type->usable_as_super_array()) {
+		if (array->type->usable_as_list()) {
 			// array.num
 			val1 = array->shift(config.target.pointer_size, TypeInt, array->token_id);
 		} else {
@@ -1171,7 +1183,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// array[index]
 		shared<Node> el;
-		if (array->type->usable_as_super_array()) {
+		if (array->type->usable_as_list()) {
 			el = add_node_dyn_array(array, index);
 		} else {
 			el = add_node_array(array, index);

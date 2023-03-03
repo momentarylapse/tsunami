@@ -51,7 +51,7 @@ void AutoImplementer::_add_missing_function_headers_for_enum(Class *t) {
 			f->mandatory_params = 1;
 			f->default_parameters[1] = add_node_const(c, t->token_id);
 		} else if (f->name == "all") {
-			f->literal_return_type = tree->request_implicit_class_super_array(t, t->token_id);
+			f->literal_return_type = tree->request_implicit_class_list(t, t->token_id);
 			f->default_parameters.resize(1);
 			auto c = tree->add_constant(TypeClassP, t);
 			c->as_int64() = (int_p)t;

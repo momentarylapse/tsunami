@@ -136,8 +136,10 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, &Class::_pointer_ref_counter);
 		class_add_func("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
 			func_add_param("c", TypeClassP);
-		class_add_func("is_pointer", TypeBool, &Class::is_pointer_raw, Flags::PURE);
-		class_add_func("is_super_array", TypeBool, &Class::is_super_array, Flags::PURE);
+		class_add_func("is_pointer_raw", TypeBool, &Class::is_pointer_raw, Flags::PURE);
+		class_add_func("is_some_pointer", TypeBool, &Class::is_some_pointer, Flags::PURE);
+		class_add_func("is_some_pointer_not_null", TypeBool, &Class::is_some_pointer_not_null, Flags::PURE);
+		class_add_func("is_list", TypeBool, &Class::is_list, Flags::PURE);
 		class_add_func("is_array", TypeBool, &Class::is_array, Flags::PURE);
 		class_add_func("is_dict", TypeBool, &Class::is_dict, Flags::PURE);
 		class_add_func("get_func", TypeFunctionP, &Class::get_func, Flags::PURE); // selfref

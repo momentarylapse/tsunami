@@ -124,7 +124,7 @@ void _array_sort_pf(DynamicArray &array, Function *func, bool stable) {
 }
 
 DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const string &_by) {
-	if (!type->is_super_array())
+	if (!type->is_list())
 		kaba_raise_exception(new KabaException(format("type '%s' is not an array", type->name)));
 	const Class *el = type->param[0];
 	if (array.element_size != el->size)

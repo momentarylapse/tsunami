@@ -76,7 +76,7 @@ CompilerConfiguration::Target CompilerConfiguration::Target::get_native() {
 	t.instruction_set = extract_instruction_set(t.abi);
 	t.interpreted = false;
 	t.pointer_size = sizeof(void*);
-	t.super_array_size = sizeof(DynamicArray);
+	t.dynamic_array_size = sizeof(DynamicArray);
 	t.stack_mem_align = 8;
 	t.function_align = 2 * t.pointer_size;
 	t.stack_frame_align = 2 * t.pointer_size;
@@ -94,7 +94,7 @@ CompilerConfiguration::Target CompilerConfiguration::Target::get_for_abi(Abi abi
 		t.pointer_size = 4;
 	else
 		t.pointer_size = 8;
-	t.super_array_size = mem_align(t.pointer_size + 3 * sizeof(int), t.pointer_size);
+	t.dynamic_array_size = mem_align(t.pointer_size + 3 * sizeof(int), t.pointer_size);
 	t.stack_mem_align = 8;
 	t.function_align = 2 * t.pointer_size;
 	t.stack_frame_align = 2 * t.pointer_size;

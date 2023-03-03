@@ -59,6 +59,8 @@ string kind2str(NodeKind kind) {
 		return "owned!";
 	if (kind == NodeKind::ABSTRACT_TYPE_POINTER)
 		return "pointer";
+	if (kind == NodeKind::ABSTRACT_TYPE_POINTER_NOT_NULL)
+		return "pointer!";
 	if (kind == NodeKind::ABSTRACT_TYPE_XFER)
 		return "xfer";
 	if (kind == NodeKind::ABSTRACT_TYPE_REFERENCE)
@@ -387,7 +389,7 @@ shared<Node> Node::ref_raw(const Class *t) const {
 }
 
 shared<Node> Node::ref_raw(SyntaxTree *tree) const {
-	return ref_new(tree->get_pointer(type, token_id));
+	return ref_new(tree->request_implicit_class_pointer_not_null(type, token_id));
 }
 
 shared<Node> Node::deref(const Class *override_type) const {

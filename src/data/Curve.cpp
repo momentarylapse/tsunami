@@ -84,7 +84,7 @@ Array<CurveTarget> CurveTarget::enumerate_type(char *pp, const kaba::Class *t, c
 		for (int i=0; i<t->array_length; i++) {
 			list.append(enumerate_type(pp + t->param[0]->size * i, t->param[0], prefix + format(":%d", i), prefix_nice + i2s_small(i)));
 		}
-	} else if (t->is_super_array()) {
+	} else if (t->is_list()) {
 		auto *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++) {
 			list.append(enumerate_type(pp + da->element_size * i, t->param[0], prefix + format(":%d", i), prefix_nice + i2s_small(i)));

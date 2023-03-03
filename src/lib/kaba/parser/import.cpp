@@ -111,7 +111,7 @@ Path find_import(Module *s, const string &_name) {
 	return Path::EMPTY;
 }
 
-shared<Module> get_import(Parser *parser, const string &name, int token) {
+shared<Module> get_import(Parser *parser, const string &name, int token_id) {
 
 	// internal packages?
 	for (auto p: parser->context->packages)
@@ -120,11 +120,11 @@ shared<Module> get_import(Parser *parser, const string &name, int token) {
 
 	Path filename = find_import(parser->tree->module, name);
 	if (!filename)
-		parser->do_error(format("can not find import '%s'", name), token);
+		parser->do_error(format("can not find import '%s'", name), token_id);
 
 	for (auto ss: weak(loading_module_stack))
 		if (ss->filename == filename)
-			parser->do_error("recursive import", token);
+			parser->do_error("recursive import", token_id);
 
 	msg_right();
 	shared<Module> include;
@@ -134,17 +134,11 @@ shared<Module> get_import(Parser *parser, const string &name, int token) {
 	} catch (Exception &e) {
 		msg_left();
 
-		int token_id = parser->Exp.cur_token();
-		string expr = parser->Exp.get_token(token_id);
+		e.text = e.message() + format("\n...imported from:");
 		e.line = parser->Exp.token_physical_line_no(token_id);
 		e.column = parser->Exp.token_line_offset(token_id);
-		e.text += format("\n...imported from:\nline %d, %s", e.line+1, parser->tree->module->filename);
+		e.filename = parser->tree->module->filename;
 		throw e;
-		//msg_write(e.message);
-		//msg_write("...");
-		string msg = e.message() + "\nimported file:";
-		//string msg = "in imported file:\n\"" + e.message + "\"";
-		parser->do_error(msg, token);
 	}
 
 	msg_left();

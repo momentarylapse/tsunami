@@ -3,7 +3,7 @@
 #include "Interpreter.h"
 #include "parser/Parser.h"
 #include "parser/Concretifier.h"
-#include "parser/template.h"
+#include "template/template.h"
 #include "compiler/Compiler.h"
 #include "../os/msg.h"
 

@@ -53,7 +53,7 @@ public:
 		bool is_native;
 
 		int64 pointer_size;
-		int super_array_size;
+		int dynamic_array_size;
 
 		int stack_mem_align;
 		int function_align;

@@ -49,6 +49,7 @@ namespace Identifier {
 	extern const string SHARED;
 	extern const string OWNED;
 	extern const string XFER;
+	extern const string RAW_POINTER;
 	extern const string PURE;
 	extern const string NOAUTO;
 	extern const string NOFRAME;

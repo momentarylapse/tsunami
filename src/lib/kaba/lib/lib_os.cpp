@@ -275,7 +275,7 @@ public:
 void SIAddPackageOSPath(Context *c) {
 	add_package(c, "os");
 
-	TypePath = add_type("Path", config.target.super_array_size);
+	TypePath = add_type("Path", config.target.dynamic_array_size);
 
 	add_class(TypePath);
 		class_add_element_x("_s", TypeString, 0);

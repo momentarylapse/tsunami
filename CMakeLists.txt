@@ -229,16 +229,6 @@ set(SOURCE
 	src/lib/kaba/dynamic/dynamic.cpp
 	src/lib/kaba/dynamic/exception.cpp
 	src/lib/kaba/dynamic/sorting.cpp
-	src/lib/kaba/implicit/implicit.cpp
-	src/lib/kaba/implicit/implicit_array.cpp
-	src/lib/kaba/implicit/implicit_callable.cpp
-	src/lib/kaba/implicit/implicit_dict.cpp
-	src/lib/kaba/implicit/implicit_enum.cpp
-	src/lib/kaba/implicit/implicit_optional.cpp
-	src/lib/kaba/implicit/implicit_product.cpp
-	src/lib/kaba/implicit/implicit_regular.cpp
-	src/lib/kaba/implicit/implicit_shared.cpp
-	src/lib/kaba/implicit/implicit_super_array.cpp
 	src/lib/kaba/lib/dict.cpp
 	src/lib/kaba/lib/extern.cpp
 	src/lib/kaba/lib/lib.cpp
@@ -261,7 +251,6 @@ set(SOURCE
 	src/lib/kaba/parser/lexical.cpp
 	src/lib/kaba/parser/macros.cpp
 	src/lib/kaba/parser/Parser.cpp
-	src/lib/kaba/parser/template.cpp
 	src/lib/kaba/parser/Transformer.cpp
 	src/lib/kaba/parser/type_matching.cpp
 	src/lib/kaba/syntax/Block.cpp
@@ -275,6 +264,17 @@ set(SOURCE
 	src/lib/kaba/syntax/Statement.cpp
 	src/lib/kaba/syntax/SyntaxTree.cpp
 	src/lib/kaba/syntax/Variable.cpp
+	src/lib/kaba/template/implicit.cpp
+	src/lib/kaba/template/implicit_array.cpp
+	src/lib/kaba/template/implicit_callable.cpp
+	src/lib/kaba/template/implicit_dict.cpp
+	src/lib/kaba/template/implicit_enum.cpp
+	src/lib/kaba/template/implicit_list.cpp
+	src/lib/kaba/template/implicit_optional.cpp
+	src/lib/kaba/template/implicit_pointer.cpp
+	src/lib/kaba/template/implicit_product.cpp
+	src/lib/kaba/template/implicit_regular.cpp
+	src/lib/kaba/template/template.cpp
 	src/lib/kaba/CompilerConfiguration.cpp
 	src/lib/kaba/Context.cpp
 	src/lib/kaba/Interpreter.cpp

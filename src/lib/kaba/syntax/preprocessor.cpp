@@ -80,7 +80,7 @@ void *ar_el(DynamicArray *ar, int i) {
 int host_size(const Class *_type);
 
 void rec_init(void *p, const Class *type) {
-	if (type->is_super_array()) {
+	if (type->is_list()) {
 		((DynamicArray*)p)->init(host_size(type->get_array_element()));
 	} else {
 		for (auto &el: type->elements)
@@ -89,7 +89,7 @@ void rec_init(void *p, const Class *type) {
 }
 
 void rec_delete(void *p, const Class *type) {
-	if (type->is_super_array()) {
+	if (type->is_list()) {
 		auto ar = (DynamicArray*)p;
 		rec_resize(ar, 0, type->param[0]);
 		ar->simple_clear();
@@ -113,7 +113,7 @@ void rec_resize(DynamicArray *ar, int num, const Class *type) {
 }
 
 void rec_assign(void *a, void *b, const Class *type) {
-	if (type->is_super_array()) {
+	if (type->is_list()) {
 		auto aa = (DynamicArray*)a;
 		auto bb = (DynamicArray*)b;
 		rec_resize(aa, bb->num, type);

@@ -50,9 +50,10 @@ public:
 	enum class Type {
 		REGULAR, // COMMON/BASIC
 		STRUCT,
-		ARRAY,
-		SUPER_ARRAY,
+		ARRAY, // fixed [N]
+		LIST, // dynamic []
 		POINTER_RAW,
+		POINTER_RAW_NOT_NULL,
 		POINTER_SHARED,
 		POINTER_SHARED_NOT_NULL,
 		POINTER_OWNED,
@@ -83,10 +84,12 @@ public:
 	bool is_regular() const;
 	bool is_struct() const;
 	bool is_array() const;
-	bool is_super_array() const;
+	bool is_list() const;
 	bool is_dict() const;
 	bool is_some_pointer() const;
+	bool is_some_pointer_not_null() const;
 	bool is_pointer_raw() const;
+	bool is_pointer_raw_not_null() const;
 	bool is_pointer_shared() const;
 	bool is_pointer_shared_not_null() const;
 	bool is_pointer_owned() const;
@@ -125,7 +128,7 @@ public:
 	bool can_memcpy() const;
 	bool is_size_known() const;
 	const Class *get_array_element() const;
-	bool usable_as_super_array() const;
+	bool usable_as_list() const;
 	bool needs_constructor() const;
 	bool needs_destructor() const;
 	bool is_derived_from(const Class *root) const;
@@ -157,6 +160,7 @@ extern const Class *TypeReg8; // dummy for compilation
 extern const Class *TypeDynamic;
 extern const Class *TypeVoid;
 extern const Class *TypePointer;
+extern const Class *TypePointerNN;
 extern const Class *TypeReference;
 extern const Class *TypeBool;
 extern const Class *TypeInt;

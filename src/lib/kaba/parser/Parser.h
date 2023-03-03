@@ -10,7 +10,7 @@
 
 #include "lexical.h"
 #include "Concretifier.h"
-#include "../implicit/implicit.h"
+#include "../template/implicit.h"
 #include "../syntax/SyntaxTree.h"
 
 namespace kaba {

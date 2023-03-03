@@ -339,16 +339,6 @@
     <ClCompile Include="src\lib\kaba\dynamic\dynamic.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\exception.cpp" />
     <ClCompile Include="src\lib\kaba\dynamic\sorting.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_array.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_callable.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_dict.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_enum.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_optional.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_product.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_regular.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_shared.cpp" />
-    <ClCompile Include="src\lib\kaba\implicit\implicit_super_array.cpp" />
     <ClCompile Include="src\lib\kaba\lib\dict.cpp" />
     <ClCompile Include="src\lib\kaba\lib\extern.cpp" />
     <ClCompile Include="src\lib\kaba\lib\lib.cpp" />
@@ -371,7 +361,6 @@
     <ClCompile Include="src\lib\kaba\parser\lexical.cpp" />
     <ClCompile Include="src\lib\kaba\parser\macros.cpp" />
     <ClCompile Include="src\lib\kaba\parser\Parser.cpp" />
-    <ClCompile Include="src\lib\kaba\parser\template.cpp" />
     <ClCompile Include="src\lib\kaba\parser\Transformer.cpp" />
     <ClCompile Include="src\lib\kaba\parser\type_matching.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Block.cpp" />
@@ -385,6 +374,17 @@
     <ClCompile Include="src\lib\kaba\syntax\Statement.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp" />
     <ClCompile Include="src\lib\kaba\syntax\Variable.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_array.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_callable.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_dict.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_enum.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_list.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_optional.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_pointer.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_product.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_regular.cpp" />
+    <ClCompile Include="src\lib\kaba\template\template.cpp" />
     <ClCompile Include="src\lib\kaba\CompilerConfiguration.cpp" />
     <ClCompile Include="src\lib\kaba\Context.cpp" />
     <ClCompile Include="src\lib\kaba\Interpreter.cpp" />
@@ -821,7 +821,6 @@
     <ClInclude Include="src\lib\kaba\dynamic\dynamic.h" />
     <ClInclude Include="src\lib\kaba\dynamic\exception.h" />
     <ClInclude Include="src\lib\kaba\dynamic\sorting.h" />
-    <ClInclude Include="src\lib\kaba\implicit\implicit.h" />
     <ClInclude Include="src\lib\kaba\lib\dict.h" />
     <ClInclude Include="src\lib\kaba\lib\extern.h" />
     <ClInclude Include="src\lib\kaba\lib\lib.h" />
@@ -833,7 +832,6 @@
     <ClInclude Include="src\lib\kaba\parser\Concretifier.h" />
     <ClInclude Include="src\lib\kaba\parser\lexical.h" />
     <ClInclude Include="src\lib\kaba\parser\Parser.h" />
-    <ClInclude Include="src\lib\kaba\parser\template.h" />
     <ClInclude Include="src\lib\kaba\parser\Transformer.h" />
     <ClInclude Include="src\lib\kaba\syntax\Block.h" />
     <ClInclude Include="src\lib\kaba\syntax\Class.h" />
@@ -847,6 +845,8 @@
     <ClInclude Include="src\lib\kaba\syntax\Statement.h" />
     <ClInclude Include="src\lib\kaba\syntax\SyntaxTree.h" />
     <ClInclude Include="src\lib\kaba\syntax\Variable.h" />
+    <ClInclude Include="src\lib\kaba\template\implicit.h" />
+    <ClInclude Include="src\lib\kaba\template\template.h" />
     <ClInclude Include="src\lib\kaba\CompilerConfiguration.h" />
     <ClInclude Include="src\lib\kaba\Context.h" />
     <ClInclude Include="src\lib\kaba\Interpreter.h" />

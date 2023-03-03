@@ -266,8 +266,8 @@ void SIAddPackageBase(Context *c) {
 	TypeFloat32			= add_type  ("float32", sizeof(float), Flags::FORCE_CALL_BY_VALUE);
 	TypeFloat64			= add_type  ("float64", sizeof(double), Flags::FORCE_CALL_BY_VALUE);
 	TypeChar			= add_type  ("char", sizeof(char), Flags::FORCE_CALL_BY_VALUE);
-	TypeDynamicArray	= add_type  ("@DynamicArray", config.target.super_array_size);
-	TypeDictBase		= add_type  ("@DictBase",   config.target.super_array_size);
+	TypeDynamicArray	= add_type  ("@DynamicArray", config.target.dynamic_array_size);
+	TypeDictBase		= add_type  ("@DictBase",   config.target.dynamic_array_size);
 	TypeSharedPointer	= add_type  ("@SharedPointer", config.target.pointer_size);
 	TypeCallableBase	= add_type  ("@CallableBase", sizeof(Callable<void()>));
 
@@ -321,7 +321,8 @@ void SIAddPackageBase(Context *c) {
 			func_set_inline(InlineID::SHARED_POINTER_INIT);
 
 	// derived   (must be defined after the primitive types and the bases!)
-	TypePointer     = add_type_p_raw(TypeVoid); // substitute for all pointer types
+	TypePointer     = add_type_p_raw(TypeVoid); // substitute for all raw pointer types
+	TypePointerNN   = add_type_p_raw_not_null(TypeVoid); // substitute for all raw-not-null pointer types
 	TypeReference   = add_type_ref(TypeVoid); // substitute for all reference types
 	TypeNone        = add_type_p_raw(TypeVoid); // type of <nil>
 	const_cast<Class*>(TypeNone)->name = "None";
@@ -336,7 +337,7 @@ void SIAddPackageBase(Context *c) {
 	capture_implicit_type(TypeCString, "cstring"); // cstring := char[256]
 	TypeString      = add_type_list(TypeChar);
 	capture_implicit_type(TypeString, "string"); // string := char[]
-	TypeStringAutoCast = add_type("<string-auto-cast>", config.target.super_array_size);	// string := char[]
+	TypeStringAutoCast = add_type("<string-auto-cast>", config.target.dynamic_array_size);	// string := char[]
 	TypeStringList  = add_type_list(TypeString);
 
 	TypeIntDict     = add_type_dict(TypeInt);
@@ -359,12 +360,18 @@ void SIAddPackageBase(Context *c) {
 		func_add_param("p", TypePointer);
 	
 
-
 	add_class(TypePointer);
 		class_add_func(Identifier::Func::STR, TypeString, &p2s, Flags::PURE);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypePointer, TypePointer, InlineID::POINTER_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypePointer, TypePointer, InlineID::POINTER_EQUAL);
 		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypePointer, TypePointer, InlineID::POINTER_NOT_EQUAL);
+
+
+	add_class(TypePointerNN);
+			class_add_func(Identifier::Func::STR, TypeString, &p2s, Flags::PURE);
+			add_operator(OperatorID::ASSIGN, TypeVoid, TypePointerNN, TypePointerNN, InlineID::POINTER_ASSIGN);
+			add_operator(OperatorID::EQUAL, TypeBool, TypePointerNN, TypePointerNN, InlineID::POINTER_EQUAL);
+			add_operator(OperatorID::NOT_EQUAL, TypeBool, TypePointerNN, TypePointerNN, InlineID::POINTER_NOT_EQUAL);
 
 	add_class(TypeReference);
 		add_operator(OperatorID::REF_ASSIGN, TypeVoid, TypeReference, TypeReference, InlineID::POINTER_ASSIGN);
@@ -747,7 +754,7 @@ void SIAddPackageBase(Context *c) {
 		func_add_param("str", TypeStringAutoCast);//, (Flags)((int)Flags::CONST | (int)Flags::AUTO_CAST));
 	add_ext_var("_print_postfix", TypeString, &os::terminal::_print_postfix_);
 	add_func("as_binary", TypeString, &kaba_binary, Flags::STATIC);
-		func_add_param("p", TypePointer, Flags::REF);
+		func_add_param("p", TypePointerNN, Flags::REF);
 		func_add_param("length", TypeInt);
 	// memory
 	add_func("@malloc", TypePointer, &kaba_malloc, Flags::STATIC);

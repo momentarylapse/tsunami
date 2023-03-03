@@ -301,7 +301,7 @@ public:
 			*(string*)var = aa.as_string();
 		} else if (type->is_pointer_raw()) {
 			*(const void**)var = aa.as_pointer();
-		} else if (type->is_super_array() and (aa.type == TYPE_ARRAY)) {
+		} else if (type->is_list() and (aa.type == TYPE_ARRAY)) {
 			auto *t_el = type->get_array_element();
 			auto *a = (DynamicArray*)var;
 			auto &b = aa.as_array();
@@ -909,7 +909,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func(Identifier::Func::STR, TypeString, &Any::str, Flags::PURE);
 		class_add_func(Identifier::Func::REPR, TypeString, &Any::repr, Flags::PURE);
 		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
-			func_add_param("var", TypePointer);
+			func_add_param("var", TypePointerNN);
 			func_add_param("type", TypeClassP);
 		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);

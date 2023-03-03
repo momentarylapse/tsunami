@@ -232,8 +232,8 @@ void AutoImplementer::add_missing_function_headers_for_class(Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return;
 
-	if (t->is_super_array()) {
-		_add_missing_function_headers_for_super_array(t);
+	if (t->is_list()) {
+		_add_missing_function_headers_for_list(t);
 	} else if (t->is_array()) {
 		_add_missing_function_headers_for_array(t);
 	} else if (t->is_dict()) {
@@ -277,8 +277,8 @@ void AutoImplementer::implement_functions(const Class *t) {
 
 	auto sub_classes = t->classes; // might change
 
-	if (t->is_super_array()) {
-		_implement_functions_for_super_array(t);
+	if (t->is_list()) {
+		_implement_functions_for_list(t);
 	} else if (t->is_array()) {
 		_implement_functions_for_array(t);
 	} else if (t->is_dict()) {
@@ -318,7 +318,7 @@ void AutoImplementer::complete_type(Class *t, int array_size, int token_id) {
 	// ->derive_from() will overwrite params!!!
 
 	t->array_length = max(array_size, 0);
-	if (t->is_super_array() or t->is_dict()) {
+	if (t->is_list() or t->is_dict()) {
 		t->derive_from(TypeDynamicArray); // we already set its size!
 		if (!class_can_default_construct(params[0]))
 			tree->do_error(format("can not create a dynamic array from type '%s', missing default constructor", params[0]->long_name()), token_id);
@@ -329,7 +329,7 @@ void AutoImplementer::complete_type(Class *t, int array_size, int token_id) {
 			tree->do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()), token_id);
 		t->param = params;
 		add_missing_function_headers_for_class(t);
-	} else if (t->is_pointer_raw()) {
+	} else if (t->is_pointer_raw() or t->is_pointer_raw_not_null()) {
 		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	} else if (t->is_reference()) {
 		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);

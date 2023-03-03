@@ -31,8 +31,8 @@ void AutoImplementer::implement_dict_constructor(Function *f, const Class *t) {
 }
 
 void AutoImplementer::_implement_functions_for_dict(const Class *t) {
-	implement_super_array_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
-	implement_super_array_destructor(prepare_auto_impl(t, t->get_destructor()), t);
+	implement_list_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
+	implement_list_destructor(prepare_auto_impl(t, t->get_destructor()), t);
 }
 
 }

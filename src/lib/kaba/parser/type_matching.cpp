@@ -7,7 +7,7 @@
 
 #include "Concretifier.h"
 #include "Parser.h"
-#include "template.h"
+#include "../template/template.h"
 #include "../Context.h"
 #include "../lib/lib.h"
 #include "../../base/set.h"
@@ -25,13 +25,9 @@ extern const Class *TypeNone;
 
 bool type_match_up(const Class *given, const Class *wanted);
 
-bool is_pointer_not_null(const Class *t) {
-	return t->is_reference() or t->is_pointer_shared_not_null() or t->is_pointer_owned_not_null();
-}
-
 
 shared<Node> Concretifier::deref_if_reference(shared<Node> node) {
-	if (is_pointer_not_null(node->type))
+	if (node->type->is_some_pointer_not_null())
 		return node->deref();
 	return node;
 }
@@ -71,13 +67,18 @@ bool type_match_up(const Class *given, const Class *wanted) {
 		return true;
 
 	// allow any non-owning pointer?
-	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_reference()))
+	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_pointer_raw_not_null() or given->is_reference()))
 		return true;
 
+	// allow any not-null non-owning pointer?
+	if ((wanted == TypePointerNN) and (given->is_pointer_raw_not_null() or given->is_reference()))
+		return true;
+
+	// reference
 	if ((wanted == TypeReference) and given->is_reference())
 		return true;
 
-	// allow nil as parameter
+	// nil  ->  any raw pointer
 	if (wanted->is_pointer_raw() and (given == TypeNone))
 		return true;
 
@@ -88,22 +89,31 @@ bool type_match_up(const Class *given, const Class *wanted) {
 			return true;
 	}
 
+	// ...  ->  shared not-null
 	if (given->is_pointer_shared_not_null() and wanted->is_pointer_shared())
 		if (given->param[0]->is_derived_from(wanted->param[0]))
 			return true;
 
 	//msg_write(given->long_name() + "  ->  " + wanted->long_name());
-	if (wanted->is_pointer_raw() and (given->is_reference() or given->is_pointer_owned() or given->is_pointer_owned_not_null()))
+
+	// ...  ->  raw
+	if (wanted->is_pointer_raw() and (given->is_reference() or given->is_pointer_raw_not_null() or given->is_pointer_owned() or given->is_pointer_owned_not_null()))
 		if (type_match_up(given->param[0], wanted->param[0]))
 			return true;
 
+	// ...  ->  raw
+	if (wanted->is_pointer_raw_not_null() and (given->is_reference() or given->is_pointer_owned_not_null()))
+		if (type_match_up(given->param[0], wanted->param[0]))
+			return true;
+
+	// callable
 	if (given->is_callable() and wanted->is_callable())
 		return func_pointer_match_up(given, wanted);
 
-	if (wanted->is_super_array() and given->is_super_array()) {
+	// lists
+	if (wanted->is_list() and given->is_list())
 		if (type_match_up(given->param[0], wanted->param[0]) and (given->param[0]->size == wanted->param[0]->size))
 			return true;
-	}
 
 	if (wanted == TypeStringAutoCast and given == TypeString)
 		return true;
@@ -172,7 +182,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	auto given = node->type;
 
 
-	if (is_pointer_not_null(given)) {
+	if (given->is_some_pointer_not_null()) {
 		CastingData cd_sub;
 		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub)) {
 			cd = cd_sub;
@@ -204,10 +214,17 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	}*/
 
 
-	// FIXME we should not allow ownifying references!!!
+	// xfer  ->  shared(!)
+	/*auto can_sharify = [] (const Class *w, const Class *g) {
+		if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null()) and given->is_pointer_xfer())
+			return true;
+		if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null()) and given->is_pointer_raw_not_null())
+			return true;
+		return false;
+	};*/
 	if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null())
 			and given->is_pointer_xfer()) {
-		if (type_match_up(given->param[0], wanted->param[0]) or (given == TypeNone /* nil etc */)) {
+		if (type_match_up(given->param[0], wanted->param[0])) {
 			auto t_xfer = tree->request_implicit_class_xfer(wanted->param[0], -1);
 			cd.penalty = 10;
 			cd.cast = TypeCastId::MAKE_SHARED;
@@ -215,6 +232,8 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
+
+	// ...  ->  raw
 	if (wanted->is_pointer_raw() and (given->is_some_pointer())) {
 		if (type_match_up(given->param[0], wanted->param[0])) {
 			cd.penalty = 10;
@@ -223,7 +242,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 	}
 	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeUnknown) {
-		if (wanted->is_super_array()) {
+		if (wanted->is_list()) {
 			auto t = wanted->get_array_element();
 			CastingData cast;
 			for (auto *e: weak(node->params)) {
@@ -248,7 +267,6 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 	}
 	if ((node->kind == NodeKind::TUPLE) and (given == TypeUnknown)) {
-
 		for (auto *f: wanted->get_constructors()) {
 			if (type_match_tuple_as_contructor(node, f, cd.penalty)) {
 				cd.cast = TypeCastId::TUPLE_AS_CONSTRUCTOR;

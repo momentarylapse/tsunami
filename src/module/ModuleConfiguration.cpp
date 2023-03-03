@@ -59,7 +59,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		for (int i=0; i<c->array_length; i++)
 			r.add(var_to_any(tel, &v[i * tel->size]));
 		return r;
-	} else if (c->is_super_array()) {
+	} else if (c->is_list()) {
 		Any r = Any::EmptyArray;
 		auto a = (DynamicArray*)v;
 		auto tel = c->get_array_element();
@@ -135,7 +135,7 @@ void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, i
 			var_from_string_legacy(tel, &v[i * tel->size], s, pos, session);
 		}
 		pos ++; // ']'
-	} else if (type->is_super_array()) {
+	} else if (type->is_list()) {
 		pos ++; // '['
 		auto *a = (DynamicArray*)v;
 		auto tel = type->get_array_element();
@@ -195,7 +195,7 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		auto tel = type->get_array_element();
 		for (int i=0; i<min(type->array_length, array.num); i++)
 			var_from_any(tel, &v[i * tel->size], array[i], session);
-	} else if (type->is_super_array()) {
+	} else if (type->is_list()) {
 		if (!a.is_array())
 			throw Exception("array expected");
 		auto &array = a.as_array();

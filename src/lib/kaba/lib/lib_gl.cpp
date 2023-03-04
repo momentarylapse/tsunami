@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "lib.h"
 #include "shared.h"
+#include "list.h"
 #include "../dynamic/exception.h"
 
 #if __has_include("../../nix/nix.h") && HAS_LIB_GL
@@ -51,11 +52,48 @@ public:
 };
 
 
-#else
-struct FakeTexture {
-	int width, height;
-	int color_attachments, depth_buffer;
+class KabaTexture : public nix::Texture {
+public:
+	void _cdecl __init__(int width, int height, const string &format) {
+		new(this) nix::Texture(width, height, format);
+	}
+	void _cdecl __delete__() {
+		this->~Texture();
+	}
+
+	void _cdecl __init_multi_sample__(int width, int height, int samples, const string &format) {
+		new(this) nix::TextureMultiSample(width, height, samples, format);
+	}
+	void _cdecl __init_volume__(int nx, int ny, int nz, const string &format) {
+		new(this) nix::VolumeTexture(nx, ny, nz, format);
+	}
+	void _cdecl __init_image__(int width, int height, const string &format) {
+		new(this) nix::ImageTexture(width, height, format);
+	}
+	void _cdecl __init_depth__(int width, int height, const string &format) {
+		new(this) nix::DepthBuffer(width, height, format);
+	}
+	void _cdecl __init_cube__(int size, const string &format) {
+		new(this) nix::CubeMap(size, format);
+	}
 };
+
+class KabaFrameBuffer : public nix::FrameBuffer {
+public:
+	void __init__(const shared_array<nix::Texture> &attachments) {
+		new(this) nix::FrameBuffer(attachments);
+	}
+	void __delete__() {
+		this->~FrameBuffer();
+	}
+};
+
+
+#else
+	struct FakeTexture : public Sharable<base::Empty> {
+		int width, height;
+		int color_attachments, depth_buffer;
+	};
 	namespace nix{
 		typedef int VertexBuffer;
 		typedef FakeTexture Texture;
@@ -85,7 +123,9 @@ void SIAddPackageGl(Context *c) {
 	auto TypeTexture = add_type("Texture", sizeof(nix::Texture));
 	auto TypeTextureXfer = add_type_p_xfer(TypeTexture);
 	auto TypeTextureP = add_type_p_raw(TypeTexture);
+	auto TypeTextureSharedNN = add_type_p_shared_not_null(TypeTexture);
 	auto TypeTexturePList = add_type_list(TypeTextureP);
+	auto TypeTextureSharedNNList = add_type_list(TypeTextureSharedNN);
 	auto TypeImageTexture = add_type("ImageTexture", sizeof(nix::Texture));
 	auto TypeVolumeTexture = add_type("VolumeTexture", sizeof(nix::Texture));
 	auto TypeDepthBuffer = add_type("DepthBuffer", sizeof(nix::Texture));
@@ -108,6 +148,7 @@ void SIAddPackageGl(Context *c) {
 
 	lib_create_pointer_xfer(TypeTextureXfer);
 	lib_create_pointer_xfer(TypeShaderXfer);
+	lib_create_pointer_shared<nix::Texture>(TypeTextureSharedNN, TypeTextureXfer);
 	
 	add_class(TypeVertexBuffer);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::VertexBuffer::__init__));
@@ -127,11 +168,11 @@ void SIAddPackageGl(Context *c) {
 
 
 	add_class(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::Texture::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Texture::__delete__));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__));
 		class_add_func("set_options", TypeVoid, gl_p(&nix::Texture::set_options));
 			func_add_param("op", TypeString);
 		class_add_func("write", TypeVoid, gl_p(&nix::Texture::write));
@@ -150,40 +191,40 @@ void SIAddPackageGl(Context *c) {
 
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::VolumeTexture::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_volume__));
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Texture::__delete__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeImageTexture);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::ImageTexture::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_image__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Texture::__delete__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::DepthBuffer::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_depth__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Texture::__delete__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::CubeMap::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_cube__));
 			func_add_param("size", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Texture::__delete__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE);
 
 	add_class(TypeFrameBuffer);
-		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::FrameBuffer::__init__));
-			func_add_param("attachments", TypeTexturePList);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::FrameBuffer::__delete__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaFrameBuffer::__init__));
+			func_add_param("attachments", TypeTextureSharedNNList);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaFrameBuffer::__delete__));
 		class_add_func("area", TypeRect, gl_p(&nix::FrameBuffer::area));
 		class_add_func("clear_color", TypeVoid, gl_p(&nix::FrameBuffer::clear_color));
 			func_add_param("index", TypeInt);
@@ -191,14 +232,14 @@ void SIAddPackageGl(Context *c) {
 		class_add_func("clear_depth", TypeVoid, gl_p(&nix::FrameBuffer::clear_depth));
 			func_add_param("z", TypeFloat32);
 		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update));
-			func_add_param("attachments", TypeTexturePList);
+			func_add_param("attachments", TypeTextureSharedNNList);
 		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update_x));
-			func_add_param("attachments", TypeTexturePList);
+			func_add_param("attachments", TypeTextureSharedNNList);
 			func_add_param("face", TypeInt);
 		class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
 		class_add_element("width", TypeInt, gl_p(&nix::FrameBuffer::width));
 		class_add_element("height", TypeInt, gl_p(&nix::FrameBuffer::height));
-		class_add_element("color_attachments", TypeTexturePList, gl_p(&nix::FrameBuffer::color_attachments));
+		class_add_element("color_attachments", TypeTextureSharedNNList, gl_p(&nix::FrameBuffer::color_attachments));
 		class_add_element("depth_buffer", TypeDepthBufferP, gl_p(&nix::FrameBuffer::depth_buffer));
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::FrameBuffer::_pointer_ref_counter));
 
@@ -400,6 +441,10 @@ void SIAddPackageGl(Context *c) {
 		class_add_enum("NONE", TypeCullMode, gl_p(nix::CullMode::NONE));
 		class_add_enum("CW",   TypeCullMode, gl_p(nix::CullMode::CW));
 		class_add_enum("CCW",  TypeCullMode, gl_p(nix::CullMode::CCW));
+
+
+	lib_create_list<shared<nix::Texture>>(TypeTextureSharedNNList);
+
 
 	add_ext_var("vb_temp", TypeVertexBufferRef, gl_p(&nix::vb_temp));
 }

@@ -504,7 +504,7 @@ class Song extends Object as shared
 	func extern override __delete__()
 	
 	func extern range() -> Range
-	func extern selfref time_track() -> shared[Track]
+	func extern selfref time_track() -> Track*
 	func extern selfref layers() -> TrackLayer&[]
 	
 	func extern mut add_track(type: SignalType, index: int) -> shared![Track]

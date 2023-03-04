@@ -179,12 +179,10 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	func draw_part_info(p: Painter, cur_bar_index: int)
-		
-		var song = metro.session.song
-		for t in song.time_track()
+		for t in metro.session.song.time_track()
 			draw_part_info_x(p, cur_bar_index, t)
 			
-	func draw_part_info_x(p: Painter, cur_bar_index: int, t: Track)
+	func draw_part_info_x(p: Painter, cur_bar_index: int, t: Track&)
 		var w: float = p.width
 		var h: float = p.height
 		var song = metro.session.song
@@ -196,14 +194,14 @@ Grid ? '' vertical
 		
 		for b in cur_bar
 			var offset = b.offset
-			var cur_part = get_part(t, offset + DELTA)
-			var next_part = get_part(t, offset + b.length + DELTA)
+			var cur_part = get_part(&!t, offset + DELTA)
+			var next_part = get_part(&!t, offset + b.length + DELTA)
 			p.set_color(colors.text_soft2)
 			var fs = h * 0.08
 			p.set_font_size(fs)
 			for cp in cur_part
 				p.draw_str([10, 5], cp.text)
-				var first_bar = bar_index(song, cp.range.offset + DELTA)
+				var first_bar = bar_index(&!song, cp.range.offset + DELTA)
 				p.draw_str([w - 5 - fs*3, 5], str((b.index - first_bar) + 2))
 	
 			var change: string
@@ -256,14 +254,14 @@ Grid ? '' vertical
 #		#show_control()
 
 
-func bar_index(song: Song, offset: int) -> int
+func bar_index(song: Song&, offset: int) -> int
 	for i=>b in song.bars
 		if b.offset >= offset
 			return i
 	return 0
 
 
-func get_part(t: Track, offset: int) -> TrackMarker*
+func get_part(t: Track&, offset: int) -> TrackMarker*
 	for m in t.layers[0].markers
 		if m.range.inside(offset)
 			return weak(m)
@@ -272,7 +270,6 @@ func get_part(t: Track, offset: int) -> TrackMarker*
 class Metronome extends TsunamiPlugin
 	
 	func override on_start()
-		
 		session.view.signal_chain.set_update_dt(UPDATE_DT)
 		session.view.signal_chain.set_buffer_size(1024)
 			

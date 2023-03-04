@@ -30,7 +30,7 @@ FrameBuffer::FrameBuffer() {
 	multi_samples = 0;
 }
 
-FrameBuffer::FrameBuffer(const Array<Texture*> &attachments) : FrameBuffer() {
+FrameBuffer::FrameBuffer(const shared_array<Texture> &attachments) : FrameBuffer() {
 	glCreateFramebuffers(1, &frame_buffer);
 	update(attachments);
 }
@@ -39,25 +39,17 @@ FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &frame_buffer);
 }
 
-void FrameBuffer::__init__(const Array<Texture*> &attachments) {
-	new(this) FrameBuffer(attachments);
-}
-
-void FrameBuffer::__delete__() {
-	this->~FrameBuffer();
-}
-
-void FrameBuffer::update(const Array<Texture*> &attachments) {
+void FrameBuffer::update(const shared_array<Texture> &attachments) {
 	update_x(attachments, -1);
 }
 
-void FrameBuffer::update_x(const Array<Texture*> &attachments, int cube_face) {
+void FrameBuffer::update_x(const shared_array<Texture> &attachments, int cube_face) {
 	// prevent deleting textures
 	shared<DepthBuffer> new_depth_buffer;
 	shared_array<Texture> new_attachments;
 	int samples = 0;
 
-	for (auto *a: attachments) {
+	for (auto a: weak(attachments)) {
 		if ((a->type == Texture::Type::DEPTH) or (a->type == Texture::Type::RENDERBUFFER))
 			new_depth_buffer = (DepthBuffer*)a;
 		else

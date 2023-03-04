@@ -9,15 +9,16 @@
 #define SRC_LIB_KABA_LIB_LIST_H_
 
 #include "../../base/base.h"
-#include "../../os/msg.h"
 #include "lib.h"
 #include "operators.h"
+#include "../syntax/Identifier.h"
 
 namespace kaba {
 
 extern const Class *TypeAny;
 extern const Class *TypeDynamicArray;
 extern const Class *TypePath;
+extern const Class *TypeVoid;
 
 void lib_make_list(Class *t, SyntaxTree *ps);
 
@@ -176,6 +177,14 @@ public:
 };
 
 
+template<class T>
+void lib_create_list(const Class *tt) {
+	auto t = const_cast<Class*>(tt);
+
+	add_class(t);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<T>::__init__);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &XList<T>::clear);
+}
 
 
 //using FloatList = XList<float>;

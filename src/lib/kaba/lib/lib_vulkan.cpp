@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "shared.h"
 #include "optional.h"
+#include "list.h"
 #include "../dynamic/exception.h"
 
 #if __has_include("../../vulkan/vulkan.h") && HAS_LIB_VULKAN
@@ -97,7 +98,7 @@ public:
 
 class VulkanFrameBuffer : public vulkan::FrameBuffer {
 public:
-	void __init__(vulkan::RenderPass *rp, const Array<vulkan::Texture*> &attachments) {
+	void __init__(vulkan::RenderPass *rp, const shared_array<vulkan::Texture> &attachments) {
 		new(this) vulkan::FrameBuffer(rp, attachments);
 	}
 	void __delete__() {
@@ -266,7 +267,6 @@ public:
 		typedef int Device;
 		typedef int Queue;
 		typedef int VertexBuffer;
-		typedef int Texture;
 		typedef int Shader;
 		typedef int BasePipeline;
 		typedef int GraphicsPipeline;
@@ -289,6 +289,7 @@ public:
 		typedef int CubeMap;
 		typedef int StorageTexture;
 		typedef int AccelerationStructure;
+		struct Texture : public Sharable<base::Empty> {};
 	};
 	#define vul_p(p)		nullptr
 #endif
@@ -321,6 +322,9 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypeTextureXfer = add_type_p_xfer(TypeTexture);
 	auto TypeTextureP = add_type_p_raw(TypeTexture);
 	auto TypeTexturePList = add_type_list(TypeTextureP);
+	auto TypeTextureSharedNN = add_type_p_shared_not_null(TypeTexture);
+	auto TypeTextureSharedNNList = add_type_list(TypeTextureSharedNN);
+	auto TypeTextureXferList = add_type_list(TypeTextureXfer);
 	auto TypeVolumeTexture = add_type("VolumeTexture", sizeof(vulkan::VolumeTexture));
 	auto TypeCubeMap = add_type("CubeMap", sizeof(vulkan::CubeMap));
 	auto TypeStorageTexture = add_type("StorageTexture", sizeof(vulkan::StorageTexture));
@@ -329,7 +333,8 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypeDepthBufferXfer = add_type_p_xfer(TypeDepthBuffer);
 	auto TypeFrameBuffer = add_type("FrameBuffer", sizeof(vulkan::FrameBuffer));
 	auto TypeFrameBufferP = add_type_p_raw(TypeFrameBuffer);
-	auto TypeFrameBufferPList = add_type_list(TypeFrameBufferP);
+	auto TypeFrameBufferXfer = add_type_p_xfer(TypeFrameBuffer);
+	auto TypeFrameBufferXferList = add_type_list(TypeFrameBufferXfer);
 	auto TypeShader = add_type("Shader", sizeof(vulkan::Shader));
 	auto TypeShaderXfer = add_type_p_xfer(TypeShader);
 	auto TypeShaderP = add_type_p_raw(TypeShader);
@@ -374,10 +379,12 @@ void SIAddPackageVulkan(Context *c) {
 	lib_create_pointer_xfer(TypeTextureXfer);
 	lib_create_pointer_xfer(TypeShaderXfer);
 	lib_create_pointer_xfer(TypeDepthBufferXfer);
+	lib_create_pointer_xfer(TypeFrameBufferXfer);
 	lib_create_pointer_xfer(TypeDescriptorSetXfer);
 	lib_create_pointer_xfer(TypeCommandBufferXfer);
 	lib_create_pointer_xfer(TypeRenderPassXfer);
 	lib_create_pointer_xfer(TypeAccelerationStructureXfer);
+	lib_create_pointer_shared<vulkan::Texture>(TypeTextureSharedNN, TypeTextureXfer);
 
 	lib_create_optional<int>(TypeIntOptional);
 
@@ -479,7 +486,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("height", TypeInt, vul_p(&vulkan::FrameBuffer::height));
 		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanFrameBuffer::__init__));
 			func_add_param("rp", TypeRenderPassP);
-			func_add_param("attachments", TypePointerList);
+			func_add_param("attachments", TypeTextureSharedNNList);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanFrameBuffer::__delete__));
 
 
@@ -608,10 +615,10 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_func("create_depth_buffer", TypeDepthBufferXfer, vul_p(&vulkan::SwapChain::create_depth_buffer));
 		class_add_func("create_render_pass", TypeRenderPassXfer, vul_p(&vulkan::SwapChain::create_render_pass));
 			func_add_param("depth_buffer", TypeDepthBufferP);
-		class_add_func("create_frame_buffers", TypeFrameBufferPList, vul_p(&vulkan::SwapChain::create_frame_buffers));
+		class_add_func("create_frame_buffers", TypeFrameBufferXferList, vul_p(&vulkan::SwapChain::create_frame_buffers));
 			func_add_param("render_pass", TypeRenderPassP);
 			func_add_param("depth_buffer", TypeDepthBufferP);
-		class_add_func("create_textures", TypeTexturePList, vul_p(&vulkan::SwapChain::create_textures));
+		class_add_func("create_textures", TypeTextureXferList, vul_p(&vulkan::SwapChain::create_textures));
 		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::SwapChain::rebuild));
 		class_add_func("present", TypeBool, vul_p(&vulkan::SwapChain::present));
 			func_add_param("image_index", TypeInt);
@@ -723,6 +730,10 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_enum("GRAPHICS", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::GRAPHICS));
 		class_add_enum("RAY_TRACING", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::RAY_TRACING));
 		class_add_enum("COMPUTE", TypePipelineBindPoint, vul_p(vulkan::PipelineBindPoint::COMPUTE));
+
+
+
+	lib_create_list<shared<vulkan::Texture>>(TypeTextureSharedNNList);
 
 
 	add_func("create_window", TypePointerNN, vul_p(&vulkan::create_window), Flags::STATIC);

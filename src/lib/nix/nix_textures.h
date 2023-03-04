@@ -43,8 +43,6 @@ public:
 	Texture();
 	Texture(int width, int height, const string &format);
 	~Texture();
-	void _cdecl __init__(int width, int height, const string &format);
-	void _cdecl __delete__();
 
 	void _cdecl write(const Image &image);
 	void _cdecl read(Image &image) const;
@@ -70,25 +68,21 @@ public:
 class TextureMultiSample : public Texture {
 public:
 	TextureMultiSample(int width, int height, int samples, const string &format);
-	void _cdecl __init__(int width, int height, int samples, const string &format);
 };
 
 class VolumeTexture : public Texture {
 public:
 	VolumeTexture(int nx, int ny, int nz, const string &format);
-	void _cdecl __init__(int nx, int ny, int nz, const string &format);
 };
 
 class ImageTexture : public Texture {
 public:
 	ImageTexture(int width, int height, const string &format);
-	void _cdecl __init__(int width, int height, const string &format);
 };
 
 class DepthBuffer : public Texture {
 public:
 	DepthBuffer(int width, int height, const string &format);
-	void _cdecl __init__(int width, int height, const string &format);
 };
 
 class RenderBuffer : public Texture {
@@ -100,7 +94,6 @@ public:
 class CubeMap : public Texture {
 public:
 	CubeMap(int size, const string &format);
-	void _cdecl __init__(int size, const string &format);
 
 	void _cdecl write_side(int side, const Image &image);
 	void _cdecl fill_side(int side, Texture *source);

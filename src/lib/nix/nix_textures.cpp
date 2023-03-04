@@ -141,18 +141,6 @@ Texture::~Texture() {
 		}*/
 }
 
-void Texture::__init__(int w, int h, const string &f) {
-	new(this) Texture(w, h, f);
-}
-
-void VolumeTexture::__init__(int nx, int ny, int nz, const string &f) {
-	new(this) VolumeTexture(nx, ny, nz, f);
-}
-
-void Texture::__delete__() {
-	this->~Texture();
-}
-
 Texture *Texture::load(const Path &filename) {
 	// return create_white_texture() ?
 	if (filename.is_empty())
@@ -398,10 +386,6 @@ ImageTexture::ImageTexture(int _width, int _height, const string &_format) {
 	glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-void ImageTexture::__init__(int width, int height, const string &format) {
-	new(this) ImageTexture(width, height, format);
-}
-
 
 DepthBuffer::DepthBuffer(int _width, int _height, const string &_format) {
 	msg_write(format("creating depth texture [%d x %d] ", _width, _height));
@@ -426,10 +410,6 @@ DepthBuffer::DepthBuffer(int _width, int _height, const string &_format) {
 	glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTextureParameterfv(texture, GL_TEXTURE_BORDER_COLOR, borderColor);
-}
-
-void DepthBuffer::__init__(int width, int height, const string &format) {
-	new(this) DepthBuffer(width, height, format);
 }
 
 RenderBuffer::RenderBuffer(int w, int h, const string &format) : RenderBuffer(w, h, 0, format) {}
@@ -473,10 +453,6 @@ CubeMap::CubeMap(int size, const string &_format) {
 		for (int i=0; i<6; i++)
 			write_side(i, im);
 	}
-}
-
-void CubeMap::__init__(int size, const string &format) {
-	new(this) CubeMap(size, format);
 }
 
 void CubeMap::fill_side(int side, Texture *source) {

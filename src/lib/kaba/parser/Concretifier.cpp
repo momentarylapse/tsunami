@@ -23,6 +23,7 @@ extern const Class *TypeIntList;
 extern const Class *TypeAnyList;
 extern const Class *TypeAnyDict;
 extern const Class *TypeIntDict;
+extern const Class *TypeNone;
 
 
 
@@ -1382,6 +1383,10 @@ const Class *type_ownify_xfer(SyntaxTree *tree, const Class *t) {
 	return t;
 }
 
+bool is_non_owning_pointer(const Class *t) {
+	return t->is_reference() or t->is_pointer_raw() or t->is_pointer_raw_not_null();
+}
+
 shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *block, const Class *ns) {
 	// [TYPE?, VAR, =[VAR,EXPR]]
 	bool as_const = (node->link_no == 1);
@@ -1427,9 +1432,11 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 	if (node->params.num == 3) {
 		auto rhs = concretify_node(node->params[2]->params[1], block, ns);
 		node->params[2]->params[1] = rhs;
-		if (type->is_some_pointer_not_null() and !rhs->type->is_pointer_xfer()) {
+		//if (type->is_some_pointer_not_null() and !rhs->type->is_pointer_xfer()) {
+		if (is_non_owning_pointer(type)) {
 			if (rhs->type != vars[0]->type)
-				do_error(format("reference initialization type mismatch '%s = %s'", vars[0]->type->long_name(), rhs->type->long_name()), rhs);
+				if (rhs->type != TypeNone)
+					do_error(format("pointer initialization type mismatch '%s = %s'", vars[0]->type->long_name(), rhs->type->long_name()), rhs);
 			node = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, add_node_local(vars[0]), rhs, node->token_id);
 		} else {
 			node = concretify_node(node->params[2], block, ns);

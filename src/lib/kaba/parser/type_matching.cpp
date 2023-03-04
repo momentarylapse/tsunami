@@ -61,11 +61,7 @@ bool is_same_kind_of_pointer(const Class *a, const Class *b) {
 }
 
 // can be re-interpreted as...?
-bool type_match_up(const Class *given, const Class *wanted) {
-	// exact match?
-	if (given == wanted)
-		return true;
-
+bool type_match_generic_pointer(const Class *given, const Class *wanted) {
 	// allow any non-owning pointer?
 	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_pointer_raw_not_null() or given->is_reference()))
 		return true;
@@ -76,6 +72,19 @@ bool type_match_up(const Class *given, const Class *wanted) {
 
 	// reference
 	if ((wanted == TypeReference) and given->is_reference())
+		return true;
+
+	return false;
+}
+
+// can be re-interpreted as...?
+bool type_match_up(const Class *given, const Class *wanted) {
+	// exact match?
+	if (given == wanted)
+		return true;
+
+
+	if (type_match_generic_pointer(given, wanted))
 		return true;
 
 	// nil  ->  any raw pointer
@@ -184,12 +193,13 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 
 	if (given->is_some_pointer_not_null()) {
 		CastingData cd_sub;
-		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub)) {
-			cd = cd_sub;
-			cd.pre_deref = true;
-			cd.penalty += 10;
-			return true;
-		}
+		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub))
+			if (!cd.pre_deref) {
+				cd = cd_sub;
+				cd.pre_deref = true;
+				cd.penalty += 10;
+				return true;
+			}
 	}
 
 	if (is_modifiable) {
@@ -198,13 +208,22 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 
 		// allow any raw pointer
-		if (given->is_pointer_raw() and wanted == TypePointer)
+		if (given->is_pointer_raw() and wanted == TypePointer) {
+			cd.penalty = 10;
 			return true;
+		}
 
 		return false;
 	}
 	if (type_match_up(given, wanted))
 		return true;
+
+	/*if (type_match_generic_pointer(given, wanted)) {
+		msg_error(" -> GENERIC");
+		cd.penalty = 10;
+		return true;
+	}*/
+
 	/*if (given->is_some_pointer()) {
 		if (type_match_up(given->param[0], wanted)) {
 			cd.penalty = 10;

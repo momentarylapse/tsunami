@@ -8,6 +8,7 @@
 #include "list.h"
 #include "lib.h"
 #include "../kaba.h"
+#include "../../os/msg.h"
 
 namespace kaba {
 

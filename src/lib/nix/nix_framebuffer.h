@@ -18,12 +18,12 @@ class DepthBuffer;
 class FrameBuffer : public Sharable<base::Empty> {
 public:
 	FrameBuffer();
-	FrameBuffer(const Array<Texture*> &attachments);
+	FrameBuffer(const shared_array<Texture> &attachments);
 	~FrameBuffer();
-	void __init__(const Array<Texture*> &attachments);
-	void __delete__();
-	void update(const Array<Texture*> &attachments);
-	void update_x(const Array<Texture*> &attachments, int cube_face);
+
+	void update(const shared_array<Texture> &attachments);
+	void update_x(const shared_array<Texture> &attachments, int cube_face);
+
 	shared_array<Texture> color_attachments;
 	shared<DepthBuffer> depth_buffer;
 	unsigned int frame_buffer;

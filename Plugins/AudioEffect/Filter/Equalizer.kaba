@@ -301,8 +301,8 @@ class EqualizerPanel extends ConfigPanel
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
-		grid.cp := &!self
-		grid.c := &!c.config
+		grid.cp := &self
+		grid.c := &c.config
 		grid.sample_rate = c.session.sample_rate()
 		num_peaks = 0
 		

@@ -143,7 +143,7 @@ class PADPanel extends ConfigPanel
 	var grid: PADGrid
 	var override c: PADSynthesizer&
 	func override __init__(_s: Module)
-		pc := &!c.config
+		pc := &c.config
 		from_source("
 Grid ? ''
 	Grid ? ''
@@ -162,7 +162,7 @@ Grid ? ''
 		event("detune", on_change)
 		
 		grid.pc := pc
-		grid.p := &!self
+		grid.p := &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, 8.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")

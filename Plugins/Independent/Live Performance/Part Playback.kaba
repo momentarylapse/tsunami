@@ -21,7 +21,7 @@ class PPPanel extends ConfigPanel
 		super.__init__(l)
 		from_source("
 Button forward 'Forward' expandx expandy")
-		looper := &!l
+		looper := &l
 
 		event("forward", on_forward)
 	

@@ -74,6 +74,24 @@ void AutoImplementer::db_add_print_label_node(shared<Block> block, const string 
 	block->add(cmd);
 }
 
+shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
+	if ((a->type->is_reference() and b->type->is_reference()) or (a->type->is_pointer_xfer() and b->type->is_pointer_xfer()))
+		return add_node_operator_by_inline(InlineID::POINTER_ASSIGN, a, b);
+	if (auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, a, b))
+		return n_assign;
+	do_error_implicit(f, format("(%s) no operator %s = %s found", ctx, a->type->long_name(), b->type->long_name()));
+	return nullptr;
+}
+
+shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, const string &msg, shared<Node> a, shared<Node> b) {
+	if ((a->type->is_reference() and b->type->is_reference()) or (a->type->is_pointer_xfer() and b->type->is_pointer_xfer()))
+		return add_node_operator_by_inline(InlineID::POINTER_ASSIGN, a, b);
+	if (auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, a, b))
+		return n_assign;
+	do_error_implicit(f, format("(%s) %s", ctx, msg));
+	return nullptr;
+}
+
 
 
 void AutoImplementer::do_error_implicit(Function *f, const string &str) {
@@ -329,7 +347,7 @@ void AutoImplementer::complete_type(Class *t, int array_size, int token_id) {
 			tree->do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()), token_id);
 		t->param = params;
 		add_missing_function_headers_for_class(t);
-	} else if (t->is_pointer_raw() or t->is_pointer_raw_not_null()) {
+	} else if (t->is_pointer_raw()) {
 		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	} else if (t->is_reference()) {
 		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);

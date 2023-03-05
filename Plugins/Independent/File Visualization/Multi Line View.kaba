@@ -26,8 +26,8 @@ class MyDialog extends hui.Dialog
 	func __init__(parent: hui.Window*, _mlv: MultiLineView)
 		super.__init__("Multi Line View", 800, 600, parent, true)
 		
-		mlv := &!_mlv
-		config := &!mlv.config
+		mlv := &_mlv
+		config := &mlv.config
 		session := mlv.session
 		
 		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar

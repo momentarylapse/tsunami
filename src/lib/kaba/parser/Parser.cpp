@@ -603,10 +603,10 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 	if (try_consume("(")) {
 		operand = parse_abstract_operand_greedy(block, true);
 		expect_identifier(")", "')' expected");
-	} else if (try_consume("&!")) { // &! -> new address operator
+	/*} else if (try_consume("&!")) { // &! -> new address operator
 		int token = Exp.cur_token();
 		operand = parse_abstract_operand(block)->ref_new(TypeUnknown);
-		operand->token_id = token;
+		operand->token_id = token;*/
 	} else if (try_consume("&")) { // & -> legacy address operator
 		int token = Exp.cur_token();
 		operand = parse_abstract_operand(block)->ref_raw(TypeUnknown);
@@ -633,10 +633,7 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 		operand->set_num_params(1);
 		operand->set_param(0, parse_abstract_operand(block));
 	} else if (try_consume(Identifier::RAW_POINTER)) {
-		if (try_consume("!"))
-			operand = new Node(NodeKind::ABSTRACT_TYPE_POINTER_NOT_NULL, 0, TypeUnknown, false, Exp.cur_token()-1);
-		else
-			operand = new Node(NodeKind::ABSTRACT_TYPE_POINTER, 0, TypeUnknown, false, Exp.cur_token());
+		operand = new Node(NodeKind::ABSTRACT_TYPE_POINTER, 0, TypeUnknown, false, Exp.cur_token());
 	} else if (try_consume(Identifier::SHARED)) {
 		if (try_consume("!"))
 			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL, 0, TypeUnknown, false, Exp.cur_token()-1);

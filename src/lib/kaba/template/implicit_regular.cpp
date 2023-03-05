@@ -119,13 +119,7 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 	// auto initializers
 	for (auto &init: t->initializers) {
 		auto &e = t->elements[init.element];
-		auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				n_self->shift(e.offset, e.type),
-				add_node_const(init.value.get()));
-		if (!n_assign)
-			do_error_implicit(f, format("(auto init) no operator %s = %s found", e.type->long_name(), init.value->type->long_name()));
-		f->block->add(n_assign);
-
+		f->block->add(add_assign(f, "auto init", n_self->shift(e.offset, e.type), add_node_const(init.value.get())));
 	}
 
 	if (flags_has(t->flags, Flags::SHARED)) {
@@ -151,10 +145,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 		for (auto&& [i,e]: enumerate(t->elements))
 			if (!e.hidden()) {
 				auto param = add_node_local(f->__get_var(e.name));
-				auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, self->shift(e.offset, e.type), param);
-				if (!n_assign)
-					do_error_implicit(f, format("no operator %s = %s found", param->type->long_name(), e.type->long_name()));
-				f->block->add(n_assign);
+				f->block->add(add_assign(f, "", self->shift(e.offset, e.type), param));
 			}
 	} else {
 
@@ -228,11 +219,7 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 	if (t->parent) {
 		auto p = n_self->change_type(t->parent);
 		auto o = n_other->change_type(t->parent);
-
-		auto cmd_assign = parser->con.link_operator_id(OperatorID::ASSIGN, p, o);
-		if (!cmd_assign)
-			do_error_implicit(f, "missing parent default constructor");
-		f->block->add(cmd_assign);
+		f->block->add(add_assign(f, "", "missing parent default constructor", p, o));
 	}
 
 	// call child assignment
@@ -242,11 +229,7 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 			continue;
 		auto p = n_self->shift(e.offset, e.type);
 		auto o = n_other->shift(e.offset, e.type); // needed for call-by-ref conversion!
-
-		auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, p, o);
-		if (!n_assign)
-			do_error_implicit(f, format("no operator '%s = %s' for element '%s'", e.type->long_name(), e.type->long_name(), e.name));
-		f->block->add(n_assign);
+		f->block->add(add_assign(f, "", p, o));
 	}
 }
 

@@ -54,10 +54,10 @@ Grid ? ''
 
 func choose_preset(plug: TsunamiPlugin, f: int->void)
 	var dlg: shared![PresetDialog] = new PresetDialog(plug)
+	# FIXME: (kaba) lambda shared[X] capture
 	var _dlg = weak(dlg)
 	var ff = func()
-		for d in _dlg
-			f(d.selected)
+		f(_dlg.selected)
 	hui.fly(dlg, ff)
 
 class XXX extends TsunamiPlugin
@@ -118,12 +118,9 @@ class XXX extends TsunamiPlugin
 	#							prog.set("pitch shift", 0.2)
 
 	#	prog.set("remove samples", 0.7)
-		var to_del = [for s in session.song.samples weak(s) if s.ref_count == 0]
-		for _s in to_del
-			for s in _s
-				session.song.delete_sample(s)
-	#	del prog
-		
+		var to_del = [for s in session.song.samples s if s.ref_count == 0]
+		for s in to_del
+			session.song.delete_sample(s)
 		
 
 	

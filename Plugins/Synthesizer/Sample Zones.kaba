@@ -97,7 +97,7 @@ class SamplePanel extends ConfigPanel
 	var sc: SampleConfig&
 	var override c: SampleSynthesizer&
 	func override __init__(_s: Module)
-		sc := &!c.config
+		sc := &c.config
 		add_list_view("!expandx\\Note range\\Sample", 0, 0, "list")
 		#event("list", on_select)
 

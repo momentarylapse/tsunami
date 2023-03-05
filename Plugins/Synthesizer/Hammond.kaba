@@ -87,10 +87,10 @@ Grid ? '' vertical
 		event("attack", on_change)
 		event("release", on_change)
 		event("stutter", on_change)
-		hc := &!c.config
+		hc := &c.config
 		
 		grid.hc := hc
-		grid.p := &!self
+		grid.p := &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")

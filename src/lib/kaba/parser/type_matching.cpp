@@ -63,15 +63,15 @@ bool is_same_kind_of_pointer(const Class *a, const Class *b) {
 // can be re-interpreted as...?
 bool type_match_generic_pointer(const Class *given, const Class *wanted) {
 	// allow any non-owning pointer?
-	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_pointer_raw_not_null() or given->is_reference()))
+	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_reference()))
 		return true;
 
-	// allow any not-null non-owning pointer?
-	if ((wanted == TypePointerNN) and (given->is_pointer_raw_not_null() or given->is_reference()))
-		return true;
-
-	// reference
+	// any reference
 	if ((wanted == TypeReference) and given->is_reference())
+		return true;
+
+	// any xfer[..]?
+	if ((wanted->is_pointer_xfer() and wanted->param[0] == TypeVoid) and given->is_pointer_xfer())
 		return true;
 
 	return false;
@@ -106,12 +106,12 @@ bool type_match_up(const Class *given, const Class *wanted) {
 	//msg_write(given->long_name() + "  ->  " + wanted->long_name());
 
 	// ...  ->  raw
-	if (wanted->is_pointer_raw() and (given->is_reference() or given->is_pointer_raw_not_null() or given->is_pointer_owned() or given->is_pointer_owned_not_null()))
+	if (wanted->is_pointer_raw() and (given->is_reference() or given->is_pointer_owned() or given->is_pointer_owned_not_null()))
 		if (type_match_up(given->param[0], wanted->param[0]))
 			return true;
 
-	// ...  ->  raw
-	if (wanted->is_pointer_raw_not_null() and (given->is_reference() or given->is_pointer_owned_not_null()))
+	// ...  ->  ref
+	if (wanted->is_reference() and (given->is_reference() or given->is_pointer_owned_not_null()))
 		if (type_match_up(given->param[0], wanted->param[0]))
 			return true;
 
@@ -187,19 +187,20 @@ bool Concretifier::type_match_tuple_as_contructor(shared<Node> node, Function *f
 bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd) {
 	cd.penalty = 0;
 	cd.cast = TypeCastId::NONE;
-	cd.pre_deref = false;
+	cd.pre_deref_count = 0;
 	auto given = node->type;
+
+	//msg_write("?   " + given->long_name() + " -> " + wanted->long_name());
 
 
 	if (given->is_some_pointer_not_null()) {
 		CastingData cd_sub;
-		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub))
-			if (!cd.pre_deref) {
-				cd = cd_sub;
-				cd.pre_deref = true;
-				cd.penalty += 10;
-				return true;
-			}
+		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub)) {
+			cd = cd_sub;
+			cd.pre_deref_count ++;
+			cd.penalty += 10;
+			return true;
+		}
 	}
 
 	if (is_modifiable) {
@@ -446,11 +447,11 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 }
 
 shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node> node, const Class *wanted) {
-	if (cast.pre_deref) {
-		return apply_type_cast_basic(cast, node->deref(), wanted);
-	} else {
-		return apply_type_cast_basic(cast, node, wanted);
+	if (cast.pre_deref_count > 0) {
+		for (int i=0; i<cast.pre_deref_count; i++)
+			node = node->deref();
 	}
+	return apply_type_cast_basic(cast, node, wanted);
 }
 
 }

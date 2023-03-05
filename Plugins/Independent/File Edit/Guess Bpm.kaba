@@ -169,7 +169,7 @@ Grid ? '' vertical
 		Button ok Create default")
 		set_int("beats", beats_per_bar)
 		check("discrete", discrete)
-		fb := &!_fb
+		fb := &_fb
 		buf_len = len(buf)
 		novelty = calc_novelty(buf)
 	
@@ -194,7 +194,7 @@ Grid ? '' vertical
 	func mut on_ok()
 		var song = fb.session.song
 		song.begin_action_group("guess bpm")
-		if not weak(song.time_track())
+		if not song.time_track()
 			song.add_track(SignalType.TIME, 0)
 		var length: int = (fb.session.sample_rate() * 60 * beats_per_bar) / grid.bpm_opt
 		var bar = Bar(length, beats_per_bar, 1)

@@ -16,7 +16,7 @@ class PLPanel extends ConfigPanel
 	
 	func __init__(l: PracticeLooper)
 		super.__init__(l)
-		looper := &!l
+		looper := &l
 		from_source("
 Grid ? '' vertical
 	Label ? 'Do not edit the file (even adjusting volumes)!' bold italic

@@ -88,8 +88,8 @@ class FontList as @noauto
 		if n < 0
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
-			return &!dummy
-		return &!fonts[n]
+			return &dummy
+		return &fonts[n]
 	
 	func mut get_synth(session: Session, name: string, instrument: string) -> xfer[Synthesizer]
 		var font = get(session, name)
@@ -130,7 +130,7 @@ class FontPanel extends ConfigPanel
 	var override c: FontSynthesizer&
 	func override __init__(_s: Module)
 		#super.__init__(_s)
-		sc := &!c.config
+		sc := &c.config
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
 		add_label("Set", 0 ,0, "")

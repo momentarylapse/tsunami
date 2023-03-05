@@ -83,7 +83,7 @@ class FMPanel extends ConfigPanel
 		menu_top.add(label, "top-{{id}}")
 	
 	func override __init__(_s: Module)
-		fc := &!c.config
+		fc := &c.config
 		
 		from_source("
 Grid ? ''
@@ -323,7 +323,7 @@ Grid ? ''
 			if abs(mx - z.x) + abs(my - z.y) < 20
 				return i
 		if my > v2y(1.1) and chosen >= 0
-			var o = &!fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			if abs(mx - t2x(o.attack)) < 10
 				return -10
 			if abs(mx - t2x(o.attack + o.decay)) < 10
@@ -348,7 +348,7 @@ Grid ? ''
 		let mx = e.mouse.x
 		let my = e.mouse.y
 		if moving < -5 and chosen >= 0
-			var o = &!fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			if moving == -10
 				o.attack = clamp(x2t(mx), 0.0002, 2)
 			if moving == -11
@@ -408,14 +408,14 @@ Grid ? ''
 	func mut on_spin_button()
 		if chosen < 0
 			return
-		var o = &!fc.osc[chosen]
+		var o = &fc.osc[chosen]
 		o.factor = get_float("factor")
 		o.amplitude = get_float("amplitude")
 		changed()
 	
 	func override update()
 		if chosen >= 0
-			var o = &!fc.osc[chosen]
+			var o = &fc.osc[chosen]
 			set_float("factor", o.factor)
 			set_float("amplitude", o.amplitude)
 		update_osci_pos()

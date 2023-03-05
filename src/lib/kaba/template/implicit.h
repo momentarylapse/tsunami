@@ -108,6 +108,9 @@ public:
 	void db_add_print_label(shared<Block> block, const string &s);
 	void db_add_print_label_node(shared<Block> block, const string &s, shared<Node> node);
 
+	shared<Node> add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
+	shared<Node> add_assign(Function *f, const string &ctx, const string &msg, shared<Node> a, shared<Node> b);
+
 
 	static bool needs_new(Function *f);
 	static Array<string> class_func_param_names(Function *cf);

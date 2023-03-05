@@ -107,14 +107,14 @@ Grid ? ''
 		Button export 'Export' image=hui:save")
 		
 		var view = plugin.session.view
-		dmis := &!plugin
+		dmis := &plugin
 		song = plugin.session.song
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range().offset / float(song.sample_rate), view.sel.range().end() / float(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		#grid.allow_bg = false
-		grid.plugin := &!plugin
+		grid.plugin := &plugin
 		grid.create_pitch = -1
 		grid.x_offset = view.sel.range().offset
 		grid.x_scale = song.sample_rate

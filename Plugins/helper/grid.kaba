@@ -240,8 +240,8 @@ class Grid extends Object
 		col_hover = colors.hover
 		col_sel = colors.selection
 		allow_bg = true
-		x_axis.grid := &!self
-		y_axis.grid := &!self
+		x_axis.grid := &self
+		y_axis.grid := &self
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
 
@@ -496,7 +496,7 @@ class Grid extends Object
 
 	func mut init(_panel: Panel, _id: string)
 		data_init()
-		panel := &!_panel
+		panel := &_panel
 		id = _id
 		panel.event_x(id, "hui:draw", on_draw_all)
 		panel.event_x(id, "hui:left-button-down", on_left_button_down_all)

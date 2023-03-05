@@ -27,7 +27,7 @@ struct CastingData {
 	int cast;
 	int penalty;
 	Function *f;
-	bool pre_deref;
+	unsigned char pre_deref_count;
 };
 
 class Concretifier {

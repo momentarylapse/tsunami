@@ -57,24 +57,16 @@ void AutoImplementer::implement_callable_constructor(Function *f, const Class *t
 	// self.fp = p
 	{
 		auto n_p = add_node_local(f->__get_var("p"));
-
 		auto fp = get_callable_fp(t, self);
-		auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, fp, n_p);
-		if (!n_assign)
-			do_error_implicit(f, format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"));
-		f->block->add(n_assign);
+		f->block->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"), fp, n_p));
 	}
 
 	int i_capture = 0;
 	for (auto &e: t->elements)
 		if (e.name.head(7) == "capture") {
 			auto n_p = add_node_local(f->__get_var(DUMMY_PARAMS[i_capture ++]));
-
 			auto fp = self->shift(e.offset, e.type);
-			auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, fp, n_p);
-			if (!n_assign)
-				do_error_implicit(f, format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"));
-			f->block->add(n_assign);
+			f->block->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"), fp, n_p));
 		}
 }
 

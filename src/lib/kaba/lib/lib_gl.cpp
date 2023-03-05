@@ -298,12 +298,12 @@ void SIAddPackageGl(Context *c) {
 	add_class(TypeBuffer);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Buffer::__delete__));
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update));
-			func_add_param("data", TypePointerNN);
+			func_add_param("data", TypeReference);
 			func_add_param("size", TypeInt);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update_array));
 			func_add_param("data", TypeDynamicArray);
 		class_add_func("read", TypeVoid, gl_p(&nix::Buffer::read));
-			func_add_param("data", TypePointerNN);
+			func_add_param("data", TypeReference);
 			func_add_param("size", TypeInt);
 		class_add_func("read", TypeVoid, gl_p(&nix::Buffer::read_array));
 			func_add_param("data", TypeDynamicArray);

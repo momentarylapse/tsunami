@@ -181,8 +181,8 @@ class CompressorPanel extends ConfigPanel
 		add_spin_button("!range=0:1000:0.1\\", 4, 0, "release")
 		add_label("ms", 5, 0, "")
 		
-		grid.config := &!c.config
-		grid.cp := &!self
+		grid.config := &c.config
+		grid.cp := &self
 		
 		event("attack", on_edit)
 		event("release", on_edit)

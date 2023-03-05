@@ -62,14 +62,13 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 	if (!f)
 		return;
 
-	auto te = t->get_array_element();
 	auto n_other = add_node_local(f->__get_var("other"));
 	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
 
-	// for el,i in *self
+	// for i=>el in self
 	//    el = other[i]
 
-	auto *v_el = f->block->add_var("el", tree->get_pointer(t->get_array_element()));
+	auto *v_el = f->block->add_var("el", tree->request_implicit_class_reference(t->get_array_element(), -1));
 	auto *v_i = f->block->add_var("i", TypeInt);
 
 	Block *b = new Block(f, f->block.get());
@@ -77,10 +76,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 	// other[i]
 	shared<Node> n_other_el = add_node_array(n_other, add_node_local(v_i));
 
-	auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, add_node_local(v_el)->deref(), n_other_el);
-	if (!n_assign)
-		do_error_implicit(f, format("no operator %s = %s found", te->long_name(), te->long_name()));
-	b->add(n_assign);
+	b->add(add_assign(f, "", add_node_local(v_el)->deref(), n_other_el));
 
 	auto n_for = add_node_statement(StatementID::FOR_CONTAINER);
 	// [VAR, INDEX, ARRAY, BLOCK]

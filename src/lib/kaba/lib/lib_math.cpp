@@ -909,7 +909,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func(Identifier::Func::STR, TypeString, &Any::str, Flags::PURE);
 		class_add_func(Identifier::Func::REPR, TypeString, &Any::repr, Flags::PURE);
 		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
-			func_add_param("var", TypePointerNN);
+			func_add_param("var", TypeReference);
 			func_add_param("type", TypeClassP);
 		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);

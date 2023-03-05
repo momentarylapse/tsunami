@@ -192,32 +192,31 @@ Grid ? '' vertical
 		if cur_bar_index + 1 < len(song.bars)
 			next_bar = weak(song.bars[cur_bar_index + 1])
 		
-		for b in cur_bar
-			var offset = b.offset
-			var cur_part = get_part(&!t, offset + DELTA)
-			var next_part = get_part(&!t, offset + b.length + DELTA)
-			p.set_color(colors.text_soft2)
-			var fs = h * 0.08
-			p.set_font_size(fs)
-			for cp in cur_part
-				p.draw_str([10, 5], cp.text)
-				var first_bar = bar_index(&!song, cp.range.offset + DELTA)
-				p.draw_str([w - 5 - fs*3, 5], str((b.index - first_bar) + 2))
+		var offset = cur_bar.offset
+		var cur_part = get_part(&t, offset + DELTA)
+		var next_part = get_part(&t, offset + cur_bar.length + DELTA)
+		p.set_color(colors.text_soft2)
+		var fs = h * 0.08
+		p.set_font_size(fs)
+		for cp in cur_part
+			p.draw_str([10, 5], cp.text)
+			var first_bar = bar_index(weak(song), cp.range.offset + DELTA)
+			p.draw_str([w - 5 - fs*3, 5], str((cur_bar.index - first_bar) + 2))
 	
-			var change: string
-			for np in next_part
-				if next_part != cur_part
-					change = np.text
-			for nb in next_bar
-				if len(nb.beats) != len(b.beats)
-					change += "  {{len(nb.beats)}}/₄"
-				var cur_bpm = b.bpm(song.sample_rate)
-				var next_bpm = nb.bpm(song.sample_rate)
-				if abs(cur_bpm - next_bpm) > 2
-					change += "  {{next_bpm|.0}} bpm"
-			if len(change) > 0
-				p.set_color(colors.text)
-				p.draw_str([20, 5 + fs*1.2 + 5], "> {{change}}")
+		var change: string
+		for np in next_part
+			if next_part != cur_part
+				change = np.text
+		for nb in next_bar
+			if len(nb.beats) != len(cur_bar.beats)
+				change += "  {{len(nb.beats)}}/₄"
+			var cur_bpm = cur_bar.bpm(song.sample_rate)
+			var next_bpm = nb.bpm(song.sample_rate)
+			if abs(cur_bpm - next_bpm) > 2
+				change += "  {{next_bpm|.0}} bpm"
+		if len(change) > 0
+			p.set_color(colors.text)
+			p.draw_str([20, 5 + fs*1.2 + 5], "> {{change}}")
 				
 	
 	func mut on_area_right_button_down()
@@ -274,7 +273,7 @@ class Metronome extends TsunamiPlugin
 		session.view.signal_chain.set_buffer_size(1024)
 			
 	func override create_panel() -> xfer[ConfigPanel]
-		return new MetronomePanel(&!self)
+		return new MetronomePanel(&self)
 		
 	func override on_stop()
 		pass

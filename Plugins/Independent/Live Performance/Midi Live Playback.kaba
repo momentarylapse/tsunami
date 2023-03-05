@@ -6,7 +6,7 @@ class MLPPanel extends ConfigPanel
 	var synth_panel: shared[ConfigPanel]
 	func __init__(_session: Session, _mlp: MidiLivePlayback)
 		super.__init__(_mlp)
-		session := &!_session
+		session := &_session
 		from_source("Grid grid ''
 	Button select-synth 'select synthesizer...' expandx image=hui:open")
 		event("select-synth", on_select_synth)

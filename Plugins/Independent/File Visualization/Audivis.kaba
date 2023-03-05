@@ -23,7 +23,7 @@ class PPPanel extends ConfigPanel
 		super.__init__(l)
 		from_source("
 Button forward 'Forward' expandx expandy")
-		looper := &!l
+		looper := &l
 
 		event("forward", on_forward)
 	
@@ -88,7 +88,7 @@ class Looper extends TsunamiPlugin
 	func mut on_update()
 		var pos = renderer.get_pos(0)
 		var p = get_part(song, pos)
-		if p != weak(cur_part)
+		if p != cur_part
 			for c in cur_part
 				on_leave_part(c)
 			cur_part = p

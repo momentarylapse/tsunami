@@ -236,8 +236,8 @@ class MultiEchoPanel extends ConfigPanel
 Grid ? ''
 	DrawingArea drawing '' grabfocus expandx expandy")
 	
-		grid.config := &!c.config
-		grid.cp := &!self
+		grid.config := &c.config
+		grid.cp := &self
 		grid.init(self, "drawing")
 		grid.post_init()
 	

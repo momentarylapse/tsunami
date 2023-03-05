@@ -90,7 +90,7 @@ Variable *Function::__get_var(const string &name) const {
 }
 
 Variable *Function::add_param(const string &name, const Class *type, Flags flags) {
-	auto v = block->add_var(name, type);
+	auto v = block->insert_var(num_params, name, type);
 	if (flags_has(flags, Flags::OUT))
 		flags_set(v->flags, Flags::OUT);
 	else

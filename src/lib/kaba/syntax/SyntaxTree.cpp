@@ -558,12 +558,6 @@ const Class *SyntaxTree::request_implicit_class_pointer(const Class *base, int t
 //	return request_implicit_class(format("%s[%s]", Identifier::RAW_POINTER, base->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
-const Class *SyntaxTree::request_implicit_class_pointer_not_null(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("ptr![..] not allowed for: " + base->long_name(), token_id); // TODO
-	return request_implicit_class(format("%s![%s]", Identifier::RAW_POINTER, base->name), Class::Type::POINTER_RAW_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
-}
-
 const Class *SyntaxTree::request_implicit_class_shared(const Class *base, int token_id) {
 	if (!base->name_space)
 		do_error("shared[..] not allowed for: " + base->long_name(), token_id); // TODO

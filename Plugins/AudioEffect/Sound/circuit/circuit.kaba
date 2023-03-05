@@ -343,7 +343,7 @@ class Circuit as @noauto
 			
 	func mut add_default(n: int[], t: EdgeType) -> Edge&
 		edges.add(_create_default(n, t))
-		return &!(edges[len(edges)-1])
+		return &(edges[len(edges)-1])
 
 func _main()
 	var c: Circuit

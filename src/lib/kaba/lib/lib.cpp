@@ -37,7 +37,6 @@ const Class *TypeReg16;
 const Class *TypeReg8;
 const Class *TypeVoid;
 const Class *TypePointer;
-const Class *TypePointerNN;
 const Class *TypeReference;
 const Class *TypeNone; // nil
 const Class *TypeObject;
@@ -167,15 +166,6 @@ const Class *add_type_p_raw(const Class *sub_type) {
 	//string name = format("%s[%s]", Identifier::RAW_POINTER, sub_type->name);
 	string name = sub_type->name + "*";
 	Class *t = new Class(Class::Type::POINTER_RAW, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
-	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-	__add_class__(t, sub_type->name_space);
-	cur_package->context->implicit_class_registry->add(t);
-	return t;
-}
-
-const Class *add_type_p_raw_not_null(const Class *sub_type) {
-	string name = format("%s![%s]", Identifier::RAW_POINTER, sub_type->name);
-	Class *t = new Class(Class::Type::POINTER_RAW_NOT_NULL, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
 	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->implicit_class_registry->add(t);

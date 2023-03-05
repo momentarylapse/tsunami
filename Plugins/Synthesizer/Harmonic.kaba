@@ -64,10 +64,10 @@ class HarmonicPanel extends ConfigPanel
 		add_spin_button("!range=0:500:0.1,expandx\\0", 1, 0, "release")
 		add_label("ms", 2, 0, "")
 		event("release", on_change)
-		hc := &!c.config
+		hc := &c.config
 		
 		grid.hc := hc
-		grid.p := &!self
+		grid.p := &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")

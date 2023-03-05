@@ -44,7 +44,7 @@ class UnisonPanel extends ConfigPanel
 	
 	var override c: UnisonSynthesizer&
 	func override __init__(_s: Module)
-		fc := &!c.config
+		fc := &c.config
 		
 		from_source("
 Grid ? ''
@@ -242,13 +242,13 @@ class UnisonRenderer extends PitchRenderer
 		var c = &synth.config
 
 	func override on_config()
-		var c = &!synth.config
+		var c = &synth.config
 		osc.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
 		osc.env.set2(c.initial, c.peak)
 
 	func override render(out buf: AudioBuffer) -> bool
 	
-		var c = &!synth.config
+		var c = &synth.config
 		var vv = [for k in 0:c.num_voices c.blend]
 		vv[c.num_voices/2] = 1.0
 		

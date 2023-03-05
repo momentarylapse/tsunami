@@ -130,8 +130,8 @@ Grid ? '' vertical
 	
 		#EventMX("drawing", "hui:draw", self, &OnDraw)
 	
-		grid.config := &!c.config
-		grid.cp := &!self
+		grid.config := &c.config
+		grid.cp := &self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")

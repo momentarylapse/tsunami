@@ -105,10 +105,7 @@ public:
 	void _cdecl set_cursor_pos(int x,int y);
 	void _cdecl show_cursor(bool show);
 
-	// status bar
-	void _cdecl enable_statusbar(bool enabled);
-	//bool _cdecl is_statusbar_enabled();
-	void _cdecl set_status_text(const string &str);
+	// info bar
 	void _cdecl set_info_text(const string &str, const Array<string> &options);
 
 	// events by overwriting
@@ -158,7 +155,7 @@ public:
 	GtkWidget *window;
 private:
 public:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar;
+	GtkWidget *vbox, *hbox, *menubar;
 	shared<Control> header_bar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;

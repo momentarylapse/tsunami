@@ -44,10 +44,14 @@ Toolbar::~Toolbar() {
 
 
 void Toolbar::enable(bool _enabled) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_set_visible(widget, _enabled);
+#else
 	if (_enabled)
 		gtk_widget_show(widget);
 	else
 		gtk_widget_hide(widget);
+#endif
 	enabled = _enabled;
 }
 

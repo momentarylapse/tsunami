@@ -133,10 +133,14 @@ void Control::enable(bool _enabled) {
 }
 
 void Control::hide(bool hidden) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_set_visible(widget, !hidden);
+#else
 	if (hidden)
 		gtk_widget_hide(widget);
 	else
 		gtk_widget_show(widget);
+#endif
 }
 
 void Control::set_tooltip(const string& str) {

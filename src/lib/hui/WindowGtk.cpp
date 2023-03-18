@@ -125,7 +125,6 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 	window = nullptr;
 	win = this;
 	header_bar = nullptr;
-	statusbar = nullptr;
 	requested_destroy = false;
 
 	if ((mode & WIN_MODE_DUMMY) > 0)
@@ -263,10 +262,6 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 
 		gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);
 		gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_BOTTOM]->widget, FALSE, FALSE, 0);
-
-		// status bar
-		statusbar = gtk_statusbar_new();
-		gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 #endif
 	}
 }
@@ -639,18 +634,6 @@ void Window::set_fullscreen(bool fullscreen) {
 		gtk_window_unfullscreen(GTK_WINDOW(window));
 }
 
-void Window::enable_statusbar(bool enabled) {
-	if (enabled)
-	    gtk_widget_show(statusbar);
-	else
-	    gtk_widget_hide(statusbar);
-	statusbar_enabled = enabled;
-}
-
-void Window::set_status_text(const string &str) {
-	gtk_statusbar_push(GTK_STATUSBAR(statusbar),0,sys_str(str));
-}
-
 static Array<string> __info_bar_responses;
 static int make_info_bar_response(const string &id) {
 	for (auto&& [i,_id]: enumerate(__info_bar_responses))
@@ -749,10 +732,19 @@ void Window::set_info_text(const string &str, const Array<string> &options) {
 	gtk_info_bar_set_show_close_button(GTK_INFO_BAR(infobar->widget), allow_close);
 
 	if (sa_contains(options, "clear")) {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_set_visible(infobar->widget, false);
+#else
 		gtk_widget_hide(infobar->widget);
+#endif
 	} else {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_set_visible(infobar->widget, true);
+		gtk_widget_set_visible(infobar->label, true);
+#else
 		gtk_widget_show(infobar->widget);
 		gtk_widget_show(infobar->label);
+#endif
 	}
 //#endif
 }
@@ -769,8 +761,6 @@ void Window::__set_options(const string &options) {
 			//gtk_window_set_resizable(GTK_WINDOW(window), val_is_positive(val, true));
 		} else if (op == "headerbar") {
 			_add_headerbar();
-		} else if (op == "statusbar") {
-			enable_statusbar(val_is_positive(val, true));
 		} else if (op == "closebutton") {
 			if (header_bar)
 				header_bar->set_options(op + "=" + val);

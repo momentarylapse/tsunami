@@ -311,9 +311,19 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 		set_target("");
 
-		if (hui::config.get_bool("Window.HideMenu", false))
+
+		if (hui::config.get_bool("Window.HideMenu", false)) {
+#if GTK_CHECK_VERSION(4,0,0)
+			gtk_widget_set_visible(menubar, false);
+#else
 			gtk_widget_hide(menubar);
+#endif
+		}
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_set_visible(toolbar[0]->widget, false);
+#else
 		gtk_widget_hide(toolbar[0]->widget);
+#endif
 
 		set_menu(nullptr);
 	} else {

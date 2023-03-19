@@ -134,7 +134,11 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 
 	// creation
 	if (is_dialog()) {
+#if GTK_CHECK_VERSION(4,0,0)
+		window = gtk_window_new();
+#else
 		window = gtk_dialog_new();
+#endif
 
 
 		if (!allow_parent)
@@ -202,7 +206,12 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #endif
 	if (is_dialog()) {
+#if GTK_CHECK_VERSION(4,0,0)
+		vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+		gtk_window_set_child(GTK_WINDOW(window), vbox);
+#else
 		vbox = gtk_dialog_get_content_area(GTK_DIALOG(window));
+#endif
 		plugable = vbox;
 		target_control = nullptr;
 	} else {
@@ -213,7 +222,10 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 #else
 		gtk_container_add(GTK_CONTAINER(window), vbox);
 #endif
+
+#if !GTK_CHECK_VERSION(4,0,0)
 		gtk_widget_show(vbox);
+#endif
 
 #if GTK_CHECK_VERSION(4,0,0)
 		plugable = vbox;
@@ -230,7 +242,6 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 		gtk_box_append(GTK_BOX(vbox), toolbar[TOOLBAR_TOP]->widget);
 
 		plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-		gtk_widget_show(plugable);
 		//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
 		gtk_box_append(GTK_BOX(vbox), plugable);
 #else
@@ -305,17 +316,47 @@ void Window::__delete__() {
 	this->Window::~Window();
 }
 
+namespace WindowFlightManager {
+	static shared_array<Window> windows;
+	void add(shared<Window> win) {
+		windows.add(win);
+	}
+	void remove(Window *win) {
+		for (int i=0; i<windows.num; i++)
+			if (windows[i] == win)
+				windows.erase(i);
+	}
+	void request_destroy(Window *win) {
+		hui::run_later(0.01f, [win] {
+			if (win->end_run_callback)
+				win->end_run_callback();
+			remove(win);
+			//win->requested_destroy = false;
+		});
+	}
+}
+
 void Window::request_destroy() {
+	if (requested_destroy)
+		return;
+#if GTK_CHECK_VERSION(4,0,0)
+	WindowFlightManager::request_destroy(this);
+#else
 	if (is_dialog()) {
 		gtk_dialog_response(GTK_DIALOG(window), GTK_RESPONSE_DELETE_EVENT);
 	}
+#endif
 	requested_destroy = true;
 }
 
 // should be called after creating (and filling) the window to actually show it
 void Window::show() {
 	allow_input = true;
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_set_visible(window, true);
+#else
 	gtk_widget_show(window);
+#endif
 }
 
 
@@ -327,23 +368,9 @@ void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_dat
 	run_later(0.01f, [win] { delete win; });
 }
 
-namespace WindowFlightManager {
-	static shared_array<Window> windows;
-	void add(shared<Window> win) {
-		windows.add(win);
-	}
-	void remove(Window *win) {
-		for (int i=0; i<windows.num; i++)
-			if (windows[i] == win)
-				windows.erase(i);
-	}
-}
-
 void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user_data) {
 	auto win = reinterpret_cast<Window*>(user_data);
-	if (win->end_run_callback)
-		win->end_run_callback();
-	run_later(0.01f, [win] { WindowFlightManager::remove(win); });
+	WindowFlightManager::request_destroy(win);
 }
 
 void fly(shared<Window> win, Callback cb) {
@@ -357,7 +384,7 @@ void fly(shared<Window> win, Callback cb) {
 	win->end_run_callback = cb;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
+	//g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
 	gtk_window_present(GTK_WINDOW(win->window));
 #else
 	g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
@@ -403,12 +430,12 @@ void Window::set_menu(xfer<Menu> _menu) {
 		_connect_menu_to_panel(menu.get());
 
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(menu->gmenu));
-		gtk_widget_show(menubar);
+		gtk_widget_set_visible(menubar, true);
 	} else {
 		menu = _menu;
 		auto dummy = g_menu_new();
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menubar), G_MENU_MODEL(dummy));
-		gtk_widget_hide(menubar);
+		gtk_widget_set_visible(menubar, false);
 	}
 	// only one group allowed!
 
@@ -449,7 +476,11 @@ void Window::set_menu(xfer<Menu> _menu) {
 		}
 
 	} else {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_set_visible(menubar, false);
+#else
 		gtk_widget_hide(menubar);
+#endif
 	}
 #endif
 }
@@ -481,7 +512,11 @@ void Window::add_action_checkable(const string &id) {
 
 // show/hide without closing the window
 void Window::hide() {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_set_visible(window, false);
+#else
 	gtk_widget_hide(window);
+#endif
 }
 
 // set the string in the title bar

@@ -1,6 +1,7 @@
 #include "hui.h"
 #ifdef HUI_API_GTK
 
+#include "../base/optional.h"
 #include "../os/file.h"
 #include "../os/filesystem.h"
 
@@ -10,9 +11,9 @@ namespace hui
 
 struct DialogParams {
 	string filter, show_filter;
-	string font;
-	string default_name;
-	string default_extension;
+	base::optional<string> font;
+	base::optional<string> default_name;
+	base::optional<string> default_extension;
 	bool multiple_files = false;
 
 	static DialogParams parse(const Array<string> &params) {
@@ -44,8 +45,8 @@ struct DialogParams {
 	static DialogParams STATIC_PARAMS;
 
 	Path try_to_ensure_extension(const Path &filename) {
-		if (filename.extension() == "" and default_extension != "")
-			return filename.with("." + default_extension);
+		if (filename.extension() == "" and default_extension)
+			return filename.with("." + *default_extension);
 
 		return filename;
 
@@ -80,7 +81,46 @@ static GtkWindow *get_window_save(Window *win) {
 #endif
 
 static FileDialogCallback cur_file_callback;
-void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
+
+#if GTK_CHECK_VERSION(4,10,0)
+static void on_file_dialog_open(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_FILE_DIALOG(o);
+	if (auto f = gtk_file_dialog_open_finish(dlg, res, nullptr))
+		cur_file_callback(g_file_get_path(f));
+	else
+		cur_file_callback("");
+}
+static void on_file_dialog_save(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_FILE_DIALOG(o);
+	if (auto f = gtk_file_dialog_save_finish(dlg, res, nullptr))
+		cur_file_callback(g_file_get_path(f));
+	else
+		cur_file_callback("");
+}
+static void on_file_dialog_dir(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_FILE_DIALOG(o);
+	if (auto f = gtk_file_dialog_select_folder_finish(dlg, res, nullptr))
+		cur_file_callback(g_file_get_path(f));
+	else
+		cur_file_callback("");
+}
+
+static void add_filters(GtkFileDialog *dlg, const DialogParams &p) {
+	auto ls = g_list_store_new(G_TYPE_OBJECT);
+	Array<string> show_filter_list = p.show_filter.explode("|");
+	Array<string> filter_list = p.filter.explode("|");
+	for (int i=0; i<min(show_filter_list.num, filter_list.num); i++){
+		GtkFileFilter *gtk_filter = gtk_file_filter_new();
+		gtk_file_filter_set_name(gtk_filter, sys_str(show_filter_list[i]));
+		auto filters = filter_list[i].explode(";");
+		for (string &f: filters)
+			gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
+		g_list_store_append(ls, gtk_filter);
+	}
+	gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(ls));
+}
+#else
+static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		auto fn = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(self));
 		gtk_window_destroy(GTK_WINDOW(self));
@@ -91,11 +131,31 @@ void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer use
 	}
 }
 
+static void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter) {
+	Array<string> show_filter_list = show_filter.explode("|");
+	Array<string> filter_list = filter.explode("|");
+	for (int i=0; i<min(show_filter_list.num, filter_list.num); i++){
+		GtkFileFilter *gtk_filter = gtk_file_filter_new();
+		gtk_file_filter_set_name(gtk_filter, sys_str(show_filter_list[i]));
+		auto filters = filter_list[i].explode(";");
+		for (string &f: filters)
+			gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
+		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
+	}
+}
+#endif
+
 // choose a directory (<dir> will be selected initially)
 void file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
-#if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_file_dialog_new();
+	gtk_file_dialog_set_title(dlg, sys_str(title));
+	if (dir)
+		gtk_file_dialog_set_initial_folder(dlg, g_file_new_for_path(dir.str().c_str()));
+	gtk_file_dialog_select_folder(dlg, w, nullptr, &on_file_dialog_dir, nullptr);
+#elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -108,7 +168,6 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
-	GtkWindow *w = get_window_save(win);
 	GtkWidget* dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -128,25 +187,23 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 #endif
 }
 
-void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter) {
-	Array<string> show_filter_list = show_filter.explode("|");
-	Array<string> filter_list = filter.explode("|");
-	for (int i=0; i<min(show_filter_list.num, filter_list.num); i++){
-		GtkFileFilter *gtk_filter = gtk_file_filter_new();
-		gtk_file_filter_set_name(gtk_filter, sys_str(show_filter_list[i]));
-		auto filters = filter_list[i].explode(";");
-		for (string &f: filters)
-			gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
-		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
-	}
-}
-
 // file selection for opening (filter should look like "*.txt")
 void file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
-#if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_file_dialog_new();
+	gtk_file_dialog_set_title(dlg, sys_str(title));
+	if (dir)
+		gtk_file_dialog_set_initial_folder(dlg, g_file_new_for_path(dir.str().c_str()));
+	add_filters(dlg, p);
+	cur_file_callback = cb;
+	/*if (p.multiple_files)
+		gtk_file_dialog_open_multiple(dlg, w, nullptr, &on_file_dialog_open_multi, nullptr);
+	else*/
+		gtk_file_dialog_open(dlg, w, nullptr, &on_file_dialog_open, nullptr);
+#elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -167,7 +224,6 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 	gtk_window_present(GTK_WINDOW(dlg));
 
 #else
-	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -197,8 +253,16 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 void file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
-#if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_file_dialog_new();
+	gtk_file_dialog_set_title(dlg, sys_str(title));
+	if (dir)
+		gtk_file_dialog_set_initial_folder(dlg, g_file_new_for_path(dir.str().c_str()));
+	add_filters(dlg, p);
+	cur_file_callback = cb;
+	gtk_file_dialog_save(dlg, w, nullptr, &on_file_dialog_save, nullptr);
+#elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -213,16 +277,13 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), path, nullptr);
 		//g_object_unref(path);
 	}
-	if (p.default_name.num > 0)
-		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(p.default_name));
+	if (p.default_name)
+		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(*p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
 	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
-
 #else
-
-	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -233,8 +294,8 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dlg), TRUE);
 	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
-	if (p.default_name.num > 0)
-		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(p.default_name));
+	if (p.default_name)
+		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(*p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -252,7 +313,17 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 
 
 static FontDialogCallback cur_font_callback;
-void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
+
+#if GTK_CHECK_VERSION(4,10,0)
+static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_FONT_DIALOG(o);
+	if (auto f = gtk_font_dialog_choose_font_finish(dlg, res, nullptr))
+		cur_font_callback(pango_font_description_to_string(f));
+	//else
+	//	cur_font_callback("");
+}
+#else
+static void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(self));
 		cur_font_callback(fn);
@@ -260,20 +331,29 @@ void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer use
 	}
 	gtk_window_destroy(GTK_WINDOW(self));
 }
+#endif
 
 void select_font(Window *win, const string &title, const Array<string> &params, const FontDialogCallback &cb) {
 	auto p = DialogParams::parse(params);
-#if GTK_CHECK_VERSION(4,0,0)
 	GtkWindow *w = get_window_save(win);
+	cur_font_callback = cb;
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_font_dialog_new();
+	gtk_font_dialog_set_title(dlg, sys_str(title));
+	PangoFontDescription *f0 = nullptr;
+	if (p.font)
+		f0 = pango_font_description_from_string((*p.font).c_str());
+	gtk_font_dialog_choose_font(dlg, w, f0, nullptr, &on_select_font, nullptr);
+	if (f0)
+		g_object_unref(f0);
+#elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
-	gtk_font_chooser_set_font(GTK_FONT_CHOOSER(dlg), p.font.c_str());
-
-	cur_font_callback = cb;
+	if (p.font)
+		gtk_font_chooser_set_font(GTK_FONT_CHOOSER(dlg), (*p.font).c_str());
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_font_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #elif GTK_CHECK_VERSION(3,0,0)
-	GtkWindow *w = get_window_save(win);
 	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_widget_show_all(dlg);
@@ -295,7 +375,15 @@ GdkRGBA color_to_gdk(const color &c);
 color color_from_gdk(const GdkRGBA &gcol);
 
 static ColorDialogCallback cur_color_callback;
-void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
+
+#if GTK_CHECK_VERSION(4,10,0)
+static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_COLOR_DIALOG(o);
+	if (auto c = gtk_color_dialog_choose_rgba_finish(dlg, res, nullptr))
+		cur_color_callback(color_from_gdk(*c));
+}
+#else
+static void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		GdkRGBA gcol;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(self), &gcol);
@@ -303,26 +391,25 @@ void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer us
 	}
 	gtk_window_destroy(GTK_WINDOW(self));
 }
-
+#endif
 
 void select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb) {
 	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
-#if GTK_CHECK_VERSION(4,0,0)
-
 	GtkWindow *w = get_window_save(win);
-	auto dlg = gtk_color_chooser_dialog_new("Color", w);
-
-	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-
 	cur_color_callback = cb;
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_color_dialog_new();
+	gtk_color_dialog_set_title(dlg, sys_str(title));
+	//gtk_color_dialog_set_with_alpha(dlg, true);
+	gtk_color_dialog_choose_rgba(dlg, w, &gcol, nullptr, &on_select_color, nullptr);
+#elif GTK_CHECK_VERSION(4,0,0)
+	auto dlg = gtk_color_chooser_dialog_new("Color", w);
+	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_color_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
-	GtkWindow *w = get_window_save(win);
 	auto dlg = gtk_color_chooser_dialog_new("Color", w);
-
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-
 	gtk_widget_show_all(dlg);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_OK) {
@@ -335,7 +422,19 @@ void select_color(Window *win, const string &title, const color &c, const ColorD
 
 
 static QuestionDialogCallback cur_question_callback;
-void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
+#if GTK_CHECK_VERSION(4,10,0)
+static void on_question_reply(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_ALERT_DIALOG(o);
+	int r = gtk_alert_dialog_choose_finish(dlg, res, nullptr);
+	if (r == 0)
+		cur_question_callback("hui:yes");
+	else if (r == 1)
+		cur_question_callback("hui:no");
+	else
+		cur_question_callback("hui:cancel");
+}
+#else
+static void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_YES)
 		cur_question_callback("hui:yes");
 	else if (response_id == GTK_RESPONSE_NO)
@@ -344,15 +443,29 @@ void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer
 		cur_question_callback("hui:cancel");
 	gtk_window_destroy(GTK_WINDOW(self));
 }
+#endif
 
 void question_box(Window *win, const string &title, const string &text, const QuestionDialogCallback &cb, bool allow_cancel) {
 	GtkWindow *w = get_window_save(win);
+	cur_question_callback = cb;
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_alert_dialog_new("%s", sys_str(title));
+	gtk_alert_dialog_set_detail(dlg, sys_str(text));
+	const char* buttons[3] = {"Yes", "No", nullptr};
+	const char* buttons_cancel[4] = {"Yes", "No", "Cancel", nullptr};
+	if (allow_cancel)
+		gtk_alert_dialog_set_buttons(dlg, buttons_cancel);
+	else
+		gtk_alert_dialog_set_buttons(dlg, buttons);
+	gtk_alert_dialog_set_default_button(dlg, 0);
+	gtk_alert_dialog_set_cancel_button(dlg, 2);
+	gtk_alert_dialog_choose(dlg, w, nullptr, &on_question_reply, nullptr);
+#else
 	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", sys_str(text));
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_window_set_default_size(GTK_WINDOW(dlg), 300, 150);
 	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
 #if GTK_CHECK_VERSION(4,0,0)
-	cur_question_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_question_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
@@ -367,15 +480,31 @@ void question_box(Window *win, const string &title, const string &text, const Qu
 	else
 		cb("hui:cancel");
 #endif
+#endif
 }
 
 
+#if GTK_CHECK_VERSION(4,10,0)
+static void on_message_reply(GObject* o, GAsyncResult* res, gpointer user_data) {
+	auto dlg = GTK_ALERT_DIALOG(o);
+	[[maybe_unused]] int r = gtk_alert_dialog_choose_finish(dlg, res, nullptr);
+}
+#else
 void on_gtk_message_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	gtk_window_destroy(GTK_WINDOW(self));
 }
+#endif
 
 void info_box(Window *win,const string &title,const string &text) {
 	GtkWindow *w = get_window_save(win);
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_alert_dialog_new("%s", sys_str(title));
+	gtk_alert_dialog_set_detail(dlg, sys_str(text));
+	const char* buttons[2] = {"Ok", nullptr};
+	gtk_alert_dialog_set_buttons(dlg, buttons);
+	gtk_alert_dialog_set_default_button(dlg, 0);
+	gtk_alert_dialog_choose(dlg, w, nullptr, &on_message_reply, nullptr);
+#else
 	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "%s", sys_str(text));
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_window_set_default_size(GTK_WINDOW(dlg), 300, 100);
@@ -389,10 +518,19 @@ void info_box(Window *win,const string &title,const string &text) {
 	gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);
 #endif
+#endif
 }
 
 void error_box(Window *win,const string &title,const string &text) {
 	GtkWindow *w = get_window_save(win);
+#if GTK_CHECK_VERSION(4,10,0)
+	auto dlg = gtk_alert_dialog_new("%s", sys_str(title)); // \u26A0
+	gtk_alert_dialog_set_detail(dlg, sys_str(text));
+	const char* buttons[2] = {"Ok", nullptr};
+	gtk_alert_dialog_set_buttons(dlg, buttons);
+	gtk_alert_dialog_set_default_button(dlg, 0);
+	gtk_alert_dialog_choose(dlg, w, nullptr, &on_message_reply, nullptr);
+#else
 	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text));
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_window_set_default_size(GTK_WINDOW(dlg), 300, 100);
@@ -404,6 +542,7 @@ void error_box(Window *win,const string &title,const string &text) {
 	gtk_widget_show_all(dlg);
 	gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);
+#endif
 #endif
 }
 

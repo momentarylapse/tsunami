@@ -85,7 +85,9 @@ void ControlTabControl::add_page(const string &str) {
 	boxes.add(inside);
 	pages.add(nullptr);
 	gtk_box_set_homogeneous(GTK_BOX(inside), true);
+#if !GTK_CHECK_VERSION(4,0,0)
 	gtk_widget_show(inside);
+#endif
 	GtkWidget *label = gtk_label_new(sys_str(str));
 	gtk_notebook_append_page(GTK_NOTEBOOK(widget), inside, label);
 }

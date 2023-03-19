@@ -66,8 +66,7 @@ void ControlToggleButton::__set_option(const string &op, const string &value) {
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 #endif
 	} else if (op == "circular") {
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, "circular");
+		add_css_class("circular");
 	} else if (op == "big") {
 		image_size = IconSize::LARGE;
 	} else if (op == "huge") {

@@ -179,7 +179,6 @@ int main(int num_args, char *args[]) {
 namespace hui
 {
 
-
 void _MakeUsable_() {
 	if (_screen_opened_)
 		return;

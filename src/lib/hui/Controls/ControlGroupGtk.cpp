@@ -22,7 +22,7 @@ ControlGroup::ControlGroup(const string &title, const string &id) :
 	widget = gtk_frame_new(sys_str(parts[0]));
 
 #if GTK_CHECK_VERSION(4,0,0)
-	_set_css("frame { border-style: none; }");
+	add_css_class("hui-no-border");
 #else
 	gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
 #endif

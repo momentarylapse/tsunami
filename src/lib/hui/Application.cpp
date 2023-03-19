@@ -39,6 +39,33 @@ bool Application::installed;
 Array<string> Application::_args;
 
 
+void _init_global_css_classes_() {
+	string css = R"foo(
+.hui-no-padding { padding: 1px; }
+.hui-more-padding { padding: 8px; }
+.hui-big-font { font-size: 125%; }
+.hui-huge-font { font-size: 150%; }
+.hui-small-font { font-size: 75%; }
+.hui-rotate-left { transform: rotate(90deg); } /* check? */
+.hui-rotate-right { transform: rotate(-90deg); }
+.hui-no-border { border-style: none; }
+)foo";
+
+	auto *css_provider = gtk_css_provider_new();
+
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num);
+#else
+	GError *error = nullptr;
+	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num, &error);
+	if (error) {
+		msg_error(string("css: ") + error->message + " (" + css + ")");
+		return;
+	}
+#endif
+	gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css_provider),  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 Application::Application(const string &app_name, const string &def_lang, int flags) {
 
 #ifdef HUI_API_GTK
@@ -165,7 +192,7 @@ static bool keep_running = true;
 
 int Application::run() {
 #if GTK_CHECK_VERSION(4,0,0)
-	return g_application_run(G_APPLICATION (application), 0, nullptr);
+	return g_application_run(G_APPLICATION(application), 0, nullptr);
 	while (keep_running)
 		do_single_main_loop();
 #else
@@ -179,6 +206,7 @@ int Application::run() {
 
 [[maybe_unused]] static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
 	auto app = reinterpret_cast<Application*>(user_data);
+	_init_global_css_classes_();
 	app->on_startup(app->_args);
 }
 

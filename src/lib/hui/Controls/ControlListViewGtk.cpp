@@ -673,11 +673,15 @@ void ControlListView::__set_option(const string &op, const string &value) {
 		msg_error("ListView.singleclickactivate gtk3...");
 #endif
 	} else if (op == "style") {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_add_css_class(widget, value.c_str());
+#else
 		auto sc = gtk_widget_get_style_context(widget);
 		gtk_style_context_add_class(sc, value.c_str());
 		//gtk_style_context_add_class(sc, "navigation-sidebar");
 		//gtk_style_context_add_class(sc, "rich-list");
 		//gtk_style_context_add_class(sc, "data-table");
+#endif
 	}
 #endif
 }

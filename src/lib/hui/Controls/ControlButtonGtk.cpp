@@ -82,28 +82,23 @@ void ControlButton::__set_option(const string &op, const string &value) {
 		} else {
 			msg_error("trying to set default without window..." + id);
 		}
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, "suggested-action");
+		add_css_class("suggested-action");
 #else
 		gtk_widget_set_can_default(widget, true);
 		if (panel->win) // otherwise gtk will complain
 			gtk_widget_grab_default(widget);
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, GTK_STYLE_CLASS_SUGGESTED_ACTION);
+		add_css_class(GTK_STYLE_CLASS_SUGGESTED_ACTION);
 #endif
 	} else if (op == "danger") {
 #if GTK_CHECK_VERSION(4,0,0)
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_remove_class(sc, "suggested-action");
-		gtk_style_context_add_class(sc, "destructive-action");
+		remove_css_class("suggested-action");
+		add_css_class("destructive-action");
 #else
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_remove_class(sc, GTK_STYLE_CLASS_SUGGESTED_ACTION);
-		gtk_style_context_add_class(sc, GTK_STYLE_CLASS_DESTRUCTIVE_ACTION);
+		remove_css_class(GTK_STYLE_CLASS_SUGGESTED_ACTION);
+		add_css_class(GTK_STYLE_CLASS_DESTRUCTIVE_ACTION);
 #endif
 	} else if (op == "circular") {
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, "circular");
+		add_css_class("circular");
 	} else if (op == "big") {
 		image_size = IconSize::LARGE;
 	} else if (op == "huge") {

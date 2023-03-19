@@ -111,7 +111,8 @@ public:
 
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
 
-	void _set_css(const string &css);
+	void add_css_class(const string &_class);
+	void remove_css_class(const string &_class);
 
 private:
 	int min_width, min_height;

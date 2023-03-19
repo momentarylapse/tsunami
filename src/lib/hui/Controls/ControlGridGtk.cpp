@@ -108,8 +108,7 @@ void ControlGrid::__set_option(const string &op, const string &value) {
 	} else if (op == "linked") {
 		if (is_box)
 			gtk_box_set_spacing(GTK_BOX(widget), 0);
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, "linked");
+		add_css_class("linked");
 	}
 }
 

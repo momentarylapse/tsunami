@@ -182,7 +182,7 @@ Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
 	return &size_groups->back();
 }
 
-void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css) {
+/*void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css) {
 	string css = "#" + id.replace(":", "") + _css;
 	//msg_write(css);
 
@@ -203,7 +203,7 @@ void set_style_for_widget(GtkWidget *widget, const string &id, const string &_cs
 	gtk_style_context_add_provider(context,
 			GTK_STYLE_PROVIDER(css_provider),
 			GTK_STYLE_PROVIDER_PRIORITY_USER);
-}
+}*/
 
 Array<std::pair<string, string>> parse_options(const string &options) {
 	Array<std::pair<string, string>> r;
@@ -287,13 +287,13 @@ void Control::set_options(const string &options) {
 			gtk_widget_set_can_focus(widget, false);
 #endif
 		} else if (op == "big") {
-			set_style_for_widget(widget, id, "{font-size: 125%;}");
+			add_css_class("hui-big-font");
 			__set_option(op, val);
 		} else if (op == "huge") {
-			set_style_for_widget(widget, id, "{font-size: 150%;}");
+			add_css_class("hui-huge-font");
 			__set_option(op, val);
 		} else if (op == "small") {
-			set_style_for_widget(widget, id, "{font-size: 75%;}");
+			add_css_class("hui-small-font");
 			__set_option(op, val);
 		} else if (op == "disabled") {
 			enable(!val_is_positive(val, true));
@@ -328,7 +328,12 @@ void Control::set_options(const string &options) {
 		} else if (op == "marginbottom") {
 			gtk_widget_set_margin_bottom(get_frame(), val._int());
 		} else if (op == "padding") {
-			set_style_for_widget(widget, id, format("{padding: %dpx;}", val._int()));
+			if (val._int() < 5)
+				add_css_class("hui-no-padding");
+			else
+				add_css_class("hui-more-padding");
+
+			//set_style_for_widget(widget, id, format("{padding: %dpx;}", val._int()));
 		} else if ((op == "hgroup") or (op == "vgroup")) {
 			if (panel) {
 				auto g = get_size_group(panel, val, (op == "vgroup") ? 2 : 1);
@@ -497,11 +502,21 @@ void Control::apply_foreach(const string &_id, std::function<void(Control*)> f) 
 			children[i]->apply_foreach(_id, f);
 }
 
-void Control::_set_css(const string &css) {
+void Control::add_css_class(const string &_class) {
 #if GTK_CHECK_VERSION(4,0,0)
-	auto cssp = gtk_css_provider_new();
-	gtk_css_provider_load_from_data(cssp, (const char*)css.data, css.num);
-	gtk_style_context_add_provider(gtk_widget_get_style_context(widget), GTK_STYLE_PROVIDER(cssp), GTK_STYLE_PROVIDER_PRIORITY_USER);
+	gtk_widget_add_css_class(widget, _class.c_str());
+#else
+	auto sc = gtk_widget_get_style_context(widget);
+	gtk_style_context_add_class(sc, _class.c_str());
+#endif
+}
+
+void Control::remove_css_class(const string &_class) {
+#if GTK_CHECK_VERSION(4,0,0)
+	gtk_widget_remove_css_class(widget, _class.c_str());
+#else
+	auto sc = gtk_widget_get_style_context(widget);
+	gtk_style_context_remove_class(sc, _class.c_str());
 #endif
 }
 

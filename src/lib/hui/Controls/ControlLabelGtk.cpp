@@ -13,8 +13,6 @@
 namespace hui
 {
 
-void set_style_for_widget(GtkWidget *widget, const string &id, const string &_css);
-
 ControlLabel::ControlLabel(const string &title, const string &id) :
 	Control(CONTROL_LABEL, id)
 {
@@ -73,7 +71,10 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 #endif
 	} else if (op == "angle") {
 #if GTK_CHECK_VERSION(4,0,0)
-		set_style_for_widget(widget, id, format("{transform: rotate(%.1fdeg);}", -value._float()));
+		if (fabs(value._float() - 90) < 20)
+			add_css_class("hui-rotate-left");
+		else
+			add_css_class("hui-rotate-left");
 #else
 		gtk_label_set_angle(GTK_LABEL(widget), value._float());
 #endif

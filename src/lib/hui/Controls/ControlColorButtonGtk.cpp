@@ -25,7 +25,12 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	Control(CONTROL_COLORBUTTON, id)
 {
 	auto parts = split_title(title);
+#if GTK_CHECK_VERSION(4,10,0)
+	dialog = gtk_color_dialog_new();
+	widget = gtk_color_dialog_button_new(dialog);
+#else
 	widget = gtk_color_button_new();
+#endif
 	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
@@ -67,12 +72,20 @@ void ControlColorButton::__set_color(const color& c) {
 	_last_set = c;
 	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
 	_last_set_gdk = gcol;
+#if GTK_CHECK_VERSION(4,10,0)
+	gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(widget), &gcol);
+#else
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+#endif
 }
 
 color ControlColorButton::get_color() {
 	GdkRGBA gcol;
+#if GTK_CHECK_VERSION(4,10,0)
+	gcol = *gtk_color_dialog_button_get_rgba(GTK_COLOR_DIALOG_BUTTON(widget));
+#else
 	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+#endif
 
 	// make sure, we get EXACTLY the same value, when nothing changed!
 	if (memcmp(&gcol, &_last_set_gdk, sizeof(GdkRGBA)) == 0)
@@ -81,8 +94,13 @@ color ControlColorButton::get_color() {
 }
 
 void ControlColorButton::__set_option(const string &op, const string &value) {
-	if (op == "alpha")
+	if (op == "alpha") {
+#if GTK_CHECK_VERSION(4,10,0)
+		gtk_color_dialog_set_with_alpha(GTK_COLOR_DIALOG(dialog), true);
+#else
 		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);
+#endif
+	}
 }
 
 };

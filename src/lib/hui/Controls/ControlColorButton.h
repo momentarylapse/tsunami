@@ -26,6 +26,9 @@ public:
 private:
 	color _last_set;
 	GdkRGBA _last_set_gdk;
+#if GTK_CHECK_VERSION(4,10,0)
+	GtkColorDialog *dialog;
+#endif
 };
 
 };

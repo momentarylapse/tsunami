@@ -35,10 +35,10 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	GtkWidget *scroll = gtk_scrolled_window_new(nullptr, nullptr);
 #endif
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_widget_show(scroll);
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), widget);
 #else
+	gtk_widget_show(scroll);
 	gtk_container_add(GTK_CONTAINER(scroll), widget);
 #endif
 

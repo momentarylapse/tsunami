@@ -13,7 +13,9 @@
 namespace hui
 {
 
+#if !GTK_CHECK_VERSION(4,10,0)
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
+#endif
 
 void on_gtk_edit_changed(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
@@ -55,6 +57,7 @@ void ControlEdit::__reset() {
 }
 
 void ControlEdit::completion_add(const string &text) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));
 	if (!comp){
 		comp = gtk_entry_completion_new();
@@ -70,17 +73,20 @@ void ControlEdit::completion_add(const string &text) {
 	GtkTreeIter iter;
 	gtk_list_store_append(GTK_LIST_STORE(m), &iter);
 	set_list_cell(GTK_LIST_STORE(m), iter, 0, text);
+#endif
 }
 
 void ControlEdit::completion_clear() {
+#if !GTK_CHECK_VERSION(4,10,0)
 	gtk_entry_set_completion(GTK_ENTRY(widget), nullptr);
+#endif
 }
 
 void ControlEdit::__set_option(const string &op, const string &value) {
 	if (op == "clearplaceholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), "");
 	else if (op == "clearcompletion")
-		gtk_entry_set_completion(GTK_ENTRY(widget), nullptr);
+		completion_clear();
 	else if (op == "placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), value.c_str());
 	else if (op == "completion")

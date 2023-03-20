@@ -91,7 +91,7 @@ void ControlListView::on_right_click(double x, double y) {
 	notify(EventID::RIGHT_BUTTON_DOWN, false);
 }
 
-
+#if !GTK_CHECK_VERSION(4,0,0)
 void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
 	dbo("ROW DEL");
 	auto *lv = reinterpret_cast<ControlListView*>(user_data);
@@ -120,6 +120,7 @@ void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIt
 	gint *indices = gtk_tree_path_get_indices(path);
 	lv->row_target = indices[0];
 }
+#endif
 
 
 
@@ -442,9 +443,7 @@ void ControlListView::__set_string(const string &str) {
 	__add_string(str);
 }
 
-#if GTK_CHECK_VERSION(4,0,0)
-#endif
-
+#if !GTK_CHECK_VERSION(4,10,0)
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str) {
 	GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(store), column);
 	if (type == G_TYPE_STRING) {
@@ -459,6 +458,7 @@ void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const str
 			msg_error("no image: " + str);
 	}
 }
+#endif
 
 void ControlListView::__add_string(const string& str) {
 	allow_change_messages = false;

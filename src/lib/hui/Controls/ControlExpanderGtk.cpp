@@ -60,7 +60,9 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 
 		revealer = gtk_revealer_new();
 		gtk_grid_attach(GTK_GRID(frame), revealer, 0, 1, 1, 1);
+#if !GTK_CHECK_VERSION(4,0,0)
 		gtk_widget_show(revealer);
+#endif
 
 		widget = expander;
 	} else {

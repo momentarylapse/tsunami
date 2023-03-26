@@ -267,6 +267,16 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		});
 		hui::run(dlg);
 	});
+	p.cmd("treeview", "", "bla", [] (const Array<string> &a) {
+		auto dlg = new hui::Window("TreeView", 400, 600);
+		dlg->from_source("TreeView list 'a'");
+		dlg->add_string("list", "0");
+		dlg->add_string("list", "1");
+		dlg->add_string("list", "2");
+		for (int i=3; i<30; i++)
+			dlg->add_child_string("list", i % 3, i2s(i));
+		hui::run(dlg);
+	});
 #endif
 	p.parse(args);
 

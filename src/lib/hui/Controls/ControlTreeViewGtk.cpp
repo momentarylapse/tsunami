@@ -7,6 +7,7 @@
 
 #include "../hui.h"
 #include "ControlTreeView.h"
+#include "ControlListView.h"
 #include "../../base/iter.h"
 
 #ifdef HUI_API_GTK
@@ -16,8 +17,26 @@ namespace hui
 
 #define dbo(s) //msg_write(s)
 
-Array<GType> CreateTypeList(const string &_format);
 string make_format_string_useful(const string &_format, int size);
+
+
+#if GTK_CHECK_VERSION(4,10,0)
+void on_gtk_list_activate(GtkWidget* widget, void* a, void* b, ControlListView* self);
+void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, ControlListView *c);
+void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h);
+void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h);
+//ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkListItem *list_item);
+void list_view_notify_cell_change(GtkWidget *widget, ControlListView::ItemMapper *h, const string &val);
+void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h);
+void on_gtk_list_edit_changed(GtkWidget *widget, ControlListView::ItemMapper *h);
+void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data);
+void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view);
+void on_gtk_column_view_activate(GtkColumnView* self, guint position, gpointer user_data);
+void on_gtk_selection_model_selection_changed(GtkSelectionModel* self, guint position, guint n_items, gpointer user_data);
+#endif
+
+#if !GTK_CHECK_VERSION(4,10,0)
+Array<GType> CreateTypeList(const string &_format);
 
 
 void tree_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpointer data) {
@@ -118,17 +137,87 @@ void on_gtk_tree_select(GtkTreeSelection *selection, gpointer data) {
 
 void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 
+#endif
+
 ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_TREEVIEW, id)
 {
 	auto parts = split_title(title);
-	string fmt = option_value(get_option_from_title(title), "format");
+	auto options = get_option_from_title(title);
+	string fmt = option_value(options, "format");
 
-#if GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(4,10,0)
+
 	GtkWidget *sw = gtk_scrolled_window_new();
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+	effective_format = make_format_string_useful(fmt, parts.num);
+	msg_write(effective_format);
+
+	// "model"
+	store = g_list_store_new(G_TYPE_OBJECT);
+
+//	tree_model = gtk_tree_list_model_new(store, false, false, &on_gtk_tree_list_model_create_model, this, nullptr);
+
+	auto sel = gtk_single_selection_new(G_LIST_MODEL(tree_model));
+	gtk_single_selection_set_autoselect(sel, false);
+	gtk_single_selection_set_can_unselect(sel, true);
+	selection_model = GTK_SELECTION_MODEL(sel);
+
+	GtkWidget *view;
+	if (parts.num > 1) {
+		is_column_view = true;
+		view = gtk_column_view_new(GTK_SELECTION_MODEL(selection_model));
+
+		for (auto &p: parts) {
+			auto factory = gtk_signal_list_item_factory_new();
+			factories.add(factory);
+			g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
+			g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+
+			auto col = gtk_column_view_column_new(p.c_str(), factory);
+			columns.add(col);
+			gtk_column_view_append_column(GTK_COLUMN_VIEW(view), GTK_COLUMN_VIEW_COLUMN(col));
+		}
+		if (columns.num >= 2 and fmt.back() == 'B')
+			gtk_column_view_column_set_expand(GTK_COLUMN_VIEW_COLUMN(columns[columns.num - 2]), true);
+		else
+			gtk_column_view_column_set_expand(GTK_COLUMN_VIEW_COLUMN(columns.back()), true);
+
+	} else {
+		auto factory = gtk_signal_list_item_factory_new();
+		factories.add(factory);
+		g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
+		g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+
+		if (option_has(options, "grid")) {
+			is_grid_view = true;
+			view = gtk_grid_view_new(GTK_SELECTION_MODEL(selection_model), factory);
+			gtk_orientable_set_orientation(GTK_ORIENTABLE(view), GTK_ORIENTATION_HORIZONTAL);
+		} else {
+			is_list_view = true;
+			view = gtk_list_view_new(GTK_SELECTION_MODEL(selection_model), factory);
+			//gtk_list_view_set_show_separators(GTK_LIST_VIEW(view), true);
+			//gtk_list_view_set_single_click_activate(GTK_LIST_VIEW(view), true);
+			//gtk_list_view_set_enable_rubberband(GTK_LIST_VIEW(view), true);
+		}
+	}
+
+
+
+	g_signal_connect(G_OBJECT(selection_model), "selection-changed", G_CALLBACK(&on_gtk_selection_model_selection_changed), this);
+	g_signal_connect(G_OBJECT(view), "activate", G_CALLBACK(&on_gtk_list_activate), this);
+
+	// capture right click
+	auto gesture_click = gtk_gesture_click_new();
+	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture_click), GDK_BUTTON_SECONDARY);
+	gtk_widget_add_controller(view, GTK_EVENT_CONTROLLER(gesture_click));
+	g_signal_connect(G_OBJECT(gesture_click), "pressed", G_CALLBACK(&on_gtk_list_gesture_click_pressed), this);
+
+
+
 #else
 	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
-#endif
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	// "model"
@@ -142,6 +231,7 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&on_gtk_tree_select), this);
+#endif
 
 	// frame
 	frame = sw;
@@ -153,17 +243,21 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 		gtk_container_add(GTK_CONTAINER(frame), sw);
 #endif
 	}
+
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), view);
 #else
 	gtk_container_add(GTK_CONTAINER(sw), view);
-#endif
 	gtk_widget_show(sw);
+#endif
 
 	widget = view;
 	take_gtk_ownership();
 
+#if GTK_CHECK_VERSION(4,0,0)
+#else
 	configure_tree_view_columns(this, view, fmt, parts);
+#endif
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	set_options(get_option_from_title(title));
@@ -177,6 +271,7 @@ void ControlTreeView::__set_string(const string &str) {
 	__add_string(str);
 }
 
+#if !GTK_CHECK_VERSION(4,10,0)
 void set_tree_cell(GtkTreeStore *store, GtkTreeIter &_iter, int column, const string &str) {
 	GtkTreeIter iter = _iter;
 	GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(store), column);
@@ -207,18 +302,34 @@ string tree_get_cell(GtkTreeModel *store, GtkTreeIter &_iter, int column) {
 	}
 	return r;
 }
+#endif
 
-void ControlTreeView::__add_string(const string& str) {
+void ControlTreeView::__add_string(const string& _str) {
+	allow_change_messages = false;
+	auto parts = split_title(_str);
+#if GTK_CHECK_VERSION(4,0,0)
+/*	msg_write("+++ " + str(parts));
+	//auto ob = gtk_string_object_new(str.c_str());
+	//g_list_store_append(G_LIST_STORE(store), ob);
+	auto row = g_list_store_new(G_TYPE_OBJECT);
+	for (auto &p: parts) {
+		auto ob = gtk_string_object_new(p.c_str());
+		g_list_store_append(G_LIST_STORE(row), ob);
+	}
+	g_list_store_append(G_LIST_STORE(store), row);*/
+#else
 	GtkTreeIter iter;
-	auto parts = split_title(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_tree_store_append(store, &iter, nullptr);
 	for (int j=0; j<parts.num; j++)
 		set_tree_cell(store, iter, j, parts[j]);
 	_item_.add(iter);
+#endif
+	allow_change_messages = true;
 }
 
 void ControlTreeView::__set_int(int i) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	if (i >= 0) {
 		gtk_tree_selection_select_iter(sel, &_item_[i]);
@@ -228,17 +339,21 @@ void ControlTreeView::__set_int(int i) {
 	} else {
 		gtk_tree_selection_unselect_all(sel);
 	}
+#endif
 }
 
 int ControlTreeView::get_int() {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	for (int j=0;j<_item_.num;j++)
 		if (gtk_tree_selection_iter_is_selected(sel, &_item_[j]))
 			return j;
+#endif
 	return -1;
 }
 
 void ControlTreeView::__add_child_string(int parent_row, const string& str) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeIter iter;
 	auto parts = split_title(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
@@ -246,9 +361,11 @@ void ControlTreeView::__add_child_string(int parent_row, const string& str) {
 	for (int j=0;j<parts.num;j++)
 		set_tree_cell(store, iter, j, parts[j]);
 	_item_.add(iter);
+#endif
 }
 
 void ControlTreeView::__change_string(int row, const string& str) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	auto parts = split_title(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	/*for (int j=0;j<PartString.num;j++)
@@ -256,9 +373,11 @@ void ControlTreeView::__change_string(int row, const string& str) {
 	if (gtk_tree_store_iter_is_valid(store, &_item_[row]))
 		for (int j=0;j<parts.num;j++)
 			set_tree_cell(store, _item_[row], j, parts[j]);
+#endif
 }
 
 void ControlTreeView::__remove_string(int row) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	if ((row < 0) or (row >= _item_.num))
 		return;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
@@ -266,49 +385,63 @@ void ControlTreeView::__remove_string(int row) {
 		gtk_list_store_remove(store, &_item_[row]);
 		_item_.erase(row);
 	}
+#endif
 }
 
 string ControlTreeView::get_cell(int row, int column) {
+#if GTK_CHECK_VERSION(4,10,0)
+	return "";
+#else
 	if ((row < 0) or (row >= _item_.num))
 		return "";
 	GtkTreeModel *store = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	return tree_get_cell(store, _item_[row], column);
+#endif
 }
 
 void ControlTreeView::__set_cell(int row, int column, const string& str) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	if ((row < 0) or (row >= _item_.num))
 		return;
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	if (gtk_tree_store_iter_is_valid(store, &_item_[row]))
 		set_tree_cell(store, _item_[row], column, str);
+#endif
 }
 
 Array<int> ControlTreeView::get_selection() {
 	Array<int> sel;
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	gtk_tree_selection_set_mode(s, GTK_SELECTION_MULTIPLE);
 	for (int j=0;j<_item_.num;j++)
 		if (gtk_tree_selection_iter_is_selected(s, &_item_[j])) {
 			sel.add(j);
 		}
+#endif
 	return sel;
 }
 
 void ControlTreeView::__set_selection(const Array<int>& sel) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	gtk_tree_selection_set_mode(s, GTK_SELECTION_MULTIPLE);
 	gtk_tree_selection_unselect_all(s);
 	for (int j=0;j<sel.num;j++)
 		gtk_tree_selection_select_iter(s, &_item_[sel[j]]);
+#endif
 }
 
 void ControlTreeView::__reset() {
+#if !GTK_CHECK_VERSION(4,10,0)
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_tree_store_clear(store);
 	_item_.clear();
+#endif
 }
 
 void ControlTreeView::expand(int row, bool expand) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	if (row < 0) {
 		// expand all
 		if (expand)
@@ -316,6 +449,7 @@ void ControlTreeView::expand(int row, bool expand) {
 		else
 			gtk_tree_view_collapse_all(GTK_TREE_VIEW(widget));
 	}
+#endif
 }
 
 bool ControlTreeView::is_expanded(int row) {
@@ -330,10 +464,12 @@ bool ControlTreeView::is_expanded(int row) {
 }
 
 void ControlTreeView::__set_option(const string &op, const string &value) {
+#if !GTK_CHECK_VERSION(4,10,0)
 	if (op == "nobar")
 		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), false);
 	else if (op == "bar")
 		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), val_is_positive(value, true));
+#endif
 }
 
 };

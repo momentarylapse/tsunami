@@ -3690,9 +3690,9 @@ Grid
 0
 0
 2
-TreeView
+ListView
 list
-format=tt,nobar
+format=mtt,nobar
 0
 0
 0
@@ -8823,7 +8823,7 @@ configurable-selection-dialog/configurable-selection-dialog
 Module
 
 configurable-selection-dialog/list
-Name\\Favorite
+Group\\Name\\Favorite
 
 configurable-selection-dialog/ok
 Select

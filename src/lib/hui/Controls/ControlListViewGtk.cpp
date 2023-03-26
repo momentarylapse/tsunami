@@ -125,7 +125,7 @@ void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIt
 
 
 #if GTK_CHECK_VERSION(4,0,0)
-static void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, ControlListView *c) {
+void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, ControlListView *c) {
 	dbo("...click " + i2s(c->hover));
 	int hover = c->hover; // in case we mess something up
 
@@ -138,17 +138,17 @@ static void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_pr
 	c->on_right_click(x, y);
 }
 
-static void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
+void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
 	h->list_view->hover = h->row_in_model;
 	dbo("E " + i2s(h->row_in_model));
 }
 
-static void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
+void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
 	h->list_view->hover = -1;
 	dbo("L");
 }
 
-static ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkListItem *list_item) {
+ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkListItem *list_item) {
 	//base::find(list_view->_row_associators_, child))
 	for (auto i: weak(lv->_item_map_))
 		if (i->item == list_item)
@@ -167,7 +167,7 @@ void list_view_notify_cell_change(GtkWidget *widget, ControlListView::ItemMapper
 	h->list_view->notify(EventID::CHANGE);
 }
 
-static void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h) {
+void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h) {
 	list_view_notify_cell_change(widget, h, b2s(gtk_check_button_get_active(GTK_CHECK_BUTTON(widget))));
 }
 
@@ -175,7 +175,7 @@ void on_gtk_list_edit_changed(GtkWidget *widget, ControlListView::ItemMapper *h)
 	list_view_notify_cell_change(widget, h, gtk_editable_get_text(GTK_EDITABLE(widget)));
 }
 
-static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data) {
+void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data) {
 	dbo("LIST SETUP " + p2s(list_item));
 	auto list_view = reinterpret_cast<ControlListView*>(user_data);
 	int col = base::find_index(list_view->factories, factory);
@@ -216,10 +216,10 @@ static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_ite
 //#define LIST_DRAG_N_DROP_EXPERIMENT
 
 #ifdef LIST_DRAG_N_DROP_EXPERIMENT
-static GdkContentProvider* on_drag_prepare(GtkDragSource *source, double x, double y, ControlListView::ItemMapper *m) {
+GdkContentProvider* on_drag_prepare(GtkDragSource *source, double x, double y, ControlListView::ItemMapper *m) {
 	return gdk_content_provider_new_typed(G_TYPE_STRING, "some stupid test");
 }
-static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ControlListView::ItemMapper *m) {
+void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ControlListView::ItemMapper *m) {
 	// Set the widget as the drag icon
 	GdkPaintable *paintable = gtk_widget_paintable_new (gtk_widget_get_parent(m->parent));
 	gtk_drag_source_set_icon (source, paintable, 0, 0);
@@ -227,7 +227,7 @@ static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ControlListView:
 }
 #endif
 
-static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
+void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
 	int column = base::find_index(list_view->factories, factory);
 	if (column < 0 or column >= list_view->effective_format.num)
 		return;

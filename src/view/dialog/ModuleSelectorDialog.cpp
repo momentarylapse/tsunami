@@ -20,7 +20,7 @@ ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 	return l;
 }
 
-ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory _type, Session *_session, const string &old_name) :
+ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory _type, Session *_session, const base::optional<string> &old_name) :
 	hui::Dialog("configurable-selection-dialog", _parent)
 {
 	type = _type;
@@ -51,7 +51,7 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory 
 		} else*/ {
 			set_string("list", ll);
 		}
-		if (l.name == old_name)
+		if (old_name.has_value() and l.name == *old_name)
 			set_int("list", n);
 	}
 	expand("list", true);

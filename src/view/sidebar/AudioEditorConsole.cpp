@@ -88,15 +88,17 @@ void AudioEditorConsole::on_edit_mode(int m) {
 }
 
 void AudioEditorConsole::on_action_source() {
-	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_SOURCE, [this] (const string &name) {
-		session->win->on_menu_execute_audio_source(name);
-	}, "");
+	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_SOURCE, [this] (const base::optional<string> &name) {
+		if (name.has_value())
+			session->win->on_menu_execute_audio_source(*name);
+	});
 }
 
 void AudioEditorConsole::on_action_effect() {
-	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_EFFECT, [this] (const string &name) {
-		session->win->on_menu_execute_audio_effect(name);
-	}, "");
+	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_EFFECT, [this] (const base::optional<string> &name) {
+		if (name.has_value())
+			session->win->on_menu_execute_audio_effect(*name);
+	});
 }
 
 void AudioEditorConsole::clear() {

@@ -9,6 +9,7 @@
 #define PLUGINMANAGER_H_
 
 #include "../lib/kaba/kaba.h"
+#include "../lib/base/optional.h"
 
 class Plugin;
 class Module;
@@ -50,7 +51,7 @@ public:
 	Array<string> find_module_sub_types(ModuleCategory type);
 	Array<string> find_module_sub_types_grouped(ModuleCategory type);
 
-	static void choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const string&)> cb, const string &old_name = "");
+	static void choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const base::optional<string>&)> cb, const base::optional<string> &old_name = base::None);
 
 
 	// not compiled yet

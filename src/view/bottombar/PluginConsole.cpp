@@ -38,9 +38,9 @@ void PluginConsole::on_enter() {
 }
 
 void PluginConsole::on_add_button() {
-	session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, [this] (const string &name) {
-		if (name != "")
-			session->execute_tsunami_plugin(name);
+	session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, [this] (const base::optional<string> &name) {
+		if (name.has_value())
+			session->execute_tsunami_plugin(*name);
 		
 		// TODO: have PluginManager send notifications...?
 		update_favotites();
@@ -50,7 +50,9 @@ void PluginConsole::on_add_button() {
 void PluginConsole::on_add_plugin() {
 	auto *plugin = session->last_plugin;
 	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FIXED_WIDTH | ConfigPanelMode::DELETE | ConfigPanelMode::PROFILES);
-	p->set_func_delete([this, plugin] { plugin->stop_request(); });
+	p->set_func_delete([this, plugin] {
+		plugin->stop_request();
+	});
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
 	hide_control("no-plugins-label", true);

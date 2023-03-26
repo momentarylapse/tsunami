@@ -786,7 +786,7 @@ func extern CreateBeatSource(session: Session, name: string) -> xfer[BeatSource]
 func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: shared[Sample]->void)
 #extern void SetTempBackupFilename(Path filename)
 
-func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string->void, old_name: string)
+func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string?->void, old_name: string?)
 
 enum Align
 	LEFT = -1

@@ -302,9 +302,9 @@ void SignalEditorTab::on_delete() {
 void SignalEditorTab::on_add(ModuleCategory type) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		session->plugin_manager->choose_module(win, session, type, [this, type] (const string &name) {
-			if (name.num > 0) {
-				auto m = chain->add(type, name);
+		session->plugin_manager->choose_module(win, session, type, [this, type] (const base::optional<string> &name) {
+			if (name.has_value()) {
+				auto m = chain->add(type, *name);
 				m->module_x = graph->m.x;
 				m->module_y = graph->m.y;
 			}

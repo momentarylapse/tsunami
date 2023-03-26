@@ -193,11 +193,11 @@ void FxListEditor::on_copy_from_track() {
 }
 
 void FxListEditor::on_add() {
-	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT, [this] (const string &name) {
-		if (name == "")
-			return;
-		auto *effect = CreateAudioEffect(session(), name);
-		track->add_effect(effect);
+	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT, [this] (const base::optional<string> &name) {
+		if (name.has_value()) {
+			auto effect = CreateAudioEffect(session(), *name);
+			track->add_effect(effect);
+		}
 	});
 }
 

@@ -603,15 +603,17 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_apply_effect() {
-	PluginManager::choose_module(win, session, ModuleCategory::MIDI_EFFECT, [this] (const string &name) {
-		session->win->on_menu_execute_midi_effect(name);
-	}, "");
+	PluginManager::choose_module(win, session, ModuleCategory::MIDI_EFFECT, [this] (const base::optional<string> &name) {
+		if (name.has_value())
+			session->win->on_menu_execute_midi_effect(*name);
+	});
 }
 
 void MidiEditorConsole::on_apply_source() {
-	PluginManager::choose_module(win, session, ModuleCategory::MIDI_SOURCE, [this] (const string &name) {
-		session->win->on_menu_execute_midi_source(name);
-	}, "");
+	PluginManager::choose_module(win, session, ModuleCategory::MIDI_SOURCE, [this] (const base::optional<string> &name) {
+		if (name.has_value())
+			session->win->on_menu_execute_midi_source(*name);
+	});
 }
 
 void MidiEditorConsole::on_add_key_change() {

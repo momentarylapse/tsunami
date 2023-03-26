@@ -131,8 +131,8 @@ public:
 };
 
 
- void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const string&)> &cb, const string &old_name) {
-	PluginManager::choose_module(parent, session, type, [&cb] (const string &name) {
+ void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
+	PluginManager::choose_module(parent, session, type, [&cb] (const base::optional<string> &name) {
 		cb(name);
 	}, old_name);
  }
@@ -1075,14 +1075,14 @@ Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) 
 	return find_module_sub_types(type);
 }
 
-void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const string&)> cb, const string &old_name) {
+void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const base::optional<string>&)> cb, const base::optional<string> &old_name) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num == 1) {
 		cb(names[0]);
 		return;
 	}
 	if (names.num == 0) {
-		cb("");
+		cb(base::None);
 		return;
 	}
 

@@ -9,13 +9,14 @@
 #define SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../lib/base/optional.h"
 
 class Session;
 enum class ModuleCategory;
 
 class ModuleSelectorDialog: public hui::Dialog {
 public:
-	ModuleSelectorDialog(hui::Window *_parent, ModuleCategory type, Session *session, const string &old_name = "");
+	ModuleSelectorDialog(hui::Window *_parent, ModuleCategory type, Session *session, const base::optional<string> &old_name = base::None);
 
 	void on_list_select();
 	void on_toggle_favorite();
@@ -32,7 +33,7 @@ public:
 
 	static Label split_label(const string &s);
 
-	string _return;
+	base::optional<string> _return;
 };
 
 #endif /* SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_ */

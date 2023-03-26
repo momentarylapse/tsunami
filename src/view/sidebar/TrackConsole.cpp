@@ -33,9 +33,9 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 	auto *p = new ModulePanel(track->synth.get(), parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, track, session] {
-		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [track, session] (const string &name) {
-			if (name != "")
-				track->set_synthesizer(CreateSynthesizer(session, name));
+		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [track, session] (const base::optional<string> &name) {
+			if (name.has_value())
+				track->set_synthesizer(CreateSynthesizer(session, *name));
 		}, track->synth->module_class);
 	});
 	p->set_func_detune([parent, track, session] {

@@ -355,9 +355,9 @@ void ViewModeEditMidi::set_modifier(NoteModifier mod) {
 		modifier = mod;
 	}
 	if (modifier == NoteModifier::NONE)
-		view->set_message(_("no modifier"));
+		session->status(_("no modifier"));
 	else
-		view->set_message(modifier_symbol(modifier), 2);
+		session->status(modifier_symbol(modifier));
 	notify();
 }
 
@@ -771,7 +771,7 @@ void set_note_lengthx(ViewModeEditMidi *m, int l, int p, int n, const string &te
 	} else {
 		t = (text + " ").repeat(n).trim();
 	}
-	m->view->set_message(t, 2);
+	m->session->status(t);
 }
 
 void ViewModeEditMidi::on_key_down(int k) {

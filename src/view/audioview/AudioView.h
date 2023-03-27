@@ -16,6 +16,7 @@
 #include "ViewPort.h"
 #include "../ColorScheme.h"
 #include "../HoverData.h"
+#include "graph/LogNotifier.h"
 #include <atomic>
 
 namespace hui{
@@ -64,7 +65,7 @@ class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
 class BottomBarExpandButton;
-class TemporaryMessageBox;
+class LogNotifier;
 enum class MidiMode;
 
 
@@ -291,7 +292,7 @@ public:
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
 	BottomBarExpandButton *bottom_bar_expand_button;
-	TemporaryMessageBox *temporary_message_box;
+	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
 	void update_onscreen_displays();
 
@@ -315,14 +316,6 @@ public:
 	int prefered_buffer_layer;
 	double buffer_zoom_factor;
 	void update_buffer_zoom();
-
-	struct Message {
-		string text;
-		float ttl;
-		float size;
-	} message;
-	void set_message(const string &text, float size=1.0f);
-	void draw_message(Painter *c, Message &m);
 
 	owned<PeakThread> peak_thread;
 

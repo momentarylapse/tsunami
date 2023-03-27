@@ -195,6 +195,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("show-signal-chain", [this] { session->set_mode(EditMode::XSignalEditor); });
 	event("show-mastering-console", [this] { on_mastering_console(); });
 	event("show-fx-console", [this] { on_fx_console(); });
+	event("show-session-console", [this] { bottom_bar->open(BottomBar::SESSION_CONSOLE); });
 	event("sample_from_selection", [this] { on_sample_from_selection(); });
 	event("sample-insert", [this] { on_insert_sample(); });
 	set_key_code("sample-insert", hui::KEY_I + hui::KEY_CONTROL);
@@ -381,10 +382,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		on_update();
 	}, song->action_manager->MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this] {
-		view->set_message(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
+		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [this] {
-		view->set_message(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
+		session->status(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	}, song->action_manager->MESSAGE_REDO_ACTION);
 	song->subscribe(this, [this] {
 		on_update();
@@ -672,27 +673,27 @@ void TsunamiWindow::test_allow_termination(hui::Callback cb_yes, hui::Callback c
 
 void TsunamiWindow::on_copy() {
 	app->clipboard->copy(view);
-	view->set_message(_("copied"));
+	session->status(_("copied"));
 }
 
 void TsunamiWindow::on_paste() {
 	app->clipboard->paste(view);
-	view->set_message(_("pasted"));
+	session->status(_("pasted"));
 }
 
 void TsunamiWindow::on_paste_as_samples() {
 	app->clipboard->paste_as_samples(view);
-	view->set_message(_("pasted (sample)"));
+	session->status(_("pasted (sample)"));
 }
 
 void TsunamiWindow::on_paste_insert_time() {
 	app->clipboard->paste_insert_time(view);
-	view->set_message(_("pasted (insert time)  EXPERIMENTAL!"));
+	session->status(_("pasted (insert time)  EXPERIMENTAL!"));
 }
 
 void TsunamiWindow::on_paste_aligned_to_beats() {
 	app->clipboard->paste_aligned_to_beats(view);
-	view->set_message(_("pasted (aligned)  EXPERIMENTAL!"));
+	session->status(_("pasted (aligned)  EXPERIMENTAL!"));
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
@@ -1022,7 +1023,7 @@ void TsunamiWindow::on_save() {
 		on_save_as();
 	} else {
 		if (session->storage->save(song, song->filename)) {
-			view->set_message(_("file saved"));
+			session->status(_("file saved"));
 			BackupManager::set_save_state(session);
 		}
 	}
@@ -1067,7 +1068,7 @@ void TsunamiWindow::on_save_as() {
 	session->storage->ask_save(this, [this] (const Path &filename) {
 		if (filename)
 			if (session->storage->save(song, filename))
-				view->set_message(_("file saved"));
+				session->status(_("file saved"));
 	}, {"default=" + def});
 }
 
@@ -1079,7 +1080,7 @@ void TsunamiWindow::on_export() {
 	session->storage->ask_save(this, [this] (const Path &filename) {
 		if (filename)
 			if (session->storage->_export(song, filename))
-				view->set_message(_("file exported"));
+				session->status(_("file exported"));
 	}, {"default=" + def});
 }
 
@@ -1090,7 +1091,7 @@ void TsunamiWindow::on_export_selection() {
 
 		if (view->get_playable_layers() == view->sel.layers()) {
 			if (export_selection(song, view->sel, filename))
-				view->set_message(_("file exported"));
+				session->status(_("file exported"));
 		} else {
 			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
 					{_("All non-muted"), _("All selected"), _("Only non-muted selected")},
@@ -1116,7 +1117,7 @@ void TsunamiWindow::on_export_selection() {
 						//for (auto l: sel.layers())
 						//	msg_write(l->track->nice_name() + "  v" + str(l->version_number()));
 						if (export_selection(song, sel, filename, force_unmute))
-							view->set_message(_("file exported"));
+							session->status(_("file exported"));
 					});
 		}
 	});
@@ -1125,7 +1126,7 @@ void TsunamiWindow::on_export_selection() {
 void TsunamiWindow::on_quick_export() {
 	auto dir = Path(hui::config.get_str("QuickExportDir", hui::Application::directory.str()));
 	if (session->storage->save(song, dir | _suggest_filename(song, dir)))
-		view->set_message(_("file saved"));
+		session->status(_("file saved"));
 }
 
 int pref_bar_index(AudioView *view) {

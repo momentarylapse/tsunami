@@ -507,6 +507,7 @@
     <ClCompile Include="src\view\audioview\graph\Background.cpp" />
     <ClCompile Include="src\view\audioview\graph\Cursor.cpp" />
     <ClCompile Include="src\view\audioview\graph\LayerHeader.cpp" />
+    <ClCompile Include="src\view\audioview\graph\LogNotifier.cpp" />
     <ClCompile Include="src\view\audioview\graph\TimeScale.cpp" />
     <ClCompile Include="src\view\audioview\graph\TrackHeader.cpp" />
     <ClCompile Include="src\view\audioview\graph\ViewMarker.cpp" />
@@ -973,6 +974,7 @@
     <ClInclude Include="src\view\audioview\graph\Background.h" />
     <ClInclude Include="src\view\audioview\graph\Cursor.h" />
     <ClInclude Include="src\view\audioview\graph\LayerHeader.h" />
+    <ClInclude Include="src\view\audioview\graph\LogNotifier.h" />
     <ClInclude Include="src\view\audioview\graph\TimeScale.h" />
     <ClInclude Include="src\view\audioview\graph\TrackHeader.h" />
     <ClInclude Include="src\view\audioview\graph\ViewMarker.h" />

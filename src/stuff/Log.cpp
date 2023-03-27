@@ -43,12 +43,25 @@ void Log::question(Session *session, const string &message, const Array<string> 
 }
 
 
+void Log::status(Session *session, const string &message) {
+	add_message(session, Type::STATUS, message, {});
+}
+
+
 Array<Log::Message> Log::all(Session *session) {
 	Array<Log::Message> r;
 	for (auto &m: messages)
 		if ((m.session == session) or (m.session == Session::GLOBAL))
 			r.add(m);
 	return r;
+}
+
+
+Log::Message Log::latest(Session *session) {
+	for (int i=messages.num-1; i>=0; i--)
+		if ((messages[i].session == session) or (messages[i].session == Session::GLOBAL))
+			return messages[i];
+	return Message();
 }
 
 bool Log::Message::operator==(const Log::Message &o) const {
@@ -64,7 +77,7 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 
 	int count = 0;
 	for (auto &mm: messages.sub_ref(max(messages.num - 40, 0)))
-		if (m == mm) {
+		if (m == mm and m.type != Type::STATUS) {
 			count ++;
 			if (count > 8) {
 				blocked.add(m);
@@ -83,9 +96,9 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 		} else if (type == Type::WARNING) {
 			msg_write(message);
 		} else if (type == Type::QUESTION) {
-			msg_write(message);
 		} else if (type == Type::DEBUG) {
 			msg_write(message);
+		} else if (type == Type::STATUS) {
 		} else {
 			msg_write(message);
 		}

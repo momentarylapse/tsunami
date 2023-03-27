@@ -58,6 +58,7 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 		lc->win->set_info_text(m.text, options);
 	} else if (m.type == Log::Type::DEBUG) {
 		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
+	} else if (m.type == Log::Type::STATUS) {
 	} else {
 		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}

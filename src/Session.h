@@ -88,6 +88,7 @@ public:
 	void e(const string &msg);
 	void q(const string &msg, const Array<string> &responses);
 	void debug(const string &cat, const string &msg);
+	void status(const string &msg);
 
 	static Session *GLOBAL;
 };

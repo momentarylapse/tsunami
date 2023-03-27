@@ -28,13 +28,15 @@ public:
 	void info(Session *session, const string &message);
 	void debug(Session *session, const string &message);
 	void question(Session *session, const string &message, const Array<string> &responses);
+	void status(Session *session, const string &message);
 
 	enum class Type {
 		ERROR,
 		WARNING,
 		QUESTION,
 		INFO,
-		DEBUG
+		DEBUG,
+		STATUS
 	};
 
 	struct Message {
@@ -46,6 +48,7 @@ public:
 	};
 
 	Array<Message> all(Session *session);
+	Message latest(Session *session);
 
 	bool allow_debug;
 	bool allow_console_output;

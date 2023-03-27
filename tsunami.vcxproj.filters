@@ -1174,6 +1174,9 @@
     <ClCompile Include="src\view\audioview\graph\LayerHeader.cpp">
       <Filter>src\view\audioview\graph</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\audioview\graph\LogNotifier.cpp">
+      <Filter>src\view\audioview\graph</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\audioview\graph\TimeScale.cpp">
       <Filter>src\view\audioview\graph</Filter>
     </ClCompile>
@@ -2566,6 +2569,9 @@
       <Filter>src\view\audioview\graph</Filter>
     </ClInclude>
     <ClInclude Include="src\view\audioview\graph\LayerHeader.h">
+      <Filter>src\view\audioview\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\audioview\graph\LogNotifier.h">
       <Filter>src\view\audioview\graph</Filter>
     </ClInclude>
     <ClInclude Include="src\view\audioview\graph\TimeScale.h">

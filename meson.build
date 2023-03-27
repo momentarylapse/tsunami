@@ -486,6 +486,7 @@ sources = [
 	'src/view/audioview/graph/Background.cpp',
 	'src/view/audioview/graph/Cursor.cpp',
 	'src/view/audioview/graph/LayerHeader.cpp',
+	'src/view/audioview/graph/LogNotifier.cpp',
 	'src/view/audioview/graph/TimeScale.cpp',
 	'src/view/audioview/graph/TrackHeader.cpp',
 	'src/view/audioview/graph/ViewMarker.cpp',

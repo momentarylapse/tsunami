@@ -109,7 +109,7 @@ public:
 		set_title(_("Error"));
 		add_grid("", 0, 0, "root");
 		set_target("root");
-		//add_label(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
+		add_label(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
 		add_list_view("!nobar", 0, 1, "message-list");
 		add_grid("!buttonbar", 0, 2, "buttonbar");
 		set_target("buttonbar");
@@ -123,8 +123,6 @@ public:
 		set_image("ok", "hui:ok");
 		set_options("ok", "danger,default");
 		set_tooltip("ok", _("will close the program"));
-
-		set_info_text(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), {"error"});
 
 	#ifdef _X_USE_NET_
 		event("send-report", [this] {

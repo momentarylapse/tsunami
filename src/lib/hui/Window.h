@@ -105,9 +105,6 @@ public:
 	void _cdecl set_cursor_pos(int x,int y);
 	void _cdecl show_cursor(bool show);
 
-	// info bar
-	void _cdecl set_info_text(const string &str, const Array<string> &options);
-
 	// events by overwriting
 	virtual void _cdecl on_mouse_move(){}
 	virtual void _cdecl on_mouse_enter(){}
@@ -159,13 +156,6 @@ public:
 	shared<Control> header_bar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
-	struct InfoBar {
-		GtkWidget *widget;
-		GtkWidget *label;
-		string id;
-	};
-	Array<InfoBar> info_bars;
-	InfoBar *_get_info_bar(const string &id);
 	void _add_headerbar();
 #endif
 	

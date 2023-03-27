@@ -22,7 +22,7 @@ public:
 	void add_child(shared<Control> child, int x, int y) override;
 	void remove_child(Control *child) override;
 
-	void __set_option(const string& op, const string& value);
+	void __set_option(const string& op, const string& value) override;
 
 	GtkWidget *revealer;
 	GtkWidget *expander;

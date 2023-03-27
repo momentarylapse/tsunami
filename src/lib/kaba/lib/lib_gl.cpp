@@ -58,7 +58,7 @@ public:
 		new(this) nix::Texture(width, height, format);
 	}
 	void _cdecl __delete__() {
-		this->~Texture();
+		reinterpret_cast<nix::Texture*>(this)->~Texture();
 	}
 
 	void _cdecl __init_multi_sample__(int width, int height, int samples, const string &format) {
@@ -84,7 +84,7 @@ public:
 		new(this) nix::FrameBuffer(attachments);
 	}
 	void __delete__() {
-		this->~FrameBuffer();
+		reinterpret_cast<nix::FrameBuffer*>(this)->~FrameBuffer();
 	}
 };
 

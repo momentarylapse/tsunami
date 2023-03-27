@@ -273,9 +273,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 			add_button("!ignorefocus", 0, 0, "new");
 			set_image("new", "hui:new");
 			add_button("!ignorefocus\\Open", 1, 0, "open");
+			add_button("!ignorefocus", 1, 0, "save");
+			set_image("save", "hui:save");
 			add_menu_button("!ignorefocus,width=10", 2, 0, "save-menu");
 			set_options("save-menu", "menu=header-save-menu");
-			set_image("save-menu", "hui:save");
 		set_target(":header:");
 		add_grid("!box,linked", 1, 0, "undo-redo-box");
 			set_target("undo-redo-box");
@@ -306,7 +307,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 			set_image("pause", "hui:media-pause");
 			add_button("!flat,ignorefocus", 2, 1, "stop");
 			set_image("stop", "hui:media-stop");
-			add_button("!ignorefocus", 3, 1, "record");
+			add_button("!flat,ignorefocus", 3, 1, "record");
 			set_image("record", "hui:media-record");
 		set_target(":header:");
 

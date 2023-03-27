@@ -299,7 +299,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	hui::run_later(0.5f, [this] {
-		if (true or BackupManager::should_notify_found_backups()) {
+		if (BackupManager::should_notify_found_backups()) {
 			session->q("Old recording backup found\nto load or delete, open the session manager in the bottom bar", {"show-session-console:yes"});
 			BackupManager::notify_found_backups_done();
 		}

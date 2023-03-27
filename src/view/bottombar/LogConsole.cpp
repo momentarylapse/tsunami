@@ -46,16 +46,10 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 	if (m.type == Log::Type::ERROR) {
 		lc->add_string("log_list", format("%s  <span foreground=\"red\">َ<b>Error: %s</b></span>", wrap_source(source), text));
 		//lc->blink();
-		lc->win->set_info_text(m.text, {"error", "allow-close", "id=error"});
 	} else if (m.type == Log::Type::WARNING) {
 		lc->add_string("log_list", format("%s  <span foreground=\"orange\">َ<b>Warning:</b> %s</span>", wrap_source(source), text));
-		lc->win->set_info_text(m.text, {"warning", "allow-close", "id=warning"});
 	} else if (m.type == Log::Type::QUESTION) {
 		lc->add_string("log_list", format("%s  <b>Question:</b> %s", wrap_source(source), text));
-		Array<string> options = {"warning", "allow-close", "id=question-" + i2s(rand())};
-		for (auto &o: m.responses)
-			options.add("button:" + o);
-		lc->win->set_info_text(m.text, options);
 	} else if (m.type == Log::Type::DEBUG) {
 		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
 	} else if (m.type == Log::Type::STATUS) {

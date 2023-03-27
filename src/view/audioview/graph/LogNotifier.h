@@ -18,7 +18,7 @@ public:
 	LogNotifier(AudioView *view);
 	~LogNotifier();
 
-	bool allow_handle_click_when_gaining_focus() const override { return false; }
+	bool hover(const vec2 &m) const override { return false; }
 
 	void on_draw(Painter *p) override;
 

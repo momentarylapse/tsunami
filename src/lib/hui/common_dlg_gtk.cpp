@@ -120,6 +120,7 @@ static void add_filters(GtkFileDialog *dlg, const DialogParams &p) {
 	gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(ls));
 }
 #else
+#if GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		auto fn = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(self));
@@ -130,6 +131,7 @@ static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpoin
 		cur_file_callback("");
 	}
 }
+#endif
 
 static void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter) {
 	Array<string> show_filter_list = show_filter.explode("|");
@@ -322,7 +324,7 @@ static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
 	//else
 	//	cur_font_callback("");
 }
-#else
+#elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(self));
@@ -382,7 +384,7 @@ static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
 	if (auto c = gtk_color_dialog_choose_rgba_finish(dlg, res, nullptr))
 		cur_color_callback(color_from_gdk(*c));
 }
-#else
+#elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		GdkRGBA gcol;
@@ -433,7 +435,7 @@ static void on_question_reply(GObject* o, GAsyncResult* res, gpointer user_data)
 	else
 		cur_question_callback("hui:cancel");
 }
-#else
+#elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_YES)
 		cur_question_callback("hui:yes");

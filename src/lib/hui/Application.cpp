@@ -46,15 +46,18 @@ void _init_global_css_classes_() {
 .hui-big-font { font-size: 125%; }
 .hui-huge-font { font-size: 150%; }
 .hui-small-font { font-size: 75%; }
-.hui-rotate-left { transform: rotate(90deg); } /* check? */
-.hui-rotate-right { transform: rotate(-90deg); }
 .hui-no-border { border-style: none; }
 )foo";
+#if GTK_CHECK_VERSION(4,0,0)
+	css += ".hui-rotate-left { transform: rotate(90deg); } /* check? */\n";
+	css += ".hui-rotate-right { transform: rotate(-90deg); }\n";
+#endif
 
 	auto *css_provider = gtk_css_provider_new();
 
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num);
+	gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css_provider),  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 #else
 	GError *error = nullptr;
 	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num, &error);
@@ -62,8 +65,8 @@ void _init_global_css_classes_() {
 		msg_error(string("css: ") + error->message + " (" + css + ")");
 		return;
 	}
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider),  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 #endif
-	gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css_provider),  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
 Application::Application(const string &app_name, const string &def_lang, int flags) {
@@ -106,6 +109,9 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 #if GTK_CHECK_VERSION(4,0,0)
 	application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
+#else
+	_MakeUsable_();
+	_init_global_css_classes_();
 #endif
 }
 
@@ -193,8 +199,6 @@ static bool keep_running = true;
 int Application::run() {
 #if GTK_CHECK_VERSION(4,0,0)
 	return g_application_run(G_APPLICATION(application), 0, nullptr);
-	while (keep_running)
-		do_single_main_loop();
 #else
 	gtk_main();
 #endif
@@ -204,11 +208,13 @@ int Application::run() {
 }
 
 
-[[maybe_unused]] static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
+#if GTK_CHECK_VERSION(4,0,0)
+static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
 	auto app = reinterpret_cast<Application*>(user_data);
 	_init_global_css_classes_();
 	app->on_startup(app->_args);
 }
+#endif
 
 
 

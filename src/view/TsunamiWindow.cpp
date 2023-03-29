@@ -309,6 +309,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 			set_image("stop", "hui:media-stop");
 			add_button("!flat,ignorefocus", 3, 1, "record");
 			set_image("record", "hui:media-record");
+			add_menu_button("!flat,ignorefocus,width=10", 2, 0, "sound-menu");
+			set_options("sound-menu", "menu=header-sound-menu");
 		set_target(":header:");
 
 		set_target("");

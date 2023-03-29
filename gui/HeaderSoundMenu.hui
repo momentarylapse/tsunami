@@ -1,0 +1,3 @@
+Menu header-sound-menu ""
+	Item /play-loop "Loop" checkable
+	Item record-complex "Record complex..."

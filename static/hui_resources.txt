@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-81
+82
 # Resource
 Menu
 menu_fake
@@ -1413,6 +1413,25 @@ Item
 quick-export
 image=hui:save
 4
+0
+0
+# Resource
+Menu
+header-sound-menu
+
+0
+0
+2
+Item
+play-loop
+checkable
+0
+0
+0
+Item
+record-complex
+
+1
 0
 0
 # Resource
@@ -8295,7 +8314,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-735
+736
 # Text
 /bars-add
 Add bars...
@@ -8935,6 +8954,9 @@ About
 
 header-menu/help
 Help
+
+header-sound-menu/record-complex
+Record complex...
 
 help-dialog/first-time-message
 This dialog can be found in the menu ?/Help

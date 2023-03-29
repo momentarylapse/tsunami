@@ -73,7 +73,7 @@ class MyDialog extends hui.Dialog
 		event("line-space", on_update)
 		event("track-space", on_update)
 		event("x-scale", on_update)
-		event("shadows", on_update)
+		event("allow-shadows", on_update)
 		event("play", on_play)
 		event_x("tracks", "hui:change", on_update)
 		event_x("area", "hui:left-button-down", on_click)
@@ -245,7 +245,7 @@ class MultiLineView extends TsunamiPlugin
 		x_scale = 1.0
 		track_mode: bool[]
 		y_offset = 0.0
-		allow_shadows = false
+		allow_shadows = true
 		func override reset()
 			line_height = 50.0
 			line_space = 0.8
@@ -254,7 +254,7 @@ class MultiLineView extends TsunamiPlugin
 			x_scale = 1.0
 			track_mode.clear()
 			y_offset = 0.0
-			allow_shadows = false
+			allow_shadows = true
 	var config: Config
 
 	func override on_start()

@@ -146,11 +146,18 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 	auto options = get_option_from_title(title);
 	string fmt = option_value(options, "format");
 
-#if GTK_CHECK_VERSION(4,10,0)
 
+#if GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *sw = gtk_scrolled_window_new();
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+#else
+	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
+#endif
+
+
+#if GTK_CHECK_VERSION(4,10,0)
 	effective_format = make_format_string_useful(fmt, parts.num);
 	msg_write(effective_format);
 
@@ -217,9 +224,6 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 
 
 #else
-	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-
 	// "model"
 	Array<GType> types = CreateTypeList(make_format_string_useful(fmt, parts.num));
 	GtkTreeStore *store = gtk_tree_store_newv(types.num, &types[0]);

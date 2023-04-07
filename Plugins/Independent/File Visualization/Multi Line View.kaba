@@ -149,6 +149,14 @@ class MyDialog extends hui.Dialog
 	
 	func mut on_config_changed()
 		force_redraw()
+		set_float("line-height", line_height)
+		set_float("line-space", line_space)
+		set_float("track-space", track_space)
+		set_float("x-scale", x_scale)
+		check("allow-shadows", allow_shadows)
+		for i=>t in weak(session.song.tracks)
+			set_cell("tracks", i, 1, str(track_mode[i * 2    ]))
+			set_cell("tracks", i, 2, str(track_mode[i * 2 + 1]))
 	
 	func mut on_scroll()
 		let e = hui.get_event()
@@ -233,6 +241,13 @@ class MyDialog extends hui.Dialog
 			hui.run_later(0.02, force_redraw)
 	func force_redraw()
 		redraw("area")
+
+let AUTO_CONFIG_LINE_HEIGHT = "10:200:1:1:"
+let AUTO_CONFIG_LINE_SPACE = "0:2:1:100:%"
+let AUTO_CONFIG_TRACK_SPACE = "0:2:1:100:%"
+let AUTO_CONFIG_BORDER = "0:100:1:1:"
+let AUTO_CONFIG_X_SCALE = "0.02:4:1:100:%"
+let AUTO_CONFIG_Y_OFFSET = "0:100000:1:1:"
 
 class MultiLineView extends TsunamiPlugin
 	dlg: owned[MyDialog]

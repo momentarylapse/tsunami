@@ -77,6 +77,7 @@ public:
 	int good_samples(const Range &r0);
 	float draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
 	float draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
+	void draw_track_markers(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
 	float draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale);
 
 	void draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r);

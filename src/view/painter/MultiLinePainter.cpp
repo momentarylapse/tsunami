@@ -139,6 +139,22 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	return y0 + string_dy * n;
 }
 
+void MultiLinePainter::draw_track_markers(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
+	float y = y0;
+	const float d = line_height / 20;
+	for (auto l: weak(t->layers))
+		for (auto m: weak(l->markers))
+			if (r.is_inside(m->range.start())) {
+				float x = cam->sample2screen(m->range.start());
+				p->set_color(colors.text_soft1);
+				p->draw_line({x - d*4, y - d*13}, {x - d*4, y - d*7});
+				p->draw_line({x - d*4, y - d*13}, {x + d*4, y - d*13});
+				p->draw_line({x - d*4, y - d*7},  {x + d*4, y - d*7});
+				p->set_font_size(line_height / 5);
+				p->draw_str({x - d*3, y-d*12}, m->nice_text());
+			}
+}
+
 TrackMarker* get_bar_part(Song *s, int offset) {
 	auto *t = s->time_track();
 	if (!t)
@@ -285,7 +301,10 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 			y0 = draw_track_classical(p, x0, w, y0, r, tt.track, scale) + track_space;
 		if (tt.allow_tab)
 			y0 = draw_track_tab(p, x0, w, y0, r, tt.track, scale) + track_space;
-		y0 += track_space;
+		if (tt.allow_classical or tt.allow_tab) {
+			draw_track_markers(p, x0, w, y0, r, tt.track, scale);
+			y0 += track_space;
+		}
 	}
 
 	if (line_data.num == 0)

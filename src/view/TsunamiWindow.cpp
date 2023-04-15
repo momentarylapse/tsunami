@@ -416,16 +416,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	update_menu();
 }
 
-void tsunami_clean_up(Session *session) {
-	auto sessions = weak(tsunami->session_manager->sessions);
-	foreachi(Session *s, sessions, i)
-		if (s == session and s->auto_delete)
-			tsunami->session_manager->sessions.erase(i);
-
-	if (tsunami->session_manager->sessions.num == 0)
-		tsunami->end();
-}
-
 TsunamiWindow::~TsunamiWindow() {
 	session->prepare_end();
 
@@ -452,7 +442,7 @@ TsunamiWindow::~TsunamiWindow() {
 
 	auto _session = session;
 	hui::run_later(0.010f, [_session] {
-		tsunami_clean_up(_session);
+		tsunami->session_manager->delete_session(_session);
 	});
 }
 

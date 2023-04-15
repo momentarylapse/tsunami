@@ -13,8 +13,6 @@
 #include "../any/any.h"
 
 
-string f2s_clean(float f, int dez);
-
 
 Configuration::Configuration() {
 	loaded = false;

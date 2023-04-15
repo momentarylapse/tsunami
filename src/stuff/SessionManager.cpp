@@ -29,8 +29,18 @@ Session *SessionManager::create_session() {
 	session->win->show();
 
 	sessions.add(session);
-	hui::run_later(0.5f, [this] { notify(); });
+	hui::run_later(0.1f, [this] { notify(); });
 	return session;
+}
+
+void SessionManager::delete_session(Session *session) {
+	foreachi(Session *s, weak(sessions), i)
+		if (s == session /*and s->auto_delete*/)
+			sessions.erase(i);
+	hui::run_later(0.1f, [this] { notify(); });
+
+	if (sessions.num == 0)
+		tsunami->end();
 }
 
 void SessionManager::save_session(Session *s, const Path &filename) {

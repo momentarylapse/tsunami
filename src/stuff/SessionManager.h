@@ -17,6 +17,8 @@ class Path;
 class SessionManager : public Observable<VirtualBase> {
 public:
 	Session *create_session();
+	void delete_session(Session *s);
+
 	void save_session(Session *s, const Path &filename);
 	Session *load_session(const Path &filename);
 	void delete_saved_session(const Path &filename);

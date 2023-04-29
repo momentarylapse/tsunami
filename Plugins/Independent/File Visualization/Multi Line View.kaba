@@ -194,7 +194,7 @@ class MyDialog extends hui.Dialog
 	func override on_draw(p: Painter)
 		let window_size_prev = window_size
 		get_size(window_size[0], window_size[1])
-		if window_size[0] != window_size_prev[0] or window_size[1] != window_size_prev[1]
+		if window_size != window_size_prev
 			mlv.changed()
 			
 		area = [0,p.width, 0,p.height]

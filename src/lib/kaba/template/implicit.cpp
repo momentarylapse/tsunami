@@ -92,6 +92,24 @@ shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, const s
 	return nullptr;
 }
 
+shared<Node> AutoImplementer::add_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
+	if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, a, b))
+		return n_eq;
+	if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, a, b))
+		return add_node_operator_by_inline(InlineID::BOOL_NOT, n_neq, nullptr);
+	do_error_implicit(f, format("neither operator %s == %s nor != found", a->type->long_name(), b->type->long_name()));
+	return nullptr;
+}
+
+shared<Node> AutoImplementer::add_not_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
+	if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, a, b))
+		return n_neq;
+	if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, a, b))
+		return add_node_operator_by_inline(InlineID::BOOL_NOT, n_eq, nullptr);
+	do_error_implicit(f, format("neither operator %s != %s nor == found", a->type->long_name(), b->type->long_name()));
+	return nullptr;
+}
+
 
 
 void AutoImplementer::do_error_implicit(Function *f, const string &str) {

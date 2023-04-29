@@ -35,8 +35,10 @@ void AutoImplementer::_add_missing_function_headers_for_product(Class *t) {
 		if (t->can_memcpy())
 			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
 	}
-	if (allow_equal)
+	if (allow_equal) {
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
+		add_func_header(t, Identifier::Func::NOT_EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
+	}
 }
 
 void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
@@ -50,12 +52,40 @@ void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
 		//     return false
 
 		auto cmd_if = add_node_statement(StatementID::IF);
-		if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, self->shift(e.offset, e.type), other->shift(e.offset, e.type)))
-			cmd_if->set_param(0, n_neq);
-		else if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, self->shift(e.offset, e.type), other->shift(e.offset, e.type)))
-			cmd_if->set_param(0, add_node_operator_by_inline(InlineID::BOOL_NOT, n_eq, nullptr));
-		else
-			do_error_implicit(f, format("neither operator %s != %s nor == found", e.type->long_name(), e.type->long_name()));
+		cmd_if->set_param(0, add_not_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
+
+		auto b = new Block(f, f->block.get());
+
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, node_false());
+		b->add(cmd_ret);
+
+		cmd_if->set_param(1, b);
+		f->block->add(cmd_if);
+	}
+
+	{
+		// return true
+		auto cmd_ret = add_node_statement(StatementID::RETURN);
+		cmd_ret->set_num_params(1);
+		cmd_ret->set_param(0, node_true());
+		f->block->add(cmd_ret);
+	}
+}
+
+void AutoImplementer::implement_product_not_equal(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto other = add_node_local(f->__get_var("other"));
+
+	for (auto& e: t->elements) {
+		// if self.e == other.e
+		//     return false
+
+		auto cmd_if = add_node_statement(StatementID::IF);
+		cmd_if->set_param(0, add_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
 
 		auto b = new Block(f, f->block.get());
 
@@ -83,6 +113,7 @@ void AutoImplementer::_implement_functions_for_product(const Class *t) {
 	implement_regular_destructor(prepare_auto_impl(t, t->get_destructor()), t); // if exists...
 	implement_regular_assign(prepare_auto_impl(t, t->get_assign()), t); // if exists...
 	implement_product_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t); // if exists...
+	implement_product_not_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::NOT_EQUAL, TypeBool, {t})), t); // if exists...
 }
 
 

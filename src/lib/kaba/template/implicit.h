@@ -84,6 +84,7 @@ public:
 	void implement_optional_equal(Function *f, const Class *t);
 	void implement_optional_equal_raw(Function *f, const Class *t);
 	void implement_product_equal(Function *f, const Class *t);
+	void implement_product_not_equal(Function *f, const Class *t);
 	void implement_functions(const Class *t);
 	void _implement_functions_for_array(const Class *t);
 	void _implement_functions_for_list(const Class *t);
@@ -110,6 +111,9 @@ public:
 
 	shared<Node> add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
 	shared<Node> add_assign(Function *f, const string &ctx, const string &msg, shared<Node> a, shared<Node> b);
+
+	shared<Node> add_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
+	shared<Node> add_not_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
 
 
 	static bool needs_new(Function *f);

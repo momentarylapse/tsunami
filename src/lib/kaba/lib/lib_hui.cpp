@@ -446,6 +446,12 @@ void SIAddPackageHui(Context *c) {
 		class_add_func("set_position", TypeVoid, hui_p(&hui::Window::set_position));
 			func_add_param("x", TypeInt);
 			func_add_param("y", TypeInt);
+		class_add_func("set_size", TypeVoid, hui_p(&hui::Window::set_size));
+			func_add_param("x", TypeInt);
+			func_add_param("y", TypeInt);
+		class_add_func("get_size", TypeVoid, hui_p(&hui::Window::get_size));
+			func_add_param("x", TypeInt, Flags::OUT);
+			func_add_param("y", TypeInt, Flags::OUT);
 	//add_func("setOuterior", TypeVoid, 2, TypePointer,"win",
 	//																										TypeIRect,"r");
 	//add_func("getOuterior", TypeIRect, 1, TypePointer,"win");

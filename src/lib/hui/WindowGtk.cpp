@@ -553,7 +553,8 @@ void Window::set_size(int width, int height) {
 // get the current window position and size (including the frame and menu/toolbars...)
 void Window::get_size(int &width, int &height) {
 #if GTK_CHECK_VERSION(4,0,0)
-	//gtk_widget_get_size(GTK_WIDGET(window), &width, &height);
+	width = gtk_widget_get_width(GTK_WIDGET(window));
+	height = gtk_widget_get_height(GTK_WIDGET(window));
 #else
 	gtk_window_get_size(GTK_WINDOW(window), &width, &height);
 #endif

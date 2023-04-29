@@ -58,14 +58,7 @@ class MyDialog extends hui.Dialog
 		set_image("config", "hui:properties")
 		
 		for i=>t in session.song.tracks
-			if t.type == SignalType.MIDI
-				track_mode.add(true)
-				track_mode.add(true)
-				add_string("tracks", "{{t.nice_name()}}\\true\\true")
-			else
-				track_mode.add(false)
-				track_mode.add(false)
-				add_string("tracks", "{{t.nice_name()}}\\false\\false")
+			add_string("tracks", "{{t.nice_name()}}\\false\\false")
 		
 		#var me = &self
 		event("config", on_config)#lambda(me: MyDialog) me.hide_control("config-grid", false))
@@ -85,6 +78,8 @@ class MyDialog extends hui.Dialog
 		session.view.signal_chain.subscribe(self, on_preview_tick, "Tick")
 		
 		mlp = new MultiLinePainter(session.song, colors)
+		
+		on_config_changed()
 	
 	func override __delete__()
 		session.view.signal_chain.unsubscribe(self)
@@ -142,21 +137,36 @@ class MyDialog extends hui.Dialog
 		track_space = get_float("track-space")
 		x_scale = get_float("x-scale")
 		allow_shadows = is_checked("allow-shadows")
+		track_mode.resize(len(session.song.tracks) * 2)
 		for i=>t in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
 			track_mode[i * 2 + 1] = (get_cell("tracks", i, 2) == "true")
 		mlv.changed()
 	
 	func mut on_config_changed()
-		force_redraw()
+		set_size(window_size[0], window_size[1])
 		set_float("line-height", line_height)
 		set_float("line-space", line_space)
 		set_float("track-space", track_space)
 		set_float("x-scale", x_scale)
 		check("allow-shadows", allow_shadows)
-		for i=>t in weak(session.song.tracks)
-			set_cell("tracks", i, 1, str(track_mode[i * 2    ]))
-			set_cell("tracks", i, 2, str(track_mode[i * 2 + 1]))
+		if len(track_mode) > 0
+			for i=>t in weak(session.song.tracks)
+				if i*2 < len(track_mode)
+					set_cell("tracks", i, 1, str(track_mode[i * 2    ]))
+					set_cell("tracks", i, 2, str(track_mode[i * 2 + 1]))
+				else
+					set_cell("tracks", i, 1, "false")
+					set_cell("tracks", i, 2, "false")
+		else
+			for i=>t in weak(session.song.tracks)
+				if t.type == SignalType.MIDI
+					set_cell("tracks", i, 1, "true")
+					set_cell("tracks", i, 2, "true")
+				else
+					set_cell("tracks", i, 1, "false")
+					set_cell("tracks", i, 2, "false")
+		force_redraw()
 	
 	func mut on_scroll()
 		let e = hui.get_event()
@@ -182,11 +192,19 @@ class MyDialog extends hui.Dialog
 		
 
 	func override on_draw(p: Painter)
+		let window_size_prev = window_size
+		get_size(window_size[0], window_size[1])
+		if window_size[0] != window_size_prev[0] or window_size[1] != window_size_prev[1]
+			mlv.changed()
+			
 		area = [0,p.width, 0,p.height]
 		var conf = dyn([])
 		for i=>t in session.song.tracks
 			if t.type != SignalType.MIDI
 				continue
+			if i*2+1 >= len(track_mode)
+				continue
+#			conf.add(dyn({"index":i, "classical":track_mode[i*2], "tab":track_mode[i*2+1]}))
 			if track_mode[i*2] and track_mode[i*2+1]
 				conf.add(dyn({"index":i, "classical":true, "tab":true}))
 			else if track_mode[i*2]
@@ -261,6 +279,7 @@ class MultiLineView extends TsunamiPlugin
 		track_mode: bool[]
 		y_offset = 0.0
 		allow_shadows = true
+		window_size: (int,int)
 		func override reset()
 			line_height = 50.0
 			line_space = 0.8
@@ -270,6 +289,7 @@ class MultiLineView extends TsunamiPlugin
 			track_mode.clear()
 			y_offset = 0.0
 			allow_shadows = true
+			window_size = [800,600]
 	var config: Config
 
 	func override on_start()

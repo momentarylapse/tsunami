@@ -43,6 +43,7 @@ public:
 	Path session_path(const string &name) const;
 	string session_name(const string &name) const;
 	Path directory() const;
+	bool session_exists(const string& name) const;
 
 	shared_array<Session> active_sessions;
 

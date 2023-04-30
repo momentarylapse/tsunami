@@ -72,7 +72,13 @@ void SessionConsole::on_save() {
 		return;
 
 	QuestionDialogString::ask(win, "Session name", [this, s=l.session] (const string& name) {
-		tsunami->session_manager->save_session(s, name);
+		if (tsunami->session_manager->session_exists(name))
+			hui::question_box(win, "Session already exists", "Do you want to overwrite?", [s, name=name] (const string& answer) {
+				if (answer == "hui:yes")
+					tsunami->session_manager->save_session(s, name);
+			});
+		else
+			tsunami->session_manager->save_session(s, name);
 	});
 }
 
@@ -80,15 +86,19 @@ void SessionConsole::on_delete() {
 	int n = get_int(id_list);
 	if (n < 0)
 		return;
-	auto &l = session_labels[n];
-	if (l.is_backup()) {
-		BackupManager::delete_old(l.uuid);
+	auto l = session_labels[n];
+	hui::question_box(win, "Deleting", "Are you sure?", [l] (const string& answer) {
+		if (answer == "hui:yes") {
+			if (l.is_backup()) {
+				BackupManager::delete_old(l.uuid);
 
-		// TODO: make BackupManager observable :P
-		tsunami->session_manager->notify();
-	} else if (l.is_persistent()) {
-		tsunami->session_manager->delete_saved_session(l.name);
-	}
+				// TODO: make BackupManager observable :P
+				tsunami->session_manager->notify();
+			} else if (l.is_persistent()) {
+				tsunami->session_manager->delete_saved_session(l.name);
+			}
+		}
+	});
 }
 
 void SessionConsole::on_list_double_click() {

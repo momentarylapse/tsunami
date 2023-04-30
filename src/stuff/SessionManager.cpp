@@ -120,6 +120,13 @@ string SessionManager::session_name(const string &name) const {
 	return session_path(name).basename_no_ext();
 }
 
+bool SessionManager::session_exists(const string& name) const {
+	for (const auto& l: enumerate_all_sessions())
+		if (l.is_persistent() and l.name == session_name(name))
+			return true;
+	return false;
+}
+
 Session *SessionManager::load_session(const string &name, Session *session_caller) {
 
 	xml::Parser parser;

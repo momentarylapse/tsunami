@@ -406,12 +406,18 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 		}
 	}
 
+	Array<AutoConfigData*> rr;
 	if (ps) {
-		for (auto a: r)
-			a->parse(config->auto_conf(a->name));
+		for (auto a: r) {
+			auto cc = config->auto_conf(a->name);
+			if (cc != "ignore") {
+				a->parse(cc);
+				rr.add(a);
+			}
+		}
 	}
 
-	return r;
+	return rr;
 }
 
 AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :

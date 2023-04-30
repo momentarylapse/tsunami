@@ -15,16 +15,19 @@ class Session;
 class Path;
 
 struct SessionLabel {
-	enum class Type {
-		ACTIVE,
-		SAVED,
-		BACKUP
+	enum Flags {
+		ACTIVE = 1,
+		PERSISTENT = 2,
+		BACKUP = 4
 	};
 
-	Type type;
+	Flags flags;
 	string name;
 	Session *session;
 	int uuid;
+	bool is_active() const;
+	bool is_persistent() const;
+	bool is_backup() const;
 };
 
 class SessionManager : public Observable<VirtualBase> {

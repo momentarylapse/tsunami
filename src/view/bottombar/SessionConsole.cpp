@@ -56,9 +56,9 @@ void SessionConsole::on_load() {
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
-	if (l.type == SessionLabel::Type::SAVED)
+	if (l.is_persistent())
 		tsunami->session_manager->load_session(l.name, session);
-	else if (l.type == SessionLabel::Type::BACKUP)
+	else if (l.is_backup())
 		load_backup(session, l.name);
 }
 
@@ -67,7 +67,7 @@ void SessionConsole::on_save() {
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
-	if (l.type != SessionLabel::Type::ACTIVE)
+	if (!l.is_active())
 		return;
 	os::fs::create_directory(tsunami->session_manager->directory());
 	hui::file_dialog_save(win, "", tsunami->session_manager->directory(), {"filter=*.session", "showfilter=*.session"}, [this, &l] (const Path &filename) {
@@ -81,12 +81,12 @@ void SessionConsole::on_delete() {
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
-	if (l.type == SessionLabel::Type::BACKUP) {
+	if (l.is_backup()) {
 		BackupManager::delete_old(l.uuid);
 
 		// TODO: make BackupManager observable :P
 		tsunami->session_manager->notify();
-	} else if (l.type == SessionLabel::Type::SAVED) {
+	} else if (l.is_persistent()) {
 		tsunami->session_manager->delete_saved_session(l.name);
 	}
 }
@@ -99,9 +99,9 @@ void SessionConsole::on_right_click() {
 	int n = hui::get_event()->row;
 	if (n >= 0) {
 		auto &l = session_labels[n];
-		popup_menu->enable("session-load", l.type == SessionLabel::Type::BACKUP or l.type == SessionLabel::Type::SAVED);
-		popup_menu->enable("session-delete", l.type == SessionLabel::Type::BACKUP or l.type == SessionLabel::Type::SAVED);
-		popup_menu->enable("session-save", l.type == SessionLabel::Type::ACTIVE);
+		popup_menu->enable("session-load", l.is_backup() or l.is_persistent());
+		popup_menu->enable("session-delete", l.is_backup() or l.is_persistent());
+		popup_menu->enable("session-save", l.is_active());
 	} else {
 		popup_menu->enable("session-load", false);
 		popup_menu->enable("session-delete", false);
@@ -114,14 +114,19 @@ void SessionConsole::load_data() {
 	session_labels = tsunami->session_manager->enumerate_all_sessions();
 	reset(id_list);
 	for (auto &l: session_labels) {
-		if (l.type == SessionLabel::Type::ACTIVE) {
+		if (l.is_active() and l.is_persistent()) {
 			if (l.session == session)
-				add_string(id_list, format("<b>%s\n      <small>this window's session</small></b>", l.name));
+				add_string(id_list, format("<b>%s\n      <small>this window's session, persistent</small></b>", l.name));
 			else
-				add_string(id_list, format("%s\n      <small>other window's session</small>", l.name));
-		} else if (l.type == SessionLabel::Type::SAVED) {
+				add_string(id_list, format("%s\n      <small>other window's session, persistent</small>", l.name));
+		} else if (l.is_active()) {
+				if (l.session == session)
+					add_string(id_list, format("<b>%s\n      <small>this window's session</small></b>", l.name));
+				else
+					add_string(id_list, format("%s\n      <small>other window's session</small>", l.name));
+		} else if (l.is_persistent()) {
 			add_string(id_list, format("<span alpha=\"50%%\">%s</span>\n      <span alpha=\"50%%\"><small>saved session</small></span>", l.name));
-		} else if (l.type == SessionLabel::Type::BACKUP) {
+		} else if (l.is_backup()) {
 			add_string(id_list, format("<span color=\"orange\">%s</span>\n      <span color=\"orange\"><small>recording backup</small></span>", l.name));
 		}
 	}

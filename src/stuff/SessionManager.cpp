@@ -22,6 +22,19 @@
 
 string title_filename(const Path &filename);
 
+
+bool SessionLabel::is_active() const {
+	return flags & Flags::ACTIVE;
+}
+
+bool SessionLabel::is_persistent() const {
+	return flags & Flags::PERSISTENT;
+}
+
+bool SessionLabel::is_backup() const {
+	return flags & Flags::BACKUP;
+}
+
 Session *SessionManager::spawn_new_session() {
 	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), this, tsunami->perf_mon.get());
 
@@ -142,6 +155,7 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 		}
 	}
 
+	notify();
 	return s;
 }
 
@@ -154,22 +168,39 @@ Path SessionManager::directory() const {
 	return tsunami->directory | "sessions";
 }
 
+static SessionLabel::Flags operator|(SessionLabel::Flags a, SessionLabel::Flags b) {
+	return (SessionLabel::Flags)((int)a | (int)b);
+}
+
 Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
 	Array<SessionLabel> session_labels;
 
-	// active
+	auto find_active = [this] (const string &name) -> Session* {
+		for (auto s: weak(active_sessions))
+				if (s->persistent_name == name)
+					return s;
+		return nullptr;
+	};
+
+	// non-persistent active
 	for (auto s: weak(active_sessions))
-		session_labels.add({SessionLabel::Type::ACTIVE, title_filename(s->song->filename), s, -1});
+		if (s->persistent_name == "")
+			session_labels.add({SessionLabel::Flags::ACTIVE, title_filename(s->song->filename), s, -1});
+
+	// persistent sessions
+	auto list = os::fs::search(tsunami->session_manager->directory(), "*.session", "f");
+	for (auto &e: list) {
+		auto name = e.no_ext().str();
+		if (auto s = find_active(name))
+			session_labels.add({SessionLabel::Flags::PERSISTENT | SessionLabel::Flags::ACTIVE, name, s, -1});
+		else
+			session_labels.add({SessionLabel::Flags::PERSISTENT, name, nullptr, -1});
+	}
 
 	// backups
 	BackupManager::check_old_files();
 	for (auto &f: BackupManager::files)
-		session_labels.add({SessionLabel::Type::BACKUP, f.filename.str(), nullptr, f.uuid});
-
-	// saved sessions
-	auto list = os::fs::search(tsunami->session_manager->directory(), "*.session", "f");
-	for (auto &e: list)
-		session_labels.add({SessionLabel::Type::SAVED, e.no_ext().str(), nullptr, -1});
+		session_labels.add({SessionLabel::Flags::BACKUP, f.filename.str(), nullptr, f.uuid});
 
 	return session_labels;
 }

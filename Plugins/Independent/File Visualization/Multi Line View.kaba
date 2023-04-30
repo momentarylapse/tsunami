@@ -6,7 +6,7 @@ func smooth(t: float) -> float
 		return 2*t^2
 	return 1 - 2*(1-t)^2
 
-class MyDialog extends hui.Dialog
+class MLVDialog extends hui.Dialog
 	mlp: owned![MultiLinePainter]
 	config_visible = false
 	session: Session&
@@ -108,7 +108,9 @@ class MyDialog extends hui.Dialog
 		mlv.changed()
 	
 	func mut on_close()
-		mlv.stop()
+		#mlv.stop()
+		show_window = false
+		mlv.changed()
 	
 	func mut on_play()
 		if session.view.is_playback_active()
@@ -166,7 +168,11 @@ class MyDialog extends hui.Dialog
 				else
 					set_cell("tracks", i, 1, "false")
 					set_cell("tracks", i, 2, "false")
-		force_redraw()
+		if show_window
+			show()
+			force_redraw()
+		else
+			hide()
 	
 	func mut on_scroll()
 		let e = hui.get_event()
@@ -203,6 +209,7 @@ class MyDialog extends hui.Dialog
 			if t.type != SignalType.MIDI
 				continue
 			if i*2+1 >= len(track_mode)
+				conf.add(dyn({"index":i, "classical":true, "tab":true}))
 				continue
 #			conf.add(dyn({"index":i, "classical":track_mode[i*2], "tab":track_mode[i*2+1]}))
 			if track_mode[i*2] and track_mode[i*2+1]
@@ -263,12 +270,15 @@ class MyDialog extends hui.Dialog
 let AUTO_CONFIG_LINE_HEIGHT = "10:200:1:1:"
 let AUTO_CONFIG_LINE_SPACE = "0:2:1:100:%"
 let AUTO_CONFIG_TRACK_SPACE = "0:2:1:100:%"
-let AUTO_CONFIG_BORDER = "0:100:1:1:"
+#let AUTO_CONFIG_BORDER = "0:100:1:1:"
+let AUTO_CONFIG_BORDER = "ignore"
 let AUTO_CONFIG_X_SCALE = "0.02:4:1:100:%"
-let AUTO_CONFIG_Y_OFFSET = "0:100000:1:1:"
+#let AUTO_CONFIG_Y_OFFSET = "0:100000:1:1:"
+let AUTO_CONFIG_Y_OFFSET = "ignore"
+let AUTO_CONFIG_SHOW_WINDOW = ""
 
 class MultiLineView extends TsunamiPlugin
-	dlg: owned[MyDialog]
+	dlg: owned[MLVDialog]
 	
 	class Config extends Module.Config
 		line_height = 50.0
@@ -280,6 +290,7 @@ class MultiLineView extends TsunamiPlugin
 		y_offset = 0.0
 		allow_shadows = true
 		window_size: (int,int)
+		show_window = true
 		func override reset()
 			line_height = 50.0
 			line_space = 0.8
@@ -290,10 +301,11 @@ class MultiLineView extends TsunamiPlugin
 			y_offset = 0.0
 			allow_shadows = true
 			window_size = [800,600]
+			show_window = true
 	var config: Config
 
 	func override on_start()
-		dlg = new MyDialog(session.win, self)
+		dlg = new MLVDialog(session.win, self)
 		for d in dlg
 			d.show()
 		

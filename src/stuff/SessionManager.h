@@ -14,19 +14,36 @@
 class Session;
 class Path;
 
+struct SessionLabel {
+	enum class Type {
+		ACTIVE,
+		SAVED,
+		BACKUP
+	};
+
+	Type type;
+	string name;
+	Session *session;
+	int uuid;
+};
+
 class SessionManager : public Observable<VirtualBase> {
 public:
-	Session *create_session();
-	void delete_session(Session *s);
+	Session *spawn_new_session();
+	Session *get_empty_session(Session *session_caller);
+	void end_session(Session *s);
 
-	void save_session(Session *s, const Path &filename);
-	Session *load_session(const Path &filename);
-	void delete_saved_session(const Path &filename);
+	void save_session(Session *s, const string &name);
+	Session *load_session(const string &name, Session *session_caller = nullptr);
+	void delete_saved_session(const string &name);
 
-	Path directory();
+	Path session_path(const string &name) const;
+	string session_name(const string &name) const;
+	Path directory() const;
 
+	shared_array<Session> active_sessions;
 
-	shared_array<Session> sessions;
+	Array<SessionLabel> enumerate_all_sessions() const;
 };
 
 #endif /* SRC_STUFF_SESSIONMANAGER_H_ */

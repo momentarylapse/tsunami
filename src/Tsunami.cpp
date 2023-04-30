@@ -86,7 +86,7 @@ bool Tsunami::on_startup(const Array<string> &arg) {
 
 	log = new Log;
 
-	Session::GLOBAL = new Session(log.get(), nullptr, nullptr, perf_mon.get());
+	Session::GLOBAL = new Session(log.get(), nullptr, nullptr, session_manager.get(), perf_mon.get());
 
 	clipboard = new Clipboard;
 
@@ -142,7 +142,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 		device_manager->init();
-		session = session_manager->create_session();
+		session = session_manager->spawn_new_session();
 
 		session->win->show();
 		if (a.num > 0) {
@@ -202,7 +202,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {
 		device_manager->init();
-		session = session_manager->create_session();
+		session = session_manager->spawn_new_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
@@ -218,7 +218,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		UnitTest::run_all(a[0]);
 	});
 	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
-		session = session_manager->create_session();
+		session = session_manager->spawn_new_session();
 		session->win->hide();
 		Module *m = nullptr;
 		if (a[0] == "fx") {
@@ -305,7 +305,7 @@ void Tsunami::load_key_codes() {
 void Tsunami::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
 	bool allowed = true;
 
-	for (auto *s: weak(session_manager->sessions)) {
+	for (auto *s: weak(session_manager->active_sessions)) {
 		s->win->test_allow_termination([] {}, [&allowed] { allowed = false; });
 		if (!allowed)
 			break;

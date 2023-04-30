@@ -20,6 +20,7 @@ class AudioView;
 class TsunamiPlugin;
 class DeviceManager;
 class PluginManager;
+class SessionManager;
 class PerformanceMonitor;
 class SignalChain;
 class Path;
@@ -31,7 +32,7 @@ namespace hui {
 // representing one instance/window
 class Session : public Sharable<Observable<VirtualBase>> {
 public:
-	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
+	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, SessionManager *session_manager, PerformanceMonitor *perf_mon);
 	~Session() override;
 
 	static const string MESSAGE_ADD_PLUGIN;
@@ -53,6 +54,7 @@ public:
 	AudioView *view;
 	owned<Storage> storage;
 	bool auto_delete;
+	string persistent_name;
 
 	shared_array<SignalChain> all_signal_chains;
 	void add_signal_chain(xfer<SignalChain> chain);
@@ -79,6 +81,7 @@ public:
 	Log *log;
 	DeviceManager *device_manager;
 	PluginManager *plugin_manager;
+	SessionManager *session_manager;
 	PerformanceMonitor *perf_mon;
 
 

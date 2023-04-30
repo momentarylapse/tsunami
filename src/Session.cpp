@@ -8,6 +8,7 @@
 #include "Session.h"
 #include "EditModes.h"
 #include "stuff/Log.h"
+#include "stuff/SessionManager.h"
 #include "storage/Storage.h"
 #include "plugins/TsunamiPlugin.h"
 #include "data/base.h"
@@ -57,7 +58,7 @@ const string EditMode::ScaleMarker = "scale-marker";
 const string EditMode::Curves = "curves";
 
 
-Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon) {
+Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
 	view = nullptr;
 	_kaba_win = nullptr;
 	storage = new Storage(this);
@@ -65,6 +66,7 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	log = _log;
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
+	session_manager = _session_manager;
 	perf_mon = _perf_mon;
 	auto_delete = true;
 
@@ -78,6 +80,9 @@ Session::~Session() {
 }
 
 void Session::prepare_end() {
+	if (persistent_name != "")
+		session_manager->save_session(this, persistent_name);
+
 	for (auto p: weak(plugins))
 		p->on_stop();
 	plugins.clear();
@@ -96,7 +101,7 @@ void Session::set_win(TsunamiWindow *_win) {
 }
 
 Session *Session::create_child() {
-	auto *child = new Session(log, device_manager, plugin_manager, perf_mon);
+	auto *child = new Session(log, device_manager, plugin_manager, session_manager, perf_mon);
 	return child;
 }
 

@@ -442,7 +442,7 @@ TsunamiWindow::~TsunamiWindow() {
 
 	auto _session = session;
 	hui::run_later(0.010f, [_session] {
-		tsunami->session_manager->delete_session(_session);
+		tsunami->session_manager->end_session(_session);
 	});
 }
 
@@ -1004,7 +1004,7 @@ void TsunamiWindow::on_open() {
 			if (session->storage->load(song, filename))
 				BackupManager::set_save_state(session);
 		} else {
-			auto *s = tsunami->session_manager->create_session();
+			auto *s = tsunami->session_manager->spawn_new_session();
 			s->win->show();
 			s->storage->load(s->song.get(), filename);
 		}

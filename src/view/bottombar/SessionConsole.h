@@ -11,6 +11,7 @@
 
 #include "BottomBar.h"
 
+struct SessionLabel;
 
 class SessionConsole: public BottomBar::Console {
 public:
@@ -19,21 +20,6 @@ public:
 
 	string id_list;
 
-	enum class Type {
-		ACTIVE,
-		SAVED,
-		BACKUP
-	};
-
-	struct SessionLabel {
-		Type type;
-		string name;
-		Session *session;
-		int uuid;
-	};
-	Array<SessionLabel> session_labels;
-	void find_sessions();
-
 	void on_load();
 	void on_save();
 	void on_delete();
@@ -41,6 +27,8 @@ public:
 	void on_right_click();
 
 	void load_data();
+
+	Array<SessionLabel> session_labels;
 
 	owned<hui::Menu> popup_menu;
 };

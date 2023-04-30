@@ -6,6 +6,7 @@
  */
 
 #include "SessionManager.h"
+#include "BackupManager.h"
 #include "../lib/base/base.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/doc/xml.h"
@@ -19,31 +20,38 @@
 #include "../Tsunami.h"
 #include "../Session.h"
 
+string title_filename(const Path &filename);
 
-Session *SessionManager::create_session() {
-	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), tsunami->perf_mon.get());
+Session *SessionManager::spawn_new_session() {
+	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), this, tsunami->perf_mon.get());
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
 	session->set_win(new TsunamiWindow(session));
 	session->win->show();
 
-	sessions.add(session);
+	active_sessions.add(session);
 	hui::run_later(0.1f, [this] { notify(); });
 	return session;
 }
 
-void SessionManager::delete_session(Session *session) {
-	foreachi(Session *s, weak(sessions), i)
+Session *SessionManager::get_empty_session(Session *s) {
+	if (s and s->song->is_empty())
+		return s;
+	return spawn_new_session();
+}
+
+void SessionManager::end_session(Session *session) {
+	foreachi(Session *s, weak(active_sessions), i)
 		if (s == session /*and s->auto_delete*/)
-			sessions.erase(i);
+			active_sessions.erase(i);
 	hui::run_later(0.1f, [this] { notify(); });
 
-	if (sessions.num == 0)
+	if (active_sessions.num == 0)
 		tsunami->end();
 }
 
-void SessionManager::save_session(Session *s, const Path &filename) {
+void SessionManager::save_session(Session *s, const string &name) {
 	xml::Parser parser;
 
 	auto e = xml::Element("session");
@@ -77,24 +85,34 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 	e.add(epp);
 
 	parser.elements.add(e);
-	parser.save(filename);
+	parser.save(session_path(name));
+
+	s->persistent_name = session_name(name);
 
 
 	notify();
 }
 
-Session *SessionManager::load_session(const Path &_filename) {
-	Path filename = _filename;
 
-	// just a name?
-	if (str(filename).tail(8) != ".session")
-		filename = directory() | filename.with(".session");
+Path SessionManager::session_path(const string &name) const {
+	// already a full filename?
+	if (name.tail(8) == ".session")
+		return name;
+	return directory() | (name + ".session");
+}
+
+string SessionManager::session_name(const string &name) const {
+	return session_path(name).basename_no_ext();
+}
+
+Session *SessionManager::load_session(const string &name, Session *session_caller) {
 
 	xml::Parser parser;
-	parser.load(filename);
+	parser.load(session_path(name));
 	auto &e = parser.elements[0];
 
-	auto *s = create_session();
+	auto *s = get_empty_session(session_caller);
+	s->persistent_name = session_name(name);
 	s->win->show();
 
 	auto ef = e.find("file");
@@ -127,11 +145,31 @@ Session *SessionManager::load_session(const Path &_filename) {
 	return s;
 }
 
-void SessionManager::delete_saved_session(const Path &filename) {
-	os::fs::_delete(filename);
+void SessionManager::delete_saved_session(const string &name) {
+	os::fs::_delete(session_path(name));
 	notify();
 }
 
-Path SessionManager::directory() {
+Path SessionManager::directory() const {
 	return tsunami->directory | "sessions";
+}
+
+Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
+	Array<SessionLabel> session_labels;
+
+	// active
+	for (auto s: weak(active_sessions))
+		session_labels.add({SessionLabel::Type::ACTIVE, title_filename(s->song->filename), s, -1});
+
+	// backups
+	BackupManager::check_old_files();
+	for (auto &f: BackupManager::files)
+		session_labels.add({SessionLabel::Type::BACKUP, f.filename.str(), nullptr, f.uuid});
+
+	// saved sessions
+	auto list = os::fs::search(tsunami->session_manager->directory(), "*.session", "f");
+	for (auto &e: list)
+		session_labels.add({SessionLabel::Type::SAVED, e.no_ext().str(), nullptr, -1});
+
+	return session_labels;
 }

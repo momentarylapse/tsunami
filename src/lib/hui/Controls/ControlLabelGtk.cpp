@@ -86,6 +86,13 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 		flag_underline = true;
 	} else if (op == "strikeout") {
 		flag_strikeout = true;
+	} else if (op == "style") {
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_add_css_class(widget, value.c_str());
+#else
+		auto sc = gtk_widget_get_style_context(widget);
+		gtk_style_context_add_class(sc, value.c_str());
+#endif
 	}
 }
 

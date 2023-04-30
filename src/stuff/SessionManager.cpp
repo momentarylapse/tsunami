@@ -73,7 +73,8 @@ void SessionManager::save_session(Session *s, const string &name) {
 	e.add(xml::Element("head").witha("version", "1.0"));
 
 	// file
-	e.add(xml::Element("file").witha("path", s->song->filename.absolute().str()));
+	if (s->song->filename)
+		e.add(xml::Element("file").witha("path", s->song->filename.absolute().str()));
 
 	// view
 	auto ev = xml::Element("view");
@@ -137,11 +138,12 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 	s->persistent_name = session_name(name);
 	s->win->show();
 
-	auto ef = e.find("file");
-	s->storage->load(s->song.get(), ef->value("path"));
+	if (auto ef = e.find("file")) {
+		if (ef->value("path") != "")
+			s->storage->load(s->song.get(), ef->value("path"));
+	}
 
-	auto ev = e.find("view");
-	if (ev) {
+	if (auto ev = e.find("view")) {
 		auto es = ev->find("selection");
 		s->view->sel = SongSelection::from_range(s->song.get(), Range::to(es->value("start")._int(), es->value("end")._int()));
 		s->view->update_selection();
@@ -149,8 +151,7 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 		s->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
 	}
 
-	auto epp = e.find("plugins");
-	if (epp) {
+	if (auto epp = e.find("plugins")) {
 		for (auto &ep: epp->elements) {
 			string _class = ep.value("class");
 			string config = ep.value("config");

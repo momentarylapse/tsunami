@@ -71,9 +71,9 @@ void SessionConsole::on_save() {
 	if (!l.is_active())
 		return;
 
-	QuestionDialogString::ask(win, "Session name", [this, s=l.session] (const string& name) {
+	QuestionDialogString::ask(win, _("Session name"), [this, s=l.session] (const string& name) {
 		if (tsunami->session_manager->session_exists(name))
-			hui::question_box(win, "Session already exists", "Do you want to overwrite?", [s, name=name] (const string& answer) {
+			hui::question_box(win, _("Session already exists"), _("Do you want to overwrite?"), [s, name=name] (const string& answer) {
 				if (answer == "hui:yes")
 					tsunami->session_manager->save_session(s, name);
 			});
@@ -87,7 +87,7 @@ void SessionConsole::on_delete() {
 	if (n < 0)
 		return;
 	auto l = session_labels[n];
-	hui::question_box(win, "Deleting", "Are you sure?", [l] (const string& answer) {
+	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?"), [l] (const string& answer) {
 		if (answer == "hui:yes") {
 			if (l.is_backup()) {
 				BackupManager::delete_old(l.uuid);
@@ -123,22 +123,39 @@ void SessionConsole::on_right_click() {
 void SessionConsole::load_data() {
 	session_labels = tsunami->session_manager->enumerate_all_sessions();
 	reset(id_list);
-	for (auto &l: session_labels) {
+	auto description = [this] (const SessionLabel& l) -> string {
 		if (l.is_active() and l.is_persistent()) {
 			if (l.session == session)
-				add_string(id_list, format("<b>%s\n      <small>this window's session, persistent</small></b>", l.name));
+				return _("this window's session, persistent");
 			else
-				add_string(id_list, format("%s\n      <small>other window's session, persistent</small>", l.name));
+				return _("other window's session, persistent");
 		} else if (l.is_active()) {
-				if (l.session == session)
-					add_string(id_list, format("<b>%s\n      <small>this window's session</small></b>", l.name));
-				else
-					add_string(id_list, format("%s\n      <small>other window's session</small>", l.name));
+			if (l.session == session)
+				return _("this window's session");
+			else
+				return _("other window's session");
 		} else if (l.is_persistent()) {
-			add_string(id_list, format("<span alpha=\"50%%\">%s</span>\n      <span alpha=\"50%%\"><small>saved session</small></span>", l.name));
+			return _("persistent session");
 		} else if (l.is_backup()) {
-			add_string(id_list, format("<span color=\"orange\">%s</span>\n      <span color=\"orange\"><small>recording backup</small></span>", l.name));
+			return _("recording backup");
 		}
+		return "";
+	};
+	auto markup = [this] (const SessionLabel& l) -> string {
+		if (l.is_active()) {
+			if (l.session == session)
+				return "weight='bold'";
+		} else if (l.is_persistent()) {
+			return "alpha=\"50%%\"";
+		} else if (l.is_backup()) {
+			return "color='orange'";
+		}
+		return "";
+	};
+	for (auto &l: session_labels) {
+		auto d = description(l);
+		auto m = markup(l);
+		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, l.name, d));
 	}
 }
 

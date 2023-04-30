@@ -49,7 +49,7 @@ Session *SessionManager::spawn_new_session() {
 }
 
 Session *SessionManager::get_empty_session(Session *s) {
-	if (s and s->song->is_empty())
+	if (s and s->song->is_empty() and s->persistent_name == "")
 		return s;
 	return spawn_new_session();
 }

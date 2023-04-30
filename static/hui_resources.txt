@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-82
+83
 # Resource
 Menu
 menu_fake
@@ -6360,7 +6360,7 @@ image=hui:cancel
 # Resource
 Dialog
 question-dialog-int
-width=100,height=20
+width=100,height=20,headerbar,closebutton=no
 0
 0
 1
@@ -6403,13 +6403,13 @@ image=hui:cancel
 DefButton
 ok
 image=hui:ok
-1
 0
+1
 0
 # Resource
 Dialog
 question-dialog-intint
-width=100,height=20
+width=100,height=20,headerbar,closebutton=no
 0
 0
 1
@@ -6445,7 +6445,7 @@ label1
 0
 SpinButton
 value1
-
+expandx
 1
 0
 0
@@ -6457,7 +6457,7 @@ label2
 0
 SpinButton
 value2
-
+expandx
 1
 1
 0
@@ -6476,8 +6476,57 @@ image=hui:cancel
 DefButton
 ok
 image=hui:ok
+0
 1
 0
+# Resource
+Dialog
+question-dialog-text
+width=300,height=20,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+
+0
+0
+2
+Label
+question
+margin-top=8,margin-bottom=8
+0
+0
+0
+Edit
+value
+expandx
+0
+1
+0
+Grid
+buttons
+buttonbar
+1
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+DefButton
+ok
+image=hui:ok
+0
+1
 0
 # Resource
 Dialog
@@ -8314,7 +8363,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-736
+737
 # Text
 /bars-add
 Add bars...
@@ -10066,6 +10115,9 @@ question-dialog-int/question-dialog-int
 Question
 
 question-dialog-intint/question-dialog-intint
+Question
+
+question-dialog-text/question-dialog-text
 Question
 
 raw_config_dialog/channels:mono

@@ -6,6 +6,7 @@
  */
 
 #include "SessionConsole.h"
+#include "../dialog/QuestionDialog.h"
 #include "../TsunamiWindow.h"
 #include "../../lib/os/filesystem.h"
 #include "../../stuff/SessionManager.h"
@@ -69,10 +70,9 @@ void SessionConsole::on_save() {
 	auto &l = session_labels[n];
 	if (!l.is_active())
 		return;
-	os::fs::create_directory(tsunami->session_manager->directory());
-	hui::file_dialog_save(win, "", tsunami->session_manager->directory(), {"filter=*.session", "showfilter=*.session"}, [this, &l] (const Path &filename) {
-		if (filename)
-			tsunami->session_manager->save_session(l.session, filename.basename_no_ext());
+
+	QuestionDialogString::ask(win, "Session name", [this, s=l.session] (const string& name) {
+		tsunami->session_manager->save_session(s, name);
 	});
 }
 

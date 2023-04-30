@@ -38,4 +38,14 @@ public:
 	static void ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb);
 };
 
+class QuestionDialogString : hui::Dialog {
+public:
+	using Callback = std::function<void(const string&)>;
+	QuestionDialogString(hui::Window *parent, const string &question, const string &options, Callback cb);
+	string result;
+	Callback cb;
+	static bool aborted;
+	static void ask(hui::Window *parent, const string &question, Callback cb, const string &options = "");
+};
+
 #endif /* SRC_VIEW_DIALOG_QUESTIONDIALOG_H_ */

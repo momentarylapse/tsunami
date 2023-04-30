@@ -11,6 +11,7 @@
 
 bool QuestionDialogInt::aborted;
 bool QuestionDialogIntInt::aborted;
+bool QuestionDialogString::aborted;
 
 QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options, std::function<void(int)> _cb)
 : hui::Dialog("question-dialog-int", _parent) {
@@ -103,4 +104,32 @@ void QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title,
 	hui::fly(new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel, cb));
 }
 
+
+
+QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &question, const string &options, Callback _cb)
+: hui::Dialog("question-dialog-text", _parent) {
+	cb = _cb;
+	aborted = true;
+	set_string("question", question);
+	set_options("value", options);
+	enable("ok", false);
+
+	event("value", [this] {
+		result = get_string("value");
+		enable("ok", result.num > 0);
+	});
+	event("cancel", [this] {
+		cb("");
+		request_destroy();
+	});
+	event("ok", [this] {
+		aborted = false;
+		cb(result);
+		request_destroy();
+	});
+}
+
+void QuestionDialogString::ask(hui::Window *parent, const string &question, Callback cb, const string &options) {
+	hui::fly(new QuestionDialogString(parent, question, options, cb));
+}
 

@@ -65,6 +65,8 @@ void SessionManager::end_session(Session *session) {
 }
 
 void SessionManager::save_session(Session *s, const string &name) {
+	os::fs::create_directory(directory());
+
 	xml::Parser parser;
 
 	auto e = xml::Element("session");
@@ -161,6 +163,9 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 
 void SessionManager::delete_saved_session(const string &name) {
 	os::fs::_delete(session_path(name));
+	for (auto s: weak(active_sessions))
+		if (s->persistent_name == name)
+			s->persistent_name = "";
 	notify();
 }
 

@@ -35,6 +35,48 @@ bool SessionLabel::is_backup() const {
 	return flags & Flags::BACKUP;
 }
 
+SessionManager::SessionManager() {
+	//os::Timer t;
+	load_session_map();
+	//msg_write(f2s(t.get()*1000, 3));
+}
+
+void SessionManager::load_session_map() {
+	auto all = enumerate_all_sessions();
+	if constexpr (false) {
+		// correct
+		for (const auto& l: all)
+			if (l.is_persistent()) {
+				xml::Parser parser;
+				try {
+					parser.load(session_path(l.name));
+					auto &e = parser.elements[0];
+					if (auto ef = e.find("file")) {
+						if (ef->value("path") != "")
+							session_map[ef->value("path")] = l.name;
+					}
+				} catch(...) {
+				}
+			}
+	} else {
+		// quick'n'dirty
+		for (const auto& l: all)
+			if (l.is_persistent()) {
+				try {
+					auto s = os::fs::read_text(session_path(l.name));
+					int p1 = s.find("<file path=\"");
+					if (p1 < 0)
+						continue;
+					int p2 = s.find("\"", p1 + 13);
+					if (p2 < 0)
+						continue;
+					session_map.set(s.sub_ref(p1 + 12, p2), l.name);
+				} catch(...) {
+				}
+			}
+	}
+}
+
 Session *SessionManager::spawn_new_session() {
 	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), this, tsunami->perf_mon.get());
 
@@ -129,26 +171,30 @@ bool SessionManager::session_exists(const string& name) const {
 }
 
 Session *SessionManager::load_session(const string &name, Session *session_caller) {
+	auto *session = get_empty_session(session_caller);
+	load_into_session(name, session);
+	return session;
+}
 
+void SessionManager::load_into_session(const string &name, Session *session) {
 	xml::Parser parser;
 	parser.load(session_path(name));
 	auto &e = parser.elements[0];
 
-	auto *s = get_empty_session(session_caller);
-	s->persistent_name = session_name(name);
-	s->win->show();
+	session->persistent_name = session_name(name);
+	session->win->show();
 
 	if (auto ef = e.find("file")) {
 		if (ef->value("path") != "")
-			s->storage->load(s->song.get(), ef->value("path"));
+			session->storage->load(session->song.get(), ef->value("path"));
 	}
 
 	if (auto ev = e.find("view")) {
 		auto es = ev->find("selection");
-		s->view->sel = SongSelection::from_range(s->song.get(), Range::to(es->value("start")._int(), es->value("end")._int()));
-		s->view->update_selection();
+		session->view->sel = SongSelection::from_range(session->song.get(), Range::to(es->value("start")._int(), es->value("end")._int()));
+		session->view->update_selection();
 		auto ec = ev->find("viewport");
-		s->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
+		session->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
 	}
 
 	if (auto epp = e.find("plugins")) {
@@ -157,7 +203,7 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 			string config = ep.value("config");
 			int version = ep.value("version")._int();
 
-			auto p = s->execute_tsunami_plugin(_class);
+			auto p = session->execute_tsunami_plugin(_class);
 			if (p and (config != "")) {
 				p->config_from_string(version, config);
 				p->notify();
@@ -166,7 +212,14 @@ Session *SessionManager::load_session(const string &name, Session *session_calle
 	}
 
 	notify();
-	return s;
+}
+
+void SessionManager::try_restore_matching_session(Session *session) {
+	auto path = session->song->filename.absolute();
+	if (session_map.find(path) < 0)
+		return;
+	load_into_session(session_map[path], session);
+	session->i(_("session automatically restored: ") + session_map[path]);
 }
 
 void SessionManager::delete_saved_session(const string &name) {

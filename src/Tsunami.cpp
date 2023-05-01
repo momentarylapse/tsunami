@@ -147,6 +147,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		session->win->show();
 		if (a.num > 0) {
 			session->storage->load(session->song.get(), a[0]);
+			session_manager->try_restore_matching_session(session);
 		} else {
 			// new file
 			session->song->add_track(SignalType::AUDIO_MONO);

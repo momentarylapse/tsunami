@@ -1000,14 +1000,17 @@ void TsunamiWindow::on_open() {
 	session->storage->ask_open(this, [this] (const Path &filename) {
 		if (!filename)
 			return;
-		if (song->is_empty()) {
-			if (session->storage->load(song, filename))
-				BackupManager::set_save_state(session);
-		} else {
+		auto *s = tsunami->session_manager->get_empty_session(session);
+		if (s->storage->load(s->song.get(), filename)) {
+			BackupManager::set_save_state(s);
+			s->session_manager->try_restore_matching_session(s);
+		}
+		/*} else {
 			auto *s = tsunami->session_manager->spawn_new_session();
 			s->win->show();
-			s->storage->load(s->song.get(), filename);
-		}
+			if (s->storage->load(s->song.get(), filename))
+				s->session_manager->try_restore_matching_session(s);
+		}*/
 	});
 }
 

@@ -10,6 +10,7 @@
 
 #include "../lib/pattern/Observable.h"
 #include "../lib/base/pointer.h"
+#include "../lib/base/map.h"
 
 class Session;
 class Path;
@@ -32,12 +33,15 @@ struct SessionLabel {
 
 class SessionManager : public Observable<VirtualBase> {
 public:
+	SessionManager();
 	Session *spawn_new_session();
 	Session *get_empty_session(Session *session_caller);
 	void end_session(Session *s);
 
 	void save_session(Session *s, const string &name);
 	Session *load_session(const string &name, Session *session_caller = nullptr);
+	void load_into_session(const string &name, Session *session);
+	void try_restore_matching_session(Session *session);
 	void delete_saved_session(const string &name);
 
 	Path session_path(const string &name) const;
@@ -46,6 +50,9 @@ public:
 	bool session_exists(const string& name) const;
 
 	shared_array<Session> active_sessions;
+
+	void load_session_map();
+	base::map<Path, string> session_map;
 
 	Array<SessionLabel> enumerate_all_sessions() const;
 };

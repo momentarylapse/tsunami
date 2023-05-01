@@ -10266,7 +10266,7 @@ Sessions
 
 session-console/sessions
 name
-
+A session is the current state of a single main window, i.e. active file, active plugins, zoom etc.
 settings_dialog/antialiasing
 Antialiasing
 

@@ -90,10 +90,8 @@ void ControlComboBox::__add_string(const string& str) {
 #if GTK_CHECK_VERSION(4,10,0)
 	auto m = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
 	gtk_string_list_append(GTK_STRING_LIST(m), sys_str(str));
-#elif GTK_CHECK_VERSION(3,0,0)
-	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(widget), NULL, sys_str(str));
 #else
-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget), sys_str(str));
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(widget), NULL, sys_str(str));
 #endif
 }
 
@@ -116,14 +114,9 @@ int ControlComboBox::get_int() {
 void ControlComboBox::__reset() {
 #if GTK_CHECK_VERSION(4,10,0)
 	auto m = gtk_drop_down_get_model(GTK_DROP_DOWN(widget));
-	g_list_store_remove_all(G_LIST_STORE(m));
-#elif GTK_CHECK_VERSION(3,0,0)
-	gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(widget));
+	gtk_string_list_splice(GTK_STRING_LIST(m), 0, g_list_model_get_n_items(m), nullptr);
 #else
-	/*GtkTreeModel *m = gtk_combo_box_get_model(GTK_COMBO_BOX(widget));
-	gtk_tree_model_cl
-	gtk_combo_box_remove_all(GTK_COMBO_BOX_TEXT(widget));*/
-	msg_todo("ComboBox.Reset for gtk 2.24");
+	gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(widget));
 #endif
 }
 

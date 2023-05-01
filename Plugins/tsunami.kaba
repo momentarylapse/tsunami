@@ -783,7 +783,7 @@ func extern CreateMidiSource(session: Session, name: string) -> xfer[MidiSource]
 func extern CreateMidiEffect(session: Session, name: string) -> xfer[MidiEffect]
 func extern CreateBeatMidifier(session: Session) -> xfer[BeatMidifier]
 func extern CreateBeatSource(session: Session, name: string) -> xfer[BeatSource]
-func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: shared[Sample]->void)
+func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: Sample*->void)
 #extern void SetTempBackupFilename(Path filename)
 
 func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string?->void, old_name: string?)

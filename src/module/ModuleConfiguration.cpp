@@ -71,7 +71,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		if (!str_is_integer(l))
 			return Any(l);*/
 		return Any(*(const int*)v);
-	} else if (c->name == "SampleRef shared") {
+	} else if (c->name == "shared[SampleRef]") {
 		if (auto sr = *(SampleRef**)v)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
@@ -151,7 +151,7 @@ void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, i
 		pos ++; // ']'
 	} else if (type->is_enum()) {
 		*(int*)v = get_next(s, pos)._int();
-	} else if (type->name == "shared SampleRef") {
+	} else if (type->name == "shared[SampleRef]") {
 		string ss = get_next(s, pos);
 		*(shared<SampleRef>*)v = nullptr;
 		if ((ss != "nil") and session->song) {
@@ -206,7 +206,7 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
 	} else if (type->is_enum()) {
 		*(int*)v = kaba::enum_parse(a.str(), type);
-	} else if (type->name == "SampleRef shared") {
+	} else if (type->name == "shared[SampleRef]") {
 		*(shared<SampleRef>*)v = nullptr;
 		if (a.is_string()) {
 			string ss = a.str();

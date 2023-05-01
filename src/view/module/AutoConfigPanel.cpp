@@ -395,7 +395,7 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 			auto *a = new AutoConfigDataString(e.name);
 			a->value = (string*)((char*)config + e.offset);
 			r.add(a);
-		} else if (e.type->name == "shared SampleRef") {
+		} else if (e.type->name == "shared[SampleRef]") {
 			auto *a = new AutoConfigDataSampleRef(e.name, session);
 			a->value = (shared<SampleRef>*)((char*)config + e.offset);
 			r.add(a);

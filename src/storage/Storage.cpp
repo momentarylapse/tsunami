@@ -90,7 +90,7 @@ bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 
 	od.start_progress(_("loading ") + d->description);
 
-	song->notify(song->MESSAGE_START_LOADING);
+	song->notify(Song::MESSAGE_START_LOADING);
 	song->reset();
 	song->action_manager->enable(false);
 	song->filename = filename;
@@ -103,11 +103,11 @@ bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 	if (song->tracks.num > 0)
 	{}//	a->SetCurTrack(a->track[0]);
 	song->action_manager->reset();
-	song->notify(song->MESSAGE_NEW);
-	song->notify(song->MESSAGE_CHANGE);
+	song->notify(Song::MESSAGE_NEW);
+	song->notify(Song::MESSAGE_CHANGE);
 	for (Track *t: weak(song->tracks))
 		t->notify();
-	song->notify(song->MESSAGE_FINISHED_LOADING);
+	song->notify(Song::MESSAGE_FINISHED_LOADING);
 
 	delete f;
 	return !od.errors_encountered;

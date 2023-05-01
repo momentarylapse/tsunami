@@ -16,11 +16,14 @@ struct MidiFont
 	func mut load(session: Session)
 		if song
 			return
+		if name == ""
+			return
 		sub = session.create_child()
 		for s in sub
 			s.song = new Song(s, DEFAULT_SAMPLE_RATE)
 			song = weak(s.song)
-			s.storage.load(song, hui.app_directory_static | "Midi Fonts/{{name}}.nami")
+			for _s in song
+				s.storage.load(_s, hui.app_directory | "Midi Fonts/{{name}}.nami")
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)
@@ -34,32 +37,28 @@ struct MidiFont
 	
 	func mut get_synth(session: Session, name: string) -> xfer[Synthesizer]
 		load(session)
-#		for _s in song
-#			# match by name
-#			for _t in _s.tracks
-#				for t in _t
-#					if t.type == SignalType.MIDI and t.name == name
-#						var m = t.synth.copy()
-#						var s: Synthesizer* = m
-#						return s #m as Synthesizer*
-#			# fist midi track...
-#			for _t in _s.tracks
-#				for t in _t
-#					if t.type == SignalType.MIDI
-#						var m = t.synth.copy()
-#						var s: Synthesizer* = m
-#						return s #m as Synthesizer*
+		for _s in song
+			# match by name
+			for _t in _s.tracks
+				for t in _t
+					if t.type == SignalType.MIDI and t.name == name
+						return t.synth.copy() as xfer[Synthesizer]
+			# fist midi track...
+			for _t in _s.tracks
+				for t in _t
+					if t.type == SignalType.MIDI
+						return t.synth.copy() as xfer[Synthesizer]
 		return new Synthesizer()
 
 class FontList as @noauto
 	var fonts: MidiFont[]
 	var dummy: MidiFont
 	
-	func find(name: string) -> int
+	func find(name: string) -> int?
 		for i=>f in fonts
 			if f.name == name
 				return i
-		return -1
+		return nil
 		
 	func get_names() -> string[]
 		var list: string[]
@@ -75,21 +74,21 @@ class FontList as @noauto
 
 	#string[] find_drumsets()
 	func mut update()
-		var list = fs.search(hui.app_directory_static | "Midi Fonts", "*.nami", "f")
+		let list = fs.search(hui.app_directory | "Midi Fonts", "*.nami", "f")
 		for e in list
-			var name = str(e)[:-5]
-			if find(name) >= 0
+			let name = str(e)[:-5]
+			for x in find(name)
 				continue
 			fonts.add(MidiFont(name))
 	
 	func mut get(session: Session, name: string) -> MidiFont&
 		update()
-		var n = find(name)
-		if n < 0
+		for n in find(name)
+			return &fonts[n]
+		else
 			if len(name) > 0
 				session.e("midi font not found: '{{name}}'")
 			return &dummy
-		return &fonts[n]
 	
 	func mut get_synth(session: Session, name: string, instrument: string) -> xfer[Synthesizer]
 		var font = get(session, name)
@@ -131,7 +130,7 @@ class FontPanel extends ConfigPanel
 	func override __init__(_s: Module)
 		#super.__init__(_s)
 		sc := &c.config
-		add_grid("", 0, 0, "grid")
+		add_grid("!expandx", 0, 0, "grid")
 		set_target("grid")
 		add_label("Set", 0 ,0, "")
 		add_combo_box("!expandx", 1, 0, "sets")
@@ -141,9 +140,8 @@ class FontPanel extends ConfigPanel
 		event("instruments", on_instruments)
 
 	func override update()
-		print("update....")
 		reset("sets")
-		var sets = font_list.get_names()
+		let sets = font_list.get_names()
 		if len(sets) > 0
 			enable("sets", true)
 			set_string("sets", "  - none -")
@@ -158,7 +156,7 @@ class FontPanel extends ConfigPanel
 			set_int("sets", 0)
 
 		reset("instruments")
-		var instruments = font_list.instruments(c.session, sc.name)
+		let instruments = font_list.instruments(c.session, sc.name)
 		var match = false
 		for i=>ins in instruments
 			add_string("instruments", ins)
@@ -170,17 +168,22 @@ class FontPanel extends ConfigPanel
 		
 		
 	func mut on_select()
-		var n = get_int("")-1
-		sc.name = ""
+		let n = get_int("") - 1
+		var new_name: string
 		if n >= 0 and n < len(font_list.fonts)
-			sc.name = font_list.fonts[n].name
-		changed()
-		update()
+			new_name = font_list.fonts[n].name
+		if new_name != sc.name
+			sc.name = new_name
+			changed()
+			update()
 	
 	func mut on_instruments()
-		var n = get_int("")
+		let n = get_int("")
 		sc.instrument = ""
-		var instruments = font_list.instruments(c.session, sc.name)
+		var new_instrument = ""
+		let instruments = font_list.instruments(c.session, sc.name)
 		if n >= 0 and n < len(instruments)
-			sc.instrument = instruments[n]
-		changed()
+			new_instrument = instruments[n]
+		if new_instrument != sc.instrument
+			sc.instrument = new_instrument
+			changed()

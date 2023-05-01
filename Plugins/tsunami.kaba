@@ -627,7 +627,7 @@ class AudioInput extends Module
 	func extern samples_recorded() -> int
 
 class Storage
-	func extern load(out s: Song*, filename: Path) -> bool
+	func extern load(out s: Song, filename: Path) -> bool
 	func extern save(s: Song*, filename: Path) -> bool
 	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> bool
 	func extern load_buffer(out buf: AudioBuffer, filename: Path) -> bool
@@ -672,7 +672,7 @@ class Session extends Object as shared
 	#DeviceManager* device_manager
 	#PluginManager* plugin_manager
 	
-	func extern create_child() -> shared![Session]
+	func extern create_child() -> xfer[Session]
 	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
 	func extern mut load_signal_chain(filename: Path) -> shared[SignalChain]
 	func extern mut remove_signal_chain(chain: SignalChain*)

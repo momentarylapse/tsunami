@@ -18,6 +18,14 @@ fftw3dep = dependency('fftw3f')
 add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])
 deps = [mdep, threaddep, gtk4dep, zlibdep, fftw3dep]
 
+# optional dependency: adwaita
+if 
+	add_project_arguments('-DHAS_LIB_ADWAITA=1', language : ['cpp'])
+	deps += []
+else
+	add_project_arguments('-DHAS_LIB_ADWAITA=0', language : ['cpp'])
+endif
+
 # optional dependency: ogg
 d1 = cc.find_library('ogg', required : false)
 d2 = cc.find_library('vorbis', required : false)

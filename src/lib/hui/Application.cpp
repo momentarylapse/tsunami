@@ -10,6 +10,9 @@
 #include "hui.h"
 #include "internal.h"
 #include "../os/filesystem.h"
+#if HAS_LIB_ADWAITA && GTK_CHECK_VERSION(4,0,0)
+#include <adwaita.h>
+#endif
 
 #ifdef OS_WINDOWS
 #include <windows.h>
@@ -108,6 +111,9 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 #if GTK_CHECK_VERSION(4,0,0)
+#if HAS_LIB_ADWAITA
+	adw_init();
+#endif
 	application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
 #else
 	_MakeUsable_();

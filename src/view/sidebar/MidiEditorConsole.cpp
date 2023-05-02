@@ -11,6 +11,7 @@
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../dialog/MarkerDialog.h"
 #include "../dialog/QuestionDialog.h"
+#include "../dialog/SelectStringDialog.h"
 #include "../mode/ViewModeEditMidi.h"
 #include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"
@@ -542,17 +543,16 @@ void MidiEditorConsole::on_quantize() {
 }
 
 void MidiEditorConsole::on_apply_string() {
-	QuestionDialogInt::ask(win, _("Move selected notes to which string?"), [this] (int ii) {
-		if (QuestionDialogInt::aborted)
-			return;
-		int string_no = ii - 1;
-
-		song->begin_action_group("midi apply string");
-		auto notes = layer->midi.get_notes_by_selection(view->sel);
-		for (auto *n: weak(notes))
-			layer->midi_note_set_string(n, string_no);
-		song->end_action_group();
-	}, "range=1:20");
+	auto dlg = new SelectStringDialog(win, layer->track->instrument.string_pitch);
+	hui::fly(dlg, [this, dlg] {
+		if (dlg->result) {
+			song->begin_action_group("midi apply string");
+			auto notes = layer->midi.get_notes_by_selection(view->sel);
+			for (auto *n: weak(notes))
+				layer->midi_note_set_string(n, *dlg->result);
+			song->end_action_group();
+		}
+	});
 }
 
 void MidiEditorConsole::on_apply_hand_position() {

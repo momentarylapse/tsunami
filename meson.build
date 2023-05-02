@@ -528,6 +528,7 @@ sources = [
 	'src/view/dialog/PauseEditDialog.cpp',
 	'src/view/dialog/QuestionDialog.cpp',
 	'src/view/dialog/SampleScaleDialog.cpp',
+	'src/view/dialog/SelectStringDialog.cpp',
 	'src/view/dialog/SettingsDialog.cpp',
 	'src/view/dialog/TemperamentDialog.cpp',
 	'src/view/dialog/TimeTrackAddDialog.cpp',

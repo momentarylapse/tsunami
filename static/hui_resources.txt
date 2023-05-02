@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-83
+84
 # Resource
 Menu
 menu_fake
@@ -7088,6 +7088,37 @@ default
 0
 # Resource
 Dialog
+select-string-dialog
+width=150,height=200,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+grid-strings
+
+0
+0
+0
+Grid
+?
+buttonbar
+1
+0
+1
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+# Resource
+Dialog
 session-console
 
 0
@@ -8363,7 +8394,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-737
+738
 # Text
 /bars-add
 Add bars...
@@ -10260,6 +10291,9 @@ Sample
 
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
+
+select-string-dialog/select-string-dialog
+Select string
 
 session-console/session-console
 Sessions

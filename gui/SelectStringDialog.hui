@@ -1,0 +1,5 @@
+Dialog select-string-dialog "Select string"  width=150 height=200 headerbar closebutton=no
+	Grid ? "" vertical
+		Grid grid-strings ""
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel

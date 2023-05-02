@@ -541,6 +541,7 @@
     <ClCompile Include="src\view\dialog\PauseEditDialog.cpp" />
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp" />
     <ClCompile Include="src\view\dialog\SampleScaleDialog.cpp" />
+    <ClCompile Include="src\view\dialog\SelectStringDialog.cpp" />
     <ClCompile Include="src\view\dialog\SettingsDialog.cpp" />
     <ClCompile Include="src\view\dialog\TemperamentDialog.cpp" />
     <ClCompile Include="src\view\dialog\TimeTrackAddDialog.cpp" />
@@ -1008,6 +1009,7 @@
     <ClInclude Include="src\view\dialog\PauseEditDialog.h" />
     <ClInclude Include="src\view\dialog\QuestionDialog.h" />
     <ClInclude Include="src\view\dialog\SampleScaleDialog.h" />
+    <ClInclude Include="src\view\dialog\SelectStringDialog.h" />
     <ClInclude Include="src\view\dialog\SettingsDialog.h" />
     <ClInclude Include="src\view\dialog\TemperamentDialog.h" />
     <ClInclude Include="src\view\dialog\TimeTrackAddDialog.h" />

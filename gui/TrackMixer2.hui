@@ -1,6 +1,6 @@
 Dialog track-mixer2 ""
 	Grid ? "" vertical noexpandx
-		Grid ? "" expandy
+		Grid ? "" expandy class=card
 			Grid grid-volume "" width=100 expandy vertical
 				DrawingArea name "" height=27 noexpandy
 				Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance" ignorefocus vgroup=/track-mixer-panning

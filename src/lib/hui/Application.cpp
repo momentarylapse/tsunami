@@ -38,6 +38,7 @@ Path Application::directory;
 Path Application::directory_static;
 Path Application::initial_working_directory;
 bool Application::installed;
+bool Application::adwaita_started = false;
 
 Array<string> Application::_args;
 
@@ -113,6 +114,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 #if GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_ADWAITA
 	adw_init();
+	adwaita_started = true;
 #endif
 	application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
 #else

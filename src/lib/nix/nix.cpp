@@ -22,7 +22,7 @@
 
 namespace nix{
 
-string version = "0.13.10.2";
+string version = "0.13.11.0";
 // currently, requiring OpenGL 4.5
 
 
@@ -352,6 +352,11 @@ void set_alpha(Alpha src, Alpha dst) {
 
 void set_alpha_sd(Alpha src,Alpha dst) {
 	set_alpha(src, dst);
+}
+
+void _cdecl set_alpha_split(Alpha color_src, Alpha color_dst, Alpha alpha_src, Alpha alpha_dst) {
+	glEnable(GL_BLEND);
+	glBlendFuncSeparate(OGLGetAlphaMode(color_src), OGLGetAlphaMode(color_dst), OGLGetAlphaMode(alpha_src), OGLGetAlphaMode(alpha_dst));
 }
 
 void disable_alpha() {

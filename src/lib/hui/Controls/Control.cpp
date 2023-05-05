@@ -339,6 +339,8 @@ void Control::set_options(const string &options) {
 				auto g = get_size_group(panel, val, (op == "vgroup") ? 2 : 1);
 				gtk_size_group_add_widget(g->group, get_frame());
 			}
+		} else if (op == "class") {
+			add_css_class(val);
 		} else {
 			__set_option(op, val);
 		}

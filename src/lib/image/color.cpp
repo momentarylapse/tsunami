@@ -37,6 +37,15 @@ string color::hex() const {
 color color::parse(const string &s) {
 	color c = Black;
 	if (s.head(1) == "#") {
+		auto bb = s.sub_ref(1).unhex();
+		if (bb.num >= 1)
+			c.r = (float)(unsigned char)bb[0] / 255.0f;
+		if (bb.num >= 2)
+			c.g = (float)(unsigned char)bb[1] / 255.0f;
+		if (bb.num >= 3)
+			c.b = (float)(unsigned char)bb[2] / 255.0f;
+		if (bb.num >= 4)
+			c.a = (float)(unsigned char)bb[3] / 255.0f;
 	} else {
 		auto xx = s.replace("(", "").replace(")", "").replace(",", "").explode(" ");
 		if (xx.num > 0)

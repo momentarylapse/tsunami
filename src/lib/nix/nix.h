@@ -56,6 +56,7 @@ void _cdecl _set_alpha(AlphaMode mode);
 void _cdecl set_alpha(Alpha src, Alpha dst);
 void _cdecl _set_alpha_mode(AlphaMode mode);
 void _cdecl set_alpha_sd(Alpha src, Alpha dst);
+void _cdecl set_alpha_split(Alpha color_src, Alpha color_dst, Alpha alpha_src, Alpha alpha_dst);
 void _cdecl disable_alpha();
 void _cdecl set_fog(FogMode mode, float start, float end, float density, const color &c);
 void _cdecl enable_fog(bool enabled);

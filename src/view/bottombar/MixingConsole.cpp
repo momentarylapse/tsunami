@@ -347,6 +347,14 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 	spectrum_meter->enable(false);
 
 	event("output-volume", [this] { on_output_volume(); });
+	event_xp("fancy-separator", "hui:draw", [this] (Painter* p) {
+		p->set_color(theme.grid);
+		p->draw_rect(p->area());
+		/*p->set_color(Grey);
+		p->set_line_width(10);
+		for (float y=0; y<500; y+=30)
+			p->draw_line({-10, y}, {(float)p->width + 10 , y - p->width - 20});*/
+	});
 
 	view->subscribe(this, [this] { on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
 	view->subscribe(this, [this] { update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
@@ -428,7 +436,8 @@ void MixingConsole::load_data() {
 			auto m = new TrackMixer(t, this);
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
-			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
+			if (!hui::Application::adwaita_started)
+				add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
 		}
 	}
 

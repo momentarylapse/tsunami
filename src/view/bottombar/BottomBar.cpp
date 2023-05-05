@@ -28,7 +28,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_grid("!expandx", 0, 1, "root_grid");
 	set_target("root_grid");
 	add_tab_control("!left,noexpandx,expandy", 0, 0, "choose");
-	add_separator("!vertical", 1, 0, "");
+	//add_separator("!vertical", 1, 0, "");
 	add_grid("", 2, 0, "console_grid");
 	set_target("button_grid");
 

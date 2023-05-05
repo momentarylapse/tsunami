@@ -52,6 +52,7 @@ public:
 	static Path directory_static;	// dir of static files (ie. /usr/shar/app)
 	static Path initial_working_directory;
 	static bool installed; // installed into system folders?
+	static bool adwaita_started;
 
 	static Array<string> _args;
 

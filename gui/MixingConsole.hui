@@ -1,13 +1,13 @@
 Dialog mixing-console "" width=300 height=200
 	Grid ? ""
-		Grid ? "" vertical
-			Label t_output "Output" bold center
+		DrawingArea ? "" width=5 noexpandx
+		Grid ? "" vertical class=cardx
+			Label t_output "Output" bold center height=30
 			DrawingArea output-spectrum "" width=80 height=30 noexpandx noexpandy "tooltip=Output spectrum"
 			Grid ? ""
 				Slider output-volume "" vertical width=50 expandy "tooltip=Output volume" ignorefocus
 				DrawingArea output-peaks "" width=18 noexpandx noexpandy "tooltip=Output level"
-		Separator ? "" vertical
-		Separator ? "" vertical
+		DrawingArea ? "" width=10 noexpandx
 		Scroller ? "" expandx scrolly=no
 			Grid inner-grid ""
 		Grid ? "" vertical

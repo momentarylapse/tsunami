@@ -1129,7 +1129,7 @@ width=400,height=200
 1
 TabControl
 dev-tab
-left
+left,noframe
 0
 0
 3

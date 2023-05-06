@@ -26,7 +26,7 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 	config_grid_id = "config-panel-grid";
 	add_grid("", 0, 0, grid_id);
 	set_target(grid_id);
-	add_tab_control("!left\\aaa", 0, 0, "selector");
+	add_tab_control("!left,noframe\\aaa", 0, 0, "selector");
 	add_expander("!slide=left", 1, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandx", 1, 0, config_grid_id);

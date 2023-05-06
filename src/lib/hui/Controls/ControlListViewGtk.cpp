@@ -405,7 +405,7 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 
 	// frame
 	frame = sw;
-	if (panel->border_width > 0) {
+	if (panel->border_width > 0 and !option_has(options, "nobar")) {
 		frame = gtk_frame_new(nullptr);
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_frame_set_child(GTK_FRAME(frame), sw);

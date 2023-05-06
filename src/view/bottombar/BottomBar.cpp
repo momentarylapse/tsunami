@@ -27,7 +27,10 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_separator("!horizontal,expandx", 0, 0, "");
 	add_grid("!expandx", 0, 1, "root_grid");
 	set_target("root_grid");
-	add_tab_control("!left,noexpandx,expandy", 0, 0, "choose");
+	if (hui::Application::adwaita_started)
+		add_list_view("!width=120,noexpandx,nobar,class=navigation-sidebar,noframe\\", 0, 0, "choose");
+	else
+		add_tab_control("!left,noframe,noexpandx,expandy", 1, 0, "choose");
 	//add_separator("!vertical", 1, 0, "");
 	add_grid("", 2, 0, "console_grid");
 	set_target("button_grid");
@@ -45,7 +48,10 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_console(session_console, "");
 	add_console(log_console, "");
 
-	event("choose", [this] { on_choose(); });
+	if (hui::Application::adwaita_started)
+		event_x("choose", "hui:select", [this] { on_choose(); });
+	else
+		event("choose", [this] { on_choose(); });
 	event("close", [this] { on_close(); });
 
 	expand("revealer", false);

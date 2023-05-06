@@ -27,6 +27,7 @@
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
+	mode_name = "capture";
 	chain = nullptr;
 }
 

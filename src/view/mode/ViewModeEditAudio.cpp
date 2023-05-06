@@ -81,6 +81,7 @@ public:
 ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 	ViewModeDefault(view)
 {
+	mode_name = "audio";
 	edit_mode = EditMode::SELECT;
 	
 	edit_radius = 50;

@@ -386,28 +386,16 @@ void AudioView::set_color_scheme(const string &name) {
 	force_redraw();
 }
 
-string mode_name(ViewMode *m, AudioView *v) {
-	if (m == v->mode_default)
-		return "default";
-	if (m == v->mode_curve)
-		return "curves";
-	if (m == v->mode_edit_midi)
-		return "midi";
-	if (m == v->mode_capture)
-		return "capture";
-	return "??";
-}
-
 void AudioView::set_mode(ViewMode *m) {
 	if (m == mode)
 		return;
 	if (mode) {
-		session->debug("view", "end mode " + mode_name(mode, this));
+		session->debug("view", "end mode " + mode->mode_name);
 		mode->on_end();
 	}
 	mode = m;
 	if (mode) {
-		session->debug("view", "start mode " + mode_name(mode, this));
+		session->debug("view", "start mode " + mode->mode_name);
 		mode->on_start();
 	}
 	thm.set_dirty();

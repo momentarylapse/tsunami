@@ -318,6 +318,7 @@ public:
 ViewModeEditMidi::ViewModeEditMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
+	mode_name = "midi";
 	sub_beat_partition = 1;
 	note_length = 1;
 	win->set_int("beat_partition", sub_beat_partition);

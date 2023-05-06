@@ -32,7 +32,7 @@ class Session;
 
 class ViewMode : public Observable<VirtualBase> {
 public:
-	ViewMode(AudioView *view);
+	ViewMode(AudioView *view, const string &name);
 
 	virtual void on_start() {}
 	virtual void on_end() {}
@@ -77,6 +77,7 @@ public:
 
 	virtual string get_tip() { return ""; }
 
+	string mode_name;
 	AudioView *view;
 	Session *session;
 	//ViewPort &cam();

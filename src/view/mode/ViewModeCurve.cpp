@@ -19,6 +19,7 @@
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
+	mode_name = "curve";
 	_curve = nullptr;
 }
 

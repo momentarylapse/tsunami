@@ -157,7 +157,7 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool 
 
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
-	ViewMode(view)
+	ViewMode(view, "default")
 {
 }
 

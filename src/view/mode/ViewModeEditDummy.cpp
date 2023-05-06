@@ -9,6 +9,7 @@
 #include "../sidebar/SideBar.h"
 
 ViewModeEditDummy::ViewModeEditDummy(AudioView *view) : ViewModeDefault(view) {
+	mode_name = "dummy";
 }
 
 void ViewModeEditDummy::on_start() {

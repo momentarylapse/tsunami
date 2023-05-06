@@ -10,8 +10,9 @@
 #include "../sidebar/SideBar.h"
 #include "../TsunamiWindow.h"
 
-ViewMode::ViewMode(AudioView *_view) {
+ViewMode::ViewMode(AudioView *_view, const string &name) {
 	view = _view;
+	mode_name = name;
 	cam = &view->cam;
 	session = view->session;
 	win = view->win;

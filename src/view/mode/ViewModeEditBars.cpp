@@ -99,6 +99,7 @@ public:
 ViewModeEditBars::ViewModeEditBars(AudioView *view) :
 	ViewModeDefault(view)
 {
+	mode_name = "bars";
 	edit_mode = EditMode::SELECT;
 }
 

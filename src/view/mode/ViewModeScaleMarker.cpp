@@ -17,6 +17,7 @@
 ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 	ViewModeDefault(view)
 {
+	mode_name = "scale-marker";
 
 	scaling = false;
 	marker = nullptr;

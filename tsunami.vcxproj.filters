@@ -1168,6 +1168,9 @@
     <ClCompile Include="src\view\audioview\graph\Background.cpp">
       <Filter>src\view\audioview\graph</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\audioview\graph\BottomBarExpandButton.cpp">
+      <Filter>src\view\audioview\graph</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\audioview\graph\Cursor.cpp">
       <Filter>src\view\audioview\graph</Filter>
     </ClCompile>
@@ -2566,6 +2569,9 @@
       <Filter>src\view\audioview\graph</Filter>
     </ClInclude>
     <ClInclude Include="src\view\audioview\graph\Background.h">
+      <Filter>src\view\audioview\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\audioview\graph\BottomBarExpandButton.h">
       <Filter>src\view\audioview\graph</Filter>
     </ClInclude>
     <ClInclude Include="src\view\audioview\graph\Cursor.h">

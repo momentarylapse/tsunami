@@ -395,6 +395,7 @@ set(SOURCE
 	src/view/audioview/graph/AudioViewLayer.cpp
 	src/view/audioview/graph/AudioViewTrack.cpp
 	src/view/audioview/graph/Background.cpp
+	src/view/audioview/graph/BottomBarExpandButton.cpp
 	src/view/audioview/graph/Cursor.cpp
 	src/view/audioview/graph/LayerHeader.cpp
 	src/view/audioview/graph/LogNotifier.cpp

@@ -9,6 +9,7 @@
 #include "graph/AudioViewLayer.h"
 #include "graph/AudioViewTrack.h"
 #include "graph/Background.h"
+#include "graph/BottomBarExpandButton.h"
 #include "graph/Cursor.h"
 #include "graph/TimeScale.h"
 #include "graph/LogNotifier.h"
@@ -74,48 +75,6 @@ const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
 
 
-
-class BottomBarExpandButton : public scenegraph::Node {
-public:
-	AudioView *view;
-	BottomBarExpandButton(AudioView *_view) : Node(50, 50) {
-		align.dz = 200;
-		align.horizontal = AlignData::Mode::LEFT;
-		align.vertical = AlignData::Mode::BOTTOM;
-		set_perf_name("button");
-		view = _view;
-	}
-	BottomBar *bottom_bar() const {
-		return view->session->win->bottom_bar.get();
-	}
-	void on_draw(Painter *p) override {
-		color c = theme.background_overlay;
-		if (is_cur_hover())
-			c = theme.hoverify(c);
-		p->set_color(c);
-		p->draw_circle(area.center(), 40);
-		p->set_color(theme.text_soft3);
-		p->set_font_size(17);
-		if (bottom_bar()->visible)
-			p->draw_str(area.center() - vec2(10,10),  "\u25bc");
-		else
-			p->draw_str(area.center() - vec2(10,10),  "\u25b2");
-		p->set_font_size(theme.FONT_SIZE);
-	}
-	bool on_left_button_down(const vec2 &m) override {
-		if (bottom_bar()->visible)
-			bottom_bar()->_hide();
-		else
-			bottom_bar()->_show();
-		return true;
-	}
-	string get_tip() const override {
-		if (bottom_bar()->visible)
-			return _("hide control panel");
-		else
-			return _("show control panel");
-	}
-};
 
 AudioView::AudioView(Session *_session, const string &_id) :
 	cam(this)

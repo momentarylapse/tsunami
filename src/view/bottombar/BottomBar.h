@@ -25,7 +25,7 @@ class PluginConsole;
 class SessionConsole;
 class DeviceConsole;
 
-class BottomBar : public Observable<hui::Panel> {
+class BottomBar : public obs::Node<hui::Panel> {
 public:
 	BottomBar(Session *session, hui::Panel *parent);
 

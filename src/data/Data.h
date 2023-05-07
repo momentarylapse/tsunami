@@ -17,7 +17,7 @@ class ActionManager;
 class Action;
 class Session;
 
-class Data : public Sharable<Observable<VirtualBase>> {
+class Data : public Sharable<obs::Node<VirtualBase>> {
 public:
 	explicit Data(Session *session);
 	virtual ~Data();

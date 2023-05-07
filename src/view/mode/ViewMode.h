@@ -30,7 +30,7 @@ class color;
 class Range;
 class Session;
 
-class ViewMode : public Observable<VirtualBase> {
+class ViewMode : public obs::Node<VirtualBase> {
 public:
 	ViewMode(AudioView *view, const string &name);
 

@@ -31,7 +31,7 @@ enum class SignalType;
 
 
 
-class Track : public Sharable<Observable<VirtualBase>> {
+class Track : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Track(Song *song, SignalType type, Synthesizer *synth);
 	virtual ~Track();

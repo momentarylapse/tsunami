@@ -158,7 +158,9 @@ template <class T>
 class Sharable : public T {
 public:
 	mutable int _pointer_ref_counter = 0;
-	Sharable() {}
+
+	template<typename... Args>
+	Sharable(Args... args) : T(args...) {}
 
 	// prevent copying
 	Sharable(const Sharable<T> &o) = delete;

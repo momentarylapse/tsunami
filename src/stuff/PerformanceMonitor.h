@@ -25,7 +25,7 @@ public:
 	Array<PerfChannelStat> stats;
 };
 
-class PerformanceMonitor : public Observable<VirtualBase> {
+class PerformanceMonitor : public obs::Node<VirtualBase> {
 public:
 	PerformanceMonitor();
 	virtual ~PerformanceMonitor();

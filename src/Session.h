@@ -31,7 +31,7 @@ namespace hui {
 
 
 // representing one instance/window
-class Session : public Sharable<Observable<VirtualBase>> {
+class Session : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, SessionManager *session_manager, PerformanceMonitor *perf_mon);
 	~Session() override;

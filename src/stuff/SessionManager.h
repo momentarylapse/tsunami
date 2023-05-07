@@ -31,7 +31,7 @@ struct SessionLabel {
 	bool is_backup() const;
 };
 
-class SessionManager : public Observable<VirtualBase> {
+class SessionManager : public obs::Node<VirtualBase> {
 public:
 	SessionManager();
 	Session *spawn_new_session();

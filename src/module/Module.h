@@ -67,7 +67,7 @@ enum class ModuleCommand {
 	SET_INPUT_CHANNELS,
 };
 
-class Module : public Sharable<Observable<VirtualBase>> {
+class Module : public Sharable<obs::Node<VirtualBase>> {
 public:
 
 	Module(ModuleCategory category, const string &_class);

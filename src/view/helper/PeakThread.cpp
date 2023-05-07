@@ -22,7 +22,7 @@ InterThreadMessager::~InterThreadMessager() {
 
 void InterThreadMessager::unsubscribe(VirtualBase *o) {
 	flush();
-	Observable::unsubscribe(o);
+	obs::Node<VirtualBase>::unsubscribe(o);
 }
 
 void InterThreadMessager::flush() {

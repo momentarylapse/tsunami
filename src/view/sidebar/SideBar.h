@@ -27,7 +27,7 @@ class AudioView;
 class SideBarConsole;
 class Session;
 
-class SideBar : public Observable<hui::Panel> {
+class SideBar : public obs::Node<hui::Panel> {
 public:
 	SideBar(Session *session, hui::Panel *parent);
 	~SideBar() override;

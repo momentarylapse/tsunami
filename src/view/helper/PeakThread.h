@@ -16,7 +16,7 @@ class Song;
 class Track;
 class AudioBuffer;
 
-class InterThreadMessager : public Observable<VirtualBase> {
+class InterThreadMessager : public obs::Node<VirtualBase> {
 public:
 	~InterThreadMessager();
 	void notify_x();

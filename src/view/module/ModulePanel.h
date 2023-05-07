@@ -72,7 +72,7 @@ public:
 	void copy_into(ConfigPanelSocket *dest);
 };
 
-class ModulePanel : public Observable<hui::Panel> {
+class ModulePanel : public obs::Node<hui::Panel> {
 public:
 	ModulePanel(Module *m, hui::Panel *parent, ConfigPanelMode mode);
 	~ModulePanel() override;

@@ -19,7 +19,7 @@ class AudioOutput;
 class Range;
 class AudioView;
 
-class Playback : public Observable<VirtualBase> {
+class Playback : public obs::Node<VirtualBase> {
 public:
 	Playback(Session *s);
 	~Playback();

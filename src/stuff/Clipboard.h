@@ -16,7 +16,7 @@ class TrackLayer;
 class AudioView;
 class PluginManager;
 
-class Clipboard : public Observable<VirtualBase> {
+class Clipboard : public obs::Node<VirtualBase> {
 	friend class PluginManager;
 public:
 	Clipboard();

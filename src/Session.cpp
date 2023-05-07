@@ -136,8 +136,8 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 		return nullptr;
 
 	plugins.add(p);
-	p->subscribe3(this, [this] (VirtualBase *o) {
-		on_plugin_stop_request((TsunamiPlugin*)o);
+	p->subscribe(this, [this, p] {
+		on_plugin_stop_request(p);
 	}, p->MESSAGE_STOP_REQUEST);
 
 	p->args = args;

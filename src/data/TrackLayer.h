@@ -29,7 +29,7 @@ enum class SignalType;
 
 
 
-class TrackLayer : public Sharable<Observable<VirtualBase>> {
+class TrackLayer : public Sharable<obs::Node<VirtualBase>> {
 public:
 	TrackLayer();
 	TrackLayer(Track *track);

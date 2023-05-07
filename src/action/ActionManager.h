@@ -20,7 +20,7 @@ namespace os {
 	class Timer;
 }
 
-class ActionManager : public Observable<VirtualBase> {
+class ActionManager : public obs::Node<VirtualBase> {
 	//friend class Data;
 public:
 	ActionManager(Data *_data);

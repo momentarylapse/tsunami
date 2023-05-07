@@ -16,7 +16,7 @@ namespace hui {
 	class Window;
 }
 
-class Progress : public Observable<VirtualBase> {
+class Progress : public obs::Node<VirtualBase> {
 public:
 	Progress(const string &str, hui::Window *parent);
 	~Progress() override {};

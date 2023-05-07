@@ -21,7 +21,7 @@ namespace scenegraph {
 
 class SceneGraph;
 
-class Node : public Sharable<Observable<VirtualBase>> {
+class Node : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Node();
 	Node(float w, float h);

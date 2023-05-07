@@ -19,7 +19,7 @@ class SampleRef;
 class Tag;
 enum class SignalType;
 
-class Sample : public Sharable<Observable<VirtualBase>> {
+class Sample : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Sample(SignalType type);
 	Sample(const string &name, const AudioBuffer &buf);

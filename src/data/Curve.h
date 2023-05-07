@@ -42,7 +42,7 @@ enum class CurveType {
 	EXPONENTIAL,
 };
 
-class Curve : public Sharable<Observable<VirtualBase>> {
+class Curve : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Curve();
 	virtual ~Curve();

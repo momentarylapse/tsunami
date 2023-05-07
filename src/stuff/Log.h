@@ -17,7 +17,7 @@
 
 class Session;
 
-class Log : public Observable<VirtualBase> {
+class Log : public obs::Node<VirtualBase> {
 public:
 	Log();
 

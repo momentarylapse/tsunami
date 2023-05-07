@@ -37,7 +37,7 @@ typedef int PaError;
 struct _snd_seq;
 #endif
 
-class DeviceManager : public Observable<VirtualBase> {
+class DeviceManager : public obs::Node<VirtualBase> {
 public:
 	friend class AudioOutput;
 	friend class AudioInput;

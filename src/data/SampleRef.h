@@ -20,7 +20,7 @@ class AudioBuffer;
 class Range;
 enum class SignalType;
 
-class SampleRef : public Sharable<Observable<VirtualBase>> {
+class SampleRef : public Sharable<obs::Node<VirtualBase>> {
 public:
 	SampleRef(shared<Sample> sample);
 	virtual ~SampleRef();

@@ -20,34 +20,31 @@ public:
 
 	void notify(const string &message);
 
-	typedef std::function<void()> Callback;
-	typedef std::function<void(VirtualBase*)> CallbackP;
+	using Callback = std::function<void()>;
 
 	// observers
-	class Subscription {
-	public:
+	struct Subscription {
 		Subscription();
-		Subscription(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
+		Subscription(VirtualBase *o, const string *message, const Callback &callback);
 		VirtualBase* observer;
 		const string *message;
 		Callback callback;
-		CallbackP callback_p;
 	};
 	Array<Subscription> subscriptions;
-	void subscribe(VirtualBase *me, VirtualBase *observer, const Callback &callback, const CallbackP &callback_p, const string &message);
+	void subscribe(VirtualBase *me, VirtualBase *observer, const Callback &callback, const string &message);
 	void unsubscribe(VirtualBase *observer);
 
-	class Notification : public Subscription {
-	public:
+	struct Notification : public Subscription {
 		Notification();
-		Notification(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
+		Notification(VirtualBase *o, const string *message, const Callback &callback);
 	};
 
 	VirtualBase *me;
 };
 
+
 template<class T>
-class Observable : public T {
+class LegacyObservable : public T {
 public:
 	static const string MESSAGE_CHANGE;
 	static const string MESSAGE_DELETE;
@@ -57,10 +54,7 @@ public:
 		observable_data.unsubscribe(observer);
 	}
 	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message) {
-		observable_data.subscribe(this, observer, callback, nullptr, message);
-	}
-	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback_p, const string &message) {
-		observable_data.subscribe(this, observer, nullptr, callback_p, message);
+		observable_data.subscribe(this, observer, callback, message);
 	}
 
 	void notify(const string &message = MESSAGE_CHANGE) const {
@@ -69,17 +63,86 @@ public:
 	void fake_death() const {
 		observable_data.fake_death();
 	}
-private:
 
+protected:
 	mutable ObservableData observable_data;
 };
 
 
 template<class T>
-const string Observable<T>::MESSAGE_CHANGE = "Change";
+const string LegacyObservable<T>::MESSAGE_CHANGE = "Change";
 template<class T>
-const string Observable<T>::MESSAGE_DELETE = "Delete";
+const string LegacyObservable<T>::MESSAGE_DELETE = "Delete";
 template<class T>
-const string Observable<T>::MESSAGE_ANY = "";
+const string LegacyObservable<T>::MESSAGE_ANY = "";
+
+
+namespace obs {
+struct Sink;
+using Callback = std::function<void()>;
+
+struct Source {
+	friend class Sink;
+	Source() = delete;
+	Source(VirtualBase* node, const string& name);
+	~Source();
+	void notify() const;
+	void subscribe(Sink& sink);
+	void unsubscribe(Sink& sink);
+	void unsubscribe(VirtualBase* node);
+	void operator>>(Sink& sink);
+
+private:
+	void _remove(Sink* sink);
+	VirtualBase* node;
+	string name;
+	//mutable
+	Array<Sink*> sinks;
+};
+
+struct Sink {
+	friend class Source;
+	Sink() = delete;
+	Sink(VirtualBase* node, Callback callback);
+	~Sink();
+
+private:
+	void _remove(Source* source);
+	VirtualBase* node;
+	Callback callback;
+	Array<Source*> sources;
+};
+
+
+template<class T>
+class Node : public LegacyObservable<T> {
+public:
+	template<typename... Args>
+	Node(Args... args) : LegacyObservable<T>(args...) {}
+	~Node() {
+		for (auto s: _private_sinks)
+			delete s;
+	}
+	obs::Source out_changed{this, "changed"};
+	obs::Source out_death{this, "death"};
+
+	Sink& create_sink(Callback callback) {
+		_private_sinks.add(new Sink(this, callback));
+		return *_private_sinks.back();
+	}
+
+
+	void fake_death() const {
+		out_death.notify();
+		this->observable_data.fake_death();
+	}
+
+private:
+	Array<Sink*> _private_sinks;
+};
+
+}
+
+
 
 #endif /* SRC_LIB_PATTERN_OBSERVABLE_H_ */

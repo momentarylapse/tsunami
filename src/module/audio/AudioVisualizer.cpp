@@ -45,7 +45,7 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 
 	visualizer->notify_counter ++;
 	hui::run_later(0.001f, [this] {
-		visualizer->notify();
+		visualizer->out_changed.notify();
 		visualizer->notify_counter --;
 	});
 	return r;

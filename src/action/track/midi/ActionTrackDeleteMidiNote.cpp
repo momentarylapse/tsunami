@@ -16,11 +16,11 @@ ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer *l, int _index) 
 
 void* ActionTrackDeleteMidiNote::execute(Data* d) {
 	layer->midi.erase(index);
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 	return nullptr;
 }
 
 void ActionTrackDeleteMidiNote::undo(Data* d) {
 	layer->midi.insert(note, index);
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 }

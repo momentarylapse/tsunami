@@ -17,7 +17,7 @@ ActionTrackAddCurve::ActionTrackAddCurve(Track *t, shared<Curve> _curve, int _in
 
 void* ActionTrackAddCurve::execute(Data* d) {
 	track->curves.insert(curve, index);
-	track->notify(track->MESSAGE_ADD_CURVE);
+	track->out_add_curve.notify();
 
 	return curve.get();
 }
@@ -26,7 +26,7 @@ void ActionTrackAddCurve::undo(Data* d) {
 	curve->fake_death();
 	track->curves.erase(index);
 
-	track->notify(track->MESSAGE_DELETE_CURVE);
+	track->out_delete_curve.notify();
 }
 
 

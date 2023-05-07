@@ -116,7 +116,7 @@ void ProfileManager::apply(Module *c, const string &name, bool notify) {
 	c->reset_config();
 	if (name == DEFAULT_NAME) {
 		if (notify)
-			c->notify();
+			c->out_changed.notify();
 		return;
 	}
 	if (!loaded)
@@ -126,7 +126,7 @@ void ProfileManager::apply(Module *c, const string &name, bool notify) {
 			c->config_from_string(f.version, f.options);
 	}
 	if (notify)
-		c->notify();
+		c->out_changed.notify();
 }
 
 void ProfileManager::save(Module *c, const string &name) {

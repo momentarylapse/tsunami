@@ -70,8 +70,8 @@ void NewDialog::on_ok() {
 	song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
 
 	song->action_manager->enable(true);
-	song->notify(song->MESSAGE_NEW);
-	song->notify(song->MESSAGE_FINISHED_LOADING);
+	song->out_new.notify();
+	song->out_finished_loading.notify();
 	request_destroy();
 	session->win->show();
 	session->win->activate("");

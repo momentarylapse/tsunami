@@ -36,9 +36,9 @@ void *ActionBar__Edit::execute(Data *d) {
 
 
 	s->x_message_data = {index, length, bar->length};
-	s->notify(s->MESSAGE_SCALE_BARS);
+	s->out_scale_bars.notify();
 
-	s->notify(s->MESSAGE_EDIT_BARS);
+	s->out_edit_bars.notify();
 
 	return nullptr;
 }

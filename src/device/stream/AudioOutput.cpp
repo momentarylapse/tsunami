@@ -429,7 +429,7 @@ void AudioOutput::_pause() {
 
 	device_manager->unlock();
 	state = State::PAUSED;
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 void AudioOutput::_unpause() {
@@ -458,7 +458,7 @@ void AudioOutput::_unpause() {
 
 	device_manager->unlock();
 	state = State::PLAYING;
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 int AudioOutput::_read_stream(int buffer_size) {
@@ -499,7 +499,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 void AudioOutput::set_device(Device *d) {
 	config.device = d;
 	on_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 void AudioOutput::start() {
@@ -554,7 +554,7 @@ void AudioOutput::_fill_prebuffer() {
 
 	device_manager->unlock();
 	state = State::PAUSED;
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 int AudioOutput::get_available() {
@@ -567,8 +567,8 @@ float AudioOutput::get_volume() {
 
 void AudioOutput::set_volume(float _volume) {
 	config.volume = _volume;
-	notify(MESSAGE_STATE_CHANGE);
-	notify(MESSAGE_CHANGE);
+	out_state_changed.notify();
+	out_changed.notify();
 }
 
 void AudioOutput::set_prebuffer_size(int size) {
@@ -618,12 +618,12 @@ bool AudioOutput::_portaudio_test_error(PaError err, const char *msg) {
 
 void AudioOutput::on_played_end_of_stream() {
 	//printf("---------ON PLAY END OF STREAM\n");
-	notify(MESSAGE_PLAY_END_OF_STREAM);
+	out_play_end_of_stream.notify();
 }
 
 void AudioOutput::on_read_end_of_stream() {
 	//printf("---------ON READ END OF STREAM\n");
-	notify(MESSAGE_READ_END_OF_STREAM);
+	out_read_end_of_stream.notify();
 }
 
 void AudioOutput::reset_state() {

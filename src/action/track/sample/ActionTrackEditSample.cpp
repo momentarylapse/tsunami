@@ -23,7 +23,7 @@ void *ActionTrackEditSample::execute(Data *d) {
 
 	ref->volume = new_value.volume;
 	ref->muted = new_value.mute;
-	ref->notify(ref->MESSAGE_CHANGE_BY_ACTION);
+	ref->out_changed_by_action.notify();
 
 	return nullptr;
 }
@@ -33,7 +33,7 @@ void ActionTrackEditSample::undo(Data *d) {
 
 	ref->volume = old_value.volume;
 	ref->muted = old_value.mute;
-	ref->notify(ref->MESSAGE_CHANGE_BY_ACTION);
+	ref->out_changed_by_action.notify();
 }
 
 

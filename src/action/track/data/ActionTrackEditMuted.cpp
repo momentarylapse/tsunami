@@ -17,7 +17,7 @@ void *ActionTrackEditMuted::execute(Data *d) {
 	bool temp = muted;
 	muted = track->muted;
 	track->muted = temp;
-	track->notify();
+	track->out_changed.notify();
 
 	return nullptr;
 }

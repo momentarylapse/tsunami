@@ -20,10 +20,10 @@
 #include "../view/module/ConfigPanel.h"
 #include "../view/module/AutoConfigPanel.h"
 
-const string Module::MESSAGE_STATE_CHANGE = "StateChange";
-const string Module::MESSAGE_TICK = "Tick";
-const string Module::MESSAGE_READ_END_OF_STREAM = "ReadEndOfStream";
-const string Module::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
+const string Module::MESSAGE_STATE_CHANGE = "state-changed";
+const string Module::MESSAGE_TICK = "tick";
+const string Module::MESSAGE_READ_END_OF_STREAM = "read-end-of-stream";
+const string Module::MESSAGE_PLAY_END_OF_STREAM = "play-end-of-stream";
 const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 
@@ -48,7 +48,9 @@ Module::Module(ModuleCategory category, const string &_class) {
 	allow_config_in_chain = false;
 	kaba_class = nullptr;
 	belongs_to_system = false;
-	func_edit = [this] { notify(); };
+	func_edit = [this] {
+		out_changed.notify();
+	};
 	perf_channel = PerformanceMonitor::create_channel("module", this);
 }
 
@@ -197,7 +199,7 @@ xfer<ConfigPanel> Module::create_panel() {
 //   -> signaling ui, actions
 void Module::changed() {
 	on_config();
-	//notify();
+	//out_changed.notify();
 	func_edit();
 }
 

@@ -100,7 +100,7 @@ void SideBar::_show() {
 
 	expand("revealer", true);
 	visible = true;
-	notify();
+	out_changed.notify();
 }
 
 // FIXME: this is the official closing function...
@@ -110,7 +110,7 @@ void SideBar::_hide() {
 
 	expand("revealer", false);
 	visible = false;
-	notify();
+	out_changed.notify();
 }
 
 void SideBar::choose(int console) {
@@ -127,7 +127,7 @@ void SideBar::choose(int console) {
 		consoles[active_console]->on_enter();
 	set_string("title", consoles[active_console]->title);
 
-	notify();
+	out_changed.notify();
 }
 
 void SideBar::open(int console) {
@@ -135,7 +135,7 @@ void SideBar::open(int console) {
 
 	if (!visible)
 		_show();
-	notify();
+	out_changed.notify();
 }
 
 bool SideBar::is_active(int console) {

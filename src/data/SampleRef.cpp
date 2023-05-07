@@ -11,7 +11,7 @@
 #include "../lib/math/math.h"
 #include "Song.h"
 
-const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "changed-by-action";
 
 
 
@@ -27,7 +27,7 @@ SampleRef::SampleRef(shared<Sample> sample) {
 }
 
 SampleRef::~SampleRef() {
-	notify(MESSAGE_DELETE);
+	out_death.notify();
 	origin->unref();
 	//msg_write("  del SampleRef " + p2s(this));
 }

@@ -35,7 +35,7 @@ Array<Track*> track_group_members(Track *group, bool with_self);
 const int TRACK_MIXER_WIDTH = 100;
 const int TRACK_MIXER_WIDTH_SHRUNK = 20;
 
-class TrackMixer: public hui::Panel {
+class TrackMixer: public obs::Node<hui::Panel> {
 public:
 	int shrink_button_x = 0;
 
@@ -84,12 +84,12 @@ public:
 		event(fx_id, [this] { on_show_fx(is_checked("")); });
 
 		vtrack = t;
-		vtrack->subscribe(this, [this] { update(); }, vtrack->MESSAGE_CHANGE);
-		vtrack->subscribe(this, [this] { on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
-		vtrack->view->subscribe(this, [this] {
+		vtrack->out_changed >> create_sink([this] { update(); });
+		vtrack->out_death >> create_sink([this] { on_vtrack_delete(); });
+		vtrack->view->out_selection_changed >> create_sink([this] {
 			redraw(id_name);
 			redraw(id_fx_header);
-		}, AudioView::MESSAGE_SELECTION_CHANGE);
+		});
 		fx_editor = new FxListEditor(track(), this, "fx", false);
 		update();
 	}
@@ -357,9 +357,9 @@ MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
 			p->draw_line({-10, y}, {(float)p->width + 10 , y - p->width - 20});*/
 	});
 
-	view->subscribe(this, [this] { on_tracks_change(); }, AudioView::MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, [this] { update_all(); }, AudioView::MESSAGE_SOLO_CHANGE);
-	song->subscribe(this, [this] { update_all(); }, Song::MESSAGE_FINISHED_LOADING);
+	view->out_vtrack_changed >> create_sink([this] { on_tracks_change(); });
+	view->out_solo_changed >> create_sink([this] { update_all(); });
+	song->out_finished_loading >> create_sink([this] { update_all(); });
 
 	//device_manager->subscribe(this, [this]{ on_update_device_manager(); });
 	session->playback->output_stream->subscribe(this, [this] {
@@ -370,13 +370,13 @@ MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
 
 
 	peak_runner_id = -1;
-	session->playback->signal_chain->subscribe(this, [this] {
+	session->playback->out_state_changed >> create_sink([this] {
 		on_chain_state_change();
-	}, SignalChain::MESSAGE_STATE_CHANGE);
+	});
 }
 
 MixingConsole::~MixingConsole() {
-	session->playback->signal_chain->unsubscribe(this);
+	session->playback->unsubscribe(this);
 	if (peak_runner_id >= 0)
 		hui::cancel_runner(peak_runner_id);
 	//song->unsubscribe(this);

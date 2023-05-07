@@ -29,7 +29,7 @@ Clipboard::Clipboard() {
 void Clipboard::clear() {
 	if (temp->tracks.num > 0) {
 		temp->reset();
-		notify();
+		out_changed.notify();
 	}
 	ref_uid.clear();
 }
@@ -119,7 +119,7 @@ void Clipboard::copy(AudioView *view) {
 			if (view->sel.has(l))
 				_copy_append_track(l, view, sel_range.offset);
 
-	notify();
+	out_changed.notify();
 }
 
 void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, int offset) {

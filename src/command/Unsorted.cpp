@@ -26,7 +26,7 @@ void song_compress_buffers(Song *song, const SongSelection &sel, const string &c
 					comp->data = song->session->storage->compress(buf, comp->codec);
 					if (comp->data.num > 0) {
 						buf.compressed = comp;
-						l->notify();
+						l->out_changed.notify();
 					}
 				}
 }

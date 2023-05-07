@@ -88,7 +88,9 @@ Session *SessionManager::spawn_new_session() {
 	session->win->show();
 
 	active_sessions.add(session);
-	hui::run_later(0.1f, [this] { notify(); });
+	hui::run_later(0.01f, [this] {
+		out_changed.notify();
+	});
 	return session;
 }
 
@@ -102,7 +104,9 @@ void SessionManager::end_session(Session *session) {
 	foreachi(Session *s, weak(active_sessions), i)
 		if (s == session /*and s->auto_delete*/)
 			active_sessions.erase(i);
-	hui::run_later(0.1f, [this] { notify(); });
+	hui::run_later(0.01f, [this] {
+		out_changed.notify();
+	});
 
 	if (active_sessions.num == 0)
 		tsunami->end();
@@ -150,7 +154,7 @@ void SessionManager::save_session(Session *s, const string &name) {
 	s->persistent_name = session_name(name);
 
 
-	notify();
+	out_changed.notify();
 }
 
 
@@ -208,12 +212,12 @@ void SessionManager::load_into_session(const string &name, Session *session) {
 			auto p = session->execute_tsunami_plugin(_class);
 			if (p and (config != "")) {
 				p->config_from_string(version, config);
-				p->notify();
+				p->out_changed.notify();
 			}
 		}
 	}
 
-	notify();
+	out_changed.notify();
 }
 
 void SessionManager::try_restore_matching_session(Session *session) {
@@ -229,7 +233,7 @@ void SessionManager::delete_saved_session(const string &name) {
 	for (auto s: weak(active_sessions))
 		if (s->persistent_name == name)
 			s->persistent_name = "";
-	notify();
+	out_changed.notify();
 }
 
 Path SessionManager::directory() const {

@@ -20,7 +20,7 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d) {
 	std::swap(track->synth->temperament, temperament);
 	track->synth->update_delta_phi();
 
-	track->synth->notify();
+	track->synth->out_changed.notify();
 
 	return nullptr;
 }

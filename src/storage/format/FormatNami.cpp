@@ -227,7 +227,7 @@ public:
 			me->points.add(p);
 		}
 		if (track)
-			track->notify(track->MESSAGE_ADD_CURVE);
+			track->out_add_curve.notify();
 	}
 	void write(BinaryFormatter *f) override {
 	}
@@ -254,7 +254,7 @@ public:
 			p.value = f->read_float();
 			me->points.add(p);
 		}
-		parent->notify(parent->MESSAGE_ADD_CURVE);
+		parent->out_add_curve.notify();
 	}
 	void write(BinaryFormatter *f) override {
 		f->write_int(0); // version

@@ -74,7 +74,7 @@ void Action__ShiftData::do_shift(Song *s, int delta) {
 				if (f.position >= offset)
 					f.position += delta;
 
-			l->notify();
+			l->out_changed.notify();
 		}
 	}
 }

@@ -12,33 +12,28 @@
 #include "../module/Module.h"
 #include "../module/ModuleFactory.h"
 
-const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
+const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "stop-request";
 
 TsunamiPlugin::TsunamiPlugin() :
 	Module(ModuleCategory::TSUNAMI_PLUGIN, "")
 {
 }
 
-TsunamiPlugin::~TsunamiPlugin()
-{
+TsunamiPlugin::~TsunamiPlugin() {
 }
 
-void TsunamiPlugin::__init__()
-{
+void TsunamiPlugin::__init__() {
 	new(this) TsunamiPlugin;
 }
 
-void TsunamiPlugin::__delete__()
-{
+void TsunamiPlugin::__delete__() {
 	this->TsunamiPlugin::~TsunamiPlugin();
 }
 
-void TsunamiPlugin::stop_request()
-{
-	notify(MESSAGE_STOP_REQUEST);
+void TsunamiPlugin::stop_request() {
+	out_stop_request.notify();
 }
 
-TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
-{
+TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name) {
 	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleCategory::TSUNAMI_PLUGIN, name);
 }

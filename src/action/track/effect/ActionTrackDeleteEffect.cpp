@@ -24,7 +24,7 @@ void *ActionTrackDeleteEffect::execute(Data *d) {
 	effect = track->fx[index];
 	effect->fake_death();
 	track->fx.erase(index);
-	track->notify(track->MESSAGE_DELETE_EFFECT);
+	track->out_delete_effect.notify();
 
 	return nullptr;
 }
@@ -35,6 +35,6 @@ void ActionTrackDeleteEffect::undo(Data *d) {
 	assert(index <= track->fx.num);
 
 	track->fx.insert(effect, index);
-	track->notify(track->MESSAGE_ADD_EFFECT);
+	track->out_add_effect.notify();
 }
 

@@ -124,7 +124,7 @@ void PeakMeter::process(AudioBuffer& buf) {
 
 void PeakMeter::reset_state() {
 	clear_data();
-	notify();
+	out_changed.notify();
 }
 
 Array<PeakMeterData> PeakMeter::read_channels() {

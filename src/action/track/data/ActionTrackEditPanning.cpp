@@ -16,14 +16,14 @@ ActionTrackEditPanning::ActionTrackEditPanning(Track *t, float _panning) {
 
 void *ActionTrackEditPanning::execute(Data *d) {
 	track->panning = new_value;
-	track->notify();
+	track->out_changed.notify();
 
 	return nullptr;
 }
 
 void ActionTrackEditPanning::undo(Data *d) {
 	track->panning = old_value;
-	track->notify();
+	track->out_changed.notify();
 }
 
 

@@ -24,10 +24,10 @@
 #include "../stuff/PerformanceMonitor.h"
 
 
-const string SignalChain::MESSAGE_ADD_MODULE = "AddModule";
-const string SignalChain::MESSAGE_DELETE_MODULE = "DeleteModule";
-const string SignalChain::MESSAGE_ADD_CABLE = "AddCable";
-const string SignalChain::MESSAGE_DELETE_CABLE = "DeleteCable";
+const string SignalChain::MESSAGE_ADD_MODULE = "add-module";
+const string SignalChain::MESSAGE_DELETE_MODULE = "delete-module";
+const string SignalChain::MESSAGE_ADD_CABLE = "add-cable";
+const string SignalChain::MESSAGE_DELETE_CABLE = "delete-cable";
 
 
 const float DEFAULT_UPDATE_DT = 0.050f;
@@ -112,8 +112,10 @@ shared<Module> SignalChain::_add(shared<Module> m) {
 	m->reset_state();
 	modules.add(m);
 	PerformanceMonitor::set_parent(m->perf_channel, perf_channel);
-	notify(MESSAGE_ADD_MODULE);
-	m->subscribe(this, [this] { on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	out_add_module.notify();
+	m->subscribe(this, [this] {
+		on_module_play_end_of_stream();
+	}, Module::MESSAGE_PLAY_END_OF_STREAM);
 	return m;
 }
 
@@ -152,7 +154,7 @@ void SignalChain::delete_module(Module *m) {
 		disconnect_out(m, i);
 
 	modules.erase(index);
-	notify(MESSAGE_DELETE_MODULE);
+	out_delete_module.notify();
 }
 
 Array<Cable> SignalChain::cables() {
@@ -194,7 +196,7 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 		std::lock_guard<std::mutex> lock(mutex);
 		target->_plug_in(target_port, source, source_port);
 	}
-	notify(MESSAGE_ADD_CABLE);
+	out_add_cable.notify();
 }
 
 void SignalChain::disconnect(Module *source, int source_port, Module *target, int target_port) {
@@ -211,7 +213,7 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 					std::lock_guard<std::mutex> lock(mutex);
 					*p.port = nullptr;
 				}
-				notify(MESSAGE_DELETE_CABLE);
+				out_delete_cable.notify();
 			}
 		}
 }
@@ -222,7 +224,7 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 		std::lock_guard<std::mutex> lock(mutex);
 		*(tp.port) = nullptr;
 	}
-	notify(MESSAGE_DELETE_CABLE);
+	out_delete_cable.notify();
 }
 
 void SignalChain::save(const Path& filename) {
@@ -386,8 +388,10 @@ void SignalChain::start() {
 	}
 
 	state = State::ACTIVE;
-	notify(MESSAGE_STATE_CHANGE);
-	hui_runner = hui::run_repeated(tick_dt, [this] { notify(MESSAGE_TICK); });
+	out_state_changed.notify();
+	hui_runner = hui::run_repeated(tick_dt, [this] {
+		out_tick.notify();
+	});
 }
 
 void SignalChain::stop() {
@@ -404,7 +408,7 @@ void SignalChain::stop() {
 			m->command(ModuleCommand::STOP, 0);
 	}
 	state = State::PAUSED;
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 void SignalChain::stop_hard() {
@@ -413,7 +417,7 @@ void SignalChain::stop_hard() {
 	_stop_sucking_hard();
 	reset_state();
 	state = State::UNPREPARED;
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 
@@ -446,7 +450,7 @@ bool SignalChain::is_active() {
 
 // running in gui thread!
 void SignalChain::on_module_play_end_of_stream() {
-	notify(MESSAGE_PLAY_END_OF_STREAM);
+	out_play_end_of_stream.notify();
 	//session->debug("auto stop");
 	stop_hard();
 }

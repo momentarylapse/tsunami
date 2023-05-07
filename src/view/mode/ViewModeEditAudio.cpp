@@ -190,7 +190,7 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 void ViewModeEditAudio::set_edit_mode(EditMode mode) {
 	edit_mode = mode;
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 

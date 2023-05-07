@@ -61,7 +61,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 
 
 	for (auto c: weak(consoles))
-		if (c->notify)
+		if (c->request_notify)
 			open(c);
 }
 
@@ -76,7 +76,7 @@ void BottomBar::_show() {
 	visible = true;
 	if (active_console)
 		active_console->show();
-	notify();
+	out_changed.notify();
 }
 
 void BottomBar::_hide() {
@@ -86,7 +86,7 @@ void BottomBar::_hide() {
 		active_console->hide();
 		active_console->on_leave();
 	}
-	notify();
+	out_changed.notify();
 }
 
 void BottomBar::add_console(BottomBar::Console *c, const string &list_name) {
@@ -124,7 +124,7 @@ void BottomBar::choose(BottomBar::Console *console) {
 	}
 	set_int("choose", index(active_console));
 
-	notify();
+	out_changed.notify();
 }
 
 void BottomBar::open(BottomBar::Console *console) {
@@ -132,7 +132,7 @@ void BottomBar::open(BottomBar::Console *console) {
 
 	if (!visible)
 		_show();
-	notify();
+	out_changed.notify();
 }
 
 void BottomBar::open(int console_index) {
@@ -152,9 +152,10 @@ bool BottomBar::is_active(int console_index) {
 }
 
 
-BottomBar::Console::Console(const string &_title, const string &id, Session *_session, BottomBar *bar) : hui::Panel(id, bar) {
+BottomBar::Console::Console(const string &_title, const string &id, Session *_session, BottomBar *bar) :
+		obs::Node<hui::Panel>(id, bar) {
 	title = _title;
-	notify = false;
+	request_notify = false;
 	session = _session;
 	song = session->song.get();
 	view = session->view;
@@ -164,7 +165,7 @@ void BottomBar::Console::blink() {
 	if (bar()) {
 		bar()->open(this);
 	} else {
-		notify = true;
+		request_notify = true;
 	}
 }
 

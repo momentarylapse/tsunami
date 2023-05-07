@@ -248,8 +248,8 @@ void TrackLayer::version_activate(const Range &range, bool activate) {
 void TrackLayer::set_muted(bool m) {
 	// todo
 	muted = m;
-	notify();
-	track->song->notify();
+	out_changed.notify();
+	track->song->out_changed.notify();
 }
 
 bool TrackLayer::is_main() const {

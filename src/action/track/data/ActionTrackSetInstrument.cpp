@@ -34,7 +34,7 @@ void* ActionTrackSetInstrument::execute(Data* d) {
 	for (auto &c: string_change)
 		c.note->stringno = c.to;
 
-	track->notify();
+	track->out_changed.notify();
 
 	return nullptr;
 }
@@ -47,7 +47,7 @@ void ActionTrackSetInstrument::undo(Data* d) {
 	for (auto &c: string_change)
 		c.note->stringno = c.from;
 
-	track->notify();
+	track->out_changed.notify();
 }
 
 bool ActionTrackSetInstrument::mergable(Action* a) {

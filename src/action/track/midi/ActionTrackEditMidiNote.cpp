@@ -26,7 +26,7 @@ void* ActionTrackEditMidiNote::execute(Data* d) {
 	std::swap(note->flags, note2->flags);
 	std::swap(note->clef_position, note2->clef_position);
 	std::swap(note->modifier, note2->modifier);
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 	return nullptr;
 }
 

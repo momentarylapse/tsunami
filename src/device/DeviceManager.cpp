@@ -25,8 +25,8 @@
 #include <alsa/asoundlib.h>
 #endif
 
-const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
-const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
+const string DeviceManager::MESSAGE_ADD_DEVICE = "add-device";
+const string DeviceManager::MESSAGE_REMOVE_DEVICE = "remove-device";
 
 
 struct ApiDescription {
@@ -247,7 +247,7 @@ void DeviceManager::remove_device(DeviceType type, int index) {
 	write_config();
 	msg_type = type;
 	msg_index = index;
-	notify(MESSAGE_REMOVE_DEVICE);
+	out_remove_device.notify();
 }
 
 void DeviceManager::write_config() {
@@ -275,7 +275,7 @@ void DeviceManager::update_devices(bool serious) {
 		_update_devices_midi_alsa();
 
 	write_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 
@@ -401,7 +401,7 @@ void DeviceManager::_update_devices_midi_alsa() {
 		if (d->present_old != d->present)
 			changed = true;
 	if (changed)
-		notify(MESSAGE_CHANGE);
+		out_changed.notify();
 #endif
 }
 
@@ -582,7 +582,7 @@ float DeviceManager::get_output_volume() {
 void DeviceManager::set_output_volume(float _volume) {
 	output_volume = _volume;
 	write_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 Device* DeviceManager::get_device(DeviceType type, const string &internal_name) {
@@ -602,7 +602,7 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 	devices.add(d);
 	msg_type = type;
 	msg_index = devices.num - 1;
-	notify(MESSAGE_ADD_DEVICE);
+	out_add_device.notify();
 	return d;
 }
 
@@ -649,7 +649,7 @@ void DeviceManager::set_device_config(Device *d) {
 		getDeviceList(d.type).add(d);
 	}*/
 	write_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 void DeviceManager::make_device_top_priority(Device *d) {
@@ -661,7 +661,7 @@ void DeviceManager::make_device_top_priority(Device *d) {
 			break;
 		}
 	write_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 void DeviceManager::move_device_priority(Device *d, int new_prio) {
@@ -672,7 +672,7 @@ void DeviceManager::move_device_priority(Device *d, int new_prio) {
 			break;
 		}
 	write_config();
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 #if HAS_LIB_PULSEAUDIO

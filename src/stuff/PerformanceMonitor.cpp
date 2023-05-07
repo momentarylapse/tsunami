@@ -191,7 +191,7 @@ void PerformanceMonitor::update() {
 		}
 	}
 
-	notify();
+	out_changed.notify();
 #endif
 }
 

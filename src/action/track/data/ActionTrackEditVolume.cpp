@@ -16,14 +16,14 @@ ActionTrackEditVolume::ActionTrackEditVolume(Track *t, float _volume) {
 
 void *ActionTrackEditVolume::execute(Data *d) {
 	track->volume = new_value;
-	track->notify();
+	track->out_changed.notify();
 
 	return nullptr;
 }
 
 void ActionTrackEditVolume::undo(Data *d) {
 	track->volume = old_value;
-	track->notify();
+	track->out_changed.notify();
 }
 
 

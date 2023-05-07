@@ -35,8 +35,8 @@ void *ActionTrack__DeleteEmpty::execute(Data *d) {
 	a->tracks.erase(index);
 
 	// notify outer structures first!
-	a->notify(a->MESSAGE_DELETE_LAYER);
-	a->notify(a->MESSAGE_DELETE_TRACK);
+	a->out_delete_layer.notify();
+	a->out_delete_track.notify();
 	track->layers[0]->fake_death();
 	track->fake_death();
 	return nullptr;
@@ -47,8 +47,8 @@ void *ActionTrack__DeleteEmpty::execute(Data *d) {
 void ActionTrack__DeleteEmpty::undo(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
-	a->notify(a->MESSAGE_ADD_TRACK);
-	a->notify(a->MESSAGE_ADD_LAYER);
+	a->out_add_track.notify();
+	a->out_add_layer.notify();
 }
 
 

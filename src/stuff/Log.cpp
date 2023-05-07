@@ -9,7 +9,7 @@
 #include "../lib/hui/hui.h"
 #include "../Session.h"
 
-const string Log::MESSAGE_ADD = "Add";
+const string Log::MESSAGE_ADD = "add-message";
 
 Log::Log() {
 	allow_debug = hui::config.get_bool("Log.Debug", false);
@@ -105,6 +105,7 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 	}
 
 	// make sure messages are handled in the gui thread...
-	hui::run_later(0.01f, [this] { notify(MESSAGE_ADD); });
-	//notify(MESSAGE_ADD);
+	hui::run_later(0.01f, [this] {
+		out_add_message.notify();
+	});
 }

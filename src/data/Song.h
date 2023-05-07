@@ -63,6 +63,20 @@ public:
 	static const string MESSAGE_EDIT_BARS;
 	static const string MESSAGE_SCALE_BARS;
 	static const string MESSAGE_ENABLE_FX;
+	obs::Source out_new{this, "new"};
+	obs::Source out_add_track{this, "add-track"};
+	obs::Source out_delete_track{this, "delete-track"};
+	obs::Source out_add_effect{this, "add-effect"};
+	obs::Source out_delete_effect{this, "delete-effect"};
+	obs::Source out_add_sample{this, "add-sample"};
+	obs::Source out_delete_sample{this, "delete-sample"};
+	obs::Source out_add_layer{this, "add-layer"};
+	obs::Source out_edit_layer{this, "edit-layer"};
+	obs::Source out_delete_layer{this, "delete-layer"};
+	obs::Source out_change_channels{this, "change-channels"};
+	obs::Source out_edit_bars{this, "edit-bars"};
+	obs::Source out_scale_bars{this, "scale-bars"};
+	obs::Source out_enable_fx{this, "enable-fx"};
 
 
 

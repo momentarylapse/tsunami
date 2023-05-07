@@ -24,7 +24,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 
 	for (auto &tv: track_volumes) {
 		tv.track->volume = tv.old_volume * factor;
-		tv.track->notify(tv.track->MESSAGE_CHANGE);
+		tv.track->out_changed.notify();
 	}
 
 	return nullptr;
@@ -33,7 +33,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 void ActionSongChangeAllTrackVolumes::undo(Data *d) {
 	for (auto &tv: track_volumes) {
 		tv.track->volume = tv.old_volume;
-		tv.track->notify(tv.track->MESSAGE_CHANGE);
+		tv.track->out_changed.notify();
 	}
 }
 

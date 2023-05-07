@@ -18,20 +18,20 @@ ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t) {
 
 void *ActionTrackEditSynthesizer::execute(Data *d) {
 	track->synth->_config_latest_history = new_value;
-	track->synth->notify();
+	track->synth->out_changed.notify();
 	return nullptr;
 }
 
 void ActionTrackEditSynthesizer::redo(Data *d) {
 	track->synth->_config_latest_history = new_value;
 	track->synth->config_from_string(Module::VERSION_LATEST, new_value);
-	track->synth->notify();
+	track->synth->out_changed.notify();
 }
 
 void ActionTrackEditSynthesizer::undo(Data *d) {
 	track->synth->_config_latest_history = old_value;
 	track->synth->config_from_string(Module::VERSION_LATEST, old_value);
-	track->synth->notify();
+	track->synth->out_changed.notify();
 }
 
 bool ActionTrackEditSynthesizer::mergable(Action *a) {

@@ -65,7 +65,7 @@ void ViewModeEdit::set_mode(ViewMode *m) {
 	mode = m;
 	if (view->mode == this)
 		mode->on_start();
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEdit::on_cur_layer_change() {

@@ -8,7 +8,7 @@
 #include "Progress.h"
 #include "../../lib/hui/hui.h"
 
-const string Progress::MESSAGE_CANCEL = "Cancel";
+const string Progress::MESSAGE_CANCEL = "cancel";
 
 const float PROGRESS_DT = 0.05f;
 
@@ -71,7 +71,7 @@ void Progress::set_kaba(const string &str, float progress) {
 
 void Progress::cancel() {
 	cancelled = true;
-	notify(MESSAGE_CANCEL);
+	out_cancel.notify();
 }
 
 bool Progress::is_cancelled() {

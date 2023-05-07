@@ -61,7 +61,7 @@ AudioViewTrack::~AudioViewTrack() {
 
 void AudioViewTrack::on_track_change() {
 	view->update_playback_layers(); // TODO let AudioView observe
-	notify(MESSAGE_CHANGE);
+	out_changed.notify();
 }
 
 
@@ -84,15 +84,15 @@ bool AudioView::editing_track(Track *t) {
 void AudioViewTrack::set_muted(bool muted) {
 	track->set_muted(muted);
 	/*view->force_redraw();
-	notify();
-	view->notify(view->MESSAGE_SOLO_CHANGE);*/
+	out_changed.notify();
+	view->out_solo_changed.notify();*/
 }
 
 void AudioViewTrack::set_solo(bool _solo) {
 	solo = _solo;
 	view->update_playback_layers();
-	notify();
-	view->notify(view->MESSAGE_SOLO_CHANGE);
+	out_changed.notify();
+	view->out_solo_changed.notify();
 }
 
 void AudioViewTrack::set_panning(float panning) {
@@ -106,7 +106,7 @@ void AudioViewTrack::set_volume(float volume) {
 
 void AudioViewTrack::set_midi_mode(MidiMode mode) {
 	midi_mode_wanted = mode;
-	notify();
+	out_changed.notify();
 	view->update_menu(); // FIXME
 	view->thm.set_dirty();
 	view->force_redraw();
@@ -115,7 +115,7 @@ void AudioViewTrack::set_midi_mode(MidiMode mode) {
 
 void AudioViewTrack::set_audio_mode(AudioViewMode mode) {
 	audio_mode = mode;
-	notify();
+	out_changed.notify();
 	view->update_menu(); // FIXME
 	view->thm.set_dirty();
 	view->force_redraw();

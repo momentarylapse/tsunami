@@ -30,6 +30,7 @@ public:
 	void _cdecl set_kaba(const string &str, float progress);
 
 	static const string MESSAGE_CANCEL;
+	obs::Source out_cancel{this, "cancel"};
 
 	void _cdecl cancel();
 	bool _cdecl is_cancelled();

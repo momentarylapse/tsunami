@@ -24,7 +24,7 @@ class ActionSongMoveBarGap : public Action {
 	void set_param_and_notify(Data *d, int _param) {
 		pos = _param;
 		execute(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 	void _set(Data *d, int p) {
 		auto s = dynamic_cast<Song*>(d);
@@ -42,7 +42,7 @@ class ActionSongMoveBarGap : public Action {
 	}
 	void abort_and_notify(Data *d) {
 		undo(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 	bool is_trivial() override {
 		return (pos == pos0);
@@ -237,7 +237,7 @@ void ViewModeEditBars::draw_post(Painter *p) {
 void ViewModeEditBars::set_edit_mode(EditMode mode) {
 	edit_mode = mode;
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 

@@ -31,6 +31,9 @@ public:
 	static const string MESSAGE_CHANGE_BY_ACTION;
 	static const string MESSAGE_REFERENCE;
 	static const string MESSAGE_UNREFERENCE;
+	obs::Source out_changed_by_action{this, "changed-by-action"};
+	obs::Source out_reference{this, "reference"};
+	obs::Source out_unreference{this, "unreference"};
 
 	int get_index() const;
 	Range _cdecl range() const;

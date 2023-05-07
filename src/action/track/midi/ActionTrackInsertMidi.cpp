@@ -33,7 +33,7 @@ void *ActionTrackInsertMidi::execute(Data *d) {
 		inserted_at.add(index);
 	}
 	applied = true;
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 
 	return nullptr;
 }
@@ -43,6 +43,6 @@ void ActionTrackInsertMidi::undo(Data *d) {
 		layer->midi.erase(i);
 
 	applied = false;
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 }
 

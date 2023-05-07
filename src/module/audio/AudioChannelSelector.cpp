@@ -69,7 +69,7 @@ int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
 		if (cs->peak_meter) {
 			cs->peak_meter->process(buf_in);
 			// FIXME should we go to main thread?
-			cs->peak_meter->notify();
+			cs->peak_meter->out_changed.notify();
 		}
 		cs->apply(buf_in.ref(0, r), buf);
 	}

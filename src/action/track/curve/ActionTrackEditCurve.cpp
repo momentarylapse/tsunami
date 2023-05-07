@@ -24,7 +24,7 @@ void* ActionTrackEditCurve::execute(Data* d) {
 	std::swap(max, curve->max);
 	std::swap(type, curve->type);
 
-	track->notify(track->MESSAGE_EDIT_CURVE);
+	track->out_edit_curve.notify();
 	return nullptr;
 }
 

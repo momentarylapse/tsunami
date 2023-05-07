@@ -19,13 +19,13 @@ void* ActionTrackDeleteCurve::execute(Data* d) {
 	curve->fake_death();
 	track->curves.erase(index);
 
-	track->notify(track->MESSAGE_DELETE_CURVE);
+	track->out_delete_curve.notify();
 
 	return nullptr;
 }
 
 void ActionTrackDeleteCurve::undo(Data* d) {
 	track->curves.insert(curve, index);
-	track->notify(track->MESSAGE_ADD_CURVE);
+	track->out_add_curve.notify();
 }
 

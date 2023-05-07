@@ -186,7 +186,8 @@ Source::Source(VirtualBase* _node, const string& _name, ObservableData* obs_data
 Source::~Source() {
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("del  %s . %s", get_obs_name(node), name));
-	for (auto s: sinks)
+	auto _sinks = sinks;
+	for (auto s: _sinks)
 		unsubscribe(*s);
 }
 void Source::notify() const {
@@ -202,17 +203,17 @@ void Source::subscribe(Sink& sink) {
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
 	sinks.add(&sink);
+	sink.sources.add(this);
 }
 void Source::unsubscribe(Sink& sink) {
 	_remove(&sink);
 	sink._remove(this);
 }
 void Source::unsubscribe(VirtualBase* node) {
-	base::remove_if(sinks, [this, node] (Sink* s) {
+	auto _sinks = sinks;
+	for (auto s: _sinks)
 		if (s->node == node)
-			s->_remove(this);
-		return s->node == node;
-	});
+			unsubscribe(*s);
 }
 void Source::operator >>(Sink& sink) {
 	subscribe(sink);
@@ -229,7 +230,8 @@ Sink::Sink(VirtualBase* n, Callback c) {
 Sink::~Sink() {
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("del  %s  (sink)", get_obs_name(node)));
-	for (auto s: sources)
+	auto _sources = sources;
+	for (auto s: _sources)
 		s->unsubscribe(*this);
 }
 void Sink::_remove(Source* source) {

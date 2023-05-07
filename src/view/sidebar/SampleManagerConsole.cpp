@@ -197,7 +197,7 @@ void SampleManagerConsole::on_auto_delete() {
 	auto sel = get_selected();
 	for (auto *s: sel) {
 		s->auto_delete = !s->auto_delete;
-		s->notify();
+		s->out_changed.notify();
 	}
 }
 

@@ -161,7 +161,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 			session->song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
 			session->song->reset_history();
 
-			session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
+			session->song->out_finished_loading.notify();
 		}
 		allow_window = true;
 	});

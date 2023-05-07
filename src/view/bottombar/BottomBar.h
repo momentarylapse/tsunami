@@ -40,7 +40,7 @@ public:
 	};
 
 
-	class Console : public hui::Panel {
+	class Console : public obs::Node<hui::Panel> {
 	public:
 		Console(const string &_title, const string &id, Session *_session, BottomBar *bar);
 		string title;
@@ -53,7 +53,7 @@ public:
 		virtual void on_enter() {}
 		virtual void on_leave() {}
 		void blink();
-		bool notify;
+		bool request_notify;
 	};
 
 	void on_close();

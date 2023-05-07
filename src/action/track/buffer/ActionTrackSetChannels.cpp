@@ -19,7 +19,7 @@ public:
 		std::swap(track->channels, channels);
 		for (auto l: weak(track->layers))
 			l->channels = track->channels;
-		track->song->notify(Song::MESSAGE_CHANGE_CHANNELS);
+		track->song->out_change_channels.notify();
 		return nullptr;
 	}
 	void undo(Data *d) override

@@ -234,9 +234,9 @@ AudioView::AudioView(Session *_session, const string &_id) {
 	output_volume_dial->set_callback([this] (float v) {
 		session->playback->output_stream->set_volume(v / 100.0f);
 	});
-	session->playback->output_stream->subscribe(this, [this] {
+	session->playback->output_stream->out_changed >> create_sink([this] {
 		output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
-	}, AudioOutput::MESSAGE_CHANGE);
+	});
 	output_volume_dial->hidden = true;
 	scene_graph->add_child(output_volume_dial);
 
@@ -295,7 +295,9 @@ AudioView::AudioView(Session *_session, const string &_id) {
 	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
 	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
 	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
-	song->subscribe(this, [this]{ on_song_new(); }, song->MESSAGE_NEW);
+	song->out_new >> create_sink([this] {
+		on_song_new();
+	});
 	//song->subscribe(this, [this]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
 	auto apply_bar_scale = [this](int i) {
 		auto b = song->bars[song->x_message_data.i[0]].get();
@@ -305,25 +307,25 @@ AudioView::AudioView(Session *_session, const string &_id) {
 			return i - song->x_message_data.i[1] + song->x_message_data.i[2];
 		return b->offset + (int)((float)(i - b->offset) * (float)song->x_message_data.i[2] / (float)song->x_message_data.i[1]);
 	};
-	song->subscribe(this, [this, apply_bar_scale] {
+	song->out_scale_bars >> create_sink([this, apply_bar_scale] {
 		sel.range_raw.set_start(apply_bar_scale(sel.range_raw.start()));
 		sel.range_raw.set_end(apply_bar_scale(sel.range_raw.end()));
 		update_selection();
-	}, song->MESSAGE_SCALE_BARS);
-	song->subscribe(this, [this] {
+	});
+	song->out_finished_loading >> create_sink([this] {
 		on_song_new();
 		on_song_finished_loading();
 		enable(true);
-	}, song->MESSAGE_FINISHED_LOADING);
-	song->subscribe(this, [this] {
+	});
+	song->out_start_loading >> create_sink([this] {
 		enable(false);
-	}, song->MESSAGE_START_LOADING);
-	song->subscribe(this, [this] {
+	});
+	song->out_before_change >> create_sink([this] {
 		peak_thread->stop_update();
-	}, song->MESSAGE_BEFORE_CHANGE);
-	song->subscribe(this, [this] {
+	});
+	song->out_after_change >> create_sink([this] {
 		on_song_change();
-	}, song->MESSAGE_AFTER_CHANGE);
+	});
 	song->subscribe(this, [this] {
 		force_redraw();
 		update_menu();

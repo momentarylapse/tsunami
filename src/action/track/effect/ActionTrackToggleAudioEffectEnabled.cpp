@@ -15,8 +15,8 @@ ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(AudioEffect *_fx)
 
 void *ActionTrackToggleEffectEnabled::execute(Data *d) {
 	fx->enabled = !fx->enabled;
-	fx->notify();
-	d->notify(Song::MESSAGE_ENABLE_FX);
+	fx->out_changed.notify();
+	((Song*)d)->out_enable_fx.notify();
 
 	return nullptr;
 }

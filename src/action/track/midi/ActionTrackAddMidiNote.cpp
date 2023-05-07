@@ -24,12 +24,12 @@ ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, shared<MidiNote> n
 
 void* ActionTrackAddMidiNote::execute(Data* d) {
 	layer->midi.insert(note, insert_index);
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 
 	return note.get();
 }
 
 void ActionTrackAddMidiNote::undo(Data* d) {
 	layer->midi.erase(insert_index);
-	layer->notify(layer->MESSAGE_CHANGE);
+	layer->out_changed.notify();
 }

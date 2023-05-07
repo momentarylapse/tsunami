@@ -26,7 +26,7 @@ void *ActionSampleDelete::execute(Data *d) {
 	a->samples.erase(index);
 	sample->unset_owner();
 
-	a->notify(a->MESSAGE_DELETE_SAMPLE);
+	a->out_delete_sample.notify();
 	return nullptr;
 }
 
@@ -35,6 +35,6 @@ void ActionSampleDelete::undo(Data *d) {
 	sample->set_owner(a);
 	a->samples.insert(sample, index);
 
-	a->notify(a->MESSAGE_ADD_SAMPLE);
+	a->out_add_sample.notify();
 }
 

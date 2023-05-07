@@ -67,20 +67,20 @@ void Song::__delete__() {
 }
 
 
-const string Song::MESSAGE_NEW = "New";
-const string Song::MESSAGE_ADD_TRACK = "AddTrack";
-const string Song::MESSAGE_DELETE_TRACK = "DeleteTrack";
-const string Song::MESSAGE_ADD_EFFECT = "AddEffect";
-const string Song::MESSAGE_DELETE_EFFECT = "DeleteEffect";
-const string Song::MESSAGE_ADD_SAMPLE = "AddSample";
-const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
-const string Song::MESSAGE_ADD_LAYER = "AddLayer";
-const string Song::MESSAGE_EDIT_LAYER = "EditLayer";
-const string Song::MESSAGE_DELETE_LAYER = "DeleteLayer";
-const string Song::MESSAGE_CHANGE_CHANNELS = "ChangeChannels";
-const string Song::MESSAGE_EDIT_BARS = "EditBars";
-const string Song::MESSAGE_SCALE_BARS = "ScaleBars";
-const string Song::MESSAGE_ENABLE_FX = "EnableFx";
+const string Song::MESSAGE_NEW = "new";
+const string Song::MESSAGE_ADD_TRACK = "add-track";
+const string Song::MESSAGE_DELETE_TRACK = "delete-track";
+const string Song::MESSAGE_ADD_EFFECT = "add-effect";
+const string Song::MESSAGE_DELETE_EFFECT = "delete-effect";
+const string Song::MESSAGE_ADD_SAMPLE = "add-sample";
+const string Song::MESSAGE_DELETE_SAMPLE = "delete-sample";
+const string Song::MESSAGE_ADD_LAYER = "add-layer";
+const string Song::MESSAGE_EDIT_LAYER = "edit-layer";
+const string Song::MESSAGE_DELETE_LAYER = "delete-layer";
+const string Song::MESSAGE_CHANGE_CHANNELS = "change-channels";
+const string Song::MESSAGE_EDIT_BARS = "edit-bars";
+const string Song::MESSAGE_SCALE_BARS = "scale-bars";
+const string Song::MESSAGE_ENABLE_FX = "enable-fx";
 
 bool Tag::operator ==(const Tag &o) const {
 	return key == o.key and value == o.value;
@@ -143,8 +143,8 @@ void Song::reset() {
 
 	action_manager->reset();
 
-	notify();
-	notify(MESSAGE_NEW);
+	out_changed.notify();
+	out_new.notify();
 }
 
 Song::~Song() {

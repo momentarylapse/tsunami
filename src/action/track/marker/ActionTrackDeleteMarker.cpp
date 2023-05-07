@@ -23,12 +23,12 @@ void *ActionTrackDeleteMarker::execute(Data *d) {
 	//marker->fake_death();
 	layer->markers.erase(index);
 
-	layer->notify();
+	layer->out_changed.notify();
 	return nullptr;
 }
 
 void ActionTrackDeleteMarker::undo(Data *d) {
 	layer->markers.insert(marker.get(), index);
-	layer->notify();
+	layer->out_changed.notify();
 }
 

@@ -27,6 +27,8 @@ public:
 	TsunamiWindow(Session *session);
 	~TsunamiWindow() override;
 
+	obs::Sink in_update;
+
 	void on_help();
 	void on_about();
 	void on_send_bug_report();

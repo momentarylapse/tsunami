@@ -15,7 +15,7 @@ ActionTrackSetTarget::ActionTrackSetTarget(Track *t, Track *_target) {
 
 void *ActionTrackSetTarget::execute(Data *d) {
 	std::swap(track->send_target, target);
-	track->notify();
+	track->out_changed.notify();
 
 	return nullptr;
 }

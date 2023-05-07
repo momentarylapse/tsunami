@@ -21,7 +21,7 @@ void *ActionTrackEditMarker::execute(Data *d) {
 	std::swap(marker->text, text);
 	std::swap(marker->range, range);
 
-	layer->notify();
+	layer->out_changed.notify();
 	return nullptr;
 }
 

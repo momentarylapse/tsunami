@@ -15,8 +15,8 @@ ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(MidiEffec
 
 void *ActionTrackToggleMidiEffectEnabled::execute(Data *d) {
 	fx->enabled = !fx->enabled;
-	fx->notify();
-	d->notify(Song::MESSAGE_ENABLE_FX);
+	fx->out_changed.notify();
+	((Song*)d)->out_enable_fx.notify();
 
 	return nullptr;
 }

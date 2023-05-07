@@ -41,7 +41,7 @@ void InterThreadMessager::notify_x() {
 	counter.fetch_add(1);
 	hui::run_later(0.001f, [this] {
 		if (!flushing.load())
-			this->notify();
+			this->out_changed.notify();
 		counter.fetch_sub(1);
 	});
 }

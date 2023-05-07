@@ -23,7 +23,7 @@ void *ActionBar__Add::execute(Data *d) {
 
 	s->bars.insert(bar, index);
 	s->bars._update_offsets();
-	s->notify(s->MESSAGE_EDIT_BARS);
+	s->out_edit_bars.notify();
 
 	return nullptr;
 }
@@ -33,6 +33,6 @@ void ActionBar__Add::undo(Data *d) {
 
 	s->bars.erase(index);
 	s->bars._update_offsets();
-	s->notify(s->MESSAGE_EDIT_BARS);
+	s->out_edit_bars.notify();
 }
 

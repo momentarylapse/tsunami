@@ -12,9 +12,9 @@
 #include "Song.h"
 #include <assert.h>
 
-const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
-const string Sample::MESSAGE_REFERENCE = "Reference";
-const string Sample::MESSAGE_UNREFERENCE = "Unreference";
+const string Sample::MESSAGE_CHANGE_BY_ACTION = "changed-by-action";
+const string Sample::MESSAGE_REFERENCE = "reference";
+const string Sample::MESSAGE_UNREFERENCE = "unreference";
 
 Sample::Sample(SignalType _type) {
 	//msg_write("  new Sample " + p2s(this));
@@ -47,7 +47,7 @@ Sample::Sample(const string &_name, const MidiNoteBuffer &_buf) : Sample(SignalT
 }
 
 Sample::~Sample() {
-	notify(MESSAGE_DELETE);
+	out_death.notify();
 	if (buf)
 		delete buf;
 	//msg_write("  del Sample " + p2s(this));
@@ -72,12 +72,12 @@ Range Sample::range() const {
 
 void Sample::ref() {
 	ref_count ++;
-	notify(MESSAGE_REFERENCE);
+	out_reference.notify();
 }
 
 void Sample::unref() {
 	ref_count --;
-	notify(MESSAGE_UNREFERENCE);
+	out_unreference.notify();
 }
 
 xfer<SampleRef> Sample::create_ref() {

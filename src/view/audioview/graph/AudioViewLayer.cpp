@@ -122,7 +122,7 @@ void AudioViewLayer::on_track_change() {
 	if (layer)
 		update_midi_key_changes();
 
-	//notify(MESSAGE_CHANGE);
+	//out_changed.notify();
 }
 
 Track *AudioViewLayer::track() {
@@ -461,8 +461,8 @@ bool AudioView::editing_layer(AudioViewLayer *l) {
 void AudioViewLayer::set_solo(bool _solo) {
 	solo = _solo;
 	view->update_playback_layers();
-	notify();
-	view->notify(view->MESSAGE_SOLO_CHANGE);
+	out_changed.notify();
+	view->out_solo_changed.notify();
 }
 
 

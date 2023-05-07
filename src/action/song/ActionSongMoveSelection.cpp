@@ -53,7 +53,7 @@ void *ActionSongMoveSelection::execute(Data *d) {
 	for (auto &b: buffers)
 		b.layer->buffers[b.index].offset = b.pos_old + param;
 	for (auto *t: tracks)
-		t->notify();
+		t->out_changed.notify();
 	return nullptr;
 }
 
@@ -75,7 +75,7 @@ void ActionSongMoveSelection::undo(Data *d) {
 	for (auto &b: buffers)
 		b.layer->buffers[b.index].offset = b.pos_old;
 	for (auto *t: tracks)
-		t->notify();
+		t->out_changed.notify();
 }
 
 
@@ -83,12 +83,12 @@ void ActionSongMoveSelection::undo(Data *d) {
 void ActionSongMoveSelection::set_param_and_notify(Data *d, int _param) {
 	param = _param;
 	execute(d);
-	d->notify();
+	d->out_changed.notify();
 }
 
 void ActionSongMoveSelection::abort_and_notify(Data *d) {
 	abort(d);
-	d->notify();
+	d->out_changed.notify();
 }
 
 bool ActionSongMoveSelection::is_trivial() {

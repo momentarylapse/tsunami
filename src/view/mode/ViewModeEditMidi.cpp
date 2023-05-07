@@ -89,7 +89,7 @@ public:
 				d.note->stringno = clamp(d.string_old + dstring, 0, layer->track->instrument.string_pitch.num - 1);
 			d.note->reset_clef();
 		}
-		layer->track->notify();
+		layer->track->out_changed.notify();
 		return nullptr;
 	}
 	void undo(Data *d) override{
@@ -99,7 +99,7 @@ public:
 			d.note->stringno = d.string_old;
 			d.note->reset_clef();
 		}
-		layer->track->notify();
+		layer->track->out_changed.notify();
 	}
 
 	// continuous editing
@@ -108,14 +108,14 @@ public:
 	}
 	void abort_and_notify(Data *d) {
 		abort(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 	void set_param_and_notify(Data *d, int _doffset, float _dpitch, int _dstring) {
 		doffset = _doffset;
 		dpitch = _dpitch;
 		dstring = _dstring;
 		execute(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 
 	bool is_trivial() override {
@@ -166,13 +166,13 @@ public:
 		for (auto &d: notes) {
 			d.note->range = d.range_old.scale_rel(range0, range);
 		}
-		layer->track->notify();
+		layer->track->out_changed.notify();
 		return nullptr;
 	}
 	void undo(Data *d) override{
 		for (auto &d: notes)
 			d.note->range = d.range_old;
-		layer->track->notify();
+		layer->track->out_changed.notify();
 	}
 
 	// continuous editing
@@ -181,12 +181,12 @@ public:
 	}
 	void abort_and_notify(Data *d) {
 		abort(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 	void set_param_and_notify(Data *d, const Range &r) {
 		range = r;
 		execute(d);
-		d->notify();
+		d->out_changed.notify();
 	}
 
 	bool is_trivial() override {
@@ -359,26 +359,26 @@ void ViewModeEditMidi::set_modifier(NoteModifier mod) {
 		session->status(_("no modifier"));
 	else
 		session->status(modifier_symbol(modifier));
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEditMidi::set_mode(MidiMode _mode) {
 	mode_wanted = _mode;
 	view->thm.set_dirty();
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEditMidi::set_creation_mode(CreationMode _mode) {
 	creation_mode = _mode;
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEditMidi::set_input_mode(InputMode _mode) {
 	input_mode = _mode;
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 bool ViewModeEditMidi::editing(AudioViewLayer *l) {
@@ -455,7 +455,7 @@ void ViewModeEditMidi::activate_input(bool active) {
 
 void ViewModeEditMidi::set_input_capture(bool capture) {
 	input_capture = capture;
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEditMidi::_start_input() {
@@ -968,7 +968,7 @@ void ViewModeEditMidi::set_note_length_and_partition(int length, int partition) 
 	sub_beat_partition = max(partition, 1);
 	select_in_edit_cursor();
 	view->force_redraw();
-	notify();
+	out_changed.notify();
 }
 
 void ViewModeEditMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {

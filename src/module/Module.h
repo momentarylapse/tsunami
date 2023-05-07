@@ -81,6 +81,10 @@ public:
 	static const string MESSAGE_READ_END_OF_STREAM;
 	static const string MESSAGE_PLAY_END_OF_STREAM;
 	static const string MESSAGE_TICK;
+	obs::Source out_state_changed{this, "state-changed"};
+	obs::Source out_read_end_of_stream{this, "read-end-of-stream"};
+	obs::Source out_play_end_of_stream{this, "play-end-of-stream"};
+	obs::Source out_tick{this, "tick"};
 
 
 	// basic

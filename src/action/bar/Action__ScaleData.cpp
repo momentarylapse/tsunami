@@ -86,7 +86,7 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 				if (f.position >= pos0)
 					f.position = __shift_data_shift(r, new_length, f.position);
 
-			l->notify();
+			l->out_changed.notify();
 		}
 	}
 }

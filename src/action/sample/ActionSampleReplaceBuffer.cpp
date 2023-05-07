@@ -16,7 +16,7 @@ ActionSampleReplaceBuffer::ActionSampleReplaceBuffer(shared<Sample> s, AudioBuff
 
 void* ActionSampleReplaceBuffer::execute(Data* d) {
 	std::swap(sample->buf, buf);
-	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
+	sample->out_changed_by_action.notify();
 	return sample.get();
 }
 

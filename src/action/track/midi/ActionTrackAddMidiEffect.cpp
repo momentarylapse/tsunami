@@ -17,7 +17,7 @@ ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, shared<MidiEffect> 
 
 void *ActionTrackAddMidiEffect::execute(Data *d) {
 	track->midi_fx.add(effect);
-	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
+	track->out_add_midi_effect.notify();
 
 	return nullptr;
 }
@@ -26,6 +26,6 @@ void ActionTrackAddMidiEffect::undo(Data *d) {
 	assert(track->midi_fx.num > 0);
 	track->midi_fx.pop();
 	effect->fake_death();
-	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
+	track->out_delete_midi_effect.notify();
 }
 

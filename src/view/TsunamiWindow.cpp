@@ -68,7 +68,9 @@ extern const string AppName;
 
 
 TsunamiWindow::TsunamiWindow(Session *_session) :
-		obs::Node<hui::Window>(AppName, 800, 600) {
+		obs::Node<hui::Window>(AppName, 800, 600),
+		in_update(this, [this] { on_update(); })
+{
 	session = _session;
 	session->set_win(this);
 	song = session->song.get();
@@ -365,9 +367,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	embed(side_bar.get(), "root-grid", 2, 0);
 
 
-	side_bar->subscribe(view, [this] {
-		view->on_update_sidebar();
-	}, SideBar::MESSAGE_ANY);
+	side_bar->out_changed >> in_update;
 
 	// bottom bar
 	bottom_bar = new BottomBar(session, this);
@@ -375,34 +375,28 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	//mini_bar = new MiniBar(bottom_bar, session);
 	//embed(mini_bar.get(), "main-grid", 0, 2);
 
-	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
-	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_SELECTION_CHANGE);
-	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->out_settings_changed >> in_update;
+	view->out_selection_changed >> in_update;
+	view->out_cur_layer_changed >> in_update;
+	view->out_cur_sample_changed >> in_update;
 	session->playback->signal_chain->subscribe(this, [this] {
 		on_update();
 	}, SignalChain::MESSAGE_ANY);
-	song->action_manager->out_changed >> create_sink([this] {
-		on_update();
-	});
+	song->action_manager->out_changed >> in_update;
 	song->action_manager->out_undo_action >> create_sink([this] {
 		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	});
 	song->action_manager->out_redo_action >> create_sink([this] {
 		session->status(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
 	});
-	song->out_after_change >> create_sink([this] {
-		on_update();
-	});
-	app->clipboard->subscribe(this, [this] {
-		on_update();
-	}, Clipboard::MESSAGE_ANY);
-	bottom_bar->subscribe(this, [this] {
+	song->out_after_change >> in_update;
+	app->clipboard->out_changed >> in_update;
+	bottom_bar->out_changed >> create_sink([this] {
 		on_bottom_bar_update();
-	}, BottomBar::MESSAGE_ANY);
-	side_bar->subscribe(this, [this] {
+	});
+	side_bar->out_changed >> create_sink([this] {
 		on_side_bar_update();
-	}, SideBar::MESSAGE_ANY);
+	});
 	
 	event("*", [this] { view->on_command(hui::get_event()->id); });
 

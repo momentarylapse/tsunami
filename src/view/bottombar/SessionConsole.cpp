@@ -93,7 +93,7 @@ void SessionConsole::on_delete() {
 				BackupManager::delete_old(l.uuid);
 
 				// TODO: make BackupManager observable :P
-				tsunami->session_manager->notify();
+				tsunami->session_manager->out_changed.notify();
 			} else if (l.is_persistent()) {
 				tsunami->session_manager->delete_saved_session(l.name);
 			}

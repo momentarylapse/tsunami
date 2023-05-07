@@ -55,14 +55,14 @@
 #include "../lib/threads/Mutex.h"
 
 
-const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
-const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
-const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
-const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
-const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
-const string Track::MESSAGE_ADD_CURVE = "AddCurve";
-const string Track::MESSAGE_DELETE_CURVE = "DeleteCurve";
-const string Track::MESSAGE_EDIT_CURVE = "EditCurve";
+const string Track::MESSAGE_ADD_EFFECT = "add-effect";
+const string Track::MESSAGE_DELETE_EFFECT = "delete-effect";
+const string Track::MESSAGE_ADD_MIDI_EFFECT = "add-midi-effect";
+const string Track::MESSAGE_DELETE_MIDI_EFFECT = "delete-midi-effect";
+const string Track::MESSAGE_REPLACE_SYNTHESIZER = "replace-synthesizer";
+const string Track::MESSAGE_ADD_CURVE = "add-curve";
+const string Track::MESSAGE_DELETE_CURVE = "delete-curve";
+const string Track::MESSAGE_EDIT_CURVE = "edit-curve";
 
 Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 	//msg_write("  new Track " + p2s(this));
@@ -92,7 +92,7 @@ Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 
 
 Track::~Track() {
-	notify(MESSAGE_DELETE);
+	out_death.notify();
 	//msg_write("  del Track " + p2s(this));
 }
 

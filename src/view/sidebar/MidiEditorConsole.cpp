@@ -421,17 +421,17 @@ void MidiEditorConsole::on_creation_mode() {
 
 void MidiEditorConsole::on_interval() {
 	mode->midi_interval = get_int("");
-	mode->notify();
+	mode->out_changed.notify();
 }
 
 void MidiEditorConsole::on_chord_type(ChordType t) {
 	mode->chord_type = t;
-	mode->notify();
+	mode->out_changed.notify();
 }
 
 void MidiEditorConsole::on_chord_inversion(int i) {
 	mode->chord_inversion = i;
-	mode->notify();
+	mode->out_changed.notify();
 }
 
 void MidiEditorConsole::on_reference_tracks() {

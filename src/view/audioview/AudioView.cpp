@@ -203,12 +203,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	draw_runner_id = -1;
 
 
-	session->playback->subscribe(this, [this] {
+	session->playback->out_tick >> create_sink([this] {
 		on_stream_tick();
-	}, Playback::MESSAGE_TICK);
-	session->playback->subscribe(this, [this] {
+	});
+	session->playback->out_state_changed >> create_sink([this] {
 		on_stream_state_change();
-	}, Playback::MESSAGE_STATE_CHANGE);
+	});
 
 
 	// TODO move "OnScreenDisplay"?

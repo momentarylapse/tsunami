@@ -11,7 +11,13 @@
 #include "../base/base.h"
 #include <functional>
 
+
+namespace obs {
+	struct Source;
+}
+
 class ObservableData {
+	friend struct obs::Source;
 public:
 	ObservableData();
 	~ObservableData();
@@ -70,9 +76,9 @@ protected:
 
 
 template<class T>
-const string LegacyObservable<T>::MESSAGE_CHANGE = "Change";
+const string LegacyObservable<T>::MESSAGE_CHANGE = "changed";
 template<class T>
-const string LegacyObservable<T>::MESSAGE_DELETE = "Delete";
+const string LegacyObservable<T>::MESSAGE_DELETE = "death";
 template<class T>
 const string LegacyObservable<T>::MESSAGE_ANY = "";
 
@@ -83,8 +89,13 @@ using Callback = std::function<void()>;
 
 struct Source {
 	friend class Sink;
+
 	Source() = delete;
-	Source(VirtualBase* node, const string& name);
+	Source(VirtualBase* node, const string& name, ObservableData* obs_data);
+	template<class T>
+	Source(T* node, const string& name) : Source(node, name, &node->observable_data) {
+		node->_sources.add(this);
+	}
 	~Source();
 	void notify() const;
 	void subscribe(Sink& sink);
@@ -94,6 +105,7 @@ struct Source {
 
 private:
 	void _remove(Sink* sink);
+	ObservableData* legacy_observable_data;
 	VirtualBase* node;
 	string name;
 	//mutable
@@ -102,6 +114,7 @@ private:
 
 struct Sink {
 	friend class Source;
+
 	Sink() = delete;
 	Sink(VirtualBase* node, Callback callback);
 	~Sink();
@@ -116,6 +129,8 @@ private:
 
 template<class T>
 class Node : public LegacyObservable<T> {
+	friend class Source;
+
 public:
 	template<typename... Args>
 	Node(Args... args) : LegacyObservable<T>(args...) {}
@@ -123,6 +138,12 @@ public:
 		for (auto s: _private_sinks)
 			delete s;
 	}
+
+private:
+	Array<Source*> _sources;
+	Array<Sink*> _private_sinks;
+
+public:
 	obs::Source out_changed{this, "changed"};
 	obs::Source out_death{this, "death"};
 
@@ -131,14 +152,16 @@ public:
 		return *_private_sinks.back();
 	}
 
+	void unsubscribe(VirtualBase *observer) {
+		LegacyObservable<T>::unsubscribe(observer);
+		for (auto s: _sources)
+			s->unsubscribe(observer);
+	}
 
 	void fake_death() const {
 		out_death.notify();
 		this->observable_data.fake_death();
 	}
-
-private:
-	Array<Sink*> _private_sinks;
 };
 
 }

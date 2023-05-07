@@ -74,7 +74,7 @@ DrawingArea area '' height=200 expandy")
 		grid.init(self, "area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		
-		c.subscribe(self, on_update, "Change")
+		c.subscribe(self, on_update, "changed")
 	
 	func override __delete__()
 		c.unsubscribe(self)

@@ -24,8 +24,8 @@ public:
 	Playback(Session *s);
 	~Playback();
 
-	static const string MESSAGE_TICK;
-	static const string MESSAGE_STATE_CHANGE;
+	obs::Source out_tick{this, "tick"};
+	obs::Source out_state_changed{this, "state-changed"};
 
 
 	Session *session;

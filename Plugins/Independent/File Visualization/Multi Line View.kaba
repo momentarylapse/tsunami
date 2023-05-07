@@ -74,8 +74,8 @@ class MLVDialog extends hui.Dialog
 		event_x("area", "hui:key-down", on_key)
 		event("hui:close", on_close)
 		
-		#session.playback.signal_chain.subscribe(self, on_preview_change, "Change")
-		session.playback.signal_chain.subscribe(self, on_preview_tick, "Tick")
+		#session.playback.signal_chain.subscribe(self, on_preview_change, "changed")
+		session.playback.subscribe(self, on_preview_tick, "tick")
 		
 		mlp = new MultiLinePainter(session.song, colors)
 		

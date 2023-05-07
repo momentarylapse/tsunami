@@ -14,7 +14,7 @@ DrawingArea area '' height=200 expandy")
 	
 		event_x("area", "hui:draw", on_draw)
 		
-		c.subscribe(self, on_update, "Change")
+		c.subscribe(self, on_update, "changed")
 	
 	func override __delete__()
 		c.unsubscribe(self)

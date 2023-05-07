@@ -176,9 +176,10 @@ void ObservableData::notify(const string &message) {
 
 
 namespace obs {
-Source::Source(VirtualBase* _node, const string& _name) {
+Source::Source(VirtualBase* _node, const string& _name, ObservableData* obs_data) {
 	node = _node;
 	name = _name;
+	legacy_observable_data = obs_data;
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("add  %s . %s", get_obs_name(node), name));
 }
@@ -194,6 +195,8 @@ void Source::notify() const {
 			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
 		s->callback();
 	}
+	if (legacy_observable_data)
+		legacy_observable_data->notify(name);
 }
 void Source::subscribe(Sink& sink) {
 	if constexpr (NODE_DEBUG_LEVEL >= 2)

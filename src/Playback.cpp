@@ -14,9 +14,6 @@
 #include "view/audioview/AudioView.h"
 #include "lib/hui/hui.h"
 
-const string Playback::MESSAGE_TICK = "Tick";
-const string Playback::MESSAGE_STATE_CHANGE = "StateChange";
-
 Playback::Playback(Session *s) {
 	session = s;
 
@@ -31,10 +28,10 @@ Playback::Playback(Session *s) {
 
 	// propagate messages
 	signal_chain->subscribe(this, [this] {
-		notify(MESSAGE_TICK);
+		out_tick.notify();
 	}, Module::MESSAGE_TICK);
 	signal_chain->subscribe(this, [this] {
-		notify(MESSAGE_STATE_CHANGE);
+		out_state_changed.notify();
 	}, Module::MESSAGE_STATE_CHANGE);
 
 }
@@ -90,7 +87,7 @@ void Playback::prepare(const Range &range, bool allow_loop) {
 
 void Playback::set_loop(bool loop) {
 	renderer->set_loop(loop);
-	notify(MESSAGE_STATE_CHANGE);
+	out_state_changed.notify();
 }
 
 void Playback::stop() {

@@ -24,7 +24,7 @@ Grid ? '' vertical
 		event("threshold", on_threshold)
 		event("blocking", on_blocking)
 		
-		c.subscribe(self, on_update, "Change")
+		c.subscribe(self, on_update, "changed")
 	
 	func override __delete__()
 		c.unsubscribe(self)

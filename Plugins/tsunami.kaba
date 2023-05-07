@@ -670,7 +670,7 @@ class Session extends Object as shared
 	var song: shared![Song]
 	var view: AudioView&
 	var storage: Storage&
-	var playback: Playback&
+	var playback: owned![Playback]
 	
 	func extern sample_rate() -> int
 	

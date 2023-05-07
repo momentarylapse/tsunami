@@ -9,6 +9,7 @@
 #define SRC_VIEW_PAINTER_MULTILINEPAINTER_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/pointer.h"
 
 class Song;
 class Track;
@@ -40,8 +41,8 @@ public:
 	void update_scales();
 
 
-	MidiPainter *mp;
-	ViewPort *cam;
+	owned<MidiPainter> mp;
+	owned<ViewPort> cam;
 	const ColorScheme &colors;
 	SongSelection *sel;
 	HoverData *hover;

@@ -34,18 +34,16 @@ MultiLinePainter::MultiLinePainter(Song *s, const ColorScheme &c) :
 	song = s;
 
 
-	cam = new ViewPort(nullptr);
+	cam = new ViewPort();
 	cam->area = rect(border, page_width - border, 0, 2000);
 	sel = new SongSelection;
 	hover = new HoverData;
-	mp = new MidiPainter(song, cam, sel, hover, c);
+	mp = new MidiPainter(song, cam.get(), sel, hover, c);
 
 	pdf_bpm = 0;
 }
 
 MultiLinePainter::~MultiLinePainter() {
-	delete mp;
-	delete cam;
 }
 
 

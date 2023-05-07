@@ -9,20 +9,18 @@
 #define SRC_VIEW_VIEWPORT_H_
 
 #include "../../lib/math/rect.h"
+#include "../../lib/pattern/Observable.h"
 
-class AudioView;
 class Range;
 class Song;
 
-class ViewPort {
+class ViewPort : public obs::Node<VirtualBase> {
 public:
-	ViewPort(AudioView *v);
-	void __init__(AudioView *v);
+	ViewPort();
+	void __init__();
 
 	static const float BORDER_FACTOR;
 	static const float BORDER_FACTOR_RIGHT;
-
-	AudioView *view;
 
 	double pos;
 	double pos_pre_animation;

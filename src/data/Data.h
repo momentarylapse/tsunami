@@ -26,6 +26,10 @@ public:
 	static const string MESSAGE_FINISHED_LOADING;
 	static const string MESSAGE_BEFORE_CHANGE;
 	static const string MESSAGE_AFTER_CHANGE;
+	obs::Source out_start_loading{this, "start-loading"};
+	obs::Source out_finished_loading{this, "finished-loading"};
+	obs::Source out_before_change{this, "before-change"};
+	obs::Source out_after_change{this, "after-change"};
 
 	virtual void _cdecl reset() = 0;
 

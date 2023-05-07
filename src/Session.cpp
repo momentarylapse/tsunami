@@ -34,9 +34,9 @@
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
 
-const string Session::MESSAGE_ADD_PLUGIN = "AddPlugin";
-const string Session::MESSAGE_REMOVE_PLUGIN = "RemovePlugin";
-const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "AddSignalChain";
+const string Session::MESSAGE_ADD_PLUGIN = "add-plugin";
+const string Session::MESSAGE_REMOVE_PLUGIN = "remove-plugin";
+const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "add-signal-chain";
 
 
 const string EditMode::Default = "default";
@@ -144,7 +144,7 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 	p->on_start();
 
 	last_plugin = p;
-	notify(MESSAGE_ADD_PLUGIN);
+	out_add_plugin.notify();
 	return p;
 }
 
@@ -152,7 +152,7 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 	hui::run_later(0.001f, [this,p]{
 		last_plugin = p;
-		notify(MESSAGE_REMOVE_PLUGIN);
+		out_remove_plugin.notify();
 		p->on_stop();
 		foreachi (auto *pp, weak(plugins), i)
 			if (p == pp)
@@ -234,7 +234,7 @@ bool Session::in_mode(const string &m) {
 
 void Session::add_signal_chain(xfer<SignalChain> chain) {
 	all_signal_chains.add(chain);
-	notify(MESSAGE_ADD_SIGNAL_CHAIN);
+	out_add_signal_chain.notify();
 	/*chain->subscribe(this, [this] {
 		_remove_signal_chain(chain);
 	}, chain->MESSAGE_DELETE);*/

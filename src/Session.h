@@ -39,6 +39,9 @@ public:
 	static const string MESSAGE_ADD_PLUGIN;
 	static const string MESSAGE_REMOVE_PLUGIN;
 	static const string MESSAGE_ADD_SIGNAL_CHAIN;
+	obs::Source out_add_plugin{this, "add-plugin"};
+	obs::Source out_remove_plugin{this, "remove-plugin"};
+	obs::Source out_add_signal_chain{this, "add-signal-chain"};
 
 	static int next_id;
 

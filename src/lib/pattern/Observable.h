@@ -52,6 +52,9 @@ public:
 template<class T>
 class LegacyObservable : public T {
 public:
+	template<typename... Args>
+	LegacyObservable(Args... args) : T(args...) {}
+
 	static const string MESSAGE_CHANGE;
 	static const string MESSAGE_DELETE;
 	static const string MESSAGE_ANY;

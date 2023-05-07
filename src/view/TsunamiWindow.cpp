@@ -68,7 +68,7 @@ extern const string AppName;
 
 
 TsunamiWindow::TsunamiWindow(Session *_session) :
-		hui::Window(AppName, 800, 600) {
+		obs::Node<hui::Window>(AppName, 800, 600) {
 	session = _session;
 	session->set_win(this);
 	song = session->song.get();
@@ -382,18 +382,18 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	session->playback->signal_chain->subscribe(this, [this] {
 		on_update();
 	}, SignalChain::MESSAGE_ANY);
-	song->action_manager->subscribe(this, [this] {
+	song->action_manager->out_changed >> create_sink([this] {
 		on_update();
-	}, ActionManager::MESSAGE_ANY);
-	song->action_manager->subscribe(this, [this] {
+	});
+	song->action_manager->out_undo_action >> create_sink([this] {
 		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
-	}, ActionManager::MESSAGE_UNDO_ACTION);
-	song->action_manager->subscribe(this, [this] {
+	});
+	song->action_manager->out_redo_action >> create_sink([this] {
 		session->status(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
-	}, ActionManager::MESSAGE_REDO_ACTION);
-	song->subscribe(this, [this] {
+	});
+	song->out_after_change >> create_sink([this] {
 		on_update();
-	}, Song::MESSAGE_AFTER_CHANGE);
+	});
 	app->clipboard->subscribe(this, [this] {
 		on_update();
 	}, Clipboard::MESSAGE_ANY);

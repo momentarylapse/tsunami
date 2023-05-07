@@ -10,6 +10,7 @@
 
 #include "../lib/base/pointer.h"
 #include "../lib/hui/hui.h"
+#include "../lib/pattern/Observable.h"
 
 class Song;
 class AudioView;
@@ -21,7 +22,7 @@ class Tsunami;
 class Module;
 class ModulePanel;
 
-class TsunamiWindow : public hui::Window {
+class TsunamiWindow : public obs::Node<hui::Window> {
 public:
 	TsunamiWindow(Session *session);
 	~TsunamiWindow() override;

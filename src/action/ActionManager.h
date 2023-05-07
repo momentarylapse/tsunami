@@ -30,6 +30,9 @@ public:
 	static const string MESSAGE_DO_ACTION;
 	static const string MESSAGE_UNDO_ACTION;
 	static const string MESSAGE_REDO_ACTION;
+	obs::Source out_do_action{this, "do-action"};
+	obs::Source out_undo_action{this, "undo-action"};
+	obs::Source out_redo_action{this, "redo-action"};
 
 	void reset();
 	void enable(bool enabled);

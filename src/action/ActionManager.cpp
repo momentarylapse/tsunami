@@ -27,9 +27,9 @@ public:
 };
 
 
-const string ActionManager::MESSAGE_DO_ACTION = "DoAction";
-const string ActionManager::MESSAGE_UNDO_ACTION = "UndoAction";
-const string ActionManager::MESSAGE_REDO_ACTION = "RedoAction";
+const string ActionManager::MESSAGE_DO_ACTION = "do-action";
+const string ActionManager::MESSAGE_UNDO_ACTION = "undo-action";
+const string ActionManager::MESSAGE_REDO_ACTION = "redo-action";
 
 ActionManager::ActionManager(Data *_data) {
 	data = _data;
@@ -51,7 +51,7 @@ void ActionManager::reset() {
 	enabled = true;
 	cur_group_level = 0;
 	cur_group = nullptr;
-	notify();
+	out_changed.notify();
 }
 
 
@@ -87,15 +87,15 @@ bool ActionManager::_try_merge_into_head(Action *a) {
 }
 
 void ActionManager::_edit_start() {
-	data->notify(Data::MESSAGE_BEFORE_CHANGE);
+	data->out_before_change.notify();
 	_lock();
 }
 
 void ActionManager::_edit_end() {
 	_unlock();
-	data->notify(Data::MESSAGE_AFTER_CHANGE);
-	data->notify();
-	notify();
+	data->out_after_change.notify();
+	data->out_changed.notify();
+	out_changed.notify();
 }
 
 
@@ -110,7 +110,7 @@ void *ActionManager::execute(Action *a) {
 		_add_to_history(a);
 
 	_edit_end();
-	notify(MESSAGE_DO_ACTION);
+	out_do_action.notify();
 	return r;
 }
 
@@ -124,7 +124,7 @@ bool ActionManager::undo() {
 	action[-- cur_pos]->undo(data);
 	prev_action = action[cur_pos];
 	_edit_end();
-	notify(MESSAGE_UNDO_ACTION);
+	out_undo_action.notify();
 	return true;
 }
 
@@ -138,7 +138,7 @@ bool ActionManager::redo() {
 	prev_action = action[cur_pos];
 	action[cur_pos ++]->redo(data);
 	_edit_end();
-	notify(MESSAGE_REDO_ACTION);
+	out_redo_action.notify();
 	return true;
 }
 
@@ -156,7 +156,7 @@ bool ActionManager::redoable() {
 
 void ActionManager::mark_current_as_save() {
 	save_pos = cur_pos;
-	notify();
+	out_changed.notify();
 }
 
 

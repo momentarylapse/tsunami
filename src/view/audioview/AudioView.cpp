@@ -66,20 +66,18 @@
 const int AudioView::SNAPPING_DIST = 8;
 
 
-const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
-const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";
-const string AudioView::MESSAGE_CUR_LAYER_CHANGE = "CurLayerChange";
-const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
-const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
-const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
-const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
-const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
+const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "cur-track-changed";
+const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "cur-sample-changed";
+const string AudioView::MESSAGE_CUR_LAYER_CHANGE = "cur-layer-changed";
+const string AudioView::MESSAGE_SELECTION_CHANGE = "selection-changed";
+const string AudioView::MESSAGE_SETTINGS_CHANGE = "settings-changed";
+const string AudioView::MESSAGE_VIEW_CHANGE = "view-changed";
+const string AudioView::MESSAGE_VTRACK_CHANGE = "vtrack-changed";
+const string AudioView::MESSAGE_SOLO_CHANGE = "solo-changed";
 
 
 
-AudioView::AudioView(Session *_session, const string &_id) :
-	cam(this)
-{
+AudioView::AudioView(Session *_session, const string &_id) {
 	id = _id;
 	session = _session;
 	win = session->win.get();
@@ -208,6 +206,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	});
 	session->playback->out_state_changed >> create_sink([this] {
 		on_stream_state_change();
+	});
+	cam.out_changed >> create_sink([this] {
+		cam_changed();
 	});
 
 
@@ -350,7 +351,7 @@ void AudioView::set_antialiasing(bool set) {
 	antialiasing = set;
 	hui::config.set_bool("View.Antialiasing", antialiasing);
 	force_redraw();
-	notify(MESSAGE_SETTINGS_CHANGE);
+	out_settings_changed.notify();
 }
 
 void AudioView::set_high_details(bool set) {
@@ -358,13 +359,13 @@ void AudioView::set_high_details(bool set) {
 	detail_steps = high_details ? 1 : 3;
 	hui::config.set_bool("View.HighDetails", high_details);
 	force_redraw();
-	notify(MESSAGE_SETTINGS_CHANGE);
+	out_settings_changed.notify();
 }
 
 void AudioView::set_mouse_wheel_speed(float speed) {
 	mouse_wheel_speed = speed;
 	hui::config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
-	notify(MESSAGE_SETTINGS_CHANGE);
+	out_settings_changed.notify();
 }
 
 void AudioView::set_color_scheme(const string &name) {
@@ -422,7 +423,7 @@ void AudioView::update_selection() {
 	session->playback->update_range(get_playback_selection(false));
 	force_redraw();
 
-	notify(MESSAGE_SELECTION_CHANGE);
+	out_selection_changed.notify();
 }
 
 
@@ -454,7 +455,7 @@ Range AudioView::get_playback_selection(bool for_recording) {
 
 void AudioView::set_selection_snap_mode(SelectionSnapMode mode) {
 	selection_snap_mode = mode;
-	notify(MESSAGE_SETTINGS_CHANGE);
+	out_settings_changed.notify();
 }
 
 void _update_find_min(int &new_pos, bool &found, float &dmin, int pos, int trial_pos) {
@@ -1049,7 +1050,7 @@ void AudioView::update_tracks() {
 
 	// TODO: detect order change
 	check_consistency();
-	notify(MESSAGE_VTRACK_CHANGE);
+	out_vtrack_changed.notify();
 
 
 	for (auto *v: vlayer_del)
@@ -1229,7 +1230,7 @@ void AudioView::set_midi_view_mode(MidiMode mode) {
 	for (auto *t: vtracks)
 		t->set_midi_mode(mode);
 	//forceRedraw();
-	notify(MESSAGE_SETTINGS_CHANGE);
+	out_settings_changed.notify();
 	update_menu();
 }
 
@@ -1329,16 +1330,16 @@ void AudioView::set_current(const HoverData &h) {
 
 	// notifications
 	if (cur_sample() != _prev_selection.sample) {
-		notify(MESSAGE_CUR_SAMPLE_CHANGE);
+		out_cur_sample_changed.notify();
 	}
 	if (cur_vlayer() != _prev_selection.vlayer) {
 		mode->on_cur_layer_change();
 		ensure_layer_on_screen(this, cur_vlayer());
 		force_redraw();
-		notify(MESSAGE_CUR_LAYER_CHANGE);
+		out_cur_layer_changed.notify();
 	}
 	if (cur_vtrack() != _prev_track) {
-		notify(MESSAGE_CUR_TRACK_CHANGE);
+		out_cur_track_changed.notify();
 	}
 
 	_prev_selection = cur_selection;
@@ -1516,7 +1517,7 @@ void AudioView::set_playback_range_locked(bool locked) {
 	if (!locked)
 		playback_wish_range = sel.range();
 	force_redraw();
-	//notify();
+	//out_changed.notify();
 }
 
 
@@ -1638,7 +1639,7 @@ HoverData AudioView::hover_time(const vec2 &m) {
 }
 
 void AudioView::cam_changed() {
-	notify(MESSAGE_VIEW_CHANGE);
+	out_view_changed.notify();
 	scroll_bar_time->set_view(cam.range());
 	scroll_bar_time->set_content(song->range());
 	force_redraw();

@@ -559,7 +559,7 @@ class SceneGraph
 
 class AudioView extends Object
 	class ViewPort
-		func extern __init__(view: AudioView*)
+		func extern __init__()
 		func extern range() -> Range
 		func extern mut set_range(r: Range)
 		func extern sample2screen64(s: float64) -> float64

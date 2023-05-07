@@ -6,14 +6,14 @@
  */
 
 #include "ViewPort.h"
-#include "AudioView.h"
+#include "../ColorScheme.h"
+#include "../../data/Range.h"
 #include "../../lib/math/math.h"
 
 const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
-ViewPort::ViewPort(AudioView *v) {
-	view = v;
+ViewPort::ViewPort() {
 	pixels_per_sample = 1.0f;
 	pos = 0;
 	pos_target = 0;
@@ -24,8 +24,8 @@ ViewPort::ViewPort(AudioView *v) {
 	area = rect::ID;
 }
 
-void ViewPort::__init__(AudioView *v) {
-	new(this) ViewPort(v);
+void ViewPort::__init__() {
+	new(this) ViewPort();
 }
 
 
@@ -72,14 +72,10 @@ void ViewPort::zoom(float f, float mx) {
 	pos += (mx - area.x1) * (1.0/pixels_per_sample - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;
 	pixels_per_sample = scale_new;
-	if (view)
-		view->cam_changed();
+	out_changed.notify();
 }
 
 void ViewPort::move(float dpos) {
-	/*pos += dpos;
-	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->forceRedraw();*/
 	set_target(pos_target + dpos, 0.0f);
 }
 
@@ -90,10 +86,7 @@ void ViewPort::set_target(float target, float nonlin) {
 	pos_target = target;
 	animation_time = 0;
 	animation_non_linearity = nonlin;
-	if (view) {
-		view->notify(view->MESSAGE_VIEW_CHANGE);
-		view->force_redraw();
-	}
+	out_changed.notify();
 }
 
 void ViewPort::update(float dt) {
@@ -109,8 +102,7 @@ void ViewPort::update(float dt) {
 		t = s*(-2*t*t*t + 3*t*t) + (1-s) * t;
 		pos = t * pos_target + (1-t) * pos_pre_animation;
 	}
-	if (view)
-		view->cam_changed();
+	out_changed.notify();
 }
 
 bool ViewPort::needs_update() {
@@ -128,9 +120,7 @@ void ViewPort::set_range(const Range &r) {
 
 void ViewPort::make_sample_visible(int sample, int samples_ahead) {
 	double x = sample2screen(sample);
-	float border = 0;
-	if (view->is_playback_active())
-		border = dsample2screen(samples_ahead);
+	float border = dsample2screen(samples_ahead);
 	float dx = area.width() * BORDER_FACTOR;
 	float dxr = min(area.width() * BORDER_FACTOR_RIGHT, dx + border);
 
@@ -167,8 +157,7 @@ void ViewPort::show(const Range &r) {
 	pos = (double)r.start() - (mr.x1 - area.x1) / pixels_per_sample;
 	pos_pre_animation = pos;
 	pos_target = pos;
-	if (view)
-		view->cam_changed();
+	out_changed.notify();
 }
 
 // for scroll bar override

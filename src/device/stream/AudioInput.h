@@ -9,6 +9,7 @@
 #define SRC_DEVICE_STREAM_AUDIOINPUT_H_
 
 #include "../../lib/base/base.h"
+#include "../../lib/base/optional.h"
 #include "../../data/audio/RingBuffer.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
@@ -72,7 +73,7 @@ public:
 
 	int _sample_rate;
 	
-	int64 samples_recorded();
+	base::optional<int64> samples_recorded();
 
 protected:
 

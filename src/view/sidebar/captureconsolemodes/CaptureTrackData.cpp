@@ -71,11 +71,15 @@ void CaptureTrackData::start_sync_before(AudioOutput *out) {
 
 void CaptureTrackData::sync(AudioOutput *out) {
 	if (type() == SignalType::AUDIO) {
-		SyncPoint p;
-		p.pos_play = out->samples_played();
-		p.pos_record = audio_input()->samples_recorded();
-		p.samples_skipped_start = audio_recorder()->samples_skipped;
-		sync_points.add(p);
+		auto sr = out->samples_played();
+		auto sp = audio_input()->samples_recorded();
+		if (sr.has_value() and sp.has_value()) {
+			SyncPoint p;
+			p.pos_play = *sp;
+			p.pos_record = *sr;
+			p.samples_skipped_start = audio_recorder()->samples_skipped;
+			sync_points.add(p);
+		}
 	}
 }
 
@@ -86,9 +90,11 @@ int SyncPoint::delay(int64 samples_played_before_capture) {
 int CaptureTrackData::get_sync_delay() {
 	if (sync_points.num == 0)
 		return 0;
+	if (!samples_played_before_capture.has_value())
+		return 0;
 	int d = 0;
 	for (auto &p: sync_points)
-		d += p.delay(samples_played_before_capture);
+		d += p.delay(*samples_played_before_capture);
 	d /= sync_points.num;
 	/*if (fabs(d) > 50000)
 		return 0;*/

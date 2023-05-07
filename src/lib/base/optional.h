@@ -36,7 +36,7 @@ public:
 		return _is_set;
 	}
 
-	operator bool() const {
+	explicit operator bool() const {
 		return has_value();
 	}
 	T &operator*() const {

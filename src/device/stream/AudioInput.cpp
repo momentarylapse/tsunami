@@ -498,18 +498,19 @@ int AudioInput::command(ModuleCommand cmd, int param) {
 	return COMMAND_NOT_HANDLED;
 }
 
-int64 AudioInput::samples_recorded() {
+base::optional<int64> AudioInput::samples_recorded() {
 	if (state == State::NO_DEVICE)
-		return 0;
+		return base::None;
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		pa_usec_t t;
-		pa_stream_get_time(pulse_stream, &t);
-		double usec2samples = session->sample_rate() / 1000000.0;
-		return (double)t * usec2samples;
+		if (pa_stream_get_time(pulse_stream, &t) == 0) {
+			double usec2samples = session->sample_rate() / 1000000.0;
+			return (double)t * usec2samples;
+		}
 	}
 #endif
-	return 0;
+	return base::None;
 }
 
 ModuleConfiguration *AudioInput::get_config() const {

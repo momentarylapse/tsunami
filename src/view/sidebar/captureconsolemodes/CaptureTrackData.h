@@ -9,6 +9,7 @@
 #define SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURETRACKDATA_H_
 
 #include "../../../lib/base/base.h"
+#include "../../../lib/base/optional.h"
 
 class Device;
 class AudioInput;
@@ -46,7 +47,7 @@ struct CaptureTrackData : public VirtualBase {
 	AudioAccumulator *audio_recorder();
 	MidiAccumulator *midi_recorder();
 
-	int64 samples_played_before_capture = 0;
+	base::optional<int64> samples_played_before_capture;
 	int64 samples_skiped_before_capture = 0;
 	Array<SyncPoint> sync_points;
 

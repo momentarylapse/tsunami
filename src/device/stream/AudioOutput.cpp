@@ -685,9 +685,10 @@ base::optional<int> AudioOutput::get_latency() {
 	//return latency;
 }
 
-int64 AudioOutput::samples_played() {
+//base::optional<int64> AudioOutput::samples_played() {
+base::optional<int64> AudioOutput::samples_played() {
 	if (state == State::NO_DEVICE)
-		return 0;
+		return base::None;
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 		pa_usec_t t;
@@ -696,6 +697,7 @@ int64 AudioOutput::samples_played() {
 			double usec2samples = session->sample_rate() / 1000000.0;
 			return (double)t * usec2samples - fake_samples_played;
 		}
+		return samples_requested;
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -706,7 +708,7 @@ int64 AudioOutput::samples_played() {
 		return samples_requested;
 	}
 #endif
-	return 0;
+	return base::None;
 }
 
 ModuleConfiguration *AudioOutput::get_config() const {

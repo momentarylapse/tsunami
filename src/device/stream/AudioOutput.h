@@ -67,7 +67,7 @@ public:
 
 	void _cdecl set_prebuffer_size(int size);
 
-	int64 samples_played();
+	base::optional<int64> samples_played();
 
 	base::optional<int> get_latency();
 

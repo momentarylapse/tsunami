@@ -203,8 +203,6 @@ DeviceManager::DeviceManager(Session *_session) {
 DeviceManager::~DeviceManager() {
 	hui::cancel_runner(hui_rep_id);
 
-	kill();
-
 	for (Device *d: output_devices)
 		delete d;
 	for (Device *d: input_devices)
@@ -213,6 +211,8 @@ DeviceManager::~DeviceManager() {
 		delete d;
 
 	delete dummy_device;
+
+	kill_library();
 }
 
 void DeviceManager::lock() {
@@ -536,7 +536,7 @@ void DeviceManager::_init_midi_alsa() {
 #endif
 }
 
-void DeviceManager::kill() {
+void DeviceManager::kill_library() {
 	if (!initialized)
 		return;
 

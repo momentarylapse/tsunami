@@ -67,11 +67,14 @@ Tsunami::Tsunami() :
 }
 
 Tsunami::~Tsunami() {
-	//msg_write("~Tsunami");
+	clipboard = nullptr;
+	session_manager = nullptr;
+
+	// keep the DeviceManager until all sessions are destroyed!
+	device_manager = nullptr;
 }
 
 void Tsunami::on_end() {
-	//msg_write("Tsunami on end");
 	session_manager = nullptr;
 }
 

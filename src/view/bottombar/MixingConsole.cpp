@@ -426,7 +426,8 @@ void MixingConsole::load_data() {
 
 	// delete non-matching
 	for (int i=n_ok; i<mixer.num; i++) {
-		remove_control("separator-" + i2s(i));
+		if (!hui::Application::adwaita_started)
+			remove_control("separator-" + i2s(i));
 		unembed(mixer[i].get());
 	}
 	mixer.resize(n_ok);

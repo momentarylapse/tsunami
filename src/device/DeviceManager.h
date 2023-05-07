@@ -52,7 +52,7 @@ public:
 	Session *session;
 
 	void init();
-	void kill();
+	void kill_library();
 
 	void _init_audio_pulse();
 	void _init_audio_portaudio();

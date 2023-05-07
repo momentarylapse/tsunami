@@ -13,7 +13,6 @@
 #include "PluginConsole.h"
 #include "SessionConsole.h"
 #include "../audioview/AudioView.h"
-#include "MiniBar.h"
 #include "../../Session.h"
 
 BottomBar::BottomBar(Session *session, hui::Panel *parent) {

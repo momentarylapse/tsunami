@@ -32,6 +32,7 @@
 #include "../../action/song/ActionSongMoveSelection.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include <math.h>
 
 float marker_alpha_factor(float w, float w_group, bool border);
@@ -270,13 +271,6 @@ void ViewModeDefault::on_mouse_wheel() {
 		cam->move(e->scroll.x * view->mouse_wheel_speed / cam->pixels_per_sample * view->ScrollSpeed);
 }
 
-void playback_seek_relative(AudioView *view, float dt) {
-	int pos = view->playback_pos();
-	pos += dt * view->song->sample_rate;
-	pos = max(pos, view->renderer->range().offset);
-	view->set_playback_pos(pos);
-}
-
 void expand_sel_range(AudioView *view, int pos) {
 	view->sel.range_raw.set_end(pos);
 
@@ -346,9 +340,9 @@ void ViewModeDefault::on_command(const string &id) {
 	// playback
 	if (view->is_playback_active()) {
 		if (id == "cursor-move-right")
-			playback_seek_relative(view, 5);
+			session->playback->seek_relative(5);
 		if (id == "cursor-move-left")
-			playback_seek_relative(view, -5);
+			session->playback->seek_relative(-5);
 	} else {
 		if (id == "cursor-move-right")
 			view->set_cursor_pos(suggest_move_cursor(view->cursor_range(), true));

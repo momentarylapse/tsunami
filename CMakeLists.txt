@@ -413,7 +413,6 @@ set(SOURCE
 	src/view/bottombar/BottomBar.cpp
 	src/view/bottombar/DeviceConsole.cpp
 	src/view/bottombar/LogConsole.cpp
-	src/view/bottombar/MiniBar.cpp
 	src/view/bottombar/MixingConsole.cpp
 	src/view/bottombar/PluginConsole.cpp
 	src/view/bottombar/SessionConsole.cpp
@@ -496,6 +495,7 @@ set(SOURCE
 	src/view/HoverData.cpp
 	src/view/MouseDelayPlanner.cpp
 	src/view/TsunamiWindow.cpp
+	src/Playback.cpp
 	src/Session.cpp
 	src/Tsunami.cpp
 )

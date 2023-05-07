@@ -230,24 +230,20 @@ public:
 
 	Song *song;
 
-	shared<SignalChain> signal_chain;
-	shared<SongRenderer> renderer;
-	shared<PeakMeter> peak_meter;
-	shared<AudioOutput> output_stream;
 	void set_playback_loop(bool loop);
 	void play();
 	void stop();
 	void pause(bool pause);
 	void prepare_playback(const Range &range, bool allow_loop);
-	bool is_playback_active();
+	bool is_playback_active() const;
 	void playback_click();
-	bool is_paused();
-	int playback_pos();
-	bool looping();
-	void _sync_playback_pos();
-	int _playback_sync_counter = 0;
-	int64 _playback_stream_offset = 0;
+	bool is_paused() const;
+	int playback_pos() const;
+	bool looping() const;
 	void set_playback_pos(int pos);
+	void update_playback_layers();
+	Range playback_range() const;
+
 	base::set<const Track*> get_playable_tracks();
 	bool has_any_solo_track();
 	base::set<const TrackLayer*> get_playable_layers();

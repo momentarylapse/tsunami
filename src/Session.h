@@ -24,6 +24,7 @@ class SessionManager;
 class PerformanceMonitor;
 class SignalChain;
 class Path;
+class Playback;
 namespace hui {
 	class Window;
 }
@@ -51,6 +52,7 @@ public:
 	owned<TsunamiWindow> win;
 	hui::Window *_kaba_win;
 	shared<Song> song;
+	owned<Playback> playback;
 	AudioView *view;
 	owned<Storage> storage;
 	bool auto_delete;

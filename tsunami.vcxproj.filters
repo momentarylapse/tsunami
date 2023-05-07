@@ -1222,9 +1222,6 @@
     <ClCompile Include="src\view\bottombar\LogConsole.cpp">
       <Filter>src\view\bottombar</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\bottombar\MiniBar.cpp">
-      <Filter>src\view\bottombar</Filter>
-    </ClCompile>
     <ClCompile Include="src\view\bottombar\MixingConsole.cpp">
       <Filter>src\view\bottombar</Filter>
     </ClCompile>
@@ -1470,6 +1467,9 @@
     </ClCompile>
     <ClCompile Include="src\view\TsunamiWindow.cpp">
       <Filter>src\view</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Playback.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Session.cpp">
       <Filter>src</Filter>
@@ -2625,9 +2625,6 @@
     <ClInclude Include="src\view\bottombar\LogConsole.h">
       <Filter>src\view\bottombar</Filter>
     </ClInclude>
-    <ClInclude Include="src\view\bottombar\MiniBar.h">
-      <Filter>src\view\bottombar</Filter>
-    </ClInclude>
     <ClInclude Include="src\view\bottombar\MixingConsole.h">
       <Filter>src\view\bottombar</Filter>
     </ClInclude>
@@ -2875,6 +2872,9 @@
       <Filter>src\view</Filter>
     </ClInclude>
     <ClInclude Include="src\EditModes.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Playback.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Session.h">

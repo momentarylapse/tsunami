@@ -15,9 +15,10 @@
 #include "../../../module/audio/AudioChannelSelector.h"
 #include "../../../data/base.h"
 #include "../../../data/Track.h"
-#include "../../../Session.h"
 #include "../../../device/DeviceManager.h"
 #include "../../../device/Device.h"
+#include "../../../Session.h"
+#include "../../../Playback.h"
 
 
 CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_cc) {
@@ -30,12 +31,12 @@ CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_cc) {
 
 void CaptureConsoleMode::start_sync_before() {
 	for (auto &d: view->mode_capture->data)
-		d.start_sync_before(view->output_stream.get());
+		d.start_sync_before(session->playback->output_stream.get());
 }
 
 void CaptureConsoleMode::sync() {
 	for (auto &d: view->mode_capture->data)
-		d.sync(view->output_stream.get());
+		d.sync(session->playback->output_stream.get());
 }
 
 

@@ -19,6 +19,7 @@
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include "../../EditModes.h"
 
 
@@ -83,8 +84,12 @@ void CaptureConsole::on_enter() {
 	chain = mode->chain.get();
 	view->mode_capture->chain = chain.get();
 
-	view->signal_chain->subscribe(this, [this] { on_putput_tick(); }, Module::MESSAGE_TICK);
-	view->signal_chain->subscribe(this, [this] { on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	session->playback->signal_chain->subscribe(this, [this] {
+		on_putput_tick();
+	}, Module::MESSAGE_TICK);
+	session->playback->signal_chain->subscribe(this, [this] {
+		on_output_end_of_stream();
+	}, Module::MESSAGE_PLAY_END_OF_STREAM);
 
 	// automatically start
 	if (num_audio + num_midi == 1 and !_capture_console_force_complex_)
@@ -95,7 +100,7 @@ void CaptureConsole::on_leave() {
 	//view->mode_capture->data.clear();
 	chain = nullptr;
 	view->mode_capture->chain = nullptr;
-	view->signal_chain->unsubscribe(this);
+	session->playback->signal_chain->unsubscribe(this);
 
 	view->stop();
 
@@ -126,7 +131,7 @@ void CaptureConsole::on_start() {
 	
 	mode->start_sync_before();
 	
-	view->signal_chain->start();
+	session->playback->signal_chain->start();
 	mode->accumulation_start();
 	mode->allow_change_device(false);
 	enable("start", false);
@@ -150,7 +155,7 @@ void CaptureConsole::on_dump() {
 
 void CaptureConsole::on_pause() {
 	// TODO...
-	view->signal_chain->stop();
+	session->playback->signal_chain->stop();
 
 	mode->accumulation_stop();
 	mode->allow_change_device(true);

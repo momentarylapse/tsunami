@@ -6,7 +6,11 @@
  */
 
 #include "AudioViewTrack.h"
+#include "AudioViewLayer.h"
+#include "TrackHeader.h"
 #include "../AudioView.h"
+#include "../../helper/SymbolRenderer.h"
+#include "../../painter/BufferPainter.h"
 #include "../../mode/ViewMode.h"
 #include "../../../Session.h"
 #include "../../../EditModes.h"
@@ -18,10 +22,6 @@
 #include "../../../data/midi/MidiData.h"
 #include "../../../data/CrossFade.h"
 #include "../../../module/audio/SongRenderer.h"
-#include "AudioViewLayer.h"
-#include "TrackHeader.h"
-#include "../../helper/SymbolRenderer.h"
-#include "../../painter/BufferPainter.h"
 
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
@@ -60,7 +60,7 @@ AudioViewTrack::~AudioViewTrack() {
 }
 
 void AudioViewTrack::on_track_change() {
-	view->renderer->allow_layers(view->get_playable_layers());
+	view->update_playback_layers(); // TODO let AudioView observe
 	notify(MESSAGE_CHANGE);
 }
 
@@ -90,8 +90,7 @@ void AudioViewTrack::set_muted(bool muted) {
 
 void AudioViewTrack::set_solo(bool _solo) {
 	solo = _solo;
-	view->renderer->allow_layers(view->get_playable_layers());
-	view->force_redraw();
+	view->update_playback_layers();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }

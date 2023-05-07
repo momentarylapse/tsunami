@@ -115,8 +115,7 @@ AudioViewLayer::~AudioViewLayer() {
 }
 
 void AudioViewLayer::on_layer_change() {
-	view->renderer->allow_layers(view->get_playable_layers());
-	notify();
+	view->update_playback_layers();
 }
 
 void AudioViewLayer::on_track_change() {
@@ -461,8 +460,7 @@ bool AudioView::editing_layer(AudioViewLayer *l) {
 
 void AudioViewLayer::set_solo(bool _solo) {
 	solo = _solo;
-	view->renderer->allow_layers(view->get_playable_layers());
-	view->force_redraw();
+	view->update_playback_layers();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }

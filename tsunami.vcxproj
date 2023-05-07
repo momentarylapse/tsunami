@@ -523,7 +523,6 @@
     <ClCompile Include="src\view\bottombar\BottomBar.cpp" />
     <ClCompile Include="src\view\bottombar\DeviceConsole.cpp" />
     <ClCompile Include="src\view\bottombar\LogConsole.cpp" />
-    <ClCompile Include="src\view\bottombar\MiniBar.cpp" />
     <ClCompile Include="src\view\bottombar\MixingConsole.cpp" />
     <ClCompile Include="src\view\bottombar\PluginConsole.cpp" />
     <ClCompile Include="src\view\bottombar\SessionConsole.cpp" />
@@ -606,6 +605,7 @@
     <ClCompile Include="src\view\HoverData.cpp" />
     <ClCompile Include="src\view\MouseDelayPlanner.cpp" />
     <ClCompile Include="src\view\TsunamiWindow.cpp" />
+    <ClCompile Include="src\Playback.cpp" />
     <ClCompile Include="src\Session.cpp" />
     <ClCompile Include="src\Tsunami.cpp" />
   </ItemGroup>
@@ -992,7 +992,6 @@
     <ClInclude Include="src\view\bottombar\BottomBar.h" />
     <ClInclude Include="src\view\bottombar\DeviceConsole.h" />
     <ClInclude Include="src\view\bottombar\LogConsole.h" />
-    <ClInclude Include="src\view\bottombar\MiniBar.h" />
     <ClInclude Include="src\view\bottombar\MixingConsole.h" />
     <ClInclude Include="src\view\bottombar\PluginConsole.h" />
     <ClInclude Include="src\view\bottombar\SessionConsole.h" />
@@ -1076,6 +1075,7 @@
     <ClInclude Include="src\view\MouseDelayPlanner.h" />
     <ClInclude Include="src\view\TsunamiWindow.h" />
     <ClInclude Include="src\EditModes.h" />
+    <ClInclude Include="src\Playback.h" />
     <ClInclude Include="src\Session.h" />
     <ClInclude Include="src\Tsunami.h" />
   </ItemGroup>

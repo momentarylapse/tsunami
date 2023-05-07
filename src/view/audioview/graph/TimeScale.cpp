@@ -28,7 +28,7 @@ public:
 		area = target_area;
 		Range r = view->playback_wish_range;
 		if (view->is_playback_active())
-			r = view->renderer->range();
+			r = view->playback_range();
 		view->cam.range2screen_clip(r, parent->area, area.x1, area.x2);
 		hidden = (view->playback_wish_range.length == 0) and !view->is_playback_active();
 	}

@@ -6,31 +6,6 @@
  */
 
 #include "TsunamiWindow.h"
-#include "../Session.h"
-#include "../EditModes.h"
-#include "../Tsunami.h"
-#include "../data/base.h"
-#include "../data/Track.h"
-#include "../data/TrackLayer.h"
-#include "../data/Song.h"
-#include "../data/SongSelection.h"
-#include "../data/audio/AudioBuffer.h"
-#include "../data/rhythm/Bar.h"
-#include "../action/ActionManager.h"
-#include "../command/song/Export.h"
-#include "../command/Unsorted.h"
-#include "../module/audio/AudioEffect.h"
-#include "../module/audio/AudioSource.h"
-#include "../module/midi/MidiEffect.h"
-#include "../module/midi/MidiSource.h"
-#include "../module/SignalChain.h"
-#include "../plugins/PluginManager.h"
-#include "../plugins/TsunamiPlugin.h"
-#include "../storage/Storage.h"
-#include "../stuff/Log.h"
-#include "../stuff/Clipboard.h"
-#include "../stuff/BackupManager.h"
-#include "../stuff/SessionManager.h"
 #include "audioview/AudioView.h"
 #include "audioview/graph/AudioViewTrack.h"
 #include "dialog/NewDialog.h"
@@ -59,6 +34,32 @@
 #include "module/ModulePanel.h"
 #include "module/ConfigPanel.h"
 #include "module/ConfigurationDialog.h"
+#include "../Session.h"
+#include "../Playback.h"
+#include "../EditModes.h"
+#include "../Tsunami.h"
+#include "../data/base.h"
+#include "../data/Track.h"
+#include "../data/TrackLayer.h"
+#include "../data/Song.h"
+#include "../data/SongSelection.h"
+#include "../data/audio/AudioBuffer.h"
+#include "../data/rhythm/Bar.h"
+#include "../action/ActionManager.h"
+#include "../command/song/Export.h"
+#include "../command/Unsorted.h"
+#include "../module/audio/AudioEffect.h"
+#include "../module/audio/AudioSource.h"
+#include "../module/midi/MidiEffect.h"
+#include "../module/midi/MidiSource.h"
+#include "../module/SignalChain.h"
+#include "../plugins/PluginManager.h"
+#include "../plugins/TsunamiPlugin.h"
+#include "../storage/Storage.h"
+#include "../stuff/Log.h"
+#include "../stuff/Clipboard.h"
+#include "../stuff/BackupManager.h"
+#include "../stuff/SessionManager.h"
 #include "../lib/hui/hui.h"
 #include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
@@ -378,30 +379,30 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_SELECTION_CHANGE);
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, [this] { on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
-	view->signal_chain->subscribe(this, [this] {
+	session->playback->signal_chain->subscribe(this, [this] {
 		on_update();
-	}, view->signal_chain->MESSAGE_ANY);
+	}, SignalChain::MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this] {
 		on_update();
-	}, song->action_manager->MESSAGE_ANY);
+	}, ActionManager::MESSAGE_ANY);
 	song->action_manager->subscribe(this, [this] {
 		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
-	}, song->action_manager->MESSAGE_UNDO_ACTION);
+	}, ActionManager::MESSAGE_UNDO_ACTION);
 	song->action_manager->subscribe(this, [this] {
 		session->status(_("redo: ") + hui::get_language_s(song->action_manager->get_current_action()));
-	}, song->action_manager->MESSAGE_REDO_ACTION);
+	}, ActionManager::MESSAGE_REDO_ACTION);
 	song->subscribe(this, [this] {
 		on_update();
-	}, song->MESSAGE_AFTER_CHANGE);
+	}, Song::MESSAGE_AFTER_CHANGE);
 	app->clipboard->subscribe(this, [this] {
 		on_update();
-	}, app->clipboard->MESSAGE_ANY);
+	}, Clipboard::MESSAGE_ANY);
 	bottom_bar->subscribe(this, [this] {
 		on_bottom_bar_update();
-	}, bottom_bar->MESSAGE_ANY);
+	}, BottomBar::MESSAGE_ANY);
 	side_bar->subscribe(this, [this] {
 		on_side_bar_update();
-	}, side_bar->MESSAGE_ANY);
+	}, SideBar::MESSAGE_ANY);
 	
 	event("*", [this] { view->on_command(hui::get_event()->id); });
 
@@ -425,10 +426,10 @@ TsunamiWindow::~TsunamiWindow() {
 	hui::config.set_int("Window.Height", h);
 	hui::config.set_bool("Window.Maximized", is_maximized());
 
-	view->signal_chain->stop_hard();
+	session->playback->signal_chain->stop_hard();
 	view->unsubscribe(side_bar.get());
 	view->unsubscribe(this);
-	view->signal_chain->unsubscribe(this);
+	session->playback->signal_chain->unsubscribe(this);
 	song->action_manager->unsubscribe(this);
 	app->clipboard->unsubscribe(this);
 	bottom_bar->unsubscribe(this);

@@ -12,6 +12,7 @@
 #include "TsunamiPlugin.h"
 #include "../Tsunami.h"
 #include "../Session.h"
+#include "../Playback.h"
 #include "../view/helper/Slider.h"
 #include "../view/helper/Drawing.h"
 #include "../data/base.h"
@@ -222,6 +223,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Session.win", &Session::_kaba_win);
 	ext->declare_class_element("Session.view", &Session::view);
 	ext->declare_class_element("Session.song", &Session::song);
+	ext->declare_class_element("Session.playback", &Session::playback);
 	ext->declare_class_element("Session." + kaba::Identifier::SHARED_COUNT, &Session::_pointer_ref_counter);
 	ext->link_class_func("Session.sample_rate", &Session::sample_rate);
 	ext->link_class_func("Session.i", &Session::i);
@@ -723,22 +725,27 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("AudioView.cam", &AudioView::cam);
 	ext->declare_class_element("AudioView.sel", &AudioView::sel);
 	ext->declare_class_element("AudioView.mouse_wheel_speed", &AudioView::mouse_wheel_speed);
-	ext->declare_class_element("AudioView.renderer", &AudioView::renderer);
-	ext->declare_class_element("AudioView.signal_chain", &AudioView::signal_chain);
-	ext->declare_class_element("AudioView.output_stream", &AudioView::output_stream);
 	ext->link_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	ext->link_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
-	ext->link_class_func("AudioView.play", &AudioView::play);
-	ext->link_class_func("AudioView.is_playback_active", &AudioView::is_playback_active);
-	ext->link_class_func("AudioView.is_paused", &AudioView::is_paused);
-	ext->link_class_func("AudioView.playback_pos", &AudioView::playback_pos);
-	ext->link_class_func("AudioView.set_playback_pos", &AudioView::set_playback_pos);
-	ext->link_class_func("AudioView.prepare_playback", &AudioView::prepare_playback);
-	ext->link_class_func("AudioView.set_playback_loop", &AudioView::set_playback_loop);
 	ext->link_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);
 	ext->link_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
 	ext->link_class_func("AudioView.cur_vtrack", &AudioView::cur_vtrack);
 	ext->link_class_func("AudioView.update_selection", &AudioView::update_selection);
+
+
+	ext->declare_class_size("Playback", sizeof(Playback));
+	ext->declare_class_element("Playback.renderer", &Playback::renderer);
+	ext->declare_class_element("Playback.signal_chain", &Playback::signal_chain);
+	ext->declare_class_element("Playback.output_stream", &Playback::output_stream);
+	ext->link_class_func("Playback.subscribe", &ObservableKabaWrapper<Playback>::subscribe_kaba);
+	ext->link_class_func("Playback.unsubscribe", &Playback::unsubscribe);
+	ext->link_class_func("Playback.play", &Playback::play);
+	ext->link_class_func("Playback.is_active", &Playback::is_active);
+	ext->link_class_func("Playback.is_paused", &Playback::is_paused);
+	ext->link_class_func("Playback.get_pos", &Playback::get_pos);
+	ext->link_class_func("Playback.set_pos", &Playback::set_pos);
+	ext->link_class_func("Playback.prepare", &Playback::prepare);
+	ext->link_class_func("Playback.set_loop", &Playback::set_loop);
 
 	ext->declare_class_size("SceneGraph.Node", sizeof(scenegraph::Node));
 	ext->declare_class_element("SceneGraph.Node.area", &scenegraph::Node::area);

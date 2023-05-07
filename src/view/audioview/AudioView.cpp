@@ -58,6 +58,7 @@
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../stuff/BackupManager.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include "../../EditModes.h"
 #include "../../Tsunami.h"
 
@@ -202,24 +203,16 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	draw_runner_id = -1;
 
 
-	signal_chain = session->create_signal_chain_system("playback");
-	renderer = signal_chain->addx<SongRenderer>(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
-	peak_meter = signal_chain->addx<PeakMeter>(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	output_stream = signal_chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput");
-	output_stream->set_volume(hui::config.get_float("Output.Volume", 1.0f));
-	signal_chain->connect(renderer.get(), 0, peak_meter.get(), 0);
-	signal_chain->connect(peak_meter.get(), 0, output_stream.get(), 0);
-	signal_chain->mark_all_modules_as_system();
-
-	signal_chain->subscribe(this, [this] {
+	session->playback->subscribe(this, [this] {
 		on_stream_tick();
-	}, Module::MESSAGE_TICK);
-	signal_chain->subscribe(this, [this] {
+	}, Playback::MESSAGE_TICK);
+	session->playback->subscribe(this, [this] {
 		on_stream_state_change();
-	}, Module::MESSAGE_STATE_CHANGE);
+	}, Playback::MESSAGE_STATE_CHANGE);
 
 
-	peak_meter_display = new PeakMeterDisplay(peak_meter.get(), PeakMeterDisplay::Mode::BOTH);
+	// TODO move "OnScreenDisplay"?
+	peak_meter_display = new PeakMeterDisplay(session->playback->peak_meter.get(), PeakMeterDisplay::Mode::BOTH);
 	peak_meter_display->align.dx = 90;
 	peak_meter_display->align.dy = -20;
 	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
@@ -236,13 +229,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	output_volume_dial->align.dz = 100;
 	//output_volume_dial->reference_value = 50;
 	output_volume_dial->unit = "%";
-	output_volume_dial->set_value(output_stream->get_volume() * 100);
+	output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
 	output_volume_dial->set_callback([this] (float v) {
-		output_stream->set_volume(v / 100.0f);
+		session->playback->output_stream->set_volume(v / 100.0f);
 	});
-	output_stream->subscribe(this, [this] {
-		output_volume_dial->set_value(output_stream->get_volume() * 100);
-	}, output_stream->MESSAGE_CHANGE);
+	session->playback->output_stream->subscribe(this, [this] {
+		output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
+	}, AudioOutput::MESSAGE_CHANGE);
 	output_volume_dial->hidden = true;
 	scene_graph->add_child(output_volume_dial);
 
@@ -345,10 +338,8 @@ AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
 		hui::cancel_runner(draw_runner_id);
 
-	hui::config.set_float("Output.Volume", output_stream->get_volume());
 	peak_thread->messanger.unsubscribe(this);
-	output_stream->unsubscribe(this);
-	signal_chain->unsubscribe(this);
+	session->playback->unsubscribe(this);
 	song->unsubscribe(this);
 
 	peak_thread->hard_stop();
@@ -428,17 +419,7 @@ void AudioView::update_selection() {
 		playback_wish_range = sel.range();
 	}
 
-
-	renderer->change_range(get_playback_selection(false));
-
-	// TODO ...check....
-	if (is_playback_active()) {
-		if (renderer->range().is_inside(playback_pos())) {
-			renderer->change_range(get_playback_selection(false));
-		} else {
-			stop();
-		}
-	}
+	session->playback->update_range(get_playback_selection(false));
 	force_redraw();
 
 	notify(MESSAGE_SELECTION_CHANGE);
@@ -907,7 +888,7 @@ void AudioView::on_song_change() {
 }
 
 void AudioView::on_stream_tick() {
-	cam.make_sample_visible(playback_pos(), session->sample_rate() * 2);
+	cam.make_sample_visible(session->playback->get_pos(), session->sample_rate() * 2);
 	force_redraw();
 }
 
@@ -919,8 +900,8 @@ void AudioView::update_onscreen_displays() {
 
 	if (session->win->bottom_bar)
 		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
-			peak_meter_display->hidden = !is_playback_active();
-			output_volume_dial->hidden = !is_playback_active();
+			peak_meter_display->hidden = !session->playback->is_active();
+			output_volume_dial->hidden = !session->playback->is_active();
 		}
 	force_redraw();
 }
@@ -1161,8 +1142,8 @@ void AudioView::draw_song(Painter *c) {
 
 
 	// playing/capturing position
-	if (is_playback_active())
-		draw_time_line(c, playback_pos(), theme.preview_marker, false, true);
+	if (session->playback->is_active())
+		draw_time_line(c, session->playback->get_pos(), theme.preview_marker, false, true);
 
 	mode->draw_post(c);
 	for (auto *plugin: weak(session->plugins))
@@ -1422,91 +1403,40 @@ void AudioView::enable(bool _enabled) {
 	force_redraw();
 }
 
-
-void AudioView::play() {
-	if (signal_chain->is_prepared() and !signal_chain->is_active()) {
-		signal_chain->start();
-		return;
-	}
-
-	prepare_playback(get_playback_selection(false), true);
-	signal_chain->start();
-}
-
-void AudioView::prepare_playback(const Range &range, bool allow_loop) {
-	if (signal_chain->is_active() or signal_chain->is_prepared())
-		stop();
-
-	renderer->allow_loop = allow_loop;
-	renderer->set_range(range);
-	renderer->allow_layers(get_playable_layers());
-	_playback_stream_offset = range.offset - output_stream->samples_played();
-
-	signal_chain->command(ModuleCommand::PREPARE_START, 0);
-}
-
 void AudioView::set_playback_loop(bool loop) {
-	renderer->set_loop(loop);
-	force_redraw();
-	notify(MESSAGE_SELECTION_CHANGE);
+	session->playback->set_loop(loop);
 }
-
+void AudioView::play() {
+	session->playback->play();
+}
 void AudioView::stop() {
-	signal_chain->stop_hard();
+	session->playback->stop();
 }
-
-void AudioView::pause(bool _pause) {
-	if (_pause)
-		signal_chain->stop();
-	else
-		signal_chain->start();
+void AudioView::pause(bool pause) {
+	session->playback->pause(pause);
 }
-
-// playing or paused?
-bool AudioView::is_playback_active() {
-	return signal_chain->is_active() or signal_chain->is_prepared();
+void AudioView::prepare_playback(const Range &range, bool allow_loop) {
+	session->playback->prepare(range, allow_loop);
 }
-
-bool AudioView::is_paused() {
-	return signal_chain->is_prepared() and !signal_chain->is_active();
+bool AudioView::is_playback_active() const {
+	return session->playback->is_active();
 }
-
-int loop_in_range(int pos, const Range &r) {
-	return loop(pos, r.start(), r.end());
+bool AudioView::is_paused() const {
+	return session->playback->is_paused();
 }
-
-bool AudioView::looping() {
-	return renderer->loop;
+int AudioView::playback_pos() const {
+	return session->playback->get_pos();
 }
-
-int AudioView::playback_pos() {
-	// crappy syncing....
-	_playback_sync_counter ++;
-	if (_playback_sync_counter > 100)
-		_sync_playback_pos();
-	
-	int pos = output_stream->samples_played() + _playback_stream_offset;
-	if (looping() and renderer->allow_loop)
-		return loop_in_range(pos, renderer->range());
-	return pos;
+bool AudioView::looping() const {
+	return session->playback->looping();
 }
-
-// crappy syncing....
-void AudioView::_sync_playback_pos() {
-	int spos = output_stream->samples_played();
-    auto lat = output_stream->get_latency();
-    if (lat.has_value()) {
-        int xpos = renderer->get_pos(-output_stream->get_available() - lat.value());
-        _playback_stream_offset = xpos - spos;
-    }
-	_playback_sync_counter = 0;
-}
-
 void AudioView::set_playback_pos(int pos) {
 	if (mode == mode_capture)
 		return;
-	renderer->set_pos(pos);
-	_playback_stream_offset = pos - output_stream->samples_played();
+	session->playback->set_pos(pos);
+}
+Range AudioView::playback_range() const {
+	return session->playback->renderer->range();
 }
 
 void AudioView::playback_click() {
@@ -1514,7 +1444,7 @@ void AudioView::playback_click() {
 		return;
 
 	if (is_playback_active()) {
-		if (renderer->range().is_inside(hover().pos)) {
+		if (playback_range().is_inside(hover().pos)) {
 			set_playback_pos(hover().pos);
 			hover().type = HoverData::Type::PLAYBACK_CURSOR;
 			force_redraw();
@@ -1522,6 +1452,10 @@ void AudioView::playback_click() {
 			stop();
 		}
 	}
+}
+void AudioView::update_playback_layers() {
+	session->playback->renderer->allow_layers(get_playable_layers());
+	force_redraw();
 }
 
 bool AudioView::has_any_solo_track() {

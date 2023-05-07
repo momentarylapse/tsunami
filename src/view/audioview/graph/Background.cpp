@@ -6,13 +6,13 @@
  */
 
 #include "Background.h"
+#include "AudioViewLayer.h"
 #include "../AudioView.h"
 #include "../../mode/ViewMode.h"
 #include "../../painter/GridPainter.h"
 #include "../../../data/Song.h"
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
-#include "AudioViewLayer.h"
 
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);

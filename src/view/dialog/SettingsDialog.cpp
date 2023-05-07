@@ -15,6 +15,7 @@
 #include "../../module/SignalChain.h"
 #include "../../stuff/Log.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include "../../Tsunami.h"
 
 struct ApiDescription {
@@ -182,13 +183,13 @@ void SettingsDialog::on_midi_api() {
 void SettingsDialog::on_prebuffer() {
 	int n = get_int("");
 	hui::config.set_int("Output.BufferSize", n);
-	view->output_stream->set_prebuffer_size(n);
+	view->session->playback->output_stream->set_prebuffer_size(n);
 }
 
 void SettingsDialog::on_suck_buffer() {
 	int n = get_int("");
 	hui::config.set_int("SignalChain.BufferSize", n);
-	view->signal_chain->set_buffer_size(n);
+	view->session->playback->signal_chain->set_buffer_size(n);
 }
 
 void SettingsDialog::on_cpu_meter() {

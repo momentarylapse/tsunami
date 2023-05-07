@@ -21,6 +21,7 @@
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/SignalChain.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include "../../EditModes.h"
 #include "../../plugins/PluginManager.h"
 #include "../../device/DeviceManager.h"
@@ -270,7 +271,7 @@ public:
 		p->draw_rect(rect(0, w, 0, h));
 		p->set_color(theme.text);
 		float peak[2];
-		console->view->renderer->get_peak(track(), peak);
+		console->session->playback->renderer->get_peak(track(), peak);
 		peak[0] = sqrt(peak[0]);
 		peak[1] = sqrt(peak[1]);
 		p->draw_rect(rect(0, w/2,  h * (1 - peak[0]), h));
@@ -329,8 +330,8 @@ public:
 
 
 
-MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
-	BottomBar::Console(_("Mixer"), "mixing-console", session, bar)
+MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
+	BottomBar::Console(_("Mixer"), "mixing-console", _session, bar)
 {
 	device_manager = session->device_manager;
 	id_inner = "inner-grid";
@@ -338,10 +339,10 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 	set_spacing(2);
 	from_resource("mixing-console");
 
-	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter.get(), PeakMeterDisplay::Mode::PEAKS);
-	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter.get(), PeakMeterDisplay::Mode::SPECTRUM);
+	peak_meter = new PeakMeterDisplay(this, "output-peaks", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::PEAKS);
+	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::SPECTRUM);
 	//set_float("output-volume", device_manager->get_output_volume());
-	set_float("output-volume", view->output_stream->get_volume());
+	set_float("output-volume", session->playback->output_stream->get_volume());
 	
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
@@ -356,31 +357,31 @@ MixingConsole::MixingConsole(Session *session, BottomBar *bar) :
 			p->draw_line({-10, y}, {(float)p->width + 10 , y - p->width - 20});*/
 	});
 
-	view->subscribe(this, [this] { on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, [this] { update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
-	song->subscribe(this, [this] { update_all(); }, song->MESSAGE_FINISHED_LOADING);
+	view->subscribe(this, [this] { on_tracks_change(); }, AudioView::MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, [this] { update_all(); }, AudioView::MESSAGE_SOLO_CHANGE);
+	song->subscribe(this, [this] { update_all(); }, Song::MESSAGE_FINISHED_LOADING);
 
 	//device_manager->subscribe(this, [this]{ on_update_device_manager(); });
-	view->output_stream->subscribe(this, [this] {
-		set_float("output-volume", view->output_stream->get_volume());
+	session->playback->output_stream->subscribe(this, [this] {
+		set_float("output-volume", session->playback->output_stream->get_volume());
 
-	}, view->output_stream->MESSAGE_ANY);
+	}, AudioOutput::MESSAGE_ANY);
 	load_data();
 
 
 	peak_runner_id = -1;
-	view->signal_chain->subscribe(this, [this] {
+	session->playback->signal_chain->subscribe(this, [this] {
 		on_chain_state_change();
 	}, SignalChain::MESSAGE_STATE_CHANGE);
 }
 
 MixingConsole::~MixingConsole() {
-	view->signal_chain->unsubscribe(this);
+	session->playback->signal_chain->unsubscribe(this);
 	if (peak_runner_id >= 0)
 		hui::cancel_runner(peak_runner_id);
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
-	view->output_stream->unsubscribe(this);
+	session->playback->output_stream->unsubscribe(this);
 	//device_manager->unsubscribe(this);
 }
 
@@ -389,7 +390,7 @@ void MixingConsole::on_chain_state_change() {
 		hui::cancel_runner(peak_runner_id);
 		peak_runner_id = -1;
 		// clear
-		view->renderer->clear_peaks();
+		session->playback->renderer->clear_peaks();
 		for (auto m: weak(mixer))
 			m->redraw("peaks");
 	} else if (peak_runner_id == -1 and view->is_playback_active()) {
@@ -401,7 +402,7 @@ void MixingConsole::on_chain_state_change() {
 }
 
 void MixingConsole::on_output_volume() {
-	view->output_stream->set_volume(get_float(""));
+	session->playback->output_stream->set_volume(get_float(""));
 	//device_manager->set_output_volume(get_float(""));
 }
 

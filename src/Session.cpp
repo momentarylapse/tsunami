@@ -7,6 +7,7 @@
 
 #include "Session.h"
 #include "EditModes.h"
+#include "Playback.h"
 #include "stuff/Log.h"
 #include "stuff/SessionManager.h"
 #include "storage/Storage.h"

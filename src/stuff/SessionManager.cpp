@@ -19,6 +19,7 @@
 #include "../view/TsunamiWindow.h"
 #include "../Tsunami.h"
 #include "../Session.h"
+#include "../Playback.h"
 
 string title_filename(const Path &filename);
 
@@ -82,6 +83,7 @@ Session *SessionManager::spawn_new_session() {
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
+	session->playback = new Playback(session);
 	session->set_win(new TsunamiWindow(session));
 	session->win->show();
 

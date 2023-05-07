@@ -99,8 +99,8 @@ class Looper extends TsunamiPlugin
 		mode = 2
 		
 		session.view.sel.range_raw = Range(0, length)
-		session.view.set_playback_loop(true)
-		session.view.play()
+		session.playback.set_loop(true)
+		session.playback.play()
 		session.view.optimize_view()
 
 	func override create_panel() -> xfer[ConfigPanel]

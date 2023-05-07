@@ -45,14 +45,14 @@ class Looper extends TsunamiPlugin
 	func override on_start()
 		cur_part = nil
 		song = session.song
-		chain = session.view.signal_chain
-		renderer = session.view.renderer
+		chain = session.playback.signal_chain
+		renderer = session.playback.renderer
 		runner = hui.run_repeated(0.05, on_update)
 		mode = Mode.FORWARD
 		
 		shader_vis = chain.add[ShaderVis]()
 		chain.connect(renderer, 0, shader_vis, 0)
-		chain.connect(shader_vis, 0, session.view.output_stream, 0) # almost ...
+		chain.connect(shader_vis, 0, session.playback.output_stream, 0) # almost ...
 		
 		shader_win = new Dialog("Shader", 800, 800, session.win, true)
 		shader_panel = shader_vis.create_panel() as xfer[ShaderPanel]

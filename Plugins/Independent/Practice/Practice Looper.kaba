@@ -64,8 +64,8 @@ class PracticeLooper extends TsunamiPlugin
 	
 	func override on_start()
 		song = session.song
-		chain = session.view.signal_chain
-		renderer = session.view.renderer
+		chain = session.playback.signal_chain
+		renderer = session.playback.renderer
 #		runner = hui.run_repeated(0.05, self, on_update)
 		
 	func override on_stop()
@@ -76,10 +76,10 @@ class PracticeLooper extends TsunamiPlugin
 		return new PLPanel(self)
 	
 	func mut play()
-		session.view.play()
+		session.playback.play()
 		return
 		print(session.view.sel.range())
-		session.view.prepare_playback(session.view.sel.range(), true)
+		session.playback.prepare(session.view.sel.range(), true)
 		#renderer.set_range(session.view.sel.range())
 		renderer.set_loop(true)
 		#chain.command(Module.Command.PREPARE_START, 0)

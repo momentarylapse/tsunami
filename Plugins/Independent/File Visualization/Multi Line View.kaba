@@ -74,20 +74,20 @@ class MLVDialog extends hui.Dialog
 		event_x("area", "hui:key-down", on_key)
 		event("hui:close", on_close)
 		
-		#session.view.signal_chain.subscribe(self, on_preview_change, "Change")
-		session.view.signal_chain.subscribe(self, on_preview_tick, "Tick")
+		#session.playback.signal_chain.subscribe(self, on_preview_change, "Change")
+		session.playback.signal_chain.subscribe(self, on_preview_tick, "Tick")
 		
 		mlp = new MultiLinePainter(session.song, colors)
 		
 		on_config_changed()
 	
 	func override __delete__()
-		session.view.signal_chain.unsubscribe(self)
+		session.playback.signal_chain.unsubscribe(self)
 	
 	func mut on_preview_change()
 	func mut on_preview_tick()
-		if session.view.is_playback_active()
-			make_sure_sample_on_screen(session.view.playback_pos())
+		if session.playback.is_active()
+			make_sure_sample_on_screen(session.playback.get_pos())
 			force_redraw()
 	
 	func mut make_sure_sample_on_screen(s: int)
@@ -113,13 +113,13 @@ class MLVDialog extends hui.Dialog
 		mlv.changed()
 	
 	func mut on_play()
-		if session.view.is_playback_active()
-			if session.view.is_paused()
-				session.view.signal_chain.start()
+		if session.playback.is_active()
+			if session.playback.is_paused()
+				session.playback.signal_chain.start()
 			else
-				session.view.signal_chain.stop()
+				session.playback.signal_chain.stop()
 		else
-			session.view.play()
+			session.playback.play()
 	
 	func mut on_key()
 		let e = hui.get_event()
@@ -182,7 +182,7 @@ class MLVDialog extends hui.Dialog
 	
 	func mut on_click()
 		let e = hui.get_event()
-		session.view.set_playback_pos(screen_to_sample(e.mouse))
+		session.playback.set_pos(screen_to_sample(e.mouse))
 	
 	func screen_to_sample(pos: vec2) -> int
 		for i=>y0 in line_y0[:-1]
@@ -247,8 +247,8 @@ class MLVDialog extends hui.Dialog
 			
 			#line_samples.add(offset - s0)
 			
-			if session.view.is_playback_active()
-				let pos = session.view.playback_pos()
+			if session.playback.is_active()
+				let pos = session.playback.get_pos()
 				if pos >= s0 and pos < offset
 					let w = p.width - border*2
 					let x = border + float(pos - s0) * w / float(offset - s0)

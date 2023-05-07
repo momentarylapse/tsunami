@@ -247,6 +247,7 @@ void SongRenderer::_set_pos(int _pos) {
 		tr->set_pos(pos);
 }
 
+// delta (negative): how much is rendered but not played yet (= available in buffer)?
 int SongRenderer::get_pos(int delta) const {
 	Range r = range();
 	int p = pos + delta;

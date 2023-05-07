@@ -41,8 +41,8 @@ class Looper extends TsunamiPlugin
 	func override on_start()
 		cur_part = nil
 		song = session.song
-		chain = session.view.signal_chain
-		renderer = session.view.renderer
+		chain = session.playback.signal_chain
+		renderer = session.playback.renderer
 		runner = hui.run_repeated(0.05, on_update)
 		mode = Mode.FORWARD
 		

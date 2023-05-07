@@ -691,9 +691,11 @@ int64 AudioOutput::samples_played() {
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 		pa_usec_t t;
-		pa_stream_get_time(pulse_stream, &t);
-		double usec2samples = session->sample_rate() / 1000000.0;
-		return (double)t * usec2samples - fake_samples_played;
+		// PA_STREAM_INTERPOLATE_TIMING
+		if (pa_stream_get_time(pulse_stream, &t) == 0) {
+			double usec2samples = session->sample_rate() / 1000000.0;
+			return (double)t * usec2samples - fake_samples_played;
+		}
 	}
 #endif
 #if HAS_LIB_PORTAUDIO

@@ -572,24 +572,28 @@ class AudioView extends Object
 		var layer: TrackLayer&
 		
 	var sel: SongSelection
-	var renderer: shared![SongRenderer]
-	var signal_chain: shared![SignalChain]
-	var output_stream: shared![AudioOutput]
 	var cam: ViewPort
 	var mouse_wheel_speed: float
 	func extern mut subscribe(handler: Object, f: void->void, message: string)
 	func extern mut unsubscribe(handler: Object)
-	func extern mut prepare_playback(r: Range, allow_loop: bool)
-	func extern mut play()
-	func extern is_playback_active() -> bool
-	func extern is_paused() -> bool
-	func extern playback_pos() -> int
-	func extern mut set_playback_pos(pos: int)
-	func extern mut set_playback_loop(loop: bool)
 	func extern mut optimize_view()
 	func extern cur_vlayer() -> Layer&
 	func extern cur_vtrack() -> void*
 	func extern mut update_selection()
+
+class Playback
+	var renderer: shared![SongRenderer]
+	var signal_chain: shared![SignalChain]
+	var output_stream: shared![AudioOutput]
+	func extern mut subscribe(handler: Object, f: void->void, message: string)
+	func extern mut unsubscribe(handler: Object)
+	func extern mut prepare(r: Range, allow_loop: bool)
+	func extern mut play()
+	func extern is_active() -> bool
+	func extern is_paused() -> bool
+	func extern get_pos() -> int
+	func extern mut set_pos(pos: int)
+	func extern mut set_loop(loop: bool)
 
 class SongRenderer extends AudioSource
 	func extern __init__(s: Song)
@@ -666,6 +670,7 @@ class Session extends Object as shared
 	var song: shared![Song]
 	var view: AudioView&
 	var storage: Storage&
+	var playback: Playback&
 	
 	func extern sample_rate() -> int
 	

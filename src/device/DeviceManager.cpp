@@ -25,9 +25,6 @@
 #include <alsa/asoundlib.h>
 #endif
 
-const string DeviceManager::MESSAGE_ADD_DEVICE = "add-device";
-const string DeviceManager::MESSAGE_REMOVE_DEVICE = "remove-device";
-
 
 struct ApiDescription {
 	string name;

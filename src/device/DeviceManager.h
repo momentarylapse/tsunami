@@ -43,8 +43,6 @@ public:
 	friend class AudioInput;
 	friend class MidiInput;
 
-	static const string MESSAGE_ADD_DEVICE;
-	static const string MESSAGE_REMOVE_DEVICE;
 	obs::Source out_add_device{this, "add-device"};
 	obs::Source out_remove_device{this, "remove-device"};
 

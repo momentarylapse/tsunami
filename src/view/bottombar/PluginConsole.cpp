@@ -21,8 +21,8 @@ PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
 
 	event("add", [this] { on_add_button(); });
 
-	session->subscribe(this, [this] { on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
-	session->subscribe(this, [this] { on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
+	session->out_add_plugin >> create_sink([this] { on_add_plugin(); });
+	session->out_remove_plugin >> create_sink([this] { on_remove_plugin(); });
 }
 
 PluginConsole::~PluginConsole() {

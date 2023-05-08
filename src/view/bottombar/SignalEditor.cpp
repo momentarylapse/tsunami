@@ -43,9 +43,9 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 		add_chain(c);
 	show_config(nullptr);
 
-	session->subscribe(this, [this, session] {
+	session->out_add_signal_chain >> create_sink([this, session] {
 		add_chain(session->all_signal_chains.back().get());
-	}, session->MESSAGE_ADD_SIGNAL_CHAIN);
+	});
 }
 
 SignalEditor::~SignalEditor() {

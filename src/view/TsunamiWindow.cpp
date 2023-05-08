@@ -397,6 +397,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	side_bar->out_changed >> create_sink([this] {
 		on_side_bar_update();
 	});
+	session->out_mode_changed >> in_update;
 	
 	event("*", [this] { view->on_command(hui::get_event()->id); });
 

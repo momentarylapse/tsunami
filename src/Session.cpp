@@ -34,10 +34,6 @@
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
 
-const string Session::MESSAGE_ADD_PLUGIN = "add-plugin";
-const string Session::MESSAGE_REMOVE_PLUGIN = "remove-plugin";
-const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "add-signal-chain";
-
 
 const string EditMode::Default = "default";
 const string EditMode::DefaultSong = "default/song";
@@ -166,66 +162,68 @@ void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 		hui::RunLater(0.01f, std::bind(&TsunamiWindow::destroy, win));*/
 }
 
-void Session::set_mode(const string &mode) {
-	debug("mode", ">> " + mode);
-	if (mode == EditMode::Default) {
-		view->set_mode(view->mode_default);
-		win->side_bar->_hide();
-	} else if (mode == EditMode::Capture) {
-		view->set_mode(view->mode_capture);
-	} else if (mode == EditMode::EditTrack) {
-		view->set_mode(view->mode_edit);
-	} else if (mode == EditMode::ScaleBars) {
-		view->set_mode(view->mode_edit_bars);
-		view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::RUBBER);
-	} else if (mode == EditMode::ScaleMarker) {
-		view->set_mode(view->mode_scale_marker);
-	} else if (mode == EditMode::Curves) {
-		view->set_mode(view->mode_curve);
-	} else if (mode == EditMode::DefaultTrack) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::TRACK_CONSOLE);
-	} else if (mode == EditMode::DefaultTrackFx) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::TRACK_CONSOLE);
-		win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
-	} else if (mode == EditMode::DefaultTrackMidiFx) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::TRACK_CONSOLE);
-		win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
-	} else if (mode == EditMode::DefaultTrackSynth) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::TRACK_CONSOLE);
-		win->side_bar->track_console->set_mode(TrackConsole::Mode::SYNTH);
-	} else if (mode == EditMode::DefaultSong) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::SONG_CONSOLE);
-	} else if (mode == EditMode::DefaultSamples) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::SAMPLE_CONSOLE);
-	} else if (mode == EditMode::DefaultMixing) {
-		view->set_mode(view->mode_default);
-		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-	} else if (mode == EditMode::DefaultFx) {
-		view->set_mode(view->mode_default);
-		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->show_fx(view->cur_track());
-	} else if (mode == EditMode::DefaultMidiFx) {
-		view->set_mode(view->mode_default);
-		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->show_fx(view->cur_track());
-	} else if (mode == EditMode::DefaultSampleRef) {
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
-	} else if (mode == EditMode::XSignalEditor) {
-		//view->set_mode(view->mode_default);
-		win->bottom_bar->open(BottomBar::SIGNAL_EDITOR);
-	} else {
-		e("unknown mode: " + mode);
-		return;
-	}
-	hui::run_later(0.1f, [this] { win->update_menu(); });
-	this->mode = mode;
+void Session::set_mode(const string &_mode) {
+	hui::run_later(0.1f, [this, mode = _mode] {
+		debug("mode", ">> " + mode);
+		if (mode == EditMode::Default) {
+			view->set_mode(view->mode_default);
+			win->side_bar->_hide();
+		} else if (mode == EditMode::Capture) {
+			view->set_mode(view->mode_capture);
+		} else if (mode == EditMode::EditTrack) {
+			view->set_mode(view->mode_edit);
+		} else if (mode == EditMode::ScaleBars) {
+			view->set_mode(view->mode_edit_bars);
+			view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::RUBBER);
+		} else if (mode == EditMode::ScaleMarker) {
+			view->set_mode(view->mode_scale_marker);
+		} else if (mode == EditMode::Curves) {
+			view->set_mode(view->mode_curve);
+		} else if (mode == EditMode::DefaultTrack) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::TRACK_CONSOLE);
+		} else if (mode == EditMode::DefaultTrackFx) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::TRACK_CONSOLE);
+			win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
+		} else if (mode == EditMode::DefaultTrackMidiFx) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::TRACK_CONSOLE);
+			win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
+		} else if (mode == EditMode::DefaultTrackSynth) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::TRACK_CONSOLE);
+			win->side_bar->track_console->set_mode(TrackConsole::Mode::SYNTH);
+		} else if (mode == EditMode::DefaultSong) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::SONG_CONSOLE);
+		} else if (mode == EditMode::DefaultSamples) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::SAMPLE_CONSOLE);
+		} else if (mode == EditMode::DefaultMixing) {
+			view->set_mode(view->mode_default);
+			win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+		} else if (mode == EditMode::DefaultFx) {
+			view->set_mode(view->mode_default);
+			win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+			win->bottom_bar->mixing_console->show_fx(view->cur_track());
+		} else if (mode == EditMode::DefaultMidiFx) {
+			view->set_mode(view->mode_default);
+			win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+			win->bottom_bar->mixing_console->show_fx(view->cur_track());
+		} else if (mode == EditMode::DefaultSampleRef) {
+			view->set_mode(view->mode_default);
+			win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
+		} else if (mode == EditMode::XSignalEditor) {
+			//view->set_mode(view->mode_default);
+			win->bottom_bar->open(BottomBar::SIGNAL_EDITOR);
+		} else {
+			e("unknown mode: " + mode);
+			return;
+		}
+		this->mode = mode;
+		out_mode_changed.notify();
+	});
 }
 
 bool Session::in_mode(const string &m) {

@@ -26,11 +26,6 @@ public:
 	void build(Data *d) override {}
 };
 
-
-const string ActionManager::MESSAGE_DO_ACTION = "do-action";
-const string ActionManager::MESSAGE_UNDO_ACTION = "undo-action";
-const string ActionManager::MESSAGE_REDO_ACTION = "redo-action";
-
 ActionManager::ActionManager(Data *_data) {
 	data = _data;
 	cur_group = nullptr;

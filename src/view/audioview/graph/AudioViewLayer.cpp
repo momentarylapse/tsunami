@@ -431,7 +431,7 @@ void AudioViewLayer::set_edit_pitch_min_max(float _min, float _max) {
 	float diff = _max - _min;
 	edit_pitch_min = clamp(_min, 0.0f, MAX_PITCH - diff);
 	edit_pitch_max = edit_pitch_min + diff;
-	view->force_redraw();
+	request_redraw();
 }
 
 bool AudioViewLayer::is_playable() const {
@@ -460,9 +460,8 @@ bool AudioView::editing_layer(AudioViewLayer *l) {
 
 void AudioViewLayer::set_solo(bool _solo) {
 	solo = _solo;
-	view->update_playback_layers();
 	out_changed.notify();
-	view->out_solo_changed.notify();
+	out_solo_changed.notify();
 }
 
 
@@ -612,7 +611,7 @@ string AudioViewLayer::get_tip() const {
 	if (h.sample)
 		return _("sample ") + h.sample->origin->name;
 	if (h.marker)
-		return  _("marker ") + h.marker->nice_text();
+		return _("marker ") + h.marker->nice_text();
 	if (h.bar) {
 		if (h.bar->is_pause())
 			return _("pause ") + view->song->get_time_str_long(h.bar->length);

@@ -26,7 +26,7 @@
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
-AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : scenegraph::NodeFree() {
+AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) {
 	view = _view;
 	track = _track;
 	solo = false;
@@ -83,16 +83,12 @@ bool AudioView::editing_track(Track *t) {
 
 void AudioViewTrack::set_muted(bool muted) {
 	track->set_muted(muted);
-	/*view->force_redraw();
-	out_changed.notify();
-	view->out_solo_changed.notify();*/
 }
 
 void AudioViewTrack::set_solo(bool _solo) {
 	solo = _solo;
-	view->update_playback_layers();
 	out_changed.notify();
-	view->out_solo_changed.notify();
+	out_solo_changed.notify();
 }
 
 void AudioViewTrack::set_panning(float panning) {

@@ -121,7 +121,6 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
-	static const string MESSAGE_SOLO_CHANGE;
 	obs::Source out_cur_track_changed{this, "cur-track-changed"};
 	obs::Source out_cur_sample_changed{this, "cur-sample-changed"};
 	obs::Source out_cur_layer_changed{this, "cur-layer-changed"};
@@ -130,6 +129,7 @@ public:
 	obs::Source out_view_changed{this, "view-changed"};
 	obs::Source out_vtrack_changed{this, "vtrack-changed"};
 	obs::Source out_solo_changed{this, "solo-changed"};
+	obs::Sink in_solo_changed;
 
 	void update_peaks();
 	void zoom_in();

@@ -73,11 +73,15 @@ const string AudioView::MESSAGE_SELECTION_CHANGE = "selection-changed";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "settings-changed";
 const string AudioView::MESSAGE_VIEW_CHANGE = "view-changed";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "vtrack-changed";
-const string AudioView::MESSAGE_SOLO_CHANGE = "solo-changed";
 
 
 
-AudioView::AudioView(Session *_session, const string &_id) {
+AudioView::AudioView(Session *_session, const string &_id) :
+		in_solo_changed{this, [this] {
+			update_playback_layers();
+			out_solo_changed.notify();
+		}}
+{
 	id = _id;
 	session = _session;
 	win = session->win.get();
@@ -979,6 +983,7 @@ void AudioView::update_tracks() {
 		if (!found) {
 			vtrack2[ti] = new AudioViewTrack(this, t);
 			background->add_child(vtrack2[ti]);
+			vtrack2[ti]->out_solo_changed >> in_solo_changed;
 		}
 	}
 	// delete deleted
@@ -1007,6 +1012,7 @@ void AudioView::update_tracks() {
 			vlayer2[li] = new AudioViewLayer(this, l);
 			get_track(l->track)->add_child(vlayer2[li]);
 			sel.add(l);
+			vlayer2[li]->out_solo_changed >> in_solo_changed;
 		}
 
 		li ++;

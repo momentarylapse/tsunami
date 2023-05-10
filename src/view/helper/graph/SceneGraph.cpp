@@ -23,14 +23,6 @@ SceneGraph::SceneGraph() {
 	show_debug = hui::config.get_bool("scene-graph.debug", false);
 }
 
-void SceneGraph::set_callback_set_current(hui::Callback f) {
-	cb_set_current = f;
-}
-
-void SceneGraph::set_callback_redraw(hui::Callback f) {
-	cb_redraw = f;
-}
-
 void SceneGraph::update_hover() {
 	hover = get_hover_data(m);
 }
@@ -201,8 +193,7 @@ void SceneGraph::set_mouse(const vec2 &_m) {
 
 void SceneGraph::set_current(const HoverData &h) {
 	cur_selection = h;
-	if (cb_set_current)
-		cb_set_current();
+	out_current_changed.notify();
 }
 
 void SceneGraph::mdp_prepare(MouseDelayAction *a) {
@@ -233,8 +224,8 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 		}
 	}
 
-	set_callback_redraw([=] {
-		panel->redraw(id);
+	out_redraw >> create_sink([panel, _id = id] {
+		panel->redraw(_id);
 	});
 	panel->event_xp(id, "hui:draw", [this, custom_draw] (Painter* p) {
 		if (custom_draw) {

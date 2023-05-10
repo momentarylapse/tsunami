@@ -29,7 +29,7 @@ class CpuDisplayDialog : public hui::Dialog {
 public:
 	CpuDisplayDialog(Session *session) : hui::Dialog("cpu-display-dialog", session->win.get()->win) {
 		// will be owned by graph
-		auto cpu_display = new CpuDisplay(session, [this] { redraw("area"); });
+		auto cpu_display = new CpuDisplay(session);
 		graph = scenegraph::SceneGraph::create_integrated(this, "area", cpu_display, "cpu");
 		check("show-sleeping", cpu_display->show_sleeping);
 		check("show-total", cpu_display->show_total);
@@ -49,7 +49,7 @@ public:
 };
 
 
-CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scenegraph::NodeFree() {
+CpuDisplay::CpuDisplay(Session *_session) {
 	align.w = 120;
 	align.h = 30;
 	align.dx = -20;
@@ -63,7 +63,6 @@ CpuDisplay::CpuDisplay(Session *_session, hui::Callback _request_redraw) : scene
 	session = _session;
 	perf_mon = session->perf_mon;
 	view = session->view;
-	request_redraw = _request_redraw;
 	show_sleeping = false;
 	show_total = true;
 	scroll_offset = 0;

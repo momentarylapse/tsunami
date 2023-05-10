@@ -25,8 +25,9 @@ class SceneGraph : public Node {
 public:
 	using Callback = std::function<void()>;
 	SceneGraph();
-	void set_callback_set_current(Callback f);
-	void set_callback_redraw(Callback f);
+
+	obs::Source out_current_changed{this, "current-changed"};
+	obs::Source out_redraw{this, "redraw"};
 
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_left_button_up(const vec2 &m) override;
@@ -49,8 +50,6 @@ public:
 	HoverData hover;
 	HoverData cur_selection;
 	void set_current(const HoverData &h);
-	Callback cb_set_current;
-	Callback cb_redraw;
 
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);

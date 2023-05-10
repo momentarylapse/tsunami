@@ -130,6 +130,7 @@ public:
 	obs::Source out_vtrack_changed{this, "vtrack-changed"};
 	obs::Source out_solo_changed{this, "solo-changed"};
 	obs::Sink in_solo_changed;
+	obs::Sink in_redraw;
 
 	void update_peaks();
 	void zoom_in();

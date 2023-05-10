@@ -26,8 +26,7 @@ class PerfChannelInfo;
 
 class CpuDisplay : public scenegraph::NodeFree {
 public:
-	using Callback = std::function<void()>;
-	CpuDisplay(Session *session, Callback request_redraw);
+	CpuDisplay(Session *session);
 	virtual ~CpuDisplay();
 
 	bool on_left_button_down(const vec2 &m) override;
@@ -46,10 +45,7 @@ public:
 	AudioView *view;
 	bool large;
 
-	Callback request_redraw;
-
 	hui::Dialog *dlg;
-
 
 	Array<PerfChannelInfo> channels;
 	Array<int> expanded;

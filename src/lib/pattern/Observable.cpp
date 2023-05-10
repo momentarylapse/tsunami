@@ -20,8 +20,6 @@
 static const int MESSAGE_DEBUG_LEVEL = 0;
 static const int NODE_DEBUG_LEVEL = 0;
 
-static string dummy_string;
-
 bool split_num_string(const string &n, string &out, int &after) {
 	out = n;
 	if (n[0] < '0' or n[0] > '9')

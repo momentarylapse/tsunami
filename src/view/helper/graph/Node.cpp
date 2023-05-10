@@ -205,8 +205,7 @@ Array<Node*> Node::collect_children_down() const {
 
 void Node::request_redraw() {
 	if (auto g = graph())
-		if (g->cb_redraw)
-			g->cb_redraw();
+		g->out_redraw.notify();
 }
 
 

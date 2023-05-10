@@ -80,7 +80,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 		in_solo_changed{this, [this] {
 			update_playback_layers();
 			out_solo_changed.notify();
-		}}
+		}},
+		in_redraw(this, [this] {
+			force_redraw();
+		})
 {
 	id = _id;
 	session = _session;
@@ -124,9 +127,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 		if (!selecting_or())
 			set_current(scene_graph->cur_selection);
 	});*/
-	scene_graph->set_callback_redraw([this] {
-		force_redraw();
-	});
+	scene_graph->out_redraw >> in_redraw;
 	PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
@@ -171,9 +172,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(metronome_overlay_vlayer);
 
 
-	cpu_display = new CpuDisplay(session, [this] {
-		force_redraw();
-	});
+	cpu_display = new CpuDisplay(session);
 	scene_graph->add_child(cpu_display);
 
 	buffer_painter = new BufferPainter(this);
@@ -198,9 +197,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_group = Image::load(tsunami->directory_static | "icons/track-group.png");
 
 	peak_thread = new PeakThread(song);
-	peak_thread->messanger.subscribe(this, [this] {
-		force_redraw();
-	}, InterThreadMessager::MESSAGE_ANY);
+	peak_thread->messanger.out_changed >> in_redraw;
 	peak_thread->run();
 	draw_runner_id = -1;
 

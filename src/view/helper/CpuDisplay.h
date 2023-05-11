@@ -40,18 +40,25 @@ public:
 	void update();
 	void enable(bool active);
 
+	float table_height() const;
+
 	Session *session;
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
 	bool large;
+	obs::Sink in_perf_mon_update;
 
-	hui::Dialog *dlg;
+	owned<hui::Dialog> dlg;
 
 	Array<PerfChannelInfo> channels;
 	Array<int> expanded;
 	bool show_sleeping;
 	bool show_total;
 	float scroll_offset;
+
+	float line_dy;
+	float line_offset;
+	float indent_dx;
 };
 
 

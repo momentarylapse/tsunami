@@ -49,7 +49,10 @@ public:
 };
 
 
-CpuDisplay::CpuDisplay(Session *_session) {
+CpuDisplay::CpuDisplay(Session *_session) :
+		in_perf_mon_update{this, [this] {
+			update();
+		}} {
 	align.w = 120;
 	align.h = 30;
 	align.dx = -20;
@@ -67,7 +70,9 @@ CpuDisplay::CpuDisplay(Session *_session) {
 	show_total = true;
 	scroll_offset = 0;
 
-	dlg = nullptr;
+	line_offset = 30;
+	line_dy = 12;
+	indent_dx = 12;
 
 	set_perf_name("cpu");
 
@@ -77,8 +82,6 @@ CpuDisplay::CpuDisplay(Session *_session) {
 
 CpuDisplay::~CpuDisplay() {
 	enable(false);
-	if (dlg)
-		delete dlg;
 }
 
 void CpuDisplay::enable(bool active) {
@@ -88,9 +91,7 @@ void CpuDisplay::enable(bool active) {
 	request_redraw();
 
 	if (active)
-		perf_mon->subscribe(this, [this] {
-			update();
-		}, perf_mon->MESSAGE_ANY);
+		perf_mon->out_changed >> in_perf_mon_update;
 }
 
 color type_color(const string &t) {
@@ -213,7 +214,7 @@ void CpuDisplay::draw_table(Painter* p) {
 			}
 
 
-		float y = scroll_offset + 30;
+		float y = scroll_offset + line_offset;
 		for (auto &c: channels) {
 			if (c.stats.num > 0) {
 				if (c.parent < 0)
@@ -229,12 +230,12 @@ void CpuDisplay::draw_table(Painter* p) {
 					for (int i=0; i<channels.num; i++)
 						if (channels[i].id == c.parent)
 							if (i < indent.num) {
-								dx = indent[i] + 12;
+								dx = indent[i] + indent_dx;
 							}
 				}
 				string name = channel_title(c);
 				p->set_font_size(9);
-				float dy = 12;
+				float dy = line_dy;
 				p->draw_str({20 + dx, y}, name);
 				draw_str_r(p, xoff[0], y, format("%.1f", c.stats.back().cpu * 100));
 				draw_str_r(p, xoff[1], y, format("%.2f", c.stats.back().avg * 1000));
@@ -268,9 +269,22 @@ void CpuDisplay::draw_table(Painter* p) {
 	}
 }
 
+float CpuDisplay::table_height() const {
+	float h = line_offset;
+	for (auto &c: channels)
+		if (c.stats.num > 0)
+			h += line_dy;
+	h += line_dy; // lower margin
+	return h;
+}
+
 void CpuDisplay::on_draw(Painter* p) {
 	int h = area.height();
 	large = (h > 50);
+
+	float y_max = table_height();
+	scroll_offset = max(scroll_offset, h - y_max);
+	scroll_offset = min(scroll_offset, 0.0f);
 
 	draw_background(p);
 
@@ -291,7 +305,8 @@ bool CpuDisplay::on_left_button_down(const vec2 &m) {
 
 bool CpuDisplay::on_mouse_wheel(const vec2 &d) {
 	if (large) {
-		scroll_offset = min(scroll_offset - d.y * 10, 0.0f);
+		scroll_offset -= d.y * 10;
+		scroll_offset = min(scroll_offset, 0.0f);
 		request_redraw();
 	}
 	return true;

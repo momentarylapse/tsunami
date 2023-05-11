@@ -13,12 +13,7 @@ class Path;
 
 namespace hui
 {
-
-void _cdecl SetDirectory(const Path &dir);
-int _cdecl GetCpuCount();
-
-void _cdecl OpenDocument(const Path &filename);
-
+void _cdecl open_document(const Path &filename);
 };
 
 #endif

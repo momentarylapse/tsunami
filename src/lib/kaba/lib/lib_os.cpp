@@ -588,6 +588,8 @@ void SIAddPackageOS(Context *c) {
 		class_add_func("delete_directory", TypeVoid, &kaba_dir_delete, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("dir", TypePath);
 		class_add_func("current_directory", TypePath, &os::fs::current_directory, Flags::STATIC);
+		class_add_func("set_current_directory", TypeVoid, &os::fs::set_current_directory, Flags::STATIC);
+			func_add_param("dir", TypePath);
 		
 		if (!_kaba_stdin)
 			_kaba_stdin = new os::fs::FileStream(0);

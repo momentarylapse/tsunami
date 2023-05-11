@@ -16,7 +16,7 @@ bool Panel::is_enabled(const string &id) {
 // creating control items
 
 Array<string> split_title(const string &title) {
-	auto r = title.explode(ComboBoxSeparator);
+	auto r = title.explode(separator);
 	if (r.num > 0)
 		if (r[0].head(1) == "!")
 			r.erase(0);
@@ -27,7 +27,7 @@ Array<string> split_title(const string &title) {
 
 
 string get_option_from_title(const string &title) {
-	auto r = title.explode(ComboBoxSeparator);
+	auto r = title.explode(separator);
 	if (r.num > 0)
 		if (r[0].head(1) == "!")
 			return r[0].sub(1);

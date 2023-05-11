@@ -12,6 +12,7 @@ namespace os::fs {
 void create_directory(const Path &dir);
 void delete_directory(const Path &dir);
 Path current_directory();
+void set_current_directory(const Path &dir);
 void rename(const Path &source, const Path &target);
 void move(const Path &source, const Path &target);
 void copy(const Path &source, const Path &target);

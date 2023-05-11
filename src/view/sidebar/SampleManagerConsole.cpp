@@ -68,7 +68,7 @@ string render_sample(Sample *s, AudioView *view) {
 	else if (s->type == SignalType::MIDI)
 		render_midi(im, s->midi);
 	string id = "image:sample-" + i2s(s->uid);
-	return hui::SetImage(&im, id);
+	return hui::set_image(&im, id);
 }
 
 class SampleManagerItem : public obs::Node<VirtualBase> {
@@ -101,7 +101,7 @@ public:
 		if (s) {
 			s->unsubscribe(this);
 			s = nullptr;
-			hui::DeleteImage(icon);
+			hui::delete_image(icon);
 		}
 	}
 
@@ -403,7 +403,7 @@ public:
 	}
 	virtual ~SampleSelector() {
 		for (string &name: icon_names)
-			hui::DeleteImage(name);
+			hui::delete_image(name);
 	}
 
 	void fill_list() {

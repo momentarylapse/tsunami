@@ -144,7 +144,7 @@ public:
 		set_int("message-list", n-1);
 
 		event("show-log", [] {
-			OpenDocument("message.txt");
+			open_document("message.txt");
 		});
 		event("hui:win_close", [] {
 			exit(1);

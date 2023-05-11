@@ -128,6 +128,16 @@ Path current_directory() {
 	return Path(str);
 }
 
+
+void set_current_directory(const Path &dir) {
+#ifdef OS_WINDOWS
+	_chdir(dir.str().c_str());
+#endif
+#ifdef OS_LINUX
+	static_cast<void>(chdir(dir.str().c_str()));
+#endif
+}
+
 void rename(const Path &source, const Path &target) {
 	for (auto &p: target.all_parents())
 		create_directory(p);

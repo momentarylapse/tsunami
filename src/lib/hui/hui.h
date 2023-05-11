@@ -44,11 +44,11 @@ class EventHandler;
 
 // images
 //int LoadImage(const string &filename);
-string SetImage(const Image *image, const string &name = "");
-void DeleteImage(const string &name);
+string set_image(const Image *image, const string &name = "");
+void delete_image(const string &name);
 
 // HUI configuration
-extern string ComboBoxSeparator;
+extern string separator;
 
 };
 

@@ -60,7 +60,7 @@ string Version = "0.7.1.0";
 bool _screen_opened_ = false;
 
 // HUI configuration
-string ComboBoxSeparator;
+string separator;
 
 
 
@@ -216,11 +216,11 @@ void _MakeUsable_() {
 
 static int _current_image_no_ = 0;
 
-string SetImage(const Image *image, const string &user_name) {
+string set_image(const Image *image, const string &user_name) {
 	HuiImage *img = nullptr;
 	if (user_name != "") {
 		if (user_name.head(6) != "image:") {
-			msg_error("hui.SetImage(): name must begin with 'image:'");
+			msg_error("hui.set_image(): name must begin with 'image:'");
 			return "";
 		}
 		for (int i=0;i<_all_images_.num;i++)
@@ -245,7 +245,7 @@ string SetImage(const Image *image, const string &user_name) {
 	return img->filename;
 }
 
-void DeleteImage(const string &name) {
+void delete_image(const string &name) {
 	for (int i=0;i<_all_images_.num;i++)
 		if (_all_images_[i].filename == name) {
 			if (_all_images_[i].pix_buf)

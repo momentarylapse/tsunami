@@ -10,7 +10,7 @@
 
 namespace hui {
 
-namespace Clipboard {
+namespace clipboard {
 
 void copy(const string &buffer) {
 #ifdef HUI_API_GTK

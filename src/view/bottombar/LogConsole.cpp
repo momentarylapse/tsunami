@@ -31,7 +31,7 @@ LogConsole::~LogConsole() {
 }
 
 void console_add_message(LogConsole *lc, Log::Message &m) {
-	hui::ComboBoxSeparator = "§§";
+	hui::separator = "§§";
 	string text = m.text;
 	string source;
 	if (m.session == Session::GLOBAL)
@@ -56,7 +56,7 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 	} else {
 		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}
-	hui::ComboBoxSeparator = "\\";
+	hui::separator = "\\";
 }
 
 void LogConsole::reload() {

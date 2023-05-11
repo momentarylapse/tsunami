@@ -84,7 +84,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	_InitInput_();
 
-	ComboBoxSeparator = "\\";
+	separator = "\\";
 	_using_language_ = false;
 	if ((flags & FLAG_NO_ERROR_HANDLER) == 0)
 		SetDefaultErrorHandler(nullptr);

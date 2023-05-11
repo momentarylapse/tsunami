@@ -30,6 +30,7 @@ public:
 	~AudioViewTrack() override;
 
 	obs::Source out_solo_changed{this, "solo-changed"};
+	obs::Sink in_track_changed;
 
 	void draw_imploded_data(Painter *c);
 	void on_draw(Painter *c) override;

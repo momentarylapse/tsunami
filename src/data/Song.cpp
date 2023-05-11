@@ -67,21 +67,6 @@ void Song::__delete__() {
 }
 
 
-const string Song::MESSAGE_NEW = "new";
-const string Song::MESSAGE_ADD_TRACK = "add-track";
-const string Song::MESSAGE_DELETE_TRACK = "delete-track";
-const string Song::MESSAGE_ADD_EFFECT = "add-effect";
-const string Song::MESSAGE_DELETE_EFFECT = "delete-effect";
-const string Song::MESSAGE_ADD_SAMPLE = "add-sample";
-const string Song::MESSAGE_DELETE_SAMPLE = "delete-sample";
-const string Song::MESSAGE_ADD_LAYER = "add-layer";
-const string Song::MESSAGE_EDIT_LAYER = "edit-layer";
-const string Song::MESSAGE_DELETE_LAYER = "delete-layer";
-const string Song::MESSAGE_CHANGE_CHANNELS = "change-channels";
-const string Song::MESSAGE_EDIT_BARS = "edit-bars";
-const string Song::MESSAGE_SCALE_BARS = "scale-bars";
-const string Song::MESSAGE_ENABLE_FX = "enable-fx";
-
 bool Tag::operator ==(const Tag &o) const {
 	return key == o.key and value == o.value;
 }

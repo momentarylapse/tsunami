@@ -26,7 +26,8 @@
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
-AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) {
+AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) :
+		in_track_changed(this, [this] { on_track_change(); }) {
 	view = _view;
 	track = _track;
 	solo = false;
@@ -42,12 +43,10 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) {
 	if (track) {
 		header = new TrackHeader(this);
 		add_child(header);
-		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_CHANGE);
-		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_ADD_EFFECT);
-		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_DELETE_EFFECT);
-		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, [this] { on_track_change(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
-		track->subscribe(this, [this] { track = NULL; }, track->MESSAGE_DELETE);
+		track->out_changed >> in_track_changed;
+		track->out_effect_list_changed >> in_track_changed;
+		track->out_midi_effect_list_changed >> in_track_changed;
+		track->out_death >> create_sink([this] { track = nullptr; });
 	} else {
 		hidden = true;
 		header = nullptr;
@@ -55,8 +54,6 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) {
 }
 
 AudioViewTrack::~AudioViewTrack() {
-	if (track)
-		track->unsubscribe(this);
 }
 
 void AudioViewTrack::on_track_change() {

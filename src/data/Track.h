@@ -38,21 +38,11 @@ public:
 
 	Range _cdecl range() const;
 
-	static const string MESSAGE_ADD_EFFECT;
-	static const string MESSAGE_DELETE_EFFECT;
-	static const string MESSAGE_ADD_MIDI_EFFECT;
-	static const string MESSAGE_DELETE_MIDI_EFFECT;
-	static const string MESSAGE_REPLACE_SYNTHESIZER;
-	static const string MESSAGE_ADD_CURVE;
-	static const string MESSAGE_DELETE_CURVE;
-	static const string MESSAGE_EDIT_CURVE;
-	obs::Source out_add_effect{this, "add-effect"};
-	obs::Source out_delete_effect{this, "delete-effect"};
-	obs::Source out_add_midi_effect{this, "add-midi-effect"};
-	obs::Source out_delete_midi_effect{this, "delete-midi-effect"};
+	obs::Source out_layer_list_changed{this, "layer-list-changed"};
+	obs::Source out_effect_list_changed{this, "effect-list-changed"};
+	obs::Source out_midi_effect_list_changed{this, "midi-effect-list-changed"};
 	obs::Source out_replace_synthesizer{this, "replace-synthesizer"};
-	obs::Source out_add_curve{this, "add-curve"};
-	obs::Source out_delete_curve{this, "delete-curve"};
+	obs::Source out_curve_list_changed{this, "curve-list-changed"};
 	obs::Source out_edit_curve{this, "edit-curve"};
 
 	void _cdecl invalidate_all_peaks();

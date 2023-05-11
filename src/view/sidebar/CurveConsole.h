@@ -23,6 +23,9 @@ class CurveConsole : public SideBarConsole {
 public:
 	CurveConsole(Session *session, SideBar *bar);
 
+	obs::Sink in_update;
+	obs::Sink in_cur_layer_changed;
+
 	void on_update();
 
 	void update_list();

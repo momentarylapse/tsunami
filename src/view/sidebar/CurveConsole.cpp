@@ -17,7 +17,12 @@
 #include "../../EditModes.h"
 
 CurveConsole::CurveConsole(Session *session, SideBar *bar) :
-	SideBarConsole(_("Curves"), "curve-console", session, bar)
+	SideBarConsole(_("Curves"), "curve-console", session, bar),
+	in_update{this, [this] { on_update(); }},
+	in_cur_layer_changed{this, [this] {
+		view->mode_curve->set_curve_target("");
+		update_list();
+	}}
 {
 
 	from_resource("curve_console");
@@ -58,14 +63,10 @@ void CurveConsole::on_enter() {
 	auto t = track();
 	enable("edit_synth", t->type == SignalType::MIDI);
 	enable("edit_midi", t->type == SignalType::MIDI);
-	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_NEW);
-	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_ADD_CURVE);
-	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_DELETE_CURVE);
-	t->subscribe(this, [this] { on_update(); }, t->MESSAGE_EDIT_CURVE);
-	view->subscribe(this, [this] {
-		view->mode_curve->set_curve_target("");
-		update_list();
-	}, view->MESSAGE_CUR_LAYER_CHANGE);
+	song->out_new >> in_update;
+	t->out_curve_list_changed >> in_update;
+	t->out_edit_curve >> in_update;
+	view->out_cur_layer_changed >> in_cur_layer_changed;
 }
 
 void CurveConsole::on_leave() {

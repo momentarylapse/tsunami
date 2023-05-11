@@ -66,8 +66,9 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 
 
 	auto *song = track->song;
-	song->subscribe(this, [this] { update(); }, song->MESSAGE_ENABLE_FX);
-	track->subscribe(this, [this] { update(); }, track->MESSAGE_ANY);
+	song->out_enable_fx >> create_sink([this] { update(); });
+	track->out_effect_list_changed >> create_sink([this] { update(); });
+	track->out_changed >> create_sink([this] { update(); });
 
 	update();
 }

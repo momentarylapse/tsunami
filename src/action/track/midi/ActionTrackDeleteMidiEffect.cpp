@@ -21,7 +21,7 @@ void *ActionTrackDeleteMidiEffect::execute(Data *d) {
 
 	effect->fake_death();
 	track->midi_fx.erase(index);
-	track->out_delete_midi_effect.notify();
+	track->out_midi_effect_list_changed.notify();
 
 	return nullptr;
 }
@@ -31,6 +31,6 @@ void ActionTrackDeleteMidiEffect::undo(Data *d) {
 	assert(index <= track->midi_fx.num);
 
 	track->midi_fx.insert(effect, index);
-	track->out_add_midi_effect.notify();
+	track->out_midi_effect_list_changed.notify();
 }
 

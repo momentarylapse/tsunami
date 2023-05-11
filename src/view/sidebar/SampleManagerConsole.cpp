@@ -71,17 +71,17 @@ string render_sample(Sample *s, AudioView *view) {
 	return hui::SetImage(&im, id);
 }
 
-class SampleManagerItem : public VirtualBase {
+class SampleManagerItem : public obs::Node<VirtualBase> {
 public:
 	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *_view) {
 		manager = _manager;
 		s = _s;
 		view = _view;
 		icon = render_sample(s, view);
-		s->subscribe(this, [this] { on_delete(); }, s->MESSAGE_DELETE);
-		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_CHANGE_BY_ACTION);
-		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_REFERENCE);
-		s->subscribe(this, [this] { on_update(); }, s->MESSAGE_UNREFERENCE);
+		s->out_death >> create_sink([this] { on_delete(); });
+		s->out_changed_by_action >> create_sink([this] { on_update(); });
+		s->out_reference >> create_sink([this] { on_update(); });
+		s->out_unreference >> create_sink([this] { on_update(); });
 	}
 	virtual ~SampleManagerItem() {
 		zombify();
@@ -121,7 +121,8 @@ public:
 };
 
 SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
-	SideBarConsole(_("Samples"), "sample-manager-console", session, bar)
+	SideBarConsole(_("Samples"), "sample-manager-console", session, bar),
+	in_song_update{this, [this] { on_song_update(); }}
 {
 	from_resource("sample-manager-dialog");
 
@@ -148,9 +149,8 @@ SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
 void SampleManagerConsole::on_enter() {
 	update_list();
 
-	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_ADD_SAMPLE);
-	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe(this, [this] { on_song_update(); }, song->MESSAGE_NEW);
+	song->out_sample_list_changed >> in_song_update;
+	song->out_new >> in_song_update;
 }
 
 void SampleManagerConsole::on_leave() {
@@ -220,7 +220,7 @@ void SampleManagerConsole::on_export() {
 
 	session->storage->ask_save_render_export(win, [this, sel] (const Path &filename) {
 		if (filename) {
-			if (sel[0]->type == SignalType::AUDIO){
+			if (sel[0]->type == SignalType::AUDIO) {
 				BufferStreamer rr(sel[0]->buf);
 				session->storage->save_via_renderer(rr.port_out[0], filename, sel[0]->buf->length, {});
 			}

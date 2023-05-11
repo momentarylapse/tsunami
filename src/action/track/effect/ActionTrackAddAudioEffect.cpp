@@ -17,7 +17,7 @@ ActionTrackAddEffect::ActionTrackAddEffect(Track *t, shared<AudioEffect> _effect
 
 void *ActionTrackAddEffect::execute(Data *d) {
 	track->fx.add(effect);
-	track->out_add_effect.notify();
+	track->out_effect_list_changed.notify();
 
 	return nullptr;
 }
@@ -25,6 +25,6 @@ void *ActionTrackAddEffect::execute(Data *d) {
 void ActionTrackAddEffect::undo(Data *d) {
 	effect->fake_death();
 	track->fx.pop();
-	track->out_delete_effect.notify();
+	track->out_effect_list_changed.notify();
 }
 

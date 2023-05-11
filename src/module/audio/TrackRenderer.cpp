@@ -125,13 +125,11 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		f->perf_set_parent(this);
 		
 
-	track->subscribe(this, [this] { on_track_replace_synth(); }, track->MESSAGE_REPLACE_SYNTHESIZER);
-	track->subscribe(this, [this] { on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
-	track->subscribe(this, [this] { on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
-	track->subscribe(this, [this] { on_track_change_data(); }, track->MESSAGE_CHANGE);
-	track->subscribe(this, [this] { on_track_delete(); }, track->MESSAGE_DELETE);
-	track->song->subscribe(this, [this] { update_layers(); }, track->song->MESSAGE_ADD_LAYER);
-	track->song->subscribe(this, [this] { update_layers(); }, track->song->MESSAGE_DELETE_LAYER);
+	track->out_replace_synthesizer >> create_sink([this] { on_track_replace_synth(); });
+	track->out_effect_list_changed >> create_sink([this] { on_track_add_or_delete_fx(); });
+	track->out_changed >> create_sink([this] { on_track_change_data(); });
+	track->out_death >> create_sink([this] { on_track_delete(); });
+	track->out_layer_list_changed >> create_sink([this] { update_layers(); });
 
 	update_layers();
 }
@@ -141,12 +139,6 @@ TrackRenderer::~TrackRenderer() {
 
 	if (synth)
 		synth->perf_set_parent(nullptr);
-	for (auto *l: weak(layers))
-		l->unsubscribe(this);
-	if (track) {
-		track->song->unsubscribe(this);
-		track->unsubscribe(this);
-	}
 }
 
 void TrackRenderer::unlink_from_track() {
@@ -156,7 +148,6 @@ void TrackRenderer::unlink_from_track() {
 	}
 
 	if (track) {
-		track->song->unsubscribe(this);
 		track->unsubscribe(this);
 		track = nullptr;
 	}

@@ -20,7 +20,7 @@ void *ActionSampleAdd::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	sample->set_owner(a);
 	a->samples.add(sample);
-	a->out_add_sample.notify();
+	a->out_sample_list_changed.notify();
 	return sample.get();
 }
 
@@ -30,6 +30,6 @@ void ActionSampleAdd::undo(Data *d) {
 	sample->fake_death();
 	a->samples.pop();
 	sample->unset_owner();
-	a->out_delete_sample.notify();
+	a->out_sample_list_changed.notify();
 }
 

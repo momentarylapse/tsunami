@@ -21,8 +21,8 @@ void ActionTrackAdd::undo(Data *d) {
 	s->tracks.erase(index);
 
 	// notify outer structures first!
-	s->out_delete_layer.notify();
-	s->out_delete_track.notify();
+	s->out_layer_list_changed.notify();
+	s->out_track_list_changed.notify();
 	track->layers[0]->fake_death();
 	track->fake_death();
 }
@@ -37,8 +37,8 @@ void *ActionTrackAdd::execute(Data *d) {
 
 	s->tracks.insert(track, index);
 
-	s->out_add_track.notify();
-	s->out_add_layer.notify();
+	s->out_track_list_changed.notify();
+	s->out_layer_list_changed.notify();
 
 	return track.get();
 }

@@ -28,7 +28,8 @@ void* ActionTrackLayer__Delete::execute(Data* d) {
 	layer->fake_death();
 	track->layers.erase(index);
 
-	a->out_delete_layer.notify();
+	track->out_layer_list_changed.notify();
+	a->out_layer_list_changed.notify();
 
 	return nullptr;
 }
@@ -38,7 +39,8 @@ void ActionTrackLayer__Delete::undo(Data* d) {
 
 	track->layers.insert(layer, index);
 
-	a->out_add_layer.notify();
+	track->out_layer_list_changed.notify();
+	a->out_layer_list_changed.notify();
 }
 
 

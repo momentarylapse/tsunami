@@ -9,6 +9,7 @@
 
 #include "../../lib/base/base.h"
 #include "../../lib/base/pointer.h"
+#include "../../lib/pattern/Observable.h"
 
 class Session;
 class Track;
@@ -22,7 +23,7 @@ namespace hui {
 
 
 //todo set/unset track...
-class FxListEditor : public VirtualBase {
+class FxListEditor : public obs::Node<VirtualBase> {
 public:
 	FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexpand);
 	~FxListEditor();

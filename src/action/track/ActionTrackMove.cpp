@@ -17,8 +17,8 @@ void *ActionTrackMove::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	weak(s->tracks).move(origin, target);
-	s->out_add_track.notify();
-	s->out_add_layer.notify();
+	s->out_track_list_changed.notify();
+	s->out_layer_list_changed.notify();
 	return nullptr;
 }
 
@@ -26,7 +26,7 @@ void ActionTrackMove::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	weak(s->tracks).move(target, origin);
-	s->out_add_track.notify();
-	s->out_add_layer.notify();
+	s->out_track_list_changed.notify();
+	s->out_layer_list_changed.notify();
 }
 

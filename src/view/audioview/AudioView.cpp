@@ -291,11 +291,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_bar_gap = hui::create_resource_menu("popup-menu-bar-gap", win);
 	menu_buffer = hui::create_resource_menu("popup-menu-buffer", win);
 
-	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
-	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
-	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
-	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
-	song->subscribe(this, [this]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
+	song->out_track_list_changed >> create_sink([this]{ on_song_tracks_change(); });
+	song->out_layer_list_changed >> create_sink([this]{ on_song_tracks_change(); });
+	song->out_channels_changed >> create_sink([this]{ on_song_tracks_change(); });
 	song->out_new >> create_sink([this] {
 		on_song_new();
 	});

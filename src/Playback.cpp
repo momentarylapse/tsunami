@@ -27,17 +27,16 @@ Playback::Playback(Session *s) {
 	signal_chain->mark_all_modules_as_system();
 
 	// propagate messages
-	signal_chain->subscribe(this, [this] {
+	signal_chain->out_tick >> create_sink([this] {
 		out_tick.notify();
-	}, Module::MESSAGE_TICK);
-	signal_chain->subscribe(this, [this] {
+	});
+	signal_chain->out_state_changed >> create_sink([this] {
 		out_state_changed.notify();
-	}, Module::MESSAGE_STATE_CHANGE);
+	});
 
 }
 
 Playback::~Playback() {
-	signal_chain->unsubscribe(this);
 	hui::config.set_float("Output.Volume", output_stream->get_volume());
 }
 

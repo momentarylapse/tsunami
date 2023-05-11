@@ -55,15 +55,6 @@
 #include "../lib/threads/Mutex.h"
 
 
-const string Track::MESSAGE_ADD_EFFECT = "add-effect";
-const string Track::MESSAGE_DELETE_EFFECT = "delete-effect";
-const string Track::MESSAGE_ADD_MIDI_EFFECT = "add-midi-effect";
-const string Track::MESSAGE_DELETE_MIDI_EFFECT = "delete-midi-effect";
-const string Track::MESSAGE_REPLACE_SYNTHESIZER = "replace-synthesizer";
-const string Track::MESSAGE_ADD_CURVE = "add-curve";
-const string Track::MESSAGE_DELETE_CURVE = "delete-curve";
-const string Track::MESSAGE_EDIT_CURVE = "edit-curve";
-
 Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 	//msg_write("  new Track " + p2s(this));
 	type = _type;

@@ -21,7 +21,8 @@
 
 
 
-SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
+SongRenderer::SongRenderer(Song *s, bool _direct_mode) :
+		in_track_list_changed{this, [this] { update_tracks(); }} {
 	module_class = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
@@ -38,9 +39,8 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 		build_data();
 		set_range(song->range());
 		allow_layers(layer_set(song->layers()));
-		song->subscribe(this, [this] { on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
-		song->subscribe(this, [this] { on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
-		song->subscribe(this, [this] { on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+		song->out_track_list_changed >> in_track_list_changed;
+		song->out_finished_loading >> create_sink([this] { on_song_finished_loading(); });
 	}
 }
 
@@ -256,15 +256,8 @@ int SongRenderer::get_pos(int delta) const {
 	return p;//loopi(pos + delta, r.start(), r.end());
 }
 
-void SongRenderer::on_song_add_track() {
-	update_tracks();
-}
-
-void SongRenderer::on_song_delete_track() {
-	update_tracks();
-}
-
 void SongRenderer::on_song_finished_loading() {
+	update_tracks();
 	for (auto *tr: tracks)
 		tr->on_track_change_data();
 }

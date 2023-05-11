@@ -33,6 +33,8 @@ public:
 	void _cdecl __init__(Song *s);
 	void _cdecl __delete__() override;
 
+	obs::Sink in_track_list_changed;
+
 	// from Module
 	void reset_state() override ;
 
@@ -59,8 +61,6 @@ private:
 	void render_send_target(AudioBuffer &buf, Track *target);
 	void render_song_no_fx(AudioBuffer &buf);
 
-	void on_song_add_track();
-	void on_song_delete_track();
 	void on_song_finished_loading();
 	void update_tracks();
 	void _rebuild();

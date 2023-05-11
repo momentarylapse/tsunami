@@ -20,7 +20,8 @@ void* ActionTrackLayerAdd::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.add(layer);
-	a->out_add_layer.notify();
+	track->out_layer_list_changed.notify();
+	a->out_layer_list_changed.notify();
 
 	return layer.get();
 }
@@ -31,7 +32,8 @@ void ActionTrackLayerAdd::undo(Data* d) {
 	layer->fake_death();
 	track->layers.pop();
 
-	a->out_delete_layer.notify();
+	track->out_layer_list_changed.notify();
+	a->out_layer_list_changed.notify();
 }
 
 

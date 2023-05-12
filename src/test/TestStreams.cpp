@@ -15,6 +15,7 @@
 #include "../module/SignalChain.h"
 #include "../Session.h"
 #include "../device/stream/AudioOutput.h"
+#include <cstdio>
 
 TestStreams::TestStreams() : UnitTest("streams") {
 }

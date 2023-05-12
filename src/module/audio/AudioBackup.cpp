@@ -29,7 +29,9 @@ void AudioBackup::Config::reset() {
 string AudioBackup::Config::auto_conf(const string &name) const {
 	if (name == "channels")
 		return "1:16";
-	return "";
+	if (name == "format")
+		return "sample-format";
+	return "ignore";
 }
 
 AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "AudioBackup") {

@@ -11,6 +11,7 @@
 #include "../sidebar/SampleManagerConsole.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
+#include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
@@ -159,6 +160,33 @@ public:
 	}
 	void value_to_gui() override {
 		panel->set_int(id, *value);
+	}
+};
+
+class AutoConfigDataSampleFormat : public AutoConfigData {
+public:
+	int *value;
+	ConfigPanel *panel;
+	string id;
+	AutoConfigDataSampleFormat(const string &_name) : AutoConfigData(_name) {
+		value = nullptr;
+		panel = nullptr;
+	}
+	void parse(const string &s) override {
+	}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
+		id = "combo-" + i2s(i);
+		panel = p;
+		p->add_combo_box("!width=150,expandx", 1, i, id);
+		for (int i=1; i<(int)SampleFormat::NUM; i++)
+			p->add_string(id, format_name((SampleFormat)i));
+		p->event(id, callback);
+	}
+	void value_from_gui() override {
+		*value = panel->get_int(id) + 1;
+	}
+	void value_to_gui() override {
+		panel->set_int(id, *value - 1);
 	}
 };
 
@@ -370,11 +398,14 @@ public:
 };
 
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session) {
-	auto *ps = config->kaba_class->owner;
+	//auto *ps = config->kaba_class->owner;
 	Array<AutoConfigData*> r;
 	for (auto &e: config->kaba_class->elements) {
+		auto cc = config->auto_conf(e.name);
+		if (cc == "ignore")
+			continue;
 		if (e.type == kaba::TypeFloat32) {
-			if (e.name == "pitch") {
+			if (e.name == "pitch" or cc == "pitch") {
 				auto *a = new AutoConfigDataPitch(e.name);
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
@@ -384,9 +415,15 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 				r.add(a);
 			}
 		} else if (e.type == kaba::TypeInt) {
-			auto *a = new AutoConfigDataInt(e.name);
-			a->value = (int*)((char*)config + e.offset);
-			r.add(a);
+			if (cc == "sample-format") {
+				auto *a = new AutoConfigDataSampleFormat(e.name);
+				a->value = (int*)((char*)config + e.offset);
+				r.add(a);
+			} else {
+				auto *a = new AutoConfigDataInt(e.name);
+				a->value = (int*)((char*)config + e.offset);
+				r.add(a);
+			}
 		} else if (e.type == kaba::TypeBool) {
 			auto *a = new AutoConfigDataBool(e.name);
 			a->value = (bool*)((char*)config + e.offset);
@@ -404,20 +441,10 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 			a->value = (Device**)((char*)config + e.offset);
 			r.add(a);
 		}
+		r.back()->parse(cc);
 	}
 
-	Array<AutoConfigData*> rr;
-	if (ps) {
-		for (auto a: r) {
-			auto cc = config->auto_conf(a->name);
-			if (cc != "ignore") {
-				a->parse(cc);
-				rr.add(a);
-			}
-		}
-	}
-
-	return rr;
+	return r;
 }
 
 AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :

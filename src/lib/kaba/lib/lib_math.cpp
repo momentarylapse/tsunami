@@ -492,7 +492,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("length", TypeFloat32, type_p(&vec2::length), Flags::PURE);
 		//class_add_func("length_sqr", TypeFloat32, type_p(&vec2::length_sqr), Flags::PURE);
 		//class_add_func("length_fuzzy", TypeFloat32, type_p(&vec2::length_fuzzy), Flags::PURE);
-		class_add_func("normalized", TypeVec3, &vec2::normalized, Flags::PURE);
+		class_add_func("normalized", TypeVec2, &vec2::normalized, Flags::PURE);
 		class_add_func(Identifier::Func::STR, TypeString, &vec2::str, Flags::PURE);
 		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::STATIC | Flags::PURE);
 			func_add_param("v1", TypeVec2);

@@ -48,6 +48,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 	}
 
 	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE) == 0);
+	panel->hide_control("replace", (int)(mode & ConfigPanelMode::REPLACE) == 0);
 
 	panel->event("enabled", [this] { on_enabled(); });
 	panel->event("delete", [this] { on_delete(); });

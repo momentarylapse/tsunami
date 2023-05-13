@@ -3714,7 +3714,7 @@ header
 
 0
 0
-3
+4
 MenuButton
 menu
 image=hui:properties,flat,menu=popup_fx_menu
@@ -3731,6 +3731,12 @@ CheckBox
 enabled
 switch
 2
+0
+0
+Button
+replace
+image=hui:open,flat
+3
 0
 0
 Grid
@@ -8677,7 +8683,7 @@ default
 # Language
 English
 # Number Of IDs
-764
+766
 # Text
 /bars-add
 Add bars...
@@ -9960,6 +9966,12 @@ Module
 module-panel/enabled
 
 active?
+module-panel/menu
+
+Configure
+module-panel/replace
+
+Replace
 module_console/no_config
 this module is not configurable
 

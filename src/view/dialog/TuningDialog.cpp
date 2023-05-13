@@ -8,11 +8,10 @@
 #include "TuningDialog.h"
 #include "../../data/Track.h"
 
-TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
+TuningDialog::TuningDialog(hui::Window *_parent, const Array<int> &_strings) :
 	hui::Dialog("tuning_dialog", _parent)
 {
-	track = t;
-	tuning = track->instrument.string_pitch;
+	strings = _strings;
 
 	gui_num_strings = 0;
 
@@ -25,7 +24,7 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 }
 
 void TuningDialog::update() {
-	for (int i=tuning.num; i<gui_num_strings; i++) {
+	for (int i=strings.num; i<gui_num_strings; i++) {
 		string id = format("string%d", i);
 		remove_control(id);
 		remove_control(id + "_label");
@@ -35,7 +34,7 @@ void TuningDialog::update() {
 	remove_control("add_first");
 
 	set_target("td_g_tuning");
-	foreachi(int t, tuning, i) {
+	foreachi(int t, strings, i) {
 		string id = format("string%d", i);
 		if (i >= gui_num_strings) {
 			add_label(i2s(i+1), 0, 100 - i, id + "_label");
@@ -54,18 +53,16 @@ void TuningDialog::update() {
 		}
 		set_int(id, MAX_PITCH - 1 - t);
 	}
-	if (tuning.num == 0) {
+	if (strings.num == 0) {
 		add_button("", 0, 0, "add_first");
 		set_image("add_first", "hui:add");
 	}
 
-	gui_num_strings = tuning.num;
+	gui_num_strings = strings.num;
 }
 
 void TuningDialog::on_ok() {
-	Instrument i = track->instrument;
-	i.string_pitch = tuning;
-	track->set_instrument(i);
+	ok = true;
 	request_destroy();
 }
 
@@ -73,13 +70,13 @@ void TuningDialog::on_edit() {
 	string id = hui::get_event()->id;
 	int n = id.sub(6)._int();
 	int p = MAX_PITCH - 1 - get_int(id);
-	tuning[n] = p;
+	strings[n] = p;
 }
 
 void TuningDialog::on_delete() {
 	string id = hui::get_event()->id;
 	int n = id.sub(7+6)._int();
-	tuning.erase(n);
+	strings.erase(n);
 
 	hui::run_later(0.001f, [this] { update(); });
 }
@@ -87,13 +84,13 @@ void TuningDialog::on_delete() {
 void TuningDialog::on_add() {
 	string id = hui::get_event()->id;
 	int n = id.sub(4+6)._int();
-	tuning.insert(tuning[n], n);
+	strings.insert(strings[n], n);
 
 	hui::run_later(0.001f, [this] { update(); });
 }
 
 void TuningDialog::on_add_first() {
-	tuning.add(69);
+	strings.add(69);
 
 	hui::run_later(0.001f, [this] { update(); });
 }

@@ -537,6 +537,7 @@
     <ClCompile Include="src\view\dialog\MarkerDialog.cpp" />
     <ClCompile Include="src\view\dialog\ModuleSelectorDialog.cpp" />
     <ClCompile Include="src\view\dialog\NewDialog.cpp" />
+    <ClCompile Include="src\view\dialog\NewTrackDialog.cpp" />
     <ClCompile Include="src\view\dialog\PauseAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\PauseEditDialog.cpp" />
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp" />
@@ -1006,6 +1007,7 @@
     <ClInclude Include="src\view\dialog\MarkerDialog.h" />
     <ClInclude Include="src\view\dialog\ModuleSelectorDialog.h" />
     <ClInclude Include="src\view\dialog\NewDialog.h" />
+    <ClInclude Include="src\view\dialog\NewTrackDialog.h" />
     <ClInclude Include="src\view\dialog\PauseAddDialog.h" />
     <ClInclude Include="src\view\dialog\PauseEditDialog.h" />
     <ClInclude Include="src\view\dialog\QuestionDialog.h" />

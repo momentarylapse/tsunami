@@ -1264,6 +1264,9 @@
     <ClCompile Include="src\view\dialog\NewDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\dialog\NewTrackDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\dialog\PauseAddDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -2665,6 +2668,9 @@
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\NewDialog.h">
+      <Filter>src\view\dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\NewTrackDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\PauseAddDialog.h">

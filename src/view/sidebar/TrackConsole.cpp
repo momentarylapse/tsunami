@@ -191,7 +191,14 @@ void TrackConsole::on_instrument() {
 }
 
 void TrackConsole::on_edit_tuning() {
-	hui::fly(new TuningDialog(win, track));
+	auto dlg = new TuningDialog(win, track->instrument.string_pitch);
+	hui::fly(dlg, [dlg, this] {
+		if (dlg->ok) {
+			Instrument i = track->instrument;
+			i.string_pitch = dlg->strings;
+			track->set_instrument(i);
+		}
+	});
 }
 
 void TrackConsole::on_view_cur_track_change() {

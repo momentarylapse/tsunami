@@ -14,7 +14,7 @@ class Track;
 
 class TuningDialog : public hui::Dialog {
 public:
-	TuningDialog(hui::Window *parent, Track *t);
+	TuningDialog(hui::Window *parent, const Array<int> &strings);
 
 	void update();
 
@@ -25,8 +25,8 @@ public:
 	void on_delete();
 	void on_edit();
 
-	Track *track;
-	Array<int> tuning;
+	Array<int> strings;
+	bool ok = false;
 
 	int gui_num_strings;
 };

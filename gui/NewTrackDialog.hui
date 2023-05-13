@@ -1,0 +1,52 @@
+Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
+	Grid ? "" vertical width=300
+		Grid ? "" homogenousx
+			ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
+			ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
+			ToggleButton type-metronome "M" flat huge expandx "tooltip=Metronome" ignorefocus
+			ToggleButton type-master "M" flat huge expandx "tooltip=Master" ignorefocus
+		Group g-channels "Channels"
+			Grid ? ""
+				RadioButton channels:mono "Mono"
+				RadioButton channels:stereo "Stereo"
+		Group g-instrument "Instrument"
+			Grid ? ""
+				ComboBox instrument "" expandx ignorefocus
+				---|
+				Grid ? ""
+					Label tuning "" expandx
+					Button edit_tuning "" image=hui:edit flat ignorefocus
+		Group g-metronome "Metronome"
+			Grid ? ""
+				Label nd_t_bpm "Speed" right disabled
+				SpinButton beats_per_minute "90" range=0:999:0.1
+				Label /per_minute "/min"
+				---|
+				Label nd_t_bars "Bars" right disabled
+				SpinButton num_bars "10" range=0:999
+				---|
+				Label nd_t_beats "Beats" right disabled
+				Grid ? ""
+					SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
+					Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
+				ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
+				ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
+		Group g-synth "Synthesizer"
+			Label ? "..."
+		Label l-master "A master track does not contain any audio or midi data itself. It can be used to group a number of tracks and apply volume and effects collectively." italic wrap
+		Revealer g-fx "Effects"
+			Grid ? "" expandx
+				ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160
+				---|
+				Revealer config-revealer "" slide=down
+					Grid grid-config ""
+		Revealer g-fx-midi "Midi effects" hidden
+			Grid ? "" expandx
+				ListView midi-fx "\\name" format=Ct reorderable nobar noexpandy expandx height=100
+				---|
+				Revealer config-revealer-midi "" slide=down
+					Grid grid-config-midi ""
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button ok "Create" default image=hui:ok

@@ -16,6 +16,7 @@
 #include "dialog/BarDeleteDialog.h"
 #include "dialog/BarEditSpeedDialog.h"
 #include "dialog/BarReplaceDialog.h"
+#include "dialog/NewTrackDialog.h"
 #include "dialog/PauseAddDialog.h"
 #include "dialog/PauseEditDialog.h"
 #include "dialog/TrackRoutingDialog.h"
@@ -28,9 +29,6 @@
 #include "mode/ViewModeDefault.h"
 #include "mode/ViewModeEdit.h"
 #include "mode/ViewModeCapture.h"
-#include "helper/Slider.h"
-#include "helper/Progress.h"
-#include "helper/PeakMeterDisplay.h"
 #include "module/ModulePanel.h"
 #include "module/ConfigPanel.h"
 #include "module/ConfigurationDialog.h"
@@ -41,10 +39,7 @@
 #include "../data/base.h"
 #include "../data/Track.h"
 #include "../data/TrackLayer.h"
-#include "../data/Song.h"
-#include "../data/SongSelection.h"
 #include "../data/audio/AudioBuffer.h"
-#include "../data/rhythm/Bar.h"
 #include "../action/ActionManager.h"
 #include "../command/song/Export.h"
 #include "../command/Unsorted.h"
@@ -112,6 +107,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("redo", [this] { on_redo(); });
 	set_key_code("redo", hui::KEY_Y + hui::KEY_CONTROL);
 	event("track_render", [this] { on_track_render(); });
+	event("track-add", [this] {
+		hui::fly(new NewTrackDialog(this, session));
+	});
+	set_key_code("track-add", hui::KEY_N + hui::KEY_CONTROL + hui::KEY_SHIFT);
 	event("track-add-audio-mono", [this] { on_add_audio_track_mono(); });
 	event("track-add-audio-stereo", [this] { on_add_audio_track_stereo(); });
 	event("track-add-group", [this] { song->add_track(SignalType::GROUP); });

@@ -427,6 +427,7 @@ set(SOURCE
 	src/view/dialog/MarkerDialog.cpp
 	src/view/dialog/ModuleSelectorDialog.cpp
 	src/view/dialog/NewDialog.cpp
+	src/view/dialog/NewTrackDialog.cpp
 	src/view/dialog/PauseAddDialog.cpp
 	src/view/dialog/PauseEditDialog.cpp
 	src/view/dialog/QuestionDialog.cpp

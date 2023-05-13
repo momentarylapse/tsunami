@@ -440,6 +440,8 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 			auto *a = new AutoConfigDataDevice(e.name, session);
 			a->value = (Device**)((char*)config + e.offset);
 			r.add(a);
+		} else {
+			continue;
 		}
 		r.back()->parse(cc);
 	}

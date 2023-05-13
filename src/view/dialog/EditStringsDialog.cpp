@@ -1,15 +1,15 @@
 /*
- * TuningDialog.cpp
+ * EditStringsDialog.cpp
  *
  *  Created on: 11.02.2016
  *      Author: michi
  */
 
-#include "TuningDialog.h"
+#include "EditStringsDialog.h"
 #include "../../data/Track.h"
 
-TuningDialog::TuningDialog(hui::Window *_parent, const Array<int> &_strings) :
-	hui::Dialog("tuning_dialog", _parent)
+EditStringsDialog::EditStringsDialog(hui::Window *_parent, const Array<int> &_strings) :
+	hui::Dialog("edit-strings-dialog", _parent)
 {
 	strings = _strings;
 
@@ -20,10 +20,10 @@ TuningDialog::TuningDialog(hui::Window *_parent, const Array<int> &_strings) :
 	event("ok", [this] { on_ok(); });
 	event("cancel", [this] { request_destroy(); });
 	event("hui:close", [this] { request_destroy(); });
-	event("add_first", [this] { on_add_first(); });
+	event("add-first", [this] { on_add_first(); });
 }
 
-void TuningDialog::update() {
+void EditStringsDialog::update() {
 	for (int i=strings.num; i<gui_num_strings; i++) {
 		string id = format("string%d", i);
 		remove_control(id);
@@ -31,9 +31,9 @@ void TuningDialog::update() {
 		remove_control("delete_" + id);
 		remove_control("add_" + id);
 	}
-	remove_control("add_first");
+	hide_control("add-first", strings.num > 0);
 
-	set_target("td_g_tuning");
+	set_target("g-strings");
 	foreachi(int t, strings, i) {
 		string id = format("string%d", i);
 		if (i >= gui_num_strings) {
@@ -53,27 +53,23 @@ void TuningDialog::update() {
 		}
 		set_int(id, MAX_PITCH - 1 - t);
 	}
-	if (strings.num == 0) {
-		add_button("", 0, 0, "add_first");
-		set_image("add_first", "hui:add");
-	}
 
 	gui_num_strings = strings.num;
 }
 
-void TuningDialog::on_ok() {
+void EditStringsDialog::on_ok() {
 	ok = true;
 	request_destroy();
 }
 
-void TuningDialog::on_edit() {
+void EditStringsDialog::on_edit() {
 	string id = hui::get_event()->id;
 	int n = id.sub(6)._int();
 	int p = MAX_PITCH - 1 - get_int(id);
 	strings[n] = p;
 }
 
-void TuningDialog::on_delete() {
+void EditStringsDialog::on_delete() {
 	string id = hui::get_event()->id;
 	int n = id.sub(7+6)._int();
 	strings.erase(n);
@@ -81,15 +77,16 @@ void TuningDialog::on_delete() {
 	hui::run_later(0.001f, [this] { update(); });
 }
 
-void TuningDialog::on_add() {
+void EditStringsDialog::on_add() {
 	string id = hui::get_event()->id;
 	int n = id.sub(4+6)._int();
-	strings.insert(strings[n], n);
+	int pitch = strings[n];
+	strings.insert(pitch, n);
 
 	hui::run_later(0.001f, [this] { update(); });
 }
 
-void TuningDialog::on_add_first() {
+void EditStringsDialog::on_add_first() {
 	strings.add(69);
 
 	hui::run_later(0.001f, [this] { update(); });

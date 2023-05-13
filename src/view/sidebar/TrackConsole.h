@@ -30,7 +30,7 @@ public:
 	void on_volume();
 	void on_panning();
 	void on_instrument();
-	void on_edit_tuning();
+	void on_edit_strings();
 
 	void set_track(Track *t);
 

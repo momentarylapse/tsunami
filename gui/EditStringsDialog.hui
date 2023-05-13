@@ -1,0 +1,9 @@
+Dialog edit-strings-dialog "Strings" width=120 height=50 headerbar closebutton=no
+	Grid ? "" width=240
+		Grid g-strings ""
+			Button add-first "" image=hui:add
+		---|
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button ok "Apply" default image=hui:ok

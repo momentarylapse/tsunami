@@ -423,6 +423,7 @@ set(SOURCE
 	src/view/dialog/BarReplaceDialog.cpp
 	src/view/dialog/BufferCompressionDialog.cpp
 	src/view/dialog/ChannelMapperDialog.cpp
+	src/view/dialog/EditStringsDialog.cpp
 	src/view/dialog/HelpDialog.cpp
 	src/view/dialog/MarkerDialog.cpp
 	src/view/dialog/ModuleSelectorDialog.cpp
@@ -437,7 +438,6 @@ set(SOURCE
 	src/view/dialog/TemperamentDialog.cpp
 	src/view/dialog/TimeTrackAddDialog.cpp
 	src/view/dialog/TrackRoutingDialog.cpp
-	src/view/dialog/TuningDialog.cpp
 	src/view/helper/graph/Node.cpp
 	src/view/helper/graph/SceneGraph.cpp
 	src/view/helper/graph/Scrollable.cpp

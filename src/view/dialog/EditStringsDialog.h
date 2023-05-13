@@ -1,20 +1,20 @@
 /*
- * TuningDialog.h
+ * EditStringsDialog.h
  *
  *  Created on: 11.02.2016
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_DIALOG_TUNINGDIALOG_H_
-#define SRC_VIEW_DIALOG_TUNINGDIALOG_H_
+#ifndef SRC_VIEW_DIALOG_EDITSTRINGSDIALOG_H_
+#define SRC_VIEW_DIALOG_EDITSTRINGSDIALOG_H_
 
 #include "../../lib/hui/hui.h"
 
 class Track;
 
-class TuningDialog : public hui::Dialog {
+class EditStringsDialog : public hui::Dialog {
 public:
-	TuningDialog(hui::Window *parent, const Array<int> &strings);
+	EditStringsDialog(hui::Window *parent, const Array<int> &strings);
 
 	void update();
 
@@ -31,4 +31,4 @@ public:
 	int gui_num_strings;
 };
 
-#endif /* SRC_VIEW_DIALOG_TUNINGDIALOG_H_ */
+#endif /* SRC_VIEW_DIALOG_EDITSTRINGSDIALOG_H_ */

@@ -1214,6 +1214,49 @@ link,ignorefocus
 0
 # Resource
 Dialog
+edit-strings-dialog
+width=120,height=50,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+width=240
+0
+0
+2
+Grid
+g-strings
+
+0
+0
+1
+Button
+add-first
+image=hui:add
+0
+0
+0
+Grid
+?
+buttonbar
+0
+1
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
+# Resource
+Dialog
 favorite-dialog
 width=300,height=200,headerbar,closebutton=no,resizable
 0
@@ -8629,43 +8672,6 @@ default
 0
 1
 0
-# Resource
-Dialog
-tuning_dialog
-width=120,height=50,headerbar,closebutton=no
-0
-0
-1
-Grid
-?
-
-0
-0
-2
-Grid
-td_g_tuning
-
-0
-0
-0
-Grid
-?
-buttonbar
-0
-1
-2
-Button
-cancel
-image=hui:cancel
-0
-0
-0
-Button
-ok
-default,image=hui:ok
-0
-1
-0
 # Number Of Languages
 2
 # Language
@@ -9284,6 +9290,12 @@ Only audio and midi tracks can be edited here
 
 dummy-editor/warning
 Can not edit this track type
+
+edit-strings-dialog/edit-strings-dialog
+Strings
+
+edit-strings-dialog/ok
+Apply
 
 favorite-dialog/favorite-dialog
 Parameter
@@ -10958,12 +10970,6 @@ Track
 
 trackdest_dialog/trackdest_dialog
 Ziel-Spur für die Ebenen
-
-tuning_dialog/ok
-Apply
-
-tuning_dialog/tuning_dialog
-Tuning
 
 # Num Language Strings
 0

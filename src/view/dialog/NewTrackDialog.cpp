@@ -14,7 +14,7 @@
 #include "../../Session.h"
 #include "../../lib/base/sort.h"
 #include "../../data/midi/MidiData.h"
-#include "TuningDialog.h"
+#include "EditStringsDialog.h"
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
@@ -62,7 +62,7 @@ void NewTrackDialog::on_instrument() {
 }
 
 void NewTrackDialog::on_edit_tuning() {
-	auto dlg = new TuningDialog(win, instrument.string_pitch);
+	auto dlg = new EditStringsDialog(win, instrument.string_pitch);
 	hui::fly(dlg, [this, dlg] {
 		if (dlg->ok) {
 			instrument.string_pitch = dlg->strings;

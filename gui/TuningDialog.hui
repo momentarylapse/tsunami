@@ -1,8 +1,0 @@
-Dialog tuning_dialog "Tuning" width=120 height=50 headerbar closebutton=no
-	Grid ? ""
-		Grid td_g_tuning ""
-		---|
-		Grid ? "" buttonbar
-			Button /cancel "Cancel" image=hui:cancel
-			---|
-			Button ok "Apply" default image=hui:ok

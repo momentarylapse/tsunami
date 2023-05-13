@@ -12,7 +12,7 @@
 #include "../module/ConfigPanel.h"
 #include "../helper/FxListEditor.h"
 #include "../dialog/TemperamentDialog.h"
-#include "../dialog/TuningDialog.h"
+#include "../dialog/EditStringsDialog.h"
 #include "../dialog/ModuleSelectorDialog.h"
 #include "../../data/Track.h"
 #include "../../data/base.h"
@@ -62,7 +62,7 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	event("volume", [this] { on_volume(); });
 	event("panning", [this] { on_panning(); });
 	event("instrument", [this] { on_instrument(); });
-	event("edit_tuning", [this] { on_edit_tuning(); });
+	event("edit_tuning", [this] { on_edit_strings(); });
 
 	event("edit-song", [session] { session->set_mode(EditMode::DefaultSong); });
 	event("edit-track-curves", [session] { session->set_mode(EditMode::Curves); });
@@ -190,8 +190,8 @@ void TrackConsole::on_instrument() {
 	editing = false;
 }
 
-void TrackConsole::on_edit_tuning() {
-	auto dlg = new TuningDialog(win, track->instrument.string_pitch);
+void TrackConsole::on_edit_strings() {
+	auto dlg = new EditStringsDialog(win, track->instrument.string_pitch);
 	hui::fly(dlg, [dlg, this] {
 		if (dlg->ok) {
 			Instrument i = track->instrument;

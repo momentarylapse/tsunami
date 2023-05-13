@@ -1,9 +1,8 @@
 //
 // Created by michi on 13.05.23.
 //
-
-#ifndef TSUNAMI_NEWTRACKDIALOG_H
-#define TSUNAMI_NEWTRACKDIALOG_H
+#ifndef SRC_VIEW_DIALOG_NEWTRACKDIALOG_H
+#define SRC_VIEW_DIALOG_NEWTRACKDIALOG_H
 
 
 #include "../../lib/hui/hui.h"
@@ -38,4 +37,4 @@ public:
 	void on_edit_tuning();
 };
 
-#endif //TSUNAMI_NEWTRACKDIALOG_H
+#endif //SRC_VIEW_DIALOG_NEWTRACKDIALOG_H

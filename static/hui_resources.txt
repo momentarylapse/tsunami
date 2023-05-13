@@ -8297,7 +8297,7 @@ percent
 2
 1
 0
-Expander
+Group
 g_instrument
 
 1
@@ -8333,10 +8333,22 @@ image=hui:edit,flat,ignorefocus
 1
 0
 0
-Expander
-g_fx
+Group
+g_synth
 
 2
+0
+1
+Grid
+synth
+
+0
+0
+0
+Group
+g_fx
+
+3
 0
 1
 Grid
@@ -8366,7 +8378,7 @@ grid-config
 Expander
 g-fx-midi
 disabled
-3
+4
 0
 1
 Grid
@@ -8389,18 +8401,6 @@ slide=down
 1
 Grid
 grid-config-midi
-
-0
-0
-0
-Expander
-g_synth
-
-4
-0
-1
-Grid
-synth
 
 0
 0

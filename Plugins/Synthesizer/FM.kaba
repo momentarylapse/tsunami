@@ -136,22 +136,25 @@ Grid ? ''
 		# initial
 		p_out = vec2(40, 60)
 		for i=>p in p_osci
-			p = vec2(100+15*i, i*20)#vec2((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
-			var has_links = fc.osc[i].target_out
-			for t in fc.osc[i].target
-				has_links = has_links or t
-			if not has_links
-				p += vec2(1000,1000)
+			var p_parent = vec2(1000, 1000)
+			if fc.osc[i].target_out
+				p_parent = p_out
+			for k=>t in fc.osc[i].target
+				if t
+					p_parent = p_osci[k]
+			p = p_parent + vec2(LINK_LENGTH, i * 10)
 		for i in 0:2000
 			iterate_osci_pos()
 	func _f_link(a: vec2, b: vec2) -> vec2
 		let d = len(b - a)
 		let dir = (b - a) * (1/d)
-		return dir * (d - LINK_LENGTH) * 0.1 + vec2(0, (b.y-a.y) * 0.05)
+		return vec2(0, (b.y-a.y) * 0.05)
 	func _f_free(a: vec2, b: vec2) -> vec2
+		if abs(a.x - b.x) > 10
+			return [0,0]
 		let d = len(b - a)
 		let dir = (b - a) * (1/d)
-		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
+		return dir * min(d - OSCI_RADIUS*2.5, 0) * 0.3
 	func mut iterate_osci_pos()
 		var f: vec2[NUM_OSCILLATORS]
 		for i=>o in fc.osc
@@ -217,7 +220,13 @@ Grid ? ''
 		p.set_color(colors.text_soft1)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
-		draw_spline(p, [z2.x + 18, z2.y], [50,0], [z1.x - 18, z1.y], [50,0])
+		let p0 = vec2(z2.x + 18, z2.y)
+		let p1 = vec2(z1.x - 18, z1.y)
+		let v = vec2(50, 0)
+		draw_spline(p, p0, v, p1, v)
+		let m = spline_pos(p0, v, p1, v, 0.5)
+		let dm = spline_vel(p0, v, p1, v, 0.5).normalized()
+		draw_arrow(p, m + dm * 6, m - dm * 6)
 	
 	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)

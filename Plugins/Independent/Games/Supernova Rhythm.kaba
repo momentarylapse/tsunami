@@ -16,7 +16,7 @@ Grid ? ''
 	---|
 	Button button 'X'")
 	
-		cam = new AudioView.ViewPort(nil)
+		cam = new AudioView.ViewPort()
 		mp = new MidiPainter(c.session.song, cam, nil, nil, colors)
 		gp = new GridPainter(c.session.song, cam, nil, nil, colors)
 	

@@ -172,6 +172,7 @@ void PluginManager::link_app_data() {
 	ext->link("SelectSample", (void*)&wrapper_select_sample);
 	ext->link("ChooseModule", (void*)&wrapper_choose_module);
 	ext->link("draw_boxed_str", (void*)&draw_boxed_str);
+	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
 

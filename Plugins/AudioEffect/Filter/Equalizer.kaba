@@ -6,6 +6,7 @@ use helper.grid
 use helper.tone.kaba
 use helper.filter
 use helper.curves
+use helper.draw
 
 
 

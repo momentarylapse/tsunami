@@ -19,3 +19,15 @@ const COLORS = [color.RED, color.ORANGE, color.YELLOW, color.GREEN, color(0.2,0.
 func cool_color(index: int) -> color
 	let col = COLORS[loop(index, 0, len(COLORS))]
 	return color.interpolate(col, colors.text_soft2, 0.3)
+
+
+
+enum Align
+	LEFT = -1
+	CENTER = 0
+	RIGHT = 1
+
+func extern draw_boxed_str(p: Painter, pos: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
+
+func extern draw_arrow(p: Painter, start: vec2, end: vec2)
+

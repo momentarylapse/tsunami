@@ -793,12 +793,5 @@ func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: Sample
 
 func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string?->void, old_name: string?)
 
-enum Align
-	LEFT = -1
-	CENTER = 0
-	RIGHT = 1
-
-func extern draw_boxed_str(c: Painter, p: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
-
 #extern void get_style_colors(Panel p, string id, color{} colors)
 func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])

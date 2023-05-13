@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933334"
+   version="1.1"
+   id="svg1149"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="track-group-symbolic.svg"
+   inkscape:export-filename="/home/michi/Projekte/Tsunami/static/track-group.png"
+   inkscape:export-xdpi="18"
+   inkscape:export-ydpi="18"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs1143" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.919596"
+     inkscape:cx="24.180526"
+     inkscape:cy="44.509846"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1131"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2245" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata1146">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-280.06665)">
+    <path
+       style="color:#000000;fill:#000000;stroke-width:0.418399;-inkscape-stroke:none"
+       d="m 8.3878013,285.94432 -1.0402777,2.88875 -2.1107913,-1.64091 0.89155,4.07449 h 0.1683403 4.3506984 l 0.891549,-4.07449 -2.110791,1.64091 z m 0,1.23558 0.8417016,2.33798 1.6531671,-1.28544 -0.57203,2.61581 H 6.4649629 l -0.5720302,-2.61581 1.6531671,1.28544 z"
+       id="path2247" />
+    <circle
+       style="opacity:1;fill-opacity:1;stroke:none;stroke-width:1.06492;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4676"
+       cx="8.3603516"
+       cy="286.02399"
+       r="0.79868716" />
+    <circle
+       style="opacity:1;fill-opacity:1;stroke:none;stroke-width:0.869226;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4676-7"
+       cx="5.5450168"
+       cy="287.56546"
+       r="0.65191644" />
+    <circle
+       style="opacity:1;fill-opacity:1;stroke:none;stroke-width:0.869226;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4676-5"
+       cx="11.252568"
+       cy="287.57132"
+       r="0.65191644" />
+  </g>
+</svg>

@@ -3800,7 +3800,7 @@ Grid
 vertical
 0
 0
-4
+6
 Group
 nd_g_frequency
 
@@ -3838,27 +3838,87 @@ homogenousx
 0
 3
 ToggleButton
-type-audio-mono
+type-audio
 flat,huge,expandx,ignorefocus
 0
-0
-0
-ToggleButton
-type-audio-stereo
-flat,huge,expandx,ignorefocus
-1
 0
 0
 ToggleButton
 type-midi
 flat,huge,expandx,ignorefocus
+1
+0
+0
+ToggleButton
+type-preset
+flat,huge,expandx,ignorefocus
 2
+0
+0
+Revealer
+revealer-channels
+
+2
+0
+1
+Group
+g-channels
+
+0
+0
+1
+Grid
+?
+
+0
+0
+4
+Label
+?
+expandx
+0
+0
+0
+RadioButton
+channels:mono
+
+1
+0
+0
+RadioButton
+channels:stereo
+
+2
+0
+0
+Label
+?
+expandx
+3
+0
+0
+Revealer
+revealer-presets
+
+3
+0
+1
+Group
+g-presets
+
+0
+0
+1
+ListView
+presets
+expandx,height=150,nobar
+0
 0
 0
 Group
 nd_g_metronome
 
-2
+4
 0
 1
 Grid
@@ -3954,7 +4014,7 @@ divisor
 Grid
 ?
 buttonbar
-3
+5
 0
 2
 Button
@@ -3981,13 +4041,13 @@ Grid
 vertical,width=300
 0
 0
-9
+10
 Grid
 ?
 homogenousx
 0
 0
-4
+8
 ToggleButton
 type-audio
 flat,huge,expandx,ignorefocus
@@ -4002,20 +4062,50 @@ flat,huge,expandx,ignorefocus
 0
 ToggleButton
 type-metronome
-flat,huge,expandx,ignorefocus
+image=track-time,flat,huge,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 type-master
-flat,huge,expandx,ignorefocus
+image=track-group,flat,huge,expandx,ignorefocus
 3
 0
 0
+ToggleButton
+type-import
+image=hui:open,flat,big,expandx,ignorefocus,disabled
+0
+1
+0
+ToggleButton
+type-copy
+image=hui:copy,flat,big,expandx,ignorefocus,disabled
+1
+1
+0
+ToggleButton
+type-render
+image=hui:media-record,flat,big,expandx,ignorefocus,disabled
+2
+1
+0
+ToggleButton
+type-preset
+flat,big,expandx,ignorefocus
+3
+1
+0
+Revealer
+revealer-channels
+
+1
+0
+1
 Group
 g-channels
 
-1
+0
 0
 1
 Grid
@@ -4023,23 +4113,41 @@ Grid
 
 0
 0
-2
+4
+Label
+?
+expandx
+0
+0
+0
 RadioButton
 channels:mono
 
-0
+1
 0
 0
 RadioButton
 channels:stereo
 
+2
+0
+0
+Label
+?
+expandx
+3
+0
+0
+Revealer
+revealer-instrument
+
+2
+0
 1
-0
-0
 Group
 g-instrument
 
-2
+0
 0
 1
 Grid
@@ -4072,10 +4180,16 @@ image=hui:edit,flat,ignorefocus
 1
 0
 0
+Revealer
+revealer-metronome
+
+3
+0
+1
 Group
 g-metronome
 
-3
+0
 0
 1
 Grid
@@ -4150,10 +4264,16 @@ divisor
 3
 2
 0
+Revealer
+revealer-synth
+
+4
+0
+1
 Group
 g-synth
 
-4
+0
 0
 1
 Label
@@ -4162,16 +4282,40 @@ Label
 0
 0
 0
+Revealer
+revealer-master
+
+5
+0
+1
 Label
 l-master
 italic,wrap
-5
+0
+0
+0
+Revealer
+revealer-presets
+
+6
+0
+1
+Group
+g-presets
+
+0
+0
+1
+ListView
+presets
+expandx,height=150,nobar
+0
 0
 0
 Revealer
 g-fx
 
-6
+7
 0
 1
 Grid
@@ -4201,7 +4345,7 @@ grid-config
 Revealer
 g-fx-midi
 hidden
-7
+8
 0
 1
 Grid
@@ -4231,7 +4375,7 @@ grid-config-midi
 Grid
 ?
 buttonbar
-8
+9
 0
 2
 Button
@@ -8683,7 +8827,7 @@ default
 # Language
 English
 # Number Of IDs
-766
+777
 # Text
 /bars-add
 Add bars...
@@ -10020,6 +10164,9 @@ Instrument
 new-track-dialog/g-metronome
 Metronome
 
+new-track-dialog/g-presets
+Presets
+
 new-track-dialog/g-synth
 Synthesizer
 
@@ -10050,23 +10197,44 @@ Create
 new-track-dialog/pattern
 
 example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
+new-track-dialog/presets
+name
+
 new-track-dialog/type-audio
 ∿
 Audio
+new-track-dialog/type-copy
+
+Copy existing track
+new-track-dialog/type-import
+
+Import from file
 new-track-dialog/type-master
-M
+
 Master
 new-track-dialog/type-metronome
-M
+
 Metronome
 new-track-dialog/type-midi
 ♫
 Midi
+new-track-dialog/type-preset
+❤
+From list of presets
+new-track-dialog/type-render
+
+Render selection into audio track
 new_dialog/beats
 1
 beats per bar
 new_dialog/beats_per_minute
 90
+
+new_dialog/channels:mono
+Mono
+
+new_dialog/channels:stereo
+Stereo
 
 new_dialog/complex
 
@@ -10074,6 +10242,12 @@ complex beat pattern
 new_dialog/divisor
 𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+new_dialog/g-channels
+Channels
+
+new_dialog/g-presets
+Presets
+
 new_dialog/metronome
 Add
 
@@ -10107,15 +10281,18 @@ Create
 new_dialog/pattern
 
 example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
-new_dialog/type-audio-mono
+new_dialog/presets
+name
+
+new_dialog/type-audio
 ∿
-Audio (mono)
-new_dialog/type-audio-stereo
-∿₂
-Audio (stereo)
+Audio
 new_dialog/type-midi
 ♫
 Midi
+new_dialog/type-preset
+❤
+From preset list
 pause_add_dialog/duration
 1.0
 

@@ -6,9 +6,19 @@ Dialog new_dialog "New file" width=250 height=80 headerbar closebutton=no
 				Label /per_second "/s"
 		Group nd_g_track "First track"
 			Grid ? "" homogenousx
-				ToggleButton type-audio-mono "∿" flat huge expandx "tooltip=Audio (mono)" ignorefocus
-				ToggleButton type-audio-stereo "∿₂" flat huge expandx "tooltip=Audio (stereo)" ignorefocus
+				ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
 				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
+				ToggleButton type-preset "❤" flat huge expandx "tooltip=From preset list" ignorefocus
+		Revealer revealer-channels ""
+			Group g-channels "Channels"
+				Grid ? ""
+					Label ? "" expandx
+					RadioButton channels:mono "Mono"
+					RadioButton channels:stereo "Stereo"
+					Label ? "" expandx
+		Revealer revealer-presets ""
+			Group g-presets "Presets"
+				ListView presets "name" expandx height=150 nobar
 		Group nd_g_metronome "Metronome"
 			Grid ? "" vertical
 				CheckBox metronome "Add"

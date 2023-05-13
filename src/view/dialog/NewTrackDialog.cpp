@@ -49,6 +49,7 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	event("type-midi", [this] { on_type(SignalType::MIDI); });
 	event("type-metronome", [this] { on_type(SignalType::BEATS); });
 	event("type-master", [this] { on_type(SignalType::GROUP); });
+	event("type-preset", [this] { on_type((SignalType)-1); });
 	event("beats", [this] { on_beats(); });
 	event("divisor", [this] { on_divisor(); });
 	event("pattern", [this] { on_pattern(); });
@@ -146,13 +147,17 @@ void NewTrackDialog::on_type(SignalType t) {
 	check("type-midi", t == SignalType::MIDI);
 	check("type-metronome", t == SignalType::BEATS);
 	check("type-master", t == SignalType::GROUP);
+	check("type-preset", t == (SignalType)-1);
 
-	hide_control("g-channels", t != SignalType::AUDIO);
-	hide_control("g-instrument", t != SignalType::MIDI);
-	hide_control("g-synth", t != SignalType::MIDI and t != SignalType::BEATS);
-	hide_control("g-fx-midi", true);//t != SignalType::MIDI);
-	hide_control("g-metronome", t != SignalType::BEATS);
-	hide_control("l-master", t != SignalType::GROUP);
+	enable("ok", type != (SignalType)-1);
+
+	expand("revealer-channels", t == SignalType::AUDIO);
+	expand("revealer-instrument", t == SignalType::MIDI);
+	expand("revealer-synth", t == SignalType::MIDI or t == SignalType::BEATS);
+	//expand("g-fx-midi", true);//t == SignalType::MIDI);
+	expand("revealer-metronome", t == SignalType::BEATS);
+	expand("revealer-master", t == SignalType::GROUP);
+	expand("revealer-presets", t == (SignalType)-1);
 }
 
 void NewTrackDialog::on_metronome() {

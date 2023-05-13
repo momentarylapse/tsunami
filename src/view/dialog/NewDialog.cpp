@@ -27,8 +27,9 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_int("sample_rate", 1);
 	expand("metro-revealer", false);
 
-	type = SignalType::AUDIO_MONO;
-	check("type-audio-mono", true);
+	on_type(SignalType::AUDIO);
+
+	check("channels:mono", true);
 
 	new_bar = {1000, 4, 1};
 	set_int("num_bars", 32);
@@ -40,9 +41,10 @@ NewDialog::NewDialog(hui::Window *_parent):
 	event("hui:close", [this] { request_destroy(); });
 	event("ok", [this] { on_ok(); });
 	event("metronome", [this] { on_metronome(); });
-	event("type-audio-mono", [this] { on_type(SignalType::AUDIO_MONO); });
-	event("type-audio-stereo", [this] { on_type(SignalType::AUDIO_STEREO); });
+	event("type-audio", [this] { on_type(SignalType::AUDIO); });
+	//event("type-audio-stereo", [this] { on_type(SignalType::AUDIO_STEREO); });
 	event("type-midi", [this] { on_type(SignalType::MIDI); });
+	event("type-preset", [this] { on_type((SignalType)-1); });
 	event("beats", [this] { on_beats(); });
 	event("divisor", [this] { on_divisor(); });
 	event("pattern", [this] { on_pattern(); });
@@ -99,9 +101,14 @@ void NewDialog::on_complex() {
 
 void NewDialog::on_type(SignalType t) {
 	type = t;
-	check("type-audio-mono", t == SignalType::AUDIO_MONO);
-	check("type-audio-stereo", t == SignalType::AUDIO_STEREO);
+	check("type-audio", t == SignalType::AUDIO);
+	//check("type-audio-stereo", t == SignalType::AUDIO_STEREO);
 	check("type-midi", t == SignalType::MIDI);
+	check("type-preset", t == (SignalType)-1);
+
+	expand("revealer-channels", type == SignalType::AUDIO);
+	expand("revealer-presets", type == (SignalType)-1);
+	enable("ok", type != (SignalType)-1);
 
 	if (t == SignalType::MIDI) {
 		check("metronome", true);

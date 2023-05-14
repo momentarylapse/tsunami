@@ -47,6 +47,8 @@ ApiDescription api_descriptions[] = {
 
 // inside lock() ... unlock()
 void pulse_wait_op(Session *session, pa_operation *op) {
+	if (!op)
+		return;
 	//printf("-w-\n");
 	int n = 0;
 	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING) {
@@ -294,8 +296,9 @@ void DeviceManager::_update_devices_audio_pulse() {
 	lock();
 	
 	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pulse_sink_info_callback, this);
-	if (!_pulse_test_error(session, "pa_context_get_sink_info_list"))
-		pulse_wait_op(session, op);
+	if (!op)
+		_pulse_test_error(session, "pa_context_get_sink_info_list");
+	pulse_wait_op(session, op);
 
 	// system default
 	def = get_device_create(DeviceType::AUDIO_INPUT, "");
@@ -304,8 +307,9 @@ void DeviceManager::_update_devices_audio_pulse() {
 	def->present = true;
 
 	op = pa_context_get_source_info_list(pulse_context, pulse_source_info_callback, this);
-	if (!_pulse_test_error(session, "pa_context_get_source_info_list"))
-		pulse_wait_op(session, op);
+	if (!op)
+		_pulse_test_error(session, "pa_context_get_source_info_list");
+	pulse_wait_op(session, op);
 
 	unlock();
 
@@ -542,10 +546,10 @@ void DeviceManager::kill_library() {
 	if (audio_api == ApiType::PULSE and pulse_context) {
 		
 		pa_threaded_mainloop_stop(pulse_mainloop);
-		_pulse_test_error(session, "pa_threaded_mainloop_stop");
+		//_pulse_test_error(session, "pa_threaded_mainloop_stop");
 		
 		pa_context_disconnect(pulse_context);
-		_pulse_test_error(session, "pa_context_disconnect");
+		//_pulse_test_error(session, "pa_context_disconnect");
 		
 		pa_context_unref(pulse_context);
 		//_pulse_test_error(session, "pa_context_unref"); // would require a context...

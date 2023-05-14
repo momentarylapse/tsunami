@@ -639,7 +639,7 @@ void AudioOutput::reset_state() {
 			session->debug("out", "flush");
 			if (pulse_stream) {
 				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
-				if (op)
+				if (!op)
 					_pulse_test_error("pa_stream_flush");
 				pulse_wait_op(session, op);
 			}

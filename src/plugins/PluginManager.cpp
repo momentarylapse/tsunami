@@ -691,7 +691,7 @@ void PluginManager::link_app_data() {
 		//ext->link_class_func("AudioOutput.sample_rate", &OutputStream::sample_rate);
 		ext->link_class_func("AudioOutput.get_volume", &AudioOutput::get_volume);
 		ext->link_class_func("AudioOutput.set_volume", &AudioOutput::set_volume);
-		ext->link_class_func("AudioOutput.samples_played", &AudioOutput::samples_played);
+		ext->link_class_func("AudioOutput.samples_played", &AudioOutput::estimate_samples_played);
 		ext->link_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
 	}
 	

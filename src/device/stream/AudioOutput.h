@@ -68,7 +68,7 @@ public:
 
 	void _cdecl set_prebuffer_size(int size);
 
-	base::optional<int64> samples_played();
+	base::optional<int64> estimate_samples_played();
 
 	base::optional<int> get_latency();
 
@@ -89,6 +89,7 @@ private:
 	pa_operation *operation = nullptr;
 	void _pulse_flush_op();
 	void _pulse_start_op(pa_operation *op, const char *msg);
+	int64 samples_offset_since_reset = 0;
 #endif
 
 #if HAS_LIB_PORTAUDIO
@@ -116,13 +117,19 @@ private:
 
 	Device *cur_device;
 	void update_device();
+	void _clear_data_state();
 
 	enum class State {
-		NO_DEVICE,
-		DEVICE_WITHOUT_DATA,
+		UNPREPARED_NO_DEVICE_NO_DATA,
+		UNPREPARED_NO_DEVICE,
+		UNPREPARED_NO_DATA,
 		PAUSED,
 		PLAYING,
 	} state;
+	void _set_state(State s);
+
+	bool has_data() const;
+	bool has_device() const;
 
 	int latency;
 	//timeval xxx_prev_time;

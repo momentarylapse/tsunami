@@ -65,13 +65,13 @@ MidiAccumulator *CaptureTrackData::midi_recorder() {
 
 void CaptureTrackData::start_sync_before(AudioOutput *out) {
 	sync_points.clear();
-	samples_played_before_capture = out->samples_played();
+	samples_played_before_capture = out->estimate_samples_played();
 	samples_skiped_before_capture = audio_recorder()->samples_skipped;
 }
 
 void CaptureTrackData::sync(AudioOutput *out) {
 	if (type() == SignalType::AUDIO) {
-		auto sr = out->samples_played();
+		auto sr = out->estimate_samples_played();
 		auto sp = audio_input()->samples_recorded();
 		if (sr.has_value() and sp.has_value()) {
 			SyncPoint p;

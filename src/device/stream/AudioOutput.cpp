@@ -26,7 +26,7 @@ namespace kaba {
 #include <portaudio.h>
 #endif
 
-static const bool STREAM_WARNINGS = false;
+static const bool STREAM_WARNINGS = true;
 
 const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 
@@ -65,7 +65,7 @@ int xxx_total_read = 0;
 
 
 void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
-	//printf("output request %d\n", (int)nbytes);
+	//printf("output request %d\n", (int)nbytes/8);
 	auto stream = static_cast<AudioOutput*>(userdata);
 
 	if (nbytes == 0)
@@ -118,24 +118,20 @@ void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) 
 #endif
 
 
+// return: underrun?
 bool AudioOutput::feed_stream_output(int frames_request, float *out) {
-	if (state != State::PLAYING) {
-		// output silence...
-		memset(out, 0, frames_request * 8);
-		return false;
-	}
 
-
-	int done = 0;
-
+	//printf("feed %d\n", frames_request);
 	int available = ring_buf.available();
 	int frames = min(frames_request, available);
 	samples_requested += frames_request;
 
 
-//	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
+	//printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
 
-	for (int n=0; (n<2) and (done < (int)frames); n++) {
+	// read 2x in case of wrap-around
+	int done = 0;
+	for (int n=0; (n<2) and (done < frames); n++) {
 		AudioBuffer b;
 		ring_buf.read_ref(b, frames - done);
 		b.interleave(out, device_manager->get_output_volume() * config.volume);
@@ -144,31 +140,9 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 		done += b.length;
 	}
 	done = frames;
-	
-	
-	
-	#if 0
-	nnn ++;
-	if (nnn > 10) {
-		const pa_timing_info *ti = pa_stream_get_timing_info(pulse_stream);
-		if (ti and !ti->read_index_corrupt and !ti->write_index_corrupt and (pa_timeval_diff(&ti->timestamp, &xxx_prev_time) != 0)) {
-			//printf("%d\n", (int)pa_timeval_diff(&ti->timestamp, &xxx_prev_time) / 1000);
-		//	printf("%d   %d   %d   %d   %d\n", ti->write_index/8, ti->read_index/8, ti->since_underrun, (long)ti->transport_usec, (long)ti->sink_usec);
-			int bl = (ti->write_index - ti->read_index)/8;
-			//int lat = (double)bl / session->sample_rate() * 1000 + (ti->sink_usec - ti->transport_usec)/1000;
-			//printf("   %d ms\n", lat);
-			/* / (double)session->sample_rate() * 1000.0*/
-			double usec2samples = session->sample_rate() / 1000000.0;
-			latency = bl + (ti->sink_usec + ti->transport_usec) * usec2samples;
-//			printf("%d   %.0f    %.0f\n", bl, ti->sink_usec*usec2samples, ti->transport_usec*usec2samples);
-			//printf("%d   %d\n", ti->write_index/8 - (xxx_total_read + xxx_fake_read), ti->read_index/8 - (xxx_total_read + xxx_fake_read));
-			nnn = 0;
-			xxx_prev_time = ti->timestamp;
-		}
-	}
-	xxx_total_read += done;
-	#endif
 
+
+	// underflow? -> add silence
 	if (available < frames_request) {
 		if (!read_end_of_stream and !buffer_is_cleared)
 			if (STREAM_WARNINGS)
@@ -183,7 +157,6 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 	}
 
 	return false;
-
 }
 
 #if HAS_LIB_PORTAUDIO
@@ -231,7 +204,7 @@ string AudioOutput::Config::auto_conf(const string &name) const {
 AudioOutput::AudioOutput(Session *_session) :
 	Module(ModuleCategory::STREAM, "AudioOutput"),
 	ring_buf(1048576) {
-	state = State::NO_DEVICE;
+	state = State::UNPREPARED_NO_DEVICE_NO_DATA;
 	session = _session;
 	source = nullptr;
 
@@ -281,7 +254,7 @@ void AudioOutput::__delete__() {
 }
 
 void AudioOutput::_create_dev() {
-	if (state != State::NO_DEVICE)
+	if (has_device())
 		return;
 	session->debug("out", "create device");
 	dev_sample_rate = session->sample_rate();
@@ -304,10 +277,11 @@ void AudioOutput::_create_dev() {
 
 		pa_buffer_attr attr_out;
 		attr_out.fragsize = -1; // recording only
-		attr_out.maxlength = hui::config.get_int("Output.Pulseaudio.maxlength", 1024);
-		attr_out.minreq = hui::config.get_int("Output.Pulseaudio.minreq", -1);
-		attr_out.tlength = hui::config.get_int("Output.Pulseaudio.tlength", -1);
-		attr_out.prebuf = -1;
+		attr_out.maxlength = hui::config.get_int("Output.Pulseaudio.maxlength", -1);
+		attr_out.minreq = hui::config.get_int("Output.Pulseaudio.minreq", 1024);
+		attr_out.tlength = hui::config.get_int("Output.Pulseaudio.tlength", 1024);
+		attr_out.prebuf = hui::config.get_int("Output.Pulseaudio.prebuf", 0); // don't prebuffer
+		// prebuf = 0 also prevents pausing during buffer underruns
 
 		const char *dev = nullptr;
 		if (!cur_device->is_default())
@@ -361,11 +335,14 @@ void AudioOutput::_create_dev() {
 	}
 #endif
 	device_manager->unlock();
-	state = State::DEVICE_WITHOUT_DATA;
+	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
+		_set_state(State::UNPREPARED_NO_DATA);
+	else if (state == State::UNPREPARED_NO_DEVICE)
+		_set_state(State::PAUSED);
 }
 
 void AudioOutput::_kill_dev() {
-	if (state != State::DEVICE_WITHOUT_DATA and state != State::PAUSED)
+	if (!has_device())
 		return;
 	session->debug("out", "kill device");
 
@@ -397,16 +374,25 @@ void AudioOutput::_kill_dev() {
 	}
 #endif
 
-	state = State::NO_DEVICE;
+	_clear_data_state();
+	_set_state(State::UNPREPARED_NO_DEVICE_NO_DATA);
 }
 
-
+void AudioOutput::_clear_data_state() {
+	ring_buf.clear();
+	buffer_is_cleared = true;
+	read_end_of_stream = false;
+	played_end_of_stream = false;
+	samples_requested = 0;
+	fake_samples_played = 0;
+}
 
 
 void AudioOutput::stop() {
 	os::require_main_thread("out.stop");
 	_pause();
 }
+
 #if HAS_LIB_PULSEAUDIO
 // NOT inside lock()/unlock()
 void AudioOutput::_pulse_flush_op() {
@@ -453,7 +439,11 @@ void AudioOutput::_pause() {
 	}
 #endif
 
-	state = State::PAUSED;
+	_set_state(State::PAUSED);
+}
+
+void AudioOutput::_set_state(State s) {
+	state = s;
 	out_state_changed.notify();
 }
 
@@ -471,6 +461,7 @@ void AudioOutput::_unpause() {
 		pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 		device_manager->unlock();
 		_pulse_start_op(op, "pa_stream_cork");
+		_pulse_flush_op();
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -482,8 +473,7 @@ void AudioOutput::_unpause() {
 	}
 #endif
 
-	state = State::PLAYING;
-	out_state_changed.notify();
+	_set_state(State::PLAYING);
 }
 
 int AudioOutput::_read_stream(int buffer_size) {
@@ -527,19 +517,23 @@ void AudioOutput::set_device(Device *d) {
 	out_changed.notify();
 }
 
-void AudioOutput::start() {
-	os::require_main_thread("out.start");
-	if (state == State::NO_DEVICE)
-		_create_dev();
+#include "../../lib/os/time.h"
 
-	if (state == State::DEVICE_WITHOUT_DATA)
+void AudioOutput::start() {
+	os::sleep(0.1f);
+	os::require_main_thread("out.start");
+
+	if (!has_data())
 		_fill_prebuffer();
+
+	if (!has_device())
+		_create_dev();
 
 	_unpause();
 }
 
 void AudioOutput::_fill_prebuffer() {
-	if (state != State::DEVICE_WITHOUT_DATA)
+	if (has_data())
 		return;
 	session->debug("out", "prebuf");
 
@@ -551,10 +545,10 @@ void AudioOutput::_fill_prebuffer() {
 		if (!pulse_stream)
 			return;
 
-		device_manager->lock();
+		/*device_manager->lock();
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
 		device_manager->unlock();
-		_pulse_start_op(op, "pa_stream_prebuf");
+		_pulse_start_op(op, "pa_stream_prebuf");*/
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");
@@ -573,8 +567,10 @@ void AudioOutput::_fill_prebuffer() {
 	}
 #endif
 
-	state = State::PAUSED;
-	out_state_changed.notify();
+	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
+		_set_state(State::UNPREPARED_NO_DEVICE);
+	else if (state == State::UNPREPARED_NO_DATA)
+		_set_state(State::PAUSED);
 }
 
 int AudioOutput::get_available() {
@@ -601,7 +597,7 @@ void AudioOutput::update_device() {
 	auto old_state = state;
 	if (state == State::PLAYING)
 		_pause();
-	if (state == State::PAUSED)
+	if (has_device())
 		_kill_dev();
 
 	cur_device = config.device;
@@ -647,11 +643,12 @@ void AudioOutput::on_read_end_of_stream() {
 }
 
 void AudioOutput::reset_state() {
-	if (state == State::NO_DEVICE)
+	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
 		return;
 	if (state == State::PLAYING)
 		_pause();
 	os::require_main_thread("out.reset");
+
 	if (state == State::PAUSED) {
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
@@ -661,16 +658,22 @@ void AudioOutput::reset_state() {
 				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
 				device_manager->unlock();
 				_pulse_start_op(op, "pa_stream_flush");
+				_pulse_flush_op();
+
+				auto get_write_offset = [this] () {
+					if (auto info = pa_stream_get_timing_info(pulse_stream))
+						if (info->read_index_corrupt == 0)
+							return info->write_index / 8 - samples_offset_since_reset;
+					return samples_requested;
+				};
+				samples_offset_since_reset += get_write_offset();
 			}
 		}
 #endif
-		state = State::DEVICE_WITHOUT_DATA;
+		_set_state(State::UNPREPARED_NO_DATA);
 	}
 
-	ring_buf.clear();
-	buffer_is_cleared = true;
-	read_end_of_stream = false;
-	played_end_of_stream = false;
+	_clear_data_state();
 }
 
 int AudioOutput::command(ModuleCommand cmd, int param) {
@@ -681,9 +684,10 @@ int AudioOutput::command(ModuleCommand cmd, int param) {
 		stop();
 		return 0;
 	} else if (cmd == ModuleCommand::PREPARE_START) {
-		if (state == State::NO_DEVICE)
+		if (!has_data())
+			_fill_prebuffer();
+		if (!has_device())
 			_create_dev();
-		_fill_prebuffer();
 		return 0;
 	} else if (cmd == ModuleCommand::SUCK) {
 		if (ring_buf.available() >= prebuffer_size)
@@ -698,27 +702,42 @@ bool AudioOutput::is_playing() {
 	return (state == State::PLAYING) or (state == State::PAUSED);
 }
 
+bool AudioOutput::has_data() const {
+	return state != State::UNPREPARED_NO_DATA and state != State::UNPREPARED_NO_DEVICE_NO_DATA;
+}
+
+bool AudioOutput::has_device() const {
+	return state != State::UNPREPARED_NO_DEVICE and state != State::UNPREPARED_NO_DEVICE_NO_DATA;
+}
+
 base::optional<int> AudioOutput::get_latency() {
 	return base::None;
 	//return latency;
 }
 
-base::optional<int64> AudioOutput::samples_played() {
-	if (state == State::NO_DEVICE)
+// (roughly) how many samples might the sound card have played since the last reset?
+base::optional<int64> AudioOutput::estimate_samples_played() {
+	if (!has_device())
 		return base::None;
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		pa_usec_t t;
 		// PA_STREAM_INTERPOLATE_TIMING
 		if (auto info = pa_stream_get_timing_info(pulse_stream)) {
+			auto dbuffer = (info->write_index - info->read_index) / 8;
+			if (false)
+				printf("%6ld  %6ld  %6ld | w=%-6lld  r=%-6lld  d=%-6ld | req=%-8lld\n", info->configured_sink_usec, info->sink_usec, info->transport_usec, info->write_index/8-samples_offset_since_reset, info->read_index/8-samples_offset_since_reset, dbuffer, samples_requested);
+			double samples_per_usec = session->sample_rate() / 1000000.0;
+			double delay_samples = (double)(info->sink_usec + info->transport_usec) * samples_per_usec;
 			if (info->read_index_corrupt == 0)
-				return info->read_index / 8;
+				return max(info->write_index / 8 - samples_offset_since_reset - (int64)delay_samples, (int64)0);
 			//printf("    %d %d\n", info->write_index, info->read_index);
 		}
+		/*pa_usec_t t;
 		if (pa_stream_get_time(pulse_stream, &t) == 0) {
 			double usec2samples = session->sample_rate() / 1000000.0;
+			printf("%lld  %.3f\n", fake_samples_played, t/1000000.0);
 			return (double)t * usec2samples - fake_samples_played;
-		}
+		}*/
 		return samples_requested;
 	}
 #endif

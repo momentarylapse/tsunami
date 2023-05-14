@@ -75,7 +75,7 @@ void Playback::prepare(const Range &range, bool allow_loop) {
 	renderer->allow_loop = allow_loop;
 	renderer->set_range(range);
 	renderer->allow_layers(view()->get_playable_layers());
-	auto p0 = output_stream->samples_played();
+	auto p0 = output_stream->estimate_samples_played();
 	if (p0.has_value())
 		_stream_offset = range.offset - *p0;
 	else
@@ -124,7 +124,7 @@ int Playback::get_pos() {
 		_sync_pos();
 
 	int pos = _stream_offset;
-	auto p0 = output_stream->samples_played();
+	auto p0 = output_stream->estimate_samples_played();
 	if (p0.has_value())
 		pos += *p0;
 	if (looping() and renderer->allow_loop)
@@ -134,7 +134,7 @@ int Playback::get_pos() {
 
 // crappy syncing....
 void Playback::_sync_pos() {
-	auto spos = output_stream->samples_played();
+	auto spos = output_stream->estimate_samples_played();
     auto lat = output_stream->get_latency();
     if (lat.has_value() and spos.has_value()) {
         int xpos = renderer->get_pos(-output_stream->get_available() - *lat);
@@ -145,7 +145,7 @@ void Playback::_sync_pos() {
 
 void Playback::set_pos(int pos) {
 	renderer->set_pos(pos);
-	auto p0 = output_stream->samples_played();
+	auto p0 = output_stream->estimate_samples_played();
 	if (p0.has_value())
 		_stream_offset = pos - *p0;
 	else

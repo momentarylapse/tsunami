@@ -368,10 +368,11 @@ void AudioOutput::_kill_dev() {
 	if (state != State::DEVICE_WITHOUT_DATA and state != State::PAUSED)
 		return;
 	session->debug("out", "kill device");
-	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
+		_pulse_flush_op();
+		device_manager->lock();
 		pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
 		pa_stream_set_write_callback(pulse_stream, nullptr, nullptr);
 		pa_stream_set_underflow_callback(pulse_stream, nullptr, nullptr);
@@ -382,18 +383,20 @@ void AudioOutput::_kill_dev() {
 		pa_stream_unref(pulse_stream);
 		//_pulse_test_error("pa_stream_unref");
 		pulse_stream = nullptr;
+		device_manager->unlock();
 	}
 #endif
 
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
+		device_manager->lock();
 		PaError err = Pa_CloseStream(portaudio_stream);
 		_portaudio_test_error(err, "Pa_CloseStream");
 		portaudio_stream = nullptr;
+		device_manager->unlock();
 	}
 #endif
 
-	device_manager->unlock();
 	state = State::NO_DEVICE;
 }
 
@@ -404,30 +407,52 @@ void AudioOutput::stop() {
 	os::require_main_thread("out.stop");
 	_pause();
 }
+#if HAS_LIB_PULSEAUDIO
+// NOT inside lock()/unlock()
+void AudioOutput::_pulse_flush_op() {
+	if (operation) {
+		device_manager->lock();
+		pulse_wait_op(session, operation);
+		device_manager->unlock();
+	}
+	operation = nullptr;
+}
+
+// NOT inside lock()/unlock()
+void AudioOutput::_pulse_start_op(pa_operation *op, const char *msg) {
+	if (!op) {
+		_pulse_test_error(msg);
+		return;
+	}
+	_pulse_flush_op();
+	operation = op;
+	//pulse_wait_op(session, op);
+}
+#endif
 
 void AudioOutput::_pause() {
 	if (state != State::PLAYING)
 		return;
 	session->debug("out", "pause");
-	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		if (!op)
-			_pulse_test_error("pa_stream_cork");
-		pulse_wait_op(session, op);
+		device_manager->lock();
+		auto op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
+		device_manager->unlock();
+		_pulse_start_op(op, "pa_stream_cork");
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
+		device_manager->lock();
 		//Pa_AbortStream Pa_StopStream
 		PaError err = Pa_AbortStream(portaudio_stream);
 		_portaudio_test_error(err, "Pa_AbortStream");
+		device_manager->unlock();
 	}
 #endif
 
-	device_manager->unlock();
 	state = State::PAUSED;
 	out_state_changed.notify();
 }
@@ -439,24 +464,24 @@ void AudioOutput::_unpause() {
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
-	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
+		device_manager->lock();
 		pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-		if (!op)
-			_pulse_test_error("pa_stream_cork");
-		pulse_wait_op(session, op);
+		device_manager->unlock();
+		_pulse_start_op(op, "pa_stream_cork");
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
+		device_manager->lock();
 		PaError err = Pa_StartStream(portaudio_stream);
 		_portaudio_test_error(err, "Pa_StartStream");
+		device_manager->unlock();
 	}
 #endif
 
-	device_manager->unlock();
 	state = State::PLAYING;
 	out_state_changed.notify();
 }
@@ -520,20 +545,16 @@ void AudioOutput::_fill_prebuffer() {
 
 	// we need some data in the buffer...
 	_read_stream(prebuffer_size);
-	
-	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		if (!pulse_stream) {
-			device_manager->unlock();
+		if (!pulse_stream)
 			return;
-		}
 
+		device_manager->lock();
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
-		if (!op)
-			_pulse_test_error("pa_stream_prebuf");
-		pulse_wait_op(session, op);
+		device_manager->unlock();
+		_pulse_start_op(op, "pa_stream_prebuf");
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");
@@ -543,16 +564,15 @@ void AudioOutput::_fill_prebuffer() {
 
 #if HAS_LIB_PORTAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		if (!portaudio_stream) {
-			device_manager->unlock();
+		if (!portaudio_stream)
 			return;
-		}
+		//device_manager->lock();
 		//PaError err = Pa_StartStream(portaudio_stream);
 		//_portaudio_test_error(err, "Pa_StartStream");
+		//device_manager->unlock();
 	}
 #endif
 
-	device_manager->unlock();
 	state = State::PAUSED;
 	out_state_changed.notify();
 }
@@ -633,19 +653,17 @@ void AudioOutput::reset_state() {
 		_pause();
 	os::require_main_thread("out.reset");
 	if (state == State::PAUSED) {
-		device_manager->lock();
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 			session->debug("out", "flush");
 			if (pulse_stream) {
+				device_manager->lock();
 				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
-				if (!op)
-					_pulse_test_error("pa_stream_flush");
-				pulse_wait_op(session, op);
+				device_manager->unlock();
+				_pulse_start_op(op, "pa_stream_flush");
 			}
 		}
 #endif
-		device_manager->unlock();
 		state = State::DEVICE_WITHOUT_DATA;
 	}
 
@@ -693,6 +711,11 @@ base::optional<int64> AudioOutput::samples_played() {
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 		pa_usec_t t;
 		// PA_STREAM_INTERPOLATE_TIMING
+		if (auto info = pa_stream_get_timing_info(pulse_stream)) {
+			if (info->read_index_corrupt == 0)
+				return info->read_index / 8;
+			//printf("    %d %d\n", info->write_index, info->read_index);
+		}
 		if (pa_stream_get_time(pulse_stream, &t) == 0) {
 			double usec2samples = session->sample_rate() / 1000000.0;
 			return (double)t * usec2samples - fake_samples_played;

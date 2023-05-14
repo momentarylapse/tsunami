@@ -23,6 +23,7 @@ class Session;
 
 #if HAS_LIB_PULSEAUDIO
 struct pa_stream;
+struct pa_operation;
 #endif
 
 #if HAS_LIB_PORTAUDIO
@@ -83,8 +84,11 @@ private:
 	std::atomic<bool> played_end_of_stream;
 
 #if HAS_LIB_PULSEAUDIO
-	pa_stream *pulse_stream;
+	pa_stream *pulse_stream = nullptr;
 	bool _pulse_test_error(const char *msg);
+	pa_operation *operation = nullptr;
+	void _pulse_flush_op();
+	void _pulse_start_op(pa_operation *op, const char *msg);
 #endif
 
 #if HAS_LIB_PORTAUDIO

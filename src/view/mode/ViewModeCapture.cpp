@@ -87,7 +87,7 @@ void ViewModeCapture::insert() {
 #ifdef OS_WINDOWS
 	clear_sync_data();
 #else
-	if (data.num > 1)
+	if (data.num >= 1)
 		clear_sync_data();
 #endif
 

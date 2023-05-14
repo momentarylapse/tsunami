@@ -703,7 +703,6 @@ base::optional<int> AudioOutput::get_latency() {
 	//return latency;
 }
 
-//base::optional<int64> AudioOutput::samples_played() {
 base::optional<int64> AudioOutput::samples_played() {
 	if (state == State::NO_DEVICE)
 		return base::None;

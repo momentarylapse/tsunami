@@ -324,7 +324,7 @@ void AudioInput::_pause() {
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
 		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		if (op)
+		if (!op)
 			_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}

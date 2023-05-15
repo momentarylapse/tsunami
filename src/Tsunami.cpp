@@ -48,7 +48,7 @@ bool ugly_hack_slow = false;
 
 
 Tsunami::Tsunami() :
-	hui::Application("tsunami", "English", hui::FLAG_NO_ERROR_HANDLER)
+	hui::Application("tsunami", "English", hui::Flags::NO_ERROR_HANDLER)
 {
 	device_manager = nullptr;
 	log = nullptr;

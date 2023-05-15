@@ -17,16 +17,20 @@ namespace hui {
 
 class Window;
 
-enum {
-	FLAG_DONT_LOAD_RESOURCE = 1,
-	FLAG_SILENT = 2,
-	FLAG_NO_ERROR_HANDLER = 4,
-	FLAG_UNIQUE = 16,
+enum class Flags {
+	NONE = 0,
+	DONT_LOAD_RESOURCE = 1,
+	SILENT = 2,
+	NO_ERROR_HANDLER = 4,
+	LAZY_GUI_INITIALIZATION = 8,
+	UNIQUE = 16,
 };
+Flags operator|(Flags a, Flags b);
+int operator&(Flags a, Flags b);
 
 class Application : public VirtualBase {
 public:
-	Application(const string &app_name, const string &def_lang, int flags);
+	Application(const string &app_name, const string &def_lang, Flags flags);
 	~Application() override;
 
 	virtual bool on_startup(const Array<string> &arg) = 0;
@@ -53,6 +57,7 @@ public:
 	static Path initial_working_directory;
 	static bool installed; // installed into system folders?
 	static bool adwaita_started;
+	static Flags flags;
 
 	static Array<string> _args;
 

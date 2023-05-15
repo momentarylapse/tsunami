@@ -10,9 +10,6 @@
 #include "hui.h"
 #include "internal.h"
 #include "../os/filesystem.h"
-#if HAS_LIB_ADWAITA && GTK_CHECK_VERSION(4,0,0)
-#include <adwaita.h>
-#endif
 
 #ifdef OS_WINDOWS
 #include <windows.h>
@@ -21,18 +18,21 @@
 namespace hui
 {
 
-extern Callback _idle_function_;
+Flags operator|(Flags a, Flags b) {
+	return (Flags)((int)a | (int)b);
+}
+int operator&(Flags a, Flags b) {
+	return (int)a & (int)b;
+}
 
-
-#ifdef HUI_API_GTK
-	extern void *invisible_cursor;
-#endif
+//extern Callback _idle_function_;
 
 GtkApplication *Application::application = nullptr;
 
 
 base::map<string, string> Application::_properties_;
 
+Flags Application::flags = Flags::NONE;
 Path Application::filename;
 Path Application::directory;
 Path Application::directory_static;
@@ -73,7 +73,8 @@ void _init_global_css_classes_() {
 #endif
 }
 
-Application::Application(const string &app_name, const string &def_lang, int flags) {
+Application::Application(const string &app_name, const string &def_lang, Flags _flags) {
+	flags = _flags;
 
 #ifdef HUI_API_GTK
 	g_set_prgname(app_name.c_str());
@@ -86,14 +87,14 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	separator = "\\";
 	_using_language_ = false;
-	if ((flags & FLAG_NO_ERROR_HANDLER) == 0)
+	if ((flags & Flags::NO_ERROR_HANDLER) == 0)
 		SetDefaultErrorHandler(nullptr);
 
 	if (os::fs::exists(directory | "config.txt"))
 		config.load(directory | "config.txt");
 
 
-	if ((flags & FLAG_DONT_LOAD_RESOURCE) == 0)
+	if ((flags & Flags::DONT_LOAD_RESOURCE) == 0)
 		load_resource(directory_static | "hui_resources.txt");
 
 	if (def_lang.num > 0)
@@ -102,25 +103,17 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 #ifdef OS_LINUX
 	if (os::fs::exists(directory_static | "icon.svg"))
-		set_property("logo", (directory_static | "icon.svg").str());
+		set_property("logo", str(directory_static | "icon.svg"));
 	else
 #endif
 	if (os::fs::exists(directory_static | "icon.png"))
-		set_property("logo", (directory_static | "icon.png").str());
+		set_property("logo", str(directory_static | "icon.png"));
 	else if (os::fs::exists(directory_static | "icon.ico"))
-		set_property("logo", (directory_static | "icon.ico").str());
+		set_property("logo", str(directory_static | "icon.ico"));
 
 
-#if GTK_CHECK_VERSION(4,0,0)
-#if HAS_LIB_ADWAITA
-	adw_init();
-	adwaita_started = true;
-#endif
-	application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
-#else
-	_MakeUsable_();
-	_init_global_css_classes_();
-#endif
+	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0)
+		_MakeUsable_();
 }
 
 Application::~Application() {
@@ -132,7 +125,8 @@ Application::~Application() {
 		msg_end();
 
 #if GTK_CHECK_VERSION(4,0,0)
-	g_object_unref(application);
+	if (application)
+		g_object_unref(application);
 #endif
 }
 
@@ -205,11 +199,16 @@ static bool keep_running = true;
 #endif
 
 int Application::run() {
+
+	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)
-	return g_application_run(G_APPLICATION(application), 0, nullptr);
+		return g_application_run(G_APPLICATION(application), 0, nullptr);
 #else
-	gtk_main();
+		gtk_main();
 #endif
+	} else {
+		printf("hui: lazy gui initialization does not go well rith run()!\n");
+	}
 
 	on_end();
 	return 0;
@@ -227,10 +226,12 @@ static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data
 
 
 int Application::try_execute(const Array<string> &args) {
+	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)
-	g_signal_connect(application, "activate", G_CALLBACK(on_gtk_application_activate), this);
-	return g_application_run(G_APPLICATION(application), 0, nullptr);
+		g_signal_connect(application, "activate", G_CALLBACK(on_gtk_application_activate), this);
+		return g_application_run(G_APPLICATION(application), 0, nullptr);
 #endif
+	}
 	if (on_startup(args))
 		return run();
 	return 0;

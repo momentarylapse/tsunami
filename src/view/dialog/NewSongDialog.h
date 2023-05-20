@@ -15,9 +15,9 @@
 class Song;
 enum class SignalType;
 
-class NewDialog: public hui::Dialog {
+class NewSongDialog: public hui::Dialog {
 public:
-	NewDialog(hui::Window *_parent);
+	NewSongDialog(hui::Window *_parent);
 
 	BarPattern new_bar;
 	SignalType type;

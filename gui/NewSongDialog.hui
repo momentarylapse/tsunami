@@ -1,10 +1,10 @@
-Dialog new_dialog "New file" width=250 height=80 headerbar closebutton=no
+Dialog new-song-dialog "New file" width=250 height=80 headerbar closebutton=no
 	Grid ? "" vertical
-		Group nd_g_frequency "Samplerate"
+		Group g-frequency "Samplerate"
 			Grid ? ""
-				ComboBox sample_rate "" expandx editable
-				Label /per_second "/s"
-		Group nd_g_track "First track"
+				ComboBox sample-rate "" expandx editable
+				Label /per-second "/s"
+		Group g-track "First track"
 			Grid ? "" homogenousx box linked
 				ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
 				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
@@ -19,19 +19,19 @@ Dialog new_dialog "New file" width=250 height=80 headerbar closebutton=no
 		Revealer revealer-presets ""
 			Group g-presets "Presets"
 				ListView presets "name" expandx height=150 nobar
-		Group nd_g_metronome "Metronome"
+		Group g-metronome "Metronome"
 			Grid ? "" vertical
 				CheckBox metronome "Add"
 				Revealer metro-revealer ""
 					Grid nd_g_metronome_params ""
-						Label nd_t_bpm "Speed" right disabled
-						SpinButton beats_per_minute "90" range=0:999:0.1
-						Label /per_minute "/min"
+						Label l-bpm "Speed" right disabled
+						SpinButton beats-per-minute "90" range=0:999:0.1
+						Label /per-minute "/min"
 						---|
-						Label nd_t_bars "Bars" right disabled
-						SpinButton num_bars "10" range=0:999
+						Label l-bars "Bars" right disabled
+						SpinButton num-bars "10" range=0:999
 						---|
-						Label nd_t_beats "Beats" right disabled
+						Label l-beats "Beats" right disabled
 						Grid ? ""
 							SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
 							Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden

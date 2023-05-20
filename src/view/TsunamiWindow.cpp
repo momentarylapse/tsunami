@@ -8,7 +8,7 @@
 #include "TsunamiWindow.h"
 #include "audioview/AudioView.h"
 #include "audioview/graph/AudioViewTrack.h"
-#include "dialog/NewDialog.h"
+#include "dialog/NewSongDialog.h"
 #include "dialog/HelpDialog.h"
 #include "dialog/SettingsDialog.h"
 #include "dialog/MarkerDialog.h"
@@ -988,7 +988,7 @@ void TsunamiWindow::on_exit() {
 }
 
 void TsunamiWindow::on_new() {
-	hui::fly(new NewDialog(this));
+	hui::fly(new NewSongDialog(this));
 }
 
 void TsunamiWindow::on_open() {

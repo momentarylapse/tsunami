@@ -3790,7 +3790,7 @@ toggle-favorite
 0
 # Resource
 Dialog
-new_dialog
+new-song-dialog
 width=250,height=80,headerbar,closebutton=no
 0
 0
@@ -3802,7 +3802,7 @@ vertical
 0
 6
 Group
-nd_g_frequency
+g-frequency
 
 0
 0
@@ -3814,19 +3814,19 @@ Grid
 0
 2
 ComboBox
-sample_rate
+sample-rate
 expandx,editable
 0
 0
 0
 Label
-per_second
+per-second
 
 1
 0
 0
 Group
-nd_g_track
+g-track
 
 1
 0
@@ -3916,7 +3916,7 @@ expandx,height=150,nobar
 0
 0
 Group
-nd_g_metronome
+g-metronome
 
 4
 0
@@ -3946,37 +3946,37 @@ nd_g_metronome_params
 0
 9
 Label
-nd_t_bpm
+l-bpm
 right,disabled
 0
 0
 0
 SpinButton
-beats_per_minute
+beats-per-minute
 range=0:999:0.1
 1
 0
 0
 Label
-per_minute
+per-minute
 
 2
 0
 0
 Label
-nd_t_bars
+l-bars
 right,disabled
 0
 1
 0
 SpinButton
-num_bars
+num-bars
 range=0:999
 1
 1
 0
 Label
-nd_t_beats
+l-beats
 right,disabled
 0
 2
@@ -4187,37 +4187,37 @@ Grid
 0
 9
 Label
-nd_t_bpm
+l-bpm
 right,disabled
 0
 0
 0
 SpinButton
-beats_per_minute
+beats-per-minute
 range=0:999:0.1
 1
 0
 0
 Label
-per_minute
+per-minute
 
 2
 0
 0
 Label
-nd_t_bars
+l-bars
 right,disabled
 0
 1
 0
 SpinButton
-num_bars
+num-bars
 range=0:999
 1
 1
 0
 Label
-nd_t_beats
+l-beats
 right,disabled
 0
 2
@@ -8815,7 +8815,7 @@ default
 # Language
 English
 # Number Of IDs
-774
+775
 # Text
 /bars-add
 Add bars...
@@ -9015,11 +9015,14 @@ Paste as samples
 /paste-insert-time
 Paste and insert time
 
-/per_minute
+/per-minute
 /min
 
-/per_second
+/per-second
 /s
+
+/per_minute
+/min
 
 /percent
 %
@@ -10116,10 +10119,79 @@ Category
 module_console/t_sub_category
 Sub type
 
+new-song-dialog/beats
+1
+beats per bar
+new-song-dialog/beats-per-minute
+90
+
+new-song-dialog/channels:mono
+Mono
+
+new-song-dialog/channels:stereo
+Stereo
+
+new-song-dialog/complex
+
+complex beat pattern
+new-song-dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+new-song-dialog/g-channels
+Channels
+
+new-song-dialog/g-frequency
+Samplerate
+
+new-song-dialog/g-metronome
+Metronome
+
+new-song-dialog/g-presets
+Presets
+
+new-song-dialog/g-track
+First track
+
+new-song-dialog/l-bars
+Bars
+
+new-song-dialog/l-beats
+Beats
+
+new-song-dialog/l-bpm
+Speed
+
+new-song-dialog/metronome
+Add
+
+new-song-dialog/new-song-dialog
+New file
+
+new-song-dialog/num-bars
+10
+
+new-song-dialog/ok
+Create
+
+new-song-dialog/pattern
+
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
+new-song-dialog/presets
+name
+
+new-song-dialog/type-audio
+∿
+Audio
+new-song-dialog/type-midi
+♫
+Midi
+new-song-dialog/type-preset
+❤
+From preset list
 new-track-dialog/beats
 1
 beats per bar
-new-track-dialog/beats_per_minute
+new-track-dialog/beats-per-minute
 90
 
 new-track-dialog/channels:mono
@@ -10158,25 +10230,25 @@ Presets
 new-track-dialog/g-synth
 Synthesizer
 
+new-track-dialog/l-bars
+Bars
+
+new-track-dialog/l-beats
+Beats
+
+new-track-dialog/l-bpm
+Speed
+
 new-track-dialog/l-master
 A master track does not contain any audio or midi data itself. It can be used to group a number of tracks and apply volume and effects collectively.
 
 new-track-dialog/midi-fx
 \\name
 
-new-track-dialog/nd_t_bars
-Bars
-
-new-track-dialog/nd_t_beats
-Beats
-
-new-track-dialog/nd_t_bpm
-Speed
-
 new-track-dialog/new-track-dialog
 New track
 
-new-track-dialog/num_bars
+new-track-dialog/num-bars
 10
 
 new-track-dialog/ok
@@ -10203,75 +10275,6 @@ Midi
 new-track-dialog/type-preset
 ❤
 From list of presets
-new_dialog/beats
-1
-beats per bar
-new_dialog/beats_per_minute
-90
-
-new_dialog/channels:mono
-Mono
-
-new_dialog/channels:stereo
-Stereo
-
-new_dialog/complex
-
-complex beat pattern
-new_dialog/divisor
-𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
-basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
-new_dialog/g-channels
-Channels
-
-new_dialog/g-presets
-Presets
-
-new_dialog/metronome
-Add
-
-new_dialog/nd_g_frequency
-Samplerate
-
-new_dialog/nd_g_metronome
-Metronome
-
-new_dialog/nd_g_track
-First track
-
-new_dialog/nd_t_bars
-Bars
-
-new_dialog/nd_t_beats
-Beats
-
-new_dialog/nd_t_bpm
-Speed
-
-new_dialog/new_dialog
-New file
-
-new_dialog/num_bars
-10
-
-new_dialog/ok
-Create
-
-new_dialog/pattern
-
-example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
-new_dialog/presets
-name
-
-new_dialog/type-audio
-∿
-Audio
-new_dialog/type-midi
-♫
-Midi
-new_dialog/type-preset
-❤
-From preset list
 pause_add_dialog/duration
 1.0
 

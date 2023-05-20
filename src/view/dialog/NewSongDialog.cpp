@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#include "NewDialog.h"
+#include "NewSongDialog.h"
 #include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
@@ -17,14 +17,14 @@
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
-NewDialog::NewDialog(hui::Window *_parent):
-	hui::Dialog("new_dialog", _parent)
+NewSongDialog::NewSongDialog(hui::Window *_parent):
+	hui::Dialog("new-song-dialog", _parent)
 {
-	add_string("sample_rate", "22050");
-	add_string("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
-	add_string("sample_rate", "48000");
-	add_string("sample_rate", "96000");
-	set_int("sample_rate", 1);
+	add_string("sample-rate", "22050");
+	add_string("sample-rate", i2s(DEFAULT_SAMPLE_RATE));
+	add_string("sample-rate", "48000");
+	add_string("sample-rate", "96000");
+	set_int("sample-rate", 1);
 	expand("metro-revealer", false);
 
 	on_type(SignalType::AUDIO);
@@ -32,7 +32,7 @@ NewDialog::NewDialog(hui::Window *_parent):
 	check("channels:mono", true);
 
 	new_bar = {1000, 4, 1};
-	set_int("num_bars", 32);
+	set_int("num-bars", 32);
 	set_int("beats", new_bar.beats.num);
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
@@ -51,16 +51,16 @@ NewDialog::NewDialog(hui::Window *_parent):
 	event("complex", [this] { on_complex(); });
 }
 
-void NewDialog::on_ok() {
-	int sample_rate = get_string("sample_rate")._int();
+void NewSongDialog::on_ok() {
+	int sample_rate = get_string("sample-rate")._int();
 	Session *session = tsunami->session_manager->spawn_new_session();
 	Song *song = session->song.get();
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
 	if (is_checked("metronome")) {
 		song->add_track(SignalType::BEATS, 0);
-		int count = get_int("num_bars");
-		float bpm = get_float("beats_per_minute");
+		int count = get_int("num-bars");
+		float bpm = get_float("beats-per-minute");
 		new_bar.set_bpm(bpm, song->sample_rate);
 		for (int i=0; i<count; i++)
 			song->add_bar(-1, new_bar, false);
@@ -79,27 +79,27 @@ void NewDialog::on_ok() {
 	session->win->activate("");
 }
 
-void NewDialog::on_beats() {
+void NewSongDialog::on_beats() {
 	new_bar = Bar(100, get_int(""), new_bar.divisor);
 	set_string("pattern", new_bar.pat_str());
 }
 
-void NewDialog::on_divisor() {
+void NewSongDialog::on_divisor() {
 	new_bar.divisor = 1 << get_int("");
 }
 
-void NewDialog::on_pattern() {
+void NewSongDialog::on_pattern() {
 	set_bar_pattern(new_bar, get_string("pattern"));
 	set_int("beats", new_bar.beats.num);
 }
 
-void NewDialog::on_complex() {
+void NewSongDialog::on_complex() {
 	bool complex = is_checked("complex");
 	hide_control("beats", complex);
 	hide_control("pattern", !complex);
 }
 
-void NewDialog::on_type(SignalType t) {
+void NewSongDialog::on_type(SignalType t) {
 	type = t;
 	check("type-audio", t == SignalType::AUDIO);
 	//check("type-audio-stereo", t == SignalType::AUDIO_STEREO);
@@ -116,7 +116,7 @@ void NewDialog::on_type(SignalType t) {
 	}
 }
 
-void NewDialog::on_metronome() {
+void NewSongDialog::on_metronome() {
 	expand("metro-revealer", is_checked(""));
 	manually_changed_metronome_flag = true;
 }

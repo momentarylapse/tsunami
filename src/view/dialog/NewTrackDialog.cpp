@@ -53,7 +53,7 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	update_strings();
 
 	new_bar = {1000, 4, 1};
-	set_int("num_bars", 32);
+	set_int("num-bars", 32);
 	set_int("beats", new_bar.beats.num);
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);
@@ -63,8 +63,8 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	auto disable_beats = [this] (const string& message) {
 		hide_control("l-no-metronome", false);
 		set_string("l-no-metronome", message);
-		enable("beats_per_minute", false);
-		enable("num_bars", false);
+		enable("beats-per-minute", false);
+		enable("num-bars", false);
 		enable("beats", false);
 		enable("pattern", false);
 		enable("complex", false);
@@ -142,13 +142,13 @@ void NewTrackDialog::on_ok() {
 	} else if (type == SignalType::BEATS) {
 		t->set_synthesizer(synth);
 
-		//if (is_checked("metronome")) {
-			int count = get_int("num_bars");
-			float bpm = get_float("beats_per_minute");
+		if (song->bars.num == 0) {
+			int count = get_int("num-bars");
+			float bpm = get_float("beats-per-minute");
 			new_bar.set_bpm(bpm, song->sample_rate);
 			for (int i = 0; i < count; i++)
 				song->add_bar(-1, new_bar, false);
-		//}
+		}
 	}
 	song->end_action_group();
 	request_destroy();

@@ -11,6 +11,7 @@
 
 class Song;
 class Session;
+class Synthesizer;
 enum class SignalType;
 
 class NewTrackDialog : public hui::Dialog {
@@ -21,6 +22,10 @@ public:
 	Session *session;
 	Instrument instrument;
 	Array<Instrument> instrument_list;
+
+	shared<Synthesizer> synth;
+	shared<hui::Panel> synth_panel;
+	void set_synthesizer(Synthesizer *synth);
 
 	void load_data();
 	void apply_data();

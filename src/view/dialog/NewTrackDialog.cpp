@@ -3,20 +3,39 @@
 //
 
 #include "NewTrackDialog.h"
+#include "EditStringsDialog.h"
+#include "../module/ModulePanel.h"
+#include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
+#include "../../data/midi/MidiData.h"
 #include "../../data/rhythm/Bar.h"
+#include "../../module/synthesizer/Synthesizer.h"
 #include "../../action/ActionManager.h"
 #include "../../stuff/SessionManager.h"
+#include "../../plugins/PluginManager.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 #include "../../lib/base/sort.h"
-#include "../../data/midi/MidiData.h"
-#include "EditStringsDialog.h"
 
 void set_bar_pattern(BarPattern &b, const string &pat);
+
+hui::Panel *create_synth_panel(Synthesizer *synth, Session *session, NewTrackDialog *parent) {
+	auto *p = new ModulePanel(synth, parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
+	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
+	p->set_func_replace([parent, session, synth] {
+		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [parent, session] (const base::optional<string> &name) {
+			if (name.has_value())
+				parent->set_synthesizer(CreateSynthesizer(session, *name));
+		}, synth->module_class);
+	});
+	/*p->set_func_detune([parent, track, session] {
+		hui::fly(new TemperamentDialog(track, session->view, parent->win));
+	});*/
+	return p;
+}
 
 NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 		hui::Dialog("new-track-dialog", _parent)
@@ -39,6 +58,8 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	set_string("pattern", new_bar.pat_str());
 	set_int("divisor", 0);*/
 
+	set_synthesizer(CreateSynthesizer(session, "Dummy"));
+
 	event("cancel", [this] { request_destroy(); });
 	event("hui:close", [this] { request_destroy(); });
 	event("ok", [this] { on_ok(); });
@@ -54,6 +75,12 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	event("divisor", [this] { on_divisor(); });
 	event("pattern", [this] { on_pattern(); });
 	event("complex", [this] { on_complex(); });
+}
+
+void NewTrackDialog::set_synthesizer(Synthesizer *s) {
+	synth = s;
+	synth_panel = create_synth_panel(synth.get(), session, this);
+	embed(synth_panel.get(), "g-synth", 0, 0);
 }
 
 void NewTrackDialog::on_instrument() {
@@ -92,8 +119,12 @@ void NewTrackDialog::on_ok() {
 		effective_type = SignalType::AUDIO_STEREO;
 	song->begin_action_group("add-track");
 	auto t = song->add_track(effective_type);
-	if (type == SignalType::MIDI) {
+	if (type == SignalType::AUDIO) {
+	} else if (type == SignalType::MIDI) {
 		t->set_instrument(instrument);
+		t->set_synthesizer(synth);
+	} else if (type == SignalType::BEATS) {
+		t->set_synthesizer(synth);
 	}
 	song->end_action_group();
 	/*int sample_rate = get_string("sample_rate")._int();

@@ -4270,14 +4270,8 @@ revealer-synth
 4
 0
 1
-Group
+Revealer
 g-synth
-
-0
-0
-1
-Label
-?
 
 0
 0

@@ -42,8 +42,7 @@ Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
 					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
 					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 		Revealer revealer-synth ""
-			Group g-synth "Synthesizer"
-				Label ? "..."
+			Revealer g-synth "Synthesizer"
 		Revealer revealer-master ""
 			Label l-master "A master track does not contain any audio or midi data itself. It can be used to group a number of tracks and apply volume and effects collectively." italic wrap
 		Revealer revealer-presets ""

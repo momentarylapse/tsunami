@@ -16,6 +16,8 @@ float db2amplitude(float db);
 
 const int DEFAULT_SAMPLE_RATE = 44100;
 
+extern const Array<int> POSSIBLE_SAMPLE_RATES;
+
 
 enum class SampleFormat {
 	UNKNOWN,

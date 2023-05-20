@@ -20,11 +20,9 @@ void set_bar_pattern(BarPattern &b, const string &pat);
 NewSongDialog::NewSongDialog(hui::Window *_parent):
 	hui::Dialog("new-song-dialog", _parent)
 {
-	add_string("sample-rate", "22050");
-	add_string("sample-rate", i2s(DEFAULT_SAMPLE_RATE));
-	add_string("sample-rate", "48000");
-	add_string("sample-rate", "96000");
-	set_int("sample-rate", 1);
+	for (int rate: POSSIBLE_SAMPLE_RATES)
+		add_string("sample-rate", i2s(rate));
+	set_int("sample-rate", POSSIBLE_SAMPLE_RATES.find(DEFAULT_SAMPLE_RATE));
 	expand("metro-revealer", false);
 
 	on_type(SignalType::AUDIO);

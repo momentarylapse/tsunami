@@ -9,6 +9,12 @@
 #include "../lib/hui/hui.h"
 #include <math.h>
 
+const Array<int> POSSIBLE_SAMPLE_RATES = {
+		22050,
+		DEFAULT_SAMPLE_RATE,
+		48000,
+		96000
+};
 
 float amplitude2db(float amp) {
 	return log10(amp) * 20.0f;

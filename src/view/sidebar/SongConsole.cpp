@@ -10,11 +10,11 @@
 #include "../bottombar/BottomBar.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"
+#include "../../lib/base/iter.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 
-const int NUM_POSSIBLE_FORMATS = 4;
-const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
+const Array<SampleFormat> POSSIBLE_FORMATS = {
 	SampleFormat::INT_16,
 	SampleFormat::INT_24,
 	SampleFormat::INT_32,
@@ -30,13 +30,11 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 
 	expand_row("ad_t_tags", 0, true);
 
-	add_string("samplerate", "22050");
-	add_string("samplerate", i2s(DEFAULT_SAMPLE_RATE));
-	add_string("samplerate", "48000");
-	add_string("samplerate", "96000");
+	for (auto rate: POSSIBLE_SAMPLE_RATES)
+		add_string("samplerate", i2s(rate));
 
-	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
-		add_string("format", format_name(POSSIBLE_FORMATS[i]));
+	for (auto f: POSSIBLE_FORMATS)
+		add_string("format", format_name(f));
 
 	menu_tags = hui::create_resource_menu("popup-menu-tag", this);
 
@@ -80,8 +78,11 @@ void SongConsole::load_data() {
 	set_string("samples", i2s(samples));
 
 	set_string("samplerate", i2s(song->sample_rate));
-	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
-		if (song->default_format == POSSIBLE_FORMATS[i])
+	for (const auto& [i, rate]: enumerate(POSSIBLE_SAMPLE_RATES))
+		if (song->sample_rate == rate)
+			set_int("samplerate", i);
+	for (const auto& [i, f]: enumerate(POSSIBLE_FORMATS))
+		if (song->default_format == f)
 			set_int("format", i);
 }
 

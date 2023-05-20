@@ -2449,40 +2449,10 @@ Separator
 2
 0
 0
-Menu
-menu-track-new
+Item
+track-add-new
 
 3
-0
-5
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
-1
-0
-0
-Item
-track-add-midi
-image=hui:add
-2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Menu
@@ -5067,59 +5037,47 @@ menu-song
 
 11
 0
-4
-Menu
-menu-track-new
-
-0
-0
 5
 Item
-track-add-audio-mono
+track-add-new
 image=hui:add
 0
 0
 0
-Item
-track-add-audio-stereo
-image=hui:add
+Menu
+menu-track-create
+
 1
 0
-0
-Item
-track-add-midi
-image=hui:add
 2
+Item
+track_import
+image=hui:open
+0
 0
 0
 Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
+track_render
+
+1
 0
 0
 Item
 song-edit-samples
 
-1
+2
 0
 0
 Item
 show-mixing-console
 
-2
+3
 0
 0
 Item
 song-properties
 
-3
+4
 0
 0
 # Resource
@@ -5369,77 +5327,47 @@ menu-song
 
 9
 0
-4
+5
+Item
+track-add-new
+image=hui:add
+0
+0
+0
 Menu
-menu-track-new
+menu-track-create
 
-0
-0
-8
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
 1
 0
-0
-Item
-track-add-midi
-image=hui:add
 2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Separator
-
-
-5
-0
-0
 Item
 track_import
 image=hui:open
-6
+0
 0
 0
 Item
 track_render
 
-7
+1
 0
 0
 Item
 song-edit-samples
 
-1
+2
 0
 0
 Item
 show-mixing-console
 
-2
+3
 0
 0
 Item
 song-properties
 
-3
+4
 0
 0
 # Resource
@@ -5793,77 +5721,47 @@ menu-song
 
 15
 0
-4
+5
+Item
+track-add-new
+image=hui:add
+0
+0
+0
 Menu
-menu-track-new
+menu-track-create
 
-0
-0
-8
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
 1
 0
-0
-Item
-track-add-midi
-image=hui:add
 2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Separator
-
-
-5
-0
-0
 Item
 track_import
 image=hui:open
-6
+0
 0
 0
 Item
 track_render
 
-7
+1
 0
 0
 Item
 song-edit-samples
 
-1
+2
 0
 0
 Item
 show-mixing-console
 
-2
+3
 0
 0
 Item
 song-properties
 
-3
+4
 0
 0
 # Resource
@@ -6372,7 +6270,7 @@ popup-menu-song
 
 0
 0
-6
+7
 Item
 header
 disabled
@@ -6385,76 +6283,46 @@ Separator
 1
 0
 0
+Item
+track-add-new
+image=hui:add
+2
+0
+0
 Menu
-menu-track-new
+menu-track-create
 
-2
-0
-8
-Item
-track-add-audio-mono
-image=hui:add
-0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
-1
-0
-0
-Item
-track-add-midi
-image=hui:add
-2
-0
-0
-Item
-track-add-beats
-image=hui:add
 3
 0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Separator
-
-
-5
-0
-0
+2
 Item
 track_import
 image=hui:open
-6
+0
 0
 0
 Item
 track_render
 
-7
+1
 0
 0
 Item
 song-edit-samples
 
-3
+4
 0
 0
 Item
 show-mixing-console
 
-4
+5
 0
 0
 Item
 song-properties
 
-5
+6
 0
 0
 # Resource
@@ -6704,77 +6572,47 @@ menu-song
 
 15
 0
-4
-Menu
-menu-track-new
+5
+Item
+track-add-new
 
 0
 0
-8
-Item
-track-add-audio-mono
-image=hui:add
 0
-0
-0
-Item
-track-add-audio-stereo
-image=hui:add
+Menu
+menu-track-create
+
 1
 0
-0
-Item
-track-add-midi
-image=hui:add
 2
-0
-0
-Item
-track-add-beats
-image=hui:add
-3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
-0
-0
-Separator
-
-
-5
-0
-0
 Item
 track_import
 image=hui:open
-6
+0
 0
 0
 Item
 track_render
 
-7
+1
 0
 0
 Item
 song-edit-samples
 
-1
+2
 0
 0
 Item
 show-mixing-console
 
-2
+3
 0
 0
 Item
 song-properties
 
-3
+4
 0
 0
 # Resource
@@ -8815,7 +8653,7 @@ default
 # Language
 English
 # Number Of IDs
-775
+779
 # Text
 /bars-add
 Add bars...
@@ -8982,6 +8820,9 @@ File
 /menu-track
 Track
 
+/menu-track-create
+Create track
+
 /menu-track-new
 Add new track
 
@@ -9082,16 +8923,16 @@ Audio (mono)
 Audio (stereo)
 
 /track-add-beats
-Metronome...
-
-/track-add-group
-Group/master
+Metronome
 
 /track-add-marker
 Add marker...
 
 /track-add-midi
 Midi
+
+/track-add-new
+Add new track
 
 /track-audio-mode-peaks
 Peaks
@@ -9819,6 +9660,9 @@ Signal chain
 menu/stop
 Stop
 
+menu/track-add-new
+Add new track...
+
 menu/track_import
 Import from file...
 
@@ -10349,6 +10193,12 @@ Bar gap
 
 popup-menu-bar/header
 Bar
+
+popup-menu-bar/track_import
+Import from file...
+
+popup-menu-bar/track_render
+Render from selection
 
 popup-menu-buffer/header
 Audio buffer

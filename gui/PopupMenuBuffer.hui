@@ -32,13 +32,8 @@ Menu popup-menu-buffer ""
 		Item /track-delete "Delete"
 		Item /track-properties "Properties..."
 	Menu /menu-song "File"
-		Menu /menu-track-new "Add new track"
-			Item /track-add-audio-mono "Audio (mono)" image=hui:add
-			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
-			Item /track-add-midi "Midi" image=hui:add
-			Item /track-add-beats "Metronome..." image=hui:add
-			Item /track-add-group "Group/master" image=hui:add
-			Separator
+		Item /track-add-new "Add new track" image=hui:add
+		Menu /menu-track-create "Create track"
 			Item track_import "Import from file..." image=hui:open
 			Item track_render "Render from selection"
 		Item /song-edit-samples "Manage samples..."

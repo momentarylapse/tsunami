@@ -110,13 +110,14 @@ void NewDialog::on_type(SignalType t) {
 	expand("revealer-presets", type == (SignalType)-1);
 	enable("ok", type != (SignalType)-1);
 
-	if (t == SignalType::MIDI) {
-		check("metronome", true);
-		expand("metro-revealer", true);
+	if (!manually_changed_metronome_flag) {
+		check("metronome", t == SignalType::MIDI);
+		expand("metro-revealer", t == SignalType::MIDI);
 	}
 }
 
 void NewDialog::on_metronome() {
 	expand("metro-revealer", is_checked(""));
+	manually_changed_metronome_flag = true;
 }
 

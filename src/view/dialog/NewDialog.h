@@ -21,6 +21,7 @@ public:
 
 	BarPattern new_bar;
 	SignalType type;
+	bool manually_changed_metronome_flag = false;
 
 	void load_data();
 	void apply_data();

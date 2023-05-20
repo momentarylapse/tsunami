@@ -3833,7 +3833,7 @@ nd_g_track
 1
 Grid
 ?
-homogenousx
+homogenousx,box,linked
 0
 0
 3
@@ -4044,10 +4044,10 @@ vertical,width=300
 10
 Grid
 ?
-homogenousx
+homogenousx,box,linked
 0
 0
-8
+5
 ToggleButton
 type-audio
 flat,huge,expandx,ignorefocus
@@ -4073,28 +4073,10 @@ image=track-group,flat,huge,expandx,ignorefocus
 0
 0
 ToggleButton
-type-import
-image=hui:open,flat,big,expandx,ignorefocus,disabled
-0
-1
-0
-ToggleButton
-type-copy
-image=hui:copy,flat,big,expandx,ignorefocus,disabled
-1
-1
-0
-ToggleButton
-type-render
-image=hui:media-record,flat,big,expandx,ignorefocus,disabled
-2
-1
-0
-ToggleButton
 type-preset
-flat,big,expandx,ignorefocus
-3
-1
+flat,huge,expandx,ignorefocus
+4
+0
 0
 Revealer
 revealer-channels
@@ -4197,6 +4179,12 @@ Grid
 
 0
 0
+2
+Grid
+?
+
+0
+0
 9
 Label
 nd_t_bpm
@@ -4264,6 +4252,12 @@ divisor
 3
 2
 0
+Label
+l-no-metronome
+wrap,hidden,italic,style=warning
+0
+1
+0
 Revealer
 revealer-synth
 
@@ -4308,7 +4302,7 @@ expandx,height=150,nobar
 0
 Revealer
 g-fx
-
+hidden
 7
 0
 1
@@ -8821,7 +8815,7 @@ default
 # Language
 English
 # Number Of IDs
-777
+774
 # Text
 /bars-add
 Add bars...
@@ -10197,12 +10191,6 @@ name
 new-track-dialog/type-audio
 ∿
 Audio
-new-track-dialog/type-copy
-
-Copy existing track
-new-track-dialog/type-import
-
-Import from file
 new-track-dialog/type-master
 
 Master
@@ -10215,9 +10203,6 @@ Midi
 new-track-dialog/type-preset
 ❤
 From list of presets
-new-track-dialog/type-render
-
-Render selection into audio track
 new_dialog/beats
 1
 beats per bar

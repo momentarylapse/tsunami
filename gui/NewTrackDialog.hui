@@ -1,15 +1,11 @@
 Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
 	Grid ? "" vertical width=300
-		Grid ? "" homogenousx
+		Grid ? "" homogenousx box linked
 			ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
 			ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
 			ToggleButton type-metronome "" image=track-time flat huge expandx "tooltip=Metronome" ignorefocus
 			ToggleButton type-master "" image=track-group flat huge expandx "tooltip=Master" ignorefocus
-			---|
-			ToggleButton type-import "" image=hui:open flat big expandx "tooltip=Import from file" ignorefocus disabled
-			ToggleButton type-copy "" image=hui:copy flat big expandx "tooltip=Copy existing track" ignorefocus disabled
-			ToggleButton type-render "" image=hui:media-record flat big expandx "tooltip=Render selection into audio track" ignorefocus disabled
-			ToggleButton type-preset "❤" flat big expandx "tooltip=From list of presets" ignorefocus
+			ToggleButton type-preset "❤" flat huge expandx "tooltip=From list of presets" ignorefocus
 		Revealer revealer-channels ""
 			Group g-channels "Channels"
 				Grid ? ""
@@ -28,19 +24,22 @@ Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
 		Revealer revealer-metronome ""
 			Group g-metronome "Metronome"
 				Grid ? ""
-					Label nd_t_bpm "Speed" right disabled
-					SpinButton beats_per_minute "90" range=0:999:0.1
-					Label /per_minute "/min"
-					---|
-					Label nd_t_bars "Bars" right disabled
-					SpinButton num_bars "10" range=0:999
-					---|
-					Label nd_t_beats "Beats" right disabled
 					Grid ? ""
-						SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
-						Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
-					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
-					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
+						Label nd_t_bpm "Speed" right disabled
+						SpinButton beats_per_minute "90" range=0:999:0.1
+						Label /per_minute "/min"
+						---|
+						Label nd_t_bars "Bars" right disabled
+						SpinButton num_bars "10" range=0:999
+						---|
+						Label nd_t_beats "Beats" right disabled
+						Grid ? ""
+							SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
+							Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
+						ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
+						ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
+					---|
+					Label l-no-metronome "" wrap hidden italic style=warning
 		Revealer revealer-synth ""
 			Revealer g-synth "Synthesizer"
 		Revealer revealer-master ""
@@ -48,7 +47,7 @@ Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
 		Revealer revealer-presets ""
 			Group g-presets "Presets"
 				ListView presets "name" expandx height=150 nobar
-		Revealer g-fx "Effects"
+		Revealer g-fx "Effects" hidden
 			Grid ? "" expandx
 				ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160
 				---|

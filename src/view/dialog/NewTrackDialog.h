@@ -8,6 +8,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/base.h"
 #include "../../data/midi/Instrument.h"
+#include "../../data/rhythm/Bar.h"
 
 class Song;
 class Session;
@@ -22,6 +23,7 @@ public:
 	Session *session;
 	Instrument instrument;
 	Array<Instrument> instrument_list;
+	BarPattern new_bar;
 
 	shared<Synthesizer> synth;
 	shared<hui::Panel> synth_panel;

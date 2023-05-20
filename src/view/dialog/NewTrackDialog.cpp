@@ -52,13 +52,29 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	set_int("instrument", instrument_list.find(instrument));
 	update_strings();
 
-	/*new_bar = {1000, 4, 1};
+	new_bar = {1000, 4, 1};
 	set_int("num_bars", 32);
 	set_int("beats", new_bar.beats.num);
 	set_string("pattern", new_bar.pat_str());
-	set_int("divisor", 0);*/
+	set_int("divisor", 0);
 
 	set_synthesizer(CreateSynthesizer(session, "Dummy"));
+
+	auto disable_beats = [this] (const string& message) {
+		hide_control("l-no-metronome", false);
+		set_string("l-no-metronome", message);
+		enable("beats_per_minute", false);
+		enable("num_bars", false);
+		enable("beats", false);
+		enable("pattern", false);
+		enable("complex", false);
+		enable("divisor", false);
+	};
+	if (session->song->time_track()) {
+		disable_beats("There can only be one metronome track.");
+	} else if (session->song->bars.num > 0) {
+		disable_beats("There already is a bar structure. A new metronome track will reuse the existing one.");
+	}
 
 	event("cancel", [this] { request_destroy(); });
 	event("hui:close", [this] { request_destroy(); });
@@ -125,51 +141,37 @@ void NewTrackDialog::on_ok() {
 		t->set_synthesizer(synth);
 	} else if (type == SignalType::BEATS) {
 		t->set_synthesizer(synth);
+
+		//if (is_checked("metronome")) {
+			int count = get_int("num_bars");
+			float bpm = get_float("beats_per_minute");
+			new_bar.set_bpm(bpm, song->sample_rate);
+			for (int i = 0; i < count; i++)
+				song->add_bar(-1, new_bar, false);
+		//}
 	}
 	song->end_action_group();
-	/*int sample_rate = get_string("sample_rate")._int();
-	Session *session = tsunami->session_manager->spawn_new_session();
-	Song *song = session->song.get();
-	song->sample_rate = sample_rate;
-	song->action_manager->enable(false);
-	if (is_checked("metronome")) {
-		song->add_track(SignalType::BEATS, 0);
-		int count = get_int("num_bars");
-		float bpm = get_float("beats_per_minute");
-		new_bar.set_bpm(bpm, song->sample_rate);
-		for (int i=0; i<count; i++)
-			song->add_bar(-1, new_bar, false);
-	}
-	song->add_track(type);
-
-	song->add_tag("title", _("New Audio File"));
-	song->add_tag("album", AppName);
-	song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
-
-	song->action_manager->enable(true);
-	song->out_new.notify();
-	song->out_finished_loading.notify();*/
 	request_destroy();
 }
 
 void NewTrackDialog::on_beats() {
-	/*new_bar = Bar(100, get_int(""), new_bar.divisor);
-	set_string("pattern", new_bar.pat_str());*/
+	new_bar = Bar(100, get_int(""), new_bar.divisor);
+	set_string("pattern", new_bar.pat_str());
 }
 
 void NewTrackDialog::on_divisor() {
-	//new_bar.divisor = 1 << get_int("");
+	new_bar.divisor = 1 << get_int("");
 }
 
 void NewTrackDialog::on_pattern() {
-	//set_bar_pattern(new_bar, get_string("pattern"));
-	//set_int("beats", new_bar.beats.num);
+	set_bar_pattern(new_bar, get_string("pattern"));
+	set_int("beats", new_bar.beats.num);
 }
 
 void NewTrackDialog::on_complex() {
-	//bool complex = is_checked("complex");
-	//hide_control("beats", complex);
-	//hide_control("pattern", !complex);
+	bool complex = is_checked("complex");
+	hide_control("beats", complex);
+	hide_control("pattern", !complex);
 }
 
 void NewTrackDialog::on_type(SignalType t) {
@@ -180,7 +182,12 @@ void NewTrackDialog::on_type(SignalType t) {
 	check("type-master", t == SignalType::GROUP);
 	check("type-preset", t == (SignalType)-1);
 
-	enable("ok", type != (SignalType)-1);
+	bool allow_ok = true;
+	if (type == (SignalType)-1)
+		allow_ok = false;
+	if (type == SignalType::BEATS and session->song->time_track())
+		allow_ok = false;
+	enable("ok", allow_ok);
 
 	expand("revealer-channels", t == SignalType::AUDIO);
 	expand("revealer-instrument", t == SignalType::MIDI);

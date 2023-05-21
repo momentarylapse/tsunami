@@ -8,6 +8,7 @@
 
 #include "AutoConfigPanel.h"
 #include "../helper/Slider.h"
+#include "../helper/VolumeControl.h"
 #include "../sidebar/SampleManagerConsole.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
@@ -258,6 +259,32 @@ public:
 	}
 };
 
+class AutoConfigDataVolume : public AutoConfigData {
+public:
+	float *value;
+	owned<VolumeControl> volume_control;
+	AutoConfigDataVolume(const string &_name) : AutoConfigData(_name) {
+		value = nullptr;
+	}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
+		p->add_grid("", 1, i, "grid-" + i2s(i));
+		p->set_target("grid-" + i2s(i));
+		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
+		p->add_spin_button("", 0, 1, "spin-" + i2s(i));
+		p->add_button("", 1, 1, "unit-" + i2s(i));
+		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i), [this, callback] (float f) {
+			callback();
+		});
+	}
+	void parse(const string &s) override {}
+	void value_from_gui() override {
+		*value = volume_control->get();
+	}
+	void value_to_gui() override {
+		volume_control->set(*value);
+	}
+};
+
 class AutoConfigDataString : public AutoConfigData {
 public:
 	string *value;
@@ -405,8 +432,12 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 		if (cc == "ignore")
 			continue;
 		if (e.type == kaba::TypeFloat32) {
-			if (e.name == "pitch" or cc == "pitch") {
+			if (e.name == "pitch" or (cc.find("pitch") >= 0)) {
 				auto *a = new AutoConfigDataPitch(e.name);
+				a->value = (float*)((char*)config + e.offset);
+				r.add(a);
+			} else if (e.name == "volume" or (cc.find("volume") >= 0)) {
+				auto *a = new AutoConfigDataVolume(e.name);
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			} else {

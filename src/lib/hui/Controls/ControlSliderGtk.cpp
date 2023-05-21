@@ -77,6 +77,10 @@ void parse_range(const string &str, float &vmin, float &vmax, float &step) {
 	}
 }
 
+void ControlSlider::__reset() {
+	gtk_scale_clear_marks(GTK_SCALE(widget));
+}
+
 void ControlSlider::__set_option(const string &op, const string &value) {
 	if (op == "range") {
 		float vmin, vmax, step;
@@ -90,7 +94,7 @@ void ControlSlider::__set_option(const string &op, const string &value) {
 	} else if (op == "mark") {
 		__add_string(value);
 	} else if (op == "clearmarks") {
-		gtk_scale_clear_marks(GTK_SCALE(widget));
+		__reset();
 	}
 }
 

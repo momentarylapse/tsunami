@@ -21,6 +21,7 @@ public:
 	void __set_float(float f) override;
 	void __add_string(const string &s) override;
 	void __set_option(const string &op, const string &value) override;
+	void __reset() override;
 	bool vertical;
 };
 

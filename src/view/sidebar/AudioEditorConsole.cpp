@@ -2,7 +2,9 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../mode/ViewModeEditAudio.h"
+#include "../dialog/QuestionDialog.h"
 #include "../TsunamiWindow.h"
+#include "../../command/Unsorted.h"
 #include "../../module/Module.h"
 #include "../../plugins/PluginManager.h"
 #include "../../Session.h"
@@ -47,6 +49,9 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	});
 	event("action-effect", [this] {
 		on_action_effect();
+	});
+	event("action-volume", [this] {
+		on_action_volume();
 	});
 	event("edit-song", [session] {
 		session->set_mode(EditMode::DefaultSong);
@@ -99,6 +104,14 @@ void AudioEditorConsole::on_action_effect() {
 		if (name.has_value())
 			session->win->on_menu_execute_audio_effect(*name);
 	});
+}
+
+void AudioEditorConsole::on_action_volume() {
+	QuestionDialogFloat::ask(win, _("Volume"), [this] (float f) {
+		if (!QuestionDialogFloat::aborted)
+			song_apply_volume(session->song.get(), f, QuestionDialogFloat::maximize, session->view->sel, win);
+	}, 1, 0, 8, "mode=volume");
+
 }
 
 void AudioEditorConsole::clear() {

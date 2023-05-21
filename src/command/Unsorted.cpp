@@ -193,6 +193,27 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	l->edit_buffers_finish(a);
 }
 
+void layer_apply_volume(TrackLayer *l, const Range &r, float f, hui::Window *win) {
+	auto p = ownify(new Progress(_("applying volume"), win));
+
+	AudioBuffer buf;
+	auto *a = l->edit_buffers(buf, r);
+
+	int chunk_size = 2048 * 16;
+	int done = 0;
+	while (done < r.length) {
+		p->set((float) done / (float) r.length);
+
+		auto ref = buf.ref(done, min(done + chunk_size, r.length));
+		for (auto& c: ref.c)
+			for (int i=0; i<ref.length; i++)
+				c[i] *= f;
+		done += chunk_size;
+	}
+
+	l->edit_buffers_finish(a);
+}
+
 void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::Window *win) {
 	auto p = ownify(new Progress(_("applying source"), win));
 	fx->reset_state();
@@ -212,6 +233,36 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 	}
 
 	l->edit_buffers_finish(a);
+}
+
+float song_max_volume(Song *song, const SongSelection &sel) {
+	float max_vol = 0;
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
+			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+				AudioBuffer buf;
+				l->read_buffers(buf, sel.range(), true);
+				for (auto& c: buf.c)
+					for (auto f: c)
+						max_vol = max(max_vol, abs(f));
+			}
+	return max_vol;
+}
+
+int song_apply_volume(Song *song, float volume, bool maximize, const SongSelection &sel, hui::Window *win) {
+	if (maximize)
+		volume = 1.0f / song_max_volume(song, sel);
+
+	int n_layers = 0;
+	song->begin_action_group(_("apply audio fx"));
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
+			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+				layer_apply_volume(l, sel.range(), volume, win);
+				n_layers ++;
+			}
+	song->end_action_group();
+	return n_layers;
 }
 
 int song_apply_audio_effect(Song *song, AudioEffect *fx, const SongSelection &sel, hui::Window *win) {

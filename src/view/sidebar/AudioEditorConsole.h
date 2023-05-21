@@ -24,6 +24,7 @@ public:
 	void on_edit_mode(int mode);
 	void on_action_source();
 	void on_action_effect();
+	void on_action_volume();
 
 	void clear();
 	void set_layer(TrackLayer *t);

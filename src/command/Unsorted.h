@@ -47,6 +47,7 @@ void song_ungroup_tracks(Song *song, const Array<Track*> &tracks);
 void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win);
 void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::Window *win);
 
+int song_apply_volume(Song *song, float volume, bool maximize, const SongSelection &sel, hui::Window *win);
 int song_apply_audio_effect(Song *song, AudioEffect *fx, const SongSelection &sel, hui::Window *win);
 int song_apply_audio_source(Song *song, AudioSource *s, const SongSelection &sel, hui::Window *win);
 int song_apply_midi_effect(Song *song, MidiEffect *fx, const SongSelection &sel, hui::Window *win);

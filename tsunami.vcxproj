@@ -564,6 +564,7 @@
     <ClCompile Include="src\view\helper\Progress.cpp" />
     <ClCompile Include="src\view\helper\Slider.cpp" />
     <ClCompile Include="src\view\helper\SymbolRenderer.cpp" />
+    <ClCompile Include="src\view\helper\VolumeControl.cpp" />
     <ClCompile Include="src\view\mode\ViewMode.cpp" />
     <ClCompile Include="src\view\mode\ViewModeCapture.cpp" />
     <ClCompile Include="src\view\mode\ViewModeCurve.cpp" />
@@ -1036,6 +1037,7 @@
     <ClInclude Include="src\view\helper\Progress.h" />
     <ClInclude Include="src\view\helper\Slider.h" />
     <ClInclude Include="src\view\helper\SymbolRenderer.h" />
+    <ClInclude Include="src\view\helper\VolumeControl.h" />
     <ClInclude Include="src\view\mode\ViewMode.h" />
     <ClInclude Include="src\view\mode\ViewModeCapture.h" />
     <ClInclude Include="src\view\mode\ViewModeCurve.h" />

@@ -454,6 +454,7 @@ set(SOURCE
 	src/view/helper/Progress.cpp
 	src/view/helper/Slider.cpp
 	src/view/helper/SymbolRenderer.cpp
+	src/view/helper/VolumeControl.cpp
 	src/view/mode/ViewMode.cpp
 	src/view/mode/ViewModeCapture.cpp
 	src/view/mode/ViewModeCurve.cpp

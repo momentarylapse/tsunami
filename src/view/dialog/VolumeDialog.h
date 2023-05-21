@@ -10,34 +10,20 @@
 
 #include "../../lib/hui/hui.h"
 
+class VolumeControl;
+
 class VolumeDialog : hui::Dialog {
 public:
 	using Callback = std::function<void(float)>;
 	VolumeDialog(hui::Window *parent, float value0, float min, float max, Callback cb);
+
+	owned<VolumeControl> volume_control;
 	float result;
-	float _min, _max, _min_db, _max_db;
-	enum Mode {
-		PERCENT,
-		DB
-	};
-	Mode mode;
-	void set_mode(Mode m);
-	void set_spin(float f);
-	void set_slider(float f);
-	float get_spin();
-	float get_slider();
 	Callback cb;
+
 	static bool aborted;
 	static bool maximize;
 	static void ask(hui::Window *parent, float value0, float min, float max, Callback cb);
-
-
-	static constexpr float DB_MIN = -1000000;
-	static constexpr float DB_MAX = 12;
-	static constexpr float TAN_SCALE = 13.0f;
-
-	static float db2slider(float db);
-	static float slider2db(float val);
 };
 
 

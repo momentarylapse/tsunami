@@ -24,6 +24,7 @@ public:
 	Instrument instrument;
 	Array<Instrument> instrument_list;
 	BarPattern new_bar;
+	Array<string> presets;
 
 	shared<Synthesizer> synth;
 	shared<hui::Panel> synth_panel;
@@ -42,6 +43,10 @@ public:
 	void on_ok();
 	void on_metronome();
 	void on_edit_tuning();
+
+	void on_save_preset();
+	void on_preset_select();
+	void on_preset();
 };
 
 #endif //SRC_VIEW_DIALOG_NEWTRACKDIALOG_H

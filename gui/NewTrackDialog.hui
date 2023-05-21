@@ -1,5 +1,5 @@
-Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
-	Grid ? "" vertical width=300
+Dialog new-track-dialog "New track" width=300 height=80 headerbar closebutton=no
+	Grid ? "" vertical width=320
 		Grid ? "" homogenousx box linked
 			ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
 			ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
@@ -63,3 +63,4 @@ Dialog new-track-dialog "New track" width=250 height=80 headerbar closebutton=no
 			Button /cancel "Cancel" image=hui:cancel
 			---|
 			Button ok "Create" default image=hui:ok
+			Button save-preset "" image=hui:save "tooltip=Save as preset..."

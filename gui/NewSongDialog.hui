@@ -8,7 +8,7 @@ Dialog new-song-dialog "New file" width=250 height=80 headerbar closebutton=no
 			Grid ? "" homogenousx box linked
 				ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
 				ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
-				ToggleButton type-preset "❤" flat huge expandx "tooltip=From preset list" ignorefocus
+				ToggleButton type-preset "❤" flat huge expandx "tooltip=From preset list" ignorefocus disabled
 		Revealer revealer-channels ""
 			Group g-channels "Channels"
 				Grid ? ""

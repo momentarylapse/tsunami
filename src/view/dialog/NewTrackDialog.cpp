@@ -4,21 +4,25 @@
 
 #include "NewTrackDialog.h"
 #include "EditStringsDialog.h"
+#include "PresetSelectionDialog.h"
+#include "QuestionDialog.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
-#include "../../data/midi/MidiData.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../action/ActionManager.h"
 #include "../../stuff/SessionManager.h"
 #include "../../plugins/PluginManager.h"
+#include "../../plugins/PresetManager.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 #include "../../lib/base/sort.h"
+
+static const int FAKE_TYPE_PRESET = -1;
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
@@ -60,6 +64,10 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 
 	set_synthesizer(CreateSynthesizer(session, "Dummy"));
 
+	presets = session->plugin_manager->presets->enumerate_track_presets(session);
+	for (auto& n: presets)
+		add_string("presets", n);
+
 	auto disable_beats = [this] (const string& message) {
 		hide_control("l-no-metronome", false);
 		set_string("l-no-metronome", message);
@@ -79,6 +87,9 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	event("cancel", [this] { request_destroy(); });
 	event("hui:close", [this] { request_destroy(); });
 	event("ok", [this] { on_ok(); });
+	event("save-preset", [this] { on_save_preset(); });
+	event_x("presets", "hui:select", [this] { on_preset_select(); });
+	event_x("presets", "hui:activate", [this] { on_preset(); });
 	event("instrument", [this] { on_instrument(); });
 	event("edit_tuning", [this] { on_edit_tuning(); });
 	event("metronome", [this] { on_metronome(); });
@@ -86,7 +97,7 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
 	event("type-midi", [this] { on_type(SignalType::MIDI); });
 	event("type-metronome", [this] { on_type(SignalType::BEATS); });
 	event("type-master", [this] { on_type(SignalType::GROUP); });
-	event("type-preset", [this] { on_type((SignalType)-1); });
+	event("type-preset", [this] { on_type((SignalType)FAKE_TYPE_PRESET); });
 	event("beats", [this] { on_beats(); });
 	event("divisor", [this] { on_divisor(); });
 	event("pattern", [this] { on_pattern(); });
@@ -130,16 +141,18 @@ void NewTrackDialog::update_strings() {
 
 void NewTrackDialog::on_ok() {
 	auto song = session->song;
-	auto effective_type = type;
-	if (type == SignalType::AUDIO and is_checked("channels:stereo"))
-		effective_type = SignalType::AUDIO_STEREO;
+
 	song->begin_action_group("add-track");
-	auto t = song->add_track(effective_type);
 	if (type == SignalType::AUDIO) {
+		auto t = song->add_track(type);
+		if (is_checked("channels:stereo"))
+			t->set_channels(2);
 	} else if (type == SignalType::MIDI) {
+		auto t = song->add_track(type);
 		t->set_instrument(instrument);
 		t->set_synthesizer(synth);
 	} else if (type == SignalType::BEATS) {
+		auto t = song->add_track(type);
 		t->set_synthesizer(synth);
 
 		if (song->bars.num == 0) {
@@ -149,8 +162,23 @@ void NewTrackDialog::on_ok() {
 			for (int i = 0; i < count; i++)
 				song->add_bar(-1, new_bar, false);
 		}
+	} else if (type == SignalType::GROUP) {
+		[[maybe_unused]] auto t = song->add_track(type);
+	} else if (type == (SignalType)FAKE_TYPE_PRESET) {
+		int r = get_int("presets");
+		const auto& p = session->plugin_manager->presets->get_track_preset(session, presets[r]);
+		auto t = song->add_track(p.type);
+		t->set_channels(p.channels);
+		if (p.type == SignalType::MIDI)
+			t->set_instrument(p.instrument);
+		if (p.type == SignalType::MIDI or p.type == SignalType::BEATS) {
+			synth = CreateSynthesizer(session, p.synth_class);
+			synth->config_from_string(p.synth_version, p.synth_options);
+			t->set_synthesizer(synth);
+		}
 	}
 	song->end_action_group();
+
 	request_destroy();
 }
 
@@ -180,13 +208,15 @@ void NewTrackDialog::on_type(SignalType t) {
 	check("type-midi", t == SignalType::MIDI);
 	check("type-metronome", t == SignalType::BEATS);
 	check("type-master", t == SignalType::GROUP);
-	check("type-preset", t == (SignalType)-1);
+	check("type-preset", t == (SignalType)FAKE_TYPE_PRESET);
 
 	bool allow_ok = true;
-	if (type == (SignalType)-1)
+	if (type == (SignalType)FAKE_TYPE_PRESET) {
+		int r = get_int("presets");
+		allow_ok = (r >= 0);
+	} else if (type == SignalType::BEATS and session->song->time_track()) {
 		allow_ok = false;
-	if (type == SignalType::BEATS and session->song->time_track())
-		allow_ok = false;
+	}
 	enable("ok", allow_ok);
 
 	expand("revealer-channels", t == SignalType::AUDIO);
@@ -195,10 +225,34 @@ void NewTrackDialog::on_type(SignalType t) {
 	//expand("g-fx-midi", true);//t == SignalType::MIDI);
 	expand("revealer-metronome", t == SignalType::BEATS);
 	expand("revealer-master", t == SignalType::GROUP);
-	expand("revealer-presets", t == (SignalType)-1);
+	expand("revealer-presets", t == (SignalType)FAKE_TYPE_PRESET);
 }
 
 void NewTrackDialog::on_metronome() {
 	//expand("metro-revealer", is_checked(""));
+}
+
+void NewTrackDialog::on_save_preset() {
+	QuestionDialogString::ask(this, _("Name of the track preset?"), [this] (const string& name) {
+		if (name == "")
+			return;
+		PresetManager::TrackPreset p;
+		p.name = name;
+		p.type = type;
+		p.instrument = instrument;
+		p.synth_class = synth->module_class;
+		p.synth_version = synth->version();
+		p.synth_options = synth->config_to_string();
+		session->plugin_manager->presets->save_track_preset(session, p);
+	});
+}
+
+void NewTrackDialog::on_preset_select() {
+	int r = get_int("presets");
+	enable("ok", r >= 0);
+}
+
+void NewTrackDialog::on_preset() {
+	on_ok();
 }
 

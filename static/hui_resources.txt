@@ -3821,7 +3821,7 @@ flat,huge,expandx,ignorefocus
 0
 ToggleButton
 type-preset
-flat,huge,expandx,ignorefocus
+flat,huge,expandx,ignorefocus,disabled
 2
 0
 0
@@ -4002,13 +4002,13 @@ default,image=hui:ok
 # Resource
 Dialog
 new-track-dialog
-width=250,height=80,headerbar,closebutton=no
+width=300,height=80,headerbar,closebutton=no
 0
 0
 1
 Grid
 ?
-vertical,width=300
+vertical,width=320
 0
 0
 10
@@ -4335,7 +4335,7 @@ Grid
 buttonbar
 9
 0
-2
+3
 Button
 cancel
 image=hui:cancel
@@ -4346,6 +4346,12 @@ Button
 ok
 default,image=hui:ok
 0
+1
+0
+Button
+save-preset
+image=hui:save
+1
 1
 0
 # Resource
@@ -8653,7 +8659,7 @@ default
 # Language
 English
 # Number Of IDs
-779
+780
 # Text
 /bars-add
 Add bars...
@@ -10104,6 +10110,9 @@ example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc.
 new-track-dialog/presets
 name
 
+new-track-dialog/save-preset
+
+Save as preset...
 new-track-dialog/type-audio
 ∿
 Audio

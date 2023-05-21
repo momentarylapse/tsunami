@@ -541,6 +541,7 @@
     <ClCompile Include="src\view\dialog\NewTrackDialog.cpp" />
     <ClCompile Include="src\view\dialog\PauseAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\PauseEditDialog.cpp" />
+    <ClCompile Include="src\view\dialog\PresetSelectionDialog.cpp" />
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp" />
     <ClCompile Include="src\view\dialog\SampleScaleDialog.cpp" />
     <ClCompile Include="src\view\dialog\SelectStringDialog.cpp" />
@@ -1011,6 +1012,7 @@
     <ClInclude Include="src\view\dialog\NewTrackDialog.h" />
     <ClInclude Include="src\view\dialog\PauseAddDialog.h" />
     <ClInclude Include="src\view\dialog\PauseEditDialog.h" />
+    <ClInclude Include="src\view\dialog\PresetSelectionDialog.h" />
     <ClInclude Include="src\view\dialog\QuestionDialog.h" />
     <ClInclude Include="src\view\dialog\SampleScaleDialog.h" />
     <ClInclude Include="src\view\dialog\SelectStringDialog.h" />

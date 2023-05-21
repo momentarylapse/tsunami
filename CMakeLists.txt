@@ -431,6 +431,7 @@ set(SOURCE
 	src/view/dialog/NewTrackDialog.cpp
 	src/view/dialog/PauseAddDialog.cpp
 	src/view/dialog/PauseEditDialog.cpp
+	src/view/dialog/PresetSelectionDialog.cpp
 	src/view/dialog/QuestionDialog.cpp
 	src/view/dialog/SampleScaleDialog.cpp
 	src/view/dialog/SelectStringDialog.cpp

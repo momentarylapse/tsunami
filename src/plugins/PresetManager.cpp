@@ -6,11 +6,11 @@
  */
 
 #include "../module/Module.h"
-#include "../lib/base/pointer.h"
 #include "../lib/base/algo.h"
 #include "../lib/hui/hui.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/doc/xml.h"
+#include "../view/dialog/PresetSelectionDialog.h"
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "PresetManager.h"
@@ -181,55 +181,6 @@ void PresetManager::set(const ModulePreset &ff) {
 
 	module_presets.add(ff);
 }
-
-
-class PresetSelectionDialog : public hui::Dialog {
-public:
-	PresetSelectionDialog(hui::Window *parent, const Array<string> &_names, bool _save) :
-		hui::Dialog("favorite-dialog", parent)
-	{
-		save = _save;
-		names = _names;
-		set_options("name", "placeholder=" + _("enter new name"));
-		if (!save)
-			add_string("list", _("-Default  Parameters-"));
-		for (string &n: names)
-			add_string("list", n);
-		if (!save)
-			names.insert(":def:", 0);
-		hide_control("name", !save);
-		event("list", [this] { on_list(); });
-		event_x("list", "hui:select", [this] { on_list_select(); });
-		event("name", [this] { on_name(); });
-		event("ok", [this] { on_ok(); });
-		event("cancel", [this] { request_destroy(); });
-	}
-	void on_list() {
-		int n = get_int("list");
-		selection = "";
-		if (n >= 0) {
-			selection = names[n];
-			set_string("name", names[n]);
-		}
-		request_destroy();
-	}
-	void on_list_select() {
-		int n = get_int("list");
-		if (n >= 0)
-			set_string("name", names[n]);
-	}
-	void on_name() {
-		set_int("list", -1);
-	}
-	void on_ok() {
-		selection = get_string("name");
-		request_destroy();
-	}
-
-	bool save;
-	Array<string> names;
-	string selection;
-};
 
 void PresetManager::select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
 	auto dlg = new PresetSelectionDialog(win, get_list(c), save);

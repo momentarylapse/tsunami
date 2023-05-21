@@ -1276,6 +1276,9 @@
     <ClCompile Include="src\view\dialog\PauseEditDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\dialog\PresetSelectionDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -2680,6 +2683,9 @@
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\PauseEditDialog.h">
+      <Filter>src\view\dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\PresetSelectionDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\QuestionDialog.h">

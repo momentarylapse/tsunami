@@ -13,15 +13,15 @@
 #include "../lib/doc/xml.h"
 #include "../Tsunami.h"
 #include "../Session.h"
-#include "ProfileManager.h"
+#include "PresetManager.h"
 
-const string ProfileManager::DEFAULT_NAME = ":def:";
+const string PresetManager::DEFAULT_NAME = ":def:";
 
-ProfileManager::ProfileManager() {
+PresetManager::PresetManager() {
 	loaded = false;
 }
 
-void ProfileManager::load_from_file(const Path &filename, bool read_only, Session *session) {
+void PresetManager::load_from_file_old(const Path &filename, bool read_only, Session *session) {
 	if (!os::fs::exists(filename))
 		return;
 	try {
@@ -32,7 +32,7 @@ void ProfileManager::load_from_file(const Path &filename, bool read_only, Sessio
 		auto &root = p.elements[0];
 		auto *mm = root.find("list");
 		for (auto &e: mm->elements) {
-			Profile ff;
+			ModulePreset ff;
 			string cat = e.value("category");
 			ff.category = Module::category_from_str(cat);
 			ff._class = e.value("class");
@@ -53,28 +53,61 @@ void ProfileManager::load_from_file(const Path &filename, bool read_only, Sessio
 	}
 }
 
-void ProfileManager::load(Session *session) {
-	load_from_file(tsunami->directory_static | "profiles-demo.xml", true, session);
-	load_from_file(tsunami->directory | "profiles.xml", false, session);
-	save(session);
+void PresetManager::load_from_file(const Path &filename, bool read_only, Session *session) {
+	if (!os::fs::exists(filename))
+		return;
+	try {
+		xml::Parser p;
+		p.load(filename);
+		if (p.elements.num == 0)
+			throw Exception("no root element");
+		auto &root = p.elements[0];
+		auto *mm = root.find("modules");
+		for (auto &e: mm->elements) {
+			if (e.tag == "preset") {
+				ModulePreset ff;
+				string cat = e.value("category");
+				ff.category = Module::category_from_str(cat);
+				ff._class = e.value("class");
+				ff.name = e.value("name");
+				ff.version = e.value("version")._int();
+				ff.options = e.text;
+				ff.read_only = read_only;
+				set(ff);
+			} else if (e.tag == "favorite") {
+				favorites.add({Module::category_from_str(e.value("category")), e.value("name")});
+			}
+		}
+	} catch (Exception &e) {
+		session->e("loading profile: " + e.message());
+	}
+}
+
+void PresetManager::load(Session *session) {
+	if (os::fs::exists(tsunami->directory | "profiles.xml")) {
+		// convert from legacy
+		load_from_file_old(tsunami->directory | "profiles.xml", false, session);
+		save(session);
+		os::fs::_delete(tsunami->directory | "profiles.xml");
+	} else {
+		load_from_file(tsunami->directory_static | "presets-demo.xml", true, session);
+		load_from_file(tsunami->directory | "presets.xml", false, session);
+		save(session);
+	}
 	loaded = true;
 }
 
-void ProfileManager::save(Session *session) {
+void PresetManager::save(Session *session) {
 	try {
 		xml::Parser p;
-		xml::Element root("profiles");
+		xml::Element root("presets");
+		root.add_attribute("version", "1.0");
 
-		// head
-		xml::Element hh("head");
-		hh.add_attribute("version", "1.0");
-		root.add(hh);
-
-		// profiles
-		xml::Element mm("list");
-		for (auto &ff: profiles)
+		// module presets / favorites
+		xml::Element mm("modules");
+		for (auto &ff: module_presets)
 			if (!ff.read_only) {
-				xml::Element e("profile");
+				xml::Element e("preset");
 				e.add_attribute("category", Module::category_to_str(ff.category));
 				e.add_attribute("class", ff._class);
 				e.add_attribute("version", i2s(ff.version));
@@ -82,37 +115,33 @@ void ProfileManager::save(Session *session) {
 				e.text = ff.options;
 				mm.add(e);
 			}
+		for (auto &ff: favorites) {
+			xml::Element e("favorite");
+			e.add_attribute("category", Module::category_to_str(ff.type));
+			e.add_attribute("name", ff.name);
+			mm.add(e);
+		}
 		root.add(mm);
 
-		// favorites
-		xml::Element favs("favorites");
-		for (auto &ff: favorites) {
-				xml::Element e("favorite");
-				e.add_attribute("category", Module::category_to_str(ff.type));
-				e.add_attribute("name", ff.name);
-				favs.add(e);
-			}
-		root.add(favs);
-
 		p.elements.add(root);
-		p.save(tsunami->directory | "profiles.xml");
+		p.save(tsunami->directory | "presets.xml");
 	} catch (Exception &e) {
 		session->e(e.message());
 	}
 }
 
-Array<string> ProfileManager::get_list(Module *c) {
+Array<string> PresetManager::get_list(Module *c) {
 	if (!loaded)
 		load(c->session);
 	Array<string> r;
-	for (auto &f: profiles) {
+	for (auto &f: module_presets) {
 		if ((f.category == c->module_category) and (f._class == c->module_class))
 			r.add(f.name);
 	}
 	return r;
 }
 
-void ProfileManager::apply(Module *c, const string &name, bool notify) {
+void PresetManager::apply(Module *c, const string &name, bool notify) {
 	c->reset_config();
 	if (name == DEFAULT_NAME) {
 		if (notify)
@@ -121,7 +150,7 @@ void ProfileManager::apply(Module *c, const string &name, bool notify) {
 	}
 	if (!loaded)
 		load(c->session);
-	for (auto &f: profiles) {
+	for (auto &f: module_presets) {
 		if ((f.category == c->module_category) and (f._class == c->module_class) and (f.name == name))
 			c->config_from_string(f.version, f.options);
 	}
@@ -129,34 +158,34 @@ void ProfileManager::apply(Module *c, const string &name, bool notify) {
 		c->out_changed.notify();
 }
 
-void ProfileManager::save(Module *c, const string &name) {
+void PresetManager::save(Module *c, const string &name) {
 	if (!loaded)
 		load(c->session);
-	Profile f;
+	ModulePreset f;
 	f.category = c->module_category;
 	f._class = c->module_class;
 	f.name = name;
+	f.version = c->version();
 	f.read_only = false;
 	f.options = c->config_to_string();
 	set(f);
 	save(c->session);
 }
 
-void ProfileManager::set(const Profile &ff) {
-	for (auto &f: profiles) {
+void PresetManager::set(const ModulePreset &ff) {
+	for (auto &f: module_presets)
 		if ((f.category == ff.category) and (f._class == ff._class) and (f.name == ff.name)) {
 			f.options = ff.options;
 			return;
 		}
-	}
 
-	profiles.add(ff);
+	module_presets.add(ff);
 }
 
 
-class FavoriteSelectionDialog : public hui::Dialog {
+class PresetSelectionDialog : public hui::Dialog {
 public:
-	FavoriteSelectionDialog(hui::Window *parent, const Array<string> &_names, bool _save) :
+	PresetSelectionDialog(hui::Window *parent, const Array<string> &_names, bool _save) :
 		hui::Dialog("favorite-dialog", parent)
 	{
 		save = _save;
@@ -202,18 +231,18 @@ public:
 	string selection;
 };
 
-void ProfileManager::select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
-	auto dlg = new FavoriteSelectionDialog(win, get_list(c), save);
+void PresetManager::select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
+	auto dlg = new PresetSelectionDialog(win, get_list(c), save);
 	hui::fly(dlg, [dlg, cb] {
 		cb(dlg->selection);
 	});
 }
 
-bool ProfileManager::Favorite::operator==(const Favorite &o) const {
+bool PresetManager::Favorite::operator==(const Favorite &o) const {
 	return (type == o.type) and (name == o.name);
 }
 
-void ProfileManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {
+void PresetManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {
 	if (!loaded)
 		load(session);
 	Favorite x = {type, name};
@@ -228,7 +257,7 @@ void ProfileManager::set_favorite(Session *session, ModuleCategory type, const s
 	save(session);
 }
 
-bool ProfileManager::is_favorite(Session *session, ModuleCategory type, const string &name) {
+bool PresetManager::is_favorite(Session *session, ModuleCategory type, const string &name) {
 	if (!loaded)
 		load(session);
 	Favorite x = {type, name};

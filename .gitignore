@@ -1,6 +1,10 @@
+build
+build3
+.idea
 message.txt
 config.txt
 favorites.txt
+presets.xml
 *.o
 *.a
 *~

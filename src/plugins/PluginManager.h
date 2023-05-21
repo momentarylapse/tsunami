@@ -14,7 +14,7 @@
 class Plugin;
 class Module;
 enum class ModuleCategory;
-class ProfileManager;
+class PresetManager;
 class TsunamiWindow;
 class SongPlugin;
 class TsunamiPlugin;
@@ -44,9 +44,9 @@ public:
 	Plugin *load_and_compile_plugin(ModuleCategory type, const Path &filename);
 	Plugin *get_plugin(Session *session, ModuleCategory type, const string &name);
 
-	void apply_profile(Module *c, const string &name, bool notify);
-	void save_profile(Module *c, const string &name);
-	void select_profile_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
+	void apply_module_preset(Module *c, const string &name, bool notify);
+	void save_module_preset(Module *c, const string &name);
+	void select_module_preset_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
 
 	Array<string> find_module_sub_types(ModuleCategory type);
 	Array<string> find_module_sub_types_grouped(ModuleCategory type);
@@ -54,7 +54,7 @@ public:
 	static void choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const base::optional<string>&)> cb, const base::optional<string> &old_name = base::None);
 
 
-	// not compiled yet
+	// (potentially) not compiled yet
 	struct PluginFile {
 		string name;
 		string group;
@@ -70,7 +70,7 @@ public:
 
 	Array<Plugin*> plugins;
 
-	owned<ProfileManager> profiles;
+	owned<PresetManager> presets;
 
 
 	shared<kaba::Module> package;

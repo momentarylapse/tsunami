@@ -8,7 +8,7 @@
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "ExtendedAudioBuffer.h"
-#include "ProfileManager.h"
+#include "PresetManager.h"
 #include "TsunamiPlugin.h"
 #include "../Tsunami.h"
 #include "../Session.h"
@@ -74,7 +74,7 @@ namespace hui {
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager() {
-	profiles = new ProfileManager;
+	presets = new PresetManager;
 
 	find_plugins();
 
@@ -979,17 +979,17 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	add_plugins_in_dir("Independent/Special", m->get_sub_menu_by_id("menu_plugins_special"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 }
 
-void PluginManager::apply_profile(Module *c, const string &name, bool notify) {
-	profiles->apply(c, name, notify);
+void PluginManager::apply_module_preset(Module *c, const string &name, bool notify) {
+	presets->apply(c, name, notify);
 }
 
-void PluginManager::save_profile(Module *c, const string &name) {
-	profiles->save(c, name);
+void PluginManager::save_module_preset(Module *c, const string &name) {
+	presets->save(c, name);
 }
 
 
-void PluginManager::select_profile_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
-	profiles->select_name(win, c, save, cb);
+void PluginManager::select_module_preset_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
+	presets->select_name(win, c, save, cb);
 }
 
 // always push the script... even if an error occurred
@@ -1101,11 +1101,11 @@ void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCa
 }
 
 void PluginManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {
-	profiles->set_favorite(session, type, name, favorite);
+	presets->set_favorite(session, type, name, favorite);
 }
 
 bool PluginManager::is_favorite(Session *session, ModuleCategory type, const string &name) {
-	return profiles->is_favorite(session, type, name);
+	return presets->is_favorite(session, type, name);
 }
 
 

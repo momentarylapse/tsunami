@@ -1048,7 +1048,7 @@
     <ClCompile Include="src\plugins\PluginManager.cpp">
       <Filter>src\plugins</Filter>
     </ClCompile>
-    <ClCompile Include="src\plugins\ProfileManager.cpp">
+    <ClCompile Include="src\plugins\PresetManager.cpp">
       <Filter>src\plugins</Filter>
     </ClCompile>
     <ClCompile Include="src\plugins\TsunamiPlugin.cpp">
@@ -2451,7 +2451,7 @@
     <ClInclude Include="src\plugins\PluginManager.h">
       <Filter>src\plugins</Filter>
     </ClInclude>
-    <ClInclude Include="src\plugins\ProfileManager.h">
+    <ClInclude Include="src\plugins\PresetManager.h">
       <Filter>src\plugins</Filter>
     </ClInclude>
     <ClInclude Include="src\plugins\TsunamiPlugin.h">

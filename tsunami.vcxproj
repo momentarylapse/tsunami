@@ -465,7 +465,7 @@
     <ClCompile Include="src\plugins\ExtendedAudioBuffer.cpp" />
     <ClCompile Include="src\plugins\Plugin.cpp" />
     <ClCompile Include="src\plugins\PluginManager.cpp" />
-    <ClCompile Include="src\plugins\ProfileManager.cpp" />
+    <ClCompile Include="src\plugins\PresetManager.cpp" />
     <ClCompile Include="src\plugins\TsunamiPlugin.cpp" />
     <ClCompile Include="src\storage\dialog\PdfConfigDialog.cpp" />
     <ClCompile Include="src\storage\dialog\RawConfigDialog.cpp" />
@@ -934,7 +934,7 @@
     <ClInclude Include="src\plugins\ExtendedAudioBuffer.h" />
     <ClInclude Include="src\plugins\Plugin.h" />
     <ClInclude Include="src\plugins\PluginManager.h" />
-    <ClInclude Include="src\plugins\ProfileManager.h" />
+    <ClInclude Include="src\plugins\PresetManager.h" />
     <ClInclude Include="src\plugins\TsunamiPlugin.h" />
     <ClInclude Include="src\storage\dialog\PdfConfigDialog.h" />
     <ClInclude Include="src\storage\dialog\RawConfigDialog.h" />

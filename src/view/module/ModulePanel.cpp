@@ -74,10 +74,10 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 }
 
 void ConfigPanelSocket::on_load() {
-	session->plugin_manager->select_profile_name(panel->win, module, false, [this] (const string &name) {
+	session->plugin_manager->select_module_preset_name(panel->win, module, false, [this](const string &name) {
 		if (name.num == 0)
 			return;
-		session->plugin_manager->apply_profile(module, name, false);
+		session->plugin_manager->apply_module_preset(module, name, false);
 		module->changed();
 		//if (func_edit)
 		//	func_edit(old_param);
@@ -86,10 +86,10 @@ void ConfigPanelSocket::on_load() {
 }
 
 void ConfigPanelSocket::on_save() {
-	session->plugin_manager->select_profile_name(panel->win, module, true, [this] (const string &name) {
+	session->plugin_manager->select_module_preset_name(panel->win, module, true, [this](const string &name) {
 		if (name.num == 0)
 			return;
-		session->plugin_manager->save_profile(module, name);
+		session->plugin_manager->save_module_preset(module, name);
 	});
 }
 

@@ -1,5 +1,5 @@
 /*
- * ProfileManager.h
+ * PresetManager.h
  *
  *  Created on: 13.04.2014
  *      Author: michi
@@ -17,13 +17,13 @@ namespace hui {
 }
 class Session;
 
-class ProfileManager {
+class PresetManager {
 public:
-	ProfileManager();
+	PresetManager();
 
 	static const string DEFAULT_NAME;
 
-	struct Profile {
+	struct ModulePreset {
 		ModuleCategory category;
 		string _class;
 		string name;
@@ -33,13 +33,14 @@ public:
 	};
 
 	bool loaded;
-	Array<Profile> profiles;
+	Array<ModulePreset> module_presets;
 
 	void load(Session *session);
 	void load_from_file(const Path &filename, bool read_only, Session *session);
+	void load_from_file_old(const Path &filename, bool read_only, Session *session);
 	void save(Session *session);
 
-	void set(const Profile &f);
+	void set(const ModulePreset &f);
 
 	Array<string> get_list(Module *c);
 	void apply(Module *c, const string &name, bool notify);

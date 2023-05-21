@@ -452,7 +452,7 @@ sources = [
 	'src/plugins/ExtendedAudioBuffer.cpp',
 	'src/plugins/Plugin.cpp',
 	'src/plugins/PluginManager.cpp',
-	'src/plugins/ProfileManager.cpp',
+	'src/plugins/PresetManager.cpp',
 	'src/plugins/TsunamiPlugin.cpp',
 	'src/storage/dialog/PdfConfigDialog.cpp',
 	'src/storage/dialog/RawConfigDialog.cpp',

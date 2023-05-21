@@ -48,6 +48,7 @@ public:
 	float get_slider();
 	Callback cb;
 	static bool aborted;
+	static bool maximize;
 	static void ask(hui::Window *parent, const string &question, Callback cb, float value0, float min, float max, const string& options = "");
 
 

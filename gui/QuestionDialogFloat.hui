@@ -8,6 +8,8 @@ Dialog question-dialog-float "Question" width=100 height=20 headerbar closebutto
 			Grid ? ""
 				SpinButton value "" expandx
 				Button unit "" hidden
+			---|
+			CheckBox maximize "Maximize" hidden
 		Grid buttons "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			---|

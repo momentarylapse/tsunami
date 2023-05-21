@@ -6683,7 +6683,7 @@ Grid
 
 0
 0
-3
+4
 Label
 question
 margin-top=8,margin-bottom=8,hidden
@@ -6713,6 +6713,12 @@ unit
 hidden
 1
 0
+0
+CheckBox
+maximize
+hidden
+0
+3
 0
 Grid
 buttons
@@ -8732,7 +8738,7 @@ default
 # Language
 English
 # Number Of IDs
-782
+783
 # Text
 /bars-add
 Add bars...
@@ -10614,6 +10620,9 @@ in Arbeit
 
 progress_dialog/progress_dialog
 in Arbeit
+
+question-dialog-float/maximize
+Maximize
 
 question-dialog-float/question-dialog-float
 Question

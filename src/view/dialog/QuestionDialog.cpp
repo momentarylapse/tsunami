@@ -14,6 +14,7 @@
 bool QuestionDialogInt::aborted;
 bool QuestionDialogIntInt::aborted;
 bool QuestionDialogFloat::aborted;
+bool QuestionDialogFloat::maximize;
 bool QuestionDialogString::aborted;
 
 QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options, std::function<void(int)> _cb)
@@ -85,6 +86,7 @@ QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &que
 	cb = _cb;
 	result = value0;
 	aborted = true;
+	maximize = false;
 	_min = min;
 	_max = max;
 	_min_db = amplitude2db(::max(_min, 0.001f));
@@ -111,12 +113,17 @@ QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &que
 		else if (mode == Mode::VOLUME_DB)
 			set_mode(Mode::VOLUME_PERCENT);
 	});
+	event("maximize", [this] {
+		enable("value", !is_checked("maximize"));
+		enable("slider", !is_checked("maximize"));
+	});
 	event("cancel", [this] {
 		cb(-1);
 		request_destroy();
 	});
 	event("ok", [this] {
 		aborted = false;
+		maximize = is_checked("maximize");
 		cb(result);
 		request_destroy();
 	});
@@ -136,6 +143,7 @@ void QuestionDialogFloat::set_mode(Mode m) {
 	if (mode == Mode::VOLUME_PERCENT) {
 		set_options("value", format("range=%f:%f:%f", _min * 100, _max * 100, 0.1f));
 		hide_control("unit", false);
+		hide_control("maximize", false);
 		set_string("unit", "%");
 		add_string("slider", format("%f\\<span size='x-small'>%d</span>", 0.0f, 0));
 		add_string("slider", format("%f\\<span size='x-small'>%d</span>", 0.25f, 50));
@@ -145,6 +153,7 @@ void QuestionDialogFloat::set_mode(Mode m) {
 	} else if (mode == Mode::VOLUME_DB) {
 		set_options("value", format("range=%f:%f:%f", _min_db, _max_db, 0.1f));
 		hide_control("unit", false);
+		hide_control("maximize", false);
 		set_string("unit", "dB");
 		add_string("slider", format("%f\\<span size='x-small'>%+d</span>", db2slider(DB_MAX), (int)DB_MAX));
 		add_string("slider", format("%f\\", db2slider(6), 6));
@@ -156,6 +165,7 @@ void QuestionDialogFloat::set_mode(Mode m) {
 	} else if (mode == Mode::DIRECT) {
 		set_options("value", format("range=%f:%f:%f", _min, _max, 0.01f));
 		hide_control("unit", true);
+		hide_control("maximize", true);
 	}
 	set_spin(result);
 	set_slider(result);

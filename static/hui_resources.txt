@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-86
+87
 # Resource
 Menu
 menu_fake
@@ -6683,10 +6683,10 @@ Grid
 
 0
 0
-4
+3
 Label
 question
-margin-top=8,margin-bottom=8,hidden
+margin-top=8,margin-bottom=8
 0
 0
 0
@@ -6713,12 +6713,6 @@ unit
 hidden
 1
 0
-0
-CheckBox
-maximize
-hidden
-0
-3
 0
 Grid
 buttons
@@ -7908,7 +7902,7 @@ Grid
 
 0
 0
-4
+7
 Button
 edit-song
 link,ignorefocus,disabled
@@ -7922,15 +7916,33 @@ disabled
 0
 0
 Button
-edit-track
+edit-edit
 link,ignorefocus
 2
+0
+0
+Label
+edit-separator2
+disabled
+3
+0
+0
+Button
+edit-track
+link,ignorefocus
+4
+0
+0
+Label
+edit-separator2
+disabled
+5
 0
 0
 Button
 edit-samples
 link,ignorefocus
-3
+6
 0
 0
 # Resource
@@ -8733,12 +8745,79 @@ default
 0
 1
 0
+# Resource
+Dialog
+volume-dialog
+width=320,height=20,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+
+0
+0
+3
+Slider
+slider
+
+0
+0
+0
+Grid
+?
+
+0
+1
+2
+SpinButton
+value
+expandx
+0
+0
+0
+Button
+unit
+
+1
+0
+0
+CheckBox
+maximize
+hidden
+0
+2
+0
+Grid
+buttons
+buttonbar
+1
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
 # Number Of Languages
 2
 # Language
 English
 # Number Of IDs
-783
+786
 # Text
 /bars-add
 Add bars...
@@ -8806,11 +8885,17 @@ Remove (if missing)
 /device-hide
 Ignore
 
+/edit-edit
+Edit
+
 /edit-samples
 Samples
 
 /edit-separator
 ›
+
+/edit-separator2
+|
 
 /edit-song
 File
@@ -10621,9 +10706,6 @@ in Arbeit
 progress_dialog/progress_dialog
 in Arbeit
 
-question-dialog-float/maximize
-Maximize
-
 question-dialog-float/question-dialog-float
 Question
 
@@ -11088,6 +11170,12 @@ Track
 
 trackdest_dialog/trackdest_dialog
 Ziel-Spur für die Ebenen
+
+volume-dialog/maximize
+Maximize
+
+volume-dialog/volume-dialog
+Volume
 
 # Num Language Strings
 0

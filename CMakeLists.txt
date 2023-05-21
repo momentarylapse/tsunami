@@ -439,6 +439,7 @@ set(SOURCE
 	src/view/dialog/TemperamentDialog.cpp
 	src/view/dialog/TimeTrackAddDialog.cpp
 	src/view/dialog/TrackRoutingDialog.cpp
+	src/view/dialog/VolumeDialog.cpp
 	src/view/helper/graph/Node.cpp
 	src/view/helper/graph/SceneGraph.cpp
 	src/view/helper/graph/Scrollable.cpp

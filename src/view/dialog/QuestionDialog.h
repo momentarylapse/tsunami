@@ -34,30 +34,14 @@ public:
 	using Callback = std::function<void(float)>;
 	QuestionDialogFloat(hui::Window *parent, const string &question, float value0, float min, float max, const string &options, Callback cb);
 	float result;
-	float _min, _max, _min_db, _max_db;
-	enum Mode {
-		DIRECT,
-		VOLUME_PERCENT,
-		VOLUME_DB
-	};
-	Mode mode;
-	void set_mode(Mode m);
+	float _min, _max;
 	void set_spin(float f);
 	void set_slider(float f);
 	float get_spin();
 	float get_slider();
 	Callback cb;
 	static bool aborted;
-	static bool maximize;
 	static void ask(hui::Window *parent, const string &question, Callback cb, float value0, float min, float max, const string& options = "");
-
-
-	static constexpr float DB_MIN = -1000000;
-	static constexpr float DB_MAX = 12;
-	static constexpr float TAN_SCALE = 13.0f;
-
-	static float db2slider(float db);
-	static float slider2db(float val);
 };
 
 

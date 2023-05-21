@@ -68,8 +68,6 @@ class Equalizer extends AudioEffect
 		func override reset()
 			gain = 0
 			peaks.clear()
-			peaks.add(Peak(FilterType.HIGH_PASS, 30, -10, 2))
-			peaks.add(Peak(FilterType.LOW_PASS, 100, -10, 2))
 
 	# FIXME find a better way!
 	var grid: EqualizerGrid* = nil

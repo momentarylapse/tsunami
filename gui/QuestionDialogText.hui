@@ -7,4 +7,4 @@ Dialog question-dialog-text "Question" width=300 height=20 headerbar closebutton
 		Grid buttons "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			---|
-			DefButton /ok "Ok" image=hui:ok
+			Button /ok "Ok" default image=hui:ok

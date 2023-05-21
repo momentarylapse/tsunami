@@ -1,0 +1,14 @@
+Dialog question-dialog-float "Question" width=100 height=20 headerbar closebutton=no
+	Grid ? "" vertical width=320
+		Grid ? ""
+			Label question "" margin-top=8 margin-bottom=8 hidden
+			---|
+			Slider slider ""
+			---|
+			Grid ? ""
+				SpinButton value "" expandx
+				Button unit "" hidden
+		Grid buttons "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button /ok "Ok" default image=hui:ok

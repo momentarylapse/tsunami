@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-85
+86
 # Resource
 Menu
 menu_fake
@@ -176,7 +176,7 @@ Grid
 
 0
 0
-2
+3
 Button
 action-source
 expandx
@@ -188,6 +188,12 @@ action-effect
 expandx
 1
 0
+0
+Button
+action-volume
+
+0
+1
 0
 Label
 ?
@@ -6661,6 +6667,73 @@ image=hui:cancel
 0
 # Resource
 Dialog
+question-dialog-float
+width=100,height=20,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical,width=320
+0
+0
+2
+Grid
+?
+
+0
+0
+3
+Label
+question
+margin-top=8,margin-bottom=8,hidden
+0
+0
+0
+Slider
+slider
+
+0
+1
+0
+Grid
+?
+
+0
+2
+2
+SpinButton
+value
+expandx
+0
+0
+0
+Button
+unit
+hidden
+1
+0
+0
+Grid
+buttons
+buttonbar
+1
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
+0
+# Resource
+Dialog
 question-dialog-int
 width=100,height=20,headerbar,closebutton=no
 0
@@ -6702,9 +6775,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 0
 1
 0
@@ -6775,9 +6848,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 0
 1
 0
@@ -6824,9 +6897,9 @@ image=hui:cancel
 0
 0
 0
-DefButton
+Button
 ok
-image=hui:ok
+default,image=hui:ok
 0
 1
 0
@@ -8659,7 +8732,7 @@ default
 # Language
 English
 # Number Of IDs
-780
+782
 # Text
 /bars-add
 Add bars...
@@ -8996,6 +9069,9 @@ Apply effect...
 
 audio-editor/action-source
 Fill from source...
+
+audio-editor/action-volume
+Change volume...
 
 audio-editor/audio-editor
 Audio
@@ -10538,6 +10614,9 @@ in Arbeit
 
 progress_dialog/progress_dialog
 in Arbeit
+
+question-dialog-float/question-dialog-float
+Question
 
 question-dialog-int/question-dialog-int
 Question

@@ -599,6 +599,7 @@
     <ClCompile Include="src\view\sidebar\CaptureConsole.cpp" />
     <ClCompile Include="src\view\sidebar\CurveConsole.cpp" />
     <ClCompile Include="src\view\sidebar\DummyEditorConsole.cpp" />
+    <ClCompile Include="src\view\sidebar\EffectsConsole.cpp" />
     <ClCompile Include="src\view\sidebar\MidiEditorConsole.cpp" />
     <ClCompile Include="src\view\sidebar\SampleManagerConsole.cpp" />
     <ClCompile Include="src\view\sidebar\SampleRefConsole.cpp" />
@@ -1073,6 +1074,7 @@
     <ClInclude Include="src\view\sidebar\CaptureConsole.h" />
     <ClInclude Include="src\view\sidebar\CurveConsole.h" />
     <ClInclude Include="src\view\sidebar\DummyEditorConsole.h" />
+    <ClInclude Include="src\view\sidebar\EffectsConsole.h" />
     <ClInclude Include="src\view\sidebar\MidiEditorConsole.h" />
     <ClInclude Include="src\view\sidebar\SampleManagerConsole.h" />
     <ClInclude Include="src\view\sidebar\SampleRefConsole.h" />

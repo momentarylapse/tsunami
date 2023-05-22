@@ -1,10 +1,18 @@
-Dialog fx_editor "Effects" width=380 height=516
+Dialog fx-editor "Effects" width=380 height=516
 	Grid ? "" vertical
-		Label comment_no_fx "- no effects active here (yet) -" center italic
-		Scroller scroller "" scrollx=no
-			Grid fx_inner_table ""
-		Button add "" expandx flat image=hui:add "tooltip=add new effect"
+		Grid ? "" vertical
+			ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=260
+			Revealer config-revealer "" slide=down
+				Grid grid-config ""
 		Label ? "" expandy
-		Group fe_g_edit "Edit"
+		Group td_t_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link
+				Button /edit-song "File" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit-track "Track" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit-track-fx "Fx" link ignorefocus disabled
+				Label /edit-separator2 "|" disabled
+				Button /edit-track-data "Edit" link ignorefocus
+				Label /edit-separator2 "|" disabled
+				Button /edit-track-curves "Curves" link ignorefocus

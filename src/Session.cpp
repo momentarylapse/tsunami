@@ -184,12 +184,13 @@ void Session::set_mode(const string &_mode) {
 			win->side_bar->open(SideBar::TRACK_CONSOLE);
 		} else if (mode == EditMode::DefaultTrackFx) {
 			view->set_mode(view->mode_default);
-			win->side_bar->open(SideBar::TRACK_CONSOLE);
-			win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
+			win->side_bar->open(SideBar::EFFECTS_CONSOLE);
+			//win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
 		} else if (mode == EditMode::DefaultTrackMidiFx) {
 			view->set_mode(view->mode_default);
-			win->side_bar->open(SideBar::TRACK_CONSOLE);
-			win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
+			win->side_bar->open(SideBar::EFFECTS_CONSOLE);
+			//win->side_bar->open(SideBar::TRACK_CONSOLE);
+			//win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
 		} else if (mode == EditMode::DefaultTrackSynth) {
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::TRACK_CONSOLE);

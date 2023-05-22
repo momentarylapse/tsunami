@@ -22,6 +22,9 @@ void add(hui::Panel* panel, Session* session) {
 	panel->event("edit-track", [session] {
 		session->set_mode(EditMode::DefaultTrack);
 	});
+	panel->event("edit-track-fx", [session] {
+		session->set_mode(EditMode::DefaultTrackFx);
+	});
 	panel->event("edit-track-curves", [session] {
 		session->set_mode(EditMode::Curves);
 	});

@@ -586,6 +586,7 @@ sources = [
 	'src/view/sidebar/CaptureConsole.cpp',
 	'src/view/sidebar/CurveConsole.cpp',
 	'src/view/sidebar/DummyEditorConsole.cpp',
+	'src/view/sidebar/EffectsConsole.cpp',
 	'src/view/sidebar/MidiEditorConsole.cpp',
 	'src/view/sidebar/SampleManagerConsole.cpp',
 	'src/view/sidebar/SampleRefConsole.cpp',

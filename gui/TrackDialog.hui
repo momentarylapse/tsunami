@@ -1,45 +1,52 @@
 Dialog track_dialog "Track" width=380 height=516
 	Grid ? "" vertical
-		Group g_name "Name"
+		Group g-name "Name"
 			Edit name "" expandx
 		Scroller scroller ? expandy
 			Grid ? "" vertical
-				Group g_volume "Volume"
+				Group g-volume "Volume"
 					Grid ? "" noexpandx
-						Label t_volume "Volume" right disabled
+						Label t-volume "Volume" right disabled
 						SpinButton volume "0" range=-10000:24:0.1 expandx
 						Label /db "dB"
 						---|
-						Label t_panning "Balance" right disabled
+						Label t-panning "Balance" right disabled
 						SpinButton panning "0" range=-100:100:1 "tooltip=+100% = right, -100% = left"
 						Label /percent "%"
-				Group g_instrument "Instrument"
+				Group g-instrument "Instrument"
 					Grid ? ""
 						ComboBox instrument "" expandx ignorefocus
 						---|
 						Grid ? ""
 							Label tuning "" expandx
 							Button edit_tuning "" image=hui:edit flat ignorefocus
-				Group g_synth "Synthesizer"
+				Group g-synth "Synthesizer"
 					Grid synth ""
-				Group g_fx "Effects"
-					Grid ? "" expandx
-						ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160
+				Group g-fx "Effects"
+					Grid ? ""
+						Grid g-fx-external "" expandx
+							Label l-fx "" italic
+							Button /edit-track-fx "Fx" link ignorefocus
 						---|
-						Revealer config-revealer "" slide=down
-							Grid grid-config ""
-				Expander g-fx-midi "Midi effects" disabled
+						Grid g-fx-internal "" expandx hidden
+							ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160
+							---|
+							Revealer config-revealer "" slide=down
+								Grid grid-config ""
+				Group g-fx-midi "Midi effects" disabled hidden
 					Grid ? "" expandx
 						ListView midi-fx "\\name" format=Ct reorderable nobar noexpandy expandx height=100
 						---|
 						Revealer config-revealer-midi "" slide=down
 							Grid grid-config-midi ""
-		Group td_t_edit "Edit"
+		Group g-edit "Edit"
 			Grid ? ""
 				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
 				Button /edit-track "Track" link ignorefocus disabled
 				Label /edit-separator "›" disabled
+				Button /edit-track-fx "Fx" link ignorefocus
+				Label /edit-separator2 "|" disabled
 				Button /edit-track-data "Edit" link ignorefocus
 				Label /edit-separator2 "|" disabled
 				Button /edit-track-curves "Curves" link ignorefocus

@@ -212,7 +212,7 @@ Grid
 
 0
 0
-7
+9
 Button
 edit-song
 link,ignorefocus
@@ -238,8 +238,8 @@ disabled
 0
 0
 Button
-edit-track-data
-link,ignorefocus,disabled
+edit-track-fx
+link,ignorefocus
 4
 0
 0
@@ -250,9 +250,21 @@ disabled
 0
 0
 Button
+edit-track-data
+link,ignorefocus,disabled
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
 edit-track-curves
 link,ignorefocus
-6
+8
 0
 0
 # Resource
@@ -685,7 +697,7 @@ Grid
 
 0
 0
-7
+9
 Button
 edit-song
 link,ignorefocus
@@ -711,8 +723,8 @@ disabled
 0
 0
 Button
-edit-track-data
-link,ignorefocus,disabled
+edit-track-fx
+link,ignorefocus
 4
 0
 0
@@ -723,9 +735,21 @@ disabled
 0
 0
 Button
+edit-track-data
+link,ignorefocus,disabled
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
 edit-track-curves
 link,ignorefocus
-6
+8
 0
 0
 # Resource
@@ -950,7 +974,7 @@ expandx,format=mTT
 0
 0
 Group
-cc_group_edit
+g-edit
 
 1
 0
@@ -960,7 +984,7 @@ Grid
 
 0
 0
-7
+9
 Button
 edit-song
 link,ignorefocus
@@ -986,7 +1010,7 @@ disabled
 0
 0
 Button
-edit-track-data
+edit-track-fx
 link,ignorefocus
 4
 0
@@ -998,9 +1022,21 @@ disabled
 0
 0
 Button
+edit-track-data
+link,ignorefocus
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
 edit-track-curves
 link,ignorefocus,disabled
-6
+8
 0
 0
 # Resource
@@ -1324,7 +1360,7 @@ default
 0
 # Resource
 Dialog
-fx_editor
+fx-editor
 width=380,height=516
 0
 0
@@ -1334,41 +1370,41 @@ Grid
 vertical
 0
 0
-5
-Label
-comment_no_fx
-center,italic
+3
+Grid
+?
+vertical
+0
+0
+2
+ListView
+fx
+format=Cm,reorderable,nobar,noexpandy,expandx,height=260
 0
 0
 0
-Scroller
-scroller
-scrollx=no
+Revealer
+config-revealer
+slide=down
 1
 0
 1
 Grid
-fx_inner_table
+grid-config
 
 0
-0
-0
-Button
-add
-expandx,flat,image=hui:add
-2
 0
 0
 Label
 ?
 expandy
-3
+1
 0
 0
 Group
-fe_g_edit
+td_t_edit
 
-4
+2
 0
 1
 Grid
@@ -1376,11 +1412,59 @@ Grid
 
 0
 0
-1
+9
 Button
-edit_song
-link
+edit-song
+link,ignorefocus
 0
+0
+0
+Label
+edit-separator
+disabled
+1
+0
+0
+Button
+edit-track
+link,ignorefocus
+2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
+Button
+edit-track-fx
+link,ignorefocus,disabled
+4
+0
+0
+Label
+edit-separator2
+disabled
+5
+0
+0
+Button
+edit-track-data
+link,ignorefocus
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
+edit-track-curves
+link,ignorefocus
+8
 0
 0
 # Resource
@@ -3387,7 +3471,7 @@ expandy
 0
 0
 Group
-me_group_edit
+g-edit
 
 9
 0
@@ -3397,7 +3481,7 @@ Grid
 
 0
 0
-7
+9
 Button
 edit-song
 link,ignorefocus
@@ -3423,8 +3507,8 @@ disabled
 0
 0
 Button
-edit-track-data
-link,ignorefocus,disabled
+edit-track-fx
+link,ignorefocus
 4
 0
 0
@@ -3435,9 +3519,21 @@ disabled
 0
 0
 Button
+edit-track-data
+link,ignorefocus,disabled
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
 edit-track-curves
 link,ignorefocus
-6
+8
 0
 0
 # Resource
@@ -7292,7 +7388,7 @@ expandy
 0
 0
 Group
-ld_t_edit
+g-edit
 
 4
 0
@@ -8226,7 +8322,7 @@ vertical
 0
 3
 Group
-g_name
+g-name
 
 0
 0
@@ -8250,7 +8346,7 @@ vertical
 0
 5
 Group
-g_volume
+g-volume
 
 0
 0
@@ -8262,7 +8358,7 @@ noexpandx
 0
 6
 Label
-t_volume
+t-volume
 right,disabled
 0
 0
@@ -8280,7 +8376,7 @@ db
 0
 0
 Label
-t_panning
+t-panning
 right,disabled
 0
 1
@@ -8298,7 +8394,7 @@ percent
 1
 0
 Group
-g_instrument
+g-instrument
 
 1
 0
@@ -8334,7 +8430,7 @@ image=hui:edit,flat,ignorefocus
 0
 0
 Group
-g_synth
+g-synth
 
 2
 0
@@ -8346,16 +8442,40 @@ synth
 0
 0
 Group
-g_fx
+g-fx
 
 3
 0
 1
 Grid
 ?
+
+0
+0
+2
+Grid
+g-fx-external
 expandx
 0
 0
+2
+Label
+l-fx
+italic
+0
+0
+0
+Button
+edit-track-fx
+link,ignorefocus
+1
+0
+0
+Grid
+g-fx-internal
+expandx,hidden
+0
+1
 2
 ListView
 fx
@@ -8375,9 +8495,9 @@ grid-config
 0
 0
 0
-Expander
+Group
 g-fx-midi
-disabled
+disabled,hidden
 4
 0
 1
@@ -8406,7 +8526,7 @@ grid-config-midi
 0
 0
 Group
-td_t_edit
+g-edit
 
 2
 0
@@ -8416,7 +8536,7 @@ Grid
 
 0
 0
-7
+9
 Button
 edit-song
 link,ignorefocus
@@ -8442,7 +8562,7 @@ disabled
 0
 0
 Button
-edit-track-data
+edit-track-fx
 link,ignorefocus
 4
 0
@@ -8454,9 +8574,21 @@ disabled
 0
 0
 Button
-edit-track-curves
+edit-track-data
 link,ignorefocus
 6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
+edit-track-curves
+link,ignorefocus
+8
 0
 0
 # Resource
@@ -8844,6 +8976,9 @@ Curves
 
 /edit-track-data
 Edit
+
+/edit-track-fx
+Fx
 
 /edit_sample
 Sample
@@ -9331,14 +9466,14 @@ Name
 curve-target-dialog/ok
 Select
 
-curve_console/cc_group_edit
-Edit
-
 curve_console/curve_console
 Kurven
 
 curve_console/curves
 Target\\min\\max
+
+curve_console/g-edit
+Edit
 
 detune_synthesizer_dialog/all_octaves
 All octaves
@@ -9394,17 +9529,14 @@ Name
 favorite-dialog/ok
 Select
 
-fx_editor/add
+fx-editor/fx
+\\name
 
-add new effect
-fx_editor/comment_no_fx
-- no effects active here (yet) -
-
-fx_editor/fe_g_edit
-Edit
-
-fx_editor/fx_editor
+fx-editor/fx-editor
 Effects
+
+fx-editor/td_t_edit
+Edit
 
 header-menu/about
 About
@@ -9895,6 +10027,9 @@ Set tenuto flag
 midi_editor/flag-trill
 
 Set trill flag
+midi_editor/g-edit
+Edit
+
 midi_editor/grp-flags
 Flags
 
@@ -9957,9 +10092,6 @@ midi_editor/length-whole
 Whole note
 midi_editor/me_group_creation
 Edit mode
-
-midi_editor/me_group_edit
-Edit
 
 midi_editor/me_group_reference
 Reference tracks
@@ -10711,7 +10843,7 @@ Sample Manager
 sample_ref_dialog/edit_samples
 Samples
 
-sample_ref_dialog/ld_t_edit
+sample_ref_dialog/g-edit
 Edit
 
 sample_ref_dialog/ld_t_name
@@ -11020,22 +11152,25 @@ tracks
 track_dialog/fx
 \\name
 
+track_dialog/g-edit
+Edit
+
+track_dialog/g-fx
+Effects
+
 track_dialog/g-fx-midi
 Midi effects
 
-track_dialog/g_fx
-Effects
-
-track_dialog/g_instrument
+track_dialog/g-instrument
 Instrument
 
-track_dialog/g_name
+track_dialog/g-name
 Name
 
-track_dialog/g_synth
+track_dialog/g-synth
 Synthesizer
 
-track_dialog/g_volume
+track_dialog/g-volume
 Volume
 
 track_dialog/midi-fx
@@ -11047,14 +11182,11 @@ track_dialog/panning
 track_dialog/scroller
 ?
 
-track_dialog/t_panning
+track_dialog/t-panning
 Balance
 
-track_dialog/t_volume
+track_dialog/t-volume
 Volume
-
-track_dialog/td_t_edit
-Edit
 
 track_dialog/track_dialog
 Track

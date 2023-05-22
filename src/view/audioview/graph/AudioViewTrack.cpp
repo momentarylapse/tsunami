@@ -67,9 +67,11 @@ bool AudioView::editing_track(Track *t) {
 		return false;
 	if (session->in_mode(EditMode::DefaultTrack))
 		return true;
-	if (session->in_mode(EditMode::DefaultFx))
+	if (session->in_mode(EditMode::DefaultTrackFx))
 		return true;
 	if (session->in_mode(EditMode::DefaultMidiFx))
+		return true;
+	if (session->in_mode(EditMode::Curves))
 		return true;
 	if (session->in_mode(EditMode::EditTrack))
 		return true;

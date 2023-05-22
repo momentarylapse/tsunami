@@ -1450,6 +1450,9 @@
     <ClCompile Include="src\view\sidebar\DummyEditorConsole.cpp">
       <Filter>src\view\sidebar</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\sidebar\EffectsConsole.cpp">
+      <Filter>src\view\sidebar</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\sidebar\MidiEditorConsole.cpp">
       <Filter>src\view\sidebar</Filter>
     </ClCompile>
@@ -2866,6 +2869,9 @@
       <Filter>src\view\sidebar</Filter>
     </ClInclude>
     <ClInclude Include="src\view\sidebar\DummyEditorConsole.h">
+      <Filter>src\view\sidebar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\sidebar\EffectsConsole.h">
       <Filter>src\view\sidebar</Filter>
     </ClInclude>
     <ClInclude Include="src\view\sidebar\MidiEditorConsole.h">

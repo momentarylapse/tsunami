@@ -36,6 +36,8 @@ Dialog audio-editor "Audio" width=300 height=516
 				Label /edit-separator "›" disabled
 				Button /edit-track "Track" link ignorefocus
 				Label /edit-separator "›" disabled
+				Button /edit-track-fx "Fx" link ignorefocus
+				Label /edit-separator2 "|" disabled
 				Button /edit-track-data "Edit" link ignorefocus disabled
 				Label /edit-separator2 "|" disabled
 				Button /edit-track-curves "Curves" link ignorefocus

@@ -8,6 +8,7 @@
 #include "SideBar.h"
 #include "TrackConsole.h"
 #include "CurveConsole.h"
+#include "EffectsConsole.h"
 #include "DummyEditorConsole.h"
 #include "AudioEditorConsole.h"
 #include "MidiEditorConsole.h"
@@ -51,6 +52,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	song_console = new SongConsole(session, this);
 	sample_manager = new SampleManagerConsole(session, this);
 	track_console = new TrackConsole(session, this);
+	effects_console = new EffectsConsole(session, this);
 	dummy_editor_console = new DummyEditorConsole(session, this);
 	audio_editor_console = new AudioEditorConsole(session, this);
 	midi_editor_console = new MidiEditorConsole(session, this);
@@ -62,6 +64,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	add_console(song_console);
 	add_console(sample_manager);
 	add_console(track_console);
+	add_console(effects_console);
 	add_console(dummy_editor_console);
 	add_console(audio_editor_console);
 	add_console(midi_editor_console);

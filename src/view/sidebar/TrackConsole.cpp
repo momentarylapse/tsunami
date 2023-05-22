@@ -61,19 +61,24 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	event("volume", [this] { on_volume(); });
 	event("panning", [this] { on_panning(); });
 	event("instrument", [this] { on_instrument(); });
-	event("edit_tuning", [this] { on_edit_strings(); });
+	event("edit-tuning", [this] { on_edit_strings(); });
+
+	//event("g-fx", )
 }
 
 void TrackConsole::set_mode(Mode mode) {
-	if (mode == Mode::FX) {
-		expand("g_fx", true);
+	/*if (mode == Mode::FX) {
+		expand("g-fx", true);
 		set_int("tc", 0);
 	} else if (mode == Mode::MIDI_FX) {
-		expand("g_fx", true);
+		expand("g-fx", true);
 		set_int("tc", 1);
 	} else if (mode == Mode::SYNTH) {
-		expand("g_synth", true);
-	}
+		expand("g-synth", true);
+	}*/
+	expand("g-fx", mode == Mode::FX);
+	expand("g-midi-fx", mode == Mode::MIDI_FX);
+	expand("g-synth", mode == Mode::SYNTH);
 }
 
 void TrackConsole::on_enter() {
@@ -124,6 +129,11 @@ void TrackConsole::load_data() {
 			panel = create_dummy_synth_panel();
 		}
 		embed(panel, "synth", 0, 0);
+
+		if (track->fx.num > 0)
+			set_string("l-fx", format(_("%d effects active"), track->fx.num));
+		else
+			set_string("l-fx", _("no effects yet"));
 
 	} else {
 		hide_control("td_t_bars", true);

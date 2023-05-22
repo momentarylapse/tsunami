@@ -2,8 +2,8 @@
 
 use tsunami
 
-const AUTO_CONFIG_SPEED = "0:20:0.1:1:Hz"
-const AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
+let AUTO_CONFIG_SPEED = "range=0:20:0.1,unit=Hz"
+let AUTO_CONFIG_DEPTH = "range=0:1:0.001,scale=100,unit=%"
 
 
 class Tremolo extends AudioEffect

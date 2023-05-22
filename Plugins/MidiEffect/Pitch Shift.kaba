@@ -1,6 +1,6 @@
 use tsunami
 
-const AUTO_CONFIG_SHIFT = "-50:50:1:1:"
+let AUTO_CONFIG_SHIFT = "range=-50:50"
 
 class Config extends Module.Config
 	var shift: float

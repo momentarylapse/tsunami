@@ -3,7 +3,7 @@
 
 use tsunami
 
-let AUTO_CONFIG_VOLUME = "0:2:1:100:%"
+let AUTO_CONFIG_VOLUME = "volume,range=0:2"
 	
 class Volume extends AudioEffect
 

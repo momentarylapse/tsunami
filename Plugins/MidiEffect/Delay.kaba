@@ -1,6 +1,6 @@
 use tsunami
 
-const AUTO_CONFIG_DELAY = "-2:2:1:1000:ms"
+let AUTO_CONFIG_DELAY = "range=-2:2:0.001,scale=1000,unit=ms"
 
 class Config extends Module.Config
 	var delay: float

@@ -6,30 +6,23 @@
  */
 
 #include "Slider.h"
+#include <cmath>
 
-Slider::Slider() {
-	value_min = 0;
-	value_max = 0;
-	factor = 1;
-	panel = nullptr;
-	event_handler_id[0] = -1;
-	event_handler_id[1] = -1;
-}
-
-
-Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, const hui::Callback &_func, float _value) {
+Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, Callback _func) {
 	panel = _panel;
 	id_slider = _id_slider;
 	id_edit = _id_edit;
-	value_min = _v_min;
-	value_max = _v_max;
-	factor = _factor;
+	value_min = 0;
+	value_max = 1;
+	value_min_slider = 0;
+	value_max_slider = 1;
+	factor = 1;
+	value = 0;
 	func = _func;
+	mode = Mode::LINEAR;
 
 	event_handler_id[0] = panel->event(id_slider, [this] { on_slide(); });
 	event_handler_id[1] = panel->event(id_edit, [this] { on_edit(); });
-
-	set(_value);
 }
 
 
@@ -41,25 +34,62 @@ Slider::~Slider() {
 	}
 }
 
-void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Callable<void()> *_func, float _value) {
-	new(this) Slider(_panel, _id_slider, _id_edit, _v_min, _v_max, _factor, [_func] { (*_func)(); }, _value);
+void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callable<void()> *_func) {
+	new(this) Slider(_panel, _id_slider, _id_edit, [_func] (float f) { (*_func)(); });
 }
 
 void Slider::__delete__() {
 	this->Slider::~Slider();
 }
 
-void Slider::set(float value) {
-	panel->set_float(id_slider, (value - value_min) / (value_max - value_min));
+void Slider::set_scale(float _factor) {
+	factor = _factor;
+	set(value);
+}
+
+void Slider::set_range(float _v_min, float _v_max, float _step) {
+	value_min = _v_min;
+	value_max = _v_max;
+	value_step = _step;
+	value_min_slider = _v_min;
+	value_max_slider = _v_max;
+	panel->set_options(id_edit, format("range=%f:%f:%f", value_min*factor, value_max*factor, value_step*factor));
+	set(value);
+}
+
+void Slider::set_slider_range(float _v_min, float _v_max) {
+	value_min_slider = _v_min;
+	value_max_slider = _v_max;
+	set(value);
+}
+
+
+void Slider::set(float v) {
+	value = v;
+	set_slide(v);
 	panel->set_float(id_edit, value * factor);
+}
+
+
+void Slider::set_slide(float v) {
+	if (mode == Mode::EXPONENTIAL)
+		panel->set_float(id_slider, (log(value) - log(value_min_slider)) / (log(value_max_slider) - log(value_min_slider)));
+	else if (mode == Mode::SQUARE)
+		panel->set_float(id_slider, (sqrt(value) - sqrt(value_min_slider)) / (sqrt(value_max_slider) - sqrt(value_min_slider)));
+	else
+		panel->set_float(id_slider, (value - value_min_slider) / (value_max_slider - value_min_slider));
 }
 
 
 
 float Slider::get() {
-	return panel->get_float(id_edit) / factor;
+	return value;
 }
 
+void Slider::set_mode(Mode m) {
+	mode = m;
+	set(value);
+}
 
 void Slider::enable(bool enabled) {
 	panel->enable(id_slider, enabled);
@@ -68,14 +98,19 @@ void Slider::enable(bool enabled) {
 
 
 void Slider::on_slide() {
-	float value = value_min + panel->get_float(id_slider) * (value_max - value_min);
+	if (mode == Mode::EXPONENTIAL)
+		value = value_min_slider + exp(panel->get_float(id_slider)) * (value_max_slider - value_min_slider);
+	else if (mode == Mode::SQUARE)
+		value = value_min_slider + sqr(panel->get_float(id_slider)) * (value_max_slider - value_min_slider);
+	else
+		value = value_min_slider + panel->get_float(id_slider) * (value_max_slider - value_min_slider);
 	panel->set_float(id_edit, value * factor);
-	func();
+	func(value);
 }
 
 void Slider::on_edit() {
-	float value = panel->get_float(id_edit) / factor;
-	panel->set_float(id_slider, (value - value_min) / (value_max - value_min));
-	func();
+	value = panel->get_float(id_edit) / factor;
+	set_slide(value);
+	func(value);
 }
 

@@ -1,6 +1,6 @@
 use tsunami
 
-#let AUTO_CONFIG_PITCH = "0:127:1:1:"
+#let AUTO_CONFIG_PITCH = "pitch,range=0:127"
 
 
 #class Config extends Module.Config

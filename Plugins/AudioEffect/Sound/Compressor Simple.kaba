@@ -5,12 +5,12 @@ use tsunami
 
 const MIN_DB = -60.0
 
-const AUTO_CONFIG_THRESHOLD = "-60:0:1:1:db"
-const AUTO_CONFIG_RATIO = "1:60:0.1:1:"
-const AUTO_CONFIG_ATTACK = "0:1:1:1000:ms"
-const AUTO_CONFIG_RELEASE = "0:1:1:1000:ms"
-const AUTO_CONFIG_SOFTNESS = "0:1:0.1:100:%"
-const AUTO_CONFIG_UPWARD = ""
+let AUTO_CONFIG_THRESHOLD = "range=-60:0,unit=db"
+let AUTO_CONFIG_RATIO = "range=1:60"
+let AUTO_CONFIG_ATTACK = "range=0:1:0.001,scale=1000,unit=ms"
+let AUTO_CONFIG_RELEASE = "range=0:1:0.001,scale=1000,unit=ms"
+let AUTO_CONFIG_SOFTNESS = "range=0:1:0.001,scale=100,unit=%"
+let AUTO_CONFIG_UPWARD = ""
 
 class CompressorConfig extends Module.Config
 	var threshold: float

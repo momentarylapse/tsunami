@@ -2,7 +2,7 @@
 # Title[Deutsch] = Verzerrer
 use tsunami
 
-const AUTO_CONFIG_GAIN = "0:1:0.1:100:%"
+let AUTO_CONFIG_GAIN = "range=0:1:0.001,scale=100,unit=%"
 
 class Config extends Module.Config
 	var gain: float

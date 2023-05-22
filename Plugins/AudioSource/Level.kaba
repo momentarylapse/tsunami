@@ -1,7 +1,7 @@
 use tsunami
 use helper.tone
 
-const AUTO_CONFIG_LEVEL = "-1:1:0.01:100:%"
+let AUTO_CONFIG_LEVEL = "range=-1:1:0.01,scale=100,unit=%"
 
 
 class FlipFlopSource extends AudioSource

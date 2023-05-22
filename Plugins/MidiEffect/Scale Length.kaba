@@ -1,6 +1,6 @@
 use tsunami
 
-const AUTO_CONFIG_SCALE = "0:2:1:100:%"
+let AUTO_CONFIG_SCALE = "range=0:2:0.01,scale=100,unit=%"
 
 class Config extends Module.Config
 	var scale: float

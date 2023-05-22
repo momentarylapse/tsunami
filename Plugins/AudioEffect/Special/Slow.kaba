@@ -1,6 +1,6 @@
 use tsunami
 
-const AutoConfigSpeed = "0.01:1:0.1:100:%"
+let AutoConfigSpeed = "range=0.01:1:0.001,scale=100,unit=%"
 
 class Config extends Module.Config
 	var speed: float

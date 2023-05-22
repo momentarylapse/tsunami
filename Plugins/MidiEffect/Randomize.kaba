@@ -1,8 +1,8 @@
 use tsunami
 
-const AutoConfigTimeDelay = "-2:2:1:1000:ms"
-const AutoConfigTimeVariation = "0:1:1:1000:ms"
-const AutoConfigVolume = "0:1:1:100:%"
+let AutoConfigTimeDelay = "range=-2:2:0.001,scale=1000,unit=ms"
+let AutoConfigTimeVariation = "range=0:1:0.001,scale=1000,unit=ms"
+let AutoConfigVolume = "range=0:1:0.01,scale=100,unit=%"
 
 class Config extends Module.Config
 	var TimeDelay: float

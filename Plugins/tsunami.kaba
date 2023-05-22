@@ -696,10 +696,14 @@ class Session extends Object as shared
 #	Range range
 
 class Slider
-	func extern __init__(panel: Panel, id_slider: string, id_edit: string, v_min: float, v_max: float, factor: float, on_update: void->void, value: float)
-	func extern virtual __delete__()
+	func extern __init__(panel: Panel, id_slider: string, id_edit: string, on_update: void->void)
+	func extern __delete__()
 	func extern get() -> float
 	func extern mut set(f: float)
+	func extern set_range(v_min: float, v_max: float, step: float)
+	func extern set_slider_range(v_min: float, v_max: float)
+	func extern set_scale(factor: float)
+	func extern enable(enabled: bool)
 
 class TsunamiPlugin extends Module
 	func extern __init__()

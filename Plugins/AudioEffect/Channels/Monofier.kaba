@@ -2,9 +2,9 @@
 # Title[Deutsch] = Monofizieren
 use tsunami
 
-const AUTO_CONFIG_PANNING = "-1:1:1:100:%"
-const AUTO_CONFIG_DISTANCE = "-2:2:0.1:100:cm"
-const AUTO_CONFIG_INVERT = ""
+let AUTO_CONFIG_PANNING = "range=-1:1:0.01,scale=100,unit=%"
+let AUTO_CONFIG_DISTANCE = "range=-2:2:0.001,scale=100,unit=cm"
+let AUTO_CONFIG_INVERT = ""
 
 const SPEED_OF_SOUND = 320.0 # m/s
 

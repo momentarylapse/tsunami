@@ -1,8 +1,8 @@
 use tsunami
 
-const AUTO_CONFIG_A = "0:1:0.0001:1:"
-const AUTO_CONFIG_B = "0:1:0.0001:1:"
-const AUTO_CONFIG_C = "0:1:0.0001:1:"
+let AUTO_CONFIG_A = "range=0:1:0.0001"
+let AUTO_CONFIG_B = "range=0:1:0.0001"
+let AUTO_CONFIG_C = "range=0:1:0.0001"
 
 class EnvConfig extends Module.Config
 	var a, b, c: float

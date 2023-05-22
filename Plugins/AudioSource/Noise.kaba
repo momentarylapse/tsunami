@@ -1,7 +1,7 @@
 use tsunami
 
-const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
-const AUTO_CONFIG_TYPE = "uniform|gauss"
+let AUTO_CONFIG_VOLUME = "volume,range=0:1"
+let AUTO_CONFIG_TYPE = "choice=uniform|gauss"
 
 
 

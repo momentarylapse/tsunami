@@ -9,55 +9,47 @@ func CreateMidiSourceX[T](session: Session, name: string) -> xfer[T]
 	return CreateMidiSource(session, name) as xfer[T]
 
 
+let AUTO_CONFIG_VOLUME = "volume"
+let AUTO_CONFIG_BEATS_PER_MINUTE = "range=1:1000,sliderrange=10:200,step=0.1,square"
+let AUTO_CONFIG_BEATS_PER_BAR = "range=1:32"
 
 class Metronome extends AudioSource
 	class Config extends Module.Config
 		var beats_per_minute: float
+		var beats_per_bar: int
 		var volume: float
-		var beats_per_measure: int
 		func override reset()
-			volume = 0.3
 			beats_per_minute = 90
-			beats_per_measure = 4
+			beats_per_bar = 4
+			volume = 0.3
 
 	var config: Config
 	var synth: shared[Synthesizer]
 	var source: shared[MetronomeSource]
 	
 	func mut create_stuff()
-		print("M create")
 		synth = CreateSynthesizer(session, "")
-		print(p2s(weak(synth)))
 		source = CreateMidiSourceX[MetronomeSource](session, "Metronome") #weak(CreateMidiSource(session, "Metronome")) as MetronomeSource*
-		print(p2s(weak(source)))
 		for s in synth
-			print("SYNTH PLUG")
 			s.plug_in(0, source, 0)
-			print("ok")
 
 	func override read(out buf: AudioBuffer) -> int
 		for s in synth
 			return s.port_out[0].read_audio(buf)
 		return 0
 		
-	func override create_panel() -> xfer[ConfigPanel]
+#	func override create_panel() -> xfer[ConfigPanel]
 		#return source.create_panel()
-		# how to deal with configuration/string exports...
-		
-		return new MetronomePanel(self)
+		# how to deal with configuration/string exports...		
+#		return new MetronomePanel(self)
 	
 	func override on_config()
-		print("M on config")
 		if not weak(source)
 			create_stuff()
-		print("AAA")
-		print(p2s(weak(source)))
 		for s in source
-			print("BBB")
 			s.config.volume = config.volume
-			s.set_beats(config.beats_per_measure, 1)
+			s.set_beats(config.beats_per_bar, 1)
 			s.set_bpm(config.beats_per_minute)
-			print("/BBB")
 	
 	func override reset_state()
 		if not weak(source)
@@ -68,42 +60,43 @@ class Metronome extends AudioSource
 			s.reset_state()
 
 	
-class MetronomePanel extends ConfigPanel
-	var override c: Metronome&
-	func override __init__(_m: Module)
-		add_grid("", 0, 0, "table2")
-		set_target("table2")
-		add_label("!right,disabled\\Speed", 0, 0, "")
-		add_spin_button("!expandx,range=0:1000:0.1\\", 1, 0, "beats_per_minute")
-		add_label("/min", 2, 0, "")
-		add_label("!right,disabled\\Beats per bar", 0, 1, "")
-		add_spin_button("!range=1:32:1\\", 1, 1, "beats_per_measure")
-		add_label("!right,disabled\\Volume", 0, 2, "")
-		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
-		add_label("%", 2, 2, "")
-	
-		event("beats_per_minute", on_bpm)
-		event("beats_per_measure", on_beats)
-		event("volume", on_volume)
-	
-		update()
-
-	func override update()
-		set_float("beats_per_minute", c.config.beats_per_minute)
-		set_int("beats_per_measure", c.config.beats_per_measure)
-		set_float("volume", c.config.volume * 100)
-		#SliderSet(self, "volume", c.config.volume)
-
-	func mut on_bpm()
-		c.config.beats_per_minute = get_float("")
-		changed()
-
-	func mut on_beats()
-		c.config.beats_per_measure = get_int("")
-		changed()
-
-	func mut on_volume()
-		c.config.volume = get_float("") / 100
-		#m.config.volume = SliderGet(self, "volume")
-		changed()
-
+#class MetronomePanel extends ConfigPanel
+#	var override c: Metronome&
+#	func override __init__(_m: Module)
+#		add_grid("", 0, 0, "table2")
+#		set_target("table2")
+#		add_label("!right,disabled\\Speed", 0, 0, "")
+#		add_spin_button("!expandx,range=0:1000:0.1\\", 1, 0, "beats_per_minute")
+#		add_label("/min", 2, 0, "")
+#		add_label("!right,disabled\\Beats per bar", 0, 1, "")
+#		add_spin_button("!range=1:32:1\\", 1, 1, "beats_per_measure")
+#		add_label("!right,disabled\\Volume", 0, 2, "")
+#		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
+#		add_label("%", 2, 2, "")
+#	
+#		event("beats_per_minute", on_bpm)
+#		event("beats_per_measure", on_beats)
+#		event("volume", on_volume)
+#	
+#		update()
+#
+#	func override update()
+#		set_float("beats_per_minute", c.config.beats_per_minute)
+#		set_int("beats_per_measure", c.config.beats_per_bar)
+#		set_float("volume", c.config.volume * 100)
+#		#SliderSet(self, "volume", c.config.volume)
+#
+#	func mut on_bpm()
+#		c.config.beats_per_minute = get_float("")
+#		changed()
+#
+#	func mut on_beats()
+#		c.config.beats_per_bar = get_int("")
+#		changed()
+#
+#	func mut on_volume()
+#		c.config.volume = get_float("") / 100
+#		#m.config.volume = SliderGet(self, "volume")
+#		changed()
+#
+#

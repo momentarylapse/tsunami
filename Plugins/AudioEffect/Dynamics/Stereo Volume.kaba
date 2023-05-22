@@ -3,8 +3,8 @@
 
 use tsunami
 
-const AUTO_CONFIG_VOLUME_RIGHT = "0:2:0.1:100:%"
-const AUTO_CONFIG_VOLUME_LEFT = "0:2:0.1:100:%"
+let AUTO_CONFIG_VOLUME_RIGHT = "volume,range=0:2"
+let AUTO_CONFIG_VOLUME_LEFT = "volume,range=0:2"
 
 
 class Volume extends AudioEffect

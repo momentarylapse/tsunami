@@ -23,7 +23,7 @@ VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const
 	_min_db = -120;
 	_max_db = 0;
 	value = 1;
-	set_mode(Mode::PERCENT);
+	set_mode(Mode::DB);
 
 	panel->event(id_spin, [this] {
 		value = get_spin();

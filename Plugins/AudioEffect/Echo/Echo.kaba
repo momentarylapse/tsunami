@@ -4,9 +4,9 @@
 use tsunami
 use helper.grid
 
-const AUTO_CONFIG_DELAY = "0:1:1:1000:ms"
-const AUTO_CONFIG_VOLUME = "0:2:0.1:100:%"
-const AUTO_CONFIG_FEEDBACK = "0:1:0.1:100:%"
+let AUTO_CONFIG_DELAY = "range=0:1:0.001,scale=1000,unit=ms"
+let AUTO_CONFIG_VOLUME = "volume,range=0:2"
+let AUTO_CONFIG_FEEDBACK = "range=0:1:0.001,scale=100,unit=%"
 
 
 

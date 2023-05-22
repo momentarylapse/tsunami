@@ -267,13 +267,13 @@ class MLVDialog extends hui.Dialog
 	func force_redraw()
 		redraw("area")
 
-let AUTO_CONFIG_LINE_HEIGHT = "10:200:1:1:"
-let AUTO_CONFIG_LINE_SPACE = "0:2:1:100:%"
-let AUTO_CONFIG_TRACK_SPACE = "0:2:1:100:%"
-#let AUTO_CONFIG_BORDER = "0:100:1:1:"
+let AUTO_CONFIG_LINE_HEIGHT = "range=10:200"
+let AUTO_CONFIG_LINE_SPACE = "range=0:2:0.01,scale=100,unit=%"
+let AUTO_CONFIG_TRACK_SPACE = "range=0:2:0.01,scale=100,unit=%"
+#let AUTO_CONFIG_BORDER = "range=0:100"
 let AUTO_CONFIG_BORDER = "ignore"
-let AUTO_CONFIG_X_SCALE = "0.02:4:1:100:%"
-#let AUTO_CONFIG_Y_OFFSET = "0:100000:1:1:"
+let AUTO_CONFIG_X_SCALE = "range=0.02:4:0.01,scale=100,unit=%"
+#let AUTO_CONFIG_Y_OFFSET = "range=0:100000"
 let AUTO_CONFIG_Y_OFFSET = "ignore"
 let AUTO_CONFIG_SHOW_WINDOW = ""
 

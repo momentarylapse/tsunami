@@ -1,10 +1,10 @@
 use tsunami
 use helper.tone
 
-const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
-const AUTO_CONFIG_FREQMIN = "1:40000:1:1:Hz"
-const AUTO_CONFIG_FREQMAX = "1:40000:1:1:Hz"
-const AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
+let AUTO_CONFIG_VOLUME = "range=0:1:0.001,scale=100,unit=%"
+let AUTO_CONFIG_FREQMIN = "range=1:40000,unit=Hz,square"
+let AUTO_CONFIG_FREQMAX = "range=1:40000,unit=Hz,square"
+let AUTO_CONFIG_PERIOD = "range=0:10:0.1,unit=s,square"
 
 
 class SweepSource extends AudioSource

@@ -1,7 +1,7 @@
 use tsunami
 use helper.tone
 
-const AUTO_CONFIG_PERIOD = "0:10:0.1:1:s"
+let AUTO_CONFIG_PERIOD = "range=0:10:0.1,unit=s"
 
 
 class FlipFlopSource extends AudioSource

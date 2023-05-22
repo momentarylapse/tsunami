@@ -1,7 +1,7 @@
 use tsunami
 
-const AUTO_CONFIG_PITCH = "0:127"
-const AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+let AUTO_CONFIG_PITCH = "pitch,range=0:127"
+let AUTO_CONFIG_VOLUME = "volume,range=0:1"
 
 
 class ToneConfig extends Module.Config

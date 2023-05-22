@@ -12,29 +12,45 @@
 #include "../../lib/base/callable.h"
 
 
-class Slider : public hui::EventHandler {
+class Slider {
 public:
-	Slider();
-	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, const hui::Callback &func, float _value);
-	virtual ~Slider();
+	using Callback = std::function<void(float)>;
 
-	void _cdecl __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Callable<void()> *_func, float _value);
-	virtual void _cdecl __delete__();
+	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callback func);
+	~Slider();
 
-	void _cdecl set(float value);
-	float _cdecl get();
-	void _cdecl enable(bool enabled);
+	void __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callable<void()> *_func);
+	void __delete__();
 
+	void set(float value);
+	float get();
+
+	void set_scale(float factor);
+	void set_range(float min, float max, float step);
+	void set_slider_range(float min, float max);
+	void enable(bool enabled);
+
+	enum Mode {
+		LINEAR,
+		EXPONENTIAL,
+		SQUARE
+	};
+	void set_mode(Mode m);
+
+private:
+	void set_slide(float f);
 	void on_slide();
 	void on_edit();
 
-private:
 	string id_slider, id_edit;
 	int event_handler_id[2];
-	float value_min, value_max;
+	float value;
+	float value_min, value_max, value_step;
+	float value_min_slider, value_max_slider;
 	float factor;
+	Mode mode;
 	hui::Panel *panel;
-	hui::Callback func;
+	Callback func;
 };
 
 #endif /* SLIDER_H_ */

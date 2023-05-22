@@ -1,6 +1,6 @@
 use tsunami
 
-const AUTO_CONFIG_VOLUME = "0:1:1:100:%"
+let AUTO_CONFIG_VOLUME = "volume,range=0:1"
 
 class Config extends Module.Config
 	var volume: float

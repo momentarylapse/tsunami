@@ -1,9 +1,9 @@
 use tsunami
 use Special.Envelope
 
-const AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
-const AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"
-const AUTO_CONFIG_MIX = "0:1:1:100:%"
+let AUTO_CONFIG_ATTACK = "range=-1:10:0.01,scale=100,unit=%"
+let AUTO_CONFIG_SUSTAIN = "range=-1:10:0.01,scale=100,unit=%"
+let AUTO_CONFIG_MIX = "range=0:1:0.01,scale=100,unit=%"
 
 class Config extends Module.Config
 	var attack: float

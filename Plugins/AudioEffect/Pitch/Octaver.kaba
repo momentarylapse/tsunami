@@ -2,7 +2,7 @@
 # Title[Deutsch] = Oktavieren
 use tsunami
 
-const AUTO_CONFIG_LEVEL = "0:1:0.1:100:%"
+let AUTO_CONFIG_LEVEL = "range=0:1:0.001,scale=100,unit=%"
 
 
 class Octaver extends AudioEffect

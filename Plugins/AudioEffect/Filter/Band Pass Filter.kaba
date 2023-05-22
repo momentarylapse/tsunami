@@ -2,7 +2,7 @@
 # Title[Deutsch] = Band Pass Filter
 use tsunami
 
-const AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
+let AUTO_CONFIG_FREQUENCY = "range=0:5000:0.1,unit=Hz"
 
 
 class LowPassFilter extends AudioEffect

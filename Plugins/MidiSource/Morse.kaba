@@ -1,8 +1,8 @@
 use tsunami
 
-const AUTO_CONFIG_PITCH = "0:127:1:1:"
-const AUTO_CONFIG_TEXT = ""
-const AUTO_CONFIG_BEAT_PARTITION = "1:8"
+let AUTO_CONFIG_PITCH = "range=0:127"
+let AUTO_CONFIG_TEXT = ""
+let AUTO_CONFIG_BEAT_PARTITION = "range=1:8"
 
 func append(out a: int[], b: int[])
 	for x in b

@@ -1,11 +1,11 @@
 use tsunami
 use helper.filter
 
-const AUTO_CONFIG_FMIN = "0:10000:1:1:Hz"
-const AUTO_CONFIG_FMAX = "0:10000:1:1:Hz"
-const AUTO_CONFIG_LFO = "0:5:0.1:1:Hz"
-const AUTO_CONFIG_Q = "0:20:0.1:1:"
-const AUTO_CONFIG_MIX = "0:1:1:100:%"
+let AUTO_CONFIG_FMIN = "range=0:10000,unit=Hz"
+let AUTO_CONFIG_FMAX = "range=0:10000,unit=Hz"
+let AUTO_CONFIG_LFO = "range=0:5:0.1,unit=Hz"
+let AUTO_CONFIG_Q = "range=0:20:0.1"
+let AUTO_CONFIG_MIX = "range=0:1:0.01,scale=100,unit=%"
 
 class Config extends Module.Config
 	var f_min: float

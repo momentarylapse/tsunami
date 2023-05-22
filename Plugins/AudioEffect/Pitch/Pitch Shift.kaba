@@ -3,7 +3,7 @@
 
 use tsunami
 
-const AutoConfigFactor = "0:2:0.1:100:%"
+const AutoConfigFactor = "range=0:2:0.001,scale=100,unit=%"
 
 const CHUNK_SIZE = 1024
 const OVERLAP = 512

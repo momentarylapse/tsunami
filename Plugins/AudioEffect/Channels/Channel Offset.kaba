@@ -1,7 +1,7 @@
 use tsunami
 
-const AUTO_CONFIG_OFFSETL = "-1:1:0.001:1:"
-const AUTO_CONFIG_OFFSETR = "-1:1:0.001:1:"
+let AUTO_CONFIG_OFFSETL = "range=-1:1:0.001"
+let AUTO_CONFIG_OFFSETR = "range=-1:1:0.001"
 
 class ChannelOffset extends AudioEffect
 	class Config extends Module.Config

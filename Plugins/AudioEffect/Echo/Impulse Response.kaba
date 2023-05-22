@@ -1,6 +1,6 @@
 use tsunami
 
-const AUTO_CONFIG_SAMPLE = ""
+let AUTO_CONFIG_SAMPLE = ""
 
 func fold(x: float[], h: float[], out HH: complex[], out result: float[])
 	var N = len(x)

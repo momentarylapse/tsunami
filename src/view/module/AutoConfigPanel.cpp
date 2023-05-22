@@ -23,11 +23,16 @@
 #include "../../Session.h"
 
 
-string to_camel_case(const string &s) {
+bool is_number(char c) {
+	return (c >= '0' and c <= '9');
+}
+
+string snake_case_to_label(const string &s) {
 	string r;
 	bool next_upper = true;
 	for (int i=0; i<s.num; i++) {
 		if (s[i] == '_') {
+			r += " ";
 			next_upper = true;
 			continue;
 		} else {
@@ -48,7 +53,7 @@ public:
 	string name, label, unit;
 	AutoConfigData(const string &_name) {
 		name = _name;
-		label = to_camel_case(_name);
+		label = snake_case_to_label(_name);
 	}
 	virtual ~AutoConfigData() {}
 
@@ -64,36 +69,73 @@ public:
 class AutoConfigDataFloat : public AutoConfigData {
 public:
 	float min, max, step, factor;
+	float min_slider, max_slider;
 	float *value;
 	owned<Slider> slider;
+	Slider::Mode mode = Slider::Mode::LINEAR;
 	AutoConfigDataFloat(const string &_name) : AutoConfigData(_name) {
-		min = -1000000;
-		max = 1000000;
-		step = 0.001f;
+		min = -100;
+		max = 100;
+		step = 0.1f;
+		min_slider = min;
+		max_slider = max;
 		factor = 1;
 		value = nullptr;
 	}
 	void parse(const string &s) override {
-		auto p = s.explode(":");
-		if (p.num == 5) {
-			min = p[0]._float();
-			max = p[1]._float();
-			step = p[2]._float();
-			factor = p[3]._float();
-			unit = p[4];
+		if (is_number(s[0])) {
+			// legacy
+			auto p = s.explode(":");
+			if (p.num == 5) {
+				min = p[0]._float();
+				max = p[1]._float();
+				step = p[2]._float();
+				factor = p[3]._float();
+				step /= factor;
+				unit = p[4];
+			} else {
+				msg_write("required format: min:max:step:factor:unit");
+			}
 		} else {
-			msg_write("required format: min:max:step:factor:unit");
+			for (const auto& p: s.explode(",")) {
+				if (p.head(6) == "range=") {
+					auto x = p.sub_ref(6).explode(":");
+					min_slider = min = x[0]._float();
+					if (x.num >= 2)
+						max_slider = max = x[1]._float();
+					if (x.num >= 3)
+						step = x[2]._float();
+				} else if (p.head(12) == "sliderrange=") {
+					auto x = p.sub_ref(12).explode(":");
+					min_slider = x[0]._float();
+					if (x.num >= 2)
+						max_slider = x[1]._float();
+				} else if (p.head(5) == "step=") {
+					step = p.sub_ref(5)._float();
+				} else if (p.head(6) == "scale=") {
+					factor = p.sub_ref(6)._float();
+				} else if (p.head(5) == "unit=") {
+					unit = p.sub(5);
+				} else if (p == "exponential") {
+					mode = Slider::Mode::EXPONENTIAL;
+				} else if (p == "square") {
+					mode = Slider::Mode::SQUARE;
+				}
+			}
 		}
-
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		p->add_grid("", 1, i, "grid-" + i2s(i));
 		p->set_target("grid-" + i2s(i));
 		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
 		p->add_spin_button("!width=50\\" + f2s(*value, 6), 1, 0, "spin-" + i2s(i));
-		p->set_options("spin-" + i2s(i), format("range=%f:%f:%f", min*factor, max*factor, step));
 		//p->addLabel(unit, 2, 0, "");
-		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), min, max, factor, callback, *value);
+		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), [callback] (float f) { callback(); });
+		slider->set_scale(factor);
+		slider->set_range(min, max, step);
+		slider->set_slider_range(min_slider, max_slider);
+		slider->set(*value);
+		slider->set_mode(mode);
 	}
 	void value_from_gui() override {
 		*value = slider->get();
@@ -141,12 +183,26 @@ public:
 		panel = nullptr;
 	}
 	void parse(const string &s) override {
-		auto p = s.explode(":");
-		if (p.num == 2) {
-			min = p[0]._int();
-			max = p[1]._int();
+		if (is_number(s[0])) {
+			// legacy
+			auto p = s.explode(":");
+			if (p.num == 2) {
+				min = p[0]._float();
+				max = p[1]._float();
+			} else {
+				msg_write("required format: min:max");
+			}
 		} else {
-			msg_write("required format: min:max");
+			for (const auto& p: s.explode(",")) {
+				if (p.head(6) == "range=") {
+					auto x = p.sub_ref(6).explode(":");
+					min = x[0]._float();
+					if (x.num >= 2)
+						max = x[1]._float();
+				} else if (p.head(5) == "unit=") {
+					unit = p.sub(5);
+				}
+			}
 		}
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
@@ -261,10 +317,13 @@ public:
 
 class AutoConfigDataVolume : public AutoConfigData {
 public:
+	float value_min, value_max;
 	float *value;
 	owned<VolumeControl> volume_control;
 	AutoConfigDataVolume(const string &_name) : AutoConfigData(_name) {
 		value = nullptr;
+		value_min = 0;
+		value_max = 1;
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		p->add_grid("", 1, i, "grid-" + i2s(i));
@@ -275,8 +334,19 @@ public:
 		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i), [this, callback] (float f) {
 			callback();
 		});
+		volume_control->set_range(value_min, value_max);
 	}
-	void parse(const string &s) override {}
+	void parse(const string &s) override {
+		for (const auto& p: s.explode(",")) {
+			if (p.head(6) == "range=") {
+				auto x = p.sub_ref(6).explode(":");
+				if (x.num >= 2) {
+					value_min = x[0]._float();
+					value_max = x[1]._float();
+				}
+			}
+		}
+	}
 	void value_from_gui() override {
 		*value = volume_control->get();
 	}
@@ -296,8 +366,11 @@ public:
 		panel = nullptr;
 	}
 	void parse(const string &s) override {
-		if (s.find("|", 0) >= 0)
-			choices = s.explode("|");
+		for (const auto& p: s.explode(",")) {
+			if (p.head(7) == "choice=") {
+				choices = p.sub_ref(7).explode("|");
+			}
+		}
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		panel = p;

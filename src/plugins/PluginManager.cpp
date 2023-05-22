@@ -828,12 +828,15 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("MultiLinePainter.get_line_dy", &MultiLinePainter::get_line_dy);
 
 	{
-		Slider slider;
 		ext->declare_class_size("Slider", sizeof(Slider));
 		ext->link_class_func("Slider.__init__", &Slider::__init_ext__);
-		ext->link_virtual("Slider.__delete__", &Slider::__delete__, &slider);
+		ext->link_class_func("Slider.__delete__", &Slider::__delete__);
 		ext->link_class_func("Slider.get", &Slider::get);
 		ext->link_class_func("Slider.set", &Slider::set);
+		ext->link_class_func("Slider.set_range", &Slider::set_range);
+		ext->link_class_func("Slider.set_slider_range", &Slider::set_slider_range);
+		ext->link_class_func("Slider.set_scale", &Slider::set_scale);
+		ext->link_class_func("Slider.enable", &Slider::enable);
 	}
 
 	{

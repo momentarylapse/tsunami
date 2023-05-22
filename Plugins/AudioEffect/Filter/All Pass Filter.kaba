@@ -3,8 +3,8 @@
 use tsunami
 use helper.filter
 
-const AUTO_CONFIG_Z = "0:100:0.1:1:"
-const AUTO_CONFIG_PHI = "0:6.3:0.1:1:"
+let AUTO_CONFIG_Z = "range=0:100:0.1"
+let AUTO_CONFIG_PHI = "range=0:6.3:0.1"
 
 
 class AllPassFilter extends AudioEffect

@@ -1420,7 +1420,7 @@ header-paste-menu
 
 0
 0
-4
+7
 Item
 paste
 image=hui:paste
@@ -1443,6 +1443,24 @@ Item
 paste-insert-time
 image=hui:paste
 3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
+delete
+image=hui:delete
+5
+0
+0
+Item
+delete-shift
+image=hui:delete
+6
 0
 0
 # Resource

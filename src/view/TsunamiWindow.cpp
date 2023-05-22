@@ -856,7 +856,6 @@ void TsunamiWindow::update_menu() {
 	enable("redo", song->action_manager->redoable());
 	enable("copy", app->clipboard->can_copy(view));
 	enable("paste", app->clipboard->has_data());
-	enable("paste-menu", app->clipboard->has_data());
 	enable("paste-as-samples", app->clipboard->has_data());
 	enable("paste-aligned-to-beats", app->clipboard->has_data());
 	enable("paste-insert-time", app->clipboard->has_data());

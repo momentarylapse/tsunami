@@ -3,3 +3,6 @@ Menu header-paste-menu ""
 	Item /paste-as-samples "Paste as samples" image=hui:paste
 	Item /paste-aligned-to-beats "Paste aligned to beats" image=hui:paste
 	Item /paste-insert-time "Paste and insert time" image=hui:paste
+	Separator
+	Item /delete "Delete" image=hui:delete "tooltip=does not move anything - leaves a gap instead"
+	Item /delete-shift "Delete and shift" image=hui:delete "tooltip=no gap - moves everyting afterwards"

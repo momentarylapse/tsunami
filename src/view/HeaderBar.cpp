@@ -15,6 +15,8 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	win = _win;
 
 	win->_add_headerbar();
+
+	// file load/save
 	win->set_target(":header:");
 	win->add_grid("!box,linked", 0, 0, "file-box");
 		win->set_target("file-box");
@@ -25,6 +27,8 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 		win->set_image("save", "hui:save");
 		win->add_menu_button("!ignorefocus,width=10", 2, 0, "save-menu");
 		win->set_options("save-menu", "menu=header-save-menu");
+
+	// unde/redo
 	win->set_target(":header:");
 	win->add_grid("!box,linked", 1, 0, "undo-redo-box");
 		win->set_target("undo-redo-box");
@@ -32,17 +36,19 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 		win->set_image("undo", "hui:undo");
 		win->add_button("!ignorefocus", 1, 0, "redo");
 		win->set_image("redo", "hui:redo");
+
+	// copy/paste
 	win->set_target(":header:");
 	win->add_grid("!box,linked", 2, 0, "copy-paste-box");
 		win->set_target("copy-paste-box");
 		win->add_button("!ignorefocus", 0, 0, "copy");
 		win->set_image("copy", "hui:copy");
-		win->add_menu_button("!ignorefocus,width=10", 1, 0, "paste-menu");
-		win->set_options("paste-menu", "menu=header-paste-menu");
-		win->set_image("paste-menu", "hui:paste");
+		win->add_button("!ignorefocus", 0, 0, "paste");
+		win->set_image("paste", "hui:paste");
+		win->add_menu_button("!ignorefocus,width=10", 1, 0, "edit-menu");
+		win->set_options("edit-menu", "menu=header-paste-menu");
+
 	win->set_target(":header:");
-
-
 	win->add_menu_button("!menu=header-menu,arrow=no", 2, 1, "menu-x");
 	win->set_image("menu-x", "hui:open-menu");
 	win->add_button("!ignorefocus", 1, 1, "mode-edit-check");

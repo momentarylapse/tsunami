@@ -20,7 +20,6 @@
 #include "dialog/PauseAddDialog.h"
 #include "dialog/PauseEditDialog.h"
 #include "dialog/TrackRoutingDialog.h"
-#include "dialog/TimeTrackAddDialog.h"
 #include "dialog/QuestionDialog.h"
 #include "dialog/BufferCompressionDialog.h"
 #include "bottombar/BottomBar.h"
@@ -107,15 +106,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("redo", [this] { on_redo(); });
 	set_key_code("redo", hui::KEY_Y + hui::KEY_CONTROL);
 	event("track_render", [this] { on_track_render(); });
-	event("track-add-new", [this] {
-		hui::fly(new NewTrackDialog(this, session));
-	});
+	event("track-add-new", [this] { on_add_new_track(SignalType::AUDIO); });
 	set_key_code("track-add-new", hui::KEY_N + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	/*event("track-add-audio-mono", [this] { on_add_audio_track_mono(); });
-	event("track-add-audio-stereo", [this] { on_add_audio_track_stereo(); });
-	event("track-add-group", [this] { song->add_track(SignalType::GROUP); });
-	event("track-add-beats", [this] { on_add_time_track(); });
-	event("track-add-midi", [this] { on_add_midi_track(); });*/
+	event("track-add-beats", [this] { on_add_new_track(SignalType::BEATS); });
 	event("track-delete", [this] { on_track_delete(); });
 	event("track-create-group", [this] { on_track_group(); });
 	event("track-ungroup", [this] { on_track_ungroup(); });
@@ -449,22 +442,9 @@ void TsunamiWindow::on_help() {
 	hui::fly(new HelpDialog(this));
 }
 
-void TsunamiWindow::on_add_audio_track_mono() {
-	song->add_track(SignalType::AUDIO_MONO);
+void TsunamiWindow::on_add_new_track(SignalType type) {
+	hui::fly(new NewTrackDialog(this, session, type));
 }
-
-void TsunamiWindow::on_add_audio_track_stereo() {
-	song->add_track(SignalType::AUDIO_STEREO);
-}
-
-void TsunamiWindow::on_add_time_track() {
-	hui::fly(new TimeTrackAddDialog(song, this));
-}
-
-void TsunamiWindow::on_add_midi_track() {
-	song->add_track(SignalType::MIDI);
-}
-
 
 void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range();

@@ -21,6 +21,7 @@ class Session;
 class Tsunami;
 class Module;
 class ModulePanel;
+enum class SignalType;
 
 class TsunamiWindow : public obs::Node<hui::Window> {
 public:
@@ -55,10 +56,7 @@ public:
 	void on_quick_export();
 	void on_undo();
 	void on_redo();
-	void on_add_audio_track_mono();
-	void on_add_audio_track_stereo();
-	void on_add_time_track();
-	void on_add_midi_track();
+	void on_add_new_track(SignalType type);
 	void on_track_delete();
 	void on_track_render();
 	void on_track_edit();

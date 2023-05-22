@@ -41,11 +41,11 @@ hui::Panel *create_synth_panel(Synthesizer *synth, Session *session, NewTrackDia
 	return p;
 }
 
-NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s):
+NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s, SignalType initial_type):
 		hui::Dialog("new-track-dialog", _parent)
 {
 	session = s;
-	on_type(SignalType::AUDIO);
+	on_type(initial_type);
 	check("channels:mono", true);
 	instrument = Instrument(Instrument::Type::PIANO);
 

@@ -17,7 +17,7 @@ enum class SignalType;
 
 class NewTrackDialog : public hui::Dialog {
 public:
-	NewTrackDialog(hui::Window *parent, Session *session);
+	NewTrackDialog(hui::Window *parent, Session *session, SignalType initial_type);
 
 	SignalType type;
 	Session *session;

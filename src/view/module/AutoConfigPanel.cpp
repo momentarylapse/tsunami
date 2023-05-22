@@ -326,11 +326,12 @@ public:
 		value_max = 1;
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
+		p->remove_control(format("unit-%d", i));
+		p->add_button("!small,padding=2", 2, i, format("unit-%d", i));
 		p->add_grid("", 1, i, "grid-" + i2s(i));
 		p->set_target("grid-" + i2s(i));
 		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
-		p->add_spin_button("", 0, 1, "spin-" + i2s(i));
-		p->add_button("", 1, 1, "unit-" + i2s(i));
+		p->add_spin_button("", 1, 0, "spin-" + i2s(i));
 		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i), [this, callback] (float f) {
 			callback();
 		});
@@ -561,7 +562,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	foreachi(auto *a, aa, i) {
 		set_target("grid");
 		add_label("!right,disabled\\" + a->label, 0, i, format("label-%d", i));
-		add_label(a->unit, 2, i, "");
+		add_label(a->unit, 2, i, format("unit-%d", i));
 		a->add_gui(this, i, [a,this]{
 			a->value_from_gui();
 			changed();

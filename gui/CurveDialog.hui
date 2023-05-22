@@ -1,6 +1,10 @@
 Dialog curve_console "Kurven" width=380 height=516
 	Grid ? "" vertical
-		ListView curves "Target\\min\\max" expandx format=mTT
+		Group g-track "Track"
+			Grid ? ""
+				Button link-to-track "Track" link ignorefocus
+		Group g-curves "Curves"
+			ListView curves "Target\\min\\max" expandx format=mTT
 		Group g-edit "Edit"
 			Grid ? ""
 				Button /edit-song "File" link ignorefocus

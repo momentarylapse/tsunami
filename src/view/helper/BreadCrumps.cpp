@@ -35,6 +35,13 @@ void add(hui::Panel* panel, Session* session) {
 		bar()->sample_manager->set_selection({sample->origin.get()});
 		session->set_mode(EditMode::DefaultSamples);
 	});*/
+
+	panel->event("link-to-track", [session] {
+		session->set_mode(EditMode::DefaultTrack);
+	});
+	panel->event("link-to-fx", [session] {
+		session->set_mode(EditMode::DefaultTrackFx);
+	});
 }
 
 }

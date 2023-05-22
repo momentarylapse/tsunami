@@ -1,10 +1,16 @@
 Dialog dummy-editor "Editing" width=300 height=516
 	Grid ? "" vertical
-		Label warning "Can not edit this track type" center italic bold expandx
-		Label more-warning "Only audio and midi tracks can be edited here"
+		Label warning "Can not edit this track type" center bold expandx style=warning
+		Label more-warning "Only audio and midi tracks can be edited here" expandx center italic
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link ignorefocus
+				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_track "Track" link ignorefocus
+				Button /edit-track "Track" link ignorefocus
+				Label /edit-separator "›" disabled
+				Button /edit-track-fx "Fx" link ignorefocus
+				Label /edit-separator2 "|" disabled
+				Button /edit-track-data "Edit" link ignorefocus disabled
+				Label /edit-separator2 "|" disabled
+				Button /edit-track-curves "Curves" link ignorefocus

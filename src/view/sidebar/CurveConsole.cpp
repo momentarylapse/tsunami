@@ -89,6 +89,8 @@ void CurveConsole::update_list() {
 			set_int(id_list, i);
 	}
 	set_float(id_list, scroll);
+
+	set_string("link-to-track", t->nice_name());
 }
 
 void CurveConsole::on_delete() {

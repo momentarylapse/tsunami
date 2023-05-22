@@ -66,6 +66,7 @@ void EffectsConsole::set_track(Track *t) {
 	track = t;
 	load_data();
 	if (track) {
+		set_string("link-to-track", track->nice_name());
 		fx_editor = new FxListEditor(track, this, "fx", true);
 		track->subscribe(this, [this] { set_track(nullptr); }, track->MESSAGE_DELETE);
 		track->subscribe(this, [this] { on_update(); }, track->MESSAGE_ANY);

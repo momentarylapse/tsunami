@@ -966,7 +966,31 @@ Grid
 vertical
 0
 0
-2
+3
+Group
+g-track
+
+0
+0
+1
+Grid
+?
+
+0
+0
+1
+Button
+link-to-track
+link,ignorefocus
+0
+0
+0
+Group
+g-curves
+
+1
+0
+1
 ListView
 curves
 expandx,format=mTT
@@ -976,7 +1000,7 @@ expandx,format=mTT
 Group
 g-edit
 
-1
+2
 0
 1
 Grid
@@ -1226,13 +1250,13 @@ vertical
 4
 Label
 warning
-center,italic,bold,expandx
+center,bold,expandx,style=warning
 0
 0
 0
 Label
 more-warning
-
+expandx,center,italic
 1
 0
 0
@@ -1253,9 +1277,9 @@ Grid
 
 0
 0
-3
+9
 Button
-edit_song
+edit-song
 link,ignorefocus
 0
 0
@@ -1267,9 +1291,45 @@ disabled
 0
 0
 Button
-edit_track
+edit-track
 link,ignorefocus
 2
+0
+0
+Label
+edit-separator
+disabled
+3
+0
+0
+Button
+edit-track-fx
+link,ignorefocus
+4
+0
+0
+Label
+edit-separator2
+disabled
+5
+0
+0
+Button
+edit-track-data
+link,ignorefocus,disabled
+6
+0
+0
+Label
+edit-separator2
+disabled
+7
+0
+0
+Button
+edit-track-curves
+link,ignorefocus
+8
 0
 0
 # Resource
@@ -1370,7 +1430,31 @@ Grid
 vertical
 0
 0
-3
+4
+Group
+g-track
+
+0
+0
+1
+Grid
+?
+
+0
+0
+1
+Button
+link-to-track
+link,ignorefocus
+0
+0
+0
+Group
+g-effects
+
+1
+0
+1
 Grid
 ?
 vertical
@@ -1398,13 +1482,13 @@ grid-config
 Label
 ?
 expandy
-1
+2
 0
 0
 Group
 td_t_edit
 
-2
+3
 0
 1
 Grid
@@ -8344,7 +8428,7 @@ Grid
 vertical
 0
 0
-5
+6
 Group
 g-volume
 
@@ -8430,9 +8514,27 @@ image=hui:edit,flat,ignorefocus
 0
 0
 Group
-g-synth
+g-fx-external
 
 2
+0
+1
+Grid
+?
+
+0
+0
+1
+Button
+link-to-fx
+link,ignorefocus
+0
+0
+0
+Group
+g-synth
+
+3
 0
 1
 Grid
@@ -8442,9 +8544,9 @@ synth
 0
 0
 Group
-g-fx
-
-3
+g-fx-internal
+hidden
+4
 0
 1
 Grid
@@ -8452,30 +8554,6 @@ Grid
 
 0
 0
-2
-Grid
-g-fx-external
-expandx
-0
-0
-2
-Label
-l-fx
-italic
-0
-0
-0
-Button
-edit-track-fx
-link,ignorefocus
-1
-0
-0
-Grid
-g-fx-internal
-expandx,hidden
-0
-1
 2
 ListView
 fx
@@ -8498,7 +8576,7 @@ grid-config
 Group
 g-fx-midi
 disabled,hidden
-4
+5
 0
 1
 Grid
@@ -8888,7 +8966,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-772
+780
 # Text
 /bars-add
 Add bars...
@@ -9472,8 +9550,17 @@ Kurven
 curve_console/curves
 Target\\min\\max
 
+curve_console/g-curves
+Curves
+
 curve_console/g-edit
 Edit
+
+curve_console/g-track
+Track
+
+curve_console/link-to-track
+Track
 
 detune_synthesizer_dialog/all_octaves
 All octaves
@@ -9534,6 +9621,15 @@ fx-editor/fx
 
 fx-editor/fx-editor
 Effects
+
+fx-editor/g-effects
+Effects
+
+fx-editor/g-track
+Track
+
+fx-editor/link-to-track
+Track
 
 fx-editor/td_t_edit
 Edit
@@ -10322,7 +10418,7 @@ new-track-dialog/l-bpm
 Speed
 
 new-track-dialog/l-master
-A master track does not contain any audio or midi data itself. It can be used to group a number of tracks and apply volume and effects collectively.
+A master track does not contain any audio or\nmidi data itself. It can be used to group a number\nof tracks and apply volume and effects collectively.
 
 new-track-dialog/midi-fx
 \\name
@@ -11155,7 +11251,10 @@ track_dialog/fx
 track_dialog/g-edit
 Edit
 
-track_dialog/g-fx
+track_dialog/g-fx-external
+Effects
+
+track_dialog/g-fx-internal
 Effects
 
 track_dialog/g-fx-midi
@@ -11172,6 +11271,9 @@ Synthesizer
 
 track_dialog/g-volume
 Volume
+
+track_dialog/link-to-fx
+Fx
 
 track_dialog/midi-fx
 \\name

@@ -1,9 +1,13 @@
 Dialog fx-editor "Effects" width=380 height=516
 	Grid ? "" vertical
-		Grid ? "" vertical
-			ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=260
-			Revealer config-revealer "" slide=down
-				Grid grid-config ""
+		Group g-track "Track"
+			Grid ? ""
+				Button link-to-track "Track" link ignorefocus
+		Group g-effects "Effects"
+			Grid ? "" vertical
+				ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=260
+				Revealer config-revealer "" slide=down
+					Grid grid-config ""
 		Label ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""

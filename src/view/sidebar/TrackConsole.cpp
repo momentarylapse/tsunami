@@ -131,9 +131,9 @@ void TrackConsole::load_data() {
 		embed(panel, "synth", 0, 0);
 
 		if (track->fx.num > 0)
-			set_string("l-fx", format(_("%d effects active"), track->fx.num));
+			set_string("link-to-fx", format(_("%d effects active"), track->fx.num));
 		else
-			set_string("l-fx", _("no effects yet"));
+			set_string("link-to-fx", _("no effects yet"));
 
 	} else {
 		hide_control("td_t_bars", true);

@@ -122,13 +122,13 @@ LogNotifier::LogNotifier(AudioView *_view) : scenegraph::NodeFree() {
 	info_box = new LogInfoBox(view);
 	add_child(info_box);
 
-	view->session->log->subscribe(this, [this] {
+	view->session->log->out_add_message >> create_sink([this] {
 		auto m = view->session->log->latest(view->session);
 		if (m.type == Log::Type::STATUS)
 			set_status(m.text);
 		else if (m.type == Log::Type::ERROR or m.type == Log::Type::QUESTION)
 			info_box->add_message(m);
-	}, Log::MESSAGE_ADD);
+	});
 }
 
 LogNotifier::~LogNotifier() {

@@ -10,6 +10,8 @@
 
 #include <chrono>
 
+class string;
+
 namespace os {
 
 class Timer {
@@ -26,6 +28,9 @@ private:
 
 
 void sleep(float duration);
+
+bool is_main_thread();
+void require_main_thread(const string &msg);
 
 }
 

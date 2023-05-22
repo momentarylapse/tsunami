@@ -7,7 +7,13 @@
 
 #include "Log.h"
 #include "../lib/hui/hui.h"
+#include "../lib/threads/Thread.h"
 #include "../Session.h"
+
+namespace os {
+	extern bool is_main_thread();
+}
+
 
 const string Log::MESSAGE_ADD = "add-message";
 
@@ -70,6 +76,17 @@ bool Log::Message::operator==(const Log::Message &o) const {
 
 
 void Log::add_message(Session *session, Type type, const string &message, const Array<string> &responses) {
+
+	// make sure messages are handled in the gui thread...
+	if (!os::is_main_thread()) {
+		hui::run_later(0.001f, [this, session, type, _message = message, _responses = responses] {
+			add_message(session, type, _message, _responses);
+		});
+		return;
+	}
+
+
+
 	Message m = {session, type, message, responses};
 	for (auto &b: blocked)
 		if (m == b)
@@ -104,8 +121,5 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 		}
 	}
 
-	// make sure messages are handled in the gui thread...
-	hui::run_later(0.01f, [this] {
-		out_add_message.notify();
-	});
+	out_add_message.notify();
 }

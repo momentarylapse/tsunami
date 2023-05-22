@@ -12,11 +12,15 @@
 namespace os {
 
 static std::thread::id main_thread_id = std::this_thread::get_id();
+
+bool is_main_thread() {
+	return main_thread_id == std::this_thread::get_id();
+}
+
 void require_main_thread(const string &msg) {
-	if (main_thread_id != std::this_thread::get_id()) {
+	if (!is_main_thread()) {
 		msg_error("called from non-main thread: " + msg);
 	}
-
 }
 
 

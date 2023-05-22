@@ -893,6 +893,9 @@ void TsunamiWindow::update_menu() {
 	if (!song->action_manager->is_save())
 		title = "*" + title;
 	set_title(title);
+
+	if (header_bar)
+		header_bar->update();
 }
 
 void TsunamiWindow::on_side_bar_update() {

@@ -16,6 +16,8 @@ class HeaderBar {
 public:
 	HeaderBar(TsunamiWindow* win);
 
+	void update();
+
 	TsunamiWindow* win;
 };
 

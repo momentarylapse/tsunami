@@ -7,6 +7,9 @@
 
 #include "HeaderBar.h"
 #include "TsunamiWindow.h"
+#include "sidebar/SideBar.h"
+#include "../Session.h"
+#include "../EditModes.h"
 
 HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	win = _win;
@@ -57,5 +60,12 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 		win->add_menu_button("!flat,ignorefocus,width=10", 2, 0, "sound-menu");
 		win->set_options("sound-menu", "menu=header-sound-menu");
 	win->set_target(":header:");
+}
+
+void HeaderBar::update() {
+	bool editing = win->session->in_mode(EditMode::EditTrack);
+	bool recording = win->session->in_mode(EditMode::Capture);
+	win->hide_control("undo-redo-box", !win->side_bar->visible or recording);
+	win->hide_control("copy-paste-box", !editing);
 }
 

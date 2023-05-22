@@ -6,6 +6,7 @@
  */
 
 #include "TsunamiWindow.h"
+#include "HeaderBar.h"
 #include "audioview/AudioView.h"
 #include "audioview/graph/AudioViewTrack.h"
 #include "dialog/NewSongDialog.h"
@@ -260,56 +261,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_menu(hui::create_resource_menu("menu", this));
 	app->plugin_manager->add_plugins_to_menu(this);
 
-	if (hui::config.get_bool("Window.HeaderBar", false)) {
-		_add_headerbar();
-		set_target(":header:");
-		add_grid("!box,linked", 0, 0, "file-box");
-			set_target("file-box");
-			add_button("!ignorefocus", 0, 0, "new");
-			set_image("new", "hui:new");
-			add_button("!ignorefocus\\Open", 1, 0, "open");
-			add_button("!ignorefocus", 1, 0, "save");
-			set_image("save", "hui:save");
-			add_menu_button("!ignorefocus,width=10", 2, 0, "save-menu");
-			set_options("save-menu", "menu=header-save-menu");
-		set_target(":header:");
-		add_grid("!box,linked", 1, 0, "undo-redo-box");
-			set_target("undo-redo-box");
-			add_button("!ignorefocus", 0, 0, "undo");
-			set_image("undo", "hui:undo");
-			add_button("!ignorefocus", 1, 0, "redo");
-			set_image("redo", "hui:redo");
-		set_target(":header:");
-		add_grid("!box,linked", 2, 0, "copy-paste-box");
-			set_target("copy-paste-box");
-			add_button("!ignorefocus", 0, 0, "copy");
-			set_image("copy", "hui:copy");
-			add_menu_button("!ignorefocus,width=10", 1, 0, "paste-menu");
-			set_options("paste-menu", "menu=header-paste-menu");
-			set_image("paste-menu", "hui:paste");
-		set_target(":header:");
-
-
-		add_menu_button("!menu=header-menu,arrow=no", 2, 1, "menu-x");
-		set_image("menu-x", "hui:open-menu");
-		add_button("!ignorefocus", 1, 1, "mode-edit-check");
-		set_image("mode-edit-check", "hui:edit");
-		add_grid("!box,linked", 0, 1, "sound-box");
-			set_target("sound-box");
-			add_button("!flat,ignorefocus", 0, 1, "play");
-			set_image("play", "hui:media-play");
-			add_button("!flat,ignorefocus", 1, 1, "pause");
-			set_image("pause", "hui:media-pause");
-			add_button("!flat,ignorefocus", 2, 1, "stop");
-			set_image("stop", "hui:media-stop");
-			add_button("!flat,ignorefocus", 3, 1, "record");
-			set_image("record", "hui:media-record");
-			add_menu_button("!flat,ignorefocus,width=10", 2, 0, "sound-menu");
-			set_options("sound-menu", "menu=header-sound-menu");
-		set_target(":header:");
+	if (hui::config.get_bool("Window.HeaderBar", true)) {
+		header_bar = new HeaderBar(this);
 
 		set_target("");
-
 
 		if (hui::config.get_bool("Window.HideMenu", false)) {
 #if GTK_CHECK_VERSION(4,0,0)
@@ -331,6 +286,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// table structure
 	set_size(width, height);
+	set_maximized(maximized);
 	set_border_width(0);
 	set_spacing(0);
 	add_grid("", 0, 0, "root-grid");
@@ -342,8 +298,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	add_drawing_area("!grabfocus,gesture=zoom", 0, 0, "area");
 	if (hui::config.get_bool("View.EventCompression", true) == false)
 		set_options("area", "noeventcompression");
-
-	set_maximized(maximized);
 
 	// events
 	event("hui:close", [this] { on_exit(); });

@@ -496,6 +496,7 @@ set(SOURCE
 	src/view/sidebar/SongConsole.cpp
 	src/view/sidebar/TrackConsole.cpp
 	src/view/ColorScheme.cpp
+	src/view/HeaderBar.cpp
 	src/view/HoverData.cpp
 	src/view/MouseDelayPlanner.cpp
 	src/view/TsunamiWindow.cpp

@@ -16,6 +16,7 @@ class Song;
 class AudioView;
 class SideBar;
 class BottomBar;
+class HeaderBar;
 class MiniBar;
 class Session;
 class Tsunami;
@@ -142,6 +143,7 @@ public:
 
 	Session *session;
 
+	owned<HeaderBar> header_bar;
 	shared<SideBar> side_bar;
 	shared<BottomBar> bottom_bar;
 	

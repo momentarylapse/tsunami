@@ -606,6 +606,7 @@
     <ClCompile Include="src\view\sidebar\SongConsole.cpp" />
     <ClCompile Include="src\view\sidebar\TrackConsole.cpp" />
     <ClCompile Include="src\view\ColorScheme.cpp" />
+    <ClCompile Include="src\view\HeaderBar.cpp" />
     <ClCompile Include="src\view\HoverData.cpp" />
     <ClCompile Include="src\view\MouseDelayPlanner.cpp" />
     <ClCompile Include="src\view\TsunamiWindow.cpp" />
@@ -1079,6 +1080,7 @@
     <ClInclude Include="src\view\sidebar\SongConsole.h" />
     <ClInclude Include="src\view\sidebar\TrackConsole.h" />
     <ClInclude Include="src\view\ColorScheme.h" />
+    <ClInclude Include="src\view\HeaderBar.h" />
     <ClInclude Include="src\view\HoverData.h" />
     <ClInclude Include="src\view\MouseDelayPlanner.h" />
     <ClInclude Include="src\view\TsunamiWindow.h" />

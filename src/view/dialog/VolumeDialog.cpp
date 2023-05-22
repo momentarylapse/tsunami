@@ -27,7 +27,7 @@ VolumeDialog::VolumeDialog(hui::Window *_parent, float value0, float min, float 
 	volume_control = new VolumeControl(this, "slider", "value", "unit", [this] (float f) {
 		result = f;
 	});
-	volume_control->set_range(0, 800);
+	volume_control->set_range(0, 8);
 
 	event("maximize", [this] {
 		enable("value", !is_checked("maximize"));

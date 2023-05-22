@@ -33,7 +33,9 @@ private:
 	Callback cb;
 
 	float value;
-	float _min, _max, _min_db, _max_db;
+	float min_value, max_value;
+	float min_slider_lin, max_slider_lin;
+	float min_slider_db, max_slider_db;
 	enum Mode {
 		PERCENT,
 		DB
@@ -50,8 +52,11 @@ private:
 	static constexpr float DB_MAX = 12;
 	static constexpr float TAN_SCALE = 13.0f;
 
-	static float db2slider(float db);
-	static float slider2db(float val);
+	float db2slider(float db) const;
+	float slider2db(float val) const;
+
+	float amp2slider(float amp) const;
+	float slider2amp(float val) const;
 };
 
 #endif /* SRC_VIEW_HELPER_VOLUMECONTROL_H_ */

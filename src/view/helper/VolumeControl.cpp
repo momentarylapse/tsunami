@@ -18,10 +18,12 @@ VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const
 	id_unit = _id_unit;
 	cb = _cb;
 
-	_min = 0;
-	_max = 1;
-	_min_db = -120;
-	_max_db = 0;
+	min_value = 0;
+	max_value = 1;
+	min_slider_lin = 0;
+	max_slider_lin = 1;
+	min_slider_db = -120;
+	max_slider_db = 0;
 	value = 1;
 	set_mode(Mode::DB);
 
@@ -54,39 +56,53 @@ float VolumeControl::get() const {
 }
 
 void VolumeControl::set_range(float min, float max) {
-	_min = min;
-	_max = max;
-	_min_db = amplitude2db(::max(_min, db2amplitude(-120)));
-	_max_db = amplitude2db(_max);
+	min_value = min;
+	max_value = max;
+	min_slider_lin = ::max(min_value, 0.0f);
+	max_slider_lin = ::min(max_value, 2.0f);
+	min_slider_db = amplitude2db(::max(min_value, db2amplitude(-120)));
+	max_slider_db = amplitude2db(::min(max_value, db2amplitude(DB_MAX)));
 	set_mode(mode);
 }
 
-float VolumeControl::db2slider(float db) {
-	return (atan(db / TAN_SCALE) - atan(DB_MIN / TAN_SCALE)) / (atan(DB_MAX / TAN_SCALE) - atan(DB_MIN / TAN_SCALE));
+float VolumeControl::db2slider(float db) const {
+	return (atan(db / TAN_SCALE) - atan(min_slider_db / TAN_SCALE)) / (atan(max_slider_db / TAN_SCALE) - atan(min_slider_db / TAN_SCALE));
 }
 
-float VolumeControl::slider2db(float val) {
-	return tan(atan(DB_MIN / TAN_SCALE) + val * (atan(DB_MAX / TAN_SCALE)- atan(DB_MIN / TAN_SCALE))) * TAN_SCALE;
+float VolumeControl::slider2db(float val) const {
+	return tan(atan(min_slider_db / TAN_SCALE) + val * (atan(max_slider_db / TAN_SCALE)- atan(min_slider_db / TAN_SCALE))) * TAN_SCALE;
+}
+
+float VolumeControl::amp2slider(float amp) const {
+	return (amp - min_slider_lin) / (max_slider_lin - min_slider_lin);
+}
+
+float VolumeControl::slider2amp(float val) const {
+	return min_slider_lin + val * (max_slider_lin - min_slider_lin);
 }
 
 void VolumeControl::set_mode(Mode m) {
 	mode = m;
 	panel->reset(id_slider);
 	if (mode == Mode::PERCENT) {
-		panel->set_options(id_spin, format("range=%f:%f:%f", _min * 100, _max * 100, 0.1f));
+		panel->set_options(id_spin, format("range=%f:%f:%f", min_value * 100, max_value * 100, 0.1f));
 		panel->hide_control(id_unit, false);
 		panel->set_string(id_unit, "%");
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", 0.0f, 0));
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", 0.25f, 50));
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", 0.5f, 100));
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", 0.75f, 150));
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", 1.0f, 200));
+		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", amp2slider(0.0f), 0));
+		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", amp2slider(0.5f), 50));
+		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", amp2slider(1.0f), 100));
+		if (1.5f <= max_slider_lin)
+			panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", amp2slider(1.5f), 150));
+		if (2.0f <= max_slider_lin)
+		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", amp2slider(2.0f), 200));
 	} else if (mode == Mode::DB) {
-		panel->set_options(id_spin, format("range=%f:%f:%f", _min_db, _max_db, 0.1f));
+		panel->set_options(id_spin, format("range=%f:%f:%f", min_slider_db, amplitude2db(max_value), 0.1f));
 		panel->hide_control(id_unit, false);
 		panel->set_string(id_unit, "dB");
-		panel->add_string(id_slider, format("%f\\<span size='x-small'>%+d</span>", db2slider(DB_MAX), (int)DB_MAX));
-		panel->add_string(id_slider, format("%f\\", db2slider(6), 6));
+		if (DB_MAX <= max_slider_db)
+			panel->add_string(id_slider, format("%f\\<span size='x-small'>%+d</span>", db2slider(DB_MAX), (int)DB_MAX));
+		if (6 <= max_slider_db)
+			panel->add_string(id_slider, format("%f\\", db2slider(6), 6));
 		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", db2slider(0), 0));
 		panel->add_string(id_slider, format("%f\\", db2slider(-6), -6));
 		panel->add_string(id_slider, format("%f\\<span size='x-small'>%d</span>", db2slider(-12), -12));
@@ -108,7 +124,7 @@ void VolumeControl::set_slider(float f) {
 	if (mode == Mode::DB)
 		panel->set_float(id_slider, db2slider(amplitude2db(f)));
 	else if (mode == Mode::PERCENT)
-		panel->set_float(id_slider, f / 2);
+		panel->set_float(id_slider, amp2slider(f));
 }
 
 float VolumeControl::get_spin() const {
@@ -123,7 +139,7 @@ float VolumeControl::get_slider() const {
 	if (mode == Mode::DB)
 		return db2amplitude(slider2db(panel->get_float(id_slider)));
 	if (mode == Mode::PERCENT)
-		return panel->get_float(id_slider) * 2;
+		return slider2amp(panel->get_float(id_slider));
 	return 0;
 }
 

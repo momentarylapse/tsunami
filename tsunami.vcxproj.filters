@@ -1312,6 +1312,9 @@
     <ClCompile Include="src\view\helper\graph\ScrollBar.cpp">
       <Filter>src\view\helper\graph</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\helper\BreadCrumps.cpp">
+      <Filter>src\view\helper</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\helper\CpuDisplay.cpp">
       <Filter>src\view\helper</Filter>
     </ClCompile>
@@ -2723,6 +2726,9 @@
     </ClInclude>
     <ClInclude Include="src\view\helper\graph\ScrollBar.h">
       <Filter>src\view\helper\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\helper\BreadCrumps.h">
+      <Filter>src\view\helper</Filter>
     </ClInclude>
     <ClInclude Include="src\view\helper\CpuDisplay.h">
       <Filter>src\view\helper</Filter>

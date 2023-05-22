@@ -11,7 +11,7 @@
 
 
 BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
-	SideBarConsole(_("Bars editor"), "bars-editor", session, bar)
+	SideBarConsole(_("Metronome editor"), "bars-editor", session, bar)
 {
 	from_resource("bars-editor");
 
@@ -29,15 +29,6 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	});
 	event("action-replace", [this] {
 		on_action_replace();
-	});
-	event("edit-song", [session] {
-		session->set_mode(EditMode::DefaultSong);
-	});
-	event("edit-track", [session] {
-		session->set_mode(EditMode::DefaultTrack);
-	});
-	event("edit-track-curves", [session] {
-		session->set_mode(EditMode::Curves);
 	});
 }
 

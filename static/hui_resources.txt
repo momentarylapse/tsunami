@@ -212,7 +212,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit-song
 link,ignorefocus
@@ -243,10 +243,16 @@ link,ignorefocus,disabled
 4
 0
 0
+Label
+edit-separator2
+disabled
+5
+0
+0
 Button
 edit-track-curves
 link,ignorefocus
-5
+6
 0
 0
 # Resource
@@ -679,7 +685,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit-song
 link,ignorefocus
@@ -710,10 +716,16 @@ link,ignorefocus,disabled
 4
 0
 0
+Label
+edit-separator2
+disabled
+5
+0
+0
 Button
 edit-track-curves
 link,ignorefocus
-5
+6
 0
 0
 # Resource
@@ -948,7 +960,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit-song
 link,ignorefocus
@@ -979,10 +991,16 @@ link,ignorefocus
 4
 0
 0
+Label
+edit-separator2
+disabled
+5
+0
+0
 Button
 edit-track-curves
 link,ignorefocus,disabled
-5
+6
 0
 0
 # Resource
@@ -3361,7 +3379,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit-song
 link,ignorefocus
@@ -3392,10 +3410,16 @@ link,ignorefocus,disabled
 4
 0
 0
+Label
+edit-separator2
+disabled
+5
+0
+0
 Button
 edit-track-curves
 link,ignorefocus
-5
+6
 0
 0
 # Resource
@@ -7145,7 +7169,7 @@ Grid
 
 0
 0
-3
+5
 Button
 edit-song
 link,ignorefocus
@@ -7159,9 +7183,21 @@ disabled
 0
 0
 Button
+edit-track
+link,ignorefocus
+2
+0
+0
+Label
+edit-separator2
+disabled
+3
+0
+0
+Button
 edit-samples
 link,ignorefocus,disabled
-2
+4
 0
 0
 # Resource
@@ -7248,7 +7284,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit_song
 link,ignorefocus
@@ -7267,22 +7303,28 @@ link,ignorefocus
 2
 0
 0
+Label
+edit-separator2
+disabled
+3
+0
+0
 Button
 edit_track
 link,ignorefocus
-3
+4
 0
 0
 Label
 edit-separator
 disabled
-4
+5
 0
 0
 Button
 edit_sample
 link,ignorefocus,disabled
-5
+6
 0
 0
 # Resource
@@ -7902,7 +7944,7 @@ Grid
 
 0
 0
-7
+5
 Button
 edit-song
 link,ignorefocus,disabled
@@ -7916,7 +7958,7 @@ disabled
 0
 0
 Button
-edit-edit
+edit-track
 link,ignorefocus
 2
 0
@@ -7928,21 +7970,9 @@ disabled
 0
 0
 Button
-edit-track
-link,ignorefocus
-4
-0
-0
-Label
-edit-separator2
-disabled
-5
-0
-0
-Button
 edit-samples
 link,ignorefocus
-6
+4
 0
 0
 # Resource
@@ -8368,7 +8398,7 @@ Grid
 
 0
 0
-6
+7
 Button
 edit-song
 link,ignorefocus
@@ -8399,10 +8429,16 @@ link,ignorefocus
 4
 0
 0
+Label
+edit-separator2
+disabled
+5
+0
+0
 Button
 edit-track-curves
 link,ignorefocus
-5
+6
 0
 0
 # Resource
@@ -8702,7 +8738,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-773
+772
 # Text
 /bars-add
 Add bars...
@@ -8770,9 +8806,6 @@ Remove (if missing)
 /device-hide
 Ignore
 
-/edit-edit
-Edit
-
 /edit-samples
 Samples
 
@@ -8792,7 +8825,7 @@ Track
 Curves
 
 /edit-track-data
-Data
+Edit
 
 /edit_sample
 Sample

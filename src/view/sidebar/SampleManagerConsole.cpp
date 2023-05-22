@@ -25,7 +25,6 @@
 #include "../../storage/Storage.h"
 #include "../../lib/math/math.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 #include <math.h>
 
 
@@ -140,8 +139,6 @@ SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
 	event_x(id_list, "hui:change", [this] { on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [this] { on_list_right_click(); });
 	event("sample-list", [this] { on_preview(); });
-
-	event("edit-song", [session] { session->set_mode(EditMode::DefaultSong); });
 
 	progress = nullptr;
 }

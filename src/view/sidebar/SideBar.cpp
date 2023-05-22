@@ -18,6 +18,7 @@
 #include "CaptureConsole.h"
 #include "../audioview/AudioView.h"
 #include "../bottombar/BottomBar.h"
+#include "../helper/BreadCrumps.h"
 #include "../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
@@ -157,6 +158,8 @@ SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session 
 	session = _session;
 	song = session->song.get();
 	view = session->view;
+
+	BreadCrumps::add(this, session);
 }
 
 SideBarConsole::~SideBarConsole() {

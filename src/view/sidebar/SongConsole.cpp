@@ -12,7 +12,6 @@
 #include "../../data/base.h"
 #include "../../lib/base/iter.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 
 const Array<SampleFormat> POSSIBLE_FORMATS = {
 	SampleFormat::INT_16,
@@ -44,13 +43,6 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 	event_x("tags", "hui:right-button-down", [this] { on_tags_right_click(); });
 	event("tag-add", [this] { on_tag_add(); });
 	event("tag-delete", [this] { on_tag_delete(); });
-
-	event("edit-track", [session] {
-		session->set_mode(EditMode::DefaultTrack);
-	});
-	event("edit-samples", [session] {
-		session->set_mode(EditMode::DefaultSamples);
-	});
 }
 
 void SongConsole::on_enter() {

@@ -53,15 +53,6 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	event("action-volume", [this] {
 		on_action_volume();
 	});
-	event("edit-song", [session] {
-		session->set_mode(EditMode::DefaultSong);
-	});
-	event("edit-track", [session] {
-		session->set_mode(EditMode::DefaultTrack);
-	});
-	event("edit-track-curves", [session] {
-		session->set_mode(EditMode::Curves);
-	});
 }
 
 void AudioEditorConsole::on_enter() {

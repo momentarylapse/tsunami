@@ -16,7 +16,6 @@
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 
 SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar)
@@ -29,17 +28,6 @@ SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	event("volume", [this] { on_volume(); });
 	event("mute", [this] { on_mute(); });
 	event("track", [this] { on_track(); });
-
-	event("edit_song", [session] {
-		session->set_mode(EditMode::DefaultSong);
-	});
-	event("edit_track", [session] {
-		session->set_mode(EditMode::DefaultTrack);
-	});
-	event("edit_samples", [this, session] {
-		bar()->sample_manager->set_selection({sample->origin.get()});
-		session->set_mode(EditMode::DefaultSamples);
-	});
 }
 
 void SampleRefConsole::on_enter() {

@@ -5,4 +5,6 @@ Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 			Grid ? ""
 				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
+				Button /edit-track "Track" link ignorefocus
+				Label /edit-separator2 "|" disabled
 				Button /edit-samples "Samples" link ignorefocus disabled

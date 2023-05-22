@@ -28,8 +28,6 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 			Grid ? ""
 				Button /edit-song "File" link ignorefocus disabled
 				Label /edit-separator "›" disabled
-				Button /edit-edit "Edit" link ignorefocus
-				Label /edit-separator2 "|" disabled
 				Button /edit-track "Track" link ignorefocus
 				Label /edit-separator2 "|" disabled
 				Button /edit-samples "Samples" link ignorefocus

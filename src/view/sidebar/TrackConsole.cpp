@@ -21,7 +21,6 @@
 #include "../../lib/base/sort.h"
 #include "../../lib/base/iter.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();
@@ -63,10 +62,6 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	event("panning", [this] { on_panning(); });
 	event("instrument", [this] { on_instrument(); });
 	event("edit_tuning", [this] { on_edit_strings(); });
-
-	event("edit-song", [session] { session->set_mode(EditMode::DefaultSong); });
-	event("edit-track-curves", [session] { session->set_mode(EditMode::Curves); });
-	event("edit-track-data", [session] { session->set_mode(EditMode::EditTrack); });
 }
 
 void TrackConsole::set_mode(Mode mode) {

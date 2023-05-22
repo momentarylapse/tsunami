@@ -14,7 +14,6 @@
 #include "../../data/Track.h"
 #include "../../data/Curve.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 
 CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Curves"), "curve-console", session, bar),
@@ -37,16 +36,6 @@ CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 	event_x(id_list, "hui:select", [this]{ on_list_select(); });
 	event_x(id_list, "hui:change", [this]{ on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [this]{ on_list_right_click(); });
-	event("edit-song", [session] {
-		session->set_mode(EditMode::DefaultSong);
-	});
-	event("edit-track", [session] {
-		session->set_mode(EditMode::DefaultTrack);
-	});
-	event("edit-track-data", [session] {
-		session->set_mode(EditMode::EditTrack);
-	});
-
 }
 
 void CurveConsole::on_update() {

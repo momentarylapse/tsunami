@@ -540,6 +540,7 @@ sources = [
 	'src/view/helper/graph/SceneGraph.cpp',
 	'src/view/helper/graph/Scrollable.cpp',
 	'src/view/helper/graph/ScrollBar.cpp',
+	'src/view/helper/BreadCrumps.cpp',
 	'src/view/helper/CpuDisplay.cpp',
 	'src/view/helper/Dial.cpp',
 	'src/view/helper/Drawing.cpp',

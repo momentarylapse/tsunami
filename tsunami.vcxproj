@@ -553,6 +553,7 @@
     <ClCompile Include="src\view\helper\graph\SceneGraph.cpp" />
     <ClCompile Include="src\view\helper\graph\Scrollable.cpp" />
     <ClCompile Include="src\view\helper\graph\ScrollBar.cpp" />
+    <ClCompile Include="src\view\helper\BreadCrumps.cpp" />
     <ClCompile Include="src\view\helper\CpuDisplay.cpp" />
     <ClCompile Include="src\view\helper\Dial.cpp" />
     <ClCompile Include="src\view\helper\Drawing.cpp" />
@@ -1025,6 +1026,7 @@
     <ClInclude Include="src\view\helper\graph\SceneGraph.h" />
     <ClInclude Include="src\view\helper\graph\Scrollable.h" />
     <ClInclude Include="src\view\helper\graph\ScrollBar.h" />
+    <ClInclude Include="src\view\helper\BreadCrumps.h" />
     <ClInclude Include="src\view\helper\CpuDisplay.h" />
     <ClInclude Include="src\view\helper\Dial.h" />
     <ClInclude Include="src\view\helper\Drawing.h" />

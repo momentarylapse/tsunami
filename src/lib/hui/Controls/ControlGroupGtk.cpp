@@ -13,7 +13,7 @@
 namespace hui {
 
 const int FRAME_INDENT = 0; //20;
-const int FRAME_MARGIN_BOTTOM = 8;
+const int FRAME_MARGIN_BOTTOM = 12;
 
 ControlGroup::ControlGroup(const string &title, const string &id) :
 	Control(CONTROL_GROUP, id)
@@ -26,7 +26,7 @@ ControlGroup::ControlGroup(const string &title, const string &id) :
 #else
 	gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
 #endif
-	gtk_widget_set_margin_bottom(widget, FRAME_MARGIN_BOTTOM );
+	gtk_widget_set_margin_bottom(widget, FRAME_MARGIN_BOTTOM);
 	take_gtk_ownership();
 
 	GtkWidget *label = gtk_frame_get_label_widget(GTK_FRAME(widget));

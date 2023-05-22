@@ -534,7 +534,6 @@ sources = [
 	'src/view/dialog/SelectStringDialog.cpp',
 	'src/view/dialog/SettingsDialog.cpp',
 	'src/view/dialog/TemperamentDialog.cpp',
-	'src/view/dialog/TimeTrackAddDialog.cpp',
 	'src/view/dialog/TrackRoutingDialog.cpp',
 	'src/view/dialog/VolumeDialog.cpp',
 	'src/view/helper/graph/Node.cpp',

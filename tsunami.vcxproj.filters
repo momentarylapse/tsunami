@@ -1294,9 +1294,6 @@
     <ClCompile Include="src\view\dialog\TemperamentDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
-    <ClCompile Include="src\view\dialog\TimeTrackAddDialog.cpp">
-      <Filter>src\view\dialog</Filter>
-    </ClCompile>
     <ClCompile Include="src\view\dialog\TrackRoutingDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -2707,9 +2704,6 @@
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\TemperamentDialog.h">
-      <Filter>src\view\dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="src\view\dialog\TimeTrackAddDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\TrackRoutingDialog.h">

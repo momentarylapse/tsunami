@@ -7,7 +7,7 @@ Dialog fx-editor "Effects" width=380 height=516
 			Grid ? "" vertical
 				ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=260
 				Revealer config-revealer "" slide=down
-					Grid grid-config ""
+					Grid grid-config "" class=card
 		Label ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""

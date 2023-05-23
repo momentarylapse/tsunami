@@ -24,7 +24,10 @@ Dialog track_dialog "Track" width=380 height=516
 					Grid ? ""
 						Button link-to-fx "Fx" link ignorefocus
 				Group g-synth "Synthesizer"
-					Grid synth ""
+					Grid ? ""
+						Grid synth "" class=card
+						---|
+						Label l-no-synth "Only for midi and metronome tracks." center italic disabled expandx hidden
 				Group g-fx-internal "Effects" hidden
 					Grid ? ""
 						ListView fx "\\name" format=Cm reorderable nobar noexpandy expandx height=160

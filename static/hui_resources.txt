@@ -1256,7 +1256,7 @@ center,bold,expandx,style=warning
 0
 Label
 more-warning
-expandx,center,italic
+expandx,center,italic,wrap
 1
 0
 0
@@ -1475,7 +1475,7 @@ slide=down
 1
 Grid
 grid-config
-
+class=card
 0
 0
 0
@@ -8538,10 +8538,22 @@ g-synth
 0
 1
 Grid
-synth
+?
 
 0
 0
+2
+Grid
+synth
+class=card
+0
+0
+0
+Label
+l-no-synth
+center,italic,disabled,expandx,hidden
+0
+1
 0
 Group
 g-fx-internal
@@ -8966,7 +8978,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-780
+781
 # Text
 /bars-add
 Add bars...
@@ -9596,7 +9608,7 @@ dummy-editor/group-edit
 Edit
 
 dummy-editor/more-warning
-Only audio and midi tracks can be edited here
+Only audio, midi and metronome tracks can be edited here.
 
 dummy-editor/warning
 Can not edit this track type
@@ -11271,6 +11283,9 @@ Synthesizer
 
 track_dialog/g-volume
 Volume
+
+track_dialog/l-no-synth
+Only for midi and metronome tracks.
 
 track_dialog/link-to-fx
 Fx

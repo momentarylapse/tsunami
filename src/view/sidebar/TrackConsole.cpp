@@ -24,7 +24,7 @@
 
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();
-	panel->add_label("!expandx,center,disabled\\<i>" + _("only for midi or time tracks") + "</i>", 0, 0, "");
+	panel->add_label("", 0, 0, "");
 	return panel;
 }
 
@@ -123,11 +123,13 @@ void TrackConsole::load_data() {
 		update_strings();
 
 
-		if (track->synth and track_wants_synth(track)) {
+		bool show_synth = track->synth and track_wants_synth(track);
+		if (show_synth)
 			panel = create_synth_panel(track, session, this);
-		} else {
+		else
 			panel = create_dummy_synth_panel();
-		}
+		hide_control("l-no-synth", show_synth);
+		hide_control("synth", !show_synth);
 		embed(panel, "synth", 0, 0);
 
 		if (track->fx.num > 0)

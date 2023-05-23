@@ -1,7 +1,7 @@
 Dialog dummy-editor "Editing" width=300 height=516
 	Grid ? "" vertical
 		Label warning "Can not edit this track type" center bold expandx style=warning
-		Label more-warning "Only audio and midi tracks can be edited here" expandx center italic
+		Label more-warning "Only audio, midi and metronome tracks can be edited here." expandx center italic wrap
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

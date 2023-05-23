@@ -9,6 +9,7 @@
 #include "SampleManagerConsole.h"
 #include "../audioview/AudioView.h"
 #include "../helper/Slider.h"
+#include "../helper/VolumeControl.h"
 #include "../../data/base.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
@@ -18,26 +19,35 @@
 #include "../../Session.h"
 
 SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
-	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar)
+	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar),
+	in_cur_sample_changed(this, [this] { on_view_cur_sample_change(); })
 {
-	from_resource("sample_ref_dialog");
+	from_resource("sample-ref-dialog");
 	layer = nullptr;
 	sample = nullptr;
 	editing = false;
 
-	event("volume", [this] { on_volume(); });
+	volume_control = new VolumeControl(this, "volume-slider", "volume", "volume-unit", [this] (float v) {
+		editing = true;
+		if (sample)
+			layer->edit_sample_ref(sample, v, sample->muted);
+		editing = false;
+	});
+	volume_control->set_range(0, 4);
+
 	event("mute", [this] { on_mute(); });
 	event("track", [this] { on_track(); });
 }
 
 void SampleRefConsole::on_enter() {
-	view->subscribe(this, [this] { on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	set_sample(view->cur_sample());
+	view->out_cur_sample_changed >> in_cur_sample_changed;
 }
 
 void SampleRefConsole::on_leave() {
-	if (sample)
-		sample->unsubscribe(this);
 	view->unsubscribe(this);
+	set_sample(nullptr);
+
 }
 
 
@@ -51,7 +61,7 @@ void SampleRefConsole::on_mute() {
 	editing = true;
 	layer->edit_sample_ref(sample, sample->volume, is_checked(""));
 
-	enable("volume", !sample->muted);
+	volume_control->enable(!sample->muted);
 	editing = true;
 }
 
@@ -67,22 +77,38 @@ void SampleRefConsole::on_volume() {
 	editing = false;
 }
 
+void SampleRefConsole::set_sample(SampleRef *s) {
+	if (sample)
+		sample->unsubscribe(this);
+
+	sample = s;
+	layer = nullptr;
+
+	if (sample) {
+		layer = s->layer;
+		sample->subscribe(this, [this] {
+			// FIXME should also happen via view->on_cur_sample_change, but does not
+			set_sample(nullptr);
+		}, sample->MESSAGE_DELETE);
+		sample->subscribe(this, [this] {
+			on_update();
+		}, sample->MESSAGE_ANY);
+	}
+	load_data();
+}
+
 void SampleRefConsole::load_data() {
 	enable("name", false);
-	enable("mute", sample);
-	enable("volume", sample);
-	enable("repnum", sample);
-	enable("repdelay", sample);
 
-	set_string("name", _("no sample selected"));
+	hide_control("g-no-sample", sample);
+	hide_control("g-sample", !sample);
 
 	if (!sample)
 		return;
 	set_string("name", sample->origin->name);
-	set_decimals(1);
 	check("mute", sample->muted);
-	set_float("volume", amplitude2db(sample->volume));
-	enable("volume", !sample->muted);
+	volume_control->set(sample->volume);
+	volume_control->enable(!sample->muted);
 	reset("track");
 	for (Track *t: weak(song->tracks))
 		add_string("track", t->nice_name());
@@ -90,18 +116,7 @@ void SampleRefConsole::load_data() {
 }
 
 void SampleRefConsole::on_view_cur_sample_change() {
-	if (sample)
-		sample->unsubscribe(this);
-	layer = view->cur_layer();
-	sample = view->cur_sample();
-	if (sample) {
-		sample->subscribe(this, [this] {
-			sample->unsubscribe(this);
-			sample = nullptr;
-		}, sample->MESSAGE_DELETE);
-		sample->subscribe(this, [this] { on_update(); }, sample->MESSAGE_ANY);
-	}
-	load_data();
+	set_sample(view->cur_sample());
 }
 
 void SampleRefConsole::on_update() {

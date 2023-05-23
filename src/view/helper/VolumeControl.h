@@ -24,6 +24,7 @@ public:
 	void set(float f);
 	float get() const;
 
+	void enable(bool enabled);
 	void set_range(float min, float max);
 
 private:

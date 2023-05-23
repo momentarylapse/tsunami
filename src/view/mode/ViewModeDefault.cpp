@@ -225,8 +225,10 @@ void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
 
 void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer) {
 	view->exclusively_select_layer(vlayer);
-	if (!view->hover_selected_object())
+	if (!view->hover_selected_object()) {
 		view->exclusively_select_object();
+		view->set_current(hover());
+	}
 
 	// start drag'n'drop?
 	//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){

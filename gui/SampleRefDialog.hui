@@ -1,22 +1,28 @@
-Dialog sample_ref_dialog "Sample" width=375 height=230
+Dialog sample-ref-dialog "Sample" width=375 height=230
 	Grid ? "" vertical
-		Group ld_t_name "Name"
-			Edit name "" expandx
-		Group ld_t_track "Track"
-			ComboBox track "" ignorefocus
-		Group ld_t_volume "Volume"
-			Grid ? ""
-				SpinButton volume "0" range=-10000:10:0.1 expandx
-				Label /db "dB"
-				CheckBox mute "Muted" ignorefocus
+		Grid g-sample "" vertical
+			Group ld_t_name "Name"
+				Edit name "" expandx
+			Group ld_t_track "Track"
+				ComboBox track "" ignorefocus
+			Group ld_t_volume "Volume"
+				Grid ? ""
+					Slider volume-slider "" expandx
+					---|
+					Grid ? ""
+						SpinButton volume "0" expandx
+						Button volume-unit ""
+						CheckBox mute "Muted" ignorefocus
+		Grid g-no-sample ""
+			Label l-no-sample "No sample selected" bold center expandx
 		Label ? "" expandy
 		Group g-edit "Edit"
 			Grid ? ""
-				Button /edit_song "File" link ignorefocus
+				Button /edit-song "File" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button edit_samples "Samples" link ignorefocus
+				Button edit-samples "Samples" link ignorefocus
 				Label /edit-separator2 "|" disabled
-				Button /edit_track "Track" link ignorefocus
+				Button /edit-track "Track" link ignorefocus
 				Label /edit-separator "›" disabled
-				Button /edit_sample "Sample" link ignorefocus disabled
+				Button /edit-sample "Sample" link ignorefocus disabled
 

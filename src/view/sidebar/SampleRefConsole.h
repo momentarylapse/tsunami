@@ -12,10 +12,14 @@
 class Track;
 class TrackLayer;
 class SampleRef;
+class VolumeControl;
 
 class SampleRefConsole: public SideBarConsole {
 public:
 	SampleRefConsole(Session *session, SideBar *bar);
+
+	obs::Sink in_cur_sample_changed;
+
 	void on_enter() override;
 	void on_leave() override;
 
@@ -30,8 +34,12 @@ public:
 	void on_view_cur_sample_change();
 	void on_update();
 
+	void set_sample(SampleRef* sample);
+
 	TrackLayer *layer;
 	SampleRef *sample;
+
+	owned<VolumeControl> volume_control;
 
 	bool editing;
 };

@@ -65,6 +65,12 @@ void VolumeControl::set_range(float min, float max) {
 	set_mode(mode);
 }
 
+void VolumeControl::enable(bool enabled) {
+	panel->enable(id_spin, enabled);
+	panel->enable(id_slider, enabled);
+	panel->enable(id_unit, enabled);
+}
+
 float VolumeControl::db2slider(float db) const {
 	return (atan(db / TAN_SCALE) - atan(min_slider_db / TAN_SCALE)) / (atan(max_slider_db / TAN_SCALE) - atan(min_slider_db / TAN_SCALE));
 }

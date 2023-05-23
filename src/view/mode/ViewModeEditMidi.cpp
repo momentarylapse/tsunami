@@ -650,8 +650,10 @@ bool hover_end_of_note(HoverData &h, MidiNote *n) {
 void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 
 	view->exclusively_select_layer(vlayer);
-	if (!view->hover_selected_object())
+	if (!view->hover_selected_object()) {
 		view->exclusively_select_object();
+		view->set_current(hover());
+	}
 
 	// start drag'n'drop?
 	if (auto n = hover().note) {

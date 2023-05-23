@@ -47,7 +47,7 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Track"), "track-console", session, bar)
 {
 	track = nullptr;
-	panel = nullptr;
+	synth_panel = nullptr;
 	editing = false;
 	from_resource("track_dialog");
 	set_decimals(1);
@@ -101,9 +101,9 @@ void TrackConsole::load_data() {
 	enable("panning", track);
 	enable("instrument", track);
 	hide_control("td_t_edit", !track);
-	if (panel)
-		unembed(panel);
-	panel = nullptr;
+	if (synth_panel)
+		unembed(synth_panel);
+	synth_panel = nullptr;
 
 	if (track) {
 		set_string("name", track->name);
@@ -125,12 +125,12 @@ void TrackConsole::load_data() {
 
 		bool show_synth = track->synth and track_wants_synth(track);
 		if (show_synth)
-			panel = create_synth_panel(track, session, this);
+			synth_panel = create_synth_panel(track, session, this);
 		else
-			panel = create_dummy_synth_panel();
+			synth_panel = create_dummy_synth_panel();
 		hide_control("l-no-synth", show_synth);
 		hide_control("synth", !show_synth);
-		embed(panel, "synth", 0, 0);
+		embed(synth_panel, "synth", 0, 0);
 
 		if (track->fx.num > 0)
 			set_string("link-to-fx", format(_("%d effects active"), track->fx.num));

@@ -17,7 +17,6 @@ class AudioView;
 class SideBar;
 class BottomBar;
 class HeaderBar;
-class MiniBar;
 class Session;
 class Tsunami;
 class Module;

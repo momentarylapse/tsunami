@@ -75,6 +75,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	int height = hui::config.get_int("Window.Height", 600);
 	bool maximized = hui::config.get_bool("Window.Maximized", true);
 
+	set_size(width, height);
+	set_maximized(maximized);
+
 	event("new", [this] { on_new(); });
 	set_key_code("new", hui::KEY_N + hui::KEY_CONTROL);
 	event("open", [this] { on_open(); });
@@ -258,37 +261,18 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("cursor-expand-right", hui::KEY_RIGHT + hui::KEY_SHIFT);
 
 
-	set_menu(hui::create_resource_menu("menu", this));
-	app->plugin_manager->add_plugins_to_menu(this);
-
 	if (hui::config.get_bool("Window.HeaderBar", true)) {
 		header_bar = new HeaderBar(this);
-
-		set_target("");
-
-		if (hui::config.get_bool("Window.HideMenu", false)) {
-#if GTK_CHECK_VERSION(4,0,0)
-			gtk_widget_set_visible(menubar, false);
-#else
-			gtk_widget_hide(menubar);
-#endif
-		}
-#if GTK_CHECK_VERSION(4,0,0)
-		gtk_widget_set_visible(toolbar[0]->widget, false);
-#else
-		gtk_widget_hide(toolbar[0]->widget);
-#endif
-
-		set_menu(nullptr);
 	} else {
+		set_menu(hui::create_resource_menu("menu", this));
+		app->plugin_manager->add_plugins_to_menu(this);
 		toolbar[0]->set_by_id("toolbar");
 	}
 
 	// table structure
-	set_size(width, height);
-	set_maximized(maximized);
 	set_border_width(0);
 	set_spacing(0);
+	set_target("");
 	add_grid("", 0, 0, "root-grid");
 	set_target("root-grid");
 	add_grid("", 1, 0, "main-grid");
@@ -318,8 +302,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// bottom bar
 	bottom_bar = new BottomBar(session, this);
 	embed(bottom_bar.get(), "main-grid", 0, 1);
-	//mini_bar = new MiniBar(bottom_bar, session);
-	//embed(mini_bar.get(), "main-grid", 0, 2);
 
 	view->out_settings_changed >> in_update;
 	view->out_selection_changed >> in_update;
@@ -345,7 +327,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	});
 	session->out_mode_changed >> in_update;
 	
-	event("*", [this] { view->on_command(hui::get_event()->id); });
+	event("*", [this] {
+		view->on_command(hui::get_event()->id);
+	});
 
 	// first time start?
 	if (hui::config.get_bool("FirstStart", true)) {

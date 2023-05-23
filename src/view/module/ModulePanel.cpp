@@ -17,6 +17,8 @@
 extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
+extern const int CONFIG_PANEL_DIALOG_WIDTH = 480;
+extern const int CONFIG_PANEL_DIALOG_HEIGHT = 380;
 
 
 ConfigPanelSocket::ConfigPanelSocket(Module *_m, ConfigPanelMode _mode) {
@@ -225,7 +227,7 @@ ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, 
 		socket(module, mode)
 {
 	set_title(module->module_class);
-	set_size(CONFIG_PANEL_WIDTH, 300);
+	set_size(CONFIG_PANEL_DIALOG_WIDTH, CONFIG_PANEL_DIALOG_HEIGHT);
 	//m->set_options("grid", "expandx");
 
 	socket.integrate(this);

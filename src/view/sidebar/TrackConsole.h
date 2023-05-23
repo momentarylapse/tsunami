@@ -38,7 +38,7 @@ public:
 	void on_update();
 
 	Track *track;
-	hui::Panel *panel;
+	hui::Panel *synth_panel;
 	bool editing;
 	owned<FxListEditor> fx_editor;
 	Array<Instrument> instrument_list;

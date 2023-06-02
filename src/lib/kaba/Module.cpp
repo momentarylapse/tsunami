@@ -182,5 +182,8 @@ const Class *Module::base_class() {
 	return tree->base_class;
 }
 
+bool Module::is_system_module() const {
+	return filename.basename().find(".kaba") < 0;
+}
 
 }

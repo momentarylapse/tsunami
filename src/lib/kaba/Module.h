@@ -44,6 +44,8 @@ public:
 	//debug displaying
 	void show_vars(bool include_consts=false);
 
+	bool is_system_module() const;
+
 // data
 
 	Path filename;

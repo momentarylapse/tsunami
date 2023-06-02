@@ -189,12 +189,16 @@ Class *get_namespace_for_import(SyntaxTree *tree, const string &name) {
 }
 
 // import data from an included module file
-void SyntaxTree::import_data(shared<Module> s, bool indirect, const string &as_name) {
+//   indirect: "import" => true, "use" => false
+void SyntaxTree::import_data(shared<Module> source, bool indirect, const string &as_name) {
 	for (auto i: weak(includes))
-		if (i == s)
+		if (i == source)
 			return;
 
-	SyntaxTree *ps = s->tree.get();
+	SyntaxTree *ps = source->tree.get();
+
+	// propagate immortality TO the (dependent) source!
+	//  (might be unnecessary due to shared pointers)
 	if (flag_immortal)
 		SetImmortal(ps);
 
@@ -205,16 +209,26 @@ void SyntaxTree::import_data(shared<Module> s, bool indirect, const string &as_n
 		import_deep(this, ps);
 	} else {*/
 	if (indirect) {
+		// "import"
 		auto ns = get_namespace_for_import(this, as_name);
 		namespace_import_contents(ns, ps->base_class);
 	} else {
+		// "use"
 		namespace_import_contents(imported_symbols.get(), ps->base_class);
-		if (s->filename.basename().find(".kaba") < 0)
+		if (source->is_system_module())
 			if (!_class_contains(imported_symbols.get(), ps->base_class->name)) {
 				imported_symbols->classes.add(ps->base_class);
 			}
+
+		// hack: package auto import
+		for (auto c: weak(ps->base_class->constants))
+			if (c->name == "EXPORT_IMPORTS") {
+				for (auto i: weak(ps->includes))
+					if (!i->is_system_module())
+						import_data(i, indirect, "");
+			}
 	}
-	includes.add(s);
+	includes.add(source);
 	//}
 }
 

@@ -1438,6 +1438,10 @@ void Parser::parse_import() {
 	bool indirect = (command == Identifier::IMPORT);
 	Exp.next();
 
+	[[maybe_unused]] bool also_export = false;
+	if (try_consume("@export") or try_consume("out"))
+		also_export = true;
+
 	// parse import name
 	string name = Exp.cur;
 	int token = Exp.consume_token();

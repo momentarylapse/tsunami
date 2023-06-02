@@ -16,7 +16,6 @@
 
 namespace kaba {
 
-extern Array<Operator*> global_operators;
 extern const Class *TypeSpecialFunctionRef;
 
 extern const Class *TypeIntList;
@@ -319,7 +318,7 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 	const Class *t1_best = nullptr, *t2_best = nullptr;
 	Operator *op_found = nullptr;
 	Function *op_cf_found = nullptr;
-	for (auto *op: global_operators)
+	for (auto op: weak(context->global_operators))
 		if (primop == op->abstract)
 			if (type_match_with_cast(param1, left_modifiable, op->param_type_1,  c1) and type_match_with_cast(param2, false, op->param_type_2, c2))
 				if (c1.penalty + c2.penalty < c1_best.penalty + c2_best.penalty) {
@@ -1910,10 +1909,10 @@ shared<Node> Concretifier::link_unary_operator(AbstractOperator *po, shared<Node
 	const Class *p1 = operand->type;
 
 	// exact match?
-	bool ok=false;
-	for (auto *_op: global_operators)
+	bool ok = false;
+	for (auto _op: weak(context->global_operators))
 		if (po == _op->abstract)
-			if ((!_op->param_type_2) and (type_match_up(p1, _op->param_type_1))) {
+			if (!_op->param_type_2 and type_match_up(p1, _op->param_type_1)) {
 				op = _op;
 				ok = true;
 				break;
@@ -1925,9 +1924,9 @@ shared<Node> Concretifier::link_unary_operator(AbstractOperator *po, shared<Node
 		CastingData current;
 		CastingData best = {-1, 10000};
 		const Class *t_best = nullptr;
-		for (auto *_op: global_operators)
+		for (auto _op: weak(context->global_operators))
 			if (po == _op->abstract)
-				if ((!_op->param_type_2) and (type_match_with_cast(operand, false, _op->param_type_1, current))) {
+				if (!_op->param_type_2 and type_match_with_cast(operand, false, _op->param_type_1, current)) {
 					ok = true;
 					if (current.penalty < best.penalty) {
 						op = _op;

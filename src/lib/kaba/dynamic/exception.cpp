@@ -269,6 +269,38 @@ Array<StackFrameInfo> get_stack_trace(void **rbp) {
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
 
+void clean_up_block(Block *b, const StackFrameInfo& r) {
+	dbo("  block " + p2s(b));
+	for (Variable *v: b->vars) {
+		// for now, ignore temporary variables...
+		if (v->name.head(1) == "-")
+			continue;
+
+		char *p = (char*)r.rbp + v->_offset;
+		dbo("   " + v->type->name + " " + v->name + "  " + p2s(p));
+		auto cf = v->type->get_destructor();
+		if (cf) {
+			dbo("call destr: " + cf->long_name());
+			typedef void con_func(void *);
+			if (con_func * f = (con_func*)cf->address)
+				f(p);
+		}
+	}
+}
+
+void just_die(KabaException *kaba_exception, const Class *ex_type, const Array<StackFrameInfo> &trace) {
+	// uncaught...
+	if (!kaba_exception)
+		msg_error("uncaught exception  (nil)");
+	else if (ex_type == TypeUnknown)
+		msg_error("uncaught exception:  " + kaba_exception->message());
+	else
+		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
+	for (auto r: trace)
+		msg_write(r.str());
+	exit(1);
+}
+
 void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 #ifdef OS_LINUX
 	// get stack frame base pointer rbp
@@ -290,63 +322,48 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 	assert((rbp > rsp) and (rbp > local) and (local > rsp));
 	assert((int_p)rbp - (int_p)rsp < 10000);
 
+	void *return_rsp = nullptr;
+	void *return_rip = nullptr;
 
-	auto trace = get_stack_trace(rbp);
 
-	const Class *ex_type = get_type(kaba_exception);
+	{
+		auto trace = get_stack_trace(rbp);
 
-	for (auto r: trace) {
+		const Class *ex_type = get_type(kaba_exception);
 
-		dbo(r.str());
-		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
+		for (auto r: trace) {
 
-		for (Block *b: ebd.needs_killing) {
-			dbo("  block " + p2s(b));
-			for (Variable *v: b->vars) {
-				// for now, ignore temporary variables...
-				if (v->name.head(1) == "-")
-					continue;
+			dbo(r.str());
+			auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
 
-				char *p = (char*)r.rbp + v->_offset;
-				dbo("   " + v->type->name + " " + v->name + "  " + p2s(p));
-				auto cf = v->type->get_destructor();
-				if (cf) {
-					dbo("call destr: " + cf->long_name());
-					typedef void con_func(void *);
-					con_func * f = (con_func*)cf->address;
-					if (f) {
-						f(p);
-					}
+			for (Block *b: ebd.needs_killing)
+				clean_up_block(b, r);
+
+			if (ebd.except_block) {
+				dbo("except_block block: " + p2s(ebd.except_block));
+
+				if (ebd.except->params.num > 0) {
+					auto v = ebd.except_block->vars[0];
+					void **p = (void**)((int_p)r.rbp + v->_offset);
+					*p = kaba_exception;
 				}
+
+				// TODO special return
+				return_rsp = (void*)((int_p)r.rsp - 16);
+				return_rip = ebd.except_block->_start;
+				break;
 			}
 		}
-		if (ebd.except_block) {
-			dbo("except_block block: " + p2s(ebd.except_block));
 
-			if (ebd.except->params.num > 0) {
-				auto v = ebd.except_block->vars[0];
-				void **p = (void**)((int_p)r.rbp + v->_offset);
-				*p = kaba_exception;
-			}
-
-			// TODO special return
-			relink_return(ebd.except_block->_start, rbp, (void*)((int_p)r.rsp - 16));
-			return;
-		}
+		// uncaught?
+		if (!return_rsp)
+			just_die(kaba_exception, ex_type, trace);
 	}
+	relink_return(return_rip, rbp, return_rsp);
 
-
-	// uncaught...
-	if (!kaba_exception)
-		msg_error("uncaught exception  (nil)");
-	else if (ex_type == TypeUnknown)
-		msg_error("uncaught exception:  " + kaba_exception->message());
-	else
-		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
-	for (auto r: trace)
-		msg_write(r.str());
+#else
+	just_die(kaba_exception, TypeUnknown, {});
 #endif
-	exit(1);
 }
 #pragma GCC pop_options
 

@@ -37,8 +37,6 @@ extern const Class *TypeStringDict;
 extern const Class *TypeAny;
 extern const Class *TypeNoValueError;
 
-int enum_parse(const string &label, const Class *type);
-
 
 void _cdecl kaba_cstringout(char *str) {
 	os::terminal::print(str);

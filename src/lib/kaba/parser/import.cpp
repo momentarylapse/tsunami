@@ -131,13 +131,14 @@ shared<Module> get_import(Parser *parser, const string &name, int token_id) {
 	try {
 		include = parser->context->load_module(filename, parser->tree->module->just_analyse or config.compile_os);
 		// os-includes will be appended to syntax_tree... so don't compile yet
-	} catch (Exception &e) {
+	} catch (kaba::Exception &e) {
 		msg_left();
 
-		e.text = e.message() + format("\n...imported from:");
+		auto p = new Exception(e);
 		e.line = parser->Exp.token_physical_line_no(token_id);
 		e.column = parser->Exp.token_line_offset(token_id);
 		e.filename = parser->tree->module->filename;
+		e.parent = p;
 		throw e;
 	}
 

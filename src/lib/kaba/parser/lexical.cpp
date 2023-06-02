@@ -35,13 +35,7 @@ string ExpressionBuffer::peek_next() const {
 }
 
 int ExpressionBuffer::cur_token() const {
-	int i0 = 0;
-	for (auto &l: lines) {
-		if (cur_line == &l)
-			return i0 + _cur_exp;
-		i0 += l.tokens.num;
-	}
-	return -1;
+	return cur_line->token_ids[_cur_exp];
 }
 
 int ExpressionBuffer::consume_token() {
@@ -53,52 +47,41 @@ int ExpressionBuffer::consume_token() {
 }
 
 string ExpressionBuffer::get_token(int id) const {
-	int i0 = 0;
-	for (auto &l: lines) {
-		if ((id >= i0) and (id < i0 + l.tokens.num))
-			return l.tokens[id - i0].name;
-		i0 += l.tokens.num;
-	}
+	if (auto l = token_logical_line(id))
+		return l->tokens[id - l->first_token_id].name;
 	return "";
 }
 
 ExpressionBuffer::Line *ExpressionBuffer::token_logical_line(int id) const {
 	int i0 = 0;
-	for (auto &l: lines) {
-		if ((id >= i0) and (id < i0 + l.tokens.num))
-			return &l;
-		i0 += l.tokens.num;
+	int i1 = lines.num - 1;
+	while (i0 < i1) {
+		int m = (i0 + i1) >> 1;
+		if (id < lines[m].first_token_id)
+			i1 = m - 1;
+		else if (id > lines[m].last_token_id)
+			i0 = m + 1;
+		else
+			return &lines[m];
 	}
-	return nullptr;
+	return &lines[i0];
 }
 
 int ExpressionBuffer::token_physical_line_no(int id) const {
-	int i0 = 0;
-	for (auto &l: lines) {
-		if ((id >= i0) and (id < i0 + l.tokens.num))
-			return l.physical_line;
-		i0 += l.tokens.num;
-	}
+	if (auto l = token_logical_line(id))
+		return l->physical_line;
 	return -1;
 }
 
 int ExpressionBuffer::token_line_offset(int id) const {
-	int i0 = 0;
-	for (auto &l: lines) {
-		if ((id >= i0) and (id < i0 + l.tokens.num))
-			return l.tokens[id - i0].pos;
-		i0 += l.tokens.num;
-	}
+	if (auto l = token_logical_line(id))
+		return l->tokens[id - l->first_token_id].pos;
 	return -1;
 }
 
 int ExpressionBuffer::token_index_in_line(int id) const {
-	int i0 = 0;
-	for (auto &l: lines) {
-		if ((id >= i0) and (id < i0 + l.tokens.num))
-			return id - i0;
-		i0 += l.tokens.num;
-	}
+	if (auto l = token_logical_line(id))
+		return id - l->first_token_id;
 	return -1;
 }
 
@@ -216,6 +199,8 @@ void ExpressionBuffer::erase_logical_line(int line_no) {
 void ExpressionBuffer::update_meta_data() {
 	int id0 = 0;
 	for (auto &l: lines) {
+		l.first_token_id = id0;
+		l.last_token_id = id0 + l.tokens.num - 1;
 		l.token_ids.clear();
 		for (int i=0; i<l.tokens.num; i++)
 			l.token_ids.add(id0 + i);

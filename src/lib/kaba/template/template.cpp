@@ -282,11 +282,7 @@ void ImplicitClassRegistry::add(const Class* t) {
 // TODO track which module requests what
 // TODO implement as templates INSIDE base module
 void ImplicitClassRegistry::clear_from_module(Module *m) {
-	return;
-	msg_write("CLEAR..." + str(m->filename));
 	remove_if(classes, [m] (const Class *c) {
-		if (c->owner->module == m)
-			msg_write("  " + c->name);
 		return c->owner->module == m;
 	});
 }

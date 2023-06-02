@@ -68,10 +68,12 @@ int icomparex(const string &a, const string &b) {
 	return i;
 }
 
-// * ignore / at the end
-// * ignore recursion
+// * compare literally!
+// * NOPE: ignore / at the end
+// * NOPE: ignore recursion
 int Path::compare(const Path &p) const {
-	return icomparex(canonical().as_dir().s, p.canonical().as_dir().s);
+	//return icomparex(canonical().as_dir().s, p.canonical().as_dir().s);
+	return icomparex(s, p.s);
 }
 
 bool Path::operator ==(const Path &p) const {

@@ -1,5 +1,6 @@
 #include "../../base/base.h"
 #include "../../base/iter.h"
+#include "../../base/set.h"
 #include "../kaba.h"
 #include "../../os/msg.h"
 #include "Class.h"
@@ -7,6 +8,8 @@
 namespace kaba {
 
 void remove_enum_labels(const Class *type);
+
+base::set<Class*> _all_classes_;
 
 ClassElement::ClassElement() {
 	offset = 0;
@@ -52,10 +55,13 @@ Class::Class(Type _type, const string &_name, int64 _size, SyntaxTree *_owner, c
 	_vtable_location_target_ = nullptr;
 	_vtable_location_compiler_ = nullptr;
 	_vtable_location_external_ = nullptr;
+	_all_classes_.add(this);
 };
 
 Class::~Class() {
 	remove_enum_labels(this);
+
+	_all_classes_.erase(this);
 }
 
 bool Class::force_call_by_value() const {

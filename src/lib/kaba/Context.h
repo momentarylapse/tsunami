@@ -18,6 +18,7 @@ class Module;
 class Function;
 class Class;
 class TypeCast;
+class Operator;
 class TemplateManager;
 class ImplicitClassRegistry;
 class ExternalLinkData;
@@ -26,9 +27,12 @@ class Exception : public Asm::Exception {
 public:
 	Exception(const string &message, const string &expression, int line, int column, Module *s);
 	Exception(const Asm::Exception &e, Module *s, Function *f);
+	Exception(const Exception& e);
 	string message() const override;
 	//Module *module;
 	Path filename;
+
+	owned<Exception> parent;
 };
 /*struct SyntaxException : Exception{};
 struct LinkerException : Exception{};
@@ -42,6 +46,8 @@ public:
     owned<TemplateManager> template_manager;
     owned<ImplicitClassRegistry> implicit_class_registry;
     owned<ExternalLinkData> external;
+
+    shared_array<Operator> global_operators;
 
     Context();
     ~Context();

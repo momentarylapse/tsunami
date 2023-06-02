@@ -342,9 +342,10 @@ void Window::request_destroy() {
 #if GTK_CHECK_VERSION(4,0,0)
 	WindowFlightManager::request_destroy(this);
 #else
-	if (is_dialog()) {
+	if (is_dialog())
 		gtk_dialog_response(GTK_DIALOG(window), GTK_RESPONSE_DELETE_EVENT);
-	}
+	else
+		WindowFlightManager::request_destroy(this);
 #endif
 	requested_destroy = true;
 }
@@ -374,9 +375,6 @@ void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user
 }
 
 void fly(shared<Window> win, Callback cb) {
-	if (!win->is_dialog())
-		msg_error("hui.fly() only allowed for Dialog!");
-
 	win->show();
 
 	WindowFlightManager::add(win);
@@ -387,7 +385,8 @@ void fly(shared<Window> win, Callback cb) {
 	//g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
 	gtk_window_present(GTK_WINDOW(win->window));
 #else
-	g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
+	if (win->is_dialog())
+		g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
 #endif
 }
 

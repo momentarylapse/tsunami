@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../../base/base.h"
+#include "../../base/pointer.h"
 
 
 namespace kaba {
@@ -92,7 +93,7 @@ extern AbstractOperator abstract_operators[];
 
 
 
-class Operator {
+class Operator : public Sharable<base::Empty> {
 public:
 	AbstractOperator *abstract;
 	const Class *return_type, *param_type_1, *param_type_2;

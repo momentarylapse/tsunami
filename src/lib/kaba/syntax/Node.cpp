@@ -242,6 +242,8 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const, int 
 }
 
 Node::~Node() {
+	if (kind == NodeKind::BLOCK)
+		as_block()->vars.clear();
 }
 
 Node *Node::modifiable() {
@@ -579,10 +581,8 @@ shared<Node> make_constructor_static(shared<Node> n, const string &name) {
 	return n;
 }
 
-extern Array<Operator*> global_operators;
-
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
-	for (auto *op: global_operators)
+	for (auto op: weak(default_context->global_operators))
 		if (op->f->inline_no == inline_index)
 			return add_node_operator(op, p1, p2, token_id, override_type);
 

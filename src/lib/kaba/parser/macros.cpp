@@ -23,8 +23,7 @@ enum {
 	NumMacroNames
 };
 
-string MacroName[NumMacroNames] =
-{
+string MacroName[NumMacroNames] = {
 	"#define",
 	"#immortal",
 };
@@ -96,9 +95,9 @@ void Parser::parse_macros(bool just_analyse) {
 	bool IfDefed[1024];
 	
 	for (int i=0; i<Exp.lines.num-1; i++) {
-		Exp.jump(Exp.lines[i].token_ids[0]);
 
-		if (Exp.cur[0] == '#') {
+		if (Exp.lines[i].tokens[0].name[0] == '#') {
+			Exp.jump(Exp.lines[i].token_ids[0]);
 			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
 		} else {
 #if 0

@@ -27,8 +27,36 @@ Exception::Exception(const Asm::Exception &e, Module *s, Function *f) :
 	text = format("assembler: %s, %s", message(), f->long_name());
 }
 
+Exception::Exception(const Exception& e) :
+	Asm::Exception(e.text, e.expression, e.line, e.column)
+{
+	filename = e.filename;
+	if (e.parent.get())
+		parent = new Exception(*e.parent.get());
+}
+
 string Exception::message() const {
-	return format("%s, %s", Asm::Exception::message(), filename);
+	string m;
+	if (expression != "")
+		m += format("\"%s\": ", expression);
+	m += text;
+
+	auto location = [] (const Exception &e) {
+		if (e.line >= 0)
+			return format("%s, line %d", e.filename, e.line + 1);
+		return str(e.filename);
+	};
+
+	Array<string> locations;
+	locations.add(location(*this));
+
+	auto ee = parent.get();
+	while (ee) {
+		locations.add(location(*ee));
+		ee = ee->parent.get();
+	}
+	locations.reverse();
+	return m + "\nat: " + implode(locations, "\nimported at: ");
 }
 
 
@@ -198,8 +226,7 @@ const Class *_dyn_type_in_namespace(const VirtualTable *p, const Class *ns) {
 const Class *Context::get_dynamic_type(const VirtualBase *p) const {
 	auto *pp = get_vtable(p);
 	for (auto s: public_modules) {
-		auto t = _dyn_type_in_namespace(pp, s->tree->base_class);
-		if (t)
+		if (auto t = _dyn_type_in_namespace(pp, s->tree->base_class))
 			return t;
 	}
 	return nullptr;
@@ -208,10 +235,9 @@ const Class *Context::get_dynamic_type(const VirtualBase *p) const {
 
 
 void Context::clean_up() {
-	//delete_all_modules(true, true);
-
+	global_operators.clear();
+	public_modules.clear();
 	packages.clear();
-
 	external->reset();
 }
 
@@ -224,6 +250,7 @@ xfer<Context> Context::create() {
 	//c->external = _secret_lib_context_->external;
 	c->template_manager->copy_from(_secret_lib_context_->template_manager.get());
 	c->implicit_class_registry->copy_from(_secret_lib_context_->implicit_class_registry.get());
+	c->global_operators = _secret_lib_context_->global_operators;
 	return c;
 }
 

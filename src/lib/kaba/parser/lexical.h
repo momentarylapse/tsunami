@@ -23,6 +23,8 @@ public:
 		int physical_line, length, indent;
 		Array<Token> tokens;
 		Array<int> token_ids;
+		int first_token_id;
+		int last_token_id;
 	};
 
 	Array<Line> lines;

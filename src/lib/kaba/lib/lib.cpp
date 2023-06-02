@@ -346,8 +346,6 @@ const Class *add_type_func(const Class *ret_type, const Array<const Class*> &par
 
 //   with type information
 
-Array<Operator*> global_operators;
-
 void add_operator_x(OperatorID primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, InlineID inline_index, void *func) {
 	Operator *o = new Operator;
 	o->owner = cur_package->tree.get();
@@ -387,8 +385,10 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 			func_add_param("b", p);
 	}
 	func_set_inline(inline_index);
-	if (inline_index != InlineID::NONE)
-		global_operators.add(o);
+	if (inline_index != InlineID::NONE and cur_package->filename.extension() == "")
+		cur_package->context->global_operators.add(o);
+	else
+		delete o;
 }
 
 
@@ -713,6 +713,29 @@ void init(Abi abi, bool allow_std_lib) {
 	init_lib(_secret_lib_context_);
 
 	default_context = Context::create();
+}
+
+extern base::set<Class*> _all_classes_;
+extern base::set<Module*> _all_modules_;
+
+void clean_up() {
+	default_context->clean_up();
+	_secret_lib_context_->clean_up();
+
+	for (auto s: Statements)
+		delete s;
+	for (auto s: special_functions)
+		delete s;
+
+	if (_all_modules_.num > 0) {
+		msg_error(format("remaining modules: %d", _all_modules_.num));
+		for (auto m: _all_modules_)
+			msg_write("  " + str(m->filename) + "  " + str(m->_pointer_ref_counter));
+	} else if (_all_classes_.num > 0) {
+		msg_error(format("remaining classes: %d", _all_classes_.num));
+		for (auto c: _all_classes_)
+			msg_write("  " + c->name + "  " + str(c->_pointer_ref_counter));
+	}
 }
 
 };

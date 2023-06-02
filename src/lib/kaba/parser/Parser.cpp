@@ -2078,11 +2078,6 @@ void Parser::parse_abstract_function_body(Function *f) {
 		msg_write("ABSTRACT:");
 		f->block->show();
 	}
-
-	if (!f->is_template())
-		con.concretify_function_body(f);
-
-	cur_func = nullptr;
 }
 
 void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
@@ -2112,9 +2107,14 @@ void Parser::parse_all_function_bodies() {
 	//for (auto *f: function_needs_parsing)   might add lambda functions...
 	for (int i=0; i<function_needs_parsing.num; i++) {
 		auto f = function_needs_parsing[i];
-		if (!f->is_extern() and (f->token_id >= 0))
+		if (!f->is_extern() and (f->token_id >= 0)) {
 			parse_abstract_function_body(f);
+			if (!f->is_template())
+				con.concretify_function_body(f);
+		}
 	}
+
+	cur_func = nullptr;
 }
 
 Flags Parser::parse_flags(Flags initial) {

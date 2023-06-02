@@ -13,6 +13,7 @@
 namespace kaba {
 
 extern const Class *TypeDynamicArray;
+extern Module *cur_package;
 
 int kaba_int_passthrough(int i);
 int op_int_add(int a, int b);
@@ -22,6 +23,8 @@ int enum_parse(const string&, const Class*);
 Array<int> enum_all(const Class*);
 
 void AutoImplementer::_add_missing_function_headers_for_enum(Class *t) {
+	cur_package = t->owner->module;
+
 	class_add_func("from_int", t, &kaba_int_passthrough, Flags::STATIC | Flags::PURE);
 		func_set_inline(InlineID::PASSTHROUGH);
 		func_add_param("i", TypeInt);

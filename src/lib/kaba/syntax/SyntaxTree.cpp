@@ -1380,10 +1380,19 @@ void SyntaxTree::map_local_variables_to_stack() {
 	}
 }
 
+void delete_all_constants(Class *c) {
+	for (auto cc: weak(c->classes)) {
+		auto ccc = const_cast<Class*>(cc);
+		ccc->constants.clear();
+		delete_all_constants(ccc);
+	}
+}
 
 // no included modules may be deleted before us!!!
 SyntaxTree::~SyntaxTree() {
 	// delete all classes, functions etc created by this module
+
+	delete_all_constants(base_class);
 
 	module->context->template_manager->clear_from_module(module);
 	module->context->implicit_class_registry->clear_from_module(module);

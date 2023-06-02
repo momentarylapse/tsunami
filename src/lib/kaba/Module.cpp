@@ -7,6 +7,7 @@
 #include "compiler/Compiler.h"
 #include "dynamic/dynamic.h"
 #include "lib/lib.h"
+#include "../base/set.h"
 #include "../os/filesystem.h"
 #include "../os/file.h"
 #include "../os/msg.h"
@@ -25,6 +26,7 @@ Path absolute_module_path(const Path &filename);
 
 
 Array<shared<Module>> loading_module_stack;
+base::set<Module*> _all_modules_;
 
 
 void Module::load(const Path &_filename, bool _just_analyse) {
@@ -100,9 +102,11 @@ Module::Module(Context *c, const Path &_filename) {
 	memory_size = 0;
 
 	tree = new SyntaxTree(this);
+	_all_modules_.add(this);
 }
 
 Module::~Module() {
+	_all_modules_.erase(this);
 	int r = 0;
 	if (opcode) {
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)

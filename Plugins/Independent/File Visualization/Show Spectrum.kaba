@@ -34,15 +34,15 @@ class SpecGrid extends Grid
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
-			var x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
+			let x = log2lin(float(i) / float(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
 			if type == SpectrumType.LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
 			else #if type == SpectrumType.LOG
-				var vol_max = todb(peak_max)
-				var vol_min = vol_max - 60
+				let vol_max = todb(peak_max)
+				let vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
 	func mut set_type(t: SpectrumType)
@@ -50,8 +50,8 @@ class SpecGrid extends Grid
 		if type == SpectrumType.LINEAR
 			y_axis.set(0, peak_max, false, "")
 		else #if type == SpectrumType.LOG
-			var vol_max = todb(peak_max)
-			var vol_min = vol_max - 60
+			let vol_max = todb(peak_max)
+			let vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
 		create_lines()
 
@@ -82,7 +82,7 @@ Grid ? ''
 		set_int("type", int(SpectrumType.LOG))
 
 	func mut on_type()
-		var t = SpectrumType.from_int(get_int("type")) # ...
+		let t = SpectrumType.from_int(get_int("type")) # ...
 		grid.set_type(t)
 		grid.redraw()
 
@@ -110,26 +110,17 @@ class ShowSpectrum extends TsunamiPlugin
 	
 		let ww = float(len(buf)) / song.sample_rate
 		for i in 0:N
-			let fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
-			let fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
-			var j0 = int(fmin * ww)
-			var j1 = int(fmax * ww + 1)
-			j0 = clamp(j0, 0, len2)
-			j1 = clamp(j1, 0, len2)
-			var bmaxr = 0.0
-			var bmaxl = 0.0
-			for j in j0:j1
-				let ampr = fr[j].x * fr[j].x + fr[j].y * fr[j].y
-				if bmaxr < ampr
-					bmaxr = ampr
-				let ampl = fl[j].x * fl[j].x + fl[j].y * fl[j].y
-				if bmaxl < ampl
-					bmaxl = ampl
+			let fmin = MIN_FREQ * exp(log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
+			let fmax = MIN_FREQ * exp(log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
+			let j0 = clamp(int(fmin * ww), 0, len2 - 1)
+			let j1 = clamp(int(fmax * ww + 1), 0, len2 - 1)
+			let bmaxr = fr[j0:j1] |> complex.abs_sqr |> max
+			let bmaxl = fl[j0:j1] |> complex.abs_sqr |> max
 			ffr.add(bmaxr)
 			ffl.add(bmaxl)
 
 		peak_max = max(max(ffr), max(ffl))
-		let mmax = sqr(buf.length) / 4
+		let mmax = sqr(len(buf)) / 4
 		if mmax > 0
 			ffr /= mmax
 			ffl /= mmax
@@ -140,7 +131,7 @@ class ShowSpectrum extends TsunamiPlugin
 		hui.fly(dlg, stop)
 
 	func override on_start()
-		if session.view.sel.range().length > 0
+		if len(session.view.sel.range()) > 0
 			show_spec(session.song)
 		else
 			session.e("'Show Spectrum.kaba': Needs some selection!")

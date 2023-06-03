@@ -780,6 +780,7 @@ void Serializer::serialize_function(Function *f) {
 
 
 void Serializer::simplify_if_statements() {
+	// TODO ucomiss (float cmp)
 	for (int i=0;i<cmd.cmd.num - 4;i++) {
 		if ((cmd.cmd[i].inst == Asm::InstID::CMP) and (cmd.cmd[i+2].inst == Asm::InstID::CMP) and (cmd.cmd[i+3].inst == Asm::InstID::JZ)) {
 			if (cmd.cmd[i+1].inst == Asm::InstID::SETL)

@@ -801,7 +801,7 @@ shared<Node> Parser::parse_operand_super_greedy(Block *block) {
 
 // Node structure
 //  p = [VAR, START, STOP, STEP]
-//  p = [VAR, KEY, ARRAY]
+//  p = [REF_VAR, KEY, ARRAY]
 shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 	// variable name
@@ -851,7 +851,7 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 
 		auto cmd_for = add_node_statement(StatementID::FOR_CONTAINER, token0, TypeUnknown);
-		// [VAR, KEY, ARRAY, BLOCK]
+		// [REF_VAR (token), KEY? (token), ARRAY, BLOCK]
 
 		cmd_for->set_param(0, var);
 		cmd_for->set_param(1, key);

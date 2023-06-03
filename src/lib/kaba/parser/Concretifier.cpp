@@ -1475,16 +1475,18 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 		type_el = type_el->param[0];
 
 	// create an array
-	auto type_array = tree->request_implicit_class_list(type_el, token_id);
-	auto *var = block->add_var(block->function->create_slightly_hidden_name(), type_array);
+	auto array_type = tree->request_implicit_class_list(type_el, token_id);
+	auto array_var = block->add_var(block->function->create_slightly_hidden_name(), array_type);
 
 	// array.add(exp)
-	auto *f_add = type_array->get_member_func("add", TypeVoid, {type_el});
+	auto f_add = array_type->get_member_func("add", TypeVoid, {type_el});
 	if (!f_add)
 		do_error("...add() ???", token_id);
-	auto n_add = add_node_member_call(f_add, add_node_local(var));
-	n_add->set_param(1, n_exp);
-	n_add->type = TypeUnknown; // mark abstract so n_exp will be concretified
+	auto n_add = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown, false, token_id);
+	n_add->set_num_params(3);
+	n_add->set_param(0, add_node_func_name(f_add));
+	n_add->set_param(1, add_node_local(array_var));
+	n_add->set_param(2, n_exp);
 
 	// add new code to the loop
 	Block *b;
@@ -1509,10 +1511,10 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 	// NOW we can set the types
 	n_for = concretify_node(n_for, block, ns);
 
-	auto n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, type_array);
+	auto n = new Node(NodeKind::ARRAY_BUILDER_FOR, 0, array_type);
 	n->set_num_params(2);
 	n->set_param(0, n_for);
-	n->set_param(1, add_node_local(var));
+	n->set_param(1, add_node_local(array_var));
 	return n;
 }
 
@@ -2132,9 +2134,9 @@ shared<Node> Concretifier::build_pipe_filter(const shared<Node> &input, const sh
 	if (rhs->kind == NodeKind::ABSTRACT_CALL)
 		l = rhs->params[1];
 	if (l->kind != NodeKind::ABSTRACT_OPERATOR or l->as_abstract_op()->name != "=>")
-		do_error("labmda expression '=>' expected inside 'filter()'", l);
+		do_error("lambda expression '=>' expected inside 'filter()'", l);
 
-//  p = [VAR, KEY, ARRAY]
+//  p = [REF_VAR, KEY, ARRAY]
 	auto n_for = add_node_statement(StatementID::FOR_CONTAINER, token_id, TypeUnknown);
 	n_for->set_param(0, l->params[0]); // token variable
 	//n_for->set_param(1, key);

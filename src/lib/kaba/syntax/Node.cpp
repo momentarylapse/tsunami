@@ -153,7 +153,7 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::CONSTANT)
 		return as_const()->str() + t;
 	if (kind == NodeKind::CALL_FUNCTION)
-		return as_func()->signature(ns);
+		return as_func()->signature(ns) + t;
 	if (kind == NodeKind::CALL_RAW_POINTER)
 		return "(...)" + t;
 	if (kind == NodeKind::CALL_INLINE)

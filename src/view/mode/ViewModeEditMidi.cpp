@@ -486,14 +486,8 @@ void ViewModeEditMidi::on_start() {
 	preview->set_input_device(input_wanted_device);
 	if (input_wanted_active)
 		_start_input();
-	auto *sb = cur_vlayer()->scroll_bar;
-	sb->hidden = false;
-	sb->set_callback([this] (float offset) {
-		float _pitch_max = 128 - offset;
-		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
-	});
-	sb->set_content(0, 128);
-	sb->set_view_size(EDIT_PITCH_SHOW_COUNT);
+
+	on_cur_layer_change();
 
 	if (!song->time_track())
 		session->q(_("Midi editing is far easier with a metronome track. Do you want to add one?"), {"track-add-beats:" + _("yes")});
@@ -914,6 +908,18 @@ float ViewModeEditMidi::layer_suggested_height(AudioViewLayer *l) {
 
 void ViewModeEditMidi::on_cur_layer_change() {
 	view->thm.set_dirty();
+	auto sb = cur_vlayer()->scroll_bar;
+	sb->set_content(0, MAX_PITCH);
+	sb->set_view_size(EDIT_PITCH_SHOW_COUNT);
+	sb->set_view_offset(MAX_PITCH - cur_vlayer()->edit_pitch_max);
+
+	for (auto l: view->vlayers)
+		l->scroll_bar->hidden = true;
+	sb->hidden = false;
+	sb->set_callback([this] (float offset) {
+		float _pitch_max = MAX_PITCH - offset;
+		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
+	});
 }
 
 
@@ -1094,8 +1100,6 @@ void ViewModeEditMidi::draw_post(Painter *c) {
 
 	} else if (mode == MidiMode::LINEAR) {
 		l->scroll_bar->hidden = false;
-		l->scroll_bar->set_view_offset(127 - cur_vlayer()->edit_pitch_max);
-		//l->scroll_bar->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
 	}
 
 

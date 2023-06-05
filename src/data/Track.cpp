@@ -79,6 +79,8 @@ Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 
 	_register_synth(_synth);
 	synth = _synth;
+	if (synth)
+		synth->set_instrument(instrument);
 }
 
 

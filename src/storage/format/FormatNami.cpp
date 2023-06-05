@@ -1019,6 +1019,8 @@ public:
 		me->muted = muted;
 		me->panning = f->read_float();
 		me->instrument = Instrument((Instrument::Type)f->read_int());
+		if (me->synth)
+			me->synth->set_instrument(me->instrument);
 		f->read_int(); // reserved
 
 		notify();

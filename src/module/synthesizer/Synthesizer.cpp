@@ -6,13 +6,13 @@
  */
 
 #include "Synthesizer.h"
+#include "DummySynthesizer.h"
 #include "../ModuleFactory.h"
+#include "../port/Port.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/audio/AudioBuffer.h"
-#include "DummySynthesizer.h"
 #include "../../lib/math/math.h"
-#include "../port/Port.h"
 
 PitchRenderer::PitchRenderer(Synthesizer *s, int p) {
 	synth = s;

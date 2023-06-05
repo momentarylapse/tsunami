@@ -23,6 +23,7 @@ void ActionTrackSetSynthesizer::undo(Data *d) {
 void *ActionTrackSetSynthesizer::execute(Data *d) {
 	track->synth->fake_death();
 	std::swap(synth, track->synth);
+	track->synth->set_instrument(track->instrument);
 	track->out_replace_synthesizer.notify();
 
 	return synth.get();

@@ -50,25 +50,6 @@ void on_gtk_list_activate(GtkWidget* widget, void* a, void* b, ControlListView* 
 	self->notify(EventID::ACTIVATE);
 }
 
-#if !GTK_CHECK_VERSION(4,0,0)
-
-void on_gtk_list_select(GtkTreeSelection *selection, gpointer data) {
-	reinterpret_cast<Control*>(data)->notify(EventID::SELECT, false);
-}
-
-gboolean on_gtk_list_right_button(GtkWidget* widget, GdkEventButton* event, ControlListView* self) {
-	dbo("LIST RIGHT BUTTON");
-	if (event->button != GDK_BUTTON_SECONDARY) // right
-		return false;
-	if (event->type != GDK_BUTTON_PRESS)
-		return false;
-	if (event->window != gtk_tree_view_get_bin_window(GTK_TREE_VIEW(self->widget)))
-		return false;
-	self->on_right_click(event->x, event->y);
-	return false;
-}
-#endif
-
 void ControlListView::on_right_click(double x, double y) {
 	dbo("LIST ON RIGHT CLICK");
 	panel->win->input.column = -1;
@@ -76,7 +57,7 @@ void ControlListView::on_right_click(double x, double y) {
 	panel->win->input.x = x;
 	panel->win->input.y = y;
 #if GTK_CHECK_VERSION(4,0,0)
-	msg_write(hover);
+	//msg_write(hover);
 	panel->win->input.row = hover;
 #else
 	int cell_x = 0, cell_y = 0;
@@ -90,37 +71,6 @@ void ControlListView::on_right_click(double x, double y) {
 #endif
 	notify(EventID::RIGHT_BUTTON_DOWN, false);
 }
-
-#if !GTK_CHECK_VERSION(4,0,0)
-void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
-	dbo("ROW DEL");
-	auto *lv = reinterpret_cast<ControlListView*>(user_data);
-	if (!lv->allow_change_messages)
-		return;
-
-	//msg_write("row del");
-	gint *indices = gtk_tree_path_get_indices(path);
-
-	if (indices[0] >= lv->row_target) {
-		lv->panel->win->input.row = indices[0] - 1;
-		lv->panel->win->input.row_target = lv->row_target;
-	} else {
-		lv->panel->win->input.row = indices[0];
-		lv->panel->win->input.row_target = lv->row_target - 1;
-	}
-	lv->notify(EventID::MOVE, false);
-}
-
-void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data) {
-	dbo("ROW INSERTED");
-	auto *lv = reinterpret_cast<ControlListView*>(user_data);
-	if (!lv->allow_change_messages)
-		return;
-	//msg_write("row insert");
-	gint *indices = gtk_tree_path_get_indices(path);
-	lv->row_target = indices[0];
-}
-#endif
 
 
 
@@ -175,7 +125,85 @@ void on_gtk_list_edit_changed(GtkWidget *widget, ControlListView::ItemMapper *h)
 	list_view_notify_cell_change(widget, h, gtk_editable_get_text(GTK_EDITABLE(widget)));
 }
 
-void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data) {
+
+//----------------------------------------------------
+// drag n drop
+
+GdkContentProvider* on_drag_prepare(GtkDragSource *source, double x, double y, ControlListView::ItemMapper *m) {
+	return gdk_content_provider_new_typed(G_TYPE_STRING, format("::::%s|%d", p2s(m->list_view), m->row_in_model).c_str());
+}
+
+void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ControlListView::ItemMapper *m) {
+	// Set the widget as the drag icon
+	GdkPaintable *paintable = gtk_widget_paintable_new(gtk_widget_get_parent(m->parent));
+	gtk_drag_source_set_icon(source, paintable, 0, 0);
+	g_object_unref(paintable);
+}
+
+void on_gtk_list_overlay_draw(GtkDrawingArea* drawing_area, cairo_t* cr, int width, int height, gpointer user_data) {
+	auto lv = reinterpret_cast<ControlListView*>(user_data);
+	if (lv->potential_drop_row < 0)
+		return;
+	float y = 0;
+	if (lv->potential_drop_row > 0) {
+		for (auto &i: lv->_item_map_)
+			if (i->row_in_model == lv->potential_drop_row - 1) {
+				graphene_rect_t bounds;
+				if (!gtk_widget_compute_bounds(i->widget, lv->widget, &bounds))
+					return;
+				y = bounds.origin.y + bounds.size.height;
+			}
+	}
+
+	cairo_set_source_rgba(cr, 1, 1, 1, 0.7f);
+	cairo_rectangle(cr, 0, y-1, width, 3);
+	cairo_fill(cr);
+}
+
+static gboolean on_gtk_list_drop(GtkDropTarget *target, const GValue *value, double x, double y, ControlListView* self) {
+	gtk_widget_set_visible(self->overlay_drawing_area, false);
+	if (G_VALUE_HOLDS(value, G_TYPE_STRING)) {
+		string s = g_value_get_string(value);
+		string m = "::::" + p2s(self) + "|";
+		if (s.head(m.num) == m) {
+			int row_source = s.sub(m.num)._int();
+			self->panel->win->input.row = row_source;
+			if (row_source >= self->potential_drop_row)
+				self->panel->win->input.row_target = self->potential_drop_row;
+			else
+				self->panel->win->input.row_target = self->potential_drop_row - 1;
+			if (self->panel->win->input.row != self->panel->win->input.row_target)
+				self->notify(EventID::MOVE, false);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+static GdkDragAction on_gtk_list_drop_motion(GtkDropTarget* target, gdouble x, gdouble y, ControlListView* self) {
+	//msg_write(format("motion %f  %f", x, y));
+	self->potential_drop_row = 0;
+	for (auto &i: self->_item_map_) {
+		graphene_rect_t bounds;
+		if (gtk_widget_compute_bounds(i->widget, self->widget, &bounds)) {
+			if (y >= bounds.origin.y + bounds.size.height / 2)
+				self->potential_drop_row = i->row_in_model + 1;
+		}
+	}
+	gtk_widget_set_visible(self->overlay_drawing_area, true);
+	gtk_widget_queue_draw(self->overlay_drawing_area);
+	return GDK_ACTION_COPY;
+}
+
+static void on_gtk_list_drop_leave(GtkDropTarget* target, ControlListView* self) {
+	self->potential_drop_row = -1;
+	gtk_widget_set_visible(self->overlay_drawing_area, false);
+}
+
+//----------------------------------------------------
+// factory
+
+void on_gtk_list_item_setup(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data) {
 	dbo("LIST SETUP " + p2s(list_item));
 	auto list_view = reinterpret_cast<ControlListView*>(user_data);
 	int col = base::find_index(list_view->factories, factory);
@@ -213,21 +241,7 @@ void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void
 	m->widget = w;
 }
 
-//#define LIST_DRAG_N_DROP_EXPERIMENT
-
-#ifdef LIST_DRAG_N_DROP_EXPERIMENT
-GdkContentProvider* on_drag_prepare(GtkDragSource *source, double x, double y, ControlListView::ItemMapper *m) {
-	return gdk_content_provider_new_typed(G_TYPE_STRING, "some stupid test");
-}
-void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ControlListView::ItemMapper *m) {
-	// Set the widget as the drag icon
-	GdkPaintable *paintable = gtk_widget_paintable_new (gtk_widget_get_parent(m->parent));
-	gtk_drag_source_set_icon (source, paintable, 0, 0);
-	g_object_unref (paintable);
-}
-#endif
-
-void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
+void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
 	int column = base::find_index(list_view->factories, factory);
 	if (column < 0 or column >= list_view->effective_format.num)
 		return;
@@ -275,12 +289,12 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, Contr
 			g_signal_connect(controller, "leave", G_CALLBACK(gtk_list_item_widget_leave_cb), m);
 			gtk_widget_add_controller(m->parent, controller);
 
-#ifdef LIST_DRAG_N_DROP_EXPERIMENT
-			GtkDragSource *drag_source = gtk_drag_source_new();
-			g_signal_connect(drag_source, "prepare", G_CALLBACK(on_drag_prepare), m);
-			g_signal_connect(drag_source, "drag-begin", G_CALLBACK(on_drag_begin), m);
-			gtk_widget_add_controller(m->parent, GTK_EVENT_CONTROLLER(drag_source));
-#endif
+			if (list_view->reorderable) {
+				GtkDragSource *drag_source = gtk_drag_source_new();
+				g_signal_connect(drag_source, "prepare", G_CALLBACK(on_drag_prepare), m);
+				g_signal_connect(drag_source, "drag-begin", G_CALLBACK(on_drag_begin), m);
+				gtk_widget_add_controller(m->parent, GTK_EVENT_CONTROLLER(drag_source));
+			}
 		}
 	} else {
 		msg_error("hui.ListView.bind: no map");
@@ -294,6 +308,53 @@ void on_gtk_column_view_activate(GtkColumnView* self, guint position, gpointer u
 void on_gtk_selection_model_selection_changed(GtkSelectionModel* self, guint position, guint n_items, gpointer user_data) {
 	reinterpret_cast<Control*>(user_data)->notify(EventID::SELECT, false);
 }
+
+#else // gtk3
+
+void on_gtk_list_select(GtkTreeSelection *selection, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::SELECT, false);
+}
+
+gboolean on_gtk_list_right_button(GtkWidget* widget, GdkEventButton* event, ControlListView* self) {
+	dbo("LIST RIGHT BUTTON");
+	if (event->button != GDK_BUTTON_SECONDARY) // right
+		return false;
+	if (event->type != GDK_BUTTON_PRESS)
+		return false;
+	if (event->window != gtk_tree_view_get_bin_window(GTK_TREE_VIEW(self->widget)))
+		return false;
+	self->on_right_click(event->x, event->y);
+	return false;
+}
+void on_gtk_list_row_deleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
+	dbo("ROW DEL");
+	auto *lv = reinterpret_cast<ControlListView*>(user_data);
+	if (!lv->allow_change_messages)
+		return;
+
+	//msg_write("row del");
+	gint *indices = gtk_tree_path_get_indices(path);
+
+	if (indices[0] >= lv->row_target) {
+		lv->panel->win->input.row = indices[0] - 1;
+		lv->panel->win->input.row_target = lv->row_target;
+	} else {
+		lv->panel->win->input.row = indices[0];
+		lv->panel->win->input.row_target = lv->row_target - 1;
+	}
+	lv->notify(EventID::MOVE, false);
+}
+
+void on_gtk_list_row_inserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data) {
+	dbo("ROW INSERTED");
+	auto *lv = reinterpret_cast<ControlListView*>(user_data);
+	if (!lv->allow_change_messages)
+		return;
+	//msg_write("row insert");
+	gint *indices = gtk_tree_path_get_indices(path);
+	lv->row_target = indices[0];
+}
+
 #endif
 
 
@@ -332,8 +393,8 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 		for (auto &p: parts) {
 			auto factory = gtk_signal_list_item_factory_new();
 			factories.add(factory);
-			g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
-			g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+			g_signal_connect(factory, "setup", G_CALLBACK(on_gtk_list_item_setup), this);
+			g_signal_connect(factory, "bind", G_CALLBACK(on_gtk_list_item_bind), this);
 
 			auto col = gtk_column_view_column_new(p.c_str(), factory);
 			columns.add(col);
@@ -347,8 +408,8 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	} else {
 		auto factory = gtk_signal_list_item_factory_new();
 		factories.add(factory);
-		g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
-		g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+		g_signal_connect(factory, "setup", G_CALLBACK(on_gtk_list_item_setup), this);
+		g_signal_connect(factory, "bind", G_CALLBACK(on_gtk_list_item_bind), this);
 
 		if (option_has(options, "grid")) {
 			is_grid_view = true;
@@ -393,8 +454,8 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 
 
 	// drag'n'drop reordering
-	g_signal_connect(G_OBJECT(store), "row-inserted", G_CALLBACK(&OnGtkListRowInserted), this);
-	g_signal_connect(G_OBJECT(store), "row-deleted", G_CALLBACK(&OnGtkListRowDeleted), this);
+	g_signal_connect(G_OBJECT(store), "row-inserted", G_CALLBACK(&on_gtk_list_row_inserted), this);
+	g_signal_connect(G_OBJECT(store), "row-deleted", G_CALLBACK(&on_gtk_list_row_deleted), this);
 #endif
 
 
@@ -417,7 +478,17 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 
 
 #if GTK_CHECK_VERSION(4,0,0)
-	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), view);
+	// overlay to show drag'n'drop state
+	auto ol = gtk_overlay_new();
+	overlay_drawing_area = gtk_drawing_area_new();
+	gtk_widget_set_halign(overlay_drawing_area, GTK_ALIGN_FILL);
+	gtk_widget_set_valign(overlay_drawing_area, GTK_ALIGN_FILL);
+	gtk_widget_set_can_target(overlay_drawing_area, false);
+	gtk_overlay_set_child(GTK_OVERLAY(ol), view);
+	gtk_overlay_add_overlay(GTK_OVERLAY(ol), overlay_drawing_area);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), ol);//view);
+
+	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(overlay_drawing_area), on_gtk_list_overlay_draw, this, nullptr);
 #else
 	gtk_container_add(GTK_CONTAINER(sw), view);
 	gtk_widget_show(sw);
@@ -652,6 +723,16 @@ void ControlListView::__set_option(const string &op, const string &value) {
 			auto child = gtk_widget_get_first_child(widget);
 			gtk_widget_set_visible(child, false);
 		}
+	} else if (op == "reorderable") {
+		reorderable = true;
+
+		GtkDropTarget *target = gtk_drop_target_new(G_TYPE_STRING, GDK_ACTION_COPY);
+		g_signal_connect(target, "drop", G_CALLBACK(on_gtk_list_drop), this);
+		g_signal_connect(target, "motion", G_CALLBACK(on_gtk_list_drop_motion), this);
+		g_signal_connect(target, "leave", G_CALLBACK(on_gtk_list_drop_leave), this);
+		gtk_widget_add_controller(widget, GTK_EVENT_CONTROLLER(target));
+	} else if (op == "singleclickactivate") {
+		gtk_list_view_set_single_click_activate(GTK_LIST_VIEW(widget), true);
 	}
 #else
 	if ((op == "multiline") or (op == "selectmulti")) {
@@ -667,23 +748,15 @@ void ControlListView::__set_option(const string &op, const string &value) {
 	} else if (op == "reorderable") {
 		gtk_tree_view_set_reorderable(GTK_TREE_VIEW(widget), true);
 	} else if (op == "singleclickactivate") {
-#if GTK_CHECK_VERSION(4,0,0)
-		gtk_list_view_set_single_click_activate(GTK_LIST_VIEW(widget), true);
-#else
 		msg_error("ListView.singleclickactivate gtk3...");
+	}
 #endif
-	} else if (op == "style") {
-#if GTK_CHECK_VERSION(4,0,0)
-		gtk_widget_add_css_class(widget, value.c_str());
-#else
-		auto sc = gtk_widget_get_style_context(widget);
-		gtk_style_context_add_class(sc, value.c_str());
+	if (op == "style") {
+		add_css_class(value);
 		//gtk_style_context_add_class(sc, "navigation-sidebar");
 		//gtk_style_context_add_class(sc, "rich-list");
 		//gtk_style_context_add_class(sc, "data-table");
-#endif
 	}
-#endif
 }
 
 };

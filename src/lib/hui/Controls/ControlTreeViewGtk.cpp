@@ -29,8 +29,8 @@ void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double 
 void list_view_notify_cell_change(GtkWidget *widget, ControlListView::ItemMapper *h, const string &val);
 void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h);
 void on_gtk_list_edit_changed(GtkWidget *widget, ControlListView::ItemMapper *h);
-void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data);
-void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view);
+void on_gtk_list_item_setup(GtkListItemFactory *factory, GtkListItem *list_item, void *user_data);
+void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view);
 void on_gtk_column_view_activate(GtkColumnView* self, guint position, gpointer user_data);
 void on_gtk_selection_model_selection_changed(GtkSelectionModel* self, guint position, guint n_items, gpointer user_data);
 #endif
@@ -179,8 +179,8 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 		for (auto &p: parts) {
 			auto factory = gtk_signal_list_item_factory_new();
 			factories.add(factory);
-			g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
-			g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+			g_signal_connect(factory, "setup", G_CALLBACK(on_gtk_list_item_setup), this);
+			g_signal_connect(factory, "bind", G_CALLBACK(on_gtk_list_item_bind), this);
 
 			auto col = gtk_column_view_column_new(p.c_str(), factory);
 			columns.add(col);
@@ -194,8 +194,8 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 	} else {
 		auto factory = gtk_signal_list_item_factory_new();
 		factories.add(factory);
-		g_signal_connect(factory, "setup", G_CALLBACK(setup_listitem_cb), this);
-		g_signal_connect(factory, "bind", G_CALLBACK(bind_listitem_cb), this);
+		g_signal_connect(factory, "setup", G_CALLBACK(on_gtk_list_item_setup), this);
+		g_signal_connect(factory, "bind", G_CALLBACK(on_gtk_list_item_bind), this);
 
 		if (option_has(options, "grid")) {
 			is_grid_view = true;

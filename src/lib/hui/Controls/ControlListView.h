@@ -34,6 +34,7 @@ public:
 
 	bool allow_change_messages;
 	int row_target;
+	bool reorderable = false;
 
 	string effective_format;
 #if GTK_CHECK_VERSION(4,0,0)
@@ -44,6 +45,9 @@ public:
 	bool is_grid_view = false;
 	Array<GtkColumnViewColumn*> columns;
 	Array<GtkListItemFactory*> factories;
+	GtkWidget *overlay_drawing_area = nullptr;
+
+	int potential_drop_row = -1;
 
 	struct ItemMapper {
 		ControlListView *list_view;

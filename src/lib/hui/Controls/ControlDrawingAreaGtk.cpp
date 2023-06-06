@@ -63,7 +63,7 @@ void get_style_colors(Panel *p, const string &id, base::map<string,color> &color
 
 #if GTK_CHECK_VERSION(4,0,0)
 
-void on_gtk_area_draw (GtkDrawingArea* drawing_area, cairo_t* cr, int width, int height, gpointer user_data) {
+void on_gtk_area_draw(GtkDrawingArea* drawing_area, cairo_t* cr, int width, int height, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 	//std::lock_guard<std::mutex> lock(da->mutex);
 	da->cur_cairo = cr;

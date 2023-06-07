@@ -38,9 +38,9 @@ void ControlLabel::__set_string(const string &str) {
 	auto parts = split_title(str);
 	text = parts[0];
 	set_options(get_option_from_title(str));
-	string s = sys_str(text);
+	string s = text;
 	if (flag_bold)
-		s = "<b>" + text + "</b>";
+		s = "<b>" + s + "</b>";
 	if (flag_italic)
 		s = "<i>" + s + "</i>";
 	if (flag_underline)

@@ -2128,13 +2128,18 @@ shared<Node> Concretifier::build_pipe_sort(const shared<Node> &input, const shar
 // rhs is already the "lambda"  x=>y
 shared<Node> Concretifier::build_pipe_filter(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id) {
 	if (!input->type->is_list())
-		do_error(format("'|> filter()' expects a list on the left, but '%s' given", input->type->long_name()), token_id);
+		do_error(format("'|> filter(...)' expects a list on the left, but '%s' given", input->type->long_name()), token_id);
 
-	auto l = rhs->params[0];
-	if (rhs->kind == NodeKind::ABSTRACT_CALL)
-		l = rhs->params[1];
-	if (l->kind != NodeKind::ABSTRACT_OPERATOR or l->as_abstract_op()->name != "=>")
-		do_error("lambda expression '=>' expected inside 'filter()'", l);
+	shared<Node> l;
+	if (rhs->kind == NodeKind::ABSTRACT_CALL and rhs->params.num == 2) {
+		auto ll = rhs->params[1];
+		if (ll->kind == NodeKind::ABSTRACT_OPERATOR and ll->as_abstract_op()->name == "=>")
+			l = ll;
+		else
+			do_error("lambda expression 'var => expression' expected inside 'filter(...)'", ll);
+	}
+	if (!l)
+		do_error("lambda expression 'var => expression' expected inside 'filter(...)'", rhs);
 
 //  p = [REF_VAR, KEY, ARRAY]
 	auto n_for = add_node_statement(StatementID::FOR_CONTAINER, token_id, TypeUnknown);

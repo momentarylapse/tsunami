@@ -88,13 +88,13 @@ bool FileStream::is_end() {
 
 void set_mode_bin(int handle) {
 #ifdef OS_WINDOWS
-	_setmode(f->handle,_O_BINARY);
+	_setmode(handle,_O_BINARY);
 #endif
 }
 
 void set_mode_text(int handle) {
 #ifdef OS_WINDOWS
-	_setmode(f->handle,_O_TEXT);
+	_setmode(handle,_O_TEXT);
 #endif
 }
 

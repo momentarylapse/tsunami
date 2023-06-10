@@ -16,15 +16,15 @@
 
 // which api?
 
-#ifdef OS_WINDOWS
+/*#ifdef OS_WINDOWS
 	#ifdef HUI_USE_GTK_ON_WINDOWS
 		#define HUI_API_GTK
 	#else
 		#define HUI_API_WIN
 	#endif
-#else
+#else*/
 	#define HUI_API_GTK
-#endif
+//#endif
 
 
 

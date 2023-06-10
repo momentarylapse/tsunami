@@ -13,7 +13,7 @@
 
 namespace kaba {
 
-extern Class* TypeNone;
+extern const Class* TypeNone;
 
 /*static shared<Node> shared_p(shared<Node> n) {
 	return n->change_type(tree->get_pointer(t->param[0]));

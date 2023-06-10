@@ -692,7 +692,7 @@ void Compiler::_compile() {
 
 
 #ifdef OS_WINDOWS
-	register_functions(this);
+	register_functions(module);
 #endif
 }
 

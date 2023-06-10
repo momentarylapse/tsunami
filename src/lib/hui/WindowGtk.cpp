@@ -10,7 +10,7 @@
 
 
 #ifdef OS_WINDOWS
-	#include <gdk/gdkwin32.h>
+	#include <gdk/win32/gdkwin32.h>
 #endif
 #ifdef OS_LINUX
 #if !GTK_CHECK_VERSION(4,0,0)

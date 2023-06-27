@@ -87,7 +87,10 @@ SerialNodeParam Serializer::serialize_parameter(Node *link, Block *block, int in
 		p.p = link->link_no;
 	} else if (link->kind == NodeKind::ADDRESS) {
 		//p.p = link->link_no;
-		p.p = (int_p)&link->link_no;
+		if (config.compile_os)
+			p.p = link->link_no; // by map_address_constants_to_opcode()
+		else
+			p.p = (int_p)&link->link_no;
 		p.kind = NodeKind::CONSTANT_BY_ADDRESS;
 	} else if (link->kind == NodeKind::VAR_GLOBAL) {
 		p.p = link->link_no;

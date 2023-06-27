@@ -27,6 +27,7 @@ public:
 
 	void _compile();
 	void map_constants_to_opcode();
+	void map_address_constants_to_opcode();
 	void _map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space);
 	void map_global_variables_to_memory();
 	void map_constants_to_memory(char *mem, int &offset, char *address);

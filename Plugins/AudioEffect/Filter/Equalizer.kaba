@@ -10,10 +10,10 @@ use helper.draw
 
 
 
-const MIN_FREQ = 20.0
-const MAX_FREQ = 20000.0
-const MIN_VOL = -55
-const MAX_VOL = 35
+let MIN_FREQ = 20.0
+let MAX_FREQ = 20000.0
+let MIN_VOL = -55
+let MAX_VOL = 35
 
 
 struct Peak
@@ -36,7 +36,7 @@ struct Peak
 	#	return pow(2, width/12) - 1
 	
 	func create_filter(out f: BiquadFilter, sample_rate: float)
-		var freq = pitch_to_freq(pitch)
+		let freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
 
@@ -137,38 +137,38 @@ class EqualizerGrid extends Grid
 		draw_curve_c(p, curve, true)
 		
 		# gain base-line
-		var y = y_axis.project(c.gain)
+		let y = y_axis.project(c.gain)
 		p.set_line_width(2)
 		p.set_color(colors.text_soft2)
+		if hover[0] == HoverType.GAIN
+			p.set_color(colors.text_soft1)
 		p.set_line_dash([8.0,5.0])
 		p.draw_line([0,y], [p.width,y])
 		p.set_line_dash([8.0,0.0])
 	
 		# points
 		for i=>pk in c.peaks
-			var pp = project2(pk.z(c.gain))
+			let pp = project2(pk.z(c.gain))
 			
 			p.set_line_width(2)
-			var col = point_color(i == selected.e1, i == hover.e1)
-			var col2 = col
-			col2.a = 0.6
-			p.set_color(col2)
+			let col = point_color(i == selected[1], i == hover[1])
+			p.set_color(col.with_alpha(0.6))
 			p.draw_line([pp.x, 0], [pp.x, p.height])
 			
 			#p.set_font_size(12)
-			p.set_font("", 12, i == hover.e1, false)
+			p.set_font("", 12, i == hover[1], false)
 			draw_boxed_str(p, [pp.x, 10], str(i+1), col_text, colors.text_soft3, Align.CENTER)
 			p.set_font("", 12, false, false)
 			
-			draw_point2(p, pk.z(c.gain), i == selected.e1, i == hover.e1)
-			if i == hover.e1
+			draw_point2(p, pk.z(c.gain), i == selected[1], i == hover[1])
+			if i == hover[1]
 				p.set_font_size(8)
 				p.set_color(col_hover)
 				p.draw_str([pp.x - 20, pp.y - 65], str(pk.mode))
 				p.draw_str([pp.x - 20, pp.y - 50], "{{pitch_to_freq(pk.pitch)|.1}} Hz")
 				p.draw_str([pp.x - 20, pp.y - 35], "{{pk.gain|.1}} dB")
 				p.draw_str([pp.x - 20, pp.y - 20], "Q {{pk.q|.1}}")
-		if hover.e0 == HoverType.GAIN
+		if hover[0] == HoverType.GAIN
 			p.set_font_size(8)
 			p.set_color(col_hover)
 			p.draw_str([m.x - 20, y_axis.project(c.gain) - 20], "Gain {{c.gain|.1}} dB")
@@ -180,7 +180,7 @@ class EqualizerGrid extends Grid
 		redraw()
 
 	func override on_mouse_wheel()
-		var dy = hui.get_event().scroll.y
+		let dy = hui.get_event().scroll.y
 		if hover.e1 >= 0
 			if dy > 0
 				c.peaks[hover.e1].q *= 1.04
@@ -215,7 +215,7 @@ class EqualizerGrid extends Grid
 	
 	# hui events
 	func mut on_add_peak()
-		var id = hui.get_event().id
+		let id = hui.get_event().id
 		var t = FilterType.PEAK
 		if id == "add-low-pass"
 			t = FilterType.LOW_PASS
@@ -225,7 +225,7 @@ class EqualizerGrid extends Grid
 			t = FilterType.LOW_SHELF
 		if id == "add-high-shelf"
 			t = FilterType.HIGH_SHELF
-		var m = right_click_mouse_pos
+		let m = right_click_mouse_pos
 		c.peaks.add(Peak(t, freq_to_pitch(m.x), m.y - c.gain, 2))
 		selected = (HoverType.PEAK, len(c.peaks) - 1)
 		hover = selected
@@ -246,15 +246,15 @@ class EqualizerGrid extends Grid
 			redraw()
 	
 	func get_hover(m: vec2) -> (HoverType, int)
-		if abs(m.y - y_axis.project(c.gain)) < 10
-			return (HoverType.GAIN, -1)
 		for i=>p in c.peaks
 			if mouse_over_point2(p.z(c.gain))
 				return (HoverType.PEAK, i)
 		for i=>p in c.peaks
-			var pp = project2(p.z(c.gain))
+			let pp = project2(p.z(c.gain))
 			if abs(pp.x - m.x) < 15 and m.y < 30
 				return (HoverType.PEAK_LABEL, i)
+		if abs(m.y - y_axis.project(c.gain)) < 10
+			return (HoverType.GAIN, -1)
 		return (HoverType.NONE, -1)
 
 	func override on_mouse_move()

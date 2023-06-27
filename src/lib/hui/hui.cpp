@@ -12,6 +12,7 @@
 
 #include "hui.h"
 #include "../os/file.h"
+#include "../os/time.h"
 
 
 #include <stdio.h>
@@ -189,11 +190,17 @@ void _MakeUsable_() {
 	if (_screen_opened_)
 		return;
 
+
 	if ((Application::flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_ADWAITA
-		adw_init();
-		Application::adwaita_started = true;
+		if (config.get_bool("hui.allow-libadwaita", true)) {
+			os::Timer timer;
+			adw_init();
+			if (timer.get() > 4)
+				msg_error("libadwaita adw_init() takes too long... this happens on some desktop environments.\nTry setting 'hui.allow-libadwaita = false' in 'config.txt'");
+			Application::adwaita_started = true;
+		}
 #endif
 		Application::application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
 		//gtk_init();

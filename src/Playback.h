@@ -24,8 +24,8 @@ public:
 	Playback(Session *s);
 	~Playback();
 
-	obs::Source out_tick{this, "tick"};
-	obs::Source out_state_changed{this, "state-changed"};
+	obs::source out_tick{this, "tick"};
+	obs::source out_state_changed{this, "state-changed"};
 
 
 	Session *session;

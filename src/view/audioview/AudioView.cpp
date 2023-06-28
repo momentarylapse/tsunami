@@ -66,16 +66,6 @@
 const int AudioView::SNAPPING_DIST = 8;
 
 
-const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "cur-track-changed";
-const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "cur-sample-changed";
-const string AudioView::MESSAGE_CUR_LAYER_CHANGE = "cur-layer-changed";
-const string AudioView::MESSAGE_SELECTION_CHANGE = "selection-changed";
-const string AudioView::MESSAGE_SETTINGS_CHANGE = "settings-changed";
-const string AudioView::MESSAGE_VIEW_CHANGE = "view-changed";
-const string AudioView::MESSAGE_VTRACK_CHANGE = "vtrack-changed";
-
-
-
 AudioView::AudioView(Session *_session, const string &_id) :
 		in_solo_changed{this, [this] {
 			update_playback_layers();
@@ -325,10 +315,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	song->out_after_change >> create_sink([this] {
 		on_song_change();
 	});
-	song->subscribe(this, [this] {
+	/*song->subscribe(this, [this] {
 		force_redraw();
 		update_menu();
-	}, song->MESSAGE_ANY);
+	}, song->MESSAGE_ANY);*/
 	enable(true);
 
 	//ForceRedraw();

@@ -70,9 +70,9 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 		menu->enable("replace", (int)(mode & ConfigPanelMode::REPLACE));
 	}
 
-	module->subscribe(panel, [this] {
+	module->out_changed >> create_sink([this] {
 		panel->check("enabled", module->enabled);
-	}, Module::MESSAGE_CHANGE);
+	});
 }
 
 void ConfigPanelSocket::on_load() {
@@ -199,13 +199,13 @@ ModulePanel::ModulePanel(Module *module, hui::Panel *_parent, ConfigPanelMode mo
 	
 
 	socket.old_param = module->config_to_string();
-	module->subscribe(this, [this, module] {
+	module->out_death >> create_sink([this, module] {
 		module->unsubscribe(this);
 		socket.module = nullptr;
 		if (socket.config_panel)
 			unembed(socket.config_panel.get());
 		socket.config_panel = nullptr;
-	}, Module::MESSAGE_DELETE);
+	});
 }
 
 ModulePanel::~ModulePanel() {
@@ -223,7 +223,7 @@ void ModulePanel::set_width(int width) {
 
 
 ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, ConfigPanelMode mode) :
-		hui::Dialog("module-external-dialog", parent),
+		obs::Node<hui::Dialog>("module-external-dialog", parent),
 		socket(module, mode)
 {
 	set_title(module->module_class);
@@ -240,9 +240,9 @@ ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, 
 	set_options("content", "expandx,expandy");
 	//set_options("grid", "noexpandy");
 
-	module->subscribe(this, [this] {
+	module->out_death >> create_sink([this] {
 		request_destroy();
-	}, module->MESSAGE_DELETE);
+	});
 	event("hui:close",[this] {
 		request_destroy();
 	});

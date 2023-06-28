@@ -33,7 +33,7 @@ inline ConfigPanelMode operator|(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a | (int)b );
 }
 
-class ConfigPanelSocket : public VirtualBase {
+class ConfigPanelSocket : public obs::Node<VirtualBase> {
 public:
 	ConfigPanelSocket(Module *m, ConfigPanelMode mode);
 	~ConfigPanelSocket() override;
@@ -89,7 +89,7 @@ public:
 };
 
 
-class ModuleExternalDialog : public hui::Dialog {
+class ModuleExternalDialog : public obs::Node<hui::Dialog> {
 public:
 	ModuleExternalDialog(Module *_module, hui::Window *parent, ConfigPanelMode mode);
 	~ModuleExternalDialog() override;

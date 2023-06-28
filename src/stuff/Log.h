@@ -21,8 +21,7 @@ class Log : public obs::Node<VirtualBase> {
 public:
 	Log();
 
-	static const string MESSAGE_ADD;
-	obs::Source out_add_message{this, "add-message"};
+	obs::source out_add_message{this, "add-message"};
 
 	void error(Session *session, const string &message);
 	void warn(Session *session, const string &message);

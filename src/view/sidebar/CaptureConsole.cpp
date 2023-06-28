@@ -84,12 +84,12 @@ void CaptureConsole::on_enter() {
 	chain = mode->chain.get();
 	view->mode_capture->chain = chain.get();
 
-	session->playback->signal_chain->subscribe(this, [this] {
+	session->playback->signal_chain->out_tick >> create_sink([this] {
 		on_putput_tick();
-	}, Module::MESSAGE_TICK);
-	session->playback->signal_chain->subscribe(this, [this] {
+	});
+	session->playback->signal_chain->out_play_end_of_stream >> create_sink([this] {
 		on_output_end_of_stream();
-	}, Module::MESSAGE_PLAY_END_OF_STREAM);
+	});
 
 	// automatically start
 	if (num_audio + num_midi == 1 and !_capture_console_force_complex_)

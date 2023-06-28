@@ -480,10 +480,11 @@ void MidiEditorConsole::clear() {
 }
 
 void MidiEditorConsole::on_enter() {
-	session->device_manager->subscribe(this, [this] { update_input_device_list(); }, session->device_manager->MESSAGE_ANY);
-	view->subscribe(this, [this] { on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [this] { on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
-	mode->subscribe(this, [this] { on_settings_change(); }, mode->MESSAGE_ANY);
+	session->device_manager->out_add_device >> create_sink([this] { update_input_device_list(); });
+	session->device_manager->out_remove_device >> create_sink([this] { update_input_device_list(); });
+	view->out_cur_layer_changed >> create_sink([this] { on_view_cur_layer_change(); });
+	view->out_vtrack_changed >> create_sink([this] { on_view_vtrack_change(); });
+	mode->out_changed >> create_sink([this] { on_settings_change(); });
 	set_layer(view->cur_layer());
 }
 
@@ -500,8 +501,8 @@ void MidiEditorConsole::set_layer(TrackLayer *l) {
 	layer = l;
 	if (layer) {
 
-		layer->subscribe(this, [this] { on_layer_delete(); }, layer->MESSAGE_DELETE);
-		view->cur_vtrack()->subscribe(this, [this] { update(); }, AudioViewTrack::MESSAGE_ANY);
+		layer->out_death >> create_sink([this] { on_layer_delete(); });
+		view->cur_vtrack()->out_changed >> create_sink([this] { update(); });
 
 		/*auto v = view->get_layer(layer);
 		if (v)

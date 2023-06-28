@@ -12,9 +12,6 @@
 #include "Song.h"
 #include <assert.h>
 
-const string Sample::MESSAGE_CHANGE_BY_ACTION = "changed-by-action";
-const string Sample::MESSAGE_REFERENCE = "reference";
-const string Sample::MESSAGE_UNREFERENCE = "unreference";
 
 Sample::Sample(SignalType _type) {
 	//msg_write("  new Sample " + p2s(this));

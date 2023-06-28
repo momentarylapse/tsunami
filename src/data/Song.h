@@ -49,15 +49,15 @@ public:
 	Range _cdecl range();
 	Range _cdecl range_no_bars();
 
-	obs::Source out_new{this, "new"};
-	obs::Source out_track_list_changed{this, "track-list-changed"};
-	obs::Source out_sample_list_changed{this, "sample-list-changed"};
-	obs::Source out_layer_list_changed{this, "layer-list-changed"};
-	//obs::Source out_edit_layer{this, "edit-layer"};
-	obs::Source out_channels_changed{this, "channels-changed"};
-	obs::Source out_edit_bars{this, "edit-bars"};
-	obs::Source out_scale_bars{this, "scale-bars"};
-	obs::Source out_enable_fx{this, "enable-fx"};
+	obs::source out_new{this, "new"};
+	obs::source out_track_list_changed{this, "track-list-changed"};
+	obs::source out_sample_list_changed{this, "sample-list-changed"};
+	obs::source out_layer_list_changed{this, "layer-list-changed"};
+	//obs::source out_edit_layer{this, "edit-layer"};
+	obs::source out_channels_changed{this, "channels-changed"};
+	obs::source out_edit_bars{this, "edit-bars"};
+	obs::source out_scale_bars{this, "scale-bars"};
+	obs::source out_enable_fx{this, "enable-fx"};
 
 
 

@@ -24,11 +24,6 @@
 #include "../stuff/PerformanceMonitor.h"
 
 
-const string SignalChain::MESSAGE_ADD_MODULE = "add-module";
-const string SignalChain::MESSAGE_DELETE_MODULE = "delete-module";
-const string SignalChain::MESSAGE_ADD_CABLE = "add-cable";
-const string SignalChain::MESSAGE_DELETE_CABLE = "delete-cable";
-
 
 const float DEFAULT_UPDATE_DT = 0.050f;
 extern bool ugly_hack_slow;
@@ -113,9 +108,9 @@ shared<Module> SignalChain::_add(shared<Module> m) {
 	modules.add(m);
 	PerformanceMonitor::set_parent(m->perf_channel, perf_channel);
 	out_add_module.notify();
-	m->subscribe(this, [this] {
+	m->out_play_end_of_stream >> create_sink([this] {
 		on_module_play_end_of_stream();
-	}, Module::MESSAGE_PLAY_END_OF_STREAM);
+	});
 	return m;
 }
 

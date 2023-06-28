@@ -44,7 +44,8 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 }
 
 TrackConsole::TrackConsole(Session *session, SideBar *bar) :
-	SideBarConsole(_("Track"), "track-console", session, bar)
+	SideBarConsole(_("Track"), "track-console", session, bar),
+	in_track_update(this, [this] { on_update(); })
 {
 	track = nullptr;
 	synth_panel = nullptr;
@@ -83,7 +84,7 @@ void TrackConsole::set_mode(Mode mode) {
 
 void TrackConsole::on_enter() {
 	set_track(view->cur_track());
-	view->subscribe(this, [this] { on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->out_cur_track_changed >> create_sink([this] { on_view_cur_track_change(); });
 
 }
 void TrackConsole::on_leave() {
@@ -166,8 +167,10 @@ void TrackConsole::set_track(Track *t) {
 	load_data();
 	if (track) {
 		fx_editor = new FxListEditor(track, this, "fx", true);
-		track->subscribe(this, [this] { set_track(nullptr); }, track->MESSAGE_DELETE);
-		track->subscribe(this, [this] { on_update(); }, track->MESSAGE_ANY);
+		track->out_death >> create_sink([this] { set_track(nullptr); });
+		track->out_changed >> in_track_update;
+		track->out_replace_synthesizer >> in_track_update;
+		track->out_effect_list_changed >> in_track_update;
 	}
 }
 

@@ -86,13 +86,16 @@ void SampleRefConsole::set_sample(SampleRef *s) {
 
 	if (sample) {
 		layer = s->layer;
-		sample->subscribe(this, [this] {
+		sample->out_death >> create_sink([this] {
 			// FIXME should also happen via view->on_cur_sample_change, but does not
 			set_sample(nullptr);
-		}, sample->MESSAGE_DELETE);
-		sample->subscribe(this, [this] {
+		});
+		sample->out_changed >> create_sink([this] {
 			on_update();
-		}, sample->MESSAGE_ANY);
+		});
+		sample->out_changed_by_action >> create_sink([this] {
+			on_update();
+		});
 	}
 	load_data();
 }

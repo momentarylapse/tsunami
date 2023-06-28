@@ -46,7 +46,7 @@ SongConsole::SongConsole(Session *session, SideBar *bar) :
 }
 
 void SongConsole::on_enter() {
-	song->subscribe(this, [this] { on_update(); }, song->MESSAGE_ANY);
+	song->out_changed >> create_sink([this] { on_update(); });
 	load_data();
 }
 

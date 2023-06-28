@@ -38,12 +38,12 @@ public:
 
 	Range _cdecl range() const;
 
-	obs::Source out_layer_list_changed{this, "layer-list-changed"};
-	obs::Source out_effect_list_changed{this, "effect-list-changed"};
-	obs::Source out_midi_effect_list_changed{this, "midi-effect-list-changed"};
-	obs::Source out_replace_synthesizer{this, "replace-synthesizer"};
-	obs::Source out_curve_list_changed{this, "curve-list-changed"};
-	obs::Source out_edit_curve{this, "edit-curve"};
+	obs::source out_layer_list_changed{this, "layer-list-changed"};
+	obs::source out_effect_list_changed{this, "effect-list-changed"};
+	obs::source out_midi_effect_list_changed{this, "midi-effect-list-changed"};
+	obs::source out_replace_synthesizer{this, "replace-synthesizer"};
+	obs::source out_curve_list_changed{this, "curve-list-changed"};
+	obs::source out_edit_curve{this, "edit-curve"};
 
 	void _cdecl invalidate_all_peaks();
 

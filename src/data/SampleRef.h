@@ -27,8 +27,7 @@ public:
 	void _cdecl __init__(shared<Sample> sample);
 	virtual void _cdecl __delete__();
 
-	static const string MESSAGE_CHANGE_BY_ACTION;
-	obs::Source out_changed_by_action{this, "changed-by-action"};
+	obs::source out_changed_by_action{this, "changed-by-action"};
 
 	Range _cdecl range() const;
 	SignalType _cdecl type() const;

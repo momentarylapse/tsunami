@@ -11,9 +11,6 @@
 #include "../lib/math/math.h"
 #include "Song.h"
 
-const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "changed-by-action";
-
-
 
 SampleRef::SampleRef(shared<Sample> sample) {
 	//msg_write("  new SampleRef " + p2s(this));

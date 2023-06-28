@@ -33,7 +33,7 @@ EffectsConsole::EffectsConsole(Session *session, SideBar *bar) :
 
 void EffectsConsole::on_enter() {
 	set_track(view->cur_track());
-	view->subscribe(this, [this] { on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->out_cur_track_changed >> create_sink([this] { on_view_cur_track_change(); });
 
 }
 void EffectsConsole::on_leave() {
@@ -68,8 +68,11 @@ void EffectsConsole::set_track(Track *t) {
 	if (track) {
 		set_string("link-to-track", track->nice_name());
 		fx_editor = new FxListEditor(track, this, "fx", true);
-		track->subscribe(this, [this] { set_track(nullptr); }, track->MESSAGE_DELETE);
-		track->subscribe(this, [this] { on_update(); }, track->MESSAGE_ANY);
+		track->out_death >> create_sink([this] { set_track(nullptr); });
+		track->out_changed >> create_sink([this] {
+			set_string("link-to-track", track->nice_name());
+		});
+		track->out_effect_list_changed >> create_sink([this] { on_update(); });
 	}
 }
 

@@ -81,7 +81,7 @@ public:
 };
 
 
-class SideBarConsole : public hui::Panel {
+class SideBarConsole : public obs::Node<hui::Panel> {
 public:
 	SideBarConsole(const string &_title, const string &id, Session *_session, SideBar *bar);
 	~SideBarConsole() override;

@@ -307,9 +307,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->out_selection_changed >> in_update;
 	view->out_cur_layer_changed >> in_update;
 	view->out_cur_sample_changed >> in_update;
-	session->playback->signal_chain->subscribe(this, [this] {
+	session->playback->signal_chain->out_changed >> create_sink([this] {
 		on_update();
-	}, SignalChain::MESSAGE_ANY);
+	});
+	session->playback->signal_chain->out_state_changed >> create_sink([this] {
+		on_update();
+	});
 	song->action_manager->out_changed >> in_update;
 	song->action_manager->out_undo_action >> create_sink([this] {
 		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));

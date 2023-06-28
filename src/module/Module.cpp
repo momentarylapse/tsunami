@@ -20,10 +20,6 @@
 #include "../view/module/ConfigPanel.h"
 #include "../view/module/AutoConfigPanel.h"
 
-const string Module::MESSAGE_STATE_CHANGE = "state-changed";
-const string Module::MESSAGE_TICK = "tick";
-const string Module::MESSAGE_READ_END_OF_STREAM = "read-end-of-stream";
-const string Module::MESSAGE_PLAY_END_OF_STREAM = "play-end-of-stream";
 const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 

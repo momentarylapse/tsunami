@@ -106,9 +106,9 @@ ViewModeEditBars::ViewModeEditBars(AudioView *view) :
 
 void ViewModeEditBars::on_start() {
 	set_side_bar(SideBar::BARS_EDITOR_CONSOLE);
-	view->subscribe(this, [this] {
+	view->out_selection_changed >> create_sink([this] {
 		rubber_end_target = selected_bar_range().end();
-	}, AudioView::MESSAGE_SELECTION_CHANGE);
+	});
 	rubber_end_target = selected_bar_range().end();
 }
 

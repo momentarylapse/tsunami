@@ -155,7 +155,7 @@ void SideBar::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
 }
 
 
-SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session *_session, SideBar *bar) : hui::Panel(_id, bar) {
+SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session *_session, SideBar *bar) : obs::Node<hui::Panel>(_id, bar) {
 	set_id(_id);
 	title = _title;
 	session = _session;

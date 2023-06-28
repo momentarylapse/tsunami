@@ -25,7 +25,7 @@ class ScrollPad;
 class ScrollBar;
 
 
-class SignalEditorTab : public hui::Panel {
+class SignalEditorTab : public obs::Node<hui::Panel> {
 public:
 	SignalEditorTab(SignalEditor *ed, SignalChain *_chain);
 	virtual ~SignalEditorTab();

@@ -10,6 +10,7 @@
 
 #include "../../../lib/base/base.h"
 #include "../../../lib/base/optional.h"
+#include "../../../lib/pattern/Observable.h"
 
 class Device;
 class AudioInput;
@@ -37,8 +38,7 @@ struct SyncPoint {
 	int delay(int64 samples_played_before_capture);
 };
 
-// VirtualBase... because Observer...
-struct CaptureTrackData : public VirtualBase {
+struct CaptureTrackData : public obs::Node<VirtualBase> {
 
 	SignalType type();
 

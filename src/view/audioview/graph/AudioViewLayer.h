@@ -40,7 +40,7 @@ public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;
 
-	obs::Source out_solo_changed{this, "solo-changed"};
+	obs::source out_solo_changed{this, "solo-changed"};
 
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_left_double_click(const vec2 &m) override;

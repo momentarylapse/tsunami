@@ -9,10 +9,11 @@
 #define SRC_VIEW_MODULE_CONFIGPANEL_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../lib/pattern/Observable.h"
 
 class Module;
 
-class ConfigPanel : public hui::Panel {
+class ConfigPanel : public obs::Node<hui::Panel> {
 public:
 	ConfigPanel(Module *c);
 	~ConfigPanel() override;

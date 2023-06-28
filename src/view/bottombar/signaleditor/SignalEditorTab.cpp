@@ -92,7 +92,7 @@ public:
 };
 
 
-SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : hui::Panel() {
+SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::Node<hui::Panel>() {
 	set_parent(ed);
 	static int count = 0;
 	set_id(format("signal-editor-tab-%d", count++));
@@ -159,13 +159,13 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : hui::P
 	event("signal_chain_new", [this] { editor->on_new(); });
 	event("signal_chain_load", [this] { editor->on_load(); });
 
-	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_STATE_CHANGE);
+	chain->out_state_changed >> create_sink([this] { on_chain_update(); });
 	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
-	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_DELETE_CABLE);
-	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_DELETE_MODULE);
-	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_ADD_CABLE);
-	chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_ADD_MODULE);
-	chain->subscribe(this, [this] { on_chain_delete(); }, chain->MESSAGE_DELETE);
+	chain->out_delete_cable >> create_sink([this] { on_chain_update(); });
+	chain->out_delete_module >> create_sink([this] { on_chain_update(); });
+	chain->out_add_cable >> create_sink([this] { on_chain_update(); });
+	chain->out_add_module >> create_sink([this] { on_chain_update(); });
+	chain->out_death >> create_sink([this] { on_chain_delete(); });
 
 	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
 	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);

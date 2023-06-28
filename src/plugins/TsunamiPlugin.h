@@ -17,8 +17,7 @@ public:
 	TsunamiPlugin();
 	virtual ~TsunamiPlugin();
 
-	static const string MESSAGE_STOP_REQUEST;
-	obs::Source out_stop_request{this, "stop-request"};
+	obs::source out_stop_request{this, "stop-request"};
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();

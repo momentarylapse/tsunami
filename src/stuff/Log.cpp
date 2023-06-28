@@ -15,8 +15,6 @@ namespace os {
 }
 
 
-const string Log::MESSAGE_ADD = "add-message";
-
 Log::Log() {
 	allow_debug = hui::config.get_bool("Log.Debug", false);
 	allow_console_output = true;

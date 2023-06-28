@@ -125,9 +125,10 @@ template<class T>
 class ObservableKabaWrapper : public T {
 public:
 	void _cdecl subscribe_kaba(hui::EventHandler *handler, Callable<void(VirtualBase*)> *f, const string &message) {
-		T::subscribe(handler, [f, handler] {
+		/*T::subscribe(handler, [f, handler] {
 			(*f)(handler);
-		}, message);
+		}, message);*/
+		msg_error("X.subscribe() TODO in plugins");
 	}
 };
 

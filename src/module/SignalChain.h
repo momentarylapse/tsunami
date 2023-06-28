@@ -34,14 +34,10 @@ public:
 	void _cdecl __init__(Session *session, const string &name);
 	void _cdecl __delete__() override;
 
-	static const string MESSAGE_ADD_MODULE;
-	static const string MESSAGE_DELETE_MODULE;
-	static const string MESSAGE_ADD_CABLE;
-	static const string MESSAGE_DELETE_CABLE;
-	obs::Source out_add_module{this, "add-module"};
-	obs::Source out_delete_module{this, "delete-module"};
-	obs::Source out_add_cable{this, "add-cable"};
-	obs::Source out_delete_cable{this, "delete-cable"};
+	obs::source out_add_module{this, "add-module"};
+	obs::source out_delete_module{this, "delete-module"};
+	obs::source out_add_cable{this, "add-cable"};
+	obs::source out_delete_cable{this, "delete-cable"};
 
 	void unregister();
 

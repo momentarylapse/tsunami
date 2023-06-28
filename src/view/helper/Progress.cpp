@@ -8,7 +8,6 @@
 #include "Progress.h"
 #include "../../lib/hui/hui.h"
 
-const string Progress::MESSAGE_CANCEL = "cancel";
 
 const float PROGRESS_DT = 0.05f;
 

@@ -16,7 +16,7 @@
 hui::Panel *ConfigPanel::_hidden_parent_ = nullptr;
 bool ConfigPanel::_hidden_parent_check_ = true;
 
-ConfigPanel::ConfigPanel(Module *_c) : hui::Panel() {
+ConfigPanel::ConfigPanel(Module *_c) : obs::Node<hui::Panel>() {
 	static int count = 0;
 	set_id(format("config-panel-%d", count ++));
 
@@ -29,9 +29,9 @@ ConfigPanel::ConfigPanel(Module *_c) : hui::Panel() {
 	ignore_change = false;
 	c = _c;
 	if (c) {
-		c->subscribe(this, [this]{
+		c->out_changed >> create_sink([this]{
 			if (!ignore_change) update();
-		}, c->MESSAGE_CHANGE);
+		});
 	}
 }
 

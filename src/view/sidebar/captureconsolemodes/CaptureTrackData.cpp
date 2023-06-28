@@ -196,9 +196,12 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 
 		// configure
 		audio_input()->set_device(device);
-		channel_selector->subscribe(this, [&] {
+		channel_selector->out_changed >> create_sink([&] {
 			peak_meter_display->set_channel_map(channel_map());
-		}, channel_selector->MESSAGE_ANY);
+		});
+		channel_selector->out_state_changed >> create_sink([&] {
+			peak_meter_display->set_channel_map(channel_map());
+		});
 		accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
 		backup->command(ModuleCommand::SET_INPUT_CHANNELS, track->channels);
 		backup->command(ModuleCommand::ACCUMULATION_STOP, 0);

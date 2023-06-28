@@ -46,7 +46,7 @@ public:
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
 	bool large;
-	obs::Sink in_perf_mon_update;
+	obs::sink in_perf_mon_update;
 
 	owned<hui::Dialog> dlg;
 

@@ -24,7 +24,7 @@ class SampleManagerConsole : public SideBarConsole {
 public:
 	SampleManagerConsole(Session *session, SideBar *bar);
 
-	obs::Sink in_song_update;
+	obs::sink in_song_update;
 
 	void on_enter() override;
 	void on_leave() override;

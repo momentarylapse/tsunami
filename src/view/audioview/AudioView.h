@@ -114,23 +114,17 @@ public:
 	void on_stream_tick();
 	void on_stream_state_change();
 	void on_update_sidebar();
-	static const string MESSAGE_CUR_TRACK_CHANGE;
-	static const string MESSAGE_CUR_SAMPLE_CHANGE;
-	static const string MESSAGE_CUR_LAYER_CHANGE;
-	static const string MESSAGE_SELECTION_CHANGE;
-	static const string MESSAGE_SETTINGS_CHANGE;
-	static const string MESSAGE_VIEW_CHANGE;
-	static const string MESSAGE_VTRACK_CHANGE;
-	obs::Source out_cur_track_changed{this, "cur-track-changed"};
-	obs::Source out_cur_sample_changed{this, "cur-sample-changed"};
-	obs::Source out_cur_layer_changed{this, "cur-layer-changed"};
-	obs::Source out_selection_changed{this, "selection-changed"};
-	obs::Source out_settings_changed{this, "settings-changed"};
-	obs::Source out_view_changed{this, "view-changed"};
-	obs::Source out_vtrack_changed{this, "vtrack-changed"};
-	obs::Source out_solo_changed{this, "solo-changed"};
-	obs::Sink in_solo_changed;
-	obs::Sink in_redraw;
+
+	obs::source out_cur_track_changed{this, "cur-track-changed"};
+	obs::source out_cur_sample_changed{this, "cur-sample-changed"};
+	obs::source out_cur_layer_changed{this, "cur-layer-changed"};
+	obs::source out_selection_changed{this, "selection-changed"};
+	obs::source out_settings_changed{this, "settings-changed"};
+	obs::source out_view_changed{this, "view-changed"};
+	obs::source out_vtrack_changed{this, "vtrack-changed"};
+	obs::source out_solo_changed{this, "solo-changed"};
+	obs::sink in_solo_changed;
+	obs::sink in_redraw;
 
 	void update_peaks();
 	void zoom_in();

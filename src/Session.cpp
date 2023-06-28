@@ -132,9 +132,9 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 		return nullptr;
 
 	plugins.add(p);
-	p->subscribe(this, [this, p] {
+	p->out_stop_request >> create_sink([this, p] {
 		on_plugin_stop_request(p);
-	}, p->MESSAGE_STOP_REQUEST);
+	});
 
 	p->args = args;
 	p->on_start();

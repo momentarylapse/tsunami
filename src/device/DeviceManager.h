@@ -43,8 +43,8 @@ public:
 	friend class AudioInput;
 	friend class MidiInput;
 
-	obs::Source out_add_device{this, "add-device"};
-	obs::Source out_remove_device{this, "remove-device"};
+	obs::source out_add_device{this, "add-device"};
+	obs::source out_remove_device{this, "remove-device"};
 
 	DeviceManager(Session *session);
 	virtual ~DeviceManager();

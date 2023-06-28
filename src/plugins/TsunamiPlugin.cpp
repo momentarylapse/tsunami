@@ -12,7 +12,6 @@
 #include "../module/Module.h"
 #include "../module/ModuleFactory.h"
 
-const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "stop-request";
 
 TsunamiPlugin::TsunamiPlugin() :
 	Module(ModuleCategory::TSUNAMI_PLUGIN, "")

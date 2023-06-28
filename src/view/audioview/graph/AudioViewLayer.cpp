@@ -91,16 +91,16 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegrap
 	represents_imploded = false;
 
 	if (layer) {
-		layer->subscribe(this, [this] {
+		layer->out_changed >> create_sink([this] {
 			on_layer_change();
-		}, layer->MESSAGE_CHANGE);
-		layer->track->subscribe(this, [this] {
+		});
+		layer->track->out_changed >> create_sink([this] {
 			on_track_change();
-		}, layer->track->MESSAGE_CHANGE);
-		layer->track->subscribe(this, [this] {
+		});
+		layer->track->out_death >> create_sink([this] {
 			layer->track->unsubscribe(this);
 			layer = nullptr;
-		}, layer->track->MESSAGE_DELETE);
+		});
 		update_midi_key_changes();
 		header = new LayerHeader(this);
 		add_child(header);

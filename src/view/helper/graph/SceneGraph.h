@@ -26,8 +26,8 @@ public:
 	using Callback = std::function<void()>;
 	SceneGraph();
 
-	obs::Source out_current_changed{this, "current-changed"};
-	obs::Source out_redraw{this, "redraw"};
+	obs::source out_current_changed{this, "current-changed"};
+	obs::source out_redraw{this, "redraw"};
 
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_left_button_up(const vec2 &m) override;

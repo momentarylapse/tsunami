@@ -56,12 +56,12 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 }
 
 void AudioEditorConsole::on_enter() {
-	view->mode_edit_audio->subscribe(this, [this] {
+	view->mode_edit_audio->out_changed >> create_sink([this] {
 		update();
-	}, view->mode_edit_audio->MESSAGE_ANY);
-	view->subscribe(this, [this] {
+	});
+	view->out_cur_track_changed >> create_sink([this] {
 		update();
-	}, view->MESSAGE_CUR_TRACK_CHANGE);
+	});
 	update();
 }
 

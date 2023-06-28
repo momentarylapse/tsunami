@@ -68,7 +68,7 @@ void LogConsole::reload() {
 		console_add_message(this, m);
 	messages_loaded = messages.num;
 
-	log->subscribe(this, [this]{ on_log_add(); }, Log::MESSAGE_ADD);
+	log->out_add_message >> create_sink([this]{ on_log_add(); });
 }
 
 void LogConsole::on_log_add() {

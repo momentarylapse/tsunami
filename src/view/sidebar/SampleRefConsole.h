@@ -18,7 +18,7 @@ class SampleRefConsole: public SideBarConsole {
 public:
 	SampleRefConsole(Session *session, SideBar *bar);
 
-	obs::Sink in_cur_sample_changed;
+	obs::sink in_cur_sample_changed;
 
 	void on_enter() override;
 	void on_leave() override;

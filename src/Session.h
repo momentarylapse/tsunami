@@ -36,10 +36,10 @@ public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, SessionManager *session_manager, PerformanceMonitor *perf_mon);
 	~Session() override;
 
-	obs::Source out_mode_changed{this, "mode-changed"};
-	obs::Source out_add_plugin{this, "add-plugin"};
-	obs::Source out_remove_plugin{this, "remove-plugin"};
-	obs::Source out_add_signal_chain{this, "add-signal-chain"};
+	obs::source out_mode_changed{this, "mode-changed"};
+	obs::source out_add_plugin{this, "add-plugin"};
+	obs::source out_remove_plugin{this, "remove-plugin"};
+	obs::source out_add_signal_chain{this, "add-signal-chain"};
 
 	static int next_id;
 

@@ -33,7 +33,7 @@ public:
 	void _cdecl __init__(Song *s);
 	void _cdecl __delete__() override;
 
-	obs::Sink in_track_list_changed;
+	obs::sink in_track_list_changed;
 
 	// from Module
 	void reset_state() override ;

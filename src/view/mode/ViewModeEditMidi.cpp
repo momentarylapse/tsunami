@@ -460,7 +460,7 @@ void ViewModeEditMidi::set_input_capture(bool capture) {
 
 void ViewModeEditMidi::_start_input() {
 	preview->_start_input();
-	preview->chain->subscribe(this, [this] { on_midi_input(); }, Module::MESSAGE_TICK);
+	preview->chain->out_tick >> create_sink([this] { on_midi_input(); });
 }
 
 void ViewModeEditMidi::_stop_input() {

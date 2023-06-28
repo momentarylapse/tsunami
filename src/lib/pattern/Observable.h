@@ -13,158 +13,101 @@
 
 
 namespace obs {
-	struct Source;
-}
 
-class ObservableData {
-	friend struct obs::Source;
-public:
-	ObservableData();
-	~ObservableData();
-	
-	void fake_death();
-
-	void notify(const string &message);
-
-	using Callback = std::function<void()>;
-
-	// observers
-	struct Subscription {
-		Subscription();
-		Subscription(VirtualBase *o, const string *message, const Callback &callback);
-		VirtualBase* observer;
-		const string *message;
-		Callback callback;
-	};
-	Array<Subscription> subscriptions;
-	void subscribe(VirtualBase *me, VirtualBase *observer, const Callback &callback, const string &message);
-	void unsubscribe(VirtualBase *observer);
-
-	struct Notification : public Subscription {
-		Notification();
-		Notification(VirtualBase *o, const string *message, const Callback &callback);
-	};
-
-	VirtualBase *me;
-};
-
-
-template<class T>
-class LegacyObservable : public T {
-public:
-	template<typename... Args>
-	LegacyObservable(Args... args) : T(args...) {}
-
-	static const string MESSAGE_CHANGE;
-	static const string MESSAGE_DELETE;
-	static const string MESSAGE_ANY;
-
-	void unsubscribe(VirtualBase *observer) {
-		observable_data.unsubscribe(observer);
-	}
-	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message) {
-		observable_data.subscribe(this, observer, callback, message);
-	}
-
-	void notify(const string &message = MESSAGE_CHANGE) const {
-		observable_data.notify(message);
-	}
-	void fake_death() const {
-		observable_data.fake_death();
-	}
-
-protected:
-	mutable ObservableData observable_data;
-};
-
-
-template<class T>
-const string LegacyObservable<T>::MESSAGE_CHANGE = "changed";
-template<class T>
-const string LegacyObservable<T>::MESSAGE_DELETE = "death";
-template<class T>
-const string LegacyObservable<T>::MESSAGE_ANY = "";
-
-
-namespace obs {
-struct Sink;
+struct internal_node_data;
+struct sink;
 using Callback = std::function<void()>;
 
-struct Source {
-	friend class Sink;
+struct source {
+	friend struct sink;
 
-	Source() = delete;
-	Source(VirtualBase* node, const string& name, ObservableData* obs_data);
-	template<class T>
-	Source(T* node, const string& name) : Source(node, name, &node->observable_data) {
-		node->_sources.add(this);
+	source() = delete;
+	source(VirtualBase* node, const string& name, int _dummy);
+	template<class N>
+	source(N* node, const string& name) : source(node, name, 0) {
+		node->_internal_node_data.sources.add(this);
 	}
-	~Source();
+	~source();
 	void notify() const;
-	void subscribe(Sink& sink);
-	void unsubscribe(Sink& sink);
+	void operator() () const { notify(); }
+	void subscribe(sink& sink);
+	void unsubscribe(sink& sink);
 	void unsubscribe(VirtualBase* node);
-	void operator>>(Sink& sink);
+	void operator>>(sink& sink);
+	int count_subscribers() { return connected_sinks.num; }
 
 private:
-	void _remove(Sink* sink);
-	ObservableData* legacy_observable_data;
+	void remove_sink(sink* sink);
 	VirtualBase* node;
 	string name;
 	//mutable
-	Array<Sink*> sinks;
+	Array<sink*> connected_sinks;
 };
 
-struct Sink {
-	friend class Source;
+struct sink {
+	friend struct source;
+	friend struct internal_node_data;
 
-	Sink() = delete;
-	Sink(VirtualBase* node, Callback callback);
-	~Sink();
+	sink() = delete;
+	sink(VirtualBase* node, Callback callback, int _dummy);
+	template<class N>
+	sink(N* node, Callback callback) : sink(node, callback, 0) {}
+	/*template<class T, class F>
+	sink(T* _node, F *f) {
+		node = _node;
+		callback = [_node, f] { (*_node.*f)(); };
+	}*/
+	~sink();
 
 private:
-	void _remove(Source* source);
+	void _remove(source* source);
 	VirtualBase* node;
 	Callback callback;
-	Array<Source*> sources;
+	Array<source*> connected_sources;
+};
+
+struct internal_node_data {
+	friend struct source;
+
+	~internal_node_data();
+	sink& create_sink(VirtualBase* node, Callback callback);
+	void cleanup_temp_sinks();
+	void unsubscribe(VirtualBase* observer);
+
+	Array<source*> sources;
+	Array<sink*> temp_sinks;
 };
 
 
 template<class T>
-class Node : public LegacyObservable<T> {
-	friend class Source;
+class Node : public T {
+	friend struct source;
 
 public:
 	template<typename... Args>
-	Node(Args... args) : LegacyObservable<T>(args...) {}
+	Node(Args... args) : T(args...) {}
 	~Node() {
-		for (auto s: _private_sinks)
-			delete s;
+		out_death();
 	}
 
-private:
-	Array<Source*> _sources;
-	Array<Sink*> _private_sinks;
-
-public:
-	obs::Source out_changed{this, "changed"};
-	obs::Source out_death{this, "death"};
-
-	Sink& create_sink(Callback callback) {
-		_private_sinks.add(new Sink(this, callback));
-		return *_private_sinks.back();
+	sink& create_sink(Callback callback) {
+		return _internal_node_data.create_sink(this, callback);
 	}
 
 	void unsubscribe(VirtualBase *observer) {
-		LegacyObservable<T>::unsubscribe(observer);
-		for (auto s: _sources)
-			s->unsubscribe(observer);
+		_internal_node_data.unsubscribe(observer);
 	}
 
 	void fake_death() const {
-		out_death.notify();
-		this->observable_data.fake_death();
+		out_death();
 	}
+
+//private:
+	internal_node_data _internal_node_data;
+
+public:
+	obs::source out_changed{this, "changed"};
+	obs::source out_death{this, "death"};
 };
 
 }

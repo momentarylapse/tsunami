@@ -8,7 +8,10 @@
 #include "Observable.h"
 #include <functional>
 //#include <typeinfo>
+#if __has_include("../kaba/kaba.h")
 #include "../kaba/kaba.h"
+#define HAS_KABA
+#endif
 #include "../os/msg.h"
 #include "../base/algo.h"
 
@@ -61,179 +64,102 @@ string get_obs_name(VirtualBase *o) {
 	string pp;
 	if constexpr (MESSAGE_DEBUG_LEVEL >= 4)
 		pp = "(" + p2s(o) + ")";
+#ifdef HAS_KABA
 	if (kaba::default_context) {
 		if (auto *c = kaba::default_context->get_dynamic_type(o))
 			return "<kaba:" + c->name + ">" + pp;
 	}
+#endif
 	return printify(typeid(*o).name()) + pp;
-}
-
-ObservableData::Subscription::Subscription() {
-	observer = nullptr;
-	message = nullptr;
-}
-
-ObservableData::Subscription::Subscription(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback) {
-	observer = o;
-	message = _message;
-	callback = _callback;
-}
-
-ObservableData::Notification::Notification() {
-	observer = nullptr;
-	message = nullptr;
-}
-
-ObservableData::Notification::Notification(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback) {
-	observer = o;
-	message = _message;
-	callback = _callback;
-}
-
-
-ObservableData::ObservableData() {
-	me = nullptr; // it is only useful, when set by subscribe anyways...
-}
-
-ObservableData::~ObservableData() {
-	if constexpr (MESSAGE_DEBUG_LEVEL >= 2)
-		msg_write("~ObservableData");
-	if (me) {
-		if constexpr (MESSAGE_DEBUG_LEVEL >= 2)
-			msg_write("notify... " + get_obs_name(me));
-		//notify(me->MESSAGE_DELETE);
-		notify(LegacyObservable<VirtualBase>::MESSAGE_DELETE);
-	}
-}
-
-// in case an object is "out of service" but still needs to be kept in memory
-void ObservableData::fake_death() {
-	notify(LegacyObservable<VirtualBase>::MESSAGE_DELETE);
-	subscriptions.clear();
-}
-
-
-void ObservableData::subscribe(VirtualBase *_me, VirtualBase *observer, const ObservableData::Callback &callback, const string &message) {
-	subscriptions.add(ObservableData::Subscription(observer, &message, callback));
-	me = _me;
-	if constexpr (MESSAGE_DEBUG_LEVEL >= 2)
-		msg_write(format("subscribe:  %s  <<  (%s)  <<  %s", get_obs_name(me), message, get_obs_name(observer)));
-}
-
-void ObservableData::unsubscribe(VirtualBase *observer) {
-	if constexpr (MESSAGE_DEBUG_LEVEL >= 2)
-		msg_write(format("unsubscribe:  %s  <<  %s", get_obs_name(me), get_obs_name(observer)));
-	for (int i=subscriptions.num-1; i>=0; i--)
-		if (subscriptions[i].observer == observer) {
-			subscriptions.erase(i);
-		}
-}
-
-static bool om_match(const string &m, const ObservableData::Subscription &r) {
-	if (*r.message == m)
-		return true;
-	if ((*r.message == LegacyObservable<VirtualBase>::MESSAGE_ANY) and (m != LegacyObservable<VirtualBase>::MESSAGE_DELETE))
-		return true;
-	return false;
-}
-
-
-void ObservableData::notify(const string &message) {
-	if (!me)
-		return;
-
-	Array<Notification> notifications;
-
-	// decide whom to send what
-	//msg_write("send " + observable_name + ": " + queue[i]);
-	for (auto &r: subscriptions) {
-		if (om_match(message, r))
-			notifications.add(Notification(r.observer, &message, r.callback));
-
-		// why don't we just send in this loop?
-		// I guess it has something to do with recursion... but what...???
-		// still needed without grouping/etc
-	}
-
-	// send
-	for (auto &n: notifications) {
-		if constexpr (MESSAGE_DEBUG_LEVEL >= 1) {
-			msg_write(format("send %s  ---%s--->> %s", get_obs_name(me), message, get_obs_name(n.observer)));
-			msg_right();
-		}
-
-		//cur_message = n.message;
-		if (n.callback)
-			n.callback();
-
-		if constexpr (MESSAGE_DEBUG_LEVEL >= 1) {
-			msg_left();
-		}
-	}
 }
 
 
 namespace obs {
-Source::Source(VirtualBase* _node, const string& _name, ObservableData* obs_data) {
+source::source(VirtualBase* _node, const string& _name, int) {
 	node = _node;
 	name = _name;
-	legacy_observable_data = obs_data;
-	if constexpr (NODE_DEBUG_LEVEL >= 2)
-		msg_write(format("add  %s . %s", get_obs_name(node), name));
+//	if constexpr (NODE_DEBUG_LEVEL >= 2)
+//		msg_write(format("add  %s . %s", get_obs_name(node), name));
 }
-Source::~Source() {
-	if constexpr (NODE_DEBUG_LEVEL >= 2)
-		msg_write(format("del  %s . %s", get_obs_name(node), name));
-	auto _sinks = sinks;
+source::~source() {
+//	if constexpr (NODE_DEBUG_LEVEL >= 2)
+//		msg_write(format("del  %s . %s", get_obs_name(node), name));
+	auto _sinks = connected_sinks;
 	for (auto s: _sinks)
 		unsubscribe(*s);
 }
-void Source::notify() const {
-	for (auto s: sinks) {
-		if constexpr (NODE_DEBUG_LEVEL >= 2)
-			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
+void source::notify() const {
+	for (auto s: connected_sinks) {
+//		if constexpr (NODE_DEBUG_LEVEL >= 2)
+//			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
 		s->callback();
 	}
-	if (legacy_observable_data)
-		legacy_observable_data->notify(name);
 }
-void Source::subscribe(Sink& sink) {
-	if constexpr (NODE_DEBUG_LEVEL >= 2)
-		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
-	sinks.add(&sink);
-	sink.sources.add(this);
+void source::subscribe(sink& sink) {
+//	if constexpr (NODE_DEBUG_LEVEL >= 2)
+//		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
+	connected_sinks.add(&sink);
+	sink.connected_sources.add(this);
 }
-void Source::unsubscribe(Sink& sink) {
-	_remove(&sink);
+void source::unsubscribe(sink& sink) {
+	remove_sink(&sink);
 	sink._remove(this);
 }
-void Source::unsubscribe(VirtualBase* node) {
-	auto _sinks = sinks;
-	for (auto s: _sinks)
+void source::unsubscribe(VirtualBase* node) {
+	auto _connected_sinks = connected_sinks;
+	for (auto s: _connected_sinks)
 		if (s->node == node)
 			unsubscribe(*s);
 }
-void Source::operator >>(Sink& sink) {
+void source::operator >>(sink& sink) {
 	subscribe(sink);
 }
-void Source::_remove(Sink* sink) {
-	base::remove(sinks, sink);
+void source::remove_sink(sink* sink) {
+	base::remove(connected_sinks, sink);
 }
 
 
-Sink::Sink(VirtualBase* n, Callback c) {
+sink::sink(VirtualBase* n, Callback c, int) {
 	node = n;
 	callback = c;
 }
-Sink::~Sink() {
-	if constexpr (NODE_DEBUG_LEVEL >= 2)
-		msg_write(format("del  %s  (sink)", get_obs_name(node)));
-	auto _sources = sources;
-	for (auto s: _sources)
+sink::~sink() {
+	//if constexpr (NODE_DEBUG_LEVEL >= 2)
+	//	msg_write(format("del  %s  (sink)", get_obs_name(node)));
+	auto _connected_sources = connected_sources;
+	for (auto s: _connected_sources)
 		s->unsubscribe(*this);
 }
-void Sink::_remove(Source* source) {
-	base::remove(sources, source);
+void sink::_remove(source* source) {
+	base::remove(connected_sources, source);
 }
+
+
+
+internal_node_data::~internal_node_data() {
+	for (auto s: temp_sinks)
+		delete s;
+}
+
+sink& internal_node_data::create_sink(VirtualBase* node, Callback callback) {
+	void cleanup_temp_sinks();
+	temp_sinks.add(new sink(node, callback, 0));
+	return *temp_sinks.back();
+}
+
+void internal_node_data::cleanup_temp_sinks() {
+	for (int i=0; i<temp_sinks.num; i++)
+		if (temp_sinks[i]->connected_sources.num == 0) {
+			delete temp_sinks[i];
+			temp_sinks.erase(i);
+			i --;
+		}
+}
+
+void internal_node_data::unsubscribe(VirtualBase *observer) {
+	for (auto s: sources)
+		s->unsubscribe(observer);
+}
+
 }
 

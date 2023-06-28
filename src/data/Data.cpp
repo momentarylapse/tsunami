@@ -10,11 +10,6 @@
 #include "../lib/threads/Mutex.h"
 
 
-const string Data::MESSAGE_START_LOADING = "start-loading";
-const string Data::MESSAGE_FINISHED_LOADING = "finished-loading";
-const string Data::MESSAGE_BEFORE_CHANGE = "before-change";
-const string Data::MESSAGE_AFTER_CHANGE = "after-change";
-
 Data::Data(Session *_session) {
 	action_manager = new ActionManager(this);
 	session = _session;

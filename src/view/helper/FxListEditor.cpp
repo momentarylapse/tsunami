@@ -120,9 +120,9 @@ void FxListEditor::select_module(Module *m) {
 		}
 		panel->embed(config_panel.get(), config_grid_id, 0, 0);
 
-		m->subscribe(this, [this] {
+		m->out_death >> create_sink([this] {
 			select_module(nullptr);
-		}, m->MESSAGE_DELETE);
+		});
 	} else {
 		// dummy panel to keep the size allocation for the animation
 		config_panel = new ModulePanel(dummy_module.get(), panel, module_panel_mode);

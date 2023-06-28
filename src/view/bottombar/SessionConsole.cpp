@@ -45,7 +45,7 @@ SessionConsole::SessionConsole(Session *s, BottomBar *bar) :
 	event(id_list, [this] { on_list_double_click(); });
 	event_x(id_list, "hui:right-button-down", [this] { on_right_click(); });
 
-	tsunami->session_manager->subscribe(this, [this] { load_data(); }, SessionManager::MESSAGE_ANY);
+	tsunami->session_manager->out_changed >> create_sink([this] { load_data(); });
 }
 
 SessionConsole::~SessionConsole() {

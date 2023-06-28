@@ -362,10 +362,10 @@ MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
 	song->out_finished_loading >> create_sink([this] { update_all(); });
 
 	//device_manager->subscribe(this, [this]{ on_update_device_manager(); });
-	session->playback->output_stream->subscribe(this, [this] {
+	session->playback->output_stream->out_state_changed >> create_sink([this] {
 		set_float("output-volume", session->playback->output_stream->get_volume());
 
-	}, AudioOutput::MESSAGE_ANY);
+	});
 	load_data();
 
 

@@ -233,7 +233,7 @@ void TrackRenderer::update_layers() {
 	//msg_write("-----TR update done");
 
 	for (auto *l: weak(layers)) {
-		l->subscribe(this, [this] { on_track_change_data(); }, l->MESSAGE_CHANGE);
+		l->out_changed >> create_sink([this] { on_track_change_data(); });
 		//l->subscribe(this, [this] { on_track_delete_layer(); }, l->MESSAGE_DELETE);
 	}
 }

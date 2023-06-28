@@ -33,12 +33,12 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 }
 
 void BarsEditorConsole::on_enter() {
-	view->mode_edit_bars->subscribe(this, [this] {
+	view->mode_edit_bars->out_changed >> create_sink([this] {
 		update();
-	}, view->mode_edit_bars->MESSAGE_ANY);
-	view->subscribe(this, [this] {
+	});
+	view->out_cur_track_changed >> create_sink([this] {
 		update();
-	}, view->MESSAGE_CUR_TRACK_CHANGE);
+	});
 	update();
 }
 

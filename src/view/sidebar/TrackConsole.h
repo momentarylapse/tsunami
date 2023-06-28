@@ -20,6 +20,8 @@ class TrackConsole: public SideBarConsole {
 public:
 	TrackConsole(Session *session, SideBar *bar);
 
+	obs::sink in_track_update;
+
 	void on_enter() override;
 	void on_leave() override;
 

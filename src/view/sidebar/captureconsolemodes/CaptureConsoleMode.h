@@ -10,6 +10,7 @@
 
 #include "../../../lib/base/base.h"
 #include "../../../lib/base/pointer.h"
+#include "../../../lib/pattern/Observable.h"
 
 class CaptureConsole;
 class Song;
@@ -30,7 +31,7 @@ namespace hui {
 }
 enum class SignalType;
 
-class CaptureConsoleMode : public VirtualBase {
+class CaptureConsoleMode : public obs::Node<VirtualBase> {
 public:
 	CaptureConsoleMode(CaptureConsole *cc);
 	virtual void enter() = 0;

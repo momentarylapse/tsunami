@@ -54,20 +54,27 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->subscribe(this, [this] { update_device_list(); }, session->device_manager->MESSAGE_ANY);
+	session->device_manager->out_add_device >> create_sink([this] { update_device_list(); });
+	session->device_manager->out_remove_device >> create_sink([this] { update_device_list(); });
 
 
 	for (auto &c: items()) {
 		cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
 
-		c.input->subscribe(this, [this] {
+		c.input->out_changed >> create_sink([this] {
 			update_device_list();
-		}, c.input->MESSAGE_ANY);
+		});
+		c.input->out_state_changed >> create_sink([this] {
+			update_device_list();
+		});
 
 		if (c.channel_selector) {
-			c.channel_selector->subscribe(this, [&] {
+			c.channel_selector->out_changed >> create_sink([&] {
 				cc->peak_meter_display->set_channel_map(c.channel_map());
-			}, c.channel_selector->MESSAGE_ANY);
+			});
+			c.channel_selector->out_state_changed >> create_sink([&] {
+				cc->peak_meter_display->set_channel_map(c.channel_map());
+			});
 		}
 
 		if (c.id_mapper.num > 0 and c.channel_selector) {

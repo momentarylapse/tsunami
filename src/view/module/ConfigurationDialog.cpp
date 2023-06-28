@@ -18,22 +18,22 @@ extern const int CONFIG_PANEL_HEIGHT;
 
 
 
-class ConfigurationDialog : public hui::Dialog {
+class ConfigurationDialog : public obs::Node<hui::Dialog> {
 public:
 	ConfigPanelSocket socket;
 
 	ConfigurationDialog(shared<Module> m, hui::Window *parent) :
-		hui::Dialog("configurable_dialog", parent),
+		obs::Node<hui::Dialog>("configurable_dialog", parent),
 		socket(m.get(), ConfigPanelMode::PROFILES)
 	{
 		module = m;
 		set_title(module->module_class);
 		set_size(CONFIG_PANEL_WIDTH, 300);
 		socket.integrate(this);
-		module->subscribe(this, [this] {
+		module->out_death >> create_sink([this] {
 			module = nullptr;
 			request_destroy();
-		}, module->MESSAGE_DELETE);
+		});
 
 		ok = false;
 

@@ -104,6 +104,14 @@ void source::notify() const {
 }
 #endif
 
+
+void base_source::_notify() const {
+	if constexpr (NODE_DEBUG_LEVEL >= 2) {
+		for (const base_sink* s: connected_sinks)
+			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
+	}
+}
+
 void base_source::_subscribe(base_sink& sink) {
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));

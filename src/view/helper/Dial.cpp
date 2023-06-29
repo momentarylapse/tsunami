@@ -112,8 +112,7 @@ bool Dial::on_left_button_down(const vec2 &m) {
 				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.0002f, val_min, val_max));
 			else
 				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.002f, val_min, val_max));
-			if (cb_update)
-				cb_update(value);
+			out_value(value);
 		});
 	}
 	return true;
@@ -125,17 +124,12 @@ bool Dial::on_mouse_wheel(const vec2 &d) {
 		set_value(clamp(value + d.y * (val_max - val_min) * 0.02f, val_min, val_max));
 	else
 		set_value(clamp(value + d.y * (val_max - val_min) * 0.02f, val_min, val_max));
-	if (cb_update)
-		cb_update(value);
+	out_value(value);
 	return true;
 }
 
 string Dial::get_tip() const {
 	//return label;
 	return "";
-}
-
-void Dial::set_callback(std::function<void(float)> callback) {
-	cb_update = callback;
 }
 

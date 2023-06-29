@@ -222,7 +222,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	//output_volume_dial->reference_value = 50;
 	output_volume_dial->unit = "%";
 	output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
-	output_volume_dial->set_callback([this] (float v) {
+	output_volume_dial->out_value >> create_data_sink<float>([this] (float v) {
 		session->playback->output_stream->set_volume(v / 100.0f);
 	});
 	session->playback->output_stream->out_changed >> create_sink([this] {

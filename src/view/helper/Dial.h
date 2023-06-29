@@ -14,6 +14,8 @@ class Dial : public scenegraph::Node {
 public:
 	Dial(const string &label, float vmin, float vmax);
 
+	obs::xsource<float> out_value{this, "value"};
+
 	float val_min, val_max;
 	float value;
 	float reference_value;
@@ -36,8 +38,5 @@ public:
 	bool on_mouse_wheel(const vec2 &d) override;
 
 	string get_tip() const override;
-
-	std::function<void(float)> cb_update;
-	void set_callback(std::function<void(float)> callback);
 };
 

@@ -16,11 +16,11 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	set_perf_name("scrollpad");
 	scrollbar_h = new ScrollBarHorizontal();
 	scrollbar_v = new ScrollBar();
-	scrollbar_h->set_callback([&] (float offset) {
+	scrollbar_h->out_offset >> create_data_sink<float>([&] (float offset) {
 		view_pos.x = offset;
 		move_view({0,0});
 	});
-	scrollbar_v->set_callback([&] (float offset) {
+	scrollbar_v->out_offset >> create_data_sink<float>([&] (float offset) {
 		view_pos.y = offset;
 		move_view({0,0});
 	});

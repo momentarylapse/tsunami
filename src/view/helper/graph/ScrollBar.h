@@ -17,6 +17,7 @@ public:
 	ScrollBar();
 	bool constrained = true;
 
+	obs::xsource<float> out_offset{this, "offset"};
 
 	float get_view_offset() const;
 
@@ -50,9 +51,6 @@ public:
 	bool on_left_button_down(const vec2 &m) override;
 
 	void update_geometry(const rect &target_area) override;
-
-	std::function<void(float)> cb_update_view;
-	void set_callback(std::function<void(float)> callback);
 };
 
 class ScrollBarHorizontal : public ScrollBar {

@@ -27,18 +27,13 @@ ScrollBarHorizontal::ScrollBarHorizontal() : ScrollBar() {
 	horizontal = true;
 }
 
-void ScrollBar::set_callback(std::function<void(float)> f) {
-	cb_update_view = f;
-}
-
 void ScrollBar::drag_update(const vec2 &m) {
 	//unproject(mx) - view_offset = mouse_offset
 	if (horizontal)
 		set_view_offset(unproject(m.x) - mouse_offset);
 	else
 		set_view_offset(unproject(m.y) - mouse_offset);
-	if (cb_update_view)
-		cb_update_view(view_offset);
+	out_offset(view_offset);
 }
 
 void ScrollBar::on_draw(Painter *c) {
@@ -87,8 +82,7 @@ void ScrollBar::set_view_offset(float offset) {
 	if (offset != view_offset) {
 		view_offset = offset;
 		request_redraw();
-		if (cb_update_view)
-			cb_update_view(view_offset);
+		out_offset(view_offset);
 	}
 }
 

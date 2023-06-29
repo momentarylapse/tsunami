@@ -916,7 +916,7 @@ void ViewModeEditMidi::on_cur_layer_change() {
 	for (auto l: view->vlayers)
 		l->scroll_bar->hidden = true;
 	sb->hidden = false;
-	sb->set_callback([this] (float offset) {
+	sb->out_offset >> create_data_sink<float>([this] (float offset) {
 		float _pitch_max = MAX_PITCH - offset;
 		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 	});

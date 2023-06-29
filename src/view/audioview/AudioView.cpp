@@ -132,11 +132,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	selection_marker = new SelectionMarker(this);
 	scroll_bar_y = new ScrollBar(); // pixels
 	scroll_bar_y->auto_hide = true;
-	scroll_bar_y->set_callback([this] (float offset) {
+	scroll_bar_y->out_offset >> create_data_sink<float>([this] (float offset) {
 		thm.update_immediately(this, song, song_area());
 	});
 	scroll_bar_time = new ScrollBarHorizontal(); // samples
-	scroll_bar_time->set_callback([this] (float offset) {
+	scroll_bar_time->out_offset >> create_data_sink<float>([this] (float offset) {
 		cam.dirty_jump(offset);
 	});
 	scroll_bar_time->constrained = false;

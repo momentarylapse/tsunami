@@ -8,7 +8,7 @@
 #include "Slider.h"
 #include <cmath>
 
-Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, Callback _func) {
+Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit) {
 	panel = _panel;
 	id_slider = _id_slider;
 	id_edit = _id_edit;
@@ -18,11 +18,12 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	value_max_slider = 1;
 	factor = 1;
 	value = 0;
-	func = _func;
 	mode = Mode::LINEAR;
 
-	event_handler_id[0] = panel->event(id_slider, [this] { on_slide(); });
-	event_handler_id[1] = panel->event(id_edit, [this] { on_edit(); });
+	if (panel) {
+		event_handler_id[0] = panel->event(id_slider, [this] { on_slide(); });
+		event_handler_id[1] = panel->event(id_edit, [this] { on_edit(); });
+	}
 }
 
 
@@ -35,7 +36,8 @@ Slider::~Slider() {
 }
 
 void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callable<void()> *_func) {
-	new(this) Slider(_panel, _id_slider, _id_edit, [_func] (float f) { (*_func)(); });
+	new(this) Slider(_panel, _id_slider, _id_edit);
+	out_value >> create_data_sink<float>([_func] (float f) { (*_func)(); });
 }
 
 void Slider::__delete__() {
@@ -105,12 +107,12 @@ void Slider::on_slide() {
 	else
 		value = value_min_slider + panel->get_float(id_slider) * (value_max_slider - value_min_slider);
 	panel->set_float(id_edit, value * factor);
-	func(value);
+	out_value(value);
 }
 
 void Slider::on_edit() {
 	value = panel->get_float(id_edit) / factor;
 	set_slide(value);
-	func(value);
+	out_value(value);
 }
 

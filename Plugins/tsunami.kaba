@@ -695,9 +695,9 @@ class Session extends Object as shared
 #	int layer
 #	Range range
 
-class Slider
+class Slider extends Object
 	func extern __init__(panel: Panel, id_slider: string, id_edit: string, on_update: void->void)
-	func extern __delete__()
+	func extern override __delete__()
 	func extern get() -> float
 	func extern mut set(f: float)
 	func extern set_range(v_min: float, v_max: float, step: float)

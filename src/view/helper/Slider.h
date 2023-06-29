@@ -8,16 +8,19 @@
 #ifndef SLIDER_H_
 #define SLIDER_H_
 
-#include "../../lib/hui/hui.h"
 #include "../../lib/base/callable.h"
+#include "../../lib/hui/hui.h"
+#include "../../lib/pattern/Observable.h"
 
 
-class Slider {
+class Slider : public obs::Node<VirtualBase> {
 public:
 	using Callback = std::function<void(float)>;
 
-	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callback func);
+	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit);
 	~Slider();
+
+	obs::xsource<float> out_value{this, "value"};
 
 	void __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callable<void()> *_func);
 	void __delete__();
@@ -50,7 +53,6 @@ private:
 	float factor;
 	Mode mode;
 	hui::Panel *panel;
-	Callback func;
 };
 
 #endif /* SLIDER_H_ */

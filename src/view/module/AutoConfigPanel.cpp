@@ -66,14 +66,14 @@ public:
 	virtual void value_to_gui() = 0;
 };
 
-class AutoConfigDataFloat : public AutoConfigData {
+class AutoConfigDataFloat : public obs::Node<AutoConfigData> {
 public:
 	float min, max, step, factor;
 	float min_slider, max_slider;
 	float *value;
 	owned<Slider> slider;
 	Slider::Mode mode = Slider::Mode::LINEAR;
-	AutoConfigDataFloat(const string &_name) : AutoConfigData(_name) {
+	AutoConfigDataFloat(const string &_name) : obs::Node<AutoConfigData>(_name) {
 		min = -100;
 		max = 100;
 		step = 0.1f;
@@ -130,7 +130,8 @@ public:
 		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
 		p->add_spin_button("!width=50\\" + f2s(*value, 6), 1, 0, "spin-" + i2s(i));
 		//p->addLabel(unit, 2, 0, "");
-		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), [callback] (float f) { callback(); });
+		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i));
+		slider->out_value >> create_data_sink<float>([callback] (float f) { callback(); });
 		slider->set_scale(factor);
 		slider->set_range(min, max, step);
 		slider->set_slider_range(min_slider, max_slider);

@@ -9,17 +9,17 @@
 #define SRC_VIEW_HELPER_VOLUMECONTROL_H_
 
 #include "../../lib/base/base.h"
-#include <functional>
+#include "../../lib/pattern/Observable.h"
 
 namespace hui {
 class Panel;
 }
 
-class VolumeControl {
+class VolumeControl : public obs::Node<VirtualBase> {
 public:
-	using Callback = std::function<void(float)>;
+	VolumeControl(hui::Panel* panel, const string& id_slider, const string& id_spin, const string& id_unit);
 
-	VolumeControl(hui::Panel* panel, const string& id_slider, const string& id_spin, const string& id_unit, Callback cb);
+	obs::xsource<float> out_volume{this, "volume"};
 
 	void set(float f);
 	float get() const;
@@ -30,8 +30,6 @@ public:
 private:
 	hui::Panel* panel;
 	string id_slider, id_spin, id_unit;
-
-	Callback cb;
 
 	float value;
 	float min_value, max_value;

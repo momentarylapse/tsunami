@@ -9,10 +9,11 @@
 #define SRC_VIEW_DIALOG_VOLUMEDIALOG_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../lib/pattern/Observable.h"
 
 class VolumeControl;
 
-class VolumeDialog : hui::Dialog {
+class VolumeDialog : obs::Node<hui::Dialog> {
 public:
 	using Callback = std::function<void(float)>;
 	VolumeDialog(hui::Window *parent, float value0, float min, float max, Callback cb);

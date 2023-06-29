@@ -27,7 +27,8 @@ SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	sample = nullptr;
 	editing = false;
 
-	volume_control = new VolumeControl(this, "volume-slider", "volume", "volume-unit", [this] (float v) {
+	volume_control = new VolumeControl(this, "volume-slider", "volume", "volume-unit");
+	volume_control->out_volume >> create_data_sink<float>([this] (float v) {
 		editing = true;
 		if (sample)
 			layer->edit_sample_ref(sample, v, sample->muted);

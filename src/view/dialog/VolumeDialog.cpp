@@ -18,13 +18,14 @@ bool VolumeDialog::maximize;
 
 
 VolumeDialog::VolumeDialog(hui::Window *_parent, float value0, float min, float max, Callback _cb)
-: hui::Dialog("volume-dialog", _parent) {
+: obs::Node<hui::Dialog>("volume-dialog", _parent) {
 	cb = _cb;
 	result = value0;
 	aborted = true;
 	maximize = false;
 
-	volume_control = new VolumeControl(this, "slider", "value", "unit", [this] (float f) {
+	volume_control = new VolumeControl(this, "slider", "value", "unit");
+	volume_control->out_volume >> create_data_sink<float>([this] (float f) {
 		result = f;
 	});
 	volume_control->set_range(0, 8);

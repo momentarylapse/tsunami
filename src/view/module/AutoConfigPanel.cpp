@@ -316,12 +316,12 @@ public:
 	}
 };
 
-class AutoConfigDataVolume : public AutoConfigData {
+class AutoConfigDataVolume : public obs::Node<AutoConfigData> {
 public:
 	float value_min, value_max;
 	float *value;
 	owned<VolumeControl> volume_control;
-	AutoConfigDataVolume(const string &_name) : AutoConfigData(_name) {
+	AutoConfigDataVolume(const string &_name) : obs::Node<AutoConfigData>(_name) {
 		value = nullptr;
 		value_min = 0;
 		value_max = 1;
@@ -333,7 +333,8 @@ public:
 		p->set_target("grid-" + i2s(i));
 		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
 		p->add_spin_button("", 1, 0, "spin-" + i2s(i));
-		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i), [this, callback] (float f) {
+		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i));
+		volume_control->out_volume >> create_data_sink<float>([this, callback] (float f) {
 			callback();
 		});
 		volume_control->set_range(value_min, value_max);

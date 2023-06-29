@@ -11,12 +11,11 @@
 #include <math.h>
 
 
-VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const string& _id_spin, const string& _id_unit, Callback _cb) {
+VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const string& _id_spin, const string& _id_unit) {
 	panel = _panel;
 	id_slider = _id_slider;
 	id_spin = _id_spin;
 	id_unit = _id_unit;
-	cb = _cb;
 
 	min_value = 0;
 	max_value = 1;
@@ -30,12 +29,12 @@ VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const
 	panel->event(id_spin, [this] {
 		value = get_spin();
 		set_slider(value);
-		cb(value);
+		out_volume(value);
 	});
 	panel->event(id_slider, [this] {
 		value = get_slider();
 		set_spin(value);
-		cb(value);
+		out_volume(value);
 	});
 	panel->event(id_unit, [this] {
 		if (mode == Mode::PERCENT)

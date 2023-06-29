@@ -10,88 +10,135 @@
 
 #include "../base/base.h"
 #include <functional>
+#include <type_traits>
 
 
 namespace obs {
 
 struct internal_node_data;
-struct sink;
-using Callback = std::function<void()>;
+struct base_sink;
+struct base_source;
 
-struct source {
-	friend struct sink;
+struct base_source {
+	friend struct base_sink;
+	base_source(VirtualBase* _node, const string& _name, int);
+	~base_source();
 
-	source() = delete;
-	source(VirtualBase* node, const string& name, int _dummy);
-	template<class N>
-	source(N* node, const string& name) : source(node, name, 0) {
-		node->_internal_node_data.sources.add(this);
-	}
-	~source();
-	void notify() const;
-	void operator() () const { notify(); }
-	void subscribe(sink& sink);
-	void unsubscribe(sink& sink);
+	void unsubscribe(base_sink& sink);
 	void unsubscribe(VirtualBase* node);
-	void operator>>(sink& sink);
+
 	int count_subscribers() { return connected_sinks.num; }
 
-private:
-	void remove_sink(sink* sink);
+protected:
+	void _subscribe(base_sink& sink);
+	void remove_sink(base_sink* sink);
 	VirtualBase* node;
 	string name;
 	//mutable
-	Array<sink*> connected_sinks;
+	Array<base_sink*> connected_sinks;
 };
 
-struct sink {
-	friend struct source;
+struct base_sink {
+	friend struct base_source;
+	friend struct internal_node_data;
+	~base_sink();
+protected:
+	void remove_source(base_source* source);
+	VirtualBase* node;
+	Array<base_source*> connected_sources;
+};
+
+
+
+
+
+template<class... T> struct xsink;
+
+template<class... T>
+struct xsource : base_source {
+	friend struct xsink<T...>;
+
+	xsource() = delete;
+	template<class N>
+	xsource(N* node, const string& name) : base_source(node, name, 0) {
+		node->_internal_node_data.sources.add(this);
+	}
+
+	void notify(T... t) const {
+		for (const base_sink* s: connected_sinks) {
+			//if constexpr (NODE_DEBUG_LEVEL >= 2)
+			//	msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
+			reinterpret_cast<const xsink<T...>*>(s)->callback(t...);
+		}
+	}
+	void operator() (T... t) const { notify(t...); }
+	void subscribe(xsink<T...>& s) {
+		_subscribe(s);
+	}
+	void operator>>(xsink<T...>& s) {
+		subscribe(s);
+	}
+};
+
+template<class... T>
+struct xsink : base_sink {
+	friend struct xsource<T...>;
+	friend struct base_source;
 	friend struct internal_node_data;
 
-	sink() = delete;
-	sink(VirtualBase* node, Callback callback, int _dummy);
-	template<class N>
-	sink(N* node, Callback callback) : sink(node, callback, 0) {}
-	/*template<class T, class F>
-	sink(T* _node, F *f) {
+	using Callback = std::function<void(T...)>;
+
+	xsink() = delete;
+	template<class N, class F>
+	xsink(N* _node, F f) {
 		node = _node;
-		callback = [_node, f] { (*_node.*f)(); };
-	}*/
-	~sink();
+		if constexpr (std::is_member_function_pointer<F>::value)
+			callback = [_node, f] (T... t) { (*_node.*f)(t...); };
+		else
+			callback = f;
+	}
 
 private:
-	void _remove(source* source);
-	VirtualBase* node;
+	//void init(VirtualBase* node, Callback callback);
 	Callback callback;
-	Array<source*> connected_sources;
 };
 
 struct internal_node_data {
-	friend struct source;
+	friend struct base_source;
 
 	~internal_node_data();
-	sink& create_sink(VirtualBase* node, Callback callback);
+	//template<class... T>
+	//xsink<T...>& create_sink(VirtualBase* node, std::function<void(T...)> callback);
 	void cleanup_temp_sinks();
 	void unsubscribe(VirtualBase* observer);
 
-	Array<source*> sources;
-	Array<sink*> temp_sinks;
+	Array<base_source*> sources;
+	Array<base_sink*> temp_sinks;
 };
 
+using sink = xsink<>;
+using source = xsource<>;
 
-template<class T>
-class Node : public T {
-	friend struct source;
+template<class Base>
+class Node : public Base {
+	friend struct base_source;
 
 public:
 	template<typename... Args>
-	Node(Args... args) : T(args...) {}
+	Node(Args... args) : Base(args...) {}
 	~Node() {
 		out_death();
 	}
 
-	sink& create_sink(Callback callback) {
-		return _internal_node_data.create_sink(this, callback);
+	template<class... T>
+	xsink<T...>& create_sink(std::function<void(T...)> callback) {
+		_internal_node_data.cleanup_temp_sinks();
+		_internal_node_data.temp_sinks.add(new xsink<T...>(this, callback));
+		return *reinterpret_cast<xsink<T...>*>(_internal_node_data.temp_sinks.back());
+		//return _internal_node_data.create_sink(this, callback);
+	}
+	sink& create_sink(std::function<void()> callback) {
+		return create_sink<>(callback);
 	}
 
 	void unsubscribe(VirtualBase *observer) {

@@ -74,78 +74,106 @@ string get_obs_name(VirtualBase *o) {
 }
 
 
+/**************************************
+ * source
+ **************************************/
+
 namespace obs {
-source::source(VirtualBase* _node, const string& _name, int) {
+base_source::base_source(VirtualBase* _node, const string& _name, int) {
 	node = _node;
 	name = _name;
-//	if constexpr (NODE_DEBUG_LEVEL >= 2)
-//		msg_write(format("add  %s . %s", get_obs_name(node), name));
+	if constexpr (NODE_DEBUG_LEVEL >= 2)
+		msg_write(format("add  %s . %s", get_obs_name(node), name));
 }
-source::~source() {
-//	if constexpr (NODE_DEBUG_LEVEL >= 2)
-//		msg_write(format("del  %s . %s", get_obs_name(node), name));
+
+base_source::~base_source() {
+	if constexpr (NODE_DEBUG_LEVEL >= 2)
+		msg_write(format("del  %s . %s", get_obs_name(node), name));
 	auto _sinks = connected_sinks;
 	for (auto s: _sinks)
 		unsubscribe(*s);
 }
+
+#if 0
 void source::notify() const {
 	for (auto s: connected_sinks) {
-//		if constexpr (NODE_DEBUG_LEVEL >= 2)
-//			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
+		if constexpr (NODE_DEBUG_LEVEL >= 2)
+			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
 		s->callback();
 	}
 }
-void source::subscribe(sink& sink) {
-//	if constexpr (NODE_DEBUG_LEVEL >= 2)
-//		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
+#endif
+
+void base_source::_subscribe(base_sink& sink) {
+	if constexpr (NODE_DEBUG_LEVEL >= 2)
+		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
 	connected_sinks.add(&sink);
 	sink.connected_sources.add(this);
 }
-void source::unsubscribe(sink& sink) {
-	remove_sink(&sink);
-	sink._remove(this);
+
+void base_source::unsubscribe(base_sink& s) {
+	remove_sink(&s);
+	s.remove_source(this);
 }
-void source::unsubscribe(VirtualBase* node) {
+
+void base_source::unsubscribe(VirtualBase* node) {
 	auto _connected_sinks = connected_sinks;
 	for (auto s: _connected_sinks)
 		if (s->node == node)
 			unsubscribe(*s);
 }
+
+#if 0
 void source::operator >>(sink& sink) {
 	subscribe(sink);
 }
-void source::remove_sink(sink* sink) {
-	base::remove(connected_sinks, sink);
+#endif
+
+void base_source::remove_sink(base_sink* s) {
+	base::remove(connected_sinks, s);
 }
 
 
-sink::sink(VirtualBase* n, Callback c, int) {
+/**************************************
+ * sink
+ **************************************/
+
+#if 0
+void sink::init(VirtualBase* n, Callback c) {
 	node = n;
 	callback = c;
 }
-sink::~sink() {
-	//if constexpr (NODE_DEBUG_LEVEL >= 2)
-	//	msg_write(format("del  %s  (sink)", get_obs_name(node)));
+#endif
+
+base_sink::~base_sink() {
+	if constexpr (NODE_DEBUG_LEVEL >= 2)
+		msg_write(format("del  %s  (sink)", get_obs_name(node)));
 	auto _connected_sources = connected_sources;
 	for (auto s: _connected_sources)
 		s->unsubscribe(*this);
 }
-void sink::_remove(source* source) {
-	base::remove(connected_sources, source);
+
+void base_sink::remove_source(base_source* s) {
+	base::remove(connected_sources, s);
 }
 
 
+/**************************************
+ * internal_node_data
+ **************************************/
 
 internal_node_data::~internal_node_data() {
 	for (auto s: temp_sinks)
 		delete s;
 }
 
+#if 0
 sink& internal_node_data::create_sink(VirtualBase* node, Callback callback) {
-	void cleanup_temp_sinks();
-	temp_sinks.add(new sink(node, callback, 0));
+	cleanup_temp_sinks();
+	temp_sinks.add(new sink(node, callback));
 	return *temp_sinks.back();
 }
+#endif
 
 void internal_node_data::cleanup_temp_sinks() {
 	for (int i=0; i<temp_sinks.num; i++)

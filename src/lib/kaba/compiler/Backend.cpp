@@ -96,14 +96,15 @@ void Backend::do_error(const string &e) {
 }
 
 
-void Backend::add_asm_block() {
-	//msg_write(".------------------------------- asm");
-	SyntaxTree *ps = module->tree.get();
-	if (ps->asm_blocks.num == 0)
-		do_error("asm block mismatch");
-	ps->asm_meta_info->line_offset = ps->asm_blocks[0].line;
-	list->append_from_source(ps->asm_blocks[0].block);
-	ps->asm_blocks.erase(0);
+void Backend::add_asm_block(int uuid) {
+	SyntaxTree *tree = module->tree.get();
+	for (auto& a: tree->asm_blocks)
+		if (a.uuid == uuid) {
+			tree->asm_meta_info->line_offset = a.line;
+			list->append_from_source(a.block);
+			return;
+		}
+	do_error(format("asm block not found: uuid=%d", uuid));
 }
 
 

@@ -82,6 +82,7 @@ public:
 	void jump(int token_id);
 
 	std::function<void()> do_error_endl;
+	void do_error_analyse(const string& msg, int pos, int line_no);
 };
 
 

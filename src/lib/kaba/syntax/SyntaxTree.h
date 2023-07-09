@@ -30,6 +30,7 @@ class Parser;
 
 
 struct AsmBlock {
+	int uuid;
 	string block;
 	int line;
 };

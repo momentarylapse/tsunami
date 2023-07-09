@@ -82,7 +82,7 @@ public:
 	void do_error(const string &e);
 
 
-	void add_asm_block();
+	void add_asm_block(int uuid);
 };
 
 

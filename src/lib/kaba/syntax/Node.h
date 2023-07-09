@@ -12,6 +12,7 @@
 #include "../../base/base.h"
 #include "../../base/pointer.h"
 //#include "../lib/common.h"
+#include "Flags.h"
 
 namespace kaba {
 
@@ -116,15 +117,15 @@ public:
 	// linking of class function instances
 	// return value
 	const Class *type;
-	bool is_const;
+	Flags flags;
+	bool is_mutable() const;
 
-	Node(NodeKind kind, int64 link_no, const Class *type, bool is_const = false, int token_id = -1);
+	Node(NodeKind kind, int64 link_no, const Class *type, Flags flags = Flags::MUTABLE, int token_id = -1);
 	/*Node(const Class *c);
 	Node(const Block *b);
 	Node(const Constant *c);*/
 	~Node();
-	Node *modifiable();
-	Node *make_const();
+	void set_mutable(bool _mutable);
 	bool is_call() const;
 	bool is_function() const;
 	Block *as_block() const;

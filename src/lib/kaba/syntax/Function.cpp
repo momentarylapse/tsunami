@@ -234,13 +234,13 @@ bool Function::is_member() const {
 	return !flags_has(flags, Flags::STATIC);
 }
 
-bool Function::is_const() const {
-	return flags_has(flags, Flags::CONST);
+bool Function::is_mutable() const {
+	return !flags_has(flags, Flags::CONST);
 
 	// hmmm, might be better, to use self:
 	if (is_static())
-		return false;
-	return __get_var(Identifier::SELF)->is_const();
+		return true;
+	return __get_var(Identifier::SELF)->is_mutable();
 }
 
 bool Function::is_selfref() const {

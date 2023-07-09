@@ -209,7 +209,7 @@ shared<Node> Concretifier::link_special_operator_tuple_extract(shared<Node> para
 		if (param1->params[i]->type != etypes[i])
 			do_error(format("tuple extraction: type mismatch element #%d (%s vs %s)", i+1, param1->params[i]->type->long_name(), etypes[i]->long_name()), token_id);
 
-	auto node = new Node(NodeKind::TUPLE_EXTRACTION, -1, TypeVoid, false, token_id);
+	auto node = new Node(NodeKind::TUPLE_EXTRACTION, -1, TypeVoid, Flags::NONE, token_id);
 	node->set_num_params(etypes.num + 1);
 	node->set_param(0, param2);
 	for (int i=0; i<etypes.num; i++)
@@ -237,7 +237,7 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 	if ((primop->id == OperatorID::REF_ASSIGN) and (param1->type->is_reference() and param2->type->is_reference()))
 		return link_special_operator_ref_assign(param1, param2, token_id);
 
-	if (left_modifiable and param1->is_const)
+	if (left_modifiable and !param1->is_mutable())
 		do_error("trying to modify a constant expression", token_id);
 
 	if (primop->id == OperatorID::IS)
@@ -547,7 +547,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		auto *cf = operand->type->get_member_func(Identifier::Func::SUBARRAY, operand->type, {index->type, index->type});
 		if (cf) {
 			auto f = add_node_member_call(cf, operand, operand->token_id);
-			f->is_const = operand->is_const;
+			f->set_mutable(operand->is_mutable());
 			f->set_param(1, index);
 			f->set_param(2, index2);
 			return f;
@@ -576,7 +576,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 	auto *cf = operand->type->get_get(index->type);
 	if (cf) {
 		auto f = add_node_member_call(cf, operand, operand->token_id);
-		f->is_const = operand->is_const;
+		f->set_mutable(operand->is_mutable());
 		f->set_param(1, index);
 		return f;
 	}
@@ -609,7 +609,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		array_element = add_node_array(operand, index);
 	else
 		do_error(format("type '%s' is neither an array nor does it have a function %s(%s)", operand->type->long_name(), Identifier::Func::GET, index->type->long_name()), index);
-	array_element->is_const = operand->is_const;
+	array_element->set_mutable(operand->is_mutable());
 	return array_element;
 
 }
@@ -845,7 +845,7 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	auto var_name = node->params[0]->as_token();
 	auto var_type = tree->request_implicit_class_reference(container->type->get_array_element(), node->params[0]->token_id);
 	auto var = block->add_var(var_name, var_type);
-	if (container->is_const)
+	if (!container->is_mutable())
 		flags_set(var->flags, Flags::CONST);
 	node->set_param(0, add_node_local(var));
 
@@ -992,7 +992,7 @@ shared<Node> Concretifier::concretify_special_function_sort(shared<Node> node, B
 
 	if (!array->type->is_list())
 		do_error(format("%s(): first parameter must be a list[]", Identifier::SORT), array);
-	if (crit->type != TypeString or !crit->is_const)
+	if (crit->type != TypeString or crit->is_mutable())
 		do_error(format("%s(): second parameter must be a string literal", Identifier::SORT), crit);
 
 	Function *f = tree->required_func_global("@sorted", node->token_id);
@@ -1482,7 +1482,7 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 	auto f_add = array_type->get_member_func("add", TypeVoid, {type_el});
 	if (!f_add)
 		do_error("...add() ???", token_id);
-	auto n_add = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown, false, token_id);
+	auto n_add = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown, Flags::MUTABLE, token_id);
 	n_add->set_num_params(3);
 	n_add->set_param(0, add_node_func_name(f_add));
 	n_add->set_param(1, add_node_local(array_var));
@@ -1858,10 +1858,10 @@ shared<Node> Concretifier::make_func_pointer_node_callable(const shared<Node> l)
 
 	shared<Node> c;
 	if (f->virtual_index >= 0) {
-		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, true);
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::CONST);
 	} else {
 		do_error("function pointer call should be virtual???", l);
-		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true);
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST);
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(l->deref());
@@ -2009,18 +2009,18 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 		// "ref" parameter -> return mut/const depends on param!
 		if (f->num_params >= 1)
 			if (flags_has(f->var[0]->flags, Flags::REF))
-				n->is_const = n->params[0]->is_const;
+				n->set_mutable(n->params[0]->is_mutable());
 
 		// const check
 		if (f->is_member()) {
 			offset = 1;
 			if (f->is_selfref()) {
-			} else if (n->params[0]->is_const and !f->is_const()) {
+			} else if (!n->params[0]->is_mutable() and f->is_mutable()) {
 				tree->do_error(f->long_name() + ": member function expects a mutable instance, because it is declared 'mut'", n->token_id);
 			}
 		}
 		for (int i=offset; i<f->num_params; i++)
-			if (n->params[i]->is_const and !f->var[i]->is_const())
+			if (!n->params[i]->is_mutable() and f->var[i]->is_mutable())
 				tree->do_error(format("%s: function parameter %d ('%s') is 'out' and does not accept a constant value", f->long_name(), i+1-offset, f->var[i]->name), n->token_id);
 	}
 	return n;

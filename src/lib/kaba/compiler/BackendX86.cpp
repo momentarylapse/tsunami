@@ -1101,7 +1101,7 @@ void BackendX86::assemble() {
 		if (c.inst == Asm::InstID::LABEL) {
 			list->insert_location_label(c.p[0].p);
 		} else if (c.inst == Asm::InstID::ASM) {
-			add_asm_block();
+			add_asm_block(c.p[0].p);
 		} else {
 			assemble_cmd(c);
 		}

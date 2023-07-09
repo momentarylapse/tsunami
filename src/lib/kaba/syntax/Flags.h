@@ -25,6 +25,7 @@ enum class OperatorID;
 
 enum class Flags {
 	NONE = 0,
+	MUTABLE = 0, // TODO
 	//CALL_BY_VALUE = 1<<0,
 	//MEMBER = 1<<2,
 	CONST = 1<<3,

@@ -51,7 +51,7 @@ public:
 	bool is_pure() const;
 	bool is_static() const;
 	bool is_member() const;
-	bool is_const() const;
+	bool is_mutable() const;
 	bool is_selfref() const;
 	bool throws_exceptions() const; // for external
 	bool is_template() const;

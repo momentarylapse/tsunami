@@ -233,11 +233,11 @@ void Node::show(const Class *ns) const {
 //  edit the tree by shallow copy, relink to old parameters
 //  relinked params count as "new" Node!
 // ...(although, Block are allowed to be edited)
-Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, bool _const, int _token_id) {
+Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, Flags _flags, int _token_id) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
-	is_const = _const;
+	flags = _flags;
 	token_id = _token_id;
 }
 
@@ -246,14 +246,14 @@ Node::~Node() {
 		as_block()->vars.clear();
 }
 
-Node *Node::modifiable() {
-	is_const = false;
-	return this;
+bool Node::is_mutable() const {
+	return !flags_has(flags, Flags::CONST);
 }
 
-Node *Node::make_const() {
-	is_const = true;
-	return this;
+void Node::set_mutable(bool _mutable) {
+	flags_clear(flags, Flags::CONST);
+	if (!_mutable)
+		flags_set(flags, Flags::CONST);
 }
 
 bool Node::is_call() const {
@@ -365,13 +365,13 @@ void Node::set_param(int index, shared<Node> p) {
 }
 
 shared<Node> Node::shallow_copy() const {
-	auto r = new Node(kind, link_no, type, is_const, token_id);
+	auto r = new Node(kind, link_no, type, flags, token_id);
 	r->params = params;
 	return r;
 }
 
 shared<Node> Node::ref_new(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE_NEW, 0, t, false, token_id);
+	shared<Node> c = new Node(NodeKind::REFERENCE_NEW, 0, t, Flags::NONE, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -382,7 +382,7 @@ shared<Node> Node::ref_new(SyntaxTree *tree) const {
 }
 
 shared<Node> Node::ref_raw(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE_RAW, 0, t, false, token_id);
+	shared<Node> c = new Node(NodeKind::REFERENCE_RAW, 0, t, Flags::NONE, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -396,21 +396,21 @@ shared<Node> Node::ref_raw(SyntaxTree *tree) const {
 shared<Node> Node::deref(const Class *override_type) const {
 	if (!override_type)
 		override_type = type->param[0];
-	shared<Node> c = new Node(NodeKind::DEREFERENCE, 0, override_type, is_const, token_id);
+	shared<Node> c = new Node(NodeKind::DEREFERENCE, 0, override_type, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::shift(int64 shift, const Class *type, int token_id) const {
-	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, is_const, token_id >= 0 ? token_id : this->token_id);
+	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, flags, token_id >= 0 ? token_id : this->token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::deref_shift(int64 shift, const Class *type, int token_id) const {
-	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, is_const, token_id);
+	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -435,7 +435,7 @@ shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 		cmd->as_block()->vars = c->as_block()->vars;
 		parent_block = cmd->as_block();
 	} else {
-		cmd = new Node(c->kind, c->link_no, c->type, c->is_const);
+		cmd = new Node(c->kind, c->link_no, c->type, c->flags);
 	}
 	cmd->token_id = c->token_id;
 	cmd->set_num_params(c->params.num);
@@ -448,7 +448,7 @@ shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 
 
 shared<Node> add_node_constructor(Function *f, int token_id) {
-	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space, false);
+	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space, Flags::MUTABLE);
 	auto n = add_node_member_call(f, dummy, token_id); // temp var added later...
 	n->kind = NodeKind::CONSTRUCTOR_AS_FUNCTION;
 	n->type = f->name_space;
@@ -456,7 +456,7 @@ shared<Node> add_node_constructor(Function *f, int token_id) {
 }
 
 shared<Node> add_node_const(Constant *c, int token_id) {
-	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), true, token_id);
+	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), Flags::CONST, token_id);
 }
 
 /*shared<Node> add_node_block(Block *b) {
@@ -465,21 +465,21 @@ shared<Node> add_node_const(Constant *c, int token_id) {
 
 shared<Node> add_node_statement(StatementID id, int token_id, const Class *type) {
 	auto *s = statement_from_id(id);
-	auto c = new Node(NodeKind::STATEMENT, (int_p)s, type, false, token_id);
+	auto c = new Node(NodeKind::STATEMENT, (int_p)s, type, Flags::NONE, token_id);
 	c->set_num_params(s->num_params);
 	return c;
 }
 
 shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id, const Class *type) {
 	auto *s = special_function_from_id(id);
-	auto c = new Node(NodeKind::CALL_SPECIAL_FUNCTION, (int_p)s, type, false, token_id);
+	auto c = new Node(NodeKind::CALL_SPECIAL_FUNCTION, (int_p)s, type, Flags::NONE, token_id);
 	c->set_num_params(s->max_params);
 	return c;
 }
 
 shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, const Class *type) {
 	auto *s = special_function_from_id(id);
-	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, false, token_id);
+	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, Flags::CONST, token_id);
 	return c;
 }
 
@@ -487,9 +487,9 @@ shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, 
 shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
 	if ((f->virtual_index >= 0) and !force_non_virtual) {
-		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, true, token_id);
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
 	} else {
-		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true, token_id);
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(inst);
@@ -501,24 +501,24 @@ shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int toke
 // non-member!
 shared<Node> add_node_call(Function *f, int token_id) {
 	// FIXME: literal_return_type???
-	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, true, token_id);
+	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
 		c->set_num_params(f->num_params);
 	return c;
 }
 
 shared<Node> add_node_func_name(Function *f, int token_id) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, true, token_id);
+	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, Flags::CONST, token_id);
 }
 
 shared<Node> add_node_class(const Class *c, int token_id) {
-	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP, true, token_id);
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP, Flags::CONST, token_id);
 }
 
 
 shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
 	if (!override_type)
 		override_type = op->return_type;
-	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, true, token_id);
+	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, Flags::CONST, token_id);
 	if (op->abstract->is_binary()) {
 		cmd->set_num_params(2); // binary
 		cmd->set_param(0, p1);
@@ -532,19 +532,19 @@ shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared
 
 
 shared<Node> add_node_local(Variable *v, const Class *type, int token_id) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->is_const(), token_id);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->flags, token_id);
 }
 
 shared<Node> add_node_local(Variable *v, int token_id) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->is_const(), token_id);
+	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->flags, token_id);
 }
 
 shared<Node> add_node_global(Variable *v, int token_id) {
-	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->is_const(), token_id);
+	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->flags, token_id);
 }
 
 shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type) {
-	shared<Node> cmd_el = new Node(NodeKind::POINTER_AS_ARRAY, 0, type, false, index->token_id);
+	shared<Node> cmd_el = new Node(NodeKind::POINTER_AS_ARRAY, 0, type, p->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, p);
 	cmd_el->set_param(1, index);
@@ -552,7 +552,7 @@ shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *ty
 }
 
 shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
-	shared<Node> cmd_el = new Node(NodeKind::DYNAMIC_ARRAY, 0, array->type->get_array_element(), false, index->token_id);
+	shared<Node> cmd_el = new Node(NodeKind::DYNAMIC_ARRAY, 0, array->type->get_array_element(), array->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, array);
 	cmd_el->set_param(1, index);
@@ -562,7 +562,7 @@ shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
 shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *type) {
 	if (!type)
 		type = array->type->param[0];
-	auto *el = new Node(NodeKind::ARRAY, 0, type, false, index->token_id);
+	auto *el = new Node(NodeKind::ARRAY, 0, type, array->flags, index->token_id);
 	el->set_num_params(2);
 	el->set_param(0, array);
 	el->set_param(1, index);

@@ -29,7 +29,7 @@ public:
 	bool memory_owner;
 	Flags flags;
 	bool is_extern() const;
-	bool is_const() const;
+	bool is_mutable() const;
 	bool explicitly_constructed;
 	int _label;
 };

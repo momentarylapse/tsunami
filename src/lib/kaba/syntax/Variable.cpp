@@ -37,8 +37,8 @@ string Variable::cname(const Class *ns, const Class *ns_obs) const {
 	return namespacify_rel(name, ns, ns_obs);
 }
 
-bool Variable::is_const() const {
-	return flags_has(flags, Flags::CONST);
+bool Variable::is_mutable() const {
+	return !flags_has(flags, Flags::CONST);
 }
 
 bool Variable::is_extern() const {

@@ -168,7 +168,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("return_type", TypeClassRef, &Function::literal_return_type);
 		class_add_func("is_static", TypeBool, &Function::is_static, Flags::PURE);
 		class_add_func("is_pure", TypeBool, &Function::is_pure, Flags::PURE);
-		class_add_func("is_const", TypeBool, &Function::is_const, Flags::PURE);
+		class_add_func("is_mutable", TypeBool, &Function::is_mutable, Flags::PURE);
 		class_add_func("is_extern", TypeBool, &Function::is_extern, Flags::PURE);
 		class_add_func("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
 		class_add_func("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
@@ -183,7 +183,7 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeVariable);
 		class_add_element("name", TypeString, &Variable::name);
 		class_add_element("type", TypeClassP, &Variable::type);
-		class_add_func("is_const", TypeBool, &Variable::is_const, Flags::PURE);
+		class_add_func("is_mutable", TypeBool, &Variable::is_mutable, Flags::PURE);
 		class_add_func("is_extern", TypeBool, &Variable::is_extern, Flags::PURE);
 		
 	add_class(TypeConstant);

@@ -135,6 +135,7 @@ public:
 	SyntaxTree *tree;
 	Function *cur_func;
 	ExpressionBuffer &Exp;
+	int next_asm_block = 0;
 
 	Concretifier con;
 	AutoImplementer auto_implementer;

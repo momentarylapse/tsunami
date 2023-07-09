@@ -1,8 +1,9 @@
 #include "../../base/base.h"
 #include "../../os/msg.h"
 #include "lexical.h"
-#include <stdio.h>
 #include "../syntax/SyntaxTree.h"
+#include "../Context.h"
+#include <stdio.h>
 
 namespace kaba {
 
@@ -316,7 +317,7 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 		if (source[pos] == '{')
 			break;
 		if ((source[pos] != ' ') and (source[pos] != '\t') and (source[pos] != '\n'))
-			syntax->do_error("'{' expected after 'asm'");
+			do_error_analyse("'{' expected after 'asm'", pos, line_no);
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -329,7 +330,7 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 		if (source[pos] == '}')
 			break;
 		if (source[pos] == 0)
-			syntax->do_error("'}' expected to end \"asm\"");
+			do_error_analyse("'}' expected to end \"asm\"", pos, line_no);
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -338,11 +339,17 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 	pos ++;
 
 	AsmBlock a;
+	static int next_asm_uuid = 0;
+	a.uuid = next_asm_uuid ++;
 	a.line = cur_line->physical_line;
 	a.block = strip_comments(string(&source[asm_start], asm_end - asm_start));
 	syntax->asm_blocks.add(a);
 
 	line_no += line_breaks;
+}
+
+void ExpressionBuffer::do_error_analyse(const string& msg, int pos, int line_no) {
+	throw Exception(msg, "?", line_no, pos, syntax->module);
 }
 
 // scan one line
@@ -398,7 +405,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 			if ((c == '\"') and (i > 0)) {
 				break;
 			} else if (c == 0) {
-				syntax->do_error("string exceeds file");
+				do_error_analyse("string exceeds file", pos, line_no);
 			} else if (c == '\n') {
 				line_no ++;
 				//syntax->DoError("string exceeds line");
@@ -409,7 +416,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 						for (int j=0; true; j++) {
 							c = Temp[TempLength ++] = source[pos ++];
 							if (c == 0)
-								syntax->do_error("string interpolation exceeds file");
+								do_error_analyse("string interpolation exceeds file", pos, line_no);
 							if ((c == '}') and (Temp[TempLength-2] == '}'))
 								break;
 						}
@@ -446,7 +453,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 		}
 		Temp[TempLength ++] = source[pos ++];
 		if (Temp[TempLength - 1] != '\'')
-			syntax->do_error("character constant should end with '''");
+			do_error_analyse("character constant should end with '''", pos, line_no);
 
 	// word
 	} else if (exp_kind == ExpKind::LETTER) {

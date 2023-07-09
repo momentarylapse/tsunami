@@ -278,7 +278,7 @@ void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Bloc
 			}break;
 		case StatementID::ASM:
 			//AddAsmBlock(list, script);
-			cmd.add_cmd(Asm::InstID::ASM);
+			cmd.add_cmd(Asm::InstID::ASM, param_imm(TypeInt, com->params[0]->as_const()->as_int()));
 			break;
 		case StatementID::PASS:
 			break;

@@ -468,7 +468,7 @@ shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, c
 
 	// operators
 	if (auto w = parser->which_abstract_operator(name, OperatorFlags::UNARY_RIGHT)) // negate/not...
-		return {new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown, token_id)};
+		return {new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown, Flags::NONE, token_id)};
 
 	// in include files (only global)...
 	links.append(get_existence_global(name, imported_symbols.get(), token_id));
@@ -699,7 +699,7 @@ shared<Node> SyntaxTree::conv_easyfy_shift_deref(shared<Node> c, int l) {
 			// unify 2 knots (remove 1)
 			c->show(TypeVoid);
 			auto kind = (c->kind == NodeKind::ADDRESS_SHIFT) ? NodeKind::DEREF_ADDRESS_SHIFT : NodeKind::POINTER_AS_ARRAY;
-			auto r = new Node(kind, 0, c->type, c->is_const);
+			auto r = new Node(kind, 0, c->type, c->flags);
 			r->set_param(0, c->params[0]->params[0]);
 			r->set_param(1, c->params[1]);
 			r->show(TypeVoid);
@@ -1249,7 +1249,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 	if (n->kind == NodeKind::CALL_FUNCTION) {
 		if (n->as_func()->inline_no != InlineID::NONE) {
-			auto r = new Node(NodeKind::CALL_INLINE, n->link_no, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_INLINE, n->link_no, n->type, n->flags);
 			r->params = n->params;
 			return r;
 		}
@@ -1257,11 +1257,11 @@ shared<Node> SyntaxTree::conv_func_inline(shared<Node> n) {
 	if (n->kind == NodeKind::OPERATOR) {
 		Operator *op = n->as_op();
 		if (op->f->inline_no != InlineID::NONE) {
-			auto r = new Node(NodeKind::CALL_INLINE, (int_p)op->f, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_INLINE, (int_p)op->f, n->type, n->flags);
 			r->params = n->params;
 			return r;
 		} else {
-			auto r = new Node(NodeKind::CALL_FUNCTION, (int_p)op->f, n->type, n->is_const);
+			auto r = new Node(NodeKind::CALL_FUNCTION, (int_p)op->f, n->type, n->flags);
 			r->params = n->params;
 			return r;
 		}

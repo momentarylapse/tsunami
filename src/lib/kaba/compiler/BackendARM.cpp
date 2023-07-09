@@ -896,7 +896,7 @@ void BackendARM::assemble() {
 		if (cmd.cmd[i].inst == Asm::InstID::LABEL) {
 			list->insert_location_label(cmd.cmd[i].p[0].p);
 		} else if (cmd.cmd[i].inst == Asm::InstID::ASM) {
-			do_error("asm block insert..."); //AddAsmBlock(list, script);
+			add_asm_block(cmd.cmd[i].p[0].p);
 		} else {
 			assemble_cmd_arm(cmd.cmd[i]);
 		}

@@ -24,10 +24,7 @@ Grid ? '' vertical
 		event("threshold", on_threshold)
 		event("blocking", on_blocking)
 		
-		c.subscribe(self, on_update, "changed")
-	
-	func override __delete__()
-		c.unsubscribe(self)
+		c.out_changed >> create_sink(on_update)
 	
 	func override update()
 		set_float("threshold", c.config.threshold)

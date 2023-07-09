@@ -124,12 +124,19 @@ public:
 template<class T>
 class ObservableKabaWrapper : public T {
 public:
+	obs::sink& create_sink_kaba(Callable<void()> *f) {
+		return this->create_sink([f] {
+			(*f)();
+		});
+	}
+#if 0
 	void _cdecl subscribe_kaba(hui::EventHandler *handler, Callable<void(VirtualBase*)> *f, const string &message) {
 		/*T::subscribe(handler, [f, handler] {
 			(*f)(handler);
 		}, message);*/
 		msg_error("X.subscribe() TODO in plugins");
 	}
+#endif
 };
 
 
@@ -176,6 +183,8 @@ void PluginManager::link_app_data() {
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
+
+	ext->link_class_func("obs.source.__rshift__", &obs::source::subscribe);
 
 	ext->declare_class_size("Clipboard", sizeof(Clipboard));
 	ext->declare_class_element("Clipboard.temp", &Clipboard::temp);
@@ -244,6 +253,11 @@ void PluginManager::link_app_data() {
 		ext->declare_class_element("Module.name", &Module::module_class);
 		ext->declare_class_element("Module.session", &Module::session);
 		ext->declare_class_element("Module.port_out", &Module::port_out);
+		ext->declare_class_element("Module.out_changed", &Module::out_changed);
+		ext->declare_class_element("Module.out_state_changed", &Module::out_state_changed);
+		ext->declare_class_element("Module.out_read_end_of_stream", &Module::out_read_end_of_stream);
+		ext->declare_class_element("Module.out_play_end_of_stream", &Module::out_play_end_of_stream);
+		ext->declare_class_element("Module.out_tick", &Module::out_tick);
 		ext->declare_class_element("Module." + kaba::Identifier::SHARED_COUNT, &Module::_pointer_ref_counter);
 		ext->link_class_func("Module.__init__", &Module::__init__);
 		ext->link_virtual("Module.__delete__", &Module::__delete__, &module);
@@ -258,7 +272,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("Module.config_from_any", &Module::config_from_any);
 		ext->link_virtual("Module.on_config", &Module::on_config, &module);
 		ext->link_virtual("Module.command", &Module::command, &module);
-		ext->link_class_func("Module.subscribe", &ObservableKabaWrapper<Module>::subscribe_kaba);
+		ext->link_class_func("Module.create_sink", &ObservableKabaWrapper<Module>::create_sink_kaba);
 		ext->link_class_func("Module.unsubscribe", &Module::unsubscribe);
 		ext->link_class_func("Module.copy", &Module::copy);
 		ext->link_class_func("Module.plug_in", &Module::_plug_in);
@@ -287,6 +301,7 @@ void PluginManager::link_app_data() {
 		ext->link_virtual("ConfigPanel.update", &ConfigPanel::update, &config_panel);
 		ext->link_virtual("ConfigPanel.set_large", &ConfigPanel::set_large, &config_panel);
 		ext->link_class_func("ConfigPanel.changed", &ConfigPanel::changed);
+		ext->link_class_func("ConfigPanel.create_sink", &ObservableKabaWrapper<ConfigPanel>::create_sink_kaba);
 		ext->declare_class_element("ConfigPanel.c", &ConfigPanel::c);
 		ConfigPanel::_hidden_parent_check_ = true;
 	}
@@ -727,7 +742,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("AudioView.cam", &AudioView::cam);
 	ext->declare_class_element("AudioView.sel", &AudioView::sel);
 	ext->declare_class_element("AudioView.mouse_wheel_speed", &AudioView::mouse_wheel_speed);
-	ext->link_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
+	//ext->link_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	ext->link_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
 	ext->link_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);
 	ext->link_class_func("AudioView.cur_vlayer", &AudioView::cur_vlayer);
@@ -739,7 +754,10 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Playback.renderer", &Playback::renderer);
 	ext->declare_class_element("Playback.signal_chain", &Playback::signal_chain);
 	ext->declare_class_element("Playback.output_stream", &Playback::output_stream);
-	ext->link_class_func("Playback.subscribe", &ObservableKabaWrapper<Playback>::subscribe_kaba);
+	ext->declare_class_element("Playback.out_changed", &Playback::out_changed);
+	ext->declare_class_element("Playback.out_state_changed", &Playback::out_state_changed);
+	ext->declare_class_element("Playback.out_tick", &Playback::out_tick);
+	//ext->link_class_func("Playback.create_sink", &ObservableKabaWrapper<Playback>::subscribe_kaba);
 	ext->link_class_func("Playback.unsubscribe", &Playback::unsubscribe);
 	ext->link_class_func("Playback.play", &Playback::play);
 	ext->link_class_func("Playback.is_active", &Playback::is_active);

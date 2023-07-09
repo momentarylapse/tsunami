@@ -19,6 +19,12 @@ let DEFAULT_SAMPLE_RATE = 44100
 
 let MAX_PITCH = 128
 
+class obs
+	class source
+		func extern __rshift__(s: sink)
+	
+	class sink
+
 struct Range
 	var offset, length: int
 	func extern start() -> int
@@ -94,6 +100,7 @@ class ConfigPanel extends Panel
 	func extern virtual mut update()
 	func extern virtual mut set_large(large: bool)
 	func extern changed()
+	func extern mut create_sink(f: void->void) -> obs.sink&
 	var c: Module&
 
 class Module extends Object as shared
@@ -124,6 +131,11 @@ class Module extends Object as shared
 	var name: string
 	var session: Session&
 	var port_out: owned![Port][]
+	var out_changed: obs.source
+	var out_state_changed: obs.source
+	var out_play_end_of_stream: obs.source
+	var out_read_end_of_stream: obs.source
+	var out_tick: obs.source
 	func extern __init__(type: Type, sub_type: string)
 	func extern override __delete__()
 	func extern mut reset_config()
@@ -132,7 +144,7 @@ class Module extends Object as shared
 	func extern virtual mut command(cmd: Command, param: int) -> int
 	func extern mut plug_in(in_port: int, source: Module*, out_port: int)
 	func extern mut unplug_in(in_port: int)
-	func extern mut subscribe(handler: Object, f: void->void, message: string)
+	func extern mut create_sink(f: void->void) -> obs.sink&
 	func extern mut unsubscribe(handler: Object)
 	func extern copy() -> xfer[Module]
 	
@@ -574,7 +586,6 @@ class AudioView extends Object
 	var sel: SongSelection
 	var cam: ViewPort
 	var mouse_wheel_speed: float
-	func extern mut subscribe(handler: Object, f: void->void, message: string)
 	func extern mut unsubscribe(handler: Object)
 	func extern mut optimize_view()
 	func extern cur_vlayer() -> Layer&
@@ -585,7 +596,9 @@ class Playback
 	var renderer: shared![SongRenderer]
 	var signal_chain: shared![SignalChain]
 	var output_stream: shared![AudioOutput]
-	func extern mut subscribe(handler: Object, f: void->void, message: string)
+	var out_changed: obs.source
+	var out_state_changed: obs.source
+	var out_tick: obs.source
 	func extern mut unsubscribe(handler: Object)
 	func extern mut prepare(r: Range, allow_loop: bool)
 	func extern mut play()

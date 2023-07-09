@@ -75,14 +75,14 @@ class MLVDialog extends hui.Dialog
 		event("hui:close", on_close)
 		
 		#session.playback.signal_chain.subscribe(self, on_preview_change, "changed")
-		session.playback.subscribe(self, on_preview_tick, "tick")
+#		session.playback.subscribe(self, on_preview_tick, "tick")
 		
 		mlp = new MultiLinePainter(session.song, colors)
 		
 		on_config_changed()
 	
 	func override __delete__()
-		session.playback.signal_chain.unsubscribe(self)
+		#session.playback.unsubscribe(self)
 	
 	func mut on_preview_change()
 	func mut on_preview_tick()
@@ -307,6 +307,7 @@ class MultiLineView extends TsunamiPlugin
 	func override on_start()
 		dlg = new MLVDialog(session.win, self)
 		for d in dlg
+			session.playback.out_tick >> create_sink(func() d.on_preview_tick())
 			d.show()
 		
 	func override on_stop()

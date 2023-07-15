@@ -1226,7 +1226,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// only extract explicit raw_function_pointer()
 		// skip implicit from callable...
 		if (n->params[0]->kind == NodeKind::CONSTANT) {
-			n->params[0]->as_const()->type = TypeFunctionCodeP;
+			n->params[0]->as_const()->type = TypeFunctionCodeRef;
 			return n->params[0];
 		}
 	}

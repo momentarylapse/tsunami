@@ -467,7 +467,7 @@ void BackendARM::correct_implement_commands() {
 			i --;
 		} else if (c.inst == Asm::InstID::CALL) {
 
-			if (c.p[1].type == TypeFunctionCodeP) {
+			if (c.p[1].type == TypeFunctionCodeRef) {
 				//do_error("indirect call...");
 				auto fp = c.p[1];
 				auto ret = c.p[0];

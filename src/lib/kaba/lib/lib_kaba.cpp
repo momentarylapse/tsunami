@@ -81,7 +81,7 @@ void SIAddPackageKaba(Context *c) {
 	auto TypeFunctionRef = add_type_ref(TypeFunction);
 	auto TypeFunctionRefList = add_type_list(TypeFunctionRef);
 	TypeFunctionCode = add_type  ("code", 32); // whatever
-	TypeFunctionCodeP = add_type_p_raw(TypeFunctionCode);
+	TypeFunctionCodeRef = add_type_ref(TypeFunctionCode);
 	TypeSpecialFunction = add_type  ("SpecialFunction", sizeof(SpecialFunction));
 	//TypeSpecialFunctionP = add_type_p(TypeSpecialFunction);
 	TypeSpecialFunctionRef = add_type_ref(TypeSpecialFunction);
@@ -175,7 +175,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("needs_overriding", TypeBool, &Function::needs_overriding, Flags::PURE);
 		class_add_element("virtual_index", TypeInt, &Function::virtual_index);
 		class_add_element("inline_index", TypeInt, &Function::inline_no);
-		class_add_element("code", TypeFunctionCodeP, &Function::address);
+		class_add_element("code", TypeFunctionCodeRef, &Function::address);
 		class_add_func(Identifier::Func::STR, TypeString, &FunctionX::repr, Flags::PURE);
 
 	//add_class(TypeFunctionP);

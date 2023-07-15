@@ -148,8 +148,16 @@ shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted)
 		return apply_type_cast(cast, node, wanted);
 	}
 
-	// explicit pointer cast
-	if (wanted->is_some_pointer() and type->is_some_pointer()) {
+// explicit pointer cast (we might restrict this later...)
+	if (wanted->is_pointer_raw() and type->is_some_pointer()) {
+		node->type = wanted;
+		return node;
+	}
+	if (is_same_kind_of_pointer(type, wanted)) {
+		node->type = wanted;
+		return node;
+	}
+	if (wanted->is_pointer_xfer() and type->is_reference()) {
 		node->type = wanted;
 		return node;
 	}
@@ -164,6 +172,9 @@ shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted)
 			return rrr[0];
 		}
 	}
+
+	if (wanted->is_reference() and type->is_pointer_raw())
+		do_error(format("can not cast raw pointer type '%s' to reference type '%s'", node->type->long_name(), wanted->long_name()), node);
 
 	do_error(format("can not cast expression of type '%s' to type '%s'", node->type->long_name(), wanted->long_name()), node);
 	return nullptr;

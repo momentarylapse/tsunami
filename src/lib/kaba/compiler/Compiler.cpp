@@ -467,7 +467,7 @@ void import_includes(Module *s) {
 
 void link_raw_function_pointers(Module *m) {
 	for (auto &c: m->constants())
-		if (c->type == TypeFunctionCodeP) {
+		if (c->type == TypeFunctionCodeRef) {
 			auto f = (Function*)(int_p)c->as_int64();
 			c->as_int64() = f->address;
 

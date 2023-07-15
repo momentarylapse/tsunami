@@ -41,10 +41,10 @@ void Serializer::add_virtual_function_call(Function *f, const Array<SerialNodePa
 
 	auto t1 = add_temp(TypePointer);
 	auto t2 = add_temp(TypePointer);
-	auto t3 = add_temp(TypeFunctionCodeP);
+	auto t3 = add_temp(TypeFunctionCodeRef);
 	cmd.add_cmd(Asm::InstID::MOV, t1, params[0]); // self
 	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt, config.target.pointer_size * f->virtual_index)); // vtable + n
-	cmd.add_cmd(Asm::InstID::MOV, t3, deref_temp(t2, TypeFunctionCodeP)); // vtable[n]
+	cmd.add_cmd(Asm::InstID::MOV, t3, deref_temp(t2, TypeFunctionCodeRef)); // vtable[n]
 	cmd.add_cmd(Asm::InstID::CALL_MEMBER, ret, t3); // the actual call
 }
 
@@ -289,7 +289,7 @@ void Serializer::serialize_statement(Node *com, const SerialNodeParam &ret, Bloc
 			auto func = serialize_parameter(com->params[0].get(), block, index);
 			auto t1 = add_temp(TypePointer);
 			cmd.add_cmd(Asm::InstID::ADD, t1, func, param_imm(TypeInt, config.function_address_offset)); // Function* pointer
-			cmd.add_cmd(Asm::InstID::MOV, ret, deref_temp(t1, TypeFunctionCodeP)); // the actual call
+			cmd.add_cmd(Asm::InstID::MOV, ret, deref_temp(t1, TypeFunctionCodeRef)); // the actual call
 			}break;
 		default:
 			do_error("statement unimplemented: " + com->as_statement()->name);

@@ -78,7 +78,7 @@ void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
 
 	// contains a Function* pointer, extract its raw pointer
 	auto raw = add_node_statement(StatementID::RAW_FUNCTION_POINTER);
-	raw->type = TypeFunctionCodeP;
+	raw->type = TypeFunctionCodeRef;
 	raw->set_param(0, get_callable_fp(t, self));
 
 	// call its raw pointer

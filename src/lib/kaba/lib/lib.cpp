@@ -98,7 +98,7 @@ const Class *TypeClassP;
 const Class *TypeFunction;
 const Class *TypeFunctionP;
 const Class *TypeFunctionCode;
-const Class *TypeFunctionCodeP;
+const Class *TypeFunctionCodeRef;
 const Class *TypeSpecialFunction;
 const Class *TypeSpecialFunctionRef;
 

@@ -1054,10 +1054,11 @@ shared<Node> Concretifier::concretify_statement_raw_function_pointer(shared<Node
 	auto sub = concretify_node(node->params[0], block, block->name_space());
 	if (sub->kind != NodeKind::FUNCTION)
 		do_error("raw_function_pointer() expects a function name", sub);
-	auto func = add_node_const(tree->add_constant(TypeFunctionCodeP), node->token_id);
+	auto func = add_node_const(tree->add_constant(TypeFunctionCodeRef), node->token_id);
 	func->as_const()->as_int64() = (int_p)sub->as_func(); // will be replaced during linking
 
-	node->type = TypeFunctionCodeP;
+	node = node->shallow_copy();
+	node->type = TypeFunctionCodeRef;
 	node->set_param(0, func);
 	return node;
 }

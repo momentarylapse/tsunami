@@ -659,9 +659,9 @@ class SignalChain extends Module
 	func extern override mut reset_state()
 	func extern mut add_basic(type: Module.Type, name: string) -> shared![Module]
 	func mut add_basic_as[M](type: Module.Type, name: string) -> shared![M]
-		return weak(add_basic(type, name)) as xfer[M]
+		return add_basic(type, name) as shared![M]
 	func mut add_basic_as_syn(type: Module.Type, name: string) -> shared![Synthesizer]
-		return weak(add_basic(type, name)) as xfer[Synthesizer]
+		return add_basic(type, name) as shared![Synthesizer]
 	func extern mut _add(type: kaba.Class*) -> shared![Module]
 	func mut add[M]() -> shared![M]
 		return weak(_add(M)) as xfer[M]

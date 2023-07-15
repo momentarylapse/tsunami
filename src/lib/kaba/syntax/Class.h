@@ -183,7 +183,7 @@ extern const Class *TypeClassP;
 extern const Class *TypeFunction;
 extern const Class *TypeFunctionP;
 extern const Class *TypeFunctionCode;
-extern const Class *TypeFunctionCodeP;
+extern const Class *TypeFunctionCodeRef;
 
 };
 

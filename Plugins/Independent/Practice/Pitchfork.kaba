@@ -16,7 +16,3 @@ class PitchFork extends TsunamiPlugin
 	
 	func override create_panel() -> xfer[ConfigPanel]
 		return source.create_panel()
-
-	func override on_stop()
-		session.remove_signal_chain(weak(chain))
-		chain = nil

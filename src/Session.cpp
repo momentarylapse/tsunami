@@ -144,15 +144,27 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 	return p;
 }
 
+void session_clean_up_unused_signal_chains(Session* s) {
+	auto chains = weak(s->all_signal_chains);
+	for (auto c: chains)
+		if (c->_pointer_ref_counter == 1)
+			s->remove_signal_chain(c);
+}
+
+void session_destroy_plugin(Session* s, TsunamiPlugin *p) {
+	s->last_plugin = p;
+	s->out_remove_plugin.notify();
+	p->on_stop();
+	foreachi (auto *pp, weak(s->plugins), i)
+		if (p == pp)
+			s->plugins.erase(i);
+
+	session_clean_up_unused_signal_chains(s);
+}
 
 void Session::on_plugin_stop_request(TsunamiPlugin *p) {
-	hui::run_later(0.001f, [this,p]{
-		last_plugin = p;
-		out_remove_plugin.notify();
-		p->on_stop();
-		foreachi (auto *pp, weak(plugins), i)
-			if (p == pp)
-				plugins.erase(i);
+	hui::run_later(0.001f, [this,p] {
+		session_destroy_plugin(this, p);
 	});
 
 	/*tpl->stop();

@@ -249,6 +249,3 @@ class Metronome extends TsunamiPlugin
 
 	func override create_panel() -> xfer[ConfigPanel]
 		return new MetronomePanel(session, source, chain, self)
-		
-	func override on_stop()
-		chain = nil

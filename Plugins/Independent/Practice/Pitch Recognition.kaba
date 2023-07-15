@@ -73,7 +73,6 @@ class PitchRecognition extends TsunamiPlugin
 	
 	var chain: shared![SignalChain]
 	var pitch_detector: shared![PitchDetector]
-	#var panel: PitchRecognitionPanel*
 	
 	func override on_start()
 		chain = session.create_signal_chain("pitch-recognition")
@@ -84,9 +83,6 @@ class PitchRecognition extends TsunamiPlugin
 		chain.connect(pitch_detector, 0, out, 0)
 		
 		chain.start()
-		
-	func override on_stop()
-		chain = nil
 	
 	func override mut create_panel() -> xfer[ConfigPanel]
 		return new PitchRecognitionPanel(self)

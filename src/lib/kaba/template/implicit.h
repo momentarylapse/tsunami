@@ -36,6 +36,7 @@ public:
 	void _add_missing_function_headers_for_shared(Class *t);
 	void _add_missing_function_headers_for_owned(Class *t);
 	void _add_missing_function_headers_for_xfer(Class *t);
+	void _add_missing_function_headers_for_alias(Class *t);
 	void _add_missing_function_headers_for_callable_fp(Class *t);
 	void _add_missing_function_headers_for_callable_bind(Class *t);
 
@@ -95,6 +96,7 @@ public:
 	void _implement_functions_for_shared(const Class *t);
 	void _implement_functions_for_owned(const Class *t);
 	void _implement_functions_for_xfer(const Class *t);
+	void _implement_functions_for_alias(const Class *t);
 	void _implement_functions_for_callable_fp(const Class *t);
 	void _implement_functions_for_callable_bind(const Class *t);
 	void _implement_functions_for_regular(const Class *t);

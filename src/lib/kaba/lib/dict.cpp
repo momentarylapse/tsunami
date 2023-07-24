@@ -13,6 +13,7 @@ extern const Class *TypeDictBase;
 extern const Class *TypeIntDict;
 extern const Class *TypeFloatDict;
 extern const Class *TypeStringDict;
+extern const Class *TypeStringList;
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
@@ -52,6 +53,13 @@ public:
 };
 #pragma GCC pop_options
 
+Array<string> dict_get_keys(const DynamicArray& a) {
+	Array<string> keys;
+	for (int i=0; i<a.num; i++)
+		keys.add(*(string*)((char*)a.data + i * a.element_size));
+	return keys;
+}
+
 void lib_make_dict(Class *t, SyntaxTree *ps) {
 	const Class *p = t->param[0];
 	t->derive_from(TypeDictBase, DeriveFlags::SET_SIZE);
@@ -74,6 +82,8 @@ void lib_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_func(Identifier::Func::GET, p, &IntDict::get_int, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 //		class_add_func(Identifier::Func::STR, TypeString, &IntDict::str, Flags::PURE);
+		class_add_func(Identifier::Func::CONTAINS, TypeBool, &XDict<int>::contains);
+			func_add_param("key", TypeString);
 	} else if (p == TypeFloat32) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<float>::__init__);
 		class_add_func(Identifier::Func::SET, TypeVoid, &FloatDict::set_float);
@@ -82,6 +92,8 @@ void lib_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_func(Identifier::Func::GET, p, &FloatDict::get_float, Flags::RAISES_EXCEPTIONS);
 			func_add_param("key", TypeString);
 //		class_add_func(Identifier::Func::STR, TypeString, &FloatDict::str, Flags::PURE);
+		class_add_func(Identifier::Func::CONTAINS, TypeBool, &XDict<float>::contains);
+			func_add_param("key", TypeString);
 	} else if (p == TypeString) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<string>::__init__);
 		class_add_func(Identifier::Func::SET, TypeVoid, &base::map<string,string>::set);
@@ -94,7 +106,11 @@ void lib_make_dict(Class *t, SyntaxTree *ps) {
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &StringDict::assign);
 			func_add_param("other", t);
 //		class_add_func(Identifier::Func::STR, TypeString, &StringDict::str, Flags::PURE);
+		class_add_func(Identifier::Func::CONTAINS, TypeBool, &XDict<string>::contains);
+			func_add_param("key", TypeString);
 	}
+
+	class_add_func("keys", TypeStringList, &dict_get_keys, Flags::PURE);
 }
 
 

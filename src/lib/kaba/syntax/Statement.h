@@ -39,7 +39,8 @@ enum class StatementID {
 	VAR,
 	LAMBDA,
 	FUNC,
-	RAW_FUNCTION_POINTER
+	RAW_FUNCTION_POINTER,
+	TRUST_ME
 };
 
 class Statement {

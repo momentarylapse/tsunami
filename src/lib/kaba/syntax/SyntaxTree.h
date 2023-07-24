@@ -62,6 +62,7 @@ public:
 	const Class *request_implicit_class_owned(const Class *parent, int token_id);
 	const Class *request_implicit_class_owned_not_null(const Class *parent, int token_id);
 	const Class *request_implicit_class_xfer(const Class *parent, int token_id);
+	const Class *request_implicit_class_alias(const Class *parent, int token_id);
 	const Class *request_implicit_class_reference(const Class *base, int token_id);
 	const Class *request_implicit_class_list(const Class *element_type, int token_id);
 	const Class *request_implicit_class_array(const Class *element_type, int num_elements, int token_id);

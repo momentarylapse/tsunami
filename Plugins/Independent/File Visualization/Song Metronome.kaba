@@ -182,13 +182,13 @@ Grid ? '' vertical
 		for t in metro.session.song.time_track()
 			draw_part_info_x(p, cur_bar_index, t)
 			
-	func draw_part_info_x(p: Painter, cur_bar_index: int, t: Track&)
+	func draw_part_info_x(p: Painter, cur_bar_index: int, t: Track)
 		var w: float = p.width
 		var h: float = p.height
 		var song = metro.session.song
 		
 		var cur_bar = weak(song.bars[cur_bar_index])
-		var next_bar: Bar* = nil
+		var next_bar = nil as Bar*
 		if cur_bar_index + 1 < len(song.bars)
 			next_bar = weak(song.bars[cur_bar_index + 1])
 		
@@ -200,7 +200,7 @@ Grid ? '' vertical
 		p.set_font_size(fs)
 		for cp in cur_part
 			p.draw_str([10, 5], cp.text)
-			var first_bar = bar_index(weak(song), cp.range.offset + DELTA)
+			var first_bar = bar_index(song, cp.range.offset + DELTA)
 			p.draw_str([w - 5 - fs*3, 5], str((cur_bar.index - first_bar) + 2))
 	
 		var change: string
@@ -253,7 +253,7 @@ Grid ? '' vertical
 #		#show_control()
 
 
-func bar_index(song: Song&, offset: int) -> int
+func bar_index(song: Song, offset: int) -> int
 	for i=>b in song.bars
 		if b.offset >= offset
 			return i

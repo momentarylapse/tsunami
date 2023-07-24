@@ -73,6 +73,11 @@ void AutoImplementer::_add_missing_function_headers_for_xfer(Class *t) {
 	assign->inline_no = InlineID::POINTER_ASSIGN;
 }
 
+void AutoImplementer::_add_missing_function_headers_for_alias(Class *t) {
+	auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+	assign->inline_no = InlineID::POINTER_ASSIGN;
+}
+
 void AutoImplementer::implement_shared_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
@@ -378,6 +383,9 @@ void AutoImplementer::_implement_functions_for_owned(const Class *t) {
 }
 
 void AutoImplementer::_implement_functions_for_xfer(const Class *t) {
+}
+
+void AutoImplementer::_implement_functions_for_alias(const Class *t) {
 }
 
 

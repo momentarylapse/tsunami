@@ -36,6 +36,14 @@ void Block::set(int index, shared<Node> c) {
 	params[index] = c;
 }
 
+bool Block::is_trust_me() const {
+	if (flags_has(flags, Flags::TRUST_ME))
+		return true;
+	if (parent)
+		return parent->is_trust_me();
+	return false;
+}
+
 Variable *Block::add_var(const string &name, const Class *type, Flags flags) {
 	return insert_var(function->var.num, name, type, flags);
 }

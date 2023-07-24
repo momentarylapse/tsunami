@@ -442,13 +442,11 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	}
 
 	// get parameters from stack
-	foreachb([[maybe_unused]] Variable *p, stack_param) {
-		// variables are already where expect them ([rbp+...])
-		if (config.target.abi != Abi::AMD64_WINDOWS)
-			do_error("func with stack...");
-		/*int s = 8;
-		add_cmd(Asm::inst_push, p);
-		push_size += s;*/
+	foreachib([[maybe_unused]] Variable *p, stack_param, i) {
+		// windows: variables are already where we expect them ([rbp+...])
+
+		if (config.target.abi == Abi::AMD64_GNU)
+			insert_cmd(Asm::InstID::MOV, param_local(p->type, p->_offset), param_local(p->type, 16 + i * 8));
 	}
 }
 

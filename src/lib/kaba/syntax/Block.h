@@ -26,6 +26,7 @@ public:
 	int level;
 	void add(shared<Node> c);
 	void set(int index, shared<Node> c);
+	bool is_trust_me() const;
 
 	const Class *name_space() const;
 

@@ -8,6 +8,8 @@
 #include "path.h"
 #include "filesystem.h"
 
+#include "msg.h"
+
 //const string SEPARATOR = "/";
 //const string SEPARATOR_OTHER = "\\";
 // const version creates badly compiled code...
@@ -136,6 +138,8 @@ bool Path::is_absolute() const {
 }
 
 bool Path::is_in(const Path &p) const {
+	if (p.is_empty())
+		return !is_empty();
 	string dir = p.canonical().as_dir().s;
 	return s.head(dir.num) == dir;
 }
@@ -201,6 +205,8 @@ Path Path::root() const {
 }
 
 Path Path::relative_to(const Path &p) const {
+	if (p.is_empty())
+		return *this;
 	string dir = p.canonical().as_dir().s;
 	string me = canonical().s;
 	if (me.head(dir.num) != dir)

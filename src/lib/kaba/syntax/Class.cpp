@@ -134,13 +134,15 @@ bool Class::is_some_pointer() const {
 			or type == Type::POINTER_OWNED
 			or type == Type::POINTER_OWNED_NOT_NULL
 			or type == Type::REFERENCE
-			or type == Type::POINTER_XFER;
+			or type == Type::POINTER_XFER
+			or type == Type::POINTER_ALIAS;
 }
 
 bool Class::is_some_pointer_not_null() const {
 	return type == Type::POINTER_SHARED_NOT_NULL
 			or type == Type::POINTER_OWNED_NOT_NULL
-			or type == Type::REFERENCE;
+			or type == Type::REFERENCE
+			or type == Type::POINTER_ALIAS;
 }
 
 bool Class::is_pointer_raw() const {
@@ -165,6 +167,10 @@ bool Class::is_pointer_owned_not_null() const {
 
 bool Class::is_pointer_xfer() const {
 	return type == Type::POINTER_XFER;
+}
+
+bool Class::is_pointer_alias() const {
+	return type == Type::POINTER_ALIAS;
 }
 
 bool Class::is_reference() const {
@@ -206,13 +212,13 @@ bool Class::is_callable_bind() const {
 }
 
 bool Class::uses_call_by_reference() const {
-	return (!force_call_by_value() and !is_pointer_raw() and !is_reference()) or is_array() or is_optional();
+	return (!force_call_by_value() and !is_pointer_raw() and !is_reference() and !is_pointer_alias()) or is_array() or is_optional();
 }
 
 bool Class::uses_return_by_memory() const {
 	if (_amd64_allow_pass_in_xmm())
 		return false;
-	return (!force_call_by_value() and !is_pointer_raw() and !is_reference()) or is_array() or is_optional();
+	return (!force_call_by_value() and !is_pointer_raw() and !is_reference() and !is_pointer_alias()) or is_array() or is_optional();
 }
 
 

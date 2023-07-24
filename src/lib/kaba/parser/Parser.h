@@ -126,6 +126,7 @@ public:
 	shared<Node> parse_abstract_statement_var(Block *block);
 	shared<Node> parse_abstract_statement_lambda(Block *block);
 	shared<Node> parse_abstract_statement_raw_function_pointer(Block *block);
+	shared<Node> parse_abstract_statement_trust_me(Block *block);
 
 
 	shared<Node> parse_abstract_special_function(Block *block, SpecialFunction *s);

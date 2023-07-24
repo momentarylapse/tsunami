@@ -152,7 +152,7 @@ shared<Node> Concretifier::link_special_operator_is(shared<Node> param1, shared<
 
 shared<Node> Concretifier::link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id) {
 	param2 = force_concrete_type(param2);
-	param1 = deref_if_reference(param1);
+	//param1 = deref_if_reference(param1);
 	auto *f = param2->type->get_member_func(Identifier::Func::CONTAINS, TypeBool, {param1->type});
 	if (!f)
 		do_error(format("no 'bool %s.%s(%s)' found", param2->type->long_name(), Identifier::Func::CONTAINS, param1->type->long_name()), token_id);
@@ -535,7 +535,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// auto deref?
 	operand = deref_if_reference(operand);
-	index = deref_if_reference(index);
+	//index = deref_if_reference(index);
 
 	if (operand->type->is_pointer_raw())
 		do_error(format("using pointer type '%s' as an array (like in C) is deprecated", operand->type->long_name()), index);
@@ -543,7 +543,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 	// __subarray__() ?
 	if (index2) {
-		index2 = deref_if_reference(index2);
+		//index2 = deref_if_reference(index2);
 		auto *cf = operand->type->get_member_func(Identifier::Func::SUBARRAY, operand->type, {index->type, index->type});
 		if (cf) {
 			auto f = add_node_member_call(cf, operand, operand->token_id);
@@ -708,17 +708,17 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> 
 	auto block_x = new Block(block->function, block);
 
 	auto t_out = TypeVoid;
-	if (t0->is_pointer_shared())
+	/*if (t0->is_pointer_shared())
 		// TODO would be nice to simply have an alias here!
 		// ...add temp var fist, then delete and remap inside the block_x?
 		t_out = tree->request_implicit_class_shared_not_null(t0->param[0], node->token_id);
-	else
-		t_out = tree->request_implicit_class_reference(t0->param[0], node->token_id);
+	else*/
+		t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
 	auto *var = block_x->add_var(var_name, t_out);
-	if (t0->is_pointer_shared())
+	/*if (t0->is_pointer_shared())
 		block_x->add(parser->con.link_operator_id(OperatorID::ASSIGN, add_node_local(var), expr->change_type(t_out)));
-	else
+	else*/
 		block_x->add(add_node_operator_by_inline(InlineID::POINTER_ASSIGN, add_node_local(var), expr->change_type(t_out)));
 
 	auto n_if = add_node_statement(StatementID::IF, node->token_id);
@@ -744,7 +744,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_optional(shared<Node>
 
 	auto block_x = new Block(block->function, block);
 
-	auto t_out = tree->request_implicit_class_reference(t0->param[0], node->token_id);
+	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
 	auto *var = block_x->add_var(var_name, t_out);
 	auto assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, add_node_local(var), expr->ref_raw(t_out));
@@ -825,7 +825,7 @@ shared<Node> Concretifier::concretify_statement_for_container(shared<Node> node,
 	// [VAR, INDEX, ARRAY, BLOCK]
 
 	auto container = force_concrete_type(concretify_node(node->params[2], block, ns));
-	container = deref_if_reference(container);
+	//container = deref_if_reference(container);
 	auto t_c = container->type;
 	if (t_c->is_pointer_shared() or t_c->is_pointer_shared_not_null() or t_c->is_pointer_owned() or t_c->is_pointer_owned_not_null() or t_c->is_pointer_raw())
 		// "*_not_null" only for convenience
@@ -843,7 +843,7 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	node->params[2] = container;
 
 	auto var_name = node->params[0]->as_token();
-	auto var_type = tree->request_implicit_class_reference(container->type->get_array_element(), node->params[0]->token_id);
+	auto var_type = tree->request_implicit_class_alias(container->type->get_array_element(), node->params[0]->token_id);
 	auto var = block->add_var(var_name, var_type);
 	if (!container->is_mutable())
 		flags_set(var->flags, Flags::CONST);
@@ -961,7 +961,7 @@ shared<Node> Concretifier::concretify_statement_delete(shared<Node> node, Block 
 		do_error("clear missing...", p);
 	}
 
-	p = deref_if_reference(p);
+	//p = deref_if_reference(p);
 
 	// override del operator?
 	if (auto f = p->type->get_member_func(Identifier::Func::DELETE_OVERRIDE, TypeVoid, {}))
@@ -1471,10 +1471,6 @@ shared<Node> Concretifier::concretify_array_builder_for(shared<Node> node, Block
 shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for, shared<Node> n_exp, shared<Node> n_cmp, const Class *type_el, Block *block, const Class *ns, int token_id) {
 	// OUT: [FOR, VAR]
 
-	// FIXME already feed the correct type here
-	if (type_el->is_reference())
-		type_el = type_el->param[0];
-
 	// create an array
 	auto array_type = tree->request_implicit_class_list(type_el, token_id);
 	auto array_var = block->add_var(block->function->create_slightly_hidden_name(), array_type);
@@ -1533,9 +1529,14 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		return concretify_operator(node, block, ns);
 	} else if (node->kind == NodeKind::DEREFERENCE) {
 		concretify_all_params(node, block, ns);
-		auto sub = deref_if_reference(node->params[0]);
-		if (!sub->type->is_pointer_raw()) // and !sub->type->is_reference())
-			do_error("only raw pointers can be dereferenced using '*'", node);
+		auto sub = node->params[0];//deref_if_reference(node->params[0]);
+		if (block->is_trust_me()) {
+			if (!sub->type->is_some_pointer())
+				do_error("only pointers can be dereferenced using '*' inside 'trust_me'", node);
+		} else {
+			if (!sub->type->is_some_pointer_not_null()) //   is_pointer_raw()) // and !sub->type->is_reference())
+				do_error("only not-null pointers (references, shared![X], owned![X]) can be dereferenced using '*'", node);
+		}
 		node->type = sub->type->param[0];
 	} else if (node->kind == NodeKind::REFERENCE_RAW) {
 		concretify_all_params(node, block, ns);

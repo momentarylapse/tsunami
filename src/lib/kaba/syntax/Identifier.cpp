@@ -49,7 +49,9 @@ namespace Identifier {
 	const string SHARED = "shared";
 	const string OWNED = "owned";
 	const string XFER = "xfer";
+	const string ALIAS = "@alias";
 	const string RAW_POINTER = "ptr";
+	const string TRUST_ME = "trust_me";
 	const string PURE = "pure";
 	const string NOAUTO = "@noauto";
 	const string NOFRAME = "@noframe";

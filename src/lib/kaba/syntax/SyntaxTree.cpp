@@ -429,8 +429,12 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	Function *f = block->function;
 
 	// first test local variables
-	if (auto *v = block->get_var(name))
-		return {add_node_local(v, token_id)};
+	if (auto *v = block->get_var(name)) {
+		if (v->type->is_pointer_alias())
+			return {add_node_local(v, token_id)->deref()};
+		else
+			return {add_node_local(v, token_id)};
+	}
 
 	// self.x?
 	if (f->is_member()) {
@@ -586,6 +590,12 @@ const Class *SyntaxTree::request_implicit_class_xfer(const Class *base, int toke
 	if (!base->name_space)
 		do_error("xfer[..] not allowed for: " + base->long_name(), token_id);
 	return request_implicit_class(format("%s[%s]", Identifier::XFER, base->name), Class::Type::POINTER_XFER, config.target.pointer_size, 0, nullptr, {base}, token_id);
+}
+
+const Class *SyntaxTree::request_implicit_class_alias(const Class *base, int token_id) {
+	if (!base->name_space)
+		do_error("@alias[..] not allowed for: " + base->long_name(), token_id);
+	return request_implicit_class(format("%s[%s]", Identifier::ALIAS, base->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, 0, nullptr, {base}, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_reference(const Class *base, int token_id) {

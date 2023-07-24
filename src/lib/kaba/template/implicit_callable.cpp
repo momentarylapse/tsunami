@@ -66,7 +66,7 @@ void AutoImplementer::implement_callable_constructor(Function *f, const Class *t
 		if (e.name.head(7) == "capture") {
 			auto n_p = add_node_local(f->__get_var(DUMMY_PARAMS[i_capture ++]));
 			auto fp = self->shift(e.offset, e.type);
-			f->block->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"), fp, n_p));
+			f->block->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), e.name), fp, n_p));
 		}
 }
 

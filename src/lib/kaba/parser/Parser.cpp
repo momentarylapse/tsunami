@@ -1328,6 +1328,23 @@ shared<Node> Parser::parse_abstract_statement_raw_function_pointer(Block *block)
 	return node;
 }
 
+shared<Node> Parser::parse_abstract_statement_trust_me(Block *block) {
+	[[maybe_unused]] int token0 = Exp.consume_token(); // "trust_me"
+	/*auto node = add_node_statement(StatementID::TRUST_ME, token0, TypeUnknown);
+	// ...block
+	expect_new_line_with_indent();
+	Exp.next_line();
+	node->set_param(0, parse_abstract_block(block));
+	flags_set(node->flags, Flags::TRUST_ME);
+	return node;*/
+
+	expect_new_line_with_indent();
+	Exp.next_line();
+	auto b = parse_abstract_block(block);
+	flags_set(b->flags, Flags::TRUST_ME);
+	return b;
+}
+
 shared<Node> Parser::parse_abstract_statement(Block *block) {
 	if (Exp.cur == Identifier::FOR) {
 		return parse_abstract_statement_for(block);
@@ -1360,6 +1377,8 @@ shared<Node> Parser::parse_abstract_statement(Block *block) {
 		return parse_abstract_statement_lambda(block);
 	} else if (Exp.cur == Identifier::RAW_FUNCTION_POINTER) {
 		return parse_abstract_statement_raw_function_pointer(block);
+	} else if (Exp.cur == Identifier::TRUST_ME) {
+		return parse_abstract_statement_trust_me(block);
 	}
 	do_error_exp("unhandled statement: " + Exp.cur);
 	return nullptr;

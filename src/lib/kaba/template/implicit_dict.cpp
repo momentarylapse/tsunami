@@ -18,6 +18,7 @@ void AutoImplementer::_add_missing_function_headers_for_dict(Class *t) {
 	add_func_header(t, "add", TypeVoid, {TypeString, t->param[0]}, {"key", "x"});
 	add_func_header(t, Identifier::Func::GET, t->param[0], {TypeString}, {"key"});
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+	add_func_header(t, Identifier::Func::CONTAINS, TypeBool, {t}, {"key"});
 }
 
 void AutoImplementer::implement_dict_constructor(Function *f, const Class *t) {

@@ -877,7 +877,7 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator*=));
 	
 	add_class(TypeAny);
-		class_add_element("type", TypeClassP, &Any::_class);
+		class_add_element("type", TypeClassRef, &Any::_class);
 		class_add_element("data", TypePointer, &Any::data);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &Any::__init__);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &Any::__delete__);
@@ -910,7 +910,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func(Identifier::Func::REPR, TypeString, &Any::repr, Flags::PURE);
 		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
 			func_add_param("var", TypeReference);
-			func_add_param("type", TypeClassP);
+			func_add_param("type", TypeClassRef);
 		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
 		add_operator(OperatorID::ADDS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_add);// operator+=);

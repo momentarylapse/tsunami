@@ -1022,7 +1022,7 @@ shared<Node> SyntaxTree::conv_fake_constructors(shared<Node> n) {
 
 shared<Node> SyntaxTree::conv_class_and_func_to_const(shared<Node> n) {
 	if (n->kind == NodeKind::CLASS) {
-		return add_node_const(add_constant_pointer(TypeClassP, n->as_class()));
+		return add_node_const(add_constant_pointer(TypeClassRef, n->as_class()));
 	}
 	if (n->kind == NodeKind::SPECIAL_FUNCTION_NAME) {
 		return add_node_const(add_constant_pointer(TypeSpecialFunctionRef, n->as_special_function()));
@@ -1247,7 +1247,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		for (int i=0; i<f->num_params; i++)
 			if (f->literal_param_type[i] == TypeDynamic) {
 				msg_error("conv dyn!");
-				auto c = add_constant(TypeClassP);
+				auto c = add_constant(TypeClassRef);
 				c->as_int64() = (int64)(int_p)n->params[i]->type;
 				n->params.insert(add_node_const(c), i+1);
 				n->show(base_class);

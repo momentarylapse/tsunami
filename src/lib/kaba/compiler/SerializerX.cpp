@@ -31,7 +31,7 @@ void Serializer::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 	call_used = true;
 	[[maybe_unused]] int push_size = function_call_push_params(f, params, ret);
 
-	SerialNodeParam fp = {NodeKind::FUNCTION, (int_p)f, -1, TypeFunctionP, 0};
+	SerialNodeParam fp = {NodeKind::FUNCTION, (int_p)f, -1, TypeFunctionRef, 0};
 	cmd.add_cmd(Asm::InstID::CALL, ret, fp); // the actual call
 }
 

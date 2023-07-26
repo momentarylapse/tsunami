@@ -94,9 +94,9 @@ const Class *TypeExceptionXfer;
 const Class *TypeNoValueError;
 
 const Class *TypeClass;
-const Class *TypeClassP;
+const Class *TypeClassRef;
 const Class *TypeFunction;
-const Class *TypeFunctionP;
+const Class *TypeFunctionRef;
 const Class *TypeFunctionCode;
 const Class *TypeFunctionCodeRef;
 const Class *TypeSpecialFunction;

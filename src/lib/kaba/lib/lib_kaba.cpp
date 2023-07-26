@@ -71,14 +71,14 @@ void SIAddPackageKaba(Context *c) {
 
 
 	TypeClass = add_type  ("Class", sizeof(Class));
-	TypeClassP = add_type_p_raw(TypeClass);
-	auto TypeClassRef = add_type_ref(TypeClass);
+	auto TypeClassP = add_type_p_raw(TypeClass);
+	TypeClassRef = add_type_ref(TypeClass);
 	auto TypeClassPList = add_type_list(TypeClassP);
 	auto TypeClassRefList = add_type_list(TypeClassRef);
 
 	TypeFunction = add_type  ("Function", sizeof(Function));
-	TypeFunctionP = add_type_p_raw(TypeFunction);
-	auto TypeFunctionRef = add_type_ref(TypeFunction);
+	auto TypeFunctionP = add_type_p_raw(TypeFunction);
+	TypeFunctionRef = add_type_ref(TypeFunction);
 	auto TypeFunctionRefList = add_type_list(TypeFunctionRef);
 	TypeFunctionCode = add_type  ("code", 32); // whatever
 	TypeFunctionCodeRef = add_type_ref(TypeFunctionCode);
@@ -117,7 +117,7 @@ void SIAddPackageKaba(Context *c) {
 	
 	add_class(TypeClassElement);
 		class_add_element("name", TypeString, &ClassElement::name);
-		class_add_element("type", TypeClassP, &ClassElement::type);
+		class_add_element("type", TypeClassRef, &ClassElement::type);
 		class_add_element("offset", TypeInt, &ClassElement::offset);
 
 
@@ -135,7 +135,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("static_variables", TypeVariableRefList, &Class::static_variables);
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, &Class::_pointer_ref_counter);
 		class_add_func("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
-			func_add_param("c", TypeClassP);
+			func_add_param("c", TypeClassRef);
 		class_add_func("is_pointer_raw", TypeBool, &Class::is_pointer_raw, Flags::PURE);
 		class_add_func("is_some_pointer", TypeBool, &Class::is_some_pointer, Flags::PURE);
 		class_add_func("is_some_pointer_not_null", TypeBool, &Class::is_some_pointer_not_null, Flags::PURE);
@@ -151,8 +151,8 @@ void SIAddPackageKaba(Context *c) {
 			func_add_param("ns", TypeClassP);
 		class_add_func(Identifier::Func::STR, TypeString, &ClassX::repr, Flags::PURE);
 
-	add_class(TypeClassP);
-		class_add_func(Identifier::Func::STR, TypeString, &class_repr, Flags::PURE);
+//	add_class(TypeClassRef);
+//		class_add_func(Identifier::Func::STR, TypeString, &class_repr, Flags::PURE);
 
 	add_class(TypeFunction);
 		class_add_element("name", TypeString, &Function::name);
@@ -182,13 +182,13 @@ void SIAddPackageKaba(Context *c) {
 
 	add_class(TypeVariable);
 		class_add_element("name", TypeString, &Variable::name);
-		class_add_element("type", TypeClassP, &Variable::type);
+		class_add_element("type", TypeClassRef, &Variable::type);
 		class_add_func("is_mutable", TypeBool, &Variable::is_mutable, Flags::PURE);
 		class_add_func("is_extern", TypeBool, &Variable::is_extern, Flags::PURE);
 		
 	add_class(TypeConstant);
 		class_add_element("name", TypeString, &Constant::name);
-		class_add_element("type", TypeClassP, &Constant::type);
+		class_add_element("type", TypeClassRef, &Constant::type);
 
 	add_class(TypeModule);
 		class_add_element("name", TypeString, &Module::filename);

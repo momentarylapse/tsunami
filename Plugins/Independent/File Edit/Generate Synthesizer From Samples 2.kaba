@@ -57,7 +57,7 @@ class XXX extends TsunamiPlugin
 				var index = int(zz["sample"])
 				var offset = 0
 				for k in 0:index
-					offset += len(session.song.samples[k].buf)
+					offset += len(*session.song.samples[k].buf)
 				var s = session.song.samples[index]
 				#print("I {{zz}}")
 
@@ -79,7 +79,7 @@ class XXX extends TsunamiPlugin
 				az["pitch_original"] = int(s.get_value("pitch"))
 				az["start_loop"] = int(s.get_value("start-loop"))
 				az["end_loop"] = int(s.get_value("end-loop"))
-				print("sample: {{s.get_value("start-loop")}}:{{s.get_value("end-loop")}}  {{len(s.buf)}}")
+				print("sample: {{s.get_value("start-loop")}}:{{s.get_value("end-loop")}}  {{len(*s.buf)}}")
 				
 				import_from_zone(az, z, offset) # from preset zone
 				import_from_zone(az, zz, offset) # from instrument zone

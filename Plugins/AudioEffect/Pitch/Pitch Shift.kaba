@@ -3,10 +3,10 @@
 
 use tsunami
 
-const AutoConfigFactor = "range=0:2:0.001,scale=100,unit=%"
+let AutoConfigFactor = "range=0:2:0.001,scale=100,unit=%"
 
-const CHUNK_SIZE = 1024
-const OVERLAP = 512
+let CHUNK_SIZE = 1024
+let OVERLAP = 512
 
 
 class PitchShift extends AudioEffect

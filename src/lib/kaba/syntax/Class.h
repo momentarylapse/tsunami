@@ -181,9 +181,9 @@ extern const Class *TypeException;
 extern const Class *TypeExceptionXfer;
 
 extern const Class *TypeClass;
-extern const Class *TypeClassP;
+extern const Class *TypeClassRef;
 extern const Class *TypeFunction;
-extern const Class *TypeFunctionP;
+extern const Class *TypeFunctionRef;
 extern const Class *TypeFunctionCode;
 extern const Class *TypeFunctionCodeRef;
 

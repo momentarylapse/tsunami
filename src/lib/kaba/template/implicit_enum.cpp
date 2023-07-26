@@ -34,9 +34,9 @@ void AutoImplementer::_add_missing_function_headers_for_enum(Class *t) {
     if (!flags_has(t->flags, Flags::NOAUTO)) {
         class_add_func("parse", t, &enum_parse, Flags::STATIC | Flags::PURE);
             func_add_param("label", TypeString);
-            func_add_param("type", TypeClassP);
+            func_add_param("type", TypeClassRef);
         class_add_func("all", TypeDynamicArray, &enum_all, Flags::STATIC | Flags::PURE);
-            func_add_param("type", TypeClassP);
+            func_add_param("type", TypeClassRef);
     }
 	add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT_ASSIGN);
 	add_operator(OperatorID::ADD, t, t, t, InlineID::INT_ADD, &op_int_add);
@@ -49,14 +49,14 @@ void AutoImplementer::_add_missing_function_headers_for_enum(Class *t) {
 	for (auto f: weak(t->functions)) {
 		if (f->name == "parse") {
 			f->default_parameters.resize(2);
-			auto c = tree->add_constant(TypeClassP, t);
+			auto c = tree->add_constant(TypeClassRef, t);
 			c->as_int64() = (int_p)t;
 			f->mandatory_params = 1;
 			f->default_parameters[1] = add_node_const(c, t->token_id);
 		} else if (f->name == "all") {
 			f->literal_return_type = tree->request_implicit_class_list(t, t->token_id);
 			f->default_parameters.resize(1);
-			auto c = tree->add_constant(TypeClassP, t);
+			auto c = tree->add_constant(TypeClassRef, t);
 			c->as_int64() = (int_p)t;
 			f->mandatory_params = 0;
 			f->default_parameters[0] = add_node_const(c, t->token_id);

@@ -229,17 +229,17 @@ void SIAddXCommands(Context *c) {
 
 	add_func("@sorted", TypeDynamicArray, &array_sort, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("list", TypePointer);
-		func_add_param("class", TypeClassP);
+		func_add_param("class", TypeClassRef);
 		func_add_param("by", TypeString);
 	add_func("@var2str", TypeString, &var2str, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
-		func_add_param("class", TypeClassP);
+		func_add_param("class", TypeClassRef);
 	add_func("@var_repr", TypeString, &var_repr, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
-		func_add_param("class", TypeClassP);
+		func_add_param("class", TypeClassRef);
 	add_func("@dyn", TypeAny, &dynify, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 		func_add_param("var", TypePointer);
-		func_add_param("class", TypeClassP);
+		func_add_param("class", TypeClassRef);
 }
 
 void SIAddPackageBase(Context *c) {

@@ -647,7 +647,7 @@ string b2s(bool b) {
 // convert a pointer to a string
 string p2s(const void *p) {
 	if (!p)
-		return "(nil)";
+		return "nil";
 	char tmp[64];
 #ifdef OS_WINDOWS
 	sprintf(tmp, "0x%p", p);

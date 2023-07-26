@@ -124,7 +124,7 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 				p.kind = NodeKind::MEMORY;
 			} else if (p.kind == NodeKind::CONSTANT) {
 				auto cc = (Constant*)p.p;
-				if (module->tree->flag_function_pointer_as_code and (p.type == TypeFunctionP)) {
+				if (module->tree->flag_function_pointer_as_code and (p.type == TypeFunctionRef)) {
 					auto *fp = (Function*)(int_p)cc->as_int64();
 					p.kind = NodeKind::LABEL;
 					p.p = fp->_label;

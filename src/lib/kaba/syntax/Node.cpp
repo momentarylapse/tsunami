@@ -511,7 +511,7 @@ shared<Node> add_node_func_name(Function *f, int token_id) {
 }
 
 shared<Node> add_node_class(const Class *c, int token_id) {
-	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP, Flags::CONST, token_id);
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassRef, Flags::CONST, token_id);
 }
 
 

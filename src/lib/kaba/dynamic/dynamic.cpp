@@ -165,41 +165,59 @@ string callable_repr(const void *p, const Class *type) {
 }
 
 string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
-
+//	msg_write(type->name);
 	// fixed
 	if (type == TypeInt) {
-		return str(*(int*)p);
+		return str(*reinterpret_cast<const int*>(p));
 	} else if (type == TypeFloat32) {
-		return f2s(*(float*)p, 6);
+		return f2s(*reinterpret_cast<const float*>(p), 6);
 	} else if (type == TypeFloat64) {
-		return f2s((float)*(double*)p, 6);
+		return f642s(*reinterpret_cast<const double*>(p), 6);
 	} else if (type == TypeBool) {
-		return b2s(*(bool*)p);
-	} else if (type == TypeClass) {
-		return class_repr((Class*)p);
+		return b2s(*reinterpret_cast<const bool*>(p));
+	//} else if (type == TypeClass) {
+	//	return class_repr(reinterpret_cast<const Class*>(p));
 	} else if (type->is_callable_fp() or type->is_callable_bind()) {
 		return callable_repr(p, type);
 	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
 		// probably not...
-		return func_repr((Function*)p);
+		return func_repr(reinterpret_cast<const Function*>(p));
 	} else if (type == TypeSpecialFunction) {
-		return format("<special function %s>", ((SpecialFunction*)p)->name);
+		return format("<special function %s>", reinterpret_cast<const SpecialFunction*>(p)->name);
 	} else if (type == TypeAny) {
 		if (as_repr)
-			return ((Any*)p)->repr();
+			return reinterpret_cast<const Any*>(p)->repr();
 		else
 			return reinterpret_cast<const Any*>(p)->str();
+	} else if (type->is_reference()) {
+		auto *pp = *(void**)p;
+		// auto deref?
+		if (type->param[0] == TypeClass)
+			return class_repr(*reinterpret_cast<const Class* const *>(p));
+		if (type->param[0]->is_callable())
+			return var_repr_str(pp, type->param[0], as_repr);
+		if (type->param[0] == TypeFunction)
+			return var_repr_str(pp, type->param[0], as_repr);
+		if (type->param[0]->is_callable())
+			return var_repr_str(pp, type->param[0], as_repr);
+		if (type->param[0] != TypeVoid)
+			return /*"&" +*/ var_repr_str(pp, type->param[0], as_repr);
+		return p2s(pp);
 	} else if (type->is_some_pointer()) {
 		auto *pp = *(void**)p;
 		// auto deref?
 		if (pp and (type->param[0] != TypeVoid))
+			return /*"&" +*/ var_repr_str(pp, type->param[0], as_repr);
+		if (pp and type->param[0]->is_callable())
+			return var_repr_str(pp, type->param[0], as_repr);
+		if (pp and type->param[0] == TypeFunction)
 			return var_repr_str(pp, type->param[0], as_repr);
 		return p2s(pp);
 	} else if (type == TypeString) { // covered by user code...
 		if (as_repr)
-			return ((string*)p)->repr();
+			return reinterpret_cast<const string*>(p)->repr();
 		else
-			return *(string*)p;
+			return *reinterpret_cast<const string*>(p);
 	} else if (type == TypeCString) {
 		if (as_repr)
 			return string((char*)p).repr();
@@ -207,13 +225,13 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 			return string((char*)p);
 	} else if (type == TypePath) { // covered by user code...
 		if (as_repr)
-			return ((Path*)p)->str().repr();
+			return reinterpret_cast<const Path*>(p)->str().repr();
 		else
-			return ((Path*)p)->str();
+			return reinterpret_cast<const Path*>(p)->str();
 	} else if (type->is_enum()) {
-		return find_enum_label(type, *(int*)p);
+		return find_enum_label(type, *reinterpret_cast<const int*>(p));
 	} else if (type->is_optional()) {
-		if (*(bool*)((int_p)p + type->size - 1))
+		if (*reinterpret_cast<const bool*>((int_p)p + type->size - 1))
 			return var_repr_str(p, type->param[0], as_repr);
 		return "nil";
 	} else if (type->is_list()) {

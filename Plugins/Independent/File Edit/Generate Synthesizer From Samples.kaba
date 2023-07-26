@@ -129,8 +129,8 @@ class XXX extends TsunamiPlugin
 		#let buf = *source.origin.buf
 		
 		var buf: AudioBuffer
-		buf.resize(len(source.buf) * pow(2, (from - to)/12.0))
-		print("   {{len(source.buf)}} {{len(buf)}}")
+		buf.resize(len(*source.buf) * pow(2, (from - to)/12.0))
+		print("   {{len(*source.buf)}} {{len(buf)}}")
 	#	PitchShift* ps = CreateAudioEffect(session, "Pitch Shift")
 	#	ps.config.factor = pow(2, (to - from)/12.0)
 	#	ps.process(buf)

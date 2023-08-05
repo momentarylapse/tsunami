@@ -7,8 +7,14 @@
 
 #include "../kaba.h"
 #include "Compiler.h"
+#include "BackendAmd64.h"
+#include "BackendX86.h"
+#include "BackendARM.h"
+#include "Serializer.h"
+#include "../Interpreter.h"
 #include "../asm/asm.h"
 #include "../../base/set.h"
+#include "../../base/iter.h"
 #include "../../os/msg.h"
 #include <stdio.h>
 #include <functional>
@@ -715,6 +721,159 @@ void Compiler::_compile() {
 #ifdef OS_WINDOWS
 	register_functions(module);
 #endif
+}
+
+bool is_func(shared<Node> n) {
+	return (n->kind == NodeKind::CALL_FUNCTION or n->kind == NodeKind::CALL_VIRTUAL or n->kind == NodeKind::FUNCTION);
+}
+
+int check_needed(SyntaxTree *tree, Function *f) {
+	int ref_count = 0;
+	tree->transform([&ref_count, f](shared<Node> n) {
+		if (is_func(n) and n->as_func() == f)
+			ref_count ++;
+		return n;
+	});
+
+	if (f->is_static() and f->name == "main")
+		ref_count ++;
+	if (f->virtual_index >= 0)
+		ref_count ++;
+	// well, for now, only allow these functions:
+	if (f->name != Identifier::Func::ASSIGN and f->name != Identifier::Func::DELETE and f->name != Identifier::Func::INIT)
+		ref_count ++;
+
+	return ref_count;
+}
+
+Backend *create_backend(Serializer *s) {
+	if (config.target.instruction_set == Asm::InstructionSet::AMD64)
+		return new BackendAmd64(s);
+	if (config.target.instruction_set == Asm::InstructionSet::X86)
+		return new BackendX86(s);
+	if (config.target.is_arm())
+		return new BackendARM(s);
+	s->module->do_error("unable to create a backend for the architecture");
+	return nullptr;
+}
+
+void Compiler::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list) {
+	if (config.verbose and config.allow_output(f, "asm"))
+		msg_write("serializing " + f->long_name() + " -------------------");
+	f->show("asm");
+
+
+	// skip unused functions?
+	if (config.remove_unused)
+		if (check_needed(tree, f) == 0)
+			return;
+
+	if (config.verbose and config.allow_output(f, "ser:0"))
+		f->block->show(TypeVoid);
+
+	if (config.target.interpreted) {
+		auto x = new Serializer(module, list);
+		x->cur_func_index = index;
+		x->serialize_function(f);
+		x->fix_return_by_ref();
+		if (!module->interpreter)
+			module->interpreter = new Interpreter(module);
+		module->interpreter->add_function(f, x);
+		return;
+	}
+
+
+	auto x = new Serializer(module, list);
+	x->cur_func_index = index;
+	x->serialize_function(f);
+	x->fix_return_by_ref();
+	auto be = create_backend(x);
+
+	try {
+		be->process(f, index);
+		be->assemble();
+	} catch (Exception &e) {
+		throw e;
+	} catch (Asm::Exception &e) {
+		throw Exception(e, module, f);
+	}
+	module->functions_to_link.append(be->list->wanted_label);
+	delete be;
+	delete x;
+
+}
+
+
+string function_link_name(Function *f);
+
+void function_update_address(Function *f, Asm::InstructionWithParamsList *list) {
+	f->address = list->_label_value(f->_label);
+	for (Block *b: f->all_blocks()) {
+		b->_start = (void*)list->_label_value(b->_label_start);
+		b->_end = (void*)list->_label_value(b->_label_end);
+	}
+}
+
+void Compiler::compile_functions(char *oc, int &ocs) {
+	auto *list = new Asm::InstructionWithParamsList(0);
+	Array<int> func_offset;
+
+	auto external = context->external.get();
+
+	// link external functions
+	int func_no = 0;
+	for (Function *f: tree->functions) {
+		if (f->is_template() or  f->is_macro()) {
+			//msg_write("SKIP COMPILE " + f->signature());
+		} else if (f->is_extern()) {
+			string name = function_link_name(f);
+			f->address = (int_p)external->get_link(name);
+			if (f->address == 0)
+				f->address = (int_p)external->get_link(f->cname(f->owner()->base_class));
+			if (f->address == 0)
+				module->do_error_link(format("external function '%s' not linkable", name));
+		} else {
+			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
+		}
+	}
+
+	// create assembler
+	for (auto&& [i,f]: enumerate(tree->functions)) {
+		func_offset.add(list->num);
+		if (!f->is_extern() and !f->is_template() and !f->is_macro()) {
+			assemble_function(i, f, list);
+		}
+	}
+	func_offset.add(list->num);
+
+
+	//if (config.verbose and config.allow_output(cur_func, "comp:x"))
+	//	list->show();
+
+	// assemble into opcode
+	try {
+		list->optimize(oc, ocs);
+		list->compile(oc, ocs);
+	} catch(Asm::Exception &e) {
+		list->show();
+		Function *f = nullptr;
+		for (int i=0; i<func_offset.num; i++)
+			if (e.line >= func_offset[i] and e.line < func_offset[i+1]) {
+				f = tree->functions[i];
+				break;
+			}
+		msg_write(f->long_name());
+		throw Exception(e, module, f);
+	}
+
+
+	// get function addresses
+	for (auto *f: tree->functions)
+		if (!f->is_extern() and !f->is_template() and !f->is_macro())
+			function_update_address(f, list);
+
+	if (!config.target.interpreted)
+		delete list;
 }
 
 };

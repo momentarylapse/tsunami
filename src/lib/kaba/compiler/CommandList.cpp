@@ -7,7 +7,7 @@
 
 #include "CommandList.h"
 #include "SerialNode.h"
-#include "serializer.h"
+#include "Serializer.h"
 #include "../kaba.h"
 #include "../../os/msg.h"
 

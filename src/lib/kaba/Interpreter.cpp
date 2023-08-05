@@ -7,7 +7,7 @@
 
 #include "Interpreter.h"
 #include "kaba.h"
-#include "compiler/serializer.h"
+#include "compiler/Serializer.h"
 #include "dynamic/call.h"
 #include "../os/msg.h"
 

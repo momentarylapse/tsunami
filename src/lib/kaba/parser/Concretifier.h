@@ -37,8 +37,7 @@ public:
 	enum TypeCastId {
 		NONE = -1,
 		DEREFERENCE = -2,
-		REFERENCE_LEGACY = -3,
-		REFERENCE_NEW = -4,
+		REFERENCE = -3,
 		OWN_STRING = -10,
 		ABSTRACT_LIST = -20,
 		ABSTRACT_TUPLE = -21,
@@ -64,6 +63,7 @@ public:
 	shared<Node> concretify_array_builder_for(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_array_builder_for_inner(shared<Node> n_for, shared<Node> n_exp, shared<Node> n_cmp, const Class *type_el, Block *block, const Class *ns, int token_id);
 	shared<Node> concretify_operator(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_block(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_call(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_return(shared<Node> node, Block *block, const Class *ns);
@@ -144,8 +144,12 @@ public:
 	shared<Node> build_function_pipe(const shared<Node> &input, const shared<Node> &func, Block *block, const Class *ns, int token_id);
 	shared<Node> build_pipe_sort(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
 	shared<Node> build_pipe_filter(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
+	shared<Node> build_pipe_len(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
 	shared<Node> build_pipe_map(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
 	shared<Node> build_lambda_new(const shared<Node> &param, const shared<Node> &expression, Block *block, const Class *ns, int token_id);
+	shared<Node> try_build_pipe_map_array(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
+	shared<Node> try_build_pipe_map_optional(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
+	shared<Node> try_build_pipe_map_direct(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
 
 
 

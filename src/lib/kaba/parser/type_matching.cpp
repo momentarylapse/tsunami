@@ -376,10 +376,8 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 		return node;
 	if (cast.cast == TypeCastId::DEREFERENCE)
 		return node->deref();
-	if (cast.cast == TypeCastId::REFERENCE_LEGACY)
-		return node->ref_raw(tree);
-	if (cast.cast == TypeCastId::REFERENCE_NEW)
-		return node->ref_new(tree);
+	if (cast.cast == TypeCastId::REFERENCE)
+		return node->ref(tree);
 	if (cast.cast == TypeCastId::OWN_STRING)
 		return add_converter_str(node, false);
 	if (cast.cast == TypeCastId::ABSTRACT_LIST) {

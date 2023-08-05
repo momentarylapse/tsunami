@@ -358,7 +358,7 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 			operand->type = t_ref;
 			return {operand};
 		}
-		return {operand->ref_new(t_ref)};
+		return {operand->ref(t_ref)};
 	}
 
 
@@ -650,7 +650,7 @@ shared<Node> SyntaxTree::conv_calls(shared<Node> c) {
 	if ((c->kind == NodeKind::STATEMENT) and (c->as_statement()->id == StatementID::RETURN))
 		if (c->params.num > 0) {
 			if ((c->params[0]->type->is_array()) /*or (c->Param[j]->Type->IsSuperArray)*/) {
-				c->set_param(0, c->params[0]->ref_raw(this));
+				c->set_param(0, c->params[0]->ref(this));
 			}
 			return c;
 		}
@@ -675,7 +675,7 @@ shared<Node> SyntaxTree::conv_calls(shared<Node> c) {
 		// parameters, instance: class as reference
 		for (int j=0;j<c->params.num;j++)
 			if (c->params[j] and needs_conversion(j)) {
-				r->set_param(j, c->params[j]->ref_raw(this));
+				r->set_param(j, c->params[j]->ref(this));
 				changed = true;
 			}
 
@@ -693,7 +693,7 @@ shared<Node> SyntaxTree::conv_calls(shared<Node> c) {
 
 // remove &*x
 shared<Node> SyntaxTree::conv_easyfy_ref_deref(shared<Node> c, int l) {
-	if ((c->kind == NodeKind::REFERENCE_RAW) or (c->kind == NodeKind::REFERENCE_NEW)) {
+	if (c->kind == NodeKind::REFERENCE) {
 		if (c->params[0]->kind == NodeKind::DEREFERENCE) {
 			// remove 2 knots...
 			return c->params[0]->params[0];
@@ -833,7 +833,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 //             -> index
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
-				c->params[0]->ref_new(this), // array
+				c->params[0]->ref(this), // array
 				add_node_operator_by_inline(InlineID::INT_MULTIPLY,
 						c->params[1], // ref
 						add_node_const(add_constant_int(el_type->size))),
@@ -869,11 +869,11 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 //        -> shift
 
 		//if (c->link_no == 0)
-		//	return c->params[0]->ref_raw(this)->deref(el_type);
+		//	return c->params[0]->ref(this)->deref(el_type);
 		// FIXME this causes a bug, probably by omtimizing away *(&x) and changing types
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
-				c->params[0]->ref_raw(this), // struct
+				c->params[0]->ref(this), // struct
 				add_node_const(add_constant_int(c->link_no)),
 				c->token_id,
 				get_pointer(el_type, c->token_id))->deref();
@@ -997,7 +997,7 @@ bool node_is_executable(shared<Node> n) {
 	if ((n->kind == NodeKind::CONSTANT) or (n->kind == NodeKind::VAR_LOCAL) or (n->kind == NodeKind::VAR_GLOBAL))
 		return false;
 	if ((n->kind == NodeKind::ADDRESS_SHIFT) or (n->kind == NodeKind::ARRAY) or (n->kind == NodeKind::DYNAMIC_ARRAY)
-			or (n->kind == NodeKind::REFERENCE_RAW) or (n->kind == NodeKind::REFERENCE_NEW) or (n->kind == NodeKind::DEREFERENCE)
+			or (n->kind == NodeKind::REFERENCE) or (n->kind == NodeKind::DEREFERENCE)
 			or (n->kind == NodeKind::DEREF_ADDRESS_SHIFT))
 		return node_is_executable(n->params[0]);
 	return true;
@@ -1194,7 +1194,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		}
 
 		// &for_var = &array[index]
-		auto cmd_var_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, var, el->ref_raw(this));
+		auto cmd_var_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, var, el->ref(this));
 		block->params.insert(cmd_var_assign, 0);
 
 		return nn;

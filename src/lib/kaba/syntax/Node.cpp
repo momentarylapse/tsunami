@@ -83,9 +83,7 @@ string kind2str(NodeKind kind) {
 		return "dynamic array element";
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return "pointer as array element";
-	if (kind == NodeKind::REFERENCE_RAW)
-		return "raw address operator";
-	if (kind == NodeKind::REFERENCE_NEW)
+	if (kind == NodeKind::REFERENCE)
 		return "reference operator";
 	if (kind == NodeKind::DEREFERENCE)
 		return "dereferencing";
@@ -184,9 +182,7 @@ string Node::signature(const Class *ns) const {
 		return t;
 	if (kind == NodeKind::POINTER_AS_ARRAY)
 		return t;
-	if (kind == NodeKind::REFERENCE_RAW)
-		return t;
-	if (kind == NodeKind::REFERENCE_NEW)
+	if (kind == NodeKind::REFERENCE)
 		return t;
 	if (kind == NodeKind::DEREFERENCE)
 		return t;
@@ -370,27 +366,15 @@ shared<Node> Node::shallow_copy() const {
 	return r;
 }
 
-shared<Node> Node::ref_new(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE_NEW, 0, t, Flags::NONE, token_id);
+shared<Node> Node::ref(const Class *t) const {
+	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, Flags::NONE, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
-shared<Node> Node::ref_new(SyntaxTree *tree) const {
-	return ref_raw(tree->request_implicit_class_reference(type, token_id));
-}
-
-shared<Node> Node::ref_raw(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE_RAW, 0, t, Flags::NONE, token_id);
-	c->set_num_params(1);
-	c->set_param(0, const_cast<Node*>(this));
-	return c;
-}
-
-shared<Node> Node::ref_raw(SyntaxTree *tree) const {
-	return ref_raw(tree->request_implicit_class_reference(type, token_id));
-	//return ref_new(tree->request_implicit_class_pointer_not_null(type, token_id));
+shared<Node> Node::ref(SyntaxTree *tree) const {
+	return ref(tree->request_implicit_class_reference(type, token_id));
 }
 
 shared<Node> Node::deref(const Class *override_type) const {

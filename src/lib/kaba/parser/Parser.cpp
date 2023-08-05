@@ -153,6 +153,9 @@ void Parser::do_error(const string &str, int token_id) {
 }
 
 void Parser::do_error_exp(const string &str, int override_token_id) {
+	if (Exp.lines.num == 0)
+		throw Exception(str, "", 0, 0, tree->module);
+
 	// what data do we have?
 	int token_id = Exp.cur_token();
 
@@ -603,13 +606,9 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 	if (try_consume("(")) {
 		operand = parse_abstract_operand_greedy(block, true);
 		expect_identifier(")", "')' expected");
-	/*} else if (try_consume("&!")) { // &! -> new address operator
+	} else if (try_consume("&")) { // & -> address operator
 		int token = Exp.cur_token();
-		operand = parse_abstract_operand(block)->ref_new(TypeUnknown);
-		operand->token_id = token;*/
-	} else if (try_consume("&")) { // & -> legacy address operator
-		int token = Exp.cur_token();
-		operand = parse_abstract_operand(block)->ref_raw(TypeUnknown);
+		operand = parse_abstract_operand(block)->ref(TypeUnknown);
 		operand->token_id = token;
 	} else if (try_consume("*")) { // * -> dereference
 		int token = Exp.cur_token();

@@ -227,7 +227,7 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 		c->params[0]->link_no = new_addr;
 		return c->params[0].get();
 
-	} else if ((c->kind == NodeKind::REFERENCE_RAW) or (c->kind == NodeKind::REFERENCE_NEW)) {
+	} else if (c->kind == NodeKind::REFERENCE) {
 		auto p0 = c->params[0];
 		if (p0->kind == NodeKind::VAR_GLOBAL) {
 			return new Node(NodeKind::ADDRESS, (int_p)p0->as_global_p(), c->type);

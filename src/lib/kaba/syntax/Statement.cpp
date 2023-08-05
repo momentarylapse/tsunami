@@ -52,6 +52,7 @@ int add_special_function(const string &name, SpecialFunctionID id, int min_param
 void SIAddStatements() {
 	// statements
 	add_statement(Identifier::RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
+	add_statement("-block-return-", StatementID::BLOCK_RETURN, 1);
 	add_statement(Identifier::IF, StatementID::IF, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
 	add_statement("-if/unwrap-", StatementID::IF_UNWRAP, 3); // [EXPR, OUT_VAR, BLOCK, [ELSE-BLOCK]]
 	add_statement(Identifier::WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
@@ -72,7 +73,7 @@ void SIAddStatements() {
 	add_statement(Identifier::LAMBDA, StatementID::LAMBDA);
 	add_statement(Identifier::FUNC, StatementID::FUNC);
 	add_statement(Identifier::RAW_FUNCTION_POINTER, StatementID::RAW_FUNCTION_POINTER, 1);
-	add_statement(Identifier::TRUST_ME, StatementID::TRUST_ME, 1);
+	add_statement(Identifier::TRUST_ME, StatementID::TRUST_ME, 1); // [BLOCK]
 
 	add_special_function(Identifier::SIZEOF, SpecialFunctionID::SIZEOF, 1, 1);
 	add_special_function(Identifier::TYPEOF, SpecialFunctionID::TYPEOF, 1, 1);
